@@ -17,7 +17,7 @@ QMAKE_LIBDIR = $(YADEDYNLIBPATH)
 DESTDIR = $(YADEDYNLIBPATH) 
 CONFIG += release \
           warn_on \
-          dll 
+          staticlib 
 TEMPLATE = lib 
 HEADERS += BroadCollider.hpp \
            Contact.hpp \

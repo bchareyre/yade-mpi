@@ -16,7 +16,7 @@ QMAKE_LIBDIR = $(YADEDYNLIBPATH)
 DESTDIR = $(YADEDYNLIBPATH) 
 CONFIG += release \
           warn_on \
-          dll 
+          staticlib 
 TEMPLATE = lib 
 HEADERS += BoundingVolume.hpp \
            BoundingVolumeAssembly.hpp \
