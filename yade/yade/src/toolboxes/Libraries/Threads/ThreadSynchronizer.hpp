@@ -43,16 +43,21 @@ class ThreadSynchronizer
 {
 	private : boost::mutex mutex;
 	private : boost::condition cond;
-	private : bool b ;
-
-	public : ThreadSynchronizer(bool bo = true);
+	
+	private : int i;
+	private : int nbBlocked;
+	private : int nbThreads;
+	
+	public : ThreadSynchronizer();
 	public : ~ThreadSynchronizer();
 	
-	public : void wait1();
-	public : void wait2();
-	public : void go();
-};
+	public : int insertNewThread();
+	
+	public : void wait(int id);
 
+	public : void signal();
+
+};
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 

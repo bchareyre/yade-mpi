@@ -9,6 +9,8 @@ echo 'cd $TMPDIR'										>> makeSymLinkIncl
 echo 'ln -s $ORGDIR/$1 `basename $TMPNAME`'							>> makeSymLinkIncl
 echo 'cd $ORGDIR'										>> makeSymLinkIncl
 
+rm -rf $YADEINCLUDEPATH/*
+
 chmod a+x ./makeSymLinkIncl
 
 find ../src/ -name "*.hpp" -exec ./makeSymLinkIncl {} \;

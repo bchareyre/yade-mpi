@@ -40,15 +40,16 @@
 
 class GLViewer : public QGLViewer
 {
+	
 	private : shared_ptr<FpsTracker> fpsTracker;
-	private : long int& frame;
 
 	// construction
-	public : GLViewer (QWidget * parent=0);
+	public : GLViewer (QWidget * parent=0, QGLWidget * shareWidget=0);
+	//public : GLViewer (QGLContext * context, QWidget * parent=0);
 	public : ~GLViewer ();
 
 	public : void draw();
-	public : void animate();
+//	public : void animate();
 
 	protected : void mouseMoveEvent(QMouseEvent * e);
 	protected : void mousePressEvent(QMouseEvent *e);

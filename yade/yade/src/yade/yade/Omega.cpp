@@ -51,9 +51,9 @@ void Omega::logMessage(const string& str)
 
 void Omega::init()
 {
-	fileName="";
-	maxiter = 0; // unlimited
-	iter = 0;
+	simulationFileName="";
+	maxIteration = 0; // unlimited
+	currentIteration = 0;
 	automatic=false;
 	progress=false;
 
@@ -65,16 +65,15 @@ void Omega::init()
 	logFile = shared_ptr<ofstream>(new ofstream("../data/log.xml", ofstream::out | ofstream::app));
 
 	startingSimulationTime = second_clock::local_time();
-
 	*logFile << "<Simulation" << " Date =\"" << startingSimulationTime << "\">" << endl;
-
 
 	// build dynlib information list
 	buildDynlibList();
 
+	// build simulation loop thread
+	synchronizer     = shared_ptr<ThreadSynchronizer>(new ThreadSynchronizer());
 	simulationLoop   = shared_ptr<SimulationLoop>(new SimulationLoop());
 	simulationThread = shared_ptr<boost::thread>(new boost::thread(*simulationLoop));
-	synchronizer     = shared_ptr<ThreadSynchronizer>(new ThreadSynchronizer());
 
 }
 
@@ -176,61 +175,55 @@ bool Omega::getDynlibType(const string& libName, string& type)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-long int& Omega::getIterReference()
+void Omega::incrementCurrentIteration()
 {
-	return iter;
+	++currentIteration;
 }
 
-long int Omega::getIter()
+long int Omega::getCurrentIteration()
 {
-	return iter;
+	return currentIteration;
 }
 
-/// FIXME - everything below SHOULD NOT be inside Omega.
 
 void Omega::setGravity(Vector3r g)
 {
-	//gravity_x = g.x();
-	//gravity_y = g.y();
-	//gravity_z = g.z();
 	gravity = g;
 }
 
 Vector3r Omega::getGravity()
 {
-	return gravity; //Vector3r(gravity_x,gravity_y,gravity_z);
+	return gravity; 
 }
 
-/// FIXME - maybe some settings class, or something....
-
-void Omega::setTimestep(const string t)
+void Omega::setTimeStep(const string t)
 {
 	dt = lexical_cast<float>(t);
 }
 
-float Omega::getTimestep()
+float Omega::getTimeStep()
 {
 	return dt;
 }
 
-void Omega::setFileName(const string f)
+void Omega::setSimulationFileName(const string f)
 {
-	fileName = f;
+	simulationFileName = f;
 };
 
-string Omega::getFileName()
+string Omega::getSimulationFileName()
 {
-	return fileName;
+	return simulationFileName;
 }
 
-void Omega::loadTheFile()
+void Omega::loadSimulation()
 {
 
-	if( Omega::instance().getFileName().size() != 0  &&  filesystem::exists(fileName) )
+	if( Omega::instance().getSimulationFileName().size() != 0  &&  filesystem::exists(simulationFileName) )
 	{
 
-		IOManager::loadFromFile("XMLManager",fileName,"rootBody",Omega::instance().rootBody);
-		Omega::instance().logMessage("Loading file " + fileName);
+		IOManager::loadFromFile("XMLManager",simulationFileName,"rootBody",Omega::instance().rootBody);
+		Omega::instance().logMessage("Loading file " + simulationFileName);
 	}
 	else
 	{
@@ -239,14 +232,14 @@ void Omega::loadTheFile()
 	}
 }
 
-void Omega::setMaxiter(const string m)
+void Omega::setMaxIteration(const string m)
 {
-	maxiter = lexical_cast<long int>(m);
+	maxIteration = lexical_cast<long int>(m);
 }
 
-long int Omega::getMaxiter()
+long int Omega::getMaxIteration()
 {
-	return maxiter;
+	return maxIteration;
 }
 
 void Omega::setAutomatic(bool b)
@@ -268,3 +261,25 @@ bool Omega::getProgress()
 {
 	return progress;
 }
+
+
+void Omega::waitMyTurn(int id)
+{
+	synchronizer->wait(id);
+}
+
+void Omega::endMyTurn()
+{
+	synchronizer->signal();
+}
+
+int Omega::getNewTurnId()
+{
+	return synchronizer->insertNewThread();
+}
+
+void Omega::waitForSimulationEnd()
+{
+	simulationThread->join();
+}
+

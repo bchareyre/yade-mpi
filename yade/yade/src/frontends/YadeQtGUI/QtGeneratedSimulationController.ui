@@ -15,6 +15,12 @@
     <property name="caption">
         <string>Simulation Controller</string>
     </property>
+    <property name="frameShape">
+        <enum>NoFrame</enum>
+    </property>
+    <property name="frameShadow">
+        <enum>Plain</enum>
+    </property>
     <widget class="QLabel">
         <property name="name">
             <cstring>tlMSecond</cstring>
@@ -655,9 +661,16 @@
         <receiver>QtGeneratedSimulationController</receiver>
         <slot>pbLoadClicked()</slot>
     </connection>
+    <connection>
+        <sender>pbNewView</sender>
+        <signal>clicked()</signal>
+        <receiver>QtGeneratedSimulationController</receiver>
+        <slot>pbNewViewClicked()</slot>
+    </connection>
 </connections>
 <slots>
     <slot>pbLoadClicked()</slot>
+    <slot>pbNewViewClicked()</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

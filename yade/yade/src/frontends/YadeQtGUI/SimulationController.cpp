@@ -5,7 +5,7 @@
  
 
 
-SimulationController::SimulationController(QWidget * parent) : QtGeneratedSimulationController(parent,"name")
+SimulationController::SimulationController(QWidget * parent) : QtGeneratedSimulationController(parent,"SimulationController")
 {
 	setMinimumSize(size());
 	setMaximumSize(size());
@@ -29,11 +29,19 @@ void SimulationController::pbLoadClicked()
 
 	if (!fileName.isEmpty() && selectedFilter == "XML Yade File (*.xml)")
 	{
-		Omega::instance().setFileName(fileName);
-		Omega::instance().loadTheFile();
+		Omega::instance().setSimulationFileName(fileName);
+		Omega::instance().loadSimulation();
 
-		glViewer = shared_ptr<GLViewer>(new GLViewer(this->parentWidget()->parentWidget()));
-		glViewer->show();
+		if (glViews.size()==0)
+		{
+ 			glViews.push_back(new GLViewer(this->parentWidget()->parentWidget()));
+			glViews.back()->show();
+		}
 	}
 }
 
+void SimulationController::pbNewViewClicked()
+{
+	glViews.push_back(new GLViewer( this->parentWidget()->parentWidget(), &(*glViews.front()) ) );
+	glViews.back()->show();
+}

@@ -15,6 +15,7 @@ LIBS += -lSerialization \
         -lInteractionHashMap \
         -lBodyAssocVec \
         -lBodyRedirectionVector \
+        -lThreads \
         -lboost_thread \
         -lboost_filesystem \
         -lboost_date_time \
@@ -37,6 +38,7 @@ QMAKE_LIBDIR = ../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../toolboxes/DataStructures/InteractionContainer/InteractionHashMap/$(YADEDYNLIBPATH) \
                ../../toolboxes/DataStructures/BodyContainer/BodyAssocVec/$(YADEDYNLIBPATH) \
                ../../toolboxes/DataStructures/BodyContainer/BodyRedirectionVector/$(YADEDYNLIBPATH) \
+               ../../toolboxes/Libraries/Threads/$(YADEDYNLIBPATH) \
                ../../toolboxes/DataStructures/BodyContainer/BodyVector/$(YADEDYNLIBPATH) \
                ../../toolboxes/DataStructures/InteractionContainer/$(YADEDYNLIBPATH) \
                ../../toolboxes/DataStructures/BodyContainer/$(YADEDYNLIBPATH) \
@@ -52,11 +54,9 @@ HEADERS += Chrono.hpp \
            ActorParameter.hpp \
            FrontEnd.hpp \
            FileGenerator.hpp \
-           SimulationLoop.hpp \
-           ThreadSynchronizer.hpp 
+           SimulationLoop.hpp 
 SOURCES += Chrono.cpp \
            Omega.cpp \
            yade.cpp \
            FrontEnd.cpp \
-           SimulationLoop.cpp \
-           ThreadSynchronizer.cpp 
+           SimulationLoop.cpp 

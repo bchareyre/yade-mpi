@@ -28,21 +28,21 @@ using namespace std;
 void help()
 {
 	cout << "\n\
-Yet Another Dynamic Engine, pre-alpha.\n\
-\n\
-	-h	- print this help\n\
-	-i	- specify name of frontend interface library: \n\
-		  	YadeQtGUI, NullGUI\n\
-		  (other GUIs, like ncurses, command line and\n\
-		  network-based interfaces can be added later)\n\
-	-f	- specify filename to load\n\
-	-m	- specify maximum number of iterations ( 0 = unlimited,\n\
-		  tested every 100th iteration)\n\
-	-p	- print progress every 100th iteration\n\
-	-t	- set time step in seconds\n\
-	-a	- automatic start of computation\n\
-\n\
-";
+		Yet Another Dynamic Engine, pre-alpha.\n\
+		\n\
+			-h	- print this help\n\
+			-i	- specify name of frontend interface library: \n\
+					YadeQtGUI, NullGUI\n\
+				(other GUIs, like ncurses, command line and\n\
+				network-based interfaces can be added later)\n\
+			-f	- specify filename to load\n\
+			-m	- specify maximum number of iterations ( 0 = unlimited,\n\
+				tested every 100th iteration)\n\
+			-p	- print progress every 100th iteration\n\
+			-t	- set time step in seconds\n\
+			-a	- automatic start of computation\n\
+		\n\
+		";
 }
 
 int main(int argc, char *argv[])
@@ -53,14 +53,14 @@ int main(int argc, char *argv[])
 	while((ch=getopt(argc,argv,"hi:f:m:t:ap"))!=-1) // use ':', when additional parameter optarg is expected and used
 		switch(ch)
 		{
-			case 'h' : help();					return 1;
-			case 'i' : frontend = optarg;				break;
-			case 'f' : Omega::instance().setFileName(optarg);	break;
-			case 'm' : Omega::instance().setMaxiter(optarg);	break;
-			case 't' : Omega::instance().setTimestep(optarg);	break;
-			case 'a' : Omega::instance().setAutomatic(true);	break;
-			case 'p' : Omega::instance().setProgress(true);		break; // FIXME change that !!!
-			default  : help();					return 1;
+			case 'h' : help();						return 1;
+			case 'i' : frontend = optarg;					break;
+			case 'f' : Omega::instance().setSimulationFileName(optarg);	break;
+			case 'm' : Omega::instance().setMaxIteration(optarg);		break;
+			case 't' : Omega::instance().setTimeStep(optarg);		break;
+			case 'a' : Omega::instance().setAutomatic(true);		break;
+			case 'p' : Omega::instance().setProgress(true);			break; // FIXME change that !!!
+			default  : help();						return 1;
 	}
 
 	if( frontend.size() == 0 )

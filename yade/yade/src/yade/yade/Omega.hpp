@@ -65,19 +65,21 @@ class Omega : public Singleton<Omega>
 {
 	public : shared_ptr<FrontEnd> gui;
 
-	public : shared_ptr<boost::thread> simulationThread;
-	public : shared_ptr<SimulationLoop> simulationLoop; // FIXME put private and add function into omega to build them
+	private : shared_ptr<boost::thread> simulationThread;
+	private : shared_ptr<SimulationLoop> simulationLoop;
+	public : shared_ptr<ThreadSynchronizer> synchronizer; // FIXME put private + add function waitMyTuren and finishedMyTurn
 
-	public : shared_ptr<ThreadSynchronizer> synchronizer; // FIXME put private and add function into omega to build them
-
+	public : void waitMyTurn(int id); // FIXME put private + add function waitMyTuren and finishedMyTurn
+	public : void endMyTurn(); // FIXME put private + add function waitMyTuren and finishedMyTurn
+	public : void waitForSimulationEnd(); // FIXME put private + add function waitMyTuren and finishedMyTurn
+	public : int getNewTurnId();
+	
 	public : map<string,string> dynlibsType;
 
 	public : bool getDynlibType(const string& libName,string& type);
 
 	public : shared_ptr<ofstream> logFile;
 
-// FIXME - this must be a pimpl, or removed somewhere else. (circular dependency loop : 4 hours lost to find it, janek)
-	//private : float gravity_x,gravity_y,gravity_z;
 	private : Vector3r gravity;
 	public : Vector3r getGravity();
 	public : void setGravity(Vector3r g);
@@ -90,22 +92,23 @@ class Omega : public Singleton<Omega>
 	private : void registerDynlibType(const string& name);
 
 	public	: float 	dt;
-	public	: void 		setTimestep(const string);
-	public	: float 	getTimestep();
+	public	: void 		setTimeStep(const string);
+	public	: float 	getTimeStep();
 
+	private	: string 	simulationFileName;
+	public	: void 		setSimulationFileName(const string);
+	public	: string 	getSimulationFileName();
+	public	: void		loadSimulation();
 
-	private	: string 	fileName;
-	public	: void 		setFileName(const string);
-	public	: string 	getFileName();
-	public	: void		loadTheFile();
-
-	private	: long int 	maxiter;
-	public  : long int	iter;
-	public  : long int&	getIterReference();
-	public  : long int	getIter();
-
-	public	: void 		setMaxiter(const string);
-	public	: long int 	getMaxiter();
+	private	: long int 	maxIteration;
+	public  : long int	currentIteration;
+	//public  : const long int& getCurrentIteration() const;
+	public  : long int getCurrentIteration();
+	public  : void incrementCurrentIteration();
+	
+	public	: void 		setMaxIteration(const string);
+	public	: long int 	getMaxIteration();
+	
 	// FIXME - move this junk somewhere else...
 	private : bool		automatic;
 	public  : void		setAutomatic(bool);

@@ -12,17 +12,18 @@ SimulationLoop::~SimulationLoop()
 {
 
 }
-
-
+	
 void SimulationLoop::operator()()
 {
-	while (true)
+	int turnId = Omega::instance().getNewTurnId();
+	while (true) //FIXME : change that !!
 	{
 		if (Omega::instance().rootBody)
 		{
-			Omega::instance().synchronizer->wait1(); // now if only we could calculate without waiting for draw to finish drawing....
+			Omega::instance().waitMyTurn(turnId); // now if only we could calculate without waiting for draw to finish drawing....
 			Omega::instance().rootBody->moveToNextTimeStep();
-			Omega::instance().synchronizer->go();
+			Omega::instance().incrementCurrentIteration();
+			Omega::instance().endMyTurn();
 		}
 	}
 }

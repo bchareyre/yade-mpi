@@ -29,6 +29,7 @@
 
 class SimulationLoop
 {
+	
 	public : SimulationLoop();
 	public : ~SimulationLoop();
 	
