@@ -68,11 +68,10 @@ void Threadable<Thread>::start()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//#define THREAD_DEBUG
 template<class Thread>
 void Threadable<Thread>::operator()()
 {
-#ifndef THREAD_DEBUG
+
 	if (synchronizer)
 	{
 		while (notEnd())
@@ -97,41 +96,6 @@ void Threadable<Thread>::operator()()
 		while (notEnd())
 			oneLoop();
 	}
-#else
-	if (synchronizer)
-	{
-		while (notEnd())
-		{
-			{
-				ThreadSafe::cerr("mark:  20 " + string(typeid(*this).name()) );
-				boost::mutex::scoped_lock lock(*(synchronizer->getMutex()));
-	
-				ThreadSafe::cerr("mark:  21 " + string(typeid(*this).name()) );
-				while ( synchronizer->redirectionId[turn] != synchronizer->i)
-					synchronizer->cond.wait(lock);
-				
-				ThreadSafe::cerr("mark:  21 " + string(typeid(*this).name()) );
-				oneLoop();
-				
-				ThreadSafe::cerr("mark:  22 " + string(typeid(*this).name()) );
-				synchronizer->i=(synchronizer->i+1) % synchronizer->nbThreads;
-				
-				ThreadSafe::cerr("mark:  2" " + string(typeid(*this).name()) );
-				while(synchronizer->redirectionId[synchronizer->i] == -1)
-					synchronizer->i=(synchronizer->i+1) % synchronizer->nbThreads;
-		
-				ThreadSafe::cerr("mark:  24 " + string(typeid(*this).name()) );
-				synchronizer->cond.notify_all();
-			}
-		}
-		synchronizer->removeThread(turn);
-	}
-	else
-	{
-		while (notEnd())
-			oneLoop();
-	}
-#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

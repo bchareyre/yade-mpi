@@ -32,12 +32,16 @@ void SimpleNarrowCollider::narrowCollisionPhase(Body* body)
 	for( ncb->interactions->gotoFirst() ; ncb->interactions->notAtEnd() ; )
 	{
 		contact = ncb->interactions->getCurrent();
-
+		
 		shared_ptr<Body> b1 = (*bodies)[contact->getId1()];
 		shared_ptr<Body> b2 = (*bodies)[contact->getId2()];
 
 		if (!(narrowManager.collide( b1->cm , b2->cm , b1->se3 , b2->se3 , contact )))
-			ncb->interactions->eraseCurrentAndGotoNext();
+		{
+					//cout << "before " << ncb->interactions->size() << endl;
+					ncb->interactions->eraseCurrentAndGotoNext();
+					//		cout << "after" << endl;
+		}
 		else
 			ncb->interactions->gotoNext();
 	}

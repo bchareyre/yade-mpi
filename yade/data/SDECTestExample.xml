@@ -1,113 +1,60 @@
 <Yade>
-	<rootBody className="NonConnexBody" >
-		<rootBody isDynamic="0" velocity="{0 0 0}" angularVelocity="{0 0 0}">
-			<se3 translation="{0 0 0}" rotation="{1 0 0 0}" />
+	<rootBody _className_="NonConnexBody" id="0" isDynamic="0" velocity="{0 0 0}" angularVelocity="{0 0 0}" se3="{0 0 0 1 0 0 0}">
 			<bv />
 			<cm />
 			<gm />
-			<actors size="3">
-				<actors[0] className="SAPCollider" >
-					<actors[0] />
-				</actors[0]>
-				<actors[1] className="SimpleNarrowCollider" >
-					<actors[1] collisionFunctors="[[Sphere Sphere Sphere2Sphere4SDECContactModel] [Sphere Box Box2Sphere4SDECContactModel]]" />
-				</actors[1]>
-				<actors[2] className="SDECDynamicEngine" >
-					<actors[2] />
-				</actors[2]>
+			<actors size="4">
+				<actors _className_="SAPCollider" />
+				<actors _className_="SimpleNarrowCollider"  collisionFunctors="[[Sphere Sphere Sphere2Sphere4SDECContactModel] [Sphere Box Box2Sphere4SDECContactModel]]" />
+				<actors _className_="SDECDynamicEngine" />
+				<actors _className_="Rotor"  subscribedBodies="[0]" angularVelocity="0.07" rotationAxis="{1 0 0}" />
 			</actors>
-			<bodies size="5">
-				<bodies[0] className="SDECDiscreteElement" >
-					<bodies[0] isDynamic="0" velocity="{0 0 0}" angularVelocity="{0 0 0}" mass="0" inertia="{0 0 0}" kn="100000" ks="10000">
-						<se3 translation="{0 10 0}" rotation="{1 0 0 0}" />
-						<bv className="AABB" >
-							<bv color="{1 0 0}" center="{0 10 0}" halfSize="{100 5 100}" />
-						</bv>
-						<cm className="Box" >
-							<cm diffuseColor="{1 1 1}" wire="0" visible="1" extents="{100 5 100}" />
-						</cm>
-						<gm className="Box" >
-							<gm diffuseColor="{1 1 1}" wire="0" visible="1" diffuseColor="{1 1 1}" wire="0" visible="1" extents="{100 5 100}" />
-						</gm>
-					</bodies[0]>
-				</bodies[0]>
-				<bodies[1] className="SDECDiscreteElement" >
-					<bodies[1] isDynamic="1" velocity="{0 0 -30}" angularVelocity="{0 0 0}" mass="37.699" inertia="{135.716 135.716 135.716}" kn="100000" ks="10000">
-						<se3 translation="{0 30 90}" rotation="{1 0 0 0}" />
-						<bv className="AABB" >
-							<bv color="{0 1 0}" center="{0 30 90}" halfSize="{3 3 3}" />
-						</bv>
-						<cm className="Sphere" >
-							<cm diffuseColor="{0.4 0.5 1.0}" wire="0" visible="1" radius="3" />
-						</cm>
-						<gm className="Sphere" >
-							<gm diffuseColor="{0.4 0.5 1.0}" wire="0" visible="1" wire="0" visible="1" radius="3" />
-						</gm>
-						<actors size="1">
-							<actors[0] className="BallisticDynamicEngine" >
-								<actors[0] damping="1" />
-							</actors[0]>
-						</actors>
-					</bodies[1]>
-				</bodies[1]>
-				<bodies[2] className="SDECDiscreteElement" >
-					<bodies[2] isDynamic="1" velocity="{0 0 30}" angularVelocity="{0 0 0}" mass="37.699" inertia="{135.716 135.716 135.716}" kn="100000" ks="10000">
-						<se3 translation="{2 30 -90}" rotation="{1 0 0 0}" />
-						<bv className="AABB" >
-							<bv color="{0 2 0}" center="{1 30 -90}" halfSize="{3 3 3}" />
-						</bv>
-						<cm className="Sphere" >
-							<cm diffuseColor="{0.4 0.5 1.0}" wire="0" visible="1" radius="3" />
-						</cm>
-						<gm className="Sphere" >
-							<gm diffuseColor="{1.0 0.5 0.4}" wire="0" visible="1" wire="0" visible="1" radius="3" />
-						</gm>
-						<actors size="1">
-							<actors[0] className="BallisticDynamicEngine" >
-								<actors[0] damping="1" />
-							</actors[0]>
-						</actors>
-					</bodies[2]>
-				</bodies[2]>
-				<bodies[3] className="SDECDiscreteElement" >
-					<bodies[3] isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" mass="37.699" inertia="{135.716 135.716 135.716}" kn="100000" ks="10000">
-						<se3 translation="{-1.5 30 0}" rotation="{1 0 0 0}" />
-						<bv className="AABB" >
-							<bv color="{0 1 0}" center="{-1.5 30 0}" halfSize="{3 3 3}" />
-						</bv>
-						<cm className="Sphere" >
-							<cm diffuseColor="{0.4 0.5 1.0}" wire="0" visible="1" radius="3" />
-						</cm>
-						<gm className="Sphere" >
-							<gm diffuseColor="{0.4 1.0 0.5}" wire="0" visible="1" wire="0" visible="1" radius="3" />
-						</gm>
-						<actors size="1">
-							<actors[0] className="BallisticDynamicEngine" >
-								<actors[0] damping="1" />
-							</actors[0]>
-						</actors>
-					</bodies[3]>
-				</bodies[3]>
-				<bodies[4] className="SDECDiscreteElement" >
-					<bodies[4] isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" mass="37.699" inertia="{135.716 135.716 135.716}" kn="100000" ks="10000">
-						<se3 translation="{0 30 10}" rotation="{1 0 0 0}" />
-						<bv className="AABB" >
-							<bv color="{0 1 0}" center="{0 30 10}" halfSize="{3 3 3}" />
-						</bv>
-						<cm className="Sphere" >
-							<cm diffuseColor="{0.4 0.5 1.0}" wire="0" visible="1" radius="3" />
-						</cm>
-						<gm className="Sphere" >
-							<gm diffuseColor="{0.5 1.0 0.4}" wire="0" visible="1" wire="0" visible="1" radius="3" />
-						</gm>
-						<actors size="1">
-							<actors[0] className="BallisticDynamicEngine" >
-								<actors[0] damping="1" />
-							</actors[0]>
-						</actors>
-					</bodies[4]>
-				</bodies[4]>
+			<permanentInteractions _className_="InteractionHashMap" >
+					<interaction size="0">
+					</interaction>
+			</permanentInteractions>
+			<bodies _className_="BodyAssocVec">
+				<body size="5">
+					<body _className_="SDECDiscreteElement" id="0" isDynamic="0" velocity="{0 0 0}" angularVelocity="{0 0 0}" mass="0" inertia="{0 0 0}" kn="100000" ks="10000" se3="{0 10 0 1 0 0 0}">
+							<bv _className_="AABB" color="{1 0 0}" center="{0 10 0}" halfSize="{100 5 100}" />
+							<cm _className_="Box" diffuseColor="{1 1 1}" wire="0" visible="1" extents="{100 5 100}" />
+							<gm _className_="Box" diffuseColor="{1 1 1}" wire="0" visible="1" extents="{100 5 100}" />
+							<actors size="0">
+							</actors>
+					</body>
+					<body _className_="SDECDiscreteElement" id="1" isDynamic="1" velocity="{0 0 -30}" angularVelocity="{0 0 0}" mass="37.699" inertia="{135.716 135.716 135.716}" kn="100000" ks="10000" se3="{0 30 90 1 0 0 0}">
+							<bv _className_="AABB" color="{0 1 0}" center="{0 30 90}" halfSize="{3 3 3}" />
+							<cm _className_="Sphere" diffuseColor="{0.4 0.5 1.0}" wire="0" visible="1" radius="3" />
+							<gm _className_="Sphere" diffuseColor="{0.4 0.5 1.0}" wire="0" visible="1" radius="3" />
+							<actors size="1">
+								<actors _className_="BallisticDynamicEngine" damping="1" />
+							</actors>
+					</body>
+					<body _className_="SDECDiscreteElement" id="2" isDynamic="1" velocity="{0 0 30}" angularVelocity="{0 0 0}" mass="37.699" inertia="{135.716 135.716 135.716}" kn="100000" ks="10000" se3="{2 30 -90 1 0 0 0}">
+							<bv _className_="AABB" color="{0 1 0}" center="{2 30 -90}" halfSize="{3 3 3}" />
+							<cm _className_="Sphere" diffuseColor="{0.4 0.5 1.0}" wire="0" visible="1" radius="3" />
+							<gm _className_="Sphere" diffuseColor="{0.4 0.5 1.0}"  wire="0" visible="1" radius="3" />
+							<actors size="1">
+								<actors _className_="BallisticDynamicEngine" damping="1" />
+							</actors>
+					</body>
+					<body _className_="SDECDiscreteElement" id="3" isDynamic="1" velocity="{0 0 30}" angularVelocity="{0 0 0}" mass="37.699" inertia="{135.716 135.716 135.716}" kn="100000" ks="10000" se3="{-1.5 30 0 1 0 0 0}">
+							<bv _className_="AABB" color="{0 1 0}" center="{-1.5 30 0}" halfSize="{3 3 3}" />
+							<cm _className_="Sphere" diffuseColor="{0.4 0.5 1.0}" wire="0" visible="1" radius="3" />
+							<gm _className_="Sphere" diffuseColor="{0.4 0.5 1.0}" wire="0" visible="1" radius="3" />
+							<actors size="1">
+								<actors _className_="BallisticDynamicEngine" damping="1" />
+							</actors>
+					</body>
+					<body _className_="SDECDiscreteElement" id="4" isDynamic="1" velocity="{0 0 30}" angularVelocity="{0 0 0}" mass="37.699" inertia="{135.716 135.716 135.716}" kn="100000" ks="10000" se3="{0 30 10 1 0 0 0}">
+							<bv _className_="AABB" color="{0 1 0}" center="{0 30 10}" halfSize="{3 3 3}" />
+							<cm _className_="Sphere" diffuseColor="{0.4 0.5 1.0}" wire="0" visible="1" radius="3" />
+							<gm _className_="Sphere" diffuseColor="{0.4 0.5 1.0}" wire="0" visible="1" radius="3" />
+							<actors size="1">
+								<actors _className_="BallisticDynamicEngine" damping="1" />
+							</actors>
+					</body>
+				</body>
 			</bodies>
-		</rootBody>
 	</rootBody>
 </Yade>

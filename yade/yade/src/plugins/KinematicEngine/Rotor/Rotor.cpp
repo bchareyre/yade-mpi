@@ -40,7 +40,7 @@ void Rotor::moveToNextTimeStep(Body * body)
 
 	Vector3r ax;
 	float an;
-
+	
 	for(;ii!=iiEnd;++ii)
 	{
 		shared_ptr<Body>  b = (*bodies)[*ii];
@@ -48,7 +48,9 @@ void Rotor::moveToNextTimeStep(Body * body)
 		//b->se3.translation += dp;
 
 		b->se3.translation	= q*b->se3.translation;
+		//cout << "  ## " << endl << b->se3.rotation.w() <<  " " << b->se3.rotation.x() << " " <<  b->se3.rotation.y() <<   " " <<  b->se3.rotation.z() << endl;
 		b->se3.rotation		= q*b->se3.rotation;
+		//cout << endl << b->se3.rotation.w() <<  " " << b->se3.rotation.x() << " " <<  b->se3.rotation.y() <<   " " <<  b->se3.rotation.z() << endl;
 
 		b->se3.rotation.normalize();
 		b->se3.rotation.toAxisAngle(ax,an);

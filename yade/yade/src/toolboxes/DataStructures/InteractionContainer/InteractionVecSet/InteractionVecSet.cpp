@@ -4,6 +4,7 @@
 InteractionVecSet::InteractionVecSet()
 {
 	currentSize = 0;
+	clear();
 }
 
 InteractionVecSet::~InteractionVecSet()
@@ -33,6 +34,7 @@ bool InteractionVecSet::insert(shared_ptr<Interaction>& i)
 void InteractionVecSet::clear()
 {
 	interactions.clear();
+	currentSize=0;
 }
 
 bool InteractionVecSet::erase(unsigned int id1,unsigned int id2)
@@ -163,20 +165,24 @@ shared_ptr<Interaction> InteractionVecSet::getCurrent()
 
 void InteractionVecSet::eraseCurrentAndGotoNext()
 {
-//	if(hasCurrent())
-//	{
-		vector<set<pair<unsigned int,shared_ptr<Interaction> >,lessThanPair > >::iterator tmpVii = vii;
-		set<pair<unsigned int,shared_ptr<Interaction> >,lessThanPair >::iterator tmpSii          = sii;
-		
-//		shared_ptr<Interaction> iiii = getNext();
-		gotoNext();
-		
-		(*tmpVii).erase(tmpSii);
-		
-//		return iiii;
-//	}
-//	else
-//		return shared_ptr<Interaction>();
+	//cout << "InteractionVecSet : eraseCurrentAndGotoNext" << endl;
+	
+	vector<set<pair<unsigned int,shared_ptr<Interaction> >,lessThanPair > >::iterator tmpVii = vii;
+	set<pair<unsigned int,shared_ptr<Interaction> >,lessThanPair >::iterator tmpSii          = sii;
+	
+	//int id1 = (*sii).second->getId1();
+	//int id2 = (*sii).second->getId2();
+	
+	gotoNext();
+	
+	//if (!erase(id1,id2))
+	//{
+	//	cout << "not erased" << endl;
+	//}
+	(*tmpVii).erase(tmpSii);
+	currentSize--;	
+
+
 }
 
 unsigned int InteractionVecSet::size()

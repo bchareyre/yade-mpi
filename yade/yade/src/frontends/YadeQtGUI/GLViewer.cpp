@@ -11,7 +11,7 @@ GLViewer::GLViewer(QWidget * parent, QGLWidget * shareWidget) /*: QThread() */: 
 	setAutoBufferSwap(false);
 	resize(320, 240);
 	setSceneCenter(0,0,0);
-	setSceneRadius(200);
+	setSceneRadius(100);
 	showEntireScene();
 
 	show();

@@ -3,6 +3,7 @@
 
 BodyAssocVec::BodyAssocVec()
 {
+	clear();
 }
 
 BodyAssocVec::~BodyAssocVec()

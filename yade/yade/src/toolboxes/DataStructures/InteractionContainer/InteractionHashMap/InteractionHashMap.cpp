@@ -2,6 +2,7 @@
 
 InteractionHashMap::InteractionHashMap()
 {
+	clear();
 }
 
 InteractionHashMap::~InteractionHashMap()
@@ -87,6 +88,7 @@ shared_ptr<Interaction> InteractionHashMap::getCurrent()
 // FIXME - is it absolutely correct ??
 void InteractionHashMap::eraseCurrentAndGotoNext()
 {
+	//cout << "InteractionHashMap : eraseCurrentAndGotoNext" << endl;
 	if(notAtEnd())
 	{
 		IHashMap::iterator tmpHmii=hmii;
@@ -94,6 +96,7 @@ void InteractionHashMap::eraseCurrentAndGotoNext()
 		interactions.erase(tmpHmii);
 ////////		return getCurrent();
 	}
+
 //	else
 //		return shared_ptr<Interaction>();
 }

@@ -4,6 +4,7 @@
 
 BodyRedirectionVector::BodyRedirectionVector()
 {
+	clear();
 }
 
 BodyRedirectionVector::~BodyRedirectionVector()

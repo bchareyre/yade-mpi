@@ -30,16 +30,13 @@ void ConnexBody::glDraw()
 	se3.rotation.toAxisAngle(axis,angle);	
 	glTranslatef(se3.translation[0],se3.translation[1],se3.translation[2]);
 	glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);	
-	gm->glDraw();		
+	gm->glDraw();
 	glPopMatrix();
-	
-//	cout << se3.translation[0] << " " << se3.translation[1] << " " <<  se3.translation[2] << endl;
-//	cout << angle << endl;
 
 	//FIXME : hardcoded drawing of boundingvolume, sensor will fix that
-	//glPushMatrix();
-	//bv->glDraw();
-	//glPopMatrix();
+	glPushMatrix();
+	bv->glDraw();
+	glPopMatrix();
 }
 
 

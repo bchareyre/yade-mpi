@@ -77,6 +77,10 @@ void QGLThread::oneLoop()
 	glViewer->glDraw();
 	
 	glViewer->makeCurrent();
+
+	const GLfloat pos[4]	= {75.0,75.0,0.0,1.0};
+	glLightfv(GL_LIGHT1, GL_POSITION, pos);
+	glEnable(GL_LIGHT1);
 	
 	if (*needResizing)
 	{
@@ -91,6 +95,8 @@ void QGLThread::oneLoop()
 
 	if (Omega::instance().rootBody) // if the scene is loaded
 		Omega::instance().rootBody->glDraw();
+	
+	glViewer->drawLight(GL_LIGHT1);
 	
 	// 	fpsTracker->glDraw(); 
 	// 	fpsTracker->addOneAction();

@@ -8,10 +8,11 @@
 
 #include "NonConnexBody.hpp"
 #include "InteractionVecSet.hpp"
+#include "InteractionHashMap.hpp"
 #include "BodyAssocVec.hpp"
 
 // FIXME - who is to decide which class to use by default?
-NonConnexBody::NonConnexBody() : Body() , bodies(new BodyAssocVec) , permanentInteractions(new InteractionVecSet)
+NonConnexBody::NonConnexBody() : Body() , bodies(new BodyAssocVec) , permanentInteractions(shared_ptr<InteractionContainer>(new InteractionHashMap))
 {
 }
 
@@ -37,6 +38,7 @@ void NonConnexBody::glDraw()
 
 	for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext() )
 		bodies->getCurrent()->glDraw();
+	
 
 	glPopMatrix();
 
