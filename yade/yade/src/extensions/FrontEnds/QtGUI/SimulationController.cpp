@@ -281,6 +281,7 @@ void SimulationController::pbResetClicked()
 	for(;gi!=giEnd;++gi)
 		(*gi).second->startRendering();
 
+	pbCenterSceneClicked();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -21,6 +21,7 @@ class SDECLinkedSpheres : public FileGenerator
 	private	: Real ks;
 	private : Real dampingForce;
 	private : Real dampingMomentum;
+	private : int timeStepUpdateInterval;
 	
 	private : void createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents);
 	private : void createSphere(shared_ptr<Body>& body, int i, int j, int k);

@@ -18,6 +18,7 @@
 #include "SDECParameters.hpp"
 #include "SDECLinkGeometry.hpp"
 #include "SDECLinkPhysics.hpp"
+#include "SDECTimeStepper.hpp"
 
 #include "ActionDispatcher.hpp"
 #include "ActionDispatcher.hpp"
@@ -78,6 +79,7 @@ SDECImport::SDECImport () : FileGenerator()
 	
 	dampingForce = 0.3;
 	dampingMomentum = 0.3;
+	timeStepUpdateInterval = 300;
 
 }
 
@@ -90,7 +92,7 @@ void SDECImport::registerAttributes()
 {
 //	REGISTER_ATTRIBUTE(lowerCorner);
 //	REGISTER_ATTRIBUTE(upperCorner);
-	REGISTER_ATTRIBUTE(thickness);
+//	REGISTER_ATTRIBUTE(thickness);
 	REGISTER_ATTRIBUTE(importFilename);
 	REGISTER_ATTRIBUTE(kn_Spheres);
 	REGISTER_ATTRIBUTE(ks_Spheres);
@@ -99,6 +101,7 @@ void SDECImport::registerAttributes()
 	REGISTER_ATTRIBUTE(density);
 	REGISTER_ATTRIBUTE(dampingForce);
 	REGISTER_ATTRIBUTE(dampingMomentum);
+	REGISTER_ATTRIBUTE(timeStepUpdateInterval);
 //	REGISTER_ATTRIBUTE(wall_top);
 //	REGISTER_ATTRIBUTE(wall_bottom);
 //	REGISTER_ATTRIBUTE(wall_1);
@@ -111,7 +114,7 @@ void SDECImport::registerAttributes()
 //	REGISTER_ATTRIBUTE(wall_2_wire);
 //	REGISTER_ATTRIBUTE(wall_3_wire);
 //	REGISTER_ATTRIBUTE(wall_4_wire);
-	REGISTER_ATTRIBUTE(spheresColor);
+//	REGISTER_ATTRIBUTE(spheresColor);
 //	REGISTER_ATTRIBUTE(spheresRandomColor);
 	REGISTER_ATTRIBUTE(recordBottomForce);
 	REGISTER_ATTRIBUTE(forceRecordFile);
@@ -389,6 +392,9 @@ void SDECImport::createActors(shared_ptr<ComplexBody>& rootBody)
 	timeIntegratorDispatcher->add("SDECParameters","LeapFrogIntegrator"); // FIXME - bug in locateMultivirtualFunctionCall1D ???
 		
 	
+	shared_ptr<SDECTimeStepper> sdecTimeStepper(new SDECTimeStepper);
+	sdecTimeStepper->sdecGroup = 10;
+	sdecTimeStepper->interval = timeStepUpdateInterval;
 	
 	
 	shared_ptr<SDECDynamicEngine> sdecDynamicEngine(new SDECDynamicEngine);
@@ -396,6 +402,7 @@ void SDECImport::createActors(shared_ptr<ComplexBody>& rootBody)
 	
 	rootBody->actors.clear();
 	rootBody->actors.push_back(shared_ptr<Actor>(new ActionReset));
+	rootBody->actors.push_back(sdecTimeStepper);
 	rootBody->actors.push_back(boundingVolumeDispatcher);
 	rootBody->actors.push_back(shared_ptr<Actor>(new PersistentSAPCollider));
 	rootBody->actors.push_back(interactionGeometryDispatcher);

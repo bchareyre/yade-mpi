@@ -18,6 +18,7 @@
 #include "InteractionDescriptionSet2AABBFunctor.hpp"
 #include "InteractionDescriptionSet.hpp"
 #include "SDECLinearContactModel.hpp"
+#include "SDECTimeStepper.hpp"
 
 
 #include "ActionDispatcher.hpp"
@@ -43,6 +44,7 @@ SDECSpheresPlane::SDECSpheresPlane () : FileGenerator()
 	groundSize = Vector3r(200,5,200);
 	dampingForce = 0.3;
 	dampingMomentum = 0.3;
+	timeStepUpdateInterval = 300;
 }
 
 SDECSpheresPlane::~SDECSpheresPlane ()
@@ -64,6 +66,7 @@ void SDECSpheresPlane::registerAttributes()
 	REGISTER_ATTRIBUTE(groundSize);
 	REGISTER_ATTRIBUTE(dampingForce);
 	REGISTER_ATTRIBUTE(dampingMomentum);
+	REGISTER_ATTRIBUTE(timeStepUpdateInterval);
 }
 
 string SDECSpheresPlane::generate()
@@ -100,8 +103,13 @@ string SDECSpheresPlane::generate()
 	shared_ptr<TimeIntegratorDispatcher> timeIntegratorDispatcher(new TimeIntegratorDispatcher);
 	timeIntegratorDispatcher->add("SDECParameters","LeapFrogIntegrator");
 	
+	shared_ptr<SDECTimeStepper> sdecTimeStepper(new SDECTimeStepper);
+	sdecTimeStepper->sdecGroup = 0;
+	sdecTimeStepper->interval = timeStepUpdateInterval;
+
 	rootBody->actors.clear();
 	rootBody->actors.push_back(shared_ptr<Actor>(new ActionReset));
+	rootBody->actors.push_back(sdecTimeStepper);
 	rootBody->actors.push_back(boundingVolumeDispatcher);	
 	rootBody->actors.push_back(shared_ptr<Actor>(new PersistentSAPCollider));
 	rootBody->actors.push_back(interactionGeometryDispatcher);

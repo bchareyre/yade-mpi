@@ -14,6 +14,7 @@ class SDECSpheresPlane : public FileGenerator
 	private : Real maxRadius;
 	private : Real dampingForce;
 	private : Real dampingMomentum;
+	private : int timeStepUpdateInterval;
 	// construction
 	public : SDECSpheresPlane ();
 	public : ~SDECSpheresPlane ();

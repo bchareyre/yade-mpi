@@ -53,8 +53,8 @@ class ActionForce : public Action
 /// Methods											///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	public : virtual void add(const shared_ptr<Action>& a);
-	public : virtual void sub(const shared_ptr<Action>& a);
+//	public : virtual void add(const shared_ptr<Action>& a); // FIXME - not used
+//	public : virtual void sub(const shared_ptr<Action>& a); // FIXME - not used
 	public : virtual void reset();
 	public : virtual shared_ptr<Action> clone();
 		

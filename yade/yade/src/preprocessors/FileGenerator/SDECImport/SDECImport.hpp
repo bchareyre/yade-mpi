@@ -38,6 +38,7 @@ class SDECImport : public FileGenerator
 	private	: Real bigBallRadius;
 	private	: Real bigBallDensity;
 	private	: Real bigBallDropTimeSeconds;
+	private : int timeStepUpdateInterval;
 	
 	// construction
 	public : SDECImport ();

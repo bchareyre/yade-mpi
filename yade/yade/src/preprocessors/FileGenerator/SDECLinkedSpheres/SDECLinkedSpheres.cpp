@@ -18,6 +18,7 @@
 #include "SDECParameters.hpp"
 #include "SDECLinkGeometry.hpp"
 #include "SDECLinkPhysics.hpp"
+#include "SDECTimeStepper.hpp"
 
 #include "ActionDispatcher.hpp"
 #include "ActionDispatcher.hpp"
@@ -45,6 +46,7 @@ SDECLinkedSpheres::SDECLinkedSpheres () : FileGenerator()
 	support2 = 1;
 	dampingForce = 0.3;
 	dampingMomentum = 0.3;
+	timeStepUpdateInterval = 300;
 }
 
 SDECLinkedSpheres::~SDECLinkedSpheres ()
@@ -68,6 +70,7 @@ void SDECLinkedSpheres::registerAttributes()
 	REGISTER_ATTRIBUTE(supportSize);
 	REGISTER_ATTRIBUTE(support1);
 	REGISTER_ATTRIBUTE(support2);
+	REGISTER_ATTRIBUTE(timeStepUpdateInterval);
 }
 
 string SDECLinkedSpheres::generate()
@@ -290,14 +293,17 @@ void SDECLinkedSpheres::createActors(shared_ptr<ComplexBody>& rootBody)
 	
 	
 	timeIntegratorDispatcher->add("SDECParameters","LeapFrogIntegrator"); // FIXME - bug in locateMultivirtualFunctionCall1D ???
-		
-	
-	
+
+	shared_ptr<SDECTimeStepper> sdecTimeStepper(new SDECTimeStepper);
+	sdecTimeStepper->sdecGroup = 55;
+	sdecTimeStepper->interval = timeStepUpdateInterval;
+
 	
 	shared_ptr<SDECDynamicEngine> sdecDynamicEngine(new SDECDynamicEngine);
 	sdecDynamicEngine->sdecGroup = 55;
 	
 	rootBody->actors.clear();
+	rootBody->actors.push_back(sdecTimeStepper);
 	rootBody->actors.push_back(shared_ptr<Actor>(new ActionReset));
 	rootBody->actors.push_back(boundingVolumeDispatcher);
 	rootBody->actors.push_back(shared_ptr<Actor>(new PersistentSAPCollider));

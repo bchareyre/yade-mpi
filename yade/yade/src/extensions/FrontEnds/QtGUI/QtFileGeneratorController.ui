@@ -15,6 +15,12 @@
     <property name="caption">
         <string>File Generator</string>
     </property>
+    <property name="frameShape">
+        <enum>NoFrame</enum>
+    </property>
+    <property name="frameShadow">
+        <enum>Plain</enum>
+    </property>
     <widget class="QPushButton">
         <property name="name">
             <cstring>pbClose</cstring>
@@ -29,6 +35,22 @@
         </property>
         <property name="text">
             <string>Close</string>
+        </property>
+    </widget>
+    <widget class="QPushButton">
+        <property name="name">
+            <cstring>pbGenerate</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>100</x>
+                <y>350</y>
+                <width>88</width>
+                <height>30</height>
+            </rect>
+        </property>
+        <property name="text">
+            <string>Generate</string>
         </property>
     </widget>
     <widget class="QGroupBox">
@@ -52,118 +74,101 @@
         <property name="title">
             <string>Common Parameters</string>
         </property>
-        <widget class="QPushButton">
+        <grid>
             <property name="name">
-                <cstring>pbChoose</cstring>
+                <cstring>unnamed</cstring>
             </property>
-            <property name="geometry">
-                <rect>
-                    <x>380</x>
-                    <y>20</y>
-                    <width>80</width>
-                    <height>30</height>
-                </rect>
-            </property>
-            <property name="text">
-                <string>Choose ...</string>
-            </property>
-        </widget>
-        <widget class="QComboBox">
-            <property name="name">
-                <cstring>cbSerializationName</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>150</x>
-                    <y>60</y>
-                    <width>310</width>
-                    <height>20</height>
-                </rect>
-            </property>
-        </widget>
-        <widget class="QLabel">
-            <property name="name">
-                <cstring>tlOoutputFileName</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>10</x>
-                    <y>30</y>
-                    <width>130</width>
-                    <height>20</height>
-                </rect>
-            </property>
-            <property name="text">
-                <string>Output File Name :</string>
-            </property>
-            <property name="alignment">
-                <set>AlignVCenter|AlignRight</set>
-            </property>
-        </widget>
-        <widget class="QLabel">
-            <property name="name">
-                <cstring>tlOutputDynlibName</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>10</x>
-                    <y>60</y>
-                    <width>130</width>
-                    <height>20</height>
-                </rect>
-            </property>
-            <property name="text">
-                <string>Output Library Name :</string>
-            </property>
-            <property name="alignment">
-                <set>AlignVCenter|AlignRight</set>
-            </property>
-        </widget>
-        <widget class="QLabel">
-            <property name="name">
-                <cstring>tlGeneratorName</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>10</x>
-                    <y>90</y>
-                    <width>130</width>
-                    <height>20</height>
-                </rect>
-            </property>
-            <property name="text">
-                <string>Generator Name :</string>
-            </property>
-            <property name="alignment">
-                <set>AlignVCenter|AlignRight</set>
-            </property>
-        </widget>
-        <widget class="QLineEdit">
-            <property name="name">
-                <cstring>leOutputFileName</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>150</x>
-                    <y>30</y>
-                    <width>220</width>
-                    <height>20</height>
-                </rect>
-            </property>
-        </widget>
-        <widget class="QComboBox">
-            <property name="name">
-                <cstring>cbGeneratorName</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>150</x>
-                    <y>90</y>
-                    <width>310</width>
-                    <height>20</height>
-                </rect>
-            </property>
-        </widget>
+            <widget class="QLabel" row="0" column="0">
+                <property name="name">
+                    <cstring>tlOoutputFileName</cstring>
+                </property>
+                <property name="text">
+                    <string>Output File Name :</string>
+                </property>
+                <property name="alignment">
+                    <set>AlignVCenter|AlignRight</set>
+                </property>
+            </widget>
+            <widget class="QLineEdit" row="0" column="1">
+                <property name="name">
+                    <cstring>leOutputFileName</cstring>
+                </property>
+            </widget>
+            <widget class="QPushButton" row="0" column="2">
+                <property name="name">
+                    <cstring>pbChoose</cstring>
+                </property>
+                <property name="text">
+                    <string>Choose ...</string>
+                </property>
+            </widget>
+            <widget class="QComboBox" row="2" column="1" rowspan="1" colspan="2">
+                <property name="name">
+                    <cstring>cbSerializationName</cstring>
+                </property>
+            </widget>
+            <widget class="QLabel" row="2" column="0">
+                <property name="name">
+                    <cstring>tlOutputDynlibName</cstring>
+                </property>
+                <property name="text">
+                    <string>Output Library Name :</string>
+                </property>
+                <property name="alignment">
+                    <set>AlignVCenter|AlignRight</set>
+                </property>
+            </widget>
+            <widget class="QLabel" row="4" column="0">
+                <property name="name">
+                    <cstring>tlGeneratorName</cstring>
+                </property>
+                <property name="text">
+                    <string>Generator Name :</string>
+                </property>
+                <property name="alignment">
+                    <set>AlignVCenter|AlignRight</set>
+                </property>
+            </widget>
+            <widget class="QComboBox" row="4" column="1" rowspan="1" colspan="2">
+                <property name="name">
+                    <cstring>cbGeneratorName</cstring>
+                </property>
+            </widget>
+            <spacer row="1" column="1">
+                <property name="name">
+                    <cstring>spacer15</cstring>
+                </property>
+                <property name="orientation">
+                    <enum>Vertical</enum>
+                </property>
+                <property name="sizeType">
+                    <enum>Expanding</enum>
+                </property>
+                <property name="sizeHint">
+                    <size>
+                        <width>20</width>
+                        <height>51</height>
+                    </size>
+                </property>
+            </spacer>
+            <spacer row="3" column="1">
+                <property name="name">
+                    <cstring>spacer16</cstring>
+                </property>
+                <property name="orientation">
+                    <enum>Vertical</enum>
+                </property>
+                <property name="sizeType">
+                    <enum>Expanding</enum>
+                </property>
+                <property name="sizeHint">
+                    <size>
+                        <width>20</width>
+                        <height>51</height>
+                    </size>
+                </property>
+            </spacer>
+        </grid>
     </widget>
     <widget class="QGroupBox">
         <property name="name">
@@ -179,22 +184,6 @@
         </property>
         <property name="title">
             <string>Generator Parameters</string>
-        </property>
-    </widget>
-    <widget class="QPushButton">
-        <property name="name">
-            <cstring>pbGenerate</cstring>
-        </property>
-        <property name="geometry">
-            <rect>
-                <x>100</x>
-                <y>350</y>
-                <width>88</width>
-                <height>30</height>
-            </rect>
-        </property>
-        <property name="text">
-            <string>Generate</string>
         </property>
     </widget>
 </widget>

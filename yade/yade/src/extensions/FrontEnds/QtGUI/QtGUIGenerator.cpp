@@ -165,12 +165,14 @@ void QtGUIGenerator::buildGUI(shared_ptr<Serializable> s,  QWidget * widget)
 					descriptor->widgets.push_back(cb);
 					descriptor->types.push_back(AttributeDescriptor::BOOLEAN);
 				}
-				catch(...)
+				catch(...) 
+				// FIXME catch(...) is very, very bad. it can catch na operating system error. the only thing you can do after catch(...) is to rethrow it. ignoring it, may cause big instability problems!
 				{
 					QLineEdit* le = new QLineEdit(widget);
 					le->setText(descriptor->strings[i]);
 					descriptor->widgets.push_back(le);
 					descriptor->types.push_back(AttributeDescriptor::FLOATING);
+					// throw; // FIXME: rethrow exception - uncomment this line!
 				}
 			}
 		

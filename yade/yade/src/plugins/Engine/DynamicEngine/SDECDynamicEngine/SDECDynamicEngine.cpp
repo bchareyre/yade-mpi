@@ -77,10 +77,10 @@ void SDECDynamicEngine::respondToInteractions(Body* body)
 		if( (*bodies)[id1]->getGroup() != sdecGroup || (*bodies)[id2]->getGroup() != sdecGroup )
 			continue; // skip other groups, BTW: this is example of a good usage of 'continue' keyword
 
-		shared_ptr<SDECParameters> de1				= dynamic_pointer_cast<SDECParameters>((*bodies)[id1]->physicalParameters);
-		shared_ptr<SDECParameters> de2 				= dynamic_pointer_cast<SDECParameters>((*bodies)[id2]->physicalParameters);
-		shared_ptr<SDECLinkPhysics> currentContactPhysics	= dynamic_pointer_cast<SDECLinkPhysics>(contact2->interactionPhysics);
-		shared_ptr<SDECLinkGeometry> currentContactGeometry	= dynamic_pointer_cast<SDECLinkGeometry>(contact2->interactionGeometry);
+		SDECParameters* de1				= dynamic_cast<SDECParameters*>((*bodies)[id1]->physicalParameters.get());
+		SDECParameters* de2				= dynamic_cast<SDECParameters*>((*bodies)[id2]->physicalParameters.get());
+		SDECLinkPhysics* currentContactPhysics		= dynamic_cast<SDECLinkPhysics*>(contact2->interactionPhysics.get());
+		SDECLinkGeometry* currentContactGeometry	= dynamic_cast<SDECLinkGeometry*>(contact2->interactionGeometry.get());
 
 		Real un 					= currentContactPhysics->equilibriumDistance-(de2->se3.translation-de1->se3.translation).length();
 		currentContactPhysics->normalForce		= currentContactPhysics->kn*un*currentContactGeometry->normal;
@@ -326,10 +326,10 @@ void SDECDynamicEngine::respondToInteractions(Body* body)
 		if( (*bodies)[id1]->getGroup() != sdecGroup || (*bodies)[id2]->getGroup() != sdecGroup )
 			continue; // skip other groups, BTW: this is example of a good usage of 'continue' keyword
 
-		shared_ptr<SDECParameters> de1 	= dynamic_pointer_cast<SDECParameters>((*bodies)[id1]->physicalParameters);
-		shared_ptr<SDECParameters> de2 	= dynamic_pointer_cast<SDECParameters>((*bodies)[id2]->physicalParameters);
-		shared_ptr<SDECContactGeometry> currentContactGeometry = dynamic_pointer_cast<SDECContactGeometry>(contact->interactionGeometry);
-		shared_ptr<SDECContactPhysics> currentContactPhysics   = dynamic_pointer_cast<SDECContactPhysics> (contact->interactionPhysics);
+		SDECParameters* de1 				= dynamic_cast<SDECParameters*>((*bodies)[id1]->physicalParameters.get());
+		SDECParameters* de2 				= dynamic_cast<SDECParameters*>((*bodies)[id2]->physicalParameters.get());
+		SDECContactGeometry* currentContactGeometry 	= dynamic_cast<SDECContactGeometry*>(contact->interactionGeometry.get());
+		SDECContactPhysics* currentContactPhysics   	= dynamic_cast<SDECContactPhysics*> (contact->interactionPhysics.get());
 		
 		if ( contact->isNew)
 			currentContactPhysics->shearForce			= Vector3r(0,0,0);
