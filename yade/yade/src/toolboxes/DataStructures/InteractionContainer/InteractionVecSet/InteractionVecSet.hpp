@@ -27,6 +27,7 @@ class InteractionVecSet : public InteractionContainer
 	private : set<pair<unsigned int,shared_ptr<Interaction> >,lessThanPair >::iterator sii;
 	private : set<pair<unsigned int,shared_ptr<Interaction> >,lessThanPair >::iterator siiEnd;
 	private : unsigned int currentSize;
+	private : shared_ptr<Interaction> empty;
 
 
 	public : InteractionVecSet();
@@ -36,7 +37,7 @@ class InteractionVecSet : public InteractionContainer
 	public : virtual bool insert(shared_ptr<Interaction>& i);
 	public : virtual void clear();
 	public : virtual bool erase(unsigned int id1,unsigned int id2);
-	public : virtual shared_ptr<Interaction> find(unsigned int id1,unsigned int id2);
+	public : virtual const shared_ptr<Interaction>& find(unsigned int id1,unsigned int id2);
 
 	public	: virtual void gotoFirst();
 	public	: virtual bool notAtEnd();
@@ -44,7 +45,7 @@ class InteractionVecSet : public InteractionContainer
 	public	: virtual void gotoFirstPotential();
 	public	: virtual bool notAtEndPotential();
 	public	: virtual void gotoNextPotential();
-	public	: virtual shared_ptr<Interaction> getCurrent();
+	public	: virtual const shared_ptr<Interaction>& getCurrent();
 
 	public  : virtual void eraseCurrentAndGotoNext();
 	public  : virtual void eraseCurrentAndGotoNextPotential();

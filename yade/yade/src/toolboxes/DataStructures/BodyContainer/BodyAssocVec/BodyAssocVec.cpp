@@ -119,7 +119,7 @@ void BodyAssocVec::gotoNext()
 	++bii;
 }
 
-shared_ptr<Body> BodyAssocVec::getCurrent()
+shared_ptr<Body>& BodyAssocVec::getCurrent()
 {
 	return (*bii).second;
 }

@@ -65,7 +65,7 @@ bool InteractionVecSet::erase(unsigned int id1,unsigned int id2)
 
 }
 
-shared_ptr<Interaction> InteractionVecSet::find(unsigned int id1,unsigned int id2)
+const shared_ptr<Interaction>& InteractionVecSet::find(unsigned int id1,unsigned int id2)
 {
 	if (id1>id2)
 		swap(id1,id2);
@@ -77,10 +77,16 @@ shared_ptr<Interaction> InteractionVecSet::find(unsigned int id1,unsigned int id
 		if (sii!=interactions[id1].end())
 			return (*sii).second;
 		else
-			return shared_ptr<Interaction>();
+		{
+			empty = shared_ptr<Interaction>();
+			return empty;
+		}
 	}
 	else
-		return shared_ptr<Interaction>();
+	{
+		empty = shared_ptr<Interaction>();
+		return empty;
+	}
 }
 
 void InteractionVecSet::gotoFirstPotential()
@@ -162,7 +168,7 @@ bool InteractionVecSet::notAtEnd()
 	return notAtEndPotential();
 }
 
-shared_ptr<Interaction> InteractionVecSet::getCurrent()
+const shared_ptr<Interaction>& InteractionVecSet::getCurrent()
 {
 		return (*sii).second;
 }

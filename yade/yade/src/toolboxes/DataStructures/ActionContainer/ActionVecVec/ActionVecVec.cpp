@@ -51,9 +51,6 @@ void ActionVecVec::prepare(std::vector<shared_ptr<Action> >& actionTypes)
 	{
 		actionTypesResetted[actionTypes[i]->getClassIndex()] = actionTypes[i]->clone();
 		actionTypesResetted[actionTypes[i]->getClassIndex()] -> reset();
-		
-//		actionTypesResetted[i] = actionTypes[i]->clone();
-//		actionTypesResetted[i] -> reset();
 	}
 }
 

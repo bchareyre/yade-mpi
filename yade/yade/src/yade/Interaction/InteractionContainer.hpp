@@ -17,7 +17,7 @@ class InteractionContainer : public Serializable
 	public    : virtual void clear() 									{throw;};
 	public    : virtual bool erase(unsigned int /*id1*/,unsigned int /*id2*/) 				{throw;};
 
-	public    : virtual shared_ptr<Interaction> find(unsigned int /*id1*/,unsigned int /*id2*/) 		{throw;};
+	public    : virtual const shared_ptr<Interaction>& find(unsigned int /*id1*/,unsigned int /*id2*/) 		{throw;};
 
 	// looping over the data
 	public    : virtual void gotoFirst() 									{throw;};
@@ -26,7 +26,7 @@ class InteractionContainer : public Serializable
 	public    : virtual void gotoFirstPotential() 								{throw;};
 	public    : virtual void gotoNextPotential() 								{throw;};
 	public    : virtual bool notAtEndPotential() 								{throw;};	
- 	public    : virtual shared_ptr<Interaction> getCurrent() 						{throw;};
+ 	public    : virtual const shared_ptr<Interaction>& getCurrent() 						{throw;};
 
 	// deletes currently pointed element, and goes to the next one.
 	public    : virtual void eraseCurrentAndGotoNext() 							{throw;};

@@ -24,7 +24,7 @@ class BodyContainer : public Serializable
 	public    : virtual void gotoFirst() 						{throw;};
 	public    : virtual bool notAtEnd() 						{throw;};
 	public    : virtual void gotoNext() 						{throw;};
-	public    : virtual shared_ptr<Body> getCurrent()	 			{throw;};
+	public    : virtual shared_ptr<Body>& getCurrent()	 			{throw;};
 	public    : virtual void pushIterator()			 			{throw;};
 	public    : virtual void popIterator()			 			{throw;};
 

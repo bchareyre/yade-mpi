@@ -33,7 +33,7 @@ class BodyRedirectionVector : public BodyContainer
 	public	: virtual void gotoFirst();
 	public	: virtual bool notAtEnd();
 	public	: virtual void gotoNext();
-	public	: virtual shared_ptr<Body> getCurrent();
+	public	: virtual shared_ptr<Body>& getCurrent();
 
 	public	: virtual unsigned int size();
 

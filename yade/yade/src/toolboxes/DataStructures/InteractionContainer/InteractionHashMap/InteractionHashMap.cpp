@@ -43,7 +43,7 @@ bool InteractionHashMap::erase(unsigned int id1,unsigned int id2)
 
 }
 
-shared_ptr<Interaction> InteractionHashMap::find(unsigned int id1,unsigned int id2)
+const shared_ptr<Interaction>& InteractionHashMap::find(unsigned int id1,unsigned int id2)
 {
 	if (id1>id2)
 		swap(id1,id2);
@@ -52,7 +52,10 @@ shared_ptr<Interaction> InteractionHashMap::find(unsigned int id1,unsigned int i
 	if (hmii!=interactions.end())
 		return (*hmii).second;
 	else
-		return shared_ptr<Interaction>();
+	{
+		empty = shared_ptr<Interaction>(); 
+		return empty;
+	}
 }
 
 void InteractionHashMap::gotoFirstPotential()
@@ -90,7 +93,7 @@ bool InteractionHashMap::notAtEnd()
 	return notAtEndPotential();
 }
 
-shared_ptr<Interaction> InteractionHashMap::getCurrent()
+const shared_ptr<Interaction>& InteractionHashMap::getCurrent()
 {
 	return (*hmii).second;
 }

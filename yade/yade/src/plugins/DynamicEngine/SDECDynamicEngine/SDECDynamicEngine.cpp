@@ -398,7 +398,6 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 	for( ncb->interactions->gotoFirst() ; ncb->interactions->notAtEnd() ; ncb->interactions->gotoNext() )
 	{
 		contact = ncb->interactions->getCurrent();
-
 		int id1 = contact->getId1();
 		int id2 = contact->getId2();
 

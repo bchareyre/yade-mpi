@@ -33,6 +33,7 @@ class InteractionHashMap : public InteractionContainer
 	private : IHashMap interactions;
 	private : IHashMap::iterator hmii;
 	private : IHashMap::iterator hmiiEnd;
+	private : shared_ptr<Interaction> empty;
 
 
 	public : InteractionHashMap();
@@ -42,7 +43,7 @@ class InteractionHashMap : public InteractionContainer
 	public : virtual bool insert(shared_ptr<Interaction>& i);
 	public : virtual void clear();
 	public : virtual bool erase(unsigned int id1,unsigned int id2);
-	public : virtual shared_ptr<Interaction> find(unsigned int id1,unsigned int id2);
+	public : virtual const shared_ptr<Interaction>& find(unsigned int id1,unsigned int id2);
 
 	public	: virtual void gotoFirst();
 	public	: virtual bool notAtEnd();
@@ -51,7 +52,7 @@ class InteractionHashMap : public InteractionContainer
 	public	: virtual bool notAtEndPotential();
 	public	: virtual void gotoNextPotential();
 	
-	public	: virtual shared_ptr<Interaction> getCurrent();
+	public	: virtual const shared_ptr<Interaction>& getCurrent();
 
 	public : virtual void eraseCurrentAndGotoNext();
 	public  : virtual void eraseCurrentAndGotoNextPotential();

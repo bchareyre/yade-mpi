@@ -144,7 +144,7 @@ void BodyRedirectionVector::gotoNext()
 	++vii;
 }
 
-shared_ptr<Body> BodyRedirectionVector::getCurrent()
+shared_ptr<Body>& BodyRedirectionVector::getCurrent()
 {
 	return (*vii);
 }
