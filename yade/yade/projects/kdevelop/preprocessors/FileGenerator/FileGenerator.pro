@@ -6,7 +6,8 @@
 SUBDIRS += RotatingBox \
            HangingCloth \
            FEMRock \
-           BoxStack 
+           BoxStack \
+           SDECSpheresPlane 
 MOC_DIR = $(YADECOMPILATIONPATH)
 UI_DIR = $(YADECOMPILATIONPATH)
 OBJECTS_DIR = $(YADECOMPILATIONPATH)

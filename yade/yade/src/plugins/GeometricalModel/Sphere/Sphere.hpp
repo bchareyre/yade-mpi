@@ -7,7 +7,7 @@ class Sphere : public CollisionModel
 {
 	public : float radius;
 
-		bool even;
+		int number;
 
 	private : static vector<Vector3> vertices;
 	private : static vector<Vector3> faces;
@@ -32,8 +32,5 @@ class Sphere : public CollisionModel
 };
 
 REGISTER_SERIALIZABLE(Sphere,false);
-
-REGISTER_CLASS_TO_MULTI_METHODS_MANAGER(Sphere);
-
 
 #endif // __SPHERE_H__

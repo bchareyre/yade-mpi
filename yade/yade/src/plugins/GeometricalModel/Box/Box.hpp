@@ -28,6 +28,4 @@ class Box : public CollisionModel
 using namespace ArchiveTypes;
 
 REGISTER_SERIALIZABLE(Box,false);
-REGISTER_CLASS_TO_MULTI_METHODS_MANAGER(Box);
-
 #endif // __BOX_H__

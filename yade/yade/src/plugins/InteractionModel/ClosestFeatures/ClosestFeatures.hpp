@@ -23,6 +23,5 @@ class ClosestFeatures : public InteractionModel
 };
 
 REGISTER_SERIALIZABLE(ClosestFeatures,false);
-//REGISTER_CLASS_TO_MULTI_METHODS_MANAGER(ClosestFeatures);
 
 #endif // __CLOSESTSFEATURES_H__

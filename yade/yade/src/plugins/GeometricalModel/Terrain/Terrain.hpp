@@ -82,7 +82,6 @@ class Terrain : public CollisionModel
 };
 
 REGISTER_SERIALIZABLE(Terrain,false);
-REGISTER_CLASS_TO_MULTI_METHODS_MANAGER(Terrain);
 
 #endif // __TERRAIN_H__
 

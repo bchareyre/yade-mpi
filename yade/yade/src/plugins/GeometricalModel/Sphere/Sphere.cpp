@@ -1,5 +1,5 @@
 #include "Sphere.hpp"
-
+#include "Rand.hpp"
 int Sphere::glSphereList=-1;
 int Sphere::glWiredSphereList=-1;
 
@@ -72,7 +72,6 @@ void Sphere::registerAttributes()
 bool Sphere::collideWith(CollisionModel* )
 {
 	return true;
-
 }
 
 void Sphere::subdivideTriangle(Vector3& v1,Vector3& v2,Vector3& v3, int depth)
@@ -80,12 +79,30 @@ void Sphere::subdivideTriangle(Vector3& v1,Vector3& v2,Vector3& v3, int depth)
 	Vector3 v12,v23,v31;
 
 	if (depth==0)
-	{
+	{		
+		float pi3 = 2*Constants::PI/3;
+		Vector3 v = (v1+v2+v3)/3.0;
+		float angle = atan(v[2]/v[0])/v.length();
 
-		if (even)
-			glColor3f(1.0,0.0,0.0);
+		GLfloat matAmbient[4];
+		
+		if (angle>-Constants::PI/6.0 && angle<=Constants::PI/6.0)
+		{
+			matAmbient[0] = 0.2;
+			matAmbient[1] = 0.2;
+			matAmbient[2] = 0.2;
+			matAmbient[3] = 0.0;
+		}
 		else
-			glColor3f(0.0,0.0,1.0);
+		{
+			matAmbient[0] = 0.0;
+			matAmbient[1] = 0.0;
+			matAmbient[2] = 0.0;
+			matAmbient[3] = 0.0;
+		}
+
+		glMaterialfv(GL_FRONT_AND_BACK,GL_SPECULAR,matAmbient);
+
 		glBegin(GL_TRIANGLES);
 			glNormal3fv(v3);
 			glVertex3fv(v3);
@@ -93,9 +110,8 @@ void Sphere::subdivideTriangle(Vector3& v1,Vector3& v2,Vector3& v3, int depth)
 			glVertex3fv(v2);
 			glNormal3fv(v1);
 			glVertex3fv(v1);
-
 		glEnd();
-		even=!even;
+
 		return;
 	}
 	v12 = v1+v2;
@@ -118,10 +134,12 @@ void Sphere::drawSphere(int depth)
 	glMaterialfv(GL_FRONT,GL_SPECULAR,matSpecular);
 	glMaterialfv(GL_FRONT,GL_SHININESS,matShininess);*/
 
-	even=true;
-
+	number=0;
 	for(int i=0;i<20;i++)
+	{
+		//glColor3f(Rand::unitRandom(),Rand::unitRandom(),Rand::unitRandom());	
 		subdivideTriangle(vertices[(unsigned int)faces[i][0]],vertices[(unsigned int)faces[i][1]],vertices[(unsigned int)faces[i][2]],depth);
+	}
 }
 
 void Sphere::glDraw()

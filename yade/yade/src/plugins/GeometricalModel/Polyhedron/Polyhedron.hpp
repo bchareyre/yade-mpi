@@ -37,6 +37,5 @@ class Polyhedron : public CollisionModel
 using namespace ArchiveTypes;
 
 REGISTER_SERIALIZABLE(Polyhedron,false);
-REGISTER_CLASS_TO_MULTI_METHODS_MANAGER(Polyhedron);
 
 #endif // __MESH3D_H__

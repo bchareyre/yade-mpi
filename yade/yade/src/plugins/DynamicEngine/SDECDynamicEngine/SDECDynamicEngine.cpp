@@ -70,6 +70,7 @@ void SDECDynamicEngine::registerAttributes()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+//FIXME : add reset function so it will remove bool first
 void SDECDynamicEngine::respondToCollisions(Body* body, const std::list<shared_ptr<Interaction> >& interactions)
 {
 
@@ -232,7 +233,7 @@ void SDECDynamicEngine::respondToCollisions(Body* body, const std::list<shared_p
 					sign=1;
 				else
 					sign=-1;
-				forces[i][j] -= 0.1*f*sign;
+				forces[i][j] -= 0.2*f*sign;
 			}
 
 
@@ -246,7 +247,7 @@ void SDECDynamicEngine::respondToCollisions(Body* body, const std::list<shared_p
 					sign=1;
 				else
 					sign=-1;
-				moments[i][j] -= 0.1*m*sign;
+				moments[i][j] -= 0.2*m*sign;
 			}
 
 			de->acceleration += forces[i]*de->invMass;

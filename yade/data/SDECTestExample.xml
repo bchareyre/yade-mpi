@@ -6,7 +6,7 @@
 			<cm />
 			<gm />
 			<dynamic className="SDECDynamicEngine" >
-				<dynamic />
+				<dynamic features="SDECFeatures" />
 			</dynamic>
 			<bodies size="5">
 				<bodies[0] className="SDECDiscreteElement" >
@@ -25,7 +25,7 @@
 					</bodies[0]>
 				</bodies[0]>
 				<bodies[1] className="SDECDiscreteElement" >
-					<bodies[1] isDynamic="1" velocity="{0 0 -20}" angularVelocity="{0 0 0}" mass="37.699" inertia="{135.716 135.716 135.716}" kn="100000" ks="10000">
+					<bodies[1] isDynamic="1" velocity="{0 0 -30}" angularVelocity="{0 0 0}" mass="37.699" inertia="{135.716 135.716 135.716}" kn="100000" ks="10000">
 						<se3 translation="{0 30 90}" rotation="{1 0 0 0}" />
 						<bv className="AABB" >
 							<bv color="{0 1 0}" center="{0 30 90}" halfSize="{3 3 3}" />
@@ -42,16 +42,16 @@
 					</bodies[1]>
 				</bodies[1]>
 				<bodies[2] className="SDECDiscreteElement" >
-					<bodies[2] isDynamic="1" velocity="{0 0 20}" angularVelocity="{0 0 0}" mass="37.699" inertia="{135.716 135.716 135.716}" kn="100000" ks="10000">
-						<se3 translation="{0.5 30 -90}" rotation="{1 0 0 0}" />
+					<bodies[2] isDynamic="1" velocity="{0 0 30}" angularVelocity="{0 0 0}" mass="37.699" inertia="{135.716 135.716 135.716}" kn="100000" ks="10000">
+						<se3 translation="{2 30 -90}" rotation="{1 0 0 0}" />
 						<bv className="AABB" >
-							<bv color="{0 1 0}" center="{0.5 30 -90}" halfSize="{3 3 3}" />
+							<bv color="{0 2 0}" center="{1 30 -90}" halfSize="{3 3 3}" />
 						</bv>
 						<cm className="Sphere" >
 							<cm diffuseColor="{0.4 0.5 1.0}" wire="0" visible="1" radius="3" />
 						</cm>
 						<gm className="Sphere" >
-							<gm diffuseColor="{0.4 0.5 1.0}" wire="0" visible="1" wire="0" visible="1" radius="3" />
+							<gm diffuseColor="{1.0 0.5 0.4}" wire="0" visible="1" wire="0" visible="1" radius="3" />
 						</gm>
 						<dynamic className="BallisticDynamicEngine" >
 							<dynamic damping="1" />
@@ -60,15 +60,15 @@
 				</bodies[2]>
 				<bodies[3] className="SDECDiscreteElement" >
 					<bodies[3] isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" mass="37.699" inertia="{135.716 135.716 135.716}" kn="100000" ks="10000">
-						<se3 translation="{0 30 0}" rotation="{1 0 0 0}" />
+						<se3 translation="{-1.5 30 0}" rotation="{1 0 0 0}" />
 						<bv className="AABB" >
-							<bv color="{0 1 0}" center="{0 30 0}" halfSize="{3 3 3}" />
+							<bv color="{0 1 0}" center="{-1.5 30 0}" halfSize="{3 3 3}" />
 						</bv>
 						<cm className="Sphere" >
 							<cm diffuseColor="{0.4 0.5 1.0}" wire="0" visible="1" radius="3" />
 						</cm>
 						<gm className="Sphere" >
-							<gm diffuseColor="{0.4 0.5 1.0}" wire="0" visible="1" wire="0" visible="1" radius="3" />
+							<gm diffuseColor="{0.4 1.0 0.5}" wire="0" visible="1" wire="0" visible="1" radius="3" />
 						</gm>
 						<dynamic className="BallisticDynamicEngine" >
 							<dynamic damping="1" />
@@ -85,7 +85,7 @@
 							<cm diffuseColor="{0.4 0.5 1.0}" wire="0" visible="1" radius="3" />
 						</cm>
 						<gm className="Sphere" >
-							<gm diffuseColor="{0.4 0.5 1.0}" wire="0" visible="1" wire="0" visible="1" radius="3" />
+							<gm diffuseColor="{0.5 1.0 0.4}" wire="0" visible="1" wire="0" visible="1" radius="3" />
 						</gm>
 						<dynamic className="BallisticDynamicEngine" >
 							<dynamic damping="1" />
@@ -94,13 +94,13 @@
 				</bodies[4]>
 			</bodies>
 			<narrowCollider className="SimpleNarrowCollider" >
-				<narrowCollider />
+				<narrowCollider collisionFunctors=[["Box" "Box" "dldkdkddkdk"] ["Box" "Sphere" "dldkdkddkdk"] {"Sphere" "Sphere" "dldkdkddkdk" } ] />
 			</narrowCollider>
 			<broadCollider className="SAPCollider" >
 				<broadCollider />
 			</broadCollider>
 			<kinematic className="Rotor" >
-				<kinematic subscribedBodies="[0]" />
+				<kinematic subscribedBodies="[]" />
 			</kinematic>
 		</rootBody>
 	</rootBody>

@@ -26,7 +26,5 @@ class SDECDiscreteElement : public RigidBody
 
 REGISTER_SERIALIZABLE(SDECDiscreteElement,false);
 
-//REGISTER_CLASS_TO_MULTI_METHODS_MANAGER(SDECDiscreteElement);
-
 #endif // __SDECDISCRETEELEMENT_H__
 

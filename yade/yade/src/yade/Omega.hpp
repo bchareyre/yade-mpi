@@ -41,11 +41,11 @@
 #include "Singleton.hpp"
 //#include "NonConnexBody.hpp"
 //#include "CollisionFunctor.hpp"
-class CollisionFunctor;
+//class CollisionFunctor;
 //class Vector3;
 //class Chrono;
 class NonConnexBody;
-#include "MultiMethodsManager.hpp"
+//#include "MultiMethodsManager.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -65,7 +65,7 @@ class Omega : public Singleton<Omega>
 	public : float dt;
 	
 	//public : MultiMethodsManager<CollisionFunctor> narrowCollider;
-	public : MultiMethodsManager narrowCollider;
+	//public : MultiMethodsManager narrowCollider;
 
 	public : void init();
 	private   : Omega() ;

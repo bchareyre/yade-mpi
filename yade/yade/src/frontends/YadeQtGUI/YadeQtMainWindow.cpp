@@ -29,6 +29,7 @@ YadeQtMainWindow::YadeQtMainWindow() : YadeQtGeneratedMainWindow()
 	addItem("Preprocessor","RotatingBox");
 //	addItem("Preprocessor","FEMRock"); // not working
 	addItem("Preprocessor","BoxStack");
+	addItem("Preprocessor","SDECSpheresPlane");
 	createMenus();
 
 

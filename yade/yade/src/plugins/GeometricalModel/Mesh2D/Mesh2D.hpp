@@ -52,6 +52,5 @@ class Mesh2D : public CollisionModel
 using namespace ArchiveTypes;
 
 REGISTER_SERIALIZABLE(Mesh2D,false);
-REGISTER_CLASS_TO_MULTI_METHODS_MANAGER(Mesh2D);
 
 #endif // __MESH2D_H__

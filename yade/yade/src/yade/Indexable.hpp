@@ -27,8 +27,8 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "MultiMethodsManager.hpp"
-#include "Omega.hpp"
+//#include "MultiMethodsManager.hpp"
+//#include "Omega.hpp"
 //#include "Serializable.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -55,6 +55,10 @@ class Indexable// : public Serializable
 	/*! Returns the id of the current class. This id is set by a multimethod manager */
 	public : virtual int& getClassIndex() { throw;};
 	public : virtual const int& getClassIndex() const { throw;};
+	
+	public : virtual const int& getMaxCurrentlyUsedClassIndex() const { throw;};
+	public : virtual void incrementMaxCurrentlyUsedClassIndex() { throw;};
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -78,6 +82,23 @@ class Indexable// : public Serializable
 		return getClassIndexStatic();			\
 	}
 
+
+#define REGISTER_INDEX_COUNTER(SomeClass)			\
+	static int& getMaxCurrentlyUsedIndexStatic()		\
+	{							\
+		static int maxCurrentlyUsedIndex = -1;		\
+		return maxCurrentlyUsedIndex;			\
+	}							\
+	virtual const int& getMaxCurrentlyUsedClassIndex() const\
+	{							\
+		return getMaxCurrentlyUsedIndexStatic();	\
+	}							\
+	virtual void incrementMaxCurrentlyUsedClassIndex()	\
+	{							\
+		int& max = getMaxCurrentlyUsedIndexStatic();	\
+		max++;						\
+	}							\
+	
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 

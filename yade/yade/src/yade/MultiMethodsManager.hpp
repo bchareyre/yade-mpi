@@ -28,61 +28,48 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <vector>
-#include <set>
+#include <string>
 #include <boost/shared_ptr.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "ClassFactory.hpp"
+class Indexable;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-
-class Se3;
-class Interaction;
-class CollisionModel;
-class CollisionFunctor;
 
 using namespace boost;
+using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-class MultiMethodsManager
+template<class Functor>
+class MultiMethodsManager 
 {
-	protected : std::vector<std::vector<shared_ptr<CollisionFunctor> > > callBacks;
-	private   : vector<string> indexedClassName;//indexedCollisionGeometry;
-//	private   : vector<string> indexedInteractionModel;
+	protected : std::vector<std::vector<shared_ptr<Functor> > > callBacks;
+	//private   : vector<string> indexedClassName;
+	//indexedCollisionGeometry;
+	//private   : vector<string> indexedInteractionModel;
 
 	// construction
 	public : MultiMethodsManager ();
-
 	public : virtual ~MultiMethodsManager ();
 
-	public : bool addCollisionGeometry(const string& name);
-//	public : bool addInteractionModel(const string& name);
-//	public : bool extendCallBacksTable();
+	protected : virtual bool addPair(const string& name1,const string& name2,const string& libName) = 0;
+	protected : bool add(shared_ptr<Indexable>& i1,shared_ptr<Indexable>& i2, const string& name1, const string& name2, const string& libName);
 
-	public : bool go(const shared_ptr<CollisionModel> cm1, const shared_ptr<CollisionModel> cm2, const Se3& se31, const Se3& se32, shared_ptr<Interaction> c);
-
-};
+	//public : bool go(const shared_ptr<CollisionModel> cm1, const shared_ptr<CollisionModel> cm2, const Se3& se31, const Se3& se32, shared_ptr<Interaction> c);
+};   
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-//#define REGISTER_COLLISION_GEOMETRY(SomeClass)
-
-
-#define REGISTER_CLASS_TO_MULTI_METHODS_MANAGER(SomeClass)	\
-	const bool indexed##SomeClass = Omega::instance().narrowCollider.addCollisionGeometry(#SomeClass);\
-
-//#define REGISTER_INTERACTION_MODEL(SomeClass)
-//	const bool indexed##SomeClass = Omega::instance().narrowCollider.addInteractionModel(#SomeClass);
+#include "MultiMethodsManager.tpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-
 
 #endif // __MULTIMETHODSMANAGER_H__
 
