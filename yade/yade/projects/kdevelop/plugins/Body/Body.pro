@@ -5,7 +5,8 @@
 
 SUBDIRS += RigidBody \
            MassSpringBody \
-           FEMBody 
+           FEMBody \
+           SDECDiscreteElement 
 MOC_DIR = $(YADECOMPILATIONPATH)
 UI_DIR = $(YADECOMPILATIONPATH)
 OBJECTS_DIR = $(YADECOMPILATIONPATH)
