@@ -5,7 +5,8 @@
 
 SUBDIRS += Box2AABBFactory \
            Terrain2AABBFactory \
-           Sphere2AABBFactory 
+           Sphere2AABBFactory \
+           CollisionGeometrySet2AABBFactory 
 MOC_DIR = $(YADECOMPILATIONPATH)
 UI_DIR = $(YADECOMPILATIONPATH)
 OBJECTS_DIR = $(YADECOMPILATIONPATH)

@@ -3,12 +3,14 @@
 # Subdir relative project main directory: ./yade/Body
 # Target is a library:  
 
-LIBS += -rdynamic 
+LIBS += -lCollisionGeometrySet \
+        -rdynamic 
 INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = $(YADEDYNLIBPATH) 
+QMAKE_LIBDIR = ../../plugins/CollisionGeometry/CollisionGeometrySet/$(YADEDYNLIBPATH) \
+               $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 
 QMAKE_CXXFLAGS_DEBUG += -lpthread \

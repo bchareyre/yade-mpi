@@ -10,6 +10,7 @@
 #include <qfiledialog.h>
 #include <qlcdnumber.h>
 #include <qlabel.h>
+#include <qgroupbox.h>
 #include <boost/lexical_cast.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
@@ -39,7 +40,7 @@ SimulationController::SimulationController(QWidget * parent) : QtGeneratedSimula
 		guiGen.setResizeWidth(false);
 		guiGen.setShift(10,30);
 		guiGen.setShowButtons(false);
-		guiGen.buildGUI(renderer, fDisplay);
+		guiGen.buildGUI(renderer, gbRenderingEngineParameters);
 	}
 	else
 	{
@@ -103,6 +104,8 @@ void SimulationController::pbLoadClicked()
 		Omega::instance().setSimulationFileName(fileName);
 		Omega::instance().loadSimulation();
 
+		glViews.back()->centerScene();
+		
 		string fullName = string(filesystem::basename(fileName.data()))+string(filesystem::extension(fileName.data()));
 		tlCurrentSimulation->setText(fullName);
 
@@ -120,7 +123,8 @@ void SimulationController::pbNewViewClicked()
 	QGLFormat::setDefaultFormat( format );
 	format.setStencil(TRUE);
 	format.setAlpha(TRUE);
-	glViews.push_back(new GLViewer(renderer, format, this->parentWidget()->parentWidget(), glViews.front()) );
+	glViews.push_back(new GLViewer(renderer, format, this->parentWidget()->parentWidget(), glViews.front()) );		
+	glViews.back()->centerScene();
 }
 
 void SimulationController::pbStopClicked()
@@ -143,6 +147,17 @@ void SimulationController::pbResetClicked()
 	boost::mutex::scoped_lock lock(resizeMutex);
 	Omega::instance().loadSimulation();
 	Omega::instance().stopSimulationLoop();
+}
+
+void SimulationController::pbCenterSceneClicked()
+{
+	boost::mutex resizeMutex;
+	boost::mutex::scoped_lock lock(resizeMutex);
+	for(int i=0;i<glViews.size();i++)
+	{
+		if (glViews[i]->isActiveWindow())
+			glViews[i]->centerScene();
+	}
 }
 
 void SimulationController::closeEvent(QCloseEvent *evt)

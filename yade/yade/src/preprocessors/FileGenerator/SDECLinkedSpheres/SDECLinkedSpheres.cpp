@@ -14,7 +14,8 @@
 #include "SDECDiscreteElement.hpp"
 #include "SDECPermanentLink.hpp"
 #include "Interaction.hpp"
-
+#include "CollisionGeometrySet.hpp"
+#include "CollisionGeometrySet2AABBFactory.hpp"
 #include "BoundingVolumeUpdator.hpp"
 
 SDECLinkedSpheres::SDECLinkedSpheres () : FileGenerator()
@@ -52,6 +53,8 @@ void SDECLinkedSpheres::registerAttributes()
 
 void SDECLinkedSpheres::generate()
 {
+	shared_ptr<AABB> aabb;
+		
 	shared_ptr<NonConnexBody> rootBody(new NonConnexBody);
 
 	Quaternionr q,qbox;
@@ -65,7 +68,8 @@ void SDECLinkedSpheres::generate()
 	shared_ptr<BoundingVolumeUpdator> bvu	= shared_ptr<BoundingVolumeUpdator>(new BoundingVolumeUpdator);
 	bvu->addBVFactories("Sphere","AABB","Sphere2AABBFactory");
 	bvu->addBVFactories("Box","AABB","Box2AABBFactory");
-
+	bvu->addBVFactories("CollisionGeometrySet","AABB","CollisionGeometrySet2AABBFactory");
+	
 	rootBody->actors.resize(4);
 	rootBody->actors[0] 		= bvu;
 	rootBody->actors[1] 		= shared_ptr<Actor>(new SAPCollider);
@@ -79,7 +83,19 @@ void SDECLinkedSpheres::generate()
 	rootBody->angularVelocity	= Vector3r(0,0,0);
 	rootBody->se3			= Se3r(Vector3r(0,0,0),q);
 
-	shared_ptr<AABB> aabb;
+	shared_ptr<CollisionGeometrySet> set(new CollisionGeometrySet());
+	set->diffuseColor	= Vector3r(0,0,1);
+	set->wire		= false;
+	set->visible		= true;
+	set->shadowCaster	= false;
+	rootBody->cm		= dynamic_pointer_cast<CollisionGeometry>(set);
+	
+	
+	
+	aabb			= shared_ptr<AABB>(new AABB);
+	aabb->color		= Vector3r(0,0,1);
+	rootBody->bv		= dynamic_pointer_cast<BoundingVolume>(aabb);
+
 	shared_ptr<Box> box;
 
 

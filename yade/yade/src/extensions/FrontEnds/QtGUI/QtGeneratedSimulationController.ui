@@ -21,388 +21,6 @@
     <property name="frameShadow">
         <enum>Plain</enum>
     </property>
-    <widget class="QGroupBox">
-        <property name="name">
-            <cstring>gbTime</cstring>
-        </property>
-        <property name="geometry">
-            <rect>
-                <x>20</x>
-                <y>10</y>
-                <width>260</width>
-                <height>200</height>
-            </rect>
-        </property>
-        <property name="title">
-            <string>Time</string>
-        </property>
-        <widget class="QLabel">
-            <property name="name">
-                <cstring>tlNSecond</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>210</x>
-                    <y>130</y>
-                    <width>40</width>
-                    <height>20</height>
-                </rect>
-            </property>
-            <property name="text">
-                <string>ns</string>
-            </property>
-            <property name="alignment">
-                <set>AlignCenter</set>
-            </property>
-        </widget>
-        <widget class="QLCDNumber">
-            <property name="name">
-                <cstring>lcdDay</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>10</x>
-                    <y>20</y>
-                    <width>41</width>
-                    <height>31</height>
-                </rect>
-            </property>
-            <property name="numDigits">
-                <number>2</number>
-            </property>
-        </widget>
-        <widget class="QLabel">
-            <property name="name">
-                <cstring>tlHour</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>60</x>
-                    <y>60</y>
-                    <width>40</width>
-                    <height>20</height>
-                </rect>
-            </property>
-            <property name="text">
-                <string>h</string>
-            </property>
-            <property name="alignment">
-                <set>AlignCenter</set>
-            </property>
-        </widget>
-        <widget class="QLCDNumber">
-            <property name="name">
-                <cstring>lcdMiSecondv</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>160</x>
-                    <y>90</y>
-                    <width>41</width>
-                    <height>31</height>
-                </rect>
-            </property>
-            <property name="numDigits">
-                <number>3</number>
-            </property>
-        </widget>
-        <widget class="QLCDNumber">
-            <property name="name">
-                <cstring>lcdSecondv</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>60</x>
-                    <y>90</y>
-                    <width>41</width>
-                    <height>31</height>
-                </rect>
-            </property>
-            <property name="numDigits">
-                <number>2</number>
-            </property>
-        </widget>
-        <widget class="QLCDNumber">
-            <property name="name">
-                <cstring>lcdNSecondv</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>210</x>
-                    <y>90</y>
-                    <width>41</width>
-                    <height>31</height>
-                </rect>
-            </property>
-            <property name="numDigits">
-                <number>3</number>
-            </property>
-        </widget>
-        <widget class="QLabel">
-            <property name="name">
-                <cstring>tlSecond</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>160</x>
-                    <y>60</y>
-                    <width>40</width>
-                    <height>20</height>
-                </rect>
-            </property>
-            <property name="text">
-                <string>sec</string>
-            </property>
-            <property name="alignment">
-                <set>AlignCenter</set>
-            </property>
-        </widget>
-        <widget class="QLCDNumber">
-            <property name="name">
-                <cstring>lcdSecond</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>160</x>
-                    <y>20</y>
-                    <width>41</width>
-                    <height>31</height>
-                </rect>
-            </property>
-            <property name="numDigits">
-                <number>2</number>
-            </property>
-        </widget>
-        <widget class="QLabel">
-            <property name="name">
-                <cstring>tlNSecond_2</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>110</x>
-                    <y>130</y>
-                    <width>40</width>
-                    <height>20</height>
-                </rect>
-            </property>
-            <property name="text">
-                <string>ms</string>
-            </property>
-            <property name="alignment">
-                <set>AlignCenter</set>
-            </property>
-        </widget>
-        <widget class="QLCDNumber">
-            <property name="name">
-                <cstring>lcdMinute</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>110</x>
-                    <y>20</y>
-                    <width>41</width>
-                    <height>31</height>
-                </rect>
-            </property>
-            <property name="numDigits">
-                <number>2</number>
-            </property>
-        </widget>
-        <widget class="QLabel">
-            <property name="name">
-                <cstring>tlDay</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>10</x>
-                    <y>60</y>
-                    <width>40</width>
-                    <height>20</height>
-                </rect>
-            </property>
-            <property name="text">
-                <string>d</string>
-            </property>
-            <property name="alignment">
-                <set>AlignCenter</set>
-            </property>
-        </widget>
-        <widget class="QLabel">
-            <property name="name">
-                <cstring>tlMinute_2</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>10</x>
-                    <y>130</y>
-                    <width>40</width>
-                    <height>20</height>
-                </rect>
-            </property>
-            <property name="text">
-                <string>min</string>
-            </property>
-            <property name="alignment">
-                <set>AlignCenter</set>
-            </property>
-        </widget>
-        <widget class="QLabel">
-            <property name="name">
-                <cstring>tlMSecond</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>210</x>
-                    <y>60</y>
-                    <width>40</width>
-                    <height>20</height>
-                </rect>
-            </property>
-            <property name="text">
-                <string>ms</string>
-            </property>
-            <property name="alignment">
-                <set>AlignCenter</set>
-            </property>
-        </widget>
-        <widget class="QLabel">
-            <property name="name">
-                <cstring>tlSecond_2</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>60</x>
-                    <y>130</y>
-                    <width>40</width>
-                    <height>20</height>
-                </rect>
-            </property>
-            <property name="text">
-                <string>sec</string>
-            </property>
-            <property name="alignment">
-                <set>AlignCenter</set>
-            </property>
-        </widget>
-        <widget class="QLCDNumber">
-            <property name="name">
-                <cstring>lcdMSecondv</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>110</x>
-                    <y>90</y>
-                    <width>41</width>
-                    <height>31</height>
-                </rect>
-            </property>
-            <property name="numDigits">
-                <number>3</number>
-            </property>
-        </widget>
-        <widget class="QLCDNumber">
-            <property name="name">
-                <cstring>lcdMSecond</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>210</x>
-                    <y>20</y>
-                    <width>41</width>
-                    <height>31</height>
-                </rect>
-            </property>
-            <property name="numDigits">
-                <number>3</number>
-            </property>
-        </widget>
-        <widget class="QLabel">
-            <property name="name">
-                <cstring>tlMinute</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>110</x>
-                    <y>60</y>
-                    <width>40</width>
-                    <height>20</height>
-                </rect>
-            </property>
-            <property name="text">
-                <string>min</string>
-            </property>
-            <property name="alignment">
-                <set>AlignCenter</set>
-            </property>
-        </widget>
-        <widget class="QLCDNumber">
-            <property name="name">
-                <cstring>lcdCurrentIteration</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>50</x>
-                    <y>160</y>
-                    <width>160</width>
-                    <height>31</height>
-                </rect>
-            </property>
-            <property name="numDigits">
-                <number>10</number>
-            </property>
-        </widget>
-        <widget class="QLabel">
-            <property name="name">
-                <cstring>tlNSecond_3</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>160</x>
-                    <y>130</y>
-                    <width>40</width>
-                    <height>20</height>
-                </rect>
-            </property>
-            <property name="text">
-                <string>µs</string>
-            </property>
-            <property name="alignment">
-                <set>WordBreak|AlignCenter</set>
-            </property>
-        </widget>
-        <widget class="QLCDNumber">
-            <property name="name">
-                <cstring>lcdHour</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>60</x>
-                    <y>20</y>
-                    <width>41</width>
-                    <height>31</height>
-                </rect>
-            </property>
-            <property name="numDigits">
-                <number>2</number>
-            </property>
-        </widget>
-        <widget class="QLCDNumber">
-            <property name="name">
-                <cstring>lcdMinutev</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>10</x>
-                    <y>90</y>
-                    <width>41</width>
-                    <height>31</height>
-                </rect>
-            </property>
-            <property name="numDigits">
-                <number>2</number>
-            </property>
-        </widget>
-    </widget>
     <widget class="QTabWidget">
         <property name="name">
             <cstring>tabWidget</cstring>
@@ -830,25 +448,436 @@
                     <string>Apply</string>
                 </property>
             </widget>
-            <widget class="QFrame">
+            <widget class="QGroupBox">
                 <property name="name">
-                    <cstring>fDisplay</cstring>
+                    <cstring>gbRenderingEngineParameters</cstring>
+                </property>
+                <property name="geometry">
+                    <rect>
+                        <x>10</x>
+                        <y>10</y>
+                        <width>261</width>
+                        <height>291</height>
+                    </rect>
+                </property>
+                <property name="title">
+                    <string>Rendering Engine Parameters</string>
+                </property>
+            </widget>
+            <widget class="QGroupBox">
+                <property name="name">
+                    <cstring>gbOthersParameters</cstring>
                 </property>
                 <property name="geometry">
                     <rect>
                         <x>9</x>
-                        <y>14</y>
+                        <y>305</y>
                         <width>261</width>
-                        <height>361</height>
+                        <height>70</height>
                     </rect>
                 </property>
-                <property name="frameShape">
-                    <enum>StyledPanel</enum>
+                <property name="title">
+                    <string>Others Parameters</string>
                 </property>
-                <property name="frameShadow">
-                    <enum>Raised</enum>
-                </property>
+                <widget class="QPushButton">
+                    <property name="name">
+                        <cstring>pbCenterScene</cstring>
+                    </property>
+                    <property name="geometry">
+                        <rect>
+                            <x>70</x>
+                            <y>30</y>
+                            <width>130</width>
+                            <height>30</height>
+                        </rect>
+                    </property>
+                    <property name="text">
+                        <string>Center Scene</string>
+                    </property>
+                </widget>
             </widget>
+        </widget>
+    </widget>
+    <widget class="QGroupBox">
+        <property name="name">
+            <cstring>gbTime</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>20</x>
+                <y>10</y>
+                <width>260</width>
+                <height>200</height>
+            </rect>
+        </property>
+        <property name="title">
+            <string>Time</string>
+        </property>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>tlNSecond</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>210</x>
+                    <y>130</y>
+                    <width>40</width>
+                    <height>20</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>ns</string>
+            </property>
+            <property name="alignment">
+                <set>AlignCenter</set>
+            </property>
+        </widget>
+        <widget class="QLCDNumber">
+            <property name="name">
+                <cstring>lcdDay</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>10</x>
+                    <y>20</y>
+                    <width>41</width>
+                    <height>31</height>
+                </rect>
+            </property>
+            <property name="numDigits">
+                <number>2</number>
+            </property>
+        </widget>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>tlHour</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>60</x>
+                    <y>60</y>
+                    <width>40</width>
+                    <height>20</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>h</string>
+            </property>
+            <property name="alignment">
+                <set>AlignCenter</set>
+            </property>
+        </widget>
+        <widget class="QLCDNumber">
+            <property name="name">
+                <cstring>lcdMiSecondv</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>160</x>
+                    <y>90</y>
+                    <width>41</width>
+                    <height>31</height>
+                </rect>
+            </property>
+            <property name="numDigits">
+                <number>3</number>
+            </property>
+        </widget>
+        <widget class="QLCDNumber">
+            <property name="name">
+                <cstring>lcdSecondv</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>60</x>
+                    <y>90</y>
+                    <width>41</width>
+                    <height>31</height>
+                </rect>
+            </property>
+            <property name="numDigits">
+                <number>2</number>
+            </property>
+        </widget>
+        <widget class="QLCDNumber">
+            <property name="name">
+                <cstring>lcdNSecondv</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>210</x>
+                    <y>90</y>
+                    <width>41</width>
+                    <height>31</height>
+                </rect>
+            </property>
+            <property name="numDigits">
+                <number>3</number>
+            </property>
+        </widget>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>tlSecond</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>160</x>
+                    <y>60</y>
+                    <width>40</width>
+                    <height>20</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>sec</string>
+            </property>
+            <property name="alignment">
+                <set>AlignCenter</set>
+            </property>
+        </widget>
+        <widget class="QLCDNumber">
+            <property name="name">
+                <cstring>lcdSecond</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>160</x>
+                    <y>20</y>
+                    <width>41</width>
+                    <height>31</height>
+                </rect>
+            </property>
+            <property name="numDigits">
+                <number>2</number>
+            </property>
+        </widget>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>tlNSecond_2</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>110</x>
+                    <y>130</y>
+                    <width>40</width>
+                    <height>20</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>ms</string>
+            </property>
+            <property name="alignment">
+                <set>AlignCenter</set>
+            </property>
+        </widget>
+        <widget class="QLCDNumber">
+            <property name="name">
+                <cstring>lcdMinute</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>110</x>
+                    <y>20</y>
+                    <width>41</width>
+                    <height>31</height>
+                </rect>
+            </property>
+            <property name="numDigits">
+                <number>2</number>
+            </property>
+        </widget>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>tlDay</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>10</x>
+                    <y>60</y>
+                    <width>40</width>
+                    <height>20</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>d</string>
+            </property>
+            <property name="alignment">
+                <set>AlignCenter</set>
+            </property>
+        </widget>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>tlMinute_2</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>10</x>
+                    <y>130</y>
+                    <width>40</width>
+                    <height>20</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>min</string>
+            </property>
+            <property name="alignment">
+                <set>AlignCenter</set>
+            </property>
+        </widget>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>tlMSecond</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>210</x>
+                    <y>60</y>
+                    <width>40</width>
+                    <height>20</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>ms</string>
+            </property>
+            <property name="alignment">
+                <set>AlignCenter</set>
+            </property>
+        </widget>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>tlSecond_2</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>60</x>
+                    <y>130</y>
+                    <width>40</width>
+                    <height>20</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>sec</string>
+            </property>
+            <property name="alignment">
+                <set>AlignCenter</set>
+            </property>
+        </widget>
+        <widget class="QLCDNumber">
+            <property name="name">
+                <cstring>lcdMSecondv</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>110</x>
+                    <y>90</y>
+                    <width>41</width>
+                    <height>31</height>
+                </rect>
+            </property>
+            <property name="numDigits">
+                <number>3</number>
+            </property>
+        </widget>
+        <widget class="QLCDNumber">
+            <property name="name">
+                <cstring>lcdMSecond</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>210</x>
+                    <y>20</y>
+                    <width>41</width>
+                    <height>31</height>
+                </rect>
+            </property>
+            <property name="numDigits">
+                <number>3</number>
+            </property>
+        </widget>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>tlMinute</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>110</x>
+                    <y>60</y>
+                    <width>40</width>
+                    <height>20</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>min</string>
+            </property>
+            <property name="alignment">
+                <set>AlignCenter</set>
+            </property>
+        </widget>
+        <widget class="QLCDNumber">
+            <property name="name">
+                <cstring>lcdCurrentIteration</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>50</x>
+                    <y>160</y>
+                    <width>160</width>
+                    <height>31</height>
+                </rect>
+            </property>
+            <property name="numDigits">
+                <number>10</number>
+            </property>
+        </widget>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>tlNSecond_3</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>160</x>
+                    <y>130</y>
+                    <width>40</width>
+                    <height>20</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>µs</string>
+            </property>
+            <property name="alignment">
+                <set>WordBreak|AlignCenter</set>
+            </property>
+        </widget>
+        <widget class="QLCDNumber">
+            <property name="name">
+                <cstring>lcdHour</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>60</x>
+                    <y>20</y>
+                    <width>41</width>
+                    <height>31</height>
+                </rect>
+            </property>
+            <property name="numDigits">
+                <number>2</number>
+            </property>
+        </widget>
+        <widget class="QLCDNumber">
+            <property name="name">
+                <cstring>lcdMinutev</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>10</x>
+                    <y>90</y>
+                    <width>41</width>
+                    <height>31</height>
+                </rect>
+            </property>
+            <property name="numDigits">
+                <number>2</number>
+            </property>
         </widget>
     </widget>
 </widget>
@@ -900,6 +929,12 @@
         <receiver>QtGeneratedSimulationController</receiver>
         <slot>pbApplyClicked()</slot>
     </connection>
+    <connection>
+        <sender>pbCenterScene</sender>
+        <signal>clicked()</signal>
+        <receiver>QtGeneratedSimulationController</receiver>
+        <slot>pbCenterSceneClicked()</slot>
+    </connection>
 </connections>
 <slots>
     <slot>pbLoadClicked()</slot>
@@ -908,6 +943,7 @@
     <slot>pbStopClicked()</slot>
     <slot>pbResetClicked()</slot>
     <slot>pbApplyClicked()</slot>
+    <slot>pbCenterSceneClicked()</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

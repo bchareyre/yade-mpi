@@ -11,9 +11,6 @@ GLViewer::GLViewer(shared_ptr<RenderingEngine> renderer, const QGLFormat& format
 
 	setAutoBufferSwap(false);
 	resize(320, 240);
-	setSceneCenter(0,0,0);
-	setSceneRadius(200);
-	showEntireScene();
 
 	show();
 
@@ -25,6 +22,24 @@ GLViewer::~GLViewer()
 {
 
 }
+
+void GLViewer::centerScene()
+{
+	Vector3r min = Omega::instance().rootBody->bv->min;
+	Vector3r max = Omega::instance().rootBody->bv->max;
+	Vector3r center = (max+min)*0.5;
+	Vector3r halfSize = (max-min)*0.5;
+	float radius = halfSize[0];
+	if (halfSize[1]>radius)
+		radius = halfSize[1];
+	if (halfSize[2]>radius)
+		radius = halfSize[2];
+
+	setSceneCenter(center[0],center[1],center[2]);
+	setSceneRadius(radius*1.5);
+	showEntireScene();
+}
+	
 void GLViewer::paintGL()
 {
 	//ThreadSafe::cerr("painGL");

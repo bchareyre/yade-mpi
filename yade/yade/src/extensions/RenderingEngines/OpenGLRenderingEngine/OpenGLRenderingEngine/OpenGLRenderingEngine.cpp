@@ -42,7 +42,7 @@ OpenGLRenderingEngine::OpenGLRenderingEngine() : RenderingEngine()
 	drawGeometricalModel = true;
 	castShadow = true;
 	drawShadowVolumes = false;
-
+	useFastShadowVolume = true;
 }
 
 OpenGLRenderingEngine::~OpenGLRenderingEngine()
@@ -74,10 +74,13 @@ void OpenGLRenderingEngine::render(shared_ptr<NonConnexBody> rootBody)
 	{
 		if (castShadow)
 		{	
-			//renderSceneUsingShadowVolumes(rootBody,lightPos);
-			renderSceneUsingFastShadowVolumes(rootBody,lightPos);
-			// draw transparent shadow volume
 			
+			if (useFastShadowVolume)
+				renderSceneUsingFastShadowVolumes(rootBody,lightPos);
+			else
+				renderSceneUsingShadowVolumes(rootBody,lightPos);
+				
+			// draw transparent shadow volume
 			if (drawShadowVolumes)
 			{
 				glAlphaFunc(GL_GREATER, 1.0f/255.0f);
@@ -328,6 +331,7 @@ void OpenGLRenderingEngine::registerAttributes()
 	REGISTER_ATTRIBUTE(drawGeometricalModel);
 	REGISTER_ATTRIBUTE(castShadow);
 	REGISTER_ATTRIBUTE(drawShadowVolumes);
+	REGISTER_ATTRIBUTE(useFastShadowVolume);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

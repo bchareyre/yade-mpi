@@ -10,6 +10,7 @@
 #include "InteractionVecSet.hpp"
 #include "InteractionHashMap.hpp"
 #include "BodyAssocVec.hpp"
+#include "BoundingVolumeUpdator.hpp"
 
 // FIXME - who is to decide which class to use by default?
 NonConnexBody::NonConnexBody() : Body() , bodies(new BodyAssocVec) , permanentInteractions(shared_ptr<InteractionContainer>(new InteractionHashMap))
@@ -47,17 +48,39 @@ void NonConnexBody::glDrawBoundingVolume()
 {
 	for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext() )
 		bodies->getCurrent()->glDrawBoundingVolume();
+	bv->glDraw();
 }
 
 void NonConnexBody::glDrawCollisionGeometry()
 {
 	for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext() )
 		bodies->getCurrent()->glDrawCollisionGeometry();
+	cm->glDraw();
 }
 
-void NonConnexBody::postProcessAttributes(bool)
-{
+#include "CollisionGeometrySet.hpp"
 
+void NonConnexBody::postProcessAttributes(bool deserializing)
+{
+	if (deserializing)
+	{
+		// FIXME : build that with CollisionGeometryFactory
+		shared_ptr<CollisionGeometrySet> set = dynamic_pointer_cast<CollisionGeometrySet>(cm);
+		for(unsigned int i=0;i<bodies->size();i++)
+		{
+			set->collisionGeometries.push_back((*bodies)[i]->cm);
+		}
+	}
+	
+	// to build bounding volume if there is a boundingvolume updator in the actor list
+	// FIXME : I don't know is this is so dirty to do that here
+	vector<shared_ptr<Actor> >::iterator ai    = actors.begin();
+	vector<shared_ptr<Actor> >::iterator aiEnd =  actors.end();
+	for(;ai!=aiEnd;++ai)
+		if (dynamic_pointer_cast<BoundingVolumeUpdator>(*ai))
+			(*ai)->action(this);
+			
+	Body::postProcessAttributes(deserializing);
 }
 
 void NonConnexBody::registerAttributes()

@@ -39,7 +39,7 @@ class OpenGLRenderingEngine : public RenderingEngine
 	public : bool drawGeometricalModel;
 	public : bool castShadow;
 	public : bool drawShadowVolumes;
-	
+	public : bool useFastShadowVolume;
 	
 	public : OpenGLRenderingEngine();
 	public : ~OpenGLRenderingEngine();

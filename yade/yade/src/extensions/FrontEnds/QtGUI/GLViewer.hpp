@@ -53,7 +53,9 @@ class GLViewer : public QGLViewer
 	protected : void resizeEvent(QResizeEvent *evt);
 	protected : void paintEvent(QPaintEvent *);
 	protected : void closeEvent(QCloseEvent *evt);
-
+	
+	public    : void centerScene();
+	
 	public : void paintGL();	
 	public slots: void updateGL();
 	

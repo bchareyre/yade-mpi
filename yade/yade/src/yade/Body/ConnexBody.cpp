@@ -57,7 +57,8 @@ void ConnexBody::glDrawCollisionGeometry()
 void ConnexBody::postProcessAttributes(bool deserializing)
 {
 	if(deserializing)
-		invMass = 1.0/mass;
+		invMass = 1.0/mass;	
+	Body::postProcessAttributes(deserializing);
 }
 
 void ConnexBody::registerAttributes()
