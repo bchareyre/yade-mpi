@@ -38,8 +38,6 @@ class SDECLinearContactModel : public InteractionPhysicsFunctor
 					const shared_ptr<BodyPhysicalParameters>& b2,
 					shared_ptr<Interaction>& interaction);
 	REGISTER_CLASS_NAME(SDECLinearContactModel);
-// FIXME - bug in Indaxable					
-	DEFINE_FUNCTOR_ORDER_2D(SDECParameters,SDECParameters);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

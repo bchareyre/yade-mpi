@@ -57,7 +57,8 @@ class InteractionGeometryFunctor : public FunctorWrapper
 				, const Se3r&
 				, const Se3r&
 				, shared_ptr<Interaction>&
-		) >
+			  ) 
+		>
 {
 	REGISTER_CLASS_NAME(InteractionGeometryFunctor);
 };

@@ -27,6 +27,7 @@
 
 #include "Indexable.hpp"
 #include "ClassFactory.hpp"
+#include "Serializable.hpp"
 #include "MultiMethodsExceptions.hpp"
 #include "Functor.hpp"
 #include "Typelist.hpp"
@@ -168,7 +169,94 @@ class DynLibDispatcher
 		typedef typename Impl::Parm15 Parm15;
 		
 	public:
-		DynLibDispatcher()
+		typedef          DynLibDispatcher<BaseClass,Executor,ResultType,TList,autoSymmetry> DispatcherType;
+	
+	private:
+		// Serialization stuff..
+		struct DynLibDispatcherSerializer : public Serializable
+		{
+			std::vector<std::vector<std::string> >	functorNames;
+			std::list<boost::shared_ptr<Executor> > functors;
+			DispatcherType& 			dispatcher;
+			typedef typename std::list<boost::shared_ptr<Executor> >::iterator executorListIterator;
+			
+			explicit DynLibDispatcherSerializer(DispatcherType& d) : dispatcher(d)
+			{
+				functorNames.clear();
+				functors.clear();
+			}
+
+			void addExecutor(boost::shared_ptr<Executor>& ex)
+			{
+				if(! ex) return;
+				bool dupe = false;
+				executorListIterator it    = functors.begin();
+				executorListIterator itEnd = functors.end();
+				for( ; it != itEnd ; ++it )
+					if( (*it)->getClassName() == (*ex)->getClassName() )
+						dupe = true;
+				
+				if(! dupe) functors.push_back(ex);
+			}
+						
+			void addFunctor(const std::string& str1,const std::string& str2,boost::shared_ptr<Executor>& ex) // 1D
+			{
+				std::vector<std::string> v;
+				v.push_back(str1);
+				v.push_back(str2);
+				functorNames.push_back(v);
+				addExecutor(ex);
+			}
+			void addFunctor(const std::string& str1,const std::string& str2,const std::string& str3,boost::shared_ptr<Executor>& ex) // 2D
+			{
+				std::vector<std::string> v;
+				v.push_back(str1);
+				v.push_back(str2);
+				v.push_back(str3);
+				functorNames.push_back(v);
+				addExecutor(ex);
+			}
+			void addFunctor(const std::string& str1,const std::string& str2,const std::string& str3,const std::string& str4,boost::shared_ptr<Executor>& ex) // 3D
+			{
+			}
+			
+			virtual void postProcessAttributes(bool deserializing)
+			{
+				if(deserializing)
+				{
+// 					for(unsigned int i=0;i<functorNames.size();i++)
+// 						if(functorNames[i].size() == 2) // 1D
+// 							dispatcher.add(functorNames[i][0],functorNames[i][1]);
+// 						else
+// 						if(functorNames[i].size() == 3) // 2D
+// 							dispatcher.add(functorNames[i][0],functorNames[i][1],functorNames[i][2]);
+// 						else
+// 						if(functorNames[i].size() == 4) // 3D
+// 							dispatcher.add(functorNames[i][0],functorNames[i][1],functorNames[i][2],functorNames[i][3]);
+				}
+			}
+			
+			virtual void registerAttributes()
+			{
+				REGISTER_ATTRIBUTE(functorNames);
+				REGISTER_ATTRIBUTE(functors);
+			}
+			
+			virtual string getClassName() const
+			{
+				typedef typename DynLibDispatcher<BaseClass,Executor,ResultType,TList,autoSymmetry>::DynLibDispatcherSerializer DispatcherSerializerType;
+				return typeid(DispatcherSerializerType).name();
+			};
+		};
+		
+	public:
+		typedef typename DynLibDispatcher<BaseClass,Executor,ResultType,TList,autoSymmetry>::DynLibDispatcherSerializer DispatcherSerializerType;
+
+	protected:
+		DispatcherSerializerType serializer;
+	
+	public:
+		DynLibDispatcher() : serializer(*this)
 		{
 			// FIXME - static_assert( typeid(BaseClass1) == typeid(Parm1) ); // 1D
 			// FIXME - static_assert( typeid(BaseClass2) == typeid(Parm2) ); // 2D
@@ -214,7 +302,10 @@ class DynLibDispatcher
 ////////////////////////////////////////////////////////////////////////////////
 // add multivirtual function to 1D
 ////////////////////////////////////////////////////////////////////////////////
-		void add(std::string baseClassName , std::string libName)
+		void add(	  std::string baseClassName
+				, std::string libName
+				, boost::shared_ptr<Executor> ex = boost::shared_ptr<Executor>()
+			)
 		{
 			// create base class, to access its index. (we can't access static variable, because
 			// the class might not exist in memory at all, and we have to load dynamic library,
@@ -231,7 +322,7 @@ class DynLibDispatcher
 			int maxCurrentIndex = base->getMaxCurrentlyUsedClassIndex();
 			callBacks.resize( maxCurrentIndex+1 );	// make sure that there is a place for new Functor
 
-			boost::shared_ptr<Executor> executor=makeExecutor(libName);	// create the requested functor
+			boost::shared_ptr<Executor> executor = ex ? ex : makeExecutor(libName);	// create the requested functor
 			callBacks[index] = executor;
 			#ifdef DEBUG
 				cerr <<" New class added to DynLibDispatcher 1D: " << libName << endl;
@@ -267,7 +358,11 @@ class DynLibDispatcher
 ////////////////////////////////////////////////////////////////////////////////
 // add multivirtual function to 2D
 ////////////////////////////////////////////////////////////////////////////////
-		void add(std::string baseClassName1 , std::string baseClassName2 , std::string libName)
+		void add(	  std::string baseClassName1
+				, std::string baseClassName2
+				, std::string libName
+				, boost::shared_ptr<Executor> ex = boost::shared_ptr<Executor>()
+			)
 		{
 			boost::shared_ptr<BaseClass1> baseClass1 =
 				boost::dynamic_pointer_cast<BaseClass1>(ClassFactory::instance().createShared(baseClassName1));
@@ -298,7 +393,7 @@ class DynLibDispatcher
 			for( IteratorInfo2 cii = callBacksInfo.begin() ; cii != callBacksInfo.end() ; ++cii )
 				cii->resize(maxCurrentIndex2+1);
 
-			boost::shared_ptr<Executor> executor=makeExecutor(libName);	// create the requested functor
+			boost::shared_ptr<Executor> executor = ex ? ex : makeExecutor(libName);	// create the requested functor
 			
 			if( typeid(BaseClass1) == typeid(BaseClass2) ) // both base classes are the same
 			{
@@ -308,7 +403,7 @@ class DynLibDispatcher
 				string order		= baseClassName1 + " " + baseClassName2;
 				string reverseOrder	= baseClassName2 + " " + baseClassName1;
 				
-				if( executor->checkOrder() == order )
+				if( autoSymmetry || executor->checkOrder() == order ) // if you want autoSymmetry, you don't have to DEFINE_FUNCTOR_ORDER_2D
 				{
 					callBacksInfo	[index2][index1] = 1; // this is reversed call
 					callBacksInfo	[index1][index2] = 0;
@@ -383,7 +478,7 @@ class DynLibDispatcher
 				cerr << "DynLibDispatcher: ambigious dispatch, could not determine which multivirtual function should be called\n";
 			
 			return false;
-		}
+		};
 
 		
 ////////////////////////////////////////////////////////////////////////////////

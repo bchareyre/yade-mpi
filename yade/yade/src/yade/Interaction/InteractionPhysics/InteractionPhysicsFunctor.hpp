@@ -53,7 +53,8 @@ class InteractionPhysicsFunctor : public FunctorWrapper
 		 TYPELIST_3(	  const shared_ptr<BodyPhysicalParameters>&
 				, const shared_ptr<BodyPhysicalParameters>&
 				, shared_ptr<Interaction>&
-		) >
+			   ) 
+		>
 {
 	REGISTER_CLASS_NAME(InteractionPhysicsFunctor);
 };

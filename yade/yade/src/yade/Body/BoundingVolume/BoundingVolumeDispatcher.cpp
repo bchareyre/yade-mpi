@@ -54,7 +54,6 @@ void BoundingVolumeDispatcher::addBoundingVolumeFunctors(const string& str1,cons
 	v.push_back(str2);
 	v.push_back(str3);
 	boundingVolumeFunctors.push_back(v);
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
