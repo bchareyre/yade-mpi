@@ -1,17 +1,17 @@
-#include "BodyVector.hpp"
+#include "BodyRedirectionVector.hpp"
 #include "Body.hpp"
 
 
-BodyVector::BodyVector()
+BodyRedirectionVector::BodyRedirectionVector()
 {
 }
 
-BodyVector::~BodyVector()
+BodyRedirectionVector::~BodyRedirectionVector()
 {
 }
 
 // FIXME - make sure that this is correct
-unsigned int BodyVector::insert(shared_ptr<Body>& b)
+unsigned int BodyRedirectionVector::insert(shared_ptr<Body>& b)
 {
 	unsigned int position = b->getId();
 
@@ -58,19 +58,19 @@ unsigned int BodyVector::insert(shared_ptr<Body>& b)
 	return position;
 }
 
-unsigned int BodyVector::insert(shared_ptr<Body>& b, unsigned int newId)
+unsigned int BodyRedirectionVector::insert(shared_ptr<Body>& b, unsigned int newId)
 {
 	BodyContainer::setId(b,newId);
 	return insert(b);
 }
 
-void BodyVector::clear()
+void BodyRedirectionVector::clear()
 {
 	bodies.clear();
 	indexes.clear();
 }
 
-bool BodyVector::erase(unsigned int id)
+bool BodyRedirectionVector::erase(unsigned int id)
 {
 	std::vector< shared_ptr<Body> >::iterator tmpVii    = bodies.begin();
 	std::vector< shared_ptr<Body> >::iterator tmpViiEnd = bodies.end();
@@ -86,7 +86,7 @@ bool BodyVector::erase(unsigned int id)
 	return false;
 }
 
-bool BodyVector::find(unsigned int id , shared_ptr<Body>& b) const
+bool BodyRedirectionVector::find(unsigned int id , shared_ptr<Body>& b) const
 {
 //	std::vector< shared_ptr<Body> >::iterator tmpVii    = bodies.begin();
 //	std::vector< shared_ptr<Body> >::iterator tmpViiEnd = bodies.end();
@@ -106,7 +106,7 @@ bool BodyVector::find(unsigned int id , shared_ptr<Body>& b) const
 	}
 }
 
-shared_ptr<Body>& BodyVector::operator[](unsigned int id)
+shared_ptr<Body>& BodyRedirectionVector::operator[](unsigned int id)
 {
 	// do not modify bii iterator
 //	temporaryBii = bodies.find(id);
@@ -118,7 +118,7 @@ shared_ptr<Body>& BodyVector::operator[](unsigned int id)
 	return bodies[ indexes[id] ];
 }
 
-const shared_ptr<Body>& BodyVector::operator[](unsigned int id) const
+const shared_ptr<Body>& BodyRedirectionVector::operator[](unsigned int id) const
 {
 //	Loki::AssocVector<unsigned int , shared_ptr<Body> >::const_iterator tmpBii;
 //	tmpBii = bodies.find(id);
@@ -127,39 +127,39 @@ const shared_ptr<Body>& BodyVector::operator[](unsigned int id) const
 	return bodies[ indexes[id] ];
 }
 
-void BodyVector::gotoFirst()
+void BodyRedirectionVector::gotoFirst()
 {
 	vii    = bodies.begin();
 	viiEnd = bodies.end();
 }
 
-bool BodyVector::notAtEnd()
+bool BodyRedirectionVector::notAtEnd()
 {
 	return ( vii != viiEnd );
 }
 
-void BodyVector::gotoNext()
+void BodyRedirectionVector::gotoNext()
 {
 	++vii;
 }
 
-shared_ptr<Body> BodyVector::getCurrent()
+shared_ptr<Body> BodyRedirectionVector::getCurrent()
 {
 	return (*vii);
 }
 
-void BodyVector::pushIterator()
+void BodyRedirectionVector::pushIterator()
 {// FIXME - make sure that this is FIFO (I'm tired now...)
 	iteratorList.push_front(vii);
 }
 
-void BodyVector::popIterator()
+void BodyRedirectionVector::popIterator()
 {
 	vii = iteratorList.front();
 	iteratorList.pop_front();
 }
 
-unsigned int BodyVector::size()
+unsigned int BodyRedirectionVector::size()
 {
 	return bodies.size();
 }

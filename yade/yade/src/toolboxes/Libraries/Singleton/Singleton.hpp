@@ -63,7 +63,7 @@ class Singleton
 
 				if( ! ptr_obj )
 				{
-					ptr_obj = new T;
+					ptr_obj = new T; // FIXME - this new has no delete. we have a memory leak at exit. I'll just put here a Loki::Singleton, and everything will be OK.
 				}
 			}
 
