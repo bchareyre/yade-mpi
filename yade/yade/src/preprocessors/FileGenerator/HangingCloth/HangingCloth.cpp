@@ -11,7 +11,7 @@
 #include "SimpleSpringLaw.hpp"
 #include "PersistentSAPCollider.hpp"
 #include "ComplexBody.hpp"
-#include "ExplicitMassSpringLaw.hpp"
+#include "MassSpringLaw.hpp"
 #include "MassSpringBody2RigidBodyLaw.hpp"
 
 #include "IOManager.hpp"
@@ -151,7 +151,7 @@ string HangingCloth::generate()
 	timeIntegratorDispatcher->add("ActionForce","ParticleParameters","LeapFrogForceIntegrator");
 	timeIntegratorDispatcher->add("ActionMomentum","RigidBodyParameters","LeapFrogMomentumIntegrator");
 
-	shared_ptr<ExplicitMassSpringLaw> explicitMassSpringDynamicEngine(new ExplicitMassSpringLaw);
+	shared_ptr<MassSpringLaw> explicitMassSpringDynamicEngine(new MassSpringLaw);
 	explicitMassSpringDynamicEngine->springGroupMask = 1;
 
 	shared_ptr<SDECLaw> sdecDynamicEngine(new SDECLaw);

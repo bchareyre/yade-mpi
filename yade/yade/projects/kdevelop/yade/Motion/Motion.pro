@@ -7,11 +7,11 @@ HEADERS += ActionDispatcher.hpp \
            ActionFunctor.hpp \
            ActionContainer.hpp \
            Action.hpp \
-           InteractionLaw.hpp \
+           ConstitutiveLaw.hpp \
            KinematicMotion.hpp 
 SOURCES += ActionDispatcher.cpp \
            ActionContainer.cpp \
-           InteractionLaw.cpp \
+           ConstitutiveLaw.cpp \
            KinematicMotion.cpp 
 LIBS += -rdynamic
 INCLUDEPATH = $(YADEINCLUDEPATH)

@@ -6,7 +6,7 @@
 #include "FEMNodeParameters.hpp"
 #include "ComplexBody.hpp"
 //#include "SimpleSpringLaw.hpp"
-//#include "ExplicitMassSpringLaw.hpp"
+//#include "MassSpringLaw.hpp"
 #include <fstream>
 #include "IOManager.hpp"
 #include "Box.hpp"
@@ -40,7 +40,7 @@ string FEMRock::generate()
 // 
 // 	q.fromAxisAngle(Vector3r(0,0,1),0);
 // 
-// 	//rootBody->dynamic	   = shared_ptr<InteractionLaw>(new SimpleSpringLaw);
+// 	//rootBody->dynamic	   = shared_ptr<ConstitutiveLaw>(new SimpleSpringLaw);
 // 	//rootBody->kinematic	   = shared_ptr<KinematicMotion>(new Rotor);
 // 	//rootBody->broadCollider  = shared_ptr<BroadInteractor>(new SAPCollider);
 // 	//rootBody->narrowCollider  = shared_ptr<InteractionGeometryDispatcher>(new SimpleNarrowCollider);
@@ -52,7 +52,7 @@ string FEMRock::generate()
 // 	shared_ptr<FEMNodeParameters> femBody(new FEMNodeParameters);
 // 	shared_ptr<AABB> aabb(new AABB);
 // 	shared_ptr<Polyhedron> poly(new Polyhedron);
-// 	//	femBody->dynamic	= shared_ptr<InteractionLaw>(new ExplicitMassSpringLaw);
+// 	//	femBody->dynamic	= shared_ptr<ConstitutiveLaw>(new MassSpringLaw);
 // 	femBody->isDynamic	= true;
 // 	femBody->angularVelocity= Vector3r(0,0,0);
 // 	femBody->velocity	= Vector3r(0,0,0);

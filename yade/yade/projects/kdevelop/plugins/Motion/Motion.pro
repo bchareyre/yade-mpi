@@ -5,8 +5,8 @@
 
 SUBDIRS += Action \
            ActionFunctor \
-           InteractionLaw \
-           KinematicMotion 
+           KinematicMotion \
+           ConstitutiveLaw 
 MOC_DIR = $(YADECOMPILATIONPATH)
 UI_DIR = $(YADECOMPILATIONPATH)
 OBJECTS_DIR = $(YADECOMPILATIONPATH)

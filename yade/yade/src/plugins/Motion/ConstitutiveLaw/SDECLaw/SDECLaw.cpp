@@ -36,7 +36,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-SDECLaw::SDECLaw() : InteractionLaw() , actionForce(new ActionForce) , actionMomentum(new ActionMomentum)
+SDECLaw::SDECLaw() : ConstitutiveLaw() , actionForce(new ActionForce) , actionMomentum(new ActionMomentum)
 {
 	sdecGroupMask=1;
 	first=true;
@@ -48,7 +48,7 @@ SDECLaw::SDECLaw() : InteractionLaw() , actionForce(new ActionForce) , actionMom
 
 void SDECLaw::registerAttributes()
 {
-	InteractionLaw::registerAttributes();
+	ConstitutiveLaw::registerAttributes();
 	REGISTER_ATTRIBUTE(sdecGroupMask);
 	REGISTER_ATTRIBUTE(momentRotationLaw);
 }
