@@ -136,9 +136,14 @@ void XMLManager::parseFundamental(const string& top, vector<string>& eval)
 	rule<> inside 		= +( graph_p - '[' - ']' - '{' - '}' ); // asdf23
 	rule<> empty_array 	= *space_p >> '[' >> *space_p >> ']' >> *space_p; // [ ]
 	rule<> empty_fund 	= *space_p >> '{' >> *space_p >> '}' >> *space_p; // { }
-	rule<> one_fundamental 	= *space_p >>
+	rule<> one_fundamental = *space_p >>
 				  ( '{' >> (*space_p) % (inside) >> '}' )
-				>> *space_p; // { 123 243 { sdf sd} qwe as }
+				| ( '{' >>
+					( (*space_p) % (inside) )
+					%
+					( '{' >> (*space_p) % (inside) >> '}' )
+				  >> '}' )
+			>> *space_p; // { 123 243 { sdf sd} qwe as }
 	rule<> one_array = *space_p >> '[' >> (*space_p) % (inside) >> ']' >> *space_p; // [ 123 324 243 qwe as ]
 
 	rule<> one_everything = *space_p
