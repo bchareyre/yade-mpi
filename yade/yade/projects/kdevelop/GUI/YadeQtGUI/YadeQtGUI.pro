@@ -3,9 +3,7 @@
 # Subdir relative project main directory: ./GUI/YadeQtGUI
 # Target is a library:  
 
-FORMS += YadeQtGeneratedMainWindow.ui \
-         form1.ui 
-IDLS += form1.ui 
+FORMS += YadeQtGeneratedMainWindow.ui 
 HEADERS += YadeQtGUI.hpp \
            FpsTracker.hpp \
            GLViewer.hpp \
@@ -17,28 +15,28 @@ SOURCES += YadeQtGUI.cpp \
            QGLSubWindow.cpp \
            YadeQtMainWindow.cpp 
 LIBS += -lSerialization \
-        -lM3D \
-        -lConstants \
-        -lQtGUIGenerator \
-        -lRigidBody \
-        -rdynamic 
+-lM3D \
+-lConstants \
+-lQtGUIGenerator \
+-lRigidBody \
+-rdynamic
 INCLUDEPATH = ../../GUI/QtGUIGenerator \
-              ../../plugins/Body/RigidBody \
-              ../../yade \
-              ../../toolboxes/Math/M3D \
-              ../../toolboxes/Math/Constants \
-              ../../toolboxes/Libraries/Serialization 
-MOC_DIR = $(YADECOMPILATIONPATH) 
-UI_DIR = $(YADECOMPILATIONPATH) 
-OBJECTS_DIR = $(YADECOMPILATIONPATH) 
+../../plugins/Body/RigidBody \
+../../yade \
+../../toolboxes/Math/M3D \
+../../toolboxes/Math/Constants \
+../../toolboxes/Libraries/Serialization
+MOC_DIR = $(YADECOMPILATIONPATH)
+UI_DIR = $(YADECOMPILATIONPATH)
+OBJECTS_DIR = $(YADECOMPILATIONPATH)
 QMAKE_LIBDIR = ../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
-               ../../toolboxes/Math/M3D/$(YADEDYNLIBPATH) \
-               ../../toolboxes/Math/Constants/$(YADEDYNLIBPATH) \
-               ../../GUI/QtGUIGenerator/$(YADEDYNLIBPATH) \
-               ../../plugins/Body/RigidBody/$(YADEDYNLIBPATH) \
-               $(YADEDYNLIBPATH) 
-DESTDIR = $(YADEDYNLIBPATH) 
+../../toolboxes/Math/M3D/$(YADEDYNLIBPATH) \
+../../toolboxes/Math/Constants/$(YADEDYNLIBPATH) \
+../../GUI/QtGUIGenerator/$(YADEDYNLIBPATH) \
+../../plugins/Body/RigidBody/$(YADEDYNLIBPATH) \
+$(YADEDYNLIBPATH)
+DESTDIR = $(YADEDYNLIBPATH)
 CONFIG += release \
-          warn_on \
-          dll 
-TEMPLATE = lib 
+warn_on \
+dll
+TEMPLATE = lib
