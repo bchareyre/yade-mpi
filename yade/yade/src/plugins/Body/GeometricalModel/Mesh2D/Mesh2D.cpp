@@ -61,8 +61,6 @@ void Mesh2D::registerAttributes()
 	REGISTER_ATTRIBUTE(vertices);
 	REGISTER_ATTRIBUTE(edges);
 	REGISTER_ATTRIBUTE(faces);
-	REGISTER_ATTRIBUTE(width);
-	REGISTER_ATTRIBUTE(height);
 }
 
 

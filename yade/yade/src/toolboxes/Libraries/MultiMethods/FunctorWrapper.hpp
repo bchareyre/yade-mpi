@@ -27,7 +27,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "Factorable.hpp"
+#include "Serializable.hpp"
 #include "Typelist.hpp"
 #include "Functor.hpp"
 #include "MultiMethodsExceptions.hpp"
@@ -107,7 +107,7 @@ template
 <	class ResultType, 		// type returned by multivirtual function
 	class ArgumentTypeList		// TypeList of arguments accepted by multivirtual function,
 >
-class FunctorWrapper : public Factorable
+class FunctorWrapper : public Serializable
 {
 	private:
 		typedef Loki::FunctorImpl<ResultType, ArgumentTypeList > Impl;

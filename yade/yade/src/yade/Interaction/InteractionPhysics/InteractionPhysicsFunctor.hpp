@@ -55,9 +55,10 @@ class InteractionPhysicsFunctor : public FunctorWrapper
 				, shared_ptr<Interaction>&
 		) >
 {
+	REGISTER_CLASS_NAME(InteractionPhysicsFunctor);
 };
 
-REGISTER_FACTORABLE(InteractionPhysicsFunctor);
+REGISTER_SERIALIZABLE(InteractionPhysicsFunctor,false);
 
 #endif // __INTERACTIONPHYSICSFUNCTOR_H__
 

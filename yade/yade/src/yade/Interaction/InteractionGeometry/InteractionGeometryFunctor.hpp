@@ -59,9 +59,10 @@ class InteractionGeometryFunctor : public FunctorWrapper
 				, shared_ptr<Interaction>&
 		) >
 {
+	REGISTER_CLASS_NAME(InteractionGeometryFunctor);
 };
 
-REGISTER_FACTORABLE(InteractionGeometryFunctor);
+REGISTER_SERIALIZABLE(InteractionGeometryFunctor,false);
 
 #endif // __INTERACTIONGEOMETRYFUNCTOR_H__
 

@@ -49,7 +49,6 @@ class Mesh2D : public GeometricalModel
 {
 	public : vector<Vector3r> vertices;
 	public : vector<Edge> edges;
-	public : int width,height;
 	public : vector<vector<int> > faces;
 	public : vector<Vector3r> fNormals;
 	public : vector<Vector3r> vNormals;

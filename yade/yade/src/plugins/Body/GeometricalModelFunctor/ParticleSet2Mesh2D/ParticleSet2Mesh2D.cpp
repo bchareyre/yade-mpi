@@ -38,6 +38,8 @@ void ParticleSet2Mesh2D::go(	  const shared_ptr<BodyPhysicalParameters>&
 	const ComplexBody * ncb = dynamic_cast<const ComplexBody*>(body);
 	const shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	
+// FIXME - this copying of Se3 between Mesh2D, and Particles inside ComplexBody could be done just once, if Se3 was inside shared_ptr. This can be improved once we make indexable Parameters: Velocity, Position, Orientation, ....
+
  	unsigned int i=0;
 	for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext() , ++i )
  		mesh2d->vertices[i]=bodies->getCurrent()->physicalParameters->se3.translation;

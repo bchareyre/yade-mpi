@@ -1,0 +1,83 @@
+<Yade>
+	<rootBody _className_="ComplexBody"  id="0" group="0" isDynamic="0">
+		<physicalParameters _className_="ParticleParameters"  se3="{0 0 0 1 0 0 0}" mass="0" velocity="{0 0 0}" />
+		<geometricalModel />
+		<interactionGeometry _className_="InteractionDescriptionSet"  diffuseColor="{0 0 1}" />
+		<boundingVolume _className_="AABB"  diffuseColor="{0 0 1}" />
+		<actors size="7">
+			<actors _className_="BoundingVolumeDispatcher"  boundingVolumeFunctors="[[InteractionSphere AABB Sphere2AABBFunctor] [InteractionBox AABB Box2AABBFunctor] [InteractionDescriptionSet AABB InteractionDescriptionSet2AABBFunctor]]" />
+			<actors _className_="PersistentSAPCollider"  />
+			<actors _className_="InteractionGeometryDispatcher"  interactionGeometryFunctors="[[InteractionSphere InteractionSphere Sphere2Sphere4SDECContactModel] [InteractionSphere InteractionBox Box2Sphere4SDECContactModel]]" />
+			<actors _className_="InteractionPhysicsDispatcher"  interactionPhysicsFunctors="[[SDECParameters SDECParameters SDECLinearContactModel]]" />
+			<actors _className_="SDECDynamicEngine"  />
+			<actors _className_="ApplyActionDispatcher"  applyActionFunctors="[[ActionForce RigidBodyParameters ActionForce2Particle] [ActionMomentum RigidBodyParameters ActionMomentum2RigidBody]]" />
+			<actors _className_="TimeIntegratorDispatcher"  timeIntegratorFunctors="[[SDECParameters LeapFrogIntegrator]]" />
+		</actors>
+		<bodies _className_="BodyRedirectionVector" >
+			<body size="9">
+				<body _className_="SimpleBody"  id="0" group="0" isDynamic="0">
+					<physicalParameters _className_="SDECParameters"  se3="{0 0 0 1 0 0 0}" mass="0" velocity="{0 0 0}" inertia="{0 0 0}" angularVelocity="{0 0 0}" kn="100000" ks="10000" />
+					<geometricalModel _className_="Box"  diffuseColor="{1 1 1}" wire="0" visible="1" shadowCaster="0" extents="{200 5 200}" />
+					<interactionGeometry _className_="InteractionBox"  diffuseColor="{1 1 1}" extents="{200 5 200}" />
+					<boundingVolume _className_="AABB"  diffuseColor="{1 0 0}" />
+				</body>
+				<body _className_="SimpleBody"  id="1" group="0" isDynamic="1">
+					<physicalParameters _className_="SDECParameters"  se3="{-11.36251 16.33461 -10.09438 1 0 0 0}" mass="104.7198" velocity="{0 0 0}" inertia="{1047.198 1047.198 1047.198}" angularVelocity="{0 0 0}" kn="100000" ks="10000" />
+					<geometricalModel _className_="Sphere"  diffuseColor="{0.4773971 0.55397 0.2777747}" wire="0" visible="1" shadowCaster="1" radius="5" />
+					<interactionGeometry _className_="InteractionSphere"  diffuseColor="{0.5134009 0.3647845 0.6288709}" radius="5" />
+					<boundingVolume _className_="AABB"  diffuseColor="{0 1 0}" />
+				</body>
+				<body _className_="SimpleBody"  id="2" group="0" isDynamic="1">
+					<physicalParameters _className_="SDECParameters"  se3="{-10.70143 17.91563 0.9949054 1 0 0 0}" mass="104.7198" velocity="{0 0 0}" inertia="{1047.198 1047.198 1047.198}" angularVelocity="{0 0 0}" kn="100000" ks="10000" />
+					<geometricalModel _className_="Sphere"  diffuseColor="{0.01630057 0.6069689 0.1416026}" wire="0" visible="1" shadowCaster="1" radius="5" />
+					<interactionGeometry _className_="InteractionSphere"  diffuseColor="{0.8041767 0.1372316 0.2428868}" radius="5" />
+					<boundingVolume _className_="AABB"  diffuseColor="{0 1 0}" />
+				</body>
+				<body _className_="SimpleBody"  id="3" group="0" isDynamic="1">
+					<physicalParameters _className_="SDECParameters"  se3="{-11.81446 27.78208 -11.75531 1 0 0 0}" mass="104.7198" velocity="{0 0 0}" inertia="{1047.198 1047.198 1047.198}" angularVelocity="{0 0 0}" kn="100000" ks="10000" />
+					<geometricalModel _className_="Sphere"  diffuseColor="{0.5129324 0.2182569 0.9989245}" wire="0" visible="1" shadowCaster="1" radius="5" />
+					<interactionGeometry _className_="InteractionSphere"  diffuseColor="{0.2960316 0.6126398 0.8391122}" radius="5" />
+					<boundingVolume _className_="AABB"  diffuseColor="{0 1 0}" />
+				</body>
+				<body _className_="SimpleBody"  id="4" group="0" isDynamic="1">
+					<physicalParameters _className_="SDECParameters"  se3="{-11.01412 28.05343 0.302615 1 0 0 0}" mass="104.7198" velocity="{0 0 0}" inertia="{1047.198 1047.198 1047.198}" angularVelocity="{0 0 0}" kn="100000" ks="10000" />
+					<geometricalModel _className_="Sphere"  diffuseColor="{0.526745 0.7713577 0.2925168}" wire="0" visible="1" shadowCaster="1" radius="5" />
+					<interactionGeometry _className_="InteractionSphere"  diffuseColor="{0.8915294 0.4002286 0.7699139}" radius="5" />
+					<boundingVolume _className_="AABB"  diffuseColor="{0 1 0}" />
+				</body>
+				<body _className_="SimpleBody"  id="5" group="0" isDynamic="1">
+					<physicalParameters _className_="SDECParameters"  se3="{0.6769939 16.67541 -11.47671 1 0 0 0}" mass="104.7198" velocity="{0 0 0}" inertia="{1047.198 1047.198 1047.198}" angularVelocity="{0 0 0}" kn="100000" ks="10000" />
+					<geometricalModel _className_="Sphere"  diffuseColor="{0.5259954 0.9493271 0.06975528}" wire="0" visible="1" shadowCaster="1" radius="5" />
+					<interactionGeometry _className_="InteractionSphere"  diffuseColor="{0.6632269 0.1922138 0.08605585}" radius="5" />
+					<boundingVolume _className_="AABB"  diffuseColor="{0 1 0}" />
+				</body>
+				<body _className_="SimpleBody"  id="6" group="0" isDynamic="1">
+					<physicalParameters _className_="SDECParameters"  se3="{-0.9588231 16.66756 0.8585117 1 0 0 0}" mass="104.7198" velocity="{0 0 0}" inertia="{1047.198 1047.198 1047.198}" angularVelocity="{0 0 0}" kn="100000" ks="10000" />
+					<geometricalModel _className_="Sphere"  diffuseColor="{0.23828 0.06309584 0.4577017}" wire="0" visible="1" shadowCaster="1" radius="5" />
+					<interactionGeometry _className_="InteractionSphere"  diffuseColor="{0.8509198 0.9022081 0.9706341}" radius="5" />
+					<boundingVolume _className_="AABB"  diffuseColor="{0 1 0}" />
+				</body>
+				<body _className_="SimpleBody"  id="7" group="0" isDynamic="1">
+					<physicalParameters _className_="SDECParameters"  se3="{-0.2745447 28.08747 -11.51334 1 0 0 0}" mass="104.7198" velocity="{0 0 0}" inertia="{1047.198 1047.198 1047.198}" angularVelocity="{0 0 0}" kn="100000" ks="10000" />
+					<geometricalModel _className_="Sphere"  diffuseColor="{0.5316064 0.6677238 0.5125354}" wire="0" visible="1" shadowCaster="1" radius="5" />
+					<interactionGeometry _className_="InteractionSphere"  diffuseColor="{0.9318351 0.4376376 0.03928034}" radius="5" />
+					<boundingVolume _className_="AABB"  diffuseColor="{0 1 0}" />
+				</body>
+				<body _className_="SimpleBody"  id="8" group="0" isDynamic="1">
+					<physicalParameters _className_="SDECParameters"  se3="{-0.4745545 28.4861 0.9477816 1 0 0 0}" mass="104.7198" velocity="{0 0 0}" inertia="{1047.198 1047.198 1047.198}" angularVelocity="{0 0 0}" kn="100000" ks="10000" />
+					<geometricalModel _className_="Sphere"  diffuseColor="{0.6878614 0.3540487 0.6399788}" wire="0" visible="1" shadowCaster="1" radius="5" />
+					<interactionGeometry _className_="InteractionSphere"  diffuseColor="{0.8800752 0.4401045 0.1659742}" radius="5" />
+					<boundingVolume _className_="AABB"  diffuseColor="{0 1 0}" />
+				</body>
+			</body>
+		</bodies>
+		<interactions _className_="InteractionVecSet" >
+			<interaction size="0">
+			</interaction>
+		</interactions>
+		<permanentInteractions _className_="InteractionVecSet" >
+			<interaction size="0">
+			</interaction>
+		</permanentInteractions>
+	</rootBody>
+</Yade>
