@@ -1,10 +1,10 @@
 #ifndef __TERRAINFROMWRL1FILEFACTORY_H__
 #define __TERRAINFROMWRL1FILEFACTORY_H__
 
-#include "GeometricalModelFactoryFunctor.hpp"
+#include "GeometricalModelFunctor.hpp"
 #include <boost/shared_ptr.hpp>
 
-class TerrainFromVRML1Factory : public GeometricalModelFactoryFunctor
+class TerrainFromVRML1Factory : public GeometricalModelFunctor
 {
 	// construction
 	public : TerrainFromVRML1Factory ();

@@ -13,9 +13,9 @@ LIBS += -lSerialization \
         -lFactory \
         -lInteractionVecSet \
         -lInteractionHashMap \
-        -lBodyAssocVec \
         -lBodyRedirectionVector \
         -lThreads \
+        -lBodyAssocVector \
         -lboost_thread \
         -lboost_filesystem \
         -lboost_date_time \
@@ -36,9 +36,9 @@ QMAKE_LIBDIR = ../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../toolboxes/Libraries/Factory/$(YADEDYNLIBPATH) \
                ../../toolboxes/DataStructures/InteractionContainer/InteractionVecSet/$(YADEDYNLIBPATH) \
                ../../toolboxes/DataStructures/InteractionContainer/InteractionHashMap/$(YADEDYNLIBPATH) \
-               ../../toolboxes/DataStructures/BodyContainer/BodyAssocVec/$(YADEDYNLIBPATH) \
                ../../toolboxes/DataStructures/BodyContainer/BodyRedirectionVector/$(YADEDYNLIBPATH) \
                ../../toolboxes/Libraries/Threads/$(YADEDYNLIBPATH) \
+               ../../toolboxes/DataStructures/BodyContainer/BodyAssocVec/$(YADEDYNLIBPATH) \
                ../../yade/MultiMethods/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \

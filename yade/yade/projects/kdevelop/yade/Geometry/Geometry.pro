@@ -19,17 +19,17 @@ CONFIG += debug \
           dll 
 TEMPLATE = lib 
 HEADERS += BoundingVolume.hpp \
-           BoundingVolumeFactoryFunctor.hpp \
-           BoundingVolumeFactoryDispatcher.hpp \
-           InteractionGeometry.hpp \
-           InteractionGeometryFactoryFunctor.hpp \
-           InteractionGeometryFactoryDispatcher.hpp \
+           BoundingVolumeFunctor.hpp \
+           BoundingVolumeDispatcher.hpp \
+           InteractionDescription.hpp \
+           InteractionDescriptionFunctor.hpp \
+           InteractionDescriptionDispatcher.hpp \
            GeometricalModel.hpp \
-           GeometricalModelFactoryFunctor.hpp \
-           GeometricalModelFactoryDispatcher.hpp
+           GeometricalModelFunctor.hpp \
+           GeometricalModelDispatcher.hpp
 SOURCES += BoundingVolume.cpp \
-           BoundingVolumeFactoryDispatcher.cpp \
-           InteractionGeometry.cpp \
-           InteractionGeometryFactoryDispatcher.cpp \
+           BoundingVolumeDispatcher.cpp \
+           InteractionDescription.cpp \
+           InteractionDescriptionDispatcher.cpp \
            GeometricalModel.cpp \
-           GeometricalModelFactoryDispatcher.cpp
+           GeometricalModelDispatcher.cpp

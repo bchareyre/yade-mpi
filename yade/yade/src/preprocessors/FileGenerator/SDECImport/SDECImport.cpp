@@ -16,7 +16,7 @@
 #include "ForceRecorder.hpp"
 #include "AveragePositionRecorder.hpp"
 
-#include "BoundingVolumeFactoryDispatcher.hpp"
+#include "BoundingVolumeDispatcher.hpp"
 #include "InteractionGeometrySet.hpp"
 #include "InteractionGeometrySet2AABBFactory.hpp"
 
@@ -104,7 +104,7 @@ string SDECImport::generate()
 // 	nc->addCollisionFunctor("Sphere","Box","Box2Sphere4SDECContactModel");
 // 
 // // specify bounding volume
-// 	shared_ptr<BoundingVolumeFactoryDispatcher> bvu	= shared_ptr<BoundingVolumeFactoryDispatcher>(new BoundingVolumeFactoryDispatcher);
+// 	shared_ptr<BoundingVolumeDispatcher> bvu	= shared_ptr<BoundingVolumeDispatcher>(new BoundingVolumeDispatcher);
 // 	bvu->addBVFactories("Sphere","AABB","Sphere2AABBFactory");
 // 	bvu->addBVFactories("Box","AABB","Box2AABBFactory");
 // 	bvu->addBVFactories("InteractionGeometrySet","AABB","InteractionGeometrySet2AABBFactory");

@@ -106,7 +106,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>yade/Geometry</activedir>
+      <activedir>plugins/Geometry/GeometricalModelFactory/TerrainFromVRML1Factory</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>

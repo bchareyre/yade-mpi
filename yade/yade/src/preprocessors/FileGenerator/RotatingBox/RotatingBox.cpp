@@ -13,7 +13,7 @@
 #include "IOManager.hpp"
 #include "SDECDynamicEngine.hpp"
 #include "SDECDiscreteElement.hpp"
-#include "BoundingVolumeFactoryDispatcher.hpp"
+#include "BoundingVolumeDispatcher.hpp"
 #include "InteractionGeometrySet2AABBFactory.hpp"
 #include "InteractionGeometrySet.hpp"
 
@@ -50,7 +50,7 @@ string RotatingBox::generate()
 // 	nc->addCollisionFunctor("Sphere","Sphere","Sphere2Sphere4SDECContactModel");
 // 	nc->addCollisionFunctor("Sphere","Box","Box2Sphere4SDECContactModel");
 // 	
-// 	shared_ptr<BoundingVolumeFactoryDispatcher> bvu	= shared_ptr<BoundingVolumeFactoryDispatcher>(new BoundingVolumeFactoryDispatcher);
+// 	shared_ptr<BoundingVolumeDispatcher> bvu	= shared_ptr<BoundingVolumeDispatcher>(new BoundingVolumeDispatcher);
 // 	bvu->addBVFactories("Sphere","AABB","Sphere2AABBFactory");
 // 	bvu->addBVFactories("Box","AABB","Box2AABBFactory");
 // 	bvu->addBVFactories("InteractionGeometrySet","AABB","InteractionGeometrySet2AABBFactory");

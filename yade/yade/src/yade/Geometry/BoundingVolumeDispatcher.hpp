@@ -31,17 +31,17 @@
 #include "DynLibDispatcher.hpp"
 #include "InteractionDescription.hpp"
 #include "BoundingVolume.hpp"
-#include "BoundingVolumeFactoryFunctor.hpp"
+#include "BoundingVolumeFunctor.hpp"
 #include "Body.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class BoundingVolumeFactoryDispatcher : public Actor
+class BoundingVolumeDispatcher : public Actor
 {
 	protected: DynLibDispatcher
 		<	TYPELIST_2( InteractionDescription , BoundingVolume ) ,	// base classess for dispatch
-			BoundingVolumeFactoryFunctor,					// class that provides multivirtual call
+			BoundingVolumeFunctor,					// class that provides multivirtual call
 			void ,							// return type
 			TYPELIST_3(
 					  const shared_ptr<InteractionDescription>&	// arguments
@@ -54,15 +54,15 @@ class BoundingVolumeFactoryDispatcher : public Actor
 	public  : void addBVFactories(const string& str1,const string& str2,const string& str3);
 
 	// construction
-	public : BoundingVolumeFactoryDispatcher ();
-	public : ~BoundingVolumeFactoryDispatcher ();
+	public : BoundingVolumeDispatcher ();
+	public : ~BoundingVolumeDispatcher ();
 
 	public : void registerAttributes();
 	public : void postProcessAttributes(bool deserializing);
 	public : virtual void action(Body* b);
 	public : void updateBoundingVolume(Body* b);
 	public : void updateBoundingVolume(shared_ptr<Body> b);
-	REGISTER_CLASS_NAME(BoundingVolumeFactoryDispatcher);
+	REGISTER_CLASS_NAME(BoundingVolumeDispatcher);
 
 	public : bool isActivated();
 
@@ -71,7 +71,7 @@ class BoundingVolumeFactoryDispatcher : public Actor
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-REGISTER_SERIALIZABLE(BoundingVolumeFactoryDispatcher,false);
+REGISTER_SERIALIZABLE(BoundingVolumeDispatcher,false);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
