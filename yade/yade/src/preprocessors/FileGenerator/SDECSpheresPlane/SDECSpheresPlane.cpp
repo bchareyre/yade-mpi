@@ -42,7 +42,7 @@ void SDECSpheresPlane::registerAttributes()
 	REGISTER_ATTRIBUTE(maxRadius);
 }
 
-void SDECSpheresPlane::generate()
+string SDECSpheresPlane::generate()
 {
 	rootBody = shared_ptr<NonConnexBody>(new NonConnexBody);
 
@@ -156,4 +156,6 @@ void SDECSpheresPlane::generate()
 		b = dynamic_pointer_cast<Body>(s);
 		rootBody->bodies->insert(b);
 	}
+	
+	return "";
 }

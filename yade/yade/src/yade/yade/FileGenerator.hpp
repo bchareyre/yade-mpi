@@ -48,8 +48,8 @@ class FileGenerator : public Serializable
 	protected : virtual void postProcessAttributes(bool);
 	public : virtual void registerAttributes();
 
-	public : virtual void generate();
-	public : void generateAndSave();
+	public : virtual string generate();
+	public : string generateAndSave();
 	
 	REGISTER_CLASS_NAME(FileGenerator);
 };

@@ -30,7 +30,7 @@ void BoxStack::registerAttributes()
 {
 }
 
-void BoxStack::generate()
+string BoxStack::generate()
 {
 
 
@@ -122,6 +122,5 @@ void BoxStack::generate()
 			rootBody->bodies->insert(b);
 		}
 
-
-	IOManager::saveToFile("XMLManager", "../data/BoxStack.xml", "rootBody", rootBody);
+	return "";
 }

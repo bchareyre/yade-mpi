@@ -31,7 +31,7 @@ void FEMRock::registerAttributes()
 {
 }
 
-void FEMRock::generate()
+string FEMRock::generate()
 {
 	// FIXME : not working
 	rootBody = shared_ptr<NonConnexBody>(new NonConnexBody);
@@ -109,6 +109,6 @@ void FEMRock::generate()
 	rootBody->bodies->insert(b);
 
 
-	IOManager::saveToFile("XMLManager", "../data/FEMRock.xml", "rootBody", rootBody);
+	return "";
 
 }

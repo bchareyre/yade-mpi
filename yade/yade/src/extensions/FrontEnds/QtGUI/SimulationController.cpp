@@ -28,11 +28,12 @@
 #include "Threadable.hpp"
 #include "OpenGLRenderingEngine.hpp"
 #include "MessageDialog.hpp"
+#include "FileDialog.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <qfiledialog.h>
+
 #include <qlabel.h>
 #include <qpushbutton.h>
 #include <qgroupbox.h>
@@ -144,10 +145,10 @@ void SimulationController::pbApplyClicked()
 void SimulationController::pbLoadClicked()
 {
 	
-	QString selectedFilter;
-	QString fileName = QFileDialog::getOpenFileName("../data", "XML Yade File (*.xml)", 0,"Open File","Choose a file to open",&selectedFilter );
+	string selectedFilter;
+	string fileName = FileDialog::getOpenFileName("../data", "XML Yade File (*.xml)", "Choose a file to open", parentWorkspace, selectedFilter );
 		
-	if (!fileName.isEmpty() && selectedFilter == "XML Yade File (*.xml)")
+	if (fileName.size()!=0 && selectedFilter == "XML Yade File (*.xml)")
 	{
 		
 		map<int,GLViewer*>::iterator gi = glViews.begin();

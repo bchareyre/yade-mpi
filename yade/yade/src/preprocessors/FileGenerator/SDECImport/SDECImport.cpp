@@ -87,7 +87,7 @@ void SDECImport::registerAttributes()
 	REGISTER_ATTRIBUTE(spheresRandomColor);
 }
 
-void SDECImport::generate()
+string SDECImport::generate()
 {
 
 // rootBody - the whole scene
@@ -223,8 +223,8 @@ void SDECImport::generate()
 		}
 	}
 	
-	cerr << "lower: " << lowerCorner[0] << " "<< lowerCorner[1] << " "<< lowerCorner[2] << endl;
-	cerr << "upper: " << upperCorner[0] << " "<< upperCorner[1] << " "<< upperCorner[2] << endl;
+//	cerr << "lower: " << lowerCorner[0] << " "<< lowerCorner[1] << " "<< lowerCorner[2] << endl;
+//	cerr << "upper: " << upperCorner[0] << " "<< upperCorner[1] << " "<< upperCorner[2] << endl;
 
 	
 ///////////////////////////////////////////////////////////////////////////////
@@ -466,5 +466,7 @@ void SDECImport::generate()
 ///////////////////////////////////////////////////////////////////////////////
 /// end of box inserting
 ///////////////////////////////////////////////////////////////////////////////
+	
+	return "";
 
 }

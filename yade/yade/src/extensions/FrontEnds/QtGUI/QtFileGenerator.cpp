@@ -25,6 +25,7 @@
 #include "ClassFactory.hpp"
 #include "FileGenerator.hpp"
 #include "Omega.hpp"
+#include "FileDialog.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -33,7 +34,6 @@
 #include <qlabel.h>
 #include <qpushbutton.h>
 #include <qgroupbox.h>
-#include <qfiledialog.h>
 #include <qcombobox.h>
 #include <qlineedit.h>
 
@@ -55,6 +55,7 @@ QtFileGenerator::QtFileGenerator ( QWidget * parent , const char * name) : QtFil
 			cbGeneratorName->insertItem((*di).first);
 	}
 
+	cbGeneratorNameActivated(cbGeneratorName->currentText());
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -70,10 +71,10 @@ QtFileGenerator::~QtFileGenerator()
 
 void QtFileGenerator::pbChooseClicked()
 {
-	QString selectedFilter;
-	QString fileName = QFileDialog::getSaveFileName("../data", "XML Yade File (*.xml)", this,"Open File","Choose a file to open",&selectedFilter );
+	string selectedFilter;
+	string fileName = FileDialog::getSaveFileName("../data", "XML Yade File (*.xml)", "Choose a file to save", this->parentWidget()->parentWidget(),selectedFilter );
 
-	if (!fileName.isEmpty() && selectedFilter == "XML Yade File (*.xml)")
+	if (fileName.size()!=0 && selectedFilter == "XML Yade File (*.xml)")
 		leOutputFileName->setText(fileName);
 }
 
@@ -120,6 +121,9 @@ void QtFileGenerator::cbGeneratorNameActivated(const QString& s)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include <boost/filesystem/operations.hpp>
+#include <boost/filesystem/convenience.hpp>
+#include "MessageDialog.hpp"
 void QtFileGenerator::pbGenerateClicked()
 {
 	// FIXME add some test to avoid crashing
@@ -130,9 +134,11 @@ void QtFileGenerator::pbGenerateClicked()
 	
 	guiGen.deserialize(fg);
 	
-	fg->generateAndSave();
-	
-	
+	string message = fg->generateAndSave();
+
+	string fileName = string(filesystem::basename(leOutputFileName->text().data()))+string(filesystem::extension(leOutputFileName->text().data()));
+	shared_ptr<MessageDialog> md = shared_ptr<MessageDialog>(new MessageDialog("File "+fileName+" generated successfully.\n\n"+message,this->parentWidget()->parentWidget()));
+	md->exec();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

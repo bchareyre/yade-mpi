@@ -51,7 +51,7 @@ void SDECLinkedSpheres::registerAttributes()
 	REGISTER_ATTRIBUTE(support2);
 }
 
-void SDECLinkedSpheres::generate()
+string SDECLinkedSpheres::generate()
 {
 	shared_ptr<AABB> aabb;
 	
@@ -276,6 +276,7 @@ void SDECLinkedSpheres::generate()
 
 		rootBody->bodies->popIterator();
 	}
-	cout << "total number of permament links created: " << rootBody->permanentInteractions->size() << endl;
+	
+	return "total number of permament links created: " + lexical_cast<string>(rootBody->permanentInteractions->size());
 
 }

@@ -16,7 +16,7 @@ class SDECSpheresPlane : public FileGenerator
 	protected : virtual void postProcessAttributes(bool deserializing);
 	public : void registerAttributes();
 
-	public : void generate();
+	public : string generate();
 
 	REGISTER_CLASS_NAME(SDECSpheresPlane);
 };

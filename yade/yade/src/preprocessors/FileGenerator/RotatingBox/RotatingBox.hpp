@@ -14,7 +14,7 @@ class RotatingBox : public FileGenerator
 	public : ~RotatingBox ();
 
 	public : virtual void registerAttributes();
-	public : virtual void generate();
+	public : virtual string generate();
 
 	REGISTER_CLASS_NAME(RotatingBox);
 };

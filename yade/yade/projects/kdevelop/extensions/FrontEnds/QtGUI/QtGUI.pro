@@ -3,47 +3,6 @@
 # Subdir relative project main directory: ./extensions/FrontEnds/QtGUI
 # Target is a library:  
 
-LIBS += -lSerialization \
-        -lMath \
-        -lBody \
-        -lEngine \
-        -lGeometry \
-        -lInteraction \
-        -lMultiMethods \
-        -lXMLManager \
-        -lFactory \
-        -lGLWindowManager \
-        -lThreads \
-        -lOpenGLRenderingEngine \
-        -lboost_date_time \
-        -lboost_filesystem \
-        -rdynamic 
-INCLUDEPATH = $(YADEINCLUDEPATH) 
-MOC_DIR = $(YADECOMPILATIONPATH) 
-UI_DIR = $(YADECOMPILATIONPATH) 
-OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
-               ../../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
-               ../../../yade/Body/$(YADEDYNLIBPATH) \
-               ../../../yade/Engine/$(YADEDYNLIBPATH) \
-               ../../../yade/Geometry/$(YADEDYNLIBPATH) \
-               ../../../yade/Interaction/$(YADEDYNLIBPATH) \
-               ../../../yade/MultiMethods/$(YADEDYNLIBPATH) \
-               ../../../extensions/IOManager/XMLManager/$(YADEDYNLIBPATH) \
-               ../../../toolboxes/Libraries/Factory/$(YADEDYNLIBPATH) \
-               ../../../toolboxes/OpenGL/GLWindowManager/$(YADEDYNLIBPATH) \
-               ../../../toolboxes/Libraries/Threads/$(YADEDYNLIBPATH) \
-               ../../../extensions/RenderingEngines/OpenGLRenderingEngine/OpenGLRenderingEngine/$(YADEDYNLIBPATH) \
-               $(YADEDYNLIBPATH) 
-QMAKE_CXXFLAGS_RELEASE += -lpthread \
-                          -pthread 
-QMAKE_CXXFLAGS_DEBUG += -lpthread \
-                        -pthread 
-DESTDIR = $(YADEDYNLIBPATH) 
-CONFIG += debug \
-          warn_on \
-          dll 
-TEMPLATE = lib 
 FORMS += YadeQtGeneratedMainWindow.ui \
          QtFileGeneratorController.ui \
          QtGeneratedSimulationController.ui \
@@ -56,7 +15,8 @@ HEADERS += QtGUI.hpp \
            SimulationController.hpp \
            QGLThread.hpp \
            SimulationControllerUpdater.hpp \
-           MessageDialog.hpp 
+           MessageDialog.hpp \
+           FileDialog.hpp 
 SOURCES += QtGUI.cpp \
            GLViewer.cpp \
            YadeQtMainWindow.cpp \
@@ -65,7 +25,49 @@ SOURCES += QtGUI.cpp \
            SimulationController.cpp \
            QGLThread.cpp \
            SimulationControllerUpdater.cpp \
-           MessageDialog.cpp 
+           MessageDialog.cpp \
+           FileDialog.cpp 
+LIBS += -lSerialization \
+-lMath \
+-lBody \
+-lEngine \
+-lGeometry \
+-lInteraction \
+-lMultiMethods \
+-lXMLManager \
+-lFactory \
+-lGLWindowManager \
+-lThreads \
+-lOpenGLRenderingEngine \
+-lboost_date_time \
+-lboost_filesystem \
+-rdynamic
+INCLUDEPATH = $(YADEINCLUDEPATH)
+MOC_DIR = $(YADECOMPILATIONPATH)
+UI_DIR = $(YADECOMPILATIONPATH)
+OBJECTS_DIR = $(YADECOMPILATIONPATH)
+QMAKE_LIBDIR = ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
+../../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
+../../../yade/Body/$(YADEDYNLIBPATH) \
+../../../yade/Engine/$(YADEDYNLIBPATH) \
+../../../yade/Geometry/$(YADEDYNLIBPATH) \
+../../../yade/Interaction/$(YADEDYNLIBPATH) \
+../../../yade/MultiMethods/$(YADEDYNLIBPATH) \
+../../../extensions/IOManager/XMLManager/$(YADEDYNLIBPATH) \
+../../../toolboxes/Libraries/Factory/$(YADEDYNLIBPATH) \
+../../../toolboxes/OpenGL/GLWindowManager/$(YADEDYNLIBPATH) \
+../../../toolboxes/Libraries/Threads/$(YADEDYNLIBPATH) \
+../../../extensions/RenderingEngines/OpenGLRenderingEngine/OpenGLRenderingEngine/$(YADEDYNLIBPATH) \
+$(YADEDYNLIBPATH)
+QMAKE_CXXFLAGS_RELEASE += -lpthread \
+-pthread
+QMAKE_CXXFLAGS_DEBUG += -lpthread \
+-pthread
+DESTDIR = $(YADEDYNLIBPATH)
+CONFIG += debug \
+warn_on \
+dll
+TEMPLATE = lib
 QtGeneratedSimulationController.ui.target = QtGeneratedSimulationController.ui
 QtGUISignalCatcher.ui.target = QtGUISignalCatcher.ui
 QtFileGeneratorController.ui.target = QtFileGeneratorController.ui

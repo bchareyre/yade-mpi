@@ -42,7 +42,7 @@ void RotatingBox::registerAttributes()
 	REGISTER_ATTRIBUTE(nbBoxes);
 }
 
-void RotatingBox::generate()
+string RotatingBox::generate()
 {
 	rootBody = shared_ptr<NonConnexBody>(new NonConnexBody);
 	Quaternionr q;
@@ -335,4 +335,5 @@ void RotatingBox::generate()
 				b=dynamic_pointer_cast<Body>(boxi);
 				rootBody->bodies->insert(b);
 			}
+	return "";
 }

@@ -34,7 +34,7 @@ void HangingCloth::registerAttributes()
 {
 }
 
-void HangingCloth::generate()
+string HangingCloth::generate()
 {
 	//FIXME : not working
 	
@@ -189,8 +189,5 @@ void HangingCloth::generate()
 		rootBody->bodies->insert(b);
 	}
 
-// FIXME : why it save twice some attributes?
-//	IOManager::loadFromFile("XMLManager", "../data/HangingCloth.xml", "rootBody", rootBody);
-	IOManager::saveToFile("XMLManager", "../data/HangingCloth.xml", "rootBody", rootBody);
-
+	return "";
 }
