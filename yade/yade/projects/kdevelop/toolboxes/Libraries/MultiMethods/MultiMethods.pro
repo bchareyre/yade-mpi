@@ -4,9 +4,9 @@
 # Target is a library:  
 
 HEADERS += DynLibDispatcher.hpp \
-           DynLibLauncher.hpp \
            Indexable.hpp \
-           MultiMethodsExceptions.hpp 
+           MultiMethodsExceptions.hpp \
+           FunctorWrapper.hpp 
 SOURCES += MultiMethodsExceptions.cpp 
 LIBS += -rdynamic
 INCLUDEPATH = $(YADEINCLUDEPATH)

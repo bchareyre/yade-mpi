@@ -91,7 +91,7 @@
 /// only for fundametal types and pure pointers, all other types are passed by referece. For details look 
 /// into Loki::TypeTraits::ParameterType. For example if you your class is:
 ///
-/// class ShapeDraw : public DynLibLauncher< std::string , TYPELIST_4(boost::shared_ptr<Shape>,double,char,const std::string) >
+/// class ShapeDraw : public FunctorWrapper< std::string , TYPELIST_4(boost::shared_ptr<Shape>,double,char,const std::string) >
 /// {}
 ///
 /// then virtual function to overload is:
@@ -107,7 +107,7 @@ template
 <	class ResultType, 		// type returned by multivirtual function
 	class ArgumentTypeList		// TypeList of arguments accepted by multivirtual function,
 >
-class DynLibLauncher : public Factorable
+class FunctorWrapper : public Factorable
 {
 	private:
 		typedef Loki::FunctorImpl<ResultType, ArgumentTypeList > Impl;
@@ -135,8 +135,8 @@ class DynLibLauncher : public Factorable
 		}
 
 	public:
-			DynLibLauncher () {};
-		virtual ~DynLibLauncher () {};
+			FunctorWrapper () {};
+		virtual ~FunctorWrapper () {};
 		virtual std::string checkOrder() const { return ""; };
 
 // FIXME : we can save some memory by writing specializations for each number of parameters, like FunctorImpl, but it will not make call faster - always it's one virtual redirection. So I'll do that later.

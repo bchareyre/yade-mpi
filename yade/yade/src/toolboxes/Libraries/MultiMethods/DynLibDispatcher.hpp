@@ -53,7 +53,7 @@ template
 	class Executor,		//	class which gives multivirtual function
 	class ResultType,	//	type returned by multivirtual function
 	class TList,		//	typelist of arguments passed to multivirtual function
-				//	WARNING: first arguments must be boost::shared_ptr<BaseClass>, for details see DynLibLauncher
+				//	WARNING: first arguments must be boost::shared_ptr<BaseClass>, for details see FunctorWrapper
 				
 	bool autoSymmetry=true	//	true -	the function called is always the same,
 				//		only order of arguments is rearranged

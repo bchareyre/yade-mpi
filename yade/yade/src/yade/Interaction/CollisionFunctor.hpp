@@ -29,7 +29,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "DynLibLauncher.hpp"
+#include "FunctorWrapper.hpp"
 #include "CollisionGeometry.hpp"
 #include "Se3.hpp"
 #include "Interaction.hpp"
@@ -48,7 +48,7 @@
 	Every functions that describe collision between two CollisionGeometries must derive from CollisionFunctor.
 */
 
-class CollisionFunctor : public DynLibLauncher
+class CollisionFunctor : public FunctorWrapper
 		<
 		 bool ,
 		 TYPELIST_5(
