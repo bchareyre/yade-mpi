@@ -55,9 +55,6 @@ class NonConnexBody : public Body
 
 	public	: virtual void glDraw();
 
-	public	: void updateBoundingVolume(Se3r& se3);
-	public	: void updateCollisionGeometry(Se3r& se3);
-
 	public	: void moveToNextTimeStep();
 
 	protected : virtual void postProcessAttributes(bool deserializing);

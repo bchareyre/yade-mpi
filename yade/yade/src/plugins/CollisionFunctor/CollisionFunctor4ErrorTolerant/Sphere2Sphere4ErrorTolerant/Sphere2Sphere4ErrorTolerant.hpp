@@ -42,7 +42,7 @@ class Sphere2Sphere4ErrorTolerant : public CollisionFunctor
 	protected : virtual bool collide(const shared_ptr<CollisionGeometry> cm1, const shared_ptr<CollisionGeometry> cm2, const Se3r& se31, const Se3r& se32, shared_ptr<Interaction> c);
 	protected : virtual bool reverseCollide(const shared_ptr<CollisionGeometry> cm1, const shared_ptr<CollisionGeometry> cm2,  const Se3r& se31, const Se3r& se32, shared_ptr<Interaction> c);
 
-	DEFINE_COLLISION_ORDER(Sphere,Sphere);
+	DEFINE_FUNCTOR_ORDER(Sphere,Sphere);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

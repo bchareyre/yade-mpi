@@ -23,16 +23,7 @@ void SDECDiscreteElement::registerAttributes()
 }
 
 
-/*void SDECDiscreteElement::updateBoundingVolume(Se3r& se3)
-{
-	bv->update(se3);
-}
-
-void SDECDiscreteElement::updateCollisionGeometry(Se3r& )
-{
-
-}
-
+/*
 void SDECDiscreteElement::moveToNextTimeStep()
 {	
 	RigidBody::moveToNextTimeStep();

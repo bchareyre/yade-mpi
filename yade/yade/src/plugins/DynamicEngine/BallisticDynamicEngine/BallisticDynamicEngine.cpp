@@ -52,7 +52,7 @@ void BallisticDynamicEngine::respondToCollisions(Body * body)
 	rb->se3.rotation = q*rb->se3.rotation;
 	rb->se3.rotation.normalize();
 
-	rb->updateBoundingVolume(rb->se3);
+//	rb->updateBoundingVolume(rb->se3);
 
 	first = false;
 

@@ -90,7 +90,7 @@ void ExplicitMassSpringDynamicEngine::respondToCollisions(Body * body)
         }
 	
 	// FIXME: where should we update bounding volume
-	body->updateBoundingVolume(body->se3);
+	//body->updateBoundingVolume(body->se3);
 	first = false;
 
 	massSpring->externalForces.clear();

@@ -53,9 +53,6 @@ class ConnexBody : public Body
 	protected : virtual void postProcessAttributes(bool deserializing);
 	public : void registerAttributes();
 
-	public : virtual void updateBoundingVolume(Se3r&) {};
-	public : virtual void updateCollisionGeometry(Se3r&) {};
-
 	public : virtual void moveToNextTimeStep();
 
 	REGISTER_CLASS_NAME(ConnexBody);

@@ -59,7 +59,7 @@ void Rotor::moveToNextTimeStep(Body * body)
 		b->velocity		= Vector3r(0,0,0);
 
 		// FIXME : this shouldn't be there
-		b->updateBoundingVolume(b->se3);
+		//b->updateBoundingVolume(b->se3);
 	}
 
 

@@ -39,9 +39,6 @@ QMAKE_LIBDIR = ../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../toolboxes/DataStructures/BodyContainer/BodyAssocVec/$(YADEDYNLIBPATH) \
                ../../toolboxes/DataStructures/BodyContainer/BodyRedirectionVector/$(YADEDYNLIBPATH) \
                ../../toolboxes/Libraries/Threads/$(YADEDYNLIBPATH) \
-               ../../toolboxes/DataStructures/BodyContainer/BodyVector/$(YADEDYNLIBPATH) \
-               ../../toolboxes/DataStructures/InteractionContainer/$(YADEDYNLIBPATH) \
-               ../../toolboxes/DataStructures/BodyContainer/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEBINPATH) 
 CONFIG += debug \

@@ -115,13 +115,6 @@ class Body : public Serializable
 	/*! Abstract function overloaded in Connex and NonConnex body. It is called to draw the object in an opengl context */
 	public : virtual void glDraw() {/*throw CallVirtualUndefinedMethod()*/};
 
-	/*! Abstract function overloaded in Connex and NonConnex body. It is called to update the bounding volume of the object in generel at the end of each time step */
-	public : virtual void updateBoundingVolume(Se3r& ) {};
-
-	/*! Abstract function overloaded in Connex and NonConnex body. It is called to update the collision model of the object. It is useful if the object is deformable
-	and needs to recompute its collision model */
-	public : virtual void updateCollisionGeometry(Se3r& ) {};
-
 	/*! Abstract function overloaded in Connex and NonConnex body. Move the body to the next time step using its own internal dynamic engine */
 	public : virtual void moveToNextTimeStep() {};
 

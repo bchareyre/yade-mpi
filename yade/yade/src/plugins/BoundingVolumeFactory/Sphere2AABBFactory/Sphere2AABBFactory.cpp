@@ -72,6 +72,10 @@ void Sphere2AABBFactory::buildBoundingVolume(const shared_ptr<CollisionGeometry>
 	
 	aabb->min = aabb->center-aabb->halfSize;
 	aabb->max = aabb->center+aabb->halfSize;	
+// 	cout << "####"<<endl;
+// 	cout << aabb->halfSize[0] << " "<<aabb->halfSize[1] << " " <<aabb->halfSize[2] << endl;
+// 	cout << aabb->min[0] << " "<<aabb->min[1] << " " <<aabb->min[2] << endl;
+// 	cout << aabb->max[0] << " "<<aabb->max[1] << " " <<aabb->max[2] << endl;
 }
 	
 ////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -21,9 +21,6 @@ class RigidBody : public ConnexBody
 	protected : virtual void postProcessAttributes(bool deserializing);
 	public : void registerAttributes();
 
-	public : void updateBoundingVolume(Se3r& se3);
-	public : void updateCollisionGeometry(Se3r& se3);
-
 	public : void moveToNextTimeStep();
 
 	REGISTER_CLASS_NAME(RigidBody);

@@ -53,7 +53,7 @@ class Box2Box4ClosestFeatures : public CollisionFunctor
 
 	private : bool testSeparatingAxis(float expr1, float expr2, Vector3r n,int c,BoxBoxCollisionInfo* bbInfo);
 
-	DEFINE_COLLISION_ORDER(Box,Box);
+	DEFINE_FUNCTOR_ORDER(Box,Box);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

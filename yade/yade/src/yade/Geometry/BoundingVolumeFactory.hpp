@@ -29,7 +29,7 @@
 
 #include "BoundingVolume.hpp"
 #include "CollisionGeometry.hpp"
-#include "Serializable.hpp"
+#include "MultiMethodFunctor2D.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -38,7 +38,7 @@
 	It is used for creating a bounding volume from a collision model during runtime.
 	This is very useful when it is not trivial to build the bounding volume from the collision model. For example if you want to build an AABB from a box which is not initially aligned with the world axis, it is not easy to write by hand into the configuration file the center and size of this AABB. Instead you can use a BoundingVolumeFactory that will compute for you the correct value	
 */
-class BoundingVolumeFactory : public Factorable
+class BoundingVolumeFactory : public MultiMethodFunctor2D
 {	
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -60,10 +60,18 @@ class BoundingVolumeFactory : public Factorable
 		\param se3 the 3D transformation to apply to the collision model before building the bounding volume
 		\return a shared pointer to the bounding volume
 	*/
-	public : virtual void buildBoundingVolume(const shared_ptr<CollisionGeometry> cm, const Se3r& se3,shared_ptr<BoundingVolume> bv) {};
+	public : virtual void buildBoundingVolume(const shared_ptr<CollisionGeometry> cm, const Se3r& se3,shared_ptr<BoundingVolume> bv);
 	//FIXME : add also updateBoundingVolume(cm..). In fact we can load them automatically as we do with collisionFunctor because their name are Terrain2AABB ....
+	//protected : virtual bool updateBoundingVolume(const shared_ptr<CollisionGeometry> , const shared_ptr<CollisionGeometry> , const Se3r& , const Se3r& , shared_ptr<Interaction> );
 	
+	public    : inline void operator() (const shared_ptr<CollisionGeometry> cm, const Se3r& se3, shared_ptr<BoundingVolume> bv);
+	public : virtual bool checkFunctorOrder(const string& suggestedOrder) const;
 };
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+#include "BoundingVolumeFactory.ipp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////

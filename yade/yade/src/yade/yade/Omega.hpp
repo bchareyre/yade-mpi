@@ -31,14 +31,12 @@
 #include <fstream>
 #include <time.h>
 #include <boost/thread/thread.hpp>
-
+#include <iostream>
+#include <boost/shared_ptr.hpp>
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "Vector3.hpp"
-#include <iostream>
-#include <fstream>
-#include <boost/shared_ptr.hpp>
 #include "Singleton.hpp"
 #include "ClassFactory.hpp"
 

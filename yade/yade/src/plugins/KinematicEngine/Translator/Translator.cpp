@@ -57,7 +57,7 @@ void Translator::moveToNextTimeStep(Body * body)
 			b->velocity		=  sign*velocity*translationAxis;
 
 		// FIXME : this shouldn't be there
-			b->updateBoundingVolume(b->se3);
+			//b->updateBoundingVolume(b->se3);
 		//}
 	}
 

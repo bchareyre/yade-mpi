@@ -61,16 +61,6 @@ void NonConnexBody::registerAttributes()
 //	REGISTER_ATTRIBUTE(kinematic);
 }
 
-void NonConnexBody::updateBoundingVolume(Se3r& se3)
-{
-	for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext() )
-		bodies->getCurrent()->updateBoundingVolume(se3);
-}
-
-void NonConnexBody::updateCollisionGeometry(Se3r& )
-{
-
-}
 
 void NonConnexBody::moveToNextTimeStep()
 {

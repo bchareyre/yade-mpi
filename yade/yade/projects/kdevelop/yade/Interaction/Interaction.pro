@@ -3,12 +3,14 @@
 # Subdir relative project main directory: ./yade/Interaction
 # Target is a library:  
 
-LIBS += -rdynamic 
+LIBS += -lMultiMethods \
+        -rdynamic 
 INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = $(YADEDYNLIBPATH) 
+QMAKE_LIBDIR = ../../yade/MultiMethods/$(YADEDYNLIBPATH) \
+               $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
 CONFIG += debug \
           warn_on \
@@ -20,10 +22,12 @@ HEADERS += BroadCollider.hpp \
            NarrowCollider.hpp \
            CollisionFunctor.hpp \
            CollisionMultiMethodsManager.hpp \
-	   InteractionContainer.hpp
+           InteractionContainer.hpp \
+           CollisionFunctor.ipp 
 SOURCES += BroadCollider.cpp \
            Interaction.cpp \
            InteractionGeometry.cpp \
            NarrowCollider.cpp \
            CollisionMultiMethodsManager.cpp \
-	   InteractionContainer.cpp
+           InteractionContainer.cpp \
+           CollisionFunctor.cpp 

@@ -55,10 +55,10 @@ void BoundingVolumeUpdator::updateBoundingVolume(shared_ptr<Body> b)
 			updateBoundingVolume(bodies->getCurrent());
 		}
 	}
-	
-	//b->updateBoundingVolume(Se3());
-		
+	else
+		bvFactoriesManager.buildBoundingVolume(b->cm,b->se3,b->bv);	
 }
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -73,10 +73,8 @@ void BoundingVolumeUpdator::updateBoundingVolume(Body* b)
 			updateBoundingVolume(bodies->getCurrent());
 		}
 	}
-		
-	//shared_ptr<BoundingVolumeFactoryFunctor> bvf = bvUpdatorManager.update(b->cm,b->bv);
-	//callBacks[b->cm->getClassIndex()][b->bv->getClassIndex()];
-		
+	else	
+		bvFactoriesManager.buildBoundingVolume(b->cm,b->se3,b->bv);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -94,8 +92,8 @@ void BoundingVolumeUpdator::postProcessAttributes(bool deserializing)
 {
 	if(deserializing)
 	{
-		//for(unsigned int i=0;i<bvUpdatorFunctors.size();i++)
-		//	bvUpdatorManager.addPair(bvUpdatorFunctors[i][0],bvUpdatorFunctors[i][1],bvUpdatorFunctors[i][2]);
+		for(unsigned int i=0;i<bvFactories.size();i++)
+			bvFactoriesManager.addPair(bvFactories[i][0],bvFactories[i][1],bvFactories[i][2]);
 	}
 }
 
@@ -104,8 +102,18 @@ void BoundingVolumeUpdator::postProcessAttributes(bool deserializing)
 
 void BoundingVolumeUpdator::registerAttributes()
 {
-	//REGISTER_ATTRIBUTE(bvUpdatorFunctors);
+	REGISTER_ATTRIBUTE(bvFactories);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void BoundingVolumeUpdator::addBVFactories(const string& str1,const string& str2,const string& str3)
+{
+	vector<string> v;
+	v.push_back(str1);
+	v.push_back(str2);
+	v.push_back(str3);
+	bvFactories.push_back(v);
+
+}

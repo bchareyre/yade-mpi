@@ -22,20 +22,20 @@ AABB::~AABB ()
 
 void AABB::postProcessAttributes(bool deserializing)
 {
-	if(deserializing)
-	{
-		initialHalfSize = halfSize;
-		initialCenter = center;
-		min = center-halfSize;
-		max = center+halfSize;
-	}
+// 	if(deserializing)
+// 	{
+// 		initialHalfSize = halfSize;
+// 		initialCenter = center;
+// 		min = center-halfSize;
+// 		max = center+halfSize;
+// 	}
 }
 
 void AABB::registerAttributes()
 {	
 	BoundingVolume::registerAttributes();
-	REGISTER_ATTRIBUTE(center);
-	REGISTER_ATTRIBUTE(halfSize);
+	//REGISTER_ATTRIBUTE(center);
+	//REGISTER_ATTRIBUTE(halfSize);
 }
 
 void AABB::move(Se3r& )

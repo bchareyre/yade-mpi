@@ -71,9 +71,9 @@ bool MultiMethodsManager<Functor>::add(shared_ptr<Indexable>& i1, shared_ptr<Ind
 		i2->incrementMaxCurrentlyUsedClassIndex();
 	}
 	
-	assert(i1->getMaxCurrentlyUsedClassIndex()==i2->getMaxCurrentlyUsedClassIndex());
+	//assert(i1->getMaxCurrentlyUsedClassIndex()==i2->getMaxCurrentlyUsedClassIndex());
 	
-	int maxCurrentIndex = i2->getMaxCurrentlyUsedClassIndex();
+	int maxCurrentIndex = max(i1->getMaxCurrentlyUsedClassIndex(),i2->getMaxCurrentlyUsedClassIndex());
 
 	// resizing callBacks table
 	callBacks.resize( maxCurrentIndex+1 );
@@ -96,15 +96,15 @@ bool MultiMethodsManager<Functor>::add(shared_ptr<Indexable>& i1, shared_ptr<Ind
 		throw MultiMethodsManagerNotExistingLibrary(error.c_str());
 	}	
 	
-	string collisionOrder = name1+" "+name2;
-	string reverseCollisionOrder = name2+" "+name1;
+	string functorOrder = name1+" "+name2;
+	string reverseFunctorOrder = name2+" "+name1;
 
-	if (collisionOrder==functor->getCollisionOrder())
+	if (functor->checkFunctorOrder(functorOrder))
 	{
 		functor->setReverse(true);
 		reverseFunctor->setReverse(false);
 	}
-	else if (reverseCollisionOrder==functor->getCollisionOrder())
+	else if (functor->checkFunctorOrder(reverseFunctorOrder))
 	{
 		functor->setReverse(false);
 		reverseFunctor->setReverse(true);

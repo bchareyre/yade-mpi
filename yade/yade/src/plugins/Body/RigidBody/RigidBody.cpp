@@ -40,16 +40,6 @@ void RigidBody::registerAttributes()
 }
 
 
-void RigidBody::updateBoundingVolume(Se3r& se3)
-{
-	bv->update(se3);
-}
-
-void RigidBody::updateCollisionGeometry(Se3r& )
-{
-
-}
-
 void RigidBody::moveToNextTimeStep()
 {	
 	ConnexBody::moveToNextTimeStep();

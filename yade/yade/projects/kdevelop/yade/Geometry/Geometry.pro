@@ -4,24 +4,23 @@
 # Target is a library:  
 
 HEADERS += BoundingVolume.hpp \
-           BoundingVolumeAssembly.hpp \
-           BoundingVolumeHierarchy.hpp \
            CollisionGeometry.hpp \
            CollisionGeometryFactory.hpp \
            GeometricalModel.hpp \
            GeometricalModelFactory.hpp \
            RenderingEngine.hpp \
            BoundingVolumeFactory.hpp \
-           BoundingVolumeUpdator.hpp 
+           BoundingVolumeUpdator.hpp \
+           BoundingVolumeFactory.ipp \
+           BoundingVolumeFactoryManager.hpp 
 SOURCES += BoundingVolume.cpp \
-           BoundingVolumeAssembly.cpp \
-           BoundingVolumeHierarchy.cpp \
            CollisionGeometry.cpp \
            CollisionGeometryFactory.cpp \
            GeometricalModel.cpp \
            GeometricalModelFactory.cpp \
            BoundingVolumeFactory.cpp \
-           BoundingVolumeUpdator.cpp 
+           BoundingVolumeUpdator.cpp \
+           BoundingVolumeFactoryManager.cpp 
 LIBS += -rdynamic
 INCLUDEPATH = $(YADEINCLUDEPATH)
 MOC_DIR = $(YADECOMPILATIONPATH)

@@ -15,7 +15,7 @@
 #include "SDECDiscreteElement.hpp"
 #include "SDECPermanentLink.hpp"
 #include "Interaction.hpp"
-
+#include "BoundingVolumeUpdator.hpp"
 
 SDECSpheresPlane::SDECSpheresPlane () : FileGenerator()
 {
@@ -51,10 +51,15 @@ void SDECSpheresPlane::generate()
 	nc->addCollisionFunctor("Sphere","Sphere","Sphere2Sphere4SDECContactModel");
 	nc->addCollisionFunctor("Sphere","Box","Box2Sphere4SDECContactModel");
 
-	rootBody->actors.resize(3);
-	rootBody->actors[0] 		= shared_ptr<Actor>(new SAPCollider);
-	rootBody->actors[1] 		= nc;
-	rootBody->actors[2] 		= shared_ptr<Actor>(new SDECDynamicEngine);
+	shared_ptr<BoundingVolumeUpdator> bvu	= shared_ptr<BoundingVolumeUpdator>(new BoundingVolumeUpdator);
+	bvu->addBVFactories("Sphere","AABB","Sphere2AABBFactory");
+	bvu->addBVFactories("Box","AABB","Box2AABBFactory");
+
+	rootBody->actors.resize(4);
+	rootBody->actors[0] 		= bvu;	
+	rootBody->actors[1] 		= shared_ptr<Actor>(new SAPCollider);
+	rootBody->actors[2] 		= nc;
+	rootBody->actors[3] 		= shared_ptr<Actor>(new SDECDynamicEngine);
 
 	rootBody->permanentInteractions->clear();
 //	rootBody->permanentInteractions[0] = shared_ptr<Interaction>(new Interaction);
@@ -79,8 +84,6 @@ void SDECSpheresPlane::generate()
 	box1->inertia		= Vector3r(0,0,0);
 	box1->se3		= Se3r(Vector3r(0,0,0),q);
 	aabb->color		= Vector3r(1,0,0);
-	aabb->center		= Vector3r(0,0,10);
-	aabb->halfSize		= Vector3r(200,5,200);
 	box1->bv		= dynamic_pointer_cast<BoundingVolume>(aabb);
 	box->extents		= Vector3r(200,5,200);
 	box->diffuseColor	= Vector3r(1,1,1);
@@ -122,8 +125,6 @@ void SDECSpheresPlane::generate()
 		s->se3			= Se3r(translation,q);
 
 		aabb->color		= Vector3r(0,1,0);
-		aabb->center		= translation;
-		aabb->halfSize		= Vector3r(radius,radius,radius);
 		s->bv			= dynamic_pointer_cast<BoundingVolume>(aabb);
 
 		sphere->radius		= radius;

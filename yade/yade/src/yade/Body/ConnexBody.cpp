@@ -14,7 +14,7 @@ using namespace std;
 
 ConnexBody::ConnexBody() : Body()
 {
-	containSubBodies = true;
+	containSubBodies = false;
 }
 
 ConnexBody::~ConnexBody() 
@@ -35,9 +35,9 @@ void ConnexBody::glDraw()
 	glPopMatrix();
 
 	//FIXME : hardcoded drawing of boundingvolume, sensor will fix that
-	//glPushMatrix();
-	//bv->glDraw();
-	//glPopMatrix();
+	glPushMatrix();
+	bv->glDraw();
+	glPopMatrix();
 }
 
 

@@ -29,16 +29,17 @@
 
 #include "Actor.hpp"
 #include "Body.hpp"
+#include "BoundingVolumeFactoryManager.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class BoundingVolumeUpdator : public Actor
 {
-	//protected : CollisionMultiMethodsManager bvUpdatorManager;
+	protected : BoundingVolumeFactoryManager bvFactoriesManager;
 	
-	//private : vector<vector<string> > bvUpdatorFunctors;
-	//public  : void addBVUpdatorFunctor(const string& str1,const string& str2,const string& str3);
+	private : vector<vector<string> > bvFactories;
+	public  : void addBVFactories(const string& str1,const string& str2,const string& str3);
 
 	// construction
 	public : BoundingVolumeUpdator ();

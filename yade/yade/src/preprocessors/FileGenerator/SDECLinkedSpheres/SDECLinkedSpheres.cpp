@@ -15,6 +15,8 @@
 #include "SDECPermanentLink.hpp"
 #include "Interaction.hpp"
 
+#include "BoundingVolumeUpdator.hpp"
+
 SDECLinkedSpheres::SDECLinkedSpheres () : FileGenerator()
 {
 	nbSpheresX = 2;
@@ -63,11 +65,16 @@ void SDECLinkedSpheres::generate()
 	shared_ptr<NarrowCollider> nc	= shared_ptr<NarrowCollider>(new SimpleNarrowCollider);
 	nc->addCollisionFunctor("Sphere","Sphere","Sphere2Sphere4SDECContactModel");
 	nc->addCollisionFunctor("Sphere","Box","Box2Sphere4SDECContactModel");
+	
+	shared_ptr<BoundingVolumeUpdator> bvu	= shared_ptr<BoundingVolumeUpdator>(new BoundingVolumeUpdator);
+	bvu->addBVFactories("Sphere","AABB","Sphere2AABBFactory");
+	bvu->addBVFactories("Box","AABB","Box2AABBFactory");
 
-	rootBody->actors.resize(3);
-	rootBody->actors[0] 		= shared_ptr<Actor>(new SAPCollider);
-	rootBody->actors[1] 		= nc;
-	rootBody->actors[2] 		= shared_ptr<Actor>(new SDECDynamicEngine);
+	rootBody->actors.resize(4);
+	rootBody->actors[0] 		= bvu;	
+	rootBody->actors[1] 		= shared_ptr<Actor>(new SAPCollider);
+	rootBody->actors[2] 		= nc;
+	rootBody->actors[3] 		= shared_ptr<Actor>(new SDECDynamicEngine);
 
 	rootBody->permanentInteractions->clear();
 
@@ -94,8 +101,6 @@ void SDECLinkedSpheres::generate()
 	box1->se3		= Se3r(Vector3r(0,0,0),q);
 	//box1->se3		= Se3r(Vector3r(0,0,0),qbox); 	// FIXME - damping must be 0.01, and timestep must be 0.001
 	aabb->color		= Vector3r(1,0,0);
-	aabb->center		= Vector3r(0,0,10);
-	aabb->halfSize		= Vector3r(200,5,200); 		// FIXME - this must be automatically computed
 //	aabb->halfSize		= Vector3r(200,200,200); 	// FIXME - damping must be 0.01, and timestep must be 0.001
 	box1->bv		= dynamic_pointer_cast<BoundingVolume>(aabb);
 	box->extents		= Vector3r(200,5,200);
@@ -126,8 +131,6 @@ void SDECLinkedSpheres::generate()
 	box2->inertia		= Vector3r(0,0,0);
 	box2->se3		= Se3r(Vector3r(0,0,((float)(nbSpheresZ)/2.0-supportSize+1.5)*spacing),q);
 	aabb->color		= Vector3r(1,0,0);
-	aabb->center		= Vector3r(0,0,((float)(nbSpheresZ)/2.0-supportSize+1.5)*spacing);
-	aabb->halfSize		= Vector3r(20,50,20); 		// FIXME - this must be automatically computed
 	box2->bv		= dynamic_pointer_cast<BoundingVolume>(aabb);
 	box->extents		= Vector3r(20,50,20);
 	box->diffuseColor	= Vector3r(1,1,1);
@@ -156,8 +159,6 @@ void SDECLinkedSpheres::generate()
 	box3->inertia		= Vector3r(0,0,0);
 	box3->se3		= Se3r(Vector3r(0,0,-((float)(nbSpheresZ)/2.0-supportSize+2.5)*spacing),q);
 	aabb->color		= Vector3r(1,0,0);
-	aabb->center		= Vector3r(0,0,-((float)(nbSpheresZ)/2.0-supportSize+2.5)*spacing);
-	aabb->halfSize		= Vector3r(20,50,20); 		// FIXME - this must be automatically computed
 	box3->bv		= dynamic_pointer_cast<BoundingVolume>(aabb);
 	box->extents		= Vector3r(20,50,20);
 	box->diffuseColor	= Vector3r(1,1,1);
@@ -202,8 +203,6 @@ void SDECLinkedSpheres::generate()
 		s->se3			= Se3r(translation,q);
 
 		aabb->color		= Vector3r(0,1,0);
-		aabb->center		= translation;
-		aabb->halfSize		= Vector3r(radius,radius,radius);
 		s->bv			= dynamic_pointer_cast<BoundingVolume>(aabb);
 
 		sphere->radius		= radius;

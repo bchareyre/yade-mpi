@@ -27,18 +27,20 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <vector>
-#include <set>
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-#include "ClassFactory.hpp"
-#include "Indexable.hpp"
+#include "MultiMethodFunctor2D.hpp"
 #include "CollisionGeometry.hpp"
 #include "Se3.hpp"
 #include "Interaction.hpp"
-#include "Factorable.hpp"
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+#include <boost/shared_ptr.hpp>
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+using namespace boost;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -47,44 +49,24 @@
 
 	Every functions that describe collision between two CollisionGeometrys must derived from CollisionFunctor.
 */
-class CollisionFunctor : //public Indexable , // FIXME : is NOT necessery, but produces faster code ?!?!?! hows that possible???
-			// this is because of BUG in g++3.3   (faster because of bug, hmmmfphhh)
-			// is not faster in DEBUG mode. and does not compile in RELEASE mode (libInteraction libGeometry)
-			 public Factorable
+class CollisionFunctor :  public MultiMethodFunctor2D
 {
-
-	private : bool reverse;
-
-	public : void setReverse(bool r) { reverse = r; };
-	public : bool isReverse() { return reverse; };
-
 	// construction
-	public : CollisionFunctor () {};
-	public : virtual ~CollisionFunctor () {};
+	public : CollisionFunctor ();
+	public : virtual ~CollisionFunctor ();
 
-	protected : virtual bool collide(const shared_ptr<CollisionGeometry> , const shared_ptr<CollisionGeometry> , const Se3r& , const Se3r& , shared_ptr<Interaction> ) { throw; };
-	protected : virtual bool reverseCollide(const shared_ptr<CollisionGeometry> , const shared_ptr<CollisionGeometry> ,  const Se3r& , const Se3r& , shared_ptr<Interaction> ) { throw; };
+	protected : virtual bool collide(const shared_ptr<CollisionGeometry> , const shared_ptr<CollisionGeometry> , const Se3r& , const Se3r& , shared_ptr<Interaction> );
+	protected : virtual bool reverseCollide(const shared_ptr<CollisionGeometry> , const shared_ptr<CollisionGeometry> ,  const Se3r& , const Se3r& , shared_ptr<Interaction> );
 
-	public    : inline bool operator() (const shared_ptr<CollisionGeometry> cm1, const shared_ptr<CollisionGeometry> cm2, const Se3r& se31, const Se3r& se32, shared_ptr<Interaction> c)
-	{
-		if (reverse)
-			return reverseCollide(cm1,cm2,se31,se32,c);
-		else
-			return collide(cm1,cm2,se31,se32,c);
-	}
+	public    : inline bool operator() (const shared_ptr<CollisionGeometry> cm1, const shared_ptr<CollisionGeometry> cm2, const Se3r& se31, const Se3r& se32, shared_ptr<Interaction> c);
 
-	public : virtual const string getCollisionOrder() const {throw;}
+	public : virtual bool checkFunctorOrder(const string& suggestedOrder) const;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#define DEFINE_COLLISION_ORDER(class1,class2)				\
-	public : virtual const string getCollisionOrder() const		\
-	{								\
-		return string(#class1)+" "+string(#class2);		\
-	}								\
-
+#include "CollisionFunctor.ipp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////

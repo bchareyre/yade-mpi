@@ -39,29 +39,25 @@ void FEMBody::registerAttributes()
 }
 
 
-void FEMBody::updateBoundingVolume(Se3r& )
-{
-	Vector3r max = Vector3r(-Mathr::MAX_REAL,-Mathr::MAX_REAL,-Mathr::MAX_REAL);
-	Vector3r min = Vector3r(Mathr::MAX_REAL,Mathr::MAX_REAL,Mathr::MAX_REAL);
-
-	shared_ptr<Polyhedron> mesh = dynamic_pointer_cast<Polyhedron>(gm);
-	vector<Vector3r>& vertices = mesh->vertices;
-	
-	for(unsigned int i=0;i<vertices.size();i++)
-	{
-		max = max.maxVector(vertices[i]);
-		min = min.minVector(vertices[i]);
-	}
-
-	// FIXME : dirty needs redesign
-	shared_ptr<AABB> aabb = dynamic_pointer_cast<AABB>(bv);
-	aabb->center = (max+min)*0.5;
-	aabb->halfSize = (max-min)*0.5;
-	aabb->min = aabb->center-aabb->halfSize;
-	aabb->max = aabb->center+aabb->halfSize;
-
-}
-
-void FEMBody::updateCollisionGeometry(Se3r& )
-{
-}
+// void FEMBody::updateBoundingVolume(Se3r& )
+// {
+// 	Vector3r max = Vector3r(-Mathr::MAX_REAL,-Mathr::MAX_REAL,-Mathr::MAX_REAL);
+// 	Vector3r min = Vector3r(Mathr::MAX_REAL,Mathr::MAX_REAL,Mathr::MAX_REAL);
+// 
+// 	shared_ptr<Polyhedron> mesh = dynamic_pointer_cast<Polyhedron>(gm);
+// 	vector<Vector3r>& vertices = mesh->vertices;
+// 	
+// 	for(unsigned int i=0;i<vertices.size();i++)
+// 	{
+// 		max = max.maxVector(vertices[i]);
+// 		min = min.minVector(vertices[i]);
+// 	}
+// 
+// 	// FIXME : dirty needs redesign
+// 	shared_ptr<AABB> aabb = dynamic_pointer_cast<AABB>(bv);
+// 	aabb->center = (max+min)*0.5;
+// 	aabb->halfSize = (max-min)*0.5;
+// 	aabb->min = aabb->center-aabb->halfSize;
+// 	aabb->max = aabb->center+aabb->halfSize;
+// 
+// }
