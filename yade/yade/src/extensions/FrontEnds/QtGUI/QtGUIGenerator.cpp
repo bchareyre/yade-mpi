@@ -270,6 +270,7 @@ string QtGUIGenerator::getString(shared_ptr<AttributeDescriptor> d, int widgetNu
 				return string("0");
 		}
 		break;
+		default	: return "";
 	}
 }
 
