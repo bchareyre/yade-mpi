@@ -34,7 +34,8 @@ HEADERS += Body.hpp \
            InteractionModel.hpp \
            Interaction.hpp \
            Contact.hpp \
-           FrontEnd.hpp 
+           FrontEnd.hpp \
+           FactoryExceptions.hpp 
 SOURCES += Body.cpp \
            BoundingVolume.cpp \
            BoundingVolumeFactory.cpp \
@@ -62,7 +63,8 @@ SOURCES += Body.cpp \
            InteractionModel.cpp \
            Interaction.cpp \
            Contact.cpp \
-           FrontEnd.cpp 
+           FrontEnd.cpp \
+           FactoryExceptions.cpp 
 LIBS += -lM3D \
 -lConstants \
 -lSerialization \

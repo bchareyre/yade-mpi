@@ -1,6 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2004 by Olivier Galizzi                                 *
- *   olivier.galizzi@imag.fr                                               *
+ *   Copyright (C) 2004 by Janek Kozicki                                   *
+ *   cosurgi@berlios.de                                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -18,14 +18,11 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-
-//FIXME : rename to exceptionhandling(er) ??
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#ifndef __EXECPTIONMESSAGES__
-#define __EXECPTIONMESSAGES__
+#ifndef __FACTORYEXECPTIONS__
+#define __FACTORYEXECPTIONS__
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -33,86 +30,48 @@
 #include <string>
 #include <stdexcept>
 
-#include "FactoryExceptions.hpp"
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-//FIXME : remove all serialization exception
 using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///  SerializableError                                                                           //
+///  FactoryError                                                                                //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-struct SerializableError : public std::runtime_error
+struct FactoryError : public std::runtime_error
 {
-	explicit SerializableError(const char* msg) : std::runtime_error(msg) {};
+	explicit FactoryError(const char* msg) : std::runtime_error(msg) {};
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-struct HandlerError : public SerializableError
+struct FactoryCantCreate : public FactoryError
 {
-	explicit HandlerError(const char* msg) : SerializableError(msg) {};
+	explicit FactoryCantCreate(const char* msg) : FactoryError(msg) {};
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-struct SerializableUnregisterError : public SerializableError
+struct FactoryClassNotRegistered : public FactoryError
 {
-	explicit SerializableUnregisterError(const char* msg) : SerializableError(msg) {};
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///  IOManagerError                                                                              //
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-struct IOManagerError : public std::runtime_error
-{
-	explicit IOManagerError(const char* msg) : std::runtime_error(msg) {};
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///  CustomTypesMapperError                                                                      //
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-struct CustomTypesMapperError : public std::runtime_error
-{
-	explicit CustomTypesMapperError(const char* msg) : std::runtime_error(msg) {};
+	explicit FactoryClassNotRegistered(const char* msg) : FactoryError(msg) {};
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-struct ExceptionMessages
+struct FactoryExceptions
 {
-	static const char* SerializableUnknown;
-	static const char* SerializableUnknown2;
-	static const char* ExtraAttribute;
-	static const char* ArchiveTypeNotSet;
-	static const char* UnknownFundamental;
-	static const char* WrongFileHeader;
-	static const char* WrongFileFooter;
-	static const char* WrongExpectedClassName;
-	static const char* SetFunctionNotDeclared;
-	static const char* GetFunctionNotDeclared;
-	static const char* UnsupportedArchiveType;
-	static const char* CustomClassNotRegistered;
-	static const char* AttributeNotFound;
-	static const char* AttributeIsNotDefined;
-	static const char* LexicalCopyError;
-	static const char* FundamentalNotSupported;
-	static const char* SmartPointerNotSupported;
-	static const char* ContainerNotSupported;
-
+	static const char* CantCreateClass;
+	static const char* ClassNotRegistered;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#endif //  __EXECPTIONMESSAGES__
+#endif //  __FACTORYEXECPTIONS__
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////

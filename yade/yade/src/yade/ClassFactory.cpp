@@ -50,14 +50,14 @@ bool ClassFactory::registerFactorable( std::string name 			   , CreateFactorable
 					 VerifyFactorableFnPtr verify		   , RecordType type, bool f )
 {
 	bool tmp = map.insert( ClassDescriptorMap::value_type( name , ClassDescriptor(create,createShared, createPureCustom, verify,type,f) )).second;
-	
+
 	#ifdef DEBUG
 		if (tmp)
 			std::cout << "registering class: " << name << " OK\n";
 		else
 			std::cout << "registering class: " << name << " FAILED\n";
 	#endif
-	
+
 	return tmp;
 }
 
@@ -72,12 +72,12 @@ boost::shared_ptr<Factorable> ClassFactory::createShared( std::string name )
 		{
 			if( map.find( name ) == map.end() )
 			{
-				std::string error = ExceptionMessages::ClassNotRegistered + name;
+				std::string error = FactoryExceptions::ClassNotRegistered + name;
 				throw FactoryClassNotRegistered(error.c_str());
 			}
 			return createShared(name);
 		}
-		std::string error = ExceptionMessages::CantCreateClass + name;
+		std::string error = FactoryExceptions::CantCreateClass + name;
 		throw FactoryCantCreate(error.c_str());
 	}
 	return ( i -> second.createShared ) ();
@@ -94,12 +94,12 @@ Factorable* ClassFactory::createPure( std::string name )
 		{
 			if( map.find( name ) == map.end() )
 			{
-				std::string error = ExceptionMessages::ClassNotRegistered + name;
+				std::string error = FactoryExceptions::ClassNotRegistered + name;
 				throw FactoryClassNotRegistered(error.c_str());
 			}
 			return createPure(name);
 		}
-		std::string error = ExceptionMessages::CantCreateClass + name;
+		std::string error = FactoryExceptions::CantCreateClass + name;
 		throw FactoryCantCreate(error.c_str());
 	}
 	return ( i -> second.create ) ();
@@ -110,7 +110,7 @@ void * ClassFactory::createPureCustom( std::string name )
 	ClassDescriptorMap::const_iterator i = map.find( name );
 	if( i == map.end() )
 	{
-		std::string error = ExceptionMessages::CantCreateClass + name;
+		std::string error = FactoryExceptions::CantCreateClass + name;
 		throw FactoryCantCreate(error.c_str());
 	}
 	return ( i -> second.createPureCustom ) ();
