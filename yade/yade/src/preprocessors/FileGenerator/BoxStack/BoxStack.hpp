@@ -2,9 +2,9 @@
 #ifndef __BOXSTACK_H__
 #define __BOXSTACK_H__
 
-#include "Serializable.hpp"
+#include "FileGenerator.hpp"
 
-class BoxStack : public Serializable
+class BoxStack : public FileGenerator
 {
 	// construction
 	public : BoxStack ();
@@ -13,7 +13,7 @@ class BoxStack : public Serializable
 	public : void afterDeserialization();
 	public : void registerAttributes();
 
-	public : void exec();
+	public : void generate();
 
 	REGISTER_CLASS_NAME(RotatingBox);
 };

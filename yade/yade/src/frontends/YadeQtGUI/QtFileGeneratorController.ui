@@ -15,6 +15,22 @@
     <property name="caption">
         <string>File Generator</string>
     </property>
+    <widget class="QPushButton">
+        <property name="name">
+            <cstring>pbClose</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>300</x>
+                <y>350</y>
+                <width>88</width>
+                <height>30</height>
+            </rect>
+        </property>
+        <property name="text">
+            <string>Close</string>
+        </property>
+    </widget>
     <widget class="QGroupBox">
         <property name="name">
             <cstring>gbCommonParameters</cstring>
@@ -27,9 +43,63 @@
                 <height>130</height>
             </rect>
         </property>
+        <property name="frameShape">
+            <enum>GroupBoxPanel</enum>
+        </property>
+        <property name="frameShadow">
+            <enum>Sunken</enum>
+        </property>
         <property name="title">
             <string>Common Parameters</string>
         </property>
+        <widget class="QPushButton">
+            <property name="name">
+                <cstring>pbChoose</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>380</x>
+                    <y>20</y>
+                    <width>80</width>
+                    <height>30</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>Choose ...</string>
+            </property>
+        </widget>
+        <widget class="QComboBox">
+            <property name="name">
+                <cstring>cbSerializationName</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>150</x>
+                    <y>60</y>
+                    <width>310</width>
+                    <height>20</height>
+                </rect>
+            </property>
+        </widget>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>tlOoutputFileName</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>10</x>
+                    <y>30</y>
+                    <width>130</width>
+                    <height>20</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>Output File Name :</string>
+            </property>
+            <property name="alignment">
+                <set>AlignVCenter|AlignRight</set>
+            </property>
+        </widget>
         <widget class="QLabel">
             <property name="name">
                 <cstring>tlOutputDynlibName</cstring>
@@ -70,90 +140,26 @@
         </widget>
         <widget class="QLineEdit">
             <property name="name">
-                <cstring>leOutputDynlibName</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>150</x>
-                    <y>60</y>
-                    <width>310</width>
-                    <height>20</height>
-                </rect>
-            </property>
-        </widget>
-        <widget class="QPushButton">
-            <property name="name">
-                <cstring>pbChoose</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>390</x>
-                    <y>30</y>
-                    <width>70</width>
-                    <height>20</height>
-                </rect>
-            </property>
-            <property name="text">
-                <string>Choose ...</string>
-            </property>
-        </widget>
-        <widget class="QPushButton">
-            <property name="name">
-                <cstring>pbLoad</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>390</x>
-                    <y>90</y>
-                    <width>70</width>
-                    <height>20</height>
-                </rect>
-            </property>
-            <property name="text">
-                <string>Load</string>
-            </property>
-        </widget>
-        <widget class="QLabel">
-            <property name="name">
-                <cstring>tlOoutputFileName</cstring>
-            </property>
-            <property name="geometry">
-                <rect>
-                    <x>10</x>
-                    <y>30</y>
-                    <width>130</width>
-                    <height>20</height>
-                </rect>
-            </property>
-            <property name="text">
-                <string>Output File Name :</string>
-            </property>
-            <property name="alignment">
-                <set>AlignVCenter|AlignRight</set>
-            </property>
-        </widget>
-        <widget class="QLineEdit">
-            <property name="name">
                 <cstring>leOutputFileName</cstring>
             </property>
             <property name="geometry">
                 <rect>
                     <x>150</x>
                     <y>30</y>
-                    <width>230</width>
+                    <width>220</width>
                     <height>20</height>
                 </rect>
             </property>
         </widget>
-        <widget class="QLineEdit">
+        <widget class="QComboBox">
             <property name="name">
-                <cstring>leGeneratorDynlibName</cstring>
+                <cstring>cbGeneratorName</cstring>
             </property>
             <property name="geometry">
                 <rect>
                     <x>150</x>
                     <y>90</y>
-                    <width>230</width>
+                    <width>310</width>
                     <height>20</height>
                 </rect>
             </property>
@@ -191,22 +197,6 @@
             <string>Generate</string>
         </property>
     </widget>
-    <widget class="QPushButton">
-        <property name="name">
-            <cstring>pbClose</cstring>
-        </property>
-        <property name="geometry">
-            <rect>
-                <x>300</x>
-                <y>350</y>
-                <width>88</width>
-                <height>30</height>
-            </rect>
-        </property>
-        <property name="text">
-            <string>Close</string>
-        </property>
-    </widget>
 </widget>
 <connections>
     <connection>
@@ -214,12 +204,6 @@
         <signal>clicked()</signal>
         <receiver>QtFileGeneratorController</receiver>
         <slot>pbChooseClicked()</slot>
-    </connection>
-    <connection>
-        <sender>pbLoad</sender>
-        <signal>clicked()</signal>
-        <receiver>QtFileGeneratorController</receiver>
-        <slot>pbLoadClicked()</slot>
     </connection>
     <connection>
         <sender>pbGenerate</sender>
@@ -233,12 +217,18 @@
         <receiver>QtFileGeneratorController</receiver>
         <slot>pbCloseClicked()</slot>
     </connection>
+    <connection>
+        <sender>cbGeneratorName</sender>
+        <signal>activated(const QString&amp;)</signal>
+        <receiver>QtFileGeneratorController</receiver>
+        <slot>cbGeneratorNameActivated(const QString&amp;)</slot>
+    </connection>
 </connections>
 <slots>
-    <slot>pbChooseClicked()</slot>
-    <slot>pbLoadClicked()</slot>
+    <slot>cbGeneratorNameActivated(const QString&amp;)</slot>
     <slot>pbGenerateClicked()</slot>
     <slot>pbCloseClicked()</slot>
+    <slot>pbChooseClicked()</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

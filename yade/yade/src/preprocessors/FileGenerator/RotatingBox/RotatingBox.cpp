@@ -16,8 +16,6 @@
 #include "SDECDynamicEngine.hpp"
 #include "SDECDiscreteElement.hpp"
 
-#include "QtGUIGenerator.hpp"
-
 
 RotatingBox::RotatingBox () : FileGenerator()
 {

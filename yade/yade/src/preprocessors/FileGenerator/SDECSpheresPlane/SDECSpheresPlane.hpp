@@ -2,9 +2,9 @@
 #ifndef __ROTATINGBOX_H__
 #define __ROTATINGBOX_H__
 
-#include "Serializable.hpp"
+#include "FileGenerator.hpp"
 
-class SDECSpheresPlane : public Serializable
+class SDECSpheresPlane : public FileGenerator
 {
 	// construction
 	public : SDECSpheresPlane ();
@@ -13,7 +13,7 @@ class SDECSpheresPlane : public Serializable
 	public : void afterDeserialization();
 	public : void registerAttributes();
 
-	public : void exec();
+	public : void generate();
 
 	REGISTER_CLASS_NAME(SDECSpheresPlane);
 };

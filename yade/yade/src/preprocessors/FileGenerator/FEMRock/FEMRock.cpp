@@ -13,9 +13,9 @@
 #include "RigidBody.hpp"
 
 
-FEMRock::FEMRock () : Serializable()
+FEMRock::FEMRock () : FileGenerator()
 {
-	exec();
+	generate();
 }
 
 FEMRock::~FEMRock ()
@@ -31,7 +31,7 @@ void FEMRock::registerAttributes()
 {
 }
 
-void FEMRock::exec()
+void FEMRock::generate()
 {
 	shared_ptr<NonConnexBody> rootBody(new NonConnexBody);
 

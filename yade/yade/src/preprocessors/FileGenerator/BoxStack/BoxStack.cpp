@@ -13,9 +13,9 @@
 #include <fstream>
 #include "IOManager.hpp"
 
-BoxStack::BoxStack () : Serializable()
+BoxStack::BoxStack () : FileGenerator()
 {
-	exec();
+	generate();
 }
 
 BoxStack::~BoxStack ()
@@ -31,7 +31,7 @@ void BoxStack::registerAttributes()
 {
 }
 
-void BoxStack::exec()
+void BoxStack::generate()
 {
 	shared_ptr<NonConnexBody> rootBody(new NonConnexBody);
 	int nbBox = 0;

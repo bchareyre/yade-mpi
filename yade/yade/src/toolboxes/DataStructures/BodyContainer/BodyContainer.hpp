@@ -9,7 +9,7 @@ using namespace boost;
 
 class BodyContainer : public Serializable
 {
-	public    : BodyContainer() { bodies.clear(); };
+	public    : BodyContainer() { bodies2.clear(); };
 	public    : virtual ~BodyContainer() {};
 
 	public    : virtual unsigned int insert(shared_ptr<Body>&)		{throw;};
@@ -28,7 +28,7 @@ class BodyContainer : public Serializable
 	// serialization of this class...
 	REGISTER_CLASS_NAME(BodyContainer);
 
-	private   : vector<shared_ptr<Body> > bodies;
+	private   : vector<shared_ptr<Body> > bodies2;
 	public    : virtual void registerAttributes();
 
 	protected : virtual void beforeSerialization();

@@ -2,10 +2,10 @@
 #ifndef __HANGINGCLOTH_H__
 #define __HANGINGCLOTH_H__
 
-#include "Serializable.hpp"
+#include "FileGenerator.hpp"
 
 
-class HangingCloth : public Serializable
+class HangingCloth : public FileGenerator
 {
 	// construction
 	public : HangingCloth ();
@@ -14,7 +14,7 @@ class HangingCloth : public Serializable
 	public : void afterDeserialization();
 	public : void registerAttributes();
 
-	public : void exec();
+	public : void generate();
 
 	REGISTER_CLASS_NAME(HangingCloth);
 };

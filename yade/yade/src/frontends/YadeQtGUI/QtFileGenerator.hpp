@@ -21,116 +21,65 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "QtFileGenerator.hpp"
-#include "ClassFactory.hpp"
-#include "FileGenerator.hpp"
+#ifndef __QTFILEGENERATOR_HPP__
+#define __QTFILEGENERATOR_HPP__
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <sstream>
-#include <qlabel.h>
-#include <qpushbutton.h>
-#include <qgroupbox.h>
-#include <qfiledialog.h>
+#include <QtFileGeneratorController.h>
+#include "Factorable.hpp"
+#include "QtGUIGenerator.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-QtFileGenerator::QtFileGenerator ( QWidget * parent , const char * name , WFlags f ) : QtFileGeneratorController(parent,name,f)
-{
-	setMinimumSize(size());
-	setMaximumSize(size());
-}
+/*! \brief 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-QtFileGenerator::~QtFileGenerator()
+	
+*/
+class QtFileGenerator : public QtFileGeneratorController, public Factorable
 {
 
-}
+///////////////////////////////////////////////////////////////////////////////////////////////////
+/// Attributes											///
+///////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	private : QtGUIGenerator guiGen;	
+	
+///////////////////////////////////////////////////////////////////////////////////////////////////
+/// Constructor/Destructor									///
+///////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	/*! Constructor */
+	public : QtFileGenerator (QWidget * parent = 0, const char * name = 0, WFlags f = 0 );
+
+	/*! Destructor */
+	public : virtual ~QtFileGenerator ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+/// Methods											///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-
-void QtFileGenerator::pbChooseClicked()
-{
-	QString selectedFilter;
-	QString fileName = QFileDialog::getSaveFileName("../data", "XML Yade File (*.xml)", this,"Open File","Choose a file to open",&selectedFilter );
-
-	if (!fileName.isEmpty() && selectedFilter == "XML Yade File (*.xml)")
-		leOutputFileName->setText(fileName);
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-void QtFileGenerator::pbLoadClicked()
-{
-	if (!leGeneratorDynlibName->text().isEmpty())
-	{
-		try
-		{
-			//FIXME dynamic_cast is not working ???
-			shared_ptr<FileGenerator> fg = static_pointer_cast<FileGenerator>(ClassFactory::instance().createShared(leGeneratorDynlibName->text()));
-
-			guiGen.setResizeHeight(true);
-			guiGen.setResizeWidth(false);
-			guiGen.setShift(10,30);
-			guiGen.setShowButtons(false);
-			
-			QSize s = gbGeneratorParameter->size();
-			QPoint p = gbGeneratorParameter->pos();
-			delete gbGeneratorParameter;
-			gbGeneratorParameter = new QGroupBox(this);
-			gbGeneratorParameter->resize(s.width(),s.height());
-			gbGeneratorParameter->move(p.x(),p.y()); 
-			gbGeneratorParameter->setTitle(fg->getClassName()+" Parameters"); 
-			
-			guiGen.buildGUI(fg,gbGeneratorParameter);
-			
-			gbGeneratorParameter->show();
-			s = gbGeneratorParameter->size();
-			p = gbGeneratorParameter->pos();
-			setMinimumSize(size().width(),s.height()+p.y()+50);
-			setMaximumSize(size().width(),s.height()+p.y()+50);
-			resize(size().width(),s.height()+p.y()+50);
-			pbGenerate->move(pbGenerate->pos().x(),s.height()+p.y()+10);
-			pbClose->move(pbClose->pos().x(),s.height()+p.y()+10);
-		}
-		catch (FactoryError&)
-		{
+	
+	public : virtual void show ();
 		
-		}
-	}
-}
+	public slots : virtual void pbChooseClicked(); 
+	public slots : virtual void cbGeneratorNameActivated(const QString& s);
+	public slots : virtual void pbGenerateClicked(); 
+	public slots : virtual void pbCloseClicked();
+
+};
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void QtFileGenerator::pbGenerateClicked()
-{
-	// FIXME add some test to avoid crashing
-	shared_ptr<FileGenerator> fg = static_pointer_cast<FileGenerator>(ClassFactory::instance().createShared(leGeneratorDynlibName->text()));
-	
-	fg->setFileName(leOutputFileName->text().data());
-	fg->setSerializationLibrary(leOutputDynlibName->text().data());
-	
-	guiGen.deserialize(fg);
-	
-	fg->generate();
-	
-	
-}
+REGISTER_FACTORABLE(QtFileGenerator);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void QtFileGenerator::pbCloseClicked()
-{
-
-}
+#endif // __QTFILEGENERATOR_HPP__
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+

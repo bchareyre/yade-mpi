@@ -15,9 +15,9 @@
 #include "SDECPermanentLink.hpp"
 #include "Interaction.hpp"
 
-SDECLinkedSpheres::SDECLinkedSpheres () : Serializable()
+SDECLinkedSpheres::SDECLinkedSpheres () : FileGenerator()
 {
-	exec();
+	generate();
 }
 
 SDECLinkedSpheres::~SDECLinkedSpheres ()
@@ -33,7 +33,7 @@ void SDECLinkedSpheres::registerAttributes()
 {
 }
 
-void SDECLinkedSpheres::exec()
+void SDECLinkedSpheres::generate()
 {
 	shared_ptr<NonConnexBody> rootBody(new NonConnexBody);
 	int nbSpheres = 4;// FIXME - this should ba a parameter to dynlib

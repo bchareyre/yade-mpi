@@ -8,7 +8,21 @@
 
 #include <boost/filesystem/operations.hpp> 
 #include <boost/filesystem/convenience.hpp>
-                             
+             
+#include "FileGenerator.hpp"
+#include "DynamicEngine.hpp"
+#include "KinematicEngine.hpp"
+#include "Body.hpp"
+#include "CollisionFunctor.hpp"
+#include "IOManager.hpp"
+#include "BroadCollider.hpp"
+#include "NarrowCollider.hpp"
+#include "GeometricalModel.hpp"
+#include "CollisionGeometry.hpp"
+#include "BoundingVolume.hpp"
+#include "InteractionGeometry.hpp"             
+
+
 Omega::Omega ()
 {
 	cerr << "Constructing Omega  (if multiple times - check '-rdynamic' flag!)" << endl;
@@ -65,6 +79,51 @@ void Omega::init()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+void Omega::registerDynlibType(const string& name)
+{
+	shared_ptr<Factorable> f;
+	try
+	{
+		f = ClassFactory::instance().createShared(name);
+	}
+	catch (FactoryError&)
+	{
+		return;
+	}
+	
+	if (dynamic_pointer_cast<FileGenerator>(f))
+		dynlibsType[name]="FileGenerator";
+	else if (dynamic_pointer_cast<DynamicEngine>(f))
+		dynlibsType[name]="DynamicEngine";
+	else if (dynamic_pointer_cast<KinematicEngine>(f))
+		dynlibsType[name]="KinematicEngine";
+	else if (dynamic_pointer_cast<Body>(f))
+		dynlibsType[name]="Body";
+	else if (dynamic_pointer_cast<CollisionFunctor>(f))
+		dynlibsType[name]="CollisionFunctor";
+	else if (dynamic_pointer_cast<IOManager>(f))
+		dynlibsType[name]="IOManager";
+	else if (dynamic_pointer_cast<BroadCollider>(f))
+		dynlibsType[name]="BroadCollider";
+	else if (dynamic_pointer_cast<NarrowCollider>(f))
+		dynlibsType[name]="NarrowCollider";
+	else if (dynamic_pointer_cast<GeometricalModel>(f))
+		dynlibsType[name]="GeometricalModel";
+	else if (dynamic_pointer_cast<CollisionGeometry>(f))
+		dynlibsType[name]="CollisionGeometry";
+	else if (dynamic_pointer_cast<BoundingVolume>(f))
+		dynlibsType[name]="BoundingVolume";
+	else if (dynamic_pointer_cast<InteractionGeometry>(f))
+		dynlibsType[name]="InteractionGeometry"; // FIXME : change name of the subproject
+	else 
+		dynlibsType[name]="Unknown"; 
+	
+
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 void Omega::buildDynlibList()
 {
 	char * buffer ;
@@ -78,7 +137,7 @@ void Omega::buildDynlibList()
 		filesystem::directory_iterator diEnd;
 		for ( ; di != diEnd; ++di )
 		{
-			if (!filesystem::is_directory(*di) && !filesystem::symbolic_link_exists(*di))
+			if (!filesystem::is_directory(*di) && !filesystem::symbolic_link_exists(*di) && filesystem::extension(*di)!=".a")
 			{
 				filesystem::path name(filesystem::basename((*di)));
 				int prevLength = (*di).leaf().size();
@@ -89,7 +148,8 @@ void Omega::buildDynlibList()
 					name = filesystem::path(filesystem::basename(name));
 					length = name.leaf().size();
 				}
-				cout << name.leaf() << endl;
+				registerDynlibType(name.leaf().substr(3,name.leaf().size()-3));
+				//cout << name.leaf() << endl;
 			}	
 		}
 	}

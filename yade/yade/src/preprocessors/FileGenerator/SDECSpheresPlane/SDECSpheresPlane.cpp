@@ -17,9 +17,9 @@
 #include "Interaction.hpp"
 
 
-SDECSpheresPlane::SDECSpheresPlane () : Serializable()
+SDECSpheresPlane::SDECSpheresPlane () : FileGenerator()
 {
-	exec();
+	generate();
 }
 
 SDECSpheresPlane::~SDECSpheresPlane ()
@@ -35,7 +35,7 @@ void SDECSpheresPlane::registerAttributes()
 {
 }
 
-void SDECSpheresPlane::exec()
+void SDECSpheresPlane::generate()
 {
 	shared_ptr<NonConnexBody> rootBody(new NonConnexBody);
 	int nbSpheres = 9;

@@ -2,7 +2,7 @@
 #ifndef __FEMROCK_H__
 #define __FEMROCK_H__
 
-#include "Serializable.hpp"
+#include "FileGenerator.hpp"
 #include "Vector3.hpp"
 /*class NodeProperties : public Serializable
 {
@@ -21,7 +21,7 @@
 };
 REGISTER_CLASS(NodeProperties,false);*/
 
-class FEMRock : public Serializable
+class FEMRock : public FileGenerator
 {
 	public : vector<Vector3r> nodes;
 	public : vector<vector<int> > tetrahedrons;
@@ -33,7 +33,7 @@ class FEMRock : public Serializable
 	public : void afterDeserialization();
 	public : void registerAttributes();
 
-	public : void exec();
+	public : void generate();
 
 	REGISTER_CLASS_NAME(FEMRock);
 };

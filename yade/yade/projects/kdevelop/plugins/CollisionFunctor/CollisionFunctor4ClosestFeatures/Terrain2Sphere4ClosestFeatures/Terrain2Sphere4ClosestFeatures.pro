@@ -9,8 +9,10 @@ LIBS += -lTerrain \
         -lGeometry \
         -lInteraction \
         -lMultiMethods \
+        -lSphere \
+        -lDistances \
         -rdynamic 
-INCLUDEPATH = $(YADEINCLUDEPATH)
+INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
@@ -20,6 +22,8 @@ QMAKE_LIBDIR = ../../../../plugins/GeometricalModel/Terrain/$(YADEDYNLIBPATH) \
                ../../../../yade/Geometry/$(YADEDYNLIBPATH) \
                ../../../../yade/Interaction/$(YADEDYNLIBPATH) \
                ../../../../yade/MultiMethods/$(YADEDYNLIBPATH) \
+               ../../../../plugins/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
+               ../../../../toolboxes/ComputationalGeometry/Distances/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
 CONFIG += debug \

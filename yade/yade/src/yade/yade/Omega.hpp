@@ -39,6 +39,7 @@
 #include <fstream>
 #include <boost/shared_ptr.hpp>
 #include "Singleton.hpp"
+#include "ClassFactory.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -73,7 +74,7 @@ class Omega : public Singleton<Omega>
 	public : ptime startingSimulationTime;
 
 	private : void buildDynlibList();
-	
+	private : void registerDynlibType(const string& name);
 
 	public	: float 	dt;
 	public	: void 		setTimestep(const string);

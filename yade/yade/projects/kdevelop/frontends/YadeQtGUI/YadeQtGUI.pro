@@ -4,41 +4,55 @@
 # Target is a library:  
 
 LIBS += -lSerialization \
-        -lQtGUIGenerator \
         -lMath \
         -lBody \
         -lEngine \
         -lGeometry \
         -lInteraction \
         -lMultiMethods \
+        -lXMLManager \
+        -lFactory \
         -rdynamic 
 INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 QMAKE_LIBDIR = ../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
-               ../../frontends/QtGUIGenerator/$(YADEDYNLIBPATH) \
                ../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
                ../../yade/Body/$(YADEDYNLIBPATH) \
                ../../yade/Engine/$(YADEDYNLIBPATH) \
                ../../yade/Geometry/$(YADEDYNLIBPATH) \
                ../../yade/Interaction/$(YADEDYNLIBPATH) \
                ../../yade/MultiMethods/$(YADEDYNLIBPATH) \
+               ../../plugins/IOManager/XMLManager/$(YADEDYNLIBPATH) \
+               ../../yade/Factory/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
 CONFIG += debug \
           warn_on \
           dll 
+QtGUISignalCatcher.ui.commands = $$IDL_COMPILER $$IDL_OPTIONS $$QtGUISignalCatcher.ui.target 
+QtGUISignalCatcher.ui.target = QtGUISignalCatcher.ui 
+QtFileGeneratorController.ui.commands = $$IDL_COMPILER $$IDL_OPTIONS $$QtFileGeneratorController.ui.target 
+QtFileGeneratorController.ui.target = QtFileGeneratorController.ui 
 TEMPLATE = lib 
-FORMS += YadeQtGeneratedMainWindow.ui 
+FORMS += YadeQtGeneratedMainWindow.ui \
+         QtFileGeneratorController.ui \
+         QtGUISignalCatcher.ui 
+IDLS += QtFileGeneratorController.ui \
+        QtGUISignalCatcher.ui 
 HEADERS += YadeQtGUI.hpp \
            FpsTracker.hpp \
            GLViewer.hpp \
            QGLSubWindow.hpp \
-           YadeQtMainWindow.hpp 
+           YadeQtMainWindow.hpp \
+           QtFileGenerator.hpp \
+           QtGUIGenerator.hpp 
 SOURCES += YadeQtGUI.cpp \
            FpsTracker.cpp \
            GLViewer.cpp \
            QGLSubWindow.cpp \
-           YadeQtMainWindow.cpp 
+           YadeQtMainWindow.cpp \
+           QtFileGenerator.cpp \
+           QtGUIGenerator.cpp 
 QtGeneratedFrontEnd.ui.target = QtGeneratedFrontEnd.ui

@@ -104,8 +104,7 @@ void QtGUIGenerator::reArrange(QWidget * widget)
 	for(unsigned int i=0;i<descriptors.size();i++)
 	{
 		descriptors[i]->label->setGeometry( QRect( shiftX, shiftY+(20+5)*i, maxLabelLength, 20 ) );
-		descriptors[i]->label->setIndent(Qt::AlignRight);
-		
+		descriptors[i]->label->setAlignment( int( QLabel::AlignVCenter | QLabel::AlignRight ) );
 		unsigned int nbStrings = descriptors[i]->strings.size();
 		unsigned int leWidth = (widgetWidth-maxLabelLength-shiftX-10-10-(nbStrings-1)*5)/nbStrings;	
 		for(unsigned int j=0;j<nbStrings;j++)
@@ -140,7 +139,7 @@ void QtGUIGenerator::buildGUI(shared_ptr<Serializable> s,  QWidget * widget)
 			IOManager::parseFundamental(stream.str(), descriptor->strings);
 				
 			descriptor->label = new QLabel( widget);
-			descriptor->label->setText(descriptor->name);
+			descriptor->label->setText(descriptor->name+" : ");
 			
 			unsigned int nbStrings = descriptor->strings.size();
 			for(unsigned int i=0;i<nbStrings;i++)

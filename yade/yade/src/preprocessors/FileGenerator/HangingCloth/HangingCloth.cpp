@@ -16,9 +16,9 @@
 #include <fstream>
 #include "IOManager.hpp"
 
-HangingCloth::HangingCloth () : Serializable()
+HangingCloth::HangingCloth () : FileGenerator()
 {
-	exec();
+	generate();
 }
 
 HangingCloth::~HangingCloth ()
@@ -34,7 +34,7 @@ void HangingCloth::registerAttributes()
 {
 }
 
-void HangingCloth::exec()
+void HangingCloth::generate()
 {
 	shared_ptr<NonConnexBody> rootBody(new NonConnexBody);
 	int width = 20;
