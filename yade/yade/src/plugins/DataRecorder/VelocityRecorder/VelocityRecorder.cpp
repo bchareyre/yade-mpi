@@ -1,18 +1,18 @@
-#include "AveragePositionRecorder.hpp"
-#include "RigidBodyParameters.hpp"
+#include "VelocityRecorder.hpp"
+#include "ParticleParameters.hpp"
 #include "Omega.hpp"
 #include "ComplexBody.hpp"
 
 #include <boost/lexical_cast.hpp>
 
-AveragePositionRecorder::AveragePositionRecorder () : Actor()
+VelocityRecorder::VelocityRecorder () : Actor()
 {
 	outputFile = "";
 	interval = 50;
 	bigBallId = 0;
 }
 
-void AveragePositionRecorder::postProcessAttributes(bool deserializing)
+void VelocityRecorder::postProcessAttributes(bool deserializing)
 {
 	if(deserializing)
 	{
@@ -20,7 +20,7 @@ void AveragePositionRecorder::postProcessAttributes(bool deserializing)
 	}
 }
 
-void AveragePositionRecorder::registerAttributes()
+void VelocityRecorder::registerAttributes()
 {
 	Actor::registerAttributes();
 	REGISTER_ATTRIBUTE(outputFile);
@@ -28,13 +28,13 @@ void AveragePositionRecorder::registerAttributes()
 	REGISTER_ATTRIBUTE(bigBallId);
 }
 
-bool AveragePositionRecorder::isActivated()
+bool VelocityRecorder::isActivated()
 {
 	return ((Omega::instance().getCurrentIteration() % interval == 0) && (ofile));
 }
 
 
-void AveragePositionRecorder::action(Body * body)
+void VelocityRecorder::action(Body * body)
 {
 	ComplexBody * ncb = dynamic_cast<ComplexBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
@@ -47,9 +47,10 @@ void AveragePositionRecorder::action(Body * body)
 		if( body->isDynamic && body->getId() != bigBallId )
 		{ 
 			size+=1.0;
-			x+=body->physicalParameters->se3.translation[0];
-			y+=body->physicalParameters->se3.translation[1];
-			z+=body->physicalParameters->se3.translation[2];
+			ParticleParameters* pp = dynamic_cast<ParticleParameters*>(body->physicalParameters.get());
+			x+=pp->velocity[0];
+			y+=pp->velocity[1];
+			z+=pp->velocity[2];
 		}
 	}
 
@@ -57,13 +58,15 @@ void AveragePositionRecorder::action(Body * body)
 	y /= size;
 	z /= size;
 	
+	ParticleParameters* bigBall = dynamic_cast<ParticleParameters*>((*bodies)[bigBallId]->physicalParameters.get());
+	
 	ofile << lexical_cast<string>(Omega::instance().getSimulationTime()) << " " 
 		<< lexical_cast<string>(x) << " " 
 		<< lexical_cast<string>(y) << " " 
 		<< lexical_cast<string>(z) << " "
 
-		<< lexical_cast<string>((*bodies)[bigBallId]->physicalParameters->se3.translation[0]) << " " // big ball
-		<< lexical_cast<string>((*bodies)[bigBallId]->physicalParameters->se3.translation[1]) << " " 
-		<< lexical_cast<string>((*bodies)[bigBallId]->physicalParameters->se3.translation[2]) << endl;
+		<< lexical_cast<string>(bigBall->velocity[0]) << " " // big ball
+		<< lexical_cast<string>(bigBall->velocity[1]) << " " 
+		<< lexical_cast<string>(bigBall->velocity[2]) << endl;
 }
 

@@ -53,7 +53,6 @@ void ActionDispatcher::action(Body* body)
 	for( ncb->actions->gotoFirst() ; ncb->actions->notAtEnd() ; ncb->actions->gotoNext())
 	{
 		shared_ptr<Action>& action = ncb->actions->getCurrent(id);
-// FIXME - it would be better if action was holding body's id. and it is possible that it will be even faster
-		operator()( action , (*bodies)[id]->physicalParameters);
+		operator()( action , (*bodies)[id]->physicalParameters , (*bodies)[id].get() );
 	}
 }

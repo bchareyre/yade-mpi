@@ -6,7 +6,9 @@
 SUBDIRS += ApplyActionForce2Particle \
 	   ApplyActionMomentum2RigidBody \
 	   CundallNonViscousForceDamping \
-	   CundallNonViscousMomentumDamping
+	   CundallNonViscousMomentumDamping \
+	   LeapFrogForceIntegrator \
+	   LeapFrogMomentumIntegrator
 CONFIG += release \
           warn_on 
 TEMPLATE = subdirs 

@@ -3,14 +3,13 @@
 # Subdir relative project main directory: ./plugins/Engine
 # Target is a subdirs project 
 
-MOC_DIR = $(YADECOMPILATIONPATH) 
-UI_DIR = $(YADECOMPILATIONPATH) 
-OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-CONFIG += debug \
-          warn_on 
-TEMPLATE = subdirs 
 SUBDIRS += Action \
            ActionFunctor \
-           TimeIntegratorFunctor \
            KinematicEngine \
            DynamicEngine 
+MOC_DIR = $(YADECOMPILATIONPATH)
+UI_DIR = $(YADECOMPILATIONPATH)
+OBJECTS_DIR = $(YADECOMPILATIONPATH)
+CONFIG += debug \
+warn_on
+TEMPLATE = subdirs

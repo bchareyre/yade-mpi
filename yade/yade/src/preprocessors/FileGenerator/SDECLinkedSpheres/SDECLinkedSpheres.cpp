@@ -44,8 +44,8 @@ SDECLinkedSpheres::SDECLinkedSpheres () : FileGenerator()
 	supportSize = 0.5;
 	support1 = 1;
 	support2 = 1;
-	dampingForce = 0.3;
-	dampingMomentum = 0.3;
+	dampingForce = 0.7;
+	dampingMomentum = 0.7;
 	timeStepUpdateInterval = 300;
 	//sphereYoungModulus  = 15000000.0;
 	sphereYoungModulus  = 100000;

@@ -42,7 +42,9 @@ class LeapFrogMomentumIntegrator : public ActionFunctor
 	private : vector<Vector3r> prevAngularVelocities;
 	private : vector<bool> firsts;
 	
-	protected : virtual void go(const shared_ptr<BodyPhysicalParameters>& b,unsigned int id);
+	public : virtual void go( 	  const shared_ptr<Action>&
+					, const shared_ptr<BodyPhysicalParameters>&
+					, const Body*);
 	
 	REGISTER_CLASS_NAME(LeapFrogMomentumIntegrator);
 };

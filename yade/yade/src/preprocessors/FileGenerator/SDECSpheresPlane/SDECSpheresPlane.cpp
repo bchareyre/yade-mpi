@@ -48,6 +48,7 @@ SDECSpheresPlane::SDECSpheresPlane () : FileGenerator()
 	spherePoissonRatio  = 0.2;
 	sphereFrictionDeg   = 18.0;
 	density = 2600;
+	rotationBlocked = false;
 }
 
 SDECSpheresPlane::~SDECSpheresPlane ()
@@ -71,6 +72,7 @@ void SDECSpheresPlane::registerAttributes()
 	REGISTER_ATTRIBUTE(groundSize);
 	REGISTER_ATTRIBUTE(dampingForce);
 	REGISTER_ATTRIBUTE(dampingMomentum);
+	REGISTER_ATTRIBUTE(rotationBlocked);
 	REGISTER_ATTRIBUTE(timeStepUpdateInterval);
 }
 
@@ -107,7 +109,8 @@ string SDECSpheresPlane::generate()
 	
 	shared_ptr<ActionDispatcher> timeIntegratorDispatcher(new ActionDispatcher);
 	timeIntegratorDispatcher->add("ActionForce","ParticleParameters","LeapFrogForceIntegrator");
-	timeIntegratorDispatcher->add("ActionMomentum","RigidBodyParameters","LeapFrogMomentumIntegrator");
+	if(!rotationBlocked)
+		timeIntegratorDispatcher->add("ActionMomentum","RigidBodyParameters","LeapFrogMomentumIntegrator");
 	
 	shared_ptr<SDECTimeStepper> sdecTimeStepper(new SDECTimeStepper);
 	sdecTimeStepper->sdecGroup = 0;

@@ -1,6 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2004 by Olivier Galizzi                                 *
- *   olivier.galizzi@imag.fr                                               *
+ *   Copyright (C) 2004 by Janek Kozicki                                   *
+ *   cosurgi@berlios.de                                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -21,48 +21,50 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#ifndef __TIMEINTEGRATORDISPATCHER_HPP__
-#define __TIMEINTEGRATORDISPATCHER_HPP__
+#include "LeapFrogMomentumIntegrator.hpp"
+#include "RigidBodyParameters.hpp"
+#include "ParticleParameters.hpp"
+#include "Omega.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "Actor.hpp"
 
-#include "Body.hpp"
-#include "DynLibDispatcher.hpp"
-#include "ActionFunctor.hpp"
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-class ActionDispatcher :
-	  public Actor
-	, public DynLibDispatcher
-		< 	BodyPhysicalParameters , 
-			ActionFunctor  ,
-			void ,
-			TYPELIST_2( 
-					const shared_ptr<BodyPhysicalParameters>&
-					, unsigned int 
-				) 
-		>
+// FIXME : should we pass timestep as parameter of functor
+// FIXME : what's with timestepper
+void LeapFrogMomentumIntegrator::go( 	  const shared_ptr<Action>&
+					, const shared_ptr<BodyPhysicalParameters>& b
+					, const Body* body)
 {
-	public		: virtual void action(Body* body);
-	public		: virtual void registerAttributes();
-	protected	: virtual void postProcessAttributes(bool deserializing);
-	REGISTER_CLASS_NAME(ActionDispatcher);
-};
+	if(! body->isDynamic)
+		return;
+		
+	unsigned int id = body->getId();
+	
+	if (prevAngularVelocities.size()<=id)
+	{
+		prevAngularVelocities.resize(id+1);
+		firsts.resize(id+1,true);
+	}
+
+	RigidBodyParameters * rb = dynamic_cast<RigidBodyParameters*>(b.get());
+	
+	Real dt = Omega::instance().getTimeStep();
+		
+	if (!firsts[id])
+		rb->angularVelocity = prevAngularVelocities[id]+0.5*dt*rb->angularAcceleration;
+		
+	prevAngularVelocities[id] = rb->angularVelocity+0.5*dt*rb->angularAcceleration;
+	Vector3r axis = rb->angularVelocity;
+	Real angle = axis.normalize();
+	Quaternionr q;
+	q.fromAxisAngle(axis,angle*dt);
+	rb->se3.rotation = q*rb->se3.rotation;
+	rb->se3.rotation.normalize();
+
+	firsts[id] = false;
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-REGISTER_SERIALIZABLE(ActionDispatcher,false);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-#endif // __TIMEINTEGRATORDISPATCHER_HPP__
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -13,6 +13,7 @@ class SDECSpheresPlane : public FileGenerator
 	private : Real dampingForce;
 	private : Real dampingMomentum;
 	private : int timeStepUpdateInterval;
+	private : bool rotationBlocked;
 	private : Real sphereYoungModulus,spherePoissonRatio,sphereFrictionDeg;
 	// construction
 	public : SDECSpheresPlane ();

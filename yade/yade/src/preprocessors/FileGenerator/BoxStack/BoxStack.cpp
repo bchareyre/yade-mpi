@@ -36,7 +36,7 @@ BoxStack::BoxStack () : FileGenerator()
 	bulletPosition	= Vector3r(80,0,0);
 	bulletSize	= 12;
 	bulletDensity	= 2;
-	dampingForce	= 0.4;
+	dampingForce	= 0.6;
 	dampingMomentum = 0.9;
 	kinematicBullet	= false;
 }

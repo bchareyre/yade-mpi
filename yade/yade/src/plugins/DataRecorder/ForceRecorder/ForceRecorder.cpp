@@ -11,6 +11,7 @@ ForceRecorder::ForceRecorder () : Actor(), actionForce(new ActionForce)
 	outputFile = "";
 	interval = 50;
 	id = 0;
+	changed = false;
 }
 
 void ForceRecorder::postProcessAttributes(bool deserializing)
@@ -46,7 +47,11 @@ void ForceRecorder::action(Body * body)
 		<< lexical_cast<string>(f[1]) << " " 
 		<< lexical_cast<string>(f[2]) << endl;
 		
-	if( bigBallReleaseTime < Omega::instance().getSimulationTime() )
+	// FIXME all that lines do not belong to ForceRecorder
+	if( bigBallReleaseTime < Omega::instance().getSimulationTime() && (!changed) )
+	{
+		changed = true;
 		(*(ncb->bodies))[bigBallId]->isDynamic = true;
+	}
 }
 

@@ -19,6 +19,7 @@ class ForceRecorder : public Actor
 	
 	private : std::ofstream ofile; 
 
+	private : bool changed;
 	// construction
 	public : ForceRecorder ();
 

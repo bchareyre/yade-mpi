@@ -6,6 +6,7 @@
 
 class ForceRecorder;
 class AveragePositionRecorder;
+class VelocityRecorder;
 
 class SDECImport : public FileGenerator
 {
@@ -29,10 +30,11 @@ class SDECImport : public FileGenerator
 	private	: bool wall_3_wire;
 	private	: bool wall_4_wire;
 	private	: bool bigBall;
+	private	: bool rotationBlocked;
 	private	: Vector3f spheresColor;
 	private	: bool spheresRandomColor;
 	private : bool recordBottomForce;
-	private : string forceRecordFile,positionRecordFile;
+	private : string forceRecordFile,positionRecordFile,velocityRecordFile;
 	private : bool recordAveragePositions;
 	private : int recordIntervalIter;
 	private : Real dampingForce;
@@ -48,6 +50,7 @@ class SDECImport : public FileGenerator
 	private : int timeStepUpdateInterval;
 
 	private : shared_ptr<ForceRecorder> forcerec;
+	private : shared_ptr<VelocityRecorder> velocityRecorder;
 	private : shared_ptr<AveragePositionRecorder> averagePositionRecorder;
 	
 	// construction

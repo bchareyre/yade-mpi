@@ -36,6 +36,7 @@
 
 #include "AveragePositionRecorder.hpp"
 #include "ForceRecorder.hpp"
+#include "VelocityRecorder.hpp"
 
 #include <boost/filesystem/convenience.hpp>
 #include <boost/lexical_cast.hpp>
@@ -68,9 +69,11 @@ SDECImport::SDECImport () : FileGenerator()
 	recordAveragePositions	= true;
 	positionRecordFile	= "../data/position";
 	recordIntervalIter	= 100;
+	velocityRecordFile 	= "../data/velocities";
+	rotationBlocked = true;
 
 	bigBall 		= true;
-	bigBallRadius		= 0.15;
+	bigBallRadius		= 0.075;
 	bigBallPoissonRatio 	= 0.3;
 	bigBallYoungModulus 	= 40000000000.0;
 	bigBallFrictDeg 	= 60;
@@ -118,6 +121,7 @@ void SDECImport::registerAttributes()
 	REGISTER_ATTRIBUTE(density);
 	REGISTER_ATTRIBUTE(dampingForce);
 	REGISTER_ATTRIBUTE(dampingMomentum);
+	REGISTER_ATTRIBUTE(rotationBlocked);
 	REGISTER_ATTRIBUTE(timeStepUpdateInterval);
 //	REGISTER_ATTRIBUTE(wall_top);
 //	REGISTER_ATTRIBUTE(wall_bottom);
@@ -133,10 +137,11 @@ void SDECImport::registerAttributes()
 //	REGISTER_ATTRIBUTE(wall_4_wire);
 //	REGISTER_ATTRIBUTE(spheresColor);
 //	REGISTER_ATTRIBUTE(spheresRandomColor);
-	REGISTER_ATTRIBUTE(recordBottomForce);
+//	REGISTER_ATTRIBUTE(recordBottomForce);
 	REGISTER_ATTRIBUTE(forceRecordFile);
-	REGISTER_ATTRIBUTE(recordAveragePositions);
+//	REGISTER_ATTRIBUTE(recordAveragePositions);
 	REGISTER_ATTRIBUTE(positionRecordFile);
+	REGISTER_ATTRIBUTE(velocityRecordFile)
 	REGISTER_ATTRIBUTE(recordIntervalIter);
 
 	REGISTER_ATTRIBUTE(bigBall);
@@ -199,6 +204,10 @@ string SDECImport::generate()
 	if(bigBall)
 		rootBody->bodies->insert(body);
 	bigId = body->getId();
+	forcerec->bigBallId = bigId;
+	forcerec->bigBallReleaseTime = bigBallDropTimeSeconds;
+	averagePositionRecorder->bigBallId = bigId;
+	velocityRecorder->bigBallId = bigId;
 
 // bottom box
  	Vector3r center		= Vector3r(
@@ -214,9 +223,6 @@ string SDECImport::generate()
  	if(wall_bottom)
 		rootBody->bodies->insert(body);
 	forcerec->id = body->getId();
-	forcerec->bigBallId = bigId;
-	forcerec->bigBallReleaseTime = bigBallDropTimeSeconds;
-	averagePositionRecorder->bigBalId = bigId;
 
 // top box
  	center			= Vector3r(
@@ -393,14 +399,18 @@ void SDECImport::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r e
 
 void SDECImport::createActors(shared_ptr<ComplexBody>& rootBody)
 {
+// recording average positions
 	averagePositionRecorder = shared_ptr<AveragePositionRecorder>(new AveragePositionRecorder);
 	averagePositionRecorder -> outputFile 		= positionRecordFile;
 	averagePositionRecorder -> interval 		= recordIntervalIter;
-	
-//	Recording Forces
+// recording forces
 	forcerec = shared_ptr<ForceRecorder>(new ForceRecorder);
 	forcerec -> outputFile 	= forceRecordFile;
 	forcerec -> interval 	= recordIntervalIter;
+// recording velocities
+	velocityRecorder = shared_ptr<VelocityRecorder>(new VelocityRecorder);
+	velocityRecorder-> outputFile 	= velocityRecordFile;
+	velocityRecorder-> interval 	= recordIntervalIter;
 
 	shared_ptr<InteractionGeometryDispatcher> interactionGeometryDispatcher(new InteractionGeometryDispatcher);
 	interactionGeometryDispatcher->add("InteractionSphere","InteractionSphere","Sphere2Sphere4SDECContactModel");
@@ -431,7 +441,8 @@ void SDECImport::createActors(shared_ptr<ComplexBody>& rootBody)
 	
 	shared_ptr<ActionDispatcher> timeIntegratorDispatcher(new ActionDispatcher);
 	timeIntegratorDispatcher->add("ActionForce","ParticleParameters","LeapFrogForceIntegrator");
-	timeIntegratorDispatcher->add("ActionMomentum","RigidBodyParameters","LeapFrogMomentumIntegrator");
+	if(!rotationBlocked)
+		timeIntegratorDispatcher->add("ActionMomentum","RigidBodyParameters","LeapFrogMomentumIntegrator");
 	
 	shared_ptr<SDECTimeStepper> sdecTimeStepper(new SDECTimeStepper);
 	sdecTimeStepper->sdecGroup = 10;
@@ -453,6 +464,7 @@ void SDECImport::createActors(shared_ptr<ComplexBody>& rootBody)
 	rootBody->actors.push_back(applyActionDispatcher);
 	rootBody->actors.push_back(timeIntegratorDispatcher);
 	rootBody->actors.push_back(averagePositionRecorder);
+	rootBody->actors.push_back(velocityRecorder);
 	rootBody->actors.push_back(forcerec);
 }
 

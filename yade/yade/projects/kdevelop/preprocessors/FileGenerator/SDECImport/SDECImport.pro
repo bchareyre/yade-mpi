@@ -27,6 +27,7 @@ LIBS += -lSAPCollider \
         -lSDECDynamicEngine \
         -lSDECMacroMicroElasticRelationships \
         -lSDECTimeStepper \
+        -lVelocityRecorder \
         -lForceRecorder \
         -rdynamic 
 INCLUDEPATH += $(YADEINCLUDEPATH) 
@@ -57,16 +58,6 @@ QMAKE_LIBDIR = ../../../plugins/Interaction/BroadInteractor/SAPCollider/$(YADEDY
                ../../../plugins/Engine/DynamicEngine/SDECDynamicEngine/$(YADEDYNLIBPATH) \
                ../../../plugins/Interaction/InteractionPhysicsFunctor/SDECContactPhysics/SDECMacroMicroElasticRelationships/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/DynamicEngine/SDECTimeStepper/$(YADEDYNLIBPATH) \
-               ../../../plugins/Interaction/InteractionPhysicsFunctor/SDECContactPhysics/SDECLinearContactModel/$(YADEDYNLIBPATH) \
-               ../../../plugins/Geometry/GeometricalModel/Box/$(YADEDYNLIBPATH) \
-               ../../../plugins/Geometry/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
-               ../../../plugins/Geometry/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
-               ../../../plugins/Interaction/InteractionGeometry/SDECPermanentLink/$(YADEDYNLIBPATH) \
-               ../../../plugins/Geometry/InteractionDescription/InteractionDescriptionSet/$(YADEDYNLIBPATH) \
-               ../../../plugins/Geometry/BoundingVolumeFunctor/InteractionDescriptionSet2AABBFunctor/$(YADEDYNLIBPATH) \
-               ../../../yade/Body/$(YADEDYNLIBPATH) \
-               ../../../yade/Geometry/$(YADEDYNLIBPATH) \
-               ../../../yade/Interaction/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

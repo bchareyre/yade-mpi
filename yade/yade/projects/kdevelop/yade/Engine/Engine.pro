@@ -3,16 +3,13 @@
 # Subdir relative project main directory: ./yade/Engine
 # Target is a library:  
 
-HEADERS += TimeIntegratorDispatcher.hpp \
-           TimeIntegratorFunctor.hpp \
-           ActionDispatcher.hpp \
+HEADERS += ActionDispatcher.hpp \
            ActionFunctor.hpp \
            ActionContainer.hpp \
            Action.hpp \
            DynamicEngine.hpp \
            KinematicEngine.hpp 
-SOURCES += TimeIntegratorDispatcher.cpp \
-           ActionDispatcher.cpp \
+SOURCES += ActionDispatcher.cpp \
            ActionContainer.cpp \
            DynamicEngine.cpp \
            KinematicEngine.cpp 

@@ -30,6 +30,7 @@
 #include "FunctorWrapper.hpp"
 #include "Action.hpp"
 #include "BodyPhysicalParameters.hpp"
+#include "Body.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -37,8 +38,9 @@
 class ActionFunctor : public FunctorWrapper
 		<
 		 void ,
-		 TYPELIST_2(	  const shared_ptr<Action>&
-				, shared_ptr<BodyPhysicalParameters>& 
+		 TYPELIST_3(	  const shared_ptr<Action>&
+				, const shared_ptr<BodyPhysicalParameters>&
+				, const Body*
 			   )
 		>
 {

@@ -64,7 +64,7 @@ class Body : public Serializable
 /// Attributes											///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 	private	: unsigned int id;
-	public	: unsigned int getId() {return id;};
+	public	: unsigned int getId() const {return id;};
 	// group to which body belongs (maybe vector<int> , to allow multiple groups?)
 	private : int group;
 	public  : int getGroup() {return group; };

@@ -37,7 +37,9 @@ class CundallNonViscousMomentumDamping : public ActionFunctor
 	public		: Real damping;
 	public		: CundallNonViscousMomentumDamping();
 	
-	public 		: virtual void go(const shared_ptr<Action>& , shared_ptr<BodyPhysicalParameters>&);
+	public : virtual void go( 	  const shared_ptr<Action>&
+					, const shared_ptr<BodyPhysicalParameters>&
+					, const Body*);
 	
 	protected	: virtual void registerAttributes();
 	REGISTER_CLASS_NAME(CundallNonViscousMomentumDamping);

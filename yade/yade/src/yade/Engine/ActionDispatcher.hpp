@@ -32,6 +32,8 @@
 #include "Action.hpp"
 #include "ActionFunctor.hpp"
 
+class Body;
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -41,8 +43,9 @@ class ActionDispatcher :
 		<	  TYPELIST_2( Action , BodyPhysicalParameters )	// base classess for dispatch
 			, ActionFunctor				// class that provides multivirtual call
 			, void						// return type
-			, TYPELIST_2(	  const shared_ptr<Action>&	// function arguments
-					, shared_ptr<BodyPhysicalParameters>& 
+			, TYPELIST_3(	  const shared_ptr<Action>&	// function arguments
+					, const shared_ptr<BodyPhysicalParameters>& 
+					, const Body *
 				    )
 		>
 {

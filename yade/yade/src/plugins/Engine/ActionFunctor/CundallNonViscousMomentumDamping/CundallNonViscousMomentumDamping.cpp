@@ -45,12 +45,14 @@ void CundallNonViscousMomentumDamping::registerAttributes()
 
 // this is Cundall non-viscous local damping, applied to momentum (ActionMomentum)
 
-void CundallNonViscousMomentumDamping::go(const shared_ptr<Action>& a , shared_ptr<BodyPhysicalParameters>& b)
+void CundallNonViscousMomentumDamping::go( 	  const shared_ptr<Action>& a
+						, const shared_ptr<BodyPhysicalParameters>& b
+						, const Body*)
 {
 	ActionMomentum * am = static_cast<ActionMomentum*>(a.get());
 	RigidBodyParameters * rb = static_cast<RigidBodyParameters*>(b.get());
 	
-	Real m  = am->momentum.length();
+	Vector3r& m  = am->momentum;
 	register int sign;
 	for(int j=0;j<3;j++)
 	{
@@ -60,7 +62,8 @@ void CundallNonViscousMomentumDamping::go(const shared_ptr<Action>& a , shared_p
 			sign = 1;
 		else
 			sign = -1;
-		am->momentum[j] -= damping*m*sign;
+			
+		m[j] -= damping * std::abs(m[j]) * sign;
 	}
 }
 

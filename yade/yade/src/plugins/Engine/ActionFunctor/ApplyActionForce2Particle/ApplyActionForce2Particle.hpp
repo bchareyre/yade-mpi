@@ -34,7 +34,9 @@
 
 class ApplyActionForce2Particle : public ActionFunctor
 {
-	public : virtual void go(const shared_ptr<Action>& a, shared_ptr<BodyPhysicalParameters>& b);
+	public : virtual void go( 	  const shared_ptr<Action>&
+					, const shared_ptr<BodyPhysicalParameters>&
+					, const Body*);
 	REGISTER_CLASS_NAME(ApplyActionForce2Particle);
 };
 

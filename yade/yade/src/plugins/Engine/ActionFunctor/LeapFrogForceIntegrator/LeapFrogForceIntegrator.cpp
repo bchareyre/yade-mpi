@@ -32,8 +32,15 @@
 
 // FIXME : should we pass timestep as parameter of functor
 // FIXME : what's with timestepper
-void LeapFrogForceIntegrator::go(const shared_ptr<BodyPhysicalParameters>& b,unsigned int id)
+void LeapFrogForceIntegrator::go( 	  const shared_ptr<Action>&
+					, const shared_ptr<BodyPhysicalParameters>& b
+					, const Body* body)
 {
+	if(! body->isDynamic)
+		return;
+		
+	unsigned int id = body->getId();
+	
 	if (prevVelocities.size()<=id)
 	{
 		prevVelocities.resize(id+1);
