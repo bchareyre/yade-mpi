@@ -8,13 +8,13 @@ LIBS += -lM3D \
         -lConstants \
         -lSDECDiscreteElement \
         -lRigidBody \
-        -lClosestFeatures \
         -lSphere \
+        -lSDECContactModel \
         -rdynamic 
 INCLUDEPATH = ../../../plugins/Body/SDECDiscreteElement \
               ../../../plugins/Body/RigidBody \
               ../../../plugins/GeometricalModel/Sphere \
-              ../../../plugins/InteractionModel/ClosestFeatures \
+              ../../../plugins/InteractionModel/SDECContactModel \
               ../../../yade \
               ../../../toolboxes/Math/M3D \
               ../../../toolboxes/Math/Constants \
@@ -27,8 +27,8 @@ QMAKE_LIBDIR = ../../../toolboxes/Math/M3D/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Math/Constants/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/SDECDiscreteElement/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/RigidBody/$(YADEDYNLIBPATH) \
-               ../../../plugins/InteractionModel/ClosestFeatures/$(YADEDYNLIBPATH) \
                ../../../plugins/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
+               ../../../plugins/InteractionModel/SDECContactModel/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
 CONFIG += debug \

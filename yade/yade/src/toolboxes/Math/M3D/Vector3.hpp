@@ -99,6 +99,7 @@ class Vector3 : public Serializable
 	public : Vector3& normalize (float threshold = 1e-06f);
 	public : Vector3 normalized (float threshold = 1e-06f);
 	public : Vector3 inverse (float threshold = 1e-06f);
+	public : Vector3& negate ();
 
 	public : Vector3 multTerm (const Vector3& v) const;
 	public : Vector3 maxTerm (const Vector3& v) const;

@@ -44,9 +44,8 @@ void SDECSpheresPlane::exec()
 	rootBody->broadCollider		= shared_ptr<BroadCollider>(new SAPCollider);
 	rootBody->narrowCollider	= shared_ptr<NarrowCollider>(new SimpleNarrowCollider);
 
-	rootBody->narrowCollider->addCollisionFunctor("Box","Box","Box2Box4ClosestFeatures");
-	rootBody->narrowCollider->addCollisionFunctor("Sphere","Sphere","Sphere2Sphere4ClosestFeatures");
-	rootBody->narrowCollider->addCollisionFunctor("Sphere","Box","Box2Sphere4ClosestFeatures");
+	rootBody->narrowCollider->addCollisionFunctor("Sphere","Sphere","Sphere2Sphere4SDECContactModel");
+	rootBody->narrowCollider->addCollisionFunctor("Sphere","Box","Box2Sphere4SDECContactModel");
 	rootBody->isDynamic		= false;
 	rootBody->velocity		= Vector3(0,0,0);
 	rootBody->angularVelocity	= Vector3(0,0,0);

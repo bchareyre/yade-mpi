@@ -9,8 +9,11 @@ LIBS += -lSphere \
         -lRand \
         -lConstants \
         -lSerialization \
+        -lSDECContactModel \
         -rdynamic 
 INCLUDEPATH = ../../../../plugins/GeometricalModel/Sphere \
+              ../../../../plugins/InteractionModel/SDECContactModel \
+              ../../../../yade \
               ../../../../toolboxes/Math/M2D \
               ../../../../toolboxes/Math/M3D \
               ../../../../toolboxes/Math/Rand \
@@ -25,9 +28,12 @@ QMAKE_LIBDIR = ../../../../plugins/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
                ../../../../toolboxes/Math/Rand/$(YADEDYNLIBPATH) \
                ../../../../toolboxes/Math/Constants/$(YADEDYNLIBPATH) \
                ../../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
+               ../../../../plugins/InteractionModel/SDECContactModel/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
 CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
+HEADERS += Sphere2Sphere4SDECContactModel.hpp 
+SOURCES += Sphere2Sphere4SDECContactModel.cpp 

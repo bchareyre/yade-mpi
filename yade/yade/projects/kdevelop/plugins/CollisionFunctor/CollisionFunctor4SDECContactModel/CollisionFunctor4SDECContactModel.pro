@@ -4,7 +4,7 @@
 # Target is a subdirs project 
 
 SUBDIRS += Sphere2Sphere4SDECContactModel \
-           Sphere2Box4SDECContactModel 
+           Box2Sphere4SDECContactModel 
 CONFIG += debug \
-          warn_on 
-TEMPLATE = subdirs 
+warn_on
+TEMPLATE = subdirs

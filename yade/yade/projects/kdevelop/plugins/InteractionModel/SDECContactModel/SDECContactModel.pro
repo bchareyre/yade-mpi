@@ -3,14 +3,25 @@
 # Subdir relative project main directory: ./plugins/InteractionModel/SDECContactModel
 # Target is a library:  
 
-LIBS += -rdynamic 
-INCLUDEPATH = ../../../yade 
+LIBS += -lSerialization \
+        -lM3D \
+        -lConstants \
+        -rdynamic 
+INCLUDEPATH = ../../../yade \
+              ../../../toolboxes/Math/M3D \
+              ../../../toolboxes/Math/Constants \
+              ../../../toolboxes/Libraries/Serialization 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = $(YADEDYNLIBPATH) 
+QMAKE_LIBDIR = ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
+               ../../../toolboxes/Math/M3D/$(YADEDYNLIBPATH) \
+               ../../../toolboxes/Math/Constants/$(YADEDYNLIBPATH) \
+               $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
 CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
+HEADERS += SDECContactModel.hpp 
+SOURCES += SDECContactModel.cpp 

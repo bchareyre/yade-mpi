@@ -36,6 +36,11 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include <set>
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 class SDECDynamicEngine : public DynamicEngine
 {
 
@@ -45,8 +50,9 @@ class SDECDynamicEngine : public DynamicEngine
 
 	struct interactionInfo
 	{
-		//int alreadyExists;
-
+		//int id1;
+		//int id2;
+		//int id;
 		float	kn;				// normal elastic constant.
 		float	ks;				// shear elastic constant.
 		float	initialKn;			// initial normal elastic constant.
@@ -62,15 +68,25 @@ class SDECDynamicEngine : public DynamicEngine
 
 	//map<pair<int,int> , interactionInfo > originalInteractions;
 
-	struct lessThanPair
+	/*struct lessThanPair
 	{
 		bool operator()(const pair<int,int> p1, const pair<int,int> p2) const
 		{
 			return (p1.first<p2.first || (p1.first==p2.first && p1.second<p2.second));
 		}
-	};
+	};*/
 
-	map<pair<int,int> , interactionInfo, lessThanPair> prevInteractions;
+	struct lessThanPair
+	{
+		bool operator()(const pair<int,interactionInfo>& p1, const pair<int,interactionInfo>& p2) const
+		{
+			return (p1.first<p2.first);
+		}
+	};
+	
+	//map<pair<int,int> , interactionInfo, lessThanPair> prevInteractions;
+	//list<interactionInfo> prevInteractions;
+	vector<set<pair<int,interactionInfo>,lessThanPair > > interactionsPerBody;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Attributes											///

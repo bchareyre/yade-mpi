@@ -27,11 +27,10 @@
 
 #include "SDECDynamicEngine.hpp"
 #include "SDECDiscreteElement.hpp"
-#include "ClosestFeatures.hpp"
+#include "SDECContactModel.hpp"
 #include "Omega.hpp"
 #include "Contact.hpp"
 #include "NonConnexBody.hpp"
-#include "Sphere.hpp" //FIXME : remove this line !
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -84,29 +83,33 @@ void SDECDynamicEngine::respondToCollisions(Body* body, const std::list<shared_p
 	{
 		forces.resize(bodies.size());
 		moments.resize(bodies.size());
-		prevInteractions.clear();
 		first = false;
+		interactionsPerBody.resize(bodies.size());
 	}
 
 	fill(forces.begin(),forces.end(),Vector3(0,0,0));
 	fill(moments.begin(),moments.end(),Vector3(0,0,0));
 
-	map<pair<int,int> , interactionInfo, lessThanPair>::iterator pii = prevInteractions.begin();
-	map<pair<int,int> , interactionInfo, lessThanPair>::iterator tmpi;
-	for(;pii!=prevInteractions.end();)
+	vector<set<pair<int,interactionInfo>,lessThanPair > >::iterator ipbi    = interactionsPerBody.begin();
+	vector<set<pair<int,interactionInfo>,lessThanPair > >::iterator ipbiEnd = interactionsPerBody.end();	
+	for(;ipbi!=ipbiEnd;++ipbi)
 	{
-		tmpi = pii;
-		tmpi++;
-		if ((*pii).second.accessed == false)
-			prevInteractions.erase(pii);
-		else
-			(*pii).second.accessed = false;
-		pii = tmpi;
+		set<pair<int,interactionInfo>,lessThanPair >::iterator ii = (*ipbi).begin();
+		set<pair<int,interactionInfo>,lessThanPair >::iterator iiEnd = (*ipbi).end();
+		set<pair<int,interactionInfo>,lessThanPair >::iterator tmpi;
+		for(;ii!=iiEnd;)
+		{
+			tmpi = ii;
+			tmpi++;
+			interactionInfo& prevContact = const_cast<interactionInfo&>((*ii).second);
+			if (prevContact.accessed == false)
+				(*ipbi).erase(ii);
+			else
+				prevContact.accessed = false;
+			ii = tmpi;
+		}
 	}
-
-//	if(interactions.size() == 0)
-//		prevInteractions.clear();
-
+	
 	std::list<shared_ptr<Interaction> >::const_iterator cti = interactions.begin();
 	std::list<shared_ptr<Interaction> >::const_iterator ctiEnd = interactions.end();
 	for( ; cti!=ctiEnd ; ++cti)
@@ -119,100 +122,64 @@ void SDECDynamicEngine::respondToCollisions(Body* body, const std::list<shared_p
 
 		shared_ptr<SDECDiscreteElement> de1 	= dynamic_pointer_cast<SDECDiscreteElement>(bodies[id1]);
 		shared_ptr<SDECDiscreteElement> de2 	= dynamic_pointer_cast<SDECDiscreteElement>(bodies[id2]);
-		shared_ptr<ClosestFeatures> cf 		= dynamic_pointer_cast<ClosestFeatures>(contact->interactionModel);
+		shared_ptr<SDECContactModel> scm 	= dynamic_pointer_cast<SDECContactModel>(contact->interactionModel);
+		
+		if (id1>=id2)
+			swap(id1,id2);
 
-		Vector3 p1 = cf->closestsPoints[0].first;
-		Vector3 p2 = cf->closestsPoints[0].second;
+		interactionInfo ni;
+		pair<int,interactionInfo> p(id2,ni);
+		pair<set<pair<int,interactionInfo>,lessThanPair >::iterator,bool> intertionResult = interactionsPerBody[id1].insert(p);
 
-		pair<int,int> idPair;
-		if (id1<id2)
-			idPair = pair<int,int>(id1,id2);
-		else
-			idPair = pair<int,int>(id2,id1);
-
-		/*if(id1==2 && id2==3)
+		interactionInfo& currentContact = const_cast<interactionInfo&>(intertionResult.first->second);
+		currentContact.accessed		= true;
+		
+		if (intertionResult.second)
 		{
-			//cerr << "..\n";
-			static int oo=0;
-			cerr << ++oo << endl;
-			Omega::instance().dt=0.000005;
-			dt=Omega::instance().dt;
-		}*/
-
-		pii = prevInteractions.find(idPair);
-
-		if (pii==prevInteractions.end())
-		{
+			cout << "not here" << endl;
 			// FIXME : put these lines into a dynlib - PhysicalCollider
-			interactionInfo ni;
-			ni.initialKn = 2*(de1->kn*de2->kn)/(de1->kn+de2->kn);
-			ni.initialKs = 2*(de1->ks*de2->ks)/(de1->ks+de2->ks);
-			ni.normal = (p1-p2).normalize();
-			ni.accessed = true;
-			(*pii).second.shearForce = Vector3(0,0,0);
-			shared_ptr<Sphere> s1 = dynamic_pointer_cast<Sphere>(de1->cm);
-			shared_ptr<Sphere> s2 = dynamic_pointer_cast<Sphere>(de2->cm);
-
-			if (s1 && s2) // 1
-				ni.initialEquilibriumDistance = s1->radius+s2->radius;
-			else if (s1 && !s2)
-				ni.initialEquilibriumDistance = s1->radius+2*s1->radius;
-			else if (s2 && !s1)
-				ni.initialEquilibriumDistance = s2->radius+2*s2->radius;
-			else
-				throw;
-			pii = (prevInteractions.insert(map<pair<int,int> , interactionInfo, lessThanPair>::value_type( idPair , ni ))).first;
-		}
-		else
-			(*pii).second.accessed = true;
-
+			currentContact.initialKn			= 2*(de1->kn*de2->kn)/(de1->kn+de2->kn);
+			currentContact.initialKs			= 2*(de1->ks*de2->ks)/(de1->ks+de2->ks);
+			currentContact.normal 				= scm->normal;
+			currentContact.shearForce			= Vector3(0,0,0);
+			currentContact.initialEquilibriumDistance	= scm->radius1+scm->radius2;
+		}		
+		
 		// FIXME : put these lines into another dynlib
-		(*pii).second.kn = (*pii).second.initialKn;
-		(*pii).second.ks = (*pii).second.initialKs;
-		(*pii).second.equilibriumDistance = (*pii).second.initialEquilibriumDistance;
+		currentContact.kn = currentContact.initialKn;
+		currentContact.ks = currentContact.initialKs;
+		currentContact.equilibriumDistance = currentContact.initialEquilibriumDistance;
 
-		(*pii).second.prevNormal = (*pii).second.normal;
-		(*pii).second.normal = (p1-p2).normalize();
+		currentContact.prevNormal = currentContact.normal;
+		currentContact.normal = scm->normal;
 
-		//float un = (*pii).second.initialEquilibriumDistance-(de1->se3.translation-de1->se3.translation).length();
+		//float un = currentContact.initialEquilibriumDistance-(de1->se3.translation-de1->se3.translation).length();
 
-		// 2
-		float un = (p2-p1).length(); // FIXME : it's now a penetration depth, but with initialized conditions it won't be
-		(*pii).second.normalForce = (*pii).second.kn*un*(*pii).second.normal;
+		float un = scm->penetrationDepth; // FIXME : it's now a penetration depth, but with initialized conditions it won't be
+		currentContact.normalForce = currentContact.kn*un*currentContact.normal;
+		Vector3 nn = currentContact.prevNormal.cross(currentContact.normal);
 
-//cout << id1 << " " << id2 << " 1 - " << (*pii).second.shearForce << endl;
+		
+		currentContact.shearForce      -= currentContact.shearForce.cross(nn);
+		float a 			= dt*0.5*currentContact.normal.dot(de1->angularVelocity+de2->angularVelocity);
+		Vector3 axis 			= a*currentContact.normal;
+		currentContact.shearForce      -= currentContact.shearForce.cross(axis);
+		
+		Vector3 x	= scm->contactPoint; // FIXME : it's now a penetration depth, but with initialized conditions it won't be
+		Vector3 c1x	= (x - de1->se3.translation);
+		Vector3 c2x	= (x - de2->se3.translation);
 
-		Vector3 nn = (*pii).second.prevNormal.cross((*pii).second.normal);
-		//if ( nn.length() > 0.0000001 )
-		//	nn=nn.normalize();
-
-		(*pii).second.shearForce -= (*pii).second.shearForce.cross(   nn   );
-//cout << id1 << " " << id2 << " 2 - " << (*pii).second.shearForce << endl;
-		float a = dt*0.5*(*pii).second.normal.dot(de1->angularVelocity+de2->angularVelocity);
-		Vector3 axis = a*(*pii).second.normal;
-
-		(*pii).second.shearForce -= (*pii).second.shearForce.cross(axis);
-//cout << id1 << " " << id2 << " 3 - " << (*pii).second.shearForce << endl;
-		Vector3 x = 0.5*(p1+p2); // FIXME : it's now a penetration depth, but with initialized conditions it won't be
-		Vector3 c1x = (x - de1->se3.translation);
-		Vector3 c2x = (x - de2->se3.translation);
-
-		Vector3 relativeVelocity = (de2->velocity+de2->angularVelocity.cross(c2x)) - (de1->velocity+de1->angularVelocity.cross(c1x));
-
-		//(*pii).second.shearForce = relativeVelocity.normalize()*(*pii).second.shearForce.length();
-		//cout << (*pii).second.shearForce.normalize() << "  || " <<relativeVelocity.normalize() << endl;
-
-		Vector3 shearVelocity = relativeVelocity-(*pii).second.normal.dot(relativeVelocity)*(*pii).second.normal;
-		Vector3 shearDisplacement = shearVelocity*dt;
-		(*pii).second.shearForce -=  (*pii).second.ks*shearDisplacement;
-//cout << id1 << " " << id2 << " 4 - " << (*pii).second.shearForce << endl;
-		Vector3 f = (*pii).second.normalForce + (*pii).second.shearForce;
-
-		forces[id1] -= f;
-		forces[id2] += f;
-
-		moments[id1] -= c1x.cross(f);
-		moments[id2] += c2x.cross(f);
+		Vector3 relativeVelocity 	= (de2->velocity+de2->angularVelocity.cross(c2x)) - (de1->velocity+de1->angularVelocity.cross(c1x));
+		Vector3 shearVelocity		= relativeVelocity-currentContact.normal.dot(relativeVelocity)*currentContact.normal;
+		Vector3 shearDisplacement	= shearVelocity*dt;
+		currentContact.shearForce      -=  currentContact.ks*shearDisplacement;
+		
+		Vector3 f = currentContact.normalForce + currentContact.shearForce;
+		
+		forces[id1]	-= f;
+		forces[id2]	+= f;
+		moments[id1]	-= c1x.cross(f);
+		moments[id2]	+= c2x.cross(f);
 	}
 
 	for(unsigned int i=0; i < bodies.size(); i++)
