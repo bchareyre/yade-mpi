@@ -20,7 +20,7 @@ class NodeProperties : public Serializable
 	};
 	REGISTER_CLASS_NAME(NodeProperties);
 };
-REGISTER_SERIALIZABLE(NodeProperties,false);
+REGISTER_SERIALIZABLE(NodeProperties,true);
 
 class MassSpringBody : public ConnexBody
 {

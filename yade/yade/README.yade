@@ -1,3 +1,11 @@
+
+
+attention: THIS README is outdated :( please check instructions on the website. 
+
+http://yade.berlios.de/index.php?m=800
+
+
+
 -------- QUICK:
 
 setenv SVN_SSH "ssh -l loginname"
