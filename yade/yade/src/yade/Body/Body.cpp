@@ -56,9 +56,7 @@ Body::~Body()
 void Body::postProcessAttributes(bool deserializing)
 {
 	if (deserializing)
-	{
-		if (geometricalModel)
-			geometricalModel->cm = interactionGeometry;
+	{ // FIXME !!!!!!!!!!!!!!!!!!!
 		if (interactionGeometry)
 			interactionGeometry->bv = boundingVolume;
 	}
@@ -77,9 +75,6 @@ void Body::registerAttributes()
 	REGISTER_ATTRIBUTE(geometricalModel);
 	REGISTER_ATTRIBUTE(interactionGeometry);
 	REGISTER_ATTRIBUTE(boundingVolume);
-	
-// FIXME ? - must be registered or not? how about saving state during the simulation?
-	//REGISTER_ATTRIBUTE(interactions);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -50,8 +50,7 @@ class GeometricalModel : public Serializable, public Indexable
 	public : bool visible;
 	public : bool wire;
 	public : bool shadowCaster;
-	public : Vector3f diffuseColor; // + autres proprietes
-	public : shared_ptr<CollisionGeometry> cm; // FIXME : ??
+	public : Vector3f diffuseColor;
 
 	public : void registerAttributes();
 	REGISTER_CLASS_NAME(GeometricalModel);
