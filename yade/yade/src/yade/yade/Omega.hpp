@@ -74,17 +74,26 @@ class Omega : public Singleton<Omega>
 	public	: float 	getTimestep();
 
 // FIXME - where to put settings? in another singleton, or in a class owned by Omega ?
-	private	: string 	filename;
-	public	: void 		setFilename(const string);
-	public	: string 	getFilename();
+	private	: string 	fileName;
+	public	: void 		setFileName(const string);
+	public	: string 	getFileName();
+	public	: void		loadTheFile();
 
 	private	: long int 	maxiter;
+	public  : long int	iter;
+	public  : long int&	getIterReference();
+	public  : long int	getIter();
+
 	public	: void 		setMaxiter(const string);
 	public	: long int 	getMaxiter();
 
 	private : bool		automatic;
 	public  : void		setAutomatic(bool);
 	public  : bool		getAutomatic();
+
+	private : bool		progress;
+	public  : void		setProgress(bool);
+	public  : bool		getProgress();
 
 	//public : MultiMethodsManager<CollisionFunctor> narrowCollider;
 	//public : MultiMethodsManager narrowCollider;

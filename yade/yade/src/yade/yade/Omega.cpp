@@ -1,6 +1,9 @@
 #include "Omega.hpp"
 #include "Vector3.hpp"
 
+#include "IOManager.hpp" // is this allowed? perhaps loadTheFile should be in pimpl of Omega ? (pointer to implementation)
+#include "NonConnexBody.hpp"
+
 Omega::Omega ()
 {
 	cerr << "Constructing Omega  (if multiple times - check '-rdynamic' flag!)" << endl;
@@ -26,9 +29,11 @@ void Omega::logMessage(const string& str)
 
 void Omega::init()
 {
-	filename="";
+	fileName="";
 	maxiter = 0; // unlimited
+	iter = 0;
 	automatic=false;
+	progress=false;
 
 	gravity_x = 0.0;
 	gravity_y = -9.81;
@@ -48,6 +53,16 @@ void Omega::init()
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+
+long int& Omega::getIterReference()
+{
+	return iter;
+}
+
+long int Omega::getIter()
+{
+	return iter;
+}
 
 /// FIXME - everything below SHOULD NOT be inside Omega.
 
@@ -75,14 +90,29 @@ float Omega::getTimestep()
 	return dt;
 }
 
-void Omega::setFilename(const string f)
+void Omega::setFileName(const string f)
 {
-	filename = f;
+	fileName = f;
 };
 
-string Omega::getFilename()
+string Omega::getFileName()
 {
-	return filename;
+	return fileName;
+}
+
+void Omega::loadTheFile()
+{
+
+	if( Omega::instance().getFileName().size() != 0)
+	{
+		IOManager::loadFromFile("XMLManager",fileName,"rootBody",Omega::instance().rootBody);
+		Omega::instance().logMessage("Loading file " + fileName);
+	}
+	else
+	{
+		cout << "\nMissing filename, please specify filename with -f, or through your GUI.\n";
+		exit(1);
+	}
 }
 
 void Omega::setMaxiter(const string m)
@@ -103,5 +133,15 @@ void Omega::setAutomatic(bool b)
 bool Omega::getAutomatic()
 {
 	return automatic;
+}
+
+void Omega::setProgress(bool b)
+{
+	progress = b;
+}
+
+bool Omega::getProgress()
+{
+	return progress;
 }
 

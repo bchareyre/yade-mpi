@@ -42,10 +42,13 @@ YadeQtMainWindow::YadeQtMainWindow() : YadeQtGeneratedMainWindow()
 	workspace->setBackgroundMode( PaletteMid );
 	setCentralWidget( vbox );
 
-	if( Omega::instance().getFilename().size() != 0)
-		loadSimulation( Omega::instance().getFilename() );
-	if( Omega::instance().getAutomatic() )
-		glViewer->startAnimation();
+	if( Omega::instance().getFileName().size() != 0)
+	{
+		loadSimulation( Omega::instance().getFileName() );
+
+		if( Omega::instance().getAutomatic() )
+			glViewer->startAnimation();
+	}
 
 /*
 	QtGUIGenerator guiGen;
@@ -106,8 +109,10 @@ void YadeQtMainWindow::loadSimulation(const string fileName)
 // FIXME - and this doesn't work - spheres disappear!
 //	Omega::instance().rootBody = shared_ptr<NonConnexBody>(new NonConnexBody);
 
-	IOManager::loadFromFile("XMLManager",fileName,"rootBody",Omega::instance().rootBody);
-	Omega::instance().logMessage("Loading file " + fileName);
+
+	Omega::instance().setFileName(fileName);
+	Omega::instance().loadTheFile();
+
 	glViewer = shared_ptr<GLViewer>(new GLViewer(workspace));
 	glViewer->show();
 }

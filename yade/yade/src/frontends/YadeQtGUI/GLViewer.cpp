@@ -4,7 +4,7 @@
 #include "GL/glut.h"
 #include "Omega.hpp"
 
-GLViewer::GLViewer(QWidget * parent) : QGLViewer(parent)
+GLViewer::GLViewer(QWidget * parent) : QGLViewer(parent) , frame( Omega::instance().getIterReference() )
 {
 	resize(300,300);
 	setSceneCenter(0,0,0);
@@ -43,12 +43,15 @@ void GLViewer::animate()
 {
 	Omega::instance().rootBody->moveToNextTimeStep();
 
-	static long int max=0;
+	static bool progress = Omega::instance().getProgress();
+	static long int max  = Omega::instance().getMaxiter();
+
 	if( frame % 100 == 0 )					// checks every 100th iteration
 	{
-		//cerr << "iteration: " << frame << endl;
-		if( (max = Omega::instance().getMaxiter()) )	// is maxiter != 0 ? (double brackets to suppress warning)
-			if( frame > max )			// is frame bigger than maxiter ?
+		if(progress)
+			cout << "iteration: " << frame << endl;
+		if( max != 0 )
+			if( frame > max )
 			{
 				cerr << "Calc finished at: " << frame << endl;
 				exit(0);			// terminate.
