@@ -5,8 +5,7 @@
 
 SUBDIRS += ClosestFeatures \
            SDECContactModel \
-           SDECPermanentLink \
-           ErrorTolerantContactModel 
+           SDECPermanentLink 
 MOC_DIR = $(YADECOMPILATIONPATH)
 UI_DIR = $(YADECOMPILATIONPATH)
 OBJECTS_DIR = $(YADECOMPILATIONPATH)

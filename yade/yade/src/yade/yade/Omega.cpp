@@ -31,6 +31,7 @@ void Omega::init()
 
 	gravity_x = 0.0;
 	gravity_y = -9.81;
+	//gravity_y = 0.0;
 	gravity_z = 0.0;
 	//	setGravity = Vector3(0,-9.81,0);
 	//dt = 0.04;

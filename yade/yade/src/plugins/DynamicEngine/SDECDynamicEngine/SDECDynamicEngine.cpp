@@ -35,7 +35,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-	
+
 SDECDynamicEngine::SDECDynamicEngine() : DynamicEngine()
 {
 	first=true;
@@ -99,7 +99,7 @@ void SDECDynamicEngine::filter(Body* body)
 			ii = tmpi;
 		}
 	}
-	
+
 	list<shared_ptr<Interaction> >::const_iterator cti = ncb->interactions.begin();
 	list<shared_ptr<Interaction> >::const_iterator ctiEnd = ncb->interactions.end();
 	for( ; cti!=ctiEnd ; ++cti)
@@ -108,23 +108,23 @@ void SDECDynamicEngine::filter(Body* body)
 
 		int id1 = contact->id1;
 		int id2 = contact->id2;
-		
+
 		if (id1>=id2)
 			swap(id1,id2);
 
 		bool accessed = false;
 		tuple<int,bool,shared_ptr<InteractionGeometry> > t(id2,accessed,(*cti)->interactionGeometry);
-		
+
 		pair<set<tuple<int,bool,shared_ptr<InteractionGeometry> >,lessThanTuple >::iterator,bool> intertionResult;
 
 		intertionResult	= interactionsPerBody[id1].insert(t);
-		
+
 		bool& wasAccessed = const_cast<bool&>(intertionResult.first->get<1>());
 		wasAccessed	= true;
 
 
 		(*cti)->isNew = intertionResult.second;
-		
+
 		shared_ptr<SDECContactModel> scm = dynamic_pointer_cast<SDECContactModel>((*cti)->interactionGeometry);
 
 		// here we want to get new geometrical info about contact but we want to remember physical infos from previous time step about it
@@ -133,7 +133,7 @@ void SDECDynamicEngine::filter(Body* body)
 		float pd = scm->penetrationDepth;
 		float r1 = scm->radius1;
 		float r2 = scm->radius2;
-		
+
 		(*cti)->interactionGeometry  = intertionResult.first->get<2>();
 
 		scm = dynamic_pointer_cast<SDECContactModel>((*cti)->interactionGeometry);
@@ -143,7 +143,7 @@ void SDECDynamicEngine::filter(Body* body)
 		scm->radius1=r1;
 		scm->radius2=r2;
 	}
-		
+
 }
 
 //FIXME : add reset function so it will remove bool first
@@ -153,7 +153,7 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 
 	NonConnexBody * ncb = dynamic_cast<NonConnexBody*>(body);
 	vector<shared_ptr<Body> >& bodies = ncb->bodies;
-	
+
 	Vector3 gravity = Omega::instance().getGravity();
 	float dt = Omega::instance().dt;
 
@@ -167,9 +167,6 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 	fill(forces.begin(),forces.end(),Vector3(0,0,0));
 	fill(moments.begin(),moments.end(),Vector3(0,0,0));
 
-
-
-	
 	std::vector<shared_ptr<Interaction> >::const_iterator pii = ncb->permanentInteractions.begin();
 	std::vector<shared_ptr<Interaction> >::const_iterator piiEnd = ncb->permanentInteractions.end();
 	for( ; pii!=piiEnd ; ++pii)
@@ -194,6 +191,7 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 			tmpId2 = id2;
 		}
 
+
 		tuple<int,bool,shared_ptr<InteractionGeometry> > t(tmpId2,accessed,(*pii)->interactionGeometry);
 		interactionsPerBody[tmpId1].erase(t);
 
@@ -208,31 +206,59 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 				cti=ctiEnd;
 			}
 		}
-		
+
 		///////////////////
-		
-		
-		shared_ptr<SDECDiscreteElement> de1 	= dynamic_pointer_cast<SDECDiscreteElement>(bodies[id1]);
-		shared_ptr<SDECDiscreteElement> de2 	= dynamic_pointer_cast<SDECDiscreteElement>(bodies[id2]);
-		shared_ptr<SDECPermanentLink> currentContact = dynamic_pointer_cast<SDECPermanentLink>(contact->interactionGeometry);
-	
-		// FIXME : put these lines into another dynlib
+
+
+		shared_ptr<SDECDiscreteElement> de1		= dynamic_pointer_cast<SDECDiscreteElement>(bodies[id1]);
+		shared_ptr<SDECDiscreteElement> de2 		= dynamic_pointer_cast<SDECDiscreteElement>(bodies[id2]);
+		shared_ptr<SDECPermanentLink> currentContact	= dynamic_pointer_cast<SDECPermanentLink>(contact->interactionGeometry);
+
+		/// FIXME : put these lines into another dynlib
 		currentContact->kn = currentContact->initialKn;
 		currentContact->ks = currentContact->initialKs;
-		currentContact->equilibriumDistance = currentContact->initialEquilibriumDistance;		
-	
-		float un 			= currentContact->initialEquilibriumDistance-(de1->se3.translation-de1->se3.translation).length();
+		currentContact->equilibriumDistance = currentContact->initialEquilibriumDistance;
 
-		currentContact->contactPoint	= de1->se3.translation+(currentContact->radius1-0.5*-un)*currentContact->normalForce;
-
+		float un 			= currentContact->equilibriumDistance-(de2->se3.translation-de1->se3.translation).length();
+		currentContact->contactPoint	= de1->se3.translation+(currentContact->radius1-0.5*un)*currentContact->normal;
 		currentContact->normalForce	= currentContact->kn*un*currentContact->normal;
 
-		Vector3 nn 			= currentContact->prevNormal.cross(currentContact->normal);		
-		currentContact->shearForce     -= currentContact->shearForce.cross(nn);
-		float a 			= dt*0.5*currentContact->normal.dot(de1->angularVelocity+de2->angularVelocity);
-		Vector3 axis 			= a*currentContact->normal;
+
+		Vector3 axis;
+		float angle;
+
+////////////////////////////////////////////////////////////
+/// Here is the code with approximated rotations 	 ///
+////////////////////////////////////////////////////////////
+
+		axis = currentContact->prevNormal.cross(currentContact->normal);
 		currentContact->shearForce     -= currentContact->shearForce.cross(axis);
-		
+		angle	 			= dt*0.5*currentContact->normal.dot(de1->angularVelocity+de2->angularVelocity);
+		axis 				= angle*currentContact->normal;
+		currentContact->shearForce     -= currentContact->shearForce.cross(axis);
+
+
+////////////////////////////////////////////////////////////
+/// Here is the code without approximated rotations 	 ///
+////////////////////////////////////////////////////////////
+
+// 		Quaternion q;
+//
+// 		axis				= currentContact->prevNormal.cross(currentContact->normal);
+// 		angle				= acos(currentContact->normal.dot(currentContact->prevNormal));
+// 		q.fromAngleAxis(angle,axis);
+//
+// 		currentContact->shearForce	= q*currentContact->shearForce;
+//
+// 		angle				= dt*0.5*currentContact->normal.dot(de1->angularVelocity+de2->angularVelocity);
+// 		axis				= currentContact->normal;
+// 		q.fromAngleAxis(angle,axis);
+// 		currentContact->shearForce	= q*currentContact->shearForce;
+
+////////////////////////////////////////////////////////////
+/// 							 ///
+////////////////////////////////////////////////////////////
+
 		Vector3 x	= currentContact->contactPoint; // FIXME : it's now a penetration depth, but with initialized conditions it won't be
 		Vector3 c1x	= (x - de1->se3.translation);
 		Vector3 c2x	= (x - de2->se3.translation);
@@ -241,9 +267,9 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 		Vector3 shearVelocity		= relativeVelocity-currentContact->normal.dot(relativeVelocity)*currentContact->normal;
 		Vector3 shearDisplacement	= shearVelocity*dt;
 		currentContact->shearForce      -=  currentContact->ks*shearDisplacement;
-		
+
 		Vector3 f = currentContact->normalForce + currentContact->shearForce;
-		
+
 		forces[id1]	-= f;
 		forces[id2]	+= f;
 		moments[id1]	-= c1x.cross(f);
@@ -258,10 +284,10 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 
 
 
-	
 
 
-	
+
+
 	std::list<shared_ptr<Interaction> >::const_iterator cti = ncb->interactions.begin();
 	std::list<shared_ptr<Interaction> >::const_iterator ctiEnd = ncb->interactions.end();
 	for( ; cti!=ctiEnd ; ++cti)
@@ -275,7 +301,7 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 		shared_ptr<SDECDiscreteElement> de1 	= dynamic_pointer_cast<SDECDiscreteElement>(bodies[id1]);
 		shared_ptr<SDECDiscreteElement> de2 	= dynamic_pointer_cast<SDECDiscreteElement>(bodies[id2]);
 		shared_ptr<SDECContactModel> currentContact = dynamic_pointer_cast<SDECContactModel>(contact->interactionGeometry);
-		
+
 		if ((*cti)->isNew)
 		{
 			// FIXME : put these lines into a dynlib - PhysicalCollider
@@ -285,49 +311,78 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 			currentContact->shearForce			= Vector3(0,0,0);
 			currentContact->initialEquilibriumDistance	= currentContact->radius1+currentContact->radius2;
 		}
-	
+
 		// FIXME : put these lines into another dynlib
 		currentContact->kn = currentContact->initialKn;
 		currentContact->ks = currentContact->initialKs;
-		currentContact->equilibriumDistance = currentContact->initialEquilibriumDistance;		
+		currentContact->equilibriumDistance = currentContact->initialEquilibriumDistance;
 
-		//float un = currentContact->initialEquilibriumDistance-(de1->se3.translation-de1->se3.translation).length();
-		float un 			= currentContact->penetrationDepth; // FIXME : it's now a penetration depth, but with initialized conditions it won't be
+		float un 			= currentContact->penetrationDepth;
 		currentContact->normalForce	= currentContact->kn*un*currentContact->normal;
 
-		Vector3 nn 			= currentContact->prevNormal.cross(currentContact->normal);		
-		currentContact->shearForce     -= currentContact->shearForce.cross(nn);
-		float a 			= dt*0.5*currentContact->normal.dot(de1->angularVelocity+de2->angularVelocity);
-		Vector3 axis 			= a*currentContact->normal;
-		currentContact->shearForce     -= currentContact->shearForce.cross(axis);
-		
-		Vector3 x	= currentContact->contactPoint; // FIXME : it's now a penetration depth, but with initialized conditions it won't be
-		Vector3 c1x	= (x - de1->se3.translation);
-		Vector3 c2x	= (x - de2->se3.translation);
+		Vector3 axis;
+		float angle;
 
+////////////////////////////////////////////////////////////
+/// Here is the code with approximated rotations 	 ///
+////////////////////////////////////////////////////////////
+
+		axis	 			= currentContact->prevNormal.cross(currentContact->normal);
+		currentContact->shearForce     -= currentContact->shearForce.cross(axis);
+		angle 				= dt*0.5*currentContact->normal.dot(de1->angularVelocity+de2->angularVelocity);
+		axis 				= angle*currentContact->normal;
+		currentContact->shearForce     -= currentContact->shearForce.cross(axis);
+
+
+////////////////////////////////////////////////////////////
+/// Here is the code without approximated rotations 	 ///
+////////////////////////////////////////////////////////////
+
+// 		Quaternion q;
+//
+// 		axis				= currentContact->prevNormal.cross(currentContact->normal);
+// 		angle				= acos(currentContact->normal.dot(currentContact->prevNormal));
+// 		q.fromAngleAxis(angle,axis);
+//
+// 		currentContact->shearForce	= currentContact->q*shearForce;
+//
+// 		angle				= dt*0.5*currentContact->normal.dot(de1->angularVelocity+de2->angularVelocity);
+// 		axis				= currentContact->normal;
+// 		q.fromAngleAxis(angle,axis);
+// 		currentContact->shearForce	= q*currentContact->shearForce;
+
+////////////////////////////////////////////////////////////
+/// 							 ///
+////////////////////////////////////////////////////////////
+
+		Vector3 x			= currentContact->contactPoint;
+		Vector3 c1x			= (x - de1->se3.translation);
+		Vector3 c2x			= (x - de2->se3.translation);
 		Vector3 relativeVelocity 	= (de2->velocity+de2->angularVelocity.cross(c2x)) - (de1->velocity+de1->angularVelocity.cross(c1x));
 		Vector3 shearVelocity		= relativeVelocity-currentContact->normal.dot(relativeVelocity)*currentContact->normal;
 		Vector3 shearDisplacement	= shearVelocity*dt;
-		currentContact->shearForce      -=  currentContact->ks*shearDisplacement;
-		
+		currentContact->shearForce     -=  currentContact->ks*shearDisplacement;
+
 		Vector3 f = currentContact->normalForce + currentContact->shearForce;
-		
+
 		forces[id1]	-= f;
 		forces[id2]	+= f;
 		moments[id1]	-= c1x.cross(f);
 		moments[id2]	+= c2x.cross(f);
 
 		currentContact->prevNormal = currentContact->normal;
-
 	}
 
-	
+
+////////////////////////////////////////////////////////////
+/// Damping 	 					 ///
+////////////////////////////////////////////////////////////
+
 	for(unsigned int i=0; i < bodies.size(); i++)
         {
 		shared_ptr<SDECDiscreteElement> de = dynamic_pointer_cast<SDECDiscreteElement>(bodies[i]);
 		if (de)
 		{
-
 			forces[i] += gravity*de->mass;
 			int sign;
 			float f = forces[i].length();
@@ -340,9 +395,8 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 					sign=1;
 				else
 					sign=-1;
-				forces[i][j] -= 0.1*f*sign;
+				forces[i][j] -= 0.0*f*sign;
 			}
-
 
 			float m = moments[i].length();
 
@@ -354,7 +408,7 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 					sign=1;
 				else
 					sign=-1;
-				moments[i][j] -= 0.1*m*sign;
+				moments[i][j] -= 0.0*m*sign;
 			}
 
 			de->acceleration += forces[i]*de->invMass;
