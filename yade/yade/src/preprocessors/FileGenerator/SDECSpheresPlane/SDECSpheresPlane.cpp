@@ -12,7 +12,7 @@
 #include "IOManager.hpp"
 #include "SDECDynamicEngine.hpp"
 #include "SDECParameters.hpp"
-#include "SDECPermanentLink.hpp"
+#include "SDECLinkGeometry.hpp"
 #include "Interaction.hpp"
 #include "BoundingVolumeDispatcher.hpp"
 #include "InteractionDescriptionSet2AABBFunctor.hpp"
@@ -121,7 +121,7 @@ string SDECSpheresPlane::generate()
 		
 	rootBody->permanentInteractions->clear();
 //	rootBody->permanentInteractions[0] = shared_ptr<Interaction>(new Interaction);
-//	rootBody->permanentInteractions[0]->interactionGeometry = shared_ptr<SDECPermanentLink>(new SDECPermanentLink);
+//	rootBody->permanentInteractions[0]->interactionGeometry = shared_ptr<SDECLinkGeometry>(new SDECLinkGeometry);
 
 	rootBody->isDynamic		= false;
 	//rootBody->velocity		= Vector3r(0,0,0);

@@ -14,4 +14,4 @@ CONFIG += debug \
 TEMPLATE = subdirs 
 SUBDIRS += SpringPhysics \
            SDECContactPhysics \
-           SDECPermanentLinkPhysics
+           SDECLinkPhysics

@@ -6,8 +6,8 @@
 LIBS += -lSDECContactPhysics \
         -lSDECContactGeometry \
         -lSDECParameters \
-        -lSDECPermanentLinkPhysics \
-        -lSDECPermanentLink \
+        -lSDECLinkPhysics \
+        -lSDECLinkGeometry \
         -rdynamic 
 INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 

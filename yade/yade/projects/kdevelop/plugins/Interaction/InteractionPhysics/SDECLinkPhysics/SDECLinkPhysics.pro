@@ -18,5 +18,5 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
-HEADERS += SDECPermanentLinkPhysics.hpp 
-SOURCES += SDECPermanentLinkPhysics.cpp 
+HEADERS += SDECLinkPhysics.hpp 
+SOURCES += SDECLinkPhysics.cpp 

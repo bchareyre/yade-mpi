@@ -16,8 +16,8 @@
 #include "SDECDynamicEngine.hpp"
 #include "SDECLinearContactModel.hpp"
 #include "SDECParameters.hpp"
-#include "SDECPermanentLink.hpp"
-#include "SDECPermanentLinkPhysics.hpp"
+#include "SDECLinkGeometry.hpp"
+#include "SDECLinkPhysics.hpp"
 
 #include "ActionApplyDispatcher.hpp"
 #include "ActionDampingDispatcher.hpp"
@@ -205,8 +205,8 @@ string SDECLinkedSpheres::generate()
 			if ((a->se3.translation - b->se3.translation).length() < (as->radius + bs->radius))  
 			{
 				shared_ptr<Interaction> 		link(new Interaction( bodyA->getId() , bodyB->getId() ));
-				shared_ptr<SDECPermanentLink>		geometry(new SDECPermanentLink);
-				shared_ptr<SDECPermanentLinkPhysics>	physics(new SDECPermanentLinkPhysics);
+				shared_ptr<SDECLinkGeometry>		geometry(new SDECLinkGeometry);
+				shared_ptr<SDECLinkPhysics>	physics(new SDECLinkPhysics);
 				
 				geometry->radius1			= as->radius - fabs(as->radius - bs->radius)*0.5;
 				geometry->radius2			= bs->radius - fabs(as->radius - bs->radius)*0.5;

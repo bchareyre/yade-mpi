@@ -13,7 +13,6 @@ LIBS += -lSDECDynamicEngine \
         -lBody \
         -lEngine \
         -lMultiMethods \
-        -lSDECPermanentLink \
         -lInteraction \
         -lPersistentSAPCollider \
         -lSDECLinearContactModel \
@@ -25,6 +24,7 @@ LIBS += -lSDECDynamicEngine \
         -lActionMomentumDamping \
         -lActionForceDamping \
         -lActionReset \
+        -lSDECLinkGeometry \
         -rdynamic 
 INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
@@ -40,7 +40,6 @@ QMAKE_LIBDIR = ../../../plugins/Engine/DynamicEngine/SDECDynamicEngine/$(YADEDYN
                ../../../yade/Body/Body/$(YADEDYNLIBPATH) \
                ../../../yade/Engine/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/MultiMethods/$(YADEDYNLIBPATH) \
-               ../../../plugins/Interaction/InteractionGeometry/SDECPermanentLink/$(YADEDYNLIBPATH) \
                ../../../yade/Interaction/Interaction/$(YADEDYNLIBPATH) \
                ../../../plugins/Interaction/BroadInteractor/PersistentSAPCollider/$(YADEDYNLIBPATH) \
                ../../../plugins/Interaction/InteractionPhysicsFunctor/SDECContactPhysics/SDECLinearContactModel/$(YADEDYNLIBPATH) \
@@ -51,6 +50,8 @@ QMAKE_LIBDIR = ../../../plugins/Engine/DynamicEngine/SDECDynamicEngine/$(YADEDYN
                ../../../plugins/Body/BodyPhysicalParameters/ParticleParameters/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/ActionDampingFunctor/ActionMomentumDamping/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/ActionDampingFunctor/ActionForceDamping/$(YADEDYNLIBPATH) \
+               ../../../plugins/Engine/Action/ActionReset/$(YADEDYNLIBPATH) \
+               ../../../plugins/Interaction/InteractionGeometry/SDECPermanentLink/$(YADEDYNLIBPATH) \
                ../../../plugins/Geometry/GeometricalModel/Box/$(YADEDYNLIBPATH) \
                ../../../plugins/Geometry/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
                ../../../plugins/Geometry/BoundingVolume/AABB/$(YADEDYNLIBPATH) \

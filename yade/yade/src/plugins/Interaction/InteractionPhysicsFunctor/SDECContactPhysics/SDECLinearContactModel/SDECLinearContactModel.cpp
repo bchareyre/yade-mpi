@@ -25,8 +25,8 @@
 #include "SDECContactGeometry.hpp"
 #include "SDECContactPhysics.hpp"
 
-#include "SDECPermanentLink.hpp" // FIXME - I can't dispatch by SDECPermanentLink <-> SDECContactGeometry !!?
-#include "SDECPermanentLinkPhysics.hpp" // FIXME
+#include "SDECLinkGeometry.hpp" // FIXME - I can't dispatch by SDECLinkGeometry <-> SDECContactGeometry !!?
+#include "SDECLinkPhysics.hpp" // FIXME
 
 #include "Omega.hpp"
 #include "ComplexBody.hpp"
@@ -35,34 +35,49 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void SDECLinearContactModel::go(	  const shared_ptr<BodyPhysicalParameters>& b1
-					, const shared_ptr<BodyPhysicalParameters>& b2
+void SDECLinearContactModel::go(	  const shared_ptr<BodyPhysicalParameters>& b1 // SDECParameters
+					, const shared_ptr<BodyPhysicalParameters>& b2 // SDECParameters
 					, const shared_ptr<Interaction>& interaction)
 {
 	SDECParameters* de1 = static_cast<SDECParameters*>(b1.get());
 	SDECParameters* de2 = static_cast<SDECParameters*>(b2.get());
 	SDECContactGeometry* interactionGeometry = dynamic_cast<SDECContactGeometry*>(interaction->interactionGeometry.get());
 	
-	if(! interactionGeometry) 	// FIXME - this computation is done inside SDECDynamicEngine!! this is bad !!!
-					// dynamic_cast failed, because we have here SDECPermanentLinkPhysics !!
-		return;			// maybe we should dispatch on type of interactionGeometry ?!?!
-	
-	shared_ptr<SDECContactPhysics> contactPhysics;
-	
-	if ( interaction->isNew)
+	if(interactionGeometry) // so it is SDECContactGeometry  - NON PERMANENT LINK
 	{
-		interaction->interactionPhysics = shared_ptr<SDECContactPhysics>(new SDECContactPhysics());
-		contactPhysics = dynamic_pointer_cast<SDECContactPhysics>(interaction->interactionPhysics);
+		shared_ptr<SDECContactPhysics> contactPhysics;
 		
-		contactPhysics->initialKn			= 2*(de1->kn*de2->kn)/(de1->kn+de2->kn);
-		contactPhysics->initialKs			= 2*(de1->ks*de2->ks)/(de1->ks+de2->ks);
-		contactPhysics->prevNormal 			= interactionGeometry->normal;
-		contactPhysics->initialEquilibriumDistance	= interactionGeometry->radius1+interactionGeometry->radius2;
+		if ( interaction->isNew)
+		{
+			interaction->interactionPhysics = shared_ptr<SDECContactPhysics>(new SDECContactPhysics());
+			contactPhysics = dynamic_pointer_cast<SDECContactPhysics>(interaction->interactionPhysics);
+			
+			contactPhysics->initialKn			= 2*(de1->kn*de2->kn)/(de1->kn+de2->kn);
+			contactPhysics->initialKs			= 2*(de1->ks*de2->ks)/(de1->ks+de2->ks);
+			contactPhysics->prevNormal 			= interactionGeometry->normal;
+			contactPhysics->initialEquilibriumDistance	= interactionGeometry->radius1+interactionGeometry->radius2;
+		}
+		else
+			contactPhysics = dynamic_pointer_cast<SDECContactPhysics>(interaction->interactionPhysics);
+		
+		contactPhysics->kn = contactPhysics->initialKn;
+		contactPhysics->ks = contactPhysics->initialKs;
+		contactPhysics->equilibriumDistance = contactPhysics->initialEquilibriumDistance;
+		
+		
 	}
-	else
-		contactPhysics = dynamic_pointer_cast<SDECContactPhysics>(interaction->interactionPhysics);
+	else   // this is PERMANENT LINK, instead of doing dynamic_cast here, dispatcher should work here.
 	
-	contactPhysics->kn = contactPhysics->initialKn;
-	contactPhysics->ks = contactPhysics->initialKs;
-	contactPhysics->equilibriumDistance = contactPhysics->initialEquilibriumDistance;
+	{	// dynamic_cast failed, because we have here SDECLinkGeometry !!
+		// maybe we should dispatch on type of interactionGeometry ?!?!
+		SDECLinkGeometry* sdecPermanentLink =  dynamic_cast<SDECLinkGeometry*>(interaction->interactionGeometry.get());
+		if( ! sdecPermanentLink )
+		{
+			cerr << "SDECLinearContactModel: what geometry?\n";
+			return;
+		}
+		
+			
+		
+	}
 };

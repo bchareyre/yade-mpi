@@ -24,9 +24,9 @@
 #include "SDECDynamicEngine.hpp"
 #include "SDECParameters.hpp"
 #include "SDECContactGeometry.hpp"
-#include "SDECPermanentLink.hpp"
+#include "SDECLinkGeometry.hpp"
 #include "SDECContactPhysics.hpp"
-#include "SDECPermanentLinkPhysics.hpp"
+#include "SDECLinkPhysics.hpp"
 #include "Omega.hpp"
 #include "ComplexBody.hpp"
 #include "ActionForce.hpp"
@@ -63,9 +63,6 @@ void SDECDynamicEngine::respondToInteractions(Body* body)
 	Vector3r gravity = Omega::instance().getGravity();
 	Real dt = Omega::instance().getTimeStep();
 
-	
-	// FIXME - that should be in another dynlib, I CHANGED CONTAINER so IT IS FASTER
-	// speed improvement is: 156 -> 142 = 14 sec 9% (rev.339 -> rev.340)
 	if(first) // FIXME - this should be done somewhere else
 	{
 		vector<shared_ptr<Action> > vvv; 
@@ -91,8 +88,8 @@ void SDECDynamicEngine::respondToInteractions(Body* body)
 
 		shared_ptr<SDECParameters> de1					= dynamic_pointer_cast<SDECParameters>((*bodies)[id1]->physicalParameters);
 		shared_ptr<SDECParameters> de2 					= dynamic_pointer_cast<SDECParameters>((*bodies)[id2]->physicalParameters);
-		shared_ptr<SDECPermanentLinkPhysics> currentContactPhysics	= dynamic_pointer_cast<SDECPermanentLinkPhysics>(contact2->interactionPhysics);
-		shared_ptr<SDECPermanentLink> currentContactGeometry		= dynamic_pointer_cast<SDECPermanentLink>(contact2->interactionGeometry);
+		shared_ptr<SDECLinkPhysics> currentContactPhysics	= dynamic_pointer_cast<SDECLinkPhysics>(contact2->interactionPhysics);
+		shared_ptr<SDECLinkGeometry> currentContactGeometry		= dynamic_pointer_cast<SDECLinkGeometry>(contact2->interactionGeometry);
 
 		/// FIXME : put these lines into another dynlib
 		currentContactPhysics->kn 			= currentContactPhysics->initialKn;
@@ -119,7 +116,6 @@ void SDECDynamicEngine::respondToInteractions(Body* body)
 		angle	 					= dt*0.5*currentContactGeometry->normal.dot(de1->angularVelocity+de2->angularVelocity);
 		axis 						= angle*currentContactGeometry->normal;
 		currentContactPhysics->shearForce     	       -= currentContactPhysics->shearForce.cross(axis);
-
 
 ////////////////////////////////////////////////////////////
 /// Here is the code without approximated rotations 	 ///
@@ -288,18 +284,12 @@ void SDECDynamicEngine::respondToInteractions(Body* body)
 /// Ending of use of Quaternionr			 	 ///
 ////////////////////////////////////////////////////////////
 
-
 		Vector3r dThetar = dUr/currentContactPhysics->averageRadius;
-
 		currentContactPhysics->thetar += dThetar;
 
-
 		Real fNormal = currentContactPhysics->normalForce.length();
-
 		Real normMPlastic = currentContactPhysics->heta*fNormal;
-
 		Vector3r thetarn = q_i_n*currentContactPhysics->thetar; // rolling angle
-
 		Vector3r mElastic = currentContactPhysics->kr * thetarn;
 
 		//mElastic[0] = 0;  // No moment around normal direction
@@ -343,7 +333,6 @@ void SDECDynamicEngine::respondToInteractions(Body* body)
 /// Non Permanents Links												///
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//	for( ; cti!=ctiEnd ; ++cti)
 	for( ncb->interactions->gotoFirst() ; ncb->interactions->notAtEnd() ; ncb->interactions->gotoNext() )
 	{
 		const shared_ptr<Interaction>& contact = ncb->interactions->getCurrent();
@@ -383,14 +372,14 @@ void SDECDynamicEngine::respondToInteractions(Body* body)
 
 // 		Quaternionr q;
 //
-// 		axis				= currentContactPhysics->prevNormal.cross(currentContactGeometry->normal);
-// 		angle				= acos(currentContactGeometry->normal.dot(currentContactPhysics->prevNormal));
+// 		axis					= currentContactPhysics->prevNormal.cross(currentContactGeometry->normal);
+// 		angle					= acos(currentContactGeometry->normal.dot(currentContactPhysics->prevNormal));
 // 		q.fromAngleAxis(angle,axis);
 //
 // 		currentContactPhysics->shearForce	= currentContactPhysics->shearForce*q;
 //
-// 		angle				= dt*0.5*currentContactGeometry->normal.dot(de1->angularVelocity+de2->angularVelocity);
-// 		axis				= currentContactGeometry->normal;
+// 		angle					= dt*0.5*currentContactGeometry->normal.dot(de1->angularVelocity+de2->angularVelocity);
+// 		axis					= currentContactGeometry->normal;
 // 		q.fromAngleAxis(angle,axis);
 // 		currentContactPhysics->shearForce	= q*currentContactPhysics->shearForce;
 
@@ -419,7 +408,6 @@ void SDECDynamicEngine::respondToInteractions(Body* body)
 	}
 
 
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// Gravity														///
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -427,9 +415,11 @@ void SDECDynamicEngine::respondToInteractions(Body* body)
 	for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext() )
 	{
 		shared_ptr<Body>& b = bodies->getCurrent();
-		RigidBodyParameters * de = static_cast<SDECParameters*>(b->physicalParameters.get());
-		
-		static_cast<ActionForce*>( ncb->actions->find( b->getId() , actionForce->getClassIndex() ).get() )->force += gravity*de->mass;
+		if(b->getGroup() == sdecGroup)
+		{
+			RigidBodyParameters * de = static_cast<SDECParameters*>(b->physicalParameters.get());
+			static_cast<ActionForce*>( ncb->actions->find( b->getId() , actionForce->getClassIndex() ).get() )->force += gravity*de->mass;
+		}
         }
 
 }

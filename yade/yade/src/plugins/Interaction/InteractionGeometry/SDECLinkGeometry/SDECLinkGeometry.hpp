@@ -7,9 +7,9 @@
 #include "Vector3.hpp"
 #include "Quaternion.hpp"
 
-class SDECPermanentLink : public InteractionGeometry
+class SDECLinkGeometry : public InteractionGeometry
 {
-	public : virtual ~SDECPermanentLink();
+	public : virtual ~SDECLinkGeometry();
 
 	public : Real radius1;
 	public : Real radius2;
@@ -50,9 +50,9 @@ class SDECPermanentLink : public InteractionGeometry
 	protected : virtual void postProcessAttributes(bool deserializing);
 	public : void registerAttributes();
 
-	REGISTER_CLASS_NAME(SDECPermanentLink);
+	REGISTER_CLASS_NAME(SDECLinkGeometry);
 };
 
-REGISTER_SERIALIZABLE(SDECPermanentLink,false);
+REGISTER_SERIALIZABLE(SDECLinkGeometry,false);
 
 #endif // __SDECCPERMANENTLINK_H__

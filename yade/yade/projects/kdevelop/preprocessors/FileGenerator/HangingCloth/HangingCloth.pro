@@ -30,10 +30,10 @@ LIBS += -lMesh2D \
         -lActionReset \
         -lSDECLinearContactModel \
         -lSDECParameters \
-        -lSDECPermanentLink \
-        -lSDECPermanentLinkPhysics \
         -lBox \
         -lInteractionBox \
+        -lSDECLinkGeometry \
+        -lSDECLinkPhysics \
         -rdynamic 
 INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
@@ -66,10 +66,10 @@ QMAKE_LIBDIR = ../../../plugins/Body/GeometricalModel/Mesh2D/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/Action/ActionReset/$(YADEDYNLIBPATH) \
                ../../../plugins/Interaction/InteractionPhysicsFunctor/SDECContactPhysics/SDECLinearContactModel/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/BodyPhysicalParameters/SDECParameters/$(YADEDYNLIBPATH) \
-               ../../../plugins/Interaction/InteractionGeometry/SDECPermanentLink/$(YADEDYNLIBPATH) \
-               ../../../plugins/Interaction/InteractionPhysics/SDECPermanentLinkPhysics/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/GeometricalModel/Box/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/InteractionDescription/InteractionBox/$(YADEDYNLIBPATH) \
+               ../../../plugins/Interaction/InteractionGeometry/SDECPermanentLink/$(YADEDYNLIBPATH) \
+               ../../../plugins/Interaction/InteractionPhysics/SDECPermanentLinkPhysics/$(YADEDYNLIBPATH) \
                ../../../plugins/Geometry/GeometricalModel/Mesh2D/$(YADEDYNLIBPATH) \
                ../../../plugins/Geometry/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
                ../../../plugins/Geometry/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \

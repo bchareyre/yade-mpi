@@ -38,8 +38,8 @@
 #include "SDECDynamicEngine.hpp"
 #include "SDECLinearContactModel.hpp"
 #include "SDECParameters.hpp"
-#include "SDECPermanentLink.hpp"
-#include "SDECPermanentLinkPhysics.hpp"
+#include "SDECLinkGeometry.hpp"
+#include "SDECLinkPhysics.hpp"
 #include "MassSpringBody2RigidBodyDynamicEngine.hpp"
 
 #include "ActionReset.hpp"
@@ -49,7 +49,7 @@ HangingCloth::HangingCloth () : FileGenerator()
 	width = 20;
 	height = 20;
 	springStiffness = 500;
-	springDamping   = 0.9;
+	springDamping   = 1.0;
 	particleDamping = 0.997;
 	clothMass = 10;
 	cellSize = 20;
@@ -84,10 +84,10 @@ void HangingCloth::registerAttributes()
 {
 	REGISTER_ATTRIBUTE(width);
 	REGISTER_ATTRIBUTE(height);
-	REGISTER_ATTRIBUTE(springStiffness);
-	REGISTER_ATTRIBUTE(springDamping);
-	//REGISTER_ATTRIBUTE(particleDamping); // FIXME - ignored - delete it, or start using it
-	REGISTER_ATTRIBUTE(clothMass);
+//	REGISTER_ATTRIBUTE(springStiffness);	// I commented that, because there are too many parameters, and window is too big
+//	REGISTER_ATTRIBUTE(springDamping); 	// I commented that, because there are too many parameters, and window is too big
+	//REGISTER_ATTRIBUTE(particleDamping); 	// FIXME - ignored - delete it, or start using it
+//	REGISTER_ATTRIBUTE(clothMass); 		// I commented that, because there are too many parameters, and window is too big
 	REGISTER_ATTRIBUTE(cellSize);
 	REGISTER_ATTRIBUTE(fixPoint1);
 	REGISTER_ATTRIBUTE(fixPoint2);
@@ -99,9 +99,9 @@ void HangingCloth::registerAttributes()
 	REGISTER_ATTRIBUTE(nbSpheres);
 	REGISTER_ATTRIBUTE(minRadius);
 	REGISTER_ATTRIBUTE(maxRadius);
-	REGISTER_ATTRIBUTE(density);
+//	REGISTER_ATTRIBUTE(density); 		// I commented that, because there are too many parameters, and window is too big
 	REGISTER_ATTRIBUTE(disorder);
-	REGISTER_ATTRIBUTE(spacing);
+//	REGISTER_ATTRIBUTE(spacing);		// I commented that, because there are too many parameters, and window is too big
 	
 	REGISTER_ATTRIBUTE(dampingForce);
 	REGISTER_ATTRIBUTE(dampingMomentum);
@@ -162,7 +162,7 @@ string HangingCloth::generate()
 	rootBody->actors.push_back(interactionPhysicsDispatcher);
 	rootBody->actors.push_back(explicitMassSpringDynamicEngine);
 	rootBody->actors.push_back(sdecDynamicEngine);
-	rootBody->actors.push_back(massSpringBody2RigidBodyDynamicEngine);
+//	rootBody->actors.push_back(massSpringBody2RigidBodyDynamicEngine); // FIXME - is not working...
 	rootBody->actors.push_back(actionDampingDispatcher);
 	rootBody->actors.push_back(applyActionDispatcher);
 	rootBody->actors.push_back(timeIntegratorDispatcher);
@@ -206,18 +206,31 @@ string HangingCloth::generate()
 			shared_ptr<Body> node(new SimpleBody(0,1));
 
 			node->isDynamic		= true;
+			
+			shared_ptr<InteractionSphere> iSphere(new InteractionSphere);
+			iSphere->diffuseColor	= Vector3f(0,0,1);
+			iSphere->radius		= cellSize/1.5;// /2.0;
 
+// BEGIN ORIGINAL							
 			shared_ptr<ParticleParameters> particle(new ParticleParameters);
 			particle->velocity		= Vector3r(0,0,0);
 			particle->mass			= clothMass/(Real)(width*height);
 			particle->se3			= Se3r(Vector3r(i*cellSize-(cellSize*(width-1))*0.5,0,j*cellSize-(cellSize*(height-1))*0.5),q);
+// END									
+
+// BEGIN HACK - to have collision between SDEC spheres and cloth	
+// 			shared_ptr<SDECParameters> particle(new SDECParameters);
+// 			particle->angularVelocity	= Vector3r(0,0,0);
+// 			particle->velocity		= Vector3r(0,0,0);
+// 			particle->mass			= clothMass/(Real)(width*height);
+// 			particle->inertia		= Vector3r(2.0/5.0*particle->mass*iSphere->radius*iSphere->radius,2.0/5.0*particle->mass*iSphere->radius*iSphere->radius,2.0/5.0*particle->mass*iSphere->radius*iSphere->radius);
+// 			particle->se3			= Se3r(Vector3r(i*cellSize-(cellSize*(width-1))*0.5,0,j*cellSize-(cellSize*(height-1))*0.5),q);
+// 			particle->kn			= 1000000;
+// 			particle->ks			= 100000;
+// END HACK								
 
 			shared_ptr<AABB> aabb(new AABB);
 			aabb->diffuseColor	= Vector3r(0,1,0);
-
-			shared_ptr<InteractionSphere> iSphere(new InteractionSphere);
-			iSphere->diffuseColor	= Vector3f(0,0,1);
-			iSphere->radius		= cellSize/1.5;// /2.0;
 
 			node->boundingVolume		= aabb;
 			//node->geometricalModel		= ??;
@@ -355,8 +368,8 @@ string HangingCloth::generate()
 				if ( a && b && as && bs && (a->se3.translation - b->se3.translation).length() < (as->radius + bs->radius))  
 				{
 					shared_ptr<Interaction> 		link(new Interaction( bodyA->getId() , bodyB->getId() ));
-					shared_ptr<SDECPermanentLink>		geometry(new SDECPermanentLink);
-					shared_ptr<SDECPermanentLinkPhysics>	physics(new SDECPermanentLinkPhysics);
+					shared_ptr<SDECLinkGeometry>		geometry(new SDECLinkGeometry);
+					shared_ptr<SDECLinkPhysics>	physics(new SDECLinkPhysics);
 					
 					geometry->radius1			= as->radius - fabs(as->radius - bs->radius)*0.5;
 					geometry->radius2			= bs->radius - fabs(as->radius - bs->radius)*0.5;

@@ -48,7 +48,7 @@ bool Sphere2Sphere4SDECContactModel::go(	const shared_ptr<InteractionDescription
 		{
 			scm = dynamic_pointer_cast<SDECContactGeometry>(c->interactionGeometry);
 			
-			// FIXME !!!!!!!! this is a SDECPermanentLink, and this line is in SDECDynamicEngine:
+			// FIXME !!!!!!!! this is a SDECLinkGeometry, and this line is in SDECDynamicEngine:
 			// FIXME - currentContactGeometry->normal 			= (de2->se3.translation-de1->se3.translation);
 			// that line should be here, or in some other dynlib !!!!!!!!!
 			

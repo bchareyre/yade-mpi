@@ -50,10 +50,10 @@ class Interaction : public Serializable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Attributes											///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-	// FIXME : better to test if InteractionPhysics==0 and remove this flag
-	public	: bool isNew;	
-	public  : bool isReal;
-	public  : bool isNonPermanent;
+	
+	public	: bool isNew;		// FIXME : better to test if InteractionPhysics==0 and remove this flag
+	public  : bool isReal;		// maybe we can remove this, and check if InteractionDescription, and InteractionPhysics are empty?
+	public  : bool isNonPermanent;	// FIXME - how to solve problem of permanet interactions and broad collider ???
 	private	: unsigned int id1,id2;
 
 

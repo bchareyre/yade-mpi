@@ -13,12 +13,12 @@ LIBS += -lSDECDynamicEngine \
         -lBody \
         -lEngine \
         -lMultiMethods \
-        -lSDECPermanentLink \
         -lInteraction \
         -lForceRecorder \
         -lAveragePositionRecorder \
         -lInteractionDescriptionSet \
         -lInteractionDescriptionSet2AABBFunctor \
+        -lSDECLinkGeometry \
         -rdynamic 
 INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
@@ -26,18 +26,23 @@ UI_DIR = $(YADECOMPILATIONPATH)
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 QMAKE_LIBDIR = ../../../plugins/Engine/DynamicEngine/SDECDynamicEngine/$(YADEDYNLIBPATH) \
                ../../../plugins/Interaction/BroadInteractor/SAPCollider/$(YADEDYNLIBPATH) \
-               ../../../plugins/Geometry/GeometricalModel/Box/$(YADEDYNLIBPATH) \
-               ../../../plugins/Geometry/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
-               ../../../plugins/Geometry/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
+               ../../../plugins/Body/GeometricalModel/Box/$(YADEDYNLIBPATH) \
+               ../../../plugins/Body/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
+               ../../../plugins/Body/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
                ../../../yade/Body/Body/$(YADEDYNLIBPATH) \
                ../../../yade/Engine/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/MultiMethods/$(YADEDYNLIBPATH) \
-               ../../../plugins/Interaction/InteractionGeometry/SDECPermanentLink/$(YADEDYNLIBPATH) \
                ../../../yade/Interaction/Interaction/$(YADEDYNLIBPATH) \
                ../../../plugins/DataRecorder/ForceRecorder/$(YADEDYNLIBPATH) \
                ../../../plugins/DataRecorder/AveragePositionRecorder/$(YADEDYNLIBPATH) \
+               ../../../plugins/Body/InteractionDescription/InteractionDescriptionSet/$(YADEDYNLIBPATH) \
+               ../../../plugins/Body/BoundingVolumeFunctor/InteractionDescriptionSet2AABBFunctor/$(YADEDYNLIBPATH) \
+               ../../../plugins/Geometry/GeometricalModel/Box/$(YADEDYNLIBPATH) \
+               ../../../plugins/Geometry/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
+               ../../../plugins/Geometry/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
+               ../../../plugins/Interaction/InteractionGeometry/SDECPermanentLink/$(YADEDYNLIBPATH) \
                ../../../plugins/Geometry/InteractionDescription/InteractionDescriptionSet/$(YADEDYNLIBPATH) \
                ../../../plugins/Geometry/BoundingVolumeFunctor/InteractionDescriptionSet2AABBFunctor/$(YADEDYNLIBPATH) \
                ../../../yade/Body/$(YADEDYNLIBPATH) \

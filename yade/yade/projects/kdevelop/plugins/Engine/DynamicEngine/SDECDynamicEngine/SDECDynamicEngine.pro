@@ -9,8 +9,6 @@ LIBS += -lSerialization \
         -lEngine \
         -lInteraction \
         -lMultiMethods \
-        -lSDECPermanentLink \
-        -lSDECPermanentLinkPhysics \
         -lSDECContactPhysics \
         -lSDECContactGeometry \
         -lActionForce \
@@ -18,19 +16,19 @@ LIBS += -lSerialization \
         -lBody \
         -lSDECParameters \
         -lRigidBodyParameters \
+        -lSDECLinkGeometry \
+        -lSDECLinkPhysics \
         -rdynamic 
 INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 QMAKE_LIBDIR = ../../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
-               ../../../../plugins/Geometry/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
+               ../../../../plugins/Body/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
                ../../../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
                ../../../../yade/Engine/$(YADEDYNLIBPATH) \
                ../../../../yade/Interaction/Interaction/$(YADEDYNLIBPATH) \
                ../../../../toolboxes/Libraries/MultiMethods/$(YADEDYNLIBPATH) \
-               ../../../../plugins/Interaction/InteractionGeometry/SDECPermanentLink/$(YADEDYNLIBPATH) \
-               ../../../../plugins/Interaction/InteractionPhysics/SDECPermanentLinkPhysics/$(YADEDYNLIBPATH) \
                ../../../../plugins/Interaction/InteractionPhysics/SDECContactPhysics/$(YADEDYNLIBPATH) \
                ../../../../plugins/Interaction/InteractionGeometry/SDECContactGeometry/$(YADEDYNLIBPATH) \
                ../../../../plugins/Engine/Action/ActionForce/$(YADEDYNLIBPATH) \
@@ -38,6 +36,9 @@ QMAKE_LIBDIR = ../../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../../../yade/Body/Body/$(YADEDYNLIBPATH) \
                ../../../../plugins/Body/BodyPhysicalParameters/SDECParameters/$(YADEDYNLIBPATH) \
                ../../../../plugins/Body/BodyPhysicalParameters/RigidBodyParameters/$(YADEDYNLIBPATH) \
+               ../../../../plugins/Geometry/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
+               ../../../../plugins/Interaction/InteractionGeometry/SDECPermanentLink/$(YADEDYNLIBPATH) \
+               ../../../../plugins/Interaction/InteractionPhysics/SDECPermanentLinkPhysics/$(YADEDYNLIBPATH) \
                ../../../../yade/Geometry/$(YADEDYNLIBPATH) \
                ../../../../yade/Interaction/$(YADEDYNLIBPATH) \
                ../../../../yade/Body/$(YADEDYNLIBPATH) \

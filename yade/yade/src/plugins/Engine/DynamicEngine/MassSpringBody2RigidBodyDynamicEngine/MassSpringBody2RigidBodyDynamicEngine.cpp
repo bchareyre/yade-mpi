@@ -8,9 +8,9 @@
 
 #include "SDECParameters.hpp"
 #include "SDECContactGeometry.hpp"
-#include "SDECPermanentLink.hpp"
+#include "SDECLinkGeometry.hpp"
 #include "SDECContactPhysics.hpp"
-#include "SDECPermanentLinkPhysics.hpp"
+#include "SDECLinkPhysics.hpp"
 
 MassSpringBody2RigidBodyDynamicEngine::MassSpringBody2RigidBodyDynamicEngine ()  : DynamicEngine(), actionForce(new ActionForce) , actionMomentum(new ActionMomentum)
 {
@@ -58,19 +58,24 @@ void MassSpringBody2RigidBodyDynamicEngine::respondToInteractions(Body * body)
 			continue; // skip other groups
 			
 		
-		if(!  mixedInteraction->interactionPhysics)
-			mixedInteraction->interactionPhysics = shared_ptr<SDECContactPhysics>(new SDECContactPhysics);
+//		if(!  mixedInteraction->interactionPhysics)
+//	------------------------ this is bad and will not work, InetractionPhysicsFunctor should create this
+//			mixedInteraction->interactionPhysics = shared_ptr<SDECContactPhysics>(new SDECContactPhysics);
 //		if(! ((*bodies)[id1]->physicalParameters) )
 //			(*bodies)[id1]->physicalParameters = shared_ptr<SDECParameters>(new SDECParameters);
 //		if(! ((*bodies)[id2]->physicalParameters) )
 //			(*bodies)[id2]->physicalParameters = shared_ptr<SDECParameters>(new SDECParameters);
-		cerr << "yes...: " << ((*bodies)[id1]->physicalParameters)->getClassName() << endl;
-		cerr << "yes...: " << ((*bodies)[id2]->physicalParameters)->getClassName() << endl;
 		
-		
+
+// here (*bodies)[id]->physicalParameters are:
+//  - SDECParameters
+//  - ParticleParameters
+//		cerr << "this is: " << ((*bodies)[id1]->physicalParameters)->getClassName() << endl;
+//		cerr << "this is: " << ((*bodies)[id2]->physicalParameters)->getClassName() << endl;
+
+// BEGIN - this is code just duplicated from SDECDynamicEngine for non-permanent links
 		shared_ptr<SDECParameters> de1 	= dynamic_pointer_cast<SDECParameters>((*bodies)[id1]->physicalParameters);
 		shared_ptr<SDECParameters> de2 	= dynamic_pointer_cast<SDECParameters>((*bodies)[id2]->physicalParameters);
-		
 		shared_ptr<SDECContactGeometry> currentContactGeometry = dynamic_pointer_cast<SDECContactGeometry>(mixedInteraction->interactionGeometry);
 		shared_ptr<SDECContactPhysics> currentContactPhysics   = dynamic_pointer_cast<SDECContactPhysics> (mixedInteraction->interactionPhysics);
 		
@@ -89,6 +94,7 @@ void MassSpringBody2RigidBodyDynamicEngine::respondToInteractions(Body * body)
 		axis 					= angle*currentContactGeometry->normal;
 		currentContactPhysics->shearForce      -= currentContactPhysics->shearForce.cross(axis);
 	
+
 		Vector3r x				= currentContactGeometry->contactPoint;
 		Vector3r c1x				= (x - de1->se3.translation);
 		Vector3r c2x				= (x - de2->se3.translation);
@@ -106,35 +112,18 @@ void MassSpringBody2RigidBodyDynamicEngine::respondToInteractions(Body * body)
 		static_cast<ActionMomentum*>( mixedBody->actions->find( id2 , actionMomentum->getClassIndex() ).get() )->momentum += c2x.cross(f);
 		
 		currentContactPhysics->prevNormal = currentContactGeometry->normal;
+// END										
+
+
+
+
+
+
+
 
 		
 		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		/*	
+		/*	OLD VERSION ....
 
 		shared_ptr<ClosestFeatures> cf = dynamic_pointer_cast<ClosestFeatures>(ct->interactionGeometry);
 	//	FIXME : this is a hack because we don't know if id1 is the sphere or piece of massSpring

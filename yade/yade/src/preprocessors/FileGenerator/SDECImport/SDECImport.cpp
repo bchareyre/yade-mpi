@@ -10,7 +10,7 @@
 #include "IOManager.hpp"
 #include "SDECDynamicEngine.hpp"
 #include "SDECParameters.hpp"
-#include "SDECPermanentLink.hpp"
+#include "SDECLinkGeometry.hpp"
 #include "Interaction.hpp"
 #include "Actor.hpp"
 #include "ForceRecorder.hpp"
