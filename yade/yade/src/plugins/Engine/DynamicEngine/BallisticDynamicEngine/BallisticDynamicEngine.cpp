@@ -1,7 +1,7 @@
 #include "BallisticDynamicEngine.hpp"
 #include "RigidBody.hpp"
 #include "Omega.hpp"
-#include "NonConnexBody.hpp"
+#include "ComplexBody.hpp"
 
 BallisticDynamicEngine::BallisticDynamicEngine () : DynamicEngine()
 {

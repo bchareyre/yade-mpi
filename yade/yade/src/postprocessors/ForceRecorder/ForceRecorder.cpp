@@ -1,7 +1,7 @@
 #include "ForceRecorder.hpp"
 #include "RigidBody.hpp"
 #include "Omega.hpp"
-#include "NonConnexBody.hpp"
+#include "ComplexBody.hpp"
 
 #include <boost/lexical_cast.hpp>
 

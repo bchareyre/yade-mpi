@@ -22,7 +22,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "NullGUI.hpp"
-#include "NonConnexBody.hpp"
+#include "ComplexBody.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -157,7 +157,7 @@ int NullGUI::loop()
 			// save snapshot
 			if( ( snapshotInterval != -1 ) && (intervals % snapshotInterval == 0) )
 			{
-				shared_ptr<NonConnexBody> rootBody = Omega::instance().getRootBody();
+				shared_ptr<ComplexBody> rootBody = Omega::instance().getRootBody();
 				IOManager::saveToFile(	"XMLManager",
 							"../data/" + snapshotName + "_" + lexical_cast<string>(Omega::instance().getCurrentIteration()) + ".xml",
 							"rootBody", 

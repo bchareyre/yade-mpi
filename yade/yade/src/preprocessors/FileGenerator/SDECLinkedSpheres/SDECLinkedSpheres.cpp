@@ -3,7 +3,7 @@
 #include "Box.hpp"
 #include "AABB.hpp"
 #include "Sphere.hpp"
-#include "NonConnexBody.hpp"
+#include "ComplexBody.hpp"
 #include "SAPCollider.hpp"
 #include "SDECDiscreteElement.hpp"
 #include "BallisticDynamicEngine.hpp"
@@ -58,7 +58,7 @@ string SDECLinkedSpheres::generate()
 {
 // 	shared_ptr<AABB> aabb;
 // 	
-// 	rootBody = shared_ptr<NonConnexBody>(new NonConnexBody);
+// 	rootBody = shared_ptr<ComplexBody>(new ComplexBody);
 // 
 // 	Quaternionr q,qbox;
 // 	q.fromAxisAngle( Vector3r(0,0,1),0);

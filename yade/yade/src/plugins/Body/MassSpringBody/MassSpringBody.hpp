@@ -1,11 +1,11 @@
 #ifndef __MASSPSRINGBODY_H__
 #define __MASSPSRINGBODY_H__
 
-#include "NonConnexBody.hpp"
+#include "ComplexBody.hpp"
 #include "Vector3.hpp"
 #include "Matrix3.hpp"
 
-class MassSpringBody : public NonConnexBody
+class MassSpringBody : public ComplexBody
 {
 	// construction
 	public : MassSpringBody ();
@@ -25,7 +25,7 @@ class MassSpringBody : public NonConnexBody
 /// Indexable											///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-	REGISTER_CLASS_INDEX(MassSpringBody,NonConnexBody);
+	REGISTER_CLASS_INDEX(MassSpringBody,ComplexBody);
 	
 };
 

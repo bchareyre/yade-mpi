@@ -6,7 +6,7 @@
 #include <GL/glut.h>
 #include "Math.hpp"
 
-#include "NonConnexBody.hpp"
+#include "ComplexBody.hpp"
 #include "InteractionVecSet.hpp"
 //#include "InteractionHashMap.hpp"
 #include "BodyRedirectionVector.hpp"
@@ -14,7 +14,7 @@
 #include "BoundingVolumeUpdator.hpp"
 
 // FIXME - who is to decide which class to use by default?
-NonConnexBody::NonConnexBody() :
+ComplexBody::ComplexBody() :
 	  Body()
 	, bodies(new BodyRedirectionVector)
 	, permanentInteractions(new InteractionVecSet)
@@ -26,13 +26,13 @@ NonConnexBody::NonConnexBody() :
 
 }
 
-NonConnexBody::~NonConnexBody()
+ComplexBody::~ComplexBody()
 {
 
 }
 
 
-void NonConnexBody::glDrawGeometricalModel()
+void ComplexBody::glDrawGeometricalModel()
 {
 	//glPushMatrix();
 
@@ -50,14 +50,14 @@ void NonConnexBody::glDrawGeometricalModel()
 	//glPopMatrix();
 }
 
-void NonConnexBody::glDrawBoundingVolume()
+void ComplexBody::glDrawBoundingVolume()
 {
 	for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext() )
 		bodies->getCurrent()->glDrawBoundingVolume();
 	bv->glDraw();
 }
 
-void NonConnexBody::glDrawCollisionGeometry()
+void ComplexBody::glDrawCollisionGeometry()
 {
 	for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext() )
 		bodies->getCurrent()->glDrawCollisionGeometry();
@@ -66,7 +66,7 @@ void NonConnexBody::glDrawCollisionGeometry()
 
 #include "CollisionGeometrySet.hpp"
 
-void NonConnexBody::postProcessAttributes(bool deserializing)
+void ComplexBody::postProcessAttributes(bool deserializing)
 {
 	if (deserializing)
 	{
@@ -89,7 +89,7 @@ void NonConnexBody::postProcessAttributes(bool deserializing)
 	Body::postProcessAttributes(deserializing);
 }
 
-void NonConnexBody::registerAttributes()
+void ComplexBody::registerAttributes()
 {
 	Body::registerAttributes();
 
@@ -101,7 +101,7 @@ void NonConnexBody::registerAttributes()
 }
 
 
-void NonConnexBody::moveToNextTimeStep()
+void ComplexBody::moveToNextTimeStep()
 {
 
 	vector<shared_ptr<Actor> >::iterator ai    = actors.begin();

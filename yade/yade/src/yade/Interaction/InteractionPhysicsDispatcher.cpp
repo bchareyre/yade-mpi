@@ -1,5 +1,5 @@
 #include "InteractionPhysicsDispatcher.hpp"
-#include "NonConnexBody.hpp"
+#include "ComplexBody.hpp"
 
 InteractionPhysicsDispatcher::InteractionPhysicsDispatcher () : Actor()
 {
@@ -38,7 +38,7 @@ void InteractionPhysicsDispatcher::action(Body* body)
 {
 	//this->narrowCollisionPhase(b);	
 	
-	NonConnexBody * ncb = dynamic_cast<NonConnexBody*>(body);
+	ComplexBody * ncb = dynamic_cast<ComplexBody*>(body);
 	shared_ptr<BodyContainer> bodies = ncb->bodies;
 
 	shared_ptr<Interaction> interaction;

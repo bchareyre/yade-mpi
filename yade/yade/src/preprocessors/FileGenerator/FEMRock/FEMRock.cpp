@@ -4,7 +4,7 @@
 #include "Polyhedron.hpp"
 #include "AABB.hpp"
 #include "FEMBody.hpp"
-#include "NonConnexBody.hpp"
+#include "ComplexBody.hpp"
 //#include "SimpleSpringDynamicEngine.hpp"
 //#include "ExplicitMassSpringDynamicEngine.hpp"
 #include <fstream>
@@ -34,7 +34,7 @@ void FEMRock::registerAttributes()
 string FEMRock::generate()
 {
 	// FIXME : not working
-	rootBody = shared_ptr<NonConnexBody>(new NonConnexBody);
+	rootBody = shared_ptr<ComplexBody>(new ComplexBody);
 
 	Quaternionr q;
 

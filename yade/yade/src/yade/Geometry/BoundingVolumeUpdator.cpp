@@ -22,7 +22,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "BoundingVolumeUpdator.hpp"
-#include "NonConnexBody.hpp"
+#include "ComplexBody.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -55,7 +55,7 @@ void BoundingVolumeUpdator::updateBoundingVolume(shared_ptr<Body> b)
 {
 	if (b->containSubBodies)
 	{
-		shared_ptr<NonConnexBody>  ncb = dynamic_pointer_cast<NonConnexBody>(b);
+		shared_ptr<ComplexBody>  ncb = dynamic_pointer_cast<ComplexBody>(b);
 		shared_ptr<BodyContainer> bodies = ncb->bodies;
 		for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext())
 		{
@@ -76,7 +76,7 @@ void BoundingVolumeUpdator::updateBoundingVolume(Body* b)
 {
 	if (b->containSubBodies)
 	{
-		NonConnexBody * ncb = dynamic_cast<NonConnexBody*>(b);
+		ComplexBody * ncb = dynamic_cast<ComplexBody*>(b);
 		shared_ptr<BodyContainer> bodies = ncb->bodies;
 		for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext())
 		{

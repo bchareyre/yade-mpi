@@ -1,6 +1,6 @@
 #include "SAPCollider.hpp"
 #include "Body.hpp"
-#include "NonConnexBody.hpp"
+#include "ComplexBody.hpp"
 #include "BodyContainer.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -71,7 +71,7 @@ void SAPCollider::registerAttributes()
 void SAPCollider::broadCollisionTest(Body* body)
 {
 
-	NonConnexBody * ncb = dynamic_cast<NonConnexBody*>(body);
+	ComplexBody * ncb = dynamic_cast<ComplexBody*>(body);
 	shared_ptr<BodyContainer> bodies = ncb->bodies;
 
 	unsigned int i;

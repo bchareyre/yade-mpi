@@ -2,7 +2,7 @@
 #include "RigidBody.hpp"
 #include "MassSpringBody.hpp"
 #include "Omega.hpp"
-#include "NonConnexBody.hpp"
+#include "ComplexBody.hpp"
 #include "ClosestFeatures.hpp"
 #include "SimpleSpringDynamicEngine.hpp"
 #include "Mesh2D.hpp"
@@ -28,7 +28,7 @@ void MassSpringBody2RigidBodyDynamicEngine::registerAttributes()
 
 void MassSpringBody2RigidBodyDynamicEngine::respondToCollisions(Body * body)
 {
-// /*	NonConnexBody * ncb = dynamic_cast<NonConnexBody*>(body);
+// /*	ComplexBody * ncb = dynamic_cast<ComplexBody*>(body);
 // 	shared_ptr<Interaction> ct;
 // 
 // 

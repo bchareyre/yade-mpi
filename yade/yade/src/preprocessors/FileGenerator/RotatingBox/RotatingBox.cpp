@@ -4,7 +4,7 @@
 #include "Box.hpp"
 #include "AABB.hpp"
 #include "Sphere.hpp"
-#include "NonConnexBody.hpp"
+#include "ComplexBody.hpp"
 #include "SimpleSpringDynamicEngine.hpp"
 #include "SAPCollider.hpp"
 #include "Rotor.hpp"
@@ -43,7 +43,7 @@ void RotatingBox::registerAttributes()
 
 string RotatingBox::generate()
 {
-// 	rootBody = shared_ptr<NonConnexBody>(new NonConnexBody);
+// 	rootBody = shared_ptr<ComplexBody>(new ComplexBody);
 // 	Quaternionr q;
 // 	q.fromAxisAngle(Vector3r(0,0,1),0);
 // 

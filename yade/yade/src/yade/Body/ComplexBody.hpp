@@ -21,108 +21,68 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "ActionDispatcher.hpp"
-#include "ComplexBody.hpp"
+#ifndef __NONCONNEXBODY_H__
+#define __NONCONNEXBODY_H__
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-ActionDispatcher::ActionDispatcher() : Actor()
+#include "Body.hpp"
+#include "BodyContainer.hpp"
+//#include "BroadInteractor.hpp"
+//#include "KinematicEngine.hpp"
+//#include "InteractionGeometryDispatcher.hpp"
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//FIXME : ComplexBody is abstract interface and add SetOfBodies as default simple ComplexBody
+class ComplexBody : public Body
 {
+	//public : vector<shared_ptr<Body> > bodies;
 
-}
+	//public : shared_ptr<InteractionGeometryDispatcher> narrowCollider;
+	//public : shared_ptr<BroadInteractor> broadCollider;
+	//public : shared_ptr<KinematicEngine> kinematic;
+
+	//public : vector<shared_ptr<Interaction> > permanentInteractions;
+	public	: shared_ptr<BodyContainer> bodies;
+	public	: shared_ptr<InteractionContainer> permanentInteractions;
+
+	// construction
+	public	: ComplexBody ();
+
+	public	: virtual ~ComplexBody ();
+
+	public : virtual void glDrawGeometricalModel();
+	public : virtual void glDrawBoundingVolume();
+	public : virtual void glDrawCollisionGeometry();
+
+	public	: void moveToNextTimeStep();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+/// Serialization										///
+///////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	REGISTER_CLASS_NAME(ComplexBody);
+	protected : virtual void postProcessAttributes(bool deserializing);
+	public	: void registerAttributes();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+/// Indexable											///
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+	REGISTER_CLASS_INDEX(ComplexBody,Body);
+};
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-ActionDispatcher::~ActionDispatcher()
-{
-
-}
+REGISTER_SERIALIZABLE(ComplexBody,false);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void ActionDispatcher::postProcessAttributes(bool deserializing)
-{
-	if(deserializing)
-	{
-		for(unsigned int i=0;i<actionFunctors.size();i++)
-			actionDispatcher.add(actionFunctors[i][0],actionFunctors[i][1],actionFunctors[i][2]);
-	}
-
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-void ActionDispatcher::registerAttributes()
-{
-	REGISTER_ATTRIBUTE(actionFunctors);
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-void ActionDispatcher::addActionFunctor(const string& str1,const string& str2,const string& str3)
-{
-	vector<string> v;
-	v.push_back(str1);
-	v.push_back(str2);
-	v.push_back(str3);
-	actionFunctors.push_back(v);
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-void ActionDispatcher::action(Body* body)
-{
-
-// NEW VERSION - 107 seconds - faster
-//
-// there are a lot of places where we can do improvement like this. if we do code change
-// like here - in every possible places - yade can gain a lot of speed.
-//
-// basically I've discovered that every temporary variable of type shared_ptr<> costs 3 seconds,
-// so we should avoid creating them and instead pass them around by references - whenever possible
-//
-
-
-	ComplexBody * ncb = dynamic_cast<ComplexBody*>(body);
-	shared_ptr<BodyContainer>* bodies_ptr = &(ncb->bodies);
-	shared_ptr<Action>* action_ptr;
-
-	int id;
-	for( ncb->actions->gotoFirst() ; ncb->actions->notAtEnd() ; ncb->actions->gotoNext())
-	{
-		action_ptr = &(ncb->actions->getCurrent(id));
-		actionDispatcher( *action_ptr , (*(*bodies_ptr))[id]);
-// FIXME - this line would work if action was holding body's id. and it is possible that it will be even faster
-//		actionDispatcher( ncb->actions->getCurrent(id) , (*(*bodies_ptr))[id]);
-	}
-		
-		
-/* OLD VERSION - 111 seconds
-
-	ComplexBody * ncb = dynamic_cast<ComplexBody*>(body);
-	shared_ptr<BodyContainer> bodies = ncb->bodies;
-
-	shared_ptr<Action> action;
-
-	for( ncb->actions->gotoFirst() ; ncb->actions->notAtEnd() ; ncb->actions->gotoNext())
-	{
-		int id;
-		action = ncb->actions->getCurrent(id);
-		
-		shared_ptr<Body> b = (*bodies)[id];
-
-		actionDispatcher( action, b);
-	}
-
-
-*/
-}
+#endif // __NONCONNEXBODY_H__
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -2,7 +2,7 @@
 #include "RigidBody.hpp"
 #include "ClosestFeatures.hpp"
 #include "Omega.hpp"
-#include "NonConnexBody.hpp"
+#include "ComplexBody.hpp"
 
 SimpleSpringDynamicEngine::SimpleSpringDynamicEngine () : DynamicEngine()
 {
@@ -29,7 +29,7 @@ void SimpleSpringDynamicEngine::respondToCollisions(Body * body)
 
 	//Real dt = Omega::instance().dt;
 
-	NonConnexBody * ncb = dynamic_cast<NonConnexBody*>(body);
+	ComplexBody * ncb = dynamic_cast<ComplexBody*>(body);
 	shared_ptr<BodyContainer> bodies = ncb->bodies;
 
 	Real stiffness = 10000;

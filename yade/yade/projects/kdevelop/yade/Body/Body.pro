@@ -3,30 +3,32 @@
 # Subdir relative project main directory: ./yade/Body
 # Target is a library:  
 
+HEADERS += BodyPhysics.hpp \
+           Body.hpp \
+           BodyContainer.hpp \
+           ComplexBody.hpp \
+           SimpleBody.hpp 
+SOURCES += BodyPhysics.cpp \
+           Body.cpp \
+           BodyContainer.cpp \
+           ComplexBody.cpp \
+           SimpleBody.cpp 
 LIBS += -lCollisionGeometrySet \
-        -lActionVecVec \
-        -rdynamic 
-INCLUDEPATH = $(YADEINCLUDEPATH) 
-MOC_DIR = $(YADECOMPILATIONPATH) 
-UI_DIR = $(YADECOMPILATIONPATH) 
-OBJECTS_DIR = $(YADECOMPILATIONPATH) 
+-lActionVecVec \
+-rdynamic
+INCLUDEPATH = $(YADEINCLUDEPATH)
+MOC_DIR = $(YADECOMPILATIONPATH)
+UI_DIR = $(YADECOMPILATIONPATH)
+OBJECTS_DIR = $(YADECOMPILATIONPATH)
 QMAKE_LIBDIR = ../../plugins/Geometry/CollisionGeometry/CollisionGeometrySet/$(YADEDYNLIBPATH) \
-               ../../toolboxes/DataStructures/ActionContainer/ActionVecVec/$(YADEDYNLIBPATH) \
-               $(YADEDYNLIBPATH) 
+../../toolboxes/DataStructures/ActionContainer/ActionVecVec/$(YADEDYNLIBPATH) \
+$(YADEDYNLIBPATH)
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
-                          -pthread 
+-pthread
 QMAKE_CXXFLAGS_DEBUG += -lpthread \
-                        -pthread 
-DESTDIR = $(YADEDYNLIBPATH) 
+-pthread
+DESTDIR = $(YADEDYNLIBPATH)
 CONFIG += debug \
-          warn_on \
-          dll 
-TEMPLATE = lib 
-HEADERS += Body.hpp \
-           ConnexBody.hpp \
-           NonConnexBody.hpp \
-           BodyContainer.hpp 
-SOURCES += Body.cpp \
-           ConnexBody.cpp \
-           NonConnexBody.cpp \
-           BodyContainer.cpp 
+warn_on \
+dll
+TEMPLATE = lib

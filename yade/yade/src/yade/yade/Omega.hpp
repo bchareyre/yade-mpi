@@ -43,7 +43,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-class NonConnexBody;
+class ComplexBody;
 class SimulationLoop;
 class FrontEnd;
 class ThreadSynchronizer;
@@ -96,8 +96,8 @@ class Omega : public Singleton<Omega>
 	public	: void setTimeStep(const double);
 	public	: double getTimeStep();
 	
-	private	: shared_ptr<NonConnexBody> rootBody;
-	public	: shared_ptr<NonConnexBody> getRootBody();
+	private	: shared_ptr<ComplexBody> rootBody;
+	public	: shared_ptr<ComplexBody> getRootBody();
 	public  : void freeRootBody();
 	
 	private	: ptime	sStartingSimulationTime;

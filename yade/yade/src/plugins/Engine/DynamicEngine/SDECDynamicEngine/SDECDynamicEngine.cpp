@@ -32,7 +32,7 @@
 #include "SDECContactPhysics.hpp"
 #include "SDECPermanentLinkPhysics.hpp"
 #include "Omega.hpp"
-#include "NonConnexBody.hpp"
+#include "ComplexBody.hpp"
 #include "ActionForce.hpp"
 #include "ActionMomentum.hpp"
 #include "Action.hpp"
@@ -83,7 +83,7 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 {
 	//filter(body);
 
-	NonConnexBody * ncb = dynamic_cast<NonConnexBody*>(body);
+	ComplexBody * ncb = dynamic_cast<ComplexBody*>(body);
 	shared_ptr<BodyContainer> bodies = ncb->bodies;
 
 	Vector3r gravity = Omega::instance().getGravity();

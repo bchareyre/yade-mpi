@@ -3,11 +3,8 @@
 # Subdir relative project main directory: ./plugins/Body
 # Target is a subdirs project 
 
-SUBDIRS += Particle \
-           RigidBody \
-           MassSpringBody \
-           FEMBody \
-           SDECDiscreteElement 
+SUBDIRS += BodyPhysics \
+           MassSpringBody 
 MOC_DIR = $(YADECOMPILATIONPATH)
 UI_DIR = $(YADECOMPILATIONPATH)
 OBJECTS_DIR = $(YADECOMPILATIONPATH)

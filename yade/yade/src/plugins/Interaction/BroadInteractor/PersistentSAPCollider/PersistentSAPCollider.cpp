@@ -23,7 +23,7 @@
 
 #include "PersistentSAPCollider.hpp"
 #include "Body.hpp"
-#include "NonConnexBody.hpp"
+#include "ComplexBody.hpp"
 #include "BodyContainer.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -101,7 +101,7 @@ void PersistentSAPCollider::registerAttributes()
 void PersistentSAPCollider::broadCollisionTest(Body* body)
 {
 
-	NonConnexBody * ncb = dynamic_cast<NonConnexBody*>(body);
+	ComplexBody * ncb = dynamic_cast<ComplexBody*>(body);
 	shared_ptr<BodyContainer> bodies = ncb->bodies;
 	
 	if (2*bodies->size()!=xBounds.size())

@@ -53,7 +53,7 @@
 
 /*! \brief Abstract interface for all physical object.
 
-	All the physical types (ConnexBody, NonConnexBody, RigidBody ....) must derived from this class.
+	All the physical types (SimpleBody, ComplexBody, RigidBody ....) must derived from this class.
 */
 class Body : public Serializable , public Indexable
 {
@@ -73,7 +73,7 @@ class Body : public Serializable , public Indexable
 	public	: shared_ptr<InteractionContainer> interactions;	
 	public	: shared_ptr<ActionContainer> actions;
 	
-	// FIXME : where to put gm,cm and bv : do body need them or only ConnexBody ??
+	// FIXME : where to put gm,cm and bv : do body need them or only SimpleBody ??
 	/*! The geometrical model of this body (polyhedron, box ...) */
 	public : shared_ptr<GeometricalModel> gm;
 	/*! The collision model of this body (sphere hierarchy, box ...) */

@@ -1,11 +1,11 @@
 #ifndef __RIGIDBODY_H__
 #define __RIGIDBODY_H__
 
-#include "ConnexBody.hpp"
+#include "SimpleBody.hpp"
 #include "Vector3.hpp"
 #include "Matrix3.hpp"
 
-class RigidBody : public ConnexBody
+class RigidBody : public SimpleBody
 {
 	
 	public : Vector3r invInertia;
@@ -34,7 +34,7 @@ class RigidBody : public ConnexBody
 /// Indexable											///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-	REGISTER_CLASS_INDEX(RigidBody,ConnexBody);
+	REGISTER_CLASS_INDEX(RigidBody,SimpleBody);
 	
 };
 

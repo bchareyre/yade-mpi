@@ -62,7 +62,7 @@ void OpenGLRenderingEngine::init()
 	}
 }
 
-void OpenGLRenderingEngine::render(shared_ptr<NonConnexBody> rootBody)
+void OpenGLRenderingEngine::render(shared_ptr<ComplexBody> rootBody)
 {		
 	const GLfloat pos[4]	= {lightPos[0],lightPos[1],lightPos[2],1.0};
 	const GLfloat ambientColor[4]	= {0.5,0.5,0.5,1.0};	
@@ -132,7 +132,7 @@ void OpenGLRenderingEngine::render(shared_ptr<NonConnexBody> rootBody)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void OpenGLRenderingEngine::renderSceneUsingShadowVolumes(shared_ptr<NonConnexBody> rootBody,Vector3r lightPos)
+void OpenGLRenderingEngine::renderSceneUsingShadowVolumes(shared_ptr<ComplexBody> rootBody,Vector3r lightPos)
 {
 	glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
 	glEnable(GL_CULL_FACE);
@@ -179,7 +179,7 @@ void OpenGLRenderingEngine::renderSceneUsingShadowVolumes(shared_ptr<NonConnexBo
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void OpenGLRenderingEngine::renderSceneUsingFastShadowVolumes(shared_ptr<NonConnexBody> rootBody,Vector3r lightPos)
+void OpenGLRenderingEngine::renderSceneUsingFastShadowVolumes(shared_ptr<ComplexBody> rootBody,Vector3r lightPos)
 {
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_NORMALIZE);
@@ -274,9 +274,9 @@ void OpenGLRenderingEngine::renderSceneUsingFastShadowVolumes(shared_ptr<NonConn
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void OpenGLRenderingEngine::renderShadowVolumes(shared_ptr<NonConnexBody> rootBody,Vector3r lightPos)
+void OpenGLRenderingEngine::renderShadowVolumes(shared_ptr<ComplexBody> rootBody,Vector3r lightPos)
 {
-	shared_ptr<NonConnexBody> ncb = dynamic_pointer_cast<NonConnexBody>(rootBody);
+	shared_ptr<ComplexBody> ncb = dynamic_pointer_cast<ComplexBody>(rootBody);
 	
 	for( ncb->bodies->gotoFirst() ; ncb->bodies->notAtEnd() ; ncb->bodies->gotoNext() )
 	{

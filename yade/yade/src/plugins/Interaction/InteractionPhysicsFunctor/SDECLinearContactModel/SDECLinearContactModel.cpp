@@ -25,7 +25,7 @@
 #include "SDECContactGeometry.hpp"
 #include "SDECContactPhysics.hpp"
 #include "Omega.hpp"
-#include "NonConnexBody.hpp"
+#include "ComplexBody.hpp"
 #include "SDECDiscreteElement.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

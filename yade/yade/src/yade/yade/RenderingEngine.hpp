@@ -27,7 +27,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "NonConnexBody.hpp"
+#include "ComplexBody.hpp"
 #include "Serializable.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -38,7 +38,7 @@ class RenderingEngine :  public Serializable
 	public : RenderingEngine():Serializable() {};
 	public : virtual ~RenderingEngine() {} ;
 	
-	public : virtual void render(shared_ptr<NonConnexBody> ) {throw;};
+	public : virtual void render(shared_ptr<ComplexBody> ) {throw;};
 	public : virtual void init() {throw;};
 };
 

@@ -1,7 +1,7 @@
 #include "AveragePositionRecorder.hpp"
 #include "RigidBody.hpp"
 #include "Omega.hpp"
-#include "NonConnexBody.hpp"
+#include "ComplexBody.hpp"
 
 #include <boost/lexical_cast.hpp>
 
@@ -34,7 +34,7 @@ void AveragePositionRecorder::registerAttributes()
 
 void AveragePositionRecorder::action(Body * body)
 {
-	NonConnexBody * ncb = dynamic_cast<NonConnexBody*>(body);
+	ComplexBody * ncb = dynamic_cast<ComplexBody*>(body);
 	
 	if( Omega::instance().getCurrentIteration() % interval == 0 /*&& ofile*/ )
 	{

@@ -5,7 +5,7 @@
 #include "AABB.hpp"
 #include "Math.hpp"
 
-FEMBody::FEMBody () : ConnexBody()
+FEMBody::FEMBody () : SimpleBody()
 {
 	createIndex();
 }
@@ -18,7 +18,7 @@ FEMBody::~FEMBody()
 
 void FEMBody::postProcessAttributes(bool deserializing)
 {
-	ConnexBody::postProcessAttributes(deserializing);
+	SimpleBody::postProcessAttributes(deserializing);
 	
 	if(deserializing)
 	{
@@ -31,7 +31,7 @@ void FEMBody::postProcessAttributes(bool deserializing)
 
 void FEMBody::registerAttributes()
 {
-	ConnexBody::registerAttributes();
+	SimpleBody::registerAttributes();
 //	REGISTER_ATTRIBUTE(stiffness);
 //	REGISTER_ATTRIBUTE(damping);
 //	REGISTER_ATTRIBUTE(properties);

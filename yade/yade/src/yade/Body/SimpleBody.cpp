@@ -5,25 +5,25 @@
 #include <GL/gl.h>
 #include <GL/glut.h>
 
-#include "ConnexBody.hpp"
+#include "SimpleBody.hpp"
 #include "Math.hpp"
 
 #include <iostream>
 
 using namespace std;
 
-ConnexBody::ConnexBody() : Body()
+SimpleBody::SimpleBody() : Body()
 {
 	createIndex();
 	containSubBodies = false;
 }
 
-ConnexBody::~ConnexBody() 
+SimpleBody::~SimpleBody() 
 {
 
 }
 
-void ConnexBody::glDrawGeometricalModel()
+void SimpleBody::glDrawGeometricalModel()
 {
 	glPushMatrix();
 	Real angle;
@@ -35,14 +35,14 @@ void ConnexBody::glDrawGeometricalModel()
 	glPopMatrix();
 }
 
-void ConnexBody::glDrawBoundingVolume()
+void SimpleBody::glDrawBoundingVolume()
 {
 	glPushMatrix();
 	bv->glDraw();
 	glPopMatrix();
 }
 
-void ConnexBody::glDrawCollisionGeometry()
+void SimpleBody::glDrawCollisionGeometry()
 {
 	glPushMatrix();
 	Real angle;
@@ -55,14 +55,14 @@ void ConnexBody::glDrawCollisionGeometry()
 }
 
 
-void ConnexBody::postProcessAttributes(bool deserializing)
+void SimpleBody::postProcessAttributes(bool deserializing)
 {
 	if(deserializing)
 		invMass = 1.0/mass;	
 	Body::postProcessAttributes(deserializing);
 }
 
-void ConnexBody::registerAttributes()
+void SimpleBody::registerAttributes()
 {
 	Body::registerAttributes();
 	REGISTER_ATTRIBUTE(mass);
@@ -73,7 +73,7 @@ void ConnexBody::registerAttributes()
 	//REGISTER_ATTRIBUTE(gm);
 }
 
-void ConnexBody::moveToNextTimeStep()
+void SimpleBody::moveToNextTimeStep()
 {
 	vector<shared_ptr<Actor> >::iterator ai    = actors.begin();
 	vector<shared_ptr<Actor> >::iterator aiEnd =  actors.end();

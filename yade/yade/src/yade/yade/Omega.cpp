@@ -6,7 +6,7 @@
 #include "Vector3.hpp"
 
 #include "IOManager.hpp"
-#include "NonConnexBody.hpp"
+#include "ComplexBody.hpp"
 
 #include "FileGenerator.hpp"
 #include "DynamicEngine.hpp"
@@ -333,7 +333,7 @@ void Omega::loadSimulation()
 void Omega::freeRootBody()
 {
 //	LOCK(rootBodyMutex);
-	rootBody = shared_ptr<NonConnexBody>();
+	rootBody = shared_ptr<ComplexBody>();
 }
 
 
@@ -369,7 +369,7 @@ shared_ptr<ThreadSynchronizer> Omega::getSynchronizer()
 	return synchronizer;
 }
 
-shared_ptr<NonConnexBody> Omega::getRootBody()
+shared_ptr<ComplexBody> Omega::getRootBody()
 {
 //	LOCK(omegaMutex);
 	return rootBody;

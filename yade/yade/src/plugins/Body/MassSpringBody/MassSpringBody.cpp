@@ -6,7 +6,7 @@
 #include "Math.hpp"
 #include "Particle.hpp"
 
-MassSpringBody::MassSpringBody () : NonConnexBody()
+MassSpringBody::MassSpringBody () : ComplexBody()
 {
 	createIndex();
 }
@@ -19,12 +19,12 @@ MassSpringBody::~MassSpringBody()
 
 void MassSpringBody::postProcessAttributes(bool deserializing)
 {
-	NonConnexBody::postProcessAttributes(deserializing);
+	ComplexBody::postProcessAttributes(deserializing);
 }
 
 void MassSpringBody::registerAttributes()
 {
-	NonConnexBody::registerAttributes();
+	ComplexBody::registerAttributes();
 }
 
 

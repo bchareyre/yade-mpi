@@ -3,7 +3,7 @@
 #include "Box.hpp"
 #include "AABB.hpp"
 #include "Sphere.hpp"
-#include "NonConnexBody.hpp"
+#include "ComplexBody.hpp"
 #include "SAPCollider.hpp"
 #include "SDECDiscreteElement.hpp"
 #include "BallisticDynamicEngine.hpp"
@@ -94,7 +94,7 @@ string SDECImport::generate()
 {
 
 // // rootBody - the whole scene
-// 	rootBody = shared_ptr<NonConnexBody>(new NonConnexBody);
+// 	rootBody = shared_ptr<ComplexBody>(new ComplexBody);
 // 
 // // q - a quaternion that says that we ant zero rotation = rotation around axis 0,0,1 by zero radians
 // 	Quaternionr q;		q.fromAxisAngle( Vector3r(0,0,1) , 0);

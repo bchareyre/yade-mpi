@@ -49,11 +49,11 @@ class OpenGLRenderingEngine : public RenderingEngine
 	public : ~OpenGLRenderingEngine();
 	
 	public : void init();
-	public : void render(shared_ptr<NonConnexBody> body);
+	public : void render(shared_ptr<ComplexBody> body);
 	
-	private : void renderShadowVolumes(shared_ptr<NonConnexBody> rootBody,Vector3r lightPos);
-	private : void renderSceneUsingShadowVolumes(shared_ptr<NonConnexBody> rootBody,Vector3r lightPos);
-	private : void renderSceneUsingFastShadowVolumes(shared_ptr<NonConnexBody> rootBody,Vector3r lightPos);
+	private : void renderShadowVolumes(shared_ptr<ComplexBody> rootBody,Vector3r lightPos);
+	private : void renderSceneUsingShadowVolumes(shared_ptr<ComplexBody> rootBody,Vector3r lightPos);
+	private : void renderSceneUsingFastShadowVolumes(shared_ptr<ComplexBody> rootBody,Vector3r lightPos);
 	
 	REGISTER_CLASS_NAME(OpenGLRenderingEngine);
 

@@ -1,7 +1,7 @@
 #ifndef __CLOTH_H__
 #define __CLOTH_H__
 
-#include "ConnexBody.hpp"
+#include "SimpleBody.hpp"
 #include "Vector3.hpp"
 #include "Matrix3.hpp"
 
@@ -25,7 +25,7 @@ class NodeProperties : public Serializable
 
 REGISTER_SERIALIZABLE(NodeProperties,false);
 
-class FEMBody : public ConnexBody
+class FEMBody : public SimpleBody
 {
 	public : Real stiffness;
 	public : Real damping;
@@ -50,7 +50,7 @@ class FEMBody : public ConnexBody
 /// Indexable											///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-	REGISTER_CLASS_INDEX(FEMBody,ConnexBody);
+	REGISTER_CLASS_INDEX(FEMBody,SimpleBody);
 	
 };
 

@@ -5,7 +5,7 @@
 #include "Sphere.hpp"
 #include "RigidBody.hpp"
 #include "AABB.hpp"
-#include "NonConnexBody.hpp"
+#include "ComplexBody.hpp"
 #include "SimpleSpringDynamicEngine.hpp"
 #include "ParticleBallisticEngine.hpp"
 #include "PersistentSAPCollider.hpp"
@@ -68,7 +68,7 @@ void HangingCloth::registerAttributes()
 string HangingCloth::generate()
 {
 	
-	rootBody = shared_ptr<NonConnexBody>(new MassSpringBody);
+	rootBody = shared_ptr<ComplexBody>(new MassSpringBody);
 	
 	Quaternionr q;
 	q.fromAxisAngle(Vector3r(0,0,1),0);
@@ -225,7 +225,7 @@ string HangingCloth::generate()
 }
 
 
-shared_ptr<Interaction>& HangingCloth::createSpring(const shared_ptr<NonConnexBody>& rootBody,int i,int j)
+shared_ptr<Interaction>& HangingCloth::createSpring(const shared_ptr<ComplexBody>& rootBody,int i,int j)
 {
 	
 	Particle * p1 = static_cast<Particle*>((*(rootBody->bodies))[i].get());

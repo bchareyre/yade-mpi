@@ -23,7 +23,7 @@
 
 #include "ErrorTolerantDynamicEngine.hpp"
 #include "RigidBody.hpp"
-#include "NonConnexBody.hpp"
+#include "ComplexBody.hpp"
 #include "ErrorTolerantContactModel.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -74,7 +74,7 @@ void ErrorTolerantDynamicEngine::registerAttributes()
 void ErrorTolerantDynamicEngine::respondToCollisions(Body* body)
 {
 
-	NonConnexBody * ncb = dynamic_cast<NonConnexBody*>(body);
+	ComplexBody * ncb = dynamic_cast<ComplexBody*>(body);
 	shared_ptr<BodyContainer> bodies = ncb->bodies;
 
 	if (ncb->interactions->size() > 0)

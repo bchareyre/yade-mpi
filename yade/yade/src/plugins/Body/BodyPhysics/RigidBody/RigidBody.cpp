@@ -1,6 +1,6 @@
 #include "RigidBody.hpp"
 
-RigidBody::RigidBody () : ConnexBody()
+RigidBody::RigidBody () : SimpleBody()
 {
 	createIndex();
 	acceleration = Vector3r(0,0,0);
@@ -15,7 +15,7 @@ RigidBody::~RigidBody()
 
 void RigidBody::postProcessAttributes(bool deserializing)
 {
-	ConnexBody::postProcessAttributes(deserializing);
+	SimpleBody::postProcessAttributes(deserializing);
 	
 	if(deserializing)
 	{
@@ -36,7 +36,7 @@ void RigidBody::postProcessAttributes(bool deserializing)
 
 void RigidBody::registerAttributes()
 {
-	ConnexBody::registerAttributes();
+	SimpleBody::registerAttributes();
 	REGISTER_ATTRIBUTE(inertia);
 }
 
@@ -44,7 +44,7 @@ void RigidBody::registerAttributes()
 void RigidBody::moveToNextTimeStep()
 {	
 	//FIXME : move reseting to another place
-	ConnexBody::moveToNextTimeStep();
+	SimpleBody::moveToNextTimeStep();
 	prevAcceleration = acceleration;
 	prevAngularAcceleration = angularAcceleration;
 	acceleration = Vector3r(0,0,0);
