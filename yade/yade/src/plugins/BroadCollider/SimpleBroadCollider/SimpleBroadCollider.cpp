@@ -38,11 +38,11 @@ void SimpleBroadCollider::registerAttributes()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-int SimpleBroadCollider::broadCollisionTest(const std::vector<shared_ptr<Body> >& /* bodies  (unused)  */,std::list<shared_ptr<Interaction> >& interactions)
+void SimpleBroadCollider::broadCollisionTest(Body * body)
 {
-	nbPotentialCollisions=0;
+	//nbPotentialCollisions=0;
 
-	interactions.clear();
+	//interactions.clear();
 
 	/*for(unsigned int i=0;i<bodies.size()-1 ; i++)
 	{
@@ -57,8 +57,6 @@ int SimpleBroadCollider::broadCollisionTest(const std::vector<shared_ptr<Body> >
 			}
 		}
 	}*/
-
-	return nbPotentialCollisions;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -42,18 +42,27 @@ void RotatingBox::exec()
 	Quaternion q;
 	q.fromAngleAxis(0, Vector3(0,0,1));
 
-	//rootBody->dynamic		= shared_ptr<DynamicEngine>(new SimpleSpringDynamicEngine);
-	rootBody->dynamic		= shared_ptr<DynamicEngine>(new SDECDynamicEngine);
-	rootBody->kinematic		= shared_ptr<KinematicEngine>(new Rotor);
-	rootBody->broadCollider		= shared_ptr<BroadCollider>(new SAPCollider);
-	rootBody->narrowCollider	= shared_ptr<NarrowCollider>(new SimpleNarrowCollider);
+
+	
+	shared_ptr<NarrowCollider> nc	= shared_ptr<NarrowCollider>(new SimpleNarrowCollider);
+	nc->addCollisionFunctor("Sphere","Sphere","Sphere2Sphere4SDECContactModel");
+	nc->addCollisionFunctor("Sphere","Box","Box2Sphere4SDECContactModel");
+	
+
+	shared_ptr<KinematicEngine> kinematic = shared_ptr<KinematicEngine>(new Rotor);
+	for(int i=0;i<7;i++)
+		kinematic->subscribedBodies.push_back(i);
+
+	rootBody->actors.resize(4);
+	rootBody->actors[0] 		= shared_ptr<Actor>(new SAPCollider);
+	rootBody->actors[1] 		= nc;
+	rootBody->actors[2] 		= shared_ptr<Actor>(new SDECDynamicEngine);
+	rootBody->actors[3] 		= kinematic;
+	
 	rootBody->isDynamic		= false;
 	rootBody->velocity		= Vector3(0,0,0);
 	rootBody->angularVelocity	= Vector3(0,0,0);
 	rootBody->se3			= Se3(Vector3(0,0,0),q);
-
-	for(int i=0;i<7;i++)
-		rootBody->kinematic->subscribedBodies.push_back(i);
 
 	shared_ptr<AABB> aabb;
 	shared_ptr<Box> box;
@@ -236,8 +245,10 @@ void RotatingBox::exec()
 		float radius 		= (Rand::intervalRandom(3,4));
 
 		shared_ptr<BallisticDynamicEngine> ballistic(new BallisticDynamicEngine);
-		ballistic->damping 	= 1.0;//0.95;
-		s->dynamic		= dynamic_pointer_cast<DynamicEngine>(ballistic);
+		ballistic->damping 	= 1.0;//0.95;		
+		s->actors.push_back(ballistic);
+		
+		//s->dynamic		= dynamic_pointer_cast<DynamicEngine>(ballistic);
 		s->isDynamic		= true;
 		s->angularVelocity	= Vector3(0,0,0);
 		s->velocity		= Vector3(0,0,0);
@@ -270,10 +281,14 @@ void RotatingBox::exec()
 				shared_ptr<SDECDiscreteElement> boxi(new SDECDiscreteElement);
 				aabb=shared_ptr<AABB>(new AABB);
 				box=shared_ptr<Box>(new Box);
+
 				shared_ptr<BallisticDynamicEngine> ballistic(new BallisticDynamicEngine);
+				ballistic->damping 	= 1.0;//0.95;		
+				boxi->actors.push_back(ballistic);
+
 				Vector3 size = Vector3((4+Rand::symmetricRandom()),(4+Rand::symmetricRandom()),(4+Rand::symmetricRandom()));
-				ballistic->damping 	= 1.0;//0.95;
-				boxi->dynamic		= dynamic_pointer_cast<DynamicEngine>(ballistic);
+				//ballistic->damping 	= 1.0;//0.95;
+				//boxi->dynamic		= dynamic_pointer_cast<DynamicEngine>(ballistic);
 				boxi->isDynamic		= true;
 				boxi->angularVelocity	= Vector3(0,0,0);
 				boxi->velocity		= Vector3(0,0,0);

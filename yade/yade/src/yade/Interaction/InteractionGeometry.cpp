@@ -9,3 +9,13 @@ InteractionGeometry::~InteractionGeometry()
 {
 
 }
+
+void InteractionGeometry::processAttributes()
+{
+
+}
+
+void InteractionGeometry::registerAttributes()
+{
+
+}

@@ -172,7 +172,6 @@ void XMLManager::deserializeContainer(istream& stream, Archive& ac, const string
 {
 	map<string,string> basicAttributes = saxParser.getBasicAttributes();
 	int size = lexical_cast<int>(basicAttributes["size"]);
-
 	if (size>0)
 	{
 		ac.resize(ac,size);
@@ -187,6 +186,8 @@ void XMLManager::deserializeContainer(istream& stream, Archive& ac, const string
 			saxParser.readAndParseNextXmlLine(stream);
 		} while (ac.createNextArchive(ac,tmpAc,false));
 	}
+	else
+		saxParser.readAndParseNextXmlLine(stream);
 
 	ac.markProcessed();
 }
@@ -285,13 +286,16 @@ void XMLManager::serializeContainer(ostream& stream, Archive& ac , int depth)
 	stream << " size=\"" << size << "\"";
 	stream << ">" << endl;
 
-	do
+	if (size!=0)
 	{
-		writeOpeningTag(stream,*tmpAc,depth);
-		tmpAc->serialize(stream,*tmpAc,depth+1);
-		writeClosingTag(stream,*tmpAc,depth);
-	} while (ac.createNextArchive(ac,tmpAc,false));
-
+		do
+		{
+			writeOpeningTag(stream,*tmpAc,depth);
+			tmpAc->serialize(stream,*tmpAc,depth+1);
+			writeClosingTag(stream,*tmpAc,depth);
+		} while (ac.createNextArchive(ac,tmpAc,false));
+	}
+	
 	ac.markProcessed();
 }
 

@@ -104,7 +104,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>yade/yade</activedir>
+      <activedir>preprocessors/FileGenerator/SDECSpheresPlane</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>

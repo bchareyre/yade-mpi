@@ -45,11 +45,19 @@ void HangingCloth::exec()
 	int nbSpheres = 10;
 	q.fromAngleAxis(0, Vector3(0,0,1));
 
-	//rootBody->dynamic	   = shared_ptr<DynamicEngine>(new SimpleSpringDynamicEngine);
-	rootBody->dynamic	   = shared_ptr<DynamicEngine>(new MassSpringBody2RigidBodyDynamicEngine);
-	//rootBody->kinematic	   = shared_ptr<KinematicEngine>(new Rotor);
-	rootBody->broadCollider	   = shared_ptr<BroadCollider>(new SAPCollider);
-	rootBody->narrowCollider   = shared_ptr<NarrowCollider>(new SimpleNarrowCollider);
+	shared_ptr<NarrowCollider> nc	= shared_ptr<NarrowCollider>(new SimpleNarrowCollider);
+	nc->addCollisionFunctor("Sphere","Sphere","Sphere2Sphere4ClosestFeatures");
+	nc->addCollisionFunctor("Sphere","Mesh2D","Sphere2Mesh2D4ClosestFeatures");
+	
+
+	rootBody->actors.resize(3);
+	rootBody->actors[0] 		= shared_ptr<Actor>(new SAPCollider);
+	rootBody->actors[1] 		= nc;
+	rootBody->actors[2] 		= shared_ptr<Actor>(new MassSpringBody2RigidBodyDynamicEngine);
+
+
+	
+
 	rootBody->isDynamic      = false;
 	rootBody->velocity       = Vector3(0,0,0);
 	rootBody->angularVelocity= Vector3(0,0,0);
@@ -61,7 +69,7 @@ void HangingCloth::exec()
 	shared_ptr<MassSpringBody> cloth(new MassSpringBody);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<Mesh2D> mesh2d(new Mesh2D);
-	cloth->dynamic		= shared_ptr<DynamicEngine>(new ExplicitMassSpringDynamicEngine);
+	cloth->actors.push_back(shared_ptr<Actor>(new ExplicitMassSpringDynamicEngine));
 	cloth->isDynamic	= true;
 	cloth->angularVelocity	= Vector3(0,0,0);
 	cloth->velocity		= Vector3(0,0,0);
@@ -132,8 +140,7 @@ void HangingCloth::exec()
 	rootBody->bodies.push_back(dynamic_pointer_cast<Body>(cloth));
 
 
-	for(int i=0;i<1//nbSpheres
-	;i++)
+	for(int i=0;i<1/*nbSpheres*/;i++)
 	{
 		shared_ptr<RigidBody> s(new RigidBody);
 		shared_ptr<AABB> aabb(new AABB);

@@ -9,7 +9,7 @@ class SimpleNarrowCollider : public NarrowCollider
 	public : SimpleNarrowCollider ();
 	public : ~SimpleNarrowCollider ();
 
-	public : bool narrowCollisionPhase(const std::vector<shared_ptr<Body> >& bodies, std::list<shared_ptr<Interaction> >& interactions);
+	public : void narrowCollisionPhase(Body* body);
 
 	public : void processAttributes();
 	public : void registerAttributes();

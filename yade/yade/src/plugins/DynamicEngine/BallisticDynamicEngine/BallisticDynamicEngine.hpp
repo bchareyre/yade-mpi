@@ -17,7 +17,7 @@ class BallisticDynamicEngine : public DynamicEngine
 	public : void processAttributes();
 	public : void registerAttributes();
 
-	public : void respondToCollisions(Body* body, const std::list<shared_ptr<Interaction> >& interactions);
+	public : void respondToCollisions(Body* body);
 	REGISTER_CLASS_NAME(BallisticDynamicEngine);
 };
 

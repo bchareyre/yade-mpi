@@ -27,12 +27,12 @@ void MassSpringBody2RigidBodyDynamicEngine::registerAttributes()
 }
 
 
-void MassSpringBody2RigidBodyDynamicEngine::respondToCollisions(Body * body, const std::list<shared_ptr<Interaction> >& interactions)
+void MassSpringBody2RigidBodyDynamicEngine::respondToCollisions(Body * body)
 {	
 	NonConnexBody * ncb = dynamic_cast<NonConnexBody*>(body);
 	std::list<shared_ptr<Interaction> > tmpI;
-	list<shared_ptr<Interaction> >::const_iterator ii = interactions.begin();
-	list<shared_ptr<Interaction> >::const_iterator iiEnd = interactions.end();
+	list<shared_ptr<Interaction> >::const_iterator ii = ncb->interactions.begin();
+	list<shared_ptr<Interaction> >::const_iterator iiEnd = ncb->interactions.end();
 	
 	for( ; ii!=iiEnd ; ++ii)
 	{
@@ -68,7 +68,8 @@ void MassSpringBody2RigidBodyDynamicEngine::respondToCollisions(Body * body, con
 
 	shared_ptr<DynamicEngine> de = dynamic_pointer_cast<DynamicEngine>(ClassFactory::instance().createShared("SimpleSpringDynamicEngine"));
 
-	de->respondToCollisions(body,tmpI);
+	//FIXME : this is no more working with the actors system
+	//de->respondToCollisions(body,tmpI);
 
 }
 

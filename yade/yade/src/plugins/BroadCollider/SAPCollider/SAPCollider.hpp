@@ -76,7 +76,7 @@ class SAPCollider : public BroadCollider
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 	// return a list "interactions" of pairs of Body which Bounding volume are in collisions
-	public : int broadCollisionTest(const std::vector<shared_ptr<Body> >& bodies,std::list<shared_ptr<Interaction> >& interactions);
+	public : void broadCollisionTest(Body * body);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -108,25 +108,6 @@ class SAPCollider : public BroadCollider
 
 
 REGISTER_SERIALIZABLE(SAPCollider,false);
-/*
-#ifdef WIN32
-	extern "C"
-	{
-		__declspec(dllexport) BroadCollider * create()
-		{
-			return (BroadCollider*)(new SAPCollider());
-		}
-	}
-#else
-	extern "C"
-	{
-		BroadCollider * create()
-		{
-			return (BroadCollider*)(new SAPCollider());
-		}
 
-		// info() {need min & max func in BV
-	}
-#endif*/
 
 #endif // __SAPCOLLIDER_H__

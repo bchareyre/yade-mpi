@@ -1,6 +1,6 @@
 #include "DynamicEngine.hpp"
 
-DynamicEngine::DynamicEngine() : Serializable()
+DynamicEngine::DynamicEngine() : Actor()
 {
 
 }
@@ -18,4 +18,9 @@ void DynamicEngine::processAttributes()
 void DynamicEngine::registerAttributes()
 {
 
+}
+
+void DynamicEngine::action(Body* b)
+{
+	this->respondToCollisions(b);
 }

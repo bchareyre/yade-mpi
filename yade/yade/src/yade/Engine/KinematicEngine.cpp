@@ -1,7 +1,7 @@
 #include "KinematicEngine.hpp"
 
 
-KinematicEngine::KinematicEngine() : Serializable()
+KinematicEngine::KinematicEngine() : Actor()
 {
 	//startTime = -1;
 	//stopTime = -1;
@@ -24,4 +24,10 @@ void KinematicEngine::processAttributes()
 void KinematicEngine::registerAttributes()
 {
 	REGISTER_ATTRIBUTE(subscribedBodies);
+}
+
+
+void KinematicEngine::action(Body* b)
+{
+	this->moveToNextTimeStep(b);
 }

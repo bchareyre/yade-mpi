@@ -47,10 +47,16 @@ class Contact : public Interaction
 	public : Contact (int i1,int i2);
 	public : virtual ~Contact ();
 	
-};
+	public : void processAttributes();
+	public : void registerAttributes();
 
+	REGISTER_CLASS_NAME(Contact);
+
+};
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+
+REGISTER_SERIALIZABLE(Contact,false);
 
 #endif // __CONTACT_H__
 

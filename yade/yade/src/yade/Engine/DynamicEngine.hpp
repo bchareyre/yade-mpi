@@ -36,9 +36,8 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "Interaction.hpp"
-#include "Serializable.hpp"
+#include "Actor.hpp"
 #include "Vector3.hpp"
-#include "Omega.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -48,28 +47,26 @@ class Body;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-// FIXME : Serializable or Factorable
-class DynamicEngine : public Serializable
+class DynamicEngine : public Actor
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Attributes											///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-	//public : Vector3 gravity;
-
 	// construction
 	public : DynamicEngine ();
 
 	public : virtual ~DynamicEngine ();
 
-	public : void processAttributes();
-	public : void registerAttributes();
+	public : virtual void processAttributes();
+	public : virtual void registerAttributes();
 
-	//public : virtual void respondToCollisions(std::vector<shared_ptr<Body> >& , const std::list<shared_ptr<Interaction> >& ,float ) {};
-	public : virtual void respondToCollisions(Body * , const std::list<shared_ptr<Interaction> >& ) {};
+	//public : virtual bool isActivated();
+	public : virtual void action(Body* b);
+	public : virtual void respondToCollisions(Body* ) { throw; };
 
-	public : virtual string getInteractionGeometryName() { return "";};
+	//public : virtual string getInteractionGeometryName() { return "";};
 
 	REGISTER_CLASS_NAME(DynamicEngine);
 

@@ -1,6 +1,7 @@
 #include "Rotor.hpp"
 #include "RigidBody.hpp"
 #include "Constants.hpp"
+#include "NonConnexBody.hpp"
 
 Rotor::Rotor () : KinematicEngine() // encapsuler dans implicitfunction user redefini uniquement dp = || interpolateur ...
 {
@@ -21,8 +22,12 @@ void Rotor::registerAttributes()
 	KinematicEngine::registerAttributes();
 }
 
-void Rotor::moveToNextTimeStep(std::vector<shared_ptr<Body> >& bodies)
+void Rotor::moveToNextTimeStep(Body * body)
 {
+	
+	NonConnexBody * ncb = dynamic_cast<NonConnexBody*>(body);
+	vector<shared_ptr<Body> >& bodies = ncb->bodies;
+
 	std::vector<int>::const_iterator ii = subscribedBodies.begin();
 	std::vector<int>::const_iterator iiEnd = subscribedBodies.end();
 

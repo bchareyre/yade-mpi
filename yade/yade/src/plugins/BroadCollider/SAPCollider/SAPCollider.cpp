@@ -1,6 +1,7 @@
 #include "SAPCollider.hpp"
 #include "Body.hpp"
 #include "Contact.hpp"
+#include "NonConnexBody.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -64,8 +65,12 @@ void SAPCollider::registerAttributes()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-int SAPCollider::broadCollisionTest(const std::vector<shared_ptr<Body> >& bodies,std::list<shared_ptr<Interaction> >& interactions)
+void SAPCollider::broadCollisionTest(Body* body)
 {
+	
+	NonConnexBody * ncb = dynamic_cast<NonConnexBody*>(body);
+	vector<shared_ptr<Body> >& bodies = ncb->bodies;
+
 	unsigned int i;
 
 	// Updates the minimums and maximums arrays according to the new center and radius of the spheres
@@ -103,7 +108,7 @@ int SAPCollider::broadCollisionTest(const std::vector<shared_ptr<Body> >& bodies
 		delete (*ci)->interactionGeometry;
 		delete (*ci);
 	}*/
-	interactions.clear();
+	ncb->interactions.clear();
 	
 	nbPotentialCollisions = 0;
 	for(i=0;i<nbObjects;i++)
@@ -115,12 +120,10 @@ int SAPCollider::broadCollisionTest(const std::vector<shared_ptr<Body> >& bodies
 			if (!(bodies[i]->isDynamic==false && bodies[*it]->isDynamic==false))
 			{
 				nbPotentialCollisions++;
-				interactions.push_back(shared_ptr<Interaction>(new Contact(i,*it)));
+				ncb->interactions.push_back(shared_ptr<Interaction>(new Contact(i,*it)));
 			}
 		}
 	} 
-	  	
-	return nbPotentialCollisions;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

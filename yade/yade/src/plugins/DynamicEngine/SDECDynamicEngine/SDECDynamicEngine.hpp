@@ -80,9 +80,9 @@ class SDECDynamicEngine : public DynamicEngine
 	public : void processAttributes();
 	public : void registerAttributes();
 
-	public : void respondToCollisions(Body* body, const std::list<shared_ptr<Interaction> >& interactions);
-
-	public : void filter(Body* body, const std::list<shared_ptr<Interaction> >& interactions);
+	public : void respondToCollisions(Body* body);
+	
+	public : void filter(Body* body);
 	REGISTER_CLASS_NAME(SDECDynamicEngine);
 };
 

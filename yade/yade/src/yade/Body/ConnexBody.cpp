@@ -61,9 +61,9 @@ void ConnexBody::registerAttributes()
 
 void ConnexBody::moveToNextTimeStep()
 {
-	if (dynamic!=0)
-	{	
-		std::list<shared_ptr<Interaction> > interactions;
-		dynamic->respondToCollisions(this,interactions);
-	}
+	vector<shared_ptr<Actor> >::iterator ai    = actors.begin();
+	vector<shared_ptr<Actor> >::iterator aiEnd =  actors.end();
+	for(;ai!=aiEnd;++ai)
+		if ((*ai)->isActivated())
+			(*ai)->action(this);
 }

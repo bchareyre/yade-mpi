@@ -34,14 +34,22 @@ void BoxStack::registerAttributes()
 void BoxStack::exec()
 {
 	shared_ptr<NonConnexBody> rootBody(new NonConnexBody);
-	int nbSpheres = 10;
 	int nbBox = 0;
 	Quaternion q;
 	q.fromAngleAxis(0, Vector3(0,0,1));
 	
-	rootBody->dynamic	   = shared_ptr<DynamicEngine>(new SimpleSpringDynamicEngine);
-	rootBody->broadCollider		= shared_ptr<BroadCollider>(new SAPCollider);
-	rootBody->narrowCollider	= shared_ptr<NarrowCollider>(new SimpleNarrowCollider);
+	shared_ptr<NarrowCollider> nc	= shared_ptr<NarrowCollider>(new SimpleNarrowCollider);
+	nc->addCollisionFunctor("Box","Box","Box2Box4ClosestFearures");
+	
+
+
+	rootBody->actors.resize(3);
+	rootBody->actors[0] 		= shared_ptr<Actor>(new SAPCollider);
+	rootBody->actors[1] 		= nc;
+	rootBody->actors[2] 		= shared_ptr<Actor>(new SimpleSpringDynamicEngine);
+
+
+
 	rootBody->isDynamic      = false;
 	rootBody->velocity       = Vector3(0,0,0);
 	rootBody->angularVelocity= Vector3(0,0,0);
@@ -80,10 +88,12 @@ void BoxStack::exec()
 			shared_ptr<RigidBody> boxi(new RigidBody);
 			aabb=shared_ptr<AABB>(new AABB);
 			box=shared_ptr<Box>(new Box);
-			shared_ptr<BallisticDynamicEngine> ballistic(new BallisticDynamicEngine);
 			Vector3 size = Vector3(4,4,4);
+			
+			shared_ptr<BallisticDynamicEngine> ballistic(new BallisticDynamicEngine);
 			ballistic->damping 	= 0.95;
-			boxi->dynamic		= dynamic_pointer_cast<DynamicEngine>(ballistic);
+			boxi->actors.push_back(ballistic);
+		
 			boxi->isDynamic		= true;
 			boxi->angularVelocity	= Vector3(0,0,0);
 			boxi->velocity		= Vector3(0,0,0);

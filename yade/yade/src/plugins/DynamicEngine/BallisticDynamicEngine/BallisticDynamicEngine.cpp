@@ -25,7 +25,7 @@ void BallisticDynamicEngine::registerAttributes()
 }
 
 
-void BallisticDynamicEngine::respondToCollisions(Body * body, const std::list<shared_ptr<Interaction> >& interactions)
+void BallisticDynamicEngine::respondToCollisions(Body * body)
 {
 	RigidBody * rb = dynamic_cast<RigidBody*>(body);
 

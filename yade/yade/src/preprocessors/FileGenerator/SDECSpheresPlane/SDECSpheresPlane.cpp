@@ -13,6 +13,8 @@
 #include "IOManager.hpp"
 #include "SDECDynamicEngine.hpp"
 #include "SDECDiscreteElement.hpp"
+#include "SDECPermanentLink.hpp"
+#include "Contact.hpp"
 
 SDECSpheresPlane::SDECSpheresPlane () : Serializable()
 {
@@ -39,20 +41,23 @@ void SDECSpheresPlane::exec()
 	Quaternion q;
 	q.fromAngleAxis(0, Vector3(0,0,1));
 
-	rootBody->dynamic		= shared_ptr<DynamicEngine>(new SDECDynamicEngine);
-	//rootBody->kinematic		= shared_ptr<KinematicEngine>(new Rotor);
-	rootBody->broadCollider		= shared_ptr<BroadCollider>(new SAPCollider);
-	rootBody->narrowCollider	= shared_ptr<NarrowCollider>(new SimpleNarrowCollider);
+	shared_ptr<NarrowCollider> nc	= shared_ptr<NarrowCollider>(new SimpleNarrowCollider);
+	nc->addCollisionFunctor("Sphere","Sphere","Sphere2Sphere4SDECContactModel");
+	nc->addCollisionFunctor("Sphere","Box","Box2Sphere4SDECContactModel");
+	
+	rootBody->actors.resize(3);
+	rootBody->actors[0] 		= shared_ptr<Actor>(new SAPCollider);
+	rootBody->actors[1] 		= nc;
+	rootBody->actors[2] 		= shared_ptr<Actor>(new SDECDynamicEngine);
+	
+	rootBody->permanentInteractions.resize(1);
+	rootBody->permanentInteractions[0] = shared_ptr<Contact>(new Contact);
+	rootBody->permanentInteractions[0]->interactionGeometry = shared_ptr<SDECPermanentLink>(new SDECPermanentLink);
 
-	rootBody->narrowCollider->addCollisionFunctor("Sphere","Sphere","Sphere2Sphere4SDECContactModel");
-	rootBody->narrowCollider->addCollisionFunctor("Sphere","Box","Box2Sphere4SDECContactModel");
 	rootBody->isDynamic		= false;
 	rootBody->velocity		= Vector3(0,0,0);
 	rootBody->angularVelocity	= Vector3(0,0,0);
 	rootBody->se3			= Se3(Vector3(0,0,0),q);
-
-	//for(int i=0;i<7;i++)
-	//	rootBody->kinematic->subscribedBodies.push_back(i);
 
 	shared_ptr<AABB> aabb;
 	shared_ptr<Box> box;
@@ -98,7 +103,8 @@ void SDECSpheresPlane::exec()
 
 		shared_ptr<BallisticDynamicEngine> ballistic(new BallisticDynamicEngine);
 		ballistic->damping 	= 1.0;//0.95;
-		s->dynamic		= dynamic_pointer_cast<DynamicEngine>(ballistic);
+		s->actors.push_back(ballistic);
+		
 		s->isDynamic		= true;
 		s->angularVelocity	= Vector3(0,0,0);
 		s->velocity		= Vector3(0,0,0);
@@ -122,6 +128,7 @@ void SDECSpheresPlane::exec()
 
 		rootBody->bodies.push_back(dynamic_pointer_cast<Body>(s));
 	}
+
 
 	IOManager::saveToFile("XMLManager", "../data/SDECSpheresPlane.xml", "rootBody", rootBody);
 }

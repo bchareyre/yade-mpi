@@ -28,6 +28,7 @@
 #include "SDECDynamicEngine.hpp"
 #include "SDECDiscreteElement.hpp"
 #include "SDECContactModel.hpp"
+#include "SDECPermanentLink.hpp"
 #include "Omega.hpp"
 #include "Contact.hpp"
 #include "NonConnexBody.hpp"
@@ -69,8 +70,8 @@ void SDECDynamicEngine::registerAttributes()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-void SDECDynamicEngine::filter(Body* body,const std::list<shared_ptr<Interaction> >& interactions)
+// FIXME : remove std::list<shared_ptr<Interaction> >& interactions
+void SDECDynamicEngine::filter(Body* body)
 {
 
 	NonConnexBody * ncb = dynamic_cast<NonConnexBody*>(body);
@@ -99,8 +100,8 @@ void SDECDynamicEngine::filter(Body* body,const std::list<shared_ptr<Interaction
 		}
 	}
 	
-	list<shared_ptr<Interaction> >::const_iterator cti = interactions.begin();
-	list<shared_ptr<Interaction> >::const_iterator ctiEnd = interactions.end();
+	list<shared_ptr<Interaction> >::const_iterator cti = ncb->interactions.begin();
+	list<shared_ptr<Interaction> >::const_iterator ctiEnd = ncb->interactions.end();
 	for( ; cti!=ctiEnd ; ++cti)
 	{
 		shared_ptr<Contact> contact = static_pointer_cast<Contact>(*cti);
@@ -146,9 +147,9 @@ void SDECDynamicEngine::filter(Body* body,const std::list<shared_ptr<Interaction
 }
 
 //FIXME : add reset function so it will remove bool first
-void SDECDynamicEngine::respondToCollisions(Body* body, const std::list<shared_ptr<Interaction> >& interactions)
+void SDECDynamicEngine::respondToCollisions(Body* body)
 {
-	filter(body,interactions);
+	filter(body);
 
 	NonConnexBody * ncb = dynamic_cast<NonConnexBody*>(body);
 	vector<shared_ptr<Body> >& bodies = ncb->bodies;
@@ -166,8 +167,105 @@ void SDECDynamicEngine::respondToCollisions(Body* body, const std::list<shared_p
 	fill(forces.begin(),forces.end(),Vector3(0,0,0));
 	fill(moments.begin(),moments.end(),Vector3(0,0,0));
 
-	std::list<shared_ptr<Interaction> >::const_iterator cti = interactions.begin();
-	std::list<shared_ptr<Interaction> >::const_iterator ctiEnd = interactions.end();
+
+
+	
+	std::vector<shared_ptr<Interaction> >::const_iterator pii = ncb->permanentInteractions.begin();
+	std::vector<shared_ptr<Interaction> >::const_iterator piiEnd = ncb->permanentInteractions.end();
+	for( ; pii!=piiEnd ; ++pii)
+	{
+
+		shared_ptr<Contact> contact = static_pointer_cast<Contact>(*pii);
+
+		int id1 = contact->id1;
+		int id2 = contact->id2;
+
+		/// FIXME : those lines are too dirty !
+		bool accessed = false;
+		int tmpId1,tmpId2;
+		if (id1>=id2)
+		{
+			tmpId1 = id2;
+			tmpId2 = id1;
+		}
+		else
+		{
+			tmpId1 = id1;
+			tmpId2 = id2;
+		}
+
+		tuple<int,bool,shared_ptr<InteractionGeometry> > t(tmpId2,accessed,(*pii)->interactionGeometry);
+		interactionsPerBody[tmpId1].erase(t);
+
+		std::list<shared_ptr<Interaction> >::iterator cti = ncb->interactions.begin();
+		std::list<shared_ptr<Interaction> >::iterator ctiEnd = ncb->interactions.end();
+		for( ; cti!=ctiEnd ; ++cti)
+		{
+			shared_ptr<Contact> contact = static_pointer_cast<Contact>(*cti);
+			if ((contact->id1==id1 && contact->id2==id2) || (contact->id1==id2 && contact->id2==id1))
+			{
+				ncb->interactions.erase(cti);
+				cti=ctiEnd;
+			}
+		}
+		
+		///////////////////
+		
+		
+		shared_ptr<SDECDiscreteElement> de1 	= dynamic_pointer_cast<SDECDiscreteElement>(bodies[id1]);
+		shared_ptr<SDECDiscreteElement> de2 	= dynamic_pointer_cast<SDECDiscreteElement>(bodies[id2]);
+		shared_ptr<SDECPermanentLink> currentContact = dynamic_pointer_cast<SDECPermanentLink>(contact->interactionGeometry);
+	
+		// FIXME : put these lines into another dynlib
+		currentContact->kn = currentContact->initialKn;
+		currentContact->ks = currentContact->initialKs;
+		currentContact->equilibriumDistance = currentContact->initialEquilibriumDistance;		
+//cout << currentContact->initialEquilibriumDistance << "  !!  ";
+	
+		float un 			= currentContact->initialEquilibriumDistance-(de1->se3.translation-de1->se3.translation).length();
+//cout << un << "  !!  ";
+		currentContact->contactPoint	= de1->se3.translation+(currentContact->radius1-0.5*-un)*currentContact->normalForce;
+//cout << currentContact->contactPoint << "  !!  "<<endl;
+
+		currentContact->normalForce	= currentContact->kn*un*currentContact->normal;
+
+		Vector3 nn 			= currentContact->prevNormal.cross(currentContact->normal);		
+		currentContact->shearForce     -= currentContact->shearForce.cross(nn);
+		float a 			= dt*0.5*currentContact->normal.dot(de1->angularVelocity+de2->angularVelocity);
+		Vector3 axis 			= a*currentContact->normal;
+		currentContact->shearForce     -= currentContact->shearForce.cross(axis);
+		
+		Vector3 x	= currentContact->contactPoint; // FIXME : it's now a penetration depth, but with initialized conditions it won't be
+		Vector3 c1x	= (x - de1->se3.translation);
+		Vector3 c2x	= (x - de2->se3.translation);
+
+		Vector3 relativeVelocity 	= (de2->velocity+de2->angularVelocity.cross(c2x)) - (de1->velocity+de1->angularVelocity.cross(c1x));
+		Vector3 shearVelocity		= relativeVelocity-currentContact->normal.dot(relativeVelocity)*currentContact->normal;
+		Vector3 shearDisplacement	= shearVelocity*dt;
+		currentContact->shearForce      -=  currentContact->ks*shearDisplacement;
+		
+		Vector3 f = currentContact->normalForce + currentContact->shearForce;
+		
+		forces[id1]	-= f;
+		forces[id2]	+= f;
+		moments[id1]	-= c1x.cross(f);
+		moments[id2]	+= c2x.cross(f);
+
+		currentContact->prevNormal = currentContact->normal;
+
+	}
+
+
+
+
+
+
+	
+
+
+	
+	std::list<shared_ptr<Interaction> >::const_iterator cti = ncb->interactions.begin();
+	std::list<shared_ptr<Interaction> >::const_iterator ctiEnd = ncb->interactions.end();
 	for( ; cti!=ctiEnd ; ++cti)
 	{
 
@@ -225,6 +323,7 @@ void SDECDynamicEngine::respondToCollisions(Body* body, const std::list<shared_p
 
 	}
 
+	
 	for(unsigned int i=0; i < bodies.size(); i++)
         {
 		shared_ptr<SDECDiscreteElement> de = dynamic_pointer_cast<SDECDiscreteElement>(bodies[i]);
@@ -243,7 +342,7 @@ void SDECDynamicEngine::respondToCollisions(Body* body, const std::list<shared_p
 					sign=1;
 				else
 					sign=-1;
-				forces[i][j] -= 0.3*f*sign;
+				forces[i][j] -= 0.1*f*sign;
 			}
 
 
@@ -257,7 +356,7 @@ void SDECDynamicEngine::respondToCollisions(Body* body, const std::list<shared_p
 					sign=1;
 				else
 					sign=-1;
-				moments[i][j] -= 0.3*m*sign;
+				moments[i][j] -= 0.1*m*sign;
 			}
 
 			de->acceleration += forces[i]*de->invMass;

@@ -15,9 +15,10 @@ LIBS += -lSDECDynamicEngine \
         -lBody \
         -lIOManager \
         -lEngine \
+        -lMultiMethods \
+        -lSDECPermanentLink \
         -lGeometry \
         -lInteraction \
-        -lMultiMethods \
         -rdynamic 
 INCLUDEPATH = ../../../plugins/DynamicEngine/SDECDynamicEngine \
               ../../../plugins/DynamicEngine/BallisticDynamicEngine \
@@ -28,6 +29,7 @@ INCLUDEPATH = ../../../plugins/DynamicEngine/SDECDynamicEngine \
               ../../../plugins/GeometricalModel/Box \
               ../../../plugins/GeometricalModel/Sphere \
               ../../../plugins/BoundingVolume/AABB \
+              ../../../plugins/InteractionModel/SDECPermanentLink \
               ../../../yade/yade \
               ../../../yade/Body \
               ../../../yade/Engine \
@@ -53,12 +55,13 @@ QMAKE_LIBDIR = ../../../plugins/DynamicEngine/SDECDynamicEngine/$(YADEDYNLIBPATH
                ../../../yade/Body/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/IOManager/$(YADEDYNLIBPATH) \
                ../../../yade/Engine/$(YADEDYNLIBPATH) \
+               ../../../yade/MultiMethods/$(YADEDYNLIBPATH) \
+               ../../../plugins/InteractionModel/SDECPermanentLink/$(YADEDYNLIBPATH) \
                ../../../yade/Geometry/$(YADEDYNLIBPATH) \
                ../../../yade/Interaction/$(YADEDYNLIBPATH) \
-               ../../../yade/MultiMethods/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
-CONFIG += release \
+CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 

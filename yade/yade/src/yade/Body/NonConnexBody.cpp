@@ -48,11 +48,12 @@ void NonConnexBody::processAttributes()
 void NonConnexBody::registerAttributes()
 {
 	Body::registerAttributes();
+	
 	REGISTER_ATTRIBUTE(bodies);
-
-	REGISTER_ATTRIBUTE(narrowCollider);
-	REGISTER_ATTRIBUTE(broadCollider);
-	REGISTER_ATTRIBUTE(kinematic);
+//	REGISTER_ATTRIBUTE(narrowCollider);
+//	REGISTER_ATTRIBUTE(broadCollider);
+//	REGISTER_ATTRIBUTE(kinematic);
+	REGISTER_ATTRIBUTE(permanentInteractions);
 }
 
 void NonConnexBody::updateBoundingVolume(Se3& se3)
@@ -68,34 +69,29 @@ void NonConnexBody::updateCollisionGeometry(Se3& )
 
 void NonConnexBody::moveToNextTimeStep()
 {
-	// FIXME : hardcoded nbsubtimestep !
+
+	vector<shared_ptr<Actor> >::iterator ai    = actors.begin();
+	vector<shared_ptr<Actor> >::iterator aiEnd =  actors.end();
+	for(;ai!=aiEnd;++ai)
+		if ((*ai)->isActivated())
+			(*ai)->action(this);
 
 // FIND INTERACTIONS
 	// serach for potential collision (maybe in to steps for hierarchical simulation)
-	if (broadCollider!=0)
-//		broadInteractor->broadInteractionTest(bodies,interactions);
-		broadCollider->broadCollisionTest(bodies,interactions);
-
+//	if (broadCollider!=0)
+//		broadCollider->broadCollisionTest(bodies,interactions);
 	// this has to split the contact list into several constact list according to the physical type
 	// (RigidBody,FEMBody ...) of colliding body
-	if (narrowCollider!=0)
-//		narrowInteractor->narrowInteractionPhase(bodies,interactions);
-		narrowCollider->narrowCollisionPhase(bodies,interactions);
-
+//	if (narrowCollider!=0)
+//		narrowCollider->narrowCollisionPhase(bodies,interactions);
 // MOTION
 	// for each contact list we call the correct dynamic engine
-	if (dynamic!=0)
-//		dynamic->respondToInteractions(this,interactions); //effectiveDt == dynamic->...
-		dynamic->respondToCollisions(this,interactions); //effectiveDt == dynamic->...
+	//if (dynamic!=0)
+	//	dynamic->respondToCollisions(this,interactions); //effectiveDt == dynamic->...
+	//if (kinematic!=0)
+	//	kinematic->moveToNextTimeStep(bodies);
 
-	// we call each kinematic engine one after the other
-	if (kinematic!=0)
-		kinematic->moveToNextTimeStep(bodies);
-
-	//for each body call its dynamic internal engine
-
-	// maybe use internal engine as an dynamic engine et kinematic engine
-	
+	// FIXME : do we need to walk through the tree of objects in a different way than below ??	
 	for(unsigned int i=0;i<bodies.size();i++)
 		bodies[i]->moveToNextTimeStep();
 

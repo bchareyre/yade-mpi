@@ -1,6 +1,6 @@
 #include "NarrowCollider.hpp"
 
-NarrowCollider::NarrowCollider () : Serializable()
+NarrowCollider::NarrowCollider () : Actor()
 {
 }
 
@@ -28,4 +28,10 @@ void NarrowCollider::addCollisionFunctor(const string& str1,const string& str2,c
 	v.push_back(str2);
 	v.push_back(str3);
 	collisionFunctors.push_back(v);
+}
+
+
+void NarrowCollider::action(Body* b)
+{
+	this->narrowCollisionPhase(b);
 }

@@ -25,7 +25,7 @@ void SimpleSpringDynamicEngine::registerAttributes()
 }
 
 
-void SimpleSpringDynamicEngine::respondToCollisions(Body * body, const std::list<shared_ptr<Interaction> >& interactions)
+void SimpleSpringDynamicEngine::respondToCollisions(Body * body)
 {
 
 	//float dt = Omega::instance().dt;
@@ -46,8 +46,8 @@ void SimpleSpringDynamicEngine::respondToCollisions(Body * body, const std::list
 	fill(forces.begin(),forces.end(),Vector3(0,0,0));
 	fill(couples.begin(),couples.end(),Vector3(0,0,0));
 
-	std::list<shared_ptr<Interaction> >::const_iterator cti = interactions.begin();
-	std::list<shared_ptr<Interaction> >::const_iterator ctiEnd = interactions.end();
+	std::list<shared_ptr<Interaction> >::const_iterator cti = ncb->interactions.begin();
+	std::list<shared_ptr<Interaction> >::const_iterator ctiEnd = ncb->interactions.end();
 	for( ; cti!=ctiEnd ; ++cti)
 	{
 		shared_ptr<Contact> contact = static_pointer_cast<Contact>(*cti);

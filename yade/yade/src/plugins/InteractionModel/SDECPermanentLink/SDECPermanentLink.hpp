@@ -1,12 +1,12 @@
-#ifndef __SDECCONTACTMODEL_H__
-#define __SDECCONTACTMODEL_H__
+#ifndef __SDECCPERMANENTLINK_H__
+#define __SDECCPERMANENTLINK_H__
 
 #include <vector>
 
 #include "InteractionGeometry.hpp"
 #include "Vector3.hpp"
 
-class SDECContactModel : public InteractionGeometry
+class SDECPermanentLink : public InteractionGeometry
 {
 	public : float radius1;
 	public : float radius2;
@@ -16,6 +16,10 @@ class SDECContactModel : public InteractionGeometry
 
 	public : float kn;				// normal elastic constant.
 	public : float ks;				// shear elastic constant.
+	
+	public : float knMax;
+	public : float ksMax;
+
 	public : float initialKn;			// initial normal elastic constant.
 	public : float initialKs;			// initial shear elastic constant.
 	public : float equilibriumDistance;		// equilibrium distance
@@ -25,15 +29,15 @@ class SDECContactModel : public InteractionGeometry
 	public : Vector3 shearForce;			// shear force applied on a DE
 
 	// construction
-	public : SDECContactModel ();
-	public : ~SDECContactModel ();
+	public : SDECPermanentLink ();
+	public : ~SDECPermanentLink ();
 
 	public : void processAttributes();
 	public : void registerAttributes();
 
-	REGISTER_CLASS_NAME(SDECContactModel);
+	REGISTER_CLASS_NAME(SDECPermanentLink);
 };
 
-REGISTER_SERIALIZABLE(SDECContactModel,false);
+REGISTER_SERIALIZABLE(SDECPermanentLink,false);
 
-#endif // __SDECCONTACTMODEL_H__
+#endif // __SDECCPERMANENTLINK_H__

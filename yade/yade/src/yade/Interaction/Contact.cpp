@@ -14,3 +14,15 @@ Contact::~Contact ()
 {
 
 }
+
+void Contact::processAttributes()
+{
+
+}
+
+void Contact::registerAttributes()
+{
+	Interaction::registerAttributes();
+	REGISTER_ATTRIBUTE(id1);
+	REGISTER_ATTRIBUTE(id2);
+}

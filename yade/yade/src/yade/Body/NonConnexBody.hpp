@@ -28,9 +28,9 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "Body.hpp"
-#include "BroadCollider.hpp"
-#include "KinematicEngine.hpp"
-#include "NarrowCollider.hpp"
+//#include "BroadCollider.hpp"
+//#include "KinematicEngine.hpp"
+//#include "NarrowCollider.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -38,10 +38,14 @@
 class NonConnexBody : public Body
 {
 	public : vector<shared_ptr<Body> > bodies;
-	public : shared_ptr<NarrowCollider> narrowCollider;
-	public : shared_ptr<BroadCollider> broadCollider;
-	public : shared_ptr<KinematicEngine> kinematic;
 
+	//public : shared_ptr<NarrowCollider> narrowCollider;
+	//public : shared_ptr<BroadCollider> broadCollider;
+	//public : shared_ptr<KinematicEngine> kinematic;
+
+	public : vector<shared_ptr<Interaction> > permanentInteractions;
+
+	
 	// construction
 	public : NonConnexBody ();
 

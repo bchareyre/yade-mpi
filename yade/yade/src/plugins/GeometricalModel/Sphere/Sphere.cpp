@@ -80,7 +80,6 @@ void Sphere::subdivideTriangle(Vector3& v1,Vector3& v2,Vector3& v3, int depth)
 
 	if (depth==0)
 	{
-		float pi3 = 2*Constants::PI/3;
 		Vector3 v = (v1+v2+v3)/3.0;
 		float angle = atan(v[2]/v[0])/v.length();
 

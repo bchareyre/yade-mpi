@@ -14,9 +14,9 @@ UI_DIR = $(YADECOMPILATIONPATH)
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 QMAKE_LIBDIR = $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
-CONFIG += release \
+CONFIG += debug \
           warn_on \
-          staticlib 
+          dll 
 TEMPLATE = lib 
 HEADERS += BoundingVolume.hpp \
            BoundingVolumeAssembly.hpp \

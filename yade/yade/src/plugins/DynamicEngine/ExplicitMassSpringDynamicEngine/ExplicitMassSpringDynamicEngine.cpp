@@ -23,7 +23,7 @@ void ExplicitMassSpringDynamicEngine::registerAttributes()
 }
 
 
-void ExplicitMassSpringDynamicEngine::respondToCollisions(Body * body, const std::list<shared_ptr<Interaction> >&)
+void ExplicitMassSpringDynamicEngine::respondToCollisions(Body * body)
 {
 
 	float dt = Omega::instance().dt;

@@ -26,7 +26,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-Body::Body () : Serializable()//,Indexable()
+Body::Body () : Serializable()
 { 	
 }
 
@@ -51,14 +51,14 @@ void Body::processAttributes()
 
 void Body::registerAttributes()
 {	
-	REGISTER_ATTRIBUTE(isDynamic);
+	REGISTER_ATTRIBUTE(isDynamic); // FIXME : only used for collision : no collision between 2 non dynamic objects
 	REGISTER_ATTRIBUTE(velocity);
 	REGISTER_ATTRIBUTE(angularVelocity);
 	REGISTER_ATTRIBUTE(se3);
 	REGISTER_ATTRIBUTE(bv);
 	REGISTER_ATTRIBUTE(cm);
 	REGISTER_ATTRIBUTE(gm);
-	REGISTER_ATTRIBUTE(dynamic);
+	REGISTER_ATTRIBUTE(actors);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -14,10 +14,12 @@ LIBS += -lSerialization \
         -lGeometry \
         -lInteraction \
         -lMultiMethods \
+        -lSDECPermanentLink \
         -rdynamic 
 INCLUDEPATH = ../../../plugins/Body/SDECDiscreteElement \
               ../../../plugins/Body/RigidBody \
               ../../../plugins/GeometricalModel/Sphere \
+              ../../../plugins/InteractionModel/SDECPermanentLink \
               ../../../plugins/InteractionModel/SDECContactModel \
               ../../../yade/yade \
               ../../../yade/Body \
@@ -42,9 +44,10 @@ QMAKE_LIBDIR = ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../../yade/Geometry/$(YADEDYNLIBPATH) \
                ../../../yade/Interaction/$(YADEDYNLIBPATH) \
                ../../../yade/MultiMethods/$(YADEDYNLIBPATH) \
+               ../../../plugins/InteractionModel/SDECPermanentLink/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
-CONFIG += release \
+CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 

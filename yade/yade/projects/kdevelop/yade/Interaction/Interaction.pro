@@ -5,6 +5,7 @@
 
 LIBS += -rdynamic 
 INCLUDEPATH = ../../yade/yade \
+              ../../yade/Body \
               ../../yade/Geometry \
               ../../yade/MultiMethods \
               ../../yade/Factory \
@@ -15,9 +16,9 @@ UI_DIR = $(YADECOMPILATIONPATH)
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 QMAKE_LIBDIR = $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
-CONFIG += release \
+CONFIG += debug \
           warn_on \
-          staticlib 
+          dll 
 TEMPLATE = lib 
 HEADERS += BroadCollider.hpp \
            Contact.hpp \

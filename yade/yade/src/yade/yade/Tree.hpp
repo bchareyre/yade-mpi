@@ -47,7 +47,7 @@ class Tree
 		levels[0]=root;
 	};
 	
-	public : virtual ~Tree<NodeDataType>() {};
+	public : virtual ~Tree() {};
 	
 	public : inline Node* root()
 	{

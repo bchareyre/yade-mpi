@@ -14,7 +14,7 @@ class MassSpringBody2RigidBodyDynamicEngine : public DynamicEngine
 	public : void registerAttributes();
 
 	//public : void respondToCollisions(std::vector<shared_ptr<Body> >& bodies, const std::list<shared_ptr<Interaction> >& interactions,float dt);
-	public : void respondToCollisions(Body* body, const std::list<shared_ptr<Interaction> >& interactions);
+	public : void respondToCollisions(Body* body);
 	REGISTER_CLASS_NAME(MassSpringBody2RigidBodyDynamicEngine);
 };
 

@@ -1,7 +1,7 @@
 #include "BroadCollider.hpp"
 
 
-BroadCollider::BroadCollider () : Serializable()
+BroadCollider::BroadCollider () : Actor()
 {
 }
 	
@@ -19,4 +19,9 @@ void BroadCollider::processAttributes()
 void BroadCollider::registerAttributes()
 {
 
+}
+
+void BroadCollider::action(Body* b)
+{
+	this->broadCollisionTest(b);
 }
