@@ -11,14 +11,15 @@ class SDECPermanentLink : public InteractionGeometry
 	public : float radius1;
 	public : float radius2;
 	public : Vector3 normal;			// new unit normal of the contact plane.
-	public : float penetrationDepth;
-	public : Vector3 contactPoint;
+	//public : float penetrationDepth;
+	//public : Vector3 contactPoint;
 
 	public : float kn;				// normal elastic constant.
 	public : float ks;				// shear elastic constant.
 	
 	public : float knMax;
 	public : float ksMax;
+	public : float thetar;
 
 	public : float initialKn;			// initial normal elastic constant.
 	public : float initialKs;			// initial shear elastic constant.

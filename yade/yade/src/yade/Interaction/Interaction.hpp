@@ -47,6 +47,8 @@ class Interaction : public Serializable
 	//vector<shared_ptr<Body> >
 	
 	public : shared_ptr<InteractionGeometry> interactionGeometry;
+
+	// FIXME : put it into InteractionPhysics
 	public : bool isNew;
 	
 	// construction

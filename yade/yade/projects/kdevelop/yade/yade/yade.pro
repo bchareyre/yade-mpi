@@ -8,7 +8,8 @@ HEADERS += Chrono.hpp \
            Singleton.hpp \
            Tree.hpp \
            Types.hpp \
-           Actor.hpp 
+           Actor.hpp \
+           ActorParameter.hpp 
 SOURCES += Chrono.cpp \
            Omega.cpp \
            yade.cpp 

@@ -20,7 +20,7 @@
 				<permanentInteractions[0] className="Contact" >
 					<permanentInteractions[0] id1="2" id2="1">
 						<interactionGeometry className="SDECPermanentLink" >
-							<interactionGeometry initialKn="500000" initialKs="500000" initialEquilibriumDistance="5.8" normal="{-1 0 0}" radius1="3" radius2="3" knMax="75000" ksMax="7500" />
+							<interactionGeometry initialKn="500000" initialKs="500000" initialEquilibriumDistance="5.8" radius1="3" radius2="3" knMax="75000" ksMax="7500" />
 						</interactionGeometry>
 					</permanentInteractions[0]>
 				</permanentInteractions[0]>

@@ -49,7 +49,9 @@ void RotatingBox::exec()
 	nc->addCollisionFunctor("Sphere","Box","Box2Sphere4SDECContactModel");
 	
 
-	shared_ptr<KinematicEngine> kinematic = shared_ptr<KinematicEngine>(new Rotor);
+	shared_ptr<Rotor> kinematic = shared_ptr<Rotor>(new Rotor);
+	kinematic->angularVelocity  = 0.0785375;
+	
 	for(int i=0;i<7;i++)
 		kinematic->subscribedBodies.push_back(i);
 

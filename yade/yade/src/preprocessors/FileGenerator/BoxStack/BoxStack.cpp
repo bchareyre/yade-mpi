@@ -39,7 +39,7 @@ void BoxStack::exec()
 	q.fromAngleAxis(0, Vector3(0,0,1));
 	
 	shared_ptr<NarrowCollider> nc	= shared_ptr<NarrowCollider>(new SimpleNarrowCollider);
-	nc->addCollisionFunctor("Box","Box","Box2Box4ClosestFearures");
+	nc->addCollisionFunctor("Box","Box","Box2Box4ClosestFeatures");
 	
 
 

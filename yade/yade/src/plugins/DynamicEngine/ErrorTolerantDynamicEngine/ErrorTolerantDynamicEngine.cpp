@@ -23,7 +23,18 @@
 
 #include "ErrorTolerantDynamicEngine.hpp"
 #include "RigidBody.hpp"
+#include "NonConnexBody.hpp"
 #include "ErrorTolerantContactModel.hpp"
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+#include <boost/numeric/ublas/vector.hpp>
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+using namespace boost::numeric;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -62,8 +73,26 @@ void ErrorTolerantDynamicEngine::registerAttributes()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-void ErrorTolerantDynamicEngine::respondToCollisions(Body* body, const std::list<shared_ptr<Interaction> >& interactions)
+void ErrorTolerantDynamicEngine::respondToCollisions(Body* body)
 {
+
+	NonConnexBody * ncb = dynamic_cast<NonConnexBody*>(body);
+	vector<shared_ptr<Body> >& bodies = ncb->bodies;
+
+	ublas::vector<float> masses(6*bodies.size());
+	for(unsigned int i=0;i<bodies.size();i++)
+	{
+		int offset = 6*i;
+		shared_ptr<RigidBody> rb = dynamic_pointer_cast<RigidBody>(bodies[i]);
+		masses(offset++) = rb->invMass;
+		masses(offset++) = rb->invMass;
+		masses(offset++) = rb->invMass;
+		masses(offset++) = rb->invInertia[0];
+		masses(offset++) = rb->invInertia[1];
+		masses(offset++) = rb->invInertia[2];
+	}
+
+
 
 }
 

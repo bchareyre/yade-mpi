@@ -167,6 +167,13 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 	fill(forces.begin(),forces.end(),Vector3(0,0,0));
 	fill(moments.begin(),moments.end(),Vector3(0,0,0));
 
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// Permanents Links													///
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	static bool first = true;
 	std::vector<shared_ptr<Interaction> >::const_iterator pii = ncb->permanentInteractions.begin();
 	std::vector<shared_ptr<Interaction> >::const_iterator piiEnd = ncb->permanentInteractions.end();
 	for( ; pii!=piiEnd ; ++pii)
@@ -215,14 +222,15 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 		shared_ptr<SDECPermanentLink> currentContact	= dynamic_pointer_cast<SDECPermanentLink>(contact->interactionGeometry);
 
 		/// FIXME : put these lines into another dynlib
-		currentContact->kn = currentContact->initialKn;
-		currentContact->ks = currentContact->initialKs;
-		currentContact->equilibriumDistance = currentContact->initialEquilibriumDistance;
+		currentContact->kn 			= currentContact->initialKn;
+		currentContact->ks 			= currentContact->initialKs;
+		currentContact->equilibriumDistance 	= currentContact->initialEquilibriumDistance;
+		currentContact->normal 			= (de2->se3.translation-de1->se3.translation).normalize();
+		float un 				= currentContact->equilibriumDistance-(de2->se3.translation-de1->se3.translation).length();
+		currentContact->normalForce		= currentContact->kn*un*currentContact->normal;
 
-		float un 			= currentContact->equilibriumDistance-(de2->se3.translation-de1->se3.translation).length();
-		currentContact->contactPoint	= de1->se3.translation+(currentContact->radius1-0.5*un)*currentContact->normal;
-		currentContact->normalForce	= currentContact->kn*un*currentContact->normal;
-
+		if (first)
+			currentContact->prevNormal = currentContact->normal;
 
 		Vector3 axis;
 		float angle;
@@ -259,7 +267,9 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 /// 							 ///
 ////////////////////////////////////////////////////////////
 
-		Vector3 x	= currentContact->contactPoint; // FIXME : it's now a penetration depth, but with initialized conditions it won't be
+		Vector3 x	= de1->se3.translation+(currentContact->radius1-0.5*un)*currentContact->normal;
+		//Vector3 x	= (de1->se3.translation+de2->se3.translation)*0.5;
+		//cout << currentContact->contactPoint << " || " << (de1->se3.translation+de2->se3.translation)*0.5 << endl;
 		Vector3 c1x	= (x - de1->se3.translation);
 		Vector3 c2x	= (x - de2->se3.translation);
 
@@ -270,21 +280,36 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 
 		Vector3 f = currentContact->normalForce + currentContact->shearForce;
 
+		float dBeta = currentContact->prevNormal.dot(currentContact->normal);
+		float dTheta1 = de1->angularVelocity.length()*dt;
+		float dTheta2 = de2->angularVelocity.length()*dt;
+		float da = currentContact->radius1*(dTheta1-dBeta);
+		float db = currentContact->radius2*(dTheta2-dBeta);
+		float dUr = (da-db)*0.5;
+		float dUs = (da+db)*0.5;
+		float r = (currentContact->radius1+currentContact->radius2)*0.5;
+		float dThetar = dUr/r;
+		float kr1 = currentContact->ks*currentContact->radius1*currentContact->radius1;
+		float kr2 = currentContact->ks*currentContact->radius2*currentContact->radius2;
+		float cr1 = kr1/1000;
+		float cr2 = kr2/1000;
+		float thetar = dThetar*dt;
+		
 		forces[id1]	-= f;
 		forces[id2]	+= f;
-		moments[id1]	-= c1x.cross(f);
-		moments[id2]	+= c2x.cross(f);
-
+		moments[id1]	-= c1x.cross(f)/**(-kr1*thetar-cr1*dThetar)*/;
+		moments[id2]	+= c2x.cross(f)/**(-kr2*thetar-cr2*dThetar)*/;
+		
 		currentContact->prevNormal = currentContact->normal;
 
 	}
 
+	first = false;
 
 
-
-
-
-
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// Non Permanents Links												///
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 
@@ -365,18 +390,36 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 
 		Vector3 f = currentContact->normalForce + currentContact->shearForce;
 
+		/*float dBeta = currentContact->prevNormal.dot(currentContact->normal);
+		float dTheta1 = de1->angularVelocity.length()*dt;
+		float dTheta2 = de2->angularVelocity.length()*dt;
+		float da = currentContact->radius1*(dTheta1-dBeta);
+		float db = currentContact->radius2*(dTheta2-dBeta);
+		float dUr = (da-db)*0.5;
+		float dUs = (da+db)*0.5;
+		float r = (currentContact->radius1+currentContact->radius2)*0.5;
+		float dThetar = dUr/r;
+		float kr1 = currentContact->ks*currentContact->radius1*currentContact->radius1;
+		float kr2 = currentContact->ks*currentContact->radius2*currentContact->radius2;
+		float cr1 = kr1/1000;
+		float cr2 = kr2/1000;
+		float thetar = dThetar*dt;*/
+		
 		forces[id1]	-= f;
 		forces[id2]	+= f;
-		moments[id1]	-= c1x.cross(f);
-		moments[id2]	+= c2x.cross(f);
+		moments[id1]	-= c1x.cross(f)/**(-kr1*thetar-cr1*dThetar)*/;
+		moments[id2]	+= c2x.cross(f)/**(-kr2*thetar-cr2*dThetar)*/;
 
 		currentContact->prevNormal = currentContact->normal;
 	}
 
+	
 
-////////////////////////////////////////////////////////////
-/// Damping 	 					 ///
-////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// Damping														///
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 
 	for(unsigned int i=0; i < bodies.size(); i++)
         {
@@ -395,7 +438,7 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 					sign=1;
 				else
 					sign=-1;
-				forces[i][j] -= 0.0*f*sign;
+				forces[i][j] -= 0.1*f*sign;
 			}
 
 			float m = moments[i].length();
@@ -408,7 +451,7 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 					sign=1;
 				else
 					sign=-1;
-				moments[i][j] -= 0.0*m*sign;
+				moments[i][j] -= 0.1*m*sign;
 			}
 
 			de->acceleration += forces[i]*de->invMass;
