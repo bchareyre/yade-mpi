@@ -5,7 +5,7 @@
 
 SUBDIRS += InteractionBox \
            InteractionSphere \
-           InteractionGeometrySet 
+           InteractionDescriptionSet
 MOC_DIR = $(YADECOMPILATIONPATH)
 UI_DIR = $(YADECOMPILATIONPATH)
 OBJECTS_DIR = $(YADECOMPILATIONPATH)

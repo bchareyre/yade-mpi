@@ -3,10 +3,10 @@
 # Subdir relative project main directory: ./plugins/Geometry/BoundingVolumeFactory
 # Target is a subdirs project 
 
-SUBDIRS += Box2AABBFactory \
-           Terrain2AABBFactory \
-           Sphere2AABBFactory \
-           InteractionGeometrySet2AABBFactory 
+SUBDIRS += Box2AABBFunctor \
+           Terrain2AABBFunctor \
+           Sphere2AABBFunctor \
+           InteractionDescriptionSet2AABBFunctor
 MOC_DIR = $(YADECOMPILATIONPATH)
 UI_DIR = $(YADECOMPILATIONPATH)
 OBJECTS_DIR = $(YADECOMPILATIONPATH)
