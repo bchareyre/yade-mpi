@@ -58,8 +58,7 @@ class ThreadSynchronizer
 	
 	public  : ThreadSynchronizer();
 
-	//public  : void startAll();
-	//public  : void stopAll();
+	public  : int getNbThreads();
 	
 	public  : int insertThread();
 	public  : void removeThread(int id);

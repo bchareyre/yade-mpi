@@ -78,6 +78,7 @@ void Threadable<Thread>::finish()
 	boost::mutex mutex;
 	boost::mutex::scoped_lock lock(mutex);
 	*finished = true;
+	*blocked = false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -110,14 +111,20 @@ void Threadable<Thread>::operator()()
 
 				if (!*blocked)
 					oneLoop();
-								
+
 				synchronizer->setNextCurrentThread();
 				
 				synchronizer->signal();
 			}
 		}
-		synchronizer->removeThread(*turn);
-		synchronizer->signal();
+		{
+			boost::mutex::scoped_lock lock(*(synchronizer->getMutex()));
+			while (synchronizer->notMyTurn(*turn))
+				synchronizer->wait(lock);
+			synchronizer->removeThread(*turn);
+			synchronizer->setNextCurrentThread();
+			synchronizer->signal();
+		}
 	}
 	else
 	{

@@ -43,7 +43,7 @@
 
 class YadeQtMainWindow : public YadeQtGeneratedMainWindow
 {
-	protected : shared_ptr<SimulationController> simulationController;
+	protected : SimulationController * simulationController;
 		
 	protected : QWorkspace * workspace;
 		
@@ -63,6 +63,8 @@ class YadeQtMainWindow : public YadeQtGeneratedMainWindow
 	public slots : virtual void fileNewSimulation();
 	public slots : virtual void fileExit();
 	public slots : virtual void dynamicMenuClicked();
+	public slots : virtual void closeSimulationControllerEvent();
+	public slots : virtual void closeEvent(QCloseEvent * evt);
 
 };
 

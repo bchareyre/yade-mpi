@@ -73,6 +73,9 @@ class SimulationController : public QtGeneratedSimulationController
 	public slots : virtual void pbStartClicked();
 	public slots : virtual void pbResetClicked();
 	public slots : virtual void pbCenterSceneClicked();
+	public slots : void closeGLViewEvent(int id);
+
+	private : void terminateAllThreads();
 	
 	protected : void closeEvent(QCloseEvent *evt);
 

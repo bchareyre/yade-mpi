@@ -25,6 +25,7 @@ GLWindow::GLWindow(int minX,int minY, int sizeX,int sizeY)
 	setBackgroundColor(77.0/255.0,238.0/255.0,234.0/255.0);
 	setSelectionColor(1.0,0.0,0.0);
 	setBorderColor(39.0/255.0,119.0/255.0,117.0/255.0);
+	setBorderWidth(2);
 	setWinTranslucenty(1);
 	setThreshold(4);	
 	setMinimumWidth(-1);

@@ -95,6 +95,7 @@
     <slot>fileNewSimulation()</slot>
     <slot>fileExit()</slot>
     <slot>dynamicMenuClicked()</slot>
+    <slot>closeSimulationControllerEvent()</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

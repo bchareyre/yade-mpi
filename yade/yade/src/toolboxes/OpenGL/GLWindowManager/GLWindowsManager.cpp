@@ -19,7 +19,15 @@ GLWindowsManager::GLWindowsManager()
 
 GLWindowsManager::~GLWindowsManager ()
 {
-
+	for(unsigned int i=0;i<windows.size();i++)
+	{
+		delete windows[i];
+		delete subscriptions[i];
+	}
+	windows.clear();
+	subscriptions.clear();
+	order.clear();
+	
 }
 
 void GLWindowsManager::glDraw()

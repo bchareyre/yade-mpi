@@ -38,8 +38,9 @@ ThreadSynchronizer::ThreadSynchronizer() : i(0),prevI(0),nbThreads(0)
 int ThreadSynchronizer::insertThread()
 { 
 	boost::mutex::scoped_lock lock(mutex);	
-	
-	redirectionId.push_back(nbThreads);
+	int id = redirectionId.size();
+	redirectionId.push_back(id);
+	nbThreads++;
 	//FIXME : make that work !	
 // 	int i=0;
 // 	while (i<redirectionId.size() && redirectionId[i]!=-1)
@@ -49,7 +50,7 @@ int ThreadSynchronizer::insertThread()
 // 	else
 // 		redirectionId[i] = nbThreads;
 
-	return nbThreads++;
+	return id;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -57,9 +58,10 @@ int ThreadSynchronizer::insertThread()
 
 void ThreadSynchronizer::removeThread(int id)
 { 
-	boost::mutex::scoped_lock lock(mutex);
+	//boost::mutex::scoped_lock lock(mutex);
 
 	redirectionId[id] = -1;
+	nbThreads--;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -82,9 +84,9 @@ bool ThreadSynchronizer::notMyTurn(int turn)
 
 void ThreadSynchronizer::setNextCurrentThread()
 {
-	i = (i+1)%nbThreads;
+	i = (i+1)%redirectionId.size();
 	while(redirectionId[i] == -1)
-		i = (i+1)%nbThreads;
+		i = (i+1)%redirectionId.size();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -105,3 +107,8 @@ void ThreadSynchronizer::signal()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+int ThreadSynchronizer::getNbThreads()
+{
+	return nbThreads;
+}

@@ -69,7 +69,7 @@ class Omega : public Singleton<Omega>
 	public	: void startSimulationLoop();
 	public	: void stopSimulationLoop();
 	public	: void finishSimulationLoop();
-
+	public : void joinSimulationLoop();
 	public	: shared_ptr<ThreadSynchronizer> synchronizer; // FIXME put private + add function waitMyTuren and finishedMyTurn
 
 //	public : void waitMyTurn(int id); // FIXME put private + add function waitMyTuren and finishedMyTurn

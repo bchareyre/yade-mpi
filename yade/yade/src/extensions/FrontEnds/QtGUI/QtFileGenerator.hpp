@@ -67,6 +67,8 @@ class QtFileGenerator : public QtFileGeneratorController, public Factorable
 	public slots : virtual void cbGeneratorNameActivated(const QString& s);
 	public slots : virtual void pbGenerateClicked(); 
 	public slots : virtual void pbCloseClicked();
+	
+	protected : void closeEvent(QCloseEvent *evt);
 
 };
 

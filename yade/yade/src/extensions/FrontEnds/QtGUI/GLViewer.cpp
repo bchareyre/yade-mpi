@@ -6,9 +6,10 @@
 #include "ThreadSynchronizer.hpp"
 #include "FpsTracker.hpp"
 
-GLViewer::GLViewer(shared_ptr<RenderingEngine> renderer, const QGLFormat& format, QWidget * parent, QGLWidget * shareWidget) : QGLViewer(format,parent,"glview",shareWidget), qglThread(this,renderer)
+GLViewer::GLViewer(int id, shared_ptr<RenderingEngine> renderer, const QGLFormat& format, QWidget * parent, QGLWidget * shareWidget) : QGLViewer(format,parent,"glview",shareWidget), qglThread(this,renderer)
 {
 
+	viewId = id;
 	setAutoBufferSwap(false);
 	resize(320, 240);
 
@@ -20,7 +21,17 @@ GLViewer::GLViewer(shared_ptr<RenderingEngine> renderer, const QGLFormat& format
 
 GLViewer::~GLViewer()
 {
+	
+}
 
+void GLViewer::finishRendering()
+{
+	qglThread.finish();
+}
+
+void GLViewer::joinRendering()
+{
+	qglThread.join();
 }
 
 void GLViewer::centerScene()
@@ -42,12 +53,12 @@ void GLViewer::centerScene()
 	
 void GLViewer::paintGL()
 {
-	//ThreadSafe::cerr("painGL");
+	// Handled by the GLThread.
 }
 
 void GLViewer::updateGL()
 {
-	//ThreadSafe::cerr("updateGL");
+	// Handled by the GLThread.
 }
 void GLViewer::resizeEvent(QResizeEvent *evt)
 {
@@ -59,13 +70,9 @@ void GLViewer::paintEvent(QPaintEvent *)
 	// Handled by the GLThread.
 }
 
-void GLViewer::closeEvent(QCloseEvent *evt)
+void GLViewer::closeEvent(QCloseEvent *)
 {
-	qglThread.finish();
-	qglThread.join();
-	QGLViewer::closeEvent(evt);
-	
-	//destroy();
+	emit closeSignal(viewId);
 }
 
 void GLViewer::mouseMoveEvent(QMouseEvent * e)

@@ -27,7 +27,6 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "QtGUISignalCatcher.h"
 #include "XMLManager.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -39,6 +38,7 @@
 #include <boost/shared_ptr.hpp>
 #include <qobject.h>
 #include <qlabel.h>
+#include <qobject.h>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -53,8 +53,10 @@ using namespace boost;
 
 	
 */
-class QtGUIGenerator : public XMLManager,  public QtGUISignalCatcher
+class QtGUIGenerator : public QObject
 {
+
+	Q_OBJECT
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Attributes											///
@@ -65,6 +67,18 @@ class QtGUIGenerator : public XMLManager,  public QtGUISignalCatcher
 		public : typedef enum {INTEGER,FLOATING,BOOLEAN} AttributeType;
 		
 		public : AttributeDescriptor() { strings.clear();widgets.clear();types.clear();};
+		public : ~AttributeDescriptor()
+		{
+
+			//if (label)
+			//	label->~QLabel();
+			//for(unsigned int i=0;i<widgets.size();i++)
+			//	if (widgets[i])
+			//		delete widgets[i];
+			//strings.clear();
+			//types.clear();
+			//widgets.clear();
+		}
 		public : string name;
 		public : vector<string> strings;
 		public : QLabel* label;

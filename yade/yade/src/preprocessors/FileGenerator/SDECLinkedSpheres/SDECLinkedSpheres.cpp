@@ -146,7 +146,7 @@ void SDECLinkedSpheres::generate()
 	box->diffuseColor	= Vector3f(1,1,1);
 	box->wire		= false;
 	box->visible		= true;
-	box->shadowCaster	= false;
+	box->shadowCaster	= true;
 	box2->cm		= dynamic_pointer_cast<CollisionGeometry>(box);
 	box2->gm		= dynamic_pointer_cast<CollisionGeometry>(box);
 	box2->kn		= 100000;
@@ -174,7 +174,7 @@ void SDECLinkedSpheres::generate()
 	box->diffuseColor	= Vector3f(1,1,1);
 	box->wire		= false;
 	box->visible		= true;
-	box->shadowCaster	= false;
+	box->shadowCaster	= true;
 	box3->cm		= dynamic_pointer_cast<CollisionGeometry>(box);
 	box3->gm		= dynamic_pointer_cast<CollisionGeometry>(box);
 	box3->kn		= 100000;

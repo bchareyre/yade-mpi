@@ -26,7 +26,6 @@ SimulationController::SimulationController(QWidget * parent) : QtGeneratedSimula
 {
 	setMinimumSize(size());
 	setMaximumSize(size());
-	updater = shared_ptr<SimulationControllerUpdater>(new SimulationControllerUpdater(this));
 
 //	while(! renderer )
 // FIXME - what is going on here? it was crashing rabdomly unless I added these lines...
@@ -46,14 +45,31 @@ SimulationController::SimulationController(QWidget * parent) : QtGeneratedSimula
 	{
 		cerr << "renderer not created - why?!\n";
 	}
-
+	
+	updater = shared_ptr<SimulationControllerUpdater>(new SimulationControllerUpdater(this));
 }
 
 SimulationController::~SimulationController()
 {
-
+	terminateAllThreads();
+	
+	for(unsigned int i=0;i<glViews.size();i++)
+		if (glViews[i])
+			delete glViews[i];
+	glViews.clear();
 }
 
+void SimulationController::terminateAllThreads()
+{
+	for(unsigned int i=0;i<glViews.size();i++)
+		if (glViews[i])
+			glViews[i]->finishRendering();
+			
+	updater->finish();
+	Omega::instance().finishSimulationLoop();
+	
+	while (Omega::instance().synchronizer->getNbThreads()!=0);
+}
 
 void SimulationController::pbApplyClicked()
 {
@@ -90,15 +106,12 @@ void SimulationController::pbLoadClicked()
 //		I still have this error, but less often.
 
  		{
-//			boost::mutex resizeMutex; 				// it is already locked.
-//			boost::mutex::scoped_lock lock(resizeMutex);
-
 			QGLFormat format;
 			QGLFormat::setDefaultFormat( format );
 			format.setStencil(TRUE);
 			format.setAlpha(TRUE);
-			glViews.push_back(new GLViewer(renderer,format,this->parentWidget()->parentWidget()));
-			//sleep(1); // FIXME
+			glViews.push_back(new GLViewer(glViews.size(),renderer,format,this->parentWidget()->parentWidget()));
+			connect( glViews.back(), SIGNAL( closeSignal(int) ), this, SLOT( closeGLViewEvent(int) ) );
 		}
 		
 		Omega::instance().setSimulationFileName(fileName);
@@ -123,8 +136,23 @@ void SimulationController::pbNewViewClicked()
 	QGLFormat::setDefaultFormat( format );
 	format.setStencil(TRUE);
 	format.setAlpha(TRUE);
-	glViews.push_back(new GLViewer(renderer, format, this->parentWidget()->parentWidget(), glViews.front()) );		
+	glViews.push_back(new GLViewer(glViews.size(),renderer, format, this->parentWidget()->parentWidget(), glViews.front()) );		
+	connect( glViews.back(), SIGNAL( closeSignal(int) ), this, SLOT( closeGLViewEvent(int) ) );
 	glViews.back()->centerScene();
+}
+
+void SimulationController::closeGLViewEvent(int id)
+{
+	int n = Omega::instance().synchronizer->getNbThreads();
+	
+	for(unsigned int i=0;i<glViews.size();i++)
+		glViews[id]->finishRendering();
+	
+	while (Omega::instance().synchronizer->getNbThreads()!=n-1);
+
+	delete glViews[id];
+	glViews[id] = 0;
+
 }
 
 void SimulationController::pbStopClicked()
@@ -155,20 +183,21 @@ void SimulationController::pbCenterSceneClicked()
 	boost::mutex::scoped_lock lock(resizeMutex);
 	for(unsigned int i=0;i<glViews.size();i++)
 	{
-		if (glViews[i]->isActiveWindow())
-			glViews[i]->centerScene();
+		if (glViews[i])
+			if (glViews[i]->isActiveWindow())
+				glViews[i]->centerScene();
 	}
 }
 
-void SimulationController::closeEvent(QCloseEvent *evt)
+void SimulationController::closeEvent(QCloseEvent *)
 {
-	Omega::instance().finishSimulationLoop();
-	glViews.clear();
-	updater->finish();
-	updater->join();
-	QtGeneratedSimulationController::closeEvent(evt);
-	//destroy();
+	emit closeSignal();
 }
+
+
+
+
+
 
 
 

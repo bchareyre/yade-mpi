@@ -15,6 +15,7 @@ chmod a+x ./makeSymLink
 find ../src/ -name "*.hpp" -exec ./makeSymLink {} \;
 find ../src/ -name "*.cpp" -exec ./makeSymLink {} \;
 find ../src/ -name "*.ui" -exec ./makeSymLink {} \;
+find ../src/ -name "*.cw" -exec ./makeSymLink {} \;
 find ../src/ -name "*.tpp" -exec ./makeSymLink {} \;
 find ../src/ -name "*.ipp" -exec ./makeSymLink {} \;
 

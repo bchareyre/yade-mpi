@@ -40,7 +40,7 @@ using namespace boost;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-QtGUIGenerator::QtGUIGenerator () : XMLManager(), QtGUISignalCatcher()
+QtGUIGenerator::QtGUIGenerator () : QObject()
 {
 
 	resizeHeight = true;
@@ -125,6 +125,10 @@ void QtGUIGenerator::reArrange(QWidget * widget)
 
 void QtGUIGenerator::buildGUI(shared_ptr<Serializable> s,  QWidget * widget)
 {
+
+	XMLManager xmlManager;
+	descriptors.clear();
+	lookUp.clear();
 
 	serializable = s;
 

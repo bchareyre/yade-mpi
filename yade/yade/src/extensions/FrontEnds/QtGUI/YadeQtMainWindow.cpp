@@ -25,13 +25,6 @@ YadeQtMainWindow::YadeQtMainWindow() : YadeQtGeneratedMainWindow()
 	addMenu("Preprocessor");
 	addMenu("Postprocessor");
 	
-	// I commented them, because the are all in QtFileGenerator
- 	//addItem("Preprocessor","HangingCloth");
-	//addItem("Preprocessor","RotatingBox");
-//	addItem("Preprocessor","FEMRock"); 		// not working
-//	addItem("Preprocessor","BoxStack"); 		// not working
-	//addItem("Preprocessor","SDECSpheresPlane");
-	//addItem("Preprocessor","SDECLinkedSpheres");
 	
 	addItem("Preprocessor","QtFileGenerator");
 	createMenus();
@@ -94,15 +87,13 @@ void YadeQtMainWindow::createMenus()
 
 void YadeQtMainWindow::fileNewSimulation()
 {
-
-	simulationController = shared_ptr<SimulationController>(new SimulationController(workspace));
+	simulationController = new SimulationController(workspace);
 	simulationController->show();
+	connect( simulationController, SIGNAL( closeSignal() ), this, SLOT( closeSimulationControllerEvent() ) );
+	fileNewSimulationAction->setEnabled(false);
 }
 
-void YadeQtMainWindow::fileExit()
-{
-	exit(0);
-}
+
 
 void YadeQtMainWindow::dynamicMenuClicked()
 {
@@ -116,4 +107,25 @@ void YadeQtMainWindow::dynamicMenuClicked()
 		widget->reparent(workspace,QPoint(10,10));
 		widget->show();
 	}
+}
+
+
+void YadeQtMainWindow::closeSimulationControllerEvent()
+{
+	delete simulationController;
+	fileNewSimulationAction->setEnabled(true);
+}
+
+void YadeQtMainWindow::fileExit()
+{
+	if (simulationController)
+		delete simulationController;
+	exit(0);
+}
+
+void YadeQtMainWindow::closeEvent(QCloseEvent * evt)
+{
+	if (simulationController)
+		delete simulationController;
+	exit(0);
 }
