@@ -1,7 +1,7 @@
 #ifndef __TERRAIN_H__
 #define __TERRAIN_H__
 
-#include "CollisionModel.hpp"
+#include "CollisionGeometry.hpp"
 
 #include <vector>
 #include <fstream>
@@ -10,7 +10,7 @@
 
 using namespace std;
 
-class Terrain : public CollisionModel
+class Terrain : public CollisionGeometry
 {
 	typedef std::vector<int> tFace;
 
@@ -44,7 +44,7 @@ class Terrain : public CollisionModel
 	private : int nbTriPerCell,nbCells;
 	private : bool pointInTriangle(Vector2 p ,std::vector<Vector2>& tri);
 
-	protected : void buildCollisionModel();
+	protected : void buildCollisionGeometry();
 
 	protected : std::vector<std::vector<std::pair<float,float> > > boundingBoxes;
 	public : std::vector<std::vector<std::vector<int> > > triLists;

@@ -20,7 +20,7 @@ void FEMBody::processAttributes()
 	ConnexBody::processAttributes();
 	
 	//FIXME : when serialization tracks pointers delete it
-	//cm = dynamic_pointer_cast<CollisionModel>(gm);
+	//cm = dynamic_pointer_cast<CollisionGeometry>(gm);
 	gm = cm;
 	
 }
@@ -59,6 +59,6 @@ void FEMBody::updateBoundingVolume(Se3& )
 
 }
 
-void FEMBody::updateCollisionModel(Se3& )
+void FEMBody::updateCollisionGeometry(Se3& )
 {
 }

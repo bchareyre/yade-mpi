@@ -1,11 +1,11 @@
-#include "CollisionModelFactory.hpp"
+#include "CollisionGeometryFactory.hpp"
 
-CollisionModelFactory::CollisionModelFactory() : Factorable()
+CollisionGeometryFactory::CollisionGeometryFactory() : Factorable()
 {
 
 }
 	
-CollisionModelFactory::~CollisionModelFactory()
+CollisionGeometryFactory::~CollisionGeometryFactory()
 {
 
 }

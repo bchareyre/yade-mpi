@@ -28,7 +28,7 @@ void SDECDiscreteElement::registerAttributes()
 	bv->update(se3);
 }
 
-void SDECDiscreteElement::updateCollisionModel(Se3& )
+void SDECDiscreteElement::updateCollisionGeometry(Se3& )
 {
 
 }

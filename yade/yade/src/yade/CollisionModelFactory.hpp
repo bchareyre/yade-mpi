@@ -28,7 +28,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "GeometricalModel.hpp"
-#include "CollisionModel.hpp"
+#include "CollisionGeometry.hpp"
 #include "Serializable.hpp"
 #include "Types.hpp"
 #include "Se3.hpp"
@@ -38,16 +38,16 @@
 
 /*! \brief Abstract interface for all collision model factories.
 	It is used for creating a collision model from a geometrical model during runtime.
-	This is very useful when it is not trivial to build the collision model from the geometrical model. For example if you want to build an sphere tree from a polyhedron, it is not easy to write by hand into the configuration file the center and size of all spheres. Instead you can use a CollisionModelFactory that will compute for you the correct values.
+	This is very useful when it is not trivial to build the collision model from the geometrical model. For example if you want to build an sphere tree from a polyhedron, it is not easy to write by hand into the configuration file the center and size of all spheres. Instead you can use a CollisionGeometryFactory that will compute for you the correct values.
 */
-class CollisionModelFactory : public Factorable
+class CollisionGeometryFactory : public Factorable
 {	
 	
 	// construction
-	public : CollisionModelFactory ();
-	public : virtual ~CollisionModelFactory ();
+	public : CollisionGeometryFactory ();
+	public : virtual ~CollisionGeometryFactory ();
 	
-	public : virtual shared_ptr<CollisionModel> buildCollisionModel(const shared_ptr<GeometricalModel> gm, const Se3& se3) = 0;
+	public : virtual shared_ptr<CollisionGeometry> buildCollisionGeometry(const shared_ptr<GeometricalModel> gm, const Se3& se3) = 0;
 
 };
 

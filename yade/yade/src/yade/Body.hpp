@@ -34,7 +34,7 @@
 
 #include "Se3.hpp"
 #include "GeometricalModel.hpp"
-#include "CollisionModel.hpp"
+#include "CollisionGeometry.hpp"
 #include "BoundingVolume.hpp"
 #include "Interaction.hpp"
 #include "list"
@@ -63,7 +63,7 @@ class Body : public Serializable //,Indexable
 	/*! The geometrical model of this body (polyhedron, box ...) */
 	public : shared_ptr<GeometricalModel> gm;
 	/*! The collision model of this body (sphere hierarchy, box ...) */
-	public : shared_ptr<CollisionModel> cm;
+	public : shared_ptr<CollisionGeometry> cm;
 	/*! The bouding volume of this body (AABB, K-Dop ...) */
 	public : shared_ptr<BoundingVolume> bv;
 
@@ -107,7 +107,7 @@ class Body : public Serializable //,Indexable
 
 	/*! Abstract function overloaded in Connex and NonConnex body. It is called to update the collision model of the object. It is useful if the object is deformable
 	and needs to recompute its collision model */
-	public : virtual void updateCollisionModel(Se3& ) {};
+	public : virtual void updateCollisionGeometry(Se3& ) {};
 
 	/*! Abstract function overloaded in Connex and NonConnex body. Move the body to the next time step using its own internal dynamic engine */
 	public : virtual void moveToNextTimeStep() {};

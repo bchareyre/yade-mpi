@@ -54,7 +54,7 @@ class ConnexBody : public Body
 	public : void registerAttributes();
 
 	public : virtual void updateBoundingVolume(Se3&) {};
-	public : virtual void updateCollisionModel(Se3&) {};
+	public : virtual void updateCollisionGeometry(Se3&) {};
 
 	public : virtual void moveToNextTimeStep();
 

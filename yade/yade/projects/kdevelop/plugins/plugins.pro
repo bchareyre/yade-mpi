@@ -11,10 +11,10 @@ CONFIG += debug \
 TEMPLATE = subdirs 
 SUBDIRS += InteractionModel \
            BoundingVolume \
-           CollisionModel \
+           CollisionGeometry \
            GeometricalModel \
            BoundingVolumeFactory \
-           CollisionModelFactory \
+           CollisionGeometryFactory \
            GeometricalModelFactory \
            NarrowPhaseCollider \
            BroadPhaseCollider \

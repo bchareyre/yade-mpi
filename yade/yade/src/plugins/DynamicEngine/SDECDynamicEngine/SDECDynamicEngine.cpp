@@ -233,7 +233,7 @@ void SDECDynamicEngine::respondToCollisions(Body* body, const std::list<shared_p
 					sign=1;
 				else
 					sign=-1;
-				forces[i][j] -= 0.2*f*sign;
+				forces[i][j] -= 0.3*f*sign;
 			}
 
 
@@ -247,7 +247,7 @@ void SDECDynamicEngine::respondToCollisions(Body* body, const std::list<shared_p
 					sign=1;
 				else
 					sign=-1;
-				moments[i][j] -= 0.2*m*sign;
+				moments[i][j] -= 0.3*m*sign;
 			}
 
 			de->acceleration += forces[i]*de->invMass;

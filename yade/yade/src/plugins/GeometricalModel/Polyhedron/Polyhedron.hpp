@@ -1,9 +1,9 @@
 #ifndef __MESH3D_H__
 #define __MESH3D_H__
 
-#include "CollisionModel.hpp"
+#include "CollisionGeometry.hpp"
 
-class Polyhedron : public CollisionModel
+class Polyhedron : public CollisionGeometry
 {
 	public : string mshFileName;
 
@@ -19,7 +19,7 @@ class Polyhedron : public CollisionModel
 	public : Polyhedron ();
 	public : ~Polyhedron ();
 
-	public : bool collideWith(CollisionModel* collisionModel);
+	public : bool collideWith(CollisionGeometry* collisionModel);
 	public : bool loadFromFile(char * fileName);
 	public : void glDraw();
 	public : void computeNormals();

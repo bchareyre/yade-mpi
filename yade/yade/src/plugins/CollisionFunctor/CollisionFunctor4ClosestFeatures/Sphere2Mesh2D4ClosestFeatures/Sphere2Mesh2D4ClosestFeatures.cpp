@@ -47,7 +47,7 @@ Sphere2Mesh2D4ClosestFeatures::~Sphere2Mesh2D4ClosestFeatures ()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool Sphere2Mesh2D4ClosestFeatures::collide(const shared_ptr<CollisionModel> cm1, const shared_ptr<CollisionModel> cm2, const Se3& se31, const Se3& , shared_ptr<Interaction> c)
+bool Sphere2Mesh2D4ClosestFeatures::collide(const shared_ptr<CollisionGeometry> cm1, const shared_ptr<CollisionGeometry> cm2, const Se3& se31, const Se3& , shared_ptr<Interaction> c)
 {
 
 	shared_ptr<Sphere> s = dynamic_pointer_cast<Sphere>(cm1);
@@ -104,7 +104,7 @@ bool Sphere2Mesh2D4ClosestFeatures::collide(const shared_ptr<CollisionModel> cm1
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool Sphere2Mesh2D4ClosestFeatures::reverseCollide(const shared_ptr<CollisionModel> cm1, const shared_ptr<CollisionModel> cm2,  const Se3& se31, const Se3& se32, shared_ptr<Interaction> c)
+bool Sphere2Mesh2D4ClosestFeatures::reverseCollide(const shared_ptr<CollisionGeometry> cm1, const shared_ptr<CollisionGeometry> cm2,  const Se3& se31, const Se3& se32, shared_ptr<Interaction> c)
 {
 	bool isColliding = collide(cm2,cm1,se32,se31,c);
 	if (isColliding)

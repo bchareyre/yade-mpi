@@ -38,7 +38,7 @@ class MassSpringBody : public ConnexBody
 	public : void registerAttributes();
 
 	public : void updateBoundingVolume(Se3& se3);
-	public : void updateCollisionModel(Se3& se3);
+	public : void updateCollisionGeometry(Se3& se3);
 
 	REGISTER_CLASS_NAME(MassSpringBody);
 };

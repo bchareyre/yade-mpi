@@ -6,7 +6,7 @@
 #include <set>
 
 
-Terrain::Terrain () : CollisionModel()
+Terrain::Terrain () : CollisionGeometry()
 {
 }
 
@@ -30,7 +30,7 @@ bool Terrain::loadFromFile(char * fileName)
 	if (fileName!=NULL)
 	{
 		loadWrl(fileName);		
-		buildCollisionModel();
+		buildCollisionGeometry();
 		return true;
 	}
 	else	
@@ -313,7 +313,7 @@ unsigned int Terrain::buildDisplayList()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void Terrain::buildCollisionModel()
+void Terrain::buildCollisionGeometry()
 {
 	nbTriPerCell = 40;
 	nbCells = (int)(sqrt(faces.size()/(float)nbTriPerCell));

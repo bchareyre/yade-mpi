@@ -35,7 +35,7 @@ void SDECSpheresPlane::registerAttributes()
 void SDECSpheresPlane::exec()
 {
 	shared_ptr<NonConnexBody> rootBody(new NonConnexBody);
-	int nbSpheres = 8;
+	int nbSpheres = 6;
 	Quaternion q;
 	q.fromAngleAxis(0, Vector3(0,0,1));
 
@@ -43,7 +43,7 @@ void SDECSpheresPlane::exec()
 	//rootBody->kinematic		= shared_ptr<KinematicEngine>(new Rotor);
 	rootBody->broadCollider		= shared_ptr<BroadPhaseCollider>(new SAPCollider);
 	rootBody->narrowCollider	= shared_ptr<NarrowPhaseCollider>(new SimpleNarrowCollider);
-				  
+
 	rootBody->narrowCollider->addCollisionFunctor("Box","Box","Box2Box4ClosestFeatures");
 	rootBody->narrowCollider->addCollisionFunctor("Sphere","Sphere","Sphere2Sphere4ClosestFeatures");
 	rootBody->narrowCollider->addCollisionFunctor("Sphere","Box","Box2Sphere4ClosestFeatures");
@@ -76,8 +76,8 @@ void SDECSpheresPlane::exec()
 	box->diffuseColor	= Vector3(1,1,1);
 	box->wire		= false;
 	box->visible		= true;
-	box1->cm		= dynamic_pointer_cast<CollisionModel>(box);
-	box1->gm		= dynamic_pointer_cast<CollisionModel>(box);
+	box1->cm		= dynamic_pointer_cast<CollisionGeometry>(box);
+	box1->gm		= dynamic_pointer_cast<CollisionGeometry>(box);
 	box1->kn		= 100000;
 	box1->ks		= 10000;
 
@@ -116,7 +116,7 @@ void SDECSpheresPlane::exec()
 		sphere->diffuseColor	= Vector3(Rand::unitRandom(),Rand::unitRandom(),Rand::unitRandom());
 		sphere->wire		= false;
 		sphere->visible		= true;
-		s->cm			= dynamic_pointer_cast<CollisionModel>(sphere);
+		s->cm			= dynamic_pointer_cast<CollisionGeometry>(sphere);
 		s->gm			= dynamic_pointer_cast<GeometricalModel>(sphere);
 		s->kn			= 100000;
 		s->ks			= 10000;

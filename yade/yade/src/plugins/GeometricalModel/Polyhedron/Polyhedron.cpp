@@ -4,7 +4,7 @@
 
 using namespace std;
 
-Polyhedron::Polyhedron () : CollisionModel()
+Polyhedron::Polyhedron () : CollisionGeometry()
 {
 }
 
@@ -15,7 +15,7 @@ Polyhedron::~Polyhedron ()
 
 void Polyhedron::processAttributes()
 {
-	CollisionModel::processAttributes();
+	CollisionGeometry::processAttributes();
 
 	loadGmshMesh(mshFileName);
 
@@ -34,11 +34,11 @@ void Polyhedron::processAttributes()
 
 void Polyhedron::registerAttributes()
 {
-	CollisionModel::registerAttributes();
+	CollisionGeometry::registerAttributes();
 	REGISTER_ATTRIBUTE(mshFileName);
 }
 
-bool Polyhedron::collideWith(CollisionModel* )
+bool Polyhedron::collideWith(CollisionGeometry* )
 {
 	return true;
 

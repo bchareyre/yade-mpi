@@ -2,7 +2,7 @@
 #include <iostream>
 
 
-Mesh2D::Mesh2D () : CollisionModel()
+Mesh2D::Mesh2D () : CollisionGeometry()
 {	
 }
 
@@ -13,7 +13,7 @@ Mesh2D::~Mesh2D ()
 
 void Mesh2D::processAttributes()
 {
-	CollisionModel::processAttributes();
+	CollisionGeometry::processAttributes();
 
 	fNormals.resize(faces.size());
 	vNormals.resize(vertices.size());
@@ -28,7 +28,7 @@ void Mesh2D::processAttributes()
 
 void Mesh2D::registerAttributes()
 {
-	CollisionModel::registerAttributes();
+	CollisionGeometry::registerAttributes();
 	REGISTER_ATTRIBUTE(vertices);
 	REGISTER_ATTRIBUTE(edges);
 	REGISTER_ATTRIBUTE(faces);
@@ -36,7 +36,7 @@ void Mesh2D::registerAttributes()
 	REGISTER_ATTRIBUTE(height);
 }
 
-bool Mesh2D::collideWith(CollisionModel* )
+bool Mesh2D::collideWith(CollisionGeometry* )
 {
 	return true;
 

@@ -1,12 +1,12 @@
 #include "Box.hpp"
 #include <iostream>
 
-Box::Box (Vector3 e) : CollisionModel()
+Box::Box (Vector3 e) : CollisionGeometry()
 {
 	extents = e;
 }
 
-Box::Box () : CollisionModel()
+Box::Box () : CollisionGeometry()
 {	
 }
 
@@ -17,16 +17,16 @@ Box::~Box ()
 
 void Box::processAttributes()
 {
-	CollisionModel::processAttributes();
+	CollisionGeometry::processAttributes();
 }
 
 void Box::registerAttributes()
 {
-	CollisionModel::registerAttributes();
+	CollisionGeometry::registerAttributes();
 	REGISTER_ATTRIBUTE(extents);
 }
 
-bool Box::collideWith(CollisionModel* )
+bool Box::collideWith(CollisionGeometry* )
 {
 	return true;
 

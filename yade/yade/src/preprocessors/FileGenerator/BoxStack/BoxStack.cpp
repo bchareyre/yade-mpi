@@ -67,8 +67,8 @@ void BoxStack::exec()
 	box->diffuseColor	= Vector3(1,1,1);
 	box->wire		= false;
 	box->visible		= true;
-	box1->cm		= dynamic_pointer_cast<CollisionModel>(box);
-	box1->gm		= dynamic_pointer_cast<CollisionModel>(box);
+	box1->cm		= dynamic_pointer_cast<CollisionGeometry>(box);
+	box1->gm		= dynamic_pointer_cast<CollisionGeometry>(box);
 
 	rootBody->bodies.push_back(dynamic_pointer_cast<Body>(box1));
 
@@ -101,8 +101,8 @@ void BoxStack::exec()
 			box->diffuseColor	= Vector3(Rand::unitRandom(),Rand::unitRandom(),Rand::unitRandom());
 			box->wire		= false;
 			box->visible		= true;
-			boxi->cm		= dynamic_pointer_cast<CollisionModel>(box);
-			boxi->gm		= dynamic_pointer_cast<CollisionModel>(box);
+			boxi->cm		= dynamic_pointer_cast<CollisionGeometry>(box);
+			boxi->gm		= dynamic_pointer_cast<CollisionGeometry>(box);
 			rootBody->bodies.push_back(dynamic_pointer_cast<Body>(boxi));
 		}
 	

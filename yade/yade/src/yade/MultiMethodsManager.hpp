@@ -60,7 +60,7 @@ class MultiMethodsManager
 	protected : virtual bool addPair(const string& name1,const string& name2,const string& libName) = 0;
 	protected : bool add(shared_ptr<Indexable>& i1,shared_ptr<Indexable>& i2, const string& name1, const string& name2, const string& libName);
 
-	//public : bool go(const shared_ptr<CollisionModel> cm1, const shared_ptr<CollisionModel> cm2, const Se3& se31, const Se3& se32, shared_ptr<Interaction> c);
+	//public : bool go(const shared_ptr<CollisionGeometry> cm1, const shared_ptr<CollisionGeometry> cm2, const Se3& se31, const Se3& se32, shared_ptr<Interaction> c);
 };   
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

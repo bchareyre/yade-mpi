@@ -45,7 +45,7 @@ Sphere2Sphere4ClosestFeatures::~Sphere2Sphere4ClosestFeatures ()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool Sphere2Sphere4ClosestFeatures::collide(const shared_ptr<CollisionModel> cm1, const shared_ptr<CollisionModel> cm2, const Se3& se31, const Se3& se32, shared_ptr<Interaction> c)
+bool Sphere2Sphere4ClosestFeatures::collide(const shared_ptr<CollisionGeometry> cm1, const shared_ptr<CollisionGeometry> cm2, const Se3& se31, const Se3& se32, shared_ptr<Interaction> c)
 {
 	shared_ptr<Sphere> s1 = dynamic_pointer_cast<Sphere>(cm1);
 	shared_ptr<Sphere> s2 = dynamic_pointer_cast<Sphere>(cm2);
@@ -68,7 +68,7 @@ bool Sphere2Sphere4ClosestFeatures::collide(const shared_ptr<CollisionModel> cm1
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool Sphere2Sphere4ClosestFeatures::reverseCollide(const shared_ptr<CollisionModel> cm1, const shared_ptr<CollisionModel> cm2,  const Se3& se31, const Se3& se32, shared_ptr<Interaction> c)
+bool Sphere2Sphere4ClosestFeatures::reverseCollide(const shared_ptr<CollisionGeometry> cm1, const shared_ptr<CollisionGeometry> cm2,  const Se3& se31, const Se3& se32, shared_ptr<Interaction> c)
 {
 	return collide(cm1,cm2,se31,se32,c);
 }

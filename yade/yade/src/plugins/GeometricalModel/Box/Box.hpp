@@ -1,9 +1,9 @@
 #ifndef __BOX_H__
 #define __BOX_H__
 
-#include "CollisionModel.hpp"
+#include "CollisionGeometry.hpp"
 
-class Box : public CollisionModel
+class Box : public CollisionGeometry
 {
 	public : Vector3 extents;
 
@@ -12,7 +12,7 @@ class Box : public CollisionModel
 	public : Box ();
 	public : ~Box ();
 
-	public : bool collideWith(CollisionModel* collisionModel);
+	public : bool collideWith(CollisionGeometry* collisionModel);
 	public : bool loadFromFile(char * fileName);
 	public : void glDraw();
 

@@ -22,7 +22,7 @@ void Box2AABBFactory::registerAttributes()
 
 }
 
-shared_ptr<BoundingVolume> Box2AABBFactory::buildBoundingVolume(const shared_ptr<CollisionModel> cm, const Se3&)
+shared_ptr<BoundingVolume> Box2AABBFactory::buildBoundingVolume(const shared_ptr<CollisionGeometry> cm, const Se3&)
 {
 	shared_ptr<Box> box = dynamic_pointer_cast<Box>(cm);
 	

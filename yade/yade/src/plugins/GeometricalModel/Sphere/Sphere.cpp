@@ -7,13 +7,13 @@ vector<Vector3> Sphere::vertices;
 vector<Vector3> Sphere::faces;
 
 
-Sphere::Sphere (float r) : CollisionModel()
+Sphere::Sphere (float r) : CollisionGeometry()
 {
 	radius = r;
 	Sphere::Sphere();
 }
 
-Sphere::Sphere () : CollisionModel()
+Sphere::Sphere () : CollisionGeometry()
 {
 
 	float X = 0.525731112119133606;
@@ -60,16 +60,16 @@ Sphere::~Sphere ()
 
 void Sphere::processAttributes()
 {
-	CollisionModel::processAttributes();
+	CollisionGeometry::processAttributes();
 }
 
 void Sphere::registerAttributes()
 {
-	CollisionModel::registerAttributes();
+	CollisionGeometry::registerAttributes();
 	REGISTER_ATTRIBUTE(radius);
 }
 
-bool Sphere::collideWith(CollisionModel* )
+bool Sphere::collideWith(CollisionGeometry* )
 {
 	return true;
 }
@@ -79,13 +79,13 @@ void Sphere::subdivideTriangle(Vector3& v1,Vector3& v2,Vector3& v3, int depth)
 	Vector3 v12,v23,v31;
 
 	if (depth==0)
-	{		
+	{
 		float pi3 = 2*Constants::PI/3;
 		Vector3 v = (v1+v2+v3)/3.0;
 		float angle = atan(v[2]/v[0])/v.length();
 
 		GLfloat matAmbient[4];
-		
+
 		if (angle>-Constants::PI/6.0 && angle<=Constants::PI/6.0)
 		{
 			matAmbient[0] = 0.2;
@@ -137,7 +137,7 @@ void Sphere::drawSphere(int depth)
 	number=0;
 	for(int i=0;i<20;i++)
 	{
-		//glColor3f(Rand::unitRandom(),Rand::unitRandom(),Rand::unitRandom());	
+		//glColor3f(Rand::unitRandom(),Rand::unitRandom(),Rand::unitRandom());
 		subdivideTriangle(vertices[(unsigned int)faces[i][0]],vertices[(unsigned int)faces[i][1]],vertices[(unsigned int)faces[i][2]],depth);
 	}
 }
@@ -150,12 +150,12 @@ void Sphere::glDraw()
 		glWiredSphereList = glGenLists(1);
 		glNewList(glWiredSphereList,GL_COMPILE);
 			glDisable(GL_LIGHTING);
-			drawSphere(1);
+			drawSphere(3);
 		glEndList();
 		glSphereList = glGenLists(1);
 		glNewList(glSphereList,GL_COMPILE);
 			glEnable(GL_LIGHTING);
-			drawSphere(1);
+			drawSphere(3);
 		glEndList();
 	}
 

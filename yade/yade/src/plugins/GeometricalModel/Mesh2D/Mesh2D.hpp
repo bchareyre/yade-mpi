@@ -1,7 +1,7 @@
 #ifndef __MESH2D_H__
 #define __MESH2D_H__
 
-#include "CollisionModel.hpp"
+#include "CollisionGeometry.hpp"
 
 #define offset(i,j) ((i)*height+(j))
 
@@ -22,7 +22,7 @@ class Edge : public Serializable
 };
 REGISTER_SERIALIZABLE(Edge,true);
 
-class Mesh2D : public CollisionModel
+class Mesh2D : public CollisionGeometry
 {
 	public : vector<Vector3> vertices;
 	public : vector<Edge> edges;
@@ -35,7 +35,7 @@ class Mesh2D : public CollisionModel
 	public : Mesh2D ();
 	public : ~Mesh2D ();
 
-	public : bool collideWith(CollisionModel* collisionModel);
+	public : bool collideWith(CollisionGeometry* collisionModel);
 	public : bool loadFromFile(char * fileName);
 	public : void glDraw();
 	public : void computeNormals();

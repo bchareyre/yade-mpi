@@ -1,6 +1,6 @@
 #include "CollisionMultiMethodsManager.hpp"
 #include "Indexable.hpp"
-#include "CollisionModel.hpp"
+#include "CollisionGeometry.hpp"
 #include "CollisionFunctor.hpp"
 
 
@@ -14,8 +14,8 @@ CollisionMultiMethodsManager::~CollisionMultiMethodsManager ()
 
 bool CollisionMultiMethodsManager::addPair(const string& name1,const string& name2,const string& libName)
 {
-	shared_ptr<CollisionModel> cm1  = dynamic_pointer_cast<CollisionModel>(ClassFactory::instance().createShared(name1));
-	shared_ptr<CollisionModel> cm2  = dynamic_pointer_cast<CollisionModel>(ClassFactory::instance().createShared(name2));
+	shared_ptr<CollisionGeometry> cm1  = dynamic_pointer_cast<CollisionGeometry>(ClassFactory::instance().createShared(name1));
+	shared_ptr<CollisionGeometry> cm2  = dynamic_pointer_cast<CollisionGeometry>(ClassFactory::instance().createShared(name2));
 	shared_ptr<Indexable> i1 = dynamic_pointer_cast<Indexable>(cm1);
 	shared_ptr<Indexable> i2 = dynamic_pointer_cast<Indexable>(cm2);
 
@@ -24,7 +24,7 @@ bool CollisionMultiMethodsManager::addPair(const string& name1,const string& nam
 	//int& maxCurrentIndex, const string& name1, const string& name2, const string& libName);
 }
 
-bool CollisionMultiMethodsManager::collide(const shared_ptr<CollisionModel> cm1, const shared_ptr<CollisionModel> cm2, const Se3& se31, const Se3& se32, shared_ptr<Interaction> c)
+bool CollisionMultiMethodsManager::collide(const shared_ptr<CollisionGeometry> cm1, const shared_ptr<CollisionGeometry> cm2, const Se3& se31, const Se3& se32, shared_ptr<Interaction> c)
 {
 	assert(cm1->getClassIndex()>=0);
 	assert(cm2->getClassIndex()>=0);

@@ -74,8 +74,8 @@ void FEMRock::exec()
 	poly->wire		= false;
 	poly->visible		= true;
 	poly->mshFileName 	= "../data/rock.msh";
-	femBody->cm		= dynamic_pointer_cast<CollisionModel>(poly);
-	femBody->gm		= dynamic_pointer_cast<CollisionModel>(poly);
+	femBody->cm		= dynamic_pointer_cast<CollisionGeometry>(poly);
+	femBody->gm		= dynamic_pointer_cast<CollisionGeometry>(poly);
 
 	
 
@@ -99,8 +99,8 @@ void FEMRock::exec()
 	box->diffuseColor	= Vector3(1,1,1);
 	box->wire		= false;
 	box->visible		= true;
-	box1->cm		= dynamic_pointer_cast<CollisionModel>(box);
-	box1->gm		= dynamic_pointer_cast<CollisionModel>(box);
+	box1->cm		= dynamic_pointer_cast<CollisionGeometry>(box);
+	box1->gm		= dynamic_pointer_cast<CollisionGeometry>(box);
 
 	rootBody->bodies.push_back(dynamic_pointer_cast<Body>(box1));
 

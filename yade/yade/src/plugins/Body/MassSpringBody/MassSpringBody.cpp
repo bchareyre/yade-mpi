@@ -20,7 +20,7 @@ void MassSpringBody::processAttributes()
 	ConnexBody::processAttributes();
 	
 	//FIXME : when serialization tracks pointers delete it
-	//cm = dynamic_pointer_cast<CollisionModel>(gm);
+	//cm = dynamic_pointer_cast<CollisionGeometry>(gm);
 	gm = cm;
 	
 }
@@ -59,6 +59,6 @@ void MassSpringBody::updateBoundingVolume(Se3& )
 
 }
 
-void MassSpringBody::updateCollisionModel(Se3& )
+void MassSpringBody::updateCollisionGeometry(Se3& )
 {
 }

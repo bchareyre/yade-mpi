@@ -1,9 +1,9 @@
 #ifndef __SPHERE_H__
 #define __SPHERE_H__
 
-#include "CollisionModel.hpp"
+#include "CollisionGeometry.hpp"
 
-class Sphere : public CollisionModel
+class Sphere : public CollisionGeometry
 {
 	public : float radius;
 
@@ -21,7 +21,7 @@ class Sphere : public CollisionModel
 	public : Sphere ();
 	public : ~Sphere ();
 
-	public : bool collideWith(CollisionModel* collisionModel);
+	public : bool collideWith(CollisionGeometry* collisionModel);
 	public : void glDraw();
 
 	public : void processAttributes();

@@ -1,20 +1,20 @@
-#include "CollisionModel.hpp"
+#include "CollisionGeometry.hpp"
 
-CollisionModel::CollisionModel () : GeometricalModel(),Indexable()
+CollisionGeometry::CollisionGeometry () : GeometricalModel(),Indexable()
 {
 }
 
-CollisionModel::~CollisionModel ()
+CollisionGeometry::~CollisionGeometry ()
 {
 
 }
 
-void CollisionModel::registerAttributes()
+void CollisionGeometry::registerAttributes()
 {
 	GeometricalModel::registerAttributes();
 }
 
-void CollisionModel::processAttributes()
+void CollisionGeometry::processAttributes()
 {
 	GeometricalModel::processAttributes();
 }

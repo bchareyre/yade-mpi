@@ -35,7 +35,7 @@
 
 #include "ClassFactory.hpp"
 #include "Indexable.hpp"
-#include "CollisionModel.hpp"
+#include "CollisionGeometry.hpp"
 #include "Se3.hpp"
 #include "Interaction.hpp"
 #include "Factorable.hpp"
@@ -45,7 +45,7 @@
 
 /*! \brief Abstract interface for all collision functor.
 
-	Every functions that describe collision between two CollisionModels must derived from CollisionFunctor.
+	Every functions that describe collision between two CollisionGeometrys must derived from CollisionFunctor.
 */
 class CollisionFunctor : public Indexable , public Factorable
 {
@@ -59,10 +59,10 @@ class CollisionFunctor : public Indexable , public Factorable
 	public : CollisionFunctor () {};
 	public : virtual ~CollisionFunctor () {};
 
-	protected : virtual bool collide(const shared_ptr<CollisionModel> , const shared_ptr<CollisionModel> , const Se3& , const Se3& , shared_ptr<Interaction> ) { throw; };
-	protected : virtual bool reverseCollide(const shared_ptr<CollisionModel> , const shared_ptr<CollisionModel> ,  const Se3& , const Se3& , shared_ptr<Interaction> ) { throw; };
+	protected : virtual bool collide(const shared_ptr<CollisionGeometry> , const shared_ptr<CollisionGeometry> , const Se3& , const Se3& , shared_ptr<Interaction> ) { throw; };
+	protected : virtual bool reverseCollide(const shared_ptr<CollisionGeometry> , const shared_ptr<CollisionGeometry> ,  const Se3& , const Se3& , shared_ptr<Interaction> ) { throw; };
 
-	public    : inline bool operator() (const shared_ptr<CollisionModel> cm1, const shared_ptr<CollisionModel> cm2, const Se3& se31, const Se3& se32, shared_ptr<Interaction> c)
+	public    : inline bool operator() (const shared_ptr<CollisionGeometry> cm1, const shared_ptr<CollisionGeometry> cm2, const Se3& se31, const Se3& se32, shared_ptr<Interaction> c)
 	{
 		if (reverse)
 			return reverseCollide(cm1,cm2,se31,se32,c);

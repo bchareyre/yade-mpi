@@ -61,7 +61,7 @@ void NonConnexBody::updateBoundingVolume(Se3& se3)
 		bodies[i]->updateBoundingVolume(se3);
 }
 
-void NonConnexBody::updateCollisionModel(Se3& )
+void NonConnexBody::updateCollisionGeometry(Se3& )
 {
 
 }

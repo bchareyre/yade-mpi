@@ -41,7 +41,7 @@ void RigidBody::updateBoundingVolume(Se3& se3)
 	bv->update(se3);
 }
 
-void RigidBody::updateCollisionModel(Se3& )
+void RigidBody::updateCollisionGeometry(Se3& )
 {
 
 }

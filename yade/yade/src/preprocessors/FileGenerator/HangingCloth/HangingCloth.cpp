@@ -125,8 +125,8 @@ void HangingCloth::exec()
 	mesh2d->diffuseColor	= Vector3(0,0,1);
 	mesh2d->wire		= false;
 	mesh2d->visible		= true;
-	cloth->cm		= dynamic_pointer_cast<CollisionModel>(mesh2d);
-	cloth->gm		= dynamic_pointer_cast<CollisionModel>(mesh2d);
+	cloth->cm		= dynamic_pointer_cast<CollisionGeometry>(mesh2d);
+	cloth->gm		= dynamic_pointer_cast<CollisionGeometry>(mesh2d);
 
 
 	rootBody->bodies.push_back(dynamic_pointer_cast<Body>(cloth));
@@ -172,7 +172,7 @@ void HangingCloth::exec()
 		gsphere->wire		= false;
 		gsphere->visible	= true;
 
-		s->cm			= dynamic_pointer_cast<CollisionModel>(csphere);
+		s->cm			= dynamic_pointer_cast<CollisionGeometry>(csphere);
 		s->gm			= dynamic_pointer_cast<GeometricalModel>(gsphere);
 
 		rootBody->bodies.push_back(dynamic_pointer_cast<Body>(s));
