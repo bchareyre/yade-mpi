@@ -252,11 +252,11 @@ void OpenGLRenderingEngine::renderShadowVolumes(shared_ptr<NonConnexBody> rootBo
 			Vector3r dir = lightPos-center;
 			Vector3r normalDir(-dir[1],dir[0],0);
 			normalDir.normalize();
-			normalDir *= s->radius;
-			Vector3r biNormalDir = normalDir.unitCross(dir)*(s->radius);
+			normalDir *= s->radius*0.9;
+			Vector3r biNormalDir = normalDir.unitCross(dir)*(s->radius*0.9);
 			
 			glColor4f(0.86,0.058,0.9,0.3);
-			int nbSegments = 50;
+			int nbSegments = 15;
 			
 			Vector3r p1,p2;
 			glBegin(GL_QUAD_STRIP);

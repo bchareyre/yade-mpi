@@ -20,6 +20,8 @@
 SDECSpheresPlane::SDECSpheresPlane () : FileGenerator()
 {
 	nbSpheres = 2;
+	minRadius = 5;
+	maxRadius = 5;
 }
 
 SDECSpheresPlane::~SDECSpheresPlane ()
@@ -34,6 +36,8 @@ void SDECSpheresPlane::postProcessAttributes(bool)
 void SDECSpheresPlane::registerAttributes()
 {
 	REGISTER_ATTRIBUTE(nbSpheres);
+	REGISTER_ATTRIBUTE(minRadius);
+	REGISTER_ATTRIBUTE(maxRadius);
 }
 
 void SDECSpheresPlane::generate()
@@ -103,8 +107,8 @@ void SDECSpheresPlane::generate()
 		shared_ptr<AABB> aabb(new AABB);
 		shared_ptr<Sphere> sphere(new Sphere);
 
-		translation 		= Vector3r(i,j,k)*10-Vector3r(nbSpheres/2*10,nbSpheres/2*10-90,nbSpheres/2*10)+Vector3r(Mathr::symmetricRandom()*1.3,Mathr::symmetricRandom(),Mathr::symmetricRandom()*1.3);
-		float radius 		= (Mathr::intervalRandom(1,5));
+		translation 		= Vector3r(i,j,k)*(2*maxRadius*1.1)-Vector3r(nbSpheres/2*(2*maxRadius*1.1),-7-maxRadius*2,nbSpheres/2*(2*maxRadius*1.1))+Vector3r(Mathr::symmetricRandom()*1.1,Mathr::symmetricRandom()*1.1,Mathr::symmetricRandom()*1.1);
+		float radius 		= (Mathr::intervalRandom(minRadius,maxRadius));
 
 		shared_ptr<BallisticDynamicEngine> ballistic(new BallisticDynamicEngine);
 		ballistic->damping 	= 1.0;//0.95;
