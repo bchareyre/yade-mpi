@@ -4,12 +4,16 @@
 # Target is a library:  
 
 LIBS += -lSDECDiscreteElement \
+        -lSDECContactPhysics \
+        -lSDECContactGeometry \
         -rdynamic 
-INCLUDEPATH += $(YADEINCLUDEPATH) 
+INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 QMAKE_LIBDIR = ../../../plugins/Body/SDECDiscreteElement/$(YADEDYNLIBPATH) \
+               ../../../plugins/InteractionPhysics/SDECContactPhysics/$(YADEDYNLIBPATH) \
+               ../../../plugins/InteractionGeometry/SDECContactGeometry/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
 CONFIG += debug \

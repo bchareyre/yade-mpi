@@ -99,9 +99,29 @@ void SDECLinearContactModel::computeMechanicalParameters(Body*body)
 		currentContactPhysics->ks = currentContactPhysics->initialKs;
 		currentContactPhysics->equilibriumDistance = currentContactPhysics->initialEquilibriumDistance;
 	}
-}
-	
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 	
