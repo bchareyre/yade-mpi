@@ -212,6 +212,11 @@ class DynLibDispatcher
 			try
 			{
 				executor = boost::dynamic_pointer_cast<Executor>(ClassFactory::instance().createShared(libName));
+				if(! executor )
+				{
+					cerr << "WARNING: DynLibDispatcher::add 1D, dynamic_pointer_cast failed - trying static_pointer_cast instead\n";
+					executor = boost::static_pointer_cast<Executor>(ClassFactory::instance().createShared(libName));
+				}
 			}
 			catch (FactoryCantCreate& fe)
 			{

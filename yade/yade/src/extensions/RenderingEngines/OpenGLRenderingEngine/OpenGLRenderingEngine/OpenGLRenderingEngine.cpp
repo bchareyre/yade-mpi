@@ -60,6 +60,8 @@ OpenGLRenderingEngine::OpenGLRenderingEngine() : RenderingEngine()
 	addShadowVolumeFunctor("Box","GLDrawBoxShadowVolume");
 	addShadowVolumeFunctor("Sphere","GLDrawSphereShadowVolume");
 	
+	postProcessAttributes(true);
+	
 }
 
 OpenGLRenderingEngine::~OpenGLRenderingEngine()
