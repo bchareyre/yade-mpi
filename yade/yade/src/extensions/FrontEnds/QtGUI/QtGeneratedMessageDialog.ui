@@ -43,13 +43,6 @@
                 <height>71</height>
             </rect>
         </property>
-        <property name="paletteBackgroundColor">
-            <color>
-                <red>230</red>
-                <green>230</green>
-                <blue>230</blue>
-            </color>
-        </property>
         <property name="frameShadow">
             <enum>Plain</enum>
         </property>
@@ -66,8 +59,7 @@
             <enum>AlwaysOff</enum>
         </property>
         <property name="text">
-            <string>
-</string>
+            <string></string>
         </property>
         <property name="readOnly">
             <bool>true</bool>
