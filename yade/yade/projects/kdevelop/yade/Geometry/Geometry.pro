@@ -19,15 +19,15 @@ CONFIG += debug \
           dll 
 TEMPLATE = lib 
 HEADERS += BoundingVolume.hpp \
-           CollisionGeometry.hpp \
-           CollisionGeometryFactory.hpp \
+           InteractionGeometry.hpp \
+           InteractionGeometryFactory.hpp \
            GeometricalModel.hpp \
            GeometricalModelFactory.hpp \
            BoundingVolumeFactory.hpp \
            BoundingVolumeUpdator.hpp 
 SOURCES += BoundingVolume.cpp \
-           CollisionGeometry.cpp \
-           CollisionGeometryFactory.cpp \
+           InteractionGeometry.cpp \
+           InteractionGeometryFactory.cpp \
            GeometricalModel.cpp \
            GeometricalModelFactory.cpp \
            BoundingVolumeUpdator.cpp 

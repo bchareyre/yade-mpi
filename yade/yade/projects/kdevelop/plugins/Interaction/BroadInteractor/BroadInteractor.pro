@@ -10,5 +10,5 @@ CONFIG += debug \
           warn_on 
 TEMPLATE = subdirs 
 SUBDIRS += PersistentSAPCollider \
-           SimpleBroadCollider \
+           SimpleBroadInteractor \
            SAPCollider 
