@@ -9,7 +9,6 @@ LIBS += -lSDECDynamicEngine \
         -lSphere \
         -lAABB \
         -lSerialization \
-        -lBallisticDynamicEngine \
         -lMath \
         -lBody \
         -lEngine \
@@ -32,7 +31,6 @@ QMAKE_LIBDIR = ../../../plugins/Engine/DynamicEngine/SDECDynamicEngine/$(YADEDYN
                ../../../plugins/Geometry/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
                ../../../plugins/Geometry/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/DynamicEngine/BallisticDynamicEngine/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
                ../../../yade/Body/$(YADEDYNLIBPATH) \
                ../../../yade/Engine/$(YADEDYNLIBPATH) \
@@ -42,6 +40,9 @@ QMAKE_LIBDIR = ../../../plugins/Engine/DynamicEngine/SDECDynamicEngine/$(YADEDYN
                ../../../yade/Interaction/$(YADEDYNLIBPATH) \
                ../../../plugins/Geometry/BoundingVolumeFactory/CollisionGeometrySet2AABBFactory/$(YADEDYNLIBPATH) \
                ../../../plugins/Geometry/CollisionGeometry/CollisionGeometrySet/$(YADEDYNLIBPATH) \
+               ../../../plugins/DataRecorder/ForceRecorder/$(YADEDYNLIBPATH) \
+               ../../../plugins/DataRecorder/AveragePositionRecorder/$(YADEDYNLIBPATH) \
+               ../../../plugins/Engine/DynamicEngine/BallisticDynamicEngine/$(YADEDYNLIBPATH) \
                ../../../postprocessors/ForceRecorder/$(YADEDYNLIBPATH) \
                ../../../postprocessors/AveragePositionRecorder/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 

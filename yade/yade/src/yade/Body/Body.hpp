@@ -52,10 +52,11 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-/*! \brief Abstract interface for all physical object.
+/*! \brief Abstract interface for bodies stored in BodyContainer
 
-	All the physical types (SimpleBody, ComplexBody, RigidBody ....) must derived from this class.
+	BodyContainer can store ComplexBody and SimpleBody, both derived from Body
 */
+
 class Body : public Serializable
 {
 
@@ -64,22 +65,26 @@ class Body : public Serializable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 	private	: unsigned int id;
 	public	: unsigned int getId() {return id;};
-	friend class BodyContainer; // only BodyContainer can set the id of a body
+	// only BodyContainer can set the id of a body
+	friend class BodyContainer;
 
 	public : bool containSubBodies;
 	
-	// int group;
+	// group to which body belongs (maybe vector<int> , to allow multiple groups?)
+	int group;
 		
-	// FIXME : where to put gm,cm and bv : do body need them or only SimpleBody ??
-	/*! The geometrical model of this body (polyhedron, box ...) */
-	public : shared_ptr<GeometricalModel> gm; // geometricalModel
-	/*! The collision model of this body (sphere hierarchy, box ...) */
-	public : shared_ptr<CollisionGeometry> cm; // interactionGeometry
-	/*! The bounding volume of this body (AABB, K-Dop ...) */
-	public : shared_ptr<BoundingVolume> bv; // boundingVolume
 	/*! Mechanical parameters of the body (mass, sitffness ...) */
 	public : shared_ptr<BodyPhysicalParameters> physicalParameters;
 
+	/*! The geometrical model of this body (polyhedron, box ...) */
+	public : shared_ptr<GeometricalModel> geometricalModel;
+	
+	/*! The collision model of this body (sphere hierarchy, box ...) */
+	public : shared_ptr<CollisionGeometry> interactionGeometry;
+	
+	/*! The bounding volume of this body (AABB, K-Dop ...) */
+	public : shared_ptr<BoundingVolume> boundingVolume;
+	
 
 	// FIXME : should be determined automatically or not ?? if the body has a subscription to a kinematic engine then it is not dynamic but maybe a body with no subscription can be not dynamic ??
 	/*! isDynamic is true if the state of the body is not modified by a kinematicEngine. It is useful

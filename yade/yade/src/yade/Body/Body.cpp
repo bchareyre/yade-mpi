@@ -31,12 +31,14 @@
 Body::Body () : 
 	  Serializable()
 	, id(0)
+	, group(0)
 {
 }
 
 Body::Body (unsigned int newId) :
 	  Serializable()
 	, id(newId)
+	, group(0)
 {
 }
 
@@ -55,10 +57,10 @@ void Body::postProcessAttributes(bool deserializing)
 {
 	if (deserializing)
 	{
-		if (gm)
-			gm->cm = cm;
-		if (cm)
-			cm->bv = bv;
+		if (geometricalModel)
+			geometricalModel->cm = interactionGeometry;
+		if (interactionGeometry)
+			interactionGeometry->bv = boundingVolume;
 	}
 }
 
@@ -68,12 +70,14 @@ void Body::postProcessAttributes(bool deserializing)
 void Body::registerAttributes()
 {
 	REGISTER_ATTRIBUTE(id);
+	REGISTER_ATTRIBUTE(group);
 	REGISTER_ATTRIBUTE(isDynamic); // FIXME : only used for collision : no collision between 2 non dynamic objects
-	//REGISTER_ATTRIBUTE(se3);
+	
 	REGISTER_ATTRIBUTE(physicalParameters);
-	REGISTER_ATTRIBUTE(bv);
-	REGISTER_ATTRIBUTE(cm);
-	REGISTER_ATTRIBUTE(gm);
+	REGISTER_ATTRIBUTE(geometricalModel);
+	REGISTER_ATTRIBUTE(interactionGeometry);
+	REGISTER_ATTRIBUTE(boundingVolume);
+	
 // FIXME ? - must be registered or not? how about saving state during the simulation?
 	//REGISTER_ATTRIBUTE(interactions);
 }

@@ -8,7 +8,6 @@
 #include "SimpleSpringDynamicEngine.hpp"
 #include "SAPCollider.hpp"
 #include "RigidBody.hpp"
-#include "BallisticDynamicEngine.hpp"
 #include <fstream>
 #include "IOManager.hpp"
 
@@ -70,13 +69,13 @@ string BoxStack::generate()
 // 	aabb->color		= Vector3r(1,0,0);
 // 	aabb->center		= Vector3r(0,0,10);
 // 	aabb->halfSize		= Vector3r(100,5,100);
-// 	box1->bv		= dynamic_pointer_cast<BoundingVolume>(aabb);
+// 	box1->boundingVolume		= dynamic_pointer_cast<BoundingVolume>(aabb);
 // 	box->extents		= Vector3r(100,5,100);
 // 	box->diffuseColor	= Vector3f(1,1,1);
 // 	box->wire		= false;
 // 	box->visible		= true;
-// 	box1->cm		= dynamic_pointer_cast<CollisionGeometry>(box);
-// 	box1->gm		= dynamic_pointer_cast<CollisionGeometry>(box);
+// 	box1->interactionGeometry		= dynamic_pointer_cast<CollisionGeometry>(box);
+// 	box1->geometricalModel		= dynamic_pointer_cast<CollisionGeometry>(box);
 // 
 // 	shared_ptr<Body> b;
 // 	b=dynamic_pointer_cast<Body>(box1);
@@ -108,13 +107,13 @@ string BoxStack::generate()
 // 			aabb->color		= Vector3r(Mathr::unitRandom(),Mathr::unitRandom(),Mathr::unitRandom());
 // 			aabb->center		= translation;
 // 			aabb->halfSize		= size;
-// 			boxi->bv		= dynamic_pointer_cast<BoundingVolume>(aabb);
+// 			boxi->boundingVolume		= dynamic_pointer_cast<BoundingVolume>(aabb);
 // 			box->extents		= size;
 // 			box->diffuseColor	= Vector3f(Mathr::unitRandom(),Mathr::unitRandom(),Mathr::unitRandom());
 // 			box->wire		= false;
 // 			box->visible		= true;
-// 			boxi->cm		= dynamic_pointer_cast<CollisionGeometry>(box);
-// 			boxi->gm		= dynamic_pointer_cast<CollisionGeometry>(box);
+// 			boxi->interactionGeometry		= dynamic_pointer_cast<CollisionGeometry>(box);
+// 			boxi->geometricalModel		= dynamic_pointer_cast<CollisionGeometry>(box);
 // 
 // 			b=dynamic_pointer_cast<Body>(boxi);
 // 			rootBody->bodies->insert(b);

@@ -7,7 +7,6 @@
 #include "SAPCollider.hpp"
 #include "PersistentSAPCollider.hpp"
 #include "SDECDiscreteElement.hpp"
-#include "BallisticDynamicEngine.hpp"
 #include <fstream>
 #include "IOManager.hpp"
 #include "SDECDynamicEngine.hpp"
@@ -108,8 +107,8 @@ string SDECLinkedSpheres::generate()
 	shared_ptr<AABB> aabb(new AABB);
 	aabb->diffuseColor	= Vector3r(0,0,1);
 	
-	rootBody->cm		= dynamic_pointer_cast<CollisionGeometry>(set);	
-	rootBody->bv		= dynamic_pointer_cast<BoundingVolume>(aabb);
+	rootBody->interactionGeometry		= dynamic_pointer_cast<CollisionGeometry>(set);	
+	rootBody->boundingVolume		= dynamic_pointer_cast<BoundingVolume>(aabb);
 	rootBody->physicalParameters = physics;
 	
 ////////////////////////////////////
@@ -166,8 +165,8 @@ string SDECLinkedSpheres::generate()
 
 			shared_ptr<SDECDiscreteElement> a = dynamic_pointer_cast<SDECDiscreteElement>(bodyA->physicalParameters);
 			shared_ptr<SDECDiscreteElement> b = dynamic_pointer_cast<SDECDiscreteElement>(bodyB->physicalParameters);
-			shared_ptr<InteractionSphere>	as = dynamic_pointer_cast<InteractionSphere>(bodyA->cm);
-			shared_ptr<InteractionSphere>	bs = dynamic_pointer_cast<InteractionSphere>(bodyB->cm);
+			shared_ptr<InteractionSphere>	as = dynamic_pointer_cast<InteractionSphere>(bodyA->interactionGeometry);
+			shared_ptr<InteractionSphere>	bs = dynamic_pointer_cast<InteractionSphere>(bodyB->interactionGeometry);
 
 			if ((a->se3.translation - b->se3.translation).length() < (as->radius + bs->radius))  
 			{
@@ -242,9 +241,9 @@ void SDECLinkedSpheres::createSphere(shared_ptr<Body>& body, int i, int j, int k
 	iSphere->radius		= radius;
 	iSphere->diffuseColor	= Vector3f(Mathf::unitRandom(),Mathf::unitRandom(),Mathf::unitRandom());
 
-	body->cm		= iSphere;
-	body->gm		= gSphere;
-	body->bv		= aabb;
+	body->interactionGeometry		= iSphere;
+	body->geometricalModel		= gSphere;
+	body->boundingVolume		= aabb;
 	body->physicalParameters= physics;
 }
 
@@ -284,9 +283,9 @@ void SDECLinkedSpheres::createBox(shared_ptr<Body>& body, Vector3r position, Vec
 	iBox->extents			= extents;
 	iBox->diffuseColor		= Vector3f(1,1,1);
 
-	body->bv			= aabb;
-	body->cm			= iBox;
-	body->gm			= gBox;
+	body->boundingVolume			= aabb;
+	body->interactionGeometry			= iBox;
+	body->geometricalModel			= gBox;
 	body->physicalParameters	= physics;
 }
 

@@ -116,8 +116,8 @@ void QGLThread::oneLoop()
 	
 	if (*needCentering && Omega::instance().getRootBody())
 	{
-		Vector3r min = Omega::instance().getRootBody()->bv->min;
-		Vector3r max = Omega::instance().getRootBody()->bv->max;
+		Vector3r min = Omega::instance().getRootBody()->boundingVolume->min;
+		Vector3r max = Omega::instance().getRootBody()->boundingVolume->max;
 		Vector3r center = (max+min)*0.5;
 		Vector3r halfSize = (max-min)*0.5;
 		float radius = halfSize[0];

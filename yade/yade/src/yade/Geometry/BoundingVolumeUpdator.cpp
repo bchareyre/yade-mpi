@@ -63,7 +63,7 @@ void BoundingVolumeUpdator::updateBoundingVolume(shared_ptr<Body> b)
 		}
 	}
 	
-	bvFactoriesManager(b->cm,b->bv,b->physicalParameters->se3);
+	bvFactoriesManager(b->interactionGeometry,b->boundingVolume,b->physicalParameters->se3);
 
 //	buildBoundingVolumeDispatcher(cm,se3,bv);
 		
@@ -84,7 +84,7 @@ void BoundingVolumeUpdator::updateBoundingVolume(Body* b)
 		}
 	}
 	
-	bvFactoriesManager(b->cm,b->bv,b->physicalParameters->se3);
+	bvFactoriesManager(b->interactionGeometry,b->boundingVolume,b->physicalParameters->se3);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

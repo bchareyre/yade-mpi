@@ -24,10 +24,9 @@ LIBS += -lMesh2D \
         -lCollisionGeometrySet2AABBFactory \
         -lMassSpringBody \
         -lExplicitMassSpringDynamicEngine \
-        -lParticleBallisticEngine \
         -lInteractionSphere \
         -rdynamic 
-INCLUDEPATH += $(YADEINCLUDEPATH) 
+INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
@@ -52,8 +51,8 @@ QMAKE_LIBDIR = ../../../plugins/Geometry/GeometricalModel/Mesh2D/$(YADEDYNLIBPAT
                ../../../plugins/Geometry/BoundingVolumeFactory/CollisionGeometrySet2AABBFactory/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/MassSpringBody/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/DynamicEngine/ExplicitMassSpringDynamicEngine/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/DynamicEngine/ParticleBallisticEngine/$(YADEDYNLIBPATH) \
                ../../../plugins/Geometry/CollisionGeometry/InteractionSphere/$(YADEDYNLIBPATH) \
+               ../../../plugins/Engine/DynamicEngine/ParticleBallisticEngine/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/RigidBody/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \

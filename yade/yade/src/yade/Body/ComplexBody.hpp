@@ -37,7 +37,7 @@
 class ComplexBody : public Body
 {
 	public	: shared_ptr<BodyContainer> bodies;
-	public : vector<shared_ptr<Actor> > actors;
+	public  : vector<shared_ptr<Actor> > actors;
 	
 	public	: shared_ptr<InteractionContainer> permanentInteractions;
 	public	: shared_ptr<InteractionContainer> interactions;	

@@ -44,7 +44,7 @@ void MassSpringBody2RigidBodyDynamicEngine::respondToCollisions(Body * /*body*/)
 // 		shared_ptr<Mesh2D> mesh;
 // 		if (c)
 // 		{
-// 			mesh = dynamic_pointer_cast<Mesh2D>(c->gm);
+// 			mesh = dynamic_pointer_cast<Mesh2D>(c->geometricalModel);
 // 			for(unsigned int i=0;i<cf->verticesId.size();i++)
 // 			{
 // 

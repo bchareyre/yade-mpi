@@ -143,7 +143,7 @@ void OpenGLRenderingEngine::render(shared_ptr<ComplexBody> rootBody)
 		renderBoundingVolume(rootBody);
 	
 	if (drawCollisionGeometry)
-		interactionGeometryDispatcher(rootBody->cm,rootBody->physicalParameters);
+		interactionGeometryDispatcher(rootBody->interactionGeometry,rootBody->physicalParameters);
 
 }
 
@@ -294,17 +294,17 @@ void OpenGLRenderingEngine::renderSceneUsingFastShadowVolumes(shared_ptr<Complex
 
 void OpenGLRenderingEngine::renderShadowVolumes(shared_ptr<ComplexBody> rootBody,Vector3r lightPos)
 {	
-	if (!rootBody->gm)
+	if (!rootBody->geometricalModel)
 	{
 		for( rootBody->bodies->gotoFirst() ; rootBody->bodies->notAtEnd() ; rootBody->bodies->gotoNext() )
 		{
 			shared_ptr<Body> b = rootBody->bodies->getCurrent();
-			if (b->gm->shadowCaster)
-				shadowVolumeDispatcher(b->gm,b->physicalParameters,lightPos);
+			if (b->geometricalModel->shadowCaster)
+				shadowVolumeDispatcher(b->geometricalModel,b->physicalParameters,lightPos);
 		}
 	}
 	else
-		shadowVolumeDispatcher(rootBody->gm,rootBody->physicalParameters,lightPos);
+		shadowVolumeDispatcher(rootBody->geometricalModel,rootBody->physicalParameters,lightPos);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -312,7 +312,7 @@ void OpenGLRenderingEngine::renderShadowVolumes(shared_ptr<ComplexBody> rootBody
 
 void OpenGLRenderingEngine::renderGeometricalModel(shared_ptr<ComplexBody> rootBody)
 {	
-	if (!rootBody->gm)
+	if (!rootBody->geometricalModel)
 	{
 		for( rootBody->bodies->gotoFirst() ; rootBody->bodies->notAtEnd() ; rootBody->bodies->gotoNext() )
 		{
@@ -325,12 +325,12 @@ void OpenGLRenderingEngine::renderGeometricalModel(shared_ptr<ComplexBody> rootB
 			se3.rotation.toAxisAngle(axis,angle);	
 			glTranslatef(se3.translation[0],se3.translation[1],se3.translation[2]);
 			glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
-			geometricalModelDispatcher(b->gm,b->physicalParameters);
+			geometricalModelDispatcher(b->geometricalModel,b->physicalParameters);
 			glPopMatrix();
 		}
 	}
 	else
-		geometricalModelDispatcher(rootBody->gm,rootBody->physicalParameters);
+		geometricalModelDispatcher(rootBody->geometricalModel,rootBody->physicalParameters);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -342,12 +342,12 @@ void OpenGLRenderingEngine::renderBoundingVolume(shared_ptr<ComplexBody> rootBod
 	{	
 		glPushMatrix();
 		shared_ptr<Body> b = rootBody->bodies->getCurrent();
-		boundingVolumeDispatcher(b->bv);
+		boundingVolumeDispatcher(b->boundingVolume);
 		glPopMatrix();
 	}
 	
 	glPushMatrix();
-	boundingVolumeDispatcher(rootBody->bv);
+	boundingVolumeDispatcher(rootBody->boundingVolume);
 	glPopMatrix();
 }
 

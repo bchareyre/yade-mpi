@@ -124,8 +124,8 @@ void PersistentSAPCollider::broadCollisionTest(Body* body)
 		b = bodies->getCurrent();
 		
 		offset = 3*i;
-		min = b->bv->min;
-		max = b->bv->max;
+		min = b->boundingVolume->min;
+		max = b->boundingVolume->max;
 		minimums[offset+0] = min[0];
 		minimums[offset+1] = min[1];
 		minimums[offset+2] = min[2];

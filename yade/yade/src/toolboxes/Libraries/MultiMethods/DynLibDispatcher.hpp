@@ -183,6 +183,34 @@ class DynLibDispatcher
 // 				<< a << ", " << b << ", " << ", " << c << ", " d << endl;
 // 		}
 		
+		shared_ptr<Executor> makeExecutor(string libName)
+		{
+			boost::shared_ptr<Executor> executor;
+			try
+			{
+				executor = boost::dynamic_pointer_cast<Executor>(ClassFactory::instance().createShared(libName));
+				if(! executor )
+				{
+					//static bool first=true;
+					//if(first)
+					//{
+					//	cerr << "WARNING: DynLibDispatcher::makeExecutor, dynamic_pointer_cast failed - trying static_pointer_cast instead. This may be due to compiler's bug, or programmer's mistake.\n";
+					//	first = false;
+					//}
+					executor = boost::static_pointer_cast<Executor>(ClassFactory::instance().createShared(libName));
+				}
+			}
+			catch (FactoryCantCreate& fe)
+			{
+				std::string error = string(fe.what()) 
+						+ " -- " + MultiMethodsExceptions::NotExistingClass + libName;	
+				throw MultiMethodsNotExistingClass(error.c_str());
+			}	
+			assert(executor);
+			
+			return executor;
+		}
+
 ////////////////////////////////////////////////////////////////////////////////
 // add multivirtual function to 1D
 ////////////////////////////////////////////////////////////////////////////////
@@ -199,32 +227,11 @@ class DynLibDispatcher
 			assert(base);
 			int& index = base->getClassIndex();
  			assert (index != -1);
-// 			if(index == -1)				// assign new index
-// 			{
-// 				index = base->getMaxCurrentlyUsedClassIndex()+1;
-// 				so that other dispatchers will not fall in conflict with this index
-// 				base->incrementMaxCurrentlyUsedClassIndex();
-// 			}
+			
 			int maxCurrentIndex = base->getMaxCurrentlyUsedClassIndex();
 			callBacks.resize( maxCurrentIndex+1 );	// make sure that there is a place for new Functor
 
-			boost::shared_ptr<Executor> executor;	// create the requested functor
-			try
-			{
-				executor = boost::dynamic_pointer_cast<Executor>(ClassFactory::instance().createShared(libName));
-				if(! executor )
-				{
-					cerr << "WARNING: DynLibDispatcher::add 1D, dynamic_pointer_cast failed - trying static_pointer_cast instead\n";
-					executor = boost::static_pointer_cast<Executor>(ClassFactory::instance().createShared(libName));
-				}
-			}
-			catch (FactoryCantCreate& fe)
-			{
-				std::string error = string(fe.what()) 
-						+ " -- " + MultiMethodsExceptions::NotExistingClass + libName;	
-				throw MultiMethodsNotExistingClass(error.c_str());
-			}	
-			assert(executor);
+			boost::shared_ptr<Executor> executor=makeExecutor(libName);	// create the requested functor
 			callBacks[index] = executor;
 			#ifdef DEBUG
 				cerr <<" New class added to DynLibDispatcher 1D: " << libName << endl;
@@ -274,18 +281,9 @@ class DynLibDispatcher
 
  			int& index1 = base1->getClassIndex();
 			assert (index1 != -1);
-// 			if (index1 == -1)
-// 			{
-// 				index1 = base1->getMaxCurrentlyUsedClassIndex()+1;
-// 				base1->incrementMaxCurrentlyUsedClassIndex();
-// 			}
- 			int& index2 = base2->getClassIndex();
+ 			
+			int& index2 = base2->getClassIndex();
  			assert(index2 != -1);
-// 			if (index2 == -1)
-// 			{
-// 				index2 = base2->getMaxCurrentlyUsedClassIndex()+1;
-// 				base2->incrementMaxCurrentlyUsedClassIndex();
-// 			}
 	
 			if( typeid(BaseClass1) == typeid(BaseClass2) )
 				assert(base1->getMaxCurrentlyUsedClassIndex() == base2->getMaxCurrentlyUsedClassIndex());
@@ -300,19 +298,7 @@ class DynLibDispatcher
 			for( IteratorInfo2 cii = callBacksInfo.begin() ; cii != callBacksInfo.end() ; ++cii )
 				cii->resize(maxCurrentIndex2+1);
 
-			boost::shared_ptr<Executor> executor;
-			try
-			{
-				executor = boost::dynamic_pointer_cast<Executor>(ClassFactory::instance().createShared(libName));
-			}
-			catch (FactoryCantCreate& fe)
-			{
-				std::string error = string(fe.what()) 
-						+ " -- " + MultiMethodsExceptions::NotExistingClass + libName;	
-				throw MultiMethodsNotExistingClass(error.c_str());
-			}
-			
-			assert(executor);
+			boost::shared_ptr<Executor> executor=makeExecutor(libName);	// create the requested functor
 			
 			if( typeid(BaseClass1) == typeid(BaseClass2) ) // both base classes are the same
 			{

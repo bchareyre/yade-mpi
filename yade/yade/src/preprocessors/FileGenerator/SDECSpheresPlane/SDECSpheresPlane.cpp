@@ -8,7 +8,6 @@
 #include "SAPCollider.hpp"
 #include "PersistentSAPCollider.hpp"
 #include "SDECDiscreteElement.hpp"
-#include "BallisticDynamicEngine.hpp"
 #include <fstream>
 #include "IOManager.hpp"
 #include "SDECDynamicEngine.hpp"
@@ -116,11 +115,11 @@ string SDECSpheresPlane::generate()
 	//set->wire		= false;
 	//set->visible		= true;
 	//set->shadowCaster	= false;
-	rootBody->cm		= dynamic_pointer_cast<CollisionGeometry>(set);	
+	rootBody->interactionGeometry		= dynamic_pointer_cast<CollisionGeometry>(set);	
 	
 	aabb			= shared_ptr<AABB>(new AABB);
 	aabb->diffuseColor		= Vector3r(0,0,1);
-	rootBody->bv		= dynamic_pointer_cast<BoundingVolume>(aabb);
+	rootBody->boundingVolume		= dynamic_pointer_cast<BoundingVolume>(aabb);
 
 	
 	shared_ptr<SimpleBody> box1(new SimpleBody);
@@ -136,7 +135,7 @@ string SDECSpheresPlane::generate()
 	physics->inertia	= Vector3r(0,0,0);
 	physics->se3		= Se3r(Vector3r(0,0,0),q);
 	aabb->diffuseColor	= Vector3r(1,0,0);
-	box1->bv		= dynamic_pointer_cast<BoundingVolume>(aabb);
+	box1->boundingVolume		= dynamic_pointer_cast<BoundingVolume>(aabb);
 	
 	box->extents		= groundSize;
 	box->diffuseColor	= Vector3f(1,1,1);
@@ -147,8 +146,8 @@ string SDECSpheresPlane::generate()
 	interactionBox->extents		= groundSize;
 	interactionBox->diffuseColor	= Vector3f(1,1,1);
 		
-	box1->cm		= dynamic_pointer_cast<CollisionGeometry>(interactionBox);
-	box1->gm		= dynamic_pointer_cast<GeometricalModel>(box);
+	box1->interactionGeometry		= dynamic_pointer_cast<CollisionGeometry>(interactionBox);
+	box1->geometricalModel		= dynamic_pointer_cast<GeometricalModel>(box);
 	physics->kn		= kn;
 	physics->ks		= ks;
 
@@ -185,7 +184,7 @@ string SDECSpheresPlane::generate()
 		s->se3			= Se3r(translation,q);
 
 		aabb->diffuseColor		= Vector3r(0,1,0);
-		simple->bv			= dynamic_pointer_cast<BoundingVolume>(aabb);
+		simple->boundingVolume			= dynamic_pointer_cast<BoundingVolume>(aabb);
 
 		sphere->radius		= radius;
 		sphere->diffuseColor	= Vector3f(Mathf::unitRandom(),Mathf::unitRandom(),Mathf::unitRandom());
@@ -197,8 +196,8 @@ string SDECSpheresPlane::generate()
 		interactionSphere->diffuseColor	= Vector3f(Mathf::unitRandom(),Mathf::unitRandom(),Mathf::unitRandom());
 		
 		
-		simple->cm			= dynamic_pointer_cast<CollisionGeometry>(interactionSphere);
-		simple->gm			= dynamic_pointer_cast<GeometricalModel>(sphere);
+		simple->interactionGeometry			= dynamic_pointer_cast<CollisionGeometry>(interactionSphere);
+		simple->geometricalModel			= dynamic_pointer_cast<GeometricalModel>(sphere);
 		s->kn			= kn;
 		s->ks			= ks;
 		simple->physicalParameters = s;

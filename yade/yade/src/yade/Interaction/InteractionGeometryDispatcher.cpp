@@ -50,6 +50,6 @@ void InteractionGeometryDispatcher::action(Body* body)
 		shared_ptr<Body> b1 = (*bodies)[interaction->getId1()];
 		shared_ptr<Body> b2 = (*bodies)[interaction->getId2()];
 
-		interaction->isReal = interactionGeometryDispatcher( b1->cm , b2->cm , b1->physicalParameters->se3 , b2->physicalParameters->se3 , interaction );
+		interaction->isReal = interactionGeometryDispatcher( b1->interactionGeometry , b2->interactionGeometry , b1->physicalParameters->se3 , b2->physicalParameters->se3 , interaction );
 	}
 }

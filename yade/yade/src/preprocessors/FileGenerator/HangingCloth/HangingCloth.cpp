@@ -7,7 +7,6 @@
 #include "AABB.hpp"
 #include "ComplexBody.hpp"
 #include "SimpleSpringDynamicEngine.hpp"
-#include "ParticleBallisticEngine.hpp"
 #include "PersistentSAPCollider.hpp"
 #include "MassSpringBody.hpp"
 #include "ExplicitMassSpringDynamicEngine.hpp"
@@ -123,9 +122,9 @@ string HangingCloth::generate()
 	mesh2d->visible		= true;
 	mesh2d->shadowCaster	= false;
 	
-	rootBody->gm			= mesh2d;
-	rootBody->cm			= set;
-	rootBody->bv			= aabb;
+	rootBody->geometricalModel			= mesh2d;
+	rootBody->interactionGeometry			= set;
+	rootBody->boundingVolume			= aabb;
 	rootBody->physicalParameters	= physics2;
 	
 	rootBody->permanentInteractions->clear();
@@ -149,9 +148,9 @@ string HangingCloth::generate()
 			iSphere->diffuseColor	= Vector3r(0,0,1);
 			iSphere->radius		= cellSize/2.0;
 
-			node->bv		= aabb;
-			//node->gm		= ??;
-			node->cm		= iSphere;
+			node->boundingVolume		= aabb;
+			//node->geometricalModel		= ??;
+			node->interactionGeometry		= iSphere;
 			node->physicalParameters= particle;
 			
 			rootBody->bodies->insert(node);
@@ -200,7 +199,7 @@ string HangingCloth::generate()
 		Body * body = static_cast<Body*>((*(rootBody->bodies))[offset(0,0)].get());
 		Particle * p = static_cast<Particle*>(body->physicalParameters.get());
 		p->invMass = 0;
-		body->cm->diffuseColor = Vector3r(1.0,0.0,0.0);
+		body->interactionGeometry->diffuseColor = Vector3r(1.0,0.0,0.0);
 		body->isDynamic = false;
 	}
 	
@@ -209,7 +208,7 @@ string HangingCloth::generate()
 		Body * body = static_cast<Body*>((*(rootBody->bodies))[offset(width-1,0)].get());
 		Particle * p = static_cast<Particle*>(body->physicalParameters.get());
 		p->invMass = 0;
-		body->cm->diffuseColor = Vector3r(1.0,0.0,0.0);
+		body->interactionGeometry->diffuseColor = Vector3r(1.0,0.0,0.0);
 		body->isDynamic = false;
 	}
 	
@@ -218,7 +217,7 @@ string HangingCloth::generate()
 		Body * body = static_cast<Body*>((*(rootBody->bodies))[offset(0,height-1)].get());
 		Particle * p = static_cast<Particle*>(body->physicalParameters.get());
 		p->invMass = 0;
-		body->cm->diffuseColor = Vector3r(1.0,0.0,0.0);		
+		body->interactionGeometry->diffuseColor = Vector3r(1.0,0.0,0.0);		
 		body->isDynamic = false;
 	}
 
@@ -227,7 +226,7 @@ string HangingCloth::generate()
 		Body * body = static_cast<Body*>((*(rootBody->bodies))[offset(width-1,height-1)].get());
 		Particle * p = static_cast<Particle*>(body->physicalParameters.get());
 		p->invMass = 0;
-		body->cm->diffuseColor = Vector3r(1.0,0.0,0.0);		
+		body->interactionGeometry->diffuseColor = Vector3r(1.0,0.0,0.0);		
 		body->isDynamic = false;
 	}
  	
