@@ -106,7 +106,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>plugins/Body/BodyPhysicalParameters/ParticleParameters</activedir>
+      <activedir>toolboxes/Libraries/Math</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>

@@ -103,7 +103,7 @@ public:
     static RealType fastInvCos0 (RealType fValue);
     static RealType fastInvCos1 (RealType fValue);
 
-    // The input must be in [-1,1]. 
+    // The input must be in [-1,1].
     // max error invtan0 = 1.2e-05, speed up = 2.8
     // max error invtan1 = 2.3e-08, speed up = 1.8
     static RealType fastInvTan0 (RealType fValue);

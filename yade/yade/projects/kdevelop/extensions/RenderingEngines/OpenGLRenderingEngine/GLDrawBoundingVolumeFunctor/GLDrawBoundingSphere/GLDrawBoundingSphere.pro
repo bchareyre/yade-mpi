@@ -5,12 +5,17 @@
 
 LIBS += -lBoundingSphere \
         -rdynamic 
-INCLUDEPATH += $(YADEINCLUDEPATH) 
+INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../../../plugins/Geometry/BoundingVolume/BoundingSphere/$(YADEDYNLIBPATH) \
+QMAKE_LIBDIR = ../../../../../plugins/Body/BoundingVolume/BoundingSphere/$(YADEDYNLIBPATH) \
+               ../../../../../plugins/Geometry/BoundingVolume/BoundingSphere/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
+QMAKE_CXXFLAGS_RELEASE += -lpthread \
+                          -pthread 
+QMAKE_CXXFLAGS_DEBUG += -lpthread \
+                        -pthread 
 DESTDIR = $(YADEDYNLIBPATH) 
 CONFIG += debug \
           warn_on \
