@@ -36,6 +36,9 @@ ThreadSynchronizer::ThreadSynchronizer() : i(-1),prevI(0),nbThreads(0)
 
 void ThreadSynchronizer::startAll()
 {
+//	boost::mutex tmpMutex;
+//	boost::mutex::scoped_lock tmpLoc(tmpMutex);
+	
 	i=prevI;
 	cond.notify_all();
 }
@@ -45,6 +48,9 @@ void ThreadSynchronizer::startAll()
 
 void ThreadSynchronizer::stopAll()
 {
+//	boost::mutex tmpMutex;
+//	boost::mutex::scoped_lock tmpLoc(tmpMutex);
+	
 	prevI = i;
 	i=-1;
 }
@@ -54,6 +60,9 @@ void ThreadSynchronizer::stopAll()
 
 int ThreadSynchronizer::insertThread()
 { 
+//	boost::mutex tmpMutex;
+//	boost::mutex::scoped_lock tmpLoc(tmpMutex);
+	
 	redirectionId.push_back(nbThreads);
 	return nbThreads++;
 }
@@ -63,6 +72,9 @@ int ThreadSynchronizer::insertThread()
 
 void ThreadSynchronizer::removeThread(int id)
 { 
+//	boost::mutex tmpMutex;
+//	boost::mutex::scoped_lock tmpLoc(tmpMutex);
+
 	redirectionId[id] = -1;
 }
 
@@ -71,10 +83,10 @@ void ThreadSynchronizer::removeThread(int id)
 
 void ThreadSynchronizer::wait(int id)
 {
-	boost::mutex::scoped_lock lock(mutex);
-			
-	while (redirectionId[i]!=id)
-		cond.wait(lock);
+	lock = new boost::mutex::scoped_lock(mutex);
+		
+	while (redirectionId[id]!=i)
+		cond.wait(*lock);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -87,6 +99,9 @@ void ThreadSynchronizer::signal()
 		i=(i+1)%nbThreads;
 	
 	cond.notify_all();
+	
+	delete lock;
+	
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
