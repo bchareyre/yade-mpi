@@ -1,6 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2004 by Olivier Galizzi                                 *
- *   olivier.galizzi@imag.fr                                               *
+ *   Copyright (C) 2004 by Janek Kozicki                                   *
+ *   cosurgi@berlios.de                                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -21,40 +21,37 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "ActionApplyDispatcher.hpp"
-#include "ComplexBody.hpp"
+#ifndef ACTION_DAMPING_FUNCTOR_HPP
+#define ACTION_DAMPING_FUNCTOR_HPP
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void ActionApplyDispatcher::postProcessAttributes(bool deserializing)
+#include "FunctorWrapper.hpp"
+#include "Action.hpp"
+#include "BodyPhysicalParameters.hpp"
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+class ActionDampingFunctor : public FunctorWrapper
+		<
+		 void ,
+		 TYPELIST_2(	  const shared_ptr<Action>&
+				, shared_ptr<BodyPhysicalParameters>& 
+			   )
+		>
 {
-	postProcessDispatcher2D(deserializing);
-}
+	REGISTER_CLASS_NAME(ActionDampingFunctor);
+};
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void ActionApplyDispatcher::registerAttributes()
-{
-	REGISTER_ATTRIBUTE(functorNames);
-	REGISTER_ATTRIBUTE(functorArguments);
-}
+REGISTER_SERIALIZABLE(ActionDampingFunctor,false);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void ActionApplyDispatcher::action(Body* body)
-{
-	ComplexBody * ncb = dynamic_cast<ComplexBody*>(body);
-	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 
-	int id;
-	for( ncb->actions->gotoFirst() ; ncb->actions->notAtEnd() ; ncb->actions->gotoNext())
-	{
-		shared_ptr<Action>& action = ncb->actions->getCurrent(id);
-// FIXME - it would be better if action was holding body's id. and it is possible that it will be even faster
-		operator()( action , (*bodies)[id]->physicalParameters);
-	}
-}
-
+#endif // ACTION_DAMPING_FUNCTOR_HPP

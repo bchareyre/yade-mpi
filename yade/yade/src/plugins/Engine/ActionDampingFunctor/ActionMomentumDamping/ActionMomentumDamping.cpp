@@ -1,6 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2004 by Olivier Galizzi                                 *
- *   olivier.galizzi@imag.fr                                               *
+ *   Copyright (C) 2004 by Janek Kozicki                                   *
+ *   cosurgi@berlios.de                                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -21,40 +21,47 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "ActionApplyDispatcher.hpp"
-#include "ComplexBody.hpp"
+#include "ActionMomentumDamping.hpp"
+#include "RigidBodyParameters.hpp"
+#include "ActionMomentum.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void ActionApplyDispatcher::postProcessAttributes(bool deserializing)
+ActionMomentumDamping::ActionMomentumDamping() : damping(0)
 {
-	postProcessDispatcher2D(deserializing);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void ActionApplyDispatcher::registerAttributes()
+void ActionMomentumDamping::registerAttributes()
 {
-	REGISTER_ATTRIBUTE(functorNames);
-	REGISTER_ATTRIBUTE(functorArguments);
+	REGISTER_ATTRIBUTE(damping);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void ActionApplyDispatcher::action(Body* body)
+void ActionMomentumDamping::go(const shared_ptr<Action>& a , shared_ptr<BodyPhysicalParameters>& b)
 {
-	ComplexBody * ncb = dynamic_cast<ComplexBody*>(body);
-	shared_ptr<BodyContainer>& bodies = ncb->bodies;
-
-	int id;
-	for( ncb->actions->gotoFirst() ; ncb->actions->notAtEnd() ; ncb->actions->gotoNext())
+	ActionMomentum * am = static_cast<ActionMomentum*>(a.get());
+	RigidBodyParameters * rb = static_cast<RigidBodyParameters*>(b.get());
+	
+	Real m  = am->momentum.length();
+	register int sign;
+	for(int j=0;j<3;j++)
 	{
-		shared_ptr<Action>& action = ncb->actions->getCurrent(id);
-// FIXME - it would be better if action was holding body's id. and it is possible that it will be even faster
-		operator()( action , (*bodies)[id]->physicalParameters);
+		if (rb->angularVelocity[j]==0)
+			sign = 0;
+		else if (rb->angularVelocity[j]>0)
+			sign = 1;
+		else
+			sign = -1;
+		am->momentum[j] -= damping*m*sign;
 	}
 }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
 

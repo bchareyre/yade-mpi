@@ -1,6 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2004 by Olivier Galizzi                                 *
- *   olivier.galizzi@imag.fr                                               *
+ *   Copyright (C) 2004 by Janek Kozicki                                   *
+ *   cosurgi@berlios.de                                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -21,13 +21,13 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "ActionApplyDispatcher.hpp"
+#include "ActionDampingDispatcher.hpp"
 #include "ComplexBody.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void ActionApplyDispatcher::postProcessAttributes(bool deserializing)
+void ActionDampingDispatcher::postProcessAttributes(bool deserializing)
 {
 	postProcessDispatcher2D(deserializing);
 }
@@ -35,7 +35,7 @@ void ActionApplyDispatcher::postProcessAttributes(bool deserializing)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void ActionApplyDispatcher::registerAttributes()
+void ActionDampingDispatcher::registerAttributes()
 {
 	REGISTER_ATTRIBUTE(functorNames);
 	REGISTER_ATTRIBUTE(functorArguments);
@@ -44,7 +44,7 @@ void ActionApplyDispatcher::registerAttributes()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void ActionApplyDispatcher::action(Body* body)
+void ActionDampingDispatcher::action(Body* body)
 {
 	ComplexBody * ncb = dynamic_cast<ComplexBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
@@ -57,4 +57,3 @@ void ActionApplyDispatcher::action(Body* body)
 		operator()( action , (*bodies)[id]->physicalParameters);
 	}
 }
-

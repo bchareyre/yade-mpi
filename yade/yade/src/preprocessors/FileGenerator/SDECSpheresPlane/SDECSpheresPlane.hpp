@@ -12,6 +12,8 @@ class SDECSpheresPlane : public FileGenerator
 	private : Real ks;
 	private : Vector3r groundSize;
 	private : Real maxRadius;
+	private : Real dampingForce;
+	private : Real dampingMomentum;
 	// construction
 	public : SDECSpheresPlane ();
 	public : ~SDECSpheresPlane ();

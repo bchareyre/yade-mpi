@@ -489,72 +489,51 @@ void SDECDynamicEngine::respondToInteractions(Body* body)
 
 	shared_ptr<Body> b;
 	unsigned int i=0;
-	
 	shared_ptr<ActionForce> af(new ActionForce);
 	shared_ptr<ActionMomentum> am(new ActionMomentum);
 	
 	for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext() , ++i )
 	{
 		b = bodies->getCurrent();
- 
 		shared_ptr<SDECParameters> de = dynamic_pointer_cast<SDECParameters>(b->physicalParameters);
+		static_cast<ActionForce*>( ncb->actions->find( b->getId() , actionForce->getClassIndex() ).get() )->force += gravity*de->mass;
+		
+// 		int sign;
+// 		ActionForce * actionForceTmp = static_cast<ActionForce*>( ncb->actions->find(b->getId(), actionForce->getClassIndex() ).get());
+// 		Real f  = actionForceTmp->force.length();
+// 		
+// 		for(int j=0;j<3;j++)
+// 		{
+// 			if (de->velocity[j]==0)
+// 				sign=0;
+// 			else if (de->velocity[j]>0)
+// 				sign=1;
+// 			else
+// 				sign=-1;
+// 			// FIXME - this must be a parameter in .xml !!!
+// 			//forces[    i  ] [       j        ] -= 0.3*f*sign;
+// 			actionForceTmp->force[j] -= 0.3*f*sign;
+// 			//    [ BodyId] [ (x,y,z): index ]
+// 		}
 
-///////////////////// PREVIOUS CONTAINER, begin
-//			af->force = gravity*de->mass;
-//			body->actions->add(af,b->getId());
-///////////////////// PREVIOUS CONTAINER, end
+		// all bodies do not have momentum so we have to test that
+		// it is different from forces, because we have added gravity to all bodies
 
-///////////////////// NEW CONTAINER, faster, begin
-			static_cast<ActionForce*>( ncb->actions->find( b->getId() , actionForce->getClassIndex() ).get() )->force += gravity*de->mass;
-///////////////////// NEW CONTAINER, end
-			
-			int sign;
-			//Real f = forces[i].length();
-			ActionForce * actionForceTmp = static_cast<ActionForce*>( ncb->actions->find(b->getId(), actionForce->getClassIndex() ).get());
-			Real f  = actionForceTmp->force.length();
-			
-			for(int j=0;j<3;j++)
-			{
-				if (de->velocity[j]==0)
-					sign=0;
-				else if (de->velocity[j]>0)
-					sign=1;
-				else
-					sign=-1;
-				// FIXME - this must be a parameter in .xml !!!
-				//forces[    i  ] [       j        ] -= 0.3*f*sign;
-				actionForceTmp->force[j] -= 0.3*f*sign;
-				//    [ BodyId] [ (x,y,z): index ]
-			}
-
-			// all bodies do not have momentum so we have to test that
-			// it is different from forces, because we have added gravity to all bodies
-///////////////////// PREVIOUS CONTAINER, begin
-//			shared_ptr<Action> action = body->actions->find(b->getId(),am->getClassIndex());
-//			if (action)
-//			{
-//				ActionMomentum * actionMomentum = static_cast<ActionMomentum*>(action.get());
-///////////////////// PREVIOUS CONTAINER, end
-
-			ActionMomentum * actionMomentumTmp = static_cast<ActionMomentum*>(ncb->actions->find(b->getId(),actionMomentum->getClassIndex() ) .get());
-			Real m  = actionMomentumTmp->momentum.length();
-
-			for(int j=0;j<3;j++)
-			{
-				if (de->angularVelocity[j]==0)
-					sign=0;
-				else if (de->angularVelocity[j]>0)
-					sign=1;
-				else
-					sign=-1;
-				//moments[   i   ] [       j        ] -= 0.3*m*sign;
-				actionMomentumTmp->momentum[j] -= 0.3*m*sign;
-				//     [ BodyId] [ (x,y,z): index ]
-			}
-				
-///////////////////// PREVIOUS CONTAINER, begin
-//			}
-///////////////////// PREVIOUS CONTAINER, end
+// 		ActionMomentum * actionMomentumTmp = static_cast<ActionMomentum*>(ncb->actions->find(b->getId(),actionMomentum->getClassIndex() ) .get());
+// 		Real m  = actionMomentumTmp->momentum.length();
+// 
+// 		for(int j=0;j<3;j++)
+// 		{
+// 			if (de->angularVelocity[j]==0)
+// 				sign=0;
+// 			else if (de->angularVelocity[j]>0)
+// 				sign=1;
+// 			else
+// 				sign=-1;
+// 			moments[   i   ] [       j        ] -= 0.3*m*sign;
+// 			actionMomentumTmp->momentum[j] -= 0.3*m*sign;
+// 			    [ BodyId] [ (x,y,z): index ]
+// 		}
         }
 
 }

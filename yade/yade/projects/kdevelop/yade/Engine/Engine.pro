@@ -7,12 +7,15 @@ HEADERS += TimeIntegratorDispatcher.hpp \
            TimeIntegratorFunctor.hpp \
            ActionApplyDispatcher.hpp \
            ActionApplyFunctor.hpp \
+           ActionDampingDispatcher.hpp \
+           ActionDampingFunctor.hpp \
            ActionContainer.hpp \
            Action.hpp \
            DynamicEngine.hpp \
            KinematicEngine.hpp 
 SOURCES += TimeIntegratorDispatcher.cpp \
            ActionApplyDispatcher.cpp \
+           ActionDampingDispatcher.cpp \
            ActionContainer.cpp \
            DynamicEngine.cpp \
            KinematicEngine.cpp 

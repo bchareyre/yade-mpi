@@ -106,7 +106,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>plugins/Engine/ApplyActionFunctor</activedir>
+      <activedir>preprocessors/FileGenerator/SDECSpheresPlane</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>

@@ -18,7 +18,13 @@
 #include "InteractionDescriptionSet2AABBFunctor.hpp"
 #include "InteractionDescriptionSet.hpp"
 #include "SDECLinearContactModel.hpp"
+
+
 #include "ActionApplyDispatcher.hpp"
+#include "ActionDampingDispatcher.hpp"
+#include "ActionForceDamping.hpp"
+#include "ActionMomentumDamping.hpp"
+
 #include "InteractionGeometryDispatcher.hpp"
 #include "InteractionPhysicsDispatcher.hpp"
 #include "SimpleBody.hpp"
@@ -34,7 +40,8 @@ SDECSpheresPlane::SDECSpheresPlane () : FileGenerator()
 	kn = 100000;
 	ks = 10000;
 	groundSize = Vector3r(200,5,200);
-
+	dampingForce = 0.3;
+	dampingMomentum = 0.3;
 }
 
 SDECSpheresPlane::~SDECSpheresPlane ()
@@ -54,6 +61,8 @@ void SDECSpheresPlane::registerAttributes()
 	REGISTER_ATTRIBUTE(kn);
 	REGISTER_ATTRIBUTE(ks);
 	REGISTER_ATTRIBUTE(groundSize);
+	REGISTER_ATTRIBUTE(dampingForce);
+	REGISTER_ATTRIBUTE(dampingMomentum);
 }
 
 string SDECSpheresPlane::generate()
@@ -75,6 +84,14 @@ string SDECSpheresPlane::generate()
 	boundingVolumeDispatcher->add("InteractionBox","AABB","Box2AABBFunctor");
 	boundingVolumeDispatcher->add("InteractionDescriptionSet","AABB","InteractionDescriptionSet2AABBFunctor");
 	
+	shared_ptr<ActionForceDamping> actionForceDamping(new ActionForceDamping);
+	actionForceDamping->damping = dampingForce;
+	shared_ptr<ActionMomentumDamping> actionMomentumDamping(new ActionMomentumDamping);
+	actionMomentumDamping->damping = dampingMomentum;
+	shared_ptr<ActionDampingDispatcher> actionDampingDispatcher(new ActionDampingDispatcher);
+	actionDampingDispatcher->add("ActionForce","RigidBodyParameters","ActionForceDamping",actionForceDamping);
+	actionDampingDispatcher->add("ActionMomentum","RigidBodyParameters","ActionMomentumDamping",actionMomentumDamping);
+	
 	shared_ptr<ActionApplyDispatcher> applyActionDispatcher(new ActionApplyDispatcher);
 	applyActionDispatcher->add("ActionForce","RigidBodyParameters","ActionForce2Particle");
 	applyActionDispatcher->add("ActionMomentum","RigidBodyParameters","ActionMomentum2RigidBody");
@@ -82,14 +99,15 @@ string SDECSpheresPlane::generate()
 	shared_ptr<TimeIntegratorDispatcher> timeIntegratorDispatcher(new TimeIntegratorDispatcher);
 	timeIntegratorDispatcher->add("SDECParameters","LeapFrogIntegrator");
 	
-	rootBody->actors.resize(7);
-	rootBody->actors[0] 		= boundingVolumeDispatcher;	
-	rootBody->actors[1] 		= shared_ptr<Actor>(new PersistentSAPCollider);
-	rootBody->actors[2] 		= interactionGeometryDispatcher;
-	rootBody->actors[3] 		= interactionPhysicsDispatcher;
-	rootBody->actors[4] 		= shared_ptr<Actor>(new SDECDynamicEngine);
-	rootBody->actors[5] 		= applyActionDispatcher;
-	rootBody->actors[6] 		= timeIntegratorDispatcher;
+	rootBody->actors.clear();
+	rootBody->actors.push_back(boundingVolumeDispatcher);	
+	rootBody->actors.push_back(shared_ptr<Actor>(new PersistentSAPCollider));
+	rootBody->actors.push_back(interactionGeometryDispatcher);
+	rootBody->actors.push_back(interactionPhysicsDispatcher);
+	rootBody->actors.push_back(shared_ptr<Actor>(new SDECDynamicEngine));
+	rootBody->actors.push_back(actionDampingDispatcher);
+	rootBody->actors.push_back(applyActionDispatcher);
+	rootBody->actors.push_back(timeIntegratorDispatcher);
 	
 
 	//FIXME : use a default one

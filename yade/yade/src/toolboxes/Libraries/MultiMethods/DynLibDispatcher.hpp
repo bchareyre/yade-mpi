@@ -234,6 +234,17 @@ class DynLibDispatcher
 			
 			if(! dupe) functorArguments.push_back(ex);
 		}
+		
+		boost::shared_ptr<Executor> findFunctorArguments(std::string libName)
+		{
+			executorListIterator it    = functorArguments.begin();
+			executorListIterator itEnd = functorArguments.end();
+			for( ; it != itEnd ; ++it )
+				if( (*it)->getClassName() == libName )
+					return *it;
+			
+			return boost::shared_ptr<Executor>();
+		}
 
 ////////////////////////////////////////////////////////////////////////////////
 // add multivirtual function to 1D
@@ -244,16 +255,18 @@ class DynLibDispatcher
 			{
 				deserializing = true;
 				for(unsigned int i=0;i<functorNames.size();i++)
-					add(functorNames[i][0],functorNames[i][1]);
+					add(functorNames[i][0],functorNames[i][1],findFunctorArguments(functorNames[i][1]));
 				deserializing = false;
 			}
 		}
 		
-		void storeFunctorName(const std::string& str1,const std::string& str2,boost::shared_ptr<Executor>& ex)
+		void storeFunctorName(	  const std::string& baseClassName
+					, const std::string& libName
+					, boost::shared_ptr<Executor>& ex)
 		{
 			std::vector<std::string> v;
-			v.push_back(str1);
-			v.push_back(str2);
+			v.push_back(baseClassName);
+			v.push_back(libName);
 			functorNames.push_back(v);
 			storeFunctorArguments(ex);
 		}
@@ -323,17 +336,20 @@ class DynLibDispatcher
 			{
 				deserializing = true;
 				for(unsigned int i=0;i<functorNames.size();i++)
-					add(functorNames[i][0],functorNames[i][1],functorNames[i][2]);
+					add(functorNames[i][0],functorNames[i][1],functorNames[i][2],findFunctorArguments(functorNames[i][2]));
 				deserializing = false;
 			}
 		}
 		
-		void storeFunctorName(const std::string& str1,const std::string& str2,const std::string& str3,boost::shared_ptr<Executor>& ex) // 2D
+		void storeFunctorName(	  const std::string& baseClassName1
+					, const std::string& baseClassName2
+					, const std::string& libName
+					, boost::shared_ptr<Executor>& ex) // 2D
 		{
 			std::vector<std::string> v;
-			v.push_back(str1);
-			v.push_back(str2);
-			v.push_back(str3);
+			v.push_back(baseClassName1);
+			v.push_back(baseClassName2);
+			v.push_back(libName);
 			functorNames.push_back(v);
 			storeFunctorArguments(ex);
 		}

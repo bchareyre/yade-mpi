@@ -39,7 +39,8 @@ class ActionApplyFunctor : public FunctorWrapper
 		 void ,
 		 TYPELIST_2(	  const shared_ptr<Action>&
 				, shared_ptr<BodyPhysicalParameters>&
-		) >
+			   ) 
+		>
 {
 	REGISTER_CLASS_NAME(ActionApplyFunctor);
 };
