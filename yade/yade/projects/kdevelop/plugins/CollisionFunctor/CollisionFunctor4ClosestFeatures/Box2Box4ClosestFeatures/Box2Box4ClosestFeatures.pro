@@ -20,7 +20,8 @@ INCLUDEPATH = ../../../../plugins/GeometricalModel/Box \
               ../../../../yade/Factory \
               ../../../../toolboxes/ComputationalGeometry/Intersections \
               ../../../../toolboxes/Libraries/Math \
-              ../../../../toolboxes/Libraries/Serialization 
+              ../../../../toolboxes/Libraries/Serialization \
+              ../../../../toolboxes/Libraries/AssocVector 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 

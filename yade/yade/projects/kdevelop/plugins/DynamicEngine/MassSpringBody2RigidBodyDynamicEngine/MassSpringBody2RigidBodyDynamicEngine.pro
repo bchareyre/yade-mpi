@@ -31,7 +31,8 @@ INCLUDEPATH = ../../../plugins/DynamicEngine/SimpleSpringDynamicEngine \
               ../../../yade/Factory \
               ../../../toolboxes/ComputationalGeometry/Distances \
               ../../../toolboxes/Libraries/Math \
-              ../../../toolboxes/Libraries/Serialization 
+              ../../../toolboxes/Libraries/Serialization \
+              ../../../toolboxes/Libraries/AssocVector 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 

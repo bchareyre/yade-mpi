@@ -11,12 +11,14 @@ INCLUDEPATH = ../../../yade/yade \
               ../../../yade/Interaction \
               ../../../yade/Factory \
               ../../../toolboxes/Libraries/Math \
-              ../../../toolboxes/Libraries/Serialization 
+              ../../../toolboxes/Libraries/Serialization \
+              ../../../toolboxes/Libraries/AssocVector 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 QMAKE_LIBDIR = ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
+               ../../../yade/Interaction/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
 CONFIG += debug \

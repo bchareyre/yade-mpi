@@ -5,7 +5,8 @@
 
 LIBS += -rdynamic 
 INCLUDEPATH = ../../../yade/yade \
-              ../../../yade/Factory 
+              ../../../yade/Factory \
+              ../../../toolboxes/Libraries/AssocVector 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
@@ -21,7 +22,8 @@ HEADERS += Archive.hpp \
            ContainerHandler.tpp \
            FundamentalHandler.tpp \
            PointerHandler.tpp \
-           SerializationExceptions.hpp 
+           SerializationExceptions.hpp \
+           MultiTypeHandler.tpp 
 SOURCES += Archive.cpp \
            Serializable.cpp \
            SerializationExceptions.cpp 

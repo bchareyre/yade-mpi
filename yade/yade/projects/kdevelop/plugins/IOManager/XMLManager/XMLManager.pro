@@ -10,7 +10,8 @@ INCLUDEPATH = ../../../yade/yade \
               ../../../yade/Factory \
               ../../../toolboxes/Libraries/Math \
               ../../../toolboxes/Libraries/IOManager \
-              ../../../toolboxes/Libraries/Serialization 
+              ../../../toolboxes/Libraries/Serialization \
+              ../../../toolboxes/Libraries/AssocVector 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
