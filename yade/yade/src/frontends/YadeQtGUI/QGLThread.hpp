@@ -43,10 +43,10 @@ class QGLThread : public Threadable<QGLThread>
 	private : bool * needResizing; // need to be a pointer otherwise modification into resize do not modify value into oneLoop and vice-versa
 	private : int * newWidth;
 	private : int * newHeight;
-	private : RenderingEngine* renderer;
+	private : shared_ptr<RenderingEngine> renderer;
 	private : GLViewer * glViewer;
 	
-	public : QGLThread (GLViewer * glv);
+	public : QGLThread (GLViewer * glv,shared_ptr<RenderingEngine> r);
 	public : ~QGLThread ();
 	
 	public : void resize(int w,int h);

@@ -37,6 +37,12 @@
 OpenGLRenderingEngine::OpenGLRenderingEngine() : RenderingEngine()
 {
 
+	drawBoundingVolume = false;
+	drawCollisionGeometry = false;
+	drawGeometricalModel = true;
+	castShadow = true;
+	drawShadowVolumes = false;
+
 }
 
 OpenGLRenderingEngine::~OpenGLRenderingEngine()
@@ -64,30 +70,50 @@ void OpenGLRenderingEngine::render(shared_ptr<NonConnexBody> rootBody)
 	glutSolidSphere(3,10,10);
 	glPopMatrix();	
 	
+	if (drawGeometricalModel)
+	{
+		if (castShadow)
+		{	
+			//renderSceneUsingShadowVolumes(rootBody,lightPos);
+			renderSceneUsingFastShadowVolumes(rootBody,lightPos);
+			// draw transparent shadow volume
+			
+			if (drawShadowVolumes)
+			{
+				glAlphaFunc(GL_GREATER, 1.0f/255.0f);
+				glEnable(GL_ALPHA_TEST);
+				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+				glEnable(GL_BLEND);	
+			
+				glColor4f(0.86,0.058,0.9,0.3);
+				glEnable(GL_LIGHTING);
+				
+				glEnable(GL_CULL_FACE);
+			
+				glCullFace(GL_FRONT);
+				renderShadowVolumes(rootBody,lightPos);
+				
+				glCullFace(GL_BACK);
+				renderShadowVolumes(rootBody,lightPos);
+				
+				glEnable(GL_DEPTH_TEST);
+				glDisable(GL_BLEND);
+				glDisable(GL_ALPHA_TEST);
+			}
+		}
+		else
+		{
+			glEnable(GL_CULL_FACE);
+			glEnable(GL_NORMALIZE);
+			rootBody->glDrawGeometricalModel();
+		}
+	}
 	
-//	renderSceneUsingShadowVolumes(rootBody,lightPos);
-	renderSceneUsingFastShadowVolumes(rootBody,lightPos);
-
-	// draw transparent shadow volume
-// 	glAlphaFunc(GL_GREATER, 1.0f/255.0f);
-// 	glEnable(GL_ALPHA_TEST);
-// 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-// 	glEnable(GL_BLEND);	
-// 
-// 	glColor4f(0.86,0.058,0.9,0.3);
-// 	glEnable(GL_LIGHTING);
-// 	
-// 	glEnable(GL_CULL_FACE);
-// 
-// 	glCullFace(GL_FRONT);
-// 	renderShadowVolumes(rootBody,lightPos);
-// 	
-// 	glCullFace(GL_BACK);
-// 	renderShadowVolumes(rootBody,lightPos);
-// 	
-// 	glEnable(GL_DEPTH_TEST);
-// 	glDisable(GL_BLEND);
-// 	glDisable(GL_ALPHA_TEST);
+	if (drawBoundingVolume)
+		rootBody->glDrawBoundingVolume();
+	
+	if (drawCollisionGeometry)
+		rootBody->glDrawCollisionGeometry();
 
 }
 
@@ -99,7 +125,8 @@ void OpenGLRenderingEngine::renderSceneUsingShadowVolumes(shared_ptr<NonConnexBo
 	glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
-	renderRootBody(rootBody);  /* render scene in depth buffer */
+	glEnable(GL_NORMALIZE);
+	rootBody->glDrawGeometricalModel();	
 	
 	glClear(GL_STENCIL_BUFFER_BIT);
 	glEnable(GL_STENCIL_TEST);
@@ -123,12 +150,14 @@ void OpenGLRenderingEngine::renderSceneUsingShadowVolumes(shared_ptr<NonConnexBo
 	glStencilFunc(GL_EQUAL, 1, 1);  /* draw shadowed part */
 	glStencilFunc(GL_NOTEQUAL, 0, (GLuint)(-1));
 	glDisable(GL_LIGHT0);
-	renderRootBody(rootBody);
+	glEnable(GL_NORMALIZE);
+	rootBody->glDrawGeometricalModel();	
 	
 	glStencilFunc(GL_EQUAL, 0, 1);  /* draw lit part */
 	glStencilFunc(GL_EQUAL, 0, (GLuint)(-1));
 	glEnable(GL_LIGHT0);
-	renderRootBody(rootBody);  
+	glEnable(GL_NORMALIZE);
+	rootBody->glDrawGeometricalModel();	
 	
 	glDepthFunc(GL_LESS);
 	glDisable(GL_STENCIL_TEST);
@@ -142,15 +171,17 @@ void OpenGLRenderingEngine::renderSceneUsingFastShadowVolumes(shared_ptr<NonConn
 {
 
 	glEnable(GL_CULL_FACE);
-	renderRootBody(rootBody); // render scene
-	glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+	glEnable(GL_NORMALIZE);
+	rootBody->glDrawGeometricalModel();	
+
+//	renderRootBody(rootBody); // render scene
+//	glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
 
 	glClear(GL_STENCIL_BUFFER_BIT);
 	glEnable(GL_STENCIL_TEST);
 	glDepthMask(GL_FALSE);
-	glStencilFunc(GL_ALWAYS, 0, 0);
-
-	renderRootBody(rootBody); // render scene
+	glStencilFunc(GL_ALWAYS, 0, 0);	
+	
 	glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
 
 	glStencilOp(GL_KEEP, GL_KEEP, GL_INCR);
@@ -235,16 +266,6 @@ void OpenGLRenderingEngine::renderSceneUsingFastShadowVolumes(shared_ptr<NonConn
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void OpenGLRenderingEngine::renderRootBody(shared_ptr<NonConnexBody> rootBody)
-{
-	glEnable(GL_NORMALIZE);
-
-	rootBody->glDraw();
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 void OpenGLRenderingEngine::renderShadowVolumes(shared_ptr<NonConnexBody> rootBody,Vector3r lightPos)
 {
 	shared_ptr<NonConnexBody> ncb = dynamic_pointer_cast<NonConnexBody>(rootBody);
@@ -295,6 +316,18 @@ void OpenGLRenderingEngine::renderShadowVolumes(shared_ptr<NonConnexBody> rootBo
 			glEnd();*/
 		}
 	}
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+void OpenGLRenderingEngine::registerAttributes()
+{
+	REGISTER_ATTRIBUTE(drawBoundingVolume);
+	REGISTER_ATTRIBUTE(drawCollisionGeometry);
+	REGISTER_ATTRIBUTE(drawGeometricalModel);
+	REGISTER_ATTRIBUTE(castShadow);
+	REGISTER_ATTRIBUTE(drawShadowVolumes);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

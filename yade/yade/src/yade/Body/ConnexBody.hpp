@@ -47,7 +47,9 @@ class ConnexBody : public Body
 
 	public : virtual ~ConnexBody ();
 
-	public : virtual void glDraw();
+	public : virtual void glDrawGeometricalModel();
+	public : virtual void glDrawBoundingVolume();
+	public : virtual void glDrawCollisionGeometry();
 
 
 	protected : virtual void postProcessAttributes(bool deserializing);

@@ -25,24 +25,34 @@ NonConnexBody::~NonConnexBody()
 }
 
 
-void NonConnexBody::glDraw()
+void NonConnexBody::glDrawGeometricalModel()
 {
+	//glPushMatrix();
 
-	glPushMatrix();
+	//Real angle;
+	//Vector3r axis;
+	//se3.rotation.toAxisAngle(axis,angle);
 
-	Real angle;
-	Vector3r axis;
-	se3.rotation.toAxisAngle(axis,angle);
-
-	glTranslatef(se3.translation[0],se3.translation[1],se3.translation[2]);
-	glRotated(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
+	//glTranslatef(se3.translation[0],se3.translation[1],se3.translation[2]);
+	//glRotated(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
 
 	for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext() )
-		bodies->getCurrent()->glDraw();
+		bodies->getCurrent()->glDrawGeometricalModel();
 	
 
-	glPopMatrix();
+	//glPopMatrix();
+}
 
+void NonConnexBody::glDrawBoundingVolume()
+{
+	for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext() )
+		bodies->getCurrent()->glDrawBoundingVolume();
+}
+
+void NonConnexBody::glDrawCollisionGeometry()
+{
+	for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext() )
+		bodies->getCurrent()->glDrawCollisionGeometry();
 }
 
 void NonConnexBody::postProcessAttributes(bool)

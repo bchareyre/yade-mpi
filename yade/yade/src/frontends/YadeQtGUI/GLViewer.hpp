@@ -44,7 +44,7 @@ class GLViewer : public QGLViewer
 	
 	private : GLWindowsManager wm;
 	// construction
-	public : GLViewer (const QGLFormat& format, QWidget * parent=0, QGLWidget * shareWidget=0);
+	public : GLViewer (shared_ptr<RenderingEngine> renderer, const QGLFormat& format, QWidget * parent=0, QGLWidget * shareWidget=0);
 	public : ~GLViewer ();
 
 	private : QGLThread qglThread;

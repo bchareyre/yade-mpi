@@ -29,6 +29,8 @@
 
 #include "GLViewer.hpp"
 #include "QtGeneratedSimulationController.h"
+#include "QtGUIGenerator.hpp"
+#include "RenderingEngine.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -39,7 +41,7 @@ class SimulationController;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 class SimulationControllerUpdater : public Threadable<SimulationControllerUpdater>
-{
+{	
 	private : SimulationController * controller;
 	public : SimulationControllerUpdater(SimulationController * sc);
 	public : ~SimulationControllerUpdater();
@@ -52,6 +54,9 @@ class SimulationControllerUpdater : public Threadable<SimulationControllerUpdate
 
 class SimulationController : public QtGeneratedSimulationController
 {
+	private : QtGUIGenerator guiGen;	
+	private : shared_ptr<RenderingEngine> renderer;
+
 	public : vector<GLViewer* > glViews;
 
 	private : shared_ptr<SimulationControllerUpdater> updater;
@@ -61,6 +66,7 @@ class SimulationController : public QtGeneratedSimulationController
 
 	public : ~SimulationController (); 
 	
+	public slots : virtual void pbApplyClicked();
 	public slots : virtual void pbLoadClicked();
 	public slots : virtual void pbNewViewClicked();
 	public slots : virtual void pbStopClicked();

@@ -36,12 +36,12 @@ boost::mutex resizeMutex;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-QGLThread::QGLThread(GLViewer * glv) :	Threadable<QGLThread>(), 
-					needResizing(new bool(false)), 
-					newWidth(new int(0)), 
-					newHeight(new int(0)), 
-					renderer(new OpenGLRenderingEngine()),
-					glViewer(glv)
+QGLThread::QGLThread(GLViewer * glv, shared_ptr<RenderingEngine> r) :	Threadable<QGLThread>(), 
+									needResizing(new bool(false)), 
+									newWidth(new int(0)), 
+									newHeight(new int(0)), 
+									renderer(r),
+									glViewer(glv)
 {
 	createThread(Omega::instance().synchronizer,true);
 }

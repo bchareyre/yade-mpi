@@ -113,8 +113,9 @@ class Body : public Serializable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/*! Abstract function overloaded in Connex and NonConnex body. It is called to draw the object in an opengl context */
-	public : virtual void glDraw() {/*throw CallVirtualUndefinedMethod()*/};
-
+	public : virtual void glDrawGeometricalModel() {/*throw CallVirtualUndefinedMethod()*/};
+	public : virtual void glDrawBoundingVolume() {/*throw CallVirtualUndefinedMethod()*/};
+	public : virtual void glDrawCollisionGeometry() {/*throw CallVirtualUndefinedMethod()*/};	
 	/*! Abstract function overloaded in Connex and NonConnex body. Move the body to the next time step using its own internal dynamic engine */
 	public : virtual void moveToNextTimeStep() {};
 

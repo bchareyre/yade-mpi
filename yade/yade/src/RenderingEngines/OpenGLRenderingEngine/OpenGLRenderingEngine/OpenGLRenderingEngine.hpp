@@ -34,21 +34,30 @@
 
 class OpenGLRenderingEngine : public RenderingEngine
 {	
+	public : bool drawBoundingVolume;
+	public : bool drawCollisionGeometry;
+	public : bool drawGeometricalModel;
+	public : bool castShadow;
+	public : bool drawShadowVolumes;
+	
+	
 	public : OpenGLRenderingEngine();
 	public : ~OpenGLRenderingEngine();
 	
 	public : void render(shared_ptr<NonConnexBody> body);
-	private : void renderRootBody(shared_ptr<NonConnexBody> rootBody);
 	private : void renderShadowVolumes(shared_ptr<NonConnexBody> rootBody,Vector3r lightPos);
 	private : void renderSceneUsingShadowVolumes(shared_ptr<NonConnexBody> rootBody,Vector3r lightPos);
 	private : void renderSceneUsingFastShadowVolumes(shared_ptr<NonConnexBody> rootBody,Vector3r lightPos);
+	
+	REGISTER_CLASS_NAME(OpenGLRenderingEngine);
 
+	public : void registerAttributes();
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-REGISTER_FACTORABLE(OpenGLRenderingEngine);
+REGISTER_SERIALIZABLE(OpenGLRenderingEngine,false);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////

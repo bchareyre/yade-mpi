@@ -53,7 +53,9 @@ class NonConnexBody : public Body
 
 	public	: virtual ~NonConnexBody ();
 
-	public	: virtual void glDraw();
+	public : virtual void glDrawGeometricalModel();
+	public : virtual void glDrawBoundingVolume();
+	public : virtual void glDrawCollisionGeometry();
 
 	public	: void moveToNextTimeStep();
 

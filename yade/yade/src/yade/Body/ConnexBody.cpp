@@ -22,9 +22,8 @@ ConnexBody::~ConnexBody()
 
 }
 
-
-void ConnexBody::glDraw()
-{	
+void ConnexBody::glDrawGeometricalModel()
+{
 	glPushMatrix();
 	Real angle;
 	Vector3r axis;	
@@ -33,10 +32,24 @@ void ConnexBody::glDraw()
 	glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);	
 	gm->glDraw();
 	glPopMatrix();
+}
 
-	//FIXME : hardcoded drawing of boundingvolume, sensor will fix that
+void ConnexBody::glDrawBoundingVolume()
+{
 	glPushMatrix();
 	bv->glDraw();
+	glPopMatrix();
+}
+
+void ConnexBody::glDrawCollisionGeometry()
+{
+	glPushMatrix();
+	Real angle;
+	Vector3r axis;	
+	se3.rotation.toAxisAngle(axis,angle);	
+	glTranslatef(se3.translation[0],se3.translation[1],se3.translation[2]);
+	glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);	
+	cm->glDraw();
 	glPopMatrix();
 }
 

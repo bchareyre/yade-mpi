@@ -23,11 +23,25 @@ SimulationController::SimulationController(QWidget * parent) : QtGeneratedSimula
 	setMinimumSize(size());
 	setMaximumSize(size());
 	updater = shared_ptr<SimulationControllerUpdater>(new SimulationControllerUpdater(this));
+
+	renderer = dynamic_pointer_cast<RenderingEngine>(ClassFactory::instance().createShared("OpenGLRenderingEngine"));	
+	guiGen.setResizeHeight(true);
+	guiGen.setResizeWidth(false);
+	guiGen.setShift(10,30);
+	guiGen.setShowButtons(false);	
+	guiGen.buildGUI(renderer, fDisplay);
+	
 }
 
 SimulationController::~SimulationController()
 {
 
+}
+
+
+void SimulationController::pbApplyClicked()
+{
+	guiGen.deserialize(renderer);
 }
 
 void SimulationController::pbLoadClicked()
@@ -52,7 +66,7 @@ void SimulationController::pbLoadClicked()
 			QGLFormat::setDefaultFormat( format );
 			format.setStencil(TRUE);
 			format.setAlpha(TRUE);
-			glViews.push_back(new GLViewer(format,this->parentWidget()->parentWidget()));
+			glViews.push_back(new GLViewer(renderer,format,this->parentWidget()->parentWidget()));
 		}
 		
 		Omega::instance().createSimulationLoop();
@@ -72,7 +86,7 @@ void SimulationController::pbNewViewClicked()
 	QGLFormat::setDefaultFormat( format );
 	format.setStencil(TRUE);
 	format.setAlpha(TRUE);
-	glViews.push_back(new GLViewer(format, this->parentWidget()->parentWidget(), glViews.front()) );
+	glViews.push_back(new GLViewer(renderer, format, this->parentWidget()->parentWidget(), glViews.front()) );
 }
 
 void SimulationController::pbStopClicked()

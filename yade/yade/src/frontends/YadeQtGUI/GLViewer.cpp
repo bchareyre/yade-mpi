@@ -6,7 +6,7 @@
 #include "ThreadSynchronizer.hpp"
 #include "FpsTracker.hpp"
 
-GLViewer::GLViewer(const QGLFormat& format, QWidget * parent, QGLWidget * shareWidget) : QGLViewer(format,parent,"glview",shareWidget), qglThread(this)
+GLViewer::GLViewer(shared_ptr<RenderingEngine> renderer, const QGLFormat& format, QWidget * parent, QGLWidget * shareWidget) : QGLViewer(format,parent,"glview",shareWidget), qglThread(this,renderer)
 {
 
 	setAutoBufferSwap(false);
