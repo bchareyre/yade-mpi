@@ -32,6 +32,7 @@ const char* ExceptionMessages::WrongExpectedClassName 		= "Wrong expected class 
 const char* ExceptionMessages::SetFunctionNotDeclared   	= "Set function not declared";
 const char* ExceptionMessages::GetFunctionNotDeclared   	= "Get function not declared";
 const char* ExceptionMessages::CantCreateClass   		= "ClassFactory::create - cannot create class named: ";
+const char* ExceptionMessages::ClassNotRegistered   		= "ClassFactory::create - library was loaded, but it didn't register itself - so cannot create instance: ";
 const char* ExceptionMessages::UnsupportedArchiveType 		= "Unsupported archive type";
 const char* ExceptionMessages::CustomClassNotRegistered 	= "Custom class not registered";
 const char* ExceptionMessages::ContainerNotSupported    	= "Container not supported";

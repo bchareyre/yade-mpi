@@ -3,6 +3,17 @@
 # Subdir relative project main directory: ./yade
 # Target is an application:  
 
+LIBS += -lboost_date_time \
+        -lglut \
+        -lQGLViewer \
+        -rdynamic 
+MOC_DIR = $(YADECOMPILATIONPATH) 
+UI_DIR = $(YADECOMPILATIONPATH) 
+OBJECTS_DIR = $(YADECOMPILATIONPATH) 
+DESTDIR = $(YADEBINPATH) 
+CONFIG += debug \
+          warn_on 
+TEMPLATE = app 
 FORMS += QtGeneratedFrontEnd.ui 
 HEADERS += Archive.hpp \
            ArchiveTypes.hpp \
@@ -95,16 +106,4 @@ SOURCES += Archive.cpp \
            Vector3.cpp \
            yade.cpp \
            MultiMethodsManager.cpp 
-LIBS += -lboost_date_time \
--lglut \
--lQGLViewer \
--rdynamic
-MOC_DIR = $(YADECOMPILATIONPATH)
-UI_DIR = $(YADECOMPILATIONPATH)
-OBJECTS_DIR = $(YADECOMPILATIONPATH)
-DESTDIR = $(YADEBINPATH)
-CONFIG += release \
-warn_on
-QtGeneratedFrontEnd.ui.commands = $$IDL_COMPILER $$IDL_OPTIONS $$QtGeneratedFrontEnd.ui.target
 QtGeneratedFrontEnd.ui.target = QtGeneratedFrontEnd.ui
-TEMPLATE = app

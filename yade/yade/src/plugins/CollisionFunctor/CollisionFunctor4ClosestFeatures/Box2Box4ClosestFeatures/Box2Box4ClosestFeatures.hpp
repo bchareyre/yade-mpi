@@ -17,7 +17,7 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
- 
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -34,7 +34,7 @@
 
 /*! \brief Provide collision handling between a axis aligned box and a sphere in terms of ClosestFeatures */
 class Box2Box4ClosestFeatures : public CollisionFunctor
-{		
+{
 	private : typedef struct BoxBoxCollisionInfo
 	{
 		bool isNormalPrincipalAxis;
@@ -43,7 +43,7 @@ class Box2Box4ClosestFeatures : public CollisionFunctor
 		int code;
 		Vector3 normal;
 	} BoxBoxCollisionInfo;
-	
+
 	// construction
 	public : Box2Box4ClosestFeatures ();
 	public : virtual ~Box2Box4ClosestFeatures ();
@@ -59,11 +59,19 @@ class Box2Box4ClosestFeatures : public CollisionFunctor
 	private : void clipRight(float sizeX, std::vector<Vector3>& polygon, Vector3 v1, Vector3 v2);
 	private : void clipTop(float sizeY, std::vector<Vector3>& polygon, Vector3 v1, Vector3 v2);
 	private : void clipBottom(float sizeY, std::vector<Vector3> &polygon, Vector3 v1, Vector3 v2);
+
+// FIXME : this should be just Factorable, not Serializable !!
+	public    : virtual void registerAttributes() {};
+	REGISTER_CLASS_NAME(Box2Box4ClosestFeatures);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+REGISTER_CLASS(Box2Box4ClosestFeatures,false);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #endif // __BOX2BOX4CLOSESTFEATURES_H__
 

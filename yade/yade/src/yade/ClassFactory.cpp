@@ -57,15 +57,22 @@ bool ClassFactory::registerSerializable( std::string name 			   , CreateSerializ
 
 boost::shared_ptr<Serializable> ClassFactory::createShared( std::string name )
 {
+
 	SerializableMap::const_iterator i = map.find( name );
 	if( i == map.end() )
 	{
 		dlm.load(name);
 		if (dlm.isLoaded(name))
+		{
+			if( map.find( name ) == map.end() )
+			{
+				std::string error = ExceptionMessages::ClassNotRegistered + name;
+				throw FactoryClassNotRegistered(error.c_str());
+			}
 			return createShared(name);
-		
+		}
 		std::string error = ExceptionMessages::CantCreateClass + name;
-		throw FactoryError(error.c_str());
+		throw FactoryCantCreate(error.c_str());
 	}
 	return ( i -> second.createShared ) ();
 }
@@ -78,9 +85,16 @@ Serializable* ClassFactory::createPure( std::string name )
 		//cerr << "------------ going to load something" << endl;
 		dlm.load(name);
 		if (dlm.isLoaded(name))
+		{
+			if( map.find( name ) == map.end() )
+			{
+				std::string error = ExceptionMessages::ClassNotRegistered + name;
+				throw FactoryClassNotRegistered(error.c_str());
+			}
 			return createPure(name);
+		}
 		std::string error = ExceptionMessages::CantCreateClass + name;
-		throw FactoryError(error.c_str());
+		throw FactoryCantCreate(error.c_str());
 	}
 	return ( i -> second.create ) ();
 }
@@ -91,7 +105,7 @@ void * ClassFactory::createPureCustom( std::string name )
 	if( i == map.end() )
 	{
 		std::string error = ExceptionMessages::CantCreateClass + name;
-		throw FactoryError(error.c_str());
+		throw FactoryCantCreate(error.c_str());
 	}
 	return ( i -> second.createPureCustom ) ();
 }

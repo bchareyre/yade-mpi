@@ -17,7 +17,7 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
- 
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -38,6 +38,7 @@
 #include "CollisionModel.hpp"
 #include "Se3.hpp"
 #include "Contact.hpp"
+#include "Serializable.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -46,14 +47,14 @@
 
 	Every functions that describe collision between two CollisionModels must derived from CollisionFunctor.
 */
-class CollisionFunctor : public Indexable
-{	
-		
+class CollisionFunctor : public Indexable , public Serializable
+{
+
 	private : bool reverse;
 
 	public : void setReverse(bool r) { reverse = r; };
 	public : bool isReverse() { return reverse; };
-	
+
 	// construction
 	public : CollisionFunctor () {};
 	public : virtual ~CollisionFunctor () {};
@@ -68,7 +69,10 @@ class CollisionFunctor : public Indexable
 		else
 			return collide(cm1,cm2,se31,se32,c);
 	}
-	
+
+// FIXME : this should be just Factorable, not Serializable !!
+	public    : virtual void registerAttributes() {};
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

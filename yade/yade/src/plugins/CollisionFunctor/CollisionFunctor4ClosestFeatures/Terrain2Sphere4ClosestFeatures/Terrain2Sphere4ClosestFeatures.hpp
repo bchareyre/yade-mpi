@@ -17,7 +17,7 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
- 
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -34,7 +34,7 @@
 
 /*! \brief Provide collision handling between a Terrain and a Sphere in terms of ClosestFeatures */
 class Terrain2Sphere4ClosestFeatures : public CollisionFunctor
-{		
+{
 	// construction
 	public : Terrain2Sphere4ClosestFeatures ();
 	public : virtual ~Terrain2Sphere4ClosestFeatures ();
@@ -44,12 +44,19 @@ class Terrain2Sphere4ClosestFeatures : public CollisionFunctor
 
 	// FIXME : put into toolbox and serialization and everything
 	private : float sqrDistTriPoint(const Vector3& p, const std::vector<Vector3>& tri, Vector3& pt);
-	
+
+// FIXME : this should be just Factorable, not Serializable !!
+	public    : virtual void registerAttributes() {};
+	REGISTER_CLASS_NAME(Terrain2Sphere4ClosestFeatures);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+REGISTER_CLASS(Terrain2Sphere4ClosestFeatures,false);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #endif // __TERRAIN2SPHERE4CLOSESTFEATURES_H__
 

@@ -17,7 +17,7 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
- 
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -34,19 +34,26 @@
 
 /*! \brief Provide collision handling between a axis aligned box and a sphere in terms of ClosestFeatures */
 class Sphere2Sphere4ClosestFeatures : public CollisionFunctor
-{		
+{
 	// construction
 	public : Sphere2Sphere4ClosestFeatures ();
 	public : virtual ~Sphere2Sphere4ClosestFeatures ();
 
 	protected : virtual bool collide(const shared_ptr<CollisionModel> cm1, const shared_ptr<CollisionModel> cm2, const Se3& se31, const Se3& se32, shared_ptr<Contact> c);
 	protected : virtual bool reverseCollide(const shared_ptr<CollisionModel> cm1, const shared_ptr<CollisionModel> cm2,  const Se3& se31, const Se3& se32, shared_ptr<Contact> c);
-	
+
+// FIXME : this should be just Factorable, not Serializable !!
+	public    : virtual void registerAttributes() {};
+	REGISTER_CLASS_NAME(Sphere2Sphere4ClosestFeatures);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+REGISTER_CLASS(Sphere2Sphere4ClosestFeatures,false);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #endif // __SPHERE2SPHERE4CLOSESTFEATURES_H__
 
