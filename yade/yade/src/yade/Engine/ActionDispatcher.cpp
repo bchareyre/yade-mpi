@@ -43,8 +43,13 @@ ActionDispatcher::~ActionDispatcher()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void ActionDispatcher::postProcessAttributes(bool )
+void ActionDispatcher::postProcessAttributes(bool deserializing)
 {
+	if(deserializing)
+	{
+		for(unsigned int i=0;i<actionFunctors.size();i++)
+			actionDispatcher.add(actionFunctors[i][0]/*,actionFunctors[i][1]*/,actionFunctors[i][2]);
+	}
 
 }
 
@@ -53,7 +58,19 @@ void ActionDispatcher::postProcessAttributes(bool )
 
 void ActionDispatcher::registerAttributes()
 {
+	REGISTER_ATTRIBUTE(actionFunctors);
+}
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+void ActionDispatcher::addActionFunctor(const string& str1,const string& str2,const string& str3)
+{
+	vector<string> v;
+	v.push_back(str1);
+	v.push_back(str2);
+	v.push_back(str3);
+	actionFunctors.push_back(v);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -53,6 +53,8 @@ class ActionDispatcher : public Actor
 					)
 		> actionDispatcher;
 
+	private : vector<vector<string> > actionFunctors;
+	public  : void addActionFunctor(const string& str1,const string& str2,const string& str3);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Constructor/Destructor								      ///

@@ -7,6 +7,7 @@ ActionVecVec::ActionVecVec()
 	clear();
 	currentActionType = -1;
 	empty = shared_ptr<Action>();
+	currentIndex = -1;
 }
 
 ActionVecVec::~ActionVecVec()
@@ -96,7 +97,7 @@ void ActionVecVec::erase(unsigned int id)
 	
 // finds and returns action of given polymorphic type, for body of given Id,
 // returns empty shared_ptr if this Action doesn't exist for chosen body
-shared_ptr<Action> ActionVecVec::find(unsigned int id, int idx)
+shared_ptr<Action> ActionVecVec::find(unsigned int id, int idx) const
 {
 	if( 	   idx >= 0
 		&& (unsigned int)idx < actions[id].size() )
@@ -153,10 +154,9 @@ void ActionVecVec::gotoFirst()
 			else
 				return;
 		}
+		if (!(*vi))
+			gotoNext();
 	}
-	
-	if (!(*vi))
-		gotoNext();
 }
 
 bool ActionVecVec::notAtEnd()
@@ -197,7 +197,7 @@ void ActionVecVec::gotoNext()
 	}	
 	
 	while (!(*vi))
-		gotoNext();
+		++vi;
 
 }
 

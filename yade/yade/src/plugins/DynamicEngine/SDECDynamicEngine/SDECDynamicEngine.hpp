@@ -63,8 +63,8 @@ class SDECDynamicEngine : public DynamicEngine
 /// Attributes											///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private : std::vector<Vector3r> forces;
-	private : std::vector<Vector3r> moments;
+	//private : std::vector<Vector3r> forces;
+	//private : std::vector<Vector3r> moments;
 
 	private : bool first;
 

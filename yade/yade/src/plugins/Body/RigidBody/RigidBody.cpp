@@ -42,6 +42,7 @@ void RigidBody::registerAttributes()
 
 void RigidBody::moveToNextTimeStep()
 {	
+	//FIXME : move reseting to another place
 	ConnexBody::moveToNextTimeStep();
 	prevAcceleration = acceleration;
 	prevAngularAcceleration = angularAcceleration;

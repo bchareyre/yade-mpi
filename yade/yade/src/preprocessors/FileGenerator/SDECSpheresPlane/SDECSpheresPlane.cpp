@@ -20,6 +20,7 @@
 #include "CollisionGeometrySet2AABBFactory.hpp"
 #include "CollisionGeometrySet.hpp"
 #include "SDECLinearContactModel.hpp"
+#include "ActionDispatcher.hpp"
 
 SDECSpheresPlane::SDECSpheresPlane () : FileGenerator()
 {
@@ -60,12 +61,17 @@ string SDECSpheresPlane::generate()
 	bvu->addBVFactories("Box","AABB","Box2AABBFactory");
 	bvu->addBVFactories("CollisionGeometrySet","AABB","CollisionGeometrySet2AABBFactory");
 	
-	rootBody->actors.resize(5);
+	shared_ptr<ActionDispatcher> ad(new ActionDispatcher);
+	ad->addActionFunctor("ActionForce","RigidBody","ActionForce2RigidBody");
+	ad->addActionFunctor("ActionMomentum","RigidBody","ActionMomentum2RigidBody");
+	
+	rootBody->actors.resize(6);
 	rootBody->actors[0] 		= bvu;	
 	rootBody->actors[1] 		= shared_ptr<Actor>(new PersistentSAPCollider);
 	rootBody->actors[2] 		= nc;
 	rootBody->actors[3] 		= shared_ptr<Actor>(new SDECLinearContactModel);
 	rootBody->actors[4] 		= shared_ptr<Actor>(new SDECDynamicEngine);
+	rootBody->actors[5] 		= ad;
 
 	rootBody->permanentInteractions->clear();
 //	rootBody->permanentInteractions[0] = shared_ptr<Interaction>(new Interaction);

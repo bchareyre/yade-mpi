@@ -79,7 +79,8 @@ class ActionVecVec : public ActionContainer
 	// returns empty shared_ptr if this Action doesn't exist for chosen body
 	public    : virtual shared_ptr<Action> find(
 					  unsigned int /*Body->getId() */
-					, int /*Action::getClassIndex()*/);
+					, int /*Action::getClassIndex()*/) const;
+	
 	// same as above, polymorphic Action type is selected with setCurrentActionType
 	public    : virtual shared_ptr<Action>& operator[](unsigned int);
 	public    : virtual const shared_ptr<Action>& operator[](unsigned int) const;
