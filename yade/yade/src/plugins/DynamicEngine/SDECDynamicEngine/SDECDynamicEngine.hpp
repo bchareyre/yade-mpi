@@ -76,11 +76,8 @@ class SDECDynamicEngine : public DynamicEngine
 /// Attributes											///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private : std::vector<Vector3> prevVelocities;
 	private : std::vector<Vector3> forces;
 	private : std::vector<Vector3> moments;
-	private : std::vector<Vector3> normalForces;
-	private : std::vector<Vector3> shearForces;
 	private : bool first;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

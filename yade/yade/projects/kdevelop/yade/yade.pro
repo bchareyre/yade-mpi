@@ -3,6 +3,28 @@
 # Subdir relative project main directory: ./yade
 # Target is an application:  
 
+LIBS += -lM3D \
+        -lConstants \
+        -lSerialization \
+        -lboost_date_time \
+        -lglut \
+        -lQGLViewer \
+        -rdynamic 
+INCLUDEPATH = ../toolboxes/Math/M3D \
+              ../toolboxes/Math/Constants \
+              ../toolboxes/Libraries/Serialization \
+              $(YADECOMPILATIONPATH) 
+MOC_DIR = $(YADECOMPILATIONPATH) 
+UI_DIR = $(YADECOMPILATIONPATH) 
+OBJECTS_DIR = $(YADECOMPILATIONPATH) 
+QMAKE_LIBDIR = ../toolboxes/Math/M3D/$(YADEDYNLIBPATH) \
+               ../toolboxes/Math/Constants/$(YADEDYNLIBPATH) \
+               ../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
+               $(YADEDYNLIBPATH) 
+DESTDIR = $(YADEBINPATH) 
+CONFIG += release \
+          warn_on 
+TEMPLATE = app 
 HEADERS += Body.hpp \
            BoundingVolumeFactory.hpp \
            BoundingVolume.hpp \
@@ -65,26 +87,4 @@ SOURCES += Body.cpp \
            FrontEnd.cpp \
            FactoryExceptions.cpp \
            IOManagerExceptions.cpp 
-LIBS += -lM3D \
--lConstants \
--lSerialization \
--lboost_date_time \
--lglut \
--lQGLViewer \
--rdynamic
-INCLUDEPATH = ../toolboxes/Math/M3D \
-../toolboxes/Math/Constants \
-../toolboxes/Libraries/Serialization \
-$(YADECOMPILATIONPATH)
-MOC_DIR = $(YADECOMPILATIONPATH)
-UI_DIR = $(YADECOMPILATIONPATH)
-OBJECTS_DIR = $(YADECOMPILATIONPATH)
-QMAKE_LIBDIR = ../toolboxes/Math/M3D/$(YADEDYNLIBPATH) \
-../toolboxes/Math/Constants/$(YADEDYNLIBPATH) \
-../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
-$(YADEDYNLIBPATH)
-DESTDIR = $(YADEBINPATH)
-CONFIG += release \
-warn_on
-TEMPLATE = app
 QtGeneratedFrontEnd.ui.target = QtGeneratedFrontEnd.ui

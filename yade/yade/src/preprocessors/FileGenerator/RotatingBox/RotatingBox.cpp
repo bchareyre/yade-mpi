@@ -42,15 +42,15 @@ void RotatingBox::exec()
 	Quaternion q;
 	q.fromAngleAxis(0, Vector3(0,0,1));
 
-	//rootBody->dynamic	   = shared_ptr<DynamicEngine>(new SimpleSpringDynamicEngine);
-	rootBody->dynamic	   = shared_ptr<DynamicEngine>(new SDECDynamicEngine);
-	rootBody->kinematic	   = shared_ptr<KinematicEngine>(new Rotor);
+	//rootBody->dynamic		= shared_ptr<DynamicEngine>(new SimpleSpringDynamicEngine);
+	rootBody->dynamic		= shared_ptr<DynamicEngine>(new SDECDynamicEngine);
+	rootBody->kinematic		= shared_ptr<KinematicEngine>(new Rotor);
 	rootBody->broadCollider		= shared_ptr<BroadPhaseCollider>(new SAPCollider);
 	rootBody->narrowCollider	= shared_ptr<NarrowPhaseCollider>(new SimpleNarrowCollider);
-	rootBody->isDynamic      = false;
-	rootBody->velocity       = Vector3(0,0,0);
-	rootBody->angularVelocity= Vector3(0,0,0);
-	rootBody->se3		 = Se3(Vector3(0,0,0),q);
+	rootBody->isDynamic		= false;
+	rootBody->velocity		= Vector3(0,0,0);
+	rootBody->angularVelocity	= Vector3(0,0,0);
+	rootBody->se3			= Se3(Vector3(0,0,0),q);
 
 	for(int i=0;i<7;i++)
 		rootBody->kinematic->subscribedBodies.push_back(i);
@@ -61,8 +61,8 @@ void RotatingBox::exec()
 	//shared_ptr<SDECDiscreteElement> box1(new SDECDiscreteElement);
 	shared_ptr<SDECDiscreteElement> box1(new SDECDiscreteElement);
 
-	aabb=shared_ptr<AABB>(new AABB);
-	box=shared_ptr<Box>(new Box);
+	aabb			= shared_ptr<AABB>(new AABB);
+	box			= shared_ptr<Box>(new Box);
 	box1->isDynamic		= false;
 	box1->angularVelocity	= Vector3(0,0,0);
 	box1->velocity		= Vector3(0,0,0);
@@ -83,8 +83,8 @@ void RotatingBox::exec()
 	box1->ks		= 10000;
 
 	shared_ptr<SDECDiscreteElement> box2(new SDECDiscreteElement);
-	aabb=shared_ptr<AABB>(new AABB);
-	box=shared_ptr<Box>(new Box);
+	aabb			= shared_ptr<AABB>(new AABB);
+	box			= shared_ptr<Box>(new Box);
 	box2->isDynamic		= false;
 	box2->angularVelocity	= Vector3(0,0,0);
 	box2->velocity		= Vector3(0,0,0);
@@ -105,8 +105,8 @@ void RotatingBox::exec()
 	box2->ks		= 10000;
 
 	shared_ptr<SDECDiscreteElement> box3(new SDECDiscreteElement);
-	aabb=shared_ptr<AABB>(new AABB);
-	box=shared_ptr<Box>(new Box);
+	aabb			= shared_ptr<AABB>(new AABB);
+	box			= shared_ptr<Box>(new Box);
 	box3->isDynamic		= false;
 	box3->angularVelocity	= Vector3(0,0,0);
 	box3->velocity		= Vector3(0,0,0);
@@ -127,8 +127,8 @@ void RotatingBox::exec()
 	box3->ks		= 10000;
 
 	shared_ptr<SDECDiscreteElement> box4(new SDECDiscreteElement);
-	aabb=shared_ptr<AABB>(new AABB);
-	box=shared_ptr<Box>(new Box);
+	aabb			= shared_ptr<AABB>(new AABB);
+	box			= shared_ptr<Box>(new Box);
 	box4->isDynamic		= false;
 	box4->angularVelocity	= Vector3(0,0,0);
 	box4->velocity		= Vector3(0,0,0);
@@ -149,8 +149,8 @@ void RotatingBox::exec()
 	box4->ks		= 10000;
 
 	shared_ptr<SDECDiscreteElement> box5(new SDECDiscreteElement);
-	aabb=shared_ptr<AABB>(new AABB);
-	box=shared_ptr<Box>(new Box);
+	aabb			= shared_ptr<AABB>(new AABB);
+	box			= shared_ptr<Box>(new Box);
 	box5->isDynamic		= false;
 	box5->angularVelocity	= Vector3(0,0,0);
 	box5->velocity		= Vector3(0,0,0);
@@ -171,8 +171,8 @@ void RotatingBox::exec()
 	box5->ks		= 10000;
 
 	shared_ptr<SDECDiscreteElement> box6(new SDECDiscreteElement);
-	aabb=shared_ptr<AABB>(new AABB);
-	box=shared_ptr<Box>(new Box);
+	aabb			= shared_ptr<AABB>(new AABB);
+	box			= shared_ptr<Box>(new Box);
 	box6->isDynamic		= false;
 	box6->angularVelocity	= Vector3(0,0,0);
 	box6->velocity		= Vector3(0,0,0);
@@ -193,8 +193,8 @@ void RotatingBox::exec()
 	box6->ks		= 10000;
 
 	shared_ptr<SDECDiscreteElement> box7(new SDECDiscreteElement);
-	aabb=shared_ptr<AABB>(new AABB);
-	box=shared_ptr<Box>(new Box);
+	aabb			= shared_ptr<AABB>(new AABB);
+	box			= shared_ptr<Box>(new Box);
 	box7->isDynamic		= false;
 	box7->angularVelocity	= Vector3(0,0,0);
 	box7->velocity		= Vector3(0,0,0);
@@ -214,8 +214,6 @@ void RotatingBox::exec()
 	box7->kn		= 100000;
 	box7->ks		= 10000;
 
-
-
 	rootBody->bodies.push_back(dynamic_pointer_cast<Body>(box1));
  	rootBody->bodies.push_back(dynamic_pointer_cast<Body>(box2));
  	rootBody->bodies.push_back(dynamic_pointer_cast<Body>(box3));
@@ -234,9 +232,8 @@ void RotatingBox::exec()
 		shared_ptr<AABB> aabb(new AABB);
 		shared_ptr<Sphere> sphere(new Sphere);
 
-
-		translation = Vector3(i,j,k)*10-Vector3(45,45,45)+Vector3(Rand::symmetricRandom(),Rand::symmetricRandom(),Rand::symmetricRandom());
-		float radius = (Rand::intervalRandom(3,4));
+		translation 		= Vector3(i,j,k)*10-Vector3(45,45,45)+Vector3(Rand::symmetricRandom(),Rand::symmetricRandom(),Rand::symmetricRandom());
+		float radius 		= (Rand::intervalRandom(3,4));
 
 		shared_ptr<BallisticDynamicEngine> ballistic(new BallisticDynamicEngine);
 		ballistic->damping 	= 0.95;
@@ -259,8 +256,8 @@ void RotatingBox::exec()
 		sphere->visible		= true;
 		s->cm			= dynamic_pointer_cast<CollisionModel>(sphere);
 		s->gm			= dynamic_pointer_cast<GeometricalModel>(sphere);
-		s->kn		= 100000;
-		s->ks		= 10000;
+		s->kn			= 100000;
+		s->ks			= 10000;
 
 		rootBody->bodies.push_back(dynamic_pointer_cast<Body>(s));
 	}
