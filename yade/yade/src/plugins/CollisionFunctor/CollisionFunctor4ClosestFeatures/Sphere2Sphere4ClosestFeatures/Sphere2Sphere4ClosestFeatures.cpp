@@ -48,8 +48,8 @@ Sphere2Sphere4ClosestFeatures::~Sphere2Sphere4ClosestFeatures ()
 bool Sphere2Sphere4ClosestFeatures::collide(const shared_ptr<CollisionModel> cm1, const shared_ptr<CollisionModel> cm2, const Se3& se31, const Se3& se32, shared_ptr<Interaction> c)
 {
 
-	shared_ptr<Sphere> s1 = shared_dynamic_cast<Sphere>(cm1);
-	shared_ptr<Sphere> s2 = shared_dynamic_cast<Sphere>(cm2);
+	shared_ptr<Sphere> s1 = dynamic_pointer_cast<Sphere>(cm1);
+	shared_ptr<Sphere> s2 = dynamic_pointer_cast<Sphere>(cm2);
 	
 	Vector3 v = se31.translation-se32.translation;
 	float l = v.unitize();

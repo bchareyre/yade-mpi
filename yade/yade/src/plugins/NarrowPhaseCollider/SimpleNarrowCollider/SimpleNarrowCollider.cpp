@@ -32,7 +32,7 @@ bool SimpleNarrowCollider::narrowCollisionPhase(const std::vector<shared_ptr<Bod
 	for(int i=0 ; it!=itEnd ; i++)
 	{
 		itTmp = it;
-		contact = shared_static_cast<Contact>(*itTmp);
+		contact = static_pointer_cast<Contact>(*itTmp);
 		
 		it++;
 		shared_ptr<Body> b1 = bodies[contact->id1];

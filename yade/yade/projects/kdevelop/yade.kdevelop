@@ -104,7 +104,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>plugins/CollisionFunctor/CollisionFunctor4ClosestFeatures/Box2Box4ClosestFeatures</activedir>
+      <activedir>yade</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>

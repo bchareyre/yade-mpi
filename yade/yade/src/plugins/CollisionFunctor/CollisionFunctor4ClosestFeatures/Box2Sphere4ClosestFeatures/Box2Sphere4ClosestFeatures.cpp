@@ -58,8 +58,8 @@ bool Box2Sphere4ClosestFeatures::collide(const shared_ptr<CollisionModel> cm1, c
 	Matrix3 axisT,axis;
 	float depth;
 
-	shared_ptr<Sphere> s = shared_dynamic_cast<Sphere>(cm2);
-	shared_ptr<Box> obb = shared_dynamic_cast<Box>(cm1);
+	shared_ptr<Sphere> s = dynamic_pointer_cast<Sphere>(cm2);
+	shared_ptr<Box> obb = dynamic_pointer_cast<Box>(cm1);
 	
 	Vector3 extents = obb->extents;
 
@@ -147,7 +147,7 @@ bool Box2Sphere4ClosestFeatures::reverseCollide(const shared_ptr<CollisionModel>
 	bool isColliding = collide(cm2,cm1,se32,se31,c);
 	if (isColliding)
 	{
-		shared_ptr<ClosestFeatures> cf = shared_dynamic_cast<ClosestFeatures>(c->interactionModel);
+		shared_ptr<ClosestFeatures> cf = dynamic_pointer_cast<ClosestFeatures>(c->interactionModel);
 		Vector3 tmp = cf->closestsPoints[0].first;
 		cf->closestsPoints[0].first = cf->closestsPoints[0].second;		
 		cf->closestsPoints[0].second = tmp;

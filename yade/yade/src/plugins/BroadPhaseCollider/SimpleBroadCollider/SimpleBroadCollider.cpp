@@ -69,8 +69,8 @@ int SimpleBroadCollider::broadPhaseCollisionTest(const std::vector<shared_ptr<Bo
 
 bool BVOverlapper::overlappSphereSphere(const shared_ptr<BoundingVolume> bv1, const shared_ptr<BoundingVolume> bv2)
 {
-	shared_ptr<BoundingSphere> s1 = shared_dynamic_cast<BoundingSphere>(bv1);
-	shared_ptr<BoundingSphere> s2 = shared_dynamic_cast<BoundingSphere>(bv2);
+	shared_ptr<BoundingSphere> s1 = dynamic_pointer_cast<BoundingSphere>(bv1);
+	shared_ptr<BoundingSphere> s2 = dynamic_pointer_cast<BoundingSphere>(bv2);
 	
 	return ((s1->center-s2->center).length()<s1->radius+s2->radius);
 	
@@ -84,8 +84,8 @@ bool BVOverlapper::overlappAABBSphere(const shared_ptr<BoundingVolume> bv1, cons
 	Vector3 pt1,pt2,normal;
 	float depth;
 	
-	shared_ptr<BoundingSphere> s = shared_dynamic_cast<BoundingSphere>(bv2);
-	shared_ptr<AABB> aabb = shared_dynamic_cast<AABB>(bv1);
+	shared_ptr<BoundingSphere> s = dynamic_pointer_cast<BoundingSphere>(bv2);
+	shared_ptr<AABB> aabb = dynamic_pointer_cast<AABB>(bv1);
 	
 	p = s->center-aabb->center;
 	

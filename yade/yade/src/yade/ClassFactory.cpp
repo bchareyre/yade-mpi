@@ -52,8 +52,10 @@ bool ClassFactory::registerFactorable( std::string name 			   , CreateFactorable
 	bool tmp = map.insert( ClassDescriptorMap::value_type( name , ClassDescriptor(create,createShared, createPureCustom, verify,type,f) )).second;
 	
 	#ifdef DEBUG
-	if (tmp)
-		std::cout << "registering class: " << name << "\n";
+		if (tmp)
+			std::cout << "registering class: " << name << " OK\n";
+		else
+			std::cout << "registering class: " << name << " FAILED\n";
 	#endif
 	
 	return tmp;

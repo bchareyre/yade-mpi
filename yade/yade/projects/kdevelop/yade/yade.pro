@@ -10,9 +10,9 @@ LIBS += -lM3D \
         -lglut \
         -lQGLViewer \
         -rdynamic 
-INCLUDEPATH = ../toolboxes/Libraries/Serialization \
-              ../toolboxes/Math/M3D \
+INCLUDEPATH = ../toolboxes/Math/M3D \
               ../toolboxes/Math/Constants \
+              ../toolboxes/Libraries/Serialization \
               $(YADECOMPILATIONPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
@@ -22,7 +22,7 @@ QMAKE_LIBDIR = ../toolboxes/Math/M3D/$(YADEDYNLIBPATH) \
                ../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEBINPATH) 
-CONFIG += release \
+CONFIG += debug \
           warn_on 
 TEMPLATE = app 
 FORMS += QtGeneratedFrontEnd.ui 

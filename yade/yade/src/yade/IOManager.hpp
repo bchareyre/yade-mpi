@@ -66,7 +66,7 @@ class IOManager : public Factorable
 		 static void loadFromFile(const string& libName, const string& fileName,const string& name, Type& t)
 		 {		 					
 			shared_ptr<IOManager> ioManager;
-			ioManager = shared_dynamic_cast<IOManager>(ClassFactory::instance().createShared(libName));
+			ioManager = dynamic_pointer_cast<IOManager>(ClassFactory::instance().createShared(libName));
 			ifstream filei(fileName.c_str());
 			ioManager->loadArchive(filei,t,name);
 			filei.close();
@@ -76,7 +76,7 @@ class IOManager : public Factorable
 		 static void saveToFile(const string& libName, const string& fileName,const string& name, Type& t)
 		 {		 					
 			shared_ptr<IOManager> ioManager;
-			ioManager = shared_dynamic_cast<IOManager>(ClassFactory::instance().createShared(libName));
+			ioManager = dynamic_pointer_cast<IOManager>(ClassFactory::instance().createShared(libName));
 			ofstream fileo(fileName.c_str());
 			ioManager->saveArchive(fileo,t,name);
 			fileo.close();

@@ -69,10 +69,6 @@ class CollisionFunctor : public Indexable , public Factorable
 		else
 			return collide(cm1,cm2,se31,se32,c);
 	}
-
-// FIXME : this should be just Factorable, not Serializable !!
-	public    : virtual void registerAttributes() {};
-
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -66,13 +66,13 @@ void RotatingBox::exec()
 	aabb->color		= Vector3(1,0,0);
 	aabb->center		= Vector3(0,0,10);
 	aabb->halfSize		= Vector3(50,5,40);
-	box1->bv		= shared_dynamic_cast<BoundingVolume>(aabb);
+	box1->bv		= dynamic_pointer_cast<BoundingVolume>(aabb);
 	box->extents		= Vector3(50,5,40);
 	box->diffuseColor	= Vector3(1,1,1);
 	box->wire		= false;
 	box->visible		= true;
-	box1->cm		= shared_dynamic_cast<CollisionModel>(box);
-	box1->gm		= shared_dynamic_cast<CollisionModel>(box);
+	box1->cm		= dynamic_pointer_cast<CollisionModel>(box);
+	box1->gm		= dynamic_pointer_cast<CollisionModel>(box);
 
 	shared_ptr<RigidBody> box2(new RigidBody);
 	aabb=shared_ptr<AABB>(new AABB);
@@ -86,13 +86,13 @@ void RotatingBox::exec()
 	aabb->color		= Vector3(0,0,1);
 	aabb->center		= Vector3(-55,0,0);
 	aabb->halfSize		= Vector3(5,60,50);
-	box2->bv		= shared_dynamic_cast<BoundingVolume>(aabb);
+	box2->bv		= dynamic_pointer_cast<BoundingVolume>(aabb);
 	box->extents		= Vector3(5,60,50);
 	box->diffuseColor	= Vector3(1,1,1);
 	box->wire		= true;
 	box->visible		= true;
-	box2->cm		= shared_dynamic_cast<CollisionModel>(box);
-	box2->gm		= shared_dynamic_cast<CollisionModel>(box);
+	box2->cm		= dynamic_pointer_cast<CollisionModel>(box);
+	box2->gm		= dynamic_pointer_cast<CollisionModel>(box);
 
 	shared_ptr<RigidBody> box3(new RigidBody);
 	aabb=shared_ptr<AABB>(new AABB);
@@ -106,13 +106,13 @@ void RotatingBox::exec()
 	aabb->color		= Vector3(0,0,1);
 	aabb->center		= Vector3(55,0,0);
 	aabb->halfSize		= Vector3(5,60,50);
-	box3->bv		= shared_dynamic_cast<BoundingVolume>(aabb);
+	box3->bv		= dynamic_pointer_cast<BoundingVolume>(aabb);
 	box->extents		= Vector3(5,60,50);
 	box->diffuseColor	= Vector3(1,1,1);
 	box->wire		= true;
 	box->visible		= true;
-	box3->cm		= shared_dynamic_cast<CollisionModel>(box);
-	box3->gm		= shared_dynamic_cast<CollisionModel>(box);
+	box3->cm		= dynamic_pointer_cast<CollisionModel>(box);
+	box3->gm		= dynamic_pointer_cast<CollisionModel>(box);
 
 	shared_ptr<RigidBody> box4(new RigidBody);
 	aabb=shared_ptr<AABB>(new AABB);
@@ -126,13 +126,13 @@ void RotatingBox::exec()
 	aabb->color		= Vector3(0,0,1);
 	aabb->center		= Vector3(0,-55,0);
 	aabb->halfSize		= Vector3(50,5,50);
-	box4->bv		= shared_dynamic_cast<BoundingVolume>(aabb);
+	box4->bv		= dynamic_pointer_cast<BoundingVolume>(aabb);
 	box->extents		= Vector3(50,5,50);
 	box->diffuseColor	= Vector3(1,1,1);
 	box->wire		= true;
 	box->visible		= true;
-	box4->cm		= shared_dynamic_cast<CollisionModel>(box);
-	box4->gm		= shared_dynamic_cast<CollisionModel>(box);
+	box4->cm		= dynamic_pointer_cast<CollisionModel>(box);
+	box4->gm		= dynamic_pointer_cast<CollisionModel>(box);
 
 	shared_ptr<RigidBody> box5(new RigidBody);
 	aabb=shared_ptr<AABB>(new AABB);
@@ -146,13 +146,13 @@ void RotatingBox::exec()
 	aabb->color		= Vector3(0,0,1);
 	aabb->center		= Vector3(0,55,0);
 	aabb->halfSize		= Vector3(50,5,50);
-	box5->bv		= shared_dynamic_cast<BoundingVolume>(aabb);
+	box5->bv		= dynamic_pointer_cast<BoundingVolume>(aabb);
 	box->extents		= Vector3(50,5,50);
 	box->diffuseColor	= Vector3(1,1,1);
 	box->wire		= true;
 	box->visible		= true;
-	box5->cm		= shared_dynamic_cast<CollisionModel>(box);
-	box5->gm		= shared_dynamic_cast<CollisionModel>(box);
+	box5->cm		= dynamic_pointer_cast<CollisionModel>(box);
+	box5->gm		= dynamic_pointer_cast<CollisionModel>(box);
 
 	shared_ptr<RigidBody> box6(new RigidBody);
 	aabb=shared_ptr<AABB>(new AABB);
@@ -166,13 +166,13 @@ void RotatingBox::exec()
 	aabb->color		= Vector3(0,0,1);
 	aabb->center		= Vector3(0,0,-55);
 	aabb->halfSize		= Vector3(60,60,5);
-	box6->bv		= shared_dynamic_cast<BoundingVolume>(aabb);
+	box6->bv		= dynamic_pointer_cast<BoundingVolume>(aabb);
 	box->extents		= Vector3(60,60,5);
 	box->diffuseColor	= Vector3(1,1,1);
 	box->wire		= true;
 	box->visible		= true;
-	box6->cm		= shared_dynamic_cast<CollisionModel>(box);
-	box6->gm		= shared_dynamic_cast<CollisionModel>(box);
+	box6->cm		= dynamic_pointer_cast<CollisionModel>(box);
+	box6->gm		= dynamic_pointer_cast<CollisionModel>(box);
 
 	shared_ptr<RigidBody> box7(new RigidBody);
 	aabb=shared_ptr<AABB>(new AABB);
@@ -186,23 +186,23 @@ void RotatingBox::exec()
 	aabb->color		= Vector3(0,0,1);
 	aabb->center		= Vector3(0,0,55);
 	aabb->halfSize		= Vector3(60,60,5);
-	box7->bv		= shared_dynamic_cast<BoundingVolume>(aabb);
+	box7->bv		= dynamic_pointer_cast<BoundingVolume>(aabb);
 	box->extents		= Vector3(60,60,5);
 	box->diffuseColor	= Vector3(1,1,1);
 	box->wire		= true;
 	box->visible		= true;
-	box7->cm		= shared_dynamic_cast<CollisionModel>(box);
-	box7->gm		= shared_dynamic_cast<CollisionModel>(box);
+	box7->cm		= dynamic_pointer_cast<CollisionModel>(box);
+	box7->gm		= dynamic_pointer_cast<CollisionModel>(box);
 
 
 
-	rootBody->bodies.push_back(shared_dynamic_cast<Body>(box1));
- 	rootBody->bodies.push_back(shared_dynamic_cast<Body>(box2));
- 	rootBody->bodies.push_back(shared_dynamic_cast<Body>(box3));
- 	rootBody->bodies.push_back(shared_dynamic_cast<Body>(box4));
- 	rootBody->bodies.push_back(shared_dynamic_cast<Body>(box5));
- 	rootBody->bodies.push_back(shared_dynamic_cast<Body>(box6));
- 	rootBody->bodies.push_back(shared_dynamic_cast<Body>(box7));
+	rootBody->bodies.push_back(dynamic_pointer_cast<Body>(box1));
+ 	rootBody->bodies.push_back(dynamic_pointer_cast<Body>(box2));
+ 	rootBody->bodies.push_back(dynamic_pointer_cast<Body>(box3));
+ 	rootBody->bodies.push_back(dynamic_pointer_cast<Body>(box4));
+ 	rootBody->bodies.push_back(dynamic_pointer_cast<Body>(box5));
+ 	rootBody->bodies.push_back(dynamic_pointer_cast<Body>(box6));
+ 	rootBody->bodies.push_back(dynamic_pointer_cast<Body>(box7));
 
 	for(int i=0;i<nbSpheres;i++)
 	{
@@ -223,16 +223,16 @@ void RotatingBox::exec()
 		aabb->color		= Vector3(0,1,0);
 		aabb->center		= translation;
 		aabb->halfSize		= Vector3(radius,radius,radius);
-		s->bv			= shared_dynamic_cast<BoundingVolume>(aabb);
+		s->bv			= dynamic_pointer_cast<BoundingVolume>(aabb);
 
 		sphere->radius		= radius;
 		sphere->diffuseColor	= Vector3(Rand::unitRandom(),Rand::unitRandom(),Rand::unitRandom());
 		sphere->wire		= false;
 		sphere->visible		= true;
-		s->cm			= shared_dynamic_cast<CollisionModel>(sphere);
-		s->gm			= shared_dynamic_cast<GeometricalModel>(sphere);
+		s->cm			= dynamic_pointer_cast<CollisionModel>(sphere);
+		s->gm			= dynamic_pointer_cast<GeometricalModel>(sphere);
 
-		rootBody->bodies.push_back(shared_dynamic_cast<Body>(s));
+		rootBody->bodies.push_back(dynamic_pointer_cast<Body>(s));
 	}
 
 	IOManager::saveToFile("XMLManager", "../data/scene.xml", "rootBody", rootBody);

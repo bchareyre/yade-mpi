@@ -24,7 +24,7 @@ bool MultiMethodsManager::add(const string& name)
 	{
 		indexedClassName[name] = -1;
 		
-		shared_ptr<CollisionModel> cm  = shared_dynamic_cast<CollisionModel>(ClassFactory::instance().createShared(name));
+		shared_ptr<CollisionModel> cm  = dynamic_pointer_cast<CollisionModel>(ClassFactory::instance().createShared(name));
 
 		int& index = cm->getClassIndex();
 		assert(index==-1);
@@ -39,8 +39,8 @@ bool MultiMethodsManager::add(const string& name)
 			shared_ptr<CollisionFunctor> collisionFunctor,reverseCollisionFunctor;
 			try
 			{
-				collisionFunctor = shared_dynamic_cast<CollisionFunctor>(ClassFactory::instance().createShared(functorName));
-				reverseCollisionFunctor = shared_dynamic_cast<CollisionFunctor>(ClassFactory::instance().createShared(functorName));
+				collisionFunctor = dynamic_pointer_cast<CollisionFunctor>(ClassFactory::instance().createShared(functorName));
+				reverseCollisionFunctor = dynamic_pointer_cast<CollisionFunctor>(ClassFactory::instance().createShared(functorName));
 				collisionFunctor->setReverse(false);
 				reverseCollisionFunctor->setReverse(true);
 			}
@@ -48,8 +48,8 @@ bool MultiMethodsManager::add(const string& name)
 			{
 				try
 				{
-					collisionFunctor = shared_dynamic_cast<CollisionFunctor>(ClassFactory::instance().createShared(reverseFunctorName));
-					reverseCollisionFunctor = shared_dynamic_cast<CollisionFunctor>(ClassFactory::instance().createShared(reverseFunctorName));
+					collisionFunctor = dynamic_pointer_cast<CollisionFunctor>(ClassFactory::instance().createShared(reverseFunctorName));
+					reverseCollisionFunctor = dynamic_pointer_cast<CollisionFunctor>(ClassFactory::instance().createShared(reverseFunctorName));
 					collisionFunctor->setReverse(true);
 					reverseCollisionFunctor->setReverse(false);
 				}

@@ -59,7 +59,7 @@ void IOManager::serializeFundamental(ostream& stream, Archive& ac,int )
 
 void IOManager::deserializeCustomClass(istream& stream, Archive& ac, const string& str)
 {
-	shared_ptr<Serializable> s = shared_dynamic_cast<Serializable>(ClassFactory::instance().createShared(ac.getSerializableClassName()));
+	shared_ptr<Serializable> s = dynamic_pointer_cast<Serializable>(ClassFactory::instance().createShared(ac.getSerializableClassName()));
 
 	shared_ptr<Archive> tmpAc = Archive::create(ac.getName(),*s);
 	tmpAc->deserialize(stream, *tmpAc, str);
@@ -70,7 +70,7 @@ void IOManager::deserializeCustomClass(istream& stream, Archive& ac, const strin
 
 void IOManager::serializeCustomClass(ostream& stream, Archive& ac,int depth)
 {
-	shared_ptr<Serializable> s = shared_dynamic_cast<Serializable>(ClassFactory::instance().createShared(ac.getSerializableClassName()));
+	shared_ptr<Serializable> s = dynamic_pointer_cast<Serializable>(ClassFactory::instance().createShared(ac.getSerializableClassName()));
 	s->serialize(ac.getAddress());
 	shared_ptr<Archive> tmpAc = Archive::create(ac.getName(),*s);
 	tmpAc->serialize(stream,*tmpAc,depth);

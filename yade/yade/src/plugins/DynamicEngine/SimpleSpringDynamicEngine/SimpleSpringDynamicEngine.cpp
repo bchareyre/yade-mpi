@@ -42,7 +42,7 @@ void SimpleSpringDynamicEngine::respondToCollisions(std::vector<shared_ptr<Body>
 	std::vector<shared_ptr<Body> >::iterator bi = bodies.begin();
 	for( ; fi!=fiEnd; ++fi, ++ci, ++bi)
 	{
-		shared_ptr<RigidBody>  rb = shared_dynamic_cast<RigidBody>(*bi);
+		shared_ptr<RigidBody>  rb = dynamic_pointer_cast<RigidBody>(*bi);
 		(*fi) = (gravity - rb->velocity*damping)*rb->mass;
 		(*ci) = -(rb->angularVelocity*damping).multTerm(rb->inertia);
 	}
@@ -51,21 +51,20 @@ void SimpleSpringDynamicEngine::respondToCollisions(std::vector<shared_ptr<Body>
 	std::list<shared_ptr<Interaction> >::const_iterator ctiEnd = interactions.end();
 	for( ; cti!=ctiEnd ; ++cti)
 	{
-		shared_ptr<Interaction> icontact = (*cti);
-		shared_ptr<Contact> contact = shared_static_cast<Contact>(icontact);
+		shared_ptr<Contact> contact = static_pointer_cast<Contact>(*cti);
 		
-		std::vector<std::pair<Vector3,Vector3> >::iterator cpi = (shared_dynamic_cast<ClosestFeatures>(contact->interactionModel))->closestsPoints.begin();
-		std::vector<std::pair<Vector3,Vector3> >::iterator cpiEnd = (shared_dynamic_cast<ClosestFeatures>(contact->interactionModel))->closestsPoints.end();
+		std::vector<std::pair<Vector3,Vector3> >::iterator cpi = (dynamic_pointer_cast<ClosestFeatures>(contact->interactionModel))->closestsPoints.begin();
+		std::vector<std::pair<Vector3,Vector3> >::iterator cpiEnd = (dynamic_pointer_cast<ClosestFeatures>(contact->interactionModel))->closestsPoints.end();
 		for( ; cpi!=cpiEnd ; ++cpi)
 		{	
 			Vector3 f = (*cpi).first-(*cpi).second;
 
-			f *= stiffness/(float)((shared_dynamic_cast<ClosestFeatures>(contact->interactionModel))->closestsPoints.size());
+			f *= stiffness/(float)((dynamic_pointer_cast<ClosestFeatures>(contact->interactionModel))->closestsPoints.size());
 			
 			Vector3 p = 0.5*((*cpi).first+(*cpi).second);
 			
-			shared_ptr<RigidBody> r1 = shared_dynamic_cast<RigidBody>(bodies[contact->id1]);
-			shared_ptr<RigidBody> r2 = shared_dynamic_cast<RigidBody>(bodies[contact->id2]);
+			shared_ptr<RigidBody> r1 = dynamic_pointer_cast<RigidBody>(bodies[contact->id1]);
+			shared_ptr<RigidBody> r2 = dynamic_pointer_cast<RigidBody>(bodies[contact->id2]);
 			
 			Vector3 o1p = p - r1->se3.translation;
 			Vector3 o2p = p - r2->se3.translation;
@@ -81,7 +80,7 @@ void SimpleSpringDynamicEngine::respondToCollisions(std::vector<shared_ptr<Body>
 		
 	for(unsigned int i=0; i < bodies.size(); i++)
         {
-		shared_ptr<RigidBody> rb = shared_dynamic_cast<RigidBody>(bodies[i]);
+		shared_ptr<RigidBody> rb = dynamic_pointer_cast<RigidBody>(bodies[i]);
 
 		if (rb->isDynamic)
 		{
@@ -100,7 +99,7 @@ void SimpleSpringDynamicEngine::respondToCollisions(std::vector<shared_ptr<Body>
 
 // 	for(unsigned int i=0; i < bodies.size(); i++)
 //         {
-// 		shared_ptr<RigidBody> rb = shared_dynamic_cast<RigidBody>(bodies[i]);
+// 		shared_ptr<RigidBody> rb = dynamic_pointer_cast<RigidBody>(bodies[i]);
 // 				
 // 		if (rb->isDynamic)
 // 		{

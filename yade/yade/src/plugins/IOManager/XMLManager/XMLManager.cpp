@@ -358,7 +358,7 @@ void XMLManager::serializeSmartPointer(ostream& stream, Archive& ac , int depth)
 		}
 		else if (type==CUSTOM_CLASS)
 		{
-			shared_ptr<Serializable> s = shared_dynamic_cast<Serializable>(ClassFactory::instance().createShared(tmpAc->getSerializableClassName()));
+			shared_ptr<Serializable> s = dynamic_pointer_cast<Serializable>(ClassFactory::instance().createShared(tmpAc->getSerializableClassName()));
 			stream << " className=\"" << s->getClassName() << "\" >" << endl;
 			writeOpeningTag(stream,*tmpAc,depth);
 			tmpAc->serialize(stream, *tmpAc, depth+1);
@@ -425,7 +425,7 @@ void XMLManager::serializeSerializable(ostream& stream, Archive& ac, int depth)
 // or better provide a regexp
 void XMLManager::deserializeCustomFundamental(istream& stream, Archive& ac,const string& str)
 {
-	shared_ptr<Serializable> s = shared_dynamic_cast<Serializable>(ClassFactory::instance().createShared(ac.getSerializableClassName()));
+	shared_ptr<Serializable> s = dynamic_pointer_cast<Serializable>(ClassFactory::instance().createShared(ac.getSerializableClassName()));
 
 	s->registerAttributes();
 
@@ -446,7 +446,7 @@ void XMLManager::deserializeCustomFundamental(istream& stream, Archive& ac,const
 
 void XMLManager::serializeCustomFundamental(ostream& stream, Archive& ac,int depth)
 {
-	shared_ptr<Serializable> ss = shared_dynamic_cast<Serializable>(ClassFactory::instance().createShared(ac.getSerializableClassName()));
+	shared_ptr<Serializable> ss = dynamic_pointer_cast<Serializable>(ClassFactory::instance().createShared(ac.getSerializableClassName()));
 	ss->serialize(ac.getAddress());
 	ss->registerAttributes();
 	Serializable::Archives archives = ss->getArchives();
