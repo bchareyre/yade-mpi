@@ -273,7 +273,8 @@ void Omega::loadSimulation()
 			IOManager::loadFromFile("XMLManager",simulationFileName,"rootBody",rootBody);
 			sStartingSimulationTime = second_clock::local_time();
 			msStartingSimulationTime = microsec_clock::local_time();
-	
+			simulationPauseDuration = msStartingSimulationTime-msStartingSimulationTime;
+			msStartingPauseTime = msStartingSimulationTime;
 			*logFile << "<Simulation" << " Date =\"" << sStartingSimulationTime << "\">" << endl;
 			currentIteration = 0;
 			simulationTime = 0;	
@@ -295,15 +296,22 @@ void Omega::freeRootBody()
 void Omega::startSimulationLoop()
 {
 //	LOCK(omegaMutex);
-	if (simulationLoop)
+
+	if (simulationLoop && simulationLoop->isStopped())
+	{
+		simulationPauseDuration += microsec_clock::local_time()-msStartingPauseTime;
 		simulationLoop->start();
+	}
 }
 
 void Omega::stopSimulationLoop()
 {
 //	LOCK(omegaMutex);
-	if (simulationLoop)
-		simulationLoop->stop();
+	if (simulationLoop && !(simulationLoop->isStopped()))
+	{
+		msStartingPauseTime = microsec_clock::local_time();
+		simulationLoop->stop();	
+	}
 }
 
 
@@ -351,10 +359,11 @@ ptime Omega::getMsStartingSimulationTime()
 	return msStartingSimulationTime;
 }
 
-// boost::mutex& Omega::getOmegaMutex()
-// {
-// 	return omegaMutex;
-// }
+time_duration Omega::getSimulationPauseDuration()
+{
+	return simulationPauseDuration;
+}
+
 
 boost::mutex& Omega::getRootBodyMutex()
 {

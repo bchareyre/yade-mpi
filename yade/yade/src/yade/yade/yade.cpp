@@ -61,6 +61,9 @@ int main(int argc, char *argv[])
 		return 0;
 	}
 
+	// just to call Omega constructor here
+	Omega::instance();
+	
 	shared_ptr<FrontEnd> frontEnd = dynamic_pointer_cast<FrontEnd>(ClassFactory::instance().createShared(frontEndLibName));
 	int ok = frontEnd->run(argc,argv);
 	

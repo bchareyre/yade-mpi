@@ -73,6 +73,7 @@ class Threadable
 	public    : void join();
 	public    : void start();
 	public    : void stop();
+	public    : bool isStopped();
 	public : void finish();
 
 };

@@ -73,6 +73,7 @@ void SimulationControllerUpdater::oneLoop()
 	controller->lcdNSecondv->display(lexical_cast<string>(nsec));
 
 	time_duration duration = microsec_clock::local_time()-Omega::instance().getMsStartingSimulationTime();
+	duration -= Omega::instance().getSimulationPauseDuration();
 
 	unsigned int hours	= duration.hours();
 	unsigned int minutes 	= duration.minutes();

@@ -204,8 +204,8 @@ void SimulationController::addNewView()
 
 	if (glViews.size()==0)
 	{
-			glViews[0] = new GLViewer(0,renderer,format,parentWorkspace);
-			maxNbViews = 0;
+		glViews[0] = new GLViewer(0,renderer,format,parentWorkspace);
+		maxNbViews = 0;
 	}
 	else
 	{
@@ -261,9 +261,7 @@ void SimulationController::pbStartClicked()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void SimulationController::pbResetClicked()
-{
-	//LOCK(Omega::instance().getRootBodyMutex());
-	
+{	
 	updater->stop();
 	map<int,GLViewer*>::iterator gi = glViews.begin();
 	map<int,GLViewer*>::iterator giEnd = glViews.end();
@@ -275,6 +273,8 @@ void SimulationController::pbResetClicked()
 	Omega::instance().loadSimulation();
 	Omega::instance().createSimulationLoop();
 
+	updater->oneLoop(); // to refresh gui
+	
 	gi = glViews.begin();
 	for(;gi!=giEnd;++gi)
 		(*gi).second->startRendering();

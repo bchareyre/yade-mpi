@@ -101,8 +101,11 @@ class Omega : public Singleton<Omega>
 	
 	private	: ptime	sStartingSimulationTime;
 	private	: ptime msStartingSimulationTime;
+	private	: ptime msStartingPauseTime;
+	private : time_duration simulationPauseDuration;
 	public  : ptime getMsStartingSimulationTime();
-		
+	public  : time_duration getSimulationPauseDuration();
+	
 	private	: string simulationFileName;
 	public	: void setSimulationFileName(const string);
 	public	: string getSimulationFileName();
