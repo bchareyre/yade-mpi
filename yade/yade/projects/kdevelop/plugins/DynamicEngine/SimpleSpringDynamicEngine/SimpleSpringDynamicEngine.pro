@@ -5,24 +5,15 @@
 
 LIBS += -lRigidBody \
         -lClosestFeatures \
-        -lConstants \
-        -lM3D \
-        -lSerialization \
         -rdynamic 
-INCLUDEPATH = ../../../plugins/InteractionModel/ClosestFeatures \
-              ../../../plugins/Body/RigidBody \
-              ../../../yade \
-              ../../../toolboxes/Math/M3D \
-              ../../../toolboxes/Math/Constants \
-              ../../../toolboxes/Libraries/Serialization 
+INCLUDEPATH = ../../../plugins/Body/RigidBody \
+              ../../../plugins/InteractionModel/ClosestFeatures \
+              ../../../toolboxes/Math 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 QMAKE_LIBDIR = ../../../plugins/Body/RigidBody/$(YADEDYNLIBPATH) \
                ../../../plugins/InteractionModel/ClosestFeatures/$(YADEDYNLIBPATH) \
-               ../../../toolboxes/Math/Constants/$(YADEDYNLIBPATH) \
-               ../../../toolboxes/Math/M3D/$(YADEDYNLIBPATH) \
-               ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
 CONFIG += debug \

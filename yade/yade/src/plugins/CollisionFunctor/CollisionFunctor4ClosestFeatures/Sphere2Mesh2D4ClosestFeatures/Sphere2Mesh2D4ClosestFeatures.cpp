@@ -94,7 +94,7 @@ bool Sphere2Mesh2D4ClosestFeatures::collide(const shared_ptr<CollisionGeometry> 
 
 	if (cf->closestsPoints.size()>0)
 	{
-		c->interactionModel = cf;
+		c->interactionGeometry = cf;
 		return true;
 	}
 	else
@@ -109,7 +109,7 @@ bool Sphere2Mesh2D4ClosestFeatures::reverseCollide(const shared_ptr<CollisionGeo
 	bool isColliding = collide(cm2,cm1,se32,se31,c);
 	if (isColliding)
 	{
-		shared_ptr<ClosestFeatures> cf = dynamic_pointer_cast<ClosestFeatures>(c->interactionModel);
+		shared_ptr<ClosestFeatures> cf = dynamic_pointer_cast<ClosestFeatures>(c->interactionGeometry);
 
 		for(unsigned int i=0;i<cf->closestsPoints.size();i++)
 		{

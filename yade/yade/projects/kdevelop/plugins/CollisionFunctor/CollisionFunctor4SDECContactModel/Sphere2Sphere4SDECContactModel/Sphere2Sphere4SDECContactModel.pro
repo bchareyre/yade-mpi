@@ -4,30 +4,15 @@
 # Target is a library:  
 
 LIBS += -lSphere \
-        -lM2D \
-        -lM3D \
-        -lRand \
-        -lConstants \
-        -lSerialization \
         -lSDECContactModel \
         -rdynamic 
 INCLUDEPATH = ../../../../plugins/GeometricalModel/Sphere \
               ../../../../plugins/InteractionModel/SDECContactModel \
-              ../../../../yade \
-              ../../../../toolboxes/Math/M2D \
-              ../../../../toolboxes/Math/M3D \
-              ../../../../toolboxes/Math/Rand \
-              ../../../../toolboxes/Math/Constants \
-              ../../../../toolboxes/Libraries/Serialization 
+              ../../../../toolboxes/Math 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 QMAKE_LIBDIR = ../../../../plugins/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
-               ../../../../toolboxes/Math/M2D/$(YADEDYNLIBPATH) \
-               ../../../../toolboxes/Math/M3D/$(YADEDYNLIBPATH) \
-               ../../../../toolboxes/Math/Rand/$(YADEDYNLIBPATH) \
-               ../../../../toolboxes/Math/Constants/$(YADEDYNLIBPATH) \
-               ../../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../../../plugins/InteractionModel/SDECContactModel/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 

@@ -51,7 +51,7 @@ class MultiMethodsManager
 	protected : std::vector<std::vector<shared_ptr<Functor> > > callBacks;
 	//private   : vector<string> indexedClassName;
 	//indexedCollisionGeometry;
-	//private   : vector<string> indexedInteractionModel;
+	//private   : vector<string> indexedInteractionGeometry;
 
 	// construction
 	public : MultiMethodsManager ();

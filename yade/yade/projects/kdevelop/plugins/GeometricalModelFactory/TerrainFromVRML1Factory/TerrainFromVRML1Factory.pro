@@ -5,25 +5,15 @@
 
 LIBS += -lAABB \
         -lTerrain \
-        -lM2D \
-        -lConstants \
-        -lM3D \
         -rdynamic 
 INCLUDEPATH = ../../../plugins/GeometricalModel/Terrain \
               ../../../plugins/BoundingVolume/AABB \
-              ../../../yade \
-              ../../../toolboxes/Math/M2D \
-              ../../../toolboxes/Math/M3D \
-              ../../../toolboxes/Math/Constants \
-              ../../../toolboxes/Libraries/Serialization 
+              ../../../toolboxes/Math 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 QMAKE_LIBDIR = ../../../plugins/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
                ../../../plugins/GeometricalModel/Terrain/$(YADEDYNLIBPATH) \
-               ../../../toolboxes/Math/M2D/$(YADEDYNLIBPATH) \
-               ../../../toolboxes/Math/Constants/$(YADEDYNLIBPATH) \
-               ../../../toolboxes/Math/M3D/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
 CONFIG += debug \

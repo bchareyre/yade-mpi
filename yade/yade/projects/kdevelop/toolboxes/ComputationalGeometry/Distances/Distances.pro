@@ -3,19 +3,15 @@
 # Subdir relative project main directory: ./toolboxes/ComputationalGeometry/Distances
 # Target is a library:  
 
-LIBS += -lM3D \
-        -lConstants \
-        -rdynamic 
-INCLUDEPATH = ../../../yade \
-              ../../../toolboxes/Math/M3D \
-              ../../../toolboxes/Math/Constants \
-              ../../../toolboxes/Libraries/Serialization 
+LIBS += -rdynamic 
+INCLUDEPATH = ../../../yade/yade \
+              ../../../yade/Factory \
+              ../../../yade/Serialization \
+              ../../../toolboxes/Math 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../toolboxes/Math/M3D/$(YADEDYNLIBPATH) \
-               ../../../toolboxes/Math/Constants/$(YADEDYNLIBPATH) \
-               $(YADEDYNLIBPATH) 
+QMAKE_LIBDIR = $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
 CONFIG += debug \
           warn_on \

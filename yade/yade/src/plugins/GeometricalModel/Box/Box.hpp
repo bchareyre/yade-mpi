@@ -12,7 +12,7 @@ class Box : public CollisionGeometry
 	public : Box ();
 	public : ~Box ();
 
-	public : bool collideWith(CollisionGeometry* collisionModel);
+	public : bool collideWith(CollisionGeometry* collisionGeometry);
 	public : bool loadFromFile(char * fileName);
 	public : void glDraw();
 

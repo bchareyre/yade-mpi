@@ -19,7 +19,7 @@ class Polyhedron : public CollisionGeometry
 	public : Polyhedron ();
 	public : ~Polyhedron ();
 
-	public : bool collideWith(CollisionGeometry* collisionModel);
+	public : bool collideWith(CollisionGeometry* collisionGeometry);
 	public : bool loadFromFile(char * fileName);
 	public : void glDraw();
 	public : void computeNormals();

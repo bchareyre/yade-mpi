@@ -3,7 +3,24 @@
 # Subdir relative project main directory: ./yade/Serialization
 # Target is a library:  
 
-CONFIG += release \
+OBJECTS_DIR = $(YADECOMPILATIONPATH) 
+DESTDIR = $(YADECOMPILATIONPATH) 
+CONFIG += debug \
           warn_on \
           staticlib 
 TEMPLATE = lib 
+HEADERS += Archive.hpp \
+           ArchiveTypes.hpp \
+           IOManager.hpp \
+           IOManagerExceptions.hpp \
+           Serializable.hpp \
+           SerializationExceptions.hpp \
+           Archive.tpp \
+           ContainerHandler.tpp \
+           FundamentalHandler.tpp \
+           PointerHandler.tpp 
+SOURCES += Archive.cpp \
+           IOManager.cpp \
+           IOManagerExceptions.cpp \
+           Serializable.cpp \
+           SerializationExceptions.cpp 

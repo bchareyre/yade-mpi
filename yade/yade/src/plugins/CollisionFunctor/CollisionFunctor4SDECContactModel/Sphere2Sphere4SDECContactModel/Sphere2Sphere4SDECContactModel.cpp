@@ -61,7 +61,7 @@ bool Sphere2Sphere4SDECContactModel::collide(const shared_ptr<CollisionGeometry>
 		scm->penetrationDepth = penetrationDepth;
 		scm->radius1 = s1->radius;
 		scm->radius2 = s2->radius;
-		c->interactionModel = scm;
+		c->interactionGeometry = scm;
 		return true;
 	}
 	else	

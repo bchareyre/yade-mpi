@@ -3,34 +3,31 @@
 # Subdir relative project main directory: ./plugins/CollisionFunctor/CollisionFunctor4SDECContactModel/Box2Sphere4SDECContactModel
 # Target is a library:  
 
-HEADERS += Box2Sphere4SDECContactModel.hpp 
-SOURCES += Box2Sphere4SDECContactModel.cpp 
 LIBS += -lBox \
         -lSphere \
         -lSDECContactModel \
-        -lM3D \
-        -lConstants \
-        -lSerialization \
         -rdynamic 
 INCLUDEPATH = ../../../../plugins/GeometricalModel/Box \
               ../../../../plugins/GeometricalModel/Sphere \
               ../../../../plugins/InteractionModel/SDECContactModel \
-              ../../../../yade \
-              ../../../../toolboxes/Math/M3D \
-              ../../../../toolboxes/Math/Constants \
-              ../../../../toolboxes/Libraries/Serialization 
+              ../../../../yade/yade \
+              ../../../../yade/Geometry \
+              ../../../../yade/Interaction \
+              ../../../../yade/MultiMethods \
+              ../../../../yade/Factory \
+              ../../../../yade/Serialization \
+              ../../../../toolboxes/Math 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 QMAKE_LIBDIR = ../../../../plugins/GeometricalModel/Box/$(YADEDYNLIBPATH) \
                ../../../../plugins/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
                ../../../../plugins/InteractionModel/SDECContactModel/$(YADEDYNLIBPATH) \
-               ../../../../toolboxes/Math/M3D/$(YADEDYNLIBPATH) \
-               ../../../../toolboxes/Math/Constants/$(YADEDYNLIBPATH) \
-               ../../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
 CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
+HEADERS += Box2Sphere4SDECContactModel.hpp 
+SOURCES += Box2Sphere4SDECContactModel.cpp 

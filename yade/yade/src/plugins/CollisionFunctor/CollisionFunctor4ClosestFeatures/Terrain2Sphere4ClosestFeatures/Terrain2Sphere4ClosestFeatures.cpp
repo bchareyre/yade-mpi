@@ -85,7 +85,7 @@ bool Terrain2Sphere4ClosestFeatures::collide(const shared_ptr<CollisionGeometry>
 	}
 		
 	if (inCollision)
-		c->interactionModel = cf;
+		c->interactionGeometry = cf;
 
 	return inCollision;
 
@@ -99,7 +99,7 @@ bool Terrain2Sphere4ClosestFeatures::reverseCollide(const shared_ptr<CollisionGe
 	bool isColliding = collide(cm2,cm1,se32,se31,c);
 	if (isColliding)
 	{
-		shared_ptr<ClosestFeatures> cf = dynamic_pointer_cast<ClosestFeatures>(c->interactionModel);
+		shared_ptr<ClosestFeatures> cf = dynamic_pointer_cast<ClosestFeatures>(c->interactionGeometry);
 		Vector3 tmp = cf->closestsPoints[0].first;
 		cf->closestsPoints[0].first = cf->closestsPoints[0].second;		
 		cf->closestsPoints[0].second = tmp;

@@ -3,11 +3,12 @@
 # Subdir relative project main directory: ./yade
 # Target is a subdirs project 
 
-CONFIG += release \
+CONFIG += debug \
           warn_on 
 TEMPLATE = subdirs 
 SUBDIRS += Serialization \
            Factory \
+           MultiMethods \
            Interaction \
            Geometry \
            Engine \

@@ -3,22 +3,14 @@
 # Subdir relative project main directory: ./plugins/GeometricalModel/Mesh2D
 # Target is a library:  
 
-LIBS += -lM3D \
-        -lSerialization \
-        -lConstants \
-        -lAABB 
+LIBS += -lAABB \
+        -rdynamic 
 INCLUDEPATH = ../../../plugins/BoundingVolume/AABB \
-              ../../../yade \
-              ../../../toolboxes/Math/M3D \
-              ../../../toolboxes/Math/Constants \
-              ../../../toolboxes/Libraries/Serialization 
+              ../../../toolboxes/Math 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../toolboxes/Math/M3D/$(YADEDYNLIBPATH) \
-               ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
-               ../../../toolboxes/Math/Constants/$(YADEDYNLIBPATH) \
-               ../../../plugins/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
+QMAKE_LIBDIR = ../../../plugins/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
 CONFIG += debug \

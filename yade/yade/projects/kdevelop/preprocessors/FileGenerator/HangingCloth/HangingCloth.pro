@@ -4,10 +4,6 @@
 # Target is a library:  
 
 LIBS += -lMesh2D \
-        -lM3D \
-        -lSerialization \
-        -lRand \
-        -lConstants \
         -lSAPCollider \
         -lAABB \
         -lSimpleNarrowCollider \
@@ -32,19 +28,11 @@ INCLUDEPATH = ../../../plugins/DynamicEngine/MassSpringBody2RigidBodyDynamicEngi
               ../../../plugins/GeometricalModel/Sphere \
               ../../../plugins/BoundingVolume/AABB \
               ../../../plugins/InteractionModel/ClosestFeatures \
-              ../../../yade \
-              ../../../toolboxes/Math/M3D \
-              ../../../toolboxes/Math/Rand \
-              ../../../toolboxes/Math/Constants \
-              ../../../toolboxes/Libraries/Serialization 
+              ../../../toolboxes/Math 
 MOC_DIR = $(YADEDYNLIBPATH) 
 UI_DIR = $(YADEDYNLIBPATH) 
 OBJECTS_DIR = $(YADEDYNLIBPATH) 
 QMAKE_LIBDIR = ../../../plugins/GeometricalModel/Mesh2D/$(YADEDYNLIBPATH) \
-               ../../../toolboxes/Math/M3D/$(YADEDYNLIBPATH) \
-               ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
-               ../../../toolboxes/Math/Rand/$(YADEDYNLIBPATH) \
-               ../../../toolboxes/Math/Constants/$(YADEDYNLIBPATH) \
                ../../../plugins/BroadCollider/SAPCollider/$(YADEDYNLIBPATH) \
                ../../../plugins/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
                ../../../plugins/NarrowCollider/SimpleNarrowCollider/$(YADEDYNLIBPATH) \

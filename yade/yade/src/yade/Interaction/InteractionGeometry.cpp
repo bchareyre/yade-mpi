@@ -1,11 +1,11 @@
-#include "InteractionModel.hpp"
+#include "InteractionGeometry.hpp"
 
 
-InteractionModel::InteractionModel() : Serializable()
+InteractionGeometry::InteractionGeometry() : Serializable()
 {
 }
 
-InteractionModel::~InteractionModel()
+InteractionGeometry::~InteractionGeometry()
 {
 
 }

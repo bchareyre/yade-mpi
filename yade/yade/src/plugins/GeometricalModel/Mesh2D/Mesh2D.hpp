@@ -35,7 +35,7 @@ class Mesh2D : public CollisionGeometry
 	public : Mesh2D ();
 	public : ~Mesh2D ();
 
-	public : bool collideWith(CollisionGeometry* collisionModel);
+	public : bool collideWith(CollisionGeometry* collisionGeometry);
 	public : bool loadFromFile(char * fileName);
 	public : void glDraw();
 	public : void computeNormals();

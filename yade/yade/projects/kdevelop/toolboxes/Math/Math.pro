@@ -3,7 +3,34 @@
 # Subdir relative project main directory: ./toolboxes/Math
 # Target is a library:  
 
-CONFIG += release \
+LIBS += -rdynamic 
+INCLUDEPATH = ../../yade/Serialization 
+MOC_DIR = $(YADECOMPILATIONPATH) 
+UI_DIR = $(YADECOMPILATIONPATH) 
+OBJECTS_DIR = $(YADECOMPILATIONPATH) 
+QMAKE_LIBDIR = $(YADEDYNLIBPATH) 
+DESTDIR = $(YADEDYNLIBPATH) 
+CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
+HEADERS += Constants.hpp \
+           Matrix3.hpp \
+           Quaternion.hpp \
+           Rand.hpp \
+           Se3.hpp \
+           Vector2.hpp \
+           Vector3.hpp \
+           Matrix3.ipp \
+           Quaternion.ipp \
+           Rand.ipp \
+           Se3.ipp \
+           Vector2.ipp \
+           Vector3.ipp 
+SOURCES += Constants.cpp \
+           Matrix3.cpp \
+           Quaternion.cpp \
+           Rand.cpp \
+           Se3.cpp \
+           Vector2.cpp \
+           Vector3.cpp 

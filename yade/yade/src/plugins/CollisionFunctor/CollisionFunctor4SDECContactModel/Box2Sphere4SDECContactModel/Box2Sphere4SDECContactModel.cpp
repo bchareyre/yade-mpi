@@ -117,7 +117,7 @@ bool Box2Sphere4SDECContactModel::collide(const shared_ptr<CollisionGeometry> cm
 		scm->penetrationDepth = scm->normal.unitize();
 		scm->radius1 = s->radius*2;
 		scm->radius2 = s->radius;
-		c->interactionModel = scm;
+		c->interactionGeometry = scm;
 		
 		return true;	
 	}
@@ -145,7 +145,7 @@ bool Box2Sphere4SDECContactModel::collide(const shared_ptr<CollisionGeometry> cm
 	scm->penetrationDepth = scm->normal.unitize();
 	scm->radius1 = s->radius*2;
 	scm->radius2 = s->radius;
-	c->interactionModel = scm;
+	c->interactionGeometry = scm;
 	
 	return true;
 }
@@ -158,7 +158,7 @@ bool Box2Sphere4SDECContactModel::reverseCollide(const shared_ptr<CollisionGeome
 	bool isColliding = collide(cm2,cm1,se32,se31,c);
 	if (isColliding)
 	{
-		shared_ptr<SDECContactModel> scm = dynamic_pointer_cast<SDECContactModel>(c->interactionModel);
+		shared_ptr<SDECContactModel> scm = dynamic_pointer_cast<SDECContactModel>(c->interactionGeometry);
 		//Vector3 tmp = scm->closestsPoints[0].first;		
 		//scm->closestsPoints[0].first = scm->closestsPoints[0].second;
 		//scm->closestsPoints[0].second = tmp;

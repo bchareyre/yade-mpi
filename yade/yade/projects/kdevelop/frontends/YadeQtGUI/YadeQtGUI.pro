@@ -3,25 +3,16 @@
 # Subdir relative project main directory: ./frontends/YadeQtGUI
 # Target is a library:  
 
-LIBS += -lSerialization \
-        -lM3D \
-        -lConstants \
-        -lQtGUIGenerator \
+LIBS += -lQtGUIGenerator \
         -lRigidBody \
         -rdynamic 
 INCLUDEPATH = ../../frontends/QtGUIGenerator \
               ../../plugins/Body/RigidBody \
-              ../../yade \
-              ../../toolboxes/Math/M3D \
-              ../../toolboxes/Math/Constants \
-              ../../toolboxes/Libraries/Serialization 
+              ../../toolboxes/Math 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
-               ../../toolboxes/Math/M3D/$(YADEDYNLIBPATH) \
-               ../../toolboxes/Math/Constants/$(YADEDYNLIBPATH) \
-               ../../frontends/QtGUIGenerator/$(YADEDYNLIBPATH) \
+QMAKE_LIBDIR = ../../frontends/QtGUIGenerator/$(YADEDYNLIBPATH) \
                ../../plugins/Body/RigidBody/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 

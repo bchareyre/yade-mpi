@@ -3,15 +3,11 @@
 # Subdir relative project main directory: ./plugins/IOManager/XMLManager
 # Target is a library:  
 
-LIBS += -lSerialization \
-        -rdynamic 
-INCLUDEPATH = ../../../yade \
-              ../../../toolboxes/Libraries/Serialization 
+LIBS += -rdynamic 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
-               $(YADEDYNLIBPATH) 
+QMAKE_LIBDIR = $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
 CONFIG += debug \
           warn_on \

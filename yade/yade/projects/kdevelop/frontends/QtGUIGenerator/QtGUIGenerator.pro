@@ -3,23 +3,14 @@
 # Subdir relative project main directory: ./frontends/QtGUIGenerator
 # Target is a library:  
 
-LIBS += -lSerialization \
-        -lM3D \
-        -lConstants \
-        -lXMLManager \
+LIBS += -lXMLManager \
         -rdynamic 
 INCLUDEPATH = ../../plugins/IOManager/XMLManager \
-              ../../yade \
-              ../../toolboxes/Math/M3D \
-              ../../toolboxes/Math/Constants \
-              ../../toolboxes/Libraries/Serialization 
+              ../../toolboxes/Math 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
-               ../../toolboxes/Math/M3D/$(YADEDYNLIBPATH) \
-               ../../toolboxes/Math/Constants/$(YADEDYNLIBPATH) \
-               ../../plugins/IOManager/XMLManager/$(YADEDYNLIBPATH) \
+QMAKE_LIBDIR = ../../plugins/IOManager/XMLManager/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
 CONFIG += debug \

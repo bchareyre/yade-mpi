@@ -3,25 +3,16 @@
 # Subdir relative project main directory: ./plugins/DynamicEngine/ExplicitMassSpringDynamicEngine
 # Target is a library:  
 
-LIBS += -lM3D \
-        -lConstants \
-        -lSerialization \
-        -lMesh2D \
+LIBS += -lMesh2D \
         -lMassSpringBody \
         -rdynamic 
 INCLUDEPATH = ../../../plugins/Body/MassSpringBody \
               ../../../plugins/GeometricalModel/Mesh2D \
-              ../../../yade \
-              ../../../toolboxes/Math/M3D \
-              ../../../toolboxes/Math/Constants \
-              ../../../toolboxes/Libraries/Serialization 
+              ../../../toolboxes/Math 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../toolboxes/Math/M3D/$(YADEDYNLIBPATH) \
-               ../../../toolboxes/Math/Constants/$(YADEDYNLIBPATH) \
-               ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
-               ../../../plugins/GeometricalModel/Mesh2D/$(YADEDYNLIBPATH) \
+QMAKE_LIBDIR = ../../../plugins/GeometricalModel/Mesh2D/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/MassSpringBody/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 

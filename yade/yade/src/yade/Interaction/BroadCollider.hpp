@@ -76,7 +76,7 @@ class BroadCollider : public Serializable
 		\param const std::vector<shared_ptr<Body> > vector of body you want to test for potential interaction
 		\param std::list<shared_ptr<Interaction> > list of potential interaction found by the broad phase collider
 	*/
-	public : virtual int broadPhaseCollisionTest(const std::vector<shared_ptr<Body> >& ,std::list<shared_ptr<Interaction> >& ) { return 0;};
+	public : virtual int broadCollisionTest(const std::vector<shared_ptr<Body> >& ,std::list<shared_ptr<Interaction> >& ) { return 0;};
 
 	public : void processAttributes();
 	public : void registerAttributes();

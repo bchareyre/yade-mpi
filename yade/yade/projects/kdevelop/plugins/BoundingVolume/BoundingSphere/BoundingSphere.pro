@@ -3,21 +3,12 @@
 # Subdir relative project main directory: ./plugins/BoundingVolume/BoundingSphere
 # Target is a library:  
 
-LIBS += -lConstants \
-        -lM3D \
-        -lSerialization \
-        -rdynamic 
-INCLUDEPATH = ../../../yade \
-              ../../../toolboxes/Math/M3D \
-              ../../../toolboxes/Math/Constants \
-              ../../../toolboxes/Libraries/Serialization 
+LIBS += -rdynamic 
+INCLUDEPATH = ../../../toolboxes/Math 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../toolboxes/Math/Constants/$(YADEDYNLIBPATH) \
-               ../../../toolboxes/Math/M3D/$(YADEDYNLIBPATH) \
-               ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
-               $(YADEDYNLIBPATH) 
+QMAKE_LIBDIR = $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
 CONFIG += debug \
           warn_on \

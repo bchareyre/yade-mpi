@@ -3,7 +3,19 @@
 # Subdir relative project main directory: ./yade/Interaction
 # Target is a library:  
 
-CONFIG += release \
+OBJECTS_DIR = $(YADECOMPILATIONPATH) 
+DESTDIR = $(YADECOMPILATIONPATH) 
+CONFIG += debug \
           warn_on \
           staticlib 
 TEMPLATE = lib 
+HEADERS += BroadCollider.hpp \
+           Contact.hpp \
+           Interaction.hpp \
+           InteractionGeometry.hpp \
+           NarrowCollider.hpp 
+SOURCES += BroadCollider.cpp \
+           Contact.cpp \
+           Interaction.cpp \
+           InteractionGeometry.cpp \
+           NarrowCollider.cpp 

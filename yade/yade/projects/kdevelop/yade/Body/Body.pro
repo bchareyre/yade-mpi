@@ -3,7 +3,15 @@
 # Subdir relative project main directory: ./yade/Body
 # Target is a library:  
 
-CONFIG += release \
+OBJECTS_DIR = $(YADECOMPILATIONPATH) 
+DESTDIR = $(YADECOMPILATIONPATH) 
+CONFIG += debug \
           warn_on \
           staticlib 
 TEMPLATE = lib 
+HEADERS += Body.hpp \
+           ConnexBody.hpp \
+           NonConnexBody.hpp 
+SOURCES += Body.cpp \
+           ConnexBody.cpp \
+           NonConnexBody.cpp 

@@ -3,25 +3,16 @@
 # Subdir relative project main directory: ./plugins/GeometricalModel/Polyhedron
 # Target is a library:  
 
-HEADERS += Polyhedron.hpp 
-SOURCES += Polyhedron.cpp 
-LIBS += -lM3D \
-        -lRand \
-        -lSerialization \
-        -rdynamic 
-INCLUDEPATH = ../../../yade \
-              ../../../toolboxes/Math/M3D \
-              ../../../toolboxes/Math/Constants \
-              ../../../toolboxes/Libraries/Serialization 
+LIBS += -rdynamic 
+INCLUDEPATH = ../../../toolboxes/Math 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../toolboxes/Math/M3D/$(YADEDYNLIBPATH) \
-               ../../../toolboxes/Math/Rand/$(YADEDYNLIBPATH) \
-               ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
-               $(YADEDYNLIBPATH) 
+QMAKE_LIBDIR = $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
 CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
+HEADERS += Polyhedron.hpp 
+SOURCES += Polyhedron.cpp 

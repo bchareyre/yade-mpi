@@ -5,28 +5,19 @@
 
 LIBS += -lMesh2D \
         -lSphere \
-        -lM3D \
-        -lConstants \
-        -lSerialization \
         -lClosestFeatures \
         -lDistances \
         -rdynamic 
 INCLUDEPATH = ../../../../plugins/GeometricalModel/Mesh2D \
               ../../../../plugins/GeometricalModel/Sphere \
               ../../../../plugins/InteractionModel/ClosestFeatures \
-              ../../../../yade \
-              ../../../../toolboxes/ComputationalGeometry/Distances \
-              ../../../../toolboxes/Math/M3D \
-              ../../../../toolboxes/Math/Constants \
-              ../../../../toolboxes/Libraries/Serialization 
+              ../../../../toolboxes/Math \
+              ../../../../toolboxes/ComputationalGeometry/Distances 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 QMAKE_LIBDIR = ../../../../plugins/GeometricalModel/Mesh2D/$(YADEDYNLIBPATH) \
                ../../../../plugins/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
-               ../../../../toolboxes/Math/M3D/$(YADEDYNLIBPATH) \
-               ../../../../toolboxes/Math/Constants/$(YADEDYNLIBPATH) \
-               ../../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../../../plugins/InteractionModel/ClosestFeatures/$(YADEDYNLIBPATH) \
                ../../../../toolboxes/ComputationalGeometry/Distances/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 

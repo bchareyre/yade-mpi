@@ -64,7 +64,7 @@ void SAPCollider::registerAttributes()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-int SAPCollider::broadPhaseCollisionTest(const std::vector<shared_ptr<Body> >& bodies,std::list<shared_ptr<Interaction> >& interactions)
+int SAPCollider::broadCollisionTest(const std::vector<shared_ptr<Body> >& bodies,std::list<shared_ptr<Interaction> >& interactions)
 {
 	unsigned int i;
 
@@ -100,7 +100,7 @@ int SAPCollider::broadPhaseCollisionTest(const std::vector<shared_ptr<Body> >& b
 	std::list<Interaction*>::iterator ciEnd = interactions.end();
 	for(;ci!=ciEnd;++ci)
 	{
-		delete (*ci)->interactionModel;
+		delete (*ci)->interactionGeometry;
 		delete (*ci);
 	}*/
 	interactions.clear();
@@ -129,7 +129,7 @@ int SAPCollider::broadPhaseCollisionTest(const std::vector<shared_ptr<Body> >& b
 void SAPCollider::updateIds(unsigned int nbElements)
 {
 
-	// the first time broadPhaseCollisionTest is called nbObject=0
+	// the first time broadCollisionTest is called nbObject=0
 	if (nbElements!=nbObjects)
 	{
 		int begin,end;

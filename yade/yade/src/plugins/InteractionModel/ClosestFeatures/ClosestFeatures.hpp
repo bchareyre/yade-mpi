@@ -3,11 +3,11 @@
 
 #include <vector>
 
-#include "InteractionModel.hpp"
+#include "InteractionGeometry.hpp"
 #include "Vector3.hpp"
 
-// FIXME : InteractionModel   into   InteractionModel
-class ClosestFeatures : public InteractionModel
+// FIXME : InteractionGeometry   into   InteractionGeometry
+class ClosestFeatures : public InteractionGeometry
 {
 	public : std::vector<std::pair<Vector3,Vector3> > closestsPoints;
 	public : std::vector<int> verticesId;

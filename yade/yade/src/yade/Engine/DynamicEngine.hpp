@@ -69,7 +69,7 @@ class DynamicEngine : public Serializable
 	//public : virtual void respondToCollisions(std::vector<shared_ptr<Body> >& , const std::list<shared_ptr<Interaction> >& ,float ) {};
 	public : virtual void respondToCollisions(Body * , const std::list<shared_ptr<Interaction> >& ) {};
 
-	public : virtual string getInteractionModelName() { return "";};
+	public : virtual string getInteractionGeometryName() { return "";};
 
 	REGISTER_CLASS_NAME(DynamicEngine);
 

@@ -3,24 +3,15 @@
 # Subdir relative project main directory: ./toolboxes/ComputationalGeometry/Intersections
 # Target is a library:  
 
-LIBS += -lM2D \
-        -lM3D \
-        -lConstants \
-        -lSerialization \
-        -rdynamic 
-INCLUDEPATH = ../../../yade \
-              ../../../toolboxes/Math/M2D \
-              ../../../toolboxes/Math/M3D \
-              ../../../toolboxes/Math/Constants \
-              ../../../toolboxes/Libraries/Serialization 
+LIBS += -rdynamic 
+INCLUDEPATH = ../../../yade/yade \
+              ../../../yade/Factory \
+              ../../../yade/Serialization \
+              ../../../toolboxes/Math 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../toolboxes/Math/M2D/$(YADEDYNLIBPATH) \
-               ../../../toolboxes/Math/M3D/$(YADEDYNLIBPATH) \
-               ../../../toolboxes/Math/Constants/$(YADEDYNLIBPATH) \
-               ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
-               $(YADEDYNLIBPATH) 
+QMAKE_LIBDIR = $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
 CONFIG += debug \
           warn_on \

@@ -76,12 +76,12 @@ class SAPCollider : public BroadCollider
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 	// return a list "interactions" of pairs of Body which Bounding volume are in collisions
-	public : int broadPhaseCollisionTest(const std::vector<shared_ptr<Body> >& bodies,std::list<shared_ptr<Interaction> >& interactions);
+	public : int broadCollisionTest(const std::vector<shared_ptr<Body> >& bodies,std::list<shared_ptr<Interaction> >& interactions);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-	// Used the first time broadPhaseCollisionTest is called, to initialize and sort the xBounds, yBounds,
+	// Used the first time broadCollisionTest is called, to initialize and sort the xBounds, yBounds,
 	// and zBounds arrays and to initialize the overlappingBB collection
 	protected : void updateIds(unsigned int nbElements);
 
@@ -97,7 +97,7 @@ class SAPCollider : public BroadCollider
 	// update the "value" field of the xBounds, yBounds, zBounds arrays
 	protected : void updateBounds(int nbElements);
 
-	// Used the first time broadPhaseCollisionTest is called
+	// Used the first time broadCollisionTest is called
 	// It is necessary to initialise the overlapping AABB collection because this collection is only
 	// incrementally udated each time step
 	protected : void findOverlappingBB(std::vector<AABBBound*>& bounds, int nbElements);

@@ -45,7 +45,7 @@ class CollisionGeometry : public GeometricalModel, public Indexable
 
 	public : virtual ~CollisionGeometry ();
 
-	//public : virtual bool collideWith(CollisionGeometry* collisionModel) = NULL;
+	//public : virtual bool collideWith(CollisionGeometry* collisionGeometry) = NULL;
 	public : void registerAttributes();
 	public : void processAttributes();
 

@@ -73,8 +73,8 @@ void NonConnexBody::moveToNextTimeStep()
 // FIND INTERACTIONS
 	// serach for potential collision (maybe in to steps for hierarchical simulation)
 	if (broadCollider!=0)
-//		broadInteractor->broadPhaseInteractionTest(bodies,interactions);
-		broadCollider->broadPhaseCollisionTest(bodies,interactions);
+//		broadInteractor->broadInteractionTest(bodies,interactions);
+		broadCollider->broadCollisionTest(bodies,interactions);
 
 	// this has to split the contact list into several constact list according to the physical type
 	// (RigidBody,FEMBody ...) of colliding body

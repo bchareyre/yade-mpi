@@ -11,10 +11,6 @@ LIBS += -lAABB \
         -lBox \
         -lSphere \
         -lRigidBody \
-        -lConstants \
-        -lM3D \
-        -lRand \
-        -lSerialization \
         -lBallisticDynamicEngine \
         -lSDECDynamicEngine \
         -lSDECDiscreteElement \
@@ -30,11 +26,7 @@ INCLUDEPATH = ../../../plugins/DynamicEngine/SDECDynamicEngine \
               ../../../plugins/GeometricalModel/Box \
               ../../../plugins/GeometricalModel/Sphere \
               ../../../plugins/BoundingVolume/AABB \
-              ../../../yade \
-              ../../../toolboxes/Math/M3D \
-              ../../../toolboxes/Math/Rand \
-              ../../../toolboxes/Math/Constants \
-              ../../../toolboxes/Libraries/Serialization 
+              ../../../toolboxes/Math 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
@@ -46,10 +38,6 @@ QMAKE_LIBDIR = ../../../plugins/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
                ../../../plugins/GeometricalModel/Box/$(YADEDYNLIBPATH) \
                ../../../plugins/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/RigidBody/$(YADEDYNLIBPATH) \
-               ../../../toolboxes/Math/Constants/$(YADEDYNLIBPATH) \
-               ../../../toolboxes/Math/M3D/$(YADEDYNLIBPATH) \
-               ../../../toolboxes/Math/Rand/$(YADEDYNLIBPATH) \
-               ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../../plugins/DynamicEngine/BallisticDynamicEngine/$(YADEDYNLIBPATH) \
                ../../../plugins/DynamicEngine/SDECDynamicEngine/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/SDECDiscreteElement/$(YADEDYNLIBPATH) \

@@ -3,7 +3,18 @@
 # Subdir relative project main directory: ./yade/Factory
 # Target is a library:  
 
-CONFIG += release \
+OBJECTS_DIR = $(YADECOMPILATIONPATH) 
+DESTDIR = $(YADECOMPILATIONPATH) 
+CONFIG += debug \
           warn_on \
           staticlib 
 TEMPLATE = lib 
+HEADERS += ClassFactory.hpp \
+           DynLibManager.hpp \
+           Factorable.hpp \
+           FactorableTypes.hpp \
+           FactoryExceptions.hpp 
+SOURCES += ClassFactory.cpp \
+           DynLibManager.cpp \
+           Factorable.cpp \
+           FactoryExceptions.cpp 

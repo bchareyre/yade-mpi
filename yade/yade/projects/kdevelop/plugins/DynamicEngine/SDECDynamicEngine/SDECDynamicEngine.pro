@@ -3,10 +3,7 @@
 # Subdir relative project main directory: ./plugins/DynamicEngine/SDECDynamicEngine
 # Target is a library:  
 
-LIBS += -lM3D \
-        -lSerialization \
-        -lConstants \
-        -lSDECDiscreteElement \
+LIBS += -lSDECDiscreteElement \
         -lRigidBody \
         -lSphere \
         -lSDECContactModel \
@@ -15,17 +12,11 @@ INCLUDEPATH = ../../../plugins/Body/SDECDiscreteElement \
               ../../../plugins/Body/RigidBody \
               ../../../plugins/GeometricalModel/Sphere \
               ../../../plugins/InteractionModel/SDECContactModel \
-              ../../../yade \
-              ../../../toolboxes/Math/M3D \
-              ../../../toolboxes/Math/Constants \
-              ../../../toolboxes/Libraries/Serialization 
+              ../../../toolboxes/Math 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../toolboxes/Math/M3D/$(YADEDYNLIBPATH) \
-               ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
-               ../../../toolboxes/Math/Constants/$(YADEDYNLIBPATH) \
-               ../../../plugins/Body/SDECDiscreteElement/$(YADEDYNLIBPATH) \
+QMAKE_LIBDIR = ../../../plugins/Body/SDECDiscreteElement/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/RigidBody/$(YADEDYNLIBPATH) \
                ../../../plugins/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
                ../../../plugins/InteractionModel/SDECContactModel/$(YADEDYNLIBPATH) \

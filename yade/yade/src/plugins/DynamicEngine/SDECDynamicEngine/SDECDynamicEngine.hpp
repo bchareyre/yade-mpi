@@ -51,13 +51,13 @@ class SDECDynamicEngine : public DynamicEngine
 
 	struct lessThanTuple
 	{
-		bool operator()(const tuple<int,bool,shared_ptr<InteractionModel> >& p1, const tuple<int,bool,shared_ptr<InteractionModel> >& p2) const
+		bool operator()(const tuple<int,bool,shared_ptr<InteractionGeometry> >& p1, const tuple<int,bool,shared_ptr<InteractionGeometry> >& p2) const
 		{
 			return (p1.get<0>()<p2.get<0>());
 		}
 	};
 	
-	vector<set<tuple<int,bool,shared_ptr<InteractionModel> >,lessThanTuple > > interactionsPerBody;
+	vector<set<tuple<int,bool,shared_ptr<InteractionGeometry> >,lessThanTuple > > interactionsPerBody;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Attributes											///

@@ -38,7 +38,7 @@ void SimpleBroadCollider::registerAttributes()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-int SimpleBroadCollider::broadPhaseCollisionTest(const std::vector<shared_ptr<Body> >& /* bodies  (unused)  */,std::list<shared_ptr<Interaction> >& interactions)
+int SimpleBroadCollider::broadCollisionTest(const std::vector<shared_ptr<Body> >& /* bodies  (unused)  */,std::list<shared_ptr<Interaction> >& interactions)
 {
 	nbPotentialCollisions=0;
 

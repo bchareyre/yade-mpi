@@ -54,9 +54,9 @@ void SimpleSpringDynamicEngine::respondToCollisions(Body * body, const std::list
 		shared_ptr<RigidBody> rb1 = dynamic_pointer_cast<RigidBody>(bodies[contact->id1]);
 		shared_ptr<RigidBody> rb2 = dynamic_pointer_cast<RigidBody>(bodies[contact->id2]);
 
-		std::vector<std::pair<Vector3,Vector3> >::iterator cpi = (dynamic_pointer_cast<ClosestFeatures>(contact->interactionModel))->closestsPoints.begin();
-		std::vector<std::pair<Vector3,Vector3> >::iterator cpiEnd = (dynamic_pointer_cast<ClosestFeatures>(contact->interactionModel))->closestsPoints.end();
-		float size = (dynamic_pointer_cast<ClosestFeatures>(contact->interactionModel))->closestsPoints.size();
+		std::vector<std::pair<Vector3,Vector3> >::iterator cpi = (dynamic_pointer_cast<ClosestFeatures>(contact->interactionGeometry))->closestsPoints.begin();
+		std::vector<std::pair<Vector3,Vector3> >::iterator cpiEnd = (dynamic_pointer_cast<ClosestFeatures>(contact->interactionGeometry))->closestsPoints.end();
+		float size = (dynamic_pointer_cast<ClosestFeatures>(contact->interactionGeometry))->closestsPoints.size();
 		for( ; cpi!=cpiEnd ; ++cpi)
 		{
 			Vector3 p1 = (*cpi).first;

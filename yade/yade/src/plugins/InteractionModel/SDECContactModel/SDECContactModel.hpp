@@ -3,10 +3,10 @@
 
 #include <vector>
 
-#include "InteractionModel.hpp"
+#include "InteractionGeometry.hpp"
 #include "Vector3.hpp"
 
-class SDECContactModel : public InteractionModel
+class SDECContactModel : public InteractionGeometry
 {
 	public : float radius1;
 	public : float radius2;

@@ -57,7 +57,7 @@ bool Sphere2Sphere4ClosestFeatures::collide(const shared_ptr<CollisionGeometry> 
 	{
 		shared_ptr<ClosestFeatures> cf = shared_ptr<ClosestFeatures>(new ClosestFeatures());
 		cf->closestsPoints.push_back(std::pair<Vector3,Vector3>(se31.translation-v*s1->radius,se32.translation+v*s2->radius));
-		c->interactionModel = cf;
+		c->interactionGeometry = cf;
 		return true;
 	}
 	else	

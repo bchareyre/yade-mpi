@@ -79,13 +79,13 @@ void SDECDynamicEngine::filter(Body* body,const std::list<shared_ptr<Interaction
 	if (first)
 		interactionsPerBody.resize(bodies.size());
 
-	vector<set<tuple<int,bool,shared_ptr<InteractionModel> >,lessThanTuple > >::iterator ipbi    = interactionsPerBody.begin();
-	vector<set<tuple<int,bool,shared_ptr<InteractionModel> >,lessThanTuple > >::iterator ipbiEnd = interactionsPerBody.end();
+	vector<set<tuple<int,bool,shared_ptr<InteractionGeometry> >,lessThanTuple > >::iterator ipbi    = interactionsPerBody.begin();
+	vector<set<tuple<int,bool,shared_ptr<InteractionGeometry> >,lessThanTuple > >::iterator ipbiEnd = interactionsPerBody.end();
 	for(;ipbi!=ipbiEnd;++ipbi)
 	{
-		set<tuple<int,bool,shared_ptr<InteractionModel> >,lessThanTuple >::iterator ii = (*ipbi).begin();
-		set<tuple<int,bool,shared_ptr<InteractionModel> >,lessThanTuple >::iterator iiEnd = (*ipbi).end();
-		set<tuple<int,bool,shared_ptr<InteractionModel> >,lessThanTuple >::iterator tmpi;
+		set<tuple<int,bool,shared_ptr<InteractionGeometry> >,lessThanTuple >::iterator ii = (*ipbi).begin();
+		set<tuple<int,bool,shared_ptr<InteractionGeometry> >,lessThanTuple >::iterator iiEnd = (*ipbi).end();
+		set<tuple<int,bool,shared_ptr<InteractionGeometry> >,lessThanTuple >::iterator tmpi;
 		for(;ii!=iiEnd;)
 		{
 			tmpi = ii;
@@ -112,9 +112,9 @@ void SDECDynamicEngine::filter(Body* body,const std::list<shared_ptr<Interaction
 			swap(id1,id2);
 
 		bool accessed = false;
-		tuple<int,bool,shared_ptr<InteractionModel> > t(id2,accessed,(*cti)->interactionModel);
+		tuple<int,bool,shared_ptr<InteractionGeometry> > t(id2,accessed,(*cti)->interactionGeometry);
 		
-		pair<set<tuple<int,bool,shared_ptr<InteractionModel> >,lessThanTuple >::iterator,bool> intertionResult;
+		pair<set<tuple<int,bool,shared_ptr<InteractionGeometry> >,lessThanTuple >::iterator,bool> intertionResult;
 
 		intertionResult	= interactionsPerBody[id1].insert(t);
 		
@@ -124,7 +124,7 @@ void SDECDynamicEngine::filter(Body* body,const std::list<shared_ptr<Interaction
 
 		(*cti)->isNew = intertionResult.second;
 		
-		shared_ptr<SDECContactModel> scm = dynamic_pointer_cast<SDECContactModel>((*cti)->interactionModel);
+		shared_ptr<SDECContactModel> scm = dynamic_pointer_cast<SDECContactModel>((*cti)->interactionGeometry);
 
 		// here we want to get new geometrical info about contact but we want to remember physical infos from previous time step about it
 		Vector3 cp = scm->contactPoint;
@@ -133,9 +133,9 @@ void SDECDynamicEngine::filter(Body* body,const std::list<shared_ptr<Interaction
 		float r1 = scm->radius1;
 		float r2 = scm->radius2;
 		
-		(*cti)->interactionModel  = intertionResult.first->get<2>();
+		(*cti)->interactionGeometry  = intertionResult.first->get<2>();
 
-		scm = dynamic_pointer_cast<SDECContactModel>((*cti)->interactionModel);
+		scm = dynamic_pointer_cast<SDECContactModel>((*cti)->interactionGeometry);
 		scm->contactPoint= cp;
 		scm->normal=n;
 		scm->penetrationDepth=pd;
@@ -178,7 +178,7 @@ void SDECDynamicEngine::respondToCollisions(Body* body, const std::list<shared_p
 
 		shared_ptr<SDECDiscreteElement> de1 	= dynamic_pointer_cast<SDECDiscreteElement>(bodies[id1]);
 		shared_ptr<SDECDiscreteElement> de2 	= dynamic_pointer_cast<SDECDiscreteElement>(bodies[id2]);
-		shared_ptr<SDECContactModel> currentContact = dynamic_pointer_cast<SDECContactModel>(contact->interactionModel);
+		shared_ptr<SDECContactModel> currentContact = dynamic_pointer_cast<SDECContactModel>(contact->interactionGeometry);
 		
 		if ((*cti)->isNew)
 		{
