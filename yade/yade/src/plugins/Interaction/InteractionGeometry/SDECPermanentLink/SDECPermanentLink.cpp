@@ -1,6 +1,6 @@
 #include "SDECPermanentLink.hpp"
 
-SDECPermanentLink::SDECPermanentLink() : InteractionGeometry()
+SDECPermanentLink::SDECPermanentLink() : GeometryOfInteraction()
 {
 }
 
@@ -22,7 +22,7 @@ void SDECPermanentLink::postProcessAttributes(bool /*deserializing*/)
 
 void SDECPermanentLink::registerAttributes()
 {
-	InteractionGeometry::registerAttributes();
+	GeometryOfInteraction::registerAttributes();
 	REGISTER_ATTRIBUTE(radius1);
 	REGISTER_ATTRIBUTE(radius2);
 	

@@ -3,7 +3,7 @@
 # Subdir relative project main directory: ./plugins/Geometry/BoundingVolumeFactory/CollisionGeometrySet2AABBFactory
 # Target is a library:  
 
-LIBS += -lCollisionGeometrySet \
+LIBS += -lInteractionGeometrySet \
         -lAABB \
         -rdynamic 
 INCLUDEPATH = $(YADEINCLUDEPATH) 

@@ -16,13 +16,13 @@ LIBS += -lSDECDynamicEngine \
         -lSDECPermanentLink \
         -lGeometry \
         -lInteraction \
-        -lCollisionGeometrySet2AABBFactory \
-        -lCollisionGeometrySet \
         -lSDECLinearContactModel \
         -lPersistentSAPCollider \
         -lInteractionSphere \
         -lInteractionBox \
         -lParticle \
+        -lInteractionGeometrySet2AABBFactory \
+        -lInteractionGeometrySet \
         -rdynamic 
 INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
@@ -41,13 +41,15 @@ QMAKE_LIBDIR = ../../../plugins/Engine/DynamicEngine/SDECDynamicEngine/$(YADEDYN
                ../../../plugins/Interaction/InteractionGeometry/SDECPermanentLink/$(YADEDYNLIBPATH) \
                ../../../yade/Geometry/$(YADEDYNLIBPATH) \
                ../../../yade/Interaction/$(YADEDYNLIBPATH) \
-               ../../../plugins/Geometry/BoundingVolumeFactory/CollisionGeometrySet2AABBFactory/$(YADEDYNLIBPATH) \
-               ../../../plugins/Geometry/CollisionGeometry/CollisionGeometrySet/$(YADEDYNLIBPATH) \
                ../../../plugins/Interaction/InteractionPhysicsFunctor/SDECLinearContactModel/$(YADEDYNLIBPATH) \
                ../../../plugins/Interaction/BroadInteractor/PersistentSAPCollider/$(YADEDYNLIBPATH) \
+               ../../../plugins/Geometry/InteractionGeometry/InteractionSphere/$(YADEDYNLIBPATH) \
+               ../../../plugins/Geometry/InteractionGeometry/InteractionBox/$(YADEDYNLIBPATH) \
+               ../../../plugins/Body/BodyPhysicalParameters/Particle/$(YADEDYNLIBPATH) \
+               ../../../plugins/Geometry/BoundingVolumeFactory/CollisionGeometrySet2AABBFactory/$(YADEDYNLIBPATH) \
+               ../../../plugins/Geometry/CollisionGeometry/CollisionGeometrySet/$(YADEDYNLIBPATH) \
                ../../../plugins/Geometry/CollisionGeometry/InteractionSphere/$(YADEDYNLIBPATH) \
                ../../../plugins/Geometry/CollisionGeometry/InteractionBox/$(YADEDYNLIBPATH) \
-               ../../../plugins/Body/BodyPhysicalParameters/Particle/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/DynamicEngine/BallisticDynamicEngine/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \

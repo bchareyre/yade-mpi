@@ -19,8 +19,8 @@
 #include "GeometricalModel.hpp"
 #include "InteractionGeometry.hpp"
 #include "BoundingVolume.hpp"
-#include "InteractionGeometry.hpp"
-#include "InteractionPhysics.hpp"
+#include "GeometryOfInteraction.hpp"
+#include "PhysicsOfInteraction.hpp"
 #include "ThreadSynchronizer.hpp"
 #include "SimulationLoop.hpp"
 #include "FrontEnd.hpp"
@@ -200,10 +200,10 @@ void Omega::registerDynlibType(const string& name)
 		dynlibsType[name]="InteractionGeometry";
 	else if (dynamic_pointer_cast<BoundingVolume>(f))
 		dynlibsType[name]="BoundingVolume";
-	else if (dynamic_pointer_cast<InteractionGeometry>(f))
-		dynlibsType[name]="InteractionGeometry";
-	else if (dynamic_pointer_cast<InteractionPhysics>(f))
-		dynlibsType[name]="InteractionPhysics";
+	else if (dynamic_pointer_cast<GeometryOfInteraction>(f))
+		dynlibsType[name]="GeometryOfInteraction";
+	else if (dynamic_pointer_cast<PhysicsOfInteraction>(f))
+		dynlibsType[name]="PhysicsOfInteraction";
 
 	else
 		dynlibsType[name]="Unknown";

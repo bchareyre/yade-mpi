@@ -3,10 +3,10 @@
 
 #include <vector>
 
-#include "InteractionGeometry.hpp"
+#include "GeometryOfInteraction.hpp"
 #include "Vector3.hpp"
 
-class SDECContactGeometry : public InteractionGeometry
+class SDECContactGeometry : public GeometryOfInteraction
 {
 	public : Real radius1;
 	public : Real radius2;

@@ -3,11 +3,11 @@
 
 #include <vector>
 
-#include "InteractionGeometry.hpp"
+#include "GeometryOfInteraction.hpp"
 #include "Vector3.hpp"
 #include "Quaternion.hpp"
 
-class SDECPermanentLink : public InteractionGeometry
+class SDECPermanentLink : public GeometryOfInteraction
 {
 	public : Real radius1;
 	public : Real radius2;

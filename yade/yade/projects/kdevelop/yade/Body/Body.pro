@@ -3,6 +3,26 @@
 # Subdir relative project main directory: ./yade/Body
 # Target is a library:  
 
+LIBS += -lActionVecVec \
+        -lInteractionGeometrySet \
+        -rdynamic 
+INCLUDEPATH = $(YADEINCLUDEPATH) 
+MOC_DIR = $(YADECOMPILATIONPATH) 
+UI_DIR = $(YADECOMPILATIONPATH) 
+OBJECTS_DIR = $(YADECOMPILATIONPATH) 
+QMAKE_LIBDIR = ../../toolboxes/DataStructures/ActionContainer/ActionVecVec/$(YADEDYNLIBPATH) \
+               ../../plugins/Geometry/InteractionGeometry/InteractionGeometrySet/$(YADEDYNLIBPATH) \
+               ../../plugins/Geometry/CollisionGeometry/CollisionGeometrySet/$(YADEDYNLIBPATH) \
+               $(YADEDYNLIBPATH) 
+QMAKE_CXXFLAGS_RELEASE += -lpthread \
+                          -pthread 
+QMAKE_CXXFLAGS_DEBUG += -lpthread \
+                        -pthread 
+DESTDIR = $(YADEDYNLIBPATH) 
+CONFIG += debug \
+          warn_on \
+          dll 
+TEMPLATE = lib 
 HEADERS += Body.hpp \
            BodyContainer.hpp \
            ComplexBody.hpp \
@@ -13,22 +33,3 @@ SOURCES += Body.cpp \
            ComplexBody.cpp \
            SimpleBody.cpp \
            BodyPhysicalParameters.cpp 
-LIBS += -lCollisionGeometrySet \
--lActionVecVec \
--rdynamic
-INCLUDEPATH = $(YADEINCLUDEPATH)
-MOC_DIR = $(YADECOMPILATIONPATH)
-UI_DIR = $(YADECOMPILATIONPATH)
-OBJECTS_DIR = $(YADECOMPILATIONPATH)
-QMAKE_LIBDIR = ../../plugins/Geometry/CollisionGeometry/CollisionGeometrySet/$(YADEDYNLIBPATH) \
-../../toolboxes/DataStructures/ActionContainer/ActionVecVec/$(YADEDYNLIBPATH) \
-$(YADEDYNLIBPATH)
-QMAKE_CXXFLAGS_RELEASE += -lpthread \
--pthread
-QMAKE_CXXFLAGS_DEBUG += -lpthread \
--pthread
-DESTDIR = $(YADEDYNLIBPATH)
-CONFIG += debug \
-warn_on \
-dll
-TEMPLATE = lib

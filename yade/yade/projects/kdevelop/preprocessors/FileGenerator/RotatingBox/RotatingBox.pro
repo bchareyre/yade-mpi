@@ -19,8 +19,8 @@ LIBS += -lAABB \
         -lGeometry \
         -lInteraction \
         -lMultiMethods \
-        -lCollisionGeometrySet2AABBFactory \
-        -lCollisionGeometrySet \
+        -lInteractionGeometrySet2AABBFactory \
+        -lInteractionGeometrySet \
         -rdynamic 
 INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 

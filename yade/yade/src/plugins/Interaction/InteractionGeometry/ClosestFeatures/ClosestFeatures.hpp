@@ -3,10 +3,10 @@
 
 #include <vector>
 
-#include "InteractionGeometry.hpp"
+#include "GeometryOfInteraction.hpp"
 #include "Vector3.hpp"
 
-class ClosestFeatures : public InteractionGeometry
+class ClosestFeatures : public GeometryOfInteraction
 {
 	public : std::vector<std::pair<Vector3r,Vector3r> > closestsPoints;
 	public : std::vector<int> verticesId;

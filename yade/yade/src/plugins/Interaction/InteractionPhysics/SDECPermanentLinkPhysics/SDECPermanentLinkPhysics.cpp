@@ -26,7 +26,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-SDECPermanentLinkPhysics::SDECPermanentLinkPhysics() : InteractionPhysics()
+SDECPermanentLinkPhysics::SDECPermanentLinkPhysics() : PhysicsOfInteraction()
 {
 
 }
@@ -56,7 +56,7 @@ void SDECPermanentLinkPhysics::postProcessAttributes(bool deserializing)
 
 void SDECPermanentLinkPhysics::registerAttributes()
 {
-	InteractionPhysics::registerAttributes();
+	PhysicsOfInteraction::registerAttributes();
 	REGISTER_ATTRIBUTE(initialKn);
 	REGISTER_ATTRIBUTE(initialKs);
 	REGISTER_ATTRIBUTE(initialEquilibriumDistance);
