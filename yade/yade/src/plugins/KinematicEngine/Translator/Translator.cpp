@@ -37,10 +37,10 @@ void Translator::moveToNextTimeStep(Body * body)
 	time = dt;
 	static int sign = 1;
 
-	if ((Omega::instance().getCurrentIteration()/1000)%2==0)
+	//if ((Omega::instance().getCurrentIteration()/1000)%2==0)
 		sign = 1;
-	else
-		sign = -1;
+	//else
+	//	sign = -1;
 
 	for(;ii!=iiEnd;++ii)
 	{
