@@ -1,26 +1,19 @@
 #! /bin/sh
 
-# call this file:
-# dynLib off
-# dynLib on
+grep "          dll" ../projects/kdevelop/* -Rl | fgrep .svn/text-base -v 	>  ./dynamicLibs
+echo './empty'									>> ./dynamicLibs
 
-plugins/InteractionModel/ClosestsFeatures/ClosestsFeatures.pro 
-plugins/CinematicEngine/Oscillator/Oscillator.pro 
-plugins/GeometricalModelFactory/TerrainFromWrl1FileFactory/TerrainFromWrl1FileFactory.pro 
-plugins/BoundingVolumeFactory/Terrain2AABBFactory/Terrain2AABBFactory.pro 
-plugins/BoundingVolumeFactory/Box2AABBFactory/Box2AABBFactory.pro 
-plugins/BroadPhaseCollider/SimpleBroadCollider/SimpleBroadCollider.pro 
-plugins/BroadPhaseCollider/SAPCollider/SAPCollider.pro 
-plugins/NarrowPhaseCollider/SimpleNarrowCollider/SimpleNarrowCollider.pro 
-plugins/DynamicEngine/SimpleSpringDynamicEngine/SimpleSpringDynamicEngine.pro 
-plugins/GeometricalModel/Terrain/Terrain.pro 
-plugins/GeometricalModel/Sphere/Sphere.pro 
-plugins/GeometricalModel/Box/Box.pro 
-plugins/Body/RigidBody/RigidBody.pro 
-plugins/BoundingVolume/AABB/AABB.pro 
-plugins/BoundingVolume/BoundingSphere/BoundingSphere.pro 
-plugins/IOManager/XMLManager/XMLManager.pro 
-preprocessors/FileGenerator/SimpleScene/SimpleScene.pro 
+echo ' '									>  ./empty
 
+echo 'echo NOT CHANGING $1'							>  ./changeLib
+#echo 'mv $1 $1.tmp'								>> ./changeLib
+#echo 'cat $1.tmp | sed -e "s/          dll/          staticlib/" > $1'		>> ./changeLib
+#echo 'rm $1.tmp'								>> ./changeLib
 
-cat dynamicLibs | sed -e 's/^.*/cat projects\/kdevelop\/yade_kdevelop\/& | sed  -e 's\/^        warn_on \\\\\/          warn_on\/' -e 's\/^          dll\/#          dll\/'   /'
+chmod a+x ./changeLib
+
+find `cat dynamicLibs` -exec ./changeLib {} \;
+
+rm ./changeLib
+rm ./dynamicLibs
+rm ./empty
