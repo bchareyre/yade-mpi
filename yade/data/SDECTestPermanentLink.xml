@@ -27,14 +27,14 @@
 				<permanentInteractions[1] className="Contact" >
 					<permanentInteractions[1] id1="1" id2="3">
 						<interactionGeometry className="SDECPermanentLink" >
-							<interactionGeometry initialKn="50000" initialKs="5000" initialEquilibriumDistance="2" prevNormal="{0 0 1}" knMax="75000" ksMax="7500" />
+							<interactionGeometry initialKn="50000" initialKs="5000" initialEquilibriumDistance="2" prevNormal="{0 0 -1}" knMax="75000" ksMax="7500" />
 						</interactionGeometry>
 					</permanentInteractions[1]>
 				</permanentInteractions[1]>
 				<permanentInteractions[2] className="Contact" >
 					<permanentInteractions[2] id1="3" id2="4">
 						<interactionGeometry className="SDECPermanentLink" >
-							<interactionGeometry initialKn="50000" initialKs="5000" initialEquilibriumDistance="2" prevNormal="{1 0 0}" knMax="75000" ksMax="7500" />
+							<interactionGeometry initialKn="50000" initialKs="5000" initialEquilibriumDistance="2" prevNormal="{-1 0 0}" knMax="75000" ksMax="7500" />
 						</interactionGeometry>
 					</permanentInteractions[2]>
 				</permanentInteractions[2]>
@@ -76,7 +76,7 @@
 					</bodies[0]>
 				</bodies[0]>
 				<bodies[1] className="SDECDiscreteElement" >
-					<bodies[1] isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" mass="37.699" inertia="{135.716 135.716 135.716}" kn="100000" ks="10000">
+					<bodies[1] isDynamic="1" velocity="{20 0 20}" angularVelocity="{0 0 0}" mass="37.699" inertia="{135.716 135.716 135.716}" kn="100000" ks="10000">
 						<se3 translation="{-1 15 -1}" rotation="{1 0 0 0}" />
 						<bv className="AABB" >
 							<bv color="{0 1 0}" center="{-1 15 -1}" halfSize="{3 3 3}" />
@@ -95,7 +95,7 @@
 					</bodies[1]>
 				</bodies[1]>
 				<bodies[2] className="SDECDiscreteElement" >
-					<bodies[2] isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" mass="37.699" inertia="{135.716 135.716 135.716}" kn="100000" ks="10000">
+					<bodies[2] isDynamic="1" velocity="{20 0 20}" angularVelocity="{0 0 0}" mass="37.699" inertia="{135.716 135.716 135.716}" kn="100000" ks="10000">
 						<se3 translation="{1 15 -1}" rotation="{1 0 0 0}" />
 						<bv className="AABB" >
 							<bv color="{0 1 0}" center="{1 15 -1}" halfSize="{3 3 3}" />
@@ -114,7 +114,7 @@
 					</bodies[2]>
 				</bodies[2]>
 				<bodies[3] className="SDECDiscreteElement" >
-					<bodies[3] isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" mass="37.699" inertia="{135.716 135.716 135.716}" kn="100000" ks="10000">
+					<bodies[3] isDynamic="1" velocity="{20 0 20}" angularVelocity="{0 0 0}" mass="37.699" inertia="{135.716 135.716 135.716}" kn="100000" ks="10000">
 						<se3 translation="{-1 15 1}" rotation="{1 0 0 0}" />
 						<bv className="AABB" >
 							<bv color="{0 1 0}" center="{-1 15 1}" halfSize="{3 3 3}" />
@@ -133,7 +133,7 @@
 					</bodies[3]>
 				</bodies[3]>
 				<bodies[4] className="SDECDiscreteElement" >
-					<bodies[4] isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" mass="37.699" inertia="{135.716 135.716 135.716}" kn="100000" ks="10000">
+					<bodies[4] isDynamic="1" velocity="{20 0 20}" angularVelocity="{0 0 0}" mass="37.699" inertia="{135.716 135.716 135.716}" kn="100000" ks="10000">
 						<se3 translation="{1 15 1}" rotation="{1 0 0 0}" />
 						<bv className="AABB" >
 							<bv color="{0 1 0}" center="{1 15 1}" halfSize="{3 3 3}" />

@@ -220,12 +220,10 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 		currentContact->kn = currentContact->initialKn;
 		currentContact->ks = currentContact->initialKs;
 		currentContact->equilibriumDistance = currentContact->initialEquilibriumDistance;		
-//cout << currentContact->initialEquilibriumDistance << "  !!  ";
 	
 		float un 			= currentContact->initialEquilibriumDistance-(de1->se3.translation-de1->se3.translation).length();
-//cout << un << "  !!  ";
+
 		currentContact->contactPoint	= de1->se3.translation+(currentContact->radius1-0.5*-un)*currentContact->normalForce;
-//cout << currentContact->contactPoint << "  !!  "<<endl;
 
 		currentContact->normalForce	= currentContact->kn*un*currentContact->normal;
 
