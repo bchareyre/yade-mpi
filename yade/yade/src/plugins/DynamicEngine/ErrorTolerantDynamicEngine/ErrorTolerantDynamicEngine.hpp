@@ -33,6 +33,7 @@
 
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/matrix_sparse.hpp>
+#include <boost/numeric/ublas/banded.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -47,6 +48,12 @@ using namespace boost::numeric;
 */
 class ErrorTolerantDynamicEngine : public DynamicEngine
 {
+	typedef enum{VANISHING,CLAMPED} ContactState;
+	vector<ContactState> contactStates;
+	vector<int> nbReactivations;
+	int maxReactivations;
+	int maxIterations;
+	float threshold;
 	
 	public : ErrorTolerantDynamicEngine();
 	public : ~ErrorTolerantDynamicEngine();
@@ -56,11 +63,27 @@ class ErrorTolerantDynamicEngine : public DynamicEngine
 
 	public : void respondToCollisions(Body* body);
 
-	private : void ErrorTolerantDynamicEngine::BCGSolve(	ublas::sparse_matrix<float>& J	,
-								ublas::vector<float>& invM	,
-								ublas::sparse_matrix<float>& Jt	,
-								ublas::vector<float>& constantTerm,
-								ublas::vector<float>& res);
+	private : void multA(	ublas::vector<float>& res		, 
+				ublas::sparse_matrix<float>& J		,
+				ublas::banded_matrix<float>& invM	,
+				ublas::sparse_matrix<float>& Jt		,
+				ublas::vector<float>& v	);
+	
+	private : void initInitialGuess(ublas::vector<float>& v);
+	
+	private : void filter(const ublas::vector<float>& v, ublas::vector<float>& res) ;
+	
+	private : bool solved(const ublas::vector<float>& v, float threshold) ;
+
+	private : float norm(const ublas::vector<float>& v);
+	
+	private : bool wrong(ublas::vector<float>& f, const ublas::vector<float>& a) ;
+
+	private : void BCGSolve(	ublas::sparse_matrix<float>& J		,
+					ublas::banded_matrix<float>& invM	,
+					ublas::sparse_matrix<float>& Jt		,
+					ublas::vector<float>& constantTerm	,
+					ublas::vector<float>& res);
 
 	
 	REGISTER_CLASS_NAME(ErrorTolerantDynamicEngine);

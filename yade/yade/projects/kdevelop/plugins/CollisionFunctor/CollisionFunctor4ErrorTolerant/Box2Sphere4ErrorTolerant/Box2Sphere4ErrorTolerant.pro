@@ -12,6 +12,8 @@ LIBS += -lBody \
         -lMath \
         -lErrorTolerantContactModel \
         -lSerialization \
+        -lBox \
+        -lSphere \
         -rdynamic 
 INCLUDEPATH = ../../../../plugins/GeometricalModel/Box \
               ../../../../plugins/GeometricalModel/Sphere \
@@ -37,6 +39,8 @@ QMAKE_LIBDIR = ../../../../yade/Body/$(YADEDYNLIBPATH) \
                ../../../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
                ../../../../plugins/InteractionModel/ErrorTolerantContactModel/$(YADEDYNLIBPATH) \
                ../../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
+               ../../../../plugins/GeometricalModel/Box/$(YADEDYNLIBPATH) \
+               ../../../../plugins/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
 CONFIG += debug \
