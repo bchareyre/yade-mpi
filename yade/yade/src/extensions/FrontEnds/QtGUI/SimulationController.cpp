@@ -46,7 +46,7 @@ SimulationController::SimulationController(QWidget * parent) : QtGeneratedSimula
 		cerr << "renderer not created - why?!\n";
 	}
 	
-	updater = shared_ptr<SimulationControllerUpdater>(new SimulationControllerUpdater(this));
+//	updater = shared_ptr<SimulationControllerUpdater>(new SimulationControllerUpdater(this));
 }
 
 SimulationController::~SimulationController()
@@ -113,11 +113,13 @@ void SimulationController::pbLoadClicked()
 			glViews.push_back(new GLViewer(glViews.size(),renderer,format,this->parentWidget()->parentWidget()));
 			connect( glViews.back(), SIGNAL( closeSignal(int) ), this, SLOT( closeGLViewEvent(int) ) );
 		}
-		
+
 		Omega::instance().setSimulationFileName(fileName);
 		Omega::instance().loadSimulation();
 
-		glViews.back()->centerScene();
+		for(unsigned int i=0;i<glViews.size();i++)
+			if (glViews[i])
+				glViews[i]->centerScene();
 		
 		string fullName = string(filesystem::basename(fileName.data()))+string(filesystem::extension(fileName.data()));
 		tlCurrentSimulation->setText(fullName);
@@ -125,7 +127,7 @@ void SimulationController::pbLoadClicked()
 		Omega::instance().createSimulationLoop();
 		Omega::instance().stopSimulationLoop();
 	}
-}
+} 
 
 void SimulationController::pbNewViewClicked()
 {

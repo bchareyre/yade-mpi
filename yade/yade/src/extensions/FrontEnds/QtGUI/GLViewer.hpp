@@ -45,6 +45,7 @@ class GLViewer : public QGLViewer
 	
 	private : GLWindowsManager wm;
 	private : int viewId;
+	
 	// construction
 	public : GLViewer (int id, shared_ptr<RenderingEngine> renderer, const QGLFormat& format, QWidget * parent=0, QGLWidget * shareWidget=0);
 	public : ~GLViewer ();
@@ -59,6 +60,8 @@ class GLViewer : public QGLViewer
 	public    : void centerScene();
 	public    : void finishRendering();
 	public    : void joinRendering();
+	public    : void stopRendering();
+	public    : void startRendering();
 	
 	signals : virtual void closeSignal(int i);
 	

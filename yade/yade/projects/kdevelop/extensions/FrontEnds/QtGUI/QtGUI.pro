@@ -5,22 +5,25 @@
 
 FORMS += YadeQtGeneratedMainWindow.ui \
          QtFileGeneratorController.ui \
-         QtGeneratedSimulationController.ui 
-IDLS += 
+         QtGeneratedSimulationController.ui \
+         QtGeneratedMessageDialog.ui 
+IDLS += QtGeneratedMessageDialog.ui 
 HEADERS += QtGUI.hpp \
            GLViewer.hpp \
            YadeQtMainWindow.hpp \
            QtFileGenerator.hpp \
            QtGUIGenerator.hpp \
            SimulationController.hpp \
-           QGLThread.hpp 
+           QGLThread.hpp \
+           MessageDialog.hpp 
 SOURCES += QtGUI.cpp \
            GLViewer.cpp \
            YadeQtMainWindow.cpp \
            QtFileGenerator.cpp \
            QtGUIGenerator.cpp \
            SimulationController.cpp \
-           QGLThread.cpp 
+           QGLThread.cpp \
+           MessageDialog.cpp 
 LIBS += -lSerialization \
 -lMath \
 -lBody \

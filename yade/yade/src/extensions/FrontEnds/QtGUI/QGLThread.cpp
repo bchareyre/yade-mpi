@@ -37,6 +37,7 @@ boost::mutex resizeMutex;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 QGLThread::QGLThread(GLViewer * glv, shared_ptr<RenderingEngine> r) :	Threadable<QGLThread>(),
+									needCentering(new bool(false)),
 									needResizing(new bool(false)),
 									newWidth(new int(0)),
 									newHeight(new int(0)),
@@ -93,7 +94,25 @@ void QGLThread::oneLoop()
 		*needResizing=false;
 		glViewer->wm.resizeEvent(*newWidth,*newHeight);
 	}
-
+	
+	if (*needCentering)
+	{
+		Vector3r min = Omega::instance().rootBody->bv->min;
+		Vector3r max = Omega::instance().rootBody->bv->max;
+		Vector3r center = (max+min)*0.5;
+		Vector3r halfSize = (max-min)*0.5;
+		float radius = halfSize[0];
+		if (halfSize[1]>radius)
+			radius = halfSize[1];
+		if (halfSize[2]>radius)
+			radius = halfSize[2];
+		
+		glViewer->setSceneCenter(center[0],center[1],center[2]);
+		glViewer->setSceneRadius(radius*1.5);
+		glViewer->showEntireScene();
+		*needCentering = false;
+	}	
+	
 	glViewer->preDraw();
 
 	if (Omega::instance().rootBody)

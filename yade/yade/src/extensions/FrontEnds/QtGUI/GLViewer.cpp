@@ -13,6 +13,7 @@ GLViewer::GLViewer(int id, shared_ptr<RenderingEngine> renderer, const QGLFormat
 	setAutoBufferSwap(false);
 	resize(320, 240);
 
+	//setCaption();
 	show();
 
 	wm.addWindow(new FpsTracker(),new GLWindowsManager::EventSubscription());
@@ -34,21 +35,33 @@ void GLViewer::joinRendering()
 	qglThread.join();
 }
 
+void GLViewer::stopRendering()
+{
+	qglThread.stop();
+}
+
+void GLViewer::startRendering()
+{	
+	qglThread.start();
+}
+
 void GLViewer::centerScene()
 {
-	Vector3r min = Omega::instance().rootBody->bv->min;
-	Vector3r max = Omega::instance().rootBody->bv->max;
-	Vector3r center = (max+min)*0.5;
-	Vector3r halfSize = (max-min)*0.5;
-	float radius = halfSize[0];
-	if (halfSize[1]>radius)
-		radius = halfSize[1];
-	if (halfSize[2]>radius)
-		radius = halfSize[2];
+// 	Vector3r min = Omega::instance().rootBody->bv->min;
+// 	Vector3r max = Omega::instance().rootBody->bv->max;
+// 	Vector3r center = (max+min)*0.5;
+// 	Vector3r halfSize = (max-min)*0.5;
+// 	float radius = halfSize[0];
+// 	if (halfSize[1]>radius)
+// 		radius = halfSize[1];
+// 	if (halfSize[2]>radius)
+// 		radius = halfSize[2];
+// 
+// 	setSceneCenter(center[0],center[1],center[2]);
+// 	setSceneRadius(radius*1.5);
+// 	showEntireScene();
+	qglThread.centerScene();
 
-	setSceneCenter(center[0],center[1],center[2]);
-	setSceneRadius(radius*1.5);
-	showEntireScene();
 }
 	
 void GLViewer::paintGL()

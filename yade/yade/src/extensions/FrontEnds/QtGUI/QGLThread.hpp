@@ -40,11 +40,15 @@ class GLViewer;
 
 class QGLThread : public Threadable<QGLThread>
 {	
+	public : bool * needCentering;
 	private : bool * needResizing; // need to be a pointer otherwise modification into resize do not modify value into oneLoop and vice-versa
 	private : int * newWidth;
 	private : int * newHeight;
 	private : shared_ptr<RenderingEngine> renderer;
 	private : GLViewer * glViewer;
+	
+	
+	public : void centerScene() { *needCentering=true;};
 	
 	public : QGLThread (GLViewer * glv,shared_ptr<RenderingEngine> r);
 	public : ~QGLThread ();
