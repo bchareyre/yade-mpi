@@ -3,13 +3,14 @@
 # Subdir relative project main directory: ./plugins/GeometricalModel
 # Target is a subdirs project 
 
-MOC_DIR = $(YADECOMPILATIONPATH) 
-UI_DIR = $(YADECOMPILATIONPATH) 
-OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-CONFIG += debug \
-          warn_on 
-TEMPLATE = subdirs 
 SUBDIRS += Terrain \
            Sphere \
            Box \
-           Mesh2D 
+           Mesh2D \
+           Polyhedron 
+MOC_DIR = $(YADECOMPILATIONPATH)
+UI_DIR = $(YADECOMPILATIONPATH)
+OBJECTS_DIR = $(YADECOMPILATIONPATH)
+CONFIG += debug \
+warn_on
+TEMPLATE = subdirs

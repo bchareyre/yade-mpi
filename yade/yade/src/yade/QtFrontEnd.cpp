@@ -23,6 +23,7 @@ QtFrontEnd::QtFrontEnd() : QtGeneratedFrontEnd(),FrontEnd()
 	// FIXME : no hardcoded file generator
 	//ClassFactory::instance().createShared("RotatingBox");
 	ClassFactory::instance().createShared("HangingCloth");
+	//ClassFactory::instance().createShared("FEMRock");
 	loadScene();
 
 }

@@ -4,7 +4,6 @@
 # Target is a library:  
 
 LIBS += -lMesh2D \
-        -lCloth \
         -lM3D \
         -lSerialization \
         -lRand \
@@ -18,20 +17,21 @@ LIBS += -lMesh2D \
         -lRigidBody \
         -lBallisticDynamicEngine \
         -lSimpleSpringDynamicEngine \
-        -lCloth2RigidBodyDynamicEngine \
+        -lMassSpringBody \
+        -lMassSpringBody2RigidBodyDynamicEngine \
         -rdynamic 
-INCLUDEPATH = ../../../plugins/DynamicEngine/Cloth2RigidBodyDynamicEngine \
+INCLUDEPATH = ../../../plugins/DynamicEngine/MassSpringBody2RigidBodyDynamicEngine \
               ../../../plugins/DynamicEngine/BallisticDynamicEngine \
               ../../../plugins/DynamicEngine/ExplicitMassSpringDynamicEngine \
               ../../../plugins/DynamicEngine/SimpleSpringDynamicEngine \
+              ../../../plugins/Body/MassSpringBody \
+              ../../../plugins/Body/RigidBody \
               ../../../plugins/BroadPhaseCollider/SAPCollider \
               ../../../plugins/NarrowPhaseCollider/SimpleNarrowCollider \
               ../../../plugins/GeometricalModel/Mesh2D \
               ../../../plugins/GeometricalModel/Sphere \
               ../../../plugins/BoundingVolume/AABB \
               ../../../plugins/InteractionModel/ClosestFeatures \
-              ../../../plugins/Body/Cloth \
-              ../../../plugins/Body/RigidBody \
               ../../../yade \
               ../../../toolboxes/Math/M3D \
               ../../../toolboxes/Math/Rand \
@@ -41,7 +41,6 @@ MOC_DIR = $(YADEDYNLIBPATH)
 UI_DIR = $(YADEDYNLIBPATH) 
 OBJECTS_DIR = $(YADEDYNLIBPATH) 
 QMAKE_LIBDIR = ../../../plugins/GeometricalModel/Mesh2D/$(YADEDYNLIBPATH) \
-               ../../../plugins/Body/Cloth/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Math/M3D/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Math/Rand/$(YADEDYNLIBPATH) \
@@ -55,7 +54,8 @@ QMAKE_LIBDIR = ../../../plugins/GeometricalModel/Mesh2D/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/RigidBody/$(YADEDYNLIBPATH) \
                ../../../plugins/DynamicEngine/BallisticDynamicEngine/$(YADEDYNLIBPATH) \
                ../../../plugins/DynamicEngine/SimpleSpringDynamicEngine/$(YADEDYNLIBPATH) \
-               ../../../plugins/DynamicEngine/Cloth2RigidBodyDynamicEngine/$(YADEDYNLIBPATH) \
+               ../../../plugins/Body/MassSpringBody/$(YADEDYNLIBPATH) \
+               ../../../plugins/DynamicEngine/MassSpringBody2RigidBodyDynamicEngine/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
 CONFIG += debug \

@@ -1,5 +1,5 @@
-#ifndef __CLOTH_H__
-#define __CLOTH_H__
+#ifndef __MASSPSRINGBODY_H__
+#define __MASSPSRINGBODY_H__
 
 #include "ConnexBody.hpp"
 #include "Vector3.hpp"
@@ -22,7 +22,7 @@ class NodeProperties : public Serializable
 };
 REGISTER_CLASS(NodeProperties,false);
 
-class Cloth : public ConnexBody
+class MassSpringBody : public ConnexBody
 {	
 	public : float stiffness;
 	public : float damping;
@@ -31,8 +31,8 @@ class Cloth : public ConnexBody
 	public : vector<pair<int,Vector3> > externalForces;
 	
 	// construction
-	public : Cloth ();
-	public : ~Cloth ();
+	public : MassSpringBody ();
+	public : ~MassSpringBody ();
 	
 	public : void processAttributes();
 	public : void registerAttributes();
@@ -40,9 +40,9 @@ class Cloth : public ConnexBody
 	public : void updateBoundingVolume(Se3& se3);
 	public : void updateCollisionModel(Se3& se3);
 
-	REGISTER_CLASS_NAME(Cloth);
+	REGISTER_CLASS_NAME(MassSpringBody);
 };
 
-REGISTER_CLASS(Cloth,false);
+REGISTER_CLASS(MassSpringBody,false);
 
-#endif // __CLOTH_H__
+#endif // __MASSPSRINGBODY_H__

@@ -1,6 +1,6 @@
-#include "Cloth2RigidBodyDynamicEngine.hpp"
+#include "MassSpringBody2RigidBodyDynamicEngine.hpp"
 #include "RigidBody.hpp"
-#include "Cloth.hpp"
+#include "MassSpringBody.hpp"
 #include "Contact.hpp"
 #include "Omega.hpp"
 #include "NonConnexBody.hpp"
@@ -8,26 +8,26 @@
 #include "SimpleSpringDynamicEngine.hpp"
 #include "Mesh2D.hpp"
 
-Cloth2RigidBodyDynamicEngine::Cloth2RigidBodyDynamicEngine () : DynamicEngine()
+MassSpringBody2RigidBodyDynamicEngine::MassSpringBody2RigidBodyDynamicEngine () : DynamicEngine()
 {
 }
 
-Cloth2RigidBodyDynamicEngine::~Cloth2RigidBodyDynamicEngine ()
-{
-
-}
-
-void Cloth2RigidBodyDynamicEngine::processAttributes()
+MassSpringBody2RigidBodyDynamicEngine::~MassSpringBody2RigidBodyDynamicEngine ()
 {
 
 }
 
-void Cloth2RigidBodyDynamicEngine::registerAttributes()
+void MassSpringBody2RigidBodyDynamicEngine::processAttributes()
+{
+
+}
+
+void MassSpringBody2RigidBodyDynamicEngine::registerAttributes()
 {
 }
 
 
-void Cloth2RigidBodyDynamicEngine::respondToCollisions(Body * body, const std::list<shared_ptr<Interaction> >& interactions)
+void MassSpringBody2RigidBodyDynamicEngine::respondToCollisions(Body * body, const std::list<shared_ptr<Interaction> >& interactions)
 {	
 	NonConnexBody * ncb = dynamic_cast<NonConnexBody*>(body);
 	std::list<shared_ptr<Interaction> > tmpI;
@@ -38,8 +38,8 @@ void Cloth2RigidBodyDynamicEngine::respondToCollisions(Body * body, const std::l
 	{
 		shared_ptr<Contact> ct = static_pointer_cast<Contact>(*ii);
 		shared_ptr<ClosestFeatures> cf = dynamic_pointer_cast<ClosestFeatures>(ct->interactionModel);
-		//FIXME : this is a hack because we don't know if id1 is the sphere or piece of cloth
- 		shared_ptr<Cloth> c = dynamic_pointer_cast<Cloth>(ncb->bodies[ct->id1]);
+		//FIXME : this is a hack because we don't know if id1 is the sphere or piece of massSpring
+ 		shared_ptr<MassSpringBody> c = dynamic_pointer_cast<MassSpringBody>(ncb->bodies[ct->id1]);
 		shared_ptr<RigidBody> rb = dynamic_pointer_cast<RigidBody>(ncb->bodies[ct->id2]);
 		shared_ptr<Mesh2D> mesh;
 		if (c)

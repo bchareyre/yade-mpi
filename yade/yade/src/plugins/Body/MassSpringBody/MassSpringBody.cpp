@@ -1,21 +1,21 @@
-#include "Cloth.hpp"
+#include "MassSpringBody.hpp"
 
 // FIXME : redisign must not use a particular GM,CM or BV into Body
 #include "Mesh2D.hpp"
 #include "AABB.hpp"
 #include "Constants.hpp"
 
-Cloth::Cloth () : ConnexBody()
+MassSpringBody::MassSpringBody () : ConnexBody()
 {
 }
 
 
-Cloth::~Cloth()
+MassSpringBody::~MassSpringBody()
 {
 
 }
 
-void Cloth::processAttributes()
+void MassSpringBody::processAttributes()
 {
 	ConnexBody::processAttributes();
 	
@@ -25,7 +25,7 @@ void Cloth::processAttributes()
 	
 }
 
-void Cloth::registerAttributes()
+void MassSpringBody::registerAttributes()
 {
 	ConnexBody::registerAttributes();
 	REGISTER_ATTRIBUTE(stiffness);
@@ -36,7 +36,7 @@ void Cloth::registerAttributes()
 }
 
 
-void Cloth::updateBoundingVolume(Se3& )
+void MassSpringBody::updateBoundingVolume(Se3& )
 {
 	Vector3 max = Vector3(-Constants::MAX_FLOAT,-Constants::MAX_FLOAT,-Constants::MAX_FLOAT);
 	Vector3 min = Vector3(Constants::MAX_FLOAT,Constants::MAX_FLOAT,Constants::MAX_FLOAT);
@@ -59,6 +59,6 @@ void Cloth::updateBoundingVolume(Se3& )
 
 }
 
-void Cloth::updateCollisionModel(Se3& )
+void MassSpringBody::updateCollisionModel(Se3& )
 {
 }

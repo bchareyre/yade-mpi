@@ -6,7 +6,7 @@
 SUBDIRS += SimpleSpringDynamicEngine \
            ExplicitMassSpringDynamicEngine \
            BallisticDynamicEngine \
-           Cloth2RigidBodyDynamicEngine 
+           MassSpringBody2RigidBodyDynamicEngine 
 MOC_DIR = $(YADECOMPILATIONPATH)
 UI_DIR = $(YADECOMPILATIONPATH)
 OBJECTS_DIR = $(YADECOMPILATIONPATH)

@@ -10,9 +10,9 @@
 #include "BallisticDynamicEngine.hpp"
 #include "SAPCollider.hpp"
 #include "SimpleNarrowCollider.hpp"
-#include "Cloth.hpp"
+#include "MassSpringBody.hpp"
 #include "ExplicitMassSpringDynamicEngine.hpp"
-#include "Cloth2RigidBodyDynamicEngine.hpp"
+#include "MassSpringBody2RigidBodyDynamicEngine.hpp"
 #include <fstream>
 #include "IOManager.hpp"
 
@@ -46,7 +46,7 @@ void HangingCloth::exec()
 	q.fromAngleAxis(0, Vector3(0,0,1));
 	
 	//rootBody->dynamic	   = shared_ptr<DynamicEngine>(new SimpleSpringDynamicEngine);
-	rootBody->dynamic	   = shared_ptr<DynamicEngine>(new Cloth2RigidBodyDynamicEngine);
+	rootBody->dynamic	   = shared_ptr<DynamicEngine>(new MassSpringBody2RigidBodyDynamicEngine);
 	//rootBody->kinematic	   = shared_ptr<KinematicEngine>(new Rotor);
 	rootBody->broadCollider	   = shared_ptr<BroadPhaseCollider>(new SAPCollider);
 	rootBody->narrowCollider   = shared_ptr<NarrowPhaseCollider>(new SimpleNarrowCollider);
@@ -58,7 +58,7 @@ void HangingCloth::exec()
 	//for(int i=0;i<7;i++)
 	//	rootBody->kinematic->subscribedBodies.push_back(i);
 
-	shared_ptr<Cloth> cloth(new Cloth);	
+	shared_ptr<MassSpringBody> cloth(new MassSpringBody);
 	shared_ptr<AABB> aabb(new AABB);	
 	shared_ptr<Mesh2D> mesh2d(new Mesh2D);
 	cloth->dynamic		= shared_ptr<DynamicEngine>(new ExplicitMassSpringDynamicEngine);

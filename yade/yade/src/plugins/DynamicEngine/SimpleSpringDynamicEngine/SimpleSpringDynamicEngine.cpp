@@ -28,7 +28,7 @@ void SimpleSpringDynamicEngine::registerAttributes()
 void SimpleSpringDynamicEngine::respondToCollisions(Body * body, const std::list<shared_ptr<Interaction> >& interactions)
 {
 
-	float dt = Omega::instance().dt;
+	//float dt = Omega::instance().dt;
 	
 	NonConnexBody * ncb = dynamic_cast<NonConnexBody*>(body);
 	vector<shared_ptr<Body> >& bodies = ncb->bodies;
