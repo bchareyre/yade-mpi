@@ -241,7 +241,8 @@ class DynLibDispatcher
 				else
 					if(callBacks[index_tmp])
 					{
-						index = index_tmp;
+						callBacksInfo[index] = callBacksInfo[index_tmp];
+						callBacks    [index] = callBacks    [index_tmp];
 						return true;
 					}
 					else
@@ -364,7 +365,9 @@ class DynLibDispatcher
 					else
 						if(callBacks[index1    ][index2_tmp])
 						{
-							index2 = index2_tmp;
+							callBacksInfo[index1][index2] = callBacksInfo[index1][index2_tmp];
+							callBacks    [index1][index2] = callBacks    [index1][index2_tmp];
+//							index2 = index2_tmp;
 							return true;
 						}
 						else
@@ -377,7 +380,9 @@ class DynLibDispatcher
 					else
 						if(callBacks[index1_tmp][index2    ])
 						{
-							index1 = index1_tmp;
+							callBacksInfo[index1][index2] = callBacksInfo[index1_tmp][index2];
+							callBacks    [index1][index2] = callBacks    [index1_tmp][index2];
+//							index1 = index1_tmp;
 							return true;
 						}
 						else
@@ -400,7 +405,7 @@ class DynLibDispatcher
 		}
 		
 		bool locateMultivirtualFunctor3D(int& index1, int& index2, int& index3,
-			boost::shared_ptr<BaseClass1> base1, boost::shared_ptr<BaseClass2> base2, boost::shared_ptr<BaseClass3> base3 )
+			boost::shared_ptr<BaseClass1>& base1, boost::shared_ptr<BaseClass2>& base2, boost::shared_ptr<BaseClass3>& base3 )
 		{
 			return false;
 		}
@@ -409,7 +414,7 @@ class DynLibDispatcher
 // calling multivirtual function, 1D
 ////////////////////////////////////////////////////////////////////////////////
 
-		ResultType operator() (boost::shared_ptr<BaseClass1> base)
+		ResultType operator() (boost::shared_ptr<BaseClass1>& base)
 		{
 			int index;
 			if( locateMultivirtualFunctor1D(index,base) )
@@ -417,7 +422,7 @@ class DynLibDispatcher
 			else	return ResultType();
 		}
 		
-		ResultType operator() (boost::shared_ptr<BaseClass1> base, Parm2 p2)
+		ResultType operator() (boost::shared_ptr<BaseClass1>& base, Parm2 p2)
 		{
 			int index;
 			if( locateMultivirtualFunctor1D(index,base) )
@@ -425,7 +430,7 @@ class DynLibDispatcher
 			else	return ResultType();
 		}
 		
-		ResultType operator() (boost::shared_ptr<BaseClass1> base, Parm2 p2, Parm3 p3)
+		ResultType operator() (boost::shared_ptr<BaseClass1>& base, Parm2 p2, Parm3 p3)
 		{
 			int index;
 			if( locateMultivirtualFunctor1D(index,base) )
@@ -433,7 +438,7 @@ class DynLibDispatcher
 			else	return ResultType();
 		}
 		
-		ResultType operator() (boost::shared_ptr<BaseClass1> base, Parm2 p2, Parm3 p3, Parm4 p4)
+		ResultType operator() (boost::shared_ptr<BaseClass1>& base, Parm2 p2, Parm3 p3, Parm4 p4)
 		{
 			int index;
 			if( locateMultivirtualFunctor1D(index,base) )
@@ -441,7 +446,7 @@ class DynLibDispatcher
 			else	return ResultType();
 		}
 		
-		ResultType operator() (boost::shared_ptr<BaseClass1> base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5)
+		ResultType operator() (boost::shared_ptr<BaseClass1>& base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5)
 		{
 			int index;
 			if( locateMultivirtualFunctor1D(index,base) )
@@ -449,7 +454,7 @@ class DynLibDispatcher
 			else	return ResultType();
 		}
 		
-		ResultType operator() (boost::shared_ptr<BaseClass1> base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6)
+		ResultType operator() (boost::shared_ptr<BaseClass1>& base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6)
 		{
 			int index;
 			if( locateMultivirtualFunctor1D(index,base) )
@@ -457,7 +462,7 @@ class DynLibDispatcher
 			else	return ResultType();
 		}
 		
-		ResultType operator() (boost::shared_ptr<BaseClass1> base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6, Parm7 p7)
+		ResultType operator() (boost::shared_ptr<BaseClass1>& base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6, Parm7 p7)
 		{
 			int index;
 			if( locateMultivirtualFunctor1D(index,base) )
@@ -465,7 +470,7 @@ class DynLibDispatcher
 			else	return ResultType();
 		}
 		
-		ResultType operator() (boost::shared_ptr<BaseClass1> base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6, Parm7 p7, Parm8 p8)
+		ResultType operator() (boost::shared_ptr<BaseClass1>& base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6, Parm7 p7, Parm8 p8)
 		{
 			int index;
 			if( locateMultivirtualFunctor1D(index,base) )
@@ -473,7 +478,7 @@ class DynLibDispatcher
 			else	return ResultType();
 		}
 		
-		ResultType operator() (boost::shared_ptr<BaseClass1> base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6, Parm7 p7, Parm8 p8, Parm9 p9)
+		ResultType operator() (boost::shared_ptr<BaseClass1>& base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6, Parm7 p7, Parm8 p8, Parm9 p9)
 		{
 			int index;
 			if( locateMultivirtualFunctor1D(index,base) )
@@ -481,7 +486,7 @@ class DynLibDispatcher
 			else	return ResultType();
 		}
 		
-		ResultType operator() (boost::shared_ptr<BaseClass1> base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6, Parm7 p7, Parm8 p8, Parm9 p9,
+		ResultType operator() (boost::shared_ptr<BaseClass1>& base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6, Parm7 p7, Parm8 p8, Parm9 p9,
 									Parm10 p10)
 		{
 			int index;
@@ -490,7 +495,7 @@ class DynLibDispatcher
 			else	return ResultType();
 		}
 		
-		ResultType operator() (boost::shared_ptr<BaseClass1> base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6, Parm7 p7, Parm8 p8, Parm9 p9,
+		ResultType operator() (boost::shared_ptr<BaseClass1>& base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6, Parm7 p7, Parm8 p8, Parm9 p9,
 									Parm10 p10, Parm11 p11)
 		{
 			int index;
@@ -499,7 +504,7 @@ class DynLibDispatcher
 			else	return ResultType();
 		}
 		
-		ResultType operator() (boost::shared_ptr<BaseClass1> base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6, Parm7 p7, Parm8 p8, Parm9 p9,
+		ResultType operator() (boost::shared_ptr<BaseClass1>& base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6, Parm7 p7, Parm8 p8, Parm9 p9,
 									Parm10 p10, Parm11 p11, Parm12 p12)
 		{
 			int index;
@@ -508,7 +513,7 @@ class DynLibDispatcher
 			else	return ResultType();
 		}
 		
-		ResultType operator() (boost::shared_ptr<BaseClass1> base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6, Parm7 p7, Parm8 p8, Parm9 p9,
+		ResultType operator() (boost::shared_ptr<BaseClass1>& base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6, Parm7 p7, Parm8 p8, Parm9 p9,
 									Parm10 p10, Parm11 p11, Parm12 p12, Parm13 p13)
 		{
 			int index;
@@ -517,7 +522,7 @@ class DynLibDispatcher
 			else	return ResultType();
 		}
 		
-		ResultType operator() (boost::shared_ptr<BaseClass1> base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6, Parm7 p7, Parm8 p8, Parm9 p9,
+		ResultType operator() (boost::shared_ptr<BaseClass1>& base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6, Parm7 p7, Parm8 p8, Parm9 p9,
 									Parm10 p10, Parm11 p11, Parm12 p12, Parm13 p13, Parm14 p14)
 		{
 			int index;
@@ -526,7 +531,7 @@ class DynLibDispatcher
 			else	return ResultType();
 		}
 	
-		ResultType operator() (boost::shared_ptr<BaseClass1> base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6, Parm7 p7, Parm8 p8, Parm9 p9,
+		ResultType operator() (boost::shared_ptr<BaseClass1>& base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6, Parm7 p7, Parm8 p8, Parm9 p9,
 									Parm10 p10, Parm11 p11, Parm12 p12, Parm13 p13, Parm14 p14, Parm15 p15)
 		{
 			int index;
@@ -703,7 +708,7 @@ class DynLibDispatcher
 // calling multivirtual function, 2D, public interface
 ////////////////////////////////////////////////////////////////////////////////
 	public:
-		ResultType operator() (boost::shared_ptr<BaseClass1> base1,boost::shared_ptr<BaseClass2> base2)
+		ResultType operator() (boost::shared_ptr<BaseClass1>& base1,boost::shared_ptr<BaseClass2>& base2)
 		{
 			int index1, index2;
 			if( locateMultivirtualFunctor2D(index1,index2,base1,base2) )
@@ -720,7 +725,7 @@ class DynLibDispatcher
 			else	return ResultType();
 		}
 		
-		ResultType operator() (boost::shared_ptr<BaseClass1> base1,boost::shared_ptr<BaseClass2> base2, Parm3 p3)
+		ResultType operator() (boost::shared_ptr<BaseClass1>& base1,boost::shared_ptr<BaseClass2>& base2, Parm3 p3)
 		{
 			int index1, index2;
 			if( locateMultivirtualFunctor2D(index1,index2,base1,base2) )
@@ -737,7 +742,7 @@ class DynLibDispatcher
 			else	return ResultType();
 		}
 		
-		ResultType operator() (boost::shared_ptr<BaseClass1> base1,boost::shared_ptr<BaseClass2> base2, Parm3 p3, Parm4 p4)
+		ResultType operator() (boost::shared_ptr<BaseClass1>& base1,boost::shared_ptr<BaseClass2>& base2, Parm3 p3, Parm4 p4)
 		{
 			int index1, index2;
 			if( locateMultivirtualFunctor2D(index1,index2,base1,base2) )
@@ -754,7 +759,7 @@ class DynLibDispatcher
 			else	return ResultType();
 		}
 		
-		ResultType operator() (boost::shared_ptr<BaseClass1> base1,boost::shared_ptr<BaseClass2> base2, Parm3 p3, Parm4 p4, Parm5 p5)
+		ResultType operator() (boost::shared_ptr<BaseClass1>& base1,boost::shared_ptr<BaseClass2>& base2, Parm3 p3, Parm4 p4, Parm5 p5)
 		{
 			int index1, index2;
 			if( locateMultivirtualFunctor2D(index1,index2,base1,base2) )
@@ -771,7 +776,7 @@ class DynLibDispatcher
 			else	return ResultType();
 		}
 		
-		ResultType operator() (boost::shared_ptr<BaseClass1> base1,boost::shared_ptr<BaseClass2> base2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6)
+		ResultType operator() (boost::shared_ptr<BaseClass1>& base1,boost::shared_ptr<BaseClass2>& base2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6)
 		{
 			int index1, index2;
 			if( locateMultivirtualFunctor2D(index1,index2,base1,base2) )
@@ -788,7 +793,7 @@ class DynLibDispatcher
 			else	return ResultType();
 		}
 		
-		ResultType operator() (boost::shared_ptr<BaseClass1> base1,boost::shared_ptr<BaseClass2> base2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6,
+		ResultType operator() (boost::shared_ptr<BaseClass1>& base1,boost::shared_ptr<BaseClass2>& base2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6,
 						Parm7 p7)
 		{
 			int index1, index2;
@@ -806,7 +811,7 @@ class DynLibDispatcher
 			else	return ResultType();
 		}
 		
-		ResultType operator() (boost::shared_ptr<BaseClass1> base1,boost::shared_ptr<BaseClass2> base2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6,
+		ResultType operator() (boost::shared_ptr<BaseClass1>& base1,boost::shared_ptr<BaseClass2>& base2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6,
 						Parm7 p7, Parm8 p8)
 		{
 			int index1, index2;
@@ -824,7 +829,7 @@ class DynLibDispatcher
 			else	return ResultType();
 		}
 		
-		ResultType operator() (boost::shared_ptr<BaseClass1> base1,boost::shared_ptr<BaseClass2> base2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6,
+		ResultType operator() (boost::shared_ptr<BaseClass1>& base1,boost::shared_ptr<BaseClass2>& base2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6,
 						Parm7 p7, Parm8 p8, Parm9 p9)
 		{
 			int index1, index2;
@@ -842,7 +847,7 @@ class DynLibDispatcher
 			else	return ResultType();
 		}
 		
-		ResultType operator() (boost::shared_ptr<BaseClass1> base1,boost::shared_ptr<BaseClass2> base2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6,
+		ResultType operator() (boost::shared_ptr<BaseClass1>& base1,boost::shared_ptr<BaseClass2>& base2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6,
 						Parm7 p7, Parm8 p8, Parm9 p9, Parm10 p10)
 		{
 			int index1, index2;
@@ -860,7 +865,7 @@ class DynLibDispatcher
 			else	return ResultType();
 		}
 		
-		ResultType operator() (boost::shared_ptr<BaseClass1> base1,boost::shared_ptr<BaseClass2> base2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6,
+		ResultType operator() (boost::shared_ptr<BaseClass1>& base1,boost::shared_ptr<BaseClass2>& base2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6,
 						Parm7 p7, Parm8 p8, Parm9 p9, Parm10 p10, Parm11 p11)
 		{
 			int index1, index2;
@@ -878,7 +883,7 @@ class DynLibDispatcher
 			else	return ResultType();
 		}
 		
-		ResultType operator() (boost::shared_ptr<BaseClass1> base1,boost::shared_ptr<BaseClass2> base2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6,
+		ResultType operator() (boost::shared_ptr<BaseClass1>& base1,boost::shared_ptr<BaseClass2>& base2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6,
 						Parm7 p7, Parm8 p8, Parm9 p9, Parm10 p10, Parm11 p11, Parm12 p12)
 		{
 			int index1, index2;
@@ -896,7 +901,7 @@ class DynLibDispatcher
 			else	return ResultType();
 		}
 		
-		ResultType operator() (boost::shared_ptr<BaseClass1> base1,boost::shared_ptr<BaseClass2> base2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6,
+		ResultType operator() (boost::shared_ptr<BaseClass1>& base1,boost::shared_ptr<BaseClass2>& base2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6,
 						Parm7 p7, Parm8 p8, Parm9 p9, Parm10 p10, Parm11 p11, Parm12 p12, Parm13 p13)
 		{
 			int index1, index2;
@@ -914,7 +919,7 @@ class DynLibDispatcher
 			else	return ResultType();
 		}
 		
-		ResultType operator() (boost::shared_ptr<BaseClass1> base1,boost::shared_ptr<BaseClass2> base2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6,
+		ResultType operator() (boost::shared_ptr<BaseClass1>& base1,boost::shared_ptr<BaseClass2>& base2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6,
 						Parm7 p7, Parm8 p8, Parm9 p9, Parm10 p10, Parm11 p11, Parm12 p12, Parm13 p13, Parm14 p14)
 		{
 			int index1, index2;
@@ -932,7 +937,7 @@ class DynLibDispatcher
 			else	return ResultType();
 		}
 		
-		ResultType operator() (boost::shared_ptr<BaseClass1> base1,boost::shared_ptr<BaseClass2> base2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6,
+		ResultType operator() (boost::shared_ptr<BaseClass1>& base1,boost::shared_ptr<BaseClass2>& base2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6,
 						Parm7 p7, Parm8 p8, Parm9 p9, Parm10 p10, Parm11 p11, Parm12 p12, Parm13 p13, Parm14 p14, Parm15 p15)
 		{
 			int index1, index2;

@@ -24,6 +24,8 @@
 #ifndef __INDEXABLE_H__
 #define __INDEXABLE_H__
 
+#include <boost/scoped_ptr.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -83,7 +85,7 @@ class Indexable
 										\
 	public: virtual int& getBaseClassIndex(int depth)			\
 	{									\
-		static shared_ptr<BaseClass> baseClass(new BaseClass);		\
+		static boost::scoped_ptr<BaseClass> baseClass(new BaseClass);	\
 		if(depth == 1)							\
 			return baseClass->getClassIndex();			\
 		else								\
@@ -91,7 +93,7 @@ class Indexable
 	}									\
 	public: virtual const int& getBaseClassIndex(int depth) const		\
 	{									\
-		static shared_ptr<BaseClass> baseClass(new BaseClass);		\
+		static boost::scoped_ptr<BaseClass> baseClass(new BaseClass);	\
 		if(depth == 1)							\
 			return baseClass->getClassIndex();			\
 		else								\

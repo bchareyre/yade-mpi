@@ -124,7 +124,7 @@ class Omega : public Singleton<Omega>
 	private	: Omega(const Omega&);
 	private	: Omega& operator=(const Omega&);
 	
-	friend class Singleton< Omega >;
+	FRIEND_SINGLETON(Omega);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

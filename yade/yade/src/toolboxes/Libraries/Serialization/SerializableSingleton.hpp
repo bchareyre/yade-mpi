@@ -109,7 +109,7 @@ class SerializableSingleton : public Singleton< SerializableSingleton >
 	/*! Assignement operator needed by the Singleton class */
 	private   : SerializableSingleton& operator=(const SerializableSingleton&);
 
-	friend class Singleton< SerializableSingleton >;
+	FRIEND_SINGLETON(SerializableSingleton);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

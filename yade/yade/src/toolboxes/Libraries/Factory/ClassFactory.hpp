@@ -186,7 +186,7 @@ class ClassFactory : public Singleton< ClassFactory >
 	*/
 	public 	  : bool isFactorable(const type_info& tp,bool& fundamental);
 
-	friend class Singleton< ClassFactory >;
+	FRIEND_SINGLETON(ClassFactory);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

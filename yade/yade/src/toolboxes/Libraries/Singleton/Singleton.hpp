@@ -28,6 +28,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <boost/thread/mutex.hpp>
+//#include <boost/shared_ptr.hpp>
 
 /**
 
@@ -54,7 +55,7 @@ class Singleton
 		static T& instance()
 		{
 			static T* ptr_obj;
-//			static shared_ptr<T> ptr_obj; // FIXME - try this - it may work great !!
+//			static boost::shared_ptr<T> ptr_obj; // FIXME - try this - it may work great !!
 
 			if( ! ptr_obj )
 			{
@@ -65,6 +66,7 @@ class Singleton
 				if( ! ptr_obj )
 				{
 					ptr_obj = new T; // FIXME - this new has no delete. we have a memory leak at exit. I'll just put here a Loki::Singleton, and everything will be OK.
+//					ptr_obj = boost::shared_ptr<T>(new T);
 				}
 			}
 
@@ -80,6 +82,12 @@ class Singleton
 		Singleton(const Singleton&);
 		Singleton& operator=(const Singleton&);
 };
+
+#define FRIEND_SINGLETON(SomeClass)						\
+	friend class Singleton< SomeClass >;					
+	
+//	friend class boost::checked_delete< SomeClass >;
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
