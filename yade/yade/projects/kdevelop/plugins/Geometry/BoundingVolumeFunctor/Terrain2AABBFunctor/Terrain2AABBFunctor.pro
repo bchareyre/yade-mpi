@@ -30,5 +30,5 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
-HEADERS += Terrain2AABBFactory.hpp 
-SOURCES += Terrain2AABBFactory.cpp 
+HEADERS += Terrain2AABBFunctor.hpp 
+SOURCES += Terrain2AABBFunctor.cpp 
