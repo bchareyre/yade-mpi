@@ -100,8 +100,11 @@ void IOManager::parseFundamental(const string& top, vector<string>& eval)
 	//
 	// if you uncomment these lines in snippets/Serialization - it will crash! - for "[]" - bad_lexical_cast
 	//
-	//if (eval.size()==0)
-	//	eval.push_back(top);
+	// if you really need it for something - uncomment it. but I must know what is thre real bug, so that
+	// I can fix spirit!
+	//
+	if (eval.size()==0)
+		eval.push_back(top);
 }
 
 
