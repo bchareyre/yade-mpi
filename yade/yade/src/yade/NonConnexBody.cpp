@@ -55,9 +55,10 @@ void NonConnexBody::registerAttributes()
 	REGISTER_ATTRIBUTE(kinematic);
 }
 
-void NonConnexBody::updateBoundingVolume(Se3& )
+void NonConnexBody::updateBoundingVolume(Se3& se3)
 {
-
+	for(unsigned int i=0;i<bodies.size();i++)
+		bodies[i]->updateBoundingVolume(se3);
 }
 
 void NonConnexBody::updateCollisionModel(Se3& )
@@ -65,36 +66,33 @@ void NonConnexBody::updateCollisionModel(Se3& )
 
 }
 
-void NonConnexBody::moveToNextTimeStep(float dt)
+void NonConnexBody::moveToNextTimeStep()
 {
 	// FIXME : hardcoded nbsubtimestep !
-	int nbSubStep = 2;
-	for(int i=0;i<nbSubStep;i++)
-	{
-		// serach for potential collision (maybe in to steps for hierarchical simulation)
-		if (broadCollider!=0)
-			broadCollider->broadPhaseCollisionTest(bodies,interactions);
 
-		// this has to split the contact list into several constact list according to the physical type
-		// (RigidBody,FEMBody ...) of colliding body
-		if (narrowCollider!=0)
-			narrowCollider->narrowCollisionPhase(bodies,interactions);		
+	// serach for potential collision (maybe in to steps for hierarchical simulation)
+	if (broadCollider!=0)
+		broadCollider->broadPhaseCollisionTest(bodies,interactions);
 
-		// for each contact list we call the correct dynamic engine
-		if (dynamic!=0)
-			dynamic->respondToCollisions(this,interactions,dt/(float)nbSubStep); //effectiveDt == dynamic->...
+	// this has to split the contact list into several constact list according to the physical type
+	// (RigidBody,FEMBody ...) of colliding body
+	if (narrowCollider!=0)
+		narrowCollider->narrowCollisionPhase(bodies,interactions);
 
-		// we call each kinematic engine one after the other
-		if (kinematic!=0)
-			kinematic->moveToNextTimeStep(bodies,dt/(float)nbSubStep);
+	// for each contact list we call the correct dynamic engine
+	if (dynamic!=0)
+		dynamic->respondToCollisions(this,interactions); //effectiveDt == dynamic->...
 
-		//for each body call its dynamic internal engine
+	// we call each kinematic engine one after the other
+	if (kinematic!=0)
+		kinematic->moveToNextTimeStep(bodies);
 
-		// maybe use internal engine as an dynamic engine et kinematic engine
-	}
+	//for each body call its dynamic internal engine
 
+	// maybe use internal engine as an dynamic engine et kinematic engine
+	
 	for(unsigned int i=0;i<bodies.size();i++)
-		bodies[i]->moveToNextTimeStep(dt);
+		bodies[i]->moveToNextTimeStep();
 
 	
 }

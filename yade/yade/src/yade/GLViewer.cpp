@@ -41,7 +41,8 @@ void GLViewer::draw()
 
 void GLViewer::animate()
 {
-	Omega::instance().rootBody->moveToNextTimeStep(0.04);
+	Omega::instance().rootBody->moveToNextTimeStep();
+
 	//cerr << frame << endl;
 	fpsTracker->addOneAction();
 }

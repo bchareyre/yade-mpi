@@ -110,7 +110,7 @@ class Body : public Serializable //,Indexable
 	public : virtual void updateCollisionModel(Se3& ) {};
 
 	/*! Abstract function overloaded in Connex and NonConnex body. Move the body to the next time step using its own internal dynamic engine */
-	public : virtual void moveToNextTimeStep(float ) {};
+	public : virtual void moveToNextTimeStep() {};
 
 	/*! If computations on the attributes are needed after serialization. For example you may want to serialize the name of a file that contains geometrical data and processAttributes will load the file */
 	

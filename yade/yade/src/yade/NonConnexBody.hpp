@@ -52,7 +52,7 @@ class NonConnexBody : public Body
 	public : void updateBoundingVolume(Se3& se3);
 	public : void updateCollisionModel(Se3& se3);
 	
-	public : void moveToNextTimeStep(float dt);
+	public : void moveToNextTimeStep();
 	
 	public : void processAttributes();
 	public : void registerAttributes();

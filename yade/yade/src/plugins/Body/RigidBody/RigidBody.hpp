@@ -9,7 +9,8 @@ class RigidBody : public ConnexBody
 {	
 	public : Vector3 invInertia;
 	public : Vector3 inertia;
-
+	public : Vector3 acceleration;
+	
 	// construction
 	public : RigidBody ();
 	public : ~RigidBody ();
@@ -20,7 +21,7 @@ class RigidBody : public ConnexBody
 	public : void updateBoundingVolume(Se3& se3);
 	public : void updateCollisionModel(Se3& se3);
 	
-	public : void moveToNextTimeStep(float dt);
+	public : void moveToNextTimeStep();
 
 	REGISTER_CLASS_NAME(RigidBody);
 	//REGISTER_CLASS_INDEX(RigidBody);

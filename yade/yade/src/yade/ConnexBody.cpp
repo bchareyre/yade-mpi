@@ -35,10 +35,11 @@ void ConnexBody::glDraw()
 	
 //	cout << se3.translation[0] << " " << se3.translation[1] << " " <<  se3.translation[2] << endl;
 //	cout << angle << endl;
-	
-	//glPushMatrix();
-	//bv->glDraw();
-	//glPopMatrix();
+
+	//FIXME : hardcoded drawing of boundingvolume, sensor will fix that
+	glPushMatrix();
+	bv->glDraw();
+	glPopMatrix();
 }
 
 
@@ -56,4 +57,13 @@ void ConnexBody::registerAttributes()
 	//REGISTER_ATTRIBUTE(cm);
 	//REGISTER_ATTRIBUTE(bv);
 	//REGISTER_ATTRIBUTE(gm);
+}
+
+void ConnexBody::moveToNextTimeStep()
+{
+	if (dynamic!=0)
+	{	
+		std::list<shared_ptr<Interaction> > interactions;
+		dynamic->respondToCollisions(this,interactions);
+	}
 }

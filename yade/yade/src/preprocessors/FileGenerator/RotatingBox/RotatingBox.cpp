@@ -10,7 +10,7 @@
 #include "Rotor.hpp"
 #include "SimpleNarrowCollider.hpp"
 #include "RigidBody.hpp"
-
+#include "BallisticDynamicEngine.hpp"
 #include <fstream>
 #include "IOManager.hpp"
 
@@ -213,6 +213,7 @@ void RotatingBox::exec()
 		Vector3 translation(40*Rand::symmetricRandom(),40*Rand::symmetricRandom(),40*Rand::symmetricRandom());
 		float radius = (4+Rand::symmetricRandom());
 		
+		s->dynamic		= shared_ptr<DynamicEngine>(new BallisticDynamicEngine);;
 		s->isDynamic		= true;
 		s->angularVelocity	= Vector3(0,0,0);
 		s->velocity		= Vector3(0,0,0);

@@ -4,6 +4,7 @@
 
 #include "Serializable.hpp"
 
+
 class HangingCloth : public Serializable
 {	
 	// construction

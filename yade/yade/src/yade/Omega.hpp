@@ -62,6 +62,7 @@ class Omega : public Singleton<Omega>
 	public : Vector3 gravity;
 	public : shared_ptr<NonConnexBody> rootBody;
 	public : ptime startingSimulationTime;
+	public : float dt;
 	
 	//public : MultiMethodsManager<CollisionFunctor> narrowCollider;
 	public : MultiMethodsManager narrowCollider;

@@ -3,6 +3,8 @@
 
 #include "CollisionModel.hpp"
 
+#define offset(i,j) ((i)*height+(j))
+
 class Edge : public Serializable
 {
 	public : int first;
@@ -24,7 +26,11 @@ class Mesh2D : public CollisionModel
 {
 	public : vector<Vector3> vertices;
 	public : vector<Edge> edges;
-	
+	public : int width,height;
+	public : vector<vector<int> > faces;
+	public : vector<Vector3> fNormals;
+	public : vector<Vector3> vNormals;
+ 	public : vector<vector<int> > triPerVertices;
 	// construction
 	public : Mesh2D ();
 	public : ~Mesh2D ();
@@ -32,6 +38,7 @@ class Mesh2D : public CollisionModel
 	public : bool collideWith(CollisionModel* collisionModel);
 	public : bool loadFromFile(char * fileName);
 	public : void glDraw();	
+	public : void computeNormals();
 	
 	public : void processAttributes();
 	public : void registerAttributes();

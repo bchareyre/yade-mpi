@@ -16,7 +16,7 @@ class ExplicitMassSpringDynamicEngine : public DynamicEngine
 	public : void processAttributes();
 	public : void registerAttributes();
 	
-	public : void respondToCollisions(Body* body, const std::list<shared_ptr<Interaction> >& interactions,float dt);
+	public : void respondToCollisions(Body* body, const std::list<shared_ptr<Interaction> >& interactions);
 	REGISTER_CLASS_NAME(ExplicitMassSpringDynamicEngine);
 };
 

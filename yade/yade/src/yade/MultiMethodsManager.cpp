@@ -13,7 +13,10 @@ bool MultiMethodsManager::go(const shared_ptr<CollisionModel> cm1, const shared_
 	if (cf!=0)
 		return (*cf)(cm1,cm2,se31,se32,c);
 	else
+	{
+		//cout << cm1->getClassName() << " " << cm2->getClassName() << endl;
 		return false;
+	}
 }
 
 
@@ -27,6 +30,7 @@ bool MultiMethodsManager::add(const string& name)
 		shared_ptr<CollisionModel> cm  = dynamic_pointer_cast<CollisionModel>(ClassFactory::instance().createShared(name));
 
 		int& index = cm->getClassIndex();
+		bool found;
 		assert(index==-1);
 		index = indexedClassName.size()-1;
 		indexedClassName[name] = index;
@@ -43,6 +47,7 @@ bool MultiMethodsManager::add(const string& name)
 				reverseCollisionFunctor = dynamic_pointer_cast<CollisionFunctor>(ClassFactory::instance().createShared(functorName));
 				collisionFunctor->setReverse(false);
 				reverseCollisionFunctor->setReverse(true);
+				found = true;
 			}
 			catch (FactoryCantCreate& fe)
 			{
@@ -52,15 +57,16 @@ bool MultiMethodsManager::add(const string& name)
 					reverseCollisionFunctor = dynamic_pointer_cast<CollisionFunctor>(ClassFactory::instance().createShared(reverseFunctorName));
 					collisionFunctor->setReverse(true);
 					reverseCollisionFunctor->setReverse(false);
+					found = true;
 				}
 				catch (FactoryCantCreate& fe)
 				{
-					return false;
+					found = false;
 				}
 			}
 
 			// resize callBacks table if necessary
-			if( callBacks.size() <= indexedClassName.size() )
+			if(callBacks.size() <= indexedClassName.size() )
 			{
 				callBacks.resize( indexedClassName.size() );
 				std::vector<std::vector<shared_ptr<CollisionFunctor> > >::iterator ci    = callBacks.begin();
@@ -68,9 +74,11 @@ bool MultiMethodsManager::add(const string& name)
 				for( ; ci != ciEnd ; ++ci )
 					(*ci).resize( indexedClassName.size() );
 			}
-
-			callBacks[ indexedClassName[(*icni).first] ][ index ] = reverseCollisionFunctor;
-			callBacks[ index ][ indexedClassName[(*icni).first] ] = collisionFunctor;
+ 			if (found)
+			{
+				callBacks[ indexedClassName[(*icni).first] ][ index ] = reverseCollisionFunctor;			
+				callBacks[ index ][ indexedClassName[(*icni).first] ] = collisionFunctor;
+			}
 		}
 
 		#ifdef DEBUG

@@ -34,7 +34,8 @@ void RigidBody::updateCollisionModel(Se3& )
 
 }
 
-void RigidBody::moveToNextTimeStep(float )
+void RigidBody::moveToNextTimeStep()
 {
-	//cout << mass << " " << isDynamic << endl;
+	acceleration = Vector3(0,0,0);
+	ConnexBody::moveToNextTimeStep();
 }

@@ -41,6 +41,7 @@
 
 class Constants
 {
+	// FIXME : use cmath and type_traits
 	// common constants
 	public : static const float MAX_FLOAT;
 	public : static const float PI;

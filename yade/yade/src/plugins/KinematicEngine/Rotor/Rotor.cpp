@@ -21,11 +21,12 @@ void Rotor::registerAttributes()
 	KinematicEngine::registerAttributes();
 }
 
-void Rotor::moveToNextTimeStep(std::vector<shared_ptr<Body> >& bodies, float dt)
+void Rotor::moveToNextTimeStep(std::vector<shared_ptr<Body> >& bodies)
 {
 	std::vector<int>::const_iterator ii = subscribedBodies.begin();
 	std::vector<int>::const_iterator iiEnd = subscribedBodies.end();
-	
+
+	float dt = Omega::instance().dt;
 	time = dt;
 		
 	Quaternion q;

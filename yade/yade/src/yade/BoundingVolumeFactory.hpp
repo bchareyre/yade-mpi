@@ -61,7 +61,8 @@ class BoundingVolumeFactory : public Factorable
 		\return a shared pointer to the bounding volume
 	*/
 	public : virtual shared_ptr<BoundingVolume> buildBoundingVolume(const shared_ptr<CollisionModel> cm, const Se3& se3) = 0;
-
+	//FIXME : add also updateBoundingVolume(cm..). In fact we can load them automatically as we do with collisionFunctor because their name are Terrain2AABB ....
+	
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

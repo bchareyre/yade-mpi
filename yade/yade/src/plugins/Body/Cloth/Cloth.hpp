@@ -38,8 +38,6 @@ class Cloth : public ConnexBody
 	
 	public : void updateBoundingVolume(Se3& se3);
 	public : void updateCollisionModel(Se3& se3);
-	
-	public : virtual void moveToNextTimeStep(float dt);
 
 	REGISTER_CLASS_NAME(Cloth);
 };

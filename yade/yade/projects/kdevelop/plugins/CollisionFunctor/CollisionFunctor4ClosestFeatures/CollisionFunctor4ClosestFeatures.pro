@@ -7,10 +7,11 @@ SUBDIRS += Sphere2Sphere4ClosestFeatures \
            Box2Sphere4ClosestFeatures \
            Box2Box4ClosestFeatures \
            AABox2Sphere4ClosestFeatures \
-           Terrain2Sphere4ClosestFeatures 
-MOC_DIR = $(YADECOMPILATIONPATH) 
-UI_DIR = $(YADECOMPILATIONPATH) 
-OBJECTS_DIR = $(YADECOMPILATIONPATH) 
+           Terrain2Sphere4ClosestFeatures \
+           Sphere2Mesh2D4ClosestFeatures 
+MOC_DIR = $(YADECOMPILATIONPATH)
+UI_DIR = $(YADECOMPILATIONPATH)
+OBJECTS_DIR = $(YADECOMPILATIONPATH)
 CONFIG += release \
-          warn_on 
-TEMPLATE = subdirs 
+warn_on
+TEMPLATE = subdirs

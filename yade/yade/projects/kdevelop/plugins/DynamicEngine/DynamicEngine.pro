@@ -4,7 +4,8 @@
 # Target is a subdirs project 
 
 SUBDIRS += SimpleSpringDynamicEngine \
-           ExplicitMassSpringDynamicEngine 
+           ExplicitMassSpringDynamicEngine \
+           BallisticDynamicEngine 
 MOC_DIR = $(YADECOMPILATIONPATH)
 UI_DIR = $(YADECOMPILATIONPATH)
 OBJECTS_DIR = $(YADECOMPILATIONPATH)

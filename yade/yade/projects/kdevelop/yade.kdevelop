@@ -104,7 +104,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>preprocessors/FileGenerator/HangingCloth</activedir>
+      <activedir>plugins/CollisionModel</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>

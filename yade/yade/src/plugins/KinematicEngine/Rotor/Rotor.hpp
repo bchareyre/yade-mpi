@@ -13,7 +13,7 @@ class Rotor : public KinematicEngine
 	public : Rotor ();
 	public : virtual ~Rotor ();
 	
-	public : void moveToNextTimeStep(std::vector<shared_ptr<Body> >& bodies, float dt);
+	public : void moveToNextTimeStep(std::vector<shared_ptr<Body> >& bodies);
 	
 	public : void processAttributes();
 	public : void registerAttributes();

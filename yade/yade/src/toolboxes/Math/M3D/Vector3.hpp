@@ -101,6 +101,8 @@ class Vector3 : public Serializable
 	public : Vector3 inverse (float threshold = 1e-06f);
 	
 	public : Vector3 multTerm (const Vector3& v) const;
+	public : Vector3 maxTerm (const Vector3& v) const;
+	public : Vector3 minTerm (const Vector3& v) const;
 	public : Vector3 cross (const Vector3& v) const;
 	public : Vector3 unitCross (const Vector3& v) const;
 

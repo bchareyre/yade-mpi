@@ -25,8 +25,11 @@ void SimpleSpringDynamicEngine::registerAttributes()
 }
 
 
-void SimpleSpringDynamicEngine::respondToCollisions(Body * body, const std::list<shared_ptr<Interaction> >& interactions,float dt)
+void SimpleSpringDynamicEngine::respondToCollisions(Body * body, const std::list<shared_ptr<Interaction> >& interactions)
 {
+
+	float dt = Omega::instance().dt;
+	
 	NonConnexBody * ncb = dynamic_cast<NonConnexBody*>(body);
 	vector<shared_ptr<Body> >& bodies = ncb->bodies;
 	
@@ -86,41 +89,41 @@ void SimpleSpringDynamicEngine::respondToCollisions(Body * body, const std::list
         {
 		shared_ptr<RigidBody> rb = dynamic_pointer_cast<RigidBody>(bodies[i]);
 
-		if (rb->isDynamic)
-		{
-			Vector3 acc = forces[i]*rb->invMass;
+		//if (rb->isDynamic)
+		//{
+			rb->acceleration = forces[i]*rb->invMass;
 
-			if (!first)
-				rb->velocity = prevVelocities[i]+0.5*dt*acc;
+		//	if (!first)
+		//		rb->velocity = prevVelocities[i]+0.5*dt*acc;
 
-			prevVelocities[i] = rb->velocity+0.5*dt*acc;
-			rb->se3.translation += prevVelocities[i]*dt;
+		//	prevVelocities[i] = rb->velocity+0.5*dt*acc;
+		//	rb->se3.translation += prevVelocities[i]*dt;
 
-			rb->updateBoundingVolume(rb->se3);
-		}
+		//	rb->updateBoundingVolume(rb->se3);
+		//}
         }
 	first = false;
 
 // 	for(unsigned int i=0; i < bodies.size(); i++)
 //         {
 // 		shared_ptr<RigidBody> rb = dynamic_pointer_cast<RigidBody>(bodies[i]);
-// 				
+//
 // 		if (rb->isDynamic)
 // 		{
 // 			Vector3 acc = forces[i]*rb->invMass;
-// 			Vector3 mom = couples[i].multTerm(rb->invInertia);
-// 		
+// 		s	Vector3 mom = couples[i].multTerm(rb->invInertia);
+//
 // 			rb->velocity += dt*acc;
 // 			rb->se3.translation += dt*rb->velocity;
-// 
-// 			rb->angularVelocity += dt*mom;			
+//
+// 			rb->angularVelocity += dt*mom;
 // 			Vector3 axis = rb->angularVelocity;
 // 			float angle = axis.unitize();
 // 			Quaternion q;
 // 			q.fromAngleAxis(angle*dt,axis);
 // 			rb->se3.rotation = rb->se3.rotation*q;
-// 			rb->se3.rotation.normalize();			
-// 
+// 			rb->se3.rotation.normalize();
+//
 // 			rb->updateBoundingVolume(rb->se3);
 // 		}
 //         }

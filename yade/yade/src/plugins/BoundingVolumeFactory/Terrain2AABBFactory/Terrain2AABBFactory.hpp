@@ -14,7 +14,7 @@ class Terrain2AABBFactory : public BoundingVolumeFactory
 	public : void registerAttributes();
 	
 	public : shared_ptr<BoundingVolume> buildBoundingVolume(const shared_ptr<CollisionModel> cm, const Se3& se3);
-	REGISTER_CLASS_NAME(Terrain2AABBFactory);		
+	REGISTER_CLASS_NAME(Terrain2AABBFactory);
 };
 
 REGISTER_CLASS(Terrain2AABBFactory,false);

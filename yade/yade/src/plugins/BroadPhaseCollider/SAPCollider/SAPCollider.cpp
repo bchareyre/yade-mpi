@@ -67,7 +67,7 @@ void SAPCollider::registerAttributes()
 int SAPCollider::broadPhaseCollisionTest(const std::vector<shared_ptr<Body> >& bodies,std::list<shared_ptr<Interaction> >& interactions)
 {
 	unsigned int i;
-	
+
 	// Updates the minimums and maximums arrays according to the new center and radius of the spheres
 	int offset;
 	Vector3 min,max;

@@ -13,13 +13,23 @@ LIBS += -lMesh2D \
         -lAABB \
         -lSimpleNarrowCollider \
         -lExplicitMassSpringDynamicEngine \
+        -lSphere \
+        -lClosestFeatures \
+        -lRigidBody \
+        -lBallisticDynamicEngine \
+        -lSimpleSpringDynamicEngine \
         -rdynamic 
-INCLUDEPATH = ../../../plugins/DynamicEngine/ExplicitMassSpringDynamicEngine \
+INCLUDEPATH = ../../../plugins/DynamicEngine/BallisticDynamicEngine \
+              ../../../plugins/DynamicEngine/ExplicitMassSpringDynamicEngine \
+              ../../../plugins/DynamicEngine/SimpleSpringDynamicEngine \
               ../../../plugins/BroadPhaseCollider/SAPCollider \
               ../../../plugins/NarrowPhaseCollider/SimpleNarrowCollider \
               ../../../plugins/GeometricalModel/Mesh2D \
+              ../../../plugins/GeometricalModel/Sphere \
               ../../../plugins/BoundingVolume/AABB \
+              ../../../plugins/InteractionModel/ClosestFeatures \
               ../../../plugins/Body/Cloth \
+              ../../../plugins/Body/RigidBody \
               ../../../yade \
               ../../../toolboxes/Math/M3D \
               ../../../toolboxes/Math/Rand \
@@ -38,6 +48,11 @@ QMAKE_LIBDIR = ../../../plugins/GeometricalModel/Mesh2D/$(YADEDYNLIBPATH) \
                ../../../plugins/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
                ../../../plugins/NarrowPhaseCollider/SimpleNarrowCollider/$(YADEDYNLIBPATH) \
                ../../../plugins/DynamicEngine/ExplicitMassSpringDynamicEngine/$(YADEDYNLIBPATH) \
+               ../../../plugins/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
+               ../../../plugins/InteractionModel/ClosestFeatures/$(YADEDYNLIBPATH) \
+               ../../../plugins/Body/RigidBody/$(YADEDYNLIBPATH) \
+               ../../../plugins/DynamicEngine/BallisticDynamicEngine/$(YADEDYNLIBPATH) \
+               ../../../plugins/DynamicEngine/SimpleSpringDynamicEngine/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
 CONFIG += debug \

@@ -1,6 +1,7 @@
 #include "ExplicitMassSpringDynamicEngine.hpp"
 #include "Omega.hpp"
 #include "Cloth.hpp"
+#include "Mesh2D.hpp"
 
 ExplicitMassSpringDynamicEngine::ExplicitMassSpringDynamicEngine () : DynamicEngine()
 {
@@ -22,83 +23,70 @@ void ExplicitMassSpringDynamicEngine::registerAttributes()
 }
 
 
-void ExplicitMassSpringDynamicEngine::respondToCollisions(Body * body, const std::list<shared_ptr<Interaction> >& interactions,float dt)
+void ExplicitMassSpringDynamicEngine::respondToCollisions(Body * body, const std::list<shared_ptr<Interaction> >&)
 {
 
+	float dt = Omega::instance().dt;
 	Cloth * cloth = dynamic_cast<Cloth*>(body);
 
 	Vector3 gravity = Omega::instance().gravity;
 	
 	float damping	= cloth->damping;
 	float stiffness	= cloth->stiffness;
-	
-	/*if (first)
-	{
-		forces.resize(cloth->gm->edges.size());
-		prevVelocities.resize(cloth->gm->edges.size());
-	}
-	
-	std::vector<Vector3>::iterator fi = forces.begin();
-	std::vector<Vector3>::iterator fiEnd = forces.end();
-	vector<Edge>::iterator ei = cloth->gm->edges.begin();
-	for( ; fi!=fiEnd; ++fi, ++ei)
-	{
-		Vector3 v1 = cloth->gm->vertices[(*ei).first];
-		Vector3 v2 = cloth->gm->vertices[(*ei).second];
-		(*fi) = (v2-v1).normalize();
-		
-		(*fi) += gravity*mass;
-	}
-	
-	std::list<shared_ptr<Interaction> >::const_iterator cti = interactions.begin();
-	std::list<shared_ptr<Interaction> >::const_iterator ctiEnd = interactions.end();
-	for( ; cti!=ctiEnd ; ++cti)
-	{
-		shared_ptr<Contact> contact = static_pointer_cast<Contact>(*cti);
-		
-		std::vector<std::pair<Vector3,Vector3> >::iterator cpi = (dynamic_pointer_cast<ClosestFeatures>(contact->interactionModel))->closestsPoints.begin();
-		std::vector<std::pair<Vector3,Vector3> >::iterator cpiEnd = (dynamic_pointer_cast<ClosestFeatures>(contact->interactionModel))->closestsPoints.end();
-		for( ; cpi!=cpiEnd ; ++cpi)
-		{	
-			Vector3 f = (*cpi).first-(*cpi).second;
 
-			f *= stiffness/(float)((dynamic_pointer_cast<ClosestFeatures>(contact->interactionModel))->closestsPoints.size());
-			
-			Vector3 p = 0.5*((*cpi).first+(*cpi).second);
-			
-			shared_ptr<RigidBody> r1 = dynamic_pointer_cast<RigidBody>(bodies[contact->id1]);
-			shared_ptr<RigidBody> r2 = dynamic_pointer_cast<RigidBody>(bodies[contact->id2]);
-			
-			Vector3 o1p = p - r1->se3.translation;
-			Vector3 o2p = p - r2->se3.translation;
-						
-			forces[contact->id1] -= f;
-			forces[contact->id2] += f;
-		
-			couples[contact->id1] -= o1p.cross(f);
-			couples[contact->id2] += o2p.cross(f);
-		}
+	shared_ptr<Mesh2D> mesh = dynamic_pointer_cast<Mesh2D>(cloth->gm);
+	vector<Vector3>& vertices = mesh->vertices;
+	vector<Edge>& edges	  = mesh->edges;
+
+	if (first)
+	{		
+		forces.resize(vertices.size());		
+		prevVelocities.resize(vertices.size());
+		/*vector<NodeProperties>::iterator pi = cloth->properties.begin();
+		vector<NodeProperties>::iterator piEnd = cloth->properties.end();
+		vector<Vector3>::iterator pvi = prevVelocities.begin();
+		for( ; pi!=piEnd ; ++pi,++pvi)
+			*pvi = (*pi).velocity;*/
+	}
+
+	std::fill(forces.begin(),forces.end(),Vector3(0,0,0));
+	
+	vector<Edge>::iterator ei = edges.begin();
+	vector<Edge>::iterator eiEnd = edges.end();
+	for(int i=0 ; ei!=eiEnd; ++ei,i++)
+	{
+		Vector3 v1 = vertices[(*ei).first];
+		Vector3 v2 = vertices[(*ei).second];
+		float l  = (v2-v1).length();
+		float l0 = cloth->initialLengths[i];		
+		Vector3 dir = (v2-v1).normalize();
+		float e  = (l-l0)/l0;
+		float relativeVelocity = dir.dot((cloth->properties[(*ei).second].velocity-cloth->properties[(*ei).first].velocity));
+		Vector3 f3 = (e*stiffness+relativeVelocity*damping)*dir;
+		forces[(*ei).first]  += f3;
+		forces[(*ei).second] -= f3;
 	}
 
 		
-	for(unsigned int i=0; i < bodies.size(); i++)
+	for(unsigned int i=0; i < vertices.size(); i++)
         {
-		shared_ptr<RigidBody> rb = dynamic_pointer_cast<RigidBody>(bodies[i]);
+		Vector3 acc = Vector3(0,0,0);
 
-		if (rb->isDynamic)
-		{
-			Vector3 acc = forces[i]*rb->invMass;
-
-			if (!first)
-				rb->velocity = prevVelocities[i]+0.5*dt*acc;
-
-			prevVelocities[i] = rb->velocity+0.5*dt*acc;
-			rb->se3.translation += prevVelocities[i]*dt;
-
-			rb->updateBoundingVolume(rb->se3);
-		}
-        }*/
+		if (cloth->properties[i].invMass!=0)
+			acc = Omega::instance().gravity + forces[i]*cloth->properties[i].invMass;
+					
+		if (!first)
+			cloth->properties[i].velocity = 0.999*(prevVelocities[i]+0.5*dt*acc);
+		
+		prevVelocities[i] = (cloth->properties[i].velocity+0.5*dt*acc);
+		
+		vertices[i] += prevVelocities[i]*dt;				
+        }
+	
+	// FIXME: where should we update bounding volume
+	body->updateBoundingVolume(body->se3);
 	first = false;
+	
 
 }
 
