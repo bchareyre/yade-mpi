@@ -3,21 +3,21 @@
 # Subdir relative project main directory: ./yade/Interaction
 # Target is a library:  
 
-HEADERS += PhysicalInteractor.hpp \
-           BroadInteractor.hpp \
-           Interaction.hpp \
-           InteractionGeometry.hpp \
-           NarrowInteractor.hpp \
-           CollisionFunctor.hpp \
+HEADERS += Interaction.hpp \
            InteractionContainer.hpp \
-           InteractionPhysics.hpp 
-SOURCES += PhysicalInteractor.cpp \
-           BroadInteractor.cpp \
-           Interaction.cpp \
-           InteractionGeometry.cpp \
-           NarrowInteractor.cpp \
+           InteractionGeometry.hpp \
+           InteractionPhysics.hpp  \
+           InteractionFunctor.hpp \
+	   BroadInteractor.hpp \
+	   NarrowInteractor.hpp \
+	   PhysicalInteractor.hpp
+SOURCES += Interaction.cpp \
            InteractionContainer.cpp \
-           InteractionPhysics.cpp 
+           InteractionGeometry.cpp \
+           InteractionPhysics.cpp \
+           BroadInteractor.cpp \
+           NarrowInteractor.cpp \
+	   PhysicalInteractor.cpp
 LIBS += -lMultiMethods \
 -rdynamic
 INCLUDEPATH = $(YADEINCLUDEPATH)
