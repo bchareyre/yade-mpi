@@ -23,6 +23,10 @@
 #include "CollisionGeometrySet2AABBFactory.hpp"
 
 #include <boost/filesystem/convenience.hpp>
+#include <boost/lexical_cast.hpp>
+
+using namespace boost;
+using namespace std;
 
 SDECImport::SDECImport () : FileGenerator()
 {
@@ -107,18 +111,18 @@ string SDECImport::generate()
 	bvu->addBVFactories("Box","AABB","Box2AABBFactory");
 	bvu->addBVFactories("CollisionGeometrySet","AABB","CollisionGeometrySet2AABBFactory");
 	
-	rootBody->actors.resize(5);
+	rootBody->actors.resize(4);
 	rootBody->actors[0] 		= bvu;
 	rootBody->actors[1] 		= shared_ptr<Actor>(new SAPCollider);
 	rootBody->actors[2] 		= nc;
 // use SDEC law for calculations
 	rootBody->actors[3] 		= shared_ptr<Actor>(new SDECDynamicEngine);
 	
-	shared_ptr<AveragePositionRecorder> actor;
-	actor = shared_ptr<AveragePositionRecorder>(new AveragePositionRecorder);
-	actor -> outputFile 		= "../data/Position";
-	actor -> interval 		= 100;
-	rootBody->actors[4]		= actor;
+	shared_ptr<AveragePositionRecorder> avgpos;
+	avgpos = shared_ptr<AveragePositionRecorder>(new AveragePositionRecorder);
+	avgpos -> outputFile 		= "../data/Position";
+	avgpos -> interval 		= 100;
+	rootBody->actors.push_back(avgpos);
 
 	rootBody->permanentInteractions->clear();
 
@@ -180,8 +184,8 @@ string SDECImport::generate()
 				continue;
 //			cout << i << " : " << x << " " << z << " " << y << " " << radius <<  endl;
 
-			if( i % 100 == 0 )
-				cout << i << endl;
+//			if( i % 100 == 0 ) // FIXME - should display a progress BAR !!
+//				cout << i << endl;
 
 			lowerCorner[0] = min(translation[0]-radius , lowerCorner[0]);
 			lowerCorner[1] = min(translation[1]-radius , lowerCorner[1]);
@@ -222,11 +226,7 @@ string SDECImport::generate()
 			rootBody->bodies->insert(body);
 		}
 	}
-	
-//	cerr << "lower: " << lowerCorner[0] << " "<< lowerCorner[1] << " "<< lowerCorner[2] << endl;
-//	cerr << "upper: " << upperCorner[0] << " "<< upperCorner[1] << " "<< upperCorner[2] << endl;
 
-	
 ///////////////////////////////////////////////////////////////////////////////
 /// insert bottom box
 ///////////////////////////////////////////////////////////////////////////////
@@ -264,10 +264,11 @@ string SDECImport::generate()
 	
 	
 // Recording Forces
-//	actor = shared_ptr<ForceRecorder>(new ForceRecorder);
-//	actor -> outputFile 	= "../data/Forces";
-//	actor -> interval 	= 100;
-//	sdec->actors.push_back(actor);
+//	shared_ptr<ForceRecorder> forcerec;
+//	forcerec = shared_ptr<ForceRecorder>(new ForceRecorder);
+//	forcerec -> outputFile 	= "../data/Forces";
+//	forcerec -> interval 	= 100;
+//	sdec->actors.push_back(forcerec);
 	
 	body = dynamic_pointer_cast<Body>(sdec);
 	if(wall_bottom)
@@ -467,6 +468,15 @@ string SDECImport::generate()
 /// end of box inserting
 ///////////////////////////////////////////////////////////////////////////////
 	
-	return "";
+//	cerr << "lower: " << lowerCorner[0] << " "<< lowerCorner[1] << " "<< lowerCorner[2] << endl;
+//	cerr << "upper: " << upperCorner[0] << " "<< upperCorner[1] << " "<< upperCorner[2] << endl;
+	
+	return "Generated a sample inside box of dimensions: " 
+		+ lexical_cast<string>(lowerCorner[0]) + "," 
+		+ lexical_cast<string>(lowerCorner[1]) + "," 
+		+ lexical_cast<string>(lowerCorner[2]) + " and " 
+		+ lexical_cast<string>(upperCorner[0]) + "," 
+		+ lexical_cast<string>(upperCorner[1]) + "," 
+		+ lexical_cast<string>(upperCorner[2]) + ".";
 
 }
