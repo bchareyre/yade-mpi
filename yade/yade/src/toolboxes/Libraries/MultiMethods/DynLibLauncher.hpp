@@ -97,6 +97,7 @@
 /// then virtual function to overload is:
 ///		public: virtual std::string go(boost::shared_ptr<Shape>&,double,char,const std::string& );
 ///
+/// FIXME - but not shared_ptr! 
 /// references were added where necessary, to optimize call speed.
 /// So pay attention when you overload this function.
 ///
