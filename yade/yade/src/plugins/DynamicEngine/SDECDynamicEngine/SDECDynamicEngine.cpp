@@ -316,7 +316,7 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 		Vector3 t1	= currentContact->shearForce.normalized();
 		Vector3 t2	= n.unitCross(t1);
 
-		/*if (n[0]!=0 && n[1]!=0 && n[2]!=0)
+		if (n[0]!=0 && n[1]!=0 && n[2]!=0)
 		{
 			t1 = Vector3(0,0,sqrt(1.0/(1+(n[2]*n[2]/(n[1]*n[1])))));
 			t1[1] = -n[2]/n[1]*t1[2];
@@ -355,17 +355,18 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 				t1 = Vector3(0,1,0);
 				t2 = Vector3(0,0,1);
 			}
-		}*/
+		}
 
 		Quaternion q_i_n,q_n_i;
 
 		q_i_n.fromAxes(n,t1,t2);
 		//q_i_n.fromAxes(Vector3(1,0,0),Vector3(0,1,0),Vector3(0,0,1)); // use identity matrix
+		//q_i_n.invert();
 		q_n_i = q_i_n.inverse();
 	
 		Vector3 dBeta;
-		Vector3 orientation_Nc,orientation_Nc_old;
-
+		
+		/*Vector3 orientation_Nc,orientation_Nc_old;
 		for(int i=0;i<3;i++)
 		{
 			int j = (i+1)%3;
@@ -382,7 +383,11 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 				orientation_Nc_old[k] = -acos(prevN[i]);	
 		}
 
-		dBeta = orientation_Nc - orientation_Nc_old;
+		dBeta = orientation_Nc - orientation_Nc_old;*/
+		
+		Quaternion q;
+		q.alignAxis(n,prevN);
+		q.toEulerAngles(dBeta);
 		
 		Vector3 dRotationA,dRotationB;
 
@@ -405,18 +410,19 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 		if (dRotationB[1]<-Constants::TWO_PI)	dRotationB[1]+=Constants::TWO_PI;
 		if (dRotationB[2]<-Constants::TWO_PI)	dRotationB[2]+=Constants::TWO_PI;
 
-		if (dBeta[0]>Constants::TWO_PI)	dBeta[0]-=Constants::TWO_PI;
-		if (dBeta[1]>Constants::TWO_PI)	dBeta[1]-=Constants::TWO_PI;
-		if (dBeta[2]>Constants::TWO_PI)	dBeta[2]-=Constants::TWO_PI;
+		if (dBeta[0]>Constants::PI)	dBeta[0]-=Constants::PI;
+		if (dBeta[1]>Constants::PI)	dBeta[1]-=Constants::PI;
+		if (dBeta[2]>Constants::PI)	dBeta[2]-=Constants::PI;
 		
-		if (dBeta[0]<-Constants::TWO_PI)	dBeta[0]+=Constants::TWO_PI;
-		if (dBeta[1]<-Constants::TWO_PI)	dBeta[1]+=Constants::TWO_PI;
-		if (dBeta[2]<-Constants::TWO_PI)	dBeta[2]+=Constants::TWO_PI;*/
+		if (dBeta[0]<-Constants::PI)	dBeta[0]+=Constants::PI;
+		if (dBeta[1]<-Constants::PI)	dBeta[1]+=Constants::PI;
+		if (dBeta[2]<-Constants::PI)	dBeta[2]+=Constants::PI;*/
 
 		Vector3 dUr = 	( currentContact->radius1*(  dRotationA  -  dBeta)
 				- currentContact->radius2*(  dRotationB  -  dBeta) ) * 0.5;
 
-
+		cout << dRotationA << " || " <<dRotationB << " || " <<dBeta << endl;
+		
 		Vector3 dThetar = dUr/currentContact->averageRadius;
 
 		currentContact->thetar += dThetar;
@@ -449,7 +455,6 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 		//	thetarn = mPlastic/kr;
 		//	currentContact->thetar = q_n_i*thetarn;
 		//}
-
 
 		currentContact->prevRotation1 = currentContact->currentRotation1;
 		currentContact->prevRotation2 = currentContact->currentRotation2;
