@@ -29,7 +29,7 @@
 
 #include <boost/thread/condition.hpp>
 #include <boost/thread/mutex.hpp>
-#include <vector>
+#include <set>
 #include <boost/shared_ptr.hpp>
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -48,13 +48,16 @@ class ThreadSynchronizer
 	
 	private : boost::condition cond;
 	
-	private : int i;
+	//private : int i;
 	public  : bool notMyTurn(int turn);
 	public  : void setNextCurrentThread();
 
-	private : int prevI;
-	private : int * nbThreads;
-	private : vector<int> redirectionId;
+	//private : int prevI;
+	//private : int * nbThreads;
+	//private : vector<int> redirectionId;
+	private : set<int> ids;
+	private : set<int>::iterator currentId;
+	private : int maxId;
 	
 	public  : ThreadSynchronizer();
 

@@ -117,12 +117,12 @@ void Threadable<Thread>::operator()()
 			}
 		}
 		{
-			boost::mutex::scoped_lock lock(*(synchronizer->getMutex()));
-			while (synchronizer->notMyTurn(*turn))
-				synchronizer->wait(lock);
+			//boost::mutex::scoped_lock lock(*(synchronizer->getMutex()));
+			//while (synchronizer->notMyTurn(*turn))
+			//	synchronizer->wait(lock);
 			synchronizer->removeThread(*turn);
-			synchronizer->setNextCurrentThread();
-			synchronizer->signal();
+			//synchronizer->setNextCurrentThread();
+			//synchronizer->signal();
 		}
 	}
 	else

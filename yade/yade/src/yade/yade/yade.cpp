@@ -63,5 +63,9 @@ int main(int argc, char *argv[])
 
 	Omega::instance().gui = dynamic_pointer_cast<FrontEnd>(ClassFactory::instance().createShared(frontend));
 
-	return Omega::instance().gui->run(argc,argv);
+	int ok = Omega::instance().gui->run(argc,argv);
+	
+	cout << "YADE ENDED CORRECTLY ..." << endl;
+	
+	return ok;
 }

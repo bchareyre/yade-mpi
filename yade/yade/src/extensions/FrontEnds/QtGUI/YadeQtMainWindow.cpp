@@ -120,12 +120,12 @@ void YadeQtMainWindow::fileExit()
 {
 	if (simulationController)
 		delete simulationController;
-	exit(0);
+	YadeQtGeneratedMainWindow::closeEvent(0);
 }
 
-void YadeQtMainWindow::closeEvent(QCloseEvent *)
+void YadeQtMainWindow::closeEvent(QCloseEvent *e)
 {
 	if (simulationController)
 		delete simulationController;
-	exit(0);
+	YadeQtGeneratedMainWindow::closeEvent(e);
 }

@@ -98,6 +98,7 @@ void Omega::init()
 void Omega::createSimulationLoop()
 {
 	finishSimulationLoop();
+	joinSimulationLoop();
 	simulationLoop   = shared_ptr<SimulationLoop>(new SimulationLoop(synchronizer));
 }
 
@@ -244,7 +245,7 @@ void Omega::loadSimulation()
 
 	if( Omega::instance().getSimulationFileName().size() != 0  &&  filesystem::exists(simulationFileName) )
 	{
-
+		freeSimulation();
 		IOManager::loadFromFile("XMLManager",simulationFileName,"rootBody",Omega::instance().rootBody);
 		Omega::instance().logMessage("Loading file " + simulationFileName);
 
@@ -260,6 +261,11 @@ void Omega::loadSimulation()
 		cout << "\nWrong filename, please specify filename using your frontend.\n";
 		exit(1);
 	}
+}
+
+void Omega::freeSimulation()
+{
+	rootBody = shared_ptr<NonConnexBody>();
 }
 
 void Omega::startSimulationLoop()

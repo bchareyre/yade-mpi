@@ -31,7 +31,6 @@ GLViewer::~GLViewer()
 void GLViewer::initializeGL()
 {
 	QGLViewer::initializeGL();
-	cout << "init" << endl;
 }
 
 void GLViewer::finishRendering()

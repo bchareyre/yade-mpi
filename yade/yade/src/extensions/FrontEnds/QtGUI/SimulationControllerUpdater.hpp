@@ -21,57 +21,35 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#ifndef __SIMULATIONCONTROLLER_H__
-#define __SIMULATIONCONTROLLER_H__
+#ifndef __SIMULATIONCONTROLLERUPDATER_H__
+#define __SIMULATIONCONTROLLERUPDATER_H__
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "GLViewer.hpp"
-#include "QtGeneratedSimulationController.h"
-#include "QtGUIGenerator.hpp"
-#include "RenderingEngine.hpp"
-#include "SimulationControllerUpdater.hpp"
+#include <Threadable.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-class SimulationController : public QtGeneratedSimulationController
-{
-	private : QtGUIGenerator guiGen;	
-	
-	private : shared_ptr<RenderingEngine> renderer;
-	
-	private : map<int,GLViewer* > glViews;
-	private : int maxNbViews;
-		
-	private : shared_ptr<SimulationControllerUpdater> updater;
-	
-	// construction
-	public : SimulationController (QWidget * parent=0);
+class SimulationController;
 
-	public : ~SimulationController (); 
-	
-	public slots : virtual void pbApplyClicked();
-	public slots : virtual void pbLoadClicked();
-	public slots : virtual void pbNewViewClicked();
-	public slots : virtual void pbStopClicked();
-	public slots : virtual void pbStartClicked();
-	public slots : virtual void pbResetClicked();
-	public slots : virtual void pbCenterSceneClicked();
-	public slots : void closeGLViewEvent(int id);
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private : void terminateAllThreads();
-	private : void addNewView();
-	
-	protected : void closeEvent(QCloseEvent *evt);
-
+class SimulationControllerUpdater : public Threadable<SimulationControllerUpdater>
+{	
+	private : SimulationController * controller;
+	public : SimulationControllerUpdater(SimulationController * sc);
+	public : ~SimulationControllerUpdater();
+	public : void oneLoop();
+	public : bool notEnd();
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#endif // __SIMULATIONCONTROLLER_H__
+#endif // __SIMULATIONCONTROLLERUPDATER_H__
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
