@@ -161,7 +161,6 @@ void SimulationController::pbLoadClicked()
 		Omega::instance().joinSimulationLoop();
 		
 		Omega::instance().setSimulationFileName(fileName);
-cerr << "fileName:" << fileName << endl;
 		Omega::instance().loadSimulation();
 		
 		string fullName = string(filesystem::basename(fileName.data()))+string(filesystem::extension(fileName.data()));

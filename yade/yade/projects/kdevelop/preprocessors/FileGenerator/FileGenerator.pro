@@ -3,7 +3,8 @@
 # Subdir relative project main directory: ./preprocessors/FileGenerator
 # Target is a subdirs project 
 
-SUBDIRS += RotatingBox \
+SUBDIRS += LatticeBox \
+           RotatingBox \
            HangingCloth \
            FEMRock \
            BoxStack \

@@ -1,6 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2004 by Olivier Galizzi                                 *
- *   olivier.galizzi@imag.fr                                               *
+ *   Copyright (C) 2004 by Janek Kozicki                                   *
+ *   cosurgi@berlios.de                                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -18,26 +18,28 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+#include "LineSegment.hpp"
+
 
 #include "OpenGLWrapper.hpp"
-#include "Box.hpp"
 #include <iostream>
 
 
-Box::Box () : GeometricalModel()
+LineSegment::LineSegment () : GeometricalModel()
 {		
 	createIndex();
 }
 
-Box::~Box ()
+LineSegment::~LineSegment ()
 {		
 }
 
-void Box::registerAttributes()
+void LineSegment::registerAttributes()
 {
 	GeometricalModel::registerAttributes();
-	REGISTER_ATTRIBUTE(extents);
+	REGISTER_ATTRIBUTE(length);
 }
 

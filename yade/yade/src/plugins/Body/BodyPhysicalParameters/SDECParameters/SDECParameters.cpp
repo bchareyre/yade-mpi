@@ -9,12 +9,6 @@ SDECParameters::~SDECParameters()
 {
 }
 
-
-void SDECParameters::postProcessAttributes(bool deserializing)
-{
-	RigidBodyParameters::postProcessAttributes(deserializing);
-}
-
 void SDECParameters::registerAttributes()
 {
 	RigidBodyParameters::registerAttributes();

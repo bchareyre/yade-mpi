@@ -44,8 +44,16 @@ void InteractionDescriptionSet2AABBFunctor::go(	  const shared_ptr<InteractionDe
 	for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext())
 	{
 		shared_ptr<Body>& b = bodies->getCurrent();
- 		max = max.maxVector(b->boundingVolume->max);
- 		min = min.minVector(b->boundingVolume->min);
+		if(b->boundingVolume)
+		{
+	 		max = max.maxVector(b->boundingVolume->max);
+ 			min = min.minVector(b->boundingVolume->min);
+		} 
+		else
+		{
+	 		max = max.maxVector(b->physicalParameters->se3.translation);
+ 			min = min.minVector(b->physicalParameters->se3.translation);
+		}
 	}
 	
 	aabb->center = (max+min)*0.5;

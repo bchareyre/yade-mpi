@@ -56,6 +56,7 @@ OpenGLRenderingEngine::OpenGLRenderingEngine() : RenderingEngine()
 	addGeometricalModelFunctor("Box","GLDrawBox");
 	addGeometricalModelFunctor("Sphere","GLDrawSphere");
 	addGeometricalModelFunctor("Mesh2D","GLDrawMesh2D");
+	addGeometricalModelFunctor("LineSegment","GLDrawLineSegment");
 	
 	addShadowVolumeFunctor("Box","GLDrawBoxShadowVolume");
 	addShadowVolumeFunctor("Sphere","GLDrawSphereShadowVolume");

@@ -52,7 +52,8 @@ void BoundingVolumeDispatcher::action(Body* body)
 	for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext())
 	{
 		shared_ptr<Body>& b = bodies->getCurrent();
-		operator()(b->interactionGeometry,b->boundingVolume,b->physicalParameters->se3,b.get());
+		if(b->interactionGeometry && b->boundingVolume)
+			operator()(b->interactionGeometry,b->boundingVolume,b->physicalParameters->se3,b.get());
 	}
 		
 	operator()(body->interactionGeometry,body->boundingVolume,body->physicalParameters->se3,body);

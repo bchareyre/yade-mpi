@@ -3,7 +3,8 @@
 # Subdir relative project main directory: ./extensions/RenderingEngines/OpenGLRenderingEngine/GLDrawGeometricalModelFunctor
 # Target is a subdirs project 
 
-SUBDIRS += GLDrawBox \
+SUBDIRS += GLDrawLineSegment \
+           GLDrawBox \
            GLDrawMesh2D \
            GLDrawSphere 
 CONFIG += release \

@@ -7,7 +7,9 @@ CONFIG += release \
           warn_on 
 TEMPLATE = subdirs 
 SUBDIRS += ParticleSetParameters \
+	   RigidBodyParameters \
+	   LatticeBeamParameters \
+           LatticeNodeParameters \
            FEMNodeParameters \
 	   ParticleParameters \ 
-	   RigidBodyParameters \
 	   SDECParameters

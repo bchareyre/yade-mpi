@@ -99,7 +99,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>plugins/Engine/ActionFunctor/CundallNonViscousMomentumDamping</activedir>
+      <activedir>yade/Body/BoundingVolume</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>
