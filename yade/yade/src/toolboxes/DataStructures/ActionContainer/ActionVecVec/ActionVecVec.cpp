@@ -31,12 +31,12 @@ void ActionVecVec::add(const shared_ptr<Action>& newAction, unsigned int id)
 { 
 	const int& idx = newAction->getClassIndex();
 	
-	assert(idx != -1);
+	assert(idx >= 0);
 
 	if( actions.size() <= id )
 		actions.resize(id+1);
 		
-	if( actions[id].size() <= idx )
+	if( actions[id].size() <= (unsigned int)idx )
 		actions[id].resize(idx+1);
 	
 	if( actions[id][idx] )
@@ -130,44 +130,90 @@ const shared_ptr<Action>& ActionVecVec::operator[](unsigned int id) const
 	}
 }
 
-// looping over Bodies, and their Actions (with setCurrentActionType)
 void ActionVecVec::gotoFirst()
 {
-	aii    = actions.begin();
-	aiiEnd = actions.end();
+	vvi    = actions.begin();
+	vviEnd = actions.end();
+	currentIndex=0;
+
+	if (vvi!=vviEnd)
+	{
+		vi    = (*vvi).begin();
+		viEnd = (*vvi).end();
+	
+		while( vi == viEnd )
+		{
+			++vvi;
+			++currentIndex;
+			if(vvi != vviEnd)
+			{
+				vi	= (*vvi).begin();
+				viEnd	= (*vvi).end();
+			}
+			else
+				return;
+		}
+	}
+	
+	if (!(*vi))
+		gotoNext();
 }
 
 bool ActionVecVec::notAtEnd()
 {
-	return ( aii != aiiEnd );
+	vector< shared_ptr<Action> >::iterator tmpVi = vi;
+	temporaryVvi = vvi;
+
+	if( vvi == vviEnd )
+		return false;
+
+	while (tmpVi==viEnd)
+	{
+		++temporaryVvi;
+		if (temporaryVvi==vviEnd)
+			return false;
+		tmpVi = (*vvi).begin();
+		viEnd = (*vvi).end();
+	}
+	return true;
 }
 
 void ActionVecVec::gotoNext()
 {
-	++aii;
+	if ( vi != viEnd )
+		++vi;
+		
+	while( vi == viEnd )
+	{
+		++vvi;		
+		++currentIndex;
+		if(vvi != vviEnd)
+		{
+			vi	= (*vvi).begin();
+			viEnd	= (*vvi).end();
+		}
+		else
+			break;
+	}	
+	
+	while (!(*vi))
+		gotoNext();
+
 }
+
+
+
+
 
 // returns Action selected by setCurrentActionType, for current Body
-shared_ptr<Action> ActionVecVec::getCurrent()
+shared_ptr<Action> ActionVecVec::getCurrent(int & id)
 {
-//	return (*aii).find(currentActionType);
-
-	if( currentActionType < (*aii).size() )
-		return (*aii)[currentActionType];
-	else
-		return shared_ptr<Action>();
-
-}
-
-void ActionVecVec::pushIterator()
-{// FIXME - make sure that this is FIFO (I'm tired now...)
-	iteratorList.push_front(aii);
-}
-
-void ActionVecVec::popIterator()
-{
-	aii = iteratorList.front();
-	iteratorList.pop_front();
+// 	if( currentActionType < (*aii).size() )
+// 		return (*aii)[currentActionType];
+// 	else
+// 		return shared_ptr<Action>();
+	id = currentIndex;
+	return (*vi);
 }
 
 

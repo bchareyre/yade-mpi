@@ -17,6 +17,9 @@ class ActionVecVec : public ActionContainer
 /// Internal data										///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 	
+	
+	private : int currentIndex;
+	
 	// this in fact should be also a RedirectionVector in respect to the Body.id
 	// this container is memory-consuming, because size of this vector is depending on highest id
 	// from all bodies, not on the number of bodies
@@ -25,10 +28,12 @@ class ActionVecVec : public ActionContainer
 	// 	- first  dimension is Body->getId() number
 	//	- second dimension is Action->getClassIndex() number
 	private	  : vector< vector< shared_ptr<Action> > > actions;
-	private	  : vector< vector< shared_ptr<Action> > >::iterator aii;
-	private	  : vector< vector< shared_ptr<Action> > >::iterator temporaryAii;
-	private	  : vector< vector< shared_ptr<Action> > >::iterator aiiEnd;
-	private	  : list< vector< vector< shared_ptr<Action> > >::iterator > iteratorList;
+	private	  : vector< vector< shared_ptr<Action> > >::iterator vvi;
+	private	  : vector< vector< shared_ptr<Action> > >::iterator temporaryVvi;
+	private	  : vector< vector< shared_ptr<Action> > >::iterator vviEnd;
+	private	  : vector< shared_ptr<Action> >::iterator vi;
+	private	  : vector< shared_ptr<Action> >::iterator viEnd;
+	//private	  : list< vector< vector< shared_ptr<Action> > >::iterator > iteratorList;
 	
 	private   : int currentActionType; // current polymorphic Action type - is an Action->getClassIndex();
 	private	  : mutable shared_ptr<Action> empty;
@@ -83,10 +88,8 @@ class ActionVecVec : public ActionContainer
 	public    : virtual void gotoFirst();
 	public    : virtual bool notAtEnd();
 	public    : virtual void gotoNext();
-	// returns Action selected by setCurrentActionType, for current Body
-	public    : virtual shared_ptr<Action> getCurrent();
-	public    : virtual void pushIterator();
-	public    : virtual void popIterator();
+	public    : virtual shared_ptr<Action> getCurrent(int & id);
+	
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Serialization										///

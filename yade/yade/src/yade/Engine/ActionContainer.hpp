@@ -97,8 +97,9 @@ class ActionContainer : public Serializable
 	public    : virtual void gotoFirst() 						{throw;};
 	public    : virtual bool notAtEnd() 						{throw;};
 	public    : virtual void gotoNext() 						{throw;};
-	// returns Action selected by setCurrentActionType, for current Body
-	public    : virtual shared_ptr<Action> getCurrent()	 			{throw;};
+
+	public    : virtual shared_ptr<Action> getCurrent(int& )			{throw;};
+	
 	public    : virtual void pushIterator()			 			{throw;};
 	public    : virtual void popIterator()			 			{throw;};
 

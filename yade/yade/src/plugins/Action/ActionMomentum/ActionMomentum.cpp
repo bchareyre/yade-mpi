@@ -78,11 +78,11 @@ void ActionMomentum::reset()
 
 shared_ptr<Action> ActionMomentum::clone()
 {
-	shared_ptr<ActionMomentum> am(new ActionMomentum);
-	am->momentum = momentum;
-	shared_ptr<Action> aaam = dynamic_pointer_cast<Action>(am);
-	return aaam;
-	//return shared_ptr<ActionMomentum>(new ActionMomentum(*this));
+	//shared_ptr<ActionMomentum> am(new ActionMomentum);
+	//am->momentum = momentum;
+	//shared_ptr<Action> aaam = dynamic_pointer_cast<Action>(am);
+	//return aaam;
+	return shared_ptr<ActionMomentum>(new ActionMomentum(*this));
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
