@@ -63,13 +63,10 @@ class Interaction : public Serializable
 	// construction
 	public	: Interaction ();
 	public	: Interaction(unsigned int newId1,unsigned int newId2);
-	//public: Interaction(std::vector<unsigned int> ids_) {/*....*/ }; // for multiple interactions....
-	public	: ~Interaction ();
 
 	public	: unsigned int getId1() {return id1;}; // everything written inside class declaration is inline, therefore as fast as accessing the variable itself, every compiler guarantees this.
 	public	: unsigned int getId2() {return id2;};
 
-	protected : virtual void postProcessAttributes(bool deserializing);
 	public	: void registerAttributes();
 
 	REGISTER_CLASS_NAME(Interaction);

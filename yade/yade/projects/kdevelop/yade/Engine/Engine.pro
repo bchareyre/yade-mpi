@@ -14,7 +14,6 @@ HEADERS += TimeIntegratorDispatcher.hpp \
 SOURCES += TimeIntegratorDispatcher.cpp \
            ActionDispatcher.cpp \
            ActionContainer.cpp \
-           Action.cpp \
            DynamicEngine.cpp \
            KinematicEngine.cpp 
 LIBS += -rdynamic

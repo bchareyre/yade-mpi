@@ -72,19 +72,6 @@ void BoundingVolumeDispatcher::action(Body* body)
 	}
 		
  	boundingVolumeDispatcher(body->interactionGeometry,body->boundingVolume,body->physicalParameters->se3,body);
-	
-	
-// 	if (b->containSubBodies)
-// 	{
-// 		ComplexBody * ncb = dynamic_cast<ComplexBody*>(b);
-// 		shared_ptr<BodyContainer> bodies = ncb->bodies;
-// 		for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext())
-// 		{
-// 			updateBoundingVolume(bodies->getCurrent());
-// 		}
-// 	}
-// 	
-// 	boundingVolumeDispatcher(b->interactionGeometry,b->boundingVolume,b->physicalParameters->se3);
 }
 
 

@@ -40,7 +40,7 @@
 //  	public : vector<vector<int> > triPerVertices;
 // 	// construction
 // 	public : Polyhedron ();
-// 	public : ~Polyhedron ();
+// 	public : virtual ~Polyhedron ();
 // 	
 // 	public : void glDraw();
 // 	public : void computeNormals();

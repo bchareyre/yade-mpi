@@ -54,19 +54,8 @@ class DynamicEngine : public Actor
 /// Attributes											///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-	// construction
-	public : DynamicEngine ();
-
-	public : virtual ~DynamicEngine ();
-
-	protected : virtual void postProcessAttributes(bool deserializing);
-	public : virtual void registerAttributes();
-
-	//public : virtual bool isActivated();
 	public : virtual void action(Body* b);
 	public : virtual void respondToInteractions(Body* ) { throw; };
-
-	//public : virtual string getInteractionGeometryName() { return "";};
 
 	REGISTER_CLASS_NAME(DynamicEngine);
 

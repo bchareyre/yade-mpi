@@ -11,15 +11,6 @@ MassSpringBody2RigidBodyDynamicEngine::MassSpringBody2RigidBodyDynamicEngine () 
 {
 }
 
-MassSpringBody2RigidBodyDynamicEngine::~MassSpringBody2RigidBodyDynamicEngine ()
-{
-
-}
-
-void MassSpringBody2RigidBodyDynamicEngine::postProcessAttributes(bool)
-{
-
-}
 
 void MassSpringBody2RigidBodyDynamicEngine::registerAttributes()
 {

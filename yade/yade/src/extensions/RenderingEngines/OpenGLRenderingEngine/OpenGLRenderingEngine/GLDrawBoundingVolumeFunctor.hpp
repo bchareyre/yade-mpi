@@ -39,6 +39,7 @@ class GLDrawBoundingVolumeFunctor : public FunctorWrapper
 		 TYPELIST_1(const shared_ptr<BoundingVolume>&) 
 		>
 {
+	public : virtual ~GLDrawBoundingVolumeFunctor() {};
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -92,7 +92,7 @@ class Terrain : public GeometricalModel
 
 	// construction
 	public : Terrain ();
-	public : ~Terrain ();
+	public : virtual ~Terrain ();
 
 	public : void glDraw();
 

@@ -14,13 +14,9 @@ class Rotor : public KinematicEngine
 
 	public : Real angularVelocity;
 	public : Vector3r rotationAxis;
-	// construction
-	public : Rotor ();
-	public : virtual ~Rotor ();
 
 	public : void moveToNextTimeStep(Body * body);
 
-	protected : virtual void postProcessAttributes(bool deserializing);
 	public : void registerAttributes();
 	REGISTER_CLASS_NAME(Rotor);
 };

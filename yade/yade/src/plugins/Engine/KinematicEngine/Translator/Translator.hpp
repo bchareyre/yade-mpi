@@ -15,10 +15,6 @@ class Translator : public KinematicEngine
 	public : Real velocity;
 	public : Vector3r translationAxis;
 	
-	// construction
-	public : Translator ();
-	public : virtual ~Translator ();
-
 	public : void moveToNextTimeStep(Body * body);
 
 	protected : virtual void postProcessAttributes(bool deserializing);

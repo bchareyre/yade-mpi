@@ -34,9 +34,8 @@
 
 class InteractionDescriptionSet : public InteractionDescription
 {
-//	public : vector<shared_ptr<InteractionDescription> > interactionGeometries;
-
 	public : InteractionDescriptionSet ();
+	public : virtual ~InteractionDescriptionSet ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Serialization										///

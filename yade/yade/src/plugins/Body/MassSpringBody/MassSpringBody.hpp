@@ -9,7 +9,7 @@ class MassSpringBody : public ComplexBody
 {
 	// construction
 	public : MassSpringBody ();
-	public : ~MassSpringBody ();
+	public : virtual ~MassSpringBody ();
 
 	//public : void glDrawGeometricalModel();
 

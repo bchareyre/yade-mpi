@@ -15,16 +15,6 @@ Interaction::Interaction(unsigned int newId1,unsigned int newId2) : id1(newId1) 
 	isReal = false;
 }
 
-Interaction::~Interaction ()
-{
-
-}
-
-void Interaction::postProcessAttributes(bool)
-{
-
-}
-
 void Interaction::registerAttributes()
 {
 	REGISTER_ATTRIBUTE(id1);

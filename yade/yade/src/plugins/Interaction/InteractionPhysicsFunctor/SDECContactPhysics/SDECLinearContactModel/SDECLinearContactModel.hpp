@@ -37,6 +37,7 @@ class SDECLinearContactModel : public InteractionPhysicsFunctor
 	public : virtual void go(	const shared_ptr<BodyPhysicalParameters>& b1,
 					const shared_ptr<BodyPhysicalParameters>& b2,
 					shared_ptr<Interaction>& interaction);
+// FIXME - bug in Indaxable					
 	DEFINE_FUNCTOR_ORDER_2D(SDECDiscreteElement,SDECDiscreteElement);
 };
 

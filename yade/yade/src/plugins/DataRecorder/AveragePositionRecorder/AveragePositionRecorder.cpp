@@ -11,11 +11,6 @@ AveragePositionRecorder::AveragePositionRecorder () : Actor()//, ofile("")
 	interval = 50;
 }
 
-AveragePositionRecorder::~AveragePositionRecorder ()
-{
-
-}
-
 void AveragePositionRecorder::postProcessAttributes(bool deserializing)
 {
 	if(deserializing)

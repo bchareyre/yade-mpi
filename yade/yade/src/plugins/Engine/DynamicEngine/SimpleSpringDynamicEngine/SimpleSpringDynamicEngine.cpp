@@ -9,16 +9,6 @@ SimpleSpringDynamicEngine::SimpleSpringDynamicEngine () : DynamicEngine()
 	first = true;
 }
 
-SimpleSpringDynamicEngine::~SimpleSpringDynamicEngine ()
-{
-
-}
-
-void SimpleSpringDynamicEngine::postProcessAttributes(bool)
-{
-
-}
-
 void SimpleSpringDynamicEngine::registerAttributes()
 {
 }

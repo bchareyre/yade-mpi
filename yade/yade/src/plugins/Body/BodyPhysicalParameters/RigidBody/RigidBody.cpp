@@ -1,16 +1,14 @@
 #include "RigidBody.hpp"
 
-RigidBody::RigidBody () : Particle()
+RigidBody::RigidBody() : Particle()
 {
 	createIndex();
 	acceleration = Vector3r(0,0,0);
 	angularAcceleration = Vector3r(0,0,0);
 }
 
-
 RigidBody::~RigidBody()
 {
-
 }
 
 void RigidBody::postProcessAttributes(bool deserializing)

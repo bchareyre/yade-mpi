@@ -13,8 +13,3 @@
 using namespace std;
 
 // FIXME - delete this file
-
-// SimpleBody::SimpleBody() : Body()
-// {
-// //	containSubBodies = false;
-// }

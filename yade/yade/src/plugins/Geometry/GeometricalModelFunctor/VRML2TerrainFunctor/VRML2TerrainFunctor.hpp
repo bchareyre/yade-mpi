@@ -6,11 +6,8 @@
 
 class VRML2TerrainFunctor : public GeometricalModelFunctor
 {
-	// construction
-	public : VRML2TerrainFunctor ();
-	public : ~VRML2TerrainFunctor ();
 
-	public : boost::shared_ptr<GeometricalModel> createGeometricalModel();
+	public : void go(int);
 
 };
 

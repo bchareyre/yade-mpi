@@ -36,8 +36,8 @@
 class TimeIntegratorFunctor : public FunctorWrapper
 		<
 		 void ,
-		 TYPELIST_2(
-				  const shared_ptr<BodyPhysicalParameters>&, unsigned int 
+		 TYPELIST_2(	    const shared_ptr<BodyPhysicalParameters>&
+				  , unsigned int 
 		) >
 {
 };

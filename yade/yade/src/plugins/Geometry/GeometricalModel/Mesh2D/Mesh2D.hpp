@@ -56,7 +56,7 @@ class Mesh2D : public GeometricalModel
  	public : vector<vector<int> > triPerVertices;
 	// construction
 	public : Mesh2D ();
-	public : ~Mesh2D ();
+	public : virtual ~Mesh2D ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Serialization										///

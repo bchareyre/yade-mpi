@@ -15,7 +15,6 @@ class ForceRecorder : public Actor
 
 	// construction
 	public : ForceRecorder ();
-	public : ~ForceRecorder ();
 
 	protected : virtual void postProcessAttributes(bool deserializing);
 	public : void registerAttributes();

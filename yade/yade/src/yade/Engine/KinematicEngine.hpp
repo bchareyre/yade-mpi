@@ -67,9 +67,6 @@ class KinematicEngine : public Actor
 	/*! Constructor */
 	public : KinematicEngine ();
 
-	/*! Virtual destructor for correct dealloction of polymorphic pointer */
-	public : virtual ~KinematicEngine ();
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Methods											///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -79,7 +76,6 @@ class KinematicEngine : public Actor
 	*/
 	public : virtual void moveToNextTimeStep(Body* ) { throw; };
 
-	protected : virtual void postProcessAttributes(bool deserializing);
 	public : void registerAttributes();
 	
 	//public : virtual bool isActivated();

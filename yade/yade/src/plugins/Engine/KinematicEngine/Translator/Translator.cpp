@@ -2,15 +2,6 @@
 #include "RigidBody.hpp"
 #include "ComplexBody.hpp"
 
-Translator::Translator () : KinematicEngine() // encapsuler dans implicitfunction user redefini uniquement dp = || interpolateur ...
-{
-}
-
-Translator::~Translator ()
-{
-
-}
-
 void Translator::postProcessAttributes(bool deserializing)
 {
 	if(deserializing)

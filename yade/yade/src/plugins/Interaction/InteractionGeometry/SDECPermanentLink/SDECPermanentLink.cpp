@@ -1,15 +1,9 @@
 #include "SDECPermanentLink.hpp"
 
-SDECPermanentLink::SDECPermanentLink() : InteractionGeometry()
+SDECPermanentLink::~SDECPermanentLink()
 {
 }
 
-
-SDECPermanentLink::~SDECPermanentLink ()
-{
-
-
-}
 
 void SDECPermanentLink::postProcessAttributes(bool /*deserializing*/)
 {

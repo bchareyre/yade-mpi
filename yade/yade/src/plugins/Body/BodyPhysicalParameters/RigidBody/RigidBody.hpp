@@ -10,12 +10,9 @@ class RigidBody : public Particle
 	public : Vector3r inertia;
 	public : Vector3r angularAcceleration;
 	public : Vector3r angularVelocity;
-	// construction
+	
 	public : RigidBody ();
-	public : ~RigidBody ();
-
-
-	//public : void moveToNextTimeStep();
+	public : virtual ~RigidBody ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Serialization										///

@@ -8,7 +8,7 @@
 
 #include "ComplexBody.hpp"
 #include "InteractionVecSet.hpp"
-//#include "InteractionHashMap.hpp"
+#include "InteractionHashMap.hpp"
 #include "BodyRedirectionVector.hpp"
 #include "BodyAssocVector.hpp"
 #include "BoundingVolumeDispatcher.hpp"
@@ -22,7 +22,6 @@ ComplexBody::ComplexBody() :
 	, interactions(new InteractionVecSet)
 	, actions(new ActionVecVec)
 {	
-//	containSubBodies = true;
 }
 
 //#include "InteractionDescriptionSet.hpp"
@@ -30,11 +29,6 @@ void ComplexBody::postProcessAttributes(bool deserializing)
 {
 	if (deserializing)
 	{
-//		// FIXME : build that with InteractionDescriptionFunctor
-//		shared_ptr<InteractionDescriptionSet> set = dynamic_pointer_cast<InteractionDescriptionSet>(interactionGeometry);
-//		for(unsigned int i=0;i<bodies->size();i++)
-//			set->interactionGeometries.push_back((*bodies)[i]->interactionGeometry);
-
 		// to build bounding volume if there is a bounding volume updator in the actor list
 		// FIXME : I don't know is this is so dirty to do that here
 		vector<shared_ptr<Actor> >::iterator ai    = actors.begin();
@@ -54,6 +48,7 @@ void ComplexBody::registerAttributes()
 	REGISTER_ATTRIBUTE(bodies);
 	REGISTER_ATTRIBUTE(interactions);
 	REGISTER_ATTRIBUTE(permanentInteractions);
+//	REGISTER_ATTRIBUTE(actions); // FIXME - needed or not ?
 }
 
 

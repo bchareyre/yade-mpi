@@ -50,9 +50,6 @@ class SDECDynamicEngine : public DynamicEngine
 /// Attributes											///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-	//private : std::vector<Vector3r> forces;
-	//private : std::vector<Vector3r> moments;
-
 	private : bool first;
 	private : shared_ptr<Action> actionForce;
 	private : shared_ptr<Action> actionMomentum;
@@ -61,13 +58,8 @@ class SDECDynamicEngine : public DynamicEngine
 /// Constructor/Destructor								        ///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-	/*! Constructor */
 	public : SDECDynamicEngine();
 
-	/*! Destructor */
-	public : virtual ~SDECDynamicEngine();
-
-	protected : virtual void postProcessAttributes(bool deserializing);
 	public : void registerAttributes();
 
 	public : void respondToInteractions(Body* body);

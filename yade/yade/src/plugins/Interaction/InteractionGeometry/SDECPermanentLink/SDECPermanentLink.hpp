@@ -9,6 +9,8 @@
 
 class SDECPermanentLink : public InteractionGeometry
 {
+	public : virtual ~SDECPermanentLink();
+
 	public : Real radius1;
 	public : Real radius2;
 	public : Vector3r normal;			// new unit normal of the contact plane.
@@ -44,10 +46,6 @@ class SDECPermanentLink : public InteractionGeometry
 //	public : Real averageRadius;
 //	public : Real kr;
 ////////////////////////////////////////////////////////
-
-	// construction
-	public : SDECPermanentLink ();
-	public : ~SDECPermanentLink ();
 
 	protected : virtual void postProcessAttributes(bool deserializing);
 	public : void registerAttributes();

@@ -48,7 +48,8 @@ void ActionContainer::registerAttributes()
 	REGISTER_ATTRIBUTE(action);
 };
 
-/*
+/* FIXME - this is needed or not?
+
 void ActionContainer::preProcessAttributes(bool deserializing)
 {
 	if(deserializing)

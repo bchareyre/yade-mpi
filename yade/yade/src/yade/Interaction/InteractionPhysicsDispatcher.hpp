@@ -41,9 +41,8 @@ class InteractionPhysicsDispatcher : public Actor
 	private: DynLibDispatcher
 		<	TYPELIST_2( BodyPhysicalParameters , BodyPhysicalParameters ) ,	// base classess for dispatch
 			InteractionPhysicsFunctor,					// class that provides multivirtual call
-			void ,							// return type
-			TYPELIST_3(
-					  const shared_ptr<BodyPhysicalParameters>&	// arguments
+			void ,								// return type
+			TYPELIST_3(	  const shared_ptr<BodyPhysicalParameters>&	// arguments
 					, const shared_ptr<BodyPhysicalParameters>&
 					, shared_ptr<Interaction>&
 				)

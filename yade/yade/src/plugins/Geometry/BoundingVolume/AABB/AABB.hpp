@@ -8,20 +8,14 @@ class AABB : public BoundingVolume
 	public : Vector3r halfSize;
 	public : Vector3r center;
 
-	private : Vector3r initialHalfSize;
-	private : Vector3r initialCenter;
-
-
-	// construction
-	public : AABB ();
-
+	public : AABB();
+	public : virtual ~AABB();
+	
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Serialization										///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	REGISTER_CLASS_NAME(AABB);	
-	protected : virtual void postProcessAttributes(bool deserializing);
-	public : void registerAttributes();
 	
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Indexable											///

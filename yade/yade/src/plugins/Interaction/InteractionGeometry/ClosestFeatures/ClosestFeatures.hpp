@@ -8,14 +8,10 @@
 
 class ClosestFeatures : public InteractionGeometry
 {
+	public : virtual ~ClosestFeatures();
+
 	public : std::vector<std::pair<Vector3r,Vector3r> > closestsPoints;
 	public : std::vector<int> verticesId;
-	// construction
-	public : ClosestFeatures ();
-	public : ~ClosestFeatures ();
-
-	protected : virtual void postProcessAttributes(bool deserializing);
-	public : void registerAttributes();
 
 	REGISTER_CLASS_NAME(ClosestFeatures);
 };

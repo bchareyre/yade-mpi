@@ -28,14 +28,13 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void Sphere2AABBFunctor::go(	const shared_ptr<InteractionDescription>& cm,
-				const shared_ptr<BoundingVolume>& bv,
-				const Se3r& se3,
-				const Body*	)
+void Sphere2AABBFunctor::go(	  const shared_ptr<InteractionDescription>& cm
+				, shared_ptr<BoundingVolume>& bv
+				, const Se3r& se3
+				, const Body*	)
 {
-	shared_ptr<InteractionSphere> sphere = dynamic_pointer_cast<InteractionSphere>(cm);
-	
-	shared_ptr<AABB> aabb = dynamic_pointer_cast<AABB>(bv);
+	InteractionSphere* sphere = static_cast<InteractionSphere*>(cm.get());
+	AABB* aabb = static_cast<AABB*>(bv.get());
 	
 	aabb->center = se3.translation;
 	
@@ -43,10 +42,7 @@ void Sphere2AABBFunctor::go(	const shared_ptr<InteractionDescription>& cm,
 	
 	aabb->min = aabb->center-aabb->halfSize;
 	aabb->max = aabb->center+aabb->halfSize;	
-// 	cout << "####"<<endl;
-// 	cout << aabb->halfSize[0] << " "<<aabb->halfSize[1] << " " <<aabb->halfSize[2] << endl;
-// 	cout << aabb->min[0] << " "<<aabb->min[1] << " " <<aabb->min[2] << endl;
-// 	cout << aabb->max[0] << " "<<aabb->max[1] << " " <<aabb->max[2] << endl;
+
 }
 	
 ////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -29,6 +29,7 @@
 
 #include "GeometricalModel.hpp"
 #include "Serializable.hpp"
+#include "FunctorWrapper.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -37,14 +38,8 @@
 	It is used for creating a geometrical model from a given set of parameters.
 	This is very useful when you want to load a file that contains geometrical data or when you want to build an object with that depends on several parameters.
 */
-class GeometricalModelFunctor : public Factorable
+class GeometricalModelFunctor : public FunctorWrapper< void, TYPELIST_1(int) >
 {	
-	// construction
-	public : GeometricalModelFunctor ();
-	public : virtual ~GeometricalModelFunctor ();
-	
-	public : virtual shared_ptr<GeometricalModel> createGeometricalModel() = 0;
-
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

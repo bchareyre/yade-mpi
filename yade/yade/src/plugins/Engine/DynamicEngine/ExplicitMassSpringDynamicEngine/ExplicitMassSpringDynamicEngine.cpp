@@ -13,16 +13,6 @@ ExplicitMassSpringDynamicEngine::ExplicitMassSpringDynamicEngine () : DynamicEng
 	first = true;
 }
 
-ExplicitMassSpringDynamicEngine::~ExplicitMassSpringDynamicEngine ()
-{
-
-}
-
-void ExplicitMassSpringDynamicEngine::postProcessAttributes(bool)
-{
-
-}
-
 void ExplicitMassSpringDynamicEngine::registerAttributes()
 {
 }

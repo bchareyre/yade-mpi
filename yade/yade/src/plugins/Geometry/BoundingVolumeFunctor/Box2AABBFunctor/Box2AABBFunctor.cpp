@@ -29,13 +29,12 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void Box2AABBFunctor::go(	const shared_ptr<InteractionDescription>& cm,
-				const shared_ptr<BoundingVolume>& bv,
+				shared_ptr<BoundingVolume>& bv,
 				const Se3r& se3,
 				const Body*	)
 {
-	shared_ptr<InteractionBox> box = dynamic_pointer_cast<InteractionBox>(cm);
-	
-	shared_ptr<AABB> aabb = dynamic_pointer_cast<AABB>(bv);
+	InteractionBox* box = static_cast<InteractionBox*>(cm.get());
+	AABB* aabb = static_cast<AABB*>(bv.get());
 	
 	aabb->center = se3.translation;
 
@@ -48,7 +47,6 @@ void Box2AABBFunctor::go(	const shared_ptr<InteractionDescription>& cm,
 	
 	aabb->min = aabb->center-aabb->halfSize;
 	aabb->max = aabb->center+aabb->halfSize;
-	
 }
 	
 ////////////////////////////////////////////////////////////////////////////////////////////////////

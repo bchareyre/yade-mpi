@@ -34,10 +34,10 @@
 
 class Sphere2AABBFunctor : public BoundingVolumeFunctor
 {
-	public : void go(	const shared_ptr<InteractionDescription>& cm,
-				const shared_ptr<BoundingVolume>& bv,
-				const Se3r& se3,
-				const Body*	);
+	public : void go(	  const shared_ptr<InteractionDescription>& cm
+				, shared_ptr<BoundingVolume>& bv
+				, const Se3r& se3
+				, const Body*	);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

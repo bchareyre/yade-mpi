@@ -30,15 +30,8 @@ Box::Box () : GeometricalModel()
 {		
 	createIndex();
 }
-
 Box::~Box ()
-{
-
-}
-
-void Box::postProcessAttributes(bool deserializing)
-{
-	GeometricalModel::postProcessAttributes(deserializing);
+{		
 }
 
 void Box::registerAttributes()

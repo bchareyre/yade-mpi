@@ -48,7 +48,7 @@ class ErrorTolerantContactModel : public InteractionGeometry
 	
 	// construction
 	public : ErrorTolerantContactModel ();
-	public : ~ErrorTolerantContactModel ();
+	public : virtual ~ErrorTolerantContactModel ();
 
 	protected : virtual void postProcessAttributes(bool deserializing);
 	public : void registerAttributes();

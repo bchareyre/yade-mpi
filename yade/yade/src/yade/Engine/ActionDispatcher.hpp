@@ -44,9 +44,9 @@ class ActionDispatcher : public Actor
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 	protected: DynLibDispatcher
-		<	TYPELIST_2( Action , BodyPhysicalParameters ) ,		// base classess for dispatch
-			ActionFunctor,						// class that provides multivirtual call
-			void ,							// return type
+		<	TYPELIST_2( Action , BodyPhysicalParameters ) ,	// base classess for dispatch
+			ActionFunctor,					// class that provides multivirtual call
+			void ,						// return type
 			TYPELIST_2(  const shared_ptr<Action>&
 				   , shared_ptr<BodyPhysicalParameters>& )
 		> actionDispatcher;

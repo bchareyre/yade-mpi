@@ -54,8 +54,6 @@ class Particle : public BodyPhysicalParameters
 
 	/*! Constructor */
 	public : Particle();
-
-	/*! Destructor */
 	public : virtual ~Particle();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

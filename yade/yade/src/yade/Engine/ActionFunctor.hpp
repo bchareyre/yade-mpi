@@ -37,8 +37,7 @@
 class ActionFunctor : public FunctorWrapper
 		<
 		 void ,
-		 TYPELIST_2(
-				  const shared_ptr<Action>&
+		 TYPELIST_2(	  const shared_ptr<Action>&
 				, shared_ptr<BodyPhysicalParameters>&
 		) >
 {

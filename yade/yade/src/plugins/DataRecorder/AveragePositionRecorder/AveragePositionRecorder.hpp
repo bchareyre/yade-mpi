@@ -15,7 +15,6 @@ class AveragePositionRecorder : public Actor
 
 	// construction
 	public : AveragePositionRecorder ();
-	public : ~AveragePositionRecorder ();
 
 	protected : virtual void postProcessAttributes(bool deserializing);
 	public : void registerAttributes();

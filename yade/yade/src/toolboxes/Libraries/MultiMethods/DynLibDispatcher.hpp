@@ -194,7 +194,7 @@ class DynLibDispatcher
 					//static bool first=true;
 					//if(first)
 					//{
-					//	cerr << "WARNING: DynLibDispatcher::makeExecutor, dynamic_pointer_cast failed - trying static_pointer_cast instead. This may be due to compiler's bug, or programmer's mistake.\n";
+					//	cerr << "WARNING: DynLibDispatcher::makeExecutor, dynamic_pointer_cast on library: " << libName << " failed - trying static_pointer_cast instead. Check that you have a virtual desctructor.\n";
 					//	first = false;
 					//}
 					executor = boost::static_pointer_cast<Executor>(ClassFactory::instance().createShared(libName));

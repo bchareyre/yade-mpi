@@ -1,24 +1,16 @@
 #include "BoundingSphere.hpp"
 #include "OpenGLWrapper.hpp"
 
-BoundingSphere::BoundingSphere (Real r) : BoundingVolume()
+BoundingSphere::BoundingSphere () : BoundingVolume()
 {
-	radius = r;
 	createIndex();
 }
 
-
 BoundingSphere::~BoundingSphere ()
 {
-
 }
 
-void BoundingSphere::postProcessAttributes(bool)
-{
-
-}
-
-void BoundingSphere::registerAttributes()
+void BoundingSphere::registerAttributes() // FIXME - remove that function, dispatcher shoul take care of that
 {
 	BoundingVolume::registerAttributes();
 	REGISTER_ATTRIBUTE(radius);

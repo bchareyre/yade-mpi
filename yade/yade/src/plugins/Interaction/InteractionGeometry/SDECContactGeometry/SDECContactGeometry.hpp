@@ -8,6 +8,8 @@
 
 class SDECContactGeometry : public InteractionGeometry
 {
+	public : virtual ~SDECContactGeometry();
+
 	public : Real radius1;
 	public : Real radius2;
 	public : Vector3r normal;			// new unit normal of the contact plane.
@@ -23,13 +25,6 @@ class SDECContactGeometry : public InteractionGeometry
 // 	public : Vector3r prevNormal;			// unit normal of the contact plane.
 // 	public : Vector3r normalForce;			// normal force applied on a DE
 // 	public : Vector3r shearForce;			// shear force applied on a DE
-
-	// construction
-	public : SDECContactGeometry ();
-	public : ~SDECContactGeometry ();
-
-	protected : virtual void postProcessAttributes(bool deserializing);
-	public : void registerAttributes();
 
 	REGISTER_CLASS_NAME(SDECContactGeometry);
 };

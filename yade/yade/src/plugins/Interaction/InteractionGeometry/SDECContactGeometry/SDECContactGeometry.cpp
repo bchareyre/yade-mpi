@@ -1,21 +1,19 @@
 #include "SDECContactGeometry.hpp"
 
-SDECContactGeometry::SDECContactGeometry() : InteractionGeometry()
-{
-}
-
-
+// SDECContactGeometry::SDECContactGeometry() : InteractionGeometry()
+// {
+// }
+// 
+// 
 SDECContactGeometry::~SDECContactGeometry ()
 {
-
-
 }
-
-void SDECContactGeometry::postProcessAttributes(bool)
-{
-
-}
-
-void SDECContactGeometry::registerAttributes()
-{
-}
+// 
+// void SDECContactGeometry::postProcessAttributes(bool)
+// {
+// 
+// }
+// 
+// void SDECContactGeometry::registerAttributes()
+// {
+// }

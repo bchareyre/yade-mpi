@@ -9,16 +9,6 @@ KinematicEngine::KinematicEngine() : Actor()
 	subscribedBodies.resize(0);
 }
 
-KinematicEngine::~KinematicEngine() 
-{
-
-}
-
-void KinematicEngine::postProcessAttributes(bool)
-{
-
-}
-
 void KinematicEngine::registerAttributes()
 {
 	REGISTER_ATTRIBUTE(subscribedBodies);

@@ -8,11 +8,8 @@ class SDECDiscreteElement : public RigidBody
 	public : Real kn;
 	public : Real ks;
 
-	// construction
 	public : SDECDiscreteElement ();
-	public : ~SDECDiscreteElement ();
-
-	//public : void moveToNextTimeStep();
+	public : virtual ~SDECDiscreteElement ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Serialization										///

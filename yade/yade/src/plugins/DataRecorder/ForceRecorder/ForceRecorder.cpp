@@ -11,11 +11,6 @@ ForceRecorder::ForceRecorder () : Actor()//, ofile("")
 	interval = 50;
 }
 
-ForceRecorder::~ForceRecorder ()
-{
-
-}
-
 void ForceRecorder::postProcessAttributes(bool deserializing)
 {
 	if(deserializing)

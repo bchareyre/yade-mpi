@@ -2,20 +2,6 @@
 #include "RigidBody.hpp"
 #include "ComplexBody.hpp"
 
-Rotor::Rotor () : KinematicEngine() // encapsuler dans implicitfunction user redefini uniquement dp = || interpolateur ...
-{
-}
-
-Rotor::~Rotor ()
-{
-
-}
-
-void Rotor::postProcessAttributes(bool)
-{
-
-}
-
 void Rotor::registerAttributes()
 {
 	KinematicEngine::registerAttributes();

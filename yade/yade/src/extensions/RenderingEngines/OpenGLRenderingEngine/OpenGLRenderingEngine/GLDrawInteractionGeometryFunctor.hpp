@@ -40,6 +40,7 @@ class GLDrawInteractionGeometryFunctor : public FunctorWrapper
 		 TYPELIST_2(const shared_ptr<InteractionDescription>&, const shared_ptr<BodyPhysicalParameters>&) 
 		>
 {
+	public : virtual ~GLDrawInteractionGeometryFunctor() {};
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
