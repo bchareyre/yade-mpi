@@ -6,7 +6,7 @@
 CONFIG += debug \
           warn_on 
 TEMPLATE = subdirs 
-SUBDIRS += Serialization \
+SUBDIRS += IOManager \
            Factory \
            MultiMethods \
            Interaction \

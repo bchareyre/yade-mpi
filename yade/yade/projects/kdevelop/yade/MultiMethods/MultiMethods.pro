@@ -3,8 +3,10 @@
 # Subdir relative project main directory: ./yade/MultiMethods
 # Target is a library:  
 
-LIBS += -rdynamic 
+LIBS += -lSerialization \
+        -rdynamic 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
+QMAKE_LIBDIR = ../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) 
 DESTDIR = $(YADECOMPILATIONPATH) 
 CONFIG += debug \
           warn_on \

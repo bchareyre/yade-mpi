@@ -5,13 +5,13 @@
 
 LIBS += -lQtGUIGenerator \
         -lRigidBody \
+        -lSerialization \
         $(YADECOMPILATIONPATH)/libBody.a \
         $(YADECOMPILATIONPATH)/libEngine.a \
         $(YADECOMPILATIONPATH)/libGeometry.a \
         $(YADECOMPILATIONPATH)/libInteraction.a \
         $(YADECOMPILATIONPATH)/libMultiMethods.a \
         $(YADECOMPILATIONPATH)/libFactory.a \
-        $(YADECOMPILATIONPATH)/libSerialization.a \
         -rdynamic 
 INCLUDEPATH = ../../frontends/QtGUIGenerator \
               ../../plugins/Body/RigidBody \
@@ -22,13 +22,15 @@ INCLUDEPATH = ../../frontends/QtGUIGenerator \
               ../../yade/Interaction \
               ../../yade/MultiMethods \
               ../../yade/Factory \
-              ../../yade/Serialization \
-              ../../toolboxes/Math 
+              ../../yade/IOManager \
+              ../../toolboxes/Math \
+              ../../toolboxes/Libraries/Serialization 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 QMAKE_LIBDIR = ../../frontends/QtGUIGenerator/$(YADEDYNLIBPATH) \
                ../../plugins/Body/RigidBody/$(YADEDYNLIBPATH) \
+               ../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
 CONFIG += debug \

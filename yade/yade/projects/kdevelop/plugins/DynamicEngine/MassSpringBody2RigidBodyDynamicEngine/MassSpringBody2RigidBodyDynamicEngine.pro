@@ -9,13 +9,13 @@ LIBS += -lMassSpringBody \
         -lSimpleSpringDynamicEngine \
         -lMesh2D \
         -lClosestFeatures \
+        -lSerialization \
         $(YADECOMPILATIONPATH)/libBody.a \
         $(YADECOMPILATIONPATH)/libEngine.a \
         $(YADECOMPILATIONPATH)/libGeometry.a \
         $(YADECOMPILATIONPATH)/libInteraction.a \
         $(YADECOMPILATIONPATH)/libMultiMethods.a \
         $(YADECOMPILATIONPATH)/libFactory.a \
-        $(YADECOMPILATIONPATH)/libSerialization.a \
         -rdynamic 
 INCLUDEPATH = ../../../plugins/DynamicEngine/SimpleSpringDynamicEngine \
               ../../../plugins/Body/MassSpringBody \
@@ -29,9 +29,9 @@ INCLUDEPATH = ../../../plugins/DynamicEngine/SimpleSpringDynamicEngine \
               ../../../yade/Interaction \
               ../../../yade/MultiMethods \
               ../../../yade/Factory \
-              ../../../yade/Serialization \
+              ../../../toolboxes/ComputationalGeometry/Distances \
               ../../../toolboxes/Math \
-              ../../../toolboxes/ComputationalGeometry/Distances 
+              ../../../toolboxes/Libraries/Serialization 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
@@ -41,6 +41,7 @@ QMAKE_LIBDIR = ../../../plugins/Body/MassSpringBody/$(YADEDYNLIBPATH) \
                ../../../plugins/DynamicEngine/SimpleSpringDynamicEngine/$(YADEDYNLIBPATH) \
                ../../../plugins/GeometricalModel/Mesh2D/$(YADEDYNLIBPATH) \
                ../../../plugins/InteractionModel/ClosestFeatures/$(YADEDYNLIBPATH) \
+               ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
 CONFIG += debug \

@@ -4,13 +4,13 @@
 # Target is a library:  
 
 LIBS += -lRigidBody \
+        -lSerialization \
         $(YADECOMPILATIONPATH)/libBody.a \
         $(YADECOMPILATIONPATH)/libEngine.a \
         $(YADECOMPILATIONPATH)/libGeometry.a \
         $(YADECOMPILATIONPATH)/libInteraction.a \
         $(YADECOMPILATIONPATH)/libMultiMethods.a \
         $(YADECOMPILATIONPATH)/libFactory.a \
-        $(YADECOMPILATIONPATH)/libSerialization.a \
         -rdynamic 
 INCLUDEPATH = ../../../plugins/Body/RigidBody \
               ../../../yade/yade \
@@ -20,12 +20,13 @@ INCLUDEPATH = ../../../plugins/Body/RigidBody \
               ../../../yade/Interaction \
               ../../../yade/MultiMethods \
               ../../../yade/Factory \
-              ../../../yade/Serialization \
-              ../../../toolboxes/Math 
+              ../../../toolboxes/Math \
+              ../../../toolboxes/Libraries/Serialization 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 QMAKE_LIBDIR = ../../../plugins/Body/RigidBody/$(YADEDYNLIBPATH) \
+               ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
 CONFIG += debug \

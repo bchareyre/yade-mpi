@@ -9,16 +9,17 @@ LIBS += -lMath \
         $(YADECOMPILATIONPATH)/libGeometry.a \
         $(YADECOMPILATIONPATH)/libInteraction.a \
         $(YADECOMPILATIONPATH)/libMultiMethods.a \
+        $(YADECOMPILATIONPATH)/libIOManager.a \
         $(YADECOMPILATIONPATH)/libFactory.a \
-        $(YADECOMPILATIONPATH)/libSerialization.a \
         -lboost_date_time \
         -lglut \
         -lQGLViewer \
         -rdynamic 
 INCLUDEPATH = ../../yade/yade \
               ../../yade/Factory \
-              ../../yade/Serialization \
-              ../../toolboxes/Math 
+              ../../yade/IOManager \
+              ../../toolboxes/Math \
+              ../../toolboxes/Libraries/Serialization 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 

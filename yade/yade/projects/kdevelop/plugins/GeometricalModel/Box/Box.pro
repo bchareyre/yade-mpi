@@ -3,24 +3,25 @@
 # Subdir relative project main directory: ./plugins/GeometricalModel/Box
 # Target is a library:  
 
-LIBS += $(YADECOMPILATIONPATH)/libBody.a \
+LIBS += -lSerialization \
+        $(YADECOMPILATIONPATH)/libBody.a \
         $(YADECOMPILATIONPATH)/libEngine.a \
         $(YADECOMPILATIONPATH)/libGeometry.a \
         $(YADECOMPILATIONPATH)/libInteraction.a \
         $(YADECOMPILATIONPATH)/libMultiMethods.a \
         $(YADECOMPILATIONPATH)/libFactory.a \
-        $(YADECOMPILATIONPATH)/libSerialization.a \
-	-rdynamic 
+        -rdynamic 
 INCLUDEPATH = ../../../yade/yade \
               ../../../yade/Geometry \
               ../../../yade/MultiMethods \
               ../../../yade/Factory \
-              ../../../yade/Serialization \
-              ../../../toolboxes/Math 
+              ../../../toolboxes/Math \
+              ../../../toolboxes/Libraries/Serialization 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = $(YADEDYNLIBPATH) 
+QMAKE_LIBDIR = ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
+               $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
 CONFIG += debug \
           warn_on \

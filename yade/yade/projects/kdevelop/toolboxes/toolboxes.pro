@@ -9,6 +9,7 @@ OBJECTS_DIR = $(YADECOMPILATIONPATH)
 CONFIG += debug \
           warn_on 
 TEMPLATE = subdirs 
-SUBDIRS += ComputationalGeometry \
-           DataStructures \
-           Math 
+SUBDIRS += Libraries \
+           Math \
+           ComputationalGeometry \
+           DataStructures 

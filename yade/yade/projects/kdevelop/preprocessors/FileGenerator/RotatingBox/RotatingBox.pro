@@ -14,13 +14,13 @@ LIBS += -lAABB \
         -lBallisticDynamicEngine \
         -lSDECDynamicEngine \
         -lSDECDiscreteElement \
+        -lSerialization \
         $(YADECOMPILATIONPATH)/libBody.a \
         $(YADECOMPILATIONPATH)/libEngine.a \
         $(YADECOMPILATIONPATH)/libGeometry.a \
         $(YADECOMPILATIONPATH)/libInteraction.a \
         $(YADECOMPILATIONPATH)/libMultiMethods.a \
         $(YADECOMPILATIONPATH)/libFactory.a \
-        $(YADECOMPILATIONPATH)/libSerialization.a \
         -rdynamic 
 INCLUDEPATH = ../../../plugins/DynamicEngine/SDECDynamicEngine \
               ../../../plugins/DynamicEngine/BallisticDynamicEngine \
@@ -40,8 +40,9 @@ INCLUDEPATH = ../../../plugins/DynamicEngine/SDECDynamicEngine \
               ../../../yade/Interaction \
               ../../../yade/MultiMethods \
               ../../../yade/Factory \
-              ../../../yade/Serialization \
-              ../../../toolboxes/Math 
+              ../../../yade/IOManager \
+              ../../../toolboxes/Math \
+              ../../../toolboxes/Libraries/Serialization 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
@@ -56,6 +57,7 @@ QMAKE_LIBDIR = ../../../plugins/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
                ../../../plugins/DynamicEngine/BallisticDynamicEngine/$(YADEDYNLIBPATH) \
                ../../../plugins/DynamicEngine/SDECDynamicEngine/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/SDECDiscreteElement/$(YADEDYNLIBPATH) \
+               ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
 CONFIG += debug \

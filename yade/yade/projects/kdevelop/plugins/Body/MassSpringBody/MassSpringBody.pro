@@ -5,13 +5,13 @@
 
 LIBS += -lMesh2D \
         -lAABB \
+        -lSerialization \
         $(YADECOMPILATIONPATH)/libBody.a \
         $(YADECOMPILATIONPATH)/libEngine.a \
         $(YADECOMPILATIONPATH)/libGeometry.a \
         $(YADECOMPILATIONPATH)/libInteraction.a \
         $(YADECOMPILATIONPATH)/libMultiMethods.a \
         $(YADECOMPILATIONPATH)/libFactory.a \
-        $(YADECOMPILATIONPATH)/libSerialization.a \
         -rdynamic 
 INCLUDEPATH = ../../../plugins/GeometricalModel/Mesh2D \
               ../../../plugins/BoundingVolume/AABB \
@@ -22,13 +22,14 @@ INCLUDEPATH = ../../../plugins/GeometricalModel/Mesh2D \
               ../../../yade/Interaction \
               ../../../yade/MultiMethods \
               ../../../yade/Factory \
-              ../../../yade/Serialization \
-              ../../../toolboxes/Math 
+              ../../../toolboxes/Math \
+              ../../../toolboxes/Libraries/Serialization 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 QMAKE_LIBDIR = ../../../plugins/GeometricalModel/Mesh2D/$(YADEDYNLIBPATH) \
                ../../../plugins/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
+               ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
 CONFIG += debug \

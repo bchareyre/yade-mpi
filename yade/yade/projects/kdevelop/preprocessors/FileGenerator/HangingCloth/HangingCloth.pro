@@ -15,13 +15,13 @@ LIBS += -lMesh2D \
         -lSimpleSpringDynamicEngine \
         -lMassSpringBody \
         -lMassSpringBody2RigidBodyDynamicEngine \
+        -lSerialization \
         $(YADECOMPILATIONPATH)/libBody.a \
         $(YADECOMPILATIONPATH)/libEngine.a \
         $(YADECOMPILATIONPATH)/libGeometry.a \
         $(YADECOMPILATIONPATH)/libInteraction.a \
         $(YADECOMPILATIONPATH)/libMultiMethods.a \
         $(YADECOMPILATIONPATH)/libFactory.a \
-        $(YADECOMPILATIONPATH)/libSerialization.a \
         -rdynamic 
 INCLUDEPATH = ../../../plugins/DynamicEngine/MassSpringBody2RigidBodyDynamicEngine \
               ../../../plugins/DynamicEngine/BallisticDynamicEngine \
@@ -42,8 +42,9 @@ INCLUDEPATH = ../../../plugins/DynamicEngine/MassSpringBody2RigidBodyDynamicEngi
               ../../../yade/Interaction \
               ../../../yade/MultiMethods \
               ../../../yade/Factory \
-              ../../../yade/Serialization \
-              ../../../toolboxes/Math 
+              ../../../yade/IOManager \
+              ../../../toolboxes/Math \
+              ../../../toolboxes/Libraries/Serialization 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
@@ -59,6 +60,7 @@ QMAKE_LIBDIR = ../../../plugins/GeometricalModel/Mesh2D/$(YADEDYNLIBPATH) \
                ../../../plugins/DynamicEngine/SimpleSpringDynamicEngine/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/MassSpringBody/$(YADEDYNLIBPATH) \
                ../../../plugins/DynamicEngine/MassSpringBody2RigidBodyDynamicEngine/$(YADEDYNLIBPATH) \
+               ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
 CONFIG += debug \

@@ -3,13 +3,15 @@
 # Subdir relative project main directory: ./yade/Geometry
 # Target is a library:  
 
-LIBS += -rdynamic 
+LIBS += -lSerialization \
+        -rdynamic 
 INCLUDEPATH = ../../yade/yade \
               ../../yade/MultiMethods \
               ../../yade/Factory \
-              ../../yade/Serialization \
-              ../../toolboxes/Math 
+              ../../toolboxes/Math \
+              ../../toolboxes/Libraries/Serialization 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
+QMAKE_LIBDIR = ../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) 
 DESTDIR = $(YADECOMPILATIONPATH) 
 CONFIG += debug \
           warn_on \
