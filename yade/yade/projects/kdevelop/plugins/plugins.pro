@@ -17,8 +17,8 @@ SUBDIRS += InteractionGeometry \
            BoundingVolumeFactory \
            CollisionGeometryFactory \
            GeometricalModelFactory \
-           NarrowCollider \
-           BroadCollider \
+           NarrowInteractor \
+           BroadInteractor \
            CollisionFunctor \
            Body \
            KinematicEngine \
