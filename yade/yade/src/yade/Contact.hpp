@@ -45,7 +45,7 @@ class Contact : public Interaction
 	// construction
 	public : Contact ();
 	public : Contact (int i1,int i2);
-	public : ~Contact ();
+	public : virtual ~Contact ();
 	
 };
 

@@ -13,18 +13,16 @@ class SDECContactModel : public InteractionModel
 	public : Vector3 normal;			// new unit normal of the contact plane.
 	public : float penetrationDepth;
 	public : Vector3 contactPoint;
-	/*public : float kn;				// normal elastic constant.
+
+	public : float kn;				// normal elastic constant.
 	public : float ks;				// shear elastic constant.
 	public : float initialKn;			// initial normal elastic constant.
 	public : float initialKs;			// initial shear elastic constant.
 	public : float equilibriumDistance;		// equilibrium distance
 	public : float initialEquilibriumDistance;	// initial equilibrium distance
 	public : Vector3 prevNormal;			// unit normal of the contact plane.
-	public : Vector3 normal;			// new unit normal of the contact plane.
 	public : Vector3 normalForce;			// normal force applied on a DE
 	public : Vector3 shearForce;			// shear force applied on a DE
-	public : bool accessed;*/
-
 
 	// construction
 	public : SDECContactModel ();

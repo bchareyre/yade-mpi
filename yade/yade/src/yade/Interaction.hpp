@@ -47,6 +47,7 @@ class Interaction
 	//vector<shared_ptr<Body> >
 	
 	public : shared_ptr<InteractionModel> interactionModel;
+	public : bool isNew;
 	
 	// construction
 	public : Interaction ();

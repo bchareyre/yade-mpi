@@ -37,6 +37,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <set>
+#include <boost/tuple/tuple.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -48,45 +49,15 @@ class SDECDynamicEngine : public DynamicEngine
 /// Typedef											///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-	struct interactionInfo
+	struct lessThanTuple
 	{
-		//int id1;
-		//int id2;
-		//int id;
-		float	kn;				// normal elastic constant.
-		float	ks;				// shear elastic constant.
-		float	initialKn;			// initial normal elastic constant.
-		float	initialKs;			// initial shear elastic constant.
-		float	equilibriumDistance;		// equilibrium distance
-		float initialEquilibriumDistance;	// initial equilibrium distance
-		Vector3 prevNormal;			// unit normal of the contact plane.
-		Vector3	normal;				// new unit normal of the contact plane.
-		Vector3 normalForce;			// normal force applied on a DE
-		Vector3 shearForce;			// shear force applied on a DE
-		bool accessed;
-	};
-
-	//map<pair<int,int> , interactionInfo > originalInteractions;
-
-	/*struct lessThanPair
-	{
-		bool operator()(const pair<int,int> p1, const pair<int,int> p2) const
+		bool operator()(const tuple<int,bool,shared_ptr<InteractionModel> >& p1, const tuple<int,bool,shared_ptr<InteractionModel> >& p2) const
 		{
-			return (p1.first<p2.first || (p1.first==p2.first && p1.second<p2.second));
-		}
-	};*/
-
-	struct lessThanPair
-	{
-		bool operator()(const pair<int,interactionInfo>& p1, const pair<int,interactionInfo>& p2) const
-		{
-			return (p1.first<p2.first);
+			return (p1.get<0>()<p2.get<0>());
 		}
 	};
 	
-	//map<pair<int,int> , interactionInfo, lessThanPair> prevInteractions;
-	//list<interactionInfo> prevInteractions;
-	vector<set<pair<int,interactionInfo>,lessThanPair > > interactionsPerBody;
+	vector<set<tuple<int,bool,shared_ptr<InteractionModel> >,lessThanTuple > > interactionsPerBody;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Attributes											///
@@ -111,6 +82,7 @@ class SDECDynamicEngine : public DynamicEngine
 
 	public : void respondToCollisions(Body* body, const std::list<shared_ptr<Interaction> >& interactions);
 
+	public : void filter(Body* body, const std::list<shared_ptr<Interaction> >& interactions);
 	REGISTER_CLASS_NAME(SDECDynamicEngine);
 };
 
