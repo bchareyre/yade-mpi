@@ -31,7 +31,7 @@
 #include "BodyContainer.hpp"
 //#include "BroadInteractor.hpp"
 //#include "KinematicEngine.hpp"
-//#include "NarrowInteractor.hpp"
+//#include "InteractionGeometryDispatcher.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -40,7 +40,7 @@ class NonConnexBody : public Body
 {
 	//public : vector<shared_ptr<Body> > bodies;
 
-	//public : shared_ptr<NarrowInteractor> narrowCollider;
+	//public : shared_ptr<InteractionGeometryDispatcher> narrowCollider;
 	//public : shared_ptr<BroadInteractor> broadCollider;
 	//public : shared_ptr<KinematicEngine> kinematic;
 

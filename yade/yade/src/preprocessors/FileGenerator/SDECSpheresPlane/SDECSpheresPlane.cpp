@@ -59,7 +59,7 @@ string SDECSpheresPlane::generate()
 	Quaternionr q;
 	q.fromAxisAngle( Vector3r(0,0,1),0);
 
-	shared_ptr<NarrowInteractor> nc	= shared_ptr<NarrowInteractor>(new SimpleNarrowCollider);
+	shared_ptr<InteractionGeometryDispatcher> nc(new InteractionGeometryDispatcher);
 	nc->addCollisionFunctor("Sphere","Sphere","Sphere2Sphere4SDECContactModel");
 	nc->addCollisionFunctor("Sphere","Box","Box2Sphere4SDECContactModel");
 

@@ -43,7 +43,7 @@ string FEMRock::generate()
 	//rootBody->dynamic	   = shared_ptr<DynamicEngine>(new SimpleSpringDynamicEngine);
 	//rootBody->kinematic	   = shared_ptr<KinematicEngine>(new Rotor);
 	//rootBody->broadCollider  = shared_ptr<BroadInteractor>(new SAPCollider);
-	//rootBody->narrowCollider  = shared_ptr<NarrowInteractor>(new SimpleNarrowCollider);
+	//rootBody->narrowCollider  = shared_ptr<InteractionGeometryDispatcher>(new SimpleNarrowCollider);
 	rootBody->isDynamic      = false;
 	rootBody->velocity       = Vector3r(0,0,0);
 	rootBody->angularVelocity= Vector3r(0,0,0);

@@ -21,12 +21,17 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "PhysicalInteractor.hpp"
+#include "SDECLinearContactModel.hpp"
+#include "SDECContactGeometry.hpp"
+#include "SDECContactPhysics.hpp"
+#include "Omega.hpp"
+#include "NonConnexBody.hpp"
+#include "SDECDiscreteElement.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-PhysicalInteractor::PhysicalInteractor() : Actor()
+SDECLinearContactModel::SDECLinearContactModel() : InteractionPhysicsDispatcher()
 {
 
 }
@@ -34,7 +39,7 @@ PhysicalInteractor::PhysicalInteractor() : Actor()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-PhysicalInteractor::~PhysicalInteractor()
+SDECLinearContactModel::~SDECLinearContactModel()
 {
 
 }
@@ -42,33 +47,59 @@ PhysicalInteractor::~PhysicalInteractor()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void PhysicalInteractor::postProcessAttributes(bool)
-{
-
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-void PhysicalInteractor::registerAttributes()
+void SDECLinearContactModel::postProcessAttributes(bool)
 {
 
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-
-void PhysicalInteractor::action(Body* b)
+	
+void SDECLinearContactModel::registerAttributes()
 {
-	this->computeMechanicalParameters(b);
+	InteractionPhysicsDispatcher::registerAttributes();
 }
-
+	
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void  PhysicalInteractor::computeMechanicalParameters(Body* )
+//FIXME : not easy for a user to write
+void SDECLinearContactModel::computeMechanicalParameters(Body*body)
 {
-	throw;
-}
+	NonConnexBody * ncb = dynamic_cast<NonConnexBody*>(body);
+	shared_ptr<BodyContainer> bodies = ncb->bodies;
+	shared_ptr<Interaction> contact;
+	
+	for( ncb->interactions->gotoFirst() ; ncb->interactions->notAtEnd() ; ncb->interactions->gotoNext() )
+	{
+		contact = ncb->interactions->getCurrent();
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+		int id1 = contact->getId1();
+		int id2 = contact->getId2();
+
+		shared_ptr<SDECDiscreteElement> de1 	= dynamic_pointer_cast<SDECDiscreteElement>((*bodies)[id1]);
+		shared_ptr<SDECDiscreteElement> de2 	= dynamic_pointer_cast<SDECDiscreteElement>((*bodies)[id2]);
+		shared_ptr<SDECContactGeometry> currentContactGeometry = dynamic_pointer_cast<SDECContactGeometry>(contact->interactionGeometry);
+		shared_ptr<SDECContactPhysics> currentContactPhysics;
+		
+		if ( contact->isNew)
+		{
+			contact->interactionPhysics = shared_ptr<SDECContactPhysics>(new SDECContactPhysics());
+			currentContactPhysics = dynamic_pointer_cast<SDECContactPhysics>(contact->interactionPhysics);
+			
+			currentContactPhysics->initialKn			= 2*(de1->kn*de2->kn)/(de1->kn+de2->kn);
+			currentContactPhysics->initialKs			= 2*(de1->ks*de2->ks)/(de1->ks+de2->ks);
+			currentContactPhysics->prevNormal 			= currentContactGeometry->normal;
+			currentContactPhysics->initialEquilibriumDistance	= currentContactGeometry->radius1+currentContactGeometry->radius2;
+		}
+		else
+			currentContactPhysics = dynamic_pointer_cast<SDECContactPhysics>(contact->interactionPhysics);
+		
+		currentContactPhysics->kn = currentContactPhysics->initialKn;
+		currentContactPhysics->ks = currentContactPhysics->initialKs;
+		currentContactPhysics->equilibriumDistance = currentContactPhysics->initialEquilibriumDistance;
+	}
+};
+
+
+

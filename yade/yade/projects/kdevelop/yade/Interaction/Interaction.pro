@@ -6,18 +6,18 @@
 HEADERS += Interaction.hpp \
            InteractionContainer.hpp \
            InteractionGeometry.hpp \
-           InteractionPhysics.hpp  \
+           InteractionPhysics.hpp \
            InteractionFunctor.hpp \
-	   BroadInteractor.hpp \
-	   NarrowInteractor.hpp \
-	   PhysicalInteractor.hpp
+           BroadInteractor.hpp \
+           InteractionGeometryDispatcher.hpp \
+           InteractionPhysicsDispatcher.hpp 
 SOURCES += Interaction.cpp \
            InteractionContainer.cpp \
            InteractionGeometry.cpp \
            InteractionPhysics.cpp \
            BroadInteractor.cpp \
-           NarrowInteractor.cpp \
-	   PhysicalInteractor.cpp
+           InteractionGeometryDispatcher.cpp \
+           InteractionPhysicsDispatcher.cpp 
 LIBS += -lMultiMethods \
 -rdynamic
 INCLUDEPATH = $(YADEINCLUDEPATH)
