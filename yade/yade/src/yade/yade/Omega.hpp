@@ -90,14 +90,14 @@ class Omega : public Singleton<Omega>
 
 
 	public : shared_ptr<NonConnexBody> rootBody;
-	public : ptime startingSimulationTime;
-
+	public : ptime sStartingSimulationTime;
+	public : ptime msStartingSimulationTime;
 	private : void buildDynlibList();
 	private : void registerDynlibType(const string& name);
 
-	public	: float 	dt;
+	public	: double 	dt;
 	public	: void 		setTimeStep(const string);
-	public	: float 	getTimeStep();
+	public	: double 	getTimeStep();
 
 	private	: string 	simulationFileName;
 	public	: void 		setSimulationFileName(const string);

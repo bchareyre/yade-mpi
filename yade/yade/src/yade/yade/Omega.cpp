@@ -45,7 +45,7 @@ Omega::Omega ()
 
 Omega::~Omega ()
 {
-	*logFile << "\t" << "<Summary Duration=\"" << startingSimulationTime-second_clock::local_time() << "\">" <<endl;
+	*logFile << "\t" << "<Summary Duration=\"" << sStartingSimulationTime-second_clock::local_time() << "\">" <<endl;
 	*logFile << "</Simulation>" << endl << endl;
 	logFile->close();
 }
@@ -55,7 +55,7 @@ Omega::~Omega ()
 
 void Omega::logError(const string& str)
 {
-	*logFile << "\t" << "<Error Date=\"" << startingSimulationTime-second_clock::local_time() << "\" " << "Message =\""<< str << "\"" << endl;
+	*logFile << "\t" << "<Error Date=\"" << sStartingSimulationTime-second_clock::local_time() << "\" " << "Message =\""<< str << "\"" << endl;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -63,7 +63,7 @@ void Omega::logError(const string& str)
 
 void Omega::logMessage(const string& str)
 {
-	*logFile << "\t" << "<Message Date=\"" << startingSimulationTime-second_clock::local_time() << "\" " << "Message =\""<< str << "\"" << endl;
+	*logFile << "\t" << "<Message Date=\"" << sStartingSimulationTime-second_clock::local_time() << "\" " << "Message =\""<< str << "\"" << endl;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -221,10 +221,10 @@ Vector3r Omega::getGravity()
 
 void Omega::setTimeStep(const string t)
 {
-	dt = lexical_cast<float>(t);
+	dt = lexical_cast<double>(t);
 }
 
-float Omega::getTimeStep()
+double Omega::getTimeStep()
 {
 	return dt;
 }
@@ -247,8 +247,11 @@ void Omega::loadSimulation()
 
 		IOManager::loadFromFile("XMLManager",simulationFileName,"rootBody",Omega::instance().rootBody);
 		Omega::instance().logMessage("Loading file " + simulationFileName);
-		startingSimulationTime = second_clock::local_time();
-		*logFile << "<Simulation" << " Date =\"" << startingSimulationTime << "\">" << endl;
+		
+		sStartingSimulationTime = second_clock::local_time();
+		msStartingSimulationTime = microsec_clock::local_time();
+		
+		*logFile << "<Simulation" << " Date =\"" << sStartingSimulationTime << "\">" << endl;
 		currentIteration = 0;
 		simulationTime = 0;
 	}

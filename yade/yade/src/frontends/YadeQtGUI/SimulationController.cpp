@@ -12,6 +12,8 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
+
 
 using namespace boost;
 
@@ -109,31 +111,37 @@ void SimulationControllerUpdater::oneLoop()
 	controller->lcdCurrentIteration->display(lexical_cast<string>(Omega::instance().getCurrentIteration()));
 	double simulationTime = Omega::instance().getSimulationTime();
 	
-	/*long int nsec	= (long int)(simulationTime*1000000000);
-	long int misec	= (long int)(simulationTime*1000000000);
-	 
-	int sec		= (int)((simulationTime));
-	cout << sec << endl;
-	int min		= (int)(((double)sec/60.0));	
+	unsigned int sec	= (unsigned int)(simulationTime);
+	unsigned int min	= sec/60;
+	double time		= (simulationTime-sec)*1000;
+	unsigned int msec	= (unsigned int)(time);
+	time			= (time-msec)*1000;
+	unsigned int misec	= (unsigned int)(time);
+	time			= (time-misec)*1000;
+	unsigned int nsec	= (unsigned int)(time);
+	sec			= sec-60*min;
+		
+	controller->lcdMinutev->display(lexical_cast<string>(min));
+	controller->lcdSecondv->display(lexical_cast<string>(sec));
+	controller->lcdMSecondv->display(lexical_cast<string>(msec));
+	controller->lcdMiSecondv->display(lexical_cast<string>(misec));
+	controller->lcdNSecondv->display(lexical_cast<string>(nsec));
 	
+	time_duration duration = microsec_clock::local_time()-Omega::instance().msStartingSimulationTime;
 	
+	unsigned int hours	= duration.hours();
+	unsigned int minutes 	= duration.minutes();
+	unsigned int seconds	= duration.seconds();
+	unsigned int mseconds	= duration.fractional_seconds()/1000;
+	unsigned int days 	= hours/24;
+	hours			= hours-24*days;
 	
-	double infSec	= (simulationTime-sec)*1000;
-	int msec	= infSec;
-	cout << (simulationTime-sec)*1000 << endl;
-	infSec		= (infSec-msec)*1000; 
-	int misec	= (int)((infSec));
-	cout << misec << endl;
-	infSec		= (infSec-misec)*1000;
-	int nsec	= (int)((infSec));
-	sec		= sec-60*min;
+	controller->lcdDay->display(lexical_cast<string>(days));
+	controller->lcdHour->display(lexical_cast<string>(hours));
+	controller->lcdMinute->display(lexical_cast<string>(minutes));
+	controller->lcdSecond->display(lexical_cast<string>(seconds));
+	controller->lcdMSecond->display(lexical_cast<string>(mseconds));
 
-cout << simulationTime << "  ||  " << min << " " << sec << " " << msec << " " << misec << " " << nsec << endl;
-	lcdMinutev->display(lexical_cast<string>(min));
-	lcdSecondv->display(lexical_cast<string>(sec));
-	lcdMSecondv->display(lexical_cast<string>(msec));
-	lcdMiSecondv->display(lexical_cast<string>(misec));
-	lcdNSecondv->display(lexical_cast<string>(nsec));*/
 }
 
 bool SimulationControllerUpdater::notEnd()

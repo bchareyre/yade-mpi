@@ -48,11 +48,7 @@ void OpenGLRenderingEngine::render(shared_ptr<NonConnexBody> rootBody)
 {
 	const GLfloat pos[4]	= {75.0,130.0,0.0,1.0};
 	Vector3r lightPos(pos[0],pos[1],pos[2]);
-	const GLfloat lightColor[4]	= {1.0,1.0,1.0,1.0};
-	const GLfloat ambientColor[4]	= {0.5,0.5,0.5,1.0};
-	//glLightfv(GL_LIGHT0, GL_POSITION, pos);
-	//glDisable(GL_LIGHT0);
-	
+	const GLfloat ambientColor[4]	= {0.5,0.5,0.5,1.0};	
 	
 	glLightfv(GL_LIGHT0, GL_POSITION, pos);
 	glLightModelfv(GL_LIGHT_MODEL_AMBIENT,ambientColor);
@@ -69,8 +65,6 @@ void OpenGLRenderingEngine::render(shared_ptr<NonConnexBody> rootBody)
 	glPopMatrix();	
 	
 	glEnable(GL_CULL_FACE);
-
-
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Switch between faster/slower method
@@ -221,7 +215,6 @@ void OpenGLRenderingEngine::render(shared_ptr<NonConnexBody> rootBody)
 void OpenGLRenderingEngine::renderRootBody(shared_ptr<NonConnexBody> rootBody)
 {
 	glEnable(GL_NORMALIZE);
-//	glEnable(GL_CULL_FACE);
 
 	rootBody->glDraw();
 }
@@ -233,8 +226,6 @@ void OpenGLRenderingEngine::renderShadowVolumes(shared_ptr<NonConnexBody> rootBo
 	for( ncb->bodies->gotoFirst() ; ncb->bodies->notAtEnd() ; ncb->bodies->gotoNext() )
 	{
 		shared_ptr<Body> b = ncb->bodies->getCurrent();
-		//float p[4];
-      		//glGetLightfv(GL_LIGHT0, GL_POSITION, p);
 		
 		if (b->gm->shadowCaster)
 		{

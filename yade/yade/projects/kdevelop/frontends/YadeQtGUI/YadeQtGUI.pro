@@ -15,6 +15,7 @@ LIBS += -lSerialization \
         -lGLWindowManager \
         -lThreads \
         -lOpenGLRenderingEngine \
+        -lboost_date_time \
         -lboost_filesystem \
         -rdynamic 
 INCLUDEPATH = $(YADEINCLUDEPATH) 
