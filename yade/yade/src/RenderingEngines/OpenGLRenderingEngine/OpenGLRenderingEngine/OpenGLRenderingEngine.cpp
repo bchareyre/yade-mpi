@@ -65,8 +65,8 @@ void OpenGLRenderingEngine::render(shared_ptr<NonConnexBody> rootBody)
 	glPopMatrix();	
 	
 	
-	renderSceneUsingShadowVolumes(rootBody,lightPos);
-//	renderSceneUsingFastShadowVolumes(rootBody,lightPos);
+//	renderSceneUsingShadowVolumes(rootBody,lightPos);
+	renderSceneUsingFastShadowVolumes(rootBody,lightPos);
 
 	// draw transparent shadow volume
 // 	glAlphaFunc(GL_GREATER, 1.0f/255.0f);
@@ -159,28 +159,32 @@ void OpenGLRenderingEngine::renderSceneUsingFastShadowVolumes(shared_ptr<NonConn
 	renderShadowVolumes(rootBody,lightPos);	
 	
 	// Need to do that to remove shadow that are not on object
-// 	glStencilOp(GL_KEEP, GL_KEEP, GL_INCR);	
-// 	glCullFace(GL_BACK);
-// 	glDepthMask(GL_TRUE);
-// 	glDepthMask(GL_LESS);
-// 	glMatrixMode(GL_PROJECTION);
-// 	glPushMatrix();
-// 	glLoadIdentity();
-// 	glOrtho(0, 1, 1, 0, 0.9, -1.0);
-// 	glMatrixMode(GL_MODELVIEW);
-// 	glPushMatrix();
-// 	glLoadIdentity();
-// 	glColor3f(1,0,0);
-// 	glBegin(GL_QUADS);
-// 		glVertex3f(0,0,0.97);
-// 		glVertex3f(0,1,0.97);
-// 		glVertex3f(1,1,0.97);
-// 		glVertex3f(1,0,0.97);
-// 	glEnd();
-// 	glMatrixMode(GL_PROJECTION); 
-// 	glPopMatrix();
-// 	glMatrixMode(GL_MODELVIEW);
-// 	glPopMatrix(); 
+	glStencilOp(GL_KEEP, GL_KEEP, GL_INCR);	
+	glCullFace(GL_BACK);
+	glDepthMask(GL_TRUE);
+	double clearDepthValue=0;
+	glGetDoublev(GL_DEPTH_CLEAR_VALUE,&clearDepthValue);
+	glDepthFunc(GL_EQUAL);
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	glOrtho(0, 1, 1, 0, 0.0, -clearDepthValue);
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
+	
+	glColor3f(1,0,0);
+	glBegin(GL_QUADS);
+		glVertex3f(0,0,clearDepthValue);
+		glVertex3f(0,1,clearDepthValue);
+		glVertex3f(1,1,clearDepthValue);
+		glVertex3f(1,0,clearDepthValue);
+	glEnd();
+	
+	glMatrixMode(GL_PROJECTION); 
+	glPopMatrix();
+	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix(); 
 			
 	glDepthMask(GL_TRUE);
 	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
@@ -202,7 +206,8 @@ void OpenGLRenderingEngine::renderSceneUsingFastShadowVolumes(shared_ptr<NonConn
 	glEnable(GL_ALPHA_TEST);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);	
-	glColor4f(0.3,0.3,0.3,0.4);
+	glDisable(GL_LIGHTING);	
+	glColor4f(0.1,0.1,0.1,0.3);
 	glBegin(GL_QUADS);
 		glVertex2f(0,0);
 		glVertex2f(0,1);
@@ -221,7 +226,8 @@ void OpenGLRenderingEngine::renderSceneUsingFastShadowVolumes(shared_ptr<NonConn
 
 	glDepthFunc(GL_LESS);
 	glDisable(GL_STENCIL_TEST);
-}
+	
+}	
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
