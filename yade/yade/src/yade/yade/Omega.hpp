@@ -77,7 +77,7 @@ class Omega : public Singleton<Omega>
 	public : map<string,string> dynlibsType;
 
 	public : bool getDynlibType(const string& libName,string& type);
-
+	
 	public : shared_ptr<ofstream> logFile;
 
 	private : Vector3r gravity;
@@ -105,7 +105,10 @@ class Omega : public Singleton<Omega>
 	//public  : const long int& getCurrentIteration() const;
 	public  : long int getCurrentIteration();
 	public  : void incrementCurrentIteration();
-	
+	private : double simulationTime;
+	public : double getSimulationTime() { return simulationTime;};
+	public : void incrementSimulationTime() { simulationTime+=dt;};
+		
 	public	: void 		setMaxIteration(const string);
 	public	: long int 	getMaxIteration();
 	

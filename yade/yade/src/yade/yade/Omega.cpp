@@ -64,9 +64,6 @@ void Omega::init()
 
 	logFile = shared_ptr<ofstream>(new ofstream("../data/log.xml", ofstream::out | ofstream::app));
 
-	startingSimulationTime = second_clock::local_time();
-	*logFile << "<Simulation" << " Date =\"" << startingSimulationTime << "\">" << endl;
-
 	// build dynlib information list
 	buildDynlibList();
 
@@ -224,6 +221,10 @@ void Omega::loadSimulation()
 
 		IOManager::loadFromFile("XMLManager",simulationFileName,"rootBody",Omega::instance().rootBody);
 		Omega::instance().logMessage("Loading file " + simulationFileName);
+		startingSimulationTime = second_clock::local_time();
+		*logFile << "<Simulation" << " Date =\"" << startingSimulationTime << "\">" << endl;
+		currentIteration = 0;
+		simulationTime = 0;
 	}
 	else
 	{

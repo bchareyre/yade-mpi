@@ -13,24 +13,10 @@ GLViewer::GLViewer(QWidget * parent, QGLWidget * shareWidget) : QGLViewer(parent
 	showEntireScene();
 	setAnimationPeriod(0);
 	startAnimation();
-	fpsTracker = shared_ptr<FpsTracker>(new FpsTracker(this));
+	fpsTracker = shared_ptr<FpsTracker>(new FpsTracker(this));	
 	//turnId = Omega::instance().getNewTurnId();
 }
 
-/*GLViewer::GLViewer ( QGLContext * context, QWidget * parent) : QGLViewer(context,parent)
-{
-	//FIXME : ine function init()
-	resize(300,300);
-	setSceneCenter(0,0,0);
-	setSceneRadius(200);
-	showEntireScene();
-	setAnimationPeriod(0);
-	startAnimation();
-	fpsTracker = shared_ptr<FpsTracker>(new FpsTracker(this));
-	//turnId = Omega::instance().getNewTurnId();
-
-}*/
-	
 GLViewer::~GLViewer()
 {
 
@@ -40,7 +26,7 @@ GLViewer::~GLViewer()
 void GLViewer::draw()
 {       
 	static int turnId = Omega::instance().getNewTurnId();
-
+	
 	Omega::instance().waitMyTurn(turnId);
 	
 	glEnable(GL_NORMALIZE);
@@ -50,10 +36,10 @@ void GLViewer::draw()
 		Omega::instance().rootBody->glDraw();
 
 	fpsTracker->glDraw();
-
+	fpsTracker->addOneAction();
+	
 	Omega::instance().endMyTurn();
 	
-	fpsTracker->addOneAction();
 }
 
 void GLViewer::mouseMoveEvent(QMouseEvent * e)

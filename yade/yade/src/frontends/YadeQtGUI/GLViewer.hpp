@@ -39,10 +39,9 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 class GLViewer : public QGLViewer
-{
-	
+{	
 	private : shared_ptr<FpsTracker> fpsTracker;
-
+	private : int turnId;
 	// construction
 	public : GLViewer (QWidget * parent=0, QGLWidget * shareWidget=0);
 	//public : GLViewer (QGLContext * context, QWidget * parent=0);

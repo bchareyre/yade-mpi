@@ -27,7 +27,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-ThreadSynchronizer::ThreadSynchronizer() : i(0),nbBlocked(0),nbThreads(0)
+ThreadSynchronizer::ThreadSynchronizer() : i(0),nbThreads(0)
 { 
 }
 
@@ -44,6 +44,8 @@ ThreadSynchronizer::~ThreadSynchronizer()
 
 int ThreadSynchronizer::insertNewThread()
 { 
+//	static boost::mutex mutex1;
+//	boost::mutex::scoped_lock lock(mutex1);
 	return nbThreads++;
 }
 
@@ -53,7 +55,6 @@ int ThreadSynchronizer::insertNewThread()
 void ThreadSynchronizer::wait(int id)
 {
 	boost::mutex::scoped_lock lock(mutex);
-	nbBlocked++;
 	while (i!=id)
 		cond.wait(lock);
 }
@@ -63,10 +64,10 @@ void ThreadSynchronizer::wait(int id)
 
 void ThreadSynchronizer::signal()
 {
+	////static boost::mutex mutex1;
+	//boost::mutex::scoped_lock lock(mutex);	
 	i=(i+1)%nbThreads;
-	for(int j=0;j<nbBlocked+1;j++) 
-		cond.notify_one();
-	nbBlocked--;
+	cond.notify_all();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

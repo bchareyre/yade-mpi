@@ -42,10 +42,10 @@ using namespace std;
 class ThreadSynchronizer
 {
 	private : boost::mutex mutex;
+		
 	private : boost::condition cond;
 	
 	private : int i;
-	private : int nbBlocked;
 	private : int nbThreads;
 	
 	public : ThreadSynchronizer();
