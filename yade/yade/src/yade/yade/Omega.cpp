@@ -99,7 +99,7 @@ void Omega::createSimulationLoop()
 {
 	finishSimulationLoop();
 	joinSimulationLoop();
-	simulationLoop   = shared_ptr<SimulationLoop>(new SimulationLoop(synchronizer));
+	simulationLoop   = shared_ptr<SimulationLoop>(new SimulationLoop());
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

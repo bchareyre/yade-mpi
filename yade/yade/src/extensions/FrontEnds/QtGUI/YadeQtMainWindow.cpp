@@ -38,15 +38,6 @@ YadeQtMainWindow::YadeQtMainWindow() : YadeQtGeneratedMainWindow()
 	workspace = new QWorkspace( vbox );
 	workspace->setBackgroundMode( PaletteMid );
 	setCentralWidget( vbox );
-
-	// FIXME do something here !
-/*	if( Omega::instance().getFileName().size() != 0)
-	{
-		loadSimulation( Omega::instance().getFileName() );
-
-		if( Omega::instance().getAutomatic() )
-			glViewer->startAnimation();
-	}*/
 	
 	simulationController = 0;
 }

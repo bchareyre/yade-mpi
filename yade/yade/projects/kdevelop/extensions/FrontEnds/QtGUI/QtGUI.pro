@@ -7,7 +7,6 @@ FORMS += YadeQtGeneratedMainWindow.ui \
          QtFileGeneratorController.ui \
          QtGeneratedSimulationController.ui \
          QtGeneratedMessageDialog.ui 
-IDLS += QtGeneratedMessageDialog.ui 
 HEADERS += QtGUI.hpp \
            GLViewer.hpp \
            YadeQtMainWindow.hpp \

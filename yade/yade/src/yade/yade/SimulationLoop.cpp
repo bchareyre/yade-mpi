@@ -3,9 +3,9 @@
 #include "Omega.hpp"
 #include "ThreadSynchronizer.hpp"
 
-SimulationLoop::SimulationLoop(shared_ptr<ThreadSynchronizer> s)
+SimulationLoop::SimulationLoop() : Threadable<SimulationLoop>(Omega::instance().synchronizer)
 {
-	createThread(false,s);
+	createThread();
 }
 
 SimulationLoop::~SimulationLoop()

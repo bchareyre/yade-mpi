@@ -76,8 +76,9 @@ SimulationController::SimulationController(QWidget * parent) : QtGeneratedSimula
 	
 	maxNbViews=0;
 	addNewView();
-	
+
 	updater = shared_ptr<SimulationControllerUpdater>(new SimulationControllerUpdater(this));
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

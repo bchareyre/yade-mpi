@@ -42,30 +42,25 @@ using namespace boost;
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class ThreadSynchronizer
-{
+{	
 	private : boost::mutex mutex;
 	public  : boost::mutex* getMutex();
 	
 	private : boost::condition cond;
-	
-	//private : int i;
-	public  : bool notMyTurn(int turn);
-	public  : void setNextCurrentThread();
-
-	//private : int prevI;
-	//private : int * nbThreads;
-	//private : vector<int> redirectionId;
+		
 	private : set<int> ids;
-	private : set<int>::iterator currentId;
 	private : int maxId;
+	private : set<int>::iterator currentId;
+
 	
 	public  : ThreadSynchronizer();
 
-	public  : int getNbThreads();
-	
-	public  : int insertThread();
+	public  : void insertThread(int* myTurn);
 	public  : void removeThread(int id);
 	
+	public  : bool notMyTurn(int turn);
+	public  : void setNextCurrentThread();
+
 	public  : void wait(boost::mutex::scoped_lock& lock);
 	public  : void signal();
 };

@@ -27,28 +27,22 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-ThreadSynchronizer::ThreadSynchronizer()
+ThreadSynchronizer::ThreadSynchronizer() : 	maxId(0),
+						currentId(ids.begin())
 {
-	 //redirectionId.clear();
-	 ids.clear();
-	 maxId = 0;
-	 currentId = ids.begin();
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-int ThreadSynchronizer::insertThread()
+void ThreadSynchronizer::insertThread(int* myTurn)
 { 
 	boost::mutex::scoped_lock lock(mutex);	
-	//int id = redirectionId.size();
-	//redirectionId.push_back(id);
-	//(*nbThreads)++;
 	
 	ids.insert(maxId);
 	currentId = ids.begin();
-	
-	return maxId++;
+	*myTurn = maxId++;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -56,22 +50,19 @@ int ThreadSynchronizer::insertThread()
 
 void ThreadSynchronizer::removeThread(int id)
 { 
-	//redirectionId[id] = -1;
-	//(*nbThreads)--;
-	//boost::mutex::scoped_lock lock(mutex);	
-	//if (*currentId==id)
-	//	setNextCurrentThread();
+	boost::mutex::scoped_lock lock(mutex);	
+	
 	ids.erase(id);
 	currentId = ids.begin();
 	if (id==maxId)
-		maxId--;
+		maxId--;	
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 boost::mutex* ThreadSynchronizer::getMutex()
-{
+{	
 	return &mutex;
 }
 	
@@ -80,8 +71,6 @@ boost::mutex* ThreadSynchronizer::getMutex()
 
 bool ThreadSynchronizer::notMyTurn(int turn)
 {
-	//return (redirectionId[turn] != i);
-	//ThreadSafe::cout(lexical_cast<string>(turn)+" "+lexical_cast<string>(*currentId));
 	return (turn != *currentId);
 }
 
@@ -89,11 +78,7 @@ bool ThreadSynchronizer::notMyTurn(int turn)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void ThreadSynchronizer::setNextCurrentThread()
-{
-	//i = (i+1)%redirectionId.size();
-	//while(redirectionId[i] == -1)
-	//	i = (i+1)%redirectionId.size();
-	
+{	
 	++currentId;
 	if (currentId==ids.end())
 		currentId = ids.begin();
@@ -118,9 +103,3 @@ void ThreadSynchronizer::signal()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-int ThreadSynchronizer::getNbThreads()
-{
-	return ids.size();
-	//return *nbThreads;
-}

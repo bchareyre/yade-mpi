@@ -54,28 +54,25 @@ template<class Thread>
 class Threadable
 {
 	private  : bool  * finished;
-	private  : bool  * blocked;
+	private  : bool  * blocked;	
+	protected : int * turn;
 	private     : shared_ptr<boost::thread> thread;
 	protected   : shared_ptr<ThreadSynchronizer> synchronizer;
-	protected : int * turn;
-	protected : int * saveTurn;
-	protected : int getTurn();
 
-	public    : Threadable(shared_ptr<ThreadSynchronizer> s=shared_ptr<ThreadSynchronizer>());
+	public    : Threadable(shared_ptr<ThreadSynchronizer> s);
 	public    : virtual ~Threadable();
 
 	public : void operator()();
-// modified by Janek - you can't have default value for argument when the argument is not the last one in argument list
-// (I'm trying to compile it with 3.3, I don't understand why it compiled with 3.4)
-	public    : virtual void createThread(bool autoStart,shared_ptr<ThreadSynchronizer> s = shared_ptr<ThreadSynchronizer>());
+	public : void createThread();
+	
 	public    : virtual bool notEnd()  = 0;
 	public    : virtual void oneLoop() = 0;
-	public : void finish();
 
 	public    : void sleep(int ms);
 	public    : void join();
 	public    : void start();
 	public    : void stop();
+	public : void finish();
 
 };
 

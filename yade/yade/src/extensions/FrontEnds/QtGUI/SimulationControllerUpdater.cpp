@@ -32,10 +32,10 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-SimulationControllerUpdater::SimulationControllerUpdater(SimulationController * sc) : Threadable<SimulationControllerUpdater>()
+SimulationControllerUpdater::SimulationControllerUpdater(SimulationController * sc) : 	Threadable<SimulationControllerUpdater>(Omega::instance().synchronizer),
+											controller(sc)
 {
-	controller = sc;
-	createThread(true,Omega::instance().synchronizer);
+	createThread();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

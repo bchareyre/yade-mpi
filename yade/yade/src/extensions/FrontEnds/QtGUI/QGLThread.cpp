@@ -36,7 +36,7 @@ boost::mutex resizeMutex;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-QGLThread::QGLThread(GLViewer * glv, shared_ptr<RenderingEngine> r) :	Threadable<QGLThread>(),
+QGLThread::QGLThread(GLViewer * glv, shared_ptr<RenderingEngine> r) :	Threadable<QGLThread>(Omega::instance().synchronizer),
 									needCentering(new bool(false)),
 									needResizing(new bool(false)),
 									newWidth(new int(0)),
@@ -44,7 +44,7 @@ QGLThread::QGLThread(GLViewer * glv, shared_ptr<RenderingEngine> r) :	Threadable
 									renderer(r),
 									glViewer(glv)
 {
-	createThread(true,Omega::instance().synchronizer);
+	createThread();	
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -35,7 +35,7 @@
 class SimulationLoop : public Threadable<SimulationLoop>
 {
 	
-	public : SimulationLoop(shared_ptr<ThreadSynchronizer> s);
+	public : SimulationLoop();
 	public : ~SimulationLoop();
 	
 	public : virtual bool notEnd();
