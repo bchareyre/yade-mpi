@@ -52,7 +52,7 @@ Vector3 Omega::getGravity()
 	return Vector3(gravity_x,gravity_y,gravity_z);
 }
 
-Vector3 Omega::setGravity(Vector3 g)
+void Omega::setGravity(Vector3 g)
 {
 	gravity_x = g.x;
 	gravity_y = g.y;

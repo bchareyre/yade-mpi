@@ -47,7 +47,8 @@
 
 	Every functions that describe collision between two CollisionGeometrys must derived from CollisionFunctor.
 */
-class CollisionFunctor : /*doen't have to be public Indexable !!!! it works without. */public Factorable
+class CollisionFunctor : public Indexable , // FIXME : is NOT necessery, but produces faster code ?!?!?! hows that possible???
+			 public Factorable
 {
 
 	private : bool reverse;
