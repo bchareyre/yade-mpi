@@ -12,8 +12,8 @@ class SDECContactModel : public InteractionGeometry
 	public : float radius2;
 	public : Vector3r normal;			// new unit normal of the contact plane.
 	public : float penetrationDepth;
-	public : Vector3r contactPoint;
-
+	public : Vector3r contactPoint;	
+	
 	public : float kn;				// normal elastic constant.
 	public : float ks;				// shear elastic constant.
 	public : float initialKn;			// initial normal elastic constant.

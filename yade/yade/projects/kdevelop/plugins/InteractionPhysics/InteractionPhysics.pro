@@ -12,3 +12,5 @@ DESTDIR = $(YADEDYNLIBPATH)
 CONFIG += debug \
           warn_on 
 TEMPLATE = subdirs 
+SUBDIRS += SDECContactPhysics \
+           SDECPermanentLinkPhysics \
