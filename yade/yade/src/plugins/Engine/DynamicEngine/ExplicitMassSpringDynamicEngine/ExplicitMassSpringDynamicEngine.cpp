@@ -28,7 +28,7 @@ void ExplicitMassSpringDynamicEngine::registerAttributes()
 }
 
 
-void ExplicitMassSpringDynamicEngine::respondToCollisions(Body * body)
+void ExplicitMassSpringDynamicEngine::respondToInteractions(Body * body)
 {
 	MassSpringBody * massSpring = dynamic_cast<MassSpringBody*>(body);
 	shared_ptr<BodyContainer> bodies = massSpring->bodies;

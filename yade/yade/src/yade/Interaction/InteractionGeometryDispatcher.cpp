@@ -36,7 +36,6 @@ void InteractionGeometryDispatcher::addInteractionGeometryFunctor(const string& 
 
 void InteractionGeometryDispatcher::action(Body* body)
 {
-	//this->narrowCollisionPhase(b);	
 	
 	ComplexBody * ncb = dynamic_cast<ComplexBody*>(body);
 	shared_ptr<BodyContainer> bodies = ncb->bodies;

@@ -144,8 +144,8 @@ bool Box2Sphere4ErrorTolerant::goReverse(	const shared_ptr<InteractionGeometry>&
 						const Se3r& se32,
 						shared_ptr<Interaction>& c)
 {
-	bool isColliding = go(cm2,cm1,se32,se31,c);
-	if (isColliding)
+	bool isInteracting = go(cm2,cm1,se32,se31,c);
+	if (isInteracting)
 	{
 		shared_ptr<ErrorTolerantContactModel> cm = dynamic_pointer_cast<ErrorTolerantContactModel>(c->interactionGeometry);
 
@@ -157,7 +157,7 @@ bool Box2Sphere4ErrorTolerant::goReverse(	const shared_ptr<InteractionGeometry>&
 		cm->o2p2 = tmp;
 		cm->normal = -cm->normal;
 	}
-	return isColliding;
+	return isInteracting;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -39,7 +39,7 @@ OpenGLRenderingEngine::OpenGLRenderingEngine() : RenderingEngine()
 {
 
 	drawBoundingVolume = false;
-	drawCollisionGeometry = false;
+	drawInteractionGeometry = false;
 	drawGeometricalModel = true;
 	castShadow = false;
 	drawShadowVolumes = false;
@@ -50,8 +50,8 @@ OpenGLRenderingEngine::OpenGLRenderingEngine() : RenderingEngine()
 	addBoundingVolumeFunctor("AABB","GLDrawAABB");
 	addBoundingVolumeFunctor("BoundingSphere","GLDrawBoundingSphere");
 	
-	addCollisionGeometryFunctor("InteractionSphere","GLDrawInteractionSphere");
-	addCollisionGeometryFunctor("InteractionBox","GLDrawInteractionBox");
+	addInteractionGeometryFunctor("InteractionSphere","GLDrawInteractionSphere");
+	addInteractionGeometryFunctor("InteractionBox","GLDrawInteractionBox");
 		
 	addGeometricalModelFunctor("Box","GLDrawBox");
 	addGeometricalModelFunctor("Sphere","GLDrawSphere");
@@ -142,7 +142,7 @@ void OpenGLRenderingEngine::render(shared_ptr<ComplexBody> rootBody)
 	if (drawBoundingVolume)
 		renderBoundingVolume(rootBody);
 	
-	if (drawCollisionGeometry)
+	if (drawInteractionGeometry)
 		interactionGeometryDispatcher(rootBody->interactionGeometry,rootBody->physicalParameters);
 
 }
@@ -358,7 +358,7 @@ void OpenGLRenderingEngine::registerAttributes()
 {	
 	REGISTER_ATTRIBUTE(lightPos);
 	REGISTER_ATTRIBUTE(drawBoundingVolume);
-	REGISTER_ATTRIBUTE(drawCollisionGeometry);
+	REGISTER_ATTRIBUTE(drawInteractionGeometry);
 	REGISTER_ATTRIBUTE(drawGeometricalModel);
 	REGISTER_ATTRIBUTE(castShadow);
 	REGISTER_ATTRIBUTE(drawShadowVolumes);
@@ -405,7 +405,7 @@ void OpenGLRenderingEngine::addBoundingVolumeFunctor(const string& str1,const st
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void OpenGLRenderingEngine::addCollisionGeometryFunctor(const string& str1,const string& str2)
+void OpenGLRenderingEngine::addInteractionGeometryFunctor(const string& str1,const string& str2)
 {
 	vector<string> v;
 	v.push_back(str1);

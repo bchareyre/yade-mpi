@@ -38,7 +38,7 @@ bool Terrain2Sphere4ClosestFeatures::go(	const shared_ptr<InteractionGeometry>& 
 {
 	Vector3r pt;
 	std::vector<Vector3r> tri;
-	bool inCollision =  false;
+	bool inInteraction =  false;
 	std::vector<int> faces;
 	
 	shared_ptr<Terrain> t = dynamic_pointer_cast<Terrain>(cm1);
@@ -70,14 +70,14 @@ bool Terrain2Sphere4ClosestFeatures::go(	const shared_ptr<InteractionGeometry>& 
 			Vector3r v = pt-se32.translation;
 			v.normalize();
 			cf->closestsPoints.push_back(std::pair<Vector3r,Vector3r>(pt,se32.translation+v*s->radius));
-			inCollision =  true;
+			inInteraction =  true;
 		}
 	}
 		
-	if (inCollision)
+	if (inInteraction)
 		c->interactionGeometry = cf;
 
-	return inCollision;
+	return inInteraction;
 
 }
 
@@ -90,15 +90,15 @@ bool Terrain2Sphere4ClosestFeatures::goReverse(	const shared_ptr<InteractionGeom
 						const Se3r& se32,
 						shared_ptr<Interaction>& c)
 {
-	bool isColliding = go(cm2,cm1,se32,se31,c);
-	if (isColliding)
+	bool isInteracting = go(cm2,cm1,se32,se31,c);
+	if (isInteracting)
 	{
 		shared_ptr<ClosestFeatures> cf = dynamic_pointer_cast<ClosestFeatures>(c->interactionGeometry);
 		Vector3r tmp = cf->closestsPoints[0].first;
 		cf->closestsPoints[0].first = cf->closestsPoints[0].second;		
 		cf->closestsPoints[0].second = tmp;
 	}
-	return isColliding;
+	return isInteracting;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

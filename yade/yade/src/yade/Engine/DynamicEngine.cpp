@@ -22,5 +22,5 @@ void DynamicEngine::registerAttributes()
 
 void DynamicEngine::action(Body* b)
 {
-	this->respondToCollisions(b);
+	this->respondToInteractions(b);
 }

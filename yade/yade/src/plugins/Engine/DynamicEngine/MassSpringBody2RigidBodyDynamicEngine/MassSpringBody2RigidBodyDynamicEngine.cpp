@@ -26,7 +26,7 @@ void MassSpringBody2RigidBodyDynamicEngine::registerAttributes()
 }
 
 
-void MassSpringBody2RigidBodyDynamicEngine::respondToCollisions(Body * /*body*/)
+void MassSpringBody2RigidBodyDynamicEngine::respondToInteractions(Body * /*body*/)
 {
 // /*	ComplexBody * ncb = dynamic_cast<ComplexBody*>(body);
 // 	shared_ptr<Interaction> ct;
@@ -70,7 +70,7 @@ void MassSpringBody2RigidBodyDynamicEngine::respondToCollisions(Body * /*body*/)
 // 	shared_ptr<DynamicEngine> de = dynamic_pointer_cast<DynamicEngine>(ClassFactory::instance().createShared("SimpleSpringDynamicEngine"));
 // 
 // 	FIXME : this is no more working with the actors system
-// 	de->respondToCollisions(body,tmpI);
+// 	de->respondToInteractions(body,tmpI);
 // */
 }
 

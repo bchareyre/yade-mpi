@@ -71,7 +71,7 @@ void ErrorTolerantDynamicEngine::registerAttributes()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-void ErrorTolerantDynamicEngine::respondToCollisions(Body* body)
+void ErrorTolerantDynamicEngine::respondToInteractions(Body* body)
 {
 
 	ComplexBody * ncb = dynamic_cast<ComplexBody*>(body);

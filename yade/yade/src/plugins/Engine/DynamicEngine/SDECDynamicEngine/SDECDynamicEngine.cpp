@@ -79,7 +79,7 @@ void SDECDynamicEngine::registerAttributes()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 //FIXME : add reset function so it will remove bool first
-void SDECDynamicEngine::respondToCollisions(Body* body)
+void SDECDynamicEngine::respondToInteractions(Body* body)
 {
 
 	ComplexBody * ncb = dynamic_cast<ComplexBody*>(body);

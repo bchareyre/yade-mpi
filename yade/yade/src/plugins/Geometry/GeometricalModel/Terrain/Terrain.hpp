@@ -67,7 +67,7 @@ class Terrain : public GeometricalModel
 	private : int nbTriPerCell,nbCells;
 	private : bool pointInTriangle(Vector2r p ,std::vector<Vector2r>& tri);
 
-	protected : void buildCollisionGeometry();
+	protected : void buildInteractionGeometry();
 
 	protected : std::vector<std::vector<std::pair<Real,Real> > > boundingBoxes;
 	public : std::vector<std::vector<std::vector<int> > > triLists;

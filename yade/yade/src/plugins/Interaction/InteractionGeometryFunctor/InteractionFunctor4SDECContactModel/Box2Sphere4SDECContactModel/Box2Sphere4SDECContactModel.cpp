@@ -174,8 +174,8 @@ bool Box2Sphere4SDECContactModel::goReverse(	const shared_ptr<InteractionGeometr
 						const Se3r& se32,
 						shared_ptr<Interaction>& c)
 {
-	bool isColliding = go(cm2,cm1,se32,se31,c);
-	if (isColliding)
+	bool isInteracting = go(cm2,cm1,se32,se31,c);
+	if (isInteracting)
 	{
 		shared_ptr<SDECContactGeometry> scm = dynamic_pointer_cast<SDECContactGeometry>(c->interactionGeometry);
 		//Vector3r tmp = scm->closestsPoints[0].first;		
@@ -186,7 +186,7 @@ bool Box2Sphere4SDECContactModel::goReverse(	const shared_ptr<InteractionGeometr
 		scm->radius1 = scm->radius2;
 		scm->radius2 = tmpR;
 	}
-	return isColliding;
+	return isInteracting;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

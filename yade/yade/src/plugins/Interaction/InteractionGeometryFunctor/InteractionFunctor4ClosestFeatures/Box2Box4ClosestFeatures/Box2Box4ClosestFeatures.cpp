@@ -78,7 +78,7 @@ bool Box2Box4ClosestFeatures::go(		const shared_ptr<InteractionGeometry>& cm1,
 	q21 = fabs(r21); q22 = fabs(r22); q23 = fabs(r23);
 	q31 = fabs(r31); q32 = fabs(r32); q33 = fabs(r33);
 
-	BoxBoxCollisionInfo bbInfo;
+	BoxBoxInteractionInfo bbInfo;
 	
 	bbInfo.isNormalPrincipalAxis = true;
 	bbInfo.invertNormal = false;
@@ -423,21 +423,21 @@ bool Box2Box4ClosestFeatures::goReverse(	const shared_ptr<InteractionGeometry>& 
 						const Se3r& se32,
 						shared_ptr<Interaction>& c)
 {
-	bool isColliding = go(cm2,cm1,se32,se31,c);
-	if (isColliding)
+	bool isInteracting = go(cm2,cm1,se32,se31,c);
+	if (isInteracting)
 	{
 		shared_ptr<ClosestFeatures> cf = shared_dynamic_cast<ClosestFeatures>(c->interactionGeometry);
 		Vector3r tmp = cf->closestsPoints[0].first;
 		cf->closestsPoints[0].first = cf->closestsPoints[0].second;		
 		cf->closestsPoints[0].second = tmp;
 	}
-	return isColliding;
+	return isInteracting;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool Box2Box4ClosestFeatures::testSeparatingAxis(Real expr1, Real expr2, Vector3r n,int c,BoxBoxCollisionInfo* bbInfo)
+bool Box2Box4ClosestFeatures::testSeparatingAxis(Real expr1, Real expr2, Vector3r n,int c,BoxBoxInteractionInfo* bbInfo)
 {
 	Real pd,l;
 

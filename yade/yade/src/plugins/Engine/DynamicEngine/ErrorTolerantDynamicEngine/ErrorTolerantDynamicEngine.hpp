@@ -61,7 +61,7 @@ class ErrorTolerantDynamicEngine : public DynamicEngine
 	protected : virtual void postProcessAttributes(bool deserializing);
 	public : void registerAttributes();
 
-	public : void respondToCollisions(Body* body);
+	public : void respondToInteractions(Body* body);
 
 	private : void multA(	ublas::vector<float>& res		, 
 				ublas::sparse_matrix<float>& J		,

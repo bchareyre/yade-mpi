@@ -35,14 +35,14 @@
 /*! \brief Provide interaction handling between a axis aligned box and a sphere in terms of ClosestFeatures */
 class Box2Box4ClosestFeatures : public InteractionGeometryFunctor
 {
-	private : typedef struct BoxBoxCollisionInfo
+	private : typedef struct BoxBoxInteractionInfo
 	{
 		bool isNormalPrincipalAxis;
 		bool invertNormal;
 		Real penetrationDepth;
 		int code;
 		Vector3r normal;
-	} BoxBoxCollisionInfo;
+	} BoxBoxInteractionInfo;
 
 	public : virtual bool go(		const shared_ptr<InteractionGeometry>& cm1,
 						const shared_ptr<InteractionGeometry>& cm2,
@@ -55,7 +55,7 @@ class Box2Box4ClosestFeatures : public InteractionGeometryFunctor
 						const Se3r& se32,
 						shared_ptr<Interaction>& c);
 
-	private : bool testSeparatingAxis(Real expr1, Real expr2, Vector3r n,int c,BoxBoxCollisionInfo* bbInfo);
+	private : bool testSeparatingAxis(Real expr1, Real expr2, Vector3r n,int c,BoxBoxInteractionInfo* bbInfo);
 
 	DEFINE_FUNCTOR_ORDER_2D(Box,Box);
 };

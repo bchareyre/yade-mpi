@@ -14,7 +14,7 @@
 #include "SDECDynamicEngine.hpp"
 #include "SDECDiscreteElement.hpp"
 #include "BoundingVolumeUpdator.hpp"
-#include "CollisionGeometrySet2AABBFactory.hpp"
+#include "InteractionGeometrySet2AABBFactory.hpp"
 #include "InteractionGeometrySet.hpp"
 
 RotatingBox::RotatingBox () : FileGenerator()
@@ -53,7 +53,7 @@ string RotatingBox::generate()
 // 	shared_ptr<BoundingVolumeUpdator> bvu	= shared_ptr<BoundingVolumeUpdator>(new BoundingVolumeUpdator);
 // 	bvu->addBVFactories("Sphere","AABB","Sphere2AABBFactory");
 // 	bvu->addBVFactories("Box","AABB","Box2AABBFactory");
-// 	bvu->addBVFactories("InteractionGeometrySet","AABB","CollisionGeometrySet2AABBFactory");
+// 	bvu->addBVFactories("InteractionGeometrySet","AABB","InteractionGeometrySet2AABBFactory");
 // 
 // 
 // 	shared_ptr<Rotor> kinematic = shared_ptr<Rotor>(new Rotor);

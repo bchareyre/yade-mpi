@@ -46,7 +46,7 @@ class InteractionGeometryFactory : public Factorable
 	public : InteractionGeometryFactory ();
 	public : virtual ~InteractionGeometryFactory ();
 	
-	public : virtual shared_ptr<InteractionGeometry> buildCollisionGeometry(const shared_ptr<GeometricalModel> gm, const Se3r& se3) = 0;
+	public : virtual shared_ptr<InteractionGeometry> buildInteractionGeometry(const shared_ptr<GeometricalModel> gm, const Se3r& se3) = 0;
 
 };
 

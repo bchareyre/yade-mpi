@@ -17,7 +17,7 @@
 #include "InteractionPhysicsDispatcher.hpp"
 #include "ActionDispatcher.hpp"
 #include "BoundingVolumeUpdator.hpp"
-#include "CollisionGeometrySet2AABBFactory.hpp"
+#include "InteractionGeometrySet2AABBFactory.hpp"
 #include "InteractionGeometrySet.hpp"
 #include "Particle.hpp"
 #include "SpringGeometry.hpp"
@@ -84,7 +84,7 @@ string HangingCloth::generate()
 	shared_ptr<BoundingVolumeUpdator> bvu	= shared_ptr<BoundingVolumeUpdator>(new BoundingVolumeUpdator);
 	bvu->addBVFactories("InteractionSphere","AABB","Sphere2AABBFactory");
 	bvu->addBVFactories("InteractionBox","AABB","Box2AABBFactory");
-	bvu->addBVFactories("InteractionGeometrySet","AABB","CollisionGeometrySet2AABBFactory");
+	bvu->addBVFactories("InteractionGeometrySet","AABB","InteractionGeometrySet2AABBFactory");
 	
 	shared_ptr<ActionDispatcher> ad(new ActionDispatcher);
 	ad->addActionFunctor("ActionForce","Particle","ActionForce2Particle");

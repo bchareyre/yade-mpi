@@ -15,7 +15,7 @@
 #include "SDECPermanentLink.hpp"
 #include "Interaction.hpp"
 #include "BoundingVolumeUpdator.hpp"
-#include "CollisionGeometrySet2AABBFactory.hpp"
+#include "InteractionGeometrySet2AABBFactory.hpp"
 #include "InteractionGeometrySet.hpp"
 #include "SDECLinearContactModel.hpp"
 #include "ActionDispatcher.hpp"
@@ -73,7 +73,7 @@ string SDECSpheresPlane::generate()
 	shared_ptr<BoundingVolumeUpdator> bvu	= shared_ptr<BoundingVolumeUpdator>(new BoundingVolumeUpdator);
 	bvu->addBVFactories("InteractionSphere","AABB","Sphere2AABBFactory");
 	bvu->addBVFactories("InteractionBox","AABB","Box2AABBFactory");
-	bvu->addBVFactories("InteractionGeometrySet","AABB","CollisionGeometrySet2AABBFactory");
+	bvu->addBVFactories("InteractionGeometrySet","AABB","InteractionGeometrySet2AABBFactory");
 	
 	shared_ptr<ActionDispatcher> ad(new ActionDispatcher);
 	ad->addActionFunctor("ActionForce","RigidBody","ActionForce2RigidBody");

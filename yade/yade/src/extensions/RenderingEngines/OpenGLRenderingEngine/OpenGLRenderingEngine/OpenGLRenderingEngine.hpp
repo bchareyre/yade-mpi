@@ -42,7 +42,7 @@ class OpenGLRenderingEngine : public RenderingEngine
 {	
 	public : Vector3r lightPos;
 	public : bool drawBoundingVolume;
-	public : bool drawCollisionGeometry;
+	public : bool drawInteractionGeometry;
 	public : bool drawGeometricalModel;
 	public : bool castShadow;
 	public : bool drawShadowVolumes;
@@ -58,7 +58,7 @@ class OpenGLRenderingEngine : public RenderingEngine
 	private : vector<vector<string> >  geometricalModelFunctorNames;
 	private : vector<vector<string> >  shadowVolumeFunctorNames;
 	public  : void addBoundingVolumeFunctor(const string& str1,const string& str2);
-	public  : void addCollisionGeometryFunctor(const string& str1,const string& str2);
+	public  : void addInteractionGeometryFunctor(const string& str1,const string& str2);
 	public  : void addGeometricalModelFunctor(const string& str1,const string& str2);
 	public  : void addShadowVolumeFunctor(const string& str1,const string& str2);
 	

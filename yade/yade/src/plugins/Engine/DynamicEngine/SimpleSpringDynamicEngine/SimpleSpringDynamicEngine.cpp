@@ -24,7 +24,7 @@ void SimpleSpringDynamicEngine::registerAttributes()
 }
 
 
-void SimpleSpringDynamicEngine::respondToCollisions(Body * body)
+void SimpleSpringDynamicEngine::respondToInteractions(Body * body)
 {
 
 	//Real dt = Omega::instance().dt;

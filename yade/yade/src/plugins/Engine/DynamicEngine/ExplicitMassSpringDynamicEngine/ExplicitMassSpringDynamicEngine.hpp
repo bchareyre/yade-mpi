@@ -17,7 +17,7 @@ class ExplicitMassSpringDynamicEngine : public DynamicEngine
 	protected : virtual void postProcessAttributes(bool deserializing);
 	public : void registerAttributes();
 
-	public : void respondToCollisions(Body* body);
+	public : void respondToInteractions(Body* body);
 	REGISTER_CLASS_NAME(ExplicitMassSpringDynamicEngine);
 };
 

@@ -64,7 +64,7 @@ class DynamicEngine : public Actor
 
 	//public : virtual bool isActivated();
 	public : virtual void action(Body* b);
-	public : virtual void respondToCollisions(Body* ) { throw; };
+	public : virtual void respondToInteractions(Body* ) { throw; };
 
 	//public : virtual string getInteractionGeometryName() { return "";};
 

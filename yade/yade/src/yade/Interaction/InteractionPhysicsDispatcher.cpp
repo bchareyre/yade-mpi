@@ -36,7 +36,6 @@ void InteractionPhysicsDispatcher::addInteractionPhysicsFunctor(const string& st
 
 void InteractionPhysicsDispatcher::action(Body* body)
 {
-	//this->narrowCollisionPhase(b);	
 	
 	ComplexBody * ncb = dynamic_cast<ComplexBody*>(body);
 	shared_ptr<BodyContainer> bodies = ncb->bodies;
