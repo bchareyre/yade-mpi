@@ -60,7 +60,7 @@ class NarrowCollider : public Actor
 					, const Se3r&
 					, shared_ptr<Interaction>&
 				)
-		> narrowManager;
+		> narrowCollisionDispatcher;
 
 	private : vector<vector<string> > collisionFunctors;
 	public  : void addCollisionFunctor(const string& str1,const string& str2,const string& str3);

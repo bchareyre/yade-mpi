@@ -97,7 +97,7 @@ bool Sphere2Mesh2D4ClosestFeatures::goReverse(	const shared_ptr<CollisionGeometr
 						const Se3r& se32,
 						shared_ptr<Interaction>& c)
 {
-	bool isColliding = collide(cm2,cm1,se32,se31,c);
+	bool isColliding = go(cm2,cm1,se32,se31,c);
 	if (isColliding)
 	{
 		shared_ptr<ClosestFeatures> cf = dynamic_pointer_cast<ClosestFeatures>(c->interactionGeometry);

@@ -31,6 +31,7 @@
 #include "DynLibDispatcher.hpp"
 #include "CollisionGeometry.hpp"
 #include "BoundingVolume.hpp"
+#include "BoundingVolumeFactory.hpp"
 #include "Body.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -490,13 +490,15 @@ class DynLibDispatcher
 			{
 				if(callBacksInfo[index1][index2])	// reversed
 					if(autoSymmetry)		// automatically reverse arguments
-						return (callBacks[index1][index2] )->go		(base2, base1, p3 );
+						return (callBacks[index1][index2] )->go		(base2, base1, p3 ); 
+						// FIXME - first bug - when BaseClass1 != BaseClass2, this will not compile
+						
 					else				// call goReverse()
 						return (callBacks[index1][index2] )->goReverse	(base1, base2, p3 );
 				else
 					return (callBacks[index1][index2] )->go			(base1, base2, p3 );
 			}
-			else	return 0;
+//			else	return 0; // FIXME - second bug - sometimes cliens may want to return void
 		}
 		
 		ResultType operator() (boost::shared_ptr<BaseClass1> base1,boost::shared_ptr<BaseClass2> base2, Parm3 p3, Parm4 p4)

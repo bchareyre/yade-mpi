@@ -38,7 +38,7 @@ void SimpleNarrowCollider::narrowCollisionPhase(Body* body)
 
 		// collisionDispatcher (b1->cm , b2->cm , b1->se3 , b2->se3 , contact);
 		
-		if (!(narrowManager.collide( b1->cm , b2->cm , b1->se3 , b2->se3 , contact )))
+		if (!(narrowCollisionDispatcher( b1->cm , b2->cm , b1->se3 , b2->se3 , contact )))
 		{
 					//cout << "before " << ncb->interactions->size() << endl;
 					ncb->interactions->eraseCurrentAndGotoNext();

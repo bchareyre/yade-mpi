@@ -14,7 +14,7 @@ void NarrowCollider::postProcessAttributes(bool deserializing)
 	if(deserializing)
 	{
 		for(unsigned int i=0;i<collisionFunctors.size();i++)
-			narrowManager.add(collisionFunctors[i][0],collisionFunctors[i][1],collisionFunctors[i][2]);
+			narrowCollisionDispatcher.add(collisionFunctors[i][0],collisionFunctors[i][1],collisionFunctors[i][2]);
 	}
 }
 
