@@ -20,7 +20,9 @@ NonConnexBody::NonConnexBody() :
 	, permanentInteractions(new InteractionVecSet)
 {
 
-containSubBodies = true;
+	createIndex();
+	
+	containSubBodies = true;
 
 }
 

@@ -7,6 +7,7 @@
 
 FEMBody::FEMBody () : ConnexBody()
 {
+	createIndex();
 }
 
 

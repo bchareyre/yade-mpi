@@ -55,7 +55,7 @@
 
 	All the physical types (ConnexBody, NonConnexBody, RigidBody ....) must derived from this class.
 */
-class Body : public Serializable
+class Body : public Serializable , public Indexable
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -123,11 +123,23 @@ class Body : public Serializable
 
 	/*! If computations on the attributes are needed after serialization. For example you may want to serialize the name of a file that contains geometrical data and postProcessAttributes(bool deserializing) will load the file */
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+/// Serialization										///
+///////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	REGISTER_CLASS_NAME(Body);
 	protected : virtual void postProcessAttributes(bool deserializing);
 	/*! Tells the IOManager which attributes should be serialized */
 	public : void registerAttributes();
 
-	REGISTER_CLASS_NAME(Body);
+///////////////////////////////////////////////////////////////////////////////////////////////////
+/// Indexable											///
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+	// FIXME : why to put again getClassIndex
+	public : virtual int& getClassIndex() { throw;};
+	public : virtual const int& getClassIndex() const { throw;};
+	REGISTER_INDEX_COUNTER(Body);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -382,8 +382,8 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 	{
 		vector<shared_ptr<Action> > vvv; 
 		vvv.clear();
-		cout << "ActionForce id: " << actionForce->getClassIndex() << endl;
-		cout << "ActionMomentum id: " << actionMomentum->getClassIndex() << endl;
+//		cout << "ActionForce id: " << actionForce->getClassIndex() << endl;
+//		cout << "ActionMomentum id: " << actionMomentum->getClassIndex() << endl;
 		vvv.push_back(actionForce);
 		vvv.push_back(actionMomentum);
 		body->actions->prepare(vvv);

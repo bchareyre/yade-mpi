@@ -2,6 +2,7 @@
 
 SDECDiscreteElement::SDECDiscreteElement () : RigidBody()
 {
+	createIndex(); // FIXME - verify that it works, when RigidBody has also called createIndex()
 }
 
 

@@ -14,6 +14,7 @@ using namespace std;
 
 ConnexBody::ConnexBody() : Body()
 {
+	createIndex();
 	containSubBodies = false;
 }
 

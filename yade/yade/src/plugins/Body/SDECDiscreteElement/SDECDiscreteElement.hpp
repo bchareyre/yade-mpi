@@ -12,13 +12,21 @@ class SDECDiscreteElement : public RigidBody
 	public : SDECDiscreteElement ();
 	public : ~SDECDiscreteElement ();
 
+	//public : void moveToNextTimeStep();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+/// Serialization										///
+///////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	REGISTER_CLASS_NAME(SDECDiscreteElement);
 	protected : virtual void postProcessAttributes(bool deserializing);
 	public : void registerAttributes();
 
-	//public : void moveToNextTimeStep();
+///////////////////////////////////////////////////////////////////////////////////////////////////
+/// Indexable											///
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
-	REGISTER_CLASS_NAME(SDECDiscreteElement);
-	//REGISTER_CLASS_INDEX(SDECDiscreteElement);
+	REGISTER_CLASS_INDEX(SDECDiscreteElement);
 };
 
 REGISTER_SERIALIZABLE(SDECDiscreteElement,false);

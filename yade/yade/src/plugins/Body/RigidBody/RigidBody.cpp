@@ -2,6 +2,7 @@
 
 RigidBody::RigidBody () : ConnexBody()
 {
+	createIndex();
 	acceleration = Vector3r(0,0,0);
 	angularAcceleration = Vector3r(0,0,0);
 }

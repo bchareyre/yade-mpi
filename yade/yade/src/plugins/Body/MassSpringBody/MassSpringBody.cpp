@@ -7,6 +7,7 @@
 
 MassSpringBody::MassSpringBody () : ConnexBody()
 {
+	createIndex();
 }
 
 

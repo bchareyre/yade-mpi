@@ -44,12 +44,12 @@ class Box2Box4ClosestFeatures : public CollisionFunctor
 		Vector3r normal;
 	} BoxBoxCollisionInfo;
 
-	protected : virtual bool go(		const shared_ptr<CollisionGeometry>& cm1,
+	public : virtual bool go(		const shared_ptr<CollisionGeometry>& cm1,
 						const shared_ptr<CollisionGeometry>& cm2,
 						const Se3r& se31,
 						const Se3r& se32,
 						shared_ptr<Interaction>& c);
-	protected : virtual bool goReverse(	const shared_ptr<CollisionGeometry>& cm1,
+	public : virtual bool goReverse(	const shared_ptr<CollisionGeometry>& cm1,
 						const shared_ptr<CollisionGeometry>& cm2,
 						const Se3r& se31,
 						const Se3r& se32,

@@ -48,7 +48,7 @@ void ActionDispatcher::postProcessAttributes(bool deserializing)
 	if(deserializing)
 	{
 		for(unsigned int i=0;i<actionFunctors.size();i++)
-			actionDispatcher.add(actionFunctors[i][0]/*,actionFunctors[i][1]*/,actionFunctors[i][2]);
+			actionDispatcher.add(actionFunctors[i][0],actionFunctors[i][1],actionFunctors[i][2]);
 	}
 
 }
