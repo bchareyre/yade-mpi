@@ -3,6 +3,12 @@
 # Subdir relative project main directory: ./plugins
 # Target is a subdirs project 
 
+MOC_DIR = $(YADECOMPILATIONPATH) 
+UI_DIR = $(YADECOMPILATIONPATH) 
+OBJECTS_DIR = $(YADECOMPILATIONPATH) 
+CONFIG += debug \
+          warn_on 
+TEMPLATE = subdirs 
 SUBDIRS += InteractionGeometry \
            InteractionPhysics \
            BoundingVolume \
@@ -14,14 +20,8 @@ SUBDIRS += InteractionGeometry \
            Body \
            BroadInteractor \
            InteractionFunctor \
+           InteractionPhysicsFunctor \
            Action \
            ActionFunctor \
            KinematicEngine \
-           DynamicEngine \
-           InteractionPhysicsFunctor 
-MOC_DIR = $(YADECOMPILATIONPATH)
-UI_DIR = $(YADECOMPILATIONPATH)
-OBJECTS_DIR = $(YADECOMPILATIONPATH)
-CONFIG += debug \
-warn_on
-TEMPLATE = subdirs
+           DynamicEngine 
