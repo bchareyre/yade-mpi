@@ -1,0 +1,17 @@
+#! /bin/sh
+
+removeSymLinks
+removeBackupFiles
+removeBinFiles
+removeCoreFiles
+removeMakefiles
+
+rm $YADEBINPATH/.qglviewer.xml
+rm $YADEPATH/yade/projects/kdevelop/yade.kdevelop.pcs
+rm $YADEPATH/yade/projects/kdevelop/yade.kdevses
+rm $YADEPATH/yade/projects/kdevelop/yade.tag
+rm $YADEPATH/yade/projects/kdevelop/tags
+
+find ../ -name '$(YADEBINPATH)' -exec rm -r {} \;
+find ../ -name '$(YADECOMPILATIONPATH)' -exec rm -r {} \;
+find ../ -name '$(YADEDYNLIBPATH)' -exec rm -r {} \;

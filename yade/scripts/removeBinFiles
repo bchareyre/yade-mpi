@@ -1,0 +1,10 @@
+#! /bin/sh
+
+# remove .compilation files .o
+# rm dynlib/linux
+# remove bin/yade
+
+
+rm $YADEBINPATH/yade
+rm $YADECOMPILATIONPATH/*
+rm $YADEDYNLIBPATH/*

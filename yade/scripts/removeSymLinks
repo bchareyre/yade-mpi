@@ -1,0 +1,12 @@
+#! /bin/sh
+
+echo 'if [ -L $1 ]; then' 		>	 removeSymLink
+echo '        echo SYMLINK $1 REMOVED'	>>	 removeSymLink
+echo '        rm $1'			>>	 removeSymLink
+echo 'fi'				>>	 removeSymLink
+
+chmod a+x removeSymLink
+
+find ../projects/kdevelop/ -name "*" -exec removeSymLink {} \;
+
+rm removeSymLink

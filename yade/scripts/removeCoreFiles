@@ -1,0 +1,5 @@
+#! /bin/sh
+
+# remove core*
+
+find $YADEPATH -name "core*" -exec rm {} \;

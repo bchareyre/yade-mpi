@@ -1,0 +1,63 @@
+-------- QUICK:
+
+makeSymLinks
+cd yade/projects/kdevelop/yade_kdevelop
+qmake
+make
+
+export LD_LIBRARY_PATH ...YADEPATH.../bin/dynlib/linux:$LD_LIBRARY_PATH
+cd ...YADEPATH.../bin
+yade
+
+--------- end
+
+You should know that yade is in early development stage. It compiles and runs,
+but is still not very useful.
+
+you need:
+- libqglviewer
+- libglut development package
+- qt3 development package
+- kdevelop 3.0 or higher
+- qmake (autotools does not support dynamic libraries in required manner)
+
+To get the source, as a developer you do:
+
+>	setenv SVN_SSH "ssh -l loginname"
+>	svn checkout svn+ssh://svn.berlios.de/svnroot/repos/yade/trunk/yade
+
+or, to have an anonymous checkout:
+
+>	svn checkout svn://svn.berlios.de/yade/trunk/yade
+
+# Then you should set an environment variable YADEPATH, because kdevelop uses it
+# to compile everything, for example (make sure there is no trailing slash!! "/"):
+#
+# >	scripts/setEnvVar
+  or put it into .bashrc
+
+
+All the sources are inside src/ dircetory, and kdevelop uses them in another
+directory, so you need to make symliks:
+
+>	cd yade
+>	./makeSymLinks
+
+After that you can run kdevelop (version 3.0 or higher) for debian it's kdevelop3
+for redhat it's kdevelop. You should run it from the same terminal in which all the
+environment variables are set, because kdevelop will use them.
+
+>	kdevelop
+
+Now, when kdevelop3 has started you can open a project which is here:
+>	$YADEPATH/projects/kdevelop/yade_kdevelop/yade_kdevelop.kdevelop
+
+Then select from menu "Build->Build Project", and wait. Ewentually you should
+see "success" at the end of compiling. If you don't - check if you have
+libqglviewer and qt3 development package.
+
+After that you can either run YADEPATH/bin/yade by hand (but with correct
+LD_LIBRARY_PATH, or it won't start!) or you can click tab called "Qmake manager"
+then select "yade", and click "run subproject" icon.
+
+Hopefully you should see yade running.

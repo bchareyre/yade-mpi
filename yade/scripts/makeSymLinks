@@ -1,0 +1,24 @@
+#! /bin/sh
+
+
+echo 'ORGDIR=`pwd`'										> makeSymLink
+echo 'TMPNAME=`echo $1 | sed -e "s/^..\/src\//..\/projects\/kdevelop\//"`'			>> makeSymLink
+echo 'echo symlinking $ORGDIR/$1 to `dirname $TMPNAME`'						>> makeSymLink
+echo 'TMPDIR=`dirname $TMPNAME`'								>> makeSymLink
+echo 'cd $TMPDIR'										>> makeSymLink
+echo 'ln -s $ORGDIR/$1 `basename $TMPNAME`'							>> makeSymLink
+echo 'cd $ORGDIR'										>> makeSymLink
+
+
+chmod a+x ./makeSymLink
+
+find ../src/ -name "*.hpp" -exec ./makeSymLink {} \;
+find ../src/ -name "*.cpp" -exec ./makeSymLink {} \;
+find ../src/ -name "*.ui" -exec ./makeSymLink {} \;
+find ../src/ -name "*.tpp" -exec ./makeSymLink {} \;
+find ../src/ -name "*.ipp" -exec ./makeSymLink {} \;
+
+symlinks -rcs ./
+symlinks -rcs ./
+
+#rm makeSymLink

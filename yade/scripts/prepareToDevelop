@@ -1,0 +1,8 @@
+#! /bin/sh
+
+
+makeSymLinks
+
+echo 'You should run:  source yadeEnv YOUR_YADE_PATH'
+echo "after that you are ready to compile by:  qmake ; make "
+echo 'or just run yade'

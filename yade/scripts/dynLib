@@ -1,0 +1,26 @@
+#! /bin/sh
+
+# call this file:
+# dynLib off
+# dynLib on
+
+plugins/InteractionModel/ClosestsFeatures/ClosestsFeatures.pro 
+plugins/CinematicEngine/Oscillator/Oscillator.pro 
+plugins/GeometricalModelFactory/TerrainFromWrl1FileFactory/TerrainFromWrl1FileFactory.pro 
+plugins/BoundingVolumeFactory/Terrain2AABBFactory/Terrain2AABBFactory.pro 
+plugins/BoundingVolumeFactory/Box2AABBFactory/Box2AABBFactory.pro 
+plugins/BroadPhaseCollider/SimpleBroadCollider/SimpleBroadCollider.pro 
+plugins/BroadPhaseCollider/SAPCollider/SAPCollider.pro 
+plugins/NarrowPhaseCollider/SimpleNarrowCollider/SimpleNarrowCollider.pro 
+plugins/DynamicEngine/SimpleSpringDynamicEngine/SimpleSpringDynamicEngine.pro 
+plugins/GeometricalModel/Terrain/Terrain.pro 
+plugins/GeometricalModel/Sphere/Sphere.pro 
+plugins/GeometricalModel/Box/Box.pro 
+plugins/Body/RigidBody/RigidBody.pro 
+plugins/BoundingVolume/AABB/AABB.pro 
+plugins/BoundingVolume/BoundingSphere/BoundingSphere.pro 
+plugins/IOManager/XMLManager/XMLManager.pro 
+preprocessors/FileGenerator/SimpleScene/SimpleScene.pro 
+
+
+cat dynamicLibs | sed -e 's/^.*/cat projects\/kdevelop\/yade_kdevelop\/& | sed  -e 's\/^        warn_on \\\\\/          warn_on\/' -e 's\/^          dll\/#          dll\/'   /'
