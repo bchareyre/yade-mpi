@@ -6,7 +6,7 @@
 
 SerializableSingleton::SerializableSingleton() 
 {	
-	cerr << "Constructing ClassFactory  (if multiple times - check '-rdynamic' flag!)" << endl;
+	cerr << "Constructing SerializableSingleton  (if multiple times - check '-rdynamic' flag!)" << endl;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -14,16 +14,15 @@ SerializableSingleton::SerializableSingleton()
 
 bool SerializableSingleton::registerSerializableDescriptor( string name , VerifyFactorableFnPtr verify, SerializableTypes::Type type, bool f )
 {
-	cout << "registering serializable : " << name << endl;
 	
 	bool tmp = map.insert( SerializableDescriptorMap::value_type( name , SerializableDescriptor(verify,type,f) )).second;
 
-	//#ifdef DEBUG
+	#ifdef DEBUG
 		if (tmp)
 			cout << "registering serializable : " << name << " OK\n";
 		else
 			cout << "registering serializable: " << name << " FAILED\n";
-	//#endif
+	#endif
 
 	return tmp;
 }
