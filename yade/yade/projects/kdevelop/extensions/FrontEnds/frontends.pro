@@ -3,7 +3,7 @@
 # Subdir relative project main directory: ./frontends
 # Target is a subdirs project 
 
-SUBDIRS += YadeQtGUI \
+SUBDIRS += QtGUI \
            NullGUI 
 MOC_DIR = $(YADECOMPILATIONPATH)
 UI_DIR = $(YADECOMPILATIONPATH)

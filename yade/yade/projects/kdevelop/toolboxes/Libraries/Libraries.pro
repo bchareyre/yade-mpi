@@ -3,7 +3,8 @@
 # Subdir relative project main directory: ./toolboxes/Libraries
 # Target is a subdirs project 
 
-SUBDIRS += Singleton \
+SUBDIRS += Factory \
+	   Singleton \
            Math \
            Serialization \
            Threads 
