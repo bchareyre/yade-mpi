@@ -1,6 +1,6 @@
 #include "CollisionModel.hpp"
 
-CollisionModel::CollisionModel () : GeometricalModel()
+CollisionModel::CollisionModel () : GeometricalModel(),Indexable()
 {
 }
 

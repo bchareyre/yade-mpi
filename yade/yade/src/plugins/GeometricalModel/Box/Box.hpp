@@ -18,11 +18,16 @@ class Box : public CollisionModel
 	
 	public : void processAttributes();
 	public : void registerAttributes();
+
 	REGISTER_CLASS_NAME(Box);
+	REGISTER_CLASS_INDEX(Box);
+	
 };
+
 #include "ArchiveTypes.hpp"
 using namespace ArchiveTypes;
 
 REGISTER_CLASS(Box,false);
+REGISTER_CLASS_TO_MULTI_METHODS_MANAGER(Box);
 
 #endif // __BOX_H__

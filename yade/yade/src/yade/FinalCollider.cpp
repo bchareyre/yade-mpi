@@ -3,7 +3,7 @@
 #include <iostream>
 using namespace std;
 
-FinalCollider::FinalCollider() : Serializable(), N2NPtr2FuncLookUpTable<ptr2CollidingFunc>()
+FinalCollider::FinalCollider() : Serializable(), MultiMethodsManager<ptr2CollidingFunc>()
 {
 	nullFunc = nullCollideFunc;
 }

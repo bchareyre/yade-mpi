@@ -5,7 +5,6 @@
 SimpleNarrowCollider::SimpleNarrowCollider() : NarrowPhaseCollider()
 {
 	collider = shared_ptr<FinalCollider>(new BVCFFinalCollider());
-	firstCall = true;
 }
 
 SimpleNarrowCollider::~ SimpleNarrowCollider()
@@ -24,14 +23,6 @@ void SimpleNarrowCollider::registerAttributes()
 
 bool SimpleNarrowCollider::narrowCollisionPhase(const std::vector<shared_ptr<Body> >& bodies, std::list<shared_ptr<Contact> >& contacts)
 {
-
-	if (firstCall)
-	{
-		buildNarrowCollisionManager(bodies);
-		firstCall = false;
-	}
-	
-
 	std::list<shared_ptr<Contact> >::iterator it = contacts.begin();
 	std::list<shared_ptr<Contact> >::iterator itEnd = contacts.end();
 	std::list<shared_ptr<Contact> >::iterator itTmp;
@@ -52,10 +43,3 @@ bool SimpleNarrowCollider::narrowCollisionPhase(const std::vector<shared_ptr<Bod
 	return true;
 }
 
-
-
-void SimpleNarrowCollider::buildNarrowCollisionManager(const std::vector<shared_ptr<Body> >& bodies)
-{
-
-
-}

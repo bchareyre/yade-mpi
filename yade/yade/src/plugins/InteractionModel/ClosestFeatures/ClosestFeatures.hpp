@@ -19,8 +19,10 @@ class ClosestFeatures : public ContactModel
 	public : void registerAttributes();
 
 	REGISTER_CLASS_NAME(ClosestFeatures);
+	REGISTER_CLASS_INDEX(ClosestFeatures);
 };
 
 REGISTER_CLASS(ClosestFeatures,false);
+REGISTER_CLASS_TO_MULTI_METHODS_MANAGER(ClosestFeatures);
 
 #endif // __CLOSESTSFEATURES_H__

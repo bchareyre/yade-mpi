@@ -102,6 +102,7 @@ class Serializable
 	public    : void markAllAttributesProcessed();
 	public	  : bool findAttribute(const string& name,shared_ptr<Archive>& arc);
 
+	//FIXME : should have postprocessattributes and preprocessattributes
 	protected : virtual void processAttributes() {};
 	protected : template <typename Type>
 		    void registerAttribute(const string& name, Type& attribute)

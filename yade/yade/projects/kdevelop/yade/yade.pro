@@ -34,7 +34,6 @@ HEADERS += Archive.hpp \
            Math.ipp \
            Matrix3.hpp \
            Matrix3.ipp \
-           N2NPtr2FuncLookUpTable.hpp \
            NarrowPhaseCollider.hpp \
            NonConnexBody.hpp \
            Omega.hpp \
@@ -56,7 +55,9 @@ HEADERS += Archive.hpp \
            Archive.tpp \
            ContainerHandler.tpp \
            FundamentalHandler.tpp \
-           PointerHandler.tpp 
+           PointerHandler.tpp \
+           Indexable.hpp \
+           MultiMethodsManager.hpp 
 SOURCES += Archive.cpp \
            Body.cpp \
            BoundingVolume.cpp \
@@ -84,7 +85,6 @@ SOURCES += Archive.cpp \
            KinematicEngine.cpp \
            Math.cpp \
            Matrix3.cpp \
-           N2NPtr2FuncLookUpTable.cpp \
            NarrowPhaseCollider.cpp \
            NonConnexBody.cpp \
            Omega.cpp \
@@ -96,7 +96,8 @@ SOURCES += Archive.cpp \
            Serializable.cpp \
            Vector2.cpp \
            Vector3.cpp \
-           yade.cpp 
+           yade.cpp \
+           MultiMethodsManager.cpp 
 LIBS += -lboost_date_time \
 -lglut \
 -lQGLViewer \

@@ -26,8 +26,10 @@ class Sphere : public CollisionModel
 	public : void registerAttributes();
 
 	REGISTER_CLASS_NAME(Sphere);
+	REGISTER_CLASS_INDEX(Sphere);
 };
 
 REGISTER_CLASS(Sphere,false);
+REGISTER_CLASS_TO_MULTI_METHODS_MANAGER(Sphere);
 
 #endif // __SPHERE_H__

@@ -76,11 +76,13 @@ class Terrain : public CollisionModel
 	
 	public : bool loadFromFile(char * fileName);
 	public : void glDraw();
+	
 	REGISTER_CLASS_NAME(Terrain);
+	REGISTER_CLASS_INDEX(Terrain);
 };
 
 REGISTER_CLASS(Terrain,false);
-
+REGISTER_CLASS_TO_MULTI_METHODS_MANAGER(RigidBody);
 
 #endif // __TERRAIN_H__
 

@@ -3,7 +3,7 @@
 #include <iostream>
 using namespace std;
 
-Overlapper::Overlapper () : Serializable(), N2NPtr2FuncLookUpTable<pt2OverlappingFunc>()
+Overlapper::Overlapper () : Serializable(), MultiMethodsManager<pt2OverlappingFunc>()
 {
 	nullFunc = &nullOverlappingFunc;
 }
