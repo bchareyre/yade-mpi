@@ -54,10 +54,10 @@ class Quaternion : public Serializable
 	public : void toRotationMatrix (Matrix3& m) const;
 	public : void fromAngleAxis (const float& angle, const Vector3& axis);
 	public : void toAngleAxis (float& angle, Vector3& axis) const;
-	public : void fromAxes (const Vector3* axis);
-	public : void toAxes (Vector3* axis) const;
+	public : void fromAxes (const Vector3& axis1,const Vector3& axis2,const Vector3& axis3);
+	public : void toAxes (Vector3& axis1,Vector3& axis2,Vector3& axis3) const;
 	public : void toGLMatrix(float m[16]);
-	public : void toEulerAngles (Vector3& eulerAngles,float threshold = 1e-06f) const;
+	public : void toEulerAngles (Vector3& eulerAngles,float threshold = 1e-06f);
 
 	// arithmetic operations
 	public : bool operator== (const Quaternion& q) const;

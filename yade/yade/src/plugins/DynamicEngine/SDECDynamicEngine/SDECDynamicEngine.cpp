@@ -146,6 +146,9 @@ void SDECDynamicEngine::filter(Body* body)
 
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 //FIXME : add reset function so it will remove bool first
 void SDECDynamicEngine::respondToCollisions(Body* body)
 {
@@ -298,55 +301,22 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 /// Moment law					 	 ///
 ////////////////////////////////////////////////////////////
 
-		de1->se3.rotation.toEulerAngles(currentContact->currentRotation1); ////////
-		de2->se3.rotation.toEulerAngles(currentContact->currentRotation2); ////////
-		//cout << currentContact->currentRotation1 << "  || " <<currentContact->currentRotation2<<endl;
-
-
-	//	float aa;
-
-		//de1->se3.rotation.toAngleAxis(aa,currentContact->currentRotation1);
-		//currentContact->currentRotation1.normalize();
-		//currentContact->currentRotation1 *= aa;
-
-
-		//de2->se3.rotation.toAngleAxis(aa,currentContact->currentRotation2);
-
-		//currentContact->currentRotation2.normalize();
-		//currentContact->currentRotation2 *= aa;
-
-	//	Vector3 aaxxis;
-	//	de1->se3.rotation.toAngleAxis(aa,aaxxis);
-	//	aaxxis.normalize();
-	//	aaxxis *= aa;
-//cout << currentContact->currentRotation2 << "  || " <<currentContact->currentRotation1<<endl;
-
-	//	cout << aaxxis << "  || " <<currentContact->currentRotation1<<endl;
-///		cout << currentContact->currentRotation2[1] <<endl;
-
-		//currentContact->currentRotation2 += Vector3(0.0001,-currentContact->currentRotation2[1],-currentContact->currentRotation2[2]);
-		//cout << currentContact->currentRotation1 << "  || " <<currentContact->currentRotation2<<endl;
-
-		//currentContact->currentRotation1 = -currentContact->currentRotation1;
-		//currentContact->currentRotation2 = -currentContact->currentRotation2;
+		de1->se3.rotation.toEulerAngles(currentContact->currentRotation1);
+		de2->se3.rotation.toEulerAngles(currentContact->currentRotation2);
 
 		if (first)
 		{
 			currentContact->prevRotation1 = currentContact->currentRotation1;
 			currentContact->prevRotation2 = currentContact->currentRotation2;
-			//currentContact->thetar = Vector3(0,0,0);
 			currentContact->averageRadius = (currentContact->radius1+currentContact->radius2)*0.5;
 		}
 
 		Vector3 n	= currentContact->normal;
 		Vector3 prevN	= currentContact->prevNormal;
-//		Vector3 t1	= currentContact->shearForce.normalized();
-//		Vector3 t2	= n.unitCross(t1);
+		Vector3 t1	= currentContact->shearForce.normalized();
+		Vector3 t2	= n.unitCross(t1);
 
-		Vector3 t1;
-		Vector3 t2;
-
-		if (n[0]!=0 && n[1]!=0 && n[2]!=0)
+		/*if (n[0]!=0 && n[1]!=0 && n[2]!=0)
 		{
 			t1 = Vector3(0,0,sqrt(1.0/(1+(n[2]*n[2]/(n[1]*n[1])))));
 			t1[1] = -n[2]/n[1]*t1[2];
@@ -385,32 +355,15 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 				t1 = Vector3(0,1,0);
 				t2 = Vector3(0,0,1);
 			}
-		}
+		}*/
 
-
-//		Matrix3 m	= Matrix3(	n.x ,n.y ,n.z,		// ? which order of vectors?
-//						t1.x,t1.y,t1.z,
-//						t2.x,t2.y,t2.z);
-
-		Matrix3 m	= Matrix3(	n.x,t1.x,t2.x,		// ? which order of vectors?
-						n.y,t1.y,t2.y,         /////////////////
-						n.z,t1.z,t2.z);
-
-//		Matrix3 m	= Matrix3(	1 , 0 , 0 ,		// ? which order of vectors?
-//						0 , 1 , 0 ,         /////////////////
-//						0 , 0 , 1 );
 		Quaternion q_i_n,q_n_i;
 
-		q_i_n.fromRotationMatrix (m);
-
-		q_n_i = -q_i_n;
-
-		//Vector3 axxis;
-		//float aangle;
-		//q_n_i.toAngleAxis(aangle,axxis);
-		//cout << axxis << endl;
-
-		Vector3 dNormal; /// dBeta
+		q_i_n.fromAxes(n,t1,t2);
+		//q_i_n.fromAxes(Vector3(1,0,0),Vector3(0,1,0),Vector3(0,0,1)); // use identity matrix
+		q_n_i = q_i_n.inverse();
+	
+		Vector3 dBeta;
 		Vector3 orientation_Nc,orientation_Nc_old;
 
 		for(int i=0;i<3;i++)
@@ -426,29 +379,45 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 			if (prevN[j]>=0)
 				orientation_Nc_old[k] = acos(prevN[i]);
 			else
-				orientation_Nc_old[k] = -acos(prevN[i]);
+				orientation_Nc_old[k] = -acos(prevN[i]);	
 		}
 
-
-
-		dNormal = orientation_Nc - orientation_Nc_old;
-
-
+		dBeta = orientation_Nc - orientation_Nc_old;
+		
 		Vector3 dRotationA,dRotationB;
-
 
 		dRotationA = currentContact->currentRotation1-currentContact->prevRotation1;
 		dRotationB = currentContact->currentRotation2-currentContact->prevRotation2;
 
-		Vector3 dUr = 	( currentContact->radius1*(  dRotationA  -  dNormal)
-				- currentContact->radius2*(  dRotationB  -  dNormal) ) * 0.5;
+		/*if (dRotationA[0]>Constants::TWO_PI)	dRotationA[0]-=Constants::TWO_PI;
+		if (dRotationA[1]>Constants::TWO_PI)	dRotationA[1]-=Constants::TWO_PI;
+		if (dRotationA[2]>Constants::TWO_PI)	dRotationA[2]-=Constants::TWO_PI;
+		
+		if (dRotationA[0]<-Constants::TWO_PI)	dRotationA[0]+=Constants::TWO_PI;
+		if (dRotationA[1]<-Constants::TWO_PI)	dRotationA[1]+=Constants::TWO_PI;
+		if (dRotationA[2]<-Constants::TWO_PI)	dRotationA[2]+=Constants::TWO_PI;
+		
+		if (dRotationB[0]>Constants::TWO_PI)	dRotationB[0]-=Constants::TWO_PI;
+		if (dRotationB[1]>Constants::TWO_PI)	dRotationB[1]-=Constants::TWO_PI;
+		if (dRotationB[2]>Constants::TWO_PI)	dRotationB[2]-=Constants::TWO_PI;
+		
+		if (dRotationB[0]<-Constants::TWO_PI)	dRotationB[0]+=Constants::TWO_PI;
+		if (dRotationB[1]<-Constants::TWO_PI)	dRotationB[1]+=Constants::TWO_PI;
+		if (dRotationB[2]<-Constants::TWO_PI)	dRotationB[2]+=Constants::TWO_PI;
+
+		if (dBeta[0]>Constants::TWO_PI)	dBeta[0]-=Constants::TWO_PI;
+		if (dBeta[1]>Constants::TWO_PI)	dBeta[1]-=Constants::TWO_PI;
+		if (dBeta[2]>Constants::TWO_PI)	dBeta[2]-=Constants::TWO_PI;
+		
+		if (dBeta[0]<-Constants::TWO_PI)	dBeta[0]+=Constants::TWO_PI;
+		if (dBeta[1]<-Constants::TWO_PI)	dBeta[1]+=Constants::TWO_PI;
+		if (dBeta[2]<-Constants::TWO_PI)	dBeta[2]+=Constants::TWO_PI;*/
+
+		Vector3 dUr = 	( currentContact->radius1*(  dRotationA  -  dBeta)
+				- currentContact->radius2*(  dRotationB  -  dBeta) ) * 0.5;
 
 
 		Vector3 dThetar = dUr/currentContact->averageRadius;
-
-
-		//cout << dNormal<<endl;
-
 
 		currentContact->thetar += dThetar;
 
@@ -467,13 +436,10 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 		float normElastic = mElastic.length();
 
 
-		//cout << q_n_i*mElastic << endl;
-		//cout << n << endl;
 		//if (normElastic<=normMPlastic)
 		//{
 			moments[id1]	-= q_n_i*mElastic;
 			moments[id2]	+= q_n_i*mElastic;
-			//cout <<  q_n_i*mElastic << endl;
 		//}
 		//else
 		//{

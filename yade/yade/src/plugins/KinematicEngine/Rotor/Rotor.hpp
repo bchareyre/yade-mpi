@@ -7,10 +7,13 @@
 #include <windows.h>
 #endif
 
+#include "Vector3.hpp"
+
 class Rotor : public KinematicEngine
 {
 
 	public : float angularVelocity;
+	public : Vector3 rotationAxis;
 	// construction
 	public : Rotor ();
 	public : virtual ~Rotor ();

@@ -21,6 +21,7 @@ void Rotor::registerAttributes()
 {
 	KinematicEngine::registerAttributes();
 	REGISTER_ATTRIBUTE(angularVelocity);
+	REGISTER_ATTRIBUTE(rotationAxis);
 }
 
 void Rotor::moveToNextTimeStep(Body * body)
@@ -36,8 +37,7 @@ void Rotor::moveToNextTimeStep(Body * body)
 	time = dt;
 
 	Quaternion q;
-	Vector3 axis = Vector3(0,0,1);
-	q.fromAngleAxis(angularVelocity*dt,axis);
+	q.fromAngleAxis(angularVelocity*dt,rotationAxis);
 
 	Vector3 ax;
 	float an;
@@ -61,7 +61,7 @@ void Rotor::moveToNextTimeStep(Body * body)
 		b->se3.rotation.toAngleAxis(an,ax);
 		//cout << b->se3.rotation << " - " << an << " " << ax << endl;
 
-		b->angularVelocity = axis*angularVelocity;
+		b->angularVelocity = rotationAxis*angularVelocity;
 		b->velocity = Vector3(0,0,0);//dp*1/dt;
 
 		b->updateBoundingVolume(b->se3);
