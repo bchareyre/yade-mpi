@@ -6,7 +6,7 @@ then
   echo "        source ./yadeEnv YOUR_PATH_TO_YADE";
   exit 0;
 else
-#  echo "I'm using YADEPATH="${YADEPATH};
+  echo "I'm using YADEPATH="${YADEPATH};
 fi
 
 # remove core*
