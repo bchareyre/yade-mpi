@@ -26,6 +26,9 @@ void Translator::registerAttributes()
 
 void Translator::moveToNextTimeStep(Body * body)
 {
+// check this to see wrong behaviour
+//	if( Omega::instance().getIter() > 1000 )
+//		return;
 
 	NonConnexBody * ncb = dynamic_cast<NonConnexBody*>(body);
 	vector<shared_ptr<Body> >& bodies = ncb->bodies;

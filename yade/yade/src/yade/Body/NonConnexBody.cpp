@@ -10,34 +10,34 @@
 NonConnexBody::NonConnexBody() : Body()
 {
 }
-NonConnexBody::~NonConnexBody() 
+NonConnexBody::~NonConnexBody()
 {
 
 }
 
 
 void NonConnexBody::glDraw()
-{	
-	
+{
+
 	std::vector<shared_ptr<Body> >::iterator bi = bodies.begin();
 	std::vector<shared_ptr<Body> >::iterator biEnd = bodies.end();
-	
+
 	glPushMatrix();
-	
+
 	float angle;
-	Vector3 axis;	
+	Vector3 axis;
 	se3.rotation.toAngleAxis(angle,axis);
 
 	glTranslatef(se3.translation[0],se3.translation[1],se3.translation[2]);
 	glRotated(angle*Constants::RAD_TO_DEG,axis[0],axis[1],axis[2]);
-		
+
 	glDisable(GL_LIGHTING);
-	
+
 	for(; bi != biEnd ; ++bi)
-		(*bi)->glDraw();	
-		
+		(*bi)->glDraw();
+
 	glPopMatrix();
-	
+
 }
 
 void NonConnexBody::processAttributes()
@@ -48,12 +48,12 @@ void NonConnexBody::processAttributes()
 void NonConnexBody::registerAttributes()
 {
 	Body::registerAttributes();
-	
+
+	REGISTER_ATTRIBUTE(permanentInteractions);
 	REGISTER_ATTRIBUTE(bodies);
 //	REGISTER_ATTRIBUTE(narrowCollider);
 //	REGISTER_ATTRIBUTE(broadCollider);
 //	REGISTER_ATTRIBUTE(kinematic);
-	REGISTER_ATTRIBUTE(permanentInteractions);
 }
 
 void NonConnexBody::updateBoundingVolume(Se3& se3)
@@ -91,9 +91,9 @@ void NonConnexBody::moveToNextTimeStep()
 	//if (kinematic!=0)
 	//	kinematic->moveToNextTimeStep(bodies);
 
-	// FIXME : do we need to walk through the tree of objects in a different way than below ??	
+	// FIXME : do we need to walk through the tree of objects in a different way than below ??
 	for(unsigned int i=0;i<bodies.size();i++)
 		bodies[i]->moveToNextTimeStep();
 
-	
+
 }

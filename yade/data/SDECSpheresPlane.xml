@@ -13889,7 +13889,7 @@
 				<permanentInteractions[0] className="Contact" >
 					<permanentInteractions[0] id1="0" id2="0">
 						<interactionGeometry className="SDECPermanentLink" >
-							<interactionGeometry initialKn="0" initialKs="0" initialEquilibriumDistance="0" knMax="0" ksMax="0" radius1="0" radius2="0" />
+							<interactionGeometry initialKn="0" initialKs="0" initialEquilibriumDistance="0" knMax="0" ksMax="0" radius1="0" radius2="0" heta="0" />
 						</interactionGeometry>
 					</permanentInteractions[0]>
 				</permanentInteractions[0]>

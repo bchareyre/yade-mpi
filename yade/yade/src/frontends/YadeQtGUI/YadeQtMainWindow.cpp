@@ -30,6 +30,7 @@ YadeQtMainWindow::YadeQtMainWindow() : YadeQtGeneratedMainWindow()
 //	addItem("Preprocessor","FEMRock"); // not working
 	addItem("Preprocessor","BoxStack");
 	addItem("Preprocessor","SDECSpheresPlane");
+	addItem("Preprocessor","SDECLinkedSpheres");
 	createMenus();
 
 

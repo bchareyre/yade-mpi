@@ -163,7 +163,7 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 	if (first)
 	{
 		forces.resize(bodies.size());
-		moments.resize(bodies.size());		
+		moments.resize(bodies.size());
 	}
 
 	fill(forces.begin(),forces.end(),Vector3(0,0,0));
@@ -184,7 +184,7 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 
 		int id1 = contact->id1;
 		int id2 = contact->id2;
-		
+
 ////////////////////////////////////////////////////////////
 /// FIXME : those lines are too dirty !			 ///
 ////////////////////////////////////////////////////////////
@@ -295,7 +295,7 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 ////////////////////////////////////////////////////////////
 /// Moment law					 	 ///
 ////////////////////////////////////////////////////////////
-
+/*
 		if (first)
 		{
 			currentContact->prevRotation1 = de1->se3.rotation;
@@ -309,46 +309,46 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 		Vector3 t1	= currentContact->shearForce.normalized();
 		Vector3 t2	= n.unitCross(t1);
 
-		/*if (n[0]!=0 && n[1]!=0 && n[2]!=0)
-		{
-			t1 = Vector3(0,0,sqrt(1.0/(1+(n[2]*n[2]/(n[1]*n[1])))));
-			t1[1] = -n[2]/n[1]*t1[2];
-			t1.normalize();
-			t2 = n.unitCross(t1);
-		}
-		else
-		{
-			if (n[0]==0 && n[1]!=0 && n[2]!=0)
-			{
-				t1 = Vector3(1,0,0);
-				t2 = n.unitCross(t1);
-			}
-			else if (n[0]!=0 && n[1]==0 && n[2]!=0)
-			{
-				t1 = Vector3(0,1,0);
-				t2 = n.unitCross(t1);
-			}
-			else if (n[0]!=0 && n[1]!=0 && n[2]==0)
-			{
-				t1 = Vector3(0,0,1);
-				t2 = n.unitCross(t1);
-			}
-			else if (n[0]==0 && n[1]==0 && n[2]!=0)
-			{
-				t1 = Vector3(1,0,0);
-				t2 = Vector3(0,1,0);
-			}
-			else if (n[0]==0 && n[1]!=0 && n[2]==0)
-			{
-				t1 = Vector3(0,0,1);
-				t2 = Vector3(1,0,0);
-			}
-			else if (n[0]!=0 && n[1]==0 && n[2]==0)
-			{
-				t1 = Vector3(0,1,0);
-				t2 = Vector3(0,0,1);
-			}
-		}*/
+// 		if (n[0]!=0 && n[1]!=0 && n[2]!=0)
+// 		{
+// 			t1 = Vector3(0,0,sqrt(1.0/(1+(n[2]*n[2]/(n[1]*n[1])))));
+// 			t1[1] = -n[2]/n[1]*t1[2];
+// 			t1.normalize();
+// 			t2 = n.unitCross(t1);
+// 		}
+// 		else
+// 		{
+// 			if (n[0]==0 && n[1]!=0 && n[2]!=0)
+// 			{
+// 				t1 = Vector3(1,0,0);
+// 				t2 = n.unitCross(t1);
+// 			}
+// 			else if (n[0]!=0 && n[1]==0 && n[2]!=0)
+// 			{
+// 				t1 = Vector3(0,1,0);
+// 				t2 = n.unitCross(t1);
+// 			}
+// 			else if (n[0]!=0 && n[1]!=0 && n[2]==0)
+// 			{
+// 				t1 = Vector3(0,0,1);
+// 				t2 = n.unitCross(t1);
+// 			}
+// 			else if (n[0]==0 && n[1]==0 && n[2]!=0)
+// 			{
+// 				t1 = Vector3(1,0,0);
+// 				t2 = Vector3(0,1,0);
+// 			}
+// 			else if (n[0]==0 && n[1]!=0 && n[2]==0)
+// 			{
+// 				t1 = Vector3(0,0,1);
+// 				t2 = Vector3(1,0,0);
+// 			}
+// 			else if (n[0]!=0 && n[1]==0 && n[2]==0)
+// 			{
+// 				t1 = Vector3(0,1,0);
+// 				t2 = Vector3(0,0,1);
+// 			}
+// 		}
 
 		Quaternion q_i_n,q_n_i;
 
@@ -367,34 +367,34 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 // 		{
 // 			int j = (i+1)%3;
 // 			int k = (i+2)%3;
-// 
+//
 // 			if (n[j]>=0)
 // 				orientation_Nc[k] = acos(n[i]); // what is Nc_new
 // 			else
 // 				orientation_Nc[k] = -acos(n[i]);
-// 
+//
 // 			if (prevN[j]>=0)
 // 				orientation_Nc_old[k] = acos(prevN[i]);
 // 			else
-// 				orientation_Nc_old[k] = -acos(prevN[i]);	
+// 				orientation_Nc_old[k] = -acos(prevN[i]);
 // 		}
-// 
+//
 // 		dBeta = orientation_Nc - orientation_Nc_old;
-// 
-// 
+//
+//
 // 		Vector3 dRotationA,dRotationB,da,db;
 // 		de1->se3.rotation.toEulerAngles(dRotationA);
 // 		de2->se3.rotation.toEulerAngles(dRotationB);
-// 		
+//
 // 		currentContact->prevRotation1.toEulerAngles(da);
 // 		currentContact->prevRotation2.toEulerAngles(db);
-// 		
+//
 // 		dRotationA -= da;
 // 		dRotationB -= db;
-// 		
+//
 // 		Vector3 dUr = 	( currentContact->radius1*(  dRotationA  -  dBeta)
 // 				- currentContact->radius2*(  dRotationB  -  dBeta) ) * 0.5;
-				
+
 ////////////////////////////////////////////////////////////
 /// Ending of use of eurler angle		 	 ///
 ////////////////////////////////////////////////////////////
@@ -416,8 +416,8 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 ////////////////////////////////////////////////////////////
 /// Ending of use of Quaternion			 	 ///
 ////////////////////////////////////////////////////////////
-		
-				
+
+
 		Vector3 dThetar = dUr/currentContact->averageRadius;
 
 		currentContact->thetar += dThetar;
@@ -452,7 +452,7 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 
 		currentContact->prevRotation1 = de1->se3.rotation;
 		currentContact->prevRotation2 = de2->se3.rotation;
-
+*/
 ////////////////////////////////////////////////////////////
 /// Moment law	END				 	 ///
 ////////////////////////////////////////////////////////////
@@ -581,7 +581,7 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 					sign=1;
 				else
 					sign=-1;
-				forces[i][j] -= 0.1*f*sign;
+				forces[i][j] -= 0.3*f*sign;
 			}
 
 			float m = moments[i].length();
@@ -594,7 +594,7 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 					sign=1;
 				else
 					sign=-1;
-				moments[i][j] -= 0.1*m*sign;
+				moments[i][j] -= 0.3*m*sign;
 			}
 
 			de->acceleration += forces[i]*de->invMass;
