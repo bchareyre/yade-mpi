@@ -11,5 +11,5 @@ CONFIG += debug \
 TEMPLATE = subdirs 
 SUBDIRS += KinematicEngine \
            DynamicEngine \
-           ActionFunctor \
-           Action 
+           Action \
+           ActionFunctor 

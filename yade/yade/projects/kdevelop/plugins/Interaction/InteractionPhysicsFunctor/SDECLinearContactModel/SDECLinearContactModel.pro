@@ -5,6 +5,7 @@
 
 LIBS += -lSDECDiscreteElement \
         -lSDECContactPhysics \
+        -lSDECContactGeometry \
         -rdynamic 
 INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
@@ -12,6 +13,7 @@ UI_DIR = $(YADECOMPILATIONPATH)
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 QMAKE_LIBDIR = ../../../../plugins/Body/SDECDiscreteElement/$(YADEDYNLIBPATH) \
                ../../../../plugins/Interaction/InteractionPhysics/SDECContactPhysics/$(YADEDYNLIBPATH) \
+               ../../../../plugins/Interaction/InteractionGeometry/SDECContactGeometry/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
 CONFIG += debug \

@@ -9,8 +9,8 @@ OBJECTS_DIR = $(YADECOMPILATIONPATH)
 CONFIG += debug \
           warn_on 
 TEMPLATE = subdirs 
-SUBDIRS += InteractionGeometryFunctor \
-           InteractionGeometry \
-           InteractionPhysicsFunctor \
+SUBDIRS += InteractionGeometry \
+           InteractionGeometryFunctor \
            InteractionPhysics \
+           InteractionPhysicsFunctor \
            BroadInteractor 
