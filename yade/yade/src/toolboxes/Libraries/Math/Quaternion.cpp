@@ -97,7 +97,7 @@ void Quaternion::fromAngleAxis (const float& angle, const Vector3& axis)
     float halfAngle = 0.5f*angle;
     float sinus = sin(halfAngle);
     w = cos(halfAngle);
-    
+
     x = sinus*axis.x;
     y = sinus*axis.y;
     z = sinus*axis.z;
@@ -112,7 +112,7 @@ void Quaternion::toAngleAxis (float& angle, Vector3& axis) const
     //   q = cos(A/2)+sin(A/2)*(x*i+y*j+z*k)
 
    // cerr.precision(40);
-    
+
     float sqrLength = x*x+y*y+z*z;
     if ( sqrLength > 0.0f )
     {
@@ -124,7 +124,7 @@ void Quaternion::toAngleAxis (float& angle, Vector3& axis) const
 // 		cerr << "w==-1" << endl;
 // 	else if (w==1)
 // 		cerr << "w==1" << endl;
-		
+
 	angle = 2.0f*acos(w);
         float invLength = 1.0f/sqrt(sqrLength);
         axis.x = x*invLength;
@@ -178,6 +178,33 @@ void Quaternion::toAxes (Vector3* axis) const
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+void Quaternion::toEulerAngles (Vector3& eulerAngles,float threshold) const
+{
+
+	if (fabs(x*y + z*w - 0.5) < threshold) // (north pole)
+	{
+		eulerAngles[0] = 2 * atan2(x,w);
+		eulerAngles[1] = Constants::HALF_PI;
+		eulerAngles[2] = 0;
+	}
+	else if (fabs(x*y + z*w + 0.5) < threshold ) //  (south pole)
+	{
+		eulerAngles[0] = -2 * atan2(x,w);
+		eulerAngles[1] = -Constants::HALF_PI;
+		eulerAngles[2] = 0;
+	}
+	else
+	{
+		eulerAngles[0] = atan2(2*y*w-2*x*z , 1 - 2*y*y - 2*z*z);
+		eulerAngles[1] = asin(2*x*y + 2*z*w);
+		eulerAngles[2] = atan2(2*x*w-2*y*z , 1 - 2*x*x - 2*z*z);
+	}
+
+
+
+
+}
+
 void Quaternion::toGLMatrix(float m[16])
 {
 
@@ -203,11 +230,11 @@ void Quaternion::toGLMatrix(float m[16])
     m[2]  = z2x-y2w;
     m[6]  = z2y+x2w;
     m[10] = 1.0f-(x2x+y2y);
-	
+
 	m[12] = 0.0l;
 	m[13] = 0.0l;
 	m[14] = 0.0l;
-  
+
 	m[3] = 0.0l;
 	m[7] = 0.0l;
 	m[11] = 0.0l;

@@ -56,7 +56,7 @@ class SDECDynamicEngine : public DynamicEngine
 			return (p1.get<0>()<p2.get<0>());
 		}
 	};
-	
+
 	vector<set<tuple<int,bool,shared_ptr<InteractionGeometry> >,lessThanTuple > > interactionsPerBody;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -65,7 +65,11 @@ class SDECDynamicEngine : public DynamicEngine
 
 	private : std::vector<Vector3> forces;
 	private : std::vector<Vector3> moments;
+// FIXME : this belongs only to SDECRotationLawDynamicEngine
+	private : std::vector<Vector3> prevAngularVelocities;
+
 	private : bool first;
+	//private : bool first2;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Constructor/Destructor								        ///
@@ -81,7 +85,7 @@ class SDECDynamicEngine : public DynamicEngine
 	public : void registerAttributes();
 
 	public : void respondToCollisions(Body* body);
-	
+
 	public : void filter(Body* body);
 	REGISTER_CLASS_NAME(SDECDynamicEngine);
 };

@@ -14,7 +14,7 @@ SDECPermanentLink::~SDECPermanentLink ()
 void SDECPermanentLink::processAttributes()
 {
 	shearForce = Vector3(0,0,0);
-	thetar = 0;
+	thetar = Vector3(0,0,0);
 }
 
 void SDECPermanentLink::registerAttributes()
@@ -27,4 +27,5 @@ void SDECPermanentLink::registerAttributes()
 	REGISTER_ATTRIBUTE(ksMax);
 	REGISTER_ATTRIBUTE(radius1);
 	REGISTER_ATTRIBUTE(radius2);
+	REGISTER_ATTRIBUTE(heta);
 }

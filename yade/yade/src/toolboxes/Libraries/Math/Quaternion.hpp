@@ -57,6 +57,7 @@ class Quaternion : public Serializable
 	public : void fromAxes (const Vector3* axis);
 	public : void toAxes (Vector3* axis) const;
 	public : void toGLMatrix(float m[16]);
+	public : void toEulerAngles (Vector3& eulerAngles,float threshold = 1e-06f) const;
 
 	// arithmetic operations
 	public : bool operator== (const Quaternion& q) const;

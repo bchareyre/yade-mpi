@@ -16,10 +16,9 @@ class SDECPermanentLink : public InteractionGeometry
 
 	public : float kn;				// normal elastic constant.
 	public : float ks;				// shear elastic constant.
-	
+
 	public : float knMax;
 	public : float ksMax;
-	public : float thetar;
 
 	public : float initialKn;			// initial normal elastic constant.
 	public : float initialKs;			// initial shear elastic constant.
@@ -28,6 +27,19 @@ class SDECPermanentLink : public InteractionGeometry
 	public : Vector3 prevNormal;			// unit normal of the contact plane.
 	public : Vector3 normalForce;			// normal force applied on a DE
 	public : Vector3 shearForce;			// shear force applied on a DE
+
+/////////////////////////////////////////////////////// FIXME : this goes to another dynlib - MDEM
+	public : Vector3 initRotation1;
+	public : Vector3 prevRotation1;
+	public : Vector3 currentRotation1;
+	public : Vector3 initRotation2;
+	public : Vector3 prevRotation2;
+	public : Vector3 currentRotation2;
+	public : Vector3 thetar;
+	public : float heta;
+	public : float averageRadius;
+	// kr ???????????
+////////////////////////////////////////////////////////
 
 	// construction
 	public : SDECPermanentLink ();
