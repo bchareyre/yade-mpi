@@ -29,8 +29,8 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool Box2Sphere4ErrorTolerant::go(		const shared_ptr<BodyInteractionGeometry>& cm1,
-						const shared_ptr<BodyInteractionGeometry>& cm2,
+bool Box2Sphere4ErrorTolerant::go(		const shared_ptr<InteractionDescription>& cm1,
+						const shared_ptr<InteractionDescription>& cm2,
 						const Se3r& se31,
 						const Se3r& se32,
 						shared_ptr<Interaction>& c)
@@ -138,8 +138,8 @@ bool Box2Sphere4ErrorTolerant::go(		const shared_ptr<BodyInteractionGeometry>& c
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool Box2Sphere4ErrorTolerant::goReverse(	const shared_ptr<BodyInteractionGeometry>& cm1,
-						const shared_ptr<BodyInteractionGeometry>& cm2,
+bool Box2Sphere4ErrorTolerant::goReverse(	const shared_ptr<InteractionDescription>& cm1,
+						const shared_ptr<InteractionDescription>& cm2,
 						const Se3r& se31,
 						const Se3r& se32,
 						shared_ptr<Interaction>& c)

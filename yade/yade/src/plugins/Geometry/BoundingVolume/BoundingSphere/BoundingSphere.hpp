@@ -1,9 +1,9 @@
 #ifndef __BOUNDINGSPHERE_H__
 #define __BOUNDINGSPHERE_H__
 
-#include "BodyBoundingVolume.hpp"
+#include "BoundingVolume.hpp"
 
-class BoundingSphere : public BodyBoundingVolume
+class BoundingSphere : public BoundingVolume
 {
 	public : Real radius;
 	public : Vector3r center;
@@ -25,7 +25,7 @@ class BoundingSphere : public BodyBoundingVolume
 /// Indexable											///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	REGISTER_CLASS_INDEX(BoundingSphere,BodyBoundingVolume);
+	REGISTER_CLASS_INDEX(BoundingSphere,BoundingVolume);
 };
 
 REGISTER_SERIALIZABLE(BoundingSphere,false);

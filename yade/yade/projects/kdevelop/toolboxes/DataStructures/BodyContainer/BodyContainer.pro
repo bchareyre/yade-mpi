@@ -3,7 +3,7 @@
 # Subdir relative project main directory: ./toolboxes/DataStructures/BodyContainer
 # Target is a subdirs project 
 
-SUBDIRS += BodyAssocVec \
+SUBDIRS += BodyAssocVector \
            BodyRedirectionVector 
 LIBS += -rdynamic 
 INCLUDEPATH = $(YADEINCLUDEPATH) 

@@ -29,7 +29,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void GLDrawSphereShadowVolume::go(const shared_ptr<BodyGeometricalModel>& gm , const shared_ptr<BodyPhysicalParameters>& pp, const Vector3r& lightPos)
+void GLDrawSphereShadowVolume::go(const shared_ptr<GeometricalModel>& gm , const shared_ptr<BodyPhysicalParameters>& pp, const Vector3r& lightPos)
 {
 	//FIXME : do not cast on RigidBody but use Parameters instead
 	//Vector3r center = (static_cast<Particle*>(pp.get()))->se3.translation;

@@ -17,43 +17,40 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+ 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+#ifndef __GEOMETRICALMODELFACTORY_H__
+#define __GEOMETRICALMODELFACTORY_H__
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#ifndef __COLLISIONMODELFACTORY_H__
-#define __COLLISIONMODELFACTORY_H__
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-#include "BodyGeometricalModel.hpp"
-#include "BodyInteractionGeometry.hpp"
+#include "GeometricalModel.hpp"
 #include "Serializable.hpp"
-#include "Se3.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-/*! \brief Abstract interface for all interaction model factories.
-	It is used for creating a interaction model from a geometrical model during runtime.
-	This is very useful when it is not trivial to build the interaction model from the geometrical model. For example if you want to build an sphere tree from a polyhedron, it is not easy to write by hand into the configuration file the center and size of all spheres. Instead you can use a BodyInteractionGeometryFactoryFunctor that will compute for you the correct values.
+/*! \brief Abstract interface for all geometrical model factories.
+	It is used for creating a geometrical model from a given set of parameters.
+	This is very useful when you want to load a file that contains geometrical data or when you want to build an object with that depends on several parameters.
 */
-class BodyInteractionGeometryFactoryFunctor : public Factorable
+class GeometricalModelFactoryFunctor : public Factorable
 {	
-	
 	// construction
-	public : BodyInteractionGeometryFactoryFunctor ();
-	public : virtual ~BodyInteractionGeometryFactoryFunctor ();
+	public : GeometricalModelFactoryFunctor ();
+	public : virtual ~GeometricalModelFactoryFunctor ();
 	
-	public : virtual shared_ptr<BodyInteractionGeometry> buildInteractionGeometry(const shared_ptr<BodyGeometricalModel> gm, const Se3r& se3) = 0;
+	public : virtual shared_ptr<GeometricalModel> createGeometricalModel() = 0;
 
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#endif // __COLLISIONMODELFACTORY_H__
+#endif // __GEOMETRICALMODELFACTORY_H__
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -28,16 +28,16 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void InteractionGeometrySet2AABBFactory::go(	const shared_ptr<BodyInteractionGeometry>& cm,
-						shared_ptr<BodyBoundingVolume>& bv,
+void InteractionGeometrySet2AABBFactory::go(	const shared_ptr<InteractionDescription>& cm,
+						shared_ptr<BoundingVolume>& bv,
 						const Se3r& 	)
 {
 	shared_ptr<InteractionGeometrySet> set = dynamic_pointer_cast<InteractionGeometrySet>(cm);
 	
 	shared_ptr<AABB> aabb = dynamic_pointer_cast<AABB>(bv);
 	
-	vector<shared_ptr<BodyInteractionGeometry> >::iterator si = set->interactionGeometries.begin();
-	vector<shared_ptr<BodyInteractionGeometry> >::iterator siEnd = set->interactionGeometries.end();
+	vector<shared_ptr<InteractionDescription> >::iterator si = set->interactionGeometries.begin();
+	vector<shared_ptr<InteractionDescription> >::iterator siEnd = set->interactionGeometries.end();
 	Vector3r max(-Mathr::MAX_REAL,-Mathr::MAX_REAL,-Mathr::MAX_REAL);
 	Vector3r min(Mathr::MAX_REAL,Mathr::MAX_REAL,Mathr::MAX_REAL);
 	for( ; si!=siEnd ; ++si)

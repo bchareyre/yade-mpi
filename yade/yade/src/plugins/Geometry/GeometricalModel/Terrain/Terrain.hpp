@@ -24,7 +24,7 @@
 #ifndef __TERRAIN_H__
 #define __TERRAIN_H__
 
-#include "BodyGeometricalModel.hpp"
+#include "GeometricalModel.hpp"
 
 #include <vector>
 #include <fstream>
@@ -33,7 +33,7 @@
 
 using namespace std;
 
-class Terrain : public BodyGeometricalModel
+class Terrain : public GeometricalModel
 {
 	typedef std::vector<int> tFace;
 
@@ -108,7 +108,7 @@ class Terrain : public BodyGeometricalModel
 /// Indexable											///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	REGISTER_CLASS_INDEX(Terrain,BodyGeometricalModel);
+	REGISTER_CLASS_INDEX(Terrain,GeometricalModel);
 	
 };
 

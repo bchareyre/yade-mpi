@@ -16,7 +16,7 @@
 #include "InteractionGeometryDispatcher.hpp"
 #include "InteractionPhysicsDispatcher.hpp"
 #include "ActionDispatcher.hpp"
-#include "BodyBoundingVolumeFactoryDispatcher.hpp"
+#include "BoundingVolumeFactoryDispatcher.hpp"
 #include "InteractionGeometrySet2AABBFactory.hpp"
 #include "InteractionGeometrySet.hpp"
 #include "Particle.hpp"
@@ -81,7 +81,7 @@ string HangingCloth::generate()
 	shared_ptr<InteractionPhysicsDispatcher> ipd(new InteractionPhysicsDispatcher);
 	ipd->addInteractionPhysicsFunctor("SDECDiscreteElement","SDECDiscreteElement","SDECLinearContactModel");
 		
-	shared_ptr<BodyBoundingVolumeFactoryDispatcher> bvu	= shared_ptr<BodyBoundingVolumeFactoryDispatcher>(new BodyBoundingVolumeFactoryDispatcher);
+	shared_ptr<BoundingVolumeFactoryDispatcher> bvu	= shared_ptr<BoundingVolumeFactoryDispatcher>(new BoundingVolumeFactoryDispatcher);
 	bvu->addBVFactories("InteractionSphere","AABB","Sphere2AABBFactory");
 	bvu->addBVFactories("InteractionBox","AABB","Box2AABBFactory");
 	bvu->addBVFactories("InteractionGeometrySet","AABB","InteractionGeometrySet2AABBFactory");

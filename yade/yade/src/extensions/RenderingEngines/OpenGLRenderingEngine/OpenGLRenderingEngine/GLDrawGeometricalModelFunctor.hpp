@@ -28,7 +28,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "FunctorWrapper.hpp"
-#include "BodyGeometricalModel.hpp"
+#include "GeometricalModel.hpp"
 #include "BodyPhysicalParameters.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -37,7 +37,7 @@
 class GLDrawGeometricalModelFunctor : public FunctorWrapper
 		<
 		 void ,
-		 TYPELIST_2(const shared_ptr<BodyGeometricalModel>&, const shared_ptr<BodyPhysicalParameters>&) 
+		 TYPELIST_2(const shared_ptr<GeometricalModel>&, const shared_ptr<BodyPhysicalParameters>&) 
 		>
 {
 };

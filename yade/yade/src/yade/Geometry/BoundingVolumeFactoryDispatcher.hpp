@@ -29,23 +29,23 @@
 
 #include "Actor.hpp"
 #include "DynLibDispatcher.hpp"
-#include "BodyInteractionGeometry.hpp"
-#include "BodyBoundingVolume.hpp"
-#include "BodyBoundingVolumeFactoryFunctor.hpp"
+#include "InteractionDescription.hpp"
+#include "BoundingVolume.hpp"
+#include "BoundingVolumeFactoryFunctor.hpp"
 #include "Body.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class BodyBoundingVolumeFactoryDispatcher : public Actor
+class BoundingVolumeFactoryDispatcher : public Actor
 {
 	protected: DynLibDispatcher
-		<	TYPELIST_2( BodyInteractionGeometry , BodyBoundingVolume ) ,	// base classess for dispatch
-			BodyBoundingVolumeFactoryFunctor,					// class that provides multivirtual call
+		<	TYPELIST_2( InteractionDescription , BoundingVolume ) ,	// base classess for dispatch
+			BoundingVolumeFactoryFunctor,					// class that provides multivirtual call
 			void ,							// return type
 			TYPELIST_3(
-					  const shared_ptr<BodyInteractionGeometry>&	// arguments
-					, shared_ptr<BodyBoundingVolume>&
+					  const shared_ptr<InteractionDescription>&	// arguments
+					, shared_ptr<BoundingVolume>&
 					, const Se3r&
 				)
 		> bvFactoriesManager;
@@ -54,15 +54,15 @@ class BodyBoundingVolumeFactoryDispatcher : public Actor
 	public  : void addBVFactories(const string& str1,const string& str2,const string& str3);
 
 	// construction
-	public : BodyBoundingVolumeFactoryDispatcher ();
-	public : ~BodyBoundingVolumeFactoryDispatcher ();
+	public : BoundingVolumeFactoryDispatcher ();
+	public : ~BoundingVolumeFactoryDispatcher ();
 
 	public : void registerAttributes();
 	public : void postProcessAttributes(bool deserializing);
 	public : virtual void action(Body* b);
 	public : void updateBoundingVolume(Body* b);
 	public : void updateBoundingVolume(shared_ptr<Body> b);
-	REGISTER_CLASS_NAME(BodyBoundingVolumeFactoryDispatcher);
+	REGISTER_CLASS_NAME(BoundingVolumeFactoryDispatcher);
 
 	public : bool isActivated();
 
@@ -71,7 +71,7 @@ class BodyBoundingVolumeFactoryDispatcher : public Actor
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-REGISTER_SERIALIZABLE(BodyBoundingVolumeFactoryDispatcher,false);
+REGISTER_SERIALIZABLE(BoundingVolumeFactoryDispatcher,false);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -1,7 +1,7 @@
 #include "BoundingSphere.hpp"
 #include "OpenGLWrapper.hpp"
 
-BoundingSphere::BoundingSphere (Real r) : BodyBoundingVolume()
+BoundingSphere::BoundingSphere (Real r) : BoundingVolume()
 {
 	radius = r;
 	createIndex();
@@ -20,7 +20,7 @@ void BoundingSphere::postProcessAttributes(bool)
 
 void BoundingSphere::registerAttributes()
 {
-	BodyBoundingVolume::registerAttributes();
+	BoundingVolume::registerAttributes();
 	REGISTER_ATTRIBUTE(radius);
 	REGISTER_ATTRIBUTE(center);
 }

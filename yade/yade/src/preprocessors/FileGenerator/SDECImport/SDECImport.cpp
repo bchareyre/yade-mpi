@@ -16,7 +16,7 @@
 #include "ForceRecorder.hpp"
 #include "AveragePositionRecorder.hpp"
 
-#include "BodyBoundingVolumeFactoryDispatcher.hpp"
+#include "BoundingVolumeFactoryDispatcher.hpp"
 #include "InteractionGeometrySet.hpp"
 #include "InteractionGeometrySet2AABBFactory.hpp"
 
@@ -104,7 +104,7 @@ string SDECImport::generate()
 // 	nc->addCollisionFunctor("Sphere","Box","Box2Sphere4SDECContactModel");
 // 
 // // specify bounding volume
-// 	shared_ptr<BodyBoundingVolumeFactoryDispatcher> bvu	= shared_ptr<BodyBoundingVolumeFactoryDispatcher>(new BodyBoundingVolumeFactoryDispatcher);
+// 	shared_ptr<BoundingVolumeFactoryDispatcher> bvu	= shared_ptr<BoundingVolumeFactoryDispatcher>(new BoundingVolumeFactoryDispatcher);
 // 	bvu->addBVFactories("Sphere","AABB","Sphere2AABBFactory");
 // 	bvu->addBVFactories("Box","AABB","Box2AABBFactory");
 // 	bvu->addBVFactories("InteractionGeometrySet","AABB","InteractionGeometrySet2AABBFactory");
@@ -139,11 +139,11 @@ string SDECImport::generate()
 // 	set->wire		= false;
 // 	set->visible		= true;
 // 	set->shadowCaster	= false;
-// 	rootBody->interactionGeometry		= dynamic_pointer_cast<BodyInteractionGeometry>(set);
+// 	rootBody->interactionGeometry		= dynamic_pointer_cast<InteractionDescription>(set);
 // 	
 // 	aabb			= shared_ptr<AABB>(new AABB);
 // 	aabb->color		= Vector3r(0,0,1);
-// 	rootBody->boundingVolume		= dynamic_pointer_cast<BodyBoundingVolume>(aabb);
+// 	rootBody->boundingVolume		= dynamic_pointer_cast<BoundingVolume>(aabb);
 // 
 // 	
 // 	
@@ -204,7 +204,7 @@ string SDECImport::generate()
 // 			s->se3			= Se3r(translation,q);
 // 	
 // 			aabb->color		= Vector3r(0,1,0);
-// 			s->boundingVolume			= dynamic_pointer_cast<BodyBoundingVolume>(aabb);
+// 			s->boundingVolume			= dynamic_pointer_cast<BoundingVolume>(aabb);
 // 	
 // 			sphere->radius		= radius;
 // 			if(spheresRandomColor)
@@ -215,8 +215,8 @@ string SDECImport::generate()
 // 			sphere->visible		= true;
 // 			sphere->shadowCaster	= true;
 // 	
-// 			s->interactionGeometry			= dynamic_pointer_cast<BodyInteractionGeometry>(sphere);
-// 			s->geometricalModel			= dynamic_pointer_cast<BodyGeometricalModel>(sphere);
+// 			s->interactionGeometry			= dynamic_pointer_cast<InteractionDescription>(sphere);
+// 			s->geometricalModel			= dynamic_pointer_cast<GeometricalModel>(sphere);
 // 			s->kn			= kn_Spheres;
 // 			s->ks			= ks_Spheres;
 // 	
@@ -249,14 +249,14 @@ string SDECImport::generate()
 // 	sdec->inertia		= Vector3r(0,0,0);				// is not moving, so it's inertia is zero
 // 	sdec->se3		= Se3r(center,q);				// position, rotation
 // 	aabb->color		= Vector3r(1,0,0);				// AABB is red
-// 	sdec->boundingVolume		= dynamic_pointer_cast<BodyBoundingVolume>(aabb);
+// 	sdec->boundingVolume		= dynamic_pointer_cast<BoundingVolume>(aabb);
 // 	box ->extents		= halfSize;					// size
 // 	box ->diffuseColor	= Vector3f(1,1,1);				// color is white
 // 	box ->wire		= wall_bottom_wire;				// draw as wireframe?
 // 	box ->visible		= true;						// draw
 // 	box ->shadowCaster	= false;					// is not casting shadows
-// 	sdec->interactionGeometry		= dynamic_pointer_cast<BodyInteractionGeometry>(box);
-// 	sdec->geometricalModel		= dynamic_pointer_cast<BodyInteractionGeometry>(box);
+// 	sdec->interactionGeometry		= dynamic_pointer_cast<InteractionDescription>(box);
+// 	sdec->geometricalModel		= dynamic_pointer_cast<InteractionDescription>(box);
 // 	sdec->kn		= kn_Box;					// kn
 // 	sdec->ks		= ks_Box;					// ks
 // 	
@@ -296,14 +296,14 @@ string SDECImport::generate()
 // 	sdec->inertia		= Vector3r(0,0,0);				// is not moving, so it's inertia is zero
 // 	sdec->se3		= Se3r(center,q);				// position, rotation
 // 	aabb->color		= Vector3r(1,0,0);				// AABB is red
-// 	sdec->boundingVolume		= dynamic_pointer_cast<BodyBoundingVolume>(aabb);
+// 	sdec->boundingVolume		= dynamic_pointer_cast<BoundingVolume>(aabb);
 // 	box ->extents		= halfSize;					// size
 // 	box ->diffuseColor	= Vector3f(1,1,1);				// color is white
 // 	box ->wire		= wall_top_wire;				// draw as wireframe?
 // 	box ->visible		= true;						// draw
 // 	box ->shadowCaster	= false;					// is not casting shadows
-// 	sdec->interactionGeometry		= dynamic_pointer_cast<BodyInteractionGeometry>(box);
-// 	sdec->geometricalModel		= dynamic_pointer_cast<BodyInteractionGeometry>(box);
+// 	sdec->interactionGeometry		= dynamic_pointer_cast<InteractionDescription>(box);
+// 	sdec->geometricalModel		= dynamic_pointer_cast<InteractionDescription>(box);
 // 	sdec->kn		= kn_Box;					// kn
 // 	sdec->ks		= ks_Box;					// ks
 // 	body = dynamic_pointer_cast<Body>(sdec);
@@ -334,14 +334,14 @@ string SDECImport::generate()
 // 	sdec->inertia		= Vector3r(0,0,0);				// is not moving, so it's inertia is zero
 // 	sdec->se3		= Se3r(center,q);				// position, rotation
 // 	aabb->color		= Vector3r(1,0,0);				// AABB is red
-// 	sdec->boundingVolume		= dynamic_pointer_cast<BodyBoundingVolume>(aabb);
+// 	sdec->boundingVolume		= dynamic_pointer_cast<BoundingVolume>(aabb);
 // 	box ->extents		= halfSize;					// size
 // 	box ->diffuseColor	= Vector3f(1,1,1);				// color is white
 // 	box ->wire		= wall_1_wire;					// draw as wireframe?
 // 	box ->visible		= true;						// draw
 // 	box ->shadowCaster	= false;					// is not casting shadows
-// 	sdec->interactionGeometry		= dynamic_pointer_cast<BodyInteractionGeometry>(box);
-// 	sdec->geometricalModel		= dynamic_pointer_cast<BodyInteractionGeometry>(box);
+// 	sdec->interactionGeometry		= dynamic_pointer_cast<InteractionDescription>(box);
+// 	sdec->geometricalModel		= dynamic_pointer_cast<InteractionDescription>(box);
 // 	sdec->kn		= kn_Box;					// kn
 // 	sdec->ks		= ks_Box;					// ks
 // 	body = dynamic_pointer_cast<Body>(sdec);
@@ -372,14 +372,14 @@ string SDECImport::generate()
 // 	sdec->inertia		= Vector3r(0,0,0);				// is not moving, so it's inertia is zero
 // 	sdec->se3		= Se3r(center,q);				// position, rotation
 // 	aabb->color		= Vector3r(1,0,0);				// AABB is red
-// 	sdec->boundingVolume		= dynamic_pointer_cast<BodyBoundingVolume>(aabb);
+// 	sdec->boundingVolume		= dynamic_pointer_cast<BoundingVolume>(aabb);
 // 	box ->extents		= halfSize;					// size
 // 	box ->diffuseColor	= Vector3f(1,1,1);				// color is white
 // 	box ->wire		= wall_2_wire;					// draw as wireframe?
 // 	box ->visible		= true;						// draw
 // 	box ->shadowCaster	= false;					// is not casting shadows
-// 	sdec->interactionGeometry		= dynamic_pointer_cast<BodyInteractionGeometry>(box);
-// 	sdec->geometricalModel		= dynamic_pointer_cast<BodyInteractionGeometry>(box);
+// 	sdec->interactionGeometry		= dynamic_pointer_cast<InteractionDescription>(box);
+// 	sdec->geometricalModel		= dynamic_pointer_cast<InteractionDescription>(box);
 // 	sdec->kn		= kn_Box;					// kn
 // 	sdec->ks		= ks_Box;					// ks
 // 	body = dynamic_pointer_cast<Body>(sdec);
@@ -410,14 +410,14 @@ string SDECImport::generate()
 // 	sdec->inertia		= Vector3r(0,0,0);				// is not moving, so it's inertia is zero
 // 	sdec->se3		= Se3r(center,q);				// position, rotation
 // 	aabb->color		= Vector3r(1,0,0);				// AABB is red
-// 	sdec->boundingVolume		= dynamic_pointer_cast<BodyBoundingVolume>(aabb);
+// 	sdec->boundingVolume		= dynamic_pointer_cast<BoundingVolume>(aabb);
 // 	box ->extents		= halfSize;					// size
 // 	box ->diffuseColor	= Vector3f(1,1,1);				// color is white
 // 	box ->wire		= wall_3_wire;					// draw as wireframe?
 // 	box ->visible		= true;						// draw
 // 	box ->shadowCaster	= false;					// is not casting shadows
-// 	sdec->interactionGeometry		= dynamic_pointer_cast<BodyInteractionGeometry>(box);
-// 	sdec->geometricalModel		= dynamic_pointer_cast<BodyInteractionGeometry>(box);
+// 	sdec->interactionGeometry		= dynamic_pointer_cast<InteractionDescription>(box);
+// 	sdec->geometricalModel		= dynamic_pointer_cast<InteractionDescription>(box);
 // 	sdec->kn		= kn_Box;					// kn
 // 	sdec->ks		= ks_Box;					// ks
 // 	body = dynamic_pointer_cast<Body>(sdec);
@@ -448,14 +448,14 @@ string SDECImport::generate()
 // 	sdec->inertia		= Vector3r(0,0,0);				// is not moving, so it's inertia is zero
 // 	sdec->se3		= Se3r(center,q);				// position, rotation
 // 	aabb->color		= Vector3r(1,0,0);				// AABB is red
-// 	sdec->boundingVolume		= dynamic_pointer_cast<BodyBoundingVolume>(aabb);
+// 	sdec->boundingVolume		= dynamic_pointer_cast<BoundingVolume>(aabb);
 // 	box ->extents		= halfSize;					// size
 // 	box ->diffuseColor	= Vector3f(1,1,1);				// color is white
 // 	box ->wire		= wall_4_wire;					// draw as wireframe?
 // 	box ->visible		= true;						// draw
 // 	box ->shadowCaster	= false;					// is not casting shadows
-// 	sdec->interactionGeometry		= dynamic_pointer_cast<BodyInteractionGeometry>(box);
-// 	sdec->geometricalModel		= dynamic_pointer_cast<BodyInteractionGeometry>(box);
+// 	sdec->interactionGeometry		= dynamic_pointer_cast<InteractionDescription>(box);
+// 	sdec->geometricalModel		= dynamic_pointer_cast<InteractionDescription>(box);
 // 	sdec->kn		= kn_Box;					// kn
 // 	sdec->ks		= ks_Box;					// ks
 // 	body = dynamic_pointer_cast<Body>(sdec);

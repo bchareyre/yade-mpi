@@ -30,8 +30,8 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool Terrain2Sphere4ClosestFeatures::go(	const shared_ptr<BodyInteractionGeometry>& cm1,
-						const shared_ptr<BodyInteractionGeometry>& cm2,
+bool Terrain2Sphere4ClosestFeatures::go(	const shared_ptr<InteractionDescription>& cm1,
+						const shared_ptr<InteractionDescription>& cm2,
 						const Se3r& se31,
 						const Se3r& se32,
 						shared_ptr<Interaction>& c)
@@ -84,8 +84,8 @@ bool Terrain2Sphere4ClosestFeatures::go(	const shared_ptr<BodyInteractionGeometr
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool Terrain2Sphere4ClosestFeatures::goReverse(	const shared_ptr<BodyInteractionGeometry>& cm1,
-						const shared_ptr<BodyInteractionGeometry>& cm2,
+bool Terrain2Sphere4ClosestFeatures::goReverse(	const shared_ptr<InteractionDescription>& cm1,
+						const shared_ptr<InteractionDescription>& cm2,
 						const Se3r& se31,
 						const Se3r& se32,
 						shared_ptr<Interaction>& c)

@@ -28,8 +28,8 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool Sphere2Sphere4SDECContactModel::go(	const shared_ptr<BodyInteractionGeometry>& cm1,
-						const shared_ptr<BodyInteractionGeometry>& cm2,
+bool Sphere2Sphere4SDECContactModel::go(	const shared_ptr<InteractionDescription>& cm1,
+						const shared_ptr<InteractionDescription>& cm2,
 						const Se3r& se31,
 						const Se3r& se32,
 						shared_ptr<Interaction>& c)
@@ -78,8 +78,8 @@ bool Sphere2Sphere4SDECContactModel::go(	const shared_ptr<BodyInteractionGeometr
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool Sphere2Sphere4SDECContactModel::goReverse(	const shared_ptr<BodyInteractionGeometry>& cm1,
-						const shared_ptr<BodyInteractionGeometry>& cm2,
+bool Sphere2Sphere4SDECContactModel::goReverse(	const shared_ptr<InteractionDescription>& cm1,
+						const shared_ptr<InteractionDescription>& cm2,
 						const Se3r& se31,
 						const Se3r& se32,
 						shared_ptr<Interaction>& c)

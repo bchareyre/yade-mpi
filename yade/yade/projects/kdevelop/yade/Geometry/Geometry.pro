@@ -18,27 +18,18 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
-HEADERS += BodyBoundingVolume.hpp \
-           BodyBoundingVolumeFactoryFunctor.hpp \
-           BodyBoundingVolumeFactoryDispatcher.hpp \
-           BodyBoundingVolumeUpdatorFunctor.hpp \
-           BodyBoundingVolumeUpdatorDispatcher.hpp \
-           BodyInteractionGeometry.hpp \
-           BodyInteractionGeometryFactoryFunctor.hpp \
-           BodyInteractionGeometryFactoryDispatcher.hpp \
-           BodyInteractionGeometryUpdatorFunctor.hpp \
-           BodyInteractionGeometryUpdatorDispatcher.hpp \
-           BodyGeometricalModel.hpp \
-           BodyGeometricalModelFactoryFunctor.hpp \
-           BodyGeometricalModelFactoryDispatcher.hpp \
-           BodyGeometricalModelUpdatorFunctor.hpp \
-           BodyGeometricalModelUpdatorDispatcher.hpp
-SOURCES += BodyBoundingVolume.cpp \
-           BodyBoundingVolumeFactoryDispatcher.cpp \
-           BodyBoundingVolumeUpdatorDispatcher.cpp \
-           BodyInteractionGeometry.cpp \
-           BodyInteractionGeometryFactoryDispatcher.cpp \
-           BodyInteractionGeometryUpdatorDispatcher.cpp \
-           BodyGeometricalModel.cpp \
-           BodyGeometricalModelFactoryDispatcher.cpp \
-           BodyGeometricalModelUpdatorDispatcher.cpp
+HEADERS += BoundingVolume.hpp \
+           BoundingVolumeFactoryFunctor.hpp \
+           BoundingVolumeFactoryDispatcher.hpp \
+           InteractionGeometry.hpp \
+           InteractionGeometryFactoryFunctor.hpp \
+           InteractionGeometryFactoryDispatcher.hpp \
+           GeometricalModel.hpp \
+           GeometricalModelFactoryFunctor.hpp \
+           GeometricalModelFactoryDispatcher.hpp
+SOURCES += BoundingVolume.cpp \
+           BoundingVolumeFactoryDispatcher.cpp \
+           InteractionGeometry.cpp \
+           InteractionGeometryFactoryDispatcher.cpp \
+           GeometricalModel.cpp \
+           GeometricalModelFactoryDispatcher.cpp

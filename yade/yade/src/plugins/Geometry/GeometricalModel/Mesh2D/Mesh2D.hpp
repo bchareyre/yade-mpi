@@ -24,7 +24,7 @@
 #ifndef __MESH2D_H__
 #define __MESH2D_H__
 
-#include "BodyGeometricalModel.hpp"
+#include "GeometricalModel.hpp"
 
 #define offset(i,j) ((i)*height+(j))
 
@@ -45,7 +45,7 @@ class Edge : public Serializable
 };
 REGISTER_SERIALIZABLE(Edge,true);
 
-class Mesh2D : public BodyGeometricalModel
+class Mesh2D : public GeometricalModel
 {
 	public : vector<Vector3r> vertices;
 	public : vector<Edge> edges;
@@ -70,7 +70,7 @@ class Mesh2D : public BodyGeometricalModel
 /// Indexable											///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	REGISTER_CLASS_INDEX(Mesh2D,BodyGeometricalModel);
+	REGISTER_CLASS_INDEX(Mesh2D,GeometricalModel);
 
 };
 

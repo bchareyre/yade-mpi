@@ -33,9 +33,9 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "Se3.hpp"
-#include "BodyGeometricalModel.hpp"
-#include "BodyInteractionGeometry.hpp"
-#include "BodyBoundingVolume.hpp"
+#include "GeometricalModel.hpp"
+#include "InteractionDescription.hpp"
+#include "BoundingVolume.hpp"
 #include "BodyPhysicalParameters.hpp"
 #include "InteractionContainer.hpp"
 #include "Interaction.hpp"
@@ -77,13 +77,13 @@ class Body : public Serializable
 	public : shared_ptr<BodyPhysicalParameters> physicalParameters;
 
 	/*! The geometrical model of this body (polyhedron, box ...) */
-	public : shared_ptr<BodyGeometricalModel> geometricalModel;
+	public : shared_ptr<GeometricalModel> geometricalModel;
 	
 	/*! The interaction model of this body (sphere hierarchy, box ...) */
-	public : shared_ptr<BodyInteractionGeometry> interactionGeometry;
+	public : shared_ptr<InteractionDescription> interactionGeometry;
 	
 	/*! The bounding volume of this body (AABB, K-Dop ...) */
-	public : shared_ptr<BodyBoundingVolume> boundingVolume;
+	public : shared_ptr<BoundingVolume> boundingVolume;
 	
 
 	// FIXME : should be determined automatically or not ?? if the body has a subscription to a kinematic engine then it is not dynamic but maybe a body with no subscription can be not dynamic ??

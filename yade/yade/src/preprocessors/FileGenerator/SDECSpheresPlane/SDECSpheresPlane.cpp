@@ -14,7 +14,7 @@
 #include "SDECDiscreteElement.hpp"
 #include "SDECPermanentLink.hpp"
 #include "Interaction.hpp"
-#include "BodyBoundingVolumeFactoryDispatcher.hpp"
+#include "BoundingVolumeFactoryDispatcher.hpp"
 #include "InteractionGeometrySet2AABBFactory.hpp"
 #include "InteractionGeometrySet.hpp"
 #include "SDECLinearContactModel.hpp"
@@ -70,7 +70,7 @@ string SDECSpheresPlane::generate()
 	shared_ptr<InteractionPhysicsDispatcher> ipd(new InteractionPhysicsDispatcher);
 	ipd->addInteractionPhysicsFunctor("SDECDiscreteElement","SDECDiscreteElement","SDECLinearContactModel");
 		
-	shared_ptr<BodyBoundingVolumeFactoryDispatcher> bvu	= shared_ptr<BodyBoundingVolumeFactoryDispatcher>(new BodyBoundingVolumeFactoryDispatcher);
+	shared_ptr<BoundingVolumeFactoryDispatcher> bvu	= shared_ptr<BoundingVolumeFactoryDispatcher>(new BoundingVolumeFactoryDispatcher);
 	bvu->addBVFactories("InteractionSphere","AABB","Sphere2AABBFactory");
 	bvu->addBVFactories("InteractionBox","AABB","Box2AABBFactory");
 	bvu->addBVFactories("InteractionGeometrySet","AABB","InteractionGeometrySet2AABBFactory");
@@ -116,11 +116,11 @@ string SDECSpheresPlane::generate()
 	//set->wire		= false;
 	//set->visible		= true;
 	//set->shadowCaster	= false;
-	rootBody->interactionGeometry		= dynamic_pointer_cast<BodyInteractionGeometry>(set);	
+	rootBody->interactionGeometry		= dynamic_pointer_cast<InteractionDescription>(set);	
 	
 	aabb			= shared_ptr<AABB>(new AABB);
 	aabb->diffuseColor		= Vector3r(0,0,1);
-	rootBody->boundingVolume		= dynamic_pointer_cast<BodyBoundingVolume>(aabb);
+	rootBody->boundingVolume		= dynamic_pointer_cast<BoundingVolume>(aabb);
 
 	
 	shared_ptr<SimpleBody> box1(new SimpleBody);
@@ -136,7 +136,7 @@ string SDECSpheresPlane::generate()
 	physics->inertia	= Vector3r(0,0,0);
 	physics->se3		= Se3r(Vector3r(0,0,0),q);
 	aabb->diffuseColor	= Vector3r(1,0,0);
-	box1->boundingVolume		= dynamic_pointer_cast<BodyBoundingVolume>(aabb);
+	box1->boundingVolume		= dynamic_pointer_cast<BoundingVolume>(aabb);
 	
 	box->extents		= groundSize;
 	box->diffuseColor	= Vector3f(1,1,1);
@@ -147,8 +147,8 @@ string SDECSpheresPlane::generate()
 	interactionBox->extents		= groundSize;
 	interactionBox->diffuseColor	= Vector3f(1,1,1);
 		
-	box1->interactionGeometry		= dynamic_pointer_cast<BodyInteractionGeometry>(interactionBox);
-	box1->geometricalModel		= dynamic_pointer_cast<BodyGeometricalModel>(box);
+	box1->interactionGeometry		= dynamic_pointer_cast<InteractionDescription>(interactionBox);
+	box1->geometricalModel		= dynamic_pointer_cast<GeometricalModel>(box);
 	physics->kn		= kn;
 	physics->ks		= ks;
 
@@ -185,7 +185,7 @@ string SDECSpheresPlane::generate()
 		s->se3			= Se3r(translation,q);
 
 		aabb->diffuseColor		= Vector3r(0,1,0);
-		simple->boundingVolume			= dynamic_pointer_cast<BodyBoundingVolume>(aabb);
+		simple->boundingVolume			= dynamic_pointer_cast<BoundingVolume>(aabb);
 
 		sphere->radius		= radius;
 		sphere->diffuseColor	= Vector3f(Mathf::unitRandom(),Mathf::unitRandom(),Mathf::unitRandom());
@@ -197,8 +197,8 @@ string SDECSpheresPlane::generate()
 		interactionSphere->diffuseColor	= Vector3f(Mathf::unitRandom(),Mathf::unitRandom(),Mathf::unitRandom());
 		
 		
-		simple->interactionGeometry			= dynamic_pointer_cast<BodyInteractionGeometry>(interactionSphere);
-		simple->geometricalModel			= dynamic_pointer_cast<BodyGeometricalModel>(sphere);
+		simple->interactionGeometry			= dynamic_pointer_cast<InteractionDescription>(interactionSphere);
+		simple->geometricalModel			= dynamic_pointer_cast<GeometricalModel>(sphere);
 		s->kn			= kn;
 		s->ks			= ks;
 		simple->physicalParameters = s;

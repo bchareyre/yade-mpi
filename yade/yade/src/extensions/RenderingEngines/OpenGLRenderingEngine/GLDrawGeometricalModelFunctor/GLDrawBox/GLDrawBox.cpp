@@ -28,7 +28,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void GLDrawBox::go(const shared_ptr<BodyGeometricalModel>& gm, const shared_ptr<BodyPhysicalParameters>&)
+void GLDrawBox::go(const shared_ptr<GeometricalModel>& gm, const shared_ptr<BodyPhysicalParameters>&)
 {
 	// FIXME : check that : one of those 2 lines are useless
   	glMaterialv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, gm->diffuseColor);

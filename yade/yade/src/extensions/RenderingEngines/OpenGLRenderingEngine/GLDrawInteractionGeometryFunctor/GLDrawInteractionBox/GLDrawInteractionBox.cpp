@@ -28,7 +28,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void GLDrawInteractionBox::go(const shared_ptr<BodyInteractionGeometry>& cg, const shared_ptr<BodyPhysicalParameters>&)
+void GLDrawInteractionBox::go(const shared_ptr<InteractionDescription>& cg, const shared_ptr<BodyPhysicalParameters>&)
 {
 	// FIXME : check that : one of those 2 lines are useless
   	glMaterialv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, cg->diffuseColor);

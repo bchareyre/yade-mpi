@@ -1,7 +1,7 @@
 #include "AABB.hpp"
 #include "OpenGLWrapper.hpp"
 
-AABB::AABB () : BodyBoundingVolume()
+AABB::AABB () : BoundingVolume()
 {
 	createIndex();
 }
@@ -19,7 +19,7 @@ void AABB::postProcessAttributes(bool /*deserializing*/)
 
 void AABB::registerAttributes()
 {
-	BodyBoundingVolume::registerAttributes();
+	BoundingVolume::registerAttributes();
 	//REGISTER_ATTRIBUTE(center);
 	//REGISTER_ATTRIBUTE(halfSize);
 }
@@ -27,7 +27,7 @@ void AABB::registerAttributes()
 
 
 
-//FIXME : remove all updates and overlap function from BodyBoundingVolume
+//FIXME : remove all updates and overlap function from BoundingVolume
 // void AABB::update(Se3r& se3)
 // {
 // 	//center = se3.translation;

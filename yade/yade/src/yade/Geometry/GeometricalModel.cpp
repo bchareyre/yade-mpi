@@ -1,7 +1,7 @@
-#include "BodyGeometricalModel.hpp"
+#include "GeometricalModel.hpp"
 
 
-void BodyGeometricalModel::registerAttributes()
+void GeometricalModel::registerAttributes()
 {
 	REGISTER_ATTRIBUTE(diffuseColor);
 	REGISTER_ATTRIBUTE(wire);

@@ -24,9 +24,9 @@
 // #ifndef __MESH3D_H__
 // #define __MESH3D_H__
 // 
-// #include "BodyInteractionGeometry.hpp"
+// #include "InteractionDescription.hpp"
 // 
-// class Polyhedron : public BodyInteractionGeometry
+// class Polyhedron : public InteractionDescription
 // {
 // 	public : string mshFileName;
 // 
@@ -58,7 +58,7 @@
 // /// Indexable											///
 // ///////////////////////////////////////////////////////////////////////////////////////////////////
 // 	
-// 	REGISTER_CLASS_INDEX(Polyhedron,BodyInteractionGeometry);
+// 	REGISTER_CLASS_INDEX(Polyhedron,InteractionDescription);
 // 
 // };
 // 

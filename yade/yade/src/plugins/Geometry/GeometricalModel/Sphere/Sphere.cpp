@@ -25,7 +25,7 @@
 #include "OpenGLWrapper.hpp"
 
 
-Sphere::Sphere () : BodyGeometricalModel()
+Sphere::Sphere () : GeometricalModel()
 {
 	createIndex();
 }
@@ -37,12 +37,12 @@ Sphere::~Sphere ()
 
 void Sphere::postProcessAttributes(bool deserializing)
 {
-	BodyGeometricalModel::postProcessAttributes(deserializing);
+	GeometricalModel::postProcessAttributes(deserializing);
 }
 
 void Sphere::registerAttributes()
 {
-	BodyGeometricalModel::registerAttributes();
+	GeometricalModel::registerAttributes();
 	REGISTER_ATTRIBUTE(radius);
 }
 

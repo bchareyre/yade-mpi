@@ -1,9 +1,9 @@
 #ifndef __AABB_H__
 #define __AABB_H__
 
-#include "BodyBoundingVolume.hpp"
+#include "BoundingVolume.hpp"
 
-class AABB : public BodyBoundingVolume
+class AABB : public BoundingVolume
 {
 	public : Vector3r halfSize;
 	public : Vector3r center;
@@ -27,7 +27,7 @@ class AABB : public BodyBoundingVolume
 /// Indexable											///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	REGISTER_CLASS_INDEX(AABB,BodyBoundingVolume);
+	REGISTER_CLASS_INDEX(AABB,BoundingVolume);
 };
 
 REGISTER_SERIALIZABLE(AABB,false);

@@ -26,7 +26,7 @@
 #include <iostream>
 
 
-Mesh2D::Mesh2D () : BodyGeometricalModel()
+Mesh2D::Mesh2D () : GeometricalModel()
 {		
 	createIndex();
 }
@@ -38,7 +38,7 @@ Mesh2D::~Mesh2D ()
 
 void Mesh2D::postProcessAttributes(bool deserializing)
 {
-	BodyGeometricalModel::postProcessAttributes(deserializing);
+	GeometricalModel::postProcessAttributes(deserializing);
 	
 	if(deserializing)
 	{
@@ -57,7 +57,7 @@ void Mesh2D::postProcessAttributes(bool deserializing)
 
 void Mesh2D::registerAttributes()
 {
-	BodyGeometricalModel::registerAttributes();
+	GeometricalModel::registerAttributes();
 	REGISTER_ATTRIBUTE(vertices);
 	REGISTER_ATTRIBUTE(edges);
 	REGISTER_ATTRIBUTE(faces);

@@ -46,10 +46,10 @@ void SimpleBroadInteractor::broadInteractionTest(Body * /*body*/)
 
 	/*for(unsigned int i=0;i<bodies.size()-1 ; i++)
 	{
-		shared_ptr<BodyBoundingVolume> bv1 = bodies[i]->bv;
+		shared_ptr<BoundingVolume> bv1 = bodies[i]->bv;
 		for(unsigned int j=i+1;j<bodies.size() ; j++)
 		{
-			shared_ptr<BodyBoundingVolume> bv2 = bodies[j]->bv;
+			shared_ptr<BoundingVolume> bv2 = bodies[j]->bv;
 			if ( !(bodies[i]->isDynamic==false && bodies[j]->isDynamic==false) && overlapper->overlapp(bv1,bv2))
 			{
 				interactions.push_back(shared_ptr<Interaction>(new Interaction(i,j)));
@@ -65,7 +65,7 @@ void SimpleBroadInteractor::broadInteractionTest(Body * /*body*/)
 
 /*
 
-bool BVOverlapper::overlappSphereSphere(const shared_ptr<BodyBoundingVolume> bv1, const shared_ptr<BodyBoundingVolume> bv2)
+bool BVOverlapper::overlappSphereSphere(const shared_ptr<BoundingVolume> bv1, const shared_ptr<BoundingVolume> bv2)
 {
 	shared_ptr<BoundingSphere> s1 = dynamic_pointer_cast<BoundingSphere>(bv1);
 	shared_ptr<BoundingSphere> s2 = dynamic_pointer_cast<BoundingSphere>(bv2);
@@ -74,7 +74,7 @@ bool BVOverlapper::overlappSphereSphere(const shared_ptr<BodyBoundingVolume> bv1
 
 }
 
-bool BVOverlapper::overlappAABBSphere(const shared_ptr<BodyBoundingVolume> bv1, const shared_ptr<BodyBoundingVolume> bv2)
+bool BVOverlapper::overlappAABBSphere(const shared_ptr<BoundingVolume> bv1, const shared_ptr<BoundingVolume> bv2)
 {
 
 	Vector3r l,t,p,q,r;
@@ -116,7 +116,7 @@ bool BVOverlapper::overlappAABBSphere(const shared_ptr<BodyBoundingVolume> bv1, 
 }
 
 
-bool BVOverlapper::overlappAABBAABB(const shared_ptr<BodyBoundingVolume> bv1, const shared_ptr<BodyBoundingVolume> bv2)
+bool BVOverlapper::overlappAABBAABB(const shared_ptr<BoundingVolume> bv1, const shared_ptr<BoundingVolume> bv2)
 {
 	Vector3r min1 = bv1->min;
 	Vector3r max1 = bv1->max;

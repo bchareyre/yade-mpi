@@ -13,7 +13,7 @@
 #include "SDECDiscreteElement.hpp"
 #include "SDECPermanentLink.hpp"
 #include "Interaction.hpp"
-#include "BodyBoundingVolumeFactoryDispatcher.hpp"
+#include "BoundingVolumeFactoryDispatcher.hpp"
 #include "InteractionGeometrySet2AABBFactory.hpp"
 #include "InteractionGeometrySet.hpp"
 #include "SDECLinearContactModel.hpp"
@@ -70,7 +70,7 @@ string SDECLinkedSpheres::generate()
 	shared_ptr<InteractionPhysicsDispatcher> ipd(new InteractionPhysicsDispatcher);
 	ipd->addInteractionPhysicsFunctor("SDECDiscreteElement","SDECDiscreteElement","SDECLinearContactModel");
 		
-	shared_ptr<BodyBoundingVolumeFactoryDispatcher> bvu	= shared_ptr<BodyBoundingVolumeFactoryDispatcher>(new BodyBoundingVolumeFactoryDispatcher);
+	shared_ptr<BoundingVolumeFactoryDispatcher> bvu	= shared_ptr<BoundingVolumeFactoryDispatcher>(new BoundingVolumeFactoryDispatcher);
 	bvu->addBVFactories("InteractionSphere","AABB","Sphere2AABBFactory");
 	bvu->addBVFactories("InteractionBox","AABB","Box2AABBFactory");
 	bvu->addBVFactories("InteractionGeometrySet","AABB","InteractionGeometrySet2AABBFactory");
@@ -107,8 +107,8 @@ string SDECLinkedSpheres::generate()
 	shared_ptr<AABB> aabb(new AABB);
 	aabb->diffuseColor	= Vector3r(0,0,1);
 	
-	rootBody->interactionGeometry		= dynamic_pointer_cast<BodyInteractionGeometry>(set);	
-	rootBody->boundingVolume		= dynamic_pointer_cast<BodyBoundingVolume>(aabb);
+	rootBody->interactionGeometry		= dynamic_pointer_cast<InteractionDescription>(set);	
+	rootBody->boundingVolume		= dynamic_pointer_cast<BoundingVolume>(aabb);
 	rootBody->physicalParameters = physics;
 	
 ////////////////////////////////////

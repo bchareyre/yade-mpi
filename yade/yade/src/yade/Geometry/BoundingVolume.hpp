@@ -21,54 +21,65 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#ifndef __BOUNDINGVOLUMEFACTORY_H__
-#define __BOUNDINGVOLUMEFACTORY_H__
+#ifndef __BOUNDINGVOLUME_H__
+#define __BOUNDINGVOLUME_H__
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "FunctorWrapper.hpp"
-#include "BodyBoundingVolume.hpp"
-#include "BodyInteractionGeometry.hpp"
+#include <GL/glut.h>
+#include <GL/gl.h>
+#include "Se3.hpp"
+#include "Serializable.hpp"
+#include "Indexable.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <boost/shared_ptr.hpp>
-#include <string>
+/*! \brief Abstract interface for all bounding volumes.
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-/*! \brief Abstract interface for all bounding volume factories.
-	It is used for creating a bounding volume from a interaction geometry during runtime.
-	This is very useful when it is not trivial to build the bounding volume from the interaction model.
-	 
-	For example if you want to build an AABB from a box which is not initially aligned with the world axis, it is not easy to write by hand into the configuration file the center and size of this AABB. Instead you can use a BodyBoundingVolumeFactoryFunctor that will compute for you the correct value	
+	All the bounding volumes (BoundingSphere, AABB ...) must derived from this class. A bounding volume is used to speed up the collision detection. Instead of computing if 2 complex polyhedron collide each other, it is much faster to first test if their bounding volume (for example a AABB) are in collision.
 */
-class BodyBoundingVolumeFactoryFunctor : public FunctorWrapper
-	/*! Method called to build a given bounding volume from a given collision model and a 3D transformation
-		\param const shared_ptr<BodyInteractionGeometry>& the collision model from wich we want to extract the bounding volume
-		\param Se3r& the 3D transformation to apply to the collision model before building the bounding volume
-		\return shared_ptr<BodyBoundingVolume>& shared pointer to the bounding volume
-	*/
-		<
-		 void ,
-		 TYPELIST_3(
-		 		  const shared_ptr<BodyInteractionGeometry>&
-				, shared_ptr<BodyBoundingVolume>&
-				, const Se3r&
-		)>
-{	
+class BoundingVolume : public Serializable, public Indexable
+{
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+/// Attributes											///
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+	/*! Color of the bounding volume. Used only for opengl drawing purpose */
+	public : Vector3r diffuseColor;
+
+	/*! Minimum of the bounding volume */
+	public : Vector3r min;
+
+	/*! Maximum of the bounding volume */
+	public : Vector3r max;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+/// Serialization										///
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+	REGISTER_CLASS_NAME(BoundingVolume);	
+	public : void registerAttributes();
+	
+///////////////////////////////////////////////////////////////////////////////////////////////////
+/// Indexable											///
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+	REGISTER_INDEX_COUNTER(BoundingVolume);
+
 };
 
-//FIXME : make also second class for updateBoundingVolume. In fact we can load them automatically as we do with collisionFunctor because their name are Terrain2AABB ....
-//virtual bool go(const shared_ptr<BodyInteractionGeometry> , const shared_ptr<BodyInteractionGeometry> , const Se3r& , const Se3r& , shared_ptr<Interaction> );
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+REGISTER_SERIALIZABLE(BoundingVolume,false);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#endif // __BOUNDINGVOLUMEFACTORY_H__
+#endif // __BOUNDINGVOLUME_H__
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -34,7 +34,7 @@
 
 class GLDrawAABB : public GLDrawBoundingVolumeFunctor
 {
-	public : virtual void go(const shared_ptr<BodyBoundingVolume>&);
+	public : virtual void go(const shared_ptr<BoundingVolume>&);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -17,40 +17,43 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
- 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-#ifndef __GEOMETRICALMODELFACTORY_H__
-#define __GEOMETRICALMODELFACTORY_H__
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "BodyGeometricalModel.hpp"
+#ifndef __COLLISIONMODELFACTORY_H__
+#define __COLLISIONMODELFACTORY_H__
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+#include "GeometricalModel.hpp"
+#include "InteractionDescription.hpp"
 #include "Serializable.hpp"
+#include "Se3.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-/*! \brief Abstract interface for all geometrical model factories.
-	It is used for creating a geometrical model from a given set of parameters.
-	This is very useful when you want to load a file that contains geometrical data or when you want to build an object with that depends on several parameters.
+/*! \brief Abstract interface for all interaction model factories.
+	It is used for creating a interaction model from a geometrical model during runtime.
+	This is very useful when it is not trivial to build the interaction model from the geometrical model. For example if you want to build an sphere tree from a polyhedron, it is not easy to write by hand into the configuration file the center and size of all spheres. Instead you can use a InteractionDescriptionFactoryFunctor that will compute for you the correct values.
 */
-class BodyGeometricalModelFactoryFunctor : public Factorable
+class InteractionDescriptionFactoryFunctor : public Factorable
 {	
-	// construction
-	public : BodyGeometricalModelFactoryFunctor ();
-	public : virtual ~BodyGeometricalModelFactoryFunctor ();
 	
-	public : virtual shared_ptr<BodyGeometricalModel> createGeometricalModel() = 0;
+	// construction
+	public : InteractionDescriptionFactoryFunctor ();
+	public : virtual ~InteractionDescriptionFactoryFunctor ();
+	
+	public : virtual shared_ptr<InteractionDescription> buildInteractionGeometry(const shared_ptr<GeometricalModel> gm, const Se3r& se3) = 0;
 
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#endif // __GEOMETRICALMODELFACTORY_H__
+#endif // __COLLISIONMODELFACTORY_H__
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////

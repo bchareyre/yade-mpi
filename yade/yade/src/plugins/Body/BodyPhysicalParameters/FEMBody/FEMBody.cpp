@@ -23,7 +23,7 @@
 // 	if(deserializing)
 // 	{
 // 		FIXME : when serialization tracks pointers delete it
-// 		cm = dynamic_pointer_cast<BodyInteractionGeometry>(gm);
+// 		cm = dynamic_pointer_cast<InteractionDescription>(gm);
 // 		gm = cm;
 // 	}
 // 	
