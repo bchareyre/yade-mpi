@@ -28,6 +28,7 @@ void Omega::init()
 {
 	filename="";
 	maxiter = 0; // unlimited
+	automatic=false;
 
 	gravity_x = 0.0;
 	gravity_y = -9.81;
@@ -48,10 +49,7 @@ void Omega::init()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-Vector3 Omega::getGravity()
-{
-	return Vector3(gravity_x,gravity_y,gravity_z);
-}
+/// FIXME - everything below SHOULD NOT be inside Omega.
 
 void Omega::setGravity(Vector3 g)
 {
@@ -59,6 +57,13 @@ void Omega::setGravity(Vector3 g)
 	gravity_y = g.y;
 	gravity_z = g.z;
 }
+
+Vector3 Omega::getGravity()
+{
+	return Vector3(gravity_x,gravity_y,gravity_z);
+}
+
+/// FIXME - maybe some settings class, or something....
 
 void Omega::setTimestep(const string t)
 {
@@ -88,5 +93,15 @@ void Omega::setMaxiter(const string m)
 long int Omega::getMaxiter()
 {
 	return maxiter;
+}
+
+void Omega::setAutomatic(bool b)
+{
+	automatic = b;
+}
+
+bool Omega::getAutomatic()
+{
+	return automatic;
 }
 

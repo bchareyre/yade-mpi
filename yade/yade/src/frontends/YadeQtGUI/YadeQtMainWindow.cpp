@@ -42,11 +42,10 @@ YadeQtMainWindow::YadeQtMainWindow() : YadeQtGeneratedMainWindow()
 	workspace->setBackgroundMode( PaletteMid );
 	setCentralWidget( vbox );
 
-	if( Omega::instance().getFilename().size() != 0 )
-	{
+	if( Omega::instance().getFilename().size() != 0)
 		loadSimulation( Omega::instance().getFilename() );
+	if( Omega::instance().getAutomatic() )
 		glViewer->startAnimation();
-	}
 
 /*
 	QtGUIGenerator guiGen;

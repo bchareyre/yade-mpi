@@ -33,11 +33,11 @@ Yet Another Dynamic Engine, pre-alpha.\n\
 	-i	- specify name of frontend interface library (currently only\n\
 		  YadeQtGUI is available; ncurses, command line and\n\
 		  network-based interfaces can be added later)\n\
-	-f	- specify filename to load - if given - file is loaded and\n\
-		  computations start instantly\n\
+	-f	- specify filename to load\n\
 	-m	- specify maximum number of iterations ( 0 = unlimited,\n\
 		  tested every 100th iteration)\n\
 	-t	- set time step in seconds\n\
+	-a	- automatic start of computation\n\
 \n\
 ";
 }
@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
 	string frontend="";
 
 	int ch;
-	while((ch=getopt(argc,argv,"hi:f:m:t:"))!=-1) // use ':', when additional parameter optarg is expected and used
+	while((ch=getopt(argc,argv,"hi:f:m:t:a"))!=-1) // use ':', when additional parameter optarg is expected and used
 		switch(ch)
 		{
 			case 'h' : help();					return 1;
@@ -56,6 +56,7 @@ int main(int argc, char *argv[])
 			case 'f' : Omega::instance().setFilename(optarg);	break;
 			case 'm' : Omega::instance().setMaxiter(optarg);	break;
 			case 't' : Omega::instance().setTimestep(optarg);	break;
+			case 'a' : Omega::instance().setAutomatic(true);	break;
 			default  : help();					return 1;
 	}
 
