@@ -82,6 +82,7 @@ void SDECSpheresPlane::generate()
 	box->diffuseColor	= Vector3r(1,1,1);
 	box->wire		= false;
 	box->visible		= true;
+	box->shadowCaster	= false;
 	box1->cm		= dynamic_pointer_cast<CollisionGeometry>(box);
 	box1->gm		= dynamic_pointer_cast<CollisionGeometry>(box);
 	box1->kn		= 100000;
@@ -125,6 +126,8 @@ void SDECSpheresPlane::generate()
 		sphere->diffuseColor	= Vector3r(Mathr::unitRandom(),Mathr::unitRandom(),Mathr::unitRandom());
 		sphere->wire		= false;
 		sphere->visible		= true;
+		sphere->shadowCaster	= true;
+		
 		s->cm			= dynamic_pointer_cast<CollisionGeometry>(sphere);
 		s->gm			= dynamic_pointer_cast<GeometricalModel>(sphere);
 		s->kn			= 100000;

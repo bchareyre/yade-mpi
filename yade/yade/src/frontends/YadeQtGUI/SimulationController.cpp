@@ -10,7 +10,8 @@
 #include <qlcdnumber.h>
 #include <qlabel.h>
 #include <boost/lexical_cast.hpp>
-
+#include <boost/filesystem/operations.hpp>
+#include <boost/filesystem/convenience.hpp>
 
 using namespace boost;
 
@@ -37,7 +38,8 @@ void SimulationController::pbLoadClicked()
 		Omega::instance().setSimulationFileName(fileName);
 		Omega::instance().loadSimulation();
 
-		tlCurrentSimulation->setText(fileName);
+		string fullName = string(filesystem::basename(fileName.data()))+string(filesystem::extension(fileName.data()));
+		tlCurrentSimulation->setText(fullName);
 		
 		if (glViews.size()==0)
  		{

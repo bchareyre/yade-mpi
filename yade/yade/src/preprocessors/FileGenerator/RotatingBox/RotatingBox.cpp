@@ -91,6 +91,7 @@ void RotatingBox::generate()
 	box->diffuseColor	= Vector3r(1,1,1);
 	box->wire		= false;
 	box->visible		= true;
+	box->shadowCaster	= false;
 	box1->cm		= dynamic_pointer_cast<CollisionGeometry>(box);
 	box1->gm		= dynamic_pointer_cast<CollisionGeometry>(box);
 	box1->kn		= 100000;
@@ -113,6 +114,7 @@ void RotatingBox::generate()
 	box->diffuseColor	= Vector3r(1,1,1);
 	box->wire		= true;
 	box->visible		= true;
+	box->shadowCaster	= false;
 	box2->cm		= dynamic_pointer_cast<CollisionGeometry>(box);
 	box2->gm		= dynamic_pointer_cast<CollisionGeometry>(box);
 	box2->kn		= 100000;
@@ -135,6 +137,7 @@ void RotatingBox::generate()
 	box->diffuseColor	= Vector3r(1,1,1);
 	box->wire		= true;
 	box->visible		= true;
+	box->shadowCaster	= false;	
 	box3->cm		= dynamic_pointer_cast<CollisionGeometry>(box);
 	box3->gm		= dynamic_pointer_cast<CollisionGeometry>(box);
 	box3->kn		= 100000;
@@ -157,6 +160,7 @@ void RotatingBox::generate()
 	box->diffuseColor	= Vector3r(1,1,1);
 	box->wire		= true;
 	box->visible		= true;
+	box->shadowCaster	= false;		
 	box4->cm		= dynamic_pointer_cast<CollisionGeometry>(box);
 	box4->gm		= dynamic_pointer_cast<CollisionGeometry>(box);
 	box4->kn		= 100000;
@@ -179,6 +183,7 @@ void RotatingBox::generate()
 	box->diffuseColor	= Vector3r(1,1,1);
 	box->wire		= true;
 	box->visible		= true;
+	box->shadowCaster	= false;		
 	box5->cm		= dynamic_pointer_cast<CollisionGeometry>(box);
 	box5->gm		= dynamic_pointer_cast<CollisionGeometry>(box);
 	box5->kn		= 100000;
@@ -201,6 +206,7 @@ void RotatingBox::generate()
 	box->diffuseColor	= Vector3r(1,1,1);
 	box->wire		= true;
 	box->visible		= true;
+	box->shadowCaster	= false;		
 	box6->cm		= dynamic_pointer_cast<CollisionGeometry>(box);
 	box6->gm		= dynamic_pointer_cast<CollisionGeometry>(box);
 	box6->kn		= 100000;
@@ -223,6 +229,7 @@ void RotatingBox::generate()
 	box->diffuseColor	= Vector3r(1,1,1);
 	box->wire		= true;
 	box->visible		= true;
+	box->shadowCaster	= false;		
 	box7->cm		= dynamic_pointer_cast<CollisionGeometry>(box);
 	box7->gm		= dynamic_pointer_cast<CollisionGeometry>(box);
 	box7->kn		= 100000;
@@ -271,6 +278,7 @@ void RotatingBox::generate()
 		sphere->diffuseColor	= Vector3r(Mathr::unitRandom(),Mathr::unitRandom(),Mathr::unitRandom());
 		sphere->wire		= false;
 		sphere->visible		= true;
+		sphere->shadowCaster	= true;	
 		s->cm			= dynamic_pointer_cast<CollisionGeometry>(sphere);
 		s->gm			= dynamic_pointer_cast<GeometricalModel>(sphere);
 		s->kn			= 100000;
@@ -312,6 +320,7 @@ void RotatingBox::generate()
 				box->diffuseColor	= Vector3r(Mathr::unitRandom(),Mathr::unitRandom(),Mathr::unitRandom());
 				box->wire		= false;
 				box->visible		= true;
+				box->shadowCaster	= true;	
 				boxi->cm		= dynamic_pointer_cast<CollisionGeometry>(box);
 				boxi->gm		= dynamic_pointer_cast<CollisionGeometry>(box);
 

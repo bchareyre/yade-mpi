@@ -15,6 +15,7 @@ LIBS += -lSerialization \
         -lGLWindowManager \
         -lThreads \
         -lOpenGLRenderingEngine \
+        -lboost_filesystem \
         -rdynamic 
 INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
