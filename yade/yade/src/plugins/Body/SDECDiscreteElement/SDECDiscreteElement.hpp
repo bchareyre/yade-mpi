@@ -12,7 +12,7 @@ class SDECDiscreteElement : public RigidBody
 	public : SDECDiscreteElement ();
 	public : ~SDECDiscreteElement ();
 
-	public : void processAttributes();
+	public : void afterDeserialization();
 	public : void registerAttributes();
 
 	//public : void updateBoundingVolume(Se3r& se3);

@@ -13,7 +13,7 @@ BallisticDynamicEngine::~BallisticDynamicEngine ()
 
 }
 
-void BallisticDynamicEngine::processAttributes()
+void BallisticDynamicEngine::afterDeserialization()
 {
 
 }

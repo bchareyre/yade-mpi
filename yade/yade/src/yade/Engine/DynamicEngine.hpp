@@ -59,7 +59,7 @@ class DynamicEngine : public Actor
 
 	public : virtual ~DynamicEngine ();
 
-	public : virtual void processAttributes();
+	public : virtual void afterDeserialization();
 	public : virtual void registerAttributes();
 
 	//public : virtual bool isActivated();

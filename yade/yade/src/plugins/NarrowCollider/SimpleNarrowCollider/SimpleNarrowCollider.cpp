@@ -12,9 +12,9 @@ SimpleNarrowCollider::~ SimpleNarrowCollider()
 
 }
 
-void SimpleNarrowCollider::processAttributes()
+void SimpleNarrowCollider::afterDeserialization()
 {
-	NarrowCollider::processAttributes();
+	NarrowCollider::afterDeserialization();
 }
 
 void SimpleNarrowCollider::registerAttributes()

@@ -11,7 +11,7 @@ Translator::~Translator ()
 
 }
 
-void Translator::processAttributes()
+void Translator::afterDeserialization()
 {
 	translationAxis.normalize();
 }

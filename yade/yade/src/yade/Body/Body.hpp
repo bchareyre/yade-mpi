@@ -120,9 +120,9 @@ class Body : public Serializable
 	/*! Abstract function overloaded in Connex and NonConnex body. Move the body to the next time step using its own internal dynamic engine */
 	public : virtual void moveToNextTimeStep() {};
 
-	/*! If computations on the attributes are needed after serialization. For example you may want to serialize the name of a file that contains geometrical data and processAttributes will load the file */
+	/*! If computations on the attributes are needed after serialization. For example you may want to serialize the name of a file that contains geometrical data and afterDeserialization will load the file */
 
-	public : void processAttributes();
+	public : void afterDeserialization();
 	/*! Tells the IOManager which attributes should be serialized */
 	public : void registerAttributes();
 

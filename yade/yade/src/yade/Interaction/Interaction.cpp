@@ -9,7 +9,7 @@ Interaction::~Interaction ()
 
 }
 
-void Interaction::processAttributes()
+void Interaction::afterDeserialization()
 {
 
 }

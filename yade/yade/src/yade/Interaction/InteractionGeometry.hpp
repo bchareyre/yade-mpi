@@ -39,7 +39,7 @@ class InteractionGeometry : public Serializable
 	public : InteractionGeometry ();
 	public : ~InteractionGeometry ();
 
-	public : void processAttributes();
+	public : void afterDeserialization();
 	public : void registerAttributes();
 
 	REGISTER_CLASS_NAME(InteractionGeometry);

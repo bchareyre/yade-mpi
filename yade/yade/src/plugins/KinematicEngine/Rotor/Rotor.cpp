@@ -11,7 +11,7 @@ Rotor::~Rotor ()
 
 }
 
-void Rotor::processAttributes()
+void Rotor::afterDeserialization()
 {
 
 }

@@ -27,7 +27,7 @@
 #include "ContainerHandler.tpp"
 #include "PointerHandler.tpp"
 #include "KnownFundamentalsHandler.tpp"
-//#include "MultiTypeHandler.tpp"
+//#include "MultiTypeHandler.tpp" // this is in Serializable.hpp, should be here, but then it doesn't compile
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -68,7 +68,7 @@ template<typename Type>
 bool isFundamental(Type& )
 {
 	return	(	boost::is_fundamental< Type >::value 	|| //int, float, char, double ...
-			typeid(Type)==typeid(string) 		|| // std::string 
+			typeid(Type)==typeid(string) 		|| // std::string
 			typeid(Type)==typeid(Vector2f)		||
 			typeid(Type)==typeid(Vector2d)		||
 			typeid(Type)==typeid(Vector3f)		||
@@ -84,8 +84,7 @@ bool isFundamental(Type& )
 			typeid(Type)==typeid(Quaternionf)	||
 			typeid(Type)==typeid(Quaterniond)	||
 			typeid(Type)==typeid(Se3f)		||
-			typeid(Type)==typeid(Se3d)	
-			
+			typeid(Type)==typeid(Se3d)
 		);
 }
 
@@ -98,9 +97,9 @@ template<typename Type>
 SerializableTypes::Type findType(Type& instance,bool& fundamental, string& str)
 {
 	SerializableTypes::Type type;
-			
+
 	if (isFundamental(instance))
-	{	
+	{
 		fundamental = true;
 		return SerializableTypes::FUNDAMENTAL;
 	}
@@ -124,14 +123,10 @@ SerializableTypes::Type findType(Type& instance,bool& fundamental, string& str)
 template<typename Type>
 inline shared_ptr<Archive> Archive::create(const string& name,Type& attribute)
 {
-
-	shared_ptr<Archive> ac;
-
-	ac = shared_ptr<Archive>(new Archive(name));
+	shared_ptr<Archive> ac(new Archive(name));
 
 	string SerializableClassName;
 	bool fundamental;
-
 
 	ac->setRecordType(findType(attribute, fundamental, SerializableClassName));
 
@@ -141,7 +136,7 @@ inline shared_ptr<Archive> Archive::create(const string& name,Type& attribute)
 		ac->serialize	= serializationMapOfFundamental[ac->getRecordType()].first;
 		ac->deserialize = serializationMapOfFundamental[ac->getRecordType()].second;
 	}
-	else
+	else // not fundamental
 	{
 		ac->serialize	= serializationMap[ac->getRecordType()].first;
 		ac->deserialize = serializationMap[ac->getRecordType()].second;

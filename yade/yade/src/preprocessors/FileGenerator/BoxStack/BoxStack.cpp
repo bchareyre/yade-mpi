@@ -23,7 +23,7 @@ BoxStack::~BoxStack ()
 
 }
 
-void BoxStack::processAttributes()
+void BoxStack::afterDeserialization()
 {
 }
 

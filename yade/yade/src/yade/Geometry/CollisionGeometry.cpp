@@ -14,7 +14,7 @@ void CollisionGeometry::registerAttributes()
 	GeometricalModel::registerAttributes();
 }
 
-void CollisionGeometry::processAttributes()
+void CollisionGeometry::afterDeserialization()
 {
-	GeometricalModel::processAttributes();
+	GeometricalModel::afterDeserialization();
 }

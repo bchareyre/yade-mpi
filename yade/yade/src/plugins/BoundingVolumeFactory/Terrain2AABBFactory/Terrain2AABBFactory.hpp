@@ -10,7 +10,7 @@ class Terrain2AABBFactory : public BoundingVolumeFactory
 	public : Terrain2AABBFactory ();
 	public : ~Terrain2AABBFactory ();
 
-	public : void processAttributes();
+	public : void afterDeserialization();
 	public : void registerAttributes();
 
 	public : shared_ptr<BoundingVolume> buildBoundingVolume(const shared_ptr<CollisionGeometry> cm, const Se3r& se3);

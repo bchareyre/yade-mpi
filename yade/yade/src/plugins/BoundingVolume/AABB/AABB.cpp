@@ -9,7 +9,7 @@ AABB::AABB (Vector3r hs,Vector3r c) : BoundingVolume()
 {
 	halfSize = hs;
 	center = c;
-	processAttributes();
+	afterDeserialization();
 }
 
 
@@ -19,7 +19,7 @@ AABB::~AABB ()
 
 }
 
-void AABB::processAttributes()
+void AABB::afterDeserialization()
 {
 	initialHalfSize = halfSize;
 	initialCenter = center;

@@ -15,7 +15,7 @@ Contact::~Contact ()
 
 }
 
-void Contact::processAttributes()
+void Contact::afterDeserialization()
 {
 
 }

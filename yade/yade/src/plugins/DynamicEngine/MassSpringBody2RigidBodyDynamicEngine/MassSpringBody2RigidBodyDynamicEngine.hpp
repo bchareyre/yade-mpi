@@ -10,7 +10,7 @@ class MassSpringBody2RigidBodyDynamicEngine : public DynamicEngine
 	public : MassSpringBody2RigidBodyDynamicEngine ();
 	public : ~MassSpringBody2RigidBodyDynamicEngine ();
 
-	public : void processAttributes();
+	public : void afterDeserialization();
 	public : void registerAttributes();
 
 	//public : void respondToCollisions(std::vector<shared_ptr<Body> >& bodies, const std::list<shared_ptr<Interaction> >& interactions,float dt);

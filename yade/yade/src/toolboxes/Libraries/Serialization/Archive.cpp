@@ -59,20 +59,20 @@ bool Archive::containsOnlyFundamentals()
 		if (recordType==SerializableTypes::SERIALIZABLE)
 		{
 			Serializable * s = any_cast<Serializable*>(getAddress());
-			s->registerAttributes();
+			s->registerSerializableAttributes(false);
 			bool result = s->containsOnlyFundamentals();
 			s->markAllAttributesProcessed();
-			s->unregisterAttributes();
+			s->unregisterSerializableAttributes(false); // in fact true/false here doesn't apply - we are not serializing/deserializing - just checking
 			return result;
 
 		}
 		else if (recordType==SerializableTypes::CUSTOM_CLASS)
 		{
 			shared_ptr<Serializable> s = dynamic_pointer_cast<Serializable>(ClassFactory::instance().createShared(getSerializableClassName()));
-			s->registerAttributes();
+			s->registerSerializableAttributes(false);
 			bool result = s->containsOnlyFundamentals();
 			s->markAllAttributesProcessed();
-			s->unregisterAttributes();
+			s->unregisterSerializableAttributes(false); // in fact true/false here doesn't apply - we are not serializing/deserializing - just checking
 			return result;
 		}
 		else if (recordType==SerializableTypes::POINTER)
@@ -103,16 +103,16 @@ bool Archive::addSerializablePointer(SerializableTypes::Type rt ,bool fundamenta
 // bool Archive::registerSerializableDescriptor( string name , VerifyFactorableFnPtr verify, SerializableTypes::Type type, bool f )
 // {
 // 	std::cout << "registering serializable : " << name << endl;
-// 	
+//
 // 	bool tmp = map.insert( SerializableDescriptorMap::value_type( name , SerializableDescriptor(verify,type,f) )).second;
-// 
+//
 // 	//#ifdef DEBUG
 // 		if (tmp)
 // 			std::cout << "registering serializable : " << name << " OK\n";
 // 		else
 // 			std::cout << "registering serializable: " << name << " FAILED\n";
 // 	//#endif
-// 
+//
 // 	return tmp;
 // }
 
@@ -123,7 +123,7 @@ bool Archive::addSerializablePointer(SerializableTypes::Type rt ,bool fundamenta
 // {
 // 	SerializableDescriptorMap::iterator mi    = map.begin();
 // 	SerializableDescriptorMap::iterator miEnd = map.end();
-// 
+//
 // 	for( ; mi!=miEnd ; mi++)
 // 	{
 // 		if (tp==(*mi).second.verify())

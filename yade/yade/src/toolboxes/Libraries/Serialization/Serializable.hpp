@@ -63,7 +63,7 @@ using namespace ArchiveTypes;
 	Type * attribute=any_cast< Type * >(any);
 
 #define REGISTER_ATTRIBUTE(attribute)                                   \
-                registerAttribute( #attribute, attribute );	
+                registerAttribute( #attribute, attribute );
 
 #define REGISTER_SERIALIZABLE(name,isFundamental) 						\
 	REGISTER_FACTORABLE(name);								\
@@ -73,9 +73,9 @@ using namespace ArchiveTypes;
 	REGISTER_FACTORABLE(sname);								\
 	REGISTER_SERIALIZABLE_DESCRIPTOR(name,sname,SerializableTypes::CUSTOM_CLASS,isFundamental);
 
-	
-	
-	
+
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -88,15 +88,20 @@ class Serializable : public Factorable
 	private   : Archives archives;
 	public    : Archives& getArchives() { return archives;};
 
+	// those two are used only by custom class and MultiTypeHandler
 	public    : virtual void serialize(any& ) { throw SerializableError(SerializationExceptions::SetFunctionNotDeclared);};
 	public    : virtual void deserialize(any& ) { throw SerializableError(SerializationExceptions::GetFunctionNotDeclared);};
 
-	public    : void unregisterAttributes();
+	public    : void unregisterSerializableAttributes(bool deserializing);
+	public    : void registerSerializableAttributes(bool deserializing);
 	public    : void markAllAttributesProcessed();
 	public	  : bool findAttribute(const string& name,shared_ptr<Archive>& arc);
 
-// 	//FIXME : should have postprocessattributes and preprocessattributes because of Quaternion (angle,axis)
-	protected : virtual void processAttributes() {};
+	protected : virtual void beforeSerialization() {};
+	protected : virtual void afterSerialization() {};
+	protected : virtual void beforeDeserialization() {};
+	protected : virtual void afterDeserialization() {};
+
 	protected : template <typename Type>
 		    void registerAttribute(const string& name, Type& attribute)
 		    {

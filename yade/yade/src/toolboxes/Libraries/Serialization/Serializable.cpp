@@ -19,7 +19,7 @@
  ***************************************************************************/
 
 #include "Serializable.hpp"
-	
+
 Serializable::Serializable() : Factorable()
 {
 }
@@ -29,7 +29,7 @@ Serializable::~Serializable()
 
 }
 
-void Serializable::unregisterAttributes()
+void Serializable::unregisterSerializableAttributes(bool deserializing)
 {
 	Archives::iterator ai    = archives.begin();
 	Archives::iterator aiEnd = archives.end();
@@ -44,7 +44,21 @@ void Serializable::unregisterAttributes()
 		}
 	}
 	archives.clear();
-	processAttributes();
+
+	if(deserializing)
+		afterDeserialization();
+	else
+		afterSerialization();
+}
+
+void Serializable::registerSerializableAttributes(bool deserializing)
+{
+	if(deserializing)
+		beforeDeserialization();
+	else
+		beforeSerialization();
+
+	this->registerAttributes();
 }
 
 void Serializable::markAllAttributesProcessed()

@@ -23,7 +23,7 @@ class AABB : public BoundingVolume
 	public : void update(Se3r& se3);
 	public : bool overlap(const AABB& aabb);
 
-	public : void processAttributes();
+	public : void afterDeserialization();
 	public : void registerAttributes();
 	REGISTER_CLASS_NAME(AABB);
 };

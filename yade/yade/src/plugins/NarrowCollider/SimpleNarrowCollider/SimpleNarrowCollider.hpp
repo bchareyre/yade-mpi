@@ -11,7 +11,7 @@ class SimpleNarrowCollider : public NarrowCollider
 
 	public : void narrowCollisionPhase(Body* body);
 
-	public : void processAttributes();
+	public : void afterDeserialization();
 	public : void registerAttributes();
 	REGISTER_CLASS_NAME(SimpleNarrowCollider);
 };

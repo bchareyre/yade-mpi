@@ -11,7 +11,7 @@ SDECContactModel::~SDECContactModel ()
 
 }
 
-void SDECContactModel::processAttributes()
+void SDECContactModel::afterDeserialization()
 {
 
 }

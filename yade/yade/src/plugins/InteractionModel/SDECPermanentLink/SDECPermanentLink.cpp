@@ -11,7 +11,7 @@ SDECPermanentLink::~SDECPermanentLink ()
 
 }
 
-void SDECPermanentLink::processAttributes()
+void SDECPermanentLink::afterDeserialization()
 {
 	shearForce = Vector3r(0,0,0);
 	thetar = Vector3r(0,0,0);

@@ -11,7 +11,7 @@ class Edge : public Serializable
 	public : int second;
 	public : Edge() {};
 	public : Edge(int f,int s) :first(f), second(s) {};
-	public : void processAttributes() {};
+	public : void afterDeserialization() {};
 	public : void registerAttributes()
 	{
 		REGISTER_ATTRIBUTE(first);
@@ -40,7 +40,7 @@ class Mesh2D : public CollisionGeometry
 	public : void glDraw();
 	public : void computeNormals();
 
-	public : void processAttributes();
+	public : void afterDeserialization();
 	public : void registerAttributes();
 
 	REGISTER_CLASS_NAME(Mesh2D);

@@ -20,7 +20,7 @@ class Rotor : public KinematicEngine
 
 	public : void moveToNextTimeStep(Body * body);
 
-	public : void processAttributes();
+	public : void afterDeserialization();
 	public : void registerAttributes();
 	REGISTER_CLASS_NAME(Rotor);
 };

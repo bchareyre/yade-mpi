@@ -10,7 +10,7 @@ class RotatingBox : public Serializable
 	public : RotatingBox ();
 	public : ~RotatingBox ();
 
-	public : void processAttributes();
+	public : void afterDeserialization();
 	public : void registerAttributes();
 
 	public : void exec();

@@ -36,7 +36,7 @@ XMLManager::XMLManager() : IOManager()
 	setContainerOpeningBracket('[');
 	setContainerClosingBracket(']');
 	setContainerSeparator(' ');
-	
+
 	setCustomFundamentalOpeningBracket('{');
 	setCustomFundamentalClosingBracket('}');
 	setCustomFundamentalSeparator(' ');
@@ -153,7 +153,7 @@ void XMLManager::serializeSerializable(ostream& stream, Archive& ac, int depth)
 
 	s = any_cast<Serializable*>(ac.getAddress());
 
-	s->registerAttributes();
+	s->registerSerializableAttributes(false);
 
 	Serializable::Archives archives = s->getArchives();
 
@@ -186,7 +186,7 @@ void XMLManager::serializeSerializable(ostream& stream, Archive& ac, int depth)
 	}
 
 	ac.markProcessed();
-	s->unregisterAttributes();
+	s->unregisterSerializableAttributes(false);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -198,7 +198,7 @@ void XMLManager::deserializeSerializable(istream& stream, Archive& ac, const str
 
 	Serializable * s = any_cast<Serializable*>(ac.getAddress());
 
-	s->registerAttributes();
+	s->registerSerializableAttributes(true);
 
 	// deserializing (custom-)fundamental attributes
 	map<string,string> basicAttributes = saxParser.getBasicAttributes();
@@ -236,7 +236,7 @@ void XMLManager::deserializeSerializable(istream& stream, Archive& ac, const str
 	}
 
 	ac.markProcessed();
-	s->unregisterAttributes();
+	s->unregisterSerializableAttributes(true);
 
 }
 

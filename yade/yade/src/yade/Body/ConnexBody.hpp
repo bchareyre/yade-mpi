@@ -50,7 +50,7 @@ class ConnexBody : public Body
 	public : virtual void glDraw();
 
 
-	public : void processAttributes();
+	public : void afterDeserialization();
 	public : void registerAttributes();
 
 	public : virtual void updateBoundingVolume(Se3r&) {};

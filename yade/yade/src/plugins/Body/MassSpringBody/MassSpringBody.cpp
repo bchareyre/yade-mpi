@@ -15,9 +15,9 @@ MassSpringBody::~MassSpringBody()
 
 }
 
-void MassSpringBody::processAttributes()
+void MassSpringBody::afterDeserialization()
 {
-	ConnexBody::processAttributes();
+	ConnexBody::afterDeserialization();
 	
 	//FIXME : when serialization tracks pointers delete it
 	//cm = dynamic_pointer_cast<CollisionGeometry>(gm);

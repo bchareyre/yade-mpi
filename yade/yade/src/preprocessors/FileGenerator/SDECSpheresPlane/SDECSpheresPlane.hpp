@@ -10,7 +10,7 @@ class SDECSpheresPlane : public Serializable
 	public : SDECSpheresPlane ();
 	public : ~SDECSpheresPlane ();
 
-	public : void processAttributes();
+	public : void afterDeserialization();
 	public : void registerAttributes();
 
 	public : void exec();

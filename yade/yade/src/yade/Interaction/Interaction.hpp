@@ -55,7 +55,7 @@ class Interaction : public Serializable
 	public : Interaction ();
 	public : ~Interaction ();
 	
-	public : void processAttributes();
+	public : void afterDeserialization();
 	public : void registerAttributes();
 
 	REGISTER_CLASS_NAME(Interaction);

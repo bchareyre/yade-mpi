@@ -13,9 +13,9 @@ Polyhedron::~Polyhedron ()
 
 }
 
-void Polyhedron::processAttributes()
+void Polyhedron::afterDeserialization()
 {
-	CollisionGeometry::processAttributes();
+	CollisionGeometry::afterDeserialization();
 
 	loadGmshMesh(mshFileName);
 

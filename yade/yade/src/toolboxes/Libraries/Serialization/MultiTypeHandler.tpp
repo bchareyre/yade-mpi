@@ -63,41 +63,25 @@ class MultiTypeSerializer< std::pair< ContainedType1 , ContainedType2 > > : publ
 	private	: ContainedType1 first;
 	private	: ContainedType2 second;
 
-	public : MultiTypeSerializer()
-	{
-//		cout << "\n\n--- created me: " << myName() << endl;
-	};
+	public : MultiTypeSerializer() {};
 	public : virtual ~MultiTypeSerializer() {};
-
 	public 	: static string myName(string name="")
 	{
 		static string sname = "";
-		if(name.size() != 0)
-		{
-			sname = name;
-//			cout << "\n\n---- name was set: " << sname << endl;
-		}
+		if(name.size() != 0) sname = name;
 		return sname;
 	}
-
 	public 	: virtual string getClassName()
 	{
-//		cout << "\n\n------ asking for myName " << myName() << endl;
 		return myName();
 	};
-
 	public : void registerAttributes()
 	{
 		REGISTER_ATTRIBUTE(first);
 		REGISTER_ATTRIBUTE(second);
 	};
-
-
 	public : void deserialize(any& a)
 	{
-		// this macro can't eat that: ;)
-		//DECLARE_POINTER_TO_MY_CUSTOM_CLASS( (std::pair< ContainedType1 , ContainedType2 >) ,multiType,a);
-
 		std::pair< ContainedType1 , ContainedType2 > * multiType
 			= any_cast< std::pair< ContainedType1 , ContainedType2 > * >(a);
 
@@ -107,7 +91,8 @@ class MultiTypeSerializer< std::pair< ContainedType1 , ContainedType2 > > : publ
 
 	public : void serialize(any& a)
 	{
-		std::pair< ContainedType1 , ContainedType2 > * multiType = any_cast< std::pair< ContainedType1 , ContainedType2 > * >(a);
+		std::pair< ContainedType1 , ContainedType2 > * multiType
+			= any_cast< std::pair< ContainedType1 , ContainedType2 > * >(a);
 
 		first 			= multiType->first;
 		second			= multiType->second;
@@ -161,19 +146,17 @@ SerializableTypes::Type findType( std::pair< ContainedType1 , ContainedType2 >& 
 
 	MultiTypeSerializer< std::pair< ContainedType1 , ContainedType2 > >::myName(sname);
 
-	bool registered =
-		ClassFactory::instance().registerFactorable(
-			sname ,
-			MultiTypeHandler<std::pair< ContainedType1 , ContainedType2 > >::CreateSMultiType ,
-			MultiTypeHandler<std::pair< ContainedType1 , ContainedType2 > >::CreateSharedSMultiType ,
-			MultiTypeHandler<std::pair< ContainedType1 , ContainedType2 > >::CreatePureCustomMultiType ,
-			MultiTypeHandler<std::pair< ContainedType1 , ContainedType2 > >::VerifyMultiType ,
-			SerializableTypes::CUSTOM_CLASS ,
-			fundamental );
+	ClassFactory::instance().registerFactorable(
+		sname ,
+		MultiTypeHandler<std::pair< ContainedType1 , ContainedType2 > >::CreateSMultiType ,
+		MultiTypeHandler<std::pair< ContainedType1 , ContainedType2 > >::CreateSharedSMultiType ,
+		MultiTypeHandler<std::pair< ContainedType1 , ContainedType2 > >::CreatePureCustomMultiType);
 
-	// to fool compiler warnings.
-	int foo = registered;
-	registered=foo;
+	SerializableSingleton::instance().registerSerializableDescriptor(
+		sname ,
+		MultiTypeHandler<std::pair< ContainedType1 , ContainedType2 > >::VerifyMultiType ,
+		SerializableTypes::CUSTOM_CLASS ,
+		fundamental );
 
 	str = sname;
 	return SerializableTypes::CUSTOM_CLASS;
@@ -260,18 +243,17 @@ SerializableTypes::Type findType( boost::tuple< ContainedType1 >& ,bool& fundame
 
 	MultiTypeSerializer< boost::tuple< ContainedType1 > >::myName(sname);
 
-	bool registered =
-		ClassFactory::instance().registerFactorable(
-			sname ,
-			MultiTypeHandler<boost::tuple< ContainedType1 > >::CreateSMultiType ,
-			MultiTypeHandler<boost::tuple< ContainedType1 > >::CreateSharedSMultiType ,
-			MultiTypeHandler<boost::tuple< ContainedType1 > >::CreatePureCustomMultiType ,
-			MultiTypeHandler<boost::tuple< ContainedType1 > >::VerifyMultiType ,
-			SerializableTypes::CUSTOM_CLASS ,
-			fundamental );
+	ClassFactory::instance().registerFactorable(
+		sname ,
+		MultiTypeHandler<boost::tuple< ContainedType1 > >::CreateSMultiType ,
+		MultiTypeHandler<boost::tuple< ContainedType1 > >::CreateSharedSMultiType ,
+		MultiTypeHandler<boost::tuple< ContainedType1 > >::CreatePureCustomMultiType);
 
-	int foo = registered;
-	registered=foo;
+	SerializableSingleton::instance().registerSerializableDescriptor(
+		sname ,
+		MultiTypeHandler<boost::tuple< ContainedType1 > >::VerifyMultiType ,
+		SerializableTypes::CUSTOM_CLASS ,
+		fundamental );
 
 	str = sname;
 	return SerializableTypes::CUSTOM_CLASS;
@@ -366,18 +348,17 @@ SerializableTypes::Type findType( boost::tuple< ContainedType1 , ContainedType2 
 
 	MultiTypeSerializer< boost::tuple< ContainedType1 , ContainedType2 > >::myName(sname);
 
-	bool registered =
-		ClassFactory::instance().registerFactorable(
-			sname ,
-			MultiTypeHandler<boost::tuple< ContainedType1 , ContainedType2 > >::CreateSMultiType ,
-			MultiTypeHandler<boost::tuple< ContainedType1 , ContainedType2 > >::CreateSharedSMultiType ,
-			MultiTypeHandler<boost::tuple< ContainedType1 , ContainedType2 > >::CreatePureCustomMultiType ,
-			MultiTypeHandler<boost::tuple< ContainedType1 , ContainedType2 > >::VerifyMultiType ,
-			SerializableTypes::CUSTOM_CLASS ,
-			fundamental );
+	ClassFactory::instance().registerFactorable(
+		sname ,
+		MultiTypeHandler<boost::tuple< ContainedType1 , ContainedType2 > >::CreateSMultiType ,
+		MultiTypeHandler<boost::tuple< ContainedType1 , ContainedType2 > >::CreateSharedSMultiType ,
+		MultiTypeHandler<boost::tuple< ContainedType1 , ContainedType2 > >::CreatePureCustomMultiType);
 
-	int foo = registered;
-	registered=foo;
+	SerializableSingleton::instance().registerSerializableDescriptor(
+		sname ,
+		MultiTypeHandler<boost::tuple< ContainedType1 , ContainedType2 > >::VerifyMultiType ,
+		SerializableTypes::CUSTOM_CLASS ,
+		fundamental );
 
 	str = sname;
 	return SerializableTypes::CUSTOM_CLASS;
@@ -480,18 +461,17 @@ SerializableTypes::Type findType( boost::tuple< ContainedType1 , ContainedType2 
 
 	MultiTypeSerializer< boost::tuple< ContainedType1 , ContainedType2 , ContainedType3 > >::myName(sname);
 
-	bool registered =
-		ClassFactory::instance().registerFactorable(
-			sname ,
-			MultiTypeHandler<boost::tuple< ContainedType1 , ContainedType2 , ContainedType3 > >::CreateSMultiType ,
-			MultiTypeHandler<boost::tuple< ContainedType1 , ContainedType2 , ContainedType3 > >::CreateSharedSMultiType ,
-			MultiTypeHandler<boost::tuple< ContainedType1 , ContainedType2 , ContainedType3 > >::CreatePureCustomMultiType ,
-			MultiTypeHandler<boost::tuple< ContainedType1 , ContainedType2 , ContainedType3 > >::VerifyMultiType ,
-			SerializableTypes::CUSTOM_CLASS ,
-			fundamental );
+	ClassFactory::instance().registerFactorable(
+		sname ,
+		MultiTypeHandler<boost::tuple< ContainedType1 , ContainedType2 , ContainedType3 > >::CreateSMultiType ,
+		MultiTypeHandler<boost::tuple< ContainedType1 , ContainedType2 , ContainedType3 > >::CreateSharedSMultiType ,
+		MultiTypeHandler<boost::tuple< ContainedType1 , ContainedType2 , ContainedType3 > >::CreatePureCustomMultiType);
 
-	int foo = registered;
-	registered=foo;
+	SerializableSingleton::instance().registerSerializableDescriptor(
+		sname ,
+		MultiTypeHandler<boost::tuple< ContainedType1 , ContainedType2 , ContainedType3 > >::VerifyMultiType ,
+		SerializableTypes::CUSTOM_CLASS ,
+		fundamental );
 
 	str = sname;
 	return SerializableTypes::CUSTOM_CLASS;
@@ -602,19 +582,18 @@ SerializableTypes::Type findType( boost::tuple< ContainedType1 , ContainedType2 
 
 	MultiTypeSerializer< boost::tuple< ContainedType1 , ContainedType2 , ContainedType3 , ContainedType4 > >::myName(sname);
 
-	bool registered =
-		ClassFactory::instance().registerFactorable(
-			sname ,
-			MultiTypeHandler<boost::tuple< ContainedType1 , ContainedType2 , ContainedType3 , ContainedType4 > >::CreateSMultiType ,
-			MultiTypeHandler<boost::tuple< ContainedType1 , ContainedType2 , ContainedType3 , ContainedType4 > >::CreateSharedSMultiType ,
-			MultiTypeHandler<boost::tuple< ContainedType1 , ContainedType2 , ContainedType3 , ContainedType4 > >::CreatePureCustomMultiType ,
-			MultiTypeHandler<boost::tuple< ContainedType1 , ContainedType2 , ContainedType3 , ContainedType4 > >::VerifyMultiType ,
-			SerializableTypes::CUSTOM_CLASS ,			//
-			fundamental );					//
-									//
-	int foo = registered;						//
-	registered=foo;							//
-									//
+	ClassFactory::instance().registerFactorable(
+		sname ,
+		MultiTypeHandler<boost::tuple< ContainedType1 , ContainedType2 , ContainedType3 , ContainedType4 > >::CreateSMultiType ,
+		MultiTypeHandler<boost::tuple< ContainedType1 , ContainedType2 , ContainedType3 , ContainedType4 > >::CreateSharedSMultiType ,
+		MultiTypeHandler<boost::tuple< ContainedType1 , ContainedType2 , ContainedType3 , ContainedType4 > >::CreatePureCustomMultiType);
+
+	SerializableSingleton::instance().registerSerializableDescriptor(
+		sname ,
+		MultiTypeHandler<boost::tuple< ContainedType1 , ContainedType2 , ContainedType3 , ContainedType4 > >::VerifyMultiType ,
+		SerializableTypes::CUSTOM_CLASS ,			//
+		fundamental );
+
 	str = sname;							//
 	return SerializableTypes::CUSTOM_CLASS;				//
 };
@@ -731,18 +710,17 @@ SerializableTypes::Type findType( boost::tuple< ContainedType1 , ContainedType2 
 
 	MultiTypeSerializer< boost::tuple< ContainedType1 , ContainedType2 , ContainedType3 , ContainedType4 , ContainedType5 > >::myName(sname);
 
-	bool registered =
-		ClassFactory::instance().registerFactorable(
-			sname ,
-			MultiTypeHandler<boost::tuple< ContainedType1 , ContainedType2 , ContainedType3 , ContainedType4 , ContainedType5 > >::CreateSMultiType ,
-			MultiTypeHandler<boost::tuple< ContainedType1 , ContainedType2 , ContainedType3 , ContainedType4 , ContainedType5 > >::CreateSharedSMultiType ,
-			MultiTypeHandler<boost::tuple< ContainedType1 , ContainedType2 , ContainedType3 , ContainedType4 , ContainedType5 > >::CreatePureCustomMultiType ,
-			MultiTypeHandler<boost::tuple< ContainedType1 , ContainedType2 , ContainedType3 , ContainedType4 , ContainedType5 > >::VerifyMultiType ,
-			SerializableTypes::CUSTOM_CLASS ,			//
-			fundamental );					//
-									//
-	int foo = registered;						//
-	registered=foo;							//
+	ClassFactory::instance().registerFactorable(
+		sname ,
+		MultiTypeHandler<boost::tuple< ContainedType1 , ContainedType2 , ContainedType3 , ContainedType4 , ContainedType5 > >::CreateSMultiType ,
+		MultiTypeHandler<boost::tuple< ContainedType1 , ContainedType2 , ContainedType3 , ContainedType4 , ContainedType5 > >::CreateSharedSMultiType ,
+		MultiTypeHandler<boost::tuple< ContainedType1 , ContainedType2 , ContainedType3 , ContainedType4 , ContainedType5 > >::CreatePureCustomMultiType);
+
+	SerializableSingleton::instance().registerSerializableDescriptor(
+		sname ,
+		MultiTypeHandler<boost::tuple< ContainedType1 , ContainedType2 , ContainedType3 , ContainedType4 , ContainedType5 > >::VerifyMultiType ,
+		SerializableTypes::CUSTOM_CLASS ,			//
+		fundamental );						//
 									//
 	str = sname;							//
 	return SerializableTypes::CUSTOM_CLASS;				//

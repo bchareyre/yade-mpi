@@ -10,7 +10,7 @@ class BoxStack : public Serializable
 	public : BoxStack ();
 	public : ~BoxStack ();
 
-	public : void processAttributes();
+	public : void afterDeserialization();
 	public : void registerAttributes();
 
 	public : void exec();

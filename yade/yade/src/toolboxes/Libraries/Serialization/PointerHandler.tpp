@@ -71,16 +71,22 @@ struct PointerHandler<shared_ptr<PointedType> >
 			if(boost::is_base_and_derived<Serializable,PointedType>::value)
 			{
 				Serializable * sh2s = dynamic_cast<Serializable*>(ClassFactory::instance().createPure(typeStr));
-				tmpPtr=any_cast< shared_ptr<PointedType>* >(ac.getAddress());
-				*tmpPtr = shared_ptr<PointedType>(reinterpret_cast<PointedType*>(sh2s));
-				newAc = Archive::create(name,**tmpPtr);
+				tmpPtr		= any_cast< shared_ptr<PointedType>* >(ac.getAddress());
+				*tmpPtr 	= shared_ptr<PointedType>(reinterpret_cast<PointedType*>(sh2s));
+				newAc 		= Archive::create(name,**tmpPtr);
 			}
 			else
 			{
-				void * sh2s = ClassFactory::instance().createPureCustom(typeStr);
-				tmpPtr=any_cast< shared_ptr<PointedType>* >(ac.getAddress());
-				*tmpPtr = shared_ptr<PointedType>(reinterpret_cast<PointedType*>(sh2s));
-				newAc = Archive::create(name,**tmpPtr);
+				// FIXME : creating pointer to custom class is not working!
+
+				std::string error = FactoryExceptions::CantCreateClass + name + "  - Because pointers to custom class are not working!";
+				throw FactoryCantCreate(error.c_str());
+
+
+				void * sh2s 	= ClassFactory::instance().createPureCustom(typeStr);
+				tmpPtr		= any_cast< shared_ptr<PointedType>* >(ac.getAddress());
+				*tmpPtr 	= shared_ptr<PointedType>(reinterpret_cast<PointedType*>(sh2s));
+				newAc 		= Archive::create(name,**tmpPtr);
 			}
 		}
 		else

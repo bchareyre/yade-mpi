@@ -59,7 +59,8 @@ using namespace ArchiveTypes;
 		return typeid(name);							\
 	}										\
 	const bool registered##name##sname =						\
-		SerializableSingleton::instance().registerSerializableDescriptor(	#sname ,		\
+		SerializableSingleton::instance().registerSerializableDescriptor(	\
+								#sname ,		\
 								Verify##name ,		\
 								type,			\
 								isFundamental );
@@ -241,7 +242,7 @@ class Archive
 
 	/*! Returns true is the archive is an archive of a fundamental type or of a class that contains
 	only fundamental types.	This is useful for XML output for example that can write simple attributes in a different
-	way thay write complex one.
+	way than write complex one.
 	\return true is the current archive is a fundamental archive or if it is an archive of a custom	or serializable class
 	that contains only fundamentals.
 	*/
@@ -257,10 +258,10 @@ class Archive
 	\param dsp pointer to the deserialization function for type rt that will be stored into the map
 	*/
 	public    : static bool addSerializablePointer(SerializableTypes::Type rt ,bool fundamental, SerializeFnPtr sp, DeserializeFnPtr dsp);
-	
 
 
-	
+
+
 		/*! Pointer on a function that return the type_info of the registered class */
 	private   : typedef const type_info& ( *VerifyFactorableFnPtr )();
 
@@ -293,15 +294,15 @@ class Archive
 				    };
 
 		    };
-	
+
 	/*! Type of a Stl map used to map the registered class name with their SerializableDescriptor */
 	private   : typedef std::map< std::string , SerializableDescriptor > SerializableDescriptorMap;
 	private   : static SerializableDescriptorMap map;
 	public    : static bool registerSerializableDescriptor( string name, VerifyFactorableFnPtr verify, SerializableTypes::Type type, bool f);
 	public    : static bool findClassInfo(const type_info& tp,SerializableTypes::Type& type, string& serializableClassName,bool& fundamental);
 
-	
-	
+
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -53,7 +53,7 @@ class Actor : public Serializable/*, public Indexable*/
 	public : virtual bool isActivated(  /*map<int,shared_ptr<ActorParameter> >& */) { return true; };
 	public : virtual void action(Body*/*, map<int,shared_ptr<ActorParameter> >& */) { throw; };
 
-	public : virtual void processAttributes() {};
+	public : virtual void afterDeserialization() {};
 	public : virtual void registerAttributes() {};
 
 	//public : virtual int& getClassIndex() { throw;};

@@ -26,7 +26,7 @@ RotatingBox::~RotatingBox ()
 
 }
 
-void RotatingBox::processAttributes()
+void RotatingBox::afterDeserialization()
 {
 }
 

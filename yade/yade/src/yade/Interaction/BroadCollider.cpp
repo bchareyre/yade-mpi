@@ -11,7 +11,7 @@ BroadCollider::~BroadCollider ()
 }
 
 
-void BroadCollider::processAttributes()
+void BroadCollider::afterDeserialization()
 {
 
 }

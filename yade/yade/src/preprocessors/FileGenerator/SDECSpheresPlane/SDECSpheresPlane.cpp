@@ -26,7 +26,7 @@ SDECSpheresPlane::~SDECSpheresPlane ()
 
 }
 
-void SDECSpheresPlane::processAttributes()
+void SDECSpheresPlane::afterDeserialization()
 {
 }
 

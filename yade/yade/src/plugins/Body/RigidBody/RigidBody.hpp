@@ -18,7 +18,7 @@ class RigidBody : public ConnexBody
 	public : RigidBody ();
 	public : ~RigidBody ();
 
-	public : void processAttributes();
+	public : void afterDeserialization();
 	public : void registerAttributes();
 
 	public : void updateBoundingVolume(Se3r& se3);

@@ -12,7 +12,7 @@ class NodeProperties : public Serializable
 
 	public : NodeProperties() {};
 	public : NodeProperties(float im) : invMass(im), velocity(Vector3r(0,0,0)) {};
-	public : void processAttributes() {};
+	public : void afterDeserialization() {};
 	public : void registerAttributes()
 	{
 		REGISTER_ATTRIBUTE(invMass);
@@ -35,7 +35,7 @@ class FEMBody : public ConnexBody
 	public : FEMBody ();
 	public : ~FEMBody ();
 
-	public : void processAttributes();
+	public : void afterDeserialization();
 	public : void registerAttributes();
 
 	public : void updateBoundingVolume(Se3r& se3);

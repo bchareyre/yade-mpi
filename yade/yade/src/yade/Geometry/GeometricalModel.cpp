@@ -16,6 +16,6 @@ void GeometricalModel::registerAttributes()
 	REGISTER_ATTRIBUTE(visible);
 }
 
-void GeometricalModel::processAttributes()
+void GeometricalModel::afterDeserialization()
 {
 }

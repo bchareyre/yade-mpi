@@ -60,7 +60,7 @@ class NarrowCollider : public Actor
 
 	public : virtual void narrowCollisionPhase(Body* ) { throw;};
 
-	public : void processAttributes();
+	public : void afterDeserialization();
 	public : void registerAttributes();
 
 	//public : virtual bool isActivated();

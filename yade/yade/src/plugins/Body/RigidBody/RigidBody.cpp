@@ -12,9 +12,9 @@ RigidBody::~RigidBody()
 
 }
 
-void RigidBody::processAttributes()
+void RigidBody::afterDeserialization()
 {
-	ConnexBody::processAttributes();
+	ConnexBody::afterDeserialization();
 	if (mass==0)
 		invMass = 0;
 	else

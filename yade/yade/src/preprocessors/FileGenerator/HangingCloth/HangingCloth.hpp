@@ -11,7 +11,7 @@ class HangingCloth : public Serializable
 	public : HangingCloth ();
 	public : ~HangingCloth ();
 
-	public : void processAttributes();
+	public : void afterDeserialization();
 	public : void registerAttributes();
 
 	public : void exec();

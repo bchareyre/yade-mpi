@@ -13,7 +13,7 @@ ExplicitMassSpringDynamicEngine::~ExplicitMassSpringDynamicEngine ()
 
 }
 
-void ExplicitMassSpringDynamicEngine::processAttributes()
+void ExplicitMassSpringDynamicEngine::afterDeserialization()
 {
 
 }

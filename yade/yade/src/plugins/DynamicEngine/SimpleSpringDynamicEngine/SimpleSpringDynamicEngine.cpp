@@ -15,7 +15,7 @@ SimpleSpringDynamicEngine::~SimpleSpringDynamicEngine ()
 
 }
 
-void SimpleSpringDynamicEngine::processAttributes()
+void SimpleSpringDynamicEngine::afterDeserialization()
 {
 
 }

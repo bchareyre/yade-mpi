@@ -10,7 +10,7 @@ InteractionGeometry::~InteractionGeometry()
 
 }
 
-void InteractionGeometry::processAttributes()
+void InteractionGeometry::afterDeserialization()
 {
 
 }

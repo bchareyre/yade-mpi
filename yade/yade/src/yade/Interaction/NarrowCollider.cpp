@@ -10,7 +10,7 @@ NarrowCollider::~NarrowCollider ()
 }
 
 
-void NarrowCollider::processAttributes()
+void NarrowCollider::afterDeserialization()
 {
 	for(unsigned int i=0;i<collisionFunctors.size();i++)
 		narrowManager.addPair(collisionFunctors[i][0],collisionFunctors[i][1],collisionFunctors[i][2]);

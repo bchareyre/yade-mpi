@@ -48,7 +48,7 @@ class SDECPermanentLink : public InteractionGeometry
 	public : SDECPermanentLink ();
 	public : ~SDECPermanentLink ();
 
-	public : void processAttributes();
+	public : void afterDeserialization();
 	public : void registerAttributes();
 
 	REGISTER_CLASS_NAME(SDECPermanentLink);

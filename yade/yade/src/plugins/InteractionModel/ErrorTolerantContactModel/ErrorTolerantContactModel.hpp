@@ -50,7 +50,7 @@ class ErrorTolerantContactModel : public InteractionGeometry
 	public : ErrorTolerantContactModel ();
 	public : ~ErrorTolerantContactModel ();
 
-	public : void processAttributes();
+	public : void afterDeserialization();
 	public : void registerAttributes();
 
 	REGISTER_CLASS_NAME(ErrorTolerantContactModel);

@@ -60,7 +60,7 @@ class GeometricalModel : public Serializable
 	//public : virtual bool loadFromFile(char * fileName) = NULL;
 	public : virtual void glDraw() {};
 	public : void registerAttributes();
-	public : void processAttributes();
+	public : void afterDeserialization();
 	REGISTER_CLASS_NAME(GeometricalModel);
 
 };

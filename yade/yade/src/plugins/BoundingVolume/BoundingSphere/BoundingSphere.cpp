@@ -17,7 +17,7 @@ void BoundingSphere::move(Se3r& )
 
 
 }
-void BoundingSphere::processAttributes()
+void BoundingSphere::afterDeserialization()
 {
 
 }

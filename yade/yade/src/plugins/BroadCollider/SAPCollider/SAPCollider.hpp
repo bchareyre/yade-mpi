@@ -69,7 +69,7 @@ class SAPCollider : public BroadCollider
 	public : SAPCollider ();
 	public : ~SAPCollider ();
 
-	public : void processAttributes();
+	public : void afterDeserialization();
 	public : void registerAttributes();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

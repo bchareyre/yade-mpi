@@ -15,9 +15,9 @@ Box::~Box ()
 
 }
 
-void Box::processAttributes()
+void Box::afterDeserialization()
 {
-	CollisionGeometry::processAttributes();
+	CollisionGeometry::afterDeserialization();
 }
 
 void Box::registerAttributes()

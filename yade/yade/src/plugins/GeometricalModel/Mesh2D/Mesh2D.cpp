@@ -11,9 +11,9 @@ Mesh2D::~Mesh2D ()
 
 }
 
-void Mesh2D::processAttributes()
+void Mesh2D::afterDeserialization()
 {
-	CollisionGeometry::processAttributes();
+	CollisionGeometry::afterDeserialization();
 
 	fNormals.resize(faces.size());
 	vNormals.resize(vertices.size());

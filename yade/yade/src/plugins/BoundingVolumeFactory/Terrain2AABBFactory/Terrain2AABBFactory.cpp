@@ -11,7 +11,7 @@ Terrain2AABBFactory::~Terrain2AABBFactory ()
 
 }
 
-void Terrain2AABBFactory::processAttributes()
+void Terrain2AABBFactory::afterDeserialization()
 {
 
 }

@@ -50,13 +50,15 @@ IOManager::~IOManager()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+// FIXME : this spirit stuff works currently only with ' ' - space - separators.
+
 void IOManager::parseFundamental(const string& top, vector<string>& eval)
 {
 	eval.clear();
 
-	rule<> inside 		= +( graph_p - cOB - cCB - cfOB - cfCB ); // asdf23
-	rule<> empty_array 	= *space_p >> cOB >> *space_p >> cCB >> *space_p; // [ ]
-	rule<> empty_fund 	= *space_p >> cfOB >> *space_p >> cfCB >> *space_p; // { }
+	rule<> inside 		= +( graph_p - cOB - cCB - cfOB - cfCB ); 		// asdf23
+	rule<> empty_array 	= *space_p >> cOB >> *space_p >> cCB >> *space_p; 	// [ ]
+	rule<> empty_fund 	= *space_p >> cfOB >> *space_p >> cfCB >> *space_p; 	// { }
 	rule<> one_fundamental	= *space_p >>
 				  		  ( cfOB >> (*space_p) % (inside) >> cfCB )
 						| ( cfOB >>
@@ -64,7 +66,7 @@ void IOManager::parseFundamental(const string& top, vector<string>& eval)
 							%
 							( cfOB >> (*space_p ) % (inside) >> cfCB )
 				  		  >> cfCB )
-				  >> *space_p; // { 123, 243 { sdf, sd} qwe ,as }
+				  >> *space_p; 						// { 123, 243 { sdf, sd} qwe ,as }
 
 	rule<> one_array	= *space_p >>
 				  		  ( cOB >> (*space_p  ) % (inside) >> cCB )
@@ -73,8 +75,7 @@ void IOManager::parseFundamental(const string& top, vector<string>& eval)
 							%
 							( cOB >> (*space_p) % (inside) >> cCB )
 				  		>> cCB )
-				  >> *space_p; // [ 123 324 243 qwe as ]
-//	rule<> one_array = *space_p >> '[' >> (*space_p) % (inside) >> ']' >> *space_p; // [ 123 324 243 qwe as ]
+				  >> *space_p; 						// [ 123 324 243 qwe as ]
 
 	rule<> one_everything = *space_p
 			>>	(*space_p) % (
@@ -178,7 +179,7 @@ void IOManager::deserializeCustomFundamental(istream& stream, Archive& ac,const 
 {
 	shared_ptr<Serializable> s = dynamic_pointer_cast<Serializable>(ClassFactory::instance().createShared(ac.getSerializableClassName()));
 
-	s->registerAttributes();
+	s->registerSerializableAttributes(true);
 
 	vector<string> tokens;
 	parseFundamental(str,tokens);
@@ -191,6 +192,7 @@ void IOManager::deserializeCustomFundamental(istream& stream, Archive& ac,const 
 		(*arci)->deserialize(stream,*(*arci),(*si));
 
 	s->deserialize(ac.getAddress());
+	s->unregisterSerializableAttributes(true); // FIXME - make sure that it was a mistake that this line WAS MISSING.
 	ac.markProcessed();
 }
 
@@ -199,7 +201,7 @@ void IOManager::serializeCustomFundamental(ostream& stream, Archive& ac,int dept
 {
 	shared_ptr<Serializable> ss = dynamic_pointer_cast<Serializable>(ClassFactory::instance().createShared(ac.getSerializableClassName()));
 	ss->serialize(ac.getAddress());
-	ss->registerAttributes();
+	ss->registerSerializableAttributes(false);
 	Serializable::Archives archives = ss->getArchives();
 	Serializable::Archives::iterator archi = archives.begin();
 	Serializable::Archives::iterator archiEnd = archives.end();
@@ -213,7 +215,7 @@ void IOManager::serializeCustomFundamental(ostream& stream, Archive& ac,int dept
 		(*archi)->markProcessed();
 	}
 	stream << "}";
-	ss->unregisterAttributes();
+	ss->unregisterSerializableAttributes(false);
 	ac.markProcessed();
 }
 
@@ -285,7 +287,7 @@ void IOManager::deserializeFundamentalSerializable(istream& stream, Archive& ac,
 
 	Serializable * s = any_cast<Serializable*>(ac.getAddress());
 
-	s->registerAttributes();
+	s->registerSerializableAttributes(true);
 
 	vector<string> tokens;
 	parseFundamental(str,tokens);
@@ -298,14 +300,14 @@ void IOManager::deserializeFundamentalSerializable(istream& stream, Archive& ac,
 		(*arci)->deserialize(stream,*(*arci),(*si));
 
 	ac.markProcessed();
-	s->unregisterAttributes();
+	s->unregisterSerializableAttributes(true);
 }
 
 void IOManager::serializeFundamentalSerializable(ostream& stream, Archive& ac, int depth)
 {
 	Serializable * s;
 	s = any_cast<Serializable*>(ac.getAddress());
-	s->registerAttributes();
+	s->registerSerializableAttributes(false);
 
 	Serializable::Archives archives = s->getArchives();
 
@@ -323,6 +325,6 @@ void IOManager::serializeFundamentalSerializable(ostream& stream, Archive& ac, i
 	stream << cfCB;
 
 	ac.markProcessed();
-	s->unregisterAttributes();
+	s->unregisterSerializableAttributes(false);
 
 }
