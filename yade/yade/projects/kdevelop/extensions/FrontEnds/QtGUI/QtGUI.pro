@@ -14,7 +14,8 @@ HEADERS += QtGUI.hpp \
            QtGUIGenerator.hpp \
            SimulationController.hpp \
            QGLThread.hpp \
-           SimulationControllerUpdater.hpp 
+           SimulationControllerUpdater.hpp \
+           MessageDialog.hpp 
 SOURCES += QtGUI.cpp \
            GLViewer.cpp \
            YadeQtMainWindow.cpp \
@@ -22,7 +23,8 @@ SOURCES += QtGUI.cpp \
            QtGUIGenerator.cpp \
            SimulationController.cpp \
            QGLThread.cpp \
-           SimulationControllerUpdater.cpp 
+           SimulationControllerUpdater.cpp \
+           MessageDialog.cpp 
 LIBS += -lSerialization \
 -lMath \
 -lBody \

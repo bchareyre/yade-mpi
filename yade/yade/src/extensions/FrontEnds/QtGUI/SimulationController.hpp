@@ -39,9 +39,9 @@
 class SimulationController : public QtGeneratedSimulationController
 {
 	private : QtGUIGenerator guiGen;	
-	
+	private : /*static*/ QWidget * parentWorkspace;	
 	private : shared_ptr<RenderingEngine> renderer;
-	
+	//public : static void load();
 	private : map<int,GLViewer* > glViews;
 	private : int maxNbViews;
 		

@@ -45,12 +45,12 @@ using namespace std;
 class MessageDialog : public QtGeneratedMessageDialog
 {
 	// construction
-	public : MessageDialog (const string& message);
+	public : MessageDialog (const string& message,QWidget* parent = 0, const char* name = 0, bool modal = FALSE, WFlags fl = 0 );
 	public : virtual ~MessageDialog ();
-
-
+	
 	public slots : virtual void pbOkClicked();
 	public slots : virtual void closeEvent(QCloseEvent * evt);
+	public slots : void timerEvent(QTimerEvent * evt);
 
 };
 

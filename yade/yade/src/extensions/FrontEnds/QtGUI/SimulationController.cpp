@@ -27,6 +27,7 @@
 #include "Math.hpp"
 #include "Threadable.hpp"
 #include "OpenGLRenderingEngine.hpp"
+#include "MessageDialog.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -55,6 +56,8 @@ SimulationController::SimulationController(QWidget * parent) : QtGeneratedSimula
 	setMinimumSize(size());
 	setMaximumSize(size());
 
+	parentWorkspace = parent;
+	
 //	while(! renderer )
 // FIXME - what is going on here? it was crashing rabdomly unless I added these lines...
 	shared_ptr<Factorable> tmpRenderer = ClassFactory::instance().createShared("OpenGLRenderingEngine");
@@ -142,14 +145,33 @@ void SimulationController::pbApplyClicked()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+//QWidget* SimulationController::parentWorkspace=0;
+// void SimulationController::load()
+// {
+// 	MessageDialog * d = new MessageDialog("Loading file "+Omega::instance().getSimulationFileName()+". Please wait...", parentWorkspace,"Message Dialog",true);
+// 	
+// 	parentWorkspace->setEnabled(false);
+// 	
+// 	d->setEnabled(true);
+// 	
+// 	IOManager::loadFromFile("XMLManager",Omega::instance().getSimulationFileName(),"rootBody",Omega::instance().rootBody);
+// 	
+// 	parentWorkspace->setEnabled(true);
+// 	
+// 	delete d;
+// 	d = new MessageDialog("File "+Omega::instance().getSimulationFileName()+" was  correctly loaded...", parentWorkspace);
+// 	d->exec();
+// 	delete d;
+// }
+
 void SimulationController::pbLoadClicked()
 {
 	boost::mutex resizeMutex;
 	boost::mutex::scoped_lock lock(resizeMutex);
 
 	QString selectedFilter;
-	QString fileName = QFileDialog::getOpenFileName("../data", "XML Yade File (*.xml)", this,"Open File","Choose a file to open",&selectedFilter );
-
+	QString fileName = QFileDialog::getOpenFileName("../data", "XML Yade File (*.xml)", 0,"Open File","Choose a file to open",&selectedFilter );
+		
 	if (!fileName.isEmpty() && selectedFilter == "XML Yade File (*.xml)")
 	{
 		map<int,GLViewer*>::iterator gi = glViews.begin();
@@ -164,12 +186,13 @@ void SimulationController::pbLoadClicked()
 		Omega::instance().setSimulationFileName(fileName);
 		Omega::instance().loadSimulation();
 		
+		//boost::thread t(&SimulationController::load);
 		
 		string fullName = string(filesystem::basename(fileName.data()))+string(filesystem::extension(fileName.data()));
 		tlCurrentSimulation->setText(fullName);
-
+		
 		Omega::instance().createSimulationLoop();
-
+		
 		gi = glViews.begin();
 		giEnd = glViews.end();
 		for(;gi!=giEnd;++gi)
@@ -177,6 +200,8 @@ void SimulationController::pbLoadClicked()
 			(*gi).second->centerScene();
 			(*gi).second->startRendering();
 		}
+
+
 	}
 } 
 
@@ -207,13 +232,13 @@ void SimulationController::addNewView()
 
 	if (glViews.size()==0)
 	{
-			glViews[0] = new GLViewer(0,renderer,format,this->parentWidget()->parentWidget());
+			glViews[0] = new GLViewer(0,renderer,format,parentWorkspace);
 			maxNbViews = 0;
 	}
 	else
 	{
 		maxNbViews++;
-		glViews[maxNbViews] = new GLViewer(maxNbViews,renderer, format, this->parentWidget()->parentWidget(), glViews[0]);
+		glViews[maxNbViews] = new GLViewer(maxNbViews,renderer, format, parentWorkspace, glViews[0]);
 	}
 	
 	connect( glViews[maxNbViews], SIGNAL( closeSignal(int) ), this, SLOT( closeGLViewEvent(int) ) );
