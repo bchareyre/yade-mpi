@@ -54,7 +54,7 @@ void SDECDynamicEngine::registerAttributes()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-//FIXME : add reset function so it will remove bool first
+//FIXME : remove bool first !!!!!
 void SDECDynamicEngine::respondToInteractions(Body* body)
 {
 	ComplexBody * ncb = dynamic_cast<ComplexBody*>(body);
@@ -62,15 +62,6 @@ void SDECDynamicEngine::respondToInteractions(Body* body)
 
 	Vector3r gravity = Omega::instance().getGravity();
 	Real dt = Omega::instance().getTimeStep();
-
-	if(first) // FIXME - this should be done somewhere else
-	{
-		vector<shared_ptr<Action> > vvv; 
-		vvv.clear();
-		vvv.push_back(actionForce);
-		vvv.push_back(actionMomentum);
-		ncb->actions->prepare(vvv);
-	}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// Permanents Links													///

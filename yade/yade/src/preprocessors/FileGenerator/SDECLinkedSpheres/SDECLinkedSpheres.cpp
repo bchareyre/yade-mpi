@@ -73,78 +73,9 @@ void SDECLinkedSpheres::registerAttributes()
 string SDECLinkedSpheres::generate()
 {
 	rootBody = shared_ptr<ComplexBody>(new ComplexBody);
+	createActors(rootBody);
+	positionRootBody(rootBody);
 
-	shared_ptr<InteractionGeometryDispatcher> interactionGeometryDispatcher(new InteractionGeometryDispatcher);
-	interactionGeometryDispatcher->add("InteractionSphere","InteractionSphere","Sphere2Sphere4SDECContactModel");
-	interactionGeometryDispatcher->add("InteractionSphere","InteractionBox","Box2Sphere4SDECContactModel");
-
-	shared_ptr<InteractionPhysicsDispatcher> interactionPhysicsDispatcher(new InteractionPhysicsDispatcher);
-	interactionPhysicsDispatcher->add("SDECParameters","SDECParameters","SDECLinearContactModel");
-		
-	shared_ptr<BoundingVolumeDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeDispatcher>(new BoundingVolumeDispatcher);
-	boundingVolumeDispatcher->add("InteractionSphere","AABB","Sphere2AABBFunctor");
-	boundingVolumeDispatcher->add("InteractionBox","AABB","Box2AABBFunctor");
-	boundingVolumeDispatcher->add("InteractionDescriptionSet","AABB","InteractionDescriptionSet2AABBFunctor");
-
-	
-	
-		
-	shared_ptr<ActionForceDamping> actionForceDamping(new ActionForceDamping);
-	actionForceDamping->damping = dampingForce;
-	shared_ptr<ActionMomentumDamping> actionMomentumDamping(new ActionMomentumDamping);
-	actionMomentumDamping->damping = dampingMomentum;
-	shared_ptr<ActionDampingDispatcher> actionDampingDispatcher(new ActionDampingDispatcher);
-	actionDampingDispatcher->add("ActionForce","ParticleParameters","ActionForceDamping",actionForceDamping);
-	actionDampingDispatcher->add("ActionMomentum","RigidBodyParameters","ActionMomentumDamping",actionMomentumDamping);
-	
-	shared_ptr<ActionApplyDispatcher> applyActionDispatcher(new ActionApplyDispatcher);
-	applyActionDispatcher->add("ActionForce","ParticleParameters","ActionForce2Particle");
-	applyActionDispatcher->add("ActionMomentum","RigidBodyParameters","ActionMomentum2RigidBody");
-	
-	shared_ptr<TimeIntegratorDispatcher> timeIntegratorDispatcher(new TimeIntegratorDispatcher);
-	
-	
-	timeIntegratorDispatcher->add("SDECParameters","LeapFrogIntegrator"); // FIXME - bug in locateMultivirtualFunctionCall1D ???
-		
-	
-	
-	
-	shared_ptr<SDECDynamicEngine> sdecDynamicEngine(new SDECDynamicEngine);
-	sdecDynamicEngine->sdecGroup = 55;
-	
-	rootBody->actors.clear();
-	rootBody->actors.push_back(boundingVolumeDispatcher);
-	
-	rootBody->actors.push_back(shared_ptr<Actor>(new PersistentSAPCollider));
-	rootBody->actors.push_back(interactionGeometryDispatcher);
-	rootBody->actors.push_back(interactionPhysicsDispatcher);
-	
-	rootBody->actors.push_back(sdecDynamicEngine);
-	rootBody->actors.push_back(actionDampingDispatcher);
-	rootBody->actors.push_back(applyActionDispatcher);
-	rootBody->actors.push_back(timeIntegratorDispatcher);
-	rootBody->actors.push_back(shared_ptr<Actor>(new ActionReset));
-	
-	rootBody->isDynamic		= false;
-	
-	Quaternionr q;
-	q.fromAxisAngle( Vector3r(0,0,1),0);
-	shared_ptr<ParticleParameters> physics(new ParticleParameters); // FIXME : fix indexable class BodyPhysicalParameters
-	physics->se3		= Se3r(Vector3r(0,0,0),q);
-	physics->mass		= 0;
-	physics->velocity	= Vector3r::ZERO;
-	physics->acceleration	= Vector3r::ZERO;
-	
-	shared_ptr<InteractionDescriptionSet> set(new InteractionDescriptionSet());
-	set->diffuseColor	= Vector3f(0,0,1);
-
-	shared_ptr<AABB> aabb(new AABB);
-	aabb->diffuseColor	= Vector3r(0,0,1);
-	
-	rootBody->interactionGeometry		= dynamic_pointer_cast<InteractionDescription>(set);	
-	rootBody->boundingVolume		= dynamic_pointer_cast<BoundingVolume>(aabb);
-	rootBody->physicalParameters = physics;
-	
 ////////////////////////////////////
 
 	shared_ptr<Body> ground;
@@ -292,7 +223,6 @@ void SDECLinkedSpheres::createBox(shared_ptr<Body>& body, Vector3r position, Vec
 	shared_ptr<Box> gBox(new Box);
 	shared_ptr<InteractionBox> iBox(new InteractionBox);
 	
-	
 	Quaternionr q;
 	q.fromAxisAngle( Vector3r(0,0,1),0);
 
@@ -325,3 +255,85 @@ void SDECLinkedSpheres::createBox(shared_ptr<Body>& body, Vector3r position, Vec
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+
+void SDECLinkedSpheres::createActors(shared_ptr<ComplexBody>& rootBody)
+{
+	shared_ptr<InteractionGeometryDispatcher> interactionGeometryDispatcher(new InteractionGeometryDispatcher);
+	interactionGeometryDispatcher->add("InteractionSphere","InteractionSphere","Sphere2Sphere4SDECContactModel");
+	interactionGeometryDispatcher->add("InteractionSphere","InteractionBox","Box2Sphere4SDECContactModel");
+
+	shared_ptr<InteractionPhysicsDispatcher> interactionPhysicsDispatcher(new InteractionPhysicsDispatcher);
+	interactionPhysicsDispatcher->add("SDECParameters","SDECParameters","SDECLinearContactModel");
+		
+	shared_ptr<BoundingVolumeDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeDispatcher>(new BoundingVolumeDispatcher);
+	boundingVolumeDispatcher->add("InteractionSphere","AABB","Sphere2AABBFunctor");
+	boundingVolumeDispatcher->add("InteractionBox","AABB","Box2AABBFunctor");
+	boundingVolumeDispatcher->add("InteractionDescriptionSet","AABB","InteractionDescriptionSet2AABBFunctor");
+
+	
+	
+		
+	shared_ptr<ActionForceDamping> actionForceDamping(new ActionForceDamping);
+	actionForceDamping->damping = dampingForce;
+	shared_ptr<ActionMomentumDamping> actionMomentumDamping(new ActionMomentumDamping);
+	actionMomentumDamping->damping = dampingMomentum;
+	shared_ptr<ActionDampingDispatcher> actionDampingDispatcher(new ActionDampingDispatcher);
+	actionDampingDispatcher->add("ActionForce","ParticleParameters","ActionForceDamping",actionForceDamping);
+	actionDampingDispatcher->add("ActionMomentum","RigidBodyParameters","ActionMomentumDamping",actionMomentumDamping);
+	
+	shared_ptr<ActionApplyDispatcher> applyActionDispatcher(new ActionApplyDispatcher);
+	applyActionDispatcher->add("ActionForce","ParticleParameters","ActionForce2Particle");
+	applyActionDispatcher->add("ActionMomentum","RigidBodyParameters","ActionMomentum2RigidBody");
+	
+	shared_ptr<TimeIntegratorDispatcher> timeIntegratorDispatcher(new TimeIntegratorDispatcher);
+	
+	
+	timeIntegratorDispatcher->add("SDECParameters","LeapFrogIntegrator"); // FIXME - bug in locateMultivirtualFunctionCall1D ???
+		
+	
+	
+	
+	shared_ptr<SDECDynamicEngine> sdecDynamicEngine(new SDECDynamicEngine);
+	sdecDynamicEngine->sdecGroup = 55;
+	
+	rootBody->actors.clear();
+	rootBody->actors.push_back(shared_ptr<Actor>(new ActionReset));
+	rootBody->actors.push_back(boundingVolumeDispatcher);
+	rootBody->actors.push_back(shared_ptr<Actor>(new PersistentSAPCollider));
+	rootBody->actors.push_back(interactionGeometryDispatcher);
+	rootBody->actors.push_back(interactionPhysicsDispatcher);
+	rootBody->actors.push_back(sdecDynamicEngine);
+	rootBody->actors.push_back(actionDampingDispatcher);
+	rootBody->actors.push_back(applyActionDispatcher);
+	rootBody->actors.push_back(timeIntegratorDispatcher);
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+void SDECLinkedSpheres::positionRootBody(shared_ptr<ComplexBody>& rootBody)
+{
+	rootBody->isDynamic		= false;
+	
+	Quaternionr q;
+	q.fromAxisAngle( Vector3r(0,0,1),0);
+	shared_ptr<ParticleParameters> physics(new ParticleParameters); // FIXME : fix indexable class BodyPhysicalParameters
+	physics->se3			= Se3r(Vector3r(0,0,0),q);
+	physics->mass			= 0;
+	physics->velocity		= Vector3r::ZERO;
+	physics->acceleration		= Vector3r::ZERO;
+	
+	shared_ptr<InteractionDescriptionSet> set(new InteractionDescriptionSet());
+	
+	set->diffuseColor		= Vector3f(0,0,1);
+
+	shared_ptr<AABB> aabb(new AABB);
+	aabb->diffuseColor		= Vector3r(0,0,1);
+	
+	rootBody->interactionGeometry	= dynamic_pointer_cast<InteractionDescription>(set);	
+	rootBody->boundingVolume	= dynamic_pointer_cast<BoundingVolume>(aabb);
+	rootBody->physicalParameters 	= physics;
+	
+}

@@ -48,8 +48,6 @@ RotatingBox::~RotatingBox ()
 {
 }
 
-
-
 void RotatingBox::registerAttributes()
 {
 	FileGenerator::registerAttributes();
@@ -282,15 +280,14 @@ void RotatingBox::createActors(shared_ptr<ComplexBody>& rootBody)
  		kinematic->subscribedBodies.push_back(i);
 	
 	rootBody->actors.clear();
+	rootBody->actors.push_back(shared_ptr<Actor>(new ActionReset));
 	rootBody->actors.push_back(boundingVolumeDispatcher);
-	
 	rootBody->actors.push_back(shared_ptr<Actor>(new SAPCollider));
 	rootBody->actors.push_back(interactionGeometryDispatcher);
 	rootBody->actors.push_back(shared_ptr<Actor>(new SimpleSpringDynamicEngine));
 	rootBody->actors.push_back(actionDampingDispatcher);
 	rootBody->actors.push_back(applyActionDispatcher);
 	rootBody->actors.push_back(timeIntegratorDispatcher);
-	rootBody->actors.push_back(shared_ptr<Actor>(new ActionReset));
 	if(isRotating)
 		rootBody->actors.push_back(kinematic);
 }

@@ -101,6 +101,7 @@ string SDECSpheresPlane::generate()
 	timeIntegratorDispatcher->add("SDECParameters","LeapFrogIntegrator");
 	
 	rootBody->actors.clear();
+	rootBody->actors.push_back(shared_ptr<Actor>(new ActionReset));
 	rootBody->actors.push_back(boundingVolumeDispatcher);	
 	rootBody->actors.push_back(shared_ptr<Actor>(new PersistentSAPCollider));
 	rootBody->actors.push_back(interactionGeometryDispatcher);
@@ -109,7 +110,6 @@ string SDECSpheresPlane::generate()
 	rootBody->actors.push_back(actionDampingDispatcher);
 	rootBody->actors.push_back(applyActionDispatcher);
 	rootBody->actors.push_back(timeIntegratorDispatcher);
-	rootBody->actors.push_back(shared_ptr<Actor>(new ActionReset));
 	
 
 	//FIXME : use a default one

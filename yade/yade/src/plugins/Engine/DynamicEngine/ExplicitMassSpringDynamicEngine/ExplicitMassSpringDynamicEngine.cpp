@@ -10,7 +10,6 @@
 
 ExplicitMassSpringDynamicEngine::ExplicitMassSpringDynamicEngine () : DynamicEngine(), actionForce(new ActionForce) , actionMomentum(new ActionMomentum)
 {
-	first = true;
 }
 
 void ExplicitMassSpringDynamicEngine::registerAttributes()
@@ -27,16 +26,6 @@ void ExplicitMassSpringDynamicEngine::respondToInteractions(Body * body)
 	shared_ptr<ActionContainer>& actions = massSpring->actions;
 	
 	Vector3r gravity = Omega::instance().getGravity();
-	
-	if (first) // FIXME - this should be done somewhere else
-	{
-		vector<shared_ptr<Action> > vvv; 
-		vvv.clear();
-		vvv.push_back(actionForce);	
-		vvv.push_back(actionMomentum);
-		actions->prepare(vvv);
-		first = false;
-	}
 	
 	for(permanentInteractions->gotoFirst() ; permanentInteractions->notAtEnd(); permanentInteractions->gotoNext())
 	{

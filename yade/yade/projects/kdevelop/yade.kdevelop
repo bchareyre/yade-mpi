@@ -106,7 +106,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>plugins/Engine/DynamicEngine/SimpleSpringDynamicEngine</activedir>
+      <activedir>preprocessors/FileGenerator/HangingCloth</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>

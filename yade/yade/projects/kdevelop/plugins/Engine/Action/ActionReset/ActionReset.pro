@@ -3,12 +3,16 @@
 # Subdir relative project main directory: ./plugins/Engine/Action/ActionReset
 # Target is a library:  
 
-LIBS += -rdynamic 
+LIBS += -lActionForce \
+        -lActionMomentum \
+        -rdynamic 
 INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = $(YADEDYNLIBPATH) 
+QMAKE_LIBDIR = ../../../../plugins/Engine/Action/ActionForce/$(YADEDYNLIBPATH) \
+               ../../../../plugins/Engine/Action/ActionMomentum/$(YADEDYNLIBPATH) \
+               $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 
 QMAKE_CXXFLAGS_DEBUG += -lpthread \

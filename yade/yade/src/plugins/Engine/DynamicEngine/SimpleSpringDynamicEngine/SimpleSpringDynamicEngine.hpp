@@ -7,19 +7,14 @@ class Action;
 
 class SimpleSpringDynamicEngine : public DynamicEngine
 {
-//	private : std::vector<Vector3r> prevVelocities;
-//	private : std::vector<Vector3r> forces;
-//	private : std::vector<Vector3r> couples;
 	private : shared_ptr<Action> actionForce;
 	private : shared_ptr<Action> actionMomentum;
-	private : bool first;
 
 	// construction
 	public : SimpleSpringDynamicEngine ();
 	
 	public : void registerAttributes();
 
-	//public : void respondToInteractions(std::vector<shared_ptr<Body> >& bodies, const std::list<shared_ptr<Interaction> >& interactions,Real dt);
 	public : void respondToInteractions(Body* body);
 	REGISTER_CLASS_NAME(SimpleSpringDynamicEngine);
 };

@@ -46,7 +46,7 @@ class SDECDynamicEngine : public DynamicEngine
 /// Attributes											///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private : bool first;
+	private : bool first; // FIXME - remove that!
 	private : shared_ptr<Action> actionForce;
 	private : shared_ptr<Action> actionMomentum;
 	public  : int sdecGroup;

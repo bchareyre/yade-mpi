@@ -10,7 +10,6 @@ class MassSpringBody2RigidBodyDynamicEngine : public DynamicEngine
 	public : MassSpringBody2RigidBodyDynamicEngine ();
 	private : shared_ptr<Action> actionForce;	
 	private : shared_ptr<Action> actionMomentum;
-	private : bool first;
 	public  : int sdecGroup;
 	public  : int springGroup;
 

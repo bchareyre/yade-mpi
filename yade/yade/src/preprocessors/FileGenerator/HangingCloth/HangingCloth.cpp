@@ -155,6 +155,7 @@ string HangingCloth::generate()
 	massSpringBody2RigidBodyDynamicEngine->springGroup = 1;
 
 	rootBody->actors.clear();
+	rootBody->actors.push_back(shared_ptr<Actor>(new ActionReset));
 	rootBody->actors.push_back(boundingVolumeDispatcher);
 	rootBody->actors.push_back(geometricalModelDispatcher);
 	rootBody->actors.push_back(shared_ptr<Actor>(new PersistentSAPCollider));
@@ -166,7 +167,6 @@ string HangingCloth::generate()
 	rootBody->actors.push_back(actionDampingDispatcher);
 	rootBody->actors.push_back(applyActionDispatcher);
 	rootBody->actors.push_back(timeIntegratorDispatcher);
-	rootBody->actors.push_back(shared_ptr<Actor>(new ActionReset));
 
 	Quaternionr q;
 	q.fromAxisAngle( Vector3r(0,0,1),0);

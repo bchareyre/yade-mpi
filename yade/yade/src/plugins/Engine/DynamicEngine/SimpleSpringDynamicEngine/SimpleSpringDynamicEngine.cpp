@@ -8,7 +8,6 @@
 
 SimpleSpringDynamicEngine::SimpleSpringDynamicEngine () : DynamicEngine(), actionForce(new ActionForce) , actionMomentum(new ActionMomentum)
 {
-	first = true;
 }
 
 void SimpleSpringDynamicEngine::registerAttributes()
@@ -18,7 +17,6 @@ void SimpleSpringDynamicEngine::registerAttributes()
 
 void SimpleSpringDynamicEngine::respondToInteractions(Body * body)
 {
-
 	//Real dt = Omega::instance().dt;
 
 	ComplexBody * ncb = dynamic_cast<ComplexBody*>(body);
@@ -28,15 +26,6 @@ void SimpleSpringDynamicEngine::respondToInteractions(Body * body)
 	Real viscosity = 10;
 	Vector3r gravity = Omega::instance().getGravity();
 	
-	if(first) // FIXME - this should be done somewhere else
-	{
-		vector<shared_ptr<Action> > vvv; 
-		vvv.clear();
-		vvv.push_back(actionForce);
-		vvv.push_back(actionMomentum);
-		ncb->actions->prepare(vvv);
-	}
-
 	for( ncb->interactions->gotoFirst() ; ncb->interactions->notAtEnd() ; ncb->interactions->gotoNext() )
 	{
 		const shared_ptr<Interaction>& contact = ncb->interactions->getCurrent();
@@ -79,7 +68,6 @@ void SimpleSpringDynamicEngine::respondToInteractions(Body * body)
 		}
 	}
 
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// Gravity														///
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -91,6 +79,5 @@ void SimpleSpringDynamicEngine::respondToInteractions(Body * body)
 		static_cast<ActionForce*>( ncb->actions->find( b->getId() , actionForce->getClassIndex() ).get() )->force += gravity*de->mass;
         }
 
-	first = false;
 }
 

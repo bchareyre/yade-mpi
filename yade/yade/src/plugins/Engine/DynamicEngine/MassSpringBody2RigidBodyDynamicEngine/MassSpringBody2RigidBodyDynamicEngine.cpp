@@ -14,7 +14,6 @@
 
 MassSpringBody2RigidBodyDynamicEngine::MassSpringBody2RigidBodyDynamicEngine ()  : DynamicEngine(), actionForce(new ActionForce) , actionMomentum(new ActionMomentum)
 {
-	first = true;
 	springGroup = 0;
 	sdecGroup = 1;
 }
@@ -35,16 +34,6 @@ void MassSpringBody2RigidBodyDynamicEngine::respondToInteractions(Body * body)
 	shared_ptr<ActionContainer>& actions = mixedBody->actions;
 	Real dt = Omega::instance().getTimeStep();
 
-	if (first) // FIXME - this should be done somewhere else
-	{
-		vector<shared_ptr<Action> > vvv; 
-		vvv.clear();
-		vvv.push_back(actionForce);	
-		vvv.push_back(actionMomentum);
-		actions->prepare(vvv);
-		first = false;
-	}
-	
 	for( interactions->gotoFirst() ; interactions->notAtEnd() ; interactions->gotoNext() )
 	{
 		const shared_ptr<Interaction>& mixedInteraction = interactions->getCurrent();

@@ -54,6 +54,7 @@ QtFileGenerator::QtFileGenerator ( QWidget * parent , const char * name) : QtFil
 		else if ((*di).second=="FileGenerator")
 			cbGeneratorName->insertItem((*di).first);
 	}
+	leOutputFileName->setText("../data/scene.xml");
 
 	cbGeneratorNameActivated(cbGeneratorName->currentText());
 }

@@ -29,6 +29,9 @@ class SDECLinkedSpheres : public FileGenerator
 	public : SDECLinkedSpheres ();
 	public : ~SDECLinkedSpheres ();
 
+	private : void createActors(shared_ptr<ComplexBody>& rootBody);
+	private : void positionRootBody(shared_ptr<ComplexBody>& rootBody);
+	
 	protected : virtual void postProcessAttributes(bool deserializing);
 	public : void registerAttributes();
 
