@@ -34,8 +34,10 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "Interaction.hpp"
-#include "CollisionMultiMethodsManager.hpp"
+#include "DynLibDispatcher.hpp"
 #include "Actor.hpp"
+#include "CollisionGeometry.hpp"
+#include "CollisionFunctor.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -47,9 +49,19 @@ class Body;
 
 class NarrowCollider : public Actor
 {
+	protected: DynLibDispatcher
+		<	TYPELIST_2( CollisionGeometry , CollisionGeometry ) ,	// base classess for dispatch
+			CollisionFunctor,					// class that provides multivirtual call
+			bool ,							// return type
+			TYPELIST_5(
+					const shared_ptr<CollisionGeometry>&	// arguments
+					, const shared_ptr<CollisionGeometry>&
+					, const Se3r&
+					, const Se3r&
+					, shared_ptr<Interaction>&
+				)
+		> narrowManager;
 
-	protected : CollisionMultiMethodsManager narrowManager;
-	
 	private : vector<vector<string> > collisionFunctors;
 	public  : void addCollisionFunctor(const string& str1,const string& str2,const string& str3);
 		

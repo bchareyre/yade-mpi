@@ -29,24 +29,11 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-Box2Sphere4SDECContactModel::Box2Sphere4SDECContactModel ()
-{
-
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-Box2Sphere4SDECContactModel::~Box2Sphere4SDECContactModel ()
-{
-
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-bool Box2Sphere4SDECContactModel::collide(const shared_ptr<CollisionGeometry> cm1, const shared_ptr<CollisionGeometry> cm2, const Se3r& se31, const Se3r& se32, shared_ptr<Interaction> c)
+bool Box2Sphere4SDECContactModel::go(		const shared_ptr<CollisionGeometry>& cm1,
+						const shared_ptr<CollisionGeometry>& cm2,
+						const Se3r& se31,
+						const Se3r& se32,
+						shared_ptr<Interaction>& c)
 {
 
 	//if (se31.rotation == Quaternionr())
@@ -153,9 +140,13 @@ bool Box2Sphere4SDECContactModel::collide(const shared_ptr<CollisionGeometry> cm
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool Box2Sphere4SDECContactModel::reverseCollide(const shared_ptr<CollisionGeometry> cm1, const shared_ptr<CollisionGeometry> cm2,  const Se3r& se31, const Se3r& se32, shared_ptr<Interaction> c)
+bool Box2Sphere4SDECContactModel::goReverse(	const shared_ptr<CollisionGeometry>& cm1,
+						const shared_ptr<CollisionGeometry>& cm2,
+						const Se3r& se31,
+						const Se3r& se32,
+						shared_ptr<Interaction>& c)
 {
-	bool isColliding = collide(cm2,cm1,se32,se31,c);
+	bool isColliding = go(cm2,cm1,se32,se31,c);
 	if (isColliding)
 	{
 		shared_ptr<SDECContactModel> scm = dynamic_pointer_cast<SDECContactModel>(c->interactionGeometry);

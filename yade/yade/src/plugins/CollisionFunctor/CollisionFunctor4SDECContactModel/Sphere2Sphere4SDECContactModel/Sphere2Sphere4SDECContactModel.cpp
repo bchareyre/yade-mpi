@@ -28,24 +28,11 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-Sphere2Sphere4SDECContactModel::Sphere2Sphere4SDECContactModel ()
-{
-
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-Sphere2Sphere4SDECContactModel::~Sphere2Sphere4SDECContactModel ()
-{
-
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-bool Sphere2Sphere4SDECContactModel::collide(const shared_ptr<CollisionGeometry> cm1, const shared_ptr<CollisionGeometry> cm2, const Se3r& se31, const Se3r& se32, shared_ptr<Interaction> c)
+bool Sphere2Sphere4SDECContactModel::go(	const shared_ptr<CollisionGeometry>& cm1,
+						const shared_ptr<CollisionGeometry>& cm2,
+						const Se3r& se31,
+						const Se3r& se32,
+						shared_ptr<Interaction>& c)
 {
 	shared_ptr<Sphere> s1 = dynamic_pointer_cast<Sphere>(cm1);
 	shared_ptr<Sphere> s2 = dynamic_pointer_cast<Sphere>(cm2);
@@ -72,9 +59,13 @@ bool Sphere2Sphere4SDECContactModel::collide(const shared_ptr<CollisionGeometry>
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool Sphere2Sphere4SDECContactModel::reverseCollide(const shared_ptr<CollisionGeometry> cm1, const shared_ptr<CollisionGeometry> cm2,  const Se3r& se31, const Se3r& se32, shared_ptr<Interaction> c)
+bool Sphere2Sphere4SDECContactModel::goReverse(	const shared_ptr<CollisionGeometry>& cm1,
+						const shared_ptr<CollisionGeometry>& cm2,
+						const Se3r& se31,
+						const Se3r& se32,
+						shared_ptr<Interaction>& c)
 {
-	return collide(cm1,cm2,se31,se32,c);
+	return go(cm1,cm2,se31,se32,c);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

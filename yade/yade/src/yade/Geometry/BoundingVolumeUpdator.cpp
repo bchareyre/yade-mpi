@@ -96,7 +96,7 @@ void BoundingVolumeUpdator::postProcessAttributes(bool deserializing)
 	if(deserializing)
 	{
 		for(unsigned int i=0;i<bvFactories.size();i++)
-			bvFactoriesManager.addPair(bvFactories[i][0],bvFactories[i][1],bvFactories[i][2]);
+			bvFactoriesManager.add(bvFactories[i][0],bvFactories[i][1],bvFactories[i][2]);
 	}
 }
 

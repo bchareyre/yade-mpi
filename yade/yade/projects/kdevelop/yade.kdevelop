@@ -104,7 +104,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>plugins/CollisionGeometry/CollisionGeometrySet</activedir>
+      <activedir>yade/Geometry</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>

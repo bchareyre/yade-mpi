@@ -28,17 +28,27 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "Actor.hpp"
+#include "DynLibDispatcher.hpp"
+#include "CollisionGeometry.hpp"
+#include "BoundingVolume.hpp"
 #include "Body.hpp"
-#include "BoundingVolumeFactoryManager.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class BoundingVolumeUpdator : public Actor
 {
-	protected : BoundingVolumeFactoryManager bvFactoriesManager;
-	// Dispatcher<BoundingVolume,....> buildBoundingVolumeDispatcher;
-	
+	protected: DynLibDispatcher
+		<	TYPELIST_2( CollisionGeometry , BoundingVolume ) ,	// base classess for dispatch
+			BoundingVolumeFactory,					// class that provides multivirtual call
+			void ,							// return type
+			TYPELIST_3(
+					const shared_ptr<CollisionGeometry>& ,	// arguments
+					shared_ptr<BoundingVolume>& ,
+					const Se3r&
+				)
+		> bvFactoriesManager;
+
 	private : vector<vector<string> > bvFactories;
 	public  : void addBVFactories(const string& str1,const string& str2,const string& str3);
 

@@ -27,9 +27,15 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include "DynLibLauncher.hpp"
 #include "BoundingVolume.hpp"
 #include "CollisionGeometry.hpp"
-#include "MultiMethodFunctor2D.hpp"
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+#include <boost/shared_ptr.hpp>
+#include <string>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -38,40 +44,24 @@
 	It is used for creating a bounding volume from a collision model during runtime.
 	This is very useful when it is not trivial to build the bounding volume from the collision model. For example if you want to build an AABB from a box which is not initially aligned with the world axis, it is not easy to write by hand into the configuration file the center and size of this AABB. Instead you can use a BoundingVolumeFactory that will compute for you the correct value	
 */
-class BoundingVolumeFactory : public MultiMethodFunctor2D
-{	
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-/// Constructor/Destructor									///
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-	/*! Constructor */
-	public : BoundingVolumeFactory ();
-	
-	/*! Destructor */
-	public : virtual ~BoundingVolumeFactory ();
-	
-///////////////////////////////////////////////////////////////////////////////////////////////////
-/// Methods											///
-///////////////////////////////////////////////////////////////////////////////////////////////////
-	
+class BoundingVolumeFactory : public DynLibLauncher
 	/*! Method called to build a given bounding volume from a given collision model and a 3D transformation
-		\param cm the collision model from wich we want to extract the bounding volume
-		\param se3 the 3D transformation to apply to the collision model before building the bounding volume
-		\return a shared pointer to the bounding volume
+		\param const shared_ptr<CollisionGeometry>& the collision model from wich we want to extract the bounding volume
+		\param Se3r& the 3D transformation to apply to the collision model before building the bounding volume
+		\return shared_ptr<BoundingVolume>& shared pointer to the bounding volume
 	*/
-	public : virtual void buildBoundingVolume(const shared_ptr<CollisionGeometry> cm, const Se3r& se3,shared_ptr<BoundingVolume> bv);
-	//FIXME : add also updateBoundingVolume(cm..). In fact we can load them automatically as we do with collisionFunctor because their name are Terrain2AABB ....
-	//protected : virtual bool updateBoundingVolume(const shared_ptr<CollisionGeometry> , const shared_ptr<CollisionGeometry> , const Se3r& , const Se3r& , shared_ptr<Interaction> );
-	
-	public    : inline void operator() (const shared_ptr<CollisionGeometry> cm, const Se3r& se3, shared_ptr<BoundingVolume> bv);
-	public : virtual bool checkFunctorOrder(const string& suggestedOrder) const;
+		<
+		 void ,
+		 TYPELIST_3(
+		 		const shared_ptr<CollisionGeometry>& ,
+				shared_ptr<BoundingVolume>& ,
+				const Se3r&
+		)>
+{	
 };
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-#include "BoundingVolumeFactory.ipp"
+//FIXME : make also second class for updateBoundingVolume. In fact we can load them automatically as we do with collisionFunctor because their name are Terrain2AABB ....
+//virtual bool go(const shared_ptr<CollisionGeometry> , const shared_ptr<CollisionGeometry> , const Se3r& , const Se3r& , shared_ptr<Interaction> );
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////

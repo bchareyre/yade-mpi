@@ -35,14 +35,18 @@
 /*! \brief Provide collision handling between an oriented box and a sphere in terms of ClosestFeatures */
 class Box2Sphere4ClosestFeatures : public CollisionFunctor
 {
-	// construction
-	public : Box2Sphere4ClosestFeatures ();
-	public : virtual ~Box2Sphere4ClosestFeatures ();
+	protected : virtual bool go(		const shared_ptr<CollisionGeometry>& cm1,
+						const shared_ptr<CollisionGeometry>& cm2,
+						const Se3r& se31,
+						const Se3r& se32,
+						shared_ptr<Interaction>& c);
+	protected : virtual bool goReverse(	const shared_ptr<CollisionGeometry>& cm1,
+						const shared_ptr<CollisionGeometry>& cm2,
+						const Se3r& se31,
+						const Se3r& se32,
+						shared_ptr<Interaction>& c);
 
-	protected : virtual bool collide(const shared_ptr<CollisionGeometry> cm1, const shared_ptr<CollisionGeometry> cm2, const Se3r& se31, const Se3r& se32, shared_ptr<Interaction> c);
-	protected : virtual bool reverseCollide(const shared_ptr<CollisionGeometry> cm1, const shared_ptr<CollisionGeometry> cm2,  const Se3r& se31, const Se3r& se32, shared_ptr<Interaction> c);
-
-	DEFINE_FUNCTOR_ORDER(Box,Sphere);
+	DEFINE_FUNCTOR_ORDER_2D(Box,Sphere);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

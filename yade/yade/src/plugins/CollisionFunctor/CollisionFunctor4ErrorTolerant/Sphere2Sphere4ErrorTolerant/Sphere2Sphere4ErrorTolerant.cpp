@@ -28,24 +28,11 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-Sphere2Sphere4ErrorTolerant::Sphere2Sphere4ErrorTolerant ()
-{
-
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-Sphere2Sphere4ErrorTolerant::~Sphere2Sphere4ErrorTolerant ()
-{
-
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-bool Sphere2Sphere4ErrorTolerant::collide(const shared_ptr<CollisionGeometry> cm1, const shared_ptr<CollisionGeometry> cm2, const Se3r& se31, const Se3r& se32, shared_ptr<Interaction> c)
+bool Sphere2Sphere4ErrorTolerant::go(		const shared_ptr<CollisionGeometry>& cm1,
+						const shared_ptr<CollisionGeometry>& cm2,
+						const Se3r& se31,
+						const Se3r& se32,
+						shared_ptr<Interaction>& c)
 {
 	shared_ptr<Sphere> s1 = dynamic_pointer_cast<Sphere>(cm1);
 	shared_ptr<Sphere> s2 = dynamic_pointer_cast<Sphere>(cm2);
@@ -74,9 +61,13 @@ bool Sphere2Sphere4ErrorTolerant::collide(const shared_ptr<CollisionGeometry> cm
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool Sphere2Sphere4ErrorTolerant::reverseCollide(const shared_ptr<CollisionGeometry> cm1, const shared_ptr<CollisionGeometry> cm2,  const Se3r& se31, const Se3r& se32, shared_ptr<Interaction> c)
+bool Sphere2Sphere4ErrorTolerant::goReverse(	const shared_ptr<CollisionGeometry>& cm1,
+						const shared_ptr<CollisionGeometry>& cm2,
+						const Se3r& se31,
+						const Se3r& se32,
+						shared_ptr<Interaction>& c)
 {
-	return collide(cm1,cm2,se31,se32,c);
+	return go(cm1,cm2,se31,se32,c);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

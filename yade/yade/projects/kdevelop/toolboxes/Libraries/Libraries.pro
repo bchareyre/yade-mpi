@@ -4,10 +4,12 @@
 # Target is a subdirs project 
 
 SUBDIRS += Factory \
-	   Singleton \
+           Singleton \
            Math \
            Serialization \
-           Threads 
+           Threads \
+           Typelist \
+           MultiMethods 
 MOC_DIR = $(YADECOMPILATIONPATH)
 UI_DIR = $(YADECOMPILATIONPATH)
 OBJECTS_DIR = $(YADECOMPILATIONPATH)

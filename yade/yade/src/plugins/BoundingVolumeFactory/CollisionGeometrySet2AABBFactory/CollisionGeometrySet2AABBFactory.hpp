@@ -34,14 +34,9 @@
 
 class CollisionGeometrySet2AABBFactory : public BoundingVolumeFactory
 {
-	// construction
-	public : CollisionGeometrySet2AABBFactory ();
-	public : ~CollisionGeometrySet2AABBFactory ();
-
-	protected : virtual void postProcessAttributes(bool deserializing);
-	public : void registerAttributes();
-
-	public : void buildBoundingVolume(const shared_ptr<CollisionGeometry> cm, const Se3r& se3, shared_ptr<BoundingVolume> bv);
+	public : void go(	const shared_ptr<CollisionGeometry>& cm,
+				shared_ptr<BoundingVolume>& bv,
+				const Se3r& se3	);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

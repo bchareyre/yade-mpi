@@ -6,14 +6,9 @@
 
 class Terrain2AABBFactory : public BoundingVolumeFactory
 {
-	// construction
-	public : Terrain2AABBFactory ();
-	public : ~Terrain2AABBFactory ();
-
-	protected : virtual void postProcessAttributes(bool deserializing);
-	public : void registerAttributes();
-
-	public : shared_ptr<BoundingVolume> buildBoundingVolume(const shared_ptr<CollisionGeometry> cm, const Se3r& se3);
+	public : void go(	const shared_ptr<CollisionGeometry>& cm,
+				shared_ptr<BoundingVolume>& bv,
+				const Se3r& se3	);
 };
 
 REGISTER_FACTORABLE(Terrain2AABBFactory);

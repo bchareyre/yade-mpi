@@ -106,7 +106,7 @@ template
 <	class ResultType, 		// type returned by multivirtual function
 	class ArgumentTypeList		// TypeList of arguments accepted by multivirtual function,
 >
-class DynLibLauncher : public Factorable
+class DynLibLauncher// : public Factorable
 {
 	private:
 		typedef Loki::FunctorImpl<ResultType, ArgumentTypeList > Impl;

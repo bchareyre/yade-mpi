@@ -1,4 +1,6 @@
 /***************************************************************************
+ *   Copyright (C) 2004 by Janek Kozicki                                   *
+ *   cosurgi@berlios.de                                                    *
  *   Copyright (C) 2004 by Olivier Galizzi                                 *
  *   olivier.galizzi@imag.fr                                               *
  *                                                                         *
@@ -27,7 +29,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "MultiMethodFunctor2D.hpp"
+#include "DynLibLauncher.hpp"
 #include "CollisionGeometry.hpp"
 #include "Se3.hpp"
 #include "Interaction.hpp"
@@ -36,40 +38,30 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <boost/shared_ptr.hpp>
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-using namespace boost;
+#include <string>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /*! \brief Abstract interface for all collision functor.
 
-	Every functions that describe collision between two CollisionGeometrys must derived from CollisionFunctor.
+	Every functions that describe collision between two CollisionGeometries must derive from CollisionFunctor.
 */
-class CollisionFunctor :  public MultiMethodFunctor2D
+
+class CollisionFunctor : public DynLibLauncher
+		<
+		 bool ,
+		 TYPELIST_5(
+				  const shared_ptr<CollisionGeometry>&
+				, const shared_ptr<CollisionGeometry>&
+				, const Se3r&
+				, const Se3r&
+				, shared_ptr<Interaction>&
+		) >
 {
-	// construction
-	public : CollisionFunctor ();
-	public : virtual ~CollisionFunctor ();
-
-	protected : virtual bool collide(const shared_ptr<CollisionGeometry> , const shared_ptr<CollisionGeometry> , const Se3r& , const Se3r& , shared_ptr<Interaction> );
-	protected : virtual bool reverseCollide(const shared_ptr<CollisionGeometry> , const shared_ptr<CollisionGeometry> ,  const Se3r& , const Se3r& , shared_ptr<Interaction> );
-
-	public    : inline bool operator() (const shared_ptr<CollisionGeometry> cm1, const shared_ptr<CollisionGeometry> cm2, const Se3r& se31, const Se3r& se32, shared_ptr<Interaction> c);
-
-	public : virtual bool checkFunctorOrder(const string& suggestedOrder) const;
 };
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-#include "CollisionFunctor.ipp"
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+REGISTER_FACTORABLE(CollisionFunctor);
 
 #endif // __COLLISIONFUNCTOR_H__
 

@@ -3,36 +3,31 @@
 # Subdir relative project main directory: ./yade/Geometry
 # Target is a library:  
 
-LIBS += -rdynamic 
-INCLUDEPATH = $(YADEINCLUDEPATH) 
-MOC_DIR = $(YADECOMPILATIONPATH) 
-UI_DIR = $(YADECOMPILATIONPATH) 
-OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = $(YADEDYNLIBPATH) 
-QMAKE_CXXFLAGS_RELEASE += -lpthread \
-                          -pthread 
-QMAKE_CXXFLAGS_DEBUG += -lpthread \
-                        -pthread 
-DESTDIR = $(YADEDYNLIBPATH) 
-CONFIG += debug \
-          warn_on \
-          dll 
-TEMPLATE = lib 
 HEADERS += BoundingVolume.hpp \
            CollisionGeometry.hpp \
            CollisionGeometryFactory.hpp \
            GeometricalModel.hpp \
            GeometricalModelFactory.hpp \
-           RenderingEngine.hpp \
            BoundingVolumeFactory.hpp \
-           BoundingVolumeUpdator.hpp \
-           BoundingVolumeFactory.ipp \
-           BoundingVolumeFactoryManager.hpp 
+           BoundingVolumeUpdator.hpp 
 SOURCES += BoundingVolume.cpp \
            CollisionGeometry.cpp \
            CollisionGeometryFactory.cpp \
            GeometricalModel.cpp \
            GeometricalModelFactory.cpp \
-           BoundingVolumeFactory.cpp \
-           BoundingVolumeUpdator.cpp \
-           BoundingVolumeFactoryManager.cpp 
+           BoundingVolumeUpdator.cpp 
+LIBS += -rdynamic
+INCLUDEPATH = $(YADEINCLUDEPATH)
+MOC_DIR = $(YADECOMPILATIONPATH)
+UI_DIR = $(YADECOMPILATIONPATH)
+OBJECTS_DIR = $(YADECOMPILATIONPATH)
+QMAKE_LIBDIR = $(YADEDYNLIBPATH)
+QMAKE_CXXFLAGS_RELEASE += -lpthread \
+-pthread
+QMAKE_CXXFLAGS_DEBUG += -lpthread \
+-pthread
+DESTDIR = $(YADEDYNLIBPATH)
+CONFIG += debug \
+warn_on \
+dll
+TEMPLATE = lib
