@@ -43,9 +43,10 @@ using namespace boost;
 
 class ThreadSynchronizer
 {
+	private : boost::mutex tmpMutex;
 	private : boost::mutex mutex;
 	private : boost::condition cond;
-	boost::mutex::scoped_lock * lock;	
+		  boost::mutex::scoped_lock * lock;	
 	private : int i;
 	private : int prevI;
 	private : int nbThreads;

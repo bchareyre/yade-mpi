@@ -27,6 +27,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "ThreadSynchronizer.hpp"
+#include "ThreadSafe.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -44,13 +45,14 @@ template<class Thread>
 Threadable<Thread>::~Threadable()
 {
 }
-
+//#define THREAD_DEBUG
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 template<class Thread>
 void Threadable<Thread>::operator()()
 {
+#ifndef THREAD_DEBUG
 	if (synchronizer)
 	{
 		while (notEnd())
@@ -64,8 +66,42 @@ void Threadable<Thread>::operator()()
 	else
 	{
 		while (notEnd())
+		{
 			oneLoop();
+		}
 	}
+#else
+	if (synchronizer)
+	{	
+		while (notEnd())
+		{
+			ThreadSafe::cerr("mark:  20 " + string(typeid(*this).name()) );
+			synchronizer->wait(turn);
+			
+			ThreadSafe::cerr("mark:  21 " + string(typeid(*this).name()) );
+			oneLoop();
+			
+			ThreadSafe::cerr("mark:  22 " + string(typeid(*this).name()) );
+			synchronizer->signal();
+			
+			ThreadSafe::cerr("mark:  23 " + string(typeid(*this).name()) );
+		}
+		ThreadSafe::cerr("mark:  24 " + string(typeid(*this).name()) );
+		synchronizer->removeThread(turn);
+		
+		ThreadSafe::cerr("mark:  25 " + string(typeid(*this).name()) );
+	}
+	else
+	{
+		while (notEnd())
+		{
+			ThreadSafe::cerr("mark:  30 " + string(typeid(*this).name()) );
+			oneLoop();
+			
+			ThreadSafe::cerr("mark:  31 " + string(typeid(*this).name()) );
+		}
+	}
+#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
