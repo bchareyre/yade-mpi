@@ -20,12 +20,12 @@
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
-#endif 
+#endif
 
-#include <qapplication.h>  
-#include "QtFrontEnd.hpp"  
+#include <qapplication.h>
+#include "QtFrontEnd.hpp"
 #include <iostream>
-#include "Omega.hpp" 
+#include "Omega.hpp"
 
 using namespace std;
 
@@ -33,10 +33,10 @@ int main(int argc, char *argv[])
 {
 
         QApplication app( argc, argv );
-	
+
         QtFrontEnd frontend;
         frontend.show();
-        app.setMainWidget( &frontend );   	
-	
+        app.setMainWidget( &frontend );
+
         return app.exec();
 }
