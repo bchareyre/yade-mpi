@@ -22,5 +22,5 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
-HEADERS += CollisionGeometrySet2AABBFactory.hpp 
-SOURCES += CollisionGeometrySet2AABBFactory.cpp 
+HEADERS += InteractionGeometrySet2AABBFactory.hpp 
+SOURCES += InteractionGeometrySet2AABBFactory.cpp 
