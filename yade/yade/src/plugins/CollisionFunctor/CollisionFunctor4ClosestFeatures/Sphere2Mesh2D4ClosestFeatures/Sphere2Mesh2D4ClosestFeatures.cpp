@@ -49,7 +49,7 @@ bool Sphere2Mesh2D4ClosestFeatures::go(		const shared_ptr<CollisionGeometry>& cm
 	/*for(int i=0;i<m->vertices.size();i++)
 	{
 		Vector3r v = m->vertices[i]-center;
-		float l = v.unitize();
+		Real l = v.unitize();
 
 		if (l<s->radius)
 		{
@@ -67,7 +67,7 @@ bool Sphere2Mesh2D4ClosestFeatures::go(		const shared_ptr<CollisionGeometry>& cm
 		tri[0] = m->vertices[m->faces[i][0]];
 		tri[1] = m->vertices[m->faces[i][1]];
 		tri[2] = m->vertices[m->faces[i][2]];
-		float d = sqrDistTriPoint(center, tri, pt);
+		Real d = sqrDistTriPoint(center, tri, pt);
 				
 		if (d<s->radius*s->radius)
 		{

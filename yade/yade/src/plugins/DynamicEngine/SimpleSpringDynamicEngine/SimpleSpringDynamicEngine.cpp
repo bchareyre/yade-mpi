@@ -27,13 +27,13 @@ void SimpleSpringDynamicEngine::registerAttributes()
 void SimpleSpringDynamicEngine::respondToCollisions(Body * body)
 {
 
-	//float dt = Omega::instance().dt;
+	//Real dt = Omega::instance().dt;
 
 	NonConnexBody * ncb = dynamic_cast<NonConnexBody*>(body);
 	shared_ptr<BodyContainer> bodies = ncb->bodies;
 
-	float stiffness = 10000;
-	float viscosity = 10;
+	Real stiffness = 10000;
+	Real viscosity = 10;
 	Vector3r gravity = Omega::instance().getGravity();
 	if (first)
 	{
@@ -57,7 +57,7 @@ void SimpleSpringDynamicEngine::respondToCollisions(Body * body)
 
 		std::vector<std::pair<Vector3r,Vector3r> >::iterator cpi = (dynamic_pointer_cast<ClosestFeatures>(contact->interactionGeometry))->closestsPoints.begin();
 		std::vector<std::pair<Vector3r,Vector3r> >::iterator cpiEnd = (dynamic_pointer_cast<ClosestFeatures>(contact->interactionGeometry))->closestsPoints.end();
-		float size = (dynamic_pointer_cast<ClosestFeatures>(contact->interactionGeometry))->closestsPoints.size();
+		Real size = (dynamic_pointer_cast<ClosestFeatures>(contact->interactionGeometry))->closestsPoints.size();
 		for( ; cpi!=cpiEnd ; ++cpi)
 		{
 			Vector3r p1 = (*cpi).first;
@@ -69,14 +69,14 @@ void SimpleSpringDynamicEngine::respondToCollisions(Body * body)
 			Vector3r o2p = (p - rb2->se3.translation);
 
 			Vector3r dir = p2-p1;
-			float l  = dir.normalize();
-			float elongation  = l*l;
+			Real l  = dir.normalize();
+			Real elongation  = l*l;
 
 			//Vector3r v1 = rb1->velocity+o1p.cross(rb1->angularVelocity);
 			//Vector3r v2 = rb2->velocity+o2p.cross(rb2->angularVelocity);
 			Vector3r v1 = rb1->velocity+rb1->angularVelocity.cross(o1p);
 			Vector3r v2 = rb2->velocity+rb2->angularVelocity.cross(o2p);
-			float relativeVelocity = dir.dot(v2-v1);
+			Real relativeVelocity = dir.dot(v2-v1);
 			Vector3r f = (elongation*stiffness+relativeVelocity*viscosity)/size*dir;
 
 			forces[contact->getId1()] += f;

@@ -9,22 +9,22 @@
 
 class SDECPermanentLink : public InteractionGeometry
 {
-	public : float radius1;
-	public : float radius2;
+	public : Real radius1;
+	public : Real radius2;
 	public : Vector3r normal;			// new unit normal of the contact plane.
-	//public : float penetrationDepth;
+	//public : Real penetrationDepth;
 	//public : Vector3r contactPoint;
 
-	public : float kn;				// normal elastic constant.
-	public : float ks;				// shear elastic constant.
+	public : Real kn;				// normal elastic constant.
+	public : Real ks;				// shear elastic constant.
 
-	public : float knMax;
-	public : float ksMax;
+	public : Real knMax;
+	public : Real ksMax;
 
-	public : float initialKn;			// initial normal elastic constant.
-	public : float initialKs;			// initial shear elastic constant.
-	public : float equilibriumDistance;		// equilibrium distance
-	public : float initialEquilibriumDistance;	// initial equilibrium distance
+	public : Real initialKn;			// initial normal elastic constant.
+	public : Real initialKs;			// initial shear elastic constant.
+	public : Real equilibriumDistance;		// equilibrium distance
+	public : Real initialEquilibriumDistance;	// initial equilibrium distance
 	public : Vector3r prevNormal;			// unit normal of the contact plane.
 	public : Vector3r normalForce;			// normal force applied on a DE
 	public : Vector3r shearForce;			// shear force applied on a DE
@@ -40,9 +40,9 @@ class SDECPermanentLink : public InteractionGeometry
 	//public : Quaternionr currentRotation2;
 	
 	public : Vector3r thetar;
-	public : float heta;
-	public : float averageRadius;
-	public : float kr;
+	public : Real heta;
+	public : Real averageRadius;
+	public : Real kr;
 ////////////////////////////////////////////////////////
 
 	// construction

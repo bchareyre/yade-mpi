@@ -12,7 +12,7 @@
 class Translator : public KinematicEngine
 {
 
-	public : float velocity;
+	public : Real velocity;
 	public : Vector3r translationAxis;
 	
 	// construction

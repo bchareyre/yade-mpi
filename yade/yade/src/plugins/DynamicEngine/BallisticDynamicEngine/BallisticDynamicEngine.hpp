@@ -8,7 +8,7 @@ class BallisticDynamicEngine : public DynamicEngine
 	private : Vector3r prevVelocity;
 	private : Vector3r prevAngularVelocity;
 	private : bool first;
-	public : float damping;
+	public : Real damping;
 
 	// construction
 	public : BallisticDynamicEngine ();

@@ -41,7 +41,7 @@ string HangingCloth::generate()
 	rootBody = shared_ptr<NonConnexBody>(new NonConnexBody);
 	int width = 20;
 	int height = 20;
-	float mass = 10;
+	Real mass = 10;
 	const int cellSize = 20;
 	Quaternionr q;
 	int nbSpheres = 10;
@@ -80,7 +80,7 @@ string HangingCloth::generate()
 	cloth->stiffness	= 500;
 	cloth->damping		= 0.1;
 	for(int i=0;i<width*height;i++)
-		cloth->properties.push_back(NodeProperties((float)(width*height)/mass));
+		cloth->properties.push_back(NodeProperties((Real)(width*height)/mass));
 
 	cloth->properties[offset(0,0)].invMass = 0;
 	cloth->properties[offset(width-1,0)].invMass = 0;
@@ -152,10 +152,10 @@ string HangingCloth::generate()
 
 
 		Vector3r translation(0,-60,0);
-		float radius = 50;
+		Real radius = 50;
 
 		//Vector3r translation(100*Mathr::symmetricRandom(),10+100*Mathr::unitRandom(),100*Mathr::symmetricRandom());
-		//float radius = 0.5*(20+10*Mathr::unitRandom());
+		//Real radius = 0.5*(20+10*Mathr::unitRandom());
 		//shared_ptr<BallisticDynamicEngine> ballistic(new BallisticDynamicEngine);
 		//ballistic->damping 	= 0.999;
 		//s->dynamic		= dynamic_pointer_cast<DynamicEngine>(ballistic);

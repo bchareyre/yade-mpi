@@ -5,11 +5,11 @@
 
 class BoundingSphere : public BoundingVolume
 {
-	public : float radius;
+	public : Real radius;
 	public : Vector3r center;
 
 	// construction
-	public : BoundingSphere(float r=0);
+	public : BoundingSphere(Real r=0);
 
 	public : ~BoundingSphere ();
 

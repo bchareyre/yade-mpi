@@ -31,6 +31,8 @@
 
 PersistentSAPCollider::PersistentSAPCollider() : BroadCollider()
 {
+//	cerr << "PersistentSAPCollider\n";
+
 	//this->maxObject = 150000;
 	nbObjects=0;
 
@@ -38,8 +40,8 @@ PersistentSAPCollider::PersistentSAPCollider() : BroadCollider()
 	//yBounds.resize(2*maxObject);
 	//zBounds.resize(2*maxObject);
 
-	//minimums = new float[3*maxObject];
-	//maximums = new float[3*maxObject];
+	//minimums = new Real[3*maxObject];
+	//maximums = new Real[3*maxObject];
 	
 	xBounds.clear();
 	yBounds.clear();

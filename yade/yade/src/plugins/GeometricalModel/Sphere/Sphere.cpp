@@ -31,7 +31,7 @@ vector<Vector3r> Sphere::vertices;
 vector<Vector3r> Sphere::faces;
 
 
-Sphere::Sphere (float r) : CollisionGeometry()
+Sphere::Sphere (Real r) : CollisionGeometry()
 {
 	radius = r;
 	Sphere::Sphere();
@@ -40,8 +40,8 @@ Sphere::Sphere (float r) : CollisionGeometry()
 Sphere::Sphere () : CollisionGeometry()
 {
 
-	float X = 0.525731112119133606;
-	float Z = 0.850650808352039932;
+	Real X = 0.525731112119133606;
+	Real Z = 0.850650808352039932;
 	vertices.push_back(Vector3r(-X,0,Z));
 	vertices.push_back(Vector3r(X,0,Z));
 	vertices.push_back(Vector3r(-X,0,-Z));
@@ -98,19 +98,6 @@ bool Sphere::collideWith(CollisionGeometry* )
 	return true;
 }
 
-/* FIXME - do this
-template<typename TT>
-glNormal3v(TT tt)
-{
-}
-
-template<>
-glNormal3v<float>(TT tt)
-{
-	glNormal3v(tt);
-}
-*/
-
 void Sphere::subdivideTriangle(Vector3r& v1,Vector3r& v2,Vector3r& v3, int depth)
 {
 	Vector3r v12,v23,v31;
@@ -118,7 +105,7 @@ void Sphere::subdivideTriangle(Vector3r& v1,Vector3r& v2,Vector3r& v3, int depth
 	if (depth==0)
 	{
 		Vector3r v = (v1+v2+v3)/3.0;
-		float angle = atan(v[2]/v[0])/v.length();
+		Real angle = atan(v[2]/v[0])/v.length();
 
 		GLfloat matAmbient[4];
 
@@ -224,7 +211,7 @@ void Sphere::renderShadowVolumes(const Se3r& se3, const Vector3r& lightPos)
 		glVertex3v(p2);
 		for(int i=1;i<=nbSegments;i++)
 		{
-			float angle = Mathr::TWO_PI/(float)nbSegments*i;
+			Real angle = Mathr::TWO_PI/(Real)nbSegments*i;
 			p1 = center+sin(angle)*normalDir+cos(angle)*biNormalDir;
 			p2 = p1 + (p1-lightPos)*10;
 			glVertex3v(p1);
@@ -237,7 +224,7 @@ void Sphere::renderShadowVolumes(const Se3r& se3, const Vector3r& lightPos)
 // 	glBegin(GL_POLYGON);
 // 	for(int i=0;i<nbSegments;i++)
 // 	{
-// 		float angle = Mathr::TWO_PI/(float)nbSegments*i;
+// 		Real angle = Mathr::TWO_PI/(Real)nbSegments*i;
 // 		p1 = center+sin(angle)*normalDir+cos(angle)*biNormalDir;
 // 		p2 = p1 + (p1-lightPos)*2;
 // 		glVertex3fv(p2);

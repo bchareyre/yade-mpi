@@ -129,9 +129,9 @@ void SDECDynamicEngine::filter(Body* /*body*/)
 // 		// here we want to get new geometrical info about contact but we want to remember physical infos from previous time step about it
 // 		Vector3r cp = scm->contactPoint;
 // 		Vector3r n = scm->normal;
-// 		float pd = scm->penetrationDepth;
-// 		float r1 = scm->radius1;
-// 		float r2 = scm->radius2;
+// 		Real pd = scm->penetrationDepth;
+// 		Real r1 = scm->radius1;
+// 		Real r2 = scm->radius2;
 // 
 // 		contact->interactionGeometry  = insertionResult.first->get<2>();
 // 
@@ -183,7 +183,7 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 	shared_ptr<BodyContainer> bodies = ncb->bodies;
 
 	Vector3r gravity = Omega::instance().getGravity();
-	float dt = Omega::instance().getTimeStep();
+	Real dt = Omega::instance().getTimeStep();
 
 	if (first)
 	{
@@ -238,7 +238,8 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 // 				break;
 // 			}
 // 		}
-
+	
+	// FIXME - this is much shorter but still dirty (but now in different aspect - the way we store interactions)
 		shared_ptr<Interaction> interaction = ncb->interactions->find(id1,id2);
 		if (interaction)
 			interaction->isReal = false;
@@ -257,14 +258,14 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 		currentContact->equilibriumDistance 	= currentContact->initialEquilibriumDistance;
 		currentContact->normal 			= (de2->se3.translation-de1->se3.translation);
 		currentContact->normal.normalize();
-		float un 				= currentContact->equilibriumDistance-(de2->se3.translation-de1->se3.translation).length();
+		Real un 				= currentContact->equilibriumDistance-(de2->se3.translation-de1->se3.translation).length();
 		currentContact->normalForce		= currentContact->kn*un*currentContact->normal;
 
 		if (first)
 			currentContact->prevNormal = currentContact->normal;
 
 		Vector3r axis;
-		float angle;
+		Real angle;
 
 ////////////////////////////////////////////////////////////
 /// Here is the code with approximated rotations 	 ///
@@ -451,9 +452,9 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 		currentContact->thetar += dThetar;
 
 
-		float fNormal = currentContact->normalForce.length();
+		Real fNormal = currentContact->normalForce.length();
 
-		float normMPlastic = 0.0000001*currentContact->heta*fNormal;
+		Real normMPlastic = 0.0000001*currentContact->heta*fNormal;
 
 		Vector3r thetarn = q_i_n*currentContact->thetar; // rolling angle
 
@@ -461,7 +462,7 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 
 		//mElastic[0] = 0;  // No moment around normal direction
 
-		float normElastic = mElastic.length();
+		Real normElastic = mElastic.length();
 
 
 		if (normElastic<=normMPlastic)
@@ -529,11 +530,11 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 		currentContact->ks = currentContact->initialKs;
 		currentContact->equilibriumDistance = currentContact->initialEquilibriumDistance;
 
-		float un 			= currentContact->penetrationDepth;
+		Real un 			= currentContact->penetrationDepth;
 		currentContact->normalForce	= currentContact->kn*un*currentContact->normal;
 
 		Vector3r axis;
-		float angle;
+		Real angle;
 
 ////////////////////////////////////////////////////////////
 /// Here is the code with approximated rotations 	 ///
@@ -577,6 +578,17 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 
 		Vector3r f = currentContact->normalForce + currentContact->shearForce;
 
+// THIS IS for plotting with gnuplot shearForce between sphere 1 and sphere 10
+// FIXME - we really need an easy way to obtain results like this one !!!! so don't delete those lines until we FIX that problem!!!
+//		if( (id1 == 1 || id2 == 1) && (id1 == 10 || id2 == 10) )
+// 		cout	<< Omega::instance().getCurrentIteration() << " "
+// 			<< lexical_cast<string>(-currentContact->shearForce[0]) << " "
+// 			<< lexical_cast<string>(currentContact->shearForce[1]) << " " 
+// 			<< lexical_cast<string>(currentContact->shearForce[2]) << endl;
+// 		else 
+// 			cout	<< Omega::instance().getCurrentIteration() << endl;
+// 		
+		
 		forces[id1]	-= f;
 		forces[id2]	+= f;
 		moments[id1]	-= c1x.cross(f);
@@ -605,7 +617,7 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 		{
 			forces[i] += gravity*de->mass;
 			int sign;
-			float f = forces[i].length();
+			Real f = forces[i].length();
 
 			for(int j=0;j<3;j++)
 			{
@@ -619,7 +631,7 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 				forces[i][j] -= 0.3*f*sign;
 			}
 
-			float m = moments[i].length();
+			Real m = moments[i].length();
 
 			for(int j=0;j<3;j++)
 			{

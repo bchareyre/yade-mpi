@@ -8,6 +8,9 @@
 
 SAPCollider::SAPCollider () : BroadCollider()
 {
+//	cerr << "SAPCollider\n";
+	
+
 	this->maxObject = 150000;
 	nbObjects=0;
 
@@ -15,8 +18,8 @@ SAPCollider::SAPCollider () : BroadCollider()
 	yBounds.resize(2*maxObject);
 	zBounds.resize(2*maxObject);
 
-	minimums = new float[3*maxObject];
-	maximums = new float[3*maxObject];
+	minimums = new Real[3*maxObject];
+	maximums = new Real[3*maxObject];
 
 	nbPotentialCollisions = 0;
 
@@ -239,10 +242,10 @@ void SAPCollider::updateOverlapingBBSet(int id1,int id2)
 	std::set< unsigned int>::iterator it = overlappingBB[id1].find(id2);
 
 	// test if the AABBs of the spheres number "id1" and "id2" are overlapping
-	float * min1 = minimums + 3*id1;
-	float * max1 = maximums + 3*id1;
-	float * min2 = minimums + 3*id2;
-	float * max2 = maximums + 3*id2;
+	Real * min1 = minimums + 3*id1;
+	Real * max1 = maximums + 3*id1;
+	Real * min2 = minimums + 3*id2;
+	Real * max2 = maximums + 3*id2;
 
 	bool overlapp = !(max1[0]<min2[0] || max2[0]<min1[0] || max1[1]<min2[1] || max2[1]<min1[1] || max1[2]<min2[2] || max2[2]<min1[2]);
 

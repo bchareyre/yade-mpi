@@ -139,7 +139,7 @@ string SDECLinkedSpheres::generate()
 	box2->velocity		= Vector3r(0,0,0);
 	box2->mass		= 0;
 	box2->inertia		= Vector3r(0,0,0);
-	box2->se3		= Se3r(Vector3r(0,0,((float)(nbSpheres[2])/2.0-supportSize+1.5)*spacing),q);
+	box2->se3		= Se3r(Vector3r(0,0,((Real)(nbSpheres[2])/2.0-supportSize+1.5)*spacing),q);
 	aabb->color		= Vector3r(1,0,0);
 	box2->bv		= dynamic_pointer_cast<BoundingVolume>(aabb);
 	box->extents		= Vector3r(20,50,20);
@@ -167,7 +167,7 @@ string SDECLinkedSpheres::generate()
 	box3->velocity		= Vector3r(0,0,0);
 	box3->mass		= 0;
 	box3->inertia		= Vector3r(0,0,0);
-	box3->se3		= Se3r(Vector3r(0,0,-((float)(nbSpheres[2])/2.0-supportSize+2.5)*spacing),q);
+	box3->se3		= Se3r(Vector3r(0,0,-((Real)(nbSpheres[2])/2.0-supportSize+2.5)*spacing),q);
 	aabb->color		= Vector3r(1,0,0);
 	box3->bv		= dynamic_pointer_cast<BoundingVolume>(aabb);
 	box->extents		= Vector3r(20,50,20);
@@ -200,7 +200,7 @@ string SDECLinkedSpheres::generate()
 		+
 		Vector3r(Mathr::symmetricRandom()*disorder,Mathr::symmetricRandom()*disorder,Mathr::symmetricRandom()*disorder);
 
-		float radius 		= (Mathr::intervalRandom(minRadius,maxRadius));
+		Real radius 		= (Mathr::intervalRandom(minRadius,maxRadius));
 		shared_ptr<BallisticDynamicEngine> ballistic(new BallisticDynamicEngine);
 		ballistic->damping 	= 1.0;//0.95;
 		s->actors.push_back(ballistic);

@@ -297,7 +297,7 @@ void Terrain::reOrientFaces()
 
 	Vector3r n;
 	int tmp;
-	float d;
+	Real d;
 	for(i=0;i<faces.size();i++)
 	{	
 		d = normals[i].dot(bary) - (normals[i][0]*vertices[faces[i][0]][0]+normals[i][1]*vertices[faces[i][0]][1]+normals[i][2]*vertices[faces[i][0]][2]);
@@ -338,9 +338,9 @@ void Terrain::buildDisplayList()
 void Terrain::buildCollisionGeometry()
 {
 	nbTriPerCell = 40;
-	nbCells = (int)(sqrt(faces.size()/(float)nbTriPerCell));
-	cellSizeX = (max[0]-min[0])/(float)nbCells;
-	cellSizeZ = (max[2]-min[2])/(float)nbCells;
+	nbCells = (int)(sqrt(faces.size()/(Real)nbTriPerCell));
+	cellSizeX = (max[0]-min[0])/(Real)nbCells;
+	cellSizeZ = (max[2]-min[2])/(Real)nbCells;
 
 	boundingBoxes.resize(nbCells);
 	triLists.resize(nbCells);	
@@ -379,14 +379,14 @@ void Terrain::buildCollisionGeometry()
 		
 		Vector2r v1,v2,v3;
 		
-		v1[0] = (int) ((tri[0][0]-min[0])/(float)cellSizeX);
-		v1[1] = (int) ((tri[0][1]-min[2])/(float)cellSizeZ);
+		v1[0] = (int) ((tri[0][0]-min[0])/(Real)cellSizeX);
+		v1[1] = (int) ((tri[0][1]-min[2])/(Real)cellSizeZ);
 		
-		v2[0] = (int) ((tri[1][0]-min[0])/(float)cellSizeX);
-		v2[1] = (int) ((tri[1][1]-min[2])/(float)cellSizeZ);
+		v2[0] = (int) ((tri[1][0]-min[0])/(Real)cellSizeX);
+		v2[1] = (int) ((tri[1][1]-min[2])/(Real)cellSizeZ);
 		
-		v3[0] = (int) ((tri[2][0]-min[0])/(float)cellSizeX);
-		v3[1] = (int) ((tri[2][1]-min[2])/(float)cellSizeZ);
+		v3[0] = (int) ((tri[2][0]-min[0])/(Real)cellSizeX);
+		v3[1] = (int) ((tri[2][1]-min[2])/(Real)cellSizeZ);
 		
 		if (v1[0]==nbCells) v1[0] = nbCells-1;
 		if (v1[1]==nbCells) v1[1] = nbCells-1;
@@ -434,7 +434,7 @@ void Terrain::buildCollisionGeometry()
 	for(int i=0;i<nbCells;i++)
 		for(int j=0;j<nbCells;j++)
 		{
-			float min,max;
+			Real min,max;
 			min = Mathr::MAX_REAL;
 			max = -Mathr::MAX_REAL;
 			for(unsigned int k=0 ; k<triLists[i][j].size() ; k++)
@@ -450,7 +450,7 @@ void Terrain::buildCollisionGeometry()
 				if (vertices[faces[faceId][2]][1]<min) min = vertices[faces[faceId][2]][1];
 				if (vertices[faces[faceId][2]][1]>max) max = vertices[faces[faceId][2]][1];
 				
-				boundingBoxes[i][j] = std::pair<float,float>(min,max);
+				boundingBoxes[i][j] = std::pair<Real,Real>(min,max);
 			}
 		}
 }
@@ -463,10 +463,10 @@ bool Terrain::pointInTriangle(Vector2r p , std::vector<Vector2r>& tri)
 
 	for (int i1 = 0, i0 = 2; i1 < 3; i0 = i1++)
 	{
-		float nx = tri[i1][1] - tri[i0][1];
-		float ny = tri[i0][0] - tri[i1][0];
-		float dx = p[0] - tri[i0][0];
-		float dy = p[1] - tri[i0][1];
+		Real nx = tri[i1][1] - tri[i0][1];
+		Real ny = tri[i0][0] - tri[i1][0];
+		Real dx = p[0] - tri[i0][0];
+		Real dy = p[1] - tri[i0][1];
 		if ( nx*dx + ny*dy > 0.0 )
 			return false;
 	}
@@ -482,11 +482,11 @@ void Terrain::getFaces(const AABB& aabb, std::vector<int>& faceList)
 {
 	Vector2r minCell,maxCell;
 	
-	minCell[0] = (int) ((aabb.min[0]-min[0])/(float)cellSizeX);
-	minCell[1] = (int) ((aabb.min[2]-min[2])/(float)cellSizeZ);
+	minCell[0] = (int) ((aabb.min[0]-min[0])/(Real)cellSizeX);
+	minCell[1] = (int) ((aabb.min[2]-min[2])/(Real)cellSizeZ);
 
-	maxCell[0] = (int) ((aabb.max[0]-min[0])/(float)cellSizeX);
-	maxCell[1] = (int) ((aabb.max[2]-min[2])/(float)cellSizeZ);
+	maxCell[0] = (int) ((aabb.max[0]-min[0])/(Real)cellSizeX);
+	maxCell[1] = (int) ((aabb.max[2]-min[2])/(Real)cellSizeZ);
 
 	if (minCell[0]<0) minCell[0]=0;
 	if (minCell[0]>=nbCells) minCell[0]=nbCells-1;

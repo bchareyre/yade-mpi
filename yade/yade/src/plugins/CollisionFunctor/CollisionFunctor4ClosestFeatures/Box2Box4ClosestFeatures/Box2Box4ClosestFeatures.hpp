@@ -39,7 +39,7 @@ class Box2Box4ClosestFeatures : public CollisionFunctor
 	{
 		bool isNormalPrincipalAxis;
 		bool invertNormal;
-		float penetrationDepth;
+		Real penetrationDepth;
 		int code;
 		Vector3r normal;
 	} BoxBoxCollisionInfo;
@@ -55,7 +55,7 @@ class Box2Box4ClosestFeatures : public CollisionFunctor
 						const Se3r& se32,
 						shared_ptr<Interaction>& c);
 
-	private : bool testSeparatingAxis(float expr1, float expr2, Vector3r n,int c,BoxBoxCollisionInfo* bbInfo);
+	private : bool testSeparatingAxis(Real expr1, Real expr2, Vector3r n,int c,BoxBoxCollisionInfo* bbInfo);
 
 	DEFINE_FUNCTOR_ORDER_2D(Box,Box);
 };

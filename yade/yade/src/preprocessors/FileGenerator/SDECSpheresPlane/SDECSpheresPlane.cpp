@@ -127,7 +127,7 @@ string SDECSpheresPlane::generate()
 		shared_ptr<Sphere> sphere(new Sphere);
 
 		translation 		= Vector3r(i,j,k)*(2*maxRadius*1.1)-Vector3r(nbSpheres/2*(2*maxRadius*1.1),-7-maxRadius*2,nbSpheres/2*(2*maxRadius*1.1))+Vector3r(Mathr::symmetricRandom()*1.1,Mathr::symmetricRandom()*1.1,Mathr::symmetricRandom()*1.1);
-		float radius 		= (Mathr::intervalRandom(minRadius,maxRadius));
+		Real radius 		= (Mathr::intervalRandom(minRadius,maxRadius));
 
 		shared_ptr<BallisticDynamicEngine> ballistic(new BallisticDynamicEngine);
 		ballistic->damping 	= 1.0;//0.95;

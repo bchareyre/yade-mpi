@@ -60,7 +60,7 @@ bool Terrain2Sphere4ClosestFeatures::go(	const shared_ptr<CollisionGeometry>& cm
 		tri[0] = t->vertices[t->faces[faceId][0]]+se31.translation;
 		tri[1] = t->vertices[t->faces[faceId][1]]+se31.translation;
 		tri[2] = t->vertices[t->faces[faceId][2]]+se31.translation;
-		float d = sqrDistTriPoint(se32.translation, tri, pt);
+		Real d = sqrDistTriPoint(se32.translation, tri, pt);
 				
 		if (d<s->radius*s->radius)
 		{

@@ -71,10 +71,10 @@ int clipPolygon(Vector3r quad,const std::vector<Vector3r>& polygon, std::vector<
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void clipLeft(float sizeX, std::vector<Vector3r> &polygon, Vector3r v1, Vector3r v2)
+void clipLeft(Real sizeX, std::vector<Vector3r> &polygon, Vector3r v1, Vector3r v2)
 {
 
-	float dx,dy,m;
+	Real dx,dy,m;
 	Vector3r v;
 	
    
@@ -109,10 +109,10 @@ void clipLeft(float sizeX, std::vector<Vector3r> &polygon, Vector3r v1, Vector3r
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void clipRight(float sizeX, std::vector<Vector3r>& polygon, Vector3r v1, Vector3r v2)
+void clipRight(Real sizeX, std::vector<Vector3r>& polygon, Vector3r v1, Vector3r v2)
 {
 	
-	float dx,dy,m;
+	Real dx,dy,m;
 	Vector3r v;
 	
    
@@ -148,10 +148,10 @@ void clipRight(float sizeX, std::vector<Vector3r>& polygon, Vector3r v1, Vector3
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void clipTop(float sizeY, std::vector<Vector3r>& polygon, Vector3r v1, Vector3r v2)
+void clipTop(Real sizeY, std::vector<Vector3r>& polygon, Vector3r v1, Vector3r v2)
 {
 	
-	float dx,dy,m;
+	Real dx,dy,m;
 	Vector3r v;
 	
 	dx = v2[0]-v1[0];
@@ -192,10 +192,10 @@ void clipTop(float sizeY, std::vector<Vector3r>& polygon, Vector3r v1, Vector3r 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void clipBottom(float sizeY, std::vector<Vector3r> &polygon, Vector3r v1, Vector3r v2)
+void clipBottom(Real sizeY, std::vector<Vector3r> &polygon, Vector3r v1, Vector3r v2)
 {
 	
-	float dx,dy,m;
+	Real dx,dy,m;
 	Vector3r v;
 	   
 	dx = v2[0]-v1[0];

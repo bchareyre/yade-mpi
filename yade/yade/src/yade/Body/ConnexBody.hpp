@@ -39,8 +39,8 @@ class ConnexBody : public Body
 /// Attributes											///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public : float mass;
-	public : float invMass;
+	public : Real mass;
+	public : Real invMass;
 
 	// construction
 	public : ConnexBody ();

@@ -63,17 +63,17 @@ class Terrain : public CollisionGeometry
 //  	public :  inline Vector3r& min() { return _min; };
 //  	public :  inline Vector3r& max() { return _max; };
 
-	private : float cellSizeX,cellSizeZ;
+	private : Real cellSizeX,cellSizeZ;
 	private : int nbTriPerCell,nbCells;
 	private : bool pointInTriangle(Vector2r p ,std::vector<Vector2r>& tri);
 
 	protected : void buildCollisionGeometry();
 
-	protected : std::vector<std::vector<std::pair<float,float> > > boundingBoxes;
+	protected : std::vector<std::vector<std::pair<Real,Real> > > boundingBoxes;
 	public : std::vector<std::vector<std::vector<int> > > triLists;
 	public : std::vector<AABB> facesAABB;
 
-	protected : float cellSize;
+	protected : Real cellSize;
 
 	public :  void	getFaces(const AABB& aabb, std::vector<int>& faceList);
 	private : std::vector<int> testedFaces;

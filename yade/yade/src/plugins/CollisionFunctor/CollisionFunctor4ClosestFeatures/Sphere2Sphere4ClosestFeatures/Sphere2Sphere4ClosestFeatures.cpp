@@ -38,7 +38,7 @@ bool Sphere2Sphere4ClosestFeatures::go(		const shared_ptr<CollisionGeometry>& cm
 	shared_ptr<Sphere> s2 = dynamic_pointer_cast<Sphere>(cm2);
 	
 	Vector3r v = se31.translation-se32.translation;
-	float l = v.normalize();
+	Real l = v.normalize();
 	
 	if (l<s1->radius+s2->radius)
 	{

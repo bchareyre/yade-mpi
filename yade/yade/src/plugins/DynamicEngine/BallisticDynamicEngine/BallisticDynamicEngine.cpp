@@ -29,7 +29,7 @@ void BallisticDynamicEngine::respondToCollisions(Body * body)
 {
 	RigidBody * rb = dynamic_cast<RigidBody*>(body);
 	
-	float dt = Omega::instance().getTimeStep();
+	Real dt = Omega::instance().getTimeStep();
 
 	//rb->acceleration += Omega::instance().getGravity();
 
@@ -46,7 +46,7 @@ void BallisticDynamicEngine::respondToCollisions(Body * body)
 	rb->se3.translation += prevVelocity*dt;
 
 	Vector3r axis = rb->angularVelocity;
-	float angle = axis.normalize();
+	Real angle = axis.normalize();
 	Quaternionr q;
 	q.fromAxisAngle(axis,angle*dt);
 	rb->se3.rotation = q*rb->se3.rotation;

@@ -7,8 +7,8 @@
 class SDECSpheresPlane : public FileGenerator
 {
 	private : int nbSpheres;
-	private : float minRadius;
-	private : float maxRadius;
+	private : Real minRadius;
+	private : Real maxRadius;
 	// construction
 	public : SDECSpheresPlane ();
 	public : ~SDECSpheresPlane ();

@@ -28,7 +28,7 @@
 
 class Sphere : public CollisionGeometry
 {
-	public : float radius;
+	public : Real radius;
 
 		int number;
 
@@ -40,7 +40,7 @@ class Sphere : public CollisionGeometry
 	private : void drawSphere(int depth);
 
 	// construction
-	public : Sphere (float r);
+	public : Sphere (Real r);
 	public : Sphere ();
 	public : ~Sphere ();
 

@@ -1,7 +1,7 @@
 #include "BoundingSphere.hpp"
 #include "OpenGLWrapper.hpp"
 
-BoundingSphere::BoundingSphere (float r) : BoundingVolume()
+BoundingSphere::BoundingSphere (Real r) : BoundingVolume()
 {
 	radius = r;
 }

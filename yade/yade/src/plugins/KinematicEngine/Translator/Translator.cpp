@@ -33,7 +33,7 @@ void Translator::moveToNextTimeStep(Body * body)
 	std::vector<int>::const_iterator ii = subscribedBodies.begin();
 	std::vector<int>::const_iterator iiEnd = subscribedBodies.end();
 
-	float dt = Omega::instance().getTimeStep();
+	Real dt = Omega::instance().getTimeStep();
 	time = dt;
 	static int sign = 1;
 

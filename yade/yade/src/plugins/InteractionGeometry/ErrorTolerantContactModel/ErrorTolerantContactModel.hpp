@@ -42,7 +42,7 @@ class ErrorTolerantContactModel : public InteractionGeometry
 	//public : Vector3r t;	
 	//public : Vector3r s;
 	//public : Vector3r l;
-	//public : float nu;
+	//public : Real nu;
 	//public : std::pair<t_Vertex,t_Vertex> idVertex;
 	//public : t_ConnexionType type;
 	

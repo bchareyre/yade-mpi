@@ -53,9 +53,9 @@ class KinematicEngine : public Actor
 /// Attributes											///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-	//protected : float startTime;
-	//protected : float stopTime;
-	protected : float time;
+	//protected : Real startTime;
+	//protected : Real stopTime;
+	protected : Real time;
 
 	/*! Lists of bodies which state will be modified by the kinematic engine */
 	public : std::vector<int> subscribedBodies;

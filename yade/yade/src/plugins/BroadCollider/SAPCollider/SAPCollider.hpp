@@ -20,7 +20,7 @@ class SAPCollider : public BroadCollider
 		AABBBound() {};
 		char lower; // is it the lower or upper bound of the AABB
 		int id;		// AABB of the "id" shpere
-		float value;// value of the bound
+		Real value;// value of the bound
 	};
 
 	// strucuture that compare 2 AABBBounds => used in the sort algorithm
@@ -57,10 +57,10 @@ class SAPCollider : public BroadCollider
 	protected : std::vector< std::set<unsigned int> > overlappingBB;
 
 	// upper right corner of the AABB of the objects =>  for spheres = center[i]-radius
-	protected : float * maximums;
+	protected : Real * maximums;
 
 	// lower left corner of the AABB of the objects =>  for spheres = center[i]+radius
-	protected : float * minimums;
+	protected : Real * minimums;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////

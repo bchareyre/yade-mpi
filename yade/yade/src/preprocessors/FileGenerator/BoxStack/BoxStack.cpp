@@ -100,7 +100,7 @@ string BoxStack::generate()
 			boxi->isDynamic		= true;
 			boxi->angularVelocity	= Vector3r(0,0,0);
 			boxi->velocity		= Vector3r(0,0,0);
-			float mass = 8*size[0]*size[1]*size[2];
+			Real mass = 8*size[0]*size[1]*size[2];
 			boxi->mass		= mass;
 			boxi->inertia		= Vector3r(mass*(size[1]*size[1]+size[2]*size[2])/3,mass*(size[0]*size[0]+size[2]*size[2])/3,mass*(size[1]*size[1]+size[0]*size[0])/3);
 			//translation = Vector3r(i,j,k)*10-Vector3r(15,35,25)+Vector3r(Mathr::symmetricRandom(),Mathr::symmetricRandom(),Mathr::symmetricRandom())

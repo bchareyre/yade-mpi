@@ -26,16 +26,16 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void lineClosestApproach (const Vector3r pa, const Vector3r ua, const Vector3r pb, const Vector3r ub, float &alpha, float &beta)
+void lineClosestApproach (const Vector3r pa, const Vector3r ua, const Vector3r pb, const Vector3r ub, Real &alpha, Real &beta)
 {
 	Vector3r p;
 	
 	p = pb - pa;
 
-	float uaub = ua.dot(ub);
-	float q1 =  ua.dot(p);
-	float q2 = -ub.dot(p);
-	float d = 1-uaub*uaub;
+	Real uaub = ua.dot(ub);
+	Real q1 =  ua.dot(p);
+	Real q2 = -ub.dot(p);
+	Real d = 1-uaub*uaub;
 	
 	if (d <= 0) 
 	{

@@ -51,9 +51,9 @@ void MassSpringBody2RigidBodyDynamicEngine::respondToCollisions(Body * body)
 				Vector3r p1 = cf->closestsPoints[i].first;
 				Vector3r p2 = cf->closestsPoints[i].second;
 				Vector3r dir = p2-p1;
-				float l = dir.normalize();
-				float relativeVelocity = dir.dot(rb->velocity);
-				float fi = 0.1*l*l/3.0+relativeVelocity*10;
+				Real l = dir.normalize();
+				Real relativeVelocity = dir.dot(rb->velocity);
+				Real fi = 0.1*l*l/3.0+relativeVelocity*10;
 				Vector3r f = fi*dir;
 				rb->acceleration -= f*rb->invMass;
 

@@ -9,11 +9,11 @@
 
 class NodeProperties : public Serializable
 {
-	public : float invMass;
+	public : Real invMass;
 	public : Vector3r velocity;
 
 	public : NodeProperties() {};
-	public : NodeProperties(float im) : invMass(im), velocity(Vector3r(0,0,0)) {};
+	public : NodeProperties(Real im) : invMass(im), velocity(Vector3r(0,0,0)) {};
 	protected : virtual void postProcessAttributes(bool) {};
 	public : void registerAttributes()
 	{
@@ -27,10 +27,10 @@ REGISTER_SERIALIZABLE(NodeProperties,false);
 
 class FEMBody : public ConnexBody
 {
-	public : float stiffness;
-	public : float damping;
+	public : Real stiffness;
+	public : Real damping;
  	public : vector<NodeProperties> properties;
-	public : vector<float> initialLengths;
+	public : vector<Real> initialLengths;
 	public : vector<pair<int,Vector3r> > externalForces;
 
 	// construction

@@ -38,7 +38,7 @@ bool Sphere2Sphere4SDECContactModel::go(	const shared_ptr<CollisionGeometry>& cm
 	shared_ptr<Sphere> s2 = dynamic_pointer_cast<Sphere>(cm2);
 
 	Vector3r normal = se32.translation-se31.translation;
-	float penetrationDepth = s1->radius+s2->radius-normal.normalize();
+	Real penetrationDepth = s1->radius+s2->radius-normal.normalize();
 
 	if (penetrationDepth>0)
 	{

@@ -80,7 +80,7 @@ bool BVOverlapper::overlappAABBSphere(const shared_ptr<BoundingVolume> bv1, cons
 	Vector3r l,t,p,q,r;
 	bool onborder = false;
 	Vector3r pt1,pt2,normal;
-	float depth;
+	Real depth;
 
 	shared_ptr<BoundingSphere> s = dynamic_pointer_cast<BoundingSphere>(bv2);
 	shared_ptr<AABB> aabb = dynamic_pointer_cast<AABB>(bv1);

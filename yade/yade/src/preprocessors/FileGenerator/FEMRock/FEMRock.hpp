@@ -6,11 +6,11 @@
 #include "Vector3.hpp"
 /*class NodeProperties : public Serializable
 {
-	public : float invMass;
+	public : Real invMass;
 	public : Vector3r velocity;
 
 	public : NodeProperties() {};
-	public : NodeProperties(float im) : invMass(im), velocity(Vector3r(0,0,0)) {};
+	public : NodeProperties(Real im) : invMass(im), velocity(Vector3r(0,0,0)) {};
 	protected : virtual void postProcessAttributes(bool deserializing) {};
 	public : void registerAttributes()
 	{

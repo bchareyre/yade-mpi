@@ -35,10 +35,10 @@ using namespace std;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 	int clipPolygon(Vector3r quad,const std::vector<Vector3r>& polygon, std::vector<Vector3r>& clipped);
-	void clipLeft(float sizeX, std::vector<Vector3r> &polygon, Vector3r v1, Vector3r v2);
-	void clipRight(float sizeX, std::vector<Vector3r>& polygon, Vector3r v1, Vector3r v2);
-	void clipTop(float sizeY, std::vector<Vector3r>& polygon, Vector3r v1, Vector3r v2);
-	void clipBottom(float sizeY, std::vector<Vector3r> &polygon, Vector3r v1, Vector3r v2);
+	void clipLeft(Real sizeX, std::vector<Vector3r> &polygon, Vector3r v1, Vector3r v2);
+	void clipRight(Real sizeX, std::vector<Vector3r>& polygon, Vector3r v1, Vector3r v2);
+	void clipTop(Real sizeY, std::vector<Vector3r>& polygon, Vector3r v1, Vector3r v2);
+	void clipBottom(Real sizeY, std::vector<Vector3r> &polygon, Vector3r v1, Vector3r v2);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////

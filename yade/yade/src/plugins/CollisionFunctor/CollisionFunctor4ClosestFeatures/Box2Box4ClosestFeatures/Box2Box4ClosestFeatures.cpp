@@ -37,7 +37,7 @@ bool Box2Box4ClosestFeatures::go(		const shared_ptr<CollisionGeometry>& cm1,
 						const Se3r& se32,
 						shared_ptr<Interaction>& c)
 {
-	float r11,r12,r13,r21,r22,r23,r31,r32,r33,q11,q12,q13,q21,q22,q23,q31,q32,q33;
+	Real r11,r12,r13,r21,r22,r23,r31,r32,r33,q11,q12,q13,q21,q22,q23,q31,q32,q33;
 	
 	Matrix3r axis1,axis1T,axis2,axis2T;
 	Vector3r _normal;
@@ -141,7 +141,7 @@ bool Box2Box4ClosestFeatures::go(		const shared_ptr<CollisionGeometry>& cm1,
 
 	bool isNormalPrincipalAxis = bbInfo.isNormalPrincipalAxis;
 	bool invertNormal = bbInfo.invertNormal;
-	float penetrationDepth = bbInfo.penetrationDepth;
+	Real penetrationDepth = bbInfo.penetrationDepth;
 	Vector3r normal = bbInfo.normal;
 		
 	if (!isNormalPrincipalAxis)	
@@ -181,7 +181,7 @@ bool Box2Box4ClosestFeatures::go(		const shared_ptr<CollisionGeometry>& cm1,
 		pb+=(sign[1]*extents2[1])*axis2.getRow(1);
 		pb+=(sign[2]*extents2[2])*axis2.getRow(2);
 
-		float alpha,beta;
+		Real alpha,beta;
 		Vector3r ua,ub;
 		
 		//ua = axis1[(code-7)/3];
@@ -311,7 +311,7 @@ bool Box2Box4ClosestFeatures::go(		const shared_ptr<CollisionGeometry>& cm1,
 
 	// find the four corners of the incident face, in reference-face coordinates
 	std::vector<Vector3r> quad;	// 2D coordinate of incident face (x,y pairs)
-	float c1,c2,m11,m12,m21,m22;
+	Real c1,c2,m11,m12,m21,m22;
 	//c1 = center.dot(Ra.code1]);
 	//c2 = center.dot(Ra[code2]);
 	c1 = center.dot(Ra.getRow(code1));
@@ -325,7 +325,7 @@ bool Box2Box4ClosestFeatures::go(		const shared_ptr<CollisionGeometry>& cm1,
 	m21 = Ra.getRow(code2).dot(Rb.getRow(a1));
 	m22 = Ra.getRow(code2).dot(Rb.getRow(a2));
 	
-	float k1,k2,k3,k4;
+	Real k1,k2,k3,k4;
 	
 	k1 = m11*Sb[a1];
 	k2 = m21*Sb[a1];
@@ -354,9 +354,9 @@ bool Box2Box4ClosestFeatures::go(		const shared_ptr<CollisionGeometry>& cm1,
 	// those points that have a positive (penetrating) depth. delete points in
 	// the 'ret' array as necessary so that 'point' and 'ret' correspond.
 	std::vector<Vector3r> point;	// penetrating contact points
-	std::vector<float> dep;			// depths for those points
+	std::vector<Real> dep;			// depths for those points
 
-	float det1 = 1.0/(m11*m22 - m12*m21);
+	Real det1 = 1.0/(m11*m22 - m12*m21);
 
 	m11 *= det1;
 	m12 *= det1;
@@ -437,9 +437,9 @@ bool Box2Box4ClosestFeatures::goReverse(	const shared_ptr<CollisionGeometry>& cm
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool Box2Box4ClosestFeatures::testSeparatingAxis(float expr1, float expr2, Vector3r n,int c,BoxBoxCollisionInfo* bbInfo)
+bool Box2Box4ClosestFeatures::testSeparatingAxis(Real expr1, Real expr2, Vector3r n,int c,BoxBoxCollisionInfo* bbInfo)
 {
-	float pd,l;
+	Real pd,l;
 
 	pd = fabs(expr1) - (expr2); 
 

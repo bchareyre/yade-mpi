@@ -5,8 +5,8 @@
 
 class SDECDiscreteElement : public RigidBody
 {
-	public : float kn;
-	public : float ks;
+	public : Real kn;
+	public : Real ks;
 
 	// construction
 	public : SDECDiscreteElement ();

@@ -26,13 +26,13 @@ void ExplicitMassSpringDynamicEngine::registerAttributes()
 void ExplicitMassSpringDynamicEngine::respondToCollisions(Body * body)
 {
 
-	float dt = Omega::instance().getTimeStep();
+	Real dt = Omega::instance().getTimeStep();
 	MassSpringBody * massSpring = dynamic_cast<MassSpringBody*>(body);
 
 	Vector3r gravity = Omega::instance().getGravity();
 	
-	float damping	= massSpring->damping;
-	float stiffness	= massSpring->stiffness;
+	Real damping	= massSpring->damping;
+	Real stiffness	= massSpring->stiffness;
 
 	shared_ptr<Mesh2D> mesh = dynamic_pointer_cast<Mesh2D>(massSpring->gm);
 	vector<Vector3r>& vertices = mesh->vertices;
@@ -62,12 +62,12 @@ void ExplicitMassSpringDynamicEngine::respondToCollisions(Body * body)
 	{
 		Vector3r v1 = vertices[(*ei).first];
 		Vector3r v2 = vertices[(*ei).second];
-		float l  = (v2-v1).length();
-		float l0 = massSpring->initialLengths[i];
+		Real l  = (v2-v1).length();
+		Real l0 = massSpring->initialLengths[i];
 		Vector3r dir = (v2-v1);
 		dir.normalize();
-		float e  = (l-l0)/l0;
-		float relativeVelocity = dir.dot((massSpring->properties[(*ei).second].velocity-massSpring->properties[(*ei).first].velocity));
+		Real e  = (l-l0)/l0;
+		Real relativeVelocity = dir.dot((massSpring->properties[(*ei).second].velocity-massSpring->properties[(*ei).first].velocity));
 		Vector3r f3 = (e*stiffness+relativeVelocity*damping)*dir;
 		forces[(*ei).first]  += f3;
 		forces[(*ei).second] -= f3;

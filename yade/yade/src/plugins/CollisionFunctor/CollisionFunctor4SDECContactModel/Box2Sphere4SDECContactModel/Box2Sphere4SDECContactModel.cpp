@@ -43,7 +43,7 @@ bool Box2Sphere4SDECContactModel::go(		const shared_ptr<CollisionGeometry>& cm1,
 	bool onborder = false;
 	Vector3r pt1,pt2,normal;
 	Matrix3r axisT,axis;
-	float depth;
+	Real depth;
 
 	shared_ptr<Sphere> s = dynamic_pointer_cast<Sphere>(cm2);
 	shared_ptr<Box> obb = dynamic_pointer_cast<Box>(cm1);
@@ -73,11 +73,11 @@ bool Box2Sphere4SDECContactModel::go(		const shared_ptr<CollisionGeometry>& cm1,
 	if (!onborder) 
 	{
 		// sphere center inside box. find largest `t' value
-		float min = l[0]-fabs(t[0]);
+		Real min = l[0]-fabs(t[0]);
 		int mini = 0;
 		for (int i=1; i<3; i++) 
 		{
-			float tt = l[i]-fabs(t[i]);
+			Real tt = l[i]-fabs(t[i]);
 			if (tt < min) 
 			{
 				min = tt;
@@ -182,7 +182,7 @@ bool Box2Sphere4SDECContactModel::goReverse(	const shared_ptr<CollisionGeometry>
 		//scm->closestsPoints[0].first = scm->closestsPoints[0].second;
 		//scm->closestsPoints[0].second = tmp;
 		scm->normal = -scm->normal;
-		float tmpR  = scm->radius1;
+		Real tmpR  = scm->radius1;
 		scm->radius1 = scm->radius2;
 		scm->radius2 = tmpR;
 	}

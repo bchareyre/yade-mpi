@@ -58,7 +58,7 @@ class PersistentSAPCollider : public BroadCollider
 		AABBBound(int i, char l) : id(i),lower(l) {};
 		int id;		// AABB of the "id" shpere
 		char lower; // is it the lower or upper bound of the AABB
-		float value;// value of the bound
+		Real value;// value of the bound
 	};
 
 	// strucuture that compare 2 AABBBounds => used in the sort algorithm
@@ -96,10 +96,10 @@ class PersistentSAPCollider : public BroadCollider
 	//protected : vector< set<unsigned int> > overlappingBB;
 	protected : shared_ptr<InteractionContainer> interactions;
 	// upper right corner of the AABB of the objects =>  for spheres = center[i]-radius
-	protected : vector<float> maximums;
+	protected : vector<Real> maximums;
 
 	// lower left corner of the AABB of the objects =>  for spheres = center[i]+radius
-	protected : vector<float> minimums;
+	protected : vector<Real> minimums;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
