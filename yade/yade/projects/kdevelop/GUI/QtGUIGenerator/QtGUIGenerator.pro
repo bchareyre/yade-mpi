@@ -6,7 +6,8 @@
 LIBS += -lSerialization \
         -lM3D \
         -lConstants \
-        -lXMLManager 
+        -lXMLManager \
+        -rdynamic 
 INCLUDEPATH = ../../plugins/IOManager/XMLManager \
               ../../yade \
               ../../toolboxes/Math/M3D \

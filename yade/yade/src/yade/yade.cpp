@@ -33,6 +33,11 @@ int main(int argc, char *argv[])
 	}
 	
 	shared_ptr<GUI> gui = dynamic_pointer_cast<GUI>(ClassFactory::instance().createShared(argv[1]));
-	
+
+	Omega::instance().init();
+	Omega::instance().init();
+	Omega::instance().init();
+	Omega::instance().init();
+	Omega::instance().init();
 	return gui->run(argc,argv);
 }

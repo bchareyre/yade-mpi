@@ -20,6 +20,7 @@ void Polyhedron::processAttributes()
 	loadGmshMesh(mshFileName);
 
 	fNormals.resize(faces.size());
+	cerr << "process"<<endl;
 	/*vNormals.resize(vertices.size());
 	triPerVertices.resize(vertices.size());
 	for(unsigned int i=0;i<faces.size();i++)

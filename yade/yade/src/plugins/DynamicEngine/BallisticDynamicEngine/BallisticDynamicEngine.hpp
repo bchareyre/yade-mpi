@@ -6,6 +6,7 @@
 class BallisticDynamicEngine : public DynamicEngine
 {
 	private : Vector3 prevVelocity;
+	private : Vector3 prevAngularVelocity;
 	private : bool first;
 	public : float damping;
 	

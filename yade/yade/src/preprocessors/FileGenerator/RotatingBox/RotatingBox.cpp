@@ -35,7 +35,8 @@ void RotatingBox::registerAttributes()
 void RotatingBox::exec()
 {
 	shared_ptr<NonConnexBody> rootBody(new NonConnexBody);
-	int nbSpheres = 1000;
+	int nbSpheres = 3;
+	int nbBox = 3;
 	Quaternion q;
 	q.fromAngleAxis(0, Vector3(0,0,1));
 	
@@ -204,15 +205,17 @@ void RotatingBox::exec()
  	rootBody->bodies.push_back(dynamic_pointer_cast<Body>(box6));
  	rootBody->bodies.push_back(dynamic_pointer_cast<Body>(box7));
 
-	for(int i=0;i<10;i++)
-		for(int j=0;j<10;j++)
-			for(int k=0;k<10;k++)
+	Vector3 translation;
+	
+	for(int i=0;i<nbSpheres;i++)
+		for(int j=0;j<nbSpheres;j++)
+			for(int k=0;k<nbSpheres;k++)
 	{
 		shared_ptr<RigidBody> s(new RigidBody);
 		shared_ptr<AABB> aabb(new AABB);
 		shared_ptr<Sphere> sphere(new Sphere);
 		
-		Vector3 translation;
+		
 		translation = Vector3(i,j,k)*10-Vector3(45,45,45)+Vector3(Rand::symmetricRandom(),Rand::symmetricRandom(),Rand::symmetricRandom());
 		float radius = (4+Rand::symmetricRandom());
 		
@@ -241,5 +244,37 @@ void RotatingBox::exec()
 		rootBody->bodies.push_back(dynamic_pointer_cast<Body>(s));
 	}
 
+
+	for(int i=0;i<nbBox;i++)
+		for(int j=0;j<nbBox;j++)
+			for(int k=0;k<nbBox;k++)
+			{
+				shared_ptr<RigidBody> boxi(new RigidBody);
+				aabb=shared_ptr<AABB>(new AABB);
+				box=shared_ptr<Box>(new Box);
+				shared_ptr<BallisticDynamicEngine> ballistic(new BallisticDynamicEngine);
+				ballistic->damping 	= 0.95;
+				boxi->dynamic		= dynamic_pointer_cast<DynamicEngine>(ballistic);
+				boxi->isDynamic		= true;
+				boxi->angularVelocity	= Vector3(0,0,0);
+				boxi->velocity		= Vector3(0,0,0);
+				boxi->mass		= 1;
+				boxi->inertia		= Vector3(1,1,1);
+				translation = Vector3(i,j,k)*10-Vector3(25,25,25)+Vector3(Rand::symmetricRandom(),Rand::symmetricRandom(),Rand::symmetricRandom());
+				boxi->se3		= Se3(translation,q);
+				aabb->color		= Vector3(Rand::unitRandom(),Rand::unitRandom(),Rand::unitRandom());
+				aabb->center		= translation;
+				Vector3 size = Vector3((4+Rand::symmetricRandom()),(4+Rand::symmetricRandom()),(4+Rand::symmetricRandom()));
+				aabb->halfSize		= size;
+				boxi->bv		= dynamic_pointer_cast<BoundingVolume>(aabb);
+				box->extents		= size;
+				box->diffuseColor	= Vector3(Rand::unitRandom(),Rand::unitRandom(),Rand::unitRandom());
+				box->wire		= false;
+				box->visible		= true;
+				boxi->cm		= dynamic_pointer_cast<CollisionModel>(box);
+				boxi->gm		= dynamic_pointer_cast<CollisionModel>(box);
+				rootBody->bodies.push_back(dynamic_pointer_cast<Body>(boxi));
+			}
+	
 	IOManager::saveToFile("XMLManager", "../data/RotatingBox.xml", "rootBody", rootBody);
 }

@@ -33,4 +33,5 @@ REGISTER_CLASS(Sphere,false);
 
 REGISTER_CLASS_TO_MULTI_METHODS_MANAGER(Sphere);
 
+
 #endif // __SPHERE_H__

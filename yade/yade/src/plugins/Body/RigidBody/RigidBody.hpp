@@ -11,6 +11,9 @@ class RigidBody : public ConnexBody
 	public : Vector3 inertia;
 	public : Vector3 acceleration;
 	public : Vector3 prevAcceleration;
+	public : Vector3 angularAcceleration;
+	public : Vector3 prevAngularAcceleration;
+
 	// construction
 	public : RigidBody ();
 	public : ~RigidBody ();

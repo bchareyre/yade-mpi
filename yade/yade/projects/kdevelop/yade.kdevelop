@@ -104,7 +104,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>GUI</activedir>
+      <activedir>toolboxes/Math/M3D</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>

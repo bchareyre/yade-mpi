@@ -3,6 +3,7 @@
 RigidBody::RigidBody () : ConnexBody()
 {
 	acceleration = Vector3(0,0,0);
+	angularAcceleration = Vector3(0,0,0);
 }
 
 
@@ -39,6 +40,8 @@ void RigidBody::moveToNextTimeStep()
 {	
 	ConnexBody::moveToNextTimeStep();
 	prevAcceleration = acceleration;
+	prevAngularAcceleration = angularAcceleration;
 	acceleration = Vector3(0,0,0);
+	angularAcceleration = Vector3(0,0,0);
 	
 }

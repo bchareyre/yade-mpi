@@ -93,7 +93,7 @@ void YadeQtMainWindow::createMenus()
 void YadeQtMainWindow::fileNewSimulation()
 {
 	QString selectedFilter;
-	QString fileName = QFileDialog::getOpenFileName(".", "XML Yade File (*.xml)", this,"Open File","Choose a file to open",&selectedFilter );
+	QString fileName = QFileDialog::getOpenFileName("../data", "XML Yade File (*.xml)", this,"Open File","Choose a file to open",&selectedFilter );
 
 	if (!fileName.isEmpty()) 
 	{		

@@ -1,7 +1,8 @@
 #include "Omega.hpp"
 
 Omega::Omega ()
-{		
+{
+cerr << "omega constructor" << endl;		
 }
 
 
@@ -27,7 +28,7 @@ void Omega::logMessage(const string& str)
 void Omega::init()
 {
 	gravity = Vector3(0,-9.81,0);
-	dt = 0.02;
+	dt = 0.01;
 	
 	logFile = shared_ptr<ofstream>(new ofstream("../data/log.xml", ofstream::out | ofstream::app));
 

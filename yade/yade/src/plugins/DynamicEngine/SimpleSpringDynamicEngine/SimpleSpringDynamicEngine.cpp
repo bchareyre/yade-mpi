@@ -34,7 +34,7 @@ void SimpleSpringDynamicEngine::respondToCollisions(Body * body, const std::list
 	vector<shared_ptr<Body> >& bodies = ncb->bodies;
 	
 	float stiffness = 100;
-	//float damping = 1.02;
+	float damping = 5;
 	Vector3 gravity = Omega::instance().gravity;
 	if (first)
 	{
@@ -51,28 +51,37 @@ void SimpleSpringDynamicEngine::respondToCollisions(Body * body, const std::list
 	for( ; cti!=ctiEnd ; ++cti)
 	{
 		shared_ptr<Contact> contact = static_pointer_cast<Contact>(*cti);
+		shared_ptr<RigidBody> rb1 = dynamic_pointer_cast<RigidBody>(bodies[contact->id1]);
+		shared_ptr<RigidBody> rb2 = dynamic_pointer_cast<RigidBody>(bodies[contact->id2]);
 		
 		std::vector<std::pair<Vector3,Vector3> >::iterator cpi = (dynamic_pointer_cast<ClosestFeatures>(contact->interactionModel))->closestsPoints.begin();
 		std::vector<std::pair<Vector3,Vector3> >::iterator cpiEnd = (dynamic_pointer_cast<ClosestFeatures>(contact->interactionModel))->closestsPoints.end();
+		float size = (dynamic_pointer_cast<ClosestFeatures>(contact->interactionModel))->closestsPoints.size();
 		for( ; cpi!=cpiEnd ; ++cpi)
 		{	
-			Vector3 f = (*cpi).first-(*cpi).second;
+			Vector3 v1 = (*cpi).first;
+			Vector3 v2 = (*cpi).second;
 			
-			f *= stiffness/(float)((dynamic_pointer_cast<ClosestFeatures>(contact->interactionModel))->closestsPoints.size());
-			
+			float l  = (v2-v1).length();
+			float l0 = 0;
+			Vector3 dir = (v2-v1).normalize();
+			float e  = l*l;
+
+			float relativeVelocity = dir.dot((rb2->velocity-rb1->velocity));
+			Vector3 f = (e*stiffness+relativeVelocity*damping)/size*dir;
+
 			Vector3 p = 0.5*((*cpi).first+(*cpi).second);
 			
-			shared_ptr<RigidBody> r1 = dynamic_pointer_cast<RigidBody>(bodies[contact->id1]);
-			shared_ptr<RigidBody> r2 = dynamic_pointer_cast<RigidBody>(bodies[contact->id2]);
+
 			
-			Vector3 o1p = p - r1->se3.translation;
-			Vector3 o2p = p - r2->se3.translation;
+			Vector3 o1p = p - rb1->se3.translation;
+			Vector3 o2p = p - rb2->se3.translation;
 						
-			forces[contact->id1] -= f;
-			forces[contact->id2] += f;
+			forces[contact->id1] += f;
+			forces[contact->id2] -= f;
 		
-			couples[contact->id1] -= o1p.cross(f);
-			couples[contact->id2] += o2p.cross(f);
+			couples[contact->id1] += o1p.cross(f)/3;
+			couples[contact->id2] -= o2p.cross(f)/3;
 		}
 	}
 
@@ -82,7 +91,10 @@ void SimpleSpringDynamicEngine::respondToCollisions(Body * body, const std::list
 		shared_ptr<RigidBody> rb = dynamic_pointer_cast<RigidBody>(bodies[i]);
 
 		if (rb)
+		{
 			rb->acceleration += forces[i]*rb->invMass;
+			rb->angularAcceleration += couples[i].multTerm(rb->invInertia);
+		}
         }
 	
 	first = false;
