@@ -25,7 +25,7 @@ void SimpleNarrowCollider::narrowCollisionPhase(Body* body)
 {
 
 	NonConnexBody * ncb = dynamic_cast<NonConnexBody*>(body);
-	vector<shared_ptr<Body> >& bodies = ncb->bodies;
+	shared_ptr<BodyContainer> bodies = ncb->bodies;
 
 //	std::list<shared_ptr<Interaction> >::iterator it = ncb->interactions.begin();
 //	std::list<shared_ptr<Interaction> >::iterator itEnd = ncb->interactions.end();
@@ -39,8 +39,8 @@ void SimpleNarrowCollider::narrowCollisionPhase(Body* body)
 //		contact = (*itTmp);
 
 //		it++;
-		shared_ptr<Body> b1 = bodies[contact->getId1()];
-		shared_ptr<Body> b2 = bodies[contact->getId2()];
+		shared_ptr<Body> b1 = bodies->find(contact->getId1());
+		shared_ptr<Body> b2 = bodies->find(contact->getId2());
 
 //		if (!(narrowManager.collide(b1->cm,b2->cm,b1->se3,b2->se3,(*itTmp))))
 		if (!(narrowManager.collide( b1->cm , b2->cm , b1->se3 , b2->se3 , contact )))

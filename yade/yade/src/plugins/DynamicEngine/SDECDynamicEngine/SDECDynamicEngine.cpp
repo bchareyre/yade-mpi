@@ -74,10 +74,10 @@ void SDECDynamicEngine::filter(Body* body)
 {
 
 	NonConnexBody * ncb = dynamic_cast<NonConnexBody*>(body);
-	vector<shared_ptr<Body> >& bodies = ncb->bodies;
+	shared_ptr<BodyContainer> bodies = ncb->bodies;
 
 	if (first)
-		interactionsPerBody.resize(bodies.size());
+		interactionsPerBody.resize(bodies->size());
 
 	vector<set<tuple<int,bool,shared_ptr<InteractionGeometry> >,lessThanTuple > >::iterator ipbi    = interactionsPerBody.begin();
 	vector<set<tuple<int,bool,shared_ptr<InteractionGeometry> >,lessThanTuple > >::iterator ipbiEnd = interactionsPerBody.end();
@@ -155,15 +155,15 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 	filter(body);
 
 	NonConnexBody * ncb = dynamic_cast<NonConnexBody*>(body);
-	vector<shared_ptr<Body> >& bodies = ncb->bodies;
+	shared_ptr<BodyContainer> bodies = ncb->bodies;
 
 	Vector3r gravity = Omega::instance().getGravity();
 	float dt = Omega::instance().dt;
 
 	if (first)
 	{
-		forces.resize(bodies.size());
-		moments.resize(bodies.size());
+		forces.resize(bodies->size());
+		moments.resize(bodies->size());
 	}
 
 	fill(forces.begin(),forces.end(),Vector3r(0,0,0));
@@ -184,8 +184,8 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 
 //		shared_ptr<Interaction> contact = (*pii);
 
-		int id1 = contact2->getId1();
-		int id2 = contact2->getId2();
+		unsigned int id1 = contact2->getId1();
+		unsigned int id2 = contact2->getId2();
 
 ////////////////////////////////////////////////////////////
 /// FIXME : those lines are too dirty !			 ///
@@ -224,8 +224,8 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 /// 							 ///
 ////////////////////////////////////////////////////////////
 
-		shared_ptr<SDECDiscreteElement> de1		= dynamic_pointer_cast<SDECDiscreteElement>(bodies[id1]);
-		shared_ptr<SDECDiscreteElement> de2 		= dynamic_pointer_cast<SDECDiscreteElement>(bodies[id2]);
+		shared_ptr<SDECDiscreteElement> de1		= dynamic_pointer_cast<SDECDiscreteElement>(bodies->find(id1));
+		shared_ptr<SDECDiscreteElement> de2 		= dynamic_pointer_cast<SDECDiscreteElement>(bodies->find(id2));
 		shared_ptr<SDECPermanentLink> currentContact	= dynamic_pointer_cast<SDECPermanentLink>(contact2->interactionGeometry);
 
 		/// FIXME : put these lines into another dynlib
@@ -488,8 +488,8 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 		int id1 = contact->getId1();
 		int id2 = contact->getId2();
 
-		shared_ptr<SDECDiscreteElement> de1 	= dynamic_pointer_cast<SDECDiscreteElement>(bodies[id1]);
-		shared_ptr<SDECDiscreteElement> de2 	= dynamic_pointer_cast<SDECDiscreteElement>(bodies[id2]);
+		shared_ptr<SDECDiscreteElement> de1 	= dynamic_pointer_cast<SDECDiscreteElement>(bodies->find(id1));
+		shared_ptr<SDECDiscreteElement> de2 	= dynamic_pointer_cast<SDECDiscreteElement>(bodies->find(id2));
 		shared_ptr<SDECContactModel> currentContact = dynamic_pointer_cast<SDECContactModel>(contact->interactionGeometry);
 
 		if ( contact ->isNew)
@@ -570,10 +570,13 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-
-	for(unsigned int i=0; i < bodies.size(); i++)
+	// FIXME - this is broken, because bodies have id, while forces and velocities are just a vactor of numbers.
+//	for(unsigned int i=0; i < bodies->size(); i++)
+	shared_ptr<Body> b;
+	unsigned int i=0;
+	for( b = bodies->getFirst() ; bodies->hasCurrent() ; b = bodies->getNext() , ++i )
         {
-		shared_ptr<SDECDiscreteElement> de = dynamic_pointer_cast<SDECDiscreteElement>(bodies[i]);
+		shared_ptr<SDECDiscreteElement> de = dynamic_pointer_cast<SDECDiscreteElement>(b);
 		if (de)
 		{
 			forces[i] += gravity*de->mass;

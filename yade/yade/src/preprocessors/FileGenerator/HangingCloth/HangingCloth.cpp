@@ -48,7 +48,7 @@ void HangingCloth::exec()
 	shared_ptr<NarrowCollider> nc	= shared_ptr<NarrowCollider>(new SimpleNarrowCollider);
 	nc->addCollisionFunctor("Sphere","Sphere","Sphere2Sphere4ClosestFeatures");
 	nc->addCollisionFunctor("Sphere","Mesh2D","Sphere2Mesh2D4ClosestFeatures");
-	
+
 
 	rootBody->actors.resize(3);
 	rootBody->actors[0] 		= shared_ptr<Actor>(new SAPCollider);
@@ -56,7 +56,7 @@ void HangingCloth::exec()
 	rootBody->actors[2] 		= shared_ptr<Actor>(new MassSpringBody2RigidBodyDynamicEngine);
 
 
-	
+
 
 	rootBody->isDynamic      = false;
 	rootBody->velocity       = Vector3r(0,0,0);
@@ -136,8 +136,9 @@ void HangingCloth::exec()
 	cloth->cm		= dynamic_pointer_cast<CollisionGeometry>(mesh2d);
 	cloth->gm		= dynamic_pointer_cast<CollisionGeometry>(mesh2d);
 
-
-	rootBody->bodies.push_back(dynamic_pointer_cast<Body>(cloth));
+	shared_ptr<Body> b;
+	b = dynamic_pointer_cast<Body>(cloth);
+	rootBody->bodies->insert(b);
 
 
 	for(int i=0;i<1/*nbSpheres*/;i++)
@@ -182,7 +183,8 @@ void HangingCloth::exec()
 		s->cm			= dynamic_pointer_cast<CollisionGeometry>(csphere);
 		s->gm			= dynamic_pointer_cast<GeometricalModel>(gsphere);
 
-		rootBody->bodies.push_back(dynamic_pointer_cast<Body>(s));
+		b = dynamic_pointer_cast<Body>(s);
+		rootBody->bodies->insert(b);
 	}
 
 // FIXME : why it save twice some attributes?

@@ -27,7 +27,7 @@ void Translator::moveToNextTimeStep(Body * body)
 {
 
 	NonConnexBody * ncb = dynamic_cast<NonConnexBody*>(body);
-	vector<shared_ptr<Body> >& bodies = ncb->bodies;
+	shared_ptr<BodyContainer> bodies = ncb->bodies;
 
 	std::vector<int>::const_iterator ii = subscribedBodies.begin();
 	std::vector<int>::const_iterator iiEnd = subscribedBodies.end();
@@ -43,7 +43,7 @@ void Translator::moveToNextTimeStep(Body * body)
 
 	for(;ii!=iiEnd;++ii)
 	{
-		shared_ptr<Body>  b = bodies[(*ii)];
+		shared_ptr<Body>  b = bodies->find(*ii);
 
 		// FIXME - specify intervals of activity for an actor
 		//if( Omega::instance().getIter() > 1000 )

@@ -75,16 +75,22 @@ void ErrorTolerantDynamicEngine::respondToCollisions(Body* body)
 {
 
 	NonConnexBody * ncb = dynamic_cast<NonConnexBody*>(body);
-	vector<shared_ptr<Body> >& bodies = ncb->bodies;
+	shared_ptr<BodyContainer> bodies = ncb->bodies;
 
 	if (ncb->interactions->size() > 0)
 	{
 		// Build inverse of masses matrix and store it into a vector
-		ublas::banded_matrix<float> invM(6*bodies.size(),6*bodies.size(),1,1);
-		for(unsigned int i=0;i<bodies.size();i++)
+		ublas::banded_matrix<float> invM(6*bodies->size(),6*bodies->size(),1,1);
+//		for(unsigned int i=0;i<bodies->size();i++)
+
+
+		// FIXME - this loop assumes that id's of all bodies start from zero and increment by one?
+		shared_ptr<Body> b;
+		unsigned int i=0;
+		for( b = bodies->getFirst() ; bodies->hasCurrent() ; b = bodies->getNext() , ++i )
 		{
 			int offset = 6*i;
-			shared_ptr<RigidBody> rb = dynamic_pointer_cast<RigidBody>(bodies[i]);
+			shared_ptr<RigidBody> rb = dynamic_pointer_cast<RigidBody>(b);
 			invM(offset,offset++) = rb->invMass;
 			invM(offset,offset++) = rb->invMass;
 			invM(offset,offset++) = rb->invMass;
@@ -94,14 +100,14 @@ void ErrorTolerantDynamicEngine::respondToCollisions(Body* body)
 		}
 
 		// Build the jacobian and transpose of jacobian
-		ublas::sparse_matrix<float> J (6*bodies.size(), body->interactions->size(), body->interactions->size()*2/*6*bodies.size()*body->interactions.size()*/);
-		ublas::sparse_matrix<float> Jt (body->interactions->size(), 6*bodies.size(), body->interactions->size()*2/*6*bodies.size()*body->interactions.size()*/);
+		ublas::sparse_matrix<float> J (6*bodies->size(), body->interactions->size(), body->interactions->size()*2/*6*bodies.size()*body->interactions.size()*/);
+		ublas::sparse_matrix<float> Jt (body->interactions->size(), 6*bodies->size(), body->interactions->size()*2/*6*bodies.size()*body->interactions.size()*/);
 
 		static ublas::vector<float> penetrationDepthes;
 		static ublas::vector<float> penetrationVelocities;
 
-		penetrationDepthes.resize(bodies.size());
-		penetrationVelocities.resize(bodies.size());
+		penetrationDepthes.resize(bodies->size());
+		penetrationVelocities.resize(bodies->size());
 
 		Vector3r n,o1p1,o2p2;
 		Vector3r o1p1CrossN,o2p2CrossN;
@@ -112,8 +118,8 @@ void ErrorTolerantDynamicEngine::respondToCollisions(Body* body)
 //		for(int i=0 ; cti!=ctiEnd ; ++cti,i++)
 
 		shared_ptr<Interaction> contact;
-		int i;
-		for( i=0 , contact=ncb->interactions->getFirst() ; ncb->interactions->hasCurrent() ; contact = ncb->interactions->getNext() , i++ )
+		i=0;
+		for( contact=ncb->interactions->getFirst() ; ncb->interactions->hasCurrent() ; contact = ncb->interactions->getNext() , i++ )
 		{
 //			shared_ptr<Interaction> contact = (*cti);
 			shared_ptr<ErrorTolerantContactModel> cm = dynamic_pointer_cast<ErrorTolerantContactModel>(contact->interactionGeometry);
@@ -160,24 +166,28 @@ void ErrorTolerantDynamicEngine::respondToCollisions(Body* body)
 
 			penetrationDepthes[i] = (cm->closestPoints[0].first-cm->closestPoints[0].second).length();
 
-			penetrationVelocities[i] = ( (bodies[id1]->velocity+o1p1.cross(bodies[id1]->angularVelocity)) - (bodies[id2]->velocity+o2p2.cross(bodies[id2]->angularVelocity)) ).dot(n);
+			penetrationVelocities[i] = ( (bodies->find(id1)->velocity+o1p1.cross(bodies->find(id1)->angularVelocity)) - (bodies->find(id2)->velocity+o2p2.cross(bodies->find(id2)->angularVelocity)) ).dot(n);
 
 		}
 
 		ublas::vector<float> impulses;
 		ublas::vector<float> displacement;
 
-		impulses.resize(bodies.size());
-		displacement.resize(bodies.size());
+		impulses.resize(bodies->size());
+		displacement.resize(bodies->size());
 
 		BCGSolve(J,invM,Jt,penetrationDepthes,displacement);
 		BCGSolve(J,invM,Jt,penetrationVelocities,impulses);
 	}
 
 
-	for(unsigned int i=0; i < bodies.size(); i++)
+	// FIXME - this loop assumes that id's of all bodies start from zero and increment by one?
+//	for(unsigned int i=0; i < bodies->size(); i++)
+	shared_ptr<Body> b;
+	unsigned int i=0;
+	for( b = bodies->getFirst() ; bodies->hasCurrent() ; b = bodies->getNext() , ++i )
         {
-		shared_ptr<RigidBody> rb = dynamic_pointer_cast<RigidBody>(bodies[i]);
+		shared_ptr<RigidBody> rb = dynamic_pointer_cast<RigidBody>(b);
 		if (rb)
 		{
 			Vector3r force = Omega::instance().getGravity()*rb->mass;

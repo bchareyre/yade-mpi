@@ -34,6 +34,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <typeinfo>
+#include <string>
 #include <map>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -79,7 +80,7 @@ class SerializableSingleton : public Singleton< SerializableSingleton >
 				    };
 
 		    };
-	
+
 	/*! Type of a Stl map used to map the registered class name with their SerializableDescriptor */
 	private   : typedef std::map< std::string , SerializableDescriptor > SerializableDescriptorMap;
 	private   : SerializableDescriptorMap map;
@@ -94,12 +95,12 @@ class SerializableSingleton : public Singleton< SerializableSingleton >
 		\note  the constructor is private because ClassFactory is a Singleton
 	*/
 	private   : SerializableSingleton();
-	
+
 	/*! Copy Constructor
 		\note  needed by the singleton class
 	*/
 	private   : SerializableSingleton(const SerializableSingleton&);
-	
+
 	/*! Destructor
 		\note  the destructor is private because ClassFactory is a Singleton
 	*/

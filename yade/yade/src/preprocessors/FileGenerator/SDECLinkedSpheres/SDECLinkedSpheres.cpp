@@ -82,8 +82,9 @@ void SDECLinkedSpheres::exec()
 	box1->kn		= 100000;
 	box1->ks		= 10000;
 
-
-	rootBody->bodies.push_back(dynamic_pointer_cast<Body>(box1));
+	shared_ptr<Body> b;
+	b = dynamic_pointer_cast<Body>(box1);
+	rootBody->bodies->insert(b);
 
 	Vector3r translation;
 
@@ -123,12 +124,19 @@ void SDECLinkedSpheres::exec()
 		s->kn			= 100000;
 		s->ks			= 10000;
 
-		rootBody->bodies.push_back(dynamic_pointer_cast<Body>(s));
+		b = dynamic_pointer_cast<Body>(s);
+		rootBody->bodies->insert(b);
 	}
 
-	vector<shared_ptr<Body> >::iterator ait    = (rootBody->bodies).begin();
-	vector<shared_ptr<Body> >::iterator aitEnd = (rootBody->bodies).end();
-	for( int idA=0 ; ait < aitEnd ; ++ait , ++idA )
+//	vector<shared_ptr<Body> >::iterator ait    = (rootBody->bodies).begin();
+//	vector<shared_ptr<Body> >::iterator aitEnd = (rootBody->bodies).end();
+//	for( int idA=0 ; ait < aitEnd ; ++ait , ++idA )
+
+// FIXME !!!!!!!!!!!! - nested loop is currently impossible, with BodyContainer !!!!
+
+/*
+	shared_ptr<Body> bodyA;
+	for( unsigned int idA=0 , bodyA = bodies->getFirst() ; bodies->hasCurrent() ; bodyA = bodies->getNext() , ++idA )
 	{
 		vector<shared_ptr<Body> >::iterator bit    = ait;
 		++bit;
@@ -163,7 +171,7 @@ void SDECLinkedSpheres::exec()
 		}
 	}
 	cout << "total number of permament links created: " << rootBody->permanentInteractions->size() << endl;
-
+*/
 
 	IOManager::saveToFile("XMLManager", "../data/SDECLinkedSpheres.xml", "rootBody", rootBody);
 }

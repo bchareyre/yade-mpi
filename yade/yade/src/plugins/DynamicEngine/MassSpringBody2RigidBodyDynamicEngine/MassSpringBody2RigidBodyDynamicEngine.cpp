@@ -39,8 +39,8 @@ void MassSpringBody2RigidBodyDynamicEngine::respondToCollisions(Body * body)
 	{
 		shared_ptr<ClosestFeatures> cf = dynamic_pointer_cast<ClosestFeatures>(ct->interactionGeometry);
 		//FIXME : this is a hack because we don't know if id1 is the sphere or piece of massSpring
- 		shared_ptr<MassSpringBody> c = dynamic_pointer_cast<MassSpringBody>(ncb->bodies[ct->getId1()]);
-		shared_ptr<RigidBody> rb = dynamic_pointer_cast<RigidBody>(ncb->bodies[ct->getId2()]);
+ 		shared_ptr<MassSpringBody> c = dynamic_pointer_cast<MassSpringBody>(ncb->bodies->find(ct->getId1()));
+		shared_ptr<RigidBody> rb = dynamic_pointer_cast<RigidBody>(ncb->bodies->find(ct->getId2()));
 		shared_ptr<Mesh2D> mesh;
 		if (c)
 		{

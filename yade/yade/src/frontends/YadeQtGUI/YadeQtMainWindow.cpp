@@ -27,7 +27,7 @@ YadeQtMainWindow::YadeQtMainWindow() : YadeQtGeneratedMainWindow()
  	addItem("Preprocessor","HangingCloth");
 	addItem("Preprocessor","RotatingBox");
 //	addItem("Preprocessor","FEMRock"); // not working
-	addItem("Preprocessor","BoxStack");
+//	addItem("Preprocessor","BoxStack"); // not working
 	addItem("Preprocessor","SDECSpheresPlane");
 	addItem("Preprocessor","SDECLinkedSpheres");
 	addItem("Preprocessor","QtFileGenerator");
@@ -123,7 +123,7 @@ void YadeQtMainWindow::dynamicMenuClicked()
 	QAction * action = (QAction*)(this->sender());
 	string name = action->text();
 	qtWidgets.push_back(ClassFactory::instance().createShared(name));
-	
+
 	shared_ptr<QWidget> widget = dynamic_pointer_cast<QWidget>(qtWidgets.back());
 	if (widget) // the library is a QWidget so we set workspace as its parent
 	{

@@ -30,16 +30,16 @@ void SimpleSpringDynamicEngine::respondToCollisions(Body * body)
 	//float dt = Omega::instance().dt;
 
 	NonConnexBody * ncb = dynamic_cast<NonConnexBody*>(body);
-	vector<shared_ptr<Body> >& bodies = ncb->bodies;
+	shared_ptr<BodyContainer> bodies = ncb->bodies;
 
 	float stiffness = 10000;
 	float viscosity = 10;
 	Vector3r gravity = Omega::instance().getGravity();
 	if (first)
 	{
-		forces.resize(bodies.size());
-		couples.resize(bodies.size());
-		prevVelocities.resize(bodies.size());
+		forces.resize(bodies->size());
+		couples.resize(bodies->size());
+		prevVelocities.resize(bodies->size());
 	}
 
 	fill(forces.begin(),forces.end(),Vector3r(0,0,0));
@@ -51,8 +51,8 @@ void SimpleSpringDynamicEngine::respondToCollisions(Body * body)
 	shared_ptr<Interaction> contact;
 	for( contact = ncb->interactions->getFirst() ; ncb->interactions->hasCurrent() ; contact = ncb->interactions->getNext() )
 	{
-		shared_ptr<RigidBody> rb1 = dynamic_pointer_cast<RigidBody>(bodies[contact->getId1()]);
-		shared_ptr<RigidBody> rb2 = dynamic_pointer_cast<RigidBody>(bodies[contact->getId2()]);
+		shared_ptr<RigidBody> rb1 = dynamic_pointer_cast<RigidBody>(bodies->find(contact->getId1()));
+		shared_ptr<RigidBody> rb2 = dynamic_pointer_cast<RigidBody>(bodies->find(contact->getId2()));
 
 		std::vector<std::pair<Vector3r,Vector3r> >::iterator cpi = (dynamic_pointer_cast<ClosestFeatures>(contact->interactionGeometry))->closestsPoints.begin();
 		std::vector<std::pair<Vector3r,Vector3r> >::iterator cpiEnd = (dynamic_pointer_cast<ClosestFeatures>(contact->interactionGeometry))->closestsPoints.end();
@@ -87,12 +87,16 @@ void SimpleSpringDynamicEngine::respondToCollisions(Body * body)
 	}
 
 
-	for(unsigned int i=0; i < bodies.size(); i++)
+//	for(unsigned int i=0; i < bodies.size(); i++)
+	shared_ptr<Body> b;
+	unsigned int i=0;
+	for( b = bodies->getFirst() ; bodies->hasCurrent() ; b = bodies->getNext() , ++i )
         {
-		shared_ptr<RigidBody> rb = dynamic_pointer_cast<RigidBody>(bodies[i]);
+		shared_ptr<RigidBody> rb = dynamic_pointer_cast<RigidBody>(b);
 
 		if (rb)
 		{
+			// FIXME - this assumes that bodies are numbered from zero with one number increments, BAD!!!
 			rb->acceleration += forces[i]*rb->invMass;
 			rb->angularAcceleration += couples[i].multDiag(rb->invInertia);
 			//if (i==35)

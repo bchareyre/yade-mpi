@@ -28,6 +28,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "Body.hpp"
+#include "BodyContainer.hpp"
 //#include "BroadCollider.hpp"
 //#include "KinematicEngine.hpp"
 //#include "NarrowCollider.hpp"
@@ -37,29 +38,30 @@
 //FIXME : NonConnexBody is abstract interface and add SetOfBodies as default simple NonConnexBody
 class NonConnexBody : public Body
 {
-	public : vector<shared_ptr<Body> > bodies;
+	//public : vector<shared_ptr<Body> > bodies;
 
 	//public : shared_ptr<NarrowCollider> narrowCollider;
 	//public : shared_ptr<BroadCollider> broadCollider;
 	//public : shared_ptr<KinematicEngine> kinematic;
 
 	//public : vector<shared_ptr<Interaction> > permanentInteractions;
+	public	: shared_ptr<BodyContainer> bodies;
 	public	: shared_ptr<InteractionContainer> permanentInteractions;
 
 	// construction
-	public : NonConnexBody ();
+	public	: NonConnexBody ();
 
-	public : virtual ~NonConnexBody ();
+	public	: virtual ~NonConnexBody ();
 
-	public : virtual void glDraw();
+	public	: virtual void glDraw();
 
-	public : void updateBoundingVolume(Se3r& se3);
-	public : void updateCollisionGeometry(Se3r& se3);
+	public	: void updateBoundingVolume(Se3r& se3);
+	public	: void updateCollisionGeometry(Se3r& se3);
 
-	public : void moveToNextTimeStep();
+	public	: void moveToNextTimeStep();
 
-	public : void afterDeserialization();
-	public : void registerAttributes();
+	public	: void afterDeserialization();
+	public	: void registerAttributes();
 
 	REGISTER_CLASS_NAME(NonConnexBody);
 };

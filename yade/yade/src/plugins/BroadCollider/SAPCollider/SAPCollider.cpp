@@ -68,18 +68,22 @@ void SAPCollider::broadCollisionTest(Body* body)
 {
 
 	NonConnexBody * ncb = dynamic_cast<NonConnexBody*>(body);
-	vector<shared_ptr<Body> >& bodies = ncb->bodies;
+	shared_ptr<BodyContainer> bodies = ncb->bodies;
 
 	unsigned int i;
 
 	// Updates the minimums and maximums arrays according to the new center and radius of the spheres
 	int offset;
 	Vector3r min,max;
-	for(i=0; i < bodies.size(); i++)
+
+	//for(i=0; i < bodies->size(); i++)
+	shared_ptr<Body> b;
+	i=0;
+	for( b = bodies->getFirst() ; bodies->hasCurrent() ; b = bodies->getNext() , i++ )
 	{
 		offset = 3*i;
-		min = bodies[i]->bv->min;
-		max = bodies[i]->bv->max;
+		min = b->bv->min;
+		max = b->bv->max;
 		minimums[offset+0] = min[0];
 		minimums[offset+1] = min[1];
 		minimums[offset+2] = min[2];
@@ -88,8 +92,8 @@ void SAPCollider::broadCollisionTest(Body* body)
 		maximums[offset+2] = max[2];
 	}
 
-	updateIds(bodies.size());
-	nbObjects = bodies.size();
+	updateIds(bodies->size());
+	nbObjects = bodies->size();
 
 	// permutation sort of the AABBBounds along the 3 axis performed in a independant manner
 	sortBounds(xBounds, nbObjects);
@@ -118,7 +122,8 @@ void SAPCollider::broadCollisionTest(Body* body)
 		itEnd = overlappingBB[i].end();
 		for(;it!=itEnd;++it)
 		{
-			if (!(bodies[i]->isDynamic==false && bodies[*it]->isDynamic==false))
+			// FIXME - this assumes that bodies are numbered from zero with one number increments, BAD!!!
+			if (!(bodies->find(i)->isDynamic==false && bodies->find(*it)->isDynamic==false))
 			{
 				nbPotentialCollisions++;
 				shared_ptr<Interaction> inter(new Interaction(i,*it));

@@ -87,7 +87,9 @@ void SDECSpheresPlane::exec()
 	box1->ks		= 10000;
 
 
-	rootBody->bodies.push_back(dynamic_pointer_cast<Body>(box1));
+	shared_ptr<Body> b;
+	b = dynamic_pointer_cast<Body>(box1);
+	rootBody->bodies->insert(b);
 
 	Vector3r translation;
 
@@ -127,7 +129,8 @@ void SDECSpheresPlane::exec()
 		s->kn			= 100000;
 		s->ks			= 10000;
 
-		rootBody->bodies.push_back(dynamic_pointer_cast<Body>(s));
+		b = dynamic_pointer_cast<Body>(s);
+		rootBody->bodies->insert(b);
 	}
 
 

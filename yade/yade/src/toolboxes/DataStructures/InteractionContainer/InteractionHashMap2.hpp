@@ -34,18 +34,18 @@ class InteractionHashMap2 : public InteractionContainer
 
 
 	public : InteractionHashMap2();
-	public : ~InteractionHashMap2();
+	public : virtual ~InteractionHashMap2();
 
-	public : bool insert(shared_ptr<Interaction>& i);
-	public : void clear();
-	public : bool erase(unsigned int id1,unsigned int id2);
-	public : bool find(unsigned int id1,unsigned int id2,shared_ptr<Interaction>& i);
-	public : shared_ptr<Interaction> getFirst();
-	public : bool hasCurrent();
-	public : shared_ptr<Interaction> eraseCurrent();
-	public : shared_ptr<Interaction> getNext();
-	public : shared_ptr<Interaction> getCurrent();
-	public : unsigned int size();
+	public : virtual bool insert(shared_ptr<Interaction>& i);
+	public : virtual void clear();
+	public : virtual bool erase(unsigned int id1,unsigned int id2);
+	public : virtual bool find(unsigned int id1,unsigned int id2,shared_ptr<Interaction>& i);
+	public : virtual shared_ptr<Interaction> getFirst();
+	public : virtual bool hasCurrent();
+	public : virtual shared_ptr<Interaction> eraseCurrent();
+	public : virtual shared_ptr<Interaction> getNext();
+	public : virtual shared_ptr<Interaction> getCurrent();
+	public : virtual unsigned int size();
 
 	REGISTER_CLASS_NAME(InteractionHashMap2);
 };

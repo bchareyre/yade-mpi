@@ -37,10 +37,10 @@ void BoxStack::exec()
 	int nbBox = 0;
 	Quaternionr q;
 	q.fromAxisAngle( Vector3r(0,0,1),0);
-	
+
 	shared_ptr<NarrowCollider> nc	= shared_ptr<NarrowCollider>(new SimpleNarrowCollider);
 	nc->addCollisionFunctor("Box","Box","Box2Box4ClosestFeatures");
-	
+
 
 
 	rootBody->actors.resize(3);
@@ -54,10 +54,10 @@ void BoxStack::exec()
 	rootBody->velocity       = Vector3r(0,0,0);
 	rootBody->angularVelocity= Vector3r(0,0,0);
 	rootBody->se3		 = Se3r(Vector3r(0,0,0),q);
-		
+
 	shared_ptr<AABB> aabb;
 	shared_ptr<Box> box;
-	
+
 	shared_ptr<RigidBody> box1(new RigidBody);
 	aabb=shared_ptr<AABB>(new AABB);
 	box=shared_ptr<Box>(new Box);
@@ -78,9 +78,11 @@ void BoxStack::exec()
 	box1->cm		= dynamic_pointer_cast<CollisionGeometry>(box);
 	box1->gm		= dynamic_pointer_cast<CollisionGeometry>(box);
 
-	rootBody->bodies.push_back(dynamic_pointer_cast<Body>(box1));
+	shared_ptr<Body> b;
+	b=dynamic_pointer_cast<Body>(box1);
+	rootBody->bodies->insert(b);
 
-	
+
 	int baseSize = 5;
 	for(int i=0;i<baseSize;i++)
 		for(int j=0;j<i;j++)
@@ -89,11 +91,11 @@ void BoxStack::exec()
 			aabb=shared_ptr<AABB>(new AABB);
 			box=shared_ptr<Box>(new Box);
 			Vector3r size = Vector3r(4,4,4);
-			
+
 			shared_ptr<BallisticDynamicEngine> ballistic(new BallisticDynamicEngine);
 			ballistic->damping 	= 0.95;
 			boxi->actors.push_back(ballistic);
-		
+
 			boxi->isDynamic		= true;
 			boxi->angularVelocity	= Vector3r(0,0,0);
 			boxi->velocity		= Vector3r(0,0,0);
@@ -113,9 +115,11 @@ void BoxStack::exec()
 			box->visible		= true;
 			boxi->cm		= dynamic_pointer_cast<CollisionGeometry>(box);
 			boxi->gm		= dynamic_pointer_cast<CollisionGeometry>(box);
-			rootBody->bodies.push_back(dynamic_pointer_cast<Body>(boxi));
+
+			b=dynamic_pointer_cast<Body>(boxi);
+			rootBody->bodies->insert(b);
 		}
-	
-	
+
+
 	IOManager::saveToFile("XMLManager", "../data/BoxStack.xml", "rootBody", rootBody);
 }

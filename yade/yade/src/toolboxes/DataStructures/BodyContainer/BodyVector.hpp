@@ -1,5 +1,6 @@
-#ifndef __INTERACTIONCONTAINER_HPP__
-#define __INTERACTIONCONTAINER_HPP__
+/*
+#ifndef __BODYVECTOR_HPP__
+#define __BODYVECTOR_HPP__
 
 #include "Serializable.hpp"
 
@@ -7,17 +8,17 @@ class Interaction;
 
 using namespace boost;
 
-class InteractionContainer : public Serializable
+class BodyVector : public BodyContainer
 {
-	public    : InteractionContainer() { interactionContainer.clear(); };
-	public    : virtual ~InteractionContainer() {};
+	public    : BodyVector() { data.clear(); };
+	public    : virtual ~BodyVector() {};
 
 	public    : virtual bool insert(shared_ptr<Interaction>&)						{throw;};
 	public    : virtual void clear() 									{throw;};
-	public    : virtual bool erase(unsigned int /*id1*/,unsigned int /*id2*/) 				{throw;};
+	public    : virtual bool erase(unsigned int id1,unsigned int id2) 				{throw;};
 	//public  : virtual bool erase(vector<unsigned int> ids) = 0;
 
-	public    : virtual bool find(unsigned int /*id1*/,unsigned int /*id2*/,shared_ptr<Interaction>&) 	{throw;};
+	public    : virtual bool find(unsigned int id1,unsigned int id2,shared_ptr<Interaction>&) 	{throw;};
 	//public  : virtual bool find(vector<unsigned int> ids,shared_ptr<Interaction>& i) = 0;
 
 	// looping over the data
@@ -31,9 +32,9 @@ class InteractionContainer : public Serializable
 
 
 	// serialization of this class...
-	REGISTER_CLASS_NAME(InteractionContainer);
+	REGISTER_CLASS_NAME(BodyVector);
 
-	private   : vector<shared_ptr<Interaction> > interactionContainer;
+	private   : vector<shared_ptr<Interaction> > data;
 	public    : virtual void registerAttributes();
 
 	protected : virtual void beforeSerialization();
@@ -42,6 +43,7 @@ class InteractionContainer : public Serializable
 	protected : virtual void afterDeserialization();
 };
 
-REGISTER_SERIALIZABLE(InteractionContainer,false);
+REGISTER_SERIALIZABLE(BodyVector,false);
 
-#endif // __INTERACTIONCONTAINER_HPP__
+#endif // __BODYVECTOR_HPP__
+*/

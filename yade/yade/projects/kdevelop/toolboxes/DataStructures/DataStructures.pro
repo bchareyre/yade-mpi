@@ -4,6 +4,7 @@
 # Target is a subdirs project 
 
 SUBDIRS += AssocVector \
+	   BodyContainer \
 	   InteractionContainer
 MOC_DIR = $(YADECOMPILATIONPATH)
 UI_DIR = $(YADECOMPILATIONPATH)
