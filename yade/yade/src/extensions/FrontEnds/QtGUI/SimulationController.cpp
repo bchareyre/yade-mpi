@@ -126,6 +126,10 @@ void SimulationController::pbLoadClicked()
 
 		Omega::instance().createSimulationLoop();
 		Omega::instance().stopSimulationLoop();
+		
+		for(unsigned int i=0;i<glViews.size();i++)
+			if (glViews[i])
+				glViews[i]->startRendering();
 	}
 } 
 

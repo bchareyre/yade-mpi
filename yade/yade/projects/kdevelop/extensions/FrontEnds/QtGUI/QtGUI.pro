@@ -14,16 +14,14 @@ HEADERS += QtGUI.hpp \
            QtFileGenerator.hpp \
            QtGUIGenerator.hpp \
            SimulationController.hpp \
-           QGLThread.hpp \
-           MessageDialog.hpp 
+           QGLThread.hpp 
 SOURCES += QtGUI.cpp \
            GLViewer.cpp \
            YadeQtMainWindow.cpp \
            QtFileGenerator.cpp \
            QtGUIGenerator.cpp \
            SimulationController.cpp \
-           QGLThread.cpp \
-           MessageDialog.cpp 
+           QGLThread.cpp 
 LIBS += -lSerialization \
 -lMath \
 -lBody \

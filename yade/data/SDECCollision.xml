@@ -1,10 +1,10 @@
 <Yade>
 	<rootBody _className_="NonConnexBody"  id="0" isDynamic="0" velocity="{0 0 0}" angularVelocity="{0 0 0}" se3="{0 0 0 1 0 0 0}">
-		<bv />
-		<cm />
+		<bv _className_="AABB"  color="{0 0 1}" />
+		<cm _className_="CollisionGeometrySet"  diffuseColor="{0 0 1}" wire="0" visible="1" shadowCaster="0" />
 		<gm />
 		<actors size="5">
-			<actors _className_="BoundingVolumeUpdator"  bvFactories="[[Sphere AABB Sphere2AABBFactory] [Box AABB Box2AABBFactory]]" />
+			<actors _className_="BoundingVolumeUpdator"  bvFactories="[[Sphere AABB Sphere2AABBFactory] [Box AABB Box2AABBFactory] [CollisionGeometrySet AABB CollisionGeometrySet2AABBFactory]]" />
 			<actors _className_="SAPCollider"  />
 			<actors _className_="SimpleNarrowCollider"  collisionFunctors="[[Sphere Sphere Sphere2Sphere4SDECContactModel] [Sphere Box Box2Sphere4SDECContactModel]]" />
 			<actors _className_="SDECDynamicEngine"  />

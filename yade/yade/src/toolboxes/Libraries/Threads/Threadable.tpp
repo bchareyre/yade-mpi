@@ -33,7 +33,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 template<class Thread>
-Threadable<Thread>::Threadable(shared_ptr<ThreadSynchronizer> s) : finished(new bool(false)), blocked(new bool(false)), turn(new int(0)), saveTurn(new int(0))
+Threadable<Thread>::Threadable(shared_ptr<ThreadSynchronizer> s) : finished(new bool(false)), blocked(new bool(true)), turn(new int(0)), saveTurn(new int(0))
 {
 	synchronizer = s;
 }
