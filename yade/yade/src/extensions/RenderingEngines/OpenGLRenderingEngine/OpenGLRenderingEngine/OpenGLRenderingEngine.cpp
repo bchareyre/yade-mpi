@@ -52,6 +52,8 @@ OpenGLRenderingEngine::~OpenGLRenderingEngine()
 	
 void OpenGLRenderingEngine::render(shared_ptr<NonConnexBody> rootBody)
 {
+	glClearColor(0,0,0,0);
+		
 	const GLfloat pos[4]	= {75.0,130.0,0.0,1.0};
 	Vector3r lightPos(pos[0],pos[1],pos[2]);
 	const GLfloat ambientColor[4]	= {0.5,0.5,0.5,1.0};	
@@ -170,7 +172,6 @@ void OpenGLRenderingEngine::renderSceneUsingShadowVolumes(shared_ptr<NonConnexBo
 
 void OpenGLRenderingEngine::renderSceneUsingFastShadowVolumes(shared_ptr<NonConnexBody> rootBody,Vector3r lightPos)
 {
-
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_NORMALIZE);
 	rootBody->glDrawGeometricalModel();	
@@ -190,8 +191,8 @@ void OpenGLRenderingEngine::renderSceneUsingFastShadowVolumes(shared_ptr<NonConn
 	glCullFace(GL_FRONT);  /* increment using front face of shadow volume */
 	renderShadowVolumes(rootBody,lightPos);	
 	
-	// Need to do that to remove shadow that are not on object
-	glStencilOp(GL_KEEP, GL_KEEP, GL_INCR);	
+	// Need to do that to remove shadow that are not on object but if glClear is 0
+/*	glStencilOp(GL_KEEP, GL_KEEP, GL_INCR);	
 	glCullFace(GL_BACK);
 	glDepthMask(GL_TRUE);
 	double clearDepthValue=0;
@@ -216,9 +217,9 @@ void OpenGLRenderingEngine::renderSceneUsingFastShadowVolumes(shared_ptr<NonConn
 	glMatrixMode(GL_PROJECTION); 
 	glPopMatrix();
 	glMatrixMode(GL_MODELVIEW);
-	glPopMatrix(); 
+	glPopMatrix(); */
 			
-	glDepthMask(GL_TRUE);
+	//glDepthMask(GL_TRUE);
 	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 	glCullFace(GL_BACK);
 	glDepthFunc(GL_LEQUAL);
@@ -239,7 +240,7 @@ void OpenGLRenderingEngine::renderSceneUsingFastShadowVolumes(shared_ptr<NonConn
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);	
 	glDisable(GL_LIGHTING);	
-	glColor4f(0.1,0.1,0.1,0.5);
+	glColor4f(0,0,0,0.5);
 	glBegin(GL_QUADS);
 		glVertex2f(0,0);
 		glVertex2f(0,1);
@@ -255,7 +256,7 @@ void OpenGLRenderingEngine::renderSceneUsingFastShadowVolumes(shared_ptr<NonConn
 	glMatrixMode(GL_MODELVIEW);
 	glPopMatrix(); 
 
-
+	glDepthMask(GL_TRUE);
 	glDepthFunc(GL_LESS);
 	glDisable(GL_STENCIL_TEST);
 	
