@@ -17,8 +17,8 @@
 #include "AveragePositionRecorder.hpp"
 
 #include "BoundingVolumeDispatcher.hpp"
-#include "InteractionGeometrySet.hpp"
-#include "InteractionGeometrySet2AABBFactory.hpp"
+#include "InteractionDescriptionSet.hpp"
+#include "InteractionDescriptionSet2AABBFunctor.hpp"
 
 #include <boost/filesystem/convenience.hpp>
 #include <boost/lexical_cast.hpp>
@@ -105,9 +105,9 @@ string SDECImport::generate()
 // 
 // // specify bounding volume
 // 	shared_ptr<BoundingVolumeDispatcher> bvu	= shared_ptr<BoundingVolumeDispatcher>(new BoundingVolumeDispatcher);
-// 	bvu->addBVFactories("Sphere","AABB","Sphere2AABBFactory");
-// 	bvu->addBVFactories("Box","AABB","Box2AABBFactory");
-// 	bvu->addBVFactories("InteractionGeometrySet","AABB","InteractionGeometrySet2AABBFactory");
+// 	bvu->addBVFactories("Sphere","AABB","Sphere2AABBFunctor");
+// 	bvu->addBVFactories("Box","AABB","Box2AABBFunctor");
+// 	bvu->addBVFactories("InteractionDescriptionSet","AABB","InteractionDescriptionSet2AABBFunctor");
 // 	
 // 	rootBody->actors.resize(4);
 // 	rootBody->actors[0] 		= bvu;
@@ -134,7 +134,7 @@ string SDECImport::generate()
 // 	shared_ptr<Box> box;
 // 	
 // 	
-// 	shared_ptr<InteractionGeometrySet> set(new InteractionGeometrySet());
+// 	shared_ptr<InteractionDescriptionSet> set(new InteractionDescriptionSet());
 // 	set->diffuseColor	= Vector3f(0,0,1);
 // 	set->wire		= false;
 // 	set->visible		= true;

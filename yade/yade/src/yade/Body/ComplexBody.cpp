@@ -30,13 +30,13 @@ ComplexBody::~ComplexBody()
 
 }
 
-#include "InteractionGeometrySet.hpp"
+#include "InteractionDescriptionSet.hpp"
 void ComplexBody::postProcessAttributes(bool deserializing)
 {
 	if (deserializing)
 	{
 		// FIXME : build that with InteractionDescriptionFunctor
-		shared_ptr<InteractionGeometrySet> set = dynamic_pointer_cast<InteractionGeometrySet>(interactionGeometry);
+		shared_ptr<InteractionDescriptionSet> set = dynamic_pointer_cast<InteractionDescriptionSet>(interactionGeometry);
 		for(unsigned int i=0;i<bodies->size();i++)
 			set->interactionGeometries.push_back((*bodies)[i]->interactionGeometry);
 

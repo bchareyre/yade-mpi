@@ -14,8 +14,8 @@
 #include "SDECDynamicEngine.hpp"
 #include "SDECDiscreteElement.hpp"
 #include "BoundingVolumeDispatcher.hpp"
-#include "InteractionGeometrySet2AABBFactory.hpp"
-#include "InteractionGeometrySet.hpp"
+#include "InteractionDescriptionSet2AABBFunctor.hpp"
+#include "InteractionDescriptionSet.hpp"
 
 RotatingBox::RotatingBox () : FileGenerator()
 {
@@ -51,9 +51,9 @@ string RotatingBox::generate()
 // 	nc->addCollisionFunctor("Sphere","Box","Box2Sphere4SDECContactModel");
 // 	
 // 	shared_ptr<BoundingVolumeDispatcher> bvu	= shared_ptr<BoundingVolumeDispatcher>(new BoundingVolumeDispatcher);
-// 	bvu->addBVFactories("Sphere","AABB","Sphere2AABBFactory");
-// 	bvu->addBVFactories("Box","AABB","Box2AABBFactory");
-// 	bvu->addBVFactories("InteractionGeometrySet","AABB","InteractionGeometrySet2AABBFactory");
+// 	bvu->addBVFactories("Sphere","AABB","Sphere2AABBFunctor");
+// 	bvu->addBVFactories("Box","AABB","Box2AABBFunctor");
+// 	bvu->addBVFactories("InteractionDescriptionSet","AABB","InteractionDescriptionSet2AABBFunctor");
 // 
 // 
 // 	shared_ptr<Rotor> kinematic = shared_ptr<Rotor>(new Rotor);

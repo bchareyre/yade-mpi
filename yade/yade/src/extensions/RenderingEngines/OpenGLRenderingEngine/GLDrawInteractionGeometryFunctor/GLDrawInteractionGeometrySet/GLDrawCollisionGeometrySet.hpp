@@ -34,7 +34,7 @@
 
 class GLDrawCollisionGeometrySet : public GLDrawInteractionGeometryFunctor
 {
-	// FIXME : wtf with InteractionGeometrySet !?
+	// FIXME : wtf with InteractionDescriptionSet !?
 	public : virtual void go(const shared_ptr<InteractionDescription>&, const shared_ptr<BodyPhysicalParameters>&);
 };
 

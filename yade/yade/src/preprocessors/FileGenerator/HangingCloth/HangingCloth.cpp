@@ -17,8 +17,8 @@
 #include "InteractionPhysicsDispatcher.hpp"
 #include "ActionDispatcher.hpp"
 #include "BoundingVolumeDispatcher.hpp"
-#include "InteractionGeometrySet2AABBFactory.hpp"
-#include "InteractionGeometrySet.hpp"
+#include "InteractionDescriptionSet2AABBFunctor.hpp"
+#include "InteractionDescriptionSet.hpp"
 #include "Particle.hpp"
 #include "SpringGeometry.hpp"
 #include "SpringPhysics.hpp"
@@ -82,9 +82,9 @@ string HangingCloth::generate()
 	ipd->addInteractionPhysicsFunctor("SDECDiscreteElement","SDECDiscreteElement","SDECLinearContactModel");
 		
 	shared_ptr<BoundingVolumeDispatcher> bvu	= shared_ptr<BoundingVolumeDispatcher>(new BoundingVolumeDispatcher);
-	bvu->addBVFactories("InteractionSphere","AABB","Sphere2AABBFactory");
-	bvu->addBVFactories("InteractionBox","AABB","Box2AABBFactory");
-	bvu->addBVFactories("InteractionGeometrySet","AABB","InteractionGeometrySet2AABBFactory");
+	bvu->addBVFactories("InteractionSphere","AABB","Sphere2AABBFunctor");
+	bvu->addBVFactories("InteractionBox","AABB","Box2AABBFunctor");
+	bvu->addBVFactories("InteractionDescriptionSet","AABB","InteractionDescriptionSet2AABBFunctor");
 	
 	shared_ptr<ActionDispatcher> ad(new ActionDispatcher);
 	ad->addActionFunctor("ActionForce","Particle","ActionForce2Particle");
@@ -110,7 +110,7 @@ string HangingCloth::generate()
 	
 	rootBody->isDynamic	= false;
 
-	shared_ptr<InteractionGeometrySet> set(new InteractionGeometrySet());
+	shared_ptr<InteractionDescriptionSet> set(new InteractionDescriptionSet());
 	set->diffuseColor	= Vector3f(0,0,1);
 
 	shared_ptr<AABB> aabb(new AABB);

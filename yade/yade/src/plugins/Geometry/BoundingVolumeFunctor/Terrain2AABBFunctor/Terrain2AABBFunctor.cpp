@@ -1,8 +1,8 @@
- #include "Terrain2AABBFactory.hpp"
+ #include "Terrain2AABBFunctor.hpp"
  #include "Terrain.hpp"
  #include "AABB.hpp"
   
-void Terrain2AABBFactory::go(	const shared_ptr<InteractionDescription>& /*cm*/,
+void Terrain2AABBFunctor::go(	const shared_ptr<InteractionDescription>& /*cm*/,
 							shared_ptr<BoundingVolume>& /*bv*/,
 							const Se3r& 	)
 {

@@ -21,18 +21,18 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
  
-#include "InteractionGeometrySet2AABBFactory.hpp"
-#include "InteractionGeometrySet.hpp"
+#include "InteractionDescriptionSet2AABBFunctor.hpp"
+#include "InteractionDescriptionSet.hpp"
 #include "AABB.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void InteractionGeometrySet2AABBFactory::go(	const shared_ptr<InteractionDescription>& cm,
+void InteractionDescriptionSet2AABBFunctor::go(	const shared_ptr<InteractionDescription>& cm,
 						shared_ptr<BoundingVolume>& bv,
 						const Se3r& 	)
 {
-	shared_ptr<InteractionGeometrySet> set = dynamic_pointer_cast<InteractionGeometrySet>(cm);
+	shared_ptr<InteractionDescriptionSet> set = dynamic_pointer_cast<InteractionDescriptionSet>(cm);
 	
 	shared_ptr<AABB> aabb = dynamic_pointer_cast<AABB>(bv);
 	

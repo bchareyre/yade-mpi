@@ -4,16 +4,16 @@
 #include "GeometricalModelFunctor.hpp"
 #include <boost/shared_ptr.hpp>
 
-class TerrainFromVRML1Factory : public GeometricalModelFunctor
+class VRML2TerrainFunctor : public GeometricalModelFunctor
 {
 	// construction
-	public : TerrainFromVRML1Factory ();
-	public : ~TerrainFromVRML1Factory ();
+	public : VRML2TerrainFunctor ();
+	public : ~VRML2TerrainFunctor ();
 
 	public : boost::shared_ptr<GeometricalModel> createGeometricalModel();
 
 };
 
-REGISTER_FACTORABLE(TerrainFromVRML1Factory);
+REGISTER_FACTORABLE(VRML2TerrainFunctor);
 
 #endif // __TERRAINFROMWRL1FILEFACTORY_H__
