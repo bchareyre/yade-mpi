@@ -27,30 +27,19 @@ void SimpleNarrowCollider::narrowCollisionPhase(Body* body)
 	NonConnexBody * ncb = dynamic_cast<NonConnexBody*>(body);
 	shared_ptr<BodyContainer> bodies = ncb->bodies;
 
-//	std::list<shared_ptr<Interaction> >::iterator it = ncb->interactions.begin();
-//	std::list<shared_ptr<Interaction> >::iterator itEnd = ncb->interactions.end();
 	shared_ptr<Interaction> contact;
-//	std::list<shared_ptr<Interaction> >::iterator itTmp;
-
 //	for(int i=0 ; it!=itEnd ; i++)
-	for( contact = ncb->interactions->getFirst() ; ncb->interactions->hasCurrent() ; )
+	for( ncb->interactions->gotoFirst() ; ncb->interactions->notAtEnd() ; )
 	{
-//		itTmp = it;
-//		contact = (*itTmp);
+		contact = ncb->interactions->getCurrent();
 
-//		it++;
-		shared_ptr<Body> b1 = bodies->find(contact->getId1());
-		shared_ptr<Body> b2 = bodies->find(contact->getId2());
+		shared_ptr<Body> b1 = (*bodies)[contact->getId1()];
+		shared_ptr<Body> b2 = (*bodies)[contact->getId2()];
 
-//		if (!(narrowManager.collide(b1->cm,b2->cm,b1->se3,b2->se3,(*itTmp))))
 		if (!(narrowManager.collide( b1->cm , b2->cm , b1->se3 , b2->se3 , contact )))
-		{
-//			cout << "erasing " << contact->getId1() << " " << contact->getId2() << endl;
-			contact = ncb->interactions->eraseCurrent();
-//			contact = ncb->interactions->getCurrent();
-		}
+			ncb->interactions->eraseCurrentAndGotoNext();
 		else
-			contact = ncb->interactions->getNext();
+			ncb->interactions->gotoNext();
 	}
 }
 

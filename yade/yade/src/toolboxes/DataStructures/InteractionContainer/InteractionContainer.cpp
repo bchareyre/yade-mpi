@@ -3,37 +3,36 @@
 
 void InteractionContainer::registerAttributes()
 {
-	REGISTER_ATTRIBUTE(interactionContainer);
+	REGISTER_ATTRIBUTE(interaction);
 };
 
 void InteractionContainer::beforeSerialization()
 {
-	interactionContainer.clear();
-	shared_ptr<Interaction> tmp;
-	for( tmp=this->getFirst() ; this->hasCurrent() ; tmp=this->getNext() )
-		interactionContainer.push_back(tmp);
-	// now interactionContainer is full of data
+	interaction.clear();
+	for( this->gotoFirst() ; this->notAtEnd() ; this->gotoNext() )
+		interaction.push_back(this->getCurrent());
+	// now interaction is full of data
 };
 
 void InteractionContainer::afterSerialization()
 {
-	interactionContainer.clear();
+	interaction.clear();
 	// not anymore.
 };
 
 void InteractionContainer::beforeDeserialization()
 {
 	// make sure that data is ready for deserialization
-	interactionContainer.clear();
+	interaction.clear();
 };
 
 void InteractionContainer::afterDeserialization()
 {
-	// copy interactionContainer into real container
+	// copy interaction into real container
 	this->clear();
-	vector<shared_ptr<Interaction> >::iterator it    = interactionContainer.begin();
-	vector<shared_ptr<Interaction> >::iterator itEnd = interactionContainer.end();
+	vector<shared_ptr<Interaction> >::iterator it    = interaction.begin();
+	vector<shared_ptr<Interaction> >::iterator itEnd = interaction.end();
 	for( ; it != itEnd ; ++it)
 		this->insert(*it);
-	interactionContainer.clear();
+	interaction.clear();
 };

@@ -22,14 +22,19 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "Body.hpp"
-#include "InteractionVecSet.hpp"
+#include "InteractionHashMap2.hpp"
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+// we must initialize id = 0, otherwise BodyContainer will crash.
 // FIXME - where to create interactions? here, or maybe somewhere else - who decides which type to use by default?
-Body::Body () : Serializable() , interactions(new InteractionVecSet)
+Body::Body () : Serializable() , id(0) , interactions(new InteractionHashMap2)
+{
+}
+
+Body::Body (unsigned int newId) : Serializable() , id(newId) , interactions(new InteractionHashMap2)
 {
 }
 
@@ -54,6 +59,7 @@ void Body::afterDeserialization()
 
 void Body::registerAttributes()
 {
+	REGISTER_ATTRIBUTE(id);
 	REGISTER_ATTRIBUTE(isDynamic); // FIXME : only used for collision : no collision between 2 non dynamic objects
 	REGISTER_ATTRIBUTE(velocity);
 	REGISTER_ATTRIBUTE(angularVelocity);

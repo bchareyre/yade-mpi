@@ -7,11 +7,11 @@
 #include "Math.hpp"
 
 #include "NonConnexBody.hpp"
-#include "InteractionVecSet.hpp"
+#include "InteractionHashMap2.hpp"
 #include "BodyAssocVec.hpp"
 
 // FIXME - who is to decide which class to use by default?
-NonConnexBody::NonConnexBody() : Body() , bodies(new BodyAssocVec) , permanentInteractions(new InteractionVecSet)
+NonConnexBody::NonConnexBody() : Body() , bodies(new BodyAssocVec) , permanentInteractions(new InteractionHashMap2)
 {
 }
 
@@ -24,9 +24,6 @@ NonConnexBody::~NonConnexBody()
 void NonConnexBody::glDraw()
 {
 
-//	std::vector<shared_ptr<Body> >::iterator bi = bodies.begin();
-//	std::vector<shared_ptr<Body> >::iterator biEnd = bodies.end();
-
 	glPushMatrix();
 
 	float angle;
@@ -38,9 +35,8 @@ void NonConnexBody::glDraw()
 
 	glDisable(GL_LIGHTING);
 
-	shared_ptr<Body> b;
-	for( b = bodies->getFirst() ; bodies->hasCurrent() ; b = bodies->getNext() )
-		b->glDraw();
+	for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext() )
+		bodies->getCurrent()->glDraw();
 
 	glPopMatrix();
 
@@ -64,13 +60,8 @@ void NonConnexBody::registerAttributes()
 
 void NonConnexBody::updateBoundingVolume(Se3r& se3)
 {
-	shared_ptr<Body> b;
-	for( b = bodies->getFirst() ; bodies->hasCurrent() ; b = bodies->getNext() )
-		b->updateBoundingVolume(se3);
-
-//	for(unsigned int i=0;i<bodies->size();i++)
-//		bodies[i]->updateBoundingVolume(se3);
-
+	for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext() )
+		bodies->getCurrent()->updateBoundingVolume(se3);
 }
 
 void NonConnexBody::updateCollisionGeometry(Se3r& )
@@ -102,13 +93,12 @@ void NonConnexBody::moveToNextTimeStep()
 	//if (kinematic!=0)
 	//	kinematic->moveToNextTimeStep(bodies);
 
+//	shared_ptr<Body> b;
+//	for( b = bodies->getFirst() ; bodies->hasCurrent() ; b = bodies->getNext() )
+//		b->moveToNextTimeStep();
+
 	// FIXME : do we need to walk through the tree of objects in a different way than below  (recursively in NCB... ) ??
-	shared_ptr<Body> b;
-	for( b = bodies->getFirst() ; bodies->hasCurrent() ; b = bodies->getNext() )
-		b->moveToNextTimeStep();
-
-//	for(unsigned int i=0;i<bodies.size();i++)
-//		bodies[i]->moveToNextTimeStep();
-
+	for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext() )
+		bodies->getCurrent()->moveToNextTimeStep();
 
 }

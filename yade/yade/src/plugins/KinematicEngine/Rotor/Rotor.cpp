@@ -43,7 +43,7 @@ void Rotor::moveToNextTimeStep(Body * body)
 
 	for(;ii!=iiEnd;++ii)
 	{
-		shared_ptr<Body>  b = bodies->find(*ii);
+		shared_ptr<Body>  b = (*bodies)[*ii];
 
 		//b->se3.translation += dp;
 

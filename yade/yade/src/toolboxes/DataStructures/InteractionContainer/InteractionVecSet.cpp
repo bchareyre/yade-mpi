@@ -1,3 +1,5 @@
+/*
+
 #include "InteractionVecSet.hpp"
 #include <iostream>
 
@@ -78,6 +80,13 @@ bool InteractionVecSet::find(unsigned int id1,unsigned int id2,shared_ptr<Intera
 }
 
 // FIXME : this has to be really efficient
+
+
+//	public	: virtual void gotoFirst();
+//	public	: virtual bool notAtEnd();
+//	public	: virtual void gotoNext();
+//	public	: virtual shared_ptr<Interaction> getCurrent();
+
 
 shared_ptr<Interaction> InteractionVecSet::getFirst()
 {
@@ -164,3 +173,6 @@ unsigned int InteractionVecSet::size()
 {
 	return currentSize;
 }
+
+
+*/

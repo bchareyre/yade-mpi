@@ -43,7 +43,7 @@ void Translator::moveToNextTimeStep(Body * body)
 
 	for(;ii!=iiEnd;++ii)
 	{
-		shared_ptr<Body>  b = bodies->find(*ii);
+		shared_ptr<Body>  b = (*bodies)[*ii];
 
 		// FIXME - specify intervals of activity for an actor
 		//if( Omega::instance().getIter() > 1000 )

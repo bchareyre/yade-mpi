@@ -40,11 +40,18 @@ class InteractionHashMap2 : public InteractionContainer
 	public : virtual void clear();
 	public : virtual bool erase(unsigned int id1,unsigned int id2);
 	public : virtual bool find(unsigned int id1,unsigned int id2,shared_ptr<Interaction>& i);
-	public : virtual shared_ptr<Interaction> getFirst();
-	public : virtual bool hasCurrent();
-	public : virtual shared_ptr<Interaction> eraseCurrent();
-	public : virtual shared_ptr<Interaction> getNext();
-	public : virtual shared_ptr<Interaction> getCurrent();
+
+	public	: virtual void gotoFirst();
+	public	: virtual bool notAtEnd();
+	public	: virtual void gotoNext();
+	public	: virtual shared_ptr<Interaction> getCurrent();
+
+//	public : virtual shared_ptr<Interaction> getFirst();
+//	public : virtual bool hasCurrent();
+//	public : virtual shared_ptr<Interaction> getNext();
+
+	public : virtual void eraseCurrentAndGotoNext();
+
 	public : virtual unsigned int size();
 
 	REGISTER_CLASS_NAME(InteractionHashMap2);

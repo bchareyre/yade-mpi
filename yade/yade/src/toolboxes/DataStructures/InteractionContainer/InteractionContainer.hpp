@@ -9,7 +9,7 @@ using namespace boost;
 
 class InteractionContainer : public Serializable
 {
-	public    : InteractionContainer() { interactionContainer.clear(); };
+	public    : InteractionContainer() { interaction.clear(); };
 	public    : virtual ~InteractionContainer() {};
 
 	public    : virtual bool insert(shared_ptr<Interaction>&)						{throw;};
@@ -21,19 +21,24 @@ class InteractionContainer : public Serializable
 	//public  : virtual bool find(vector<unsigned int> ids,shared_ptr<Interaction>& i) = 0;
 
 	// looping over the data
-	public    : virtual shared_ptr<Interaction> getFirst() 							{throw;};
-	public    : virtual bool hasCurrent() 									{throw;};
-	public    : virtual shared_ptr<Interaction> getNext() 							{throw;};
-	public    : virtual shared_ptr<Interaction> getCurrent() 						{throw;};
-	// deletes currently pointed element, and returns the next one.
-	public    : virtual shared_ptr<Interaction> eraseCurrent() 						{throw;};
+	public    : virtual void gotoFirst() 									{throw;};
+	public    : virtual bool notAtEnd() 									{throw;};
+	public    : virtual void gotoNext() 									{throw;};
+ 	public    : virtual shared_ptr<Interaction> getCurrent() 						{throw;};
+
+//	public    : virtual shared_ptr<Interaction> getFirst() 							{throw;};
+// 	public    : virtual bool hasCurrent() 									{throw;};
+// 	public    : virtual shared_ptr<Interaction> getNext() 							{throw;};
+
+	// deletes currently pointed element, and goes to the next one.
+	public    : virtual void eraseCurrentAndGotoNext() 							{throw;};
 	public    : virtual unsigned int size() 								{throw;};
 
 
 	// serialization of this class...
 	REGISTER_CLASS_NAME(InteractionContainer);
 
-	private   : vector<shared_ptr<Interaction> > interactionContainer;
+	private   : vector<shared_ptr<Interaction> > interaction;
 	public    : virtual void registerAttributes();
 
 	protected : virtual void beforeSerialization();

@@ -60,7 +60,9 @@ class Body : public Serializable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Attributes											///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-
+	private	: unsigned int id;
+	public	: unsigned int getId() {return id;};
+	friend class BodyContainer; // only BodyContainer can set the id of a body
 
 	public : vector<shared_ptr<Actor> > actors;
 
@@ -100,6 +102,7 @@ class Body : public Serializable
 
 	/*! Constructor */
 	public : Body ();
+	public : Body (unsigned int newId);
 
 	/*! Destructor */
 	public : virtual ~Body ();

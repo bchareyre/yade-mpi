@@ -1,3 +1,5 @@
+
+/*
 #include "InteractionHashMap.hpp"
 
 InteractionHashMap::InteractionHashMap()
@@ -84,16 +86,16 @@ shared_ptr<Interaction> InteractionHashMap::getCurrent()
 
 // FIXME - faster, but is correct ??
 
-/*void InteractionHashMap::eraseCurrent()
-{
-	if(hasCurrent())
-	{
-		IHashMap::iterator tmpHmii=hmii;
-		++hmii;
-		interactions.erase(tmpHmii);
-	}
-}
-*/
+// void InteractionHashMap::eraseCurrent()
+// {
+// 	if(hasCurrent())
+// 	{
+// 		IHashMap::iterator tmpHmii=hmii;
+// 		++hmii;
+// 		interactions.erase(tmpHmii);
+// 	}
+// }
+
 
 shared_ptr<Interaction> InteractionHashMap::eraseCurrent()
 {
@@ -127,3 +129,4 @@ unsigned int InteractionHashMap::size()
 {
 	return interactions.size();
 }
+*/

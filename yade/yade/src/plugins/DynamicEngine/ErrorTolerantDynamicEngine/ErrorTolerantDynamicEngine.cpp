@@ -81,14 +81,16 @@ void ErrorTolerantDynamicEngine::respondToCollisions(Body* body)
 	{
 		// Build inverse of masses matrix and store it into a vector
 		ublas::banded_matrix<float> invM(6*bodies->size(),6*bodies->size(),1,1);
-//		for(unsigned int i=0;i<bodies->size();i++)
 
 
-		// FIXME - this loop assumes that id's of all bodies start from zero and increment by one?
 		shared_ptr<Body> b;
 		unsigned int i=0;
-		for( b = bodies->getFirst() ; bodies->hasCurrent() ; b = bodies->getNext() , ++i )
+// FIXME - this loop assumes that id's of all bodies start from zero and increment by one?
+//		for(unsigned int i=0;i<bodies->size();i++)
+		for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext() , ++i )
 		{
+			b = bodies->getCurrent();
+
 			int offset = 6*i;
 			shared_ptr<RigidBody> rb = dynamic_pointer_cast<RigidBody>(b);
 			invM(offset,offset++) = rb->invMass;
@@ -113,15 +115,16 @@ void ErrorTolerantDynamicEngine::respondToCollisions(Body* body)
 		Vector3r o1p1CrossN,o2p2CrossN;
 		int id1,id2,offset1,offset2;
 
-//		list<shared_ptr<Interaction> >::const_iterator cti = ncb->interactions.begin();
-//		list<shared_ptr<Interaction> >::const_iterator ctiEnd = ncb->interactions.end();
-//		for(int i=0 ; cti!=ctiEnd ; ++cti,i++)
 
 		shared_ptr<Interaction> contact;
 		i=0;
-		for( contact=ncb->interactions->getFirst() ; ncb->interactions->hasCurrent() ; contact = ncb->interactions->getNext() , i++ )
+//		list<shared_ptr<Interaction> >::const_iterator cti = ncb->interactions.begin();
+//		list<shared_ptr<Interaction> >::const_iterator ctiEnd = ncb->interactions.end();
+//		for(int i=0 ; cti!=ctiEnd ; ++cti,i++)
+		for( ncb->interactions->gotoFirst() ; ncb->interactions->notAtEnd() ; ncb->interactions->gotoNext() )
 		{
-//			shared_ptr<Interaction> contact = (*cti);
+			contact = ncb->interactions->getCurrent();
+
 			shared_ptr<ErrorTolerantContactModel> cm = dynamic_pointer_cast<ErrorTolerantContactModel>(contact->interactionGeometry);
 
 			id1 		= contact->getId1();
@@ -166,7 +169,7 @@ void ErrorTolerantDynamicEngine::respondToCollisions(Body* body)
 
 			penetrationDepthes[i] = (cm->closestPoints[0].first-cm->closestPoints[0].second).length();
 
-			penetrationVelocities[i] = ( (bodies->find(id1)->velocity+o1p1.cross(bodies->find(id1)->angularVelocity)) - (bodies->find(id2)->velocity+o2p2.cross(bodies->find(id2)->angularVelocity)) ).dot(n);
+			penetrationVelocities[i] = ( ((*bodies)[id1]->velocity+o1p1.cross((*bodies)[id1]->angularVelocity)) - ((*bodies)[id2]->velocity+o2p2.cross((*bodies)[id2]->angularVelocity)) ).dot(n);
 
 		}
 
@@ -181,12 +184,15 @@ void ErrorTolerantDynamicEngine::respondToCollisions(Body* body)
 	}
 
 
-	// FIXME - this loop assumes that id's of all bodies start from zero and increment by one?
-//	for(unsigned int i=0; i < bodies->size(); i++)
 	shared_ptr<Body> b;
 	unsigned int i=0;
-	for( b = bodies->getFirst() ; bodies->hasCurrent() ; b = bodies->getNext() , ++i )
-        {
+// FIXME - this loop assumes that id's of all bodies start from zero and increment by one?
+//	for(unsigned int i=0; i < bodies->size(); i++)
+	for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext() , ++i )
+	{
+		b = bodies->getCurrent();
+
+
 		shared_ptr<RigidBody> rb = dynamic_pointer_cast<RigidBody>(b);
 		if (rb)
 		{

@@ -51,50 +51,51 @@ bool InteractionHashMap2::find(unsigned int id1,unsigned int id2,shared_ptr<Inte
 		return false;
 }
 
- shared_ptr<Interaction>InteractionHashMap2::getFirst()
+void InteractionHashMap2::gotoFirst()
 {
 	hmii    = interactions.begin();
 	hmiiEnd = interactions.end();
-	if(hmii == hmiiEnd)
-		return shared_ptr<Interaction>();
-	else
-		return (*hmii).second;
+//	if(hmii == hmiiEnd)
+//		return shared_ptr<Interaction>();
+//	else
+//		return (*hmii).second;
 }
 
-bool InteractionHashMap2::hasCurrent()
+bool InteractionHashMap2::notAtEnd()
 {
 	return ( hmii != hmiiEnd );
 }
 
-shared_ptr<Interaction> InteractionHashMap2::getNext()
+void InteractionHashMap2::gotoNext()
 {
-	if(hasCurrent() && ++hmii != hmiiEnd)
-		return (*hmii).second;
-	else
-		return shared_ptr<Interaction>();
+	++hmii;
+//	if(hasCurrent() && ++hmii != hmiiEnd)
+//		return (*hmii).second;
+//	else
+//		return shared_ptr<Interaction>();
 }
 
 shared_ptr<Interaction> InteractionHashMap2::getCurrent()
 {
-	if(hasCurrent())
+//	if(hasCurrent())
 		return (*hmii).second;
-	else
-		return shared_ptr<Interaction>();
+//	else
+//		return shared_ptr<Interaction>();
 }
 
 
 // FIXME - is it absolutely correct ??
-shared_ptr<Interaction> InteractionHashMap2::eraseCurrent()
+void InteractionHashMap2::eraseCurrentAndGotoNext()
 {
-	if(hasCurrent())
+	if(notAtEnd())
 	{
 		IHashMap::iterator tmpHmii=hmii;
 		++hmii;
 		interactions.erase(tmpHmii);
-		return getCurrent();
+////////		return getCurrent();
 	}
-	else
-		return shared_ptr<Interaction>();
+//	else
+//		return shared_ptr<Interaction>();
 }
 /*
 void InteractionHashMap2::eraseCurrent()

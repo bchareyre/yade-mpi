@@ -1,6 +1,7 @@
 #include "SAPCollider.hpp"
 #include "Body.hpp"
 #include "NonConnexBody.hpp"
+#include "BodyContainer.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -79,8 +80,11 @@ void SAPCollider::broadCollisionTest(Body* body)
 	//for(i=0; i < bodies->size(); i++)
 	shared_ptr<Body> b;
 	i=0;
-	for( b = bodies->getFirst() ; bodies->hasCurrent() ; b = bodies->getNext() , i++ )
+//	for( b = bodies->getFirst() ; bodies->hasCurrent() ; b = bodies->getNext() , i++ )
+	for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext() , ++i )
 	{
+		b = bodies->getCurrent();
+		
 		offset = 3*i;
 		min = b->bv->min;
 		max = b->bv->max;
@@ -123,7 +127,8 @@ void SAPCollider::broadCollisionTest(Body* body)
 		for(;it!=itEnd;++it)
 		{
 			// FIXME - this assumes that bodies are numbered from zero with one number increments, BAD!!!
-			if (!(bodies->find(i)->isDynamic==false && bodies->find(*it)->isDynamic==false))
+//			if (!(bodies->find(i)->isDynamic==false && bodies->find(*it)->isDynamic==false))
+			if (!((*bodies)[i]->isDynamic==false && (*bodies)[*it]->isDynamic==false))
 			{
 				nbPotentialCollisions++;
 				shared_ptr<Interaction> inter(new Interaction(i,*it));

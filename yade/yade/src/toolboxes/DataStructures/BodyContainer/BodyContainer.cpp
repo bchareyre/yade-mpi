@@ -3,38 +3,41 @@
 
 void BodyContainer::registerAttributes()
 {
-	REGISTER_ATTRIBUTE(bodies2);
+	REGISTER_ATTRIBUTE(body);
 };
 
 void BodyContainer::beforeSerialization()
 {
-	bodies2.clear();
-	shared_ptr<Body> tmp;
-	for( tmp=this->getFirst() ; this->hasCurrent() ; tmp=this->getNext() )
-		bodies2.push_back(tmp);
-	// now bodies2 is full of bodies2
+	body.clear();
+	for( this->gotoFirst() ; this->notAtEnd() ; this->gotoNext() )
+		body.push_back(this->getCurrent());
+	// now body is full of bodies
 };
 
 void BodyContainer::afterSerialization()
 {
-	bodies2.clear();
+	body.clear();
 	// not anymore.
 };
 
 void BodyContainer::beforeDeserialization()
 {
-	// make sure that bodies2 is ready for deserialization
-	bodies2.clear();
+	// make sure that body is ready for deserialization
+	body.clear();
 };
 
 void BodyContainer::afterDeserialization()
 {
-	// copy bodies2 into real container
+	// copy body into real container
 	this->clear();
-	vector<shared_ptr<Body> >::iterator it    = bodies2.begin();
-	vector<shared_ptr<Body> >::iterator itEnd = bodies2.end();
+	vector<shared_ptr<Body> >::iterator it    = body.begin();
+	vector<shared_ptr<Body> >::iterator itEnd = body.end();
 	for( ; it != itEnd ; ++it)
 		this->insert(*it);
-	bodies2.clear();
+	body.clear();
 };
 
+void BodyContainer::setId(shared_ptr<Body>& b, unsigned int newId)
+{
+	b->id = newId;
+}

@@ -45,14 +45,15 @@ void SimpleSpringDynamicEngine::respondToCollisions(Body * body)
 	fill(forces.begin(),forces.end(),Vector3r(0,0,0));
 	fill(couples.begin(),couples.end(),Vector3r(0,0,0));
 
-//	std::list<shared_ptr<Interaction> >::const_iterator cti = ncb->interactions.begin();
-//	std::list<shared_ptr<Interaction> >::const_iterator ctiEnd = ncb->interactions.end();
-//	for( ; cti!=ctiEnd ; ++cti)
 	shared_ptr<Interaction> contact;
-	for( contact = ncb->interactions->getFirst() ; ncb->interactions->hasCurrent() ; contact = ncb->interactions->getNext() )
+//	for( ; cti!=ctiEnd ; ++cti)
+	for( ncb->interactions->gotoFirst() ; ncb->interactions->notAtEnd() ; ncb->interactions->gotoNext() )
 	{
-		shared_ptr<RigidBody> rb1 = dynamic_pointer_cast<RigidBody>(bodies->find(contact->getId1()));
-		shared_ptr<RigidBody> rb2 = dynamic_pointer_cast<RigidBody>(bodies->find(contact->getId2()));
+		contact = ncb->interactions->getCurrent();
+
+
+		shared_ptr<RigidBody> rb1 = dynamic_pointer_cast<RigidBody>((*bodies)[contact->getId1()]);
+		shared_ptr<RigidBody> rb2 = dynamic_pointer_cast<RigidBody>((*bodies)[contact->getId2()]);
 
 		std::vector<std::pair<Vector3r,Vector3r> >::iterator cpi = (dynamic_pointer_cast<ClosestFeatures>(contact->interactionGeometry))->closestsPoints.begin();
 		std::vector<std::pair<Vector3r,Vector3r> >::iterator cpiEnd = (dynamic_pointer_cast<ClosestFeatures>(contact->interactionGeometry))->closestsPoints.end();
@@ -90,8 +91,10 @@ void SimpleSpringDynamicEngine::respondToCollisions(Body * body)
 //	for(unsigned int i=0; i < bodies.size(); i++)
 	shared_ptr<Body> b;
 	unsigned int i=0;
-	for( b = bodies->getFirst() ; bodies->hasCurrent() ; b = bodies->getNext() , ++i )
-        {
+	for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext() , ++i )
+	{
+		b = bodies->getCurrent();
+
 		shared_ptr<RigidBody> rb = dynamic_pointer_cast<RigidBody>(b);
 
 		if (rb)
@@ -99,8 +102,6 @@ void SimpleSpringDynamicEngine::respondToCollisions(Body * body)
 			// FIXME - this assumes that bodies are numbered from zero with one number increments, BAD!!!
 			rb->acceleration += forces[i]*rb->invMass;
 			rb->angularAcceleration += couples[i].multDiag(rb->invInertia);
-			//if (i==35)
-			//	cerr << rb->acceleration << "||" << rb->angularAcceleration << endl;
 		}
         }
 

@@ -133,24 +133,42 @@ void SDECLinkedSpheres::generate()
 
 // FIXME !!!!!!!!!!!! - nested loop is currently impossible, with BodyContainer !!!!
 
-/*
+
 	shared_ptr<Body> bodyA;
-	for( unsigned int idA=0 , bodyA = bodies->getFirst() ; bodies->hasCurrent() ; bodyA = bodies->getNext() , ++idA )
+//	unsigned int idA=0;
+	for( rootBody->bodies->gotoFirst() ; rootBody->bodies->notAtEnd() ; rootBody->bodies->gotoNext() )
 	{
-		vector<shared_ptr<Body> >::iterator bit    = ait;
-		++bit;
-		vector<shared_ptr<Body> >::iterator bitEnd = (rootBody->bodies).end();
-		for( int idB=idA+1 ; bit < bitEnd ; ++bit , ++idB )
+		bodyA = rootBody->bodies->getCurrent();
+
+//		vector<shared_ptr<Body> >::iterator bit    = ait;
+//		++bit;
+//		vector<shared_ptr<Body> >::iterator bitEnd = (rootBody->bodies).end();
+
+		rootBody->bodies->pushIterator();
+
+//		unsigned int idB=idA+1;
+		rootBody->bodies->gotoNext();
+//		for( ; bit < bitEnd ; ++bit , ++idB )
+		for( ; rootBody->bodies->notAtEnd() ; rootBody->bodies->gotoNext() )
 		{
-			shared_ptr<SDECDiscreteElement> a = dynamic_pointer_cast<SDECDiscreteElement>(*ait);
-			shared_ptr<SDECDiscreteElement> b = dynamic_pointer_cast<SDECDiscreteElement>(*bit);
+			shared_ptr<Body> bodyB;
+			bodyB = rootBody->bodies->getCurrent();
+
+			shared_ptr<SDECDiscreteElement> a = dynamic_pointer_cast<SDECDiscreteElement>(bodyA);
+			shared_ptr<SDECDiscreteElement> b = dynamic_pointer_cast<SDECDiscreteElement>(bodyB);
 			shared_ptr<Sphere>             as = dynamic_pointer_cast<Sphere>(a->cm);
 			shared_ptr<Sphere>             bs = dynamic_pointer_cast<Sphere>(a->cm);
 
-			if( a && b && as && bs &&
-			( (a->se3.translation - b->se3.translation).length() < (as->radius + bs->radius) ) )
+			if(
+				a &&
+				b &&
+				as &&
+				bs &&
+				( (a->se3.translation - b->se3.translation).length() < (as->radius + bs->radius) )
+			)
+
 			{
-				shared_ptr<Interaction> 	c(new Interaction(idA,idB));
+				shared_ptr<Interaction> 	c(new Interaction( a->getId() , b->getId() ));
 				shared_ptr<SDECPermanentLink>	link(new SDECPermanentLink);
 
 				link->initialKn			= 500000;
@@ -168,9 +186,11 @@ void SDECLinkedSpheres::generate()
 				rootBody->permanentInteractions->insert(c);
 			}
 		}
+
+		rootBody->bodies->popIterator();
 	}
 	cout << "total number of permament links created: " << rootBody->permanentInteractions->size() << endl;
-*/
+
 
 	IOManager::saveToFile("XMLManager", "../data/SDECLinkedSpheres.xml", "rootBody", rootBody);
 }

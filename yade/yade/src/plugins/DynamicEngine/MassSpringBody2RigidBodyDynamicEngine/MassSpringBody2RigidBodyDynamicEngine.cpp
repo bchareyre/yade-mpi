@@ -29,18 +29,18 @@ void MassSpringBody2RigidBodyDynamicEngine::registerAttributes()
 void MassSpringBody2RigidBodyDynamicEngine::respondToCollisions(Body * body)
 {
 	NonConnexBody * ncb = dynamic_cast<NonConnexBody*>(body);
-//	std::list<shared_ptr<Interaction> > tmpI;
-//	list<shared_ptr<Interaction> >::const_iterator ii = ncb->interactions.begin();
-//	list<shared_ptr<Interaction> >::const_iterator iiEnd = ncb->interactions.end();
 	shared_ptr<Interaction> ct;
 
 //	for( ; ii!=iiEnd ; ++ii)
-	for( ct = ncb->interactions->getFirst() ; ncb->interactions->hasCurrent() ; ct = ncb->interactions->getNext() )
+	for( ncb->interactions->gotoFirst() ; ncb->interactions->notAtEnd() ; ncb->interactions->gotoNext() )
 	{
+		ct = ncb->interactions->getCurrent();
+
+
 		shared_ptr<ClosestFeatures> cf = dynamic_pointer_cast<ClosestFeatures>(ct->interactionGeometry);
 		//FIXME : this is a hack because we don't know if id1 is the sphere or piece of massSpring
- 		shared_ptr<MassSpringBody> c = dynamic_pointer_cast<MassSpringBody>(ncb->bodies->find(ct->getId1()));
-		shared_ptr<RigidBody> rb = dynamic_pointer_cast<RigidBody>(ncb->bodies->find(ct->getId2()));
+ 		shared_ptr<MassSpringBody> c = dynamic_pointer_cast<MassSpringBody>( (*(ncb->bodies))[ct->getId1()] );
+		shared_ptr<RigidBody> rb = dynamic_pointer_cast<RigidBody>( (*(ncb->bodies))[ct->getId2()] );
 		shared_ptr<Mesh2D> mesh;
 		if (c)
 		{
