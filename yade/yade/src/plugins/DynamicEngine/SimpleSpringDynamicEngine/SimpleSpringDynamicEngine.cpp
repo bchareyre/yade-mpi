@@ -45,11 +45,12 @@ void SimpleSpringDynamicEngine::respondToCollisions(Body * body)
 	fill(forces.begin(),forces.end(),Vector3r(0,0,0));
 	fill(couples.begin(),couples.end(),Vector3r(0,0,0));
 
-	std::list<shared_ptr<Interaction> >::const_iterator cti = ncb->interactions.begin();
-	std::list<shared_ptr<Interaction> >::const_iterator ctiEnd = ncb->interactions.end();
-	for( ; cti!=ctiEnd ; ++cti)
+//	std::list<shared_ptr<Interaction> >::const_iterator cti = ncb->interactions.begin();
+//	std::list<shared_ptr<Interaction> >::const_iterator ctiEnd = ncb->interactions.end();
+//	for( ; cti!=ctiEnd ; ++cti)
+	shared_ptr<Interaction> contact;
+	for( contact = ncb->interactions->getFirst() ; ncb->interactions->hasCurrent() ; contact = ncb->interactions->getNext() )
 	{
-		shared_ptr<Interaction> contact = (*cti);
 		shared_ptr<RigidBody> rb1 = dynamic_pointer_cast<RigidBody>(bodies[contact->getId1()]);
 		shared_ptr<RigidBody> rb2 = dynamic_pointer_cast<RigidBody>(bodies[contact->getId2()]);
 

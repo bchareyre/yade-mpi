@@ -3,6 +3,16 @@
 # Subdir relative project main directory: ./toolboxes/DataStructures/InteractionContainer
 # Target is a library:  
 
+LIBS += -rdynamic 
+INCLUDEPATH = $(YADEINCLUDEPATH) 
+MOC_DIR = $(YADECOMPILATIONPATH) 
+UI_DIR = $(YADECOMPILATIONPATH) 
+OBJECTS_DIR = $(YADECOMPILATIONPATH) 
+DESTDIR = $(YADEDYNLIBPATH) 
+CONFIG += debug \
+          warn_on \
+          dll 
+TEMPLATE = lib 
 HEADERS += InteractionContainer.hpp \
            InteractionHashMap.hpp \
            InteractionHashMap2.hpp \
@@ -11,11 +21,3 @@ SOURCES += InteractionContainer.cpp \
            InteractionHashMap.cpp \
            InteractionHashMap2.cpp \
            InteractionVecSet.cpp 
-MOC_DIR = $(YADECOMPILATIONPATH)
-UI_DIR = $(YADECOMPILATIONPATH)
-OBJECTS_DIR = $(YADECOMPILATIONPATH)
-DESTDIR = $(YADEDYNLIBPATH)
-CONFIG += debug \
-warn_on \
-staticlib
-TEMPLATE = lib

@@ -109,7 +109,7 @@ void SAPCollider::broadCollisionTest(Body* body)
 	}*/
 
 // FIXME : correct that
-	ncb->interactions.clear();
+	ncb->interactions->clear();
 
 	nbPotentialCollisions = 0;
 	for(i=0;i<nbObjects;i++)
@@ -121,7 +121,8 @@ void SAPCollider::broadCollisionTest(Body* body)
 			if (!(bodies[i]->isDynamic==false && bodies[*it]->isDynamic==false))
 			{
 				nbPotentialCollisions++;
-				ncb->interactions.push_back(shared_ptr<Interaction>(new Interaction(i,*it)));
+				shared_ptr<Interaction> inter(new Interaction(i,*it));
+				ncb->interactions->insert(inter);
 			}
 		}
 	}

@@ -36,8 +36,8 @@
 #include "GeometricalModel.hpp"
 #include "CollisionGeometry.hpp"
 #include "BoundingVolume.hpp"
+#include "InteractionContainer.hpp"
 #include "Interaction.hpp"
-#include "list"
 #include "Serializable.hpp"
 #include "Indexable.hpp"
 #include "Actor.hpp"
@@ -61,11 +61,12 @@ class Body : public Serializable
 /// Attributes											///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-	
+
 	public : vector<shared_ptr<Actor> > actors;
 
-	// FIXME : to put into nonconnex body ??? but maybe useful for autocollision in connexbody
-	public : list<shared_ptr<Interaction> > interactions;
+	// FIXME : to put into nonconnex body ? but maybe useful for autocollision in connexbody - yes, useful with so generic InteractionContaier, at leas when we will implement multiple interactions....
+	//public : list<shared_ptr<Interaction> > interactions;
+	public	: shared_ptr<InteractionContainer> interactions;
 
 	// FIXME : where to put gm,cm and bv : do body need them or only ConnexBody ??
 	/*! The geometrical model of this body (polyhedron, box ...) */
@@ -108,7 +109,7 @@ class Body : public Serializable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/*! Abstract function overloaded in Connex and NonConnex body. It is called to draw the object in an opengl context */
-	public : virtual void glDraw() {/*throw CallVirtualUndifinedMethod()*/};
+	public : virtual void glDraw() {/*throw CallVirtualUndefinedMethod()*/};
 
 	/*! Abstract function overloaded in Connex and NonConnex body. It is called to update the bounding volume of the object in generel at the end of each time step */
 	public : virtual void updateBoundingVolume(Se3r& ) {};

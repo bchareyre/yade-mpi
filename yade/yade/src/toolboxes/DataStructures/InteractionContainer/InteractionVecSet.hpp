@@ -38,6 +38,7 @@ class InteractionVecSet : public InteractionContainer
 	public : bool find(unsigned int id1,unsigned int id2,shared_ptr<Interaction>& i);
 	public : shared_ptr<Interaction> getFirst();
 	public : bool hasCurrent();
+	public : void eraseCurrent();
 	public : shared_ptr<Interaction> getNext();
 	public : shared_ptr<Interaction> getCurrent();
 	public : unsigned int size();

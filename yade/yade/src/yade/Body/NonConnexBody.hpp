@@ -43,9 +43,9 @@ class NonConnexBody : public Body
 	//public : shared_ptr<BroadCollider> broadCollider;
 	//public : shared_ptr<KinematicEngine> kinematic;
 
-	public : vector<shared_ptr<Interaction> > permanentInteractions;
+	//public : vector<shared_ptr<Interaction> > permanentInteractions;
+	public	: shared_ptr<InteractionContainer> permanentInteractions;
 
-	
 	// construction
 	public : NonConnexBody ();
 

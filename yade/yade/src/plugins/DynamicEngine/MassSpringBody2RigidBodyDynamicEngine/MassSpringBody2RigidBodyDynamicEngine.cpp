@@ -29,13 +29,14 @@ void MassSpringBody2RigidBodyDynamicEngine::registerAttributes()
 void MassSpringBody2RigidBodyDynamicEngine::respondToCollisions(Body * body)
 {
 	NonConnexBody * ncb = dynamic_cast<NonConnexBody*>(body);
-	std::list<shared_ptr<Interaction> > tmpI;
-	list<shared_ptr<Interaction> >::const_iterator ii = ncb->interactions.begin();
-	list<shared_ptr<Interaction> >::const_iterator iiEnd = ncb->interactions.end();
+//	std::list<shared_ptr<Interaction> > tmpI;
+//	list<shared_ptr<Interaction> >::const_iterator ii = ncb->interactions.begin();
+//	list<shared_ptr<Interaction> >::const_iterator iiEnd = ncb->interactions.end();
+	shared_ptr<Interaction> ct;
 
-	for( ; ii!=iiEnd ; ++ii)
+//	for( ; ii!=iiEnd ; ++ii)
+	for( ct = ncb->interactions->getFirst() ; ncb->interactions->hasCurrent() ; ct = ncb->interactions->getNext() )
 	{
-		shared_ptr<Interaction> ct = (*ii);
 		shared_ptr<ClosestFeatures> cf = dynamic_pointer_cast<ClosestFeatures>(ct->interactionGeometry);
 		//FIXME : this is a hack because we don't know if id1 is the sphere or piece of massSpring
  		shared_ptr<MassSpringBody> c = dynamic_pointer_cast<MassSpringBody>(ncb->bodies[ct->getId1()]);
@@ -61,8 +62,9 @@ void MassSpringBody2RigidBodyDynamicEngine::respondToCollisions(Body * body)
 				c->externalForces.push_back(pair<int,Vector3r>(mesh->faces[cf->verticesId[i]][2],f));
 			}
 		}
-		else //if (cf->verticesId.size()==0)
-			tmpI.push_back(*ii);
+	////////////// commented this because it hacks too much stuff...
+	///	else //if (cf->verticesId.size()==0)
+	///		tmpI.push_back(*ii);
 	}
 
 	shared_ptr<DynamicEngine> de = dynamic_pointer_cast<DynamicEngine>(ClassFactory::instance().createShared("SimpleSpringDynamicEngine"));

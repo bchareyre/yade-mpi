@@ -145,6 +145,17 @@ shared_ptr<Interaction> InteractionVecSet::getCurrent()
 		return shared_ptr<Interaction>();
 }
 
+// FIXME - make sure that everything in this file is fast and has no mistakes!
+void InteractionVecSet::eraseCurrent()
+{
+	if(hasCurrent())
+	{
+		vector<set<pair<unsigned int,shared_ptr<Interaction> >,lessThanPair > >::iterator tmpVii = vii;
+		set<pair<unsigned int,shared_ptr<Interaction> >,lessThanPair >::iterator tmpSii          = sii;
+		getNext();
+		(*tmpVii).erase(tmpSii);
+	}
+}
 
 unsigned int InteractionVecSet::size()
 {

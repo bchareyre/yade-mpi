@@ -77,7 +77,7 @@ void ErrorTolerantDynamicEngine::respondToCollisions(Body* body)
 	NonConnexBody * ncb = dynamic_cast<NonConnexBody*>(body);
 	vector<shared_ptr<Body> >& bodies = ncb->bodies;
 
-	if (ncb->interactions.size()>0)
+	if (ncb->interactions->size() > 0)
 	{
 		// Build inverse of masses matrix and store it into a vector
 		ublas::banded_matrix<float> invM(6*bodies.size(),6*bodies.size(),1,1);
@@ -94,8 +94,8 @@ void ErrorTolerantDynamicEngine::respondToCollisions(Body* body)
 		}
 
 		// Build the jacobian and transpose of jacobian
-		ublas::sparse_matrix<float> J (6*bodies.size(), body->interactions.size(), body->interactions.size()*2/*6*bodies.size()*body->interactions.size()*/);
-		ublas::sparse_matrix<float> Jt (body->interactions.size(), 6*bodies.size(), body->interactions.size()*2/*6*bodies.size()*body->interactions.size()*/);
+		ublas::sparse_matrix<float> J (6*bodies.size(), body->interactions->size(), body->interactions->size()*2/*6*bodies.size()*body->interactions.size()*/);
+		ublas::sparse_matrix<float> Jt (body->interactions->size(), 6*bodies.size(), body->interactions->size()*2/*6*bodies.size()*body->interactions.size()*/);
 
 		static ublas::vector<float> penetrationDepthes;
 		static ublas::vector<float> penetrationVelocities;
@@ -107,12 +107,16 @@ void ErrorTolerantDynamicEngine::respondToCollisions(Body* body)
 		Vector3r o1p1CrossN,o2p2CrossN;
 		int id1,id2,offset1,offset2;
 
-		list<shared_ptr<Interaction> >::const_iterator cti = ncb->interactions.begin();
-		list<shared_ptr<Interaction> >::const_iterator ctiEnd = ncb->interactions.end();
-		for(int i=0 ; cti!=ctiEnd ; ++cti,i++)
+//		list<shared_ptr<Interaction> >::const_iterator cti = ncb->interactions.begin();
+//		list<shared_ptr<Interaction> >::const_iterator ctiEnd = ncb->interactions.end();
+//		for(int i=0 ; cti!=ctiEnd ; ++cti,i++)
+
+		shared_ptr<Interaction> contact;
+		int i;
+		for( i=0 , contact=ncb->interactions->getFirst() ; ncb->interactions->hasCurrent() ; contact = ncb->interactions->getNext() , i++ )
 		{
-			shared_ptr<Interaction> contact = (*cti);
-			shared_ptr<ErrorTolerantContactModel> cm = dynamic_pointer_cast<ErrorTolerantContactModel>((*cti)->interactionGeometry);
+//			shared_ptr<Interaction> contact = (*cti);
+			shared_ptr<ErrorTolerantContactModel> cm = dynamic_pointer_cast<ErrorTolerantContactModel>(contact->interactionGeometry);
 
 			id1 		= contact->getId1();
 			id2 		= contact->getId2();

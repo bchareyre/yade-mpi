@@ -12,7 +12,7 @@
 //     suitability of this software for any purpose. It is provided "as is"
 //     without express or implied warranty.
 ////////////////////////////////////////////////////////////////////////////////
-// this is the only file on MIT license in yade. everything else is GPLed
+// this is the only file on MIT license in yade.
 
 #ifndef ASSOCVECTOR_INC_
 #define ASSOCVECTOR_INC_

@@ -99,11 +99,12 @@ void SDECDynamicEngine::filter(Body* body)
 		}
 	}
 
-	list<shared_ptr<Interaction> >::const_iterator cti = ncb->interactions.begin();
-	list<shared_ptr<Interaction> >::const_iterator ctiEnd = ncb->interactions.end();
-	for( ; cti!=ctiEnd ; ++cti)
+//	list<shared_ptr<Interaction> >::const_iterator cti = ncb->interactions.begin();
+//	list<shared_ptr<Interaction> >::const_iterator ctiEnd = ncb->interactions.end();
+	shared_ptr<Interaction> contact;
+//	for( ; cti!=ctiEnd ; ++cti)
+	for( contact = ncb->interactions->getFirst() ; ncb->interactions->hasCurrent() ; contact = ncb->interactions->getNext() )
 	{
-		shared_ptr<Interaction> contact = (*cti);
 
 		int id1 = contact->getId1();
 		int id2 = contact->getId2();
@@ -112,19 +113,19 @@ void SDECDynamicEngine::filter(Body* body)
 			swap(id1,id2);
 
 		bool accessed = false;
-		tuple<int,bool,shared_ptr<InteractionGeometry> > t(id2,accessed,(*cti)->interactionGeometry);
+		tuple<int,bool,shared_ptr<InteractionGeometry> > t(id2 , accessed , contact->interactionGeometry);
 
-		pair<set<tuple<int,bool,shared_ptr<InteractionGeometry> >,lessThanTuple >::iterator,bool> intertionResult;
+		pair<set<tuple<int,bool,shared_ptr<InteractionGeometry> >,lessThanTuple >::iterator,bool> insertionResult;
 
-		intertionResult	= interactionsPerBody[id1].insert(t);
+		insertionResult	= interactionsPerBody[id1].insert(t);
 
-		bool& wasAccessed = const_cast<bool&>(intertionResult.first->get<1>());
+		bool& wasAccessed = const_cast<bool&>(insertionResult.first->get<1>());
 		wasAccessed	= true;
 
 
-		(*cti)->isNew = intertionResult.second;
+		contact->isNew = insertionResult.second;
 
-		shared_ptr<SDECContactModel> scm = dynamic_pointer_cast<SDECContactModel>((*cti)->interactionGeometry);
+		shared_ptr<SDECContactModel> scm = dynamic_pointer_cast<SDECContactModel>( contact->interactionGeometry);
 
 		// here we want to get new geometrical info about contact but we want to remember physical infos from previous time step about it
 		Vector3r cp = scm->contactPoint;
@@ -133,9 +134,9 @@ void SDECDynamicEngine::filter(Body* body)
 		float r1 = scm->radius1;
 		float r2 = scm->radius2;
 
-		(*cti)->interactionGeometry  = intertionResult.first->get<2>();
+		contact->interactionGeometry  = insertionResult.first->get<2>();
 
-		scm = dynamic_pointer_cast<SDECContactModel>((*cti)->interactionGeometry);
+		scm = dynamic_pointer_cast<SDECContactModel>(contact->interactionGeometry);
 		scm->contactPoint= cp;
 		scm->normal=n;
 		scm->penetrationDepth=pd;
@@ -174,15 +175,17 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 /// Permanents Links													///
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	std::vector<shared_ptr<Interaction> >::const_iterator pii = ncb->permanentInteractions.begin();
-	std::vector<shared_ptr<Interaction> >::const_iterator piiEnd = ncb->permanentInteractions.end();
-	for( ; pii!=piiEnd ; ++pii)
+//	std::vector<shared_ptr<Interaction> >::const_iterator pii = ncb->permanentInteractions.begin();
+//	std::vector<shared_ptr<Interaction> >::const_iterator piiEnd = ncb->permanentInteractions.end();
+	shared_ptr<Interaction> contact2;
+//	for( ; pii!=piiEnd ; ++pii)
+	for( contact2 = ncb->permanentInteractions->getFirst() ; ncb->permanentInteractions->hasCurrent() ; contact2 = ncb->permanentInteractions->getNext() )
 	{
 
-		shared_ptr<Interaction> contact = (*pii);
+//		shared_ptr<Interaction> contact = (*pii);
 
-		int id1 = contact->getId1();
-		int id2 = contact->getId2();
+		int id1 = contact2->getId1();
+		int id2 = contact2->getId2();
 
 ////////////////////////////////////////////////////////////
 /// FIXME : those lines are too dirty !			 ///
@@ -201,18 +204,19 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 			tmpId2 = id2;
 		}
 
-		tuple<int,bool,shared_ptr<InteractionGeometry> > t(tmpId2,accessed,(*pii)->interactionGeometry);
+		tuple<int,bool,shared_ptr<InteractionGeometry> > t( tmpId2 , accessed , contact2->interactionGeometry );
 		interactionsPerBody[tmpId1].erase(t);
 
-		std::list<shared_ptr<Interaction> >::iterator cti = ncb->interactions.begin();
-		std::list<shared_ptr<Interaction> >::iterator ctiEnd = ncb->interactions.end();
-		for( ; cti!=ctiEnd ; ++cti)
+//		std::list<shared_ptr<Interaction> >::iterator cti = ncb->interactions.begin();
+//		std::list<shared_ptr<Interaction> >::iterator ctiEnd = ncb->interactions.end();
+//		for( ; cti!=ctiEnd ; ++cti)
+		shared_ptr<Interaction> contact;
+		for( contact = ncb->interactions->getFirst() ; ncb->interactions->hasCurrent() ; contact = ncb->interactions->getNext() )
 		{
-			shared_ptr<Interaction> contact = (*cti);
 			if ((contact->getId1()==id1 && contact->getId2()==id2 ) || (contact->getId1()==id2 && contact->getId2()==id1))
 			{
-				ncb->interactions.erase(cti);
-				cti=ctiEnd;
+				ncb->interactions->eraseCurrent();
+				break;
 			}
 		}
 
@@ -222,7 +226,7 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 
 		shared_ptr<SDECDiscreteElement> de1		= dynamic_pointer_cast<SDECDiscreteElement>(bodies[id1]);
 		shared_ptr<SDECDiscreteElement> de2 		= dynamic_pointer_cast<SDECDiscreteElement>(bodies[id2]);
-		shared_ptr<SDECPermanentLink> currentContact	= dynamic_pointer_cast<SDECPermanentLink>(contact->interactionGeometry);
+		shared_ptr<SDECPermanentLink> currentContact	= dynamic_pointer_cast<SDECPermanentLink>(contact2->interactionGeometry);
 
 		/// FIXME : put these lines into another dynlib
 		currentContact->kn 			= currentContact->initialKn;
@@ -472,12 +476,14 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 
 
 
-	std::list<shared_ptr<Interaction> >::const_iterator cti = ncb->interactions.begin();
-	std::list<shared_ptr<Interaction> >::const_iterator ctiEnd = ncb->interactions.end();
-	for( ; cti!=ctiEnd ; ++cti)
+//	std::list<shared_ptr<Interaction> >::const_iterator cti = ncb->interactions.begin();
+//	std::list<shared_ptr<Interaction> >::const_iterator ctiEnd = ncb->interactions.end();
+//	for( ; cti!=ctiEnd ; ++cti)
+	shared_ptr<Interaction> contact;
+	for( contact = ncb->interactions->getFirst() ; ncb->interactions->hasCurrent() ; contact = ncb->interactions->getNext() )
 	{
 
-		shared_ptr<Interaction> contact = (*cti);
+//		shared_ptr<Interaction> contact = (*cti);
 
 		int id1 = contact->getId1();
 		int id2 = contact->getId2();
@@ -486,7 +492,7 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 		shared_ptr<SDECDiscreteElement> de2 	= dynamic_pointer_cast<SDECDiscreteElement>(bodies[id2]);
 		shared_ptr<SDECContactModel> currentContact = dynamic_pointer_cast<SDECContactModel>(contact->interactionGeometry);
 
-		if ((*cti)->isNew)
+		if ( contact ->isNew)
 		{
 			// FIXME : put these lines into a dynlib - PhysicalCollider
 			currentContact->initialKn			= 2*(de1->kn*de2->kn)/(de1->kn+de2->kn);

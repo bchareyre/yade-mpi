@@ -7,10 +7,12 @@
 #include "Math.hpp"
 
 #include "NonConnexBody.hpp"
+#include "InteractionVecSet.hpp"
 
-NonConnexBody::NonConnexBody() : Body()
+NonConnexBody::NonConnexBody() : Body() , permanentInteractions(new InteractionVecSet)
 {
 }
+
 NonConnexBody::~NonConnexBody()
 {
 

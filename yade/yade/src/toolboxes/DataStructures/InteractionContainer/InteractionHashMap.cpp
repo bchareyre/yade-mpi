@@ -82,6 +82,43 @@ shared_ptr<Interaction> InteractionHashMap::getCurrent()
 		return shared_ptr<Interaction>();
 }
 
+// FIXME - faster, but is correct ??
+
+/*void InteractionHashMap::eraseCurrent()
+{
+	if(hasCurrent())
+	{
+		IHashMap::iterator tmpHmii=hmii;
+		++hmii;
+		interactions.erase(tmpHmii);
+	}
+}
+*/
+
+void InteractionHashMap::eraseCurrent()
+{
+	if(hasCurrent())
+	{
+		IHashMap::iterator tmpHmii = hmii;
+
+		++tmpHmii;
+		if( tmpHmii != interactions.end() )
+		{
+			int id1 = tmpHmii->second -> getId1();
+			int id2 = tmpHmii->second -> getId2();
+
+			interactions.erase(hmii);
+			shared_ptr<Interaction> iiii;
+			find(id1,id2,iiii);
+		}
+		else
+		{
+			interactions.erase(hmii);
+			hmii = interactions.end();
+		}
+	}
+}
+
 unsigned int InteractionHashMap::size()
 {
 	return interactions.size();

@@ -51,7 +51,7 @@ void SDECSpheresPlane::exec()
 	rootBody->actors[1] 		= nc;
 	rootBody->actors[2] 		= shared_ptr<Actor>(new SDECDynamicEngine);
 
-	rootBody->permanentInteractions.clear();
+	rootBody->permanentInteractions->clear();
 //	rootBody->permanentInteractions[0] = shared_ptr<Interaction>(new Interaction);
 //	rootBody->permanentInteractions[0]->interactionGeometry = shared_ptr<SDECPermanentLink>(new SDECPermanentLink);
 

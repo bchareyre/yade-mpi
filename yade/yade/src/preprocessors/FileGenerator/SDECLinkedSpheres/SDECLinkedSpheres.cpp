@@ -49,7 +49,7 @@ void SDECLinkedSpheres::exec()
 	rootBody->actors[1] 		= nc;
 	rootBody->actors[2] 		= shared_ptr<Actor>(new SDECDynamicEngine);
 
-	rootBody->permanentInteractions.resize(0);
+	rootBody->permanentInteractions->clear();
 
 	rootBody->isDynamic		= false;
 	rootBody->velocity		= Vector3r(0,0,0);
@@ -97,7 +97,7 @@ void SDECLinkedSpheres::exec()
 
 		translation 		= Vector3r(i,j,k)*10-Vector3r(nbSpheres/2*10,nbSpheres/2*10-90,nbSpheres/2*10)/*+Vector3r(Mathr::symmetricRandom()*1.3,Mathr::symmetricRandom(),Mathr::symmetricRandom()*1.3)*/;
 		//float radius 		= (Mathr::intervalRandom(4.99,5.2)); // FIXME - this should ba a parameter to dynlib
-		float radius 		= 5;
+		float radius 		= 5.2;
 		shared_ptr<BallisticDynamicEngine> ballistic(new BallisticDynamicEngine);
 		ballistic->damping 	= 1.0;//0.95;
 		s->actors.push_back(ballistic);
@@ -158,11 +158,11 @@ void SDECLinkedSpheres::exec()
 				c->interactionGeometry = link;
 
 				//cout << "adding: " << idA << " " << idB << endl;
-				rootBody->permanentInteractions.push_back(c);
+				rootBody->permanentInteractions->insert(c);
 			}
 		}
 	}
-
+	cout << "total number of permament links created: " << rootBody->permanentInteractions->size() << endl;
 
 
 	IOManager::saveToFile("XMLManager", "../data/SDECLinkedSpheres.xml", "rootBody", rootBody);
