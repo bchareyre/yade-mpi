@@ -10,7 +10,7 @@
 			<actors _className_="SDECDynamicEngine"  />
 			<actors _className_="Translator" velocity="-5" translationAxis="{1 0 0}" subscribedBodies="[65]" />
 		</actors>
-		<permanentInteractions _className_="InteractionHashMap" >
+		<permanentInteractions _className_="InteractionVecSet" >
 			<interaction size="144">
 				<interaction _className_="Interaction"  id1="1" id2="2">
 					<interactionGeometry _className_="SDECPermanentLink"  initialKn="500000" initialKs="50000" initialEquilibriumDistance="10" knMax="75000" ksMax="7500" radius1="5.0" radius2="5.0" heta="1" />

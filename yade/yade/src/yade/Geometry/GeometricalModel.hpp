@@ -55,7 +55,7 @@ class GeometricalModel : public Serializable
 	public : bool visible;
 	public : bool wire;
 	public : bool shadowCaster;
-	public : Vector3r diffuseColor; // + autres proprietes
+	public : Vector3f diffuseColor; // + autres proprietes
 	public : shared_ptr<CollisionGeometry> cm;
 	
 	// construction

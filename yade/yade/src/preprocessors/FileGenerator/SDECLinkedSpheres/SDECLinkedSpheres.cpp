@@ -114,7 +114,7 @@ void SDECLinkedSpheres::generate()
 //	aabb->halfSize		= Vector3r(200,200,200); 	// FIXME - damping must be 0.01, and timestep must be 0.001
 	box1->bv		= dynamic_pointer_cast<BoundingVolume>(aabb);
 	box->extents		= Vector3r(200,5,200);
-	box->diffuseColor	= Vector3r(1,1,1);
+	box->diffuseColor	= Vector3f(1,1,1);
 	box->wire		= false;
 	box->visible		= true;
 	box->shadowCaster	= false;
@@ -143,7 +143,7 @@ void SDECLinkedSpheres::generate()
 	aabb->color		= Vector3r(1,0,0);
 	box2->bv		= dynamic_pointer_cast<BoundingVolume>(aabb);
 	box->extents		= Vector3r(20,50,20);
-	box->diffuseColor	= Vector3r(1,1,1);
+	box->diffuseColor	= Vector3f(1,1,1);
 	box->wire		= false;
 	box->visible		= true;
 	box->shadowCaster	= false;
@@ -171,7 +171,7 @@ void SDECLinkedSpheres::generate()
 	aabb->color		= Vector3r(1,0,0);
 	box3->bv		= dynamic_pointer_cast<BoundingVolume>(aabb);
 	box->extents		= Vector3r(20,50,20);
-	box->diffuseColor	= Vector3r(1,1,1);
+	box->diffuseColor	= Vector3f(1,1,1);
 	box->wire		= false;
 	box->visible		= true;
 	box->shadowCaster	= false;
@@ -216,7 +216,7 @@ void SDECLinkedSpheres::generate()
 		s->bv			= dynamic_pointer_cast<BoundingVolume>(aabb);
 
 		sphere->radius		= radius;
-		sphere->diffuseColor	= Vector3r(Mathr::unitRandom(),Mathr::unitRandom(),Mathr::unitRandom());
+		sphere->diffuseColor	= Vector3f(Mathf::unitRandom(),Mathf::unitRandom(),Mathf::unitRandom());
 		sphere->wire		= false;
 		sphere->visible		= true;
 		sphere->shadowCaster	= true;

@@ -43,7 +43,7 @@ SDECImport::SDECImport () : FileGenerator()
 	wall_2_wire	= true;
 	wall_3_wire	= true;
 	wall_4_wire	= true;
-	spheresColor	= Vector3r(0.8,0.3,0.3);
+	spheresColor	= Vector3f(0.8,0.3,0.3);
 	spheresRandomColor = false;
 	
 	outputFileName = "../data/SDECImport.xml";
@@ -193,7 +193,7 @@ void SDECImport::generate()
 	
 			sphere->radius		= radius;
 			if(spheresRandomColor)
-				sphere->diffuseColor	= Vector3r(Mathr::unitRandom(),Mathr::unitRandom(),Mathr::unitRandom());
+				sphere->diffuseColor	= Vector3f(Mathf::unitRandom(),Mathf::unitRandom(),Mathf::unitRandom());
 			else
 			sphere->diffuseColor	= spheresColor;
 			sphere->wire		= false;
@@ -240,7 +240,7 @@ void SDECImport::generate()
 	aabb->color		= Vector3r(1,0,0);				// AABB is red
 	sdec->bv		= dynamic_pointer_cast<BoundingVolume>(aabb);
 	box ->extents		= halfSize;					// size
-	box ->diffuseColor	= Vector3r(1,1,1);				// color is white
+	box ->diffuseColor	= Vector3f(1,1,1);				// color is white
 	box ->wire		= wall_bottom_wire;				// draw as wireframe?
 	box ->visible		= true;						// draw
 	box ->shadowCaster	= false;					// is not casting shadows
@@ -284,7 +284,7 @@ void SDECImport::generate()
 	aabb->color		= Vector3r(1,0,0);				// AABB is red
 	sdec->bv		= dynamic_pointer_cast<BoundingVolume>(aabb);
 	box ->extents		= halfSize;					// size
-	box ->diffuseColor	= Vector3r(1,1,1);				// color is white
+	box ->diffuseColor	= Vector3f(1,1,1);				// color is white
 	box ->wire		= wall_top_wire;				// draw as wireframe?
 	box ->visible		= true;						// draw
 	box ->shadowCaster	= false;					// is not casting shadows
@@ -322,7 +322,7 @@ void SDECImport::generate()
 	aabb->color		= Vector3r(1,0,0);				// AABB is red
 	sdec->bv		= dynamic_pointer_cast<BoundingVolume>(aabb);
 	box ->extents		= halfSize;					// size
-	box ->diffuseColor	= Vector3r(1,1,1);				// color is white
+	box ->diffuseColor	= Vector3f(1,1,1);				// color is white
 	box ->wire		= wall_1_wire;					// draw as wireframe?
 	box ->visible		= true;						// draw
 	box ->shadowCaster	= false;					// is not casting shadows
@@ -360,7 +360,7 @@ void SDECImport::generate()
 	aabb->color		= Vector3r(1,0,0);				// AABB is red
 	sdec->bv		= dynamic_pointer_cast<BoundingVolume>(aabb);
 	box ->extents		= halfSize;					// size
-	box ->diffuseColor	= Vector3r(1,1,1);				// color is white
+	box ->diffuseColor	= Vector3f(1,1,1);				// color is white
 	box ->wire		= wall_2_wire;					// draw as wireframe?
 	box ->visible		= true;						// draw
 	box ->shadowCaster	= false;					// is not casting shadows
@@ -398,7 +398,7 @@ void SDECImport::generate()
 	aabb->color		= Vector3r(1,0,0);				// AABB is red
 	sdec->bv		= dynamic_pointer_cast<BoundingVolume>(aabb);
 	box ->extents		= halfSize;					// size
-	box ->diffuseColor	= Vector3r(1,1,1);				// color is white
+	box ->diffuseColor	= Vector3f(1,1,1);				// color is white
 	box ->wire		= wall_3_wire;					// draw as wireframe?
 	box ->visible		= true;						// draw
 	box ->shadowCaster	= false;					// is not casting shadows
@@ -436,7 +436,7 @@ void SDECImport::generate()
 	aabb->color		= Vector3r(1,0,0);				// AABB is red
 	sdec->bv		= dynamic_pointer_cast<BoundingVolume>(aabb);
 	box ->extents		= halfSize;					// size
-	box ->diffuseColor	= Vector3r(1,1,1);				// color is white
+	box ->diffuseColor	= Vector3f(1,1,1);				// color is white
 	box ->wire		= wall_4_wire;					// draw as wireframe?
 	box ->visible		= true;						// draw
 	box ->shadowCaster	= false;					// is not casting shadows

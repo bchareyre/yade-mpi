@@ -9,13 +9,13 @@
 				<actors _className_="SimpleNarrowCollider"  collisionFunctors="[[Sphere Sphere Sphere2Sphere4SDECContactModel] [Sphere Box Box2Sphere4SDECContactModel]]" />
 				<actors _className_="SDECDynamicEngine" />
 			</actors>
-			<permanentInteractions _className_="InteractionHashMap" >
+			<permanentInteractions _className_="InteractionVecSet" >
 					<interaction size="0">
 					</interaction>
 			</permanentInteractions>
 			<bodies _className_="BodyAssocVec">
 				<body size="5">
-					<body _className_="SDECDiscreteElement" id="0" isDynamic="0" velocity="{0 0 0}" angularVelocity="{0 0 0}" mass="0" inertia="{0 0 0}" kn="100000" ks="10000" se3="{0 10 0 1 0 0 0.3}">
+					<body _className_="SDECDiscreteElement" id="0" isDynamic="0" velocity="{0 0 0}" angularVelocity="{0 0 0}" mass="0" inertia="{0 0 0}" kn="100000" ks="10000" se3="{0 10 0 1 0 0 0.5}">
 							<bv _className_="AABB" color="{1 0 0}" />
 							<cm _className_="Box" diffuseColor="{1 1 1}" wire="0" visible="1" extents="{100 5 100}" />
 							<gm _className_="Box" shadowCaster="0" diffuseColor="{1 1 1}" wire="0" visible="1" extents="{100 5 100}" />

@@ -189,7 +189,7 @@ void Sphere::glDraw()
 		glEndList();
 	}
 
-	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, diffuseColor);
+	glMaterialv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, diffuseColor);
 	glColor3v(diffuseColor);
 	if (wire)
 	{

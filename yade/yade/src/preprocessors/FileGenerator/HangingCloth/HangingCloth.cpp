@@ -132,7 +132,7 @@ void HangingCloth::generate()
 		cloth->initialLengths.push_back((v1-v2).length());
 	}
 
-	mesh2d->diffuseColor	= Vector3r(0,0,1);
+	mesh2d->diffuseColor	= Vector3f(0,0,1);
 	mesh2d->wire		= false;
 	mesh2d->visible		= true;
 	cloth->cm		= dynamic_pointer_cast<CollisionGeometry>(mesh2d);
@@ -173,12 +173,12 @@ void HangingCloth::generate()
 		s->bv			= dynamic_pointer_cast<BoundingVolume>(aabb);
 
 		csphere->radius		= radius*1.2;
-		csphere->diffuseColor	= Vector3r(Mathr::unitRandom(),Mathr::unitRandom(),Mathr::unitRandom());
+		csphere->diffuseColor	= Vector3f(Mathr::unitRandom(),Mathr::unitRandom(),Mathr::unitRandom());
 		csphere->wire		= false;
 		csphere->visible	= true;
 
 		gsphere->radius		= radius;
-		gsphere->diffuseColor	= Vector3r(Mathr::unitRandom(),Mathr::unitRandom(),Mathr::unitRandom());
+		gsphere->diffuseColor	= Vector3f(Mathr::unitRandom(),Mathr::unitRandom(),Mathr::unitRandom());
 		gsphere->wire		= false;
 		gsphere->visible	= true;
 

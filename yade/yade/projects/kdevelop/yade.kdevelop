@@ -104,7 +104,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>preprocessors/FileGenerator/SDECImport</activedir>
+      <activedir>yade/Body</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>

@@ -9,7 +9,7 @@
 			<actors _className_="SimpleNarrowCollider"  collisionFunctors="[[Sphere Sphere Sphere2Sphere4SDECContactModel] [Sphere Box Box2Sphere4SDECContactModel]]" />
 			<actors _className_="SDECDynamicEngine"  />
 		</actors>
-		<permanentInteractions _className_="InteractionHashMap" >
+		<permanentInteractions _className_="InteractionVecSet" >
 			<interaction size="6">
 				<interaction _className_="Interaction"  id1="1" id2="2" >
 					<interactionGeometry _className_="SDECPermanentLink"  initialKn="50000" initialKs="5000" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />

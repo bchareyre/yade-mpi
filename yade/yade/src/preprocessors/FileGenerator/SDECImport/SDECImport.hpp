@@ -26,7 +26,7 @@ class SDECImport : public FileGenerator
 	private	: bool wall_2_wire;
 	private	: bool wall_3_wire;
 	private	: bool wall_4_wire;
-	private	: Vector3r spheresColor;
+	private	: Vector3f spheresColor;
 	private	: bool spheresRandomColor;
 	
 	// construction

@@ -92,23 +92,19 @@ void InteractionVecSet::gotoFirst()
 	{
 		sii    = (*vii).begin();
 		siiEnd = (*vii).end();
-	}
-//	else
-//		return shared_ptr<Interaction>(); // returns nothing
-
-	while( sii == siiEnd )
-	{
-		++vii;
-		if(vii != viiEnd)
+	
+		while( sii == siiEnd )
 		{
-//			return shared_ptr<Interaction>();
-			sii	= (*vii).begin();
-			siiEnd	= (*vii).end();
+			++vii;
+			if(vii != viiEnd)
+			{
+				sii	= (*vii).begin();
+				siiEnd	= (*vii).end();
+			}
+			else
+				return;
 		}
-		else
-			break;
 	}
-	//return (*sii).second;
 }
 
 //bool InteractionVecSet::hasCurrent()

@@ -96,7 +96,7 @@ void RotatingBox::generate()
 	aabb->halfSize		= Vector3r(50,5,40);
 	box1->bv		= dynamic_pointer_cast<BoundingVolume>(aabb);
 	box->extents		= Vector3r(50,5,40);
-	box->diffuseColor	= Vector3r(1,1,1);
+	box->diffuseColor	= Vector3f(1,1,1);
 	box->wire		= false;
 	box->visible		= true;
 	box->shadowCaster	= false;
@@ -119,7 +119,7 @@ void RotatingBox::generate()
 	aabb->halfSize		= Vector3r(5,60,50);
 	box2->bv		= dynamic_pointer_cast<BoundingVolume>(aabb);
 	box->extents		= Vector3r(5,60,50);
-	box->diffuseColor	= Vector3r(1,1,1);
+	box->diffuseColor	= Vector3f(1,1,1);
 	box->wire		= true;
 	box->visible		= true;
 	box->shadowCaster	= false;
@@ -142,7 +142,7 @@ void RotatingBox::generate()
 	aabb->halfSize		= Vector3r(5,60,50);
 	box3->bv		= dynamic_pointer_cast<BoundingVolume>(aabb);
 	box->extents		= Vector3r(5,60,50);
-	box->diffuseColor	= Vector3r(1,1,1);
+	box->diffuseColor	= Vector3f(1,1,1);
 	box->wire		= true;
 	box->visible		= true;
 	box->shadowCaster	= false;	
@@ -165,7 +165,7 @@ void RotatingBox::generate()
 	aabb->halfSize		= Vector3r(50,5,50);
 	box4->bv		= dynamic_pointer_cast<BoundingVolume>(aabb);
 	box->extents		= Vector3r(50,5,50);
-	box->diffuseColor	= Vector3r(1,1,1);
+	box->diffuseColor	= Vector3f(1,1,1);
 	box->wire		= true;
 	box->visible		= true;
 	box->shadowCaster	= false;		
@@ -188,7 +188,7 @@ void RotatingBox::generate()
 	aabb->halfSize		= Vector3r(50,5,50);
 	box5->bv		= dynamic_pointer_cast<BoundingVolume>(aabb);
 	box->extents		= Vector3r(50,5,50);
-	box->diffuseColor	= Vector3r(1,1,1);
+	box->diffuseColor	= Vector3f(1,1,1);
 	box->wire		= true;
 	box->visible		= true;
 	box->shadowCaster	= false;		
@@ -211,7 +211,7 @@ void RotatingBox::generate()
 	aabb->halfSize		= Vector3r(60,60,5);
 	box6->bv		= dynamic_pointer_cast<BoundingVolume>(aabb);
 	box->extents		= Vector3r(60,60,5);
-	box->diffuseColor	= Vector3r(1,1,1);
+	box->diffuseColor	= Vector3f(1,1,1);
 	box->wire		= true;
 	box->visible		= true;
 	box->shadowCaster	= false;		
@@ -234,7 +234,7 @@ void RotatingBox::generate()
 	aabb->halfSize		= Vector3r(60,60,5);
 	box7->bv		= dynamic_pointer_cast<BoundingVolume>(aabb);
 	box->extents		= Vector3r(60,60,5);
-	box->diffuseColor	= Vector3r(1,1,1);
+	box->diffuseColor	= Vector3f(1,1,1);
 	box->wire		= true;
 	box->visible		= true;
 	box->shadowCaster	= false;		
@@ -283,7 +283,7 @@ void RotatingBox::generate()
 		s->bv			= dynamic_pointer_cast<BoundingVolume>(aabb);
 
 		sphere->radius		= radius;
-		sphere->diffuseColor	= Vector3r(Mathr::unitRandom(),Mathr::unitRandom(),Mathr::unitRandom());
+		sphere->diffuseColor	= Vector3f(Mathr::unitRandom(),Mathr::unitRandom(),Mathr::unitRandom());
 		sphere->wire		= false;
 		sphere->visible		= true;
 		sphere->shadowCaster	= true;	
@@ -325,7 +325,7 @@ void RotatingBox::generate()
 				aabb->halfSize		= size;
 				boxi->bv		= dynamic_pointer_cast<BoundingVolume>(aabb);
 				box->extents		= size;
-				box->diffuseColor	= Vector3r(Mathr::unitRandom(),Mathr::unitRandom(),Mathr::unitRandom());
+				box->diffuseColor	= Vector3f(Mathf::unitRandom(),Mathf::unitRandom(),Mathf::unitRandom());
 				box->wire		= false;
 				box->visible		= true;
 				box->shadowCaster	= true;	

@@ -71,7 +71,7 @@ void FEMRock::generate()
 		femBody->initialLengths.push_back((v1-v2).length());
 	}
 */
-	poly->diffuseColor	= Vector3r(0,0,1);
+	poly->diffuseColor	= Vector3f(0,0,1);
 	poly->wire		= false;
 	poly->visible		= true;
 	poly->mshFileName 	= "../data/rock.msh";
@@ -99,7 +99,7 @@ void FEMRock::generate()
 	aabb->halfSize		= Vector3r(50,5,40);
 	box1->bv		= dynamic_pointer_cast<BoundingVolume>(aabb);
 	box->extents		= Vector3r(50,5,40);
-	box->diffuseColor	= Vector3r(1,1,1);
+	box->diffuseColor	= Vector3f(1,1,1);
 	box->wire		= false;
 	box->visible		= true;
 	box1->cm		= dynamic_pointer_cast<CollisionGeometry>(box);

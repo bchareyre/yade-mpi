@@ -8,12 +8,12 @@
 
 #include "NonConnexBody.hpp"
 #include "InteractionVecSet.hpp"
-#include "InteractionHashMap.hpp"
+//#include "InteractionHashMap.hpp"
 #include "BodyAssocVec.hpp"
 #include "BoundingVolumeUpdator.hpp"
 
 // FIXME - who is to decide which class to use by default?
-NonConnexBody::NonConnexBody() : Body() , bodies(new BodyAssocVec) , permanentInteractions(shared_ptr<InteractionContainer>(new InteractionHashMap))
+NonConnexBody::NonConnexBody() : Body() , bodies(new BodyAssocVec) , permanentInteractions(shared_ptr<InteractionContainer>(new InteractionVecSet))
 {
 
 containSubBodies = true;

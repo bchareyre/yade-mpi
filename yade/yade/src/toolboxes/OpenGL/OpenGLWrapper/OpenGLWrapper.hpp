@@ -70,6 +70,8 @@ template< typename Type > inline GLAPI void GLAPIENTRY glRasterPos2v	( const Typ
 template< typename Type > inline GLAPI void GLAPIENTRY glRasterPos3v	( const Type )			{	static_assert<false> GL_OpenGLWrapper_bad_type;(void) GL_OpenGLWrapper_bad_type; };
 template< typename Type > inline GLAPI void GLAPIENTRY glRasterPos4v	( const Type )			{	static_assert<false> GL_OpenGLWrapper_bad_type;(void) GL_OpenGLWrapper_bad_type; };
 template< typename Type > inline GLAPI void GLAPIENTRY glRect		( Type ,Type ,Type , Type  )	{	static_assert<false> GL_OpenGLWrapper_bad_type;(void) GL_OpenGLWrapper_bad_type; };
+template< typename Type > inline GLAPI void GLAPIENTRY glMaterial	( GLenum face, GLenum pname, Type param ){	static_assert<false> GL_OpenGLWrapper_bad_type;(void) GL_OpenGLWrapper_bad_type; };
+template< typename Type > inline GLAPI void GLAPIENTRY glMaterialv	( GLenum face, GLenum pname, Type param ){	static_assert<false> GL_OpenGLWrapper_bad_type;(void) GL_OpenGLWrapper_bad_type; };
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -260,6 +262,11 @@ template< > inline GLAPI void GLAPIENTRY glRect< float >			(float	x1,float  y1,f
 template< > inline GLAPI void GLAPIENTRY glRect< int >				(int	x1,int	  y1,int x2, int y2 )		{	glRecti(x1,y1,x2,y2);	};
 template< > inline GLAPI void GLAPIENTRY glRect< short >			(short	x1,short  y1,short x2,short y2 )	{	glRects(x1,y1,x2,y2);	};
 
+template< > inline GLAPI void GLAPIENTRY glMaterial< float >			( GLenum face, GLenum pname, float param )			{	glMaterialf(face,pname,param);		};
+template< > inline GLAPI void GLAPIENTRY glMaterial< int >			( GLenum face, GLenum pname, int param )			{	glMateriali(face,pname,param);		};
+template< > inline GLAPI void GLAPIENTRY glMaterialv< Vector3<float> >		( GLenum face, GLenum pname, const Vector3<float> params )	{	glMaterialfv(face,pname,params);	};
+template< > inline GLAPI void GLAPIENTRY glMaterialv< Vector3<int> >		( GLenum face, GLenum pname, const Vector3<int> params )	{	glMaterialiv(face,pname,params);	};
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -285,11 +292,6 @@ GLAPI void GLAPIENTRY glLightModelf( GLenum pname, GLfloat param );
 GLAPI void GLAPIENTRY glLightModeli( GLenum pname, GLint param );
 GLAPI void GLAPIENTRY glLightModelfv( GLenum pname, const GLfloat *params );
 GLAPI void GLAPIENTRY glLightModeliv( GLenum pname, const GLint *params );
-
-GLAPI void GLAPIENTRY glMaterialf( GLenum face, GLenum pname, GLfloat param );
-GLAPI void GLAPIENTRY glMateriali( GLenum face, GLenum pname, GLint param );
-GLAPI void GLAPIENTRY glMaterialfv( GLenum face, GLenum pname, const GLfloat *params );
-GLAPI void GLAPIENTRY glMaterialiv( GLenum face, GLenum pname, const GLint *params );
 
 GLAPI void GLAPIENTRY glGetMaterialfv( GLenum face, GLenum pname, GLfloat *params );
 GLAPI void GLAPIENTRY glGetMaterialiv( GLenum face, GLenum pname, GLint *params );

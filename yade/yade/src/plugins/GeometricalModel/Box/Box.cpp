@@ -64,7 +64,7 @@ bool Box::loadFromFile(char * )
 void Box::glDraw()
 {
 
-  	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, diffuseColor);
+  	glMaterialv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, diffuseColor);
 
 	glColor3v(diffuseColor);
 	glScalef(2*extents[0],2*extents[1],2*extents[2]);

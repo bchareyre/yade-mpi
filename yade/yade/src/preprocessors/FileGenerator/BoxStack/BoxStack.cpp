@@ -74,7 +74,7 @@ void BoxStack::generate()
 	aabb->halfSize		= Vector3r(100,5,100);
 	box1->bv		= dynamic_pointer_cast<BoundingVolume>(aabb);
 	box->extents		= Vector3r(100,5,100);
-	box->diffuseColor	= Vector3r(1,1,1);
+	box->diffuseColor	= Vector3f(1,1,1);
 	box->wire		= false;
 	box->visible		= true;
 	box1->cm		= dynamic_pointer_cast<CollisionGeometry>(box);
@@ -112,7 +112,7 @@ void BoxStack::generate()
 			aabb->halfSize		= size;
 			boxi->bv		= dynamic_pointer_cast<BoundingVolume>(aabb);
 			box->extents		= size;
-			box->diffuseColor	= Vector3r(Mathr::unitRandom(),Mathr::unitRandom(),Mathr::unitRandom());
+			box->diffuseColor	= Vector3f(Mathr::unitRandom(),Mathr::unitRandom(),Mathr::unitRandom());
 			box->wire		= false;
 			box->visible		= true;
 			boxi->cm		= dynamic_pointer_cast<CollisionGeometry>(box);
