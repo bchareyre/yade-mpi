@@ -24,12 +24,15 @@ YadeQtMainWindow::YadeQtMainWindow() : YadeQtGeneratedMainWindow()
 
 	addMenu("Preprocessor");
 	addMenu("Postprocessor");
- 	addItem("Preprocessor","HangingCloth");
-	addItem("Preprocessor","RotatingBox");
-//	addItem("Preprocessor","FEMRock"); // not working
-//	addItem("Preprocessor","BoxStack"); // not working
-	addItem("Preprocessor","SDECSpheresPlane");
-	addItem("Preprocessor","SDECLinkedSpheres");
+	
+	// I commented them, because the are all in QtFileGenerator
+ 	//addItem("Preprocessor","HangingCloth");
+	//addItem("Preprocessor","RotatingBox");
+//	addItem("Preprocessor","FEMRock"); 		// not working
+//	addItem("Preprocessor","BoxStack"); 		// not working
+	//addItem("Preprocessor","SDECSpheresPlane");
+	//addItem("Preprocessor","SDECLinkedSpheres");
+	
 	addItem("Preprocessor","QtFileGenerator");
 	createMenus();
 

@@ -6,6 +6,13 @@
 
 class SDECLinkedSpheres : public FileGenerator
 {
+	private	: int nbSpheresX;
+	private	: int nbSpheresY;
+	private	: int nbSpheresZ;
+	private	: float minRadius;
+	private	: float maxRadius;
+	private	: float disorder;
+	private	: float spacing;
 	// construction
 	public : SDECLinkedSpheres ();
 	public : ~SDECLinkedSpheres ();

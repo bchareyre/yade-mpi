@@ -17,6 +17,13 @@
 
 SDECLinkedSpheres::SDECLinkedSpheres () : FileGenerator()
 {
+	nbSpheresX = 3;
+	nbSpheresY = 4;
+	nbSpheresZ = 7;
+	minRadius = 5.01;
+	maxRadius = 5.01;
+	disorder = 0;
+	spacing = 10;
 }
 
 SDECLinkedSpheres::~SDECLinkedSpheres ()
@@ -30,14 +37,22 @@ void SDECLinkedSpheres::postProcessAttributes(bool)
 
 void SDECLinkedSpheres::registerAttributes()
 {
+	REGISTER_ATTRIBUTE(nbSpheresX);
+	REGISTER_ATTRIBUTE(nbSpheresY);
+	REGISTER_ATTRIBUTE(nbSpheresZ);
+	REGISTER_ATTRIBUTE(minRadius);
+	REGISTER_ATTRIBUTE(maxRadius);
+	REGISTER_ATTRIBUTE(disorder);
+	REGISTER_ATTRIBUTE(spacing);
 }
 
 void SDECLinkedSpheres::generate()
 {
 	shared_ptr<NonConnexBody> rootBody(new NonConnexBody);
-	int nbSpheres = 4;// FIXME - this should ba a parameter to dynlib
-	Quaternionr q;
+	
+	Quaternionr q,qbox;
 	q.fromAxisAngle( Vector3r(0,0,1),0);
+//	qbox.fromAxisAngle( Vector3r(0,0,1),0.6); 		// FIXME - damping must be 0.01, and timestep must be 0.001
 
 	shared_ptr<NarrowCollider> nc	= shared_ptr<NarrowCollider>(new SimpleNarrowCollider);
 	nc->addCollisionFunctor("Sphere","Sphere","Sphere2Sphere4SDECContactModel");
@@ -58,46 +73,115 @@ void SDECLinkedSpheres::generate()
 	shared_ptr<AABB> aabb;
 	shared_ptr<Box> box;
 
-	shared_ptr<SDECDiscreteElement> box1(new SDECDiscreteElement);
 
+////////////////////////////////////
+	
+	shared_ptr<SDECDiscreteElement> box1(new SDECDiscreteElement);
 	aabb			= shared_ptr<AABB>(new AABB);
 	box			= shared_ptr<Box>(new Box);
+	
 	box1->isDynamic		= false;
 	box1->angularVelocity	= Vector3r(0,0,0);
 	box1->velocity		= Vector3r(0,0,0);
 	box1->mass		= 0;
 	box1->inertia		= Vector3r(0,0,0);
 	box1->se3		= Se3r(Vector3r(0,0,0),q);
+	//box1->se3		= Se3r(Vector3r(0,0,0),qbox); 	// FIXME - damping must be 0.01, and timestep must be 0.001
 	aabb->color		= Vector3r(1,0,0);
 	aabb->center		= Vector3r(0,0,10);
-	aabb->halfSize		= Vector3r(200,5,200);
+	aabb->halfSize		= Vector3r(200,5,200); 		// FIXME - this must be automatically computed
+//	aabb->halfSize		= Vector3r(200,200,200); 	// FIXME - damping must be 0.01, and timestep must be 0.001
 	box1->bv		= dynamic_pointer_cast<BoundingVolume>(aabb);
 	box->extents		= Vector3r(200,5,200);
 	box->diffuseColor	= Vector3r(1,1,1);
 	box->wire		= false;
 	box->visible		= true;
+	box->shadowCaster	= false;
 	box1->cm		= dynamic_pointer_cast<CollisionGeometry>(box);
 	box1->gm		= dynamic_pointer_cast<CollisionGeometry>(box);
 	box1->kn		= 100000;
 	box1->ks		= 10000;
-
 	shared_ptr<Body> b;
 	b = dynamic_pointer_cast<Body>(box1);
 	rootBody->bodies->insert(b);
+	
+/* FIXME : MOMENT LAW is completely not working!!!!!!!
 
+/////////////////////////////////////
+	
+	shared_ptr<SDECDiscreteElement> box2(new SDECDiscreteElement);
+	aabb			= shared_ptr<AABB>(new AABB);
+	box			= shared_ptr<Box>(new Box);
+	
+	box2->isDynamic		= false;
+	box2->angularVelocity	= Vector3r(0,0,0);
+	box2->velocity		= Vector3r(0,0,0);
+	box2->mass		= 0;
+	box2->inertia		= Vector3r(0,0,0);
+	box2->se3		= Se3r(Vector3r(0,0,40),q);
+	aabb->color		= Vector3r(1,0,0);
+	aabb->center		= Vector3r(0,0,40);
+	aabb->halfSize		= Vector3r(20,50,20); 		// FIXME - this must be automatically computed
+	box2->bv		= dynamic_pointer_cast<BoundingVolume>(aabb);
+	box->extents		= Vector3r(20,50,20);
+	box->diffuseColor	= Vector3r(1,1,1);
+	box->wire		= false;
+	box->visible		= true;
+	box->shadowCaster	= false;
+	box2->cm		= dynamic_pointer_cast<CollisionGeometry>(box);
+	box2->gm		= dynamic_pointer_cast<CollisionGeometry>(box);
+	box2->kn		= 100000;
+	box2->ks		= 10000;
+	shared_ptr<Body> b2;
+	b2 = dynamic_pointer_cast<Body>(box2);
+	rootBody->bodies->insert(b2);
+
+/////////////////////////////////////
+
+	shared_ptr<SDECDiscreteElement> box3(new SDECDiscreteElement);
+	aabb			= shared_ptr<AABB>(new AABB);
+	box			= shared_ptr<Box>(new Box);
+	
+	box3->isDynamic		= false;
+	box3->angularVelocity	= Vector3r(0,0,0);
+	box3->velocity		= Vector3r(0,0,0);
+	box3->mass		= 0;
+	box3->inertia		= Vector3r(0,0,0);
+	box3->se3		= Se3r(Vector3r(0,0,-40),q);
+	aabb->color		= Vector3r(1,0,0);
+	aabb->center		= Vector3r(0,0,-40);
+	aabb->halfSize		= Vector3r(20,50,20); 		// FIXME - this must be automatically computed
+	box3->bv		= dynamic_pointer_cast<BoundingVolume>(aabb);
+	box->extents		= Vector3r(20,50,20);
+	box->diffuseColor	= Vector3r(1,1,1);
+	box->wire		= false;
+	box->visible		= true;
+	box->shadowCaster	= false;
+	box3->cm		= dynamic_pointer_cast<CollisionGeometry>(box);
+	box3->gm		= dynamic_pointer_cast<CollisionGeometry>(box);
+	box3->kn		= 100000;
+	box3->ks		= 10000;
+	shared_ptr<Body> b3;
+	b3 = dynamic_pointer_cast<Body>(box3);
+	rootBody->bodies->insert(b3);
+
+/////////////////////////////////////
+*/
 	Vector3r translation;
 
-	for(int i=0;i<nbSpheres;i++)
-		for(int j=0;j<nbSpheres;j++)
-			for(int k=0;k<nbSpheres;k++)
+	for(int i=0;i<nbSpheresX;i++)
+		for(int j=0;j<nbSpheresY;j++)
+			for(int k=0;k<nbSpheresZ;k++)
 	{
 		shared_ptr<SDECDiscreteElement> s(new SDECDiscreteElement);
 		shared_ptr<AABB> aabb(new AABB);
 		shared_ptr<Sphere> sphere(new Sphere);
 
-		translation 		= Vector3r(i,j,k)*10-Vector3r(nbSpheres/2*10,nbSpheres/2*10-90,nbSpheres/2*10)/*+Vector3r(Mathr::symmetricRandom()*1.3,Mathr::symmetricRandom(),Mathr::symmetricRandom()*1.3)*/;
-		//float radius 		= (Mathr::intervalRandom(4.99,5.2)); // FIXME - this should ba a parameter to dynlib
-		float radius 		= 5.2;
+		translation 		= Vector3r(i,j,k)*spacing-Vector3r(nbSpheresX/2*spacing,nbSpheresY/2*spacing-90,nbSpheresZ/2*spacing)
+		+
+		Vector3r(Mathr::symmetricRandom()*disorder,Mathr::symmetricRandom()*disorder,Mathr::symmetricRandom()*disorder);
+		
+		float radius 		= (Mathr::intervalRandom(minRadius,maxRadius));
 		shared_ptr<BallisticDynamicEngine> ballistic(new BallisticDynamicEngine);
 		ballistic->damping 	= 1.0;//0.95;
 		s->actors.push_back(ballistic);
@@ -118,6 +202,8 @@ void SDECLinkedSpheres::generate()
 		sphere->diffuseColor	= Vector3r(Mathr::unitRandom(),Mathr::unitRandom(),Mathr::unitRandom());
 		sphere->wire		= false;
 		sphere->visible		= true;
+		sphere->shadowCaster	= true;
+		
 		s->cm			= dynamic_pointer_cast<CollisionGeometry>(sphere);
 		s->gm			= dynamic_pointer_cast<GeometricalModel>(sphere);
 		s->kn			= 100000;
@@ -127,28 +213,13 @@ void SDECLinkedSpheres::generate()
 		rootBody->bodies->insert(b);
 	}
 
-//	vector<shared_ptr<Body> >::iterator ait    = (rootBody->bodies).begin();
-//	vector<shared_ptr<Body> >::iterator aitEnd = (rootBody->bodies).end();
-//	for( int idA=0 ; ait < aitEnd ; ++ait , ++idA )
-
-// FIXME !!!!!!!!!!!! - nested loop is currently impossible, with BodyContainer !!!!
-
-
 	shared_ptr<Body> bodyA;
-//	unsigned int idA=0;
 	for( rootBody->bodies->gotoFirst() ; rootBody->bodies->notAtEnd() ; rootBody->bodies->gotoNext() )
 	{
 		bodyA = rootBody->bodies->getCurrent();
-
-//		vector<shared_ptr<Body> >::iterator bit    = ait;
-//		++bit;
-//		vector<shared_ptr<Body> >::iterator bitEnd = (rootBody->bodies).end();
-
 		rootBody->bodies->pushIterator();
 
-//		unsigned int idB=idA+1;
 		rootBody->bodies->gotoNext();
-//		for( ; bit < bitEnd ; ++bit , ++idB )
 		for( ; rootBody->bodies->notAtEnd() ; rootBody->bodies->gotoNext() )
 		{
 			shared_ptr<Body> bodyB;
@@ -182,7 +253,6 @@ void SDECLinkedSpheres::generate()
 
 				c->interactionGeometry = link;
 
-				//cout << "adding: " << idA << " " << idB << endl;
 				rootBody->permanentInteractions->insert(c);
 			}
 		}
