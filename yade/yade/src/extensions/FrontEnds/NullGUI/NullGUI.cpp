@@ -29,6 +29,7 @@
 
 #include <iostream>
 #include <boost/shared_ptr.hpp>
+#include <boost/filesystem/convenience.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -40,6 +41,11 @@ using namespace std;
 
 NullGUI::NullGUI ()
 {
+	interval = 100;
+	progress = false;
+	snapshotInterval = -1;
+	snapshotName = "";
+	maxIteration = 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -53,43 +59,118 @@ NullGUI::~NullGUI()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-int NullGUI::run(int , char** )
+void NullGUI::help()
+{
+	cout <<
+"\nYet Another Dynamic Engine, pre-alpha. NullGUI frontend.\n\
+\n\
+	-H		- print this help.\n\
+\n\
+    user feedback:\n\
+	-v number	- specify iteration INTERVAL in which other tasks are\n\
+			  performed, default is set to 100.\n\
+	-p		- print progress information every INTERVAL iteration\n\
+			  so you see that calculations are going on.\n\
+\n\
+    input:\n\
+	-f name		- specify filename to load.\n\
+\n\
+    output:\n\
+	-s number	- if specified, a snapshot is saved every 'number'\n\
+			  INTERVALs. Eg. if INTERVAL is 100, and 'number' is 5,\n\
+			  you will have a snpashot every 500th iteration.\n\
+	-S name		- specify base filename of snapshot. Defaults to input\n\
+			  filename. Filename has appended iteration number.\n\
+\n\
+    options:\n\
+	-m number	- specify maximum number of iterations\n\
+			  ( 0 = unlimited, tested every INTERVAL iteration).\n\
+	-t number	- set time step in seconds (FIXME - inside .xml)\n\
+	-g number	- set gravity (FIXME - inside .xml)\n\
+\n";
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+int NullGUI::run(int argc, char** argv)
+{
+
+	int ch;
+	opterr = 0;
+	while( ( ch = getopt(argc,argv,"Hf:s:S:v:pm:t:g:") ) != -1)
+		switch(ch)
+		{
+			case 'H'	: help(); 						return 1;
+			case 'v'	: interval = lexical_cast<int>(optarg);			break;
+			case 'p'	: progress = true;					break;
+			case 'f'	: Omega::instance().setSimulationFileName(optarg);
+					  if(snapshotName.size() == 0 ) snapshotName = optarg;	break;
+			case 's'	: snapshotInterval = lexical_cast<int>(optarg);		break;
+			case 'S'	: snapshotName = optarg;				break;
+			case 'm'	: maxIteration = lexical_cast<long int>(optarg);	break;
+			case 't'	: Omega::instance().setTimeStep
+						(lexical_cast<double>(optarg));			break;
+			case 'g'	: Omega::instance().setGravity
+						(Vector3r(0,-lexical_cast<Real>(optarg),0));	break;
+			default		: break;
+		}
+	return loop();
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+int NullGUI::loop()
 {
         long int& iter = Omega::instance().currentIteration; // FIXME : public variable :-P~
-        
 	Omega::instance().loadSimulation();
+	cerr << "Starting computation of file: " << Omega::instance().getSimulationFileName() << endl;
 
-	bool progress = Omega::instance().getProgress();
-	long int maxIteration = Omega::instance().getMaxIteration();
-
-	cout << "Starting computation of file: " << Omega::instance().getSimulationFileName() << endl;
-	
 	if( maxIteration == 0)
-		cout << "\nNo maxiter specified, computations will run forever, to set it, use flag -m\n";
+		cerr << "No maxiter specified, computations will run forever, to set it, use flag -m\n";
 	else
-		cout << "\nComputing " << maxIteration << " iterations\n";
+		cerr << "Computing " << maxIteration << " iterations\n";
 
-	cout << "Using timestep: " << Omega::instance().getTimeStep() << endl;
+	cerr << "Using timestep: " << Omega::instance().getTimeStep() << endl;
 
-//	Omega::instance().waitForSimulationEnd();
-	
+	filesystem::path p(snapshotName);
+	snapshotName = filesystem::basename(p);
+	if( snapshotInterval != -1 )
+		cerr 	<< "Saving snapshot every " << snapshotInterval*interval << " iterations, \n"
+			<< "to filename: " << snapshotName << "_[0-9]" << endl;
+
+	long int intervals = 0;
 	while(1)
 	{
 		Omega::instance().rootBody->moveToNextTimeStep();
 		//Omega::instance().incrementCurrentIteration();
 		++iter;
 		Omega::instance().incrementSimulationTime();
-		
-		if( iter % 100 == 0 )                                   // checks every 100th iteration
+
+		if( iter % interval == 0 )
 		{
+			++intervals;
+
+			// print progress...
 			if(progress)
-				cout << "iteration: " << iter << endl;
-			if( maxIteration !=0 )
-				if( iter > maxIteration )
-				{
-					cerr << "Calc finished at: " << iter << endl;
-					exit(0);                        // terminate.
-				}
+				cerr << "iteration: " << iter << endl;
+
+			// save snapshot
+			if( ( snapshotInterval != -1 ) && (intervals % snapshotInterval == 0) )
+			{
+				cerr << "saving snapshot: " << snapshotName + "_" + lexical_cast<string>(iter) + ".xml\n";
+				IOManager::saveToFile("XMLManager",
+				"../data/" + snapshotName + "_" + lexical_cast<string>(iter) + ".xml",
+				"rootBody", Omega::instance().rootBody);
+			}
+
+			// finish computation
+			if( ( maxIteration !=0 ) &&  (iter > maxIteration) )
+			{
+				cerr << "Calc finished at: " << iter << endl;
+				exit(0);
+			}
 		}
 	}
 }

@@ -3,12 +3,17 @@
 #define __ROTATINGBOX_H__
 
 #include "FileGenerator.hpp"
+#include "Vector3.hpp"
 
 class SDECLinkedSpheres : public FileGenerator
 {
-	private	: int nbSpheresX;
-	private	: int nbSpheresY;
-	private	: int nbSpheresZ;
+	// FIXME - if it is Vector3<int> nbSpheres; it crashes:
+	//
+	//		terminate called after throwing an instance of 'SerializableError'
+	//		what():  Cannot determine type with findType()
+
+	private	: Vector3r nbSpheres; // Vector3<int> nbSpheres; FIXME
+
 	private	: float minRadius;
 	private	: float maxRadius;
 	private	: float disorder;

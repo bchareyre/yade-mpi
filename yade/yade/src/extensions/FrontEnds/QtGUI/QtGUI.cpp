@@ -61,6 +61,20 @@ int QtGUI::run(int argc, char *argv[])
 //	#ifdef Q_WS_X11
 		XInitThreads();
 //	#endif
+
+	// FIXME - QtGUI is consuming CPU when idle - when computations are NOT running.
+
+	opterr = 0;
+	int ch;
+	while( ( ch = getopt(argc,argv,"t:") ) != -1)
+		switch(ch)
+		{
+//			case 'H'	: help(); 						return 1;
+			case 't'	: Omega::instance().setTimeStep
+						(lexical_cast<double>(optarg));			break;
+			default		: break;
+		}
+
 	
     	QApplication app( argc,argv );
 

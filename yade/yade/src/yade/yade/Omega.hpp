@@ -61,82 +61,65 @@ using namespace std;
 
 class Omega : public Singleton<Omega>
 {
-	public : shared_ptr<FrontEnd> gui;
+	public	: shared_ptr<FrontEnd> gui;
 
 	//private : shared_ptr<boost::thread> simulationThread;
-	private : shared_ptr<SimulationLoop> simulationLoop;
-	public : void createSimulationLoop();
-	public : void startSimulationLoop();
-	public : void stopSimulationLoop();
-	public : void finishSimulationLoop();
-	
-	public : shared_ptr<ThreadSynchronizer> synchronizer; // FIXME put private + add function waitMyTuren and finishedMyTurn
+	private	: shared_ptr<SimulationLoop> simulationLoop;
+	public	: void createSimulationLoop();
+	public	: void startSimulationLoop();
+	public	: void stopSimulationLoop();
+	public	: void finishSimulationLoop();
+
+	public	: shared_ptr<ThreadSynchronizer> synchronizer; // FIXME put private + add function waitMyTuren and finishedMyTurn
 
 //	public : void waitMyTurn(int id); // FIXME put private + add function waitMyTuren and finishedMyTurn
 //	public : void endMyTurn(); // FIXME put private + add function waitMyTuren and finishedMyTurn
 //	public : void waitForSimulationEnd(); // FIXME put private + add function waitMyTuren and finishedMyTurn
 //	public : int getNewTurnId();
-	
-	public : map<string,string> dynlibsType;
 
-	public : bool getDynlibType(const string& libName,string& type);
-	
-	public : shared_ptr<ofstream> logFile;
+	public	: map<string,string> dynlibsType;
 
-	private : Vector3r gravity;
-	public : Vector3r getGravity();
-	public : void setGravity(Vector3r g);
+	public	: bool getDynlibType(const string& libName,string& type);
 
+	public	: shared_ptr<ofstream> logFile;
 
-	public : shared_ptr<NonConnexBody> rootBody;
-	public : ptime sStartingSimulationTime;
-	public : ptime msStartingSimulationTime;
-	private : void buildDynlibList();
-	private : void registerDynlibType(const string& name);
-
-	public	: double 	dt;
-	public	: void 		setTimeStep(const string);
+	private : Vector3r	gravity; // FIXME
+	public	: Vector3r	getGravity();
+	public	: void setGravity(Vector3r g);
+	public	: double 	dt; // FIXME
+	public	: void 		setTimeStep(const double);
 	public	: double 	getTimeStep();
+	
+	public	: shared_ptr<NonConnexBody> rootBody;
+	public	: ptime		sStartingSimulationTime;
+	public	: ptime		msStartingSimulationTime;
+	private	: void		buildDynlibList();
+	private	: void		registerDynlibType(const string& name);
 
 	private	: string 	simulationFileName;
 	public	: void 		setSimulationFileName(const string);
 	public	: string 	getSimulationFileName();
 	public	: void		loadSimulation();
 
-	private	: long int 	maxIteration;
 	public  : long int	currentIteration;
-	//public  : const long int& getCurrentIteration() const;
-	public  : long int getCurrentIteration();
-	public  : void incrementCurrentIteration();
-	private : double simulationTime;
-	public : double getSimulationTime() { return simulationTime;};
-	public : void incrementSimulationTime() { simulationTime+=dt;};
-		
-	public	: void 		setMaxIteration(const string);
-	public	: long int 	getMaxIteration();
+	public  : long int	getCurrentIteration();
+	public  : void		incrementCurrentIteration();
 	
-	// FIXME - move this junk somewhere else...
-	private : bool		automatic;
-	public  : void		setAutomatic(bool);
-	public  : bool		getAutomatic();
-	// FIXME - move this junk somewhere else...
-	private : bool		progress;
-	public  : void		setProgress(bool);
-	public  : bool		getProgress();
+	private : double	simulationTime;
+	public	: double	getSimulationTime() { return simulationTime;};
+	public	: void 		incrementSimulationTime() { simulationTime+=dt;};
 
 
-
-
-	public : void init();
-	private   : Omega() ;
-	private   : ~Omega() ;
-	private   : Omega(const Omega&);
-	private   : Omega& operator=(const Omega&);
-
+	public	: void 		logMessage(const string& str);
+	public	: void 		logError(const string& str);
+	
+	private	: void 		init();
+	private	: Omega();
+	private	: ~Omega();
+	private	: Omega(const Omega&);
+	private	: Omega& operator=(const Omega&);
+	
 	friend class Singleton< Omega >;
-
-	public : void logMessage(const string& str);
-	public : void logError(const string& str);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -75,23 +75,20 @@ void Omega::logMessage(const string& str)
 void Omega::init()
 {
 	simulationFileName="";
-	maxIteration = 0; // unlimited
 	currentIteration = 0;
-	automatic=false;
-	progress=false;
 
-	gravity = Vector3r(0,-9.81,0);
+	gravity = Vector3r(0,-9.81,0); // FIXME
 	//dt = 0.04;
-	dt = 0.01;
+	dt = 0.01; // FIXME
 	//dt = 0.015; // max for cloth, rotating box is little slower, but both work.
 
 	logFile = shared_ptr<ofstream>(new ofstream("../data/log.xml", ofstream::out | ofstream::app));
 
 	// build dynlib information list
-	buildDynlibList();
+	buildDynlibList(); // FIXME - this shouldn't be called in constructor, because frontend launches too long, when just asking for help -H
 
 	// build simulation loop thread
-	synchronizer     = shared_ptr<ThreadSynchronizer>(new ThreadSynchronizer());
+	synchronizer     = shared_ptr<ThreadSynchronizer>(new ThreadSynchronizer()); // FIXME - this should be optional
 
 }
 
@@ -167,7 +164,7 @@ void Omega::registerDynlibType(const string& name)
 void Omega::buildDynlibList()
 {
 	char * buffer ;
-	buffer = getenv ("YADEBINPATH");
+	buffer = getenv ("YADEBINPATH"); // FIXME - yade should use config file, to check /usr/lib/yade and /home/joe/yade/lib, etc..
 	string yadeBinPath = buffer;
 
 	filesystem::path directory(yadeBinPath+"/dynlib/linux");
@@ -225,26 +222,6 @@ long int Omega::getCurrentIteration()
 }
 
 
-void Omega::setGravity(Vector3r g)
-{
-	gravity = g;
-}
-
-Vector3r Omega::getGravity()
-{
-	return gravity; 
-}
-
-void Omega::setTimeStep(const string t)
-{
-	dt = lexical_cast<double>(t);
-}
-
-double Omega::getTimeStep()
-{
-	return dt;
-}
-
 void Omega::setSimulationFileName(const string f)
 {
 	simulationFileName = f;
@@ -263,59 +240,50 @@ void Omega::loadSimulation()
 
 		IOManager::loadFromFile("XMLManager",simulationFileName,"rootBody",Omega::instance().rootBody);
 		Omega::instance().logMessage("Loading file " + simulationFileName);
-		
+
 		sStartingSimulationTime = second_clock::local_time();
 		msStartingSimulationTime = microsec_clock::local_time();
-		
+
 		*logFile << "<Simulation" << " Date =\"" << sStartingSimulationTime << "\">" << endl;
 		currentIteration = 0;
 		simulationTime = 0;
 	}
 	else
 	{
-		cout << "\nWrong filename, please specify filename with -f, or through your GUI.\n";
+		cout << "\nWrong filename, please specify filename using your frontend.\n";
 		exit(1);
 	}
 }
 
-void Omega::setMaxIteration(const string m)
+void Omega::startSimulationLoop()
 {
-	maxIteration = lexical_cast<long int>(m);
-}
-
-long int Omega::getMaxIteration()
-{
-	return maxIteration;
-}
-
-void Omega::setAutomatic(bool b)
-{
-	automatic = b;
-}
-
-bool Omega::getAutomatic()
-{
-	return automatic;
-}
-
-void Omega::setProgress(bool b)
-{
-	progress = b;
-}
-
-bool Omega::getProgress()
-{
-	return progress;
-}
-
-
-void Omega::startSimulationLoop() 
-{ 
 	simulationLoop->start();
 }
 
-void Omega::stopSimulationLoop() 
-{ 
+void Omega::stopSimulationLoop()
+{
 	simulationLoop->stop();
 }
-	
+
+
+// FIXME - remove that
+void Omega::setGravity(Vector3r g)
+{
+	gravity = g;
+}
+
+Vector3r Omega::getGravity()
+{
+	return gravity;
+}
+
+// FIXME - remove that
+void Omega::setTimeStep(const double t)
+{
+	dt = t;
+}
+
+double Omega::getTimeStep()
+{
+	return dt;
+}
