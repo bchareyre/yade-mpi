@@ -175,6 +175,13 @@ class DynLibDispatcher
 			callBacksInfo.clear();
 		};
 		
+//		ResultType error(int a, int b = -1, int c = -1, int d = -1)
+// 		{
+// 			// because of speed concern we don't want to throw here.
+// 			cerr << "DynLibDispatcher: trying to call non-registered multivirtual function at index position: "
+// 				<< a << ", " << b << ", " << ", " << c << ", " d << endl;
+// 		}
+		
 ////////////////////////////////////////////////////////////////////////////////
 // add multivirtual function to 1D
 ////////////////////////////////////////////////////////////////////////////////
