@@ -17,72 +17,57 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
- 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-#ifndef __OMEGA_H__
-#define __OMEGA_H__
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <boost/date_time/posix_time/posix_time.hpp>
-#include <fstream>
-#include <time.h>
+#ifndef __YADEQTMAINWINDOW_H__
+#define __YADEQTMAINWINDOW_H__
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "Vector3.hpp"
-//#include "Chrono.hpp"
-#include <iostream>
-#include "Types.hpp"
-#include "Singleton.hpp"
-//#include "NonConnexBody.hpp"
-//#include "CollisionFunctor.hpp"
-class CollisionFunctor;
-//class Vector3;
-//class Chrono;
-class NonConnexBody;
-#include "MultiMethodsManager.hpp"
+#include <qworkspace.h>
+#include <qmainwindow.h>
+#include <qframe.h>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-using namespace boost::posix_time;
-using namespace std;
+#include "YadeQtGeneratedMainWindow.h"
+#include "GLViewer.hpp"
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-class Omega : public Singleton<Omega>
+class YadeQtMainWindow : public YadeQtGeneratedMainWindow
 {
-	public : shared_ptr<ofstream> logFile;
-	public : Vector3 gravity;
-	public : shared_ptr<NonConnexBody> rootBody;
-	public : ptime startingSimulationTime;
-	public : float dt;
+	protected : shared_ptr<GLViewer> glViewer;
+	protected : QWorkspace * workspace;
+	protected : QAction* fileRotatingBoxAction;
+	protected : QPopupMenu *preprocessorMenu;
+	protected : map<string,QPopupMenu*> menus;
+	protected : vector<QAction*> items;
+	protected : QFrame * frame;
 	
-	//public : MultiMethodsManager<CollisionFunctor> narrowCollider;
-	public : MultiMethodsManager narrowCollider;
+	// construction
+	public : YadeQtMainWindow ();
+	public : ~YadeQtMainWindow ();
 
-	public : void init();
-	private   : Omega() ;
-	private   : ~Omega() ;
-	private   : Omega(const Omega&);
-	private   : Omega& operator=(const Omega&);
-
-	friend class Singleton< Omega >;
+	public : void addMenu(string menuName);
+	public : void addItem(string menuName, string itemName);
+	public : void createMenus();
+	public slots : virtual void fileNewSimulation();
+	public slots : virtual void fileExit();
+	public slots : virtual void dynamicMenuClicked();
 	
-	public : void logMessage(const string& str);
-	public : void logError(const string& str);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#endif // __OMEGA_H__
+#endif // __YADEQTMAINWINDOW_H__
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -51,6 +51,7 @@ class CollisionModel : public GeometricalModel,Indexable
 
 	// FIXME : why to put again getClassIndex
 	public : virtual int& getClassIndex() { throw;};
+	public : virtual const int& getClassIndex() const { throw;};
 	
 	REGISTER_CLASS_NAME(CollisionModel);
 	//REGISTER_CLASS_INDEX(CollisionModel);

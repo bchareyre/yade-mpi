@@ -14,4 +14,5 @@ SUBDIRS += toolboxes \
            yade \
            plugins \
            preprocessors \
-           postprocessors 
+           postprocessors \
+           GUI 

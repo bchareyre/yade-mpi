@@ -1,12 +1,7 @@
 #include "Omega.hpp"
 
 Omega::Omega ()
-{
-	gravity = Vector3(0,-9.81,0);
-	dt = 0.02;
-	logFile = shared_ptr<ofstream>(new ofstream("../data/log.xml", ofstream::out | ofstream::app));
-	startingSimulationTime = second_clock::local_time();
-	*logFile << "<Simulation" << " Date =\"" << startingSimulationTime << "\">" << endl;
+{		
 }
 
 
@@ -29,3 +24,14 @@ void Omega::logMessage(const string& str)
 	*logFile << "\t" << "<Message Date=\"" << startingSimulationTime-second_clock::local_time() << "\" " << "Message =\""<< str << "\"" << endl;
 };
 
+void Omega::init()
+{
+	gravity = Vector3(0,-9.81,0);
+	dt = 0.02;
+	
+	logFile = shared_ptr<ofstream>(new ofstream("../data/log.xml", ofstream::out | ofstream::app));
+
+	startingSimulationTime = second_clock::local_time();
+
+	*logFile << "<Simulation" << " Date =\"" << startingSimulationTime << "\">" << endl;
+}

@@ -18,25 +18,21 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
-#include <qapplication.h>
-#include "QtFrontEnd.hpp"
-#include <iostream>
+#include "ClassFactory.hpp"
+#include "GUI.hpp"
 #include "Omega.hpp"
-
-using namespace std;
 
 int main(int argc, char *argv[])
 {
-
-        QApplication app( argc, argv );
-
-        QtFrontEnd frontend;
-        frontend.show();
-        app.setMainWidget( &frontend );
-
-        return app.exec();
+	Omega::instance().init();
+	
+	if (argc!=2)
+	{
+		cout << "Missing parameter : name of the GUI library" << endl;
+		return 0;
+	}
+	
+	shared_ptr<GUI> gui = dynamic_pointer_cast<GUI>(ClassFactory::instance().createShared(argv[1]));
+	
+	return gui->run(argc,argv);
 }

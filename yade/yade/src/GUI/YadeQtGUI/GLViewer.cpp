@@ -1,4 +1,4 @@
-#include "QtFrontEnd.hpp"
+#include "GLViewer.hpp"
 #include "Body.hpp"
 #include "Interaction.hpp"
 #include "GL/glut.h"

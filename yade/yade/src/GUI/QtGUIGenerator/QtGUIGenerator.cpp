@@ -17,72 +17,104 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
- 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-#ifndef __OMEGA_H__
-#define __OMEGA_H__
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <boost/date_time/posix_time/posix_time.hpp>
-#include <fstream>
-#include <time.h>
+#include "QtGUIGenerator.hpp"
+#include "IOManager.hpp"
+#include "XMLManager.hpp"
+#include <sstream>
+#include <qlabel.h>
+#include <qlineedit.h>
+#include <qpushbutton.h>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "Vector3.hpp"
-//#include "Chrono.hpp"
-#include <iostream>
-#include "Types.hpp"
-#include "Singleton.hpp"
-//#include "NonConnexBody.hpp"
-//#include "CollisionFunctor.hpp"
-class CollisionFunctor;
-//class Vector3;
-//class Chrono;
-class NonConnexBody;
-#include "MultiMethodsManager.hpp"
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-using namespace boost::posix_time;
 using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-class Omega : public Singleton<Omega>
+QtGUIGenerator::QtGUIGenerator ()
+{ 	
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+QtGUIGenerator::~QtGUIGenerator()
 {
-	public : shared_ptr<ofstream> logFile;
-	public : Vector3 gravity;
-	public : shared_ptr<NonConnexBody> rootBody;
-	public : ptime startingSimulationTime;
-	public : float dt;
-	
-	//public : MultiMethodsManager<CollisionFunctor> narrowCollider;
-	public : MultiMethodsManager narrowCollider;
-
-	public : void init();
-	private   : Omega() ;
-	private   : ~Omega() ;
-	private   : Omega(const Omega&);
-	private   : Omega& operator=(const Omega&);
-
-	friend class Singleton< Omega >;
-	
-	public : void logMessage(const string& str);
-	public : void logError(const string& str);
-};
+ 
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#endif // __OMEGA_H__
+void QtGUIGenerator::buildGUI(shared_ptr<Serializable> s, QWidget * parent, QFrame* frame)
+{
+	XMLManager xmlManager;
+	s->registerAttributes();
+
+	frame->setCaption(s->getClassName().c_str());
+	
+	Serializable::Archives archives = s->getArchives();
+
+	
+	Serializable::Archives::iterator ai    = archives.begin();
+	Serializable::Archives::iterator aiEnd = archives.end();
+	int nbLines=0;
+	for( ; ai!=aiEnd ; ++ai)
+	{
+		if ((*ai)->isFundamental())
+		{
+			QLabel *label = new QLabel( frame, (*ai)->getName().c_str() );
+			label->setText((*ai)->getName().c_str());
+			label->setGeometry( QRect( 10, (20+5)*nbLines+10, 150, 20 ) );
+
+			vector<QLineEdit *> lineEdits;
+			stringstream stream;
+			(*ai)->serialize(stream,*(*ai),0);
+			string str;
+			
+			while (!stream.eof())
+			{
+				lineEdits.push_back(new QLineEdit(frame, (*ai)->getName().c_str() ));
+				stream >> str;				
+				lineEdits.back()->setText(str);
+			}
+			for(int i=0;i<lineEdits.size();i++)
+			{
+				int size = (100-(lineEdits.size()-1)*5)/lineEdits.size();
+				lineEdits[i]->setGeometry( QRect( 150+(size+5)*i, (20+5)*nbLines+10, size, 20 ) );
+			}
+			nbLines++;
+		}
+	}
+
+	QPushButton *ok    = new QPushButton( frame, "OK");
+	QPushButton *apply = new QPushButton( frame, "APPLY");
+	QPushButton *cancel = new QPushButton( frame, "CANCEL");
+	ok->setText("OK");
+	apply->setText("Apply");
+	cancel->setText("Cancel");
+	
+	int width = 260+20;
+	
+	ok->setGeometry( QRect( (width-3*70-2*5)/2, (20+5)*nbLines+30, 70, 30 ) );
+	cancel->setGeometry( QRect( (width-3*70-2*5)/2+75, (20+5)*nbLines+30, 70, 30 ) );
+	apply->setGeometry( QRect( (width-3*70-2*5)/2+75+75, (20+5)*nbLines+30, 70, 30 ) );
+
+	QSize size(width,nbLines*(20+5)+20+50);
+	frame->resize(size);
+	frame->setMinimumSize(size);
+	frame->setMaximumSize(size);
+	frame->setEnabled(true);
+	frame->move(10,10);
+	
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////

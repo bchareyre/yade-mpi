@@ -96,6 +96,7 @@ void Polyhedron::glDraw()
 
 void Polyhedron::computeNormals()
 {
+
 	for(unsigned int i=0;i<faces.size();i++)
 	{
 		Vector3 v1 = vertices[faces[i][0]];

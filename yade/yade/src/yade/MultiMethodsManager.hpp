@@ -46,19 +46,15 @@ class CollisionFunctor;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-//template<class Functor>
 class MultiMethodsManager 
 {	
 	protected : std::vector<std::vector<shared_ptr<CollisionFunctor> > > callBacks;
-	private   : map<string,int> indexedClassName;
-		
-	// construction
-	public : MultiMethodsManager ()
-	{
-		callBacks.resize(0);
-	};
+	private   : vector<string> indexedClassName;
 
-	public : virtual ~MultiMethodsManager () {};
+	// construction
+	public : MultiMethodsManager ();
+
+	public : virtual ~MultiMethodsManager ();
 
 	public : bool add(const string& name);
 	

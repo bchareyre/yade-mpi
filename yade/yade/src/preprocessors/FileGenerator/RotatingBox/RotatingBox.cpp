@@ -216,7 +216,9 @@ void RotatingBox::exec()
 		translation = Vector3(i,j,k)*10-Vector3(45,45,45)+Vector3(Rand::symmetricRandom(),Rand::symmetricRandom(),Rand::symmetricRandom());
 		float radius = (4+Rand::symmetricRandom());
 		
-		s->dynamic		= shared_ptr<DynamicEngine>(new BallisticDynamicEngine);;
+		shared_ptr<BallisticDynamicEngine> ballistic(new BallisticDynamicEngine);
+		ballistic->damping 	= 0.95;
+		s->dynamic		= dynamic_pointer_cast<DynamicEngine>(ballistic);
 		s->isDynamic		= true;
 		s->angularVelocity	= Vector3(0,0,0);
 		s->velocity		= Vector3(0,0,0);
@@ -239,5 +241,5 @@ void RotatingBox::exec()
 		rootBody->bodies.push_back(dynamic_pointer_cast<Body>(s));
 	}
 
-	IOManager::saveToFile("XMLManager", "../data/scene.xml", "rootBody", rootBody);
+	IOManager::saveToFile("XMLManager", "../data/RotatingBox.xml", "rootBody", rootBody);
 }

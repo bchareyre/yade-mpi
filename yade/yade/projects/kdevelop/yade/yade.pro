@@ -3,7 +3,6 @@
 # Subdir relative project main directory: ./yade
 # Target is an application:  
 
-FORMS += QtGeneratedFrontEnd.ui 
 HEADERS += Body.hpp \
            BoundingVolumeFactory.hpp \
            BoundingVolume.hpp \
@@ -18,18 +17,13 @@ HEADERS += Body.hpp \
            DynamicEngine.hpp \
            DynLibManager.hpp \
            ExceptionMessages.hpp \
-           FpsTracker.hpp \
-           FrontEnd.hpp \
            GeometricalModelFactory.hpp \
            GeometricalModel.hpp \
-           GLViewer.hpp \
            IOManager.hpp \
            KinematicEngine.hpp \
            NarrowPhaseCollider.hpp \
            NonConnexBody.hpp \
            Omega.hpp \
-           QGLSubWindow.hpp \
-           QtFrontEnd.hpp \
            Singleton.hpp \
            Tree.hpp \
            Types.hpp \
@@ -39,7 +33,8 @@ HEADERS += Body.hpp \
            Factorable.hpp \
            InteractionModel.hpp \
            Interaction.hpp \
-           Contact.hpp 
+           Contact.hpp \
+           GUI.hpp 
 SOURCES += Body.cpp \
            BoundingVolume.cpp \
            BoundingVolumeFactory.cpp \
@@ -54,24 +49,20 @@ SOURCES += Body.cpp \
            DynamicEngine.cpp \
            DynLibManager.cpp \
            ExceptionMessages.cpp \
-           FpsTracker.cpp \
-           FrontEnd.cpp \
            GeometricalModel.cpp \
            GeometricalModelFactory.cpp \
-           GLViewer.cpp \
            IOManager.cpp \
            KinematicEngine.cpp \
            NarrowPhaseCollider.cpp \
            NonConnexBody.cpp \
            Omega.cpp \
-           QGLSubWindow.cpp \
-           QtFrontEnd.cpp \
            yade.cpp \
            MultiMethodsManager.cpp \
            Factorable.cpp \
            InteractionModel.cpp \
            Interaction.cpp \
-           Contact.cpp 
+           Contact.cpp \
+           GUI.cpp 
 LIBS += -lM3D \
 -lConstants \
 -lSerialization \

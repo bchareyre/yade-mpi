@@ -3,43 +3,40 @@
 #include "CollisionModel.hpp"
 #include "CollisionFunctor.hpp"
 
-bool MultiMethodsManager::go(const shared_ptr<CollisionModel> cm1, const shared_ptr<CollisionModel> cm2, const Se3& se31, const Se3& se32, shared_ptr<Interaction> c)
+
+MultiMethodsManager::MultiMethodsManager ()
 {
-	assert(cm1->getClassIndex()>=0);
-	assert(cm2->getClassIndex()>=0);
-	assert((unsigned int)(cm1->getClassIndex())<callBacks.size());
-	assert((unsigned int)(cm2->getClassIndex())<callBacks.size());
-	shared_ptr<CollisionFunctor> cf = callBacks[cm1->getClassIndex()][cm2->getClassIndex()];
-	if (cf!=0)
-		return (*cf)(cm1,cm2,se31,se32,c);
-	else
-	{
-		//cout << cm1->getClassName() << " " << cm2->getClassName() << endl;
-		return false;
-	}
+	callBacks.resize(0);
+	indexedClassName.resize(0);
 }
 
+MultiMethodsManager::~MultiMethodsManager ()
+{
+}
 
 
 bool MultiMethodsManager::add(const string& name)
 {
-	if (indexedClassName.find(name)==indexedClassName.end())
+	shared_ptr<CollisionModel> cm  = dynamic_pointer_cast<CollisionModel>(ClassFactory::instance().createShared(name));
+	int& index = cm->getClassIndex();
+	
+	if (index==-1)
 	{
-		indexedClassName[name] = -1;
-		
-		shared_ptr<CollisionModel> cm  = dynamic_pointer_cast<CollisionModel>(ClassFactory::instance().createShared(name));
+		index = indexedClassName.size();
+		indexedClassName.push_back(name);
 
-		int& index = cm->getClassIndex();
-		bool found;
-		assert(index==-1);
-		index = indexedClassName.size()-1;
-		indexedClassName[name] = index;
-		map<string,int>::iterator icni    = indexedClassName.begin();
-		map<string,int>::iterator icniEnd = indexedClassName.end();
-		for( ;icni!=icniEnd; ++icni )
+		// resizing callBacks table
+		callBacks.resize( indexedClassName.size() );
+		std::vector<std::vector<shared_ptr<CollisionFunctor> > >::iterator ci    = callBacks.begin();
+		std::vector<std::vector<shared_ptr<CollisionFunctor> > >::iterator ciEnd = callBacks.end();
+		for( ; ci != ciEnd ; ++ci )
+			(*ci).resize( indexedClassName.size() );
+			
+		bool found=false;
+		for(int i=0 ;i<indexedClassName.size();i++)
 		{
-			string functorName = name+"2"+(*icni).first+"4ClosestFeatures";
-			string reverseFunctorName = (*icni).first+"2"+name+"4ClosestFeatures";
+			string functorName = name+"2"+indexedClassName[i]+"4ClosestFeatures";
+			string reverseFunctorName = indexedClassName[i]+"2"+name+"4ClosestFeatures";
 			shared_ptr<CollisionFunctor> collisionFunctor,reverseCollisionFunctor;
 			try
 			{
@@ -65,28 +62,35 @@ bool MultiMethodsManager::add(const string& name)
 				}
 			}
 
-			// resize callBacks table if necessary
-			if(callBacks.size() <= indexedClassName.size() )
-			{
-				callBacks.resize( indexedClassName.size() );
-				std::vector<std::vector<shared_ptr<CollisionFunctor> > >::iterator ci    = callBacks.begin();
-				std::vector<std::vector<shared_ptr<CollisionFunctor> > >::iterator ciEnd = callBacks.end();
-				for( ; ci != ciEnd ; ++ci )
-					(*ci).resize( indexedClassName.size() );
-			}
  			if (found)
 			{
-				callBacks[ indexedClassName[(*icni).first] ][ index ] = reverseCollisionFunctor;			
-				callBacks[ index ][ indexedClassName[(*icni).first] ] = collisionFunctor;
+				callBacks[i][index] = reverseCollisionFunctor;
+				callBacks[index][i] = collisionFunctor;
 			}
+			found=false;
 		}
 
 		#ifdef DEBUG
-			cerr << "New class added to NarrowColliderMultiMethodsManager: " << name << endl;
+			cerr <<" New class added to NarrowColliderMultiMethodsManager: " << name << endl;
 		#endif
 
 		return true;
 	}
+	else
+		return false;
+}
+
+bool MultiMethodsManager::go(const shared_ptr<CollisionModel> cm1, const shared_ptr<CollisionModel> cm2, const Se3& se31, const Se3& se32, shared_ptr<Interaction> c)
+{
+	assert(cm1->getClassIndex()>=0);
+	assert(cm2->getClassIndex()>=0);
+	assert((unsigned int)(cm1->getClassIndex())<callBacks.size());	
+	assert((unsigned int)(cm2->getClassIndex())<callBacks.size());
+	
+	shared_ptr<CollisionFunctor> cf = callBacks[cm1->getClassIndex()][cm2->getClassIndex()];
+	
+	if (cf!=0)
+		return (*cf)(cm1,cm2,se31,se32,c);
 	else
 		return false;
 }

@@ -142,7 +142,10 @@ void HangingCloth::exec()
 		Vector3 translation(100*Rand::symmetricRandom(),10+100*Rand::unitRandom(),100*Rand::symmetricRandom());
 		float radius = 0.5*(20+10*Rand::unitRandom());
 
-		s->dynamic		= shared_ptr<DynamicEngine>(new BallisticDynamicEngine);;
+		shared_ptr<BallisticDynamicEngine> ballistic(new BallisticDynamicEngine);
+		ballistic->damping 	= 0.999;
+		s->dynamic		= dynamic_pointer_cast<DynamicEngine>(ballistic);
+		
 		s->isDynamic		= true;
 		s->angularVelocity	= Vector3(0,0,0);
 		s->velocity		= Vector3(0,0,0);
@@ -172,6 +175,6 @@ void HangingCloth::exec()
 	}
 
 	
-	IOManager::saveToFile("XMLManager", "../data/scene.xml", "rootBody", rootBody);
+	IOManager::saveToFile("XMLManager", "../data/HangingCloth.xml", "rootBody", rootBody);
 
 }

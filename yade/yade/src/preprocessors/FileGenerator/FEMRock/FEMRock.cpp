@@ -105,6 +105,6 @@ void FEMRock::exec()
 	rootBody->bodies.push_back(dynamic_pointer_cast<Body>(box1));
 
 	
-	IOManager::saveToFile("XMLManager", "../data/scene.xml", "rootBody", rootBody);
+	IOManager::saveToFile("XMLManager", "../data/FEMRock.xml", "rootBody", rootBody);
 
 }

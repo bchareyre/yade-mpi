@@ -1,0 +1,100 @@
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
+<class>YadeQtGeneratedMainWindow</class>
+<widget class="QMainWindow">
+    <property name="name">
+        <cstring>YadeQtGeneratedMainWindow</cstring>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>600</width>
+            <height>482</height>
+        </rect>
+    </property>
+    <property name="caption">
+        <string>YaDe</string>
+    </property>
+</widget>
+<menubar>
+    <property name="name">
+        <cstring>MenuBar</cstring>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>600</width>
+            <height>28</height>
+        </rect>
+    </property>
+    <item text="&amp;File" name="fileMenu">
+        <action name="fileNewSimulationAction"/>
+        <separator/>
+        <action name="fileExitAction"/>
+    </item>
+</menubar>
+<toolbars>
+</toolbars>
+<actions>
+    <action>
+        <property name="name">
+            <cstring>fileNewSimulationAction</cstring>
+        </property>
+        <property name="iconSet">
+            <iconset>image0</iconset>
+        </property>
+        <property name="text">
+            <string>New Simulation ...</string>
+        </property>
+        <property name="menuText">
+            <string>&amp;New Simulation ...</string>
+        </property>
+        <property name="toolTip">
+            <string>Load a simulation from a file...</string>
+        </property>
+        <property name="accel">
+            <string>Ctrl+N</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>fileExitAction</cstring>
+        </property>
+        <property name="text">
+            <string>Exit</string>
+        </property>
+        <property name="menuText">
+            <string>E&amp;xit</string>
+        </property>
+        <property name="accel">
+            <string></string>
+        </property>
+    </action>
+</actions>
+<images>
+    <image name="image0">
+        <data format="PNG" length="184">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b0000007f49444154388ded95510a0021084475d9db041ec0e8fa5ecbfdda852d4b11fa6b2028a3570c53a188c00edd7d819935b2504470357f5945559d36000022720f60823d11910b1fac88a894f2f599592d5b52e05aeb6f6cc153e0d6da50ebe12930e2321039f09b0c6fb3542a223ae0033ee085cc2b1d790b3ce1ae3f6f9b150f6d5433af47a4f4c20000000049454e44ae426082</data>
+    </image>
+</images>
+<connections>
+    <connection>
+        <sender>fileNewSimulationAction</sender>
+        <signal>activated()</signal>
+        <receiver>YadeQtGeneratedMainWindow</receiver>
+        <slot>fileNewSimulation()</slot>
+    </connection>
+    <connection>
+        <sender>fileExitAction</sender>
+        <signal>activated()</signal>
+        <receiver>YadeQtGeneratedMainWindow</receiver>
+        <slot>fileExit()</slot>
+    </connection>
+</connections>
+<slots>
+    <slot>fileNewSimulation()</slot>
+    <slot>fileExit()</slot>
+    <slot>dynamicMenuClicked()</slot>
+</slots>
+<layoutdefaults spacing="6" margin="11"/>
+</UI>

@@ -54,6 +54,7 @@ class Indexable// : public Serializable
 
 	/*! Returns the id of the current class. This id is set by a multimethod manager */
 	public : virtual int& getClassIndex() { throw;};
+	public : virtual const int& getClassIndex() const { throw;};
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -72,6 +73,11 @@ class Indexable// : public Serializable
 		return index;					\
 	}							\
 	virtual int& getClassIndex()				\
+	{							\
+		assert(typeid(*this)==typeid(SomeClass));	\
+		return getClassIndexStatic();			\
+	}							\
+	virtual const int& getClassIndex() const		\
 	{							\
 		assert(typeid(*this)==typeid(SomeClass));	\
 		return getClassIndexStatic();			\
