@@ -22,6 +22,7 @@ rm $YADEPATH/yade/projects/kdevelop/yade.tag
 rm $YADEPATH/yade/projects/kdevelop/tags
 rm $YADEPATH/data/log.xml
 rm $YADEPATH/data/scene.xml
+rm $YADEINCLUDEPATH/*
 
 
 find ../ -name '$(YADEBINPATH)' -exec rm -r {} \;

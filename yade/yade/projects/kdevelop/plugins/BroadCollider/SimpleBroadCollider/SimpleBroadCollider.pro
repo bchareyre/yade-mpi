@@ -13,18 +13,7 @@ LIBS += -lBoundingSphere \
         -lInteraction \
         -lMultiMethods \
         -rdynamic 
-INCLUDEPATH = ../../../plugins/BoundingVolume/BoundingSphere \
-              ../../../plugins/BoundingVolume/AABB \
-              ../../../yade/yade \
-              ../../../yade/Body \
-              ../../../yade/Engine \
-              ../../../yade/Interaction \
-              ../../../yade/Geometry \
-              ../../../yade/MultiMethods \
-              ../../../yade/Factory \
-              ../../../toolboxes/Libraries/Math \
-              ../../../toolboxes/Libraries/Serialization \
-              ../../../toolboxes/Libraries/AssocVector 
+INCLUDEPATH = $(YADEINCLUDEPATH)
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 

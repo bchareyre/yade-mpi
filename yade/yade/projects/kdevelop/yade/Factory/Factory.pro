@@ -4,9 +4,7 @@
 # Target is a library:  
 
 LIBS += -rdynamic 
-INCLUDEPATH = ../../yade/yade \
-              ../../toolboxes/Libraries/Serialization \
-              ../../toolboxes/Libraries/AssocVector 
+INCLUDEPATH = $(YADEINCLUDEPATH)
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 

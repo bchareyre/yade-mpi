@@ -104,7 +104,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>toolboxes/DataStructures/AssocVector</activedir>
+      <activedir>frontends/QtGUIGenerator</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>

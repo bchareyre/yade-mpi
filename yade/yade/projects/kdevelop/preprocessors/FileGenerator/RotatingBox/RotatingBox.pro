@@ -17,34 +17,12 @@ LIBS += -lAABB \
         -lSDECDiscreteElement \
         -lMath \
         -lBody \
-        -lIOManager \
         -lEngine \
         -lGeometry \
         -lInteraction \
         -lMultiMethods \
         -rdynamic 
-INCLUDEPATH = ../../../plugins/DynamicEngine/SDECDynamicEngine \
-              ../../../plugins/DynamicEngine/BallisticDynamicEngine \
-              ../../../plugins/DynamicEngine/SimpleSpringDynamicEngine \
-              ../../../plugins/KinematicEngine/Rotor \
-              ../../../plugins/Body/SDECDiscreteElement \
-              ../../../plugins/Body/RigidBody \
-              ../../../plugins/BroadCollider/SAPCollider \
-              ../../../plugins/NarrowCollider/SimpleNarrowCollider \
-              ../../../plugins/GeometricalModel/Box \
-              ../../../plugins/GeometricalModel/Sphere \
-              ../../../plugins/BoundingVolume/AABB \
-              ../../../yade/yade \
-              ../../../yade/Body \
-              ../../../yade/Engine \
-              ../../../yade/Interaction \
-              ../../../yade/Geometry \
-              ../../../yade/MultiMethods \
-              ../../../yade/Factory \
-              ../../../toolboxes/Libraries/Math \
-              ../../../toolboxes/Libraries/IOManager \
-              ../../../toolboxes/Libraries/Serialization \
-              ../../../toolboxes/Libraries/AssocVector 
+INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
@@ -62,7 +40,6 @@ QMAKE_LIBDIR = ../../../plugins/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/SDECDiscreteElement/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
                ../../../yade/Body/$(YADEDYNLIBPATH) \
-               ../../../toolboxes/Libraries/IOManager/$(YADEDYNLIBPATH) \
                ../../../yade/Engine/$(YADEDYNLIBPATH) \
                ../../../yade/Geometry/$(YADEDYNLIBPATH) \
                ../../../yade/Interaction/$(YADEDYNLIBPATH) \

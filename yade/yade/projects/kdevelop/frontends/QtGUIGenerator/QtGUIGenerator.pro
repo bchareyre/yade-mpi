@@ -6,25 +6,14 @@
 LIBS += -lSerialization \
         -lXMLManager \
         -lMath \
-        -lIOManager \
-        -lFrontEnd \
         -rdynamic 
-INCLUDEPATH = ../../plugins/IOManager/XMLManager \
-              ../../yade/yade \
-              ../../yade/Factory \
-              ../../toolboxes/Libraries/FrontEnd \
-              ../../toolboxes/Libraries/Math \
-              ../../toolboxes/Libraries/IOManager \
-              ../../toolboxes/Libraries/Serialization \
-              ../../toolboxes/Libraries/AssocVector 
+INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 QMAKE_LIBDIR = ../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../plugins/IOManager/XMLManager/$(YADEDYNLIBPATH) \
                ../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
-               ../../toolboxes/Libraries/IOManager/$(YADEDYNLIBPATH) \
-               ../../toolboxes/Libraries/FrontEnd/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
 CONFIG += debug \

@@ -11,17 +11,7 @@ LIBS += -lBox \
         -lInteraction \
         -lMultiMethods \
         -rdynamic 
-INCLUDEPATH = ../../../../plugins/GeometricalModel/Box \
-              ../../../../plugins/InteractionModel/ClosestFeatures \
-              ../../../../yade/yade \
-              ../../../../yade/Interaction \
-              ../../../../yade/Geometry \
-              ../../../../yade/MultiMethods \
-              ../../../../yade/Factory \
-              ../../../../toolboxes/ComputationalGeometry/Intersections \
-              ../../../../toolboxes/Libraries/Math \
-              ../../../../toolboxes/Libraries/Serialization \
-              ../../../../toolboxes/Libraries/AssocVector 
+INCLUDEPATH = $(YADEINCLUDEPATH)
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 

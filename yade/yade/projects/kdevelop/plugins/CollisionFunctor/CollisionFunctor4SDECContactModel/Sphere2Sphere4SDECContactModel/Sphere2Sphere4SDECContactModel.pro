@@ -11,16 +11,7 @@ LIBS += -lSphere \
         -lInteraction \
         -lMultiMethods \
         -rdynamic 
-INCLUDEPATH = ../../../../plugins/GeometricalModel/Sphere \
-              ../../../../plugins/InteractionModel/SDECContactModel \
-              ../../../../yade/yade \
-              ../../../../yade/Interaction \
-              ../../../../yade/Geometry \
-              ../../../../yade/MultiMethods \
-              ../../../../yade/Factory \
-              ../../../../toolboxes/Libraries/Math \
-              ../../../../toolboxes/Libraries/Serialization \
-              ../../../../toolboxes/Libraries/AssocVector 
+INCLUDEPATH = $(YADEINCLUDEPATH)
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 

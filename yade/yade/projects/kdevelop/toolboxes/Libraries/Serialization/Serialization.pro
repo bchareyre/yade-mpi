@@ -5,12 +5,12 @@
 
 LIBS += -lAssocVector \
         -rdynamic 
-INCLUDEPATH = ../../../yade/yade \
-              ../../../yade/Factory \
-              ../../../toolboxes/DataStructures/AssocVector 
+INCLUDEPATH = $(YADEINCLUDEPATH)
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
+QMAKE_LIBDIR = ../../../toolboxes/DataStructures/AssocVector/$(YADEDYNLIBPATH) \
+               $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
 CONFIG += debug \
           warn_on \

@@ -10,19 +10,7 @@ LIBS += -lTerrain \
         -lInteraction \
         -lMultiMethods \
         -rdynamic 
-INCLUDEPATH = ../../../../plugins/GeometricalModel/Sphere \
-              ../../../../plugins/GeometricalModel/Terrain \
-              ../../../../plugins/BoundingVolume/AABB \
-              ../../../../plugins/InteractionModel/ClosestFeatures \
-              ../../../../yade/yade \
-              ../../../../yade/Interaction \
-              ../../../../yade/Geometry \
-              ../../../../yade/MultiMethods \
-              ../../../../yade/Factory \
-              ../../../../toolboxes/ComputationalGeometry/Distances \
-              ../../../../toolboxes/Libraries/Math \
-              ../../../../toolboxes/Libraries/Serialization \
-              ../../../../toolboxes/Libraries/AssocVector 
+INCLUDEPATH = $(YADEINCLUDEPATH)
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 

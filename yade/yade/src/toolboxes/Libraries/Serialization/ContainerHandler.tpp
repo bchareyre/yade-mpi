@@ -264,7 +264,7 @@ struct ContainerHandler<std::set<ContainedType> >
 			i=0;
 		if( i != maxSize )
 		{
-			string name = ac.getName()+"["+lexical_cast<string>(i)+"]";
+			string name = ac.getName()/*+"["+lexical_cast<string>(i)+"]"*/;
 
 			it		= tmpSet->begin();
 			itEnd		= tmpSet->end();
@@ -462,7 +462,7 @@ struct ContainerHandler<std::map< ContainedType1 , ContainedType2> >
 			i=0;
 		if( i != maxSize )
 		{
-			string name = ac.getName()+"["+lexical_cast<string>(i)+"]";
+			string name = ac.getName()/*+"["+lexical_cast<string>(i)+"]"*/;
 
 			it		= tmpMap->begin();
 			itEnd		= tmpMap->end();
@@ -573,7 +573,7 @@ struct ContainerHandler<Loki::AssocVector< ContainedType1 , ContainedType2> >
 			i=0;
 		if( i != maxSize )
 		{
-			string name = ac.getName()+"["+lexical_cast<string>(i)+"]";
+			string name = ac.getName()/*+"["+lexical_cast<string>(i)+"]"*/;
 
 			it		= tmpAssocVector->begin();
 			itEnd		= tmpAssocVector->end();

@@ -16,21 +16,7 @@ LIBS += -lSerialization \
         -lMultiMethods \
         -lSDECPermanentLink \
         -rdynamic 
-INCLUDEPATH = ../../../plugins/Body/SDECDiscreteElement \
-              ../../../plugins/Body/RigidBody \
-              ../../../plugins/GeometricalModel/Sphere \
-              ../../../plugins/InteractionModel/SDECPermanentLink \
-              ../../../plugins/InteractionModel/SDECContactModel \
-              ../../../yade/yade \
-              ../../../yade/Body \
-              ../../../yade/Engine \
-              ../../../yade/Interaction \
-              ../../../yade/Geometry \
-              ../../../yade/MultiMethods \
-              ../../../yade/Factory \
-              ../../../toolboxes/Libraries/Math \
-              ../../../toolboxes/Libraries/Serialization \
-              ../../../toolboxes/Libraries/AssocVector 
+INCLUDEPATH = $(YADEINCLUDEPATH)
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 

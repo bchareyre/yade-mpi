@@ -13,34 +13,13 @@ LIBS += -lSDECDynamicEngine \
         -lBallisticDynamicEngine \
         -lMath \
         -lBody \
-        -lIOManager \
         -lEngine \
         -lMultiMethods \
         -lSDECPermanentLink \
         -lGeometry \
         -lInteraction \
         -rdynamic 
-INCLUDEPATH = ../../../plugins/DynamicEngine/SDECDynamicEngine \
-              ../../../plugins/DynamicEngine/BallisticDynamicEngine \
-              ../../../plugins/Body/SDECDiscreteElement \
-              ../../../plugins/Body/RigidBody \
-              ../../../plugins/BroadCollider/SAPCollider \
-              ../../../plugins/NarrowCollider/SimpleNarrowCollider \
-              ../../../plugins/GeometricalModel/Box \
-              ../../../plugins/GeometricalModel/Sphere \
-              ../../../plugins/BoundingVolume/AABB \
-              ../../../plugins/InteractionModel/SDECPermanentLink \
-              ../../../yade/yade \
-              ../../../yade/Body \
-              ../../../yade/Engine \
-              ../../../yade/Interaction \
-              ../../../yade/Geometry \
-              ../../../yade/MultiMethods \
-              ../../../yade/Factory \
-              ../../../toolboxes/Libraries/Math \
-              ../../../toolboxes/Libraries/IOManager \
-              ../../../toolboxes/Libraries/Serialization \
-              ../../../toolboxes/Libraries/AssocVector 
+INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
@@ -54,7 +33,6 @@ QMAKE_LIBDIR = ../../../plugins/DynamicEngine/SDECDynamicEngine/$(YADEDYNLIBPATH
                ../../../plugins/DynamicEngine/BallisticDynamicEngine/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
                ../../../yade/Body/$(YADEDYNLIBPATH) \
-               ../../../toolboxes/Libraries/IOManager/$(YADEDYNLIBPATH) \
                ../../../yade/Engine/$(YADEDYNLIBPATH) \
                ../../../yade/MultiMethods/$(YADEDYNLIBPATH) \
                ../../../plugins/InteractionModel/SDECPermanentLink/$(YADEDYNLIBPATH) \

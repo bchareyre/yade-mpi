@@ -13,18 +13,7 @@ LIBS += -lMesh2D \
         -lInteraction \
         -lMultiMethods \
         -rdynamic 
-INCLUDEPATH = ../../../../plugins/GeometricalModel/Mesh2D \
-              ../../../../plugins/GeometricalModel/Sphere \
-              ../../../../plugins/InteractionModel/ClosestFeatures \
-              ../../../../yade/yade \
-              ../../../../yade/Interaction \
-              ../../../../yade/Geometry \
-              ../../../../yade/MultiMethods \
-              ../../../../yade/Factory \
-              ../../../../toolboxes/ComputationalGeometry/Distances \
-              ../../../../toolboxes/Libraries/Math \
-              ../../../../toolboxes/Libraries/Serialization \
-              ../../../../toolboxes/Libraries/AssocVector 
+INCLUDEPATH = $(YADEINCLUDEPATH)
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 

@@ -1,6 +1,7 @@
 #! /bin/sh
 
 ./makeSymLinks
+./createIncludes
 
 echo 'You should run:'
 echo '  >  source yadeEnv YOUR_YADE_PATH      # WARNING: _no_ trailing slash!!'

@@ -7,12 +7,7 @@ LIBS += -lSerialization \
         -lMath \
         -lGeometry \
         -rdynamic 
-INCLUDEPATH = ../../../yade/yade \
-              ../../../yade/Geometry \
-              ../../../yade/Factory \
-              ../../../toolboxes/Libraries/Math \
-              ../../../toolboxes/Libraries/Serialization \
-              ../../../toolboxes/Libraries/AssocVector 
+INCLUDEPATH = $(YADEINCLUDEPATH)
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 

@@ -1,0 +1,21 @@
+#! /bin/sh
+
+echo 'ORGDIR=`pwd`'										> makeSymLinkIncl
+echo 'ONLYNAME=`basename $1`'									>> makeSymLinkIncl
+echo 'TMPNAME=$YADEPATH/yade/include/$ONLYNAME'							>> makeSymLinkIncl
+echo 'echo symlinking $ORGDIR/$1 to `dirname $TMPNAME`'						>> makeSymLinkIncl
+echo 'TMPDIR=`dirname $TMPNAME`'								>> makeSymLinkIncl
+echo 'cd $TMPDIR'										>> makeSymLinkIncl
+echo 'ln -s $ORGDIR/$1 `basename $TMPNAME`'							>> makeSymLinkIncl
+echo 'cd $ORGDIR'										>> makeSymLinkIncl
+
+chmod a+x ./makeSymLinkIncl
+
+find ../src/ -name "*.hpp" -exec ./makeSymLinkIncl {} \;
+find ../src/ -name "*.tpp" -exec ./makeSymLinkIncl {} \;
+find ../src/ -name "*.ipp" -exec ./makeSymLinkIncl {} \;
+
+symlinks -rcs ./
+symlinks -rcs ./
+
+rm ./makeSymLinkIncl

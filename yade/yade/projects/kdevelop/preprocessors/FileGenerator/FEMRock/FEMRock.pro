@@ -11,28 +11,12 @@ LIBS += -lSerialization \
         -lPolyhedron \
         -lMath \
         -lBody \
-        -lIOManager \
         -lEngine \
         -lGeometry \
         -lInteraction \
         -lMultiMethods \
         -rdynamic 
-INCLUDEPATH = ../../../plugins/Body/FEMBody \
-              ../../../plugins/Body/RigidBody \
-              ../../../plugins/GeometricalModel/Polyhedron \
-              ../../../plugins/GeometricalModel/Box \
-              ../../../plugins/BoundingVolume/AABB \
-              ../../../yade/yade \
-              ../../../yade/Body \
-              ../../../yade/Engine \
-              ../../../yade/Interaction \
-              ../../../yade/Geometry \
-              ../../../yade/MultiMethods \
-              ../../../yade/Factory \
-              ../../../toolboxes/Libraries/Math \
-              ../../../toolboxes/Libraries/IOManager \
-              ../../../toolboxes/Libraries/Serialization \
-              ../../../toolboxes/Libraries/AssocVector 
+INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
@@ -44,7 +28,6 @@ QMAKE_LIBDIR = ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../../plugins/GeometricalModel/Polyhedron/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
                ../../../yade/Body/$(YADEDYNLIBPATH) \
-               ../../../toolboxes/Libraries/IOManager/$(YADEDYNLIBPATH) \
                ../../../yade/Engine/$(YADEDYNLIBPATH) \
                ../../../yade/Geometry/$(YADEDYNLIBPATH) \
                ../../../yade/Interaction/$(YADEDYNLIBPATH) \

@@ -18,35 +18,12 @@ LIBS += -lMesh2D \
         -lMassSpringBody2RigidBodyDynamicEngine \
         -lMath \
         -lBody \
-        -lIOManager \
         -lEngine \
         -lGeometry \
         -lInteraction \
         -lMultiMethods \
         -rdynamic 
-INCLUDEPATH = ../../../plugins/DynamicEngine/MassSpringBody2RigidBodyDynamicEngine \
-              ../../../plugins/DynamicEngine/BallisticDynamicEngine \
-              ../../../plugins/DynamicEngine/ExplicitMassSpringDynamicEngine \
-              ../../../plugins/DynamicEngine/SimpleSpringDynamicEngine \
-              ../../../plugins/Body/MassSpringBody \
-              ../../../plugins/Body/RigidBody \
-              ../../../plugins/BroadCollider/SAPCollider \
-              ../../../plugins/NarrowCollider/SimpleNarrowCollider \
-              ../../../plugins/GeometricalModel/Mesh2D \
-              ../../../plugins/GeometricalModel/Sphere \
-              ../../../plugins/BoundingVolume/AABB \
-              ../../../plugins/InteractionModel/ClosestFeatures \
-              ../../../yade/yade \
-              ../../../yade/Body \
-              ../../../yade/Engine \
-              ../../../yade/Interaction \
-              ../../../yade/Geometry \
-              ../../../yade/MultiMethods \
-              ../../../yade/Factory \
-              ../../../toolboxes/Libraries/Math \
-              ../../../toolboxes/Libraries/IOManager \
-              ../../../toolboxes/Libraries/Serialization \
-              ../../../toolboxes/Libraries/AssocVector 
+INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADEDYNLIBPATH) 
 UI_DIR = $(YADEDYNLIBPATH) 
 OBJECTS_DIR = $(YADEDYNLIBPATH) 
@@ -65,7 +42,6 @@ QMAKE_LIBDIR = ../../../plugins/GeometricalModel/Mesh2D/$(YADEDYNLIBPATH) \
                ../../../plugins/DynamicEngine/MassSpringBody2RigidBodyDynamicEngine/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
                ../../../yade/Body/$(YADEDYNLIBPATH) \
-               ../../../toolboxes/Libraries/IOManager/$(YADEDYNLIBPATH) \
                ../../../yade/Engine/$(YADEDYNLIBPATH) \
                ../../../yade/Geometry/$(YADEDYNLIBPATH) \
                ../../../yade/Interaction/$(YADEDYNLIBPATH) \
