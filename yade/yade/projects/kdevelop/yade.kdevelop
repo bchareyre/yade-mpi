@@ -106,7 +106,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>extensions</activedir>
+      <activedir>yade/Engine</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>
