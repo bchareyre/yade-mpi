@@ -7,12 +7,12 @@ HEADERS += ActionDispatcher.hpp \
            ActionFunctor.hpp \
            ActionContainer.hpp \
            Action.hpp \
-           DynamicEngine.hpp \
-           KinematicEngine.hpp 
+           InteractionLaw.hpp \
+           KinematicMotion.hpp 
 SOURCES += ActionDispatcher.cpp \
            ActionContainer.cpp \
-           DynamicEngine.cpp \
-           KinematicEngine.cpp 
+           InteractionLaw.cpp \
+           KinematicMotion.cpp 
 LIBS += -rdynamic
 INCLUDEPATH = $(YADEINCLUDEPATH)
 MOC_DIR = $(YADECOMPILATIONPATH)

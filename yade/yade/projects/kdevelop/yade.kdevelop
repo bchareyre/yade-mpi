@@ -99,7 +99,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>plugins/Engine/DynamicEngine/SDECDynamicEngine</activedir>
+      <activedir>plugins/Body/BoundingVolumeFunctor/InteractionDescriptionSet2AABBFunctor</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>
