@@ -10,8 +10,10 @@ class AveragePositionRecorder : public Actor
 {
 	public : std::string outputFile;
 	public : unsigned int interval;
+	public : unsigned int bigBallId;
 	
 	private : std::ofstream ofile;
+	
 
 	// construction
 	public : AveragePositionRecorder ();

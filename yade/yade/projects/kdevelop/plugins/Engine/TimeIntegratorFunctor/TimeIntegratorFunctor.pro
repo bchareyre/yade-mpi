@@ -3,7 +3,8 @@
 # Subdir relative project main directory: ./plugins/Engine/TimeIntegratorFunctor
 # Target is a subdirs project 
 
-SUBDIRS += LeapFrogIntegrator 
+SUBDIRS += LeapFrogMomentumIntegrator \
+           LeapFrogForceIntegrator 
 CONFIG += release \
           warn_on 
 TEMPLATE = subdirs 

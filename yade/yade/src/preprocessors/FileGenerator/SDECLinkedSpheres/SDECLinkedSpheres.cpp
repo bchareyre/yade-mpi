@@ -30,7 +30,7 @@
 #include "SimpleBody.hpp"
 #include "InteractionBox.hpp"
 #include "InteractionSphere.hpp"
-#include "TimeIntegratorDispatcher.hpp"
+#include "ActionDispatcher.hpp"
 
 #include "ActionReset.hpp"
 
@@ -306,10 +306,9 @@ void SDECLinkedSpheres::createActors(shared_ptr<ComplexBody>& rootBody)
 	applyActionDispatcher->add("ActionForce","ParticleParameters","ApplyActionForce2Particle");
 	applyActionDispatcher->add("ActionMomentum","RigidBodyParameters","ApplyActionMomentum2RigidBody");
 	
-	shared_ptr<TimeIntegratorDispatcher> timeIntegratorDispatcher(new TimeIntegratorDispatcher);
-	
-	
-	timeIntegratorDispatcher->add("SDECParameters","LeapFrogIntegrator"); // FIXME - bug in locateMultivirtualFunctionCall1D ???
+	shared_ptr<ActionDispatcher> timeIntegratorDispatcher(new ActionDispatcher);
+	timeIntegratorDispatcher->add("ActionForce","ParticleParameters","LeapFrogForceIntegrator");
+	timeIntegratorDispatcher->add("ActionMomentum","RigidBodyParameters","LeapFrogMomentumIntegrator");
 
 	shared_ptr<SDECTimeStepper> sdecTimeStepper(new SDECTimeStepper);
 	sdecTimeStepper->sdecGroup = 55;

@@ -32,7 +32,7 @@
 #include "ParticleSetParameters.hpp"
 #include "SpringGeometry.hpp"
 #include "SpringPhysics.hpp"
-#include "TimeIntegratorDispatcher.hpp"
+#include "ActionDispatcher.hpp"
 #include "InteractionSphere.hpp"
 
 #include "SDECDynamicEngine.hpp"
@@ -147,10 +147,9 @@ string HangingCloth::generate()
 	applyActionDispatcher->add("ActionForce","ParticleParameters","ApplyActionForce2Particle");
 	applyActionDispatcher->add("ActionMomentum","RigidBodyParameters","ApplyActionMomentum2RigidBody");
 
-	shared_ptr<TimeIntegratorDispatcher> timeIntegratorDispatcher(new TimeIntegratorDispatcher);
-	timeIntegratorDispatcher->add("ParticleParameters","LeapFrogIntegrator");
-	timeIntegratorDispatcher->add("RigidBodyParameters","LeapFrogIntegrator");
-	timeIntegratorDispatcher->add("SDECParameters","LeapFrogIntegrator"); // FIXME - bug in locateMultivirtualCall1D ???
+	shared_ptr<ActionDispatcher> timeIntegratorDispatcher(new ActionDispatcher);
+	timeIntegratorDispatcher->add("ActionForce","ParticleParameters","LeapFrogForceIntegrator");
+	timeIntegratorDispatcher->add("ActionMomentum","RigidBodyParameters","LeapFrogMomentumIntegrator");
 
 	shared_ptr<ExplicitMassSpringDynamicEngine> explicitMassSpringDynamicEngine(new ExplicitMassSpringDynamicEngine);
 	explicitMassSpringDynamicEngine->springGroup = 1;

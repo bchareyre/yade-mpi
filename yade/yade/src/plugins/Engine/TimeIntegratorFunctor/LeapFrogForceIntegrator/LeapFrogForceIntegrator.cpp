@@ -21,7 +21,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "LeapFrogIntegrator.hpp"
+#include "LeapFrogForceIntegrator.hpp"
 #include "RigidBodyParameters.hpp"
 #include "ParticleParameters.hpp"
 #include "Omega.hpp"
@@ -32,9 +32,8 @@
 
 // FIXME : should we pass timestep as parameter of functor
 // FIXME : what's with timestepper
-void LeapFrogIntegrator::go(const shared_ptr<BodyPhysicalParameters>& b,unsigned int id)
+void LeapFrogForceIntegrator::go(const shared_ptr<BodyPhysicalParameters>& b,unsigned int id)
 {
-
 	if (prevVelocities.size()<=id)
 	{
 		prevVelocities.resize(id+1);
@@ -51,25 +50,6 @@ void LeapFrogIntegrator::go(const shared_ptr<BodyPhysicalParameters>& b,unsigned
 	prevVelocities[id] = p->velocity+0.5*dt*p->acceleration;
 	p->se3.translation += prevVelocities[id]*dt;
 
-	
-	// FIXME : maybe split into 2 LeapFrogIntegrator
-	RigidBodyParameters * rb = dynamic_cast<RigidBodyParameters*>(b.get());
-	if(rb)
-	{		
-		if (prevAngularVelocities.size()<=id)
-			prevAngularVelocities.resize(id+1);
-			
-		if (!firsts[id])
-			rb->angularVelocity = prevAngularVelocities[id]+0.5*dt*rb->angularAcceleration;
-	
-		prevAngularVelocities[id] = rb->angularVelocity+0.5*dt*rb->angularAcceleration;
-		Vector3r axis = rb->angularVelocity;
-		Real angle = axis.normalize();
-		Quaternionr q;
-		q.fromAxisAngle(axis,angle*dt);
-		rb->se3.rotation = q*rb->se3.rotation;
-		rb->se3.rotation.normalize();
-	}
 	firsts[id] = false;
 }
 

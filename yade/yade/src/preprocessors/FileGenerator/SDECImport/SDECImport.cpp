@@ -30,7 +30,7 @@
 #include "SimpleBody.hpp"
 #include "InteractionBox.hpp"
 #include "InteractionSphere.hpp"
-#include "TimeIntegratorDispatcher.hpp"
+#include "ActionDispatcher.hpp"
 
 #include "ActionReset.hpp"
 
@@ -71,8 +71,14 @@ SDECImport::SDECImport () : FileGenerator()
 
 	bigBall 		= true;
 	bigBallRadius		= 0.15;
-	bigBallDensity		= 7000;
-	bigBallDropTimeSeconds	= 450;
+	bigBallPoissonRatio 	= 0.3;
+	bigBallYoungModulus 	= 40000000000.0;
+	bigBallFrictDeg 	= 60;
+//	bigBallCohesion 	= 10000000000;
+//	bigBallTensionStr 	= 10000000000;
+	bigBallDensity		= 7800;
+	bigBallDropTimeSeconds	= 30;
+	bigBallDropHeight 	= 3.04776;
 	
 	dampingForce = 0.7;
 	dampingMomentum = 0.7;
@@ -85,7 +91,7 @@ SDECImport::SDECImport () : FileGenerator()
 	
 	boxYoungModulus   = 15000000.0;
 	boxPoissonRatio  = 0.2;
-	boxFrictionDeg   = -20.0;
+	boxFrictionDeg   = -18.0;
 }
 
 SDECImport::~SDECImport ()
@@ -137,6 +143,10 @@ void SDECImport::registerAttributes()
 	REGISTER_ATTRIBUTE(bigBallRadius);
 	REGISTER_ATTRIBUTE(bigBallDensity);
 	REGISTER_ATTRIBUTE(bigBallDropTimeSeconds);
+	REGISTER_ATTRIBUTE(bigBallFrictDeg);
+	REGISTER_ATTRIBUTE(bigBallYoungModulus);
+	REGISTER_ATTRIBUTE(bigBallPoissonRatio);
+	REGISTER_ATTRIBUTE(bigBallDropHeight);
 
 }
 
@@ -176,13 +186,13 @@ string SDECImport::generate()
 			upperCorner[1] = max(translation[1]+radius , upperCorner[1]);
 			upperCorner[2] = max(translation[2]+radius , upperCorner[2]);
 			
-			createSphere(body,translation,radius);			
+			createSphere(body,translation,radius,false);			
 			rootBody->bodies->insert(body);
 		}
 	}
 
 // create bigBall
-	Vector3r translation = (upperCorner+lowerCorner)*0.5 + Vector3r(0,upperCorner[1]+bigBallRadius+4,0);
+	Vector3r translation = (upperCorner+lowerCorner)*0.5 + Vector3r(0,bigBallDropHeight,0);
 	createSphere(body,translation,bigBallRadius,true);	
 	body->isDynamic = false;
 	int bigId = 0;
@@ -206,6 +216,7 @@ string SDECImport::generate()
 	forcerec->id = body->getId();
 	forcerec->bigBallId = bigId;
 	forcerec->bigBallReleaseTime = bigBallDropTimeSeconds;
+	averagePositionRecorder->bigBalId = bigId;
 
 // top box
  	center			= Vector3r(
@@ -306,9 +317,9 @@ void SDECImport::createSphere(shared_ptr<Body>& body, Vector3r translation, Real
 							2.0/5.0*physics->mass*radius*radius,
 							2.0/5.0*physics->mass*radius*radius);
 	physics->se3			= Se3r(translation,q);
-	physics->young			= sphereYoungModulus;
-	physics->poisson		= spherePoissonRatio;
-	physics->frictionAngle		= sphereFrictionDeg * Mathr::PI/180.0;
+	physics->young			= big ? bigBallYoungModulus : sphereYoungModulus;
+	physics->poisson		= big ? bigBallPoissonRatio : spherePoissonRatio;
+	physics->frictionAngle		= (big ? bigBallFrictDeg : sphereFrictionDeg ) * Mathr::PI/180.0;
 
 	aabb->diffuseColor		= Vector3r(0,1,0);
 
@@ -382,7 +393,7 @@ void SDECImport::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r e
 
 void SDECImport::createActors(shared_ptr<ComplexBody>& rootBody)
 {
-	shared_ptr<AveragePositionRecorder> averagePositionRecorder = shared_ptr<AveragePositionRecorder>(new AveragePositionRecorder);
+	averagePositionRecorder = shared_ptr<AveragePositionRecorder>(new AveragePositionRecorder);
 	averagePositionRecorder -> outputFile 		= positionRecordFile;
 	averagePositionRecorder -> interval 		= recordIntervalIter;
 	
@@ -418,11 +429,9 @@ void SDECImport::createActors(shared_ptr<ComplexBody>& rootBody)
 	applyActionDispatcher->add("ActionForce","ParticleParameters","ApplyActionForce2Particle");
 	applyActionDispatcher->add("ActionMomentum","RigidBodyParameters","ApplyActionMomentum2RigidBody");
 	
-	shared_ptr<TimeIntegratorDispatcher> timeIntegratorDispatcher(new TimeIntegratorDispatcher);
-	
-	
-	timeIntegratorDispatcher->add("SDECParameters","LeapFrogIntegrator"); // FIXME - bug in locateMultivirtualFunctionCall1D ???
-		
+	shared_ptr<ActionDispatcher> timeIntegratorDispatcher(new ActionDispatcher);
+	timeIntegratorDispatcher->add("ActionForce","ParticleParameters","LeapFrogForceIntegrator");
+	timeIntegratorDispatcher->add("ActionMomentum","RigidBodyParameters","LeapFrogMomentumIntegrator");
 	
 	shared_ptr<SDECTimeStepper> sdecTimeStepper(new SDECTimeStepper);
 	sdecTimeStepper->sdecGroup = 10;

@@ -25,7 +25,7 @@
 #include "InteractionDescriptionSet2AABBFunctor.hpp"
 #include "InteractionDescriptionSet.hpp"
 
-#include "TimeIntegratorDispatcher.hpp"
+#include "ActionDispatcher.hpp"
 
 RotatingBox::RotatingBox () : FileGenerator()
 {
@@ -271,8 +271,9 @@ void RotatingBox::createActors(shared_ptr<ComplexBody>& rootBody)
 	applyActionDispatcher->add("ActionForce","ParticleParameters","ApplyActionForce2Particle");
 	applyActionDispatcher->add("ActionMomentum","RigidBodyParameters","ApplyActionMomentum2RigidBody");
 	
-	shared_ptr<TimeIntegratorDispatcher> timeIntegratorDispatcher(new TimeIntegratorDispatcher);
- 	timeIntegratorDispatcher->add("RigidBodyParameters","LeapFrogIntegrator");
+	shared_ptr<ActionDispatcher> timeIntegratorDispatcher(new ActionDispatcher);
+	timeIntegratorDispatcher->add("ActionForce","ParticleParameters","LeapFrogForceIntegrator");
+	timeIntegratorDispatcher->add("ActionMomentum","RigidBodyParameters","LeapFrogMomentumIntegrator");
  	
 	shared_ptr<Rotor> kinematic = shared_ptr<Rotor>(new Rotor);
  	kinematic->angularVelocity  = rotationSpeed;

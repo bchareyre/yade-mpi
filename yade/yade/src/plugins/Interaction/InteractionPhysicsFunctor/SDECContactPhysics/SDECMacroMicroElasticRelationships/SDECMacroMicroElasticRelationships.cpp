@@ -112,7 +112,7 @@ void SDECMacroMicroElasticRelationships::go(	  const shared_ptr<BodyPhysicalPara
 			contactPhysics->initialKn			= Kn;
 			contactPhysics->initialKs			= Kn*(1-alpha*Vab)/(1+Vab);
 //cerr << "Ks: " <<       contactPhysics->initialKs			<< endl;
-			contactPhysics->frictionAngle			= 2*fa*fb/(fa+fb); // FIXME - this is actually a waste of memory space, just like initialKs and initialKn
+			contactPhysics->frictionAngle			= (fa+fb)*0.5; // FIXME - this is actually a waste of memory space, just like initialKs and initialKn
 			contactPhysics->tangensOfFrictionAngle		= std::tan(contactPhysics->frictionAngle); 
 
 			contactPhysics->prevNormal 			= interactionGeometry->normal;

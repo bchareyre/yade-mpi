@@ -5,6 +5,7 @@
 #include "Vector3.hpp"
 
 class ForceRecorder;
+class AveragePositionRecorder;
 
 class SDECImport : public FileGenerator
 {
@@ -40,16 +41,21 @@ class SDECImport : public FileGenerator
 	private	: Real bigBallRadius;
 	private	: Real bigBallDensity;
 	private	: Real bigBallDropTimeSeconds;
+	private : Real bigBallPoissonRatio;
+	private : Real bigBallYoungModulus;
+	private : Real bigBallFrictDeg;
+	private : Real bigBallDropHeight;
 	private : int timeStepUpdateInterval;
 
 	private : shared_ptr<ForceRecorder> forcerec;
+	private : shared_ptr<AveragePositionRecorder> averagePositionRecorder;
 	
 	// construction
 	public : SDECImport ();
 	public : ~SDECImport ();
 	
 	private : void createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents,bool wire);
-	private : void createSphere(shared_ptr<Body>& body, Vector3r translation, Real radius,bool b = true);
+	private : void createSphere(shared_ptr<Body>& body, Vector3r translation, Real radius,bool big);
 	private : void createActors(shared_ptr<ComplexBody>& rootBody);
 	private : void positionRootBody(shared_ptr<ComplexBody>& rootBody);
 

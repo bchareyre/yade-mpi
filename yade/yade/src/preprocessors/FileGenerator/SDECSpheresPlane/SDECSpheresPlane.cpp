@@ -31,7 +31,7 @@
 #include "SimpleBody.hpp"
 #include "InteractionBox.hpp"
 #include "InteractionSphere.hpp"
-#include "TimeIntegratorDispatcher.hpp"
+#include "ActionDispatcher.hpp"
 #include "ActionReset.hpp"
 
 SDECSpheresPlane::SDECSpheresPlane () : FileGenerator()
@@ -105,8 +105,9 @@ string SDECSpheresPlane::generate()
 	applyActionDispatcher->add("ActionForce","RigidBodyParameters","ApplyActionForce2Particle");
 	applyActionDispatcher->add("ActionMomentum","RigidBodyParameters","ApplyActionMomentum2RigidBody");
 	
-	shared_ptr<TimeIntegratorDispatcher> timeIntegratorDispatcher(new TimeIntegratorDispatcher);
-	timeIntegratorDispatcher->add("SDECParameters","LeapFrogIntegrator");
+	shared_ptr<ActionDispatcher> timeIntegratorDispatcher(new ActionDispatcher);
+	timeIntegratorDispatcher->add("ActionForce","ParticleParameters","LeapFrogForceIntegrator");
+	timeIntegratorDispatcher->add("ActionMomentum","RigidBodyParameters","LeapFrogMomentumIntegrator");
 	
 	shared_ptr<SDECTimeStepper> sdecTimeStepper(new SDECTimeStepper);
 	sdecTimeStepper->sdecGroup = 0;
