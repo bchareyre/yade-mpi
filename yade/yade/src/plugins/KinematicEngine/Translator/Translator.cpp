@@ -26,9 +26,6 @@ void Translator::registerAttributes()
 
 void Translator::moveToNextTimeStep(Body * body)
 {
-// check this to see wrong behaviour
-//	if( Omega::instance().getIter() > 1000 )
-//		return;
 
 	NonConnexBody * ncb = dynamic_cast<NonConnexBody*>(body);
 	vector<shared_ptr<Body> >& bodies = ncb->bodies;
@@ -38,19 +35,30 @@ void Translator::moveToNextTimeStep(Body * body)
 
 	float dt = Omega::instance().dt;
 	time = dt;
+	static int sign = 1;
 
+	if ((Omega::instance().getIter()/1000)%2==0)
+		sign = 1;
+	else
+		sign = -1;
 
 	for(;ii!=iiEnd;++ii)
 	{
 		shared_ptr<Body>  b = bodies[(*ii)];
 
+		// FIXME - specify intervals of activity for an actor
+		//if( Omega::instance().getIter() > 1000 )
+		//	b->velocity		= Vector3(0,0,0);
+		//else
+		//{
 
-		b->se3.translation	+= dt*velocity*translationAxis;
+			b->se3.translation	+= sign*dt*velocity*translationAxis;
 
-		b->velocity		= translationAxis*velocity;
+			b->velocity		=  sign*translationAxis*velocity;
 
 		// FIXME : this shouldn't be there
-		b->updateBoundingVolume(b->se3);
+			b->updateBoundingVolume(b->se3);
+		//}
 	}
 
 
