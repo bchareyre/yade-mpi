@@ -157,12 +157,12 @@ int NullGUI::loop()
 			// save snapshot
 			if( ( snapshotInterval != -1 ) && (intervals % snapshotInterval == 0) )
 			{
-				cerr << "saving snapshot: " << snapshotName + "_" + lexical_cast<string>(Omega::instance().getCurrentIteration()) + ".xml\n";
 				shared_ptr<NonConnexBody> rootBody = Omega::instance().getRootBody();
 				IOManager::saveToFile(	"XMLManager",
 							"../data/" + snapshotName + "_" + lexical_cast<string>(Omega::instance().getCurrentIteration()) + ".xml",
 							"rootBody", 
 							rootBody);
+				cerr << "saved snapshot: " << snapshotName + "_" + lexical_cast<string>(Omega::instance().getCurrentIteration()) + ".xml\n";
 			}
 
 			// finish computation

@@ -50,7 +50,7 @@ class MassSpringBody : public ConnexBody
 /// Indexable											///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-	REGISTER_CLASS_INDEX(MassSpringBody);
+	REGISTER_CLASS_INDEX(MassSpringBody,ConnexBody);
 	
 };
 

@@ -26,7 +26,7 @@ class SDECDiscreteElement : public RigidBody
 /// Indexable											///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-	REGISTER_CLASS_INDEX(SDECDiscreteElement);
+	REGISTER_CLASS_INDEX(SDECDiscreteElement,RigidBody);
 };
 
 REGISTER_SERIALIZABLE(SDECDiscreteElement,false);

@@ -71,7 +71,7 @@ class MultiTypeSerializer< std::pair< ContainedType1 , ContainedType2 > > : publ
 		if(name.size() != 0) sname = name;
 		return sname;
 	}
-	public 	: virtual string getClassName()
+	public 	: virtual string getClassName() const
 	{
 		return myName();
 	};
@@ -181,7 +181,7 @@ class MultiTypeSerializer< boost::tuple< ContainedType1 > > : public Serializabl
 		if(name.size() != 0) sname = name;
 		return sname;
 	}
-	public 	: virtual string getClassName() {return myName();};
+	public 	: virtual string getClassName() const {return myName();};
 	public : void registerAttributes()
 	{
 		REGISTER_ATTRIBUTE(first);
@@ -279,7 +279,7 @@ class MultiTypeSerializer< boost::tuple< ContainedType1 , ContainedType2 > > : p
 		if(name.size() != 0) sname = name;
 		return sname;
 	}
-	public 	: virtual string getClassName() {return myName();};
+	public 	: virtual string getClassName() const {return myName();};
 	public : void registerAttributes()
 	{
 		REGISTER_ATTRIBUTE(first);
@@ -385,7 +385,7 @@ class MultiTypeSerializer< boost::tuple< ContainedType1 , ContainedType2 , Conta
 		if(name.size() != 0) sname = name;
 		return sname;
 	}
-	public 	: virtual string getClassName() {return myName();};
+	public 	: virtual string getClassName() const {return myName();};
 	public : void registerAttributes()
 	{
 		REGISTER_ATTRIBUTE(first);
@@ -498,7 +498,7 @@ class MultiTypeSerializer< boost::tuple< ContainedType1 , ContainedType2 , Conta
 		if(name.size() != 0) sname = name;			//
 		return sname;						//
 	}								//
-	public 	: virtual string getClassName() {return myName();};	//
+	public 	: virtual string getClassName() const {return myName();};	//
 	public : void registerAttributes()				//
 	{								//
 		REGISTER_ATTRIBUTE(first);
@@ -619,7 +619,7 @@ class MultiTypeSerializer< boost::tuple< ContainedType1 , ContainedType2 , Conta
 		if(name.size() != 0) sname = name;			//
 		return sname;						//
 	}								//
-	public 	: virtual string getClassName() {return myName();};	//
+	public 	: virtual string getClassName() const {return myName();};	//
 	public : void registerAttributes()				//
 	{								//
 		REGISTER_ATTRIBUTE(first);

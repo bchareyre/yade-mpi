@@ -50,6 +50,7 @@
 template 
 <
 	class BaseClass,	//	a typelist with base classess involved in the dispatch (or single class, for 1D )
+				// 		FIXME : should use shared_ptr references, like this: DynLibDispatcher< TYPELIST_2( shared_ptr<Action>& , shared_ptr<Body>& ) , ....
 	class Executor,		//	class which gives multivirtual function
 	class ResultType,	//	type returned by multivirtual function
 	class TList,		//	typelist of arguments passed to multivirtual function
@@ -151,9 +152,9 @@ class DynLibDispatcher
 		typedef typename Impl::Parm2 Parm2Real;
 		typedef typename Select< Tail2 , Loki::NullType , Parm2Real >::Result Parm2; 	// 2D
 		typedef typename Impl::Parm3 Parm3Real;
-		typedef typename Select< Tail3 , Loki::NullType , Parm3Real >::Result Parm3; 	// 3D
+		typedef typename Select< Tail3 , Loki::NullType , Parm3Real >::Result Parm3; 	// 3D - to have 3D just working, without symmetry handling - change this line to be: typedef typename Impl::Parm3 Parm3;
 		typedef typename Impl::Parm4 Parm4Real;
-		typedef typename Select< Tail4 , Loki::NullType , Parm4Real >::Result Parm4;	// 4D
+		typedef typename Select< Tail4 , Loki::NullType , Parm4Real >::Result Parm4;	// 4D - same as above
 		typedef typename Impl::Parm5 Parm5;
 		typedef typename Impl::Parm6 Parm6;
 		typedef typename Impl::Parm7 Parm7;
@@ -224,6 +225,31 @@ class DynLibDispatcher
 				cerr <<" New class added to DynLibDispatcher 1D: " << libName << endl;
 			#endif
 		};
+		
+		bool locateMultivirtualFunctor1D(int& index, boost::shared_ptr<BaseClass1>& base)
+		{
+			index = base->getClassIndex();
+			assert( index >= 0 && (unsigned int)( index ) < callBacks.size());
+			if( callBacks[index] )
+				return true;
+			
+			int depth=1;
+			int index_tmp = base->getBaseClassIndex(depth);
+			while(1)
+				if(index_tmp == -1)
+					return false;
+				else
+					if(callBacks[index_tmp])
+					{
+						index = index_tmp;
+						return true;
+					}
+					else
+						index_tmp = base->getBaseClassIndex(++depth);
+		
+			return false; // FIXME - this line should be not needed
+		}
+
 		
 ////////////////////////////////////////////////////////////////////////////////
 // add multivirtual function to 2D
@@ -316,6 +342,54 @@ class DynLibDispatcher
 			#endif
 		}
 		
+		bool locateMultivirtualFunctor2D(int& index1, int& index2, boost::shared_ptr<BaseClass1>& base1,boost::shared_ptr<BaseClass2>& base2)
+		{
+			index1 = base1->getClassIndex();
+			index2 = base2->getClassIndex();
+			assert( index1 >= 0 && (unsigned int)( index1 ) < callBacks.size() &&
+				index2 >= 0 && (unsigned int)( index2 ) < callBacks[index1].size() );
+				
+			if(callBacks[index1][index2])
+				return true;
+
+			int depth1=1;
+			int depth2=1;
+			int index1_tmp = base1->getBaseClassIndex(depth1);
+			int index2_tmp = base2->getBaseClassIndex(depth2);
+			
+			if( index1_tmp == -1 )
+				while(1)
+					if(index2_tmp == -1)
+						return false;
+					else
+						if(callBacks[index1    ][index2_tmp])
+						{
+							index2 = index2_tmp;
+							return true;
+						}
+						else
+							index2_tmp = base2->getBaseClassIndex(++depth2);
+			else
+			if( index2_tmp == -1 )
+				while(1)
+					if(index1_tmp == -1)
+						return false;
+					else
+						if(callBacks[index1_tmp][index2    ])
+						{
+							index1 = index1_tmp;
+							return true;
+						}
+						else
+							index1_tmp = base1->getBaseClassIndex(++depth1);
+			else
+			if( index1_tmp != -1 && index2_tmp != -1 )
+				cerr << "DynLibDispatcher: ambigious dispatch, could not determine which multivirtual function should be called\n";
+			
+			return false;
+		}
+
+		
 ////////////////////////////////////////////////////////////////////////////////
 // add multivirtual function to 3D
 ////////////////////////////////////////////////////////////////////////////////
@@ -325,87 +399,84 @@ class DynLibDispatcher
 		{
 		}
 		
+		bool locateMultivirtualFunctor3D(int& index1, int& index2, int& index3,
+			boost::shared_ptr<BaseClass1> base1, boost::shared_ptr<BaseClass2> base2, boost::shared_ptr<BaseClass3> base3 )
+		{
+			return false;
+		}
+		
 ////////////////////////////////////////////////////////////////////////////////
 // calling multivirtual function, 1D
 ////////////////////////////////////////////////////////////////////////////////
 
 		ResultType operator() (boost::shared_ptr<BaseClass1> base)
 		{
-			int index = base->getClassIndex();
-			assert( index >= 0 && (unsigned int)( index ) < callBacks.size());
-			if( callBacks[index] )
+			int index;
+			if( locateMultivirtualFunctor1D(index,base) )
 				return (callBacks[index])->go(base);
 			else	return ResultType();
 		}
 		
 		ResultType operator() (boost::shared_ptr<BaseClass1> base, Parm2 p2)
 		{
-			int index = base->getClassIndex();
-			assert( index >= 0 && (unsigned int)( index ) < callBacks.size());
-			if( callBacks[index] )
+			int index;
+			if( locateMultivirtualFunctor1D(index,base) )
 				return (callBacks[index])->go(base, p2);
 			else	return ResultType();
 		}
 		
 		ResultType operator() (boost::shared_ptr<BaseClass1> base, Parm2 p2, Parm3 p3)
 		{
-			int index = base->getClassIndex();
-			assert( index >= 0 && (unsigned int)( index ) < callBacks.size());
-			if( callBacks[index] )
+			int index;
+			if( locateMultivirtualFunctor1D(index,base) )
 				return (callBacks[index])->go(base, p2, p3);
 			else	return ResultType();
 		}
 		
 		ResultType operator() (boost::shared_ptr<BaseClass1> base, Parm2 p2, Parm3 p3, Parm4 p4)
 		{
-			int index = base->getClassIndex();
-			assert( index >= 0 && (unsigned int)( index ) < callBacks.size());
-			if( callBacks[index] )
+			int index;
+			if( locateMultivirtualFunctor1D(index,base) )
 				return (callBacks[index])->go(base, p2, p3, p4);
 			else	return ResultType();
 		}
 		
 		ResultType operator() (boost::shared_ptr<BaseClass1> base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5)
 		{
-			int index = base->getClassIndex();
-			assert( index >= 0 && (unsigned int)( index ) < callBacks.size());
-			if( callBacks[index] )
+			int index;
+			if( locateMultivirtualFunctor1D(index,base) )
 				return (callBacks[index])->go(base, p2, p3, p4, p5);
 			else	return ResultType();
 		}
 		
 		ResultType operator() (boost::shared_ptr<BaseClass1> base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6)
 		{
-			int index = base->getClassIndex();
-			assert( index >= 0 && (unsigned int)( index ) < callBacks.size());
-			if( callBacks[index] )
+			int index;
+			if( locateMultivirtualFunctor1D(index,base) )
 				return (callBacks[index])->go(base, p2, p3, p4, p5, p6);
 			else	return ResultType();
 		}
 		
 		ResultType operator() (boost::shared_ptr<BaseClass1> base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6, Parm7 p7)
 		{
-			int index = base->getClassIndex();
-			assert( index >= 0 && (unsigned int)( index ) < callBacks.size());
-			if( callBacks[index] )
+			int index;
+			if( locateMultivirtualFunctor1D(index,base) )
 				return (callBacks[index])->go(base, p2, p3, p4, p5, p6, p7);
 			else	return ResultType();
 		}
 		
 		ResultType operator() (boost::shared_ptr<BaseClass1> base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6, Parm7 p7, Parm8 p8)
 		{
-			int index = base->getClassIndex();
-			assert( index >= 0 && (unsigned int)( index ) < callBacks.size());
-			if( callBacks[index] )
+			int index;
+			if( locateMultivirtualFunctor1D(index,base) )
 				return (callBacks[index])->go(base, p2, p3, p4, p5, p6, p7, p8);
 			else	return ResultType();
 		}
 		
 		ResultType operator() (boost::shared_ptr<BaseClass1> base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6, Parm7 p7, Parm8 p8, Parm9 p9)
 		{
-			int index = base->getClassIndex();
-			assert( index >= 0 && (unsigned int)( index ) < callBacks.size());
-			if( callBacks[index] )
+			int index;
+			if( locateMultivirtualFunctor1D(index,base) )
 				return (callBacks[index])->go(base, p2, p3, p4, p5, p6, p7, p8, p9);
 			else	return ResultType();
 		}
@@ -413,9 +484,8 @@ class DynLibDispatcher
 		ResultType operator() (boost::shared_ptr<BaseClass1> base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6, Parm7 p7, Parm8 p8, Parm9 p9,
 									Parm10 p10)
 		{
-			int index = base->getClassIndex();
-			assert( index >= 0 && (unsigned int)( index ) < callBacks.size());
-			if( callBacks[index] )
+			int index;
+			if( locateMultivirtualFunctor1D(index,base) )
 				return (callBacks[index])->go(base, p2, p3, p4, p5, p6, p7, p8, p9, p10);
 			else	return ResultType();
 		}
@@ -423,9 +493,8 @@ class DynLibDispatcher
 		ResultType operator() (boost::shared_ptr<BaseClass1> base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6, Parm7 p7, Parm8 p8, Parm9 p9,
 									Parm10 p10, Parm11 p11)
 		{
-			int index = base->getClassIndex();
-			assert( index >= 0 && (unsigned int)( index ) < callBacks.size());
-			if( callBacks[index] )
+			int index;
+			if( locateMultivirtualFunctor1D(index,base) )
 				return (callBacks[index])->go(base, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11);
 			else	return ResultType();
 		}
@@ -433,9 +502,8 @@ class DynLibDispatcher
 		ResultType operator() (boost::shared_ptr<BaseClass1> base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6, Parm7 p7, Parm8 p8, Parm9 p9,
 									Parm10 p10, Parm11 p11, Parm12 p12)
 		{
-			int index = base->getClassIndex();
-			assert( index >= 0 && (unsigned int)( index ) < callBacks.size());
-			if( callBacks[index] )
+			int index;
+			if( locateMultivirtualFunctor1D(index,base) )
 				return (callBacks[index])->go(base, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12);
 			else	return ResultType();
 		}
@@ -443,9 +511,8 @@ class DynLibDispatcher
 		ResultType operator() (boost::shared_ptr<BaseClass1> base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6, Parm7 p7, Parm8 p8, Parm9 p9,
 									Parm10 p10, Parm11 p11, Parm12 p12, Parm13 p13)
 		{
-			int index = base->getClassIndex();
-			assert( index >= 0 && (unsigned int)( index ) < callBacks.size());
-			if( callBacks[index] )
+			int index;
+			if( locateMultivirtualFunctor1D(index,base) )
 				return (callBacks[index])->go(base, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13);
 			else	return ResultType();
 		}
@@ -453,9 +520,8 @@ class DynLibDispatcher
 		ResultType operator() (boost::shared_ptr<BaseClass1> base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6, Parm7 p7, Parm8 p8, Parm9 p9,
 									Parm10 p10, Parm11 p11, Parm12 p12, Parm13 p13, Parm14 p14)
 		{
-			int index = base->getClassIndex();
-			assert( index >= 0 && (unsigned int)( index ) < callBacks.size());
-			if( callBacks[index] )
+			int index;
+			if( locateMultivirtualFunctor1D(index,base) )
 				return (callBacks[index])->go(base, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14);
 			else	return ResultType();
 		}
@@ -463,9 +529,8 @@ class DynLibDispatcher
 		ResultType operator() (boost::shared_ptr<BaseClass1> base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6, Parm7 p7, Parm8 p8, Parm9 p9,
 									Parm10 p10, Parm11 p11, Parm12 p12, Parm13 p13, Parm14 p14, Parm15 p15)
 		{
-			int index = base->getClassIndex();
-			assert( index >= 0 && (unsigned int)( index ) < callBacks.size());
-			if( callBacks[index] )
+			int index;
+			if( locateMultivirtualFunctor1D(index,base) )
 				return (callBacks[index])->go(base, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15);
 			else	return ResultType();
 		}
@@ -640,11 +705,8 @@ class DynLibDispatcher
 	public:
 		ResultType operator() (boost::shared_ptr<BaseClass1> base1,boost::shared_ptr<BaseClass2> base2)
 		{
-			int index1 = base1->getClassIndex();
-			int index2 = base2->getClassIndex();
-			assert( index1 >= 0 && (unsigned int)( index1 ) < callBacks.size() &&
-				index2 >= 0 && (unsigned int)( index2 ) < callBacks[index1].size() );
-			if( callBacks[index1][index2] )
+			int index1, index2;
+			if( locateMultivirtualFunctor2D(index1,index2,base1,base2) )
 			{
 				if(callBacksInfo[index1][index2])	// reversed
 				{
@@ -660,11 +722,8 @@ class DynLibDispatcher
 		
 		ResultType operator() (boost::shared_ptr<BaseClass1> base1,boost::shared_ptr<BaseClass2> base2, Parm3 p3)
 		{
-			int index1 = base1->getClassIndex();
-			int index2 = base2->getClassIndex();
-			assert( index1 >= 0 && (unsigned int)( index1 ) < callBacks.size() &&
-				index2 >= 0 && (unsigned int)( index2 ) < callBacks[index1].size() );
-			if( callBacks[index1][index2] )
+			int index1, index2;
+			if( locateMultivirtualFunctor2D(index1,index2,base1,base2) )
 			{
 				if(callBacksInfo[index1][index2])	// reversed
 				{
@@ -680,11 +739,8 @@ class DynLibDispatcher
 		
 		ResultType operator() (boost::shared_ptr<BaseClass1> base1,boost::shared_ptr<BaseClass2> base2, Parm3 p3, Parm4 p4)
 		{
-			int index1 = base1->getClassIndex();
-			int index2 = base2->getClassIndex();
-			assert( index1 >= 0 && (unsigned int)( index1 ) < callBacks.size() &&
-				index2 >= 0 && (unsigned int)( index2 ) < callBacks[index1].size() );
-			if( callBacks[index1][index2] )
+			int index1, index2;
+			if( locateMultivirtualFunctor2D(index1,index2,base1,base2) )
 			{
 				if(callBacksInfo[index1][index2])	// reversed
 				{
@@ -700,11 +756,8 @@ class DynLibDispatcher
 		
 		ResultType operator() (boost::shared_ptr<BaseClass1> base1,boost::shared_ptr<BaseClass2> base2, Parm3 p3, Parm4 p4, Parm5 p5)
 		{
-			int index1 = base1->getClassIndex();
-			int index2 = base2->getClassIndex();
-			assert( index1 >= 0 && (unsigned int)( index1 ) < callBacks.size() &&
-				index2 >= 0 && (unsigned int)( index2 ) < callBacks[index1].size() );
-			if( callBacks[index1][index2] )
+			int index1, index2;
+			if( locateMultivirtualFunctor2D(index1,index2,base1,base2) )
 			{
 				if(callBacksInfo[index1][index2])	// reversed
 				{
@@ -720,11 +773,8 @@ class DynLibDispatcher
 		
 		ResultType operator() (boost::shared_ptr<BaseClass1> base1,boost::shared_ptr<BaseClass2> base2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6)
 		{
-			int index1 = base1->getClassIndex();
-			int index2 = base2->getClassIndex();
-			assert( index1 >= 0 && (unsigned int)( index1 ) < callBacks.size() &&
-				index2 >= 0 && (unsigned int)( index2 ) < callBacks[index1].size() );
-			if( callBacks[index1][index2] )
+			int index1, index2;
+			if( locateMultivirtualFunctor2D(index1,index2,base1,base2) )
 			{
 				if(callBacksInfo[index1][index2])	// reversed
 				{
@@ -741,11 +791,8 @@ class DynLibDispatcher
 		ResultType operator() (boost::shared_ptr<BaseClass1> base1,boost::shared_ptr<BaseClass2> base2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6,
 						Parm7 p7)
 		{
-			int index1 = base1->getClassIndex();
-			int index2 = base2->getClassIndex();
-			assert( index1 >= 0 && (unsigned int)( index1 ) < callBacks.size() &&
-				index2 >= 0 && (unsigned int)( index2 ) < callBacks[index1].size() );
-			if( callBacks[index1][index2] )
+			int index1, index2;
+			if( locateMultivirtualFunctor2D(index1,index2,base1,base2) )
 			{
 				if(callBacksInfo[index1][index2])	// reversed
 				{
@@ -762,11 +809,8 @@ class DynLibDispatcher
 		ResultType operator() (boost::shared_ptr<BaseClass1> base1,boost::shared_ptr<BaseClass2> base2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6,
 						Parm7 p7, Parm8 p8)
 		{
-			int index1 = base1->getClassIndex();
-			int index2 = base2->getClassIndex();
-			assert( index1 >= 0 && (unsigned int)( index1 ) < callBacks.size() &&
-				index2 >= 0 && (unsigned int)( index2 ) < callBacks[index1].size() );
-			if( callBacks[index1][index2] )
+			int index1, index2;
+			if( locateMultivirtualFunctor2D(index1,index2,base1,base2) )
 			{
 				if(callBacksInfo[index1][index2])	// reversed
 				{
@@ -783,11 +827,8 @@ class DynLibDispatcher
 		ResultType operator() (boost::shared_ptr<BaseClass1> base1,boost::shared_ptr<BaseClass2> base2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6,
 						Parm7 p7, Parm8 p8, Parm9 p9)
 		{
-			int index1 = base1->getClassIndex();
-			int index2 = base2->getClassIndex();
-			assert( index1 >= 0 && (unsigned int)( index1 ) < callBacks.size() &&
-				index2 >= 0 && (unsigned int)( index2 ) < callBacks[index1].size() );
-			if( callBacks[index1][index2] )
+			int index1, index2;
+			if( locateMultivirtualFunctor2D(index1,index2,base1,base2) )
 			{
 				if(callBacksInfo[index1][index2])	// reversed
 				{
@@ -804,11 +845,8 @@ class DynLibDispatcher
 		ResultType operator() (boost::shared_ptr<BaseClass1> base1,boost::shared_ptr<BaseClass2> base2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6,
 						Parm7 p7, Parm8 p8, Parm9 p9, Parm10 p10)
 		{
-			int index1 = base1->getClassIndex();
-			int index2 = base2->getClassIndex();
-			assert( index1 >= 0 && (unsigned int)( index1 ) < callBacks.size() &&
-				index2 >= 0 && (unsigned int)( index2 ) < callBacks[index1].size() );
-			if( callBacks[index1][index2] )
+			int index1, index2;
+			if( locateMultivirtualFunctor2D(index1,index2,base1,base2) )
 			{
 				if(callBacksInfo[index1][index2])	// reversed
 				{
@@ -825,11 +863,8 @@ class DynLibDispatcher
 		ResultType operator() (boost::shared_ptr<BaseClass1> base1,boost::shared_ptr<BaseClass2> base2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6,
 						Parm7 p7, Parm8 p8, Parm9 p9, Parm10 p10, Parm11 p11)
 		{
-			int index1 = base1->getClassIndex();
-			int index2 = base2->getClassIndex();
-			assert( index1 >= 0 && (unsigned int)( index1 ) < callBacks.size() &&
-				index2 >= 0 && (unsigned int)( index2 ) < callBacks[index1].size() );
-			if( callBacks[index1][index2] )
+			int index1, index2;
+			if( locateMultivirtualFunctor2D(index1,index2,base1,base2) )
 			{
 				if(callBacksInfo[index1][index2])	// reversed
 				{
@@ -846,11 +881,8 @@ class DynLibDispatcher
 		ResultType operator() (boost::shared_ptr<BaseClass1> base1,boost::shared_ptr<BaseClass2> base2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6,
 						Parm7 p7, Parm8 p8, Parm9 p9, Parm10 p10, Parm11 p11, Parm12 p12)
 		{
-			int index1 = base1->getClassIndex();
-			int index2 = base2->getClassIndex();
-			assert( index1 >= 0 && (unsigned int)( index1 ) < callBacks.size() &&
-				index2 >= 0 && (unsigned int)( index2 ) < callBacks[index1].size() );
-			if( callBacks[index1][index2] )
+			int index1, index2;
+			if( locateMultivirtualFunctor2D(index1,index2,base1,base2) )
 			{
 				if(callBacksInfo[index1][index2])	// reversed
 				{
@@ -867,11 +899,8 @@ class DynLibDispatcher
 		ResultType operator() (boost::shared_ptr<BaseClass1> base1,boost::shared_ptr<BaseClass2> base2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6,
 						Parm7 p7, Parm8 p8, Parm9 p9, Parm10 p10, Parm11 p11, Parm12 p12, Parm13 p13)
 		{
-			int index1 = base1->getClassIndex();
-			int index2 = base2->getClassIndex();
-			assert( index1 >= 0 && (unsigned int)( index1 ) < callBacks.size() &&
-				index2 >= 0 && (unsigned int)( index2 ) < callBacks[index1].size() );
-			if( callBacks[index1][index2] )
+			int index1, index2;
+			if( locateMultivirtualFunctor2D(index1,index2,base1,base2) )
 			{
 				if(callBacksInfo[index1][index2])	// reversed
 				{
@@ -888,11 +917,8 @@ class DynLibDispatcher
 		ResultType operator() (boost::shared_ptr<BaseClass1> base1,boost::shared_ptr<BaseClass2> base2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6,
 						Parm7 p7, Parm8 p8, Parm9 p9, Parm10 p10, Parm11 p11, Parm12 p12, Parm13 p13, Parm14 p14)
 		{
-			int index1 = base1->getClassIndex();
-			int index2 = base2->getClassIndex();
-			assert( index1 >= 0 && (unsigned int)( index1 ) < callBacks.size() &&
-				index2 >= 0 && (unsigned int)( index2 ) < callBacks[index1].size() );
-			if( callBacks[index1][index2] )
+			int index1, index2;
+			if( locateMultivirtualFunctor2D(index1,index2,base1,base2) )
 			{
 				if(callBacksInfo[index1][index2])	// reversed
 				{
@@ -909,11 +935,8 @@ class DynLibDispatcher
 		ResultType operator() (boost::shared_ptr<BaseClass1> base1,boost::shared_ptr<BaseClass2> base2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6,
 						Parm7 p7, Parm8 p8, Parm9 p9, Parm10 p10, Parm11 p11, Parm12 p12, Parm13 p13, Parm14 p14, Parm15 p15)
 		{
-			int index1 = base1->getClassIndex();
-			int index2 = base2->getClassIndex();
-			assert( index1 >= 0 && (unsigned int)( index1 ) < callBacks.size() &&
-				index2 >= 0 && (unsigned int)( index2 ) < callBacks[index1].size() );
-			if( callBacks[index1][index2] )
+			int index1, index2;
+			if( locateMultivirtualFunctor2D(index1,index2,base1,base2) )
 			{
 				if(callBacksInfo[index1][index2])	// reversed
 				{

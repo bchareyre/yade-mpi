@@ -72,7 +72,7 @@ class ActionMomentum : public Action
 /// Indexable											///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-	REGISTER_CLASS_INDEX(ActionMomentum);
+	REGISTER_CLASS_INDEX(ActionMomentum,Action);
 
 };
 

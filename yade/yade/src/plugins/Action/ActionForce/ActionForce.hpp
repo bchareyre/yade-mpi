@@ -72,7 +72,7 @@ class ActionForce : public Action
 /// Indexable											///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-	REGISTER_CLASS_INDEX(ActionForce);
+	REGISTER_CLASS_INDEX(ActionForce,Action);
 	
 };
 

@@ -33,7 +33,7 @@ class RigidBody : public ConnexBody
 /// Indexable											///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-	REGISTER_CLASS_INDEX(RigidBody);
+	REGISTER_CLASS_INDEX(RigidBody,ConnexBody);
 	
 };
 

@@ -81,13 +81,17 @@ class BoundingVolume : public GeometricalModel, public Indexable
 	//public : virtual void move(Se3r& ) {};
 	/*! Abstract function to overload. It is called to update the current bounding volume by an incremental 3D transformation */
 	public : virtual void update(Se3r& ) {};
-
-	public : void registerAttributes();
+	
+///////////////////////////////////////////////////////////////////////////////////////////////////
+/// Serialization										///
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 	REGISTER_CLASS_NAME(BoundingVolume);	
+	public : void registerAttributes();
 	
-	public : virtual int& getClassIndex() { throw;};
-	public : virtual const int& getClassIndex() const { throw;};
+///////////////////////////////////////////////////////////////////////////////////////////////////
+/// Indexable											///
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 	REGISTER_INDEX_COUNTER(BoundingVolume);
 

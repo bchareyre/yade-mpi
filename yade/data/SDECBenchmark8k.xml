@@ -9,7 +9,7 @@
 			<actors _className_="SimpleNarrowCollider" collisionFunctors="[[Sphere Sphere Sphere2Sphere4SDECContactModel] [Sphere Box Box2Sphere4SDECContactModel]]" />
 			<actors _className_="SDECLinearContactModel"  />
 			<actors _className_="SDECDynamicEngine" />
-			<actors _className_="ActionDispatcher"  actionFunctors="[[ActionForce SDECDiscreteElement ActionForce2RigidBody] [ActionMomentum SDECDiscreteElement ActionMomentum2RigidBody]]" />
+			<actors _className_="ActionDispatcher"  actionFunctors="[[ActionForce RigidBody ActionForce2RigidBody] [ActionMomentum RigidBody ActionMomentum2RigidBody]]" />
 		</actors>
 		<permanentInteractions _className_="InteractionVecSet" >
 				<interaction size="0">

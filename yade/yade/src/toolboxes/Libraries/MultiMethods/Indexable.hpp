@@ -49,6 +49,8 @@ class Indexable
 	/*! Returns the id of the current class. This id is set by a multimethod manager */
 	public : virtual int& getClassIndex() { throw;};
 	public : virtual const int& getClassIndex() const { throw;};
+	public : virtual int& getBaseClassIndex(int ) { throw;};
+	public : virtual const int& getBaseClassIndex(int ) const { throw;};
 	
 	public : virtual const int& getMaxCurrentlyUsedClassIndex() const { throw;};
 	public : virtual void incrementMaxCurrentlyUsedClassIndex() { throw;};
@@ -60,7 +62,10 @@ class Indexable
 
 // this macro is used by classes that are a dimension in multimethod matrix
 
-#define REGISTER_CLASS_INDEX(SomeClass)						\
+// this assert was removed, because I must ask Base class for it's own index.
+//		assert(typeid(*this)==typeid(SomeClass));
+
+#define REGISTER_CLASS_INDEX(SomeClass,BaseClass)				\
 	private: static int& getClassIndexStatic()				\
 	{									\
 		static int index = -1;						\
@@ -68,13 +73,29 @@ class Indexable
 	}									\
 	public: virtual int& getClassIndex()					\
 	{									\
-		assert(typeid(*this)==typeid(SomeClass));			\
 		return getClassIndexStatic();					\
 	}									\
 	public: virtual const int& getClassIndex() const			\
 	{									\
-		assert(typeid(*this)==typeid(SomeClass));			\
 		return getClassIndexStatic();					\
+	}									\
+										\
+										\
+	public: virtual int& getBaseClassIndex(int depth)			\
+	{									\
+		static shared_ptr<BaseClass> baseClass(new BaseClass);		\
+		if(depth == 1)							\
+			return baseClass->getClassIndex();			\
+		else								\
+			return baseClass->getBaseClassIndex(--depth);		\
+	}									\
+	public: virtual const int& getBaseClassIndex(int depth) const		\
+	{									\
+		static shared_ptr<BaseClass> baseClass(new BaseClass);		\
+		if(depth == 1)							\
+			return baseClass->getClassIndex();			\
+		else								\
+			return baseClass->getBaseClassIndex(--depth);		\
 	}
 
 
@@ -83,6 +104,30 @@ class Indexable
 // count this number (ie. as a size of the matrix) - because there are many multimethod matrices!
 
 #define REGISTER_INDEX_COUNTER(SomeClass)					\
+										\
+	private: static int& getClassIndexStatic()				\
+	{									\
+		static int index = -1;						\
+		return index;							\
+	}									\
+	public: virtual int& getClassIndex()					\
+	{									\
+		return getClassIndexStatic();					\
+	}									\
+	public: virtual const int& getClassIndex() const			\
+	{									\
+		return getClassIndexStatic();					\
+	}									\
+	public: virtual int& getBaseClassIndex(int)				\
+	{									\
+		throw;								\
+	}									\
+	public: virtual const int& getBaseClassIndex(int) const			\
+	{									\
+		throw;								\
+	}									\
+										\
+										\
 	private: static int& getMaxCurrentlyUsedIndexStatic()			\
 	{									\
 		static int maxCurrentlyUsedIndex = -1;				\

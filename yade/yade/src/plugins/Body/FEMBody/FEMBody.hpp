@@ -50,7 +50,7 @@ class FEMBody : public ConnexBody
 /// Indexable											///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-	REGISTER_CLASS_INDEX(FEMBody);
+	REGISTER_CLASS_INDEX(FEMBody,ConnexBody);
 	
 };
 

@@ -94,14 +94,24 @@ class Terrain : public CollisionGeometry
 	public : Terrain ();
 	public : ~Terrain ();
 
-	protected : virtual void postProcessAttributes(bool deserializing);
-	public : void registerAttributes();
 
 	public : bool loadFromFile(char * fileName);
 	public : void glDraw();
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+/// Serialization										///
+///////////////////////////////////////////////////////////////////////////////////////////////////
+	
 	REGISTER_CLASS_NAME(Terrain);
-	REGISTER_CLASS_INDEX(Terrain);
+	protected : virtual void postProcessAttributes(bool deserializing);
+	public : void registerAttributes();
+	
+///////////////////////////////////////////////////////////////////////////////////////////////////
+/// Indexable											///
+///////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	REGISTER_CLASS_INDEX(Terrain,CollisionGeometry);
+	
 };
 
 REGISTER_SERIALIZABLE(Terrain,false);

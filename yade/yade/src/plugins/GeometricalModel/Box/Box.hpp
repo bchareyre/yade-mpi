@@ -39,12 +39,21 @@ class Box : public CollisionGeometry
 	public : bool loadFromFile(char * fileName);
 	public : void glDraw();
 
-	protected : virtual void postProcessAttributes(bool deserializing);
-	public : void registerAttributes();
 	public : void renderShadowVolumes(const Se3r& se3, const Vector3r& lightPos);
 	
+///////////////////////////////////////////////////////////////////////////////////////////////////
+/// Serialization										///
+///////////////////////////////////////////////////////////////////////////////////////////////////
+	
 	REGISTER_CLASS_NAME(Box);
-	REGISTER_CLASS_INDEX(Box);
+	protected : virtual void postProcessAttributes(bool deserializing);
+	public : void registerAttributes();
+	
+///////////////////////////////////////////////////////////////////////////////////////////////////
+/// Indexable											///
+///////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	REGISTER_CLASS_INDEX(Box,CollisionGeometry);
 
 };
 

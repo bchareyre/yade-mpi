@@ -72,9 +72,6 @@ class Action : public Serializable, public Indexable
 /// Indexable											///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-	// FIXME : why to put again getClassIndex
-	public : virtual int& getClassIndex() { throw;};
-	public : virtual const int& getClassIndex() const { throw;};
 	REGISTER_INDEX_COUNTER(Action);
 };
 

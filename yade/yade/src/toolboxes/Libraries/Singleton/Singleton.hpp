@@ -54,6 +54,7 @@ class Singleton
 		static T& instance()
 		{
 			static T* ptr_obj;
+//			static shared_ptr<T> ptr_obj; // FIXME - try this - it may work great !!
 
 			if( ! ptr_obj )
 			{
