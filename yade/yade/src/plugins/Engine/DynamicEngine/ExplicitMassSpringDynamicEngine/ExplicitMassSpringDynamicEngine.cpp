@@ -1,6 +1,6 @@
 #include "ExplicitMassSpringDynamicEngine.hpp"
 #include "Omega.hpp"
-#include "MassSpringBody.hpp"
+#include "ComplexBody.hpp"
 #include "Mesh2D.hpp"
 #include "SpringGeometry.hpp"
 #include "SpringPhysics.hpp"

@@ -19,7 +19,6 @@ LIBS += -lMesh2D \
         -lPersistentSAPCollider \
         -lSpringGeometry \
         -lSpringPhysics \
-        -lMassSpringBody \
         -lExplicitMassSpringDynamicEngine \
         -lInteractionSphere \
         -lInteractionDescriptionSet2AABBFunctor \
@@ -29,11 +28,11 @@ INCLUDEPATH = $(YADEINCLUDEPATH)
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../plugins/Geometry/GeometricalModel/Mesh2D/$(YADEDYNLIBPATH) \
+QMAKE_LIBDIR = ../../../plugins/Body/GeometricalModel/Mesh2D/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../../plugins/Interaction/BroadInteractor/SAPCollider/$(YADEDYNLIBPATH) \
-               ../../../plugins/Geometry/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
-               ../../../plugins/Geometry/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
+               ../../../plugins/Body/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
+               ../../../plugins/Body/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
                ../../../plugins/Interaction/InteractionGeometry/ClosestFeatures/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/DynamicEngine/SimpleSpringDynamicEngine/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/DynamicEngine/MassSpringBody2RigidBodyDynamicEngine/$(YADEDYNLIBPATH) \
@@ -45,11 +44,16 @@ QMAKE_LIBDIR = ../../../plugins/Geometry/GeometricalModel/Mesh2D/$(YADEDYNLIBPAT
                ../../../plugins/Interaction/BroadInteractor/PersistentSAPCollider/$(YADEDYNLIBPATH) \
                ../../../plugins/Interaction/InteractionGeometry/SpringGeometry/$(YADEDYNLIBPATH) \
                ../../../plugins/Interaction/InteractionPhysics/SpringPhysics/$(YADEDYNLIBPATH) \
-               ../../../plugins/Body/MassSpringBody/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/DynamicEngine/ExplicitMassSpringDynamicEngine/$(YADEDYNLIBPATH) \
+               ../../../plugins/Body/InteractionDescription/InteractionSphere/$(YADEDYNLIBPATH) \
+               ../../../plugins/Body/BoundingVolumeFunctor/InteractionDescriptionSet2AABBFunctor/$(YADEDYNLIBPATH) \
+               ../../../plugins/Body/BodyPhysicalParameters/RigidBodyParameters/$(YADEDYNLIBPATH) \
+               ../../../plugins/Geometry/GeometricalModel/Mesh2D/$(YADEDYNLIBPATH) \
+               ../../../plugins/Geometry/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
+               ../../../plugins/Geometry/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
+               ../../../plugins/Body/MassSpringBody/$(YADEDYNLIBPATH) \
                ../../../plugins/Geometry/InteractionDescription/InteractionSphere/$(YADEDYNLIBPATH) \
                ../../../plugins/Geometry/BoundingVolumeFunctor/InteractionDescriptionSet2AABBFunctor/$(YADEDYNLIBPATH) \
-               ../../../plugins/Body/BodyPhysicalParameters/RigidBodyParameters/$(YADEDYNLIBPATH) \
                ../../../yade/Body/$(YADEDYNLIBPATH) \
                ../../../yade/Geometry/$(YADEDYNLIBPATH) \
                ../../../yade/Interaction/$(YADEDYNLIBPATH) \

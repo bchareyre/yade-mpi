@@ -5,7 +5,6 @@
 
 LIBS += -lSerialization \
         -lMesh2D \
-        -lMassSpringBody \
         -lMath \
         -lBody \
         -lEngine \
@@ -22,8 +21,7 @@ MOC_DIR = $(YADECOMPILATIONPATH)
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 QMAKE_LIBDIR = ../../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
-               ../../../../plugins/Geometry/GeometricalModel/Mesh2D/$(YADEDYNLIBPATH) \
-               ../../../../plugins/Body/MassSpringBody/$(YADEDYNLIBPATH) \
+               ../../../../plugins/Body/GeometricalModel/Mesh2D/$(YADEDYNLIBPATH) \
                ../../../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
                ../../../../yade/Body/Body/$(YADEDYNLIBPATH) \
                ../../../../yade/Engine/$(YADEDYNLIBPATH) \
@@ -34,6 +32,8 @@ QMAKE_LIBDIR = ../../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../../../plugins/Engine/Action/ActionForce/$(YADEDYNLIBPATH) \
                ../../../../plugins/Engine/Action/ActionMomentum/$(YADEDYNLIBPATH) \
                ../../../../plugins/Body/BodyPhysicalParameters/ParticleParameters/$(YADEDYNLIBPATH) \
+               ../../../../plugins/Geometry/GeometricalModel/Mesh2D/$(YADEDYNLIBPATH) \
+               ../../../../plugins/Body/MassSpringBody/$(YADEDYNLIBPATH) \
                ../../../../yade/Body/$(YADEDYNLIBPATH) \
                ../../../../yade/Geometry/$(YADEDYNLIBPATH) \
                ../../../../yade/Interaction/$(YADEDYNLIBPATH) \

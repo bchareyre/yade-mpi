@@ -3,14 +3,14 @@
 # Subdir relative project main directory: ./plugins/Interaction
 # Target is a subdirs project 
 
-SUBDIRS += InteractionGeometry \
+MOC_DIR = $(YADECOMPILATIONPATH) 
+UI_DIR = $(YADECOMPILATIONPATH) 
+OBJECTS_DIR = $(YADECOMPILATIONPATH) 
+CONFIG += debug \
+          warn_on 
+TEMPLATE = subdirs 
+SUBDIRS += BroadInteractor \
+           InteractionGeometry \
            InteractionGeometryFunctor \
            InteractionPhysics \
-           InteractionPhysicsFunctor \
-           BroadInteractor 
-MOC_DIR = $(YADECOMPILATIONPATH)
-UI_DIR = $(YADECOMPILATIONPATH)
-OBJECTS_DIR = $(YADECOMPILATIONPATH)
-CONFIG += debug \
-warn_on
-TEMPLATE = subdirs
+           InteractionPhysicsFunctor 

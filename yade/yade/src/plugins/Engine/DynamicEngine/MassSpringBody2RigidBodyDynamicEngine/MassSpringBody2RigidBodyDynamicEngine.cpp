@@ -1,6 +1,5 @@
 #include "MassSpringBody2RigidBodyDynamicEngine.hpp"
 #include "RigidBodyParameters.hpp"
-#include "MassSpringBody.hpp"
 #include "Omega.hpp"
 #include "ComplexBody.hpp"
 #include "ClosestFeatures.hpp"

@@ -3,11 +3,16 @@
 # Subdir relative project main directory: ./plugins/Body
 # Target is a subdirs project 
 
-SUBDIRS += BodyPhysicalParameters \
-           MassSpringBody 
-MOC_DIR = $(YADECOMPILATIONPATH)
-UI_DIR = $(YADECOMPILATIONPATH)
-OBJECTS_DIR = $(YADECOMPILATIONPATH)
+MOC_DIR = $(YADECOMPILATIONPATH) 
+UI_DIR = $(YADECOMPILATIONPATH) 
+OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 CONFIG += debug \
-warn_on
-TEMPLATE = subdirs
+          warn_on 
+TEMPLATE = subdirs 
+SUBDIRS += BoundingVolume \
+           GeometricalModel \
+           InteractionDescription \
+           BodyPhysicalParameters \
+           BoundingVolumeFunctor \
+           GeometricalModelFunctor \
+           InteractionDescriptionFunctor 

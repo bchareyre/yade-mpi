@@ -3,8 +3,7 @@
 # Subdir relative project main directory: ./plugins/Engine/DynamicEngine/MassSpringBody2RigidBodyDynamicEngine
 # Target is a library:  
 
-LIBS += -lMassSpringBody \
-        -lDistances \
+LIBS += -lDistances \
         -lSerialization \
         -lSimpleSpringDynamicEngine \
         -lMesh2D \
@@ -20,11 +19,10 @@ INCLUDEPATH = $(YADEINCLUDEPATH)
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../../plugins/Body/MassSpringBody/$(YADEDYNLIBPATH) \
-               ../../../../toolboxes/ComputationalGeometry/Distances/$(YADEDYNLIBPATH) \
+QMAKE_LIBDIR = ../../../../toolboxes/ComputationalGeometry/Distances/$(YADEDYNLIBPATH) \
                ../../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../../../plugins/Engine/DynamicEngine/SimpleSpringDynamicEngine/$(YADEDYNLIBPATH) \
-               ../../../../plugins/Geometry/GeometricalModel/Mesh2D/$(YADEDYNLIBPATH) \
+               ../../../../plugins/Body/GeometricalModel/Mesh2D/$(YADEDYNLIBPATH) \
                ../../../../plugins/Interaction/InteractionGeometry/ClosestFeatures/$(YADEDYNLIBPATH) \
                ../../../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
                ../../../../yade/Body/Body/$(YADEDYNLIBPATH) \
@@ -32,6 +30,8 @@ QMAKE_LIBDIR = ../../../../plugins/Body/MassSpringBody/$(YADEDYNLIBPATH) \
                ../../../../yade/Interaction/Interaction/$(YADEDYNLIBPATH) \
                ../../../../toolboxes/Libraries/MultiMethods/$(YADEDYNLIBPATH) \
                ../../../../plugins/Body/BodyPhysicalParameters/RigidBodyParameters/$(YADEDYNLIBPATH) \
+               ../../../../plugins/Body/MassSpringBody/$(YADEDYNLIBPATH) \
+               ../../../../plugins/Geometry/GeometricalModel/Mesh2D/$(YADEDYNLIBPATH) \
                ../../../../yade/Body/$(YADEDYNLIBPATH) \
                ../../../../yade/Geometry/$(YADEDYNLIBPATH) \
                ../../../../yade/Interaction/$(YADEDYNLIBPATH) \
