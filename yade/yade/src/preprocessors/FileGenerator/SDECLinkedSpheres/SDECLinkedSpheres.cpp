@@ -84,7 +84,7 @@ void SDECLinkedSpheres::generate()
 	rootBody->se3			= Se3r(Vector3r(0,0,0),q);
 
 	shared_ptr<CollisionGeometrySet> set(new CollisionGeometrySet());
-	set->diffuseColor	= Vector3r(0,0,1);
+	set->diffuseColor	= Vector3f(0,0,1);
 	set->wire		= false;
 	set->visible		= true;
 	set->shadowCaster	= false;

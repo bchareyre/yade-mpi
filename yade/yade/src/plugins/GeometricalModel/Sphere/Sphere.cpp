@@ -219,15 +219,15 @@ void Sphere::renderShadowVolumes(const Se3r& se3, const Vector3r& lightPos)
 	glBegin(GL_QUAD_STRIP);
 		p1 = center+biNormalDir;
 		p2 = p1 + (p1-lightPos)*10;
-		glVertex3fv(p1);
-		glVertex3fv(p2);
+		glVertex3v(p1);
+		glVertex3v(p2);
 		for(int i=1;i<=nbSegments;i++)
 		{
 			float angle = Mathr::TWO_PI/(float)nbSegments*i;
 			p1 = center+sin(angle)*normalDir+cos(angle)*biNormalDir;
 			p2 = p1 + (p1-lightPos)*10;
-			glVertex3fv(p1);
-			glVertex3fv(p2);
+			glVertex3v(p1);
+			glVertex3v(p2);
 		}
 	glEnd();
 			

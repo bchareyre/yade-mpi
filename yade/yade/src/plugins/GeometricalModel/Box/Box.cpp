@@ -339,14 +339,14 @@ void Box::renderShadowVolumes(const Se3r& se3, const Vector3r& lightPos)
 	glBegin(GL_QUAD_STRIP);
 		p1 = vertices[hull[0]-1];
 		p2 = p1 + (p1-pos)*10;
-		glVertex3fv(p2);
-		glVertex3fv(p1);
-		for(int i=1;i<=hull.size();i++)
+		glVertex3v(p2);
+		glVertex3v(p1);
+		for(unsigned int i=1;i<=hull.size();i++)
 		{
 			p1 = vertices[hull[i%hull.size()]-1];
 			p2 = p1 + (p1-pos)*10;
-			glVertex3fv(p2);
-			glVertex3fv(p1);
+			glVertex3v(p2);
+			glVertex3v(p1);
 		}
 	glEnd();
 	

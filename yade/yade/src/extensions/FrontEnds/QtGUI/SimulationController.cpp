@@ -86,6 +86,10 @@ void SimulationController::pbLoadClicked()
 
 	if (!fileName.isEmpty() && selectedFilter == "XML Yade File (*.xml)")
 	{
+		for(unsigned int i=0;i<glViews.size();i++)
+			if (glViews[i])
+				glViews[i]->stopRendering();
+		
 		if (glViews.size()==0)
 // 			I had to move this up (to be the first), because otherwise it was crashing:
 //

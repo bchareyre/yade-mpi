@@ -124,7 +124,7 @@ void SDECImport::generate()
 	
 	
 	shared_ptr<CollisionGeometrySet> set(new CollisionGeometrySet());
-	set->diffuseColor	= Vector3r(0,0,1);
+	set->diffuseColor	= Vector3f(0,0,1);
 	set->wire		= false;
 	set->visible		= true;
 	set->shadowCaster	= false;
