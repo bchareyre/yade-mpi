@@ -19,9 +19,11 @@ HEADERS += BroadCollider.hpp \
            InteractionGeometry.hpp \
            NarrowCollider.hpp \
            CollisionFunctor.hpp \
-           CollisionMultiMethodsManager.hpp 
+           CollisionMultiMethodsManager.hpp \
+	   InteractionContainer.hpp
 SOURCES += BroadCollider.cpp \
            Interaction.cpp \
            InteractionGeometry.cpp \
            NarrowCollider.cpp \
-           CollisionMultiMethodsManager.cpp 
+           CollisionMultiMethodsManager.cpp \
+	   InteractionContainer.cpp

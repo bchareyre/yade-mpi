@@ -16,7 +16,9 @@ CONFIG += debug \
 TEMPLATE = lib 
 HEADERS += Body.hpp \
            ConnexBody.hpp \
-           NonConnexBody.hpp 
+           NonConnexBody.hpp \
+	   BodyContainer.hpp
 SOURCES += Body.cpp \
            ConnexBody.cpp \
-           NonConnexBody.cpp 
+           NonConnexBody.cpp \
+	   BodyContainer.cpp 

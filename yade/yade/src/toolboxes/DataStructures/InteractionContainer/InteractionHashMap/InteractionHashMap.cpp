@@ -1,5 +1,3 @@
-
-/*
 #include "InteractionHashMap.hpp"
 
 InteractionHashMap::InteractionHashMap()
@@ -53,51 +51,54 @@ bool InteractionHashMap::find(unsigned int id1,unsigned int id2,shared_ptr<Inter
 		return false;
 }
 
-shared_ptr<Interaction> InteractionHashMap::getFirst()
+void InteractionHashMap::gotoFirst()
 {
 	hmii    = interactions.begin();
 	hmiiEnd = interactions.end();
-	if(hmii == hmiiEnd)
-		return shared_ptr<Interaction>();
-	else
-		return (*hmii).second;
+//	if(hmii == hmiiEnd)
+//		return shared_ptr<Interaction>();
+//	else
+//		return (*hmii).second;
 }
 
-bool InteractionHashMap::hasCurrent()
+bool InteractionHashMap::notAtEnd()
 {
 	return ( hmii != hmiiEnd );
 }
 
-shared_ptr<Interaction> InteractionHashMap::getNext()
+void InteractionHashMap::gotoNext()
 {
-	if(hasCurrent() && ++hmii != hmiiEnd)
-		return (*hmii).second;
-	else
-		return shared_ptr<Interaction>();
+	++hmii;
+//	if(hasCurrent() && ++hmii != hmiiEnd)
+//		return (*hmii).second;
+//	else
+//		return shared_ptr<Interaction>();
 }
 
 shared_ptr<Interaction> InteractionHashMap::getCurrent()
 {
-	if(hasCurrent())
+//	if(hasCurrent())
 		return (*hmii).second;
-	else
-		return shared_ptr<Interaction>();
+//	else
+//		return shared_ptr<Interaction>();
 }
 
-// FIXME - faster, but is correct ??
 
-// void InteractionHashMap::eraseCurrent()
-// {
-// 	if(hasCurrent())
-// 	{
-// 		IHashMap::iterator tmpHmii=hmii;
-// 		++hmii;
-// 		interactions.erase(tmpHmii);
-// 	}
-// }
-
-
-shared_ptr<Interaction> InteractionHashMap::eraseCurrent()
+// FIXME - is it absolutely correct ??
+void InteractionHashMap::eraseCurrentAndGotoNext()
+{
+	if(notAtEnd())
+	{
+		IHashMap::iterator tmpHmii=hmii;
+		++hmii;
+		interactions.erase(tmpHmii);
+////////		return getCurrent();
+	}
+//	else
+//		return shared_ptr<Interaction>();
+}
+/*
+void InteractionHashMap::eraseCurrent()
 {
 	if(hasCurrent())
 	{
@@ -112,21 +113,17 @@ shared_ptr<Interaction> InteractionHashMap::eraseCurrent()
 			interactions.erase(hmii);
 			shared_ptr<Interaction> iiii;
 			find(id1,id2,iiii);
-			return iiii;
 		}
 		else
 		{
 			interactions.erase(hmii);
 			hmii = interactions.end();
-			return shared_ptr<Interaction>();
 		}
 	}
-	else
-		return shared_ptr<Interaction>();
 }
+*/
 
 unsigned int InteractionHashMap::size()
 {
 	return interactions.size();
 }
-*/

@@ -22,7 +22,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "Body.hpp"
-#include "InteractionHashMap2.hpp"
+#include "InteractionHashMap.hpp"
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -30,11 +30,11 @@
 
 // we must initialize id = 0, otherwise BodyContainer will crash.
 // FIXME - where to create interactions? here, or maybe somewhere else - who decides which type to use by default?
-Body::Body () : Serializable() , id(0) , interactions(new InteractionHashMap2)
+Body::Body () : Serializable() , id(0) , interactions(new InteractionHashMap)
 {
 }
 
-Body::Body (unsigned int newId) : Serializable() , id(newId) , interactions(new InteractionHashMap2)
+Body::Body (unsigned int newId) : Serializable() , id(newId) , interactions(new InteractionHashMap)
 {
 }
 

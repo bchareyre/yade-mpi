@@ -7,11 +7,11 @@
 #include "Math.hpp"
 
 #include "NonConnexBody.hpp"
-#include "InteractionHashMap2.hpp"
+#include "InteractionHashMap.hpp"
 #include "BodyAssocVec.hpp"
 
 // FIXME - who is to decide which class to use by default?
-NonConnexBody::NonConnexBody() : Body() , bodies(new BodyAssocVec) , permanentInteractions(new InteractionHashMap2)
+NonConnexBody::NonConnexBody() : Body() , bodies(new BodyAssocVec) , permanentInteractions(new InteractionHashMap)
 {
 }
 

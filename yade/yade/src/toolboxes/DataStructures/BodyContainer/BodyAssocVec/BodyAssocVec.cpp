@@ -31,7 +31,7 @@ unsigned int BodyAssocVec::insert(shared_ptr<Body>& b)
 		// finds the first free key, which is bigger than id.
 		while( bodies.find(newPosition) != bodies.end() )
 			++newPosition;
-		cerr << "WARNING: body id=\"" << position << "\" is already used. Using first free id=\"" << newPosition << "\", beware - if you are loading a file, this will break interactions for this body!\n";
+		//cerr << "WARNING: body id=\"" << position << "\" is already used. Using first free id=\"" << newPosition << "\", beware - if you are loading a file, this will break interactions for this body!\n";
 		position = newPosition;
 	}
 	BodyContainer::setId(b,position);
