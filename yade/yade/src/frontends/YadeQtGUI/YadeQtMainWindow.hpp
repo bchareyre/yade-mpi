@@ -59,7 +59,6 @@ class YadeQtMainWindow : public YadeQtGeneratedMainWindow
 	public : void addMenu(string menuName);
 	public : void addItem(string menuName, string itemName);
 	public : void createMenus();
-	public : void endOfSimulationLoop();
 
 	public slots : virtual void fileNewSimulation();
 	public slots : virtual void fileExit();

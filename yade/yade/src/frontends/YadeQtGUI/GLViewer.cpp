@@ -3,6 +3,7 @@
 #include "Interaction.hpp"
 #include "GL/glut.h"
 #include "Omega.hpp"
+#include "ThreadSynchronizer.hpp"
 
 GLViewer::GLViewer(QWidget * parent) : QGLViewer(parent) , frame( Omega::instance().getIterReference() )
 {
@@ -22,42 +23,25 @@ GLViewer::~GLViewer()
 
 void GLViewer::draw()
 {
-        glEnable(GL_NORMALIZE);
+        
+	Omega::instance().synchronizer->wait2();
+	
+	glEnable(GL_NORMALIZE);
         glEnable(GL_CULL_FACE);
 
 	if (Omega::instance().rootBody) // if the scene is loaded
 		Omega::instance().rootBody->glDraw();
-
-// 	if (frame%50==0)
-// 	{
-// 		string name = "/disc/pictures/pic";
-// 		setSnapshotFilename(name);
-// 		saveSnapshot(true,false);
-// 	}
 	
 	frame++;
 
 	fpsTracker->glDraw();
+
+	Omega::instance().synchronizer->go();
 }
 
 void GLViewer::animate()
 {
-	Omega::instance().rootBody->moveToNextTimeStep();
-
-// 	static bool progress = Omega::instance().getProgress();
-// 	static long int max  = Omega::instance().getMaxiter();
-// 
-// 	if( frame % 100 == 0 )					// checks every 100th iteration
-// 	{
-// 		if(progress)
-// 			cout << "iteration: " << frame << endl;
-// 		if( max != 0 )
-// 			if( frame > max )
-// 			{
-// 				cerr << "Calc finished at: " << frame << endl;
-// 				exit(0);			// terminate.
-// 			}
-// 	}
+	//Omega::instance().rootBody->moveToNextTimeStep();
 
 	fpsTracker->addOneAction();
 }
@@ -70,6 +54,7 @@ void GLViewer::mouseMoveEvent(QMouseEvent * e)
 
 void GLViewer::mousePressEvent(QMouseEvent *e)
 {
+	//Omega::instance().synchronizer->wait2();
 	if (!fpsTracker->mousePressEvent(e))
 		QGLViewer::mousePressEvent(e);
 }
@@ -78,12 +63,15 @@ void GLViewer::mouseReleaseEvent(QMouseEvent *e)
 {
 	if (!fpsTracker->mouseReleaseEvent(e))
 		QGLViewer::mouseReleaseEvent(e);
+	//Omega::instance().synchronizer->go();
 }
 
 void GLViewer::mouseDoubleClickEvent(QMouseEvent *e)
 {
+	//Omega::instance().synchronizer->wait2();
 	if (!fpsTracker->mouseDoubleClickEvent(e))
 		QGLViewer::mouseDoubleClickEvent(e);
+	//Omega::instance().synchronizer->go();
 }
 
 

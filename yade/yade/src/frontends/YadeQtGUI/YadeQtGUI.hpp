@@ -65,7 +65,6 @@ class YadeQtGUI : public FrontEnd
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public : virtual int run(int argc, char *argv[]);
-	public : virtual void endOfSimulationLoop();
 
 };
 

@@ -114,9 +114,3 @@ void YadeQtMainWindow::dynamicMenuClicked()
 		widget->show();
 	}
 }
-
-void YadeQtMainWindow::endOfSimulationLoop()
-{
-	if (simulationController)
-		simulationController->glViewer->draw();
-}

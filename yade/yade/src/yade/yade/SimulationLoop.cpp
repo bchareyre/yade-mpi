@@ -1,11 +1,11 @@
 #include "SimulationLoop.hpp"
 #include "NonConnexBody.hpp"
+#include "Omega.hpp"
+#include "ThreadSynchronizer.hpp"
 
-SimulationLoop::SimulationLoop() : thread(SimulationLoop::loop) 
+SimulationLoop::SimulationLoop()
 { 
 
-//nt xtime_get(xtime* xtp, int clock_type);
-//	sleep();
 }
 
 SimulationLoop::~SimulationLoop()
@@ -14,30 +14,15 @@ SimulationLoop::~SimulationLoop()
 }
 	
 	
-void SimulationLoop::loop()
+void SimulationLoop::operator()()
 {
 	while (true)
 	{
 		if (Omega::instance().rootBody)
 		{
+			Omega::instance().synchronizer->wait1();
 			Omega::instance().rootBody->moveToNextTimeStep();
-			Omega::instance().endOfSimulationLoop();
+			Omega::instance().synchronizer->go();
 		}
 	}
-
-//		static bool progress = Omega::instance().getProgress();
-//		static long int max  = Omega::instance().getMaxiter();
-	
-// 		if( frame % 100 == 0 )					// checks every 100th iteration
-// 		{
-// 			if(progress)
-// 				cout << "iteration: " << frame << endl;
-// 			if( max != 0 )
-// 				if( frame > max )
-// 				{
-// 					cerr << "Calc finished at: " << frame << endl;
-// 					exit(0);			// terminate.
-// 				}
-// 		}
-	
 }

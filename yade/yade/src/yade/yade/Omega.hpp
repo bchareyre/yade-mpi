@@ -30,6 +30,7 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <fstream>
 #include <time.h>
+#include <boost/thread/thread.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -41,13 +42,13 @@
 #include "Singleton.hpp"
 #include "ClassFactory.hpp"
 
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 class NonConnexBody;
 class SimulationLoop;
 class FrontEnd;
+class ThreadSynchronizer;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -62,14 +63,16 @@ using namespace std;
 
 class Omega : public Singleton<Omega>
 {
-
-	public : shared_ptr<SimulationLoop> simulationLoop; // FIXME put private and add function into omega to build them
 	public : shared_ptr<FrontEnd> gui;
+	
+	public : shared_ptr<boost::thread> simulationThread;
+	public : shared_ptr<SimulationLoop> simulationLoop; // FIXME put private and add function into omega to build them
+	
+	public : shared_ptr<ThreadSynchronizer> synchronizer; // FIXME put private and add function into omega to build them
 	
 	public : map<string,string> dynlibsType;
 	
 	public : bool getDynlibType(const string& libName,string& type);
-	public : void endOfSimulationLoop();
 		
 	public : shared_ptr<ofstream> logFile;
 

@@ -34,8 +34,6 @@ void SimulationController::pbLoadClicked()
 
 		glViewer = shared_ptr<GLViewer>(new GLViewer(this->parentWidget()->parentWidget()));
 		glViewer->show();
-		//simulationLoop = shared_ptr<SimulationLoop>(new SimulationLoop());	
-
 	}
 }
 

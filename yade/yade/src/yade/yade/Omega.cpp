@@ -22,6 +22,7 @@
 #include "BoundingVolume.hpp"
 #include "InteractionGeometry.hpp"             
 
+#include "ThreadSynchronizer.hpp"
 #include "SimulationLoop.hpp"
 #include "FrontEnd.hpp"
 
@@ -56,11 +57,6 @@ void Omega::init()
 	automatic=false;
 	progress=false;
 
-	// FIXME - this must be a parameter in .xml !!!
-	//gravity_x = 0.0;
-	//gravity_y = -10.0;
-	//gravity_y = 0.0;
-	//gravity_z = 0.0;
 	gravity = Vector3r(0,-9.81,0);
 	//dt = 0.04;
 	dt = 0.01;
@@ -75,6 +71,11 @@ void Omega::init()
 
 	// build dynlib information list
 	buildDynlibList();
+	
+	simulationLoop   = shared_ptr<SimulationLoop>(new SimulationLoop());
+	simulationThread = shared_ptr<boost::thread>(new boost::thread(*simulationLoop));
+	synchronizer     = shared_ptr<ThreadSynchronizer>(new ThreadSynchronizer());
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -266,10 +267,4 @@ void Omega::setProgress(bool b)
 bool Omega::getProgress()
 {
 	return progress;
-}
-
-
-void Omega::endOfSimulationLoop()
-{
-	gui->endOfSimulationLoop();
 }
