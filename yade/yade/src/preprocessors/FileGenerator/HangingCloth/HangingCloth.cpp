@@ -178,7 +178,7 @@ string HangingCloth::generate()
 	Quaternionr q;
 	q.fromAxisAngle( Vector3r(0,0,1),0);
 
-	//FIXME : use a default one
+	// use ParticleSet so that we have automatic updating for free
 	shared_ptr<ParticleSetParameters> physics2(new ParticleSetParameters);
 	physics2->se3		= Se3r(Vector3r(0,0,0),q);
 

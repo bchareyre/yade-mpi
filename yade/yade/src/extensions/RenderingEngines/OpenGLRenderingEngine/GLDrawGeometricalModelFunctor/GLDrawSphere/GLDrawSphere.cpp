@@ -37,7 +37,7 @@ vector<Vector3r> GLDrawSphere::faces;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void GLDrawSphere::go(const shared_ptr<GeometricalModel>& gm, const shared_ptr<BodyPhysicalParameters>& )
+void GLDrawSphere::go(const shared_ptr<GeometricalModel>& gm, const shared_ptr<BodyPhysicalParameters>&,bool wire)
 {
 	static bool first=true;
 	
@@ -98,16 +98,16 @@ void GLDrawSphere::go(const shared_ptr<GeometricalModel>& gm, const shared_ptr<B
 	
 	glMaterialv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, gm->diffuseColor);
 	glColor3v(gm->diffuseColor);
-// 	if (cm->wire)
-// 	{
-// 		glScalef(radius,radius,radius);
-// 		glCallList(glWiredSphereList);
-// 	}
-// 	else
-// 	{
+ 	if (gm->wire || wire)
+ 	{
+ 		glScalef(radius,radius,radius);
+ 		glCallList(glWiredSphereList);
+ 	}
+ 	else
+ 	{
 		glScalef(radius,radius,radius);
 		glCallList(glSphereList);
-//	}
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -28,7 +28,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void GLDrawBox::go(const shared_ptr<GeometricalModel>& gm, const shared_ptr<BodyPhysicalParameters>&)
+void GLDrawBox::go(const shared_ptr<GeometricalModel>& gm, const shared_ptr<BodyPhysicalParameters>&,bool wire)
 {
 	// FIXME : check that : one of those 2 lines are useless
   	glMaterialv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, gm->diffuseColor);
@@ -38,7 +38,7 @@ void GLDrawBox::go(const shared_ptr<GeometricalModel>& gm, const shared_ptr<Body
 	
 	glScalef(2*extents[0],2*extents[1],2*extents[2]);
 
-	if (gm->wire)
+	if (gm->wire || wire)
 	{
 		glDisable(GL_LIGHTING);
 		glutWireCube(1);

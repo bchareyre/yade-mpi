@@ -144,6 +144,7 @@ namespace Loki
     class TypeTraits
     {
     private:
+	
         template <class U> struct PointerTraits
         {
             enum { result = false };
@@ -230,7 +231,7 @@ namespace Loki
         enum { isArith = isIntegral || isFloat };
         enum { isFundamental = isStdFundamental || isArith || isFloat };
         
-        typedef typename Select<isStdArith || isPointer || isMemberPointer,
+        typedef typename Select<isStdArith || isPointer || isMemberPointer ,
             T, typename Private::AddReference<T>::Result>::Result ParameterType;
         
         enum { isConst = UnConst<T>::isConst };

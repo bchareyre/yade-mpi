@@ -1,6 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2004 by Olivier Galizzi                                 *
- *   olivier.galizzi@imag.fr                                               *
+ *   Copyright (C) 2004 by Janek Kozicki                                   *
+ *   cosurgi@berlios.de                                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -21,41 +21,31 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#ifndef __GLDRAWSPHERE_HPP__
-#define __GLDRAWSPHERE_HPP__
+#ifndef LATTICE_SET_2_LATTICE_BEAMS_HPP
+#define LATTICE_SET_2_LATTICE_BEAMS_HPP 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "GLDrawGeometricalModelFunctor.hpp"
-#include "Vector3.hpp"
+#include "GeometricalModelFunctor.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-class GLDrawSphere : public GLDrawGeometricalModelFunctor
+class LatticeSet2LatticeBeams : public GeometricalModelFunctor
 {
-
-	private : static vector<Vector3r> vertices;
-	private : static vector<Vector3r> faces;
-	private : static int glWiredSphereList;
-	private : static int glSphereList;
-	private : void subdivideTriangle(Vector3r& v1,Vector3r& v2,Vector3r& v3, int depth);
-	private : void drawSphere(int depth);
-	
-	public : virtual void go(const shared_ptr<GeometricalModel>&, const shared_ptr<BodyPhysicalParameters>&,bool);
-	REGISTER_CLASS_NAME(GLDrawSphere);
+	public : void go(	  const shared_ptr<BodyPhysicalParameters>&
+				, shared_ptr<GeometricalModel>&
+				, const Body*);
+	REGISTER_CLASS_NAME(LatticeSet2LatticeBeams);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-REGISTER_SERIALIZABLE(GLDrawSphere,false);
+REGISTER_SERIALIZABLE(LatticeSet2LatticeBeams,false);
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-#endif // __GLDRAWSPHERE_HPP__
+#endif // LATTICE_SET_2_LATTICE_BEAMS_HPP 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////

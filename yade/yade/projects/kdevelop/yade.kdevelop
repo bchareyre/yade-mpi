@@ -99,7 +99,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>yade/Body/BoundingVolume</activedir>
+      <activedir>toolboxes/Libraries/Serialization</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>

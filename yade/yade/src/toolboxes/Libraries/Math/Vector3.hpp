@@ -14,8 +14,16 @@
 #include "Math.hpp"
 #include <algorithm>
 
+#include <iostream>
+
 //namespace Wm3
 //{
+
+template <class RealType>
+class Vector3;
+
+template <class RealType>
+std::ostream & operator<< (std::ostream &os, const Vector3<RealType> &v);
 
 template <class RealType>
 class Vector3
@@ -104,7 +112,8 @@ public:
     static const Vector3 UNIT_X;
     static const Vector3 UNIT_Y;
     static const Vector3 UNIT_Z;
-
+    
+    friend std::ostream & operator<< <> (std::ostream &os, const Vector3<RealType> &v);
 private:
     // support for comparisons
     int compareArrays (const Vector3& rkV) const;
@@ -115,6 +124,11 @@ private:
 template <class RealType,typename RealType2>
 Vector3<RealType> operator* (RealType2 fScalar, const Vector3<RealType>& rkV);
 
+template <class RealType>
+std::ostream & operator<< (std::ostream &os, const Vector3<RealType> &v)
+{
+    return os << v[0] << " " << v[1] << " " << v[2];
+}
 
 #include "Vector3.ipp"
 

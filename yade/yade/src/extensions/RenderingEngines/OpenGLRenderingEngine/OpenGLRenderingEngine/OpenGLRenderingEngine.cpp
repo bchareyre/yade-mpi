@@ -44,6 +44,8 @@ OpenGLRenderingEngine::OpenGLRenderingEngine() : RenderingEngine()
 	castShadow = false;
 	drawShadowVolumes = false;
 	useFastShadowVolume = true;
+	drawWireFrame = false;
+	drawInside = true;
 	needInit = true;
 	lightPos = Vector3r(75.0,130.0,0.0);
 	
@@ -314,25 +316,27 @@ void OpenGLRenderingEngine::renderShadowVolumes(const shared_ptr<ComplexBody>& r
 void OpenGLRenderingEngine::renderGeometricalModel(const shared_ptr<ComplexBody>& rootBody)
 {	
 	shared_ptr<BodyContainer>& bodies = rootBody->bodies;
-	
-	for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext() )
-	{
-		shared_ptr<Body>& b = rootBody->bodies->getCurrent();
-		if(b->geometricalModel)
+
+	if((rootBody->geometricalModel || drawInside) && drawInside)
+		for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext() )
 		{
-			glPushMatrix();
-			Se3r& se3 = b->physicalParameters->se3;
-			Real angle;
-			Vector3r axis;	
-			se3.rotation.toAxisAngle(axis,angle);	
-			glTranslatef(se3.translation[0],se3.translation[1],se3.translation[2]);
-			glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
-			geometricalModelDispatcher(b->geometricalModel,b->physicalParameters);
-			glPopMatrix();
+			shared_ptr<Body>& b = rootBody->bodies->getCurrent();
+			if(b->geometricalModel)
+			{
+				glPushMatrix();
+				Se3r& se3 = b->physicalParameters->se3;
+				Real angle;
+				Vector3r axis;	
+				se3.rotation.toAxisAngle(axis,angle);	
+				glTranslatef(se3.translation[0],se3.translation[1],se3.translation[2]);
+				glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
+				geometricalModelDispatcher(b->geometricalModel,b->physicalParameters,drawWireFrame);
+				glPopMatrix();
+			}
 		}
-	}
+		
 	if(rootBody->geometricalModel)
-		geometricalModelDispatcher(rootBody->geometricalModel,rootBody->physicalParameters);
+		geometricalModelDispatcher(rootBody->geometricalModel,rootBody->physicalParameters,drawWireFrame);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -344,12 +348,14 @@ void OpenGLRenderingEngine::renderBoundingVolume(const shared_ptr<ComplexBody>& 
 	{	
 		glPushMatrix();
 		shared_ptr<Body>& b = rootBody->bodies->getCurrent();
-		boundingVolumeDispatcher(b->boundingVolume);
+		if(b->boundingVolume)
+			boundingVolumeDispatcher(b->boundingVolume);
 		glPopMatrix();
 	}
 	
 	glPushMatrix();
-	boundingVolumeDispatcher(rootBody->boundingVolume);
+	if(rootBody->boundingVolume)
+		boundingVolumeDispatcher(rootBody->boundingVolume);
 	glPopMatrix();
 }
 
@@ -369,12 +375,14 @@ void OpenGLRenderingEngine::renderInteractionGeometry(const shared_ptr<ComplexBo
 		se3.rotation.toAxisAngle(axis,angle);	
 		glTranslatef(se3.translation[0],se3.translation[1],se3.translation[2]);
 		glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
-		interactionGeometryDispatcher(b->interactionGeometry,b->physicalParameters);
+		if(b->interactionGeometry)
+			interactionGeometryDispatcher(b->interactionGeometry,b->physicalParameters);
 		glPopMatrix();
 	}
 	
 	glPushMatrix();
-	interactionGeometryDispatcher(rootBody->interactionGeometry,rootBody->physicalParameters);
+	if(rootBody->interactionGeometry)
+		interactionGeometryDispatcher(rootBody->interactionGeometry,rootBody->physicalParameters);
 	glPopMatrix();
 }
 
@@ -390,6 +398,8 @@ void OpenGLRenderingEngine::registerAttributes()
 	REGISTER_ATTRIBUTE(castShadow);
 	REGISTER_ATTRIBUTE(drawShadowVolumes);
 	REGISTER_ATTRIBUTE(useFastShadowVolume);	
+	REGISTER_ATTRIBUTE(drawWireFrame);
+	REGISTER_ATTRIBUTE(drawInside);
 	
 	//REGISTER_ATTRIBUTE(boundingVolumeFunctorNames);
 	//REGISTER_ATTRIBUTE(interactionGeometryFunctorNames);

@@ -32,6 +32,7 @@ XMLManager::XMLManager() : IOManager()
 	Archive::addSerializablePointer(SerializableTypes::SERIALIZABLE, false, serializeSerializable, deserializeSerializable);
 	Archive::addSerializablePointer(SerializableTypes::POINTER, false, serializeSmartPointer, deserializeSmartPointer);
 	Archive::addSerializablePointer(SerializableTypes::CONTAINER, false, serializeContainer, deserializeContainer);
+	Archive::addSerializablePointer(SerializableTypes::FUNDAMENTAL, true , IOManager::serializeFundamental, deserializeFundamental);
 
 	setContainerOpeningBracket('[');
 	setContainerClosingBracket(']');
@@ -347,3 +348,17 @@ void XMLManager::deserializeSmartPointer(istream& stream, Archive& ac, const str
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+
+void XMLManager::deserializeFundamental(istream& stream, Archive& ac, const string& str)
+{
+	try
+	{
+		IOManager::deserializeFundamental(stream,ac,str);
+	}
+	catch(boost::bad_lexical_cast& )
+	{
+		//cerr << saxParser.getLineNumber() << endl;
+		string error=string(IOManagerExceptions::AttributeNotFound) + " (bad lexical_cast) " + saxParser.getTagName() + " line: " + lexical_cast<string>(saxParser.getLineNumber());
+		throw SerializableError(error.c_str());
+	}
+}

@@ -24,6 +24,7 @@ class XMLManager : public IOManager
 	public    : static void deserializeSerializable(istream& stream, Archive& ac, const string& str="");
 	public    : static void deserializeContainer(istream& stream, Archive& ac, const string& str="");
 	public    : static void deserializeSmartPointer(istream& stream, Archive& ac, const string& str="");
+	public    : static void deserializeFundamental(istream& stream, Archive& ac, const string& str);
 
 	public    : static void writeTabs(ostream& stream, int depth);
 	public    : static void writeOpeningTag(ostream& stream, Archive& ac, int depth);

@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2004 by Janek Kozicki                                   *
+ *   Copyright (C) 2005 by Janek Kozicki                                   *
  *   cosurgi@berlios.de                                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -18,45 +18,37 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "GeometricalModelDispatcher.hpp"
+#include "LatticeSet2LatticeBeams.hpp"
+#include "LatticeSetParameters.hpp"
+#include "LatticeBeamParameters.hpp"
+#include "LineSegment.hpp"
 #include "ComplexBody.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void GeometricalModelDispatcher::postProcessAttributes(bool deserializing)
+void LatticeSet2LatticeBeams::go(	  const shared_ptr<BodyPhysicalParameters>& ph
+					, shared_ptr<GeometricalModel>& 
+					, const Body* body)
 {
-	postProcessDispatcher2D(deserializing);
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-void GeometricalModelDispatcher::registerAttributes()
-{
-	REGISTER_ATTRIBUTE(functorNames);
-	REGISTER_ATTRIBUTE(functorArguments);
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-void GeometricalModelDispatcher::action(Body* body)
-{
-	ComplexBody * ncb = dynamic_cast<ComplexBody*>(body);
-	shared_ptr<BodyContainer>& bodies = ncb->bodies;
+	int beamGroup = dynamic_cast<const LatticeSetParameters*>(ph.get())->beamGroup;
+	const ComplexBody * ncb = dynamic_cast<const ComplexBody*>(body);
+	const shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	
-	for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext())
+// FIXME - this copying of length between latticeBeam geometry and physics, inside ComplexBody could be done just once, if length was inside shared_ptr. This can be improved once we make indexable Parameters: Velocity, Position, Orientation, ....
+cerr << "qwer\n";
+	for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext() )
 	{
-		shared_ptr<Body>& b = bodies->getCurrent();
-		if(b->geometricalModel)
-			operator()(b->physicalParameters,b->geometricalModel,b.get());
+		if( bodies->getCurrent()->getGroup() == beamGroup )
+		{
+			LineSegment* line 		= dynamic_cast<LineSegment*> 		(bodies->getCurrent()->geometricalModel.get());
+			LatticeBeamParameters* beam 	= dynamic_cast<LatticeBeamParameters*>  (bodies->getCurrent()->physicalParameters.get());
+			
+			line->length = beam->length;
+			// FIXME - update color too
+		}
 	}
-	
-	if(body->geometricalModel)
-	 	operator()(body->physicalParameters,body->geometricalModel,body);
 }
-

@@ -47,10 +47,12 @@ class OpenGLRenderingEngine : public RenderingEngine
 	public : bool castShadow;
 	public : bool drawShadowVolumes;
 	public : bool useFastShadowVolume;
+	public : bool drawWireFrame;
+	public : bool drawInside;
 	
 	private : DynLibDispatcher< BoundingVolume    , GLDrawBoundingVolumeFunctor, void , TYPELIST_1(const shared_ptr<BoundingVolume>&) > boundingVolumeDispatcher;
 	private : DynLibDispatcher< InteractionDescription , GLDrawInteractionGeometryFunctor, void , TYPELIST_2(const shared_ptr<InteractionDescription>&, const shared_ptr<BodyPhysicalParameters>&) >interactionGeometryDispatcher;
-	private : DynLibDispatcher< GeometricalModel  , GLDrawGeometricalModelFunctor, void , TYPELIST_2(const shared_ptr<GeometricalModel>&, const shared_ptr<BodyPhysicalParameters>&) > geometricalModelDispatcher;
+	private : DynLibDispatcher< GeometricalModel  , GLDrawGeometricalModelFunctor, void , TYPELIST_3(const shared_ptr<GeometricalModel>&, const shared_ptr<BodyPhysicalParameters>&,bool) > geometricalModelDispatcher;
 	private : DynLibDispatcher< GeometricalModel  , GLDrawShadowVolumeFunctor, void , TYPELIST_3(const shared_ptr<GeometricalModel>&, const shared_ptr<BodyPhysicalParameters>&, const Vector3r& ) > shadowVolumeDispatcher;
 
 	private : vector<vector<string> >  boundingVolumeFunctorNames;

@@ -28,11 +28,11 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void GLDrawMesh2D::go(const shared_ptr<GeometricalModel>& gm, const shared_ptr<BodyPhysicalParameters>&)
+void GLDrawMesh2D::go(const shared_ptr<GeometricalModel>& gm, const shared_ptr<BodyPhysicalParameters>&,bool wire)
 {
 	glColor3v(gm->diffuseColor);
 
-	if (gm->wire)
+	if (gm->wire || wire)
 	{
 		vector<Edge>& edges 	   = (static_cast<Mesh2D*>(gm.get()))->edges;
 		vector<Vector3r>& vertices = (static_cast<Mesh2D*>(gm.get()))->vertices;

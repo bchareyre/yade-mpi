@@ -37,9 +37,10 @@
 class GLDrawGeometricalModelFunctor : public FunctorWrapper
 		<
 		 void ,
-		 TYPELIST_2(const shared_ptr<GeometricalModel>&, const shared_ptr<BodyPhysicalParameters>&) 
+		 TYPELIST_3(const shared_ptr<GeometricalModel>&, const shared_ptr<BodyPhysicalParameters>&,bool) 
 		>
 {
+	public : bool wire;
 	public : virtual ~GLDrawGeometricalModelFunctor() {};
 	REGISTER_CLASS_NAME(GLDrawGeometricalModelFunctor);
 };

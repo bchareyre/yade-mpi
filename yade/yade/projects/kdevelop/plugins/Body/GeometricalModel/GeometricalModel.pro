@@ -3,7 +3,8 @@
 # Subdir relative project main directory: ./plugins/GeometricalModel
 # Target is a subdirs project 
 
-SUBDIRS += LineSegment \
+SUBDIRS += LatticeSetGeometry \
+           LineSegment \
            Terrain \
            Sphere \
            Box \

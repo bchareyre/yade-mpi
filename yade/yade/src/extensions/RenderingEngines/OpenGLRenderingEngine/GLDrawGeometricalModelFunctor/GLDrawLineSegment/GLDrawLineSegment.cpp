@@ -5,7 +5,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void GLDrawLineSegment::go(const shared_ptr<GeometricalModel>& gm, const shared_ptr<BodyPhysicalParameters>&)
+void GLDrawLineSegment::go(const shared_ptr<GeometricalModel>& gm, const shared_ptr<BodyPhysicalParameters>&,bool wire)
 {
 	// FIXME : check that : one of those 2 lines are useless
   	glMaterialv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, gm->diffuseColor);
@@ -13,9 +13,9 @@ void GLDrawLineSegment::go(const shared_ptr<GeometricalModel>& gm, const shared_
 	
 	Real len = (static_cast<LineSegment*>(gm.get()))->length;
 	
-	glScalef(len/20,len,len/20); // FIXME - how to draw a stupid line ?
+	glScalef(len,len/20,len/20); // it's a box, not a line. looks better :)
 
-	if (gm->wire)
+	if (gm->wire || wire)
 	{
 		glDisable(GL_LIGHTING);
 		glutWireCube(1);

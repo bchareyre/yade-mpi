@@ -9,6 +9,9 @@ LIBS += -lParticleParameters \
         -lLineSegment \
         -lLatticeNodeParameters \
         -lAABB \
+        -lSphere \
+        -lLatticeSetParameters \
+        -lLatticeNodeParameters \
         -rdynamic 
 INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
@@ -20,6 +23,7 @@ QMAKE_LIBDIR = ../../../plugins/Body/BodyPhysicalParameters/ParticleParameters/$
                ../../../plugins/Body/GeometricalModel/LineSegment/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/BodyPhysicalParameters/LatticeNodeParameters/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
+               ../../../plugins/Body/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
 CONFIG += debug \

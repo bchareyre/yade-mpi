@@ -22,5 +22,8 @@ LatticeBeamParameters::~LatticeBeamParameters()
 void LatticeBeamParameters::registerAttributes()
 {
 	RigidBodyParameters::registerAttributes();
-//	REGISTER_ATTRIBUTE(length);
+	REGISTER_ATTRIBUTE(id1);
+	REGISTER_ATTRIBUTE(id2);
+	REGISTER_ATTRIBUTE(initialLength);
+	REGISTER_ATTRIBUTE(length);
 }

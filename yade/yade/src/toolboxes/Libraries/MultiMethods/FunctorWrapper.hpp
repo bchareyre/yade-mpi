@@ -97,7 +97,6 @@
 /// then virtual function to overload is:
 ///		public: virtual std::string go(boost::shared_ptr<Shape>&,double,char,const std::string& );
 ///
-/// FIXME - but not shared_ptr! 
 /// references were added where necessary, to optimize call speed.
 /// So pay attention when you overload this function.
 ///
@@ -130,7 +129,16 @@ class FunctorWrapper : public Serializable
 	
 		ResultType error()
 		{
-			std::string err = MultiMethodsExceptions::BadVirtualCall;
+			std::string err = std::string(MultiMethodsExceptions::BadVirtualCall) + "types are:\n" 
+			+ "1. " + typeid(Parm1).name() + "\n " 
+			+ "2. " + typeid(Parm2).name() + "\n "
+			+ "3. " + typeid(Parm3).name() + "\n "
+			+ "5. " + typeid(Parm4).name() + "\n "
+			+ "6. " + typeid(Parm4).name() + "\n "
+			+ "7. " + typeid(Parm4).name() + "\n "
+			+ "8. " + typeid(Parm4).name() + "\n "
+			+ "9. " + typeid(Parm4).name() + "\n "
+			+ "10. " + typeid(Parm4).name();
 			cerr << err.c_str();
 			throw MultiMethodsBadVirtualCall(err.c_str());
 		}
