@@ -66,12 +66,14 @@ int QtGUI::run(int argc, char *argv[])
 
 	opterr = 0;
 	int ch;
-	while( ( ch = getopt(argc,argv,"t:") ) != -1)
+	while( ( ch = getopt(argc,argv,"t:g:") ) != -1)
 		switch(ch)
 		{
 //			case 'H'	: help(); 						return 1;
 			case 't'	: Omega::instance().setTimeStep
 						(lexical_cast<double>(optarg));			break;
+			case 'g'	: Omega::instance().setGravity
+						(Vector3r(0,-lexical_cast<Real>(optarg),0));	break;
 			default		: break;
 		}
 

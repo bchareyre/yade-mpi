@@ -9,7 +9,6 @@ class BallisticDynamicEngine : public DynamicEngine
 	private : Vector3r prevAngularVelocity;
 	private : bool first;
 	public : float damping;
-	public : bool recordForces; // FIXME - hack for recording forces
 
 	// construction
 	public : BallisticDynamicEngine ();

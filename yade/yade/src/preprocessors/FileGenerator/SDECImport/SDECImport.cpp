@@ -14,6 +14,9 @@
 #include "SDECDiscreteElement.hpp"
 #include "SDECPermanentLink.hpp"
 #include "Interaction.hpp"
+#include "Actor.hpp"
+#include "ForceRecorder.hpp"
+#include "AveragePositionRecorder.hpp"
 
 #include "BoundingVolumeUpdator.hpp"
 #include "CollisionGeometrySet.hpp"
@@ -104,12 +107,18 @@ void SDECImport::generate()
 	bvu->addBVFactories("Box","AABB","Box2AABBFactory");
 	bvu->addBVFactories("CollisionGeometrySet","AABB","CollisionGeometrySet2AABBFactory");
 	
-	rootBody->actors.resize(4);
+	rootBody->actors.resize(5);
 	rootBody->actors[0] 		= bvu;
 	rootBody->actors[1] 		= shared_ptr<Actor>(new SAPCollider);
 	rootBody->actors[2] 		= nc;
 // use SDEC law for calculations
 	rootBody->actors[3] 		= shared_ptr<Actor>(new SDECDynamicEngine);
+	
+	shared_ptr<AveragePositionRecorder> actor;
+	actor = shared_ptr<AveragePositionRecorder>(new AveragePositionRecorder);
+	actor -> outputFile 		= "../data/Position";
+	actor -> interval 		= 100;
+	rootBody->actors[4]		= actor;
 
 	rootBody->permanentInteractions->clear();
 
@@ -170,6 +179,10 @@ void SDECImport::generate()
 			if(f != 1) // skip loading of SDEC walls
 				continue;
 //			cout << i << " : " << x << " " << z << " " << y << " " << radius <<  endl;
+
+			if( i % 100 == 0 )
+				cout << i << endl;
+
 			lowerCorner[0] = min(translation[0]-radius , lowerCorner[0]);
 			lowerCorner[1] = min(translation[1]-radius , lowerCorner[1]);
 			lowerCorner[2] = min(translation[2]-radius , lowerCorner[2]);
@@ -249,10 +262,12 @@ void SDECImport::generate()
 	sdec->kn		= kn_Box;					// kn
 	sdec->ks		= ks_Box;					// ks
 	
-	ballistic= shared_ptr<BallisticDynamicEngine>(new BallisticDynamicEngine);
-	ballistic->damping 	= 1.0;
-	ballistic->recordForces = true; // FIXME - hack for recording forces
-	sdec->actors.push_back(ballistic);
+	
+// Recording Forces
+//	actor = shared_ptr<ForceRecorder>(new ForceRecorder);
+//	actor -> outputFile 	= "../data/Forces";
+//	actor -> interval 	= 100;
+//	sdec->actors.push_back(actor);
 	
 	body = dynamic_pointer_cast<Body>(sdec);
 	if(wall_bottom)

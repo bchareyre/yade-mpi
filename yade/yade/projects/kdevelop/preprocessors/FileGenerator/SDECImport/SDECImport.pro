@@ -20,6 +20,8 @@ LIBS += -lSDECDynamicEngine \
         -lInteraction \
         -lCollisionGeometrySet2AABBFactory \
         -lCollisionGeometrySet \
+        -lForceRecorder \
+        -lAveragePositionRecorder \
         -rdynamic 
 INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
@@ -36,12 +38,14 @@ QMAKE_LIBDIR = ../../../plugins/DynamicEngine/SDECDynamicEngine/$(YADEDYNLIBPATH
                ../../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
                ../../../yade/Body/$(YADEDYNLIBPATH) \
                ../../../yade/Engine/$(YADEDYNLIBPATH) \
-               ../../../yade/MultiMethods/$(YADEDYNLIBPATH) \
+               ../../../toolboxes/Libraries/MultiMethods/$(YADEDYNLIBPATH) \
                ../../../plugins/InteractionModel/SDECPermanentLink/$(YADEDYNLIBPATH) \
                ../../../yade/Geometry/$(YADEDYNLIBPATH) \
                ../../../yade/Interaction/$(YADEDYNLIBPATH) \
                ../../../plugins/BoundingVolumeFactory/CollisionGeometrySet2AABBFactory/$(YADEDYNLIBPATH) \
                ../../../plugins/CollisionGeometry/CollisionGeometrySet/$(YADEDYNLIBPATH) \
+               ../../../postprocessors/ForceRecorder/$(YADEDYNLIBPATH) \
+               ../../../postprocessors/AveragePositionRecorder/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

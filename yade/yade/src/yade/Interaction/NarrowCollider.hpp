@@ -60,7 +60,7 @@ class NarrowCollider : public Actor
 					, const Se3r&
 					, shared_ptr<Interaction>&
 				)
-			, false
+			, false							// disable auto symmetry handling
 		> narrowCollisionDispatcher;
 
 	private : vector<vector<string> > collisionFunctors;

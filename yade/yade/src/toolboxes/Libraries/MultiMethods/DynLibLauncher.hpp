@@ -98,7 +98,7 @@
 ///		public: virtual std::string go(boost::shared_ptr<Shape>&,double,char,const std::string& );
 ///
 /// references were added where necessary, to optimize call speed.
-/// So pay attentions when you overload this function.
+/// So pay attention when you overload this function.
 ///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
