@@ -8,11 +8,17 @@ class RotatingBox : public FileGenerator
 {
 	private : Vector3r nbSpheres;
 	private : Vector3r nbBoxes;
+	private : Vector3r rotationAxis;
 	private	: Real minSize;
 	private	: Real maxSize;
 	private	: Real disorder;
 	private : Real dampingForce;
 	private : Real dampingMomentum;
+	private : Real densityBox;
+	private : Real densitySphere;
+	private : bool isRotating;
+	private : Real rotationSpeed;
+	private : bool middleWireFrame;
 	
 	// construction
 	public : RotatingBox ();

@@ -22,7 +22,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "Sphere2Sphere4ClosestFeatures.hpp"
-#include "Sphere.hpp"
+#include "InteractionSphere.hpp"
 #include "ClosestFeatures.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -34,8 +34,8 @@ bool Sphere2Sphere4ClosestFeatures::go(		const shared_ptr<InteractionDescription
 						const Se3r& se32,
 						const shared_ptr<Interaction>& c)
 {
-	shared_ptr<Sphere> s1 = dynamic_pointer_cast<Sphere>(cm1);
-	shared_ptr<Sphere> s2 = dynamic_pointer_cast<Sphere>(cm2);
+	shared_ptr<InteractionSphere> s1 = dynamic_pointer_cast<InteractionSphere>(cm1);
+	shared_ptr<InteractionSphere> s2 = dynamic_pointer_cast<InteractionSphere>(cm2);
 	
 	Vector3r v = se31.translation-se32.translation;
 	Real l = v.normalize();

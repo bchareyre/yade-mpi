@@ -3,8 +3,10 @@
 #include "ClosestFeatures.hpp"
 #include "Omega.hpp"
 #include "ComplexBody.hpp"
+#include "ActionForce.hpp"
+#include "ActionMomentum.hpp"
 
-SimpleSpringDynamicEngine::SimpleSpringDynamicEngine () : DynamicEngine()
+SimpleSpringDynamicEngine::SimpleSpringDynamicEngine () : DynamicEngine(), actionForce(new ActionForce) , actionMomentum(new ActionMomentum)
 {
 	first = true;
 }
@@ -25,25 +27,24 @@ void SimpleSpringDynamicEngine::respondToInteractions(Body * body)
 	Real stiffness = 10000;
 	Real viscosity = 10;
 	Vector3r gravity = Omega::instance().getGravity();
-	if (first)
+	
+	if(first) // FIXME - this should be done somewhere else
 	{
-		forces.resize(bodies->size());
-		couples.resize(bodies->size());
-		prevVelocities.resize(bodies->size());
+		vector<shared_ptr<Action> > vvv; 
+		vvv.clear();
+		vvv.push_back(actionForce);
+		vvv.push_back(actionMomentum);
+		ncb->actions->prepare(vvv);
 	}
 
-	fill(forces.begin(),forces.end(),Vector3r(0,0,0));
-	fill(couples.begin(),couples.end(),Vector3r(0,0,0));
-
-	shared_ptr<Interaction> contact;
-//	for( ; cti!=ctiEnd ; ++cti)
 	for( ncb->interactions->gotoFirst() ; ncb->interactions->notAtEnd() ; ncb->interactions->gotoNext() )
 	{
-		contact = ncb->interactions->getCurrent();
+		const shared_ptr<Interaction>& contact = ncb->interactions->getCurrent();
+		int id1 = contact->getId1();
+		int id2 = contact->getId2();
 
-
-		shared_ptr<RigidBodyParameters> rb1 = dynamic_pointer_cast<RigidBodyParameters>((*bodies)[contact->getId1()]->physicalParameters);
-		shared_ptr<RigidBodyParameters> rb2 = dynamic_pointer_cast<RigidBodyParameters>((*bodies)[contact->getId2()]->physicalParameters);
+		shared_ptr<RigidBodyParameters> rb1 = dynamic_pointer_cast<RigidBodyParameters>((*bodies)[id1]->physicalParameters);
+		shared_ptr<RigidBodyParameters> rb2 = dynamic_pointer_cast<RigidBodyParameters>((*bodies)[id2]->physicalParameters);
 
 		std::vector<std::pair<Vector3r,Vector3r> >::iterator cpi = (dynamic_pointer_cast<ClosestFeatures>(contact->interactionGeometry))->closestsPoints.begin();
 		std::vector<std::pair<Vector3r,Vector3r> >::iterator cpiEnd = (dynamic_pointer_cast<ClosestFeatures>(contact->interactionGeometry))->closestsPoints.end();
@@ -69,30 +70,25 @@ void SimpleSpringDynamicEngine::respondToInteractions(Body * body)
 			Real relativeVelocity = dir.dot(v2-v1);
 			Vector3r f = (elongation*stiffness+relativeVelocity*viscosity)/size*dir;
 
-			forces[contact->getId1()] += f;
-			forces[contact->getId2()] -= f;
-
-			couples[contact->getId1()] += o1p.cross(f);
-			couples[contact->getId2()] -= o2p.cross(f);
+			static_cast<ActionForce*>   ( ncb->actions->find( id1 , actionForce   ->getClassIndex() ).get() )->force    += f;
+			static_cast<ActionForce*>   ( ncb->actions->find( id2 , actionForce   ->getClassIndex() ).get() )->force    -= f;
+		
+			static_cast<ActionMomentum*>( ncb->actions->find( id1 , actionMomentum->getClassIndex() ).get() )->momentum += o1p.cross(f);
+			static_cast<ActionMomentum*>( ncb->actions->find( id2 , actionMomentum->getClassIndex() ).get() )->momentum -= o2p.cross(f);
+			
 		}
 	}
 
 
-//	for(unsigned int i=0; i < bodies.size(); i++)
-	shared_ptr<Body> b;
-	unsigned int i=0;
-	for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext() , ++i )
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// Gravity														///
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext() )
 	{
-		b = bodies->getCurrent();
-
-		shared_ptr<RigidBodyParameters> rb = dynamic_pointer_cast<RigidBodyParameters>(b->physicalParameters);
-
-		if (rb)
-		{
-			// FIXME - this assumes that bodies are numbered from zero with one number increments, BAD!!!
-			rb->acceleration += forces[i]*rb->invMass;
-			rb->angularAcceleration += couples[i].multDiag(rb->invInertia);
-		}
+		shared_ptr<Body>& b = bodies->getCurrent();
+		RigidBodyParameters * de = static_cast<RigidBodyParameters*>(b->physicalParameters.get());
+		static_cast<ActionForce*>( ncb->actions->find( b->getId() , actionForce->getClassIndex() ).get() )->force += gravity*de->mass;
         }
 
 	first = false;

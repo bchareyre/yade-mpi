@@ -15,6 +15,11 @@
 #include "InteractionBox.hpp"
 #include "InteractionSphere.hpp"
 #include "InteractionGeometryDispatcher.hpp"
+#include "ActionApplyDispatcher.hpp"
+#include "ActionReset.hpp"
+#include "ActionForceDamping.hpp"
+#include "ActionMomentumDamping.hpp"
+#include "ActionDampingDispatcher.hpp"
 
 #include "BoundingVolumeDispatcher.hpp"
 #include "InteractionDescriptionSet2AABBFunctor.hpp"
@@ -24,13 +29,19 @@
 
 RotatingBox::RotatingBox () : FileGenerator()
 {
-	nbSpheres	= Vector3r(3,3,3);
-	nbBoxes		= Vector3r(2,2,2);
-	minSize		= 2;
+	nbSpheres	= Vector3r(3,3,5);
+	nbBoxes		= Vector3r(3,3,4);
+	minSize		= 3;
 	maxSize		= 5;
 	disorder	= 1.1;
-	dampingForce	= 0.3;
-	dampingMomentum = 0.3;
+	densityBox	= 1;
+	densitySphere	= 1;
+	dampingForce	= 0.2;
+	dampingMomentum = 0.6;
+	isRotating	= true;
+	rotationSpeed	= 0.05;
+	rotationAxis	= Vector3r(1,1,1);
+	middleWireFrame = true;
 }
 
 RotatingBox::~RotatingBox ()
@@ -46,9 +57,15 @@ void RotatingBox::registerAttributes()
 	REGISTER_ATTRIBUTE(nbBoxes);
 	REGISTER_ATTRIBUTE(minSize);
 	REGISTER_ATTRIBUTE(maxSize);
+	REGISTER_ATTRIBUTE(densityBox);
+	REGISTER_ATTRIBUTE(densitySphere);
+	REGISTER_ATTRIBUTE(dampingForce);
+	REGISTER_ATTRIBUTE(dampingMomentum);
+	REGISTER_ATTRIBUTE(isRotating);
+	REGISTER_ATTRIBUTE(rotationSpeed);
+	REGISTER_ATTRIBUTE(rotationAxis);
+	REGISTER_ATTRIBUTE(middleWireFrame);
 //	REGISTER_ATTRIBUTE(disorder);
-//	REGISTER_ATTRIBUTE(dampingForce);
-//	REGISTER_ATTRIBUTE(dampingMomentum);
 }
 
 string RotatingBox::generate()
@@ -59,7 +76,7 @@ string RotatingBox::generate()
 	positionRootBody(rootBody);
 	shared_ptr<Body> body;
 	
-	createKinematicBox(body, Vector3r(  0,  0, 10), Vector3r( 50,  5, 40),false);	rootBody->bodies->insert(body);
+	createKinematicBox(body, Vector3r(  0,  0, 10), Vector3r( 50,  5, 40),middleWireFrame);	rootBody->bodies->insert(body);
 	createKinematicBox(body, Vector3r(-55,  0,  0), Vector3r(  5, 60, 50),true );	rootBody->bodies->insert(body);
 	createKinematicBox(body, Vector3r( 55,  0,  0), Vector3r(  5, 60, 50),true );	rootBody->bodies->insert(body);
 	createKinematicBox(body, Vector3r(  0,-55,  0), Vector3r( 50,  5, 50),true );	rootBody->bodies->insert(body);
@@ -119,7 +136,7 @@ void RotatingBox::createBox(shared_ptr<Body>& body, int i, int j, int k)
 	
 	physics->angularVelocity	= Vector3r(0,0,0);
 	physics->velocity		= Vector3r(0,0,0);
-	physics->mass			= 8*size[0]*size[1]*size[2]; // *density
+	physics->mass			= size[0]*size[1]*size[2]*densityBox;
 	physics->inertia		= Vector3r(physics->mass*(size[1]*size[1]+size[2]*size[2])/3,physics->mass*(size[0]*size[0]+size[2]*size[2])/3,physics->mass*(size[1]*size[1]+size[0]*size[0])/3);
 	physics->se3			= Se3r(translation,q);
 
@@ -165,7 +182,7 @@ void RotatingBox::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 	
 	physics->angularVelocity	= Vector3r(0,0,0);
 	physics->velocity		= Vector3r(0,0,0);
-	physics->mass			= 4.0/3.0*Mathr::PI*radius*radius; // *density
+	physics->mass			= 4.0/3.0*Mathr::PI*radius*radius*densitySphere;
 	physics->inertia		= Vector3r(2.0/5.0*physics->mass*radius*radius,2.0/5.0*physics->mass*radius*radius,2.0/5.0*physics->mass*radius*radius); //
 	physics->se3			= Se3r(translation,q);
 
@@ -233,30 +250,32 @@ void RotatingBox::createActors(shared_ptr<ComplexBody>& rootBody)
 	shared_ptr<InteractionGeometryDispatcher> interactionGeometryDispatcher(new InteractionGeometryDispatcher);
 	interactionGeometryDispatcher->add("InteractionSphere","InteractionSphere","Sphere2Sphere4ClosestFeatures");
 	interactionGeometryDispatcher->add("InteractionSphere","InteractionBox","Box2Sphere4ClosestFeatures");
+	interactionGeometryDispatcher->add("InteractionBox","InteractionBox","Box2Box4ClosestFeatures");
 
 	shared_ptr<BoundingVolumeDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeDispatcher>(new BoundingVolumeDispatcher);
 	boundingVolumeDispatcher->add("InteractionSphere","AABB","Sphere2AABBFunctor");
 	boundingVolumeDispatcher->add("InteractionBox","AABB","Box2AABBFunctor");
 	boundingVolumeDispatcher->add("InteractionDescriptionSet","AABB","InteractionDescriptionSet2AABBFunctor");
 		
-// 	shared_ptr<ActionForceDamping> actionForceDamping(new ActionForceDamping);
-// 	actionForceDamping->damping = dampingForce;
-// 	shared_ptr<ActionMomentumDamping> actionMomentumDamping(new ActionMomentumDamping);
-// 	actionMomentumDamping->damping = dampingMomentum;
-// 	shared_ptr<ActionDampingDispatcher> actionDampingDispatcher(new ActionDampingDispatcher);
-// 	actionDampingDispatcher->add("ActionForce","ParticleParameters","ActionForceDamping",actionForceDamping);
-// 	actionDampingDispatcher->add("ActionMomentum","RigidBodyParameters","ActionMomentumDamping",actionMomentumDamping);
+	shared_ptr<ActionForceDamping> actionForceDamping(new ActionForceDamping);
+	actionForceDamping->damping = dampingForce;
+	shared_ptr<ActionMomentumDamping> actionMomentumDamping(new ActionMomentumDamping);
+	actionMomentumDamping->damping = dampingMomentum;
+	shared_ptr<ActionDampingDispatcher> actionDampingDispatcher(new ActionDampingDispatcher);
+	actionDampingDispatcher->add("ActionForce","ParticleParameters","ActionForceDamping",actionForceDamping);
+	actionDampingDispatcher->add("ActionMomentum","RigidBodyParameters","ActionMomentumDamping",actionMomentumDamping);
 	
-// 	shared_ptr<ActionApplyDispatcher> applyActionDispatcher(new ActionApplyDispatcher);
-// 	applyActionDispatcher->add("ActionForce","ParticleParameters","ActionForce2Particle");
-// 	applyActionDispatcher->add("ActionMomentum","RigidBodyParameters","ActionMomentum2RigidBody");
+	shared_ptr<ActionApplyDispatcher> applyActionDispatcher(new ActionApplyDispatcher);
+	applyActionDispatcher->add("ActionForce","ParticleParameters","ActionForce2Particle");
+	applyActionDispatcher->add("ActionMomentum","RigidBodyParameters","ActionMomentum2RigidBody");
 	
 	shared_ptr<TimeIntegratorDispatcher> timeIntegratorDispatcher(new TimeIntegratorDispatcher);
  	timeIntegratorDispatcher->add("RigidBodyParameters","LeapFrogIntegrator");
  	
 	shared_ptr<Rotor> kinematic = shared_ptr<Rotor>(new Rotor);
- 	kinematic->angularVelocity  = 0.0785375;
- 	kinematic->rotationAxis  = Vector3r(1,0,0);
+ 	kinematic->angularVelocity  = rotationSpeed;
+	rotationAxis.normalize();
+ 	kinematic->rotationAxis  = rotationAxis;
  	kinematic->rotateAroundZero = true;
 	
  	for(int i=0;i<7;i++)
@@ -268,11 +287,12 @@ void RotatingBox::createActors(shared_ptr<ComplexBody>& rootBody)
 	rootBody->actors.push_back(shared_ptr<Actor>(new SAPCollider));
 	rootBody->actors.push_back(interactionGeometryDispatcher);
 	rootBody->actors.push_back(shared_ptr<Actor>(new SimpleSpringDynamicEngine));
-//	rootBody->actors.push_back(actionDampingDispatcher);
-//	rootBody->actors.push_back(applyActionDispatcher);
+	rootBody->actors.push_back(actionDampingDispatcher);
+	rootBody->actors.push_back(applyActionDispatcher);
 	rootBody->actors.push_back(timeIntegratorDispatcher);
-//	rootBody->actors.push_back(shared_ptr<Actor>(new ActionReset));
-	rootBody->actors.push_back(kinematic);
+	rootBody->actors.push_back(shared_ptr<Actor>(new ActionReset));
+	if(isRotating)
+		rootBody->actors.push_back(kinematic);
 }
 
 

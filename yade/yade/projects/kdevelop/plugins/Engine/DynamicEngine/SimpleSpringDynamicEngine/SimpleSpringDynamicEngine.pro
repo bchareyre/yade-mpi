@@ -11,6 +11,8 @@ LIBS += -lClosestFeatures \
         -lInteraction \
         -lMultiMethods \
         -lRigidBodyParameters \
+        -lActionMomentum \
+        -lActionForce \
         -rdynamic 
 INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 

@@ -2,12 +2,16 @@
 #define __SIMPLESPRINGDYNAMICENGINE_H__
 
 #include "DynamicEngine.hpp"
+class Action;
+
 
 class SimpleSpringDynamicEngine : public DynamicEngine
 {
-	private : std::vector<Vector3r> prevVelocities;
-	private : std::vector<Vector3r> forces;
-	private : std::vector<Vector3r> couples;
+//	private : std::vector<Vector3r> prevVelocities;
+//	private : std::vector<Vector3r> forces;
+//	private : std::vector<Vector3r> couples;
+	private : shared_ptr<Action> actionForce;
+	private : shared_ptr<Action> actionMomentum;
 	private : bool first;
 
 	// construction
