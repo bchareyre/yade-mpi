@@ -15,7 +15,7 @@
 #include "IOManager.hpp"
 #include "InteractionGeometryDispatcher.hpp"
 #include "InteractionPhysicsDispatcher.hpp"
-#include "ApplyActionDispatcher.hpp"
+#include "ActionApplyDispatcher.hpp"
 #include "BoundingVolumeDispatcher.hpp"
 #include "GeometricalModelDispatcher.hpp"
 
@@ -92,7 +92,7 @@ string HangingCloth::generate()
 	shared_ptr<GeometricalModelDispatcher> geometricalModelDispatcher	= shared_ptr<GeometricalModelDispatcher>(new GeometricalModelDispatcher);
 	geometricalModelDispatcher->add("ParticleSetParameters","Mesh2D","ParticleSet2Mesh2D");
 
-	shared_ptr<ApplyActionDispatcher> applyActionDispatcher(new ApplyActionDispatcher);
+	shared_ptr<ActionApplyDispatcher> applyActionDispatcher(new ActionApplyDispatcher);
 	applyActionDispatcher->add("ActionForce","ParticleParameters","ActionForce2Particle");
 
 	shared_ptr<TimeIntegratorDispatcher> timeIntegratorDispatcher(new TimeIntegratorDispatcher);

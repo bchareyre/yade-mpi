@@ -4,7 +4,7 @@
 # Target is a subdirs project 
 
 SUBDIRS += Action \
-           ApplyActionFunctor \
+           ActionApplyFunctor \
            TimeIntegratorFunctor \
            KinematicEngine \
            DynamicEngine

@@ -17,7 +17,7 @@
 #include "InteractionDescriptionSet2AABBFunctor.hpp"
 #include "InteractionDescriptionSet.hpp"
 #include "SDECLinearContactModel.hpp"
-#include "ApplyActionDispatcher.hpp"
+#include "ActionApplyDispatcher.hpp"
 #include "InteractionGeometryDispatcher.hpp"
 #include "InteractionPhysicsDispatcher.hpp"
 #include "SimpleBody.hpp"
@@ -75,7 +75,7 @@ string SDECLinkedSpheres::generate()
 	boundingVolumeDispatcher->add("InteractionBox","AABB","Box2AABBFunctor");
 	boundingVolumeDispatcher->add("InteractionDescriptionSet","AABB","InteractionDescriptionSet2AABBFunctor");
 	
-	shared_ptr<ApplyActionDispatcher> applyActionDispatcher(new ApplyActionDispatcher);
+	shared_ptr<ActionApplyDispatcher> applyActionDispatcher(new ActionApplyDispatcher);
 	applyActionDispatcher->add("ActionForce","RigidBodyParameters","ActionForce2Particle");
 	applyActionDispatcher->add("ActionMomentum","RigidBodyParameters","ActionMomentum2RigidBody");
 	
