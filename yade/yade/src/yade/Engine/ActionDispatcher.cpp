@@ -78,6 +78,33 @@ void ActionDispatcher::addActionFunctor(const string& str1,const string& str2,co
 
 void ActionDispatcher::action(Body* body)
 {
+
+// NEW VERSION - 107 seconds - faster
+//
+// there are a lot of places where we can do improvement like this. if we do code change
+// like here - in every possible places - yade can gain a lot of speed.
+//
+// basically I've discovered that every temporary variable of type shared_ptr<> costs 3 seconds,
+// so we should avoid creating them and instead pass them around by references - whenever possible
+//
+
+
+	NonConnexBody * ncb = dynamic_cast<NonConnexBody*>(body);
+	shared_ptr<BodyContainer>* bodies_ptr = &(ncb->bodies);
+	shared_ptr<Action>* action_ptr;
+
+	int id;
+	for( ncb->actions->gotoFirst() ; ncb->actions->notAtEnd() ; ncb->actions->gotoNext())
+	{
+		action_ptr = &(ncb->actions->getCurrent(id));
+		actionDispatcher( *action_ptr , (*(*bodies_ptr))[id]);
+// FIXME - this line would work if action was holding body's id. and it is possible that it will be even faster
+//		actionDispatcher( ncb->actions->getCurrent(id) , (*(*bodies_ptr))[id]);
+	}
+		
+		
+/* OLD VERSION - 111 seconds
+
 	NonConnexBody * ncb = dynamic_cast<NonConnexBody*>(body);
 	shared_ptr<BodyContainer> bodies = ncb->bodies;
 
@@ -92,6 +119,9 @@ void ActionDispatcher::action(Body* body)
 
 		actionDispatcher( action, b);
 	}
+
+
+*/
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
