@@ -14,8 +14,8 @@
 #include "Body.hpp"
 #include "CollisionFunctor.hpp"
 #include "IOManager.hpp"
-#include "BroadCollider.hpp"
-#include "NarrowCollider.hpp"
+#include "BroadInteractor.hpp"
+#include "NarrowInteractor.hpp"
 #include "GeometricalModel.hpp"
 #include "CollisionGeometry.hpp"
 #include "BoundingVolume.hpp"
@@ -150,10 +150,10 @@ void Omega::registerDynlibType(const string& name)
 		dynlibsType[name]="CollisionFunctor";
 	else if (dynamic_pointer_cast<IOManager>(f))
 		dynlibsType[name]="IOManager";
-	else if (dynamic_pointer_cast<BroadCollider>(f))
-		dynlibsType[name]="BroadCollider";
-	else if (dynamic_pointer_cast<NarrowCollider>(f))
-		dynlibsType[name]="NarrowCollider";
+	else if (dynamic_pointer_cast<BroadInteractor>(f))
+		dynlibsType[name]="BroadInteractor";
+	else if (dynamic_pointer_cast<NarrowInteractor>(f))
+		dynlibsType[name]="NarrowInteractor";
 	else if (dynamic_pointer_cast<GeometricalModel>(f))
 		dynlibsType[name]="GeometricalModel";
 	else if (dynamic_pointer_cast<CollisionGeometry>(f))

@@ -47,7 +47,7 @@ class Body;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-class NarrowCollider : public Actor
+class NarrowInteractor : public Actor
 {
 	protected: DynLibDispatcher
 		<	TYPELIST_2( CollisionGeometry , CollisionGeometry ) ,	// base classess for dispatch
@@ -67,9 +67,9 @@ class NarrowCollider : public Actor
 	public  : void addCollisionFunctor(const string& str1,const string& str2,const string& str3);
 		
 	// construction
-	public : NarrowCollider ();
+	public : NarrowInteractor ();
 
-	public : virtual ~NarrowCollider ();
+	public : virtual ~NarrowInteractor ();
 
 	public : virtual void narrowCollisionPhase(Body* ) { throw;};
 
@@ -79,14 +79,14 @@ class NarrowCollider : public Actor
 	//public : virtual bool isActivated();
 	public : virtual void action(Body* b);
 
-	REGISTER_CLASS_NAME(NarrowCollider);
+	REGISTER_CLASS_NAME(NarrowInteractor);
 
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-REGISTER_SERIALIZABLE(NarrowCollider,false);
+REGISTER_SERIALIZABLE(NarrowInteractor,false);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////

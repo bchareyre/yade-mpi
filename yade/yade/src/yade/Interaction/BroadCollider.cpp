@@ -1,27 +1,27 @@
-#include "BroadCollider.hpp"
+#include "BroadInteractor.hpp"
 
 
-BroadCollider::BroadCollider () : Actor()
+BroadInteractor::BroadInteractor () : Actor()
 {
 }
 	
-BroadCollider::~BroadCollider ()
+BroadInteractor::~BroadInteractor ()
 {
 
 }
 
 
-void BroadCollider::postProcessAttributes(bool)
+void BroadInteractor::postProcessAttributes(bool)
 {
 
 }
 
-void BroadCollider::registerAttributes()
+void BroadInteractor::registerAttributes()
 {
 
 }
 
-void BroadCollider::action(Body* b)
+void BroadInteractor::action(Body* b)
 {
 	this->broadCollisionTest(b);
 }

@@ -47,7 +47,7 @@ string HangingCloth::generate()
 	int nbSpheres = 10;
 	q.fromAxisAngle(Vector3r(0,0,1),0);
 
-	shared_ptr<NarrowCollider> nc	= shared_ptr<NarrowCollider>(new SimpleNarrowCollider);
+	shared_ptr<NarrowInteractor> nc	= shared_ptr<NarrowInteractor>(new SimpleNarrowCollider);
 	nc->addCollisionFunctor("Sphere","Sphere","Sphere2Sphere4ClosestFeatures");
 	nc->addCollisionFunctor("Sphere","Mesh2D","Sphere2Mesh2D4ClosestFeatures");
 

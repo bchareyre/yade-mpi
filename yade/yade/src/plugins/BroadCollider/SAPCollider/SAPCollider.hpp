@@ -6,9 +6,9 @@
 #include <vector>
 #include <algorithm>
 
-#include "BroadCollider.hpp"
+#include "BroadInteractor.hpp"
 
-class SAPCollider : public BroadCollider
+class SAPCollider : public BroadInteractor
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

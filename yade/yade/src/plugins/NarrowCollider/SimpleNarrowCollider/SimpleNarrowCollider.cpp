@@ -2,7 +2,7 @@
 #include "Body.hpp"
 #include "NonConnexBody.hpp"
 
-SimpleNarrowCollider::SimpleNarrowCollider() : NarrowCollider()
+SimpleNarrowCollider::SimpleNarrowCollider() : NarrowInteractor()
 {
 }
 
@@ -13,12 +13,12 @@ SimpleNarrowCollider::~ SimpleNarrowCollider()
 
 void SimpleNarrowCollider::postProcessAttributes(bool deserializing)
 {
-	NarrowCollider::postProcessAttributes(deserializing);
+	NarrowInteractor::postProcessAttributes(deserializing);
 }
 
 void SimpleNarrowCollider::registerAttributes()
 {
-	NarrowCollider::registerAttributes();
+	NarrowInteractor::registerAttributes();
 }
 
 void SimpleNarrowCollider::narrowCollisionPhase(Body* body)

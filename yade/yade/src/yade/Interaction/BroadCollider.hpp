@@ -48,7 +48,7 @@ class Body;
 
 	All the broad phase collider (sweep and prune, regular grid ....) must derived from this class. A broad phase collider is used to speed up the collision detection test by testing collision between the bounding volume of the objects. In general it tries to reduce the number of potential colliding pairs.
 */
-class BroadCollider : public Actor
+class BroadInteractor : public Actor
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -61,10 +61,10 @@ class BroadCollider : public Actor
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/*! Constructor */
-	public : BroadCollider ();
+	public : BroadInteractor ();
 
 	/*! Virtual destructor for correct dealloction of polymorphic pointer */
-	public : virtual ~BroadCollider ();
+	public : virtual ~BroadInteractor ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Methods											///
@@ -83,13 +83,13 @@ class BroadCollider : public Actor
 	//public : virtual bool isActivated();
 	public : virtual void action(Body* b);
 
-	REGISTER_CLASS_NAME(BroadCollider);
+	REGISTER_CLASS_NAME(BroadInteractor);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-REGISTER_SERIALIZABLE(BroadCollider,false);
+REGISTER_SERIALIZABLE(BroadInteractor,false);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////

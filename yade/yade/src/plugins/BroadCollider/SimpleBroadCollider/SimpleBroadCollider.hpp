@@ -1,9 +1,9 @@
 #ifndef __SIMPLEBROADCOLLIDER_H__
 #define __SIMPLEBROADCOLLIDER_H__
 
-#include "BroadCollider.hpp"
+#include "BroadInteractor.hpp"
 
-class SimpleBroadCollider : public BroadCollider
+class SimpleBroadCollider : public BroadInteractor
 {
 	// number of potential collision = number of colliding AABB
 	protected : int nbPotentialCollisions;

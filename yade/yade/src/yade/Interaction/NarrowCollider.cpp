@@ -1,15 +1,15 @@
-#include "NarrowCollider.hpp"
+#include "NarrowInteractor.hpp"
 
-NarrowCollider::NarrowCollider () : Actor()
+NarrowInteractor::NarrowInteractor () : Actor()
 {
 }
 
-NarrowCollider::~NarrowCollider ()
+NarrowInteractor::~NarrowInteractor ()
 {
 
 }
 
-void NarrowCollider::postProcessAttributes(bool deserializing)
+void NarrowInteractor::postProcessAttributes(bool deserializing)
 {
 	if(deserializing)
 	{
@@ -18,12 +18,12 @@ void NarrowCollider::postProcessAttributes(bool deserializing)
 	}
 }
 
-void NarrowCollider::registerAttributes()
+void NarrowInteractor::registerAttributes()
 {
 	REGISTER_ATTRIBUTE(collisionFunctors);
 }
 
-void NarrowCollider::addCollisionFunctor(const string& str1,const string& str2,const string& str3)
+void NarrowInteractor::addCollisionFunctor(const string& str1,const string& str2,const string& str3)
 {
 	vector<string> v;
 	v.push_back(str1);
@@ -33,7 +33,7 @@ void NarrowCollider::addCollisionFunctor(const string& str1,const string& str2,c
 }
 
 
-void NarrowCollider::action(Body* b)
+void NarrowInteractor::action(Body* b)
 {
 	this->narrowCollisionPhase(b);
 }

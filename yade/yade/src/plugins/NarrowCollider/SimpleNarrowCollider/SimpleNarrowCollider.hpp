@@ -1,9 +1,9 @@
 #ifndef __SIMPLENARROWCOLLIDER_H__
 #define __SIMPLENARROWCOLLIDER_H__
 
-#include "NarrowCollider.hpp"
+#include "NarrowInteractor.hpp"
 
-class SimpleNarrowCollider : public NarrowCollider
+class SimpleNarrowCollider : public NarrowInteractor
 {
 	// construction
 	public : SimpleNarrowCollider ();

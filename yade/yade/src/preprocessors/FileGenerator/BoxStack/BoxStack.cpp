@@ -39,7 +39,7 @@ string BoxStack::generate()
 	Quaternionr q;
 	q.fromAxisAngle( Vector3r(0,0,1),0);
 
-	shared_ptr<NarrowCollider> nc	= shared_ptr<NarrowCollider>(new SimpleNarrowCollider);
+	shared_ptr<NarrowInteractor> nc	= shared_ptr<NarrowInteractor>(new SimpleNarrowCollider);
 	nc->addCollisionFunctor("Box","Box","Box2Box4ClosestFeatures");
 
 
