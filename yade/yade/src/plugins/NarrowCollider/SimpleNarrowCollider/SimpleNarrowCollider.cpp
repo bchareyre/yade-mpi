@@ -37,14 +37,6 @@ void SimpleNarrowCollider::narrowCollisionPhase(Body* body)
 		shared_ptr<Body> b2 = (*bodies)[contact->getId2()];
 
 		contact->isReal = narrowCollisionDispatcher( b1->cm , b2->cm , b1->se3 , b2->se3 , contact );
-		
-// 		if (!(narrowCollisionDispatcher( b1->cm , b2->cm , b1->se3 , b2->se3 , contact )))
-// 			ncb->interactions->eraseCurrentAndGotoNextPotential();
-// 		else
-// 		{
-// 			ncb->interactions->gotoNextPotential();
-// 			contact->isReal = true;
-// 		}
 	}
 }
 
