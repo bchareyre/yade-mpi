@@ -3,14 +3,11 @@
 # Subdir relative project main directory: ./toolboxes/Libraries
 # Target is a subdirs project 
 
-MOC_DIR = $(YADECOMPILATIONPATH) 
-UI_DIR = $(YADECOMPILATIONPATH) 
-OBJECTS_DIR = $(YADECOMPILATIONPATH) 
+SUBDIRS += Serialization \
+           Math 
+MOC_DIR = $(YADECOMPILATIONPATH)
+UI_DIR = $(YADECOMPILATIONPATH)
+OBJECTS_DIR = $(YADECOMPILATIONPATH)
 CONFIG += debug \
-          warn_on 
-TEMPLATE = subdirs 
-SUBDIRS += AssocVector \
-	   Serialization \
-	   IOManager \
-	   Math \
-	   FrontEnd
+warn_on
+TEMPLATE = subdirs

@@ -97,9 +97,9 @@ void SDECLinkedSpheres::exec()
 		shared_ptr<AABB> aabb(new AABB);
 		shared_ptr<Sphere> sphere(new Sphere);
 
-		translation 		= Vector3(i,j,k)*10-Vector3(nbSpheres/2*10,nbSpheres/2*10-90,nbSpheres/2*10)+Vector3(Rand::symmetricRandom()*1.3,Rand::symmetricRandom(),Rand::symmetricRandom()*1.3);
-		float radius 		= (Rand::intervalRandom(4.99,5.2)); // FIXME - this should ba a parameter to dynlib
-
+		translation 		= Vector3(i,j,k)*10-Vector3(nbSpheres/2*10,nbSpheres/2*10-90,nbSpheres/2*10)/*+Vector3(Rand::symmetricRandom()*1.3,Rand::symmetricRandom(),Rand::symmetricRandom()*1.3)*/;
+		//float radius 		= (Rand::intervalRandom(4.99,5.2)); // FIXME - this should ba a parameter to dynlib
+		float radius 		= 5; 
 		shared_ptr<BallisticDynamicEngine> ballistic(new BallisticDynamicEngine);
 		ballistic->damping 	= 1.0;//0.95;
 		s->actors.push_back(ballistic);

@@ -3,57 +3,59 @@
 # Subdir relative project main directory: ./yade/yade
 # Target is an application:  
 
-LIBS += -lSerialization \
-        -lMath \
-        -lBody \
-        -lIOManager \
-        -lEngine \
-        -lGeometry \
-        -lInteraction \
-        -lFrontEnd \
-        -lMultiMethods \
-        -lFactory \
-        -lboost_filesystem \
-        -lboost_date_time \
-        -lglut \
-        -lQGLViewer \
-        -rdynamic 
-INCLUDEPATH = ../../yade/Body \
-              ../../yade/Engine \
-              ../../yade/Interaction \
-              ../../yade/Geometry \
-              ../../yade/MultiMethods \
-              ../../yade/Factory \
-              ../../toolboxes/Libraries/FrontEnd \
-              ../../toolboxes/Libraries/Math \
-              ../../toolboxes/Libraries/IOManager \
-              ../../toolboxes/Libraries/Serialization \
-              ../../toolboxes/Libraries/AssocVector 
-MOC_DIR = $(YADECOMPILATIONPATH) 
-UI_DIR = $(YADECOMPILATIONPATH) 
-OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
-               ../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
-               ../../yade/Body/$(YADEDYNLIBPATH) \
-               ../../toolboxes/Libraries/IOManager/$(YADEDYNLIBPATH) \
-               ../../yade/Engine/$(YADEDYNLIBPATH) \
-               ../../yade/Geometry/$(YADEDYNLIBPATH) \
-               ../../yade/Interaction/$(YADEDYNLIBPATH) \
-               ../../toolboxes/Libraries/FrontEnd/$(YADEDYNLIBPATH) \
-               ../../yade/MultiMethods/$(YADEDYNLIBPATH) \
-               ../../yade/Factory/$(YADEDYNLIBPATH) \
-               $(YADEDYNLIBPATH) 
-DESTDIR = $(YADEBINPATH) 
-CONFIG += debug \
-          warn_on 
-TEMPLATE = app 
 HEADERS += Chrono.hpp \
            Omega.hpp \
            Singleton.hpp \
            Tree.hpp \
            Types.hpp \
            Actor.hpp \
-           ActorParameter.hpp 
+           ActorParameter.hpp \
+           FrontEnd.hpp 
 SOURCES += Chrono.cpp \
            Omega.cpp \
-           yade.cpp 
+           yade.cpp \
+           FrontEnd.cpp 
+LIBS += -lSerialization \
+-lMath \
+-lBody \
+-lIOManager \
+-lEngine \
+-lGeometry \
+-lInteraction \
+-lFrontEnd \
+-lMultiMethods \
+-lFactory \
+-lboost_filesystem \
+-lboost_date_time \
+-lglut \
+-lQGLViewer \
+-rdynamic
+INCLUDEPATH = ../../yade/Body \
+../../yade/Engine \
+../../yade/Interaction \
+../../yade/Geometry \
+../../yade/MultiMethods \
+../../yade/Factory \
+../../toolboxes/Libraries/FrontEnd \
+../../toolboxes/Libraries/Math \
+../../toolboxes/Libraries/IOManager \
+../../toolboxes/Libraries/Serialization \
+../../toolboxes/Libraries/AssocVector
+MOC_DIR = $(YADECOMPILATIONPATH)
+UI_DIR = $(YADECOMPILATIONPATH)
+OBJECTS_DIR = $(YADECOMPILATIONPATH)
+QMAKE_LIBDIR = ../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
+../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
+../../yade/Body/$(YADEDYNLIBPATH) \
+../../toolboxes/Libraries/IOManager/$(YADEDYNLIBPATH) \
+../../yade/Engine/$(YADEDYNLIBPATH) \
+../../yade/Geometry/$(YADEDYNLIBPATH) \
+../../yade/Interaction/$(YADEDYNLIBPATH) \
+../../toolboxes/Libraries/FrontEnd/$(YADEDYNLIBPATH) \
+../../yade/MultiMethods/$(YADEDYNLIBPATH) \
+../../yade/Factory/$(YADEDYNLIBPATH) \
+$(YADEDYNLIBPATH)
+DESTDIR = $(YADEBINPATH)
+CONFIG += debug \
+warn_on
+TEMPLATE = app

@@ -3,10 +3,11 @@
 # Subdir relative project main directory: ./toolboxes/Libraries/Serialization
 # Target is a library:  
 
-LIBS += -rdynamic 
+LIBS += -lAssocVector \
+        -rdynamic 
 INCLUDEPATH = ../../../yade/yade \
               ../../../yade/Factory \
-              ../../../toolboxes/Libraries/AssocVector 
+              ../../../toolboxes/DataStructures/AssocVector 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
@@ -23,7 +24,11 @@ HEADERS += Archive.hpp \
            FundamentalHandler.tpp \
            PointerHandler.tpp \
            SerializationExceptions.hpp \
-           MultiTypeHandler.tpp 
+           MultiTypeHandler.tpp \
+           IOManagerExceptions.hpp \
+           IOManager.hpp 
 SOURCES += Archive.cpp \
            Serializable.cpp \
-           SerializationExceptions.cpp 
+           SerializationExceptions.cpp \
+           IOManager.cpp \
+           IOManagerExceptions.cpp 
