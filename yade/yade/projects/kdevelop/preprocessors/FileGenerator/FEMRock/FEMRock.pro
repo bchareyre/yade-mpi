@@ -37,7 +37,7 @@ QMAKE_LIBDIR = ../../../toolboxes/Math/M3D/$(YADEDYNLIBPATH) \
                ../../../plugins/GeometricalModel/Polyhedron/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
-CONFIG += debug \
+CONFIG += release \
           warn_on \
           dll 
 TEMPLATE = lib 

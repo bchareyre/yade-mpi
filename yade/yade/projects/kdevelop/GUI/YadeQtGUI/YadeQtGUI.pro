@@ -25,7 +25,7 @@ QMAKE_LIBDIR = ../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../plugins/Body/RigidBody/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
-CONFIG += debug \
+CONFIG += release \
           warn_on \
           dll 
 TEMPLATE = lib 

@@ -16,3 +16,5 @@ find `cat proFilesRelease` -exec ./changeSet {} \;
 rm ./changeSet
 rm ./empty
 rm ./proFilesRelease
+
+## should also change the output dir and temporary compilation dir

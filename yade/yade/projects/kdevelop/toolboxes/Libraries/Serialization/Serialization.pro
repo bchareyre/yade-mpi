@@ -9,7 +9,7 @@ MOC_DIR = $(YADECOMPILATIONPATH)
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
-CONFIG += debug \
+CONFIG += release \
           warn_on \
           dll 
 TEMPLATE = lib 

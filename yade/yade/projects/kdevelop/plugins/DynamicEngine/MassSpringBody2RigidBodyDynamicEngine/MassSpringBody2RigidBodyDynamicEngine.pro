@@ -37,7 +37,7 @@ QMAKE_LIBDIR = ../../../plugins/Body/MassSpringBody/$(YADEDYNLIBPATH) \
                ../../../plugins/InteractionModel/ClosestFeatures/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
-CONFIG += debug \
+CONFIG += release \
           warn_on \
           dll 
 TEMPLATE = lib 

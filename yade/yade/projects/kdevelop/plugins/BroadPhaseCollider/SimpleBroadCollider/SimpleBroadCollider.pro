@@ -25,7 +25,7 @@ QMAKE_LIBDIR = ../../../plugins/BoundingVolume/BoundingSphere/$(YADEDYNLIBPATH) 
                ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
-CONFIG += debug \
+CONFIG += release \
           warn_on \
           dll 
 TEMPLATE = lib 

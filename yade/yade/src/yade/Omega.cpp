@@ -29,6 +29,7 @@ void Omega::init()
 {
 	gravity = Vector3(0,-9.81,0);
 	dt = 0.04;
+	//dt = 0.01;
 
 	logFile = shared_ptr<ofstream>(new ofstream("../data/log.xml", ofstream::out | ofstream::app));
 

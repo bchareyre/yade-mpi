@@ -217,7 +217,7 @@ void RotatingBox::exec()
 		
 		
 		translation = Vector3(i,j,k)*10-Vector3(45,45,45)+Vector3(Rand::symmetricRandom(),Rand::symmetricRandom(),Rand::symmetricRandom());
-		float radius = (Rand::intervalRandom(3,5));
+		float radius = (Rand::intervalRandom(3,4));
 		
 		shared_ptr<BallisticDynamicEngine> ballistic(new BallisticDynamicEngine);
 		ballistic->damping 	= 0.95;

@@ -82,7 +82,7 @@ QMAKE_LIBDIR = ../toolboxes/Math/M3D/$(YADEDYNLIBPATH) \
 ../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
 $(YADEDYNLIBPATH)
 DESTDIR = $(YADEBINPATH)
-CONFIG += debug \
+CONFIG += release \
 warn_on
 TEMPLATE = app
 QtGeneratedFrontEnd.ui.target = QtGeneratedFrontEnd.ui

@@ -7,7 +7,7 @@ MOC_DIR = $(YADECOMPILATIONPATH)
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 DEFINES = DEBUG 
-CONFIG += debug \
+CONFIG += release \
           warn_on 
 TEMPLATE = subdirs 
 SUBDIRS += toolboxes \

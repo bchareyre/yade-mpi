@@ -32,7 +32,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-/*! \brief Provide collision handling between a axis aligned box and a sphere in terms of ClosestFeatures */
+/*! \brief Provide collision handling between an oriented box and a sphere in terms of ClosestFeatures */
 class Box2Sphere4ClosestFeatures : public CollisionFunctor
 {
 	// construction

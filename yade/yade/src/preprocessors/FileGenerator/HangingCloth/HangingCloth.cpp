@@ -37,10 +37,10 @@ void HangingCloth::registerAttributes()
 void HangingCloth::exec()
 {
 	shared_ptr<NonConnexBody> rootBody(new NonConnexBody);
-	int width = 40;
-	int height = 40;
+	int width = 20;
+	int height = 20;
 	float mass = 10;
-	const int cellSize = 10;
+	const int cellSize = 20;
 	Quaternion q;
 	int nbSpheres = 10;
 	q.fromAngleAxis(0, Vector3(0,0,1));
@@ -74,8 +74,8 @@ void HangingCloth::exec()
 
 	cloth->properties[offset(0,0)].invMass = 0;
 	cloth->properties[offset(width-1,0)].invMass = 0;
-	cloth->properties[offset(0,height-1)].invMass = 0;
-	cloth->properties[offset(width-1,height-1)].invMass = 0;
+	//cloth->properties[offset(0,height-1)].invMass = 0;
+	//cloth->properties[offset(width-1,height-1)].invMass = 0;
 	
 	aabb->color		= Vector3(1,0,0);
 	aabb->center		= Vector3(0,0,0);
@@ -140,14 +140,14 @@ void HangingCloth::exec()
 		shared_ptr<Sphere> gsphere(new Sphere);
 		
 		
-		Vector3 translation(0,60,0);
+		Vector3 translation(0,-60,0);
 		float radius = 50;
 		
 		//Vector3 translation(100*Rand::symmetricRandom(),10+100*Rand::unitRandom(),100*Rand::symmetricRandom());
 		//float radius = 0.5*(20+10*Rand::unitRandom());
-		shared_ptr<BallisticDynamicEngine> ballistic(new BallisticDynamicEngine);
-		ballistic->damping 	= 0.999;
-		s->dynamic		= dynamic_pointer_cast<DynamicEngine>(ballistic);
+		//shared_ptr<BallisticDynamicEngine> ballistic(new BallisticDynamicEngine);
+		//ballistic->damping 	= 0.999;
+		//s->dynamic		= dynamic_pointer_cast<DynamicEngine>(ballistic);
 		
 		s->isDynamic		= true;
 		s->angularVelocity	= Vector3(0,0,0);
@@ -161,7 +161,7 @@ void HangingCloth::exec()
 		aabb->halfSize		= Vector3(radius,radius,radius);
 		s->bv			= dynamic_pointer_cast<BoundingVolume>(aabb);
 
-		csphere->radius		= radius*1.1;
+		csphere->radius		= radius*1.2;
 		csphere->diffuseColor	= Vector3(Rand::unitRandom(),Rand::unitRandom(),Rand::unitRandom());
 		csphere->wire		= false;
 		csphere->visible	= true;

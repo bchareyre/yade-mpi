@@ -28,6 +28,7 @@ YadeQtMainWindow::YadeQtMainWindow() : YadeQtGeneratedMainWindow()
  	addItem("Preprocessor","HangingCloth");
 	addItem("Preprocessor","RotatingBox");
 	addItem("Preprocessor","FEMRock");
+	addItem("Preprocessor","BoxStack");
 	createMenus();
 
 

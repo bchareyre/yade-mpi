@@ -5,10 +5,11 @@
 
 SUBDIRS += RotatingBox \
            HangingCloth \
-           FEMRock 
+           FEMRock \
+           BoxStack 
 MOC_DIR = $(YADECOMPILATIONPATH)
 UI_DIR = $(YADECOMPILATIONPATH)
 OBJECTS_DIR = $(YADECOMPILATIONPATH)
-CONFIG += debug \
+CONFIG += release \
 warn_on
 TEMPLATE = subdirs
