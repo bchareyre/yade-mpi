@@ -1,10 +1,10 @@
 #! /bin/sh
 
-removeSymLinks
-removeBackupFiles
-removeBinFiles
-removeCoreFiles
-removeMakefiles
+./removeSymLinks
+./removeBackupFiles
+./removeBinFiles
+./removeCoreFiles
+./removeMakefiles
 
 rm $YADEBINPATH/.qglviewer.xml
 rm $YADEPATH/yade/projects/kdevelop/yade.kdevelop.pcs

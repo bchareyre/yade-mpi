@@ -1,7 +1,0 @@
-ORGDIR=`pwd`
-TMPNAME=`echo $1 | sed -e "s/^..\/src\//..\/projects\/kdevelop\//"`
-echo symlinking $ORGDIR/$1 to `dirname $TMPNAME`
-TMPDIR=`dirname $TMPNAME`
-cd $TMPDIR
-ln -s $ORGDIR/$1 `basename $TMPNAME`
-cd $ORGDIR
