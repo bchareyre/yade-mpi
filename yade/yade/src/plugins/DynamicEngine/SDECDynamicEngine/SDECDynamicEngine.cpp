@@ -583,6 +583,7 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 					sign=1;
 				else
 					sign=-1;
+				// FIXME - this must be a parameter in .xml !!!
 				forces[i][j] -= 0.3*f*sign;
 			}
 

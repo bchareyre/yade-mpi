@@ -9,5 +9,6 @@ OBJECTS_DIR = $(YADECOMPILATIONPATH)
 CONFIG += debug \
           warn_on 
 TEMPLATE = subdirs 
-SUBDIRS += Math \
+SUBDIRS += Singleton \
+	   Math \
            Serialization 

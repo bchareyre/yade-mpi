@@ -37,6 +37,7 @@ void Omega::init()
 	automatic=false;
 	progress=false;
 
+	// FIXME - this must be a parameter in .xml !!!
 	gravity_x = 0.0;
 	gravity_y = -10.0;
 	//gravity_y = 0.0;

@@ -5,7 +5,6 @@
 
 HEADERS += Chrono.hpp \
            Omega.hpp \
-           Singleton.hpp \
            Tree.hpp \
            Actor.hpp \
            ActorParameter.hpp \
