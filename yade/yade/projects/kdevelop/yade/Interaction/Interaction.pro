@@ -4,6 +4,7 @@
 # Target is a library:  
 
 HEADERS += InteractionPhysics.hpp \
+           InteractionPhysics.hpp \
            BroadCollider.hpp \
            Interaction.hpp \
            InteractionGeometry.hpp \
@@ -11,6 +12,7 @@ HEADERS += InteractionPhysics.hpp \
            CollisionFunctor.hpp \
            InteractionContainer.hpp 
 SOURCES += InteractionPhysics.cpp \
+           InteractionPhysics.cpp \
            BroadCollider.cpp \
            Interaction.cpp \
            InteractionGeometry.cpp \
