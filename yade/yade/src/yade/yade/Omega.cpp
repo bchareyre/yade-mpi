@@ -282,24 +282,13 @@ bool Omega::getProgress()
 }
 
 
-/*void Omega::waitMyTurn(int id)
-{
-	synchronizer->wait(id);
+void Omega::startSimulationLoop() 
+{ 
+	simulationLoop->start();
 }
 
-void Omega::endMyTurn()
-{
-	synchronizer->signal();
+void Omega::stopSimulationLoop() 
+{ 
+	simulationLoop->stop();
 }
-
-int Omega::getNewTurnId()
-{
-	return synchronizer->insertNewThread();
-}
-
-void Omega::waitForSimulationEnd()
-{
-	simulationThread->join();
-}
-*/
-
+	

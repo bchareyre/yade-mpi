@@ -43,11 +43,16 @@ using namespace boost;
 
 class ThreadSynchronizer
 {
-	private : boost::mutex tmpMutex;
+
 	private : boost::mutex mutex;
+	public  : boost::mutex* getMutex();
+	
 	private : boost::condition cond;
-		  boost::mutex::scoped_lock * lock;	
+	
 	private : int i;
+	public  : bool notMyTurn(int turn);
+	public  : void setNextCurrentThread();
+
 	private : int prevI;
 	private : int nbThreads;
 	private : vector<int> redirectionId;
@@ -56,9 +61,11 @@ class ThreadSynchronizer
 
 	public  : void startAll();
 	public  : void stopAll();
+	
 	public  : int insertThread();
 	public  : void removeThread(int id);
-	public  : void wait(int id);
+	
+	public  : void wait(boost::mutex::scoped_lock& lock);
 	public  : void signal();
 };
 

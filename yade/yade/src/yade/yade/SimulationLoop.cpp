@@ -25,6 +25,7 @@ void SimulationLoop::oneLoop()
 #ifndef THREAD_DEBUG
 	if (Omega::instance().rootBody)
 	{	
+		//ThreadSafe::cerr("mark: " +lexical_cast<string>(turn)+" "+ string(typeid(*this).name()) );
 		Omega::instance().rootBody->moveToNextTimeStep();
 		Omega::instance().incrementCurrentIteration();
 		Omega::instance().incrementSimulationTime();

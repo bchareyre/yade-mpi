@@ -45,10 +45,30 @@ template<class Thread>
 Threadable<Thread>::~Threadable()
 {
 }
-//#define THREAD_DEBUG
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+template<class Thread>
+void Threadable<Thread>::stop()
+{ 
+	saveTurn = turn;
+	turn = -2;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+template<class Thread>
+void Threadable<Thread>::start()
+{
+	turn = saveTurn;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//#define THREAD_DEBUG
 template<class Thread>
 void Threadable<Thread>::operator()()
 {
@@ -57,49 +77,59 @@ void Threadable<Thread>::operator()()
 	{
 		while (notEnd())
 		{
-			synchronizer->wait(turn);
-			oneLoop();
-			synchronizer->signal();
+			{
+				boost::mutex::scoped_lock lock(*(synchronizer->getMutex()));
+	
+				while (synchronizer->notMyTurn(turn))
+					synchronizer->wait(lock);
+				
+				oneLoop();
+				
+				synchronizer->setNextCurrentThread();
+					
+				synchronizer->signal();
+			}
 		}
 		synchronizer->removeThread(turn);
 	}
 	else
 	{
 		while (notEnd())
-		{
 			oneLoop();
-		}
 	}
 #else
 	if (synchronizer)
-	{	
+	{
 		while (notEnd())
 		{
-			ThreadSafe::cerr("mark:  20 " + string(typeid(*this).name()) );
-			synchronizer->wait(turn);
-			
-			ThreadSafe::cerr("mark:  21 " + string(typeid(*this).name()) );
-			oneLoop();
-			
-			ThreadSafe::cerr("mark:  22 " + string(typeid(*this).name()) );
-			synchronizer->signal();
-			
-			ThreadSafe::cerr("mark:  23 " + string(typeid(*this).name()) );
-		}
-		ThreadSafe::cerr("mark:  24 " + string(typeid(*this).name()) );
-		synchronizer->removeThread(turn);
+			{
+				ThreadSafe::cerr("mark:  20 " + string(typeid(*this).name()) );
+				boost::mutex::scoped_lock lock(*(synchronizer->getMutex()));
+	
+				ThreadSafe::cerr("mark:  21 " + string(typeid(*this).name()) );
+				while ( synchronizer->redirectionId[turn] != synchronizer->i)
+					synchronizer->cond.wait(lock);
+				
+				ThreadSafe::cerr("mark:  21 " + string(typeid(*this).name()) );
+				oneLoop();
+				
+				ThreadSafe::cerr("mark:  22 " + string(typeid(*this).name()) );
+				synchronizer->i=(synchronizer->i+1) % synchronizer->nbThreads;
+				
+				ThreadSafe::cerr("mark:  2" " + string(typeid(*this).name()) );
+				while(synchronizer->redirectionId[synchronizer->i] == -1)
+					synchronizer->i=(synchronizer->i+1) % synchronizer->nbThreads;
 		
-		ThreadSafe::cerr("mark:  25 " + string(typeid(*this).name()) );
+				ThreadSafe::cerr("mark:  24 " + string(typeid(*this).name()) );
+				synchronizer->cond.notify_all();
+			}
+		}
+		synchronizer->removeThread(turn);
 	}
 	else
 	{
 		while (notEnd())
-		{
-			ThreadSafe::cerr("mark:  30 " + string(typeid(*this).name()) );
 			oneLoop();
-			
-			ThreadSafe::cerr("mark:  31 " + string(typeid(*this).name()) );
-		}
 	}
 #endif
 }
@@ -121,7 +151,11 @@ void Threadable<Thread>::createThread(shared_ptr<ThreadSynchronizer> s)
 {
 	synchronizer = s;
 	if (synchronizer)
+	{	
 		turn = synchronizer->insertThread();
+		saveTurn = turn;
+		//turn = -2;
+	}
 	thread = shared_ptr<boost::thread>(new boost::thread(*(dynamic_cast<Thread*>(this))));
 }
 

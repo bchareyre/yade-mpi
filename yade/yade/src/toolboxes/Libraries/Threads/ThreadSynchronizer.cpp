@@ -27,7 +27,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-ThreadSynchronizer::ThreadSynchronizer() : lock(0),i(-1),prevI(0),nbThreads(0)
+ThreadSynchronizer::ThreadSynchronizer() : i(-1),prevI(0),nbThreads(0)
 {
 	 redirectionId.clear();
 }
@@ -37,11 +37,7 @@ ThreadSynchronizer::ThreadSynchronizer() : lock(0),i(-1),prevI(0),nbThreads(0)
 
 void ThreadSynchronizer::startAll()
 {
-//	boost::mutex tmpMutex;
-	boost::mutex::scoped_lock tmpLoc(tmpMutex);
-
-//	boost::mutex::scoped_lock lock(mutex);
-	
+	boost::mutex::scoped_lock lock(mutex);
 	i=prevI;
 	cond.notify_all();
 }
@@ -51,10 +47,7 @@ void ThreadSynchronizer::startAll()
 
 void ThreadSynchronizer::stopAll()
 {
-//	boost::mutex tmpMutex;
-	boost::mutex::scoped_lock tmpLoc(tmpMutex);
-	
-//	boost::mutex::scoped_lock lock(mutex);
+	boost::mutex::scoped_lock lock(mutex);
 	
 	prevI = i;
 	i=-1;
@@ -65,11 +58,7 @@ void ThreadSynchronizer::stopAll()
 
 int ThreadSynchronizer::insertThread()
 { 
-//	boost::mutex tmpMutex;
-	boost::mutex::scoped_lock tmpLoc(tmpMutex);
-	
-//	boost::mutex::scoped_lock lock(mutex);
-	
+	boost::mutex::scoped_lock lock(mutex);	
 	redirectionId.push_back(nbThreads);
 	return nbThreads++;
 }
@@ -79,33 +68,42 @@ int ThreadSynchronizer::insertThread()
 
 void ThreadSynchronizer::removeThread(int id)
 { 
-//	boost::mutex tmpMutex;
-	boost::mutex::scoped_lock tmpLoc(tmpMutex);
-
-//	boost::mutex::scoped_lock lock(mutex);
+	boost::mutex::scoped_lock lock(mutex);
 
 	redirectionId[id] = -1;
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+boost::mutex* ThreadSynchronizer::getMutex()
+{
+	return &mutex;
+}
+	
+////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+bool ThreadSynchronizer::notMyTurn(int turn)
+{
+	return (redirectionId[turn] != i);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void ThreadSynchronizer::wait(int id)
+void ThreadSynchronizer::setNextCurrentThread()
 {
-	boost::mutex::scoped_lock tmpLoc(tmpMutex);
+	i = (i+1)%nbThreads;
+	while(redirectionId[i] == -1)
+		i = (i+1)%nbThreads;
+}
 
-//	if(lock == 0)
-//		lock = new boost::mutex::scoped_lock(mutex);		// with this line it is crashing!
-//	else
-//		throw;
-		
-//	boost::mutex::scoped_lock lock2(tmpMutex);
+////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//	boost::mutex::scoped_lock lock(mutex);
-	
-	while ( redirectionId[id] != i)
-//		cond.wait(*lock);
-		cond.wait(tmpLoc);					// with this line it is NOT crashing
+void ThreadSynchronizer::wait(boost::mutex::scoped_lock& lock)
+{
+	cond.wait(lock);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -113,26 +111,7 @@ void ThreadSynchronizer::wait(int id)
 
 void ThreadSynchronizer::signal()
 {
-	boost::mutex::scoped_lock tmpLoc(tmpMutex);
-	
-	//boost::mutex::scoped_lock lock(mutex);
-	//if( i == -1)
-	//	ThreadSafe::cerr(" ThreadSynchronizer::signal():   i == -1");
-//	if( lock ==  0)
-//		return;
-	
-	i=(i+1) % nbThreads;
-	while(redirectionId[i] == -1)
-		i=(i+1) % nbThreads;
-	
 	cond.notify_all();
-	
-	//delete lock;							// and with this line it is crashing!
-//	if(lock != 0)
-//	{
-//		delete lock;
-//		lock = 0;
-//	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

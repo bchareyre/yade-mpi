@@ -13,13 +13,15 @@ HEADERS += YadeQtGUI.hpp \
            YadeQtMainWindow.hpp \
            QtFileGenerator.hpp \
            QtGUIGenerator.hpp \
-           SimulationController.hpp 
+           SimulationController.hpp \
+           QGLThread.hpp 
 SOURCES += YadeQtGUI.cpp \
            GLViewer.cpp \
            YadeQtMainWindow.cpp \
            QtFileGenerator.cpp \
            QtGUIGenerator.cpp \
-           SimulationController.cpp 
+           SimulationController.cpp \
+           QGLThread.cpp 
 LIBS += -lSerialization \
 -lMath \
 -lBody \
@@ -51,6 +53,7 @@ $(YADEDYNLIBPATH)
 DESTDIR = $(YADEDYNLIBPATH)
 CONFIG += debug \
 warn_on \
+thread \
 dll
 QtGeneratedSimulationController.ui.commands = $$IDL_COMPILER $$IDL_OPTIONS $$QtGeneratedSimulationController.ui.target
 QtGeneratedSimulationController.ui.target = QtGeneratedSimulationController.ui

@@ -67,6 +67,9 @@ class Omega : public Singleton<Omega>
 
 	//private : shared_ptr<boost::thread> simulationThread;
 	private : shared_ptr<SimulationLoop> simulationLoop;
+	public : void startSimulationLoop();
+	public : void stopSimulationLoop();
+	
 	public : shared_ptr<ThreadSynchronizer> synchronizer; // FIXME put private + add function waitMyTuren and finishedMyTurn
 
 //	public : void waitMyTurn(int id); // FIXME put private + add function waitMyTuren and finishedMyTurn

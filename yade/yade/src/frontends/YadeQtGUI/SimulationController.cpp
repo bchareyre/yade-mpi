@@ -2,10 +2,16 @@
 #include "Omega.hpp"
 #include "ThreadSynchronizer.hpp"
 #include "Math.hpp"
+#include "Threadable.hpp"
+
+
+
 #include <qfiledialog.h>
 #include <qlcdnumber.h>
 #include <qlabel.h>
 #include <boost/lexical_cast.hpp>
+
+
 using namespace boost;
 
 
@@ -13,7 +19,7 @@ SimulationController::SimulationController(QWidget * parent) : QtGeneratedSimula
 {
 	setMinimumSize(size());
 	setMaximumSize(size());
-	updater = shared_ptr<SimulationControllerUpdater>(new SimulationControllerUpdater(this));
+	//updater = shared_ptr<SimulationControllerUpdater>(new SimulationControllerUpdater(this));
 }
 
 SimulationController::~SimulationController()
@@ -34,25 +40,37 @@ void SimulationController::pbLoadClicked()
 		tlCurrentSimulation->setText(fileName);
 		
 		if (glViews.size()==0)
- 			glViews.push_back(new GLViewer(this->parentWidget()->parentWidget()));
+ 		{
+				boost::mutex resizeMutex;	
+				boost::mutex::scoped_lock lock(resizeMutex);
+
+			glViews.push_back(new GLViewer(this->parentWidget()->parentWidget()));
+			//glViews.push_back(new GLViewer( this->parentWidget()->parentWidget(), glViews.front()->glView ) );
+		}
 		Omega::instance().synchronizer->startAll();
+		//Omega::instance().stopSimulationLoop();
 		
 	}
 }
 
 void SimulationController::pbNewViewClicked()
 {
+	boost::mutex resizeMutex;	
+	boost::mutex::scoped_lock lock(resizeMutex);
+
 	glViews.push_back(new GLViewer( this->parentWidget()->parentWidget(), glViews.front()/*->glView*/ ) );
 }
 
 void SimulationController::pbStopClicked()
 {
-	Omega::instance().synchronizer->stopAll();
+	cerr << "stop" << endl;
+	Omega::instance().stopSimulationLoop();
 }
 
 void SimulationController::pbStartClicked()
 {
-	Omega::instance().synchronizer->startAll();
+	cerr << "start" << endl;
+	Omega::instance().startSimulationLoop();
 }
 
 void SimulationController::pbResetClicked()

@@ -5,20 +5,18 @@
 #include "Omega.hpp"
 #include "ThreadSynchronizer.hpp"
 
-GLViewer::GLViewer(QWidget * parent, QGLWidget * shareWidget) : QGLViewer(parent,"glview",shareWidget)
+GLViewer::GLViewer(QWidget * parent, QGLWidget * shareWidget) /*: QThread() */: QGLViewer(parent,"glview",shareWidget), qglThread(this)
 {
-// 	glView = new GLView(parent,shareWidget);
-// 	glView->show();
-// 	createThread(Omega::instance().synchronizer);
-	fpsTracker = shared_ptr<FpsTracker>(new FpsTracker(this));
-	resize(300,300);
+
+	setAutoBufferSwap(false);
+	resize(320, 240);
 	setSceneCenter(0,0,0);
 	setSceneRadius(200);
 	showEntireScene();
-	setAnimationPeriod(0);
-	startAnimation();
+
 	show();
 
+// 	fpsTracker = shared_ptr<FpsTracker>(new FpsTracker(this));
 }
 
 GLViewer::~GLViewer()
@@ -26,64 +24,51 @@ GLViewer::~GLViewer()
 
 }
 
-// bool GLViewer::notEnd()
+void GLViewer::resizeEvent(QResizeEvent *evt)
+{
+	qglThread.resize(evt->size().width(),evt->size().height()); 
+}
+
+void GLViewer::paintEvent(QPaintEvent *)
+{
+	// Handled by the GLThread.
+}
+
+void GLViewer::closeEvent(QCloseEvent *evt)
+{
+	//stopRendering();
+	QGLViewer::closeEvent(evt);
+}
+
+// void GLViewer::mouseMoveEvent(QMouseEvent * e)
 // {
-// 	return true;
+// 	if (!fpsTracker->mouseMoveEvent(e))
+// 		QGLViewer::mouseMoveEvent(e);
 // }
 // 
-// void GLViewer::oneLoop()
+// void GLViewer::mousePressEvent(QMouseEvent *e)
 // {
-// 	glView->safedraw();
+// 	if (!fpsTracker->mousePressEvent(e))
+// 		QGLViewer::mousePressEvent(e);
 // }
-
-
-void GLViewer::draw()
-{
-	static int drawTurn = Omega::instance().synchronizer->insertThread();
+// 
+// void GLViewer::mouseReleaseEvent(QMouseEvent *e)
+// {
+// 	if (!fpsTracker->mouseReleaseEvent(e))
+// 		QGLViewer::mouseReleaseEvent(e);
+// }
+// 
+// void GLViewer::mouseDoubleClickEvent(QMouseEvent *e)
+// {
+// 	if (!fpsTracker->mouseDoubleClickEvent(e))
+// 		QGLViewer::mouseDoubleClickEvent(e);
+// }
+// 
+// void GLViewer::keyPressEvent(QKeyEvent *e)
+// {
+// 	if (e->key()=='F' || e->key()=='f')
+// 		fpsTracker->swapDisplayed();
+// 	else
+// 		QGLViewer::keyPressEvent(e);
+// }
 	
-	Omega::instance().synchronizer->wait(drawTurn);
-	
-	glEnable(GL_NORMALIZE);
-	glEnable(GL_CULL_FACE);
-
-	if (Omega::instance().rootBody) // if the scene is loaded
-		Omega::instance().rootBody->glDraw();
-		
-	fpsTracker->glDraw();
-	fpsTracker->addOneAction();
-	
-	Omega::instance().synchronizer->signal();
-
-}
-
-void GLViewer::mouseMoveEvent(QMouseEvent * e)
-{
-	if (!fpsTracker->mouseMoveEvent(e))
-		QGLViewer::mouseMoveEvent(e);
-}
-
-void GLViewer::mousePressEvent(QMouseEvent *e)
-{
-	if (!fpsTracker->mousePressEvent(e))
-		QGLViewer::mousePressEvent(e);
-}
-
-void GLViewer::mouseReleaseEvent(QMouseEvent *e)
-{
-	if (!fpsTracker->mouseReleaseEvent(e))
-		QGLViewer::mouseReleaseEvent(e);
-}
-
-void GLViewer::mouseDoubleClickEvent(QMouseEvent *e)
-{
-	if (!fpsTracker->mouseDoubleClickEvent(e))
-		QGLViewer::mouseDoubleClickEvent(e);
-}
-
-void GLViewer::keyPressEvent(QKeyEvent *e)
-{
-	if (e->key()=='F' || e->key()=='f')
-		fpsTracker->swapDisplayed();
-	else
-		QGLViewer::keyPressEvent(e);
-}

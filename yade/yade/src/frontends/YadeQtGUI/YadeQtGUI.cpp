@@ -28,9 +28,13 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+	#include <config.h>
 #endif
 
+//#ifdef Q_WS_X11
+	#include <X11/Xlib.h>
+//#endif
+    
 #include <qapplication.h>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -54,8 +58,11 @@ YadeQtGUI::~YadeQtGUI()
 
 int YadeQtGUI::run(int argc, char *argv[])
 {
-
-	QApplication app( argc,argv );
+//	#ifdef Q_WS_X11
+		XInitThreads();
+//	#endif
+	
+    	QApplication app( argc,argv );
 
 	mainWindow = new YadeQtMainWindow();
 

@@ -54,9 +54,10 @@ template<class Thread>
 class Threadable
 {
 
-	private   : shared_ptr<boost::thread> thread;
+	private     : shared_ptr<boost::thread> thread;
 	protected   : shared_ptr<ThreadSynchronizer> synchronizer;
 	protected : int turn;
+	protected : int saveTurn;
 	protected : int getTurn();	
 	
 	public    : Threadable(shared_ptr<ThreadSynchronizer> s=shared_ptr<ThreadSynchronizer>());
@@ -69,6 +70,9 @@ class Threadable
 	public    : virtual void oneLoop() = 0;
 	
 	public    : void sleep(int ms);
+	
+	public    : void start();
+	public    : void stop();
 
 };
 
