@@ -2,7 +2,7 @@
 
 echo 'ORGDIR=`pwd`'										> makeSymLinkIncl
 echo 'ONLYNAME=`basename $1`'									>> makeSymLinkIncl
-echo 'TMPNAME=$YADEPATH/yade/include/$ONLYNAME'							>> makeSymLinkIncl
+echo 'TMPNAME=../include/$ONLYNAME'								>> makeSymLinkIncl
 echo 'echo symlinking $ORGDIR/$1 to `dirname $TMPNAME`'						>> makeSymLinkIncl
 echo 'TMPDIR=`dirname $TMPNAME`'								>> makeSymLinkIncl
 echo 'cd $TMPDIR'										>> makeSymLinkIncl
