@@ -29,12 +29,7 @@
 
 void ApplyActionDispatcher::postProcessAttributes(bool deserializing)
 {
-	if(deserializing)
-	{
-		for(unsigned int i=0;i<applyActionFunctors.size();i++)
-			actionDispatcher.add(applyActionFunctors[i][0],applyActionFunctors[i][1],applyActionFunctors[i][2]);
-	}
-
+	postProcessDispatcher2D(deserializing);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -42,19 +37,8 @@ void ApplyActionDispatcher::postProcessAttributes(bool deserializing)
 
 void ApplyActionDispatcher::registerAttributes()
 {
-	REGISTER_ATTRIBUTE(applyActionFunctors);
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-void ApplyActionDispatcher::addApplyActionFunctor(const string& str1,const string& str2,const string& str3)
-{
-	vector<string> v;
-	v.push_back(str1);
-	v.push_back(str2);
-	v.push_back(str3);
-	applyActionFunctors.push_back(v);
+	REGISTER_ATTRIBUTE(functorNames);
+	REGISTER_ATTRIBUTE(functorArguments);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -62,50 +46,16 @@ void ApplyActionDispatcher::addApplyActionFunctor(const string& str1,const strin
 
 void ApplyActionDispatcher::action(Body* body)
 {
-
-// NEW VERSION - 107 seconds - faster
-//
-// there are a lot of places where we can do improvement like this. if we do code change
-// like here - in every possible places - yade can gain a lot of speed.
-//
-// basically I've discovered that every temporary variable of type shared_ptr<> costs 3 seconds,
-// so we should avoid creating them and instead pass them around by references - whenever possible
-//
-
-
 	ComplexBody * ncb = dynamic_cast<ComplexBody*>(body);
-	shared_ptr<BodyContainer>* bodies_ptr = &(ncb->bodies);
-	shared_ptr<Action>* action_ptr;
+	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 
 	int id;
 	for( ncb->actions->gotoFirst() ; ncb->actions->notAtEnd() ; ncb->actions->gotoNext())
 	{
-		action_ptr = &(ncb->actions->getCurrent(id));
-		actionDispatcher( *action_ptr , (*(*bodies_ptr))[id]->physicalParameters);
-// FIXME - this line would work if action was holding body's id. and it is possible that it will be even faster
-//		actionDispatcher( ncb->actions->getCurrent(id) , (*(*bodies_ptr))[id]);
+		shared_ptr<Action>& action = ncb->actions->getCurrent(id);
+// FIXME - it would be better if action was holding body's id. and it is possible that it will be even faster
+		operator()( action , (*bodies)[id]->physicalParameters);
 	}
-		
-		
-/* OLD VERSION - 111 seconds
-
-	ComplexBody * ncb = dynamic_cast<ComplexBody*>(body);
-	shared_ptr<BodyContainer> bodies = ncb->bodies;
-
-	shared_ptr<Action> action;
-
-	for( ncb->actions->gotoFirst() ; ncb->actions->notAtEnd() ; ncb->actions->gotoNext())
-	{
-		int id;
-		action = ncb->actions->getCurrent(id);
-		
-		shared_ptr<Body> b = (*bodies)[id];
-
-		actionDispatcher( action, b);
-	}
-
-
-*/
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -29,11 +29,7 @@
 
 void GeometricalModelDispatcher::postProcessAttributes(bool deserializing)
 {
-	if(deserializing)
-	{
-		for(unsigned int i=0;i<geometricalModelFunctors.size();i++)
-			geometricalModelDispatcher.add(geometricalModelFunctors[i][0],geometricalModelFunctors[i][1],geometricalModelFunctors[i][2]);
-	}
+	postProcessDispatcher2D(deserializing);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -41,20 +37,8 @@ void GeometricalModelDispatcher::postProcessAttributes(bool deserializing)
 
 void GeometricalModelDispatcher::registerAttributes()
 {
-	REGISTER_ATTRIBUTE(geometricalModelFunctors);
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-void GeometricalModelDispatcher::addGeometricalModelFunctors(const string& str1,const string& str2,const string& str3)
-{
-	vector<string> v;
-	v.push_back(str1);
-	v.push_back(str2);
-	v.push_back(str3);
-	geometricalModelFunctors.push_back(v);
-
+	REGISTER_ATTRIBUTE(functorNames);
+	REGISTER_ATTRIBUTE(functorArguments);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -69,11 +53,9 @@ void GeometricalModelDispatcher::action(Body* body)
 	{
 		shared_ptr<Body>& b = bodies->getCurrent();
 		if(b->geometricalModel)
-			geometricalModelDispatcher(b->physicalParameters,b->geometricalModel,b.get());
+			operator()(b->physicalParameters,b->geometricalModel,b.get());
 	}
 		
- 	geometricalModelDispatcher(body->physicalParameters,body->geometricalModel,body);
+ 	operator()(body->physicalParameters,body->geometricalModel,body);
 }
-
-
 

@@ -37,9 +37,9 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class GeometricalModelDispatcher : public Actor
-{
-	private : DynLibDispatcher
+class GeometricalModelDispatcher :
+	  public Actor
+	, public DynLibDispatcher
 		<	TYPELIST_2( BodyPhysicalParameters , GeometricalModel ) ,
 			GeometricalModelFunctor,
 			void ,
@@ -48,15 +48,11 @@ class GeometricalModelDispatcher : public Actor
 					, shared_ptr<GeometricalModel>&
 					, const Body*
 				  )
-		> geometricalModelDispatcher;
-
-	private : vector<vector<string> > geometricalModelFunctors;
-	public  : void addGeometricalModelFunctors(const string& str1,const string& str2,const string& str3);
-
-	public : virtual void action(Body* b);
-	
-	public : virtual void postProcessAttributes(bool deserializing);
-	public : virtual void registerAttributes();
+		>
+{
+	public		: virtual void action(Body* b);
+	public		: virtual void registerAttributes();
+	public		: virtual void postProcessAttributes(bool deserializing);
 	REGISTER_CLASS_NAME(GeometricalModelDispatcher);
 };
 

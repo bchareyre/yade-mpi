@@ -36,31 +36,21 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-class TimeIntegratorDispatcher : public Actor
-{
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-/// Attributes										      ///
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-	protected: DynLibDispatcher
+class TimeIntegratorDispatcher :
+	  public Actor
+	, public DynLibDispatcher
 		< 	BodyPhysicalParameters , 
-		  	TimeIntegratorFunctor  ,
+			TimeIntegratorFunctor  ,
 			void ,
-		 	TYPELIST_2( const shared_ptr<BodyPhysicalParameters>&, unsigned int ) 
-		> timeIntegratorDispatcher;
-	
-	private : vector<vector<string> > timeIntegratorFunctors;
-	public  : void addTimeIntegratorFunctor(const string& str1,const string& str2);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-/// Methods										      ///
-///////////////////////////////////////////////////////////////////////////////////////////////////
-	
-	public : virtual void action(Body* body);
-
-	protected : virtual void postProcessAttributes(bool deserializing);
-	public : void registerAttributes();
+			TYPELIST_2( 
+					const shared_ptr<BodyPhysicalParameters>&
+					, unsigned int 
+				) 
+		>
+{
+	public		: virtual void action(Body* body);
+	public		: virtual void registerAttributes();
+	protected	: virtual void postProcessAttributes(bool deserializing);
 	REGISTER_CLASS_NAME(TimeIntegratorDispatcher);
 };
 

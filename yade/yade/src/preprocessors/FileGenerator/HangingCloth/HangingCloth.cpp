@@ -77,35 +77,35 @@ string HangingCloth::generate()
 	Quaternionr q;
 	q.fromAxisAngle( Vector3r(0,0,1),0);
 
-	shared_ptr<InteractionGeometryDispatcher> igd(new InteractionGeometryDispatcher);
-	igd->addInteractionGeometryFunctor("InteractionSphere","InteractionSphere","Sphere2Sphere4SDECContactModel");
-	igd->addInteractionGeometryFunctor("InteractionSphere","InteractionBox","Box2Sphere4SDECContactModel");
+	shared_ptr<InteractionGeometryDispatcher> interactionGeometryDispatcher(new InteractionGeometryDispatcher);
+	interactionGeometryDispatcher->add("InteractionSphere","InteractionSphere","Sphere2Sphere4SDECContactModel");
+	interactionGeometryDispatcher->add("InteractionSphere","InteractionBox","Box2Sphere4SDECContactModel");
 
-	shared_ptr<InteractionPhysicsDispatcher> ipd(new InteractionPhysicsDispatcher);
-	ipd->addInteractionPhysicsFunctor("SDECParameters","SDECParameters","SDECLinearContactModel");
+	shared_ptr<InteractionPhysicsDispatcher> interactionPhysicsDispatcher(new InteractionPhysicsDispatcher);
+	interactionPhysicsDispatcher->add("SDECParameters","SDECParameters","SDECLinearContactModel");
 
-	shared_ptr<BoundingVolumeDispatcher> bvu	= shared_ptr<BoundingVolumeDispatcher>(new BoundingVolumeDispatcher);
-	bvu->addBoundingVolumeFunctors("InteractionSphere","AABB","Sphere2AABBFunctor");
-	bvu->addBoundingVolumeFunctors("InteractionBox","AABB","Box2AABBFunctor");
-	bvu->addBoundingVolumeFunctors("InteractionDescriptionSet","AABB","InteractionDescriptionSet2AABBFunctor");
+	shared_ptr<BoundingVolumeDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeDispatcher>(new BoundingVolumeDispatcher);
+	boundingVolumeDispatcher->add("InteractionSphere","AABB","Sphere2AABBFunctor");
+	boundingVolumeDispatcher->add("InteractionBox","AABB","Box2AABBFunctor");
+	boundingVolumeDispatcher->add("InteractionDescriptionSet","AABB","InteractionDescriptionSet2AABBFunctor");
 
-	shared_ptr<GeometricalModelDispatcher> gmd	= shared_ptr<GeometricalModelDispatcher>(new GeometricalModelDispatcher);
-	gmd->addGeometricalModelFunctors("ParticleSetParameters","Mesh2D","ParticleSet2Mesh2D");
+	shared_ptr<GeometricalModelDispatcher> geometricalModelDispatcher	= shared_ptr<GeometricalModelDispatcher>(new GeometricalModelDispatcher);
+	geometricalModelDispatcher->add("ParticleSetParameters","Mesh2D","ParticleSet2Mesh2D");
 
-	shared_ptr<ApplyActionDispatcher> ad(new ApplyActionDispatcher);
-	ad->addApplyActionFunctor("ActionForce","ParticleParameters","ActionForce2Particle");
+	shared_ptr<ApplyActionDispatcher> applyActionDispatcher(new ApplyActionDispatcher);
+	applyActionDispatcher->add("ActionForce","ParticleParameters","ActionForce2Particle");
 
-	shared_ptr<TimeIntegratorDispatcher> ti(new TimeIntegratorDispatcher);
-	ti->addTimeIntegratorFunctor("ParticleParameters","LeapFrogIntegrator");
+	shared_ptr<TimeIntegratorDispatcher> timeIntegratorDispatcher(new TimeIntegratorDispatcher);
+	timeIntegratorDispatcher->add("ParticleParameters","LeapFrogIntegrator");
 
-	rootBody->actors.push_back(bvu);
-	rootBody->actors.push_back(gmd);
+	rootBody->actors.push_back(boundingVolumeDispatcher);
+	rootBody->actors.push_back(geometricalModelDispatcher);
 	rootBody->actors.push_back(shared_ptr<Actor>(new PersistentSAPCollider));
-	//rootBody->actors.push_back(igd);
-	//rootBody->actors.push_back(ipd);
+	//rootBody->actors.push_back(interactionGeometryDispatcher);
+	//rootBody->actors.push_back(interactionPhysicsDispatcher);
 	rootBody->actors.push_back(shared_ptr<Actor>(new ExplicitMassSpringDynamicEngine));
-	rootBody->actors.push_back(ad);
-	rootBody->actors.push_back(ti);
+	rootBody->actors.push_back(applyActionDispatcher);
+	rootBody->actors.push_back(timeIntegratorDispatcher);
 
 
 	//FIXME : use a default one

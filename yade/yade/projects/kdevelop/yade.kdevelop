@@ -106,7 +106,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>plugins/Engine/TimeIntegratorFunctor/LeapFrogIntegrator</activedir>
+      <activedir>yade/yade</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>

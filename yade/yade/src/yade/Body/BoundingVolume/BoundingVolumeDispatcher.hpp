@@ -37,27 +37,23 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class BoundingVolumeDispatcher : public Actor
-{
-	private : DynLibDispatcher
+class BoundingVolumeDispatcher : 
+	  public Actor
+	, public DynLibDispatcher
 		<	TYPELIST_2( InteractionDescription , BoundingVolume ) ,		// base classess for dispatch
 			BoundingVolumeFunctor,						// class that provides multivirtual call
 			void ,								// return type
 			TYPELIST_4(
-					  const shared_ptr<InteractionDescription>&	// arguments
+						const shared_ptr<InteractionDescription>&	// arguments
 					, shared_ptr<BoundingVolume>& // is not working when const, because functors are supposed to modify it!
 					, const Se3r&
 					, const Body* // with that - functors have all the data they may need, but it's const, so they can't modify it !
-				  )
-		> boundingVolumeDispatcher;
-
-	private : vector<vector<string> > boundingVolumeFunctors;
-	public  : void addBoundingVolumeFunctors(const string& str1,const string& str2,const string& str3);
-
-	public : virtual void action(Body* b);
-	
-	public : virtual void postProcessAttributes(bool deserializing);
-	public : virtual void registerAttributes();
+					)
+		>
+{
+	public		: virtual void action(Body* b);
+	public		: virtual void registerAttributes();
+	public		: virtual void postProcessAttributes(bool deserializing);
 	REGISTER_CLASS_NAME(BoundingVolumeDispatcher);
 };
 

@@ -6,11 +6,7 @@
 
 void InteractionGeometryDispatcher::postProcessAttributes(bool deserializing)
 {
-	if(deserializing)
-	{
-		for(unsigned int i=0;i<interactionGeometryFunctors.size();i++)
-			interactionGeometryDispatcher.add(interactionGeometryFunctors[i][0],interactionGeometryFunctors[i][1],interactionGeometryFunctors[i][2]);
-	}
+	postProcessDispatcher2D(deserializing);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -18,21 +14,9 @@ void InteractionGeometryDispatcher::postProcessAttributes(bool deserializing)
 
 void InteractionGeometryDispatcher::registerAttributes()
 {
-	REGISTER_ATTRIBUTE(interactionGeometryFunctors);
+	REGISTER_ATTRIBUTE(functorNames);
+	REGISTER_ATTRIBUTE(functorArguments);
 }
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-void InteractionGeometryDispatcher::addInteractionGeometryFunctor(const string& str1,const string& str2,const string& str3)
-{
-	vector<string> v;
-	v.push_back(str1);
-	v.push_back(str2);
-	v.push_back(str3);
-	interactionGeometryFunctors.push_back(v);
-}
-
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -51,6 +35,6 @@ void InteractionGeometryDispatcher::action(Body* body)
 		shared_ptr<Body> b1 = (*bodies)[interaction->getId1()];
 		shared_ptr<Body> b2 = (*bodies)[interaction->getId2()];
 
-		interaction->isReal = interactionGeometryDispatcher( b1->interactionGeometry , b2->interactionGeometry , b1->physicalParameters->se3 , b2->physicalParameters->se3 , interaction );
+		interaction->isReal = operator()( b1->interactionGeometry , b2->interactionGeometry , b1->physicalParameters->se3 , b2->physicalParameters->se3 , interaction );
 	}
 }

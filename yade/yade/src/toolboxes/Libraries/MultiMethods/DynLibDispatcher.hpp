@@ -167,109 +167,32 @@ class DynLibDispatcher
 		typedef typename Impl::Parm13 Parm13;
 		typedef typename Impl::Parm14 Parm14;
 		typedef typename Impl::Parm15 Parm15;
-		
-	public:
-		typedef          DynLibDispatcher<BaseClass,Executor,ResultType,TList,autoSymmetry> DispatcherType;
 	
-	private:
-		// Serialization stuff..
-		struct DynLibDispatcherSerializer : public Serializable
-		{
-			std::vector<std::vector<std::string> >	functorNames;
-			std::list<boost::shared_ptr<Executor> > functors;
-			DispatcherType& 			dispatcher;
-			typedef typename std::list<boost::shared_ptr<Executor> >::iterator executorListIterator;
-			
-			explicit DynLibDispatcherSerializer(DispatcherType& d) : dispatcher(d)
-			{
-				functorNames.clear();
-				functors.clear();
-			}
-
-			void addExecutor(boost::shared_ptr<Executor>& ex)
-			{
-				if(! ex) return;
-				bool dupe = false;
-				executorListIterator it    = functors.begin();
-				executorListIterator itEnd = functors.end();
-				for( ; it != itEnd ; ++it )
-					if( (*it)->getClassName() == (*ex)->getClassName() )
-						dupe = true;
-				
-				if(! dupe) functors.push_back(ex);
-			}
-						
-			void addFunctor(const std::string& str1,const std::string& str2,boost::shared_ptr<Executor>& ex) // 1D
-			{
-				std::vector<std::string> v;
-				v.push_back(str1);
-				v.push_back(str2);
-				functorNames.push_back(v);
-				addExecutor(ex);
-			}
-			void addFunctor(const std::string& str1,const std::string& str2,const std::string& str3,boost::shared_ptr<Executor>& ex) // 2D
-			{
-				std::vector<std::string> v;
-				v.push_back(str1);
-				v.push_back(str2);
-				v.push_back(str3);
-				functorNames.push_back(v);
-				addExecutor(ex);
-			}
-			void addFunctor(const std::string& str1,const std::string& str2,const std::string& str3,const std::string& str4,boost::shared_ptr<Executor>& ex) // 3D
-			{
-			}
-			
-			virtual void postProcessAttributes(bool deserializing)
-			{
-				if(deserializing)
-				{
-// 					for(unsigned int i=0;i<functorNames.size();i++)
-// 						if(functorNames[i].size() == 2) // 1D
-// 							dispatcher.add(functorNames[i][0],functorNames[i][1]);
-// 						else
-// 						if(functorNames[i].size() == 3) // 2D
-// 							dispatcher.add(functorNames[i][0],functorNames[i][1],functorNames[i][2]);
-// 						else
-// 						if(functorNames[i].size() == 4) // 3D
-// 							dispatcher.add(functorNames[i][0],functorNames[i][1],functorNames[i][2],functorNames[i][3]);
-				}
-			}
-			
-			virtual void registerAttributes()
-			{
-				REGISTER_ATTRIBUTE(functorNames);
-				REGISTER_ATTRIBUTE(functors);
-			}
-			
-			virtual string getClassName() const
-			{
-				typedef typename DynLibDispatcher<BaseClass,Executor,ResultType,TList,autoSymmetry>::DynLibDispatcherSerializer DispatcherSerializerType;
-				return typeid(DispatcherSerializerType).name();
-			};
-		};
-		
-	public:
-		typedef typename DynLibDispatcher<BaseClass,Executor,ResultType,TList,autoSymmetry>::DynLibDispatcherSerializer DispatcherSerializerType;
-
+	// Serialization stuff.. - FIXME - maybe this should be done in separate class...
+		bool deserializing;
 	protected:
-		DispatcherSerializerType serializer;
-	
-	public:
-		DynLibDispatcher() : serializer(*this)
+		std::vector<std::vector<std::string> >	functorNames;
+		std::list<boost::shared_ptr<Executor> > functorArguments;
+		typedef typename std::list<boost::shared_ptr<Executor> >::iterator executorListIterator;
+			
+// 			virtual void registerAttributes()
+// 			{
+// 				REGISTER_ATTRIBUTE(functorNames);
+// 				if(functors.size() != 0)
+// 					REGISTER_ATTRIBUTE(functors);
+// 			}
+			
+ 	public:
+		DynLibDispatcher()
 		{
 			// FIXME - static_assert( typeid(BaseClass1) == typeid(Parm1) ); // 1D
 			// FIXME - static_assert( typeid(BaseClass2) == typeid(Parm2) ); // 2D
 			callBacks.clear();
 			callBacksInfo.clear();
+			functorNames.clear();
+			functorArguments.clear();
+			deserializing = false;
 		};
-		
-//		ResultType error(int a, int b = -1, int c = -1, int d = -1)
-// 		{
-// 			// because of speed concern we don't want to throw here.
-// 			cerr << "DynLibDispatcher: trying to call non-registered multivirtual function at index position: "
-// 				<< a << ", " << b << ", " << ", " << c << ", " d << endl;
-// 		}
 		
 		shared_ptr<Executor> makeExecutor(string libName)
 		{
@@ -298,10 +221,43 @@ class DynLibDispatcher
 			
 			return executor;
 		}
+		
+		void storeFunctorArguments(boost::shared_ptr<Executor>& ex)
+		{
+			if(! ex) return;
+			bool dupe = false;
+			executorListIterator it    = functorArguments.begin();
+			executorListIterator itEnd = functorArguments.end();
+			for( ; it != itEnd ; ++it )
+				if( (*it)->getClassName() == ex->getClassName() )
+					dupe = true;
+			
+			if(! dupe) functorArguments.push_back(ex);
+		}
 
 ////////////////////////////////////////////////////////////////////////////////
 // add multivirtual function to 1D
 ////////////////////////////////////////////////////////////////////////////////
+		void postProcessDispatcher1D(bool d)
+		{
+			if(d)
+			{
+				deserializing = true;
+				for(unsigned int i=0;i<functorNames.size();i++)
+					add(functorNames[i][0],functorNames[i][1]);
+				deserializing = false;
+			}
+		}
+		
+		void storeFunctorName(const std::string& str1,const std::string& str2,boost::shared_ptr<Executor>& ex)
+		{
+			std::vector<std::string> v;
+			v.push_back(str1);
+			v.push_back(str2);
+			functorNames.push_back(v);
+			storeFunctorArguments(ex);
+		}
+		
 		void add(	  std::string baseClassName
 				, std::string libName
 				, boost::shared_ptr<Executor> ex = boost::shared_ptr<Executor>()
@@ -324,6 +280,9 @@ class DynLibDispatcher
 
 			boost::shared_ptr<Executor> executor = ex ? ex : makeExecutor(libName);	// create the requested functor
 			callBacks[index] = executor;
+			
+			if(!deserializing) storeFunctorName(baseClassName,libName,ex);
+			
 			#ifdef DEBUG
 				cerr <<" New class added to DynLibDispatcher 1D: " << libName << endl;
 			#endif
@@ -358,6 +317,27 @@ class DynLibDispatcher
 ////////////////////////////////////////////////////////////////////////////////
 // add multivirtual function to 2D
 ////////////////////////////////////////////////////////////////////////////////
+		void postProcessDispatcher2D(bool d)
+		{
+			if(d)
+			{
+				deserializing = true;
+				for(unsigned int i=0;i<functorNames.size();i++)
+					add(functorNames[i][0],functorNames[i][1],functorNames[i][2]);
+				deserializing = false;
+			}
+		}
+		
+		void storeFunctorName(const std::string& str1,const std::string& str2,const std::string& str3,boost::shared_ptr<Executor>& ex) // 2D
+		{
+			std::vector<std::string> v;
+			v.push_back(str1);
+			v.push_back(str2);
+			v.push_back(str3);
+			functorNames.push_back(v);
+			storeFunctorArguments(ex);
+		}
+		
 		void add(	  std::string baseClassName1
 				, std::string baseClassName2
 				, std::string libName
@@ -424,6 +404,8 @@ class DynLibDispatcher
 				callBacksInfo	[index1][index2] = 0;
 			}
 			
+			if(!deserializing) storeFunctorName(baseClassName1,baseClassName2,libName,ex);
+			
 			#ifdef DEBUG
 				cerr <<" New class added to MultiMethodsManager 2D: " << libName << endl;
 			#endif
@@ -486,6 +468,14 @@ class DynLibDispatcher
 ////////////////////////////////////////////////////////////////////////////////
 
 //  to be written when needed.... - not too difficult
+		void postProcessDispatcher3D(bool d)
+		{
+		}
+		
+		void storeFunctorName(const std::string& str1,const std::string& str2,const std::string& str3,const std::string& str4,boost::shared_ptr<Executor>& ex)
+		{
+		}
+		
 		void add(std::string baseClassName1 , std::string baseClassName2 , std::string baseClassName3 , std::string libName)
 		{
 		}

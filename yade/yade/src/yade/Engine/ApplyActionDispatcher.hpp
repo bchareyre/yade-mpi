@@ -36,35 +36,21 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-class ApplyActionDispatcher : public Actor
-{
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-/// Attributes											///
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-	protected: DynLibDispatcher
+class ApplyActionDispatcher : 
+	  public Actor
+	, public DynLibDispatcher
 		<	TYPELIST_2( Action , BodyPhysicalParameters ) ,	// base classess for dispatch
-			ApplyActionFunctor,					// class that provides multivirtual call
+			ApplyActionFunctor,				// class that provides multivirtual call
 			void ,						// return type
-			TYPELIST_2(  const shared_ptr<Action>&
-				   , shared_ptr<BodyPhysicalParameters>& )
-		> actionDispatcher;
-
-	private : vector<vector<string> > applyActionFunctors;
-	public  : void addApplyActionFunctor(const string& str1,const string& str2,const string& str3);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-/// Methods											///
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-	protected : virtual void postProcessAttributes(bool deserializing);
-	public : void registerAttributes();
-
-	public : virtual void action(Body* body);
-
+			TYPELIST_2(	  const shared_ptr<Action>&
+					, shared_ptr<BodyPhysicalParameters>& 
+				)
+		>
+{
+	public 		: virtual void action(Body* body);
+	public		: virtual void registerAttributes();
+	protected	: virtual void postProcessAttributes(bool deserializing);
 	REGISTER_CLASS_NAME(ApplyActionDispatcher);
-
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

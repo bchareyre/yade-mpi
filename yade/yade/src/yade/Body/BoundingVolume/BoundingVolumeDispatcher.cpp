@@ -29,11 +29,7 @@
 
 void BoundingVolumeDispatcher::postProcessAttributes(bool deserializing)
 {
-	if(deserializing)
-	{
-		for(unsigned int i=0;i<boundingVolumeFunctors.size();i++)
-			boundingVolumeDispatcher.add(boundingVolumeFunctors[i][0],boundingVolumeFunctors[i][1],boundingVolumeFunctors[i][2]);
-	}
+	postProcessDispatcher2D(deserializing);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -41,19 +37,8 @@ void BoundingVolumeDispatcher::postProcessAttributes(bool deserializing)
 
 void BoundingVolumeDispatcher::registerAttributes()
 {
-	REGISTER_ATTRIBUTE(boundingVolumeFunctors);
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-void BoundingVolumeDispatcher::addBoundingVolumeFunctors(const string& str1,const string& str2,const string& str3)
-{
-	vector<string> v;
-	v.push_back(str1);
-	v.push_back(str2);
-	v.push_back(str3);
-	boundingVolumeFunctors.push_back(v);
+	REGISTER_ATTRIBUTE(functorNames);
+	REGISTER_ATTRIBUTE(functorArguments);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -67,10 +52,10 @@ void BoundingVolumeDispatcher::action(Body* body)
 	for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext())
 	{
 		shared_ptr<Body>& b = bodies->getCurrent();
-		boundingVolumeDispatcher(b->interactionGeometry,b->boundingVolume,b->physicalParameters->se3,b.get());
+		operator()(b->interactionGeometry,b->boundingVolume,b->physicalParameters->se3,b.get());
 	}
 		
- 	boundingVolumeDispatcher(body->interactionGeometry,body->boundingVolume,body->physicalParameters->se3,body);
+	operator()(body->interactionGeometry,body->boundingVolume,body->physicalParameters->se3,body);
 }
 
 

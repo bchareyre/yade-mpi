@@ -36,9 +36,9 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-class InteractionPhysicsDispatcher : public Actor
-{
-	private: DynLibDispatcher
+class InteractionPhysicsDispatcher : 
+	  public Actor
+	, public DynLibDispatcher
 		<	TYPELIST_2( BodyPhysicalParameters , BodyPhysicalParameters ) ,	// base classess for dispatch
 			InteractionPhysicsFunctor,					// class that provides multivirtual call
 			void ,								// return type
@@ -46,18 +46,12 @@ class InteractionPhysicsDispatcher : public Actor
 					, const shared_ptr<BodyPhysicalParameters>&
 					, shared_ptr<Interaction>&
 				)
-		> interactionPhysicsDispatcher;
-
-	private : vector<vector<string> > interactionPhysicsFunctors;
-	public  : void addInteractionPhysicsFunctor(const string& str1,const string& str2,const string& str3);
-		
-	protected : virtual void postProcessAttributes(bool deserializing);
-	public : void registerAttributes();
-
-	public : virtual void action(Body* body);
-
+		>
+{		
+	public 		: virtual void action(Body* body);
+	public 		: virtual void registerAttributes();
+	protected 	: virtual void postProcessAttributes(bool deserializing);
 	REGISTER_CLASS_NAME(InteractionPhysicsDispatcher);
-
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

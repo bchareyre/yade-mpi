@@ -63,33 +63,33 @@ string SDECSpheresPlane::generate()
 	Quaternionr q;
 	q.fromAxisAngle( Vector3r(0,0,1),0);
 
-	shared_ptr<InteractionGeometryDispatcher> igd(new InteractionGeometryDispatcher);
-	igd->addInteractionGeometryFunctor("InteractionSphere","InteractionSphere","Sphere2Sphere4SDECContactModel");
-	igd->addInteractionGeometryFunctor("InteractionSphere","InteractionBox","Box2Sphere4SDECContactModel");
+	shared_ptr<InteractionGeometryDispatcher> interactionGeometryDispatcher(new InteractionGeometryDispatcher);
+	interactionGeometryDispatcher->add("InteractionSphere","InteractionSphere","Sphere2Sphere4SDECContactModel");
+	interactionGeometryDispatcher->add("InteractionSphere","InteractionBox","Box2Sphere4SDECContactModel");
 
-	shared_ptr<InteractionPhysicsDispatcher> ipd(new InteractionPhysicsDispatcher);
-	ipd->addInteractionPhysicsFunctor("SDECParameters","SDECParameters","SDECLinearContactModel");
+	shared_ptr<InteractionPhysicsDispatcher> interactionPhysicsDispatcher(new InteractionPhysicsDispatcher);
+	interactionPhysicsDispatcher->add("SDECParameters","SDECParameters","SDECLinearContactModel");
 		
-	shared_ptr<BoundingVolumeDispatcher> bvu	= shared_ptr<BoundingVolumeDispatcher>(new BoundingVolumeDispatcher);
-	bvu->addBoundingVolumeFunctors("InteractionSphere","AABB","Sphere2AABBFunctor");
-	bvu->addBoundingVolumeFunctors("InteractionBox","AABB","Box2AABBFunctor");
-	bvu->addBoundingVolumeFunctors("InteractionDescriptionSet","AABB","InteractionDescriptionSet2AABBFunctor");
+	shared_ptr<BoundingVolumeDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeDispatcher>(new BoundingVolumeDispatcher);
+	boundingVolumeDispatcher->add("InteractionSphere","AABB","Sphere2AABBFunctor");
+	boundingVolumeDispatcher->add("InteractionBox","AABB","Box2AABBFunctor");
+	boundingVolumeDispatcher->add("InteractionDescriptionSet","AABB","InteractionDescriptionSet2AABBFunctor");
 	
-	shared_ptr<ApplyActionDispatcher> ad(new ApplyActionDispatcher);
-	ad->addApplyActionFunctor("ActionForce","RigidBodyParameters","ActionForce2Particle");
-	ad->addApplyActionFunctor("ActionMomentum","RigidBodyParameters","ActionMomentum2RigidBody");
+	shared_ptr<ApplyActionDispatcher> applyActionDispatcher(new ApplyActionDispatcher);
+	applyActionDispatcher->add("ActionForce","RigidBodyParameters","ActionForce2Particle");
+	applyActionDispatcher->add("ActionMomentum","RigidBodyParameters","ActionMomentum2RigidBody");
 	
-	shared_ptr<TimeIntegratorDispatcher> ti(new TimeIntegratorDispatcher);
-	ti->addTimeIntegratorFunctor("SDECParameters","LeapFrogIntegrator");
+	shared_ptr<TimeIntegratorDispatcher> timeIntegratorDispatcher(new TimeIntegratorDispatcher);
+	timeIntegratorDispatcher->add("SDECParameters","LeapFrogIntegrator");
 	
 	rootBody->actors.resize(7);
-	rootBody->actors[0] 		= bvu;	
+	rootBody->actors[0] 		= boundingVolumeDispatcher;	
 	rootBody->actors[1] 		= shared_ptr<Actor>(new PersistentSAPCollider);
-	rootBody->actors[2] 		= igd;
-	rootBody->actors[3] 		= ipd;
+	rootBody->actors[2] 		= interactionGeometryDispatcher;
+	rootBody->actors[3] 		= interactionPhysicsDispatcher;
 	rootBody->actors[4] 		= shared_ptr<Actor>(new SDECDynamicEngine);
-	rootBody->actors[5] 		= ad;
-	rootBody->actors[6] 		= ti;
+	rootBody->actors[5] 		= applyActionDispatcher;
+	rootBody->actors[6] 		= timeIntegratorDispatcher;
 	
 
 	//FIXME : use a default one

@@ -64,7 +64,6 @@ bool Archive::containsOnlyFundamentals()
 			s->markAllAttributesProcessed();
 			s->unregisterSerializableAttributes(false); // in fact true/false here doesn't apply - we are not serializing/deserializing - just checking
 			return result;
-
 		}
 		else if (recordType==SerializableTypes::CUSTOM_CLASS)
 		{
@@ -82,8 +81,12 @@ bool Archive::containsOnlyFundamentals()
 				return tmpAc->containsOnlyFundamentals();
 			else
 				return true;
-//			shared_ptr<Archive> tmpAc;
-//			return !createPointedArchive(*this,tmpAc);
+		}
+		else if (recordType==SerializableTypes::CONTAINER)
+		{
+			shared_ptr<Archive> tmpAc;
+			int size = createNextArchive(*this,tmpAc,true);
+			return size == 0;
 		}
 		else
 			return false;

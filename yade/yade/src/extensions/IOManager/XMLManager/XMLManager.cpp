@@ -251,13 +251,13 @@ void XMLManager::serializeContainer(ostream& stream, Archive& ac , int depth)
 {
 	shared_ptr<Archive> tmpAc;
 
-	int size=ac.createNextArchive(ac,tmpAc,true);
+	int size = ac.createNextArchive(ac,tmpAc,true);
 
 	stream << " size=\"" << size << "\"";
-	stream << ">" << endl;
 
 	if (size!=0)
 	{
+		stream << ">" << endl;
 		do
 		{
 			writeOpeningTag(stream,*tmpAc,depth);
@@ -290,8 +290,6 @@ void XMLManager::deserializeContainer(istream& stream, Archive& ac, const string
 			saxParser.readAndParseNextXmlLine(stream);
 		} while (ac.createNextArchive(ac,tmpAc,false));
 	}
-	else
-		saxParser.readAndParseNextXmlLine(stream);
 
 	ac.markProcessed();
 }
@@ -320,9 +318,7 @@ void XMLManager::serializeSmartPointer(ostream& stream, Archive& ac , int depth)
 		{
 			shared_ptr<Serializable> s = dynamic_pointer_cast<Serializable>(ClassFactory::instance().createShared(tmpAc->getSerializableClassName()));
 			stream << " _className_=\"" << s->getClassName() << "\" ";//>" << endl;
-//			writeOpeningTag(stream,*tmpAc,depth);
 			tmpAc->serialize(stream, *tmpAc, depth+1);
-//			writeClosingTag(stream,*tmpAc,depth);
 		}
 		else
 			tmpAc->serialize(stream,*tmpAc, depth);
@@ -341,15 +337,9 @@ void XMLManager::deserializeSmartPointer(istream& stream, Archive& ac, const str
 	if (basicAttributes.size()!=0)
 	{
 		string className = basicAttributes["_className_"];
-
-//		saxParser.readAndParseNextXmlLine(stream);
-
 		shared_ptr<Archive> tmpAc;
 		ac.createNewPointedArchive(ac,tmpAc,className);
-
 		tmpAc->deserialize(stream, *tmpAc,"");
-
-//		saxParser.readAndParseNextXmlLine(stream);
 	}
 
 	ac.markProcessed();

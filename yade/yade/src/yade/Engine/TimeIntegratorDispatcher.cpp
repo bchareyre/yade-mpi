@@ -29,11 +29,7 @@
 
 void TimeIntegratorDispatcher::postProcessAttributes(bool deserializing)
 {
-	if(deserializing)
-	{
-		for(unsigned int i=0;i<timeIntegratorFunctors.size();i++)
-			timeIntegratorDispatcher.add(timeIntegratorFunctors[i][0],timeIntegratorFunctors[i][1]);
-	}
+	postProcessDispatcher1D(deserializing);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -41,18 +37,8 @@ void TimeIntegratorDispatcher::postProcessAttributes(bool deserializing)
 
 void TimeIntegratorDispatcher::registerAttributes()
 {
-	REGISTER_ATTRIBUTE(timeIntegratorFunctors);
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-void TimeIntegratorDispatcher::addTimeIntegratorFunctor(const string& str1,const string& str2)
-{
-	vector<string> v;
-	v.push_back(str1);
-	v.push_back(str2);
-	timeIntegratorFunctors.push_back(v);
+	REGISTER_ATTRIBUTE(functorNames);
+	REGISTER_ATTRIBUTE(functorArguments);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -66,7 +52,7 @@ void TimeIntegratorDispatcher::action(Body* body)
 	for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext())
 	{
 		if (bodies->getCurrent()->isDynamic)
-			timeIntegratorDispatcher( bodies->getCurrent()->physicalParameters , bodies->getCurrent()->getId() );
+			operator()( bodies->getCurrent()->physicalParameters , bodies->getCurrent()->getId() );
 	}
 }
 
