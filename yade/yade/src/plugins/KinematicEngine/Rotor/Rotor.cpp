@@ -48,22 +48,16 @@ void Rotor::moveToNextTimeStep(Body * body)
 
 		//b->se3.translation += dp;
 
-		//cout.precision(40);
-		//q.x=0;
-
-		//cout << b->se3.translation << endl;
-		//cout << b->se3.rotation << endl;
-
-		b->se3.translation = q*b->se3.translation;
-		b->se3.rotation = q*b->se3.rotation;
+		b->se3.translation	= q*b->se3.translation;
+		b->se3.rotation		= q*b->se3.rotation;
 
 		b->se3.rotation.normalize();
 		b->se3.rotation.toAngleAxis(an,ax);
-		//cout << b->se3.rotation << " - " << an << " " << ax << endl;
 
-		b->angularVelocity = rotationAxis*angularVelocity;
-		b->velocity = Vector3(0,0,0);//dp*1/dt;
+		b->angularVelocity	= rotationAxis*angularVelocity;
+		b->velocity		= Vector3(0,0,0);
 
+		// FIXME : this shouldn't be there
 		b->updateBoundingVolume(b->se3);
 	}
 

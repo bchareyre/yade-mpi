@@ -5,7 +5,7 @@
 			<bv />
 			<cm />
 			<gm />
-			<actors size="4">
+			<actors size="5">
 				<actors[0] className="SAPCollider" >
 					<actors[0] />
 				</actors[0]>
@@ -16,8 +16,11 @@
 					<actors[2] />
 				</actors[2]>
 				<actors[3] className="Rotor" >
-					<actors[3] angularVelocity="0.3" rotationAxis="{1 1 1}" subscribedBodies="[3]" />
+					<actors[3] angularVelocity="0.3" rotationAxis="{1 1 1}" subscribedBodies="[]" />
 				</actors[3]>
+				<actors[4] className="Translator" >
+					<actors[4] velocity="3" translationAxis="{0 1 0}" subscribedBodies="[3]" />
+				</actors[4]>
 			</actors>
 			<permanentInteractions size="5">
 				<permanentInteractions[0] className="Contact" >

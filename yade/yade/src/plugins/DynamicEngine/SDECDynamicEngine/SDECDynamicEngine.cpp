@@ -163,15 +163,7 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 	if (first)
 	{
 		forces.resize(bodies.size());
-		moments.resize(bodies.size());
-		prevAngularVelocities.resize(bodies.size());
-		vector<Vector3>::iterator pavi = prevAngularVelocities.begin();
-		vector<Vector3>::iterator paviEnd = prevAngularVelocities.end();
-		vector<shared_ptr<Body> >::iterator bi = bodies.begin();
-		for( ; pavi!=paviEnd ; ++pavi,++bi)
-		{
-			(*pavi) = (*bi)->angularVelocity;
-		}
+		moments.resize(bodies.size());		
 	}
 
 	fill(forces.begin(),forces.end(),Vector3(0,0,0));
@@ -192,8 +184,11 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 
 		int id1 = contact->id1;
 		int id2 = contact->id2;
+		
+////////////////////////////////////////////////////////////
+/// FIXME : those lines are too dirty !			 ///
+////////////////////////////////////////////////////////////
 
-		/// FIXME : those lines are too dirty !
 		bool accessed = false;
 		int tmpId1,tmpId2;
 		if (id1>=id2)
@@ -206,7 +201,6 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 			tmpId1 = id1;
 			tmpId2 = id2;
 		}
-
 
 		tuple<int,bool,shared_ptr<InteractionGeometry> > t(tmpId2,accessed,(*pii)->interactionGeometry);
 		interactionsPerBody[tmpId1].erase(t);
@@ -223,8 +217,9 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 			}
 		}
 
-		///////////////////
-
+////////////////////////////////////////////////////////////
+/// 							 ///
+////////////////////////////////////////////////////////////
 
 		shared_ptr<SDECDiscreteElement> de1		= dynamic_pointer_cast<SDECDiscreteElement>(bodies[id1]);
 		shared_ptr<SDECDiscreteElement> de2 		= dynamic_pointer_cast<SDECDiscreteElement>(bodies[id2]);
@@ -303,8 +298,8 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 
 		if (first)
 		{
-			currentContact->prevRotation1 = de1->se3.rotation;//currentContact->currentRotation1;
-			currentContact->prevRotation2 = de2->se3.rotation;//currentContact->currentRotation2;
+			currentContact->prevRotation1 = de1->se3.rotation;
+			currentContact->prevRotation2 = de2->se3.rotation;
 			currentContact->averageRadius = (currentContact->radius1+currentContact->radius2)*0.5;
 			currentContact->kr = currentContact->ks * currentContact->averageRadius * currentContact->averageRadius;
 		}
@@ -358,8 +353,8 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 		Quaternion q_i_n,q_n_i;
 
 		q_i_n.fromAxes(n,t1,t2);
-		//q_i_n.fromAxes(Vector3(1,0,0),Vector3(0,1,0),Vector3(0,0,1)); // use identity matrix
-		//q_i_n.invert();
+		q_i_n.fromAxes(Vector3(1,0,0),Vector3(0,1,0),Vector3(0,0,1)); // use identity matrix
+		//q_i_n.invert();					      // in case of the order of rotation is wrong
 		q_n_i = q_i_n.inverse();
 
 ////////////////////////////////////////////////////////////
@@ -455,8 +450,8 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 		//	currentContact->thetar = q_n_i*thetarn;
 		//}
 
-		currentContact->prevRotation1 = de1->se3.rotation;//currentContact->currentRotation1;
-		currentContact->prevRotation2 = de2->se3.rotation;//currentContact->currentRotation2;
+		currentContact->prevRotation1 = de1->se3.rotation;
+		currentContact->prevRotation2 = de2->se3.rotation;
 
 ////////////////////////////////////////////////////////////
 /// Moment law	END				 	 ///

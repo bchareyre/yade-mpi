@@ -119,7 +119,6 @@ void SAPCollider::broadCollisionTest(Body* body)
 		itEnd = overlappingBB[i].end();		
 		for(;it!=itEnd;++it)
 		{
-			//if (!interactions.find(i,*it))
 			if (!(bodies[i]->isDynamic==false && bodies[*it]->isDynamic==false))
 			{
 				nbPotentialCollisions++;

@@ -65,11 +65,8 @@ class SDECDynamicEngine : public DynamicEngine
 
 	private : std::vector<Vector3> forces;
 	private : std::vector<Vector3> moments;
-// FIXME : this belongs only to SDECRotationLawDynamicEngine
-	private : std::vector<Vector3> prevAngularVelocities;
 
 	private : bool first;
-	//private : bool first2;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Constructor/Destructor								        ///
