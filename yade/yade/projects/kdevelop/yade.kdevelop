@@ -104,7 +104,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>plugins/IOManager/XMLManager</activedir>
+      <activedir>yade/Factory</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>
