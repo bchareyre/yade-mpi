@@ -106,7 +106,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>yade/Engine</activedir>
+      <activedir>yade/Interaction</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>
