@@ -28,6 +28,12 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "RenderingEngine.hpp"
+#include "DynLibDispatcher.hpp"
+
+#include "GLDrawBoundingVolumeFunctor.hpp"
+#include "GLDrawInteractionGeometryFunctor.hpp"
+#include "GLDrawGeometricalModelFunctor.hpp"
+#include "GLDrawShadowVolumeFunctor.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -43,9 +49,9 @@ class OpenGLRenderingEngine : public RenderingEngine
 	public : bool useFastShadowVolume;
 	
 	private : DynLibDispatcher< BoundingVolume    , GLDrawBoundingVolumeFunctor, void , TYPELIST_1(const shared_ptr<BoundingVolume>&) > boundingVolumeDispatcher;
-	private : DynLibDispatcher< CollisionGeometry , GLDrawInteractionGeometryFunctor, void , TYPELIST_2(const shared_ptr<CollisionGeometry>&, const Se3&) >interactionGeometryDispatcher;
-	private : DynLibDispatcher< GeometricalModel  , GLDrawGeometricalModelFunctor, void , TYPELIST_2(const shared_ptr<GeometricalModel>&, const Se3&) > geometricalModelDispatcher;
-	private : DynLibDispatcher< GeometricalModel  , GLDrawGeometricalModelFunctor, void , TYPELIST_3(const shared_ptr<GeometricalModel>&, const Se3&, const Vector3r& ) > shadowVolumeDispatcher;
+	private : DynLibDispatcher< CollisionGeometry , GLDrawInteractionGeometryFunctor, void , TYPELIST_2(const shared_ptr<CollisionGeometry>&, const shared_ptr<BodyPhysicalParameters>&) >interactionGeometryDispatcher;
+	private : DynLibDispatcher< GeometricalModel  , GLDrawGeometricalModelFunctor, void , TYPELIST_2(const shared_ptr<GeometricalModel>&, const shared_ptr<BodyPhysicalParameters>&) > geometricalModelDispatcher;
+	private : DynLibDispatcher< GeometricalModel  , GLDrawShadowVolumeFunctor, void , TYPELIST_3(const shared_ptr<GeometricalModel>&, const shared_ptr<BodyPhysicalParameters>&, const Vector3r& ) > shadowVolumeDispatcher;
 
 	private : vector<vector<string> >  boundingVolumeFunctorNames;
 	private : vector<vector<string> >  collisionGeometryFunctorNames;
@@ -65,12 +71,14 @@ class OpenGLRenderingEngine : public RenderingEngine
 	public : void init();
 	public : void render(shared_ptr<ComplexBody> body);
 	
+	private : void renderGeometricalModel(shared_ptr<ComplexBody> rootBody);
 	private : void renderShadowVolumes(shared_ptr<ComplexBody> rootBody,Vector3r lightPos);
 	private : void renderSceneUsingShadowVolumes(shared_ptr<ComplexBody> rootBody,Vector3r lightPos);
 	private : void renderSceneUsingFastShadowVolumes(shared_ptr<ComplexBody> rootBody,Vector3r lightPos);
 	
 	REGISTER_CLASS_NAME(OpenGLRenderingEngine);
-
+	public : void postProcessAttributes(bool deserializing);
+	
 	public : void registerAttributes();
 };
 

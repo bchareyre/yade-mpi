@@ -10,13 +10,13 @@ class RigidBody : public Particle
 	public : Vector3r inertia;
 	public : Vector3r angularAcceleration;
 	public : Vector3r prevAngularAcceleration;
-
+	public : Vector3r angularVelocity;
 	// construction
 	public : RigidBody ();
 	public : ~RigidBody ();
 
 
-	public : void moveToNextTimeStep();
+	//public : void moveToNextTimeStep();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Serialization										///
@@ -30,7 +30,7 @@ class RigidBody : public Particle
 /// Indexable											///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-	REGISTER_CLASS_INDEX(RigidBody,SimpleBody);
+	REGISTER_CLASS_INDEX(RigidBody,Particle);
 	
 };
 

@@ -52,12 +52,9 @@ void Translator::moveToNextTimeStep(Body * body)
 		//else
 		//{
 
-			b->se3.translation	+= sign*dt*velocity*translationAxis;
-
-			b->velocity		=  sign*velocity*translationAxis;
-
-		// FIXME : this shouldn't be there
-			//b->updateBoundingVolume(b->se3);
+			b->physicalParameters->se3.translation	+= sign*dt*velocity*translationAxis;
+		// FIXME : ??
+		//	b->velocity		=  sign*velocity*translationAxis;
 		//}
 	}
 

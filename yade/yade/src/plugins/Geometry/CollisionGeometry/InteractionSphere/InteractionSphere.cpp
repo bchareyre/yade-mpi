@@ -23,7 +23,7 @@
 
 #include "InteractionSphere.hpp"
 
-InteractionSphere::InteractionSphere () : GeometricalModel()
+InteractionSphere::InteractionSphere () : CollisionGeometry()
 {
 }
 

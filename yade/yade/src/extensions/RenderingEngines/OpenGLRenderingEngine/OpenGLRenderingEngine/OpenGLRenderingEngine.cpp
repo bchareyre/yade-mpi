@@ -22,7 +22,8 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "OpenGLRenderingEngine.hpp"
-#include "Sphere.hpp"
+//#include "Sphere.hpp"
+//#include "Particle.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -46,11 +47,18 @@ OpenGLRenderingEngine::OpenGLRenderingEngine() : RenderingEngine()
 	needInit = true;
 	lightPos = Vector3r(75.0,130.0,0.0);
 	
-	addBoundingVolumeFunctor();
-	addCollisionGeometryFunctor();
-	addGeometricalModelFunctor();
-	addShadowVolumeFunctor();
+	addBoundingVolumeFunctor("AABB","GLDrawAABB");
+	addBoundingVolumeFunctor("BoundingSphere","GLDrawBoundingSphere");
 	
+	addCollisionGeometryFunctor("InteractionSphere","GLDrawInteractionSphere");
+	addCollisionGeometryFunctor("InteractionBox","GLDrawInteractionBox");
+		
+	addGeometricalModelFunctor("Box","GLDrawBox");
+	addGeometricalModelFunctor("Sphere","GLDrawSphere");
+	addGeometricalModelFunctor("Mesh2D","GLDrawMesh2D");
+	
+	addShadowVolumeFunctor("Box","GLDrawBoxShadowVolume");
+	addShadowVolumeFunctor("Sphere","GLDrawSphereShadowVolume");
 	
 }
 
@@ -63,8 +71,9 @@ void OpenGLRenderingEngine::init()
 {
 	if (needInit)
 	{
-		shared_ptr<GeometricalModel> gm = dynamic_pointer_cast<GeometricalModel>(ClassFactory::instance().createShared("Sphere"));
-		gm->buildDisplayList();
+		// FIXME : how to build display list now ??
+		//shared_ptr<GeometricalModel> gm = dynamic_pointer_cast<GeometricalModel>(ClassFactory::instance().createShared("Sphere"));
+		//gm->buildDisplayList();
 		needInit = false;
 	}
 }
@@ -124,15 +133,15 @@ void OpenGLRenderingEngine::render(shared_ptr<ComplexBody> rootBody)
 		{
 			glEnable(GL_CULL_FACE);
 			glEnable(GL_NORMALIZE);
-			rootBody->glDrawGeometricalModel();
+			renderGeometricalModel(rootBody);
 		}
 	}
 	
 	if (drawBoundingVolume)
-		rootBody->glDrawBoundingVolume();
+		boundingVolumeDispatcher(rootBody->bv);
 	
 	if (drawCollisionGeometry)
-		rootBody->glDrawCollisionGeometry();
+		interactionGeometryDispatcher(rootBody->cm,rootBody->physicalParameters);
 
 }
 
@@ -145,7 +154,7 @@ void OpenGLRenderingEngine::renderSceneUsingShadowVolumes(shared_ptr<ComplexBody
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 	glEnable(GL_NORMALIZE);
-	rootBody->glDrawGeometricalModel();	
+	renderGeometricalModel(rootBody);	
 	
 	glClear(GL_STENCIL_BUFFER_BIT);
 	glEnable(GL_STENCIL_TEST);
@@ -170,13 +179,13 @@ void OpenGLRenderingEngine::renderSceneUsingShadowVolumes(shared_ptr<ComplexBody
 	glStencilFunc(GL_NOTEQUAL, 0, (GLuint)(-1));
 	glDisable(GL_LIGHT0);
 	glEnable(GL_NORMALIZE);
-	rootBody->glDrawGeometricalModel();	
+	renderGeometricalModel(rootBody);	
 	
 	glStencilFunc(GL_EQUAL, 0, 1);  /* draw lit part */
 	glStencilFunc(GL_EQUAL, 0, (GLuint)(-1));
 	glEnable(GL_LIGHT0);
 	glEnable(GL_NORMALIZE);
-	rootBody->glDrawGeometricalModel();	
+	renderGeometricalModel(rootBody);	
 	
 	glDepthFunc(GL_LESS);
 	glDisable(GL_STENCIL_TEST);
@@ -190,7 +199,7 @@ void OpenGLRenderingEngine::renderSceneUsingFastShadowVolumes(shared_ptr<Complex
 {
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_NORMALIZE);
-	rootBody->glDrawGeometricalModel();	
+	renderGeometricalModel(rootBody);	
 
 	glClear(GL_STENCIL_BUFFER_BIT);
 	glEnable(GL_STENCIL_TEST);
@@ -282,18 +291,46 @@ void OpenGLRenderingEngine::renderSceneUsingFastShadowVolumes(shared_ptr<Complex
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void OpenGLRenderingEngine::renderShadowVolumes(shared_ptr<ComplexBody> rootBody,Vector3r lightPos)
-{
-	shared_ptr<ComplexBody> ncb = dynamic_pointer_cast<ComplexBody>(rootBody);
-	
-	for( ncb->bodies->gotoFirst() ; ncb->bodies->notAtEnd() ; ncb->bodies->gotoNext() )
+{	
+	if (!rootBody->gm)
 	{
-		shared_ptr<Body> b = ncb->bodies->getCurrent();
-		
-		if (b->gm->shadowCaster)
+		for( rootBody->bodies->gotoFirst() ; rootBody->bodies->notAtEnd() ; rootBody->bodies->gotoNext() )
 		{
-			b->gm->renderShadowVolumes(b->se3,lightPos);
+			shared_ptr<Body> b = rootBody->bodies->getCurrent();
+			if (b->gm->shadowCaster)
+				shadowVolumeDispatcher(b->gm,b->physicalParameters,lightPos);
 		}
 	}
+	else
+		shadowVolumeDispatcher(rootBody->gm,rootBody->physicalParameters,lightPos);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+void OpenGLRenderingEngine::renderGeometricalModel(shared_ptr<ComplexBody> rootBody)
+{	
+	if (!rootBody->gm)
+	{
+		for( rootBody->bodies->gotoFirst() ; rootBody->bodies->notAtEnd() ; rootBody->bodies->gotoNext() )
+		{
+			shared_ptr<Body> b = rootBody->bodies->getCurrent();
+			//FIXME : check if Se3 exist
+			glPushMatrix();
+			//FIXME : do not cast on RigidBody but use Parameters instead
+			//Se3r& se3 = (static_cast<Particle*>(b->physicalParameters.get()))->se3;
+			Se3r& se3 = b->physicalParameters->se3;
+			Real angle;
+			Vector3r axis;	
+			se3.rotation.toAxisAngle(axis,angle);	
+			glTranslatef(se3.translation[0],se3.translation[1],se3.translation[2]);
+			glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
+			geometricalModelDispatcher(b->gm,b->physicalParameters);
+			glPopMatrix();
+		}
+	}
+	else
+		geometricalModelDispatcher(rootBody->gm,rootBody->physicalParameters);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -339,7 +376,7 @@ void OpenGLRenderingEngine::postProcessAttributes(bool deserializing)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void addBoundingVolumeFunctor(const string& str1,const string& str2)
+void OpenGLRenderingEngine::addBoundingVolumeFunctor(const string& str1,const string& str2)
 {
 	vector<string> v;
 	v.push_back(str1);
@@ -350,7 +387,7 @@ void addBoundingVolumeFunctor(const string& str1,const string& str2)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void addCollisionGeometryFunctor(const string& str1,const string& str2)
+void OpenGLRenderingEngine::addCollisionGeometryFunctor(const string& str1,const string& str2)
 {
 	vector<string> v;
 	v.push_back(str1);
@@ -361,7 +398,7 @@ void addCollisionGeometryFunctor(const string& str1,const string& str2)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void addGeometricalModelFunctor(const string& str1,const string& str2)
+void OpenGLRenderingEngine::addGeometricalModelFunctor(const string& str1,const string& str2)
 {
 	vector<string> v;
 	v.push_back(str1);
@@ -372,7 +409,7 @@ void addGeometricalModelFunctor(const string& str1,const string& str2)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void addShadowVolumeFunctor(const string& str1,const string& str2)
+void OpenGLRenderingEngine::addShadowVolumeFunctor(const string& str1,const string& str2)
 {
 	vector<string> v;
 	v.push_back(str1);

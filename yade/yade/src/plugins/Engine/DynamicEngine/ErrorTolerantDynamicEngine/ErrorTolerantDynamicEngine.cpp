@@ -169,7 +169,7 @@ void ErrorTolerantDynamicEngine::respondToCollisions(Body* body)
 
 			penetrationDepthes[i] = (cm->closestPoints[0].first-cm->closestPoints[0].second).length();
 
-			penetrationVelocities[i] = ( ((*bodies)[id1]->velocity+o1p1.cross((*bodies)[id1]->angularVelocity)) - ((*bodies)[id2]->velocity+o2p2.cross((*bodies)[id2]->angularVelocity)) ).dot(n);
+			//penetrationVelocities[i] = ( ((*bodies)[id1]->velocity+o1p1.cross((*bodies)[id1]->angularVelocity)) - ((*bodies)[id2]->velocity+o2p2.cross((*bodies)[id2]->angularVelocity)) ).dot(n);
 
 		}
 

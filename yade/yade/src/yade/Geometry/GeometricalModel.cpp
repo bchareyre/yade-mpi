@@ -1,17 +1,5 @@
 #include "GeometricalModel.hpp"
 
-GeometricalModel::GeometricalModel () : Serializable()
-{
-}
-
-GeometricalModel::~GeometricalModel ()
-{
-
-}
-
-void GeometricalModel::postProcessAttributes(bool)
-{
-}
 
 void GeometricalModel::registerAttributes()
 {

@@ -31,13 +31,8 @@ class Box : public GeometricalModel
 	public : Vector3r extents;
 
 	// construction
-	public : Box (Vector3r e);
 	public : Box ();
 	public : ~Box ();
-
-	public : void glDraw();
-
-	public : void renderShadowVolumes(const Se3r& se3, const Vector3r& lightPos);
 	
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Serialization										///

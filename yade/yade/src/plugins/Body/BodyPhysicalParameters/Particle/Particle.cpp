@@ -45,7 +45,7 @@ Particle::~Particle()
 
 void Particle::postProcessAttributes(bool deserializing)
 {
-	SimpleBody::postProcessAttributes(deserializing);
+	BodyPhysicalParameters::postProcessAttributes(deserializing);
 	
 	if(deserializing)
 	{
@@ -61,8 +61,8 @@ void Particle::postProcessAttributes(bool deserializing)
 
 void Particle::registerAttributes()
 {
-	SimpleBody::registerAttributes();
-	REGISTER_ATTRIBUTE(se3);
+	BodyPhysicalParameters::registerAttributes();
+	//REGISTER_ATTRIBUTE(se3);
 	REGISTER_ATTRIBUTE(mass);
 	REGISTER_ATTRIBUTE(velocity);
 }
@@ -70,12 +70,12 @@ void Particle::registerAttributes()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void Particle::moveToNextTimeStep()
-{	
-	//FIXME : move reseting to another place
-	SimpleBody::moveToNextTimeStep();
-	prevAcceleration = acceleration;
-	acceleration = Vector3r(0,0,0);
-
-	
-}
+// void Particle::moveToNextTimeStep()
+// {	
+// 	//FIXME : move reseting to another place
+// 	BodyPhysicalParameters::moveToNextTimeStep();
+// 	prevAcceleration = acceleration;
+// 	acceleration = Vector3r(0,0,0);
+// 
+// 	
+// }

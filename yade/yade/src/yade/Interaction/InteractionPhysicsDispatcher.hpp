@@ -29,7 +29,7 @@
 
 #include "Actor.hpp"
 #include "DynLibDispatcher.hpp"
-#include "Body.hpp"
+#include "BodyPhysicalParameters.hpp"
 #include "Interaction.hpp"
 #include "InteractionPhysicsFunctor.hpp"
 
@@ -39,12 +39,12 @@
 class InteractionPhysicsDispatcher : public Actor
 {
 	protected: DynLibDispatcher
-		<	TYPELIST_2( Body , Body ) ,	// base classess for dispatch
+		<	TYPELIST_2( BodyPhysicalParameters , BodyPhysicalParameters ) ,	// base classess for dispatch
 			InteractionPhysicsFunctor,					// class that provides multivirtual call
 			void ,							// return type
 			TYPELIST_3(
-					  const shared_ptr<Body>&	// arguments
-					, const shared_ptr<Body>&
+					  const shared_ptr<BodyPhysicalParameters>&	// arguments
+					, const shared_ptr<BodyPhysicalParameters>&
 					, shared_ptr<Interaction>&
 				)
 		> interactionPhysicsDispatcher;

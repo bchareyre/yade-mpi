@@ -14,12 +14,6 @@ class AABB : public BoundingVolume
 
 	// construction
 	public : AABB ();
-	public : AABB (Vector3r hs,Vector3r center=Vector3r(0,0,0));
-	public : ~AABB ();
-
-
-	public : void glDraw();
-
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Serialization										///

@@ -52,10 +52,10 @@ class ComplexBody : public Body
 	public	: ComplexBody ();
 
 	public	: virtual ~ComplexBody ();
-
+/*
 	public : virtual void glDrawGeometricalModel();
 	public : virtual void glDrawBoundingVolume();
-	public : virtual void glDrawCollisionGeometry();
+	public : virtual void glDrawCollisionGeometry();*/
 
 	public	: void moveToNextTimeStep();
 

@@ -21,8 +21,8 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#ifndef __SPHERE_H__
-#define __SPHERE_H__
+#ifndef __INTERACTIONSPHERE_H__
+#define __INTERACTIONSPHERE_H__
 
 #include "CollisionGeometry.hpp"
 
@@ -54,4 +54,4 @@ class InteractionSphere : public CollisionGeometry
 
 REGISTER_SERIALIZABLE(InteractionSphere,false);
 
-#endif // __SPHERE_H__
+#endif // __INTERACTIONSPHERE_H__

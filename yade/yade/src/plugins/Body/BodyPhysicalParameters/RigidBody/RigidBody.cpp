@@ -15,7 +15,7 @@ RigidBody::~RigidBody()
 
 void RigidBody::postProcessAttributes(bool deserializing)
 {
-	SimpleBody::postProcessAttributes(deserializing);
+	Particle::postProcessAttributes(deserializing);
 	
 	if(deserializing)
 	{
@@ -32,19 +32,19 @@ void RigidBody::postProcessAttributes(bool deserializing)
 
 void RigidBody::registerAttributes()
 {
-	SimpleBody::registerAttributes();
+	Particle::registerAttributes();
 	REGISTER_ATTRIBUTE(inertia);
 	REGISTER_ATTRIBUTE(angularVelocity);
 }
 
-
+/*
 void RigidBody::moveToNextTimeStep()
 {	
 	//FIXME : move reseting to another place
-	SimpleBody::moveToNextTimeStep();
+	Particle::moveToNextTimeStep();
 	prevAcceleration = acceleration;
 	prevAngularAcceleration = angularAcceleration;
 	acceleration = Vector3r(0,0,0);
 	angularAcceleration = Vector3r(0,0,0);
 	
-}
+}*/

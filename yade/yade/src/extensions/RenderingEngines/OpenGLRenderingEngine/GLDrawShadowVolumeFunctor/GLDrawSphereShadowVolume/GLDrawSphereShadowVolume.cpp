@@ -22,21 +22,55 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "GLDrawSphereShadowVolume.hpp"
+#include "Sphere.hpp"
+#include "Particle.hpp"
+#include "OpenGLWrapper.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-GLDrawSphereShadowVolume::GLDrawSphereShadowVolume() : GLDrawShadowVolumeFunctor()
+void GLDrawSphereShadowVolume::go(const shared_ptr<GeometricalModel>& gm , const shared_ptr<BodyPhysicalParameters>& pp, const Vector3r& lightPos)
 {
-
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-GLDrawSphereShadowVolume::~GLDrawSphereShadowVolume()
-{
-
+	//FIXME : do not cast on RigidBody but use Parameters instead
+	//Vector3r center = (static_cast<Particle*>(pp.get()))->se3.translation;
+	Vector3r center = pp->se3.translation;
+	Real radius = (static_cast<Sphere*>(gm.get()))->radius;
+	
+	Vector3r dir = lightPos-center;
+	Vector3r normalDir(-dir[1],dir[0],0);
+	normalDir.normalize();
+	normalDir *= radius;
+	Vector3r biNormalDir = normalDir.unitCross(dir)*radius;
+	
+	int nbSegments = 15;
+	
+	Vector3r p1,p2;
+	glBegin(GL_QUAD_STRIP);
+		p1 = center+biNormalDir;
+		p2 = p1 + (p1-lightPos)*10;
+		glVertex3v(p1);
+		glVertex3v(p2);
+		for(int i=1;i<=nbSegments;i++)
+		{
+			Real angle = Mathr::TWO_PI/(Real)nbSegments*i;
+			p1 = center+sin(angle)*normalDir+cos(angle)*biNormalDir;
+			p2 = p1 + (p1-lightPos)*10;
+			glVertex3v(p1);
+			glVertex3v(p2);
+		}
+	glEnd();
+			
+	// closing shadow volumes ??
+	// 	glColor3f(0,1,0);
+	// 	glBegin(GL_POLYGON);
+	// 	for(int i=0;i<nbSegments;i++)
+	// 	{
+	// 		Real angle = Mathr::TWO_PI/(Real)nbSegments*i;
+	// 		p1 = center+sin(angle)*normalDir+cos(angle)*biNormalDir;
+	// 		p2 = p1 + (p1-lightPos)*2;
+	// 		glVertex3fv(p2);
+	// 	}
+	// 	glEnd();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -51,6 +51,6 @@ void InteractionPhysicsDispatcher::action(Body* body)
 		shared_ptr<Body> b2 = (*bodies)[interaction->getId2()];
 
 		if (interaction->isReal)
-			interactionPhysicsDispatcher( b1 , b2 , interaction );
+			interactionPhysicsDispatcher( b1->physicalParameters , b2->physicalParameters , interaction );
 	}
 }

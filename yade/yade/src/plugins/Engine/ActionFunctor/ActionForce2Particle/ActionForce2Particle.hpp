@@ -35,7 +35,7 @@
 class ActionForce2Particle : public ActionFunctor
 {
 
-	protected : virtual void go(const shared_ptr<Action>& a, shared_ptr<Body>& b);
+	protected : virtual void go(const shared_ptr<Action>& a, shared_ptr<BodyPhysicalParameters>& b);
 
 };
 

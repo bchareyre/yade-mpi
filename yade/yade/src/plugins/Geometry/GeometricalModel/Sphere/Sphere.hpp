@@ -30,24 +30,10 @@ class Sphere : public GeometricalModel
 {
 	public : Real radius;
 
-		int number;
-
-	private : static vector<Vector3r> vertices;
-	private : static vector<Vector3r> faces;
-	private : static int glWiredSphereList;
-	private : static int glSphereList;
-	private : void subdivideTriangle(Vector3r& v1,Vector3r& v2,Vector3r& v3, int depth);
-	private : void drawSphere(int depth);
-
 	// construction
-	public : Sphere (Real r);
 	public : Sphere ();
 	public : ~Sphere ();
 
-	public : void glDraw();
-
-	public : void buildDisplayList();
-	public : void renderShadowVolumes(const Se3r& se3, const Vector3r& lightPos);
 	
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -62,7 +48,7 @@ class Sphere : public GeometricalModel
 /// Indexable											///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	REGISTER_CLASS_INDEX(Sphere,CollisionGeometry);
+	REGISTER_CLASS_INDEX(Sphere,GeometricalModel);
 	
 };
 

@@ -28,7 +28,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void ActionForce2RigidBody::go(const shared_ptr<Action>& a, shared_ptr<Body>& b)
+void ActionForce2RigidBody::go(const shared_ptr<Action>& a, shared_ptr<BodyPhysicalParameters>& b)
 {
 	ActionForce * af = static_cast<ActionForce*>(a.get());
 	RigidBody * rb = static_cast<RigidBody*>(b.get());

@@ -75,6 +75,7 @@ void Body::registerAttributes()
 {
 	REGISTER_ATTRIBUTE(id);
 	REGISTER_ATTRIBUTE(isDynamic); // FIXME : only used for collision : no collision between 2 non dynamic objects
+	//REGISTER_ATTRIBUTE(se3);
 	REGISTER_ATTRIBUTE(bv);
 	REGISTER_ATTRIBUTE(cm);
 	REGISTER_ATTRIBUTE(gm);

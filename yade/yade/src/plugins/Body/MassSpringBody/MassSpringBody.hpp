@@ -11,7 +11,7 @@ class MassSpringBody : public ComplexBody
 	public : MassSpringBody ();
 	public : ~MassSpringBody ();
 
-	public : void glDrawGeometricalModel();
+	//public : void glDrawGeometricalModel();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Serialization										///
@@ -25,7 +25,7 @@ class MassSpringBody : public ComplexBody
 /// Indexable											///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-	REGISTER_CLASS_INDEX(MassSpringBody,ComplexBody);
+//	REGISTER_CLASS_INDEX(MassSpringBody,ComplexBody);
 	
 };
 

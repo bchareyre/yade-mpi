@@ -24,7 +24,7 @@
 #include "InteractionBox.hpp"
 
 
-InteractionBox::InteractionBox () : GeometricalModel()
+InteractionBox::InteractionBox () : CollisionGeometry()
 {		
 	createIndex();
 }
@@ -36,12 +36,12 @@ InteractionBox::~InteractionBox ()
 
 void InteractionBox::postProcessAttributes(bool deserializing)
 {
-	GeometricalModel::postProcessAttributes(deserializing);
+	CollisionGeometry::postProcessAttributes(deserializing);
 }
 
 void InteractionBox::registerAttributes()
 {
-	GeometricalModel::registerAttributes();
+	CollisionGeometry::registerAttributes();
 	REGISTER_ATTRIBUTE(extents);
 }
 

@@ -42,9 +42,9 @@ void AveragePositionRecorder::action(Body * body)
 		for( ncb->bodies->gotoFirst() ; ncb->bodies->notAtEnd() ; ncb->bodies->gotoNext() )
 		{
 			size+=1.0;
-			x+=ncb->bodies->getCurrent()->se3.translation[0];
-			y+=ncb->bodies->getCurrent()->se3.translation[1];
-			z+=ncb->bodies->getCurrent()->se3.translation[2];
+			x+=ncb->bodies->getCurrent()->physicalParameters->se3.translation[0];
+			y+=ncb->bodies->getCurrent()->physicalParameters->se3.translation[1];
+			z+=ncb->bodies->getCurrent()->physicalParameters->se3.translation[2];
 		}
 	
 		x /= size;

@@ -21,8 +21,8 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#ifndef __BOX_H__
-#define __BOX_H__
+#ifndef __INTERACIONBOX_H__
+#define __INTERACIONBOX_H__
 
 #include "CollisionGeometry.hpp"
 
@@ -53,4 +53,4 @@ class InteractionBox : public CollisionGeometry
 
 REGISTER_SERIALIZABLE(InteractionBox,false);
 
-#endif // __BOX_H__
+#endif // __INTERACIONBOX_H__

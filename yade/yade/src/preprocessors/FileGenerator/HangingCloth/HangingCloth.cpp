@@ -68,7 +68,7 @@ void HangingCloth::registerAttributes()
 string HangingCloth::generate()
 {
 	
-	rootBody = shared_ptr<ComplexBody>(new MassSpringBody);
+/*	rootBody = shared_ptr<ComplexBody>(new MassSpringBody);
 	
 	Quaternionr q;
 	q.fromAxisAngle(Vector3r(0,0,1),0);
@@ -219,7 +219,7 @@ string HangingCloth::generate()
 		p->invMass = 0;
 		p->cm->diffuseColor = Vector3r(1.0,0.0,0.0);		
 		p->actors.clear();
-	}
+	}*/
  	
 	return "";
 }
@@ -228,7 +228,7 @@ string HangingCloth::generate()
 shared_ptr<Interaction>& HangingCloth::createSpring(const shared_ptr<ComplexBody>& rootBody,int i,int j)
 {
 	
-	Particle * p1 = static_cast<Particle*>((*(rootBody->bodies))[i].get());
+/*	Particle * p1 = static_cast<Particle*>((*(rootBody->bodies))[i].get());
 	Particle * p2 = static_cast<Particle*>((*(rootBody->bodies))[j].get());
 	
 	spring = shared_ptr<Interaction>(new Interaction( p1->getId() , p2->getId() ));
@@ -245,7 +245,7 @@ shared_ptr<Interaction>& HangingCloth::createSpring(const shared_ptr<ComplexBody
 	spring->interactionGeometry = geometry;
 	spring->interactionPhysics = physics;
 	spring->isReal = true;
-	spring->isNew = false;
+	spring->isNew = false;*/
 	
 	return spring;
 }

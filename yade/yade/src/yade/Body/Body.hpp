@@ -91,7 +91,10 @@ class Body : public Serializable
 	for example for collision detection : if two colliding bodies are only kinematic then it is useless to
 	modelise their contact */
 	public : bool isDynamic;
-
+	
+	// FIXME : remove that ??!
+	//public : Se3r se3;
+	
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Constructor/Destructor									///
 ///////////////////////////////////////////////////////////////////////////////////////////////////

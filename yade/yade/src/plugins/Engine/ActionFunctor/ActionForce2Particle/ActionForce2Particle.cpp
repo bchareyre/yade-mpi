@@ -28,7 +28,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void ActionForce2Particle::go(const shared_ptr<Action>& a, shared_ptr<Body>& b)
+void ActionForce2Particle::go(const shared_ptr<Action>& a, shared_ptr<BodyPhysicalParameters>& b)
 {
 	ActionForce * af = static_cast<ActionForce*>(a.get());
 	Particle * p = static_cast<Particle*>(b.get());

@@ -7,6 +7,6 @@ CONFIG += release \
           warn_on 
 TEMPLATE = subdirs 
 SUBDIRS += FEMBody \
-	   RigidBody \
-	   Particle \
+	  Particle \ 
+	  RigidBody \
 	   SDECDiscreteElement

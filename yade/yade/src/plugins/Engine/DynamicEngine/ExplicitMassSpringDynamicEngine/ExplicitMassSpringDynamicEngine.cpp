@@ -56,8 +56,8 @@ void ExplicitMassSpringDynamicEngine::respondToCollisions(Body * body)
 		int id1 = spring->getId1();
 		int id2 = spring->getId2();
 		
-		Particle * p1 = static_cast<Particle*>((*bodies)[id1].get());
-		Particle * p2 = static_cast<Particle*>((*bodies)[id2].get());
+		Particle * p1 = static_cast<Particle*>((*bodies)[id1]->physicalParameters.get());
+		Particle * p2 = static_cast<Particle*>((*bodies)[id2]->physicalParameters.get());
 		
 		SpringPhysics* physics		= static_cast<SpringPhysics*>(spring->interactionPhysics.get());
 		SpringGeometry* geometry	= static_cast<SpringGeometry*>(spring->interactionGeometry.get());
@@ -84,8 +84,8 @@ void ExplicitMassSpringDynamicEngine::respondToCollisions(Body * body)
 	
 	for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext())
 	{
-		Particle * p = static_cast<Particle*>(bodies->getCurrent().get());
-		static_cast<ActionForce*>( body->actions->find( p->getId() , actionForce->getClassIndex() ).get() )->force += gravity*p->mass;
+		Particle * p = static_cast<Particle*>(bodies->getCurrent()->physicalParameters.get());
+		static_cast<ActionForce*>( body->actions->find( bodies->getCurrent()->getId() , actionForce->getClassIndex() ).get() )->force += gravity*p->mass;
 	}
 }
 

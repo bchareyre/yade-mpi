@@ -97,7 +97,7 @@ void ActionDispatcher::action(Body* body)
 	for( ncb->actions->gotoFirst() ; ncb->actions->notAtEnd() ; ncb->actions->gotoNext())
 	{
 		action_ptr = &(ncb->actions->getCurrent(id));
-		actionDispatcher( *action_ptr , (*(*bodies_ptr))[id]);
+		actionDispatcher( *action_ptr , (*(*bodies_ptr))[id]->physicalParameters);
 // FIXME - this line would work if action was holding body's id. and it is possible that it will be even faster
 //		actionDispatcher( ncb->actions->getCurrent(id) , (*(*bodies_ptr))[id]);
 	}

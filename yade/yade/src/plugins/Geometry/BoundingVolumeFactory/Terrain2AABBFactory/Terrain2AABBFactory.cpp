@@ -8,5 +8,5 @@ void Terrain2AABBFactory::go(	const shared_ptr<CollisionGeometry>& cm,
 {
 	shared_ptr<Terrain> t = dynamic_pointer_cast<Terrain>(cm);
 	
-	bv = shared_ptr<BoundingVolume>(new AABB((t->max-t->min)*0.5,(t->max+t->min)*0.5));
+//	bv = shared_ptr<BoundingVolume>(new AABB((t->max-t->min)*0.5,(t->max+t->min)*0.5));
 }	

@@ -28,37 +28,37 @@ ComplexBody::~ComplexBody()
 }
 
 
-void ComplexBody::glDrawGeometricalModel()
-{
-	//glPushMatrix();
+// void ComplexBody::glDrawGeometricalModel()
+// {
+// 	//glPushMatrix();
+// 
+// 	//Real angle;
+// 	//Vector3r axis;
+// 	//se3.rotation.toAxisAngle(axis,angle);
+// 
+// 	//glTranslatef(se3.translation[0],se3.translation[1],se3.translation[2]);
+// 	//glRotated(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
+// 
+// 	for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext() )
+// 		bodies->getCurrent()->glDrawGeometricalModel();
+// 	
+// 
+// 	//glPopMatrix();
+// }
 
-	//Real angle;
-	//Vector3r axis;
-	//se3.rotation.toAxisAngle(axis,angle);
-
-	//glTranslatef(se3.translation[0],se3.translation[1],se3.translation[2]);
-	//glRotated(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
-
-	for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext() )
-		bodies->getCurrent()->glDrawGeometricalModel();
-	
-
-	//glPopMatrix();
-}
-
-void ComplexBody::glDrawBoundingVolume()
-{
-	for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext() )
-		bodies->getCurrent()->glDrawBoundingVolume();
-	bv->glDraw();
-}
-
-void ComplexBody::glDrawCollisionGeometry()
-{
-	for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext() )
-		bodies->getCurrent()->glDrawCollisionGeometry();
-	cm->glDraw();
-}
+// void ComplexBody::glDrawBoundingVolume()
+// {
+// 	for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext() )
+// 		bodies->getCurrent()->glDrawBoundingVolume();
+// 	bv->glDraw();
+// }
+// 
+// void ComplexBody::glDrawCollisionGeometry()
+// {
+// 	for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext() )
+// 		bodies->getCurrent()->glDrawCollisionGeometry();
+// 	cm->glDraw();
+// }
 
 #include "CollisionGeometrySet.hpp"
 

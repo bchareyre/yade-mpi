@@ -24,7 +24,7 @@
 #ifndef __MESH2D_H__
 #define __MESH2D_H__
 
-#include "CollisionGeometry.hpp"
+#include "GeometricalModel.hpp"
 
 #define offset(i,j) ((i)*height+(j))
 
@@ -45,7 +45,7 @@ class Edge : public Serializable
 };
 REGISTER_SERIALIZABLE(Edge,true);
 
-class Mesh2D : public CollisionGeometry
+class Mesh2D : public GeometricalModel
 {
 	public : vector<Vector3r> vertices;
 	public : vector<Edge> edges;
@@ -57,9 +57,6 @@ class Mesh2D : public CollisionGeometry
 	// construction
 	public : Mesh2D ();
 	public : ~Mesh2D ();
-
-	public : void glDraw();
-	public : void computeNormals();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Serialization										///
@@ -73,12 +70,10 @@ class Mesh2D : public CollisionGeometry
 /// Indexable											///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	REGISTER_CLASS_INDEX(Mesh2D,CollisionGeometry);
+	REGISTER_CLASS_INDEX(Mesh2D,GeometricalModel);
 
 };
 
-#include "ArchiveTypes.hpp"
-using namespace ArchiveTypes;
 
 REGISTER_SERIALIZABLE(Mesh2D,false);
 

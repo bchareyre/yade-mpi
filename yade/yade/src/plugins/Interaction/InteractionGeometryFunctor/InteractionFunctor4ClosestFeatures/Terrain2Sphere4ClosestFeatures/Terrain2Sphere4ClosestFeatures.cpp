@@ -49,7 +49,10 @@ bool Terrain2Sphere4ClosestFeatures::go(	const shared_ptr<CollisionGeometry>& cm
 	min = se32.translation-radius;
 	max = se32.translation+radius;
 	
-	t->getFaces(AABB((max-min)*0.5,(min+max)*0.5),faces);
+	AABB aabb;
+	aabb.center  =(max-min)*0.5;
+	aabb.halfSize=(min+max)*0.5;
+	t->getFaces(aabb,faces);
 	tri.resize(3);
 	
 	shared_ptr<ClosestFeatures> cf = shared_ptr<ClosestFeatures>(new ClosestFeatures());

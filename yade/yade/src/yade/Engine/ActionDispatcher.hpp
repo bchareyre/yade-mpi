@@ -31,7 +31,7 @@
 #include "DynLibDispatcher.hpp"
 #include "Action.hpp"
 #include "ActionFunctor.hpp"
-#include "Body.hpp"
+#include "BodyPhysicalParameters.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -44,12 +44,12 @@ class ActionDispatcher : public Actor
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 	protected: DynLibDispatcher
-		<	TYPELIST_2( Action , Body ) ,				// base classess for dispatch
+		<	TYPELIST_2( Action , BodyPhysicalParameters ) ,				// base classess for dispatch
 			ActionFunctor,						// class that provides multivirtual call
 			void ,							// return type
 			TYPELIST_2(
 					  const shared_ptr<Action>&
-					, shared_ptr<Body>&
+					, shared_ptr<BodyPhysicalParameters>&
 					)
 		> actionDispatcher;
 

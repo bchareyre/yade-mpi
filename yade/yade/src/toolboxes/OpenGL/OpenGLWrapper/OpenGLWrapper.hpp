@@ -26,6 +26,7 @@
 
 #include "Vector3.hpp"
 #include <GL/gl.h>
+#include <GL/glut.h>
 
 template <bool> struct static_assert;
 template <> struct static_assert<true> {};

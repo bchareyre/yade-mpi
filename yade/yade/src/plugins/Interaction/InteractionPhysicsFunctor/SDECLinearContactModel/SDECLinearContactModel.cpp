@@ -31,7 +31,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void SDECLinearContactModel::go(const shared_ptr<Body>& b1, const shared_ptr<Body>& b2,	shared_ptr<Interaction>& interaction)
+void SDECLinearContactModel::go(const shared_ptr<BodyPhysicalParameters>& b1, const shared_ptr<BodyPhysicalParameters>& b2,	shared_ptr<Interaction>& interaction)
 {
 	SDECDiscreteElement* de1 = static_cast<SDECDiscreteElement*>(b1.get());
 	SDECDiscreteElement* de2 = static_cast<SDECDiscreteElement*>(b2.get());
