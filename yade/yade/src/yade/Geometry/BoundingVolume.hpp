@@ -77,10 +77,6 @@ class BoundingVolume : public GeometricalModel, public Indexable
 
 	/*! Abstract function to overload. It is called to draw the bounding volume in an opengl context */
 	public : virtual void glDraw() {};
-
-	//public : virtual void move(Se3r& ) {};
-	/*! Abstract function to overload. It is called to update the current bounding volume by an incremental 3D transformation */
-	public : virtual void update(Se3r& ) {};
 	
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Serialization										///

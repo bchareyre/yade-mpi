@@ -36,6 +36,7 @@
 #include "GeometricalModel.hpp"
 #include "CollisionGeometry.hpp"
 #include "BoundingVolume.hpp"
+#include "BodyPhysicalParameters.hpp"
 #include "InteractionContainer.hpp"
 #include "Interaction.hpp"
 #include "Serializable.hpp"
@@ -55,7 +56,7 @@
 
 	All the physical types (SimpleBody, ComplexBody, RigidBody ....) must derived from this class.
 */
-class Body : public Serializable , public Indexable
+class Body : public Serializable
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -80,7 +81,8 @@ class Body : public Serializable , public Indexable
 	public : shared_ptr<CollisionGeometry> cm;
 	/*! The bounding volume of this body (AABB, K-Dop ...) */
 	public : shared_ptr<BoundingVolume> bv;
-
+	/*! Mechanical parameters of the body (mass, sitffness ...) */
+	public : shared_ptr<BodyPhysicalParameters> physicalParameters;
 
 	//public : shared_ptr<DynamicEngine> dynamic;
 
@@ -89,15 +91,6 @@ class Body : public Serializable , public Indexable
 	for example for collision detection : if two colliding bodies are only kinematic then it is useless to
 	modelise their contact */
 	public : bool isDynamic;
-
-	/*! The velocity of the object */
-	public : Vector3r velocity;
-
-	/*! The angular velocity of the object */
-	public : Vector3r angularVelocity;
-
-	/*! The position and orientation of the object */
-	public : Se3r se3;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Constructor/Destructor									///
@@ -132,11 +125,6 @@ class Body : public Serializable , public Indexable
 	/*! Tells the IOManager which attributes should be serialized */
 	public : void registerAttributes();
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-/// Indexable											///
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-	REGISTER_INDEX_COUNTER(Body);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -13,13 +13,6 @@ BoundingSphere::~BoundingSphere ()
 
 }
 
-
-void BoundingSphere::move(Se3r& )
-{
-
-
-}
-
 void BoundingSphere::postProcessAttributes(bool)
 {
 
@@ -30,11 +23,6 @@ void BoundingSphere::registerAttributes()
 	BoundingVolume::registerAttributes();
 	REGISTER_ATTRIBUTE(radius);
 	REGISTER_ATTRIBUTE(center);
-}
-
-bool BoundingSphere::loadFromFile(char * )
-{
-	return false; 
 }
 
 void BoundingSphere::glDraw()

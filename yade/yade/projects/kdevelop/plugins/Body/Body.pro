@@ -3,7 +3,7 @@
 # Subdir relative project main directory: ./plugins/Body
 # Target is a subdirs project 
 
-SUBDIRS += BodyPhysics \
+SUBDIRS += BodyPhysicalParameters \
            MassSpringBody 
 MOC_DIR = $(YADECOMPILATIONPATH)
 UI_DIR = $(YADECOMPILATIONPATH)

@@ -44,7 +44,6 @@ class Sphere : public CollisionGeometry
 	public : Sphere ();
 	public : ~Sphere ();
 
-	public : bool collideWith(CollisionGeometry* collisionGeometry);
 	public : void glDraw();
 
 	public : void buildDisplayList();

@@ -13,10 +13,7 @@ class BoundingSphere : public BoundingVolume
 
 	public : ~BoundingSphere ();
 
-	public : void move(Se3r& se3);
-	public : bool loadFromFile(char * fileName);
 	public : void glDraw();
-	public : void update(Se3r& se3);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Serialization										///

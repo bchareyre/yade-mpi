@@ -18,12 +18,8 @@ ComplexBody::ComplexBody() :
 	  Body()
 	, bodies(new BodyRedirectionVector)
 	, permanentInteractions(new InteractionVecSet)
-{
-
-	createIndex();
-	
+{	
 	containSubBodies = true;
-
 }
 
 ComplexBody::~ComplexBody()

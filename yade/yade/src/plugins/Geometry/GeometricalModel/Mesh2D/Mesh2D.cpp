@@ -65,16 +65,7 @@ void Mesh2D::registerAttributes()
 	REGISTER_ATTRIBUTE(height);
 }
 
-bool Mesh2D::collideWith(CollisionGeometry* )
-{
-	return true;
 
-}
-
-bool Mesh2D::loadFromFile(char * )
-{
-	return false;
-}
 
 void Mesh2D::glDraw()
 {

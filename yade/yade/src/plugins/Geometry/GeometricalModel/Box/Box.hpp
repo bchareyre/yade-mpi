@@ -35,8 +35,6 @@ class Box : public CollisionGeometry
 	public : Box ();
 	public : ~Box ();
 
-	public : bool collideWith(CollisionGeometry* collisionGeometry);
-	public : bool loadFromFile(char * fileName);
 	public : void glDraw();
 
 	public : void renderShadowVolumes(const Se3r& se3, const Vector3r& lightPos);

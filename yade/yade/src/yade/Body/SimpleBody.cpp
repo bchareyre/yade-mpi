@@ -14,7 +14,6 @@ using namespace std;
 
 SimpleBody::SimpleBody() : Body()
 {
-	createIndex();
 	containSubBodies = false;
 }
 
@@ -25,52 +24,44 @@ SimpleBody::~SimpleBody()
 
 void SimpleBody::glDrawGeometricalModel()
 {
-	glPushMatrix();
+/*	glPushMatrix();
 	Real angle;
 	Vector3r axis;	
 	se3.rotation.toAxisAngle(axis,angle);	
 	glTranslatef(se3.translation[0],se3.translation[1],se3.translation[2]);
 	glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);	
 	gm->glDraw();
-	glPopMatrix();
+	glPopMatrix();*/
 }
 
 void SimpleBody::glDrawBoundingVolume()
 {
-	glPushMatrix();
+/*	glPushMatrix();
 	bv->glDraw();
-	glPopMatrix();
+	glPopMatrix();*/
 }
 
 void SimpleBody::glDrawCollisionGeometry()
 {
-	glPushMatrix();
+/*	glPushMatrix();
 	Real angle;
 	Vector3r axis;	
 	se3.rotation.toAxisAngle(axis,angle);	
 	glTranslatef(se3.translation[0],se3.translation[1],se3.translation[2]);
 	glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);	
 	cm->glDraw();
-	glPopMatrix();
+	glPopMatrix();*/
 }
 
 
 void SimpleBody::postProcessAttributes(bool deserializing)
 {
-	if(deserializing)
-		invMass = 1.0/mass;	
 	Body::postProcessAttributes(deserializing);
 }
 
 void SimpleBody::registerAttributes()
 {
 	Body::registerAttributes();
-	REGISTER_ATTRIBUTE(mass);
-	
-	// FIXME : where to put gm,cm,bv
-	//REGISTER_ATTRIBUTE(cm);
-	//REGISTER_ATTRIBUTE(bv);
-	//REGISTER_ATTRIBUTE(gm);
 }
 
 void SimpleBody::moveToNextTimeStep()

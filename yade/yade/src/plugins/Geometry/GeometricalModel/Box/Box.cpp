@@ -52,16 +52,6 @@ void Box::registerAttributes()
 	REGISTER_ATTRIBUTE(extents);
 }
 
-bool Box::collideWith(CollisionGeometry* )
-{
-	return true;
-
-}
-
-bool Box::loadFromFile(char * )
-{
-	return false;
-}
 
 void Box::glDraw()
 {

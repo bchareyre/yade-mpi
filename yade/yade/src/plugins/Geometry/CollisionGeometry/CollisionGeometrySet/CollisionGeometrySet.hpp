@@ -40,8 +40,6 @@ class CollisionGeometrySet : public CollisionGeometry
 	public : CollisionGeometrySet ();
 	public : ~CollisionGeometrySet ();
 
-	public : bool collideWith(CollisionGeometry* ) {return false;};
-	public : bool loadFromFile(char * ) {return false;};
 	public : void glDraw();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

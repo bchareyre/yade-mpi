@@ -95,10 +95,6 @@ void Sphere::registerAttributes()
 	REGISTER_ATTRIBUTE(radius);
 }
 
-bool Sphere::collideWith(CollisionGeometry* )
-{
-	return true;
-}
 
 void Sphere::subdivideTriangle(Vector3r& v1,Vector3r& v2,Vector3r& v3, int depth)
 {

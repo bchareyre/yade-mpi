@@ -3,16 +3,16 @@
 # Subdir relative project main directory: ./yade/Body
 # Target is a library:  
 
-HEADERS += BodyPhysics.hpp \
-           Body.hpp \
+HEADERS += Body.hpp \
            BodyContainer.hpp \
            ComplexBody.hpp \
-           SimpleBody.hpp 
-SOURCES += BodyPhysics.cpp \
-           Body.cpp \
+           SimpleBody.hpp \
+           BodyPhysicalParameters.hpp 
+SOURCES += Body.cpp \
            BodyContainer.cpp \
            ComplexBody.cpp \
-           SimpleBody.cpp 
+           SimpleBody.cpp \
+           BodyPhysicalParameters.cpp 
 LIBS += -lCollisionGeometrySet \
 -lActionVecVec \
 -rdynamic

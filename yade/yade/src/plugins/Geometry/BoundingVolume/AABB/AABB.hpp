@@ -17,11 +17,9 @@ class AABB : public BoundingVolume
 	public : AABB (Vector3r hs,Vector3r center=Vector3r(0,0,0));
 	public : ~AABB ();
 
-	public : void move(Se3r& se3);
-	public : bool loadFromFile(char * fileName);
+
 	public : void glDraw();
-	public : void update(Se3r& se3);
-	public : bool overlap(const AABB& aabb);
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Serialization										///
