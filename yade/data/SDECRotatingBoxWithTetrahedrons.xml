@@ -33,42 +33,42 @@
 				<permanentInteractions[0] className="Contact" >
 					<permanentInteractions[0] id1="51" id2="52">
 						<interactionGeometry className="SDECPermanentLink" >
-							<interactionGeometry initialKn="50000" initialKs="5000" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
+							<interactionGeometry initialKn="50000" initialKs="5000" heta="1" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
 						</interactionGeometry>
 					</permanentInteractions[0]>
 				</permanentInteractions[0]>
 				<permanentInteractions[1] className="Contact" >
 					<permanentInteractions[1] id1="51" id2="53">
 						<interactionGeometry className="SDECPermanentLink" >
-							<interactionGeometry initialKn="50000" initialKs="5000" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
+							<interactionGeometry initialKn="50000" initialKs="5000" heta="1" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
 						</interactionGeometry>
 					</permanentInteractions[1]>
 				</permanentInteractions[1]>
 				<permanentInteractions[2] className="Contact" >
 					<permanentInteractions[2] id1="51" id2="54">
 						<interactionGeometry className="SDECPermanentLink" >
-							<interactionGeometry initialKn="50000" initialKs="5000" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
+							<interactionGeometry initialKn="50000" initialKs="5000" heta="1" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
 						</interactionGeometry>
 					</permanentInteractions[2]>
 				</permanentInteractions[2]>
 				<permanentInteractions[3] className="Contact" >
 					<permanentInteractions[3] id1="53" id2="54">
 						<interactionGeometry className="SDECPermanentLink" >
-							<interactionGeometry initialKn="50000" initialKs="5000" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
+							<interactionGeometry initialKn="50000" initialKs="5000" heta="1" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
 						</interactionGeometry>
 					</permanentInteractions[3]>
 				</permanentInteractions[3]>
 				<permanentInteractions[4] className="Contact" >
 					<permanentInteractions[4] id1="54" id2="52">
 						<interactionGeometry className="SDECPermanentLink" >
-							<interactionGeometry initialKn="50000" initialKs="5000" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
+							<interactionGeometry initialKn="50000" initialKs="5000" heta="1" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
 						</interactionGeometry>
 					</permanentInteractions[4]>
 				</permanentInteractions[4]>
 				<permanentInteractions[5] className="Contact" >
 					<permanentInteractions[5] id1="53" id2="52">
 						<interactionGeometry className="SDECPermanentLink" >
-							<interactionGeometry initialKn="50000" initialKs="5000" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
+							<interactionGeometry initialKn="50000" initialKs="5000" heta="1" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
 						</interactionGeometry>
 					</permanentInteractions[5]>
 				</permanentInteractions[5]>
@@ -82,42 +82,42 @@
 				<permanentInteractions[6] className="Contact" >
 					<permanentInteractions[6] id1="55" id2="56">
 						<interactionGeometry className="SDECPermanentLink" >
-							<interactionGeometry initialKn="50000" initialKs="5000" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
+							<interactionGeometry initialKn="50000" initialKs="5000" heta="1" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
 						</interactionGeometry>
 					</permanentInteractions[6]>
 				</permanentInteractions[6]>
 				<permanentInteractions[7] className="Contact" >
 					<permanentInteractions[7] id1="55" id2="57">
 						<interactionGeometry className="SDECPermanentLink" >
-							<interactionGeometry initialKn="50000" initialKs="5000" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
+							<interactionGeometry initialKn="50000" initialKs="5000" heta="1" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
 						</interactionGeometry>
 					</permanentInteractions[7]>
 				</permanentInteractions[7]>
 				<permanentInteractions[8] className="Contact" >
 					<permanentInteractions[8] id1="55" id2="58">
 						<interactionGeometry className="SDECPermanentLink" >
-							<interactionGeometry initialKn="50000" initialKs="5000" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
+							<interactionGeometry initialKn="50000" initialKs="5000" heta="1" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
 						</interactionGeometry>
 					</permanentInteractions[8]>
 				</permanentInteractions[8]>
 				<permanentInteractions[9] className="Contact" >
 					<permanentInteractions[9] id1="57" id2="58">
 						<interactionGeometry className="SDECPermanentLink" >
-							<interactionGeometry initialKn="50000" initialKs="5000" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
+							<interactionGeometry initialKn="50000" initialKs="5000" heta="1" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
 						</interactionGeometry>
 					</permanentInteractions[9]>
 				</permanentInteractions[9]>
 				<permanentInteractions[10] className="Contact" >
 					<permanentInteractions[10] id1="58" id2="56">
 						<interactionGeometry className="SDECPermanentLink" >
-							<interactionGeometry initialKn="50000" initialKs="5000" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
+							<interactionGeometry initialKn="50000" initialKs="5000" heta="1" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
 						</interactionGeometry>
 					</permanentInteractions[10]>
 				</permanentInteractions[10]>
 				<permanentInteractions[11] className="Contact" >
 					<permanentInteractions[11] id1="57" id2="56">
 						<interactionGeometry className="SDECPermanentLink" >
-							<interactionGeometry initialKn="50000" initialKs="5000" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
+							<interactionGeometry initialKn="50000" initialKs="5000" heta="1" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
 						</interactionGeometry>
 					</permanentInteractions[11]>
 				</permanentInteractions[11]>
@@ -131,42 +131,42 @@
 				<permanentInteractions[12] className="Contact" >
 					<permanentInteractions[12] id1="9" id2="10">
 						<interactionGeometry className="SDECPermanentLink" >
-							<interactionGeometry initialKn="50000" initialKs="5000" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
+							<interactionGeometry initialKn="50000" initialKs="5000" heta="1" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
 						</interactionGeometry>
 					</permanentInteractions[12]>
 				</permanentInteractions[12]>
 				<permanentInteractions[13] className="Contact" >
 					<permanentInteractions[13] id1="9" id2="11">
 						<interactionGeometry className="SDECPermanentLink" >
-							<interactionGeometry initialKn="50000" initialKs="5000" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
+							<interactionGeometry initialKn="50000" initialKs="5000" heta="1" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
 						</interactionGeometry>
 					</permanentInteractions[13]>
 				</permanentInteractions[13]>
 				<permanentInteractions[14] className="Contact" >
 					<permanentInteractions[14] id1="9" id2="12">
 						<interactionGeometry className="SDECPermanentLink" >
-							<interactionGeometry initialKn="50000" initialKs="5000" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
+							<interactionGeometry initialKn="50000" initialKs="5000" heta="1" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
 						</interactionGeometry>
 					</permanentInteractions[14]>
 				</permanentInteractions[14]>
 				<permanentInteractions[15] className="Contact" >
 					<permanentInteractions[15] id1="11" id2="12">
 						<interactionGeometry className="SDECPermanentLink" >
-							<interactionGeometry initialKn="50000" initialKs="5000" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
+							<interactionGeometry initialKn="50000" initialKs="5000" heta="1" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
 						</interactionGeometry>
 					</permanentInteractions[15]>
 				</permanentInteractions[15]>
 				<permanentInteractions[16] className="Contact" >
 					<permanentInteractions[16] id1="12" id2="10">
 						<interactionGeometry className="SDECPermanentLink" >
-							<interactionGeometry initialKn="50000" initialKs="5000" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
+							<interactionGeometry initialKn="50000" initialKs="5000" heta="1" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
 						</interactionGeometry>
 					</permanentInteractions[16]>
 				</permanentInteractions[16]>
 				<permanentInteractions[17] className="Contact" >
 					<permanentInteractions[17] id1="11" id2="10">
 						<interactionGeometry className="SDECPermanentLink" >
-							<interactionGeometry initialKn="50000" initialKs="5000" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
+							<interactionGeometry initialKn="50000" initialKs="5000" heta="1" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
 						</interactionGeometry>
 					</permanentInteractions[17]>
 				</permanentInteractions[17]>
@@ -180,42 +180,42 @@
 				<permanentInteractions[18] className="Contact" >
 					<permanentInteractions[18] id1="13" id2="14">
 						<interactionGeometry className="SDECPermanentLink" >
-							<interactionGeometry initialKn="50000" initialKs="5000" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
+							<interactionGeometry initialKn="50000" initialKs="5000" heta="1" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
 						</interactionGeometry>
 					</permanentInteractions[18]>
 				</permanentInteractions[18]>
 				<permanentInteractions[19] className="Contact" >
 					<permanentInteractions[19] id1="13" id2="15">
 						<interactionGeometry className="SDECPermanentLink" >
-							<interactionGeometry initialKn="50000" initialKs="5000" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
+							<interactionGeometry initialKn="50000" initialKs="5000" heta="1" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
 						</interactionGeometry>
 					</permanentInteractions[19]>
 				</permanentInteractions[19]>
 				<permanentInteractions[20] className="Contact" >
 					<permanentInteractions[20] id1="13" id2="16">
 						<interactionGeometry className="SDECPermanentLink" >
-							<interactionGeometry initialKn="50000" initialKs="5000" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
+							<interactionGeometry initialKn="50000" initialKs="5000" heta="1" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
 						</interactionGeometry>
 					</permanentInteractions[20]>
 				</permanentInteractions[20]>
 				<permanentInteractions[21] className="Contact" >
 					<permanentInteractions[21] id1="15" id2="16">
 						<interactionGeometry className="SDECPermanentLink" >
-							<interactionGeometry initialKn="50000" initialKs="5000" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
+							<interactionGeometry initialKn="50000" initialKs="5000" heta="1" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
 						</interactionGeometry>
 					</permanentInteractions[21]>
 				</permanentInteractions[21]>
 				<permanentInteractions[22] className="Contact" >
 					<permanentInteractions[22] id1="16" id2="14">
 						<interactionGeometry className="SDECPermanentLink" >
-							<interactionGeometry initialKn="50000" initialKs="5000" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
+							<interactionGeometry initialKn="50000" initialKs="5000" heta="1" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
 						</interactionGeometry>
 					</permanentInteractions[22]>
 				</permanentInteractions[22]>
 				<permanentInteractions[23] className="Contact" >
 					<permanentInteractions[23] id1="15" id2="14">
 						<interactionGeometry className="SDECPermanentLink" >
-							<interactionGeometry initialKn="50000" initialKs="5000" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
+							<interactionGeometry initialKn="50000" initialKs="5000" heta="1" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
 						</interactionGeometry>
 					</permanentInteractions[23]>
 				</permanentInteractions[23]>
@@ -229,42 +229,42 @@
 				<permanentInteractions[24] className="Contact" >
 					<permanentInteractions[24] id1="17" id2="18">
 						<interactionGeometry className="SDECPermanentLink" >
-							<interactionGeometry initialKn="50000" initialKs="5000" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
+							<interactionGeometry initialKn="50000" initialKs="5000" heta="1" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
 						</interactionGeometry>
 					</permanentInteractions[24]>
 				</permanentInteractions[24]>
 				<permanentInteractions[25] className="Contact" >
 					<permanentInteractions[25] id1="17" id2="19">
 						<interactionGeometry className="SDECPermanentLink" >
-							<interactionGeometry initialKn="50000" initialKs="5000" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
+							<interactionGeometry initialKn="50000" initialKs="5000" heta="1" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
 						</interactionGeometry>
 					</permanentInteractions[25]>
 				</permanentInteractions[25]>
 				<permanentInteractions[26] className="Contact" >
 					<permanentInteractions[26] id1="17" id2="20">
 						<interactionGeometry className="SDECPermanentLink" >
-							<interactionGeometry initialKn="50000" initialKs="5000" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
+							<interactionGeometry initialKn="50000" initialKs="5000" heta="1" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
 						</interactionGeometry>
 					</permanentInteractions[26]>
 				</permanentInteractions[26]>
 				<permanentInteractions[27] className="Contact" >
 					<permanentInteractions[27] id1="19" id2="20">
 						<interactionGeometry className="SDECPermanentLink" >
-							<interactionGeometry initialKn="50000" initialKs="5000" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
+							<interactionGeometry initialKn="50000" initialKs="5000" heta="1" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
 						</interactionGeometry>
 					</permanentInteractions[27]>
 				</permanentInteractions[27]>
 				<permanentInteractions[28] className="Contact" >
 					<permanentInteractions[28] id1="20" id2="18">
 						<interactionGeometry className="SDECPermanentLink" >
-							<interactionGeometry initialKn="50000" initialKs="5000" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
+							<interactionGeometry initialKn="50000" initialKs="5000" heta="1" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
 						</interactionGeometry>
 					</permanentInteractions[28]>
 				</permanentInteractions[28]>
 				<permanentInteractions[29] className="Contact" >
 					<permanentInteractions[29] id1="19" id2="18">
 						<interactionGeometry className="SDECPermanentLink" >
-							<interactionGeometry initialKn="50000" initialKs="5000" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
+							<interactionGeometry initialKn="50000" initialKs="5000" heta="1" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
 						</interactionGeometry>
 					</permanentInteractions[29]>
 				</permanentInteractions[29]>

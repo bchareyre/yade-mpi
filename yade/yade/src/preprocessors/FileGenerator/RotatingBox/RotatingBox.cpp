@@ -37,21 +37,22 @@ void RotatingBox::registerAttributes()
 void RotatingBox::exec()
 {
 	shared_ptr<NonConnexBody> rootBody(new NonConnexBody);
-	int nbSpheres = 10;
+	int nbSpheres = 5;
 	int nbBox = 0;
 	Quaternion q;
 	q.fromAngleAxis(0, Vector3(0,0,1));
 
 
-	
+
 	shared_ptr<NarrowCollider> nc	= shared_ptr<NarrowCollider>(new SimpleNarrowCollider);
 	nc->addCollisionFunctor("Sphere","Sphere","Sphere2Sphere4SDECContactModel");
 	nc->addCollisionFunctor("Sphere","Box","Box2Sphere4SDECContactModel");
-	
+
 
 	shared_ptr<Rotor> kinematic = shared_ptr<Rotor>(new Rotor);
 	kinematic->angularVelocity  = 0.0785375;
-	
+	kinematic->rotationAxis  = Vector3(1,0,0);
+
 	for(int i=0;i<7;i++)
 		kinematic->subscribedBodies.push_back(i);
 
@@ -60,7 +61,7 @@ void RotatingBox::exec()
 	rootBody->actors[1] 		= nc;
 	rootBody->actors[2] 		= shared_ptr<Actor>(new SDECDynamicEngine);
 	rootBody->actors[3] 		= kinematic;
-	
+
 	rootBody->isDynamic		= false;
 	rootBody->velocity		= Vector3(0,0,0);
 	rootBody->angularVelocity	= Vector3(0,0,0);
@@ -247,9 +248,9 @@ void RotatingBox::exec()
 		float radius 		= (Rand::intervalRandom(3,4));
 
 		shared_ptr<BallisticDynamicEngine> ballistic(new BallisticDynamicEngine);
-		ballistic->damping 	= 1.0;//0.95;		
+		ballistic->damping 	= 1.0;//0.95;
 		s->actors.push_back(ballistic);
-		
+
 		//s->dynamic		= dynamic_pointer_cast<DynamicEngine>(ballistic);
 		s->isDynamic		= true;
 		s->angularVelocity	= Vector3(0,0,0);
@@ -285,7 +286,7 @@ void RotatingBox::exec()
 				box=shared_ptr<Box>(new Box);
 
 				shared_ptr<BallisticDynamicEngine> ballistic(new BallisticDynamicEngine);
-				ballistic->damping 	= 1.0;//0.95;		
+				ballistic->damping 	= 1.0;//0.95;
 				boxi->actors.push_back(ballistic);
 
 				Vector3 size = Vector3((4+Rand::symmetricRandom()),(4+Rand::symmetricRandom()),(4+Rand::symmetricRandom()));
