@@ -1,6 +1,8 @@
 /***************************************************************************
  *   Copyright (C) 2004 by Olivier Galizzi                                 *
  *   olivier.galizzi@imag.fr                                               *
+ *   Copyright (C) 2004 by Janek Kozicki                                   *
+ *   cosurgi@berlios.de                                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -83,8 +85,8 @@ class Factorable;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /*! \brief The class factory of Yade used for serialization purpose and also as a dynamic library loader.
-	All classes that calls the REGISTER_CLASS in thei header macro are registered inside the factory so it is possible to ask the factory to create an instance of the class. This is automatic because the macro should be outside the class definition, so it is called automatically when the class is loaded by the program or when a dynamic library is loaded. This ClassFactory also acts as a dynamic library loader : when you ask for an instance, either the class already exists inside the factory and an new instance is created, either the class doesn't exist inside the factory and the ClassFactory will look on the hard drive to know if your class exists inside a dynamic library. If so the library is loaded and a new instance of the class can be created.
-	\note ClassFactory is a singleton so you can't create an instance of it because its constructor is private. You should instead use ClassFactory::instance().create("Rigidbody") for example
+	All classes that call the macro REGISTER_CLASS in their header are registered inside the factory so it is possible to ask the factory to create an instance of that class. This is automatic because the macro should be outside the class definition, so it is called automatically when the class is loaded by the program or when a dynamic library is loaded. This ClassFactory also acts as a dynamic library loader : when you ask for an instance, either the class already exists inside the factory and a new instance is created, either the class doesn't exist inside the factory and the ClassFactory will look on the hard drive to know if your class exists inside a dynamic library. If so the library is loaded and a new instance of the class can be created.
+	\note ClassFactory is a singleton so you can't create an instance of it because its constructor is private. You should instead use ClassFactory::instance().createShared("Rigidbody") for example
 */
 class ClassFactory : public Singleton< ClassFactory >
 {
@@ -101,7 +103,7 @@ class ClassFactory : public Singleton< ClassFactory >
 	private   : typedef void* ( *CreatePureCustomFnPtr )();
 	/*! Pointer on a function that return the type_info of the registered class */
 	private   : typedef const type_info& ( *VerifyFactorableFnPtr )();
-	
+
 	/*! Description of a class that is stored inside the factory.*/
 	private   : class ClassDescriptor
 		    {
@@ -121,7 +123,7 @@ class ClassFactory : public Singleton< ClassFactory >
 			public    : RecordType type;
 			/*! fundamental is true the class type is a fundamtental type (e.g. Vector3, Quaternion) */
 			public    : bool fundamental;
-			
+
 			///////////////////////////////////////////////////////////////////////////
 			/// Constructor/Destructor						///
 			///////////////////////////////////////////////////////////////////////////
@@ -140,7 +142,7 @@ class ClassFactory : public Singleton< ClassFactory >
 					type   		 = t;
 					fundamental 	 = f;
 				    };
-			
+
 		    };
 
  	/*! Type of a Stl map used to map the registered class name with their ClassDescription */
@@ -150,34 +152,34 @@ class ClassFactory : public Singleton< ClassFactory >
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Attributes											///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-		
+
 	/*! The internal dynamic library manager used to load dynamic libraries when an instance of a non loaded class is ask */
-	private   : DynLibManager dlm;	
+	private   : DynLibManager dlm;
 	/*! Map that contains the name of the registered class and their description */
-	private   : ClassDescriptorMap map;	
-		
-	
+	private   : ClassDescriptorMap map;
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Constructor/Destructor									///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-	/*! Constructor 
+	/*! Constructor
 		\note  the constructor is private because ClassFactory is a Singleton
-	*/	
+	*/
 	private   : ClassFactory() {};
-	/*! Copy Constructor 
+	/*! Copy Constructor
 		\note  needed by the singleton class
-	*/	
+	*/
 	private   : ClassFactory(const ClassFactory&);
-	/*! Destructor 
+	/*! Destructor
 		\note  the destructor is private because ClassFactory is a Singleton
 	*/
 	private   : ~ClassFactory() {};
-	
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Methods											///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-	
+
 	/*! Assignement operator needed by the Singleton class */
 	private   : ClassFactory& operator=(const ClassFactory&);
 
@@ -193,32 +195,32 @@ class ClassFactory : public Singleton< ClassFactory >
 	public    : bool registerFactorable( 	std::string name			  , CreateFactorableFnPtr create,
 						CreateSharedFactorableFnPtr createShared, CreatePureCustomFnPtr createPureCustom,
 						VerifyFactorableFnPtr verify		  , RecordType type, bool f );
-	
+
 	/*! Create a shared pointer on a serializable class of the given name */
 	public 	  : boost::shared_ptr<Factorable> createShared( std::string name );
-	
+
 	/*! Create a C pointer on a serializable class of the given name */
 	public 	  : Factorable* createPure( std::string name );
-	
+
 	/*! Create a void C pointer on a class of the given name */
-	public 	  : void * createPureCustom( std::string name );		
+	public 	  : void * createPureCustom( std::string name );
 
 	/*! Mainly used by the method findType for serialization purpose. Tells if a given type is a custom class
 		\param tp type info of the type to test
-		\param serializableClassName name of the serializable version of the class corresponding to "tp" 
+		\param serializableClassName name of the serializable version of the class corresponding to "tp"
 		\param fundamental is true if the given type is fundamental (Vector3,Quaternion ...)
 	*/
 	public 	  : bool isCustomClass(const type_info& tp,string& serializableClassName,bool& fundamental);
-	
+
 	/*! Mainly used by the method findType for serialization purpose. Tells if a given type is a serilializable class
 		\param tp type info of the type to test
 		\param fundamental is true if the given type is fundamental (Vector3,Quaternion ...)
 	*/
 	public 	  : bool isFactorable(const type_info& tp,bool& fundamental);
-	
+
 	public    : bool findClassInfo(const type_info& tp,RecordType& type, string& serializableClassName,bool& fundamental);
 
-	
+
 	friend class Singleton< ClassFactory >;
 };
 

@@ -63,6 +63,7 @@ namespace ArchiveTypes
 	/*! Define a pointer to a function that will serialize into a stream "stream" the content of an archive
 	"ac". Depth is used for recursive file format like XML */
 	typedef void (*SerializeFnPtr)   (ostream& stream, Archive& ac , int depth);
+
 	// FIXME : be careful const string& is only for text file => but it is maybe possible to use it for binary file
 	/*! Define a pointer to a function that will deserialize from a stream "stream" the content of an archive
 	"ac". The parameter "str" is used for fundamental archive only which are type that can be stored into a single string.*/
@@ -70,14 +71,19 @@ namespace ArchiveTypes
 
 	/*! Define a pointer to a function used for serializing fundamentals */
 	typedef void (*SerializeFundamentalFnPtr)	(Archive& ac, any& a);
+
 	/*! Define a pointer to a function used for deserializing fundamentals */
 	typedef void (*DeserializeFundamentalFnPtr)	(Archive& ac, any& a);
+
 	/*! Define a pointer to a function used for serializing container */
 	typedef int  (*NextArchiveFnPtr)  		(Archive& ac, shared_ptr<Archive>& nextAc, bool first);
+
 	/*! Define a pointer to a function used for deserializing container */
 	typedef void (*ResizeFnPtr)			(Archive& ac, int size);
+
 	/*! Define a pointer to a function used for serializing pointer */
 	typedef bool (*PointedArchiveFnPtr)		(Archive& ac, shared_ptr<Archive>& newAc);
+
 	/*! Define a pointer to a function used for deserializing pointer */
 	typedef void (*PointedNewArchiveFnPtr)	(Archive& ac, shared_ptr<Archive>& newAc , string typeStr);
 
