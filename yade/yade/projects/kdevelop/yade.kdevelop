@@ -106,7 +106,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>toolboxes/Libraries/MultiMethods</activedir>
+      <activedir>plugins/Engine/DynamicEngine/ParticleBallisticEngine</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>
