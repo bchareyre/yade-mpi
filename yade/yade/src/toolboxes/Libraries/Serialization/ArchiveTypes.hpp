@@ -44,21 +44,20 @@ class Archive;
 
 namespace ArchiveTypes
 {
-	//FIXME : change SMART_POINTER to POINTER and STL_CONTAINER to CONTAINER
 	/*! \var
 	<ul>
 		<li>FUNDAMENTAL		- class that is (de-)serialized into a single string with separator : int,float, vector<fundamental>, quaternion, octonion, vector3</li>
 		<li>CUSTOM_CLASS	- class not derived from Serializable, including POD</li>
 		<li>SERIALIZABLE	- class derived from Serializable </li>
-		<li>SMART_POINTER	- shared_ptr, weak_ptr, auto_ptr </li>
-		<li>STL_CONTAINER	- vector, list, queue, map, pair </li>
+		<li>POINTER	- shared_ptr, weak_ptr, auto_ptr </li>
+		<li>CONTAINER	- vector, list, queue, map, pair </li>
 	</ul>
 	*/
 	typedef enum 	{	FUNDAMENTAL,
 				CUSTOM_CLASS,
 				SERIALIZABLE,
-				SMART_POINTER,
-				STL_CONTAINER,
+				POINTER,
+				CONTAINER,
 			} RecordType;
 
 	/*! Define a pointer to a function that will serialize into a stream "stream" the content of an archive

@@ -24,7 +24,7 @@ IOManager::IOManager()
 {
 	Archive::addSerializablePointer(CUSTOM_CLASS, false, serializeCustomClass, deserializeCustomClass);
 	Archive::addSerializablePointer(FUNDAMENTAL, true,serializeFundamental, deserializeFundamental);	
-	Archive::addSerializablePointer(SMART_POINTER, true, serializeSmartPointerOfFundamental, deserializeSmartPointerOfFundamental);
+	Archive::addSerializablePointer(POINTER, true, serializeSmartPointerOfFundamental, deserializeSmartPointerOfFundamental);
 }
 
 IOManager::~IOManager()

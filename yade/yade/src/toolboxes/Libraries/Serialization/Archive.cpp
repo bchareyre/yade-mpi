@@ -74,7 +74,7 @@ bool Archive::containsOnlyFundamentals()
 			s->unregisterAttributes();
 			return result;
 		}
-		else if (recordType==SMART_POINTER)
+		else if (recordType==POINTER)
 		{
 			shared_ptr<Archive> tmpAc;
 			return !createPointedArchive(*this,tmpAc);

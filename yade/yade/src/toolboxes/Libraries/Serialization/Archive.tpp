@@ -123,12 +123,12 @@ inline shared_ptr<Archive> Archive::create(const string& name,Type& attribute)
 			ac->setAddress(&attribute);
 			ac->setSerializableClassName(SerializableClassName);
 		break;
-		case STL_CONTAINER :
+		case CONTAINER :
 			ac->createNextArchive = ContainerHandler< Type >::accessNext;
 			ac->resize = ContainerHandler< Type >::resize;
 			ac->setAddress(&attribute);
 		break;
-		case SMART_POINTER :
+		case POINTER :
 			ac->createPointedArchive = PointerHandler< Type >::accessor;
 			ac->createNewPointedArchive = PointerHandler< Type >::creator;
 			ac->setAddress(&attribute);

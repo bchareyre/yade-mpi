@@ -120,7 +120,7 @@ RecordType findType( shared_ptr<PointedType>& ,bool& fundamental, string& str)
 		findType(tmpPt,str) == CUSTOM_FUNDAMENTAL )
 		return SMART_POINTER_OF_FUNDAMENTAL;
 	else
-		return SMART_POINTER;*/
+		return POINTER;*/
 
 
 	PointedType tmpV;
@@ -128,9 +128,9 @@ RecordType findType( shared_ptr<PointedType>& ,bool& fundamental, string& str)
 	
 	RecordType t = findType(tmpV,tmpFundamental,str);
 
-	fundamental = ( boost::is_fundamental<PointedType>::value || ((t==SMART_POINTER || t==CUSTOM_CLASS || t==STL_CONTAINER) && tmpFundamental) );
+	fundamental = ( boost::is_fundamental<PointedType>::value || ((t==POINTER || t==CUSTOM_CLASS || t==CONTAINER) && tmpFundamental) );
 	
-	return SMART_POINTER;
+	return POINTER;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

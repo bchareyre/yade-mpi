@@ -29,10 +29,10 @@ XmlSaxParser XMLManager::saxParser;
 XMLManager::XMLManager() : IOManager()
 {
 	Archive::addSerializablePointer(SERIALIZABLE, false, serializeSerializable, deserializeSerializable);	
-	Archive::addSerializablePointer(SMART_POINTER, false, serializeSmartPointer, deserializeSmartPointer);	
-	Archive::addSerializablePointer(STL_CONTAINER, false, serializeContainer, deserializeContainer);
+	Archive::addSerializablePointer(POINTER, false, serializeSmartPointer, deserializeSmartPointer);	
+	Archive::addSerializablePointer(CONTAINER, false, serializeContainer, deserializeContainer);
 
-	Archive::addSerializablePointer(STL_CONTAINER, true, serializeContainerOfFundamental, deserializeContainerOfFundamental);
+	Archive::addSerializablePointer(CONTAINER, true, serializeContainerOfFundamental, deserializeContainerOfFundamental);
 	Archive::addSerializablePointer(CUSTOM_CLASS, true, serializeCustomFundamental, deserializeCustomFundamental);
 	Archive::addSerializablePointer(SERIALIZABLE, true, serializeFundamentalSerializable, deserializeFundamentalSerializable);
 }
@@ -486,7 +486,7 @@ void XMLManager::deserializeContainerOfFundamental(istream& stream, Archive& ac,
 	for( ; ti!=tiEnd ; ++ti)
 	{
 		shared_ptr<Archive> tmpAc2;
-		if (tmpAc->getRecordType()==SMART_POINTER)
+		if (tmpAc->getRecordType()==POINTER)
 			tmpAc->createNewPointedArchive(*tmpAc,tmpAc2,"");
 		else
 			tmpAc2 = tmpAc;
@@ -508,7 +508,7 @@ void XMLManager::serializeContainerOfFundamental(ostream& stream, Archive& ac, i
 		do
 		{
 			shared_ptr<Archive> tmpAc2;
-			if (tmpAc->getRecordType()==SMART_POINTER)
+			if (tmpAc->getRecordType()==POINTER)
 				tmpAc->createPointedArchive(*tmpAc,tmpAc2);
 			else
 				tmpAc2 = tmpAc;

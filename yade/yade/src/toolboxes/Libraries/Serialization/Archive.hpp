@@ -74,7 +74,7 @@ class Archive
 		\param nextAc archive of the next element in the container
 		\param first is true if you call this function for the first time when serializing a cointainer
 		\return the number of element of the container
-		\warning used only if recordType=STL_CONTAINER and while serializing
+		\warning used only if recordType=CONTAINER and while serializing
 		\see ContainerHandler.hpp
 	*/	
 	public    : NextArchiveFnPtr createNextArchive;
@@ -82,7 +82,7 @@ class Archive
 	/*! Pointer to a function that resize the container stored into ac
 		\param ac the archive that contains the container to resize
 		\par
-		\warning used only if recordType=STL_CONTAINER and while deserializing
+		\warning used only if recordType=CONTAINER and while deserializing
 		\see ContainerHandler.hpp
 	*/	
 	public    : ResizeFnPtr resize;
@@ -90,7 +90,7 @@ class Archive
 	/*! Pointer to a function that return an archive that represents the pointed element
 		\param ac the archive that contains the pointer 
 		\param newAc the archive representing the pointed element
-		\warning used only if recordType=SMART_POINTER and while serializing
+		\warning used only if recordType=POINTER and while serializing
 		\see PointerHandler.hpp
 	*/	
 	public    : PointedArchiveFnPtr createPointedArchive;
@@ -98,7 +98,7 @@ class Archive
 	/*! Pointer to a function that create an archive that represents the pointed element
 		\param ac the archive that contains the pointer 
 		\param newAc the archive representing the pointed element
-		\warning used only if recordType=SMART_POINTER and while deserializing
+		\warning used only if recordType=POINTER and while deserializing
 		\see PointerHandler.hpp
 	*/		
 	public    : PointedNewArchiveFnPtr createNewPointedArchive;
