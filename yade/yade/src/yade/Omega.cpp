@@ -2,7 +2,7 @@
 
 Omega::Omega ()
 {
-cerr << "omega constructor" << endl;		
+	cerr << "Constructing Omega  (if multiple times - check '-rdynamic' flag!)" << endl;
 }
 
 
@@ -12,7 +12,7 @@ Omega::~Omega ()
 	*logFile << "\t" << "<Summary Duration=\"" << startingSimulationTime-second_clock::local_time() << "\">" <<endl;
 	*logFile << "</Simulation>" << endl << endl;
 	logFile->close();
-} 
+}
 
 
 void Omega::logError(const string& str)
@@ -29,7 +29,7 @@ void Omega::init()
 {
 	gravity = Vector3(0,-9.81,0);
 	dt = 0.04;
-	
+
 	logFile = shared_ptr<ofstream>(new ofstream("../data/log.xml", ofstream::out | ofstream::app));
 
 	startingSimulationTime = second_clock::local_time();

@@ -54,7 +54,11 @@ QtGUIGenerator::~QtGUIGenerator()
 
 void QtGUIGenerator::buildGUI(shared_ptr<Serializable> s, QWidget * /* parent ( unused )*/, QFrame* frame)
 {
+
+	// FIXME : following line means that Serialization MUST be cleaned-up, finished, etc. Because with this, Serialization is simply a junk of rubbish and mess!!
 	XMLManager xmlManager;
+
+
 	s->registerAttributes();
 
 	frame->setCaption(s->getClassName().c_str());
