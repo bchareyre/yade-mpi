@@ -192,24 +192,34 @@ class Archive
 //@{
 	/*! Getter for the recordType attribute*/
 	public	  : inline FactorableTypes::Type getRecordType() {return recordType;};
+
 	/*! Setter for the recordType attribute*/
 	public	  : inline void setRecordType(FactorableTypes::Type a) {recordType=a;};
+
 	/*! Setter for the serializableClassName attribute*/
 	public    : void setSerializableClassName(const string& s) {serializableClassName=s;};
+
 	/*! Getter for the serializableClassName attribute*/
 	public    : string& getSerializableClassName() { return serializableClassName;};
+
 	/*! Getter for the address attribute */
 	public    : any& getAddress() { return address;};
+
 	/*! Setter for the address attribute */
 	public    : void setAddress(any a) { address=a;};
+
 	/*! Getter for the name attribute */
 	public    : string getName() {return name;};
+
 	/*! Setter for the fundamental attribute */
 	public    : void setFundamental(bool f) { fundamental = f;};
+
 	/*! Getter for the fundamental attribute */
 	public    : bool isFundamental() { return fundamental;};
+
 	/*! Setter for the processed attribute */
 	public    : void markProcessed() {processed = true;};
+
 	/*! Getter for the processed attribute */
 	public    : bool isProcessed() { return processed;};
 //@}

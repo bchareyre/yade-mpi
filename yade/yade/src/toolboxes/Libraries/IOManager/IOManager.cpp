@@ -39,6 +39,7 @@ IOManager::~IOManager()
 void IOManager::deserializeFundamental(istream& , Archive& ac,const string& str)
 {
 	any v = &str;
+//	cout << "deserializing : |" << str << "|" << endl;
 	ac.deserializeFundamental(ac,v);
 	ac.markProcessed();
 }

@@ -109,7 +109,7 @@ inline shared_ptr<Archive> Archive::create(const string& name,Type& attribute)
 	{
 		case FactorableTypes::SERIALIZABLE :
 		{
-			// reinterpret_cast is needed beacause this is a template function and so it is compile to catch int,float .... i.e. non class types
+			// reinterpret_cast is needed beacause this is a template function and when it is compiled it catches everything including int,float .... i.e. non class types
 			Serializable * s = reinterpret_cast<Serializable*>(&attribute);
 			ac->setAddress(s);
 		}

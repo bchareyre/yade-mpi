@@ -9,7 +9,8 @@ OBJECTS_DIR = $(YADECOMPILATIONPATH)
 CONFIG += debug \
           warn_on 
 TEMPLATE = subdirs 
-SUBDIRS += Serialization \
+SUBDIRS += AssocVector \
+	   Serialization \
 	   IOManager \
 	   Math \
 	   FrontEnd

@@ -139,15 +139,24 @@ void XMLManager::parseFundamental(const string& top, vector<string>& eval)
 	rule<> inside 		= +( graph_p - '[' - ']' - '{' - '}' ); // asdf23
 	rule<> empty_array 	= *space_p >> '[' >> *space_p >> ']' >> *space_p; // [ ]
 	rule<> empty_fund 	= *space_p >> '{' >> *space_p >> '}' >> *space_p; // { }
-	rule<> one_fundamental = *space_p >>
-				  ( '{' >> (*space_p) % (inside) >> '}' )
-				| ( '{' >>
-					( (*space_p) % (inside) )
-					%
-					( '{' >> (*space_p) % (inside) >> '}' )
-				  >> '}' )
-			>> *space_p; // { 123 243 { sdf sd} qwe as }
-	rule<> one_array = *space_p >> '[' >> (*space_p) % (inside) >> ']' >> *space_p; // [ 123 324 243 qwe as ]
+	rule<> one_fundamental	= *space_p >>
+				  		  ( '{' >> (*space_p) % (inside) >> '}' )
+						| ( '{' >>
+							( (*space_p) % (inside) )
+							%
+							( '{' >> (*space_p) % (inside) >> '}' )
+				  		  >> '}' )
+				  >> *space_p; // { 123 243 { sdf sd} qwe as }
+
+	rule<> one_array	= *space_p >>
+				  		  ( '[' >> (*space_p) % (inside) >> ']' )
+						| ( '[' >>
+							( (*space_p) % (inside) )
+							%
+							( '[' >> (*space_p) % (inside) >> ']' )
+				  		>> ']' )
+				  >> *space_p; // [ 123 324 243 qwe as ]
+//	rule<> one_array = *space_p >> '[' >> (*space_p) % (inside) >> ']' >> *space_p; // [ 123 324 243 qwe as ]
 
 	rule<> one_everything = *space_p
 			>>	(*space_p) % (
@@ -174,7 +183,7 @@ void XMLManager::parseFundamental(const string& top, vector<string>& eval)
 void XMLManager::deserializeContainer(istream& stream, Archive& ac, const string& str)
 {
 	map<string,string> basicAttributes = saxParser.getBasicAttributes();
-	int size = lexical_cast<int>(basicAttributes["size"]);
+	unsigned int size = lexical_cast<unsigned int>(basicAttributes["size"]);
 	if (size>0)
 	{
 		ac.resize(ac,size);
@@ -257,7 +266,7 @@ void XMLManager::deserializeSerializable(istream& stream, Archive& ac, const str
 			}
 			else
 			{
-				string error=IOManagerExceptions::AttributeNotFound + " " + saxParser.getTagName() + " line: " + lexical_cast<string>(saxParser.getLineNumber());
+				string error=string(IOManagerExceptions::AttributeNotFound) + " " + saxParser.getTagName() + " line: " + lexical_cast<string>(saxParser.getLineNumber());
 				throw SerializableError(error.c_str());
 			}
 			saxParser.readAndParseNextXmlLine(stream);

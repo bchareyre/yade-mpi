@@ -24,6 +24,7 @@
 
 class Factorable;
 
+// FIXME : this is used by Archive.tpp:findType, something is dirty here....
 bool ClassFactory::findClassInfo(const type_info& tp,FactorableTypes::Type& type, string& serializableClassName,bool& fundamental)
 {
 	ClassDescriptorMap::iterator mi = map.begin();

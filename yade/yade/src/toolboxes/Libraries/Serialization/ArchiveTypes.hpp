@@ -60,10 +60,10 @@ namespace ArchiveTypes
 	typedef void (*DeserializeFundamentalFnPtr)	(Archive& ac, any& a);
 
 	/*! Define a pointer to a function used for serializing container */
-	typedef int  (*NextArchiveFnPtr)  		(Archive& ac, shared_ptr<Archive>& nextAc, bool first);
+	typedef int  (*NextArchiveFnPtr)  		(Archive& ac, shared_ptr<Archive>& nextAc, bool first );
 
 	/*! Define a pointer to a function used for deserializing container */
-	typedef void (*ResizeFnPtr)			(Archive& ac, int size);
+	typedef void (*ResizeFnPtr)			(Archive& ac, unsigned long int size);
 
 	/*! Define a pointer to a function used for serializing pointer */
 	typedef bool (*PointedArchiveFnPtr)		(Archive& ac, shared_ptr<Archive>& newAc);
