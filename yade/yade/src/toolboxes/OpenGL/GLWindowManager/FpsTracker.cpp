@@ -1,14 +1,18 @@
 #include "FpsTracker.hpp"
-#include <GL/glut.h>
 #include "OpenGLWrapper.hpp"
 
-FpsTracker::FpsTracker (QGLViewer * glViewer,int minX,int minY, int sizeX,int sizeY) : QGLSubWindow(glViewer,minX,minY,sizeX,sizeY)
+#include <GL/glut.h>
+#include <boost/lexical_cast.hpp>
+
+using namespace boost;
+
+FpsTracker::FpsTracker (int minX,int minY, int sizeX,int sizeY) : GLWindow(minX,minY,sizeX,sizeY)
 {
 	chron.start();	
-	lastTime = 0;
-	maxFps = 0;
-	minFps = 1000000;
-	nbActions = 0;
+	lastTime	= 0;
+	maxFps		= 0;
+	minFps 		= 1000000;
+	nbActions	= 0;
 		
 	setCurveColor(1.0,0.0,0.0);
 	setMoyColor(0.0,0.0,1.0);	
@@ -16,6 +20,8 @@ FpsTracker::FpsTracker (QGLViewer * glViewer,int minX,int minY, int sizeX,int si
 	setMinTime(0.1);
 	setMaxStoredPoints(2000);
 	
+	setWinTranslucenty(0.6);
+		
 	fpss.resize(0);
 	fpssSize = 0;
 }
@@ -78,7 +84,7 @@ void FpsTracker::updateMoy(float lastX, float lastY, float X, float Y)
 
 void FpsTracker::drawCurve()
 {
-	QString number;
+	string number;
 	
 	glDisable(GL_DEPTH_TEST);
 		
@@ -124,10 +130,10 @@ void FpsTracker::drawCurve()
 	glEnd();
 	
 	
-	number.setNum(minFps,'g',2);
+	number = lexical_cast<string>(minFps);
 	drawString(number+" Hz",minX,(int)maxY+10,color);
 	drawString(number+" Hz",minX,(int)maxY+12,color);
-	number.setNum(maxFps,'g',2);
+	number = lexical_cast<string>(maxFps);	
 	drawString(number+" Hz",minX,minY-3,color);
 	
 	glColor3(curveColor[0],curveColor[1],curveColor[2]);
@@ -137,7 +143,7 @@ void FpsTracker::drawCurve()
 	glEnd();	
 	
 	float currentFps = (*(fpss.begin())).second;
-	number.setNum(currentFps,'g',2);
+	number = lexical_cast<string>(currentFps);
 	drawString(number+" Hz",(int)maxX+3,(int)(currentFps*scale1+corr1)+5,curveColor);
 	
 		
@@ -149,7 +155,7 @@ void FpsTracker::drawCurve()
 			glVertex2f(minX,moy*scale1+corr1);
 			glVertex2f(maxX,moy*scale1+corr1);
 		glEnd();	
-		number.setNum(moy,'g',2);
+		number = lexical_cast<string>(moy);
 		number += " Hz";
 		drawString(number,minX-number.length()*7+2,(int)(moy*scale1+corr1)+5,moyColor);
 	}
@@ -158,12 +164,12 @@ void FpsTracker::drawCurve()
 }
 
 
-void FpsTracker::drawString(QString str,int x,int y,float * c)
+void FpsTracker::drawString(string str,int x,int y,float * c)
 {
 	glPushMatrix();
 	glRasterPos2i(x,y);
 	glColor3fv(c);
 	for(unsigned int i=0;i<str.length();i++)
-		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, str.ascii()[i]);
+		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, str[i]);
 	glPopMatrix();
 }

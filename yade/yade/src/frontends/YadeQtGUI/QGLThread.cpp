@@ -23,6 +23,8 @@
 
 #include "QGLThread.hpp"
 #include "GLViewer.hpp"
+#include "FpsTracker.hpp"
+
 #include "ClassFactory.hpp"
 #include "OpenGLRenderingEngine.hpp"
 
@@ -88,6 +90,7 @@ void QGLThread::oneLoop()
 	{
 		glViewer->resizeGL(*newWidth,*newHeight);
 		*needResizing=false;	
+		glViewer->wm.resizeEvent(*newWidth,*newHeight);
 	}
 	
 	glViewer->preDraw();
@@ -95,8 +98,8 @@ void QGLThread::oneLoop()
 	if (Omega::instance().rootBody)
 		renderer->render(Omega::instance().rootBody);
 		
-	glViewer->fpsTracker->glDraw(); 
-	glViewer->fpsTracker->addOneAction();
+	glViewer->wm.glDraw(); 
+	dynamic_cast<FpsTracker*>(glViewer->wm.getWindow(0))->addOneAction();
 	
 	glViewer->postDraw();
 	

@@ -4,7 +4,7 @@
 #include "GL/glut.h"
 #include "Omega.hpp"
 #include "ThreadSynchronizer.hpp"
-
+#include "FpsTracker.hpp"
 
 GLViewer::GLViewer(const QGLFormat& format, QWidget * parent, QGLWidget * shareWidget) : QGLViewer(format,parent,"glview",shareWidget), qglThread(this)
 {
@@ -17,7 +17,8 @@ GLViewer::GLViewer(const QGLFormat& format, QWidget * parent, QGLWidget * shareW
 
 	show();
 
-	fpsTracker = shared_ptr<FpsTracker>(new FpsTracker(this));
+	wm.addWindow(new FpsTracker(),new GLWindowsManager::EventSubscription());
+	
 }
 
 GLViewer::~GLViewer()
@@ -50,32 +51,32 @@ void GLViewer::closeEvent(QCloseEvent *evt)
 
 void GLViewer::mouseMoveEvent(QMouseEvent * e)
 {
-	if (!fpsTracker->mouseMoveEvent(e))
+	if (wm.mouseMoveEvent(e->x(),e->y())==-1)
 		QGLViewer::mouseMoveEvent(e);
 }
 
 void GLViewer::mousePressEvent(QMouseEvent *e)
 {
-	if (!fpsTracker->mousePressEvent(e))
+	if (wm.mousePressEvent(e->x(),e->y())==-1)
 		QGLViewer::mousePressEvent(e);
 }
 
 void GLViewer::mouseReleaseEvent(QMouseEvent *e)
 {
-	if (!fpsTracker->mouseReleaseEvent(e))
+	if (wm.mouseReleaseEvent(e->x(),e->y())==-1)
 		QGLViewer::mouseReleaseEvent(e);
 }
 
 void GLViewer::mouseDoubleClickEvent(QMouseEvent *e)
 {
-	if (!fpsTracker->mouseDoubleClickEvent(e))
+	if (wm.mouseDoubleClickEvent(e->x(),e->y())==-1)
 		QGLViewer::mouseDoubleClickEvent(e);
 }
 
 void GLViewer::keyPressEvent(QKeyEvent *e)
 {
 	if (e->key()=='F' || e->key()=='f')
-		fpsTracker->swapDisplayed();
+		wm.getWindow(0)->swapDisplayed();
 	else
 		QGLViewer::keyPressEvent(e);
 }

@@ -4,17 +4,21 @@
 # Target is a library:  
 
 HEADERS += FpsTracker.hpp \
-           QGLSubWindow.hpp 
+           GLTextLabel.hpp \
+           GLWindow.hpp \
+           GLWindowsManager.hpp 
 SOURCES += FpsTracker.cpp \
-           QGLSubWindow.cpp 
-LIBS += -rdynamic 
-INCLUDEPATH = $(YADEINCLUDEPATH) 
-MOC_DIR = $(YADECOMPILATIONPATH) 
-UI_DIR = $(YADECOMPILATIONPATH) 
-OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = $(YADEDYNLIBPATH) 
-DESTDIR = $(YADEDYNLIBPATH) 
+           GLTextLabel.cpp \
+           GLWindow.cpp \
+           GLWindowsManager.cpp 
+LIBS += -rdynamic
+INCLUDEPATH = $(YADEINCLUDEPATH)
+MOC_DIR = $(YADECOMPILATIONPATH)
+UI_DIR = $(YADECOMPILATIONPATH)
+OBJECTS_DIR = $(YADECOMPILATIONPATH)
+QMAKE_LIBDIR = $(YADEDYNLIBPATH)
+DESTDIR = $(YADEDYNLIBPATH)
 CONFIG += debug \
-          warn_on \
-          dll 
-TEMPLATE = lib 
+warn_on \
+dll
+TEMPLATE = lib

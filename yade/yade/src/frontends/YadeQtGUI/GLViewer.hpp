@@ -32,7 +32,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "FpsTracker.hpp"
+#include "GLWindowsManager.hpp"
 #include "NonConnexBody.hpp"
 #include "QGLThread.hpp"
 
@@ -41,8 +41,8 @@
 
 class GLViewer : public QGLViewer
 {	
-	private : shared_ptr<FpsTracker> fpsTracker;
 	
+	private : GLWindowsManager wm;
 	// construction
 	public : GLViewer (const QGLFormat& format, QWidget * parent=0, QGLWidget * shareWidget=0);
 	public : ~GLViewer ();
