@@ -14,8 +14,12 @@ MultiMethodsManager::~MultiMethodsManager ()
 {
 }
 
+//bool MultiMethodsManager::addInteractionModel(const string& name)
+//{
+//
+//}
 
-bool MultiMethodsManager::add(const string& name)
+bool MultiMethodsManager::addCollisionGeometry(const string& name)
 {
 	shared_ptr<CollisionModel> cm  = dynamic_pointer_cast<CollisionModel>(ClassFactory::instance().createShared(name));
 	int& index = cm->getClassIndex();
@@ -79,6 +83,10 @@ bool MultiMethodsManager::add(const string& name)
 	else
 		return false;
 }
+
+//bool MultiMethodsManager::extendCallBacksTable()
+//{
+///}
 
 bool MultiMethodsManager::go(const shared_ptr<CollisionModel> cm1, const shared_ptr<CollisionModel> cm2, const Se3& se31, const Se3& se32, shared_ptr<Interaction> c)
 {

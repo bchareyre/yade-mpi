@@ -16,16 +16,20 @@ LIBS += -lAABB \
         -lRand \
         -lSerialization \
         -lBallisticDynamicEngine \
+        -lSDECDynamicEngine \
+        -lSDECDiscreteElement \
         -rdynamic 
-INCLUDEPATH = ../../../plugins/KinematicEngine/Rotor \
+INCLUDEPATH = ../../../plugins/DynamicEngine/SDECDynamicEngine \
               ../../../plugins/DynamicEngine/BallisticDynamicEngine \
               ../../../plugins/DynamicEngine/SimpleSpringDynamicEngine \
+              ../../../plugins/KinematicEngine/Rotor \
+              ../../../plugins/Body/SDECDiscreteElement \
+              ../../../plugins/Body/RigidBody \
               ../../../plugins/BroadPhaseCollider/SAPCollider \
               ../../../plugins/NarrowPhaseCollider/SimpleNarrowCollider \
               ../../../plugins/GeometricalModel/Box \
               ../../../plugins/GeometricalModel/Sphere \
               ../../../plugins/BoundingVolume/AABB \
-              ../../../plugins/Body/RigidBody \
               ../../../yade \
               ../../../toolboxes/Math/M3D \
               ../../../toolboxes/Math/Rand \
@@ -47,6 +51,8 @@ QMAKE_LIBDIR = ../../../plugins/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Math/Rand/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../../plugins/DynamicEngine/BallisticDynamicEngine/$(YADEDYNLIBPATH) \
+               ../../../plugins/DynamicEngine/SDECDynamicEngine/$(YADEDYNLIBPATH) \
+               ../../../plugins/Body/SDECDiscreteElement/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
 CONFIG += release \

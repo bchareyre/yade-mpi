@@ -3,10 +3,11 @@
 # Subdir relative project main directory: ./plugins/InteractionModel
 # Target is a subdirs project 
 
-MOC_DIR = $(YADECOMPILATIONPATH) 
-UI_DIR = $(YADECOMPILATIONPATH) 
-OBJECTS_DIR = $(YADECOMPILATIONPATH) 
+SUBDIRS += ClosestFeatures \
+           SDECContactModel 
+MOC_DIR = $(YADECOMPILATIONPATH)
+UI_DIR = $(YADECOMPILATIONPATH)
+OBJECTS_DIR = $(YADECOMPILATIONPATH)
 CONFIG += release \
-          warn_on 
-TEMPLATE = subdirs 
-SUBDIRS += ClosestFeatures 
+warn_on
+TEMPLATE = subdirs

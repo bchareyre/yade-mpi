@@ -52,18 +52,33 @@ using namespace boost;
 class MultiMethodsManager
 {
 	protected : std::vector<std::vector<shared_ptr<CollisionFunctor> > > callBacks;
-	private   : vector<string> indexedClassName;
+	private   : vector<string> indexedClassName;//indexedCollisionGeometry;
+//	private   : vector<string> indexedInteractionModel;
 
 	// construction
 	public : MultiMethodsManager ();
 
 	public : virtual ~MultiMethodsManager ();
 
-	public : bool add(const string& name);
+	public : bool addCollisionGeometry(const string& name);
+//	public : bool addInteractionModel(const string& name);
+//	public : bool extendCallBacksTable();
 
 	public : bool go(const shared_ptr<CollisionModel> cm1, const shared_ptr<CollisionModel> cm2, const Se3& se31, const Se3& se32, shared_ptr<Interaction> c);
 
 };
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+//#define REGISTER_COLLISION_GEOMETRY(SomeClass)
+
+
+#define REGISTER_CLASS_TO_MULTI_METHODS_MANAGER(SomeClass)	\
+	const bool indexed##SomeClass = Omega::instance().narrowCollider.addCollisionGeometry(#SomeClass);\
+
+//#define REGISTER_INTERACTION_MODEL(SomeClass)
+//	const bool indexed##SomeClass = Omega::instance().narrowCollider.addInteractionModel(#SomeClass);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////

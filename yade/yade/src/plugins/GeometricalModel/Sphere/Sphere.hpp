@@ -7,6 +7,8 @@ class Sphere : public CollisionModel
 {
 	public : float radius;
 
+		bool even;
+
 	private : static vector<Vector3> vertices;
 	private : static vector<Vector3> faces;
 	private : static int glWiredSphereList;

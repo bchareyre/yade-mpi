@@ -15,7 +15,7 @@ Sphere::Sphere (float r) : CollisionModel()
 
 Sphere::Sphere () : CollisionModel()
 {
-	
+
 	float X = 0.525731112119133606;
 	float Z = 0.850650808352039932;
 	vertices.push_back(Vector3(-X,0,Z));
@@ -30,7 +30,7 @@ Sphere::Sphere () : CollisionModel()
 	vertices.push_back(Vector3(-Z,X,0));
 	vertices.push_back(Vector3(Z,-X,0));
 	vertices.push_back(Vector3(-Z,-X,0));
-	
+
 	faces.push_back(Vector3(0,4,1));
 	faces.push_back(Vector3(0,9,4));
 	faces.push_back(Vector3(9,5,4));
@@ -57,7 +57,7 @@ Sphere::~Sphere ()
 {
 
 }
-	
+
 void Sphere::processAttributes()
 {
 	CollisionModel::processAttributes();
@@ -79,8 +79,14 @@ void Sphere::subdivideTriangle(Vector3& v1,Vector3& v2,Vector3& v3, int depth)
 {
 	Vector3 v12,v23,v31;
 
+
 	if (depth==0)
 	{
+
+		if (even)
+			glColor3f(1.0,0.0,0.0);
+		else
+			glColor3f(0.0,0.0,1.0);
 		glBegin(GL_TRIANGLES);
 			glNormal3fv(v3);
 			glVertex3fv(v3);
@@ -90,6 +96,7 @@ void Sphere::subdivideTriangle(Vector3& v1,Vector3& v2,Vector3& v3, int depth)
 			glVertex3fv(v1);
 
 		glEnd();
+		even=!even;
 		return;
 	}
 	v12 = v1+v2;
@@ -111,14 +118,16 @@ void Sphere::drawSphere(int depth)
 	GLfloat matShininess[] = { 50.0};
 	glMaterialfv(GL_FRONT,GL_SPECULAR,matSpecular);
 	glMaterialfv(GL_FRONT,GL_SHININESS,matShininess);*/
-	
+
+	even=true;
+
 	for(int i=0;i<20;i++)
 		subdivideTriangle(vertices[(unsigned int)faces[i][0]],vertices[(unsigned int)faces[i][1]],vertices[(unsigned int)faces[i][2]],depth);
 }
 
 void Sphere::glDraw()
-{	
-	
+{
+
 	if (glSphereList==-1)
 	{
 		glWiredSphereList = glGenLists(1);
