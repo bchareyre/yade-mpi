@@ -5,11 +5,15 @@
 
 class SimpleNarrowCollider : public NarrowPhaseCollider
 {
+	private : bool firstCall;
+	
 	// construction
 	public : SimpleNarrowCollider ();
 	public : ~SimpleNarrowCollider ();
 
-	public : bool collisionModelisationPhase(const std::vector<shared_ptr<Body> >& bodies, std::list<shared_ptr<Contact> >& contacts);
+	public : bool narrowCollisionPhase(const std::vector<shared_ptr<Body> >& bodies, std::list<shared_ptr<Contact> >& contacts);
+
+	public : void buildNarrowCollisionManager(const std::vector<shared_ptr<Body> >& bodies);
 	
 	public : void processAttributes();
 	public : void registerAttributes();

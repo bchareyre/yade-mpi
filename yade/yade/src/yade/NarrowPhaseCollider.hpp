@@ -54,7 +54,7 @@ class NarrowPhaseCollider : public Serializable
 	
 	public : virtual ~NarrowPhaseCollider ();
 	
-	public : virtual bool collisionModelisationPhase(const std::vector<shared_ptr<Body> >& , std::list<shared_ptr<Contact> >& ) { return false;};
+	public : virtual bool narrowCollisionPhase(const std::vector<shared_ptr<Body> >& , std::list<shared_ptr<Contact> >& ) { return false;};
 	
 	public : void processAttributes();
 	public : void registerAttributes();

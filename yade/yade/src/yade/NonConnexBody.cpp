@@ -74,7 +74,7 @@ void NonConnexBody::moveToNextTimeStep(float dt)
 	for(int i=0;i<nbSubStep;i++)
 	{
 		broadCollider->broadPhaseCollisionTest(bodies,contacts);
-		narrowCollider->collisionModelisationPhase(bodies,contacts);	
+		narrowCollider->narrowCollisionPhase(bodies,contacts);
 		dynamic->respondToCollisions(bodies,contacts,dt/(float)nbSubStep); //effectiveDt == dynamic->...
 		kinematic->moveToNextTimeStep(bodies,dt/(float)nbSubStep);
 	}

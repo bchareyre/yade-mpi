@@ -50,13 +50,13 @@ class N2NPtr2FuncLookUpTable
 	private : bool pairExists(int i,int j)
 	{
 		int sizeRow = lookUpTable.size();
-	int max = i;
-	if (max<j)
-		max = j;	
-	if (max>=sizeRow)
-		return false;
-	else
-		return (lookUpTable[i][j]!=nullFunc && lookUpTable[j][i]!=nullFunc);
+		int max = i;
+		if (max<j)
+			max = j;	
+		if (max>=sizeRow)
+			return false;
+		else
+			return (lookUpTable[i][j]!=nullFunc && lookUpTable[j][i]!=nullFunc);
 	}
 	
 	protected : bool addPair(int i,int j, ptr2Func ptr2F1,ptr2Func ptr2F2)
