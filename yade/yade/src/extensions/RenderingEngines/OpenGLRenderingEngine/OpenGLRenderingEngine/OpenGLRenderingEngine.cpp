@@ -143,7 +143,7 @@ void OpenGLRenderingEngine::render(shared_ptr<ComplexBody> rootBody)
 		renderBoundingVolume(rootBody);
 	
 	if (drawInteractionGeometry)
-		interactionGeometryDispatcher(rootBody->interactionGeometry,rootBody->physicalParameters);
+		renderInteractionGeometry(rootBody);
 
 }
 
@@ -317,7 +317,6 @@ void OpenGLRenderingEngine::renderGeometricalModel(shared_ptr<ComplexBody> rootB
 		for( rootBody->bodies->gotoFirst() ; rootBody->bodies->notAtEnd() ; rootBody->bodies->gotoNext() )
 		{
 			shared_ptr<Body> b = rootBody->bodies->getCurrent();
-
 			glPushMatrix();
 			Se3r& se3 = b->physicalParameters->se3;
 			Real angle;
@@ -348,6 +347,31 @@ void OpenGLRenderingEngine::renderBoundingVolume(shared_ptr<ComplexBody> rootBod
 	
 	glPushMatrix();
 	boundingVolumeDispatcher(rootBody->boundingVolume);
+	glPopMatrix();
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+void OpenGLRenderingEngine::renderInteractionGeometry(shared_ptr<ComplexBody> rootBody)
+{
+	for( rootBody->bodies->gotoFirst() ; rootBody->bodies->notAtEnd() ; rootBody->bodies->gotoNext() )
+	{	
+		shared_ptr<Body> b = rootBody->bodies->getCurrent();
+		glPushMatrix();
+		Se3r& se3 = b->physicalParameters->se3;
+		Real angle;
+		Vector3r axis;	
+		se3.rotation.toAxisAngle(axis,angle);	
+		glTranslatef(se3.translation[0],se3.translation[1],se3.translation[2]);
+		glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
+		interactionGeometryDispatcher(b->interactionGeometry,b->physicalParameters);
+		glPopMatrix();
+	}
+	
+	glPushMatrix();
+	interactionGeometryDispatcher(rootBody->interactionGeometry,rootBody->physicalParameters);
 	glPopMatrix();
 }
 

@@ -11,8 +11,7 @@ CONFIG += debug \
           warn_on 
 TEMPLATE = subdirs 
 SUBDIRS += Geometry \
+           Body \
            Interaction \
            Engine \
-           Body \
            yade 
-

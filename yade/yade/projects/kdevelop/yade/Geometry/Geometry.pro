@@ -18,16 +18,16 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
-HEADERS += BoundingVolume.hpp \
-           InteractionGeometry.hpp \
+HEADERS += BodyBoundingVolume.hpp \
+           BodyInteractionGeometry.hpp \
            InteractionGeometryFactory.hpp \
-           GeometricalModel.hpp \
+           BodyGeometricalModel.hpp \
            GeometricalModelFactory.hpp \
            BoundingVolumeFactory.hpp \
            BoundingVolumeUpdator.hpp 
-SOURCES += BoundingVolume.cpp \
-           InteractionGeometry.cpp \
+SOURCES += BodyBoundingVolume.cpp \
+           BodyInteractionGeometry.cpp \
            InteractionGeometryFactory.cpp \
-           GeometricalModel.cpp \
+           BodyGeometricalModel.cpp \
            GeometricalModelFactory.cpp \
            BoundingVolumeUpdator.cpp 
