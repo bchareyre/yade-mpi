@@ -32,7 +32,7 @@ bool Sphere2Sphere4ErrorTolerant::go(		const shared_ptr<InteractionDescription>&
 						const shared_ptr<InteractionDescription>& cm2,
 						const Se3r& se31,
 						const Se3r& se32,
-						shared_ptr<Interaction>& c)
+						const shared_ptr<Interaction>& c)
 {
 	shared_ptr<Sphere> s1 = dynamic_pointer_cast<Sphere>(cm1);
 	shared_ptr<Sphere> s2 = dynamic_pointer_cast<Sphere>(cm2);
@@ -65,7 +65,7 @@ bool Sphere2Sphere4ErrorTolerant::goReverse(	const shared_ptr<InteractionDescrip
 						const shared_ptr<InteractionDescription>& cm2,
 						const Se3r& se31,
 						const Se3r& se32,
-						shared_ptr<Interaction>& c)
+						const shared_ptr<Interaction>& c)
 {
 	return go(cm1,cm2,se31,se32,c);
 }

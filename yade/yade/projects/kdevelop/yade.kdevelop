@@ -106,7 +106,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>preprocessors/FileGenerator/SDECSpheresPlane</activedir>
+      <activedir>plugins/Interaction/InteractionPhysicsFunctor/SDECContactPhysics/SDECPermanentContactModel</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>

@@ -39,12 +39,12 @@ class Box2Sphere4ClosestFeatures : public InteractionGeometryFunctor
 						const shared_ptr<InteractionDescription>& cm2,
 						const Se3r& se31,
 						const Se3r& se32,
-						shared_ptr<Interaction>& c);
+						const shared_ptr<Interaction>& c);
 	public : virtual bool goReverse(	const shared_ptr<InteractionDescription>& cm1,
 						const shared_ptr<InteractionDescription>& cm2,
 						const Se3r& se31,
 						const Se3r& se32,
-						shared_ptr<Interaction>& c);
+						const shared_ptr<Interaction>& c);
 
 	REGISTER_CLASS_NAME(Box2Sphere4ClosestFeatures);
 	DEFINE_FUNCTOR_ORDER_2D(Box,Sphere);

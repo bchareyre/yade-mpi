@@ -53,6 +53,7 @@ class Interaction : public Serializable
 	// FIXME : better to test if InteractionPhysics==0 and remove this flag
 	public	: bool isNew;	
 	public  : bool isReal;
+	public  : bool isNonPermanent;
 	private	: unsigned int id1,id2;
 
 

@@ -368,7 +368,7 @@ shared_ptr<ThreadSynchronizer> Omega::getSynchronizer()
 	return synchronizer;
 }
 
-shared_ptr<ComplexBody> Omega::getRootBody()
+const shared_ptr<ComplexBody>& Omega::getRootBody()
 {
 //	LOCK(omegaMutex);
 	return rootBody;

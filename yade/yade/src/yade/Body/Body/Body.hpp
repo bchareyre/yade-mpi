@@ -65,11 +65,12 @@ class Body : public Serializable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 	private	: unsigned int id;
 	public	: unsigned int getId() {return id;};
+	// group to which body belongs (maybe vector<int> , to allow multiple groups?)
+	private : int group;
+	public  : int getGroup() {return group; };
 	// only BodyContainer can set the id of a body
 	friend class BodyContainer;
 
-	// group to which body belongs (maybe vector<int> , to allow multiple groups?)
-	int group;
 		
 	/*! Mechanical parameters of the body (mass, sitffness ...) */
 	public : shared_ptr<BodyPhysicalParameters> physicalParameters;
@@ -96,13 +97,7 @@ class Body : public Serializable
 
 	/*! Constructor */
 	public : Body ();
-	public : Body (unsigned int newId);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-/// Methods											///
-///////////////////////////////////////////////////////////////////////////////////////////////////
-	
-	/*! If computations on the attributes are needed after serialization. For example you may want to serialize the name of a file that contains geometrical data and postProcessAttributes(bool deserializing) will load the file */
+	public : Body (unsigned int newId, int newGroup);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Serialization										///

@@ -24,6 +24,7 @@ LIBS += -lSDECDynamicEngine \
         -lParticleParameters \
         -lActionMomentumDamping \
         -lActionForceDamping \
+        -lActionReset \
         -rdynamic 
 INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
@@ -48,6 +49,8 @@ QMAKE_LIBDIR = ../../../plugins/Engine/DynamicEngine/SDECDynamicEngine/$(YADEDYN
                ../../../plugins/Body/InteractionDescription/InteractionDescriptionSet/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/BoundingVolumeFunctor/InteractionDescriptionSet2AABBFunctor/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/BodyPhysicalParameters/ParticleParameters/$(YADEDYNLIBPATH) \
+               ../../../plugins/Engine/ActionDampingFunctor/ActionMomentumDamping/$(YADEDYNLIBPATH) \
+               ../../../plugins/Engine/ActionDampingFunctor/ActionForceDamping/$(YADEDYNLIBPATH) \
                ../../../plugins/Geometry/GeometricalModel/Box/$(YADEDYNLIBPATH) \
                ../../../plugins/Geometry/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
                ../../../plugins/Geometry/BoundingVolume/AABB/$(YADEDYNLIBPATH) \

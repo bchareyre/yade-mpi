@@ -58,7 +58,7 @@ class InteractionGeometryDispatcher :
 					, const shared_ptr<InteractionDescription>&
 					, const Se3r&
 					, const Se3r&
-					, shared_ptr<Interaction>&
+					, const shared_ptr<Interaction>&
 				)
 			, false								// disable auto symmetry handling
 		>

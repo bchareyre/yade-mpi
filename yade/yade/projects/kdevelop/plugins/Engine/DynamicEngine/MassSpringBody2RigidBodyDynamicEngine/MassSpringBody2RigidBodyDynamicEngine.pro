@@ -14,6 +14,13 @@ LIBS += -lDistances \
         -lInteraction \
         -lMultiMethods \
         -lRigidBodyParameters \
+        -lActionForce \
+        -lActionMomentum \
+        -lSDECPermanentLinkPhysics \
+        -lSDECContactPhysics \
+        -lSDECPermanentLink \
+        -lSDECParameters \
+        -lSDECContactGeometry \
         -rdynamic 
 INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
@@ -30,6 +37,12 @@ QMAKE_LIBDIR = ../../../../toolboxes/ComputationalGeometry/Distances/$(YADEDYNLI
                ../../../../yade/Interaction/Interaction/$(YADEDYNLIBPATH) \
                ../../../../toolboxes/Libraries/MultiMethods/$(YADEDYNLIBPATH) \
                ../../../../plugins/Body/BodyPhysicalParameters/RigidBodyParameters/$(YADEDYNLIBPATH) \
+               ../../../../plugins/Engine/Action/ActionForce/$(YADEDYNLIBPATH) \
+               ../../../../plugins/Engine/Action/ActionMomentum/$(YADEDYNLIBPATH) \
+               ../../../../plugins/Interaction/InteractionPhysics/SDECPermanentLinkPhysics/$(YADEDYNLIBPATH) \
+               ../../../../plugins/Interaction/InteractionPhysics/SDECContactPhysics/$(YADEDYNLIBPATH) \
+               ../../../../plugins/Interaction/InteractionGeometry/SDECPermanentLink/$(YADEDYNLIBPATH) \
+               ../../../../plugins/Body/BodyPhysicalParameters/SDECParameters/$(YADEDYNLIBPATH) \
                ../../../../plugins/Body/MassSpringBody/$(YADEDYNLIBPATH) \
                ../../../../plugins/Geometry/GeometricalModel/Mesh2D/$(YADEDYNLIBPATH) \
                ../../../../yade/Body/$(YADEDYNLIBPATH) \

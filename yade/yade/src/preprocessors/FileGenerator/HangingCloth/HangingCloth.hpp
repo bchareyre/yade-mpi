@@ -9,18 +9,29 @@ class HangingCloth : public FileGenerator
 {
 	private : int width;
 	private : int height;
-	private : Real stiffness ;
+	private : Real springStiffness ;
 	private : Real springDamping ;	
 	private : Real particleDamping ;
-	private : Real mass;
+	private : Real clothMass;
 	private : int cellSize;
 	private : shared_ptr<Interaction>  spring;
 	private : bool fixPoint1;
 	private : bool fixPoint2;
 	private : bool fixPoint3;
 	private : bool fixPoint4;
+	private : bool ground;
 	private : Real dampingForce;
 	
+// spheres
+	private : Vector3r nbSpheres;
+	private : Real density;
+	private : Real minRadius;
+	private : Real maxRadius;
+	private : Real disorder;
+	private : Real spacing;
+	private : Real dampingMomentum;
+	private : bool linkSpheres;
+
 	// construction
 	public : HangingCloth ();
 	public : ~HangingCloth ();
@@ -29,6 +40,8 @@ class HangingCloth : public FileGenerator
 	public : void registerAttributes();
 	
 	private : shared_ptr<Interaction>& createSpring(const shared_ptr<ComplexBody>& rootBody,int i,int j);
+	private : void createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents);
+	private : void createSphere(shared_ptr<Body>& body, int i, int j, int k);
 	
 	public : string generate();
 

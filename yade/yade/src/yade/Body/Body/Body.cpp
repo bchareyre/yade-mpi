@@ -34,10 +34,10 @@ Body::Body () :
 {
 }
 
-Body::Body (unsigned int newId) :
+Body::Body (unsigned int newId, int newGroup) :
 	  Serializable()
 	, id(newId)
-	, group(0)
+	, group(newGroup)
 {
 }
 

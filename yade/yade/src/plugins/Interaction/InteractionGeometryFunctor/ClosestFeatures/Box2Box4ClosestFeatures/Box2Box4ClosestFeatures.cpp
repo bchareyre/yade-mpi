@@ -35,7 +35,7 @@ bool Box2Box4ClosestFeatures::go(		const shared_ptr<InteractionDescription>& cm1
 						const shared_ptr<InteractionDescription>& cm2,
 						const Se3r& se31,
 						const Se3r& se32,
-						shared_ptr<Interaction>& c)
+						const shared_ptr<Interaction>& c)
 {
 	Real r11,r12,r13,r21,r22,r23,r31,r32,r33,q11,q12,q13,q21,q22,q23,q31,q32,q33;
 	
@@ -421,7 +421,7 @@ bool Box2Box4ClosestFeatures::goReverse(	const shared_ptr<InteractionDescription
 						const shared_ptr<InteractionDescription>& cm2,
 						const Se3r& se31,
 						const Se3r& se32,
-						shared_ptr<Interaction>& c)
+						const shared_ptr<Interaction>& c)
 {
 	bool isInteracting = go(cm2,cm1,se32,se31,c);
 	if (isInteracting)

@@ -2,17 +2,22 @@
 #define __MASSSPRINGBODY2RIGIDBODYNAMICENGINE_H__
 
 #include "DynamicEngine.hpp"
+#include "ActionForce.hpp"
+#include "ActionMomentum.hpp"
 
 class MassSpringBody2RigidBodyDynamicEngine : public DynamicEngine
 {
-
-	// construction
 	public : MassSpringBody2RigidBodyDynamicEngine ();
-	
+	private : shared_ptr<Action> actionForce;	
+	private : shared_ptr<Action> actionMomentum;
+	private : bool first;
+	public  : int sdecGroup;
+	public  : int springGroup;
+
 	public : void registerAttributes();
 
-	//public : void respondToInteractions(std::vector<shared_ptr<Body> >& bodies, const std::list<shared_ptr<Interaction> >& interactions,Real dt);
 	public : void respondToInteractions(Body* body);
+	
 	REGISTER_CLASS_NAME(MassSpringBody2RigidBodyDynamicEngine);
 };
 

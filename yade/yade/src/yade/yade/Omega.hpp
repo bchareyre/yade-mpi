@@ -97,7 +97,7 @@ class Omega : public Singleton<Omega>
 	public	: Real getTimeStep();
 	
 	private	: shared_ptr<ComplexBody> rootBody;
-	public	: shared_ptr<ComplexBody> getRootBody();
+	public	: const shared_ptr<ComplexBody>& getRootBody();
 	public  : void freeRootBody();
 	
 	private	: ptime	sStartingSimulationTime;

@@ -31,6 +31,7 @@
 #include "InteractionBox.hpp"
 #include "InteractionSphere.hpp"
 #include "TimeIntegratorDispatcher.hpp"
+#include "ActionReset.hpp"
 
 SDECSpheresPlane::SDECSpheresPlane () : FileGenerator()
 {
@@ -108,6 +109,7 @@ string SDECSpheresPlane::generate()
 	rootBody->actors.push_back(actionDampingDispatcher);
 	rootBody->actors.push_back(applyActionDispatcher);
 	rootBody->actors.push_back(timeIntegratorDispatcher);
+	rootBody->actors.push_back(shared_ptr<Actor>(new ActionReset));
 	
 
 	//FIXME : use a default one

@@ -48,12 +48,12 @@ class Box2Box4ClosestFeatures : public InteractionGeometryFunctor
 						const shared_ptr<InteractionDescription>& cm2,
 						const Se3r& se31,
 						const Se3r& se32,
-						shared_ptr<Interaction>& c);
+						const shared_ptr<Interaction>& c);
 	public : virtual bool goReverse(	const shared_ptr<InteractionDescription>& cm1,
 						const shared_ptr<InteractionDescription>& cm2,
 						const Se3r& se31,
 						const Se3r& se32,
-						shared_ptr<Interaction>& c);
+						const shared_ptr<Interaction>& c);
 
 	private : bool testSeparatingAxis(Real expr1, Real expr2, Vector3r n,int c,BoxBoxInteractionInfo* bbInfo);
 

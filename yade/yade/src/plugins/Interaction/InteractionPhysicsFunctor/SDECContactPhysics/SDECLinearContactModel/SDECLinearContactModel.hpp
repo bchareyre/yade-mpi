@@ -36,7 +36,7 @@ class SDECLinearContactModel : public InteractionPhysicsFunctor
 {
 	public : virtual void go(	const shared_ptr<BodyPhysicalParameters>& b1,
 					const shared_ptr<BodyPhysicalParameters>& b2,
-					shared_ptr<Interaction>& interaction);
+					const shared_ptr<Interaction>& interaction);
 	REGISTER_CLASS_NAME(SDECLinearContactModel);
 };
 
@@ -52,5 +52,4 @@ REGISTER_SERIALIZABLE(SDECLinearContactModel,false);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-
 

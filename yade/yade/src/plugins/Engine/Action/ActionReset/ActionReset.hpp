@@ -21,53 +21,34 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "InteractionPhysicsDispatcher.hpp"
-#include "ComplexBody.hpp"
+#ifndef ACTION_RESET_HPP
+#define ACTION_RESET_HPP
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void InteractionPhysicsDispatcher::postProcessAttributes(bool deserializing)
+#include "Actor.hpp"
+class Body;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+class ActionReset : public Actor
 {
-	postProcessDispatcher2D(deserializing);
-}
+	public : virtual void action(Body* body);
+	REGISTER_CLASS_NAME(ActionReset);
+};
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void InteractionPhysicsDispatcher::registerAttributes()
-{
-	REGISTER_ATTRIBUTE(functorNames);
-	REGISTER_ATTRIBUTE(functorArguments);
-}
+REGISTER_SERIALIZABLE(ActionReset,false);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void InteractionPhysicsDispatcher::action(Body* body)
-{
-	ComplexBody * ncb = dynamic_cast<ComplexBody*>(body);
-	shared_ptr<BodyContainer>& bodies = ncb->bodies;
-	
-	shared_ptr<InteractionContainer>& permanentInteractions = ncb->permanentInteractions;
-	for( permanentInteractions->gotoFirstPotential() ; permanentInteractions->notAtEndPotential() ; permanentInteractions->gotoNextPotential())
-	{
-		const shared_ptr<Interaction>& interaction = permanentInteractions->getCurrent();
+#endif // ACTION_RESET_HPP
 
-		shared_ptr<Body>& b1 = (*bodies)[interaction->getId1()];
-		shared_ptr<Body>& b2 = (*bodies)[interaction->getId2()];
-		operator()( b1->physicalParameters , b2->physicalParameters , interaction );
-	}
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
-	shared_ptr<InteractionContainer>& interactions = ncb->interactions;
-	for( interactions->gotoFirstPotential() ; interactions->notAtEndPotential() ; interactions->gotoNextPotential())
-	{
-		const shared_ptr<Interaction>& interaction = interactions->getCurrent();
-		
-		shared_ptr<Body>& b1 = (*bodies)[interaction->getId1()];
-		shared_ptr<Body>& b2 = (*bodies)[interaction->getId2()];
-
-		if (interaction->isReal)
-			operator()( b1->physicalParameters , b2->physicalParameters , interaction );
-	}
-}

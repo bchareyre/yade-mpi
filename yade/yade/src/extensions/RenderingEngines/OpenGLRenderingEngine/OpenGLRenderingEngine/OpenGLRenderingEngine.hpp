@@ -69,14 +69,14 @@ class OpenGLRenderingEngine : public RenderingEngine
 	public : ~OpenGLRenderingEngine();
 	
 	public : void init();
-	public : void render(shared_ptr<ComplexBody> body);
+	public : void render(const shared_ptr<ComplexBody>& body);
 	
-	private : void renderGeometricalModel(shared_ptr<ComplexBody> rootBody);
-	private : void renderBoundingVolume(shared_ptr<ComplexBody> rootBody);
-	private : void renderInteractionGeometry(shared_ptr<ComplexBody> rootBody);
-	private : void renderShadowVolumes(shared_ptr<ComplexBody> rootBody,Vector3r lightPos);
-	private : void renderSceneUsingShadowVolumes(shared_ptr<ComplexBody> rootBody,Vector3r lightPos);
-	private : void renderSceneUsingFastShadowVolumes(shared_ptr<ComplexBody> rootBody,Vector3r lightPos);
+	private : void renderGeometricalModel(const shared_ptr<ComplexBody>& rootBody);
+	private : void renderBoundingVolume(const shared_ptr<ComplexBody>& rootBody);
+	private : void renderInteractionGeometry(const shared_ptr<ComplexBody>& rootBody);
+	private : void renderShadowVolumes(const shared_ptr<ComplexBody>& rootBody,Vector3r lightPos);
+	private : void renderSceneUsingShadowVolumes(const shared_ptr<ComplexBody>& rootBody,Vector3r lightPos);
+	private : void renderSceneUsingFastShadowVolumes(const shared_ptr<ComplexBody>& rootBody,Vector3r lightPos);
 	
 	REGISTER_CLASS_NAME(OpenGLRenderingEngine);
 	public : void postProcessAttributes(bool deserializing);

@@ -9,6 +9,7 @@ class ExplicitMassSpringDynamicEngine : public DynamicEngine
 	private : shared_ptr<Action> actionForce;	
 	private : shared_ptr<Action> actionMomentum;
 	private : bool first;
+	public  : int springGroup;
 
 	// construction
 	public : ExplicitMassSpringDynamicEngine ();

@@ -34,7 +34,7 @@ bool Sphere2Mesh2D4ClosestFeatures::go(		const shared_ptr<InteractionDescription
 						const shared_ptr<InteractionDescription>& cm2,
 						const Se3r& se31,
 						const Se3r& /*se32*/,
-						shared_ptr<Interaction>& c)
+						const shared_ptr<Interaction>& c)
 {
 
 	shared_ptr<Sphere> s = dynamic_pointer_cast<Sphere>(cm1);
@@ -95,7 +95,7 @@ bool Sphere2Mesh2D4ClosestFeatures::goReverse(	const shared_ptr<InteractionDescr
 						const shared_ptr<InteractionDescription>& cm2,
 						const Se3r& se31,
 						const Se3r& se32,
-						shared_ptr<Interaction>& c)
+						const shared_ptr<Interaction>& c)
 {
 	bool isInteracting = go(cm2,cm1,se32,se31,c);
 	if (isInteracting)

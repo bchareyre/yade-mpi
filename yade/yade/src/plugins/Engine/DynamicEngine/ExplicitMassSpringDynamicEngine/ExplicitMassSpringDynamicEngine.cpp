@@ -15,19 +15,20 @@ ExplicitMassSpringDynamicEngine::ExplicitMassSpringDynamicEngine () : DynamicEng
 
 void ExplicitMassSpringDynamicEngine::registerAttributes()
 {
+	REGISTER_ATTRIBUTE(springGroup);
 }
 
 
 void ExplicitMassSpringDynamicEngine::respondToInteractions(Body * body)
 {
 	ComplexBody * massSpring = dynamic_cast<ComplexBody*>(body);
-	shared_ptr<BodyContainer> bodies = massSpring->bodies;
-	shared_ptr<InteractionContainer> permanentInteractions = massSpring->permanentInteractions;
-	shared_ptr<ActionContainer> actions = massSpring->actions;
+	shared_ptr<BodyContainer>& bodies = massSpring->bodies;
+	shared_ptr<InteractionContainer>& permanentInteractions = massSpring->permanentInteractions;
+	shared_ptr<ActionContainer>& actions = massSpring->actions;
 	
 	Vector3r gravity = Omega::instance().getGravity();
 	
-	if (first)
+	if (first) // FIXME - this should be done somewhere else
 	{
 		vector<shared_ptr<Action> > vvv; 
 		vvv.clear();
@@ -37,14 +38,14 @@ void ExplicitMassSpringDynamicEngine::respondToInteractions(Body * body)
 		first = false;
 	}
 	
-	actions->reset();
-	
-	shared_ptr<Interaction> spring;
 	for(permanentInteractions->gotoFirst() ; permanentInteractions->notAtEnd(); permanentInteractions->gotoNext())
 	{
-		spring = permanentInteractions->getCurrent();
+		const shared_ptr<Interaction>& spring = permanentInteractions->getCurrent();
 		int id1 = spring->getId1();
 		int id2 = spring->getId2();
+		
+		if( (*bodies)[id1]->getGroup() != springGroup || (*bodies)[id2]->getGroup() != springGroup )
+			continue; // skip other groups
 		
 		ParticleParameters * p1 = static_cast<ParticleParameters*>((*bodies)[id1]->physicalParameters.get());
 		ParticleParameters * p2 = static_cast<ParticleParameters*>((*bodies)[id2]->physicalParameters.get());
@@ -78,8 +79,11 @@ void ExplicitMassSpringDynamicEngine::respondToInteractions(Body * body)
 	
 	for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext())
 	{
-		ParticleParameters * p = static_cast<ParticleParameters*>(bodies->getCurrent()->physicalParameters.get());
-		static_cast<ActionForce*>( massSpring->actions->find( bodies->getCurrent()->getId() , actionForce->getClassIndex() ).get() )->force += gravity*p->mass;
+		if(bodies->getCurrent()->getGroup() == springGroup)
+		{
+			ParticleParameters * p = static_cast<ParticleParameters*>(bodies->getCurrent()->physicalParameters.get());
+			static_cast<ActionForce*>( massSpring->actions->find( bodies->getCurrent()->getId() , actionForce->getClassIndex() ).get() )->force += gravity*p->mass;
+		}
 	}
 }
 

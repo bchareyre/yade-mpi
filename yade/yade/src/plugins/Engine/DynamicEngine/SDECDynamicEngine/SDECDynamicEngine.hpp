@@ -1,7 +1,3 @@
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 /***************************************************************************
  *   Copyright (C) 2004 by Olivier Galizzi                                 *
  *   olivier.galizzi@imag.fr                                               *
@@ -53,18 +49,16 @@ class SDECDynamicEngine : public DynamicEngine
 	private : bool first;
 	private : shared_ptr<Action> actionForce;
 	private : shared_ptr<Action> actionMomentum;
+	public  : int sdecGroup;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Constructor/Destructor								        ///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public : SDECDynamicEngine();
-
-	public : void registerAttributes();
-
 	public : void respondToInteractions(Body* body);
 
-	public : void filter(Body* body);
+	public : void registerAttributes();
 	REGISTER_CLASS_NAME(SDECDynamicEngine);
 };
 

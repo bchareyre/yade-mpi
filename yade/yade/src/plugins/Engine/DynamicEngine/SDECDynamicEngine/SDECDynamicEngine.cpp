@@ -38,6 +38,7 @@
 
 SDECDynamicEngine::SDECDynamicEngine() : DynamicEngine() , actionForce(new ActionForce) , actionMomentum(new ActionMomentum)
 {
+	sdecGroup=0;
 	first=true;
 }
 
@@ -47,12 +48,8 @@ SDECDynamicEngine::SDECDynamicEngine() : DynamicEngine() , actionForce(new Actio
 void SDECDynamicEngine::registerAttributes()
 {
 	DynamicEngine::registerAttributes();
-	// REGISTER DESIRED ATTRIBUTES HERE
+	REGISTER_ATTRIBUTE(sdecGroup);
 }
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -60,9 +57,8 @@ void SDECDynamicEngine::registerAttributes()
 //FIXME : add reset function so it will remove bool first
 void SDECDynamicEngine::respondToInteractions(Body* body)
 {
-
 	ComplexBody * ncb = dynamic_cast<ComplexBody*>(body);
-	shared_ptr<BodyContainer> bodies = ncb->bodies;
+	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 
 	Vector3r gravity = Omega::instance().getGravity();
 	Real dt = Omega::instance().getTimeStep();
@@ -70,7 +66,7 @@ void SDECDynamicEngine::respondToInteractions(Body* body)
 	
 	// FIXME - that should be in another dynlib, I CHANGED CONTAINER so IT IS FASTER
 	// speed improvement is: 156 -> 142 = 14 sec 9% (rev.339 -> rev.340)
-	if(first)
+	if(first) // FIXME - this should be done somewhere else
 	{
 		vector<shared_ptr<Action> > vvv; 
 		vvv.clear();
@@ -79,50 +75,37 @@ void SDECDynamicEngine::respondToInteractions(Body* body)
 		ncb->actions->prepare(vvv);
 	}
 
-	// FIXME : clearing actions should be called from another actor
-	ncb->actions->reset(); // speed improvement to using clear() is: 169 -> 156 seconds = 13 sec, 8 % (rev.338 -> rev.339)
-
-	
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// Permanents Links													///
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	for( ncb->permanentInteractions->gotoFirst() ; ncb->permanentInteractions->notAtEnd() ; ncb->permanentInteractions->gotoNext() )
 	{
-		shared_ptr<Interaction> contact2 = ncb->permanentInteractions->getCurrent();
+		const shared_ptr<Interaction>& contact2 = ncb->permanentInteractions->getCurrent();
 
 		unsigned int id1 = contact2->getId1();
 		unsigned int id2 = contact2->getId2();
+		
+		if( (*bodies)[id1]->getGroup() != sdecGroup || (*bodies)[id2]->getGroup() != sdecGroup )
+			continue; // skip other groups, BTW: this is example of a good usage of 'continue' keyword
 
-////////////////////////////////////////////////////////////
-/// FIXME : those lines are dirty !			 ///
-////////////////////////////////////////////////////////////
-	
-	// FIXME - this is much shorter but still dirty (but now in different aspect - the way we store interactions)
-		shared_ptr<Interaction> interaction = ncb->interactions->find(id1,id2);
-		if (interaction)
-			interaction->isReal = false;
-
-////////////////////////////////////////////////////////////
-/// 							 ///
-////////////////////////////////////////////////////////////
-
-		shared_ptr<SDECParameters> de1		= dynamic_pointer_cast<SDECParameters>((*bodies)[id1]->physicalParameters);
-		shared_ptr<SDECParameters> de2 		= dynamic_pointer_cast<SDECParameters>((*bodies)[id2]->physicalParameters);
+		shared_ptr<SDECParameters> de1					= dynamic_pointer_cast<SDECParameters>((*bodies)[id1]->physicalParameters);
+		shared_ptr<SDECParameters> de2 					= dynamic_pointer_cast<SDECParameters>((*bodies)[id2]->physicalParameters);
 		shared_ptr<SDECPermanentLinkPhysics> currentContactPhysics	= dynamic_pointer_cast<SDECPermanentLinkPhysics>(contact2->interactionPhysics);
-		shared_ptr<SDECPermanentLink> currentContactGeometry	= dynamic_pointer_cast<SDECPermanentLink>(contact2->interactionGeometry);
+		shared_ptr<SDECPermanentLink> currentContactGeometry		= dynamic_pointer_cast<SDECPermanentLink>(contact2->interactionGeometry);
 
 		/// FIXME : put these lines into another dynlib
 		currentContactPhysics->kn 			= currentContactPhysics->initialKn;
 		currentContactPhysics->ks 			= currentContactPhysics->initialKs;
 		currentContactPhysics->equilibriumDistance 	= currentContactPhysics->initialEquilibriumDistance;
+		// FIXME - this is currently NOT DONE in Sphere2Sphere4SDECContactModel !!!!!!!!
 		currentContactGeometry->normal 			= (de2->se3.translation-de1->se3.translation);
 		currentContactGeometry->normal.normalize();
-		Real un 				= currentContactPhysics->equilibriumDistance-(de2->se3.translation-de1->se3.translation).length();
+		Real un 					= currentContactPhysics->equilibriumDistance-(de2->se3.translation-de1->se3.translation).length();
 		currentContactPhysics->normalForce		= currentContactPhysics->kn*un*currentContactGeometry->normal;
 
 		if (first)
-			currentContactPhysics->prevNormal = currentContactGeometry->normal;
+			currentContactPhysics->prevNormal 	= currentContactGeometry->normal;
 		
 		Vector3r axis;
 		Real angle;
@@ -132,10 +115,10 @@ void SDECDynamicEngine::respondToInteractions(Body* body)
 ////////////////////////////////////////////////////////////
 
 		axis = currentContactPhysics->prevNormal.cross(currentContactGeometry->normal);
-		currentContactPhysics->shearForce     -= currentContactPhysics->shearForce.cross(axis);
-		angle	 			= dt*0.5*currentContactGeometry->normal.dot(de1->angularVelocity+de2->angularVelocity);
-		axis 				= angle*currentContactGeometry->normal;
-		currentContactPhysics->shearForce     -= currentContactPhysics->shearForce.cross(axis);
+		currentContactPhysics->shearForce	       -= currentContactPhysics->shearForce.cross(axis);
+		angle	 					= dt*0.5*currentContactGeometry->normal.dot(de1->angularVelocity+de2->angularVelocity);
+		axis 						= angle*currentContactGeometry->normal;
+		currentContactPhysics->shearForce     	       -= currentContactPhysics->shearForce.cross(axis);
 
 
 ////////////////////////////////////////////////////////////
@@ -159,16 +142,16 @@ void SDECDynamicEngine::respondToInteractions(Body* body)
 /// 							 ///
 ////////////////////////////////////////////////////////////
 
-		Vector3r x	= de1->se3.translation+(currentContactGeometry->radius1-0.5*un)*currentContactGeometry->normal;
-		//Vector3r x	= (de1->se3.translation+de2->se3.translation)*0.5;
+		Vector3r x				= de1->se3.translation+(currentContactGeometry->radius1-0.5*un)*currentContactGeometry->normal;
+		//Vector3r x				= (de1->se3.translation+de2->se3.translation)*0.5;
 		//cout << currentContact->contactPoint << " || " << (de1->se3.translation+de2->se3.translation)*0.5 << endl;
-		Vector3r c1x	= (x - de1->se3.translation);
-		Vector3r c2x	= (x - de2->se3.translation);
+		Vector3r c1x				= (x - de1->se3.translation);
+		Vector3r c2x				= (x - de2->se3.translation);
 
-		Vector3r relativeVelocity 	= (de2->velocity+de2->angularVelocity.cross(c2x)) - (de1->velocity+de1->angularVelocity.cross(c1x));
-		Vector3r shearVelocity		= relativeVelocity-currentContactGeometry->normal.dot(relativeVelocity)*currentContactGeometry->normal;
-		Vector3r shearDisplacement	= shearVelocity*dt;
-		currentContactPhysics->shearForce      -=  currentContactPhysics->ks*shearDisplacement;
+		Vector3r relativeVelocity 		= (de2->velocity+de2->angularVelocity.cross(c2x)) - (de1->velocity+de1->angularVelocity.cross(c1x));
+		Vector3r shearVelocity			= relativeVelocity-currentContactGeometry->normal.dot(relativeVelocity)*currentContactGeometry->normal;
+		Vector3r shearDisplacement		= shearVelocity*dt;
+		currentContactPhysics->shearForce      -= currentContactPhysics->ks*shearDisplacement;
 
 		Vector3r f = currentContactPhysics->normalForce + currentContactPhysics->shearForce;
 
@@ -360,13 +343,15 @@ void SDECDynamicEngine::respondToInteractions(Body* body)
 /// Non Permanents Links												///
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	shared_ptr<Interaction> contact;
 //	for( ; cti!=ctiEnd ; ++cti)
 	for( ncb->interactions->gotoFirst() ; ncb->interactions->notAtEnd() ; ncb->interactions->gotoNext() )
 	{
-		contact = ncb->interactions->getCurrent();
+		const shared_ptr<Interaction>& contact = ncb->interactions->getCurrent();
 		int id1 = contact->getId1();
 		int id2 = contact->getId2();
+		
+		if( (*bodies)[id1]->getGroup() != sdecGroup || (*bodies)[id2]->getGroup() != sdecGroup )
+			continue; // skip other groups, BTW: this is example of a good usage of 'continue' keyword
 
 		shared_ptr<SDECParameters> de1 	= dynamic_pointer_cast<SDECParameters>((*bodies)[id1]->physicalParameters);
 		shared_ptr<SDECParameters> de2 	= dynamic_pointer_cast<SDECParameters>((*bodies)[id2]->physicalParameters);
@@ -391,10 +376,7 @@ void SDECDynamicEngine::respondToInteractions(Body* body)
 		angle 					= dt*0.5*currentContactGeometry->normal.dot(de1->angularVelocity+de2->angularVelocity);
 		axis 					= angle*currentContactGeometry->normal;
 		currentContactPhysics->shearForce      -= currentContactPhysics->shearForce.cross(axis);
-
-
 	
-// it will be some macro(	body->actions,	ActionType , bodyId )
 ////////////////////////////////////////////////////////////
 /// Here is the code without approximated rotations 	 ///
 ////////////////////////////////////////////////////////////

@@ -44,7 +44,7 @@ class InteractionPhysicsDispatcher :
 			void ,								// return type
 			TYPELIST_3(	  const shared_ptr<BodyPhysicalParameters>&	// arguments
 					, const shared_ptr<BodyPhysicalParameters>&
-					, shared_ptr<Interaction>&
+					, const shared_ptr<Interaction>&
 				)
 		>
 {		

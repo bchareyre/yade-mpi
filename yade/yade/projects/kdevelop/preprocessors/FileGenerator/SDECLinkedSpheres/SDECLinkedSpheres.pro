@@ -24,6 +24,7 @@ LIBS += -lSDECDynamicEngine \
         -lParticleParameters \
         -lActionMomentumDamping \
         -lActionForceDamping \
+        -lActionReset \
         -rdynamic 
 INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 

@@ -24,6 +24,10 @@
 #include "SDECLinearContactModel.hpp"
 #include "SDECContactGeometry.hpp"
 #include "SDECContactPhysics.hpp"
+
+#include "SDECPermanentLink.hpp" // FIXME - I can't dispatch by SDECPermanentLink <-> SDECContactGeometry !!?
+#include "SDECPermanentLinkPhysics.hpp" // FIXME
+
 #include "Omega.hpp"
 #include "ComplexBody.hpp"
 #include "SDECParameters.hpp"
@@ -31,11 +35,18 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void SDECLinearContactModel::go(const shared_ptr<BodyPhysicalParameters>& b1, const shared_ptr<BodyPhysicalParameters>& b2,	shared_ptr<Interaction>& interaction)
+void SDECLinearContactModel::go(	  const shared_ptr<BodyPhysicalParameters>& b1
+					, const shared_ptr<BodyPhysicalParameters>& b2
+					, const shared_ptr<Interaction>& interaction)
 {
 	SDECParameters* de1 = static_cast<SDECParameters*>(b1.get());
 	SDECParameters* de2 = static_cast<SDECParameters*>(b2.get());
-	SDECContactGeometry* interactionGeometry = static_cast<SDECContactGeometry*>(interaction->interactionGeometry.get());
+	SDECContactGeometry* interactionGeometry = dynamic_cast<SDECContactGeometry*>(interaction->interactionGeometry.get());
+	
+	if(! interactionGeometry) 	// FIXME - this computation is done inside SDECDynamicEngine!! this is bad !!!
+					// dynamic_cast failed, because we have here SDECPermanentLinkPhysics !!
+		return;			// maybe we should dispatch on type of interactionGeometry ?!?!
+	
 	shared_ptr<SDECContactPhysics> contactPhysics;
 	
 	if ( interaction->isNew)
@@ -55,6 +66,3 @@ void SDECLinearContactModel::go(const shared_ptr<BodyPhysicalParameters>& b1, co
 	contactPhysics->ks = contactPhysics->initialKs;
 	contactPhysics->equilibriumDistance = contactPhysics->initialEquilibriumDistance;
 };
-
-
-

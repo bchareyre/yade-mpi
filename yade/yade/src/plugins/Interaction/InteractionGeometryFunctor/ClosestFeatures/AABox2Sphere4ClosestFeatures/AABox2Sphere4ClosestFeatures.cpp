@@ -33,7 +33,7 @@ bool AABox2Sphere4ClosestFeatures::go(		const shared_ptr<InteractionDescription>
 						const shared_ptr<InteractionDescription>& cm2,
 						const Se3r& se31,
 						const Se3r& se32,
-						shared_ptr<Interaction>& c)
+						const shared_ptr<Interaction>& c)
 {
 	Vector3r l,t,p,q,r;
 	bool onborder = false;
@@ -125,7 +125,7 @@ bool AABox2Sphere4ClosestFeatures::goReverse(	const shared_ptr<InteractionDescri
 						const shared_ptr<InteractionDescription>& cm2,
 						const Se3r& se31,
 						const Se3r& se32,
-						shared_ptr<Interaction>& c)
+						const shared_ptr<Interaction>& c)
 {
 	bool isInteracting = go(cm2,cm1,se32,se31,c);
 	if (isInteracting)

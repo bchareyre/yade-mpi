@@ -3,7 +3,7 @@
 # Subdir relative project main directory: ./plugins/InteractionPhysicsFunctor
 # Target is a subdirs project 
 
-SUBDIRS += SDECLinearContactModel 
+SUBDIRS += SDECLinearContactModel
 CONFIG += release \
           warn_on 
 TEMPLATE = subdirs 

@@ -3,7 +3,8 @@
 # Subdir relative project main directory: ./plugins/Body
 # Target is a subdirs project 
 
-SUBDIRS += ActionMomentum \
+SUBDIRS += ActionReset \
+           ActionMomentum \
            ActionForce
 MOC_DIR = $(YADECOMPILATIONPATH)
 UI_DIR = $(YADECOMPILATIONPATH)

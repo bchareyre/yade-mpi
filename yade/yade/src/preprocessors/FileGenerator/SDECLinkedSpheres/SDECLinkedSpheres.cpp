@@ -6,17 +6,18 @@
 #include "ComplexBody.hpp"
 #include "SAPCollider.hpp"
 #include "PersistentSAPCollider.hpp"
-#include "SDECParameters.hpp"
 #include <fstream>
 #include "IOManager.hpp"
-#include "SDECDynamicEngine.hpp"
-#include "SDECParameters.hpp"
-#include "SDECPermanentLink.hpp"
 #include "Interaction.hpp"
 #include "BoundingVolumeDispatcher.hpp"
 #include "InteractionDescriptionSet2AABBFunctor.hpp"
 #include "InteractionDescriptionSet.hpp"
+
+#include "SDECDynamicEngine.hpp"
 #include "SDECLinearContactModel.hpp"
+#include "SDECParameters.hpp"
+#include "SDECPermanentLink.hpp"
+#include "SDECPermanentLinkPhysics.hpp"
 
 #include "ActionApplyDispatcher.hpp"
 #include "ActionDampingDispatcher.hpp"
@@ -29,7 +30,8 @@
 #include "InteractionBox.hpp"
 #include "InteractionSphere.hpp"
 #include "TimeIntegratorDispatcher.hpp"
-#include "SDECPermanentLinkPhysics.hpp"
+
+#include "ActionReset.hpp"
 
 SDECLinkedSpheres::SDECLinkedSpheres () : FileGenerator()
 {
@@ -83,31 +85,45 @@ string SDECLinkedSpheres::generate()
 	boundingVolumeDispatcher->add("InteractionSphere","AABB","Sphere2AABBFunctor");
 	boundingVolumeDispatcher->add("InteractionBox","AABB","Box2AABBFunctor");
 	boundingVolumeDispatcher->add("InteractionDescriptionSet","AABB","InteractionDescriptionSet2AABBFunctor");
+
 	
+	
+		
 	shared_ptr<ActionForceDamping> actionForceDamping(new ActionForceDamping);
 	actionForceDamping->damping = dampingForce;
 	shared_ptr<ActionMomentumDamping> actionMomentumDamping(new ActionMomentumDamping);
 	actionMomentumDamping->damping = dampingMomentum;
 	shared_ptr<ActionDampingDispatcher> actionDampingDispatcher(new ActionDampingDispatcher);
-	actionDampingDispatcher->add("ActionForce","RigidBodyParameters","ActionForceDamping",actionForceDamping);
+	actionDampingDispatcher->add("ActionForce","ParticleParameters","ActionForceDamping",actionForceDamping);
 	actionDampingDispatcher->add("ActionMomentum","RigidBodyParameters","ActionMomentumDamping",actionMomentumDamping);
 	
 	shared_ptr<ActionApplyDispatcher> applyActionDispatcher(new ActionApplyDispatcher);
-	applyActionDispatcher->add("ActionForce","RigidBodyParameters","ActionForce2Particle");
+	applyActionDispatcher->add("ActionForce","ParticleParameters","ActionForce2Particle");
 	applyActionDispatcher->add("ActionMomentum","RigidBodyParameters","ActionMomentum2RigidBody");
 	
 	shared_ptr<TimeIntegratorDispatcher> timeIntegratorDispatcher(new TimeIntegratorDispatcher);
-	timeIntegratorDispatcher->add("SDECParameters","LeapFrogIntegrator");
+	
+	
+	timeIntegratorDispatcher->add("SDECParameters","LeapFrogIntegrator"); // FIXME - bug in locateMultivirtualFunctionCall1D ???
+		
+	
+	
+	
+	shared_ptr<SDECDynamicEngine> sdecDynamicEngine(new SDECDynamicEngine);
+	sdecDynamicEngine->sdecGroup = 55;
 	
 	rootBody->actors.clear();
 	rootBody->actors.push_back(boundingVolumeDispatcher);
+	
 	rootBody->actors.push_back(shared_ptr<Actor>(new PersistentSAPCollider));
 	rootBody->actors.push_back(interactionGeometryDispatcher);
 	rootBody->actors.push_back(interactionPhysicsDispatcher);
-	rootBody->actors.push_back(shared_ptr<Actor>(new SDECDynamicEngine));
+	
+	rootBody->actors.push_back(sdecDynamicEngine);
 	rootBody->actors.push_back(actionDampingDispatcher);
 	rootBody->actors.push_back(applyActionDispatcher);
 	rootBody->actors.push_back(timeIntegratorDispatcher);
+	rootBody->actors.push_back(shared_ptr<Actor>(new ActionReset));
 	
 	rootBody->isDynamic		= false;
 	
@@ -222,7 +238,7 @@ string SDECLinkedSpheres::generate()
 
 void SDECLinkedSpheres::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 {
-	body = shared_ptr<Body>(new SimpleBody);
+	body = shared_ptr<Body>(new SimpleBody(0,55));
 	shared_ptr<SDECParameters> physics(new SDECParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<Sphere> gSphere(new Sphere);
@@ -270,7 +286,7 @@ void SDECLinkedSpheres::createSphere(shared_ptr<Body>& body, int i, int j, int k
 
 void SDECLinkedSpheres::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents)
 {
-	body = shared_ptr<Body>(new SimpleBody);
+	body = shared_ptr<Body>(new SimpleBody(0,55));
 	shared_ptr<SDECParameters> physics(new SDECParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<Box> gBox(new Box);
