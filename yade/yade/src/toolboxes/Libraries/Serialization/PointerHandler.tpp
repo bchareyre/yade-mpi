@@ -70,10 +70,24 @@ struct PointerHandler<shared_ptr<PointedType> >
 			// FIXME : isn't it the same code code Serializable and custom ???
 			if(boost::is_base_and_derived<Serializable,PointedType>::value)
 			{
-				Serializable * sh2s = dynamic_cast<Serializable*>(ClassFactory::instance().createPure(typeStr));
+				shared_ptr<Serializable> newInstance = dynamic_pointer_cast<Serializable>(ClassFactory::instance().createShared(typeStr));
 				tmpPtr		= any_cast< shared_ptr<PointedType>* >(ac.getAddress());
-				*tmpPtr 	= shared_ptr<PointedType>(reinterpret_cast<PointedType*>(sh2s));
+				
+				// WARNING: this will not compile if you have 'int' or 'float' inside shared_ptr
+				// but I'm not going to change this into reinterpret_cast just because of that.
+				// nobody will have 'int' inside shared_ptr, and reinterpret_cast is here too risky hack.
+				//
+				// proper solution is to write template specialization for PointerHandler< int >
+				// if you need it - then write it.
+				
+				*tmpPtr 	= dynamic_pointer_cast<PointedType>(newInstance);
 				newAc 		= Archive::create(name,**tmpPtr);
+
+// original h4x00r lines .....
+//				Serializable * newInstance = dynamic_cast<Serializable*>(ClassFactory::instance().createPure(typeStr));
+//				tmpPtr		= any_cast< shared_ptr<PointedType>* >(ac.getAddress());
+//				*tmpPtr 	= shared_ptr<PointedType>(reinterpret_cast<PointedType*>(newInstance));
+//				newAc 		= Archive::create(name,**tmpPtr);
 			}
 			else
 			{
@@ -82,15 +96,14 @@ struct PointerHandler<shared_ptr<PointedType> >
 				std::string error = FactoryExceptions::CantCreateClass + name + "  - Because pointers to custom class are not working!";
 				throw FactoryCantCreate(error.c_str());
 
-
-				void * sh2s 	= ClassFactory::instance().createPureCustom(typeStr);
-				tmpPtr		= any_cast< shared_ptr<PointedType>* >(ac.getAddress());
-				*tmpPtr 	= shared_ptr<PointedType>(reinterpret_cast<PointedType*>(sh2s));
-				newAc 		= Archive::create(name,**tmpPtr);
+//				void * newInstance 	= ClassFactory::instance().createPureCustom(typeStr);
+//				tmpPtr		= any_cast< shared_ptr<PointedType>* >(ac.getAddress());
+//				*tmpPtr 	= shared_ptr<PointedType>(reinterpret_cast<PointedType*>(newInstance));
+//				newAc 		= Archive::create(name,**tmpPtr);
 			}
 		}
 		else
-		{
+		{ // according to WARNING above - following lines are never executed ....
 			tmpPtr=any_cast< shared_ptr<PointedType>* >(ac.getAddress());
 			*tmpPtr = shared_ptr<PointedType>(new PointedType);
 			newAc = Archive::create(name,**tmpPtr);
@@ -118,17 +131,6 @@ struct PointerHandler<shared_ptr<PointedType> >
 template<typename PointedType>
 SerializableTypes::Type findType( shared_ptr<PointedType>& ,bool& fundamental, string& str)
 {
-	/*PointedType tmpPt;
-
-	if (	boost::is_fundamental<PointedType>::value ||
-		findType(tmpPt,str) == SMART_POINTER_OF_FUNDAMENTAL ||
-		findType(tmpPt,str) == STL_CONTAINER_OF_FUNDAMENTAL ||
-		findType(tmpPt,str) == CUSTOM_FUNDAMENTAL )
-		return SMART_POINTER_OF_FUNDAMENTAL;
-	else
-		return POINTER;*/
-
-
 	PointedType tmpV;
 	bool tmpFundamental;
 

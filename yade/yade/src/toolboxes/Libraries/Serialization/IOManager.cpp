@@ -95,8 +95,13 @@ void IOManager::parseFundamental(const string& top, vector<string>& eval)
 	parse(top.c_str(),everything);
 	
 	//FIXME : modified by Olivier because if top contains only one string then eval is empty!
-	if (eval.size()==0)
-		eval.push_back(top);
+	//
+	// I must ask you to reproduce this error, because if there is only one string - it works, it must be something else.
+	//
+	// if you uncomment these lines in snippets/Serialization - it will crash! - for "[]" - bad_lexical_cast
+	//
+	//if (eval.size()==0)
+	//	eval.push_back(top);
 }
 
 
