@@ -21,54 +21,92 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#ifndef __MULTIMETHODSMANAGER_H__
-#define __MULTIMETHODSMANAGER_H__
+#ifndef __INDEXABLE_H__
+#define __INDEXABLE_H__
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <vector>
-#include <string>
-#include <boost/shared_ptr.hpp>
+/*! \brief Abstract interface for all Indexable class.
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-class Indexable;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-using namespace boost;
-using namespace std;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-template<class Functor>
-class MultiMethodsManager 
+	An indexable class is a class that will be managed by a MultiMethodManager. The index the function getClassIndex() returns, corresponds to the index in the matrix where the class will be handled.
+*/
+class Indexable
 {
-	protected : std::vector<std::vector<shared_ptr<Functor> > > callBacks;
 
-	// construction
-	public : MultiMethodsManager ();
-	public : virtual ~MultiMethodsManager ();
+///////////////////////////////////////////////////////////////////////////////////////////////////
+/// Constructor/Destructor									///
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
-	protected : virtual bool addPair(const string& name1,const string& name2,const string& libName) = 0;
-	protected : bool add(shared_ptr<Indexable>& i1,shared_ptr<Indexable>& i2, const string& name1, const string& name2, const string& libName);
+	/*! Constructor */
+	public : Indexable () {};
 
-	//public : bool go(const shared_ptr<CollisionGeometry> cm1, const shared_ptr<CollisionGeometry> cm2, const Se3r& se31, const Se3r& se32, shared_ptr<Interaction> c);
-};   
+	/*! Destructor */
+	public : virtual ~Indexable () {};
+
+	/*! Returns the id of the current class. This id is set by a multimethod manager */
+	public : virtual int& getClassIndex() { throw;};
+	public : virtual const int& getClassIndex() const { throw;};
+	
+	public : virtual const int& getMaxCurrentlyUsedClassIndex() const { throw;};
+	public : virtual void incrementMaxCurrentlyUsedClassIndex() { throw;};
+
+};
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "MultiMethodsManager.tpp"
+// this macro is used by classes that are a dimension in multimethod matrix
+
+#define REGISTER_CLASS_INDEX(SomeClass)						\
+	private: static int& getClassIndexStatic()				\
+	{									\
+		static int index = -1;						\
+		return index;							\
+	}									\
+	public: virtual int& getClassIndex()					\
+	{									\
+		assert(typeid(*this)==typeid(SomeClass));			\
+		return getClassIndexStatic();					\
+	}									\
+	public: virtual const int& getClassIndex() const			\
+	{									\
+		assert(typeid(*this)==typeid(SomeClass));			\
+		return getClassIndexStatic();					\
+	}
+
+
+// this macro is used by base class for classes that are a dimension in multimethod matrix
+// to keep track of maximum number of classes of their kin. Multimethod matrix can't
+// count this number (ie. as a size of the matrix) - because there are many multimethod matrices!
+
+#define REGISTER_INDEX_COUNTER(SomeClass)					\
+	private: static int& getMaxCurrentlyUsedIndexStatic()			\
+	{									\
+		static int maxCurrentlyUsedIndex = -1;				\
+		return maxCurrentlyUsedIndex;					\
+	}									\
+	public: virtual const int& getMaxCurrentlyUsedClassIndex() const	\
+	{									\
+		SomeClass * Indexable##SomeClass = 0;				\
+		Indexable##SomeClass = dynamic_cast<SomeClass*>(const_cast<SomeClass*>(this));		\
+		assert(Indexable##SomeClass);					\
+		return getMaxCurrentlyUsedIndexStatic();			\
+	}									\
+	public: virtual void incrementMaxCurrentlyUsedClassIndex()		\
+	{									\
+		SomeClass * Indexable##SomeClass = 0;				\
+		Indexable##SomeClass = dynamic_cast<SomeClass*>(this);		\
+		assert(Indexable##SomeClass);					\
+		int& max = getMaxCurrentlyUsedIndexStatic();			\
+		max++;								\
+	}									\
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#endif // __MULTIMETHODSMANAGER_H__
+#endif // __INDEXABLE_H__
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+

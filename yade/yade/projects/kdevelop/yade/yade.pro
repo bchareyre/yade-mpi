@@ -10,8 +10,7 @@ DEFINES = DEBUG
 CONFIG += debug \
           warn_on 
 TEMPLATE = subdirs 
-SUBDIRS += MultiMethods \
-           Geometry \
+SUBDIRS += Geometry \
            Interaction \
            Engine \
            Body \

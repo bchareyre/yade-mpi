@@ -18,10 +18,3 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
-HEADERS += Indexable.hpp \
-           MultiMethodsManager.hpp \
-           MultiMethodsManagerExceptions.hpp \
-           MultiMethodsManager.tpp \
-           MultiMethodFunctor2D.hpp 
-SOURCES += MultiMethodsManagerExceptions.cpp \
-           MultiMethodFunctor2D.cpp 

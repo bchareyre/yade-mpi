@@ -18,8 +18,9 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "MultiMethodsManagerExceptions.hpp"
+#include "MultiMethodsExceptions.hpp"
 
 
-const char* MultiMethodsManagerExceptions::NotExistingLibrary   	= "MultiMethodsManager::addPair - cannot find library named : ";
-const char* MultiMethodsManagerExceptions::UndefinedCollisionOrder	= "MultiMethodsManager::addPair - Unable to determine collision and reverse collision order in collision functor named : ";
+const char* MultiMethodsExceptions::NotExistingClass	= "DynLibDispatcher::add - cannot find class (or load a library) named : ";
+const char* MultiMethodsExceptions::UndefinedOrder	= "DynLibLauncher::checkOrder - unable to determine order in functor named : ";
+const char* MultiMethodsExceptions::BadVirtualCall	= "DynLibLauncher::go/goReverse - called function was not overloaded in dynamic library. check if your argument types are correct, remember that only fundamental types and pure pointers are passed by value, all other types (including shared_ptr<>) are passed by reference, for details look into Loki::TypeTraits.hpp::ParametrType.";
