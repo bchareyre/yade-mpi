@@ -3,39 +3,6 @@
 # Subdir relative project main directory: ./frontends/YadeQtGUI
 # Target is a library:  
 
-LIBS += -lSerialization \
-        -lMath \
-        -lBody \
-        -lEngine \
-        -lGeometry \
-        -lInteraction \
-        -lMultiMethods \
-        -lXMLManager \
-        -lFactory \
-        -lGLWindowManager \
-        -rdynamic 
-INCLUDEPATH = $(YADEINCLUDEPATH) 
-MOC_DIR = $(YADECOMPILATIONPATH) 
-UI_DIR = $(YADECOMPILATIONPATH) 
-OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
-               ../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
-               ../../yade/Body/$(YADEDYNLIBPATH) \
-               ../../yade/Engine/$(YADEDYNLIBPATH) \
-               ../../yade/Geometry/$(YADEDYNLIBPATH) \
-               ../../yade/Interaction/$(YADEDYNLIBPATH) \
-               ../../yade/MultiMethods/$(YADEDYNLIBPATH) \
-               ../../plugins/IOManager/XMLManager/$(YADEDYNLIBPATH) \
-               ../../yade/Factory/$(YADEDYNLIBPATH) \
-               ../../toolboxes/OpenGL/GLWindowManager/$(YADEDYNLIBPATH) \
-               $(YADEDYNLIBPATH) 
-DESTDIR = $(YADEDYNLIBPATH) 
-CONFIG += debug \
-          warn_on \
-          dll 
-QtGeneratedSimulationController.ui.commands = $$IDL_COMPILER $$IDL_OPTIONS $$QtGeneratedSimulationController.ui.target 
-QtGeneratedSimulationController.ui.target = QtGeneratedSimulationController.ui 
-TEMPLATE = lib 
 FORMS += YadeQtGeneratedMainWindow.ui \
          QtFileGeneratorController.ui \
          QtGUISignalCatcher.ui \
@@ -53,6 +20,41 @@ SOURCES += YadeQtGUI.cpp \
            QtFileGenerator.cpp \
            QtGUIGenerator.cpp \
            SimulationController.cpp 
+LIBS += -lSerialization \
+-lMath \
+-lBody \
+-lEngine \
+-lGeometry \
+-lInteraction \
+-lMultiMethods \
+-lXMLManager \
+-lFactory \
+-lGLWindowManager \
+-lThreads \
+-rdynamic
+INCLUDEPATH = $(YADEINCLUDEPATH)
+MOC_DIR = $(YADECOMPILATIONPATH)
+UI_DIR = $(YADECOMPILATIONPATH)
+OBJECTS_DIR = $(YADECOMPILATIONPATH)
+QMAKE_LIBDIR = ../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
+../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
+../../yade/Body/$(YADEDYNLIBPATH) \
+../../yade/Engine/$(YADEDYNLIBPATH) \
+../../yade/Geometry/$(YADEDYNLIBPATH) \
+../../yade/Interaction/$(YADEDYNLIBPATH) \
+../../yade/MultiMethods/$(YADEDYNLIBPATH) \
+../../plugins/IOManager/XMLManager/$(YADEDYNLIBPATH) \
+../../yade/Factory/$(YADEDYNLIBPATH) \
+../../toolboxes/OpenGL/GLWindowManager/$(YADEDYNLIBPATH) \
+../../toolboxes/Libraries/Threads/$(YADEDYNLIBPATH) \
+$(YADEDYNLIBPATH)
+DESTDIR = $(YADEDYNLIBPATH)
+CONFIG += debug \
+warn_on \
+dll
+QtGeneratedSimulationController.ui.commands = $$IDL_COMPILER $$IDL_OPTIONS $$QtGeneratedSimulationController.ui.target
+QtGeneratedSimulationController.ui.target = QtGeneratedSimulationController.ui
+TEMPLATE = lib
 QtGUISignalCatcher.ui.target = QtGUISignalCatcher.ui
 QtFileGeneratorController.ui.target = QtFileGeneratorController.ui
 QtGeneratedFrontEnd.ui.target = QtGeneratedFrontEnd.ui

@@ -3,13 +3,17 @@
 # Subdir relative project main directory: ./toolboxes/Libraries/Threads
 # Target is a library:  
 
-HEADERS += ThreadSynchronizer.hpp 
-SOURCES += ThreadSynchronizer.cpp 
-MOC_DIR = $(YADECOMPILATIONPATH) 
-UI_DIR = $(YADECOMPILATIONPATH) 
-OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-DESTDIR = $(YADEDYNLIBPATH) 
+HEADERS += ThreadSynchronizer.hpp \
+           Threadable.hpp \
+           ThreadSafe.hpp \
+           Threadable.tpp 
+SOURCES += ThreadSynchronizer.cpp \
+           ThreadSafe.cpp 
+MOC_DIR = $(YADECOMPILATIONPATH)
+UI_DIR = $(YADECOMPILATIONPATH)
+OBJECTS_DIR = $(YADECOMPILATIONPATH)
+DESTDIR = $(YADEDYNLIBPATH)
 CONFIG += release \
-          warn_on \
-          dll 
-TEMPLATE = lib 
+warn_on \
+dll
+TEMPLATE = lib

@@ -7,39 +7,53 @@
 
 GLViewer::GLViewer(QWidget * parent, QGLWidget * shareWidget) : QGLViewer(parent,"glview",shareWidget)
 {
+// 	glView = new GLView(parent,shareWidget);
+// 	glView->show();
+// 	createThread(Omega::instance().synchronizer);
+	fpsTracker = shared_ptr<FpsTracker>(new FpsTracker(this));
 	resize(300,300);
 	setSceneCenter(0,0,0);
 	setSceneRadius(200);
 	showEntireScene();
 	setAnimationPeriod(0);
 	startAnimation();
-	fpsTracker = shared_ptr<FpsTracker>(new FpsTracker(this));	
-	//turnId = Omega::instance().getNewTurnId();
+	show();
+
 }
 
 GLViewer::~GLViewer()
 {
 
 }
-#include <boost/thread/mutex.hpp>
+
+// bool GLViewer::notEnd()
+// {
+// 	return true;
+// }
+// 
+// void GLViewer::oneLoop()
+// {
+// 	glView->safedraw();
+// }
+
 
 void GLViewer::draw()
-{       
-	static int turnId = Omega::instance().getNewTurnId();
+{
+	static int drawTurn = Omega::instance().synchronizer->insertThread();
 	
-	Omega::instance().waitMyTurn(turnId);
+	Omega::instance().synchronizer->wait(drawTurn);
 	
 	glEnable(GL_NORMALIZE);
-        glEnable(GL_CULL_FACE);
+	glEnable(GL_CULL_FACE);
 
 	if (Omega::instance().rootBody) // if the scene is loaded
 		Omega::instance().rootBody->glDraw();
-
+		
 	fpsTracker->glDraw();
 	fpsTracker->addOneAction();
 	
-	Omega::instance().endMyTurn();
-	
+	Omega::instance().synchronizer->signal();
+
 }
 
 void GLViewer::mouseMoveEvent(QMouseEvent * e)
@@ -70,6 +84,6 @@ void GLViewer::keyPressEvent(QKeyEvent *e)
 {
 	if (e->key()=='F' || e->key()=='f')
 		fpsTracker->swapDisplayed();
-	//else
-	//	QGLViewer::keyPressEvent(e);
+	else
+		QGLViewer::keyPressEvent(e);
 }

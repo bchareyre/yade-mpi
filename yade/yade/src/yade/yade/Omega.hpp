@@ -65,14 +65,14 @@ class Omega : public Singleton<Omega>
 {
 	public : shared_ptr<FrontEnd> gui;
 
-	private : shared_ptr<boost::thread> simulationThread;
+	//private : shared_ptr<boost::thread> simulationThread;
 	private : shared_ptr<SimulationLoop> simulationLoop;
 	public : shared_ptr<ThreadSynchronizer> synchronizer; // FIXME put private + add function waitMyTuren and finishedMyTurn
 
-	public : void waitMyTurn(int id); // FIXME put private + add function waitMyTuren and finishedMyTurn
-	public : void endMyTurn(); // FIXME put private + add function waitMyTuren and finishedMyTurn
-	public : void waitForSimulationEnd(); // FIXME put private + add function waitMyTuren and finishedMyTurn
-	public : int getNewTurnId();
+//	public : void waitMyTurn(int id); // FIXME put private + add function waitMyTuren and finishedMyTurn
+//	public : void endMyTurn(); // FIXME put private + add function waitMyTuren and finishedMyTurn
+//	public : void waitForSimulationEnd(); // FIXME put private + add function waitMyTuren and finishedMyTurn
+//	public : int getNewTurnId();
 	
 	public : map<string,string> dynlibsType;
 

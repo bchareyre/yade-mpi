@@ -66,7 +66,7 @@ int NullGUI::run(int , char** )
 	cout << "Starting computation of file: " << Omega::instance().getSimulationFileName() << endl;
 	cout << "Using timestep: " << Omega::instance().getTimeStep() << endl;
 
-	Omega::instance().waitForSimulationEnd();
+//	Omega::instance().waitForSimulationEnd();
 	return 1;
 }
 

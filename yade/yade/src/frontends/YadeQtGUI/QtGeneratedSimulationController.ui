@@ -670,11 +670,31 @@
         <receiver>QtGeneratedSimulationController</receiver>
         <slot>pbNewViewClicked()</slot>
     </connection>
+    <connection>
+        <sender>pbStartSimulation</sender>
+        <signal>clicked()</signal>
+        <receiver>QtGeneratedSimulationController</receiver>
+        <slot>pbStartClicked()</slot>
+    </connection>
+    <connection>
+        <sender>pbStopSimulation</sender>
+        <signal>clicked()</signal>
+        <receiver>QtGeneratedSimulationController</receiver>
+        <slot>pbStopClicked()</slot>
+    </connection>
+    <connection>
+        <sender>pbResetSimulation</sender>
+        <signal>clicked()</signal>
+        <receiver>QtGeneratedSimulationController</receiver>
+        <slot>pbResetClicked()</slot>
+    </connection>
 </connections>
 <slots>
     <slot>pbLoadClicked()</slot>
     <slot>pbNewViewClicked()</slot>
-    <slot>updateGUI()</slot>
+    <slot>pbStartClicked()</slot>
+    <slot>pbStopClicked()</slot>
+    <slot>pbResetClicked()</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

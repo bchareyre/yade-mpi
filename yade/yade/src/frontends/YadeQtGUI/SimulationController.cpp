@@ -1,5 +1,6 @@
 #include "SimulationController.hpp"
 #include "Omega.hpp"
+#include "ThreadSynchronizer.hpp"
 #include "Math.hpp"
 #include <qfiledialog.h>
 #include <qlcdnumber.h>
@@ -12,9 +13,7 @@ SimulationController::SimulationController(QWidget * parent) : QtGeneratedSimula
 {
 	setMinimumSize(size());
 	setMaximumSize(size());
-	  
- 	timer = new QTimer(this);
-	connect( timer, SIGNAL(timeout()), SLOT(updateGUI()) );
+	updater = shared_ptr<SimulationControllerUpdater>(new SimulationControllerUpdater(this));
 }
 
 SimulationController::~SimulationController()
@@ -22,13 +21,62 @@ SimulationController::~SimulationController()
 
 }
 
-void SimulationController::updateGUI()
+void SimulationController::pbLoadClicked()
+{	
+	QString selectedFilter;
+	QString fileName = QFileDialog::getOpenFileName("../data", "XML Yade File (*.xml)", this,"Open File","Choose a file to open",&selectedFilter );
+
+	if (!fileName.isEmpty() && selectedFilter == "XML Yade File (*.xml)")
+	{
+		Omega::instance().setSimulationFileName(fileName);
+		Omega::instance().loadSimulation();
+
+		tlCurrentSimulation->setText(fileName);
+		
+		if (glViews.size()==0)
+ 			glViews.push_back(new GLViewer(this->parentWidget()->parentWidget()));
+		Omega::instance().synchronizer->startAll();
+		
+	}
+}
+
+void SimulationController::pbNewViewClicked()
 {
-	//static int turnId = Omega::instance().getNewTurnId();
- 	
-	//Omega::instance().waitMyTurn(turnId);
- 
-	lcdCurrentIteration->display(lexical_cast<string>(Omega::instance().getCurrentIteration()));
+	glViews.push_back(new GLViewer( this->parentWidget()->parentWidget(), glViews.front()/*->glView*/ ) );
+}
+
+void SimulationController::pbStopClicked()
+{
+	Omega::instance().synchronizer->stopAll();
+}
+
+void SimulationController::pbStartClicked()
+{
+	Omega::instance().synchronizer->startAll();
+}
+
+void SimulationController::pbResetClicked()
+{
+
+}
+
+
+
+SimulationControllerUpdater::SimulationControllerUpdater(SimulationController * sc) : Threadable<SimulationControllerUpdater>()
+{
+	controller = sc;
+	createThread(Omega::instance().synchronizer);
+}
+
+SimulationControllerUpdater::~SimulationControllerUpdater()
+{ 
+
+}
+
+void SimulationControllerUpdater::oneLoop()
+{
+
+	controller->lcdCurrentIteration->display(lexical_cast<string>(Omega::instance().getCurrentIteration()));
 	double simulationTime = Omega::instance().getSimulationTime();
 	
 	
@@ -57,35 +105,9 @@ cout << simulationTime << "  ||  " << min << " " << sec << " " << msec << " " <<
 	lcdMSecondv->display(lexical_cast<string>(msec));
 	lcdMiSecondv->display(lexical_cast<string>(misec));
 	lcdNSecondv->display(lexical_cast<string>(nsec));*/
-	
-	//Omega::instance().endMyTurn();
-
 }
 
-void SimulationController::pbLoadClicked()
-{	
-	QString selectedFilter;
-	QString fileName = QFileDialog::getOpenFileName("../data", "XML Yade File (*.xml)", this,"Open File","Choose a file to open",&selectedFilter );
-
-	if (!fileName.isEmpty() && selectedFilter == "XML Yade File (*.xml)")
-	{
-		Omega::instance().setSimulationFileName(fileName);
-		Omega::instance().loadSimulation();
-
-		tlCurrentSimulation->setText(fileName);
-		
-		if (glViews.size()==0)
-		{
- 			glViews.push_back(new GLViewer(this->parentWidget()->parentWidget()));
-			glViews.back()->show();
-		}
-		timer->start(1);
-		
-	}
-}
-
-void SimulationController::pbNewViewClicked()
+bool SimulationControllerUpdater::notEnd()
 {
-	glViews.push_back(new GLViewer( this->parentWidget()->parentWidget(), glViews.front() ) );
-	glViews.back()->show();
+	return true;
 }

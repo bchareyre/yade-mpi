@@ -3,29 +3,27 @@
 #include "Omega.hpp"
 #include "ThreadSynchronizer.hpp"
 
-SimulationLoop::SimulationLoop()
+SimulationLoop::SimulationLoop(shared_ptr<ThreadSynchronizer> s)
 {
-
+	createThread(s);
 }
 
 SimulationLoop::~SimulationLoop()
 {
 
 }
-	
-void SimulationLoop::operator()()
+
+bool SimulationLoop::notEnd()
 {
-	int turnId = Omega::instance().getNewTurnId();
-	while (true) //FIXME : change that !!
-	{
-		
-		Omega::instance().waitMyTurn(turnId); // now if only we could calculate without waiting for draw to finish drawing....
-		if (Omega::instance().rootBody)
-		{	
-			Omega::instance().rootBody->moveToNextTimeStep();
-			Omega::instance().incrementCurrentIteration();
-			Omega::instance().incrementSimulationTime();
-		}
-		Omega::instance().endMyTurn();
+	return true;
+}
+	
+void SimulationLoop::oneLoop()
+{
+	if (Omega::instance().rootBody)
+	{	
+		Omega::instance().rootBody->moveToNextTimeStep();
+		Omega::instance().incrementCurrentIteration();
+		Omega::instance().incrementSimulationTime();
 	}
 }
