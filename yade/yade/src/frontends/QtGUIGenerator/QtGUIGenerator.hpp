@@ -27,16 +27,19 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-
 #include "QtGUISignalCatcher.h"
+#include "XMLManager.hpp"
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <qframe.h>
-#include "XMLManager.hpp"
 #include <qlineedit.h>
 #include <map>
 #include <vector>
 #include <boost/shared_ptr.hpp>
 #include <qobject.h>
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -68,6 +71,23 @@ class QtGUIGenerator : public XMLManager,  public QtGUISignalCatcher
 	public : vector<shared_ptr<AttributeDescriptor> > descriptors;
 	public : map<string,int> lookUp;
 	public : shared_ptr<Serializable> serializable;	
+
+	private : bool resizeHeight;
+	private : bool resizeWidth;
+	private : int translationX;
+	private : int translationY;
+	private : int shiftX;
+	private : int shiftY;
+	private : bool showButtons;
+	public : void setShowButtons(bool b) { showButtons=b;};
+	public : void setResizeHeight(bool b) { resizeHeight=b;};
+	public : void setResizeWidth(bool b) { resizeWidth=b;};
+	public : void setTranslation(int x, int y) { translationX=x; translationY=y; };
+	public : void setShift(int x, int y) {shiftX=x;shiftY=y;};
+	
+	private : int buttonWidth;
+	private : int buttonHeight;
+	
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Constructor/Destructor									///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -82,7 +102,7 @@ class QtGUIGenerator : public XMLManager,  public QtGUISignalCatcher
 /// Methods											///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public : void buildGUI(shared_ptr<Serializable> s, QWidget * parent, QFrame * frame);
+	public : void buildGUI(shared_ptr<Serializable> s, QWidget * widget);
 	
 	public slots : virtual void pushButtonOkClicked() ;
 	public slots : virtual void pushButtonApplyClicked() ;

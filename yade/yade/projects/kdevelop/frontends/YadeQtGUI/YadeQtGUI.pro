@@ -5,7 +5,6 @@
 
 LIBS += -lSerialization \
         -lQtGUIGenerator \
-        -lRigidBody \
         -lMath \
         -lBody \
         -lEngine \
@@ -19,7 +18,6 @@ UI_DIR = $(YADECOMPILATIONPATH)
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 QMAKE_LIBDIR = ../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../frontends/QtGUIGenerator/$(YADEDYNLIBPATH) \
-               ../../plugins/Body/RigidBody/$(YADEDYNLIBPATH) \
                ../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
                ../../yade/Body/$(YADEDYNLIBPATH) \
                ../../yade/Engine/$(YADEDYNLIBPATH) \

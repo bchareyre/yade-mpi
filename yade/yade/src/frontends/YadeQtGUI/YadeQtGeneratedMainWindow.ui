@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>600</width>
-            <height>482</height>
+            <width>839</width>
+            <height>691</height>
         </rect>
     </property>
     <property name="caption">
@@ -24,8 +24,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>600</width>
-            <height>28</height>
+            <width>839</width>
+            <height>24</height>
         </rect>
     </property>
     <item text="&amp;File" name="fileMenu">

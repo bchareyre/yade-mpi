@@ -2,18 +2,20 @@
 #ifndef __ROTATINGBOX_H__
 #define __ROTATINGBOX_H__
 
-#include "Serializable.hpp"
+#include "FileGenerator.hpp"
 
-class RotatingBox : public Serializable
+class RotatingBox : public FileGenerator
 {
+	private : int nbSpheres;
+	private : int nbBoxes;
+	
 	// construction
 	public : RotatingBox ();
 	public : ~RotatingBox ();
 
-	public : void afterDeserialization();
-	public : void registerAttributes();
+	public : virtual void registerAttributes();
 
-	public : void exec();
+	public : virtual void generate();
 
 	REGISTER_CLASS_NAME(RotatingBox);
 };

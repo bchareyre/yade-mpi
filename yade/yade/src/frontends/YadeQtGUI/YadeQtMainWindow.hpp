@@ -36,22 +36,19 @@
 
 #include "YadeQtGeneratedMainWindow.h"
 #include "GLViewer.hpp"
-#include "QtGUIGenerator.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 class YadeQtMainWindow : public YadeQtGeneratedMainWindow
 {
-
-	protected : QtGUIGenerator guiGen;
 	protected : shared_ptr<GLViewer> glViewer;
 	protected : QWorkspace * workspace;
 	protected : QAction* fileRotatingBoxAction;
 	protected : QPopupMenu *preprocessorMenu;
 	protected : map<string,QPopupMenu*> menus;
 	protected : vector<QAction*> items;
-	protected : QFrame * frame;
+	protected : vector<shared_ptr<Factorable> > qtWidgets;
 
 	// construction
 	public : YadeQtMainWindow ();

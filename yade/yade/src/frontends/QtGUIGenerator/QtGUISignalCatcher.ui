@@ -2,11 +2,7 @@
 
 <UI version="3.3" stdsetdef="1">
 	<class>QtGUISignalCatcher</class>
-	<widget class="QWidget">
-		<property name="name">
-			<cstring>QtGUISignalCatcher</cstring>
-		</property>
-	</widget>
+	<widget class="QDialog"> </widget>
 	<slots>
 		<slot>pushButtonOkClicked()</slot>
 		<slot>pushButtonApplyClicked()</slot>

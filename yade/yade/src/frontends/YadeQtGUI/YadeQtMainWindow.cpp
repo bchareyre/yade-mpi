@@ -2,7 +2,6 @@
 
 #include "IOManager.hpp"
 
-#include "RigidBody.hpp"
 
 #include <qvbox.h>
 #include <qfiledialog.h>
@@ -31,6 +30,7 @@ YadeQtMainWindow::YadeQtMainWindow() : YadeQtGeneratedMainWindow()
 	addItem("Preprocessor","BoxStack");
 	addItem("Preprocessor","SDECSpheresPlane");
 	addItem("Preprocessor","SDECLinkedSpheres");
+	addItem("Preprocessor","QtFileGenerator");
 	createMenus();
 
 
@@ -50,17 +50,6 @@ YadeQtMainWindow::YadeQtMainWindow() : YadeQtGeneratedMainWindow()
 		if( Omega::instance().getAutomatic() )
 			glViewer->startAnimation();
 	}
-
-	shared_ptr<RigidBody> rb(new RigidBody);
-	rb->mass = 11;
-	rb->velocity = Vector3r(1,2,3);
-	rb->angularVelocity = Vector3r(1.2,5,1.15);
-	rb->isDynamic = true;
-	rb->inertia = Vector3r(4,4,4);
-	frame = new QFrame(workspace);
-	guiGen.buildGUI(rb,workspace,frame);
-	frame->show();
-
 }
 
 YadeQtMainWindow::~YadeQtMainWindow()
@@ -133,5 +122,12 @@ void YadeQtMainWindow::dynamicMenuClicked()
 {
 	QAction * action = (QAction*)(this->sender());
 	string name = action->text();
-	ClassFactory::instance().createShared(name);
+	qtWidgets.push_back(ClassFactory::instance().createShared(name));
+	
+	shared_ptr<QWidget> widget = dynamic_pointer_cast<QWidget>(qtWidgets.back());
+	if (widget) // the library is a QWidget so we set workspace as its parent
+	{
+		widget->reparent(workspace,QPoint(300,300));
+		widget->show();
+	}
 }

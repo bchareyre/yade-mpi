@@ -16,9 +16,14 @@
 #include "SDECDynamicEngine.hpp"
 #include "SDECDiscreteElement.hpp"
 
-RotatingBox::RotatingBox () : Serializable()
+#include "QtGUIGenerator.hpp"
+
+
+RotatingBox::RotatingBox () : FileGenerator()
 {
-	exec();
+	//	exec();
+	nbSpheres = 0;
+	nbBoxes   = 0;
 }
 
 RotatingBox::~RotatingBox ()
@@ -26,15 +31,19 @@ RotatingBox::~RotatingBox ()
 
 }
 
-void RotatingBox::afterDeserialization()
-{
-}
+
 
 void RotatingBox::registerAttributes()
 {
+	FileGenerator::registerAttributes();
+	cout << 11 << endl;
+	REGISTER_ATTRIBUTE(nbSpheres);
+	cout << 12 << endl;
+	REGISTER_ATTRIBUTE(nbBoxes);
+	cout << 13 << endl;
 }
 
-void RotatingBox::exec()
+void RotatingBox::generate()
 {
 	shared_ptr<NonConnexBody> rootBody(new NonConnexBody);
 	int nbSpheres = 5;
@@ -42,7 +51,8 @@ void RotatingBox::exec()
 	Quaternionr q;
 	q.fromAxisAngle(Vector3r(0,0,1),0);
 
-
+	outputFileName = "../data/RotatingBox.xml";
+	serializationDynlib = "XMLManager";
 
 	shared_ptr<NarrowCollider> nc	= shared_ptr<NarrowCollider>(new SimpleNarrowCollider);
 	nc->addCollisionFunctor("Sphere","Sphere","Sphere2Sphere4SDECContactModel");
@@ -313,5 +323,5 @@ void RotatingBox::exec()
 				rootBody->bodies.push_back(dynamic_pointer_cast<Body>(boxi));
 			}
 
-	IOManager::saveToFile("XMLManager", "../data/RotatingBox.xml", "rootBody", rootBody);
+	IOManager::saveToFile(serializationDynlib, outputFileName, "rootBody", rootBody);
 }

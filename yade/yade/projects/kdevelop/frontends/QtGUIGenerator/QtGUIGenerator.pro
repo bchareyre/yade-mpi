@@ -4,10 +4,6 @@
 # Target is a library:  
 
 FORMS += QtGUISignalCatcher.ui 
-IDLS += QtGUISignalCatcher.ui \
-        QtGUISignalCatcher.cw \
-        QtGUISignalCatcher.ui \
-        QtGUISignalCatcher.ui 
 HEADERS += QtGUIGenerator.hpp 
 SOURCES += QtGUIGenerator.cpp 
 LIBS += -lSerialization \

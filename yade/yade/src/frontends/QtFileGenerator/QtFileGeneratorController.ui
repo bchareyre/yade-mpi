@@ -1,0 +1,244 @@
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
+<class>QtFileGeneratorController</class>
+<widget class="QDialog">
+    <property name="name">
+        <cstring>QtFileGeneratorController</cstring>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>490</width>
+            <height>392</height>
+        </rect>
+    </property>
+    <property name="caption">
+        <string>File Generator</string>
+    </property>
+    <widget class="QGroupBox">
+        <property name="name">
+            <cstring>gbCommonParameters</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>10</x>
+                <y>10</y>
+                <width>470</width>
+                <height>130</height>
+            </rect>
+        </property>
+        <property name="title">
+            <string>Common Parameters</string>
+        </property>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>tlOutputDynlibName</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>10</x>
+                    <y>60</y>
+                    <width>130</width>
+                    <height>20</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>Output Library Name :</string>
+            </property>
+            <property name="alignment">
+                <set>AlignVCenter|AlignRight</set>
+            </property>
+        </widget>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>tlGeneratorName</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>10</x>
+                    <y>90</y>
+                    <width>130</width>
+                    <height>20</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>Generator Name :</string>
+            </property>
+            <property name="alignment">
+                <set>AlignVCenter|AlignRight</set>
+            </property>
+        </widget>
+        <widget class="QLineEdit">
+            <property name="name">
+                <cstring>leOutputDynlibName</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>150</x>
+                    <y>60</y>
+                    <width>310</width>
+                    <height>20</height>
+                </rect>
+            </property>
+        </widget>
+        <widget class="QPushButton">
+            <property name="name">
+                <cstring>pbChoose</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>390</x>
+                    <y>30</y>
+                    <width>70</width>
+                    <height>20</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>Choose ...</string>
+            </property>
+        </widget>
+        <widget class="QPushButton">
+            <property name="name">
+                <cstring>pbLoad</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>390</x>
+                    <y>90</y>
+                    <width>70</width>
+                    <height>20</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>Load</string>
+            </property>
+        </widget>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>tlOoutputFileName</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>10</x>
+                    <y>30</y>
+                    <width>130</width>
+                    <height>20</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>Output File Name :</string>
+            </property>
+            <property name="alignment">
+                <set>AlignVCenter|AlignRight</set>
+            </property>
+        </widget>
+        <widget class="QLineEdit">
+            <property name="name">
+                <cstring>leOutputFileName</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>150</x>
+                    <y>30</y>
+                    <width>230</width>
+                    <height>20</height>
+                </rect>
+            </property>
+        </widget>
+        <widget class="QLineEdit">
+            <property name="name">
+                <cstring>leGeneratorDynlibName</cstring>
+            </property>
+            <property name="geometry">
+                <rect>
+                    <x>150</x>
+                    <y>90</y>
+                    <width>230</width>
+                    <height>20</height>
+                </rect>
+            </property>
+        </widget>
+    </widget>
+    <widget class="QGroupBox">
+        <property name="name">
+            <cstring>gbGeneratorParameter</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>10</x>
+                <y>150</y>
+                <width>470</width>
+                <height>190</height>
+            </rect>
+        </property>
+        <property name="title">
+            <string>Generator Parameters</string>
+        </property>
+    </widget>
+    <widget class="QPushButton">
+        <property name="name">
+            <cstring>pbGenerate</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>100</x>
+                <y>350</y>
+                <width>88</width>
+                <height>30</height>
+            </rect>
+        </property>
+        <property name="text">
+            <string>Generate</string>
+        </property>
+    </widget>
+    <widget class="QPushButton">
+        <property name="name">
+            <cstring>pbClose</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>300</x>
+                <y>350</y>
+                <width>88</width>
+                <height>30</height>
+            </rect>
+        </property>
+        <property name="text">
+            <string>Close</string>
+        </property>
+    </widget>
+</widget>
+<connections>
+    <connection>
+        <sender>pbChoose</sender>
+        <signal>clicked()</signal>
+        <receiver>QtFileGeneratorController</receiver>
+        <slot>pbChooseClicked()</slot>
+    </connection>
+    <connection>
+        <sender>pbLoad</sender>
+        <signal>clicked()</signal>
+        <receiver>QtFileGeneratorController</receiver>
+        <slot>pbLoadClicked()</slot>
+    </connection>
+    <connection>
+        <sender>pbGenerate</sender>
+        <signal>clicked()</signal>
+        <receiver>QtFileGeneratorController</receiver>
+        <slot>pbGenerateClicked()</slot>
+    </connection>
+    <connection>
+        <sender>pbClose</sender>
+        <signal>clicked()</signal>
+        <receiver>QtFileGeneratorController</receiver>
+        <slot>pbCloseClicked()</slot>
+    </connection>
+</connections>
+<slots>
+    <slot>pbChooseClicked()</slot>
+    <slot>pbLoadClicked()</slot>
+    <slot>pbGenerateClicked()</slot>
+    <slot>pbCloseClicked()</slot>
+</slots>
+<layoutdefaults spacing="6" margin="11"/>
+</UI>
