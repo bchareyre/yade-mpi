@@ -150,12 +150,12 @@ void Sphere::glDraw()
 		glWiredSphereList = glGenLists(1);
 		glNewList(glWiredSphereList,GL_COMPILE);
 			glDisable(GL_LIGHTING);
-			drawSphere(3);
+			drawSphere(1);
 		glEndList();
 		glSphereList = glGenLists(1);
 		glNewList(glSphereList,GL_COMPILE);
 			glEnable(GL_LIGHTING);
-			drawSphere(3);
+			drawSphere(1);
 		glEndList();
 	}
 

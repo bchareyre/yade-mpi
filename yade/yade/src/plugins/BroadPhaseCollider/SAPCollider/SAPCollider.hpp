@@ -6,9 +6,9 @@
 #include <vector>
 #include <algorithm>
 
-#include "BroadPhaseCollider.hpp"
+#include "BroadCollider.hpp"
 
-class SAPCollider : public BroadPhaseCollider
+class SAPCollider : public BroadCollider
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -112,17 +112,17 @@ REGISTER_SERIALIZABLE(SAPCollider,false);
 #ifdef WIN32
 	extern "C"
 	{
-		__declspec(dllexport) BroadPhaseCollider * create()
+		__declspec(dllexport) BroadCollider * create()
 		{
-			return (BroadPhaseCollider*)(new SAPCollider());
+			return (BroadCollider*)(new SAPCollider());
 		}
 	}
 #else
 	extern "C"
 	{
-		BroadPhaseCollider * create()
+		BroadCollider * create()
 		{
-			return (BroadPhaseCollider*)(new SAPCollider());
+			return (BroadCollider*)(new SAPCollider());
 		}
 
 		// info() {need min & max func in BV

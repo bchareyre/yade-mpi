@@ -11,8 +11,8 @@ HEADERS += Body.hpp \
            BVHierarchy.hpp \
            Chrono.hpp \
            ClassFactory.hpp \
-           CollisionModelFactory.hpp \
-           CollisionModel.hpp \
+           CollisionGeometryFactory.hpp \
+           CollisionGeometry.hpp \
            ConnexBody.hpp \
            DynamicEngine.hpp \
            DynLibManager.hpp \
@@ -47,8 +47,8 @@ SOURCES += Body.cpp \
            BVHierarchy.cpp \
            Chrono.cpp \
            ClassFactory.cpp \
-           CollisionModel.cpp \
-           CollisionModelFactory.cpp \
+           CollisionGeometry.cpp \
+           CollisionGeometryFactory.cpp \
            ConnexBody.cpp \
            DynamicEngine.cpp \
            DynLibManager.cpp \

@@ -1,27 +1,27 @@
-#include "NarrowPhaseCollider.hpp"
+#include "NarrowCollider.hpp"
 
-NarrowPhaseCollider::NarrowPhaseCollider () : Serializable()
+NarrowCollider::NarrowCollider () : Serializable()
 {
 }
 
-NarrowPhaseCollider::~NarrowPhaseCollider ()
+NarrowCollider::~NarrowCollider ()
 {
 
 }
 
 
-void NarrowPhaseCollider::processAttributes()
+void NarrowCollider::processAttributes()
 {
 	for(unsigned int i=0;i<collisionFunctors.size();i++)
 		narrowManager.addPair(collisionFunctors[i][0],collisionFunctors[i][1],collisionFunctors[i][2]);
 }
 
-void NarrowPhaseCollider::registerAttributes()
+void NarrowCollider::registerAttributes()
 {
 	REGISTER_ATTRIBUTE(collisionFunctors);
 }
 
-void NarrowPhaseCollider::addCollisionFunctor(const string& str1,const string& str2,const string& str3)
+void NarrowCollider::addCollisionFunctor(const string& str1,const string& str2,const string& str3)
 {
 	vector<string> v;
 	v.push_back(str1);

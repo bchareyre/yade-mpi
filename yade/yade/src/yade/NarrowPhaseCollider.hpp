@@ -45,7 +45,7 @@ class Body;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-class NarrowPhaseCollider : public Serializable
+class NarrowCollider : public Serializable
 {
 
 	protected : CollisionMultiMethodsManager narrowManager;
@@ -54,23 +54,23 @@ class NarrowPhaseCollider : public Serializable
 	public  : void addCollisionFunctor(const string& str1,const string& str2,const string& str3);
 		
 	// construction
-	public : NarrowPhaseCollider ();
+	public : NarrowCollider ();
 
-	public : virtual ~NarrowPhaseCollider ();
+	public : virtual ~NarrowCollider ();
 
 	public : virtual bool narrowCollisionPhase(const std::vector<shared_ptr<Body> >& , std::list<shared_ptr<Interaction> >& ) { return false;};
 
 	public : void processAttributes();
 	public : void registerAttributes();
 
-	REGISTER_CLASS_NAME(NarrowPhaseCollider);
+	REGISTER_CLASS_NAME(NarrowCollider);
 
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-REGISTER_SERIALIZABLE(NarrowPhaseCollider,false);
+REGISTER_SERIALIZABLE(NarrowCollider,false);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -3,7 +3,7 @@
 #include "Body.hpp"
 //#include "Omega.hpp"
 
-SimpleNarrowCollider::SimpleNarrowCollider() : NarrowPhaseCollider()
+SimpleNarrowCollider::SimpleNarrowCollider() : NarrowCollider()
 {
 	//collider = shared_ptr<FinalCollider>(new BVCFFinalCollider());
 }
@@ -15,12 +15,12 @@ SimpleNarrowCollider::~ SimpleNarrowCollider()
 
 void SimpleNarrowCollider::processAttributes()
 {
-	NarrowPhaseCollider::processAttributes();
+	NarrowCollider::processAttributes();
 }
 
 void SimpleNarrowCollider::registerAttributes()
 {
-	NarrowPhaseCollider::registerAttributes();
+	NarrowCollider::registerAttributes();
 }
 
 bool SimpleNarrowCollider::narrowCollisionPhase(const std::vector<shared_ptr<Body> >& bodies, std::list<shared_ptr<Interaction> >& interactions)

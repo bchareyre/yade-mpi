@@ -40,8 +40,8 @@ void BoxStack::exec()
 	q.fromAngleAxis(0, Vector3(0,0,1));
 	
 	rootBody->dynamic	   = shared_ptr<DynamicEngine>(new SimpleSpringDynamicEngine);
-	rootBody->broadCollider		= shared_ptr<BroadPhaseCollider>(new SAPCollider);
-	rootBody->narrowCollider	= shared_ptr<NarrowPhaseCollider>(new SimpleNarrowCollider);
+	rootBody->broadCollider		= shared_ptr<BroadCollider>(new SAPCollider);
+	rootBody->narrowCollider	= shared_ptr<NarrowCollider>(new SimpleNarrowCollider);
 	rootBody->isDynamic      = false;
 	rootBody->velocity       = Vector3(0,0,0);
 	rootBody->angularVelocity= Vector3(0,0,0);

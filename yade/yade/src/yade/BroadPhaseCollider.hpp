@@ -49,7 +49,7 @@ class Body;
 	All the broad phase collider (sweep and prune, regular grid ....) must derived from this class. A broad phase collider is used to speed up the collision detection test by testing collision between the bounding volume of the objects. In general it tries to reduce the number of potential colliding pairs.
 */
 // FIXME : Serializable or Factorable
-class BroadPhaseCollider : public Serializable
+class BroadCollider : public Serializable
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -62,10 +62,10 @@ class BroadPhaseCollider : public Serializable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/*! Constructor */
-	public : BroadPhaseCollider ();
+	public : BroadCollider ();
 
 	/*! Virtual destructor for correct dealloction of polymorphic pointer */
-	public : virtual ~BroadPhaseCollider ();
+	public : virtual ~BroadCollider ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Methods											///
@@ -81,13 +81,13 @@ class BroadPhaseCollider : public Serializable
 	public : void processAttributes();
 	public : void registerAttributes();
 
-	REGISTER_CLASS_NAME(BroadPhaseCollider);
+	REGISTER_CLASS_NAME(BroadCollider);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-REGISTER_SERIALIZABLE(BroadPhaseCollider,false);
+REGISTER_SERIALIZABLE(BroadCollider,false);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////

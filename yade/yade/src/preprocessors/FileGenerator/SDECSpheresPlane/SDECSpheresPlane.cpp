@@ -41,8 +41,8 @@ void SDECSpheresPlane::exec()
 
 	rootBody->dynamic		= shared_ptr<DynamicEngine>(new SDECDynamicEngine);
 	//rootBody->kinematic		= shared_ptr<KinematicEngine>(new Rotor);
-	rootBody->broadCollider		= shared_ptr<BroadPhaseCollider>(new SAPCollider);
-	rootBody->narrowCollider	= shared_ptr<NarrowPhaseCollider>(new SimpleNarrowCollider);
+	rootBody->broadCollider		= shared_ptr<BroadCollider>(new SAPCollider);
+	rootBody->narrowCollider	= shared_ptr<NarrowCollider>(new SimpleNarrowCollider);
 
 	rootBody->narrowCollider->addCollisionFunctor("Box","Box","Box2Box4ClosestFeatures");
 	rootBody->narrowCollider->addCollisionFunctor("Sphere","Sphere","Sphere2Sphere4ClosestFeatures");

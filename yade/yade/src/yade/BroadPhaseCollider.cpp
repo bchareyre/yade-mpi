@@ -1,22 +1,22 @@
-#include "BroadPhaseCollider.hpp"
+#include "BroadCollider.hpp"
 
 
-BroadPhaseCollider::BroadPhaseCollider () : Serializable()
+BroadCollider::BroadCollider () : Serializable()
 {
 }
 	
-BroadPhaseCollider::~BroadPhaseCollider ()
+BroadCollider::~BroadCollider ()
 {
 
 }
 
 
-void BroadPhaseCollider::processAttributes()
+void BroadCollider::processAttributes()
 {
 
 }
 
-void BroadPhaseCollider::registerAttributes()
+void BroadCollider::registerAttributes()
 {
 
 }
