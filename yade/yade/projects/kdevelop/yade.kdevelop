@@ -104,7 +104,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>yade/Interaction</activedir>
+      <activedir>toolboxes/DataStructures/InteractionContainer</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>

@@ -3,7 +3,8 @@
 # Subdir relative project main directory: ./toolboxes/DataStructures
 # Target is a subdirs project 
 
-SUBDIRS += AssocVector 
+SUBDIRS += AssocVector \
+	   InteractionContainer
 MOC_DIR = $(YADECOMPILATIONPATH)
 UI_DIR = $(YADECOMPILATIONPATH)
 OBJECTS_DIR = $(YADECOMPILATIONPATH)
