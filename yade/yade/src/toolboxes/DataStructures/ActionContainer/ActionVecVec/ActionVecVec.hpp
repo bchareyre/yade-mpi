@@ -19,18 +19,25 @@ class ActionVecVec : public ActionContainer
 	// this in fact should be also a RedirectionVector in respect to the Body.id
 	// this container is memory-consuming, because size of this vector is depending on highest id
 	// from all bodies, not on the number of bodies
-	private	: std::vector< std::vector< shared_ptr<Action> > > actions;
-	private	: std::vector< std::vector< shared_ptr<Action> > >::iterator aii;
-	private	: std::vector< std::vector< shared_ptr<Action> > >::iterator temporaryAii;
-	private	: std::vector< std::vector< shared_ptr<Action> > >::iterator aiiEnd;
-	private	: std::list< std::vector< std::vector< shared_ptr<Action> > >::iterator > iteratorList;
+	
+	// in this two-dimensional table:
+	// 	- first  dimension is Body->getId() number
+	//	- second dimension is Action->getClassIndex() number
+	private	  : std::vector< std::vector< shared_ptr<Action> > > actions;
+	private	  : std::vector< std::vector< shared_ptr<Action> > >::iterator aii;
+	private	  : std::vector< std::vector< shared_ptr<Action> > >::iterator temporaryAii;
+	private	  : std::vector< std::vector< shared_ptr<Action> > >::iterator aiiEnd;
+	private	  : std::list< std::vector< std::vector< shared_ptr<Action> > >::iterator > iteratorList;
+	
+	private   : int currentActionType; // current polymorphic Action type - is an Action->getClassIndex();
+	private	  : mutable shared_ptr<Action> empty;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Constructor/Destructor									///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public	: ActionVecVec();
-	public	: virtual ~ActionVecVec();
+	public	  : ActionVecVec();
+	public	  : virtual ~ActionVecVec();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Methods											///
@@ -50,19 +57,23 @@ class ActionVecVec : public ActionContainer
 	
 	// allows to set current polymorphic Action Type on which other functions will work:
 	// function that use this are: eraseAction, operator[]
-	public	  : virtual void setCurrentActionType(shared_ptr<Action>);
+	public	  : virtual void setCurrentActionType( int /*Action::getClassIndex()*/ );
 		
 	// deletes Action of given polymorphic type from body that has given Id
-	public    : virtual bool eraseAction(shared_ptr<Action>&, unsigned int);
+	public    : virtual bool eraseAction(	  unsigned int /*Body->getId() */
+						, int /*Action::getClassIndex()*/);
 	// deletes Action of given polymorphic type from body that has given Id,
 	// the polymorphic type is selected by setCurrentActionType()
+	// returns true if action existed before deletion
 	public    : virtual bool eraseAction(unsigned int);
 	// deletes all Actions in a body of given Id
-	public    : virtual bool erase(unsigned int);
+	public    : virtual void erase(unsigned int);
 	
 	// finds and returns action of given polymorphic type, for body of given Id,
-	// returns empty shared_ptr and false if this Action doesn't exists for chosen body
-	public    : virtual bool find(shared_ptr<Action>&, unsigned int) const;
+	// returns empty shared_ptr if this Action doesn't exist for chosen body
+	public    : virtual shared_ptr<Action> find(
+					  unsigned int /*Body->getId() */
+					, int /*Action::getClassIndex()*/);
 	// same as above, polymorphic Action type is selected with setCurrentActionType
 	public    : virtual shared_ptr<Action>& operator[](unsigned int);
 	public    : virtual const shared_ptr<Action>& operator[](unsigned int) const;

@@ -70,20 +70,25 @@ class ActionContainer : public Serializable
 	public	  : virtual void add(shared_ptr<Action>&, unsigned int , unsigned int)	{throw;};
 	
 	// allows to set current polymorphic Action Type on which other functions will work:
-	// function that use this are: eraseAction, operator[]
-	public	  : virtual void setCurrentActionType(shared_ptr<Action>)		{throw;};
+	// function that use this are: eraseAction, operator[], getCurrent()
+	public	  : virtual void setCurrentActionType( int /*Action::getClassIndex()*/ ){throw;};
 		
 	// deletes Action of given polymorphic type from body that has given Id
-	public    : virtual bool eraseAction(shared_ptr<Action>&, unsigned int) 	{throw;};
+	public    : virtual bool eraseAction(	  unsigned int /* Body->getId() */
+						, int /* Action::getClassIndex() */)	{throw;};
+						
 	// deletes Action of given polymorphic type from body that has given Id,
 	// the polymorphic type is selected by setCurrentActionType()
+	// returns true if action existed before deletion
 	public    : virtual bool eraseAction(unsigned int) 				{throw;};
 	// deletes all Actions in a body of given Id
-	public    : virtual bool erase(unsigned int) 					{throw;};
+	public    : virtual void erase(unsigned int) 					{throw;};
 	
 	// finds and returns action of given polymorphic type, for body of given Id,
-	// returns empty shared_ptr and false if this Action doesn't exists for chosen body
-	public    : virtual bool find(shared_ptr<Action>&, unsigned int) const		{throw;};
+	// returns empty shared_ptr if this Action doesn't exist for chosen body
+	public    : virtual shared_ptr<Action> find(
+					  unsigned int /*Body->getId() */
+					, int /*Action::getClassIndex()*/)		const{throw;};
 	// same as above, polymorphic Action type is selected with setCurrentActionType
 	public    : virtual shared_ptr<Action>& operator[](unsigned int)		{throw;};
 	public    : virtual const shared_ptr<Action>& operator[](unsigned int) const	{throw;};

@@ -1,10 +1,12 @@
 #include "ActionVecVec.hpp"
 #include "Body.hpp"
-
+#include "Action.hpp"
 
 ActionVecVec::ActionVecVec()
 {
 	clear();
+	currentActionType = -1;
+	empty = shared_ptr<Action>();
 }
 
 ActionVecVec::~ActionVecVec()
@@ -14,86 +16,156 @@ ActionVecVec::~ActionVecVec()
 
 void ActionVecVec::clear()
 {
+	actions.clear();
 }
 
 unsigned int ActionVecVec::size()
 {
+	return actions.size();
 }
 	
 // adds Action acting on one body,
 // it is mathematically added if Action of this polymorphic type already exists,
 // if it doesn't exist, then it is appended to stored list of Actions for that body
-void ActionVecVec::add(shared_ptr<Action>&, unsigned int )
-{
+void ActionVecVec::add(shared_ptr<Action>& newAction, unsigned int id)
+{/* FIXME - not compiling
+	int idx = newAction->getClassIndex();
+	if( actions.size() < id)
+		actions.resize(id);
+		
+	if( actions[id].size() < idx )
+		actions[id].resize[idx];
+		
+	if( actions[id][idx] )
+//		actions[id][idx] += newAction // FIXME - make this line compiling.
+		;
+	else
+		actions[id][idx] = newAction;
+*/
 }
 // adds Action that acts on two bodies.
 // on first body it is substarcted,
 // to second body it is added
 void ActionVecVec::add(shared_ptr<Action>&, unsigned int , unsigned int)
 {
+
 }
 	
 // allows to set current polymorphic Action Type on which other functions will work:
 // function that use this are: eraseAction, operator[]
-void ActionVecVec::setCurrentActionType(shared_ptr<Action>)
+void ActionVecVec::setCurrentActionType(int idx)
 {
+	currentActionType = idx;
 }
 		
 // deletes Action of given polymorphic type from body that has given Id
-bool ActionVecVec::eraseAction(shared_ptr<Action>&, unsigned int)
+bool ActionVecVec::eraseAction(unsigned int id, int idx)
 {
+	if( idx >= 0 && (unsigned int)idx < actions[id].size() && actions[id][idx] )
+	{
+		actions[id][idx] = shared_ptr<Action>();
+		return true;
+	}
+	else
+		return false;
 }
 
 // deletes Action of given polymorphic type from body that has given Id,
 // the polymorphic type is selected by setCurrentActionType()
-bool ActionVecVec::eraseAction(unsigned int)
+// returns true if action existed before deletion
+bool ActionVecVec::eraseAction(unsigned int id)
 {
+	if(	   currentActionType >= 0 
+		&& (unsigned int)currentActionType < actions[id].size()
+		&& actions[id][currentActionType] )
+	{
+		actions[id][currentActionType] = shared_ptr<Action>();
+		return true;
+	}
+	else
+		return false;
 }
 
 // deletes all Actions in a body of given Id
-bool ActionVecVec::erase(unsigned int)
+void ActionVecVec::erase(unsigned int id)
 {
+	actions[id].clear();
 }
 	
 // finds and returns action of given polymorphic type, for body of given Id,
-// returns empty shared_ptr and false if this Action doesn't exists for chosen body
-bool ActionVecVec::find(shared_ptr<Action>&, unsigned int) const
+// returns empty shared_ptr if this Action doesn't exist for chosen body
+shared_ptr<Action> ActionVecVec::find(unsigned int id, int idx)
 {
+	if( 	   idx >= 0
+		&& (unsigned int)idx < actions[id].size() )
+		return actions[id][idx];
+	else
+		return shared_ptr<Action>();
 }
 
 // same as above, polymorphic Action type is selected with setCurrentActionType
-shared_ptr<Action>& ActionVecVec::operator[](unsigned int)
+shared_ptr<Action>& ActionVecVec::operator[](unsigned int id)
 {
+	if(	   currentActionType >=0
+		&& (unsigned int)currentActionType < actions[id].size() )
+		return actions[id][currentActionType];
+	else
+	{
+		empty = shared_ptr<Action>();
+		return empty; // because returning reference is faster
+	}
 }
 
-const shared_ptr<Action>& ActionVecVec::operator[](unsigned int) const
+const shared_ptr<Action>& ActionVecVec::operator[](unsigned int id) const
 {
+	if(	   currentActionType >=0
+		&& (unsigned int)currentActionType < actions[id].size() )
+		return actions[id][currentActionType];
+	else
+	{
+		empty = shared_ptr<Action>();
+		return empty;
+	}
 }
 
 // looping over Bodies, and their Actions (with setCurrentActionType)
 void ActionVecVec::gotoFirst()
 {
+	aii    = actions.begin();
+	aiiEnd = actions.end();
 }
 
 bool ActionVecVec::notAtEnd()
 {
+	return ( aii != aiiEnd );
 }
 
 void ActionVecVec::gotoNext()
 {
+	++aii;
 }
 
 // returns Action selected by setCurrentActionType, for current Body
 shared_ptr<Action> ActionVecVec::getCurrent()
 {
+//	return (*aii).find(currentActionType);
+
+	if( currentActionType < (*aii).size() )
+		return (*aii)[currentActionType];
+	else
+		return shared_ptr<Action>();
+
 }
 
 void ActionVecVec::pushIterator()
-{
+{// FIXME - make sure that this is FIFO (I'm tired now...)
+	iteratorList.push_front(aii);
 }
 
 void ActionVecVec::popIterator()
 {
+	aii = iteratorList.front();
+	iteratorList.pop_front();
 }
 
 
@@ -114,16 +186,6 @@ void ActionVecVec::popIterator()
 /*
 unsigned int ActionVecVec::insert(shared_ptr<Body>& b)
 {
-//	unsigned int max;
-//	if( bodies.begin() != bodies.end() )
-//		max = (--(bodies.end()))->first + 1;
-//	else
-//		max = 0;
-//	bodies.insert( Loki::AssocVector::value_type( max , b ));
-//	bodies[max]=b;
-//	BodyContainer::setId(b,max);
-//	return max;
-
 	unsigned int position = b->getId();
 
 	Loki::AssocVector<unsigned int , shared_ptr<Body> >::const_iterator tmpBii;
@@ -148,16 +210,9 @@ unsigned int ActionVecVec::insert(shared_ptr<Body>& b, unsigned int newId)
 	return insert(b);
 }
 
-void ActionVecVec::clear()
-{
-	bodies.clear();
-}
 
 bool ActionVecVec::erase(unsigned int id)
 {
-
-// WARNING!!! AssocVector.erase() invalidates all iterators !!!
-
 	bii = bodies.find(id);
 
 	if( bii != bodies.end() )
@@ -184,62 +239,6 @@ bool ActionVecVec::find(unsigned int id , shared_ptr<Body>& b) const
 		return false;
 }
 
-shared_ptr<Body>& ActionVecVec::operator[](unsigned int id)
-{
-	// do not modify bii iterator
-	temporaryBii = bodies.find(id);
-//	if (bii != bodies.end())
-		return (*temporaryBii).second;
-//	else
-//		return shared_ptr<Body>();
-}
 
-const shared_ptr<Body>& ActionVecVec::operator[](unsigned int id) const
-{
-	Loki::AssocVector<unsigned int , shared_ptr<Body> >::const_iterator tmpBii;
-	tmpBii = bodies.find(id);
-// when commented it is faster, but less secure.
-//	if (tmpBii != bodies.end())
-		return (*tmpBii).second;
-//	else
-//		return shared_ptr<Body>();
-}
-
-void ActionVecVec::gotoFirst()
-{
-	bii    = bodies.begin();
-	biiEnd = bodies.end();
-}
-
-bool ActionVecVec::notAtEnd()
-{
-	return ( bii != biiEnd );
-}
-
-void ActionVecVec::gotoNext()
-{
-	++bii;
-}
-
-shared_ptr<Body> ActionVecVec::getCurrent()
-{
-	return (*bii).second;
-}
-
-void ActionVecVec::pushIterator()
-{// FIXME - make sure that this is FIFO (I'm tired now...)
-	iteratorList.push_front(bii);
-}
-
-void ActionVecVec::popIterator()
-{
-	bii = iteratorList.front();
-	iteratorList.pop_front();
-}
-
-unsigned int ActionVecVec::size()
-{
-	return bodies.size();
-}
 */
 
