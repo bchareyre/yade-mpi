@@ -54,7 +54,7 @@ bool Mesh2D::loadFromFile(char * )
 
 void Mesh2D::glDraw()
 {
-	glColor3fv(diffuseColor);
+	glColor3v(diffuseColor);
 
 	//wire=true;
 	if (wire)
@@ -85,11 +85,11 @@ void Mesh2D::glDraw()
 				int v1 = faces[i][0];
 				int v2 = faces[i][1];
 				int v3 = faces[i][2];
-				glNormal3fv(vNormals[v1]);
+				glNormal3v(vNormals[v1]);
 				glVertex3v(vertices[v1]);
-				glNormal3fv(vNormals[v2]);
+				glNormal3v(vNormals[v2]);
 				glVertex3v(vertices[v2]);
-				glNormal3fv(vNormals[v3]);
+				glNormal3v(vNormals[v3]);
 				glVertex3v(vertices[v3]);
 			}
 		glEnd();

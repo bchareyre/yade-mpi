@@ -1,3 +1,4 @@
+#include "OpenGLWrapper.hpp"
 #include "Box.hpp"
 #include <iostream>
 
@@ -39,7 +40,7 @@ bool Box::loadFromFile(char * )
 
 void Box::glDraw()
 {
-	glColor3fv(diffuseColor);
+	glColor3v(diffuseColor);
 	glScalef(2*extents[0],2*extents[1],2*extents[2]);
 
 	if (wire)

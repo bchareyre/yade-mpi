@@ -38,7 +38,7 @@ bool Terrain::loadFromFile(char * fileName)
 
 void Terrain::glDraw()
 {
-	glColor3f(diffuseColor[0],diffuseColor[1],diffuseColor[2]);
+	glColor3(diffuseColor[0],diffuseColor[1],diffuseColor[2]);
 	//if (_glListId==0)
 	//{
 		std::vector<std::vector<int> >::iterator fsi	= faces.begin();
@@ -51,7 +51,7 @@ void Terrain::glDraw()
 			std::vector<int>::iterator fiEnd	= (*fsi).end();
 			
 			glBegin(GL_POLYGON);
-				glNormal3fv(*ni);
+				glNormal3v(*ni);
 				for( ; fi!=fiEnd; ++fi)
 					glVertex3v(vertices[(*fi)]);
 			glEnd();
@@ -61,13 +61,13 @@ void Terrain::glDraw()
 	//	glCallList(_glListId);
 	
 	glEnable(GL_LIGHTING);
-	glColor3f(1.0,0.0,0.0);
+	glColor3(1.0,0.0,0.0);
 	
 	for(unsigned int k=0;k<testedFaces.size();k++)
 	{
 		int faceId = testedFaces[k];
 		glBegin(GL_POLYGON);
-			glNormal3fv(normals[faceId]);
+			glNormal3v(normals[faceId]);
 			glVertex3v(vertices[faces[faceId][0]]+Vector3r(0,0.1,0));
 			glVertex3v(vertices[faces[faceId][1]]+Vector3r(0,0.1,0));
 			glVertex3v(vertices[faces[faceId][2]]+Vector3r(0,0.1,0));

@@ -1,5 +1,6 @@
 #include "FpsTracker.hpp"
 #include <GL/glut.h>
+#include "OpenGLWrapper.hpp"
 
 FpsTracker::FpsTracker (QGLViewer * glViewer,int minX,int minY, int sizeX,int sizeY) : QGLSubWindow(glViewer,minX,minY,sizeX,sizeY)
 {
@@ -106,7 +107,7 @@ void FpsTracker::drawCurve()
 	float scale2 = (float)sizeX/(beginTime-endTime);
 	float corr2 = maxX-scale2*beginTime;
 			
-	glColor3f(0.3,0.3,0.3);
+	glColor3(0.3,0.3,0.3);
 	glBegin(GL_LINES);
 		for(i = (int)maxY-10 ; i>minY; i-=10)
 		{	
@@ -129,7 +130,7 @@ void FpsTracker::drawCurve()
 	number.setNum(maxFps,'g',2);
 	drawString(number+" Hz",minX,minY-3,color);
 	
-	glColor3f(curveColor[0],curveColor[1],curveColor[2]);
+	glColor3(curveColor[0],curveColor[1],curveColor[2]);
 	glBegin(GL_LINE_STRIP);		
 		for(;fi!=fiEnd;++fi)
 			glVertex2f((*fi).first*scale2+corr2,(*fi).second*scale1+corr1);
@@ -143,7 +144,7 @@ void FpsTracker::drawCurve()
 	float moy = moyFps/elapsedTime;
 	if (moy>minFps && moy<maxFps)
 	{
-		glColor3f(moyColor[0],moyColor[1],moyColor[2]);
+		glColor3(moyColor[0],moyColor[1],moyColor[2]);
 		glBegin(GL_LINES);
 			glVertex2f(minX,moy*scale1+corr1);
 			glVertex2f(maxX,moy*scale1+corr1);

@@ -1,4 +1,5 @@
 #include "BoundingSphere.hpp"
+#include "OpenGLWrapper.hpp"
 
 BoundingSphere::BoundingSphere (float r) : BoundingVolume()
 {
@@ -37,8 +38,8 @@ bool BoundingSphere::loadFromFile(char * )
 
 void BoundingSphere::glDraw()
 {	
-	glColor3fv(color);
-	glTranslatef(center[0],center[1],center[2]);
+	glColor3v(color);
+	glTranslate(center[0],center[1],center[2]);
 	glutWireSphere(radius,10,10);
 }
 

@@ -27,7 +27,7 @@ void NonConnexBody::glDraw()
 
 	glPushMatrix();
 
-	float angle;
+	Real angle;
 	Vector3r axis;
 	se3.rotation.toAxisAngle(axis,angle);
 

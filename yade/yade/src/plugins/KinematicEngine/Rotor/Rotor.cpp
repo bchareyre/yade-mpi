@@ -39,7 +39,7 @@ void Rotor::moveToNextTimeStep(Body * body)
 	q.fromAxisAngle(rotationAxis,angularVelocity*dt);
 
 	Vector3r ax;
-	float an;
+	Real an;
 	
 	for(;ii!=iiEnd;++ii)
 	{

@@ -25,7 +25,7 @@ ConnexBody::~ConnexBody()
 void ConnexBody::glDraw()
 {	
 	glPushMatrix();
-	float angle;
+	Real angle;
 	Vector3r axis;	
 	se3.rotation.toAxisAngle(axis,angle);	
 	glTranslatef(se3.translation[0],se3.translation[1],se3.translation[2]);

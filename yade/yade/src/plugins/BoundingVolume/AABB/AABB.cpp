@@ -1,4 +1,5 @@
 #include "AABB.hpp"
+#include "OpenGLWrapper.hpp"
 
 AABB::AABB () : BoundingVolume()
 {
@@ -50,9 +51,9 @@ bool AABB::loadFromFile(char * )
 
 void AABB::glDraw()
 {
-	glColor3fv(color);	
-	glTranslatef(center[0],center[1],center[2]);
-	glScalef(2*halfSize[0],2*halfSize[1],2*halfSize[2]);
+	glColor3v(color);	
+	glTranslate(center[0],center[1],center[2]);
+	glScale(2*halfSize[0],2*halfSize[1],2*halfSize[2]);
 	glDisable(GL_LIGHTING);
 	glutWireCube(1);
 }

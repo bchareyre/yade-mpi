@@ -1,3 +1,4 @@
+#include "OpenGLWrapper.hpp"
 #include "QGLSubWindow.hpp"
 #include <iostream>
 
@@ -67,7 +68,7 @@ void QGLSubWindow::drawWindow()
 		glVertex2f(minX,minY+sizeY);
 	glEnd();
 		
-	glColor3f(color[0],color[1],color[2]);	
+	glColor3(color[0],color[1],color[2]);	
 	glBegin(GL_LINE_LOOP);
 		glVertex2f(minX-1,minY);
 		glVertex2f(minX+sizeX,minY);
@@ -89,7 +90,7 @@ void QGLSubWindow::drawSelectedComponent()
 	glLineWidth(2.0);
 	glEnable(GL_POINT_SMOOTH);
 	
-	glColor3f(selectionColor[0],selectionColor[1],selectionColor[2]);
+	glColor3(selectionColor[0],selectionColor[1],selectionColor[2]);
 	switch (selected)
 	{	
 		case 0 :	glBegin(GL_POINTS);

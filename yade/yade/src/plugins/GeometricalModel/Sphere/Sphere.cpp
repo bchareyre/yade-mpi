@@ -84,7 +84,7 @@ glNormal3v(TT tt)
 template<>
 glNormal3v<float>(TT tt)
 {
-	glNormal3fv(tt);
+	glNormal3v(tt);
 }
 */
 
@@ -117,11 +117,11 @@ void Sphere::subdivideTriangle(Vector3r& v1,Vector3r& v2,Vector3r& v3, int depth
 		glMaterialfv(GL_FRONT_AND_BACK,GL_SPECULAR,matAmbient);
 
 		glBegin(GL_TRIANGLES);
-			glNormal3fv(v3);
+			glNormal3v(v3);
 			glVertex3v(v3);
-			glNormal3fv(v2);
+			glNormal3v(v2);
 			glVertex3v(v2);
-			glNormal3fv(v1);
+			glNormal3v(v1);
 			glVertex3v(v1);
 		glEnd();
 
@@ -150,7 +150,7 @@ void Sphere::drawSphere(int depth)
 	number=0;
 	for(int i=0;i<20;i++)
 	{
-		//glColor3f(Mathr::unitRandom(),Mathr::unitRandom(),Mathr::unitRandom());
+		//glColor3(Mathr::unitRandom(),Mathr::unitRandom(),Mathr::unitRandom());
 		subdivideTriangle(vertices[(unsigned int)faces[i][0]],vertices[(unsigned int)faces[i][1]],vertices[(unsigned int)faces[i][2]],depth);
 	}
 }
@@ -172,7 +172,7 @@ void Sphere::glDraw()
 		glEndList();
 	}
 
-	glColor3fv(diffuseColor);
+	glColor3v(diffuseColor);
 	if (wire)
 	{
 		glScalef(radius,radius,radius);
