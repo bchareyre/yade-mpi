@@ -135,8 +135,7 @@ void Threadable<Thread>::operator()()
 template<class Thread>
 void Threadable<Thread>::sleep(int ms)
 {
-//	boost::mutex::scoped_lock lock(*mutex);
-
+	boost::mutex::scoped_lock lock(*mutex);
 	boost::xtime xt;
 	boost::xtime_get(&xt, boost::TIME_UTC);
 	xt.nsec += ms*1000000;
