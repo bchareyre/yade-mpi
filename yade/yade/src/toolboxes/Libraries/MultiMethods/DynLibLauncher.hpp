@@ -145,7 +145,6 @@ class DynLibLauncher : public Factorable
 		virtual ResultType go	(	Parm1) 							{ error();throw; };
 		virtual ResultType go	(	Parm1,Parm2) 						{ error();throw; };
 		virtual ResultType go	(	Parm1,Parm2,Parm3) 					{ error();throw; };
-		virtual ResultType go	(	Parm2,Parm1,Parm3,int hack =10) 			{ hack=0;error();throw; }; // FIXME - nasty bug in DynLibDispatcher
 		virtual ResultType go	(	Parm1,Parm2,Parm3,Parm4) 				{ error();throw; };
 		virtual ResultType go	(	Parm1,Parm2,Parm3,Parm4,Parm5) 				{ error();throw; };
 		virtual ResultType go	(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6) 			{ error();throw; };

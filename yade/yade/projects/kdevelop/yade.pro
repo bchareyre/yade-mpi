@@ -13,6 +13,6 @@ TEMPLATE = subdirs
 SUBDIRS += toolboxes \
            yade \
            plugins \
-           preprocessors \
            postprocessors \
+           preprocessors \
            extensions 

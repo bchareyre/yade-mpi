@@ -53,7 +53,7 @@ template
 	class Executor,		//	class which gives multivirtual function
 	class ResultType,	//	type returned by multivirtual function
 	class TList,		//	typelist of arguments passed to multivirtual function
-				//	WARNING: first arguments must be shared_ptr<BaseClass>, for details see DynLibLauncher
+				//	WARNING: first arguments must be boost::shared_ptr<BaseClass>, for details see DynLibLauncher
 				
 	bool autoSymmetry=true	//	true -	the function called is always the same,
 				//		only order of arguments is rearranged
@@ -329,7 +329,7 @@ class DynLibDispatcher
 			assert( index >= 0 && (unsigned int)( index ) < callBacks.size());
 			if( callBacks[index] )
 				return (callBacks[index])->go(base);
-			else	return 0;
+			else	return ResultType();
 		}
 		
 		ResultType operator() (boost::shared_ptr<BaseClass1> base, Parm2 p2)
@@ -338,7 +338,7 @@ class DynLibDispatcher
 			assert( index >= 0 && (unsigned int)( index ) < callBacks.size());
 			if( callBacks[index] )
 				return (callBacks[index])->go(base, p2);
-			else	return 0;
+			else	return ResultType();
 		}
 		
 		ResultType operator() (boost::shared_ptr<BaseClass1> base, Parm2 p2, Parm3 p3)
@@ -347,7 +347,7 @@ class DynLibDispatcher
 			assert( index >= 0 && (unsigned int)( index ) < callBacks.size());
 			if( callBacks[index] )
 				return (callBacks[index])->go(base, p2, p3);
-			else	return 0;
+			else	return ResultType();
 		}
 		
 		ResultType operator() (boost::shared_ptr<BaseClass1> base, Parm2 p2, Parm3 p3, Parm4 p4)
@@ -356,7 +356,7 @@ class DynLibDispatcher
 			assert( index >= 0 && (unsigned int)( index ) < callBacks.size());
 			if( callBacks[index] )
 				return (callBacks[index])->go(base, p2, p3, p4);
-			else	return 0;
+			else	return ResultType();
 		}
 		
 		ResultType operator() (boost::shared_ptr<BaseClass1> base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5)
@@ -365,7 +365,7 @@ class DynLibDispatcher
 			assert( index >= 0 && (unsigned int)( index ) < callBacks.size());
 			if( callBacks[index] )
 				return (callBacks[index])->go(base, p2, p3, p4, p5);
-			else	return 0;
+			else	return ResultType();
 		}
 		
 		ResultType operator() (boost::shared_ptr<BaseClass1> base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6)
@@ -374,7 +374,7 @@ class DynLibDispatcher
 			assert( index >= 0 && (unsigned int)( index ) < callBacks.size());
 			if( callBacks[index] )
 				return (callBacks[index])->go(base, p2, p3, p4, p5, p6);
-			else	return 0;
+			else	return ResultType();
 		}
 		
 		ResultType operator() (boost::shared_ptr<BaseClass1> base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6, Parm7 p7)
@@ -383,7 +383,7 @@ class DynLibDispatcher
 			assert( index >= 0 && (unsigned int)( index ) < callBacks.size());
 			if( callBacks[index] )
 				return (callBacks[index])->go(base, p2, p3, p4, p5, p6, p7);
-			else	return 0;
+			else	return ResultType();
 		}
 		
 		ResultType operator() (boost::shared_ptr<BaseClass1> base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6, Parm7 p7, Parm8 p8)
@@ -392,7 +392,7 @@ class DynLibDispatcher
 			assert( index >= 0 && (unsigned int)( index ) < callBacks.size());
 			if( callBacks[index] )
 				return (callBacks[index])->go(base, p2, p3, p4, p5, p6, p7, p8);
-			else	return 0;
+			else	return ResultType();
 		}
 		
 		ResultType operator() (boost::shared_ptr<BaseClass1> base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6, Parm7 p7, Parm8 p8, Parm9 p9)
@@ -401,7 +401,7 @@ class DynLibDispatcher
 			assert( index >= 0 && (unsigned int)( index ) < callBacks.size());
 			if( callBacks[index] )
 				return (callBacks[index])->go(base, p2, p3, p4, p5, p6, p7, p8, p9);
-			else	return 0;
+			else	return ResultType();
 		}
 		
 		ResultType operator() (boost::shared_ptr<BaseClass1> base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6, Parm7 p7, Parm8 p8, Parm9 p9,
@@ -411,7 +411,7 @@ class DynLibDispatcher
 			assert( index >= 0 && (unsigned int)( index ) < callBacks.size());
 			if( callBacks[index] )
 				return (callBacks[index])->go(base, p2, p3, p4, p5, p6, p7, p8, p9, p10);
-			else	return 0;
+			else	return ResultType();
 		}
 		
 		ResultType operator() (boost::shared_ptr<BaseClass1> base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6, Parm7 p7, Parm8 p8, Parm9 p9,
@@ -421,7 +421,7 @@ class DynLibDispatcher
 			assert( index >= 0 && (unsigned int)( index ) < callBacks.size());
 			if( callBacks[index] )
 				return (callBacks[index])->go(base, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11);
-			else	return 0;
+			else	return ResultType();
 		}
 		
 		ResultType operator() (boost::shared_ptr<BaseClass1> base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6, Parm7 p7, Parm8 p8, Parm9 p9,
@@ -431,7 +431,7 @@ class DynLibDispatcher
 			assert( index >= 0 && (unsigned int)( index ) < callBacks.size());
 			if( callBacks[index] )
 				return (callBacks[index])->go(base, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12);
-			else	return 0;
+			else	return ResultType();
 		}
 		
 		ResultType operator() (boost::shared_ptr<BaseClass1> base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6, Parm7 p7, Parm8 p8, Parm9 p9,
@@ -441,7 +441,7 @@ class DynLibDispatcher
 			assert( index >= 0 && (unsigned int)( index ) < callBacks.size());
 			if( callBacks[index] )
 				return (callBacks[index])->go(base, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13);
-			else	return 0;
+			else	return ResultType();
 		}
 		
 		ResultType operator() (boost::shared_ptr<BaseClass1> base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6, Parm7 p7, Parm8 p8, Parm9 p9,
@@ -451,7 +451,7 @@ class DynLibDispatcher
 			assert( index >= 0 && (unsigned int)( index ) < callBacks.size());
 			if( callBacks[index] )
 				return (callBacks[index])->go(base, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14);
-			else	return 0;
+			else	return ResultType();
 		}
 	
 		ResultType operator() (boost::shared_ptr<BaseClass1> base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6, Parm7 p7, Parm8 p8, Parm9 p9,
@@ -461,13 +461,177 @@ class DynLibDispatcher
 			assert( index >= 0 && (unsigned int)( index ) < callBacks.size());
 			if( callBacks[index] )
 				return (callBacks[index])->go(base, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15);
-			else	return 0;
+			else	return ResultType();
 		}
 	
 ////////////////////////////////////////////////////////////////////////////////
-// calling multivirtual function, 2D
+// calling multivirtual function, 2D, 
+// symmetry handling in private struct
 ////////////////////////////////////////////////////////////////////////////////
-		
+	private:
+		template< bool useSymmetry, class BaseClassTrait1, class BaseClassTrait2, class ParmTrait3, class ParmTrait4, class ParmTrait5, class ParmTrait6,
+				class ParmTrait7, class ParmTrait8, class ParmTrait9, class ParmTrait10, class ParmTrait11, class ParmTrait12, class ParmTrait13,
+				class ParmTrait14, class ParmTrait15 >
+		struct InvocationTraits
+		{
+			static ResultType doDispatch( boost::shared_ptr<Executor>& ex, boost::shared_ptr<BaseClassTrait1> base1, boost::shared_ptr<BaseClassTrait2> base2 )
+			{	
+				return ex->goReverse	(base1, base2);	
+			}	
+			static ResultType doDispatch( boost::shared_ptr<Executor>& ex, boost::shared_ptr<BaseClassTrait1> base1, boost::shared_ptr<BaseClassTrait2> base2, ParmTrait3 p3)
+			{
+				return ex->goReverse	(base1, base2, p3);
+			}
+			static ResultType doDispatch( boost::shared_ptr<Executor>& ex, boost::shared_ptr<BaseClassTrait1> base1, boost::shared_ptr<BaseClassTrait2> base2, ParmTrait3 p3,
+						ParmTrait4 p4)
+			{
+				return ex->goReverse	(base1, base2, p3, p4);
+			}
+			static ResultType doDispatch( boost::shared_ptr<Executor>& ex, boost::shared_ptr<BaseClassTrait1> base1, boost::shared_ptr<BaseClassTrait2> base2, ParmTrait3 p3,
+						ParmTrait4 p4, ParmTrait5 p5)
+			{
+				return ex->goReverse	(base1, base2, p3, p4, p5);
+			}
+			static ResultType doDispatch( boost::shared_ptr<Executor>& ex, boost::shared_ptr<BaseClassTrait1> base1, boost::shared_ptr<BaseClassTrait2> base2, ParmTrait3 p3,
+						ParmTrait4 p4, ParmTrait5 p5, ParmTrait6 p6)
+			{	
+				return ex->goReverse	(base1, base2, p3, p4, p5, p6);
+			}
+			static ResultType doDispatch( boost::shared_ptr<Executor>& ex, boost::shared_ptr<BaseClassTrait1> base1, boost::shared_ptr<BaseClassTrait2> base2, ParmTrait3 p3,
+						ParmTrait4 p4, ParmTrait5 p5, ParmTrait6 p6, ParmTrait7 p7)
+			{	
+				return ex->goReverse	(base1, base2, p3, p4, p5, p6, p7);
+			}
+			static ResultType doDispatch( boost::shared_ptr<Executor>& ex, boost::shared_ptr<BaseClassTrait1> base1, boost::shared_ptr<BaseClassTrait2> base2, ParmTrait3 p3,
+						ParmTrait4 p4, ParmTrait5 p5, ParmTrait6 p6, ParmTrait7 p7, ParmTrait8 p8)
+			{	
+				return ex->goReverse	(base1, base2, p3, p4, p5, p6, p7, p8);
+			}
+			static ResultType doDispatch( boost::shared_ptr<Executor>& ex, boost::shared_ptr<BaseClassTrait1> base1, boost::shared_ptr<BaseClassTrait2> base2, ParmTrait3 p3,
+						ParmTrait4 p4, ParmTrait5 p5, ParmTrait6 p6, ParmTrait7 p7, ParmTrait8 p8, ParmTrait9 p9)
+			{	
+				return ex->goReverse	(base1, base2, p3, p4, p5, p6, p7, p8, p9);
+			}
+			static ResultType doDispatch( boost::shared_ptr<Executor>& ex, boost::shared_ptr<BaseClassTrait1> base1, boost::shared_ptr<BaseClassTrait2> base2, ParmTrait3 p3,
+						ParmTrait4 p4, ParmTrait5 p5, ParmTrait6 p6, ParmTrait7 p7, ParmTrait8 p8, ParmTrait9 p9, ParmTrait10 p10)
+			{	
+				return ex->goReverse	(base1, base2, p3, p4, p5, p6, p7, p8, p9, p10);
+			}
+			static ResultType doDispatch( boost::shared_ptr<Executor>& ex, boost::shared_ptr<BaseClassTrait1> base1, boost::shared_ptr<BaseClassTrait2> base2, ParmTrait3 p3,
+						ParmTrait4 p4, ParmTrait5 p5, ParmTrait6 p6, ParmTrait7 p7, ParmTrait8 p8, ParmTrait9 p9, ParmTrait10 p10, ParmTrait11 p11)
+			{	
+				return ex->goReverse	(base1, base2, p3, p4, p5, p6, p7, p8, p9, p10, p11);
+			}
+			static ResultType doDispatch( boost::shared_ptr<Executor>& ex, boost::shared_ptr<BaseClassTrait1> base1, boost::shared_ptr<BaseClassTrait2> base2, ParmTrait3 p3,
+						ParmTrait4 p4, ParmTrait5 p5, ParmTrait6 p6, ParmTrait7 p7, ParmTrait8 p8, ParmTrait9 p9, ParmTrait10 p10, ParmTrait11 p11,
+						ParmTrait12 p12)
+			{	
+				return ex->goReverse	(base1, base2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12);
+			}
+			static ResultType doDispatch( boost::shared_ptr<Executor>& ex, boost::shared_ptr<BaseClassTrait1> base1, boost::shared_ptr<BaseClassTrait2> base2, ParmTrait3 p3,
+						ParmTrait4 p4, ParmTrait5 p5, ParmTrait6 p6, ParmTrait7 p7, ParmTrait8 p8, ParmTrait9 p9, ParmTrait10 p10, ParmTrait11 p11,
+						ParmTrait12 p12, ParmTrait13 p13)
+			{	
+				return ex->goReverse	(base1, base2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13);
+			}
+			static ResultType doDispatch( boost::shared_ptr<Executor>& ex, boost::shared_ptr<BaseClassTrait1> base1, boost::shared_ptr<BaseClassTrait2> base2, ParmTrait3 p3,
+						ParmTrait4 p4, ParmTrait5 p5, ParmTrait6 p6, ParmTrait7 p7, ParmTrait8 p8, ParmTrait9 p9, ParmTrait10 p10, ParmTrait11 p11,
+						ParmTrait12 p12, ParmTrait13 p13, ParmTrait14 p14)
+			{	
+				return ex->goReverse	(base1, base2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14);
+			}
+			static ResultType doDispatch( boost::shared_ptr<Executor>& ex, boost::shared_ptr<BaseClassTrait1> base1, boost::shared_ptr<BaseClassTrait2> base2, ParmTrait3 p3,
+						ParmTrait4 p4, ParmTrait5 p5, ParmTrait6 p6, ParmTrait7 p7, ParmTrait8 p8, ParmTrait9 p9, ParmTrait10 p10, ParmTrait11 p11,
+						ParmTrait12 p12, ParmTrait13 p13, ParmTrait14 p14, ParmTrait15 p15)
+			{	
+				return ex->goReverse	(base1, base2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15);
+			}
+		};
+		template< class BaseClassTrait, class ParmTrait3, class ParmTrait4, class ParmTrait5, class ParmTrait6
+					, class ParmTrait7, class ParmTrait8, class ParmTrait9, class ParmTrait10, class ParmTrait11, class ParmTrait12
+					, class ParmTrait13, class ParmTrait14, class ParmTrait15 >
+		struct InvocationTraits< true , BaseClassTrait, BaseClassTrait, ParmTrait3, ParmTrait4, ParmTrait5, ParmTrait6
+					, ParmTrait7, ParmTrait8, ParmTrait9, ParmTrait10, ParmTrait11, ParmTrait12
+					, ParmTrait13, ParmTrait14, ParmTrait15 >
+		{
+			static ResultType doDispatch( boost::shared_ptr<Executor>& ex , boost::shared_ptr<BaseClassTrait> base1, boost::shared_ptr<BaseClassTrait> base2 )
+			{
+				return ex->go		(base2, base1 );
+			}
+			static ResultType doDispatch( boost::shared_ptr<Executor>& ex , boost::shared_ptr<BaseClassTrait> base1, boost::shared_ptr<BaseClassTrait> base2, ParmTrait3 p3)
+			{
+				return ex->go		(base2, base1, p3);
+			}
+			static ResultType doDispatch( boost::shared_ptr<Executor>& ex , boost::shared_ptr<BaseClassTrait> base1, boost::shared_ptr<BaseClassTrait> base2, ParmTrait3 p3,
+						ParmTrait4 p4)
+			{
+				return ex->go		(base2, base1, p3, p4);
+			}
+			static ResultType doDispatch( boost::shared_ptr<Executor>& ex , boost::shared_ptr<BaseClassTrait> base1, boost::shared_ptr<BaseClassTrait> base2, ParmTrait3 p3,
+						ParmTrait4 p4, ParmTrait5 p5)
+			{	
+				return ex->go		(base2, base1, p3, p4, p5);
+			}
+			static ResultType doDispatch( boost::shared_ptr<Executor>& ex , boost::shared_ptr<BaseClassTrait> base1, boost::shared_ptr<BaseClassTrait> base2, ParmTrait3 p3,
+						ParmTrait4 p4, ParmTrait5 p5, ParmTrait6 p6)
+			{	
+				return ex->go		(base2, base1, p3, p4, p5, p6);
+			}
+			static ResultType doDispatch( boost::shared_ptr<Executor>& ex , boost::shared_ptr<BaseClassTrait> base1, boost::shared_ptr<BaseClassTrait> base2, ParmTrait3 p3,
+						ParmTrait4 p4, ParmTrait5 p5, ParmTrait6 p6, ParmTrait7 p7)
+			{	
+				return ex->go		(base2, base1, p3, p4, p5, p6, p7);
+			}
+			static ResultType doDispatch( boost::shared_ptr<Executor>& ex , boost::shared_ptr<BaseClassTrait> base1, boost::shared_ptr<BaseClassTrait> base2, ParmTrait3 p3,
+						ParmTrait4 p4, ParmTrait5 p5, ParmTrait6 p6, ParmTrait7 p7, ParmTrait8 p8)
+			{	
+				return ex->go		(base2, base1, p3, p4, p5, p6, p7, p8);
+			}
+			static ResultType doDispatch( boost::shared_ptr<Executor>& ex , boost::shared_ptr<BaseClassTrait> base1, boost::shared_ptr<BaseClassTrait> base2, ParmTrait3 p3,
+						ParmTrait4 p4, ParmTrait5 p5, ParmTrait6 p6, ParmTrait7 p7, ParmTrait8 p8, ParmTrait9 p9)
+			{	
+				return ex->go		(base2, base1, p3, p4, p5, p6, p7, p8, p9);
+			}
+			static ResultType doDispatch( boost::shared_ptr<Executor>& ex , boost::shared_ptr<BaseClassTrait> base1, boost::shared_ptr<BaseClassTrait> base2, ParmTrait3 p3,
+						ParmTrait4 p4, ParmTrait5 p5, ParmTrait6 p6, ParmTrait7 p7, ParmTrait8 p8, ParmTrait9 p9, ParmTrait10 p10)
+			{	
+				return ex->go		(base2, base1, p3, p4, p5, p6, p7, p8, p9, p10);
+			}
+			static ResultType doDispatch( boost::shared_ptr<Executor>& ex , boost::shared_ptr<BaseClassTrait> base1, boost::shared_ptr<BaseClassTrait> base2, ParmTrait3 p3,
+						ParmTrait4 p4, ParmTrait5 p5, ParmTrait6 p6, ParmTrait7 p7, ParmTrait8 p8, ParmTrait9 p9, ParmTrait10 p10, ParmTrait11 p11)
+			{	
+				return ex->go		(base2, base1, p3, p4, p5, p6, p7, p8, p9, p10, p11);
+			}	
+			static ResultType doDispatch( boost::shared_ptr<Executor>& ex , boost::shared_ptr<BaseClassTrait> base1, boost::shared_ptr<BaseClassTrait> base2, ParmTrait3 p3,
+						ParmTrait4 p4, ParmTrait5 p5, ParmTrait6 p6, ParmTrait7 p7, ParmTrait8 p8, ParmTrait9 p9, ParmTrait10 p10, ParmTrait11 p11,
+						ParmTrait12 p12)
+			{	
+				return ex->go		(base2, base1, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12);
+			}
+			static ResultType doDispatch( boost::shared_ptr<Executor>& ex , boost::shared_ptr<BaseClassTrait> base1, boost::shared_ptr<BaseClassTrait> base2, ParmTrait3 p3,
+						ParmTrait4 p4, ParmTrait5 p5, ParmTrait6 p6, ParmTrait7 p7, ParmTrait8 p8, ParmTrait9 p9, ParmTrait10 p10, ParmTrait11 p11,
+						ParmTrait12 p12, ParmTrait13 p13)
+			{	
+				return ex->go		(base2, base1, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13);
+			}
+			static ResultType doDispatch( boost::shared_ptr<Executor>& ex , boost::shared_ptr<BaseClassTrait> base1, boost::shared_ptr<BaseClassTrait> base2, ParmTrait3 p3,
+						ParmTrait4 p4, ParmTrait5 p5, ParmTrait6 p6, ParmTrait7 p7, ParmTrait8 p8, ParmTrait9 p9, ParmTrait10 p10, ParmTrait11 p11,
+						ParmTrait12 p12, ParmTrait13 p13, ParmTrait14 p14)
+			{	
+				return ex->go		(base2, base1, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14);
+			}
+			static ResultType doDispatch( boost::shared_ptr<Executor>& ex , boost::shared_ptr<BaseClassTrait> base1, boost::shared_ptr<BaseClassTrait> base2, ParmTrait3 p3,
+						ParmTrait4 p4, ParmTrait5 p5, ParmTrait6 p6, ParmTrait7 p7, ParmTrait8 p8, ParmTrait9 p9, ParmTrait10 p10, ParmTrait11 p11,
+						ParmTrait12 p12, ParmTrait13 p13, ParmTrait14 p14, ParmTrait15 p15)
+			{	
+				return ex->go		(base2, base1, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15);
+			}
+		};
+
+////////////////////////////////////////////////////////////////////////////////
+// calling multivirtual function, 2D, public interface
+////////////////////////////////////////////////////////////////////////////////
+	public:
 		ResultType operator() (boost::shared_ptr<BaseClass1> base1,boost::shared_ptr<BaseClass2> base2)
 		{
 			int index1 = base1->getClassIndex();
@@ -477,14 +641,15 @@ class DynLibDispatcher
 			if( callBacks[index1][index2] )
 			{
 				if(callBacksInfo[index1][index2])	// reversed
-					if(autoSymmetry)		// automatically reverse arguments
-						return (callBacks[index1][index2] )->go		(base2, base1 );
-					else				// call goReverse()
-						return (callBacks[index1][index2] )->goReverse	(base1, base2 );
+				{
+					typedef InvocationTraits<autoSymmetry, BaseClass1, BaseClass2, Parm3, Parm4, Parm5, Parm6,
+						Parm7, Parm8, Parm9, Parm10, Parm11, Parm12, Parm13, Parm14, Parm15 > CallTraits;
+					return CallTraits::doDispatch( callBacks[index1][index2] , base1, base2 );
+				}
 				else
 					return (callBacks[index1][index2] )->go			(base1, base2 );
 			}
-			else	return 0;
+			else	return ResultType();
 		}
 		
 		ResultType operator() (boost::shared_ptr<BaseClass1> base1,boost::shared_ptr<BaseClass2> base2, Parm3 p3)
@@ -496,16 +661,15 @@ class DynLibDispatcher
 			if( callBacks[index1][index2] )
 			{
 				if(callBacksInfo[index1][index2])	// reversed
-					if(autoSymmetry)		// automatically reverse arguments
-						return (callBacks[index1][index2] )->go		(base2, base1, p3 ); 
-						// FIXME - first bug - when BaseClass1 != BaseClass2, this will not compile
-						
-					else				// call goReverse()
-						return (callBacks[index1][index2] )->goReverse	(base1, base2, p3 );
+				{
+					typedef InvocationTraits<autoSymmetry, BaseClass1, BaseClass2, Parm3, Parm4, Parm5, Parm6,
+						Parm7, Parm8, Parm9, Parm10, Parm11, Parm12, Parm13, Parm14, Parm15 > CallTraits;
+					return CallTraits::doDispatch( callBacks[index1][index2] , base1, base2, p3);
+				}
 				else
 					return (callBacks[index1][index2] )->go			(base1, base2, p3 );
 			}
-//			else	return 0; // FIXME - second bug - sometimes cliens may want to return void
+			else	return ResultType();
 		}
 		
 		ResultType operator() (boost::shared_ptr<BaseClass1> base1,boost::shared_ptr<BaseClass2> base2, Parm3 p3, Parm4 p4)
@@ -517,14 +681,15 @@ class DynLibDispatcher
 			if( callBacks[index1][index2] )
 			{
 				if(callBacksInfo[index1][index2])	// reversed
-					if(autoSymmetry)		// automatically reverse arguments
-						return (callBacks[index1][index2] )->go		(base2, base1, p3, p4 );
-					else				// call goReverse()
-						return (callBacks[index1][index2] )->goReverse	(base1, base2, p3, p4 );
+				{
+					typedef InvocationTraits<autoSymmetry, BaseClass1, BaseClass2, Parm3, Parm4, Parm5, Parm6,
+						Parm7, Parm8, Parm9, Parm10, Parm11, Parm12, Parm13, Parm14, Parm15 > CallTraits;
+					return CallTraits::doDispatch( callBacks[index1][index2] , base1, base2, p3, p4 );
+				}
 				else
 					return (callBacks[index1][index2] )->go			(base1, base2, p3, p4 );
 			}
-			else	return 0;
+			else	return ResultType();
 		}
 		
 		ResultType operator() (boost::shared_ptr<BaseClass1> base1,boost::shared_ptr<BaseClass2> base2, Parm3 p3, Parm4 p4, Parm5 p5)
@@ -536,14 +701,15 @@ class DynLibDispatcher
 			if( callBacks[index1][index2] )
 			{
 				if(callBacksInfo[index1][index2])	// reversed
-					if(autoSymmetry)		// automatically reverse arguments
-						return (callBacks[index1][index2] )->go		(base2, base1, p3, p4, p5 );
-					else				// call goReverse()
-						return (callBacks[index1][index2] )->goReverse	(base1, base2, p3, p4, p5 );
+				{
+					typedef InvocationTraits<autoSymmetry, BaseClass1, BaseClass2, Parm3, Parm4, Parm5, Parm6,
+						Parm7, Parm8, Parm9, Parm10, Parm11, Parm12, Parm13, Parm14, Parm15 > CallTraits;
+					return CallTraits::doDispatch( callBacks[index1][index2] , base1, base2, p3, p4, p5 );
+				}
 				else
 					return (callBacks[index1][index2] )->go			(base1, base2, p3, p4, p5 );
 			}
-			else	return 0;
+			else	return ResultType();
 		}
 		
 		ResultType operator() (boost::shared_ptr<BaseClass1> base1,boost::shared_ptr<BaseClass2> base2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6)
@@ -555,14 +721,15 @@ class DynLibDispatcher
 			if( callBacks[index1][index2] )
 			{
 				if(callBacksInfo[index1][index2])	// reversed
-					if(autoSymmetry)		// automatically reverse arguments
-						return (callBacks[index1][index2] )->go		(base2, base1, p3, p4, p5, p6 );
-					else				// call goReverse()
-						return (callBacks[index1][index2] )->goReverse	(base1, base2, p3, p4, p5, p6 );
+				{
+					typedef InvocationTraits<autoSymmetry, BaseClass1, BaseClass2, Parm3, Parm4, Parm5, Parm6,
+						Parm7, Parm8, Parm9, Parm10, Parm11, Parm12, Parm13, Parm14, Parm15 > CallTraits;
+					return CallTraits::doDispatch( callBacks[index1][index2] , base1, base2, p3, p4, p5, p6 );
+				}
 				else
 					return (callBacks[index1][index2] )->go			(base1, base2, p3, p4, p5, p6 );
 			}
-			else	return 0;
+			else	return ResultType();
 		}
 		
 		ResultType operator() (boost::shared_ptr<BaseClass1> base1,boost::shared_ptr<BaseClass2> base2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6,
@@ -575,14 +742,15 @@ class DynLibDispatcher
 			if( callBacks[index1][index2] )
 			{
 				if(callBacksInfo[index1][index2])	// reversed
-					if(autoSymmetry)		// automatically reverse arguments
-						return (callBacks[index1][index2] )->go		(base2, base1, p3, p4, p5, p6, p7 );
-					else				// call goReverse()
-						return (callBacks[index1][index2] )->goReverse	(base1, base2, p3, p4, p5, p6, p7 );
+				{
+					typedef InvocationTraits<autoSymmetry, BaseClass1, BaseClass2, Parm3, Parm4, Parm5, Parm6,
+						Parm7, Parm8, Parm9, Parm10, Parm11, Parm12, Parm13, Parm14, Parm15 > CallTraits;
+					return CallTraits::doDispatch( callBacks[index1][index2] , base1, base2, p3, p4, p5, p6, p7 );
+				}
 				else
 					return (callBacks[index1][index2] )->go			(base1, base2, p3, p4, p5, p6, p7 );
 			}
-			else	return 0;
+			else	return ResultType();
 		}
 		
 		ResultType operator() (boost::shared_ptr<BaseClass1> base1,boost::shared_ptr<BaseClass2> base2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6,
@@ -595,14 +763,15 @@ class DynLibDispatcher
 			if( callBacks[index1][index2] )
 			{
 				if(callBacksInfo[index1][index2])	// reversed
-					if(autoSymmetry)		// automatically reverse arguments
-						return (callBacks[index1][index2] )->go		(base2, base1, p3, p4, p5, p6, p7, p8 );
-					else				// call goReverse()
-						return (callBacks[index1][index2] )->goReverse	(base1, base2, p3, p4, p5, p6, p7, p8 );
+				{
+					typedef InvocationTraits<autoSymmetry, BaseClass1, BaseClass2, Parm3, Parm4, Parm5, Parm6,
+						Parm7, Parm8, Parm9, Parm10, Parm11, Parm12, Parm13, Parm14, Parm15 > CallTraits;
+					return CallTraits::doDispatch( callBacks[index1][index2] , base1, base2, p3, p4, p5, p6, p7, p8);
+				}
 				else
 					return (callBacks[index1][index2] )->go			(base1, base2, p3, p4, p5, p6, p7, p8 );
 			}
-			else	return 0;
+			else	return ResultType();
 		}
 		
 		ResultType operator() (boost::shared_ptr<BaseClass1> base1,boost::shared_ptr<BaseClass2> base2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6,
@@ -615,14 +784,15 @@ class DynLibDispatcher
 			if( callBacks[index1][index2] )
 			{
 				if(callBacksInfo[index1][index2])	// reversed
-					if(autoSymmetry)		// automatically reverse arguments
-						return (callBacks[index1][index2] )->go		(base2, base1, p3, p4, p5, p6, p7, p8, p9 );
-					else				// call goReverse()
-						return (callBacks[index1][index2] )->goReverse	(base1, base2, p3, p4, p5, p6, p7, p8, p9 );
+				{
+					typedef InvocationTraits<autoSymmetry, BaseClass1, BaseClass2, Parm3, Parm4, Parm5, Parm6,
+						Parm7, Parm8, Parm9, Parm10, Parm11, Parm12, Parm13, Parm14, Parm15 > CallTraits;
+					return CallTraits::doDispatch( callBacks[index1][index2] , base1, base2, p3, p4, p5, p6, p7, p8, p9 );
+				}
 				else
 					return (callBacks[index1][index2] )->go			(base1, base2, p3, p4, p5, p6, p7, p8, p9 );
 			}
-			else	return 0;
+			else	return ResultType();
 		}
 		
 		ResultType operator() (boost::shared_ptr<BaseClass1> base1,boost::shared_ptr<BaseClass2> base2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6,
@@ -635,14 +805,15 @@ class DynLibDispatcher
 			if( callBacks[index1][index2] )
 			{
 				if(callBacksInfo[index1][index2])	// reversed
-					if(autoSymmetry)		// automatically reverse arguments
-						return (callBacks[index1][index2] )->go		(base2, base1, p3, p4, p5, p6, p7, p8, p9, p10 );
-					else				// call goReverse()
-						return (callBacks[index1][index2] )->goReverse	(base1, base2, p3, p4, p5, p6, p7, p8, p9, p10 );
+				{
+					typedef InvocationTraits<autoSymmetry, BaseClass1, BaseClass2, Parm3, Parm4, Parm5, Parm6,
+						Parm7, Parm8, Parm9, Parm10, Parm11, Parm12, Parm13, Parm14, Parm15 > CallTraits;
+					return CallTraits::doDispatch( callBacks[index1][index2] , base1, base2, p3, p4, p5, p6, p7, p8, p9, p10);
+				}
 				else
 					return (callBacks[index1][index2] )->go			(base1, base2, p3, p4, p5, p6, p7, p8, p9, p10 );
 			}
-			else	return 0;
+			else	return ResultType();
 		}
 		
 		ResultType operator() (boost::shared_ptr<BaseClass1> base1,boost::shared_ptr<BaseClass2> base2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6,
@@ -655,14 +826,15 @@ class DynLibDispatcher
 			if( callBacks[index1][index2] )
 			{
 				if(callBacksInfo[index1][index2])	// reversed
-					if(autoSymmetry)		// automatically reverse arguments
-						return (callBacks[index1][index2] )->go		(base2, base1, p3, p4, p5, p6, p7, p8, p9, p10, p11 );
-					else				// call goReverse()
-						return (callBacks[index1][index2] )->goReverse	(base1, base2, p3, p4, p5, p6, p7, p8, p9, p10, p11 );
+				{
+					typedef InvocationTraits<autoSymmetry, BaseClass1, BaseClass2, Parm3, Parm4, Parm5, Parm6,
+						Parm7, Parm8, Parm9, Parm10, Parm11, Parm12, Parm13, Parm14, Parm15 > CallTraits;
+					return CallTraits::doDispatch( callBacks[index1][index2] , base1, base2, p3, p4, p5, p6, p7, p8, p9, p10, p11);
+				}
 				else
 					return (callBacks[index1][index2] )->go			(base1, base2, p3, p4, p5, p6, p7, p8, p9, p10, p11 );
 			}
-			else	return 0;
+			else	return ResultType();
 		}
 		
 		ResultType operator() (boost::shared_ptr<BaseClass1> base1,boost::shared_ptr<BaseClass2> base2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6,
@@ -675,14 +847,15 @@ class DynLibDispatcher
 			if( callBacks[index1][index2] )
 			{
 				if(callBacksInfo[index1][index2])	// reversed
-					if(autoSymmetry)		// automatically reverse arguments
-						return (callBacks[index1][index2] )->go		(base2, base1, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12 );
-					else				// call goReverse()
-						return (callBacks[index1][index2] )->goReverse	(base1, base2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12 );
+				{
+					typedef InvocationTraits<autoSymmetry, BaseClass1, BaseClass2, Parm3, Parm4, Parm5, Parm6,
+						Parm7, Parm8, Parm9, Parm10, Parm11, Parm12, Parm13, Parm14, Parm15 > CallTraits;
+					return CallTraits::doDispatch( callBacks[index1][index2] , base1, base2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12 );
+				}
 				else
 					return (callBacks[index1][index2] )->go			(base1, base2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12 );
 			}
-			else	return 0;
+			else	return ResultType();
 		}
 		
 		ResultType operator() (boost::shared_ptr<BaseClass1> base1,boost::shared_ptr<BaseClass2> base2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6,
@@ -695,14 +868,15 @@ class DynLibDispatcher
 			if( callBacks[index1][index2] )
 			{
 				if(callBacksInfo[index1][index2])	// reversed
-					if(autoSymmetry)		// automatically reverse arguments
-						return (callBacks[index1][index2] )->go		(base2, base1, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13 );
-					else				// call goReverse()
-						return (callBacks[index1][index2] )->goReverse	(base1, base2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13 );
+				{
+					typedef InvocationTraits<autoSymmetry, BaseClass1, BaseClass2, Parm3, Parm4, Parm5, Parm6,
+						Parm7, Parm8, Parm9, Parm10, Parm11, Parm12, Parm13, Parm14, Parm15 > CallTraits;
+					return CallTraits::doDispatch( callBacks[index1][index2] , base1, base2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13);
+				}
 				else
 					return (callBacks[index1][index2] )->go			(base1, base2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13 );
 			}
-			else	return 0;
+			else	return ResultType();
 		}
 		
 		ResultType operator() (boost::shared_ptr<BaseClass1> base1,boost::shared_ptr<BaseClass2> base2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6,
@@ -715,14 +889,15 @@ class DynLibDispatcher
 			if( callBacks[index1][index2] )
 			{
 				if(callBacksInfo[index1][index2])	// reversed
-					if(autoSymmetry)		// automatically reverse arguments
-						return (callBacks[index1][index2] )->go		(base2, base1, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14 );
-					else				// call goReverse()
-						return (callBacks[index1][index2] )->goReverse	(base1, base2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14 );
+				{
+					typedef InvocationTraits<autoSymmetry, BaseClass1, BaseClass2, Parm3, Parm4, Parm5, Parm6,
+						Parm7, Parm8, Parm9, Parm10, Parm11, Parm12, Parm13, Parm14, Parm15 > CallTraits;
+					return CallTraits::doDispatch( callBacks[index1][index2] , base1, base2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14);
+				}
 				else
 					return (callBacks[index1][index2] )->go			(base1, base2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14 );
 			}
-			else	return 0;
+			else	return ResultType();
 		}
 		
 		ResultType operator() (boost::shared_ptr<BaseClass1> base1,boost::shared_ptr<BaseClass2> base2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6,
@@ -735,14 +910,15 @@ class DynLibDispatcher
 			if( callBacks[index1][index2] )
 			{
 				if(callBacksInfo[index1][index2])	// reversed
-					if(autoSymmetry)		// automatically reverse arguments
-						return (callBacks[index1][index2] )->go		(base2, base1, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15 );
-					else				// call goReverse()
-						return (callBacks[index1][index2] )->goReverse	(base1, base2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15 );
+				{
+					typedef InvocationTraits<autoSymmetry, BaseClass1, BaseClass2, Parm3, Parm4, Parm5, Parm6,
+						Parm7, Parm8, Parm9, Parm10, Parm11, Parm12, Parm13, Parm14, Parm15 > CallTraits;
+					return CallTraits::doDispatch( callBacks[index1][index2] , base1, base2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15);
+				}
 				else
 					return (callBacks[index1][index2] )->go			(base1, base2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15 );
 			}
-			else	return 0;
+			else	return ResultType();
 		}
 		
 ////////////////////////////////////////////////////////////////////////////////
