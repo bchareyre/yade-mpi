@@ -68,31 +68,24 @@ class Body : public Serializable
 
 	public : bool containSubBodies;
 	
-	// FIXME : to put into nonconnex body ? but maybe useful for autocollision in connexbody - yes, useful with so generic InteractionContaier, at leas when we will implement multiple interactions....
-	//public : list<shared_ptr<Interaction> > interactions;
-	public	: shared_ptr<InteractionContainer> interactions;	
-	public	: shared_ptr<ActionContainer> actions;
-	
+	// int group;
+		
 	// FIXME : where to put gm,cm and bv : do body need them or only SimpleBody ??
 	/*! The geometrical model of this body (polyhedron, box ...) */
-	public : shared_ptr<GeometricalModel> gm;
+	public : shared_ptr<GeometricalModel> gm; // geometricalModel
 	/*! The collision model of this body (sphere hierarchy, box ...) */
-	public : shared_ptr<CollisionGeometry> cm;
+	public : shared_ptr<CollisionGeometry> cm; // interactionGeometry
 	/*! The bounding volume of this body (AABB, K-Dop ...) */
-	public : shared_ptr<BoundingVolume> bv;
+	public : shared_ptr<BoundingVolume> bv; // boundingVolume
 	/*! Mechanical parameters of the body (mass, sitffness ...) */
 	public : shared_ptr<BodyPhysicalParameters> physicalParameters;
 
-	//public : shared_ptr<DynamicEngine> dynamic;
 
 	// FIXME : should be determined automatically or not ?? if the body has a subscription to a kinematic engine then it is not dynamic but maybe a body with no subscription can be not dynamic ??
 	/*! isDynamic is true if the state of the body is not modified by a kinematicEngine. It is useful
 	for example for collision detection : if two colliding bodies are only kinematic then it is useless to
 	modelise their contact */
 	public : bool isDynamic;
-	
-	// FIXME : remove that ??!
-	//public : Se3r se3;
 	
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Constructor/Destructor									///

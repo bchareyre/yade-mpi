@@ -1,5 +1,5 @@
 #include "Translator.hpp"
-//#include "RigidBody.hpp"
+#include "RigidBody.hpp"
 #include "ComplexBody.hpp"
 
 Translator::Translator () : KinematicEngine() // encapsuler dans implicitfunction user redefini uniquement dp = || interpolateur ...
@@ -44,17 +44,15 @@ void Translator::moveToNextTimeStep(Body * body)
 
 	for(;ii!=iiEnd;++ii)
 	{
-		shared_ptr<Body>  b = (*bodies)[*ii];
+		RigidBody * rb = static_cast<RigidBody*>((*bodies)[*ii]->physicalParameters.get());
 
-		// FIXME - specify intervals of activity for an actor
+		// FIXME - specify intervals of activity for an actor => use isActivated method
 		//if( Omega::instance().getIter() > 1000 )
 		//	b->velocity		= Vector3r(0,0,0);
 		//else
 		//{
-
-			b->physicalParameters->se3.translation	+= sign*dt*velocity*translationAxis;
-		// FIXME : ??
-		//	b->velocity		=  sign*velocity*translationAxis;
+			rb->se3.translation	+= sign*dt*velocity*translationAxis;
+			rb->velocity		=  sign*velocity*translationAxis;
 		//}
 	}
 

@@ -1,6 +1,6 @@
 #include "HangingCloth.hpp"
 
-
+#include "SimpleBody.hpp"
 #include "Mesh2D.hpp"
 #include "Sphere.hpp"
 #include "RigidBody.hpp"
@@ -23,6 +23,8 @@
 #include "Particle.hpp"
 #include "SpringGeometry.hpp"
 #include "SpringPhysics.hpp"
+#include "TimeIntegratorDispatcher.hpp"
+#include "InteractionSphere.hpp"
 
 HangingCloth::HangingCloth () : FileGenerator()
 {
@@ -68,50 +70,52 @@ void HangingCloth::registerAttributes()
 string HangingCloth::generate()
 {
 	
-/*	rootBody = shared_ptr<ComplexBody>(new MassSpringBody);
-	
+	rootBody = shared_ptr<ComplexBody>(new MassSpringBody);
+
 	Quaternionr q;
-	q.fromAxisAngle(Vector3r(0,0,1),0);
- 
-	//shared_ptr<InteractionGeometryDispatcher> igd(new InteractionGeometryDispatcher);
-	//igd->addInteractionGeometryFunctor("Sphere","Sphere","Sphere2Sphere4SDECContactModel");
-	
-	//shared_ptr<InteractionPhysicsDispatcher> ipd(new InteractionPhysicsDispatcher);
-	//ipd->addInteractionPhysicsFunctor("Particle","Particle","SDECLinearContactModel");
+	q.fromAxisAngle( Vector3r(0,0,1),0);
+
+	shared_ptr<InteractionGeometryDispatcher> igd(new InteractionGeometryDispatcher);
+	igd->addInteractionGeometryFunctor("InteractionSphere","InteractionSphere","Sphere2Sphere4SDECContactModel");
+	igd->addInteractionGeometryFunctor("InteractionSphere","InteractionBox","Box2Sphere4SDECContactModel");
+
+	shared_ptr<InteractionPhysicsDispatcher> ipd(new InteractionPhysicsDispatcher);
+	ipd->addInteractionPhysicsFunctor("SDECDiscreteElement","SDECDiscreteElement","SDECLinearContactModel");
 		
 	shared_ptr<BoundingVolumeUpdator> bvu	= shared_ptr<BoundingVolumeUpdator>(new BoundingVolumeUpdator);
-	bvu->addBVFactories("Sphere","AABB","Sphere2AABBFactory");
+	bvu->addBVFactories("InteractionSphere","AABB","Sphere2AABBFactory");
+	bvu->addBVFactories("InteractionBox","AABB","Box2AABBFactory");
 	bvu->addBVFactories("CollisionGeometrySet","AABB","CollisionGeometrySet2AABBFactory");
 	
 	shared_ptr<ActionDispatcher> ad(new ActionDispatcher);
 	ad->addActionFunctor("ActionForce","Particle","ActionForce2Particle");
-
 	
-	rootBody->actors.resize(4);
+	shared_ptr<TimeIntegratorDispatcher> ti(new TimeIntegratorDispatcher);
+	ti->addTimeIntegratorFunctor("Particle","LeapFrogIntegrator");
+	
+	rootBody->actors.resize(5);
 	rootBody->actors[0] 		= bvu;	
 	rootBody->actors[1] 		= shared_ptr<Actor>(new PersistentSAPCollider);
 	//rootBody->actors[2] 		= igd;
 	//rootBody->actors[3] 		= ipd;
 	rootBody->actors[2] 		= shared_ptr<Actor>(new ExplicitMassSpringDynamicEngine);
 	rootBody->actors[3] 		= ad;
+	rootBody->actors[4] 		= ti;
+	
 
-	rootBody->permanentInteractions->clear();
-
-	rootBody->isDynamic		= false;
-	rootBody->velocity		= Vector3r(0,0,0);
-	rootBody->angularVelocity	= Vector3r(0,0,0);
-	rootBody->se3			= Se3r(Vector3r(0,0,0),q);
+	//FIXME : use a default one
+	shared_ptr<Particle> physics2(new Particle); // FIXME : fix indexable class BodyPhysicalParameters
+	physics2->se3		= Se3r(Vector3r(0,0,0),q);
+	physics2->mass		= 0;
+	physics2->velocity	= Vector3r::ZERO;
+	
+	rootBody->isDynamic	= false;
 
 	shared_ptr<CollisionGeometrySet> set(new CollisionGeometrySet());
 	set->diffuseColor	= Vector3f(0,0,1);
-	set->wire		= false;
-	set->visible		= true;
-	set->shadowCaster	= false;
-	rootBody->cm		= dynamic_pointer_cast<CollisionGeometry>(set);
-	
+
 	shared_ptr<AABB> aabb(new AABB);
-	aabb->color		= Vector3r(0,0,1);
-	rootBody->bv		= dynamic_pointer_cast<BoundingVolume>(aabb);
+	aabb->diffuseColor	= Vector3r(0,0,1);
 	
 	shared_ptr<Mesh2D> mesh2d(new Mesh2D);
 	mesh2d->diffuseColor	= Vector3f(0,0,1);
@@ -119,35 +123,39 @@ string HangingCloth::generate()
 	mesh2d->visible		= true;
 	mesh2d->shadowCaster	= false;
 	
+	rootBody->gm			= mesh2d;
+	rootBody->cm			= set;
+	rootBody->bv			= aabb;
+	rootBody->physicalParameters	= physics2;
+	
+	rootBody->permanentInteractions->clear();
+	
 	for(int i=0;i<width;i++)
 		for(int j=0;j<height;j++)
 		{
+			shared_ptr<Body> node(new SimpleBody);
+			
+			node->isDynamic		= true;
+			
 			shared_ptr<Particle> particle(new Particle);
-			particle->position 		= Vector3r(i*cellSize-(cellSize*(width-1))*0.5,0,j*cellSize-(cellSize*(height-1))*0.5);
-			particle->isDynamic		= true;
-			particle->angularVelocity	= Vector3r(0,0,0);
 			particle->velocity		= Vector3r(0,0,0);
 			particle->mass			= mass/(Real)(width*height);
-			particle->se3			= Se3r(particle->position,q);
+			particle->se3			= Se3r(Vector3r(i*cellSize-(cellSize*(width-1))*0.5,0,j*cellSize-(cellSize*(height-1))*0.5),q);
+			
 			shared_ptr<AABB> aabb(new AABB);
-			aabb->color		= Vector3r(0,1,0);
-			particle->bv		= dynamic_pointer_cast<BoundingVolume>(aabb);
-			shared_ptr<Sphere> sphere(new Sphere);
-			sphere->diffuseColor	= Vector3r(0,0,1);
-			sphere->radius		= cellSize/2.0;
-			sphere->wire		= false;
-			sphere->visible		= true;
-			sphere->shadowCaster		= false;
-			particle->cm		= dynamic_pointer_cast<CollisionGeometry>(sphere);
-			particle->gm		= particle->cm;
+			aabb->diffuseColor	= Vector3r(0,1,0);
 			
-			shared_ptr<ParticleBallisticEngine> ballistic(new ParticleBallisticEngine);
-			ballistic->damping 	= particleDamping;
-			particle->actors.push_back(ballistic);
+			shared_ptr<InteractionSphere> iSphere(new InteractionSphere);
+			iSphere->diffuseColor	= Vector3r(0,0,1);
+			iSphere->radius		= cellSize/2.0;
+
+			node->bv		= aabb;
+			//node->gm		= ??;
+			node->cm		= iSphere;
+			node->physicalParameters= particle;
 			
-			shared_ptr<Body> body = dynamic_pointer_cast<Body>(particle);
-			rootBody->bodies->insert(body);
-			mesh2d->vertices.push_back(particle->position);
+			rootBody->bodies->insert(node);
+			mesh2d->vertices.push_back(particle->se3.translation);
 		}
 		
 	for(int i=0;i<width-1;i++)
@@ -186,40 +194,42 @@ string HangingCloth::generate()
 		mesh2d->edges.push_back(Edge(offset(width-1,j),offset(width-1,j+1)));
 		rootBody->permanentInteractions->insert(createSpring(rootBody,offset(width-1,j),offset(width-1,j+1)));
 	}
-	
-	rootBody->gm = mesh2d;
 
 	if (fixPoint1)
 	{
-		Particle * p = static_cast<Particle*>((*(rootBody->bodies))[offset(0,0)].get());
+		Body * body = static_cast<Body*>((*(rootBody->bodies))[offset(0,0)].get());
+		Particle * p = static_cast<Particle*>(body->physicalParameters.get());
 		p->invMass = 0;
-		p->cm->diffuseColor = Vector3r(1.0,0.0,0.0);
-		p->actors.clear();
+		body->cm->diffuseColor = Vector3r(1.0,0.0,0.0);
+		body->isDynamic = false;
 	}
 	
 	if (fixPoint2)
 	{
-		Particle * p = static_cast<Particle*>((*(rootBody->bodies))[offset(width-1,0)].get());
+		Body * body = static_cast<Body*>((*(rootBody->bodies))[offset(width-1,0)].get());
+		Particle * p = static_cast<Particle*>(body->physicalParameters.get());
 		p->invMass = 0;
-		p->cm->diffuseColor = Vector3r(1.0,0.0,0.0);
-		p->actors.clear();
+		body->cm->diffuseColor = Vector3r(1.0,0.0,0.0);
+		body->isDynamic = false;
 	}
 	
 	if (fixPoint3)
 	{
-		Particle * p = static_cast<Particle*>((*(rootBody->bodies))[offset(0,height-1)].get());
+		Body * body = static_cast<Body*>((*(rootBody->bodies))[offset(0,height-1)].get());
+		Particle * p = static_cast<Particle*>(body->physicalParameters.get());
 		p->invMass = 0;
-		p->cm->diffuseColor = Vector3r(1.0,0.0,0.0);		
-		p->actors.clear();
+		body->cm->diffuseColor = Vector3r(1.0,0.0,0.0);		
+		body->isDynamic = false;
 	}
 
 	if (fixPoint4)
 	{
-		Particle * p = static_cast<Particle*>((*(rootBody->bodies))[offset(width-1,height-1)].get());
+		Body * body = static_cast<Body*>((*(rootBody->bodies))[offset(width-1,height-1)].get());
+		Particle * p = static_cast<Particle*>(body->physicalParameters.get());
 		p->invMass = 0;
-		p->cm->diffuseColor = Vector3r(1.0,0.0,0.0);		
-		p->actors.clear();
-	}*/
+		body->cm->diffuseColor = Vector3r(1.0,0.0,0.0);		
+		body->isDynamic = false;
+	}
  	
 	return "";
 }
@@ -227,16 +237,15 @@ string HangingCloth::generate()
 
 shared_ptr<Interaction>& HangingCloth::createSpring(const shared_ptr<ComplexBody>& rootBody,int i,int j)
 {
+	SimpleBody * b1 = static_cast<SimpleBody*>((*(rootBody->bodies))[i].get());
+	SimpleBody * b2 = static_cast<SimpleBody*>((*(rootBody->bodies))[j].get());
 	
-/*	Particle * p1 = static_cast<Particle*>((*(rootBody->bodies))[i].get());
-	Particle * p2 = static_cast<Particle*>((*(rootBody->bodies))[j].get());
-	
-	spring = shared_ptr<Interaction>(new Interaction( p1->getId() , p2->getId() ));
+	spring = shared_ptr<Interaction>(new Interaction( b1->getId() , b2->getId() ));
 	shared_ptr<SpringGeometry>	geometry(new SpringGeometry);
 	shared_ptr<SpringPhysics>	physics(new SpringPhysics);
 	
-	geometry->p1			= p1->position;
-	geometry->p2			= p2->position;
+	geometry->p1			= b1->physicalParameters->se3.translation;
+	geometry->p2			= b2->physicalParameters->se3.translation;
 	
 	physics->initialLength		= (geometry->p1-geometry->p2).length();
 	physics->stiffness		= stiffness;
@@ -245,7 +254,7 @@ shared_ptr<Interaction>& HangingCloth::createSpring(const shared_ptr<ComplexBody
 	spring->interactionGeometry = geometry;
 	spring->interactionPhysics = physics;
 	spring->isReal = true;
-	spring->isNew = false;*/
+	spring->isNew = false;
 	
 	return spring;
 }

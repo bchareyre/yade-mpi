@@ -4,15 +4,11 @@
 
 #include "FileGenerator.hpp"
 #include "Vector3.hpp"
+#include "SimpleBody.hpp"
 
 class SDECLinkedSpheres : public FileGenerator
 {
-	// FIXME - if it is Vector3<int> nbSpheres; it crashes:
-	//
-	//		terminate called after throwing an instance of 'SerializableError'
-	//		what():  Cannot determine type with findType()
-
-	private	: Vector3r nbSpheres; // Vector3<int> nbSpheres; FIXME
+	private	: Vector3r nbSpheres; 
 
 	private	: Real minRadius;
 	private	: Real maxRadius;
@@ -23,6 +19,10 @@ class SDECLinkedSpheres : public FileGenerator
 	private	: bool support2;
 	private	: Real kn;
 	private	: Real ks;
+	
+	private : void createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents);
+	private : void createSphere(shared_ptr<Body>& body, int i, int j, int k);
+	
 	// construction
 	public : SDECLinkedSpheres ();
 	public : ~SDECLinkedSpheres ();

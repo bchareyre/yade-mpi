@@ -12,12 +12,15 @@
 #include "BodyRedirectionVector.hpp"
 #include "BodyAssocVec.hpp"
 #include "BoundingVolumeUpdator.hpp"
+#include "ActionVecVec.hpp"
 
 // FIXME - who is to decide which class to use by default?
 ComplexBody::ComplexBody() :
 	  Body()
 	, bodies(new BodyRedirectionVector)
 	, permanentInteractions(new InteractionVecSet)
+	, interactions(new InteractionVecSet)
+	, actions(new ActionVecVec)
 {	
 	containSubBodies = true;
 }

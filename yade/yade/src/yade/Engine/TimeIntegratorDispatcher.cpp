@@ -64,8 +64,10 @@ void TimeIntegratorDispatcher::action(Body* body)
 	shared_ptr<BodyContainer> bodies = ncb->bodies;
 
 	for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext())
-		timeIntegratorDispatcher( bodies->getCurrent()->physicalParameters , bodies->getCurrent()->getId() );
-	
+	{
+		if (bodies->getCurrent()->isDynamic)
+			timeIntegratorDispatcher( bodies->getCurrent()->physicalParameters , bodies->getCurrent()->getId() );
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

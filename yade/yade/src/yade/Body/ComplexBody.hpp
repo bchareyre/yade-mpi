@@ -29,9 +29,6 @@
 
 #include "Body.hpp"
 #include "BodyContainer.hpp"
-//#include "BroadInteractor.hpp"
-//#include "KinematicEngine.hpp"
-//#include "InteractionGeometryDispatcher.hpp"
 #include "Actor.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -39,25 +36,17 @@
 //FIXME : ComplexBody is abstract interface and add SetOfBodies as default simple ComplexBody
 class ComplexBody : public Body
 {
-	//public : vector<shared_ptr<Body> > bodies;
-
-	//public : shared_ptr<InteractionGeometryDispatcher> narrowCollider;
-	//public : shared_ptr<BroadInteractor> broadCollider;
-	//public : shared_ptr<KinematicEngine> kinematic;
-
-	//public : vector<shared_ptr<Interaction> > permanentInteractions;
 	public	: shared_ptr<BodyContainer> bodies;
-	public	: shared_ptr<InteractionContainer> permanentInteractions;
 	public : vector<shared_ptr<Actor> > actors;
+	
+	public	: shared_ptr<InteractionContainer> permanentInteractions;
+	public	: shared_ptr<InteractionContainer> interactions;	
+	public	: shared_ptr<ActionContainer> actions;
 	
 	// construction
 	public	: ComplexBody ();
 
 	public	: virtual ~ComplexBody ();
-/*
-	public : virtual void glDrawGeometricalModel();
-	public : virtual void glDrawBoundingVolume();
-	public : virtual void glDrawCollisionGeometry();*/
 
 	public	: void moveToNextTimeStep();
 

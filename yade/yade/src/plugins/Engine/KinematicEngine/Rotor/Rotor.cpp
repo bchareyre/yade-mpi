@@ -43,21 +43,16 @@ void Rotor::moveToNextTimeStep(Body * body)
 	
 	for(;ii!=iiEnd;++ii)
 	{
-		shared_ptr<Body>  b = (*bodies)[*ii];
+		RigidBody * rb = static_cast<RigidBody*>((*bodies)[*ii]->physicalParameters.get());
 
-		//b->se3.translation += dp;
+		//rb->se3.translation	= q*rb->se3.translation;
+		rb->se3.rotation	= q*rb->se3.rotation;
 
-		b->physicalParameters->se3.translation	= q*b->physicalParameters->se3.translation;
-		//cout << "  ## " << endl << b->se3.rotation.w() <<  " " << b->se3.rotation.x() << " " <<  b->se3.rotation.y() <<   " " <<  b->se3.rotation.z() << endl;
-		b->physicalParameters->se3.rotation		= q*b->physicalParameters->se3.rotation;
-		//cout << endl << b->se3.rotation.w() <<  " " << b->se3.rotation.x() << " " <<  b->se3.rotation.y() <<   " " <<  b->se3.rotation.z() << endl;
-
-		b->physicalParameters->se3.rotation.normalize();
-		b->physicalParameters->se3.rotation.toAxisAngle(ax,an);
-
-		//FIXME : ???
-		//b->angularVelocity	= rotationAxis*angularVelocity;
-		//b->velocity		= Vector3r(0,0,0);
+		rb->se3.rotation.normalize();
+		rb->se3.rotation.toAxisAngle(ax,an);
+		
+		rb->angularVelocity	= rotationAxis*angularVelocity;
+		rb->velocity		= Vector3r(0,0,0);
 	}
 
 

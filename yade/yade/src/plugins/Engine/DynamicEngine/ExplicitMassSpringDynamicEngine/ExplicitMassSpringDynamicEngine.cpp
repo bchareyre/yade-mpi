@@ -85,7 +85,7 @@ void ExplicitMassSpringDynamicEngine::respondToCollisions(Body * body)
 	for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext())
 	{
 		Particle * p = static_cast<Particle*>(bodies->getCurrent()->physicalParameters.get());
-		static_cast<ActionForce*>( body->actions->find( bodies->getCurrent()->getId() , actionForce->getClassIndex() ).get() )->force += gravity*p->mass;
+		static_cast<ActionForce*>( massSpring->actions->find( bodies->getCurrent()->getId() , actionForce->getClassIndex() ).get() )->force += gravity*p->mass;
 	}
 }
 

@@ -102,8 +102,8 @@ void ErrorTolerantDynamicEngine::respondToCollisions(Body* body)
 		}
 
 		// Build the jacobian and transpose of jacobian
-		ublas::sparse_matrix<float> J (6*bodies->size(), body->interactions->size(), body->interactions->size()*2/*6*bodies.size()*body->interactions.size()*/);
-		ublas::sparse_matrix<float> Jt (body->interactions->size(), 6*bodies->size(), body->interactions->size()*2/*6*bodies.size()*body->interactions.size()*/);
+		ublas::sparse_matrix<float> J (6*bodies->size(), ncb->interactions->size(), ncb->interactions->size()*2/*6*bodies.size()*body->interactions.size()*/);
+		ublas::sparse_matrix<float> Jt (ncb->interactions->size(), 6*bodies->size(), ncb->interactions->size()*2/*6*bodies.size()*body->interactions.size()*/);
 
 		static ublas::vector<float> penetrationDepthes;
 		static ublas::vector<float> penetrationVelocities;

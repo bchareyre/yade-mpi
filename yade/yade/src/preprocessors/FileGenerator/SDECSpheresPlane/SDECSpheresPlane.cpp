@@ -94,9 +94,11 @@ string SDECSpheresPlane::generate()
 	
 
 	//FIXME : use a default one
-	rootBody->physicalParameters = shared_ptr<BodyPhysicalParameters>(new SDECDiscreteElement);
-	rootBody->physicalParameters->se3 =  Se3r(Vector3r(0,0,0),q);
-	
+	shared_ptr<Particle> physics2(new Particle); // FIXME : fix indexable class BodyPhysicalParameters
+	physics2->se3		= Se3r(Vector3r(0,0,0),q);
+	physics2->mass		= 0;
+	rootBody->physicalParameters = physics2;
+		
 	rootBody->permanentInteractions->clear();
 //	rootBody->permanentInteractions[0] = shared_ptr<Interaction>(new Interaction);
 //	rootBody->permanentInteractions[0]->interactionGeometry = shared_ptr<SDECPermanentLink>(new SDECPermanentLink);
