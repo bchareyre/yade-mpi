@@ -6,11 +6,11 @@
 LIBS += -lCollisionGeometrySet \
         -lActionVecVec \
         -rdynamic 
-INCLUDEPATH += $(YADEINCLUDEPATH) 
+INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../plugins/CollisionGeometry/CollisionGeometrySet/$(YADEDYNLIBPATH) \
+QMAKE_LIBDIR = ../../plugins/Geometry/CollisionGeometry/CollisionGeometrySet/$(YADEDYNLIBPATH) \
                ../../toolboxes/DataStructures/ActionContainer/ActionVecVec/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \

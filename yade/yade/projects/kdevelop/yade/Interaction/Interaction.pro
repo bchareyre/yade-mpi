@@ -3,6 +3,23 @@
 # Subdir relative project main directory: ./yade/Interaction
 # Target is a library:  
 
+LIBS += -lMultiMethods \
+        -rdynamic 
+INCLUDEPATH = $(YADEINCLUDEPATH) 
+MOC_DIR = $(YADECOMPILATIONPATH) 
+UI_DIR = $(YADECOMPILATIONPATH) 
+OBJECTS_DIR = $(YADECOMPILATIONPATH) 
+QMAKE_LIBDIR = ../../toolboxes/Libraries/MultiMethods/$(YADEDYNLIBPATH) \
+               $(YADEDYNLIBPATH) 
+QMAKE_CXXFLAGS_RELEASE += -lpthread \
+                          -pthread 
+QMAKE_CXXFLAGS_DEBUG += -lpthread \
+                        -pthread 
+DESTDIR = $(YADEDYNLIBPATH) 
+CONFIG += debug \
+          warn_on \
+          dll 
+TEMPLATE = lib 
 HEADERS += Interaction.hpp \
            InteractionContainer.hpp \
            InteractionGeometry.hpp \
@@ -19,20 +36,3 @@ SOURCES += Interaction.cpp \
            BroadInteractor.cpp \
            InteractionGeometryDispatcher.cpp \
            InteractionPhysicsDispatcher.cpp 
-LIBS += -lMultiMethods \
--rdynamic
-INCLUDEPATH = $(YADEINCLUDEPATH)
-MOC_DIR = $(YADECOMPILATIONPATH)
-UI_DIR = $(YADECOMPILATIONPATH)
-OBJECTS_DIR = $(YADECOMPILATIONPATH)
-QMAKE_LIBDIR = ../../toolboxes/Libraries/MultiMethods/$(YADEDYNLIBPATH) \
-$(YADEDYNLIBPATH)
-QMAKE_CXXFLAGS_RELEASE += -lpthread \
--pthread
-QMAKE_CXXFLAGS_DEBUG += -lpthread \
--pthread
-DESTDIR = $(YADEDYNLIBPATH)
-CONFIG += debug \
-warn_on \
-dll
-TEMPLATE = lib
