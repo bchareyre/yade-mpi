@@ -3,9 +3,9 @@
 # Subdir relative project main directory: ./plugins/CollisionFunctor
 # Target is a subdirs project 
 
-SUBDIRS += CollisionFunctor4ClosestFeatures \
-           CollisionFunctor4SDECContactModel \
-           CollisionFunctor4ErrorTolerant 
+SUBDIRS += InteractionFunctor4ClosestFeatures \
+           InteractionFunctor4SDECContactModel \
+           InteractionFunctor4ErrorTolerant 
 MOC_DIR = $(YADECOMPILATIONPATH)
 UI_DIR = $(YADECOMPILATIONPATH)
 OBJECTS_DIR = $(YADECOMPILATIONPATH)
