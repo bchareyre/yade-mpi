@@ -38,11 +38,11 @@ void SimpleBroadCollider::registerAttributes()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-int SimpleBroadCollider::broadPhaseCollisionTest(const std::vector<shared_ptr<Body> >& bodies,std::list<shared_ptr<Contact> >& contacts)
+int SimpleBroadCollider::broadPhaseCollisionTest(const std::vector<shared_ptr<Body> >& bodies,std::list<shared_ptr<Interaction> >& interactions)
 {	
 	nbPotentialCollisions=0;
 	
-	contacts.clear();
+	interactions.clear();
 	
 	/*for(unsigned int i=0;i<bodies.size()-1 ; i++)
 	{
@@ -52,7 +52,7 @@ int SimpleBroadCollider::broadPhaseCollisionTest(const std::vector<shared_ptr<Bo
 			shared_ptr<BoundingVolume> bv2 = bodies[j]->bv;
 			if ( !(bodies[i]->isDynamic==false && bodies[j]->isDynamic==false) && overlapper->overlapp(bv1,bv2))
 			{
-				contacts.push_back(shared_ptr<Contact>(new Contact(i,j)));
+				interactions.push_back(shared_ptr<Interaction>(new Interaction(i,j)));
 				nbPotentialCollisions++;
 			}
 		}

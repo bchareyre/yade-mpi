@@ -37,7 +37,7 @@
 	It is used for creating a geometrical model from a given set of parameters.
 	This is very useful when you want to load a file that contains geometrical data or when you want to build an object with that depends on several parameters.
 */
-class GeometricalModelFactory : public Serializable
+class GeometricalModelFactory : public Factorable
 {	
 	// construction
 	public : GeometricalModelFactory ();

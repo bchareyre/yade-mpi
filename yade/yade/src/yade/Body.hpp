@@ -36,7 +36,7 @@
 #include "GeometricalModel.hpp"
 #include "CollisionModel.hpp"
 #include "BoundingVolume.hpp"
-#include "Contact.hpp"
+#include "Interaction.hpp"
 #include "list"
 #include "Serializable.hpp"
 #include "Indexable.hpp"
@@ -57,7 +57,7 @@ class Body : public Serializable //,Indexable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	// FIXME : to put into nonconnex body ??? but maybe useful for autocollision in connexbody
-	public : std::list<shared_ptr<Contact> > contacts;
+	public : std::list<shared_ptr<Interaction> > interactions;
 
 	// FIXME : where to put gm,cm and bv : do body need them or only ConnexBody ??
 	/*! The geometrical model of this body (polyhedron, box ...) */

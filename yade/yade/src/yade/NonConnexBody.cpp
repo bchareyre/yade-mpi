@@ -74,14 +74,14 @@ void NonConnexBody::moveToNextTimeStep(float dt)
 	for(int i=0;i<nbSubStep;i++)
 	{
 		// serach for potential collision (maybe in to steps for hierarchical simulation)
-		broadCollider->broadPhaseCollisionTest(bodies,contacts);
+		broadCollider->broadPhaseCollisionTest(bodies,interactions);
 
 		// this has to split the contact list into several constact list according to the physical type
 		// (RigidBody,FEMBody ...) of colliding body
-		narrowCollider->narrowCollisionPhase(bodies,contacts);		
+		narrowCollider->narrowCollisionPhase(bodies,interactions);		
 
 		// for each contact list we call the correct dynamic engine
-		dynamic->respondToCollisions(bodies,contacts,dt/(float)nbSubStep); //effectiveDt == dynamic->...
+		dynamic->respondToCollisions(bodies,interactions,dt/(float)nbSubStep); //effectiveDt == dynamic->...
 
 		// we call each kinematic engine one after the other
 		kinematic->moveToNextTimeStep(bodies,dt/(float)nbSubStep);

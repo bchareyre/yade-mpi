@@ -104,7 +104,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir></activedir>
+      <activedir>plugins/NarrowPhaseCollider/SimpleNarrowCollider</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>
@@ -161,7 +161,7 @@
   </kdevcppsupport>
   <cppsupportpart>
     <filetemplates>
-      <interfacesuffix>.h</interfacesuffix>
+      <interfacesuffix>.hpp</interfacesuffix>
       <implementationsuffix>.cpp</implementationsuffix>
     </filetemplates>
   </cppsupportpart>

@@ -1,6 +1,6 @@
 #include "ClosestFeatures.hpp"
 
-ClosestFeatures::ClosestFeatures() : ContactModel()
+ClosestFeatures::ClosestFeatures() : InteractionModel()
 {
 }
 

@@ -1,5 +1,5 @@
 #include "SimpleNarrowCollider.hpp"
-//#include "BVCFFinalCollider.hpp"
+#include "Contact.hpp"
 #include "Body.hpp"
 #include "Omega.hpp"
 
@@ -22,21 +22,24 @@ void SimpleNarrowCollider::registerAttributes()
 {
 }
 
-bool SimpleNarrowCollider::narrowCollisionPhase(const std::vector<shared_ptr<Body> >& bodies, std::list<shared_ptr<Contact> >& contacts)
+bool SimpleNarrowCollider::narrowCollisionPhase(const std::vector<shared_ptr<Body> >& bodies, std::list<shared_ptr<Interaction> >& interactions)
 {
-	std::list<shared_ptr<Contact> >::iterator it = contacts.begin();
-	std::list<shared_ptr<Contact> >::iterator itEnd = contacts.end();
-	std::list<shared_ptr<Contact> >::iterator itTmp;
-
+	std::list<shared_ptr<Interaction> >::iterator it = interactions.begin();
+	std::list<shared_ptr<Interaction> >::iterator itEnd = interactions.end();
+	shared_ptr<Contact> contact;
+	std::list<shared_ptr<Interaction> >::iterator itTmp;
+	
 	for(int i=0 ; it!=itEnd ; i++)
 	{
 		itTmp = it;
+		contact = shared_static_cast<Contact>(*itTmp);
+		
 		it++;
-		shared_ptr<Body> b1 = bodies[(*itTmp)->id1];
-		shared_ptr<Body> b2 = bodies[(*itTmp)->id2];
-		//if (!(collider->collide(b1->cm,b2->cm,b1->se3,b2->se3,(*itTmp))))
+		shared_ptr<Body> b1 = bodies[contact->id1];
+		shared_ptr<Body> b2 = bodies[contact->id2];
+		
 		if (!(Omega::instance().narrowCollider.go(b1->cm,b2->cm,b1->se3,b2->se3,(*itTmp))))
-			contacts.erase(itTmp);
+			interactions.erase(itTmp);
 	}
 
 	return true;

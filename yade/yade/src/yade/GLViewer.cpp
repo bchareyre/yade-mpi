@@ -1,6 +1,6 @@
 #include "QtFrontEnd.hpp"
 #include "Body.hpp"
-#include "Contact.hpp"
+#include "Interaction.hpp"
 #include "GL/glut.h"
 
 GLViewer::GLViewer(QWidget * parent) : QGLViewer(parent)

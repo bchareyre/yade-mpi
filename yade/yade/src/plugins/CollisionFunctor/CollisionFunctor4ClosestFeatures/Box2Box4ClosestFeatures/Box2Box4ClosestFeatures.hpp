@@ -48,8 +48,8 @@ class Box2Box4ClosestFeatures : public CollisionFunctor
 	public : Box2Box4ClosestFeatures ();
 	public : virtual ~Box2Box4ClosestFeatures ();
 
-	protected : virtual bool collide(const shared_ptr<CollisionModel> cm1, const shared_ptr<CollisionModel> cm2, const Se3& se31, const Se3& se32, shared_ptr<Contact> c);
-	protected : virtual bool reverseCollide(const shared_ptr<CollisionModel> cm1, const shared_ptr<CollisionModel> cm2,  const Se3& se31, const Se3& se32, shared_ptr<Contact> c);
+	protected : virtual bool collide(const shared_ptr<CollisionModel> cm1, const shared_ptr<CollisionModel> cm2, const Se3& se31, const Se3& se32, shared_ptr<Interaction> c);
+	protected : virtual bool reverseCollide(const shared_ptr<CollisionModel> cm1, const shared_ptr<CollisionModel> cm2,  const Se3& se31, const Se3& se32, shared_ptr<Interaction> c);
 
 	// FIXME
 	private : void lineClosestApproach (const Vector3 pa, const Vector3 ua, const Vector3 pb, const Vector3 ub, float &alpha, float &beta);

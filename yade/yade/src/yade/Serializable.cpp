@@ -20,7 +20,7 @@
 
 #include "Serializable.hpp"
 
-Serializable::Serializable() 
+Serializable::Serializable() : Factorable()
 {
 }
 

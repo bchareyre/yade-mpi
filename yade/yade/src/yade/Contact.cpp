@@ -1,12 +1,10 @@
 #include "Contact.hpp"
-#include <cstdlib>
 
-Contact::Contact ()
+Contact::Contact () : Interaction()
 {
-//	contactModel = 0;
 }
 
-Contact::Contact (int i1,int i2)
+Contact::Contact (int i1,int i2) : Interaction()
 {
 	id1 = i1;
 	id2 = i2;

@@ -67,7 +67,7 @@ bool Archive::containsOnlyFundamentals()
 		}
 		else if (recordType==CUSTOM_CLASS)
 		{
-			shared_ptr<Serializable> s = ClassFactory::instance().createShared(getSerializableClassName());
+			shared_ptr<Serializable> s = shared_dynamic_cast<Serializable>(ClassFactory::instance().createShared(getSerializableClassName()));
 			s->registerAttributes();
 			bool result = s->containsOnlyFundamentals();
 			s->markAllAttributesProcessed();

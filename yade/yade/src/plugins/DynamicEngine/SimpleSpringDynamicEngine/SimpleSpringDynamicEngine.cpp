@@ -2,7 +2,7 @@
 #include "RigidBody.hpp"
 #include "ClosestFeatures.hpp"
 #include "Omega.hpp"
-
+#include "Contact.hpp"
 
 SimpleSpringDynamicEngine::SimpleSpringDynamicEngine () : DynamicEngine()
 {
@@ -24,7 +24,7 @@ void SimpleSpringDynamicEngine::registerAttributes()
 }
 
 
-void SimpleSpringDynamicEngine::respondToCollisions(std::vector<shared_ptr<Body> >& bodies, const std::list<shared_ptr<Contact> >& contacts,float dt)
+void SimpleSpringDynamicEngine::respondToCollisions(std::vector<shared_ptr<Body> >& bodies, const std::list<shared_ptr<Interaction> >& interactions,float dt)
 {
 	float stiffness = 100;
 	float damping = 1.02;
@@ -47,31 +47,34 @@ void SimpleSpringDynamicEngine::respondToCollisions(std::vector<shared_ptr<Body>
 		(*ci) = -(rb->angularVelocity*damping).multTerm(rb->inertia);
 	}
 	
-	std::list<shared_ptr<Contact> >::const_iterator cti = contacts.begin();
-	std::list<shared_ptr<Contact> >::const_iterator ctiEnd = contacts.end();
+	std::list<shared_ptr<Interaction> >::const_iterator cti = interactions.begin();
+	std::list<shared_ptr<Interaction> >::const_iterator ctiEnd = interactions.end();
 	for( ; cti!=ctiEnd ; ++cti)
 	{
-		std::vector<std::pair<Vector3,Vector3> >::iterator cpi = (shared_dynamic_cast<ClosestFeatures>((*cti)->contactModel))->closestsPoints.begin();
-		std::vector<std::pair<Vector3,Vector3> >::iterator cpiEnd = (shared_dynamic_cast<ClosestFeatures>((*cti)->contactModel))->closestsPoints.end();
+		shared_ptr<Interaction> icontact = (*cti);
+		shared_ptr<Contact> contact = shared_static_cast<Contact>(icontact);
+		
+		std::vector<std::pair<Vector3,Vector3> >::iterator cpi = (shared_dynamic_cast<ClosestFeatures>(contact->interactionModel))->closestsPoints.begin();
+		std::vector<std::pair<Vector3,Vector3> >::iterator cpiEnd = (shared_dynamic_cast<ClosestFeatures>(contact->interactionModel))->closestsPoints.end();
 		for( ; cpi!=cpiEnd ; ++cpi)
 		{	
 			Vector3 f = (*cpi).first-(*cpi).second;
 
-			f *= stiffness/(float)((shared_dynamic_cast<ClosestFeatures>((*cti)->contactModel))->closestsPoints.size());
+			f *= stiffness/(float)((shared_dynamic_cast<ClosestFeatures>(contact->interactionModel))->closestsPoints.size());
 			
 			Vector3 p = 0.5*((*cpi).first+(*cpi).second);
 			
-			shared_ptr<RigidBody> r1 = shared_dynamic_cast<RigidBody>(bodies[(*cti)->id1]);
-			shared_ptr<RigidBody> r2 = shared_dynamic_cast<RigidBody>(bodies[(*cti)->id2]);
+			shared_ptr<RigidBody> r1 = shared_dynamic_cast<RigidBody>(bodies[contact->id1]);
+			shared_ptr<RigidBody> r2 = shared_dynamic_cast<RigidBody>(bodies[contact->id2]);
 			
 			Vector3 o1p = p - r1->se3.translation;
 			Vector3 o2p = p - r2->se3.translation;
 						
-			forces[(*cti)->id1] -= f;
-			forces[(*cti)->id2] += f;
+			forces[contact->id1] -= f;
+			forces[contact->id2] += f;
 		
-			couples[(*cti)->id1] -= o1p.cross(f);
-			couples[(*cti)->id2] += o2p.cross(f);
+			couples[contact->id1] -= o1p.cross(f);
+			couples[contact->id2] += o2p.cross(f);
 		}
 	}
 

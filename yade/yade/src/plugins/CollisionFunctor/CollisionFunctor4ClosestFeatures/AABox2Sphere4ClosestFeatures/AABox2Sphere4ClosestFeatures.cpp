@@ -46,7 +46,7 @@ AABox2Sphere4ClosestFeatures::~AABox2Sphere4ClosestFeatures ()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool AABox2Sphere4ClosestFeatures::collide(const shared_ptr<CollisionModel> cm1, const shared_ptr<CollisionModel> cm2, const Se3& se31, const Se3& se32, shared_ptr<Contact> c)
+bool AABox2Sphere4ClosestFeatures::collide(const shared_ptr<CollisionModel> cm1, const shared_ptr<CollisionModel> cm2, const Se3& se31, const Se3& se32, shared_ptr<Interaction> c)
 {
 	Vector3 l,t,p,q,r;
 	bool onborder = false;
@@ -103,7 +103,7 @@ bool AABox2Sphere4ClosestFeatures::collide(const shared_ptr<CollisionModel> cm1,
 	
 		shared_ptr<ClosestFeatures> cf = shared_ptr<ClosestFeatures>(new ClosestFeatures());
 		cf->closestsPoints.push_back(std::pair<Vector3,Vector3>(pt1,pt2));
-		c->contactModel = cf;
+		c->interactionModel = cf;
 		
 		return true;
 	}
@@ -126,7 +126,7 @@ bool AABox2Sphere4ClosestFeatures::collide(const shared_ptr<CollisionModel> cm1,
 		
 	shared_ptr<ClosestFeatures> cf = shared_ptr<ClosestFeatures>(new ClosestFeatures());
 	cf->closestsPoints.push_back(std::pair<Vector3,Vector3>(pt1,pt2));
-	c->contactModel = cf;
+	c->interactionModel = cf;
 	
 	return true;	
 }
@@ -134,12 +134,12 @@ bool AABox2Sphere4ClosestFeatures::collide(const shared_ptr<CollisionModel> cm1,
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool AABox2Sphere4ClosestFeatures::reverseCollide(const shared_ptr<CollisionModel> cm1, const shared_ptr<CollisionModel> cm2,  const Se3& se31, const Se3& se32, shared_ptr<Contact> c)
+bool AABox2Sphere4ClosestFeatures::reverseCollide(const shared_ptr<CollisionModel> cm1, const shared_ptr<CollisionModel> cm2,  const Se3& se31, const Se3& se32, shared_ptr<Interaction> c)
 {
 	bool isColliding = collide(cm2,cm1,se32,se31,c);
 	if (isColliding)
 	{
-		shared_ptr<ClosestFeatures> cf = shared_dynamic_cast<ClosestFeatures>(c->contactModel);
+		shared_ptr<ClosestFeatures> cf = shared_dynamic_cast<ClosestFeatures>(c->interactionModel);
 		Vector3 tmp = cf->closestsPoints[0].first;
 		cf->closestsPoints[0].first = cf->closestsPoints[0].second;		
 		cf->closestsPoints[0].second = tmp;

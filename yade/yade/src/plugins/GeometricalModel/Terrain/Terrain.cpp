@@ -7,8 +7,6 @@
 
 Terrain::Terrain () : CollisionModel()
 {
-	
-	type = 3;
 }
 
 Terrain::~Terrain ()

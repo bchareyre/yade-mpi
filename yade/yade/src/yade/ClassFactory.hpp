@@ -21,8 +21,8 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#ifndef SERIALIZABLEFACTORY_HPP
-#define SERIALIZABLEFACTORY_HPP
+#ifndef __CLASSFACTORY_HPP__
+#define __CLASSFACTORY_HPP__
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -49,11 +49,11 @@ using namespace ArchiveTypes;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #define REGISTER_CLASS_TO_FACTORY(name,sname,type,isFundamental) 			\
-	inline boost::shared_ptr< Serializable > CreateShared##sname()			\
+	inline boost::shared_ptr< Factorable > CreateShared##sname()			\
 	{										\
 		return boost::shared_ptr< sname > ( new sname );			\
 	}										\
-	inline Serializable* Create##sname()						\
+	inline Factorable* Create##sname()						\
 	{										\
 		return new sname;							\
 	}										\
@@ -66,7 +66,7 @@ using namespace ArchiveTypes;
 		return typeid(name);							\
 	}										\
 	const bool registered##name##sname =						\
-		ClassFactory::instance().registerSerializable( 	#sname ,		\
+		ClassFactory::instance().registerFactorable( 	#sname ,		\
 								Create##sname ,		\
 								CreateShared##sname ,	\
 								CreatePureCustom##name,	\
@@ -77,7 +77,7 @@ using namespace ArchiveTypes;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-class Serializable;
+class Factorable;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -94,13 +94,13 @@ class ClassFactory : public Singleton< ClassFactory >
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/*! Pointer on a function that create an instance of a serializable class an return a shared pointer on it */
-	private   : typedef boost::shared_ptr<Serializable> ( *CreateSharedSerializableFnPtr )();
+	private   : typedef boost::shared_ptr<Factorable> ( *CreateSharedFactorableFnPtr )();
 	/*! Pointer on a function that create an instance of a serializable class an return a C pointer on it */
-	private   : typedef Serializable* ( *CreateSerializableFnPtr )();
+	private   : typedef Factorable* ( *CreateFactorableFnPtr )();
 	/*! Pointer on a function that create an instance of a custom class (i.e. not serializable) and return a void C pointer on it */
 	private   : typedef void* ( *CreatePureCustomFnPtr )();
 	/*! Pointer on a function that return the type_info of the registered class */
-	private   : typedef const type_info& ( *VerifySerializableFnPtr )();
+	private   : typedef const type_info& ( *VerifyFactorableFnPtr )();
 	
 	/*! Description of a class that is stored inside the factory.*/
 	private   : class ClassDescriptor
@@ -110,13 +110,13 @@ class ClassFactory : public Singleton< ClassFactory >
 			///////////////////////////////////////////////////////////////////////////
 
 			/*! Used to create a C pointer on the class (if serializable) */
-			public    : CreateSerializableFnPtr create;
+			public    : CreateFactorableFnPtr create;
 			/*! Used to create a shared pointer on the class (if serializable) */
-			public    : CreateSharedSerializableFnPtr createShared;
+			public    : CreateSharedFactorableFnPtr createShared;
 			/*! Used to create a void C pointer on the class */
 			public    : CreatePureCustomFnPtr createPureCustom;
-			/*! Used by the findType method to test the type of the class and know if it is a Serializable or Custom class*/
-			public    : VerifySerializableFnPtr verify;
+			/*! Used by the findType method to test the type of the class and know if it is a Factorable (i.e. Factorable) or Custom class*/
+			public    : VerifyFactorableFnPtr verify;
 			/*! Type of the class : SERIALIZABLE,CUSTOM,CONTAINER,POINTER */
 			public    : RecordType type;
 			/*! fundamental is true the class type is a fundamtental type (e.g. Vector3, Quaternion) */
@@ -129,8 +129,8 @@ class ClassFactory : public Singleton< ClassFactory >
 			/*! Empty constructor */
 			public    : ClassDescriptor() {};
 			/*! Constructor that initialize all the attributes of the class */
-			public    : ClassDescriptor(	CreateSerializableFnPtr c, CreateSharedSerializableFnPtr cs,
-							CreatePureCustomFnPtr cpc, VerifySerializableFnPtr v,
+			public    : ClassDescriptor(	CreateFactorableFnPtr c, CreateSharedFactorableFnPtr cs,
+							CreatePureCustomFnPtr cpc, VerifyFactorableFnPtr v,
 							RecordType t, bool f)
 				    {
 					create 		 = c;
@@ -144,7 +144,7 @@ class ClassFactory : public Singleton< ClassFactory >
 		    };
 
  	/*! Type of a Stl map used to map the registered class name with their ClassDescription */
-	private   : typedef std::map< std::string , ClassDescriptor > SerializableMap;
+	private   : typedef std::map< std::string , ClassDescriptor > ClassDescriptorMap;
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -154,7 +154,7 @@ class ClassFactory : public Singleton< ClassFactory >
 	/*! The internal dynamic library manager used to load dynamic libraries when an instance of a non loaded class is ask */
 	private   : DynLibManager dlm;	
 	/*! Map that contains the name of the registered class and their description */
-	private   : SerializableMap map;	
+	private   : ClassDescriptorMap map;	
 		
 	
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -181,7 +181,7 @@ class ClassFactory : public Singleton< ClassFactory >
 	/*! Assignement operator needed by the Singleton class */
 	private   : ClassFactory& operator=(const ClassFactory&);
 
-	/*! This method is used to register a Serializable class into the factory. It is called only from macro REGISTER_CLASS_TO_FACTORY
+	/*! This method is used to register a Factorable class into the factory. It is called only from macro REGISTER_CLASS_TO_FACTORY
 		\param name the name of the class
 		\param create a pointer to a function that is able to return a C pointer on the given class
 		\param createPureCustom a pointer to a function that is able to return a void C pointer on the given class
@@ -190,15 +190,15 @@ class ClassFactory : public Singleton< ClassFactory >
 		\param f is true is the class is a fundamental one (Vector3, Quaternion)
 		\return true if registration is succesfull
 	*/
-	public    : bool registerSerializable( 	std::string name			  , CreateSerializableFnPtr create,
-						CreateSharedSerializableFnPtr createShared, CreatePureCustomFnPtr createPureCustom,
-						VerifySerializableFnPtr verify		  , RecordType type, bool f );
+	public    : bool registerFactorable( 	std::string name			  , CreateFactorableFnPtr create,
+						CreateSharedFactorableFnPtr createShared, CreatePureCustomFnPtr createPureCustom,
+						VerifyFactorableFnPtr verify		  , RecordType type, bool f );
 	
 	/*! Create a shared pointer on a serializable class of the given name */
-	public 	  : boost::shared_ptr<Serializable> createShared( std::string name );
+	public 	  : boost::shared_ptr<Factorable> createShared( std::string name );
 	
 	/*! Create a C pointer on a serializable class of the given name */
-	public 	  : Serializable* createPure( std::string name );
+	public 	  : Factorable* createPure( std::string name );
 	
 	/*! Create a void C pointer on a class of the given name */
 	public 	  : void * createPureCustom( std::string name );		
@@ -214,7 +214,7 @@ class ClassFactory : public Singleton< ClassFactory >
 		\param tp type info of the type to test
 		\param fundamental is true if the given type is fundamental (Vector3,Quaternion ...)
 	*/
-	public 	  : bool isSerializable(const type_info& tp,bool& fundamental);
+	public 	  : bool isFactorable(const type_info& tp,bool& fundamental);
 	
 	public    : bool findClassInfo(const type_info& tp,RecordType& type, string& serializableClassName,bool& fundamental);
 
@@ -225,7 +225,7 @@ class ClassFactory : public Singleton< ClassFactory >
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#endif
+#endif // __CLASSFACTORY_HPP__
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////

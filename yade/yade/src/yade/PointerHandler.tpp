@@ -70,7 +70,7 @@ struct PointerHandler<shared_ptr<PointedType> >
 			// FIXME : isn't it the same code code Serializable and custom ???
 			if(boost::is_base_and_derived<Serializable,PointedType>::value)
 			{
-				Serializable * sh2s = ClassFactory::instance().createPure(typeStr);
+				Serializable * sh2s = dynamic_cast<Serializable*>(ClassFactory::instance().createPure(typeStr));
 				tmpPtr=any_cast< shared_ptr<PointedType>* >(ac.getAddress());
 				*tmpPtr = shared_ptr<PointedType>(reinterpret_cast<PointedType*>(sh2s));
 				newAc = Archive::create(name,**tmpPtr);

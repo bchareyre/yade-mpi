@@ -3,7 +3,7 @@
 #include "CollisionModel.hpp"
 #include "CollisionFunctor.hpp"
 
-bool MultiMethodsManager::go(const shared_ptr<CollisionModel> cm1, const shared_ptr<CollisionModel> cm2, const Se3& se31, const Se3& se32, shared_ptr<Contact> c)
+bool MultiMethodsManager::go(const shared_ptr<CollisionModel> cm1, const shared_ptr<CollisionModel> cm2, const Se3& se31, const Se3& se32, shared_ptr<Interaction> c)
 {
 	assert(cm1->getClassIndex()>=0);
 	assert(cm2->getClassIndex()>=0);
@@ -20,17 +20,13 @@ bool MultiMethodsManager::go(const shared_ptr<CollisionModel> cm1, const shared_
 
 bool MultiMethodsManager::add(const string& name)
 {
-//		cerr << "maybe Adding " << name << endl;
 	if (indexedClassName.find(name)==indexedClassName.end())
 	{
 		indexedClassName[name] = -1;
-		//shared_ptr<Indexable> indexable  = shared_dynamic_cast<Indexable>(ClassFactory::instance().createShared(name));
-		shared_ptr<Serializable> s  = ClassFactory::instance().createShared(name);
-		shared_ptr<CollisionModel> indexable = shared_dynamic_cast<CollisionModel>(s);
-//		if (ClassFactory::instance().createShared(name) == 0)
-//			cerr <<"OOOOOOOOOOOOOOOops!\n";
+		
+		shared_ptr<CollisionModel> cm  = shared_dynamic_cast<CollisionModel>(ClassFactory::instance().createShared(name));
 
-		int& index = indexable->getClassIndex();
+		int& index = cm->getClassIndex();
 		assert(index==-1);
 		index = indexedClassName.size()-1;
 		indexedClassName[name] = index;
@@ -76,7 +72,9 @@ bool MultiMethodsManager::add(const string& name)
 			callBacks[ index ][ indexedClassName[(*icni).first] ] = collisionFunctor;
 		}
 
-		cerr << "Added to NarrowCollider: " << name << endl;
+		#ifdef DEBUG
+			cerr << "New class added to NarrowColliderMultiMethodsManager: " << name << endl;
+		#endif
 
 		return true;
 	}

@@ -33,7 +33,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "Contact.hpp"
+#include "Interaction.hpp"
 //#include "FinalCollider.hpp"
 #include "Serializable.hpp"
 
@@ -45,6 +45,7 @@ class Body;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+// FIXME : Serializable or Factorable
 class NarrowPhaseCollider : public Serializable
 {
 	// construction
@@ -52,7 +53,7 @@ class NarrowPhaseCollider : public Serializable
 	
 	public : virtual ~NarrowPhaseCollider ();
 	
-	public : virtual bool narrowCollisionPhase(const std::vector<shared_ptr<Body> >& , std::list<shared_ptr<Contact> >& ) { return false;};
+	public : virtual bool narrowCollisionPhase(const std::vector<shared_ptr<Body> >& , std::list<shared_ptr<Interaction> >& ) { return false;};
 	
 	public : void processAttributes();
 	public : void registerAttributes();

@@ -23,13 +23,13 @@
 
 using namespace ArchiveTypes;
 
-class Serializable;
+class Factorable;
 
 
 bool ClassFactory::findClassInfo(const type_info& tp,RecordType& type, string& serializableClassName,bool& fundamental)
 {
-	SerializableMap::iterator mi = map.begin();
-	SerializableMap::iterator miEnd = map.end();
+	ClassDescriptorMap::iterator mi = map.begin();
+	ClassDescriptorMap::iterator miEnd = map.end();
 
 	for( ; mi!=miEnd ; mi++)
 	{
@@ -45,20 +45,24 @@ bool ClassFactory::findClassInfo(const type_info& tp,RecordType& type, string& s
 }
 
 
-bool ClassFactory::registerSerializable( std::string name 			   , CreateSerializableFnPtr create,
-					 CreateSharedSerializableFnPtr createShared, CreatePureCustomFnPtr createPureCustom,
-					 VerifySerializableFnPtr verify		   , RecordType type, bool f )
+bool ClassFactory::registerFactorable( std::string name 			   , CreateFactorableFnPtr create,
+					 CreateSharedFactorableFnPtr createShared, CreatePureCustomFnPtr createPureCustom,
+					 VerifyFactorableFnPtr verify		   , RecordType type, bool f )
 {
-	bool tmp = map.insert( SerializableMap::value_type( name , ClassDescriptor(create,createShared, createPureCustom, verify,type,f) )).second;
+	bool tmp = map.insert( ClassDescriptorMap::value_type( name , ClassDescriptor(create,createShared, createPureCustom, verify,type,f) )).second;
+	
+	#ifdef DEBUG
 	if (tmp)
 		std::cout << "registering class: " << name << "\n";
+	#endif
+	
 	return tmp;
 }
 
-boost::shared_ptr<Serializable> ClassFactory::createShared( std::string name )
+boost::shared_ptr<Factorable> ClassFactory::createShared( std::string name )
 {
 
-	SerializableMap::const_iterator i = map.find( name );
+	ClassDescriptorMap::const_iterator i = map.find( name );
 	if( i == map.end() )
 	{
 		dlm.load(name);
@@ -77,9 +81,9 @@ boost::shared_ptr<Serializable> ClassFactory::createShared( std::string name )
 	return ( i -> second.createShared ) ();
 }
 
-Serializable* ClassFactory::createPure( std::string name )
+Factorable* ClassFactory::createPure( std::string name )
 {
-	SerializableMap::const_iterator i = map.find( name );
+	ClassDescriptorMap::const_iterator i = map.find( name );
 	if( i == map.end() )
 	{
 		//cerr << "------------ going to load something" << endl;
@@ -101,7 +105,7 @@ Serializable* ClassFactory::createPure( std::string name )
 
 void * ClassFactory::createPureCustom( std::string name )
 {
-	SerializableMap::const_iterator i = map.find( name );
+	ClassDescriptorMap::const_iterator i = map.find( name );
 	if( i == map.end() )
 	{
 		std::string error = ExceptionMessages::CantCreateClass + name;

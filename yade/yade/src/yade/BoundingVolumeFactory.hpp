@@ -38,7 +38,7 @@
 	It is used for creating a bounding volume from a collision model during runtime.
 	This is very useful when it is not trivial to build the bounding volume from the collision model. For example if you want to build an AABB from a box which is not initially aligned with the world axis, it is not easy to write by hand into the configuration file the center and size of this AABB. Instead you can use a BoundingVolumeFactory that will compute for you the correct value	
 */
-class BoundingVolumeFactory : public Serializable
+class BoundingVolumeFactory : public Factorable
 {	
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

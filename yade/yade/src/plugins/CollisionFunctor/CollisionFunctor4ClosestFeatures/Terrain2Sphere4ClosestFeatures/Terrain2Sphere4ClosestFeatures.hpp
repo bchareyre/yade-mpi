@@ -39,8 +39,8 @@ class Terrain2Sphere4ClosestFeatures : public CollisionFunctor
 	public : Terrain2Sphere4ClosestFeatures ();
 	public : virtual ~Terrain2Sphere4ClosestFeatures ();
 
-	protected : virtual bool collide(const shared_ptr<CollisionModel> cm1, const shared_ptr<CollisionModel> cm2, const Se3& se31, const Se3& se32, shared_ptr<Contact> c);
-	protected : virtual bool reverseCollide(const shared_ptr<CollisionModel> cm1, const shared_ptr<CollisionModel> cm2,  const Se3& se31, const Se3& se32, shared_ptr<Contact> c);
+	protected : virtual bool collide(const shared_ptr<CollisionModel> cm1, const shared_ptr<CollisionModel> cm2, const Se3& se31, const Se3& se32, shared_ptr<Interaction> c);
+	protected : virtual bool reverseCollide(const shared_ptr<CollisionModel> cm1, const shared_ptr<CollisionModel> cm2,  const Se3& se31, const Se3& se32, shared_ptr<Interaction> c);
 
 	// FIXME : put into toolbox and serialization and everything
 	private : float sqrDistTriPoint(const Vector3& p, const std::vector<Vector3>& tri, Vector3& pt);

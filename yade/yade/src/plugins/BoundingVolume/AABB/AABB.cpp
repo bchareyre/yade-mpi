@@ -2,13 +2,11 @@
 
 AABB::AABB () : BoundingVolume()
 {
-	type = 2;
 
 }
 
 AABB::AABB (Vector3 hs,Vector3 c) : BoundingVolume()
 {
-	type = 2;
 	halfSize = hs;
 	center = c;
 	processAttributes();

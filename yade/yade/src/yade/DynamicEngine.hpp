@@ -35,7 +35,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "Contact.hpp"
+#include "Interaction.hpp"
 #include "Serializable.hpp"
 #include "Vector3.hpp"
 
@@ -47,6 +47,7 @@ class Body;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+// FIXME : Serializable or Factorable
 class DynamicEngine : public Serializable
 {
 
@@ -64,7 +65,7 @@ class DynamicEngine : public Serializable
 	public : void processAttributes();
 	public : void registerAttributes();
 	
-	public : virtual void respondToCollisions(std::vector<shared_ptr<Body> >& , const std::list<shared_ptr<Contact> >& ,float ) {};
+	public : virtual void respondToCollisions(std::vector<shared_ptr<Body> >& , const std::list<shared_ptr<Interaction> >& ,float ) {};
 
 	public : virtual string getInteractionModelName() { return "";};
 	

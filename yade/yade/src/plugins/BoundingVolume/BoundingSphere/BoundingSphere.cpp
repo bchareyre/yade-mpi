@@ -3,8 +3,6 @@
 BoundingSphere::BoundingSphere (float r) : BoundingVolume()
 {
 	radius = r;
-	type = 1;
-	
 }
 
 

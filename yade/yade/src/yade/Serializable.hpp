@@ -42,9 +42,9 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include "Factorable.hpp"
 #include "ExceptionMessages.hpp"
 #include "Archive.hpp"
-#include "ClassFactory.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -58,35 +58,17 @@ using namespace ArchiveTypes;
 
 #define REGISTER_CLASS_NAME(cn)						\
 	public : virtual string getClassName() { return #cn; };
-
-#define REGISTER_ATTRIBUTE(attribute) 					\
-		registerAttribute( #attribute, attribute );
-		
+	
 #define DECLARE_POINTER_TO_MY_CUSTOM_CLASS(Type,attribute,any)		\
 	Type * attribute=any_cast< Type * >(any);
 
-#define REGISTER_CLASS(name,isFundamental) 						\
-	REGISTER_CLASS_TO_FACTORY(name,name,SERIALIZABLE,isFundamental);
-	
-#define REGISTER_CUSTOM_CLASS(name,sname,isFundamental) 				\
-REGISTER_CLASS_TO_FACTORY(name,sname,CUSTOM_CLASS,isFundamental);
+#define REGISTER_ATTRIBUTE(attribute)                                   \
+                registerAttribute( #attribute, attribute );
 
-//#define REGISTER_FUNDAMENTAL_CLASS(name) 						
-//	REGISTER_CLASS_TO_FACTORY(name,name,SERIALIZABLE,true);
-
-//#define REGISTER_CUSTOM_FUNDAMENTAL(name,sname) 				
-//	REGISTER_CLASS_TO_FACTORY(name,sname,CUSTOM_FUNDAMENTAL,true);
-
-//#define REGISTER_CUSTOM_POLYMORPHIC_BASE(base,derived)	
-//	public : virtual any getCustomPolymorphicBase() { return #cn; };
-	
-//#define REGISTER_CUSTOM_TEMPLATE_CLASS(name,templateType)			
-//	REGISTER_TEMPLATE_CLASS_TO_FACTORY(name,templateType, CUSTOM_CLASS);
-		
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-class Serializable
+class Serializable : public Factorable
 {
 	public    : Serializable();
 	public    : virtual ~Serializable();

@@ -10,14 +10,12 @@ vector<Vector3> Sphere::faces;
 Sphere::Sphere (float r) : CollisionModel()
 {
 	radius = r;
-	type = 1;
 	Sphere::Sphere();
 }
 
 Sphere::Sphere () : CollisionModel()
 {
-	type = 1;
-
+	
 	float X = 0.525731112119133606;
 	float Z = 0.850650808352039932;
 	vertices.push_back(Vector3(-X,0,Z));

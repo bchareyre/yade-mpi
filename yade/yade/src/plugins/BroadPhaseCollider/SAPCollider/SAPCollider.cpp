@@ -1,5 +1,6 @@
 #include "SAPCollider.hpp"
 #include "Body.hpp"
+#include "Contact.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -63,7 +64,7 @@ void SAPCollider::registerAttributes()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-int SAPCollider::broadPhaseCollisionTest(const std::vector<shared_ptr<Body> >& bodies,std::list<shared_ptr<Contact> >& contacts)
+int SAPCollider::broadPhaseCollisionTest(const std::vector<shared_ptr<Body> >& bodies,std::list<shared_ptr<Interaction> >& interactions)
 {
 	unsigned int i;
 	
@@ -95,14 +96,14 @@ int SAPCollider::broadPhaseCollisionTest(const std::vector<shared_ptr<Body> >& b
 	std::set<unsigned int>::iterator it;
 	std::set<unsigned int>::iterator itEnd;	
 	
-	/*std::list<Contact*>::iterator ci = contacts.begin();
-	std::list<Contact*>::iterator ciEnd = contacts.end();
+	/*std::list<Interaction*>::iterator ci = interactions.begin();
+	std::list<Interaction*>::iterator ciEnd = interactions.end();
 	for(;ci!=ciEnd;++ci)
 	{
-		delete (*ci)->contactModel;
+		delete (*ci)->interactionModel;
 		delete (*ci);
 	}*/
-	contacts.clear();
+	interactions.clear();
 	
 	nbPotentialCollisions = 0;
 	for(i=0;i<nbObjects;i++)
@@ -114,7 +115,7 @@ int SAPCollider::broadPhaseCollisionTest(const std::vector<shared_ptr<Body> >& b
 			if (!(bodies[i]->isDynamic==false && bodies[*it]->isDynamic==false))
 			{
 				nbPotentialCollisions++;
-				contacts.push_back(shared_ptr<Contact>(new Contact(i,*it)));
+				interactions.push_back(shared_ptr<Interaction>(new Contact(i,*it)));
 			}
 		}
 	} 

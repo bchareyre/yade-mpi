@@ -33,12 +33,13 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-
 #include "ClassFactory.hpp"
-//#include "CollisionFunctor.hpp"
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 class Se3;
-class Contact;
+class Interaction;
 class CollisionModel;
 class CollisionFunctor;
 
@@ -49,11 +50,7 @@ class CollisionFunctor;
 class MultiMethodsManager 
 {	
 	protected : std::vector<std::vector<shared_ptr<CollisionFunctor> > > callBacks;
-	//private   : int size;
 	private   : map<string,int> indexedClassName;
-	
-	// FIXME : remove nullFunc
-	//protected : Functor nullFunc;
 		
 	// construction
 	public : MultiMethodsManager ()
@@ -65,75 +62,7 @@ class MultiMethodsManager
 
 	public : bool add(const string& name);
 	
-	/*private : bool pairExists(int i,int j)
-	{
-		int sizeRow = callBacks.size();
-		int max = i;
-		if (max<j)
-			max = j;	
-		if (max>=sizeRow)
-			return false;
-		else
-			return (callBacks[i][j]!=nullFunc && callBacks[j][i]!=nullFunc);
-	}
-	
-	protected : bool addPair(int i,int j, Functor ptr2F1,Functor ptr2F2)
-	{
-		//assert(ptf1!=NULL);
-		if (!pairExists(i,j))
-		{	
-			int sizeRow = callBacks.size();
-			int max = i;
-			if (max<j)
-				max = j;
-			if (sizeRow <= max)
-			{
-				callBacks.resize(max+1);
-				for(int k=0;k<=max;k++)
-				{
-					callBacks[k].resize(max+1);
-					for(int l=0;l<=max;l++)
-					{					
-						if (k>=max || l>=max)
-							callBacks[k][l] = nullFunc;
-					}
-				}
-			}
-			callBacks[i][j] = ptr2F1;
-			if (i!=j)
-				callBacks[j][i] = ptr2F2;
-			return true;
-		}
-		else
-			return false;
-	}
-	
-	protected : bool overwritePair(int i,int j, Functor ptr2F1,Functor ptr2F2)
-		    {
-			if (pairExists(i,j))
-			{
-				callBacks[i][j] = ptr2F1;
-				if (i!=j)
-					callBacks[j][i] = ptr2F2;
-				return true;
-			}
-			else
-				return false;
-		    }
-	
-	protected : bool removePair(int i,int j)
-	{
-		if (pairExists(i,j))
-		{
-			callBacks[i][j] = nullFunc;
-			callBacks[j][i] = nullFunc;
-			return true;
-		}
-		else
-			return false;
-	}*/
-
-	public : bool go(const shared_ptr<CollisionModel> cm1, const shared_ptr<CollisionModel> cm2, const Se3& se31, const Se3& se32, shared_ptr<Contact> c);
+	public : bool go(const shared_ptr<CollisionModel> cm1, const shared_ptr<CollisionModel> cm2, const Se3& se31, const Se3& se32, shared_ptr<Interaction> c);
 
 };
 

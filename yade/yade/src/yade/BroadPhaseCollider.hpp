@@ -33,7 +33,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "Contact.hpp"
+#include "Interaction.hpp"
 #include "Serializable.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -48,6 +48,7 @@ class Body;
 
 	All the broad phase collider (sweep and prune, regular grid ....) must derived from this class. A broad phase collider is used to speed up the collision detection test by testing collision between the bounding volume of the objects. In general it tries to reduce the number of potential colliding pairs. 
 */
+// FIXME : Serializable or Factorable
 class BroadPhaseCollider : public Serializable
 {
 
@@ -73,9 +74,9 @@ class BroadPhaseCollider : public Serializable
 	//FIXME :all the virtual method should throw ???
 	/*! Common interface for all broad phase collider. This method find the bodies which are a potentially in interaction and store the potential interactions into a list
 		\param const std::vector<shared_ptr<Body> > vector of body you want to test for potential interaction
-		\param std::list<shared_ptr<Contact> > list of potential interaction found by the broad phase collider
+		\param std::list<shared_ptr<Interaction> > list of potential interaction found by the broad phase collider
 	*/ 
-	public : virtual int broadPhaseCollisionTest(const std::vector<shared_ptr<Body> >& ,std::list<shared_ptr<Contact> >& ) { return 0;};
+	public : virtual int broadPhaseCollisionTest(const std::vector<shared_ptr<Body> >& ,std::list<shared_ptr<Interaction> >& ) { return 0;};
 	
 	public : void processAttributes();
 	public : void registerAttributes();

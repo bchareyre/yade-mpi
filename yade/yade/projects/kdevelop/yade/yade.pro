@@ -3,17 +3,6 @@
 # Subdir relative project main directory: ./yade
 # Target is an application:  
 
-LIBS += -lboost_date_time \
-        -lglut \
-        -lQGLViewer \
-        -rdynamic 
-MOC_DIR = $(YADECOMPILATIONPATH) 
-UI_DIR = $(YADECOMPILATIONPATH) 
-OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-DESTDIR = $(YADEBINPATH) 
-CONFIG += debug \
-          warn_on 
-TEMPLATE = app 
 FORMS += QtGeneratedFrontEnd.ui 
 HEADERS += Archive.hpp \
            ArchiveTypes.hpp \
@@ -28,8 +17,6 @@ HEADERS += Archive.hpp \
            CollisionModelFactory.hpp \
            CollisionModel.hpp \
            ConnexBody.hpp \
-           Contact.hpp \
-           ContactModel.hpp \
            DynamicEngine.hpp \
            DynLibManager.hpp \
            ExceptionMessages.hpp \
@@ -67,7 +54,11 @@ HEADERS += Archive.hpp \
            PointerHandler.tpp \
            Indexable.hpp \
            MultiMethodsManager.hpp \
-           CollisionFunctor.hpp 
+           CollisionFunctor.hpp \
+           Factorable.hpp \
+           InteractionModel.hpp \
+           Interaction.hpp \
+           Contact.hpp 
 SOURCES += Archive.cpp \
            Body.cpp \
            BoundingVolume.cpp \
@@ -80,8 +71,6 @@ SOURCES += Archive.cpp \
            CollisionModel.cpp \
            CollisionModelFactory.cpp \
            ConnexBody.cpp \
-           Contact.cpp \
-           ContactModel.cpp \
            DynamicEngine.cpp \
            DynLibManager.cpp \
            ExceptionMessages.cpp \
@@ -105,5 +94,21 @@ SOURCES += Archive.cpp \
            Vector2.cpp \
            Vector3.cpp \
            yade.cpp \
-           MultiMethodsManager.cpp 
+           MultiMethodsManager.cpp \
+           Factorable.cpp \
+           InteractionModel.cpp \
+           Interaction.cpp \
+           Contact.cpp 
+LIBS += -lboost_date_time \
+-lglut \
+-lQGLViewer \
+-rdynamic
+INCLUDEPATH = $(YADECOMPILATIONPATH)
+MOC_DIR = $(YADECOMPILATIONPATH)
+UI_DIR = $(YADECOMPILATIONPATH)
+OBJECTS_DIR = $(YADECOMPILATIONPATH)
+DESTDIR = $(YADEBINPATH)
+CONFIG += release \
+warn_on
+TEMPLATE = app
 QtGeneratedFrontEnd.ui.target = QtGeneratedFrontEnd.ui

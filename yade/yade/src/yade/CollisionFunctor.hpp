@@ -37,8 +37,8 @@
 #include "Indexable.hpp"
 #include "CollisionModel.hpp"
 #include "Se3.hpp"
-#include "Contact.hpp"
-#include "Serializable.hpp"
+#include "Interaction.hpp"
+#include "Factorable.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -47,7 +47,7 @@
 
 	Every functions that describe collision between two CollisionModels must derived from CollisionFunctor.
 */
-class CollisionFunctor : public Indexable , public Serializable
+class CollisionFunctor : public Indexable , public Factorable
 {
 
 	private : bool reverse;
@@ -59,10 +59,10 @@ class CollisionFunctor : public Indexable , public Serializable
 	public : CollisionFunctor () {};
 	public : virtual ~CollisionFunctor () {};
 
-	protected : virtual bool collide(const shared_ptr<CollisionModel> , const shared_ptr<CollisionModel> , const Se3& , const Se3& , shared_ptr<Contact> ) { throw; };
-	protected : virtual bool reverseCollide(const shared_ptr<CollisionModel> , const shared_ptr<CollisionModel> ,  const Se3& , const Se3& , shared_ptr<Contact> ) { throw; };
+	protected : virtual bool collide(const shared_ptr<CollisionModel> , const shared_ptr<CollisionModel> , const Se3& , const Se3& , shared_ptr<Interaction> ) { throw; };
+	protected : virtual bool reverseCollide(const shared_ptr<CollisionModel> , const shared_ptr<CollisionModel> ,  const Se3& , const Se3& , shared_ptr<Interaction> ) { throw; };
 
-	public    : inline bool operator() (const shared_ptr<CollisionModel> cm1, const shared_ptr<CollisionModel> cm2, const Se3& se31, const Se3& se32, shared_ptr<Contact> c)
+	public    : inline bool operator() (const shared_ptr<CollisionModel> cm1, const shared_ptr<CollisionModel> cm2, const Se3& se31, const Se3& se32, shared_ptr<Interaction> c)
 	{
 		if (reverse)
 			return reverseCollide(cm1,cm2,se31,se32,c);

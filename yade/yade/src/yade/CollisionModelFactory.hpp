@@ -40,7 +40,7 @@
 	It is used for creating a collision model from a geometrical model during runtime.
 	This is very useful when it is not trivial to build the collision model from the geometrical model. For example if you want to build an sphere tree from a polyhedron, it is not easy to write by hand into the configuration file the center and size of all spheres. Instead you can use a CollisionModelFactory that will compute for you the correct values.
 */
-class CollisionModelFactory : public Serializable
+class CollisionModelFactory : public Factorable
 {	
 	
 	// construction

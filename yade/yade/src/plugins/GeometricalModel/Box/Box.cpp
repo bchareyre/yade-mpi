@@ -4,12 +4,10 @@
 Box::Box (Vector3 e) : CollisionModel()
 {
 	extents = e;
-	type=2;
 }
 
 Box::Box () : CollisionModel()
 {	
-	type=2;	
 }
 
 Box::~Box ()

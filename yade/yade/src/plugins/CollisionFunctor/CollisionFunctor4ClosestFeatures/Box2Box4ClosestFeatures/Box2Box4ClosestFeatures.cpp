@@ -45,7 +45,7 @@ Box2Box4ClosestFeatures::~Box2Box4ClosestFeatures ()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool Box2Box4ClosestFeatures::collide(const shared_ptr<CollisionModel> cm1, const shared_ptr<CollisionModel> cm2, const Se3& se31, const Se3& se32, shared_ptr<Contact> c)
+bool Box2Box4ClosestFeatures::collide(const shared_ptr<CollisionModel> cm1, const shared_ptr<CollisionModel> cm2, const Se3& se31, const Se3& se32, shared_ptr<Interaction> c)
 {
 	float r11,r12,r13,r21,r22,r23,r31,r32,r33,q11,q12,q13,q21,q22,q23,q31,q32,q33;
 	
@@ -57,7 +57,7 @@ bool Box2Box4ClosestFeatures::collide(const shared_ptr<CollisionModel> cm1, cons
 	shared_ptr<Box> obb1 = shared_dynamic_cast<Box>(cm1);
 	shared_ptr<Box> obb2 = shared_dynamic_cast<Box>(cm2);
 
-	int nbContacts = 0;
+	int nbInteractions = 0;
 	
 	se31.rotation.toRotationMatrix(axis1T);
 	axis1 = axis1T.Transpose();
@@ -205,9 +205,9 @@ bool Box2Box4ClosestFeatures::collide(const shared_ptr<CollisionModel> cm1, cons
 		//pt2 = pb;//(pa+pb-normal*penetrationDepth)*0.5;
 		shared_ptr<ClosestFeatures> cf = shared_ptr<ClosestFeatures>(new ClosestFeatures());
 		cf->closestsPoints.push_back(std::pair<Vector3,Vector3>(pa,pb));
-		c->contactModel = cf;
+		c->interactionModel = cf;
 		
-		nbContacts++;
+		nbInteractions++;
 
 		return true;	
 	}
@@ -412,9 +412,9 @@ bool Box2Box4ClosestFeatures::collide(const shared_ptr<CollisionModel> cm1, cons
 			pt2 	= pt1-normal*dep[j];
 			cf->closestsPoints.push_back(std::pair<Vector3,Vector3>(pt1,pt2));
 		}
-		nbContacts++;
+		nbInteractions++;
 	}
-	c->contactModel = cf;
+	c->interactionModel = cf;
 	
 	return true;
 }
@@ -422,12 +422,12 @@ bool Box2Box4ClosestFeatures::collide(const shared_ptr<CollisionModel> cm1, cons
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool Box2Box4ClosestFeatures::reverseCollide(const shared_ptr<CollisionModel> cm1, const shared_ptr<CollisionModel> cm2,  const Se3& se31, const Se3& se32, shared_ptr<Contact> c)
+bool Box2Box4ClosestFeatures::reverseCollide(const shared_ptr<CollisionModel> cm1, const shared_ptr<CollisionModel> cm2,  const Se3& se31, const Se3& se32, shared_ptr<Interaction> c)
 {
 	bool isColliding = collide(cm2,cm1,se32,se31,c);
 	if (isColliding)
 	{
-		shared_ptr<ClosestFeatures> cf = shared_dynamic_cast<ClosestFeatures>(c->contactModel);
+		shared_ptr<ClosestFeatures> cf = shared_dynamic_cast<ClosestFeatures>(c->interactionModel);
 		Vector3 tmp = cf->closestsPoints[0].first;
 		cf->closestsPoints[0].first = cf->closestsPoints[0].second;		
 		cf->closestsPoints[0].second = tmp;
