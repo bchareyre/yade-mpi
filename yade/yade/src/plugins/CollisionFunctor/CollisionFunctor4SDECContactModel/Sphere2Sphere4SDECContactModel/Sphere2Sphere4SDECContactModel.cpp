@@ -23,7 +23,7 @@
 
 #include "Sphere2Sphere4SDECContactModel.hpp"
 #include "Sphere.hpp"
-#include "SDECContactModel.hpp"
+#include "SDECContactGeometry.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -43,11 +43,11 @@ bool Sphere2Sphere4SDECContactModel::go(	const shared_ptr<CollisionGeometry>& cm
 	if (penetrationDepth>0)
 	{
 		// FIXME : remove those uncommented lines
-		shared_ptr<SDECContactModel> scm;
+		shared_ptr<SDECContactGeometry> scm;
 		if (c->interactionGeometry)
-			scm = dynamic_pointer_cast<SDECContactModel>(c->interactionGeometry);
+			scm = dynamic_pointer_cast<SDECContactGeometry>(c->interactionGeometry);
 		else
-			scm = shared_ptr<SDECContactModel>(new SDECContactModel());
+			scm = shared_ptr<SDECContactGeometry>(new SDECContactGeometry());
 			
 		scm->contactPoint = se31.translation+(s1->radius-0.5*penetrationDepth)*normal;//0.5*(pt1+pt2);
 		scm->normal = normal;
@@ -60,7 +60,7 @@ bool Sphere2Sphere4SDECContactModel::go(	const shared_ptr<CollisionGeometry>& cm
 	
 // FIXME : uncommente those lines	
 /////////////////////////////////////////////////
-// 		shared_ptr<SDECContactModel> scm = shared_ptr<SDECContactModel>(new SDECContactModel());
+// 		shared_ptr<SDECContactGeometry> scm = shared_ptr<SDECContactGeometry>(new SDECContactGeometry());
 // 		scm->contactPoint = se31.translation+(s1->radius-0.5*penetrationDepth)*normal;//0.5*(pt1+pt2);
 // 		scm->normal = normal;
 // 		scm->penetrationDepth = penetrationDepth;

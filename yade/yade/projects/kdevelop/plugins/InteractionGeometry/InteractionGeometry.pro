@@ -4,7 +4,7 @@
 # Target is a subdirs project 
 
 SUBDIRS += ClosestFeatures \
-           SDECContactModel \
+           SDECContactGeometry \
            SDECPermanentLink \
            ErrorTolerantContactModel 
 MOC_DIR = $(YADECOMPILATIONPATH)

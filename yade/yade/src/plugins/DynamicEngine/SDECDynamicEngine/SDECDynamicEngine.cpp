@@ -27,7 +27,7 @@
 
 #include "SDECDynamicEngine.hpp"
 #include "SDECDiscreteElement.hpp"
-#include "SDECContactModel.hpp"
+#include "SDECContactGeometry.hpp"
 #include "SDECPermanentLink.hpp"
 #include "SDECContactPhysics.hpp"
 #include "SDECPermanentLinkPhysics.hpp"
@@ -386,7 +386,7 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 
 		shared_ptr<SDECDiscreteElement> de1 	= dynamic_pointer_cast<SDECDiscreteElement>((*bodies)[id1]);
 		shared_ptr<SDECDiscreteElement> de2 	= dynamic_pointer_cast<SDECDiscreteElement>((*bodies)[id2]);
-		shared_ptr<SDECContactModel> currentContactGeometry = dynamic_pointer_cast<SDECContactModel>(contact->interactionGeometry);
+		shared_ptr<SDECContactGeometry> currentContactGeometry = dynamic_pointer_cast<SDECContactGeometry>(contact->interactionGeometry);
 		shared_ptr<SDECContactPhysics> currentContactPhysics;
 		
 		if ( contact->isNew)

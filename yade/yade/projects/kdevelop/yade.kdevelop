@@ -104,7 +104,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>toolboxes/Libraries/MultiMethods</activedir>
+      <activedir>plugins/InteractionGeometry/SDECContactModel</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>

@@ -6,7 +6,7 @@
 #include "InteractionGeometry.hpp"
 #include "Vector3.hpp"
 
-class SDECContactModel : public InteractionGeometry
+class SDECContactGeometry : public InteractionGeometry
 {
 	public : Real radius1;
 	public : Real radius2;
@@ -25,15 +25,15 @@ class SDECContactModel : public InteractionGeometry
 // 	public : Vector3r shearForce;			// shear force applied on a DE
 
 	// construction
-	public : SDECContactModel ();
-	public : ~SDECContactModel ();
+	public : SDECContactGeometry ();
+	public : ~SDECContactGeometry ();
 
 	protected : virtual void postProcessAttributes(bool deserializing);
 	public : void registerAttributes();
 
-	REGISTER_CLASS_NAME(SDECContactModel);
+	REGISTER_CLASS_NAME(SDECContactGeometry);
 };
 
-REGISTER_SERIALIZABLE(SDECContactModel,false);
+REGISTER_SERIALIZABLE(SDECContactGeometry,false);
 
 #endif // __SDECCONTACTMODEL_H__
