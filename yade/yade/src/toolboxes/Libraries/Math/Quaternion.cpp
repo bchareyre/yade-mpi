@@ -181,27 +181,118 @@ void Quaternion::toAxes (Vector3* axis) const
 void Quaternion::toEulerAngles (Vector3& eulerAngles,float threshold) const
 {
 
-	if (fabs(x*y + z*w - 0.5) < threshold) // (north pole)
-	{
-		eulerAngles[0] = 2 * atan2(x,w);
-		eulerAngles[1] = Constants::HALF_PI;
-		eulerAngles[2] = 0;
+// /*
+// 	if (fabs(x*y + z*w - 0.5) < threshold) // (north pole)
+// 	{
+// 		eulerAngles[0] = 2 * atan2(x,w);
+// 		eulerAngles[1] = Constants::HALF_PI;
+// 		eulerAngles[2] = 0;
+// 	}
+// 	else if (fabs(x*y + z*w + 0.5) < threshold ) //  (south pole)
+// 	{
+// 		eulerAngles[0] = -2 * atan2(x,w);
+// 		eulerAngles[1] = -Constants::HALF_PI;
+// 		eulerAngles[2] = 0;
+// 	}
+// 	else
+// 	{
+// 		eulerAngles[0] = atan2(2*y*w-2*x*z , 1 - 2*y*y - 2*z*z);
+// 		eulerAngles[1] = asin(2*x*y + 2*z*w);
+// 		eulerAngles[2] = atan2(2*x*w-2*y*z , 1 - 2*x*x - 2*z*z);
+// 	}
+// */
+//
+//
+//
+// 	if (fabs(y*z + w*x - 0.5) < threshold) // (north pole)
+// 	{
+// 		eulerAngles[0] = 2 * atan2(y,x);
+// 		eulerAngles[1] = Constants::HALF_PI;
+// 		eulerAngles[2] = 0;
+// 	}
+// 	else if (fabs(y*z + w*x + 0.5) < threshold ) //  (south pole)
+// 	{
+// 		eulerAngles[0] = -2 * atan2(y,x);
+// 		eulerAngles[1] = -Constants::HALF_PI;
+// 		eulerAngles[2] = 0;
+// 	}
+// 	else
+// 	{
+// 		eulerAngles[0] = atan2(2*z*x-2*y*w , 1 - 2*z*z - 2*w*w);
+// 		eulerAngles[1] = asin(2*y*z + 2*w*x);
+// 		eulerAngles[2] = atan2(2*y*x-2*z*w , 1 - 2*y*y - 2*w*w);
+// 	}
+//
+//
+//
+// 	float tmp = eulerAngles[0];
+// 	eulerAngles[0] = eulerAngles[1];
+// 	eulerAngles[1] = eulerAngles[2];
+// 	eulerAngles[2] = tmp;
+//
+//
+// 	/*
+// 	float tmp1 = eulerAngles[1];
+// 	float tmp0 = eulerAngles[0];
+// 	eulerAngles[0] = eulerAngles[2];
+// 	eulerAngles[1] = tmp0;
+// 	eulerAngles[2] = tmp1;
+// 	*/
+
+
+	float angle;
+	Vector3 axis;
+	this->toAngleAxis(angle,axis);
+	//axis  = axis.normalize();
+
+
+
+	float s=sin(angle);
+	float c=cos(angle);
+	float t=1-c;
+	float x = axis[0];
+	float y = axis[1];
+	float z = axis[2];
+	float heading,attitude,bank;
+	if ((x*y*t + z*s) > 0.999998) { // north pole singularity detected
+		heading = 2*atan2(x*sin(angle/2),cos(angle/2));
+		attitude = Constants::HALF_PI;
+		bank = 0;
 	}
-	else if (fabs(x*y + z*w + 0.5) < threshold ) //  (south pole)
-	{
-		eulerAngles[0] = -2 * atan2(x,w);
-		eulerAngles[1] = -Constants::HALF_PI;
-		eulerAngles[2] = 0;
+	if ((x*y*t + z*s) < -0.999998) { // south pole singularity detected
+		heading = -2*atan2(x*sin(angle/2),cos(angle/2));
+		attitude = -Constants::HALF_PI;
+		bank = 0;
 	}
 	else
 	{
-		eulerAngles[0] = atan2(2*y*w-2*x*z , 1 - 2*y*y - 2*z*z);
-		eulerAngles[1] = asin(2*x*y + 2*z*w);
-		eulerAngles[2] = atan2(2*x*w-2*y*z , 1 - 2*x*x - 2*z*z);
+		heading = atan2(y * s- x * z * t , 1 - (y*y+ z*z ) * t);
+		attitude = asin(x * y * t + z * s) ;
+		bank = 	atan2(x * s - y * z * t , 1 - (x*x + z*z) * t);
 	}
 
+	eulerAngles[0] = bank;
+	eulerAngles[1] = heading;
+
+//	if(heading < 0 )
+//		eulerAngles[1] = heading + 2*Constants::PI;
+//	else
+//		eulerAngles[1] = heading;
 
 
+	eulerAngles[2] = attitude;
+
+/*	for(int i=0;i<3;i++)
+	{
+		int j = (i+1)%3;
+		int k = (i+2)%3;
+
+		if (axis[j]>=0)
+			eulerAngles[k] = acos(axis[i]); // what is Nc_new
+		else
+			eulerAngles[k] = -acos(axis[i]);
+	}
+*/
 
 }
 

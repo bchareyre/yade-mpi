@@ -300,6 +300,35 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 
 		de1->se3.rotation.toEulerAngles(currentContact->currentRotation1); ////////
 		de2->se3.rotation.toEulerAngles(currentContact->currentRotation2); ////////
+		//cout << currentContact->currentRotation1 << "  || " <<currentContact->currentRotation2<<endl;
+
+
+	//	float aa;
+
+		//de1->se3.rotation.toAngleAxis(aa,currentContact->currentRotation1);
+		//currentContact->currentRotation1.normalize();
+		//currentContact->currentRotation1 *= aa;
+
+
+		//de2->se3.rotation.toAngleAxis(aa,currentContact->currentRotation2);
+
+		//currentContact->currentRotation2.normalize();
+		//currentContact->currentRotation2 *= aa;
+
+	//	Vector3 aaxxis;
+	//	de1->se3.rotation.toAngleAxis(aa,aaxxis);
+	//	aaxxis.normalize();
+	//	aaxxis *= aa;
+//cout << currentContact->currentRotation2 << "  || " <<currentContact->currentRotation1<<endl;
+
+	//	cout << aaxxis << "  || " <<currentContact->currentRotation1<<endl;
+		cout << currentContact->currentRotation2[1] <<endl;
+
+		//currentContact->currentRotation2 += Vector3(0.0001,-currentContact->currentRotation2[1],-currentContact->currentRotation2[2]);
+		//cout << currentContact->currentRotation1 << "  || " <<currentContact->currentRotation2<<endl;
+
+		//currentContact->currentRotation1 = -currentContact->currentRotation1;
+		//currentContact->currentRotation2 = -currentContact->currentRotation2;
 
 		if (first)
 		{
@@ -311,12 +340,57 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 
 		Vector3 n	= currentContact->normal;
 		Vector3 prevN	= currentContact->prevNormal;
-		Vector3 t1	= currentContact->shearForce.normalized();
-		Vector3 t2	= n.unitCross(t1);
+//		Vector3 t1	= currentContact->shearForce.normalized();
+//		Vector3 t2	= n.unitCross(t1);
 
-		//Matrix3 m	= Matrix3(	n.x ,n.y ,n.z,		// ? which order of vectors?
-		//				t1.x,t1.y,t1.z,
-		//				t2.x,t2.y,t2.z);
+		Vector3 t1;
+		Vector3 t2;
+
+		if (n[0]!=0 && n[1]!=0 && n[2]!=0)
+		{
+			t1 = Vector3(0,0,sqrt(1.0/(1+(n[2]*n[2]/(n[1]*n[1])))));
+			t1[1] = -n[2]/n[1]*t1[2];
+			t1.normalize();
+			t2 = n.unitCross(t1);
+		}
+		else
+		{
+			if (n[0]==0 && n[1]!=0 && n[2]!=0)
+			{
+				t1 = Vector3(1,0,0);
+				t2 = n.unitCross(t1);
+			}
+			else if (n[0]!=0 && n[1]==0 && n[2]!=0)
+			{
+				t1 = Vector3(0,1,0);
+				t2 = n.unitCross(t1);
+			}
+			else if (n[0]!=0 && n[1]!=0 && n[2]==0)
+			{
+				t1 = Vector3(0,0,1);
+				t2 = n.unitCross(t1);
+			}
+			else if (n[0]==0 && n[1]==0 && n[2]!=0)
+			{
+				t1 = Vector3(1,0,0);
+				t2 = Vector3(0,1,0);
+			}
+			else if (n[0]==0 && n[1]!=0 && n[2]==0)
+			{
+				t1 = Vector3(0,0,1);
+				t2 = Vector3(1,0,0);
+			}
+			else if (n[0]!=0 && n[1]==0 && n[2]==0)
+			{
+				t1 = Vector3(0,1,0);
+				t2 = Vector3(0,0,1);
+			}
+		}
+
+
+//		Matrix3 m	= Matrix3(	n.x ,n.y ,n.z,		// ? which order of vectors?
+//						t1.x,t1.y,t1.z,
+//						t2.x,t2.y,t2.z);
 
 		Matrix3 m	= Matrix3(	n.x,t1.x,t2.x,		// ? which order of vectors?
 						n.y,t1.y,t2.y,         /////////////////
@@ -328,6 +402,11 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 
 		q_n_i = -q_i_n;
 
+		//Vector3 axxis;
+		//float aangle;
+		//q_n_i.toAngleAxis(aangle,axxis);
+		//cout << axxis << endl;
+
 		Vector3 dNormal; /// dBeta
 		Vector3 orientation_Nc,orientation_Nc_old;
 
@@ -337,7 +416,7 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 			int k = (i+2)%3;
 
 			if (n[j]>=0)
-				orientation_Nc[k] = acos(n[i]);
+				orientation_Nc[k] = acos(n[i]); // what is Nc_new
 			else
 				orientation_Nc[k] = -acos(n[i]);
 
@@ -347,7 +426,10 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 				orientation_Nc_old[k] = -acos(prevN[i]);
 		}
 
+
+
 		dNormal = orientation_Nc - orientation_Nc_old;
+
 
 		Vector3 dRotationA,dRotationB;
 
@@ -355,15 +437,19 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 		dRotationA = currentContact->currentRotation1-currentContact->prevRotation1;
 		dRotationB = currentContact->currentRotation2-currentContact->prevRotation2;
 
-		Vector3 dUr = 	( currentContact->radius1*(dRotationA-dNormal)
-				- currentContact->radius2*(dRotationB-dNormal) ) * 0.5;
+		Vector3 dUr = 	( currentContact->radius1*(  dRotationA  -  dNormal)
+				- currentContact->radius2*(  dRotationB  -  dNormal) ) * 0.5;
 
 
 		Vector3 dThetar = dUr/currentContact->averageRadius;
 
+
+		//cout << dNormal<<endl;
+
+
 		currentContact->thetar += dThetar;
 
-		float kr = currentContact->ks*currentContact->averageRadius*currentContact->averageRadius;
+		float kr = currentContact->ks  *   currentContact->averageRadius  *  currentContact->averageRadius;
 
 		float fNormal = currentContact->normalForce.length();
 
@@ -373,34 +459,40 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 
 		Vector3 mElastic = kr * thetarn;
 
-///		mElastic = 0;  // No moment around normal direction
+		//mElastic[0] = 0;  // No moment around normal direction
 
 		float normElastic = mElastic.length();
 
-		if (normElastic<=normMPlastic)
-		{
+
+		//cout << q_n_i*mElastic << endl;
+		//cout << n << endl;
+		//if (normElastic<=normMPlastic)
+		//{
 			moments[id1]	-= q_n_i*mElastic;
 			moments[id2]	+= q_n_i*mElastic;
-		}
-		else
-		{
-			Vector3 mPlastic = normMPlastic*mElastic.normalized();
-			moments[id1]	-= q_n_i*mPlastic;
-			moments[id2]	+= q_n_i*mPlastic;
-			thetarn = mPlastic/kr;
-			currentContact->thetar = q_n_i*thetarn;
-		}
+			//cout <<  q_n_i*mElastic << endl;
+		//}
+		//else
+		//{
+		//	Vector3 mPlastic = normMPlastic*mElastic.normalized();
+		//	moments[id1]	-= q_n_i*mPlastic;
+		//	moments[id2]	+= q_n_i*mPlastic;
+		//	thetarn = mPlastic/kr;
+		//	currentContact->thetar = q_n_i*thetarn;
+		//}
 
-		currentContact->prevNormal = currentContact->normal;
+
 		currentContact->prevRotation1 = currentContact->currentRotation1;
 		currentContact->prevRotation2 = currentContact->currentRotation2;
+
+////////////////////////////////////////////////////////////
+/// Moment law	END				 	 ///
+////////////////////////////////////////////////////////////
+
+		currentContact->prevNormal = currentContact->normal;
 	}
 
 	first = false;
-
-////////////////////////////////////////////////////////////
-/// 							 ///
-////////////////////////////////////////////////////////////
 
 
 

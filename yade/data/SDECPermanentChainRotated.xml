@@ -16,7 +16,7 @@
 					<actors[2] />
 				</actors[2]>
 				<actors[3] className="Rotor" >
-					<actors[3] angularVelocity="0.157" subscribedBodies="[]" />
+					<actors[3] angularVelocity="0.157" subscribedBodies="[3]" />
 				</actors[3]>
 			</actors>
 			<permanentInteractions size="5">
@@ -92,9 +92,9 @@
 				</bodies[1]>
 				<bodies[2] className="SDECDiscreteElement" >
 					<bodies[2] isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" mass="37.699" inertia="{135.716 135.716 135.716}" kn="100000" ks="10000">
-						<se3 translation="{0 0 -5.9}" rotation="{1 0 0 0}" />
+						<se3 translation="{-5.9 0 0}" rotation="{1 0 0 0}" />
 						<bv className="AABB" >
-							<bv color="{0 1 0}" center="{0 0 -5.9}" halfSize="{3 3 3}" />
+							<bv color="{0 1 0}" center="{-5.9 0 0}" halfSize="{3 3 3}" />
 						</bv>
 						<cm className="Sphere" >
 							<cm diffuseColor="{0.4 0.5 1.0}" wire="0" visible="1" radius="3" />
@@ -111,9 +111,9 @@
 				</bodies[2]>
 				<bodies[3] className="SDECDiscreteElement" >
 					<bodies[3] isDynamic="0" velocity="{0 0 0}" angularVelocity="{0 0 0}" mass="37.699" inertia="{135.716 135.716 135.716}" kn="100000" ks="10000">
-						<se3 translation="{0 0 -11.8}" rotation="{1 0 0 0}" />
+						<se3 translation="{-11.8 0 0}" rotation="{1 0 0 0}" />
 						<bv className="AABB" >
-							<bv color="{0 1 0}" center="{0 0 -11.8}" halfSize="{3 3 3}" />
+							<bv color="{0 1 0}" center="{-11.8 0 0}" halfSize="{3 3 3}" />
 						</bv>
 						<cm className="Sphere" >
 							<cm diffuseColor="{0.4 0.5 1.0}" wire="0" visible="1" radius="3" />
@@ -126,9 +126,9 @@
 				</bodies[3]>
 				<bodies[4] className="SDECDiscreteElement" >
 					<bodies[4] isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" mass="37.699" inertia="{135.716 135.716 135.716}" kn="100000" ks="10000">
-						<se3 translation="{0 0 -17.7}" rotation="{1 0 0 0}" />
+						<se3 translation="{-17.7 0 0}" rotation="{1 0 0 0}" />
 						<bv className="AABB" >
-							<bv color="{0 1 0}" center="{0 0 -17.7}" halfSize="{3 3 3}" />
+							<bv color="{0 1 0}" center="{-17.7 0 0}" halfSize="{3 3 3}" />
 						</bv>
 						<cm className="Sphere" >
 							<cm diffuseColor="{0.4 0.5 1.0}" wire="0" visible="1" radius="3" />
@@ -145,9 +145,9 @@
 				</bodies[4]>
 				<bodies[5] className="SDECDiscreteElement" >
 					<bodies[5] isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" mass="37.699" inertia="{135.716 135.716 135.716}" kn="100000" ks="10000">
-						<se3 translation="{0 0 -23.6}" rotation="{1 0 0 0}" />
+						<se3 translation="{-23.6 0 0}" rotation="{1 0 0 0}" />
 						<bv className="AABB" >
-							<bv color="{0 1 0}" center="{0 0 -23.6}" halfSize="{3 3 3}" />
+							<bv color="{0 1 0}" center="{-23.6 0 0}" halfSize="{3 3 3}" />
 						</bv>
 						<cm className="Sphere" >
 							<cm diffuseColor="{0.4 0.5 1.0}" wire="0" visible="1" radius="3" />
@@ -164,9 +164,9 @@
 				</bodies[5]>
 				<bodies[6] className="SDECDiscreteElement" >
 					<bodies[6] isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" mass="37.699" inertia="{135.716 135.716 135.716}" kn="100000" ks="10000">
-						<se3 translation="{0 0 -29.5}" rotation="{1 0 0 0}" />
+						<se3 translation="{-29.5 0 0}" rotation="{1 0 0 0}" />
 						<bv className="AABB" >
-							<bv color="{0 1 0}" center="{0 0 -29.5}" halfSize="{3 3 3}" />
+							<bv color="{0 1 0}" center="{-29.5 0 0}" halfSize="{3 3 3}" />
 						</bv>
 						<cm className="Sphere" >
 							<cm diffuseColor="{0.4 0.5 1.0}" wire="0" visible="1" radius="3" />
