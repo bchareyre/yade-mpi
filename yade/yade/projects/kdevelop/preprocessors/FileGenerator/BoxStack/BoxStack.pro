@@ -11,6 +11,13 @@ LIBS += -lRigidBody \
         -lAABB \
         -lBallisticDynamicEngine \
         -lSimpleSpringDynamicEngine \
+        $(YADECOMPILATIONPATH)/libBody.a \
+        $(YADECOMPILATIONPATH)/libEngine.a \
+        $(YADECOMPILATIONPATH)/libGeometry.a \
+        $(YADECOMPILATIONPATH)/libInteraction.a \
+        $(YADECOMPILATIONPATH)/libMultiMethods.a \
+        $(YADECOMPILATIONPATH)/libFactory.a \
+        $(YADECOMPILATIONPATH)/libSerialization.a \
         -rdynamic 
 INCLUDEPATH = ../../../plugins/DynamicEngine/BallisticDynamicEngine \
               ../../../plugins/DynamicEngine/SimpleSpringDynamicEngine \

@@ -4,8 +4,20 @@
 # Target is a library:  
 
 LIBS += -lAABB \
+        $(YADECOMPILATIONPATH)/libBody.a \
+        $(YADECOMPILATIONPATH)/libEngine.a \
+        $(YADECOMPILATIONPATH)/libGeometry.a \
+        $(YADECOMPILATIONPATH)/libInteraction.a \
+        $(YADECOMPILATIONPATH)/libMultiMethods.a \
+        $(YADECOMPILATIONPATH)/libFactory.a \
+        $(YADECOMPILATIONPATH)/libSerialization.a \
         -rdynamic 
 INCLUDEPATH = ../../../plugins/BoundingVolume/AABB \
+              ../../../yade/yade \
+              ../../../yade/Geometry \
+              ../../../yade/MultiMethods \
+              ../../../yade/Factory \
+              ../../../yade/Serialization \
               ../../../toolboxes/Math 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 

@@ -1,16 +1,16 @@
-#include "BVHierarchy.hpp"
+#include "BoundingVolumeHierarchy.hpp"
 
-BVHierarchy::BVHierarchy () : BoundingVolume()
+BoundingVolumeHierarchy::BoundingVolumeHierarchy () : BoundingVolume()
 {
 
 }
 
-BVHierarchy::~BVHierarchy ()
+BoundingVolumeHierarchy::~BoundingVolumeHierarchy ()
 {
 
 }
 	
-void BVHierarchy::move(Se3& )
+void BoundingVolumeHierarchy::move(Se3& )
 {
 
 

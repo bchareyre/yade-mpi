@@ -6,6 +6,13 @@
 LIBS += -lBox \
         -lSphere \
         -lSDECContactModel \
+        $(YADECOMPILATIONPATH)/libBody.a \
+        $(YADECOMPILATIONPATH)/libEngine.a \
+        $(YADECOMPILATIONPATH)/libGeometry.a \
+        $(YADECOMPILATIONPATH)/libInteraction.a \
+        $(YADECOMPILATIONPATH)/libMultiMethods.a \
+        $(YADECOMPILATIONPATH)/libFactory.a \
+        $(YADECOMPILATIONPATH)/libSerialization.a \
         -rdynamic 
 INCLUDEPATH = ../../../../plugins/GeometricalModel/Box \
               ../../../../plugins/GeometricalModel/Sphere \

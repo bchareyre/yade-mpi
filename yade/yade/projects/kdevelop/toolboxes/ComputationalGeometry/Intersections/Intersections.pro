@@ -3,7 +3,14 @@
 # Subdir relative project main directory: ./toolboxes/ComputationalGeometry/Intersections
 # Target is a library:  
 
-LIBS += -rdynamic 
+LIBS += $(YADECOMPILATIONPATH)/libFactory.a \
+        $(YADECOMPILATIONPATH)/libSerialization.a \
+        $(YADECOMPILATIONPATH)/libBody.a \
+        $(YADECOMPILATIONPATH)/libEngine.a \
+        $(YADECOMPILATIONPATH)/libGeometry.a \
+        $(YADECOMPILATIONPATH)/libInteraction.a \
+        $(YADECOMPILATIONPATH)/libMultiMethods.a \
+	-rdynamic 
 INCLUDEPATH = ../../../yade/yade \
               ../../../yade/Factory \
               ../../../yade/Serialization \

@@ -6,9 +6,22 @@
 LIBS += -lBox \
         -lClosestFeatures \
         -lIntersections \
+        $(YADECOMPILATIONPATH)/libBody.a \
+        $(YADECOMPILATIONPATH)/libEngine.a \
+        $(YADECOMPILATIONPATH)/libGeometry.a \
+        $(YADECOMPILATIONPATH)/libInteraction.a \
+        $(YADECOMPILATIONPATH)/libMultiMethods.a \
+        $(YADECOMPILATIONPATH)/libFactory.a \
+        $(YADECOMPILATIONPATH)/libSerialization.a \
         -rdynamic 
 INCLUDEPATH = ../../../../plugins/GeometricalModel/Box \
               ../../../../plugins/InteractionModel/ClosestFeatures \
+              ../../../../yade/yade \
+              ../../../../yade/Geometry \
+              ../../../../yade/Interaction \
+              ../../../../yade/MultiMethods \
+              ../../../../yade/Factory \
+              ../../../../yade/Serialization \
               ../../../../toolboxes/Math \
               ../../../../toolboxes/ComputationalGeometry/Intersections 
 MOC_DIR = $(YADECOMPILATIONPATH) 

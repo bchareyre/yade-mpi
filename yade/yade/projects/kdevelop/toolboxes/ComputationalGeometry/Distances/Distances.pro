@@ -3,7 +3,14 @@
 # Subdir relative project main directory: ./toolboxes/ComputationalGeometry/Distances
 # Target is a library:  
 
-LIBS += -rdynamic 
+LIBS += $(YADECOMPILATIONPATH)/libBody.a \
+        $(YADECOMPILATIONPATH)/libEngine.a \
+        $(YADECOMPILATIONPATH)/libGeometry.a \
+        $(YADECOMPILATIONPATH)/libInteraction.a \
+        $(YADECOMPILATIONPATH)/libMultiMethods.a \
+        $(YADECOMPILATIONPATH)/libFactory.a \
+        $(YADECOMPILATIONPATH)/libSerialization.a \
+	-rdynamic 
 INCLUDEPATH = ../../../yade/yade \
               ../../../yade/Factory \
               ../../../yade/Serialization \

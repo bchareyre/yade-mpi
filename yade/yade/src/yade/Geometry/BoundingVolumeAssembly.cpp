@@ -1,16 +1,16 @@
-#include "BVAssembly.hpp"
+#include "BoundingVolumeAssembly.hpp"
 
-BVAssembly::BVAssembly () : BoundingVolume()
+BoundingVolumeAssembly::BoundingVolumeAssembly () : BoundingVolume()
 {
 
 }
 
-BVAssembly::~BVAssembly ()
+BoundingVolumeAssembly::~BoundingVolumeAssembly ()
 {
 
 }
 
-void BVAssembly::move(Se3& )
+void BoundingVolumeAssembly::move(Se3& )
 {
 
 

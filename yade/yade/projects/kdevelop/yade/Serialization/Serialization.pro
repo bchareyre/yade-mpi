@@ -3,6 +3,9 @@
 # Subdir relative project main directory: ./yade/Serialization
 # Target is a library:  
 
+LIBS += -rdynamic 
+INCLUDEPATH = ../../yade/yade \
+              ../../yade/Factory 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 DESTDIR = $(YADECOMPILATIONPATH) 
 CONFIG += debug \

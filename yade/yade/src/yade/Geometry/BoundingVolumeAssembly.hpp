@@ -25,14 +25,14 @@
 
 #include "BoundingVolume.hpp"
 
-class BVAssembly : public BoundingVolume
+class BoundingVolumeAssembly : public BoundingVolume
 {
 	
 	protected : std::vector<shared_ptr<BoundingVolume> > bvs;
 	
 	// construction
-	public : BVAssembly ();
-	public : ~BVAssembly ();
+	public : BoundingVolumeAssembly ();
+	public : ~BoundingVolumeAssembly ();
 	
 	public : void move(Se3& se3);
 	

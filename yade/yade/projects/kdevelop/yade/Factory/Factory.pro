@@ -3,6 +3,8 @@
 # Subdir relative project main directory: ./yade/Factory
 # Target is a library:  
 
+LIBS += -rdynamic 
+INCLUDEPATH = ../../yade/yade 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 DESTDIR = $(YADECOMPILATIONPATH) 
 CONFIG += debug \

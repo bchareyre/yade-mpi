@@ -5,9 +5,24 @@
 
 LIBS += -lBoundingSphere \
         -lAABB \
+        $(YADECOMPILATIONPATH)/libBody.a \
+        $(YADECOMPILATIONPATH)/libEngine.a \
+        $(YADECOMPILATIONPATH)/libGeometry.a \
+        $(YADECOMPILATIONPATH)/libInteraction.a \
+        $(YADECOMPILATIONPATH)/libMultiMethods.a \
+        $(YADECOMPILATIONPATH)/libFactory.a \
+        $(YADECOMPILATIONPATH)/libSerialization.a \
         -rdynamic 
 INCLUDEPATH = ../../../plugins/BoundingVolume/BoundingSphere \
               ../../../plugins/BoundingVolume/AABB \
+              ../../../yade/yade \
+              ../../../yade/Body \
+              ../../../yade/Engine \
+              ../../../yade/Geometry \
+              ../../../yade/Interaction \
+              ../../../yade/MultiMethods \
+              ../../../yade/Factory \
+              ../../../yade/Serialization \
               ../../../toolboxes/Math 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 

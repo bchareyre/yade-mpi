@@ -15,6 +15,13 @@ LIBS += -lMesh2D \
         -lSimpleSpringDynamicEngine \
         -lMassSpringBody \
         -lMassSpringBody2RigidBodyDynamicEngine \
+        $(YADECOMPILATIONPATH)/libBody.a \
+        $(YADECOMPILATIONPATH)/libEngine.a \
+        $(YADECOMPILATIONPATH)/libGeometry.a \
+        $(YADECOMPILATIONPATH)/libInteraction.a \
+        $(YADECOMPILATIONPATH)/libMultiMethods.a \
+        $(YADECOMPILATIONPATH)/libFactory.a \
+        $(YADECOMPILATIONPATH)/libSerialization.a \
         -rdynamic 
 INCLUDEPATH = ../../../plugins/DynamicEngine/MassSpringBody2RigidBodyDynamicEngine \
               ../../../plugins/DynamicEngine/BallisticDynamicEngine \
@@ -28,10 +35,18 @@ INCLUDEPATH = ../../../plugins/DynamicEngine/MassSpringBody2RigidBodyDynamicEngi
               ../../../plugins/GeometricalModel/Sphere \
               ../../../plugins/BoundingVolume/AABB \
               ../../../plugins/InteractionModel/ClosestFeatures \
+              ../../../yade/yade \
+              ../../../yade/Body \
+              ../../../yade/Engine \
+              ../../../yade/Geometry \
+              ../../../yade/Interaction \
+              ../../../yade/MultiMethods \
+              ../../../yade/Factory \
+              ../../../yade/Serialization \
               ../../../toolboxes/Math 
-MOC_DIR = $(YADEDYNLIBPATH) 
-UI_DIR = $(YADEDYNLIBPATH) 
-OBJECTS_DIR = $(YADEDYNLIBPATH) 
+MOC_DIR = $(YADECOMPILATIONPATH) 
+UI_DIR = $(YADECOMPILATIONPATH) 
+OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 QMAKE_LIBDIR = ../../../plugins/GeometricalModel/Mesh2D/$(YADEDYNLIBPATH) \
                ../../../plugins/BroadCollider/SAPCollider/$(YADEDYNLIBPATH) \
                ../../../plugins/BoundingVolume/AABB/$(YADEDYNLIBPATH) \

@@ -14,6 +14,13 @@ LIBS += -lAABB \
         -lBallisticDynamicEngine \
         -lSDECDynamicEngine \
         -lSDECDiscreteElement \
+        $(YADECOMPILATIONPATH)/libBody.a \
+        $(YADECOMPILATIONPATH)/libEngine.a \
+        $(YADECOMPILATIONPATH)/libGeometry.a \
+        $(YADECOMPILATIONPATH)/libInteraction.a \
+        $(YADECOMPILATIONPATH)/libMultiMethods.a \
+        $(YADECOMPILATIONPATH)/libFactory.a \
+        $(YADECOMPILATIONPATH)/libSerialization.a \
         -rdynamic 
 INCLUDEPATH = ../../../plugins/DynamicEngine/SDECDynamicEngine \
               ../../../plugins/DynamicEngine/BallisticDynamicEngine \
@@ -26,6 +33,14 @@ INCLUDEPATH = ../../../plugins/DynamicEngine/SDECDynamicEngine \
               ../../../plugins/GeometricalModel/Box \
               ../../../plugins/GeometricalModel/Sphere \
               ../../../plugins/BoundingVolume/AABB \
+              ../../../yade/yade \
+              ../../../yade/Body \
+              ../../../yade/Engine \
+              ../../../yade/Geometry \
+              ../../../yade/Interaction \
+              ../../../yade/MultiMethods \
+              ../../../yade/Factory \
+              ../../../yade/Serialization \
               ../../../toolboxes/Math 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 

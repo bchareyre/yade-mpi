@@ -3,17 +3,15 @@
 # Subdir relative project main directory: ./yade/MultiMethods
 # Target is a library:  
 
+LIBS += -rdynamic 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 DESTDIR = $(YADECOMPILATIONPATH) 
 CONFIG += debug \
           warn_on \
           staticlib 
 TEMPLATE = lib 
-HEADERS += CollisionFunctor.hpp \
-           CollisionMultiMethodsManager.hpp \
-           Indexable.hpp \
+HEADERS += Indexable.hpp \
            MultiMethodsManager.hpp \
            MultiMethodsManagerExceptions.hpp \
            MultiMethodsManager.tpp 
-SOURCES += CollisionMultiMethodsManager.cpp \
-           MultiMethodsManagerExceptions.cpp 
+SOURCES += MultiMethodsManagerExceptions.cpp 

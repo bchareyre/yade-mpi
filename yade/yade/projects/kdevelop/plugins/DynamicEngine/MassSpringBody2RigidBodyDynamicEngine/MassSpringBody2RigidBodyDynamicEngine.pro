@@ -9,12 +9,27 @@ LIBS += -lMassSpringBody \
         -lSimpleSpringDynamicEngine \
         -lMesh2D \
         -lClosestFeatures \
+        $(YADECOMPILATIONPATH)/libBody.a \
+        $(YADECOMPILATIONPATH)/libEngine.a \
+        $(YADECOMPILATIONPATH)/libGeometry.a \
+        $(YADECOMPILATIONPATH)/libInteraction.a \
+        $(YADECOMPILATIONPATH)/libMultiMethods.a \
+        $(YADECOMPILATIONPATH)/libFactory.a \
+        $(YADECOMPILATIONPATH)/libSerialization.a \
         -rdynamic 
 INCLUDEPATH = ../../../plugins/DynamicEngine/SimpleSpringDynamicEngine \
               ../../../plugins/Body/MassSpringBody \
               ../../../plugins/Body/RigidBody \
               ../../../plugins/GeometricalModel/Mesh2D \
               ../../../plugins/InteractionModel/ClosestFeatures \
+              ../../../yade/yade \
+              ../../../yade/Body \
+              ../../../yade/Engine \
+              ../../../yade/Geometry \
+              ../../../yade/Interaction \
+              ../../../yade/MultiMethods \
+              ../../../yade/Factory \
+              ../../../yade/Serialization \
               ../../../toolboxes/Math \
               ../../../toolboxes/ComputationalGeometry/Distances 
 MOC_DIR = $(YADECOMPILATIONPATH) 

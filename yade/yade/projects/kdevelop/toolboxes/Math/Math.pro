@@ -3,8 +3,17 @@
 # Subdir relative project main directory: ./toolboxes/Math
 # Target is a library:  
 
-LIBS += -rdynamic 
-INCLUDEPATH = ../../yade/Serialization 
+LIBS += $(YADECOMPILATIONPATH)/libFactory.a \
+        $(YADECOMPILATIONPATH)/libSerialization.a \
+        $(YADECOMPILATIONPATH)/libBody.a \
+        $(YADECOMPILATIONPATH)/libEngine.a \
+        $(YADECOMPILATIONPATH)/libGeometry.a \
+        $(YADECOMPILATIONPATH)/libInteraction.a \
+        $(YADECOMPILATIONPATH)/libMultiMethods.a \
+	-rdynamic 
+INCLUDEPATH = ../../yade/yade \
+              ../../yade/Factory \
+              ../../yade/Serialization 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 

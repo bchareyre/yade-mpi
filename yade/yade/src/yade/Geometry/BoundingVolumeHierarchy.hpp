@@ -23,12 +23,12 @@
 
 #include "BoundingVolume.hpp"
 
-class BVHierarchy : public BoundingVolume
+class BoundingVolumeHierarchy : public BoundingVolume
 {
 	
 	// construction
-	public : BVHierarchy ();
-	public : ~BVHierarchy ();
+	public : BoundingVolumeHierarchy ();
+	public : ~BoundingVolumeHierarchy ();
 	
 	public : void move(Se3& se3);
 	

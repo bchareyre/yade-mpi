@@ -3,13 +3,27 @@
 # Subdir relative project main directory: ./yade/yade
 # Target is an application:  
 
-LIBS += -lboost_date_time \
+LIBS += -lMath \
+        $(YADECOMPILATIONPATH)/libBody.a \
+        $(YADECOMPILATIONPATH)/libEngine.a \
+        $(YADECOMPILATIONPATH)/libGeometry.a \
+        $(YADECOMPILATIONPATH)/libInteraction.a \
+        $(YADECOMPILATIONPATH)/libMultiMethods.a \
+        $(YADECOMPILATIONPATH)/libFactory.a \
+        $(YADECOMPILATIONPATH)/libSerialization.a \
+        -lboost_date_time \
         -lglut \
         -lQGLViewer \
         -rdynamic 
+INCLUDEPATH = ../../yade/yade \
+              ../../yade/Factory \
+              ../../yade/Serialization \
+              ../../toolboxes/Math 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
+QMAKE_LIBDIR = ../../toolboxes/Math/$(YADEDYNLIBPATH) \
+               $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEBINPATH) 
 CONFIG += debug \
           warn_on 
