@@ -18,8 +18,8 @@ SUBDIRS += InteractionModel \
            GeometricalModelFactory \
            NarrowPhaseCollider \
            BroadPhaseCollider \
-           KinematicEngine \
            IOManager \
            CollisionFunctor \
            Body \
+           KinematicEngine \
            DynamicEngine 
