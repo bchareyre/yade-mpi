@@ -11,7 +11,7 @@ CONFIG += debug \
 TEMPLATE = subdirs 
 SUBDIRS += BoundingVolume \
            GeometricalModel \
-           InteractionGeometry \
-           BoundingVolumeFactory \
-           GeometricalModelFactory \
-           InteractionGeometryFactory 
+           InteractionDescription \
+           BoundingVolumeFunctor \
+           GeometricalModelFunctor \
+           InteractionDescriptionFunctor
