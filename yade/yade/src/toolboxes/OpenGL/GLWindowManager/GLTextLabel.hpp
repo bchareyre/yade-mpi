@@ -11,7 +11,7 @@ class GLTextLabel : public GLWindow
 	private : Vector3r textColor;
 
 	private : void glDrawInsideWindow();
-	private : void drawString(char * str,int x,int y,Vector3r c);
+	private : void drawString(char * str,int ,int ,Vector3r c);
 
 	// construction
 	public : GLTextLabel (int minX=10, int minY=10, int sizeX=10, int sizeY=10,char * text=NULL);

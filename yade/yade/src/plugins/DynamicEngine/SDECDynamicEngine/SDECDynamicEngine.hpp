@@ -57,7 +57,7 @@ class SDECDynamicEngine : public DynamicEngine
 		}
 	};
 
-	vector<set<tuple<int,bool,shared_ptr<InteractionGeometry> >,lessThanTuple > > interactionsPerBody;
+	//vector<set<tuple<int,bool,shared_ptr<InteractionGeometry> >,lessThanTuple > > interactionsPerBody;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Attributes											///

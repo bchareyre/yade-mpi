@@ -6,6 +6,7 @@
 #include "Sphere.hpp"
 #include "NonConnexBody.hpp"
 #include "SAPCollider.hpp"
+#include "PersistentSAPCollider.hpp"
 #include "SimpleNarrowCollider.hpp"
 #include "SDECDiscreteElement.hpp"
 #include "BallisticDynamicEngine.hpp"
@@ -60,7 +61,7 @@ string SDECSpheresPlane::generate()
 	
 	rootBody->actors.resize(4);
 	rootBody->actors[0] 		= bvu;	
-	rootBody->actors[1] 		= shared_ptr<Actor>(new SAPCollider);
+	rootBody->actors[1] 		= shared_ptr<Actor>(new PersistentSAPCollider);
 	rootBody->actors[2] 		= nc;
 	rootBody->actors[3] 		= shared_ptr<Actor>(new SDECDynamicEngine);
 

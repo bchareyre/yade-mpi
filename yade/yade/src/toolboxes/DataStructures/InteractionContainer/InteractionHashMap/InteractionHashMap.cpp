@@ -55,27 +55,39 @@ shared_ptr<Interaction> InteractionHashMap::find(unsigned int id1,unsigned int i
 		return shared_ptr<Interaction>();
 }
 
-void InteractionHashMap::gotoFirst()
+void InteractionHashMap::gotoFirstPotential()
 {
 	hmii    = interactions.begin();
 	hmiiEnd = interactions.end();
 }
 
-bool InteractionHashMap::notAtEnd()
+bool InteractionHashMap::notAtEndPotential()
 {
 	return ( hmii != hmiiEnd );
 }
 
-void InteractionHashMap::gotoNextPotentialOrReal()
+void InteractionHashMap::gotoNextPotential()
 {
 	++hmii;
 }
 
+void InteractionHashMap::gotoFirst()
+{
+	gotoFirstPotential();
+	if (notAtEnd() && !getCurrent()->isReal)
+		gotoNext();
+}
+
 void InteractionHashMap::gotoNext()
 {
-	gotoNextPotentialOrReal();
-	while( notAtEnd() && getCurrent()->isPotential )
-		gotoNextPotentialOrReal();
+	gotoNextPotential();
+	while( notAtEnd() && !getCurrent()->isReal)
+		gotoNextPotential();
+}
+
+bool InteractionHashMap::notAtEnd()
+{
+	return notAtEndPotential();
 }
 
 shared_ptr<Interaction> InteractionHashMap::getCurrent()
@@ -84,14 +96,22 @@ shared_ptr<Interaction> InteractionHashMap::getCurrent()
 }
 
 
-void InteractionHashMap::eraseCurrentAndGotoNext()
+void InteractionHashMap::eraseCurrentAndGotoNextPotential()
 {
-	if(notAtEnd())
+	if (notAtEnd())
 	{
 		IHashMap::iterator tmpHmii=hmii;
 		++hmii;
 		interactions.erase(tmpHmii);
 	}
+}
+
+void InteractionHashMap::eraseCurrentAndGotoNext()
+{
+	IHashMap::iterator tmpHmii=hmii;	
+	while (notAtEnd() && !((*hmii).second->isReal))
+		++hmii;	
+	interactions.erase(tmpHmii);
 }
 
 unsigned int InteractionHashMap::size()

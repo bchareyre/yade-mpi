@@ -96,15 +96,30 @@ bool Box2Sphere4SDECContactModel::go(		const shared_ptr<CollisionGeometry>& cm1,
 		
 		pt1 = se32.translation + normal*min;
 		pt2 = se32.translation - normal*s->radius;	
-	
-		shared_ptr<SDECContactModel> scm = shared_ptr<SDECContactModel>(new SDECContactModel());
-		//scm->closestsPoints.push_back(std::pair<Vector3r,Vector3r>(pt1,pt2));
+
+		// FIXME : remove those uncommented lines
+		shared_ptr<SDECContactModel> scm;
+		if (c->isNew)
+			scm = shared_ptr<SDECContactModel>(new SDECContactModel());
+		else
+			scm = dynamic_pointer_cast<SDECContactModel>(c->interactionGeometry);
+			
 		scm->contactPoint = 0.5*(pt1+pt2);
 		scm->normal = pt1-pt2;
 		scm->penetrationDepth = scm->normal.normalize();
 		scm->radius1 = s->radius*2;
 		scm->radius2 = s->radius;
 		c->interactionGeometry = scm;
+		
+// FIXME : uncommente those lines	
+/////////////////////////////////////////////////
+// 		shared_ptr<SDECContactModel> scm = shared_ptr<SDECContactModel>(new SDECContactModel());
+// 		scm->contactPoint = 0.5*(pt1+pt2);
+// 		scm->normal = pt1-pt2;
+// 		scm->penetrationDepth = scm->normal.normalize();
+// 		scm->radius1 = s->radius*2;
+// 		scm->radius2 = s->radius;
+// 		c->interactionGeometry = scm;
 		
 		return true;	
 	}
@@ -125,14 +140,27 @@ bool Box2Sphere4SDECContactModel::go(		const shared_ptr<CollisionGeometry>& cm1,
 
 	pt2 = se32.translation - normal * s->radius;
 	
-	shared_ptr<SDECContactModel> scm = shared_ptr<SDECContactModel>(new SDECContactModel());
-	//scm->closestsPoints.push_back(std::pair<Vector3r,Vector3r>(pt1,pt2));
+	// FIXME : remove those uncommented lines
+	shared_ptr<SDECContactModel> scm;
+	if (c->isNew)
+		scm = shared_ptr<SDECContactModel>(new SDECContactModel());
+	else
+		scm = dynamic_pointer_cast<SDECContactModel>(c->interactionGeometry);	
 	scm->contactPoint = 0.5*(pt1+pt2);
 	scm->normal = pt1-pt2;
 	scm->penetrationDepth = scm->normal.normalize();
 	scm->radius1 = s->radius*2;
 	scm->radius2 = s->radius;
 	c->interactionGeometry = scm;
+// FIXME : uncommente those lines	
+/////////////////////////////////////////////////	
+// 	shared_ptr<SDECContactModel> scm = shared_ptr<SDECContactModel>(new SDECContactModel());
+// 	scm->contactPoint = 0.5*(pt1+pt2);
+// 	scm->normal = pt1-pt2;
+// 	scm->penetrationDepth = scm->normal.normalize();
+// 	scm->radius1 = s->radius*2;
+// 	scm->radius2 = s->radius;
+// 	c->interactionGeometry = scm;
 	
 	return true;
 }

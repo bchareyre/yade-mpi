@@ -24,7 +24,7 @@ void GLTextLabel::glDrawInsideWindow()
 	drawString(text,10,10,textColor);
 }
 
-void GLTextLabel::drawString(char * str,int x,int y,Vector3r c)
+void GLTextLabel::drawString(char * str,int ,int ,Vector3r c)
 {
 	if (str!=NULL)		
 	{

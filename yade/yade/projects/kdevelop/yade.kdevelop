@@ -104,7 +104,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>extensions/FrontEnds/QtGUI</activedir>
+      <activedir>toolboxes/Libraries/Math</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>

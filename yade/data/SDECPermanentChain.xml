@@ -13,28 +13,28 @@
 		<permanentInteractions _className_="InteractionVecSet" >
 			<interaction size="8">
 				<interaction _className_="Interaction" id1="1" id2="2">
-					<interactionGeometry _className_="SDECPermanentLink" initialKn="500000" initialKs="50000" heta="1" initialEquilibriumDistance="5.9" radius1="3" radius2="3" knMax="750000" ksMax="7500" />
+					<interactionGeometry _className_="SDECPermanentLink" isReal="1" initialKn="500000" initialKs="50000" heta="1" initialEquilibriumDistance="5.9" radius1="3" radius2="3" knMax="750000" ksMax="7500" />
 				</interaction>
 				<interaction _className_="Interaction" id1="2" id2="3">
-					<interactionGeometry _className_="SDECPermanentLink" initialKn="500000" initialKs="50000" heta="1" initialEquilibriumDistance="5.9" radius1="3" radius2="3" knMax="750000" ksMax="7500" />
+					<interactionGeometry _className_="SDECPermanentLink" isReal="1" initialKn="500000" initialKs="50000" heta="1" initialEquilibriumDistance="5.9" radius1="3" radius2="3" knMax="750000" ksMax="7500" />
 				</interaction>
 				<interaction _className_="Interaction" id1="3" id2="4">
-					<interactionGeometry _className_="SDECPermanentLink" initialKn="500000" initialKs="50000" heta="1" initialEquilibriumDistance="5.9" radius1="3" radius2="3" knMax="750000" ksMax="7500" />
+					<interactionGeometry _className_="SDECPermanentLink" isReal="1" initialKn="500000" initialKs="50000" heta="1" initialEquilibriumDistance="5.9" radius1="3" radius2="3" knMax="750000" ksMax="7500" />
 				</interaction>
 				<interaction _className_="Interaction" id1="4" id2="5">
-					<interactionGeometry _className_="SDECPermanentLink" initialKn="500000" initialKs="50000" heta="1" initialEquilibriumDistance="5.9" radius1="3" radius2="3" knMax="750000" ksMax="7500" />
+					<interactionGeometry _className_="SDECPermanentLink" isReal="1" initialKn="500000" initialKs="50000" heta="1" initialEquilibriumDistance="5.9" radius1="3" radius2="3" knMax="750000" ksMax="7500" />
 				</interaction>
 				<interaction _className_="Interaction" id1="5" id2="6">
-					<interactionGeometry _className_="SDECPermanentLink" initialKn="500000" initialKs="50000" heta="1" initialEquilibriumDistance="5.9" radius1="3" radius2="3" knMax="750000" ksMax="7500" />
+					<interactionGeometry _className_="SDECPermanentLink" isReal="1" initialKn="500000" initialKs="50000" heta="1" initialEquilibriumDistance="5.9" radius1="3" radius2="3" knMax="750000" ksMax="7500" />
 				</interaction>
 				<interaction _className_="Interaction" id1="6" id2="7">
-					<interactionGeometry _className_="SDECPermanentLink" initialKn="500000" initialKs="50000" heta="1" initialEquilibriumDistance="5.9" radius1="3" radius2="3" knMax="750000" ksMax="7500" />
+					<interactionGeometry _className_="SDECPermanentLink" isReal="1" initialKn="500000" initialKs="50000" heta="1" initialEquilibriumDistance="5.9" radius1="3" radius2="3" knMax="750000" ksMax="7500" />
 				</interaction>
 				<interaction _className_="Interaction" id1="1" id2="8">
-					<interactionGeometry _className_="SDECPermanentLink" initialKn="500000" initialKs="50000" heta="1" initialEquilibriumDistance="5.9" radius1="3" radius2="3" knMax="750000" ksMax="7500" />
+					<interactionGeometry _className_="SDECPermanentLink" isReal="1" initialKn="500000" initialKs="50000" heta="1" initialEquilibriumDistance="5.9" radius1="3" radius2="3" knMax="750000" ksMax="7500" />
 				</interaction>
 				<interaction _className_="Interaction" id1="8" id2="9">
-					<interactionGeometry _className_="SDECPermanentLink" initialKn="500000" initialKs="50000" heta="1" initialEquilibriumDistance="5.9" radius1="3" radius2="3" knMax="750000" ksMax="7500" />
+					<interactionGeometry _className_="SDECPermanentLink" isReal="1" initialKn="500000" initialKs="50000" heta="1" initialEquilibriumDistance="5.9" radius1="3" radius2="3" knMax="750000" ksMax="7500" />
 				</interaction>
 			</interaction>
 		</permanentInteractions>

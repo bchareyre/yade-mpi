@@ -33,7 +33,7 @@
 bool Sphere2Mesh2D4ClosestFeatures::go(		const shared_ptr<CollisionGeometry>& cm1,
 						const shared_ptr<CollisionGeometry>& cm2,
 						const Se3r& se31,
-						const Se3r& se32,
+						const Se3r& /*se32*/,
 						shared_ptr<Interaction>& c)
 {
 

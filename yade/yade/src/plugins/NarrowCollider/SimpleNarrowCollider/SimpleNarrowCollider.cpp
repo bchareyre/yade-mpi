@@ -28,24 +28,23 @@ void SimpleNarrowCollider::narrowCollisionPhase(Body* body)
 	shared_ptr<BodyContainer> bodies = ncb->bodies;
 
 	shared_ptr<Interaction> contact;
-//	for(int i=0 ; it!=itEnd ; i++)
-	for( ncb->interactions->gotoFirst() ; ncb->interactions->notAtEnd() ; )
+
+	for( ncb->interactions->gotoFirstPotential() ; ncb->interactions->notAtEndPotential() ; ncb->interactions->gotoNextPotential())
 	{
 		contact = ncb->interactions->getCurrent();
 		
 		shared_ptr<Body> b1 = (*bodies)[contact->getId1()];
 		shared_ptr<Body> b2 = (*bodies)[contact->getId2()];
 
-		// collisionDispatcher (b1->cm , b2->cm , b1->se3 , b2->se3 , contact);
+		contact->isReal = narrowCollisionDispatcher( b1->cm , b2->cm , b1->se3 , b2->se3 , contact );
 		
-		if (!(narrowCollisionDispatcher( b1->cm , b2->cm , b1->se3 , b2->se3 , contact )))
-		{
-					//cout << "before " << ncb->interactions->size() << endl;
-					ncb->interactions->eraseCurrentAndGotoNext();
-					//		cout << "after" << endl;
-		}
-		else
-			ncb->interactions->gotoNext();
+// 		if (!(narrowCollisionDispatcher( b1->cm , b2->cm , b1->se3 , b2->se3 , contact )))
+// 			ncb->interactions->eraseCurrentAndGotoNextPotential();
+// 		else
+// 		{
+// 			ncb->interactions->gotoNextPotential();
+// 			contact->isReal = true;
+// 		}
 	}
 }
 

@@ -55,9 +55,9 @@ class Interaction : public Serializable
 	// FIXME - why public ?!
 	public	: shared_ptr<InteractionGeometry> interactionGeometry;
 
-	// FIXME : put it into InteractionPhysics
+	// FIXME : better to test if InteractionPhysics==0 and remove this flag
 	public	: bool isNew;
-	public  : bool isPotential;
+	public  : bool isReal;
 
 	// construction
 	public	: Interaction ();

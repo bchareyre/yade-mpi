@@ -1,5 +1,13 @@
 #! /bin/sh
 
+
+if [ "${1:-nothing}" = "nothing" ];
+then
+  echo 'Usage: createDynlib "dynLibName" "baseClassName" "directory"';
+  exit 0;
+fi
+
+
 # YADEPATH
 if [ "${YADEPATH:-nothing}" = "nothing" ];
 then
@@ -49,6 +57,9 @@ then
 else
   echo "I'm using YADEINCLUDEPATH="${YADEINCLUDEPATH};
 fi
+
+
+
 
 # This script can be used to create a new DynamicEngine sub project for kdevelop
 # usage : ./createDynamicEngine nameOfYouNewEngine then just add the new subproject into kdevelop

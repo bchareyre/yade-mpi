@@ -42,13 +42,32 @@ bool Sphere2Sphere4SDECContactModel::go(	const shared_ptr<CollisionGeometry>& cm
 
 	if (penetrationDepth>0)
 	{
-		shared_ptr<SDECContactModel> scm = shared_ptr<SDECContactModel>(new SDECContactModel());
+		// FIXME : remove those uncommented lines
+		shared_ptr<SDECContactModel> scm;
+		if (c->interactionGeometry)
+			scm = dynamic_pointer_cast<SDECContactModel>(c->interactionGeometry);
+		else
+			scm = shared_ptr<SDECContactModel>(new SDECContactModel());
+			
 		scm->contactPoint = se31.translation+(s1->radius-0.5*penetrationDepth)*normal;//0.5*(pt1+pt2);
 		scm->normal = normal;
 		scm->penetrationDepth = penetrationDepth;
 		scm->radius1 = s1->radius;
 		scm->radius2 = s2->radius;
-		c->interactionGeometry = scm;
+				
+		if (!c->interactionGeometry)
+			c->interactionGeometry = scm;
+	
+// FIXME : uncommente those lines	
+/////////////////////////////////////////////////
+// 		shared_ptr<SDECContactModel> scm = shared_ptr<SDECContactModel>(new SDECContactModel());
+// 		scm->contactPoint = se31.translation+(s1->radius-0.5*penetrationDepth)*normal;//0.5*(pt1+pt2);
+// 		scm->normal = normal;
+// 		scm->penetrationDepth = penetrationDepth;
+// 		scm->radius1 = s1->radius;
+// 		scm->radius2 = s2->radius;
+// 		c->interactionGeometry = scm;
+/////////////////////////////////////////		
 		return true;
 	}
 	else	

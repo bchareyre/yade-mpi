@@ -150,7 +150,7 @@ void GLWindowsManager::resizeEvent(int w, int h)
 {
 	width = w;
 	height = h;
-	for(int i=0;i<windows.size();i++)
+	for(unsigned int i=0;i<windows.size();i++)
 		windows[i]->resizeGlWindow(w,h);
 }
 

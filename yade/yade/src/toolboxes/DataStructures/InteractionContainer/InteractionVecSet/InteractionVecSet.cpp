@@ -83,7 +83,7 @@ shared_ptr<Interaction> InteractionVecSet::find(unsigned int id1,unsigned int id
 		return shared_ptr<Interaction>();
 }
 
-void InteractionVecSet::gotoFirst()
+void InteractionVecSet::gotoFirstPotential()
 {
 	vii    = interactions.begin();
 	viiEnd = interactions.end();
@@ -107,7 +107,7 @@ void InteractionVecSet::gotoFirst()
 	}
 }
 
-bool InteractionVecSet::notAtEnd()
+bool InteractionVecSet::notAtEndPotential()
 {
 	set<pair<unsigned int,shared_ptr<Interaction> >,lessThanPair >::iterator tmpSii          = sii;
 	vector<set<pair<unsigned int,shared_ptr<Interaction> >,lessThanPair > >::iterator tmpVii = vii;
@@ -126,7 +126,7 @@ bool InteractionVecSet::notAtEnd()
 	return true;
 }
 
-void InteractionVecSet::gotoNextPotentialOrReal()
+void InteractionVecSet::gotoNextPotential()
 {
 	if ( sii != siiEnd )
 		++sii;
@@ -143,16 +143,39 @@ void InteractionVecSet::gotoNextPotentialOrReal()
 	}
 }
 
+void InteractionVecSet::gotoFirst()
+{
+	gotoFirstPotential();
+	while (notAtEnd() && !getCurrent()->isReal)
+		gotoNextPotential();
+}
+
 void InteractionVecSet::gotoNext()
 {
-	gotoNextPotentialOrReal();
-	while( notAtEnd() && getCurrent()->isPotential )
-		gotoNextPotentialOrReal();
+	gotoNextPotential();
+	while( notAtEnd() && !getCurrent()->isReal)
+		gotoNextPotential();
+}
+
+bool InteractionVecSet::notAtEnd()
+{
+	return notAtEndPotential();
 }
 
 shared_ptr<Interaction> InteractionVecSet::getCurrent()
 {
 		return (*sii).second;
+}
+
+void InteractionVecSet::eraseCurrentAndGotoNextPotential()
+{
+	vector<set<pair<unsigned int,shared_ptr<Interaction> >,lessThanPair > >::iterator tmpVii = vii;
+	set<pair<unsigned int,shared_ptr<Interaction> >,lessThanPair >::iterator tmpSii          = sii;
+	
+	gotoNextPotential();
+	
+	(*tmpVii).erase(tmpSii);
+	currentSize--;	
 }
 
 void InteractionVecSet::eraseCurrentAndGotoNext()
@@ -164,6 +187,7 @@ void InteractionVecSet::eraseCurrentAndGotoNext()
 	
 	(*tmpVii).erase(tmpSii);
 	currentSize--;	
+	
 }
 
 unsigned int InteractionVecSet::size()

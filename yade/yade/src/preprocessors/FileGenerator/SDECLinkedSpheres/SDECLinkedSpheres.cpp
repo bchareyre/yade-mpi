@@ -269,7 +269,7 @@ string SDECLinkedSpheres::generate()
 				link->ksMax			= 7500;
 
 				c->interactionGeometry = link;
-
+				c->isReal = true;
 				rootBody->permanentInteractions->insert(c);
 			}
 		}

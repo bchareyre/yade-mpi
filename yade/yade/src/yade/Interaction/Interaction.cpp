@@ -3,16 +3,18 @@
 
 Interaction::Interaction ()
 {
-	isPotential = false;  // should be true 
-	isNew = true; // maybe we can remove this, and check if InteractionGeometry, and InteractionPhysics are empty?
+	// FIXME : -1
+	id1 = 0;
+	id2 = 0;
+	isNew = true;
+	isReal = false; // maybe we can remove this, and check if InteractionGeometry, and InteractionPhysics are empty?
 }
 
 Interaction::Interaction(unsigned int newId1,unsigned int newId2) : id1(newId1) , id2(newId2)
-{
-	// FIXME - this should be initialized to true, then modified by BroadCollider.
-	isPotential = false;  // should be true 
-	isNew = true; // maybe we can remove this, and check if InteractionGeometry, and InteractionPhysics are empty?
-};
+{	
+	isNew = true;
+	isReal = false;
+}
 
 Interaction::~Interaction ()
 {
@@ -28,5 +30,6 @@ void Interaction::registerAttributes()
 {
 	REGISTER_ATTRIBUTE(id1);
 	REGISTER_ATTRIBUTE(id2);
+	REGISTER_ATTRIBUTE(isReal);
 	REGISTER_ATTRIBUTE(interactionGeometry);
 }

@@ -165,7 +165,6 @@ void Sphere::subdivideTriangle(Vector3r& v1,Vector3r& v2,Vector3r& v3, int depth
 void Sphere::drawSphere(int depth)
 {
 	glShadeModel(GL_SMOOTH);
-	GLfloat matAmbientAndDiffuse[] = { 1.0,1.0,1.0,1.0};
 
 	number=0;
 	for(int i=0;i<20;i++)

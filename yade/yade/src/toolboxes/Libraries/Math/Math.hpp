@@ -152,13 +152,12 @@ public:
     } \
 }
 
-#define DOUBLE_PRECISION
-
 #ifdef DOUBLE_PRECISION
 	typedef double Real;
 #else
 	typedef float Real;
 #endif
+
 typedef Math<float> Mathf;
 typedef Math<double> Mathd;
 

@@ -43,8 +43,8 @@ SAPCollider::~SAPCollider ()
 		delete zBounds[i];
 	}
 
-	delete minimums;
-	delete maximums;
+	delete[] minimums;
+	delete[] maximums;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -104,7 +104,7 @@ void GLWindow::drawSelectedComponent()
 	glLineWidth(2.0);
 	
 	glColor3f(selectionColor[0],selectionColor[1],selectionColor[2]);
-	int p1x,p2x,p1y,p2y;
+	int p1x,p1y;
 	switch (selectedComponent)
 	{	
 		case 0 :		
@@ -324,7 +324,7 @@ bool GLWindow::mousePressEvent(int x, int y)
 	return mousePress;
 }
 
-bool GLWindow::mouseReleaseEvent(int x, int y)
+bool GLWindow::mouseReleaseEvent(int , int )
 {
 	bool pressed = mousePress;
 	selectedComponent = -1;

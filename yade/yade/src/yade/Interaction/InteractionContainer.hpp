@@ -23,11 +23,14 @@ class InteractionContainer : public Serializable
 	public    : virtual void gotoFirst() 									{throw;};
 	public    : virtual bool notAtEnd() 									{throw;};
 	public    : virtual void gotoNext() 									{throw;};
-	public    : virtual void gotoNextPotentialOrReal() 							{throw;};
+	public    : virtual void gotoFirstPotential() 								{throw;};
+	public    : virtual void gotoNextPotential() 								{throw;};
+	public    : virtual bool notAtEndPotential() 								{throw;};	
  	public    : virtual shared_ptr<Interaction> getCurrent() 						{throw;};
 
 	// deletes currently pointed element, and goes to the next one.
 	public    : virtual void eraseCurrentAndGotoNext() 							{throw;};
+	public    : virtual void eraseCurrentAndGotoNextPotential()						{throw;};
 	public    : virtual unsigned int size() 								{throw;};
 
 

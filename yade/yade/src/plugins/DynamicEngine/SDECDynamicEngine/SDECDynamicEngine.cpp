@@ -70,78 +70,104 @@ void SDECDynamicEngine::registerAttributes()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 // FIXME : remove std::list<shared_ptr<Interaction> >& interactions
-void SDECDynamicEngine::filter(Body* body)
+void SDECDynamicEngine::filter(Body* /*body*/)
 {
 
-	NonConnexBody * ncb = dynamic_cast<NonConnexBody*>(body);
-	shared_ptr<BodyContainer> bodies = ncb->bodies;
+// 	NonConnexBody * ncb = dynamic_cast<NonConnexBody*>(body);
+// 	shared_ptr<BodyContainer> bodies = ncb->bodies;
+// 
+// 	if (first)
+// 		interactionsPerBody.resize(bodies->size());
+// 
+// 	vector<set<tuple<int,bool,shared_ptr<InteractionGeometry> >,lessThanTuple > >::iterator ipbi    = interactionsPerBody.begin();
+// 	vector<set<tuple<int,bool,shared_ptr<InteractionGeometry> >,lessThanTuple > >::iterator ipbiEnd = interactionsPerBody.end();
+// 	for(;ipbi!=ipbiEnd;++ipbi)
+// 	{
+// 		set<tuple<int,bool,shared_ptr<InteractionGeometry> >,lessThanTuple >::iterator ii = (*ipbi).begin();
+// 		set<tuple<int,bool,shared_ptr<InteractionGeometry> >,lessThanTuple >::iterator iiEnd = (*ipbi).end();
+// 		set<tuple<int,bool,shared_ptr<InteractionGeometry> >,lessThanTuple >::iterator tmpi;
+// 		for(;ii!=iiEnd;)
+// 		{
+// 			tmpi = ii;
+// 			tmpi++;
+// 			bool &access = const_cast<bool&>((*ii).get<1>());
+// 			if (access == false)
+// 				(*ipbi).erase(ii);
+// 			else
+// 				access = false;
+// 			ii = tmpi;
+// 		}
+// 	}
+// 
+// 	shared_ptr<Interaction> contact;
+// //	for( ; cti!=ctiEnd ; ++cti)
+// 	for( ncb->interactions->gotoFirst() ; ncb->interactions->notAtEnd() ; ncb->interactions->gotoNext() )
+// 	{
+// 		contact = ncb->interactions->getCurrent();
+// 
+// 		int id1 = contact->getId1();
+// 		int id2 = contact->getId2();
+// 
+// 		if (id1>=id2)
+// 			swap(id1,id2);
+// 
+// 		bool accessed = false;
+// 		tuple<int,bool,shared_ptr<InteractionGeometry> > t(id2 , accessed , contact->interactionGeometry);
+// 
+// 		pair<set<tuple<int,bool,shared_ptr<InteractionGeometry> >,lessThanTuple >::iterator,bool> insertionResult;
+// 
+// 		insertionResult	= interactionsPerBody[id1].insert(t);
+// 
+// 		bool& wasAccessed = const_cast<bool&>(insertionResult.first->get<1>());
+// 		wasAccessed	= true;
+// 
+// 
+// 		contact->isNew = insertionResult.second;
+// 
+// 		shared_ptr<SDECContactModel> scm = dynamic_pointer_cast<SDECContactModel>( contact->interactionGeometry);
+// 
+// 		// here we want to get new geometrical info about contact but we want to remember physical infos from previous time step about it
+// 		Vector3r cp = scm->contactPoint;
+// 		Vector3r n = scm->normal;
+// 		float pd = scm->penetrationDepth;
+// 		float r1 = scm->radius1;
+// 		float r2 = scm->radius2;
+// 
+// 		contact->interactionGeometry  = insertionResult.first->get<2>();
+// 
+// 		scm = dynamic_pointer_cast<SDECContactModel>(contact->interactionGeometry);
+// 		scm->contactPoint= cp;
+// 		scm->normal=n;
+// 		scm->penetrationDepth=pd;
+// 		scm->radius1=r1;
+// 		scm->radius2=r2;
+// 	}
 
-	if (first)
-		interactionsPerBody.resize(bodies->size());
+//	NonConnexBody * ncb = dynamic_cast<NonConnexBody*>(body);
+//	shared_ptr<BodyContainer> bodies = ncb->bodies;
 
-	vector<set<tuple<int,bool,shared_ptr<InteractionGeometry> >,lessThanTuple > >::iterator ipbi    = interactionsPerBody.begin();
-	vector<set<tuple<int,bool,shared_ptr<InteractionGeometry> >,lessThanTuple > >::iterator ipbiEnd = interactionsPerBody.end();
-	for(;ipbi!=ipbiEnd;++ipbi)
-	{
-		set<tuple<int,bool,shared_ptr<InteractionGeometry> >,lessThanTuple >::iterator ii = (*ipbi).begin();
-		set<tuple<int,bool,shared_ptr<InteractionGeometry> >,lessThanTuple >::iterator iiEnd = (*ipbi).end();
-		set<tuple<int,bool,shared_ptr<InteractionGeometry> >,lessThanTuple >::iterator tmpi;
-		for(;ii!=iiEnd;)
-		{
-			tmpi = ii;
-			tmpi++;
-			bool &access = const_cast<bool&>((*ii).get<1>());
-			if (access == false)
-				(*ipbi).erase(ii);
-			else
-				access = false;
-			ii = tmpi;
-		}
-	}
-
-	shared_ptr<Interaction> contact;
-//	for( ; cti!=ctiEnd ; ++cti)
-	for( ncb->interactions->gotoFirst() ; ncb->interactions->notAtEnd() ; ncb->interactions->gotoNext() )
-	{
-		contact = ncb->interactions->getCurrent();
-
-		int id1 = contact->getId1();
-		int id2 = contact->getId2();
-
-		if (id1>=id2)
-			swap(id1,id2);
-
-		bool accessed = false;
-		tuple<int,bool,shared_ptr<InteractionGeometry> > t(id2 , accessed , contact->interactionGeometry);
-
-		pair<set<tuple<int,bool,shared_ptr<InteractionGeometry> >,lessThanTuple >::iterator,bool> insertionResult;
-
-		insertionResult	= interactionsPerBody[id1].insert(t);
-
-		bool& wasAccessed = const_cast<bool&>(insertionResult.first->get<1>());
-		wasAccessed	= true;
-
-
-		contact->isNew = insertionResult.second;
-
-		shared_ptr<SDECContactModel> scm = dynamic_pointer_cast<SDECContactModel>( contact->interactionGeometry);
-
-		// here we want to get new geometrical info about contact but we want to remember physical infos from previous time step about it
-		Vector3r cp = scm->contactPoint;
-		Vector3r n = scm->normal;
-		float pd = scm->penetrationDepth;
-		float r1 = scm->radius1;
-		float r2 = scm->radius2;
-
-		contact->interactionGeometry  = insertionResult.first->get<2>();
-
-		scm = dynamic_pointer_cast<SDECContactModel>(contact->interactionGeometry);
-		scm->contactPoint= cp;
-		scm->normal=n;
-		scm->penetrationDepth=pd;
-		scm->radius1=r1;
-		scm->radius2=r2;
-	}
+// 	if (first)
+// 		interactionsPerBody.resize(bodies->size());
+// 
+// 	vector<set<tuple<int,bool,shared_ptr<InteractionGeometry> >,lessThanTuple > >::iterator ipbi    = interactionsPerBody.begin();
+// 	vector<set<tuple<int,bool,shared_ptr<InteractionGeometry> >,lessThanTuple > >::iterator ipbiEnd = interactionsPerBody.end();
+// 	for(;ipbi!=ipbiEnd;++ipbi)
+// 	{
+// 		set<tuple<int,bool,shared_ptr<InteractionGeometry> >,lessThanTuple >::iterator ii = (*ipbi).begin();
+// 		set<tuple<int,bool,shared_ptr<InteractionGeometry> >,lessThanTuple >::iterator iiEnd = (*ipbi).end();
+// 		set<tuple<int,bool,shared_ptr<InteractionGeometry> >,lessThanTuple >::iterator tmpi;
+// 		for(;ii!=iiEnd;)
+// 		{
+// 			tmpi = ii;
+// 			tmpi++;
+// 			bool &access = const_cast<bool&>((*ii).get<1>());
+// 			if (access == false)
+// 				(*ipbi).erase(ii);
+// 			else
+// 				access = false;
+// 			ii = tmpi;
+// 		}
+// 	}
 
 }
 
@@ -151,7 +177,7 @@ void SDECDynamicEngine::filter(Body* body)
 //FIXME : add reset function so it will remove bool first
 void SDECDynamicEngine::respondToCollisions(Body* body)
 {
-	filter(body);
+	//filter(body);
 
 	NonConnexBody * ncb = dynamic_cast<NonConnexBody*>(body);
 	shared_ptr<BodyContainer> bodies = ncb->bodies;
@@ -197,34 +223,34 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 /// FIXME : those lines are too dirty !			 ///
 ////////////////////////////////////////////////////////////
 
-		bool accessed = false;
-		int tmpId1,tmpId2;
-		if (id1>=id2)
-		{
-			tmpId1 = id2;
-			tmpId2 = id1;
-		}
-		else
-		{
-			tmpId1 = id1;
-			tmpId2 = id2;
-		}
-
-		tuple<int,bool,shared_ptr<InteractionGeometry> > t( tmpId2 , accessed , contact2->interactionGeometry );
-		interactionsPerBody[tmpId1].erase(t);
-
-		shared_ptr<Interaction> contact;
-//		for( ; cti!=ctiEnd ; ++cti)
-		for( ncb->interactions->gotoFirst() ; ncb->interactions->notAtEnd() ; ncb->interactions->gotoNext() )
-		{
-			contact = ncb->interactions->getCurrent();
-
-			if ((contact->getId1()==id1 && contact->getId2()==id2 ) || (contact->getId1()==id2 && contact->getId2()==id1))
-			{
-				ncb->interactions->eraseCurrentAndGotoNext();
-				break;
-			}
-		}
+// 		bool accessed = false;
+// 		int tmpId1,tmpId2;
+// 		if (id1>=id2)
+// 		{
+// 			tmpId1 = id2;
+// 			tmpId2 = id1;
+// 		}
+// 		else
+// 		{
+// 			tmpId1 = id1;
+// 			tmpId2 = id2;
+// 		}
+// 
+// 		tuple<int,bool,shared_ptr<InteractionGeometry> > t( tmpId2 , accessed , contact2->interactionGeometry );
+// 		interactionsPerBody[tmpId1].erase(t);
+// 
+// 		shared_ptr<Interaction> contact;
+// 		for( ncb->interactions->gotoFirst() ; ncb->interactions->notAtEnd() ; ncb->interactions->gotoNext() )
+// 		{
+// 			contact = ncb->interactions->getCurrent();
+// 
+// 			if ((contact->getId1()==id1 && contact->getId2()==id2 ) || (contact->getId1()==id2 && contact->getId2()==id1))
+// 			{
+// 				ncb->interactions->eraseCurrentAndGotoNext();
+// 				break;
+// 			}
+// 		}
+		ncb->interactions->find(id1,id2)->isReal = false;
 
 ////////////////////////////////////////////////////////////
 /// 							 ///
@@ -447,19 +473,21 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 		float normElastic = mElastic.length();
 
 
-		//if (normElastic<=normMPlastic)
-		//{
+		if (normElastic<=normMPlastic)
+		{
 			moments[id1]	-= q_n_i*mElastic;
 			moments[id2]	+= q_n_i*mElastic;
-		//}
-		//else
-		//{
-		//	Vector3r mPlastic = normMPlastic*mElastic.normalized();
-		//	moments[id1]	-= q_n_i*mPlastic;
-		//	moments[id2]	+= q_n_i*mPlastic;
-		//	thetarn = mPlastic/currentContact->kr;
-		//	currentContact->thetar = q_n_i*thetarn;
-		//}
+		}
+		else
+		{
+			Vector3r mPlastic = mElastic;
+			mPlastic.normalize();
+			mPlastic *= normMPlastic;
+			moments[id1]	-= q_n_i*mPlastic;
+			moments[id2]	+= q_n_i*mPlastic;
+			thetarn = mPlastic/currentContact->kr;
+			currentContact->thetar = q_n_i*thetarn;
+		}
 
 		currentContact->prevRotation1 = de1->se3.rotation;
 		currentContact->prevRotation2 = de2->se3.rotation;
@@ -495,7 +523,7 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 		shared_ptr<SDECDiscreteElement> de2 	= dynamic_pointer_cast<SDECDiscreteElement>((*bodies)[id2]);
 		shared_ptr<SDECContactModel> currentContact = dynamic_pointer_cast<SDECContactModel>(contact->interactionGeometry);
 
-		if ( contact ->isNew)
+		if ( contact->isNew)
 		{
 			// FIXME : put these lines into a dynlib - PhysicalCollider
 			currentContact->initialKn			= 2*(de1->kn*de2->kn)/(de1->kn+de2->kn);
@@ -504,7 +532,7 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 			currentContact->shearForce			= Vector3r(0,0,0);
 			currentContact->initialEquilibriumDistance	= currentContact->radius1+currentContact->radius2;
 		}
-
+		
 		// FIXME : put these lines into another dynlib
 		currentContact->kn = currentContact->initialKn;
 		currentContact->ks = currentContact->initialKs;

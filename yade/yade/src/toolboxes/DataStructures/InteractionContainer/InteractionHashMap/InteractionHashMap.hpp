@@ -47,10 +47,14 @@ class InteractionHashMap : public InteractionContainer
 	public	: virtual void gotoFirst();
 	public	: virtual bool notAtEnd();
 	public	: virtual void gotoNext();
-	public  : virtual void gotoNextPotentialOrReal();
+	public	: virtual void gotoFirstPotential();
+	public	: virtual bool notAtEndPotential();
+	public	: virtual void gotoNextPotential();
+	
 	public	: virtual shared_ptr<Interaction> getCurrent();
 
 	public : virtual void eraseCurrentAndGotoNext();
+	public  : virtual void eraseCurrentAndGotoNextPotential();
 
 	public : virtual unsigned int size();
 

@@ -143,7 +143,7 @@ string HangingCloth::generate()
 	rootBody->bodies->insert(b);
 
 
-	for(int i=0;i<1/*nbSpheres*/;i++)
+	for(int i=0;i<nbSpheres;i++)
 	{
 		shared_ptr<RigidBody> s(new RigidBody);
 		shared_ptr<AABB> aabb(new AABB);

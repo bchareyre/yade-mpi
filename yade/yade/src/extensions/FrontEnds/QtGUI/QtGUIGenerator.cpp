@@ -255,6 +255,7 @@ string QtGUIGenerator::getString(shared_ptr<AttributeDescriptor> d, int widgetNu
 	switch (d->types[widgetNum])
 	{
 		case AttributeDescriptor::FLOATING : 
+		case AttributeDescriptor::INTEGER : 
 		{
 			
 			return dynamic_cast<QLineEdit*>(d->widgets[widgetNum])->text().data();

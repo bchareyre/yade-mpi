@@ -30,7 +30,7 @@
 
 void CollisionGeometrySet2AABBFactory::go(	const shared_ptr<CollisionGeometry>& cm,
 						shared_ptr<BoundingVolume>& bv,
-						const Se3r& se3	)
+						const Se3r& 	)
 {
 	shared_ptr<CollisionGeometrySet> set = dynamic_pointer_cast<CollisionGeometrySet>(cm);
 	

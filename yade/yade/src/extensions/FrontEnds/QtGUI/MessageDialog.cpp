@@ -38,7 +38,7 @@ using namespace std;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-MessageDialog::MessageDialog (const string& message,QWidget* parent, const char* name, bool modal, WFlags fl) : QtGeneratedMessageDialog(parent,name,modal,false)
+MessageDialog::MessageDialog (const string& message,QWidget* parent, const char* name, bool modal, WFlags fl) : QtGeneratedMessageDialog(parent,name,modal,fl)
 {
 	
 	teMessage->setText(message.c_str());
@@ -84,7 +84,7 @@ void MessageDialog::closeEvent(QCloseEvent * evt)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MessageDialog::timerEvent(QTimerEvent * evt)
+void MessageDialog::timerEvent(QTimerEvent * /*evt*/)
 {
 	//cout << "timer" << endl;
 }
