@@ -1,0 +1,53 @@
+<Yade>
+	<rootBody className="NonConnexBody" >
+		<rootBody isDynamic="0" velocity="{0 0 0}" angularVelocity="{0 0 0}">
+			<se3 translation="{0 0 0}" rotation="{1 0 0 0}" />
+			<bv />
+			<cm />
+			<gm />
+			<dynamic className="SDECDynamicEngine" >
+				<dynamic />
+			</dynamic>
+			<bodies size="2">
+				<bodies[0] className="SDECDiscreteElement" >
+					<bodies[0] isDynamic="0" velocity="{0 0 0}" angularVelocity="{0 0 0}" mass="0" inertia="{0 0 0}" kn="1" ks="1">
+						<se3 translation="{0 0 0}" rotation="{1 0 0 0}" />
+						<bv className="AABB" >
+							<bv color="{1 0 0}" center="{0 0 0}" halfSize="{100 5 100}" />
+						</bv>
+						<cm className="Box" >
+							<cm diffuseColor="{1 1 1}" wire="0" visible="1" extents="{100 5 100}" />
+						</cm>
+						<gm className="Box" >
+							<gm diffuseColor="{1 1 1}" wire="0" visible="1" diffuseColor="{1 1 1}" wire="0" visible="1" extents="{100 5 100}" />
+						</gm>
+						<dynamic />
+					</bodies[0]>
+				</bodies[0]>
+				<bodies[1] className="SDECDiscreteElement" >
+					<bodies[1] isDynamic="1" velocity="{0 0 -7}" angularVelocity="{0 0 0}" mass="37.699" inertia="{135.716 135.716 135.716}" kn="1" ks="1">
+						<se3 translation="{0 30 90}" rotation="{1 0 0 0}" />
+						<bv className="AABB" >
+							<bv color="{0 1 0}" center="{0 30 90}" halfSize="{3 3 3}" />
+						</bv>
+						<cm className="Sphere" >
+							<cm diffuseColor="{0.4 0.5 1.0}" wire="0" visible="1" radius="3" />
+						</cm>
+						<gm className="Sphere" >
+							<gm diffuseColor="{0.4 0.5 1.0}" wire="0" visible="1" wire="0" visible="1" radius="3" />
+						</gm>
+						<dynamic className="BallisticDynamicEngine" >
+							<dynamic damping="0.999" />
+						</dynamic>
+					</bodies[1]>
+				</bodies[1]>
+			</bodies>
+			<narrowCollider className="SimpleNarrowCollider" >
+				<narrowCollider />
+			</narrowCollider>
+			<broadCollider className="SAPCollider" >
+				<broadCollider />
+			</broadCollider>
+		</rootBody>
+	</rootBody>
+</Yade>
