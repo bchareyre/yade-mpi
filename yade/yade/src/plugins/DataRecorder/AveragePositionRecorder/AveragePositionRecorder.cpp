@@ -38,12 +38,13 @@ void AveragePositionRecorder::action(Body * body)
 	
 	Real x=0, y=0, z=0, size=0;
 	for( ncb->bodies->gotoFirst() ; ncb->bodies->notAtEnd() ; ncb->bodies->gotoNext() )
-	{
-		size+=1.0;
-		x+=ncb->bodies->getCurrent()->physicalParameters->se3.translation[0];
-		y+=ncb->bodies->getCurrent()->physicalParameters->se3.translation[1];
-		z+=ncb->bodies->getCurrent()->physicalParameters->se3.translation[2];
-	}
+	if( ncb->bodies->getCurrent()->isDynamic)
+		{ 
+			size+=1.0;
+			x+=ncb->bodies->getCurrent()->physicalParameters->se3.translation[0];
+			y+=ncb->bodies->getCurrent()->physicalParameters->se3.translation[1];
+			z+=ncb->bodies->getCurrent()->physicalParameters->se3.translation[2];
+		}
 
 	x /= size;
 	y /= size;

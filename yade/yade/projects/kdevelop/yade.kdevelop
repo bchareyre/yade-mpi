@@ -99,7 +99,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>yade/Engine</activedir>
+      <activedir>preprocessors/FileGenerator/SDECImport</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>

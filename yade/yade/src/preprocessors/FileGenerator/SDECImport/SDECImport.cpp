@@ -69,6 +69,7 @@ SDECImport::SDECImport () : FileGenerator()
 	positionRecordFile	= "../data/position";
 	recordIntervalIter	= 100;
 
+	bigBall 		= true;
 	bigBallRadius		= 0.15;
 	bigBallDensity		= 7000;
 	bigBallDropTimeSeconds	= 450;
@@ -132,6 +133,7 @@ void SDECImport::registerAttributes()
 	REGISTER_ATTRIBUTE(positionRecordFile);
 	REGISTER_ATTRIBUTE(recordIntervalIter);
 
+	REGISTER_ATTRIBUTE(bigBall);
 	REGISTER_ATTRIBUTE(bigBallRadius);
 	REGISTER_ATTRIBUTE(bigBallDensity);
 	REGISTER_ATTRIBUTE(bigBallDropTimeSeconds);
@@ -164,8 +166,8 @@ string SDECImport::generate()
 			if(f != 1) // skip loading of SDEC walls
 				continue;
 
-			if( i % 100 == 0 ) // FIXME - should display a progress BAR !!
-				cout << "loaded: " << i << endl;
+	//		if( i % 100 == 0 ) // FIXME - should display a progress BAR !!
+	//			cout << "loaded: " << i << endl;
 			
 			lowerCorner[0] = min(translation[0]-radius , lowerCorner[0]);
 			lowerCorner[1] = min(translation[1]-radius , lowerCorner[1]);
@@ -183,8 +185,10 @@ string SDECImport::generate()
 	Vector3r translation = (upperCorner+lowerCorner)*0.5 + Vector3r(0,upperCorner[1]+bigBallRadius+4,0);
 	createSphere(body,translation,bigBallRadius,true);	
 	body->isDynamic = false;
-	rootBody->bodies->insert(body);
-	int bigId = body->getId();
+	int bigId = 0;
+	if(bigBall)
+		rootBody->bodies->insert(body);
+	bigId = body->getId();
 
 // bottom box
  	Vector3r center		= Vector3r(

@@ -385,10 +385,10 @@ void SDECDynamicEngine::respondToInteractions(Body* body)
 			
 		if( shearForce.squaredLength() > maxFs )
 		{
-			maxFs = Mathr::sqRoot(maxFs);
-			for(int g = 0 ; g < 3 ; g++)
-				if(shearForce[g] != 0)
-					shearForce[g] *= maxFs / shearForce[g];
+			maxFs = Mathr::sqRoot(maxFs) / shearForce.length();
+			shearForce *= maxFs;
+//	for(int g = 0 ; g < 3 ; g++)
+//		if(shearForce[g] != 0)
 		}
 
 		Vector3r f				= currentContactPhysics->normalForce + shearForce;
