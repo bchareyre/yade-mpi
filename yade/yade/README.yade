@@ -1,12 +1,16 @@
 -------- QUICK:
 
-makeSymLinks
-cd yade/projects/kdevelop/yade_kdevelop
+setenv SVN_SSH "ssh -l loginname"
+svn checkout svn+ssh://svn.berlios.de/svnroot/repos/yade/trunk/yade
+
+cd yade/yade/scripts
+./prepareToDevelop
+source yadeEnv ........../yade
+cd ../projects/kdevelop/
 qmake
 make
 
-export LD_LIBRARY_PATH ...YADEPATH.../bin/dynlib/linux:$LD_LIBRARY_PATH
-cd ...YADEPATH.../bin
+cd $YADEBINPATH
 yade
 
 --------- end
