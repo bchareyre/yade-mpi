@@ -47,7 +47,7 @@ Sphere2Mesh2D4ClosestFeatures::~Sphere2Mesh2D4ClosestFeatures ()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool Sphere2Mesh2D4ClosestFeatures::collide(const shared_ptr<CollisionGeometry> cm1, const shared_ptr<CollisionGeometry> cm2, const Se3& se31, const Se3& , shared_ptr<Interaction> c)
+bool Sphere2Mesh2D4ClosestFeatures::collide(const shared_ptr<CollisionGeometry> cm1, const shared_ptr<CollisionGeometry> cm2, const Se3r& se31, const Se3r& , shared_ptr<Interaction> c)
 {
 
 	shared_ptr<Sphere> s = dynamic_pointer_cast<Sphere>(cm1);
@@ -57,23 +57,23 @@ bool Sphere2Mesh2D4ClosestFeatures::collide(const shared_ptr<CollisionGeometry> 
 
 	cf->closestsPoints.resize(0);
 
-	Vector3 center = se31.translation;
+	Vector3r center = se31.translation;
 	
 	/*for(int i=0;i<m->vertices.size();i++)
 	{
-		Vector3 v = m->vertices[i]-center;
+		Vector3r v = m->vertices[i]-center;
 		float l = v.unitize();
 
 		if (l<s->radius)
 		{
 			cf->verticesId.push_back(i);
-			cf->closestsPoints.push_back(std::pair<Vector3,Vector3>(center+v*s->radius,m->vertices[i]));
+			cf->closestsPoints.push_back(std::pair<Vector3r,Vector3r>(center+v*s->radius,m->vertices[i]));
 		}
 	}*/
 
-	std::vector<Vector3> tri;
+	std::vector<Vector3r> tri;
 	tri.resize(3);
-	Vector3 pt;
+	Vector3r pt;
 	
 	for(unsigned int i=0;i<m->faces.size();i++)
 	{
@@ -84,9 +84,9 @@ bool Sphere2Mesh2D4ClosestFeatures::collide(const shared_ptr<CollisionGeometry> 
 				
 		if (d<s->radius*s->radius)
 		{
-			Vector3 v = pt-center;
-			v.unitize();
-			cf->closestsPoints.push_back(std::pair<Vector3,Vector3>(center+v*s->radius,pt));
+			Vector3r v = pt-center;
+			v.normalize();
+			cf->closestsPoints.push_back(std::pair<Vector3r,Vector3r>(center+v*s->radius,pt));
 			cf->verticesId.push_back(i);
 		}
 	}
@@ -104,7 +104,7 @@ bool Sphere2Mesh2D4ClosestFeatures::collide(const shared_ptr<CollisionGeometry> 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool Sphere2Mesh2D4ClosestFeatures::reverseCollide(const shared_ptr<CollisionGeometry> cm1, const shared_ptr<CollisionGeometry> cm2,  const Se3& se31, const Se3& se32, shared_ptr<Interaction> c)
+bool Sphere2Mesh2D4ClosestFeatures::reverseCollide(const shared_ptr<CollisionGeometry> cm1, const shared_ptr<CollisionGeometry> cm2,  const Se3r& se31, const Se3r& se32, shared_ptr<Interaction> c)
 {
 	bool isColliding = collide(cm2,cm1,se32,se31,c);
 	if (isColliding)
@@ -113,7 +113,7 @@ bool Sphere2Mesh2D4ClosestFeatures::reverseCollide(const shared_ptr<CollisionGeo
 
 		for(unsigned int i=0;i<cf->closestsPoints.size();i++)
 		{
-			Vector3 tmp = cf->closestsPoints[i].first;
+			Vector3r tmp = cf->closestsPoints[i].first;
 			cf->closestsPoints[i].first = cf->closestsPoints[i].second;
 			cf->closestsPoints[i].second = tmp;
 		}

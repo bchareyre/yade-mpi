@@ -6,7 +6,7 @@
 #include <GL/glut.h>
 
 #include "ConnexBody.hpp"
-#include "Constants.hpp"
+#include "Math.hpp"
 
 #include <iostream>
 
@@ -26,10 +26,10 @@ void ConnexBody::glDraw()
 {	
 	glPushMatrix();
 	float angle;
-	Vector3 axis;	
-	se3.rotation.toAngleAxis(angle,axis);	
+	Vector3r axis;	
+	se3.rotation.toAxisAngle(axis,angle);	
 	glTranslatef(se3.translation[0],se3.translation[1],se3.translation[2]);
-	glRotatef(angle*Constants::RAD_TO_DEG,axis[0],axis[1],axis[2]);	
+	glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);	
 	gm->glDraw();		
 	glPopMatrix();
 	

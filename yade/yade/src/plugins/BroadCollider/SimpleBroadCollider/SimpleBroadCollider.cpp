@@ -77,9 +77,9 @@ bool BVOverlapper::overlappSphereSphere(const shared_ptr<BoundingVolume> bv1, co
 bool BVOverlapper::overlappAABBSphere(const shared_ptr<BoundingVolume> bv1, const shared_ptr<BoundingVolume> bv2)
 {
 
-	Vector3 l,t,p,q,r;
+	Vector3r l,t,p,q,r;
 	bool onborder = false;
-	Vector3 pt1,pt2,normal;
+	Vector3r pt1,pt2,normal;
 	float depth;
 
 	shared_ptr<BoundingSphere> s = dynamic_pointer_cast<BoundingSphere>(bv2);
@@ -118,10 +118,10 @@ bool BVOverlapper::overlappAABBSphere(const shared_ptr<BoundingVolume> bv1, cons
 
 bool BVOverlapper::overlappAABBAABB(const shared_ptr<BoundingVolume> bv1, const shared_ptr<BoundingVolume> bv2)
 {
-	Vector3 min1 = bv1->min;
-	Vector3 max1 = bv1->max;
-	Vector3 min2 = bv2->min;
-	Vector3 max2 = bv2->max;
+	Vector3r min1 = bv1->min;
+	Vector3r max1 = bv1->max;
+	Vector3r min2 = bv2->min;
+	Vector3r max2 = bv2->max;
 
 	return !(max1[0]<min2[0] || max2[0]<min1[0] || max1[1]<min2[1] || max2[1]<min1[1] || max1[2]<min2[2] || max2[2]<min1[2]);
 }

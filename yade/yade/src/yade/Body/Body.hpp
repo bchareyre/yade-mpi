@@ -85,13 +85,13 @@ class Body : public Serializable
 	public : bool isDynamic;
 
 	/*! The velocity of the object */
-	public : Vector3 velocity;
+	public : Vector3r velocity;
 
 	/*! The angular velocity of the object */
-	public : Vector3 angularVelocity;
+	public : Vector3r angularVelocity;
 
 	/*! The position and orientation of the object */
-	public : Se3 se3;
+	public : Se3r se3;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Constructor/Destructor									///
@@ -111,11 +111,11 @@ class Body : public Serializable
 	public : virtual void glDraw() {/*throw CallVirtualUndifinedMethod()*/};
 
 	/*! Abstract function overloaded in Connex and NonConnex body. It is called to update the bounding volume of the object in generel at the end of each time step */
-	public : virtual void updateBoundingVolume(Se3& ) {};
+	public : virtual void updateBoundingVolume(Se3r& ) {};
 
 	/*! Abstract function overloaded in Connex and NonConnex body. It is called to update the collision model of the object. It is useful if the object is deformable
 	and needs to recompute its collision model */
-	public : virtual void updateCollisionGeometry(Se3& ) {};
+	public : virtual void updateCollisionGeometry(Se3r& ) {};
 
 	/*! Abstract function overloaded in Connex and NonConnex body. Move the body to the next time step using its own internal dynamic engine */
 	public : virtual void moveToNextTimeStep() {};

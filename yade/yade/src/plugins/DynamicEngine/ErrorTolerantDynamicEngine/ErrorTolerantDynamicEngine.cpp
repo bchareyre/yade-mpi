@@ -104,8 +104,8 @@ void ErrorTolerantDynamicEngine::respondToCollisions(Body* body)
 		penetrationDepthes.resize(bodies.size());
 		penetrationVelocities.resize(bodies.size());
 	
-		Vector3 n,o1p1,o2p2;
-		Vector3 o1p1CrossN,o2p2CrossN;
+		Vector3r n,o1p1,o2p2;
+		Vector3r o1p1CrossN,o2p2CrossN;
 		int id1,id2,offset1,offset2;
 		
 		list<shared_ptr<Interaction> >::const_iterator cti = ncb->interactions.begin();
@@ -177,7 +177,7 @@ void ErrorTolerantDynamicEngine::respondToCollisions(Body* body)
 		shared_ptr<RigidBody> rb = dynamic_pointer_cast<RigidBody>(bodies[i]);
 		if (rb)
 		{
-			Vector3 force = Omega::instance().getGravity()*rb->mass;
+			Vector3r force = Omega::instance().getGravity()*rb->mass;
 			int sign;
 			float f = force.length();
 

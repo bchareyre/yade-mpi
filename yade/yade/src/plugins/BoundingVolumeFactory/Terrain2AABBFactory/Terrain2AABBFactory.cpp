@@ -21,7 +21,7 @@ void Terrain2AABBFactory::registerAttributes()
 
 }
 
-shared_ptr<BoundingVolume> Terrain2AABBFactory::buildBoundingVolume(const shared_ptr<CollisionGeometry> cm, const Se3& )
+shared_ptr<BoundingVolume> Terrain2AABBFactory::buildBoundingVolume(const shared_ptr<CollisionGeometry> cm, const Se3r& )
 {
 	shared_ptr<Terrain> t = dynamic_pointer_cast<Terrain>(cm);
 	

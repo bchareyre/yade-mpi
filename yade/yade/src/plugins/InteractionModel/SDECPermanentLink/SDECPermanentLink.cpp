@@ -13,8 +13,8 @@ SDECPermanentLink::~SDECPermanentLink ()
 
 void SDECPermanentLink::processAttributes()
 {
-	shearForce = Vector3(0,0,0);
-	thetar = Vector3(0,0,0);
+	shearForce = Vector3r(0,0,0);
+	thetar = Vector3r(0,0,0);
 }
 
 void SDECPermanentLink::registerAttributes()

@@ -10,7 +10,7 @@ BoundingVolumeHierarchy::~BoundingVolumeHierarchy ()
 
 }
 	
-void BoundingVolumeHierarchy::move(Se3& )
+void BoundingVolumeHierarchy::move(Se3r& )
 {
 
 

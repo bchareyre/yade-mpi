@@ -30,19 +30,19 @@ class Terrain : public CollisionGeometry
 	};
 
 
-	public : std::vector<Vector3> vertices;
+	public : std::vector<Vector3r> vertices;
 	public : std::vector<tFace> faces;
-	public : std::vector<Vector3> normals;
+	public : std::vector<Vector3r> normals;
 	public : string fileName;
 
-	public : Vector3 min;
-	public : Vector3 max;
-//  	public :  inline Vector3& min() { return _min; };
-//  	public :  inline Vector3& max() { return _max; };
+	public : Vector3r min;
+	public : Vector3r max;
+//  	public :  inline Vector3r& min() { return _min; };
+//  	public :  inline Vector3r& max() { return _max; };
 
 	private : float cellSizeX,cellSizeZ;
 	private : int nbTriPerCell,nbCells;
-	private : bool pointInTriangle(Vector2 p ,std::vector<Vector2>& tri);
+	private : bool pointInTriangle(Vector2r p ,std::vector<Vector2r>& tri);
 
 	protected : void buildCollisionGeometry();
 

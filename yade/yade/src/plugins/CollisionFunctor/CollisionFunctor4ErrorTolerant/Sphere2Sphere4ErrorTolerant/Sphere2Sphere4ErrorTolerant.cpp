@@ -45,21 +45,21 @@ Sphere2Sphere4ErrorTolerant::~Sphere2Sphere4ErrorTolerant ()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool Sphere2Sphere4ErrorTolerant::collide(const shared_ptr<CollisionGeometry> cm1, const shared_ptr<CollisionGeometry> cm2, const Se3& se31, const Se3& se32, shared_ptr<Interaction> c)
+bool Sphere2Sphere4ErrorTolerant::collide(const shared_ptr<CollisionGeometry> cm1, const shared_ptr<CollisionGeometry> cm2, const Se3r& se31, const Se3r& se32, shared_ptr<Interaction> c)
 {
 	shared_ptr<Sphere> s1 = dynamic_pointer_cast<Sphere>(cm1);
 	shared_ptr<Sphere> s2 = dynamic_pointer_cast<Sphere>(cm2);
 
-	Vector3 normal = se32.translation-se31.translation;
-	float penetrationDepth = s1->radius+s2->radius-normal.unitize();
+	Vector3r normal = se32.translation-se31.translation;
+	float penetrationDepth = s1->radius+s2->radius-normal.normalize();
 
 	if (penetrationDepth>0)
 	{
 		shared_ptr<ErrorTolerantContactModel> cm = shared_ptr<ErrorTolerantContactModel>(new ErrorTolerantContactModel());
 
-		Vector3 pt1 = se31.translation+normal*s1->radius;
-		Vector3 pt2 = se32.translation-normal*s2->radius;
-		cm->closestPoints.push_back(std::pair<Vector3,Vector3>(pt1,pt2));
+		Vector3r pt1 = se31.translation+normal*s1->radius;
+		Vector3r pt2 = se32.translation-normal*s2->radius;
+		cm->closestPoints.push_back(std::pair<Vector3r,Vector3r>(pt1,pt2));
 		cm->o1p1 = pt1-se31.translation;
 		cm->o2p2 = pt2-se32.translation;
 		cm->normal = normal;
@@ -74,7 +74,7 @@ bool Sphere2Sphere4ErrorTolerant::collide(const shared_ptr<CollisionGeometry> cm
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool Sphere2Sphere4ErrorTolerant::reverseCollide(const shared_ptr<CollisionGeometry> cm1, const shared_ptr<CollisionGeometry> cm2,  const Se3& se31, const Se3& se32, shared_ptr<Interaction> c)
+bool Sphere2Sphere4ErrorTolerant::reverseCollide(const shared_ptr<CollisionGeometry> cm1, const shared_ptr<CollisionGeometry> cm2,  const Se3r& se31, const Se3r& se32, shared_ptr<Interaction> c)
 {
 	return collide(cm1,cm2,se31,se32,c);
 }

@@ -29,13 +29,13 @@ void ExplicitMassSpringDynamicEngine::respondToCollisions(Body * body)
 	float dt = Omega::instance().dt;
 	MassSpringBody * massSpring = dynamic_cast<MassSpringBody*>(body);
 
-	Vector3 gravity = Omega::instance().getGravity();
+	Vector3r gravity = Omega::instance().getGravity();
 	
 	float damping	= massSpring->damping;
 	float stiffness	= massSpring->stiffness;
 
 	shared_ptr<Mesh2D> mesh = dynamic_pointer_cast<Mesh2D>(massSpring->gm);
-	vector<Vector3>& vertices = mesh->vertices;
+	vector<Vector3r>& vertices = mesh->vertices;
 	vector<Edge>& edges	  = mesh->edges;
 
 	if (first)
@@ -44,15 +44,15 @@ void ExplicitMassSpringDynamicEngine::respondToCollisions(Body * body)
 		prevVelocities.resize(vertices.size());
 		/*vector<NodeProperties>::iterator pi = massSpring->properties.begin();
 		vector<NodeProperties>::iterator piEnd = massSpring->properties.end();
-		vector<Vector3>::iterator pvi = prevVelocities.begin();
+		vector<Vector3r>::iterator pvi = prevVelocities.begin();
 		for( ; pi!=piEnd ; ++pi,++pvi)
 			*pvi = (*pi).velocity;*/
 	}
 	
-	std::fill(forces.begin(),forces.end(),Vector3(0,0,0));
+	std::fill(forces.begin(),forces.end(),Vector3r(0,0,0));
 	
-	vector<pair<int,Vector3> >::iterator efi    = massSpring->externalForces.begin();
-	vector<pair<int,Vector3> >::iterator efiEnd = massSpring->externalForces.end();
+	vector<pair<int,Vector3r> >::iterator efi    = massSpring->externalForces.begin();
+	vector<pair<int,Vector3r> >::iterator efiEnd = massSpring->externalForces.end();
 	for(; efi!=efiEnd; ++efi)
 		forces[(*efi).first] += (*efi).second;
 	
@@ -60,14 +60,15 @@ void ExplicitMassSpringDynamicEngine::respondToCollisions(Body * body)
 	vector<Edge>::iterator eiEnd = edges.end();
 	for(int i=0 ; ei!=eiEnd; ++ei,i++)
 	{
-		Vector3 v1 = vertices[(*ei).first];
-		Vector3 v2 = vertices[(*ei).second];
+		Vector3r v1 = vertices[(*ei).first];
+		Vector3r v2 = vertices[(*ei).second];
 		float l  = (v2-v1).length();
 		float l0 = massSpring->initialLengths[i];
-		Vector3 dir = (v2-v1).normalize();
+		Vector3r dir = (v2-v1);
+		dir.normalize();
 		float e  = (l-l0)/l0;
 		float relativeVelocity = dir.dot((massSpring->properties[(*ei).second].velocity-massSpring->properties[(*ei).first].velocity));
-		Vector3 f3 = (e*stiffness+relativeVelocity*damping)*dir;
+		Vector3r f3 = (e*stiffness+relativeVelocity*damping)*dir;
 		forces[(*ei).first]  += f3;
 		forces[(*ei).second] -= f3;
 	}
@@ -75,7 +76,7 @@ void ExplicitMassSpringDynamicEngine::respondToCollisions(Body * body)
 		
 	for(unsigned int i=0; i < vertices.size(); i++)
         {
-		Vector3 acc = Vector3(0,0,0);
+		Vector3r acc = Vector3r(0,0,0);
 
 		if (massSpring->properties[i].invMass!=0)
 			acc = Omega::instance().getGravity() + forces[i]*massSpring->properties[i].invMass;

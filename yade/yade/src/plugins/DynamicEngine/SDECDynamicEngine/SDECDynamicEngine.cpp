@@ -128,8 +128,8 @@ void SDECDynamicEngine::filter(Body* body)
 		shared_ptr<SDECContactModel> scm = dynamic_pointer_cast<SDECContactModel>((*cti)->interactionGeometry);
 
 		// here we want to get new geometrical info about contact but we want to remember physical infos from previous time step about it
-		Vector3 cp = scm->contactPoint;
-		Vector3 n = scm->normal;
+		Vector3r cp = scm->contactPoint;
+		Vector3r n = scm->normal;
 		float pd = scm->penetrationDepth;
 		float r1 = scm->radius1;
 		float r2 = scm->radius2;
@@ -157,7 +157,7 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 	NonConnexBody * ncb = dynamic_cast<NonConnexBody*>(body);
 	vector<shared_ptr<Body> >& bodies = ncb->bodies;
 
-	Vector3 gravity = Omega::instance().getGravity();
+	Vector3r gravity = Omega::instance().getGravity();
 	float dt = Omega::instance().dt;
 
 	if (first)
@@ -166,8 +166,8 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 		moments.resize(bodies.size());
 	}
 
-	fill(forces.begin(),forces.end(),Vector3(0,0,0));
-	fill(moments.begin(),moments.end(),Vector3(0,0,0));
+	fill(forces.begin(),forces.end(),Vector3r(0,0,0));
+	fill(moments.begin(),moments.end(),Vector3r(0,0,0));
 
 
 
@@ -229,14 +229,15 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 		currentContact->kn 			= currentContact->initialKn;
 		currentContact->ks 			= currentContact->initialKs;
 		currentContact->equilibriumDistance 	= currentContact->initialEquilibriumDistance;
-		currentContact->normal 			= (de2->se3.translation-de1->se3.translation).normalize();
+		currentContact->normal 			= (de2->se3.translation-de1->se3.translation);
+		currentContact->normal.normalize();
 		float un 				= currentContact->equilibriumDistance-(de2->se3.translation-de1->se3.translation).length();
 		currentContact->normalForce		= currentContact->kn*un*currentContact->normal;
 
 		if (first)
 			currentContact->prevNormal = currentContact->normal;
 
-		Vector3 axis;
+		Vector3r axis;
 		float angle;
 
 ////////////////////////////////////////////////////////////
@@ -254,7 +255,7 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 /// Here is the code without approximated rotations 	 ///
 ////////////////////////////////////////////////////////////
 
-// 		Quaternion q;
+// 		Quaternionr q;
 //
 // 		axis				= currentContact->prevNormal.cross(currentContact->normal);
 // 		angle				= acos(currentContact->normal.dot(currentContact->prevNormal));
@@ -271,18 +272,18 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 /// 							 ///
 ////////////////////////////////////////////////////////////
 
-		Vector3 x	= de1->se3.translation+(currentContact->radius1-0.5*un)*currentContact->normal;
-		//Vector3 x	= (de1->se3.translation+de2->se3.translation)*0.5;
+		Vector3r x	= de1->se3.translation+(currentContact->radius1-0.5*un)*currentContact->normal;
+		//Vector3r x	= (de1->se3.translation+de2->se3.translation)*0.5;
 		//cout << currentContact->contactPoint << " || " << (de1->se3.translation+de2->se3.translation)*0.5 << endl;
-		Vector3 c1x	= (x - de1->se3.translation);
-		Vector3 c2x	= (x - de2->se3.translation);
+		Vector3r c1x	= (x - de1->se3.translation);
+		Vector3r c2x	= (x - de2->se3.translation);
 
-		Vector3 relativeVelocity 	= (de2->velocity+de2->angularVelocity.cross(c2x)) - (de1->velocity+de1->angularVelocity.cross(c1x));
-		Vector3 shearVelocity		= relativeVelocity-currentContact->normal.dot(relativeVelocity)*currentContact->normal;
-		Vector3 shearDisplacement	= shearVelocity*dt;
+		Vector3r relativeVelocity 	= (de2->velocity+de2->angularVelocity.cross(c2x)) - (de1->velocity+de1->angularVelocity.cross(c1x));
+		Vector3r shearVelocity		= relativeVelocity-currentContact->normal.dot(relativeVelocity)*currentContact->normal;
+		Vector3r shearDisplacement	= shearVelocity*dt;
 		currentContact->shearForce      -=  currentContact->ks*shearDisplacement;
 
-		Vector3 f = currentContact->normalForce + currentContact->shearForce;
+		Vector3r f = currentContact->normalForce + currentContact->shearForce;
 
 		forces[id1]	-= f;
 		forces[id2]	+= f;
@@ -304,14 +305,15 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 			currentContact->kr = currentContact->ks * currentContact->averageRadius * currentContact->averageRadius;
 		}
 
-		Vector3 n	= currentContact->normal;
-		Vector3 prevN	= currentContact->prevNormal;
-		Vector3 t1	= currentContact->shearForce.normalized();
-		Vector3 t2	= n.unitCross(t1);
+		Vector3r n	= currentContact->normal;
+		Vector3r prevN	= currentContact->prevNormal;
+		Vector3r t1	= currentContact->shearForce;
+		t1.normalize();
+		Vector3r t2	= n.unitCross(t1);
 
 // 		if (n[0]!=0 && n[1]!=0 && n[2]!=0)
 // 		{
-// 			t1 = Vector3(0,0,sqrt(1.0/(1+(n[2]*n[2]/(n[1]*n[1])))));
+// 			t1 = Vector3r(0,0,sqrt(1.0/(1+(n[2]*n[2]/(n[1]*n[1])))));
 // 			t1[1] = -n[2]/n[1]*t1[2];
 // 			t1.normalize();
 // 			t2 = n.unitCross(t1);
@@ -320,40 +322,40 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 // 		{
 // 			if (n[0]==0 && n[1]!=0 && n[2]!=0)
 // 			{
-// 				t1 = Vector3(1,0,0);
+// 				t1 = Vector3r(1,0,0);
 // 				t2 = n.unitCross(t1);
 // 			}
 // 			else if (n[0]!=0 && n[1]==0 && n[2]!=0)
 // 			{
-// 				t1 = Vector3(0,1,0);
+// 				t1 = Vector3r(0,1,0);
 // 				t2 = n.unitCross(t1);
 // 			}
 // 			else if (n[0]!=0 && n[1]!=0 && n[2]==0)
 // 			{
-// 				t1 = Vector3(0,0,1);
+// 				t1 = Vector3r(0,0,1);
 // 				t2 = n.unitCross(t1);
 // 			}
 // 			else if (n[0]==0 && n[1]==0 && n[2]!=0)
 // 			{
-// 				t1 = Vector3(1,0,0);
-// 				t2 = Vector3(0,1,0);
+// 				t1 = Vector3r(1,0,0);
+// 				t2 = Vector3r(0,1,0);
 // 			}
 // 			else if (n[0]==0 && n[1]!=0 && n[2]==0)
 // 			{
-// 				t1 = Vector3(0,0,1);
-// 				t2 = Vector3(1,0,0);
+// 				t1 = Vector3r(0,0,1);
+// 				t2 = Vector3r(1,0,0);
 // 			}
 // 			else if (n[0]!=0 && n[1]==0 && n[2]==0)
 // 			{
-// 				t1 = Vector3(0,1,0);
-// 				t2 = Vector3(0,0,1);
+// 				t1 = Vector3r(0,1,0);
+// 				t2 = Vector3r(0,0,1);
 // 			}
 // 		}
 
-		Quaternion q_i_n,q_n_i;
+		Quaternionr q_i_n,q_n_i;
 
 		q_i_n.fromAxes(n,t1,t2);
-		q_i_n.fromAxes(Vector3(1,0,0),Vector3(0,1,0),Vector3(0,0,1)); // use identity matrix
+		q_i_n.fromAxes(Vector3r(1,0,0),Vector3r(0,1,0),Vector3r(0,0,1)); // use identity matrix
 		//q_i_n.invert();					      // in case of the order of rotation is wrong
 		q_n_i = q_i_n.inverse();
 
@@ -361,8 +363,8 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 /// Using Euler angle				 	 ///
 ////////////////////////////////////////////////////////////
 
-// 		Vector3 dBeta;
-// 		Vector3 orientation_Nc,orientation_Nc_old;
+// 		Vector3r dBeta;
+// 		Vector3r orientation_Nc,orientation_Nc_old;
 // 		for(int i=0;i<3;i++)
 // 		{
 // 			int j = (i+1)%3;
@@ -382,7 +384,7 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 // 		dBeta = orientation_Nc - orientation_Nc_old;
 //
 //
-// 		Vector3 dRotationA,dRotationB,da,db;
+// 		Vector3r dRotationA,dRotationB,da,db;
 // 		de1->se3.rotation.toEulerAngles(dRotationA);
 // 		de2->se3.rotation.toEulerAngles(dRotationB);
 //
@@ -392,7 +394,7 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 // 		dRotationA -= da;
 // 		dRotationB -= db;
 //
-// 		Vector3 dUr = 	( currentContact->radius1*(  dRotationA  -  dBeta)
+// 		Vector3r dUr = 	( currentContact->radius1*(  dRotationA  -  dBeta)
 // 				- currentContact->radius2*(  dRotationB  -  dBeta) ) * 0.5;
 
 ////////////////////////////////////////////////////////////
@@ -400,25 +402,25 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 ////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////
-/// Using Quaternion				 	 ///
+/// Using Quaternionr				 	 ///
 ////////////////////////////////////////////////////////////
 
-		Quaternion q,q1,q2;
-		Vector3 dRotationAMinusDBeta,dRotationBMinusDBeta;
+		Quaternionr q,q1,q2;
+		Vector3r dRotationAMinusDBeta,dRotationBMinusDBeta;
 
-		q.alignAxis(n,prevN);
-		q1 = (de1->se3.rotation*currentContact->prevRotation1.invert())*q.invert();
-		q2 = (de2->se3.rotation*currentContact->prevRotation2.invert())*q.invert();
+		q.align(n,prevN);
+		q1 = (de1->se3.rotation*currentContact->prevRotation1.inverse())*q.inverse();
+		q2 = (de2->se3.rotation*currentContact->prevRotation2.inverse())*q.inverse();
 		q1.toEulerAngles(dRotationAMinusDBeta);
 		q2.toEulerAngles(dRotationBMinusDBeta);
-		Vector3 dUr = ( currentContact->radius1*dRotationAMinusDBeta - currentContact->radius2*dRotationBMinusDBeta ) * 0.5;
+		Vector3r dUr = ( currentContact->radius1*dRotationAMinusDBeta - currentContact->radius2*dRotationBMinusDBeta ) * 0.5;
 
 ////////////////////////////////////////////////////////////
-/// Ending of use of Quaternion			 	 ///
+/// Ending of use of Quaternionr			 	 ///
 ////////////////////////////////////////////////////////////
 
 
-		Vector3 dThetar = dUr/currentContact->averageRadius;
+		Vector3r dThetar = dUr/currentContact->averageRadius;
 
 		currentContact->thetar += dThetar;
 
@@ -427,9 +429,9 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 
 		float normMPlastic = currentContact->heta*fNormal;
 
-		Vector3 thetarn = q_i_n*currentContact->thetar; // rolling angle
+		Vector3r thetarn = q_i_n*currentContact->thetar; // rolling angle
 
-		Vector3 mElastic = currentContact->kr * thetarn;
+		Vector3r mElastic = currentContact->kr * thetarn;
 
 		//mElastic[0] = 0;  // No moment around normal direction
 
@@ -443,7 +445,7 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 		//}
 		//else
 		//{
-		//	Vector3 mPlastic = normMPlastic*mElastic.normalized();
+		//	Vector3r mPlastic = normMPlastic*mElastic.normalized();
 		//	moments[id1]	-= q_n_i*mPlastic;
 		//	moments[id2]	+= q_n_i*mPlastic;
 		//	thetarn = mPlastic/currentContact->kr;
@@ -491,7 +493,7 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 			currentContact->initialKn			= 2*(de1->kn*de2->kn)/(de1->kn+de2->kn);
 			currentContact->initialKs			= 2*(de1->ks*de2->ks)/(de1->ks+de2->ks);
 			currentContact->prevNormal 			= currentContact->normal;
-			currentContact->shearForce			= Vector3(0,0,0);
+			currentContact->shearForce			= Vector3r(0,0,0);
 			currentContact->initialEquilibriumDistance	= currentContact->radius1+currentContact->radius2;
 		}
 
@@ -503,7 +505,7 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 		float un 			= currentContact->penetrationDepth;
 		currentContact->normalForce	= currentContact->kn*un*currentContact->normal;
 
-		Vector3 axis;
+		Vector3r axis;
 		float angle;
 
 ////////////////////////////////////////////////////////////
@@ -521,7 +523,7 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 /// Here is the code without approximated rotations 	 ///
 ////////////////////////////////////////////////////////////
 
-// 		Quaternion q;
+// 		Quaternionr q;
 //
 // 		axis				= currentContact->prevNormal.cross(currentContact->normal);
 // 		angle				= acos(currentContact->normal.dot(currentContact->prevNormal));
@@ -538,15 +540,15 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 /// 							 ///
 ////////////////////////////////////////////////////////////
 
-		Vector3 x			= currentContact->contactPoint;
-		Vector3 c1x			= (x - de1->se3.translation);
-		Vector3 c2x			= (x - de2->se3.translation);
-		Vector3 relativeVelocity 	= (de2->velocity+de2->angularVelocity.cross(c2x)) - (de1->velocity+de1->angularVelocity.cross(c1x));
-		Vector3 shearVelocity		= relativeVelocity-currentContact->normal.dot(relativeVelocity)*currentContact->normal;
-		Vector3 shearDisplacement	= shearVelocity*dt;
+		Vector3r x			= currentContact->contactPoint;
+		Vector3r c1x			= (x - de1->se3.translation);
+		Vector3r c2x			= (x - de2->se3.translation);
+		Vector3r relativeVelocity 	= (de2->velocity+de2->angularVelocity.cross(c2x)) - (de1->velocity+de1->angularVelocity.cross(c1x));
+		Vector3r shearVelocity		= relativeVelocity-currentContact->normal.dot(relativeVelocity)*currentContact->normal;
+		Vector3r shearDisplacement	= shearVelocity*dt;
 		currentContact->shearForce     -=  currentContact->ks*shearDisplacement;
 
-		Vector3 f = currentContact->normalForce + currentContact->shearForce;
+		Vector3r f = currentContact->normalForce + currentContact->shearForce;
 
 		forces[id1]	-= f;
 		forces[id2]	+= f;
@@ -598,7 +600,7 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 			}
 
 			de->acceleration += forces[i]*de->invMass;
-			de->angularAcceleration += moments[i].multTerm(de->invInertia);
+			de->angularAcceleration += moments[i].multDiag(de->invInertia);
 		}
         }
 

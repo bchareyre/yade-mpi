@@ -5,8 +5,8 @@
 
 class ExplicitMassSpringDynamicEngine : public DynamicEngine
 {
-	private : std::vector<Vector3> prevVelocities;
-	private : std::vector<Vector3> forces;
+	private : std::vector<Vector3r> prevVelocities;
+	private : std::vector<Vector3r> forces;
 	private : bool first;
 
 	// construction

@@ -5,9 +5,9 @@
 
 class SimpleSpringDynamicEngine : public DynamicEngine
 {
-	private : std::vector<Vector3> prevVelocities;
-	private : std::vector<Vector3> forces;
-	private : std::vector<Vector3> couples;
+	private : std::vector<Vector3r> prevVelocities;
+	private : std::vector<Vector3r> forces;
+	private : std::vector<Vector3r> couples;
 	private : bool first;
 
 	// construction

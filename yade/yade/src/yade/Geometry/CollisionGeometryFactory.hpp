@@ -30,7 +30,6 @@
 #include "GeometricalModel.hpp"
 #include "CollisionGeometry.hpp"
 #include "Serializable.hpp"
-#include "Types.hpp"
 #include "Se3.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -47,7 +46,7 @@ class CollisionGeometryFactory : public Factorable
 	public : CollisionGeometryFactory ();
 	public : virtual ~CollisionGeometryFactory ();
 	
-	public : virtual shared_ptr<CollisionGeometry> buildCollisionGeometry(const shared_ptr<GeometricalModel> gm, const Se3& se3) = 0;
+	public : virtual shared_ptr<CollisionGeometry> buildCollisionGeometry(const shared_ptr<GeometricalModel> gm, const Se3r& se3) = 0;
 
 };
 

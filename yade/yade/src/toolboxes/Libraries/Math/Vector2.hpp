@@ -1,120 +1,122 @@
-/***************************************************************************
- *   Copyright (C) 2004 by Olivier Galizzi                                 *
- *   olivier.galizzi@imag.fr                                               *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
+// Magic Software, Inc.
+// http://www.magic-software.com
+// http://www.wild-magic.com
+// Copyright (c) 1998-2005.  All Rights Reserved
+//
+// The Wild Magic Library (WM3) source code is supplied under the terms of
+// the license agreement http://www.wild-magic.com/License/WildMagic3.pdf and
+// may not be copied or disclosed except in accordance with the terms of that
+// agreement.
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+#ifndef WM3VECTOR2_H
+#define WM3VECTOR2_H
 
-#ifndef __VECTOR2_H__
-#define __VECTOR2_H__
+#include "Math.hpp"
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+//namespace Wm3
+//{
 
-#include "Serializable.hpp"
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-class Vector2 : public Serializable
+template <class RealType>
+class Vector2
 {
+public:
+    // construction
+    Vector2 ();  // uninitialized
+    Vector2 (RealType fX, RealType fY);
+    Vector2 (const Vector2& rkV);
 
-	// construction
-	public : Vector2 ();
-	public : Vector2 (float fX, float fY);
-	public : Vector2 (float afCoordinate[2]);
-	public : Vector2 (const Vector2& rkVector);
+    // coordinate access
+    operator const RealType* () const;
+    operator RealType* ();
+    RealType operator[] (int i) const;
+    RealType& operator[] (int i);
+    RealType x () const;
+    RealType& x ();
+    RealType y () const;
+    RealType& y ();
 
-	// coordinates
-	public : float x, y;
+    // assignment
+    Vector2& operator= (const Vector2& rkV);
 
-	// access vector V as V[0] = V.x, V[1] = V.y
-	//
-	// WARNING.  These member functions rely on
-	// (1) Vector2 not having virtual functions
-	// (2) the data packed in a 3*sizeof(float) memory block
-	public : float& operator[] (int i) const;
-	public : operator float* ();
+    // comparison
+    bool operator== (const Vector2& rkV) const;
+    bool operator!= (const Vector2& rkV) const;
+    bool operator<  (const Vector2& rkV) const;
+    bool operator<= (const Vector2& rkV) const;
+    bool operator>  (const Vector2& rkV) const;
+    bool operator>= (const Vector2& rkV) const;
 
-	// assignment
-	public : Vector2& operator= (const Vector2& rkVector);
+    // arithmetic operations
+    Vector2 operator+ (const Vector2& rkV) const;
+    Vector2 operator- (const Vector2& rkV) const;
+    Vector2 operator* (RealType fScalar) const;
+    Vector2 operator/ (RealType fScalar) const;
+    Vector2 operator- () const;
 
-	// comparison (supports fuzzy arithmetic when FUZZ > 0)
-	public : bool operator== (const Vector2& rkVector) const;
-	public : bool operator!= (const Vector2& rkVector) const;
-	public : bool operator<  (const Vector2& rkVector) const;
-	public : bool operator<= (const Vector2& rkVector) const;
-	public : bool operator>  (const Vector2& rkVector) const;
-	public : bool operator>= (const Vector2& rkVector) const;
+    // arithmetic updates
+    Vector2& operator+= (const Vector2& rkV);
+    Vector2& operator-= (const Vector2& rkV);
+    Vector2& operator*= (RealType fScalar);
+    Vector2& operator/= (RealType fScalar);
 
-	// arithmetic operations
-	public : Vector2 operator+ (const Vector2& rkVector) const;
-	public : Vector2 operator- (const Vector2& rkVector) const;
-	public : Vector2 operator* (float fScalar) const;
-	public : Vector2 operator/ (float fScalar) const;
-	public : Vector2 operator- () const;
-	public : friend Vector2 operator* (float fScalar, const Vector2& rkVector);
+    // vector operations
+    RealType length () const;
+    RealType squaredLength () const;
+    RealType dot (const Vector2& rkV) const;
+    RealType normalize ();
+    Vector2 maxVector (const Vector2& rkV) const;
+    Vector2 minVector (const Vector2& rkV) const;
+    Vector2 multDiag (const Vector2& rkV) const;
+    
+    // returns (y,-x)
+    Vector2 perp () const;
 
-	// arithmetic updates
-	public : Vector2& operator+= (const Vector2& rkVector);
-	public : Vector2& operator-= (const Vector2& rkVector);
-	public : Vector2& operator*= (float fScalar);
-	public : Vector2& operator/= (float fScalar);
+    // returns (y,-x)/sqrt(x*x+y*y)
+    Vector2 unitPerp () const;
 
-	// vector operations
-	public : float length () const;
-	public : float squaredLength () const;
-	public : float dot (const Vector2& rkVector) const;
-	public : float unitize (float fTolerance = 1e-06f);
+    // returns DotPerp((x,y),(V.x,V.y)) = x*V.y - y*V.x
+    RealType dotPerp (const Vector2& rkV) const;
 
-	// special points
-	public : static const Vector2 ZERO;
-	public : static const Vector2 UNIT_X;
-	public : static const Vector2 UNIT_Y;
+    // Compute the barycentric coordinates of the point with respect to the
+    // triangle <V0,V1,V2>, P = b0*V0 + b1*V1 + b2*V2, where b0 + b1 + b2 = 1.
+    void getBarycentrics (const Vector2<RealType>& rkV0,
+        const Vector2<RealType>& rkV1, const Vector2<RealType>& rkV2,
+        RealType afBary[3]) const;
 
-	// fuzzy arithmetic (set FUZZ > 0 to enable)
-	public : static float FUZZ;
+    // Gram-Schmidt orthonormalization.  Take linearly independent vectors U
+    // and V and compute an orthonormal set (unit length, mutually
+    // perpendicular).
+    static void orthonormalize (Vector2& rkU, Vector2& rkV);
 
-	public : void registerAttributes()
-	{
-		REGISTER_ATTRIBUTE(x);
-		REGISTER_ATTRIBUTE(y);
-	}
+    // Input V must be initialized to a nonzero vector, output is {U,V}, an
+    // orthonormal basis.  A hint is provided about whether or not V is
+    // already unit length.
+    static void generateOrthonormalBasis (Vector2& rkU, Vector2& rkV,
+        bool bUnitLengthV);
 
-	REGISTER_CLASS_NAME(Vector2);
+    // special vectors
+    static const Vector2 ZERO;
+    static const Vector2 UNIT_X;
+    static const Vector2 UNIT_Y;
+
+private:
+    // support for comparisons
+    int compareArrays (const Vector2& rkV) const;
+
+    RealType m_afTuple[2];
 };
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class RealType>
+Vector2<RealType> operator* (RealType fScalar, const Vector2<RealType>& rkV);
 
 #include "Vector2.ipp"
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+typedef Vector2<float> Vector2f;
+typedef Vector2<double> Vector2d;
+typedef Vector2<Real> Vector2r;
 
-REGISTER_SERIALIZABLE(Vector2,true);
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+//}
 
-#endif // __VECTOR2_H__
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+#endif
 

@@ -45,10 +45,10 @@ void BallisticDynamicEngine::respondToCollisions(Body * body)
 
 	rb->se3.translation += prevVelocity*dt;
 
-	Vector3 axis = rb->angularVelocity;
-	float angle = axis.unitize();
-	Quaternion q;
-	q.fromAngleAxis(angle*dt,axis);
+	Vector3r axis = rb->angularVelocity;
+	float angle = axis.normalize();
+	Quaternionr q;
+	q.fromAxisAngle(axis,angle*dt);
 	rb->se3.rotation = q*rb->se3.rotation;
 	rb->se3.rotation.normalize();
 

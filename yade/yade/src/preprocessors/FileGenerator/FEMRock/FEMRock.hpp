@@ -7,10 +7,10 @@
 /*class NodeProperties : public Serializable
 {
 	public : float invMass;
-	public : Vector3 velocity;
+	public : Vector3r velocity;
 
 	public : NodeProperties() {};
-	public : NodeProperties(float im) : invMass(im), velocity(Vector3(0,0,0)) {};
+	public : NodeProperties(float im) : invMass(im), velocity(Vector3r(0,0,0)) {};
 	public : void processAttributes() {};
 	public : void registerAttributes()
 	{
@@ -23,7 +23,7 @@ REGISTER_CLASS(NodeProperties,false);*/
 
 class FEMRock : public Serializable
 {
-	public : vector<Vector3> nodes;
+	public : vector<Vector3r> nodes;
 	public : vector<vector<int> > tetrahedrons;
 
 	// construction

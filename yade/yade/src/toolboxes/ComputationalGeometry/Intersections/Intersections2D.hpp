@@ -28,15 +28,17 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "Vector3.hpp"
+#include <vector>
+using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-	int clipPolygon(Vector3 quad,const std::vector<Vector3>& polygon, std::vector<Vector3>& clipped);
-	void clipLeft(float sizeX, std::vector<Vector3> &polygon, Vector3 v1, Vector3 v2);
-	void clipRight(float sizeX, std::vector<Vector3>& polygon, Vector3 v1, Vector3 v2);
-	void clipTop(float sizeY, std::vector<Vector3>& polygon, Vector3 v1, Vector3 v2);
-	void clipBottom(float sizeY, std::vector<Vector3> &polygon, Vector3 v1, Vector3 v2);
+	int clipPolygon(Vector3r quad,const std::vector<Vector3r>& polygon, std::vector<Vector3r>& clipped);
+	void clipLeft(float sizeX, std::vector<Vector3r> &polygon, Vector3r v1, Vector3r v2);
+	void clipRight(float sizeX, std::vector<Vector3r>& polygon, Vector3r v1, Vector3r v2);
+	void clipTop(float sizeY, std::vector<Vector3r>& polygon, Vector3r v1, Vector3r v2);
+	void clipBottom(float sizeY, std::vector<Vector3r> &polygon, Vector3r v1, Vector3r v2);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////

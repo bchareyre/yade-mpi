@@ -48,14 +48,14 @@ class GeometricalModel : public Serializable
 
 	public : bool visible;
 	public : bool wire;
-	public : Vector3 diffuseColor; // + autres proprietes
+	public : Vector3r diffuseColor; // + autres proprietes
 
 	// construction
 	public : GeometricalModel ();
 
 	public : virtual ~GeometricalModel ();
 
-	//public : virtual bool rayIntersection(const Vector3& origin, const Vector3& direction, Vector3& point) = NULL;
+	//public : virtual bool rayIntersection(const Vector3r& origin, const Vector3r& direction, Vector3r& point) = NULL;
 
 	//public : virtual bool loadFromFile(char * fileName) = NULL;
 	public : virtual void glDraw() {};

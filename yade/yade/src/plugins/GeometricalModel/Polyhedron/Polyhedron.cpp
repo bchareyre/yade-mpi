@@ -100,9 +100,9 @@ void Polyhedron::computeNormals()
 
 	for(unsigned int i=0;i<faces.size();i++)
 	{
-		Vector3 v1 = vertices[faces[i][0]];
-		Vector3 v2 = vertices[faces[i][1]];
-		Vector3 v3 = vertices[faces[i][2]];
+		Vector3r v1 = vertices[faces[i][0]];
+		Vector3r v2 = vertices[faces[i][1]];
+		Vector3r v3 = vertices[faces[i][2]];
 		fNormals[i] = (v2-v1).cross(v3-v1);
 	}
 	/*for(unsigned int i=0;i<vertices.size();i++)

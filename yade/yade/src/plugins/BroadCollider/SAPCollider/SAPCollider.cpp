@@ -75,7 +75,7 @@ void SAPCollider::broadCollisionTest(Body* body)
 
 	// Updates the minimums and maximums arrays according to the new center and radius of the spheres
 	int offset;
-	Vector3 min,max;
+	Vector3r min,max;
 	for(i=0; i < bodies.size(); i++)
 	{
 		offset = 3*i;

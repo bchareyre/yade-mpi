@@ -3,35 +3,42 @@
 # Subdir relative project main directory: ./toolboxes/Libraries/Math
 # Target is a library:  
 
-LIBS += -lm \
-        -rdynamic 
-INCLUDEPATH = $(YADEINCLUDEPATH)
-MOC_DIR = $(YADECOMPILATIONPATH) 
-UI_DIR = $(YADECOMPILATIONPATH) 
-OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = $(YADEDYNLIBPATH) 
-DESTDIR = $(YADEDYNLIBPATH) 
-CONFIG += debug \
-          warn_on \
-          dll 
-TEMPLATE = lib 
-HEADERS += Matrix3.hpp \
-           Quaternion.hpp \
-           Se3.hpp \
-           Vector3.hpp \
-           Matrix3.ipp \
-           Quaternion.ipp \
+HEADERS += Se3.hpp \
            Se3.ipp \
-           Vector3.ipp \
-           Constants.hpp \
-           Rand.hpp \
-           Rand.ipp \
+           Math.hpp \
+           Matrix2.hpp \
+           Matrix3.hpp \
+           Matrix4.hpp \
+           Quaternion.hpp \
            Vector2.hpp \
-           Vector2.ipp 
-SOURCES += Matrix3.cpp \
+           Vector3.hpp \
+           Vector4.hpp \
+           Math.ipp \
+           Matrix2.ipp \
+           Matrix3.ipp \
+           Matrix4.ipp \
+           Quaternion.ipp \
+           Vector2.ipp \
+           Vector3.ipp \
+           Vector4.ipp 
+SOURCES += Se3.cpp \
+           Math.cpp \
+           Matrix2.cpp \
+           Matrix3.cpp \
+           Matrix4.cpp \
            Quaternion.cpp \
-           Se3.cpp \
+           Vector2.cpp \
            Vector3.cpp \
-           Constants.cpp \
-           Rand.cpp \
-           Vector2.cpp 
+           Vector4.cpp 
+LIBS += -lm \
+-rdynamic
+INCLUDEPATH = $(YADEINCLUDEPATH)
+MOC_DIR = $(YADECOMPILATIONPATH)
+UI_DIR = $(YADECOMPILATIONPATH)
+OBJECTS_DIR = $(YADECOMPILATIONPATH)
+QMAKE_LIBDIR = $(YADEDYNLIBPATH)
+DESTDIR = $(YADEDYNLIBPATH)
+CONFIG += debug \
+warn_on \
+dll
+TEMPLATE = lib

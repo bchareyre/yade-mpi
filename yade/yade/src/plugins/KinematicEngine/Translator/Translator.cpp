@@ -1,6 +1,5 @@
 #include "Translator.hpp"
 //#include "RigidBody.hpp"
-#include "Constants.hpp"
 #include "NonConnexBody.hpp"
 
 Translator::Translator () : KinematicEngine() // encapsuler dans implicitfunction user redefini uniquement dp = || interpolateur ...
@@ -48,13 +47,13 @@ void Translator::moveToNextTimeStep(Body * body)
 
 		// FIXME - specify intervals of activity for an actor
 		//if( Omega::instance().getIter() > 1000 )
-		//	b->velocity		= Vector3(0,0,0);
+		//	b->velocity		= Vector3r(0,0,0);
 		//else
 		//{
 
 			b->se3.translation	+= sign*dt*velocity*translationAxis;
 
-			b->velocity		=  sign*translationAxis*velocity;
+			b->velocity		=  sign*velocity*translationAxis;
 
 		// FIXME : this shouldn't be there
 			b->updateBoundingVolume(b->se3);

@@ -41,17 +41,17 @@ class Box2Box4ClosestFeatures : public CollisionFunctor
 		bool invertNormal;
 		float penetrationDepth;
 		int code;
-		Vector3 normal;
+		Vector3r normal;
 	} BoxBoxCollisionInfo;
 
 	// construction
 	public : Box2Box4ClosestFeatures ();
 	public : virtual ~Box2Box4ClosestFeatures ();
 
-	protected : virtual bool collide(const shared_ptr<CollisionGeometry> cm1, const shared_ptr<CollisionGeometry> cm2, const Se3& se31, const Se3& se32, shared_ptr<Interaction> c);
-	protected : virtual bool reverseCollide(const shared_ptr<CollisionGeometry> cm1, const shared_ptr<CollisionGeometry> cm2,  const Se3& se31, const Se3& se32, shared_ptr<Interaction> c);
+	protected : virtual bool collide(const shared_ptr<CollisionGeometry> cm1, const shared_ptr<CollisionGeometry> cm2, const Se3r& se31, const Se3r& se32, shared_ptr<Interaction> c);
+	protected : virtual bool reverseCollide(const shared_ptr<CollisionGeometry> cm1, const shared_ptr<CollisionGeometry> cm2,  const Se3r& se31, const Se3r& se32, shared_ptr<Interaction> c);
 
-	private : bool testSeparatingAxis(float expr1, float expr2, Vector3 n,int c,BoxBoxCollisionInfo* bbInfo);
+	private : bool testSeparatingAxis(float expr1, float expr2, Vector3r n,int c,BoxBoxCollisionInfo* bbInfo);
 
 	DEFINE_COLLISION_ORDER(Box,Box);
 };

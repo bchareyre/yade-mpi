@@ -24,7 +24,7 @@
 #include "Box2Box4ClosestFeatures.hpp"
 #include "Box.hpp"
 #include "ClosestFeatures.hpp"
-#include "Constants.hpp"
+#include "Math.hpp"
 #include "Intersections2D.hpp"
 #include "Intersections3D.hpp"
 
@@ -48,14 +48,14 @@ Box2Box4ClosestFeatures::~Box2Box4ClosestFeatures ()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool Box2Box4ClosestFeatures::collide(const shared_ptr<CollisionGeometry> cm1, const shared_ptr<CollisionGeometry> cm2, const Se3& se31, const Se3& se32, shared_ptr<Interaction> c)
+bool Box2Box4ClosestFeatures::collide(const shared_ptr<CollisionGeometry> cm1, const shared_ptr<CollisionGeometry> cm2, const Se3r& se31, const Se3r& se32, shared_ptr<Interaction> c)
 {
 	float r11,r12,r13,r21,r22,r23,r31,r32,r33,q11,q12,q13,q21,q22,q23,q31,q32,q33;
 	
-	Matrix3 axis1,axis1T,axis2,axis2T;
-	Vector3 _normal;
-	Vector3 pt1, pt2, o1p1, o2p2;
-	Vector3 extents1,extents2;
+	Matrix3r axis1,axis1T,axis2,axis2T;
+	Vector3r _normal;
+	Vector3r pt1, pt2, o1p1, o2p2;
+	Vector3r extents1,extents2;
 	
 	shared_ptr<Box> obb1 = shared_dynamic_cast<Box>(cm1);
 	shared_ptr<Box> obb2 = shared_dynamic_cast<Box>(cm2);
@@ -63,26 +63,26 @@ bool Box2Box4ClosestFeatures::collide(const shared_ptr<CollisionGeometry> cm1, c
 	int nbInteractions = 0;
 	
 	se31.rotation.toRotationMatrix(axis1T);
-	axis1 = axis1T.Transpose();
+	axis1 = axis1T.transpose();
 	
 	se32.rotation.toRotationMatrix(axis2T);
-	axis2 = axis2T.Transpose();
+	axis2 = axis2T.transpose();
 		
 	extents1 = obb1->extents;
 	extents2 = obb2->extents;
 	
 	//translation, in parent frame
-	Vector3 p = se32.translation-se31.translation;
+	Vector3r p = se32.translation-se31.translation;
 
 	//translation of p in A's frame
-	Vector3 pp;
+	Vector3r pp;
 	pp = axis1*p;
 
 	//calculate rotation matrix			
-	r11 = (axis1.GetRow(0)).dot(axis2.GetRow(0)); r12 = (axis1.GetRow(0)).dot(axis2.GetRow(1)); r13 = (axis1.GetRow(0)).dot(axis2.GetRow(2));
-	r21 = (axis1.GetRow(1)).dot(axis2.GetRow(0)); r22 = (axis1.GetRow(1)).dot(axis2.GetRow(1)); r23 = (axis1.GetRow(1)).dot(axis2.GetRow(2));
-	r31 = (axis1.GetRow(2)).dot(axis2.GetRow(0)); r32 = (axis1.GetRow(2)).dot(axis2.GetRow(1)); r33 = (axis1.GetRow(2)).dot(axis2.GetRow(2));
-	/*Matrix3 R = axis1*axis2T;
+	r11 = (axis1.getRow(0)).dot(axis2.getRow(0)); r12 = (axis1.getRow(0)).dot(axis2.getRow(1)); r13 = (axis1.getRow(0)).dot(axis2.getRow(2));
+	r21 = (axis1.getRow(1)).dot(axis2.getRow(0)); r22 = (axis1.getRow(1)).dot(axis2.getRow(1)); r23 = (axis1.getRow(1)).dot(axis2.getRow(2));
+	r31 = (axis1.getRow(2)).dot(axis2.getRow(0)); r32 = (axis1.getRow(2)).dot(axis2.getRow(1)); r33 = (axis1.getRow(2)).dot(axis2.getRow(2));
+	/*Matrix3r R = axis1*axis2T;
 	r11 = R[0][0]; r12 = R[0][1]; r13 = R[0][2];
 	r21 = R[1][0]; r22 = R[1][1]; r23 = R[1][2];
 	r31 = R[2][0]; r32 = R[2][1]; r33 = R[2][2];*/
@@ -95,57 +95,57 @@ bool Box2Box4ClosestFeatures::collide(const shared_ptr<CollisionGeometry> cm1, c
 	
 	bbInfo.isNormalPrincipalAxis = true;
 	bbInfo.invertNormal = false;
-	bbInfo.penetrationDepth = -Constants::MAX_FLOAT+1;
+	bbInfo.penetrationDepth = -Mathr::MAX_REAL+1;
 	bbInfo.code = 0;
 	
 	// separating axis = u1,u2,u3
-	if (!testSeparatingAxis(pp[0],(extents1[0] + extents2[0]*q11 + extents2[1]*q12 + extents2[2]*q13),axis1.GetRow(0),1,&bbInfo))
+	if (!testSeparatingAxis(pp[0],(extents1[0] + extents2[0]*q11 + extents2[1]*q12 + extents2[2]*q13),axis1.getRow(0),1,&bbInfo))
 		return false;
 		
-	if (!testSeparatingAxis(pp[1],(extents1[1] + extents2[0]*q21 + extents2[1]*q22 + extents2[2]*q23),axis1.GetRow(1),2,&bbInfo))
+	if (!testSeparatingAxis(pp[1],(extents1[1] + extents2[0]*q21 + extents2[1]*q22 + extents2[2]*q23),axis1.getRow(1),2,&bbInfo))
 		return false;	
 		
-	if (!testSeparatingAxis(pp[2],(extents1[2] + extents2[0]*q31 + extents2[1]*q32 + extents2[2]*q33),axis1.GetRow(2),3,&bbInfo))
+	if (!testSeparatingAxis(pp[2],(extents1[2] + extents2[0]*q31 + extents2[1]*q32 + extents2[2]*q33),axis1.getRow(2),3,&bbInfo))
 		return false;
 
 	// separating axis = v1,v2,v3
-	if (!testSeparatingAxis(axis2.GetRow(0).dot(p),(extents1[0]*q11+extents1[1]*q21+extents1[2]*q31+extents2[0]),axis2.GetRow(0),4,&bbInfo))
+	if (!testSeparatingAxis(axis2.getRow(0).dot(p),(extents1[0]*q11+extents1[1]*q21+extents1[2]*q31+extents2[0]),axis2.getRow(0),4,&bbInfo))
 		return false;	
 
-	if (!testSeparatingAxis(axis2.GetRow(1).dot(p),(extents1[0]*q12+extents1[1]*q22+extents1[2]*q32+extents2[1]),axis2.GetRow(1),5,&bbInfo))
+	if (!testSeparatingAxis(axis2.getRow(1).dot(p),(extents1[0]*q12+extents1[1]*q22+extents1[2]*q32+extents2[1]),axis2.getRow(1),5,&bbInfo))
 		return false;	
 		
-	if (!testSeparatingAxis(axis2.GetRow(2).dot(p),(extents1[0]*q13+extents1[1]*q23+extents1[2]*q33+extents2[2]),axis2.GetRow(2),6,&bbInfo))
+	if (!testSeparatingAxis(axis2.getRow(2).dot(p),(extents1[0]*q13+extents1[1]*q23+extents1[2]*q33+extents2[2]),axis2.getRow(2),6,&bbInfo))
 		return false;
 
 	// separating axis = u1 x (v1,v2,v3)
-	if (!testSeparatingAxis(pp[2]*r21-pp[1]*r31,(extents1[1]*q31+extents1[2]*q21+extents2[1]*q13+extents2[2]*q12),Vector3(0,-r31,r21),7,&bbInfo))
+	if (!testSeparatingAxis(pp[2]*r21-pp[1]*r31,(extents1[1]*q31+extents1[2]*q21+extents2[1]*q13+extents2[2]*q12),Vector3r(0,-r31,r21),7,&bbInfo))
 		return false;		
 		
-	if (!testSeparatingAxis(pp[2]*r22-pp[1]*r32,(extents1[1]*q32+extents1[2]*q22+extents2[0]*q13+extents2[2]*q11),Vector3(0,-r32,r22),8,&bbInfo))
+	if (!testSeparatingAxis(pp[2]*r22-pp[1]*r32,(extents1[1]*q32+extents1[2]*q22+extents2[0]*q13+extents2[2]*q11),Vector3r(0,-r32,r22),8,&bbInfo))
 		return false;		
 		
-	if (!testSeparatingAxis(pp[2]*r23-pp[1]*r33,(extents1[1]*q33+extents1[2]*q23+extents2[0]*q12+extents2[1]*q11),Vector3(0,-r33,r23),9,&bbInfo))
+	if (!testSeparatingAxis(pp[2]*r23-pp[1]*r33,(extents1[1]*q33+extents1[2]*q23+extents2[0]*q12+extents2[1]*q11),Vector3r(0,-r33,r23),9,&bbInfo))
 		return false;
 		
 	// separating axis = u2 x (v1,v2,v3)
-	if (!testSeparatingAxis(pp[0]*r31-pp[2]*r11,(extents1[0]*q31+extents1[2]*q11+extents2[1]*q23+extents2[2]*q22),Vector3(r31,0,-r11),10,&bbInfo))
+	if (!testSeparatingAxis(pp[0]*r31-pp[2]*r11,(extents1[0]*q31+extents1[2]*q11+extents2[1]*q23+extents2[2]*q22),Vector3r(r31,0,-r11),10,&bbInfo))
 		return false;
 		
-	if (!testSeparatingAxis(pp[0]*r32-pp[2]*r12,(extents1[0]*q32+extents1[2]*q12+extents2[0]*q23+extents2[2]*q21),Vector3(r32,0,-r12),11,&bbInfo))
+	if (!testSeparatingAxis(pp[0]*r32-pp[2]*r12,(extents1[0]*q32+extents1[2]*q12+extents2[0]*q23+extents2[2]*q21),Vector3r(r32,0,-r12),11,&bbInfo))
 		return false;
 		
-	if (!testSeparatingAxis(pp[0]*r33-pp[2]*r13,(extents1[0]*q33+extents1[2]*q13+extents2[0]*q22+extents2[1]*q21),Vector3(r33,0,-r13),12,&bbInfo))
+	if (!testSeparatingAxis(pp[0]*r33-pp[2]*r13,(extents1[0]*q33+extents1[2]*q13+extents2[0]*q22+extents2[1]*q21),Vector3r(r33,0,-r13),12,&bbInfo))
 		return false;	
 
 	// separating axis = u3 x (v1,v2,v3)
-	if (!testSeparatingAxis(pp[1]*r11-pp[0]*r21,(extents1[0]*q21+extents1[1]*q11+extents2[1]*q33+extents2[2]*q32),Vector3(-r21,r11,0),13,&bbInfo))
+	if (!testSeparatingAxis(pp[1]*r11-pp[0]*r21,(extents1[0]*q21+extents1[1]*q11+extents2[1]*q33+extents2[2]*q32),Vector3r(-r21,r11,0),13,&bbInfo))
 		return false;	
 		
-	if (!testSeparatingAxis(pp[1]*r12-pp[0]*r22,(extents1[0]*q22+extents1[1]*q12+extents2[0]*q33+extents2[2]*q31),Vector3(-r22,r12,0),14,&bbInfo))
+	if (!testSeparatingAxis(pp[1]*r12-pp[0]*r22,(extents1[0]*q22+extents1[1]*q12+extents2[0]*q33+extents2[2]*q31),Vector3r(-r22,r12,0),14,&bbInfo))
 		return false;	
 		
-	if (!testSeparatingAxis(pp[1]*r13-pp[0]*r23,(extents1[0]*q23+extents1[1]*q13+extents2[0]*q32+extents2[1]*q31),Vector3(-r23,r13,0),15,&bbInfo))
+	if (!testSeparatingAxis(pp[1]*r13-pp[0]*r23,(extents1[0]*q23+extents1[1]*q13+extents2[0]*q32+extents2[1]*q31),Vector3r(-r23,r13,0),15,&bbInfo))
 		return false;
 
 	int code = bbInfo.code;	
@@ -155,7 +155,7 @@ bool Box2Box4ClosestFeatures::collide(const shared_ptr<CollisionGeometry> cm1, c
 	bool isNormalPrincipalAxis = bbInfo.isNormalPrincipalAxis;
 	bool invertNormal = bbInfo.invertNormal;
 	float penetrationDepth = bbInfo.penetrationDepth;
-	Vector3 normal = bbInfo.normal;
+	Vector3r normal = bbInfo.normal;
 		
 	if (!isNormalPrincipalAxis)	
 		_normal = axis1T*normal;
@@ -167,38 +167,41 @@ bool Box2Box4ClosestFeatures::collide(const shared_ptr<CollisionGeometry> cm1, c
 	else
 		normal = _normal;
 		
-	normal.unitize(); 
+	normal.normalize(); 
 	penetrationDepth = -penetrationDepth;
 
 	if (code > 6) 
 	{
 		// an edge from box 1 touches an edge from box 2.
 		// find a point pa on the intersecting edge of box 1
-		Vector3 pa,pb;
-		Vector3 sign;
+		Vector3r pa,pb;
+		Vector3r sign;
 
 		pa = se31.translation;
-		sign[0] = (axis1.GetRow(0).dot(normal) > 0) ? 1.0 : -1.0;
-		sign[1] = (axis1.GetRow(1).dot(normal) > 0) ? 1.0 : -1.0;
-		sign[2] = (axis1.GetRow(2).dot(normal) > 0) ? 1.0 : -1.0;
-		pa+=(sign[0]*extents1[0])*axis1.GetRow(0);
-		pa+=(sign[1]*extents1[1])*axis1.GetRow(1);
-		pa+=(sign[2]*extents1[2])*axis1.GetRow(2);
+		sign[0] = (axis1.getRow(0).dot(normal) > 0) ? 1.0 : -1.0;
+		sign[1] = (axis1.getRow(1).dot(normal) > 0) ? 1.0 : -1.0;
+		sign[2] = (axis1.getRow(2).dot(normal) > 0) ? 1.0 : -1.0;
+		pa+=(sign[0]*extents1[0])*axis1.getRow(0);
+		pa+=(sign[1]*extents1[1])*axis1.getRow(1);
+		pa+=(sign[2]*extents1[2])*axis1.getRow(2);
 
 		// find a point pb on the intersecting edge of box 2
 		pb = se32.translation;
-		sign[0] = (axis2.GetRow(0).dot(normal) > 0) ? -1.0 : 1.0;
-		sign[1] = (axis2.GetRow(1).dot(normal) > 0) ? -1.0 : 1.0;
-		sign[2] = (axis2.GetRow(2).dot(normal) > 0) ? -1.0 : 1.0;
-		pb+=(sign[0]*extents2[0])*axis2.GetRow(0);
-		pb+=(sign[1]*extents2[1])*axis2.GetRow(1);
-		pb+=(sign[2]*extents2[2])*axis2.GetRow(2);
+		sign[0] = (axis2.getRow(0).dot(normal) > 0) ? -1.0 : 1.0;
+		sign[1] = (axis2.getRow(1).dot(normal) > 0) ? -1.0 : 1.0;
+		sign[2] = (axis2.getRow(2).dot(normal) > 0) ? -1.0 : 1.0;
+		pb+=(sign[0]*extents2[0])*axis2.getRow(0);
+		pb+=(sign[1]*extents2[1])*axis2.getRow(1);
+		pb+=(sign[2]*extents2[2])*axis2.getRow(2);
 
 		float alpha,beta;
-		Vector3 ua,ub;
+		Vector3r ua,ub;
 		
-		ua = axis1[(code-7)/3];
-		ub = axis2[(code-7)%3];
+		//ua = axis1[(code-7)/3];
+		//ub = axis2[(code-7)%3];
+		// FIXME : I'm not sure it is getRow now maybe it is getColumn
+		ua = axis1.getRow((code-7)/3);
+		ub = axis2.getRow((code-7)%3);
 		
 		lineClosestApproach(pa,ua,pb,ub,alpha,beta);
 		pa+=alpha*ua;
@@ -207,7 +210,7 @@ bool Box2Box4ClosestFeatures::collide(const shared_ptr<CollisionGeometry> cm1, c
 		//pt1 = pa;//(pa+pb+normal*penetrationDepth)*0.5;
 		//pt2 = pb;//(pa+pb-normal*penetrationDepth)*0.5;
 		shared_ptr<ClosestFeatures> cf = shared_ptr<ClosestFeatures>(new ClosestFeatures());
-		cf->closestsPoints.push_back(std::pair<Vector3,Vector3>(pa,pb));
+		cf->closestsPoints.push_back(std::pair<Vector3r,Vector3r>(pa,pb));
 		c->interactionGeometry = cf;
 		
 		nbInteractions++;
@@ -216,8 +219,8 @@ bool Box2Box4ClosestFeatures::collide(const shared_ptr<CollisionGeometry> cm1, c
 	}
 	
 	
-	Vector3 pa,pb,Sa,Sb;
-	Matrix3 Ra,Rb;
+	Vector3r pa,pb,Sa,Sb;
+	Matrix3r Ra,Rb;
 	
 	if (code <= 3) 
 	{
@@ -240,7 +243,7 @@ bool Box2Box4ClosestFeatures::collide(const shared_ptr<CollisionGeometry> cm1, c
 
 	// nr = normal vector of reference face dotted with axes of incident box.
 	// anr = absolute values of nr.
-	Vector3 normal2,nr,anr;
+	Vector3r normal2,nr,anr;
 	if (code <= 3) 
 		normal2 = normal;
 	else 
@@ -288,11 +291,11 @@ bool Box2Box4ClosestFeatures::collide(const shared_ptr<CollisionGeometry> cm1, c
 	}
 
 	// compute center point of incident face, in reference-face coordinates
-	Vector3 center;
+	Vector3r center;
 	if (nr[lanr] < 0) 
-		center = pb - pa + Rb.GetRow(lanr)*Sb[lanr];
+		center = pb - pa + Rb.getRow(lanr)*Sb[lanr];
 	else 
-		center = pb - pa - Rb.GetRow(lanr)*Sb[lanr];
+		center = pb - pa - Rb.getRow(lanr)*Sb[lanr];
 
 	// find the normal and non-normal axis numbers of the reference box
 	int codeN,code1,code2;
@@ -320,18 +323,20 @@ bool Box2Box4ClosestFeatures::collide(const shared_ptr<CollisionGeometry> cm1, c
 
 
 	// find the four corners of the incident face, in reference-face coordinates
-	std::vector<Vector3> quad;	// 2D coordinate of incident face (x,y pairs)
+	std::vector<Vector3r> quad;	// 2D coordinate of incident face (x,y pairs)
 	float c1,c2,m11,m12,m21,m22;
-	c1 = center.dot(Ra[code1]);
-	c2 = center.dot(Ra[code2]);
+	//c1 = center.dot(Ra.code1]);
+	//c2 = center.dot(Ra[code2]);
+	c1 = center.dot(Ra.getRow(code1));
+	c2 = center.dot(Ra.getRow(code2));
 	
 	// optimize this? - we have already computed this data above, but it is not
 	// stored in an easy-to-index format. for now it's quicker just to recompute
 	// the four dot products.
-	m11 = Ra.GetRow(code1).dot(Rb.GetRow(a1));
-	m12 = Ra.GetRow(code1).dot(Rb.GetRow(a2));
-	m21 = Ra.GetRow(code2).dot(Rb.GetRow(a1));
-	m22 = Ra.GetRow(code2).dot(Rb.GetRow(a2));
+	m11 = Ra.getRow(code1).dot(Rb.getRow(a1));
+	m12 = Ra.getRow(code1).dot(Rb.getRow(a2));
+	m21 = Ra.getRow(code2).dot(Rb.getRow(a1));
+	m22 = Ra.getRow(code2).dot(Rb.getRow(a2));
 	
 	float k1,k2,k3,k4;
 	
@@ -340,17 +345,17 @@ bool Box2Box4ClosestFeatures::collide(const shared_ptr<CollisionGeometry> cm1, c
 	k3 = m12*Sb[a2];
 	k4 = m22*Sb[a2];
 
-	quad.push_back(Vector3(c1 - k1 - k3, c2 - k2 - k4,0));
-	quad.push_back(Vector3(c1 - k1 + k3, c2 - k2 + k4,0));
-	quad.push_back(Vector3(c1 + k1 + k3, c2 + k2 + k4,0));
-	quad.push_back(Vector3(c1 + k1 - k3, c2 + k2 - k4,0));
+	quad.push_back(Vector3r(c1 - k1 - k3, c2 - k2 - k4,0));
+	quad.push_back(Vector3r(c1 - k1 + k3, c2 - k2 + k4,0));
+	quad.push_back(Vector3r(c1 + k1 + k3, c2 + k2 + k4,0));
+	quad.push_back(Vector3r(c1 + k1 - k3, c2 + k2 - k4,0));
 
 	// find the size of the reference face
-	Vector3 rect;
-	rect = Vector3(Sa[code1],Sa[code2],0);
+	Vector3r rect;
+	rect = Vector3r(Sa[code1],Sa[code2],0);
 
 	// intersect the incident and reference faces
-	std::vector<Vector3> ret;
+	std::vector<Vector3r> ret;
 
 	int n = clipPolygon (rect,quad,ret);
 
@@ -361,7 +366,7 @@ bool Box2Box4ClosestFeatures::collide(const shared_ptr<CollisionGeometry> cm1, c
 	// and compute the contact position and depth for each point. only keep
 	// those points that have a positive (penetrating) depth. delete points in
 	// the 'ret' array as necessary so that 'point' and 'ret' correspond.
-	std::vector<Vector3> point;	// penetrating contact points
+	std::vector<Vector3r> point;	// penetrating contact points
 	std::vector<float> dep;			// depths for those points
 
 	float det1 = 1.0/(m11*m22 - m12*m21);
@@ -381,7 +386,7 @@ bool Box2Box4ClosestFeatures::collide(const shared_ptr<CollisionGeometry> cm1, c
 		k1 =  m22*(ret[j][0]-c1) - m12*(ret[j][1]-c2);
 		k2 = -m21*(ret[j][0]-c1) + m11*(ret[j][1]-c2);
 		
-		point[cnum] = center + k1*Rb.GetRow(a1) + k2*Rb.GetRow(a2);
+		point[cnum] = center + k1*Rb.getRow(a1) + k2*Rb.getRow(a2);
 		
 		dep[cnum] = Sa[codeN] - normal2.dot(point[cnum]);
 		
@@ -405,7 +410,7 @@ bool Box2Box4ClosestFeatures::collide(const shared_ptr<CollisionGeometry> cm1, c
 			pt1 	= pt2+normal*dep[j];
 			//pt1	= point[j] + pa;
 			//pt2 	= pt1+normal*dep[j];
-			cf->closestsPoints.push_back(std::pair<Vector3,Vector3>(pt1,pt2));
+			cf->closestsPoints.push_back(std::pair<Vector3r,Vector3r>(pt1,pt2));
 		}
 		else
 		{
@@ -413,7 +418,7 @@ bool Box2Box4ClosestFeatures::collide(const shared_ptr<CollisionGeometry> cm1, c
 			//pt1 	= pt2-normal*dep[j];
 			pt1		= point[j] + pa;
 			pt2 	= pt1-normal*dep[j];
-			cf->closestsPoints.push_back(std::pair<Vector3,Vector3>(pt1,pt2));
+			cf->closestsPoints.push_back(std::pair<Vector3r,Vector3r>(pt1,pt2));
 		}
 		nbInteractions++;
 	}
@@ -425,13 +430,13 @@ bool Box2Box4ClosestFeatures::collide(const shared_ptr<CollisionGeometry> cm1, c
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool Box2Box4ClosestFeatures::reverseCollide(const shared_ptr<CollisionGeometry> cm1, const shared_ptr<CollisionGeometry> cm2,  const Se3& se31, const Se3& se32, shared_ptr<Interaction> c)
+bool Box2Box4ClosestFeatures::reverseCollide(const shared_ptr<CollisionGeometry> cm1, const shared_ptr<CollisionGeometry> cm2,  const Se3r& se31, const Se3r& se32, shared_ptr<Interaction> c)
 {
 	bool isColliding = collide(cm2,cm1,se32,se31,c);
 	if (isColliding)
 	{
 		shared_ptr<ClosestFeatures> cf = shared_dynamic_cast<ClosestFeatures>(c->interactionGeometry);
-		Vector3 tmp = cf->closestsPoints[0].first;
+		Vector3r tmp = cf->closestsPoints[0].first;
 		cf->closestsPoints[0].first = cf->closestsPoints[0].second;		
 		cf->closestsPoints[0].second = tmp;
 	}
@@ -441,7 +446,7 @@ bool Box2Box4ClosestFeatures::reverseCollide(const shared_ptr<CollisionGeometry>
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool Box2Box4ClosestFeatures::testSeparatingAxis(float expr1, float expr2, Vector3 n,int c,BoxBoxCollisionInfo* bbInfo)
+bool Box2Box4ClosestFeatures::testSeparatingAxis(float expr1, float expr2, Vector3r n,int c,BoxBoxCollisionInfo* bbInfo)
 {
 	float pd,l;
 

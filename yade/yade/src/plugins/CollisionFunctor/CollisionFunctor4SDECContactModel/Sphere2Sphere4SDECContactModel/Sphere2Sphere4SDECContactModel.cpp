@@ -45,13 +45,13 @@ Sphere2Sphere4SDECContactModel::~Sphere2Sphere4SDECContactModel ()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool Sphere2Sphere4SDECContactModel::collide(const shared_ptr<CollisionGeometry> cm1, const shared_ptr<CollisionGeometry> cm2, const Se3& se31, const Se3& se32, shared_ptr<Interaction> c)
+bool Sphere2Sphere4SDECContactModel::collide(const shared_ptr<CollisionGeometry> cm1, const shared_ptr<CollisionGeometry> cm2, const Se3r& se31, const Se3r& se32, shared_ptr<Interaction> c)
 {
 	shared_ptr<Sphere> s1 = dynamic_pointer_cast<Sphere>(cm1);
 	shared_ptr<Sphere> s2 = dynamic_pointer_cast<Sphere>(cm2);
 
-	Vector3 normal = se32.translation-se31.translation;
-	float penetrationDepth = s1->radius+s2->radius-normal.unitize();
+	Vector3r normal = se32.translation-se31.translation;
+	float penetrationDepth = s1->radius+s2->radius-normal.normalize();
 
 	if (penetrationDepth>0)
 	{
@@ -72,7 +72,7 @@ bool Sphere2Sphere4SDECContactModel::collide(const shared_ptr<CollisionGeometry>
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool Sphere2Sphere4SDECContactModel::reverseCollide(const shared_ptr<CollisionGeometry> cm1, const shared_ptr<CollisionGeometry> cm2,  const Se3& se31, const Se3& se32, shared_ptr<Interaction> c)
+bool Sphere2Sphere4SDECContactModel::reverseCollide(const shared_ptr<CollisionGeometry> cm1, const shared_ptr<CollisionGeometry> cm2,  const Se3r& se31, const Se3r& se32, shared_ptr<Interaction> c)
 {
 	return collide(cm1,cm2,se31,se32,c);
 }

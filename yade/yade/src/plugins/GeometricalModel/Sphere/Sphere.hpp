@@ -9,11 +9,11 @@ class Sphere : public CollisionGeometry
 
 		int number;
 
-	private : static vector<Vector3> vertices;
-	private : static vector<Vector3> faces;
+	private : static vector<Vector3r> vertices;
+	private : static vector<Vector3r> faces;
 	private : static int glWiredSphereList;
 	private : static int glSphereList;
-	private : void subdivideTriangle(Vector3& v1,Vector3& v2,Vector3& v3, int depth);
+	private : void subdivideTriangle(Vector3r& v1,Vector3r& v2,Vector3r& v3, int depth);
 	private : void drawSphere(int depth);
 
 	// construction

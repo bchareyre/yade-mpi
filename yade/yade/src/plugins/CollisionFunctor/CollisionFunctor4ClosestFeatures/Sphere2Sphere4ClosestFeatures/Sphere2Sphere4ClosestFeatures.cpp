@@ -45,18 +45,18 @@ Sphere2Sphere4ClosestFeatures::~Sphere2Sphere4ClosestFeatures ()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool Sphere2Sphere4ClosestFeatures::collide(const shared_ptr<CollisionGeometry> cm1, const shared_ptr<CollisionGeometry> cm2, const Se3& se31, const Se3& se32, shared_ptr<Interaction> c)
+bool Sphere2Sphere4ClosestFeatures::collide(const shared_ptr<CollisionGeometry> cm1, const shared_ptr<CollisionGeometry> cm2, const Se3r& se31, const Se3r& se32, shared_ptr<Interaction> c)
 {
 	shared_ptr<Sphere> s1 = dynamic_pointer_cast<Sphere>(cm1);
 	shared_ptr<Sphere> s2 = dynamic_pointer_cast<Sphere>(cm2);
 	
-	Vector3 v = se31.translation-se32.translation;
-	float l = v.unitize();
+	Vector3r v = se31.translation-se32.translation;
+	float l = v.normalize();
 	
 	if (l<s1->radius+s2->radius)
 	{
 		shared_ptr<ClosestFeatures> cf = shared_ptr<ClosestFeatures>(new ClosestFeatures());
-		cf->closestsPoints.push_back(std::pair<Vector3,Vector3>(se31.translation-v*s1->radius,se32.translation+v*s2->radius));
+		cf->closestsPoints.push_back(std::pair<Vector3r,Vector3r>(se31.translation-v*s1->radius,se32.translation+v*s2->radius));
 		c->interactionGeometry = cf;
 		return true;
 	}
@@ -68,7 +68,7 @@ bool Sphere2Sphere4ClosestFeatures::collide(const shared_ptr<CollisionGeometry> 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool Sphere2Sphere4ClosestFeatures::reverseCollide(const shared_ptr<CollisionGeometry> cm1, const shared_ptr<CollisionGeometry> cm2,  const Se3& se31, const Se3& se32, shared_ptr<Interaction> c)
+bool Sphere2Sphere4ClosestFeatures::reverseCollide(const shared_ptr<CollisionGeometry> cm1, const shared_ptr<CollisionGeometry> cm2,  const Se3r& se31, const Se3r& se32, shared_ptr<Interaction> c)
 {
 	return collide(cm1,cm2,se31,se32,c);
 }

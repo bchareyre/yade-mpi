@@ -28,11 +28,13 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "MultiMethodsManager.hpp"
+#include "Se3.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-class Se3;
+
+
 class Interaction;
 class CollisionGeometry;
 class CollisionFunctor;
@@ -54,7 +56,7 @@ class CollisionMultiMethodsManager : public MultiMethodsManager<CollisionFunctor
 
 	public : virtual bool addPair(const string& name1,const string& name2,const string& libName);
 
-	public : bool collide(const shared_ptr<CollisionGeometry> cm1, const shared_ptr<CollisionGeometry> cm2, const Se3& se31, const Se3& se32, shared_ptr<Interaction> c);
+	public : bool collide(const shared_ptr<CollisionGeometry> cm1, const shared_ptr<CollisionGeometry> cm2, const Se3r& se31, const Se3r& se32, shared_ptr<Interaction> c);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

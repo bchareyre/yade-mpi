@@ -46,40 +46,40 @@ Box2Sphere4ClosestFeatures::~Box2Sphere4ClosestFeatures ()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool Box2Sphere4ClosestFeatures::collide(const shared_ptr<CollisionGeometry> cm1, const shared_ptr<CollisionGeometry> cm2, const Se3& se31, const Se3& se32, shared_ptr<Interaction> c)
+bool Box2Sphere4ClosestFeatures::collide(const shared_ptr<CollisionGeometry> cm1, const shared_ptr<CollisionGeometry> cm2, const Se3r& se31, const Se3r& se32, shared_ptr<Interaction> c)
 {
 
-	//if (se31.rotation == Quaternion())
+	//if (se31.rotation == Quaternionr())
 	//	return collideAABoxSphere(cm1,cm2,se31,se32,c);
 	
-	Vector3 l,t,p,q,r;
+	Vector3r l,t,p,q,r;
 	bool onborder = false;
-	Vector3 pt1,pt2,normal;
-	Matrix3 axisT,axis;
+	Vector3r pt1,pt2,normal;
+	Matrix3r axisT,axis;
 	float depth;
 
 	shared_ptr<Sphere> s = dynamic_pointer_cast<Sphere>(cm2);
 	shared_ptr<Box> obb = dynamic_pointer_cast<Box>(cm1);
 	
-	Vector3 extents = obb->extents;
+	Vector3r extents = obb->extents;
 
 	se31.rotation.toRotationMatrix(axisT);
-	axis = axisT.Transpose();
+	axis = axisT.transpose();
 	
 	p = se32.translation-se31.translation;
 	
 	l[0] = extents[0];
-	t[0] = axis.GetRow(0).dot(p); 
+	t[0] = axis.getRow(0).dot(p); 
 	if (t[0] < -l[0]) { t[0] = -l[0]; onborder = true; }
 	if (t[0] >  l[0]) { t[0] =  l[0]; onborder = true; }
 
 	l[1] = extents[1];
-	t[1] = axis.GetRow(1).dot(p);
+	t[1] = axis.getRow(1).dot(p);
 	if (t[1] < -l[1]) { t[1] = -l[1]; onborder = true; }
 	if (t[1] >  l[1]) { t[1] =  l[1]; onborder = true; }
 
 	l[2] = extents[2];
-	t[2] = axis.GetRow(2).dot(p);
+	t[2] = axis.getRow(2).dot(p);
 	if (t[2] < -l[2]) { t[2] = -l[2]; onborder = true; }
 	if (t[2] >  l[2]) { t[2] =  l[2]; onborder = true; }
 	
@@ -99,19 +99,19 @@ bool Box2Sphere4ClosestFeatures::collide(const shared_ptr<CollisionGeometry> cm1
 		}
 		
 		// contact normal aligned with box edge along largest `t' value
-		Vector3 tmp = Vector3(0,0,0);
+		Vector3r tmp = Vector3r(0,0,0);
 
 		tmp[mini] = (t[mini] > 0) ? 1.0 : -1.0;
 		
 		normal = axisT*tmp;
 		
-		normal.unitize();
+		normal.normalize();
 		
 		pt1 = se32.translation + normal*min;
 		pt2 = se32.translation - normal*s->radius;	
 	
 		shared_ptr<ClosestFeatures> cf = shared_ptr<ClosestFeatures>(new ClosestFeatures());
-		cf->closestsPoints.push_back(std::pair<Vector3,Vector3>(pt1,pt2));
+		cf->closestsPoints.push_back(std::pair<Vector3r,Vector3r>(pt1,pt2));
 		c->interactionGeometry = cf;
 		
 		return true;	
@@ -128,12 +128,12 @@ bool Box2Sphere4ClosestFeatures::collide(const shared_ptr<CollisionGeometry> cm1
 	pt1 = q + se31.translation;
 
 	normal = r;
-	normal.unitize();
+	normal.normalize();
 
 	pt2 = se32.translation - normal * s->radius;
 	
 	shared_ptr<ClosestFeatures> cf = shared_ptr<ClosestFeatures>(new ClosestFeatures());
-	cf->closestsPoints.push_back(std::pair<Vector3,Vector3>(pt1,pt2));
+	cf->closestsPoints.push_back(std::pair<Vector3r,Vector3r>(pt1,pt2));
 	c->interactionGeometry = cf;
 	
 	return true;
@@ -142,13 +142,13 @@ bool Box2Sphere4ClosestFeatures::collide(const shared_ptr<CollisionGeometry> cm1
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool Box2Sphere4ClosestFeatures::reverseCollide(const shared_ptr<CollisionGeometry> cm1, const shared_ptr<CollisionGeometry> cm2,  const Se3& se31, const Se3& se32, shared_ptr<Interaction> c)
+bool Box2Sphere4ClosestFeatures::reverseCollide(const shared_ptr<CollisionGeometry> cm1, const shared_ptr<CollisionGeometry> cm2,  const Se3r& se31, const Se3r& se32, shared_ptr<Interaction> c)
 {
 	bool isColliding = collide(cm2,cm1,se32,se31,c);
 	if (isColliding)
 	{
 		shared_ptr<ClosestFeatures> cf = dynamic_pointer_cast<ClosestFeatures>(c->interactionGeometry);
-		Vector3 tmp = cf->closestsPoints[0].first;
+		Vector3r tmp = cf->closestsPoints[0].first;
 		cf->closestsPoints[0].first = cf->closestsPoints[0].second;		
 		cf->closestsPoints[0].second = tmp;
 	}

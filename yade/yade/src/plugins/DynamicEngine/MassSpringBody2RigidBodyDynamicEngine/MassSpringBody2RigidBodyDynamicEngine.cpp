@@ -48,18 +48,18 @@ void MassSpringBody2RigidBodyDynamicEngine::respondToCollisions(Body * body)
 			for(unsigned int i=0;i<cf->verticesId.size();i++)
 			{
 				
-				Vector3 p1 = cf->closestsPoints[i].first;
-				Vector3 p2 = cf->closestsPoints[i].second;
-				Vector3 dir = p2-p1;
-				float l = dir.unitize();
+				Vector3r p1 = cf->closestsPoints[i].first;
+				Vector3r p2 = cf->closestsPoints[i].second;
+				Vector3r dir = p2-p1;
+				float l = dir.normalize();
 				float relativeVelocity = dir.dot(rb->velocity);
 				float fi = 0.1*l*l/3.0+relativeVelocity*10;
-				Vector3 f = fi*dir;
+				Vector3r f = fi*dir;
 				rb->acceleration -= f*rb->invMass;
 				
-				c->externalForces.push_back(pair<int,Vector3>(mesh->faces[cf->verticesId[i]][0],f));
-				c->externalForces.push_back(pair<int,Vector3>(mesh->faces[cf->verticesId[i]][1],f));
-				c->externalForces.push_back(pair<int,Vector3>(mesh->faces[cf->verticesId[i]][2],f));
+				c->externalForces.push_back(pair<int,Vector3r>(mesh->faces[cf->verticesId[i]][0],f));
+				c->externalForces.push_back(pair<int,Vector3r>(mesh->faces[cf->verticesId[i]][1],f));
+				c->externalForces.push_back(pair<int,Vector3r>(mesh->faces[cf->verticesId[i]][2],f));
 			}		
 		}
 		else //if (cf->verticesId.size()==0)

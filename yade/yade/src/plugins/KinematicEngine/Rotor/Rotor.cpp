@@ -1,6 +1,5 @@
 #include "Rotor.hpp"
 #include "RigidBody.hpp"
-#include "Constants.hpp"
 #include "NonConnexBody.hpp"
 
 Rotor::Rotor () : KinematicEngine() // encapsuler dans implicitfunction user redefini uniquement dp = || interpolateur ...
@@ -36,10 +35,10 @@ void Rotor::moveToNextTimeStep(Body * body)
 	float dt = Omega::instance().dt;
 	time = dt;
 
-	Quaternion q;
-	q.fromAngleAxis(angularVelocity*dt,rotationAxis);
+	Quaternionr q;
+	q.fromAxisAngle(rotationAxis,angularVelocity*dt);
 
-	Vector3 ax;
+	Vector3r ax;
 	float an;
 
 	for(;ii!=iiEnd;++ii)
@@ -52,10 +51,10 @@ void Rotor::moveToNextTimeStep(Body * body)
 		b->se3.rotation		= q*b->se3.rotation;
 
 		b->se3.rotation.normalize();
-		b->se3.rotation.toAngleAxis(an,ax);
+		b->se3.rotation.toAxisAngle(ax,an);
 
 		b->angularVelocity	= rotationAxis*angularVelocity;
-		b->velocity		= Vector3(0,0,0);
+		b->velocity		= Vector3r(0,0,0);
 
 		// FIXME : this shouldn't be there
 		b->updateBoundingVolume(b->se3);

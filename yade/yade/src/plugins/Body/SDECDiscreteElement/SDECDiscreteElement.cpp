@@ -23,12 +23,12 @@ void SDECDiscreteElement::registerAttributes()
 }
 
 
-/*void SDECDiscreteElement::updateBoundingVolume(Se3& se3)
+/*void SDECDiscreteElement::updateBoundingVolume(Se3r& se3)
 {
 	bv->update(se3);
 }
 
-void SDECDiscreteElement::updateCollisionGeometry(Se3& )
+void SDECDiscreteElement::updateCollisionGeometry(Se3r& )
 {
 
 }

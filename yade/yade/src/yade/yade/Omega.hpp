@@ -34,15 +34,17 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-//#include "Vector3.hpp"
+#include "Vector3.hpp"
 //#include "Chrono.hpp"
 #include <iostream>
-#include "Types.hpp"
+#include <fstream>
+#include <boost/shared_ptr.hpp>
 #include "Singleton.hpp"
 //#include "NonConnexBody.hpp"
 //#include "CollisionFunctor.hpp"
 //class CollisionFunctor;
-class Vector3; // FIXME - this is acceptable, but should be removed.
+//template<typename Type>
+//struct Vector3; // FIXME - this is acceptable, but should be removed.
 //class Chrono;
 class NonConnexBody;
 //#include "MultiMethodsManager.hpp"
@@ -50,6 +52,7 @@ class NonConnexBody;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+using namespace boost;
 using namespace boost::posix_time;
 using namespace std;
 
@@ -62,8 +65,8 @@ class Omega : public Singleton<Omega>
 
 // FIXME - this must be a pimpl, or removed somewhere else. (circular dependency loop : 4 hours lost to find it, janek)
 	private : float gravity_x,gravity_y,gravity_z;
-	public : Vector3 getGravity();
-	public : void setGravity(Vector3 g);
+	public : Vector3r getGravity();
+	public : void setGravity(Vector3r g);
 
 
 	public : shared_ptr<NonConnexBody> rootBody;

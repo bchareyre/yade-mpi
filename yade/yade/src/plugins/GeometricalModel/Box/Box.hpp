@@ -5,10 +5,10 @@
 
 class Box : public CollisionGeometry
 {
-	public : Vector3 extents;
+	public : Vector3r extents;
 
 	// construction
-	public : Box (Vector3 e);
+	public : Box (Vector3r e);
 	public : Box ();
 	public : ~Box ();
 

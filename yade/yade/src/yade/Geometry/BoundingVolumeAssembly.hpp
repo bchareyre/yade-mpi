@@ -34,7 +34,7 @@ class BoundingVolumeAssembly : public BoundingVolume
 	public : BoundingVolumeAssembly ();
 	public : ~BoundingVolumeAssembly ();
 	
-	public : void move(Se3& se3);
+	public : void move(Se3r& se3);
 	
 };
 

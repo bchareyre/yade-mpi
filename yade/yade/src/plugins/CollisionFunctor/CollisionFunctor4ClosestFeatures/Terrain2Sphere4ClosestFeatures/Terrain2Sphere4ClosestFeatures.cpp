@@ -47,18 +47,18 @@ Terrain2Sphere4ClosestFeatures::~Terrain2Sphere4ClosestFeatures ()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool Terrain2Sphere4ClosestFeatures::collide(const shared_ptr<CollisionGeometry> cm1, const shared_ptr<CollisionGeometry> cm2, const Se3& se31, const Se3& se32, shared_ptr<Interaction> c)
+bool Terrain2Sphere4ClosestFeatures::collide(const shared_ptr<CollisionGeometry> cm1, const shared_ptr<CollisionGeometry> cm2, const Se3r& se31, const Se3r& se32, shared_ptr<Interaction> c)
 {
-	Vector3 pt;
-	std::vector<Vector3> tri;
+	Vector3r pt;
+	std::vector<Vector3r> tri;
 	bool inCollision =  false;
 	std::vector<int> faces;
 	
 	shared_ptr<Terrain> t = dynamic_pointer_cast<Terrain>(cm1);
 	shared_ptr<Sphere> s  = dynamic_pointer_cast<Sphere>(cm2);
 	
-	Vector3 min,max;
-	Vector3 radius = Vector3(s->radius,s->radius,s->radius);
+	Vector3r min,max;
+	Vector3r radius = Vector3r(s->radius,s->radius,s->radius);
 	min = se32.translation-radius;
 	max = se32.translation+radius;
 	
@@ -77,9 +77,9 @@ bool Terrain2Sphere4ClosestFeatures::collide(const shared_ptr<CollisionGeometry>
 				
 		if (d<s->radius*s->radius)
 		{
-			Vector3 v = pt-se32.translation;
-			v.unitize();
-			cf->closestsPoints.push_back(std::pair<Vector3,Vector3>(pt,se32.translation+v*s->radius));
+			Vector3r v = pt-se32.translation;
+			v.normalize();
+			cf->closestsPoints.push_back(std::pair<Vector3r,Vector3r>(pt,se32.translation+v*s->radius));
 			inCollision =  true;
 		}
 	}
@@ -94,13 +94,13 @@ bool Terrain2Sphere4ClosestFeatures::collide(const shared_ptr<CollisionGeometry>
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool Terrain2Sphere4ClosestFeatures::reverseCollide(const shared_ptr<CollisionGeometry> cm1, const shared_ptr<CollisionGeometry> cm2,  const Se3& se31, const Se3& se32, shared_ptr<Interaction> c)
+bool Terrain2Sphere4ClosestFeatures::reverseCollide(const shared_ptr<CollisionGeometry> cm1, const shared_ptr<CollisionGeometry> cm2,  const Se3r& se31, const Se3r& se32, shared_ptr<Interaction> c)
 {
 	bool isColliding = collide(cm2,cm1,se32,se31,c);
 	if (isColliding)
 	{
 		shared_ptr<ClosestFeatures> cf = dynamic_pointer_cast<ClosestFeatures>(c->interactionGeometry);
-		Vector3 tmp = cf->closestsPoints[0].first;
+		Vector3r tmp = cf->closestsPoints[0].first;
 		cf->closestsPoints[0].first = cf->closestsPoints[0].second;		
 		cf->closestsPoints[0].second = tmp;
 	}

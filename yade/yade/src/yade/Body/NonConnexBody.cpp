@@ -4,7 +4,8 @@
 
 #include <GL/gl.h>
 #include <GL/glut.h>
-#include "Constants.hpp"
+#include "Math.hpp"
+
 #include "NonConnexBody.hpp"
 
 NonConnexBody::NonConnexBody() : Body()
@@ -25,11 +26,11 @@ void NonConnexBody::glDraw()
 	glPushMatrix();
 
 	float angle;
-	Vector3 axis;
-	se3.rotation.toAngleAxis(angle,axis);
+	Vector3r axis;
+	se3.rotation.toAxisAngle(axis,angle);
 
 	glTranslatef(se3.translation[0],se3.translation[1],se3.translation[2]);
-	glRotated(angle*Constants::RAD_TO_DEG,axis[0],axis[1],axis[2]);
+	glRotated(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
 
 	glDisable(GL_LIGHTING);
 
@@ -56,13 +57,13 @@ void NonConnexBody::registerAttributes()
 //	REGISTER_ATTRIBUTE(kinematic);
 }
 
-void NonConnexBody::updateBoundingVolume(Se3& se3)
+void NonConnexBody::updateBoundingVolume(Se3r& se3)
 {
 	for(unsigned int i=0;i<bodies.size();i++)
 		bodies[i]->updateBoundingVolume(se3);
 }
 
-void NonConnexBody::updateCollisionGeometry(Se3& )
+void NonConnexBody::updateCollisionGeometry(Se3r& )
 {
 
 }

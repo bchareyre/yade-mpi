@@ -1,5 +1,4 @@
 #include "Terrain.hpp"
-#include "Constants.hpp"
 
 #include <iostream>
 #include <GL/gl.h>
@@ -44,7 +43,7 @@ void Terrain::glDraw()
 	//{
 		std::vector<std::vector<int> >::iterator fsi	= faces.begin();
 		std::vector<std::vector<int> >::iterator fsiEnd	= faces.end();
-		std::vector<Vector3>::iterator ni = normals.begin();	
+		std::vector<Vector3r>::iterator ni = normals.begin();	
 
 		for( ; fsi!=fsiEnd; ++fsi, ++ni)
 		{
@@ -69,9 +68,9 @@ void Terrain::glDraw()
 		int faceId = testedFaces[k];
 		glBegin(GL_POLYGON);
 			glNormal3fv(normals[faceId]);
-			glVertex3fv(vertices[faces[faceId][0]]+Vector3(0,0.1,0));
-			glVertex3fv(vertices[faces[faceId][1]]+Vector3(0,0.1,0));
-			glVertex3fv(vertices[faces[faceId][2]]+Vector3(0,0.1,0));
+			glVertex3fv(vertices[faces[faceId][0]]+Vector3r(0,0.1,0));
+			glVertex3fv(vertices[faces[faceId][1]]+Vector3r(0,0.1,0));
+			glVertex3fv(vertices[faces[faceId][2]]+Vector3r(0,0.1,0));
 		glEnd();
 	}
 	testedFaces.clear();
@@ -97,7 +96,7 @@ void Terrain::loadWrl(const char * fileName)
 	findTag(file,"point\0");
 	findTag(file,"[\0");	
 
-	Vector3 p,barycenter;
+	Vector3r p,barycenter;
 	char c;
 	
 	barycenter[0] = barycenter[1] = barycenter[2] = 0;
@@ -145,7 +144,7 @@ void Terrain::loadWrl(const char * fileName)
 	int n;
 	
 	std::vector<int> vId;
-	Vector3 v1,v2,normal,faceBarycenter;
+	Vector3r v1,v2,normal,faceBarycenter;
 	stop = false;
 	while (!file->eof() && !stop)	
 	{
@@ -237,9 +236,9 @@ void Terrain::glDrawNormals()
 {
 	std::vector<std::vector<int> >::iterator fsi	= faces.begin();
 	std::vector<std::vector<int> >::iterator fsiEnd	= faces.end();
-	std::vector<Vector3>::iterator ni = normals.begin();	
+	std::vector<Vector3r>::iterator ni = normals.begin();	
 
-	Vector3 bary;
+	Vector3r bary;
 
 	for( ; fsi!=fsiEnd; ++fsi, ++ni)
 	{
@@ -267,13 +266,13 @@ void Terrain::glDrawNormals()
 void Terrain::reOrientFaces()
 {
 	
-	Vector3 bary = Vector3(0,0,0);
+	Vector3r bary = Vector3r(0,0,0);
 	unsigned int i;
 	for(i=0;i<vertices.size();i++)
 		bary += vertices[i];
 	bary /= vertices.size();
 
-	Vector3 n;
+	Vector3r n;
 	int tmp;
 	float d;
 	for(i=0;i<faces.size();i++)
@@ -332,11 +331,11 @@ void Terrain::buildCollisionGeometry()
 	
 	for(unsigned int i=0;i<faces.size();i++)
 	{
-		Vector3 p1 = vertices[faces[i][0]]+Vector3(0,-70,0); // beurk
-		Vector3 p2 = vertices[faces[i][1]]+Vector3(0,-70,0);
-		Vector3 p3 = vertices[faces[i][2]]+Vector3(0,-70,0);
-		Vector3 inf = p1;
-		Vector3 sup = p1;
+		Vector3r p1 = vertices[faces[i][0]]+Vector3r(0,-70,0); // beurk
+		Vector3r p2 = vertices[faces[i][1]]+Vector3r(0,-70,0);
+		Vector3r p3 = vertices[faces[i][2]]+Vector3r(0,-70,0);
+		Vector3r inf = p1;
+		Vector3r sup = p1;
 		for(int j=0;j<3;j++)
 		{
 			if (p2[j]<inf[j]) inf[j]=p2[j];
@@ -349,13 +348,13 @@ void Terrain::buildCollisionGeometry()
 	
 	for(unsigned int i=0;i<faces.size();i++)
 	{
-		std::vector<Vector2> tri;
+		std::vector<Vector2r> tri;
 		tri.clear();
-		tri.push_back(Vector2(vertices[faces[i][0]][0],vertices[faces[i][0]][2]));
-		tri.push_back(Vector2(vertices[faces[i][1]][0],vertices[faces[i][1]][2]));
-		tri.push_back(Vector2(vertices[faces[i][2]][0],vertices[faces[i][2]][2]));
+		tri.push_back(Vector2r(vertices[faces[i][0]][0],vertices[faces[i][0]][2]));
+		tri.push_back(Vector2r(vertices[faces[i][1]][0],vertices[faces[i][1]][2]));
+		tri.push_back(Vector2r(vertices[faces[i][2]][0],vertices[faces[i][2]][2]));
 		
-		Vector2 v1,v2,v3;
+		Vector2r v1,v2,v3;
 		
 		v1[0] = (int) ((tri[0][0]-min[0])/(float)cellSizeX);
 		v1[1] = (int) ((tri[0][1]-min[2])/(float)cellSizeZ);
@@ -373,7 +372,7 @@ void Terrain::buildCollisionGeometry()
 		if (v3[0]==nbCells) v3[0] = nbCells-1;
 		if (v3[1]==nbCells) v3[1] = nbCells-1;
 		
-		Vector2 min,max;
+		Vector2r min,max;
 		min = v1;
 		max = v1;
 		
@@ -399,12 +398,12 @@ void Terrain::buildCollisionGeometry()
 		for(int j=(int)min[0];j<(int)min[1];j++)
 			for(int k=(int)max[0];k<(int)max[1];k++)
 			{
-				Vector2 current = Vector2(j,k);
+				Vector2r current = Vector2r(j,k);
 				if (current!=v1 && current!=v2 && current!=v3)
-					if (	pointInTriangle(Vector2(min[0]+(j+0)*cellSizeX,min[2]+(k+0)*cellSizeZ),tri) || 
-						pointInTriangle(Vector2(min[0]+(j+1)*cellSizeX,min[2]+(k+0)*cellSizeZ),tri) || 
-						pointInTriangle(Vector2(min[0]+(j+1)*cellSizeX,min[2]+(k+1)*cellSizeZ),tri) || 
-						pointInTriangle(Vector2(min[0]+(j+0)*cellSizeX,min[2]+(k+1)*cellSizeZ),tri) )
+					if (	pointInTriangle(Vector2r(min[0]+(j+0)*cellSizeX,min[2]+(k+0)*cellSizeZ),tri) || 
+						pointInTriangle(Vector2r(min[0]+(j+1)*cellSizeX,min[2]+(k+0)*cellSizeZ),tri) || 
+						pointInTriangle(Vector2r(min[0]+(j+1)*cellSizeX,min[2]+(k+1)*cellSizeZ),tri) || 
+						pointInTriangle(Vector2r(min[0]+(j+0)*cellSizeX,min[2]+(k+1)*cellSizeZ),tri) )
 						triLists[j][k].push_back(i);
 			}
 	}
@@ -413,8 +412,8 @@ void Terrain::buildCollisionGeometry()
 		for(int j=0;j<nbCells;j++)
 		{
 			float min,max;
-			min = Constants::MAX_FLOAT;
-			max = -Constants::MAX_FLOAT;
+			min = Mathr::MAX_REAL;
+			max = -Mathr::MAX_REAL;
 			for(unsigned int k=0 ; k<triLists[i][j].size() ; k++)
 			{
 				int faceId = triLists[i][j][k];
@@ -436,7 +435,7 @@ void Terrain::buildCollisionGeometry()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool Terrain::pointInTriangle(Vector2 p , std::vector<Vector2>& tri)
+bool Terrain::pointInTriangle(Vector2r p , std::vector<Vector2r>& tri)
 {
 
 	for (int i1 = 0, i0 = 2; i1 < 3; i0 = i1++)
@@ -458,7 +457,7 @@ bool Terrain::pointInTriangle(Vector2 p , std::vector<Vector2>& tri)
 
 void Terrain::getFaces(const AABB& aabb, std::vector<int>& faceList)
 {
-	Vector2 minCell,maxCell;
+	Vector2r minCell,maxCell;
 	
 	minCell[0] = (int) ((aabb.min[0]-min[0])/(float)cellSizeX);
 	minCell[1] = (int) ((aabb.min[2]-min[2])/(float)cellSizeZ);

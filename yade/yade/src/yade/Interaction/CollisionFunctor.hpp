@@ -62,10 +62,10 @@ class CollisionFunctor : //public Indexable , // FIXME : is NOT necessery, but p
 	public : CollisionFunctor () {};
 	public : virtual ~CollisionFunctor () {};
 
-	protected : virtual bool collide(const shared_ptr<CollisionGeometry> , const shared_ptr<CollisionGeometry> , const Se3& , const Se3& , shared_ptr<Interaction> ) { throw; };
-	protected : virtual bool reverseCollide(const shared_ptr<CollisionGeometry> , const shared_ptr<CollisionGeometry> ,  const Se3& , const Se3& , shared_ptr<Interaction> ) { throw; };
+	protected : virtual bool collide(const shared_ptr<CollisionGeometry> , const shared_ptr<CollisionGeometry> , const Se3r& , const Se3r& , shared_ptr<Interaction> ) { throw; };
+	protected : virtual bool reverseCollide(const shared_ptr<CollisionGeometry> , const shared_ptr<CollisionGeometry> ,  const Se3r& , const Se3r& , shared_ptr<Interaction> ) { throw; };
 
-	public    : inline bool operator() (const shared_ptr<CollisionGeometry> cm1, const shared_ptr<CollisionGeometry> cm2, const Se3& se31, const Se3& se32, shared_ptr<Interaction> c)
+	public    : inline bool operator() (const shared_ptr<CollisionGeometry> cm1, const shared_ptr<CollisionGeometry> cm2, const Se3r& se31, const Se3r& se32, shared_ptr<Interaction> c)
 	{
 		if (reverse)
 			return reverseCollide(cm1,cm2,se31,se32,c);

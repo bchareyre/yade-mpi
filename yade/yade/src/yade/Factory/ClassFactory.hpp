@@ -116,7 +116,7 @@ class ClassFactory : public Singleton< ClassFactory >
 			public    : VerifyFactorableFnPtr verify;
 			/*! Type of the class : SERIALIZABLE,CUSTOM,CONTAINER,POINTER */
 			public    : FactorableTypes::Type type;
-			/*! fundamental is true the class type is a fundamtental type (e.g. Vector3, Quaternion) */
+			/*! fundamental is true the class type is a fundamtental type (e.g. Vector3r, Quaternionr) */
 			public    : bool fundamental;
 
 			///////////////////////////////////////////////////////////////////////////
@@ -184,7 +184,7 @@ class ClassFactory : public Singleton< ClassFactory >
 		\param createPureCustom a pointer to a function that is able to return a void C pointer on the given class
 		\param verify a pointer to a function that is able to return the type_info of the given class
 		\param type type of the class (SERIALIZABLE or CUSTOM)
-		\param f is true is the class is a fundamental one (Vector3, Quaternion)
+		\param f is true is the class is a fundamental one (Vector3r, Quaternionr)
 		\return true if registration is succesfull
 	*/
 	public    : bool registerFactorable( 	std::string name			  , CreateFactorableFnPtr create,
@@ -203,13 +203,13 @@ class ClassFactory : public Singleton< ClassFactory >
 	/*! Mainly used by the method findType for serialization purpose. Tells if a given type is a custom class
 		\param tp type info of the type to test
 		\param serializableClassName name of the serializable version of the class corresponding to "tp"
-		\param fundamental is true if the given type is fundamental (Vector3,Quaternion ...)
+		\param fundamental is true if the given type is fundamental (Vector3r,Quaternionr ...)
 	*/
 	public 	  : bool isCustomClass(const type_info& tp,string& serializableClassName,bool& fundamental);
 
 	/*! Mainly used by the method findType for serialization purpose. Tells if a given type is a serilializable class
 		\param tp type info of the type to test
-		\param fundamental is true if the given type is fundamental (Vector3,Quaternion ...)
+		\param fundamental is true if the given type is fundamental (Vector3r,Quaternionr ...)
 	*/
 	public 	  : bool isFactorable(const type_info& tp,bool& fundamental);
 

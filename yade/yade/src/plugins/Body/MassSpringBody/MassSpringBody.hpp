@@ -8,10 +8,10 @@
 class NodeProperties : public Serializable
 {
 	public : float invMass;
-	public : Vector3 velocity;
+	public : Vector3r velocity;
 
 	public : NodeProperties() {};
-	public : NodeProperties(float im) : invMass(im), velocity(Vector3(0,0,0)) {};
+	public : NodeProperties(float im) : invMass(im), velocity(Vector3r(0,0,0)) {};
 	public : void processAttributes() {};
 	public : void registerAttributes()
 	{
@@ -28,7 +28,7 @@ class MassSpringBody : public ConnexBody
 	public : float damping;
  	public : vector<NodeProperties> properties;
 	public : vector<float> initialLengths;
-	public : vector<pair<int,Vector3> > externalForces;
+	public : vector<pair<int,Vector3r> > externalForces;
 
 	// construction
 	public : MassSpringBody ();
@@ -37,8 +37,8 @@ class MassSpringBody : public ConnexBody
 	public : void processAttributes();
 	public : void registerAttributes();
 
-	public : void updateBoundingVolume(Se3& se3);
-	public : void updateCollisionGeometry(Se3& se3);
+	public : void updateBoundingVolume(Se3r& se3);
+	public : void updateCollisionGeometry(Se3r& se3);
 
 	REGISTER_CLASS_NAME(MassSpringBody);
 };

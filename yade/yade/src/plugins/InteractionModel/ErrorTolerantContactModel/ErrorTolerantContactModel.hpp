@@ -35,13 +35,13 @@
 
 class ErrorTolerantContactModel : public InteractionGeometry
 {
-	public : vector<pair<Vector3,Vector3> > closestPoints;
-	public : Vector3 o1p1;
-	public : Vector3 o2p2;
-	public : Vector3 normal;
-	//public : Vector3 t;	
-	//public : Vector3 s;
-	//public : Vector3 l;
+	public : vector<pair<Vector3r,Vector3r> > closestPoints;
+	public : Vector3r o1p1;
+	public : Vector3r o2p2;
+	public : Vector3r normal;
+	//public : Vector3r t;	
+	//public : Vector3r s;
+	//public : Vector3r l;
 	//public : float nu;
 	//public : std::pair<t_Vertex,t_Vertex> idVertex;
 	//public : t_ConnexionType type;

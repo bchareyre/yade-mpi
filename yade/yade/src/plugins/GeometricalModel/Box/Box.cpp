@@ -1,7 +1,7 @@
 #include "Box.hpp"
 #include <iostream>
 
-Box::Box (Vector3 e) : CollisionGeometry()
+Box::Box (Vector3r e) : CollisionGeometry()
 {
 	extents = e;
 }

@@ -1,160 +1,128 @@
-/***************************************************************************
- *   Copyright (C) 2004 by Olivier Galizzi                                 *
- *   olivier.galizzi@imag.fr                                               *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
+// Magic Software, Inc.
+// http://www.magic-software.com
+// http://www.wild-magic.com
+// Copyright (c) 1998-2005.  All Rights Reserved
+//
+// The Wild Magic Library (WM3) source code is supplied under the terms of
+// the license agreement http://www.wild-magic.com/License/WildMagic3.pdf and
+// may not be copied or disclosed except in accordance with the terms of that
+// agreement.
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+#ifndef WM3VECTOR3_H
+#define WM3VECTOR3_H
 
-#ifndef __VECTOR3_H__
-#define __VECTOR3_H__
+#include "Math.hpp"
+#include <algorithm>
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+//namespace Wm3
+//{
 
-#include <ostream>
-#include <istream>
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-#include "Constants.hpp"
-#include "Serializable.hpp"
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-class Vector3 : public Serializable
+template <class RealType>
+class Vector3
 {
-// coordinates
-//public : float x, y, z;
-
-	union
-	{
-		struct { float x,y,z; };
-		float v[3];
- 	};
-
-//private: float* refs[3];
-
+public:
     // construction
-	public : Vector3 ();
-	public : Vector3 (float vx, float vy, float vz);
-	public : Vector3 (float coord[3]);
-	public : Vector3 (const Vector3& v);
+    Vector3 ();  // uninitialized
+    Vector3 (RealType fX, RealType fY, RealType fZ);
+    Vector3 (const Vector3& rkV);
 
+    // coordinate access
+    operator const RealType* () const;
+    operator RealType* ();
+    RealType operator[] (int i) const;
+    RealType& operator[] (int i);
+    RealType x () const;
+    RealType& x ();
+    RealType y () const;
+    RealType& y ();
+    RealType z () const;
+    RealType& z ();
 
+    // assignment
+    Vector3& operator= (const Vector3& rkV);
 
-
-
-	public : float& operator[] (int i);
-	public : const float& operator[] (int i) const;
-	public : operator float* ();
-
-	// assignment
-	public : Vector3& operator= (const Vector3& v);
-
-    // comparison (supports fuzzy arithmetic when FUZZ > 0)
-	public : bool operator== (const Vector3& v) const;
-	public : bool operator!= (const Vector3& v) const;
-	public : bool operator<  (const Vector3& v) const;
-	public : bool operator<= (const Vector3& v) const;
-	public : bool operator>  (const Vector3& v) const;
-	public : bool operator>= (const Vector3& v) const;
+    // comparison
+    bool operator== (const Vector3& rkV) const;
+    bool operator!= (const Vector3& rkV) const;
+    bool operator<  (const Vector3& rkV) const;
+    bool operator<= (const Vector3& rkV) const;
+    bool operator>  (const Vector3& rkV) const;
+    bool operator>= (const Vector3& rkV) const;
 
     // arithmetic operations
-	public : Vector3 operator+ (const Vector3& v) const;
-	public : Vector3 operator- (const Vector3& v) const;
-	public : Vector3 operator* (float f) const;
-	public : Vector3 operator/ (float f) const;
-	public : Vector3 operator- () const;
-	public : friend Vector3 operator* (float f, const Vector3& v);
+    Vector3 operator+ (const Vector3& rkV) const;
+    Vector3 operator- (const Vector3& rkV) const;
+    Vector3 operator* (RealType fScalar) const;
+    Vector3 operator/ (RealType fScalar) const;
+    Vector3 operator- () const;
 
     // arithmetic updates
-	public : Vector3& operator+= (const Vector3& v);
-	public : Vector3& operator-= (const Vector3& v);
-	public : Vector3& operator*= (float f);
-	public : Vector3& operator/= (float f);
+    Vector3& operator+= (const Vector3& rkV);
+    Vector3& operator-= (const Vector3& rkV);
+    Vector3& operator*= (RealType fScalar);
+    Vector3& operator/= (RealType fScalar);
 
     // vector operations
-	public : float length () const;
-	public : float squaredLength () const;
-	public : float dot (const Vector3& v) const;
-	public : float unitize (float threshold = 1e-06f);
-	public : Vector3& normalize (float threshold = 1e-06f);
-	public : Vector3 normalized (float threshold = 1e-06f);
-	public : Vector3 inverse (float threshold = 1e-06f);
-	public : Vector3& negate ();
+    RealType length () const;
+    RealType squaredLength () const;
+    RealType dot (const Vector3& rkV) const;
+    RealType normalize ();
+    Vector3 maxVector (const Vector3& rkV) const;
+    Vector3 minVector (const Vector3& rkV) const;
+    Vector3 multDiag (const Vector3& rkV) const;
+ 
 
-	public : Vector3 multTerm (const Vector3& v) const;
-	public : Vector3 maxTerm (const Vector3& v) const;
-	public : Vector3 minTerm (const Vector3& v) const;
-	public : Vector3 cross (const Vector3& v) const;
-	public : Vector3 unitCross (const Vector3& v) const;
+    // The cross products are computed using the right-handed rule.  Be aware
+    // that some graphics APIs use a left-handed rule.  If you have to compute
+    // a cross product with these functions and send the result to the API
+    // that expects left-handed, you will need to change sign on the vector
+    // (replace each component value c by -c).
+    Vector3 cross (const Vector3& rkV) const;
+    Vector3 unitCross (const Vector3& rkV) const;
 
-    // special points
-	public : static const Vector3 ZERO;
-	public : static const Vector3 UNIT_X;
-	public : static const Vector3 UNIT_Y;
-	public : static const Vector3 UNIT_Z;
+    // Compute the barycentric coordinates of the point with respect to the
+    // tetrahedron <V0,V1,V2,V3>, P = b0*V0 + b1*V1 + b2*V2 + b3*V3, where
+    // b0 + b1 + b2 + b3 = 1.
+    void getBarycentrics (const Vector3<RealType>& rkV0,
+        const Vector3<RealType>& rkV1, const Vector3<RealType>& rkV2,
+        const Vector3<RealType>& rkV3, RealType afBary[4]) const;
 
-	// fuzzy arithmetic (set FUZZ > 0 to enable)
-	public : static float FUZZ;
+    // Gram-Schmidt orthonormalization.  Take linearly independent vectors
+    // U, V, and W and compute an orthonormal set (unit length, mutually
+    // perpendicular).
+    static void orthonormalize (Vector3& rkU, Vector3& rkV, Vector3& rkW);
+    static void orthonormalize (Vector3* akV);
 
-	REGISTER_CLASS_NAME(Vector3);
+    // Input W must be initialized to a nonzero vector, output is {U,V,W},
+    // an orthonormal basis.  A hint is provided about whether or not W
+    // is already unit length.
+    static void generateOrthonormalBasis (Vector3& rkU, Vector3& rkV,
+        Vector3& rkW, bool bUnitLengthW);
 
-	public : void registerAttributes();
+    // special vectors
+    static const Vector3 ZERO;
+    static const Vector3 UNIT_X;
+    static const Vector3 UNIT_Y;
+    static const Vector3 UNIT_Z;
 
+private:
+    // support for comparisons
+    int compareArrays (const Vector3& rkV) const;
+
+    RealType m_afTuple[3];
 };
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class RealType,typename RealType2>
+Vector3<RealType> operator* (RealType2 fScalar, const Vector3<RealType>& rkV);
 
-REGISTER_SERIALIZABLE(Vector3,true);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-inline std::ostream& operator<< (std::ostream& o, const Vector3& vec)
-{
-	o << vec[0] << " " << vec[1] << " " << vec[2];
-	return o;
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-inline std::istream& operator>> (std::istream& i, Vector3& vec)
-{
-	i >> vec[0] >> vec[1] >> vec[2];
-	return i;
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "Vector3.ipp"
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+typedef Vector3<float> Vector3f;
+typedef Vector3<double> Vector3d;
+typedef Vector3<Real> Vector3r;
 
-#endif // __VECTOR3_H__
+//}
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+#endif
 

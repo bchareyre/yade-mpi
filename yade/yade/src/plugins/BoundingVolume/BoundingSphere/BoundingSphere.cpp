@@ -12,7 +12,7 @@ BoundingSphere::~BoundingSphere ()
 }
 
 
-void BoundingSphere::move(Se3& )
+void BoundingSphere::move(Se3r& )
 {
 
 
@@ -41,9 +41,9 @@ void BoundingSphere::glDraw()
 	glutWireSphere(radius,10,10);
 }
 
-void BoundingSphere::update(Se3& se3)
+void BoundingSphere::update(Se3r& se3)
 {
-	Vector3 v(radius,radius,radius);
+	Vector3r v(radius,radius,radius);
 	center = se3.translation;
 	min = center-v;
 	max = center+v;	

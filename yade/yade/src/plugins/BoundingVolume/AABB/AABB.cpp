@@ -5,7 +5,7 @@ AABB::AABB () : BoundingVolume()
 
 }
 
-AABB::AABB (Vector3 hs,Vector3 c) : BoundingVolume()
+AABB::AABB (Vector3r hs,Vector3r c) : BoundingVolume()
 {
 	halfSize = hs;
 	center = c;
@@ -34,7 +34,7 @@ void AABB::registerAttributes()
 	REGISTER_ATTRIBUTE(halfSize);
 }
 
-void AABB::move(Se3& )
+void AABB::move(Se3r& )
 {
 
 
@@ -54,16 +54,16 @@ void AABB::glDraw()
 	glutWireCube(1);
 }
 
-void AABB::update(Se3& se3)
+void AABB::update(Se3r& se3)
 {
 	//center = se3.translation;
-	Vector3 newHalf,newCenter;	
+	Vector3r newHalf,newCenter;	
 
  	center = se3.translation;// + se3.rotation * initialCenter;
 	
-	Matrix3 r;
+	Matrix3r r;
 	se3.rotation.toRotationMatrix(r);
-	halfSize = Vector3(0,0,0);
+	halfSize = Vector3r(0,0,0);
 	for( int i=0; i<3; ++i )
 		for( int j=0; j<3; ++j )
 			halfSize[i] += fabs( r[i][j] * initialHalfSize[j] );
@@ -75,8 +75,8 @@ void AABB::update(Se3& se3)
 
 bool AABB::overlap(const AABB& aabb)
 {
-	Vector3 max2 = aabb.max;
-	Vector3 min2 = aabb.min;
+	Vector3r max2 = aabb.max;
+	Vector3r min2 = aabb.min;
 	
 	return !(max[0]<min2[0] || max2[0]<min[0] || max[1]<min2[1] || max2[1]<min[1] || max[2]<min2[2] || max2[2]<min[2]);               
 }

@@ -30,7 +30,7 @@ class BoundingVolumeHierarchy : public BoundingVolume
 	public : BoundingVolumeHierarchy ();
 	public : ~BoundingVolumeHierarchy ();
 	
-	public : void move(Se3& se3);
+	public : void move(Se3r& se3);
 	
 };
 

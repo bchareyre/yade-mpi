@@ -13,7 +13,7 @@ class Box2AABBFactory : public BoundingVolumeFactory
 	public : void processAttributes();
 	public : void registerAttributes();
 
-	public : shared_ptr<BoundingVolume> buildBoundingVolume(const shared_ptr<CollisionGeometry> cm, const Se3& se3);
+	public : shared_ptr<BoundingVolume> buildBoundingVolume(const shared_ptr<CollisionGeometry> cm, const Se3r& se3);
 };
 
 REGISTER_FACTORABLE(Box2AABBFactory);

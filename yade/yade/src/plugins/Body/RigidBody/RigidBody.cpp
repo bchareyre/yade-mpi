@@ -2,8 +2,8 @@
 
 RigidBody::RigidBody () : ConnexBody()
 {
-	acceleration = Vector3(0,0,0);
-	angularAcceleration = Vector3(0,0,0);
+	acceleration = Vector3r(0,0,0);
+	angularAcceleration = Vector3r(0,0,0);
 }
 
 
@@ -36,12 +36,12 @@ void RigidBody::registerAttributes()
 }
 
 
-void RigidBody::updateBoundingVolume(Se3& se3)
+void RigidBody::updateBoundingVolume(Se3r& se3)
 {
 	bv->update(se3);
 }
 
-void RigidBody::updateCollisionGeometry(Se3& )
+void RigidBody::updateCollisionGeometry(Se3r& )
 {
 
 }
@@ -51,7 +51,7 @@ void RigidBody::moveToNextTimeStep()
 	ConnexBody::moveToNextTimeStep();
 	prevAcceleration = acceleration;
 	prevAngularAcceleration = angularAcceleration;
-	acceleration = Vector3(0,0,0);
-	angularAcceleration = Vector3(0,0,0);
+	acceleration = Vector3r(0,0,0);
+	angularAcceleration = Vector3r(0,0,0);
 	
 }

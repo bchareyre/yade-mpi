@@ -10,7 +10,7 @@ BoundingVolumeAssembly::~BoundingVolumeAssembly ()
 
 }
 
-void BoundingVolumeAssembly::move(Se3& )
+void BoundingVolumeAssembly::move(Se3r& )
 {
 
 

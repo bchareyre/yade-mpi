@@ -26,12 +26,12 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-int clipPolygon(Vector3 quad,const std::vector<Vector3>& polygon, std::vector<Vector3>& clipped)
+int clipPolygon(Vector3r quad,const std::vector<Vector3r>& polygon, std::vector<Vector3r>& clipped)
 {
 
 	unsigned int v;
 	int d;
-	std::vector<Vector3> tmpPoly;
+	std::vector<Vector3r> tmpPoly;
 	
 	clipped.clear();
 	//tmpPoly.clear();
@@ -71,11 +71,11 @@ int clipPolygon(Vector3 quad,const std::vector<Vector3>& polygon, std::vector<Ve
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void clipLeft(float sizeX, std::vector<Vector3> &polygon, Vector3 v1, Vector3 v2)
+void clipLeft(float sizeX, std::vector<Vector3r> &polygon, Vector3r v1, Vector3r v2)
 {
 
 	float dx,dy,m;
-	Vector3 v;
+	Vector3r v;
 	
    
 	dx = v2[0]-v1[0];
@@ -109,11 +109,11 @@ void clipLeft(float sizeX, std::vector<Vector3> &polygon, Vector3 v1, Vector3 v2
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void clipRight(float sizeX, std::vector<Vector3>& polygon, Vector3 v1, Vector3 v2)
+void clipRight(float sizeX, std::vector<Vector3r>& polygon, Vector3r v1, Vector3r v2)
 {
 	
 	float dx,dy,m;
-	Vector3 v;
+	Vector3r v;
 	
    
 	dx = v2[0]-v1[0];
@@ -148,11 +148,11 @@ void clipRight(float sizeX, std::vector<Vector3>& polygon, Vector3 v1, Vector3 v
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void clipTop(float sizeY, std::vector<Vector3>& polygon, Vector3 v1, Vector3 v2)
+void clipTop(float sizeY, std::vector<Vector3r>& polygon, Vector3r v1, Vector3r v2)
 {
 	
 	float dx,dy,m;
-	Vector3 v;
+	Vector3r v;
 	
 	dx = v2[0]-v1[0];
 	dy = v2[1]-v1[1];
@@ -192,11 +192,11 @@ void clipTop(float sizeY, std::vector<Vector3>& polygon, Vector3 v1, Vector3 v2)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void clipBottom(float sizeY, std::vector<Vector3> &polygon, Vector3 v1, Vector3 v2)
+void clipBottom(float sizeY, std::vector<Vector3r> &polygon, Vector3r v1, Vector3r v2)
 {
 	
 	float dx,dy,m;
-	Vector3 v;
+	Vector3r v;
 	   
 	dx = v2[0]-v1[0];
 	dy = v2[1]-v1[1];

@@ -5,22 +5,22 @@
 
 class AABB : public BoundingVolume
 {
-	public : Vector3 halfSize;
-	public : Vector3 center;
+	public : Vector3r halfSize;
+	public : Vector3r center;
 
-	private : Vector3 initialHalfSize;
-	private : Vector3 initialCenter;
+	private : Vector3r initialHalfSize;
+	private : Vector3r initialCenter;
 
 
 	// construction
 	public : AABB ();
-	public : AABB (Vector3 hs,Vector3 center=Vector3(0,0,0));
+	public : AABB (Vector3r hs,Vector3r center=Vector3r(0,0,0));
 	public : ~AABB ();
 
-	public : void move(Se3& se3);
+	public : void move(Se3r& se3);
 	public : bool loadFromFile(char * fileName);
 	public : void glDraw();
-	public : void update(Se3& se3);
+	public : void update(Se3r& se3);
 	public : bool overlap(const AABB& aabb);
 
 	public : void processAttributes();

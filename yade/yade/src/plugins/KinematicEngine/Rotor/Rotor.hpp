@@ -13,7 +13,7 @@ class Rotor : public KinematicEngine
 {
 
 	public : float angularVelocity;
-	public : Vector3 rotationAxis;
+	public : Vector3r rotationAxis;
 	// construction
 	public : Rotor ();
 	public : virtual ~Rotor ();

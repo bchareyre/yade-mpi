@@ -141,7 +141,7 @@ class Archive
 	private   : string name;
 
 	/*! fundamental is true if the archive represent a fundamental type (int,float,
-	vector<int>, shared_pointer<int>, vector<shared_ptr<Quaternion>> */
+	vector<int>, shared_pointer<int>, vector<shared_ptr<Quaternionr>> */
 	private   : bool fundamental;
 
 	/*! processed is true if the atrtibute represented by the current archive has already been (de)-serialized */

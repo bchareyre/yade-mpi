@@ -1,6 +1,6 @@
 #include "RotatingBox.hpp"
 
-#include "Rand.hpp"
+
 #include "Box.hpp"
 #include "AABB.hpp"
 #include "Sphere.hpp"
@@ -39,8 +39,8 @@ void RotatingBox::exec()
 	shared_ptr<NonConnexBody> rootBody(new NonConnexBody);
 	int nbSpheres = 5;
 	int nbBox = 0;
-	Quaternion q;
-	q.fromAngleAxis(0, Vector3(0,0,1));
+	Quaternionr q;
+	q.fromAxisAngle(Vector3r(0,0,1),0);
 
 
 
@@ -51,7 +51,7 @@ void RotatingBox::exec()
 
 	shared_ptr<Rotor> kinematic = shared_ptr<Rotor>(new Rotor);
 	kinematic->angularVelocity  = 0.0785375;
-	kinematic->rotationAxis  = Vector3(1,0,0);
+	kinematic->rotationAxis  = Vector3r(1,0,0);
 
 	for(int i=0;i<7;i++)
 		kinematic->subscribedBodies.push_back(i);
@@ -63,9 +63,9 @@ void RotatingBox::exec()
 	rootBody->actors[3] 		= kinematic;
 
 	rootBody->isDynamic		= false;
-	rootBody->velocity		= Vector3(0,0,0);
-	rootBody->angularVelocity	= Vector3(0,0,0);
-	rootBody->se3			= Se3(Vector3(0,0,0),q);
+	rootBody->velocity		= Vector3r(0,0,0);
+	rootBody->angularVelocity	= Vector3r(0,0,0);
+	rootBody->se3			= Se3r(Vector3r(0,0,0),q);
 
 	shared_ptr<AABB> aabb;
 	shared_ptr<Box> box;
@@ -76,17 +76,17 @@ void RotatingBox::exec()
 	aabb			= shared_ptr<AABB>(new AABB);
 	box			= shared_ptr<Box>(new Box);
 	box1->isDynamic		= false;
-	box1->angularVelocity	= Vector3(0,0,0);
-	box1->velocity		= Vector3(0,0,0);
+	box1->angularVelocity	= Vector3r(0,0,0);
+	box1->velocity		= Vector3r(0,0,0);
 	box1->mass		= 0;
-	box1->inertia		= Vector3(0,0,0);
-	box1->se3		= Se3(Vector3(0,0,10),q);
-	aabb->color		= Vector3(1,0,0);
-	aabb->center		= Vector3(0,0,10);
-	aabb->halfSize		= Vector3(50,5,40);
+	box1->inertia		= Vector3r(0,0,0);
+	box1->se3		= Se3r(Vector3r(0,0,10),q);
+	aabb->color		= Vector3r(1,0,0);
+	aabb->center		= Vector3r(0,0,10);
+	aabb->halfSize		= Vector3r(50,5,40);
 	box1->bv		= dynamic_pointer_cast<BoundingVolume>(aabb);
-	box->extents		= Vector3(50,5,40);
-	box->diffuseColor	= Vector3(1,1,1);
+	box->extents		= Vector3r(50,5,40);
+	box->diffuseColor	= Vector3r(1,1,1);
 	box->wire		= false;
 	box->visible		= true;
 	box1->cm		= dynamic_pointer_cast<CollisionGeometry>(box);
@@ -98,17 +98,17 @@ void RotatingBox::exec()
 	aabb			= shared_ptr<AABB>(new AABB);
 	box			= shared_ptr<Box>(new Box);
 	box2->isDynamic		= false;
-	box2->angularVelocity	= Vector3(0,0,0);
-	box2->velocity		= Vector3(0,0,0);
+	box2->angularVelocity	= Vector3r(0,0,0);
+	box2->velocity		= Vector3r(0,0,0);
 	box2->mass		= 0;
-	box2->inertia		= Vector3(0,0,0);
-	box2->se3		= Se3(Vector3(-55,0,0),q);
-	aabb->color		= Vector3(0,0,1);
-	aabb->center		= Vector3(-55,0,0);
-	aabb->halfSize		= Vector3(5,60,50);
+	box2->inertia		= Vector3r(0,0,0);
+	box2->se3		= Se3r(Vector3r(-55,0,0),q);
+	aabb->color		= Vector3r(0,0,1);
+	aabb->center		= Vector3r(-55,0,0);
+	aabb->halfSize		= Vector3r(5,60,50);
 	box2->bv		= dynamic_pointer_cast<BoundingVolume>(aabb);
-	box->extents		= Vector3(5,60,50);
-	box->diffuseColor	= Vector3(1,1,1);
+	box->extents		= Vector3r(5,60,50);
+	box->diffuseColor	= Vector3r(1,1,1);
 	box->wire		= true;
 	box->visible		= true;
 	box2->cm		= dynamic_pointer_cast<CollisionGeometry>(box);
@@ -120,17 +120,17 @@ void RotatingBox::exec()
 	aabb			= shared_ptr<AABB>(new AABB);
 	box			= shared_ptr<Box>(new Box);
 	box3->isDynamic		= false;
-	box3->angularVelocity	= Vector3(0,0,0);
-	box3->velocity		= Vector3(0,0,0);
+	box3->angularVelocity	= Vector3r(0,0,0);
+	box3->velocity		= Vector3r(0,0,0);
 	box3->mass		= 0;
-	box3->inertia		= Vector3(0,0,0);
-	box3->se3		= Se3(Vector3(55,0,0),q);
-	aabb->color		= Vector3(0,0,1);
-	aabb->center		= Vector3(55,0,0);
-	aabb->halfSize		= Vector3(5,60,50);
+	box3->inertia		= Vector3r(0,0,0);
+	box3->se3		= Se3r(Vector3r(55,0,0),q);
+	aabb->color		= Vector3r(0,0,1);
+	aabb->center		= Vector3r(55,0,0);
+	aabb->halfSize		= Vector3r(5,60,50);
 	box3->bv		= dynamic_pointer_cast<BoundingVolume>(aabb);
-	box->extents		= Vector3(5,60,50);
-	box->diffuseColor	= Vector3(1,1,1);
+	box->extents		= Vector3r(5,60,50);
+	box->diffuseColor	= Vector3r(1,1,1);
 	box->wire		= true;
 	box->visible		= true;
 	box3->cm		= dynamic_pointer_cast<CollisionGeometry>(box);
@@ -142,17 +142,17 @@ void RotatingBox::exec()
 	aabb			= shared_ptr<AABB>(new AABB);
 	box			= shared_ptr<Box>(new Box);
 	box4->isDynamic		= false;
-	box4->angularVelocity	= Vector3(0,0,0);
-	box4->velocity		= Vector3(0,0,0);
+	box4->angularVelocity	= Vector3r(0,0,0);
+	box4->velocity		= Vector3r(0,0,0);
 	box4->mass		= 0;
-	box4->inertia		= Vector3(0,0,0);
-	box4->se3		= Se3(Vector3(0,-55,0),q);
-	aabb->color		= Vector3(0,0,1);
-	aabb->center		= Vector3(0,-55,0);
-	aabb->halfSize		= Vector3(50,5,50);
+	box4->inertia		= Vector3r(0,0,0);
+	box4->se3		= Se3r(Vector3r(0,-55,0),q);
+	aabb->color		= Vector3r(0,0,1);
+	aabb->center		= Vector3r(0,-55,0);
+	aabb->halfSize		= Vector3r(50,5,50);
 	box4->bv		= dynamic_pointer_cast<BoundingVolume>(aabb);
-	box->extents		= Vector3(50,5,50);
-	box->diffuseColor	= Vector3(1,1,1);
+	box->extents		= Vector3r(50,5,50);
+	box->diffuseColor	= Vector3r(1,1,1);
 	box->wire		= true;
 	box->visible		= true;
 	box4->cm		= dynamic_pointer_cast<CollisionGeometry>(box);
@@ -164,17 +164,17 @@ void RotatingBox::exec()
 	aabb			= shared_ptr<AABB>(new AABB);
 	box			= shared_ptr<Box>(new Box);
 	box5->isDynamic		= false;
-	box5->angularVelocity	= Vector3(0,0,0);
-	box5->velocity		= Vector3(0,0,0);
+	box5->angularVelocity	= Vector3r(0,0,0);
+	box5->velocity		= Vector3r(0,0,0);
 	box5->mass		= 0;
-	box5->inertia		= Vector3(0,0,0);
-	box5->se3		= Se3(Vector3(0,55,0),q);
-	aabb->color		= Vector3(0,0,1);
-	aabb->center		= Vector3(0,55,0);
-	aabb->halfSize		= Vector3(50,5,50);
+	box5->inertia		= Vector3r(0,0,0);
+	box5->se3		= Se3r(Vector3r(0,55,0),q);
+	aabb->color		= Vector3r(0,0,1);
+	aabb->center		= Vector3r(0,55,0);
+	aabb->halfSize		= Vector3r(50,5,50);
 	box5->bv		= dynamic_pointer_cast<BoundingVolume>(aabb);
-	box->extents		= Vector3(50,5,50);
-	box->diffuseColor	= Vector3(1,1,1);
+	box->extents		= Vector3r(50,5,50);
+	box->diffuseColor	= Vector3r(1,1,1);
 	box->wire		= true;
 	box->visible		= true;
 	box5->cm		= dynamic_pointer_cast<CollisionGeometry>(box);
@@ -186,17 +186,17 @@ void RotatingBox::exec()
 	aabb			= shared_ptr<AABB>(new AABB);
 	box			= shared_ptr<Box>(new Box);
 	box6->isDynamic		= false;
-	box6->angularVelocity	= Vector3(0,0,0);
-	box6->velocity		= Vector3(0,0,0);
+	box6->angularVelocity	= Vector3r(0,0,0);
+	box6->velocity		= Vector3r(0,0,0);
 	box6->mass		= 0;
-	box6->inertia		= Vector3(0,0,0);
-	box6->se3		= Se3(Vector3(0,0,-55),q);
-	aabb->color		= Vector3(0,0,1);
-	aabb->center		= Vector3(0,0,-55);
-	aabb->halfSize		= Vector3(60,60,5);
+	box6->inertia		= Vector3r(0,0,0);
+	box6->se3		= Se3r(Vector3r(0,0,-55),q);
+	aabb->color		= Vector3r(0,0,1);
+	aabb->center		= Vector3r(0,0,-55);
+	aabb->halfSize		= Vector3r(60,60,5);
 	box6->bv		= dynamic_pointer_cast<BoundingVolume>(aabb);
-	box->extents		= Vector3(60,60,5);
-	box->diffuseColor	= Vector3(1,1,1);
+	box->extents		= Vector3r(60,60,5);
+	box->diffuseColor	= Vector3r(1,1,1);
 	box->wire		= true;
 	box->visible		= true;
 	box6->cm		= dynamic_pointer_cast<CollisionGeometry>(box);
@@ -208,17 +208,17 @@ void RotatingBox::exec()
 	aabb			= shared_ptr<AABB>(new AABB);
 	box			= shared_ptr<Box>(new Box);
 	box7->isDynamic		= false;
-	box7->angularVelocity	= Vector3(0,0,0);
-	box7->velocity		= Vector3(0,0,0);
+	box7->angularVelocity	= Vector3r(0,0,0);
+	box7->velocity		= Vector3r(0,0,0);
 	box7->mass		= 0;
-	box7->inertia		= Vector3(0,0,0);
-	box7->se3		= Se3(Vector3(0,0,55),q);
-	aabb->color		= Vector3(0,0,1);
-	aabb->center		= Vector3(0,0,55);
-	aabb->halfSize		= Vector3(60,60,5);
+	box7->inertia		= Vector3r(0,0,0);
+	box7->se3		= Se3r(Vector3r(0,0,55),q);
+	aabb->color		= Vector3r(0,0,1);
+	aabb->center		= Vector3r(0,0,55);
+	aabb->halfSize		= Vector3r(60,60,5);
 	box7->bv		= dynamic_pointer_cast<BoundingVolume>(aabb);
-	box->extents		= Vector3(60,60,5);
-	box->diffuseColor	= Vector3(1,1,1);
+	box->extents		= Vector3r(60,60,5);
+	box->diffuseColor	= Vector3r(1,1,1);
 	box->wire		= true;
 	box->visible		= true;
 	box7->cm		= dynamic_pointer_cast<CollisionGeometry>(box);
@@ -234,7 +234,7 @@ void RotatingBox::exec()
  	rootBody->bodies.push_back(dynamic_pointer_cast<Body>(box6));
  	rootBody->bodies.push_back(dynamic_pointer_cast<Body>(box7));
 
-	Vector3 translation;
+	Vector3r translation;
 
 	for(int i=0;i<nbSpheres;i++)
 		for(int j=0;j<nbSpheres;j++)
@@ -244,8 +244,8 @@ void RotatingBox::exec()
 		shared_ptr<AABB> aabb(new AABB);
 		shared_ptr<Sphere> sphere(new Sphere);
 
-		translation 		= Vector3(i,j,k)*10-Vector3(45,45,45)+Vector3(Rand::symmetricRandom(),Rand::symmetricRandom(),Rand::symmetricRandom());
-		float radius 		= (Rand::intervalRandom(3,4));
+		translation 		= Vector3r(i,j,k)*10-Vector3r(45,45,45)+Vector3r(Mathr::symmetricRandom(),Mathr::symmetricRandom(),Mathr::symmetricRandom());
+		float radius 		= (Mathr::intervalRandom(3,4));
 
 		shared_ptr<BallisticDynamicEngine> ballistic(new BallisticDynamicEngine);
 		ballistic->damping 	= 1.0;//0.95;
@@ -253,19 +253,19 @@ void RotatingBox::exec()
 
 		//s->dynamic		= dynamic_pointer_cast<DynamicEngine>(ballistic);
 		s->isDynamic		= true;
-		s->angularVelocity	= Vector3(0,0,0);
-		s->velocity		= Vector3(0,0,0);
-		s->mass			= 4.0/3.0*Constants::PI*radius*radius;
-		s->inertia		= Vector3(2.0/5.0*s->mass*radius*radius,2.0/5.0*s->mass*radius*radius,2.0/5.0*s->mass*radius*radius);
-		s->se3			= Se3(translation,q);
+		s->angularVelocity	= Vector3r(0,0,0);
+		s->velocity		= Vector3r(0,0,0);
+		s->mass			= 4.0/3.0*Mathr::PI*radius*radius;
+		s->inertia		= Vector3r(2.0/5.0*s->mass*radius*radius,2.0/5.0*s->mass*radius*radius,2.0/5.0*s->mass*radius*radius);
+		s->se3			= Se3r(translation,q);
 
-		aabb->color		= Vector3(0,1,0);
+		aabb->color		= Vector3r(0,1,0);
 		aabb->center		= translation;
-		aabb->halfSize		= Vector3(radius,radius,radius);
+		aabb->halfSize		= Vector3r(radius,radius,radius);
 		s->bv			= dynamic_pointer_cast<BoundingVolume>(aabb);
 
 		sphere->radius		= radius;
-		sphere->diffuseColor	= Vector3(Rand::unitRandom(),Rand::unitRandom(),Rand::unitRandom());
+		sphere->diffuseColor	= Vector3r(Mathr::unitRandom(),Mathr::unitRandom(),Mathr::unitRandom());
 		sphere->wire		= false;
 		sphere->visible		= true;
 		s->cm			= dynamic_pointer_cast<CollisionGeometry>(sphere);
@@ -289,23 +289,23 @@ void RotatingBox::exec()
 				ballistic->damping 	= 1.0;//0.95;
 				boxi->actors.push_back(ballistic);
 
-				Vector3 size = Vector3((4+Rand::symmetricRandom()),(4+Rand::symmetricRandom()),(4+Rand::symmetricRandom()));
+				Vector3r size = Vector3r((4+Mathr::symmetricRandom()),(4+Mathr::symmetricRandom()),(4+Mathr::symmetricRandom()));
 				//ballistic->damping 	= 1.0;//0.95;
 				//boxi->dynamic		= dynamic_pointer_cast<DynamicEngine>(ballistic);
 				boxi->isDynamic		= true;
-				boxi->angularVelocity	= Vector3(0,0,0);
-				boxi->velocity		= Vector3(0,0,0);
+				boxi->angularVelocity	= Vector3r(0,0,0);
+				boxi->velocity		= Vector3r(0,0,0);
 				float mass = 8*size[0]*size[1]*size[2];
 				boxi->mass		= mass;
-				boxi->inertia		= Vector3(mass*(size[1]*size[1]+size[2]*size[2])/3,mass*(size[0]*size[0]+size[2]*size[2])/3,mass*(size[1]*size[1]+size[0]*size[0])/3);
-				translation = Vector3(i,j,k)*10-Vector3(15,35,25)+Vector3(Rand::symmetricRandom(),Rand::symmetricRandom(),Rand::symmetricRandom());
-				boxi->se3		= Se3(translation,q);
-				aabb->color		= Vector3(Rand::unitRandom(),Rand::unitRandom(),Rand::unitRandom());
+				boxi->inertia		= Vector3r(mass*(size[1]*size[1]+size[2]*size[2])/3,mass*(size[0]*size[0]+size[2]*size[2])/3,mass*(size[1]*size[1]+size[0]*size[0])/3);
+				translation = Vector3r(i,j,k)*10-Vector3r(15,35,25)+Vector3r(Mathr::symmetricRandom(),Mathr::symmetricRandom(),Mathr::symmetricRandom());
+				boxi->se3		= Se3r(translation,q);
+				aabb->color		= Vector3r(Mathr::unitRandom(),Mathr::unitRandom(),Mathr::unitRandom());
 				aabb->center		= translation;
 				aabb->halfSize		= size;
 				boxi->bv		= dynamic_pointer_cast<BoundingVolume>(aabb);
 				box->extents		= size;
-				box->diffuseColor	= Vector3(Rand::unitRandom(),Rand::unitRandom(),Rand::unitRandom());
+				box->diffuseColor	= Vector3r(Mathr::unitRandom(),Mathr::unitRandom(),Mathr::unitRandom());
 				box->wire		= false;
 				box->visible		= true;
 				boxi->cm		= dynamic_pointer_cast<CollisionGeometry>(box);

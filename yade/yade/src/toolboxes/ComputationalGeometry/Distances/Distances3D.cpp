@@ -26,11 +26,11 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-float sqrDistTriPoint(const Vector3& p, const std::vector<Vector3>& tri, Vector3& pt)
+float sqrDistTriPoint(const Vector3r& p, const vector<Vector3r>& tri, Vector3r& pt)
 {
-	Vector3 kDiff = tri[0] - p;
-	Vector3 edge0 = tri[1]-tri[0];
-	Vector3 edge1 = tri[2]-tri[0];
+	Vector3r kDiff = tri[0] - p;
+	Vector3r edge0 = tri[1]-tri[0];
+	Vector3r edge1 = tri[2]-tri[0];
 	float fA00 = edge0.squaredLength();
 	float fA01 = edge0.dot(edge1);
 	float fA11 = edge1.squaredLength();

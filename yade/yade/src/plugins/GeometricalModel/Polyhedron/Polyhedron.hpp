@@ -7,13 +7,13 @@ class Polyhedron : public CollisionGeometry
 {
 	public : string mshFileName;
 
-	public : vector<Vector3> vertices;
+	public : vector<Vector3r> vertices;
 	public : vector<pair<int,int> > edges;
 	public : vector<vector<int> > tetrahedrons;
 
 	public : vector<vector<int> > faces;
-	public : vector<Vector3> fNormals;
-	public : vector<Vector3> vNormals;
+	public : vector<Vector3r> fNormals;
+	public : vector<Vector3r> vNormals;
  	public : vector<vector<int> > triPerVertices;
 	// construction
 	public : Polyhedron ();

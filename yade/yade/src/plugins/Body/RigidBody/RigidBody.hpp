@@ -7,12 +7,12 @@
 
 class RigidBody : public ConnexBody
 {
-	public : Vector3 invInertia;
-	public : Vector3 inertia;
-	public : Vector3 acceleration;
-	public : Vector3 prevAcceleration;
-	public : Vector3 angularAcceleration;
-	public : Vector3 prevAngularAcceleration;
+	public : Vector3r invInertia;
+	public : Vector3r inertia;
+	public : Vector3r acceleration;
+	public : Vector3r prevAcceleration;
+	public : Vector3r angularAcceleration;
+	public : Vector3r prevAngularAcceleration;
 
 	// construction
 	public : RigidBody ();
@@ -21,8 +21,8 @@ class RigidBody : public ConnexBody
 	public : void processAttributes();
 	public : void registerAttributes();
 
-	public : void updateBoundingVolume(Se3& se3);
-	public : void updateCollisionGeometry(Se3& se3);
+	public : void updateBoundingVolume(Se3r& se3);
+	public : void updateCollisionGeometry(Se3r& se3);
 
 	public : void moveToNextTimeStep();
 

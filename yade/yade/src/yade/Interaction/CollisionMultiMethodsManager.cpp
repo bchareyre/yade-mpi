@@ -24,7 +24,7 @@ bool CollisionMultiMethodsManager::addPair(const string& name1,const string& nam
 	//int& maxCurrentIndex, const string& name1, const string& name2, const string& libName);
 }
 
-bool CollisionMultiMethodsManager::collide(const shared_ptr<CollisionGeometry> cm1, const shared_ptr<CollisionGeometry> cm2, const Se3& se31, const Se3& se32, shared_ptr<Interaction> c)
+bool CollisionMultiMethodsManager::collide(const shared_ptr<CollisionGeometry> cm1, const shared_ptr<CollisionGeometry> cm2, const Se3r& se31, const Se3r& se32, shared_ptr<Interaction> c)
 {
 	assert(cm1->getClassIndex()>=0);
 	assert(cm2->getClassIndex()>=0);

@@ -15,8 +15,8 @@ class SDECDiscreteElement : public RigidBody
 	public : void processAttributes();
 	public : void registerAttributes();
 
-	//public : void updateBoundingVolume(Se3& se3);
-	//public : void updateCollisionGeometry(Se3& se3);
+	//public : void updateBoundingVolume(Se3r& se3);
+	//public : void updateCollisionGeometry(Se3r& se3);
 
 	//public : void moveToNextTimeStep();
 

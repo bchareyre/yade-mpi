@@ -6,17 +6,17 @@
 class BoundingSphere : public BoundingVolume
 {
 	public : float radius;
-	public : Vector3 center;
+	public : Vector3r center;
 
 	// construction
 	public : BoundingSphere(float r=0);
 
 	public : ~BoundingSphere ();
 
-	public : void move(Se3& se3);
+	public : void move(Se3r& se3);
 	public : bool loadFromFile(char * fileName);
 	public : void glDraw();
-	public : void update(Se3& se3);
+	public : void update(Se3r& se3);
 
 	public : void processAttributes();
 	public : void registerAttributes();

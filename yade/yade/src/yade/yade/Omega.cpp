@@ -41,7 +41,7 @@ void Omega::init()
 	gravity_y = -10.0;
 	//gravity_y = 0.0;
 	gravity_z = 0.0;
-	//	setGravity = Vector3(0,-9.81,0);
+	//	setGravity = Vector3r(0,-9.81,0);
 	//dt = 0.04;
 	dt = 0.01;
 	//dt = 0.015; // max for cloth, rotating box is little slower, but both work.
@@ -68,16 +68,16 @@ long int Omega::getIter()
 
 /// FIXME - everything below SHOULD NOT be inside Omega.
 
-void Omega::setGravity(Vector3 g)
+void Omega::setGravity(Vector3r g)
 {
-	gravity_x = g.x;
-	gravity_y = g.y;
-	gravity_z = g.z;
+	gravity_x = g.x();
+	gravity_y = g.y();
+	gravity_z = g.z();
 }
 
-Vector3 Omega::getGravity()
+Vector3r Omega::getGravity()
 {
-	return Vector3(gravity_x,gravity_y,gravity_z);
+	return Vector3r(gravity_x,gravity_y,gravity_z);
 }
 
 /// FIXME - maybe some settings class, or something....

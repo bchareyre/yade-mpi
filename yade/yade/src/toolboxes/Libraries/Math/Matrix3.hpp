@@ -1,40 +1,37 @@
-/***************************************************************************
- *   Copyright (C) 2004 by Olivier Galizzi                                 *
- *   olivier.galizzi@imag.fr                                               *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
+// Magic Software, Inc.
+// http://www.magic-software.com
+// http://www.wild-magic.com
+// Copyright (c) 1998-2005.  All Rights Reserved
+//
+// The Wild Magic Library (WM3) source code is supplied under the terms of
+// the license agreement http://www.wild-magic.com/License/WildMagic3.pdf and
+// may not be copied or disclosed except in accordance with the terms of that
+// agreement.
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+#ifndef WM3MATRIX3_H
+#define WM3MATRIX3_H
 
-#ifndef _MATRIX3__H__
-#define _MATRIX3__H__
+// Matrix operations are applied on the left.  For example, given a matrix M
+// and a vector V, matrix-times-vector is M*V.  That is, V is treated as a
+// column vector.  Some graphics APIs use V*M where V is treated as a row
+// vector.  In this context the "M" matrix is really a transpose of the M as
+// represented in Wild Magic.  Similarly, to apply two matrix operations M0
+// and M1, in that order, you compute M1*M0 so that the transform of a vector
+// is (M1*M0)*V = M1*(M0*V).  Some graphics APIs use M0*M1, but again these
+// matrices are the transpose of those as represented in Wild Magic.  You
+// must therefore be careful about how you interface the transformation code
+// with graphics APIS.
+//
+// For memory organization it might seem natural to chose RealType[N][N] for the
+// matrix storage, but this can be a problem on a platform/console that
+// chooses to store the data in column-major rather than row-major format.
+// To avoid potential portability problems, the matrix is stored as RealType[N*N]
+// and organized in row-major order.  That is, the entry of the matrix in row
+// r (0 <= r < N) and column c (0 <= c < N) is stored at index i = c+N*r
+// (0 <= i < N*N).
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-#include "Vector3.hpp"
-#include "Serializable.hpp"
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-// NOTE.  The (x,y,z) coordinate system is assumed to be right-handed.
-// Coordinate axis rotation matrices are of the form
+// The (x,y,z) coordinate system is assumed to be right-handed.  Coordinate
+// axis rotation matrices are of the form
 //   RX =    1       0       0
 //           0     cos(t) -sin(t)
 //           0     sin(t)  cos(t)
@@ -48,150 +45,206 @@
 //           0       0       1
 // where t > 0 indicates a counterclockwise rotation in the xy-plane.
 
-class Matrix3 : public Serializable
+#include "Vector3.hpp"
+
+//namespace Wm3
+//{
+
+template <class RealType>
+class Matrix3
 {
+public:
+    // If bZero is true, create the zero matrix.  Otherwise, create the
+    // identity matrix.
+    Matrix3 (bool bZero = true);
 
-	// construction
-	public : Matrix3 ();
-	public : Matrix3 (const float aafEntry[3][3]);
-	public : Matrix3 (const Matrix3& rkMatrix);
-	public : Matrix3 (float fM00, float fM01, float fM02,
-			  float fM10, float fM11, float fM12,
-			  float fM20, float fM21, float fM22);
+    // copy constructor
+    Matrix3 (const Matrix3& rkM);
 
-	// member access, allows use of construct mat[r][c]
-	public : float* operator[] (int iRow) const;
-	public : operator float* ();
-	public : Vector3 GetColumn (int iCol) const;
-	public : Vector3 GetRow (int iCol) const;
+    // input Mrc is in row r, column c.
+    Matrix3 (RealType fM00, RealType fM01, RealType fM02,
+             RealType fM10, RealType fM11, RealType fM12,
+             RealType fM20, RealType fM21, RealType fM22);
 
-	// assignment and comparison
-	public :  Matrix3& operator= (const Matrix3& rkMatrix);
-	public : bool operator== (const Matrix3& rkMatrix) const;
-	public : bool operator!= (const Matrix3& rkMatrix) const;
+    // Create a matrix from an array of numbers.  The input array is
+    // interpreted based on the Boolean input as
+    //   true:  entry[0..8]={m00,m01,m02,m10,m11,m12,m20,m21,m22} [row major]
+    //   false: entry[0..8]={m00,m10,m20,m01,m11,m21,m02,m12,m22} [col major]
+    Matrix3 (const RealType afEntry[9], bool bRowMajor);
 
-	// arithmetic operations
-	public : Matrix3 operator+ (const Matrix3& rkMatrix) const;
-	public : Matrix3 operator- (const Matrix3& rkMatrix) const;
-	public : Matrix3 operator* (const Matrix3& rkMatrix) const;
-	public : Matrix3 operator- () const;
+    // Create matrices based on vector input.  The Boolean is interpreted as
+    //   true: vectors are columns of the matrix
+    //   false: vectors are rows of the matrix
+    Matrix3 (const Vector3<RealType>& rkU, const Vector3<RealType>& rkV,
+        const Vector3<RealType>& rkW, bool bColumns);
+    Matrix3 (const Vector3<RealType>* akV, bool bColumns);
 
-	// matrix * vector [3x3 * 3x1 = 3x1]
-	public : Vector3 operator* (const Vector3& rkVector) const;
+    // create a diagonal matrix
+    Matrix3 (RealType fM00, RealType fM11, RealType fM22);
 
-	// vector * matrix [1x3 * 3x3 = 1x3]
-	public : friend Vector3 operator* (const Vector3& rkVector, const Matrix3& rkMatrix);
+    // Create rotation matrices (positive angle - counterclockwise).  The
+    // angle must be in radians, not degrees.
+    Matrix3 (const Vector3<RealType>& rkAxis, RealType fAngle);
 
-	// matrix * scalar
-	public : Matrix3 operator* (float fScalar) const;
+    // create a tensor product U*V^T
+    Matrix3 (const Vector3<RealType>& rkU, const Vector3<RealType>& rkV);
 
-	// scalar * matrix
-	public : friend Matrix3 operator* (float fScalar, const Matrix3& rkMatrix);
+    // create various matrices
+    Matrix3& makeZero ();
+    Matrix3& makeIdentity ();
+    Matrix3& makeDiagonal (RealType fM00, RealType fM11, RealType fM22);
+    Matrix3& fromAxisAngle (const Vector3<RealType>& rkAxis, RealType fAngle);
+    Matrix3& makeTensorProduct (const Vector3<RealType>& rkU,
+        const Vector3<RealType>& rkV);
 
-	// M0.TransposeTimes(M1) = M0^t*M1 where M0^t is the transpose of M0
-	public : Matrix3 TransposeTimes (const Matrix3& rkM) const;
+    // member access
+    operator const RealType* () const;
+    operator RealType* ();
+    const RealType* operator[] (int iRow) const;
+    RealType* operator[] (int iRow);
+    RealType operator() (int iRow, int iCol) const;
+    RealType& operator() (int iRow, int iCol);
+    void setRow (int iRow, const Vector3<RealType>& rkV);
+    Vector3<RealType> getRow (int iRow) const;
+    void setColumn (int iCol, const Vector3<RealType>& rkV);
+    Vector3<RealType> getColumn (int iCol) const;
+    void getColumnMajor (RealType* afCMajor) const;
 
-	// M0.TimesTranspose(M1) = M0*M1^t where M1^t is the transpose of M1
-	public : Matrix3 TimesTranspose (const Matrix3& rkM) const;
+    // assignment
+    Matrix3& operator= (const Matrix3& rkM);
 
-	// utilities
-	public : Matrix3 Transpose () const;
-	public : bool Inverse (Matrix3& rkInverse, float fTolerance = 1e-06f) const;
-	public : Matrix3 Inverse (float fTolerance = 1e-06f) const;
-	public : float Determinant () const;
+    // comparison
+    bool operator== (const Matrix3& rkM) const;
+    bool operator!= (const Matrix3& rkM) const;
+    bool operator<  (const Matrix3& rkM) const;
+    bool operator<= (const Matrix3& rkM) const;
+    bool operator>  (const Matrix3& rkM) const;
+    bool operator>= (const Matrix3& rkM) const;
 
-	// SLERP (spherical linear interpolation) without quaternions.  Computes
-	// R(t) = R0*(Transpose(R0)*R1)^t.  If Q is a rotation matrix with
-	// unit-length axis U and angle A, then Q^t is a rotation matrix with
-	// unit-length axis U and rotation angle t*A.
-	public : static Matrix3 Slerp (float fT, const Matrix3& rkR0, const Matrix3& rkR1);
+    // arithmetic operations
+    Matrix3 operator+ (const Matrix3& rkM) const;
+    Matrix3 operator- (const Matrix3& rkM) const;
+    Matrix3 operator* (const Matrix3& rkM) const;
+    Matrix3 operator* (RealType fScalar) const;
+    Matrix3 operator/ (RealType fScalar) const;
+    Matrix3 operator- () const;
 
-	// singular value decomposition
-	public : void SingularValueDecomposition (Matrix3& rkL, Vector3& rkS, Matrix3& rkR) const;
-	public : void SingularValueComposition (const Matrix3& rkL, const Vector3& rkS, const Matrix3& rkR);
+    // arithmetic updates
+    Matrix3& operator+= (const Matrix3& rkM);
+    Matrix3& operator-= (const Matrix3& rkM);
+    Matrix3& operator*= (RealType fScalar);
+    Matrix3& operator/= (RealType fScalar);
 
-	// Gram-Schmidt orthonormalization (applied to columns of rotation matrix)
-	public : void Orthonormalize ();
+    // matrix times vector
+    Vector3<RealType> operator* (const Vector3<RealType>& rkV) const;  // M * v
 
-	// orthogonal Q, diagonal D, upper triangular U stored as (u01,u02,u12)
-	public : void QDUDecomposition (Matrix3& rkQ, Vector3& rkD, Vector3& rkU) const;
+    // other operations
+    Matrix3 transpose () const;  // M^T
+    Matrix3 transposeTimes (const Matrix3& rkM) const;  // this^T * M
+    Matrix3 timesTranspose (const Matrix3& rkM) const;  // this * M^T
+    Matrix3 inverse () const;
+    Matrix3 adjoint () const;
+    RealType determinant () const;
+    RealType qForm (const Vector3<RealType>& rkU,
+        const Vector3<RealType>& rkV) const;  // u^T*M*v
+    Matrix3 timesDiagonal (const Vector3<RealType>& rkDiag) const;  // M*D
+    Matrix3 diagonalTimes (const Vector3<RealType>& rkDiag) const;  // D*M
 
-	public : float SpectralNorm () const;
+    // The matrix must be a rotation for these functions to be valid.  The
+    // last function uses Gram-Schmidt orthonormalization applied to the
+    // columns of the rotation matrix.  The angle must be in radians, not
+    // degrees.
+    void toAxisAngle (Vector3<RealType>& rkAxis, RealType& rfAngle) const;
+    void orthonormalize ();
 
-	// matrix must be orthonormal
-	public : void ToAxisAngle (Vector3& rkAxis, float& rfRadians) const;
-	public : void FromAxisAngle (const Vector3& rkAxis, float fRadians);
+    // The matrix must be symmetric.  Factor M = R * D * R^T where
+    // R = [u0|u1|u2] is a rotation matrix with columns u0, u1, and u2 and
+    // D = diag(d0,d1,d2) is a diagonal matrix whose diagonal entries are d0,
+    // d1, and d2.  The eigenvector u[i] corresponds to eigenvector d[i].
+    // The eigenvalues are ordered as d0 <= d1 <= d2.
+    void eigenDecomposition (Matrix3& rkRot, Matrix3& rkDiag) const;
 
-	// The matrix must be orthonormal.  The decomposition is yaw*pitch*roll
-	// where yaw is rotation about the Up vector, pitch is rotation about the
-	// Right axis, and roll is rotation about the Direction axis.
-	public : bool ToEulerAnglesXYZ (float& rfYAngle, float& rfPAngle, float& rfRAngle) const;
-    	public : bool ToEulerAnglesXZY (float& rfYAngle, float& rfPAngle, float& rfRAngle) const;
-	public : bool ToEulerAnglesYXZ (float& rfYAngle, float& rfPAngle, float& rfRAngle) const;
-	public : bool ToEulerAnglesYZX (float& rfYAngle, float& rfPAngle, float& rfRAngle) const;
-	public : bool ToEulerAnglesZXY (float& rfYAngle, float& rfPAngle, float& rfRAngle) const;
-	public : bool ToEulerAnglesZYX (float& rfYAngle, float& rfPAngle, float& rfRAngle) const;
-	public : void FromEulerAnglesXYZ (float fYAngle, float fPAngle, float fRAngle);
-	public : void FromEulerAnglesXZY (float fYAngle, float fPAngle, float fRAngle);
-	public : void FromEulerAnglesYXZ (float fYAngle, float fPAngle, float fRAngle);
-	public : void FromEulerAnglesYZX (float fYAngle, float fPAngle, float fRAngle);
-	public : void FromEulerAnglesZXY (float fYAngle, float fPAngle, float fRAngle);
-	public : void FromEulerAnglesZYX (float fYAngle, float fPAngle, float fRAngle);
+    // The matrix must be orthonormal.  The decomposition is yaw*pitch*roll
+    // where yaw is rotation about the Up vector, pitch is rotation about the
+    // Right axis, and roll is rotation about the Direction axis.
+    Matrix3& fromEulerAnglesXYZ (RealType fYAngle, RealType fPAngle, RealType fRAngle);
+    Matrix3& fromEulerAnglesXZY (RealType fYAngle, RealType fPAngle, RealType fRAngle);
+    Matrix3& fromEulerAnglesYXZ (RealType fYAngle, RealType fPAngle, RealType fRAngle);
+    Matrix3& fromEulerAnglesYZX (RealType fYAngle, RealType fPAngle, RealType fRAngle);
+    Matrix3& fromEulerAnglesZXY (RealType fYAngle, RealType fPAngle, RealType fRAngle);
+    Matrix3& fromEulerAnglesZYX (RealType fYAngle, RealType fPAngle, RealType fRAngle);
+    bool toEulerAnglesXYZ (RealType& rfYAngle, RealType& rfPAngle,
+        RealType& rfRAngle) const;
+    bool toEulerAnglesXZY (RealType& rfYAngle, RealType& rfPAngle,
+        RealType& rfRAngle) const;
+    bool toEulerAnglesYXZ (RealType& rfYAngle, RealType& rfPAngle,
+        RealType& rfRAngle) const;
+    bool toEulerAnglesYZX (RealType& rfYAngle, RealType& rfPAngle,
+        RealType& rfRAngle) const;
+    bool toEulerAnglesZXY (RealType& rfYAngle, RealType& rfPAngle,
+        RealType& rfRAngle) const;
+    bool toEulerAnglesZYX (RealType& rfYAngle, RealType& rfPAngle,
+        RealType& rfRAngle) const;
 
-	// eigensolver, matrix must be symmetric
-	public : void EigenSolveSymmetric (float afEigenvalue[3], Vector3 akEigenvector[3]) const;
+    // SLERP (spherical linear interpolation) without quaternions.  Computes
+    // R(t) = R0*(Transpose(R0)*R1)^t.  If Q is a rotation matrix with
+    // unit-length axis U and angle A, then Q^t is a rotation matrix with
+    // unit-length axis U and rotation angle t*A.
+    static Matrix3 slerp (RealType fT, const Matrix3& rkR0,
+        const Matrix3& rkR1);
 
-	public : static void TensorProduct (const Vector3& rkU, const Vector3& rkV, Matrix3& rkProduct);
-	public : static const float EPSILON;
-	public : static const Matrix3 ZERO;
-	public : static const Matrix3 IDENTITY;
+    // Singular value decomposition, M = L*S*R, where L and R are orthogonal
+    // and S is a diagonal matrix whose diagonal entries are nonnegative.
+    void singularValueDecomposition (Matrix3& rkL, Matrix3& rkS,
+        Matrix3& rkR) const;
+    void singularValueComposition (const Matrix3& rkL, const Matrix3& rkS,
+        const Matrix3& rkR);
 
-	// support for eigensolver
-	protected : void Tridiagonal (float afDiag[3], float afSubDiag[3]);
-	protected : bool QLAlgorithm (float afDiag[3], float afSubDiag[3]);
+    // factor M = Q*D*U with orthogonal Q, diagonal D, upper triangular U
+    void QDUDecomposition (Matrix3& rkQ, Matrix3& rkD, Matrix3& rkU) const;
 
-	// support for singular value decomposition
-	protected : static const float ms_fSvdEpsilon;
-	protected : static const int ms_iSvdMaxIterations;
-	protected : static void Bidiagonalize (Matrix3& kA, Matrix3& kL, Matrix3& kR);
-	protected : static void GolubKahanStep (Matrix3& kA, Matrix3& kL, Matrix3& kR);
-	// support for spectral norm
-	protected : static float MaxCubicRoot (float afCoeff[3]);
+    // special matrices
+    static const Matrix3 ZERO;
+    static const Matrix3 IDENTITY;
 
-	protected : float m[3][3];
+private:
+    // Support for eigendecomposition.  The Tridiagonalize function applies
+    // a Householder transformation to the matrix.  If that transformation
+    // is the identity (the matrix is already tridiagonal), then the return
+    // value is 'false'.  Otherwise, the transformation is a reflection and
+    // the return value is 'true'.  The QLAlgorithm returns 'true' iff the
+    // QL iteration scheme converged.
+    bool tridiagonalize (RealType afDiag[3], RealType afSubd[2]);
+    bool QLAlgorithm (RealType afDiag[3], RealType afSubd[2]);
 
-	public : void registerAttributes()
-	{
-		REGISTER_ATTRIBUTE(m[0][0]);
-		REGISTER_ATTRIBUTE(m[0][1]);
-		REGISTER_ATTRIBUTE(m[0][2]);
-		REGISTER_ATTRIBUTE(m[1][0]);
-		REGISTER_ATTRIBUTE(m[1][1]);
-		REGISTER_ATTRIBUTE(m[1][2]);
-		REGISTER_ATTRIBUTE(m[2][0]);
-		REGISTER_ATTRIBUTE(m[2][1]);
-		REGISTER_ATTRIBUTE(m[2][2]);
-	}
+    // support for singular value decomposition
+    static void bidiagonalize (Matrix3& rkA, Matrix3& rkL, Matrix3& rkR);
+    static void golubKahanStep (Matrix3& rkA, Matrix3& rkL, Matrix3& rkR);
 
-	REGISTER_CLASS_NAME(Matrix3);
+    // for indexing into the 1D array of the matrix, iCol+N*iRow
+    static int I (int iRow, int iCol);
+
+    // support for comparisons
+    int compareArrays (const Matrix3& rkM) const;
+
+    RealType m_afEntry[9];
 };
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+// c * M
+template <class RealType>
+Matrix3<RealType> operator* (RealType fScalar, const Matrix3<RealType>& rkM);
 
-REGISTER_SERIALIZABLE(Matrix3, true);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+// v^T * M
+template <class RealType>
+Vector3<RealType> operator* (const Vector3<RealType>& rkV, const Matrix3<RealType>& rkM);
 
 #include "Matrix3.ipp"
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+typedef Matrix3<float> Matrix3f;
+typedef Matrix3<double> Matrix3d;
+typedef Matrix3<Real> Matrix3r;
+
+//}
 
 #endif
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 
