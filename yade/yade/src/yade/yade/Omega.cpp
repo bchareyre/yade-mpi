@@ -6,9 +6,9 @@
 
 #include <cstdlib>
 
-#include <boost/filesystem/operations.hpp> 
+#include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
-             
+
 #include "FileGenerator.hpp"
 #include "DynamicEngine.hpp"
 #include "KinematicEngine.hpp"
@@ -20,7 +20,7 @@
 #include "GeometricalModel.hpp"
 #include "CollisionGeometry.hpp"
 #include "BoundingVolume.hpp"
-#include "InteractionGeometry.hpp"             
+#include "InteractionGeometry.hpp"
 
 #include "ThreadSynchronizer.hpp"
 #include "SimulationLoop.hpp"
@@ -67,11 +67,11 @@ void Omega::init()
 	startingSimulationTime = second_clock::local_time();
 
 	*logFile << "<Simulation" << " Date =\"" << startingSimulationTime << "\">" << endl;
-	
+
 
 	// build dynlib information list
 	buildDynlibList();
-	
+
 	simulationLoop   = shared_ptr<SimulationLoop>(new SimulationLoop());
 	simulationThread = shared_ptr<boost::thread>(new boost::thread(*simulationLoop));
 	synchronizer     = shared_ptr<ThreadSynchronizer>(new ThreadSynchronizer());
@@ -92,7 +92,7 @@ void Omega::registerDynlibType(const string& name)
 	{
 		return;
 	}
-	
+
 	if (dynamic_pointer_cast<FileGenerator>(f))
 		dynlibsType[name]="FileGenerator";
 	else if (dynamic_pointer_cast<DynamicEngine>(f))
@@ -117,9 +117,9 @@ void Omega::registerDynlibType(const string& name)
 		dynlibsType[name]="BoundingVolume";
 	else if (dynamic_pointer_cast<InteractionGeometry>(f))
 		dynlibsType[name]="InteractionGeometry"; // FIXME : change name of the subproject
-	else 
-		dynlibsType[name]="Unknown"; 
-	
+	else
+		dynlibsType[name]="Unknown";
+
 
 }
 
@@ -131,10 +131,10 @@ void Omega::buildDynlibList()
 	char * buffer ;
 	buffer = getenv ("YADEBINPATH");
 	string yadeBinPath = buffer;
-	
+
 	filesystem::path directory(yadeBinPath+"/dynlib/linux");
-	if ( filesystem::exists( directory ) ) 
-	{	
+	if ( filesystem::exists( directory ) )
+	{
 		filesystem::directory_iterator di( directory );
 		filesystem::directory_iterator diEnd;
 		for ( ; di != diEnd; ++di )
@@ -152,7 +152,7 @@ void Omega::buildDynlibList()
 				}
 				registerDynlibType(name.leaf().substr(3,name.leaf().size()-3));
 				//cout << name.leaf() << endl;
-			}	
+			}
 		}
 	}
 }

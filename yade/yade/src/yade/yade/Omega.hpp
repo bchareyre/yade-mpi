@@ -64,16 +64,16 @@ using namespace std;
 class Omega : public Singleton<Omega>
 {
 	public : shared_ptr<FrontEnd> gui;
-	
+
 	public : shared_ptr<boost::thread> simulationThread;
 	public : shared_ptr<SimulationLoop> simulationLoop; // FIXME put private and add function into omega to build them
-	
+
 	public : shared_ptr<ThreadSynchronizer> synchronizer; // FIXME put private and add function into omega to build them
-	
+
 	public : map<string,string> dynlibsType;
-	
+
 	public : bool getDynlibType(const string& libName,string& type);
-		
+
 	public : shared_ptr<ofstream> logFile;
 
 // FIXME - this must be a pimpl, or removed somewhere else. (circular dependency loop : 4 hours lost to find it, janek)
@@ -106,18 +106,18 @@ class Omega : public Singleton<Omega>
 
 	public	: void 		setMaxiter(const string);
 	public	: long int 	getMaxiter();
-
+	// FIXME - move this junk somewhere else...
 	private : bool		automatic;
 	public  : void		setAutomatic(bool);
 	public  : bool		getAutomatic();
-
+	// FIXME - move this junk somewhere else...
 	private : bool		progress;
 	public  : void		setProgress(bool);
 	public  : bool		getProgress();
 
-	
-	
-	
+
+
+
 	public : void init();
 	private   : Omega() ;
 	private   : ~Omega() ;

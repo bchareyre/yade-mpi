@@ -27,6 +27,8 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include <boost/thread/mutex.hpp>
+
 /**
 
 This is a Singleton template. You can make a singleton out of any class that
@@ -41,14 +43,32 @@ from ashes if someone tries to access it, and it's destroyed)
 
 */
 
+namespace {
+	boost::mutex singleton_constructor_mutex;
+}
+
 template <class T>
 class Singleton
 {
 	public:
 		static T& instance()
 		{
-			static T obj;
-			return obj;
+			//static T obj;
+			static T* ptr_obj;
+
+			if( ! ptr_obj )
+			{
+				boost::mutex::scoped_lock lock(singleton_constructor_mutex);
+				if( ! ptr_obj )
+				{
+					ptr_obj = new T;
+				}
+			}
+
+			return *ptr_obj;
+
+
+			//return obj;
 		}
 	protected:
 		Singleton() {};
