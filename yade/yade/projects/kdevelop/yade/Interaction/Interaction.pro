@@ -22,8 +22,8 @@ CONFIG += debug \
 TEMPLATE = lib 
 HEADERS += Interaction.hpp \
            InteractionContainer.hpp \
-           GeometryOfInteraction.hpp \
-           PhysicsOfInteraction.hpp \
+           InteractionGeometry.hpp \
+           InteractionPhysics.hpp \
            BroadInteractor.hpp \
            InteractionGeometryDispatcher.hpp \
            InteractionPhysicsDispatcher.hpp \

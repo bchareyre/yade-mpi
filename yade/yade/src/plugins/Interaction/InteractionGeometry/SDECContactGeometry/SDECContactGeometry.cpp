@@ -1,6 +1,6 @@
 #include "SDECContactGeometry.hpp"
 
-SDECContactGeometry::SDECContactGeometry() : GeometryOfInteraction()
+SDECContactGeometry::SDECContactGeometry() : InteractionGeometry()
 {
 }
 

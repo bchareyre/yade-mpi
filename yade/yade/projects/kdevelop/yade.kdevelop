@@ -106,7 +106,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>extensions/RenderingEngines/OpenGLRenderingEngine/OpenGLRenderingEngine</activedir>
+      <activedir>extensions</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>

@@ -3,13 +3,12 @@
 # Subdir relative project main directory: ./toolboxes/Libraries
 # Target is a subdirs project 
 
-SUBDIRS += Factory \
-           Singleton \
+SUBDIRS += Loki \
            Math \
+	   Factory \
            Serialization \
-           Threads \
-           Typelist \
-           MultiMethods 
+           MultiMethods \
+           Threads
 MOC_DIR = $(YADECOMPILATIONPATH)
 UI_DIR = $(YADECOMPILATIONPATH)
 OBJECTS_DIR = $(YADECOMPILATIONPATH)

@@ -37,8 +37,8 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "GeometryOfInteraction.hpp"
-#include "PhysicsOfInteraction.hpp"
+#include "InteractionGeometry.hpp"
+#include "InteractionPhysics.hpp"
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -57,8 +57,8 @@ class Interaction : public Serializable
 
 
 	// FIXME - why public ?!
-	public	: shared_ptr<GeometryOfInteraction> interactionGeometry;
-	public	: shared_ptr<PhysicsOfInteraction> interactionPhysics;
+	public	: shared_ptr<InteractionGeometry> interactionGeometry;
+	public	: shared_ptr<InteractionPhysics> interactionPhysics;
 
 	// construction
 	public	: Interaction ();
