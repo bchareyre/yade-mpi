@@ -55,19 +55,43 @@ NullGUI::~NullGUI()
 
 int NullGUI::run(int , char** )
 {
+        long int& iter = Omega::instance().currentIteration; // FIXME : public variable :-P~
+        
 	Omega::instance().loadSimulation();
 
 	bool progress = Omega::instance().getProgress();
 	long int maxIteration = Omega::instance().getMaxIteration();
 
+	cout << "Starting computation of file: " << Omega::instance().getSimulationFileName() << endl;
+	
 	if( maxIteration == 0)
 		cout << "\nNo maxiter specified, computations will run forever, to set it, use flag -m\n";
+	else
+		cout << "\nComputing " << maxIteration << " iterations\n";
 
-	cout << "Starting computation of file: " << Omega::instance().getSimulationFileName() << endl;
 	cout << "Using timestep: " << Omega::instance().getTimeStep() << endl;
 
 //	Omega::instance().waitForSimulationEnd();
-	return 1;
+	
+	while(1)
+	{
+		Omega::instance().rootBody->moveToNextTimeStep();
+		//Omega::instance().incrementCurrentIteration();
+		++iter;
+		Omega::instance().incrementSimulationTime();
+		
+		if( iter % 100 == 0 )                                   // checks every 100th iteration
+		{
+			if(progress)
+				cout << "iteration: " << iter << endl;
+			if( maxIteration !=0 )
+				if( iter > maxIteration )
+				{
+					cerr << "Calc finished at: " << iter << endl;
+					exit(0);                        // terminate.
+				}
+		}
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
