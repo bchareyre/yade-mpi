@@ -20,7 +20,7 @@ CONFIG += debug \
 TEMPLATE = lib 
 HEADERS += BodyBoundingVolume.hpp \
            BodyBoundingVolumeFactoryFunctor.hpp \
-           BodyBoundingVolumeFactoryDispatcher.hpp 
+           BodyBoundingVolumeFactoryDispatcher.hpp \
            BodyBoundingVolumeUpdatorFunctor.hpp \
            BodyBoundingVolumeUpdatorDispatcher.hpp \
            BodyInteractionGeometry.hpp \

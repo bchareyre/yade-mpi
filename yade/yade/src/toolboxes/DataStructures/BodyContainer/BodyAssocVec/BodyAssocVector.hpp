@@ -9,7 +9,7 @@ class Body;
 
 using namespace boost;
 
-class BodyAssocVec : public BodyContainer
+class BodyAssocVector : public BodyContainer
 {
 	private	: Loki::AssocVector<unsigned int , shared_ptr<Body> > bodies;
 	private	: Loki::AssocVector<unsigned int , shared_ptr<Body> >::iterator bii;
@@ -17,8 +17,8 @@ class BodyAssocVec : public BodyContainer
 	private	: Loki::AssocVector<unsigned int , shared_ptr<Body> >::iterator biiEnd;
 	private	: std::list<Loki::AssocVector<unsigned int , shared_ptr<Body> >::iterator> iteratorList;
 
-	public	: BodyAssocVec();
-	public	: virtual ~BodyAssocVec();
+	public	: BodyAssocVector();
+	public	: virtual ~BodyAssocVector();
 
 	public	: virtual unsigned int insert(shared_ptr<Body>&);
 	public	: virtual unsigned int insert(shared_ptr<Body>& , unsigned int);
@@ -38,9 +38,9 @@ class BodyAssocVec : public BodyContainer
 	public	: virtual unsigned int size();
 
 	// serialization of this class...
-	REGISTER_CLASS_NAME(BodyAssocVec);
+	REGISTER_CLASS_NAME(BodyAssocVector);
 };
 
-REGISTER_SERIALIZABLE(BodyAssocVec,false);
+REGISTER_SERIALIZABLE(BodyAssocVector,false);
 
 #endif // __BODYASSOCVEC_HPP__

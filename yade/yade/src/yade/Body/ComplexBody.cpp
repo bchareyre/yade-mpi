@@ -10,7 +10,7 @@
 #include "InteractionVecSet.hpp"
 //#include "InteractionHashMap.hpp"
 #include "BodyRedirectionVector.hpp"
-#include "BodyAssocVec.hpp"
+#include "BodyAssocVector.hpp"
 #include "BodyBoundingVolumeFactoryDispatcher.hpp"
 #include "ActionVecVec.hpp"
 

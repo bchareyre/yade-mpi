@@ -106,7 +106,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>yade/Geometry</activedir>
+      <activedir>toolboxes/DataStructures/BodyContainer/BodyAssocVec</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>

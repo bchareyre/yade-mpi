@@ -6,7 +6,6 @@
 LIBS += -lAABB \
         -lTerrain \
         -lMath \
-        -lGeometry \
         -lMultiMethods \
         -rdynamic 
 INCLUDEPATH = $(YADEINCLUDEPATH) 
@@ -16,7 +15,6 @@ OBJECTS_DIR = $(YADECOMPILATIONPATH)
 QMAKE_LIBDIR = ../../../../plugins/Geometry/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
                ../../../../plugins/Geometry/GeometricalModel/Terrain/$(YADEDYNLIBPATH) \
                ../../../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
-               ../../../../yade/Geometry/$(YADEDYNLIBPATH) \
                ../../../../toolboxes/Libraries/MultiMethods/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \

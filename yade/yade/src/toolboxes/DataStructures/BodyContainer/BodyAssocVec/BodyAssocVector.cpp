@@ -1,16 +1,16 @@
-#include "BodyAssocVec.hpp"
+#include "BodyAssocVector.hpp"
 #include "Body.hpp"
 
-BodyAssocVec::BodyAssocVec()
+BodyAssocVector::BodyAssocVector()
 {
 	clear();
 }
 
-BodyAssocVec::~BodyAssocVec()
+BodyAssocVector::~BodyAssocVector()
 {
 }
 
-unsigned int BodyAssocVec::insert(shared_ptr<Body>& b)
+unsigned int BodyAssocVector::insert(shared_ptr<Body>& b)
 {
 //	unsigned int max;
 //	if( bodies.begin() != bodies.end() )
@@ -40,18 +40,18 @@ unsigned int BodyAssocVec::insert(shared_ptr<Body>& b)
 	return position;
 }
 
-unsigned int BodyAssocVec::insert(shared_ptr<Body>& b, unsigned int newId)
+unsigned int BodyAssocVector::insert(shared_ptr<Body>& b, unsigned int newId)
 {
 	BodyContainer::setId(b,newId);
 	return insert(b);
 }
 
-void BodyAssocVec::clear()
+void BodyAssocVector::clear()
 {
 	bodies.clear();
 }
 
-bool BodyAssocVec::erase(unsigned int id)
+bool BodyAssocVector::erase(unsigned int id)
 {
 
 // WARNING!!! AssocVector.erase() invalidates all iterators !!!
@@ -67,7 +67,7 @@ bool BodyAssocVec::erase(unsigned int id)
 		return false;
 }
 
-bool BodyAssocVec::find(unsigned int id , shared_ptr<Body>& b) const
+bool BodyAssocVector::find(unsigned int id , shared_ptr<Body>& b) const
 {
 	// do not modify the interanl iterator
 	Loki::AssocVector<unsigned int , shared_ptr<Body> >::const_iterator tmpBii;
@@ -82,7 +82,7 @@ bool BodyAssocVec::find(unsigned int id , shared_ptr<Body>& b) const
 		return false;
 }
 
-shared_ptr<Body>& BodyAssocVec::operator[](unsigned int id)
+shared_ptr<Body>& BodyAssocVector::operator[](unsigned int id)
 {
 	// do not modify bii iterator
 	temporaryBii = bodies.find(id);
@@ -92,7 +92,7 @@ shared_ptr<Body>& BodyAssocVec::operator[](unsigned int id)
 //		return shared_ptr<Body>();
 }
 
-const shared_ptr<Body>& BodyAssocVec::operator[](unsigned int id) const
+const shared_ptr<Body>& BodyAssocVector::operator[](unsigned int id) const
 {
 	Loki::AssocVector<unsigned int , shared_ptr<Body> >::const_iterator tmpBii;
 	tmpBii = bodies.find(id);
@@ -103,39 +103,39 @@ const shared_ptr<Body>& BodyAssocVec::operator[](unsigned int id) const
 //		return shared_ptr<Body>();
 }
 
-void BodyAssocVec::gotoFirst()
+void BodyAssocVector::gotoFirst()
 {
 	bii    = bodies.begin();
 	biiEnd = bodies.end();
 }
 
-bool BodyAssocVec::notAtEnd()
+bool BodyAssocVector::notAtEnd()
 {
 	return ( bii != biiEnd );
 }
 
-void BodyAssocVec::gotoNext()
+void BodyAssocVector::gotoNext()
 {
 	++bii;
 }
 
-shared_ptr<Body>& BodyAssocVec::getCurrent()
+shared_ptr<Body>& BodyAssocVector::getCurrent()
 {
 	return (*bii).second;
 }
 
-void BodyAssocVec::pushIterator()
+void BodyAssocVector::pushIterator()
 {// FIXME - make sure that this is FIFO (I'm tired now...)
 	iteratorList.push_front(bii);
 }
 
-void BodyAssocVec::popIterator()
+void BodyAssocVector::popIterator()
 {
 	bii = iteratorList.front();
 	iteratorList.pop_front();
 }
 
-unsigned int BodyAssocVec::size()
+unsigned int BodyAssocVector::size()
 {
 	return bodies.size();
 }
