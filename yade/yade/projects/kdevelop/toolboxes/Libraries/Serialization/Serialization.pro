@@ -3,6 +3,19 @@
 # Subdir relative project main directory: ./toolboxes/Libraries/Serialization
 # Target is a library:  
 
+LIBS += -lMath \
+        -rdynamic 
+INCLUDEPATH = $(YADEINCLUDEPATH) 
+MOC_DIR = $(YADECOMPILATIONPATH) 
+UI_DIR = $(YADECOMPILATIONPATH) 
+OBJECTS_DIR = $(YADECOMPILATIONPATH) 
+QMAKE_LIBDIR = ../../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
+               $(YADEDYNLIBPATH) 
+DESTDIR = $(YADEDYNLIBPATH) 
+CONFIG += debug \
+          warn_on \
+          dll 
+TEMPLATE = lib 
 HEADERS += Archive.hpp \
            ArchiveTypes.hpp \
            Serializable.hpp \
@@ -24,18 +37,3 @@ SOURCES += Archive.cpp \
            IOManager.cpp \
            IOManagerExceptions.cpp \
            SerializableSingleton.cpp 
-LIBS += -lAssocVector \
-        -lMath \
-        -rdynamic 
-INCLUDEPATH = $(YADEINCLUDEPATH) 
-MOC_DIR = $(YADECOMPILATIONPATH) 
-UI_DIR = $(YADECOMPILATIONPATH) 
-OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../toolboxes/DataStructures/AssocVector/$(YADEDYNLIBPATH) \
-               ../../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
-               $(YADEDYNLIBPATH) 
-DESTDIR = $(YADEDYNLIBPATH) 
-CONFIG += debug \
-          warn_on \
-          dll 
-TEMPLATE = lib 

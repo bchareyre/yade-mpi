@@ -8,13 +8,13 @@ LIBS += -lMath \
         -lFactory \
         -lInteraction \
         -rdynamic 
-INCLUDEPATH = $(YADEINCLUDEPATH)
+INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 QMAKE_LIBDIR = ../../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
-               ../../../yade/Factory/$(YADEDYNLIBPATH) \
+               ../../../toolboxes/Libraries/Factory/$(YADEDYNLIBPATH) \
                ../../../yade/Interaction/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 

@@ -1,1 +1,1 @@
-./yade -i YadeQtGUI $@
+./yade -i QtGUI $@

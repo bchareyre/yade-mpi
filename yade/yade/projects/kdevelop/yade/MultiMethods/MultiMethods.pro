@@ -3,6 +3,17 @@
 # Subdir relative project main directory: ./yade/MultiMethods
 # Target is a library:  
 
+LIBS += -rdynamic 
+INCLUDEPATH = $(YADEINCLUDEPATH) 
+MOC_DIR = $(YADECOMPILATIONPATH) 
+UI_DIR = $(YADECOMPILATIONPATH) 
+OBJECTS_DIR = $(YADECOMPILATIONPATH) 
+QMAKE_LIBDIR = $(YADEDYNLIBPATH) 
+DESTDIR = $(YADEDYNLIBPATH) 
+CONFIG += debug \
+          warn_on \
+          dll 
+TEMPLATE = lib 
 HEADERS += Indexable.hpp \
            MultiMethodsManager.hpp \
            MultiMethodsManagerExceptions.hpp \
@@ -10,14 +21,3 @@ HEADERS += Indexable.hpp \
            MultiMethodFunctor2D.hpp 
 SOURCES += MultiMethodsManagerExceptions.cpp \
            MultiMethodFunctor2D.cpp 
-LIBS += -rdynamic
-INCLUDEPATH = $(YADEINCLUDEPATH)
-MOC_DIR = $(YADECOMPILATIONPATH)
-UI_DIR = $(YADECOMPILATIONPATH)
-OBJECTS_DIR = $(YADECOMPILATIONPATH)
-QMAKE_LIBDIR = $(YADEDYNLIBPATH)
-DESTDIR = $(YADEDYNLIBPATH)
-CONFIG += debug \
-warn_on \
-dll
-TEMPLATE = lib

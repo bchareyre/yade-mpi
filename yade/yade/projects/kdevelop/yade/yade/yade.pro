@@ -33,7 +33,7 @@ QMAKE_LIBDIR = ../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../yade/Geometry/$(YADEDYNLIBPATH) \
                ../../yade/Interaction/$(YADEDYNLIBPATH) \
                ../../yade/MultiMethods/$(YADEDYNLIBPATH) \
-               ../../yade/Factory/$(YADEDYNLIBPATH) \
+               ../../toolboxes/Libraries/Factory/$(YADEDYNLIBPATH) \
                ../../toolboxes/DataStructures/InteractionContainer/InteractionVecSet/$(YADEDYNLIBPATH) \
                ../../toolboxes/DataStructures/InteractionContainer/InteractionHashMap/$(YADEDYNLIBPATH) \
                ../../toolboxes/DataStructures/BodyContainer/BodyAssocVec/$(YADEDYNLIBPATH) \

@@ -12,7 +12,7 @@ CONFIG += debug \
 TEMPLATE = subdirs 
 SUBDIRS += toolboxes \
            yade \
-	   extensions \
            plugins \
            preprocessors \
-           postprocessors
+           postprocessors \
+           extensions 

@@ -104,7 +104,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>frontends/YadeQtGUI</activedir>
+      <activedir>extensions/FrontEnds/QtGUI</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>

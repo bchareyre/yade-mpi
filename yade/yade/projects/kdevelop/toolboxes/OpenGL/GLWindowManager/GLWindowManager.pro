@@ -3,6 +3,17 @@
 # Subdir relative project main directory: ./toolboxes/OpenGL/GLWindowManager
 # Target is a library:  
 
+LIBS += -rdynamic 
+INCLUDEPATH = $(YADEINCLUDEPATH) 
+MOC_DIR = $(YADECOMPILATIONPATH) 
+UI_DIR = $(YADECOMPILATIONPATH) 
+OBJECTS_DIR = $(YADECOMPILATIONPATH) 
+QMAKE_LIBDIR = $(YADEDYNLIBPATH) 
+DESTDIR = $(YADEDYNLIBPATH) 
+CONFIG += debug \
+          warn_on \
+          dll 
+TEMPLATE = lib 
 HEADERS += FpsTracker.hpp \
            GLTextLabel.hpp \
            GLWindow.hpp \
@@ -11,14 +22,3 @@ SOURCES += FpsTracker.cpp \
            GLTextLabel.cpp \
            GLWindow.cpp \
            GLWindowsManager.cpp 
-LIBS += -rdynamic
-INCLUDEPATH = $(YADEINCLUDEPATH)
-MOC_DIR = $(YADECOMPILATIONPATH)
-UI_DIR = $(YADECOMPILATIONPATH)
-OBJECTS_DIR = $(YADECOMPILATIONPATH)
-QMAKE_LIBDIR = $(YADEDYNLIBPATH)
-DESTDIR = $(YADEDYNLIBPATH)
-CONFIG += debug \
-warn_on \
-dll
-TEMPLATE = lib

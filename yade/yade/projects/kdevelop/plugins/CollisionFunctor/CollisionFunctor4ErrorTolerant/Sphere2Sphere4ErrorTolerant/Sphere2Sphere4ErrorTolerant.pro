@@ -14,7 +14,7 @@ LIBS += -lSphere \
         -lErrorTolerantContactModel \
         -lSerialization \
         -rdynamic 
-INCLUDEPATH = $(YADEINCLUDEPATH)
+INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
@@ -24,7 +24,7 @@ QMAKE_LIBDIR = ../../../../plugins/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
                ../../../../yade/Interaction/$(YADEDYNLIBPATH) \
                ../../../../yade/Geometry/$(YADEDYNLIBPATH) \
                ../../../../yade/MultiMethods/$(YADEDYNLIBPATH) \
-               ../../../../yade/Factory/$(YADEDYNLIBPATH) \
+               ../../../../toolboxes/Libraries/Factory/$(YADEDYNLIBPATH) \
                ../../../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
                ../../../../plugins/InteractionModel/ErrorTolerantContactModel/$(YADEDYNLIBPATH) \
                ../../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \

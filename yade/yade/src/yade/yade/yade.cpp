@@ -33,7 +33,7 @@ void help()
 			-h	- print this help\n\
 			-H	- print help for selected fronted\n\
 			-i	- specify name of frontend interface library: \n\
-					YadeQtGUI, NullGUI\n\
+					QtGUI, NullGUI\n\
 				(other GUIs, like ncurses, command line and\n\
 				network-based interfaces can be added later)\n\
 			-f	- specify filename to load\n\

@@ -3,6 +3,17 @@
 # Subdir relative project main directory: ./yade/Geometry
 # Target is a library:  
 
+LIBS += -rdynamic 
+INCLUDEPATH = $(YADEINCLUDEPATH) 
+MOC_DIR = $(YADECOMPILATIONPATH) 
+UI_DIR = $(YADECOMPILATIONPATH) 
+OBJECTS_DIR = $(YADECOMPILATIONPATH) 
+QMAKE_LIBDIR = $(YADEDYNLIBPATH) 
+DESTDIR = $(YADEDYNLIBPATH) 
+CONFIG += debug \
+          warn_on \
+          dll 
+TEMPLATE = lib 
 HEADERS += BoundingVolume.hpp \
            CollisionGeometry.hpp \
            CollisionGeometryFactory.hpp \
@@ -21,14 +32,3 @@ SOURCES += BoundingVolume.cpp \
            BoundingVolumeFactory.cpp \
            BoundingVolumeUpdator.cpp \
            BoundingVolumeFactoryManager.cpp 
-LIBS += -rdynamic
-INCLUDEPATH = $(YADEINCLUDEPATH)
-MOC_DIR = $(YADECOMPILATIONPATH)
-UI_DIR = $(YADECOMPILATIONPATH)
-OBJECTS_DIR = $(YADECOMPILATIONPATH)
-QMAKE_LIBDIR = $(YADEDYNLIBPATH)
-DESTDIR = $(YADEDYNLIBPATH)
-CONFIG += debug \
-warn_on \
-dll
-TEMPLATE = lib
