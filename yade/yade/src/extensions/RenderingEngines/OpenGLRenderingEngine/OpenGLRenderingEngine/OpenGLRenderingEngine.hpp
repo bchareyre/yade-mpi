@@ -44,7 +44,9 @@ class OpenGLRenderingEngine : public RenderingEngine
 	public : OpenGLRenderingEngine();
 	public : ~OpenGLRenderingEngine();
 	
+	public : void init();
 	public : void render(shared_ptr<NonConnexBody> body);
+	
 	private : void renderShadowVolumes(shared_ptr<NonConnexBody> rootBody,Vector3r lightPos);
 	private : void renderSceneUsingShadowVolumes(shared_ptr<NonConnexBody> rootBody,Vector3r lightPos);
 	private : void renderSceneUsingFastShadowVolumes(shared_ptr<NonConnexBody> rootBody,Vector3r lightPos);

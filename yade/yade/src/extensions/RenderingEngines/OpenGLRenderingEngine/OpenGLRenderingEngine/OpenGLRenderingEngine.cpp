@@ -49,7 +49,13 @@ OpenGLRenderingEngine::~OpenGLRenderingEngine()
 {
 
 }
-	
+
+void OpenGLRenderingEngine::init()
+{
+	shared_ptr<GeometricalModel> gm = dynamic_pointer_cast<GeometricalModel>(ClassFactory::instance().createShared("Sphere"));
+	gm->buildDisplayList();
+}
+
 void OpenGLRenderingEngine::render(shared_ptr<NonConnexBody> rootBody)
 {
 	glClearColor(0,0,0,0);

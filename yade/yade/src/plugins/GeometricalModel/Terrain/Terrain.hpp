@@ -86,7 +86,7 @@ class Terrain : public CollisionGeometry
 
 	private : bool findTag(ifstream * file, char * tag);
 	private : void loadWrl(const char * fileName);
-	private : unsigned int buildDisplayList();
+	private : void buildDisplayList();
 	private : void glDrawNormals();
 	private : void reOrientFaces();
 

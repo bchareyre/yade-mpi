@@ -172,11 +172,10 @@ void Sphere::drawSphere(int depth)
 		subdivideTriangle(vertices[(unsigned int)faces[i][0]],vertices[(unsigned int)faces[i][1]],vertices[(unsigned int)faces[i][2]],depth);
 }
 
-void Sphere::glDraw()
+void Sphere::buildDisplayList()
 {
-
-	if (glSphereList==-1)
-	{
+	//if (glSphereList==-1)
+	//{
 		glWiredSphereList = glGenLists(1);
 		glNewList(glWiredSphereList,GL_COMPILE);
 			glDisable(GL_LIGHTING);
@@ -187,8 +186,11 @@ void Sphere::glDraw()
 			glEnable(GL_LIGHTING); // FIXME : remove enable/disable lighting from object
 			drawSphere(1);
 		glEndList();
-	}
+	//}
+}
 
+void Sphere::glDraw()
+{
 	glMaterialv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, diffuseColor);
 	glColor3v(diffuseColor);
 	if (wire)

@@ -47,7 +47,7 @@ class QGLThread : public Threadable<QGLThread>
 	private : shared_ptr<RenderingEngine> renderer;
 	private : GLViewer * glViewer;
 	
-	
+	public : void initializeGL();
 	public : void centerScene() { *needCentering=true;};
 	
 	public : QGLThread (GLViewer * glv,shared_ptr<RenderingEngine> r);

@@ -66,7 +66,9 @@ class GeometricalModel : public Serializable
 	//public : virtual bool rayIntersection(const Vector3r& origin, const Vector3r& direction, Vector3r& point) = NULL;
 
 	//public : virtual bool loadFromFile(char * fileName) = NULL;
-	public : virtual void glDraw() {};
+	public : virtual void glDraw() {};	
+	
+	public : virtual void buildDisplayList() {};
 	public : virtual void renderShadowVolumes(const Se3r& , const Vector3r& ) {};
 	protected : virtual void postProcessAttributes(bool deserializing);
 	public : void registerAttributes();

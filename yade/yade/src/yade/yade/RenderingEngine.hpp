@@ -39,6 +39,7 @@ class RenderingEngine :  public Serializable
 	public : virtual ~RenderingEngine() {} ;
 	
 	public : virtual void render(shared_ptr<NonConnexBody> ) {throw;};
+	public : virtual void init() {throw;};
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

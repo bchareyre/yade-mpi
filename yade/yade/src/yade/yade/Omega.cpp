@@ -117,8 +117,10 @@ void Omega::finishSimulationLoop()
 void Omega::joinSimulationLoop()
 {
 	if (simulationLoop)
+	{
 		simulationLoop->join();
-
+		simulationLoop = shared_ptr<SimulationLoop>();
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

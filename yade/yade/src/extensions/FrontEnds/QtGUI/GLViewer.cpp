@@ -31,6 +31,7 @@ GLViewer::~GLViewer()
 void GLViewer::initializeGL()
 {
 	QGLViewer::initializeGL();
+	qglThread.initializeGL();
 }
 
 void GLViewer::finishRendering()
@@ -55,21 +56,7 @@ void GLViewer::startRendering()
 
 void GLViewer::centerScene()
 {
-// 	Vector3r min = Omega::instance().rootBody->bv->min;
-// 	Vector3r max = Omega::instance().rootBody->bv->max;
-// 	Vector3r center = (max+min)*0.5;
-// 	Vector3r halfSize = (max-min)*0.5;
-// 	float radius = halfSize[0];
-// 	if (halfSize[1]>radius)
-// 		radius = halfSize[1];
-// 	if (halfSize[2]>radius)
-// 		radius = halfSize[2];
-// 
-// 	setSceneCenter(center[0],center[1],center[2]);
-// 	setSceneRadius(radius*1.5);
-// 	showEntireScene();
 	qglThread.centerScene();
-
 }
 	
 void GLViewer::paintGL()
