@@ -250,7 +250,10 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 // 				break;
 // 			}
 // 		}
-		ncb->interactions->find(id1,id2)->isReal = false;
+
+		shared_ptr<Interaction> interaction = ncb->interactions->find(id1,id2);
+		if (interaction)
+			interaction->isReal = false;
 
 ////////////////////////////////////////////////////////////
 /// 							 ///
@@ -473,21 +476,21 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 		float normElastic = mElastic.length();
 
 
-		if (normElastic<=normMPlastic)
-		{
+		//if (normElastic<=normMPlastic)
+		//{
 			moments[id1]	-= q_n_i*mElastic;
 			moments[id2]	+= q_n_i*mElastic;
-		}
-		else
-		{
-			Vector3r mPlastic = mElastic;
-			mPlastic.normalize();
-			mPlastic *= normMPlastic;
-			moments[id1]	-= q_n_i*mPlastic;
-			moments[id2]	+= q_n_i*mPlastic;
-			thetarn = mPlastic/currentContact->kr;
-			currentContact->thetar = q_n_i*thetarn;
-		}
+// 		}
+// 		else
+// 		{
+// 			Vector3r mPlastic = mElastic;
+// 			mPlastic.normalize();
+// 			mPlastic *= normMPlastic;
+// 			moments[id1]	-= q_n_i*mPlastic;
+// 			moments[id2]	+= q_n_i*mPlastic;
+// 			thetarn = mPlastic/currentContact->kr;
+// 			currentContact->thetar = q_n_i*thetarn;
+// 		}
 
 		currentContact->prevRotation1 = de1->se3.rotation;
 		currentContact->prevRotation2 = de2->se3.rotation;

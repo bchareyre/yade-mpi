@@ -270,6 +270,7 @@ string SDECLinkedSpheres::generate()
 
 				c->interactionGeometry = link;
 				c->isReal = true;
+				c->isNew = false;
 				rootBody->permanentInteractions->insert(c);
 			}
 		}
