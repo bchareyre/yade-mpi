@@ -57,41 +57,45 @@ class Indexable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-#define REGISTER_CLASS_INDEX(SomeClass)				\
-	static int& getClassIndexStatic()			\
-	{							\
-		static int index = -1;				\
-		return index;					\
-	}							\
-	virtual int& getClassIndex()				\
-	{							\
-		assert(typeid(*this)==typeid(SomeClass));	\
-		return getClassIndexStatic();			\
-	}							\
-	virtual const int& getClassIndex() const		\
-	{							\
-		assert(typeid(*this)==typeid(SomeClass));	\
-		return getClassIndexStatic();			\
+#define REGISTER_CLASS_INDEX(SomeClass)						\
+	static int& getClassIndexStatic()					\
+	{									\
+		static int index = -1;						\
+		return index;							\
+	}									\
+	virtual int& getClassIndex()						\
+	{									\
+		assert(typeid(*this)==typeid(SomeClass));			\
+		return getClassIndexStatic();					\
+	}									\
+	virtual const int& getClassIndex() const				\
+	{									\
+		assert(typeid(*this)==typeid(SomeClass));			\
+		return getClassIndexStatic();					\
 	}
 
 
-#define REGISTER_INDEX_COUNTER(SomeClass)			\
-	static int& getMaxCurrentlyUsedIndexStatic()		\
-	{							\
-		static int maxCurrentlyUsedIndex = -1;		\
-		return maxCurrentlyUsedIndex;			\
-	}							\
-	virtual const int& getMaxCurrentlyUsedClassIndex() const\
-	{							\
-		return getMaxCurrentlyUsedIndexStatic();	\
-	}							\
-	virtual void incrementMaxCurrentlyUsedClassIndex()	\
-	{							\
-		int& max = getMaxCurrentlyUsedIndexStatic();	\
-		max++;						\
-	}							\
-
-	// check with dynamic cast
+#define REGISTER_INDEX_COUNTER(SomeClass)					\
+	static int& getMaxCurrentlyUsedIndexStatic()				\
+	{									\
+		static int maxCurrentlyUsedIndex = -1;				\
+		return maxCurrentlyUsedIndex;					\
+	}									\
+	virtual const int& getMaxCurrentlyUsedClassIndex() const		\
+	{									\
+		SomeClass * Indexable##SomeClass = 0;				\
+		Indexable##SomeClass = dynamic_cast<SomeClass*>(const_cast<SomeClass*>(this));		\
+		assert(Indexable##SomeClass);					\
+		return getMaxCurrentlyUsedIndexStatic();			\
+	}									\
+	virtual void incrementMaxCurrentlyUsedClassIndex()			\
+	{									\
+		SomeClass * Indexable##SomeClass = 0;				\
+		Indexable##SomeClass = dynamic_cast<SomeClass*>(this);		\
+		assert(Indexable##SomeClass);					\
+		int& max = getMaxCurrentlyUsedIndexStatic();			\
+		max++;								\
+	}									\
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
