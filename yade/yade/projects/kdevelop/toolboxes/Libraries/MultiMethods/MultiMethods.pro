@@ -7,7 +7,8 @@ HEADERS += DynLibDispatcher.hpp \
            Indexable.hpp \
            MultiMethodsExceptions.hpp \
            FunctorWrapper.hpp 
-SOURCES += MultiMethodsExceptions.cpp 
+SOURCES += MultiMethodsExceptions.cpp \
+           Indexable.cpp 
 LIBS += -rdynamic
 INCLUDEPATH = $(YADEINCLUDEPATH)
 MOC_DIR = $(YADECOMPILATIONPATH)

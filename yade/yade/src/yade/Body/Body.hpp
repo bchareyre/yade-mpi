@@ -41,6 +41,7 @@
 #include "Serializable.hpp"
 #include "Indexable.hpp"
 #include "Actor.hpp"
+#include "ActionContainer.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -69,8 +70,9 @@ class Body : public Serializable
 	
 	// FIXME : to put into nonconnex body ? but maybe useful for autocollision in connexbody - yes, useful with so generic InteractionContaier, at leas when we will implement multiple interactions....
 	//public : list<shared_ptr<Interaction> > interactions;
-	public	: shared_ptr<InteractionContainer> interactions;
-
+	public	: shared_ptr<InteractionContainer> interactions;	
+	public	: shared_ptr<ActionContainer> actions;
+	
 	// FIXME : where to put gm,cm and bv : do body need them or only ConnexBody ??
 	/*! The geometrical model of this body (polyhedron, box ...) */
 	public : shared_ptr<GeometricalModel> gm;

@@ -27,26 +27,25 @@ unsigned int ActionVecVec::size()
 // adds Action acting on one body,
 // it is mathematically added if Action of this polymorphic type already exists,
 // if it doesn't exist, then it is appended to stored list of Actions for that body
-void ActionVecVec::add(shared_ptr<Action>& newAction, unsigned int id)
-{/* FIXME - not compiling
+void ActionVecVec::add(const shared_ptr<Action>& newAction, unsigned int id)
+{ 
 	int idx = newAction->getClassIndex();
 	if( actions.size() < id)
 		actions.resize(id);
 		
 	if( actions[id].size() < idx )
-		actions[id].resize[idx];
+		actions[id].resize(idx);
 		
 	if( actions[id][idx] )
-//		actions[id][idx] += newAction // FIXME - make this line compiling.
-		;
+		actions[id][idx]->add(newAction);
 	else
-		actions[id][idx] = newAction;
-*/
+		actions[id][idx]->reset(newAction);
+
 }
 // adds Action that acts on two bodies.
 // on first body it is substarcted,
 // to second body it is added
-void ActionVecVec::add(shared_ptr<Action>&, unsigned int , unsigned int)
+void ActionVecVec::add(const shared_ptr<Action>&, unsigned int , unsigned int)
 {
 
 }

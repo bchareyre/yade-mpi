@@ -63,11 +63,11 @@ class ActionContainer : public Serializable
 	// adds Action acting on one body,
 	// it is mathematically added if Action of this polymorphic type already exists,
 	// if it doesn't exist, then it is appended to stored list of Actions for that body
-	public	  : virtual void add(shared_ptr<Action>&, unsigned int )		{throw;};
+	public	  : virtual void add(const shared_ptr<Action>&, unsigned int )		{throw;};
 	// adds Action that acts on two bodies.
 	// on first body it is substarcted,
 	// to second body it is added
-	public	  : virtual void add(shared_ptr<Action>&, unsigned int , unsigned int)	{throw;};
+	public	  : virtual void add(const shared_ptr<Action>&, unsigned int , unsigned int)	{throw;};
 	
 	// allows to set current polymorphic Action Type on which other functions will work:
 	// function that use this are: eraseAction, operator[], getCurrent()

@@ -8,7 +8,6 @@ LIBS += -lSerialization \
         -lRigidBody \
         -lSphere \
         -lMath \
-        -lBody \
         -lEngine \
         -lGeometry \
         -lInteraction \
@@ -17,8 +16,11 @@ LIBS += -lSerialization \
         -lSDECPermanentLinkPhysics \
         -lSDECContactPhysics \
         -lSDECContactGeometry \
+        -lActionForce \
+        -lActionMomentum \
+        -lBody \
         -rdynamic 
-INCLUDEPATH = $(YADEINCLUDEPATH) 
+INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
@@ -27,7 +29,6 @@ QMAKE_LIBDIR = ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/RigidBody/$(YADEDYNLIBPATH) \
                ../../../plugins/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
-               ../../../yade/Body/$(YADEDYNLIBPATH) \
                ../../../yade/Engine/$(YADEDYNLIBPATH) \
                ../../../yade/Geometry/$(YADEDYNLIBPATH) \
                ../../../yade/Interaction/$(YADEDYNLIBPATH) \
@@ -36,10 +37,8 @@ QMAKE_LIBDIR = ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../../plugins/InteractionPhysics/SDECPermanentLinkPhysics/$(YADEDYNLIBPATH) \
                ../../../plugins/InteractionPhysics/SDECContactPhysics/$(YADEDYNLIBPATH) \
                ../../../plugins/InteractionGeometry/SDECContactGeometry/$(YADEDYNLIBPATH) \
-               ../../../plugins/InteractionGeometry/SDECContactModel/$(YADEDYNLIBPATH) \
-               ../../../plugins/InteractionModel/SDECContactModel/$(YADEDYNLIBPATH) \
-               ../../../yade/MultiMethods/$(YADEDYNLIBPATH) \
-               ../../../plugins/InteractionModel/SDECPermanentLink/$(YADEDYNLIBPATH) \
+               ../../../plugins/Action/ActionForce/$(YADEDYNLIBPATH) \
+               ../../../plugins/Action/ActionMomentum/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

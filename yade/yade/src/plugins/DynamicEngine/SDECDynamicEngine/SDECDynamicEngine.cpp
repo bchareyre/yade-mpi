@@ -33,6 +33,9 @@
 #include "SDECPermanentLinkPhysics.hpp"
 #include "Omega.hpp"
 #include "NonConnexBody.hpp"
+#include "ActionForce.hpp"
+#include "ActionMomentum.hpp"
+#include "Action.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -463,7 +466,21 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 		forces[id2]	+= f;
 		moments[id1]	-= c1x.cross(f);
 		moments[id2]	+= c2x.cross(f);
-
+		
+		
+		shared_ptr<ActionForce> af(new ActionForce);
+		shared_ptr<ActionMomentum> am(new ActionMomentum);
+		
+		/*af->force = -f;
+		body->actions->add(af,id1);
+		af->force = f;
+		body->actions->add(af,id2);
+		
+		am->momentum = -c1x.cross(f);
+		body->actions->add(am,id1);
+		am->momentum = c2x.cross(f);
+		body->actions->add(am,id2);*/
+		
 		currentContactPhysics->prevNormal = currentContactGeometry->normal;
 	}
 

@@ -39,10 +39,10 @@ class Indexable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/*! Constructor */
-	public : Indexable () {};
+	public : Indexable ();
 
 	/*! Destructor */
-	public : virtual ~Indexable () {};
+	public : virtual ~Indexable ();
 
 	/*! Returns the id of the current class. This id is set by a multimethod manager */
 	public : virtual int& getClassIndex() { throw;};

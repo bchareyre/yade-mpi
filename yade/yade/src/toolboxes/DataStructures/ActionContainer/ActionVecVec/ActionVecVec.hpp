@@ -8,6 +8,7 @@
 class Action;
 
 using namespace boost;
+using namespace std;
 
 class ActionVecVec : public ActionContainer
 {
@@ -23,11 +24,11 @@ class ActionVecVec : public ActionContainer
 	// in this two-dimensional table:
 	// 	- first  dimension is Body->getId() number
 	//	- second dimension is Action->getClassIndex() number
-	private	  : std::vector< std::vector< shared_ptr<Action> > > actions;
-	private	  : std::vector< std::vector< shared_ptr<Action> > >::iterator aii;
-	private	  : std::vector< std::vector< shared_ptr<Action> > >::iterator temporaryAii;
-	private	  : std::vector< std::vector< shared_ptr<Action> > >::iterator aiiEnd;
-	private	  : std::list< std::vector< std::vector< shared_ptr<Action> > >::iterator > iteratorList;
+	private	  : vector< vector< shared_ptr<Action> > > actions;
+	private	  : vector< vector< shared_ptr<Action> > >::iterator aii;
+	private	  : vector< vector< shared_ptr<Action> > >::iterator temporaryAii;
+	private	  : vector< vector< shared_ptr<Action> > >::iterator aiiEnd;
+	private	  : list< vector< vector< shared_ptr<Action> > >::iterator > iteratorList;
 	
 	private   : int currentActionType; // current polymorphic Action type - is an Action->getClassIndex();
 	private	  : mutable shared_ptr<Action> empty;
@@ -49,11 +50,11 @@ class ActionVecVec : public ActionContainer
 	// adds Action acting on one body,
 	// it is mathematically added if Action of this polymorphic type already exists,
 	// if it doesn't exist, then it is appended to stored list of Actions for that body
-	public	  : virtual void add(shared_ptr<Action>&, unsigned int );
+	public	  : virtual void add(const shared_ptr<Action>&, unsigned int );
 	// adds Action that acts on two bodies.
 	// on first body it is substarcted,
 	// to second body it is added
-	public	  : virtual void add(shared_ptr<Action>&, unsigned int , unsigned int);
+	public	  : virtual void add(const shared_ptr<Action>&, unsigned int , unsigned int);
 	
 	// allows to set current polymorphic Action Type on which other functions will work:
 	// function that use this are: eraseAction, operator[]

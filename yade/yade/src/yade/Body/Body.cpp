@@ -23,7 +23,7 @@
 
 #include "Body.hpp"
 #include "InteractionVecSet.hpp"
-//#include "InteractionHashMap.hpp"
+#include "ActionVecVec.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -34,6 +34,7 @@ Body::Body () :
 	  Serializable()
 	, id(0)
 	, interactions(new InteractionVecSet)
+	, actions(new ActionVecVec)
 {
 }
 
@@ -41,6 +42,7 @@ Body::Body (unsigned int newId) :
 	  Serializable()
 	, id(newId)
 	, interactions(new InteractionVecSet)
+	, actions(new ActionVecVec)
 {
 }
 
