@@ -51,6 +51,7 @@ QGLThread::QGLThread(GLViewer * glv, shared_ptr<RenderingEngine> r) :	Threadable
 
 QGLThread::~QGLThread()
 {
+	// FIXME - why this is commented ?
 	//delete needResizing;
 	//delete newWidth;
 	//delete newHeight;
