@@ -8,6 +8,7 @@ SUBDIRS += RotatingBox \
            FEMRock \
            BoxStack \
            SDECSpheresPlane \
+	   SDECImport \
            SDECLinkedSpheres 
 MOC_DIR = $(YADECOMPILATIONPATH)
 UI_DIR = $(YADECOMPILATIONPATH)

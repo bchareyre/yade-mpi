@@ -1,6 +1,6 @@
 
-#ifndef __ROTATINGBOX_H__
-#define __ROTATINGBOX_H__
+#ifndef __LINKEDSPHERES_H__
+#define __LINKEDSPHERES_H__
 
 #include "FileGenerator.hpp"
 #include "Vector3.hpp"
@@ -37,5 +37,5 @@ class SDECLinkedSpheres : public FileGenerator
 
 REGISTER_SERIALIZABLE(SDECLinkedSpheres,false);
 
-#endif // __ROTATINGBOX_H__
+#endif // __LINKEDSPHERES_H__
 

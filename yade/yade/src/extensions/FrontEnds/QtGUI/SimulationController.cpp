@@ -15,6 +15,8 @@
 #include <boost/filesystem/convenience.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
+#include <unistd.h>
+
 
 using namespace boost;
 
@@ -67,23 +69,42 @@ void SimulationController::pbLoadClicked()
 
 	if (!fileName.isEmpty() && selectedFilter == "XML Yade File (*.xml)")
 	{
-		Omega::instance().setSimulationFileName(fileName);
-		Omega::instance().loadSimulation();
-
-		string fullName = string(filesystem::basename(fileName.data()))+string(filesystem::extension(fileName.data()));
-		tlCurrentSimulation->setText(fullName);
-
 		if (glViews.size()==0)
+// 			I had to move this up (to be the first), because otherwise it was crashing:
+//
+// 						X Error: BadWindow (invalid Window parameter) 3
+// 						Major opcode:  3
+// 						Minor opcode:  0
+// 						Resource id:  0x34001df
+// 						QGLContext::makeCurrent(): Failed.
+// 						QGLContext::makeCurrent(): Failed.
+// 						QGLContext::makeCurrent(): Failed.
+// 						X Error: GLXBadDrawable 161
+// 						Major opcode:  145
+// 						Minor opcode:  11
+// 						Resource id:  0x34001e2
+// 						QGLContext::makeCurrent(): Failed.
+// 						QGLContext::makeCurrent(): Failed.
+
+//		I still have this error, but less often.
+
  		{
-			boost::mutex resizeMutex;
-			boost::mutex::scoped_lock lock(resizeMutex);
+//			boost::mutex resizeMutex; 				// it is already locked.
+//			boost::mutex::scoped_lock lock(resizeMutex);
 
 			QGLFormat format;
 			QGLFormat::setDefaultFormat( format );
 			format.setStencil(TRUE);
 			format.setAlpha(TRUE);
 			glViews.push_back(new GLViewer(renderer,format,this->parentWidget()->parentWidget()));
+			//sleep(1); // FIXME
 		}
+		
+		Omega::instance().setSimulationFileName(fileName);
+		Omega::instance().loadSimulation();
+
+		string fullName = string(filesystem::basename(fileName.data()))+string(filesystem::extension(fileName.data()));
+		tlCurrentSimulation->setText(fullName);
 
 		Omega::instance().createSimulationLoop();
 		Omega::instance().stopSimulationLoop();
