@@ -143,7 +143,7 @@ void QtFileGenerator::pbGenerateClicked()
 	
 	guiGen.deserialize(fg);
 	
-	fg->generate();
+	fg->generateAndSave();
 	
 	
 }

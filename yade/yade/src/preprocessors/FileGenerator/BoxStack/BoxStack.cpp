@@ -32,7 +32,10 @@ void BoxStack::registerAttributes()
 
 void BoxStack::generate()
 {
-	shared_ptr<NonConnexBody> rootBody(new NonConnexBody);
+
+
+	// FIXME : not working
+	rootBody = shared_ptr<NonConnexBody>(new NonConnexBody);
 	int nbBox = 0;
 	Quaternionr q;
 	q.fromAxisAngle( Vector3r(0,0,1),0);

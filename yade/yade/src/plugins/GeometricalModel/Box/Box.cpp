@@ -80,3 +80,9 @@ void Box::glDraw()
 		glutSolidCube(1);
 	}
 }
+
+void Box::renderShadowVolumes(const Se3r& se3, const Vector3r& lightPos)
+{
+	//Vector3r pos = lightPos-se3->translation;
+	
+}

@@ -15,7 +15,9 @@
 #include "IOManager.hpp"
 #include "SDECDynamicEngine.hpp"
 #include "SDECDiscreteElement.hpp"
-
+#include "BoundingVolumeUpdator.hpp"
+#include "CollisionGeometrySet2AABBFactory.hpp"
+#include "CollisionGeometrySet.hpp"
 
 RotatingBox::RotatingBox () : FileGenerator()
 {
@@ -42,13 +44,18 @@ void RotatingBox::registerAttributes()
 
 void RotatingBox::generate()
 {
-	shared_ptr<NonConnexBody> rootBody(new NonConnexBody);
+	rootBody = shared_ptr<NonConnexBody>(new NonConnexBody);
 	Quaternionr q;
 	q.fromAxisAngle(Vector3r(0,0,1),0);
 
 	shared_ptr<NarrowCollider> nc	= shared_ptr<NarrowCollider>(new SimpleNarrowCollider);
 	nc->addCollisionFunctor("Sphere","Sphere","Sphere2Sphere4SDECContactModel");
 	nc->addCollisionFunctor("Sphere","Box","Box2Sphere4SDECContactModel");
+	
+	shared_ptr<BoundingVolumeUpdator> bvu	= shared_ptr<BoundingVolumeUpdator>(new BoundingVolumeUpdator);
+	bvu->addBVFactories("Sphere","AABB","Sphere2AABBFactory");
+	bvu->addBVFactories("Box","AABB","Box2AABBFactory");
+	bvu->addBVFactories("CollisionGeometrySet","AABB","CollisionGeometrySet2AABBFactory");
 
 
 	shared_ptr<Rotor> kinematic = shared_ptr<Rotor>(new Rotor);
@@ -58,11 +65,12 @@ void RotatingBox::generate()
 	for(int i=0;i<7;i++)
 		kinematic->subscribedBodies.push_back(i);
 
-	rootBody->actors.resize(4);
-	rootBody->actors[0] 		= shared_ptr<Actor>(new SAPCollider);
-	rootBody->actors[1] 		= nc;
-	rootBody->actors[2] 		= shared_ptr<Actor>(new SDECDynamicEngine);
-	rootBody->actors[3] 		= kinematic;
+	rootBody->actors.resize(5);
+	rootBody->actors[0] 		= bvu;	
+	rootBody->actors[1] 		= shared_ptr<Actor>(new SAPCollider);
+	rootBody->actors[2] 		= nc;
+	rootBody->actors[3] 		= shared_ptr<Actor>(new SDECDynamicEngine);
+	rootBody->actors[4] 		= kinematic;
 
 	rootBody->isDynamic		= false;
 	rootBody->velocity		= Vector3r(0,0,0);
@@ -327,6 +335,4 @@ void RotatingBox::generate()
 				b=dynamic_pointer_cast<Body>(boxi);
 				rootBody->bodies->insert(b);
 			}
-
-	IOManager::saveToFile(serializationDynlib, outputFileName, "rootBody", rootBody);
 }

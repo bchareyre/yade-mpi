@@ -41,7 +41,8 @@ class Box : public CollisionGeometry
 
 	protected : virtual void postProcessAttributes(bool deserializing);
 	public : void registerAttributes();
-
+	public : void renderShadowVolumes(const Se3r& se3, const Vector3r& lightPos);
+	
 	REGISTER_CLASS_NAME(Box);
 	REGISTER_CLASS_INDEX(Box);
 

@@ -36,7 +36,9 @@ void HangingCloth::registerAttributes()
 
 void HangingCloth::generate()
 {
-	shared_ptr<NonConnexBody> rootBody(new NonConnexBody);
+	//FIXME : not working
+	
+	rootBody = shared_ptr<NonConnexBody>(new NonConnexBody);
 	int width = 20;
 	int height = 20;
 	float mass = 10;

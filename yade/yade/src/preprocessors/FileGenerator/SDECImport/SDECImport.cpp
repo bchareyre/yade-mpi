@@ -16,6 +16,8 @@
 #include "Interaction.hpp"
 
 #include "BoundingVolumeUpdator.hpp"
+#include "CollisionGeometrySet.hpp"
+#include "CollisionGeometrySet2AABBFactory.hpp"
 
 #include <boost/filesystem/convenience.hpp>
 
@@ -25,7 +27,6 @@ SDECImport::SDECImport () : FileGenerator()
 	upperCorner 	= Vector3r(-1000,-1000,-1000);
 	thickness 	= 0.01;
 	importFilename 	= "";
-	scale 		= 50;
 	kn_Spheres 	= 100000;
 	ks_Spheres 	= 10000;
 	kn_Box		= 100000;
@@ -63,7 +64,6 @@ void SDECImport::registerAttributes()
 //	REGISTER_ATTRIBUTE(upperCorner);
 	REGISTER_ATTRIBUTE(thickness);
 	REGISTER_ATTRIBUTE(importFilename);
-	REGISTER_ATTRIBUTE(scale);
 	REGISTER_ATTRIBUTE(kn_Spheres);
 	REGISTER_ATTRIBUTE(ks_Spheres);
 	REGISTER_ATTRIBUTE(kn_Box);
@@ -88,7 +88,7 @@ void SDECImport::generate()
 {
 
 // rootBody - the whole scene
-	shared_ptr<NonConnexBody> rootBody(new NonConnexBody);
+	rootBody = shared_ptr<NonConnexBody>(new NonConnexBody);
 
 // q - a quaternion that says that we ant zero rotation = rotation around axis 0,0,1 by zero radians
 	Quaternionr q;		q.fromAxisAngle( Vector3r(0,0,1) , 0);
@@ -102,7 +102,8 @@ void SDECImport::generate()
 	shared_ptr<BoundingVolumeUpdator> bvu	= shared_ptr<BoundingVolumeUpdator>(new BoundingVolumeUpdator);
 	bvu->addBVFactories("Sphere","AABB","Sphere2AABBFactory");
 	bvu->addBVFactories("Box","AABB","Box2AABBFactory");
-
+	bvu->addBVFactories("CollisionGeometrySet","AABB","CollisionGeometrySet2AABBFactory");
+	
 	rootBody->actors.resize(4);
 	rootBody->actors[0] 		= bvu;
 	rootBody->actors[1] 		= shared_ptr<Actor>(new SAPCollider);
@@ -120,6 +121,22 @@ void SDECImport::generate()
 // variables used for generating data
 	shared_ptr<AABB> aabb;
 	shared_ptr<Box> box;
+	
+	
+	shared_ptr<CollisionGeometrySet> set(new CollisionGeometrySet());
+	set->diffuseColor	= Vector3r(0,0,1);
+	set->wire		= false;
+	set->visible		= true;
+	set->shadowCaster	= false;
+	rootBody->cm		= dynamic_pointer_cast<CollisionGeometry>(set);
+	
+	aabb			= shared_ptr<AABB>(new AABB);
+	aabb->color		= Vector3r(0,0,1);
+	rootBody->bv		= dynamic_pointer_cast<BoundingVolume>(aabb);
+
+	
+	
+	
 	shared_ptr<SDECDiscreteElement> sdec;
 	shared_ptr<Body> body;
 	Vector3r		center,halfSize;
@@ -160,9 +177,6 @@ void SDECImport::generate()
 			upperCorner[1] = max(translation[1]+radius , upperCorner[1]);
 			upperCorner[2] = max(translation[2]+radius , upperCorner[2]);
 			
-			translation *= scale;
-			radius *= scale;
-
 			ballistic= shared_ptr<BallisticDynamicEngine>(new BallisticDynamicEngine);
 			ballistic->damping 	= 1.0;
 			s->actors.push_back(ballistic);
@@ -208,11 +222,11 @@ void SDECImport::generate()
 	aabb			= shared_ptr<AABB>(new AABB);
 	box			= shared_ptr<Box>(new Box);
 
-	center			= scale*Vector3r(
+	center			= Vector3r(
 					(lowerCorner[0]+upperCorner[0])/2,
 					lowerCorner[1]-thickness/2.0,
 					(lowerCorner[2]+upperCorner[2])/2);
-	halfSize		= scale*Vector3r(
+	halfSize		= Vector3r(
 					fabs(lowerCorner[0]-upperCorner[0])/2+thickness,
 					thickness/2.0,
 					fabs(lowerCorner[2]-upperCorner[2])/2+thickness);
@@ -252,11 +266,11 @@ void SDECImport::generate()
 	aabb			= shared_ptr<AABB>(new AABB);
 	box			= shared_ptr<Box>(new Box);
 
-	center			= scale*Vector3r(
+	center			= Vector3r(
 					(lowerCorner[0]+upperCorner[0])/2,
 					upperCorner[1]+thickness/2.0,
 					(lowerCorner[2]+upperCorner[2])/2);
-	halfSize		= scale*Vector3r(
+	halfSize		= Vector3r(
 					fabs(lowerCorner[0]-upperCorner[0])/2+thickness,
 					thickness/2.0,
 					fabs(lowerCorner[2]-upperCorner[2])/2+thickness);
@@ -290,11 +304,11 @@ void SDECImport::generate()
 	aabb			= shared_ptr<AABB>(new AABB);
 	box			= shared_ptr<Box>(new Box);
 
-	center			= scale*Vector3r(
+	center			= Vector3r(
 					lowerCorner[0]-thickness/2.0,
 					(lowerCorner[1]+upperCorner[1])/2,
 					(lowerCorner[2]+upperCorner[2])/2);
-	halfSize		= scale*Vector3r(
+	halfSize		= Vector3r(
 					thickness/2.0,
 					fabs(lowerCorner[1]-upperCorner[1])/2+thickness,
 					fabs(lowerCorner[2]-upperCorner[2])/2+thickness);
@@ -328,11 +342,11 @@ void SDECImport::generate()
 	aabb			= shared_ptr<AABB>(new AABB);
 	box			= shared_ptr<Box>(new Box);
 
-	center			= scale*Vector3r(
+	center			= Vector3r(
 					upperCorner[0]+thickness/2.0,
 					(lowerCorner[1]+upperCorner[1])/2,
 					(lowerCorner[2]+upperCorner[2])/2);
-	halfSize		= scale*Vector3r(
+	halfSize		= Vector3r(
 					thickness/2.0,
 					fabs(lowerCorner[1]-upperCorner[1])/2+thickness,
 					fabs(lowerCorner[2]-upperCorner[2])/2+thickness);
@@ -366,11 +380,11 @@ void SDECImport::generate()
 	aabb			= shared_ptr<AABB>(new AABB);
 	box			= shared_ptr<Box>(new Box);
 
-	center			= scale*Vector3r(
+	center			= Vector3r(
 					(lowerCorner[0]+upperCorner[0])/2,
 					(lowerCorner[1]+upperCorner[1])/2,
 					lowerCorner[2]-thickness/2.0);
-	halfSize		= scale*Vector3r(
+	halfSize		= Vector3r(
 					fabs(lowerCorner[0]-upperCorner[0])/2+thickness,
 					fabs(lowerCorner[1]-upperCorner[1])/2+thickness,
 					thickness/2.0);
@@ -404,11 +418,11 @@ void SDECImport::generate()
 	aabb			= shared_ptr<AABB>(new AABB);
 	box			= shared_ptr<Box>(new Box);
 
-	center			= scale*Vector3r(
+	center			= Vector3r(
 					(lowerCorner[0]+upperCorner[0])/2,
 					(lowerCorner[1]+upperCorner[1])/2,
 					upperCorner[2]+thickness/2.0);
-	halfSize		= scale*Vector3r(
+	halfSize		= Vector3r(
 					fabs(lowerCorner[0]-upperCorner[0])/2+thickness,
 					fabs(lowerCorner[1]-upperCorner[1])/2+thickness,
 					thickness/2.0);
@@ -438,6 +452,4 @@ void SDECImport::generate()
 /// end of box inserting
 ///////////////////////////////////////////////////////////////////////////////
 
-	
-	IOManager::saveToFile("XMLManager", "../data/SDECImport.xml" , "rootBody", rootBody);
 }

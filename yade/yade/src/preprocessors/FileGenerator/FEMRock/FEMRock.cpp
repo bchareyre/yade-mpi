@@ -33,7 +33,8 @@ void FEMRock::registerAttributes()
 
 void FEMRock::generate()
 {
-	shared_ptr<NonConnexBody> rootBody(new NonConnexBody);
+	// FIXME : not working
+	rootBody = shared_ptr<NonConnexBody>(new NonConnexBody);
 
 	Quaternionr q;
 

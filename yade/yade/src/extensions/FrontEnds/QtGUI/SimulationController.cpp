@@ -153,7 +153,7 @@ void SimulationController::pbCenterSceneClicked()
 {
 	boost::mutex resizeMutex;
 	boost::mutex::scoped_lock lock(resizeMutex);
-	for(int i=0;i<glViews.size();i++)
+	for(unsigned int i=0;i<glViews.size();i++)
 	{
 		if (glViews[i]->isActiveWindow())
 			glViews[i]->centerScene();

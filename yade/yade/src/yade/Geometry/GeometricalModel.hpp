@@ -33,6 +33,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include "Se3.hpp"
 #include "Vector3.hpp"
 #include "Serializable.hpp"
 
@@ -66,6 +67,7 @@ class GeometricalModel : public Serializable
 
 	//public : virtual bool loadFromFile(char * fileName) = NULL;
 	public : virtual void glDraw() {};
+	public : virtual void renderShadowVolumes(const Se3r& , const Vector3r& ) {};
 	protected : virtual void postProcessAttributes(bool deserializing);
 	public : void registerAttributes();
 	REGISTER_CLASS_NAME(GeometricalModel);

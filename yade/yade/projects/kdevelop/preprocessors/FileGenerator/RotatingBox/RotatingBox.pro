@@ -21,6 +21,8 @@ LIBS += -lAABB \
         -lGeometry \
         -lInteraction \
         -lMultiMethods \
+        -lCollisionGeometrySet2AABBFactory \
+        -lCollisionGeometrySet \
         -rdynamic 
 INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
@@ -44,6 +46,8 @@ QMAKE_LIBDIR = ../../../plugins/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
                ../../../yade/Geometry/$(YADEDYNLIBPATH) \
                ../../../yade/Interaction/$(YADEDYNLIBPATH) \
                ../../../yade/MultiMethods/$(YADEDYNLIBPATH) \
+               ../../../plugins/BoundingVolumeFactory/CollisionGeometrySet2AABBFactory/$(YADEDYNLIBPATH) \
+               ../../../plugins/CollisionGeometry/CollisionGeometrySet/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

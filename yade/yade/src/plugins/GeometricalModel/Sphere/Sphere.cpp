@@ -202,3 +202,44 @@ void Sphere::glDraw()
 		glCallList(glSphereList);
 	}
 }
+
+
+void Sphere::renderShadowVolumes(const Se3r& se3, const Vector3r& lightPos)
+{
+	Vector3r center = se3.translation;
+	Vector3r dir = lightPos-center;
+	Vector3r normalDir(-dir[1],dir[0],0);
+	normalDir.normalize();
+	normalDir *= radius*0.9;
+	Vector3r biNormalDir = normalDir.unitCross(dir)*(radius*0.9);
+	
+	int nbSegments = 15;
+	
+	Vector3r p1,p2;
+	glBegin(GL_QUAD_STRIP);
+		p1 = center+biNormalDir;
+		p2 = p1 + (p1-lightPos)*10;
+		glVertex3fv(p1);
+		glVertex3fv(p2);
+		for(int i=1;i<=nbSegments;i++)
+		{
+			float angle = Mathr::TWO_PI/(float)nbSegments*i;
+			p1 = center+sin(angle)*normalDir+cos(angle)*biNormalDir;
+			p2 = p1 + (p1-lightPos)*10;
+			glVertex3fv(p1);
+			glVertex3fv(p2);
+		}
+	glEnd();
+			
+	// closing shadow volumes ??
+// 	glColor3f(0,1,0);
+// 	glBegin(GL_POLYGON);
+// 	for(int i=0;i<nbSegments;i++)
+// 	{
+// 		float angle = Mathr::TWO_PI/(float)nbSegments*i;
+// 		p1 = center+sin(angle)*normalDir+cos(angle)*biNormalDir;
+// 		p2 = p1 + (p1-lightPos)*2;
+// 		glVertex3fv(p2);
+// 	}
+// 	glEnd();
+}

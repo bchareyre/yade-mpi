@@ -54,8 +54,8 @@ void SDECLinkedSpheres::registerAttributes()
 void SDECLinkedSpheres::generate()
 {
 	shared_ptr<AABB> aabb;
-		
-	shared_ptr<NonConnexBody> rootBody(new NonConnexBody);
+	
+	rootBody = shared_ptr<NonConnexBody>(new NonConnexBody);
 
 	Quaternionr q,qbox;
 	q.fromAxisAngle( Vector3r(0,0,1),0);
@@ -88,9 +88,7 @@ void SDECLinkedSpheres::generate()
 	set->wire		= false;
 	set->visible		= true;
 	set->shadowCaster	= false;
-	rootBody->cm		= dynamic_pointer_cast<CollisionGeometry>(set);
-	
-	
+	rootBody->cm		= dynamic_pointer_cast<CollisionGeometry>(set);	
 	
 	aabb			= shared_ptr<AABB>(new AABB);
 	aabb->color		= Vector3r(0,0,1);
@@ -280,6 +278,4 @@ void SDECLinkedSpheres::generate()
 	}
 	cout << "total number of permament links created: " << rootBody->permanentInteractions->size() << endl;
 
-
-	IOManager::saveToFile("XMLManager", "../data/SDECLinkedSpheres.xml", "rootBody", rootBody);
 }

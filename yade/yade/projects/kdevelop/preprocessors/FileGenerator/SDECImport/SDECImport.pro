@@ -18,6 +18,8 @@ LIBS += -lSDECDynamicEngine \
         -lSDECPermanentLink \
         -lGeometry \
         -lInteraction \
+        -lCollisionGeometrySet2AABBFactory \
+        -lCollisionGeometrySet \
         -rdynamic 
 INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
@@ -38,6 +40,8 @@ QMAKE_LIBDIR = ../../../plugins/DynamicEngine/SDECDynamicEngine/$(YADEDYNLIBPATH
                ../../../plugins/InteractionModel/SDECPermanentLink/$(YADEDYNLIBPATH) \
                ../../../yade/Geometry/$(YADEDYNLIBPATH) \
                ../../../yade/Interaction/$(YADEDYNLIBPATH) \
+               ../../../plugins/BoundingVolumeFactory/CollisionGeometrySet2AABBFactory/$(YADEDYNLIBPATH) \
+               ../../../plugins/CollisionGeometry/CollisionGeometrySet/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

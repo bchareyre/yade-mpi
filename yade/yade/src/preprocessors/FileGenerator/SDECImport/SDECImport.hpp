@@ -10,7 +10,6 @@ class SDECImport : public FileGenerator
 	private	: Vector3r upperCorner;
 	private	: Real thickness;
 	private	: string importFilename;
-	private	: Real scale;
 	private	: Real kn_Spheres;
 	private	: Real ks_Spheres;
 	private	: Real kn_Box;

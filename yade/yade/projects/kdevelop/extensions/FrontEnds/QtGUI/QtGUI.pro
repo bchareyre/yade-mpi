@@ -42,7 +42,6 @@ QMAKE_CXXFLAGS_DEBUG += -lpthread \
 DESTDIR = $(YADEDYNLIBPATH) 
 CONFIG += debug \
           warn_on \
-          thread \
           dll 
 QtGeneratedSimulationController.ui.commands = $$IDL_COMPILER $$IDL_OPTIONS $$QtGeneratedSimulationController.ui.target 
 QtGeneratedSimulationController.ui.target = QtGeneratedSimulationController.ui 

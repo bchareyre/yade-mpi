@@ -47,6 +47,8 @@ class Sphere : public CollisionGeometry
 	public : bool collideWith(CollisionGeometry* collisionGeometry);
 	public : void glDraw();
 
+	public : void renderShadowVolumes(const Se3r& se3, const Vector3r& lightPos);
+	
 	protected : virtual void postProcessAttributes(bool deserializing);
 	public : void registerAttributes();
 

@@ -59,8 +59,6 @@ void OpenGLRenderingEngine::render(shared_ptr<NonConnexBody> rootBody)
 	glLightfv(GL_LIGHT0, GL_POSITION, pos);
 	glLightModelfv(GL_LIGHT_MODEL_AMBIENT,ambientColor);
 	glEnable(GL_LIGHT0);
-
-	float sceneRadius = 100;
 	
 	glDisable(GL_LIGHTING);
 	
@@ -177,9 +175,6 @@ void OpenGLRenderingEngine::renderSceneUsingFastShadowVolumes(shared_ptr<NonConn
 	glEnable(GL_NORMALIZE);
 	rootBody->glDrawGeometricalModel();	
 
-//	renderRootBody(rootBody); // render scene
-//	glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
-
 	glClear(GL_STENCIL_BUFFER_BIT);
 	glEnable(GL_STENCIL_TEST);
 	glDepthMask(GL_FALSE);
@@ -279,44 +274,7 @@ void OpenGLRenderingEngine::renderShadowVolumes(shared_ptr<NonConnexBody> rootBo
 		
 		if (b->gm->shadowCaster)
 		{
-			shared_ptr<Sphere> s = dynamic_pointer_cast<Sphere>(b->gm);
-			
-			Vector3r center = b->se3.translation;
-			Vector3r dir = lightPos-center;
-			Vector3r normalDir(-dir[1],dir[0],0);
-			normalDir.normalize();
-			normalDir *= s->radius*0.9;
-			Vector3r biNormalDir = normalDir.unitCross(dir)*(s->radius*0.9);
-			
-			int nbSegments = 15;
-			
-			Vector3r p1,p2;
-			glBegin(GL_QUAD_STRIP);
-				p1 = center+biNormalDir;
-				p2 = p1 + (p1-lightPos)*10;
-				glVertex3fv(p1);
-				glVertex3fv(p2);
-				for(int i=1;i<=nbSegments;i++)
-				{
-					float angle = Mathr::TWO_PI/(float)nbSegments*i;
-					p1 = center+sin(angle)*normalDir+cos(angle)*biNormalDir;
-					p2 = p1 + (p1-lightPos)*10;
-					glVertex3fv(p1);
-					glVertex3fv(p2);
-				}
-			glEnd();
-			
-			// closing shadow volumes ??
-			//glColor3f(0,1,0);
-/*			glBegin(GL_POLYGON);
-				for(int i=0;i<nbSegments;i++)
-				{
-					float angle = Mathr::TWO_PI/(float)nbSegments*i;
-					p1 = center+sin(angle)*normalDir+cos(angle)*biNormalDir;
-					p2 = p1 + (p1-lightPos)*2;
-					glVertex3fv(p2);
-				}
-			glEnd();*/
+			b->gm->renderShadowVolumes(b->se3,lightPos);
 		}
 	}
 }
