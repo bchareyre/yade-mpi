@@ -106,7 +106,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>plugins/ActionFunctor/ActionForce2RigidBody</activedir>
+      <activedir>extensions/FrontEnds/QtGUI</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>

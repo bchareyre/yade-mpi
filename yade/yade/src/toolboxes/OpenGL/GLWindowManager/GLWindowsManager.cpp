@@ -175,7 +175,7 @@ void GLWindowsManager::deleteWindow(int i)
 		subscriptions[j] = subscriptions[j+1];		
 	}
 	
-	int id;
+	int id=0;
 	for(j=0;j<order.size()-1;j++)
 		if (order[j]==i)
 			id = j;

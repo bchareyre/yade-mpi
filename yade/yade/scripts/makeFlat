@@ -1,7 +1,7 @@
 #! /bin/sh
 
-echo "With this you can have flat version of yade - all files in single directory"
-exit 0
+# echo "With this you can have flat version of yade - all files in single directory"
+# exit 0
 
 echo 'ORGDIR=`pwd`'										> makeSymLinkFlat
 echo 'ONLYNAME=`basename $1`'									>> makeSymLinkFlat
