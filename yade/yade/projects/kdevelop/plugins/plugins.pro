@@ -16,8 +16,8 @@ SUBDIRS += InteractionModel \
            BoundingVolumeFactory \
            CollisionGeometryFactory \
            GeometricalModelFactory \
-           NarrowPhaseCollider \
-           BroadPhaseCollider \
+           NarrowCollider \
+           BroadCollider \
            IOManager \
            CollisionFunctor \
            Body \

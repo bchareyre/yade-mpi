@@ -19,8 +19,8 @@ LIBS += -lM3D \
 INCLUDEPATH = ../../../plugins/DynamicEngine/BallisticDynamicEngine \
               ../../../plugins/DynamicEngine/SimpleSpringDynamicEngine \
               ../../../plugins/Body/RigidBody \
-              ../../../plugins/BroadPhaseCollider/SAPCollider \
-              ../../../plugins/NarrowPhaseCollider/SimpleNarrowCollider \
+              ../../../plugins/BroadCollider/SAPCollider \
+              ../../../plugins/NarrowCollider/SimpleNarrowCollider \
               ../../../plugins/GeometricalModel/Box \
               ../../../plugins/GeometricalModel/Sphere \
               ../../../plugins/BoundingVolume/AABB \
@@ -36,8 +36,8 @@ QMAKE_LIBDIR = ../../../toolboxes/Math/M3D/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Math/Constants/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/RigidBody/$(YADEDYNLIBPATH) \
-               ../../../plugins/BroadPhaseCollider/SAPCollider/$(YADEDYNLIBPATH) \
-               ../../../plugins/NarrowPhaseCollider/SimpleNarrowCollider/$(YADEDYNLIBPATH) \
+               ../../../plugins/BroadCollider/SAPCollider/$(YADEDYNLIBPATH) \
+               ../../../plugins/NarrowCollider/SimpleNarrowCollider/$(YADEDYNLIBPATH) \
                ../../../plugins/GeometricalModel/Box/$(YADEDYNLIBPATH) \
                ../../../plugins/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
                ../../../plugins/BoundingVolume/AABB/$(YADEDYNLIBPATH) \

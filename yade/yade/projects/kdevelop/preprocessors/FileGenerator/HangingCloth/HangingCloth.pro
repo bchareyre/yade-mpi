@@ -26,8 +26,8 @@ INCLUDEPATH = ../../../plugins/DynamicEngine/MassSpringBody2RigidBodyDynamicEngi
               ../../../plugins/DynamicEngine/SimpleSpringDynamicEngine \
               ../../../plugins/Body/MassSpringBody \
               ../../../plugins/Body/RigidBody \
-              ../../../plugins/BroadPhaseCollider/SAPCollider \
-              ../../../plugins/NarrowPhaseCollider/SimpleNarrowCollider \
+              ../../../plugins/BroadCollider/SAPCollider \
+              ../../../plugins/NarrowCollider/SimpleNarrowCollider \
               ../../../plugins/GeometricalModel/Mesh2D \
               ../../../plugins/GeometricalModel/Sphere \
               ../../../plugins/BoundingVolume/AABB \
@@ -45,9 +45,9 @@ QMAKE_LIBDIR = ../../../plugins/GeometricalModel/Mesh2D/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Math/Rand/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Math/Constants/$(YADEDYNLIBPATH) \
-               ../../../plugins/BroadPhaseCollider/SAPCollider/$(YADEDYNLIBPATH) \
+               ../../../plugins/BroadCollider/SAPCollider/$(YADEDYNLIBPATH) \
                ../../../plugins/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
-               ../../../plugins/NarrowPhaseCollider/SimpleNarrowCollider/$(YADEDYNLIBPATH) \
+               ../../../plugins/NarrowCollider/SimpleNarrowCollider/$(YADEDYNLIBPATH) \
                ../../../plugins/DynamicEngine/ExplicitMassSpringDynamicEngine/$(YADEDYNLIBPATH) \
                ../../../plugins/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
                ../../../plugins/InteractionModel/ClosestFeatures/$(YADEDYNLIBPATH) \

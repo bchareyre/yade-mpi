@@ -20,8 +20,8 @@ INCLUDEPATH = ../../../plugins/DynamicEngine/SDECDynamicEngine \
               ../../../plugins/DynamicEngine/BallisticDynamicEngine \
               ../../../plugins/Body/SDECDiscreteElement \
               ../../../plugins/Body/RigidBody \
-              ../../../plugins/BroadPhaseCollider/SAPCollider \
-              ../../../plugins/NarrowPhaseCollider/SimpleNarrowCollider \
+              ../../../plugins/BroadCollider/SAPCollider \
+              ../../../plugins/NarrowCollider/SimpleNarrowCollider \
               ../../../plugins/GeometricalModel/Box \
               ../../../plugins/GeometricalModel/Sphere \
               ../../../plugins/BoundingVolume/AABB \
@@ -34,8 +34,8 @@ MOC_DIR = $(YADECOMPILATIONPATH)
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 QMAKE_LIBDIR = ../../../plugins/DynamicEngine/SDECDynamicEngine/$(YADEDYNLIBPATH) \
-               ../../../plugins/BroadPhaseCollider/SAPCollider/$(YADEDYNLIBPATH) \
-               ../../../plugins/NarrowPhaseCollider/SimpleNarrowCollider/$(YADEDYNLIBPATH) \
+               ../../../plugins/BroadCollider/SAPCollider/$(YADEDYNLIBPATH) \
+               ../../../plugins/NarrowCollider/SimpleNarrowCollider/$(YADEDYNLIBPATH) \
                ../../../plugins/GeometricalModel/Box/$(YADEDYNLIBPATH) \
                ../../../plugins/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
                ../../../plugins/BoundingVolume/AABB/$(YADEDYNLIBPATH) \

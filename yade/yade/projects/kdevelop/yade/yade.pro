@@ -6,7 +6,7 @@
 HEADERS += Body.hpp \
            BoundingVolumeFactory.hpp \
            BoundingVolume.hpp \
-           BroadPhaseCollider.hpp \
+           BroadCollider.hpp \
            BVAssembly.hpp \
            BVHierarchy.hpp \
            Chrono.hpp \
@@ -20,7 +20,7 @@ HEADERS += Body.hpp \
            GeometricalModel.hpp \
            IOManager.hpp \
            KinematicEngine.hpp \
-           NarrowPhaseCollider.hpp \
+           NarrowCollider.hpp \
            NonConnexBody.hpp \
            Omega.hpp \
            Singleton.hpp \
@@ -42,7 +42,7 @@ HEADERS += Body.hpp \
 SOURCES += Body.cpp \
            BoundingVolume.cpp \
            BoundingVolumeFactory.cpp \
-           BroadPhaseCollider.cpp \
+           BroadCollider.cpp \
            BVAssembly.cpp \
            BVHierarchy.cpp \
            Chrono.cpp \
@@ -56,7 +56,7 @@ SOURCES += Body.cpp \
            GeometricalModelFactory.cpp \
            IOManager.cpp \
            KinematicEngine.cpp \
-           NarrowPhaseCollider.cpp \
+           NarrowCollider.cpp \
            NonConnexBody.cpp \
            Omega.cpp \
            yade.cpp \
