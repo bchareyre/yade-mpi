@@ -69,6 +69,7 @@ void GLViewer::updateGL()
 {
 	// Handled by the GLThread.
 }
+
 void GLViewer::resizeEvent(QResizeEvent *evt)
 {
 	qglThread.resize(evt->size().width(),evt->size().height()); 

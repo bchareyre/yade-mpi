@@ -112,17 +112,19 @@ void Threadable<Thread>::operator()()
 	while (notEnd() && !*finished)
 	{
 		{	
+		//	ThreadSafe::cout(lexical_cast<string>(*turn)+" : 1");
 			boost::mutex::scoped_lock lock(synchronizer->getMutex());
-
+		//	ThreadSafe::cout(lexical_cast<string>(*turn)+" : 2");
 			while (synchronizer->notMyTurn(*turn))
 				synchronizer->wait(lock);
-
+		//	ThreadSafe::cout(lexical_cast<string>(*turn)+" : 3");
 			if (!*blocked)
 				oneLoop();
-
+		//	ThreadSafe::cout(lexical_cast<string>(*turn)+" : 4");
 			synchronizer->setNextCurrentThread();
-			
+		//	ThreadSafe::cout(lexical_cast<string>(*turn)+" : 5");
 			synchronizer->signal();
+		//	ThreadSafe::cout(lexical_cast<string>(*turn)+" : 6");
 		}
 	}
 	synchronizer->removeThread(*turn);

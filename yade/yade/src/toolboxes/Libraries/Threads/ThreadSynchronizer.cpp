@@ -43,6 +43,7 @@ void ThreadSynchronizer::insertThread(int* myTurn)
 	ids.insert(maxId);
 	currentId = ids.begin();
 	*myTurn = maxId++;
+	signal();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -82,7 +83,7 @@ void ThreadSynchronizer::setNextCurrentThread()
 	++currentId;
 	if (currentId==ids.end())
 		currentId = ids.begin();
-	
+//	ThreadSafe::cout("Next turn : "+lexical_cast<string>(*currentId));	
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
