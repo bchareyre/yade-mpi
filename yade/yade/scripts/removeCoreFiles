@@ -1,5 +1,14 @@
 #! /bin/sh
 
+if [ "${YADEPATH:-nothing}" = "nothing" ];
+then
+  echo "ERROR:  YADEPATH is not defined, you forgot to run:";
+  echo "        source ./yadeEnv YOUR_PATH_TO_YADE";
+  exit 0;
+else
+#  echo "I'm using YADEPATH="${YADEPATH};
+fi
+
 # remove core*
 
 find $YADEPATH -name "core*" -exec rm {} \;

@@ -1,5 +1,13 @@
 #! /bin/sh
 
+if [ "${YADEPATH:-nothing}" = "nothing" ];
+then
+  echo "ERROR:  YADEPATH is not defined, you forgot to run:";
+  echo "        source ./yadeEnv YOUR_PATH_TO_YADE";
+  exit 0;
+else
+  echo "I'm using YADEPATH="${YADEPATH};
+fi
 
 # This script can be used to create a new DynamicEngine sub project for kdevelop
 # usage : ./createDynamicEngine nameOfYouNewEngine then just add the new subproject into kdevelop
