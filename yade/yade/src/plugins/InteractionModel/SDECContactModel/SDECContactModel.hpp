@@ -28,7 +28,7 @@ class SDECContactModel : public InteractionGeometry
 	public : SDECContactModel ();
 	public : ~SDECContactModel ();
 
-	public : void afterDeserialization();
+	protected : virtual void postProcessAttributes(bool deserializing);
 	public : void registerAttributes();
 
 	REGISTER_CLASS_NAME(SDECContactModel);

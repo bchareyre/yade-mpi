@@ -38,10 +38,8 @@ class BodyContainer : public Serializable
 	private   : vector<shared_ptr<Body> > body;
 	public    : virtual void registerAttributes();
 
-	protected : virtual void beforeSerialization();
-	protected : virtual void afterSerialization();
-	protected : virtual void beforeDeserialization();
-	protected : virtual void afterDeserialization();
+	protected : virtual void preProcessAttributes(bool deserializing);
+	protected : virtual void postProcessAttributes(bool deserializing);
 };
 
 REGISTER_SERIALIZABLE(BodyContainer,false);

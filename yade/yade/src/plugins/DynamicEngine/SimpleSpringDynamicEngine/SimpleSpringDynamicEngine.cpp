@@ -14,7 +14,7 @@ SimpleSpringDynamicEngine::~SimpleSpringDynamicEngine ()
 
 }
 
-void SimpleSpringDynamicEngine::afterDeserialization()
+void SimpleSpringDynamicEngine::postProcessAttributes(bool)
 {
 
 }

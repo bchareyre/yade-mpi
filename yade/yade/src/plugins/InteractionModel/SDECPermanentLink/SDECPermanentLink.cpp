@@ -11,10 +11,13 @@ SDECPermanentLink::~SDECPermanentLink ()
 
 }
 
-void SDECPermanentLink::afterDeserialization()
+void SDECPermanentLink::postProcessAttributes(bool deserializing)
 {
-	shearForce = Vector3r(0,0,0);
-	thetar = Vector3r(0,0,0);
+	if(deserializing)
+	{
+		shearForce = Vector3r(0,0,0);
+		thetar = Vector3r(0,0,0);
+	}
 }
 
 void SDECPermanentLink::registerAttributes()

@@ -14,9 +14,7 @@ KinematicEngine::~KinematicEngine()
 
 }
 
-
-
-void KinematicEngine::afterDeserialization()
+void KinematicEngine::postProcessAttributes(bool)
 {
 
 }

@@ -78,7 +78,7 @@ class SDECDynamicEngine : public DynamicEngine
 	/*! Destructor */
 	public : virtual ~SDECDynamicEngine();
 
-	public : void afterDeserialization();
+	protected : virtual void postProcessAttributes(bool deserializing);
 	public : void registerAttributes();
 
 	public : void respondToCollisions(Body* body);

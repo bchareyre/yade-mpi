@@ -11,9 +11,9 @@ SimpleNarrowCollider::~ SimpleNarrowCollider()
 
 }
 
-void SimpleNarrowCollider::afterDeserialization()
+void SimpleNarrowCollider::postProcessAttributes(bool deserializing)
 {
-	NarrowCollider::afterDeserialization();
+	NarrowCollider::postProcessAttributes(deserializing);
 }
 
 void SimpleNarrowCollider::registerAttributes()

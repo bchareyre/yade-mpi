@@ -11,7 +11,7 @@
 
 	public : NodeProperties() {};
 	public : NodeProperties(float im) : invMass(im), velocity(Vector3r(0,0,0)) {};
-	public : void afterDeserialization() {};
+	protected : virtual void postProcessAttributes(bool deserializing) {};
 	public : void registerAttributes()
 	{
 		REGISTER_ATTRIBUTE(invMass);
@@ -30,7 +30,7 @@ class FEMRock : public FileGenerator
 	public : FEMRock ();
 	public : ~FEMRock ();
 
-	public : void afterDeserialization();
+	protected : virtual void postProcessAttributes(bool deserializing);
 	public : void registerAttributes();
 
 	public : void generate();

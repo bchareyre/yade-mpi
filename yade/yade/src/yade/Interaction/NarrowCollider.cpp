@@ -10,10 +10,13 @@ NarrowCollider::~NarrowCollider ()
 }
 
 
-void NarrowCollider::afterDeserialization()
+void NarrowCollider::postProcessAttributes(bool deserializing)
 {
-	for(unsigned int i=0;i<collisionFunctors.size();i++)
-		narrowManager.addPair(collisionFunctors[i][0],collisionFunctors[i][1],collisionFunctors[i][2]);
+	if(deserializing)
+	{
+		for(unsigned int i=0;i<collisionFunctors.size();i++)
+			narrowManager.addPair(collisionFunctors[i][0],collisionFunctors[i][1],collisionFunctors[i][2]);
+	}
 }
 
 void NarrowCollider::registerAttributes()

@@ -10,7 +10,7 @@ class SDECSpheresPlane : public FileGenerator
 	public : SDECSpheresPlane ();
 	public : ~SDECSpheresPlane ();
 
-	public : void afterDeserialization();
+	protected : virtual void postProcessAttributes(bool deserializing);
 	public : void registerAttributes();
 
 	public : void generate();

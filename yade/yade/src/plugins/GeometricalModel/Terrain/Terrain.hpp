@@ -71,7 +71,7 @@ class Terrain : public CollisionGeometry
 	public : Terrain ();
 	public : ~Terrain ();
 
-	public : void afterDeserialization();
+	protected : virtual void postProcessAttributes(bool deserializing);
 	public : void registerAttributes();
 
 	public : bool loadFromFile(char * fileName);

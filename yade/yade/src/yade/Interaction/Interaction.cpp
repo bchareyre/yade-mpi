@@ -14,7 +14,7 @@ Interaction::~Interaction ()
 
 }
 
-void Interaction::afterDeserialization()
+void Interaction::postProcessAttributes(bool)
 {
 
 }

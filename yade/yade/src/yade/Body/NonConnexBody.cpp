@@ -42,7 +42,7 @@ void NonConnexBody::glDraw()
 
 }
 
-void NonConnexBody::afterDeserialization()
+void NonConnexBody::postProcessAttributes(bool)
 {
 
 }

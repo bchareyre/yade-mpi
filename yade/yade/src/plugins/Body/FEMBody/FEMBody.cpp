@@ -15,13 +15,16 @@ FEMBody::~FEMBody()
 
 }
 
-void FEMBody::afterDeserialization()
+void FEMBody::postProcessAttributes(bool deserializing)
 {
-	ConnexBody::afterDeserialization();
+	ConnexBody::postProcessAttributes(deserializing);
 	
-	//FIXME : when serialization tracks pointers delete it
-	//cm = dynamic_pointer_cast<CollisionGeometry>(gm);
-	gm = cm;
+	if(deserializing)
+	{
+		//FIXME : when serialization tracks pointers delete it
+		//cm = dynamic_pointer_cast<CollisionGeometry>(gm);
+		gm = cm;
+	}
 	
 }
 

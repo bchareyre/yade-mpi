@@ -58,7 +58,7 @@ class ErrorTolerantDynamicEngine : public DynamicEngine
 	public : ErrorTolerantDynamicEngine();
 	public : ~ErrorTolerantDynamicEngine();
 
-	public : void afterDeserialization();
+	protected : virtual void postProcessAttributes(bool deserializing);
 	public : void registerAttributes();
 
 	public : void respondToCollisions(Body* body);

@@ -10,7 +10,7 @@ class SDECLinkedSpheres : public FileGenerator
 	public : SDECLinkedSpheres ();
 	public : ~SDECLinkedSpheres ();
 
-	public : void afterDeserialization();
+	protected : virtual void postProcessAttributes(bool deserializing);
 	public : void registerAttributes();
 
 	public : void generate();

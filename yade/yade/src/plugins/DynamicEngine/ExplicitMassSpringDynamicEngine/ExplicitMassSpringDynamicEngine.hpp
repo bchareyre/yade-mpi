@@ -13,7 +13,7 @@ class ExplicitMassSpringDynamicEngine : public DynamicEngine
 	public : ExplicitMassSpringDynamicEngine ();
 	public : ~ExplicitMassSpringDynamicEngine ();
 
-	public : void afterDeserialization();
+	protected : virtual void postProcessAttributes(bool deserializing);
 	public : void registerAttributes();
 
 	public : void respondToCollisions(Body* body);

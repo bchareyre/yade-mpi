@@ -16,7 +16,7 @@ MassSpringBody2RigidBodyDynamicEngine::~MassSpringBody2RigidBodyDynamicEngine ()
 
 }
 
-void MassSpringBody2RigidBodyDynamicEngine::afterDeserialization()
+void MassSpringBody2RigidBodyDynamicEngine::postProcessAttributes(bool)
 {
 
 }

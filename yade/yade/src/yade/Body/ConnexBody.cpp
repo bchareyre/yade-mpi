@@ -43,9 +43,10 @@ void ConnexBody::glDraw()
 }
 
 
-void ConnexBody::afterDeserialization()
+void ConnexBody::postProcessAttributes(bool deserializing)
 {
-	invMass = 1.0/mass;
+	if(deserializing)
+		invMass = 1.0/mass;
 }
 
 void ConnexBody::registerAttributes()

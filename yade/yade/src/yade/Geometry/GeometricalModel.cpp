@@ -9,6 +9,10 @@ GeometricalModel::~GeometricalModel ()
 
 }
 
+void GeometricalModel::postProcessAttributes(bool)
+{
+}
+
 void GeometricalModel::registerAttributes()
 {
 	REGISTER_ATTRIBUTE(diffuseColor);
@@ -16,6 +20,3 @@ void GeometricalModel::registerAttributes()
 	REGISTER_ATTRIBUTE(visible);
 }
 
-void GeometricalModel::afterDeserialization()
-{
-}

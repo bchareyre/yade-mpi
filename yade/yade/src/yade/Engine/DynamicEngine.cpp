@@ -10,7 +10,7 @@ DynamicEngine::~DynamicEngine ()
 
 }
 
-void DynamicEngine::afterDeserialization()
+void DynamicEngine::postProcessAttributes(bool)
 {
 
 }

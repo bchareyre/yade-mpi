@@ -60,7 +60,7 @@ class NonConnexBody : public Body
 
 	public	: void moveToNextTimeStep();
 
-	public	: void afterDeserialization();
+	protected : virtual void postProcessAttributes(bool deserializing);
 	public	: void registerAttributes();
 
 	REGISTER_CLASS_NAME(NonConnexBody);

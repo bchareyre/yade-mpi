@@ -58,9 +58,9 @@ Sphere::~Sphere ()
 
 }
 
-void Sphere::afterDeserialization()
+void Sphere::postProcessAttributes(bool deserializing)
 {
-	CollisionGeometry::afterDeserialization();
+	CollisionGeometry::postProcessAttributes(deserializing);
 }
 
 void Sphere::registerAttributes()

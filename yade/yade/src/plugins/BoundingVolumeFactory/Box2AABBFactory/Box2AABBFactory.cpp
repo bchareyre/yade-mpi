@@ -12,7 +12,7 @@ Box2AABBFactory::~Box2AABBFactory ()
 
 }
 
-void Box2AABBFactory::afterDeserialization()
+void Box2AABBFactory::postProcessAttributes(bool)
 {
 
 }

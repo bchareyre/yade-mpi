@@ -67,7 +67,7 @@ class Interaction : public Serializable
 	public	: unsigned int getId1() {return id1;}; // everything written inside class declaration is inline, therefore as fast as accessing the variable itself, every compiler guarantees this.
 	public	: unsigned int getId2() {return id2;};
 
-	public	: void afterDeserialization();
+	protected : virtual void postProcessAttributes(bool deserializing);
 	public	: void registerAttributes();
 
 	REGISTER_CLASS_NAME(Interaction);

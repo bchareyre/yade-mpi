@@ -14,7 +14,7 @@ class BallisticDynamicEngine : public DynamicEngine
 	public : BallisticDynamicEngine ();
 	public : ~BallisticDynamicEngine ();
 
-	public : void afterDeserialization();
+	protected : virtual void postProcessAttributes(bool deserializing);
 	public : void registerAttributes();
 
 	public : void respondToCollisions(Body* body);

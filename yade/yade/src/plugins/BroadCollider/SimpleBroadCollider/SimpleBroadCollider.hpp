@@ -15,7 +15,7 @@ class SimpleBroadCollider : public BroadCollider
 	public : SimpleBroadCollider ();
 	public : ~SimpleBroadCollider ();
 
-	public : void afterDeserialization();
+	protected : virtual void postProcessAttributes(bool deserializing);
 	public : void registerAttributes();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

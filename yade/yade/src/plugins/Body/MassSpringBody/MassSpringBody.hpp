@@ -5,6 +5,8 @@
 #include "Vector3.hpp"
 #include "Matrix3.hpp"
 
+// FIXME - class class NodeProperties is duplicated in FEMBody and MassSpringBody
+
 class NodeProperties : public Serializable
 {
 	public : float invMass;
@@ -12,7 +14,7 @@ class NodeProperties : public Serializable
 
 	public : NodeProperties() {};
 	public : NodeProperties(float im) : invMass(im), velocity(Vector3r(0,0,0)) {};
-	public : void afterDeserialization() {};
+	protected : virtual void postProcessAttributes(bool) {};
 	public : void registerAttributes()
 	{
 		REGISTER_ATTRIBUTE(invMass);
@@ -20,6 +22,7 @@ class NodeProperties : public Serializable
 	};
 	REGISTER_CLASS_NAME(NodeProperties);
 };
+
 REGISTER_SERIALIZABLE(NodeProperties,true);
 
 class MassSpringBody : public ConnexBody
@@ -34,7 +37,7 @@ class MassSpringBody : public ConnexBody
 	public : MassSpringBody ();
 	public : ~MassSpringBody ();
 
-	public : void afterDeserialization();
+	protected : virtual void postProcessAttributes(bool deserializing);
 	public : void registerAttributes();
 
 	public : void updateBoundingVolume(Se3r& se3);

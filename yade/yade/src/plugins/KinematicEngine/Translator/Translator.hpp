@@ -21,7 +21,7 @@ class Translator : public KinematicEngine
 
 	public : void moveToNextTimeStep(Body * body);
 
-	public : void afterDeserialization();
+	protected : virtual void postProcessAttributes(bool deserializing);
 	public : void registerAttributes();
 	REGISTER_CLASS_NAME(Translator);
 };

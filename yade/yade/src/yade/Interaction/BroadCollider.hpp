@@ -77,7 +77,7 @@ class BroadCollider : public Actor
 	*/
 	public : virtual void broadCollisionTest(Body*  ) { throw; };
 
-	public : void afterDeserialization();
+	protected : virtual void postProcessAttributes(bool deserializing);
 	public : void registerAttributes();
 	
 	//public : virtual bool isActivated();

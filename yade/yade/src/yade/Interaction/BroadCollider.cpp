@@ -11,7 +11,7 @@ BroadCollider::~BroadCollider ()
 }
 
 
-void BroadCollider::afterDeserialization()
+void BroadCollider::postProcessAttributes(bool)
 {
 
 }

@@ -46,8 +46,8 @@ class CollisionGeometry : public GeometricalModel, public Indexable
 	public : virtual ~CollisionGeometry ();
 
 	//public : virtual bool collideWith(CollisionGeometry* collisionGeometry) = NULL;
+	protected : virtual void postProcessAttributes(bool deserializing);
 	public : void registerAttributes();
-	public : void afterDeserialization();
 
 	// FIXME : why to put again getClassIndex
 	public : virtual int& getClassIndex() { throw;};

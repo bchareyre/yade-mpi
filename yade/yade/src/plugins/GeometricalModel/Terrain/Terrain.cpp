@@ -14,7 +14,7 @@ Terrain::~Terrain ()
 
 }
 
-void Terrain::afterDeserialization()
+void Terrain::postProcessAttributes(bool)
 {
 
 }

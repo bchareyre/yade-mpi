@@ -11,18 +11,22 @@ Mesh2D::~Mesh2D ()
 
 }
 
-void Mesh2D::afterDeserialization()
+void Mesh2D::postProcessAttributes(bool deserializing)
 {
-	CollisionGeometry::afterDeserialization();
-
-	fNormals.resize(faces.size());
-	vNormals.resize(vertices.size());
-	triPerVertices.resize(vertices.size());
-	for(unsigned int i=0;i<faces.size();i++)
+	CollisionGeometry::postProcessAttributes(deserializing);
+	
+	if(deserializing)
 	{
-		triPerVertices[faces[i][0]].push_back(i);
-		triPerVertices[faces[i][1]].push_back(i);
-		triPerVertices[faces[i][2]].push_back(i);
+	
+		fNormals.resize(faces.size());
+		vNormals.resize(vertices.size());
+		triPerVertices.resize(vertices.size());
+		for(unsigned int i=0;i<faces.size();i++)
+		{
+			triPerVertices[faces[i][0]].push_back(i);
+			triPerVertices[faces[i][1]].push_back(i);
+			triPerVertices[faces[i][2]].push_back(i);
+		}
 	}
 }
 

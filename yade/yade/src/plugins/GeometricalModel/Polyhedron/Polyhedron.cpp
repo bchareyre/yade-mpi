@@ -13,23 +13,25 @@ Polyhedron::~Polyhedron ()
 
 }
 
-void Polyhedron::afterDeserialization()
+void Polyhedron::postProcessAttributes(bool deserializing)
 {
-	CollisionGeometry::afterDeserialization();
+	CollisionGeometry::postProcessAttributes(deserializing);
 
-	loadGmshMesh(mshFileName);
-
-	fNormals.resize(faces.size());
-	cerr << "process"<<endl;
-	/*vNormals.resize(vertices.size());
-	triPerVertices.resize(vertices.size());
-	for(unsigned int i=0;i<faces.size();i++)
+	if(deserializing)
 	{
-		triPerVertices[faces[i][0]].push_back(i);
-		triPerVertices[faces[i][1]].push_back(i);
-		triPerVertices[faces[i][2]].push_back(i);
-	}*/
-
+		loadGmshMesh(mshFileName);
+	
+		fNormals.resize(faces.size());
+		cerr << "process"<<endl;
+		/*vNormals.resize(vertices.size());
+		triPerVertices.resize(vertices.size());
+		for(unsigned int i=0;i<faces.size();i++)
+		{
+			triPerVertices[faces[i][0]].push_back(i);
+			triPerVertices[faces[i][1]].push_back(i);
+			triPerVertices[faces[i][2]].push_back(i);
+		}*/
+	}
 }
 
 void Polyhedron::registerAttributes()

@@ -97,10 +97,8 @@ class Serializable : public Factorable
 	public    : void markAllAttributesProcessed();
 	public	  : bool findAttribute(const string& name,shared_ptr<Archive>& arc);
 
-	protected : virtual void beforeSerialization() {};
-	protected : virtual void afterSerialization() {};
-	protected : virtual void beforeDeserialization() {};
-	protected : virtual void afterDeserialization() {};
+	protected : virtual void preProcessAttributes(bool /*deserializing*/) {};
+	protected : virtual void postProcessAttributes(bool /*deserializing*/) {};
 
 	protected : template <typename Type>
 		    void registerAttribute(const string& name, Type& attribute)

@@ -11,9 +11,10 @@ Translator::~Translator ()
 
 }
 
-void Translator::afterDeserialization()
+void Translator::postProcessAttributes(bool deserializing)
 {
-	translationAxis.normalize();
+	if(deserializing)
+		translationAxis.normalize();
 }
 
 void Translator::registerAttributes()

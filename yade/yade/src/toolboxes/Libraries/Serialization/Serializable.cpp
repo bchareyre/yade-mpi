@@ -45,18 +45,12 @@ void Serializable::unregisterSerializableAttributes(bool deserializing)
 	}
 	archives.clear();
 
-	if(deserializing)
-		afterDeserialization();
-	else
-		afterSerialization();
+	postProcessAttributes(deserializing);
 }
 
 void Serializable::registerSerializableAttributes(bool deserializing)
 {
-	if(deserializing)
-		beforeDeserialization();
-	else
-		beforeSerialization();
+	preProcessAttributes(deserializing);
 
 	this->registerAttributes();
 }

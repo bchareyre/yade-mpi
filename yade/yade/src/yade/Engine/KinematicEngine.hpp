@@ -79,7 +79,7 @@ class KinematicEngine : public Actor
 	*/
 	public : virtual void moveToNextTimeStep(Body* ) { throw; };
 
-	public : void afterDeserialization();
+	protected : virtual void postProcessAttributes(bool deserializing);
 	public : void registerAttributes();
 	
 	//public : virtual bool isActivated();

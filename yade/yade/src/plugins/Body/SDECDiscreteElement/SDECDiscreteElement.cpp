@@ -10,9 +10,9 @@ SDECDiscreteElement::~SDECDiscreteElement()
 
 }
 
-void SDECDiscreteElement::afterDeserialization()
+void SDECDiscreteElement::postProcessAttributes(bool deserializing)
 {
-	RigidBody::afterDeserialization();
+	RigidBody::postProcessAttributes(deserializing);
 }
 
 void SDECDiscreteElement::registerAttributes()

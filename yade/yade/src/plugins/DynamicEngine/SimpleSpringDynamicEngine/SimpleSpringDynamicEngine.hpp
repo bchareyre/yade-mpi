@@ -14,7 +14,7 @@ class SimpleSpringDynamicEngine : public DynamicEngine
 	public : SimpleSpringDynamicEngine ();
 	public : ~SimpleSpringDynamicEngine ();
 
-	public : void afterDeserialization();
+	protected : virtual void postProcessAttributes(bool deserializing);
 	public : void registerAttributes();
 
 	//public : void respondToCollisions(std::vector<shared_ptr<Body> >& bodies, const std::list<shared_ptr<Interaction> >& interactions,float dt);

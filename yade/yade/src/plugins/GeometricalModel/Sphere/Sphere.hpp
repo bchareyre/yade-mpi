@@ -24,7 +24,7 @@ class Sphere : public CollisionGeometry
 	public : bool collideWith(CollisionGeometry* collisionGeometry);
 	public : void glDraw();
 
-	public : void afterDeserialization();
+	protected : virtual void postProcessAttributes(bool deserializing);
 	public : void registerAttributes();
 
 	REGISTER_CLASS_NAME(Sphere);

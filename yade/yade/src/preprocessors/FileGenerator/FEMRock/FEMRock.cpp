@@ -23,7 +23,7 @@ FEMRock::~FEMRock ()
 
 }
 
-void FEMRock::afterDeserialization()
+void FEMRock::postProcessAttributes(bool)
 {
 }
 

@@ -11,7 +11,7 @@ ClosestFeatures::~ClosestFeatures ()
 
 }
 
-void ClosestFeatures::afterDeserialization()
+void ClosestFeatures::postProcessAttributes(bool)
 {
 
 }

@@ -24,7 +24,7 @@ SDECLinkedSpheres::~SDECLinkedSpheres ()
 
 }
 
-void SDECLinkedSpheres::afterDeserialization()
+void SDECLinkedSpheres::postProcessAttributes(bool)
 {
 }
 

@@ -14,7 +14,7 @@ class ClosestFeatures : public InteractionGeometry
 	public : ClosestFeatures ();
 	public : ~ClosestFeatures ();
 
-	public : void afterDeserialization();
+	protected : virtual void postProcessAttributes(bool deserializing);
 	public : void registerAttributes();
 
 	REGISTER_CLASS_NAME(ClosestFeatures);

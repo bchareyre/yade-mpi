@@ -25,7 +25,7 @@ class Polyhedron : public CollisionGeometry
 	public : void computeNormals();
 	public : void loadGmshMesh(const string& fileName);
 
-	public : void afterDeserialization();
+	protected : virtual void postProcessAttributes(bool deserializing);
 	public : void registerAttributes();
 
 	REGISTER_CLASS_NAME(Polyhedron);

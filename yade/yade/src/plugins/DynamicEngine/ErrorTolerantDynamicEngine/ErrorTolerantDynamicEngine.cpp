@@ -52,9 +52,9 @@ ErrorTolerantDynamicEngine::~ErrorTolerantDynamicEngine()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-void ErrorTolerantDynamicEngine::afterDeserialization()
+void ErrorTolerantDynamicEngine::postProcessAttributes(bool deserializing)
 {
-	DynamicEngine::afterDeserialization();
+	DynamicEngine::postProcessAttributes(deserializing);
 	// PROCESS DESIRED ATTRIBUTES HERE
 }
 

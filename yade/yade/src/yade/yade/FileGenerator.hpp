@@ -15,7 +15,7 @@ class FileGenerator : public Serializable
 	public : FileGenerator () : Serializable() {};
 	public : ~FileGenerator () {};
 
-	public : virtual void afterDeserialization() {};
+	protected : virtual void postProcessAttributes(bool) {};
 	public : virtual void registerAttributes() {};
 
 	public : virtual void generate() {};

@@ -51,9 +51,9 @@ SDECDynamicEngine::~SDECDynamicEngine()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void SDECDynamicEngine::afterDeserialization()
+void SDECDynamicEngine::postProcessAttributes(bool deserializing)
 {
-	DynamicEngine::afterDeserialization();
+	DynamicEngine::postProcessAttributes(deserializing);
 	// PROCESS DESIRED ATTRIBUTES HERE
 }
 

@@ -26,7 +26,7 @@ HangingCloth::~HangingCloth ()
 
 }
 
-void HangingCloth::afterDeserialization()
+void HangingCloth::postProcessAttributes(bool)
 {
 }
 

@@ -10,7 +10,7 @@ class BoxStack : public FileGenerator
 	public : BoxStack ();
 	public : ~BoxStack ();
 
-	public : void afterDeserialization();
+	protected : virtual void postProcessAttributes(bool deserializing);
 	public : void registerAttributes();
 
 	public : void generate();

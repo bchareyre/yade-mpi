@@ -18,7 +18,7 @@ class BoundingSphere : public BoundingVolume
 	public : void glDraw();
 	public : void update(Se3r& se3);
 
-	public : void afterDeserialization();
+	protected : virtual void postProcessAttributes(bool deserializing);
 	public : void registerAttributes();
 
 	REGISTER_CLASS_NAME(BoundingSphere);
