@@ -4,7 +4,7 @@
 # Target is a subdirs project 
 
 SUBDIRS += GLWindowManager \
-	   OpenGLWrapper
+           OpenGLWrapper 
 CONFIG += debug \
-          warn_on 
-TEMPLATE = subdirs 
+warn_on
+TEMPLATE = subdirs

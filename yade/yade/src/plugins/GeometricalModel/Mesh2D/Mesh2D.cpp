@@ -1,4 +1,5 @@
 #include "Mesh2D.hpp"
+#include "OpenGLWrapper.hpp"
 #include <iostream>
 
 
@@ -62,8 +63,8 @@ void Mesh2D::glDraw()
 		glBegin(GL_LINES);
 			for(unsigned int i=0;i<edges.size();i++)
 			{
-				glVertex3fv(vertices[edges[i].first]);
-				glVertex3fv(vertices[edges[i].second]);			
+				glVertex3v(vertices[edges[i].first]);
+				glVertex3v(vertices[edges[i].second]);			
 			}	
 		glEnd();
 	}
@@ -85,11 +86,11 @@ void Mesh2D::glDraw()
 				int v2 = faces[i][1];
 				int v3 = faces[i][2];
 				glNormal3fv(vNormals[v1]);
-				glVertex3fv(vertices[v1]);
+				glVertex3v(vertices[v1]);
 				glNormal3fv(vNormals[v2]);
-				glVertex3fv(vertices[v2]);
+				glVertex3v(vertices[v2]);
 				glNormal3fv(vNormals[v3]);
-				glVertex3fv(vertices[v3]);
+				glVertex3v(vertices[v3]);
 			}
 		glEnd();
 	}

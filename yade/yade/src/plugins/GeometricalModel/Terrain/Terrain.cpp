@@ -3,7 +3,7 @@
 #include <iostream>
 #include <GL/gl.h>
 #include <set>
-
+#include "OpenGLWrapper.hpp"
 
 Terrain::Terrain () : CollisionGeometry()
 {
@@ -53,7 +53,7 @@ void Terrain::glDraw()
 			glBegin(GL_POLYGON);
 				glNormal3fv(*ni);
 				for( ; fi!=fiEnd; ++fi)
-					glVertex3fv(vertices[(*fi)]);
+					glVertex3v(vertices[(*fi)]);
 			glEnd();
 		}
 	//}
@@ -68,9 +68,9 @@ void Terrain::glDraw()
 		int faceId = testedFaces[k];
 		glBegin(GL_POLYGON);
 			glNormal3fv(normals[faceId]);
-			glVertex3fv(vertices[faces[faceId][0]]+Vector3r(0,0.1,0));
-			glVertex3fv(vertices[faces[faceId][1]]+Vector3r(0,0.1,0));
-			glVertex3fv(vertices[faces[faceId][2]]+Vector3r(0,0.1,0));
+			glVertex3v(vertices[faces[faceId][0]]+Vector3r(0,0.1,0));
+			glVertex3v(vertices[faces[faceId][1]]+Vector3r(0,0.1,0));
+			glVertex3v(vertices[faces[faceId][2]]+Vector3r(0,0.1,0));
 		glEnd();
 	}
 	testedFaces.clear();
@@ -253,8 +253,8 @@ void Terrain::glDrawNormals()
 		bary /= (*fsi).size();
 		
 		glBegin(GL_LINES);
-			glVertex3fv(bary);
-			glVertex3fv(bary+*(ni)*0.2);
+			glVertex3v(bary);
+			glVertex3v(bary+*(ni)*0.2);
 		glEnd();
 		
 	}

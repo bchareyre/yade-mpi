@@ -1,4 +1,5 @@
 #include "Polyhedron.hpp"
+#include "OpenGLWrapper.hpp"
 #include <fstream>
 #include <map>
 
@@ -63,8 +64,8 @@ void Polyhedron::glDraw()
 		glBegin(GL_LINES);
 			for(unsigned int i=0;i<edges.size();i++)
 			{
-				glVertex3fv(vertices[edges[i].first]);
-				glVertex3fv(vertices[edges[i].second]);
+				glVertex3v(vertices[edges[i].first]);
+				glVertex3v(vertices[edges[i].second]);
 			}
 		glEnd();
 	}
@@ -87,11 +88,11 @@ void Polyhedron::glDraw()
 				int v3 = faces[i][2];
 				//glNormal3fv(vNormals[v1]);
 				glNormal3fv(fNormals[i]);
-				glVertex3fv(vertices[v1]);
+				glVertex3v(vertices[v1]);
 				//glNormal3fv(vNormals[v2]);
-				glVertex3fv(vertices[v2]);
+				glVertex3v(vertices[v2]);
 				//glNormal3fv(vNormals[v3]);
-				glVertex3fv(vertices[v3]);
+				glVertex3v(vertices[v3]);
 			}
 		glEnd();
 	}

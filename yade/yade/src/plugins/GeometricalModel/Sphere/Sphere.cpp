@@ -1,4 +1,5 @@
 #include "Sphere.hpp"
+#include "OpenGLWrapper.hpp"
 
 int Sphere::glSphereList=-1;
 int Sphere::glWiredSphereList=-1;
@@ -117,11 +118,11 @@ void Sphere::subdivideTriangle(Vector3r& v1,Vector3r& v2,Vector3r& v3, int depth
 
 		glBegin(GL_TRIANGLES);
 			glNormal3fv(v3);
-			glVertex3fv(v3);
+			glVertex3v(v3);
 			glNormal3fv(v2);
-			glVertex3fv(v2);
+			glVertex3v(v2);
 			glNormal3fv(v1);
-			glVertex3fv(v1);
+			glVertex3v(v1);
 		glEnd();
 
 		return;
