@@ -10,6 +10,7 @@
 #include <qfiledialog.h>
 #include <qlcdnumber.h>
 #include <qlabel.h>
+#include <qpushbutton.h>
 #include <qgroupbox.h>
 #include <boost/lexical_cast.hpp>
 #include <boost/filesystem/operations.hpp>
@@ -46,32 +47,39 @@ SimulationController::SimulationController(QWidget * parent) : QtGeneratedSimula
 		cerr << "renderer not created - why?!\n";
 	}
 	
+	maxNbViews=0;
+	addNewView();
+	
+	updater = shared_ptr<SimulationControllerUpdater>(new SimulationControllerUpdater(this));
 }
 
 SimulationController::~SimulationController()
 {
 	terminateAllThreads();
 	
-	for(unsigned int i=0;i<glViews.size();i++)
-		if (glViews[i])
-			delete glViews[i];
+	map<int,GLViewer*>::iterator gi = glViews.begin();
+	map<int,GLViewer*>::iterator giEnd = glViews.end();
+	for(;gi!=giEnd;++gi)
+		delete (*gi).second;
 	glViews.clear();
 }
 
 void SimulationController::terminateAllThreads()
 {
-	for(unsigned int i=0;i<glViews.size();i++)
-		if (glViews[i])
-		{
-			glViews[i]->finishRendering();
-			//glViews[i]->joinRendering();
-		}
-		
 	updater->finish();
-	//updater->join();
+	updater->join();
+	
+	map<int,GLViewer*>::iterator gi = glViews.begin();
+	map<int,GLViewer*>::iterator giEnd = glViews.end();
+	for(;gi!=giEnd;++gi)
+	{
+		(*gi).second->finishRendering();
+		(*gi).second->joinRendering();
+	}
+		
 	Omega::instance().finishSimulationLoop();
-	//Omega::instance().joinSimulationLoop();
-	while (Omega::instance().synchronizer->getNbThreads()!=0);
+	Omega::instance().joinSimulationLoop();
+	//while (Omega::instance().synchronizer->getNbThreads()!=0);
 }
 
 void SimulationController::pbApplyClicked()
@@ -89,56 +97,27 @@ void SimulationController::pbLoadClicked()
 
 	if (!fileName.isEmpty() && selectedFilter == "XML Yade File (*.xml)")
 	{
-		for(unsigned int i=0;i<glViews.size();i++)
-			if (glViews[i])
-				glViews[i]->stopRendering();
+		map<int,GLViewer*>::iterator gi = glViews.begin();
+		map<int,GLViewer*>::iterator giEnd = glViews.end();
+		//for(;gi!=giEnd;++gi)
+		//	(*gi).second->stopRendering();
 		
-		if (glViews.size()==0)
-// 			I had to move this up (to be the first), because otherwise it was crashing:
-//
-// 						X Error: BadWindow (invalid Window parameter) 3
-// 						Major opcode:  3
-// 						Minor opcode:  0
-// 						Resource id:  0x34001df
-// 						QGLContext::makeCurrent(): Failed.
-// 						QGLContext::makeCurrent(): Failed.
-// 						QGLContext::makeCurrent(): Failed.
-// 						X Error: GLXBadDrawable 161
-// 						Major opcode:  145
-// 						Minor opcode:  11
-// 						Resource id:  0x34001e2
-// 						QGLContext::makeCurrent(): Failed.
-// 						QGLContext::makeCurrent(): Failed.
-
-//		I still have this error, but less often.
-
- 		{
-			QGLFormat format;
-			QGLFormat::setDefaultFormat( format );
-			format.setStencil(TRUE);
-			format.setAlpha(TRUE);
-			glViews.push_back(new GLViewer(glViews.size(),renderer,format,this->parentWidget()->parentWidget()));
-			connect( glViews.back(), SIGNAL( closeSignal(int) ), this, SLOT( closeGLViewEvent(int) ) );
-		}
-
 		Omega::instance().setSimulationFileName(fileName);
 		Omega::instance().loadSimulation();
-
-		for(unsigned int i=0;i<glViews.size();i++)
-			if (glViews[i])
-				glViews[i]->centerScene();
+		
+		gi = glViews.begin();
+		for(;gi!=giEnd;++gi)
+			(*gi).second->centerScene();
 		
 		string fullName = string(filesystem::basename(fileName.data()))+string(filesystem::extension(fileName.data()));
 		tlCurrentSimulation->setText(fullName);
 
 		Omega::instance().createSimulationLoop();
-		Omega::instance().stopSimulationLoop();
-		
-		for(unsigned int i=0;i<glViews.size();i++)
-			if (glViews[i])
-				glViews[i]->startRendering();
-				
-		updater = shared_ptr<SimulationControllerUpdater>(new SimulationControllerUpdater(this));
+		//Omega::instance().stopSimulationLoop();
+
+		//gi = glViews.begin();
+		//for(;gi!=giEnd;++gi)
+		//	(*gi).second->startRendering();
 	}
 } 
 
@@ -147,28 +126,58 @@ void SimulationController::pbNewViewClicked()
 	boost::mutex resizeMutex;
 	boost::mutex::scoped_lock lock(resizeMutex);
 
+	addNewView();
+	
+}
+
+void SimulationController::addNewView()
+{
+	boost::mutex resizeMutex;
+	boost::mutex::scoped_lock lock(resizeMutex);
+
 	QGLFormat format;
 	QGLFormat::setDefaultFormat( format );
 	format.setStencil(TRUE);
 	format.setAlpha(TRUE);
-	glViews.push_back(new GLViewer(glViews.size(),renderer, format, this->parentWidget()->parentWidget(), glViews.front()) );		
-	connect( glViews.back(), SIGNAL( closeSignal(int) ), this, SLOT( closeGLViewEvent(int) ) );
-	glViews.back()->centerScene();
-	glViews.back()->startRendering();
+
+	
+	if (glViews.size()==0)
+	{
+			glViews[0] = new GLViewer(0,renderer,format,this->parentWidget()->parentWidget());
+			maxNbViews = 0;
+	}
+	else
+	{
+		maxNbViews++;
+		glViews[maxNbViews] = new GLViewer(maxNbViews,renderer, format, this->parentWidget()->parentWidget(), glViews[0]);
+	}
+	
+	connect( glViews[maxNbViews], SIGNAL( closeSignal(int) ), this, SLOT( closeGLViewEvent(int) ) );
+	glViews[maxNbViews]->centerScene();
+	glViews[maxNbViews]->startRendering();
 }
+
+
+
+
+
+
 
 void SimulationController::closeGLViewEvent(int id)
 {
-	int n = Omega::instance().synchronizer->getNbThreads();
-	
-	for(unsigned int i=0;i<glViews.size();i++)
+//	int n = Omega::instance().synchronizer->getNbThreads();
+	if (id!=0)
+	{
+		//for(unsigned int i=0;i<glViews.size();i++)
 		glViews[id]->finishRendering();
-	glViews[id]->joinRendering();
-//	while (Omega::instance().synchronizer->getNbThreads()!=n-1);
-
-	delete glViews[id];
-	glViews[id] = 0;
-
+		glViews[id]->joinRendering();
+	//	while (Omega::instance().synchronizer->getNbThreads()!=n-1);
+		delete glViews[id];
+		glViews.erase(id);
+		//glViews[id] = 0;
+		if (id==maxNbViews)
+			maxNbViews--;
+	}
 }
 
 void SimulationController::pbStopClicked()
@@ -199,12 +208,10 @@ void SimulationController::pbCenterSceneClicked()
 {
 	boost::mutex resizeMutex;
 	boost::mutex::scoped_lock lock(resizeMutex);
-	for(unsigned int i=0;i<glViews.size();i++)
-	{
-		if (glViews[i])
-			if (glViews[i]->isActiveWindow())
-				glViews[i]->centerScene();
-	}
+	map<int,GLViewer*>::iterator gi = glViews.begin();
+	map<int,GLViewer*>::iterator giEnd = glViews.end();
+	for(;gi!=giEnd;++gi)
+		(*gi).second->centerScene();
 }
 
 void SimulationController::closeEvent(QCloseEvent *)

@@ -28,8 +28,8 @@ class GLWindowsManager
 
 	protected : int selectedWindow;
 
-	public : static int width;
-	public : static int height;
+	public : int width;
+	public : int height;
 	
 	// construction
 	public : GLWindowsManager ();

@@ -98,7 +98,6 @@ void Threadable<Thread>::join()
 template<class Thread>
 void Threadable<Thread>::operator()()
 {
-
 	if (synchronizer)
 	{
 		while (notEnd() && !*finished)

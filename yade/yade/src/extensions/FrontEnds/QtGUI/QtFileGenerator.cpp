@@ -44,6 +44,17 @@ QtFileGenerator::QtFileGenerator ( QWidget * parent , const char * name) : QtFil
 {
 	setMinimumSize(size());
 	setMaximumSize(size());	
+	
+	map<string,string>::iterator di    = Omega::instance().dynlibsType.begin();
+	map<string,string>::iterator diEnd = Omega::instance().dynlibsType.end();
+	for(;di!=diEnd;++di)
+	{
+		if ((*di).second=="IOManager")
+			cbSerializationName->insertItem((*di).first);
+		else if ((*di).second=="FileGenerator")
+			cbGeneratorName->insertItem((*di).first);
+	}
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -52,30 +63,6 @@ QtFileGenerator::QtFileGenerator ( QWidget * parent , const char * name) : QtFil
 QtFileGenerator::~QtFileGenerator()
 {
 
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-void QtFileGenerator::show()
-{
-	static bool firstShow = true;
-	
-	if (firstShow)
-	{
-		map<string,string>::iterator di    = Omega::instance().dynlibsType.begin();
-		map<string,string>::iterator diEnd = Omega::instance().dynlibsType.end();
-		for(;di!=diEnd;++di)
-		{
-			if ((*di).second=="IOManager")
-				cbSerializationName->insertItem((*di).first);
-			else if ((*di).second=="FileGenerator")
-				cbGeneratorName->insertItem((*di).first);
-		}
-		firstShow = false;
-	}
-	
-	QtFileGeneratorController::show();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

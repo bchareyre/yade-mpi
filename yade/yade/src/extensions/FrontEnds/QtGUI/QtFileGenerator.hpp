@@ -60,9 +60,7 @@ class QtFileGenerator : public QtFileGeneratorController, public Factorable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Methods											///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-	
-	public : virtual void show ();
-		
+
 	public slots : virtual void pbChooseClicked(); 
 	public slots : virtual void cbGeneratorNameActivated(const QString& s);
 	public slots : virtual void pbGenerateClicked(); 

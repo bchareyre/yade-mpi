@@ -13,7 +13,10 @@ GLViewer::GLViewer(int id, shared_ptr<RenderingEngine> renderer, const QGLFormat
 	setAutoBufferSwap(false);
 	resize(320, 240);
 
-	//setCaption();
+	if (id==0)
+		setCaption("Primary View (not closable)");
+	else
+		setCaption("Secondary View number "+lexical_cast<string>(id));
 	show();
 
 	wm.addWindow(new FpsTracker(),new GLWindowsManager::EventSubscription());
@@ -23,6 +26,12 @@ GLViewer::GLViewer(int id, shared_ptr<RenderingEngine> renderer, const QGLFormat
 GLViewer::~GLViewer()
 {
 	
+}
+
+void GLViewer::initializeGL()
+{
+	QGLViewer::initializeGL();
+	cout << "init" << endl;
 }
 
 void GLViewer::finishRendering()

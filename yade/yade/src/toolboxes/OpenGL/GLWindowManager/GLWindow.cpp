@@ -32,11 +32,19 @@ GLWindow::GLWindow(int minX,int minY, int sizeX,int sizeY)
 	setMaximumWidth(-1);
 	setMinimumHeight(-1);
 	setMaximumHeight(-1);
+	glWindowWidth=0;
+	glWindowHeight=0;
 }
 
 GLWindow::~GLWindow ()
 {
 
+}
+
+void GLWindow::resizeGlWindow(int w,int h)
+{
+	glWindowWidth=w;
+	glWindowHeight=h;
 }
 
 void GLWindow::glDraw()
@@ -279,12 +287,12 @@ bool GLWindow::mouseMoveEvent(int x, int y)
 		}	
 		if (minX<-sizeX+5) 
 			minX = -sizeX+5;
-		if (minX>GLWindowsManager::width-5) 
-			minX = GLWindowsManager::width-5;
+		if (minX>glWindowWidth-5) 
+			minX = glWindowWidth-5;
 		if (minY<-sizeY+5) 
 			minY = -sizeY+5;
-		if (minY>GLWindowsManager::height-5) 
-			minY = GLWindowsManager::height-5;
+		if (minY>glWindowHeight-5) 
+			minY = glWindowHeight-5;
 		if (minSizeX!=-1 && sizeX<minSizeX) 
 			sizeX=minSizeX;
 		if (minSizeY!=-1 && sizeY<minSizeY) 

@@ -6,15 +6,16 @@
 #include <GL/gl.h>
 
 
-int GLWindowsManager::width = 0;
-int GLWindowsManager::height = 0;
-
 GLWindowsManager::GLWindowsManager()
 {
 	windows.clear();
 	subscriptions.clear();
 	selectedWindow = -1;
 	order.clear();
+
+	width = 0;
+	height = 0;
+
 }
 
 GLWindowsManager::~GLWindowsManager ()
@@ -38,7 +39,7 @@ void GLWindowsManager::glDraw()
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
 	glLoadIdentity();
-	glOrtho( 0, GLWindowsManager::width, GLWindowsManager::height, 0, -1, 1 );
+	glOrtho( 0, width, height, 0, -1, 1 );
   
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
@@ -149,6 +150,8 @@ void GLWindowsManager::resizeEvent(int w, int h)
 {
 	width = w;
 	height = h;
+	for(int i=0;i<windows.size();i++)
+		windows[i]->resizeGlWindow(w,h);
 }
 
 

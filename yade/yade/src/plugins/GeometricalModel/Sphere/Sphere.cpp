@@ -210,8 +210,8 @@ void Sphere::renderShadowVolumes(const Se3r& se3, const Vector3r& lightPos)
 	Vector3r dir = lightPos-center;
 	Vector3r normalDir(-dir[1],dir[0],0);
 	normalDir.normalize();
-	normalDir *= radius*0.9;
-	Vector3r biNormalDir = normalDir.unitCross(dir)*(radius*0.9);
+	normalDir *= radius;
+	Vector3r biNormalDir = normalDir.unitCross(dir)*radius;
 	
 	int nbSegments = 15;
 	

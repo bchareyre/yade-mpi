@@ -7,6 +7,11 @@
 
 class GLWindow
 {	
+	
+	protected : int glWindowWidth;
+	protected : int glWindowHeight;
+	public : void resizeGlWindow(int w,int h);
+	
 	protected : int minX;
 	public : int getMinX() { return minX; };
 	public : void setMinX(int m) { minX = m; };

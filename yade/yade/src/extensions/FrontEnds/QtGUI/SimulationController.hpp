@@ -55,10 +55,12 @@ class SimulationControllerUpdater : public Threadable<SimulationControllerUpdate
 class SimulationController : public QtGeneratedSimulationController
 {
 	private : QtGUIGenerator guiGen;	
+	
 	private : shared_ptr<RenderingEngine> renderer;
-
-	public : vector<GLViewer* > glViews;
-
+	
+	private : map<int,GLViewer* > glViews;
+	private : int maxNbViews;
+		
 	private : shared_ptr<SimulationControllerUpdater> updater;
 	
 	// construction
@@ -76,6 +78,7 @@ class SimulationController : public QtGeneratedSimulationController
 	public slots : void closeGLViewEvent(int id);
 
 	private : void terminateAllThreads();
+	private : void addNewView();
 	
 	protected : void closeEvent(QCloseEvent *evt);
 
