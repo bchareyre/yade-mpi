@@ -48,7 +48,7 @@ class BoundingVolumeDispatcher : public Actor
 					, shared_ptr<BoundingVolume>& // is not working when const, because functors are supposed to modify it!
 					, const Se3r&
 					, const Body* // with that - functors have all the data they may need, but it's const, so they can't modify it !
-				)
+				  )
 		> boundingVolumeDispatcher;
 
 	private : vector<vector<string> > boundingVolumeFunctors;

@@ -27,18 +27,34 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "GeometricalModel.hpp"
 #include "Serializable.hpp"
+#include "BodyPhysicalParameters.hpp"
+#include "GeometricalModel.hpp"
+#include "Body.hpp"
 #include "FunctorWrapper.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /*! \brief Abstract interface for all geometrical model factories.
+ OLD: FIXME, what is written below is a description of BodyFactory. move it there
+ 
 	It is used for creating a geometrical model from a given set of parameters.
-	This is very useful when you want to load a file that contains geometrical data or when you want to build an object with that depends on several parameters.
+	This is very useful when you want to load a file that contains geometrical data or when
+	you want to build an object with that depends on several parameters.
+	
+ NEW: FIXME - delete comment that is above
+ 
+ 	It is used when you want to update GeometricalModel of your Body during runtime. Only Physical Parameters of the Body can affect "perfect geometrical representation"(GeometricalModel) of the Body. So it is given as first argument.
 */
-class GeometricalModelFunctor : public FunctorWrapper< void, TYPELIST_1(int) >
+class GeometricalModelFunctor : public FunctorWrapper
+		<
+		 void ,
+		 TYPELIST_3(
+		 		  const shared_ptr<BodyPhysicalParameters>&
+				, shared_ptr<GeometricalModel>&
+				, const Body*
+		)>
 {	
 };
 

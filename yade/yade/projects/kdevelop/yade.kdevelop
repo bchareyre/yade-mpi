@@ -106,7 +106,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>preprocessors/FileGenerator/HangingCloth</activedir>
+      <activedir>plugins/Body/BodyPhysicalParameters/ParticleParameters</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>

@@ -17,9 +17,12 @@
 #include "InteractionPhysicsDispatcher.hpp"
 #include "ApplyActionDispatcher.hpp"
 #include "BoundingVolumeDispatcher.hpp"
+#include "GeometricalModelDispatcher.hpp"
+
 #include "InteractionDescriptionSet2AABBFunctor.hpp"
 #include "InteractionDescriptionSet.hpp"
 #include "ParticleParameters.hpp"
+#include "ParticleSetParameters.hpp"
 #include "SpringGeometry.hpp"
 #include "SpringPhysics.hpp"
 #include "TimeIntegratorDispatcher.hpp"
@@ -85,28 +88,29 @@ string HangingCloth::generate()
 	bvu->addBoundingVolumeFunctors("InteractionSphere","AABB","Sphere2AABBFunctor");
 	bvu->addBoundingVolumeFunctors("InteractionBox","AABB","Box2AABBFunctor");
 	bvu->addBoundingVolumeFunctors("InteractionDescriptionSet","AABB","InteractionDescriptionSet2AABBFunctor");
-	
+
+	shared_ptr<GeometricalModelDispatcher> gmd	= shared_ptr<GeometricalModelDispatcher>(new GeometricalModelDispatcher);
+	gmd->addGeometricalModelFunctors("ParticleSetParameters","Mesh2D","ParticleSet2Mesh2D");
+		
 	shared_ptr<ApplyActionDispatcher> ad(new ApplyActionDispatcher);
 	ad->addApplyActionFunctor("ActionForce","ParticleParameters","ActionForce2Particle");
 	
 	shared_ptr<TimeIntegratorDispatcher> ti(new TimeIntegratorDispatcher);
 	ti->addTimeIntegratorFunctor("ParticleParameters","LeapFrogIntegrator");
 	
-	rootBody->actors.resize(5);
-	rootBody->actors[0] 		= bvu;	
-	rootBody->actors[1] 		= shared_ptr<Actor>(new PersistentSAPCollider);
-	//rootBody->actors[2] 		= igd;
-	//rootBody->actors[3] 		= ipd;
-	rootBody->actors[2] 		= shared_ptr<Actor>(new ExplicitMassSpringDynamicEngine);
-	rootBody->actors[3] 		= ad;
-	rootBody->actors[4] 		= ti;
+	rootBody->actors.push_back(bvu);	
+	rootBody->actors.push_back(gmd);	
+	rootBody->actors.push_back(shared_ptr<Actor>(new PersistentSAPCollider));
+	//rootBody->actors.push_back(igd);
+	//rootBody->actors.push_back(ipd);
+	rootBody->actors.push_back(shared_ptr<Actor>(new ExplicitMassSpringDynamicEngine));
+	rootBody->actors.push_back(ad);
+	rootBody->actors.push_back(ti);
 	
 
 	//FIXME : use a default one
-	shared_ptr<ParticleParameters> physics2(new ParticleParameters); // FIXME : fix indexable class BodyPhysicalParameters
+	shared_ptr<ParticleSetParameters> physics2(new ParticleSetParameters);
 	physics2->se3		= Se3r(Vector3r(0,0,0),q);
-	physics2->mass		= 0;
-	physics2->velocity	= Vector3r::ZERO;
 	
 	rootBody->isDynamic	= false;
 

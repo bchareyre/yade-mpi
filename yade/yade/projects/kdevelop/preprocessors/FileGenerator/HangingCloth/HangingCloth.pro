@@ -23,6 +23,7 @@ LIBS += -lMesh2D \
         -lInteractionSphere \
         -lInteractionDescriptionSet2AABBFunctor \
         -lRigidBodyParameters \
+        -lParticleSetParameters \
         -rdynamic 
 INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
@@ -48,6 +49,7 @@ QMAKE_LIBDIR = ../../../plugins/Body/GeometricalModel/Mesh2D/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/InteractionDescription/InteractionSphere/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/BoundingVolumeFunctor/InteractionDescriptionSet2AABBFunctor/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/BodyPhysicalParameters/RigidBodyParameters/$(YADEDYNLIBPATH) \
+               ../../../plugins/Body/BodyPhysicalParameters/ParticleSetParameters/$(YADEDYNLIBPATH) \
                ../../../plugins/Geometry/GeometricalModel/Mesh2D/$(YADEDYNLIBPATH) \
                ../../../plugins/Geometry/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
                ../../../plugins/Geometry/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \

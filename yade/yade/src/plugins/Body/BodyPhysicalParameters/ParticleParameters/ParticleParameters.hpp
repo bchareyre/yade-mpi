@@ -57,10 +57,8 @@ class ParticleParameters : public BodyPhysicalParameters
 	public : virtual ~ParticleParameters();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-/// Methods											///
+/// Serializable										///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-	
-	public : void moveToNextTimeStep();
 
 	REGISTER_CLASS_NAME(ParticleParameters);
 	protected : virtual void postProcessAttributes(bool deserializing);
