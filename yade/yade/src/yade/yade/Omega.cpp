@@ -16,9 +16,9 @@
 #include "IOManager.hpp"
 #include "BroadInteractor.hpp"
 #include "InteractionGeometryDispatcher.hpp"
-#include "GeometricalModel.hpp"
-#include "InteractionGeometry.hpp"
-#include "BoundingVolume.hpp"
+#include "BodyGeometricalModel.hpp"
+#include "BodyInteractionGeometry.hpp"
+#include "BodyBoundingVolume.hpp"
 #include "GeometryOfInteraction.hpp"
 #include "PhysicsOfInteraction.hpp"
 #include "ThreadSynchronizer.hpp"
@@ -194,12 +194,12 @@ void Omega::registerDynlibType(const string& name)
 		dynlibsType[name]="IOManager";
 	else if (dynamic_pointer_cast<BroadInteractor>(f))
 		dynlibsType[name]="BroadInteractor";
-	else if (dynamic_pointer_cast<GeometricalModel>(f))
-		dynlibsType[name]="GeometricalModel";
-	else if (dynamic_pointer_cast<InteractionGeometry>(f))
-		dynlibsType[name]="InteractionGeometry";
-	else if (dynamic_pointer_cast<BoundingVolume>(f))
-		dynlibsType[name]="BoundingVolume";
+	else if (dynamic_pointer_cast<BodyGeometricalModel>(f))
+		dynlibsType[name]="BodyGeometricalModel";
+	else if (dynamic_pointer_cast<BodyInteractionGeometry>(f))
+		dynlibsType[name]="BodyInteractionGeometry";
+	else if (dynamic_pointer_cast<BodyBoundingVolume>(f))
+		dynlibsType[name]="BodyBoundingVolume";
 	else if (dynamic_pointer_cast<GeometryOfInteraction>(f))
 		dynlibsType[name]="GeometryOfInteraction";
 	else if (dynamic_pointer_cast<PhysicsOfInteraction>(f))

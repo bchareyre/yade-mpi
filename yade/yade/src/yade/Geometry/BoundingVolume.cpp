@@ -1,7 +1,7 @@
-#include "BoundingVolume.hpp"
+#include "BodyBoundingVolume.hpp"
 
 
-void BoundingVolume::registerAttributes()
+void BodyBoundingVolume::registerAttributes()
 {
 	REGISTER_ATTRIBUTE(diffuseColor);
 }

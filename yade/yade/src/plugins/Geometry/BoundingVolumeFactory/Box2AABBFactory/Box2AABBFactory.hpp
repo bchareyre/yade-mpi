@@ -34,8 +34,8 @@
 
 class Box2AABBFactory : public BoundingVolumeFactory
 {
-	public : void go(	const shared_ptr<InteractionGeometry>& cm,
-				shared_ptr<BoundingVolume>& bv,
+	public : void go(	const shared_ptr<BodyInteractionGeometry>& cm,
+				shared_ptr<BodyBoundingVolume>& bv,
 				const Se3r& se3	);
 };
 

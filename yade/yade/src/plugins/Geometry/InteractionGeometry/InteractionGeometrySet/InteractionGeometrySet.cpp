@@ -26,7 +26,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-InteractionGeometrySet::InteractionGeometrySet () : InteractionGeometry()
+InteractionGeometrySet::InteractionGeometrySet () : BodyInteractionGeometry()
 {
 	createIndex();
 }
@@ -44,7 +44,7 @@ InteractionGeometrySet::~InteractionGeometrySet ()
 
 void InteractionGeometrySet::postProcessAttributes(bool deserializing)
 {
-	InteractionGeometry::postProcessAttributes(deserializing);
+	BodyInteractionGeometry::postProcessAttributes(deserializing);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -52,7 +52,7 @@ void InteractionGeometrySet::postProcessAttributes(bool deserializing)
 
 void InteractionGeometrySet::registerAttributes()
 {
-	InteractionGeometry::registerAttributes();
+	BodyInteractionGeometry::registerAttributes();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -92,14 +92,14 @@ string RotatingBox::generate()
 // 	aabb->color		= Vector3r(1,0,0);
 // 	aabb->center		= Vector3r(0,0,10);
 // 	aabb->halfSize		= Vector3r(50,5,40);
-// 	box1->boundingVolume		= dynamic_pointer_cast<BoundingVolume>(aabb);
+// 	box1->boundingVolume		= dynamic_pointer_cast<BodyBoundingVolume>(aabb);
 // 	box->extents		= Vector3r(50,5,40);
 // 	box->diffuseColor	= Vector3f(1,1,1);
 // 	box->wire		= false;
 // 	box->visible		= true;
 // 	box->shadowCaster	= false;
-// 	box1->interactionGeometry		= dynamic_pointer_cast<InteractionGeometry>(box);
-// 	box1->geometricalModel		= dynamic_pointer_cast<InteractionGeometry>(box);
+// 	box1->interactionGeometry		= dynamic_pointer_cast<BodyInteractionGeometry>(box);
+// 	box1->geometricalModel		= dynamic_pointer_cast<BodyInteractionGeometry>(box);
 // 	box1->kn		= 100000;
 // 	box1->ks		= 10000;
 // 
@@ -115,14 +115,14 @@ string RotatingBox::generate()
 // 	aabb->color		= Vector3r(0,0,1);
 // 	aabb->center		= Vector3r(-55,0,0);
 // 	aabb->halfSize		= Vector3r(5,60,50);
-// 	box2->boundingVolume		= dynamic_pointer_cast<BoundingVolume>(aabb);
+// 	box2->boundingVolume		= dynamic_pointer_cast<BodyBoundingVolume>(aabb);
 // 	box->extents		= Vector3r(5,60,50);
 // 	box->diffuseColor	= Vector3f(1,1,1);
 // 	box->wire		= true;
 // 	box->visible		= true;
 // 	box->shadowCaster	= false;
-// 	box2->interactionGeometry		= dynamic_pointer_cast<InteractionGeometry>(box);
-// 	box2->geometricalModel		= dynamic_pointer_cast<InteractionGeometry>(box);
+// 	box2->interactionGeometry		= dynamic_pointer_cast<BodyInteractionGeometry>(box);
+// 	box2->geometricalModel		= dynamic_pointer_cast<BodyInteractionGeometry>(box);
 // 	box2->kn		= 100000;
 // 	box2->ks		= 10000;
 // 
@@ -138,14 +138,14 @@ string RotatingBox::generate()
 // 	aabb->color		= Vector3r(0,0,1);
 // 	aabb->center		= Vector3r(55,0,0);
 // 	aabb->halfSize		= Vector3r(5,60,50);
-// 	box3->boundingVolume		= dynamic_pointer_cast<BoundingVolume>(aabb);
+// 	box3->boundingVolume		= dynamic_pointer_cast<BodyBoundingVolume>(aabb);
 // 	box->extents		= Vector3r(5,60,50);
 // 	box->diffuseColor	= Vector3f(1,1,1);
 // 	box->wire		= true;
 // 	box->visible		= true;
 // 	box->shadowCaster	= false;	
-// 	box3->interactionGeometry		= dynamic_pointer_cast<InteractionGeometry>(box);
-// 	box3->geometricalModel		= dynamic_pointer_cast<InteractionGeometry>(box);
+// 	box3->interactionGeometry		= dynamic_pointer_cast<BodyInteractionGeometry>(box);
+// 	box3->geometricalModel		= dynamic_pointer_cast<BodyInteractionGeometry>(box);
 // 	box3->kn		= 100000;
 // 	box3->ks		= 10000;
 // 
@@ -161,14 +161,14 @@ string RotatingBox::generate()
 // 	aabb->color		= Vector3r(0,0,1);
 // 	aabb->center		= Vector3r(0,-55,0);
 // 	aabb->halfSize		= Vector3r(50,5,50);
-// 	box4->boundingVolume		= dynamic_pointer_cast<BoundingVolume>(aabb);
+// 	box4->boundingVolume		= dynamic_pointer_cast<BodyBoundingVolume>(aabb);
 // 	box->extents		= Vector3r(50,5,50);
 // 	box->diffuseColor	= Vector3f(1,1,1);
 // 	box->wire		= true;
 // 	box->visible		= true;
 // 	box->shadowCaster	= false;		
-// 	box4->interactionGeometry		= dynamic_pointer_cast<InteractionGeometry>(box);
-// 	box4->geometricalModel		= dynamic_pointer_cast<InteractionGeometry>(box);
+// 	box4->interactionGeometry		= dynamic_pointer_cast<BodyInteractionGeometry>(box);
+// 	box4->geometricalModel		= dynamic_pointer_cast<BodyInteractionGeometry>(box);
 // 	box4->kn		= 100000;
 // 	box4->ks		= 10000;
 // 
@@ -184,14 +184,14 @@ string RotatingBox::generate()
 // 	aabb->color		= Vector3r(0,0,1);
 // 	aabb->center		= Vector3r(0,55,0);
 // 	aabb->halfSize		= Vector3r(50,5,50);
-// 	box5->boundingVolume		= dynamic_pointer_cast<BoundingVolume>(aabb);
+// 	box5->boundingVolume		= dynamic_pointer_cast<BodyBoundingVolume>(aabb);
 // 	box->extents		= Vector3r(50,5,50);
 // 	box->diffuseColor	= Vector3f(1,1,1);
 // 	box->wire		= true;
 // 	box->visible		= true;
 // 	box->shadowCaster	= false;		
-// 	box5->interactionGeometry		= dynamic_pointer_cast<InteractionGeometry>(box);
-// 	box5->geometricalModel		= dynamic_pointer_cast<InteractionGeometry>(box);
+// 	box5->interactionGeometry		= dynamic_pointer_cast<BodyInteractionGeometry>(box);
+// 	box5->geometricalModel		= dynamic_pointer_cast<BodyInteractionGeometry>(box);
 // 	box5->kn		= 100000;
 // 	box5->ks		= 10000;
 // 
@@ -207,14 +207,14 @@ string RotatingBox::generate()
 // 	aabb->color		= Vector3r(0,0,1);
 // 	aabb->center		= Vector3r(0,0,-55);
 // 	aabb->halfSize		= Vector3r(60,60,5);
-// 	box6->boundingVolume		= dynamic_pointer_cast<BoundingVolume>(aabb);
+// 	box6->boundingVolume		= dynamic_pointer_cast<BodyBoundingVolume>(aabb);
 // 	box->extents		= Vector3r(60,60,5);
 // 	box->diffuseColor	= Vector3f(1,1,1);
 // 	box->wire		= true;
 // 	box->visible		= true;
 // 	box->shadowCaster	= false;		
-// 	box6->interactionGeometry		= dynamic_pointer_cast<InteractionGeometry>(box);
-// 	box6->geometricalModel		= dynamic_pointer_cast<InteractionGeometry>(box);
+// 	box6->interactionGeometry		= dynamic_pointer_cast<BodyInteractionGeometry>(box);
+// 	box6->geometricalModel		= dynamic_pointer_cast<BodyInteractionGeometry>(box);
 // 	box6->kn		= 100000;
 // 	box6->ks		= 10000;
 // 
@@ -230,14 +230,14 @@ string RotatingBox::generate()
 // 	aabb->color		= Vector3r(0,0,1);
 // 	aabb->center		= Vector3r(0,0,55);
 // 	aabb->halfSize		= Vector3r(60,60,5);
-// 	box7->boundingVolume		= dynamic_pointer_cast<BoundingVolume>(aabb);
+// 	box7->boundingVolume		= dynamic_pointer_cast<BodyBoundingVolume>(aabb);
 // 	box->extents		= Vector3r(60,60,5);
 // 	box->diffuseColor	= Vector3f(1,1,1);
 // 	box->wire		= true;
 // 	box->visible		= true;
 // 	box->shadowCaster	= false;		
-// 	box7->interactionGeometry		= dynamic_pointer_cast<InteractionGeometry>(box);
-// 	box7->geometricalModel		= dynamic_pointer_cast<InteractionGeometry>(box);
+// 	box7->interactionGeometry		= dynamic_pointer_cast<BodyInteractionGeometry>(box);
+// 	box7->geometricalModel		= dynamic_pointer_cast<BodyInteractionGeometry>(box);
 // 	box7->kn		= 100000;
 // 	box7->ks		= 10000;
 // 
@@ -278,15 +278,15 @@ string RotatingBox::generate()
 // 		aabb->color		= Vector3r(0,1,0);
 // 		aabb->center		= translation;
 // 		aabb->halfSize		= Vector3r(radius,radius,radius);
-// 		s->boundingVolume			= dynamic_pointer_cast<BoundingVolume>(aabb);
+// 		s->boundingVolume			= dynamic_pointer_cast<BodyBoundingVolume>(aabb);
 // 
 // 		sphere->radius		= radius;
 // 		sphere->diffuseColor	= Vector3f(Mathr::unitRandom(),Mathr::unitRandom(),Mathr::unitRandom());
 // 		sphere->wire		= false;
 // 		sphere->visible		= true;
 // 		sphere->shadowCaster	= true;	
-// 		s->interactionGeometry			= dynamic_pointer_cast<InteractionGeometry>(sphere);
-// 		s->geometricalModel			= dynamic_pointer_cast<GeometricalModel>(sphere);
+// 		s->interactionGeometry			= dynamic_pointer_cast<BodyInteractionGeometry>(sphere);
+// 		s->geometricalModel			= dynamic_pointer_cast<BodyGeometricalModel>(sphere);
 // 		s->kn			= 100000;
 // 		s->ks			= 10000;
 // 
@@ -321,14 +321,14 @@ string RotatingBox::generate()
 // 				aabb->color		= Vector3r(Mathr::unitRandom(),Mathr::unitRandom(),Mathr::unitRandom());
 // 				aabb->center		= translation;
 // 				aabb->halfSize		= size;
-// 				boxi->boundingVolume		= dynamic_pointer_cast<BoundingVolume>(aabb);
+// 				boxi->boundingVolume		= dynamic_pointer_cast<BodyBoundingVolume>(aabb);
 // 				box->extents		= size;
 // 				box->diffuseColor	= Vector3f(Mathf::unitRandom(),Mathf::unitRandom(),Mathf::unitRandom());
 // 				box->wire		= false;
 // 				box->visible		= true;
 // 				box->shadowCaster	= true;	
-// 				boxi->interactionGeometry		= dynamic_pointer_cast<InteractionGeometry>(box);
-// 				boxi->geometricalModel		= dynamic_pointer_cast<InteractionGeometry>(box);
+// 				boxi->interactionGeometry		= dynamic_pointer_cast<BodyInteractionGeometry>(box);
+// 				boxi->geometricalModel		= dynamic_pointer_cast<BodyInteractionGeometry>(box);
 // 
 // 				b=dynamic_pointer_cast<Body>(boxi);
 // 				rootBody->bodies->insert(b);

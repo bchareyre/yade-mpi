@@ -10,7 +10,7 @@ class TerrainFromVRML1Factory : public GeometricalModelFactory
 	public : TerrainFromVRML1Factory ();
 	public : ~TerrainFromVRML1Factory ();
 
-	public : boost::shared_ptr<GeometricalModel> createGeometricalModel();
+	public : boost::shared_ptr<BodyGeometricalModel> createGeometricalModel();
 
 };
 

@@ -24,9 +24,9 @@
 #ifndef __INTERACIONBOX_H__
 #define __INTERACIONBOX_H__
 
-#include "InteractionGeometry.hpp"
+#include "BodyInteractionGeometry.hpp"
 
-class InteractionBox : public InteractionGeometry
+class InteractionBox : public BodyInteractionGeometry
 {
 	public : Vector3r extents;
 
@@ -46,7 +46,7 @@ class InteractionBox : public InteractionGeometry
 /// Indexable											///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	REGISTER_CLASS_INDEX(InteractionBox,InteractionGeometry);
+	REGISTER_CLASS_INDEX(InteractionBox,BodyInteractionGeometry);
 
 };
 

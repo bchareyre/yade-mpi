@@ -26,7 +26,7 @@
 #include <iostream>
 
 
-Box::Box () : GeometricalModel()
+Box::Box () : BodyGeometricalModel()
 {		
 	createIndex();
 }
@@ -38,11 +38,11 @@ Box::~Box ()
 
 void Box::postProcessAttributes(bool deserializing)
 {
-	GeometricalModel::postProcessAttributes(deserializing);
+	BodyGeometricalModel::postProcessAttributes(deserializing);
 }
 
 void Box::registerAttributes()
 {
-	GeometricalModel::registerAttributes();
+	BodyGeometricalModel::registerAttributes();
 	REGISTER_ATTRIBUTE(extents);
 }

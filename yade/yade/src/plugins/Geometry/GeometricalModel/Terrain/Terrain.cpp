@@ -28,7 +28,7 @@
 #include <set>
 #include "OpenGLWrapper.hpp"
 
-Terrain::Terrain () : GeometricalModel()
+Terrain::Terrain () : BodyGeometricalModel()
 {
 	createIndex();
 }

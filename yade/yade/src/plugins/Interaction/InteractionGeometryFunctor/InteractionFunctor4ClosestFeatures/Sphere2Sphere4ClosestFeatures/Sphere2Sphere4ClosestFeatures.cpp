@@ -28,8 +28,8 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool Sphere2Sphere4ClosestFeatures::go(		const shared_ptr<InteractionGeometry>& cm1,
-						const shared_ptr<InteractionGeometry>& cm2,
+bool Sphere2Sphere4ClosestFeatures::go(		const shared_ptr<BodyInteractionGeometry>& cm1,
+						const shared_ptr<BodyInteractionGeometry>& cm2,
 						const Se3r& se31,
 						const Se3r& se32,
 						shared_ptr<Interaction>& c)
@@ -55,8 +55,8 @@ bool Sphere2Sphere4ClosestFeatures::go(		const shared_ptr<InteractionGeometry>& 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool Sphere2Sphere4ClosestFeatures::goReverse(	const shared_ptr<InteractionGeometry>& cm1,
-						const shared_ptr<InteractionGeometry>& cm2,
+bool Sphere2Sphere4ClosestFeatures::goReverse(	const shared_ptr<BodyInteractionGeometry>& cm1,
+						const shared_ptr<BodyInteractionGeometry>& cm2,
 						const Se3r& se31,
 						const Se3r& se32,
 						shared_ptr<Interaction>& c)

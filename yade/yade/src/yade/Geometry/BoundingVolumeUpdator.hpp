@@ -29,8 +29,8 @@
 
 #include "Actor.hpp"
 #include "DynLibDispatcher.hpp"
-#include "InteractionGeometry.hpp"
-#include "BoundingVolume.hpp"
+#include "BodyInteractionGeometry.hpp"
+#include "BodyBoundingVolume.hpp"
 #include "BoundingVolumeFactory.hpp"
 #include "Body.hpp"
 
@@ -40,12 +40,12 @@
 class BoundingVolumeUpdator : public Actor
 {
 	protected: DynLibDispatcher
-		<	TYPELIST_2( InteractionGeometry , BoundingVolume ) ,	// base classess for dispatch
+		<	TYPELIST_2( BodyInteractionGeometry , BodyBoundingVolume ) ,	// base classess for dispatch
 			BoundingVolumeFactory,					// class that provides multivirtual call
 			void ,							// return type
 			TYPELIST_3(
-					  const shared_ptr<InteractionGeometry>&	// arguments
-					, shared_ptr<BoundingVolume>&
+					  const shared_ptr<BodyInteractionGeometry>&	// arguments
+					, shared_ptr<BodyBoundingVolume>&
 					, const Se3r&
 				)
 		> bvFactoriesManager;

@@ -37,11 +37,11 @@ REGISTER_SERIALIZABLE(SimpleBroadInteractor,false);
 
 
 /*
-	protected : static bool overlappSphereSphere(const shared_ptr<BoundingVolume> bv1, const shared_ptr<BoundingVolume> bv2);
-	protected : static inline bool overlappSphereAABB(const shared_ptr<BoundingVolume> bv1, const shared_ptr<BoundingVolume> bv2)
+	protected : static bool overlappSphereSphere(const shared_ptr<BodyBoundingVolume> bv1, const shared_ptr<BodyBoundingVolume> bv2);
+	protected : static inline bool overlappSphereAABB(const shared_ptr<BodyBoundingVolume> bv1, const shared_ptr<BodyBoundingVolume> bv2)
 	{
 		return overlappAABBSphere(bv2,bv1);
 	}
-	protected : static bool overlappAABBSphere(const shared_ptr<BoundingVolume> bv1, const shared_ptr<BoundingVolume> bv2);
-	protected : static bool overlappAABBAABB(const shared_ptr<BoundingVolume> bv1, const shared_ptr<BoundingVolume> bv2);
+	protected : static bool overlappAABBSphere(const shared_ptr<BodyBoundingVolume> bv1, const shared_ptr<BodyBoundingVolume> bv2);
+	protected : static bool overlappAABBAABB(const shared_ptr<BodyBoundingVolume> bv1, const shared_ptr<BodyBoundingVolume> bv2);
 */

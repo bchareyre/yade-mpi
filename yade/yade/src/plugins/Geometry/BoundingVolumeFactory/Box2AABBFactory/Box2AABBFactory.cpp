@@ -28,8 +28,8 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void Box2AABBFactory::go(	const shared_ptr<InteractionGeometry>& cm,
-				shared_ptr<BoundingVolume>& bv,
+void Box2AABBFactory::go(	const shared_ptr<BodyInteractionGeometry>& cm,
+				shared_ptr<BodyBoundingVolume>& bv,
 				const Se3r& se3	)
 {
 	shared_ptr<InteractionBox> box = dynamic_pointer_cast<InteractionBox>(cm);

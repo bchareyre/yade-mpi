@@ -24,9 +24,9 @@
 #ifndef __SPHERE_H__
 #define __SPHERE_H__
 
-#include "GeometricalModel.hpp"
+#include "BodyGeometricalModel.hpp"
 
-class Sphere : public GeometricalModel
+class Sphere : public BodyGeometricalModel
 {
 	public : Real radius;
 
@@ -48,7 +48,7 @@ class Sphere : public GeometricalModel
 /// Indexable											///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	REGISTER_CLASS_INDEX(Sphere,GeometricalModel);
+	REGISTER_CLASS_INDEX(Sphere,BodyGeometricalModel);
 	
 };
 

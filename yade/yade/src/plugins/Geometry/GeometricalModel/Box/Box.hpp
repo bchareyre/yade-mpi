@@ -24,9 +24,9 @@
 #ifndef __BOX_H__
 #define __BOX_H__
 
-#include "GeometricalModel.hpp"
+#include "BodyGeometricalModel.hpp"
 
-class Box : public GeometricalModel
+class Box : public BodyGeometricalModel
 {
 	public : Vector3r extents;
 
@@ -46,7 +46,7 @@ class Box : public GeometricalModel
 /// Indexable											///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	REGISTER_CLASS_INDEX(Box,GeometricalModel);
+	REGISTER_CLASS_INDEX(Box,BodyGeometricalModel);
 
 };
 

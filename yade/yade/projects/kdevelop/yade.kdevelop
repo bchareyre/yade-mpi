@@ -106,7 +106,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>extensions/RenderingEngines/OpenGLRenderingEngine/GLDrawInteractionGeometryFunctor/GLDrawInteractionGeometrySet</activedir>
+      <activedir>yade/Geometry</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>

@@ -24,7 +24,7 @@
 #include "InteractionBox.hpp"
 
 
-InteractionBox::InteractionBox () : InteractionGeometry()
+InteractionBox::InteractionBox () : BodyInteractionGeometry()
 {		
 	createIndex();
 }
@@ -36,12 +36,12 @@ InteractionBox::~InteractionBox ()
 
 void InteractionBox::postProcessAttributes(bool deserializing)
 {
-	InteractionGeometry::postProcessAttributes(deserializing);
+	BodyInteractionGeometry::postProcessAttributes(deserializing);
 }
 
 void InteractionBox::registerAttributes()
 {
-	InteractionGeometry::registerAttributes();
+	BodyInteractionGeometry::registerAttributes();
 	REGISTER_ATTRIBUTE(extents);
 }
 

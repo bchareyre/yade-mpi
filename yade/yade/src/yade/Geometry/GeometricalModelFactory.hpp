@@ -27,7 +27,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "GeometricalModel.hpp"
+#include "BodyGeometricalModel.hpp"
 #include "Serializable.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -43,7 +43,7 @@ class GeometricalModelFactory : public Factorable
 	public : GeometricalModelFactory ();
 	public : virtual ~GeometricalModelFactory ();
 	
-	public : virtual shared_ptr<GeometricalModel> createGeometricalModel() = 0;
+	public : virtual shared_ptr<BodyGeometricalModel> createGeometricalModel() = 0;
 
 };
 

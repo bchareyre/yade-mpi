@@ -28,8 +28,8 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "FunctorWrapper.hpp"
-#include "BoundingVolume.hpp"
-#include "InteractionGeometry.hpp"
+#include "BodyBoundingVolume.hpp"
+#include "BodyInteractionGeometry.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -46,22 +46,22 @@
 */
 class BoundingVolumeFactory : public FunctorWrapper
 	/*! Method called to build a given bounding volume from a given collision model and a 3D transformation
-		\param const shared_ptr<InteractionGeometry>& the collision model from wich we want to extract the bounding volume
+		\param const shared_ptr<BodyInteractionGeometry>& the collision model from wich we want to extract the bounding volume
 		\param Se3r& the 3D transformation to apply to the collision model before building the bounding volume
-		\return shared_ptr<BoundingVolume>& shared pointer to the bounding volume
+		\return shared_ptr<BodyBoundingVolume>& shared pointer to the bounding volume
 	*/
 		<
 		 void ,
 		 TYPELIST_3(
-		 		  const shared_ptr<InteractionGeometry>&
-				, shared_ptr<BoundingVolume>&
+		 		  const shared_ptr<BodyInteractionGeometry>&
+				, shared_ptr<BodyBoundingVolume>&
 				, const Se3r&
 		)>
 {	
 };
 
 //FIXME : make also second class for updateBoundingVolume. In fact we can load them automatically as we do with collisionFunctor because their name are Terrain2AABB ....
-//virtual bool go(const shared_ptr<InteractionGeometry> , const shared_ptr<InteractionGeometry> , const Se3r& , const Se3r& , shared_ptr<Interaction> );
+//virtual bool go(const shared_ptr<BodyInteractionGeometry> , const shared_ptr<BodyInteractionGeometry> , const Se3r& , const Se3r& , shared_ptr<Interaction> );
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////

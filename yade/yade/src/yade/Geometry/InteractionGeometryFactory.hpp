@@ -27,8 +27,8 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "GeometricalModel.hpp"
-#include "InteractionGeometry.hpp"
+#include "BodyGeometricalModel.hpp"
+#include "BodyInteractionGeometry.hpp"
 #include "Serializable.hpp"
 #include "Se3.hpp"
 
@@ -46,7 +46,7 @@ class InteractionGeometryFactory : public Factorable
 	public : InteractionGeometryFactory ();
 	public : virtual ~InteractionGeometryFactory ();
 	
-	public : virtual shared_ptr<InteractionGeometry> buildInteractionGeometry(const shared_ptr<GeometricalModel> gm, const Se3r& se3) = 0;
+	public : virtual shared_ptr<BodyInteractionGeometry> buildInteractionGeometry(const shared_ptr<BodyGeometricalModel> gm, const Se3r& se3) = 0;
 
 };
 

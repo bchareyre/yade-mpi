@@ -74,7 +74,7 @@ void OpenGLRenderingEngine::init()
 	if (needInit)
 	{
 		// FIXME : how to build display list now ??
-		//shared_ptr<GeometricalModel> gm = dynamic_pointer_cast<GeometricalModel>(ClassFactory::instance().createShared("Sphere"));
+		//shared_ptr<BodyGeometricalModel> gm = dynamic_pointer_cast<BodyGeometricalModel>(ClassFactory::instance().createShared("Sphere"));
 		//gm->buildDisplayList();
 		needInit = false;
 	}

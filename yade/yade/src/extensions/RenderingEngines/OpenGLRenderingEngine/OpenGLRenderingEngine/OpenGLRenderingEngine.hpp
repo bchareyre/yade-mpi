@@ -48,10 +48,10 @@ class OpenGLRenderingEngine : public RenderingEngine
 	public : bool drawShadowVolumes;
 	public : bool useFastShadowVolume;
 	
-	private : DynLibDispatcher< BoundingVolume    , GLDrawBoundingVolumeFunctor, void , TYPELIST_1(const shared_ptr<BoundingVolume>&) > boundingVolumeDispatcher;
-	private : DynLibDispatcher< InteractionGeometry , GLDrawInteractionGeometryFunctor, void , TYPELIST_2(const shared_ptr<InteractionGeometry>&, const shared_ptr<BodyPhysicalParameters>&) >interactionGeometryDispatcher;
-	private : DynLibDispatcher< GeometricalModel  , GLDrawGeometricalModelFunctor, void , TYPELIST_2(const shared_ptr<GeometricalModel>&, const shared_ptr<BodyPhysicalParameters>&) > geometricalModelDispatcher;
-	private : DynLibDispatcher< GeometricalModel  , GLDrawShadowVolumeFunctor, void , TYPELIST_3(const shared_ptr<GeometricalModel>&, const shared_ptr<BodyPhysicalParameters>&, const Vector3r& ) > shadowVolumeDispatcher;
+	private : DynLibDispatcher< BodyBoundingVolume    , GLDrawBoundingVolumeFunctor, void , TYPELIST_1(const shared_ptr<BodyBoundingVolume>&) > boundingVolumeDispatcher;
+	private : DynLibDispatcher< BodyInteractionGeometry , GLDrawInteractionGeometryFunctor, void , TYPELIST_2(const shared_ptr<BodyInteractionGeometry>&, const shared_ptr<BodyPhysicalParameters>&) >interactionGeometryDispatcher;
+	private : DynLibDispatcher< BodyGeometricalModel  , GLDrawGeometricalModelFunctor, void , TYPELIST_2(const shared_ptr<BodyGeometricalModel>&, const shared_ptr<BodyPhysicalParameters>&) > geometricalModelDispatcher;
+	private : DynLibDispatcher< BodyGeometricalModel  , GLDrawShadowVolumeFunctor, void , TYPELIST_3(const shared_ptr<BodyGeometricalModel>&, const shared_ptr<BodyPhysicalParameters>&, const Vector3r& ) > shadowVolumeDispatcher;
 
 	private : vector<vector<string> >  boundingVolumeFunctorNames;
 	private : vector<vector<string> >  interactionGeometryFunctorNames;

@@ -11,8 +11,8 @@ TerrainFromVRML1Factory::~TerrainFromVRML1Factory()
 
 }
 
-boost::shared_ptr<GeometricalModel> TerrainFromVRML1Factory::createGeometricalModel()
+boost::shared_ptr<BodyGeometricalModel> TerrainFromVRML1Factory::createGeometricalModel()
 {
-	return boost::shared_ptr<GeometricalModel>(new Terrain);
+	return boost::shared_ptr<BodyGeometricalModel>(new Terrain);
 }
 

@@ -61,7 +61,7 @@ string FEMRock::generate()
 // 	aabb->color		= Vector3r(1,0,0);
 // 	aabb->center		= Vector3r(0,0,0);
 // //	aabb->halfSize		= Vector3r((cellSize*(width-1))*0.5,0,(cellSize*(height-1))*0.5);
-// 	femBody->boundingVolume		= dynamic_pointer_cast<BoundingVolume>(aabb);
+// 	femBody->boundingVolume		= dynamic_pointer_cast<BodyBoundingVolume>(aabb);
 // 
 // /*
 // 	for(unsigned int i=0;i<poly->edges.size();i++)
@@ -75,8 +75,8 @@ string FEMRock::generate()
 // 	poly->wire		= false;
 // 	poly->visible		= true;
 // 	poly->mshFileName 	= "../data/rock.msh";
-// 	femBody->interactionGeometry		= dynamic_pointer_cast<InteractionGeometry>(poly);
-// 	femBody->geometricalModel		= dynamic_pointer_cast<InteractionGeometry>(poly);
+// 	femBody->interactionGeometry		= dynamic_pointer_cast<BodyInteractionGeometry>(poly);
+// 	femBody->geometricalModel		= dynamic_pointer_cast<BodyInteractionGeometry>(poly);
 // 
 // 
 // 
@@ -97,13 +97,13 @@ string FEMRock::generate()
 // 	aabb->color		= Vector3r(1,0,0);
 // 	aabb->center		= Vector3r(0,0,10);
 // 	aabb->halfSize		= Vector3r(50,5,40);
-// 	box1->boundingVolume		= dynamic_pointer_cast<BoundingVolume>(aabb);
+// 	box1->boundingVolume		= dynamic_pointer_cast<BodyBoundingVolume>(aabb);
 // 	box->extents		= Vector3r(50,5,40);
 // 	box->diffuseColor	= Vector3f(1,1,1);
 // 	box->wire		= false;
 // 	box->visible		= true;
-// 	box1->interactionGeometry		= dynamic_pointer_cast<InteractionGeometry>(box);
-// 	box1->geometricalModel		= dynamic_pointer_cast<InteractionGeometry>(box);
+// 	box1->interactionGeometry		= dynamic_pointer_cast<BodyInteractionGeometry>(box);
+// 	box1->geometricalModel		= dynamic_pointer_cast<BodyInteractionGeometry>(box);
 // 
 // 	b = dynamic_pointer_cast<Body>(box1);
 // 	rootBody->bodies->insert(b);

@@ -34,7 +34,7 @@
 
 class GLDrawMesh2D : public GLDrawGeometricalModelFunctor
 {	
-	public : virtual void go(const shared_ptr<GeometricalModel>&, const shared_ptr<BodyPhysicalParameters>&);
+	public : virtual void go(const shared_ptr<BodyGeometricalModel>&, const shared_ptr<BodyPhysicalParameters>&);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -107,8 +107,8 @@ string SDECLinkedSpheres::generate()
 	shared_ptr<AABB> aabb(new AABB);
 	aabb->diffuseColor	= Vector3r(0,0,1);
 	
-	rootBody->interactionGeometry		= dynamic_pointer_cast<InteractionGeometry>(set);	
-	rootBody->boundingVolume		= dynamic_pointer_cast<BoundingVolume>(aabb);
+	rootBody->interactionGeometry		= dynamic_pointer_cast<BodyInteractionGeometry>(set);	
+	rootBody->boundingVolume		= dynamic_pointer_cast<BodyBoundingVolume>(aabb);
 	rootBody->physicalParameters = physics;
 	
 ////////////////////////////////////

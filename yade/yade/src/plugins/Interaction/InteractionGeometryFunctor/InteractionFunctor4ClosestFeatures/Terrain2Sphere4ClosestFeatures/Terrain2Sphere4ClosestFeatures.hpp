@@ -35,13 +35,13 @@
 /*! \brief Provide interaction handling between a Terrain and a Sphere in terms of ClosestFeatures */
 class Terrain2Sphere4ClosestFeatures : public InteractionGeometryFunctor
 {
-	public : virtual bool go(		const shared_ptr<InteractionGeometry>& cm1,
-						const shared_ptr<InteractionGeometry>& cm2,
+	public : virtual bool go(		const shared_ptr<BodyInteractionGeometry>& cm1,
+						const shared_ptr<BodyInteractionGeometry>& cm2,
 						const Se3r& se31,
 						const Se3r& se32,
 						shared_ptr<Interaction>& c);
-	public : virtual bool goReverse(	const shared_ptr<InteractionGeometry>& cm1,
-						const shared_ptr<InteractionGeometry>& cm2,
+	public : virtual bool goReverse(	const shared_ptr<BodyInteractionGeometry>& cm1,
+						const shared_ptr<BodyInteractionGeometry>& cm2,
 						const Se3r& se31,
 						const Se3r& se32,
 						shared_ptr<Interaction>& c);
