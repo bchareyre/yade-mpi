@@ -1,0 +1,18 @@
+find ../projects/kdevelop/  -name "*.pro" -exec fgrep -l "= release" {} \;	> ./proFilesRelease
+
+echo './empty'                                                                  >> ./proFilesRelease
+
+echo ' '                                                                        >  ./empty
+
+echo 'echo CHANGING $1'								>  ./changeSet
+echo 'mv $1 $1.tmp'								>> ./changeSet
+echo 'cat $1.tmp | sed -e "s/= release/= debug/" > $1'				>> ./changeSet
+echo 'rm $1.tmp'								>> ./changeSet
+
+chmod a+x ./changeSet
+
+find `cat proFilesRelease` -exec ./changeSet {} \;
+
+rm ./changeSet
+rm ./empty
+rm ./proFilesRelease
