@@ -57,6 +57,7 @@ class Interaction : public Serializable
 
 	// FIXME : put it into InteractionPhysics
 	public	: bool isNew;
+	public  : bool isPotential;
 
 	// construction
 	public	: Interaction ();

@@ -12,23 +12,19 @@ class InteractionContainer : public Serializable
 	public    : InteractionContainer() { interaction.clear(); };
 	public    : virtual ~InteractionContainer() {};
 
+	public    : virtual bool insert(unsigned int /*id1*/,unsigned int /*id2*/)				{throw;};
 	public    : virtual bool insert(shared_ptr<Interaction>&)						{throw;};
 	public    : virtual void clear() 									{throw;};
 	public    : virtual bool erase(unsigned int /*id1*/,unsigned int /*id2*/) 				{throw;};
-	//public  : virtual bool erase(vector<unsigned int> ids) = 0;
 
-	public    : virtual bool find(unsigned int /*id1*/,unsigned int /*id2*/,shared_ptr<Interaction>&) 	{throw;};
-	//public  : virtual bool find(vector<unsigned int> ids,shared_ptr<Interaction>& i) = 0;
+	public    : virtual shared_ptr<Interaction> find(unsigned int /*id1*/,unsigned int /*id2*/) 		{throw;};
 
 	// looping over the data
 	public    : virtual void gotoFirst() 									{throw;};
 	public    : virtual bool notAtEnd() 									{throw;};
 	public    : virtual void gotoNext() 									{throw;};
+	public    : virtual void gotoNextPotentialOrReal() 							{throw;};
  	public    : virtual shared_ptr<Interaction> getCurrent() 						{throw;};
-
-//	public    : virtual shared_ptr<Interaction> getFirst() 							{throw;};
-// 	public    : virtual bool hasCurrent() 									{throw;};
-// 	public    : virtual shared_ptr<Interaction> getNext() 							{throw;};
 
 	// deletes currently pointed element, and goes to the next one.
 	public    : virtual void eraseCurrentAndGotoNext() 							{throw;};

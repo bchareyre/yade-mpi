@@ -57,6 +57,7 @@ fi
 ./removeMakefiles
 
 rm $YADEBINPATH/.qglviewer.xml
+rm $YADEBINPATH/.qglviewer?.xml
 rm $YADEPATH/yade/projects/kdevelop/yade.kdevelop.pcs
 rm $YADEPATH/yade/projects/kdevelop/yade.kdevses
 rm $YADEPATH/yade/projects/kdevelop/yade.tag

@@ -38,14 +38,16 @@ class InteractionHashMap : public InteractionContainer
 	public : InteractionHashMap();
 	public : virtual ~InteractionHashMap();
 
+	public : virtual bool insert(unsigned int id1,unsigned int id2);
 	public : virtual bool insert(shared_ptr<Interaction>& i);
 	public : virtual void clear();
 	public : virtual bool erase(unsigned int id1,unsigned int id2);
-	public : virtual bool find(unsigned int id1,unsigned int id2,shared_ptr<Interaction>& i);
+	public : virtual shared_ptr<Interaction> find(unsigned int id1,unsigned int id2);
 
 	public	: virtual void gotoFirst();
 	public	: virtual bool notAtEnd();
 	public	: virtual void gotoNext();
+	public  : virtual void gotoNextPotentialOrReal();
 	public	: virtual shared_ptr<Interaction> getCurrent();
 
 	public : virtual void eraseCurrentAndGotoNext();
