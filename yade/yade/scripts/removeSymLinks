@@ -5,8 +5,8 @@ echo '        echo SYMLINK $1 REMOVED'	>>	 removeSymLink
 echo '        rm $1'			>>	 removeSymLink
 echo 'fi'				>>	 removeSymLink
 
-chmod a+x removeSymLink
+chmod a+x ./removeSymLink
 
-find ../projects/kdevelop/ -name "*" -exec removeSymLink {} \;
+find ../projects/kdevelop/ -name "*" -exec ./removeSymLink {} \;
 
-rm removeSymLink
+rm ./removeSymLink

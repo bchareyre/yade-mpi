@@ -21,4 +21,4 @@ find ../src/ -name "*.ipp" -exec ./makeSymLink {} \;
 symlinks -rcs ./
 symlinks -rcs ./
 
-rm makeSymLink
+rm ./makeSymLink
