@@ -3,11 +3,11 @@
 # Subdir relative project main directory: ./GUI
 # Target is a subdirs project 
 
-SUBDIRS += YadeQtGUI \
-           QtGUIGenerator 
-MOC_DIR = $(YADECOMPILATIONPATH)
-UI_DIR = $(YADECOMPILATIONPATH)
-OBJECTS_DIR = $(YADECOMPILATIONPATH)
+MOC_DIR = $(YADECOMPILATIONPATH) 
+UI_DIR = $(YADECOMPILATIONPATH) 
+OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 CONFIG += release \
-warn_on
-TEMPLATE = subdirs
+          warn_on 
+TEMPLATE = subdirs 
+SUBDIRS += QtGUIGenerator \
+           YadeQtGUI 

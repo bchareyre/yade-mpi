@@ -104,7 +104,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>GUI/YadeQtGUI</activedir>
+      <activedir>GUI</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>
