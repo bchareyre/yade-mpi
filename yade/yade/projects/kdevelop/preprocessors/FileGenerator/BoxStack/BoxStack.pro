@@ -3,7 +3,8 @@
 # Subdir relative project main directory: ./preprocessors/FileGenerator/BoxStack
 # Target is a library:  
 
-LIBS += -lRigidBody \
+LIBS += -lSerialization \
+        -lRigidBody \
         -lSAPCollider \
         -lSimpleNarrowCollider \
         -lBox \
@@ -11,13 +12,13 @@ LIBS += -lRigidBody \
         -lAABB \
         -lBallisticDynamicEngine \
         -lSimpleSpringDynamicEngine \
-        -lSerialization \
-        $(YADECOMPILATIONPATH)/libBody.a \
-        $(YADECOMPILATIONPATH)/libEngine.a \
-        $(YADECOMPILATIONPATH)/libGeometry.a \
-        $(YADECOMPILATIONPATH)/libInteraction.a \
-        $(YADECOMPILATIONPATH)/libMultiMethods.a \
-        $(YADECOMPILATIONPATH)/libFactory.a \
+        -lMath \
+        -lBody \
+        -lIOManager \
+        -lEngine \
+        -lGeometry \
+        -lInteraction \
+        -lMultiMethods \
         -rdynamic 
 INCLUDEPATH = ../../../plugins/DynamicEngine/BallisticDynamicEngine \
               ../../../plugins/DynamicEngine/SimpleSpringDynamicEngine \
@@ -30,17 +31,18 @@ INCLUDEPATH = ../../../plugins/DynamicEngine/BallisticDynamicEngine \
               ../../../yade/yade \
               ../../../yade/Body \
               ../../../yade/Engine \
-              ../../../yade/Geometry \
               ../../../yade/Interaction \
+              ../../../yade/Geometry \
               ../../../yade/MultiMethods \
               ../../../yade/Factory \
-              ../../../yade/IOManager \
-              ../../../toolboxes/Math \
+              ../../../toolboxes/Libraries/Math \
+              ../../../toolboxes/Libraries/IOManager \
               ../../../toolboxes/Libraries/Serialization 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../plugins/Body/RigidBody/$(YADEDYNLIBPATH) \
+QMAKE_LIBDIR = ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
+               ../../../plugins/Body/RigidBody/$(YADEDYNLIBPATH) \
                ../../../plugins/BroadCollider/SAPCollider/$(YADEDYNLIBPATH) \
                ../../../plugins/NarrowCollider/SimpleNarrowCollider/$(YADEDYNLIBPATH) \
                ../../../plugins/GeometricalModel/Box/$(YADEDYNLIBPATH) \
@@ -48,10 +50,16 @@ QMAKE_LIBDIR = ../../../plugins/Body/RigidBody/$(YADEDYNLIBPATH) \
                ../../../plugins/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
                ../../../plugins/DynamicEngine/BallisticDynamicEngine/$(YADEDYNLIBPATH) \
                ../../../plugins/DynamicEngine/SimpleSpringDynamicEngine/$(YADEDYNLIBPATH) \
-               ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
+               ../../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
+               ../../../yade/Body/$(YADEDYNLIBPATH) \
+               ../../../toolboxes/Libraries/IOManager/$(YADEDYNLIBPATH) \
+               ../../../yade/Engine/$(YADEDYNLIBPATH) \
+               ../../../yade/Geometry/$(YADEDYNLIBPATH) \
+               ../../../yade/Interaction/$(YADEDYNLIBPATH) \
+               ../../../yade/MultiMethods/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
-CONFIG += debug \
+CONFIG += release \
           warn_on \
           dll 
 TEMPLATE = lib 

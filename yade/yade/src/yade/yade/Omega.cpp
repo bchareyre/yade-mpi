@@ -1,4 +1,5 @@
 #include "Omega.hpp"
+#include "Vector3.hpp"
 
 Omega::Omega ()
 {
@@ -28,7 +29,10 @@ void Omega::init()
 	filename="";
 	maxiter = 0; // unlimited
 
-	gravity = Vector3(0,-9.81,0);
+	gravity_x = 0.0;
+	gravity_y = -9.81;
+	gravity_z = 0.0;
+	//	setGravity = Vector3(0,-9.81,0);
 	//dt = 0.04;
 	dt = 0.01;
 	//dt = 0.015; // max for cloth, rotating box is little slower, but both work.
@@ -42,6 +46,18 @@ void Omega::init()
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+
+Vector3 Omega::getGravity()
+{
+	return Vector3(gravity_x,gravity_y,gravity_z);
+}
+
+Vector3 Omega::setGravity(Vector3 g)
+{
+	gravity_x = g.x;
+	gravity_y = g.y;
+	gravity_z = g.z;
+}
 
 void Omega::setTimestep(const string t)
 {

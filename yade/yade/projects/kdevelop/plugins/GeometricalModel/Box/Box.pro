@@ -4,26 +4,26 @@
 # Target is a library:  
 
 LIBS += -lSerialization \
-        $(YADECOMPILATIONPATH)/libBody.a \
-        $(YADECOMPILATIONPATH)/libEngine.a \
-        $(YADECOMPILATIONPATH)/libGeometry.a \
-        $(YADECOMPILATIONPATH)/libInteraction.a \
-        $(YADECOMPILATIONPATH)/libMultiMethods.a \
-        $(YADECOMPILATIONPATH)/libFactory.a \
+        -lMath \
+        -lGeometry \
+        -lMultiMethods \
         -rdynamic 
 INCLUDEPATH = ../../../yade/yade \
               ../../../yade/Geometry \
               ../../../yade/MultiMethods \
               ../../../yade/Factory \
-              ../../../toolboxes/Math \
+              ../../../toolboxes/Libraries/Math \
               ../../../toolboxes/Libraries/Serialization 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 QMAKE_LIBDIR = ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
+               ../../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
+               ../../../yade/Geometry/$(YADEDYNLIBPATH) \
+               ../../../yade/MultiMethods/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
-CONFIG += debug \
+CONFIG += release \
           warn_on \
           dll 
 TEMPLATE = lib 

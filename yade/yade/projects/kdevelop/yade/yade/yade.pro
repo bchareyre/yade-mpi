@@ -3,39 +3,53 @@
 # Subdir relative project main directory: ./yade/yade
 # Target is an application:  
 
-LIBS += -lMath \
-        $(YADECOMPILATIONPATH)/libBody.a \
-        $(YADECOMPILATIONPATH)/libEngine.a \
-        $(YADECOMPILATIONPATH)/libGeometry.a \
-        $(YADECOMPILATIONPATH)/libInteraction.a \
-        $(YADECOMPILATIONPATH)/libMultiMethods.a \
-        $(YADECOMPILATIONPATH)/libIOManager.a \
-        $(YADECOMPILATIONPATH)/libFactory.a \
+LIBS += -lSerialization \
+        -lMath \
+        -lBody \
+        -lIOManager \
+        -lEngine \
+        -lGeometry \
+        -lInteraction \
+        -lFrontEnd \
+        -lMultiMethods \
+        -lFactory \
         -lboost_date_time \
         -lglut \
         -lQGLViewer \
         -rdynamic 
-INCLUDEPATH = ../../yade/yade \
+INCLUDEPATH = ../../yade/Body \
+              ../../yade/Engine \
+              ../../yade/Interaction \
+              ../../yade/Geometry \
+              ../../yade/MultiMethods \
               ../../yade/Factory \
-              ../../yade/IOManager \
-              ../../toolboxes/Math \
+              ../../toolboxes/Libraries/FrontEnd \
+              ../../toolboxes/Libraries/Math \
+              ../../toolboxes/Libraries/IOManager \
               ../../toolboxes/Libraries/Serialization 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../toolboxes/Math/$(YADEDYNLIBPATH) \
+QMAKE_LIBDIR = ../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
+               ../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
+               ../../yade/Body/$(YADEDYNLIBPATH) \
+               ../../toolboxes/Libraries/IOManager/$(YADEDYNLIBPATH) \
+               ../../yade/Engine/$(YADEDYNLIBPATH) \
+               ../../yade/Geometry/$(YADEDYNLIBPATH) \
+               ../../yade/Interaction/$(YADEDYNLIBPATH) \
+               ../../toolboxes/Libraries/FrontEnd/$(YADEDYNLIBPATH) \
+               ../../yade/MultiMethods/$(YADEDYNLIBPATH) \
+               ../../yade/Factory/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEBINPATH) 
-CONFIG += debug \
+CONFIG += release \
           warn_on 
 TEMPLATE = app 
 HEADERS += Chrono.hpp \
-           FrontEnd.hpp \
            Omega.hpp \
            Singleton.hpp \
            Tree.hpp \
            Types.hpp 
 SOURCES += Chrono.cpp \
-           FrontEnd.cpp \
            Omega.cpp \
            yade.cpp 

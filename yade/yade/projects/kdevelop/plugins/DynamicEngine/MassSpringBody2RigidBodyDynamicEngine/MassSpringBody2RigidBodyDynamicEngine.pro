@@ -6,16 +6,16 @@
 LIBS += -lMassSpringBody \
         -lRigidBody \
         -lDistances \
+        -lSerialization \
         -lSimpleSpringDynamicEngine \
         -lMesh2D \
         -lClosestFeatures \
-        -lSerialization \
-        $(YADECOMPILATIONPATH)/libBody.a \
-        $(YADECOMPILATIONPATH)/libEngine.a \
-        $(YADECOMPILATIONPATH)/libGeometry.a \
-        $(YADECOMPILATIONPATH)/libInteraction.a \
-        $(YADECOMPILATIONPATH)/libMultiMethods.a \
-        $(YADECOMPILATIONPATH)/libFactory.a \
+        -lMath \
+        -lBody \
+        -lEngine \
+        -lGeometry \
+        -lInteraction \
+        -lMultiMethods \
         -rdynamic 
 INCLUDEPATH = ../../../plugins/DynamicEngine/SimpleSpringDynamicEngine \
               ../../../plugins/Body/MassSpringBody \
@@ -25,12 +25,12 @@ INCLUDEPATH = ../../../plugins/DynamicEngine/SimpleSpringDynamicEngine \
               ../../../yade/yade \
               ../../../yade/Body \
               ../../../yade/Engine \
-              ../../../yade/Geometry \
               ../../../yade/Interaction \
+              ../../../yade/Geometry \
               ../../../yade/MultiMethods \
               ../../../yade/Factory \
               ../../../toolboxes/ComputationalGeometry/Distances \
-              ../../../toolboxes/Math \
+              ../../../toolboxes/Libraries/Math \
               ../../../toolboxes/Libraries/Serialization 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
@@ -38,13 +38,19 @@ OBJECTS_DIR = $(YADECOMPILATIONPATH)
 QMAKE_LIBDIR = ../../../plugins/Body/MassSpringBody/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/RigidBody/$(YADEDYNLIBPATH) \
                ../../../toolboxes/ComputationalGeometry/Distances/$(YADEDYNLIBPATH) \
+               ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../../plugins/DynamicEngine/SimpleSpringDynamicEngine/$(YADEDYNLIBPATH) \
                ../../../plugins/GeometricalModel/Mesh2D/$(YADEDYNLIBPATH) \
                ../../../plugins/InteractionModel/ClosestFeatures/$(YADEDYNLIBPATH) \
-               ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
+               ../../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
+               ../../../yade/Body/$(YADEDYNLIBPATH) \
+               ../../../yade/Engine/$(YADEDYNLIBPATH) \
+               ../../../yade/Geometry/$(YADEDYNLIBPATH) \
+               ../../../yade/Interaction/$(YADEDYNLIBPATH) \
+               ../../../yade/MultiMethods/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
-CONFIG += debug \
+CONFIG += release \
           warn_on \
           dll 
 TEMPLATE = lib 

@@ -3,14 +3,18 @@
 # Subdir relative project main directory: ./yade
 # Target is a subdirs project 
 
-CONFIG += debug \
+MOC_DIR = $(YADECOMPILATIONPATH) 
+UI_DIR = $(YADECOMPILATIONPATH) 
+OBJECTS_DIR = $(YADECOMPILATIONPATH) 
+DEFINES = DEBUG 
+CONFIG += release \
           warn_on 
 TEMPLATE = subdirs 
-SUBDIRS += IOManager \
-           Factory \
-           MultiMethods \
-           Interaction \
+SUBDIRS += Factory \
+	   MultiMethods \
            Geometry \
+           Interaction \
            Engine \
            Body \
            yade 
+

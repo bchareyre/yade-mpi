@@ -31,7 +31,7 @@ void BallisticDynamicEngine::respondToCollisions(Body * body, const std::list<sh
 
 	float dt = Omega::instance().dt;
 
-	//rb->acceleration += Omega::instance().gravity;
+	//rb->acceleration += Omega::instance().getGravity();
 
 	if (!first)
 	{

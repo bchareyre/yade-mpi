@@ -3,37 +3,48 @@
 # Subdir relative project main directory: ./frontends/YadeQtGUI
 # Target is a library:  
 
-LIBS += -lQtGUIGenerator \
+LIBS += -lSerialization \
+        -lQtGUIGenerator \
         -lRigidBody \
-        -lSerialization \
-        $(YADECOMPILATIONPATH)/libBody.a \
-        $(YADECOMPILATIONPATH)/libEngine.a \
-        $(YADECOMPILATIONPATH)/libGeometry.a \
-        $(YADECOMPILATIONPATH)/libInteraction.a \
-        $(YADECOMPILATIONPATH)/libMultiMethods.a \
-        $(YADECOMPILATIONPATH)/libFactory.a \
+        -lMath \
+        -lBody \
+        -lIOManager \
+        -lEngine \
+        -lGeometry \
+        -lInteraction \
+        -lFrontEnd \
+        -lMultiMethods \
         -rdynamic 
 INCLUDEPATH = ../../frontends/QtGUIGenerator \
               ../../plugins/Body/RigidBody \
               ../../yade/yade \
               ../../yade/Body \
               ../../yade/Engine \
-              ../../yade/Geometry \
               ../../yade/Interaction \
+              ../../yade/Geometry \
               ../../yade/MultiMethods \
               ../../yade/Factory \
-              ../../yade/IOManager \
-              ../../toolboxes/Math \
+              ../../toolboxes/Libraries/FrontEnd \
+              ../../toolboxes/Libraries/Math \
+              ../../toolboxes/Libraries/IOManager \
               ../../toolboxes/Libraries/Serialization 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../frontends/QtGUIGenerator/$(YADEDYNLIBPATH) \
+QMAKE_LIBDIR = ../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
+               ../../frontends/QtGUIGenerator/$(YADEDYNLIBPATH) \
                ../../plugins/Body/RigidBody/$(YADEDYNLIBPATH) \
-               ../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
+               ../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
+               ../../yade/Body/$(YADEDYNLIBPATH) \
+               ../../toolboxes/Libraries/IOManager/$(YADEDYNLIBPATH) \
+               ../../yade/Engine/$(YADEDYNLIBPATH) \
+               ../../yade/Geometry/$(YADEDYNLIBPATH) \
+               ../../yade/Interaction/$(YADEDYNLIBPATH) \
+               ../../toolboxes/Libraries/FrontEnd/$(YADEDYNLIBPATH) \
+               ../../yade/MultiMethods/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
-CONFIG += debug \
+CONFIG += release \
           warn_on \
           dll 
 TEMPLATE = lib 
@@ -48,3 +59,4 @@ SOURCES += YadeQtGUI.cpp \
            GLViewer.cpp \
            QGLSubWindow.cpp \
            YadeQtMainWindow.cpp 
+QtGeneratedFrontEnd.ui.target = QtGeneratedFrontEnd.ui

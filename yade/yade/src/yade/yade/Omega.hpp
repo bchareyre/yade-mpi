@@ -34,7 +34,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "Vector3.hpp"
+//#include "Vector3.hpp"
 //#include "Chrono.hpp"
 #include <iostream>
 #include "Types.hpp"
@@ -42,7 +42,7 @@
 //#include "NonConnexBody.hpp"
 //#include "CollisionFunctor.hpp"
 //class CollisionFunctor;
-//class Vector3;
+class Vector3; // FIXME - this is acceptable, but should be removed.
 //class Chrono;
 class NonConnexBody;
 //#include "MultiMethodsManager.hpp"
@@ -59,7 +59,13 @@ using namespace std;
 class Omega : public Singleton<Omega>
 {
 	public : shared_ptr<ofstream> logFile;
-	public : Vector3 gravity;
+
+// FIXME - this must be a pimpl, or removed somewhere else. (circular dependency loop : 4 hours lost to find it, janek)
+	private : float gravity_x,gravity_y,gravity_z;
+	public : Vector3 getGravity();
+	public : Vector3 setGravity(Vector3 g);
+
+
 	public : shared_ptr<NonConnexBody> rootBody;
 	public : ptime startingSimulationTime;
 

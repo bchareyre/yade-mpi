@@ -35,7 +35,7 @@ void SimpleSpringDynamicEngine::respondToCollisions(Body * body, const std::list
 
 	float stiffness = 10000;
 	float viscosity = 10;
-	Vector3 gravity = Omega::instance().gravity;
+	Vector3 gravity = Omega::instance().getGravity();
 	if (first)
 	{
 		forces.resize(bodies.size());

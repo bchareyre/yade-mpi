@@ -153,7 +153,7 @@ void SDECDynamicEngine::respondToCollisions(Body* body, const std::list<shared_p
 	NonConnexBody * ncb = dynamic_cast<NonConnexBody*>(body);
 	vector<shared_ptr<Body> >& bodies = ncb->bodies;
 	
-	Vector3 gravity = Omega::instance().gravity;
+	Vector3 gravity = Omega::instance().getGravity();
 	float dt = Omega::instance().dt;
 
 	if (first)

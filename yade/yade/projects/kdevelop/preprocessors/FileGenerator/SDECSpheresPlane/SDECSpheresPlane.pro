@@ -9,15 +9,15 @@ LIBS += -lSDECDynamicEngine \
         -lBox \
         -lSphere \
         -lAABB \
+        -lSerialization \
         -lBallisticDynamicEngine \
         -lMath \
-        -lSerialization \
-        $(YADECOMPILATIONPATH)/libBody.a \
-        $(YADECOMPILATIONPATH)/libEngine.a \
-        $(YADECOMPILATIONPATH)/libGeometry.a \
-        $(YADECOMPILATIONPATH)/libInteraction.a \
-        $(YADECOMPILATIONPATH)/libMultiMethods.a \
-        $(YADECOMPILATIONPATH)/libFactory.a \
+        -lBody \
+        -lIOManager \
+        -lEngine \
+        -lGeometry \
+        -lInteraction \
+        -lMultiMethods \
         -rdynamic 
 INCLUDEPATH = ../../../plugins/DynamicEngine/SDECDynamicEngine \
               ../../../plugins/DynamicEngine/BallisticDynamicEngine \
@@ -31,12 +31,12 @@ INCLUDEPATH = ../../../plugins/DynamicEngine/SDECDynamicEngine \
               ../../../yade/yade \
               ../../../yade/Body \
               ../../../yade/Engine \
-              ../../../yade/Geometry \
               ../../../yade/Interaction \
+              ../../../yade/Geometry \
               ../../../yade/MultiMethods \
               ../../../yade/Factory \
-              ../../../yade/IOManager \
-              ../../../toolboxes/Math \
+              ../../../toolboxes/Libraries/Math \
+              ../../../toolboxes/Libraries/IOManager \
               ../../../toolboxes/Libraries/Serialization 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
@@ -47,12 +47,18 @@ QMAKE_LIBDIR = ../../../plugins/DynamicEngine/SDECDynamicEngine/$(YADEDYNLIBPATH
                ../../../plugins/GeometricalModel/Box/$(YADEDYNLIBPATH) \
                ../../../plugins/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
                ../../../plugins/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
-               ../../../plugins/DynamicEngine/BallisticDynamicEngine/$(YADEDYNLIBPATH) \
-               ../../../toolboxes/Math/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
+               ../../../plugins/DynamicEngine/BallisticDynamicEngine/$(YADEDYNLIBPATH) \
+               ../../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
+               ../../../yade/Body/$(YADEDYNLIBPATH) \
+               ../../../toolboxes/Libraries/IOManager/$(YADEDYNLIBPATH) \
+               ../../../yade/Engine/$(YADEDYNLIBPATH) \
+               ../../../yade/Geometry/$(YADEDYNLIBPATH) \
+               ../../../yade/Interaction/$(YADEDYNLIBPATH) \
+               ../../../yade/MultiMethods/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
-CONFIG += debug \
+CONFIG += release \
           warn_on \
           dll 
 TEMPLATE = lib 

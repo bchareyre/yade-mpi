@@ -29,7 +29,7 @@ void ExplicitMassSpringDynamicEngine::respondToCollisions(Body * body, const std
 	float dt = Omega::instance().dt;
 	MassSpringBody * massSpring = dynamic_cast<MassSpringBody*>(body);
 
-	Vector3 gravity = Omega::instance().gravity;
+	Vector3 gravity = Omega::instance().getGravity();
 	
 	float damping	= massSpring->damping;
 	float stiffness	= massSpring->stiffness;
@@ -78,7 +78,7 @@ void ExplicitMassSpringDynamicEngine::respondToCollisions(Body * body, const std
 		Vector3 acc = Vector3(0,0,0);
 
 		if (massSpring->properties[i].invMass!=0)
-			acc = Omega::instance().gravity + forces[i]*massSpring->properties[i].invMass;
+			acc = Omega::instance().getGravity() + forces[i]*massSpring->properties[i].invMass;
 					
 		if (!first)
 			massSpring->properties[i].velocity = 0.997*(prevVelocities[i]+0.5*dt*acc); //0.995

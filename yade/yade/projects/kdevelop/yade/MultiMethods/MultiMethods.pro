@@ -3,14 +3,18 @@
 # Subdir relative project main directory: ./yade/MultiMethods
 # Target is a library:  
 
-LIBS += -lSerialization \
-        -rdynamic 
+LIBS += -rdynamic 
+INCLUDEPATH = ../../yade/yade \
+              ../../toolboxes/Libraries/Math \
+              ../../toolboxes/Libraries/Serialization 
+MOC_DIR = $(YADECOMPILATIONPATH) 
+UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) 
-DESTDIR = $(YADECOMPILATIONPATH) 
-CONFIG += debug \
+QMAKE_LIBDIR = $(YADEDYNLIBPATH) 
+DESTDIR = $(YADEDYNLIBPATH) 
+CONFIG += release \
           warn_on \
-          staticlib 
+          dll 
 TEMPLATE = lib 
 HEADERS += Indexable.hpp \
            MultiMethodsManager.hpp \

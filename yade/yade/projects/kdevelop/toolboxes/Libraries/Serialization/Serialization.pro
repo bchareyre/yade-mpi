@@ -10,18 +10,18 @@ MOC_DIR = $(YADECOMPILATIONPATH)
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
-CONFIG += debug \
+CONFIG += release \
           warn_on \
           dll 
 TEMPLATE = lib 
 HEADERS += Archive.hpp \
            ArchiveTypes.hpp \
            Serializable.hpp \
-           SerializationExceptions.hpp \
            Archive.tpp \
            ContainerHandler.tpp \
            FundamentalHandler.tpp \
-           PointerHandler.tpp 
+           PointerHandler.tpp \
+           SerializationExceptions.hpp 
 SOURCES += Archive.cpp \
            Serializable.cpp \
            SerializationExceptions.cpp 

@@ -3,15 +3,17 @@
 # Subdir relative project main directory: ./yade/Factory
 # Target is a library:  
 
-LIBS += -lSerialization \
-        -rdynamic 
-INCLUDEPATH = ../../yade/yade 
+LIBS += -rdynamic 
+INCLUDEPATH = ../../yade/yade \
+              ../../toolboxes/Libraries/Serialization 
+MOC_DIR = $(YADECOMPILATIONPATH) 
+UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) 
-DESTDIR = $(YADECOMPILATIONPATH) 
-CONFIG += debug \
+QMAKE_LIBDIR = $(YADEDYNLIBPATH) 
+DESTDIR = $(YADEDYNLIBPATH) 
+CONFIG += release \
           warn_on \
-          staticlib 
+          dll 
 TEMPLATE = lib 
 HEADERS += ClassFactory.hpp \
            DynLibManager.hpp \

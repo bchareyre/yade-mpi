@@ -3,29 +3,30 @@
 # Subdir relative project main directory: ./frontends/QtGUIGenerator
 # Target is a library:  
 
-LIBS += -lXMLManager \
-        -lSerialization \
-        $(YADECOMPILATIONPATH)/libBody.a \
-        $(YADECOMPILATIONPATH)/libEngine.a \
-        $(YADECOMPILATIONPATH)/libGeometry.a \
-        $(YADECOMPILATIONPATH)/libInteraction.a \
-        $(YADECOMPILATIONPATH)/libMultiMethods.a \
-        $(YADECOMPILATIONPATH)/libFactory.a \
+LIBS += -lSerialization \
+        -lXMLManager \
+        -lMath \
+        -lIOManager \
+        -lFrontEnd \
         -rdynamic 
 INCLUDEPATH = ../../plugins/IOManager/XMLManager \
               ../../yade/yade \
               ../../yade/Factory \
-              ../../yade/IOManager \
-              ../../toolboxes/Math \
+              ../../toolboxes/Libraries/FrontEnd \
+              ../../toolboxes/Libraries/Math \
+              ../../toolboxes/Libraries/IOManager \
               ../../toolboxes/Libraries/Serialization 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../plugins/IOManager/XMLManager/$(YADEDYNLIBPATH) \
-               ../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
+QMAKE_LIBDIR = ../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
+               ../../plugins/IOManager/XMLManager/$(YADEDYNLIBPATH) \
+               ../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
+               ../../toolboxes/Libraries/IOManager/$(YADEDYNLIBPATH) \
+               ../../toolboxes/Libraries/FrontEnd/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
-CONFIG += debug \
+CONFIG += release \
           warn_on \
           dll 
 TEMPLATE = lib 

@@ -12,6 +12,6 @@ SUBDIRS += Sphere2Sphere4ClosestFeatures \
 MOC_DIR = $(YADECOMPILATIONPATH)
 UI_DIR = $(YADECOMPILATIONPATH)
 OBJECTS_DIR = $(YADECOMPILATIONPATH)
-CONFIG += debug \
+CONFIG += release \
 warn_on
 TEMPLATE = subdirs

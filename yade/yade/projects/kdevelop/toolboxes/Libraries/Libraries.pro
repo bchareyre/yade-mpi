@@ -3,7 +3,13 @@
 # Subdir relative project main directory: ./toolboxes/Libraries
 # Target is a subdirs project 
 
-SUBDIRS += Serialization 
+MOC_DIR = $(YADECOMPILATIONPATH) 
+UI_DIR = $(YADECOMPILATIONPATH) 
+OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 CONFIG += release \
           warn_on 
 TEMPLATE = subdirs 
+SUBDIRS += Serialization \
+	   IOManager \
+	   Math \
+	   FrontEnd

@@ -5,6 +5,6 @@
 
 SUBDIRS += Sphere2Sphere4SDECContactModel \
            Box2Sphere4SDECContactModel 
-CONFIG += debug \
+CONFIG += release \
 warn_on
 TEMPLATE = subdirs
