@@ -66,7 +66,8 @@ void SDECMacroMicroElasticRelationships::go(	  const shared_ptr<BodyPhysicalPara
 	if(interactionGeometry) // so it is SDECContactGeometry  - NON PERMANENT LINK
 	{
 
-/* OLD VERSION
+/* OLD VERSION  this is a LinearContactModel, different class, model different that MicroMacroElasticRelationships
+another would be HerzMindlinContactModel
 
 		shared_ptr<SDECContactPhysics> contactPhysics;
 		

@@ -386,15 +386,14 @@ void SDECLaw::respondToInteractions(Body* body)
 		Vector3r shearDisplacement		= shearVelocity*dt;
 		shearForce 			       -= currentContactPhysics->ks*shearDisplacement;
 
+// PFC3d SlipModel, is using friction angle. CoulombCriterion
 		Real maxFs = currentContactPhysics->normalForce.squaredLength() * std::pow(currentContactPhysics->tangensOfFrictionAngle,2);
-			
 		if( shearForce.squaredLength() > maxFs )
 		{
 			maxFs = Mathr::sqRoot(maxFs) / shearForce.length();
 			shearForce *= maxFs;
-//	for(int g = 0 ; g < 3 ; g++)
-//		if(shearForce[g] != 0)
 		}
+////////// PFC3d SlipModel
 
 		Vector3r f				= currentContactPhysics->normalForce + shearForce;
 		
