@@ -7,10 +7,11 @@ HEADERS += Interaction.hpp \
            InteractionContainer.hpp \
            InteractionGeometry.hpp \
            InteractionPhysics.hpp \
-           InteractionFunctor.hpp \
            BroadInteractor.hpp \
            InteractionGeometryDispatcher.hpp \
-           InteractionPhysicsDispatcher.hpp 
+           InteractionPhysicsDispatcher.hpp \
+           InteractionGeometryFunctor.hpp \
+           InteractionPhysicsFunctor.hpp 
 SOURCES += Interaction.cpp \
            InteractionContainer.cpp \
            InteractionGeometry.cpp \

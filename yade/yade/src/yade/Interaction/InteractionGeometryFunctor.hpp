@@ -23,8 +23,8 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#ifndef __COLLISIONFUNCTOR_H__
-#define __COLLISIONFUNCTOR_H__
+#ifndef __INTERACTIONGEOMETRYFUNCTOR_H__
+#define __INTERACTIONGEOMETRYFUNCTOR_H__
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -45,10 +45,10 @@
 
 /*! \brief Abstract interface for all collision functor.
 
-	Every functions that describe collision between two CollisionGeometries must derive from InteractionFunctor.
+	Every functions that describe collision between two CollisionGeometries must derive from InteractionGeometryFunctor.
 */
 
-class InteractionFunctor : public FunctorWrapper
+class InteractionGeometryFunctor : public FunctorWrapper
 		<
 		 bool ,
 		 TYPELIST_5(
@@ -61,9 +61,9 @@ class InteractionFunctor : public FunctorWrapper
 {
 };
 
-REGISTER_FACTORABLE(InteractionFunctor);
+REGISTER_FACTORABLE(InteractionGeometryFunctor);
 
-#endif // __COLLISIONFUNCTOR_H__
+#endif // __INTERACTIONGEOMETRYFUNCTOR_H__
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////

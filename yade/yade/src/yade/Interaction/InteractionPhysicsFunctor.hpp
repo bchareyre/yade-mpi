@@ -1,4 +1,6 @@
 /***************************************************************************
+ *   Copyright (C) 2004 by Janek Kozicki                                   *
+ *   cosurgi@berlios.de                                                    *
  *   Copyright (C) 2004 by Olivier Galizzi                                 *
  *   olivier.galizzi@imag.fr                                               *
  *                                                                         *
@@ -21,77 +23,44 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#ifndef __NARROWPHASECOLLIDER_H__
-#define __NARROWPHASECOLLIDER_H__
+#ifndef __INTERACTIONPHYSICSFUNCTOR_H__
+#define __INTERACTIONPHYSICSFUNCTOR_H__
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <vector>
-#include <list>
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
+#include "FunctorWrapper.hpp"
+#include "Body.hpp"
 #include "Interaction.hpp"
-#include "DynLibDispatcher.hpp"
-#include "Actor.hpp"
-#include "CollisionGeometry.hpp"
-#include "InteractionGeometryFunctor.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-class Body;
+#include <boost/shared_ptr.hpp>
+#include <string>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-class InteractionGeometryDispatcher : public Actor
+/*! \brief Abstract interface for all collision functor.
+
+	Every functions that describe collision between two CollisionGeometries must derive from InteractionGeometryFunctor.
+*/
+
+class InteractionPhysicsFunctor : public FunctorWrapper
+		<
+		 void ,
+		 TYPELIST_3(
+				  const shared_ptr<Body>&
+				, const shared_ptr<Body>&
+				, shared_ptr<Interaction>&
+		) >
 {
-	protected: DynLibDispatcher
-		<	TYPELIST_2( CollisionGeometry , CollisionGeometry ) ,	// base classess for dispatch
-			InteractionGeometryFunctor,					// class that provides multivirtual call
-			bool ,							// return type
-			TYPELIST_5(
-					  const shared_ptr<CollisionGeometry>&	// arguments
-					, const shared_ptr<CollisionGeometry>&
-					, const Se3r&
-					, const Se3r&
-					, shared_ptr<Interaction>&
-				)
-			, false							// disable auto symmetry handling
-		> interactionGeometryDispatcher;
-
-	private : vector<vector<string> > interactionGeometryFunctors;
-	public  : void addInteractionGeometryFunctor(const string& str1,const string& str2,const string& str3);
-		
-	// construction
-	public : InteractionGeometryDispatcher ();
-
-	public : virtual ~InteractionGeometryDispatcher ();
-
-	//public : virtual void narrowCollisionPhase(Body* ) { throw;};
-
-	protected : virtual void postProcessAttributes(bool deserializing);
-	public : void registerAttributes();
-
-	//public : virtual bool isActivated();
-	public : virtual void action(Body* body);
-
-	REGISTER_CLASS_NAME(InteractionGeometryDispatcher);
-
 };
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+REGISTER_FACTORABLE(InteractionPhysicsFunctor);
 
-REGISTER_SERIALIZABLE(InteractionGeometryDispatcher,false);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-#endif // __NARROWPHASECOLLIDER_H__
+#endif // __INTERACTIONPHYSICSFUNCTOR_H__
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////

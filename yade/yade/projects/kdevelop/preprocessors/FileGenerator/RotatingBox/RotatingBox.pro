@@ -7,7 +7,6 @@ LIBS += -lAABB \
         -lRotor \
         -lSimpleSpringDynamicEngine \
         -lSAPCollider \
-        -lSimpleNarrowCollider \
         -lBox \
         -lSphere \
         -lRigidBody \
@@ -24,15 +23,14 @@ LIBS += -lAABB \
         -lCollisionGeometrySet2AABBFactory \
         -lCollisionGeometrySet \
         -rdynamic 
-INCLUDEPATH = $(YADEINCLUDEPATH) 
+INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 QMAKE_LIBDIR = ../../../plugins/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
                ../../../plugins/KinematicEngine/Rotor/$(YADEDYNLIBPATH) \
                ../../../plugins/DynamicEngine/SimpleSpringDynamicEngine/$(YADEDYNLIBPATH) \
-               ../../../plugins/BroadCollider/SAPCollider/$(YADEDYNLIBPATH) \
-               ../../../plugins/NarrowCollider/SimpleNarrowCollider/$(YADEDYNLIBPATH) \
+               ../../../plugins/BroadInteractor/SAPCollider/$(YADEDYNLIBPATH) \
                ../../../plugins/GeometricalModel/Box/$(YADEDYNLIBPATH) \
                ../../../plugins/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/RigidBody/$(YADEDYNLIBPATH) \

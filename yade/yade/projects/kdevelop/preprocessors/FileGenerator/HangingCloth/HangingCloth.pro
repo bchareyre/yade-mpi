@@ -7,7 +7,6 @@ LIBS += -lMesh2D \
         -lSerialization \
         -lSAPCollider \
         -lAABB \
-        -lSimpleNarrowCollider \
         -lExplicitMassSpringDynamicEngine \
         -lSphere \
         -lClosestFeatures \
@@ -23,18 +22,17 @@ LIBS += -lMesh2D \
         -lInteraction \
         -lMultiMethods \
         -rdynamic 
-INCLUDEPATH = $(YADEINCLUDEPATH) 
+INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 QMAKE_LIBDIR = ../../../plugins/GeometricalModel/Mesh2D/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
-               ../../../plugins/BroadCollider/SAPCollider/$(YADEDYNLIBPATH) \
+               ../../../plugins/BroadInteractor/SAPCollider/$(YADEDYNLIBPATH) \
                ../../../plugins/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
-               ../../../plugins/NarrowCollider/SimpleNarrowCollider/$(YADEDYNLIBPATH) \
                ../../../plugins/DynamicEngine/ExplicitMassSpringDynamicEngine/$(YADEDYNLIBPATH) \
                ../../../plugins/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
-               ../../../plugins/InteractionModel/ClosestFeatures/$(YADEDYNLIBPATH) \
+               ../../../plugins/InteractionGeometry/ClosestFeatures/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/RigidBody/$(YADEDYNLIBPATH) \
                ../../../plugins/DynamicEngine/BallisticDynamicEngine/$(YADEDYNLIBPATH) \
                ../../../plugins/DynamicEngine/SimpleSpringDynamicEngine/$(YADEDYNLIBPATH) \
@@ -45,7 +43,7 @@ QMAKE_LIBDIR = ../../../plugins/GeometricalModel/Mesh2D/$(YADEDYNLIBPATH) \
                ../../../yade/Engine/$(YADEDYNLIBPATH) \
                ../../../yade/Geometry/$(YADEDYNLIBPATH) \
                ../../../yade/Interaction/$(YADEDYNLIBPATH) \
-               ../../../yade/MultiMethods/$(YADEDYNLIBPATH) \
+               ../../../toolboxes/Libraries/MultiMethods/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

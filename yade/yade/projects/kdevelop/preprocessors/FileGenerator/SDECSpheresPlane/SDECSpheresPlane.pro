@@ -5,7 +5,6 @@
 
 LIBS += -lSDECDynamicEngine \
         -lSAPCollider \
-        -lSimpleNarrowCollider \
         -lBox \
         -lSphere \
         -lAABB \
@@ -29,7 +28,6 @@ UI_DIR = $(YADECOMPILATIONPATH)
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 QMAKE_LIBDIR = ../../../plugins/DynamicEngine/SDECDynamicEngine/$(YADEDYNLIBPATH) \
                ../../../plugins/BroadInteractor/SAPCollider/$(YADEDYNLIBPATH) \
-               ../../../plugins/NarrowInteractor/SimpleNarrowCollider/$(YADEDYNLIBPATH) \
                ../../../plugins/GeometricalModel/Box/$(YADEDYNLIBPATH) \
                ../../../plugins/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
                ../../../plugins/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
@@ -45,11 +43,7 @@ QMAKE_LIBDIR = ../../../plugins/DynamicEngine/SDECDynamicEngine/$(YADEDYNLIBPATH
                ../../../plugins/BoundingVolumeFactory/CollisionGeometrySet2AABBFactory/$(YADEDYNLIBPATH) \
                ../../../plugins/CollisionGeometry/CollisionGeometrySet/$(YADEDYNLIBPATH) \
                ../../../plugins/BroadInteractor/PersistentSAPCollider/$(YADEDYNLIBPATH) \
-               ../../../plugins/PhysicalInteractor/SDECLinearContactModel/$(YADEDYNLIBPATH) \
-               ../../../plugins/BroadCollider/SAPCollider/$(YADEDYNLIBPATH) \
-               ../../../plugins/NarrowCollider/SimpleNarrowCollider/$(YADEDYNLIBPATH) \
-               ../../../plugins/InteractionModel/SDECPermanentLink/$(YADEDYNLIBPATH) \
-               ../../../plugins/BroadCollider/PersistentSAPCollider/$(YADEDYNLIBPATH) \
+               ../../../plugins/InteractionPhysicsFunctor/SDECLinearContactModel/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

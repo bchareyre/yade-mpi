@@ -6,7 +6,6 @@
 LIBS += -lSerialization \
         -lRigidBody \
         -lSAPCollider \
-        -lSimpleNarrowCollider \
         -lBox \
         -lSphere \
         -lAABB \
@@ -19,14 +18,13 @@ LIBS += -lSerialization \
         -lInteraction \
         -lMultiMethods \
         -rdynamic 
-INCLUDEPATH = $(YADEINCLUDEPATH) 
+INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 QMAKE_LIBDIR = ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/RigidBody/$(YADEDYNLIBPATH) \
-               ../../../plugins/BroadCollider/SAPCollider/$(YADEDYNLIBPATH) \
-               ../../../plugins/NarrowCollider/SimpleNarrowCollider/$(YADEDYNLIBPATH) \
+               ../../../plugins/BroadInteractor/SAPCollider/$(YADEDYNLIBPATH) \
                ../../../plugins/GeometricalModel/Box/$(YADEDYNLIBPATH) \
                ../../../plugins/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
                ../../../plugins/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
@@ -37,7 +35,7 @@ QMAKE_LIBDIR = ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../../yade/Engine/$(YADEDYNLIBPATH) \
                ../../../yade/Geometry/$(YADEDYNLIBPATH) \
                ../../../yade/Interaction/$(YADEDYNLIBPATH) \
-               ../../../yade/MultiMethods/$(YADEDYNLIBPATH) \
+               ../../../toolboxes/Libraries/MultiMethods/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

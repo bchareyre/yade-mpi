@@ -7,7 +7,6 @@
 #include "NonConnexBody.hpp"
 #include "SAPCollider.hpp"
 #include "PersistentSAPCollider.hpp"
-#include "SimpleNarrowCollider.hpp"
 #include "SDECDiscreteElement.hpp"
 #include "BallisticDynamicEngine.hpp"
 #include <fstream>
@@ -21,6 +20,8 @@
 #include "CollisionGeometrySet.hpp"
 #include "SDECLinearContactModel.hpp"
 #include "ActionDispatcher.hpp"
+#include "InteractionGeometryDispatcher.hpp"
+#include "InteractionPhysicsDispatcher.hpp"
 
 SDECSpheresPlane::SDECSpheresPlane () : FileGenerator()
 {
@@ -59,10 +60,13 @@ string SDECSpheresPlane::generate()
 	Quaternionr q;
 	q.fromAxisAngle( Vector3r(0,0,1),0);
 
-	shared_ptr<InteractionGeometryDispatcher> nc(new InteractionGeometryDispatcher);
-	nc->addCollisionFunctor("Sphere","Sphere","Sphere2Sphere4SDECContactModel");
-	nc->addCollisionFunctor("Sphere","Box","Box2Sphere4SDECContactModel");
+	shared_ptr<InteractionGeometryDispatcher> igd(new InteractionGeometryDispatcher);
+	igd->addInteractionGeometryFunctor("Sphere","Sphere","Sphere2Sphere4SDECContactModel");
+	igd->addInteractionGeometryFunctor("Sphere","Box","Box2Sphere4SDECContactModel");
 
+	shared_ptr<InteractionPhysicsDispatcher> ipd(new InteractionPhysicsDispatcher);
+	ipd->addInteractionPhysicsFunctor("SDECDiscreteElement","SDECDiscreteElement","SDECLinearContactModel");
+		
 	shared_ptr<BoundingVolumeUpdator> bvu	= shared_ptr<BoundingVolumeUpdator>(new BoundingVolumeUpdator);
 	bvu->addBVFactories("Sphere","AABB","Sphere2AABBFactory");
 	bvu->addBVFactories("Box","AABB","Box2AABBFactory");
@@ -75,8 +79,8 @@ string SDECSpheresPlane::generate()
 	rootBody->actors.resize(6);
 	rootBody->actors[0] 		= bvu;	
 	rootBody->actors[1] 		= shared_ptr<Actor>(new PersistentSAPCollider);
-	rootBody->actors[2] 		= nc;
-	rootBody->actors[3] 		= shared_ptr<Actor>(new SDECLinearContactModel);
+	rootBody->actors[2] 		= igd;
+	rootBody->actors[3] 		= ipd;
 	rootBody->actors[4] 		= shared_ptr<Actor>(new SDECDynamicEngine);
 	rootBody->actors[5] 		= ad;
 

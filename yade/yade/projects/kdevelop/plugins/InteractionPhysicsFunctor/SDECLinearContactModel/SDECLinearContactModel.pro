@@ -3,16 +3,18 @@
 # Subdir relative project main directory: ./plugins/InteractionPhysicsFunctor/SDECLinearContactModel
 # Target is a library:  
 
-HEADERS += SDECLinearContactModel.hpp 
-SOURCES += SDECLinearContactModel.cpp 
-LIBS += -rdynamic 
+LIBS += -lSDECDiscreteElement \
+        -rdynamic 
 INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = $(YADEDYNLIBPATH) 
+QMAKE_LIBDIR = ../../../plugins/Body/SDECDiscreteElement/$(YADEDYNLIBPATH) \
+               $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
 CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
+HEADERS += SDECLinearContactModel.hpp 
+SOURCES += SDECLinearContactModel.cpp 

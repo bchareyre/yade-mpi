@@ -12,7 +12,7 @@
 #include "DynamicEngine.hpp"
 #include "KinematicEngine.hpp"
 #include "Body.hpp"
-#include "InteractionFunctor.hpp"
+#include "InteractionGeometryFunctor.hpp"
 #include "IOManager.hpp"
 #include "BroadInteractor.hpp"
 #include "InteractionGeometryDispatcher.hpp"
@@ -188,8 +188,8 @@ void Omega::registerDynlibType(const string& name)
 		dynlibsType[name]="KinematicEngine";
 	else if (dynamic_pointer_cast<Body>(f))
 		dynlibsType[name]="Body";
-	else if (dynamic_pointer_cast<InteractionFunctor>(f))
-		dynlibsType[name]="InteractionFunctor";
+	else if (dynamic_pointer_cast<InteractionGeometryFunctor>(f))
+		dynlibsType[name]="InteractionGeometryFunctor";
 	else if (dynamic_pointer_cast<IOManager>(f))
 		dynlibsType[name]="IOManager";
 	else if (dynamic_pointer_cast<BroadInteractor>(f))

@@ -1,74 +1,56 @@
-/***************************************************************************
- *   Copyright (C) 2004 by Olivier Galizzi                                 *
- *   olivier.galizzi@imag.fr                                               *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 #include "InteractionPhysicsDispatcher.hpp"
+#include "NonConnexBody.hpp"
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+InteractionPhysicsDispatcher::InteractionPhysicsDispatcher () : Actor()
+{
+}
 
-InteractionPhysicsDispatcher::InteractionPhysicsDispatcher() : Actor()
+InteractionPhysicsDispatcher::~InteractionPhysicsDispatcher ()
 {
 
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-InteractionPhysicsDispatcher::~InteractionPhysicsDispatcher()
+void InteractionPhysicsDispatcher::postProcessAttributes(bool deserializing)
 {
-
+	if(deserializing)
+	{
+		for(unsigned int i=0;i<interactionPhysicsFunctors.size();i++)
+			interactionPhysicsDispatcher.add(interactionPhysicsFunctors[i][0],interactionPhysicsFunctors[i][1],interactionPhysicsFunctors[i][2]);
+	}
 }
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-void InteractionPhysicsDispatcher::postProcessAttributes(bool)
-{
-
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void InteractionPhysicsDispatcher::registerAttributes()
 {
-
+	REGISTER_ATTRIBUTE(interactionPhysicsFunctors);
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-void InteractionPhysicsDispatcher::action(Body* b)
+void InteractionPhysicsDispatcher::addInteractionPhysicsFunctor(const string& str1,const string& str2,const string& str3)
 {
-	this->computeMechanicalParameters(b);
+	vector<string> v;
+	v.push_back(str1);
+	v.push_back(str2);
+	v.push_back(str3);
+	interactionPhysicsFunctors.push_back(v);
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void  InteractionPhysicsDispatcher::computeMechanicalParameters(Body* )
+void InteractionPhysicsDispatcher::action(Body* body)
 {
-	throw;
-}
+	//this->narrowCollisionPhase(b);	
+	
+	NonConnexBody * ncb = dynamic_cast<NonConnexBody*>(body);
+	shared_ptr<BodyContainer> bodies = ncb->bodies;
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+	shared_ptr<Interaction> interaction;
+
+	for( ncb->interactions->gotoFirstPotential() ; ncb->interactions->notAtEndPotential() ; ncb->interactions->gotoNextPotential())
+	{
+		interaction = ncb->interactions->getCurrent();
+		
+		shared_ptr<Body> b1 = (*bodies)[interaction->getId1()];
+		shared_ptr<Body> b2 = (*bodies)[interaction->getId2()];
+
+		if (interaction->isReal)
+			interactionPhysicsDispatcher( b1 , b2 , interaction );
+	}
+}

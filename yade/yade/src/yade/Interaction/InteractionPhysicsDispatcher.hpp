@@ -28,38 +28,41 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "Actor.hpp"
+#include "DynLibDispatcher.hpp"
+#include "Body.hpp"
+#include "Interaction.hpp"
+#include "InteractionPhysicsFunctor.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 class InteractionPhysicsDispatcher : public Actor
 {
+	protected: DynLibDispatcher
+		<	TYPELIST_2( Body , Body ) ,	// base classess for dispatch
+			InteractionPhysicsFunctor,					// class that provides multivirtual call
+			void ,							// return type
+			TYPELIST_3(
+					  const shared_ptr<Body>&	// arguments
+					, const shared_ptr<Body>&
+					, shared_ptr<Interaction>&
+				)
+		> interactionPhysicsDispatcher;
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-/// Attributes										      ///
-///////////////////////////////////////////////////////////////////////////////////////////////////
+	private : vector<vector<string> > interactionPhysicsFunctors;
+	public  : void addInteractionPhysicsFunctor(const string& str1,const string& str2,const string& str3);
+		
+	// construction
+	public : InteractionPhysicsDispatcher ();
 
-// DECLARE YOU ATTRIBUTES HERE
+	public : virtual ~InteractionPhysicsDispatcher ();
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-/// Constructor/Destructor								      ///
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
-	/*! Constructor */
-	public : InteractionPhysicsDispatcher();
-
-	/*! Destructor */
-	public : virtual ~InteractionPhysicsDispatcher();
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-/// Methods										      ///
-///////////////////////////////////////////////////////////////////////////////////////////////////
-	
 	protected : virtual void postProcessAttributes(bool deserializing);
 	public : void registerAttributes();
-	public : virtual void computeMechanicalParameters(Body*b);
-	public : virtual void action(Body* b);
-	
+
+	public : virtual void action(Body* body);
+
 	REGISTER_CLASS_NAME(InteractionPhysicsDispatcher);
 
 };
