@@ -3,17 +3,17 @@
 
 #include "BroadInteractor.hpp"
 
-class SimpleBroadCollider : public BroadInteractor
+class SimpleBroadInteractor : public BroadInteractor
 {
-	// number of potential collision = number of colliding AABB
-	protected : int nbPotentialCollisions;
+	// number of potential interacions = number of interacting AABB
+	protected : int nbPotentialInteractions;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 	// construction
-	public : SimpleBroadCollider ();
-	public : ~SimpleBroadCollider ();
+	public : SimpleBroadInteractor ();
+	public : ~SimpleBroadInteractor ();
 
 	protected : virtual void postProcessAttributes(bool deserializing);
 	public : void registerAttributes();
@@ -21,17 +21,17 @@ class SimpleBroadCollider : public BroadInteractor
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-	// return a list "interactions" of pairs of Body which Bounding volume are in collisions
-	public : void broadCollisionTest(Body* body);
+	// return a list "interactions" of pairs of Body which Bounding volume are in potential interaction
+	public : void broadInteractionTest(Body* body);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-	REGISTER_CLASS_NAME(SimpleBroadCollider);
+	REGISTER_CLASS_NAME(SimpleBroadInteractor);
 
 };
 
-REGISTER_SERIALIZABLE(SimpleBroadCollider,false);
+REGISTER_SERIALIZABLE(SimpleBroadInteractor,false);
 
 #endif // __SIMPLEBROADCOLLIDER_H__
 

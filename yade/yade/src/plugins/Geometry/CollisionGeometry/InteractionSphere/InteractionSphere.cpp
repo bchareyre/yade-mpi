@@ -23,7 +23,7 @@
 
 #include "InteractionSphere.hpp"
 
-InteractionSphere::InteractionSphere () : CollisionGeometry()
+InteractionSphere::InteractionSphere () : InteractionGeometry()
 {
 	createIndex();
 }
@@ -35,12 +35,12 @@ InteractionSphere::~InteractionSphere ()
 
 void InteractionSphere::postProcessAttributes(bool deserializing)
 {
-	CollisionGeometry::postProcessAttributes(deserializing);
+	InteractionGeometry::postProcessAttributes(deserializing);
 }
 
 void InteractionSphere::registerAttributes()
 {
-	CollisionGeometry::registerAttributes();
+	InteractionGeometry::registerAttributes();
 	REGISTER_ATTRIBUTE(radius);
 }
 

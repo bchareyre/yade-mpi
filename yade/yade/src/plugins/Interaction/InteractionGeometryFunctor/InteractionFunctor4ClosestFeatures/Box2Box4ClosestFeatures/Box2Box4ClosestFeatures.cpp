@@ -31,8 +31,8 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool Box2Box4ClosestFeatures::go(		const shared_ptr<CollisionGeometry>& cm1,
-						const shared_ptr<CollisionGeometry>& cm2,
+bool Box2Box4ClosestFeatures::go(		const shared_ptr<InteractionGeometry>& cm1,
+						const shared_ptr<InteractionGeometry>& cm2,
 						const Se3r& se31,
 						const Se3r& se32,
 						shared_ptr<Interaction>& c)
@@ -417,8 +417,8 @@ bool Box2Box4ClosestFeatures::go(		const shared_ptr<CollisionGeometry>& cm1,
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool Box2Box4ClosestFeatures::goReverse(	const shared_ptr<CollisionGeometry>& cm1,
-						const shared_ptr<CollisionGeometry>& cm2,
+bool Box2Box4ClosestFeatures::goReverse(	const shared_ptr<InteractionGeometry>& cm1,
+						const shared_ptr<InteractionGeometry>& cm2,
 						const Se3r& se31,
 						const Se3r& se32,
 						shared_ptr<Interaction>& c)

@@ -46,7 +46,7 @@ class Body;
 
 /*! \brief Abstract interface for all broad phase collider.
 
-	All the broad phase collider (sweep and prune, regular grid ....) must derived from this class. A broad phase collider is used to speed up the collision detection test by testing collision between the bounding volume of the objects. In general it tries to reduce the number of potential colliding pairs.
+	All the broad phase interactor (sweep and prune, regular grid ....) must derived from this class. A broad phase collider is used to speed up the collision detection test by testing collision between the bounding volume of the objects. In general it tries to reduce the number of potential colliding pairs.
 */
 class BroadInteractor : public Actor
 {
@@ -75,7 +75,7 @@ class BroadInteractor : public Actor
 		\param const std::vector<shared_ptr<Body> > vector of body you want to test for potential interaction
 		\param std::list<shared_ptr<Interaction> > list of potential interaction found by the broad phase collider
 	*/
-	public : virtual void broadCollisionTest(Body*  ) { throw; };
+	public : virtual void broadInteractionTest(Body*  ) { throw; };
 
 	protected : virtual void postProcessAttributes(bool deserializing);
 	public : void registerAttributes();

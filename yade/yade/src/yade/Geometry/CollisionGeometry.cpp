@@ -1,6 +1,6 @@
-#include "CollisionGeometry.hpp"
+#include "InteractionGeometry.hpp"
 
-void CollisionGeometry::registerAttributes()
+void InteractionGeometry::registerAttributes()
 {
 	REGISTER_ATTRIBUTE(diffuseColor);
 }

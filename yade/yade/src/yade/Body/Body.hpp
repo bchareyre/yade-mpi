@@ -34,7 +34,7 @@
 
 #include "Se3.hpp"
 #include "GeometricalModel.hpp"
-#include "CollisionGeometry.hpp"
+#include "InteractionGeometry.hpp"
 #include "BoundingVolume.hpp"
 #include "BodyPhysicalParameters.hpp"
 #include "InteractionContainer.hpp"
@@ -79,8 +79,8 @@ class Body : public Serializable
 	/*! The geometrical model of this body (polyhedron, box ...) */
 	public : shared_ptr<GeometricalModel> geometricalModel;
 	
-	/*! The collision model of this body (sphere hierarchy, box ...) */
-	public : shared_ptr<CollisionGeometry> interactionGeometry;
+	/*! The interaction model of this body (sphere hierarchy, box ...) */
+	public : shared_ptr<InteractionGeometry> interactionGeometry;
 	
 	/*! The bounding volume of this body (AABB, K-Dop ...) */
 	public : shared_ptr<BoundingVolume> boundingVolume;

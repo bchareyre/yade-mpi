@@ -42,9 +42,9 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-/*! \brief Abstract interface for all collision functor.
+/*! \brief Abstract interface for all interaction functor.
 
-	Every functions that describe collision between two CollisionGeometries must derive from InteractionGeometryFunctor.
+	Every functions that describe interaction between two CollisionGeometries must derive from InteractionGeometryFunctor.
 */
 
 class InteractionPhysicsFunctor : public FunctorWrapper

@@ -17,7 +17,7 @@
 #include "AveragePositionRecorder.hpp"
 
 #include "BoundingVolumeUpdator.hpp"
-#include "CollisionGeometrySet.hpp"
+#include "InteractionGeometrySet.hpp"
 #include "CollisionGeometrySet2AABBFactory.hpp"
 
 #include <boost/filesystem/convenience.hpp>
@@ -107,7 +107,7 @@ string SDECImport::generate()
 // 	shared_ptr<BoundingVolumeUpdator> bvu	= shared_ptr<BoundingVolumeUpdator>(new BoundingVolumeUpdator);
 // 	bvu->addBVFactories("Sphere","AABB","Sphere2AABBFactory");
 // 	bvu->addBVFactories("Box","AABB","Box2AABBFactory");
-// 	bvu->addBVFactories("CollisionGeometrySet","AABB","CollisionGeometrySet2AABBFactory");
+// 	bvu->addBVFactories("InteractionGeometrySet","AABB","CollisionGeometrySet2AABBFactory");
 // 	
 // 	rootBody->actors.resize(4);
 // 	rootBody->actors[0] 		= bvu;
@@ -134,12 +134,12 @@ string SDECImport::generate()
 // 	shared_ptr<Box> box;
 // 	
 // 	
-// 	shared_ptr<CollisionGeometrySet> set(new CollisionGeometrySet());
+// 	shared_ptr<InteractionGeometrySet> set(new InteractionGeometrySet());
 // 	set->diffuseColor	= Vector3f(0,0,1);
 // 	set->wire		= false;
 // 	set->visible		= true;
 // 	set->shadowCaster	= false;
-// 	rootBody->interactionGeometry		= dynamic_pointer_cast<CollisionGeometry>(set);
+// 	rootBody->interactionGeometry		= dynamic_pointer_cast<InteractionGeometry>(set);
 // 	
 // 	aabb			= shared_ptr<AABB>(new AABB);
 // 	aabb->color		= Vector3r(0,0,1);
@@ -215,7 +215,7 @@ string SDECImport::generate()
 // 			sphere->visible		= true;
 // 			sphere->shadowCaster	= true;
 // 	
-// 			s->interactionGeometry			= dynamic_pointer_cast<CollisionGeometry>(sphere);
+// 			s->interactionGeometry			= dynamic_pointer_cast<InteractionGeometry>(sphere);
 // 			s->geometricalModel			= dynamic_pointer_cast<GeometricalModel>(sphere);
 // 			s->kn			= kn_Spheres;
 // 			s->ks			= ks_Spheres;
@@ -255,8 +255,8 @@ string SDECImport::generate()
 // 	box ->wire		= wall_bottom_wire;				// draw as wireframe?
 // 	box ->visible		= true;						// draw
 // 	box ->shadowCaster	= false;					// is not casting shadows
-// 	sdec->interactionGeometry		= dynamic_pointer_cast<CollisionGeometry>(box);
-// 	sdec->geometricalModel		= dynamic_pointer_cast<CollisionGeometry>(box);
+// 	sdec->interactionGeometry		= dynamic_pointer_cast<InteractionGeometry>(box);
+// 	sdec->geometricalModel		= dynamic_pointer_cast<InteractionGeometry>(box);
 // 	sdec->kn		= kn_Box;					// kn
 // 	sdec->ks		= ks_Box;					// ks
 // 	
@@ -302,8 +302,8 @@ string SDECImport::generate()
 // 	box ->wire		= wall_top_wire;				// draw as wireframe?
 // 	box ->visible		= true;						// draw
 // 	box ->shadowCaster	= false;					// is not casting shadows
-// 	sdec->interactionGeometry		= dynamic_pointer_cast<CollisionGeometry>(box);
-// 	sdec->geometricalModel		= dynamic_pointer_cast<CollisionGeometry>(box);
+// 	sdec->interactionGeometry		= dynamic_pointer_cast<InteractionGeometry>(box);
+// 	sdec->geometricalModel		= dynamic_pointer_cast<InteractionGeometry>(box);
 // 	sdec->kn		= kn_Box;					// kn
 // 	sdec->ks		= ks_Box;					// ks
 // 	body = dynamic_pointer_cast<Body>(sdec);
@@ -340,8 +340,8 @@ string SDECImport::generate()
 // 	box ->wire		= wall_1_wire;					// draw as wireframe?
 // 	box ->visible		= true;						// draw
 // 	box ->shadowCaster	= false;					// is not casting shadows
-// 	sdec->interactionGeometry		= dynamic_pointer_cast<CollisionGeometry>(box);
-// 	sdec->geometricalModel		= dynamic_pointer_cast<CollisionGeometry>(box);
+// 	sdec->interactionGeometry		= dynamic_pointer_cast<InteractionGeometry>(box);
+// 	sdec->geometricalModel		= dynamic_pointer_cast<InteractionGeometry>(box);
 // 	sdec->kn		= kn_Box;					// kn
 // 	sdec->ks		= ks_Box;					// ks
 // 	body = dynamic_pointer_cast<Body>(sdec);
@@ -378,8 +378,8 @@ string SDECImport::generate()
 // 	box ->wire		= wall_2_wire;					// draw as wireframe?
 // 	box ->visible		= true;						// draw
 // 	box ->shadowCaster	= false;					// is not casting shadows
-// 	sdec->interactionGeometry		= dynamic_pointer_cast<CollisionGeometry>(box);
-// 	sdec->geometricalModel		= dynamic_pointer_cast<CollisionGeometry>(box);
+// 	sdec->interactionGeometry		= dynamic_pointer_cast<InteractionGeometry>(box);
+// 	sdec->geometricalModel		= dynamic_pointer_cast<InteractionGeometry>(box);
 // 	sdec->kn		= kn_Box;					// kn
 // 	sdec->ks		= ks_Box;					// ks
 // 	body = dynamic_pointer_cast<Body>(sdec);
@@ -416,8 +416,8 @@ string SDECImport::generate()
 // 	box ->wire		= wall_3_wire;					// draw as wireframe?
 // 	box ->visible		= true;						// draw
 // 	box ->shadowCaster	= false;					// is not casting shadows
-// 	sdec->interactionGeometry		= dynamic_pointer_cast<CollisionGeometry>(box);
-// 	sdec->geometricalModel		= dynamic_pointer_cast<CollisionGeometry>(box);
+// 	sdec->interactionGeometry		= dynamic_pointer_cast<InteractionGeometry>(box);
+// 	sdec->geometricalModel		= dynamic_pointer_cast<InteractionGeometry>(box);
 // 	sdec->kn		= kn_Box;					// kn
 // 	sdec->ks		= ks_Box;					// ks
 // 	body = dynamic_pointer_cast<Body>(sdec);
@@ -454,8 +454,8 @@ string SDECImport::generate()
 // 	box ->wire		= wall_4_wire;					// draw as wireframe?
 // 	box ->visible		= true;						// draw
 // 	box ->shadowCaster	= false;					// is not casting shadows
-// 	sdec->interactionGeometry		= dynamic_pointer_cast<CollisionGeometry>(box);
-// 	sdec->geometricalModel		= dynamic_pointer_cast<CollisionGeometry>(box);
+// 	sdec->interactionGeometry		= dynamic_pointer_cast<InteractionGeometry>(box);
+// 	sdec->geometricalModel		= dynamic_pointer_cast<InteractionGeometry>(box);
 // 	sdec->kn		= kn_Box;					// kn
 // 	sdec->ks		= ks_Box;					// ks
 // 	body = dynamic_pointer_cast<Body>(sdec);

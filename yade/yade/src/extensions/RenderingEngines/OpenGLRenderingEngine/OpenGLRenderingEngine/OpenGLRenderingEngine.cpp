@@ -365,7 +365,7 @@ void OpenGLRenderingEngine::registerAttributes()
 	REGISTER_ATTRIBUTE(useFastShadowVolume);	
 	
 	//REGISTER_ATTRIBUTE(boundingVolumeFunctorNames);
-	//REGISTER_ATTRIBUTE(collisionGeometryFunctorNames);
+	//REGISTER_ATTRIBUTE(interactionGeometryFunctorNames);
 	//REGISTER_ATTRIBUTE(geometricalModelFunctorNames);
 	//REGISTER_ATTRIBUTE(shadowVolumeFunctorNames);
 }
@@ -380,8 +380,8 @@ void OpenGLRenderingEngine::postProcessAttributes(bool deserializing)
 		for(unsigned int i=0;i<boundingVolumeFunctorNames.size();i++)
 			boundingVolumeDispatcher.add(boundingVolumeFunctorNames[i][0],boundingVolumeFunctorNames[i][1]);
 			
-		for(unsigned int i=0;i<collisionGeometryFunctorNames.size();i++)
-			interactionGeometryDispatcher.add(collisionGeometryFunctorNames[i][0],collisionGeometryFunctorNames[i][1]);
+		for(unsigned int i=0;i<interactionGeometryFunctorNames.size();i++)
+			interactionGeometryDispatcher.add(interactionGeometryFunctorNames[i][0],interactionGeometryFunctorNames[i][1]);
 			
 		for(unsigned int i=0;i<geometricalModelFunctorNames.size();i++)
 			geometricalModelDispatcher.add(geometricalModelFunctorNames[i][0],geometricalModelFunctorNames[i][1]);
@@ -410,7 +410,7 @@ void OpenGLRenderingEngine::addCollisionGeometryFunctor(const string& str1,const
 	vector<string> v;
 	v.push_back(str1);
 	v.push_back(str2);
-	collisionGeometryFunctorNames.push_back(v);
+	interactionGeometryFunctorNames.push_back(v);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

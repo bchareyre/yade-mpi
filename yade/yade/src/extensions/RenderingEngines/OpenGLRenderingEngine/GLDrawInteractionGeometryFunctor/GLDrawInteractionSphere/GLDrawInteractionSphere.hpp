@@ -42,7 +42,7 @@ class GLDrawInteractionSphere : public GLDrawInteractionGeometryFunctor
 	private : void subdivideTriangle(Vector3r& v1,Vector3r& v2,Vector3r& v3, int depth);
 	private : void drawSphere(int depth);
 	
-	public : virtual void go(const shared_ptr<CollisionGeometry>&, const shared_ptr<BodyPhysicalParameters>&);
+	public : virtual void go(const shared_ptr<InteractionGeometry>&, const shared_ptr<BodyPhysicalParameters>&);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

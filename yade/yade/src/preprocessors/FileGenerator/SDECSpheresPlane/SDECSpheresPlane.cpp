@@ -16,7 +16,7 @@
 #include "Interaction.hpp"
 #include "BoundingVolumeUpdator.hpp"
 #include "CollisionGeometrySet2AABBFactory.hpp"
-#include "CollisionGeometrySet.hpp"
+#include "InteractionGeometrySet.hpp"
 #include "SDECLinearContactModel.hpp"
 #include "ActionDispatcher.hpp"
 #include "InteractionGeometryDispatcher.hpp"
@@ -73,7 +73,7 @@ string SDECSpheresPlane::generate()
 	shared_ptr<BoundingVolumeUpdator> bvu	= shared_ptr<BoundingVolumeUpdator>(new BoundingVolumeUpdator);
 	bvu->addBVFactories("InteractionSphere","AABB","Sphere2AABBFactory");
 	bvu->addBVFactories("InteractionBox","AABB","Box2AABBFactory");
-	bvu->addBVFactories("CollisionGeometrySet","AABB","CollisionGeometrySet2AABBFactory");
+	bvu->addBVFactories("InteractionGeometrySet","AABB","CollisionGeometrySet2AABBFactory");
 	
 	shared_ptr<ActionDispatcher> ad(new ActionDispatcher);
 	ad->addActionFunctor("ActionForce","RigidBody","ActionForce2RigidBody");
@@ -110,12 +110,12 @@ string SDECSpheresPlane::generate()
 	shared_ptr<AABB> aabb;
 	shared_ptr<Box> box;
 	
-	shared_ptr<CollisionGeometrySet> set(new CollisionGeometrySet());
+	shared_ptr<InteractionGeometrySet> set(new InteractionGeometrySet());
 	set->diffuseColor	= Vector3f(0,0,1);
 	//set->wire		= false;
 	//set->visible		= true;
 	//set->shadowCaster	= false;
-	rootBody->interactionGeometry		= dynamic_pointer_cast<CollisionGeometry>(set);	
+	rootBody->interactionGeometry		= dynamic_pointer_cast<InteractionGeometry>(set);	
 	
 	aabb			= shared_ptr<AABB>(new AABB);
 	aabb->diffuseColor		= Vector3r(0,0,1);
@@ -146,7 +146,7 @@ string SDECSpheresPlane::generate()
 	interactionBox->extents		= groundSize;
 	interactionBox->diffuseColor	= Vector3f(1,1,1);
 		
-	box1->interactionGeometry		= dynamic_pointer_cast<CollisionGeometry>(interactionBox);
+	box1->interactionGeometry		= dynamic_pointer_cast<InteractionGeometry>(interactionBox);
 	box1->geometricalModel		= dynamic_pointer_cast<GeometricalModel>(box);
 	physics->kn		= kn;
 	physics->ks		= ks;
@@ -196,7 +196,7 @@ string SDECSpheresPlane::generate()
 		interactionSphere->diffuseColor	= Vector3f(Mathf::unitRandom(),Mathf::unitRandom(),Mathf::unitRandom());
 		
 		
-		simple->interactionGeometry			= dynamic_pointer_cast<CollisionGeometry>(interactionSphere);
+		simple->interactionGeometry			= dynamic_pointer_cast<InteractionGeometry>(interactionSphere);
 		simple->geometricalModel			= dynamic_pointer_cast<GeometricalModel>(sphere);
 		s->kn			= kn;
 		s->ks			= ks;

@@ -30,15 +30,15 @@ ComplexBody::~ComplexBody()
 
 }
 
-#include "CollisionGeometrySet.hpp"
+#include "InteractionGeometrySet.hpp"
 void ComplexBody::postProcessAttributes(bool deserializing)
 {
 	if (deserializing)
 	{
-		// FIXME : build that with CollisionGeometryFactory
-		shared_ptr<CollisionGeometrySet> set = dynamic_pointer_cast<CollisionGeometrySet>(interactionGeometry);
+		// FIXME : build that with InteractionGeometryFactory
+		shared_ptr<InteractionGeometrySet> set = dynamic_pointer_cast<InteractionGeometrySet>(interactionGeometry);
 		for(unsigned int i=0;i<bodies->size();i++)
-			set->collisionGeometries.push_back((*bodies)[i]->interactionGeometry);
+			set->interactionGeometries.push_back((*bodies)[i]->interactionGeometry);
 
 	// to build bounding volume if there is a boundingvolume updator in the actor list
 	// FIXME : I don't know is this is so dirty to do that here

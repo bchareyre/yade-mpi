@@ -34,7 +34,7 @@
 
 class Sphere2AABBFactory : public BoundingVolumeFactory
 {
-	public : void go(	const shared_ptr<CollisionGeometry>& cm,
+	public : void go(	const shared_ptr<InteractionGeometry>& cm,
 				shared_ptr<BoundingVolume>& bv,
 				const Se3r& se3	);
 };

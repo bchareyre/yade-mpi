@@ -30,7 +30,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "FunctorWrapper.hpp"
-#include "CollisionGeometry.hpp"
+#include "InteractionGeometry.hpp"
 #include "Se3.hpp"
 #include "Interaction.hpp"
 
@@ -43,17 +43,17 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-/*! \brief Abstract interface for all collision functor.
+/*! \brief Abstract interface for all interaction functor.
 
-	Every functions that describe collision between two CollisionGeometries must derive from InteractionGeometryFunctor.
+	Every functions that describe interaction between two CollisionGeometries must derive from InteractionGeometryFunctor.
 */
 
 class InteractionGeometryFunctor : public FunctorWrapper
 		<
 		 bool ,
 		 TYPELIST_5(
-				  const shared_ptr<CollisionGeometry>&
-				, const shared_ptr<CollisionGeometry>&
+				  const shared_ptr<InteractionGeometry>&
+				, const shared_ptr<InteractionGeometry>&
 				, const Se3r&
 				, const Se3r&
 				, shared_ptr<Interaction>&

@@ -75,8 +75,8 @@ string FEMRock::generate()
 // 	poly->wire		= false;
 // 	poly->visible		= true;
 // 	poly->mshFileName 	= "../data/rock.msh";
-// 	femBody->interactionGeometry		= dynamic_pointer_cast<CollisionGeometry>(poly);
-// 	femBody->geometricalModel		= dynamic_pointer_cast<CollisionGeometry>(poly);
+// 	femBody->interactionGeometry		= dynamic_pointer_cast<InteractionGeometry>(poly);
+// 	femBody->geometricalModel		= dynamic_pointer_cast<InteractionGeometry>(poly);
 // 
 // 
 // 
@@ -102,8 +102,8 @@ string FEMRock::generate()
 // 	box->diffuseColor	= Vector3f(1,1,1);
 // 	box->wire		= false;
 // 	box->visible		= true;
-// 	box1->interactionGeometry		= dynamic_pointer_cast<CollisionGeometry>(box);
-// 	box1->geometricalModel		= dynamic_pointer_cast<CollisionGeometry>(box);
+// 	box1->interactionGeometry		= dynamic_pointer_cast<InteractionGeometry>(box);
+// 	box1->geometricalModel		= dynamic_pointer_cast<InteractionGeometry>(box);
 // 
 // 	b = dynamic_pointer_cast<Body>(box1);
 // 	rootBody->bodies->insert(b);

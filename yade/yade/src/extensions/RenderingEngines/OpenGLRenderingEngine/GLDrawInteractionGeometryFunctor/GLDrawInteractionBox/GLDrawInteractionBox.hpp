@@ -34,7 +34,7 @@
 
 class GLDrawInteractionBox : public GLDrawInteractionGeometryFunctor
 {
-	public : virtual void go(const shared_ptr<CollisionGeometry>&, const shared_ptr<BodyPhysicalParameters>&);
+	public : virtual void go(const shared_ptr<InteractionGeometry>&, const shared_ptr<BodyPhysicalParameters>&);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -15,7 +15,7 @@
 #include "Interaction.hpp"
 #include "BoundingVolumeUpdator.hpp"
 #include "CollisionGeometrySet2AABBFactory.hpp"
-#include "CollisionGeometrySet.hpp"
+#include "InteractionGeometrySet.hpp"
 #include "SDECLinearContactModel.hpp"
 #include "ActionDispatcher.hpp"
 #include "InteractionGeometryDispatcher.hpp"
@@ -73,7 +73,7 @@ string SDECLinkedSpheres::generate()
 	shared_ptr<BoundingVolumeUpdator> bvu	= shared_ptr<BoundingVolumeUpdator>(new BoundingVolumeUpdator);
 	bvu->addBVFactories("InteractionSphere","AABB","Sphere2AABBFactory");
 	bvu->addBVFactories("InteractionBox","AABB","Box2AABBFactory");
-	bvu->addBVFactories("CollisionGeometrySet","AABB","CollisionGeometrySet2AABBFactory");
+	bvu->addBVFactories("InteractionGeometrySet","AABB","CollisionGeometrySet2AABBFactory");
 	
 	shared_ptr<ActionDispatcher> ad(new ActionDispatcher);
 	ad->addActionFunctor("ActionForce","RigidBody","ActionForce2RigidBody");
@@ -101,13 +101,13 @@ string SDECLinkedSpheres::generate()
 	physics->velocity	= Vector3r::ZERO;
 	physics->acceleration	= Vector3r::ZERO;
 	
-	shared_ptr<CollisionGeometrySet> set(new CollisionGeometrySet());
+	shared_ptr<InteractionGeometrySet> set(new InteractionGeometrySet());
 	set->diffuseColor	= Vector3f(0,0,1);
 
 	shared_ptr<AABB> aabb(new AABB);
 	aabb->diffuseColor	= Vector3r(0,0,1);
 	
-	rootBody->interactionGeometry		= dynamic_pointer_cast<CollisionGeometry>(set);	
+	rootBody->interactionGeometry		= dynamic_pointer_cast<InteractionGeometry>(set);	
 	rootBody->boundingVolume		= dynamic_pointer_cast<BoundingVolume>(aabb);
 	rootBody->physicalParameters = physics;
 	

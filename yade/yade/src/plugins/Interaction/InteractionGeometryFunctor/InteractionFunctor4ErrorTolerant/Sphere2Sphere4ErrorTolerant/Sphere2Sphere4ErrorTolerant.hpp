@@ -32,16 +32,16 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-/*! \brief Provide collision handling between a axis aligned box and a sphere in terms of ClosestFeatures */
+/*! \brief Provide interaction handling between a axis aligned box and a sphere in terms of ClosestFeatures */
 class Sphere2Sphere4ErrorTolerant : public InteractionGeometryFunctor
 {
-	public : virtual bool go(		const shared_ptr<CollisionGeometry>& cm1,
-						const shared_ptr<CollisionGeometry>& cm2,
+	public : virtual bool go(		const shared_ptr<InteractionGeometry>& cm1,
+						const shared_ptr<InteractionGeometry>& cm2,
 						const Se3r& se31,
 						const Se3r& se32,
 						shared_ptr<Interaction>& c);
-	public : virtual bool goReverse(	const shared_ptr<CollisionGeometry>& cm1,
-						const shared_ptr<CollisionGeometry>& cm2,
+	public : virtual bool goReverse(	const shared_ptr<InteractionGeometry>& cm1,
+						const shared_ptr<InteractionGeometry>& cm2,
 						const Se3r& se31,
 						const Se3r& se32,
 						shared_ptr<Interaction>& c);

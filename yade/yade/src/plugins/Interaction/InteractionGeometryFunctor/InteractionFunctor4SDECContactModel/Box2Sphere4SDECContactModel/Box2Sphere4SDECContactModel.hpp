@@ -32,16 +32,16 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-/*! \brief Provide collision handling between an oriented box and a sphere in terms of ClosestFeatures */
+/*! \brief Provide interaction handling between an oriented box and a sphere in terms of ClosestFeatures */
 class Box2Sphere4SDECContactModel : public InteractionGeometryFunctor
 {
-	public : virtual bool go(		const shared_ptr<CollisionGeometry>& cm1,
-						const shared_ptr<CollisionGeometry>& cm2,
+	public : virtual bool go(		const shared_ptr<InteractionGeometry>& cm1,
+						const shared_ptr<InteractionGeometry>& cm2,
 						const Se3r& se31,
 						const Se3r& se32,
 						shared_ptr<Interaction>& c);
-	public : virtual bool goReverse(	const shared_ptr<CollisionGeometry>& cm1,
-						const shared_ptr<CollisionGeometry>& cm2,
+	public : virtual bool goReverse(	const shared_ptr<InteractionGeometry>& cm1,
+						const shared_ptr<InteractionGeometry>& cm2,
 						const Se3r& se31,
 						const Se3r& se32,
 						shared_ptr<Interaction>& c);

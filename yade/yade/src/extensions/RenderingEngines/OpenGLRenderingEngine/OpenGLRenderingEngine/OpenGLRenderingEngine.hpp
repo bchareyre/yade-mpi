@@ -49,12 +49,12 @@ class OpenGLRenderingEngine : public RenderingEngine
 	public : bool useFastShadowVolume;
 	
 	private : DynLibDispatcher< BoundingVolume    , GLDrawBoundingVolumeFunctor, void , TYPELIST_1(const shared_ptr<BoundingVolume>&) > boundingVolumeDispatcher;
-	private : DynLibDispatcher< CollisionGeometry , GLDrawInteractionGeometryFunctor, void , TYPELIST_2(const shared_ptr<CollisionGeometry>&, const shared_ptr<BodyPhysicalParameters>&) >interactionGeometryDispatcher;
+	private : DynLibDispatcher< InteractionGeometry , GLDrawInteractionGeometryFunctor, void , TYPELIST_2(const shared_ptr<InteractionGeometry>&, const shared_ptr<BodyPhysicalParameters>&) >interactionGeometryDispatcher;
 	private : DynLibDispatcher< GeometricalModel  , GLDrawGeometricalModelFunctor, void , TYPELIST_2(const shared_ptr<GeometricalModel>&, const shared_ptr<BodyPhysicalParameters>&) > geometricalModelDispatcher;
 	private : DynLibDispatcher< GeometricalModel  , GLDrawShadowVolumeFunctor, void , TYPELIST_3(const shared_ptr<GeometricalModel>&, const shared_ptr<BodyPhysicalParameters>&, const Vector3r& ) > shadowVolumeDispatcher;
 
 	private : vector<vector<string> >  boundingVolumeFunctorNames;
-	private : vector<vector<string> >  collisionGeometryFunctorNames;
+	private : vector<vector<string> >  interactionGeometryFunctorNames;
 	private : vector<vector<string> >  geometricalModelFunctorNames;
 	private : vector<vector<string> >  shadowVolumeFunctorNames;
 	public  : void addBoundingVolumeFunctor(const string& str1,const string& str2);

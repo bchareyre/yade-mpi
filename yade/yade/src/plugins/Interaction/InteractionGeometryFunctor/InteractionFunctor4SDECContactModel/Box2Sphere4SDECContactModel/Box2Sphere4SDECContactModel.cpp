@@ -29,8 +29,8 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //FIXME return type should be shared_ptr<Interaction>
-bool Box2Sphere4SDECContactModel::go(		const shared_ptr<CollisionGeometry>& cm1,
-						const shared_ptr<CollisionGeometry>& cm2,
+bool Box2Sphere4SDECContactModel::go(		const shared_ptr<InteractionGeometry>& cm1,
+						const shared_ptr<InteractionGeometry>& cm2,
 						const Se3r& se31,
 						const Se3r& se32,
 						shared_ptr<Interaction>& c)
@@ -168,8 +168,8 @@ bool Box2Sphere4SDECContactModel::go(		const shared_ptr<CollisionGeometry>& cm1,
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool Box2Sphere4SDECContactModel::goReverse(	const shared_ptr<CollisionGeometry>& cm1,
-						const shared_ptr<CollisionGeometry>& cm2,
+bool Box2Sphere4SDECContactModel::goReverse(	const shared_ptr<InteractionGeometry>& cm1,
+						const shared_ptr<InteractionGeometry>& cm2,
 						const Se3r& se31,
 						const Se3r& se32,
 						shared_ptr<Interaction>& c)

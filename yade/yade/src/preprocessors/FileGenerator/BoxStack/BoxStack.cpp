@@ -74,8 +74,8 @@ string BoxStack::generate()
 // 	box->diffuseColor	= Vector3f(1,1,1);
 // 	box->wire		= false;
 // 	box->visible		= true;
-// 	box1->interactionGeometry		= dynamic_pointer_cast<CollisionGeometry>(box);
-// 	box1->geometricalModel		= dynamic_pointer_cast<CollisionGeometry>(box);
+// 	box1->interactionGeometry		= dynamic_pointer_cast<InteractionGeometry>(box);
+// 	box1->geometricalModel		= dynamic_pointer_cast<InteractionGeometry>(box);
 // 
 // 	shared_ptr<Body> b;
 // 	b=dynamic_pointer_cast<Body>(box1);
@@ -112,8 +112,8 @@ string BoxStack::generate()
 // 			box->diffuseColor	= Vector3f(Mathr::unitRandom(),Mathr::unitRandom(),Mathr::unitRandom());
 // 			box->wire		= false;
 // 			box->visible		= true;
-// 			boxi->interactionGeometry		= dynamic_pointer_cast<CollisionGeometry>(box);
-// 			boxi->geometricalModel		= dynamic_pointer_cast<CollisionGeometry>(box);
+// 			boxi->interactionGeometry		= dynamic_pointer_cast<InteractionGeometry>(box);
+// 			boxi->geometricalModel		= dynamic_pointer_cast<InteractionGeometry>(box);
 // 
 // 			b=dynamic_pointer_cast<Body>(boxi);
 // 			rootBody->bodies->insert(b);

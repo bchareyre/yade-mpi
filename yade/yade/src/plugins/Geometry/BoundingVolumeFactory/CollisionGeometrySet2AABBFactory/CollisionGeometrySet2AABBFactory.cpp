@@ -22,22 +22,22 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
  
 #include "CollisionGeometrySet2AABBFactory.hpp"
-#include "CollisionGeometrySet.hpp"
+#include "InteractionGeometrySet.hpp"
 #include "AABB.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void CollisionGeometrySet2AABBFactory::go(	const shared_ptr<CollisionGeometry>& cm,
+void CollisionGeometrySet2AABBFactory::go(	const shared_ptr<InteractionGeometry>& cm,
 						shared_ptr<BoundingVolume>& bv,
 						const Se3r& 	)
 {
-	shared_ptr<CollisionGeometrySet> set = dynamic_pointer_cast<CollisionGeometrySet>(cm);
+	shared_ptr<InteractionGeometrySet> set = dynamic_pointer_cast<InteractionGeometrySet>(cm);
 	
 	shared_ptr<AABB> aabb = dynamic_pointer_cast<AABB>(bv);
 	
-	vector<shared_ptr<CollisionGeometry> >::iterator si = set->collisionGeometries.begin();
-	vector<shared_ptr<CollisionGeometry> >::iterator siEnd = set->collisionGeometries.end();
+	vector<shared_ptr<InteractionGeometry> >::iterator si = set->interactionGeometries.begin();
+	vector<shared_ptr<InteractionGeometry> >::iterator siEnd = set->interactionGeometries.end();
 	Vector3r max(-Mathr::MAX_REAL,-Mathr::MAX_REAL,-Mathr::MAX_REAL);
 	Vector3r min(Mathr::MAX_REAL,Mathr::MAX_REAL,Mathr::MAX_REAL);
 	for( ; si!=siEnd ; ++si)

@@ -23,5 +23,5 @@ void BroadInteractor::registerAttributes()
 
 void BroadInteractor::action(Body* b)
 {
-	this->broadCollisionTest(b);
+	this->broadInteractionTest(b);
 }

@@ -2,7 +2,7 @@
  #include "Terrain.hpp"
  #include "AABB.hpp"
   
-void Terrain2AABBFactory::go(	const shared_ptr<CollisionGeometry>& /*cm*/,
+void Terrain2AABBFactory::go(	const shared_ptr<InteractionGeometry>& /*cm*/,
 							shared_ptr<BoundingVolume>& /*bv*/,
 							const Se3r& 	)
 {

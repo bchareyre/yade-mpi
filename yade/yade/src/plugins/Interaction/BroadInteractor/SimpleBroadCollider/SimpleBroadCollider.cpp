@@ -1,20 +1,20 @@
-#include "SimpleBroadCollider.hpp"
+#include "SimpleBroadInteractor.hpp"
 //#include "BVOverlapper.hpp"
 #include "Body.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-SimpleBroadCollider::SimpleBroadCollider () : BroadInteractor()
+SimpleBroadInteractor::SimpleBroadInteractor () : BroadInteractor()
 {
-	nbPotentialCollisions = 0;
+	nbPotentialInteractions = 0;
 	//overlapper = shared_ptr<Overlapper>(new BVOverlapper());
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-SimpleBroadCollider::~SimpleBroadCollider ()
+SimpleBroadInteractor::~SimpleBroadInteractor ()
 {
 
 }
@@ -22,7 +22,7 @@ SimpleBroadCollider::~SimpleBroadCollider ()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void SimpleBroadCollider::postProcessAttributes(bool)
+void SimpleBroadInteractor::postProcessAttributes(bool)
 {
 
 }
@@ -30,7 +30,7 @@ void SimpleBroadCollider::postProcessAttributes(bool)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void SimpleBroadCollider::registerAttributes()
+void SimpleBroadInteractor::registerAttributes()
 {
 }
 
@@ -38,9 +38,9 @@ void SimpleBroadCollider::registerAttributes()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void SimpleBroadCollider::broadCollisionTest(Body * /*body*/)
+void SimpleBroadInteractor::broadInteractionTest(Body * /*body*/)
 {
-	//nbPotentialCollisions=0;
+	//nbPotentialInteractions=0;
 
 	//interactions.clear();
 
@@ -53,7 +53,7 @@ void SimpleBroadCollider::broadCollisionTest(Body * /*body*/)
 			if ( !(bodies[i]->isDynamic==false && bodies[j]->isDynamic==false) && overlapper->overlapp(bv1,bv2))
 			{
 				interactions.push_back(shared_ptr<Interaction>(new Interaction(i,j)));
-				nbPotentialCollisions++;
+				nbPotentialInteractions++;
 			}
 		}
 	}*/

@@ -18,7 +18,7 @@
 #include "ActionDispatcher.hpp"
 #include "BoundingVolumeUpdator.hpp"
 #include "CollisionGeometrySet2AABBFactory.hpp"
-#include "CollisionGeometrySet.hpp"
+#include "InteractionGeometrySet.hpp"
 #include "Particle.hpp"
 #include "SpringGeometry.hpp"
 #include "SpringPhysics.hpp"
@@ -84,7 +84,7 @@ string HangingCloth::generate()
 	shared_ptr<BoundingVolumeUpdator> bvu	= shared_ptr<BoundingVolumeUpdator>(new BoundingVolumeUpdator);
 	bvu->addBVFactories("InteractionSphere","AABB","Sphere2AABBFactory");
 	bvu->addBVFactories("InteractionBox","AABB","Box2AABBFactory");
-	bvu->addBVFactories("CollisionGeometrySet","AABB","CollisionGeometrySet2AABBFactory");
+	bvu->addBVFactories("InteractionGeometrySet","AABB","CollisionGeometrySet2AABBFactory");
 	
 	shared_ptr<ActionDispatcher> ad(new ActionDispatcher);
 	ad->addActionFunctor("ActionForce","Particle","ActionForce2Particle");
@@ -110,7 +110,7 @@ string HangingCloth::generate()
 	
 	rootBody->isDynamic	= false;
 
-	shared_ptr<CollisionGeometrySet> set(new CollisionGeometrySet());
+	shared_ptr<InteractionGeometrySet> set(new InteractionGeometrySet());
 	set->diffuseColor	= Vector3f(0,0,1);
 
 	shared_ptr<AABB> aabb(new AABB);

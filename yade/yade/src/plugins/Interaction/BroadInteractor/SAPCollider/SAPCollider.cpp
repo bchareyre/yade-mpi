@@ -21,7 +21,7 @@ SAPCollider::SAPCollider () : BroadInteractor()
 	minimums = new Real[3*maxObject];
 	maximums = new Real[3*maxObject];
 
-	nbPotentialCollisions = 0;
+	nbPotentialInteractions = 0;
 
 	overlappingBB.clear();
 	overlappingBB.resize(maxObject);
@@ -68,7 +68,7 @@ void SAPCollider::registerAttributes()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void SAPCollider::broadCollisionTest(Body* body)
+void SAPCollider::broadInteractionTest(Body* body)
 {
 
 	ComplexBody * ncb = dynamic_cast<ComplexBody*>(body);
@@ -122,7 +122,7 @@ void SAPCollider::broadCollisionTest(Body* body)
 // FIXME : correct that
 	ncb->interactions->clear();
 
-	nbPotentialCollisions = 0;
+	nbPotentialInteractions = 0;
 	for(i=0;i<nbObjects;i++)
 	{
 		it = overlappingBB[i].begin();
@@ -133,7 +133,7 @@ void SAPCollider::broadCollisionTest(Body* body)
 //			if (!(bodies->find(i)->isDynamic==false && bodies->find(*it)->isDynamic==false))
 			if (!((*bodies)[i]->isDynamic==false && (*bodies)[*it]->isDynamic==false))
 			{
-				nbPotentialCollisions++;
+				nbPotentialInteractions++;
 				shared_ptr<Interaction> inter(new Interaction(i,*it));
 				ncb->interactions->insert(inter);
 			}
@@ -147,7 +147,7 @@ void SAPCollider::broadCollisionTest(Body* body)
 void SAPCollider::updateIds(unsigned int nbElements)
 {
 
-	// the first time broadCollisionTest is called nbObject=0
+	// the first time broadInteractionTest is called nbObject=0
 	if (nbElements!=nbObjects)
 	{
 		int begin,end;

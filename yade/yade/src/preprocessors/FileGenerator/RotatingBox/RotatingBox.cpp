@@ -15,7 +15,7 @@
 #include "SDECDiscreteElement.hpp"
 #include "BoundingVolumeUpdator.hpp"
 #include "CollisionGeometrySet2AABBFactory.hpp"
-#include "CollisionGeometrySet.hpp"
+#include "InteractionGeometrySet.hpp"
 
 RotatingBox::RotatingBox () : FileGenerator()
 {
@@ -53,7 +53,7 @@ string RotatingBox::generate()
 // 	shared_ptr<BoundingVolumeUpdator> bvu	= shared_ptr<BoundingVolumeUpdator>(new BoundingVolumeUpdator);
 // 	bvu->addBVFactories("Sphere","AABB","Sphere2AABBFactory");
 // 	bvu->addBVFactories("Box","AABB","Box2AABBFactory");
-// 	bvu->addBVFactories("CollisionGeometrySet","AABB","CollisionGeometrySet2AABBFactory");
+// 	bvu->addBVFactories("InteractionGeometrySet","AABB","CollisionGeometrySet2AABBFactory");
 // 
 // 
 // 	shared_ptr<Rotor> kinematic = shared_ptr<Rotor>(new Rotor);
@@ -98,8 +98,8 @@ string RotatingBox::generate()
 // 	box->wire		= false;
 // 	box->visible		= true;
 // 	box->shadowCaster	= false;
-// 	box1->interactionGeometry		= dynamic_pointer_cast<CollisionGeometry>(box);
-// 	box1->geometricalModel		= dynamic_pointer_cast<CollisionGeometry>(box);
+// 	box1->interactionGeometry		= dynamic_pointer_cast<InteractionGeometry>(box);
+// 	box1->geometricalModel		= dynamic_pointer_cast<InteractionGeometry>(box);
 // 	box1->kn		= 100000;
 // 	box1->ks		= 10000;
 // 
@@ -121,8 +121,8 @@ string RotatingBox::generate()
 // 	box->wire		= true;
 // 	box->visible		= true;
 // 	box->shadowCaster	= false;
-// 	box2->interactionGeometry		= dynamic_pointer_cast<CollisionGeometry>(box);
-// 	box2->geometricalModel		= dynamic_pointer_cast<CollisionGeometry>(box);
+// 	box2->interactionGeometry		= dynamic_pointer_cast<InteractionGeometry>(box);
+// 	box2->geometricalModel		= dynamic_pointer_cast<InteractionGeometry>(box);
 // 	box2->kn		= 100000;
 // 	box2->ks		= 10000;
 // 
@@ -144,8 +144,8 @@ string RotatingBox::generate()
 // 	box->wire		= true;
 // 	box->visible		= true;
 // 	box->shadowCaster	= false;	
-// 	box3->interactionGeometry		= dynamic_pointer_cast<CollisionGeometry>(box);
-// 	box3->geometricalModel		= dynamic_pointer_cast<CollisionGeometry>(box);
+// 	box3->interactionGeometry		= dynamic_pointer_cast<InteractionGeometry>(box);
+// 	box3->geometricalModel		= dynamic_pointer_cast<InteractionGeometry>(box);
 // 	box3->kn		= 100000;
 // 	box3->ks		= 10000;
 // 
@@ -167,8 +167,8 @@ string RotatingBox::generate()
 // 	box->wire		= true;
 // 	box->visible		= true;
 // 	box->shadowCaster	= false;		
-// 	box4->interactionGeometry		= dynamic_pointer_cast<CollisionGeometry>(box);
-// 	box4->geometricalModel		= dynamic_pointer_cast<CollisionGeometry>(box);
+// 	box4->interactionGeometry		= dynamic_pointer_cast<InteractionGeometry>(box);
+// 	box4->geometricalModel		= dynamic_pointer_cast<InteractionGeometry>(box);
 // 	box4->kn		= 100000;
 // 	box4->ks		= 10000;
 // 
@@ -190,8 +190,8 @@ string RotatingBox::generate()
 // 	box->wire		= true;
 // 	box->visible		= true;
 // 	box->shadowCaster	= false;		
-// 	box5->interactionGeometry		= dynamic_pointer_cast<CollisionGeometry>(box);
-// 	box5->geometricalModel		= dynamic_pointer_cast<CollisionGeometry>(box);
+// 	box5->interactionGeometry		= dynamic_pointer_cast<InteractionGeometry>(box);
+// 	box5->geometricalModel		= dynamic_pointer_cast<InteractionGeometry>(box);
 // 	box5->kn		= 100000;
 // 	box5->ks		= 10000;
 // 
@@ -213,8 +213,8 @@ string RotatingBox::generate()
 // 	box->wire		= true;
 // 	box->visible		= true;
 // 	box->shadowCaster	= false;		
-// 	box6->interactionGeometry		= dynamic_pointer_cast<CollisionGeometry>(box);
-// 	box6->geometricalModel		= dynamic_pointer_cast<CollisionGeometry>(box);
+// 	box6->interactionGeometry		= dynamic_pointer_cast<InteractionGeometry>(box);
+// 	box6->geometricalModel		= dynamic_pointer_cast<InteractionGeometry>(box);
 // 	box6->kn		= 100000;
 // 	box6->ks		= 10000;
 // 
@@ -236,8 +236,8 @@ string RotatingBox::generate()
 // 	box->wire		= true;
 // 	box->visible		= true;
 // 	box->shadowCaster	= false;		
-// 	box7->interactionGeometry		= dynamic_pointer_cast<CollisionGeometry>(box);
-// 	box7->geometricalModel		= dynamic_pointer_cast<CollisionGeometry>(box);
+// 	box7->interactionGeometry		= dynamic_pointer_cast<InteractionGeometry>(box);
+// 	box7->geometricalModel		= dynamic_pointer_cast<InteractionGeometry>(box);
 // 	box7->kn		= 100000;
 // 	box7->ks		= 10000;
 // 
@@ -285,7 +285,7 @@ string RotatingBox::generate()
 // 		sphere->wire		= false;
 // 		sphere->visible		= true;
 // 		sphere->shadowCaster	= true;	
-// 		s->interactionGeometry			= dynamic_pointer_cast<CollisionGeometry>(sphere);
+// 		s->interactionGeometry			= dynamic_pointer_cast<InteractionGeometry>(sphere);
 // 		s->geometricalModel			= dynamic_pointer_cast<GeometricalModel>(sphere);
 // 		s->kn			= 100000;
 // 		s->ks			= 10000;
@@ -327,8 +327,8 @@ string RotatingBox::generate()
 // 				box->wire		= false;
 // 				box->visible		= true;
 // 				box->shadowCaster	= true;	
-// 				boxi->interactionGeometry		= dynamic_pointer_cast<CollisionGeometry>(box);
-// 				boxi->geometricalModel		= dynamic_pointer_cast<CollisionGeometry>(box);
+// 				boxi->interactionGeometry		= dynamic_pointer_cast<InteractionGeometry>(box);
+// 				boxi->geometricalModel		= dynamic_pointer_cast<InteractionGeometry>(box);
 // 
 // 				b=dynamic_pointer_cast<Body>(boxi);
 // 				rootBody->bodies->insert(b);

@@ -28,25 +28,25 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "GeometricalModel.hpp"
-#include "CollisionGeometry.hpp"
+#include "InteractionGeometry.hpp"
 #include "Serializable.hpp"
 #include "Se3.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-/*! \brief Abstract interface for all collision model factories.
-	It is used for creating a collision model from a geometrical model during runtime.
-	This is very useful when it is not trivial to build the collision model from the geometrical model. For example if you want to build an sphere tree from a polyhedron, it is not easy to write by hand into the configuration file the center and size of all spheres. Instead you can use a CollisionGeometryFactory that will compute for you the correct values.
+/*! \brief Abstract interface for all interaction model factories.
+	It is used for creating a interaction model from a geometrical model during runtime.
+	This is very useful when it is not trivial to build the interaction model from the geometrical model. For example if you want to build an sphere tree from a polyhedron, it is not easy to write by hand into the configuration file the center and size of all spheres. Instead you can use a InteractionGeometryFactory that will compute for you the correct values.
 */
-class CollisionGeometryFactory : public Factorable
+class InteractionGeometryFactory : public Factorable
 {	
 	
 	// construction
-	public : CollisionGeometryFactory ();
-	public : virtual ~CollisionGeometryFactory ();
+	public : InteractionGeometryFactory ();
+	public : virtual ~InteractionGeometryFactory ();
 	
-	public : virtual shared_ptr<CollisionGeometry> buildCollisionGeometry(const shared_ptr<GeometricalModel> gm, const Se3r& se3) = 0;
+	public : virtual shared_ptr<InteractionGeometry> buildCollisionGeometry(const shared_ptr<GeometricalModel> gm, const Se3r& se3) = 0;
 
 };
 

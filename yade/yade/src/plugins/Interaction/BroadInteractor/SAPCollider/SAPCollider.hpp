@@ -35,8 +35,8 @@ class SAPCollider : public BroadInteractor
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-	// number of potential collision = number of colliding AABB
-	protected : int nbPotentialCollisions;
+	// number of potential interactions = number of colliding AABB
+	protected : int nbPotentialInteractions;
 
 	// maximum number of object that that collider can handle
 	protected : unsigned int maxObject;
@@ -53,7 +53,7 @@ class SAPCollider : public BroadInteractor
 	// AABB extremity of the sphere number "id" projected onto the Z axis
 	protected : std::vector<AABBBound*> zBounds;
 
-	// collection of AABB that are in collision
+	// collection of AABB that are in interaction
 	protected : std::vector< std::set<unsigned int> > overlappingBB;
 
 	// upper right corner of the AABB of the objects =>  for spheres = center[i]-radius
@@ -75,13 +75,13 @@ class SAPCollider : public BroadInteractor
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-	// return a list "interactions" of pairs of Body which Bounding volume are in collisions
-	public : void broadCollisionTest(Body * body);
+	// return a list "interactions" of pairs of Body which Bounding volume are in potential interaction
+	public : void broadInteractionTest(Body * body);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-	// Used the first time broadCollisionTest is called, to initialize and sort the xBounds, yBounds,
+	// Used the first time broadInteractionTest is called, to initialize and sort the xBounds, yBounds,
 	// and zBounds arrays and to initialize the overlappingBB collection
 	protected : void updateIds(unsigned int nbElements);
 
@@ -97,7 +97,7 @@ class SAPCollider : public BroadInteractor
 	// update the "value" field of the xBounds, yBounds, zBounds arrays
 	protected : void updateBounds(int nbElements);
 
-	// Used the first time broadCollisionTest is called
+	// Used the first time broadInteractionTest is called
 	// It is necessary to initialise the overlapping AABB collection because this collection is only
 	// incrementally udated each time step
 	protected : void findOverlappingBB(std::vector<AABBBound*>& bounds, int nbElements);

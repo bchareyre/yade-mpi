@@ -28,7 +28,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "FunctorWrapper.hpp"
-#include "CollisionGeometry.hpp"
+#include "InteractionGeometry.hpp"
 #include "BodyPhysicalParameters.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -37,7 +37,7 @@
 class GLDrawInteractionGeometryFunctor : public FunctorWrapper
 		<
 		 void ,
-		 TYPELIST_2(const shared_ptr<CollisionGeometry>&, const shared_ptr<BodyPhysicalParameters>&) 
+		 TYPELIST_2(const shared_ptr<InteractionGeometry>&, const shared_ptr<BodyPhysicalParameters>&) 
 		>
 {
 };

@@ -28,7 +28,7 @@
 // 
 // using namespace std;
 // 
-// Polyhedron::Polyhedron () : CollisionGeometry()
+// Polyhedron::Polyhedron () : InteractionGeometry()
 // {
 // 	createIndex();
 // }
@@ -40,7 +40,7 @@
 // 
 // void Polyhedron::postProcessAttributes(bool deserializing)
 // {
-// 	CollisionGeometry::postProcessAttributes(deserializing);
+// 	InteractionGeometry::postProcessAttributes(deserializing);
 // 
 // 	if(deserializing)
 // 	{
@@ -61,7 +61,7 @@
 // 
 // void Polyhedron::registerAttributes()
 // {
-// 	CollisionGeometry::registerAttributes();
+// 	InteractionGeometry::registerAttributes();
 // 	REGISTER_ATTRIBUTE(mshFileName);
 // }
 // 

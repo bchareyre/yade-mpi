@@ -50,7 +50,7 @@ PersistentSAPCollider::PersistentSAPCollider() : BroadInteractor()
 	minimums.clear();
 	maximums.clear();
 
-//	nbPotentialCollisions = 0;
+//	nbPotentialInteractions = 0;
 
 	//overlappingBB.clear();
 // 	overlappingBB.resize(maxObject);
@@ -98,7 +98,7 @@ void PersistentSAPCollider::registerAttributes()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void PersistentSAPCollider::broadCollisionTest(Body* body)
+void PersistentSAPCollider::broadInteractionTest(Body* body)
 {
 
 	ComplexBody * ncb = dynamic_cast<ComplexBody*>(body);
@@ -138,7 +138,7 @@ void PersistentSAPCollider::broadCollisionTest(Body* body)
 	for( interactions->gotoFirstPotential() ; interactions->notAtEndPotential() ; interactions->gotoNextPotential())
 	{
 		// FIXME : remove this isNew flag and test if interactionPhysic ?
-		if (interactions->getCurrent()->isReal) // if a collision was only potential then no geometry was created for it and so this time it is still a new one
+		if (interactions->getCurrent()->isReal) // if a interaction was only potential then no geometry was created for it and so this time it is still a new one
 			interactions->getCurrent()->isNew = false;
 		interactions->getCurrent()->isReal = false;
 	}
@@ -159,7 +159,7 @@ void PersistentSAPCollider::broadCollisionTest(Body* body)
 void PersistentSAPCollider::updateIds(unsigned int nbElements)
 {
 
-	// the first time broadCollisionTest is called nbObject=0
+	// the first time broadInteractionTest is called nbObject=0
 	if (nbElements!=nbObjects)
 	{
 		int begin,end;
