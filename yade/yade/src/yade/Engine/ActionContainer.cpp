@@ -29,7 +29,7 @@
 
 ActionContainer::ActionContainer() : Serializable()
 {
-
+	action.clear();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -48,3 +48,35 @@ void ActionContainer::registerAttributes()
 	REGISTER_ATTRIBUTE(action);
 };
 
+/*
+void ActionContainer::preProcessAttributes(bool deserializing)
+{
+	if(deserializing)
+	{
+		action.clear();
+	}
+	else
+	{
+		action.clear();
+		for( this->gotoFirst() ; this->notAtEnd() ; this->gotoNext() )
+			action.push_back(this->getCurrent());
+	}
+};
+
+void ActionContainer::postProcessAttributes(bool deserializing)
+{
+	if(deserializing)
+	{
+		this->clear();
+		vector<shared_ptr<Action> >::iterator it    = action.begin();
+		vector<shared_ptr<Action> >::iterator itEnd = action.end();
+		for( ; it != itEnd ; ++it)
+			this->insert(*it);
+		action.clear();
+	}
+	else
+	{
+		action.clear();
+	}
+};
+*/

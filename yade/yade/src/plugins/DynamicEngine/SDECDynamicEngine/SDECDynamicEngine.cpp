@@ -498,7 +498,8 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 				else
 					sign=-1;
 				// FIXME - this must be a parameter in .xml !!!
-				forces[i][j] -= 0.3*f*sign;
+				forces[    i  ] [       j        ] -= 0.3*f*sign;
+				//    [ BodyId] [ (x,y,z): index ]
 			}
 
 			Real m = moments[i].length();
@@ -511,7 +512,8 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 					sign=1;
 				else
 					sign=-1;
-				moments[i][j] -= 0.3*m*sign;
+				moments[   i   ] [       j        ] -= 0.3*m*sign;
+				//     [ BodyId] [ (x,y,z): index ]
 			}
 
 			de->acceleration += forces[i]*de->invMass;

@@ -1,16 +1,116 @@
 #include "ActionVecVec.hpp"
 #include "Body.hpp"
 
-/*
+
 ActionVecVec::ActionVecVec()
 {
-//	clear();
+	clear();
 }
 
 ActionVecVec::~ActionVecVec()
 {
 }
-*/
+
+
+void ActionVecVec::clear()
+{
+}
+
+unsigned int ActionVecVec::size()
+{
+}
+	
+// adds Action acting on one body,
+// it is mathematically added if Action of this polymorphic type already exists,
+// if it doesn't exist, then it is appended to stored list of Actions for that body
+void ActionVecVec::add(shared_ptr<Action>&, unsigned int )
+{
+}
+// adds Action that acts on two bodies.
+// on first body it is substarcted,
+// to second body it is added
+void ActionVecVec::add(shared_ptr<Action>&, unsigned int , unsigned int)
+{
+}
+	
+// allows to set current polymorphic Action Type on which other functions will work:
+// function that use this are: eraseAction, operator[]
+void ActionVecVec::setCurrentActionType(shared_ptr<Action>)
+{
+}
+		
+// deletes Action of given polymorphic type from body that has given Id
+bool ActionVecVec::eraseAction(shared_ptr<Action>&, unsigned int)
+{
+}
+
+// deletes Action of given polymorphic type from body that has given Id,
+// the polymorphic type is selected by setCurrentActionType()
+bool ActionVecVec::eraseAction(unsigned int)
+{
+}
+
+// deletes all Actions in a body of given Id
+bool ActionVecVec::erase(unsigned int)
+{
+}
+	
+// finds and returns action of given polymorphic type, for body of given Id,
+// returns empty shared_ptr and false if this Action doesn't exists for chosen body
+bool ActionVecVec::find(shared_ptr<Action>&, unsigned int) const
+{
+}
+
+// same as above, polymorphic Action type is selected with setCurrentActionType
+shared_ptr<Action>& ActionVecVec::operator[](unsigned int)
+{
+}
+
+const shared_ptr<Action>& ActionVecVec::operator[](unsigned int) const
+{
+}
+
+// looping over Bodies, and their Actions (with setCurrentActionType)
+void ActionVecVec::gotoFirst()
+{
+}
+
+bool ActionVecVec::notAtEnd()
+{
+}
+
+void ActionVecVec::gotoNext()
+{
+}
+
+// returns Action selected by setCurrentActionType, for current Body
+shared_ptr<Action> ActionVecVec::getCurrent()
+{
+}
+
+void ActionVecVec::pushIterator()
+{
+}
+
+void ActionVecVec::popIterator()
+{
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /*
 unsigned int ActionVecVec::insert(shared_ptr<Body>& b)
 {
