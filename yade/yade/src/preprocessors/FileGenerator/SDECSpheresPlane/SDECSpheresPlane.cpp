@@ -14,7 +14,8 @@
 #include "SDECDynamicEngine.hpp"
 #include "SDECDiscreteElement.hpp"
 #include "SDECPermanentLink.hpp"
-#include "Contact.hpp"
+#include "Interaction.hpp"
+
 
 SDECSpheresPlane::SDECSpheresPlane () : Serializable()
 {
@@ -44,15 +45,15 @@ void SDECSpheresPlane::exec()
 	shared_ptr<NarrowCollider> nc	= shared_ptr<NarrowCollider>(new SimpleNarrowCollider);
 	nc->addCollisionFunctor("Sphere","Sphere","Sphere2Sphere4SDECContactModel");
 	nc->addCollisionFunctor("Sphere","Box","Box2Sphere4SDECContactModel");
-	
+
 	rootBody->actors.resize(3);
 	rootBody->actors[0] 		= shared_ptr<Actor>(new SAPCollider);
 	rootBody->actors[1] 		= nc;
 	rootBody->actors[2] 		= shared_ptr<Actor>(new SDECDynamicEngine);
-	
-	rootBody->permanentInteractions.resize(1);
-	rootBody->permanentInteractions[0] = shared_ptr<Contact>(new Contact);
-	rootBody->permanentInteractions[0]->interactionGeometry = shared_ptr<SDECPermanentLink>(new SDECPermanentLink);
+
+	rootBody->permanentInteractions.clear();
+//	rootBody->permanentInteractions[0] = shared_ptr<Interaction>(new Interaction);
+//	rootBody->permanentInteractions[0]->interactionGeometry = shared_ptr<SDECPermanentLink>(new SDECPermanentLink);
 
 	rootBody->isDynamic		= false;
 	rootBody->velocity		= Vector3r(0,0,0);
@@ -104,7 +105,7 @@ void SDECSpheresPlane::exec()
 		shared_ptr<BallisticDynamicEngine> ballistic(new BallisticDynamicEngine);
 		ballistic->damping 	= 1.0;//0.95;
 		s->actors.push_back(ballistic);
-		
+
 		s->isDynamic		= true;
 		s->angularVelocity	= Vector3r(0,0,0);
 		s->velocity		= Vector3r(0,0,0);

@@ -1,7 +1,6 @@
 #include "MassSpringBody2RigidBodyDynamicEngine.hpp"
 #include "RigidBody.hpp"
 #include "MassSpringBody.hpp"
-#include "Contact.hpp"
 #include "Omega.hpp"
 #include "NonConnexBody.hpp"
 #include "ClosestFeatures.hpp"
@@ -28,26 +27,26 @@ void MassSpringBody2RigidBodyDynamicEngine::registerAttributes()
 
 
 void MassSpringBody2RigidBodyDynamicEngine::respondToCollisions(Body * body)
-{	
+{
 	NonConnexBody * ncb = dynamic_cast<NonConnexBody*>(body);
 	std::list<shared_ptr<Interaction> > tmpI;
 	list<shared_ptr<Interaction> >::const_iterator ii = ncb->interactions.begin();
 	list<shared_ptr<Interaction> >::const_iterator iiEnd = ncb->interactions.end();
-	
+
 	for( ; ii!=iiEnd ; ++ii)
 	{
-		shared_ptr<Contact> ct = static_pointer_cast<Contact>(*ii);
+		shared_ptr<Interaction> ct = (*ii);
 		shared_ptr<ClosestFeatures> cf = dynamic_pointer_cast<ClosestFeatures>(ct->interactionGeometry);
 		//FIXME : this is a hack because we don't know if id1 is the sphere or piece of massSpring
- 		shared_ptr<MassSpringBody> c = dynamic_pointer_cast<MassSpringBody>(ncb->bodies[ct->id1]);
-		shared_ptr<RigidBody> rb = dynamic_pointer_cast<RigidBody>(ncb->bodies[ct->id2]);
+ 		shared_ptr<MassSpringBody> c = dynamic_pointer_cast<MassSpringBody>(ncb->bodies[ct->getId1()]);
+		shared_ptr<RigidBody> rb = dynamic_pointer_cast<RigidBody>(ncb->bodies[ct->getId2()]);
 		shared_ptr<Mesh2D> mesh;
 		if (c)
 		{
 			mesh = dynamic_pointer_cast<Mesh2D>(c->gm);
 			for(unsigned int i=0;i<cf->verticesId.size();i++)
 			{
-				
+
 				Vector3r p1 = cf->closestsPoints[i].first;
 				Vector3r p2 = cf->closestsPoints[i].second;
 				Vector3r dir = p2-p1;
@@ -56,11 +55,11 @@ void MassSpringBody2RigidBodyDynamicEngine::respondToCollisions(Body * body)
 				float fi = 0.1*l*l/3.0+relativeVelocity*10;
 				Vector3r f = fi*dir;
 				rb->acceleration -= f*rb->invMass;
-				
+
 				c->externalForces.push_back(pair<int,Vector3r>(mesh->faces[cf->verticesId[i]][0],f));
 				c->externalForces.push_back(pair<int,Vector3r>(mesh->faces[cf->verticesId[i]][1],f));
 				c->externalForces.push_back(pair<int,Vector3r>(mesh->faces[cf->verticesId[i]][2],f));
-			}		
+			}
 		}
 		else //if (cf->verticesId.size()==0)
 			tmpI.push_back(*ii);

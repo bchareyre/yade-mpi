@@ -30,7 +30,6 @@
 #include "SDECContactModel.hpp"
 #include "SDECPermanentLink.hpp"
 #include "Omega.hpp"
-#include "Contact.hpp"
 #include "NonConnexBody.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -104,10 +103,10 @@ void SDECDynamicEngine::filter(Body* body)
 	list<shared_ptr<Interaction> >::const_iterator ctiEnd = ncb->interactions.end();
 	for( ; cti!=ctiEnd ; ++cti)
 	{
-		shared_ptr<Contact> contact = static_pointer_cast<Contact>(*cti);
+		shared_ptr<Interaction> contact = (*cti);
 
-		int id1 = contact->id1;
-		int id2 = contact->id2;
+		int id1 = contact->getId1();
+		int id2 = contact->getId2();
 
 		if (id1>=id2)
 			swap(id1,id2);
@@ -180,10 +179,10 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 	for( ; pii!=piiEnd ; ++pii)
 	{
 
-		shared_ptr<Contact> contact = static_pointer_cast<Contact>(*pii);
+		shared_ptr<Interaction> contact = (*pii);
 
-		int id1 = contact->id1;
-		int id2 = contact->id2;
+		int id1 = contact->getId1();
+		int id2 = contact->getId2();
 
 ////////////////////////////////////////////////////////////
 /// FIXME : those lines are too dirty !			 ///
@@ -209,8 +208,8 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 		std::list<shared_ptr<Interaction> >::iterator ctiEnd = ncb->interactions.end();
 		for( ; cti!=ctiEnd ; ++cti)
 		{
-			shared_ptr<Contact> contact = static_pointer_cast<Contact>(*cti);
-			if ((contact->id1==id1 && contact->id2==id2) || (contact->id1==id2 && contact->id2==id1))
+			shared_ptr<Interaction> contact = (*cti);
+			if ((contact->getId1()==id1 && contact->getId2()==id2 ) || (contact->getId1()==id2 && contact->getId2()==id1))
 			{
 				ncb->interactions.erase(cti);
 				cti=ctiEnd;
@@ -478,10 +477,10 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 	for( ; cti!=ctiEnd ; ++cti)
 	{
 
-		shared_ptr<Contact> contact = static_pointer_cast<Contact>(*cti);
+		shared_ptr<Interaction> contact = (*cti);
 
-		int id1 = contact->id1;
-		int id2 = contact->id2;
+		int id1 = contact->getId1();
+		int id2 = contact->getId2();
 
 		shared_ptr<SDECDiscreteElement> de1 	= dynamic_pointer_cast<SDECDiscreteElement>(bodies[id1]);
 		shared_ptr<SDECDiscreteElement> de2 	= dynamic_pointer_cast<SDECDiscreteElement>(bodies[id2]);

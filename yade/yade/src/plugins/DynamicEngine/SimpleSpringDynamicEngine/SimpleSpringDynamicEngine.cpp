@@ -2,7 +2,6 @@
 #include "RigidBody.hpp"
 #include "ClosestFeatures.hpp"
 #include "Omega.hpp"
-#include "Contact.hpp"
 #include "NonConnexBody.hpp"
 
 SimpleSpringDynamicEngine::SimpleSpringDynamicEngine () : DynamicEngine()
@@ -50,9 +49,9 @@ void SimpleSpringDynamicEngine::respondToCollisions(Body * body)
 	std::list<shared_ptr<Interaction> >::const_iterator ctiEnd = ncb->interactions.end();
 	for( ; cti!=ctiEnd ; ++cti)
 	{
-		shared_ptr<Contact> contact = static_pointer_cast<Contact>(*cti);
-		shared_ptr<RigidBody> rb1 = dynamic_pointer_cast<RigidBody>(bodies[contact->id1]);
-		shared_ptr<RigidBody> rb2 = dynamic_pointer_cast<RigidBody>(bodies[contact->id2]);
+		shared_ptr<Interaction> contact = (*cti);
+		shared_ptr<RigidBody> rb1 = dynamic_pointer_cast<RigidBody>(bodies[contact->getId1()]);
+		shared_ptr<RigidBody> rb2 = dynamic_pointer_cast<RigidBody>(bodies[contact->getId2()]);
 
 		std::vector<std::pair<Vector3r,Vector3r> >::iterator cpi = (dynamic_pointer_cast<ClosestFeatures>(contact->interactionGeometry))->closestsPoints.begin();
 		std::vector<std::pair<Vector3r,Vector3r> >::iterator cpiEnd = (dynamic_pointer_cast<ClosestFeatures>(contact->interactionGeometry))->closestsPoints.end();
@@ -78,11 +77,11 @@ void SimpleSpringDynamicEngine::respondToCollisions(Body * body)
 			float relativeVelocity = dir.dot(v2-v1);
 			Vector3r f = (elongation*stiffness+relativeVelocity*viscosity)/size*dir;
 
-			forces[contact->id1] += f;
-			forces[contact->id2] -= f;
+			forces[contact->getId1()] += f;
+			forces[contact->getId2()] -= f;
 
-			couples[contact->id1] += o1p.cross(f);
-			couples[contact->id2] -= o2p.cross(f);
+			couples[contact->getId1()] += o1p.cross(f);
+			couples[contact->getId2()] -= o2p.cross(f);
 		}
 	}
 

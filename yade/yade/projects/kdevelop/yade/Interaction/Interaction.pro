@@ -15,14 +15,12 @@ CONFIG += debug \
           dll 
 TEMPLATE = lib 
 HEADERS += BroadCollider.hpp \
-           Contact.hpp \
            Interaction.hpp \
            InteractionGeometry.hpp \
            NarrowCollider.hpp \
            CollisionFunctor.hpp \
            CollisionMultiMethodsManager.hpp 
 SOURCES += BroadCollider.cpp \
-           Contact.cpp \
            Interaction.cpp \
            InteractionGeometry.cpp \
            NarrowCollider.cpp \

@@ -13,8 +13,7 @@
 #include "SDECDynamicEngine.hpp"
 #include "SDECDiscreteElement.hpp"
 #include "SDECPermanentLink.hpp"
-#include "Contact.hpp"
-
+#include "Interaction.hpp"
 
 SDECLinkedSpheres::SDECLinkedSpheres () : Serializable()
 {
@@ -98,7 +97,7 @@ void SDECLinkedSpheres::exec()
 
 		translation 		= Vector3r(i,j,k)*10-Vector3r(nbSpheres/2*10,nbSpheres/2*10-90,nbSpheres/2*10)/*+Vector3r(Mathr::symmetricRandom()*1.3,Mathr::symmetricRandom(),Mathr::symmetricRandom()*1.3)*/;
 		//float radius 		= (Mathr::intervalRandom(4.99,5.2)); // FIXME - this should ba a parameter to dynlib
-		float radius 		= 5; 
+		float radius 		= 5;
 		shared_ptr<BallisticDynamicEngine> ballistic(new BallisticDynamicEngine);
 		ballistic->damping 	= 1.0;//0.95;
 		s->actors.push_back(ballistic);
@@ -144,11 +143,9 @@ void SDECLinkedSpheres::exec()
 			if( a && b && as && bs &&
 			( (a->se3.translation - b->se3.translation).length() < (as->radius + bs->radius) ) )
 			{
-				shared_ptr<Contact> 		c(new Contact);
+				shared_ptr<Interaction> 	c(new Interaction(idA,idB));
 				shared_ptr<SDECPermanentLink>	link(new SDECPermanentLink);
 
-				c->id1 				= idA;
-				c->id2 				= idB;
 				link->initialKn			= 500000;
 				link->initialKs			= 50000;
 				link->heta			= 1;
