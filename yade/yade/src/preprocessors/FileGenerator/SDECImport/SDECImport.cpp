@@ -40,6 +40,8 @@
 
 #include <boost/filesystem/convenience.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/numeric/conversion/bounds.hpp>
+#include <boost/limits.hpp>
 
 using namespace boost;
 using namespace std;
@@ -160,6 +162,8 @@ void SDECImport::registerAttributes()
 
 string SDECImport::generate()
 {
+	unsigned int startId=boost::numeric::bounds<unsigned int>::highest(), endId=0; // record forces from group 2
+	
 	rootBody = shared_ptr<ComplexBody>(new ComplexBody);
 	createActors(rootBody);
 	positionRootBody(rootBody);
@@ -181,7 +185,7 @@ string SDECImport::generate()
 		
 			loadFile >> f;
 			loadFile >> g;
-			if( boxWalls ? f>1 : (f!=1 && f==2) ) // skip loading of SDEC walls
+			if( boxWalls ? f>1 : false ) // skip loading of SDEC walls
 				continue;
 			if(f==8)
 				continue;
@@ -199,6 +203,12 @@ string SDECImport::generate()
 			}
 			createSphere(body,translation,radius,false,f==1);
 			rootBody->bodies->insert(body);
+			if(f == 2)
+			{
+				startId = std::min(body->getId() , startId);
+				endId   = std::max(body->getId() , endId);
+			}
+				
 		}
 	}
 
@@ -211,26 +221,28 @@ string SDECImport::generate()
 	bigId = body->getId();
 	forcerec->bigBallId = bigId;
 	forcerec->bigBallReleaseTime = bigBallDropTimeSeconds;
+	forcerec->startId = startId;
+	forcerec->endId   = endId;
 	averagePositionRecorder->bigBallId = bigId;
 	velocityRecorder->bigBallId = bigId;
 
-// bottom box
- 	Vector3r center		= Vector3r(
- 						(lowerCorner[0]+upperCorner[0])/2,
- 						lowerCorner[1]-thickness/2.0,
- 						(lowerCorner[2]+upperCorner[2])/2);
- 	Vector3r halfSize	= Vector3r(
- 						fabs(lowerCorner[0]-upperCorner[0])/2+thickness,
-						thickness/2.0,
- 						fabs(lowerCorner[2]-upperCorner[2])/2+thickness);
-
-	createBox(body,center,halfSize,wall_bottom_wire);
- 	if(wall_bottom)
-		rootBody->bodies->insert(body);
-	forcerec->id = body->getId();
-	
 	if(boxWalls)
 	{
+	// bottom box
+	 	Vector3r center		= Vector3r(
+	 						(lowerCorner[0]+upperCorner[0])/2,
+	 						lowerCorner[1]-thickness/2.0,
+	 						(lowerCorner[2]+upperCorner[2])/2);
+	 	Vector3r halfSize	= Vector3r(
+	 						fabs(lowerCorner[0]-upperCorner[0])/2+thickness,
+							thickness/2.0,
+	 						fabs(lowerCorner[2]-upperCorner[2])/2+thickness);
+	
+		createBox(body,center,halfSize,wall_bottom_wire);
+	 	if(wall_bottom)
+			rootBody->bodies->insert(body);
+//		forcerec->id = body->getId();
+	
 	// top box
 	 	center			= Vector3r(
 	 						(lowerCorner[0]+upperCorner[0])/2,

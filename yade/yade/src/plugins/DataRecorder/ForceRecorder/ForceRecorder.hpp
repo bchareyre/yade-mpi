@@ -12,7 +12,7 @@ class ForceRecorder : public Actor
 {
 	public : std::string outputFile;
 	public : unsigned int interval;
-	public : int id;
+	public : int startId,endId;
 	public : int bigBallId; // FIXME !!!!!!!!!!
 	public : Real bigBallReleaseTime; // FIXME !!!!!!!!!!
 	private : shared_ptr<Action> actionForce;

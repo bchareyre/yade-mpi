@@ -10,7 +10,8 @@ ForceRecorder::ForceRecorder () : Actor(), actionForce(new ActionForce)
 {
 	outputFile = "";
 	interval = 50;
-	id = 0;
+	startId = 0;
+	endId = 1;
 	changed = false;
 }
 
@@ -27,7 +28,8 @@ void ForceRecorder::registerAttributes()
 	Actor::registerAttributes();
 	REGISTER_ATTRIBUTE(outputFile);
 	REGISTER_ATTRIBUTE(interval);
-	REGISTER_ATTRIBUTE(id);
+	REGISTER_ATTRIBUTE(startId);
+	REGISTER_ATTRIBUTE(endId);
 	REGISTER_ATTRIBUTE(bigBallId);
 	REGISTER_ATTRIBUTE(bigBallReleaseTime);
 }
@@ -40,12 +42,22 @@ bool ForceRecorder::isActivated()
 void ForceRecorder::action(Body * body)
 {
 	ComplexBody * ncb = dynamic_cast<ComplexBody*>(body);
-	Vector3r f = dynamic_cast<ActionForce*>(ncb->actions->find(id,actionForce->getClassIndex()).get())->force;
-
+	Real x=0, y=0, z=0;
+	
+	for( unsigned int i = startId ; i <= endId ; ++i )
+	{
+		Vector3r force = dynamic_cast<ActionForce*>(ncb->actions->find( i , actionForce->getClassIndex() ) . get() )->force;
+		
+		x+=force[0];
+		y+=force[1];
+		z+=force[2];
+	}
+	
 	ofile << lexical_cast<string>(Omega::instance().getSimulationTime()) << " " 
-		<< lexical_cast<string>(f[0]) << " " 
-		<< lexical_cast<string>(f[1]) << " " 
-		<< lexical_cast<string>(f[2]) << endl;
+		<< lexical_cast<string>(x) << " " 
+		<< lexical_cast<string>(y) << " " 
+		<< lexical_cast<string>(z) << endl;
+
 		
 	// FIXME all that lines do not belong to ForceRecorder
 	if( bigBallReleaseTime < Omega::instance().getSimulationTime() && (!changed) )
