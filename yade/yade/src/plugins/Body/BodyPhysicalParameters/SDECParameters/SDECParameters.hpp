@@ -1,36 +1,32 @@
-#ifndef __RIGIDBODY_H__
-#define __RIGIDBODY_H__
+#ifndef __SDECDISCRETEELEMENT_H__
+#define __SDECDISCRETEELEMENT_H__
 
-#include "Particle.hpp"
-#include "Matrix3.hpp"
+#include "RigidBodyParameters.hpp"
 
-class RigidBody : public Particle
-{	
-	public : Vector3r invInertia;
-	public : Vector3r inertia;
-	public : Vector3r angularAcceleration;
-	public : Vector3r angularVelocity;
-	
-	public : RigidBody ();
-	public : virtual ~RigidBody ();
+class SDECParameters : public RigidBodyParameters
+{
+	public : Real kn;
+	public : Real ks;
+
+	public : SDECParameters ();
+	public : virtual ~SDECParameters ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Serialization										///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	REGISTER_CLASS_NAME(RigidBody);
+	REGISTER_CLASS_NAME(SDECParameters);
 	protected : virtual void postProcessAttributes(bool deserializing);
 	public : void registerAttributes();
-	
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Indexable											///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-	REGISTER_CLASS_INDEX(RigidBody,Particle);
-	
+	REGISTER_CLASS_INDEX(SDECParameters,RigidBodyParameters);
 };
 
-REGISTER_SERIALIZABLE(RigidBody,false);
+REGISTER_SERIALIZABLE(SDECParameters,false);
 
-#endif // __RIGIDBODY_H__
+#endif // __SDECDISCRETEELEMENT_H__
 

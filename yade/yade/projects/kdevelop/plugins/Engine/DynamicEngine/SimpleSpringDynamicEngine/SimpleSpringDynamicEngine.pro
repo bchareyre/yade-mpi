@@ -3,8 +3,7 @@
 # Subdir relative project main directory: ./plugins/Engine/DynamicEngine/SimpleSpringDynamicEngine
 # Target is a library:  
 
-LIBS += -lRigidBody \
-        -lClosestFeatures \
+LIBS += -lClosestFeatures \
         -lSerialization \
         -lMath \
         -lBody \
@@ -12,13 +11,13 @@ LIBS += -lRigidBody \
         -lGeometry \
         -lInteraction \
         -lMultiMethods \
+        -lRigidBodyParameters \
         -rdynamic 
 INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../../plugins/Body/RigidBody/$(YADEDYNLIBPATH) \
-               ../../../../plugins/Interaction/InteractionGeometry/ClosestFeatures/$(YADEDYNLIBPATH) \
+QMAKE_LIBDIR = ../../../../plugins/Interaction/InteractionGeometry/ClosestFeatures/$(YADEDYNLIBPATH) \
                ../../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
                ../../../../yade/Body/$(YADEDYNLIBPATH) \
@@ -26,6 +25,7 @@ QMAKE_LIBDIR = ../../../../plugins/Body/RigidBody/$(YADEDYNLIBPATH) \
                ../../../../yade/Geometry/$(YADEDYNLIBPATH) \
                ../../../../yade/Interaction/$(YADEDYNLIBPATH) \
                ../../../../toolboxes/Libraries/MultiMethods/$(YADEDYNLIBPATH) \
+               ../../../../plugins/Body/RigidBody/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

@@ -13,5 +13,5 @@ CONFIG += debug \
           warn_on \
           dll
 TEMPLATE = lib
-HEADERS += Particle.hpp
-SOURCES += Particle.cpp
+HEADERS += ParticleParameters.hpp
+SOURCES += ParticleParameters.cpp

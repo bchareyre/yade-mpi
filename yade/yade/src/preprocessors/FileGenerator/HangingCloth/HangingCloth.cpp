@@ -3,7 +3,7 @@
 #include "SimpleBody.hpp"
 #include "Mesh2D.hpp"
 #include "Sphere.hpp"
-#include "RigidBody.hpp"
+#include "RigidBodyParameters.hpp"
 #include "AABB.hpp"
 #include "ComplexBody.hpp"
 #include "SimpleSpringDynamicEngine.hpp"
@@ -19,7 +19,7 @@
 #include "BoundingVolumeDispatcher.hpp"
 #include "InteractionDescriptionSet2AABBFunctor.hpp"
 #include "InteractionDescriptionSet.hpp"
-#include "Particle.hpp"
+#include "ParticleParameters.hpp"
 #include "SpringGeometry.hpp"
 #include "SpringPhysics.hpp"
 #include "TimeIntegratorDispatcher.hpp"
@@ -79,7 +79,7 @@ string HangingCloth::generate()
 	igd->addInteractionGeometryFunctor("InteractionSphere","InteractionBox","Box2Sphere4SDECContactModel");
 
 	shared_ptr<InteractionPhysicsDispatcher> ipd(new InteractionPhysicsDispatcher);
-	ipd->addInteractionPhysicsFunctor("SDECDiscreteElement","SDECDiscreteElement","SDECLinearContactModel");
+	ipd->addInteractionPhysicsFunctor("SDECParameters","SDECParameters","SDECLinearContactModel");
 		
 	shared_ptr<BoundingVolumeDispatcher> bvu	= shared_ptr<BoundingVolumeDispatcher>(new BoundingVolumeDispatcher);
 	bvu->addBoundingVolumeFunctors("InteractionSphere","AABB","Sphere2AABBFunctor");
@@ -87,10 +87,10 @@ string HangingCloth::generate()
 	bvu->addBoundingVolumeFunctors("InteractionDescriptionSet","AABB","InteractionDescriptionSet2AABBFunctor");
 	
 	shared_ptr<ActionDispatcher> ad(new ActionDispatcher);
-	ad->addActionFunctor("ActionForce","Particle","ActionForce2Particle");
+	ad->addActionFunctor("ActionForce","ParticleParameters","ActionForce2Particle");
 	
 	shared_ptr<TimeIntegratorDispatcher> ti(new TimeIntegratorDispatcher);
-	ti->addTimeIntegratorFunctor("Particle","LeapFrogIntegrator");
+	ti->addTimeIntegratorFunctor("ParticleParameters","LeapFrogIntegrator");
 	
 	rootBody->actors.resize(5);
 	rootBody->actors[0] 		= bvu;	
@@ -103,7 +103,7 @@ string HangingCloth::generate()
 	
 
 	//FIXME : use a default one
-	shared_ptr<Particle> physics2(new Particle); // FIXME : fix indexable class BodyPhysicalParameters
+	shared_ptr<ParticleParameters> physics2(new ParticleParameters); // FIXME : fix indexable class BodyPhysicalParameters
 	physics2->se3		= Se3r(Vector3r(0,0,0),q);
 	physics2->mass		= 0;
 	physics2->velocity	= Vector3r::ZERO;
@@ -136,7 +136,7 @@ string HangingCloth::generate()
 			
 			node->isDynamic		= true;
 			
-			shared_ptr<Particle> particle(new Particle);
+			shared_ptr<ParticleParameters> particle(new ParticleParameters);
 			particle->velocity		= Vector3r(0,0,0);
 			particle->mass			= mass/(Real)(width*height);
 			particle->se3			= Se3r(Vector3r(i*cellSize-(cellSize*(width-1))*0.5,0,j*cellSize-(cellSize*(height-1))*0.5),q);
@@ -197,7 +197,7 @@ string HangingCloth::generate()
 	if (fixPoint1)
 	{
 		Body * body = static_cast<Body*>((*(rootBody->bodies))[offset(0,0)].get());
-		Particle * p = static_cast<Particle*>(body->physicalParameters.get());
+		ParticleParameters * p = static_cast<ParticleParameters*>(body->physicalParameters.get());
 		p->invMass = 0;
 		body->interactionGeometry->diffuseColor = Vector3r(1.0,0.0,0.0);
 		body->isDynamic = false;
@@ -206,7 +206,7 @@ string HangingCloth::generate()
 	if (fixPoint2)
 	{
 		Body * body = static_cast<Body*>((*(rootBody->bodies))[offset(width-1,0)].get());
-		Particle * p = static_cast<Particle*>(body->physicalParameters.get());
+		ParticleParameters * p = static_cast<ParticleParameters*>(body->physicalParameters.get());
 		p->invMass = 0;
 		body->interactionGeometry->diffuseColor = Vector3r(1.0,0.0,0.0);
 		body->isDynamic = false;
@@ -215,7 +215,7 @@ string HangingCloth::generate()
 	if (fixPoint3)
 	{
 		Body * body = static_cast<Body*>((*(rootBody->bodies))[offset(0,height-1)].get());
-		Particle * p = static_cast<Particle*>(body->physicalParameters.get());
+		ParticleParameters * p = static_cast<ParticleParameters*>(body->physicalParameters.get());
 		p->invMass = 0;
 		body->interactionGeometry->diffuseColor = Vector3r(1.0,0.0,0.0);		
 		body->isDynamic = false;
@@ -224,7 +224,7 @@ string HangingCloth::generate()
 	if (fixPoint4)
 	{
 		Body * body = static_cast<Body*>((*(rootBody->bodies))[offset(width-1,height-1)].get());
-		Particle * p = static_cast<Particle*>(body->physicalParameters.get());
+		ParticleParameters * p = static_cast<ParticleParameters*>(body->physicalParameters.get());
 		p->invMass = 0;
 		body->interactionGeometry->diffuseColor = Vector3r(1.0,0.0,0.0);		
 		body->isDynamic = false;

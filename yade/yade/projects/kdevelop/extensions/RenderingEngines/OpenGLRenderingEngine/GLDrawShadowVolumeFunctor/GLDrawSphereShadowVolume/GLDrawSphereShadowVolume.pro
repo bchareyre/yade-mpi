@@ -3,19 +3,19 @@
 # Subdir relative project main directory: ./extensions/RenderingEngines/OpenGLRenderingEngine/GLDrawShadowVolumeFunctor/GLDrawSphereShadowVolume
 # Target is a library:  
 
-LIBS += -lParticle \
-        -lSphere \
+LIBS += -lSphere \
         -lBody \
         -lGeometry \
+        -lParticleParameters \
         -rdynamic 
-INCLUDEPATH += $(YADEINCLUDEPATH) 
+INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../../../plugins/Body/BodyPhysicalParameters/Particle/$(YADEDYNLIBPATH) \
-               ../../../../../plugins/Geometry/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
+QMAKE_LIBDIR = ../../../../../plugins/Geometry/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
                ../../../../../yade/Body/$(YADEDYNLIBPATH) \
                ../../../../../yade/Geometry/$(YADEDYNLIBPATH) \
+               ../../../../../plugins/Body/BodyPhysicalParameters/Particle/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
 CONFIG += debug \

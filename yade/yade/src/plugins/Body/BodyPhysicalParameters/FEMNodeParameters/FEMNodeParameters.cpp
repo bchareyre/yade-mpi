@@ -1,22 +1,22 @@
-#include "FEMBody.hpp"
+#include "FEMNodeParameters.hpp"
 
 // // FIXME : redisign must not use a particular GM,CM or BV into Body
 // #include "Polyhedron.hpp"
 // #include "AABB.hpp"
 // #include "Math.hpp"
 // 
-// FEMBody::FEMBody () : SimpleBody()
+// FEMNodeParameters::FEMNodeParameters () : SimpleBody()
 // {
 // 	createIndex();
 // }
 // 
 // 
-// FEMBody::~FEMBody()
+// FEMNodeParameters::~FEMNodeParameters()
 // {
 // 
 // }
 // 
-// void FEMBody::postProcessAttributes(bool deserializing)
+// void FEMNodeParameters::postProcessAttributes(bool deserializing)
 // {
 // 	SimpleBody::postProcessAttributes(deserializing);
 // 	
@@ -29,7 +29,7 @@
 // 	
 // }
 // 
-// void FEMBody::registerAttributes()
+// void FEMNodeParameters::registerAttributes()
 // {
 // 	SimpleBody::registerAttributes();
 // 	REGISTER_ATTRIBUTE(stiffness);
@@ -40,7 +40,7 @@
 // }
 // 
 // 
-// void FEMBody::updateBoundingVolume(Se3r& )
+// void FEMNodeParameters::updateBoundingVolume(Se3r& )
 // {
 // 	Vector3r max = Vector3r(-Mathr::MAX_REAL,-Mathr::MAX_REAL,-Mathr::MAX_REAL);
 // 	Vector3r min = Vector3r(Mathr::MAX_REAL,Mathr::MAX_REAL,Mathr::MAX_REAL);

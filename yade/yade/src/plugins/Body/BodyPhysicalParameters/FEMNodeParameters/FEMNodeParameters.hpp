@@ -5,7 +5,7 @@
 // #include "Vector3.hpp"
 // #include "Matrix3.hpp"
 // 
-// // FIXME - class class NodeProperties is duplicated in FEMBody and MassSpringBody
+// // FIXME - class class NodeProperties is duplicated in FEMNodeParameters and MassSpringBody
 // 
 // class NodeProperties : public Serializable
 // {
@@ -25,7 +25,7 @@
 // 
 // REGISTER_SERIALIZABLE(NodeProperties,false);
 // 
-// class FEMBody : public SimpleBody
+// class FEMNodeParameters : public SimpleBody
 // {
 // 	public : Real stiffness;
 // 	public : Real damping;
@@ -34,15 +34,15 @@
 // 	public : vector<pair<int,Vector3r> > externalForces;
 // 
 // 	// construction
-// 	public : FEMBody ();
-// 	public : virtual FEMBody ();
+// 	public : FEMNodeParameters ();
+// 	public : virtual FEMNodeParameters ();
 // 
 // 
 // ///////////////////////////////////////////////////////////////////////////////////////////////////
 // /// Serialization										///
 // ///////////////////////////////////////////////////////////////////////////////////////////////////
 // 	
-// 	REGISTER_CLASS_NAME(FEMBody);
+// 	REGISTER_CLASS_NAME(FEMNodeParameters);
 // 	protected : virtual void postProcessAttributes(bool deserializing);
 // 	public : void registerAttributes();
 // 
@@ -50,10 +50,10 @@
 // /// Indexable											///
 // ///////////////////////////////////////////////////////////////////////////////////////////////////
 // 
-// 	REGISTER_CLASS_INDEX(FEMBody,SimpleBody);
+// 	REGISTER_CLASS_INDEX(FEMNodeParameters,SimpleBody);
 // 	
 // };
 // 
-// REGISTER_SERIALIZABLE(FEMBody,false);
+// REGISTER_SERIALIZABLE(FEMNodeParameters,false);
 
 #endif // __CLOTH_H__

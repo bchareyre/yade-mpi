@@ -3,8 +3,7 @@
 # Subdir relative project main directory: ./plugins/Engine/DynamicEngine/ErrorTolerantDynamicEngine
 # Target is a library:  
 
-LIBS += -lRigidBody \
-        -lEngine \
+LIBS += -lEngine \
         -lMath \
         -lSerialization \
         -lFactory \
@@ -13,13 +12,13 @@ LIBS += -lRigidBody \
         -lGeometry \
         -lMultiMethods \
         -lErrorTolerantContactModel \
+        -lRigidBodyParameters \
         -rdynamic 
 INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../../plugins/Body/RigidBody/$(YADEDYNLIBPATH) \
-               ../../../../yade/Engine/$(YADEDYNLIBPATH) \
+QMAKE_LIBDIR = ../../../../yade/Engine/$(YADEDYNLIBPATH) \
                ../../../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
                ../../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../../../toolboxes/Libraries/Factory/$(YADEDYNLIBPATH) \
@@ -28,6 +27,7 @@ QMAKE_LIBDIR = ../../../../plugins/Body/RigidBody/$(YADEDYNLIBPATH) \
                ../../../../yade/Geometry/$(YADEDYNLIBPATH) \
                ../../../../toolboxes/Libraries/MultiMethods/$(YADEDYNLIBPATH) \
                ../../../../plugins/Interaction/InteractionGeometry/ErrorTolerantContactModel/$(YADEDYNLIBPATH) \
+               ../../../../plugins/Body/RigidBody/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

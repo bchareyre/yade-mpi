@@ -20,9 +20,9 @@ LIBS += -lSDECDynamicEngine \
         -lSDECLinearContactModel \
         -lInteractionSphere \
         -lInteractionBox \
-        -lParticle \
         -lInteractionDescriptionSet \
         -lInteractionDescriptionSet2AABBFunctor \
+        -lParticleParameters \
         -rdynamic 
 INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
@@ -42,12 +42,13 @@ QMAKE_LIBDIR = ../../../plugins/Engine/DynamicEngine/SDECDynamicEngine/$(YADEDYN
                ../../../yade/Geometry/$(YADEDYNLIBPATH) \
                ../../../yade/Interaction/$(YADEDYNLIBPATH) \
                ../../../plugins/Interaction/BroadInteractor/PersistentSAPCollider/$(YADEDYNLIBPATH) \
-               ../../../plugins/Interaction/InteractionPhysicsFunctor/SDECLinearContactModel/$(YADEDYNLIBPATH) \
+               ../../../plugins/Interaction/InteractionPhysicsFunctor/SDECContactPhysics/SDECLinearContactModel/$(YADEDYNLIBPATH) \
                ../../../plugins/Geometry/InteractionDescription/InteractionSphere/$(YADEDYNLIBPATH) \
                ../../../plugins/Geometry/InteractionDescription/InteractionBox/$(YADEDYNLIBPATH) \
-               ../../../plugins/Body/BodyPhysicalParameters/Particle/$(YADEDYNLIBPATH) \
                ../../../plugins/Geometry/InteractionDescription/InteractionDescriptionSet/$(YADEDYNLIBPATH) \
                ../../../plugins/Geometry/BoundingVolumeFunctor/InteractionDescriptionSet2AABBFunctor/$(YADEDYNLIBPATH) \
+               ../../../plugins/Interaction/InteractionPhysicsFunctor/SDECLinearContactModel/$(YADEDYNLIBPATH) \
+               ../../../plugins/Body/BodyPhysicalParameters/Particle/$(YADEDYNLIBPATH) \
                ../../../plugins/Geometry/InteractionGeometry/InteractionSphere/$(YADEDYNLIBPATH) \
                ../../../plugins/Geometry/InteractionGeometry/InteractionBox/$(YADEDYNLIBPATH) \
                ../../../plugins/Geometry/BoundingVolumeFactory/CollisionGeometrySet2AABBFactory/$(YADEDYNLIBPATH) \

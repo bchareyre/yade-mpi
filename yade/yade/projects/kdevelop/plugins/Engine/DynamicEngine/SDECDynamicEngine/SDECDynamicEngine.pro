@@ -4,8 +4,6 @@
 # Target is a library:  
 
 LIBS += -lSerialization \
-        -lSDECDiscreteElement \
-        -lRigidBody \
         -lSphere \
         -lMath \
         -lEngine \
@@ -19,14 +17,14 @@ LIBS += -lSerialization \
         -lActionForce \
         -lActionMomentum \
         -lBody \
+        -lSDECParameters \
+        -lRigidBodyParameters \
         -rdynamic 
 INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 QMAKE_LIBDIR = ../../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
-               ../../../../plugins/Body/SDECDiscreteElement/$(YADEDYNLIBPATH) \
-               ../../../../plugins/Body/RigidBody/$(YADEDYNLIBPATH) \
                ../../../../plugins/Geometry/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
                ../../../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
                ../../../../yade/Engine/$(YADEDYNLIBPATH) \
@@ -40,6 +38,8 @@ QMAKE_LIBDIR = ../../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../../../plugins/Engine/Action/ActionForce/$(YADEDYNLIBPATH) \
                ../../../../plugins/Engine/Action/ActionMomentum/$(YADEDYNLIBPATH) \
                ../../../../yade/Body/$(YADEDYNLIBPATH) \
+               ../../../../plugins/Body/SDECDiscreteElement/$(YADEDYNLIBPATH) \
+               ../../../../plugins/Body/RigidBody/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

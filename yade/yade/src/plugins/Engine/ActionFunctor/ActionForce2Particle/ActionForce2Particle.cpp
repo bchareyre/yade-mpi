@@ -22,7 +22,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "ActionForce2Particle.hpp"
-#include "Particle.hpp"
+#include "ParticleParameters.hpp"
 #include "ActionForce.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -31,7 +31,7 @@
 void ActionForce2Particle::go(const shared_ptr<Action>& a, shared_ptr<BodyPhysicalParameters>& b)
 {
 	ActionForce * af = static_cast<ActionForce*>(a.get());
-	Particle * p = static_cast<Particle*>(b.get());
+	ParticleParameters * p = static_cast<ParticleParameters*>(b.get());
 	
 	//FIXME : should be += and we should add an Actor that reset acceleration at the beginning
 	// if another Action also acts on acceleration then we are overwritting it here

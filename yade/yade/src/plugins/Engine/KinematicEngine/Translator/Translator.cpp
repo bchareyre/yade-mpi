@@ -1,5 +1,5 @@
 #include "Translator.hpp"
-#include "RigidBody.hpp"
+#include "RigidBodyParameters.hpp"
 #include "ComplexBody.hpp"
 
 void Translator::postProcessAttributes(bool deserializing)
@@ -35,7 +35,7 @@ void Translator::moveToNextTimeStep(Body * body)
 
 	for(;ii!=iiEnd;++ii)
 	{
-		RigidBody * rb = static_cast<RigidBody*>((*bodies)[*ii]->physicalParameters.get());
+		RigidBodyParameters * rb = static_cast<RigidBodyParameters*>((*bodies)[*ii]->physicalParameters.get());
 
 		// FIXME - specify intervals of activity for an actor => use isActivated method
 		//if( Omega::instance().getIter() > 1000 )

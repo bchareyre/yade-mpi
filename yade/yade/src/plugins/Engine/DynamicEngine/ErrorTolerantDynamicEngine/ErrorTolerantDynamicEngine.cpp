@@ -22,7 +22,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "ErrorTolerantDynamicEngine.hpp"
-#include "RigidBody.hpp"
+#include "RigidBodyParameters.hpp"
 #include "ComplexBody.hpp"
 #include "ErrorTolerantContactModel.hpp"
 
@@ -92,7 +92,7 @@ void ErrorTolerantDynamicEngine::respondToInteractions(Body* body)
 			b = bodies->getCurrent();
 
 			int offset = 6*i;
-			shared_ptr<RigidBody> rb = dynamic_pointer_cast<RigidBody>(b);
+			shared_ptr<RigidBodyParameters> rb = dynamic_pointer_cast<RigidBodyParameters>(b);
 			invM(offset,offset++) = rb->invMass;
 			invM(offset,offset++) = rb->invMass;
 			invM(offset,offset++) = rb->invMass;
@@ -193,7 +193,7 @@ void ErrorTolerantDynamicEngine::respondToInteractions(Body* body)
 		b = bodies->getCurrent();
 
 
-		shared_ptr<RigidBody> rb = dynamic_pointer_cast<RigidBody>(b);
+		shared_ptr<RigidBodyParameters> rb = dynamic_pointer_cast<RigidBodyParameters>(b);
 		if (rb)
 		{
 			Vector3r force = Omega::instance().getGravity()*rb->mass;

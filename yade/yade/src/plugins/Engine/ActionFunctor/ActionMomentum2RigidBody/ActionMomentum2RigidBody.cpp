@@ -22,7 +22,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "ActionMomentum2RigidBody.hpp"
-#include "RigidBody.hpp"
+#include "RigidBodyParameters.hpp"
 #include "ActionMomentum.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -31,7 +31,7 @@
 void ActionMomentum2RigidBody::go(const shared_ptr<Action>& a, shared_ptr<BodyPhysicalParameters>& b)
 {
 	ActionMomentum * am = static_cast<ActionMomentum*>(a.get());
-	RigidBody * rb = static_cast<RigidBody*>(b.get());
+	RigidBodyParameters * rb = static_cast<RigidBodyParameters*>(b.get());
 	
 	//FIXME : should be += and we should add an Actor that reset acceleration at the beginning
 	rb->angularAcceleration = am->momentum.multDiag(rb->invInertia);

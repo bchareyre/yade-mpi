@@ -1,5 +1,5 @@
 #include "SimpleSpringDynamicEngine.hpp"
-#include "RigidBody.hpp"
+#include "RigidBodyParameters.hpp"
 #include "ClosestFeatures.hpp"
 #include "Omega.hpp"
 #include "ComplexBody.hpp"
@@ -42,8 +42,8 @@ void SimpleSpringDynamicEngine::respondToInteractions(Body * body)
 		contact = ncb->interactions->getCurrent();
 
 
-		shared_ptr<RigidBody> rb1 = dynamic_pointer_cast<RigidBody>((*bodies)[contact->getId1()]);
-		shared_ptr<RigidBody> rb2 = dynamic_pointer_cast<RigidBody>((*bodies)[contact->getId2()]);
+		shared_ptr<RigidBodyParameters> rb1 = dynamic_pointer_cast<RigidBodyParameters>((*bodies)[contact->getId1()]);
+		shared_ptr<RigidBodyParameters> rb2 = dynamic_pointer_cast<RigidBodyParameters>((*bodies)[contact->getId2()]);
 
 		std::vector<std::pair<Vector3r,Vector3r> >::iterator cpi = (dynamic_pointer_cast<ClosestFeatures>(contact->interactionGeometry))->closestsPoints.begin();
 		std::vector<std::pair<Vector3r,Vector3r> >::iterator cpiEnd = (dynamic_pointer_cast<ClosestFeatures>(contact->interactionGeometry))->closestsPoints.end();
@@ -85,7 +85,7 @@ void SimpleSpringDynamicEngine::respondToInteractions(Body * body)
 	{
 		b = bodies->getCurrent();
 
-		shared_ptr<RigidBody> rb = dynamic_pointer_cast<RigidBody>(b);
+		shared_ptr<RigidBodyParameters> rb = dynamic_pointer_cast<RigidBodyParameters>(b);
 
 		if (rb)
 		{

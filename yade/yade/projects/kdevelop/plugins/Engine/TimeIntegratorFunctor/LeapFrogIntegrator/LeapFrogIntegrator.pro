@@ -3,10 +3,10 @@
 # Subdir relative project main directory: ./plugins/Engine/TimeIntegratorFunctor/LeapFrogIntegrator
 # Target is a library:  
 
-LIBS += -lRigidBody \
-        -lParticle \
+LIBS += -lRigidBodyParameters \
+        -lParticleParameters \
         -rdynamic 
-INCLUDEPATH += $(YADEINCLUDEPATH) 
+INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 

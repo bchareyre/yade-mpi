@@ -22,7 +22,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "SDECDynamicEngine.hpp"
-#include "SDECDiscreteElement.hpp"
+#include "SDECParameters.hpp"
 #include "SDECContactGeometry.hpp"
 #include "SDECPermanentLink.hpp"
 #include "SDECContactPhysics.hpp"
@@ -109,8 +109,8 @@ void SDECDynamicEngine::respondToInteractions(Body* body)
 /// 							 ///
 ////////////////////////////////////////////////////////////
 
-		shared_ptr<SDECDiscreteElement> de1		= dynamic_pointer_cast<SDECDiscreteElement>((*bodies)[id1]->physicalParameters);
-		shared_ptr<SDECDiscreteElement> de2 		= dynamic_pointer_cast<SDECDiscreteElement>((*bodies)[id2]->physicalParameters);
+		shared_ptr<SDECParameters> de1		= dynamic_pointer_cast<SDECParameters>((*bodies)[id1]->physicalParameters);
+		shared_ptr<SDECParameters> de2 		= dynamic_pointer_cast<SDECParameters>((*bodies)[id2]->physicalParameters);
 		shared_ptr<SDECPermanentLinkPhysics> currentContactPhysics	= dynamic_pointer_cast<SDECPermanentLinkPhysics>(contact2->interactionPhysics);
 		shared_ptr<SDECPermanentLink> currentContactGeometry	= dynamic_pointer_cast<SDECPermanentLink>(contact2->interactionGeometry);
 
@@ -370,8 +370,8 @@ void SDECDynamicEngine::respondToInteractions(Body* body)
 		int id1 = contact->getId1();
 		int id2 = contact->getId2();
 
-		shared_ptr<SDECDiscreteElement> de1 	= dynamic_pointer_cast<SDECDiscreteElement>((*bodies)[id1]->physicalParameters);
-		shared_ptr<SDECDiscreteElement> de2 	= dynamic_pointer_cast<SDECDiscreteElement>((*bodies)[id2]->physicalParameters);
+		shared_ptr<SDECParameters> de1 	= dynamic_pointer_cast<SDECParameters>((*bodies)[id1]->physicalParameters);
+		shared_ptr<SDECParameters> de2 	= dynamic_pointer_cast<SDECParameters>((*bodies)[id2]->physicalParameters);
 		shared_ptr<SDECContactGeometry> currentContactGeometry = dynamic_pointer_cast<SDECContactGeometry>(contact->interactionGeometry);
 		shared_ptr<SDECContactPhysics> currentContactPhysics   = dynamic_pointer_cast<SDECContactPhysics> (contact->interactionPhysics);
 		
@@ -497,7 +497,7 @@ void SDECDynamicEngine::respondToInteractions(Body* body)
 	{
 		b = bodies->getCurrent();
  
-		shared_ptr<SDECDiscreteElement> de = dynamic_pointer_cast<SDECDiscreteElement>(b->physicalParameters);
+		shared_ptr<SDECParameters> de = dynamic_pointer_cast<SDECParameters>(b->physicalParameters);
 
 ///////////////////// PREVIOUS CONTAINER, begin
 //			af->force = gravity*de->mass;

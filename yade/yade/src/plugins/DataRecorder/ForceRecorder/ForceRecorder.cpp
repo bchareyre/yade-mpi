@@ -1,5 +1,5 @@
 #include "ForceRecorder.hpp"
-#include "RigidBody.hpp"
+#include "RigidBodyParameters.hpp"
 #include "Omega.hpp"
 #include "ComplexBody.hpp"
 
@@ -29,7 +29,7 @@ void ForceRecorder::registerAttributes()
 
 void ForceRecorder::action(Body * body)
 {
-	RigidBody * rb = dynamic_cast<RigidBody*>(body);
+	RigidBodyParameters * rb = dynamic_cast<RigidBodyParameters*>(body);
 	
 	if( Omega::instance().getCurrentIteration() % interval == 0 /*&& ofile*/ )
 	

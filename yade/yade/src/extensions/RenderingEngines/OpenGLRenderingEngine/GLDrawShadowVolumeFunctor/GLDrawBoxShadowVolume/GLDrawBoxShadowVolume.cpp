@@ -23,7 +23,7 @@
 
 #include "GLDrawBoxShadowVolume.hpp"
 #include "Box.hpp"
-#include "RigidBody.hpp"
+#include "RigidBodyParameters.hpp"
 #include "OpenGLWrapper.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -31,7 +31,7 @@
 
 void GLDrawBoxShadowVolume::go(const shared_ptr<GeometricalModel>& gm , const shared_ptr<BodyPhysicalParameters>& pp, const Vector3r& lightPos)
 {
-	//Se3r& se3 = (static_cast<RigidBody*>(pp.get()))->se3;
+	//Se3r& se3 = (static_cast<RigidBodyParameters*>(pp.get()))->se3;
 	Se3r& se3 = pp->se3;
 	Vector3r& extents = (static_cast<Box*>(gm.get()))->extents;
 	

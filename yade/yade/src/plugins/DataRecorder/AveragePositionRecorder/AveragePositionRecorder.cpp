@@ -1,5 +1,5 @@
 #include "AveragePositionRecorder.hpp"
-#include "RigidBody.hpp"
+#include "RigidBodyParameters.hpp"
 #include "Omega.hpp"
 #include "ComplexBody.hpp"
 

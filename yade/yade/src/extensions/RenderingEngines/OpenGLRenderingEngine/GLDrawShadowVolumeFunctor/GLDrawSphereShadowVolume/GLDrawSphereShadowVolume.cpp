@@ -23,7 +23,7 @@
 
 #include "GLDrawSphereShadowVolume.hpp"
 #include "Sphere.hpp"
-#include "Particle.hpp"
+#include "ParticleParameters.hpp"
 #include "OpenGLWrapper.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -31,8 +31,8 @@
 
 void GLDrawSphereShadowVolume::go(const shared_ptr<GeometricalModel>& gm , const shared_ptr<BodyPhysicalParameters>& pp, const Vector3r& lightPos)
 {
-	//FIXME : do not cast on RigidBody but use Parameters instead
-	//Vector3r center = (static_cast<Particle*>(pp.get()))->se3.translation;
+	//FIXME : do not cast on RigidBodyParameters but use Parameters instead
+	//Vector3r center = (static_cast<ParticleParameters*>(pp.get()))->se3.translation;
 	Vector3r center = pp->se3.translation;
 	Real radius = (static_cast<Sphere*>(gm.get()))->radius;
 	

@@ -26,15 +26,15 @@
 #include "SDECContactPhysics.hpp"
 #include "Omega.hpp"
 #include "ComplexBody.hpp"
-#include "SDECDiscreteElement.hpp"
+#include "SDECParameters.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void SDECLinearContactModel::go(const shared_ptr<BodyPhysicalParameters>& b1, const shared_ptr<BodyPhysicalParameters>& b2,	shared_ptr<Interaction>& interaction)
 {
-	SDECDiscreteElement* de1 = static_cast<SDECDiscreteElement*>(b1.get());
-	SDECDiscreteElement* de2 = static_cast<SDECDiscreteElement*>(b2.get());
+	SDECParameters* de1 = static_cast<SDECParameters*>(b1.get());
+	SDECParameters* de2 = static_cast<SDECParameters*>(b2.get());
 	SDECContactGeometry* interactionGeometry = static_cast<SDECContactGeometry*>(interaction->interactionGeometry.get());
 	shared_ptr<SDECContactPhysics> contactPhysics;
 	

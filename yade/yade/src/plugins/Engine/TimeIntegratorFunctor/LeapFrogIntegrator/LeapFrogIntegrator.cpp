@@ -22,8 +22,8 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "LeapFrogIntegrator.hpp"
-#include "RigidBody.hpp"
-#include "Particle.hpp"
+#include "RigidBodyParameters.hpp"
+#include "ParticleParameters.hpp"
 #include "Omega.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -41,7 +41,7 @@ void LeapFrogIntegrator::go(const shared_ptr<BodyPhysicalParameters>& b,unsigned
 		firsts.resize(id+1,true);
 	}
 
-	Particle * p = dynamic_cast<Particle*>(b.get());
+	ParticleParameters * p = dynamic_cast<ParticleParameters*>(b.get());
 
 	Real dt = Omega::instance().getTimeStep();
 
@@ -53,7 +53,7 @@ void LeapFrogIntegrator::go(const shared_ptr<BodyPhysicalParameters>& b,unsigned
 
 	
 	// FIXME : maybe split into 2 LeapFrogIntegrator
-	RigidBody * rb = dynamic_cast<RigidBody*>(b.get());
+	RigidBodyParameters * rb = dynamic_cast<RigidBodyParameters*>(b.get());
 	if(rb)
 	{		
 		if (prevAngularVelocities.size()<=id)

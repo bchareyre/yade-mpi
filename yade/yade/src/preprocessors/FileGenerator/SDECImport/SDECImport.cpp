@@ -5,11 +5,11 @@
 #include "Sphere.hpp"
 #include "ComplexBody.hpp"
 #include "SAPCollider.hpp"
-#include "SDECDiscreteElement.hpp"
+#include "SDECParameters.hpp"
 #include <fstream>
 #include "IOManager.hpp"
 #include "SDECDynamicEngine.hpp"
-#include "SDECDiscreteElement.hpp"
+#include "SDECParameters.hpp"
 #include "SDECPermanentLink.hpp"
 #include "Interaction.hpp"
 #include "Actor.hpp"
@@ -148,7 +148,7 @@ string SDECImport::generate()
 // 	
 // 	
 // 	
-// 	shared_ptr<SDECDiscreteElement> sdec;
+// 	shared_ptr<SDECParameters> sdec;
 // 	shared_ptr<Body> body;
 // 	Vector3r		center,halfSize;
 // 	Vector3r translation;
@@ -165,7 +165,7 @@ string SDECImport::generate()
 // 		{
 // 			++i;
 // 		
-// 			shared_ptr<SDECDiscreteElement> s(new SDECDiscreteElement);
+// 			shared_ptr<SDECParameters> s(new SDECParameters);
 // 			shared_ptr<AABB> aabb(new AABB);
 // 			shared_ptr<Sphere> sphere(new Sphere);
 // 	
@@ -229,7 +229,7 @@ string SDECImport::generate()
 // /// insert bottom box
 // ///////////////////////////////////////////////////////////////////////////////
 // 
-// 	sdec			= shared_ptr<SDECDiscreteElement>(new SDECDiscreteElement);
+// 	sdec			= shared_ptr<SDECParameters>(new SDECParameters);
 // 	aabb			= shared_ptr<AABB>(new AABB);
 // 	box			= shared_ptr<Box>(new Box);
 // 
@@ -276,7 +276,7 @@ string SDECImport::generate()
 // /// insert top box
 // ///////////////////////////////////////////////////////////////////////////////
 // 
-// 	sdec			= shared_ptr<SDECDiscreteElement>(new SDECDiscreteElement);
+// 	sdec			= shared_ptr<SDECParameters>(new SDECParameters);
 // 	aabb			= shared_ptr<AABB>(new AABB);
 // 	box			= shared_ptr<Box>(new Box);
 // 
@@ -314,7 +314,7 @@ string SDECImport::generate()
 // /// insert 1 box
 // ///////////////////////////////////////////////////////////////////////////////
 // 
-// 	sdec			= shared_ptr<SDECDiscreteElement>(new SDECDiscreteElement);
+// 	sdec			= shared_ptr<SDECParameters>(new SDECParameters);
 // 	aabb			= shared_ptr<AABB>(new AABB);
 // 	box			= shared_ptr<Box>(new Box);
 // 
@@ -352,7 +352,7 @@ string SDECImport::generate()
 // /// insert 2 box
 // ///////////////////////////////////////////////////////////////////////////////
 // 
-// 	sdec			= shared_ptr<SDECDiscreteElement>(new SDECDiscreteElement);
+// 	sdec			= shared_ptr<SDECParameters>(new SDECParameters);
 // 	aabb			= shared_ptr<AABB>(new AABB);
 // 	box			= shared_ptr<Box>(new Box);
 // 
@@ -390,7 +390,7 @@ string SDECImport::generate()
 // /// insert 3 box
 // ///////////////////////////////////////////////////////////////////////////////
 // 
-// 	sdec			= shared_ptr<SDECDiscreteElement>(new SDECDiscreteElement);
+// 	sdec			= shared_ptr<SDECParameters>(new SDECParameters);
 // 	aabb			= shared_ptr<AABB>(new AABB);
 // 	box			= shared_ptr<Box>(new Box);
 // 
@@ -428,7 +428,7 @@ string SDECImport::generate()
 // /// insert 4 box
 // ///////////////////////////////////////////////////////////////////////////////
 // 
-// 	sdec			= shared_ptr<SDECDiscreteElement>(new SDECDiscreteElement);
+// 	sdec			= shared_ptr<SDECParameters>(new SDECParameters);
 // 	aabb			= shared_ptr<AABB>(new AABB);
 // 	box			= shared_ptr<Box>(new Box);
 // 

@@ -14,11 +14,11 @@ LIBS += -lSerialization \
         -lMultiMethods \
         -lSpringPhysics \
         -lSpringGeometry \
-        -lParticle \
         -lActionForce \
         -lActionMomentum \
+        -lParticleParameters \
         -rdynamic 
-INCLUDEPATH += $(YADEINCLUDEPATH) 
+INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
@@ -33,8 +33,9 @@ QMAKE_LIBDIR = ../../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../../../toolboxes/Libraries/MultiMethods/$(YADEDYNLIBPATH) \
                ../../../../plugins/Interaction/InteractionPhysics/SpringPhysics/$(YADEDYNLIBPATH) \
                ../../../../plugins/Interaction/InteractionGeometry/SpringGeometry/$(YADEDYNLIBPATH) \
-               ../../../../plugins/Body/Particle/$(YADEDYNLIBPATH) \
                ../../../../plugins/Engine/Action/ActionForce/$(YADEDYNLIBPATH) \
+               ../../../../plugins/Engine/Action/ActionMomentum/$(YADEDYNLIBPATH) \
+               ../../../../plugins/Body/Particle/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

@@ -3,27 +3,27 @@
 # Subdir relative project main directory: ./plugins/Engine/KinematicEngine/Rotor
 # Target is a library:  
 
-LIBS += -lRigidBody \
-        -lSerialization \
+LIBS += -lSerialization \
         -lMath \
         -lBody \
         -lEngine \
         -lGeometry \
         -lInteraction \
         -lMultiMethods \
+        -lRigidBodyParameters \
         -rdynamic 
 INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../../plugins/Body/RigidBody/$(YADEDYNLIBPATH) \
-               ../../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
+QMAKE_LIBDIR = ../../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
                ../../../../yade/Body/$(YADEDYNLIBPATH) \
                ../../../../yade/Engine/$(YADEDYNLIBPATH) \
                ../../../../yade/Geometry/$(YADEDYNLIBPATH) \
                ../../../../yade/Interaction/$(YADEDYNLIBPATH) \
                ../../../../toolboxes/Libraries/MultiMethods/$(YADEDYNLIBPATH) \
+               ../../../../plugins/Body/RigidBody/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

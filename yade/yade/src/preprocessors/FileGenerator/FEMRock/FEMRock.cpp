@@ -3,14 +3,14 @@
 //#include "Rand.hpp"
 #include "Polyhedron.hpp"
 #include "AABB.hpp"
-#include "FEMBody.hpp"
+#include "FEMNodeParameters.hpp"
 #include "ComplexBody.hpp"
 //#include "SimpleSpringDynamicEngine.hpp"
 //#include "ExplicitMassSpringDynamicEngine.hpp"
 #include <fstream>
 #include "IOManager.hpp"
 #include "Box.hpp"
-#include "RigidBody.hpp"
+#include "RigidBodyParameters.hpp"
 
 
 FEMRock::FEMRock () : FileGenerator()
@@ -49,7 +49,7 @@ string FEMRock::generate()
 // 	rootBody->angularVelocity= Vector3r(0,0,0);
 // 	rootBody->se3		 = Se3r(Vector3r(0,0,0),q);
 // 
-// 	shared_ptr<FEMBody> femBody(new FEMBody);
+// 	shared_ptr<FEMNodeParameters> femBody(new FEMNodeParameters);
 // 	shared_ptr<AABB> aabb(new AABB);
 // 	shared_ptr<Polyhedron> poly(new Polyhedron);
 // 	//	femBody->dynamic	= shared_ptr<DynamicEngine>(new ExplicitMassSpringDynamicEngine);
@@ -85,7 +85,7 @@ string FEMRock::generate()
 // 	rootBody->bodies->insert(b);
 // 
 // 	shared_ptr<Box> box;
-// 	shared_ptr<RigidBody> box1(new RigidBody);
+// 	shared_ptr<RigidBodyParameters> box1(new RigidBodyParameters);
 // 	aabb=shared_ptr<AABB>(new AABB);
 // 	box=shared_ptr<Box>(new Box);
 // 	box1->isDynamic		= false;

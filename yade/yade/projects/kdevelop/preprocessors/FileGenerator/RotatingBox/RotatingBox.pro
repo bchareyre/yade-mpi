@@ -9,10 +9,8 @@ LIBS += -lAABB \
         -lSAPCollider \
         -lBox \
         -lSphere \
-        -lRigidBody \
         -lSerialization \
         -lSDECDynamicEngine \
-        -lSDECDiscreteElement \
         -lMath \
         -lBody \
         -lEngine \
@@ -21,6 +19,8 @@ LIBS += -lAABB \
         -lMultiMethods \
         -lInteractionDescriptionSet \
         -lInteractionDescriptionSet2AABBFunctor \
+        -lRigidBodyParameters \
+        -lSDECParameters \
         -rdynamic 
 INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
@@ -32,10 +32,8 @@ QMAKE_LIBDIR = ../../../plugins/Geometry/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
                ../../../plugins/Interaction/BroadInteractor/SAPCollider/$(YADEDYNLIBPATH) \
                ../../../plugins/Geometry/GeometricalModel/Box/$(YADEDYNLIBPATH) \
                ../../../plugins/Geometry/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
-               ../../../plugins/Body/BodyPhysicalParameters/RigidBody/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/DynamicEngine/SDECDynamicEngine/$(YADEDYNLIBPATH) \
-               ../../../plugins/Body/BodyPhysicalParameters/SDECDiscreteElement/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
                ../../../yade/Body/$(YADEDYNLIBPATH) \
                ../../../yade/Engine/$(YADEDYNLIBPATH) \
@@ -44,6 +42,8 @@ QMAKE_LIBDIR = ../../../plugins/Geometry/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/MultiMethods/$(YADEDYNLIBPATH) \
                ../../../plugins/Geometry/InteractionDescription/InteractionDescriptionSet/$(YADEDYNLIBPATH) \
                ../../../plugins/Geometry/BoundingVolumeFunctor/InteractionDescriptionSet2AABBFunctor/$(YADEDYNLIBPATH) \
+               ../../../plugins/Body/BodyPhysicalParameters/RigidBody/$(YADEDYNLIBPATH) \
+               ../../../plugins/Body/BodyPhysicalParameters/SDECDiscreteElement/$(YADEDYNLIBPATH) \
                ../../../plugins/Geometry/BoundingVolumeFactory/CollisionGeometrySet2AABBFactory/$(YADEDYNLIBPATH) \
                ../../../plugins/Geometry/CollisionGeometry/CollisionGeometrySet/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/RigidBody/$(YADEDYNLIBPATH) \

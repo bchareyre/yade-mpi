@@ -8,11 +8,11 @@
 #include "SimpleSpringDynamicEngine.hpp"
 #include "SAPCollider.hpp"
 #include "Rotor.hpp"
-#include "SDECDiscreteElement.hpp"
+#include "SDECParameters.hpp"
 #include <fstream>
 #include "IOManager.hpp"
 #include "SDECDynamicEngine.hpp"
-#include "SDECDiscreteElement.hpp"
+#include "SDECParameters.hpp"
 #include "BoundingVolumeDispatcher.hpp"
 #include "InteractionDescriptionSet2AABBFunctor.hpp"
 #include "InteractionDescriptionSet.hpp"
@@ -78,8 +78,8 @@ string RotatingBox::generate()
 // 	shared_ptr<AABB> aabb;
 // 	shared_ptr<Box> box;
 // 
-// 	//shared_ptr<SDECDiscreteElement> box1(new SDECDiscreteElement);
-// 	shared_ptr<SDECDiscreteElement> box1(new SDECDiscreteElement);
+// 	//shared_ptr<SDECParameters> box1(new SDECParameters);
+// 	shared_ptr<SDECParameters> box1(new SDECParameters);
 // 
 // 	aabb			= shared_ptr<AABB>(new AABB);
 // 	box			= shared_ptr<Box>(new Box);
@@ -103,7 +103,7 @@ string RotatingBox::generate()
 // 	box1->kn		= 100000;
 // 	box1->ks		= 10000;
 // 
-// 	shared_ptr<SDECDiscreteElement> box2(new SDECDiscreteElement);
+// 	shared_ptr<SDECParameters> box2(new SDECParameters);
 // 	aabb			= shared_ptr<AABB>(new AABB);
 // 	box			= shared_ptr<Box>(new Box);
 // 	box2->isDynamic		= false;
@@ -126,7 +126,7 @@ string RotatingBox::generate()
 // 	box2->kn		= 100000;
 // 	box2->ks		= 10000;
 // 
-// 	shared_ptr<SDECDiscreteElement> box3(new SDECDiscreteElement);
+// 	shared_ptr<SDECParameters> box3(new SDECParameters);
 // 	aabb			= shared_ptr<AABB>(new AABB);
 // 	box			= shared_ptr<Box>(new Box);
 // 	box3->isDynamic		= false;
@@ -149,7 +149,7 @@ string RotatingBox::generate()
 // 	box3->kn		= 100000;
 // 	box3->ks		= 10000;
 // 
-// 	shared_ptr<SDECDiscreteElement> box4(new SDECDiscreteElement);
+// 	shared_ptr<SDECParameters> box4(new SDECParameters);
 // 	aabb			= shared_ptr<AABB>(new AABB);
 // 	box			= shared_ptr<Box>(new Box);
 // 	box4->isDynamic		= false;
@@ -172,7 +172,7 @@ string RotatingBox::generate()
 // 	box4->kn		= 100000;
 // 	box4->ks		= 10000;
 // 
-// 	shared_ptr<SDECDiscreteElement> box5(new SDECDiscreteElement);
+// 	shared_ptr<SDECParameters> box5(new SDECParameters);
 // 	aabb			= shared_ptr<AABB>(new AABB);
 // 	box			= shared_ptr<Box>(new Box);
 // 	box5->isDynamic		= false;
@@ -195,7 +195,7 @@ string RotatingBox::generate()
 // 	box5->kn		= 100000;
 // 	box5->ks		= 10000;
 // 
-// 	shared_ptr<SDECDiscreteElement> box6(new SDECDiscreteElement);
+// 	shared_ptr<SDECParameters> box6(new SDECParameters);
 // 	aabb			= shared_ptr<AABB>(new AABB);
 // 	box			= shared_ptr<Box>(new Box);
 // 	box6->isDynamic		= false;
@@ -218,7 +218,7 @@ string RotatingBox::generate()
 // 	box6->kn		= 100000;
 // 	box6->ks		= 10000;
 // 
-// 	shared_ptr<SDECDiscreteElement> box7(new SDECDiscreteElement);
+// 	shared_ptr<SDECParameters> box7(new SDECParameters);
 // 	aabb			= shared_ptr<AABB>(new AABB);
 // 	box			= shared_ptr<Box>(new Box);
 // 	box7->isDynamic		= false;
@@ -256,7 +256,7 @@ string RotatingBox::generate()
 // 		for(int j=0;j<nbSpheres;j++)
 // 			for(int k=0;k<nbSpheres;k++)
 // 	{
-// 		shared_ptr<SDECDiscreteElement> s(new SDECDiscreteElement);
+// 		shared_ptr<SDECParameters> s(new SDECParameters);
 // 		shared_ptr<AABB> aabb(new AABB);
 // 		shared_ptr<Sphere> sphere(new Sphere);
 // 
@@ -299,7 +299,7 @@ string RotatingBox::generate()
 // 		for(int j=0;j<nbBoxes;j++)
 // 			for(int k=0;k<nbBoxes;k++)
 // 			{
-// 				shared_ptr<SDECDiscreteElement> boxi(new SDECDiscreteElement);
+// 				shared_ptr<SDECParameters> boxi(new SDECParameters);
 // 				aabb=shared_ptr<AABB>(new AABB);
 // 				box=shared_ptr<Box>(new Box);
 // 

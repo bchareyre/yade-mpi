@@ -1,5 +1,5 @@
 #include "Rotor.hpp"
-#include "RigidBody.hpp"
+#include "RigidBodyParameters.hpp"
 #include "ComplexBody.hpp"
 
 void Rotor::registerAttributes()
@@ -29,7 +29,7 @@ void Rotor::moveToNextTimeStep(Body * body)
 	
 	for(;ii!=iiEnd;++ii)
 	{
-		RigidBody * rb = static_cast<RigidBody*>((*bodies)[*ii]->physicalParameters.get());
+		RigidBodyParameters * rb = static_cast<RigidBodyParameters*>((*bodies)[*ii]->physicalParameters.get());
 
 		//rb->se3.translation	= q*rb->se3.translation;
 		rb->se3.rotation	= q*rb->se3.rotation;

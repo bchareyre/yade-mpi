@@ -7,11 +7,11 @@
 #include "ComplexBody.hpp"
 #include "SAPCollider.hpp"
 #include "PersistentSAPCollider.hpp"
-#include "SDECDiscreteElement.hpp"
+#include "SDECParameters.hpp"
 #include <fstream>
 #include "IOManager.hpp"
 #include "SDECDynamicEngine.hpp"
-#include "SDECDiscreteElement.hpp"
+#include "SDECParameters.hpp"
 #include "SDECPermanentLink.hpp"
 #include "Interaction.hpp"
 #include "BoundingVolumeDispatcher.hpp"
@@ -68,7 +68,7 @@ string SDECSpheresPlane::generate()
 	igd->addInteractionGeometryFunctor("InteractionSphere","InteractionBox","Box2Sphere4SDECContactModel");
 
 	shared_ptr<InteractionPhysicsDispatcher> ipd(new InteractionPhysicsDispatcher);
-	ipd->addInteractionPhysicsFunctor("SDECDiscreteElement","SDECDiscreteElement","SDECLinearContactModel");
+	ipd->addInteractionPhysicsFunctor("SDECParameters","SDECParameters","SDECLinearContactModel");
 		
 	shared_ptr<BoundingVolumeDispatcher> bvu	= shared_ptr<BoundingVolumeDispatcher>(new BoundingVolumeDispatcher);
 	bvu->addBoundingVolumeFunctors("InteractionSphere","AABB","Sphere2AABBFunctor");
@@ -76,11 +76,11 @@ string SDECSpheresPlane::generate()
 	bvu->addBoundingVolumeFunctors("InteractionDescriptionSet","AABB","InteractionDescriptionSet2AABBFunctor");
 	
 	shared_ptr<ActionDispatcher> ad(new ActionDispatcher);
-	ad->addActionFunctor("ActionForce","RigidBody","ActionForce2Particle");
-	ad->addActionFunctor("ActionMomentum","RigidBody","ActionMomentum2RigidBody");
+	ad->addActionFunctor("ActionForce","RigidBodyParameters","ActionForce2Particle");
+	ad->addActionFunctor("ActionMomentum","RigidBodyParameters","ActionMomentum2RigidBody");
 	
 	shared_ptr<TimeIntegratorDispatcher> ti(new TimeIntegratorDispatcher);
-	ti->addTimeIntegratorFunctor("SDECDiscreteElement","LeapFrogIntegrator");
+	ti->addTimeIntegratorFunctor("SDECParameters","LeapFrogIntegrator");
 	
 	rootBody->actors.resize(7);
 	rootBody->actors[0] 		= bvu;	
@@ -93,7 +93,7 @@ string SDECSpheresPlane::generate()
 	
 
 	//FIXME : use a default one
-	shared_ptr<Particle> physics2(new Particle); // FIXME : fix indexable class BodyPhysicalParameters
+	shared_ptr<ParticleParameters> physics2(new ParticleParameters); // FIXME : fix indexable class BodyPhysicalParameters
 	physics2->se3		= Se3r(Vector3r(0,0,0),q);
 	physics2->mass		= 0;
 	physics2->velocity	= Vector3r(0,0,0);
@@ -124,7 +124,7 @@ string SDECSpheresPlane::generate()
 
 	
 	shared_ptr<SimpleBody> box1(new SimpleBody);
-	shared_ptr<SDECDiscreteElement> physics(new SDECDiscreteElement);
+	shared_ptr<SDECParameters> physics(new SDECParameters);
 	
 	aabb			= shared_ptr<AABB>(new AABB);
 	box			= shared_ptr<Box>(new Box);
@@ -165,7 +165,7 @@ string SDECSpheresPlane::generate()
 			for(int k=0;k<nbSpheres;k++)
 	{
 		shared_ptr<SimpleBody> simple(new SimpleBody);
-		shared_ptr<SDECDiscreteElement> s(new SDECDiscreteElement);
+		shared_ptr<SDECParameters> s(new SDECParameters);
 		shared_ptr<AABB> aabb(new AABB);
 		shared_ptr<Sphere> sphere(new Sphere);
 		shared_ptr<InteractionSphere> interactionSphere(new InteractionSphere);

@@ -4,7 +4,6 @@
 # Target is a library:  
 
 LIBS += -lMassSpringBody \
-        -lRigidBody \
         -lDistances \
         -lSerialization \
         -lSimpleSpringDynamicEngine \
@@ -16,13 +15,13 @@ LIBS += -lMassSpringBody \
         -lGeometry \
         -lInteraction \
         -lMultiMethods \
+        -lRigidBodyParameters \
         -rdynamic 
 INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 QMAKE_LIBDIR = ../../../../plugins/Body/MassSpringBody/$(YADEDYNLIBPATH) \
-               ../../../../plugins/Body/RigidBody/$(YADEDYNLIBPATH) \
                ../../../../toolboxes/ComputationalGeometry/Distances/$(YADEDYNLIBPATH) \
                ../../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../../../plugins/Engine/DynamicEngine/SimpleSpringDynamicEngine/$(YADEDYNLIBPATH) \
@@ -34,6 +33,7 @@ QMAKE_LIBDIR = ../../../../plugins/Body/MassSpringBody/$(YADEDYNLIBPATH) \
                ../../../../yade/Geometry/$(YADEDYNLIBPATH) \
                ../../../../yade/Interaction/$(YADEDYNLIBPATH) \
                ../../../../toolboxes/Libraries/MultiMethods/$(YADEDYNLIBPATH) \
+               ../../../../plugins/Body/RigidBody/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

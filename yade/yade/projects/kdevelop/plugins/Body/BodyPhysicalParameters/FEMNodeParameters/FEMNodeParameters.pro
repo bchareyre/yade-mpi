@@ -36,5 +36,5 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
-HEADERS += FEMBody.hpp 
-SOURCES += FEMBody.cpp 
+HEADERS += FEMNodeParameters.hpp 
+SOURCES += FEMNodeParameters.cpp 

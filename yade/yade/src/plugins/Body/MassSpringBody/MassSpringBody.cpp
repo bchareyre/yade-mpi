@@ -3,7 +3,7 @@
 #include "Mesh2D.hpp"
 #include "AABB.hpp"
 #include "Math.hpp"
-#include "Particle.hpp"
+#include "ParticleParameters.hpp"
 
 MassSpringBody::MassSpringBody () : ComplexBody()
 {

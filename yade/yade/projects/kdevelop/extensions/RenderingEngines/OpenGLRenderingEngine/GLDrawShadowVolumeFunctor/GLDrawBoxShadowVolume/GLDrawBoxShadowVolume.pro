@@ -3,19 +3,19 @@
 # Subdir relative project main directory: ./extensions/RenderingEngines/OpenGLRenderingEngine/GLDrawShadowVolumeFunctor/GLDrawBoxShadowVolume
 # Target is a library:  
 
-LIBS += -lRigidBody \
-        -lBox \
+LIBS += -lBox \
         -lBody \
         -lGeometry \
+        -lRigidBodyParameters \
         -rdynamic 
-INCLUDEPATH += $(YADEINCLUDEPATH) 
+INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../../../plugins/Body/BodyPhysicalParameters/RigidBody/$(YADEDYNLIBPATH) \
-               ../../../../../plugins/Geometry/GeometricalModel/Box/$(YADEDYNLIBPATH) \
+QMAKE_LIBDIR = ../../../../../plugins/Geometry/GeometricalModel/Box/$(YADEDYNLIBPATH) \
                ../../../../../yade/Body/$(YADEDYNLIBPATH) \
                ../../../../../yade/Geometry/$(YADEDYNLIBPATH) \
+               ../../../../../plugins/Body/BodyPhysicalParameters/RigidBody/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
 CONFIG += debug \

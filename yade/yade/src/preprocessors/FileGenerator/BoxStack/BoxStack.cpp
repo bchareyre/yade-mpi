@@ -7,7 +7,7 @@
 #include "ComplexBody.hpp"
 #include "SimpleSpringDynamicEngine.hpp"
 #include "SAPCollider.hpp"
-#include "RigidBody.hpp"
+#include "RigidBodyParameters.hpp"
 #include <fstream>
 #include "IOManager.hpp"
 
@@ -57,7 +57,7 @@ string BoxStack::generate()
 // 	shared_ptr<AABB> aabb;
 // 	shared_ptr<Box> box;
 // 
-// 	shared_ptr<RigidBody> box1(new RigidBody);
+// 	shared_ptr<RigidBodyParameters> box1(new RigidBodyParameters);
 // 	aabb=shared_ptr<AABB>(new AABB);
 // 	box=shared_ptr<Box>(new Box);
 // 	box1->isDynamic		= false;
@@ -86,7 +86,7 @@ string BoxStack::generate()
 // 	for(int i=0;i<baseSize;i++)
 // 		for(int j=0;j<i;j++)
 // 		{
-// 			shared_ptr<RigidBody> boxi(new RigidBody);
+// 			shared_ptr<RigidBodyParameters> boxi(new RigidBodyParameters);
 // 			aabb=shared_ptr<AABB>(new AABB);
 // 			box=shared_ptr<Box>(new Box);
 // 			Vector3r size = Vector3r(4,4,4);
