@@ -26,7 +26,7 @@ QMAKE_LIBDIR = ../../../../plugins/GeometricalModel/Box/$(YADEDYNLIBPATH) \
                ../../../../toolboxes/ComputationalGeometry/Intersections/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
-CONFIG += release \
+CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 

@@ -26,7 +26,7 @@ QMAKE_LIBDIR = ../../../plugins/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Math/M2D/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
-CONFIG += release \
+CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 

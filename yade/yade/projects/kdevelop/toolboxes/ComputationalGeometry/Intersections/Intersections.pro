@@ -22,7 +22,7 @@ QMAKE_LIBDIR = ../../../toolboxes/Math/M2D/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
-CONFIG += release \
+CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 

@@ -38,7 +38,7 @@
 
 SDECDynamicEngine::SDECDynamicEngine() : DynamicEngine()
 {
-
+	first=true;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -72,17 +72,19 @@ void SDECDynamicEngine::registerAttributes()
 
 void SDECDynamicEngine::respondToCollisions(Body* body, const std::list<shared_ptr<Interaction> >& interactions)
 {
+
 	NonConnexBody * ncb = dynamic_cast<NonConnexBody*>(body);
 	vector<shared_ptr<Body> >& bodies = ncb->bodies;
 
 	Vector3 gravity = Omega::instance().gravity;
 	float dt = Omega::instance().dt;
-	
+
 	if (first)
 	{
 		forces.resize(bodies.size());
 		moments.resize(bodies.size());
 		prevInteractions.clear();
+		first = false;
 	}
 
 	fill(forces.begin(),forces.end(),Vector3(0,0,0));
@@ -108,8 +110,9 @@ void SDECDynamicEngine::respondToCollisions(Body* body, const std::list<shared_p
 	std::list<shared_ptr<Interaction> >::const_iterator ctiEnd = interactions.end();
 	for( ; cti!=ctiEnd ; ++cti)
 	{
+
 		shared_ptr<Contact> contact = static_pointer_cast<Contact>(*cti);
-	
+
 		int id1 = contact->id1;
 		int id2 = contact->id2;
 
@@ -119,15 +122,24 @@ void SDECDynamicEngine::respondToCollisions(Body* body, const std::list<shared_p
 
 		Vector3 p1 = cf->closestsPoints[0].first;
 		Vector3 p2 = cf->closestsPoints[0].second;
- 
+
 		pair<int,int> idPair;
 		if (id1<id2)
 			idPair = pair<int,int>(id1,id2);
 		else
 			idPair = pair<int,int>(id2,id1);
-			
+
+		/*if(id1==2 && id2==3)
+		{
+			//cerr << "..\n";
+			static int oo=0;
+			cerr << ++oo << endl;
+			Omega::instance().dt=0.000005;
+			dt=Omega::instance().dt;
+		}*/
+
 		pii = prevInteractions.find(idPair);
-		
+
 		if (pii==prevInteractions.end())
 		{
 			// FIXME : put these lines into a dynlib - PhysicalCollider
@@ -136,10 +148,11 @@ void SDECDynamicEngine::respondToCollisions(Body* body, const std::list<shared_p
 			ni.initialKs = 2*(de1->ks*de2->ks)/(de1->ks+de2->ks);
 			ni.normal = (p1-p2).normalize();
 			ni.accessed = true;
+			(*pii).second.shearForce = Vector3(0,0,0);
 			shared_ptr<Sphere> s1 = dynamic_pointer_cast<Sphere>(de1->cm);
 			shared_ptr<Sphere> s2 = dynamic_pointer_cast<Sphere>(de2->cm);
 
-			if (s1 && s2)
+			if (s1 && s2) // 1
 				ni.initialEquilibriumDistance = s1->radius+s2->radius;
 			else if (s1 && !s2)
 				ni.initialEquilibriumDistance = s1->radius+2*s1->radius;
@@ -147,7 +160,6 @@ void SDECDynamicEngine::respondToCollisions(Body* body, const std::list<shared_p
 				ni.initialEquilibriumDistance = s2->radius+2*s2->radius;
 			else
 				throw;
-
 			pii = (prevInteractions.insert(map<pair<int,int> , interactionInfo, lessThanPair>::value_type( idPair , ni ))).first;
 		}
 		else
@@ -163,27 +175,36 @@ void SDECDynamicEngine::respondToCollisions(Body* body, const std::list<shared_p
 
 		//float un = (*pii).second.initialEquilibriumDistance-(de1->se3.translation-de1->se3.translation).length();
 
+		// 2
 		float un = (p2-p1).length(); // FIXME : it's now a penetration depth, but with initialized conditions it won't be
 		(*pii).second.normalForce = (*pii).second.kn*un*(*pii).second.normal;
 
-cout << id1 << " " << id2 << " 1 - " << (*pii).second.shearForce << endl;
-		(*pii).second.shearForce -= (*pii).second.shearForce.cross((*pii).second.prevNormal.cross((*pii).second.normal));
-cout << id1 << " " << id2 << " 2 - " << (*pii).second.shearForce << endl;
-		float a = 0.5*(*pii).second.normal.dot(de1->angularVelocity+de2->angularVelocity);
+//cout << id1 << " " << id2 << " 1 - " << (*pii).second.shearForce << endl;
+
+		Vector3 nn = (*pii).second.prevNormal.cross((*pii).second.normal);
+		//if ( nn.length() > 0.0000001 )
+		//	nn=nn.normalize();
+
+		(*pii).second.shearForce -= (*pii).second.shearForce.cross(   nn   );
+//cout << id1 << " " << id2 << " 2 - " << (*pii).second.shearForce << endl;
+		float a = dt*0.5*(*pii).second.normal.dot(de1->angularVelocity+de2->angularVelocity);
 		Vector3 axis = a*(*pii).second.normal;
 
 		(*pii).second.shearForce -= (*pii).second.shearForce.cross(axis);
-cout << id1 << " " << id2 << " 3 - " << (*pii).second.shearForce << endl;
+//cout << id1 << " " << id2 << " 3 - " << (*pii).second.shearForce << endl;
 		Vector3 x = 0.5*(p1+p2); // FIXME : it's now a penetration depth, but with initialized conditions it won't be
 		Vector3 c1x = (x - de1->se3.translation);
 		Vector3 c2x = (x - de2->se3.translation);
 
 		Vector3 relativeVelocity = (de2->velocity+de2->angularVelocity.cross(c2x)) - (de1->velocity+de1->angularVelocity.cross(c1x));
 
+		//(*pii).second.shearForce = relativeVelocity.normalize()*(*pii).second.shearForce.length();
+		//cout << (*pii).second.shearForce.normalize() << "  || " <<relativeVelocity.normalize() << endl;
+
 		Vector3 shearVelocity = relativeVelocity-(*pii).second.normal.dot(relativeVelocity)*(*pii).second.normal;
 		Vector3 shearDisplacement = shearVelocity*dt;
 		(*pii).second.shearForce -=  (*pii).second.ks*shearDisplacement;
-cout << id1 << " " << id2 << " 4 - " << (*pii).second.shearForce << endl;
+//cout << id1 << " " << id2 << " 4 - " << (*pii).second.shearForce << endl;
 		Vector3 f = (*pii).second.normalForce + (*pii).second.shearForce;
 
 		forces[id1] -= f;
@@ -196,15 +217,42 @@ cout << id1 << " " << id2 << " 4 - " << (*pii).second.shearForce << endl;
 	for(unsigned int i=0; i < bodies.size(); i++)
         {
 		shared_ptr<SDECDiscreteElement> de = dynamic_pointer_cast<SDECDiscreteElement>(bodies[i]);
-
 		if (de)
 		{
+
+			forces[i] += gravity*de->mass;
+			int sign;
+			float f = forces[i].length();
+
+			for(int j=0;j<3;j++)
+			{
+				if (de->velocity[j]==0)
+					sign=0;
+				else if (de->velocity[j]>0)
+					sign=1;
+				else
+					sign=-1;
+				forces[i][j] -= 0.1*f*sign;
+			}
+
+
+			float m = moments[i].length();
+
+			for(int j=0;j<3;j++)
+			{
+				if (de->angularVelocity[j]==0)
+					sign=0;
+				else if (de->angularVelocity[j]>0)
+					sign=1;
+				else
+					sign=-1;
+				moments[i][j] -= 0.1*m*sign;
+			}
+
 			de->acceleration += forces[i]*de->invMass;
 			de->angularAcceleration += moments[i].multTerm(de->invInertia);
 		}
         }
-
-	first = false;
 
 }
 

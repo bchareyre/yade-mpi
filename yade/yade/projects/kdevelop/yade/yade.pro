@@ -22,7 +22,7 @@ QMAKE_LIBDIR = ../toolboxes/Math/M3D/$(YADEDYNLIBPATH) \
                ../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEBINPATH) 
-CONFIG += release \
+CONFIG += debug \
           warn_on 
 TEMPLATE = app 
 HEADERS += Body.hpp \

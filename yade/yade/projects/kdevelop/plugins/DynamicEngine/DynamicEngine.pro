@@ -11,6 +11,6 @@ SUBDIRS += SimpleSpringDynamicEngine \
 MOC_DIR = $(YADECOMPILATIONPATH)
 UI_DIR = $(YADECOMPILATIONPATH)
 OBJECTS_DIR = $(YADECOMPILATIONPATH)
-CONFIG += release \
+CONFIG += debug \
 warn_on
 TEMPLATE = subdirs

@@ -132,7 +132,8 @@ void HangingCloth::exec()
 	rootBody->bodies.push_back(dynamic_pointer_cast<Body>(cloth));
 
 
-	for(int i=0;i<1/*nbSpheres*/;i++)
+	for(int i=0;i<1//nbSpheres
+	;i++)
 	{
 		shared_ptr<RigidBody> s(new RigidBody);
 		shared_ptr<AABB> aabb(new AABB);
@@ -177,7 +178,8 @@ void HangingCloth::exec()
 		rootBody->bodies.push_back(dynamic_pointer_cast<Body>(s));
 	}
 
-
+// FIXME : why it save twice some attributes?
+//	IOManager::loadFromFile("XMLManager", "../data/HangingCloth.xml", "rootBody", rootBody);
 	IOManager::saveToFile("XMLManager", "../data/HangingCloth.xml", "rootBody", rootBody);
 
 }

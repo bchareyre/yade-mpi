@@ -37,7 +37,7 @@ void RotatingBox::registerAttributes()
 void RotatingBox::exec()
 {
 	shared_ptr<NonConnexBody> rootBody(new NonConnexBody);
-	int nbSpheres = 3;
+	int nbSpheres = 10;
 	int nbBox = 0;
 	Quaternion q;
 	q.fromAngleAxis(0, Vector3(0,0,1));
@@ -236,7 +236,7 @@ void RotatingBox::exec()
 		float radius 		= (Rand::intervalRandom(3,4));
 
 		shared_ptr<BallisticDynamicEngine> ballistic(new BallisticDynamicEngine);
-		ballistic->damping 	= 0.95;
+		ballistic->damping 	= 1.0;//0.95;
 		s->dynamic		= dynamic_pointer_cast<DynamicEngine>(ballistic);
 		s->isDynamic		= true;
 		s->angularVelocity	= Vector3(0,0,0);
@@ -272,7 +272,7 @@ void RotatingBox::exec()
 				box=shared_ptr<Box>(new Box);
 				shared_ptr<BallisticDynamicEngine> ballistic(new BallisticDynamicEngine);
 				Vector3 size = Vector3((4+Rand::symmetricRandom()),(4+Rand::symmetricRandom()),(4+Rand::symmetricRandom()));
-				ballistic->damping 	= 0.95;
+				ballistic->damping 	= 1.0;//0.95;
 				boxi->dynamic		= dynamic_pointer_cast<DynamicEngine>(ballistic);
 				boxi->isDynamic		= true;
 				boxi->angularVelocity	= Vector3(0,0,0);

@@ -79,7 +79,6 @@ void Sphere::subdivideTriangle(Vector3& v1,Vector3& v2,Vector3& v3, int depth)
 {
 	Vector3 v12,v23,v31;
 
-
 	if (depth==0)
 	{
 
