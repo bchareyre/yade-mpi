@@ -37,11 +37,11 @@
 	It is used for creating a geometrical model from a given set of parameters.
 	This is very useful when you want to load a file that contains geometrical data or when you want to build an object with that depends on several parameters.
 */
-class GeometricalModelFactory : public Factorable
+class BodyGeometricalModelFactoryFunctor : public Factorable
 {	
 	// construction
-	public : GeometricalModelFactory ();
-	public : virtual ~GeometricalModelFactory ();
+	public : BodyGeometricalModelFactoryFunctor ();
+	public : virtual ~BodyGeometricalModelFactoryFunctor ();
 	
 	public : virtual shared_ptr<BodyGeometricalModel> createGeometricalModel() = 0;
 

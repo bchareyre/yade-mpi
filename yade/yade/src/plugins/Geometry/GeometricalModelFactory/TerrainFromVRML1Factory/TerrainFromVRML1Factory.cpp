@@ -1,7 +1,7 @@
 #include "TerrainFromVRML1Factory.hpp"
 #include "Terrain.hpp"
 
-TerrainFromVRML1Factory::TerrainFromVRML1Factory() : GeometricalModelFactory()
+TerrainFromVRML1Factory::TerrainFromVRML1Factory() : BodyGeometricalModelFactoryFunctor()
 {
 
 }

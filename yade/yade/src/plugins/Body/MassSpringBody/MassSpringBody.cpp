@@ -1,6 +1,5 @@
 #include "MassSpringBody.hpp"
 
-// FIXME : redisign must not use a particular GM,CM or BV into Body
 #include "Mesh2D.hpp"
 #include "AABB.hpp"
 #include "Math.hpp"

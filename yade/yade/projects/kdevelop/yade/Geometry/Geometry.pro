@@ -19,15 +19,26 @@ CONFIG += debug \
           dll 
 TEMPLATE = lib 
 HEADERS += BodyBoundingVolume.hpp \
+           BodyBoundingVolumeFactoryFunctor.hpp \
+           BodyBoundingVolumeFactoryDispatcher.hpp 
+           BodyBoundingVolumeUpdatorFunctor.hpp \
+           BodyBoundingVolumeUpdatorDispatcher.hpp \
            BodyInteractionGeometry.hpp \
-           InteractionGeometryFactory.hpp \
+           BodyInteractionGeometryFactoryFunctor.hpp \
+           BodyInteractionGeometryFactoryDispatcher.hpp \
+           BodyInteractionGeometryUpdatorFunctor.hpp \
+           BodyInteractionGeometryUpdatorDispatcher.hpp \
            BodyGeometricalModel.hpp \
-           GeometricalModelFactory.hpp \
-           BoundingVolumeFactory.hpp \
-           BoundingVolumeUpdator.hpp 
+           BodyGeometricalModelFactoryFunctor.hpp \
+           BodyGeometricalModelFactoryDispatcher.hpp \
+           BodyGeometricalModelUpdatorFunctor.hpp \
+           BodyGeometricalModelUpdatorDispatcher.hpp
 SOURCES += BodyBoundingVolume.cpp \
+           BodyBoundingVolumeFactoryDispatcher.cpp \
+           BodyBoundingVolumeUpdatorDispatcher.cpp \
            BodyInteractionGeometry.cpp \
-           InteractionGeometryFactory.cpp \
+           BodyInteractionGeometryFactoryDispatcher.cpp \
+           BodyInteractionGeometryUpdatorDispatcher.cpp \
            BodyGeometricalModel.cpp \
-           GeometricalModelFactory.cpp \
-           BoundingVolumeUpdator.cpp 
+           BodyGeometricalModelFactoryDispatcher.cpp \
+           BodyGeometricalModelUpdatorDispatcher.cpp

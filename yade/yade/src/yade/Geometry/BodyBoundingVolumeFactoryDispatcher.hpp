@@ -20,110 +20,63 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-#include "BoundingVolumeUpdator.hpp"
-#include "ComplexBody.hpp"
+ 
+#ifndef __BOUNDINGVOLUMEUPDATOR_HPP__
+#define __BOUNDINGVOLUMEUPDATOR_HPP__
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//FIXME : should this class be abstract interface
-BoundingVolumeUpdator::BoundingVolumeUpdator () : Actor()
+#include "Actor.hpp"
+#include "DynLibDispatcher.hpp"
+#include "BodyInteractionGeometry.hpp"
+#include "BodyBoundingVolume.hpp"
+#include "BodyBoundingVolumeFactoryFunctor.hpp"
+#include "Body.hpp"
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class BodyBoundingVolumeFactoryDispatcher : public Actor
 {
-}
+	protected: DynLibDispatcher
+		<	TYPELIST_2( BodyInteractionGeometry , BodyBoundingVolume ) ,	// base classess for dispatch
+			BodyBoundingVolumeFactoryFunctor,					// class that provides multivirtual call
+			void ,							// return type
+			TYPELIST_3(
+					  const shared_ptr<BodyInteractionGeometry>&	// arguments
+					, shared_ptr<BodyBoundingVolume>&
+					, const Se3r&
+				)
+		> bvFactoriesManager;
+
+	private : vector<vector<string> > bvFactories;
+	public  : void addBVFactories(const string& str1,const string& str2,const string& str3);
+
+	// construction
+	public : BodyBoundingVolumeFactoryDispatcher ();
+	public : ~BodyBoundingVolumeFactoryDispatcher ();
+
+	public : void registerAttributes();
+	public : void postProcessAttributes(bool deserializing);
+	public : virtual void action(Body* b);
+	public : void updateBoundingVolume(Body* b);
+	public : void updateBoundingVolume(shared_ptr<Body> b);
+	REGISTER_CLASS_NAME(BodyBoundingVolumeFactoryDispatcher);
+
+	public : bool isActivated();
+
+};
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-BoundingVolumeUpdator::~BoundingVolumeUpdator ()
-{
-
-}
+REGISTER_SERIALIZABLE(BodyBoundingVolumeFactoryDispatcher,false);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool BoundingVolumeUpdator::isActivated()
-{
-	return true;
-}
+#endif // __BOUNDINGVOLUMEUPDATOR_HPP__
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-void BoundingVolumeUpdator::updateBoundingVolume(shared_ptr<Body> b)
-{
-	if (b->containSubBodies)
-	{
-		shared_ptr<ComplexBody>  ncb = dynamic_pointer_cast<ComplexBody>(b);
-		shared_ptr<BodyContainer> bodies = ncb->bodies;
-		for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext())
-		{
-			updateBoundingVolume(bodies->getCurrent());
-		}
-	}
-	
-	bvFactoriesManager(b->interactionGeometry,b->boundingVolume,b->physicalParameters->se3);
-
-//	buildBoundingVolumeDispatcher(cm,se3,bv);
-		
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-void BoundingVolumeUpdator::updateBoundingVolume(Body* b)
-{
-	if (b->containSubBodies)
-	{
-		ComplexBody * ncb = dynamic_cast<ComplexBody*>(b);
-		shared_ptr<BodyContainer> bodies = ncb->bodies;
-		for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext())
-		{
-			updateBoundingVolume(bodies->getCurrent());
-		}
-	}
-	
-	bvFactoriesManager(b->interactionGeometry,b->boundingVolume,b->physicalParameters->se3);
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-void BoundingVolumeUpdator::action(Body* b)
-{
-	updateBoundingVolume(b);
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-void BoundingVolumeUpdator::postProcessAttributes(bool deserializing)
-{
-	if(deserializing)
-	{
-		for(unsigned int i=0;i<bvFactories.size();i++)
-			bvFactoriesManager.add(bvFactories[i][0],bvFactories[i][1],bvFactories[i][2]);
-	}
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-void BoundingVolumeUpdator::registerAttributes()
-{
-	REGISTER_ATTRIBUTE(bvFactories);
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-void BoundingVolumeUpdator::addBVFactories(const string& str1,const string& str2,const string& str3)
-{
-	vector<string> v;
-	v.push_back(str1);
-	v.push_back(str2);
-	v.push_back(str3);
-	bvFactories.push_back(v);
-
-}

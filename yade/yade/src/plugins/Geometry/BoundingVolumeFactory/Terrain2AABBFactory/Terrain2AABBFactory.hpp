@@ -2,9 +2,9 @@
 #ifndef __TERRAIN2AABBFACTORY_H__
 #define __TERRAIN2AABBFACTORY_H__
 
-#include "BoundingVolumeFactory.hpp"
+#include "BodyBoundingVolumeFactoryFunctor.hpp"
 
-class Terrain2AABBFactory : public BoundingVolumeFactory
+class Terrain2AABBFactory : public BodyBoundingVolumeFactoryFunctor
 {
 	public : void go(	const shared_ptr<BodyInteractionGeometry>& cm,
 				shared_ptr<BodyBoundingVolume>& bv,

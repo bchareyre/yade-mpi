@@ -37,14 +37,14 @@
 
 /*! \brief Abstract interface for all interaction model factories.
 	It is used for creating a interaction model from a geometrical model during runtime.
-	This is very useful when it is not trivial to build the interaction model from the geometrical model. For example if you want to build an sphere tree from a polyhedron, it is not easy to write by hand into the configuration file the center and size of all spheres. Instead you can use a InteractionGeometryFactory that will compute for you the correct values.
+	This is very useful when it is not trivial to build the interaction model from the geometrical model. For example if you want to build an sphere tree from a polyhedron, it is not easy to write by hand into the configuration file the center and size of all spheres. Instead you can use a BodyInteractionGeometryFactoryFunctor that will compute for you the correct values.
 */
-class InteractionGeometryFactory : public Factorable
+class BodyInteractionGeometryFactoryFunctor : public Factorable
 {	
 	
 	// construction
-	public : InteractionGeometryFactory ();
-	public : virtual ~InteractionGeometryFactory ();
+	public : BodyInteractionGeometryFactoryFunctor ();
+	public : virtual ~BodyInteractionGeometryFactoryFunctor ();
 	
 	public : virtual shared_ptr<BodyInteractionGeometry> buildInteractionGeometry(const shared_ptr<BodyGeometricalModel> gm, const Se3r& se3) = 0;
 

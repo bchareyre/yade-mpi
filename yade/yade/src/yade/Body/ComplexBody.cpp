@@ -11,7 +11,7 @@
 //#include "InteractionHashMap.hpp"
 #include "BodyRedirectionVector.hpp"
 #include "BodyAssocVec.hpp"
-#include "BoundingVolumeUpdator.hpp"
+#include "BodyBoundingVolumeFactoryDispatcher.hpp"
 #include "ActionVecVec.hpp"
 
 // FIXME - who is to decide which class to use by default?
@@ -35,7 +35,7 @@ void ComplexBody::postProcessAttributes(bool deserializing)
 {
 	if (deserializing)
 	{
-		// FIXME : build that with InteractionGeometryFactory
+		// FIXME : build that with BodyInteractionGeometryFactoryFunctor
 		shared_ptr<InteractionGeometrySet> set = dynamic_pointer_cast<InteractionGeometrySet>(interactionGeometry);
 		for(unsigned int i=0;i<bodies->size();i++)
 			set->interactionGeometries.push_back((*bodies)[i]->interactionGeometry);
@@ -45,7 +45,7 @@ void ComplexBody::postProcessAttributes(bool deserializing)
 	vector<shared_ptr<Actor> >::iterator ai    = actors.begin();
 	vector<shared_ptr<Actor> >::iterator aiEnd =  actors.end();
 	for(;ai!=aiEnd;++ai)
-		if (dynamic_pointer_cast<BoundingVolumeUpdator>(*ai))
+		if (dynamic_pointer_cast<BodyBoundingVolumeFactoryDispatcher>(*ai))
 			(*ai)->action(this);
 	}
 			
