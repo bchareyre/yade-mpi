@@ -7,7 +7,8 @@ SUBDIRS += SimpleSpringDynamicEngine \
            ExplicitMassSpringDynamicEngine \
            BallisticDynamicEngine \
            MassSpringBody2RigidBodyDynamicEngine \
-           SDECDynamicEngine 
+           SDECDynamicEngine \
+           ErrorTolerantDynamicEngine 
 MOC_DIR = $(YADECOMPILATIONPATH)
 UI_DIR = $(YADECOMPILATIONPATH)
 OBJECTS_DIR = $(YADECOMPILATIONPATH)

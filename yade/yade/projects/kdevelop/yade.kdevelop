@@ -104,7 +104,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>plugins/InteractionModel/SDECPermanentLink</activedir>
+      <activedir>plugins/InteractionModel</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>
