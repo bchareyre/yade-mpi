@@ -25,8 +25,8 @@ class InteractionContainer : public Serializable
 	public    : virtual bool hasCurrent() 									{throw;};
 	public    : virtual shared_ptr<Interaction> getNext() 							{throw;};
 	public    : virtual shared_ptr<Interaction> getCurrent() 						{throw;};
-	// deletes currently pointed element, and points to the next one.
-	public    : virtual void eraseCurrent() 								{throw;};
+	// deletes currently pointed element, and returns the next one.
+	public    : virtual shared_ptr<Interaction> eraseCurrent() 						{throw;};
 	public    : virtual unsigned int size() 								{throw;};
 
 

@@ -84,14 +84,17 @@ shared_ptr<Interaction> InteractionHashMap2::getCurrent()
 
 
 // FIXME - is it absolutely correct ??
-void InteractionHashMap2::eraseCurrent()
+shared_ptr<Interaction> InteractionHashMap2::eraseCurrent()
 {
 	if(hasCurrent())
 	{
 		IHashMap::iterator tmpHmii=hmii;
 		++hmii;
 		interactions.erase(tmpHmii);
+		return getCurrent();
 	}
+	else
+		return shared_ptr<Interaction>();
 }
 /*
 void InteractionHashMap2::eraseCurrent()

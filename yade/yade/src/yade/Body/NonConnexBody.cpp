@@ -9,6 +9,7 @@
 #include "NonConnexBody.hpp"
 #include "InteractionVecSet.hpp"
 
+// FIXME - who is to decide which class to use by default?
 NonConnexBody::NonConnexBody() : Body() , permanentInteractions(new InteractionVecSet)
 {
 }

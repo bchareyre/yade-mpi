@@ -95,7 +95,7 @@ shared_ptr<Interaction> InteractionHashMap::getCurrent()
 }
 */
 
-void InteractionHashMap::eraseCurrent()
+shared_ptr<Interaction> InteractionHashMap::eraseCurrent()
 {
 	if(hasCurrent())
 	{
@@ -110,13 +110,17 @@ void InteractionHashMap::eraseCurrent()
 			interactions.erase(hmii);
 			shared_ptr<Interaction> iiii;
 			find(id1,id2,iiii);
+			return iiii;
 		}
 		else
 		{
 			interactions.erase(hmii);
 			hmii = interactions.end();
+			return shared_ptr<Interaction>();
 		}
 	}
+	else
+		return shared_ptr<Interaction>();
 }
 
 unsigned int InteractionHashMap::size()

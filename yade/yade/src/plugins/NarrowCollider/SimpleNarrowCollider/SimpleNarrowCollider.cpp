@@ -46,8 +46,8 @@ void SimpleNarrowCollider::narrowCollisionPhase(Body* body)
 		if (!(narrowManager.collide( b1->cm , b2->cm , b1->se3 , b2->se3 , contact )))
 		{
 //			cout << "erasing " << contact->getId1() << " " << contact->getId2() << endl;
-			ncb->interactions->eraseCurrent();
-			contact = ncb->interactions->getCurrent();
+			contact = ncb->interactions->eraseCurrent();
+//			contact = ncb->interactions->getCurrent();
 		}
 		else
 			contact = ncb->interactions->getNext();
