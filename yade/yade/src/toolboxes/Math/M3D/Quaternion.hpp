@@ -20,7 +20,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
- 
+
 #ifndef __QUATERNION_H__
 #define __QUATERNION_H__
 
@@ -57,7 +57,7 @@ class Quaternion : public Serializable
 	public : void fromAxes (const Vector3* axis);
 	public : void toAxes (Vector3* axis) const;
 	public : void toGLMatrix(float m[16]);
-	
+
 	// arithmetic operations
 	public : bool operator== (const Quaternion& q) const;
 	public : Quaternion& operator= (const Quaternion& q);
@@ -92,22 +92,22 @@ class Quaternion : public Serializable
 	public : static float FUZZ;
 	public : void registerAttributes();
 	public : void processAttributes();
-	
+
 	REGISTER_CLASS_NAME(Quaternion);
-	
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-REGISTER_CLASS(Quaternion,true);
+REGISTER_SERIALIZABLE(Quaternion,true);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 inline std::ostream& operator<< (std::ostream& o, const Quaternion& q)
 {
-	o << q.w << " " << q.x << " " << q.y << " " << q.z;	
+	o << q.w << " " << q.x << " " << q.y << " " << q.z;
 	return o;
 }
 
@@ -116,7 +116,7 @@ inline std::ostream& operator<< (std::ostream& o, const Quaternion& q)
 
 inline std::istream& operator>> (std::istream& i, Quaternion& q)
 {
-	i >> q.w >> q.x >> q.y >> q.z;	
+	i >> q.w >> q.x >> q.y >> q.z;
 	return i;
 }
 

@@ -20,7 +20,7 @@ class Edge : public Serializable
 	REGISTER_CLASS_NAME(Edge);
 
 };
-REGISTER_CLASS(Edge,true);
+REGISTER_SERIALIZABLE(Edge,true);
 
 class Mesh2D : public CollisionModel
 {
@@ -37,21 +37,21 @@ class Mesh2D : public CollisionModel
 
 	public : bool collideWith(CollisionModel* collisionModel);
 	public : bool loadFromFile(char * fileName);
-	public : void glDraw();	
+	public : void glDraw();
 	public : void computeNormals();
-	
+
 	public : void processAttributes();
 	public : void registerAttributes();
 
 	REGISTER_CLASS_NAME(Mesh2D);
 	REGISTER_CLASS_INDEX(Mesh2D);
-	
+
 };
 
 #include "ArchiveTypes.hpp"
 using namespace ArchiveTypes;
 
-REGISTER_CLASS(Mesh2D,false);
+REGISTER_SERIALIZABLE(Mesh2D,false);
 REGISTER_CLASS_TO_MULTI_METHODS_MANAGER(Mesh2D);
 
 #endif // __MESH2D_H__

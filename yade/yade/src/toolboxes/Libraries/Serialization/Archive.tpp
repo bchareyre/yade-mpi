@@ -51,18 +51,18 @@ struct PointerHandler;
 
 /*! Primary template for findtype. Use to catch fundamental type, serializable class and custom class */
 template<typename Type>
-RecordType findType(Type& ,bool& fundamental, string& str)
+FactorableTypes::Type findType(Type& ,bool& fundamental, string& str)
 {
-	RecordType type;
+	FactorableTypes::Type type;
 	if (boost::is_fundamental< Type >::value || typeid(Type)==typeid(string) )
 	{
 		fundamental = true;
-		return FUNDAMENTAL;
+		return FactorableTypes::FUNDAMENTAL;
 	}
 	else if (typeid(Serializable)==typeid(Type))
 	{
 		fundamental = false;
-		return SERIALIZABLE;
+		return FactorableTypes::SERIALIZABLE;
 	}
 	else if (ClassFactory::instance().findClassInfo(typeid(Type),type,str,fundamental))
 	{
@@ -81,13 +81,13 @@ inline shared_ptr<Archive> Archive::create(const string& name,Type& attribute)
 {
 
 	shared_ptr<Archive> ac;
-	
+
 	ac = shared_ptr<Archive>(new Archive(name));
-	
+
 	string SerializableClassName;
 	bool fundamental;
 
-	
+
 	ac->setRecordType(findType(attribute, fundamental, SerializableClassName));
 
 	// At this point serializationMap and serializationMapOfFundamental should be initialized with the correct (de)-serialization function pointer
@@ -101,34 +101,34 @@ inline shared_ptr<Archive> Archive::create(const string& name,Type& attribute)
 		ac->serialize	= serializationMap[ac->getRecordType()].first;
 		ac->deserialize = serializationMap[ac->getRecordType()].second;
 	}
-	
+
 	ac->setFundamental(fundamental);
-	
+
 	// according to Type, the Archive is filled with the needed information
 	switch (ac->getRecordType())
 	{
-		case SERIALIZABLE :
+		case FactorableTypes::SERIALIZABLE :
 		{
 			// reinterpret_cast is needed beacause this is a template function and so it is compile to catch int,float .... i.e. non class types
 			Serializable * s = reinterpret_cast<Serializable*>(&attribute);
 			ac->setAddress(s);
 		}
 		break;
-		case FUNDAMENTAL :
+		case FactorableTypes::FUNDAMENTAL :
 			ac->serializeFundamental   = FundamentalHandler< Type >::accessor;
 			ac->deserializeFundamental = FundamentalHandler< Type >::creator;
 			ac->setAddress(&attribute);
 		break;
-		case CUSTOM_CLASS :
+		case FactorableTypes::CUSTOM_CLASS :
 			ac->setAddress(&attribute);
 			ac->setSerializableClassName(SerializableClassName);
 		break;
-		case CONTAINER :
+		case FactorableTypes::CONTAINER :
 			ac->createNextArchive = ContainerHandler< Type >::accessNext;
 			ac->resize = ContainerHandler< Type >::resize;
 			ac->setAddress(&attribute);
 		break;
-		case POINTER :
+		case FactorableTypes::POINTER :
 			ac->createPointedArchive = PointerHandler< Type >::accessor;
 			ac->createNewPointedArchive = PointerHandler< Type >::creator;
 			ac->setAddress(&attribute);
@@ -136,7 +136,7 @@ inline shared_ptr<Archive> Archive::create(const string& name,Type& attribute)
 		default :
 			throw SerializableError(ExceptionMessages::SerializableUnknown);
 	}
-	
+
 	return ac;
 };
 

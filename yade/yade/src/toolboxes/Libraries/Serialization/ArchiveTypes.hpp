@@ -44,22 +44,6 @@ class Archive;
 
 namespace ArchiveTypes
 {
-	/*! \var
-	<ul>
-		<li>FUNDAMENTAL		- class that is (de-)serialized into a single string with separator : int,float, vector<fundamental>, quaternion, octonion, vector3</li>
-		<li>CUSTOM_CLASS	- class not derived from Serializable, including POD</li>
-		<li>SERIALIZABLE	- class derived from Serializable </li>
-		<li>POINTER	- shared_ptr, weak_ptr, auto_ptr </li>
-		<li>CONTAINER	- vector, list, queue, map, pair </li>
-	</ul>
-	*/
-	typedef enum 	{	FUNDAMENTAL,
-				CUSTOM_CLASS,
-				SERIALIZABLE,
-				POINTER,
-				CONTAINER,
-			} RecordType;
-
 	/*! Define a pointer to a function that will serialize into a stream "stream" the content of an archive
 	"ac". Depth is used for recursive file format like XML */
 	typedef void (*SerializeFnPtr)   (ostream& stream, Archive& ac , int depth);

@@ -8,13 +8,13 @@
 
 // FIXME : InteractionModel   into   InteractionModel
 class ClosestFeatures : public InteractionModel
-{	
+{
 	public : std::vector<std::pair<Vector3,Vector3> > closestsPoints;
 	public : std::vector<int> verticesId;
 	// construction
-	public : ClosestFeatures ();	
-	public : ~ClosestFeatures ();	
-	
+	public : ClosestFeatures ();
+	public : ~ClosestFeatures ();
+
 	public : void processAttributes();
 	public : void registerAttributes();
 
@@ -22,7 +22,7 @@ class ClosestFeatures : public InteractionModel
 	//REGISTER_CLASS_INDEX(ClosestFeatures);
 };
 
-REGISTER_CLASS(ClosestFeatures,false);
+REGISTER_SERIALIZABLE(ClosestFeatures,false);
 //REGISTER_CLASS_TO_MULTI_METHODS_MANAGER(ClosestFeatures);
 
 #endif // __CLOSESTSFEATURES_H__

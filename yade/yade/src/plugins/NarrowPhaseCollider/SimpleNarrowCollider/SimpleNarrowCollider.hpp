@@ -10,12 +10,12 @@ class SimpleNarrowCollider : public NarrowPhaseCollider
 	public : ~SimpleNarrowCollider ();
 
 	public : bool narrowCollisionPhase(const std::vector<shared_ptr<Body> >& bodies, std::list<shared_ptr<Interaction> >& interactions);
-	
+
 	public : void processAttributes();
 	public : void registerAttributes();
 	REGISTER_CLASS_NAME(SimpleNarrowCollider);
 };
 
-REGISTER_CLASS(SimpleNarrowCollider,false);
+REGISTER_SERIALIZABLE(SimpleNarrowCollider,false);
 
 #endif // __SIMPLENARROWCOLLIDER_H__

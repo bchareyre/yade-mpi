@@ -11,25 +11,24 @@ class AABB : public BoundingVolume
 	private : Vector3 initialHalfSize;
 	private : Vector3 initialCenter;
 
-		
+
 	// construction
 	public : AABB ();
 	public : AABB (Vector3 hs,Vector3 center=Vector3(0,0,0));
 	public : ~AABB ();
-	
+
 	public : void move(Se3& se3);
 	public : bool loadFromFile(char * fileName);
-	public : void glDraw();	
+	public : void glDraw();
 	public : void update(Se3& se3);
 	public : bool overlap(const AABB& aabb);
-	
+
 	public : void processAttributes();
 	public : void registerAttributes();
-	REGISTER_CLASS_NAME(AABB);	
+	REGISTER_CLASS_NAME(AABB);
 };
 
-//EXPORT_DYNLIB(AABB);
-REGISTER_CLASS(AABB,false);
+REGISTER_SERIALIZABLE(AABB,false);
 
 #endif // __AABB_H__
 

@@ -21,14 +21,10 @@
  ***************************************************************************/
 
 #include "ClassFactory.hpp"
-#include "ArchiveTypes.hpp"
-
-using namespace ArchiveTypes;
 
 class Factorable;
 
-
-bool ClassFactory::findClassInfo(const type_info& tp,RecordType& type, string& serializableClassName,bool& fundamental)
+bool ClassFactory::findClassInfo(const type_info& tp,FactorableTypes::Type& type, string& serializableClassName,bool& fundamental)
 {
 	ClassDescriptorMap::iterator mi = map.begin();
 	ClassDescriptorMap::iterator miEnd = map.end();
@@ -49,7 +45,7 @@ bool ClassFactory::findClassInfo(const type_info& tp,RecordType& type, string& s
 
 bool ClassFactory::registerFactorable( std::string name 			   , CreateFactorableFnPtr create,
 					 CreateSharedFactorableFnPtr createShared, CreatePureCustomFnPtr createPureCustom,
-					 VerifyFactorableFnPtr verify		   , RecordType type, bool f )
+					 VerifyFactorableFnPtr verify		   , FactorableTypes::Type type, bool f )
 {
 	bool tmp = map.insert( ClassDescriptorMap::value_type( name , ClassDescriptor(create,createShared, createPureCustom, verify,type,f) )).second;
 

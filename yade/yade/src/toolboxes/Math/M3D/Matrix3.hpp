@@ -50,9 +50,9 @@
 
 class Matrix3 : public Serializable
 {
-	
+
 	// construction
-	public : Matrix3 ();   
+	public : Matrix3 ();
 	public : Matrix3 (const float aafEntry[3][3]);
 	public : Matrix3 (const Matrix3& rkMatrix);
 	public : Matrix3 (float fM00, float fM01, float fM02,
@@ -69,7 +69,7 @@ class Matrix3 : public Serializable
 	public :  Matrix3& operator= (const Matrix3& rkMatrix);
 	public : bool operator== (const Matrix3& rkMatrix) const;
 	public : bool operator!= (const Matrix3& rkMatrix) const;
-	
+
 	// arithmetic operations
 	public : Matrix3 operator+ (const Matrix3& rkMatrix) const;
 	public : Matrix3 operator- (const Matrix3& rkMatrix) const;
@@ -81,16 +81,16 @@ class Matrix3 : public Serializable
 
 	// vector * matrix [1x3 * 3x3 = 1x3]
 	public : friend Vector3 operator* (const Vector3& rkVector, const Matrix3& rkMatrix);
-	
+
 	// matrix * scalar
 	public : Matrix3 operator* (float fScalar) const;
-	
+
 	// scalar * matrix
 	public : friend Matrix3 operator* (float fScalar, const Matrix3& rkMatrix);
-	
+
 	// M0.TransposeTimes(M1) = M0^t*M1 where M0^t is the transpose of M0
 	public : Matrix3 TransposeTimes (const Matrix3& rkM) const;
-	
+
 	// M0.TimesTranspose(M1) = M0*M1^t where M1^t is the transpose of M1
 	public : Matrix3 TimesTranspose (const Matrix3& rkM) const;
 
@@ -99,7 +99,7 @@ class Matrix3 : public Serializable
 	public : bool Inverse (Matrix3& rkInverse, float fTolerance = 1e-06f) const;
 	public : Matrix3 Inverse (float fTolerance = 1e-06f) const;
 	public : float Determinant () const;
-	
+
 	// SLERP (spherical linear interpolation) without quaternions.  Computes
 	// R(t) = R0*(Transpose(R0)*R1)^t.  If Q is a rotation matrix with
 	// unit-length axis U and angle A, then Q^t is a rotation matrix with
@@ -109,19 +109,19 @@ class Matrix3 : public Serializable
 	// singular value decomposition
 	public : void SingularValueDecomposition (Matrix3& rkL, Vector3& rkS, Matrix3& rkR) const;
 	public : void SingularValueComposition (const Matrix3& rkL, const Vector3& rkS, const Matrix3& rkR);
-	
+
 	// Gram-Schmidt orthonormalization (applied to columns of rotation matrix)
 	public : void Orthonormalize ();
-	
+
 	// orthogonal Q, diagonal D, upper triangular U stored as (u01,u02,u12)
 	public : void QDUDecomposition (Matrix3& rkQ, Vector3& rkD, Vector3& rkU) const;
-	
+
 	public : float SpectralNorm () const;
-	
+
 	// matrix must be orthonormal
 	public : void ToAxisAngle (Vector3& rkAxis, float& rfRadians) const;
 	public : void FromAxisAngle (const Vector3& rkAxis, float fRadians);
-	
+
 	// The matrix must be orthonormal.  The decomposition is yaw*pitch*roll
 	// where yaw is rotation about the Up vector, pitch is rotation about the
 	// Right axis, and roll is rotation about the Direction axis.
@@ -137,15 +137,15 @@ class Matrix3 : public Serializable
 	public : void FromEulerAnglesYZX (float fYAngle, float fPAngle, float fRAngle);
 	public : void FromEulerAnglesZXY (float fYAngle, float fPAngle, float fRAngle);
 	public : void FromEulerAnglesZYX (float fYAngle, float fPAngle, float fRAngle);
-	
+
 	// eigensolver, matrix must be symmetric
 	public : void EigenSolveSymmetric (float afEigenvalue[3], Vector3 akEigenvector[3]) const;
-	
+
 	public : static void TensorProduct (const Vector3& rkU, const Vector3& rkV, Matrix3& rkProduct);
 	public : static const float EPSILON;
 	public : static const Matrix3 ZERO;
 	public : static const Matrix3 IDENTITY;
-	
+
 	// support for eigensolver
 	protected : void Tridiagonal (float afDiag[3], float afSubDiag[3]);
 	protected : bool QLAlgorithm (float afDiag[3], float afSubDiag[3]);
@@ -172,14 +172,14 @@ class Matrix3 : public Serializable
 		REGISTER_ATTRIBUTE(m[2][1]);
 		REGISTER_ATTRIBUTE(m[2][2]);
 	}
-	
+
 	REGISTER_CLASS_NAME(Matrix3);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-REGISTER_CLASS(Matrix3, true);
+REGISTER_SERIALIZABLE(Matrix3, true);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -17,7 +17,7 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-//FIXME : hpp => tpp 
+//FIXME : hpp => tpp
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -40,7 +40,7 @@ struct ContainerHandler
 	{
 		throw HandlerError(ExceptionMessages::ContainerNotSupported);
 	}
-	
+
 	static int accessNext(Archive& , shared_ptr<Archive>& , bool )
 	{
 		throw HandlerError(ExceptionMessages::ContainerNotSupported);
@@ -60,7 +60,7 @@ struct ContainerHandler<std::vector<VectoredType> >
 		tmpVec=any_cast<vector<VectoredType>*>(ac.getAddress());
 		tmpVec->resize(size);
 	}
-	
+
 	static int accessNext(Archive& ac, shared_ptr<Archive>& nextAc , bool first)
 	{
 		typedef typename vector<VectoredType>::iterator VectorIterator;
@@ -77,7 +77,7 @@ struct ContainerHandler<std::vector<VectoredType> >
 			itEnd=tmpVec->end();
 			i=0;
 		}
-		
+
 		if(it != itEnd )
 		{
 			string name = ac.getName()+"["+lexical_cast<string>(i)+"]";
@@ -88,18 +88,18 @@ struct ContainerHandler<std::vector<VectoredType> >
 		}
 		else
 			return 0;
-		
+
 	}
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-template<typename VectoredType> 
-RecordType findType( std::vector<VectoredType>& ,bool& fundamental, string& str)
+template<typename VectoredType>
+FactorableTypes::Type findType( std::vector<VectoredType>& ,bool& fundamental, string& str)
 {
 // 	VectoredType tmpV;
-// 	
+//
 // 	if (	boost::is_fundamental<VectoredType>::value ||
 // 		findType(tmpV,str) == SMART_POINTER_OF_FUNDAMENTAL ||
 // 		findType(tmpV,str) == CUSTOM_FUNDAMENTAL
@@ -118,8 +118,8 @@ RecordType findType( std::vector<VectoredType>& ,bool& fundamental, string& str)
 
 	//RecordType t =
 	findType(tmpV,fundamental,str);
-	
-	return CONTAINER;
+
+	return FactorableTypes::CONTAINER;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

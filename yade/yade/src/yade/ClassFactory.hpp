@@ -39,13 +39,8 @@
 
 #include "FactoryExceptions.hpp"
 #include "Singleton.hpp"
-#include "ArchiveTypes.hpp"
+#include "FactorableTypes.hpp"
 #include "DynLibManager.hpp"
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-using namespace ArchiveTypes;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -120,7 +115,7 @@ class ClassFactory : public Singleton< ClassFactory >
 			/*! Used by the findType method to test the type of the class and know if it is a Factorable (i.e. Factorable) or Custom class*/
 			public    : VerifyFactorableFnPtr verify;
 			/*! Type of the class : SERIALIZABLE,CUSTOM,CONTAINER,POINTER */
-			public    : RecordType type;
+			public    : FactorableTypes::Type type;
 			/*! fundamental is true the class type is a fundamtental type (e.g. Vector3, Quaternion) */
 			public    : bool fundamental;
 
@@ -133,7 +128,7 @@ class ClassFactory : public Singleton< ClassFactory >
 			/*! Constructor that initialize all the attributes of the class */
 			public    : ClassDescriptor(	CreateFactorableFnPtr c, CreateSharedFactorableFnPtr cs,
 							CreatePureCustomFnPtr cpc, VerifyFactorableFnPtr v,
-							RecordType t, bool f)
+							FactorableTypes::Type t, bool f)
 				    {
 					create 		 = c;
 					createShared	 = cs;
@@ -194,7 +189,7 @@ class ClassFactory : public Singleton< ClassFactory >
 	*/
 	public    : bool registerFactorable( 	std::string name			  , CreateFactorableFnPtr create,
 						CreateSharedFactorableFnPtr createShared, CreatePureCustomFnPtr createPureCustom,
-						VerifyFactorableFnPtr verify		  , RecordType type, bool f );
+						VerifyFactorableFnPtr verify		  , FactorableTypes::Type type, bool f );
 
 	/*! Create a shared pointer on a serializable class of the given name */
 	public 	  : boost::shared_ptr<Factorable> createShared( std::string name );
@@ -218,7 +213,7 @@ class ClassFactory : public Singleton< ClassFactory >
 	*/
 	public 	  : bool isFactorable(const type_info& tp,bool& fundamental);
 
-	public    : bool findClassInfo(const type_info& tp,RecordType& type, string& serializableClassName,bool& fundamental);
+	public    : bool findClassInfo(const type_info& tp,FactorableTypes::Type& type, string& serializableClassName,bool& fundamental);
 
 
 	friend class Singleton< ClassFactory >;

@@ -13,15 +13,15 @@ class Sphere : public CollisionModel
 	private : static int glSphereList;
 	private : void subdivideTriangle(Vector3& v1,Vector3& v2,Vector3& v3, int depth);
 	private : void drawSphere(int depth);
-	
+
 	// construction
 	public : Sphere (float r);
 	public : Sphere ();
 	public : ~Sphere ();
-	
+
 	public : bool collideWith(CollisionModel* collisionModel);
-	public : void glDraw();	
-	
+	public : void glDraw();
+
 	public : void processAttributes();
 	public : void registerAttributes();
 
@@ -29,7 +29,7 @@ class Sphere : public CollisionModel
 	REGISTER_CLASS_INDEX(Sphere);
 };
 
-REGISTER_CLASS(Sphere,false);
+REGISTER_SERIALIZABLE(Sphere,false);
 
 REGISTER_CLASS_TO_MULTI_METHODS_MANAGER(Sphere);
 

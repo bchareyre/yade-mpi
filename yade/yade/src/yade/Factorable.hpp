@@ -32,24 +32,27 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#define REGISTER_CLASS(name,isFundamental) 						\
-	REGISTER_CLASS_TO_FACTORY(name,name,SERIALIZABLE,isFundamental);
-	
-#define REGISTER_CUSTOM_CLASS(name,sname,isFundamental) 				\
-	REGISTER_CLASS_TO_FACTORY(name,sname,CUSTOM_CLASS,isFundamental);
+#define REGISTER_FACTORABLE(name) 								\
+	REGISTER_CLASS_TO_FACTORY(name,name,FactorableTypes::FACTORABLE,false);
 
-//#define REGISTER_FUNDAMENTAL_CLASS(name) 						
-//	REGISTER_CLASS_TO_FACTORY(name,name,FACTORABLE,true);
+#define REGISTER_SERIALIZABLE(name,isFundamental) 						\
+	REGISTER_CLASS_TO_FACTORY(name,name,FactorableTypes::SERIALIZABLE,isFundamental);
 
-//#define REGISTER_CUSTOM_FUNDAMENTAL(name,sname) 				
-//	REGISTER_CLASS_TO_FACTORY(name,sname,CUSTOM_FUNDAMENTAL,true);
+#define REGISTER_CUSTOM_CLASS(name,sname,isFundamental) 					\
+	REGISTER_CLASS_TO_FACTORY(name,sname,FactorableTypes::CUSTOM_CLASS,isFundamental);
 
-//#define REGISTER_CUSTOM_POLYMORPHIC_BASE(base,derived)	
+//#define REGISTER_FUNDAMENTAL_CLASS(name)
+//	REGISTER_CLASS_TO_FACTORY(name,name,FactorableTypes::FACTORABLE,true);
+
+//#define REGISTER_CUSTOM_FUNDAMENTAL(name,sname)
+//	REGISTER_CLASS_TO_FACTORY(name,sname,FactorableTypes::CUSTOM_FUNDAMENTAL,true);
+
+//#define REGISTER_CUSTOM_POLYMORPHIC_BASE(base,derived)
 //	public : virtual any getCustomPolymorphicBase() { return #cn; };
-	
-//#define REGISTER_CUSTOM_TEMPLATE_CLASS(name,templateType)			
-//	REGISTER_TEMPLATE_CLASS_TO_FACTORY(name,templateType, CUSTOM_CLASS);
-		
+
+//#define REGISTER_CUSTOM_TEMPLATE_CLASS(name,templateType)
+//	REGISTER_TEMPLATE_CLASS_TO_FACTORY(name,templateType, FactorableTypes::CUSTOM_CLASS);
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 

@@ -22,9 +22,9 @@
 
 IOManager::IOManager()
 {
-	Archive::addSerializablePointer(CUSTOM_CLASS, false, serializeCustomClass, deserializeCustomClass);
-	Archive::addSerializablePointer(FUNDAMENTAL, true,serializeFundamental, deserializeFundamental);	
-	Archive::addSerializablePointer(POINTER, true, serializeSmartPointerOfFundamental, deserializeSmartPointerOfFundamental);
+	Archive::addSerializablePointer(FactorableTypes::CUSTOM_CLASS, false, serializeCustomClass, deserializeCustomClass);
+	Archive::addSerializablePointer(FactorableTypes::FUNDAMENTAL, true,serializeFundamental, deserializeFundamental);
+	Archive::addSerializablePointer(FactorableTypes::POINTER, true, serializeSmartPointerOfFundamental, deserializeSmartPointerOfFundamental);
 }
 
 IOManager::~IOManager()
@@ -37,7 +37,7 @@ IOManager::~IOManager()
 
 
 void IOManager::deserializeFundamental(istream& , Archive& ac,const string& str)
-{	
+{
 	any v = &str;
 	ac.deserializeFundamental(ac,v);
 	ac.markProcessed();
@@ -48,7 +48,7 @@ void IOManager::serializeFundamental(ostream& stream, Archive& ac,int )
 	string str;
 	any v = &str;
 	ac.serializeFundamental(ac,v);
-	stream << str;	
+	stream << str;
 	ac.markProcessed();
 }
 
@@ -64,7 +64,7 @@ void IOManager::deserializeCustomClass(istream& stream, Archive& ac, const strin
 	shared_ptr<Archive> tmpAc = Archive::create(ac.getName(),*s);
 	tmpAc->deserialize(stream, *tmpAc, str);
 	s->deserialize(ac.getAddress());
-	
+
 	ac.markProcessed();
 }
 
@@ -99,6 +99,6 @@ void IOManager::serializeSmartPointerOfFundamental(ostream& stream, Archive& ac 
 
 	if(ac.createPointedArchive(ac,tmpAc))
 		tmpAc->serialize(stream, *tmpAc,depth+1);
-	
+
 	ac.markProcessed();
 }

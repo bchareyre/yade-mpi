@@ -17,7 +17,7 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
- 
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -29,6 +29,7 @@
 
 #include <vector>
 #include <set>
+#include <boost/shared_ptr.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -43,11 +44,13 @@ class Interaction;
 class CollisionModel;
 class CollisionFunctor;
 
+using namespace boost;
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-class MultiMethodsManager 
-{	
+class MultiMethodsManager
+{
 	protected : std::vector<std::vector<shared_ptr<CollisionFunctor> > > callBacks;
 	private   : vector<string> indexedClassName;
 
@@ -57,7 +60,7 @@ class MultiMethodsManager
 	public : virtual ~MultiMethodsManager ();
 
 	public : bool add(const string& name);
-	
+
 	public : bool go(const shared_ptr<CollisionModel> cm1, const shared_ptr<CollisionModel> cm2, const Se3& se31, const Se3& se32, shared_ptr<Interaction> c);
 
 };

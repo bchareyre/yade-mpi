@@ -45,13 +45,13 @@ class BoundingVolume : public Serializable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Attributes											///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-		
+
 	/*! Color of the bounding volume. Used only for opengl drawing purpose */
 	public : Vector3 color;
-	
+
 	/*! Minimum of the bounding volume */
 	public : Vector3 min;
-	
+
 	/*! Maximum of the bounding volume */
 	public : Vector3 max;
 
@@ -60,10 +60,10 @@ class BoundingVolume : public Serializable
 /// Constructor/Destructor									///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-	
+
 	/*!  Constructor */
 	public : BoundingVolume ();
-	
+
 	/*! Destructor */
 	public : virtual ~BoundingVolume ();
 
@@ -75,21 +75,21 @@ class BoundingVolume : public Serializable
 
 	/*! Abstract function to overload. It is called to draw the bounding volume in an opengl context */
 	public : virtual void glDraw() {};
-	
+
 	//public : virtual void move(Se3& ) {};
 	/*! Abstract function to overload. It is called to update the current bounding volume by an incremental 3D transformation */
 	public : virtual void update(Se3& ) {};
 
 	public : void registerAttributes();
-	
+
 	REGISTER_CLASS_NAME(BoundingVolume);
-	
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-REGISTER_CLASS(BoundingVolume,false);
+REGISTER_SERIALIZABLE(BoundingVolume,false);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////

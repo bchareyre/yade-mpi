@@ -64,7 +64,7 @@ struct PointerHandler<shared_ptr<PointedType> >
 	{
 		string name = ac.getName();
 		shared_ptr<PointedType> * tmpPtr;
-		
+
 		if(typeStr.size() != 0)
 		{
 			// FIXME : isn't it the same code code Serializable and custom ???
@@ -84,13 +84,13 @@ struct PointerHandler<shared_ptr<PointedType> >
 			}
 		}
 		else
-		{			
+		{
 			tmpPtr=any_cast< shared_ptr<PointedType>* >(ac.getAddress());
 			*tmpPtr = shared_ptr<PointedType>(new PointedType);
 			newAc = Archive::create(name,**tmpPtr);
-		}	
+		}
 	}
-	
+
 	static bool accessor(Archive& ac, shared_ptr<Archive>& newAc)
 	{
 		string name = ac.getName();
@@ -110,7 +110,7 @@ struct PointerHandler<shared_ptr<PointedType> >
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 template<typename PointedType>
-RecordType findType( shared_ptr<PointedType>& ,bool& fundamental, string& str)
+FactorableTypes::Type findType( shared_ptr<PointedType>& ,bool& fundamental, string& str)
 {
 	/*PointedType tmpPt;
 
@@ -125,12 +125,12 @@ RecordType findType( shared_ptr<PointedType>& ,bool& fundamental, string& str)
 
 	PointedType tmpV;
 	bool tmpFundamental;
-	
-	RecordType t = findType(tmpV,tmpFundamental,str);
 
-	fundamental = ( boost::is_fundamental<PointedType>::value || ((t==POINTER || t==CUSTOM_CLASS || t==CONTAINER) && tmpFundamental) );
-	
-	return POINTER;
+	FactorableTypes::Type t = findType(tmpV,tmpFundamental,str);
+
+	fundamental = ( boost::is_fundamental<PointedType>::value || ((t==FactorableTypes::POINTER || t==FactorableTypes::CUSTOM_CLASS || t==FactorableTypes::CONTAINER) && tmpFundamental) );
+
+	return FactorableTypes::POINTER;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

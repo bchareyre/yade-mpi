@@ -20,7 +20,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
- 
+
 #ifndef __VECTOR3_H__
 #define __VECTOR3_H__
 
@@ -58,9 +58,9 @@ class Vector3 : public Serializable
 	public : Vector3 (float coord[3]);
 	public : Vector3 (const Vector3& v);
 
-    
-	
-	
+
+
+
 
 	public : float& operator[] (int i);
 	public : const float& operator[] (int i) const;
@@ -99,7 +99,7 @@ class Vector3 : public Serializable
 	public : Vector3& normalize (float threshold = 1e-06f);
 	public : Vector3 normalized (float threshold = 1e-06f);
 	public : Vector3 inverse (float threshold = 1e-06f);
-	
+
 	public : Vector3 multTerm (const Vector3& v) const;
 	public : Vector3 maxTerm (const Vector3& v) const;
 	public : Vector3 minTerm (const Vector3& v) const;
@@ -110,13 +110,13 @@ class Vector3 : public Serializable
 	public : static const Vector3 ZERO;
 	public : static const Vector3 UNIT_X;
 	public : static const Vector3 UNIT_Y;
-	public : static const Vector3 UNIT_Z;	
+	public : static const Vector3 UNIT_Z;
 
 	// fuzzy arithmetic (set FUZZ > 0 to enable)
 	public : static float FUZZ;
-	
+
 	REGISTER_CLASS_NAME(Vector3);
-	
+
 	public : void registerAttributes();
 
 };
@@ -124,14 +124,14 @@ class Vector3 : public Serializable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-REGISTER_CLASS(Vector3,true);
+REGISTER_SERIALIZABLE(Vector3,true);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 inline std::ostream& operator<< (std::ostream& o, const Vector3& vec)
 {
-	o << vec[0] << " " << vec[1] << " " << vec[2];	
+	o << vec[0] << " " << vec[1] << " " << vec[2];
 	return o;
 }
 

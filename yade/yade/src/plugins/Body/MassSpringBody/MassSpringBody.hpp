@@ -8,8 +8,8 @@
 class NodeProperties : public Serializable
 {
 	public : float invMass;
-	public : Vector3 velocity; 	
-	
+	public : Vector3 velocity;
+
 	public : NodeProperties() {};
 	public : NodeProperties(float im) : invMass(im), velocity(Vector3(0,0,0)) {};
 	public : void processAttributes() {};
@@ -20,29 +20,29 @@ class NodeProperties : public Serializable
 	};
 	REGISTER_CLASS_NAME(NodeProperties);
 };
-REGISTER_CLASS(NodeProperties,false);
+REGISTER_SERIALIZABLE(NodeProperties,false);
 
 class MassSpringBody : public ConnexBody
-{	
+{
 	public : float stiffness;
 	public : float damping;
  	public : vector<NodeProperties> properties;
 	public : vector<float> initialLengths;
 	public : vector<pair<int,Vector3> > externalForces;
-	
+
 	// construction
 	public : MassSpringBody ();
 	public : ~MassSpringBody ();
-	
+
 	public : void processAttributes();
 	public : void registerAttributes();
-	
+
 	public : void updateBoundingVolume(Se3& se3);
 	public : void updateCollisionModel(Se3& se3);
 
 	REGISTER_CLASS_NAME(MassSpringBody);
 };
 
-REGISTER_CLASS(MassSpringBody,false);
+REGISTER_SERIALIZABLE(MassSpringBody,false);
 
 #endif // __MASSPSRINGBODY_H__

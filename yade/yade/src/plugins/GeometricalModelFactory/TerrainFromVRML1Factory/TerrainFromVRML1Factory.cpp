@@ -5,23 +5,14 @@ TerrainFromVRML1Factory::TerrainFromVRML1Factory() : GeometricalModelFactory()
 {
 
 }
-	
+
 TerrainFromVRML1Factory::~TerrainFromVRML1Factory()
 {
 
 }
-void TerrainFromVRML1Factory::processAttributes()
+
+boost::shared_ptr<GeometricalModel> TerrainFromVRML1Factory::createGeometricalModel()
 {
-
-}
-
-void TerrainFromVRML1Factory::registerAttributes()
-{
-
-}
-
-shared_ptr<GeometricalModel> TerrainFromVRML1Factory::createGeometricalModel()
-{
-	return shared_ptr<GeometricalModel>(new Terrain);
+	return boost::shared_ptr<GeometricalModel>(new Terrain);
 }
 

@@ -8,10 +8,10 @@
 class XMLManager : public IOManager
 {
 	private   : static XmlSaxParser saxParser;
-	
-	public    : XMLManager();	
+
+	public    : XMLManager();
 	public    : virtual ~XMLManager();
-	
+
 	public    : void beginSerialization(ostream& stream, Archive& ac);
 	public    : void finalizeSerialization(ostream& stream, Archive& ac);
 	public    : string beginDeserialization(istream& stream, Archive& ac);
@@ -19,33 +19,32 @@ class XMLManager : public IOManager
 
 	protected : static void tokenizeContainerOfFundamental(const string& str, vector<string>& tokens);
 	protected : static void tokenizeCustomFundamental(const string& str, vector<string>& tokens);
-	
-	public    : static void serializeSerializable(ostream& stream, Archive& ac, int depth);	
+
+	public    : static void serializeSerializable(ostream& stream, Archive& ac, int depth);
 	public    : static void serializeContainer(ostream& stream, Archive& ac , int depth);
 	public    : static void serializeSmartPointer(ostream& stream, Archive& ac , int depth);
 
 	public    : static void deserializeSerializable(istream& stream, Archive& ac, const string& str="");
 	public    : static void deserializeContainer(istream& stream, Archive& ac, const string& str="");
 	public    : static void deserializeSmartPointer(istream& stream, Archive& ac, const string& str="");
-		
+
 	public    : static void writeTabs(ostream& stream, int depth);
 	public    : static void writeOpeningTag(ostream& stream, Archive& ac, int depth);
 	public    : static void writeClosingTag(ostream& stream, Archive& ac, int depth);
 
 
-	public    : static void serializeCustomFundamental(ostream& stream, Archive& ac, int depth);	
+	public    : static void serializeCustomFundamental(ostream& stream, Archive& ac, int depth);
 	public    : static void serializeContainerOfFundamental(ostream& stream, Archive& ac, int depth);
 	public    : static void serializeFundamentalSerializable(ostream& stream, Archive& ac, int depth);
 
 	public    : static void deserializeCustomFundamental(istream& stream, Archive& ac,const string& str);
 	public    : static void deserializeContainerOfFundamental(istream& stream, Archive& ac, const string& str);
 	public    : static void deserializeFundamentalSerializable(istream& stream, Archive& ac, const string& str);
-	
+
 	public    : void registerAttributes() {};
-	
-	REGISTER_CLASS_NAME(XMLManager);	
+
 };
 
-REGISTER_CLASS(XMLManager,false);
+REGISTER_FACTORABLE(XMLManager);
 
 #endif // __XMLMANAGER__

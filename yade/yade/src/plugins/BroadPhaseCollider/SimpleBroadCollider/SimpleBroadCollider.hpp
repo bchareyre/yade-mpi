@@ -4,13 +4,13 @@
 #include "BroadPhaseCollider.hpp"
 
 class SimpleBroadCollider : public BroadPhaseCollider
-{	
+{
 	// number of potential collision = number of colliding AABB
 	protected : int nbPotentialCollisions;
-	
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-	
+
 	// construction
 	public : SimpleBroadCollider ();
 	public : ~SimpleBroadCollider ();
@@ -20,10 +20,10 @@ class SimpleBroadCollider : public BroadPhaseCollider
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-	
+
 	// return a list "interactions" of pairs of Body which Bounding volume are in collisions
 	public : int broadPhaseCollisionTest(const std::vector<shared_ptr<Body> >& bodies,std::list<shared_ptr<Interaction> >& interactions);
-	
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -31,9 +31,9 @@ class SimpleBroadCollider : public BroadPhaseCollider
 
 };
 
-REGISTER_CLASS(SimpleBroadCollider,false);
+REGISTER_SERIALIZABLE(SimpleBroadCollider,false);
 
-#endif // __SIMPLEBROADCOLLIDER_H__ 
+#endif // __SIMPLEBROADCOLLIDER_H__
 
 
 /*

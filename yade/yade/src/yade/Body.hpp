@@ -55,7 +55,7 @@ class Body : public Serializable //,Indexable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Attributes											///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-	
+
 	// FIXME : to put into nonconnex body ??? but maybe useful for autocollision in connexbody
 	public : std::list<shared_ptr<Interaction> > interactions;
 
@@ -69,7 +69,7 @@ class Body : public Serializable //,Indexable
 
 
 	public : shared_ptr<DynamicEngine> dynamic;
-	
+
 	// FIXME : should be determined automatically or not ?? if the body has a subscription to a kinematic engine then it is not dynamic but maybe a body with no subscription can be not dynamic ??
 	/*! isDynamic is true if the state of the body is not modified by a kinematicEngine. It is useful
 	for example for collision detection : if two colliding bodies are only kinematic then it is useless to
@@ -84,11 +84,11 @@ class Body : public Serializable //,Indexable
 
 	/*! The position and orientation of the object */
 	public : Se3 se3;
-		
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Constructor/Destructor									///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-	
+
 	/*! Constructor */
 	public : Body ();
 
@@ -101,10 +101,10 @@ class Body : public Serializable //,Indexable
 
 	/*! Abstract function overloaded in Connex and NonConnex body. It is called to draw the object in an opengl context */
 	public : virtual void glDraw() {/*throw CallVirtualUndifinedMethod()*/};
-	
+
 	/*! Abstract function overloaded in Connex and NonConnex body. It is called to update the bounding volume of the object in generel at the end of each time step */
 	public : virtual void updateBoundingVolume(Se3& ) {};
-	
+
 	/*! Abstract function overloaded in Connex and NonConnex body. It is called to update the collision model of the object. It is useful if the object is deformable
 	and needs to recompute its collision model */
 	public : virtual void updateCollisionModel(Se3& ) {};
@@ -113,18 +113,18 @@ class Body : public Serializable //,Indexable
 	public : virtual void moveToNextTimeStep() {};
 
 	/*! If computations on the attributes are needed after serialization. For example you may want to serialize the name of a file that contains geometrical data and processAttributes will load the file */
-	
+
 	public : void processAttributes();
 	/*! Tells the IOManager which attributes should be serialized */
 	public : void registerAttributes();
-	
+
 	REGISTER_CLASS_NAME(Body);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-REGISTER_CLASS(Body,false);
+REGISTER_SERIALIZABLE(Body,false);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -20,7 +20,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
- 
+
 #ifndef __ARCHIVECONTENT_HPP__
 #define __ARCHIVECONTENT_HPP__
 
@@ -40,6 +40,7 @@
 
 #include "SerializationExceptions.hpp"
 #include "ArchiveTypes.hpp"
+#include "FactorableTypes.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -53,17 +54,17 @@ using namespace ArchiveTypes;
 
 /*! \brief Abstract representation of a class attributes.
 
-	This class is designed for serialization purpose. For each attribute of a class to serialize, an Archive 
-	is build, based on its <a href="../ArchiveTypes.html">type</a>. Once this archive is built it is possible 
-	to write it down to a stream (e.g. a file) of any type (XML, YAML, GNUPLOT ....) via a dynamic library 
-	derived from <a href="../IOManager.html">IOManager</a>. This not on the fly serialization process using 
-	an abstract representation an data gives the possibility to be independant of the file type and so to 
+	This class is designed for serialization purpose. For each attribute of a class to serialize, an Archive
+	is build, based on its <a href="../ArchiveTypes.html">type</a>. Once this archive is built it is possible
+	to write it down to a stream (e.g. a file) of any type (XML, YAML, GNUPLOT ....) via a dynamic library
+	derived from <a href="../IOManager.html">IOManager</a>. This not on the fly serialization process using
+	an abstract representation an data gives the possibility to be independant of the file type and so to
 	create a new one without recompiling anything.
 	\warning You will need to use this class only if you want to create your own IOManager
 */
 class Archive
 {
-	
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Attributes											///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -76,7 +77,7 @@ class Archive
 		\return the number of element of the container
 		\warning used only if recordType=CONTAINER and while serializing
 		\see ContainerHandler.hpp
-	*/	
+	*/
 	public    : NextArchiveFnPtr createNextArchive;
 
 	/*! Pointer to a function that resize the container stored into ac
@@ -84,23 +85,23 @@ class Archive
 		\par
 		\warning used only if recordType=CONTAINER and while deserializing
 		\see ContainerHandler.hpp
-	*/	
+	*/
 	public    : ResizeFnPtr resize;
-	
+
 	/*! Pointer to a function that return an archive that represents the pointed element
-		\param ac the archive that contains the pointer 
+		\param ac the archive that contains the pointer
 		\param newAc the archive representing the pointed element
 		\warning used only if recordType=POINTER and while serializing
 		\see PointerHandler.hpp
-	*/	
+	*/
 	public    : PointedArchiveFnPtr createPointedArchive;
 
 	/*! Pointer to a function that create an archive that represents the pointed element
-		\param ac the archive that contains the pointer 
+		\param ac the archive that contains the pointer
 		\param newAc the archive representing the pointed element
 		\warning used only if recordType=POINTER and while deserializing
 		\see PointerHandler.hpp
-	*/		
+	*/
 	public    : PointedNewArchiveFnPtr createNewPointedArchive;
 
 	/*! Pointer to a function that convert a fundamental type (int,float,string...) to
@@ -111,14 +112,14 @@ class Archive
 		\see FundamentalHandler.hpp
 	*/
 	public    : SerializeFundamentalFnPtr serializeFundamental;
-	
+
 	/*! Pointer to a function that convert a the string or vector<unsigned char> to a fundamental
 	type (int,float,string...)
 		\param ac the Archive to fill
 		\param a  contains a pointer to the string or vector<unsigned char> to deserialize
 		\warning used only if recordType=FUNDAMENTAL and while deserializing
 		\see FundamentalHandler.hpp
-	*/	
+	*/
 	public    : DeserializeFundamentalFnPtr deserializeFundamental;
 
 	/*! Function pointer assigned by the create function. Contains a pointer to a function that is able to
@@ -128,7 +129,7 @@ class Archive
 	/*! Function pointer assigned by the create function. Contains a pointer to a function that is able to
 	deserialize the current recordType type of attribute */
 	public    : DeserializeFnPtr deserialize;
-	
+
 	/*! This attribute is valid only if the current archive is of type CUSTOM_CLASS. It contains the name
 	of the serializable version of the class. */
 	private   : string serializableClassName;
@@ -148,21 +149,21 @@ class Archive
 
 	/*! Stl map that contains a pointer to the serialization and deserialization function for each non
 	fundamental type */
-	private   : static map<RecordType,pair<SerializeFnPtr,DeserializeFnPtr> > serializationMap;
+	private   : static map<FactorableTypes::Type,pair<SerializeFnPtr,DeserializeFnPtr> > serializationMap;
 
 	/*! Stl map that contains a pointer to the serialization and deserialization function for each non
 	fundamental type */
-	private   : static map<RecordType,pair<SerializeFnPtr,DeserializeFnPtr> > serializationMapOfFundamental;
-	
+	private   : static map<FactorableTypes::Type,pair<SerializeFnPtr,DeserializeFnPtr> > serializationMapOfFundamental;
+
 	/*! <a href="../ArchiveTypes.html">Type</a> of the attribute represented by the current archive */
-	private   : RecordType recordType;
-	
+	private   : FactorableTypes::Type recordType;
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Constructor/Destructor									///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /*! @name Constructor/Destructor function*/
-//@{	
+//@{
 	/*! Constructor
 	\see create()
 	\warning This constructor is only used in the create function
@@ -190,9 +191,9 @@ class Archive
 /*! @name Getters and setters*/
 //@{
 	/*! Getter for the recordType attribute*/
-	public	  : inline RecordType getRecordType() {return recordType;};
+	public	  : inline FactorableTypes::Type getRecordType() {return recordType;};
 	/*! Setter for the recordType attribute*/
-	public	  : inline void setRecordType(RecordType a) {recordType=a;};
+	public	  : inline void setRecordType(FactorableTypes::Type a) {recordType=a;};
 	/*! Setter for the serializableClassName attribute*/
 	public    : void setSerializableClassName(const string& s) {serializableClassName=s;};
 	/*! Getter for the serializableClassName attribute*/
@@ -220,7 +221,7 @@ class Archive
 	that contains only fundamentals.
 	*/
 	public    : bool containsOnlyFundamentals();
-	
+
 	/*! This function is used to fill the maps serializationMap and serializationMapOfFundamental
 	You should call it only from your own IOManager to tell the Archive which function to use for
 	(de)-serializing a given type
@@ -230,8 +231,8 @@ class Archive
 	\param sp pointer to the serialization function for type rt that will be stored into the map
 	\param dsp pointer to the deserialization function for type rt that will be stored into the map
 	*/
-	public    : static bool addSerializablePointer(RecordType rt ,bool fundamental, SerializeFnPtr sp, DeserializeFnPtr dsp);
-		
+	public    : static bool addSerializablePointer(FactorableTypes::Type rt ,bool fundamental, SerializeFnPtr sp, DeserializeFnPtr dsp);
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

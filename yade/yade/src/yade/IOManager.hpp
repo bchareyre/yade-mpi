@@ -17,7 +17,7 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
- 
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -47,12 +47,12 @@ class IOManager : public Factorable
 {
 	public   : IOManager();
 	public   : virtual ~IOManager();
-	
+
 	public  : virtual void beginSerialization(ostream& ,  Archive& )     {};
 	public  : virtual void finalizeSerialization(ostream& ,  Archive& )  {};
 	public  : virtual string beginDeserialization(istream& ,  Archive& ) { return "";};
 	public  : virtual void finalizeDeserialization(istream& , Archive& ) {};
-	
+
 	public : static void serializeFundamental(ostream& stream, Archive& ac, int depth);
 	public : static void deserializeFundamental(istream& stream, Archive& ac, const string& str);
 
@@ -64,7 +64,7 @@ class IOManager : public Factorable
 
 	public : template<typename Type>
 		 static void loadFromFile(const string& libName, const string& fileName,const string& name, Type& t)
-		 {		 					
+		 {
 			shared_ptr<IOManager> ioManager;
 			ioManager = dynamic_pointer_cast<IOManager>(ClassFactory::instance().createShared(libName));
 			ifstream filei(fileName.c_str());
@@ -74,7 +74,7 @@ class IOManager : public Factorable
 
 	public : template<typename Type>
 		 static void saveToFile(const string& libName, const string& fileName,const string& name, Type& t)
-		 {		 					
+		 {
 			shared_ptr<IOManager> ioManager;
 			ioManager = dynamic_pointer_cast<IOManager>(ClassFactory::instance().createShared(libName));
 			ofstream fileo(fileName.c_str());
@@ -82,39 +82,37 @@ class IOManager : public Factorable
 			fileo.close();
 		 }
 
-		 		 	
+
 	public : template<typename Type>
 		 void loadArchive(istream& stream, Type& t, const string& name)
 		 {
 		 	shared_ptr<Archive> ac = Archive::create(name,t);
-			
+
 			string str = beginDeserialization(stream,*ac);
 
 			ac->deserialize(stream, *ac, str);
-			
+
 			finalizeDeserialization(stream,*ac);
 		 }
-		 
+
 	public : template<typename Type>
 		 void saveArchive(ostream& stream, Type& t, const string& name)
 		 {
 			shared_ptr<Archive> ac = Archive::create(name,t);
-			
+
 			beginSerialization(stream, *ac);
-						
+
 			ac->serialize(stream, *ac, 1);
-		
+
 			finalizeSerialization(stream, *ac);
 		 }
-		 
-	REGISTER_CLASS_NAME(IOManager);
-	public : void registerAttributes() {};
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-REGISTER_CLASS(IOManager,false);
+REGISTER_FACTORABLE(IOManager);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////

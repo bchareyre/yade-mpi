@@ -26,8 +26,8 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-map<RecordType,pair<SerializeFnPtr,DeserializeFnPtr> > Archive::serializationMap;
-map<RecordType,pair<SerializeFnPtr,DeserializeFnPtr> > Archive::serializationMapOfFundamental;
+map<FactorableTypes::Type,pair<SerializeFnPtr,DeserializeFnPtr> > Archive::serializationMap;
+map<FactorableTypes::Type,pair<SerializeFnPtr,DeserializeFnPtr> > Archive::serializationMapOfFundamental;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -55,7 +55,7 @@ bool Archive::containsOnlyFundamentals()
 		return true;
 	else
 	{
-		if (recordType==SERIALIZABLE)
+		if (recordType==FactorableTypes::SERIALIZABLE)
 		{
 			Serializable * s = any_cast<Serializable*>(getAddress());
 			s->registerAttributes();
@@ -65,7 +65,7 @@ bool Archive::containsOnlyFundamentals()
 			return result;
 
 		}
-		else if (recordType==CUSTOM_CLASS)
+		else if (recordType==FactorableTypes::CUSTOM_CLASS)
 		{
 			shared_ptr<Serializable> s = dynamic_pointer_cast<Serializable>(ClassFactory::instance().createShared(getSerializableClassName()));
 			s->registerAttributes();
@@ -74,12 +74,12 @@ bool Archive::containsOnlyFundamentals()
 			s->unregisterAttributes();
 			return result;
 		}
-		else if (recordType==POINTER)
+		else if (recordType==FactorableTypes::POINTER)
 		{
 			shared_ptr<Archive> tmpAc;
 			return !createPointedArchive(*this,tmpAc);
 		}
-		else		
+		else
 			return false;
 	}
 }
@@ -87,7 +87,7 @@ bool Archive::containsOnlyFundamentals()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool Archive::addSerializablePointer(RecordType rt ,bool fundamental, SerializeFnPtr sp, DeserializeFnPtr dsp)
+bool Archive::addSerializablePointer(FactorableTypes::Type rt ,bool fundamental, SerializeFnPtr sp, DeserializeFnPtr dsp)
 {
 	if (fundamental)
 		serializationMapOfFundamental[rt] = pair<SerializeFnPtr,DeserializeFnPtr>(sp,dsp);

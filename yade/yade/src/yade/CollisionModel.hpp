@@ -17,7 +17,7 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
- 
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -39,12 +39,12 @@ class CollisionModel : public GeometricalModel,Indexable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Attributes											///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-	
+
 	// construction
 	public : CollisionModel ();
-	
+
 	public : virtual ~CollisionModel ();
-	
+
 	//public : virtual bool collideWith(CollisionModel* collisionModel) = NULL;
 	public : void registerAttributes();
 	public : void processAttributes();
@@ -52,16 +52,16 @@ class CollisionModel : public GeometricalModel,Indexable
 	// FIXME : why to put again getClassIndex
 	public : virtual int& getClassIndex() { throw;};
 	public : virtual const int& getClassIndex() const { throw;};
-	
+
 	REGISTER_CLASS_NAME(CollisionModel);
 	//REGISTER_CLASS_INDEX(CollisionModel);
-	
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-REGISTER_CLASS(CollisionModel,false);
+REGISTER_SERIALIZABLE(CollisionModel,false);
 //REGISTER_CLASS_TO_MULTI_METHODS_MANAGER(CollisionModel);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

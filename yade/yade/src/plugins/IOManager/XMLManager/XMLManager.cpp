@@ -28,13 +28,13 @@ XmlSaxParser XMLManager::saxParser;
 
 XMLManager::XMLManager() : IOManager()
 {
-	Archive::addSerializablePointer(SERIALIZABLE, false, serializeSerializable, deserializeSerializable);	
-	Archive::addSerializablePointer(POINTER, false, serializeSmartPointer, deserializeSmartPointer);	
-	Archive::addSerializablePointer(CONTAINER, false, serializeContainer, deserializeContainer);
+	Archive::addSerializablePointer(FactorableTypes::SERIALIZABLE, false, serializeSerializable, deserializeSerializable);
+	Archive::addSerializablePointer(FactorableTypes::POINTER, false, serializeSmartPointer, deserializeSmartPointer);
+	Archive::addSerializablePointer(FactorableTypes::CONTAINER, false, serializeContainer, deserializeContainer);
 
-	Archive::addSerializablePointer(CONTAINER, true, serializeContainerOfFundamental, deserializeContainerOfFundamental);
-	Archive::addSerializablePointer(CUSTOM_CLASS, true, serializeCustomFundamental, deserializeCustomFundamental);
-	Archive::addSerializablePointer(SERIALIZABLE, true, serializeFundamentalSerializable, deserializeFundamentalSerializable);
+	Archive::addSerializablePointer(FactorableTypes::CONTAINER, true, serializeContainerOfFundamental, deserializeContainerOfFundamental);
+	Archive::addSerializablePointer(FactorableTypes::CUSTOM_CLASS, true, serializeCustomFundamental, deserializeCustomFundamental);
+	Archive::addSerializablePointer(FactorableTypes::SERIALIZABLE, true, serializeFundamentalSerializable, deserializeFundamentalSerializable);
 }
 
 
@@ -101,7 +101,7 @@ string XMLManager::beginDeserialization(istream& stream, Archive& ac)
 void XMLManager::finalizeDeserialization(istream& , Archive&)
 {
 	//saxParser.readAndParseNextXmlLine(stream);
-		
+
 	//if (saxParser.getTagName()!="Yade")
 	//	throw SerializableError(ExceptionMessages::WrongFileFooter);
 }
@@ -129,13 +129,13 @@ void XMLManager::tokenizeCustomFundamental(const string& str, vector<string>& to
 	int openBracketId = 0;
 	int closingBracketId = 0;
 	string tmpStr;
-	
+
 	while (str[openBracketId++]!='{');
 	closingBracketId = openBracketId;
 	while (str[closingBracketId++]!='}');
 
 	tmpStr = str.substr(openBracketId,closingBracketId-openBracketId-1);
-	
+
 	string buf;
 	stringstream sstr(tmpStr);
 	while (sstr >> buf)
@@ -150,7 +150,7 @@ void XMLManager::tokenizeContainerOfFundamental(const string& str, vector<string
 	unsigned int start;
 
 	int category=-1;
-	
+
 	if (str.size()==0 || str=="[]")
 		return;
 	else
@@ -181,7 +181,7 @@ void XMLManager::tokenizeContainerOfFundamental(const string& str, vector<string
 		start = i;
 		if (str[i]=='[' && (category==-1 || category==1)) // container of container
 		{
-			category = 1;			
+			category = 1;
 			bracketCount=0;
 			do
 			{
@@ -195,9 +195,9 @@ void XMLManager::tokenizeContainerOfFundamental(const string& str, vector<string
 			} while (bracketCount!=0);
 		}
 		else if (str[i]=='{' && (category==-1 || category==2)) // container of custom fundamental
-		{	
-			category = 2;			
-			while (str[i++]!='}');				
+		{
+			category = 2;
+			while (str[i++]!='}');
 		}
 		else if(category==-1 || category==3) // container of fundamental
 		{
@@ -205,7 +205,7 @@ void XMLManager::tokenizeContainerOfFundamental(const string& str, vector<string
 			while (str[i]!=' ' && str[i]!='\t' && str[i]!='\n' && str[i]!=']')
 				i++;
 		}
-		tokens.push_back(str.substr(start,i-start));	
+		tokens.push_back(str.substr(start,i-start));
 		i++;
 	}
 }
@@ -213,24 +213,24 @@ void XMLManager::tokenizeContainerOfFundamental(const string& str, vector<string
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-	
+
 void XMLManager::deserializeContainer(istream& stream, Archive& ac, const string& str)
 {
 	map<string,string> basicAttributes = saxParser.getBasicAttributes();
 	int size = lexical_cast<int>(basicAttributes["size"]);
 
 	if (size>0)
-	{	
+	{
 		ac.resize(ac,size);
 		shared_ptr<Archive> tmpAc;
-	
+
 		saxParser.readAndParseNextXmlLine(stream);
 		ac.createNextArchive(ac,tmpAc,true);
-			
+
 		do
 		{
 			tmpAc->deserialize(stream, *tmpAc,str);
-			saxParser.readAndParseNextXmlLine(stream);			
+			saxParser.readAndParseNextXmlLine(stream);
 		} while (ac.createNextArchive(ac,tmpAc,false));
 	}
 
@@ -240,18 +240,18 @@ void XMLManager::deserializeContainer(istream& stream, Archive& ac, const string
 void XMLManager::deserializeSmartPointer(istream& stream, Archive& ac, const string& )
 {
 	map<string,string> basicAttributes = saxParser.getBasicAttributes();
-	
+
 	if (basicAttributes.size()!=0)
 	{
 		string className = basicAttributes["className"];
-				
+
 		saxParser.readAndParseNextXmlLine(stream);
 
-		shared_ptr<Archive> tmpAc;		
+		shared_ptr<Archive> tmpAc;
 		ac.createNewPointedArchive(ac,tmpAc,className);
-	
+
 		tmpAc->deserialize(stream, *tmpAc,"");
-		
+
 		saxParser.readAndParseNextXmlLine(stream);
 	}
 
@@ -259,18 +259,18 @@ void XMLManager::deserializeSmartPointer(istream& stream, Archive& ac, const str
 }
 
 void XMLManager::deserializeSerializable(istream& stream, Archive& ac, const string& )
-{		
+{
 /*	cerr << "Starting deserialization of " << ac.getName();
 	for(unsigned int i=0;i<48-ac.getName().size();i++)
 		cerr <<".";
 	cerr << "OK"<<endl;*/
-	
+
 	shared_ptr<Archive> tmpAc;
 
 	Serializable * s = any_cast<Serializable*>(ac.getAddress());
 
 	s->registerAttributes();
-	
+
 	// deserializing (custom-)fundamental attributes
 	map<string,string> basicAttributes = saxParser.getBasicAttributes();
 	map<string,string>::const_iterator bai    = basicAttributes.begin();
@@ -278,11 +278,11 @@ void XMLManager::deserializeSerializable(istream& stream, Archive& ac, const str
 	for(;bai!=baiEnd;++bai)
 	{
 		if(s->findAttribute(bai->first,tmpAc))
-		{			
+		{
 			if (tmpAc->isFundamental())
 				tmpAc->deserialize(stream, *tmpAc,bai->second);
 		}
-		
+
 	}
 
 	if(!saxParser.isFullTag())
@@ -325,7 +325,7 @@ void XMLManager::deserializeSerializable(istream& stream, Archive& ac, const str
 void XMLManager::serializeContainer(ostream& stream, Archive& ac , int depth)
 {
 	shared_ptr<Archive> tmpAc;
-	
+
 	int size=ac.createNextArchive(ac,tmpAc,true);
 
 	stream << " size=\"" << size << "\"";
@@ -337,7 +337,7 @@ void XMLManager::serializeContainer(ostream& stream, Archive& ac , int depth)
 		tmpAc->serialize(stream,*tmpAc,depth+1);
 		writeClosingTag(stream,*tmpAc,depth);
 	} while (ac.createNextArchive(ac,tmpAc,false));
-			
+
 	ac.markProcessed();
 }
 
@@ -346,17 +346,17 @@ void XMLManager::serializeSmartPointer(ostream& stream, Archive& ac , int depth)
 	shared_ptr<Archive> tmpAc;
 
 	if(ac.createPointedArchive(ac,tmpAc))
-	{	
-		RecordType type = tmpAc->getRecordType();
-		if (type==SERIALIZABLE)
-		{			
+	{
+		FactorableTypes::Type type = tmpAc->getRecordType();
+		if (type==FactorableTypes::SERIALIZABLE)
+		{
 			Serializable * s = any_cast<Serializable*>(tmpAc->getAddress());
 			stream << " className=\"" << s->getClassName() << "\" >" << endl;
 			writeOpeningTag(stream,*tmpAc,depth);
 			tmpAc->serialize(stream,*tmpAc,depth+1);
 			writeClosingTag(stream,*tmpAc,depth);
 		}
-		else if (type==CUSTOM_CLASS)
+		else if (type==FactorableTypes::CUSTOM_CLASS)
 		{
 			shared_ptr<Serializable> s = dynamic_pointer_cast<Serializable>(ClassFactory::instance().createShared(tmpAc->getSerializableClassName()));
 			stream << " className=\"" << s->getClassName() << "\" >" << endl;
@@ -374,8 +374,8 @@ void XMLManager::serializeSmartPointer(ostream& stream, Archive& ac , int depth)
 void XMLManager::serializeSerializable(ostream& stream, Archive& ac, int depth)
 {
 	Serializable * s;
-	
-	s = any_cast<Serializable*>(ac.getAddress());	
+
+	s = any_cast<Serializable*>(ac.getAddress());
 
 	s->registerAttributes();
 
@@ -396,8 +396,8 @@ void XMLManager::serializeSerializable(ostream& stream, Archive& ac, int depth)
 	if (!s->containsOnlyFundamentals())
 	{
 		stream << ">" << endl;
-		
-		ai    = archives.begin();	
+
+		ai    = archives.begin();
 		for( ; ai!=aiEnd ; ++ai)
 		{
 			if (!(*ai)->isFundamental())
@@ -408,7 +408,7 @@ void XMLManager::serializeSerializable(ostream& stream, Archive& ac, int depth)
 			}
 		}
 	}
-	
+
 	ac.markProcessed();
 	s->unregisterAttributes();
 }
@@ -438,7 +438,7 @@ void XMLManager::deserializeCustomFundamental(istream& stream, Archive& ac,const
 	Serializable::Archives::iterator arci = archives.begin();
 	for(;si!=siEnd;++si,++arci)
 		(*arci)->deserialize(stream,*(*arci),(*si));
-		
+
 	s->deserialize(ac.getAddress());
 	ac.markProcessed();
 }
@@ -478,7 +478,7 @@ void XMLManager::deserializeContainerOfFundamental(istream& stream, Archive& ac,
 
 	shared_ptr<Archive> tmpAc;
 	vector<string>::iterator ti = tokens.begin();
-	vector<string>::iterator tiEnd = tokens.end();	
+	vector<string>::iterator tiEnd = tokens.end();
 
 	ac.resize(ac,tokens.size());
 	ac.createNextArchive(ac,tmpAc,true);
@@ -486,14 +486,14 @@ void XMLManager::deserializeContainerOfFundamental(istream& stream, Archive& ac,
 	for( ; ti!=tiEnd ; ++ti)
 	{
 		shared_ptr<Archive> tmpAc2;
-		if (tmpAc->getRecordType()==POINTER)
+		if (tmpAc->getRecordType()==FactorableTypes::POINTER)
 			tmpAc->createNewPointedArchive(*tmpAc,tmpAc2,"");
 		else
 			tmpAc2 = tmpAc;
 		tmpAc2->deserialize(stream,*tmpAc2,*ti);
 		ac.createNextArchive(ac,tmpAc,false);
 	}
-	
+
 	ac.markProcessed();
 }
 
@@ -508,7 +508,7 @@ void XMLManager::serializeContainerOfFundamental(ostream& stream, Archive& ac, i
 		do
 		{
 			shared_ptr<Archive> tmpAc2;
-			if (tmpAc->getRecordType()==POINTER)
+			if (tmpAc->getRecordType()==FactorableTypes::POINTER)
 				tmpAc->createPointedArchive(*tmpAc,tmpAc2);
 			else
 				tmpAc2 = tmpAc;
@@ -518,7 +518,7 @@ void XMLManager::serializeContainerOfFundamental(ostream& stream, Archive& ac, i
 			i++;
 		} while (ac.createNextArchive(ac,tmpAc,false));
 	}
-	
+
 	stream << "]";
 	ac.markProcessed();
 }
@@ -535,8 +535,8 @@ void XMLManager::deserializeFundamentalSerializable(istream& stream, Archive& ac
 	Serializable * s = any_cast<Serializable*>(ac.getAddress());
 
 	s->registerAttributes();
-	
-	vector<string> tokens;	
+
+	vector<string> tokens;
 	tokenizeCustomFundamental(str,tokens);
 
 	vector<string>::const_iterator si    = tokens.begin();
@@ -545,7 +545,7 @@ void XMLManager::deserializeFundamentalSerializable(istream& stream, Archive& ac
 	Serializable::Archives::iterator arci = archives.begin();
 	for(;si!=siEnd;++si,++arci)
 		(*arci)->deserialize(stream,*(*arci),(*si));
-		
+
 	ac.markProcessed();
 	s->unregisterAttributes();
 }
@@ -553,11 +553,11 @@ void XMLManager::deserializeFundamentalSerializable(istream& stream, Archive& ac
 void XMLManager::serializeFundamentalSerializable(ostream& stream, Archive& ac, int depth)
 {
 	Serializable * s;
-	s = any_cast<Serializable*>(ac.getAddress());	
+	s = any_cast<Serializable*>(ac.getAddress());
 	s->registerAttributes();
-	
+
 	Serializable::Archives archives = s->getArchives();
-	
+
 	Serializable::Archives::iterator ai    = archives.begin();
 	Serializable::Archives::iterator aiEnd = archives.end();
 	Serializable::Archives::iterator ai2;
@@ -567,13 +567,13 @@ void XMLManager::serializeFundamentalSerializable(ostream& stream, Archive& ac, 
 		(*ai)->serialize(stream,**ai,depth+1);
 		if (++(ai2=ai)!=aiEnd)
 			stream << " ";
-		(*ai)->markProcessed();		
+		(*ai)->markProcessed();
 	}
 	stream << "}";
-	
+
 	ac.markProcessed();
 	s->unregisterAttributes();
-	
+
 }
 
 

@@ -10,7 +10,7 @@
  *   This program is distributed in the hope that it will be useful,       *
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                         
+ *   GNU General Public License for more details.
  *                                                                         *
  *   You should have received a copy of the GNU General Public License     *
  *   along with this program; if not, write to the                         *
@@ -46,7 +46,7 @@ class Body;
 
 /*! \brief Abstract interface for all broad phase collider.
 
-	All the broad phase collider (sweep and prune, regular grid ....) must derived from this class. A broad phase collider is used to speed up the collision detection test by testing collision between the bounding volume of the objects. In general it tries to reduce the number of potential colliding pairs. 
+	All the broad phase collider (sweep and prune, regular grid ....) must derived from this class. A broad phase collider is used to speed up the collision detection test by testing collision between the bounding volume of the objects. In general it tries to reduce the number of potential colliding pairs.
 */
 // FIXME : Serializable or Factorable
 class BroadPhaseCollider : public Serializable
@@ -55,7 +55,7 @@ class BroadPhaseCollider : public Serializable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Attributes											///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-	
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Constructor/Destructor									///
@@ -63,21 +63,21 @@ class BroadPhaseCollider : public Serializable
 
 	/*! Constructor */
 	public : BroadPhaseCollider ();
-	
+
 	/*! Virtual destructor for correct dealloction of polymorphic pointer */
 	public : virtual ~BroadPhaseCollider ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Methods											///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-	
+
 	//FIXME :all the virtual method should throw ???
 	/*! Common interface for all broad phase collider. This method find the bodies which are a potentially in interaction and store the potential interactions into a list
 		\param const std::vector<shared_ptr<Body> > vector of body you want to test for potential interaction
 		\param std::list<shared_ptr<Interaction> > list of potential interaction found by the broad phase collider
-	*/ 
+	*/
 	public : virtual int broadPhaseCollisionTest(const std::vector<shared_ptr<Body> >& ,std::list<shared_ptr<Interaction> >& ) { return 0;};
-	
+
 	public : void processAttributes();
 	public : void registerAttributes();
 
@@ -87,7 +87,7 @@ class BroadPhaseCollider : public Serializable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-REGISTER_CLASS(BroadPhaseCollider,false);
+REGISTER_SERIALIZABLE(BroadPhaseCollider,false);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////

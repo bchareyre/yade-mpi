@@ -41,21 +41,21 @@ class ConnexBody : public Body
 
 	public : float mass;
 	public : float invMass;
-	
+
 	// construction
 	public : ConnexBody ();
-	
+
 	public : virtual ~ConnexBody ();
-	
+
 	public : virtual void glDraw();
-	
-	
+
+
 	public : void processAttributes();
 	public : void registerAttributes();
 
 	public : virtual void updateBoundingVolume(Se3&) {};
 	public : virtual void updateCollisionModel(Se3&) {};
-	
+
 	public : virtual void moveToNextTimeStep();
 
 	REGISTER_CLASS_NAME(ConnexBody);
@@ -64,7 +64,7 @@ class ConnexBody : public Body
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-REGISTER_CLASS(ConnexBody,false);
+REGISTER_SERIALIZABLE(ConnexBody,false);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////

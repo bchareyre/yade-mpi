@@ -17,12 +17,12 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
- 
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#ifndef __CINEMATICENGINE_H__
-#define __CINEMATICENGINE_H__
+#ifndef __KINEMATICENGINE_H__
+#define __KINEMATICENGINE_H__
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -44,18 +44,18 @@ class Body;
 
 /*! \brief Abstract interface for all kinematic engine.
 
-	All kinematic engines must derived from this class. A kinematic engine is used to modify the state of an object (position,veloity ...) according to a predefined law (mathematical function, stored data ...) and not according to a dynamic law as dynamic engines do. A kinematic engine contains a list of bodies to act on, and a bodie can subscribe to several kinematic engines.  
+	All kinematic engines must derived from this class. A kinematic engine is used to modify the state of an object (position,veloity ...) according to a predefined law (mathematical function, stored data ...) and not according to a dynamic law as dynamic engines do. A kinematic engine contains a list of bodies to act on, and a bodie can subscribe to several kinematic engines.
 */
 // FIXME : Serializable or Factorable
 class KinematicEngine : public Serializable
-{	
+{
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Attributes											///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 	//protected : float startTime;
-	//protected : float stopTime; 
+	//protected : float stopTime;
 	protected : float time;
 
 	/*! Lists of bodies which state will be modified by the kinematic engine */
@@ -68,18 +68,18 @@ class KinematicEngine : public Serializable
 	/*! Constructor */
 	public : KinematicEngine ();
 
-	/*! Virtual destructor for correct dealloction of polymorphic pointer */	
+	/*! Virtual destructor for correct dealloction of polymorphic pointer */
 	public : virtual ~KinematicEngine ();
- 
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Methods											///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-	
+
 	/*! Common interface for all kinematic engines. This method move all registered bodies from time t to time t+dt according to its internal law
 		\param const std::vector<shared_ptr<Body> > vector of body that contains the registered one
 	*/
 	public : virtual void moveToNextTimeStep(std::vector<shared_ptr<Body> >&  ) {};
-	
+
 	public : void processAttributes();
 	public : void registerAttributes();
 
@@ -90,12 +90,12 @@ class KinematicEngine : public Serializable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-REGISTER_CLASS(KinematicEngine,false);
+REGISTER_SERIALIZABLE(KinematicEngine,false);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#endif // __CINEMATICENGINE_H__
+#endif // __KINEMATICENGINE_H__
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
