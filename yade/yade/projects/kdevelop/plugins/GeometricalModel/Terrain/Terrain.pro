@@ -3,13 +3,22 @@
 # Subdir relative project main directory: ./plugins/GeometricalModel/Terrain
 # Target is a library:  
 
-LIBS += -rdynamic 
+LIBS += -lConstants \
+        -lM3D \
+        -lM2D \
+        -rdynamic 
 INCLUDEPATH = ../../../plugins/BoundingVolume/AABB \
-              ../../../yade 
+              ../../../yade \
+              ../../../toolboxes/Math/M2D \
+              ../../../toolboxes/Math/Constants \
+              ../../../toolboxes/Math/M3D 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = $(YADEDYNLIBPATH) 
+QMAKE_LIBDIR = ../../../toolboxes/Math/Constants/$(YADEDYNLIBPATH) \
+               ../../../toolboxes/Math/M3D/$(YADEDYNLIBPATH) \
+               ../../../toolboxes/Math/M2D/$(YADEDYNLIBPATH) \
+               $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
 CONFIG += release \
           warn_on \

@@ -3,11 +3,18 @@
 # Subdir relative project main directory: ./plugins/Body/RigidBody
 # Target is a library:  
 
-LIBS += -rdynamic 
-INCLUDEPATH = ../../../yade 
+LIBS += -lM3D \
+        -lConstants \
+        -rdynamic 
+INCLUDEPATH = ../../../yade \
+              ../../../toolboxes/Math/Constants \
+              ../../../toolboxes/Math/M3D 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
+QMAKE_LIBDIR = ../../../toolboxes/Math/M3D/$(YADEDYNLIBPATH) \
+               ../../../toolboxes/Math/Constants/$(YADEDYNLIBPATH) \
+               $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
 CONFIG += release \
           warn_on \

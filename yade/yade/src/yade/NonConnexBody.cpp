@@ -5,7 +5,6 @@
 #include <GL/gl.h>
 #include <GL/glut.h>
 
-#include "Math.hpp"
 #include "NonConnexBody.hpp"
 
 NonConnexBody::NonConnexBody() : Body()
@@ -30,7 +29,7 @@ void NonConnexBody::glDraw()
 	se3.rotation.toAngleAxis(angle,axis);
 
 	glTranslatef(se3.translation[0],se3.translation[1],se3.translation[2]);
-	glRotated(angle*Math::RAD_TO_DEG,axis[0],axis[1],axis[2]);
+	glRotated(angle*Constants::RAD_TO_DEG,axis[0],axis[1],axis[2]);
 		
 	glDisable(GL_LIGHTING);
 	

@@ -11,6 +11,9 @@ LIBS += -lAABB \
         -lBox \
         -lSphere \
         -lRigidBody \
+        -lConstants \
+        -lM3D \
+        -lRand \
         -rdynamic 
 INCLUDEPATH = ../../../plugins/KinematicEngine/Rotor \
               ../../../plugins/DynamicEngine/SimpleSpringDynamicEngine \
@@ -20,7 +23,10 @@ INCLUDEPATH = ../../../plugins/KinematicEngine/Rotor \
               ../../../plugins/GeometricalModel/Sphere \
               ../../../plugins/BoundingVolume/AABB \
               ../../../plugins/Body/RigidBody \
-              ../../../yade 
+              ../../../yade \
+              ../../../toolboxes/Math/Constants \
+              ../../../toolboxes/Math/M3D \
+              ../../../toolboxes/Math/Rand 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
@@ -32,6 +38,9 @@ QMAKE_LIBDIR = ../../../plugins/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
                ../../../plugins/GeometricalModel/Box/$(YADEDYNLIBPATH) \
                ../../../plugins/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/RigidBody/$(YADEDYNLIBPATH) \
+               ../../../toolboxes/Math/Constants/$(YADEDYNLIBPATH) \
+               ../../../toolboxes/Math/M3D/$(YADEDYNLIBPATH) \
+               ../../../toolboxes/Math/Rand/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
 CONFIG += release \

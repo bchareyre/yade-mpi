@@ -27,27 +27,15 @@ HEADERS += Archive.hpp \
            GLViewer.hpp \
            IOManager.hpp \
            KinematicEngine.hpp \
-           Math.hpp \
-           Math.ipp \
-           Matrix3.hpp \
-           Matrix3.ipp \
            NarrowPhaseCollider.hpp \
            NonConnexBody.hpp \
            Omega.hpp \
            QGLSubWindow.hpp \
            QtFrontEnd.hpp \
-           Quaternion.hpp \
-           Quaternion.ipp \
-           Se3.hpp \
-           Se3.ipp \
            Serializable.hpp \
            Singleton.hpp \
            Tree.hpp \
            Types.hpp \
-           Vector2.hpp \
-           Vector2.ipp \
-           Vector3.hpp \
-           Vector3.ipp \
            Archive.tpp \
            ContainerHandler.tpp \
            FundamentalHandler.tpp \
@@ -81,32 +69,33 @@ SOURCES += Archive.cpp \
            GLViewer.cpp \
            IOManager.cpp \
            KinematicEngine.cpp \
-           Math.cpp \
-           Matrix3.cpp \
            NarrowPhaseCollider.cpp \
            NonConnexBody.cpp \
            Omega.cpp \
            QGLSubWindow.cpp \
            QtFrontEnd.cpp \
-           Quaternion.cpp \
-           Se3.cpp \
            Serializable.cpp \
-           Vector2.cpp \
-           Vector3.cpp \
            yade.cpp \
            MultiMethodsManager.cpp \
            Factorable.cpp \
            InteractionModel.cpp \
            Interaction.cpp \
            Contact.cpp 
-LIBS += -lboost_date_time \
+LIBS += -lM3D \
+-lConstants \
+-lboost_date_time \
 -lglut \
 -lQGLViewer \
 -rdynamic
-INCLUDEPATH = $(YADECOMPILATIONPATH)
+INCLUDEPATH = ../toolboxes/Math/Constants \
+../toolboxes/Math/M3D \
+$(YADECOMPILATIONPATH)
 MOC_DIR = $(YADECOMPILATIONPATH)
 UI_DIR = $(YADECOMPILATIONPATH)
 OBJECTS_DIR = $(YADECOMPILATIONPATH)
+QMAKE_LIBDIR = ../toolboxes/Math/M3D/$(YADEDYNLIBPATH) \
+../toolboxes/Math/Constants/$(YADEDYNLIBPATH) \
+$(YADEDYNLIBPATH)
 DESTDIR = $(YADEBINPATH)
 CONFIG += release \
 warn_on

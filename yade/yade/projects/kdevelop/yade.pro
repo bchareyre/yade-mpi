@@ -10,8 +10,8 @@ DEFINES = DEBUG
 CONFIG += release \
           warn_on 
 TEMPLATE = subdirs 
-SUBDIRS += yade \
+SUBDIRS += toolboxes \
+           yade \
            plugins \
            preprocessors \
-           postprocessors \
-           toolboxes 
+           postprocessors 

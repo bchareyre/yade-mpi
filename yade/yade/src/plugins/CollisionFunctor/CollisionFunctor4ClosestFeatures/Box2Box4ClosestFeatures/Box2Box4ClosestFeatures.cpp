@@ -92,7 +92,7 @@ bool Box2Box4ClosestFeatures::collide(const shared_ptr<CollisionModel> cm1, cons
 	
 	bbInfo.isNormalPrincipalAxis = true;
 	bbInfo.invertNormal = false;
-	bbInfo.penetrationDepth = -Math::MAX_FLOAT+1;
+	bbInfo.penetrationDepth = -Constants::MAX_FLOAT+1;
 	bbInfo.code = 0;
 	
 	// separating axis = u1,u2,u3

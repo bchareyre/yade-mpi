@@ -3,7 +3,6 @@
 #endif
 
 #include <GL/gl.h>
-#include "Math.hpp"
 #include <GL/glut.h>
 
 #include "ConnexBody.hpp"
@@ -28,7 +27,7 @@ void ConnexBody::glDraw()
 	Vector3 axis;	
 	se3.rotation.toAngleAxis(angle,axis);	
 	glTranslatef(se3.translation[0],se3.translation[1],se3.translation[2]);
-	glRotatef(angle*Math::RAD_TO_DEG,axis[0],axis[1],axis[2]);	
+	glRotatef(angle*Constants::RAD_TO_DEG,axis[0],axis[1],axis[2]);	
 	gm->glDraw();		
 	glPopMatrix();
 	

@@ -412,8 +412,8 @@ void Terrain::buildCollisionModel()
 		for(int j=0;j<nbCells;j++)
 		{
 			float min,max;
-			min = Math::MAX_FLOAT;
-			max = -Math::MAX_FLOAT;
+			min = Constants::MAX_FLOAT;
+			max = -Constants::MAX_FLOAT;
 			for(unsigned int k=0 ; k<triLists[i][j].size() ; k++)
 			{
 				int faceId = triLists[i][j][k];

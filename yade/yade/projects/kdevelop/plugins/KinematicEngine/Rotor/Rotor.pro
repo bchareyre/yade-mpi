@@ -4,13 +4,19 @@
 # Target is a library:  
 
 LIBS += -lRigidBody \
+        -lConstants \
+        -lM3D \
         -rdynamic 
 INCLUDEPATH = ../../../plugins/Body/RigidBody \
-              ../../../yade 
+              ../../../yade \
+              ../../../toolboxes/Math/Constants \
+              ../../../toolboxes/Math/M3D 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 QMAKE_LIBDIR = ../../../plugins/Body/RigidBody/$(YADEDYNLIBPATH) \
+               ../../../toolboxes/Math/Constants/$(YADEDYNLIBPATH) \
+               ../../../toolboxes/Math/M3D/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
 CONFIG += release \

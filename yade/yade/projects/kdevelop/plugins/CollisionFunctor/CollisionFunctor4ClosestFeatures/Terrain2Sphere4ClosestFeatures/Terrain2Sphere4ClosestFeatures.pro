@@ -3,21 +3,28 @@
 # Subdir relative project main directory: ./plugins/CollisionFunctor/CollisionFunctor4ClosestFeatures/Terrain2Sphere4ClosestFeatures
 # Target is a library:  
 
-LIBS += -lSphere \
-        -lTerrain \
+LIBS += -lTerrain \
         -lClosestFeatures \
+        -lM2D \
+        -lConstants \
+        -lM3D \
         -rdynamic 
 INCLUDEPATH = ../../../../plugins/GeometricalModel/Sphere \
               ../../../../plugins/GeometricalModel/Terrain \
               ../../../../plugins/BoundingVolume/AABB \
               ../../../../plugins/InteractionModel/ClosestFeatures \
-              ../../../../yade 
+              ../../../../yade \
+              ../../../../toolboxes/Math/M2D \
+              ../../../../toolboxes/Math/Constants \
+              ../../../../toolboxes/Math/M3D 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../../plugins/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
-               ../../../../plugins/GeometricalModel/Terrain/$(YADEDYNLIBPATH) \
+QMAKE_LIBDIR = ../../../../plugins/GeometricalModel/Terrain/$(YADEDYNLIBPATH) \
                ../../../../plugins/InteractionModel/ClosestFeatures/$(YADEDYNLIBPATH) \
+               ../../../../toolboxes/Math/M2D/$(YADEDYNLIBPATH) \
+               ../../../../toolboxes/Math/Constants/$(YADEDYNLIBPATH) \
+               ../../../../toolboxes/Math/M3D/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
 CONFIG += release \

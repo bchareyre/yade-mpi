@@ -3,22 +3,28 @@
 # Subdir relative project main directory: ./plugins/BroadPhaseCollider/SimpleBroadCollider
 # Target is a library:  
 
+LIBS += -lBoundingSphere \
+        -lAABB \
+        -lConstants \
+        -lM3D \
+        -rdynamic 
+INCLUDEPATH = ../../../plugins/BoundingVolume/BoundingSphere \
+              ../../../plugins/BoundingVolume/AABB \
+              ../../../yade \
+              ../../../toolboxes/Math/Constants \
+              ../../../toolboxes/Math/M3D 
+MOC_DIR = $(YADECOMPILATIONPATH) 
+UI_DIR = $(YADECOMPILATIONPATH) 
+OBJECTS_DIR = $(YADECOMPILATIONPATH) 
+QMAKE_LIBDIR = ../../../plugins/BoundingVolume/BoundingSphere/$(YADEDYNLIBPATH) \
+               ../../../plugins/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
+               ../../../toolboxes/Math/Constants/$(YADEDYNLIBPATH) \
+               ../../../toolboxes/Math/M3D/$(YADEDYNLIBPATH) \
+               $(YADEDYNLIBPATH) 
+DESTDIR = $(YADEDYNLIBPATH) 
+CONFIG += release \
+          warn_on \
+          dll 
+TEMPLATE = lib 
 HEADERS += SimpleBroadCollider.hpp 
 SOURCES += SimpleBroadCollider.cpp 
-LIBS += -lBoundingSphere \
--lAABB \
--rdynamic
-INCLUDEPATH = ../../../plugins/BoundingVolume/BoundingSphere \
-../../../plugins/BoundingVolume/AABB \
-../../../yade
-MOC_DIR = $(YADECOMPILATIONPATH)
-UI_DIR = $(YADECOMPILATIONPATH)
-OBJECTS_DIR = $(YADECOMPILATIONPATH)
-QMAKE_LIBDIR = ../../../plugins/BoundingVolume/BoundingSphere/$(YADEDYNLIBPATH) \
-../../../plugins/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
-$(YADEDYNLIBPATH)
-DESTDIR = $(YADEDYNLIBPATH)
-CONFIG += release \
-warn_on \
-dll
-TEMPLATE = lib

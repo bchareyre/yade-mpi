@@ -9,7 +9,7 @@
 #include "Rotor.hpp"
 #include "SimpleNarrowCollider.hpp"
 #include "RigidBody.hpp"
-#include "Math.hpp"
+#include "Rand.hpp"
 #include <fstream>
 #include "IOManager.hpp"
 
@@ -209,8 +209,8 @@ void RotatingBox::exec()
 		shared_ptr<AABB> aabb(new AABB);
 		shared_ptr<Sphere> sphere(new Sphere);
 		
-		Vector3 translation(40*Math::symmetricRandom(),40*Math::symmetricRandom(),40*Math::symmetricRandom());
-		float radius = (4+Math::symmetricRandom());
+		Vector3 translation(40*Rand::symmetricRandom(),40*Rand::symmetricRandom(),40*Rand::symmetricRandom());
+		float radius = (4+Rand::symmetricRandom());
 		
 		s->isDynamic		= true;
 		s->angularVelocity	= Vector3(0,0,0);
@@ -225,7 +225,7 @@ void RotatingBox::exec()
 		s->bv			= shared_dynamic_cast<BoundingVolume>(aabb);
 
 		sphere->radius		= radius;
-		sphere->diffuseColor	= Vector3(Math::unitRandom(),Math::unitRandom(),Math::unitRandom());
+		sphere->diffuseColor	= Vector3(Rand::unitRandom(),Rand::unitRandom(),Rand::unitRandom());
 		sphere->wire		= false;
 		sphere->visible		= true;
 		s->cm			= shared_dynamic_cast<CollisionModel>(sphere);
