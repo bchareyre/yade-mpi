@@ -91,13 +91,15 @@ void OpenGLRenderingEngine::render(shared_ptr<NonConnexBody> rootBody)
 	glDepthFunc(GL_LEQUAL);
 	glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
 	
-	glStencilFunc(GL_EQUAL, 1, 1);  /* draw shadowed part */
+	//glStencilFunc(GL_EQUAL, 1, 1);  /* draw shadowed part */
+	glStencilFunc(GL_NOTEQUAL, 0, (GLuint)(-1));
 	glDisable(GL_LIGHT0);
-	renderRootBody(rootBody);  /* render scene in depth buffer */
+	renderRootBody(rootBody);  
 	
-	glStencilFunc(GL_EQUAL, 0, 1);  /* draw lit part */
+	//glStencilFunc(GL_EQUAL, 0, 1);  /* draw lit part */
+	glStencilFunc(GL_EQUAL, 0, (GLuint)(-1));
 	glEnable(GL_LIGHT0);
-	renderRootBody(rootBody);  /* render scene in depth buffer */
+	renderRootBody(rootBody);  
 	
 	glDepthFunc(GL_LESS);
 	glDisable(GL_STENCIL_TEST);
