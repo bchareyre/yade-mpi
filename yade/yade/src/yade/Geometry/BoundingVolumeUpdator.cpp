@@ -57,6 +57,9 @@ void BoundingVolumeUpdator::updateBoundingVolume(shared_ptr<Body> b)
 	}
 	
 	bvFactoriesManager.buildBoundingVolume(b->cm,b->se3,b->bv);
+
+//	buildBoundingVolumeDispatcher(cm,se3,bv);
+		
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

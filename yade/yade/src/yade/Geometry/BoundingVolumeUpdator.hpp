@@ -37,6 +37,7 @@
 class BoundingVolumeUpdator : public Actor
 {
 	protected : BoundingVolumeFactoryManager bvFactoriesManager;
+	// Dispatcher<BoundingVolume,....> buildBoundingVolumeDispatcher;
 	
 	private : vector<vector<string> > bvFactories;
 	public  : void addBVFactories(const string& str1,const string& str2,const string& str3);

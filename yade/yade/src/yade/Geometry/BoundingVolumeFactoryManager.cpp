@@ -14,8 +14,15 @@ BoundingVolumeFactoryManager::~BoundingVolumeFactoryManager ()
 
 bool BoundingVolumeFactoryManager::addPair(const string& name1,const string& name2,const string& libName)
 {
-	shared_ptr<CollisionGeometry> cm	= dynamic_pointer_cast<CollisionGeometry>(ClassFactory::instance().createShared(name1));
-	shared_ptr<BoundingVolume> bv		= dynamic_pointer_cast<BoundingVolume>(ClassFactory::instance().createShared(name2));
+	shared_ptr<CollisionGeometry> 
+	cm	= 
+		dynamic_pointer_cast<CollisionGeometry>
+			(ClassFactory::instance().createShared(name1));
+	shared_ptr<BoundingVolume> 
+	bv	= 
+		dynamic_pointer_cast<BoundingVolume>
+			(ClassFactory::instance().createShared(name2));
+			
 	shared_ptr<Indexable> i1 = dynamic_pointer_cast<Indexable>(cm);
 	shared_ptr<Indexable> i2 = dynamic_pointer_cast<Indexable>(bv);
 

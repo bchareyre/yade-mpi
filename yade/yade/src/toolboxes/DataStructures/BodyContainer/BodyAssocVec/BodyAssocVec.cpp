@@ -53,6 +53,9 @@ void BodyAssocVec::clear()
 
 bool BodyAssocVec::erase(unsigned int id)
 {
+
+// WARNING!!! AssocVector.erase() invalidates all iterators !!!
+
 	bii = bodies.find(id);
 
 	if( bii != bodies.end() )

@@ -67,6 +67,9 @@ class MultiMethodFunctor2D : public Factorable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+// don't forget to use this macro so that Dispatcher can static_cast before calling the Functor
+// so inside the functor we already have the right type.
+
 #define DEFINE_FUNCTOR_ORDER(class1,class2)							\
 	public : virtual bool checkFunctorOrder(const string& suggestedOrder) const	\
 	{											\

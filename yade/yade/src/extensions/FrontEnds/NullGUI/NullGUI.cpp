@@ -85,8 +85,8 @@ void NullGUI::help()
     options:\n\
 	-m number	- specify maximum number of iterations\n\
 			  ( 0 = unlimited, tested every INTERVAL iteration).\n\
-	-t number	- set time step in seconds (FIXME - inside .xml)\n\
-	-g number	- set gravity (FIXME - inside .xml)\n\
+	-t number	- set time step in seconds, default is 0.01 (FIXME - inside .xml)\n\
+	-g number	- set gravity, default is 9.81 (FIXME - inside .xml)\n\
 \n";
 }
 

@@ -71,7 +71,10 @@ class Singleton
 		}
 	protected:
 		Singleton() {};
-		~Singleton() {};
+		~Singleton() {
+		 // FIXME - maybe this:
+		 // delete & (instance()) ; ?? or sth like that....
+		};
 	private:
 		Singleton(const Singleton&);
 		Singleton& operator=(const Singleton&);

@@ -53,6 +53,9 @@ using namespace ArchiveTypes;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+// FIXME - if you are doing major rewrite of Serialization, check if following macro
+// could make good use of Loki::OrderedTypeInfo
+
 #define REGISTER_SERIALIZABLE_DESCRIPTOR(name,sname,type,isFundamental) 		\
 	inline const type_info& Verify##name()						\
 	{										\

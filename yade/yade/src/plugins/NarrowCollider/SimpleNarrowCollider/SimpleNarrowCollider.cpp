@@ -36,6 +36,8 @@ void SimpleNarrowCollider::narrowCollisionPhase(Body* body)
 		shared_ptr<Body> b1 = (*bodies)[contact->getId1()];
 		shared_ptr<Body> b2 = (*bodies)[contact->getId2()];
 
+		// collisionDispatcher (b1->cm , b2->cm , b1->se3 , b2->se3 , contact);
+		
 		if (!(narrowManager.collide( b1->cm , b2->cm , b1->se3 , b2->se3 , contact )))
 		{
 					//cout << "before " << ncb->interactions->size() << endl;
