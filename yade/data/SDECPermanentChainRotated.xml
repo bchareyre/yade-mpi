@@ -16,7 +16,7 @@
 					<actors[2] />
 				</actors[2]>
 				<actors[3] className="Rotor" >
-					<actors[3] angularVelocity="0.157" subscribedBodies="[3]" />
+					<actors[3] angularVelocity="0.157" rotationAxis="{1 1 1}"  subscribedBodies="[3]" />
 				</actors[3]>
 			</actors>
 			<permanentInteractions size="5">
