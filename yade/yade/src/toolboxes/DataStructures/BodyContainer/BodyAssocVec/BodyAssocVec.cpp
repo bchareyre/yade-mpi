@@ -42,7 +42,7 @@ unsigned int BodyAssocVec::insert(shared_ptr<Body>& b)
 unsigned int BodyAssocVec::insert(shared_ptr<Body>& b, unsigned int newId)
 {
 	BodyContainer::setId(b,newId);
-	insert(b);
+	return insert(b);
 }
 
 void BodyAssocVec::clear()

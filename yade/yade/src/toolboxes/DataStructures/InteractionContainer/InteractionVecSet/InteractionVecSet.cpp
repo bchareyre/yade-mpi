@@ -1,5 +1,3 @@
-/*
-
 #include "InteractionVecSet.hpp"
 #include <iostream>
 
@@ -82,13 +80,8 @@ bool InteractionVecSet::find(unsigned int id1,unsigned int id2,shared_ptr<Intera
 // FIXME : this has to be really efficient
 
 
-//	public	: virtual void gotoFirst();
-//	public	: virtual bool notAtEnd();
-//	public	: virtual void gotoNext();
-//	public	: virtual shared_ptr<Interaction> getCurrent();
-
-
-shared_ptr<Interaction> InteractionVecSet::getFirst()
+//shared_ptr<Interaction> InteractionVecSet::getFirst()
+void InteractionVecSet::gotoFirst()
 {
 	vii    = interactions.begin();
 	viiEnd = interactions.end();
@@ -98,21 +91,26 @@ shared_ptr<Interaction> InteractionVecSet::getFirst()
 		sii    = (*vii).begin();
 		siiEnd = (*vii).end();
 	}
-	else
-		return shared_ptr<Interaction>(); // returns nothing
+//	else
+//		return shared_ptr<Interaction>(); // returns nothing
 
 	while( sii == siiEnd )
 	{
 		++vii;
-		if(vii == viiEnd)
-			return shared_ptr<Interaction>();
-		sii	= (*vii).begin();
-		siiEnd	= (*vii).end();
+		if(vii != viiEnd)
+		{
+//			return shared_ptr<Interaction>();
+			sii	= (*vii).begin();
+			siiEnd	= (*vii).end();
+		}
+		else
+			break;
 	}
-	return (*sii).second;
+	//return (*sii).second;
 }
 
-bool InteractionVecSet::hasCurrent()
+//bool InteractionVecSet::hasCurrent()
+bool InteractionVecSet::notAtEnd()
 {
 	set<pair<unsigned int,shared_ptr<Interaction> >,lessThanPair >::iterator tmpSii          = sii;
 	vector<set<pair<unsigned int,shared_ptr<Interaction> >,lessThanPair > >::iterator tmpVii = vii;
@@ -131,42 +129,54 @@ bool InteractionVecSet::hasCurrent()
 	return true;
 }
 
-shared_ptr<Interaction> InteractionVecSet::getNext()
+//shared_ptr<Interaction> InteractionVecSet::getNext()
+void InteractionVecSet::gotoNext()
 {
 	if ( sii != siiEnd )
 		++sii;
 	while( sii == siiEnd )
 	{
 		++vii;
-		if(vii == viiEnd)
-			return shared_ptr<Interaction>();
-		sii	= (*vii).begin();
-		siiEnd	= (*vii).end();
+		if(vii != viiEnd)
+		{
+//			return shared_ptr<Interaction>();
+			sii	= (*vii).begin();
+			siiEnd	= (*vii).end();
+		}
+		else
+			break;
 	}
-	return (*sii).second;
+//	return (*sii).second;
 }
 
+//shared_ptr<Interaction> InteractionVecSet::getCurrent()
 shared_ptr<Interaction> InteractionVecSet::getCurrent()
 {
-	if(hasCurrent())
+//	if(hasCurrent())
 		return (*sii).second;
-	else
-		return shared_ptr<Interaction>();
+//	else
+//		return shared_ptr<Interaction>();
 }
 
 // FIXME - make sure that everything in this file is fast and has no mistakes!
-shared_ptr<Interaction>  InteractionVecSet::eraseCurrent()
+//shared_ptr<Interaction>  InteractionVecSet::eraseCurrent()
+
+void InteractionVecSet::eraseCurrentAndGotoNext()
 {
-	if(hasCurrent())
-	{
+//	if(hasCurrent())
+//	{
 		vector<set<pair<unsigned int,shared_ptr<Interaction> >,lessThanPair > >::iterator tmpVii = vii;
 		set<pair<unsigned int,shared_ptr<Interaction> >,lessThanPair >::iterator tmpSii          = sii;
-		shared_ptr<Interaction> iiii = getNext();
+		
+//		shared_ptr<Interaction> iiii = getNext();
+		gotoNext();
+		
 		(*tmpVii).erase(tmpSii);
-		return iiii;
-	}
-	else
-		return shared_ptr<Interaction>();
+		
+//		return iiii;
+//	}
+//	else
+//		return shared_ptr<Interaction>();
 }
 
 unsigned int InteractionVecSet::size()
@@ -174,5 +184,3 @@ unsigned int InteractionVecSet::size()
 	return currentSize;
 }
 
-
-*/

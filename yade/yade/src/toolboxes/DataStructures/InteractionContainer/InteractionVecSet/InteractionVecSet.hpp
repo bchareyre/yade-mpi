@@ -1,5 +1,3 @@
-/*
-
 #ifndef __INTERACTIONVECSET_HPP__
 #define __INTERACTIONVECSET_HPP__
 
@@ -44,12 +42,7 @@ class InteractionVecSet : public InteractionContainer
 	public	: virtual void gotoNext();
 	public	: virtual shared_ptr<Interaction> getCurrent();
 
-//	public : virtual shared_ptr<Interaction> getFirst();
-// 	public : virtual bool hasCurrent();
-// 	public : virtual shared_ptr<Interaction> getNext();
-// 	public : virtual shared_ptr<Interaction> getCurrent();
-	
-	public : virtual shared_ptr<Interaction> eraseCurrent();
+	public : virtual void eraseCurrentAndGotoNext();
 	
 	public : virtual unsigned int size();
 
@@ -59,6 +52,4 @@ class InteractionVecSet : public InteractionContainer
 REGISTER_SERIALIZABLE(InteractionVecSet,false);
 
 #endif // __INTERACTIONVECSET_HPP__
-
-
-*/
+	

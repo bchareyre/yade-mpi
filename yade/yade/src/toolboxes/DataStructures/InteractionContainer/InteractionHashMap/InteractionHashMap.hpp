@@ -48,10 +48,6 @@ class InteractionHashMap : public InteractionContainer
 	public	: virtual void gotoNext();
 	public	: virtual shared_ptr<Interaction> getCurrent();
 
-//	public : virtual shared_ptr<Interaction> getFirst();
-//	public : virtual bool hasCurrent();
-//	public : virtual shared_ptr<Interaction> getNext();
-
 	public : virtual void eraseCurrentAndGotoNext();
 
 	public : virtual unsigned int size();
