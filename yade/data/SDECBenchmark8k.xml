@@ -4,7 +4,7 @@
 		<geometricalModel />
 		<interactionGeometry _className_="InteractionDescriptionSet"  diffuseColor="{0 0 1}" />
 		<boundingVolume _className_="AABB"  diffuseColor="{0 0 1}" />
-		<actors size="7">
+		<actors size="8">
 			<actors _className_="BoundingVolumeDispatcher"  functorNames="[[InteractionSphere AABB Sphere2AABBFunctor] [InteractionBox AABB Box2AABBFunctor] [InteractionDescriptionSet AABB InteractionDescriptionSet2AABBFunctor]]">
 				<functorArguments size="0" />
 			</actors>
@@ -16,6 +16,12 @@
 				<functorArguments size="0" />
 			</actors>
 			<actors _className_="SDECDynamicEngine"  />
+			<actors _className_="ActionDampingDispatcher"  functorNames="[[ActionForce RigidBodyParameters ActionForceDamping] [ActionMomentum RigidBodyParameters ActionMomentumDamping]]">
+				<functorArguments size="2">
+					<functorArguments _className_="ActionForceDamping"  damping="0.3" />
+					<functorArguments _className_="ActionMomentumDamping"  damping="0.3" />
+				</functorArguments>
+			</actors>
 			<actors _className_="ActionApplyDispatcher"  functorNames="[[ActionForce RigidBodyParameters ActionForce2Particle] [ActionMomentum RigidBodyParameters ActionMomentum2RigidBody]]">
 				<functorArguments size="0" />
 			</actors>

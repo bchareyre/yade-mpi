@@ -64,11 +64,15 @@ void ExplicitMassSpringDynamicEngine::respondToInteractions(Body * body)
 		
 		Real e  = (l-l0)/l0;
 		Real relativeVelocity = dir.dot((p1->velocity-p2->velocity));
-		Vector3r f3 = (e*physics->stiffness+relativeVelocity*physics->damping)*dir;
+		Vector3r f3 = (e*physics->stiffness + relativeVelocity* ( 1.0 - physics->damping )  )*dir;
 		
 		static_cast<ActionForce*>   ( actions->find( id1 , actionForce->getClassIndex() ).get() )->force    -= f3;
 		static_cast<ActionForce*>   ( actions->find( id2 , actionForce->getClassIndex() ).get() )->force    += f3;
 	}
+	
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// Gravity														///
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	shared_ptr<ActionForce> af(new ActionForce);
 	

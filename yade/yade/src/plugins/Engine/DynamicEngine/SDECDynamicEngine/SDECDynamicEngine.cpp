@@ -74,8 +74,6 @@ void SDECDynamicEngine::respondToInteractions(Body* body)
 	{
 		vector<shared_ptr<Action> > vvv; 
 		vvv.clear();
-//		cout << "ActionForce id: " << actionForce->getClassIndex() << endl;
-//		cout << "ActionMomentum id: " << actionMomentum->getClassIndex() << endl;
 		vvv.push_back(actionForce);
 		vvv.push_back(actionMomentum);
 		ncb->actions->prepare(vvv);
@@ -428,47 +426,6 @@ void SDECDynamicEngine::respondToInteractions(Body* body)
 
 		Vector3r f				= currentContactPhysics->normalForce + currentContactPhysics->shearForce;
 
-// THIS IS for plotting with gnuplot shearForce between sphere 1 and sphere 10
-// FIXME - we really need an easy way to obtain results like this one !!!! so don't delete those lines until we FIX that problem!!!
-//		if( (id1 == 1 || id2 == 1) && (id1 == 10 || id2 == 10) )
-// 		cout	<< Omega::instance().getCurrentIteration() << " "
-// 			<< lexical_cast<string>(-currentContactPhysics->shearForce[0]) << " "
-// 			<< lexical_cast<string>(currentContactPhysics->shearForce[1]) << " " 
-// 			<< lexical_cast<string>(currentContactPhysics->shearForce[2]) << endl;
-// 		else 
-// 			cout	<< Omega::instance().getCurrentIteration() << endl;
-// 		
-
-// 		ActionForce f(currentContactPhysics->normalForce + currentContactPhysics->shearForce);
-//  		ActionForce  af(f);
-// 		vector[id1].add(af,id1,id2);
-
-
-//		forces[id1]	-= f;
-//		forces[id2]	+= f;
-//		moments[id1]	-= c1x.cross(f);
-//		moments[id2]	+= c2x.cross(f);
-
-//////////////////////////////////////// PREVIOUS CONTAINER, begin
-// PREVIOUS CONTAINER, slower	
-// 		shared_ptr<ActionForce> af(new ActionForce);
-// 		shared_ptr<ActionMomentum> am(new ActionMomentum);
-// 		
-// 		af->force = -f;
-// 		body->actions->add(af,id1);
-// 		af->force = f;
-// 		body->actions->add(af,id2);
-// 		
-// 		am->momentum = -c1x.cross(f);
-// 		body->actions->add(am,id1);
-// 		am->momentum = c2x.cross(f);
-// 		body->actions->add(am,id2);
-// 		
-// 		currentContactPhysics->prevNormal = currentContactGeometry->normal;
-///////////////////// PREVIOUS CONTAINER, end
-
-///////////////////// NEW CONTAINER, faster, begin       speed improvement is: 156 -> 142 = 14 sec 9% (rev.339 -> rev.340)
-	
 // it will be some macro(	body->actions,	ActionType , bodyId )
 		static_cast<ActionForce*>   ( ncb->actions->find( id1 , actionForce   ->getClassIndex() ).get() )->force    -= f;
 		static_cast<ActionForce*>   ( ncb->actions->find( id2 , actionForce   ->getClassIndex() ).get() )->force    += f;
@@ -477,63 +434,20 @@ void SDECDynamicEngine::respondToInteractions(Body* body)
 		static_cast<ActionMomentum*>( ncb->actions->find( id2 , actionMomentum->getClassIndex() ).get() )->momentum += c2x.cross(f);
 		
 		currentContactPhysics->prevNormal = currentContactGeometry->normal;
-///////////////////// NEW CONTAINER, end
 	}
 
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// Damping														///
+/// Gravity														///
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-	shared_ptr<Body> b;
-	unsigned int i=0;
-	shared_ptr<ActionForce> af(new ActionForce);
-	shared_ptr<ActionMomentum> am(new ActionMomentum);
 	
-	for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext() , ++i )
+	for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext() )
 	{
-		b = bodies->getCurrent();
-		shared_ptr<SDECParameters> de = dynamic_pointer_cast<SDECParameters>(b->physicalParameters);
-		static_cast<ActionForce*>( ncb->actions->find( b->getId() , actionForce->getClassIndex() ).get() )->force += gravity*de->mass;
+		shared_ptr<Body>& b = bodies->getCurrent();
+		RigidBodyParameters * de = static_cast<SDECParameters*>(b->physicalParameters.get());
 		
-// 		int sign;
-// 		ActionForce * actionForceTmp = static_cast<ActionForce*>( ncb->actions->find(b->getId(), actionForce->getClassIndex() ).get());
-// 		Real f  = actionForceTmp->force.length();
-// 		
-// 		for(int j=0;j<3;j++)
-// 		{
-// 			if (de->velocity[j]==0)
-// 				sign=0;
-// 			else if (de->velocity[j]>0)
-// 				sign=1;
-// 			else
-// 				sign=-1;
-// 			// FIXME - this must be a parameter in .xml !!!
-// 			//forces[    i  ] [       j        ] -= 0.3*f*sign;
-// 			actionForceTmp->force[j] -= 0.3*f*sign;
-// 			//    [ BodyId] [ (x,y,z): index ]
-// 		}
-
-		// all bodies do not have momentum so we have to test that
-		// it is different from forces, because we have added gravity to all bodies
-
-// 		ActionMomentum * actionMomentumTmp = static_cast<ActionMomentum*>(ncb->actions->find(b->getId(),actionMomentum->getClassIndex() ) .get());
-// 		Real m  = actionMomentumTmp->momentum.length();
-// 
-// 		for(int j=0;j<3;j++)
-// 		{
-// 			if (de->angularVelocity[j]==0)
-// 				sign=0;
-// 			else if (de->angularVelocity[j]>0)
-// 				sign=1;
-// 			else
-// 				sign=-1;
-// 			moments[   i   ] [       j        ] -= 0.3*m*sign;
-// 			actionMomentumTmp->momentum[j] -= 0.3*m*sign;
-// 			    [ BodyId] [ (x,y,z): index ]
-// 		}
+		static_cast<ActionForce*>( ncb->actions->find( b->getId() , actionForce->getClassIndex() ).get() )->force += gravity*de->mass;
         }
 
 }

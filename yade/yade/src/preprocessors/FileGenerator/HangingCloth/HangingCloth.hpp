@@ -19,6 +19,7 @@ class HangingCloth : public FileGenerator
 	private : bool fixPoint2;
 	private : bool fixPoint3;
 	private : bool fixPoint4;
+	private : Real dampingForce;
 	
 	// construction
 	public : HangingCloth ();

@@ -24,6 +24,8 @@ LIBS += -lMesh2D \
         -lInteractionDescriptionSet2AABBFunctor \
         -lRigidBodyParameters \
         -lParticleSetParameters \
+        -lActionMomentumDamping \
+        -lActionForceDamping \
         -rdynamic 
 INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 

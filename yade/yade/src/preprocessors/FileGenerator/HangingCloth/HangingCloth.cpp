@@ -15,7 +15,12 @@
 #include "IOManager.hpp"
 #include "InteractionGeometryDispatcher.hpp"
 #include "InteractionPhysicsDispatcher.hpp"
+
 #include "ActionApplyDispatcher.hpp"
+#include "ActionDampingDispatcher.hpp"
+#include "ActionForceDamping.hpp"
+#include "ActionMomentumDamping.hpp"
+
 #include "BoundingVolumeDispatcher.hpp"
 #include "GeometricalModelDispatcher.hpp"
 
@@ -34,14 +39,15 @@ HangingCloth::HangingCloth () : FileGenerator()
 	width = 20;
 	height = 20;
 	stiffness = 500;
-	springDamping   = 0.1;
+	springDamping   = 0.8;
+	particleDamping = 0.997;
 	mass = 10;
 	cellSize = 20;
-	particleDamping = 0.997;
 	fixPoint1 = true;
 	fixPoint2 = true;
 	fixPoint3 = true;
 	fixPoint4 = true;
+	dampingForce = 0.3;
 
 }
 
@@ -59,9 +65,10 @@ void HangingCloth::registerAttributes()
 	REGISTER_ATTRIBUTE(width);
 	REGISTER_ATTRIBUTE(height);
 	REGISTER_ATTRIBUTE(stiffness);
+	REGISTER_ATTRIBUTE(dampingForce);
 	REGISTER_ATTRIBUTE(springDamping);
+	//REGISTER_ATTRIBUTE(particleDamping); // FIXME - ignored - delete it, or start using it
 	REGISTER_ATTRIBUTE(mass);
-	REGISTER_ATTRIBUTE(particleDamping);
 	REGISTER_ATTRIBUTE(cellSize);
 	REGISTER_ATTRIBUTE(fixPoint1);
 	REGISTER_ATTRIBUTE(fixPoint2);
@@ -92,6 +99,11 @@ string HangingCloth::generate()
 	shared_ptr<GeometricalModelDispatcher> geometricalModelDispatcher	= shared_ptr<GeometricalModelDispatcher>(new GeometricalModelDispatcher);
 	geometricalModelDispatcher->add("ParticleSetParameters","Mesh2D","ParticleSet2Mesh2D");
 
+	shared_ptr<ActionForceDamping> actionForceDamping(new ActionForceDamping);
+	actionForceDamping->damping = dampingForce;
+	shared_ptr<ActionDampingDispatcher> actionDampingDispatcher(new ActionDampingDispatcher);
+	actionDampingDispatcher->add("ActionForce","ParticleParameters","ActionForceDamping",actionForceDamping);
+	
 	shared_ptr<ActionApplyDispatcher> applyActionDispatcher(new ActionApplyDispatcher);
 	applyActionDispatcher->add("ActionForce","ParticleParameters","ActionForce2Particle");
 
@@ -104,6 +116,7 @@ string HangingCloth::generate()
 	//rootBody->actors.push_back(interactionGeometryDispatcher);
 	//rootBody->actors.push_back(interactionPhysicsDispatcher);
 	rootBody->actors.push_back(shared_ptr<Actor>(new ExplicitMassSpringDynamicEngine));
+	rootBody->actors.push_back(actionDampingDispatcher);
 	rootBody->actors.push_back(applyActionDispatcher);
 	rootBody->actors.push_back(timeIntegratorDispatcher);
 
