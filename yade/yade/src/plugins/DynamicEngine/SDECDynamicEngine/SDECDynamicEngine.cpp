@@ -322,7 +322,7 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 //cout << currentContact->currentRotation2 << "  || " <<currentContact->currentRotation1<<endl;
 
 	//	cout << aaxxis << "  || " <<currentContact->currentRotation1<<endl;
-		cout << currentContact->currentRotation2[1] <<endl;
+///		cout << currentContact->currentRotation2[1] <<endl;
 
 		//currentContact->currentRotation2 += Vector3(0.0001,-currentContact->currentRotation2[1],-currentContact->currentRotation2[2]);
 		//cout << currentContact->currentRotation1 << "  || " <<currentContact->currentRotation2<<endl;
@@ -396,6 +396,9 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 						n.y,t1.y,t2.y,         /////////////////
 						n.z,t1.z,t2.z);
 
+//		Matrix3 m	= Matrix3(	1 , 0 , 0 ,		// ? which order of vectors?
+//						0 , 1 , 0 ,         /////////////////
+//						0 , 0 , 1 );
 		Quaternion q_i_n,q_n_i;
 
 		q_i_n.fromRotationMatrix (m);

@@ -1,0 +1,727 @@
+<Yade>
+	<rootBody className="NonConnexBody" >
+		<rootBody isDynamic="0" velocity="{0 0 0}" angularVelocity="{0 0 0}">
+			<se3 translation="{0 0 0}" rotation="{1 0 0 0}" />
+			<bv />
+			<cm />
+			<gm />
+			<actors size="3">
+				<actors[0] className="SAPCollider" >
+					<actors[0] />
+				</actors[0]>
+				<actors[1] className="SimpleNarrowCollider" >
+					<actors[1] collisionFunctors="[[Sphere Sphere Sphere2Sphere4SDECContactModel] [Sphere Box Box2Sphere4SDECContactModel]]" />
+				</actors[1]>
+				<actors[2] className="SDECDynamicEngine" >
+					<actors[2] />
+				</actors[2]>
+			</actors>
+			<permanentInteractions size="30">
+
+
+				<permanentInteractions[0] className="Contact" >
+					<permanentInteractions[0] id1="1" id2="2">
+						<interactionGeometry className="SDECPermanentLink" >
+							<interactionGeometry initialKn="500000" initialKs="50000" heta="1" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
+						</interactionGeometry>
+					</permanentInteractions[0]>
+				</permanentInteractions[0]>
+				<permanentInteractions[1] className="Contact" >
+					<permanentInteractions[1] id1="1" id2="3">
+						<interactionGeometry className="SDECPermanentLink" >
+							<interactionGeometry initialKn="500000" initialKs="50000" heta="1" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
+						</interactionGeometry>
+					</permanentInteractions[1]>
+				</permanentInteractions[1]>
+				<permanentInteractions[2] className="Contact" >
+					<permanentInteractions[2] id1="1" id2="4">
+						<interactionGeometry className="SDECPermanentLink" >
+							<interactionGeometry initialKn="500000" initialKs="50000" heta="1" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
+						</interactionGeometry>
+					</permanentInteractions[2]>
+				</permanentInteractions[2]>
+				<permanentInteractions[3] className="Contact" >
+					<permanentInteractions[3] id1="3" id2="4">
+						<interactionGeometry className="SDECPermanentLink" >
+							<interactionGeometry initialKn="500000" initialKs="50000" heta="1" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
+						</interactionGeometry>
+					</permanentInteractions[3]>
+				</permanentInteractions[3]>
+				<permanentInteractions[4] className="Contact" >
+					<permanentInteractions[4] id1="4" id2="2">
+						<interactionGeometry className="SDECPermanentLink" >
+							<interactionGeometry initialKn="500000" initialKs="50000" heta="1" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
+						</interactionGeometry>
+					</permanentInteractions[4]>
+				</permanentInteractions[4]>
+				<permanentInteractions[5] className="Contact" >
+					<permanentInteractions[5] id1="3" id2="2">
+						<interactionGeometry className="SDECPermanentLink" >
+							<interactionGeometry initialKn="500000" initialKs="50000" heta="1" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
+						</interactionGeometry>
+					</permanentInteractions[5]>
+				</permanentInteractions[5]>
+
+
+
+
+
+
+
+				<permanentInteractions[6] className="Contact" >
+					<permanentInteractions[6] id1="5" id2="6">
+						<interactionGeometry className="SDECPermanentLink" >
+							<interactionGeometry initialKn="500000" initialKs="50000" heta="1" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
+						</interactionGeometry>
+					</permanentInteractions[6]>
+				</permanentInteractions[6]>
+				<permanentInteractions[7] className="Contact" >
+					<permanentInteractions[7] id1="5" id2="7">
+						<interactionGeometry className="SDECPermanentLink" >
+							<interactionGeometry initialKn="500000" initialKs="50000" heta="1" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
+						</interactionGeometry>
+					</permanentInteractions[7]>
+				</permanentInteractions[7]>
+				<permanentInteractions[8] className="Contact" >
+					<permanentInteractions[8] id1="5" id2="8">
+						<interactionGeometry className="SDECPermanentLink" >
+							<interactionGeometry initialKn="500000" initialKs="50000" heta="1" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
+						</interactionGeometry>
+					</permanentInteractions[8]>
+				</permanentInteractions[8]>
+				<permanentInteractions[9] className="Contact" >
+					<permanentInteractions[9] id1="7" id2="8">
+						<interactionGeometry className="SDECPermanentLink" >
+							<interactionGeometry initialKn="500000" initialKs="50000" heta="1" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
+						</interactionGeometry>
+					</permanentInteractions[9]>
+				</permanentInteractions[9]>
+				<permanentInteractions[10] className="Contact" >
+					<permanentInteractions[10] id1="8" id2="6">
+						<interactionGeometry className="SDECPermanentLink" >
+							<interactionGeometry initialKn="500000" initialKs="50000" heta="1" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
+						</interactionGeometry>
+					</permanentInteractions[10]>
+				</permanentInteractions[10]>
+				<permanentInteractions[11] className="Contact" >
+					<permanentInteractions[11] id1="7" id2="6">
+						<interactionGeometry className="SDECPermanentLink" >
+							<interactionGeometry initialKn="500000" initialKs="50000" heta="1" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
+						</interactionGeometry>
+					</permanentInteractions[11]>
+				</permanentInteractions[11]>
+
+
+
+
+
+
+				<permanentInteractions[12] className="Contact" >
+					<permanentInteractions[12] id1="9" id2="10">
+						<interactionGeometry className="SDECPermanentLink" >
+							<interactionGeometry initialKn="500000" initialKs="50000" heta="1" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
+						</interactionGeometry>
+					</permanentInteractions[12]>
+				</permanentInteractions[12]>
+				<permanentInteractions[13] className="Contact" >
+					<permanentInteractions[13] id1="9" id2="11">
+						<interactionGeometry className="SDECPermanentLink" >
+							<interactionGeometry initialKn="500000" initialKs="50000" heta="1" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
+						</interactionGeometry>
+					</permanentInteractions[13]>
+				</permanentInteractions[13]>
+				<permanentInteractions[14] className="Contact" >
+					<permanentInteractions[14] id1="9" id2="12">
+						<interactionGeometry className="SDECPermanentLink" >
+							<interactionGeometry initialKn="500000" initialKs="50000" heta="1" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
+						</interactionGeometry>
+					</permanentInteractions[14]>
+				</permanentInteractions[14]>
+				<permanentInteractions[15] className="Contact" >
+					<permanentInteractions[15] id1="11" id2="12">
+						<interactionGeometry className="SDECPermanentLink" >
+							<interactionGeometry initialKn="500000" initialKs="50000" heta="1" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
+						</interactionGeometry>
+					</permanentInteractions[15]>
+				</permanentInteractions[15]>
+				<permanentInteractions[16] className="Contact" >
+					<permanentInteractions[16] id1="12" id2="10">
+						<interactionGeometry className="SDECPermanentLink" >
+							<interactionGeometry initialKn="500000" initialKs="50000" heta="1" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
+						</interactionGeometry>
+					</permanentInteractions[16]>
+				</permanentInteractions[16]>
+				<permanentInteractions[17] className="Contact" >
+					<permanentInteractions[17] id1="11" id2="10">
+						<interactionGeometry className="SDECPermanentLink" >
+							<interactionGeometry initialKn="500000" initialKs="50000" heta="1" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
+						</interactionGeometry>
+					</permanentInteractions[17]>
+				</permanentInteractions[17]>
+
+
+
+
+
+
+
+				<permanentInteractions[18] className="Contact" >
+					<permanentInteractions[18] id1="13" id2="14">
+						<interactionGeometry className="SDECPermanentLink" >
+							<interactionGeometry initialKn="500000" initialKs="50000" heta="1" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
+						</interactionGeometry>
+					</permanentInteractions[18]>
+				</permanentInteractions[18]>
+				<permanentInteractions[19] className="Contact" >
+					<permanentInteractions[19] id1="13" id2="15">
+						<interactionGeometry className="SDECPermanentLink" >
+							<interactionGeometry initialKn="500000" initialKs="50000" heta="1" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
+						</interactionGeometry>
+					</permanentInteractions[19]>
+				</permanentInteractions[19]>
+				<permanentInteractions[20] className="Contact" >
+					<permanentInteractions[20] id1="13" id2="16">
+						<interactionGeometry className="SDECPermanentLink" >
+							<interactionGeometry initialKn="500000" initialKs="50000" heta="1" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
+						</interactionGeometry>
+					</permanentInteractions[20]>
+				</permanentInteractions[20]>
+				<permanentInteractions[21] className="Contact" >
+					<permanentInteractions[21] id1="15" id2="16">
+						<interactionGeometry className="SDECPermanentLink" >
+							<interactionGeometry initialKn="500000" initialKs="50000" heta="1" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
+						</interactionGeometry>
+					</permanentInteractions[21]>
+				</permanentInteractions[21]>
+				<permanentInteractions[22] className="Contact" >
+					<permanentInteractions[22] id1="16" id2="14">
+						<interactionGeometry className="SDECPermanentLink" >
+							<interactionGeometry initialKn="500000" initialKs="50000" heta="1" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
+						</interactionGeometry>
+					</permanentInteractions[22]>
+				</permanentInteractions[22]>
+				<permanentInteractions[23] className="Contact" >
+					<permanentInteractions[23] id1="15" id2="14">
+						<interactionGeometry className="SDECPermanentLink" >
+							<interactionGeometry initialKn="500000" initialKs="50000" heta="1" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
+						</interactionGeometry>
+					</permanentInteractions[23]>
+				</permanentInteractions[23]>
+
+
+
+
+
+
+
+				<permanentInteractions[24] className="Contact" >
+					<permanentInteractions[24] id1="17" id2="18">
+						<interactionGeometry className="SDECPermanentLink" >
+							<interactionGeometry initialKn="500000" initialKs="50000" heta="1" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
+						</interactionGeometry>
+					</permanentInteractions[24]>
+				</permanentInteractions[24]>
+				<permanentInteractions[25] className="Contact" >
+					<permanentInteractions[25] id1="17" id2="19">
+						<interactionGeometry className="SDECPermanentLink" >
+							<interactionGeometry initialKn="500000" initialKs="50000" heta="1" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
+						</interactionGeometry>
+					</permanentInteractions[25]>
+				</permanentInteractions[25]>
+				<permanentInteractions[26] className="Contact" >
+					<permanentInteractions[26] id1="17" id2="20">
+						<interactionGeometry className="SDECPermanentLink" >
+							<interactionGeometry initialKn="500000" initialKs="50000" heta="1" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
+						</interactionGeometry>
+					</permanentInteractions[26]>
+				</permanentInteractions[26]>
+				<permanentInteractions[27] className="Contact" >
+					<permanentInteractions[27] id1="19" id2="20">
+						<interactionGeometry className="SDECPermanentLink" >
+							<interactionGeometry initialKn="500000" initialKs="50000" heta="1" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
+						</interactionGeometry>
+					</permanentInteractions[27]>
+				</permanentInteractions[27]>
+				<permanentInteractions[28] className="Contact" >
+					<permanentInteractions[28] id1="20" id2="18">
+						<interactionGeometry className="SDECPermanentLink" >
+							<interactionGeometry initialKn="500000" initialKs="50000" heta="1" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
+						</interactionGeometry>
+					</permanentInteractions[28]>
+				</permanentInteractions[28]>
+				<permanentInteractions[29] className="Contact" >
+					<permanentInteractions[29] id1="19" id2="18">
+						<interactionGeometry className="SDECPermanentLink" >
+							<interactionGeometry initialKn="500000" initialKs="50000" heta="1" initialEquilibriumDistance="8.6603" radius1="4.4" radius2="4.4" knMax="75000" ksMax="7500" />
+						</interactionGeometry>
+					</permanentInteractions[29]>
+				</permanentInteractions[29]>
+
+
+
+
+
+
+
+			</permanentInteractions>
+			<bodies size="21">
+				<bodies[0] className="SDECDiscreteElement" >
+					<bodies[0] isDynamic="0" velocity="{0 0 0}" angularVelocity="{0 0 0}" mass="0" inertia="{0 0 0}" kn="100000" ks="10000">
+						<se3 translation="{0 -15 0}" rotation="{1 0 0 0}" />
+						<bv className="AABB" >
+							<bv color="{1 0 0}" center="{0 -11.4 0}" halfSize="{100 5 100}" />
+						</bv>
+						<cm className="Box" >
+							<cm diffuseColor="{1 1 1}" wire="0" visible="1" extents="{100 5 100}" />
+						</cm>
+						<gm className="Box" >
+							<gm diffuseColor="{1 1 1}" wire="0" visible="1" diffuseColor="{1 1 1}" wire="0" visible="1" extents="{100 5 100}" />
+						</gm>
+					</bodies[0]>
+				</bodies[0]>
+
+
+
+
+
+
+
+
+
+				<bodies[1] className="SDECDiscreteElement" >
+					<bodies[1] isDynamic="1" velocity="{50 0 0}" angularVelocity="{0 0 0}" mass="37.699" inertia="{135.716 135.716 135.716}" kn="100000" ks="10000">
+						<se3 translation="{-4.3301 -2.5 0}" rotation="{0 0.707107 0.707107 0}" />
+						<bv className="AABB" >
+							<bv color="{0 1 0}" center="{-4.3301 -2.5 0}" halfSize="{3 3 3}" />
+						</bv>
+						<cm className="Sphere" >
+							<cm diffuseColor="{0.4 0.5 1.0}" wire="0" visible="1" radius="4.4" />
+						</cm>
+						<gm className="Sphere" >
+							<gm diffuseColor="{0.0 0.0 1.0}" wire="0" visible="1" wire="0" visible="1" radius="4.4" />
+						</gm>
+						<actors size="1">
+							<actors[0] className="BallisticDynamicEngine" >
+								<actors[0] damping="1" />
+							</actors[0]>
+						</actors>
+					</bodies[1]>
+				</bodies[1]>
+				<bodies[2] className="SDECDiscreteElement" >
+					<bodies[2] isDynamic="1" velocity="{50 0 0}" angularVelocity="{0 0 0}" mass="37.699" inertia="{135.716 135.716 135.716}" kn="100000" ks="10000">
+						<se3 translation="{4.3301 -2.5 0}" rotation="{1 0 0 0}" />
+						<bv className="AABB" >
+							<bv color="{0 1 0}" center="{4.3301 -2.5 0}" halfSize="{3 3 3}" />
+						</bv>
+						<cm className="Sphere" >
+							<cm diffuseColor="{0.4 0.5 1.0}" wire="0" visible="1" radius="4.4" />
+						</cm>
+						<gm className="Sphere" >
+							<gm diffuseColor="{0.0 1.0 0.0}" wire="0" visible="1" wire="0" visible="1" radius="4.4" />
+						</gm>
+						<actors size="1">
+							<actors[0] className="BallisticDynamicEngine" >
+								<actors[0] damping="1" />
+							</actors[0]>
+						</actors>
+					</bodies[2]>
+				</bodies[2]>
+				<bodies[3] className="SDECDiscreteElement" >
+					<bodies[3] isDynamic="1" velocity="{50 0 0}" angularVelocity="{0 0 0}" mass="37.699" inertia="{135.716 135.716 135.716}" kn="100000" ks="10000">
+						<se3 translation="{0 5 0}" rotation="{1 0 0 0}" />
+						<bv className="AABB" >
+							<bv color="{0 1 0}" center="{0 5 0}" halfSize="{3 3 3}" />
+						</bv>
+						<cm className="Sphere" >
+							<cm diffuseColor="{0.4 0.5 1.0}" wire="0" visible="1" radius="4.4" />
+						</cm>
+						<gm className="Sphere" >
+							<gm diffuseColor="{1.0 0.0 0.0}" wire="0" visible="1" wire="0" visible="1" radius="4.4" />
+						</gm>
+						<actors size="1">
+							<actors[0] className="BallisticDynamicEngine" >
+								<actors[0] damping="1" />
+							</actors[0]>
+						</actors>
+					</bodies[3]>
+				</bodies[3]>
+				<bodies[4] className="SDECDiscreteElement" >
+					<bodies[4] isDynamic="1" velocity="{50 0 0}" angularVelocity="{0 0 0}" mass="37.699" inertia="{135.716 135.716 135.716}" kn="100000" ks="10000">
+						<se3 translation="{0 0 7.0711}" rotation="{1 0 0 0}" />
+						<bv className="AABB" >
+							<bv color="{0 1 0}" center="{0 0 7.0711}" halfSize="{3 3 3}" />
+						</bv>
+						<cm className="Sphere" >
+							<cm diffuseColor="{0.4 0.5 1.0}" wire="0" visible="1" radius="4.4" />
+						</cm>
+						<gm className="Sphere" >
+							<gm diffuseColor="{1.0 0.0 1.0}" wire="0" visible="1" wire="0" visible="1" radius="4.4" />
+						</gm>
+						<actors size="1">
+							<actors[0] className="BallisticDynamicEngine" >
+								<actors[0] damping="1" />
+							</actors[0]>
+						</actors>
+					</bodies[4]>
+				</bodies[4]>
+
+
+
+
+
+				<bodies[5] className="SDECDiscreteElement" >
+					<bodies[5] isDynamic="1" velocity="{50 0 0}" angularVelocity="{0 0 0}" mass="37.699" inertia="{135.716 135.716 135.716}" kn="100000" ks="10000">
+						<se3 translation="{5.6699 -2.5 5}" rotation="{0 0.707107 0.707107 0}" />
+						<bv className="AABB" >
+							<bv color="{0 1 0}" center="{5.6699 -2.5 5}" halfSize="{3 3 3}" />
+						</bv>
+						<cm className="Sphere" >
+							<cm diffuseColor="{0.4 0.5 1.0}" wire="0" visible="1" radius="4.4" />
+						</cm>
+						<gm className="Sphere" >
+							<gm diffuseColor="{0.0 0.0 1.0}" wire="0" visible="1" wire="0" visible="1" radius="4.4" />
+						</gm>
+						<actors size="1">
+							<actors[0] className="BallisticDynamicEngine" >
+								<actors[0] damping="1" />
+							</actors[0]>
+						</actors>
+					</bodies[5]>
+				</bodies[5]>
+				<bodies[6] className="SDECDiscreteElement" >
+					<bodies[6] isDynamic="1" velocity="{50 0 0}" angularVelocity="{0 0 0}" mass="37.699" inertia="{135.716 135.716 135.716}" kn="100000" ks="10000">
+						<se3 translation="{14.3301 -2.5 5}" rotation="{1 0 0 0}" />
+						<bv className="AABB" >
+							<bv color="{0 1 0}" center="{14.3301 -2.5 5}" halfSize="{3 3 3}" />
+						</bv>
+						<cm className="Sphere" >
+							<cm diffuseColor="{0.4 0.5 1.0}" wire="0" visible="1" radius="4.4" />
+						</cm>
+						<gm className="Sphere" >
+							<gm diffuseColor="{0.0 1.0 0.0}" wire="0" visible="1" wire="0" visible="1" radius="4.4" />
+						</gm>
+						<actors size="1">
+							<actors[0] className="BallisticDynamicEngine" >
+								<actors[0] damping="1" />
+							</actors[0]>
+						</actors>
+					</bodies[6]>
+				</bodies[6]>
+				<bodies[7] className="SDECDiscreteElement" >
+					<bodies[7] isDynamic="1" velocity="{50 0 0}" angularVelocity="{0 0 0}" mass="37.699" inertia="{135.716 135.716 135.716}" kn="100000" ks="10000">
+						<se3 translation="{10 5 5}" rotation="{1 0 0 0}" />
+						<bv className="AABB" >
+							<bv color="{0 1 0}" center="{10 5 5}" halfSize="{3 3 3}" />
+						</bv>
+						<cm className="Sphere" >
+							<cm diffuseColor="{0.4 0.5 1.0}" wire="0" visible="1" radius="4.4" />
+						</cm>
+						<gm className="Sphere" >
+							<gm diffuseColor="{1.0 0.0 0.0}" wire="0" visible="1" wire="0" visible="1" radius="4.4" />
+						</gm>
+						<actors size="1">
+							<actors[0] className="BallisticDynamicEngine" >
+								<actors[0] damping="1" />
+							</actors[0]>
+						</actors>
+					</bodies[7]>
+				</bodies[7]>
+				<bodies[8] className="SDECDiscreteElement" >
+					<bodies[8] isDynamic="1" velocity="{50 0 0}" angularVelocity="{0 0 0}" mass="37.699" inertia="{135.716 135.716 135.716}" kn="100000" ks="10000">
+						<se3 translation="{10 0 12.0711}" rotation="{1 0 0 0}" />
+						<bv className="AABB" >
+							<bv color="{0 1 0}" center="{10 0 12.0711}" halfSize="{3 3 3}" />
+						</bv>
+						<cm className="Sphere" >
+							<cm diffuseColor="{0.4 0.5 1.0}" wire="0" visible="1" radius="4.4" />
+						</cm>
+						<gm className="Sphere" >
+							<gm diffuseColor="{1.0 0.0 1.0}" wire="0" visible="1" wire="0" visible="1" radius="4.4" />
+						</gm>
+						<actors size="1">
+							<actors[0] className="BallisticDynamicEngine" >
+								<actors[0] damping="1" />
+							</actors[0]>
+						</actors>
+					</bodies[8]>
+				</bodies[8]>
+
+
+
+
+
+				<bodies[9] className="SDECDiscreteElement" >
+					<bodies[9] isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" mass="37.699" inertia="{135.716 135.716 135.716}" kn="100000" ks="10000">
+						<se3 translation="{5.6699 17.5 5}" rotation="{0 0.707107 0.707107 0}" />
+						<bv className="AABB" >
+							<bv color="{0 1 0}" center="{5.6699 17.5 5}" halfSize="{3 3 3}" />
+						</bv>
+						<cm className="Sphere" >
+							<cm diffuseColor="{0.4 0.5 1.0}" wire="0" visible="1" radius="4.4" />
+						</cm>
+						<gm className="Sphere" >
+							<gm diffuseColor="{0.0 0.0 1.0}" wire="0" visible="1" wire="0" visible="1" radius="4.4" />
+						</gm>
+						<actors size="1">
+							<actors[0] className="BallisticDynamicEngine" >
+								<actors[0] damping="1" />
+							</actors[0]>
+						</actors>
+					</bodies[9]>
+				</bodies[9]>
+				<bodies[10] className="SDECDiscreteElement" >
+					<bodies[10] isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" mass="37.699" inertia="{135.716 135.716 135.716}" kn="100000" ks="10000">
+						<se3 translation="{14.3301 17.5 5}" rotation="{1 0 0 0}" />
+						<bv className="AABB" >
+							<bv color="{0 1 0}" center="{14.3301 17.5 5}" halfSize="{3 3 3}" />
+						</bv>
+						<cm className="Sphere" >
+							<cm diffuseColor="{0.4 0.5 1.0}" wire="0" visible="1" radius="4.4" />
+						</cm>
+						<gm className="Sphere" >
+							<gm diffuseColor="{0.0 1.0 0.0}" wire="0" visible="1" wire="0" visible="1" radius="4.4" />
+						</gm>
+						<actors size="1">
+							<actors[0] className="BallisticDynamicEngine" >
+								<actors[0] damping="1" />
+							</actors[0]>
+						</actors>
+					</bodies[10]>
+				</bodies[10]>
+				<bodies[11] className="SDECDiscreteElement" >
+					<bodies[11] isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" mass="37.699" inertia="{135.716 135.716 135.716}" kn="100000" ks="10000">
+						<se3 translation="{10 25 5}" rotation="{1 0 0 0}" />
+						<bv className="AABB" >
+							<bv color="{0 1 0}" center="{10 25 5}" halfSize="{3 3 3}" />
+						</bv>
+						<cm className="Sphere" >
+							<cm diffuseColor="{0.4 0.5 1.0}" wire="0" visible="1" radius="4.4" />
+						</cm>
+						<gm className="Sphere" >
+							<gm diffuseColor="{1.0 0.0 0.0}" wire="0" visible="1" wire="0" visible="1" radius="4.4" />
+						</gm>
+						<actors size="1">
+							<actors[0] className="BallisticDynamicEngine" >
+								<actors[0] damping="1" />
+							</actors[0]>
+						</actors>
+					</bodies[11]>
+				</bodies[11]>
+				<bodies[12] className="SDECDiscreteElement" >
+					<bodies[12] isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" mass="37.699" inertia="{135.716 135.716 135.716}" kn="100000" ks="10000">
+						<se3 translation="{10 20 12.0711}" rotation="{1 0 0 0}" />
+						<bv className="AABB" >
+							<bv color="{0 1 0}" center="{10 20 12.0711}" halfSize="{3 3 3}" />
+						</bv>
+						<cm className="Sphere" >
+							<cm diffuseColor="{0.4 0.5 1.0}" wire="0" visible="1" radius="4.4" />
+						</cm>
+						<gm className="Sphere" >
+							<gm diffuseColor="{1.0 0.0 1.0}" wire="0" visible="1" wire="0" visible="1" radius="4.4" />
+						</gm>
+						<actors size="1">
+							<actors[0] className="BallisticDynamicEngine" >
+								<actors[0] damping="1" />
+							</actors[0]>
+						</actors>
+					</bodies[12]>
+				</bodies[12]>
+
+
+
+
+
+
+
+
+				<bodies[13] className="SDECDiscreteElement" >
+					<bodies[13] isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" mass="37.699" inertia="{135.716 135.716 135.716}" kn="100000" ks="10000">
+						<se3 translation="{25.6699 17.5 5}" rotation="{0 0.707107 0.707107 0}" />
+						<bv className="AABB" >
+							<bv color="{0 1 0}" center="{25.6699 17.5 5}" halfSize="{3 3 3}" />
+						</bv>
+						<cm className="Sphere" >
+							<cm diffuseColor="{0.4 0.5 1.0}" wire="0" visible="1" radius="4.4" />
+						</cm>
+						<gm className="Sphere" >
+							<gm diffuseColor="{0.0 0.0 1.0}" wire="0" visible="1" wire="0" visible="1" radius="4.4" />
+						</gm>
+						<actors size="1">
+							<actors[0] className="BallisticDynamicEngine" >
+								<actors[0] damping="1" />
+							</actors[0]>
+						</actors>
+					</bodies[13]>
+				</bodies[13]>
+				<bodies[14] className="SDECDiscreteElement" >
+					<bodies[14] isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" mass="37.699" inertia="{135.716 135.716 135.716}" kn="100000" ks="10000">
+						<se3 translation="{34.3301 17.5 5}" rotation="{1 0 0 0}" />
+						<bv className="AABB" >
+							<bv color="{0 1 0}" center="{34.3301 17.5 5}" halfSize="{3 3 3}" />
+						</bv>
+						<cm className="Sphere" >
+							<cm diffuseColor="{0.4 0.5 1.0}" wire="0" visible="1" radius="4.4" />
+						</cm>
+						<gm className="Sphere" >
+							<gm diffuseColor="{0.0 1.0 0.0}" wire="0" visible="1" wire="0" visible="1" radius="4.4" />
+						</gm>
+						<actors size="1">
+							<actors[0] className="BallisticDynamicEngine" >
+								<actors[0] damping="1" />
+							</actors[0]>
+						</actors>
+					</bodies[14]>
+				</bodies[14]>
+				<bodies[15] className="SDECDiscreteElement" >
+					<bodies[15] isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" mass="37.699" inertia="{135.716 135.716 135.716}" kn="100000" ks="10000">
+						<se3 translation="{30 25 5}" rotation="{1 0 0 0}" />
+						<bv className="AABB" >
+							<bv color="{0 1 0}" center="{30 25 5}" halfSize="{3 3 3}" />
+						</bv>
+						<cm className="Sphere" >
+							<cm diffuseColor="{0.4 0.5 1.0}" wire="0" visible="1" radius="4.4" />
+						</cm>
+						<gm className="Sphere" >
+							<gm diffuseColor="{1.0 0.0 0.0}" wire="0" visible="1" wire="0" visible="1" radius="4.4" />
+						</gm>
+						<actors size="1">
+							<actors[0] className="BallisticDynamicEngine" >
+								<actors[0] damping="1" />
+							</actors[0]>
+						</actors>
+					</bodies[15]>
+				</bodies[15]>
+				<bodies[16] className="SDECDiscreteElement" >
+					<bodies[16] isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" mass="37.699" inertia="{135.716 135.716 135.716}" kn="100000" ks="10000">
+						<se3 translation="{30 20 12.0711}" rotation="{1 0 0 0}" />
+						<bv className="AABB" >
+							<bv color="{0 1 0}" center="{30 20 12.0711}" halfSize="{3 3 3}" />
+						</bv>
+						<cm className="Sphere" >
+							<cm diffuseColor="{0.4 0.5 1.0}" wire="0" visible="1" radius="4.4" />
+						</cm>
+						<gm className="Sphere" >
+							<gm diffuseColor="{1.0 0.0 1.0}" wire="0" visible="1" wire="0" visible="1" radius="4.4" />
+						</gm>
+						<actors size="1">
+							<actors[0] className="BallisticDynamicEngine" >
+								<actors[0] damping="1" />
+							</actors[0]>
+						</actors>
+					</bodies[16]>
+				</bodies[16]>
+
+
+
+
+
+
+
+
+
+
+
+
+
+				<bodies[17] className="SDECDiscreteElement" >
+					<bodies[17] isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" mass="37.699" inertia="{135.716 135.716 135.716}" kn="100000" ks="10000">
+						<se3 translation="{5.6699 37.5 5}" rotation="{0 0.707107 0.707107 0}" />
+						<bv className="AABB" >
+							<bv color="{0 1 0}" center="{5.6699 37.5 5}" halfSize="{3 3 3}" />
+						</bv>
+						<cm className="Sphere" >
+							<cm diffuseColor="{0.4 0.5 1.0}" wire="0" visible="1" radius="4.4" />
+						</cm>
+						<gm className="Sphere" >
+							<gm diffuseColor="{0.0 0.0 1.0}" wire="0" visible="1" wire="0" visible="1" radius="4.4" />
+						</gm>
+						<actors size="1">
+							<actors[0] className="BallisticDynamicEngine" >
+								<actors[0] damping="1" />
+							</actors[0]>
+						</actors>
+					</bodies[17]>
+				</bodies[17]>
+				<bodies[18] className="SDECDiscreteElement" >
+					<bodies[18] isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" mass="37.699" inertia="{135.716 135.716 135.716}" kn="100000" ks="10000">
+						<se3 translation="{14.3301 37.5 5}" rotation="{1 0 0 0}" />
+						<bv className="AABB" >
+							<bv color="{0 1 0}" center="{14.3301 37.5 5}" halfSize="{3 3 3}" />
+						</bv>
+						<cm className="Sphere" >
+							<cm diffuseColor="{0.4 0.5 1.0}" wire="0" visible="1" radius="4.4" />
+						</cm>
+						<gm className="Sphere" >
+							<gm diffuseColor="{0.0 1.0 0.0}" wire="0" visible="1" wire="0" visible="1" radius="4.4" />
+						</gm>
+						<actors size="1">
+							<actors[0] className="BallisticDynamicEngine" >
+								<actors[0] damping="1" />
+							</actors[0]>
+						</actors>
+					</bodies[18]>
+				</bodies[18]>
+				<bodies[19] className="SDECDiscreteElement" >
+					<bodies[19] isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" mass="37.699" inertia="{135.716 135.716 135.716}" kn="100000" ks="10000">
+						<se3 translation="{10 45 5}" rotation="{1 0 0 0}" />
+						<bv className="AABB" >
+							<bv color="{0 1 0}" center="{10 45 5}" halfSize="{3 3 3}" />
+						</bv>
+						<cm className="Sphere" >
+							<cm diffuseColor="{0.4 0.5 1.0}" wire="0" visible="1" radius="4.4" />
+						</cm>
+						<gm className="Sphere" >
+							<gm diffuseColor="{1.0 0.0 0.0}" wire="0" visible="1" wire="0" visible="1" radius="4.4" />
+						</gm>
+						<actors size="1">
+							<actors[0] className="BallisticDynamicEngine" >
+								<actors[0] damping="1" />
+							</actors[0]>
+						</actors>
+					</bodies[19]>
+				</bodies[19]>
+				<bodies[20] className="SDECDiscreteElement" >
+					<bodies[20] isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" mass="37.699" inertia="{135.716 135.716 135.716}" kn="100000" ks="10000">
+						<se3 translation="{10 40 12.0711}" rotation="{1 0 0 0}" />
+						<bv className="AABB" >
+							<bv color="{0 1 0}" center="{10 40 12.0711}" halfSize="{3 3 3}" />
+						</bv>
+						<cm className="Sphere" >
+							<cm diffuseColor="{0.4 0.5 1.0}" wire="0" visible="1" radius="4.4" />
+						</cm>
+						<gm className="Sphere" >
+							<gm diffuseColor="{1.0 0.0 1.0}" wire="0" visible="1" wire="0" visible="1" radius="4.4" />
+						</gm>
+						<actors size="1">
+							<actors[0] className="BallisticDynamicEngine" >
+								<actors[0] damping="1" />
+							</actors[0]>
+						</actors>
+					</bodies[20]>
+				</bodies[20]>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+			</bodies>
+		</rootBody>
+	</rootBody>
+</Yade>
