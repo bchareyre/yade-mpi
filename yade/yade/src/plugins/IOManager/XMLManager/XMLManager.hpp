@@ -17,8 +17,7 @@ class XMLManager : public IOManager
 	public    : string beginDeserialization(istream& stream, Archive& ac);
 	public    : void finalizeDeserialization(istream& stream, Archive& ac);
 
-	protected : static void tokenizeContainerOfFundamental(const string& str, vector<string>& tokens);
-	protected : static void tokenizeCustomFundamental(const string& str, vector<string>& tokens);
+	protected : static void parseFundamental(const string& str, vector<string>& tokens);
 
 	public    : static void serializeSerializable(ostream& stream, Archive& ac, int depth);
 	public    : static void serializeContainer(ostream& stream, Archive& ac , int depth);

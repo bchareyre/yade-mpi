@@ -22,8 +22,10 @@
 #include "IOManagerExceptions.hpp"
 
 #include <string>
+#include <boost/spirit.hpp>
 
 using namespace std;
+using namespace boost::spirit;
 
 XmlSaxParser XMLManager::saxParser;
 
@@ -124,91 +126,37 @@ void XMLManager::finalizeSerialization(ostream& stream, Archive& ac)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-// FIXME : a fundamental made of a 2 fundamentalq for example is not parsed correctly ! => {1.2 {1 2 3}}
-void XMLManager::tokenizeCustomFundamental(const string& str, vector<string>& tokens)
+// FIXME : a fundamental made of a 2 fundamentals for example is not parsed correctly ! => {1.2 {1 2 3}}
+//         check if now it works (in my small separate program it works - question - is the rest of deserialization using it correctly?) because this function now parses correctly {1.2 {1 2 3}}
+
+void XMLManager::parseFundamental(const string& top, vector<string>& eval)
 {
-	int openBracketId = 0;
-	int closingBracketId = 0;
-	string tmpStr;
+	eval.clear();
 
-	while (str[openBracketId++]!='{');
-	closingBracketId = openBracketId;
-	while (str[closingBracketId++]!='}');
+	rule<> inside 		= +( graph_p - '[' - ']' - '{' - '}' ); // asdf23
+	rule<> empty_array 	= *space_p >> '[' >> *space_p >> ']' >> *space_p; // [ ]
+	rule<> empty_fund 	= *space_p >> '{' >> *space_p >> '}' >> *space_p; // { }
+	rule<> one_fundamental 	= *space_p >>
+				  ( '{' >> (*space_p) % (inside) >> '}' )
+				>> *space_p; // { 123 243 { sdf sd} qwe as }
+	rule<> one_array = *space_p >> '[' >> (*space_p) % (inside) >> ']' >> *space_p; // [ 123 324 243 qwe as ]
 
-	tmpStr = str.substr(openBracketId,closingBracketId-openBracketId-1);
+	rule<> one_everything = *space_p
+			>>	(*space_p) % (
+						  (inside)
+						| (empty_array)
+						| (empty_fund)
+						| (one_fundamental)
+						| (one_array)
+					     ) [push_back_a(eval)]
+			>> *space_p;
 
-	string buf;
-	stringstream sstr(tmpStr);
-	while (sstr >> buf)
-		tokens.push_back(buf);
+	rule<> array = *space_p >> '[' >> *space_p >> one_everything >> *space_p >> ']' >> *space_p >> end_p;
+	rule<> fundamental = *space_p >> '{' >> *space_p >> one_everything >> *space_p >> '}' >> *space_p >> end_p;
 
-}
+	rule<> everything = array | fundamental;
 
-void XMLManager::tokenizeContainerOfFundamental(const string& str, vector<string>& tokens)
-{
-	unsigned int i = 0;
-	unsigned int bracketCount=0;
-	unsigned int start;
-
-	int category=-1;
-
-	if (str.size()==0 || str=="[]")
-		return;
-	else
-	{
-		int nbOpeningBrackets = 0;
-		int nbClosingBrackets = 0;
-
-		for(unsigned int j=0;j<str.size();j++)
-		{
-			if (str[j]!=']')
-				nbClosingBrackets++;
-			else if (str[j]!='[')
-				nbOpeningBrackets++;
-			else if (str[j]!=' ' && str[j]!='\t' && str[j]!='\n')
-				return;
-		}
-		if (nbOpeningBrackets==1 && nbClosingBrackets==1)
-			return;
-	}
-
-	while (str[i++]!='[');
-
-	while (i<str.size())
-	{
-		while (str[i]==' ' || str[i]=='\t' || str[i]=='\n')
-			i++;
-
-		start = i;
-		if (str[i]=='[' && (category==-1 || category==1)) // container of container
-		{
-			category = 1;
-			bracketCount=0;
-			do
-			{
-				while (str[i]==' ' || str[i]=='\t' || str[i]=='\n')
-					i++;
-				if (str[i]==']')
-					bracketCount--;
-				else if (str[i]=='[')
-					bracketCount++;
-				i++;
-			} while (bracketCount!=0);
-		}
-		else if (str[i]=='{' && (category==-1 || category==2)) // container of custom fundamental
-		{
-			category = 2;
-			while (str[i++]!='}');
-		}
-		else if(category==-1 || category==3) // container of fundamental
-		{
-			category = 3;
-			while (str[i]!=' ' && str[i]!='\t' && str[i]!='\n' && str[i]!=']')
-				i++;
-		}
-		tokens.push_back(str.substr(start,i-start));
-		i++;
-	}
+	parse(top.c_str(),everything);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -431,7 +379,7 @@ void XMLManager::deserializeCustomFundamental(istream& stream, Archive& ac,const
 	s->registerAttributes();
 
 	vector<string> tokens;
-	tokenizeCustomFundamental(str,tokens);
+	parseFundamental(str,tokens);
 
 	vector<string>::const_iterator si    = tokens.begin();
 	vector<string>::const_iterator siEnd = tokens.end();
@@ -475,7 +423,7 @@ void XMLManager::serializeCustomFundamental(ostream& stream, Archive& ac,int dep
 void XMLManager::deserializeContainerOfFundamental(istream& stream, Archive& ac, const string& str)
 {
 	vector<string> tokens;
-	tokenizeContainerOfFundamental(str,tokens);
+	parseFundamental(str,tokens);
 
 	shared_ptr<Archive> tmpAc;
 	vector<string>::iterator ti = tokens.begin();
@@ -538,7 +486,7 @@ void XMLManager::deserializeFundamentalSerializable(istream& stream, Archive& ac
 	s->registerAttributes();
 
 	vector<string> tokens;
-	tokenizeCustomFundamental(str,tokens);
+	parseFundamental(str,tokens);
 
 	vector<string>::const_iterator si    = tokens.begin();
 	vector<string>::const_iterator siEnd = tokens.end();
