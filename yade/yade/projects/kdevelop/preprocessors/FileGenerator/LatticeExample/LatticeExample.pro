@@ -30,5 +30,5 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
-HEADERS += LatticeBox.hpp 
-SOURCES += LatticeBox.cpp 
+HEADERS += LatticeExample.hpp 
+SOURCES += LatticeExample.cpp 

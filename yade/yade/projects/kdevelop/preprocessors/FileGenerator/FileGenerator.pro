@@ -3,14 +3,14 @@
 # Subdir relative project main directory: ./preprocessors/FileGenerator
 # Target is a subdirs project 
 
-SUBDIRS += LatticeBox \
-           RotatingBox \
+SUBDIRS += RotatingBox \
            HangingCloth \
            FEMRock \
            BoxStack \
            SDECSpheresPlane \
-	   SDECImport \
-           SDECLinkedSpheres 
+           SDECImport \
+           SDECLinkedSpheres \
+           LatticeExample 
 MOC_DIR = $(YADECOMPILATIONPATH)
 UI_DIR = $(YADECOMPILATIONPATH)
 OBJECTS_DIR = $(YADECOMPILATIONPATH)

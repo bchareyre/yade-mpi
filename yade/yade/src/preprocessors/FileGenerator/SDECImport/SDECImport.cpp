@@ -71,6 +71,8 @@ SDECImport::SDECImport () : FileGenerator()
 	recordIntervalIter	= 100;
 	velocityRecordFile 	= "../data/velocities";
 	rotationBlocked = true;
+	
+	boxWalls 		= false;
 
 	bigBall 		= true;
 	bigBallRadius		= 0.075;
@@ -109,6 +111,7 @@ void SDECImport::registerAttributes()
 //	REGISTER_ATTRIBUTE(upperCorner);
 //	REGISTER_ATTRIBUTE(thickness);
 	REGISTER_ATTRIBUTE(importFilename);
+	REGISTER_ATTRIBUTE(boxWalls);
 
 	REGISTER_ATTRIBUTE(sphereYoungModulus);
 	REGISTER_ATTRIBUTE(spherePoissonRatio);
@@ -178,28 +181,30 @@ string SDECImport::generate()
 		
 			loadFile >> f;
 			loadFile >> g;
-			if(f != 1) // skip loading of SDEC walls
+			if( boxWalls ? f>1 : (f!=1 && f==2) ) // skip loading of SDEC walls
+				continue;
+			if(f==8)
 				continue;
 
 	//		if( i % 100 == 0 ) // FIXME - should display a progress BAR !!
 	//			cout << "loaded: " << i << endl;
-			
-			lowerCorner[0] = min(translation[0]-radius , lowerCorner[0]);
-			lowerCorner[1] = min(translation[1]-radius , lowerCorner[1]);
-			lowerCorner[2] = min(translation[2]-radius , lowerCorner[2]);
-			upperCorner[0] = max(translation[0]+radius , upperCorner[0]);
-			upperCorner[1] = max(translation[1]+radius , upperCorner[1]);
-			upperCorner[2] = max(translation[2]+radius , upperCorner[2]);
-			
-			createSphere(body,translation,radius,false);			
+			if(f==1)
+			{
+				lowerCorner[0] = min(translation[0]-radius , lowerCorner[0]);
+				lowerCorner[1] = min(translation[1]-radius , lowerCorner[1]);
+				lowerCorner[2] = min(translation[2]-radius , lowerCorner[2]);
+				upperCorner[0] = max(translation[0]+radius , upperCorner[0]);
+				upperCorner[1] = max(translation[1]+radius , upperCorner[1]);
+				upperCorner[2] = max(translation[2]+radius , upperCorner[2]);
+			}
+			createSphere(body,translation,radius,false,f==1);
 			rootBody->bodies->insert(body);
 		}
 	}
 
 // create bigBall
 	Vector3r translation = (upperCorner+lowerCorner)*0.5 + Vector3r(0,bigBallDropHeight,0);
-	createSphere(body,translation,bigBallRadius,true);	
-	body->isDynamic = false;
+	createSphere(body,translation,bigBallRadius,true,false);	
 	int bigId = 0;
 	if(bigBall)
 		rootBody->bodies->insert(body);
@@ -223,71 +228,75 @@ string SDECImport::generate()
  	if(wall_bottom)
 		rootBody->bodies->insert(body);
 	forcerec->id = body->getId();
-
-// top box
- 	center			= Vector3r(
- 						(lowerCorner[0]+upperCorner[0])/2,
- 						upperCorner[1]+thickness/2.0,
- 						(lowerCorner[2]+upperCorner[2])/2);
- 	halfSize		= Vector3r(
- 						fabs(lowerCorner[0]-upperCorner[0])/2+thickness,
- 						thickness/2.0,
- 						fabs(lowerCorner[2]-upperCorner[2])/2+thickness);
-
-	createBox(body,center,halfSize,wall_top_wire);
- 	if(wall_top)
-		rootBody->bodies->insert(body);
-// box 1
-
- 	center			= Vector3r(
- 						lowerCorner[0]-thickness/2.0,
- 						(lowerCorner[1]+upperCorner[1])/2,
- 						(lowerCorner[2]+upperCorner[2])/2);
-	halfSize		= Vector3r(
-						thickness/2.0,
- 						fabs(lowerCorner[1]-upperCorner[1])/2+thickness,
- 						fabs(lowerCorner[2]-upperCorner[2])/2+thickness);
-	createBox(body,center,halfSize,wall_1_wire);
- 	if(wall_1)
-		rootBody->bodies->insert(body);
-// box 2
- 	center			= Vector3r(
- 						upperCorner[0]+thickness/2.0,
- 						(lowerCorner[1]+upperCorner[1])/2,
-						(lowerCorner[2]+upperCorner[2])/2);
- 	halfSize		= Vector3r(
- 						thickness/2.0,
- 						fabs(lowerCorner[1]-upperCorner[1])/2+thickness,
- 						fabs(lowerCorner[2]-upperCorner[2])/2+thickness);
- 	
-	createBox(body,center,halfSize,wall_2_wire);
- 	if(wall_2)
-		rootBody->bodies->insert(body);
-// box 3
- 	center			= Vector3r(
- 						(lowerCorner[0]+upperCorner[0])/2,
- 						(lowerCorner[1]+upperCorner[1])/2,
- 						lowerCorner[2]-thickness/2.0);
- 	halfSize		= Vector3r(
- 						fabs(lowerCorner[0]-upperCorner[0])/2+thickness,
- 						fabs(lowerCorner[1]-upperCorner[1])/2+thickness,
- 						thickness/2.0);
-	createBox(body,center,halfSize,wall_3_wire);
- 	if(wall_3)
- 		rootBody->bodies->insert(body);
-
-// box 4
- 	center			= Vector3r(
- 						(lowerCorner[0]+upperCorner[0])/2,
- 						(lowerCorner[1]+upperCorner[1])/2,
- 						upperCorner[2]+thickness/2.0);
- 	halfSize		= Vector3r(
- 						fabs(lowerCorner[0]-upperCorner[0])/2+thickness,
- 						fabs(lowerCorner[1]-upperCorner[1])/2+thickness,
- 						thickness/2.0);
-	createBox(body,center,halfSize,wall_3_wire);
- 	if(wall_4)
- 		rootBody->bodies->insert(body);
+	
+	if(boxWalls)
+	{
+	// top box
+	 	center			= Vector3r(
+	 						(lowerCorner[0]+upperCorner[0])/2,
+	 						upperCorner[1]+thickness/2.0,
+	 						(lowerCorner[2]+upperCorner[2])/2);
+	 	halfSize		= Vector3r(
+	 						fabs(lowerCorner[0]-upperCorner[0])/2+thickness,
+	 						thickness/2.0,
+	 						fabs(lowerCorner[2]-upperCorner[2])/2+thickness);
+	
+		createBox(body,center,halfSize,wall_top_wire);
+	 	if(wall_top)
+			rootBody->bodies->insert(body);
+	// box 1
+	
+	 	center			= Vector3r(
+	 						lowerCorner[0]-thickness/2.0,
+	 						(lowerCorner[1]+upperCorner[1])/2,
+	 						(lowerCorner[2]+upperCorner[2])/2);
+		halfSize		= Vector3r(
+							thickness/2.0,
+	 						fabs(lowerCorner[1]-upperCorner[1])/2+thickness,
+	 						fabs(lowerCorner[2]-upperCorner[2])/2+thickness);
+		createBox(body,center,halfSize,wall_1_wire);
+	 	if(wall_1)
+			rootBody->bodies->insert(body);
+	// box 2
+	 	center			= Vector3r(
+	 						upperCorner[0]+thickness/2.0,
+	 						(lowerCorner[1]+upperCorner[1])/2,
+							(lowerCorner[2]+upperCorner[2])/2);
+	 	halfSize		= Vector3r(
+	 						thickness/2.0,
+	 						fabs(lowerCorner[1]-upperCorner[1])/2+thickness,
+	 						fabs(lowerCorner[2]-upperCorner[2])/2+thickness);
+	 	
+		createBox(body,center,halfSize,wall_2_wire);
+	 	if(wall_2)
+			rootBody->bodies->insert(body);
+	// box 3
+	 	center			= Vector3r(
+	 						(lowerCorner[0]+upperCorner[0])/2,
+	 						(lowerCorner[1]+upperCorner[1])/2,
+	 						lowerCorner[2]-thickness/2.0);
+	 	halfSize		= Vector3r(
+	 						fabs(lowerCorner[0]-upperCorner[0])/2+thickness,
+	 						fabs(lowerCorner[1]-upperCorner[1])/2+thickness,
+	 						thickness/2.0);
+		createBox(body,center,halfSize,wall_3_wire);
+	 	if(wall_3)
+	 		rootBody->bodies->insert(body);
+	
+	// box 4
+	 	center			= Vector3r(
+	 						(lowerCorner[0]+upperCorner[0])/2,
+	 						(lowerCorner[1]+upperCorner[1])/2,
+	 						upperCorner[2]+thickness/2.0);
+	 	halfSize		= Vector3r(
+	 						fabs(lowerCorner[0]-upperCorner[0])/2+thickness,
+	 						fabs(lowerCorner[1]-upperCorner[1])/2+thickness,
+	 						thickness/2.0);
+		createBox(body,center,halfSize,wall_3_wire);
+	 	if(wall_4)
+	 		rootBody->bodies->insert(body);
+			 
+	}
 
  	return "Generated a sample inside box of dimensions: (" 
  		+ lexical_cast<string>(lowerCorner[0]) + "," 
@@ -303,7 +312,7 @@ string SDECImport::generate()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void SDECImport::createSphere(shared_ptr<Body>& body, Vector3r translation, Real radius, bool big )
+void SDECImport::createSphere(shared_ptr<Body>& body, Vector3r translation, Real radius, bool big, bool dynamic )
 {
 	body = shared_ptr<Body>(new SimpleBody(0,10));
 	shared_ptr<SDECParameters> physics(new SDECParameters);
@@ -314,7 +323,7 @@ void SDECImport::createSphere(shared_ptr<Body>& body, Vector3r translation, Real
 	Quaternionr q;
 	q.fromAxisAngle( Vector3r(0,0,1),0);
 	
-	body->isDynamic			= true;
+	body->isDynamic			= dynamic;
 	
 	physics->angularVelocity	= Vector3r(0,0,0);
 	physics->velocity		= Vector3r(0,0,0);
@@ -327,6 +336,13 @@ void SDECImport::createSphere(shared_ptr<Body>& body, Vector3r translation, Real
 	physics->poisson		= big ? bigBallPoissonRatio : spherePoissonRatio;
 	physics->frictionAngle		= (big ? bigBallFrictDeg : sphereFrictionDeg ) * Mathr::PI/180.0;
 
+	if((!big) && (!dynamic) && (!boxWalls))
+	{
+		physics->young			= boxYoungModulus;
+		physics->poisson		= boxPoissonRatio;
+		physics->frictionAngle		= boxFrictionDeg * Mathr::PI/180.0;
+	}
+	
 	aabb->diffuseColor		= Vector3r(0,1,0);
 
 

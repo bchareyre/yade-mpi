@@ -63,6 +63,7 @@ struct IOManagerExceptions
 	static const char* WrongFileHeader;
 	static const char* WrongFileFooter;
 	static const char* AttributeNotFound;
+	static const char* BadAttributeValue;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

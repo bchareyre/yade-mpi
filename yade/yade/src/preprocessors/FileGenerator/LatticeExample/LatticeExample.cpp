@@ -21,7 +21,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "LatticeBox.hpp"
+#include "LatticeExample.hpp"
 #include "LatticeSetParameters.hpp"
 #include "LatticeBeamParameters.hpp"
 #include "LatticeNodeParameters.hpp"
@@ -43,7 +43,7 @@ using namespace std;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-LatticeBox::LatticeBox() : FileGenerator()
+LatticeExample::LatticeExample() : FileGenerator()
 {
 	nodeGroup 		= 10;
 	beamGroup 		= 20;
@@ -56,7 +56,7 @@ LatticeBox::LatticeBox() : FileGenerator()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-LatticeBox::~LatticeBox()
+LatticeExample::~LatticeExample()
 {
 
 }
@@ -64,14 +64,14 @@ LatticeBox::~LatticeBox()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void LatticeBox::registerAttributes()
+void LatticeExample::registerAttributes()
 {
 	REGISTER_ATTRIBUTE(nbNodes); 
 	REGISTER_ATTRIBUTE(disorder);
 	REGISTER_ATTRIBUTE(maxLength);
 }
 
-string LatticeBox::generate()
+string LatticeExample::generate()
 {
 	rootBody = shared_ptr<ComplexBody>(new ComplexBody);
 	createActors(rootBody);
@@ -126,7 +126,7 @@ string LatticeBox::generate()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void LatticeBox::createNode(shared_ptr<Body>& body, int i, int j, int k)
+void LatticeExample::createNode(shared_ptr<Body>& body, int i, int j, int k)
 {
 	body = shared_ptr<Body>(new SimpleBody(0,nodeGroup));
 	shared_ptr<LatticeNodeParameters> physics(new LatticeNodeParameters);
@@ -163,7 +163,7 @@ void LatticeBox::createNode(shared_ptr<Body>& body, int i, int j, int k)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void LatticeBox::createBeam(shared_ptr<Body>& body, unsigned int i, unsigned int j)
+void LatticeExample::createBeam(shared_ptr<Body>& body, unsigned int i, unsigned int j)
 {
 	body = shared_ptr<Body>(new SimpleBody(0,beamGroup));
 	shared_ptr<LatticeBeamParameters> physics(new LatticeBeamParameters);
@@ -193,7 +193,7 @@ void LatticeBox::createBeam(shared_ptr<Body>& body, unsigned int i, unsigned int
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void LatticeBox::calcBeamsPositionOrientationLength(shared_ptr<ComplexBody>& body)
+void LatticeExample::calcBeamsPositionOrientationLength(shared_ptr<ComplexBody>& body)
 {
 	for( rootBody->bodies->gotoFirst(); rootBody->bodies->notAtEnd() ; rootBody->bodies->gotoNext() )
 	{
@@ -224,7 +224,7 @@ void LatticeBox::calcBeamsPositionOrientationLength(shared_ptr<ComplexBody>& bod
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void LatticeBox::createActors(shared_ptr<ComplexBody>& )
+void LatticeExample::createActors(shared_ptr<ComplexBody>& )
 {
 	shared_ptr<BoundingVolumeDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeDispatcher>(new BoundingVolumeDispatcher);
 	boundingVolumeDispatcher->add("InteractionDescriptionSet","AABB","InteractionDescriptionSet2AABBFunctor");
@@ -241,7 +241,7 @@ void LatticeBox::createActors(shared_ptr<ComplexBody>& )
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void LatticeBox::positionRootBody(shared_ptr<ComplexBody>& rootBody)
+void LatticeExample::positionRootBody(shared_ptr<ComplexBody>& rootBody)
 {
 	rootBody->isDynamic		= false;
 

@@ -357,8 +357,7 @@ void XMLManager::deserializeFundamental(istream& stream, Archive& ac, const stri
 	}
 	catch(boost::bad_lexical_cast& )
 	{
-		//cerr << saxParser.getLineNumber() << endl;
-		string error=string(IOManagerExceptions::AttributeNotFound) + " (bad lexical_cast) " + saxParser.getTagName() + " line: " + lexical_cast<string>(saxParser.getLineNumber());
+		string error=string(IOManagerExceptions::BadAttributeValue) + " (bad lexical_cast) " + saxParser.getTagName() + " line: " + lexical_cast<string>(saxParser.getLineNumber());
 		throw SerializableError(error.c_str());
 	}
 }

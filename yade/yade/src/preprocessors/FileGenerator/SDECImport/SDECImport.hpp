@@ -40,6 +40,8 @@ class SDECImport : public FileGenerator
 	private : Real dampingForce;
 	private : Real dampingMomentum;
 	
+	private : bool boxWalls;
+	
 	private	: Real bigBallRadius;
 	private	: Real bigBallDensity;
 	private	: Real bigBallDropTimeSeconds;
@@ -58,7 +60,7 @@ class SDECImport : public FileGenerator
 	public : ~SDECImport ();
 	
 	private : void createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents,bool wire);
-	private : void createSphere(shared_ptr<Body>& body, Vector3r translation, Real radius,bool big);
+	private : void createSphere(shared_ptr<Body>& body, Vector3r translation, Real radius,bool big,bool dynamic);
 	private : void createActors(shared_ptr<ComplexBody>& rootBody);
 	private : void positionRootBody(shared_ptr<ComplexBody>& rootBody);
 
