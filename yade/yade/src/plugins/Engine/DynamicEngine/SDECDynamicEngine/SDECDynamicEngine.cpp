@@ -40,6 +40,7 @@ SDECDynamicEngine::SDECDynamicEngine() : DynamicEngine() , actionForce(new Actio
 {
 	sdecGroupMask=1;
 	first=true;
+	momentRotationLaw = true;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -49,6 +50,7 @@ void SDECDynamicEngine::registerAttributes()
 {
 	DynamicEngine::registerAttributes();
 	REGISTER_ATTRIBUTE(sdecGroupMask);
+	REGISTER_ATTRIBUTE(momentRotationLaw);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -145,6 +147,8 @@ void SDECDynamicEngine::respondToInteractions(Body* body)
 
 ////////////////////////////////////////////////////////////
 /// Moment law					 	 ///
+	if(momentRotationLaw)
+	{
 ////////////////////////////////////////////////////////////
 
 		if (first)
@@ -303,6 +307,7 @@ void SDECDynamicEngine::respondToInteractions(Body* body)
 
 ////////////////////////////////////////////////////////////
 /// Moment law	END				 	 ///
+	}
 ////////////////////////////////////////////////////////////
 
 		currentContactPhysics->prevNormal = currentContactGeometry->normal;

@@ -52,6 +52,7 @@ SDECLinkedSpheres::SDECLinkedSpheres () : FileGenerator()
 	spherePoissonRatio  = 0.2;
 	sphereFrictionDeg   = 18.0;
 	density = 2.6;
+	momentRotationLaw = true;
 }
 
 SDECLinkedSpheres::~SDECLinkedSpheres ()
@@ -74,6 +75,7 @@ void SDECLinkedSpheres::registerAttributes()
 	REGISTER_ATTRIBUTE(sphereFrictionDeg);
 	REGISTER_ATTRIBUTE(dampingForce);
 	REGISTER_ATTRIBUTE(dampingMomentum);
+	REGISTER_ATTRIBUTE(momentRotationLaw);
 	REGISTER_ATTRIBUTE(disorder);
 	REGISTER_ATTRIBUTE(spacing);
 	REGISTER_ATTRIBUTE(supportSize);
@@ -154,7 +156,7 @@ string SDECLinkedSpheres::generate()
 				geometry->radius1			= as->radius - fabs(as->radius - bs->radius)*0.5;
 				geometry->radius2			= bs->radius - fabs(as->radius - bs->radius)*0.5;
 
-				physics->initialKn			= 500000;
+				physics->initialKn			= 500000; // FIXME - BIG problem here.
 				physics->initialKs			= 50000;
 				physics->heta				= 1;
 				physics->initialEquilibriumDistance	= (a->se3.translation - b->se3.translation).length();
@@ -201,7 +203,7 @@ void SDECLinkedSpheres::createSphere(shared_ptr<Body>& body, int i, int j, int k
 	
 	physics->angularVelocity	= Vector3r(0,0,0);
 	physics->velocity		= Vector3r(0,0,0);
-	physics->mass			= 4.0/3.0*Mathr::PI*radius*radius*density;
+	physics->mass			= 4.0/3.0*Mathr::PI*radius*radius*radius*density;
 	physics->inertia		= Vector3r(2.0/5.0*physics->mass*radius*radius,2.0/5.0*physics->mass*radius*radius,2.0/5.0*physics->mass*radius*radius); //
 	physics->se3			= Se3r(translation,q);
 	physics->young			= sphereYoungModulus;
@@ -317,6 +319,7 @@ void SDECLinkedSpheres::createActors(shared_ptr<ComplexBody>& rootBody)
 	
 	shared_ptr<SDECDynamicEngine> sdecDynamicEngine(new SDECDynamicEngine);
 	sdecDynamicEngine->sdecGroupMask = 55;
+	sdecDynamicEngine->momentRotationLaw = momentRotationLaw;
 	
 	rootBody->actors.clear();
 	rootBody->actors.push_back(sdecTimeStepper);

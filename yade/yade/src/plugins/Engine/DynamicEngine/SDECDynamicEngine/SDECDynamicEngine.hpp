@@ -50,6 +50,7 @@ class SDECDynamicEngine : public DynamicEngine
 	private : shared_ptr<Action> actionForce;
 	private : shared_ptr<Action> actionMomentum;
 	public  : int sdecGroupMask;
+	public  : bool momentRotationLaw;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Constructor/Destructor								        ///

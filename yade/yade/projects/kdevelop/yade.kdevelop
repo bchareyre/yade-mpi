@@ -99,7 +99,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>extensions</activedir>
+      <activedir>plugins/Engine/DynamicEngine/SDECDynamicEngine</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>

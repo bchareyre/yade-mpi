@@ -194,7 +194,7 @@ void SDECSpheresPlane::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 	
 	physics->angularVelocity	= Vector3r(0,0,0);
 	physics->velocity		= Vector3r(0,0,0);
-	physics->mass			= 4.0/3.0*Mathr::PI*radius*radius*density;
+	physics->mass			= 4.0/3.0*Mathr::PI*radius*radius*radius*density;
 	physics->inertia		= Vector3r(2.0/5.0*physics->mass*radius*radius,2.0/5.0*physics->mass*radius*radius,2.0/5.0*physics->mass*radius*radius); //
 	physics->se3			= Se3r(translation,q);
 	physics->young			= sphereYoungModulus;

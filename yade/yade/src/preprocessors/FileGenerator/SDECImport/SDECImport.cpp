@@ -327,7 +327,8 @@ void SDECImport::createSphere(shared_ptr<Body>& body, Vector3r translation, Real
 	
 	physics->angularVelocity	= Vector3r(0,0,0);
 	physics->velocity		= Vector3r(0,0,0);
-	physics->mass			= 4.0/3.0*Mathr::PI*radius*radius*(big ? bigBallDensity : density);
+	physics->mass			= 4.0/3.0*Mathr::PI*radius*radius*radius*(big ? bigBallDensity : density);
+	
 	physics->inertia		= Vector3r( 	2.0/5.0*physics->mass*radius*radius,
 							2.0/5.0*physics->mass*radius*radius,
 							2.0/5.0*physics->mass*radius*radius);
