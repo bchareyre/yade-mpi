@@ -37,7 +37,7 @@
 #include "DynLibDispatcher.hpp"
 #include "Actor.hpp"
 #include "CollisionGeometry.hpp"
-#include "CollisionFunctor.hpp"
+#include "InteractionFunctor.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -51,7 +51,7 @@ class NarrowInteractor : public Actor
 {
 	protected: DynLibDispatcher
 		<	TYPELIST_2( CollisionGeometry , CollisionGeometry ) ,	// base classess for dispatch
-			CollisionFunctor,					// class that provides multivirtual call
+			InteractionFunctor,					// class that provides multivirtual call
 			bool ,							// return type
 			TYPELIST_5(
 					  const shared_ptr<CollisionGeometry>&	// arguments

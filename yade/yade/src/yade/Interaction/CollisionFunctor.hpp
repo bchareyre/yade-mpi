@@ -45,10 +45,10 @@
 
 /*! \brief Abstract interface for all collision functor.
 
-	Every functions that describe collision between two CollisionGeometries must derive from CollisionFunctor.
+	Every functions that describe collision between two CollisionGeometries must derive from InteractionFunctor.
 */
 
-class CollisionFunctor : public FunctorWrapper
+class InteractionFunctor : public FunctorWrapper
 		<
 		 bool ,
 		 TYPELIST_5(
@@ -61,7 +61,7 @@ class CollisionFunctor : public FunctorWrapper
 {
 };
 
-REGISTER_FACTORABLE(CollisionFunctor);
+REGISTER_FACTORABLE(InteractionFunctor);
 
 #endif // __COLLISIONFUNCTOR_H__
 
