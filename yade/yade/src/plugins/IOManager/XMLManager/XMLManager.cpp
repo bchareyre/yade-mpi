@@ -314,16 +314,7 @@ void XMLManager::serializeSmartPointer(ostream& stream, Archive& ac , int depth)
 		{
 			Serializable * s = any_cast<Serializable*>(tmpAc->getAddress());
 			stream << " _className_=\"" << s->getClassName() << "\" ";//>" << endl;
-			//writeOpeningTag(stream,*tmpAc,depth);
-			tmpAc->serialize(stream,*tmpAc,depth+1);
-			//writeClosingTag(stream,*tmpAc,depth);
-			
-			
-//			Serializable * s = any_cast<Serializable*>(tmpAc->getAddress());
-//			stream << " className=\"" << s->getClassName() << "\" >" << endl;
-//			writeOpeningTag(stream,*tmpAc,depth);
-//			tmpAc->serialize(stream,*tmpAc,depth+1);
-//			writeClosingTag(stream,*tmpAc,depth);
+			tmpAc->serialize(stream,*tmpAc,depth);
 		}
 		else if (type==SerializableTypes::CUSTOM_CLASS)
 		{

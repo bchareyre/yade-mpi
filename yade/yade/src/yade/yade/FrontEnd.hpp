@@ -39,7 +39,8 @@ class FrontEnd : public Factorable
 	// construction
 	public : FrontEnd ();
 	public : virtual ~FrontEnd ();
-	
+
+	// FIXME - add getShortName
 	public : virtual int run(int , char * []) { return -1;};
 	
 };

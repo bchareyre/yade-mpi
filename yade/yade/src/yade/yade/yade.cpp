@@ -26,11 +26,12 @@
 #include <iostream>
 using namespace std;
 void help()
-{
+{	// FIXME - remove those flags
 	cout << "\n\
 		Yet Another Dynamic Engine, pre-alpha.\n\
 		\n\
 			-h	- print this help\n\
+			-H	- print help for selected fronted\n\
 			-i	- specify name of frontend interface library: \n\
 					YadeQtGUI, NullGUI\n\
 				(other GUIs, like ncurses, command line and\n\

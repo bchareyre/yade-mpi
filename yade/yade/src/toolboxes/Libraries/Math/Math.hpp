@@ -152,6 +152,8 @@ public:
     } \
 }
 
+//#define DOUBLE_PRECISION
+
 #ifdef DOUBLE_PRECISION
 	typedef double Real;
 #else

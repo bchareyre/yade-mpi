@@ -74,6 +74,19 @@ bool Sphere::collideWith(CollisionGeometry* )
 	return true;
 }
 
+/* FIXME - do this
+template<typename TT>
+glNormal3v(TT tt)
+{
+}
+
+template<>
+glNormal3v<float>(TT tt)
+{
+	glNormal3fv(tt);
+}
+*/
+
 void Sphere::subdivideTriangle(Vector3r& v1,Vector3r& v2,Vector3r& v3, int depth)
 {
 	Vector3r v12,v23,v31;
