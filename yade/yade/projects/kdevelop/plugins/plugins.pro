@@ -9,7 +9,9 @@ OBJECTS_DIR = $(YADECOMPILATIONPATH)
 CONFIG += debug \
           warn_on 
 TEMPLATE = subdirs 
-SUBDIRS += BoundingVolume \
+SUBDIRS += InteractionGeometry \
+           InteractionPhysics \
+           BoundingVolume \
            CollisionGeometry \
            GeometricalModel \
            BoundingVolumeFactory \
@@ -20,6 +22,4 @@ SUBDIRS += BoundingVolume \
            CollisionFunctor \
            Body \
            KinematicEngine \
-           DynamicEngine \
-           InteractionPhysics \
-           InteractionGeometry 
+           DynamicEngine 
