@@ -70,8 +70,7 @@ void NonConnexBody::postProcessAttributes(bool deserializing)
 		{
 			set->collisionGeometries.push_back((*bodies)[i]->cm);
 		}
-	}
-	
+
 	// to build bounding volume if there is a boundingvolume updator in the actor list
 	// FIXME : I don't know is this is so dirty to do that here
 	vector<shared_ptr<Actor> >::iterator ai    = actors.begin();
@@ -79,6 +78,7 @@ void NonConnexBody::postProcessAttributes(bool deserializing)
 	for(;ai!=aiEnd;++ai)
 		if (dynamic_pointer_cast<BoundingVolumeUpdator>(*ai))
 			(*ai)->action(this);
+	}
 			
 	Body::postProcessAttributes(deserializing);
 }
