@@ -6,9 +6,9 @@
 LIBS += -lSphere \
         -lSDECContactPhysics \
         -lSDECContactGeometry \
-        -lSDECLinearContactModel \
+        -lSDECMacroMicroElasticRelationships \
         -rdynamic 
-INCLUDEPATH = $(YADEINCLUDEPATH) 
+INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 

@@ -14,7 +14,7 @@
 #include "InteractionDescriptionSet.hpp"
 
 #include "SDECDynamicEngine.hpp"
-#include "SDECLinearContactModel.hpp"
+#include "SDECMacroMicroElasticRelationships.hpp"
 #include "SDECParameters.hpp"
 #include "SDECLinkGeometry.hpp"
 #include "SDECLinkPhysics.hpp"
@@ -284,7 +284,7 @@ void SDECLinkedSpheres::createActors(shared_ptr<ComplexBody>& rootBody)
 	interactionGeometryDispatcher->add("InteractionSphere","InteractionBox","Box2Sphere4SDECContactModel");
 
 	shared_ptr<InteractionPhysicsDispatcher> interactionPhysicsDispatcher(new InteractionPhysicsDispatcher);
-	interactionPhysicsDispatcher->add("SDECParameters","SDECParameters","SDECLinearContactModel");
+	interactionPhysicsDispatcher->add("SDECParameters","SDECParameters","SDECMacroMicroElasticRelationships");
 		
 	shared_ptr<BoundingVolumeDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeDispatcher>(new BoundingVolumeDispatcher);
 	boundingVolumeDispatcher->add("InteractionSphere","AABB","Sphere2AABBFunctor");

@@ -19,7 +19,7 @@ LIBS += -lSerialization \
         -lSDECLinkGeometry \
         -lSDECLinkPhysics \
         -rdynamic 
-INCLUDEPATH = $(YADEINCLUDEPATH) 
+INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
@@ -36,14 +36,8 @@ QMAKE_LIBDIR = ../../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../../../yade/Body/Body/$(YADEDYNLIBPATH) \
                ../../../../plugins/Body/BodyPhysicalParameters/SDECParameters/$(YADEDYNLIBPATH) \
                ../../../../plugins/Body/BodyPhysicalParameters/RigidBodyParameters/$(YADEDYNLIBPATH) \
-               ../../../../plugins/Geometry/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
-               ../../../../plugins/Interaction/InteractionGeometry/SDECPermanentLink/$(YADEDYNLIBPATH) \
-               ../../../../plugins/Interaction/InteractionPhysics/SDECPermanentLinkPhysics/$(YADEDYNLIBPATH) \
-               ../../../../yade/Geometry/$(YADEDYNLIBPATH) \
-               ../../../../yade/Interaction/$(YADEDYNLIBPATH) \
-               ../../../../yade/Body/$(YADEDYNLIBPATH) \
-               ../../../../plugins/Body/SDECDiscreteElement/$(YADEDYNLIBPATH) \
-               ../../../../plugins/Body/RigidBody/$(YADEDYNLIBPATH) \
+               ../../../../plugins/Interaction/InteractionGeometry/SDECLinkGeometry/$(YADEDYNLIBPATH) \
+               ../../../../plugins/Interaction/InteractionPhysics/SDECLinkPhysics/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

@@ -52,6 +52,7 @@ namespace Loki
         template <typename R /*, template <class> class ThreadingModel */>
         struct FunctorImplBase /* : public SmallObject<ThreadingModel> */
         {
+	    virtual ~FunctorImplBase(){};
             typedef R ResultType;
             
             typedef EmptyType Parm1;

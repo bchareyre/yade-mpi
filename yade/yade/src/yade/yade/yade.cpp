@@ -67,7 +67,7 @@ int main(int argc, char *argv[])
 	shared_ptr<FrontEnd> frontEnd = dynamic_pointer_cast<FrontEnd>(ClassFactory::instance().createShared(frontEndLibName));
 	int ok = frontEnd->run(argc,argv);
 	
-	cout << "YADE ENDED CORRECTLY ..." << endl;
+	cout << "Yade: normal exit." << endl;
 	
 	return ok;
 }

@@ -21,7 +21,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "SDECLinearContactModel.hpp"
+#include "SDECMacroMicroElasticRelationships.hpp"
 #include "SDECContactGeometry.hpp"
 #include "SDECContactPhysics.hpp"
 
@@ -35,7 +35,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-SDECLinearContactModel::SDECLinearContactModel()
+SDECMacroMicroElasticRelationships::SDECMacroMicroElasticRelationships()
 {
 	alpha 	= 2.5;
 	beta 	= 2.0;
@@ -45,7 +45,7 @@ SDECLinearContactModel::SDECLinearContactModel()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void SDECLinearContactModel::registerAttributes()
+void SDECMacroMicroElasticRelationships::registerAttributes()
 {
 	REGISTER_ATTRIBUTE(alpha);
 	REGISTER_ATTRIBUTE(beta);
@@ -55,7 +55,7 @@ void SDECLinearContactModel::registerAttributes()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void SDECLinearContactModel::go(	  const shared_ptr<BodyPhysicalParameters>& b1 // SDECParameters
+void SDECMacroMicroElasticRelationships::go(	  const shared_ptr<BodyPhysicalParameters>& b1 // SDECParameters
 					, const shared_ptr<BodyPhysicalParameters>& b2 // SDECParameters
 					, const shared_ptr<Interaction>& interaction)
 {
@@ -112,7 +112,8 @@ void SDECLinearContactModel::go(	  const shared_ptr<BodyPhysicalParameters>& b1 
 			contactPhysics->initialKn			= Kn;
 			contactPhysics->initialKs			= Kn*(1-alpha*Vab)/(1+Vab);
 //cerr << "Ks: " <<       contactPhysics->initialKs			<< endl;
-			contactPhysics->frictionAngle			= 2*fa*fb/(fa+fb);
+			contactPhysics->frictionAngle			= 2*fa*fb/(fa+fb); // FIXME - this is actually a waste of memory space, just like initialKs and initialKn
+			contactPhysics->tangensOfFrictionAngle		= std::tan(contactPhysics->frictionAngle); 
 
 			contactPhysics->prevNormal 			= interactionGeometry->normal;
 			contactPhysics->initialEquilibriumDistance	= Dinit;			

@@ -14,7 +14,7 @@
 #include "InteractionDescriptionSet.hpp"
 
 #include "SDECDynamicEngine.hpp"
-#include "SDECLinearContactModel.hpp"
+#include "SDECMacroMicroElasticRelationships.hpp"
 #include "SDECParameters.hpp"
 #include "SDECLinkGeometry.hpp"
 #include "SDECLinkPhysics.hpp"
@@ -35,6 +35,7 @@
 #include "ActionReset.hpp"
 
 #include "AveragePositionRecorder.hpp"
+#include "ForceRecorder.hpp"
 
 #include <boost/filesystem/convenience.hpp>
 #include <boost/lexical_cast.hpp>
@@ -68,9 +69,9 @@ SDECImport::SDECImport () : FileGenerator()
 	positionRecordFile	= "../data/position";
 	recordIntervalIter	= 100;
 
-	bigBallRadius		= 1;
+	bigBallRadius		= 0.15;
 	bigBallDensity		= 7000;
-	bigBallDropTimeSeconds	= 50;
+	bigBallDropTimeSeconds	= 450;
 	
 	dampingForce = 0.7;
 	dampingMomentum = 0.7;
@@ -90,6 +91,7 @@ SDECImport::~SDECImport ()
 {
 
 }
+
 
 void SDECImport::registerAttributes()
 {
@@ -177,6 +179,13 @@ string SDECImport::generate()
 		}
 	}
 
+// create bigBall
+	Vector3r translation = (upperCorner+lowerCorner)*0.5 + Vector3r(0,upperCorner[1]+bigBallRadius+4,0);
+	createSphere(body,translation,bigBallRadius,true);	
+	body->isDynamic = false;
+	rootBody->bodies->insert(body);
+	int bigId = body->getId();
+
 // bottom box
  	Vector3r center		= Vector3r(
  						(lowerCorner[0]+upperCorner[0])/2,
@@ -190,6 +199,9 @@ string SDECImport::generate()
 	createBox(body,center,halfSize,wall_bottom_wire);
  	if(wall_bottom)
 		rootBody->bodies->insert(body);
+	forcerec->id = body->getId();
+	forcerec->bigBallId = bigId;
+	forcerec->bigBallReleaseTime = bigBallDropTimeSeconds;
 
 // top box
  	center			= Vector3r(
@@ -270,7 +282,7 @@ string SDECImport::generate()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void SDECImport::createSphere(shared_ptr<Body>& body, Vector3r translation, Real radius)
+void SDECImport::createSphere(shared_ptr<Body>& body, Vector3r translation, Real radius, bool big )
 {
 	body = shared_ptr<Body>(new SimpleBody(0,10));
 	shared_ptr<SDECParameters> physics(new SDECParameters);
@@ -285,7 +297,7 @@ void SDECImport::createSphere(shared_ptr<Body>& body, Vector3r translation, Real
 	
 	physics->angularVelocity	= Vector3r(0,0,0);
 	physics->velocity		= Vector3r(0,0,0);
-	physics->mass			= 4.0/3.0*Mathr::PI*radius*radius*density;
+	physics->mass			= 4.0/3.0*Mathr::PI*radius*radius*(big ? bigBallDensity : density);
 	physics->inertia		= Vector3r( 	2.0/5.0*physics->mass*radius*radius,
 							2.0/5.0*physics->mass*radius*radius,
 							2.0/5.0*physics->mass*radius*radius);
@@ -369,21 +381,18 @@ void SDECImport::createActors(shared_ptr<ComplexBody>& rootBody)
 	shared_ptr<AveragePositionRecorder> averagePositionRecorder = shared_ptr<AveragePositionRecorder>(new AveragePositionRecorder);
 	averagePositionRecorder -> outputFile 		= positionRecordFile;
 	averagePositionRecorder -> interval 		= recordIntervalIter;
-///// FIXME - add forceRecordFile ....
 	
-// // Recording Forces
-// //	shared_ptr<ForceRecorder> forcerec;
-// //	forcerec = shared_ptr<ForceRecorder>(new ForceRecorder);
-// //	forcerec -> outputFile 	= "../data/Forces";
-// //	forcerec -> interval 	= 100;
-// //	sdec->actors.push_back(forcerec);
+//	Recording Forces
+	forcerec = shared_ptr<ForceRecorder>(new ForceRecorder);
+	forcerec -> outputFile 	= forceRecordFile;
+	forcerec -> interval 	= recordIntervalIter;
 
 	shared_ptr<InteractionGeometryDispatcher> interactionGeometryDispatcher(new InteractionGeometryDispatcher);
 	interactionGeometryDispatcher->add("InteractionSphere","InteractionSphere","Sphere2Sphere4SDECContactModel");
 	interactionGeometryDispatcher->add("InteractionSphere","InteractionBox","Box2Sphere4SDECContactModel");
 
 	shared_ptr<InteractionPhysicsDispatcher> interactionPhysicsDispatcher(new InteractionPhysicsDispatcher);
-	interactionPhysicsDispatcher->add("SDECParameters","SDECParameters","SDECLinearContactModel");
+	interactionPhysicsDispatcher->add("SDECParameters","SDECParameters","SDECMacroMicroElasticRelationships");
 		
 	shared_ptr<BoundingVolumeDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeDispatcher>(new BoundingVolumeDispatcher);
 	boundingVolumeDispatcher->add("InteractionSphere","AABB","Sphere2AABBFunctor");
@@ -431,6 +440,7 @@ void SDECImport::createActors(shared_ptr<ComplexBody>& rootBody)
 	rootBody->actors.push_back(applyActionDispatcher);
 	rootBody->actors.push_back(timeIntegratorDispatcher);
 	rootBody->actors.push_back(averagePositionRecorder);
+	rootBody->actors.push_back(forcerec);
 }
 
 

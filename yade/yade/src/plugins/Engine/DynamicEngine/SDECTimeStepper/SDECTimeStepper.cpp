@@ -28,12 +28,12 @@
 #include "SDECContactPhysics.hpp"
 #include "SDECContactGeometry.hpp"
 #include "Sphere.hpp"
-#include "SDECLinearContactModel.hpp"
+#include "SDECMacroMicroElasticRelationships.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-SDECTimeStepper::SDECTimeStepper() : Actor() , sdecContactModel(new SDECLinearContactModel)
+SDECTimeStepper::SDECTimeStepper() : Actor() , sdecContactModel(new SDECMacroMicroElasticRelationships)
 {
 	sdecGroup = 0;
 	interval = 10;

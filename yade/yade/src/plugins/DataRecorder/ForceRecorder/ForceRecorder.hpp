@@ -6,20 +6,27 @@
 #include <string>
 #include <fstream>
 
+class Action;
+
 class ForceRecorder : public Actor
 {
 	public : std::string outputFile;
 	public : unsigned int interval;
+	public : int id;
+	public : int bigBallId; // FIXME !!!!!!!!!!
+	public : Real bigBallReleaseTime; // FIXME !!!!!!!!!!
+	private : shared_ptr<Action> actionForce;
 	
-	//private : std::ofstream ofile; // FIXME - why this is crashing ?!?
+	private : std::ofstream ofile; 
 
 	// construction
 	public : ForceRecorder ();
 
 	protected : virtual void postProcessAttributes(bool deserializing);
-	public : void registerAttributes();
+	public : virtual void registerAttributes();
 
 	public : virtual void action(Body* b);
+	public : virtual bool isActivated();
 	REGISTER_CLASS_NAME(ForceRecorder);
 };
 

@@ -24,9 +24,7 @@ LIBS += -lMesh2D \
         -lInteractionDescriptionSet2AABBFunctor \
         -lRigidBodyParameters \
         -lParticleSetParameters \
-        -lSDECDynamicEngine \
         -lActionReset \
-        -lSDECLinearContactModel \
         -lSDECParameters \
         -lBox \
         -lInteractionBox \
@@ -34,8 +32,12 @@ LIBS += -lMesh2D \
         -lSDECLinkPhysics \
         -lCundallNonViscousMomentumDamping \
         -lCundallNonViscousForceDamping \
+        -lSDECMacroMicroElasticRelationships \
+         \
+         \
+        -lSDECDynamicEngine \
         -rdynamic 
-INCLUDEPATH = $(YADEINCLUDEPATH) 
+INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
@@ -60,33 +62,15 @@ QMAKE_LIBDIR = ../../../plugins/Body/GeometricalModel/Mesh2D/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/BoundingVolumeFunctor/InteractionDescriptionSet2AABBFunctor/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/BodyPhysicalParameters/RigidBodyParameters/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/BodyPhysicalParameters/ParticleSetParameters/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/DynamicEngine/SDECDynamicEngine/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/Action/ActionReset/$(YADEDYNLIBPATH) \
-               ../../../plugins/Interaction/InteractionPhysicsFunctor/SDECContactPhysics/SDECLinearContactModel/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/BodyPhysicalParameters/SDECParameters/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/GeometricalModel/Box/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/InteractionDescription/InteractionBox/$(YADEDYNLIBPATH) \
                ../../../plugins/Interaction/InteractionGeometry/SDECLinkGeometry/$(YADEDYNLIBPATH) \
                ../../../plugins/Interaction/InteractionPhysics/SDECLinkPhysics/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/ActionDampingFunctor/ActionMomentumDamping/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/ActionDampingFunctor/ActionForceDamping/$(YADEDYNLIBPATH) \
-               ../../../plugins/Interaction/InteractionGeometry/SDECPermanentLink/$(YADEDYNLIBPATH) \
-               ../../../plugins/Interaction/InteractionPhysics/SDECPermanentLinkPhysics/$(YADEDYNLIBPATH) \
-               ../../../plugins/Geometry/GeometricalModel/Mesh2D/$(YADEDYNLIBPATH) \
-               ../../../plugins/Geometry/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
-               ../../../plugins/Geometry/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
-               ../../../plugins/Body/MassSpringBody/$(YADEDYNLIBPATH) \
-               ../../../plugins/Geometry/InteractionDescription/InteractionSphere/$(YADEDYNLIBPATH) \
-               ../../../plugins/Geometry/BoundingVolumeFunctor/InteractionDescriptionSet2AABBFunctor/$(YADEDYNLIBPATH) \
-               ../../../yade/Body/$(YADEDYNLIBPATH) \
-               ../../../yade/Geometry/$(YADEDYNLIBPATH) \
-               ../../../yade/Interaction/$(YADEDYNLIBPATH) \
-               ../../../plugins/Body/BodyPhysicalParameters/RigidBody/$(YADEDYNLIBPATH) \
-               ../../../plugins/Geometry/InteractionGeometry/InteractionSphere/$(YADEDYNLIBPATH) \
-               ../../../plugins/Geometry/BoundingVolumeFactory/CollisionGeometrySet2AABBFactory/$(YADEDYNLIBPATH) \
-               ../../../plugins/Geometry/CollisionGeometry/InteractionSphere/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/DynamicEngine/ParticleBallisticEngine/$(YADEDYNLIBPATH) \
-               ../../../plugins/Body/RigidBody/$(YADEDYNLIBPATH) \
+               ../../../plugins/Engine/ActionFunctor/CundallNonViscousMomentumDamping/$(YADEDYNLIBPATH) \
+               ../../../plugins/Engine/ActionFunctor/CundallNonViscousForceDamping/$(YADEDYNLIBPATH) \
+               ../../../plugins/Interaction/InteractionPhysicsFunctor/SDECContactPhysics/SDECMacroMicroElasticRelationships/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

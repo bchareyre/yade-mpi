@@ -331,8 +331,10 @@ void SDECDynamicEngine::respondToInteractions(Body* body)
 		SDECContactGeometry* currentContactGeometry 	= dynamic_cast<SDECContactGeometry*>(contact->interactionGeometry.get());
 		SDECContactPhysics* currentContactPhysics   	= dynamic_cast<SDECContactPhysics*> (contact->interactionPhysics.get());
 		
+		Vector3r& shearForce 			= currentContactPhysics->shearForce;
+
 		if ( contact->isNew)
-			currentContactPhysics->shearForce			= Vector3r(0,0,0);
+			shearForce			= Vector3r(0,0,0);
 				
 		Real un 				= currentContactGeometry->penetrationDepth;
 		currentContactPhysics->normalForce	= currentContactPhysics->kn*un*currentContactGeometry->normal;
@@ -343,12 +345,12 @@ void SDECDynamicEngine::respondToInteractions(Body* body)
 ////////////////////////////////////////////////////////////
 /// Here is the code with approximated rotations 	 ///
 ////////////////////////////////////////////////////////////
-
-		axis	 				= currentContactPhysics->prevNormal.cross(currentContactGeometry->normal);
-		currentContactPhysics->shearForce      -= currentContactPhysics->shearForce.cross(axis);
-		angle 					= dt*0.5*currentContactGeometry->normal.dot(de1->angularVelocity+de2->angularVelocity);
-		axis 					= angle*currentContactGeometry->normal;
-		currentContactPhysics->shearForce      -= currentContactPhysics->shearForce.cross(axis);
+		
+		axis	 		= currentContactPhysics->prevNormal.cross(currentContactGeometry->normal);
+		shearForce 	       -= shearForce.cross(axis);
+		angle 			= dt*0.5*currentContactGeometry->normal.dot(de1->angularVelocity+de2->angularVelocity);
+		axis 			= angle*currentContactGeometry->normal;
+		shearForce 	       -= shearForce.cross(axis);
 	
 ////////////////////////////////////////////////////////////
 /// Here is the code with exact rotations 		 ///
@@ -377,10 +379,20 @@ void SDECDynamicEngine::respondToInteractions(Body* body)
 		Vector3r relativeVelocity		= (de2->velocity+de2->angularVelocity.cross(c2x)) - (de1->velocity+de1->angularVelocity.cross(c1x));
 		Vector3r shearVelocity			= relativeVelocity-currentContactGeometry->normal.dot(relativeVelocity)*currentContactGeometry->normal;
 		Vector3r shearDisplacement		= shearVelocity*dt;
-		currentContactPhysics->shearForce      -= currentContactPhysics->ks*shearDisplacement;
+		shearForce 			       -= currentContactPhysics->ks*shearDisplacement;
 
-		Vector3r f				= currentContactPhysics->normalForce + currentContactPhysics->shearForce;
+		Real maxFs = currentContactPhysics->normalForce.squaredLength() * std::pow(currentContactPhysics->tangensOfFrictionAngle,2);
+			
+		if( shearForce.squaredLength() > maxFs )
+		{
+			maxFs = Mathr::sqRoot(maxFs);
+			for(int g = 0 ; g < 3 ; g++)
+				if(shearForce[g] != 0)
+					shearForce[g] *= maxFs / shearForce[g];
+		}
 
+		Vector3r f				= currentContactPhysics->normalForce + shearForce;
+		
 // it will be some macro(	body->actions,	ActionType , bodyId )
 		static_cast<ActionForce*>   ( ncb->actions->find( id1 , actionForce   ->getClassIndex() ).get() )->force    -= f;
 		static_cast<ActionForce*>   ( ncb->actions->find( id2 , actionForce   ->getClassIndex() ).get() )->force    += f;

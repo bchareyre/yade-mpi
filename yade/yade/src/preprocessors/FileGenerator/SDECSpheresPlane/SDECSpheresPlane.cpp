@@ -17,7 +17,7 @@
 #include "BoundingVolumeDispatcher.hpp"
 #include "InteractionDescriptionSet2AABBFunctor.hpp"
 #include "InteractionDescriptionSet.hpp"
-#include "SDECLinearContactModel.hpp"
+#include "SDECMacroMicroElasticRelationships.hpp"
 #include "SDECTimeStepper.hpp"
 
 
@@ -86,7 +86,7 @@ string SDECSpheresPlane::generate()
 	interactionGeometryDispatcher->add("InteractionSphere","InteractionBox","Box2Sphere4SDECContactModel");
 
 	shared_ptr<InteractionPhysicsDispatcher> interactionPhysicsDispatcher(new InteractionPhysicsDispatcher);
-	interactionPhysicsDispatcher->add("SDECParameters","SDECParameters","SDECLinearContactModel");
+	interactionPhysicsDispatcher->add("SDECParameters","SDECParameters","SDECMacroMicroElasticRelationships");
 		
 	shared_ptr<BoundingVolumeDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeDispatcher>(new BoundingVolumeDispatcher);
 	boundingVolumeDispatcher->add("InteractionSphere","AABB","Sphere2AABBFunctor");

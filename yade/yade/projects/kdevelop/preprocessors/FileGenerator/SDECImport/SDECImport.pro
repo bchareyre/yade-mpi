@@ -3,8 +3,7 @@
 # Subdir relative project main directory: ./preprocessors/FileGenerator/SDECImport
 # Target is a library:  
 
-LIBS += -lSDECDynamicEngine \
-        -lSAPCollider \
+LIBS += -lSAPCollider \
         -lBox \
         -lSphere \
         -lAABB \
@@ -23,17 +22,18 @@ LIBS += -lSDECDynamicEngine \
         -lInteractionSphere \
         -lInteractionBox \
         -lActionReset \
-        -lSDECLinearContactModel \
         -lCundallNonViscousMomentumDamping \
         -lCundallNonViscousForceDamping \
+        -lSDECDynamicEngine \
+        -lSDECMacroMicroElasticRelationships \
         -lSDECTimeStepper \
+        -lForceRecorder \
         -rdynamic 
-INCLUDEPATH = $(YADEINCLUDEPATH) 
+INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../plugins/Engine/DynamicEngine/SDECDynamicEngine/$(YADEDYNLIBPATH) \
-               ../../../plugins/Interaction/BroadInteractor/SAPCollider/$(YADEDYNLIBPATH) \
+QMAKE_LIBDIR = ../../../plugins/Interaction/BroadInteractor/SAPCollider/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/GeometricalModel/Box/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
@@ -52,9 +52,12 @@ QMAKE_LIBDIR = ../../../plugins/Engine/DynamicEngine/SDECDynamicEngine/$(YADEDYN
                ../../../plugins/Body/InteractionDescription/InteractionSphere/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/InteractionDescription/InteractionBox/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/Action/ActionReset/$(YADEDYNLIBPATH) \
-               ../../../plugins/Interaction/InteractionPhysicsFunctor/SDECContactPhysics/SDECLinearContactModel/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/ActionFunctor/CundallNonViscousMomentumDamping/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/ActionFunctor/CundallNonViscousForceDamping/$(YADEDYNLIBPATH) \
+               ../../../plugins/Engine/DynamicEngine/SDECDynamicEngine/$(YADEDYNLIBPATH) \
+               ../../../plugins/Interaction/InteractionPhysicsFunctor/SDECContactPhysics/SDECMacroMicroElasticRelationships/$(YADEDYNLIBPATH) \
+               ../../../plugins/Engine/DynamicEngine/SDECTimeStepper/$(YADEDYNLIBPATH) \
+               ../../../plugins/Interaction/InteractionPhysicsFunctor/SDECContactPhysics/SDECLinearContactModel/$(YADEDYNLIBPATH) \
                ../../../plugins/Geometry/GeometricalModel/Box/$(YADEDYNLIBPATH) \
                ../../../plugins/Geometry/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
                ../../../plugins/Geometry/BoundingVolume/AABB/$(YADEDYNLIBPATH) \

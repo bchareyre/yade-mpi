@@ -32,12 +32,12 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-class SDECLinearContactModel : public InteractionPhysicsFunctor
+class SDECMacroMicroElasticRelationships : public InteractionPhysicsFunctor
 {
 	// parameters of the contact, they have default values. but those values can be modifies from xml
 	public : Real alpha,beta,gamma;
 
-	public : SDECLinearContactModel();
+	public : SDECMacroMicroElasticRelationships();
 
 	public : virtual void go(	const shared_ptr<BodyPhysicalParameters>& b1,
 					const shared_ptr<BodyPhysicalParameters>& b2,
@@ -45,13 +45,13 @@ class SDECLinearContactModel : public InteractionPhysicsFunctor
 
 	protected: virtual void registerAttributes();
 
-	REGISTER_CLASS_NAME(SDECLinearContactModel);
+	REGISTER_CLASS_NAME(SDECMacroMicroElasticRelationships);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-REGISTER_SERIALIZABLE(SDECLinearContactModel,false);
+REGISTER_SERIALIZABLE(SDECMacroMicroElasticRelationships,false);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
