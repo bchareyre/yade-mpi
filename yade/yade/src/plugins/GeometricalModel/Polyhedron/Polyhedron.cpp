@@ -5,7 +5,7 @@
 using namespace std;
 
 Polyhedron::Polyhedron () : CollisionModel()
-{	
+{
 }
 
 Polyhedron::~Polyhedron ()
@@ -29,7 +29,7 @@ void Polyhedron::processAttributes()
 		triPerVertices[faces[i][1]].push_back(i);
 		triPerVertices[faces[i][2]].push_back(i);
 	}*/
-	
+
 }
 
 void Polyhedron::registerAttributes()
@@ -57,13 +57,13 @@ void Polyhedron::glDraw()
 	if (wire)
 	{
 		glDisable(GL_LIGHTING);
-		
+
 		glBegin(GL_LINES);
 			for(unsigned int i=0;i<edges.size();i++)
 			{
 				glVertex3fv(vertices[edges[i].first]);
-				glVertex3fv(vertices[edges[i].second]);			
-			}	
+				glVertex3fv(vertices[edges[i].second]);
+			}
 		glEnd();
 	}
 	else
@@ -120,20 +120,20 @@ void Polyhedron::computeNormals()
 
 void Polyhedron::loadGmshMesh(const string& fileName)
 {
-	
+
 	// all the vertices
 	//std::set<NumberedVertice,lessThantNumberedVertice> vertices;
 	int nbVertices;
 
 	map<int,int> vTranslationTable;
-	
+
 	// all others elements : edges, faces, tetrahedrons
 	std::vector<std::vector<int> > elements;
 	std::vector<int> elementsType;
 	int nbElements,type;
 
 	int n,phys,elem,nNodes;
-	char buffer[100];	
+	char buffer[100];
 
 	ifstream file(fileName.c_str());
 
@@ -144,13 +144,13 @@ void Polyhedron::loadGmshMesh(const string& fileName)
 	file >> nbVertices;
 
 	vertices.resize(nbVertices);
-		
+
 	// read all vertices
 	for(int i=0;i<nbVertices;i++)
 	{
 		file >> n >> vertices[i][0] >> vertices[i][1] >> vertices[i][2];
 		vTranslationTable[n] = i;
-	}	
+	}
 
 	// skipping return after last number
 	file.get();
@@ -165,7 +165,7 @@ void Polyhedron::loadGmshMesh(const string& fileName)
 	int nbTetras = 0;
 	int nbFaces  = 0;
 	int nbEdges  = 0;
-	
+
 	// loading all edges, faces, tetrahedrons
 	elements.resize(nbElements);
 	elementsType.resize(nbElements);
@@ -185,40 +185,39 @@ void Polyhedron::loadGmshMesh(const string& fileName)
 			default : break;
 		}
 	}
-	
+
 	// skipping return after last number
 	file.get();
 	//skipping $ELM
 	file.getline(buffer,10);
-	
+
 	file.close();
-	
+
 	tetrahedrons.resize(nbTetras);
 	faces.resize(nbFaces);
 	edges.resize(nbEdges);
-	int e,f,t;
 	for(int i=0,e=0,f=0,t=0;i<nbElements;i++)
 	{
 		switch (elementsType[i])
 		{
-			case 4 : 			
+			case 4 :
 				tetrahedrons[t].push_back(vTranslationTable[elements[i][0]]);
 				tetrahedrons[t].push_back(vTranslationTable[elements[i][1]]);
 				tetrahedrons[t].push_back(vTranslationTable[elements[i][2]]);
 				tetrahedrons[t].push_back(vTranslationTable[elements[i][3]]);
 				t++;
-				break;			
+				break;
 			case 2 :
 				faces[f].push_back(vTranslationTable[elements[i][0]]);
 				faces[f].push_back(vTranslationTable[elements[i][1]]);
 				faces[f].push_back(vTranslationTable[elements[i][2]]);
 				f++;
-				break;			
-			case 1 :			
+				break;
+			case 1 :
 				edges[e] = pair<int,int>(vTranslationTable[elements[i][0]],vTranslationTable[elements[i][1]]);
 				e++;
-				break;						
-			default : break;			
+				break;
+			default : break;
 		}
-	}	
+	}
 }

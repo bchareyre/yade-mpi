@@ -25,19 +25,16 @@
 int main(int argc, char *argv[])
 {
 	Omega::instance().init();
-	
+
 	if (argc!=2)
 	{
-		cout << "Missing parameter : name of the GUI library" << endl;
+		cout << "Missing parameter : name of the GUI library, try   ./yade YadeQtGUI" << endl;
 		return 0;
 	}
-	
+
 	shared_ptr<GUI> gui = dynamic_pointer_cast<GUI>(ClassFactory::instance().createShared(argv[1]));
 
 	Omega::instance().init();
-	Omega::instance().init();
-	Omega::instance().init();
-	Omega::instance().init();
-	Omega::instance().init();
+
 	return gui->run(argc,argv);
 }

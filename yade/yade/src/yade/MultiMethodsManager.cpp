@@ -19,7 +19,7 @@ bool MultiMethodsManager::add(const string& name)
 {
 	shared_ptr<CollisionModel> cm  = dynamic_pointer_cast<CollisionModel>(ClassFactory::instance().createShared(name));
 	int& index = cm->getClassIndex();
-	
+
 	if (index==-1)
 	{
 		index = indexedClassName.size();
@@ -31,9 +31,9 @@ bool MultiMethodsManager::add(const string& name)
 		std::vector<std::vector<shared_ptr<CollisionFunctor> > >::iterator ciEnd = callBacks.end();
 		for( ; ci != ciEnd ; ++ci )
 			(*ci).resize( indexedClassName.size() );
-			
+
 		bool found=false;
-		for(int i=0 ;i<indexedClassName.size();i++)
+		for(unsigned int i=0 ;i<indexedClassName.size();i++)
 		{
 			string functorName = name+"2"+indexedClassName[i]+"4ClosestFeatures";
 			string reverseFunctorName = indexedClassName[i]+"2"+name+"4ClosestFeatures";
@@ -84,11 +84,11 @@ bool MultiMethodsManager::go(const shared_ptr<CollisionModel> cm1, const shared_
 {
 	assert(cm1->getClassIndex()>=0);
 	assert(cm2->getClassIndex()>=0);
-	assert((unsigned int)(cm1->getClassIndex())<callBacks.size());	
+	assert((unsigned int)(cm1->getClassIndex())<callBacks.size());
 	assert((unsigned int)(cm2->getClassIndex())<callBacks.size());
-	
+
 	shared_ptr<CollisionFunctor> cf = callBacks[cm1->getClassIndex()][cm2->getClassIndex()];
-	
+
 	if (cf!=0)
 		return (*cf)(cm1,cm2,se31,se32,c);
 	else

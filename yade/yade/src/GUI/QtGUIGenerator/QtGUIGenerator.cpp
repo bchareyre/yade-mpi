@@ -38,7 +38,7 @@ using namespace std;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 QtGUIGenerator::QtGUIGenerator ()
-{ 	
+{
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -46,22 +46,22 @@ QtGUIGenerator::QtGUIGenerator ()
 
 QtGUIGenerator::~QtGUIGenerator()
 {
- 
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void QtGUIGenerator::buildGUI(shared_ptr<Serializable> s, QWidget * parent, QFrame* frame)
+void QtGUIGenerator::buildGUI(shared_ptr<Serializable> s, QWidget * /* parent ( unused )*/, QFrame* frame)
 {
 	XMLManager xmlManager;
 	s->registerAttributes();
 
 	frame->setCaption(s->getClassName().c_str());
-	
+
 	Serializable::Archives archives = s->getArchives();
 
-	
+
 	Serializable::Archives::iterator ai    = archives.begin();
 	Serializable::Archives::iterator aiEnd = archives.end();
 	int nbLines=0;
@@ -77,14 +77,14 @@ void QtGUIGenerator::buildGUI(shared_ptr<Serializable> s, QWidget * parent, QFra
 			stringstream stream;
 			(*ai)->serialize(stream,*(*ai),0);
 			string str;
-			
+
 			while (!stream.eof())
 			{
 				lineEdits.push_back(new QLineEdit(frame, (*ai)->getName().c_str() ));
-				stream >> str;				
+				stream >> str;
 				lineEdits.back()->setText(str);
 			}
-			for(int i=0;i<lineEdits.size();i++)
+			for(unsigned int i=0;i<lineEdits.size();i++)
 			{
 				int size = (100-(lineEdits.size()-1)*5)/lineEdits.size();
 				lineEdits[i]->setGeometry( QRect( 150+(size+5)*i, (20+5)*nbLines+10, size, 20 ) );
@@ -99,9 +99,9 @@ void QtGUIGenerator::buildGUI(shared_ptr<Serializable> s, QWidget * parent, QFra
 	ok->setText("OK");
 	apply->setText("Apply");
 	cancel->setText("Cancel");
-	
+
 	int width = 260+20;
-	
+
 	ok->setGeometry( QRect( (width-3*70-2*5)/2, (20+5)*nbLines+30, 70, 30 ) );
 	cancel->setGeometry( QRect( (width-3*70-2*5)/2+75, (20+5)*nbLines+30, 70, 30 ) );
 	apply->setGeometry( QRect( (width-3*70-2*5)/2+75+75, (20+5)*nbLines+30, 70, 30 ) );
@@ -112,7 +112,7 @@ void QtGUIGenerator::buildGUI(shared_ptr<Serializable> s, QWidget * parent, QFra
 	frame->setMaximumSize(size);
 	frame->setEnabled(true);
 	frame->move(10,10);
-	
+
 }
 
 

@@ -29,17 +29,18 @@ YadeQtMainWindow::YadeQtMainWindow() : YadeQtGeneratedMainWindow()
 	addItem("Preprocessor","RotatingBox");
 	addItem("Preprocessor","FEMRock");
 	createMenus();
-	
-	
+
+
 	QVBox *vbox = new QVBox( this );
 	vbox->setFrameStyle( QFrame::StyledPanel | QFrame::Sunken );
 	vbox->setMargin( 2 );
 	vbox->setLineWidth( 2 );
 
-	workspace = new QWorkspace( vbox );	
+	workspace = new QWorkspace( vbox );
 	workspace->setBackgroundMode( PaletteMid );
 	setCentralWidget( vbox );
-	
+
+/*
 	QtGUIGenerator guiGen;
 	shared_ptr<RigidBody> rb(new RigidBody);
 	rb->mass = 11;
@@ -50,7 +51,7 @@ YadeQtMainWindow::YadeQtMainWindow() : YadeQtGeneratedMainWindow()
 	frame = new QFrame(workspace);
 	guiGen.buildGUI(rb,workspace,frame);
 	frame->show();
-
+*/
 
 }
 
@@ -87,7 +88,7 @@ void YadeQtMainWindow::createMenus()
 	map<string,QPopupMenu*>::reverse_iterator miEnd = menus.rend();
 	for(;mi!=miEnd;++mi)
 		MenuBar->insertItem( QString((*mi).first), (*mi).second);
-		 
+
 }
 
 void YadeQtMainWindow::fileNewSimulation()
@@ -95,15 +96,18 @@ void YadeQtMainWindow::fileNewSimulation()
 	QString selectedFilter;
 	QString fileName = QFileDialog::getOpenFileName("../data", "XML Yade File (*.xml)", this,"Open File","Choose a file to open",&selectedFilter );
 
-	if (!fileName.isEmpty()) 
-	{		
+	if (!fileName.isEmpty())
+	{
 		setCaption( "Yade - "+fileName);
 		if (selectedFilter=="XML Yade File (*.xml)")
 		{
+		// FIXME - resetting the rootBody shouldn't be here. It shoul dbe inside Omega. As well as all Omega variables SHOULD be private!
+		// FIXME - and this doesn't work - spheres disappear!
+//			Omega::instance().rootBody = shared_ptr<NonConnexBody>(new NonConnexBody);
 			IOManager::loadFromFile("XMLManager",fileName,"rootBody",Omega::instance().rootBody);
 			Omega::instance().logMessage("Loading file ../data/scene.xml");
 			glViewer = shared_ptr<GLViewer>(new GLViewer(workspace));
-			glViewer->show();	
+			glViewer->show();
 		}
 	}
 }
