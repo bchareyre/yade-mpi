@@ -15,6 +15,12 @@ yade
 
 --------- end
 
+---------- tagging example:
+
+svn copy svn+ssh://svn.berlios.de/svnroot/repos/yade/trunk/yade svn+ssh://svn.berlios.de/svnroot/repos/yade/tags/yade-0.1/yade-0.1.2-m "Tagging version 0.1.2 after adding multimethods and before adding Cloth"
+
+---------- end
+
 You should know that yade is in early development stage. It compiles and runs,
 but is still not very useful.
 

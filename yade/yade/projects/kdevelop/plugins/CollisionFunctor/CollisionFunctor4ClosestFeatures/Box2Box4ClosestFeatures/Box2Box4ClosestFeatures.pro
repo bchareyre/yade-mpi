@@ -14,7 +14,8 @@ INCLUDEPATH = ../../../../plugins/GeometricalModel/Box \
               ../../../../yade \
               ../../../../toolboxes/ComputationalGeometry/Intersections \
               ../../../../toolboxes/Math/M3D \
-              ../../../../toolboxes/Math/Constants 
+              ../../../../toolboxes/Math/Constants \
+              ../../../../toolboxes/Libraries/Serialization 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
@@ -25,7 +26,7 @@ QMAKE_LIBDIR = ../../../../plugins/GeometricalModel/Box/$(YADEDYNLIBPATH) \
                ../../../../toolboxes/ComputationalGeometry/Intersections/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
-CONFIG += release \
+CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 

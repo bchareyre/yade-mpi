@@ -45,7 +45,7 @@ class Tree
 		root->next=NULL;
 		root->childs.resize(0);
 		levels[0]=root;
-	}
+	};
 	
 	public : virtual ~Tree<NodeDataType>() {};
 	

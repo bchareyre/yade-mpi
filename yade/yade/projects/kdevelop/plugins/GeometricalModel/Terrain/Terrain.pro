@@ -6,21 +6,24 @@
 LIBS += -lConstants \
         -lM3D \
         -lM2D \
+        -lSerialization \
         -rdynamic 
 INCLUDEPATH = ../../../plugins/BoundingVolume/AABB \
               ../../../yade \
               ../../../toolboxes/Math/M2D \
+              ../../../toolboxes/Math/M3D \
               ../../../toolboxes/Math/Constants \
-              ../../../toolboxes/Math/M3D 
+              ../../../toolboxes/Libraries/Serialization 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 QMAKE_LIBDIR = ../../../toolboxes/Math/Constants/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Math/M3D/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Math/M2D/$(YADEDYNLIBPATH) \
+               ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
-CONFIG += release \
+CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 

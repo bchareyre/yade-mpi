@@ -21,8 +21,8 @@ QtFrontEnd::QtFrontEnd() : QtGeneratedFrontEnd(),FrontEnd()
 	glViewer->show();	
 
 	// FIXME : no hardcoded file generator
-	ClassFactory::instance().createShared("RotatingBox");
-
+	//ClassFactory::instance().createShared("RotatingBox");
+	ClassFactory::instance().createShared("HangingCloth");
 	loadScene();
 
 }
@@ -35,6 +35,9 @@ QtFrontEnd::~QtFrontEnd()
 
 void QtFrontEnd::loadScene()
 {
+	// FIXME : don't load scene in a hardcoded way
+	
 	IOManager::loadFromFile("XMLManager","../data/scene.xml","rootBody",Omega::instance().rootBody);
+	
 	Omega::instance().logMessage("Loading file ../data/scene.xml");
 }

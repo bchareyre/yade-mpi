@@ -1,6 +1,6 @@
  
-#ifndef __SIMPLESCENE_H__
-#define __SIMPLESCENE_H__
+#ifndef __ROTATINGBOX_H__
+#define __ROTATINGBOX_H__
 
 #include "Serializable.hpp"
 
@@ -20,5 +20,5 @@ class RotatingBox : public Serializable
 
 REGISTER_CLASS(RotatingBox,false);
 
-#endif // __SIMPLESCENE_H__
+#endif // __ROTATINGBOX_H__
  

@@ -65,7 +65,9 @@ RecordType findType(Type& ,bool& fundamental, string& str)
 		return SERIALIZABLE;
 	}
 	else if (ClassFactory::instance().findClassInfo(typeid(Type),type,str,fundamental))
+	{
 		return type;
+	}
 	else
 		throw SerializableError(ExceptionMessages::SerializableUnknown2);
 };
@@ -77,12 +79,14 @@ RecordType findType(Type& ,bool& fundamental, string& str)
 template<typename Type>
 inline shared_ptr<Archive> Archive::create(const string& name,Type& attribute)
 {
-	shared_ptr<Archive> ac;
 
+	shared_ptr<Archive> ac;
+	
 	ac = shared_ptr<Archive>(new Archive(name));
 	
 	string SerializableClassName;
 	bool fundamental;
+
 	
 	ac->setRecordType(findType(attribute, fundamental, SerializableClassName));
 

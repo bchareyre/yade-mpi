@@ -14,6 +14,7 @@ LIBS += -lAABB \
         -lConstants \
         -lM3D \
         -lRand \
+        -lSerialization \
         -rdynamic 
 INCLUDEPATH = ../../../plugins/KinematicEngine/Rotor \
               ../../../plugins/DynamicEngine/SimpleSpringDynamicEngine \
@@ -24,9 +25,10 @@ INCLUDEPATH = ../../../plugins/KinematicEngine/Rotor \
               ../../../plugins/BoundingVolume/AABB \
               ../../../plugins/Body/RigidBody \
               ../../../yade \
-              ../../../toolboxes/Math/Constants \
               ../../../toolboxes/Math/M3D \
-              ../../../toolboxes/Math/Rand 
+              ../../../toolboxes/Math/Rand \
+              ../../../toolboxes/Math/Constants \
+              ../../../toolboxes/Libraries/Serialization 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
@@ -41,9 +43,10 @@ QMAKE_LIBDIR = ../../../plugins/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Math/Constants/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Math/M3D/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Math/Rand/$(YADEDYNLIBPATH) \
+               ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
-CONFIG += release \
+CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 

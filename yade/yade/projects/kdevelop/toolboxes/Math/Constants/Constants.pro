@@ -3,14 +3,14 @@
 # Subdir relative project main directory: ./toolboxes/Math/Constants
 # Target is a library:  
 
-HEADERS += Constants.hpp 
-SOURCES += Constants.cpp 
 LIBS += -rdynamic 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
-CONFIG += release \
+CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
+HEADERS += Constants.hpp 
+SOURCES += Constants.cpp 

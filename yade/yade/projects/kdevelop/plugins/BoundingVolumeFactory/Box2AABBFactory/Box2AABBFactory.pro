@@ -11,8 +11,9 @@ LIBS += -lAABB \
 INCLUDEPATH = ../../../plugins/GeometricalModel/Box \
               ../../../plugins/BoundingVolume/AABB \
               ../../../yade \
+              ../../../toolboxes/Math/M3D \
               ../../../toolboxes/Math/Constants \
-              ../../../toolboxes/Math/M3D 
+              ../../../toolboxes/Libraries/Serialization 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
@@ -22,7 +23,7 @@ QMAKE_LIBDIR = ../../../plugins/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Math/M3D/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
-CONFIG += release \
+CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 

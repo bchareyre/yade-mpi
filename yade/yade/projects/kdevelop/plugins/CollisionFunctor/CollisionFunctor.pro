@@ -3,10 +3,10 @@
 # Subdir relative project main directory: ./plugins/CollisionFunctor
 # Target is a subdirs project 
 
-SUBDIRS += CollisionFunctor4ClosestFeatures 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-CONFIG += release \
+CONFIG += debug \
           warn_on 
 TEMPLATE = subdirs 
+SUBDIRS += CollisionFunctor4ClosestFeatures 

@@ -7,17 +7,17 @@ LIBS += -lM3D \
         -lConstants \
         -rdynamic 
 INCLUDEPATH = ../../../yade \
-              ../../../toolboxes/Libraries/Serialization \
               ../../../toolboxes/Math/M3D \
-              ../../../toolboxes/Math/Constants 
+              ../../../toolboxes/Math/Constants \
+              ../../../toolboxes/Libraries/Serialization 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 QMAKE_LIBDIR = ../../../toolboxes/Math/M3D/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Math/Constants/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
-DESTDIR = $(YADEDYNLIBATH) 
-CONFIG += release \
+DESTDIR = $(YADEDYNLIBPATH) 
+CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 

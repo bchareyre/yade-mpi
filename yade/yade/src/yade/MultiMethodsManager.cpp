@@ -55,6 +55,7 @@ bool MultiMethodsManager::add(const string& name)
 				}
 				catch (FactoryCantCreate& fe)
 				{
+					return false;
 				}
 			}
 
