@@ -8,7 +8,7 @@
 #include "ComplexBody.hpp"
 #include "SimpleSpringDynamicEngine.hpp"
 #include "PersistentSAPCollider.hpp"
-#include "MassSpringBody.hpp"
+#include "ComplexBody.hpp"
 #include "ExplicitMassSpringDynamicEngine.hpp"
 #include "MassSpringBody2RigidBodyDynamicEngine.hpp"
 
@@ -69,7 +69,7 @@ void HangingCloth::registerAttributes()
 string HangingCloth::generate()
 {
 	
-	rootBody = shared_ptr<ComplexBody>(new MassSpringBody);
+	rootBody = shared_ptr<ComplexBody>(new ComplexBody);
 
 	Quaternionr q;
 	q.fromAxisAngle( Vector3r(0,0,1),0);

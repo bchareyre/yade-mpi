@@ -76,7 +76,7 @@ string SDECSpheresPlane::generate()
 	bvu->addBoundingVolumeFunctors("InteractionDescriptionSet","AABB","InteractionDescriptionSet2AABBFunctor");
 	
 	shared_ptr<ActionDispatcher> ad(new ActionDispatcher);
-	ad->addActionFunctor("ActionForce","RigidBody","ActionForce2RigidBody");
+	ad->addActionFunctor("ActionForce","RigidBody","ActionForce2Particle");
 	ad->addActionFunctor("ActionMomentum","RigidBody","ActionMomentum2RigidBody");
 	
 	shared_ptr<TimeIntegratorDispatcher> ti(new TimeIntegratorDispatcher);

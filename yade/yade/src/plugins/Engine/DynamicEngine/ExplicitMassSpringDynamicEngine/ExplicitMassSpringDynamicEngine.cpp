@@ -20,7 +20,7 @@ void ExplicitMassSpringDynamicEngine::registerAttributes()
 
 void ExplicitMassSpringDynamicEngine::respondToInteractions(Body * body)
 {
-	MassSpringBody * massSpring = dynamic_cast<MassSpringBody*>(body);
+	ComplexBody * massSpring = dynamic_cast<ComplexBody*>(body);
 	shared_ptr<BodyContainer> bodies = massSpring->bodies;
 	shared_ptr<InteractionContainer> permanentInteractions = massSpring->permanentInteractions;
 	shared_ptr<ActionContainer> actions = massSpring->actions;

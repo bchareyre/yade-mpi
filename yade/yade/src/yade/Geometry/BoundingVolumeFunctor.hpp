@@ -58,9 +58,9 @@ class BoundingVolumeFunctor : public FunctorWrapper
 		 void ,
 		 TYPELIST_4(
 		 		  const shared_ptr<InteractionDescription>&
-				, shared_ptr<BoundingVolume>&
+				, shared_ptr<BoundingVolume>& // is not working when const, because functors are supposed to modify it!
 				, const Se3r& // FIXME - remove Se3r, because not everything is supposed to have it. If some function needs Se3r it must find it through Body*
-				, const Body*
+				, const Body* // with that - functors have all the data they may need, but it's const, so they can't modify it !
 		)>
 {	
 };

@@ -4,8 +4,7 @@
 # Target is a subdirs project 
 
 SUBDIRS += ActionForce2Particle \
-           ActionMomentum2RigidBody \
-           ActionForce2RigidBody 
+           ActionMomentum2RigidBody
 CONFIG += release \
           warn_on 
 TEMPLATE = subdirs 

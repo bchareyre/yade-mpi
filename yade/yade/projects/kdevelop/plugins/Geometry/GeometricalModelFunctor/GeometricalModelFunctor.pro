@@ -9,5 +9,6 @@ OBJECTS_DIR = $(YADECOMPILATIONPATH)
 CONFIG += debug \
           warn_on 
 TEMPLATE = subdirs 
-SUBDIRS += VRML2TerrainFunctor
+SUBDIRS += ParticleSet2Mesh2D \
+           VRML2TerrainFunctor
 

@@ -79,6 +79,7 @@ string FileDialog::getSaveFileName(const string& directory,const string& filters
 	const QString f(filters.c_str());
 		
 	shared_ptr<FileDialog> fd = shared_ptr<FileDialog>(new FileDialog(d,f,caption,parent));
+	fd->setMode( QFileDialog::AnyFile );
 	fd->exec();
 	selectedFilter = fd->selectedFilter().data();
 	return fd->selectedFile().data();
