@@ -1,4 +1,5 @@
 #include "Terrain.hpp"
+#include "Constants.hpp"
 
 #include <iostream>
 #include <GL/gl.h>

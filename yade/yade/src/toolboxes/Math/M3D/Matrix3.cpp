@@ -665,7 +665,7 @@ void Matrix3::ToAxisAngle (Vector3& rkAxis, float& rfRadians) const
 
     if ( rfRadians > 0.0f )
     {
-        if ( rfRadians < Math::PI )
+        if ( rfRadians < Constants::PI )
         {
             rkAxis.x = m[2][1]-m[1][2];
             rkAxis.y = m[0][2]-m[2][0];
@@ -783,7 +783,7 @@ bool Matrix3::ToEulerAnglesXYZ (float& rfXAngle, float& rfYAngle, float& rfZAngl
         {
             // WARNING.  Not unique.  XA - ZA = -atan2(r10,r11)
             rfXAngle = -atan2(m[1][0],m[1][1]);
-            rfYAngle = -Math::HALF_PI;
+            rfYAngle = -Constants::HALF_PI;
             rfZAngle = 0.0f;
             return false;
         }
@@ -792,7 +792,7 @@ bool Matrix3::ToEulerAnglesXYZ (float& rfXAngle, float& rfYAngle, float& rfZAngl
     {
         // WARNING.  Not unique.  XAngle + ZAngle = atan2(r10,r11)
         rfXAngle = atan2(m[1][0],m[1][1]);
-        rfYAngle = Math::HALF_PI;
+        rfYAngle = Constants::HALF_PI;
         rfZAngle = 0.0f;
         return false;
     }
@@ -820,7 +820,7 @@ bool Matrix3::ToEulerAnglesXZY (float& rfXAngle, float& rfZAngle, float& rfYAngl
         {
             // WARNING.  Not unique.  XA - YA = atan2(r20,r22)
             rfXAngle = atan2(m[2][0],m[2][2]);
-            rfZAngle = Math::HALF_PI;
+            rfZAngle = Constants::HALF_PI;
             rfYAngle = 0.0f;
             return false;
         }
@@ -829,7 +829,7 @@ bool Matrix3::ToEulerAnglesXZY (float& rfXAngle, float& rfZAngle, float& rfYAngl
     {
         // WARNING.  Not unique.  XA + YA = atan2(-r20,r22)
         rfXAngle = atan2(-m[2][0],m[2][2]);
-        rfZAngle = -Math::HALF_PI;
+        rfZAngle = -Constants::HALF_PI;
         rfYAngle = 0.0f;
         return false;
     }
@@ -857,7 +857,7 @@ bool Matrix3::ToEulerAnglesYXZ (float& rfYAngle, float& rfXAngle, float& rfZAngl
         {
             // WARNING.  Not unique.  YA - ZA = atan2(r01,r00)
             rfYAngle = atan2(m[0][1],m[0][0]);
-            rfXAngle = Math::HALF_PI;
+            rfXAngle = Constants::HALF_PI;
             rfZAngle = 0.0f;
             return false;
         }
@@ -866,7 +866,7 @@ bool Matrix3::ToEulerAnglesYXZ (float& rfYAngle, float& rfXAngle, float& rfZAngl
     {
         // WARNING.  Not unique.  YA + ZA = atan2(-r01,r00)
         rfYAngle = atan2(-m[0][1],m[0][0]);
-        rfXAngle = -Math::HALF_PI;
+        rfXAngle = -Constants::HALF_PI;
         rfZAngle = 0.0f;
         return false;
     }
@@ -894,7 +894,7 @@ bool Matrix3::ToEulerAnglesYZX (float& rfYAngle, float& rfZAngle, float& rfXAngl
         {
             // WARNING.  Not unique.  YA - XA = -atan2(r21,r22);
             rfYAngle = -atan2(m[2][1],m[2][2]);
-            rfZAngle = -Math::HALF_PI;
+            rfZAngle = -Constants::HALF_PI;
             rfXAngle = 0.0f;
             return false;
         }
@@ -903,7 +903,7 @@ bool Matrix3::ToEulerAnglesYZX (float& rfYAngle, float& rfZAngle, float& rfXAngl
     {
         // WARNING.  Not unique.  YA + XA = atan2(r21,r22)
         rfYAngle = atan2(m[2][1],m[2][2]);
-        rfZAngle = Math::HALF_PI;
+        rfZAngle = Constants::HALF_PI;
         rfXAngle = 0.0f;
         return false;
     }
@@ -931,7 +931,7 @@ bool Matrix3::ToEulerAnglesZXY (float& rfZAngle, float& rfXAngle, float& rfYAngl
         {
             // WARNING.  Not unique.  ZA - YA = -atan(r02,r00)
             rfZAngle = -atan2(m[0][2],m[0][0]);
-            rfXAngle = -Math::HALF_PI;
+            rfXAngle = -Constants::HALF_PI;
             rfYAngle = 0.0f;
             return false;
         }
@@ -940,7 +940,7 @@ bool Matrix3::ToEulerAnglesZXY (float& rfZAngle, float& rfXAngle, float& rfYAngl
     {
         // WARNING.  Not unique.  ZA + YA = atan2(r02,r00)
         rfZAngle = atan2(m[0][2],m[0][0]);
-        rfXAngle = Math::HALF_PI;
+        rfXAngle = Constants::HALF_PI;
         rfYAngle = 0.0f;
         return false;
     }
@@ -968,7 +968,7 @@ bool Matrix3::ToEulerAnglesZYX (float& rfZAngle, float& rfYAngle, float& rfXAngl
         {
             // WARNING.  Not unique.  ZA - XA = -atan2(r01,r02)
             rfZAngle = -atan2(m[0][1],m[0][2]);
-            rfYAngle = Math::HALF_PI;
+            rfYAngle = Constants::HALF_PI;
             rfXAngle = 0.0f;
             return false;
         }
@@ -977,7 +977,7 @@ bool Matrix3::ToEulerAnglesZYX (float& rfZAngle, float& rfYAngle, float& rfXAngl
     {
         // WARNING.  Not unique.  ZA + XA = atan2(-r01,-r02)
         rfZAngle = atan2(-m[0][1],-m[0][2]);
-        rfYAngle = -Math::HALF_PI;
+        rfYAngle = -Constants::HALF_PI;
         rfXAngle = 0.0f;
         return false;
     }

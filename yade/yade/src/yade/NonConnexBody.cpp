@@ -4,7 +4,7 @@
 
 #include <GL/gl.h>
 #include <GL/glut.h>
-
+#include "Constants.hpp"
 #include "NonConnexBody.hpp"
 
 NonConnexBody::NonConnexBody() : Body()

@@ -1,5 +1,6 @@
 #include "RotatingBox.hpp"
- 
+
+#include "Rand.hpp" 
 #include "Box.hpp"
 #include "AABB.hpp"
 #include "Sphere.hpp"
@@ -9,7 +10,7 @@
 #include "Rotor.hpp"
 #include "SimpleNarrowCollider.hpp"
 #include "RigidBody.hpp"
-#include "Rand.hpp"
+
 #include <fstream>
 #include "IOManager.hpp"
 

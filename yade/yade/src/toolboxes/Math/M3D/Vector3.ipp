@@ -162,7 +162,7 @@ inline Vector3 Vector3::operator/ (float f) const
         return Vector3(invF*x,invF*y,invF*z);
     }
     else
-        return Vector3(Math::MAX_FLOAT,Math::MAX_FLOAT,Math::MAX_FLOAT);
+        return Vector3(Constants::MAX_FLOAT,Constants::MAX_FLOAT,Constants::MAX_FLOAT);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -228,9 +228,9 @@ inline Vector3& Vector3::operator/= (float f)
     }
     else
     {
-        x = Math::MAX_FLOAT;
-        y = Math::MAX_FLOAT;
-        z = Math::MAX_FLOAT;
+        x = Constants::MAX_FLOAT;
+        y = Constants::MAX_FLOAT;
+        z = Constants::MAX_FLOAT;
     }
 
     return *this;

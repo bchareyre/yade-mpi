@@ -1,5 +1,6 @@
 #include "Rotor.hpp"
 #include "RigidBody.hpp"
+#include "Constants.hpp"
 	
 Rotor::Rotor () : KinematicEngine() // encapsuler dans implicitfunction user redefini uniquement dp = || interpolateur ...
 {

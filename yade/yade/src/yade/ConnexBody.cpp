@@ -6,6 +6,8 @@
 #include <GL/glut.h>
 
 #include "ConnexBody.hpp"
+#include "Constants.hpp"
+
 #include <iostream>
 
 using namespace std;
