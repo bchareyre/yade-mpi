@@ -1,5 +1,6 @@
 #! /bin/sh
 
+# YADEPATH
 if [ "${YADEPATH:-nothing}" = "nothing" ];
 then
   echo "ERROR:  YADEPATH is not defined, you forgot to run:";
@@ -7,6 +8,46 @@ then
   exit 0;
 else
   echo "I'm using YADEPATH="${YADEPATH};
+fi
+
+# YADEBINPATH
+if [ "${YADEBINPATH:-nothing}" = "nothing" ];
+then
+  echo "ERROR:  YADEBINPATHis not defined, you forgot to run:";
+  echo "        source ./yadeEnv YOUR_PATH_TO_YADE";
+  exit 0;
+else
+  echo "I'm using YADEBINPATH="${YADEBINPATH};
+fi
+
+# YADECOMPILATIONPATH
+if [ "${YADECOMPILATIONPATH:-nothing}" = "nothing" ];
+then
+  echo "ERROR:  YADECOMPILATIONPATH is not defined, you forgot to run:";
+  echo "        source ./yadeEnv YOUR_PATH_TO_YADE";
+  exit 0;
+else
+  echo "I'm using YADECOMPILATIONPATH="${YADECOMPILATIONPATH};
+fi
+
+# YADEDYNLIBPATH
+if [ "${YADEDYNLIBPATH:-nothing}" = "nothing" ];
+then
+  echo "ERROR:  YADEDYNLIBPATHis not defined, you forgot to run:";
+  echo "        source ./yadeEnv YOUR_PATH_TO_YADE";
+  exit 0;
+else
+  echo "I'm using YADEDYNLIBPATH="${YADEDYNLIBPATH};
+fi
+
+# YADEINCLUDEPATH
+if [ "${YADEINCLUDEPATH:-nothing}" = "nothing" ];
+then
+  echo "ERROR:  YADEINCLUDEPATHis not defined, you forgot to run:";
+  echo "        source ./yadeEnv YOUR_PATH_TO_YADE";
+  exit 0;
+else
+  echo "I'm using YADEINCLUDEPATH="${YADEINCLUDEPATH};
 fi
 
 ./removeSymLinks

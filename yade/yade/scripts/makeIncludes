@@ -9,7 +9,10 @@ echo 'cd $TMPDIR'										>> makeSymLinkIncl
 echo 'ln -s $ORGDIR/$1 `basename $TMPNAME`'							>> makeSymLinkIncl
 echo 'cd $ORGDIR'										>> makeSymLinkIncl
 
-rm -rf $YADEINCLUDEPATH/*
+# this line is wrong, because YADEINCLUDEPATH is not defined when we run ./prepareToDevelop
+# rm -rf $YADEINCLUDEPATH/*
+
+rm -rf ../include/*
 
 chmod a+x ./makeSymLinkIncl
 
