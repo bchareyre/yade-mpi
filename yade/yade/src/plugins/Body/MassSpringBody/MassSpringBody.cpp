@@ -31,11 +31,10 @@ void MassSpringBody::registerAttributes()
 void MassSpringBody::glDrawGeometricalModel()
 {
 	Mesh2D * mesh2d = static_cast<Mesh2D*>(gm.get());
-	for(unsigned int i=0;i<mesh2d->vertices.size();i++)
-	{
-		Particle * particle = static_cast<Particle*>((*bodies)[i].get());
-		mesh2d->vertices[i]=particle->se3.translation;
-	}
+	unsigned int i=0;
+	for(bodies->gotoFirst();bodies->notAtEnd();bodies->gotoNext(),i++)
+		mesh2d->vertices[i]=bodies->getCurrent()->se3.translation;
+		
 	gm->glDraw();
 }
 

@@ -28,49 +28,49 @@ void MassSpringBody2RigidBodyDynamicEngine::registerAttributes()
 
 void MassSpringBody2RigidBodyDynamicEngine::respondToCollisions(Body * body)
 {
-	NonConnexBody * ncb = dynamic_cast<NonConnexBody*>(body);
-	shared_ptr<Interaction> ct;
-
-//	for( ; ii!=iiEnd ; ++ii)
-	for( ncb->interactions->gotoFirst() ; ncb->interactions->notAtEnd() ; ncb->interactions->gotoNext() )
-	{
-		ct = ncb->interactions->getCurrent();
-
-
-		shared_ptr<ClosestFeatures> cf = dynamic_pointer_cast<ClosestFeatures>(ct->interactionGeometry);
-		//FIXME : this is a hack because we don't know if id1 is the sphere or piece of massSpring
- 		shared_ptr<MassSpringBody> c = dynamic_pointer_cast<MassSpringBody>( (*(ncb->bodies))[ct->getId1()] );
-		shared_ptr<RigidBody> rb = dynamic_pointer_cast<RigidBody>( (*(ncb->bodies))[ct->getId2()] );
-		shared_ptr<Mesh2D> mesh;
-		if (c)
-		{
-			mesh = dynamic_pointer_cast<Mesh2D>(c->gm);
-			for(unsigned int i=0;i<cf->verticesId.size();i++)
-			{
-
-				Vector3r p1 = cf->closestsPoints[i].first;
-				Vector3r p2 = cf->closestsPoints[i].second;
-				Vector3r dir = p2-p1;
-				Real l = dir.normalize();
-				Real relativeVelocity = dir.dot(rb->velocity);
-				Real fi = 0.1*l*l/3.0+relativeVelocity*10;
-				Vector3r f = fi*dir;
-				rb->acceleration -= f*rb->invMass;
-
-				c->externalForces.push_back(pair<int,Vector3r>(mesh->faces[cf->verticesId[i]][0],f));
-				c->externalForces.push_back(pair<int,Vector3r>(mesh->faces[cf->verticesId[i]][1],f));
-				c->externalForces.push_back(pair<int,Vector3r>(mesh->faces[cf->verticesId[i]][2],f));
-			}
-		}
-	////////////// commented this because it hacks too much stuff...
-	///	else //if (cf->verticesId.size()==0)
-	///		tmpI.push_back(*ii);
-	}
-
-	shared_ptr<DynamicEngine> de = dynamic_pointer_cast<DynamicEngine>(ClassFactory::instance().createShared("SimpleSpringDynamicEngine"));
-
-	//FIXME : this is no more working with the actors system
-	//de->respondToCollisions(body,tmpI);
-
+// /*	NonConnexBody * ncb = dynamic_cast<NonConnexBody*>(body);
+// 	shared_ptr<Interaction> ct;
+// 
+// 
+// 	for( ncb->interactions->gotoFirst() ; ncb->interactions->notAtEnd() ; ncb->interactions->gotoNext() )
+// 	{
+// 		ct = ncb->interactions->getCurrent();
+// 
+// 
+// 		shared_ptr<ClosestFeatures> cf = dynamic_pointer_cast<ClosestFeatures>(ct->interactionGeometry);
+// 		FIXME : this is a hack because we don't know if id1 is the sphere or piece of massSpring
+//  		shared_ptr<MassSpringBody> c = dynamic_pointer_cast<MassSpringBody>( (*(ncb->bodies))[ct->getId1()] );
+// 		shared_ptr<RigidBody> rb = dynamic_pointer_cast<RigidBody>( (*(ncb->bodies))[ct->getId2()] );
+// 		shared_ptr<Mesh2D> mesh;
+// 		if (c)
+// 		{
+// 			mesh = dynamic_pointer_cast<Mesh2D>(c->gm);
+// 			for(unsigned int i=0;i<cf->verticesId.size();i++)
+// 			{
+// 
+// 				Vector3r p1 = cf->closestsPoints[i].first;
+// 				Vector3r p2 = cf->closestsPoints[i].second;
+// 				Vector3r dir = p2-p1;
+// 				Real l = dir.normalize();
+// 				Real relativeVelocity = dir.dot(rb->velocity);
+// 				Real fi = 0.1*l*l/3.0+relativeVelocity*10;
+// 				Vector3r f = fi*dir;
+// 				rb->acceleration -= f*rb->invMass;
+// 
+// 				c->externalForces.push_back(pair<int,Vector3r>(mesh->faces[cf->verticesId[i]][0],f));
+// 				c->externalForces.push_back(pair<int,Vector3r>(mesh->faces[cf->verticesId[i]][1],f));
+// 				c->externalForces.push_back(pair<int,Vector3r>(mesh->faces[cf->verticesId[i]][2],f));
+// 			}
+// 		}
+// 	//////////// commented this because it hacks too much stuff...
+// 	/	else //if (cf->verticesId.size()==0)
+// 	/		tmpI.push_back(*ii);
+// 	}
+// 
+// 	shared_ptr<DynamicEngine> de = dynamic_pointer_cast<DynamicEngine>(ClassFactory::instance().createShared("SimpleSpringDynamicEngine"));
+// 
+// 	FIXME : this is no more working with the actors system
+// 	de->respondToCollisions(body,tmpI);
+// */
 }
 

@@ -64,6 +64,8 @@ class BoundingVolumeUpdator : public Actor
 	public : void updateBoundingVolume(shared_ptr<Body> b);
 	REGISTER_CLASS_NAME(BoundingVolumeUpdator);
 
+	public : bool isActivated();
+
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -87,13 +87,13 @@ string HangingCloth::generate()
 	ad->addActionFunctor("ActionForce","Particle","ActionForce2Particle");
 
 	
-	rootBody->actors.resize(3);
+	rootBody->actors.resize(4);
 	rootBody->actors[0] 		= bvu;	
-	//rootBody->actors[1] 		= shared_ptr<Actor>(new PersistentSAPCollider);
+	rootBody->actors[1] 		= shared_ptr<Actor>(new PersistentSAPCollider);
 	//rootBody->actors[2] 		= igd;
 	//rootBody->actors[3] 		= ipd;
-	rootBody->actors[1] 		= shared_ptr<Actor>(new ExplicitMassSpringDynamicEngine);
-	rootBody->actors[2] 		= ad;
+	rootBody->actors[2] 		= shared_ptr<Actor>(new ExplicitMassSpringDynamicEngine);
+	rootBody->actors[3] 		= ad;
 
 	rootBody->permanentInteractions->clear();
 
