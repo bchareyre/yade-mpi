@@ -47,18 +47,19 @@ void MassSpringBody2RigidBodyDynamicEngine::respondToCollisions(Body * body, con
 			mesh = dynamic_pointer_cast<Mesh2D>(c->gm);
 			for(unsigned int i=0;i<cf->verticesId.size();i++)
 			{
+				
 				Vector3 p1 = cf->closestsPoints[i].first;
 				Vector3 p2 = cf->closestsPoints[i].second;
 				Vector3 dir = p2-p1;
 				float l = dir.unitize();
-				//FIXME :  put stiffness as a parameter of the engine
-				float fi = 500*l;
-				Vector3 f = (fi*dir)/cf->verticesId.size();
+				float relativeVelocity = dir.dot(rb->velocity);
+				float fi = 0.1*l*l/3.0+relativeVelocity*10;
+				Vector3 f = fi*dir;
 				rb->acceleration -= f*rb->invMass;
 				
-				c->externalForces.push_back(pair<int,Vector3>(mesh->faces[cf->verticesId[i]][0],f/3.0));
-				c->externalForces.push_back(pair<int,Vector3>(mesh->faces[cf->verticesId[i]][1],f/3.0));
-				c->externalForces.push_back(pair<int,Vector3>(mesh->faces[cf->verticesId[i]][2],f/3.0));
+				c->externalForces.push_back(pair<int,Vector3>(mesh->faces[cf->verticesId[i]][0],f));
+				c->externalForces.push_back(pair<int,Vector3>(mesh->faces[cf->verticesId[i]][1],f));
+				c->externalForces.push_back(pair<int,Vector3>(mesh->faces[cf->verticesId[i]][2],f));
 			}		
 		}
 		else //if (cf->verticesId.size()==0)

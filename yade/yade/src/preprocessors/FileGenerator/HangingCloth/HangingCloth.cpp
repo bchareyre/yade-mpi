@@ -37,10 +37,10 @@ void HangingCloth::registerAttributes()
 void HangingCloth::exec()
 {
 	shared_ptr<NonConnexBody> rootBody(new NonConnexBody);
-	int width = 20;
-	int height = 20;
+	int width = 40;
+	int height = 40;
 	float mass = 10;
-	const int cellSize = 20;
+	const int cellSize = 10;
 	Quaternion q;
 	int nbSpheres = 10;
 	q.fromAngleAxis(0, Vector3(0,0,1));
@@ -67,7 +67,7 @@ void HangingCloth::exec()
 	cloth->velocity		= Vector3(0,0,0);
 	cloth->mass		= mass;
 	cloth->se3		= Se3(Vector3(0,0,0),q);
-	cloth->stiffness	= 100;
+	cloth->stiffness	= 500;
 	cloth->damping		= 0.1;
 	for(int i=0;i<width*height;i++)
 		cloth->properties.push_back(NodeProperties((float)(width*height)/mass));
@@ -132,16 +132,19 @@ void HangingCloth::exec()
 	rootBody->bodies.push_back(dynamic_pointer_cast<Body>(cloth));
 
 
-	for(int i=0;i<nbSpheres;i++)
+	for(int i=0;i<1/*nbSpheres*/;i++)
 	{
 		shared_ptr<RigidBody> s(new RigidBody);
 		shared_ptr<AABB> aabb(new AABB);
 		shared_ptr<Sphere> csphere(new Sphere);
 		shared_ptr<Sphere> gsphere(new Sphere);
 		
-		Vector3 translation(100*Rand::symmetricRandom(),10+100*Rand::unitRandom(),100*Rand::symmetricRandom());
-		float radius = 0.5*(20+10*Rand::unitRandom());
-
+		
+		Vector3 translation(0,60,0);
+		float radius = 50;
+		
+		//Vector3 translation(100*Rand::symmetricRandom(),10+100*Rand::unitRandom(),100*Rand::symmetricRandom());
+		//float radius = 0.5*(20+10*Rand::unitRandom());
 		shared_ptr<BallisticDynamicEngine> ballistic(new BallisticDynamicEngine);
 		ballistic->damping 	= 0.999;
 		s->dynamic		= dynamic_pointer_cast<DynamicEngine>(ballistic);
@@ -149,8 +152,8 @@ void HangingCloth::exec()
 		s->isDynamic		= true;
 		s->angularVelocity	= Vector3(0,0,0);
 		s->velocity		= Vector3(0,0,0);
-		s->mass			= 0.3;
-		s->inertia		= Vector3(1,1,1);
+		s->mass			= 4.0/3.0*Constants::PI*radius*radius;
+		s->inertia		= Vector3(2.0/5.0*s->mass*radius*radius,2.0/5.0*s->mass*radius*radius,2.0/5.0*s->mass*radius*radius);
 		s->se3			= Se3(translation,q);
 
 		aabb->color		= Vector3(0,1,0);

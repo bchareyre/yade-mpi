@@ -31,7 +31,7 @@ void Rotor::moveToNextTimeStep(std::vector<shared_ptr<Body> >& bodies)
 		
 	Quaternion q;
 	Vector3 axis = Vector3(1,0,0);
-	float angularVelocity = Constants::PI/80.0*0;
+	float angularVelocity = Constants::PI/40.0;
 	q.fromAngleAxis(angularVelocity*dt,axis);
 
 	Vector3 ax;

@@ -35,8 +35,8 @@ void RotatingBox::registerAttributes()
 void RotatingBox::exec()
 {
 	shared_ptr<NonConnexBody> rootBody(new NonConnexBody);
-	int nbSpheres = 3;
-	int nbBox = 3;
+	int nbSpheres = 10;
+	int nbBox = 0;
 	Quaternion q;
 	q.fromAngleAxis(0, Vector3(0,0,1));
 	
@@ -217,7 +217,7 @@ void RotatingBox::exec()
 		
 		
 		translation = Vector3(i,j,k)*10-Vector3(45,45,45)+Vector3(Rand::symmetricRandom(),Rand::symmetricRandom(),Rand::symmetricRandom());
-		float radius = (4+Rand::symmetricRandom());
+		float radius = (Rand::intervalRandom(3,5));
 		
 		shared_ptr<BallisticDynamicEngine> ballistic(new BallisticDynamicEngine);
 		ballistic->damping 	= 0.95;
@@ -225,8 +225,8 @@ void RotatingBox::exec()
 		s->isDynamic		= true;
 		s->angularVelocity	= Vector3(0,0,0);
 		s->velocity		= Vector3(0,0,0);
-		s->mass			= 1;
-		s->inertia		= Vector3(1,1,1);
+		s->mass			= 4.0/3.0*Constants::PI*radius*radius;
+		s->inertia		= Vector3(2.0/5.0*s->mass*radius*radius,2.0/5.0*s->mass*radius*radius,2.0/5.0*s->mass*radius*radius);
 		s->se3			= Se3(translation,q);
 
 		aabb->color		= Vector3(0,1,0);
@@ -253,18 +253,19 @@ void RotatingBox::exec()
 				aabb=shared_ptr<AABB>(new AABB);
 				box=shared_ptr<Box>(new Box);
 				shared_ptr<BallisticDynamicEngine> ballistic(new BallisticDynamicEngine);
+				Vector3 size = Vector3((4+Rand::symmetricRandom()),(4+Rand::symmetricRandom()),(4+Rand::symmetricRandom()));
 				ballistic->damping 	= 0.95;
 				boxi->dynamic		= dynamic_pointer_cast<DynamicEngine>(ballistic);
 				boxi->isDynamic		= true;
 				boxi->angularVelocity	= Vector3(0,0,0);
 				boxi->velocity		= Vector3(0,0,0);
-				boxi->mass		= 1;
-				boxi->inertia		= Vector3(1,1,1);
-				translation = Vector3(i,j,k)*10-Vector3(25,25,25)+Vector3(Rand::symmetricRandom(),Rand::symmetricRandom(),Rand::symmetricRandom());
+				float mass = 8*size[0]*size[1]*size[2];
+				boxi->mass		= mass;
+				boxi->inertia		= Vector3(mass*(size[1]*size[1]+size[2]*size[2])/3,mass*(size[0]*size[0]+size[2]*size[2])/3,mass*(size[1]*size[1]+size[0]*size[0])/3);
+				translation = Vector3(i,j,k)*10-Vector3(15,35,25)+Vector3(Rand::symmetricRandom(),Rand::symmetricRandom(),Rand::symmetricRandom());
 				boxi->se3		= Se3(translation,q);
 				aabb->color		= Vector3(Rand::unitRandom(),Rand::unitRandom(),Rand::unitRandom());
 				aabb->center		= translation;
-				Vector3 size = Vector3((4+Rand::symmetricRandom()),(4+Rand::symmetricRandom()),(4+Rand::symmetricRandom()));
 				aabb->halfSize		= size;
 				boxi->bv		= dynamic_pointer_cast<BoundingVolume>(aabb);
 				box->extents		= size;

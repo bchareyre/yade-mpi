@@ -33,8 +33,8 @@ void SimpleSpringDynamicEngine::respondToCollisions(Body * body, const std::list
 	NonConnexBody * ncb = dynamic_cast<NonConnexBody*>(body);
 	vector<shared_ptr<Body> >& bodies = ncb->bodies;
 	
-	float stiffness = 100;
-	float damping = 5;
+	float stiffness = 10000;
+	float viscosity = 10;
 	Vector3 gravity = Omega::instance().gravity;
 	if (first)
 	{
@@ -59,29 +59,28 @@ void SimpleSpringDynamicEngine::respondToCollisions(Body * body, const std::list
 		float size = (dynamic_pointer_cast<ClosestFeatures>(contact->interactionModel))->closestsPoints.size();
 		for( ; cpi!=cpiEnd ; ++cpi)
 		{	
-			Vector3 v1 = (*cpi).first;
-			Vector3 v2 = (*cpi).second;
-			
-			float l  = (v2-v1).length();
-			float l0 = 0;
-			Vector3 dir = (v2-v1).normalize();
-			float e  = l*l;
+			Vector3 p1 = (*cpi).first;
+			Vector3 p2 = (*cpi).second;
 
-			float relativeVelocity = dir.dot((rb2->velocity-rb1->velocity));
-			Vector3 f = (e*stiffness+relativeVelocity*damping)/size*dir;
-
-			Vector3 p = 0.5*((*cpi).first+(*cpi).second);
+			Vector3 p = 0.5*(p1+p2);
 			
-
+			Vector3 o1p = (p - rb1->se3.translation);
+			Vector3 o2p = (p - rb2->se3.translation);
 			
-			Vector3 o1p = p - rb1->se3.translation;
-			Vector3 o2p = p - rb2->se3.translation;
-						
+			Vector3 dir = p2-p1;
+			float l  = dir.unitize();
+			float elongation  = l*l;
+			
+			Vector3 v1 = rb1->velocity+o1p.cross(rb1->angularVelocity);
+			Vector3 v2 = rb2->velocity+o2p.cross(rb2->angularVelocity);
+			float relativeVelocity = dir.dot(v2-v1);
+			Vector3 f = (elongation*stiffness+relativeVelocity*viscosity)/size*dir;
+
 			forces[contact->id1] += f;
 			forces[contact->id2] -= f;
 		
-			couples[contact->id1] += o1p.cross(f)/3;
-			couples[contact->id2] -= o2p.cross(f)/3;
+			couples[contact->id1] += o1p.cross(f);
+			couples[contact->id2] -= o2p.cross(f);
 		}
 	}
 
@@ -94,6 +93,8 @@ void SimpleSpringDynamicEngine::respondToCollisions(Body * body, const std::list
 		{
 			rb->acceleration += forces[i]*rb->invMass;
 			rb->angularAcceleration += couples[i].multTerm(rb->invInertia);
+			//if (i==35)
+			//	cerr << rb->acceleration << "||" << rb->angularAcceleration << endl;
 		}
         }
 	

@@ -36,7 +36,7 @@ void BallisticDynamicEngine::respondToCollisions(Body * body, const std::list<sh
 	if (!first)
 	{
 		rb->velocity = damping*(prevVelocity+0.5*dt*rb->acceleration);
-		rb->angularVelocity = (prevAngularVelocity+0.5*dt*rb->angularAcceleration);
+		rb->angularVelocity = damping*(prevAngularVelocity+0.5*dt*rb->angularAcceleration);
 	}
 
 	prevVelocity = rb->velocity+0.5*dt*rb->acceleration;
@@ -49,7 +49,7 @@ void BallisticDynamicEngine::respondToCollisions(Body * body, const std::list<sh
 	float angle = axis.unitize();
 	Quaternion q;
 	q.fromAngleAxis(angle*dt,axis);
-	rb->se3.rotation = rb->se3.rotation+q;
+	rb->se3.rotation = q*rb->se3.rotation;
 	rb->se3.rotation.normalize();
 
 	rb->updateBoundingVolume(rb->se3);
