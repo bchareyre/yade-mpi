@@ -3,8 +3,7 @@
 # Subdir relative project main directory: ./plugins/DynamicEngine
 # Target is a subdirs project 
 
-SUBDIRS += MyEngine2 \
-           SimpleSpringDynamicEngine \
+SUBDIRS += SimpleSpringDynamicEngine \
            ExplicitMassSpringDynamicEngine \
            BallisticDynamicEngine \
            MassSpringBody2RigidBodyDynamicEngine \

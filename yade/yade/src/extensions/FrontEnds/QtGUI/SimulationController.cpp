@@ -152,8 +152,11 @@ void SimulationController::pbLoadClicked()
 
 	if (!fileName.isEmpty() && selectedFilter == "XML Yade File (*.xml)")
 	{
-		//for(;gi!=giEnd;++gi)
-		//	(*gi).second->stopRendering();
+		map<int,GLViewer*>::iterator gi = glViews.begin();
+		map<int,GLViewer*>::iterator giEnd = glViews.end();
+		for(;gi!=giEnd;++gi)
+			(*gi).second->stopRendering();
+			
 		updater->stop();
 		Omega::instance().finishSimulationLoop();
 		Omega::instance().joinSimulationLoop();
@@ -161,18 +164,19 @@ void SimulationController::pbLoadClicked()
 		Omega::instance().setSimulationFileName(fileName);
 		Omega::instance().loadSimulation();
 		
-		map<int,GLViewer*>::iterator gi = glViews.begin();
-		map<int,GLViewer*>::iterator giEnd = glViews.end();
-		for(;gi!=giEnd;++gi)
-			(*gi).second->centerScene();
 		
 		string fullName = string(filesystem::basename(fileName.data()))+string(filesystem::extension(fileName.data()));
 		tlCurrentSimulation->setText(fullName);
 
 		Omega::instance().createSimulationLoop();
 
-		//for(;gi!=giEnd;++gi)
-		//	(*gi).second->startRendering();
+		gi = glViews.begin();
+		giEnd = glViews.end();
+		for(;gi!=giEnd;++gi)
+		{
+			(*gi).second->centerScene();
+			(*gi).second->startRendering();
+		}
 	}
 } 
 
