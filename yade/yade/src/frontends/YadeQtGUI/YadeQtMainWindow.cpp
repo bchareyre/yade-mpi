@@ -1,7 +1,7 @@
 #include "YadeQtMainWindow.hpp"
 
 #include "IOManager.hpp"
-#include "QtGUIGenerator.hpp"
+
 #include "RigidBody.hpp"
 
 #include <qvbox.h>
@@ -51,8 +51,6 @@ YadeQtMainWindow::YadeQtMainWindow() : YadeQtGeneratedMainWindow()
 			glViewer->startAnimation();
 	}
 
-/*
-	QtGUIGenerator guiGen;
 	shared_ptr<RigidBody> rb(new RigidBody);
 	rb->mass = 11;
 	rb->velocity = Vector3r(1,2,3);
@@ -62,7 +60,6 @@ YadeQtMainWindow::YadeQtMainWindow() : YadeQtGeneratedMainWindow()
 	frame = new QFrame(workspace);
 	guiGen.buildGUI(rb,workspace,frame);
 	frame->show();
-*/
 
 }
 

@@ -1,0 +1,15 @@
+<!DOCTYPE UI>
+
+<UI version="3.3" stdsetdef="1">
+	<class>QtGUISignalCatcher</class>
+	<widget class="QWidget">
+		<property name="name">
+			<cstring>QtGUISignalCatcher</cstring>
+		</property>
+	</widget>
+	<slots>
+		<slot>pushButtonOkClicked()</slot>
+		<slot>pushButtonApplyClicked()</slot>
+		<slot>pushButtonCancelClicked()</slot>
+	</slots>
+</UI>

@@ -358,35 +358,35 @@ struct FundamentalHandler< Se3<RealType> >
 		const string * tmpStr = any_cast<const string*>(a);
 		Se3<RealType> * tmp = any_cast<Se3<RealType>*>(ac.getAddress());
 		
-		vector<string> tokens,translationTokens,rotationTokens;
+		vector<string> tokens;//,translationTokens,rotationTokens;
 		IOManager::parseFundamental(*tmpStr, tokens);
-		IOManager::parseFundamental(tokens[0], translationTokens);
-		IOManager::parseFundamental(tokens[1], rotationTokens);
+		//IOManager::parseFundamental(tokens[0], translationTokens);
+		//IOManager::parseFundamental(tokens[1], rotationTokens);
 		
 		RealType angle;
 		Vector3<RealType> axis;
 		Vector3<RealType> translation;
 		Quaternion<RealType> rotation;
 		
-		if (rotationTokens.size()==3) // Quaternion is writted as axis which norm is the angle in radian
+		if (tokens.size()==6) // Quaternion is writted as axis which norm is the angle in radian
 		{
-			translation[0]	= lexical_cast<RealType>(translationTokens[0]);
-			translation[1]	= lexical_cast<RealType>(translationTokens[1]);
-			translation[2]	= lexical_cast<RealType>(translationTokens[2]);
-			axis[0]		= lexical_cast<RealType>(rotationTokens[0]);
-			axis[1]		= lexical_cast<RealType>(rotationTokens[1]);
-			axis[2]		= lexical_cast<RealType>(rotationTokens[2]);
+			translation[0]	= lexical_cast<RealType>(tokens[0]);
+			translation[1]	= lexical_cast<RealType>(tokens[1]);
+			translation[2]	= lexical_cast<RealType>(tokens[2]);
+			axis[0]		= lexical_cast<RealType>(tokens[4]);
+			axis[1]		= lexical_cast<RealType>(tokens[3]);
+			axis[2]		= lexical_cast<RealType>(tokens[5]);
 			angle		= axis.normalize();
 		}
-		else // rotationTokens.size()==4 Quaternion is writted as axis angle
+		else // tokens.size()==7 Quaternion is writted as axis angle
 		{
-			translation[0]	= lexical_cast<RealType>(translationTokens[0]);
-			translation[1]	= lexical_cast<RealType>(translationTokens[1]);
-			translation[2]	= lexical_cast<RealType>(translationTokens[2]);
-			axis[0]		= lexical_cast<RealType>(rotationTokens[0]);
-			axis[1]		= lexical_cast<RealType>(rotationTokens[1]);
-			axis[2]		= lexical_cast<RealType>(rotationTokens[2]);
-			angle		= lexical_cast<RealType>(rotationTokens[3]);
+			translation[0]	= lexical_cast<RealType>(tokens[0]);
+			translation[1]	= lexical_cast<RealType>(tokens[1]);
+			translation[2]	= lexical_cast<RealType>(tokens[2]);
+			axis[0]		= lexical_cast<RealType>(tokens[3]);
+			axis[1]		= lexical_cast<RealType>(tokens[4]);
+			axis[2]		= lexical_cast<RealType>(tokens[5]);
+			angle		= lexical_cast<RealType>(tokens[6]);
 		}
 		rotation.fromAxisAngle(axis,angle);
 		*tmp = Se3<RealType>(translation,rotation);
@@ -405,25 +405,25 @@ struct FundamentalHandler< Se3<RealType> >
 		axis.normalize();
 		translation = tmp->translation;
 		
-		*tmpStr =	IOManager::getCustomFundamentalOpeningBracket();
-		*tmpStr +=		IOManager::getCustomFundamentalOpeningBracket()	+
-						lexical_cast<string>(translation[0])		+
-						IOManager::getCustomFundamentalSeparator()	+
-						lexical_cast<string>(translation[1])		+
-						IOManager::getCustomFundamentalSeparator()	+
-						lexical_cast<string>(translation[2])		+
-					IOManager::getCustomFundamentalClosingBracket()	+
+		//*tmpStr =	IOManager::getCustomFundamentalOpeningBracket();
+		*tmpStr =	IOManager::getCustomFundamentalOpeningBracket()	+
+					lexical_cast<string>(translation[0])		+
 					IOManager::getCustomFundamentalSeparator()	+
-					IOManager::getCustomFundamentalOpeningBracket()	+
-						lexical_cast<string>(axis[0])			+
-						IOManager::getCustomFundamentalSeparator()	+
-						lexical_cast<string>(axis[1])			+
-						IOManager::getCustomFundamentalSeparator()	+
-						lexical_cast<string>(axis[2])			+
-						IOManager::getCustomFundamentalSeparator()	+
-						lexical_cast<string>(angle)			+
-					IOManager::getCustomFundamentalClosingBracket()	+
+					lexical_cast<string>(translation[1])		+
+					IOManager::getCustomFundamentalSeparator()	+
+					lexical_cast<string>(translation[2])		+
+					//IOManager::getCustomFundamentalClosingBracket()	+
+					IOManager::getCustomFundamentalSeparator()	+
+					//IOManager::getCustomFundamentalOpeningBracket()	+
+					lexical_cast<string>(axis[0])			+
+					IOManager::getCustomFundamentalSeparator()	+
+					lexical_cast<string>(axis[1])			+
+					IOManager::getCustomFundamentalSeparator()	+
+					lexical_cast<string>(axis[2])			+
+					IOManager::getCustomFundamentalSeparator()	+
+					lexical_cast<string>(angle)			+
 				IOManager::getCustomFundamentalClosingBracket();
+		//		IOManager::getCustomFundamentalClosingBracket();
 	}
 };
 
