@@ -61,15 +61,12 @@ QtGUIGenerator::~QtGUIGenerator()
 
 void QtGUIGenerator::buildGUI(shared_ptr<Serializable> s,  QWidget * widget)
 {
-cerr << 1 << endl;
+
 	serializable = s;
-cerr << 2 << endl;
+
 	serializable->registerAttributes();
-cerr << 3 << endl;
 	widget->setCaption(serializable->getClassName().c_str());
-cerr << 4 << endl;
 	Serializable::Archives archives = serializable->getArchives();
-cerr << 5 << endl;
 	Serializable::Archives::iterator ai    = archives.begin();
 	Serializable::Archives::iterator aiEnd = archives.end();
 	int nbLines=0;
@@ -162,10 +159,10 @@ cerr << 5 << endl;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void QtGUIGenerator::pushButtonOkClicked()
+void QtGUIGenerator::deserialize(shared_ptr<Serializable> s)
 {
-	serializable->registerAttributes();
-	Serializable::Archives archives = serializable->getArchives();
+	s->registerAttributes();
+	Serializable::Archives archives = s->getArchives();
 
 	Serializable::Archives::iterator ai    = archives.begin();
 	Serializable::Archives::iterator aiEnd = archives.end();
@@ -190,7 +187,7 @@ void QtGUIGenerator::pushButtonOkClicked()
 				str[str.size()-1]='}';
 				
 			}
-			cout << str << endl;
+			//cout << str << endl;
 			stringstream voidStream;
 		
 			(*ai)->deserialize(voidStream,*(*ai),str);
@@ -198,7 +195,16 @@ void QtGUIGenerator::pushButtonOkClicked()
 	}
 
 	//ac.markProcessed();
-	serializable->unregisterSerializableAttributes(true);
+	s->unregisterSerializableAttributes(true);
+
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+void QtGUIGenerator::pushButtonOkClicked()
+{
+	deserialize(serializable);
 	cout << "pushButtonOkClicked" << endl;
 }
 
@@ -209,6 +215,7 @@ void QtGUIGenerator::pushButtonApplyClicked()
 {
 	cout << "pushButtonApplyClicked" << endl;
 }
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 

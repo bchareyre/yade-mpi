@@ -24,6 +24,9 @@ RotatingBox::RotatingBox () : FileGenerator()
 	//	exec();
 	nbSpheres = 0;
 	nbBoxes   = 0;
+	outputFileName = "../data/RotatingBox.xml";
+	serializationDynlib = "XMLManager";
+
 }
 
 RotatingBox::~RotatingBox ()
@@ -36,23 +39,15 @@ RotatingBox::~RotatingBox ()
 void RotatingBox::registerAttributes()
 {
 	FileGenerator::registerAttributes();
-	cout << 11 << endl;
 	REGISTER_ATTRIBUTE(nbSpheres);
-	cout << 12 << endl;
 	REGISTER_ATTRIBUTE(nbBoxes);
-	cout << 13 << endl;
 }
 
 void RotatingBox::generate()
 {
 	shared_ptr<NonConnexBody> rootBody(new NonConnexBody);
-	int nbSpheres = 5;
-	int nbBox = 0;
 	Quaternionr q;
 	q.fromAxisAngle(Vector3r(0,0,1),0);
-
-	outputFileName = "../data/RotatingBox.xml";
-	serializationDynlib = "XMLManager";
 
 	shared_ptr<NarrowCollider> nc	= shared_ptr<NarrowCollider>(new SimpleNarrowCollider);
 	nc->addCollisionFunctor("Sphere","Sphere","Sphere2Sphere4SDECContactModel");
@@ -287,9 +282,9 @@ void RotatingBox::generate()
 	}
 
 
-	for(int i=0;i<nbBox;i++)
-		for(int j=0;j<nbBox;j++)
-			for(int k=0;k<nbBox;k++)
+	for(int i=0;i<nbBoxes;i++)
+		for(int j=0;j<nbBoxes;j++)
+			for(int k=0;k<nbBoxes;k++)
 			{
 				shared_ptr<SDECDiscreteElement> boxi(new SDECDiscreteElement);
 				aabb=shared_ptr<AABB>(new AABB);

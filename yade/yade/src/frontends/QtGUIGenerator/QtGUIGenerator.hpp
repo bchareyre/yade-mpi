@@ -103,6 +103,7 @@ class QtGUIGenerator : public XMLManager,  public QtGUISignalCatcher
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public : void buildGUI(shared_ptr<Serializable> s, QWidget * widget);
+	public : void deserialize(shared_ptr<Serializable> s);
 	
 	public slots : virtual void pushButtonOkClicked() ;
 	public slots : virtual void pushButtonApplyClicked() ;

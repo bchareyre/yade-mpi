@@ -6,8 +6,11 @@
 
 class FileGenerator : public Serializable
 {
-	public : string outputFileName;
-	public : string serializationDynlib;
+	protected : string outputFileName;
+	protected : string serializationDynlib;
+	
+	public    : void setFileName(const string& fileName) { outputFileName=fileName;};
+	public    : void setSerializationLibrary(const string& lib) { serializationDynlib=lib;};
 	// construction
 	public : FileGenerator () : Serializable() {};
 	public : ~FileGenerator () {};

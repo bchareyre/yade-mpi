@@ -65,14 +65,14 @@ void QtFileGenerator::pbChooseClicked()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-//#include "RotatingBox.hpp" // without this lines it is crashing ??????
 void QtFileGenerator::pbLoadClicked()
 {
 	if (!leGeneratorDynlibName->text().isEmpty())
 	{
 		try
 		{
-			shared_ptr<FileGenerator> fg = dynamic_pointer_cast<FileGenerator>(ClassFactory::instance().createShared(leGeneratorDynlibName->text()));
+			//FIXME dynamic_cast is not working ???
+			shared_ptr<FileGenerator> fg = static_pointer_cast<FileGenerator>(ClassFactory::instance().createShared(leGeneratorDynlibName->text()));
 
 			guiGen.setResizeHeight(true);
 			guiGen.setResizeWidth(false);
@@ -108,7 +108,15 @@ void QtFileGenerator::pbLoadClicked()
 
 void QtFileGenerator::pbGenerateClicked()
 {
+	// FIXME add some test to avoid crashing
+	shared_ptr<FileGenerator> fg = static_pointer_cast<FileGenerator>(ClassFactory::instance().createShared(leGeneratorDynlibName->text()));
 	
+	fg->setFileName(leOutputFileName->text().data());
+	fg->setSerializationLibrary(leOutputDynlibName->text().data());
+	
+	guiGen.deserialize(fg);
+	
+	fg->generate();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
