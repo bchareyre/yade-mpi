@@ -104,6 +104,7 @@ struct PointerHandler<shared_ptr<PointedType> >
 		}
 		else
 		{ // according to WARNING above - following lines are never executed ....
+		  // FIXME - maybe with Type2Int, or bool/templates it is possible to solve ("Modern C++ Design", chapter 2)
 			tmpPtr=any_cast< shared_ptr<PointedType>* >(ac.getAddress());
 			*tmpPtr = shared_ptr<PointedType>(new PointedType);
 			newAc = Archive::create(name,**tmpPtr);

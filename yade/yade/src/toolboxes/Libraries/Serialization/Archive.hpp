@@ -77,6 +77,9 @@ using namespace ArchiveTypes;
 	an abstract representation an data gives the possibility to be independant of the file type and so to
 	create a new one without recompiling anything.
 	\warning You will need to use this class only if you want to create your own IOManager
+	
+	All this serialization stuff needs rewriting, especially class Archive is a total mess. Rewriting should
+	make it clean, while preserving original client interface.
 */
 class Archive
 {

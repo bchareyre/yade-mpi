@@ -166,6 +166,21 @@ void SimulationController::pbApplyClicked()
 
 void SimulationController::pbLoadClicked()
 {
+
+	class ScopeTest
+	{
+		public : ScopeTest() { ok_=false; };
+		public : ~ScopeTest()
+		{
+			if(ok_)
+				cerr << "loading file scope left correctly\n";
+			else
+				cerr << "loading file scope left UNCORRECTLY!\n";
+		}
+		public : void ok() { ok_=true; };
+		private: bool ok_;
+	};
+
 	boost::mutex resizeMutex;
 	boost::mutex::scoped_lock lock(resizeMutex);
 
@@ -174,6 +189,8 @@ void SimulationController::pbLoadClicked()
 		
 	if (!fileName.isEmpty() && selectedFilter == "XML Yade File (*.xml)")
 	{
+		ScopeTest scopeTest;
+			
 		map<int,GLViewer*>::iterator gi = glViews.begin();
 		map<int,GLViewer*>::iterator giEnd = glViews.end();
 		for(;gi!=giEnd;++gi)
@@ -200,8 +217,8 @@ void SimulationController::pbLoadClicked()
 			(*gi).second->centerScene();
 			(*gi).second->startRendering();
 		}
-
-
+		
+		scopeTest.ok();
 	}
 } 
 
