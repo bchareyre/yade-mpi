@@ -17,11 +17,11 @@ SUBDIRS += InteractionGeometry \
            BoundingVolumeFactory \
            CollisionGeometryFactory \
            GeometricalModelFactory \
-           CollisionFunctor \
            Body \
            BroadInteractor \
            NarrowInteractor \
            PhysicalInteractor \
+           InteractionFunctor \
            Action \
            ActionFunctor \
            KinematicEngine \
