@@ -54,11 +54,11 @@ void SimulationControllerUpdater::oneLoop()
 	LOCK(Omega::instance().getRootBodyMutex());
 			
 	controller->lcdCurrentIteration->display(lexical_cast<string>(Omega::instance().getCurrentIteration()));
-	double simulationTime = Omega::instance().getSimulationTime();
+	Real simulationTime = Omega::instance().getSimulationTime();
 
 	unsigned int sec	= (unsigned int)(simulationTime);
 	unsigned int min	= sec/60;
-	double time		= (simulationTime-sec)*1000;
+	Real time		= (simulationTime-sec)*1000;
 	unsigned int msec	= (unsigned int)(time);
 	time			= (time-msec)*1000;
 	unsigned int misec	= (unsigned int)(time);

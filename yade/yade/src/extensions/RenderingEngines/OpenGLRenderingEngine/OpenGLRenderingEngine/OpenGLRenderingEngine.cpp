@@ -222,7 +222,7 @@ void OpenGLRenderingEngine::renderSceneUsingFastShadowVolumes(shared_ptr<Complex
 /*	glStencilOp(GL_KEEP, GL_KEEP, GL_INCR);	
 	glCullFace(GL_BACK);
 	glDepthMask(GL_TRUE);
-	double clearDepthValue=0;
+	Real clearDepthValue=0;
 	glGetDoublev(GL_DEPTH_CLEAR_VALUE,&clearDepthValue);
 	glDepthFunc(GL_EQUAL);
 	glMatrixMode(GL_PROJECTION);

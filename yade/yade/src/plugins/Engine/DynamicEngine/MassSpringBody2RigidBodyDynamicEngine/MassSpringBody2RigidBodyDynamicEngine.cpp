@@ -26,7 +26,7 @@ void MassSpringBody2RigidBodyDynamicEngine::registerAttributes()
 }
 
 
-void MassSpringBody2RigidBodyDynamicEngine::respondToCollisions(Body * body)
+void MassSpringBody2RigidBodyDynamicEngine::respondToCollisions(Body * /*body*/)
 {
 // /*	ComplexBody * ncb = dynamic_cast<ComplexBody*>(body);
 // 	shared_ptr<Interaction> ct;

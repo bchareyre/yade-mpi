@@ -351,13 +351,13 @@ Vector3r Omega::getGravity()
 }
 
 // FIXME - remove that
-void Omega::setTimeStep(const double t)
+void Omega::setTimeStep(const Real t)
 {
 //	LOCK(omegaMutex);
 	dt = t;
 }
 
-double Omega::getTimeStep()
+Real Omega::getTimeStep()
 {
 //	LOCK(omegaMutex);
 	return dt;

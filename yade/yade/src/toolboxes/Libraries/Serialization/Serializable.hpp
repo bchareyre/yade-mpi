@@ -108,7 +108,7 @@ class Serializable : public Factorable
 		    }
 	public    : bool containsOnlyFundamentals();
 	public    : virtual string getClassName() const = 0;
-	public    : virtual void registerAttributes()   = 0;
+	public    : virtual void registerAttributes() {};
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -92,9 +92,9 @@ class Omega : public Singleton<Omega>
 	public	: Vector3r getGravity();
 	public	: void setGravity(Vector3r g);
 	
-	private	: double dt; // FIXME
-	public	: void setTimeStep(const double);
-	public	: double getTimeStep();
+	private	: Real dt; // FIXME
+	public	: void setTimeStep(const Real);
+	public	: Real getTimeStep();
 	
 	private	: shared_ptr<ComplexBody> rootBody;
 	public	: shared_ptr<ComplexBody> getRootBody();
@@ -116,8 +116,8 @@ class Omega : public Singleton<Omega>
 	public  : long int getCurrentIteration();
 	public  : void incrementCurrentIteration();
 	
-	private : double simulationTime;
-	public	: double getSimulationTime() { return simulationTime;};
+	private : Real simulationTime;
+	public	: Real getSimulationTime() { return simulationTime;};
 	public	: void incrementSimulationTime() { simulationTime+=dt;};
 	
 	private	: Omega();

@@ -110,7 +110,7 @@ int NullGUI::run(int argc, char** argv)
 			case 'S'	: snapshotName = optarg;				break;
 			case 'm'	: maxIteration = lexical_cast<long int>(optarg);	break;
 			case 't'	: Omega::instance().setTimeStep
-						(lexical_cast<double>(optarg));			break;
+						(lexical_cast<Real>(optarg));			break;
 			case 'g'	: Omega::instance().setGravity
 						(Vector3r(0,-lexical_cast<Real>(optarg),0));	break;
 			default		: break;

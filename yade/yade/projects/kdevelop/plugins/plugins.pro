@@ -9,8 +9,8 @@ OBJECTS_DIR = $(YADECOMPILATIONPATH)
 CONFIG += debug \
           warn_on 
 TEMPLATE = subdirs 
-SUBDIRS += DataRecorder \
-	   Geometry \
+SUBDIRS += Geometry \
            Body \
            Interaction \
-           Engine
+           Engine \
+           DataRecorder 

@@ -71,7 +71,7 @@ int QtGUI::run(int argc, char *argv[])
 		{
 //			case 'H'	: help(); 						return 1;
 			case 't'	: Omega::instance().setTimeStep
-						(lexical_cast<double>(optarg));			break;
+						(lexical_cast<Real>(optarg));			break;
 			case 'g'	: Omega::instance().setGravity
 						(Vector3r(0,-lexical_cast<Real>(optarg),0));	break;
 			default		: break;

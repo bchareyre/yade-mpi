@@ -88,7 +88,7 @@ void Terrain::registerAttributes()
 // 	testedFaces.clear();
 // }	
 
-void Terrain::loadWrl(const char * fileName)
+void Terrain::loadWrl(const char * /*fileName*/)
 {
 /*	vertices.clear(); 
 	faces.clear();      
@@ -200,7 +200,7 @@ void Terrain::loadWrl(const char * fileName)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool Terrain::findTag(ifstream * file, char * tag)
+bool Terrain::findTag(ifstream * /*file*/, char * /*tag*/)
 {
 /*	char * c;
 	int tagLength,i;
@@ -239,6 +239,7 @@ bool Terrain::findTag(ifstream * file, char * tag)
 		return false;
 
 */
+	return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -447,7 +448,7 @@ void Terrain::buildCollisionGeometry()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool Terrain::pointInTriangle(Vector2r p , std::vector<Vector2r>& tri)
+bool Terrain::pointInTriangle(Vector2r /*p*/ , std::vector<Vector2r>& /*tri*/)
 {
 
 // 	for (int i1 = 0, i0 = 2; i1 < 3; i0 = i1++)
@@ -461,13 +462,13 @@ bool Terrain::pointInTriangle(Vector2r p , std::vector<Vector2r>& tri)
 // 	}
 // 
 // 	return true;
-
+	return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void Terrain::getFaces(const AABB& aabb, std::vector<int>& faceList)
+void Terrain::getFaces(const AABB& /*aabb*/, std::vector<int>& /*faceList*/)
 {
 /*	Vector2r minCell,maxCell;
 	
