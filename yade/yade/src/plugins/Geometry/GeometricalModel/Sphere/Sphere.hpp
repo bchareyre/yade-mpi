@@ -24,9 +24,9 @@
 #ifndef __SPHERE_H__
 #define __SPHERE_H__
 
-#include "CollisionGeometry.hpp"
+#include "GeometricalModel.hpp"
 
-class Sphere : public CollisionGeometry
+class Sphere : public GeometricalModel
 {
 	public : Real radius;
 

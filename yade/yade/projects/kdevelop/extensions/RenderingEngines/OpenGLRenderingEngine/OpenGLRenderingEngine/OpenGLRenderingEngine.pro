@@ -3,25 +3,29 @@
 # Subdir relative project main directory: ./extensions/RenderingEngines/OpenGLRenderingEngine/OpenGLRenderingEngine
 # Target is a library:  
 
-LIBS += -lSphere \
-        -lglut \
-        -lGLU \
-        -lGL \
-        -rdynamic 
-INCLUDEPATH = $(YADEINCLUDEPATH) 
-MOC_DIR = $(YADECOMPILATIONPATH) 
-UI_DIR = $(YADECOMPILATIONPATH) 
-OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../../plugins/Geometry/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
-               $(YADEDYNLIBPATH) 
-QMAKE_CXXFLAGS_RELEASE += -lpthread \
-                          -pthread 
-QMAKE_CXXFLAGS_DEBUG += -lpthread \
-                        -pthread 
-DESTDIR = $(YADEDYNLIBPATH) 
-CONFIG += debug \
-          warn_on \
-          dll 
-TEMPLATE = lib 
-HEADERS += OpenGLRenderingEngine.hpp 
+HEADERS += GLDrawBoundingVolumeFunctor.hpp \
+           GLDrawGeometricalModelFunctor.hpp \
+           GLDrawInteractionGeometryFunctor.hpp \
+           GLDrawShadowVolumeFunctor.hpp \
+           OpenGLRenderingEngine.hpp 
 SOURCES += OpenGLRenderingEngine.cpp 
+LIBS += -lSphere \
+-lglut \
+-lGLU \
+-lGL \
+-rdynamic
+INCLUDEPATH = $(YADEINCLUDEPATH)
+MOC_DIR = $(YADECOMPILATIONPATH)
+UI_DIR = $(YADECOMPILATIONPATH)
+OBJECTS_DIR = $(YADECOMPILATIONPATH)
+QMAKE_LIBDIR = ../../../../plugins/Geometry/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
+$(YADEDYNLIBPATH)
+QMAKE_CXXFLAGS_RELEASE += -lpthread \
+-pthread
+QMAKE_CXXFLAGS_DEBUG += -lpthread \
+-pthread
+DESTDIR = $(YADEDYNLIBPATH)
+CONFIG += debug \
+warn_on \
+dll
+TEMPLATE = lib

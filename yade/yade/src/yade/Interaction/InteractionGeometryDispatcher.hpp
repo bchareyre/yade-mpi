@@ -68,17 +68,12 @@ class InteractionGeometryDispatcher : public Actor
 		
 	// construction
 	public : InteractionGeometryDispatcher ();
-
 	public : virtual ~InteractionGeometryDispatcher ();
 
-	//public : virtual void narrowCollisionPhase(Body* ) { throw;};
+	public : virtual void action(Body* body);
 
 	protected : virtual void postProcessAttributes(bool deserializing);
 	public : void registerAttributes();
-
-	//public : virtual bool isActivated();
-	public : virtual void action(Body* body);
-
 	REGISTER_CLASS_NAME(InteractionGeometryDispatcher);
 
 };

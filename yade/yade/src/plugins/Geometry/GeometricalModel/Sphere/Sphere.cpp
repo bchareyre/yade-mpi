@@ -31,13 +31,13 @@ vector<Vector3r> Sphere::vertices;
 vector<Vector3r> Sphere::faces;
 
 
-Sphere::Sphere (Real r) : CollisionGeometry()
+Sphere::Sphere (Real r) : GeometricalModel()
 {
 	radius = r;
 	Sphere::Sphere();
 }
 
-Sphere::Sphere () : CollisionGeometry()
+Sphere::Sphere () : GeometricalModel()
 {
 	createIndex();
 	
@@ -86,12 +86,12 @@ Sphere::~Sphere ()
 
 void Sphere::postProcessAttributes(bool deserializing)
 {
-	CollisionGeometry::postProcessAttributes(deserializing);
+	GeometricalModel::postProcessAttributes(deserializing);
 }
 
 void Sphere::registerAttributes()
 {
-	CollisionGeometry::registerAttributes();
+	GeometricalModel::registerAttributes();
 	REGISTER_ATTRIBUTE(radius);
 }
 

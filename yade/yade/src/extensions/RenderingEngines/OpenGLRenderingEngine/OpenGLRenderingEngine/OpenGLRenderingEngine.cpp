@@ -45,6 +45,13 @@ OpenGLRenderingEngine::OpenGLRenderingEngine() : RenderingEngine()
 	useFastShadowVolume = true;
 	needInit = true;
 	lightPos = Vector3r(75.0,130.0,0.0);
+	
+	addBoundingVolumeFunctor();
+	addCollisionGeometryFunctor();
+	addGeometricalModelFunctor();
+	addShadowVolumeFunctor();
+	
+	
 }
 
 OpenGLRenderingEngine::~OpenGLRenderingEngine()
@@ -300,7 +307,77 @@ void OpenGLRenderingEngine::registerAttributes()
 	REGISTER_ATTRIBUTE(drawGeometricalModel);
 	REGISTER_ATTRIBUTE(castShadow);
 	REGISTER_ATTRIBUTE(drawShadowVolumes);
-	REGISTER_ATTRIBUTE(useFastShadowVolume);
+	REGISTER_ATTRIBUTE(useFastShadowVolume);	
+	
+	//REGISTER_ATTRIBUTE(boundingVolumeFunctorNames);
+	//REGISTER_ATTRIBUTE(collisionGeometryFunctorNames);
+	//REGISTER_ATTRIBUTE(geometricalModelFunctorNames);
+	//REGISTER_ATTRIBUTE(shadowVolumeFunctorNames);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+void OpenGLRenderingEngine::postProcessAttributes(bool deserializing)
+{
+	if(deserializing)
+	{
+		for(unsigned int i=0;i<boundingVolumeFunctorNames.size();i++)
+			boundingVolumeDispatcher.add(boundingVolumeFunctorNames[i][0],boundingVolumeFunctorNames[i][1]);
+			
+		for(unsigned int i=0;i<collisionGeometryFunctorNames.size();i++)
+			interactionGeometryDispatcher.add(collisionGeometryFunctorNames[i][0],collisionGeometryFunctorNames[i][1]);
+			
+		for(unsigned int i=0;i<geometricalModelFunctorNames.size();i++)
+			geometricalModelDispatcher.add(geometricalModelFunctorNames[i][0],geometricalModelFunctorNames[i][1]);
+		
+		for(unsigned int i=0;i<shadowVolumeFunctorNames.size();i++)
+			shadowVolumeDispatcher.add(shadowVolumeFunctorNames[i][0],shadowVolumeFunctorNames[i][1]);
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+void addBoundingVolumeFunctor(const string& str1,const string& str2)
+{
+	vector<string> v;
+	v.push_back(str1);
+	v.push_back(str2);
+	boundingVolumeFunctorNames.push_back(v);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+void addCollisionGeometryFunctor(const string& str1,const string& str2)
+{
+	vector<string> v;
+	v.push_back(str1);
+	v.push_back(str2);
+	collisionGeometryFunctorNames.push_back(v);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+void addGeometricalModelFunctor(const string& str1,const string& str2)
+{
+	vector<string> v;
+	v.push_back(str1);
+	v.push_back(str2);
+	geometricalModelFunctorNames.push_back(v);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+void addShadowVolumeFunctor(const string& str1,const string& str2)
+{
+	vector<string> v;
+	v.push_back(str1);
+	v.push_back(str2);
+	shadowVolumeFunctorNames.push_back(v);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -106,7 +106,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>plugins/Geometry/CollisionGeometry/CollisionGeometrySet</activedir>
+      <activedir>extensions/RenderingEngines/OpenGLRenderingEngine/OpenGLRenderingEngine</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>

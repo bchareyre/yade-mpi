@@ -25,13 +25,8 @@
 #include "Box.hpp"
 #include <iostream>
 
-Box::Box (Vector3r e) : CollisionGeometry()
-{
-	extents = e;
-	createIndex();
-}
 
-Box::Box () : CollisionGeometry()
+Box::Box () : GeometricalModel()
 {		
 	createIndex();
 }
@@ -43,12 +38,12 @@ Box::~Box ()
 
 void Box::postProcessAttributes(bool deserializing)
 {
-	CollisionGeometry::postProcessAttributes(deserializing);
+	GeometricalModel::postProcessAttributes(deserializing);
 }
 
 void Box::registerAttributes()
 {
-	CollisionGeometry::registerAttributes();
+	GeometricalModel::registerAttributes();
 	REGISTER_ATTRIBUTE(extents);
 }
 

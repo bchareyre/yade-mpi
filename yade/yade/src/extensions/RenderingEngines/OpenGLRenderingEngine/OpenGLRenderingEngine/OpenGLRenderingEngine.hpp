@@ -41,7 +41,21 @@ class OpenGLRenderingEngine : public RenderingEngine
 	public : bool castShadow;
 	public : bool drawShadowVolumes;
 	public : bool useFastShadowVolume;
+	
+	private : DynLibDispatcher< BoundingVolume    , GLDrawBoundingVolumeFunctor, void , TYPELIST_1(const shared_ptr<BoundingVolume>&) > boundingVolumeDispatcher;
+	private : DynLibDispatcher< CollisionGeometry , GLDrawInteractionGeometryFunctor, void , TYPELIST_2(const shared_ptr<CollisionGeometry>&, const Se3&) >interactionGeometryDispatcher;
+	private : DynLibDispatcher< GeometricalModel  , GLDrawGeometricalModelFunctor, void , TYPELIST_2(const shared_ptr<GeometricalModel>&, const Se3&) > geometricalModelDispatcher;
+	private : DynLibDispatcher< GeometricalModel  , GLDrawGeometricalModelFunctor, void , TYPELIST_3(const shared_ptr<GeometricalModel>&, const Se3&, const Vector3r& ) > shadowVolumeDispatcher;
 
+	private : vector<vector<string> >  boundingVolumeFunctorNames;
+	private : vector<vector<string> >  collisionGeometryFunctorNames;
+	private : vector<vector<string> >  geometricalModelFunctorNames;
+	private : vector<vector<string> >  shadowVolumeFunctorNames;
+	public  : void addBoundingVolumeFunctor(const string& str1,const string& str2);
+	public  : void addCollisionGeometryFunctor(const string& str1,const string& str2);
+	public  : void addGeometricalModelFunctor(const string& str1,const string& str2);
+	public  : void addShadowVolumeFunctor(const string& str1,const string& str2);
+	
 	private : bool needInit;
 
 			

@@ -24,9 +24,9 @@
 #ifndef __BOX_H__
 #define __BOX_H__
 
-#include "CollisionGeometry.hpp"
+#include "GeometricalModel.hpp"
 
-class Box : public CollisionGeometry
+class Box : public GeometricalModel
 {
 	public : Vector3r extents;
 
@@ -51,12 +51,9 @@ class Box : public CollisionGeometry
 /// Indexable											///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	REGISTER_CLASS_INDEX(Box,CollisionGeometry);
+	REGISTER_CLASS_INDEX(Box,GeometricalModel);
 
 };
-
-#include "ArchiveTypes.hpp"
-using namespace ArchiveTypes;
 
 REGISTER_SERIALIZABLE(Box,false);
 #endif // __BOX_H__
