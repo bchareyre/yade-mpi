@@ -52,7 +52,7 @@ class QtFileGenerator : public QtFileGeneratorController, public Factorable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	/*! Constructor */
-	public : QtFileGenerator (QWidget * parent = 0, const char * name = 0, WFlags f = 0 );
+	public : QtFileGenerator (QWidget * parent = 0, const char * name = 0 );
 
 	/*! Destructor */
 	public : virtual ~QtFileGenerator ();

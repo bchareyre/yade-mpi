@@ -35,16 +35,22 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "YadeQtGeneratedMainWindow.h"
-#include "GLViewer.hpp"
+//#include "GLViewer.hpp"
+#include "SimulationController.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 class YadeQtMainWindow : public YadeQtGeneratedMainWindow
 {
-	protected : shared_ptr<GLViewer> glViewer;
+	//protected : shared_ptr<GLViewer> glViewer;
+	
+	protected : shared_ptr<SimulationController> simulationController;
+		
 	protected : QWorkspace * workspace;
-	protected : QAction* fileRotatingBoxAction;
+	
+	//protected : QAction* fileRotatingBoxAction;
+	
 	protected : QPopupMenu *preprocessorMenu;
 	protected : map<string,QPopupMenu*> menus;
 	protected : vector<QAction*> items;

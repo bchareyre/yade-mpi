@@ -1,6 +1,6 @@
 <!DOCTYPE UI><UI version="3.3" stdsetdef="1">
 <class>QtGeneratedSimulationController</class>
-<widget class="QDialog">
+<widget class="QFrame">
     <property name="name">
         <cstring>QtGeneratedSimulationController</cstring>
     </property>
@@ -648,5 +648,16 @@
         </property>
     </widget>
 </widget>
+<connections>
+    <connection>
+        <sender>pbLoadSimulation</sender>
+        <signal>clicked()</signal>
+        <receiver>QtGeneratedSimulationController</receiver>
+        <slot>pbLoadClicked()</slot>
+    </connection>
+</connections>
+<slots>
+    <slot>pbLoadClicked()</slot>
+</slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

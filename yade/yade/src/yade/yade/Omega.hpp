@@ -65,7 +65,8 @@ class Omega : public Singleton<Omega>
 	public : shared_ptr<ofstream> logFile;
 
 // FIXME - this must be a pimpl, or removed somewhere else. (circular dependency loop : 4 hours lost to find it, janek)
-	private : float gravity_x,gravity_y,gravity_z;
+	//private : float gravity_x,gravity_y,gravity_z;
+	private : Vector3r gravity;
 	public : Vector3r getGravity();
 	public : void setGravity(Vector3r g);
 
@@ -80,7 +81,7 @@ class Omega : public Singleton<Omega>
 	public	: void 		setTimestep(const string);
 	public	: float 	getTimestep();
 
-// FIXME - where to put settings? in another singleton, or in a class owned by Omega ?
+
 	private	: string 	fileName;
 	public	: void 		setFileName(const string);
 	public	: string 	getFileName();

@@ -54,12 +54,11 @@ int main(int argc, char *argv[])
 		{
 			case 'h' : help();					return 1;
 			case 'i' : frontend = optarg;				break;
-		// FIXME - maybe make another singleton with settings?, or a struct with settings inside Omega???
 			case 'f' : Omega::instance().setFileName(optarg);	break;
 			case 'm' : Omega::instance().setMaxiter(optarg);	break;
 			case 't' : Omega::instance().setTimestep(optarg);	break;
 			case 'a' : Omega::instance().setAutomatic(true);	break;
-			case 'p' : Omega::instance().setProgress(true);		break;
+			case 'p' : Omega::instance().setProgress(true);		break; // FIXME change that !!!
 			default  : help();					return 1;
 	}
 

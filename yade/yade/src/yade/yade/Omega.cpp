@@ -55,11 +55,11 @@ void Omega::init()
 	progress=false;
 
 	// FIXME - this must be a parameter in .xml !!!
-	gravity_x = 0.0;
-	gravity_y = -10.0;
+	//gravity_x = 0.0;
+	//gravity_y = -10.0;
 	//gravity_y = 0.0;
-	gravity_z = 0.0;
-	//	setGravity = Vector3r(0,-9.81,0);
+	//gravity_z = 0.0;
+	gravity = Vector3r(0,-9.81,0);
 	//dt = 0.04;
 	dt = 0.01;
 	//dt = 0.015; // max for cloth, rotating box is little slower, but both work.
@@ -188,14 +188,15 @@ long int Omega::getIter()
 
 void Omega::setGravity(Vector3r g)
 {
-	gravity_x = g.x();
-	gravity_y = g.y();
-	gravity_z = g.z();
+	//gravity_x = g.x();
+	//gravity_y = g.y();
+	//gravity_z = g.z();
+	gravity = g;
 }
 
 Vector3r Omega::getGravity()
 {
-	return Vector3r(gravity_x,gravity_y,gravity_z);
+	return gravity; //Vector3r(gravity_x,gravity_y,gravity_z);
 }
 
 /// FIXME - maybe some settings class, or something....

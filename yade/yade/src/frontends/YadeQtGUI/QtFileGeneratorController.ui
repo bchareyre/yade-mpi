@@ -1,6 +1,6 @@
 <!DOCTYPE UI><UI version="3.3" stdsetdef="1">
 <class>QtFileGeneratorController</class>
-<widget class="QDialog">
+<widget class="QFrame">
     <property name="name">
         <cstring>QtFileGeneratorController</cstring>
     </property>

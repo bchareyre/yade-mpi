@@ -12,12 +12,14 @@ HEADERS += YadeQtGUI.hpp \
            GLViewer.hpp \
            YadeQtMainWindow.hpp \
            QtFileGenerator.hpp \
-           QtGUIGenerator.hpp 
+           QtGUIGenerator.hpp \
+           SimulationController.hpp 
 SOURCES += YadeQtGUI.cpp \
            GLViewer.cpp \
            YadeQtMainWindow.cpp \
            QtFileGenerator.cpp \
-           QtGUIGenerator.cpp 
+           QtGUIGenerator.cpp \
+           SimulationController.cpp 
 LIBS += -lSerialization \
         -lMath \
         -lBody \
