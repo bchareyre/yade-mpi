@@ -34,7 +34,6 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <qframe.h>
-#include <qlineedit.h>
 #include <map>
 #include <vector>
 #include <boost/shared_ptr.hpp>
@@ -63,11 +62,15 @@ class QtGUIGenerator : public XMLManager,  public QtGUISignalCatcher
 	
 	class AttributeDescriptor
 	{
-		public : AttributeDescriptor() { strings.clear();lineEdits.clear();};
+		public : typedef enum {INTEGER,FLOATING,BOOLEAN} AttributeType;
+		
+		public : AttributeDescriptor() { strings.clear();widgets.clear();types.clear();};
 		public : string name;
 		public : vector<string> strings;
 		public : QLabel* label;
-		public : vector<QLineEdit*> lineEdits;
+		public : vector<AttributeType> types;
+		//public : vector<QLineEdit*> lineEdits;
+		public : vector<QWidget*> widgets;
 	};
 	
 	public : vector<shared_ptr<AttributeDescriptor> > descriptors;
@@ -87,6 +90,7 @@ class QtGUIGenerator : public XMLManager,  public QtGUISignalCatcher
 	public : void setTranslation(int x, int y) { translationX=x; translationY=y; };
 	public : void setShift(int x, int y) {shiftX=x;shiftY=y;};
 	
+	private : string getString(shared_ptr<AttributeDescriptor> d, int widgetNum);
 	private : int buttonWidth;
 	private : int buttonHeight;
 	private : int widgetWidth;

@@ -28,6 +28,14 @@
 
 #include <sstream>
 #include <qpushbutton.h>
+#include <boost/any.hpp>
+#include <qlineedit.h>
+#include <qcheckbox.h>
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+using namespace boost;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -108,7 +116,7 @@ void QtGUIGenerator::reArrange(QWidget * widget)
 		unsigned int nbStrings = descriptors[i]->strings.size();
 		unsigned int leWidth = (widgetWidth-maxLabelLength-shiftX-10-10-(nbStrings-1)*5)/nbStrings;	
 		for(unsigned int j=0;j<nbStrings;j++)
-			descriptors[i]->lineEdits[j]->setGeometry( QRect( shiftX+maxLabelLength+10+(leWidth+5)*j, shiftY+(20+5)*i, leWidth, 20 ) );
+			descriptors[i]->widgets[j]->setGeometry( QRect( shiftX+maxLabelLength+10+(leWidth+5)*j, shiftY+(20+5)*i, leWidth, 20 ) );
 	}
 }
 
@@ -144,9 +152,22 @@ void QtGUIGenerator::buildGUI(shared_ptr<Serializable> s,  QWidget * widget)
 			unsigned int nbStrings = descriptor->strings.size();
 			for(unsigned int i=0;i<nbStrings;i++)
 			{
-				QLineEdit* le = new QLineEdit(widget);
-				le->setText(descriptor->strings[i]);
-				descriptor->lineEdits.push_back(le);
+				any instance = (*ai)->getAddress();
+				try
+				{
+					bool * b = any_cast<bool*>(instance);
+					QCheckBox * cb = new QCheckBox(widget);
+					cb->setChecked(*b);
+					descriptor->widgets.push_back(cb);
+					descriptor->types.push_back(AttributeDescriptor::BOOLEAN);
+				}
+				catch(...)
+				{
+					QLineEdit* le = new QLineEdit(widget);
+					le->setText(descriptor->strings[i]);
+					descriptor->widgets.push_back(le);
+					descriptor->types.push_back(AttributeDescriptor::FLOATING);
+				}
 			}
 		
 			// not possible to store descriptor into a map or set ?????!!!
@@ -194,21 +215,23 @@ void QtGUIGenerator::deserialize(shared_ptr<Serializable> s)
 		{
 			string str;
 			int i = lookUp[(*ai)->getName()];
-			int nbLineEdit = descriptors[i]->lineEdits.size();
 			
-			if (nbLineEdit==1)
-				str = descriptors[i]->lineEdits[0]->text().data();
+			int nbWidget = descriptors[i]->widgets.size();
+					
+			if (nbWidget==1)
+				str = getString(descriptors[i],0);
 			else
 			{
 				str="{";
-				for(int j=0;j<nbLineEdit;j++)
+				for(int j=0;j<nbWidget;j++)
 				{
-					str+= descriptors[i]->lineEdits[j]->text().data();
+					str+= getString(descriptors[i],j);
 					str+=" ";
 				}
 				str[str.size()-1]='}';
 				
 			}
+			
 			stringstream voidStream;
 		
 			(*ai)->deserialize(voidStream,*(*ai),str);
@@ -218,6 +241,31 @@ void QtGUIGenerator::deserialize(shared_ptr<Serializable> s)
 	//ac.markProcessed();
 	s->unregisterSerializableAttributes(true);
 
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+string QtGUIGenerator::getString(shared_ptr<AttributeDescriptor> d, int widgetNum)
+{
+	switch (d->types[widgetNum])
+	{
+		case AttributeDescriptor::FLOATING : 
+		{
+			
+			return dynamic_cast<QLineEdit*>(d->widgets[widgetNum])->text().data();
+			
+		}
+		break;
+		case AttributeDescriptor::BOOLEAN :
+		{
+			if (dynamic_cast<QCheckBox*>(d->widgets[widgetNum])->isChecked())
+				return string("1");
+			else
+				return string("0");
+		}
+		break;
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
