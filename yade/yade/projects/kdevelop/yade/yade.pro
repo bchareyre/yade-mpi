@@ -11,4 +11,5 @@ SUBDIRS += Serialization \
            Interaction \
            Geometry \
            Engine \
+           Body \
            yade 
