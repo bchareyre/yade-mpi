@@ -115,7 +115,7 @@ void Sphere::subdivideTriangle(Vector3r& v1,Vector3r& v2,Vector3r& v3, int depth
 		}
 
 		glMaterialfv(GL_FRONT_AND_BACK,GL_SPECULAR,matAmbient);
-
+		
 		glBegin(GL_TRIANGLES);
 			glNormal3v(v3);
 			glVertex3v(v3);
@@ -142,20 +142,11 @@ void Sphere::subdivideTriangle(Vector3r& v1,Vector3r& v2,Vector3r& v3, int depth
 void Sphere::drawSphere(int depth)
 {
 	glShadeModel(GL_SMOOTH);
-	//GLfloat matSpecular[] = { 1.0,1.0,1.0,1.0};
-	//GLfloat matShininess[] = { 50.0};
 	GLfloat matAmbientAndDiffuse[] = { 1.0,1.0,1.0,1.0};
-
-	//glMaterialfv(GL_FRONT,GL_SPECULAR,matSpecular);
-	//glMaterialfv(GL_FRONT,GL_SHININESS,matShininess);
-  	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, diffuseColor);
 
 	number=0;
 	for(int i=0;i<20;i++)
-	{
-		//glColor3(Mathr::unitRandom(),Mathr::unitRandom(),Mathr::unitRandom());
 		subdivideTriangle(vertices[(unsigned int)faces[i][0]],vertices[(unsigned int)faces[i][1]],vertices[(unsigned int)faces[i][2]],depth);
-	}
 }
 
 void Sphere::glDraw()
@@ -175,6 +166,7 @@ void Sphere::glDraw()
 		glEndList();
 	}
 
+	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, diffuseColor);
 	glColor3v(diffuseColor);
 	if (wire)
 	{

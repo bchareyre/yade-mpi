@@ -47,7 +47,7 @@ void SimulationController::pbLoadClicked()
 			QGLFormat format;
 			QGLFormat::setDefaultFormat( format );
 			format.setStencil(TRUE);
-
+			format.setAlpha(TRUE);
 			glViews.push_back(new GLViewer(format,this->parentWidget()->parentWidget()));
 		}
 		
@@ -67,6 +67,7 @@ void SimulationController::pbNewViewClicked()
 	QGLFormat format;
 	QGLFormat::setDefaultFormat( format );
 	format.setStencil(TRUE);
+	format.setAlpha(TRUE);
 	glViews.push_back(new GLViewer(format, this->parentWidget()->parentWidget(), glViews.front()) );
 }
 

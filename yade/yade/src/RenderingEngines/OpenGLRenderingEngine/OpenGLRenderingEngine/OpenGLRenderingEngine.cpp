@@ -69,15 +69,29 @@ void OpenGLRenderingEngine::render(shared_ptr<NonConnexBody> rootBody)
 	glPopMatrix();	
 	
 	glEnable(GL_CULL_FACE);
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+/// Switch between faster/slower method
+///////////////////////////////////////////////////////////////////////////////////////////////////
 	
+	renderRootBody(rootBody);  /* render scene in depth buffer */	
 	glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
-	renderRootBody(rootBody);  /* render scene in depth buffer */
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	//glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+	//renderRootBody(rootBody);  /* render scene in depth buffer */
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+/// End Switch between faster/slower method
+///////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	glClear(GL_STENCIL_BUFFER_BIT);
 	glEnable(GL_STENCIL_TEST);
 	glDepthMask(GL_FALSE);
 	glStencilFunc(GL_ALWAYS, 0, 0);
-
 
 	glStencilOp(GL_KEEP, GL_KEEP, GL_INCR);
 	glCullFace(GL_BACK);  /* increment using front face of shadow volume */
@@ -85,31 +99,123 @@ void OpenGLRenderingEngine::render(shared_ptr<NonConnexBody> rootBody)
 	
 	glStencilOp(GL_KEEP, GL_KEEP, GL_DECR);
 	glCullFace(GL_FRONT);  /* increment using front face of shadow volume */
-	renderShadowVolumes(rootBody,lightPos);
+	renderShadowVolumes(rootBody,lightPos);	
 	
+///////////////////////////////////////////////////////////////////////////////////////////////////
+/// End Switch between faster/slower method
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+	// Need to do that to remove shadow that are not on object
+	glCullFace(GL_BACK);
+	glDepthMask(GL_LESS);
+	
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	glOrtho(0, 1, 1, 0, 0.0, -1.0);
+	
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
+	
+	glBegin(GL_QUADS);
+		glVertex3f(0,0,0.99);
+		glVertex3f(0,1,0.99);
+		glVertex3f(1,1,0.99);
+		glVertex3f(1,0,0.99);
+	glEnd();
+		
+	glMatrixMode(GL_PROJECTION); 
+	glPopMatrix();
+	
+	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix(); 
+	
+///////////////////////////////////////////////////////////////////////////////////////////////////
+/// End Switch between faster/slower method
+///////////////////////////////////////////////////////////////////////////////////////////////////
+		
 	glDepthMask(GL_TRUE);
 	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 	glCullFace(GL_BACK);
 	glDepthFunc(GL_LEQUAL);
 	glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
-	
-	//glStencilFunc(GL_EQUAL, 1, 1);  /* draw shadowed part */
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+/// Switch between faster/slower method
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 	glStencilFunc(GL_NOTEQUAL, 0, (GLuint)(-1));
-	glDisable(GL_LIGHT0);
-	renderRootBody(rootBody);  
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	glOrtho(0, 1, 1, 0, 0.0, -1.0);
 	
-	//glStencilFunc(GL_EQUAL, 0, 1);  /* draw lit part */
-	glStencilFunc(GL_EQUAL, 0, (GLuint)(-1));
-	glEnable(GL_LIGHT0);
-	renderRootBody(rootBody);  
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
 	
+	glDisable(GL_CULL_FACE);
+	glAlphaFunc(GL_GREATER, 1.0f/255.0f);
+	glEnable(GL_ALPHA_TEST);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_BLEND);	
+		
+	glColor4f(0.3,0.3,0.3,0.4);
+	glBegin(GL_QUADS);
+		glVertex2f(0,0);
+		glVertex2f(0,1);
+		glVertex2f(1,1);
+		glVertex2f(1,0);
+	glEnd();
+	
+	glEnable(GL_DEPTH_TEST);
+	glDisable(GL_BLEND);
+	glDisable(GL_ALPHA_TEST);
+	glEnable(GL_CULL_FACE);
+	
+	glMatrixMode(GL_PROJECTION); 
+	glPopMatrix();
+	
+	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix(); 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+		
+	// 	glStencilFunc(GL_EQUAL, 1, 1);  /* draw shadowed part */
+	// 	glStencilFunc(GL_NOTEQUAL, 0, (GLuint)(-1));
+	// 	glDisable(GL_LIGHT0);
+	// 	renderRootBody(rootBody);
+	// 	
+	// 	glStencilFunc(GL_EQUAL, 0, 1);  /* draw lit part */
+	// 	glStencilFunc(GL_EQUAL, 0, (GLuint)(-1));
+	// 	glEnable(GL_LIGHT0);
+	// 	renderRootBody(rootBody);  
+		
+///////////////////////////////////////////////////////////////////////////////////////////////////
+/// End Switch between faster/slower method
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 	glDepthFunc(GL_LESS);
 	glDisable(GL_STENCIL_TEST);
-	    
 
-//	renderShadowVolumes(rootBody,lightPos);
-	  
-
+	// draw transparent shadow volume
+// 	glAlphaFunc(GL_GREATER, 1.0f/255.0f);
+// 	glEnable(GL_ALPHA_TEST);
+// 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+// 	glEnable(GL_BLEND);	
+// 	glEnable(GL_LIGHTING);
+// 	
+// 	glEnable(GL_CULL_FACE);
+// 	glCullFace(GL_FRONT);
+// 	renderShadowVolumes(rootBody,lightPos);
+// 	
+// 	glCullFace(GL_BACK);
+// 	renderShadowVolumes(rootBody,lightPos);
+// 	
+// 	glEnable(GL_DEPTH_TEST);
+// 	glDisable(GL_BLEND);
+// 	glDisable(GL_ALPHA_TEST);
 }
 
 void OpenGLRenderingEngine::renderRootBody(shared_ptr<NonConnexBody> rootBody)
@@ -140,40 +246,24 @@ void OpenGLRenderingEngine::renderShadowVolumes(shared_ptr<NonConnexBody> rootBo
 			normalDir *= s->radius+0.001;
 			Vector3r biNormalDir = normalDir.unitCross(dir)*(s->radius+0.001);
 			
-			glColor3f(1.0,1.0,1.0);
+			glColor4f(0.86,0.058,0.9,0.3);
 			int nbSegments = 100;
-// 			glLineWidth(3);
-// 			glBegin(GL_LINE_LOOP);
-// 			for(int i=0;i<nbSegments;i++)
-// 			{
-// 				Vector3r p = center;
-// 				float angle = Mathr::TWO_PI/(float)nbSegments*i;
-// 				p += sin(angle)*normalDir+cos(angle)*biNormalDir;
-// 				glVertex3fv(p);
-// 			}
-// 			glEnd();
 			
-			glDisable(GL_LIGHTING);	
-			
-			glBegin(GL_QUADS);
-			for(int i=0;i<nbSegments;i++)
-			{
-				float angle = Mathr::TWO_PI/(float)nbSegments*i;
-				Vector3r p1 = center+sin(angle)*normalDir+cos(angle)*biNormalDir;
-				
-				angle = Mathr::TWO_PI/(float)nbSegments*(i+1);
-				Vector3r p4 = center+sin(angle)*normalDir+cos(angle)*biNormalDir;
-				Vector3r p2 = p1 + (p1-lightPos);
-				Vector3r p3 = p4 + (p4-lightPos);
-				Vector3r n = (p2-p1).unitCross(p4-p1);
-//				glNormal3fv(n);
+			Vector3r p1,p2;
+			glBegin(GL_QUAD_STRIP);
+				p1 = center+biNormalDir;
+				p2 = p1 + (p1-lightPos);
 				glVertex3fv(p1);
 				glVertex3fv(p2);
-				glVertex3fv(p3);
-				glVertex3fv(p4);
-			}
+				for(int i=1;i<=nbSegments;i++)
+				{
+					float angle = Mathr::TWO_PI/(float)nbSegments*i;			
+					p1 = center+sin(angle)*normalDir+cos(angle)*biNormalDir;
+					p2 = p1 + (p1-lightPos);
+					glVertex3fv(p1);
+					glVertex3fv(p2);
+				}
 			glEnd();
-			glEnable(GL_LIGHTING);	
 		}
 	}
 }

@@ -32,7 +32,7 @@
 					<body _className_="SDECDiscreteElement" id="2" isDynamic="1" velocity="{0 0 40}" angularVelocity="{0 0 0}" mass="37.699" inertia="{135.716 135.716 135.716}" kn="100000" ks="10000" se3="{2 30 -90 1 0 0 0}">
 							<bv _className_="AABB" color="{0 1 0}" center="{2 30 -90}" halfSize="{3 3 3}" />
 							<cm _className_="Sphere" diffuseColor="{0.4 0.5 1.0}" wire="0" visible="1" radius="3" />
-							<gm _className_="Sphere" shadowCaster="1" diffuseColor="{0.4 0.5 1.0}"  wire="0" visible="1" radius="3" />
+							<gm _className_="Sphere" shadowCaster="1" diffuseColor="{0.5 0.4 1.0}"  wire="0" visible="1" radius="3" />
 							<actors size="1">
 								<actors _className_="BallisticDynamicEngine" damping="1" />
 							</actors>
@@ -40,7 +40,7 @@
 					<body _className_="SDECDiscreteElement" id="3" isDynamic="1" velocity="{0 0 40}" angularVelocity="{0 0 0}" mass="37.699" inertia="{135.716 135.716 135.716}" kn="100000" ks="10000" se3="{-1.5 30 0 1 0 0 0}">
 							<bv _className_="AABB" color="{0 1 0}" center="{-1.5 30 0}" halfSize="{3 3 3}" />
 							<cm _className_="Sphere" diffuseColor="{0.4 0.5 1.0}" wire="0" visible="1" radius="3" />
-							<gm _className_="Sphere" shadowCaster="1" diffuseColor="{0.4 0.5 1.0}" wire="0" visible="1" radius="3" />
+							<gm _className_="Sphere" shadowCaster="1" diffuseColor="{1.0 0.4 0.5}" wire="0" visible="1" radius="3" />
 							<actors size="1">
 								<actors _className_="BallisticDynamicEngine" damping="1" />
 							</actors>
@@ -48,7 +48,7 @@
 					<body _className_="SDECDiscreteElement" id="4" isDynamic="1" velocity="{0 0 40}" angularVelocity="{0 0 0}" mass="37.699" inertia="{135.716 135.716 135.716}" kn="100000" ks="10000" se3="{0 30 10 1 0 0 0}">
 							<bv _className_="AABB" color="{0 1 0}" center="{0 30 10}" halfSize="{3 3 3}" />
 							<cm _className_="Sphere" diffuseColor="{0.4 0.5 1.0}" wire="0" visible="1" radius="3" />
-							<gm _className_="Sphere" shadowCaster="1" diffuseColor="{0.4 0.5 1.0}" wire="0" visible="1" radius="3" />
+							<gm _className_="Sphere" shadowCaster="1" diffuseColor="{0.4 1.0 0.5}" wire="0" visible="1" radius="3" />
 							<actors size="1">
 								<actors _className_="BallisticDynamicEngine" damping="1" />
 							</actors>
