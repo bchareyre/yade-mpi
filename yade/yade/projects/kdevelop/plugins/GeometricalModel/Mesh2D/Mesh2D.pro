@@ -5,8 +5,10 @@
 
 LIBS += -lM3D \
         -lSerialization \
-        -lConstants 
-INCLUDEPATH = ../../../yade \
+        -lConstants \
+        -lAABB 
+INCLUDEPATH = ../../../plugins/BoundingVolume/AABB \
+              ../../../yade \
               ../../../toolboxes/Math/M3D \
               ../../../toolboxes/Math/Constants \
               ../../../toolboxes/Libraries/Serialization 
@@ -16,6 +18,7 @@ OBJECTS_DIR = $(YADECOMPILATIONPATH)
 QMAKE_LIBDIR = ../../../toolboxes/Math/M3D/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Math/Constants/$(YADEDYNLIBPATH) \
+               ../../../plugins/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
 CONFIG += debug \
