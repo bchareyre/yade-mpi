@@ -43,9 +43,12 @@ void SimulationController::pbLoadClicked()
  		{
 				boost::mutex resizeMutex;	
 				boost::mutex::scoped_lock lock(resizeMutex);
+			
+			QGLFormat format;
+			QGLFormat::setDefaultFormat( format );
+			format.setStencil(TRUE);
 
-			glViews.push_back(new GLViewer(this->parentWidget()->parentWidget()));
-			//glViews.push_back(new GLViewer( this->parentWidget()->parentWidget(), glViews.front()->glView ) );
+			glViews.push_back(new GLViewer(format,this->parentWidget()->parentWidget()));
 		}
 		Omega::instance().synchronizer->startAll();
 		//Omega::instance().stopSimulationLoop();
@@ -58,7 +61,10 @@ void SimulationController::pbNewViewClicked()
 	boost::mutex resizeMutex;	
 	boost::mutex::scoped_lock lock(resizeMutex);
 
-	glViews.push_back(new GLViewer( this->parentWidget()->parentWidget(), glViews.front()/*->glView*/ ) );
+	QGLFormat format;
+	QGLFormat::setDefaultFormat( format );
+	format.setStencil(TRUE);
+	glViews.push_back(new GLViewer(format, this->parentWidget()->parentWidget(), glViews.front()/*->glView*/ ) );
 }
 
 void SimulationController::pbStopClicked()

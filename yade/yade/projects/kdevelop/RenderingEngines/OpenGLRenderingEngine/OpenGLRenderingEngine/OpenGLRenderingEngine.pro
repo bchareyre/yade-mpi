@@ -3,16 +3,21 @@
 # Subdir relative project main directory: ./RenderingEngines/OpenGLRenderingEngine/OpenGLRenderingEngine
 # Target is a library:  
 
-HEADERS += OpenGLRenderingEngine.hpp 
-SOURCES += OpenGLRenderingEngine.cpp 
-LIBS += -rdynamic 
+LIBS += -lSphere \
+        -lglut \
+        -lGLU \
+        -lGL \
+        -rdynamic 
 INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = $(YADEDYNLIBPATH) 
+QMAKE_LIBDIR = ../../../plugins/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
+               $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
 CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
+HEADERS += OpenGLRenderingEngine.hpp 
+SOURCES += OpenGLRenderingEngine.cpp 

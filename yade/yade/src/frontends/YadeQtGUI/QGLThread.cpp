@@ -94,12 +94,7 @@ void QGLThread::oneLoop()
 	
 	if (Omega::instance().rootBody)
 		renderer->render(Omega::instance().rootBody);
-	
-	const GLfloat pos[4]	= {75.0,75.0,0.0,1.0};
-	glLightfv(GL_LIGHT1, GL_POSITION, pos);
-	glEnable(GL_LIGHT1);
-	glViewer->drawLight(GL_LIGHT1);
-	
+		
 	glViewer->fpsTracker->glDraw(); 
 	glViewer->fpsTracker->addOneAction();
 	

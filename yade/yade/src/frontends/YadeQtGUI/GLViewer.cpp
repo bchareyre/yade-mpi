@@ -5,7 +5,8 @@
 #include "Omega.hpp"
 #include "ThreadSynchronizer.hpp"
 
-GLViewer::GLViewer(QWidget * parent, QGLWidget * shareWidget) /*: QThread() */: QGLViewer(parent,"glview",shareWidget), qglThread(this)
+
+GLViewer::GLViewer(const QGLFormat& format, QWidget * parent, QGLWidget * shareWidget) /*: QThread() */: QGLViewer(format,parent,"glview",shareWidget), qglThread(this)
 {
 
 	setAutoBufferSwap(false);

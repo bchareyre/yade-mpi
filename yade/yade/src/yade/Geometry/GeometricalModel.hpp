@@ -48,6 +48,7 @@ class GeometricalModel : public Serializable
 
 	public : bool visible;
 	public : bool wire;
+	public : bool shadowCaster;
 	public : Vector3r diffuseColor; // + autres proprietes
 
 	// construction

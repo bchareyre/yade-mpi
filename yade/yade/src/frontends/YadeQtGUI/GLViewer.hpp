@@ -44,7 +44,7 @@ class GLViewer : public QGLViewer
 	private : shared_ptr<FpsTracker> fpsTracker;
 	
 	// construction
-	public : GLViewer (QWidget * parent=0, QGLWidget * shareWidget=0);
+	public : GLViewer (const QGLFormat& format, QWidget * parent=0, QGLWidget * shareWidget=0);
 	public : ~GLViewer ();
 
 	private : QGLThread qglThread;
