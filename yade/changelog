@@ -1,0 +1,67 @@
+
+r.298
+- new very generic MultiMethods are added, allowing multivirtual call with extra parameters, and easy code reuse
+
+r.291
+- better handling of threads, but still not fully stable
+
+r.245
+- BoundingVolume now can be used to center scene for display
+
+r.227
+- BoundingVolume optimized for each kind of GeometricalModel makes computation almost twice faster
+
+r.225
+- some examples are not updated, and therefor not working. it is guaranteed that SDECBenchmark8k will always work.
+
+r.219
+- displayed objects are now casting really cool shadows
+
+r.209
+- switch at compile time to select float/double precision of calculation
+
+r.182
+- yade uses threads now, but still not fully stable
+
+r.180
+- for storing Bodies and Interactions we now use polymorphic classes InteractionContainer and BodyContainer
+
+r.154
+- math classes are separate from serialization, and done with templates (but with wild-magic license)
+
+r.140
+- Serialization now supports almost all std, boost and Loki containers and more
+
+r.127
+- LPC solver for ErrorTolerant computations
+
+r.122
+- moment rotation law added, mess inside SDECDynamicEngine (three enegines in one!)
+
+r.112
+- added NullGUI, so commandline computation is possible
+
+r.108
+- started ErrorTolerant DynamicEngine
+
+r.83
+- SDECDynamicEngine starts to work with SDEC contact law
+
+r.80
+- simple example for SDEC added
+
+r.76
+- Serialization uses boost::spirit
+
+r.56
+- ClassFactory is now reusable
+
+r.40
+- setDebug, setRelease scripts added
+
+r.30
+- cloth simulation added
+
+r.17
+- first try at multimethods, added class Indexable, and multimethods are used
+for collision
