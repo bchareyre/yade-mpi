@@ -47,7 +47,7 @@
 
 	Every functions that describe collision between two CollisionGeometrys must derived from CollisionFunctor.
 */
-class CollisionFunctor : public Indexable , public Factorable
+class CollisionFunctor : /*doen't have to be public Indexable !!!! it works without. */public Factorable
 {
 
 	private : bool reverse;
@@ -81,7 +81,7 @@ class CollisionFunctor : public Indexable , public Factorable
 	{								\
 		return string(#class1)+" "+string(#class2);		\
 	}								\
-	
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
