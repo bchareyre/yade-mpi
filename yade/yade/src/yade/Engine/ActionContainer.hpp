@@ -58,6 +58,8 @@ class ActionContainer : public Serializable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public    : virtual void clear() 						{throw;};
+	// doen't not delete all, just resets data
+	public    : virtual void reset() 						{throw;};
 	public    : virtual unsigned int size() 					{throw;};
 	
 	// adds Action acting on one body,

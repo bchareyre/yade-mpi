@@ -376,8 +376,8 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 /// Non Permanents Links												///
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	// FIXME : this is not very optimised : better reset them all one by one
-	body->actions->clear();
+	// FIXME : clearing actions should be called from another actor
+	body->actions->reset();
 
 	shared_ptr<Interaction> contact;
 //	for( ; cti!=ctiEnd ; ++cti)

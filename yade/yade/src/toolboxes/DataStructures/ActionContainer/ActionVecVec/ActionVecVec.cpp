@@ -20,6 +20,20 @@ void ActionVecVec::clear()
 	actions.clear();
 }
 
+void ActionVecVec::reset()
+{
+	vvi    = actions.begin();
+	vviEnd = actions.end();
+	for( ; vvi < vviEnd ; ++vvi )
+	{
+		vi    = (*vvi).begin();
+		viEnd = (*vvi).end();
+		for( ; vi < viEnd ; ++vi)
+			if(*vi)
+				(*vi)->reset();
+	}
+}
+
 unsigned int ActionVecVec::size()
 {
 	return actions.size();

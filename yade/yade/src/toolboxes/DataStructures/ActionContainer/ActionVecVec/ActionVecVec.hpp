@@ -50,6 +50,7 @@ class ActionVecVec : public ActionContainer
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public    : virtual void clear();
+	public    : virtual void reset();
 	public    : virtual unsigned int size();
 	
 	// adds Action acting on one body,
