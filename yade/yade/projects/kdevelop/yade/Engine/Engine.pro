@@ -18,7 +18,11 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
-HEADERS += DynamicEngine.hpp \
+HEADERS += ActionContainer.hpp \
+           Action.hpp \
+           DynamicEngine.hpp \
            KinematicEngine.hpp 
-SOURCES += DynamicEngine.cpp \
+SOURCES += ActionContainer.cpp \
+           Action.cpp \
+           DynamicEngine.cpp \
            KinematicEngine.cpp 

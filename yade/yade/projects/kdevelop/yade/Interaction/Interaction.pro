@@ -3,14 +3,16 @@
 # Subdir relative project main directory: ./yade/Interaction
 # Target is a library:  
 
-HEADERS += BroadInteractor.hpp \
+HEADERS += PhysicalInteractor.hpp \
+           BroadInteractor.hpp \
            Interaction.hpp \
            InteractionGeometry.hpp \
            NarrowInteractor.hpp \
            CollisionFunctor.hpp \
            InteractionContainer.hpp \
            InteractionPhysics.hpp 
-SOURCES += BroadInteractor.cpp \
+SOURCES += PhysicalInteractor.cpp \
+           BroadInteractor.cpp \
            Interaction.cpp \
            InteractionGeometry.cpp \
            NarrowInteractor.cpp \

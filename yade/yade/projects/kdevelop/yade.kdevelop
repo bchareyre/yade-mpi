@@ -30,6 +30,8 @@
       <group pattern="*.ui" name="User Interface" />
       <group pattern="*.png" name="Icons" />
       <group pattern="*" name="Others" />
+      <hidenonprojectfiles>false</hidenonprojectfiles>
+      <hidenonlocation>false</hidenonlocation>
     </groups>
     <tree>
       <hidepatterns>*.o,*.lo,CVS</hidepatterns>
@@ -104,7 +106,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>yade/Interaction</activedir>
+      <activedir>extensions</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>

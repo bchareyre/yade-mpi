@@ -18,6 +18,7 @@
 #include "CollisionGeometrySet.hpp"
 #include "CollisionGeometrySet2AABBFactory.hpp"
 #include "BoundingVolumeUpdator.hpp"
+#include "SDECLinearContactModel.hpp"
 
 SDECLinkedSpheres::SDECLinkedSpheres () : FileGenerator()
 {
@@ -71,11 +72,12 @@ string SDECLinkedSpheres::generate()
 	bvu->addBVFactories("Box","AABB","Box2AABBFactory");
 	bvu->addBVFactories("CollisionGeometrySet","AABB","CollisionGeometrySet2AABBFactory");
 	
-	rootBody->actors.resize(4);
+	rootBody->actors.resize(5);
 	rootBody->actors[0] 		= bvu;
 	rootBody->actors[1] 		= shared_ptr<Actor>(new SAPCollider);
 	rootBody->actors[2] 		= nc;
-	rootBody->actors[3] 		= shared_ptr<Actor>(new SDECDynamicEngine);
+	rootBody->actors[3] 		= shared_ptr<Actor>(new SDECLinearContactModel);
+	rootBody->actors[4] 		= shared_ptr<Actor>(new SDECDynamicEngine);
 
 	rootBody->permanentInteractions->clear();
 

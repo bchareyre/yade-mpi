@@ -389,26 +389,13 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 		shared_ptr<SDECContactGeometry> currentContactGeometry = dynamic_pointer_cast<SDECContactGeometry>(contact->interactionGeometry);
 		shared_ptr<SDECContactPhysics> currentContactPhysics;
 		
-		if ( contact->isNew)
-		{
-			// FIXME : put these lines into a dynlib - PhysicalCollider
-			contact->interactionPhysics = shared_ptr<SDECContactPhysics>(new SDECContactPhysics());
-			currentContactPhysics = dynamic_pointer_cast<SDECContactPhysics>(contact->interactionPhysics);
-			currentContactPhysics->initialKn			= 2*(de1->kn*de2->kn)/(de1->kn+de2->kn);
-			currentContactPhysics->initialKs			= 2*(de1->ks*de2->ks)/(de1->ks+de2->ks);
-			currentContactPhysics->prevNormal 			= currentContactGeometry->normal;
-			currentContactPhysics->shearForce			= Vector3r(0,0,0);
-			currentContactPhysics->initialEquilibriumDistance	= currentContactGeometry->radius1+currentContactGeometry->radius2;
-		}
-		else
-			currentContactPhysics = dynamic_pointer_cast<SDECContactPhysics>(contact->interactionPhysics);
+		currentContactPhysics = dynamic_pointer_cast<SDECContactPhysics>(contact->interactionPhysics);
 		
-		// FIXME : put these lines into another dynlib
-		currentContactPhysics->kn = currentContactPhysics->initialKn;
-		currentContactPhysics->ks = currentContactPhysics->initialKs;
-		currentContactPhysics->equilibriumDistance = currentContactPhysics->initialEquilibriumDistance;
+		if ( contact->isNew)
+			currentContactPhysics->shearForce			= Vector3r(0,0,0);
 
-		Real un 			= currentContactGeometry->penetrationDepth;
+				
+		Real un 	= currentContactGeometry->penetrationDepth;
 		currentContactPhysics->normalForce	= currentContactPhysics->kn*un*currentContactGeometry->normal;
 
 		Vector3r axis;
@@ -466,7 +453,12 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 // 		else 
 // 			cout	<< Omega::instance().getCurrentIteration() << endl;
 // 		
-		
+
+// 		ActionForce f(currentContactPhysics->normalForce + currentContactPhysics->shearForce);
+//  		ActionForce  af(f);
+// 		vector[id1].add(af,id1,id2);
+
+
 		forces[id1]	-= f;
 		forces[id2]	+= f;
 		moments[id1]	-= c1x.cross(f);
