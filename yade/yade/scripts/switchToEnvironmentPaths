@@ -1,0 +1,38 @@
+#! /bin/sh
+
+echo ' '												>  ./empty
+
+echo '#! /bin/sh'											>  ./changeProFiles
+echo 'echo CHANGING $1'											>> ./changeProFiles
+echo 'RELPATH=`echo $1 |  sed -e "s/\/[^/.]*/\\\\\\\\\/\.\./g" | sed -e "s/\/\.\.\.pro/\\\\//g"`'	>>  ./changeProFiles
+#echo 'echo $RELPATH'											>> ./changeProFiles
+echo 'mv $1 $1.tmp'											>> ./changeProFiles
+echo 'cat $1.tmp | sed -e "s/$RELPATH$3/$2/" > $1'							>> ./changeProFiles
+echo 'rm $1.tmp'											>> ./changeProFiles
+
+chmod a+x ./changeProFiles
+
+echo "adding YADECOMPILATIONPATH .... "
+find ../projects/kdevelop/  -name "*.pro" -exec fgrep -l "bin/compilation" {} \;			> ./proFilesModified
+echo './empty'												>> ./proFilesModified
+find `cat proFilesModified` -exec ./changeProFiles {} '$(YADECOMPILATIONPATH)' 'bin\/compilation' \;
+
+echo "adding YADEDYNLIBPATH .... "
+find ../projects/kdevelop/  -name "*.pro" -exec fgrep -l "bin/dynlib/linux" {} \;			> ./proFilesModified
+echo './empty'												>> ./proFilesModified
+find `cat proFilesModified` -exec ./changeProFiles {} '$(YADEDYNLIBPATH)' 'bin\/dynlib\/linux' \;
+
+echo "adding YADEINCLUDEPATH .... "
+find ../projects/kdevelop/  -name "*.pro" -exec fgrep -l "../yade/include" {} \;			> ./proFilesModified
+echo './empty'												>> ./proFilesModified
+find `cat proFilesModified` -exec ./changeProFiles {} '$(YADEINCLUDEPATH)' 'yade\/include' \;
+
+echo "adding YADEBINPATH .... "
+find ../projects/kdevelop/  -name "*.pro" -exec fgrep -l "DESTDIR = ../../../../../bin" {} \;		> ./proFilesModified
+echo './empty'												>> ./proFilesModified
+find `cat proFilesModified` -exec ./changeProFiles {} '$(YADEBINPATH)' 'bin' \;
+
+rm ./changeProFiles
+rm ./empty
+rm ./proFilesModified
+

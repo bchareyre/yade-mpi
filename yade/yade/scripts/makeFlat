@@ -1,0 +1,26 @@
+#! /bin/sh
+
+echo "With this you can have flat version of yade - all files in single directory"
+exit 0
+
+echo 'ORGDIR=`pwd`'										> makeSymLinkFlat
+echo 'ONLYNAME=`basename $1`'									>> makeSymLinkFlat
+echo 'TMPNAME=../projects/flat/src/$ONLYNAME'							>> makeSymLinkFlat
+echo 'echo symlinking $ORGDIR/$1 to `dirname $TMPNAME`'						>> makeSymLinkFlat
+echo 'TMPDIR=`dirname $TMPNAME`'								>> makeSymLinkFlat
+echo 'cd $TMPDIR'										>> makeSymLinkFlat
+echo 'ln -s $ORGDIR/$1 `basename $TMPNAME`'							>> makeSymLinkFlat
+echo 'cd $ORGDIR'										>> makeSymLinkFlat
+
+chmod a+x ./makeSymLinkFlat
+
+find ../src/ -name "*.hpp" -exec ./makeSymLinkFlat {} \;
+find ../src/ -name "*.tpp" -exec ./makeSymLinkFlat {} \;
+find ../src/ -name "*.ipp" -exec ./makeSymLinkFlat {} \;
+find ../src/ -name "*.cpp" -exec ./makeSymLinkFlat {} \;
+find ../src/ -name "*.ui" -exec ./makeSymLinkFlat {} \;
+
+symlinks -rcs ./
+symlinks -rcs ./
+
+rm ./makeSymLinkFlat
