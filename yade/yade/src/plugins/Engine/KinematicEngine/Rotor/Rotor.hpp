@@ -11,9 +11,11 @@
 
 class Rotor : public KinematicEngine
 {
+	public : Rotor();
 
 	public : Real angularVelocity;
 	public : Vector3r rotationAxis;
+	public : bool rotateAroundZero;
 
 	public : void moveToNextTimeStep(Body * body);
 

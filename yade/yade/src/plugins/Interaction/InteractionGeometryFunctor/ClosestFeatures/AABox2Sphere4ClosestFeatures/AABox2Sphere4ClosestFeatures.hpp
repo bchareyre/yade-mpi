@@ -47,7 +47,7 @@ class AABox2Sphere4ClosestFeatures : public InteractionGeometryFunctor
 						const shared_ptr<Interaction>& c);
 
 	REGISTER_CLASS_NAME(AABox2Sphere4ClosestFeatures);
-	DEFINE_FUNCTOR_ORDER_2D(Box,Sphere);
+	DEFINE_FUNCTOR_ORDER_2D(InteractionBox,InteractionSphere);
 	
 };
 

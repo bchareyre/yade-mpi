@@ -2,11 +2,17 @@
 #include "RigidBodyParameters.hpp"
 #include "ComplexBody.hpp"
 
+Rotor::Rotor()
+{
+	rotateAroundZero = false;
+}
+
 void Rotor::registerAttributes()
 {
 	KinematicEngine::registerAttributes();
 	REGISTER_ATTRIBUTE(angularVelocity);
 	REGISTER_ATTRIBUTE(rotationAxis);
+	REGISTER_ATTRIBUTE(rotateAroundZero);
 }
 
 void Rotor::moveToNextTimeStep(Body * body)
@@ -31,7 +37,9 @@ void Rotor::moveToNextTimeStep(Body * body)
 	{
 		RigidBodyParameters * rb = static_cast<RigidBodyParameters*>((*bodies)[*ii]->physicalParameters.get());
 
-		//rb->se3.translation	= q*rb->se3.translation;
+		if(rotateAroundZero)
+			rb->se3.translation	= q*rb->se3.translation; // for RotatingBox
+			
 		rb->se3.rotation	= q*rb->se3.rotation;
 
 		rb->se3.rotation.normalize();

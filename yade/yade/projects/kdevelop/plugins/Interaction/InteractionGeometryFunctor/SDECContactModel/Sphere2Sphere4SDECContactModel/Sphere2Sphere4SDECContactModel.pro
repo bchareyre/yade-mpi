@@ -9,6 +9,7 @@ LIBS += -lSerialization \
         -lMultiMethods \
         -lSDECContactGeometry \
         -lInteractionSphere \
+        -lSDECLinkGeometry \
         -rdynamic 
 INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
@@ -19,6 +20,7 @@ QMAKE_LIBDIR = ../../../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH
                ../../../../../yade/Interaction/Interaction/$(YADEDYNLIBPATH) \
                ../../../../../toolboxes/Libraries/MultiMethods/$(YADEDYNLIBPATH) \
                ../../../../../plugins/Interaction/InteractionGeometry/SDECContactGeometry/$(YADEDYNLIBPATH) \
+               ../../../../../plugins/Body/InteractionDescription/InteractionSphere/$(YADEDYNLIBPATH) \
                ../../../../../plugins/Geometry/InteractionDescription/InteractionSphere/$(YADEDYNLIBPATH) \
                ../../../../../yade/Geometry/$(YADEDYNLIBPATH) \
                ../../../../../yade/Interaction/$(YADEDYNLIBPATH) \

@@ -6,7 +6,7 @@
 
 class SDECSpheresPlane : public FileGenerator
 {
-	private : int nbSpheres;
+	private : Vector3r nbSpheres;
 	private : Real minRadius;
 	private : Real kn;
 	private : Real ks;
@@ -17,6 +17,8 @@ class SDECSpheresPlane : public FileGenerator
 	// construction
 	public : SDECSpheresPlane ();
 	public : ~SDECSpheresPlane ();
+	private : void createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents);
+	private : void createSphere(shared_ptr<Body>& body, int i, int j, int k);
 
 	protected : virtual void postProcessAttributes(bool deserializing);
 	public : void registerAttributes();

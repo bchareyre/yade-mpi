@@ -14,10 +14,6 @@ class SDECContactPhysics : public InteractionPhysics
 
 	public : virtual ~SDECContactPhysics();
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-/// Attributes											///
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 	public : Real kn;				// normal elastic constant.
 	public : Real ks;				// shear elastic constant.
 	public : Real initialKn;			// initial normal elastic constant.
@@ -27,10 +23,6 @@ class SDECContactPhysics : public InteractionPhysics
 	public : Vector3r prevNormal;			// unit normal of the contact plane.
 	public : Vector3r normalForce;			// normal force applied on a DE
 	public : Vector3r shearForce;			// shear force applied on a DE
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-/// Serialization										///
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 	REGISTER_CLASS_NAME(SDECContactPhysics);
 };

@@ -106,7 +106,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>preprocessors/FileGenerator/SDECLinkedSpheres</activedir>
+      <activedir>plugins/Engine/DynamicEngine/SimpleSpringDynamicEngine</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>

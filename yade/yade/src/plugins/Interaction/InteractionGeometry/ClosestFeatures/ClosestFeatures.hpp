@@ -8,8 +8,9 @@
 
 class ClosestFeatures : public InteractionGeometry
 {
+	public : ClosestFeatures();
 	public : virtual ~ClosestFeatures();
-
+	
 	public : std::vector<std::pair<Vector3r,Vector3r> > closestsPoints;
 	public : std::vector<int> verticesId;
 

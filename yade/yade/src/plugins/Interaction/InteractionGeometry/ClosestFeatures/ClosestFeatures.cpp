@@ -1,12 +1,9 @@
 #include "ClosestFeatures.hpp"
 
-// ClosestFeatures::ClosestFeatures() : InteractionGeometry()
-// {
-// }
-// 
-// 
-
-// is necessery for dynamic_cast to succeed
+ClosestFeatures::ClosestFeatures() : InteractionGeometry()
+{
+	closestsPoints.clear();
+}
 
 ClosestFeatures::~ClosestFeatures ()
 {

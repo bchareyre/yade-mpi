@@ -22,8 +22,8 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "Box2Sphere4ClosestFeatures.hpp"
-#include "Sphere.hpp"
-#include "Box.hpp"
+#include "InteractionSphere.hpp"
+#include "InteractionBox.hpp"
 #include "ClosestFeatures.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -33,11 +33,11 @@ bool Box2Sphere4ClosestFeatures::go(		const shared_ptr<InteractionDescription>& 
 						const shared_ptr<InteractionDescription>& cm2,
 						const Se3r& se31,
 						const Se3r& se32,
-						const shared_ptr<Interaction>& c)
+						const shared_ptr<Interaction>& interaction)
 {
 
 	//if (se31.rotation == Quaternionr())
-	//	return collideAABoxSphere(cm1,cm2,se31,se32,c);
+	//	return collideAABoxSphere(cm1,cm2,se31,se32,interaction);
 	
 	Vector3r l,t,p,q,r;
 	bool onborder = false;
@@ -45,8 +45,8 @@ bool Box2Sphere4ClosestFeatures::go(		const shared_ptr<InteractionDescription>& 
 	Matrix3r axisT,axis;
 	Real depth;
 
-	shared_ptr<Sphere> s = dynamic_pointer_cast<Sphere>(cm2);
-	shared_ptr<Box> obb = dynamic_pointer_cast<Box>(cm1);
+	shared_ptr<InteractionSphere> s = dynamic_pointer_cast<InteractionSphere>(cm2);
+	shared_ptr<InteractionBox> obb = dynamic_pointer_cast<InteractionBox>(cm1);
 	
 	Vector3r extents = obb->extents;
 
@@ -99,7 +99,7 @@ bool Box2Sphere4ClosestFeatures::go(		const shared_ptr<InteractionDescription>& 
 	
 		shared_ptr<ClosestFeatures> cf = shared_ptr<ClosestFeatures>(new ClosestFeatures());
 		cf->closestsPoints.push_back(std::pair<Vector3r,Vector3r>(pt1,pt2));
-		c->interactionGeometry = cf;
+		interaction->interactionGeometry = cf;
 		
 		return true;	
 	}
@@ -121,7 +121,8 @@ bool Box2Sphere4ClosestFeatures::go(		const shared_ptr<InteractionDescription>& 
 	
 	shared_ptr<ClosestFeatures> cf = shared_ptr<ClosestFeatures>(new ClosestFeatures());
 	cf->closestsPoints.push_back(std::pair<Vector3r,Vector3r>(pt1,pt2));
-	c->interactionGeometry = cf;
+	
+	interaction->interactionGeometry = cf;
 	
 	return true;
 }
@@ -133,12 +134,12 @@ bool Box2Sphere4ClosestFeatures::goReverse(	const shared_ptr<InteractionDescript
 						const shared_ptr<InteractionDescription>& cm2,
 						const Se3r& se31,
 						const Se3r& se32,
-						const shared_ptr<Interaction>& c)
+						const shared_ptr<Interaction>& interaction)
 {
-	bool isInteracting = go(cm2,cm1,se32,se31,c);
+	bool isInteracting = go(cm2,cm1,se32,se31,interaction);
 	if (isInteracting)
 	{
-		shared_ptr<ClosestFeatures> cf = dynamic_pointer_cast<ClosestFeatures>(c->interactionGeometry);
+		shared_ptr<ClosestFeatures> cf = dynamic_pointer_cast<ClosestFeatures>(interaction->interactionGeometry);
 		Vector3r tmp = cf->closestsPoints[0].first;
 		cf->closestsPoints[0].first = cf->closestsPoints[0].second;		
 		cf->closestsPoints[0].second = tmp;

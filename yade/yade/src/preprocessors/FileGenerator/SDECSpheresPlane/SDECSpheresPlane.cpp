@@ -35,7 +35,7 @@
 
 SDECSpheresPlane::SDECSpheresPlane () : FileGenerator()
 {
-	nbSpheres = 2;
+	nbSpheres = Vector3r(2,3,2);
 	minRadius = 5;
 	maxRadius = 5;
 	kn = 100000;
@@ -120,112 +120,128 @@ string SDECSpheresPlane::generate()
 	rootBody->physicalParameters = physics2;
 		
 	rootBody->permanentInteractions->clear();
-//	rootBody->permanentInteractions[0] = shared_ptr<Interaction>(new Interaction);
-//	rootBody->permanentInteractions[0]->interactionGeometry = shared_ptr<SDECLinkGeometry>(new SDECLinkGeometry);
 
 	rootBody->isDynamic		= false;
-	//rootBody->velocity		= Vector3r(0,0,0);
-	//rootBody->angularVelocity	= Vector3r(0,0,0);
-	//rootBody->se3			= Se3r(Vector3r(0,0,0),q);
 
 	shared_ptr<AABB> aabb;
 	shared_ptr<Box> box;
 	
 	shared_ptr<InteractionDescriptionSet> set(new InteractionDescriptionSet());
 	set->diffuseColor	= Vector3f(0,0,1);
-	//set->wire		= false;
-	//set->visible		= true;
-	//set->shadowCaster	= false;
 	rootBody->interactionGeometry		= dynamic_pointer_cast<InteractionDescription>(set);	
-	
-	aabb			= shared_ptr<AABB>(new AABB);
-	aabb->diffuseColor		= Vector3r(0,0,1);
+	aabb					= shared_ptr<AABB>(new AABB);
+	aabb->diffuseColor			= Vector3r(0,0,1);
 	rootBody->boundingVolume		= dynamic_pointer_cast<BoundingVolume>(aabb);
 
-	
-	shared_ptr<SimpleBody> box1(new SimpleBody);
-	shared_ptr<SDECParameters> physics(new SDECParameters);
-	
-	aabb			= shared_ptr<AABB>(new AABB);
-	box			= shared_ptr<Box>(new Box);
-	shared_ptr<InteractionBox> interactionBox(new InteractionBox);
-	box1->isDynamic		= false;
-	physics->angularVelocity= Vector3r(0,0,0);
-	physics->velocity	= Vector3r(0,0,0);
-	physics->mass		= 0;
-	physics->inertia	= Vector3r(0,0,0);
-	physics->se3		= Se3r(Vector3r(0,0,0),q);
-	aabb->diffuseColor	= Vector3r(1,0,0);
-	box1->boundingVolume		= dynamic_pointer_cast<BoundingVolume>(aabb);
-	
-	box->extents		= groundSize;
-	box->diffuseColor	= Vector3f(1,1,1);
-	box->wire		= false;
-	box->visible		= true;
-	box->shadowCaster	= false;
-	
-	interactionBox->extents		= groundSize;
-	interactionBox->diffuseColor	= Vector3f(1,1,1);
-		
-	box1->interactionGeometry		= dynamic_pointer_cast<InteractionDescription>(interactionBox);
-	box1->geometricalModel		= dynamic_pointer_cast<GeometricalModel>(box);
-	physics->kn		= kn;
-	physics->ks		= ks;
+///////// ground
 
-	box1->physicalParameters = physics;
-	
-	shared_ptr<Body> b;
-	b = dynamic_pointer_cast<Body>(box1);
-	rootBody->bodies->insert(b);
+	shared_ptr<Body> ground;
+	createBox(ground, Vector3r(0,0,0), groundSize);
+	rootBody->bodies->insert(ground);
 
-	Vector3r translation;
+///////// spheres
 
-	for(int i=0;i<nbSpheres;i++)
-		for(int j=0;j<nbSpheres;j++)
-			for(int k=0;k<nbSpheres;k++)
-	{
-		shared_ptr<SimpleBody> simple(new SimpleBody);
-		shared_ptr<SDECParameters> s(new SDECParameters);
-		shared_ptr<AABB> aabb(new AABB);
-		shared_ptr<Sphere> sphere(new Sphere);
-		shared_ptr<InteractionSphere> interactionSphere(new InteractionSphere);
-		
-		translation 		= Vector3r(i,j,k)*(2*maxRadius*1.1)-Vector3r(nbSpheres/2*(2*maxRadius*1.1),-7-maxRadius*2,nbSpheres/2*(2*maxRadius*1.1))+Vector3r(Mathr::symmetricRandom()*1.1,Mathr::symmetricRandom()*1.1,Mathr::symmetricRandom()*1.1);
-		Real radius 		= (Mathr::intervalRandom(minRadius,maxRadius));
-
-// 		shared_ptr<BallisticDynamicEngine> ballistic(new BallisticDynamicEngine);
-// 		ballistic->damping 	= 1.0;//0.95;
-// 		simple->actors.push_back(ballistic);
-
-		simple->isDynamic		= true;
-		s->angularVelocity	= Vector3r(0,0,0);
-		s->velocity		= Vector3r(0,0,0);
-		s->mass			= 4.0/3.0*Mathr::PI*radius*radius;
-		s->inertia		= Vector3r(2.0/5.0*s->mass*radius*radius,2.0/5.0*s->mass*radius*radius,2.0/5.0*s->mass*radius*radius);
-		s->se3			= Se3r(translation,q);
-
-		aabb->diffuseColor		= Vector3r(0,1,0);
-		simple->boundingVolume			= dynamic_pointer_cast<BoundingVolume>(aabb);
-
-		sphere->radius		= radius;
-		sphere->diffuseColor	= Vector3f(Mathf::unitRandom(),Mathf::unitRandom(),Mathf::unitRandom());
-		sphere->wire		= false;
-		sphere->visible		= true;
-		sphere->shadowCaster	= true;
-		
-		interactionSphere->radius	= radius;
-		interactionSphere->diffuseColor	= Vector3f(Mathf::unitRandom(),Mathf::unitRandom(),Mathf::unitRandom());
-		
-		
-		simple->interactionGeometry			= dynamic_pointer_cast<InteractionDescription>(interactionSphere);
-		simple->geometricalModel			= dynamic_pointer_cast<GeometricalModel>(sphere);
-		s->kn			= kn;
-		s->ks			= ks;
-		simple->physicalParameters = s;
-		
-		b = dynamic_pointer_cast<Body>(simple);
-		rootBody->bodies->insert(b);
-	}
+	for(int i=0;i<nbSpheres[0];i++)
+		for(int j=0;j<nbSpheres[1];j++)
+			for(int k=0;k<nbSpheres[2];k++)
+			{
+				shared_ptr<Body> sphere;
+				createSphere(sphere,i,j,k);
+				rootBody->bodies->insert(sphere);
+			}
 	
 	return "";
 }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+void SDECSpheresPlane::createSphere(shared_ptr<Body>& body, int i, int j, int k)
+{
+	body = shared_ptr<Body>(new SimpleBody(0,0));
+	shared_ptr<SDECParameters> physics(new SDECParameters);
+	shared_ptr<AABB> aabb(new AABB);
+	shared_ptr<Sphere> gSphere(new Sphere);
+	shared_ptr<InteractionSphere> iSphere(new InteractionSphere);
+	
+	Quaternionr q;
+	q.fromAxisAngle( Vector3r(0,0,1),0);
+	
+	Vector3r translation		= Vector3r(i,j,k)*(2*maxRadius*1.1) // this formula is crazy !!
+					  - Vector3r( nbSpheres[0]/2*(2*maxRadius*1.1) , -7-maxRadius*2 , nbSpheres[2]/2*(2*maxRadius*1.1) )
+					  + Vector3r(Mathr::symmetricRandom()*1.1,Mathr::symmetricRandom()*1.1,Mathr::symmetricRandom()*1.1);
+	
+	Real radius 			= (Mathr::intervalRandom(minRadius,maxRadius));
+	
+	body->isDynamic			= true;
+	
+	physics->angularVelocity	= Vector3r(0,0,0);
+	physics->velocity		= Vector3r(0,0,0);
+	physics->mass			= 4.0/3.0*Mathr::PI*radius*radius; //*density
+	physics->inertia		= Vector3r(2.0/5.0*physics->mass*radius*radius,2.0/5.0*physics->mass*radius*radius,2.0/5.0*physics->mass*radius*radius); //
+	physics->se3			= Se3r(translation,q);
+	physics->kn			= kn;
+	physics->ks			= ks;
+
+	aabb->diffuseColor		= Vector3r(0,1,0);
+
+	gSphere->radius			= radius;
+	gSphere->diffuseColor		= Vector3f(Mathf::unitRandom(),Mathf::unitRandom(),Mathf::unitRandom());
+	gSphere->wire			= false;
+	gSphere->visible		= true;
+	gSphere->shadowCaster		= true;
+	
+	iSphere->radius			= radius;
+	iSphere->diffuseColor		= Vector3f(0.8,0.3,0.3);
+
+	body->interactionGeometry	= iSphere;
+	body->geometricalModel		= gSphere;
+	body->boundingVolume		= aabb;
+	body->physicalParameters	= physics;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+void SDECSpheresPlane::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents)
+{
+	body = shared_ptr<Body>(new SimpleBody(0,0));
+	shared_ptr<SDECParameters> physics(new SDECParameters);
+	shared_ptr<AABB> aabb(new AABB);
+	shared_ptr<Box> gBox(new Box);
+	shared_ptr<InteractionBox> iBox(new InteractionBox);
+	
+	
+	Quaternionr q;
+	q.fromAxisAngle( Vector3r(0,0,1),0);
+
+	body->isDynamic			= false;
+	
+	physics->angularVelocity	= Vector3r(0,0,0);
+	physics->velocity		= Vector3r(0,0,0);
+	physics->mass			= 0;
+	physics->inertia		= Vector3r(0,0,0);
+	physics->se3			= Se3r(position,q);
+	physics->kn			= kn;
+	physics->ks			= ks;
+
+	aabb->diffuseColor		= Vector3r(1,0,0);
+
+	gBox->extents			= extents;
+	gBox->diffuseColor		= Vector3f(1,1,1);
+	gBox->wire			= false;
+	gBox->visible			= true;
+	gBox->shadowCaster		= true;
+	
+	iBox->extents			= extents;
+	iBox->diffuseColor		= Vector3f(1,1,1);
+
+	body->boundingVolume		= aabb;
+	body->interactionGeometry	= iBox;
+	body->geometricalModel		= gBox;
+	body->physicalParameters	= physics;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+

@@ -24,6 +24,7 @@
 #include "Sphere2Sphere4SDECContactModel.hpp"
 #include "InteractionSphere.hpp"
 #include "SDECContactGeometry.hpp"
+#include "SDECLinkGeometry.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -40,23 +41,31 @@ bool Sphere2Sphere4SDECContactModel::go(	const shared_ptr<InteractionDescription
 	Vector3r normal = se32.translation-se31.translation;
 	Real penetrationDepth = s1->radius+s2->radius-normal.normalize();
 
+	shared_ptr<SDECContactGeometry> scm;
+	if (c->interactionGeometry)
+	{
+		scm = dynamic_pointer_cast<SDECContactGeometry>(c->interactionGeometry);
+		
+		if(! scm) // this is not SDECContactGeometry, so it is SDECLinkGeometry, dispatcher should do this job.
+		{
+			shared_ptr<SDECLinkGeometry> linkGeometry = dynamic_pointer_cast<SDECLinkGeometry>(c->interactionGeometry);
+//			cerr << "it is SpringGeometry ???: " << c->interactionGeometry->getClassName() << endl;
+//			assert(linkGeometry);
+			if(linkGeometry)
+			{
+				linkGeometry->normal 			= se32.translation-se31.translation;
+				linkGeometry->normal.normalize();
+				return true;
+			}
+			else
+				return false; // SpringGeometry !!!???????
+		}
+	}
+	else
+		scm = shared_ptr<SDECContactGeometry>(new SDECContactGeometry());
+		
 	if (penetrationDepth>0)
 	{
-		// FIXME : remove those uncommented lines
-		shared_ptr<SDECContactGeometry> scm;
-		if (c->interactionGeometry)
-		{
-			scm = dynamic_pointer_cast<SDECContactGeometry>(c->interactionGeometry);
-			
-			// FIXME !!!!!!!! this is a SDECLinkGeometry, and this line is in SDECDynamicEngine:
-			// FIXME - currentContactGeometry->normal 			= (de2->se3.translation-de1->se3.translation);
-			// that line should be here, or in some other dynlib !!!!!!!!!
-			
-			if(! scm) return true; 
-		}
-		else
-			scm = shared_ptr<SDECContactGeometry>(new SDECContactGeometry());
-			
 		scm->contactPoint = se31.translation+(s1->radius-0.5*penetrationDepth)*normal;//0.5*(pt1+pt2);
 		scm->normal = normal;
 		scm->penetrationDepth = penetrationDepth;
@@ -66,21 +75,10 @@ bool Sphere2Sphere4SDECContactModel::go(	const shared_ptr<InteractionDescription
 		if (!c->interactionGeometry)
 			c->interactionGeometry = scm;
 	
-// FIXME : uncommente those lines	
-/////////////////////////////////////////////////
-// 		shared_ptr<SDECContactGeometry> scm = shared_ptr<SDECContactGeometry>(new SDECContactGeometry());
-// 		scm->contactPoint = se31.translation+(s1->radius-0.5*penetrationDepth)*normal;//0.5*(pt1+pt2);
-// 		scm->normal = normal;
-// 		scm->penetrationDepth = penetrationDepth;
-// 		scm->radius1 = s1->radius;
-// 		scm->radius2 = s2->radius;
-// 		c->interactionGeometry = scm;
-/////////////////////////////////////////		
 		return true;
 	}
 	else	
 		return false;
-
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

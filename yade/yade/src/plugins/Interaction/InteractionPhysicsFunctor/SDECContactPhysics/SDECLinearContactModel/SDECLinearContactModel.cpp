@@ -66,18 +66,15 @@ void SDECLinearContactModel::go(	  const shared_ptr<BodyPhysicalParameters>& b1 
 		
 		
 	}
-	else   // this is PERMANENT LINK, instead of doing dynamic_cast here, dispatcher should work here.
-	
-	{	// dynamic_cast failed, because we have here SDECLinkGeometry !!
-		// maybe we should dispatch on type of interactionGeometry ?!?!
-		SDECLinkGeometry* sdecPermanentLink =  dynamic_cast<SDECLinkGeometry*>(interaction->interactionGeometry.get());
-		if( ! sdecPermanentLink )
-		{
-			cerr << "SDECLinearContactModel: what geometry?\n";
-			return;
-		}
+	else   // this is PERMANENT LINK because previous dynamic_cast failed, dispatcher should do this job
+	{
+		SDECLinkGeometry* sdecLinkGeometry =  dynamic_cast<SDECLinkGeometry*>(interaction->interactionGeometry.get());
+		assert( sdecLinkGeometry );
 		
-			
+		shared_ptr<SDECLinkPhysics> linkPhysics = dynamic_pointer_cast<SDECLinkPhysics>(interaction->interactionPhysics);
 		
+		linkPhysics->kn 			= linkPhysics->initialKn;
+		linkPhysics->ks 			= linkPhysics->initialKs;
+		linkPhysics->equilibriumDistance 	= linkPhysics->initialEquilibriumDistance;
 	}
 };

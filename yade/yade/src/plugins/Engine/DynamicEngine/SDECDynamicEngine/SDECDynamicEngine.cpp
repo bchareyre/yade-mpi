@@ -86,18 +86,11 @@ void SDECDynamicEngine::respondToInteractions(Body* body)
 		if( (*bodies)[id1]->getGroup() != sdecGroup || (*bodies)[id2]->getGroup() != sdecGroup )
 			continue; // skip other groups, BTW: this is example of a good usage of 'continue' keyword
 
-		shared_ptr<SDECParameters> de1					= dynamic_pointer_cast<SDECParameters>((*bodies)[id1]->physicalParameters);
-		shared_ptr<SDECParameters> de2 					= dynamic_pointer_cast<SDECParameters>((*bodies)[id2]->physicalParameters);
+		shared_ptr<SDECParameters> de1				= dynamic_pointer_cast<SDECParameters>((*bodies)[id1]->physicalParameters);
+		shared_ptr<SDECParameters> de2 				= dynamic_pointer_cast<SDECParameters>((*bodies)[id2]->physicalParameters);
 		shared_ptr<SDECLinkPhysics> currentContactPhysics	= dynamic_pointer_cast<SDECLinkPhysics>(contact2->interactionPhysics);
-		shared_ptr<SDECLinkGeometry> currentContactGeometry		= dynamic_pointer_cast<SDECLinkGeometry>(contact2->interactionGeometry);
+		shared_ptr<SDECLinkGeometry> currentContactGeometry	= dynamic_pointer_cast<SDECLinkGeometry>(contact2->interactionGeometry);
 
-		/// FIXME : put these lines into another dynlib
-		currentContactPhysics->kn 			= currentContactPhysics->initialKn;
-		currentContactPhysics->ks 			= currentContactPhysics->initialKs;
-		currentContactPhysics->equilibriumDistance 	= currentContactPhysics->initialEquilibriumDistance;
-		// FIXME - this is currently NOT DONE in Sphere2Sphere4SDECContactModel !!!!!!!!
-		currentContactGeometry->normal 			= (de2->se3.translation-de1->se3.translation);
-		currentContactGeometry->normal.normalize();
 		Real un 					= currentContactPhysics->equilibriumDistance-(de2->se3.translation-de1->se3.translation).length();
 		currentContactPhysics->normalForce		= currentContactPhysics->kn*un*currentContactGeometry->normal;
 

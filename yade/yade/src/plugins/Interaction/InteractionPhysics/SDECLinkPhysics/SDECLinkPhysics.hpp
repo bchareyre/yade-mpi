@@ -11,6 +11,7 @@
 
 class SDECLinkPhysics : public InteractionPhysics
 {
+	public : SDECLinkPhysics();
 	public : virtual ~SDECLinkPhysics();
 	
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -47,7 +47,7 @@ class Terrain2Sphere4ClosestFeatures : public InteractionGeometryFunctor
 						const shared_ptr<Interaction>& c);
 	
 	REGISTER_CLASS_NAME(Terrain2Sphere4ClosestFeatures);
-	DEFINE_FUNCTOR_ORDER_2D(Terrain,Sphere);
+	DEFINE_FUNCTOR_ORDER_2D(InteractionTerrain,InteractionSphere);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
