@@ -47,6 +47,8 @@ YadeQtMainWindow::YadeQtMainWindow() : YadeQtGeneratedMainWindow()
 		if( Omega::instance().getAutomatic() )
 			glViewer->startAnimation();
 	}*/
+	
+	simulationController = 0;
 }
 
 YadeQtMainWindow::~YadeQtMainWindow()
@@ -118,9 +120,7 @@ void YadeQtMainWindow::closeSimulationControllerEvent()
 
 void YadeQtMainWindow::fileExit()
 {
-	if (simulationController)
-		delete simulationController;
-	YadeQtGeneratedMainWindow::closeEvent(0);
+	emit close();
 }
 
 void YadeQtMainWindow::closeEvent(QCloseEvent *e)
