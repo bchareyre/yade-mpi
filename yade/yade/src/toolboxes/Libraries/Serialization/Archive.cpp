@@ -26,8 +26,9 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-map<FactorableTypes::Type,pair<SerializeFnPtr,DeserializeFnPtr> > Archive::serializationMap;
-map<FactorableTypes::Type,pair<SerializeFnPtr,DeserializeFnPtr> > Archive::serializationMapOfFundamental;
+map<SerializableTypes::Type,pair<SerializeFnPtr,DeserializeFnPtr> > Archive::serializationMap;
+map<SerializableTypes::Type,pair<SerializeFnPtr,DeserializeFnPtr> > Archive::serializationMapOfFundamental;
+Archive::SerializableDescriptorMap Archive::map;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -55,7 +56,7 @@ bool Archive::containsOnlyFundamentals()
 		return true;
 	else
 	{
-		if (recordType==FactorableTypes::SERIALIZABLE)
+		if (recordType==SerializableTypes::SERIALIZABLE)
 		{
 			Serializable * s = any_cast<Serializable*>(getAddress());
 			s->registerAttributes();
@@ -65,7 +66,7 @@ bool Archive::containsOnlyFundamentals()
 			return result;
 
 		}
-		else if (recordType==FactorableTypes::CUSTOM_CLASS)
+		else if (recordType==SerializableTypes::CUSTOM_CLASS)
 		{
 			shared_ptr<Serializable> s = dynamic_pointer_cast<Serializable>(ClassFactory::instance().createShared(getSerializableClassName()));
 			s->registerAttributes();
@@ -74,7 +75,7 @@ bool Archive::containsOnlyFundamentals()
 			s->unregisterAttributes();
 			return result;
 		}
-		else if (recordType==FactorableTypes::POINTER)
+		else if (recordType==SerializableTypes::POINTER)
 		{
 			shared_ptr<Archive> tmpAc;
 			return !createPointedArchive(*this,tmpAc);
@@ -87,7 +88,7 @@ bool Archive::containsOnlyFundamentals()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool Archive::addSerializablePointer(FactorableTypes::Type rt ,bool fundamental, SerializeFnPtr sp, DeserializeFnPtr dsp)
+bool Archive::addSerializablePointer(SerializableTypes::Type rt ,bool fundamental, SerializeFnPtr sp, DeserializeFnPtr dsp)
 {
 	if (fundamental)
 		serializationMapOfFundamental[rt] = pair<SerializeFnPtr,DeserializeFnPtr>(sp,dsp);
@@ -99,4 +100,41 @@ bool Archive::addSerializablePointer(FactorableTypes::Type rt ,bool fundamental,
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+// bool Archive::registerSerializableDescriptor( string name , VerifyFactorableFnPtr verify, SerializableTypes::Type type, bool f )
+// {
+// 	std::cout << "registering serializable : " << name << endl;
+// 	
+// 	bool tmp = map.insert( SerializableDescriptorMap::value_type( name , SerializableDescriptor(verify,type,f) )).second;
+// 
+// 	//#ifdef DEBUG
+// 		if (tmp)
+// 			std::cout << "registering serializable : " << name << " OK\n";
+// 		else
+// 			std::cout << "registering serializable: " << name << " FAILED\n";
+// 	//#endif
+// 
+// 	return tmp;
+// }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+// bool Archive::findClassInfo(const type_info& tp,SerializableTypes::Type& type, string& serializableClassName,bool& fundamental)
+// {
+// 	SerializableDescriptorMap::iterator mi    = map.begin();
+// 	SerializableDescriptorMap::iterator miEnd = map.end();
+// 
+// 	for( ; mi!=miEnd ; mi++)
+// 	{
+// 		if (tp==(*mi).second.verify())
+// 		{
+// 			serializableClassName=(*mi).first;
+// 			fundamental = (*mi).second.fundamental;
+// 			type = (*mi).second.type;
+// 			return true;
+// 		}
+// 	}
+// 	return false;
+// }
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////

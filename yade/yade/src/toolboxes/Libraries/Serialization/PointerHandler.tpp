@@ -110,7 +110,7 @@ struct PointerHandler<shared_ptr<PointedType> >
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 template<typename PointedType>
-FactorableTypes::Type findType( shared_ptr<PointedType>& ,bool& fundamental, string& str)
+SerializableTypes::Type findType( shared_ptr<PointedType>& ,bool& fundamental, string& str)
 {
 	/*PointedType tmpPt;
 
@@ -126,11 +126,11 @@ FactorableTypes::Type findType( shared_ptr<PointedType>& ,bool& fundamental, str
 	PointedType tmpV;
 	bool tmpFundamental;
 
-	FactorableTypes::Type t = findType(tmpV,tmpFundamental,str);
+	SerializableTypes::Type t = findType(tmpV,tmpFundamental,str);
 
-	fundamental = ( boost::is_fundamental<PointedType>::value || ((t==FactorableTypes::POINTER || t==FactorableTypes::CUSTOM_CLASS || t==FactorableTypes::CONTAINER) && tmpFundamental) );
+	fundamental = ( boost::is_fundamental<PointedType>::value || ((t==SerializableTypes::POINTER || t==SerializableTypes::CUSTOM_CLASS || t==SerializableTypes::CONTAINER) && tmpFundamental) );
 
-	return FactorableTypes::POINTER;
+	return SerializableTypes::POINTER;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -21,11 +21,25 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "Serializable.hpp"
+
 #include "ArchiveTypes.hpp"
 #include "FundamentalHandler.tpp"
 #include "ContainerHandler.tpp"
 #include "PointerHandler.tpp"
+#include "KnownFundamentalsHandler.tpp"
+//#include "MultiTypeHandler.tpp"
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+#include "Vector2.hpp"
+#include "Vector3.hpp"
+#include "Vector4.hpp"
+#include "Matrix2.hpp"
+#include "Matrix3.hpp"
+#include "Matrix4.hpp"
+#include "Quaternion.hpp"
+#include "Se3.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -46,25 +60,56 @@ struct ContainerHandler;
 template<typename Type>
 struct PointerHandler;
 
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+template<typename Type>
+bool isFundamental(Type& )
+{
+	return	(	boost::is_fundamental< Type >::value 	|| //int, float, char, double ...
+			typeid(Type)==typeid(string) 		|| // std::string 
+			typeid(Type)==typeid(Vector2f)		||
+			typeid(Type)==typeid(Vector2d)		||
+			typeid(Type)==typeid(Vector3f)		||
+			typeid(Type)==typeid(Vector3d)		||
+			typeid(Type)==typeid(Vector4f)		||
+			typeid(Type)==typeid(Vector4d)		||
+			typeid(Type)==typeid(Matrix2f)		||
+			typeid(Type)==typeid(Matrix2d)		||
+			typeid(Type)==typeid(Matrix3f)		||
+			typeid(Type)==typeid(Matrix3d)		||
+			typeid(Type)==typeid(Matrix4f)		||
+			typeid(Type)==typeid(Matrix4d)		||
+			typeid(Type)==typeid(Quaternionf)	||
+			typeid(Type)==typeid(Quaterniond)	||
+			typeid(Type)==typeid(Se3f)		||
+			typeid(Type)==typeid(Se3d)	
+			
+		);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 /*! Primary template for findtype. Use to catch fundamental type, serializable class and custom class */
 template<typename Type>
-FactorableTypes::Type findType(Type& ,bool& fundamental, string& str)
+SerializableTypes::Type findType(Type& instance,bool& fundamental, string& str)
 {
-	FactorableTypes::Type type;
-	if (boost::is_fundamental< Type >::value || typeid(Type)==typeid(string) )
-	{
+	SerializableTypes::Type type;
+			
+	if (isFundamental(instance))
+	{	
 		fundamental = true;
-		return FactorableTypes::FUNDAMENTAL;
+		return SerializableTypes::FUNDAMENTAL;
 	}
 	else if (typeid(Serializable)==typeid(Type))
 	{
 		fundamental = false;
-		return FactorableTypes::SERIALIZABLE;
+		return SerializableTypes::SERIALIZABLE;
 	}
-	else if (ClassFactory::instance().findClassInfo(typeid(Type),type,str,fundamental))
+	else if (SerializableSingleton::instance().findClassInfo(typeid(Type),type,str,fundamental))
 	{
 		return type;
 	}
@@ -107,28 +152,28 @@ inline shared_ptr<Archive> Archive::create(const string& name,Type& attribute)
 	// according to Type, the Archive is filled with the needed information
 	switch (ac->getRecordType())
 	{
-		case FactorableTypes::SERIALIZABLE :
+		case SerializableTypes::SERIALIZABLE :
 		{
 			// reinterpret_cast is needed beacause this is a template function and when it is compiled it catches everything including int,float .... i.e. non class types
 			Serializable * s = reinterpret_cast<Serializable*>(&attribute);
 			ac->setAddress(s);
 		}
 		break;
-		case FactorableTypes::FUNDAMENTAL :
+		case SerializableTypes::FUNDAMENTAL :
 			ac->serializeFundamental   = FundamentalHandler< Type >::accessor;
 			ac->deserializeFundamental = FundamentalHandler< Type >::creator;
 			ac->setAddress(&attribute);
 		break;
-		case FactorableTypes::CUSTOM_CLASS :
+		case SerializableTypes::CUSTOM_CLASS :
 			ac->setAddress(&attribute);
 			ac->setSerializableClassName(SerializableClassName);
 		break;
-		case FactorableTypes::CONTAINER :
+		case SerializableTypes::CONTAINER :
 			ac->createNextArchive = ContainerHandler< Type >::accessNext;
 			ac->resize = ContainerHandler< Type >::resize;
 			ac->setAddress(&attribute);
 		break;
-		case FactorableTypes::POINTER :
+		case SerializableTypes::POINTER :
 			ac->createPointedArchive = PointerHandler< Type >::accessor;
 			ac->createNewPointedArchive = PointerHandler< Type >::creator;
 			ac->setAddress(&attribute);

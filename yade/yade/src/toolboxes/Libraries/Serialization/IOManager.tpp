@@ -1,6 +1,8 @@
 /***************************************************************************
  *   Copyright (C) 2004 by Olivier Galizzi                                 *
  *   olivier.galizzi@imag.fr                                               *
+ *   Copyright (C) 2004 by Janek Kozicki                                   *
+ *   cosurgi@berlios.de                                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -21,43 +23,65 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#ifndef __CONSTANTS_H__
-#define __CONSTANTS_H__
+#ifndef __IOMANAGER_TPP_
+#define __IOMANAGER_TPP_
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#ifdef WIN32
-	#include <limits.h>
-	#include <float.h>
-#else
-	#include <values.h>
-#endif
-
-#include <math.h>
+#include "Archive.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-class Constants
+template<typename Type>
+void IOManager::loadFromFile(const string& libName, const string& fileName,const string& name, Type& t)
 {
-	// FIXME : use cmath and type_traits
-	// common constants
-	public : static const float MAX_FLOAT;
-	public : static const float PI;
-	public : static const float TWO_PI;
-	public : static const float HALF_PI;
-	public : static const float INV_TWO_PI;
-	public : static const float DEG_TO_RAD;
-	public : static const float RAD_TO_DEG;
-};
+	shared_ptr<IOManager> ioManager;
+	ioManager = dynamic_pointer_cast<IOManager>(ClassFactory::instance().createShared(libName));
+	ifstream filei(fileName.c_str());
+	ioManager->loadArchive(filei,t,name);
+	filei.close();
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-#endif // __CONSTANTS_H__
+template<typename Type>
+void IOManager::saveToFile(const string& libName, const string& fileName,const string& name, Type& t)
+{
+	shared_ptr<IOManager> ioManager;
+	ioManager = dynamic_pointer_cast<IOManager>(ClassFactory::instance().createShared(libName));
+	ofstream fileo(fileName.c_str());
+	ioManager->saveArchive(fileo,t,name);
+	fileo.close();
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+template<typename Type>
+void IOManager::loadArchive(istream& stream, Type& t, const string& name)
+{
+	shared_ptr<Archive> ac = Archive::create(name,t);
+	string str = beginDeserialization(stream,*ac);
+	ac->deserialize(stream, *ac, str);
+	finalizeDeserialization(stream,*ac);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+template<typename Type>
+void IOManager::saveArchive(ostream& stream, Type& t, const string& name)
+{
+	shared_ptr<Archive> ac = Archive::create(name,t);
+	beginSerialization(stream, *ac);
+	ac->serialize(stream, *ac, 1);
+	finalizeSerialization(stream, *ac);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+#endif // __IOMANAGER_TPP_

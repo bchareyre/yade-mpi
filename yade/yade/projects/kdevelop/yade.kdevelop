@@ -104,7 +104,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>toolboxes/Libraries/Math</activedir>
+      <activedir>plugins/IOManager/XMLManager</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>

@@ -3,6 +3,18 @@
 # Subdir relative project main directory: ./toolboxes/Libraries/Math
 # Target is a library:  
 
+LIBS += -lm \
+        -rdynamic 
+INCLUDEPATH = $(YADEINCLUDEPATH) 
+MOC_DIR = $(YADECOMPILATIONPATH) 
+UI_DIR = $(YADECOMPILATIONPATH) 
+OBJECTS_DIR = $(YADECOMPILATIONPATH) 
+QMAKE_LIBDIR = $(YADEDYNLIBPATH) 
+DESTDIR = $(YADEDYNLIBPATH) 
+CONFIG += debug \
+          warn_on \
+          dll 
+TEMPLATE = lib 
 HEADERS += Se3.hpp \
            Se3.ipp \
            Math.hpp \
@@ -30,15 +42,3 @@ SOURCES += Se3.cpp \
            Vector2.cpp \
            Vector3.cpp \
            Vector4.cpp 
-LIBS += -lm \
--rdynamic
-INCLUDEPATH = $(YADEINCLUDEPATH)
-MOC_DIR = $(YADECOMPILATIONPATH)
-UI_DIR = $(YADECOMPILATIONPATH)
-OBJECTS_DIR = $(YADECOMPILATIONPATH)
-QMAKE_LIBDIR = $(YADEDYNLIBPATH)
-DESTDIR = $(YADEDYNLIBPATH)
-CONFIG += debug \
-warn_on \
-dll
-TEMPLATE = lib

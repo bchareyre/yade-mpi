@@ -17,8 +17,6 @@ class XMLManager : public IOManager
 	public    : string beginDeserialization(istream& stream, Archive& ac);
 	public    : void finalizeDeserialization(istream& stream, Archive& ac);
 
-	protected : static void parseFundamental(const string& str, vector<string>& tokens);
-
 	public    : static void serializeSerializable(ostream& stream, Archive& ac, int depth);
 	public    : static void serializeContainer(ostream& stream, Archive& ac , int depth);
 	public    : static void serializeSmartPointer(ostream& stream, Archive& ac , int depth);
@@ -32,16 +30,13 @@ class XMLManager : public IOManager
 	public    : static void writeClosingTag(ostream& stream, Archive& ac, int depth);
 
 
-	public    : static void serializeCustomFundamental(ostream& stream, Archive& ac, int depth);
-	public    : static void serializeContainerOfFundamental(ostream& stream, Archive& ac, int depth);
-	public    : static void serializeFundamentalSerializable(ostream& stream, Archive& ac, int depth);
+	//public    : static void serializeCustomFundamental(ostream& stream, Archive& ac, int depth);
+	//public    : static void serializeContainerOfFundamental(ostream& stream, Archive& ac, int depth);
+	//public    : static void serializeFundamentalSerializable(ostream& stream, Archive& ac, int depth);
 
-	public    : static void deserializeCustomFundamental(istream& stream, Archive& ac,const string& str);
-	public    : static void deserializeContainerOfFundamental(istream& stream, Archive& ac, const string& str);
-	public    : static void deserializeFundamentalSerializable(istream& stream, Archive& ac, const string& str);
-
-	public    : void registerAttributes() {};
-
+	//public    : static void deserializeCustomFundamental(istream& stream, Archive& ac,const string& str);
+	//public    : static void deserializeContainerOfFundamental(istream& stream, Archive& ac, const string& str);
+	//public    : static void deserializeFundamentalSerializable(istream& stream, Archive& ac, const string& str);
 };
 
 REGISTER_FACTORABLE(XMLManager);

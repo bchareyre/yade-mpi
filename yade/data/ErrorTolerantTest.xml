@@ -1,7 +1,6 @@
 <Yade>
 	<rootBody className="NonConnexBody" >
-		<rootBody isDynamic="0" velocity="{0 0 0}" angularVelocity="{0 0 0}">
-			<se3 translation="{0 0 0}" rotation="{1 0 0 0}" />
+		<rootBody isDynamic="0" velocity="{0 0 0}" angularVelocity="{0 0 0}" se3="{{0 0 0} {1 0 0 0}}">
 			<bv />
 			<cm />
 			<gm />
@@ -18,8 +17,7 @@
 			</actors>
 			<bodies size="2">
 				<bodies[0] className="RigidBody" >
-					<bodies[0] isDynamic="0" velocity="{0 0 0}" angularVelocity="{0 0 0}" mass="0" inertia="{0 0 0}">
-						<se3 translation="{0 0 0}" rotation="{1 0 0 0}" />
+					<bodies[0] isDynamic="0" velocity="{0 0 0}" angularVelocity="{0 0 0}" mass="0" inertia="{0 0 0}" se3="{{0 0 0} {1 0 0 0}}">
 						<bv className="AABB" >
 							<bv color="{1 0 0}" center="{0 0 10}" halfSize="{200 5 200}" />
 						</bv>
@@ -34,8 +32,7 @@
 					</bodies[0]>
 				</bodies[0]>
 				<bodies[1] className="RigidBody" >
-					<bodies[1] isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" mass="90.4393" inertia="{781.0624 781.0624 781.0624}">
-						<se3 translation="{0 20 0}" rotation="{1 0 0 0}" />
+					<bodies[1] isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" mass="90.4393" inertia="{781.0624 781.0624 781.0624}" se3="{{0 0 0} {1 0 0 0}}">
 						<bv className="AABB" >
 							<bv color="{0 1 0}" center="{0 20 0}" halfSize="{4.646589 4.646589 4.646589}" />
 						</bv>

@@ -23,7 +23,7 @@
 #include "Omega.hpp"
 
 #include <iostream>
-
+using namespace std;
 void help()
 {
 	cout << "\n\

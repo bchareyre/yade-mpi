@@ -32,26 +32,21 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#define REGISTER_FACTORABLE(name) 								\
-	REGISTER_CLASS_TO_FACTORY(name,name,FactorableTypes::FACTORABLE,false);
+//#define REGISTER_FACTORABLE(name) 								
+//	REGISTER_CLASS_TO_FACTORY(name);
 
-#define REGISTER_SERIALIZABLE(name,isFundamental) 						\
-	REGISTER_CLASS_TO_FACTORY(name,name,FactorableTypes::SERIALIZABLE,isFundamental);
-
-#define REGISTER_CUSTOM_CLASS(name,sname,isFundamental) 					\
-	REGISTER_CLASS_TO_FACTORY(name,sname,FactorableTypes::CUSTOM_CLASS,isFundamental);
 
 //#define REGISTER_FUNDAMENTAL_CLASS(name)
-//	REGISTER_CLASS_TO_FACTORY(name,name,FactorableTypes::FACTORABLE,true);
+//	REGISTER_CLASS_TO_FACTORY(name,name,SerializableTypes::FACTORABLE,true);
 
 //#define REGISTER_CUSTOM_FUNDAMENTAL(name,sname)
-//	REGISTER_CLASS_TO_FACTORY(name,sname,FactorableTypes::CUSTOM_FUNDAMENTAL,true);
+//	REGISTER_CLASS_TO_FACTORY(name,sname,SerializableTypes::CUSTOM_FUNDAMENTAL,true);
 
 //#define REGISTER_CUSTOM_POLYMORPHIC_BASE(base,derived)
 //	public : virtual any getCustomPolymorphicBase() { return #cn; };
 
 //#define REGISTER_CUSTOM_TEMPLATE_CLASS(name,templateType)
-//	REGISTER_TEMPLATE_CLASS_TO_FACTORY(name,templateType, FactorableTypes::CUSTOM_CLASS);
+//	REGISTER_TEMPLATE_CLASS_TO_FACTORY(name,templateType, SerializableTypes::CUSTOM_CLASS);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////

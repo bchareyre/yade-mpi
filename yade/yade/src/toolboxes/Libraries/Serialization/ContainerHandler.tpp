@@ -89,7 +89,7 @@ struct ContainerHandler<std::vector<ContainedType> >
 
 		if(it != itEnd )
 		{
-			string name = ac.getName()+"["+lexical_cast<string>(i)+"]";
+			string name = ac.getName()/*+"["+lexical_cast<string>(i)+"]"*/;
 			nextAc = Archive::create(name,(*it));
 			++it;
 			++i;
@@ -104,7 +104,7 @@ struct ContainerHandler<std::vector<ContainedType> >
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 template<typename ContainedType>
-FactorableTypes::Type findType( std::vector<ContainedType>& ,bool& fundamental, string& str)
+SerializableTypes::Type findType( std::vector<ContainedType>& ,bool& fundamental, string& str)
 {
 // 	ContainedType tmpV;
 //
@@ -127,7 +127,7 @@ FactorableTypes::Type findType( std::vector<ContainedType>& ,bool& fundamental, 
 	//RecordType t =
 	findType(tmpV,fundamental,str);
 
-	return FactorableTypes::CONTAINER;
+	return SerializableTypes::CONTAINER;
 };
 
 
@@ -164,7 +164,7 @@ struct ContainerHandler<std::list<ContainedType> >
 
 		if(it != itEnd )
 		{// FIXME, why "[" is HERE ? it belongs to XMLManger! it is not generic. if somebody else wants to use this Serialization - he will not do that, because of this.
-			string name = ac.getName()+"["+lexical_cast<string>(i)+"]";
+			string name = ac.getName()/*+"["+lexical_cast<string>(i)+"]"*/;
 			nextAc = Archive::create(name,(*it));
 			++it;
 			++i;
@@ -179,12 +179,12 @@ struct ContainerHandler<std::list<ContainedType> >
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 template<typename ContainedType>
-FactorableTypes::Type findType( std::list<ContainedType>& ,bool& fundamental, string& str)
+SerializableTypes::Type findType( std::list<ContainedType>& ,bool& fundamental, string& str)
 {
 	ContainedType tmp;
 	findType(tmp,fundamental,str);
 
-	return FactorableTypes::CONTAINER;
+	return SerializableTypes::CONTAINER;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -291,12 +291,12 @@ struct ContainerHandler<std::set<ContainedType> >
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 template<typename ContainedType>
-FactorableTypes::Type findType( std::set<ContainedType>& ,bool& fundamental, string& str)
+SerializableTypes::Type findType( std::set<ContainedType>& ,bool& fundamental, string& str)
 {
 	ContainedType tmp;
 	findType(tmp,fundamental,str);
 
-	return FactorableTypes::CONTAINER;
+	return SerializableTypes::CONTAINER;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -320,7 +320,7 @@ struct ContainerHandler<std::set<ContainedType> >
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 template<typename ContainedType>
-FactorableTypes::Type findType( std::set<ContainedType>& ,bool& fundamental, string& str)
+SerializableTypes::Type findType( std::set<ContainedType>& ,bool& fundamental, string& str)
 {
 	static_assert<false> ________SET_NOT_SUPPORTED________;
 	(void) ________SET_NOT_SUPPORTED________;
@@ -363,7 +363,7 @@ struct ContainerHandler<std::deque<ContainedType> >
 
 		if(it != itEnd )
 		{
-			string name = ac.getName()+"["+lexical_cast<string>(i)+"]";
+			string name = ac.getName()/*+"["+lexical_cast<string>(i)+"]"*/;
 			nextAc = Archive::create(name,(*it));
 			++it;
 			++i;
@@ -378,12 +378,12 @@ struct ContainerHandler<std::deque<ContainedType> >
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 template<typename ContainedType>
-FactorableTypes::Type findType( std::deque<ContainedType>& ,bool& fundamental, string& str)
+SerializableTypes::Type findType( std::deque<ContainedType>& ,bool& fundamental, string& str)
 {
 	ContainedType tmp;
 	findType(tmp,fundamental,str);
 
-	return FactorableTypes::CONTAINER;
+	return SerializableTypes::CONTAINER;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -489,12 +489,12 @@ struct ContainerHandler<std::map< ContainedType1 , ContainedType2> >
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 template<typename ContainedType1 , typename ContainedType2 >
-FactorableTypes::Type findType( std::map< ContainedType1, ContainedType2 >& ,bool& fundamental, string& str)
+SerializableTypes::Type findType( std::map< ContainedType1, ContainedType2 >& ,bool& fundamental, string& str)
 {
 	std::pair< ContainedType1 , ContainedType2 > tmp;
 	findType(tmp,fundamental,str);
 
-	return FactorableTypes::CONTAINER;
+	return SerializableTypes::CONTAINER;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -600,12 +600,12 @@ struct ContainerHandler<Loki::AssocVector< ContainedType1 , ContainedType2> >
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 template<typename ContainedType1 , typename ContainedType2 >
-FactorableTypes::Type findType( Loki::AssocVector< ContainedType1, ContainedType2 >& ,bool& fundamental, string& str)
+SerializableTypes::Type findType( Loki::AssocVector< ContainedType1, ContainedType2 >& ,bool& fundamental, string& str)
 {
 	std::pair< ContainedType1 , ContainedType2 > tmp;
 	findType(tmp,fundamental,str);
 
-	return FactorableTypes::CONTAINER;
+	return SerializableTypes::CONTAINER;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

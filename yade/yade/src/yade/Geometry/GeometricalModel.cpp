@@ -18,7 +18,4 @@ void GeometricalModel::registerAttributes()
 
 void GeometricalModel::processAttributes()
 {
-	REGISTER_ATTRIBUTE(diffuseColor);
-	REGISTER_ATTRIBUTE(wire);
-	REGISTER_ATTRIBUTE(visible);
 }

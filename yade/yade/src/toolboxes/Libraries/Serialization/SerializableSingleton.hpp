@@ -21,102 +21,100 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#ifndef __SERIALIZABLE__
-#define __SERIALIZABLE__
+#ifndef __SERIALIZABLESINGLETON_HPP__
+#define __SERIALIZABLESINGLETON_HPP__
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <boost/any.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/type_traits.hpp>
-#include <boost/lexical_cast.hpp>
+#include "Singleton.hpp"
+#include "SerializableTypes.hpp"
 
-#include <list>
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+#include <typeinfo>
 #include <map>
-#include <string>
-#include <vector>
-
-#include <iostream>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "Factorable.hpp"
-#include "SerializationExceptions.hpp"
-#include "Archive.hpp"
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-using namespace boost;
 using namespace std;
-using namespace ArchiveTypes;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#define REGISTER_CLASS_NAME(cn)						\
-	public : virtual string getClassName() { return #cn; };
-
-#define DECLARE_POINTER_TO_MY_CUSTOM_CLASS(Type,attribute,any)		\
-	Type * attribute=any_cast< Type * >(any);
-
-#define REGISTER_ATTRIBUTE(attribute)                                   \
-                registerAttribute( #attribute, attribute );	
-
-#define REGISTER_SERIALIZABLE(name,isFundamental) 						\
-	REGISTER_FACTORABLE(name);								\
-	REGISTER_SERIALIZABLE_DESCRIPTOR(name,name,SerializableTypes::SERIALIZABLE,isFundamental);
-
-#define REGISTER_CUSTOM_CLASS(name,sname,isFundamental) 					\
-	REGISTER_FACTORABLE(sname);								\
-	REGISTER_SERIALIZABLE_DESCRIPTOR(name,sname,SerializableTypes::CUSTOM_CLASS,isFundamental);
-
-	
-	
-	
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-class Serializable : public Factorable
+class SerializableSingleton : public Singleton< SerializableSingleton >
 {
-	public    : Serializable();
-	public    : virtual ~Serializable();
 
-	public    : typedef list< shared_ptr<Archive> > Archives;
-	private   : Archives archives;
-	public    : Archives& getArchives() { return archives;};
+	/*! Pointer on a function that return the type_info of the registered class */
+	private   : typedef const type_info& ( *VerifyFactorableFnPtr )();
 
-	public    : virtual void serialize(any& ) { throw SerializableError(SerializationExceptions::SetFunctionNotDeclared);};
-	public    : virtual void deserialize(any& ) { throw SerializableError(SerializationExceptions::GetFunctionNotDeclared);};
-
-	public    : void unregisterAttributes();
-	public    : void markAllAttributesProcessed();
-	public	  : bool findAttribute(const string& name,shared_ptr<Archive>& arc);
-
-// 	//FIXME : should have postprocessattributes and preprocessattributes because of Quaternion (angle,axis)
-	protected : virtual void processAttributes() {};
-	protected : template <typename Type>
-		    void registerAttribute(const string& name, Type& attribute)
+	/*! Description of a class that is stored inside the factory.*/
+	private   : class SerializableDescriptor
 		    {
-			shared_ptr<Archive> ac = Archive::create(name,attribute);
-			archives.push_back(ac);
-		    }
-	public    : bool containsOnlyFundamentals();
-	public    : virtual string getClassName()     = 0;
-	public    : virtual void registerAttributes() = 0;
+			///////////////////////////////////////////////////////////////////////////
+			/// Attributes								///
+			///////////////////////////////////////////////////////////////////////////
+
+			/*! Used by the findType method to test the type of the class and know if it is a Factorable (i.e. Factorable) or Custom class*/
+			public    : VerifyFactorableFnPtr verify;
+			/*! Type of the class : SERIALIZABLE,CUSTOM,CONTAINER,POINTER */
+			public    : SerializableTypes::Type type;
+			/*! fundamental is true the class type is a fundamtental type (e.g. Vector3, Quaternion) */
+			public    : bool fundamental;
+
+			///////////////////////////////////////////////////////////////////////////
+			/// Constructor/Destructor						///
+			///////////////////////////////////////////////////////////////////////////
+
+			/*! Empty constructor */
+			public    : SerializableDescriptor() {};
+			/*! Constructor that initialize all the attributes of the class */
+			public    : SerializableDescriptor(	VerifyFactorableFnPtr v, SerializableTypes::Type t, bool f)
+				    {
+					verify 		 = v;
+					type   		 = t;
+					fundamental 	 = f;
+				    };
+
+		    };
+	
+	/*! Type of a Stl map used to map the registered class name with their SerializableDescriptor */
+	private   : typedef std::map< std::string , SerializableDescriptor > SerializableDescriptorMap;
+	private   : SerializableDescriptorMap map;
+	public    : bool registerSerializableDescriptor( string name, VerifyFactorableFnPtr verify, SerializableTypes::Type type, bool f);
+	public    : bool findClassInfo(const type_info& tp,SerializableTypes::Type& type, string& serializableClassName,bool& fundamental);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+/// Constructor/Destructor									///
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+	/*! Constructor
+		\note  the constructor is private because ClassFactory is a Singleton
+	*/
+	private   : SerializableSingleton();
+	
+	/*! Copy Constructor
+		\note  needed by the singleton class
+	*/
+	private   : SerializableSingleton(const SerializableSingleton&);
+	
+	/*! Destructor
+		\note  the destructor is private because ClassFactory is a Singleton
+	*/
+	private   : ~SerializableSingleton() {};
+
+	/*! Assignement operator needed by the Singleton class */
+	private   : SerializableSingleton& operator=(const SerializableSingleton&);
+
+	friend class Singleton< SerializableSingleton >;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-// FIXME : find a better place to include this file - must be after declaration of Serializable... or try to split this file into more pieces...
-#include "MultiTypeHandler.tpp"
-
-#endif // __SERIALIZABLE__
+#endif // __SERIALIZABLESINGLETON_HPP__
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-
-

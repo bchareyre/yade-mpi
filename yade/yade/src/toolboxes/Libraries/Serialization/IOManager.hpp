@@ -33,12 +33,26 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "Serializable.hpp"
+#include "Factorable.hpp"
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+#include <vector>
+#include <string>
+#include <boost/shared_ptr.hpp>
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+class Serializable;
+class Archive;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 using namespace std;
+using namespace boost;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -52,7 +66,32 @@ class IOManager : public Factorable
 	public  : virtual void finalizeSerialization(ostream& ,  Archive& )  {};
 	public  : virtual string beginDeserialization(istream& ,  Archive& ) { return "";};
 	public  : virtual void finalizeDeserialization(istream& , Archive& ) {};
-
+	
+	private    : static char cOB;	// containerOpeningBracket 
+	private    : static char cCB;	// containerClosingBracket
+	private    : static char cS;	// containerSeparator
+	private    : static char cfOB;	// customFundamentalOpeningBracket
+	private    : static char cfCB;	// customFundamentalClosingBracket
+	private    : static char cfS; 	// customFundamentalSeparator
+	
+	protected  : void setContainerOpeningBracket(char c) {cOB=c;};
+	protected  : void setContainerClosingBracket(char c) {cCB=c;};
+	protected  : void setContainerSeparator(char c)      {cS=c;};
+	
+	protected  : void setCustomFundamentalOpeningBracket(char c) {cfOB=c;};
+	protected  : void setCustomFundamentalClosingBracket(char c) {cfCB=c;};
+	protected  : void setCustomFundamentalSeparator(char c)      {cfS=c;};
+	
+	public  : static char getContainerOpeningBracket() {return cOB;};
+	public  : static char getContainerClosingBracket() {return cCB;};
+	public  : static char getContainerSeparator()      {return cS;};
+	 
+	public  : static char getCustomFundamentalOpeningBracket() {return cfOB;};
+	public  : static char getCustomFundamentalClosingBracket() {return cfCB;};
+	public  : static char getCustomFundamentalSeparator()      {return cfS;};
+	
+	public : static void parseFundamental(const string& str, vector<string>& tokens);
+	
 	public : static void serializeFundamental(ostream& stream, Archive& ac, int depth);
 	public : static void deserializeFundamental(istream& stream, Archive& ac, const string& str);
 
@@ -61,53 +100,33 @@ class IOManager : public Factorable
 
 	public : static void serializeSmartPointerOfFundamental(ostream& stream, Archive& ac , int depth);
 	public : static void deserializeSmartPointerOfFundamental(istream& stream, Archive& ac, const string& str);
+	
+	public    : static void serializeCustomFundamental(ostream& stream, Archive& ac, int depth);
+	public    : static void serializeContainerOfFundamental(ostream& stream, Archive& ac, int depth);
+	public    : static void serializeFundamentalSerializable(ostream& stream, Archive& ac, int depth);
+
+	public    : static void deserializeCustomFundamental(istream& stream, Archive& ac,const string& str);
+	public    : static void deserializeContainerOfFundamental(istream& stream, Archive& ac, const string& str);
+	public    : static void deserializeFundamentalSerializable(istream& stream, Archive& ac, const string& str);
 
 	public : template<typename Type>
-		 static void loadFromFile(const string& libName, const string& fileName,const string& name, Type& t)
-		 {
-			shared_ptr<IOManager> ioManager;
-			ioManager = dynamic_pointer_cast<IOManager>(ClassFactory::instance().createShared(libName));
-			ifstream filei(fileName.c_str());
-			ioManager->loadArchive(filei,t,name);
-			filei.close();
-		 }
+		 static void loadFromFile(const string& libName, const string& fileName,const string& name, Type& t);
 
 	public : template<typename Type>
-		 static void saveToFile(const string& libName, const string& fileName,const string& name, Type& t)
-		 {
-			shared_ptr<IOManager> ioManager;
-			ioManager = dynamic_pointer_cast<IOManager>(ClassFactory::instance().createShared(libName));
-			ofstream fileo(fileName.c_str());
-			ioManager->saveArchive(fileo,t,name);
-			fileo.close();
-		 }
+		 static void saveToFile(const string& libName, const string& fileName,const string& name, Type& t);
 
 
 	public : template<typename Type>
-		 void loadArchive(istream& stream, Type& t, const string& name)
-		 {
-		 	shared_ptr<Archive> ac = Archive::create(name,t);
-
-			string str = beginDeserialization(stream,*ac);
-
-			ac->deserialize(stream, *ac, str);
-
-			finalizeDeserialization(stream,*ac);
-		 }
+		 void loadArchive(istream& stream, Type& t, const string& name);
 
 	public : template<typename Type>
-		 void saveArchive(ostream& stream, Type& t, const string& name)
-		 {
-			shared_ptr<Archive> ac = Archive::create(name,t);
-
-			beginSerialization(stream, *ac);
-
-			ac->serialize(stream, *ac, 1);
-
-			finalizeSerialization(stream, *ac);
-		 }
+		 void saveArchive(ostream& stream, Type& t, const string& name);
 
 };
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+#include "IOManager.tpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////

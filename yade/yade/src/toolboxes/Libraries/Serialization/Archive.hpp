@@ -40,7 +40,8 @@
 
 #include "SerializationExceptions.hpp"
 #include "ArchiveTypes.hpp"
-#include "FactorableTypes.hpp"
+#include "SerializableTypes.hpp"
+#include "SerializableSingleton.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -48,6 +49,20 @@
 using namespace boost;
 using namespace std;
 using namespace ArchiveTypes;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+#define REGISTER_SERIALIZABLE_DESCRIPTOR(name,sname,type,isFundamental) 		\
+	inline const type_info& Verify##name()						\
+	{										\
+		return typeid(name);							\
+	}										\
+	const bool registered##name##sname =						\
+		SerializableSingleton::instance().registerSerializableDescriptor(	#sname ,		\
+								Verify##name ,		\
+								type,			\
+								isFundamental );
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -141,7 +156,7 @@ class Archive
 	private   : string name;
 
 	/*! fundamental is true if the archive represent a fundamental type (int,float,
-	vector<int>, shared_pointer<int>, vector<shared_ptr<Quaternionr>> */
+	vector<int>, shared_pointer<int>, vector<shared_ptr<Quaternion>> */
 	private   : bool fundamental;
 
 	/*! processed is true if the atrtibute represented by the current archive has already been (de)-serialized */
@@ -149,14 +164,14 @@ class Archive
 
 	/*! Stl map that contains a pointer to the serialization and deserialization function for each non
 	fundamental type */
-	private   : static map<FactorableTypes::Type,pair<SerializeFnPtr,DeserializeFnPtr> > serializationMap;
+	private   : static map<SerializableTypes::Type,pair<SerializeFnPtr,DeserializeFnPtr> > serializationMap;
 
 	/*! Stl map that contains a pointer to the serialization and deserialization function for each non
 	fundamental type */
-	private   : static map<FactorableTypes::Type,pair<SerializeFnPtr,DeserializeFnPtr> > serializationMapOfFundamental;
+	private   : static map<SerializableTypes::Type,pair<SerializeFnPtr,DeserializeFnPtr> > serializationMapOfFundamental;
 
 	/*! <a href="../ArchiveTypes.html">Type</a> of the attribute represented by the current archive */
-	private   : FactorableTypes::Type recordType;
+	private   : SerializableTypes::Type recordType;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Constructor/Destructor									///
@@ -191,10 +206,10 @@ class Archive
 /*! @name Getters and setters*/
 //@{
 	/*! Getter for the recordType attribute*/
-	public	  : inline FactorableTypes::Type getRecordType() {return recordType;};
+	public	  : inline SerializableTypes::Type getRecordType() {return recordType;};
 
 	/*! Setter for the recordType attribute*/
-	public	  : inline void setRecordType(FactorableTypes::Type a) {recordType=a;};
+	public	  : inline void setRecordType(SerializableTypes::Type a) {recordType=a;};
 
 	/*! Setter for the serializableClassName attribute*/
 	public    : void setSerializableClassName(const string& s) {serializableClassName=s;};
@@ -241,8 +256,52 @@ class Archive
 	\param sp pointer to the serialization function for type rt that will be stored into the map
 	\param dsp pointer to the deserialization function for type rt that will be stored into the map
 	*/
-	public    : static bool addSerializablePointer(FactorableTypes::Type rt ,bool fundamental, SerializeFnPtr sp, DeserializeFnPtr dsp);
+	public    : static bool addSerializablePointer(SerializableTypes::Type rt ,bool fundamental, SerializeFnPtr sp, DeserializeFnPtr dsp);
+	
 
+
+	
+		/*! Pointer on a function that return the type_info of the registered class */
+	private   : typedef const type_info& ( *VerifyFactorableFnPtr )();
+
+	/*! Description of a class that is stored inside the factory.*/
+	private   : class SerializableDescriptor
+		    {
+			///////////////////////////////////////////////////////////////////////////
+			/// Attributes								///
+			///////////////////////////////////////////////////////////////////////////
+
+			/*! Used by the findType method to test the type of the class and know if it is a Factorable (i.e. Factorable) or Custom class*/
+			public    : VerifyFactorableFnPtr verify;
+			/*! Type of the class : SERIALIZABLE,CUSTOM,CONTAINER,POINTER */
+			public    : SerializableTypes::Type type;
+			/*! fundamental is true the class type is a fundamtental type (e.g. Vector3, Quaternion) */
+			public    : bool fundamental;
+
+			///////////////////////////////////////////////////////////////////////////
+			/// Constructor/Destructor						///
+			///////////////////////////////////////////////////////////////////////////
+
+			/*! Empty constructor */
+			public    : SerializableDescriptor() {};
+			/*! Constructor that initialize all the attributes of the class */
+			public    : SerializableDescriptor(	VerifyFactorableFnPtr v, SerializableTypes::Type t, bool f)
+				    {
+					verify 		 = v;
+					type   		 = t;
+					fundamental 	 = f;
+				    };
+
+		    };
+	
+	/*! Type of a Stl map used to map the registered class name with their SerializableDescriptor */
+	private   : typedef std::map< std::string , SerializableDescriptor > SerializableDescriptorMap;
+	private   : static SerializableDescriptorMap map;
+	public    : static bool registerSerializableDescriptor( string name, VerifyFactorableFnPtr verify, SerializableTypes::Type type, bool f);
+	public    : static bool findClassInfo(const type_info& tp,SerializableTypes::Type& type, string& serializableClassName,bool& fundamental);
+
+	
+	
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

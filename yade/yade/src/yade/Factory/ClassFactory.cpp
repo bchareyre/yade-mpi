@@ -24,38 +24,21 @@
 
 class Factorable;
 
-// FIXME : this is used by Archive.tpp:findType, something is dirty here....
-bool ClassFactory::findClassInfo(const type_info& tp,FactorableTypes::Type& type, string& serializableClassName,bool& fundamental)
-{
-	ClassDescriptorMap::iterator mi = map.begin();
-	ClassDescriptorMap::iterator miEnd = map.end();
 
-	for( ; mi!=miEnd ; mi++)
-	{
-		if (tp==(*mi).second.verify())
-		{
-			serializableClassName=(*mi).first;
-			fundamental = (*mi).second.fundamental;
-			type = (*mi).second.type;
-			return true;
-		}
-	}
-	return false;
-}
 
 
 bool ClassFactory::registerFactorable( std::string name 			   , CreateFactorableFnPtr create,
-					 CreateSharedFactorableFnPtr createShared, CreatePureCustomFnPtr createPureCustom,
-					 VerifyFactorableFnPtr verify		   , FactorableTypes::Type type, bool f )
+					 CreateSharedFactorableFnPtr createShared, CreatePureCustomFnPtr createPureCustom)
 {
-	bool tmp = map.insert( ClassDescriptorMap::value_type( name , ClassDescriptor(create,createShared, createPureCustom, verify,type,f) )).second;
 
-	#ifdef DEBUG
+	bool tmp = map.insert( FactorableCreatorsMap::value_type( name , FactorableCreators(create,createShared, createPureCustom) )).second;
+
+	//#ifdef DEBUG
 		if (tmp)
-			std::cout << "registering class: " << name << " OK\n";
+			std::cout << "registering factorable: " << name << " OK\n";
 		else
-			std::cout << "registering class: " << name << " FAILED\n";
-	#endif
+			std::cout << "registering factorable: " << name << " FAILED\n";
+	//#endif
 
 	return tmp;
 }
@@ -63,7 +46,7 @@ bool ClassFactory::registerFactorable( std::string name 			   , CreateFactorable
 boost::shared_ptr<Factorable> ClassFactory::createShared( std::string name )
 {
 
-	ClassDescriptorMap::const_iterator i = map.find( name );
+	FactorableCreatorsMap::const_iterator i = map.find( name );
 	if( i == map.end() )
 	{
 		dlm.load(name);
@@ -84,7 +67,7 @@ boost::shared_ptr<Factorable> ClassFactory::createShared( std::string name )
 
 Factorable* ClassFactory::createPure( std::string name )
 {
-	ClassDescriptorMap::const_iterator i = map.find( name );
+	FactorableCreatorsMap::const_iterator i = map.find( name );
 	if( i == map.end() )
 	{
 		//cerr << "------------ going to load something" << endl;
@@ -106,7 +89,7 @@ Factorable* ClassFactory::createPure( std::string name )
 
 void * ClassFactory::createPureCustom( std::string name )
 {
-	ClassDescriptorMap::const_iterator i = map.find( name );
+	FactorableCreatorsMap::const_iterator i = map.find( name );
 	if( i == map.end() )
 	{
 		std::string error = FactoryExceptions::CantCreateClass + name;

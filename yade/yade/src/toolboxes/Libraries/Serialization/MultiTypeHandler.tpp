@@ -107,8 +107,7 @@ class MultiTypeSerializer< std::pair< ContainedType1 , ContainedType2 > > : publ
 
 	public : void serialize(any& a)
 	{
-		std::pair< ContainedType1 , ContainedType2 > * multiType
-			= any_cast< std::pair< ContainedType1 , ContainedType2 > * >(a);
+		std::pair< ContainedType1 , ContainedType2 > * multiType = any_cast< std::pair< ContainedType1 , ContainedType2 > * >(a);
 
 		first 			= multiType->first;
 		second			= multiType->second;
@@ -143,7 +142,7 @@ struct MultiTypeHandler< std::pair< ContainedType1 , ContainedType2 > >
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 template<typename ContainedType1 , typename ContainedType2 >
-FactorableTypes::Type findType( std::pair< ContainedType1 , ContainedType2 >& ,bool& fundamental, string& str)
+SerializableTypes::Type findType( std::pair< ContainedType1 , ContainedType2 >& ,bool& fundamental, string& str)
 {
 	ContainedType1 tmp1;
 	bool fundamental1;
@@ -169,7 +168,7 @@ FactorableTypes::Type findType( std::pair< ContainedType1 , ContainedType2 >& ,b
 			MultiTypeHandler<std::pair< ContainedType1 , ContainedType2 > >::CreateSharedSMultiType ,
 			MultiTypeHandler<std::pair< ContainedType1 , ContainedType2 > >::CreatePureCustomMultiType ,
 			MultiTypeHandler<std::pair< ContainedType1 , ContainedType2 > >::VerifyMultiType ,
-			FactorableTypes::CUSTOM_CLASS ,
+			SerializableTypes::CUSTOM_CLASS ,
 			fundamental );
 
 	// to fool compiler warnings.
@@ -177,7 +176,7 @@ FactorableTypes::Type findType( std::pair< ContainedType1 , ContainedType2 >& ,b
 	registered=foo;
 
 	str = sname;
-	return FactorableTypes::CUSTOM_CLASS;
+	return SerializableTypes::CUSTOM_CLASS;
 };
 
 
@@ -248,7 +247,7 @@ struct MultiTypeHandler< boost::tuple< ContainedType1 > >
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 template< typename ContainedType1  >
-FactorableTypes::Type findType( boost::tuple< ContainedType1 >& ,bool& fundamental, string& str)
+SerializableTypes::Type findType( boost::tuple< ContainedType1 >& ,bool& fundamental, string& str)
 {
 	ContainedType1 tmp1;
 	bool fundamental1;
@@ -268,14 +267,14 @@ FactorableTypes::Type findType( boost::tuple< ContainedType1 >& ,bool& fundament
 			MultiTypeHandler<boost::tuple< ContainedType1 > >::CreateSharedSMultiType ,
 			MultiTypeHandler<boost::tuple< ContainedType1 > >::CreatePureCustomMultiType ,
 			MultiTypeHandler<boost::tuple< ContainedType1 > >::VerifyMultiType ,
-			FactorableTypes::CUSTOM_CLASS ,
+			SerializableTypes::CUSTOM_CLASS ,
 			fundamental );
 
 	int foo = registered;
 	registered=foo;
 
 	str = sname;
-	return FactorableTypes::CUSTOM_CLASS;
+	return SerializableTypes::CUSTOM_CLASS;
 };
 
 
@@ -350,7 +349,7 @@ struct MultiTypeHandler< boost::tuple< ContainedType1 , ContainedType2 > >
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 template< typename ContainedType1 , typename ContainedType2 >
-FactorableTypes::Type findType( boost::tuple< ContainedType1 , ContainedType2 >& ,bool& fundamental, string& str)
+SerializableTypes::Type findType( boost::tuple< ContainedType1 , ContainedType2 >& ,bool& fundamental, string& str)
 {
 	ContainedType1 tmp1;
 	bool fundamental1;
@@ -374,14 +373,14 @@ FactorableTypes::Type findType( boost::tuple< ContainedType1 , ContainedType2 >&
 			MultiTypeHandler<boost::tuple< ContainedType1 , ContainedType2 > >::CreateSharedSMultiType ,
 			MultiTypeHandler<boost::tuple< ContainedType1 , ContainedType2 > >::CreatePureCustomMultiType ,
 			MultiTypeHandler<boost::tuple< ContainedType1 , ContainedType2 > >::VerifyMultiType ,
-			FactorableTypes::CUSTOM_CLASS ,
+			SerializableTypes::CUSTOM_CLASS ,
 			fundamental );
 
 	int foo = registered;
 	registered=foo;
 
 	str = sname;
-	return FactorableTypes::CUSTOM_CLASS;
+	return SerializableTypes::CUSTOM_CLASS;
 };
 
 
@@ -460,7 +459,7 @@ struct MultiTypeHandler< boost::tuple< ContainedType1 , ContainedType2 , Contain
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 template< typename ContainedType1 , typename ContainedType2 , typename ContainedType3 >
-FactorableTypes::Type findType( boost::tuple< ContainedType1 , ContainedType2 , ContainedType3 >& ,bool& fundamental, string& str)
+SerializableTypes::Type findType( boost::tuple< ContainedType1 , ContainedType2 , ContainedType3 >& ,bool& fundamental, string& str)
 {
 	ContainedType1 tmp1;
 	bool fundamental1;
@@ -488,14 +487,14 @@ FactorableTypes::Type findType( boost::tuple< ContainedType1 , ContainedType2 , 
 			MultiTypeHandler<boost::tuple< ContainedType1 , ContainedType2 , ContainedType3 > >::CreateSharedSMultiType ,
 			MultiTypeHandler<boost::tuple< ContainedType1 , ContainedType2 , ContainedType3 > >::CreatePureCustomMultiType ,
 			MultiTypeHandler<boost::tuple< ContainedType1 , ContainedType2 , ContainedType3 > >::VerifyMultiType ,
-			FactorableTypes::CUSTOM_CLASS ,
+			SerializableTypes::CUSTOM_CLASS ,
 			fundamental );
 
 	int foo = registered;
 	registered=foo;
 
 	str = sname;
-	return FactorableTypes::CUSTOM_CLASS;
+	return SerializableTypes::CUSTOM_CLASS;
 };
 
 
@@ -578,7 +577,7 @@ struct MultiTypeHandler< boost::tuple< ContainedType1 , ContainedType2 , Contain
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 template< typename ContainedType1 , typename ContainedType2 , typename ContainedType3 , typename ContainedType4 >
-FactorableTypes::Type findType( boost::tuple< ContainedType1 , ContainedType2 , ContainedType3 , ContainedType4 >& ,bool& fundamental, string& str)
+SerializableTypes::Type findType( boost::tuple< ContainedType1 , ContainedType2 , ContainedType3 , ContainedType4 >& ,bool& fundamental, string& str)
 {
 	ContainedType1 tmp1;
 	bool fundamental1;
@@ -610,14 +609,14 @@ FactorableTypes::Type findType( boost::tuple< ContainedType1 , ContainedType2 , 
 			MultiTypeHandler<boost::tuple< ContainedType1 , ContainedType2 , ContainedType3 , ContainedType4 > >::CreateSharedSMultiType ,
 			MultiTypeHandler<boost::tuple< ContainedType1 , ContainedType2 , ContainedType3 , ContainedType4 > >::CreatePureCustomMultiType ,
 			MultiTypeHandler<boost::tuple< ContainedType1 , ContainedType2 , ContainedType3 , ContainedType4 > >::VerifyMultiType ,
-			FactorableTypes::CUSTOM_CLASS ,			//
+			SerializableTypes::CUSTOM_CLASS ,			//
 			fundamental );					//
 									//
 	int foo = registered;						//
 	registered=foo;							//
 									//
 	str = sname;							//
-	return FactorableTypes::CUSTOM_CLASS;				//
+	return SerializableTypes::CUSTOM_CLASS;				//
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -703,7 +702,7 @@ struct MultiTypeHandler< boost::tuple< ContainedType1 , ContainedType2 , Contain
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 template< typename ContainedType1 , typename ContainedType2 , typename ContainedType3 , typename ContainedType4 , typename ContainedType5 >
-FactorableTypes::Type findType( boost::tuple< ContainedType1 , ContainedType2 , ContainedType3 , ContainedType4 , ContainedType5 >& ,bool& fundamental, string& str)
+SerializableTypes::Type findType( boost::tuple< ContainedType1 , ContainedType2 , ContainedType3 , ContainedType4 , ContainedType5 >& ,bool& fundamental, string& str)
 {
 	ContainedType1 tmp1;
 	bool fundamental1;
@@ -739,14 +738,14 @@ FactorableTypes::Type findType( boost::tuple< ContainedType1 , ContainedType2 , 
 			MultiTypeHandler<boost::tuple< ContainedType1 , ContainedType2 , ContainedType3 , ContainedType4 , ContainedType5 > >::CreateSharedSMultiType ,
 			MultiTypeHandler<boost::tuple< ContainedType1 , ContainedType2 , ContainedType3 , ContainedType4 , ContainedType5 > >::CreatePureCustomMultiType ,
 			MultiTypeHandler<boost::tuple< ContainedType1 , ContainedType2 , ContainedType3 , ContainedType4 , ContainedType5 > >::VerifyMultiType ,
-			FactorableTypes::CUSTOM_CLASS ,			//
+			SerializableTypes::CUSTOM_CLASS ,			//
 			fundamental );					//
 									//
 	int foo = registered;						//
 	registered=foo;							//
 									//
 	str = sname;							//
-	return FactorableTypes::CUSTOM_CLASS;				//
+	return SerializableTypes::CUSTOM_CLASS;				//
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
