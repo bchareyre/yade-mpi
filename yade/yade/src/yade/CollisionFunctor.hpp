@@ -46,7 +46,7 @@
 
 	Every functions that describe collision between two CollisionModels must derived from CollisionFunctor.
 */
-class CollisionFunctor 
+class CollisionFunctor : public Indexable
 {	
 		
 	private : bool reverse;

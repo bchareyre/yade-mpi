@@ -23,11 +23,11 @@ class RigidBody : public ConnexBody
 	public : void moveToNextTimeStep(float dt);
 
 	REGISTER_CLASS_NAME(RigidBody);
-	REGISTER_CLASS_INDEX(RigidBody);
+	//REGISTER_CLASS_INDEX(RigidBody);
 };
 
 REGISTER_CLASS(RigidBody,false);
 
-REGISTER_CLASS_TO_MULTI_METHODS_MANAGER(RigidBody);
+//REGISTER_CLASS_TO_MULTI_METHODS_MANAGER(RigidBody);
 
 #endif // __RIGIDBODY_H__

@@ -49,7 +49,7 @@
 
 	All the physical types (ConnexBody, NonConnexBody, RigidBody ....) must derived from this class.
 */
-class Body : public Serializable,Indexable
+class Body : public Serializable //,Indexable
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

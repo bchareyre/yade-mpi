@@ -51,8 +51,11 @@ class CollisionModel : public GeometricalModel,Indexable
 	public : void registerAttributes();
 	public : void processAttributes();
 
+	// FIXME : why to put again getClassIndex
+	public : virtual int& getClassIndex() { throw;};
+	
 	REGISTER_CLASS_NAME(CollisionModel);
-	REGISTER_CLASS_INDEX(CollisionModel);
+	//REGISTER_CLASS_INDEX(CollisionModel);
 	
 };
 
@@ -60,7 +63,7 @@ class CollisionModel : public GeometricalModel,Indexable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 REGISTER_CLASS(CollisionModel,false);
-REGISTER_CLASS_TO_MULTI_METHODS_MANAGER(CollisionModel);
+//REGISTER_CLASS_TO_MULTI_METHODS_MANAGER(CollisionModel);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////

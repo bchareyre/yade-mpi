@@ -33,6 +33,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+
 #include "ClassFactory.hpp"
 //#include "CollisionFunctor.hpp"
 
@@ -132,8 +133,8 @@ class MultiMethodsManager
 			return false;
 	}*/
 
-	public : inline bool operator() (const shared_ptr<CollisionModel> cm1, const shared_ptr<CollisionModel> cm2, const Se3& se31, const Se3& se32, shared_ptr<Contact> c);
-	
+	public : bool go(const shared_ptr<CollisionModel> cm1, const shared_ptr<CollisionModel> cm2, const Se3& se31, const Se3& se32, shared_ptr<Contact> c);
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

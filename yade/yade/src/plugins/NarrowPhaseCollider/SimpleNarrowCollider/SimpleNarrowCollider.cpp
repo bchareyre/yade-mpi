@@ -35,7 +35,7 @@ bool SimpleNarrowCollider::narrowCollisionPhase(const std::vector<shared_ptr<Bod
 		shared_ptr<Body> b1 = bodies[(*itTmp)->id1];
 		shared_ptr<Body> b2 = bodies[(*itTmp)->id2];
 		//if (!(collider->collide(b1->cm,b2->cm,b1->se3,b2->se3,(*itTmp))))
-		if (!(Omega::instance().narrowCollider(b1->cm,b2->cm,b1->se3,b2->se3,(*itTmp))))
+		if (!(Omega::instance().narrowCollider.go(b1->cm,b2->cm,b1->se3,b2->se3,(*itTmp))))
 			contacts.erase(itTmp);
 	}
 
