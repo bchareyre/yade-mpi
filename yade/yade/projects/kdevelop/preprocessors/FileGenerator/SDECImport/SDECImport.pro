@@ -3,14 +3,12 @@
 # Subdir relative project main directory: ./preprocessors/FileGenerator/SDECImport
 # Target is a library:  
 
-LIBS += -lSAPCollider \
-        -lBox \
+LIBS += -lBox \
         -lSphere \
         -lAABB \
         -lSerialization \
         -lMath \
         -lBody \
-        -lEngine \
         -lMultiMethods \
         -lInteraction \
         -lForceRecorder \
@@ -24,24 +22,24 @@ LIBS += -lSAPCollider \
         -lActionReset \
         -lCundallNonViscousMomentumDamping \
         -lCundallNonViscousForceDamping \
-        -lSDECDynamicEngine \
         -lSDECMacroMicroElasticRelationships \
         -lSDECTimeStepper \
         -lVelocityRecorder \
+        -lMotion \
+        -lSAPCollider \
+        -lSDECLaw \
         -lForceRecorder \
         -rdynamic 
 INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../plugins/Interaction/BroadInteractor/SAPCollider/$(YADEDYNLIBPATH) \
-               ../../../plugins/Body/GeometricalModel/Box/$(YADEDYNLIBPATH) \
+QMAKE_LIBDIR = ../../../plugins/Body/GeometricalModel/Box/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
                ../../../yade/Body/Body/$(YADEDYNLIBPATH) \
-               ../../../yade/Engine/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/MultiMethods/$(YADEDYNLIBPATH) \
                ../../../yade/Interaction/Interaction/$(YADEDYNLIBPATH) \
                ../../../plugins/DataRecorder/ForceRecorder/$(YADEDYNLIBPATH) \
@@ -52,13 +50,13 @@ QMAKE_LIBDIR = ../../../plugins/Interaction/BroadInteractor/SAPCollider/$(YADEDY
                ../../../plugins/Interaction/BroadInteractor/PersistentSAPCollider/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/InteractionDescription/InteractionSphere/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/InteractionDescription/InteractionBox/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/Action/ActionReset/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/ActionFunctor/CundallNonViscousMomentumDamping/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/ActionFunctor/CundallNonViscousForceDamping/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/DynamicEngine/SDECDynamicEngine/$(YADEDYNLIBPATH) \
+               ../../../plugins/Motion/Action/ActionReset/$(YADEDYNLIBPATH) \
+               ../../../plugins/Motion/ActionFunctor/CundallNonViscousMomentumDamping/$(YADEDYNLIBPATH) \
+               ../../../plugins/Motion/ActionFunctor/CundallNonViscousForceDamping/$(YADEDYNLIBPATH) \
                ../../../plugins/Interaction/InteractionPhysicsFunctor/SDECContactPhysics/SDECMacroMicroElasticRelationships/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/DynamicEngine/SDECTimeStepper/$(YADEDYNLIBPATH) \
+               ../../../plugins/Motion/InteractionLaw/SDECTimeStepper/$(YADEDYNLIBPATH) \
                ../../../plugins/DataRecorder/VelocityRecorder/$(YADEDYNLIBPATH) \
+               ../../../yade/Motion/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

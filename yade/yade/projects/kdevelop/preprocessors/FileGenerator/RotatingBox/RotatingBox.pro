@@ -4,69 +4,48 @@
 # Target is a library:  
 
 LIBS += -lAABB \
-        -lRotor \
-        -lSimpleSpringDynamicEngine \
-        -lSAPCollider \
         -lBox \
         -lSphere \
         -lSerialization \
-        -lSDECDynamicEngine \
         -lMath \
         -lBody \
-        -lEngine \
         -lInteraction \
         -lMultiMethods \
         -lInteractionDescriptionSet \
         -lInteractionDescriptionSet2AABBFunctor \
-        -lRigidBodyParameters \
-        -lSDECParameters \
         -lInteractionSphere \
         -lInteractionBox \
         -lActionReset \
         -lCundallNonViscousForceDamping \
         -lCundallNonViscousMomentumDamping \
+        -lMotion \
+        -lRotor \
+        -lSimpleSpringLaw \
+        -lSAPCollider \
+        -lSDECLaw \
+        -lRigidBodyParameters \
+        -lSDECParameters \
         -rdynamic 
-INCLUDEPATH = $(YADEINCLUDEPATH) 
+INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 QMAKE_LIBDIR = ../../../plugins/Body/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/KinematicEngine/Rotor/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/DynamicEngine/SimpleSpringDynamicEngine/$(YADEDYNLIBPATH) \
-               ../../../plugins/Interaction/BroadInteractor/SAPCollider/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/GeometricalModel/Box/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/DynamicEngine/SDECDynamicEngine/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
                ../../../yade/Body/Body/$(YADEDYNLIBPATH) \
-               ../../../yade/Engine/$(YADEDYNLIBPATH) \
                ../../../yade/Interaction/Interaction/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/MultiMethods/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/InteractionDescription/InteractionDescriptionSet/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/BoundingVolumeFunctor/InteractionDescriptionSet2AABBFunctor/$(YADEDYNLIBPATH) \
-               ../../../plugins/Body/BodyPhysicalParameters/RigidBodyParameters/$(YADEDYNLIBPATH) \
-               ../../../plugins/Body/BodyPhysicalParameters/SDECParameters/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/InteractionDescription/InteractionSphere/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/InteractionDescription/InteractionBox/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/Action/ActionReset/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/ActionDampingFunctor/ActionForceDamping/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/ActionDampingFunctor/ActionMomentumDamping/$(YADEDYNLIBPATH) \
-               ../../../plugins/Geometry/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
-               ../../../plugins/Geometry/GeometricalModel/Box/$(YADEDYNLIBPATH) \
-               ../../../plugins/Geometry/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
-               ../../../plugins/Geometry/InteractionDescription/InteractionDescriptionSet/$(YADEDYNLIBPATH) \
-               ../../../plugins/Geometry/BoundingVolumeFunctor/InteractionDescriptionSet2AABBFunctor/$(YADEDYNLIBPATH) \
-               ../../../yade/Body/$(YADEDYNLIBPATH) \
-               ../../../yade/Geometry/$(YADEDYNLIBPATH) \
-               ../../../yade/Interaction/$(YADEDYNLIBPATH) \
-               ../../../plugins/Body/BodyPhysicalParameters/RigidBody/$(YADEDYNLIBPATH) \
-               ../../../plugins/Body/BodyPhysicalParameters/SDECDiscreteElement/$(YADEDYNLIBPATH) \
-               ../../../plugins/Geometry/BoundingVolumeFactory/CollisionGeometrySet2AABBFactory/$(YADEDYNLIBPATH) \
-               ../../../plugins/Geometry/CollisionGeometry/CollisionGeometrySet/$(YADEDYNLIBPATH) \
-               ../../../plugins/Body/RigidBody/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/DynamicEngine/BallisticDynamicEngine/$(YADEDYNLIBPATH) \
-               ../../../plugins/Body/SDECDiscreteElement/$(YADEDYNLIBPATH) \
+               ../../../plugins/Motion/Action/ActionReset/$(YADEDYNLIBPATH) \
+               ../../../plugins/Motion/ActionFunctor/CundallNonViscousForceDamping/$(YADEDYNLIBPATH) \
+               ../../../plugins/Motion/ActionFunctor/CundallNonViscousMomentumDamping/$(YADEDYNLIBPATH) \
+               ../../../yade/Motion/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

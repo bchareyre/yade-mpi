@@ -8,22 +8,23 @@ LIBS += -lBoundingSphere \
         -lSerialization \
         -lMath \
         -lBody \
-        -lEngine \
         -lInteraction \
         -lMultiMethods \
         -rdynamic 
-INCLUDEPATH = $(YADEINCLUDEPATH) 
+INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../../plugins/Geometry/BoundingVolume/BoundingSphere/$(YADEDYNLIBPATH) \
-               ../../../../plugins/Geometry/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
+QMAKE_LIBDIR = ../../../../plugins/Body/BoundingVolume/BoundingSphere/$(YADEDYNLIBPATH) \
+               ../../../../plugins/Body/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
                ../../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
                ../../../../yade/Body/Body/$(YADEDYNLIBPATH) \
-               ../../../../yade/Engine/$(YADEDYNLIBPATH) \
                ../../../../yade/Interaction/Interaction/$(YADEDYNLIBPATH) \
                ../../../../toolboxes/Libraries/MultiMethods/$(YADEDYNLIBPATH) \
+               ../../../../plugins/Geometry/BoundingVolume/BoundingSphere/$(YADEDYNLIBPATH) \
+               ../../../../plugins/Geometry/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
+               ../../../../yade/Engine/$(YADEDYNLIBPATH) \
                ../../../../yade/Body/$(YADEDYNLIBPATH) \
                ../../../../yade/Geometry/$(YADEDYNLIBPATH) \
                ../../../../yade/Interaction/$(YADEDYNLIBPATH) \

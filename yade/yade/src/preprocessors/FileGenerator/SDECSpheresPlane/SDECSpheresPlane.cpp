@@ -10,7 +10,7 @@
 #include "SDECParameters.hpp"
 #include <fstream>
 #include "IOManager.hpp"
-#include "SDECDynamicEngine.hpp"
+#include "SDECLaw.hpp"
 #include "SDECParameters.hpp"
 #include "SDECLinkGeometry.hpp"
 #include "Interaction.hpp"
@@ -123,7 +123,7 @@ string SDECSpheresPlane::generate()
 	rootBody->actors.push_back(shared_ptr<Actor>(new PersistentSAPCollider));
 	rootBody->actors.push_back(interactionGeometryDispatcher);
 	rootBody->actors.push_back(interactionPhysicsDispatcher);
-	rootBody->actors.push_back(shared_ptr<Actor>(new SDECDynamicEngine));
+	rootBody->actors.push_back(shared_ptr<Actor>(new SDECLaw));
 	rootBody->actors.push_back(actionDampingDispatcher);
 	rootBody->actors.push_back(applyActionDispatcher);
 	rootBody->actors.push_back(timeIntegratorDispatcher);

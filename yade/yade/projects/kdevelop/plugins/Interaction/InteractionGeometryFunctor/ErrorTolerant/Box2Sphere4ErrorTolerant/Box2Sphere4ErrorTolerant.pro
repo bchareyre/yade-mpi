@@ -4,7 +4,6 @@
 # Target is a library:  
 
 LIBS += -lBody \
-        -lEngine \
         -lInteraction \
         -lMultiMethods \
         -lFactory \
@@ -14,18 +13,20 @@ LIBS += -lBody \
         -lBox \
         -lSphere \
         -rdynamic 
-INCLUDEPATH = $(YADEINCLUDEPATH) 
+INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 QMAKE_LIBDIR = ../../../../../yade/Body/Body/$(YADEDYNLIBPATH) \
-               ../../../../../yade/Engine/$(YADEDYNLIBPATH) \
                ../../../../../yade/Interaction/Interaction/$(YADEDYNLIBPATH) \
                ../../../../../toolboxes/Libraries/MultiMethods/$(YADEDYNLIBPATH) \
                ../../../../../toolboxes/Libraries/Factory/$(YADEDYNLIBPATH) \
                ../../../../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
                ../../../../../plugins/Interaction/InteractionGeometry/ErrorTolerantContactModel/$(YADEDYNLIBPATH) \
                ../../../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
+               ../../../../../plugins/Body/GeometricalModel/Box/$(YADEDYNLIBPATH) \
+               ../../../../../plugins/Body/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
+               ../../../../../yade/Engine/$(YADEDYNLIBPATH) \
                ../../../../../plugins/Geometry/GeometricalModel/Box/$(YADEDYNLIBPATH) \
                ../../../../../plugins/Geometry/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
                ../../../../../yade/Body/$(YADEDYNLIBPATH) \

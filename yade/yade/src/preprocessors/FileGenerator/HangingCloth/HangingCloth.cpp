@@ -8,11 +8,11 @@
 #include "AABB.hpp"
 #include "InteractionBox.hpp"
 #include "ComplexBody.hpp"
-#include "SimpleSpringDynamicEngine.hpp"
+#include "SimpleSpringLaw.hpp"
 #include "PersistentSAPCollider.hpp"
 #include "ComplexBody.hpp"
-#include "ExplicitMassSpringDynamicEngine.hpp"
-#include "MassSpringBody2RigidBodyDynamicEngine.hpp"
+#include "ExplicitMassSpringLaw.hpp"
+#include "MassSpringBody2RigidBodyLaw.hpp"
 
 #include "IOManager.hpp"
 #include "InteractionGeometryDispatcher.hpp"
@@ -35,12 +35,12 @@
 #include "ActionDispatcher.hpp"
 #include "InteractionSphere.hpp"
 
-#include "SDECDynamicEngine.hpp"
+#include "SDECLaw.hpp"
 #include "SDECMacroMicroElasticRelationships.hpp"
 #include "SDECParameters.hpp"
 #include "SDECLinkGeometry.hpp"
 #include "SDECLinkPhysics.hpp"
-#include "MassSpringBody2RigidBodyDynamicEngine.hpp"
+#include "MassSpringBody2RigidBodyLaw.hpp"
 
 #include "ActionReset.hpp"
 
@@ -151,13 +151,13 @@ string HangingCloth::generate()
 	timeIntegratorDispatcher->add("ActionForce","ParticleParameters","LeapFrogForceIntegrator");
 	timeIntegratorDispatcher->add("ActionMomentum","RigidBodyParameters","LeapFrogMomentumIntegrator");
 
-	shared_ptr<ExplicitMassSpringDynamicEngine> explicitMassSpringDynamicEngine(new ExplicitMassSpringDynamicEngine);
+	shared_ptr<ExplicitMassSpringLaw> explicitMassSpringDynamicEngine(new ExplicitMassSpringLaw);
 	explicitMassSpringDynamicEngine->springGroupMask = 1;
 
-	shared_ptr<SDECDynamicEngine> sdecDynamicEngine(new SDECDynamicEngine);
+	shared_ptr<SDECLaw> sdecDynamicEngine(new SDECLaw);
 	sdecDynamicEngine->sdecGroupMask = 2;
 
-	shared_ptr<MassSpringBody2RigidBodyDynamicEngine> massSpringBody2RigidBodyDynamicEngine(new MassSpringBody2RigidBodyDynamicEngine);
+	shared_ptr<MassSpringBody2RigidBodyLaw> massSpringBody2RigidBodyDynamicEngine(new MassSpringBody2RigidBodyLaw);
 	massSpringBody2RigidBodyDynamicEngine->sdecGroupMask = 2;
 	massSpringBody2RigidBodyDynamicEngine->springGroupMask = 1;
 

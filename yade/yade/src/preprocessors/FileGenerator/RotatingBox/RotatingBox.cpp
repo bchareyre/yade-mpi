@@ -6,7 +6,7 @@
 #include "Sphere.hpp"
 #include "ComplexBody.hpp"
 #include "SingleBody.hpp"
-#include "SimpleSpringDynamicEngine.hpp"
+#include "SimpleSpringLaw.hpp"
 #include "SAPCollider.hpp"
 #include "RigidBodyParameters.hpp"
 #include "Rotor.hpp"
@@ -289,7 +289,7 @@ void RotatingBox::createActors(shared_ptr<ComplexBody>& rootBody)
 	rootBody->actors.push_back(boundingVolumeDispatcher);
 	rootBody->actors.push_back(shared_ptr<Actor>(new SAPCollider));
 	rootBody->actors.push_back(interactionGeometryDispatcher);
-	rootBody->actors.push_back(shared_ptr<Actor>(new SimpleSpringDynamicEngine));
+	rootBody->actors.push_back(shared_ptr<Actor>(new SimpleSpringLaw));
 	rootBody->actors.push_back(actionDampingDispatcher);
 	rootBody->actors.push_back(applyActionDispatcher);
 	rootBody->actors.push_back(timeIntegratorDispatcher);

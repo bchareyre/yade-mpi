@@ -1,6 +1,6 @@
-#include "DynamicEngine.hpp"
+#include "InteractionLaw.hpp"
 
-void DynamicEngine::action(Body* b)
+void InteractionLaw::action(Body* b)
 {
 	this->respondToInteractions(b);
 }

@@ -7,8 +7,8 @@
 #include "ComplexBody.hpp"
 
 #include "FileGenerator.hpp"
-#include "DynamicEngine.hpp"
-#include "KinematicEngine.hpp"
+#include "InteractionLaw.hpp"
+#include "KinematicMotion.hpp"
 #include "Body.hpp"
 #include "InteractionGeometryFunctor.hpp"
 #include "IOManager.hpp"
@@ -179,10 +179,10 @@ void Omega::registerDynlibType(const string& name)
 
 	if (dynamic_pointer_cast<FileGenerator>(f))
 		dynlibsType[name]="FileGenerator";
-	else if (dynamic_pointer_cast<DynamicEngine>(f))
-		dynlibsType[name]="DynamicEngine";
-	else if (dynamic_pointer_cast<KinematicEngine>(f))
-		dynlibsType[name]="KinematicEngine";
+	else if (dynamic_pointer_cast<InteractionLaw>(f))
+		dynlibsType[name]="InteractionLaw";
+	else if (dynamic_pointer_cast<KinematicMotion>(f))
+		dynlibsType[name]="KinematicMotion";
 	else if (dynamic_pointer_cast<Body>(f))
 		dynlibsType[name]="Body";
 	else if (dynamic_pointer_cast<InteractionGeometryFunctor>(f))

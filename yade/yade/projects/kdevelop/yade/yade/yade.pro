@@ -6,7 +6,6 @@
 LIBS += -lSerialization \
         -lMath \
         -lBody \
-        -lEngine \
         -lInteraction \
         -lMultiMethods \
         -lFactory \
@@ -21,20 +20,20 @@ LIBS += -lSerialization \
         -lInteractionDescription \
         -lGeometricalModel \
         -lBodyPhysicalParameters \
+        -lMotion \
         -lboost_thread \
         -lboost_filesystem \
         -lboost_date_time \
         -lglut \
         -lQGLViewer \
         -rdynamic 
-INCLUDEPATH = $(YADEINCLUDEPATH) 
+INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 QMAKE_LIBDIR = ../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
                ../../yade/Body/Body/$(YADEDYNLIBPATH) \
-               ../../yade/Engine/$(YADEDYNLIBPATH) \
                ../../yade/Interaction/Interaction/$(YADEDYNLIBPATH) \
                ../../toolboxes/Libraries/MultiMethods/$(YADEDYNLIBPATH) \
                ../../toolboxes/Libraries/Factory/$(YADEDYNLIBPATH) \
@@ -49,6 +48,7 @@ QMAKE_LIBDIR = ../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../yade/Body/InteractionDescription/$(YADEDYNLIBPATH) \
                ../../yade/Body/GeometricalModel/$(YADEDYNLIBPATH) \
                ../../yade/Body/BodyPhysicalParameters/$(YADEDYNLIBPATH) \
+               ../../yade/Engine/$(YADEDYNLIBPATH) \
                ../../yade/Body/$(YADEDYNLIBPATH) \
                ../../yade/Geometry/$(YADEDYNLIBPATH) \
                ../../yade/Interaction/$(YADEDYNLIBPATH) \
@@ -70,11 +70,11 @@ HEADERS += Chrono.hpp \
            FileGenerator.hpp \
            SimulationLoop.hpp \
            RenderingEngine.hpp \
-	   yadeExceptions.hpp
+           yadeExceptions.hpp 
 SOURCES += Chrono.cpp \
            Omega.cpp \
            yade.cpp \
            FrontEnd.cpp \
            SimulationLoop.cpp \
            FileGenerator.cpp \
-	   yadeExceptions.cpp
+           yadeExceptions.cpp 

@@ -99,7 +99,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>plugins/Body/BoundingVolumeFunctor/InteractionDescriptionSet2AABBFunctor</activedir>
+      <activedir>preprocessors/FileGenerator/SDECLinkedSpheres</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>

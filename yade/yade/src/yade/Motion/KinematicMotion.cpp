@@ -1,7 +1,7 @@
-#include "KinematicEngine.hpp"
+#include "KinematicMotion.hpp"
 
 
-KinematicEngine::KinematicEngine() : Actor()
+KinematicMotion::KinematicMotion() : Actor()
 {
 	//startTime = -1;
 	//stopTime = -1;
@@ -9,13 +9,13 @@ KinematicEngine::KinematicEngine() : Actor()
 	subscribedBodies.resize(0);
 }
 
-void KinematicEngine::registerAttributes()
+void KinematicMotion::registerAttributes()
 {
 	REGISTER_ATTRIBUTE(subscribedBodies);
 }
 
 
-void KinematicEngine::action(Body* b)
+void KinematicMotion::action(Body* b)
 {
 	this->moveToNextTimeStep(b);
 }

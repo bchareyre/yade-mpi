@@ -39,7 +39,7 @@ void VelocityRecorder::action(Body * body)
 	ComplexBody * ncb = dynamic_cast<ComplexBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	
-	Real x=0, y=0, z=0, size=0, totalMass=0;
+	Real x=0, y=0, z=0, size=0;//, totalMass=0; FIXME- how many recorders/Actors to make simple stuff?
 	
 	for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext() )
 	{
@@ -52,14 +52,14 @@ void VelocityRecorder::action(Body * body)
 			y+=pp->velocity[1];
 			z+=pp->velocity[2];
 			
-			totalMass += pp->mass;
+//			totalMass += pp->mass;
 		}
 	}
 
 	x /= size;
 	y /= size;
 	z /= size;
-	cerr << totalMass << endl;
+//	cerr << totalMass << endl;
 	ParticleParameters* bigBall = dynamic_cast<ParticleParameters*>((*bodies)[bigBallId]->physicalParameters.get());
 	
 	ofile << lexical_cast<string>(Omega::instance().getSimulationTime()) << " " 

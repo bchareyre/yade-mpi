@@ -13,7 +13,7 @@
 #include "InteractionDescriptionSet2AABBFunctor.hpp"
 #include "InteractionDescriptionSet.hpp"
 
-#include "SDECDynamicEngine.hpp"
+#include "SDECLaw.hpp"
 #include "SDECMacroMicroElasticRelationships.hpp"
 #include "SDECParameters.hpp"
 #include "SDECLinkGeometry.hpp"
@@ -478,7 +478,7 @@ void SDECImport::createActors(shared_ptr<ComplexBody>& rootBody)
 	sdecTimeStepper->interval = timeStepUpdateInterval;
 	
 	
-	shared_ptr<SDECDynamicEngine> sdecDynamicEngine(new SDECDynamicEngine);
+	shared_ptr<SDECLaw> sdecDynamicEngine(new SDECLaw);
 	sdecDynamicEngine->sdecGroupMask = 2;
 	
 	rootBody->actors.clear();

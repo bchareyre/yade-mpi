@@ -7,10 +7,9 @@ LIBS += -lParticleParameters \
         -lInteractionDescriptionSet \
         -lAABB \
         -lSphere \
-        -lLatticeBeamParameters \
         -lLineSegment \
-        -lLatticeNodeParameters \
         -lLatticeSetParameters \
+        -lLatticeBeamParameters \
         -lLatticeNodeParameters \
         -rdynamic 
 INCLUDEPATH += $(YADEINCLUDEPATH) 
@@ -21,9 +20,8 @@ QMAKE_LIBDIR = ../../../plugins/Body/BodyPhysicalParameters/ParticleParameters/$
                ../../../plugins/Body/InteractionDescription/InteractionDescriptionSet/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
-               ../../../plugins/Body/BodyPhysicalParameters/LatticeBeamParameters/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/GeometricalModel/LineSegment/$(YADEDYNLIBPATH) \
-               ../../../plugins/Body/BodyPhysicalParameters/LatticeNodeParameters/$(YADEDYNLIBPATH) \
+               ../../../plugins/Body/BodyPhysicalParameters/LatticeSetParameters/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 
