@@ -3,7 +3,8 @@
 # Subdir relative project main directory: ./plugins/InteractionModel
 # Target is a subdirs project 
 
-SUBDIRS += ClosestFeatures \
+SUBDIRS += SpringGeometry \
+           ClosestFeatures \
            SDECContactGeometry \
            SDECPermanentLink \
            ErrorTolerantContactModel 

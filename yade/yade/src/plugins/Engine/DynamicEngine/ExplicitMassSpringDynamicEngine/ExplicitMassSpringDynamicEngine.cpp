@@ -2,8 +2,13 @@
 #include "Omega.hpp"
 #include "MassSpringBody.hpp"
 #include "Mesh2D.hpp"
+#include "SpringGeometry.hpp"
+#include "SpringPhysics.hpp"
+#include "Particle.hpp"
+#include "ActionForce.hpp"
+#include "ActionMomentum.hpp"
 
-ExplicitMassSpringDynamicEngine::ExplicitMassSpringDynamicEngine () : DynamicEngine()
+ExplicitMassSpringDynamicEngine::ExplicitMassSpringDynamicEngine () : DynamicEngine(), actionForce(new ActionForce) , actionMomentum(new ActionMomentum)
 {
 	first = true;
 }
@@ -25,74 +30,62 @@ void ExplicitMassSpringDynamicEngine::registerAttributes()
 
 void ExplicitMassSpringDynamicEngine::respondToCollisions(Body * body)
 {
-
-	Real dt = Omega::instance().getTimeStep();
 	MassSpringBody * massSpring = dynamic_cast<MassSpringBody*>(body);
-
+	shared_ptr<BodyContainer> bodies = massSpring->bodies;
+	shared_ptr<InteractionContainer> permanentInteractions = massSpring->permanentInteractions;
+	shared_ptr<ActionContainer> actions = massSpring->actions;
+	
 	Vector3r gravity = Omega::instance().getGravity();
 	
-	Real damping	= massSpring->damping;
-	Real stiffness	= massSpring->stiffness;
-
-	shared_ptr<Mesh2D> mesh = dynamic_pointer_cast<Mesh2D>(massSpring->gm);
-	vector<Vector3r>& vertices = mesh->vertices;
-	vector<Edge>& edges	  = mesh->edges;
-
 	if (first)
-	{		
-		forces.resize(vertices.size());		
-		prevVelocities.resize(vertices.size());
-		/*vector<NodeProperties>::iterator pi = massSpring->properties.begin();
-		vector<NodeProperties>::iterator piEnd = massSpring->properties.end();
-		vector<Vector3r>::iterator pvi = prevVelocities.begin();
-		for( ; pi!=piEnd ; ++pi,++pvi)
-			*pvi = (*pi).velocity;*/
+	{
+		vector<shared_ptr<Action> > vvv; 
+		vvv.clear();
+		vvv.push_back(actionForce);	
+		vvv.push_back(actionMomentum);
+		actions->prepare(vvv);
+		first = false;
 	}
 	
-	std::fill(forces.begin(),forces.end(),Vector3r(0,0,0));
+	actions->reset();
 	
-	vector<pair<int,Vector3r> >::iterator efi    = massSpring->externalForces.begin();
-	vector<pair<int,Vector3r> >::iterator efiEnd = massSpring->externalForces.end();
-	for(; efi!=efiEnd; ++efi)
-		forces[(*efi).first] += (*efi).second;
-	
-	vector<Edge>::iterator ei = edges.begin();
-	vector<Edge>::iterator eiEnd = edges.end();
-	for(int i=0 ; ei!=eiEnd; ++ei,i++)
+	shared_ptr<Interaction> spring;
+	for(permanentInteractions->gotoFirst() ; permanentInteractions->notAtEnd(); permanentInteractions->gotoNext())
 	{
-		Vector3r v1 = vertices[(*ei).first];
-		Vector3r v2 = vertices[(*ei).second];
+		spring = permanentInteractions->getCurrent();
+		int id1 = spring->getId1();
+		int id2 = spring->getId2();
+		
+		Particle * p1 = static_cast<Particle*>((*bodies)[id1].get());
+		Particle * p2 = static_cast<Particle*>((*bodies)[id2].get());
+		
+		SpringPhysics* physics		= static_cast<SpringPhysics*>(spring->interactionPhysics.get());
+		SpringGeometry* geometry	= static_cast<SpringGeometry*>(spring->interactionGeometry.get());
+		
+		Vector3r v1 = p2->se3.translation;
+		Vector3r v2 = p1->se3.translation;
+		
 		Real l  = (v2-v1).length();
-		Real l0 = massSpring->initialLengths[i];
+		
+		Real l0 = physics->initialLength;
+		
 		Vector3r dir = (v2-v1);
 		dir.normalize();
+		
 		Real e  = (l-l0)/l0;
-		Real relativeVelocity = dir.dot((massSpring->properties[(*ei).second].velocity-massSpring->properties[(*ei).first].velocity));
-		Vector3r f3 = (e*stiffness+relativeVelocity*damping)*dir;
-		forces[(*ei).first]  += f3;
-		forces[(*ei).second] -= f3;
+		Real relativeVelocity = dir.dot((p1->velocity-p2->velocity));
+		Vector3r f3 = (e*physics->stiffness+relativeVelocity*physics->damping)*dir;
+		
+		static_cast<ActionForce*>   ( actions->find( id1 , actionForce->getClassIndex() ).get() )->force    -= f3;
+		static_cast<ActionForce*>   ( actions->find( id2 , actionForce->getClassIndex() ).get() )->force    += f3;
 	}
-
-		
-	for(unsigned int i=0; i < vertices.size(); i++)
-        {
-		Vector3r acc = Vector3r(0,0,0);
-
-		if (massSpring->properties[i].invMass!=0)
-			acc = Omega::instance().getGravity() + forces[i]*massSpring->properties[i].invMass;
-					
-		if (!first)
-			massSpring->properties[i].velocity = 0.997*(prevVelocities[i]+0.5*dt*acc); //0.995
-		
-		prevVelocities[i] = (massSpring->properties[i].velocity+0.5*dt*acc);
-		
-		vertices[i] += prevVelocities[i]*dt;				
-        }
 	
-	// FIXME: where should we update bounding volume
-	//body->updateBoundingVolume(body->se3);
-	first = false;
-
-	massSpring->externalForces.clear();
+	shared_ptr<ActionForce> af(new ActionForce);
+	
+	for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext())
+	{
+		Particle * p = static_cast<Particle*>(bodies->getCurrent().get());
+		static_cast<ActionForce*>( body->actions->find( p->getId() , actionForce->getClassIndex() ).get() )->force += gravity*p->mass;
+	}
 }
 

@@ -104,7 +104,13 @@ void IOManager::parseFundamental(const string& top, vector<string>& eval)
 	// I can fix spirit!
 	//
 	if (eval.size()==0)
-		eval.push_back(top);
+	{
+		bool pushBackTop = true;
+		for(unsigned int i=0;i<top.size();i++)
+			pushBackTop &=  (top[i]!=']' && top[i]!='[' && top[i]!='}' && top[i]!='{');
+		if (pushBackTop)
+			eval.push_back(top);
+	}
 }
 
 

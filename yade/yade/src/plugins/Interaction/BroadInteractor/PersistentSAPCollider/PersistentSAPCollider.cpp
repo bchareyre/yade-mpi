@@ -234,16 +234,7 @@ void PersistentSAPCollider::sortBounds(vector<shared_ptr<AABBBound> >& bounds, i
 void PersistentSAPCollider::updateOverlapingBBSet(int id1,int id2)
 {
 
-// 	if (id1>id2) // beacause (i,j)==(j,i)
-// 	{
-// 		int tmp=id2;
-// 		id2 = id1;
-// 		id1=tmp;
-// 	}
-// 
 // 	// look if the paiur (id1,id2) already exists in the overleppingBB collection
-// 	std::set< unsigned int>::iterator it = overlappingBB[id1].find(id2);
-
 	bool found = (interactions->find(id1,id2)!=0);
 	
 	// test if the AABBs of the spheres number "id1" and "id2" are overlapping

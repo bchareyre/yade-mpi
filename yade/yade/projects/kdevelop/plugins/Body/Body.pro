@@ -3,7 +3,8 @@
 # Subdir relative project main directory: ./plugins/Body
 # Target is a subdirs project 
 
-SUBDIRS += RigidBody \
+SUBDIRS += Particle \
+           RigidBody \
            MassSpringBody \
            FEMBody \
            SDECDiscreteElement 

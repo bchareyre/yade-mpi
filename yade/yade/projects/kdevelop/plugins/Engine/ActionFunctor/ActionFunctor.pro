@@ -3,7 +3,8 @@
 # Subdir relative project main directory: ./plugins/ActionFunctor
 # Target is a subdirs project 
 
-SUBDIRS += ActionMomentum2RigidBody \
+SUBDIRS += ActionForce2Particle \
+           ActionMomentum2RigidBody \
            ActionForce2RigidBody 
 CONFIG += release \
           warn_on 

@@ -12,6 +12,7 @@ class BodyContainer : public Serializable
 	public    : BodyContainer() { body.clear(); };
 	public    : virtual ~BodyContainer() {};
 
+	//FIXME : use const shared_ptr<Body>&
 	public    : virtual unsigned int insert(shared_ptr<Body>&)			{throw;};
 	public    : virtual unsigned int insert(shared_ptr<Body>& , unsigned int)	{throw;};
 	public    : virtual void clear() 						{throw;};

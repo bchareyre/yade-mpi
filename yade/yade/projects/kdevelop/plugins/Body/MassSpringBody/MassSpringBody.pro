@@ -12,8 +12,9 @@ LIBS += -lSerialization \
         -lGeometry \
         -lInteraction \
         -lMultiMethods \
+        -lParticle \
         -rdynamic 
-INCLUDEPATH = $(YADEINCLUDEPATH) 
+INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 

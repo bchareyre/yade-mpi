@@ -2,11 +2,12 @@
 #define __EXPLICITMASSSPRINGDYNAMICENGINE_H__
 
 #include "DynamicEngine.hpp"
+#include "Action.hpp"
 
 class ExplicitMassSpringDynamicEngine : public DynamicEngine
 {
-	private : std::vector<Vector3r> prevVelocities;
-	private : std::vector<Vector3r> forces;
+	private : shared_ptr<Action> actionForce;	
+	private : shared_ptr<Action> actionMomentum;
 	private : bool first;
 
 	// construction

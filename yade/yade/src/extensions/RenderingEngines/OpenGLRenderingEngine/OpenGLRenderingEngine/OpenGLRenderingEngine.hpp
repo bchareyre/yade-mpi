@@ -34,6 +34,7 @@
 
 class OpenGLRenderingEngine : public RenderingEngine
 {	
+	public : Vector3r lightPos;
 	public : bool drawBoundingVolume;
 	public : bool drawCollisionGeometry;
 	public : bool drawGeometricalModel;

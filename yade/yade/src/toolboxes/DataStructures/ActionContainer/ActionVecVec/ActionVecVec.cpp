@@ -47,7 +47,7 @@ void ActionVecVec::prepare(std::vector<shared_ptr<Action> >& actionTypes)
 		maxSize = max(maxSize , actionTypes[i]->getClassIndex() );
 	++maxSize;
 	actionTypesResetted.resize(maxSize);
-	for(int i = 0 ; i < maxSize ; ++i )
+	for(unsigned int i = 0 ; i < size ; ++i )
 	{
 		actionTypesResetted[actionTypes[i]->getClassIndex()] = actionTypes[i]->clone();
 		actionTypesResetted[actionTypes[i]->getClassIndex()] -> reset();

@@ -44,6 +44,7 @@ OpenGLRenderingEngine::OpenGLRenderingEngine() : RenderingEngine()
 	drawShadowVolumes = false;
 	useFastShadowVolume = true;
 	needInit = true;
+	lightPos = Vector3r(75.0,130.0,0.0);
 }
 
 OpenGLRenderingEngine::~OpenGLRenderingEngine()
@@ -63,8 +64,7 @@ void OpenGLRenderingEngine::init()
 
 void OpenGLRenderingEngine::render(shared_ptr<NonConnexBody> rootBody)
 {		
-	const GLfloat pos[4]	= {75.0,130.0,0.0,1.0};
-	Vector3r lightPos(pos[0],pos[1],pos[2]);
+	const GLfloat pos[4]	= {lightPos[0],lightPos[1],lightPos[2],1.0};
 	const GLfloat ambientColor[4]	= {0.5,0.5,0.5,1.0};	
 	
 	glLightfv(GL_LIGHT0, GL_POSITION, pos);
@@ -293,7 +293,8 @@ void OpenGLRenderingEngine::renderShadowVolumes(shared_ptr<NonConnexBody> rootBo
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void OpenGLRenderingEngine::registerAttributes()
-{
+{	
+	REGISTER_ATTRIBUTE(lightPos);
 	REGISTER_ATTRIBUTE(drawBoundingVolume);
 	REGISTER_ATTRIBUTE(drawCollisionGeometry);
 	REGISTER_ATTRIBUTE(drawGeometricalModel);
