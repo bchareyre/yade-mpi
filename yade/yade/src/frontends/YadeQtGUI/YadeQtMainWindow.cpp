@@ -42,6 +42,12 @@ YadeQtMainWindow::YadeQtMainWindow() : YadeQtGeneratedMainWindow()
 	workspace->setBackgroundMode( PaletteMid );
 	setCentralWidget( vbox );
 
+	if( Omega::instance().getFilename().size() != 0 )
+	{
+		loadSimulation( Omega::instance().getFilename() );
+		glViewer->startAnimation();
+	}
+
 /*
 	QtGUIGenerator guiGen;
 	shared_ptr<RigidBody> rb(new RigidBody);
@@ -93,25 +99,27 @@ void YadeQtMainWindow::createMenus()
 
 }
 
+void YadeQtMainWindow::loadSimulation(const string fileName)
+{
+	setCaption( "Yade - "+fileName);
+
+// FIXME - resetting the rootBody shouldn't be here. It shoul dbe inside Omega. As well as all Omega variables SHOULD be private!
+// FIXME - and this doesn't work - spheres disappear!
+//	Omega::instance().rootBody = shared_ptr<NonConnexBody>(new NonConnexBody);
+
+	IOManager::loadFromFile("XMLManager",fileName,"rootBody",Omega::instance().rootBody);
+	Omega::instance().logMessage("Loading file " + fileName);
+	glViewer = shared_ptr<GLViewer>(new GLViewer(workspace));
+	glViewer->show();
+}
+
 void YadeQtMainWindow::fileNewSimulation()
 {
 	QString selectedFilter;
 	QString fileName = QFileDialog::getOpenFileName("../data", "XML Yade File (*.xml)", this,"Open File","Choose a file to open",&selectedFilter );
 
-	if (!fileName.isEmpty())
-	{
-		setCaption( "Yade - "+fileName);
-		if (selectedFilter=="XML Yade File (*.xml)")
-		{
-		// FIXME - resetting the rootBody shouldn't be here. It shoul dbe inside Omega. As well as all Omega variables SHOULD be private!
-		// FIXME - and this doesn't work - spheres disappear!
-//			Omega::instance().rootBody = shared_ptr<NonConnexBody>(new NonConnexBody);
-			IOManager::loadFromFile("XMLManager",fileName,"rootBody",Omega::instance().rootBody);
-			Omega::instance().logMessage("Loading file ../data/scene.xml");
-			glViewer = shared_ptr<GLViewer>(new GLViewer(workspace));
-			glViewer->show();
-		}
-	}
+	if (!fileName.isEmpty() && selectedFilter == "XML Yade File (*.xml)")
+		loadSimulation( fileName );
 }
 
 void YadeQtMainWindow::fileExit()

@@ -17,7 +17,7 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
- 
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -42,20 +42,20 @@ class GLViewer : public QGLViewer
 {
 	private : shared_ptr<FpsTracker> fpsTracker;
 	private : int frame;
-	
+
 	// construction
 	public : GLViewer (QWidget * parent=0);
 	public : ~GLViewer ();
-	
+
 	public : void draw();
-	public : void animate();	
-	
+	public : void animate();
+
 	protected : void mouseMoveEvent(QMouseEvent * e);
 	protected : void mousePressEvent(QMouseEvent *e);
 	protected : void mouseReleaseEvent(QMouseEvent *e);
 	protected : void keyPressEvent(QKeyEvent *e);
 	protected : void mouseDoubleClickEvent(QMouseEvent *e);
-	
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -22,19 +22,50 @@
 #include "FrontEnd.hpp"
 #include "Omega.hpp"
 
+#include <iostream>
+
+void help()
+{
+	cout << "\n\
+Yet Another Dynamic Engine, pre-alpha.\n\
+\n\
+	-h	- print this help\n\
+	-i	- specify name of frontend interface library (currently only\n\
+		  YadeQtGUI is available; ncurses, command line and\n\
+		  network-based interfaces can be added later)\n\
+	-f	- specify filename to load - if given - file is loaded and\n\
+		  computations start instantly\n\
+	-m	- specify maximum number of iterations ( 0 = unlimited,\n\
+		  tested every 100th iteration)\n\
+	-t	- set time step in seconds\n\
+\n\
+";
+}
+
 int main(int argc, char *argv[])
 {
-	Omega::instance().init();
+	string frontend="";
 
-	if (argc!=2)
+	int ch;
+	while((ch=getopt(argc,argv,"hi:f:m:t:"))!=-1) // use ':', when additional parameter optarg is expected and used
+		switch(ch)
+		{
+			case 'h' : help();					return 1;
+			case 'i' : frontend = optarg;				break;
+		// FIXME - maybe make another singleton with settings?, or a struct with settings inside Omega???
+			case 'f' : Omega::instance().setFilename(optarg);	break;
+			case 'm' : Omega::instance().setMaxiter(optarg);	break;
+			case 't' : Omega::instance().setTimestep(optarg);	break;
+			default  : help();					return 1;
+	}
+
+	if( frontend.size() == 0 )
 	{
-		cout << "Missing parameter : name of the FrontEnd library, try   ./yade YadeQtFrontEnd" << endl;
+		help();
 		return 0;
 	}
 
-	shared_ptr<FrontEnd> gui = dynamic_pointer_cast<FrontEnd>(ClassFactory::instance().createShared(argv[1]));
-
-	Omega::instance().init();
+	shared_ptr<FrontEnd> gui = dynamic_pointer_cast<FrontEnd>(ClassFactory::instance().createShared(frontend));
 
 	return gui->run(argc,argv);
 }

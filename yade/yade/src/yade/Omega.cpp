@@ -3,9 +3,8 @@
 Omega::Omega ()
 {
 	cerr << "Constructing Omega  (if multiple times - check '-rdynamic' flag!)" << endl;
+	init();
 }
-
-
 
 Omega::~Omega ()
 {
@@ -13,7 +12,6 @@ Omega::~Omega ()
 	*logFile << "</Simulation>" << endl << endl;
 	logFile->close();
 }
-
 
 void Omega::logError(const string& str)
 {
@@ -27,6 +25,9 @@ void Omega::logMessage(const string& str)
 
 void Omega::init()
 {
+	filename="";
+	maxiter = 0; // unlimited
+
 	gravity = Vector3(0,-9.81,0);
 	//dt = 0.04;
 	dt = 0.01;
@@ -38,3 +39,37 @@ void Omega::init()
 
 	*logFile << "<Simulation" << " Date =\"" << startingSimulationTime << "\">" << endl;
 }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+void Omega::setTimestep(const string t)
+{
+	dt = lexical_cast<float>(t);
+}
+
+float Omega::getTimestep()
+{
+	return dt;
+}
+
+void Omega::setFilename(const string f)
+{
+	filename = f;
+};
+
+string Omega::getFilename()
+{
+	return filename;
+}
+
+void Omega::setMaxiter(const string m)
+{
+	maxiter = lexical_cast<long int>(m);
+}
+
+long int Omega::getMaxiter()
+{
+	return maxiter;
+}
+

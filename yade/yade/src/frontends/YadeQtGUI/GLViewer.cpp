@@ -13,7 +13,6 @@ GLViewer::GLViewer(QWidget * parent) : QGLViewer(parent)
 	setAnimationPeriod(0);
 	fpsTracker = shared_ptr<FpsTracker>(new FpsTracker(this));
 	frame = 0;
-
 }
 
 GLViewer::~GLViewer()
@@ -25,18 +24,18 @@ void GLViewer::draw()
 {
         glEnable(GL_NORMALIZE);
         glEnable(GL_CULL_FACE);
-	
+
 	if (Omega::instance().rootBody!=0) // if the scene is loaded
 		Omega::instance().rootBody->glDraw();
 
 // 	if (frame%50==0)
-// 	{		
+// 	{
 // 		string name = "/disc/pictures/pic";
 // 		setSnapshotFilename(name);
 // 		saveSnapshot(true,false);
 // 	}
 	frame++;
-		
+
 	fpsTracker->glDraw();
 }
 
@@ -44,7 +43,15 @@ void GLViewer::animate()
 {
 	Omega::instance().rootBody->moveToNextTimeStep();
 
-	//cerr << frame << endl;
+	static long int max=0;
+	if( frame % 100 == 0 )					// checks every 100th iteration
+		if( (max = Omega::instance().getMaxiter()) )	// is maxiter != 0 ? (double brackets to suppress warning)
+			if( frame > max )			// is frame bigger than maxiter ?
+			{
+				cerr << "Calc finished at: " << frame << endl;
+				exit(0);			// terminate.
+			}
+
 	fpsTracker->addOneAction();
 }
 
@@ -62,13 +69,13 @@ void GLViewer::mousePressEvent(QMouseEvent *e)
 
 void GLViewer::mouseReleaseEvent(QMouseEvent *e)
 {
-	if (!fpsTracker->mouseReleaseEvent(e))	
+	if (!fpsTracker->mouseReleaseEvent(e))
 		QGLViewer::mouseReleaseEvent(e);
 }
 
 void GLViewer::mouseDoubleClickEvent(QMouseEvent *e)
 {
-	if (!fpsTracker->mouseDoubleClickEvent(e))	
+	if (!fpsTracker->mouseDoubleClickEvent(e))
 		QGLViewer::mouseDoubleClickEvent(e);
 }
 

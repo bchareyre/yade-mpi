@@ -1,1 +1,1 @@
-./yade YadeQtGUI
+./yade -i YadeQtGUI $@

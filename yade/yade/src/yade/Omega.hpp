@@ -17,7 +17,7 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
- 
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -62,8 +62,20 @@ class Omega : public Singleton<Omega>
 	public : Vector3 gravity;
 	public : shared_ptr<NonConnexBody> rootBody;
 	public : ptime startingSimulationTime;
-	public : float dt;
-	
+
+	public	: float 	dt;
+	public	: void 		setTimestep(const string t);
+	public	: float 	getTimestep();
+
+// FIXME - where to put settings? in another singleton, or in a class owned by Omega ?
+	private	: string 	filename;
+	public	: void 		setFilename(const string f);
+	public	: string 	getFilename();
+
+	private	: long int 	maxiter;
+	public	: void 		setMaxiter(const string m);
+	public	: long int 	getMaxiter();
+
 	//public : MultiMethodsManager<CollisionFunctor> narrowCollider;
 	//public : MultiMethodsManager narrowCollider;
 
@@ -74,7 +86,7 @@ class Omega : public Singleton<Omega>
 	private   : Omega& operator=(const Omega&);
 
 	friend class Singleton< Omega >;
-	
+
 	public : void logMessage(const string& str);
 	public : void logError(const string& str);
 };

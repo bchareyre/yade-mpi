@@ -50,7 +50,7 @@ class YadeQtMainWindow : public YadeQtGeneratedMainWindow
 	protected : map<string,QPopupMenu*> menus;
 	protected : vector<QAction*> items;
 	protected : QFrame * frame;
-	
+
 	// construction
 	public : YadeQtMainWindow ();
 	public : ~YadeQtMainWindow ();
@@ -59,9 +59,10 @@ class YadeQtMainWindow : public YadeQtGeneratedMainWindow
 	public : void addItem(string menuName, string itemName);
 	public : void createMenus();
 	public slots : virtual void fileNewSimulation();
+	public slots : virtual void loadSimulation(const string f);
 	public slots : virtual void fileExit();
 	public slots : virtual void dynamicMenuClicked();
-	
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

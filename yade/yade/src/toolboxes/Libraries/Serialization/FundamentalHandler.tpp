@@ -59,13 +59,13 @@ inline void lexical_copy(Archive& ac , any& a )
 		*tmp = lexical_cast<Type>(*tmpStr);
 	}
 	else if (a.type()==typeid(string*)) // serialization - writing to string from some Type
-	{
+	{ // FIXME - throw when trying to serialize a string that has spaces. ( if(string.find(' ') != string.end() ...)
 		string * tmpStr = any_cast<string*>(a);
 		Type * tmp = any_cast<Type*>(ac.getAddress());
 		*tmpStr = lexical_cast<string>(*tmp);
 	}
 	else if (a.type()==typeid(const vector<unsigned char>*))
-	{
+	{ // FIXME - throw because binary serialization is not supported yet.
 	}
 	else if (a.type()==typeid(vector<unsigned char>*))
 	{
