@@ -16,14 +16,22 @@ GLViewer::GLViewer(QWidget * parent, QGLWidget * shareWidget) /*: QThread() */: 
 
 	show();
 
-// 	fpsTracker = shared_ptr<FpsTracker>(new FpsTracker(this));
+	fpsTracker = shared_ptr<FpsTracker>(new FpsTracker(this));
 }
 
 GLViewer::~GLViewer()
 {
 
 }
+void GLViewer::paintGL()
+{
+	//ThreadSafe::cerr("painGL");
+}
 
+void GLViewer::updateGL()
+{
+	//ThreadSafe::cerr("updateGL");
+}
 void GLViewer::resizeEvent(QResizeEvent *evt)
 {
 	qglThread.resize(evt->size().width(),evt->size().height()); 
@@ -36,39 +44,39 @@ void GLViewer::paintEvent(QPaintEvent *)
 
 void GLViewer::closeEvent(QCloseEvent *evt)
 {
-	//stopRendering();
 	QGLViewer::closeEvent(evt);
 }
 
-// void GLViewer::mouseMoveEvent(QMouseEvent * e)
-// {
-// 	if (!fpsTracker->mouseMoveEvent(e))
-// 		QGLViewer::mouseMoveEvent(e);
-// }
-// 
-// void GLViewer::mousePressEvent(QMouseEvent *e)
-// {
-// 	if (!fpsTracker->mousePressEvent(e))
-// 		QGLViewer::mousePressEvent(e);
-// }
-// 
-// void GLViewer::mouseReleaseEvent(QMouseEvent *e)
-// {
-// 	if (!fpsTracker->mouseReleaseEvent(e))
-// 		QGLViewer::mouseReleaseEvent(e);
-// }
-// 
-// void GLViewer::mouseDoubleClickEvent(QMouseEvent *e)
-// {
-// 	if (!fpsTracker->mouseDoubleClickEvent(e))
-// 		QGLViewer::mouseDoubleClickEvent(e);
-// }
-// 
-// void GLViewer::keyPressEvent(QKeyEvent *e)
-// {
-// 	if (e->key()=='F' || e->key()=='f')
-// 		fpsTracker->swapDisplayed();
-// 	else
-// 		QGLViewer::keyPressEvent(e);
-// }
+void GLViewer::mouseMoveEvent(QMouseEvent * e)
+{
+	if (!fpsTracker->mouseMoveEvent(e))
+		QGLViewer::mouseMoveEvent(e);
+}
+
+void GLViewer::mousePressEvent(QMouseEvent *e)
+{
+	if (!fpsTracker->mousePressEvent(e))
+		QGLViewer::mousePressEvent(e);
+}
+
+void GLViewer::mouseReleaseEvent(QMouseEvent *e)
+{
+	if (!fpsTracker->mouseReleaseEvent(e))
+		QGLViewer::mouseReleaseEvent(e);
+}
+
+void GLViewer::mouseDoubleClickEvent(QMouseEvent *e)
+{
+	if (!fpsTracker->mouseDoubleClickEvent(e))
+		QGLViewer::mouseDoubleClickEvent(e);
+}
+
+void GLViewer::keyPressEvent(QKeyEvent *e)
+{
+	if (e->key()=='F' || e->key()=='f')
+		fpsTracker->swapDisplayed();
+	else
+		QGLViewer::keyPressEvent(e);
+}
+
 	

@@ -90,22 +90,12 @@ SimulationControllerUpdater::~SimulationControllerUpdater()
 { 
 
 }
-//#define THREAD_DEBUG
 
 void SimulationControllerUpdater::oneLoop()
 {
-#ifndef THREAD_DEBUG
+
 	controller->lcdCurrentIteration->display(lexical_cast<string>(Omega::instance().getCurrentIteration()));
 	double simulationTime = Omega::instance().getSimulationTime();
-#else
-	ThreadSafe::cerr("mark:  10 " + string(typeid(*this).name()) );
-	controller->lcdCurrentIteration->display(lexical_cast<string>(Omega::instance().getCurrentIteration()));
-	
-	ThreadSafe::cerr("mark:  11 " + string(typeid(*this).name()) );
-	double simulationTime = Omega::instance().getSimulationTime();
-	
-	ThreadSafe::cerr("mark:  12 " + string(typeid(*this).name()) );
-#endif
 	
 	/*long int nsec	= (long int)(simulationTime*1000000000);
 	long int misec	= (long int)(simulationTime*1000000000);

@@ -41,6 +41,8 @@
 
 class GLViewer : public QGLViewer
 {	
+	private : shared_ptr<FpsTracker> fpsTracker;
+	
 	// construction
 	public : GLViewer (QWidget * parent=0, QGLWidget * shareWidget=0);
 	public : ~GLViewer ();
@@ -52,23 +54,14 @@ class GLViewer : public QGLViewer
 	protected : void paintEvent(QPaintEvent *);
 	protected : void closeEvent(QCloseEvent *evt);
 
-	public : void paintGL()
-	{
-		//ThreadSafe::cerr("painGL");
-	}
+	public : void paintGL();	
+	public slots: void updateGL();
 	
-	public slots: void updateGL()
-	{
-		//ThreadSafe::cerr("updateGL");
-	}
-	
-// 	private : shared_ptr<FpsTracker> fpsTracker;
-
-// 	protected : void mouseMoveEvent(QMouseEvent * e);
-// 	protected : void mousePressEvent(QMouseEvent *e);
-// 	protected : void mouseReleaseEvent(QMouseEvent *e);
-// 	protected : void keyPressEvent(QKeyEvent *e);
-// 	protected : void mouseDoubleClickEvent(QMouseEvent *e);
+	protected : void mouseMoveEvent(QMouseEvent * e);
+	protected : void mousePressEvent(QMouseEvent *e);
+	protected : void mouseReleaseEvent(QMouseEvent *e);
+	protected : void keyPressEvent(QKeyEvent *e);
+	protected : void mouseDoubleClickEvent(QMouseEvent *e);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
