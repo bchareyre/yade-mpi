@@ -14,6 +14,7 @@ using namespace std;
 
 ConnexBody::ConnexBody() : Body()
 {
+	containSubBodies = true;
 }
 
 ConnexBody::~ConnexBody() 

@@ -3,11 +3,12 @@
 # Subdir relative project main directory: ./plugins/BoundingVolumeFactory
 # Target is a subdirs project 
 
-MOC_DIR = $(YADECOMPILATIONPATH) 
-UI_DIR = $(YADECOMPILATIONPATH) 
-OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-CONFIG += debug \
-          warn_on 
-TEMPLATE = subdirs 
 SUBDIRS += Box2AABBFactory \
-           Terrain2AABBFactory 
+           Terrain2AABBFactory \
+           Sphere2AABBFactory 
+MOC_DIR = $(YADECOMPILATIONPATH)
+UI_DIR = $(YADECOMPILATIONPATH)
+OBJECTS_DIR = $(YADECOMPILATIONPATH)
+CONFIG += debug \
+warn_on
+TEMPLATE = subdirs

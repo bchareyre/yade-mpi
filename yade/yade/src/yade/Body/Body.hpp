@@ -65,7 +65,8 @@ class Body : public Serializable
 	friend class BodyContainer; // only BodyContainer can set the id of a body
 
 	public : vector<shared_ptr<Actor> > actors;
-
+	public : bool containSubBodies;
+	
 	// FIXME : to put into nonconnex body ? but maybe useful for autocollision in connexbody - yes, useful with so generic InteractionContaier, at leas when we will implement multiple interactions....
 	//public : list<shared_ptr<Interaction> > interactions;
 	public	: shared_ptr<InteractionContainer> interactions;

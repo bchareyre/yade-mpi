@@ -20,8 +20,6 @@ bool CollisionMultiMethodsManager::addPair(const string& name1,const string& nam
 	shared_ptr<Indexable> i2 = dynamic_pointer_cast<Indexable>(cm2);
 
 	return add(i1, i2, name1, name2, libName);
-	
-	//int& maxCurrentIndex, const string& name1, const string& name2, const string& libName);
 }
 
 bool CollisionMultiMethodsManager::collide(const shared_ptr<CollisionGeometry> cm1, const shared_ptr<CollisionGeometry> cm2, const Se3r& se31, const Se3r& se32, shared_ptr<Interaction> c)

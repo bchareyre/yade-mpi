@@ -3,30 +3,33 @@
 # Subdir relative project main directory: ./yade/Geometry
 # Target is a library:  
 
-LIBS += -rdynamic 
-INCLUDEPATH = $(YADEINCLUDEPATH)
-MOC_DIR = $(YADECOMPILATIONPATH) 
-UI_DIR = $(YADECOMPILATIONPATH) 
-OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = $(YADEDYNLIBPATH) 
-DESTDIR = $(YADEDYNLIBPATH) 
-CONFIG += debug \
-          warn_on \
-          dll 
-TEMPLATE = lib 
 HEADERS += BoundingVolume.hpp \
            BoundingVolumeAssembly.hpp \
-           BoundingVolumeFactory.hpp \
            BoundingVolumeHierarchy.hpp \
            CollisionGeometry.hpp \
            CollisionGeometryFactory.hpp \
            GeometricalModel.hpp \
-           GeometricalModelFactory.hpp 
+           GeometricalModelFactory.hpp \
+           RenderingEngine.hpp \
+           BoundingVolumeFactory.hpp \
+           BoundingVolumeUpdator.hpp 
 SOURCES += BoundingVolume.cpp \
            BoundingVolumeAssembly.cpp \
-           BoundingVolumeFactory.cpp \
            BoundingVolumeHierarchy.cpp \
            CollisionGeometry.cpp \
            CollisionGeometryFactory.cpp \
            GeometricalModel.cpp \
-           GeometricalModelFactory.cpp 
+           GeometricalModelFactory.cpp \
+           BoundingVolumeFactory.cpp \
+           BoundingVolumeUpdator.cpp 
+LIBS += -rdynamic
+INCLUDEPATH = $(YADEINCLUDEPATH)
+MOC_DIR = $(YADECOMPILATIONPATH)
+UI_DIR = $(YADECOMPILATIONPATH)
+OBJECTS_DIR = $(YADECOMPILATIONPATH)
+QMAKE_LIBDIR = $(YADEDYNLIBPATH)
+DESTDIR = $(YADEDYNLIBPATH)
+CONFIG += debug \
+warn_on \
+dll
+TEMPLATE = lib

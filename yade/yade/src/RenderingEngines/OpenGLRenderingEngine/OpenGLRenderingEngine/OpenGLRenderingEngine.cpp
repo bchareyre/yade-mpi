@@ -73,9 +73,12 @@ void OpenGLRenderingEngine::render(shared_ptr<NonConnexBody> rootBody)
 // 	glEnable(GL_ALPHA_TEST);
 // 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 // 	glEnable(GL_BLEND);	
+
+//	glColor4f(0.86,0.058,0.9,0.3);
 // 	glEnable(GL_LIGHTING);
 // 	
 // 	glEnable(GL_CULL_FACE);
+
 // 	glCullFace(GL_FRONT);
 // 	renderShadowVolumes(rootBody,lightPos);
 // 	
@@ -207,7 +210,7 @@ void OpenGLRenderingEngine::renderSceneUsingFastShadowVolumes(shared_ptr<NonConn
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);	
 	glDisable(GL_LIGHTING);	
-	glColor4f(0.1,0.1,0.1,0.3);
+	glColor4f(0.1,0.1,0.1,0.5);
 	glBegin(GL_QUADS);
 		glVertex2f(0,0);
 		glVertex2f(0,1);
@@ -261,7 +264,6 @@ void OpenGLRenderingEngine::renderShadowVolumes(shared_ptr<NonConnexBody> rootBo
 			normalDir *= s->radius*0.9;
 			Vector3r biNormalDir = normalDir.unitCross(dir)*(s->radius*0.9);
 			
-			glColor4f(0.86,0.058,0.9,0.3);
 			int nbSegments = 15;
 			
 			Vector3r p1,p2;

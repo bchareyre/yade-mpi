@@ -92,7 +92,7 @@ bool MultiMethodsManager<Functor>::add(shared_ptr<Indexable>& i1, shared_ptr<Ind
 	}
 	catch (FactoryCantCreate& fe)
 	{
-		std::string error = MultiMethodsManagerExceptions::NotExistingLibrary + libName;		
+		std::string error = MultiMethodsManagerExceptions::NotExistingLibrary + libName;	
 		throw MultiMethodsManagerNotExistingLibrary(error.c_str());
 	}	
 	

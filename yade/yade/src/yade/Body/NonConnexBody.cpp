@@ -14,6 +14,9 @@
 // FIXME - who is to decide which class to use by default?
 NonConnexBody::NonConnexBody() : Body() , bodies(new BodyAssocVec) , permanentInteractions(shared_ptr<InteractionContainer>(new InteractionHashMap))
 {
+
+containSubBodies = true;
+
 }
 
 NonConnexBody::~NonConnexBody()
