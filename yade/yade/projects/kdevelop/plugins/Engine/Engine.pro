@@ -4,10 +4,10 @@
 # Target is a subdirs project 
 
 SUBDIRS += Action \
-           ActionFunctor \
+           ApplyActionFunctor \
+           TimeIntegratorFunctor \
            KinematicEngine \
-           DynamicEngine \
-           TimeIntegratorFunctor 
+           DynamicEngine
 MOC_DIR = $(YADECOMPILATIONPATH)
 UI_DIR = $(YADECOMPILATIONPATH)
 OBJECTS_DIR = $(YADECOMPILATIONPATH)

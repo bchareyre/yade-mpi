@@ -106,7 +106,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>plugins/Body/BodyPhysicalParameters/SDECDiscreteElement</activedir>
+      <activedir>extensions/FrontEnds/NullGUI</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>

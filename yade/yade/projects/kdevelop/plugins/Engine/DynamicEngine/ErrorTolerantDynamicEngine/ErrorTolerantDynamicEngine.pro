@@ -9,7 +9,6 @@ LIBS += -lEngine \
         -lFactory \
         -lInteraction \
         -lBody \
-        -lGeometry \
         -lMultiMethods \
         -lErrorTolerantContactModel \
         -lRigidBodyParameters \
@@ -22,11 +21,14 @@ QMAKE_LIBDIR = ../../../../yade/Engine/$(YADEDYNLIBPATH) \
                ../../../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
                ../../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../../../toolboxes/Libraries/Factory/$(YADEDYNLIBPATH) \
+               ../../../../yade/Interaction/Interaction/$(YADEDYNLIBPATH) \
+               ../../../../yade/Body/Body/$(YADEDYNLIBPATH) \
+               ../../../../toolboxes/Libraries/MultiMethods/$(YADEDYNLIBPATH) \
+               ../../../../plugins/Interaction/InteractionGeometry/ErrorTolerantContactModel/$(YADEDYNLIBPATH) \
+               ../../../../plugins/Body/BodyPhysicalParameters/RigidBodyParameters/$(YADEDYNLIBPATH) \
                ../../../../yade/Interaction/$(YADEDYNLIBPATH) \
                ../../../../yade/Body/$(YADEDYNLIBPATH) \
                ../../../../yade/Geometry/$(YADEDYNLIBPATH) \
-               ../../../../toolboxes/Libraries/MultiMethods/$(YADEDYNLIBPATH) \
-               ../../../../plugins/Interaction/InteractionGeometry/ErrorTolerantContactModel/$(YADEDYNLIBPATH) \
                ../../../../plugins/Body/RigidBody/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \

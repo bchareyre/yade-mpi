@@ -18,18 +18,8 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
-HEADERS += BoundingVolume.hpp \
-           BoundingVolumeFunctor.hpp \
-           BoundingVolumeDispatcher.hpp \
-           InteractionDescription.hpp \
+HEADERS += InteractionDescription.hpp \
            InteractionDescriptionFunctor.hpp \
-           InteractionDescriptionDispatcher.hpp \
-           GeometricalModel.hpp \
-           GeometricalModelFunctor.hpp \
-           GeometricalModelDispatcher.hpp
-SOURCES += BoundingVolume.cpp \
-           BoundingVolumeDispatcher.cpp \
-           InteractionDescription.cpp \
-           InteractionDescriptionDispatcher.cpp \
-           GeometricalModel.cpp \
-           GeometricalModelDispatcher.cpp
+           InteractionDescriptionDispatcher.hpp
+SOURCES += InteractionDescription.cpp \
+           InteractionDescriptionDispatcher.cpp

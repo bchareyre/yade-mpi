@@ -18,7 +18,7 @@
 #include "InteractionDescriptionSet2AABBFunctor.hpp"
 #include "InteractionDescriptionSet.hpp"
 #include "SDECLinearContactModel.hpp"
-#include "ActionDispatcher.hpp"
+#include "ApplyActionDispatcher.hpp"
 #include "InteractionGeometryDispatcher.hpp"
 #include "InteractionPhysicsDispatcher.hpp"
 #include "SimpleBody.hpp"
@@ -75,9 +75,9 @@ string SDECSpheresPlane::generate()
 	bvu->addBoundingVolumeFunctors("InteractionBox","AABB","Box2AABBFunctor");
 	bvu->addBoundingVolumeFunctors("InteractionDescriptionSet","AABB","InteractionDescriptionSet2AABBFunctor");
 	
-	shared_ptr<ActionDispatcher> ad(new ActionDispatcher);
-	ad->addActionFunctor("ActionForce","RigidBodyParameters","ActionForce2Particle");
-	ad->addActionFunctor("ActionMomentum","RigidBodyParameters","ActionMomentum2RigidBody");
+	shared_ptr<ApplyActionDispatcher> ad(new ApplyActionDispatcher);
+	ad->addApplyActionFunctor("ActionForce","RigidBodyParameters","ActionForce2Particle");
+	ad->addApplyActionFunctor("ActionMomentum","RigidBodyParameters","ActionMomentum2RigidBody");
 	
 	shared_ptr<TimeIntegratorDispatcher> ti(new TimeIntegratorDispatcher);
 	ti->addTimeIntegratorFunctor("SDECParameters","LeapFrogIntegrator");

@@ -3,15 +3,16 @@
 # Subdir relative project main directory: ./plugins/Geometry/GeometricalModelFunctor/VRML2TerrainFunctor
 # Target is a library:  
 
-LIBS += -lGeometry \
-        -lTerrain \
+LIBS += -lTerrain \
+        -lGeometricalModel \
         -rdynamic 
 INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../../yade/Geometry/$(YADEDYNLIBPATH) \
-               ../../../../plugins/Geometry/GeometricalModel/Terrain/$(YADEDYNLIBPATH) \
+QMAKE_LIBDIR = ../../../../plugins/Geometry/GeometricalModel/Terrain/$(YADEDYNLIBPATH) \
+               ../../../../yade/Body/GeometricalModel/$(YADEDYNLIBPATH) \
+               ../../../../yade/Geometry/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

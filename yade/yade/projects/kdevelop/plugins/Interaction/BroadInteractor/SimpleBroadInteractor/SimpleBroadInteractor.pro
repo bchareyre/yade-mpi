@@ -3,38 +3,39 @@
 # Subdir relative project main directory: ./plugins/Interaction/BroadInteractor/SimpleBroadInteractor
 # Target is a library:  
 
+LIBS += -lBoundingSphere \
+        -lAABB \
+        -lSerialization \
+        -lMath \
+        -lBody \
+        -lEngine \
+        -lInteraction \
+        -lMultiMethods \
+        -rdynamic 
+INCLUDEPATH = $(YADEINCLUDEPATH) 
+MOC_DIR = $(YADECOMPILATIONPATH) 
+UI_DIR = $(YADECOMPILATIONPATH) 
+OBJECTS_DIR = $(YADECOMPILATIONPATH) 
+QMAKE_LIBDIR = ../../../../plugins/Geometry/BoundingVolume/BoundingSphere/$(YADEDYNLIBPATH) \
+               ../../../../plugins/Geometry/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
+               ../../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
+               ../../../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
+               ../../../../yade/Body/Body/$(YADEDYNLIBPATH) \
+               ../../../../yade/Engine/$(YADEDYNLIBPATH) \
+               ../../../../yade/Interaction/Interaction/$(YADEDYNLIBPATH) \
+               ../../../../toolboxes/Libraries/MultiMethods/$(YADEDYNLIBPATH) \
+               ../../../../yade/Body/$(YADEDYNLIBPATH) \
+               ../../../../yade/Geometry/$(YADEDYNLIBPATH) \
+               ../../../../yade/Interaction/$(YADEDYNLIBPATH) \
+               $(YADEDYNLIBPATH) 
+QMAKE_CXXFLAGS_RELEASE += -lpthread \
+                          -pthread 
+QMAKE_CXXFLAGS_DEBUG += -lpthread \
+                        -pthread 
+DESTDIR = $(YADEDYNLIBPATH) 
+CONFIG += debug \
+          warn_on \
+          dll 
+TEMPLATE = lib 
 HEADERS += SimpleBroadInteractor.hpp 
 SOURCES += SimpleBroadInteractor.cpp 
-LIBS += -lBoundingSphere \
--lAABB \
--lSerialization \
--lMath \
--lBody \
--lEngine \
--lGeometry \
--lInteraction \
--lMultiMethods \
--rdynamic
-INCLUDEPATH = $(YADEINCLUDEPATH)
-MOC_DIR = $(YADECOMPILATIONPATH)
-UI_DIR = $(YADECOMPILATIONPATH)
-OBJECTS_DIR = $(YADECOMPILATIONPATH)
-QMAKE_LIBDIR = ../../../../plugins/Geometry/BoundingVolume/BoundingSphere/$(YADEDYNLIBPATH) \
-../../../../plugins/Geometry/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
-../../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
-../../../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
-../../../../yade/Body/$(YADEDYNLIBPATH) \
-../../../../yade/Engine/$(YADEDYNLIBPATH) \
-../../../../yade/Geometry/$(YADEDYNLIBPATH) \
-../../../../yade/Interaction/$(YADEDYNLIBPATH) \
-../../../../toolboxes/Libraries/MultiMethods/$(YADEDYNLIBPATH) \
-$(YADEDYNLIBPATH)
-QMAKE_CXXFLAGS_RELEASE += -lpthread \
--pthread
-QMAKE_CXXFLAGS_DEBUG += -lpthread \
--pthread
-DESTDIR = $(YADEDYNLIBPATH)
-CONFIG += debug \
-warn_on \
-dll
-TEMPLATE = lib

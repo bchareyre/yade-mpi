@@ -5,14 +5,14 @@
 
 HEADERS += TimeIntegratorDispatcher.hpp \
            TimeIntegratorFunctor.hpp \
-           ActionDispatcher.hpp \
-           ActionFunctor.hpp \
+           ApplyActionDispatcher.hpp \
+           ApplyActionFunctor.hpp \
            ActionContainer.hpp \
            Action.hpp \
            DynamicEngine.hpp \
            KinematicEngine.hpp 
 SOURCES += TimeIntegratorDispatcher.cpp \
-           ActionDispatcher.cpp \
+           ApplyActionDispatcher.cpp \
            ActionContainer.cpp \
            DynamicEngine.cpp \
            KinematicEngine.cpp 

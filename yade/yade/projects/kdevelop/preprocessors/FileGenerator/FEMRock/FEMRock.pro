@@ -10,7 +10,6 @@ LIBS += -lSerialization \
         -lMath \
         -lBody \
         -lEngine \
-        -lGeometry \
         -lInteraction \
         -lMultiMethods \
         -lFEMNodeParameters \
@@ -25,11 +24,15 @@ QMAKE_LIBDIR = ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../../plugins/Geometry/GeometricalModel/Box/$(YADEDYNLIBPATH) \
                ../../../plugins/Geometry/GeometricalModel/Polyhedron/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
-               ../../../yade/Body/$(YADEDYNLIBPATH) \
+               ../../../yade/Body/Body/$(YADEDYNLIBPATH) \
                ../../../yade/Engine/$(YADEDYNLIBPATH) \
+               ../../../yade/Interaction/Interaction/$(YADEDYNLIBPATH) \
+               ../../../toolboxes/Libraries/MultiMethods/$(YADEDYNLIBPATH) \
+               ../../../plugins/Body/BodyPhysicalParameters/FEMNodeParameters/$(YADEDYNLIBPATH) \
+               ../../../plugins/Body/BodyPhysicalParameters/RigidBodyParameters/$(YADEDYNLIBPATH) \
+               ../../../yade/Body/$(YADEDYNLIBPATH) \
                ../../../yade/Geometry/$(YADEDYNLIBPATH) \
                ../../../yade/Interaction/$(YADEDYNLIBPATH) \
-               ../../../toolboxes/Libraries/MultiMethods/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/BodyPhysicalParameters/FEMBody/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/BodyPhysicalParameters/RigidBody/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/FEMBody/$(YADEDYNLIBPATH) \

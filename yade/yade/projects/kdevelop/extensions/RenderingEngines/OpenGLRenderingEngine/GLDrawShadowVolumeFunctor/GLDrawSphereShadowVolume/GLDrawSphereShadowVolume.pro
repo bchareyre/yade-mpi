@@ -5,7 +5,6 @@
 
 LIBS += -lSphere \
         -lBody \
-        -lGeometry \
         -lParticleParameters \
         -rdynamic 
 INCLUDEPATH = $(YADEINCLUDEPATH) 
@@ -13,6 +12,8 @@ MOC_DIR = $(YADECOMPILATIONPATH)
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 QMAKE_LIBDIR = ../../../../../plugins/Geometry/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
+               ../../../../../yade/Body/Body/$(YADEDYNLIBPATH) \
+               ../../../../../plugins/Body/BodyPhysicalParameters/ParticleParameters/$(YADEDYNLIBPATH) \
                ../../../../../yade/Body/$(YADEDYNLIBPATH) \
                ../../../../../yade/Geometry/$(YADEDYNLIBPATH) \
                ../../../../../plugins/Body/BodyPhysicalParameters/Particle/$(YADEDYNLIBPATH) \

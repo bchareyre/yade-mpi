@@ -21,92 +21,62 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "ActionDispatcher.hpp"
-#include "ComplexBody.hpp"
+#ifndef __ACTIONDISPATCHER_HPP__
+#define __ACTIONDISPATCHER_HPP__
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void ActionDispatcher::postProcessAttributes(bool deserializing)
-{
-	if(deserializing)
-	{
-		for(unsigned int i=0;i<actionFunctors.size();i++)
-			actionDispatcher.add(actionFunctors[i][0],actionFunctors[i][1],actionFunctors[i][2]);
-	}
-
-}
+#include "Actor.hpp"
+#include "DynLibDispatcher.hpp"
+#include "Action.hpp"
+#include "ApplyActionFunctor.hpp"
+#include "BodyPhysicalParameters.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void ActionDispatcher::registerAttributes()
-{
-	REGISTER_ATTRIBUTE(actionFunctors);
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-void ActionDispatcher::addActionFunctor(const string& str1,const string& str2,const string& str3)
-{
-	vector<string> v;
-	v.push_back(str1);
-	v.push_back(str2);
-	v.push_back(str3);
-	actionFunctors.push_back(v);
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-void ActionDispatcher::action(Body* body)
+class ApplyActionDispatcher : public Actor
 {
 
-// NEW VERSION - 107 seconds - faster
-//
-// there are a lot of places where we can do improvement like this. if we do code change
-// like here - in every possible places - yade can gain a lot of speed.
-//
-// basically I've discovered that every temporary variable of type shared_ptr<> costs 3 seconds,
-// so we should avoid creating them and instead pass them around by references - whenever possible
-//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+/// Attributes											///
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
+	protected: DynLibDispatcher
+		<	TYPELIST_2( Action , BodyPhysicalParameters ) ,	// base classess for dispatch
+			ApplyActionFunctor,					// class that provides multivirtual call
+			void ,						// return type
+			TYPELIST_2(  const shared_ptr<Action>&
+				   , shared_ptr<BodyPhysicalParameters>& )
+		> actionDispatcher;
 
-	ComplexBody * ncb = dynamic_cast<ComplexBody*>(body);
-	shared_ptr<BodyContainer>* bodies_ptr = &(ncb->bodies);
-	shared_ptr<Action>* action_ptr;
+	private : vector<vector<string> > applyActionFunctors;
+	public  : void addApplyActionFunctor(const string& str1,const string& str2,const string& str3);
 
-	int id;
-	for( ncb->actions->gotoFirst() ; ncb->actions->notAtEnd() ; ncb->actions->gotoNext())
-	{
-		action_ptr = &(ncb->actions->getCurrent(id));
-		actionDispatcher( *action_ptr , (*(*bodies_ptr))[id]->physicalParameters);
-// FIXME - this line would work if action was holding body's id. and it is possible that it will be even faster
-//		actionDispatcher( ncb->actions->getCurrent(id) , (*(*bodies_ptr))[id]);
-	}
-		
-		
-/* OLD VERSION - 111 seconds
+///////////////////////////////////////////////////////////////////////////////////////////////////
+/// Methods											///
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
-	ComplexBody * ncb = dynamic_cast<ComplexBody*>(body);
-	shared_ptr<BodyContainer> bodies = ncb->bodies;
+	protected : virtual void postProcessAttributes(bool deserializing);
+	public : void registerAttributes();
 
-	shared_ptr<Action> action;
+	public : virtual void action(Body* body);
 
-	for( ncb->actions->gotoFirst() ; ncb->actions->notAtEnd() ; ncb->actions->gotoNext())
-	{
-		int id;
-		action = ncb->actions->getCurrent(id);
-		
-		shared_ptr<Body> b = (*bodies)[id];
+	REGISTER_CLASS_NAME(ApplyActionDispatcher);
 
-		actionDispatcher( action, b);
-	}
-
-
-*/
-}
+};
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+
+REGISTER_SERIALIZABLE(ApplyActionDispatcher,false);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+#endif // __ACTIONDISPATCHER_HPP__
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+

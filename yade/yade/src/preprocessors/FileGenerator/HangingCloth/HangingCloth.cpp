@@ -15,7 +15,7 @@
 #include "IOManager.hpp"
 #include "InteractionGeometryDispatcher.hpp"
 #include "InteractionPhysicsDispatcher.hpp"
-#include "ActionDispatcher.hpp"
+#include "ApplyActionDispatcher.hpp"
 #include "BoundingVolumeDispatcher.hpp"
 #include "InteractionDescriptionSet2AABBFunctor.hpp"
 #include "InteractionDescriptionSet.hpp"
@@ -86,8 +86,8 @@ string HangingCloth::generate()
 	bvu->addBoundingVolumeFunctors("InteractionBox","AABB","Box2AABBFunctor");
 	bvu->addBoundingVolumeFunctors("InteractionDescriptionSet","AABB","InteractionDescriptionSet2AABBFunctor");
 	
-	shared_ptr<ActionDispatcher> ad(new ActionDispatcher);
-	ad->addActionFunctor("ActionForce","ParticleParameters","ActionForce2Particle");
+	shared_ptr<ApplyActionDispatcher> ad(new ApplyActionDispatcher);
+	ad->addApplyActionFunctor("ActionForce","ParticleParameters","ActionForce2Particle");
 	
 	shared_ptr<TimeIntegratorDispatcher> ti(new TimeIntegratorDispatcher);
 	ti->addTimeIntegratorFunctor("ParticleParameters","LeapFrogIntegrator");

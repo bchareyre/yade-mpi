@@ -7,7 +7,6 @@ LIBS += -lSerialization \
         -lMath \
         -lBody \
         -lEngine \
-        -lGeometry \
         -lInteraction \
         -lMultiMethods \
         -lFactory \
@@ -16,6 +15,12 @@ LIBS += -lSerialization \
         -lBodyRedirectionVector \
         -lThreads \
         -lBodyAssocVector \
+        -lInteractionPhysics \
+        -lInteractionGeometry \
+        -lBoundingVolume \
+        -lInteractionDescription \
+        -lGeometricalModel \
+        -lBodyPhysicalParameters \
         -lboost_thread \
         -lboost_filesystem \
         -lboost_date_time \
@@ -28,16 +33,25 @@ UI_DIR = $(YADECOMPILATIONPATH)
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 QMAKE_LIBDIR = ../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
-               ../../yade/Body/$(YADEDYNLIBPATH) \
+               ../../yade/Body/Body/$(YADEDYNLIBPATH) \
                ../../yade/Engine/$(YADEDYNLIBPATH) \
-               ../../yade/Geometry/$(YADEDYNLIBPATH) \
-               ../../yade/Interaction/$(YADEDYNLIBPATH) \
+               ../../yade/Interaction/Interaction/$(YADEDYNLIBPATH) \
                ../../toolboxes/Libraries/MultiMethods/$(YADEDYNLIBPATH) \
                ../../toolboxes/Libraries/Factory/$(YADEDYNLIBPATH) \
                ../../toolboxes/DataStructures/InteractionContainer/InteractionVecSet/$(YADEDYNLIBPATH) \
                ../../toolboxes/DataStructures/InteractionContainer/InteractionHashMap/$(YADEDYNLIBPATH) \
                ../../toolboxes/DataStructures/BodyContainer/BodyRedirectionVector/$(YADEDYNLIBPATH) \
                ../../toolboxes/Libraries/Threads/$(YADEDYNLIBPATH) \
+               ../../toolboxes/DataStructures/BodyContainer/BodyAssocVector/$(YADEDYNLIBPATH) \
+               ../../yade/Interaction/InteractionPhysics/$(YADEDYNLIBPATH) \
+               ../../yade/Interaction/InteractionGeometry/$(YADEDYNLIBPATH) \
+               ../../yade/Body/BoundingVolume/$(YADEDYNLIBPATH) \
+               ../../yade/Body/InteractionDescription/$(YADEDYNLIBPATH) \
+               ../../yade/Body/GeometricalModel/$(YADEDYNLIBPATH) \
+               ../../yade/Body/BodyPhysicalParameters/$(YADEDYNLIBPATH) \
+               ../../yade/Body/$(YADEDYNLIBPATH) \
+               ../../yade/Geometry/$(YADEDYNLIBPATH) \
+               ../../yade/Interaction/$(YADEDYNLIBPATH) \
                ../../toolboxes/DataStructures/BodyContainer/BodyAssocVec/$(YADEDYNLIBPATH) \
                ../../yade/MultiMethods/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
