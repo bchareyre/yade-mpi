@@ -43,7 +43,7 @@ void help()
 
 int main(int argc, char *argv[])
 {
-	string frontend="";
+	string frontEndLibName="";
 
 	int ch;
 	opterr = 0;
@@ -51,19 +51,18 @@ int main(int argc, char *argv[])
 		switch(ch)
 		{
 			case 'h'	: help();		return 1;
-			case 'i'	: frontend = optarg;	break;
+			case 'i'	: frontEndLibName = optarg;	break;
 			default		: help();		return 1;
 		}
 
-	if( frontend.size() == 0 )
+	if( frontEndLibName.size() == 0 )
 	{
 		help();
 		return 0;
 	}
 
-	Omega::instance().gui = dynamic_pointer_cast<FrontEnd>(ClassFactory::instance().createShared(frontend));
-
-	int ok = Omega::instance().gui->run(argc,argv);
+	shared_ptr<FrontEnd> frontEnd = dynamic_pointer_cast<FrontEnd>(ClassFactory::instance().createShared(frontEndLibName));
+	int ok = frontEnd->run(argc,argv);
 	
 	cout << "YADE ENDED CORRECTLY ..." << endl;
 	

@@ -81,57 +81,34 @@ SimulationController::SimulationController(QWidget * parent) : QtGeneratedSimula
 	addNewView();
 
 	updater = shared_ptr<SimulationControllerUpdater>(new SimulationControllerUpdater(this));
-
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 SimulationController::~SimulationController()
-{
-	terminateAllThreads();
+{	
+	//LOCK(Omega::instance().getRootBodyMutex());
 	
-	map<int,GLViewer*>::iterator gi = glViews.begin();
-	map<int,GLViewer*>::iterator giEnd = glViews.end();
-	for(;gi!=giEnd;++gi)
-		delete (*gi).second;
-	glViews.clear();
+	Omega::instance().finishSimulationLoop();
+	Omega::instance().joinSimulationLoop();
 	
-	Omega::instance().freeRootBody();
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-void SimulationController::terminateAllThreads()
-{
-	{
-		boost::mutex mutex;
-		boost::mutex::scoped_lock lock(mutex);
-		
-		Omega::instance().finishSimulationLoop();
-		Omega::instance().joinSimulationLoop();
-	}
-	
-	{
-		boost::mutex mutex;
-		boost::mutex::scoped_lock lock(mutex);
-		
-		updater->finish();
-		updater->join();
-	}
+	updater->finish();
+	updater->join();
 	
 	map<int,GLViewer*>::reverse_iterator gi = glViews.rbegin();
 	map<int,GLViewer*>::reverse_iterator giEnd = glViews.rend();
 	for(;gi!=giEnd;++gi)
 	{
-		{
-			boost::mutex mutex;
-			boost::mutex::scoped_lock lock(mutex);
-			(*gi).second->finishRendering();
-			(*gi).second->joinRendering();
-		}
+		boost::mutex::scoped_lock lock(mutex);
+		(*gi).second->finishRendering();
+		(*gi).second->joinRendering();
+		delete (*gi).second;
 	}
+
+	glViews.clear();
+	
+	Omega::instance().freeRootBody();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -166,28 +143,25 @@ void SimulationController::pbApplyClicked()
 
 void SimulationController::pbLoadClicked()
 {
-	boost::mutex resizeMutex;
-	boost::mutex::scoped_lock lock(resizeMutex);
-
+	
 	QString selectedFilter;
 	QString fileName = QFileDialog::getOpenFileName("../data", "XML Yade File (*.xml)", 0,"Open File","Choose a file to open",&selectedFilter );
 		
 	if (!fileName.isEmpty() && selectedFilter == "XML Yade File (*.xml)")
 	{
-			
+		
 		map<int,GLViewer*>::iterator gi = glViews.begin();
 		map<int,GLViewer*>::iterator giEnd = glViews.end();
 		for(;gi!=giEnd;++gi)
 			(*gi).second->stopRendering();
-			
+
 		updater->stop();
 		Omega::instance().finishSimulationLoop();
 		Omega::instance().joinSimulationLoop();
-	
-		Omega::instance().setSimulationFileName(fileName);
-		Omega::instance().loadSimulation();
 		
-		//boost::thread t(&SimulationController::load);
+		Omega::instance().setSimulationFileName(fileName);
+		
+		Omega::instance().loadSimulation();
 		
 		string fullName = string(filesystem::basename(fileName.data()))+string(filesystem::extension(fileName.data()));
 		tlCurrentSimulation->setText(fullName);
@@ -201,6 +175,10 @@ void SimulationController::pbLoadClicked()
 			(*gi).second->centerScene();
 			(*gi).second->startRendering();
 		}
+		
+		pbStartSimulation->setEnabled(true);
+		pbStopSimulation->setEnabled(true);
+		pbResetSimulation->setEnabled(true);
 	}
 } 
 
@@ -209,11 +187,7 @@ void SimulationController::pbLoadClicked()
 
 void SimulationController::pbNewViewClicked()
 {
-	boost::mutex resizeMutex;
-	boost::mutex::scoped_lock lock(resizeMutex);
-
 	addNewView();
-	
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -221,9 +195,8 @@ void SimulationController::pbNewViewClicked()
 
 void SimulationController::addNewView()
 {
-	boost::mutex resizeMutex;
-	boost::mutex::scoped_lock lock(resizeMutex);
-
+	//LOCK(Omega::instance().getRootBodyMutex());
+	
 	QGLFormat format;
 	QGLFormat::setDefaultFormat( format );
 	format.setStencil(TRUE);
@@ -250,14 +223,15 @@ void SimulationController::addNewView()
 
 void SimulationController::closeGLViewEvent(int id)
 {
+	//LOCK(Omega::instance().getRootBodyMutex());
+	//boost::mutex::scoped_lock lock(mutex);
+
 	if (id!=0)
 	{
 		glViews[id]->finishRendering();
 		glViews[id]->joinRendering();
-
 		delete glViews[id];
 		glViews.erase(id);
-
 		if (id==maxNbViews)
 			maxNbViews--;
 	}
@@ -268,8 +242,7 @@ void SimulationController::closeGLViewEvent(int id)
 
 void SimulationController::pbStopClicked()
 {
-	boost::mutex resizeMutex;
-	boost::mutex::scoped_lock lock(resizeMutex);
+	//LOCK(Omega::instance().getRootBodyMutex());
 	Omega::instance().stopSimulationLoop();
 	updater->stop();
 }
@@ -279,8 +252,7 @@ void SimulationController::pbStopClicked()
 
 void SimulationController::pbStartClicked()
 {
-	boost::mutex resizeMutex;
-	boost::mutex::scoped_lock lock(resizeMutex);
+	//LOCK(Omega::instance().getRootBodyMutex());
 	Omega::instance().startSimulationLoop();	
 	updater->start();
 }
@@ -290,8 +262,8 @@ void SimulationController::pbStartClicked()
 
 void SimulationController::pbResetClicked()
 {
-	boost::mutex resizeMutex;
-	boost::mutex::scoped_lock lock(resizeMutex);
+	//LOCK(Omega::instance().getRootBodyMutex());
+	
 	updater->stop();
 	map<int,GLViewer*>::iterator gi = glViews.begin();
 	map<int,GLViewer*>::iterator giEnd = glViews.end();
@@ -300,7 +272,7 @@ void SimulationController::pbResetClicked()
 	
 	Omega::instance().finishSimulationLoop();
 	Omega::instance().joinSimulationLoop();	
-	Omega::instance().loadSimulation();		
+	Omega::instance().loadSimulation();
 	Omega::instance().createSimulationLoop();
 
 	gi = glViews.begin();
@@ -314,8 +286,7 @@ void SimulationController::pbResetClicked()
 
 void SimulationController::pbCenterSceneClicked()
 {
-	boost::mutex resizeMutex;
-	boost::mutex::scoped_lock lock(resizeMutex);
+	//LOCK(Omega::instance().getRootBodyMutex());
 	map<int,GLViewer*>::iterator gi = glViews.begin();
 	map<int,GLViewer*>::iterator giEnd = glViews.end();
 	for(;gi!=giEnd;++gi)

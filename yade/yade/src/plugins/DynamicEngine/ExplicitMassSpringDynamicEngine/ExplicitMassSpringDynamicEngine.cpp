@@ -26,7 +26,7 @@ void ExplicitMassSpringDynamicEngine::registerAttributes()
 void ExplicitMassSpringDynamicEngine::respondToCollisions(Body * body)
 {
 
-	float dt = Omega::instance().dt;
+	float dt = Omega::instance().getTimeStep();
 	MassSpringBody * massSpring = dynamic_cast<MassSpringBody*>(body);
 
 	Vector3r gravity = Omega::instance().getGravity();

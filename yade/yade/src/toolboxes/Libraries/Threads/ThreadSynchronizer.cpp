@@ -38,7 +38,7 @@ ThreadSynchronizer::ThreadSynchronizer() : 	maxId(0),
 
 void ThreadSynchronizer::insertThread(int* myTurn)
 { 
-	boost::mutex::scoped_lock lock(mutex);	
+	boost::mutex::scoped_lock lock(mutex);
 	
 	ids.insert(maxId);
 	currentId = ids.begin();
@@ -61,9 +61,9 @@ void ThreadSynchronizer::removeThread(int id)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-boost::mutex* ThreadSynchronizer::getMutex()
+boost::mutex& ThreadSynchronizer::getMutex()
 {	
-	return &mutex;
+	return mutex;
 }
 	
 ////////////////////////////////////////////////////////////////////////////////////////////////////

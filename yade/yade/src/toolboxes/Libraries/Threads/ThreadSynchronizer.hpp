@@ -44,7 +44,7 @@ using namespace boost;
 class ThreadSynchronizer
 {	
 	private : boost::mutex mutex;
-	public  : boost::mutex* getMutex();
+	public  : boost::mutex& getMutex();
 	
 	private : boost::condition cond;
 		

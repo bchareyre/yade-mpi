@@ -38,6 +38,7 @@
 
 class SimulationController : public QtGeneratedSimulationController
 {
+	private : boost::mutex mutex;
 	private : QtGUIGenerator guiGen;	
 	private : /*static*/ QWidget * parentWorkspace;	
 	private : shared_ptr<RenderingEngine> renderer;
@@ -61,7 +62,6 @@ class SimulationController : public QtGeneratedSimulationController
 	public slots : virtual void pbCenterSceneClicked();
 	public slots : void closeGLViewEvent(int id);
 
-	private : void terminateAllThreads();
 	private : void addNewView();
 	
 	protected : void closeEvent(QCloseEvent *evt);

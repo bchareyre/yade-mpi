@@ -157,7 +157,7 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 	shared_ptr<BodyContainer> bodies = ncb->bodies;
 
 	Vector3r gravity = Omega::instance().getGravity();
-	float dt = Omega::instance().dt;
+	float dt = Omega::instance().getTimeStep();
 
 	if (first)
 	{

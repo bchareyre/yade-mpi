@@ -31,9 +31,10 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-
+	
 template<class Thread>
-Threadable<Thread>::Threadable(shared_ptr<ThreadSynchronizer> s) :	finished(new bool(false)), 
+Threadable<Thread>::Threadable(shared_ptr<ThreadSynchronizer> s) :	mutex(new boost::mutex),
+									finished(new bool(false)), 
 									blocked(new bool(true)), 
 									turn(new int(0)),
 									synchronizer(s)
@@ -55,8 +56,6 @@ Threadable<Thread>::~Threadable()
 template<class Thread>
 void Threadable<Thread>::createThread()
 {	
-	boost::mutex mutex;
-	boost::mutex::scoped_lock lock(mutex);
 	synchronizer->insertThread(turn);
 	thread = shared_ptr<boost::thread>(new boost::thread(*(dynamic_cast<Thread*>(this))));
 }
@@ -67,8 +66,7 @@ void Threadable<Thread>::createThread()
 template<class Thread>
 void Threadable<Thread>::stop()
 {
-	boost::mutex mutex;
-	boost::mutex::scoped_lock lock(mutex);
+	boost::mutex::scoped_lock lock(*mutex);
 	*blocked = true;
 }
 
@@ -78,8 +76,7 @@ void Threadable<Thread>::stop()
 template<class Thread>
 void Threadable<Thread>::start()
 {
-	boost::mutex mutex;
-	boost::mutex::scoped_lock lock(mutex);
+	boost::mutex::scoped_lock lock(*mutex);
 	*blocked = false;
 
 }
@@ -90,8 +87,7 @@ void Threadable<Thread>::start()
 template<class Thread>
 void Threadable<Thread>::finish()
 {
-	boost::mutex mutex;
-	boost::mutex::scoped_lock lock(mutex);
+	boost::mutex::scoped_lock lock(*mutex);
 	*finished = true;
 	*blocked = false;
 }
@@ -102,8 +98,7 @@ void Threadable<Thread>::finish()
 template<class Thread>
 void Threadable<Thread>::join()
 {
-	boost::mutex mutex;
-	boost::mutex::scoped_lock lock(mutex);
+	//boost::mutex::scoped_lock lock(*mutex);
 	thread->join();
 }
 
@@ -113,10 +108,11 @@ void Threadable<Thread>::join()
 template<class Thread>
 void Threadable<Thread>::operator()()
 {
+	ThreadSafe::cout("beginning Of thread number : "+lexical_cast<string>(*turn));
 	while (notEnd() && !*finished)
 	{
-		{
-			boost::mutex::scoped_lock lock(*(synchronizer->getMutex()));
+		{	
+			boost::mutex::scoped_lock lock(synchronizer->getMutex());
 
 			while (synchronizer->notMyTurn(*turn))
 				synchronizer->wait(lock);
@@ -130,6 +126,7 @@ void Threadable<Thread>::operator()()
 		}
 	}
 	synchronizer->removeThread(*turn);
+	ThreadSafe::cout("Ending Of thread number : "+lexical_cast<string>(*turn));
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -138,8 +135,7 @@ void Threadable<Thread>::operator()()
 template<class Thread>
 void Threadable<Thread>::sleep(int ms)
 {
-	boost::mutex mutex;
-	boost::mutex::scoped_lock lock(mutex);
+//	boost::mutex::scoped_lock lock(*mutex);
 
 	boost::xtime xt;
 	boost::xtime_get(&xt, boost::TIME_UTC);

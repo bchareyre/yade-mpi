@@ -43,7 +43,7 @@ void BallisticDynamicEngine::respondToCollisions(Body * body)
 	else
 	{
 	
-		float dt = Omega::instance().dt;
+		float dt = Omega::instance().getTimeStep();
 	
 		//rb->acceleration += Omega::instance().getGravity();
 	

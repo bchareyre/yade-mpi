@@ -40,7 +40,7 @@ OpenGLRenderingEngine::OpenGLRenderingEngine() : RenderingEngine()
 	drawBoundingVolume = false;
 	drawCollisionGeometry = false;
 	drawGeometricalModel = true;
-	castShadow = true;
+	castShadow = false;
 	drawShadowVolumes = false;
 	useFastShadowVolume = true;
 	needInit = true;

@@ -3,7 +3,7 @@
 #include "Omega.hpp"
 #include "ThreadSynchronizer.hpp"
 
-SimulationLoop::SimulationLoop() : Threadable<SimulationLoop>(Omega::instance().synchronizer)
+SimulationLoop::SimulationLoop() : Threadable<SimulationLoop>(Omega::instance().getSynchronizer())
 {
 	createThread();
 }
@@ -20,9 +20,11 @@ bool SimulationLoop::notEnd()
 
 void SimulationLoop::oneLoop()
 {
-	if (Omega::instance().rootBody)
+	LOCK(Omega::instance().getRootBodyMutex());
+		
+	if (Omega::instance().getRootBody())
 	{
-		Omega::instance().rootBody->moveToNextTimeStep();
+		Omega::instance().getRootBody()->moveToNextTimeStep();
 		Omega::instance().incrementCurrentIteration();
 		Omega::instance().incrementSimulationTime();
 	}

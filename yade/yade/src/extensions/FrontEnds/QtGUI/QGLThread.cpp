@@ -31,12 +31,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-boost::mutex resizeMutex;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-QGLThread::QGLThread(GLViewer * glv, shared_ptr<RenderingEngine> r) :	Threadable<QGLThread>(Omega::instance().synchronizer),
+QGLThread::QGLThread(GLViewer * glv, shared_ptr<RenderingEngine> r) :	Threadable<QGLThread>(Omega::instance().getSynchronizer()),
 									needCentering(new bool(false)),
 									needResizing(new bool(false)),
 									newWidth(new int(0)),
@@ -72,7 +67,8 @@ void QGLThread::initializeGL()
 
 void QGLThread::resize(int w,int h)
 {
-	boost::mutex::scoped_lock lock(resizeMutex);
+	LOCK(*mutex);
+	
 	*newWidth = w;
 	*newHeight = h;
 
@@ -82,8 +78,20 @@ void QGLThread::resize(int w,int h)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+void QGLThread::centerScene() 
+{ 
+	LOCK(*mutex);
+	
+	*needCentering=true;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 bool QGLThread::notEnd()
 {
+	//LOCK(*mutex);
+	
 	return true;
 }
 
@@ -92,6 +100,9 @@ bool QGLThread::notEnd()
 
 void QGLThread::oneLoop()
 {
+	LOCK2(*mutex);
+	LOCK(Omega::instance().getRootBodyMutex());
+	
 	glViewer->glDraw();
 
 	glViewer->makeCurrent();
@@ -103,10 +114,10 @@ void QGLThread::oneLoop()
 		glViewer->wm.resizeEvent(*newWidth,*newHeight);
 	}
 	
-	if (*needCentering && Omega::instance().rootBody)
+	if (*needCentering && Omega::instance().getRootBody())
 	{
-		Vector3r min = Omega::instance().rootBody->bv->min;
-		Vector3r max = Omega::instance().rootBody->bv->max;
+		Vector3r min = Omega::instance().getRootBody()->bv->min;
+		Vector3r max = Omega::instance().getRootBody()->bv->max;
 		Vector3r center = (max+min)*0.5;
 		Vector3r halfSize = (max-min)*0.5;
 		float radius = halfSize[0];
@@ -123,8 +134,8 @@ void QGLThread::oneLoop()
 	
 	glViewer->preDraw();
 
-	if (Omega::instance().rootBody)
-		renderer->render(Omega::instance().rootBody);
+	if (Omega::instance().getRootBody())
+		renderer->render(Omega::instance().getRootBody());
 	
 	glViewer->wm.glDraw();
 	dynamic_cast<FpsTracker*>(glViewer->wm.getWindow(0))->addOneAction();

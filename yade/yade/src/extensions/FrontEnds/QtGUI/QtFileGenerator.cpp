@@ -45,8 +45,8 @@ QtFileGenerator::QtFileGenerator ( QWidget * parent , const char * name) : QtFil
 	setMinimumSize(size());
 	setMaximumSize(size());	
 	
-	map<string,string>::iterator di    = Omega::instance().dynlibsType.begin();
-	map<string,string>::iterator diEnd = Omega::instance().dynlibsType.end();
+	map<string,string>::const_iterator di    = Omega::instance().getDynlibsType().begin();
+	map<string,string>::const_iterator diEnd = Omega::instance().getDynlibsType().end();
 	for(;di!=diEnd;++di)
 	{
 		if ((*di).second=="IOManager")

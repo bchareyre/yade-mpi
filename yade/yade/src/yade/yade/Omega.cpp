@@ -39,8 +39,23 @@
 
 Omega::Omega ()
 {
-	cerr << "Constructing Omega  (if multiple times - check '-rdynamic' flag!)" << endl;
-	init();
+	ThreadSafe::cerr("Constructing Omega  (if multiple times - check '-rdynamic' flag!)");
+
+	{
+		//LOCK(omegaMutex);
+		simulationFileName="";
+		currentIteration = 0;
+		gravity = Vector3r(0,-9.81,0);
+		dt = 0.01; 
+		logFile = shared_ptr<ofstream>(new ofstream("../data/log.xml", ofstream::out | ofstream::app));
+		// build simulation loop thread
+		synchronizer = shared_ptr<ThreadSynchronizer>(new ThreadSynchronizer()); // FIXME - this should be optional
+	}
+	
+	// build dynlib information list
+	buildDynlibList();
+
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -48,6 +63,8 @@ Omega::Omega ()
 
 Omega::~Omega ()
 {
+	//LOCK(omegaMutex);
+	
 	*logFile << "\t" << "<Summary Duration=\"" << sStartingSimulationTime-second_clock::local_time() << "\">" <<endl;
 	*logFile << "</Simulation>" << endl << endl;
 	logFile->close();
@@ -58,6 +75,8 @@ Omega::~Omega ()
 
 void Omega::logError(const string& str)
 {
+	//LOCK(omegaMutex);
+	
 	*logFile << "\t" << "<Error Date=\"" << sStartingSimulationTime-second_clock::local_time() << "\" " << "Message =\""<< str << "\"" << endl;
 }
 
@@ -66,30 +85,9 @@ void Omega::logError(const string& str)
 
 void Omega::logMessage(const string& str)
 {
+	//LOCK(omegaMutex);
+		
 	*logFile << "\t" << "<Message Date=\"" << sStartingSimulationTime-second_clock::local_time() << "\" " << "Message =\""<< str << "\"" << endl;
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-void Omega::init()
-{
-	simulationFileName="";
-	currentIteration = 0;
-
-	gravity = Vector3r(0,-9.81,0); // FIXME
-	//dt = 0.04;
-	dt = 0.01; // FIXME
-	//dt = 0.015; // max for cloth, rotating box is little slower, but both work.
-
-	logFile = shared_ptr<ofstream>(new ofstream("../data/log.xml", ofstream::out | ofstream::app));
-
-	// build dynlib information list
-	buildDynlibList(); // FIXME - this shouldn't be called in constructor, because frontend launches too long, when just asking for help -H
-
-	// build simulation loop thread
-	synchronizer     = shared_ptr<ThreadSynchronizer>(new ThreadSynchronizer()); // FIXME - this should be optional
-
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -97,8 +95,7 @@ void Omega::init()
 
 void Omega::createSimulationLoop()
 {
-	finishSimulationLoop();
-	joinSimulationLoop();
+	//LOCK(omegaMutex);
 	simulationLoop   = shared_ptr<SimulationLoop>(new SimulationLoop());
 }
 
@@ -107,6 +104,8 @@ void Omega::createSimulationLoop()
 
 void Omega::finishSimulationLoop()
 {
+	//LOCK(omegaMutex);
+	
 	if (simulationLoop)
 		simulationLoop->finish();
 }
@@ -116,15 +115,21 @@ void Omega::finishSimulationLoop()
 
 void Omega::joinSimulationLoop()
 {
+	//LOCK(omegaMutex);
+	
 	if (simulationLoop)
+	{
 		simulationLoop->join();
+		simulationLoop   = shared_ptr<SimulationLoop>();
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void Omega::registerDynlibType(const string& name)
-{
+{	
+	// called by BuildDynLibList
 	shared_ptr<Factorable> f;
 	try
 	{
@@ -161,8 +166,6 @@ void Omega::registerDynlibType(const string& name)
 		dynlibsType[name]="InteractionGeometry"; // FIXME : change name of the subproject
 	else
 		dynlibsType[name]="Unknown";
-
-
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -170,6 +173,8 @@ void Omega::registerDynlibType(const string& name)
 
 void Omega::buildDynlibList()
 {
+	//LOCK(omegaMutex);
+	
 	char * buffer ;
 	buffer = getenv ("YADEBINPATH"); // FIXME - yade should use config file, to check /usr/lib/yade and /home/joe/yade/lib, etc..
 	string yadeBinPath = buffer;
@@ -204,6 +209,8 @@ void Omega::buildDynlibList()
 
 bool Omega::getDynlibType(const string& libName, string& type)
 {
+	//LOCK(omegaMutex);
+		
 	map<string,string>::iterator it = dynlibsType.find(libName);
 	if (it!=dynlibsType.end())
 	{
@@ -212,7 +219,15 @@ bool Omega::getDynlibType(const string& libName, string& type)
 	}
 	else
 		return false;
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
+const map<string,string>& Omega::getDynlibsType()
+{
+	//LOCK(omegaMutex);
+		
+	return dynlibsType;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -220,61 +235,75 @@ bool Omega::getDynlibType(const string& libName, string& type)
 
 void Omega::incrementCurrentIteration()
 {
+	//LOCK(omegaMutex);
+	
 	++currentIteration;
 }
 
 long int Omega::getCurrentIteration()
 {
+	//LOCK(omegaMutex);
+	
 	return currentIteration;
 }
 
 void Omega::setSimulationFileName(const string f)
 {
+	//LOCK(omegaMutex);
+	
 	simulationFileName = f;
 };
 
 string Omega::getSimulationFileName()
 {
+	//LOCK(omegaMutex);
+	
 	return simulationFileName;
 }
 
 void Omega::loadSimulation()
 {
-
+	LOCK(Omega::instance().getRootBodyMutex());
+	
 	if( Omega::instance().getSimulationFileName().size() != 0  &&  filesystem::exists(simulationFileName) )
 	{
 		freeRootBody();
-		IOManager::loadFromFile("XMLManager",simulationFileName,"rootBody",Omega::instance().rootBody);
+		logMessage("Loading file " + simulationFileName);
 		
-		Omega::instance().logMessage("Loading file " + simulationFileName);
-
-		sStartingSimulationTime = second_clock::local_time();
-		msStartingSimulationTime = microsec_clock::local_time();
-
-		*logFile << "<Simulation" << " Date =\"" << sStartingSimulationTime << "\">" << endl;
-		currentIteration = 0;
-		simulationTime = 0;
+		//{
+		//	LOCK(rootBodyMutex);
+			IOManager::loadFromFile("XMLManager",simulationFileName,"rootBody",rootBody);
+			sStartingSimulationTime = second_clock::local_time();
+			msStartingSimulationTime = microsec_clock::local_time();
+	
+			*logFile << "<Simulation" << " Date =\"" << sStartingSimulationTime << "\">" << endl;
+			currentIteration = 0;
+			simulationTime = 0;	
+		//}
 	}
 	else
 	{
-		cout << "\nWrong filename, please specify filename using your frontend.\n";
+		ThreadSafe::cout("\nWrong filename, please specify filename using your frontend.\n");
 		exit(1);
 	}
 }
 
 void Omega::freeRootBody()
 {
+//	LOCK(rootBodyMutex);
 	rootBody = shared_ptr<NonConnexBody>();
 }
 
 void Omega::startSimulationLoop()
 {
+//	LOCK(omegaMutex);
 	if (simulationLoop)
 		simulationLoop->start();
 }
 
 void Omega::stopSimulationLoop()
 {
+//	LOCK(omegaMutex);
 	if (simulationLoop)
 		simulationLoop->stop();
 }
@@ -283,21 +312,53 @@ void Omega::stopSimulationLoop()
 // FIXME - remove that
 void Omega::setGravity(Vector3r g)
 {
+//	LOCK(omegaMutex);
 	gravity = g;
 }
 
 Vector3r Omega::getGravity()
 {
+//	LOCK(omegaMutex);
 	return gravity;
 }
 
 // FIXME - remove that
 void Omega::setTimeStep(const double t)
 {
+//	LOCK(omegaMutex);
 	dt = t;
 }
 
 double Omega::getTimeStep()
 {
+//	LOCK(omegaMutex);
 	return dt;
+}
+
+shared_ptr<ThreadSynchronizer> Omega::getSynchronizer()
+{
+//	LOCK(omegaMutex); // we can safatly return it because it is constructed in Omega constructor
+	return synchronizer;
+}
+
+shared_ptr<NonConnexBody> Omega::getRootBody()
+{
+//	LOCK(omegaMutex);
+	return rootBody;
+}
+
+ptime Omega::getMsStartingSimulationTime()
+{
+//	LOCK(omegaMutex);
+	return msStartingSimulationTime;
+}
+
+// boost::mutex& Omega::getOmegaMutex()
+// {
+// 	return omegaMutex;
+// }
+
+boost::mutex& Omega::getRootBodyMutex()
+{
+	return rootBodyMutex;
 }

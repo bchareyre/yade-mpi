@@ -123,8 +123,7 @@ int NullGUI::run(int argc, char** argv)
 
 int NullGUI::loop()
 {
-        long int& iter = Omega::instance().currentIteration; // FIXME : public variable :-P~
-	Omega::instance().loadSimulation();
+     	Omega::instance().loadSimulation();
 	cerr << "Starting computation of file: " << Omega::instance().getSimulationFileName() << endl;
 
 	if( maxIteration == 0)
@@ -143,32 +142,33 @@ int NullGUI::loop()
 	long int intervals = 0;
 	while(1)
 	{
-		Omega::instance().rootBody->moveToNextTimeStep();
-		//Omega::instance().incrementCurrentIteration();
-		++iter;
+		Omega::instance().getRootBody()->moveToNextTimeStep();
+		Omega::instance().incrementCurrentIteration();
 		Omega::instance().incrementSimulationTime();
 
-		if( iter % interval == 0 )
+		if(Omega::instance().getCurrentIteration() % interval == 0 )
 		{
 			++intervals;
 
 			// print progress...
 			if(progress)
-				cerr << "iteration: " << iter << endl;
+				cerr << "iteration: " << Omega::instance().getCurrentIteration() << endl;
 
 			// save snapshot
 			if( ( snapshotInterval != -1 ) && (intervals % snapshotInterval == 0) )
 			{
-				cerr << "saving snapshot: " << snapshotName + "_" + lexical_cast<string>(iter) + ".xml\n";
-				IOManager::saveToFile("XMLManager",
-				"../data/" + snapshotName + "_" + lexical_cast<string>(iter) + ".xml",
-				"rootBody", Omega::instance().rootBody);
+				cerr << "saving snapshot: " << snapshotName + "_" + lexical_cast<string>(Omega::instance().getCurrentIteration()) + ".xml\n";
+				shared_ptr<NonConnexBody> rootBody = Omega::instance().getRootBody();
+				IOManager::saveToFile(	"XMLManager",
+							"../data/" + snapshotName + "_" + lexical_cast<string>(Omega::instance().getCurrentIteration()) + ".xml",
+							"rootBody", 
+							rootBody);
 			}
 
 			// finish computation
-			if( ( maxIteration !=0 ) &&  (iter > maxIteration) )
+			if( ( maxIteration !=0 ) &&  (Omega::instance().getCurrentIteration() > maxIteration) )
 			{
-				cerr << "Calc finished at: " << iter << endl;
+				cerr << "Calc finished at: " << Omega::instance().getCurrentIteration() << endl;
 				exit(0);
 			}
 		}

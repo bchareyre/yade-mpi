@@ -734,7 +734,29 @@
                 </property>
                 <widget class="QPushButton">
                     <property name="name">
+                        <cstring>pbNewView</cstring>
+                    </property>
+                    <property name="enabled">
+                        <bool>true</bool>
+                    </property>
+                    <property name="geometry">
+                        <rect>
+                            <x>60</x>
+                            <y>80</y>
+                            <width>140</width>
+                            <height>30</height>
+                        </rect>
+                    </property>
+                    <property name="text">
+                        <string>New View ...</string>
+                    </property>
+                </widget>
+                <widget class="QPushButton">
+                    <property name="name">
                         <cstring>pbResetSimulation</cstring>
+                    </property>
+                    <property name="enabled">
+                        <bool>false</bool>
                     </property>
                     <property name="geometry">
                         <rect>
@@ -755,6 +777,9 @@
                     <property name="name">
                         <cstring>pbStopSimulation</cstring>
                     </property>
+                    <property name="enabled">
+                        <bool>false</bool>
+                    </property>
                     <property name="geometry">
                         <rect>
                             <x>110</x>
@@ -774,6 +799,9 @@
                     <property name="name">
                         <cstring>pbStartSimulation</cstring>
                     </property>
+                    <property name="enabled">
+                        <bool>false</bool>
+                    </property>
                     <property name="geometry">
                         <rect>
                             <x>60</x>
@@ -787,25 +815,6 @@
                     </property>
                     <property name="pixmap">
                         <pixmap>image2</pixmap>
-                    </property>
-                </widget>
-                <widget class="QPushButton">
-                    <property name="name">
-                        <cstring>pbNewView</cstring>
-                    </property>
-                    <property name="enabled">
-                        <bool>true</bool>
-                    </property>
-                    <property name="geometry">
-                        <rect>
-                            <x>60</x>
-                            <y>80</y>
-                            <width>140</width>
-                            <height>30</height>
-                        </rect>
-                    </property>
-                    <property name="text">
-                        <string>New View ...</string>
                     </property>
                 </widget>
             </widget>

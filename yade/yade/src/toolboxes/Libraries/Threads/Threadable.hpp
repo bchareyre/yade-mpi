@@ -53,6 +53,7 @@ class ThreadSynchronizer;
 template<class Thread>
 class Threadable
 {
+	protected : boost::mutex * mutex;
 	private  : bool  * finished;
 	private  : bool  * blocked;	
 	protected : int * turn;

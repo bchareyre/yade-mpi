@@ -32,7 +32,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-SimulationControllerUpdater::SimulationControllerUpdater(SimulationController * sc) : 	Threadable<SimulationControllerUpdater>(Omega::instance().synchronizer),
+SimulationControllerUpdater::SimulationControllerUpdater(SimulationController * sc) : 	Threadable<SimulationControllerUpdater>(Omega::instance().getSynchronizer()),
 											controller(sc)
 {
 	createThread();
@@ -51,7 +51,8 @@ SimulationControllerUpdater::~SimulationControllerUpdater()
 
 void SimulationControllerUpdater::oneLoop()
 {
-
+	LOCK(Omega::instance().getRootBodyMutex());
+			
 	controller->lcdCurrentIteration->display(lexical_cast<string>(Omega::instance().getCurrentIteration()));
 	double simulationTime = Omega::instance().getSimulationTime();
 
@@ -71,7 +72,7 @@ void SimulationControllerUpdater::oneLoop()
 	controller->lcdMiSecondv->display(lexical_cast<string>(misec));
 	controller->lcdNSecondv->display(lexical_cast<string>(nsec));
 
-	time_duration duration = microsec_clock::local_time()-Omega::instance().msStartingSimulationTime;
+	time_duration duration = microsec_clock::local_time()-Omega::instance().getMsStartingSimulationTime();
 
 	unsigned int hours	= duration.hours();
 	unsigned int minutes 	= duration.minutes();

@@ -61,61 +61,61 @@ using namespace std;
 
 class Omega : public Singleton<Omega>
 {
-	public	: shared_ptr<FrontEnd> gui;
+	private	: shared_ptr<ofstream> logFile;
+	public	: void logMessage(const string& str);
+	public	: void logError(const string& str);
+		
+	private	: boost::mutex omegaMutex;
+	//public	: boost::mutex& getOmegaMutex();
 
-	//private : shared_ptr<boost::thread> simulationThread;
+	private	: boost::mutex rootBodyMutex;
+	public	: boost::mutex& getRootBodyMutex();
+	
 	private	: shared_ptr<SimulationLoop> simulationLoop;
 	public	: void createSimulationLoop();
 	public	: void startSimulationLoop();
 	public	: void stopSimulationLoop();
 	public	: void finishSimulationLoop();
-	public : void joinSimulationLoop();
-	public : void freeRootBody();
+	public  : void joinSimulationLoop();
 	
-	public	: shared_ptr<ThreadSynchronizer> synchronizer; // FIXME put private + add function waitMyTuren and finishedMyTurn
+	private	: shared_ptr<ThreadSynchronizer> synchronizer;
+	public  : shared_ptr<ThreadSynchronizer> getSynchronizer();
 
-//	public : void waitMyTurn(int id); // FIXME put private + add function waitMyTuren and finishedMyTurn
-//	public : void endMyTurn(); // FIXME put private + add function waitMyTuren and finishedMyTurn
-//	public : void waitForSimulationEnd(); // FIXME put private + add function waitMyTuren and finishedMyTurn
-//	public : int getNewTurnId();
-
-	public	: map<string,string> dynlibsType;
-
+	private : map<string,string> dynlibsType;
+	public  : const map<string,string>& getDynlibsType();	
 	public	: bool getDynlibType(const string& libName,string& type);
-
-	public	: shared_ptr<ofstream> logFile;
-
-	private : Vector3r	gravity; // FIXME
-	public	: Vector3r	getGravity();
+	private	: void buildDynlibList();
+	private	: void registerDynlibType(const string& name);
+	
+	private : Vector3r gravity; // FIXME
+	public	: Vector3r getGravity();
 	public	: void setGravity(Vector3r g);
-	public	: double 	dt; // FIXME
-	public	: void 		setTimeStep(const double);
-	public	: double 	getTimeStep();
 	
-	public	: shared_ptr<NonConnexBody> rootBody;
-	public	: ptime		sStartingSimulationTime;
-	public	: ptime		msStartingSimulationTime;
-	private	: void		buildDynlibList();
-	private	: void		registerDynlibType(const string& name);
-
-	private	: string 	simulationFileName;
-	public	: void 		setSimulationFileName(const string);
-	public	: string 	getSimulationFileName();
-	public	: void	loadSimulation();
-
-	public  : long int	currentIteration;
-	public  : long int	getCurrentIteration();
-	public  : void		incrementCurrentIteration();
+	private	: double dt; // FIXME
+	public	: void setTimeStep(const double);
+	public	: double getTimeStep();
 	
-	private : double	simulationTime;
-	public	: double	getSimulationTime() { return simulationTime;};
-	public	: void 		incrementSimulationTime() { simulationTime+=dt;};
-
-
-	public	: void 		logMessage(const string& str);
-	public	: void 		logError(const string& str);
+	private	: shared_ptr<NonConnexBody> rootBody;
+	public	: shared_ptr<NonConnexBody> getRootBody();
+	public  : void freeRootBody();
 	
-	private	: void 		init();
+	private	: ptime	sStartingSimulationTime;
+	private	: ptime msStartingSimulationTime;
+	public  : ptime getMsStartingSimulationTime();
+		
+	private	: string simulationFileName;
+	public	: void setSimulationFileName(const string);
+	public	: string getSimulationFileName();
+	public	: void loadSimulation();
+
+	private : long int currentIteration;
+	public  : long int getCurrentIteration();
+	public  : void incrementCurrentIteration();
+	
+	private : double simulationTime;
+	public	: double getSimulationTime() { return simulationTime;};
+	public	: void incrementSimulationTime() { simulationTime+=dt;};
+	
 	private	: Omega();
 	private	: ~Omega();
 	private	: Omega(const Omega&);
