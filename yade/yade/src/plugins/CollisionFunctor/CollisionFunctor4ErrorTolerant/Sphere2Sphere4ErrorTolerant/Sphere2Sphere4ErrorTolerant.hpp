@@ -21,48 +21,39 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#ifndef __ERRORTOLERANTCONTACTMODEL_H__
-#define __ERRORTOLERANTCONTACTMODEL_H__
+#ifndef __SPHERE2SPHERE4ERRORTOLERANT_H__
+#define __SPHERE2SPHERE4ERRORTOLERANT_H__
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "InteractionGeometry.hpp"
-#include "Vector3.hpp"
+#include "CollisionFunctor.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-class ErrorTolerantContactModel : public InteractionGeometry
+/*! \brief Provide collision handling between a axis aligned box and a sphere in terms of ClosestFeatures */
+class Sphere2Sphere4ErrorTolerant : public CollisionFunctor
 {
-	public : vector<pair<Vector3,Vector3> > closestPoints;
-	public : Vector3 o1p1;
-	public : Vector3 o2p2;
-	public : Vector3 normal;
-	//public : Vector3 t;	
-	//public : Vector3 s;
-	//public : Vector3 l;
-	//public : float nu;
-	//public : std::pair<t_Vertex,t_Vertex> idVertex;
-	//public : t_ConnexionType type;
-	
 	// construction
-	public : ErrorTolerantContactModel ();
-	public : ~ErrorTolerantContactModel ();
+	public : Sphere2Sphere4ErrorTolerant ();
+	public : virtual ~Sphere2Sphere4ErrorTolerant ();
 
-	public : void processAttributes();
-	public : void registerAttributes();
+	protected : virtual bool collide(const shared_ptr<CollisionGeometry> cm1, const shared_ptr<CollisionGeometry> cm2, const Se3& se31, const Se3& se32, shared_ptr<Interaction> c);
+	protected : virtual bool reverseCollide(const shared_ptr<CollisionGeometry> cm1, const shared_ptr<CollisionGeometry> cm2,  const Se3& se31, const Se3& se32, shared_ptr<Interaction> c);
 
-	REGISTER_CLASS_NAME(ErrorTolerantContactModel);
-	//REGISTER_CLASS_INDEX(ErrorTolerantContactModel);
+	DEFINE_COLLISION_ORDER(Sphere,Sphere);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-REGISTER_SERIALIZABLE(ErrorTolerantContactModel,false);
+REGISTER_FACTORABLE(Sphere2Sphere4ErrorTolerant);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#endif // __ERRORTOLERANTCONTACTMODEL_H__
+#endif // __SPHERE2SPHERE4ERRORTOLERANT_H__
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////

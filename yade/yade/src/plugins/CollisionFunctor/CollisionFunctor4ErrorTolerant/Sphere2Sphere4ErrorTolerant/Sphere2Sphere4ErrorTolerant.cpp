@@ -21,48 +21,64 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#ifndef __ERRORTOLERANTCONTACTMODEL_H__
-#define __ERRORTOLERANTCONTACTMODEL_H__
+#include "Sphere2Sphere4ErrorTolerant.hpp"
+#include "Sphere.hpp"
+#include "ErrorTolerantContactModel.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "InteractionGeometry.hpp"
-#include "Vector3.hpp"
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-class ErrorTolerantContactModel : public InteractionGeometry
+Sphere2Sphere4ErrorTolerant::Sphere2Sphere4ErrorTolerant ()
 {
-	public : vector<pair<Vector3,Vector3> > closestPoints;
-	public : Vector3 o1p1;
-	public : Vector3 o2p2;
-	public : Vector3 normal;
-	//public : Vector3 t;	
-	//public : Vector3 s;
-	//public : Vector3 l;
-	//public : float nu;
-	//public : std::pair<t_Vertex,t_Vertex> idVertex;
-	//public : t_ConnexionType type;
-	
-	// construction
-	public : ErrorTolerantContactModel ();
-	public : ~ErrorTolerantContactModel ();
 
-	public : void processAttributes();
-	public : void registerAttributes();
-
-	REGISTER_CLASS_NAME(ErrorTolerantContactModel);
-	//REGISTER_CLASS_INDEX(ErrorTolerantContactModel);
-};
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-REGISTER_SERIALIZABLE(ErrorTolerantContactModel,false);
+Sphere2Sphere4ErrorTolerant::~Sphere2Sphere4ErrorTolerant ()
+{
+
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#endif // __ERRORTOLERANTCONTACTMODEL_H__
+bool Sphere2Sphere4ErrorTolerant::collide(const shared_ptr<CollisionGeometry> cm1, const shared_ptr<CollisionGeometry> cm2, const Se3& se31, const Se3& se32, shared_ptr<Interaction> c)
+{
+	shared_ptr<Sphere> s1 = dynamic_pointer_cast<Sphere>(cm1);
+	shared_ptr<Sphere> s2 = dynamic_pointer_cast<Sphere>(cm2);
+
+	Vector3 normal = se32.translation-se31.translation;
+	float penetrationDepth = s1->radius+s2->radius-normal.unitize();
+
+	if (penetrationDepth>0)
+	{
+		shared_ptr<ErrorTolerantContactModel> cm = shared_ptr<ErrorTolerantContactModel>(new ErrorTolerantContactModel());
+
+		Vector3 pt1 = se31.translation+normal*s1->radius;
+		Vector3 pt2 = se32.translation-normal*s2->radius;
+		cm->closestPoints.push_back(std::pair<Vector3,Vector3>(pt1,pt2));
+		cm->o1p1 = pt1-se31.translation;
+		cm->o2p2 = pt2-se32.translation;
+		cm->normal = normal;
+		c->interactionGeometry = cm;
+		return true;
+	}
+	else	
+		return false;
+
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+bool Sphere2Sphere4ErrorTolerant::reverseCollide(const shared_ptr<CollisionGeometry> cm1, const shared_ptr<CollisionGeometry> cm2,  const Se3& se31, const Se3& se32, shared_ptr<Interaction> c)
+{
+	return collide(cm1,cm2,se31,se32,c);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
