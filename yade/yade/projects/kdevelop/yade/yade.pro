@@ -3,10 +3,30 @@
 # Subdir relative project main directory: ./yade
 # Target is an application:  
 
+LIBS += -lM3D \
+        -lConstants \
+        -lSerialization \
+        -lboost_date_time \
+        -lglut \
+        -lQGLViewer \
+        -rdynamic 
+INCLUDEPATH = ../toolboxes/Libraries/Serialization \
+              ../toolboxes/Math/M3D \
+              ../toolboxes/Math/Constants \
+              $(YADECOMPILATIONPATH) 
+MOC_DIR = $(YADECOMPILATIONPATH) 
+UI_DIR = $(YADECOMPILATIONPATH) 
+OBJECTS_DIR = $(YADECOMPILATIONPATH) 
+QMAKE_LIBDIR = ../toolboxes/Math/M3D/$(YADEDYNLIBPATH) \
+               ../toolboxes/Math/Constants/$(YADEDYNLIBPATH) \
+               ../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
+               $(YADEDYNLIBPATH) 
+DESTDIR = $(YADEBINPATH) 
+CONFIG += release \
+          warn_on 
+TEMPLATE = app 
 FORMS += QtGeneratedFrontEnd.ui 
-HEADERS += Archive.hpp \
-           ArchiveTypes.hpp \
-           Body.hpp \
+HEADERS += Body.hpp \
            BoundingVolumeFactory.hpp \
            BoundingVolume.hpp \
            BroadPhaseCollider.hpp \
@@ -32,14 +52,9 @@ HEADERS += Archive.hpp \
            Omega.hpp \
            QGLSubWindow.hpp \
            QtFrontEnd.hpp \
-           Serializable.hpp \
            Singleton.hpp \
            Tree.hpp \
            Types.hpp \
-           Archive.tpp \
-           ContainerHandler.tpp \
-           FundamentalHandler.tpp \
-           PointerHandler.tpp \
            Indexable.hpp \
            MultiMethodsManager.hpp \
            CollisionFunctor.hpp \
@@ -47,8 +62,7 @@ HEADERS += Archive.hpp \
            InteractionModel.hpp \
            Interaction.hpp \
            Contact.hpp 
-SOURCES += Archive.cpp \
-           Body.cpp \
+SOURCES += Body.cpp \
            BoundingVolume.cpp \
            BoundingVolumeFactory.cpp \
            BroadPhaseCollider.cpp \
@@ -74,30 +88,10 @@ SOURCES += Archive.cpp \
            Omega.cpp \
            QGLSubWindow.cpp \
            QtFrontEnd.cpp \
-           Serializable.cpp \
            yade.cpp \
            MultiMethodsManager.cpp \
            Factorable.cpp \
            InteractionModel.cpp \
            Interaction.cpp \
            Contact.cpp 
-LIBS += -lM3D \
--lConstants \
--lboost_date_time \
--lglut \
--lQGLViewer \
--rdynamic
-INCLUDEPATH = ../toolboxes/Math/Constants \
-../toolboxes/Math/M3D \
-$(YADECOMPILATIONPATH)
-MOC_DIR = $(YADECOMPILATIONPATH)
-UI_DIR = $(YADECOMPILATIONPATH)
-OBJECTS_DIR = $(YADECOMPILATIONPATH)
-QMAKE_LIBDIR = ../toolboxes/Math/M3D/$(YADEDYNLIBPATH) \
-../toolboxes/Math/Constants/$(YADEDYNLIBPATH) \
-$(YADEDYNLIBPATH)
-DESTDIR = $(YADEBINPATH)
-CONFIG += release \
-warn_on
-TEMPLATE = app
 QtGeneratedFrontEnd.ui.target = QtGeneratedFrontEnd.ui

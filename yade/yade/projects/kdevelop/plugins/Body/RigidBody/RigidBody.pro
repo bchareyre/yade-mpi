@@ -7,8 +7,8 @@ LIBS += -lM3D \
         -lConstants \
         -rdynamic 
 INCLUDEPATH = ../../../yade \
-              ../../../toolboxes/Math/Constants \
-              ../../../toolboxes/Math/M3D 
+              ../../../toolboxes/Math/M3D \
+              ../../../toolboxes/Math/Constants 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 

@@ -4,14 +4,17 @@
 # Target is a library:  
 
 LIBS += -lConstants \
+        -lSerialization \
         -lm \
         -rdynamic 
 INCLUDEPATH = ../../../yade \
+              ../../../toolboxes/Libraries/Serialization \
               ../../../toolboxes/Math/Constants 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 QMAKE_LIBDIR = ../../../toolboxes/Math/Constants/$(YADEDYNLIBPATH) \
+               ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
 CONFIG += release \

@@ -104,7 +104,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>yade</activedir>
+      <activedir>toolboxes/Math/Rand</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>

@@ -5,7 +5,8 @@
 
 SUBDIRS += Math \
            ComputationalGeometry \
-           DataStructures 
+           DataStructures \
+           Libraries 
 MOC_DIR = $(YADECOMPILATIONPATH)
 UI_DIR = $(YADECOMPILATIONPATH)
 OBJECTS_DIR = $(YADECOMPILATIONPATH)
