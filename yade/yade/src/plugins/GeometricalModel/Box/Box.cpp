@@ -53,7 +53,7 @@ void Box::glDraw()
 	}
 	else
 	{
-		//glEnable(GL_LIGHTING);
+		glEnable(GL_LIGHTING);
 		glutSolidCube(1);
 	}
 }

@@ -48,12 +48,14 @@ void OpenGLRenderingEngine::render(shared_ptr<NonConnexBody> rootBody)
 {
 	const GLfloat pos[4]	= {75.0,75.0,0.0,1.0};
 	Vector3r lightPos(pos[0],pos[1],pos[2]);
-	
+	const GLfloat lightColor[4]	= {1.0,1.0,1.0,1.0};
+	const GLfloat ambientColor[4]	= {0.5,0.5,0.5,1.0};
 	//glLightfv(GL_LIGHT0, GL_POSITION, pos);
 	//glDisable(GL_LIGHT0);
 	
 	
 	glLightfv(GL_LIGHT0, GL_POSITION, pos);
+	glLightModelfv(GL_LIGHT_MODEL_AMBIENT,ambientColor);
 	glEnable(GL_LIGHT0);
 
 	float sceneRadius = 100;

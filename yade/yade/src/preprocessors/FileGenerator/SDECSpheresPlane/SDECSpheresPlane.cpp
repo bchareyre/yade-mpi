@@ -19,6 +19,7 @@
 
 SDECSpheresPlane::SDECSpheresPlane () : FileGenerator()
 {
+	nbSpheres = 2;
 }
 
 SDECSpheresPlane::~SDECSpheresPlane ()
@@ -32,12 +33,13 @@ void SDECSpheresPlane::postProcessAttributes(bool)
 
 void SDECSpheresPlane::registerAttributes()
 {
+	REGISTER_ATTRIBUTE(nbSpheres);
 }
 
 void SDECSpheresPlane::generate()
 {
 	shared_ptr<NonConnexBody> rootBody(new NonConnexBody);
-	int nbSpheres = 9;
+
 	Quaternionr q;
 	q.fromAxisAngle( Vector3r(0,0,1),0);
 

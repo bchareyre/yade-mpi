@@ -144,12 +144,12 @@ void Sphere::drawSphere(int depth)
 	glShadeModel(GL_SMOOTH);
 	//GLfloat matSpecular[] = { 1.0,1.0,1.0,1.0};
 	//GLfloat matShininess[] = { 50.0};
-	//GLfloat matAmbientAndDiffuse[] = { 1.0,1.0,1.0,1.0};
+	GLfloat matAmbientAndDiffuse[] = { 1.0,1.0,1.0,1.0};
 
 	//glMaterialfv(GL_FRONT,GL_SPECULAR,matSpecular);
 	//glMaterialfv(GL_FRONT,GL_SHININESS,matShininess);
   	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, diffuseColor);
-	
+
 	number=0;
 	for(int i=0;i<20;i++)
 	{
@@ -170,7 +170,7 @@ void Sphere::glDraw()
 		glEndList();
 		glSphereList = glGenLists(1);
 		glNewList(glSphereList,GL_COMPILE);
-			//glEnable(GL_LIGHTING);
+			glEnable(GL_LIGHTING); // FIXME : remove enable/disable lighting from object
 			drawSphere(1);
 		glEndList();
 	}
