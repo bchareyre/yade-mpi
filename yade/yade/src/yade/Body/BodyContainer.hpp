@@ -34,8 +34,9 @@ class BodyContainer : public Serializable
 
 	// serialization of this class...
 	REGISTER_CLASS_NAME(BodyContainer);
-
-	private   : vector<shared_ptr<Body> > body;
+	// local storage for uniform serialization of all possible container concrete implementations.
+	private   : vector<shared_ptr<Body> > body; 
+	
 	public    : virtual void registerAttributes();
 
 	protected : virtual void preProcessAttributes(bool deserializing);

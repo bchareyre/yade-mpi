@@ -32,6 +32,8 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+class Action;
+
 class ActionContainer : public Serializable
 {
 
@@ -55,7 +57,11 @@ class ActionContainer : public Serializable
 /// Methods										      ///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+	// serialization of this class...
 	REGISTER_CLASS_NAME(ActionContainer);
+	// local storage for uniform serialization of all possible container concrete implementations.
+	private   : vector<shared_ptr<Action> > action;
+	public    : virtual void registerAttributes();
 
 };
 

@@ -11,7 +11,7 @@ SDECPermanentLink::~SDECPermanentLink ()
 
 }
 
-void SDECPermanentLink::postProcessAttributes(bool deserializing)
+void SDECPermanentLink::postProcessAttributes(bool /*deserializing*/)
 {
 // 	if(deserializing)
 // 	{
