@@ -19,7 +19,7 @@ SimulationController::SimulationController(QWidget * parent) : QtGeneratedSimula
 {
 	setMinimumSize(size());
 	setMaximumSize(size());
-	//updater = shared_ptr<SimulationControllerUpdater>(new SimulationControllerUpdater(this));
+	updater = shared_ptr<SimulationControllerUpdater>(new SimulationControllerUpdater(this));
 }
 
 SimulationController::~SimulationController()
