@@ -25,7 +25,8 @@ class AABB : public BoundingVolume
 
 	protected : virtual void postProcessAttributes(bool deserializing);
 	public : void registerAttributes();
-	REGISTER_CLASS_NAME(AABB);
+	REGISTER_CLASS_NAME(AABB);	
+	REGISTER_CLASS_INDEX(AABB);
 };
 
 REGISTER_SERIALIZABLE(AABB,false);

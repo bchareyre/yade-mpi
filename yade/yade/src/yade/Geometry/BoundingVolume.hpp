@@ -31,6 +31,8 @@
 #include <GL/gl.h>
 #include "Se3.hpp"
 #include "Serializable.hpp"
+#include "Indexable.hpp"
+#include "GeometricalModel.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -39,7 +41,7 @@
 
 	All the bounding volumes (BoundingSphere, AABB ...) must derived from this class. A bounding volume is used to speed up the collision detection. Instead of computing if 2 complex polyhedron collide each other, it is much faster to first test if their bounding volume (for example a AABB) are in collision.
 */
-class BoundingVolume : public Serializable
+class BoundingVolume : public GeometricalModel, public Indexable
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -82,7 +84,12 @@ class BoundingVolume : public Serializable
 
 	public : void registerAttributes();
 
-	REGISTER_CLASS_NAME(BoundingVolume);
+	REGISTER_CLASS_NAME(BoundingVolume);	
+	
+	public : virtual int& getClassIndex() { throw;};
+	public : virtual const int& getClassIndex() const { throw;};
+
+	REGISTER_INDEX_COUNTER(BoundingVolume);
 
 };
 

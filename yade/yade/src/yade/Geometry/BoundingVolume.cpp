@@ -1,6 +1,6 @@
 #include "BoundingVolume.hpp"
 
-BoundingVolume::BoundingVolume () : Serializable()
+BoundingVolume::BoundingVolume () : GeometricalModel(),Indexable()
 {
 }
 

@@ -35,12 +35,20 @@
 
 class BoundingVolumeUpdator : public Actor
 {
+	//protected : CollisionMultiMethodsManager bvUpdatorManager;
+	
+	//private : vector<vector<string> > bvUpdatorFunctors;
+	//public  : void addBVUpdatorFunctor(const string& str1,const string& str2,const string& str3);
+
 	// construction
 	public : BoundingVolumeUpdator ();
 	public : ~BoundingVolumeUpdator ();
-	
+
+	public : void registerAttributes();
+	public : void postProcessAttributes(bool deserializing);
 	public : virtual void action(Body* b);
 	public : void updateBoundingVolume(Body* b);
+	public : void updateBoundingVolume(shared_ptr<Body> b);
 	REGISTER_CLASS_NAME(BoundingVolumeUpdator);
 
 };

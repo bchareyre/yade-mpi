@@ -21,7 +21,8 @@ class BoundingSphere : public BoundingVolume
 	protected : virtual void postProcessAttributes(bool deserializing);
 	public : void registerAttributes();
 
-	REGISTER_CLASS_NAME(BoundingSphere);
+	REGISTER_CLASS_NAME(BoundingSphere);	
+	REGISTER_CLASS_INDEX(BoundingSphere);
 };
 
 REGISTER_SERIALIZABLE(BoundingSphere,false);
