@@ -200,21 +200,9 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 /// Permanents Links													///
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//	std::vector<shared_ptr<Interaction> >::const_iterator pii = ncb->permanentInteractions.begin();
-//	std::vector<shared_ptr<Interaction> >::const_iterator piiEnd = ncb->permanentInteractions.end();
-	shared_ptr<Interaction> contact2;
-//	for( ; pii!=piiEnd ; ++pii)
-//
-//	{
-
 	for( ncb->permanentInteractions->gotoFirst() ; ncb->permanentInteractions->notAtEnd() ; ncb->permanentInteractions->gotoNext() )
 	{
-		contact2 = ncb->permanentInteractions->getCurrent();
-
-
-
-
-//		shared_ptr<Interaction> contact = (*pii);
+		shared_ptr<Interaction> contact2 = ncb->permanentInteractions->getCurrent();
 
 		unsigned int id1 = contact2->getId1();
 		unsigned int id2 = contact2->getId2();
@@ -465,7 +453,7 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 
 		float fNormal = currentContact->normalForce.length();
 
-		float normMPlastic = currentContact->heta*fNormal;
+		float normMPlastic = 0.0000001*currentContact->heta*fNormal;
 
 		Vector3r thetarn = q_i_n*currentContact->thetar; // rolling angle
 
@@ -476,21 +464,21 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 		float normElastic = mElastic.length();
 
 
-		//if (normElastic<=normMPlastic)
-		//{
+		if (normElastic<=normMPlastic)
+		{
 			moments[id1]	-= q_n_i*mElastic;
 			moments[id2]	+= q_n_i*mElastic;
-// 		}
-// 		else
-// 		{
-// 			Vector3r mPlastic = mElastic;
-// 			mPlastic.normalize();
-// 			mPlastic *= normMPlastic;
-// 			moments[id1]	-= q_n_i*mPlastic;
-// 			moments[id2]	+= q_n_i*mPlastic;
-// 			thetarn = mPlastic/currentContact->kr;
-// 			currentContact->thetar = q_n_i*thetarn;
-// 		}
+		}
+		else
+		{
+			Vector3r mPlastic = mElastic;
+			mPlastic.normalize();
+			mPlastic *= normMPlastic;
+			moments[id1]	-= q_n_i*mPlastic;
+			moments[id2]	+= q_n_i*mPlastic;
+			thetarn = mPlastic/currentContact->kr;
+			currentContact->thetar = q_n_i*thetarn;
+		}
 
 		currentContact->prevRotation1 = de1->se3.rotation;
 		currentContact->prevRotation2 = de2->se3.rotation;
