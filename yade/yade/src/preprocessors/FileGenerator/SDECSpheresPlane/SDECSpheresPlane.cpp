@@ -35,7 +35,7 @@ void SDECSpheresPlane::registerAttributes()
 void SDECSpheresPlane::exec()
 {
 	shared_ptr<NonConnexBody> rootBody(new NonConnexBody);
-	int nbSpheres = 6;
+	int nbSpheres = 9;
 	Quaternion q;
 	q.fromAngleAxis(0, Vector3(0,0,1));
 
@@ -93,8 +93,8 @@ void SDECSpheresPlane::exec()
 		shared_ptr<AABB> aabb(new AABB);
 		shared_ptr<Sphere> sphere(new Sphere);
 
-		translation 		= Vector3(i,j,k)*10-Vector3(nbSpheres/2*10,nbSpheres/2*10-80,nbSpheres/2*10)+Vector3(Rand::symmetricRandom(),Rand::symmetricRandom(),Rand::symmetricRandom());
-		float radius 		= (Rand::intervalRandom(2,5));
+		translation 		= Vector3(i,j,k)*10-Vector3(nbSpheres/2*10,nbSpheres/2*10-90,nbSpheres/2*10)+Vector3(Rand::symmetricRandom()*1.3,Rand::symmetricRandom(),Rand::symmetricRandom()*1.3);
+		float radius 		= (Rand::intervalRandom(1,5));
 
 		shared_ptr<BallisticDynamicEngine> ballistic(new BallisticDynamicEngine);
 		ballistic->damping 	= 1.0;//0.95;

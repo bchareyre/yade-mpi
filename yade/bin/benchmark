@@ -1,0 +1,1 @@
+time ./yade -i YadeQtGUI -f ../data/SDECBenchmark8k.xml -m 8000

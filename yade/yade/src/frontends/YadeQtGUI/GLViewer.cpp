@@ -45,12 +45,15 @@ void GLViewer::animate()
 
 	static long int max=0;
 	if( frame % 100 == 0 )					// checks every 100th iteration
+	{
+		//cerr << "iteration: " << frame << endl;
 		if( (max = Omega::instance().getMaxiter()) )	// is maxiter != 0 ? (double brackets to suppress warning)
 			if( frame > max )			// is frame bigger than maxiter ?
 			{
 				cerr << "Calc finished at: " << frame << endl;
 				exit(0);			// terminate.
 			}
+	}
 
 	fpsTracker->addOneAction();
 }
