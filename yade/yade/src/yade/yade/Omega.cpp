@@ -20,7 +20,7 @@
 #include "CollisionGeometry.hpp"
 #include "BoundingVolume.hpp"
 #include "InteractionGeometry.hpp"
-
+#include "InteractionPhysics.hpp"
 #include "ThreadSynchronizer.hpp"
 #include "SimulationLoop.hpp"
 #include "FrontEnd.hpp"
@@ -161,7 +161,10 @@ void Omega::registerDynlibType(const string& name)
 	else if (dynamic_pointer_cast<BoundingVolume>(f))
 		dynlibsType[name]="BoundingVolume";
 	else if (dynamic_pointer_cast<InteractionGeometry>(f))
-		dynlibsType[name]="InteractionGeometry"; // FIXME : change name of the subproject
+		dynlibsType[name]="InteractionGeometry";
+	else if (dynamic_pointer_cast<InteractionPhysics>(f))
+		dynlibsType[name]="InteractionPhysics";
+
 	else
 		dynlibsType[name]="Unknown";
 }

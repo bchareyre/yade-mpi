@@ -3,7 +3,6 @@
 # Subdir relative project main directory: ./plugins/InteractionPhysics
 # Target is a subdirs project 
 
-LIBS += -rdynamic 
 INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 

@@ -3,35 +3,31 @@
 # Subdir relative project main directory: ./yade/Interaction
 # Target is a library:  
 
-HEADERS += InteractionPhysics.hpp \
-           InteractionPhysics.hpp \
-           BroadCollider.hpp \
+LIBS += -lMultiMethods \
+        -rdynamic 
+INCLUDEPATH = $(YADEINCLUDEPATH) 
+MOC_DIR = $(YADECOMPILATIONPATH) 
+UI_DIR = $(YADECOMPILATIONPATH) 
+OBJECTS_DIR = $(YADECOMPILATIONPATH) 
+QMAKE_LIBDIR = ../../toolboxes/Libraries/MultiMethods/$(YADEDYNLIBPATH) \
+               $(YADEDYNLIBPATH) 
+QMAKE_CXXFLAGS_RELEASE += -lpthread \
+                          -pthread 
+QMAKE_CXXFLAGS_DEBUG += -lpthread \
+                        -pthread 
+DESTDIR = $(YADEDYNLIBPATH) 
+CONFIG += debug \
+          warn_on \
+          dll 
+TEMPLATE = lib 
+HEADERS += BroadCollider.hpp \
            Interaction.hpp \
            InteractionGeometry.hpp \
            NarrowCollider.hpp \
            CollisionFunctor.hpp \
            InteractionContainer.hpp 
-SOURCES += InteractionPhysics.cpp \
-           InteractionPhysics.cpp \
-           BroadCollider.cpp \
+SOURCES += BroadCollider.cpp \
            Interaction.cpp \
            InteractionGeometry.cpp \
            NarrowCollider.cpp \
            InteractionContainer.cpp 
-LIBS += -lMultiMethods \
--rdynamic
-INCLUDEPATH = $(YADEINCLUDEPATH)
-MOC_DIR = $(YADECOMPILATIONPATH)
-UI_DIR = $(YADECOMPILATIONPATH)
-OBJECTS_DIR = $(YADECOMPILATIONPATH)
-QMAKE_LIBDIR = ../../yade/MultiMethods/$(YADEDYNLIBPATH) \
-$(YADEDYNLIBPATH)
-QMAKE_CXXFLAGS_RELEASE += -lpthread \
--pthread
-QMAKE_CXXFLAGS_DEBUG += -lpthread \
--pthread
-DESTDIR = $(YADEDYNLIBPATH)
-CONFIG += debug \
-warn_on \
-dll
-TEMPLATE = lib

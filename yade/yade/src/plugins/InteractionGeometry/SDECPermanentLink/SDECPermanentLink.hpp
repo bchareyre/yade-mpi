@@ -29,6 +29,7 @@ class SDECPermanentLink : public InteractionGeometry
 	public : Vector3r normalForce;			// normal force applied on a DE
 	public : Vector3r shearForce;			// shear force applied on a DE
 
+	
 /////////////////////////////////////////////////////// FIXME : this goes to another dynlib - MDEM
 	//public : Vector3r initRotation1;
 	//public : Vector3r initRotation2;
