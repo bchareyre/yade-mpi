@@ -3,6 +3,6 @@
 
 makeSymLinks
 
-echo 'You should run:  source yadeEnv YOUR_YADE_PATH'
+echo 'You should run:  source yadeEnv YOUR_YADE_PATH   --- without the trailing slash!!!'
 echo "after that you are ready to compile by:  qmake ; make "
 echo 'or just run yade'

@@ -104,7 +104,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>plugins/InteractionModel/ClosestFeatures</activedir>
+      <activedir></activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>

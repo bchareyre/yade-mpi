@@ -4,7 +4,6 @@
 # Target is an application:  
 
 FORMS += QtGeneratedFrontEnd.ui 
-IDLS += QtGeneratedFrontEnd.ui 
 HEADERS += Archive.hpp \
            ArchiveTypes.hpp \
            Body.hpp \
@@ -99,15 +98,15 @@ SOURCES += Archive.cpp \
            Vector3.cpp \
            yade.cpp 
 LIBS += -lboost_date_time \
-        -lglut \
-        -lQGLViewer \
-        -rdynamic 
-MOC_DIR = $(YADECOMPILATIONPATH) 
-UI_DIR = $(YADECOMPILATIONPATH) 
-OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-DESTDIR = $(YADEBINPATH) 
+-lglut \
+-lQGLViewer \
+-rdynamic
+MOC_DIR = $(YADECOMPILATIONPATH)
+UI_DIR = $(YADECOMPILATIONPATH)
+OBJECTS_DIR = $(YADECOMPILATIONPATH)
+DESTDIR = $(YADEBINPATH)
 CONFIG += release \
-          warn_on 
-QtGeneratedFrontEnd.ui.commands = $$IDL_COMPILER $$IDL_OPTIONS $$QtGeneratedFrontEnd.ui.target 
-QtGeneratedFrontEnd.ui.target = QtGeneratedFrontEnd.ui 
-TEMPLATE = app 
+warn_on
+QtGeneratedFrontEnd.ui.commands = $$IDL_COMPILER $$IDL_OPTIONS $$QtGeneratedFrontEnd.ui.target
+QtGeneratedFrontEnd.ui.target = QtGeneratedFrontEnd.ui
+TEMPLATE = app
