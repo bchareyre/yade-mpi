@@ -38,7 +38,7 @@ void SDECLinkedSpheres::registerAttributes()
 void SDECLinkedSpheres::exec()
 {
 	shared_ptr<NonConnexBody> rootBody(new NonConnexBody);
-	int nbSpheres = 2;
+	int nbSpheres = 4;// FIXME - this should ba a parameter to dynlib
 	Quaternion q;
 	q.fromAngleAxis(0, Vector3(0,0,1));
 
@@ -52,8 +52,6 @@ void SDECLinkedSpheres::exec()
 	rootBody->actors[2] 		= shared_ptr<Actor>(new SDECDynamicEngine);
 
 	rootBody->permanentInteractions.resize(0);
-//	rootBody->permanentInteractions[0] = shared_ptr<Contact>(new Contact);
-//	rootBody->permanentInteractions[0]->interactionGeometry = shared_ptr<SDECPermanentLink>(new SDECPermanentLink);
 
 	rootBody->isDynamic		= false;
 	rootBody->velocity		= Vector3(0,0,0);
@@ -100,7 +98,7 @@ void SDECLinkedSpheres::exec()
 		shared_ptr<Sphere> sphere(new Sphere);
 
 		translation 		= Vector3(i,j,k)*10-Vector3(nbSpheres/2*10,nbSpheres/2*10-90,nbSpheres/2*10)+Vector3(Rand::symmetricRandom()*1.3,Rand::symmetricRandom(),Rand::symmetricRandom()*1.3);
-		float radius 		= (Rand::intervalRandom(3,5));
+		float radius 		= (Rand::intervalRandom(4.99,5.2)); // FIXME - this should ba a parameter to dynlib
 
 		shared_ptr<BallisticDynamicEngine> ballistic(new BallisticDynamicEngine);
 		ballistic->damping 	= 1.0;//0.95;

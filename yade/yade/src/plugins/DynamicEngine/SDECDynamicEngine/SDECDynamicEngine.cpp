@@ -295,7 +295,7 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 ////////////////////////////////////////////////////////////
 /// Moment law					 	 ///
 ////////////////////////////////////////////////////////////
-/*
+
 		if (first)
 		{
 			currentContact->prevRotation1 = de1->se3.rotation;
@@ -452,7 +452,7 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 
 		currentContact->prevRotation1 = de1->se3.rotation;
 		currentContact->prevRotation2 = de2->se3.rotation;
-*/
+
 ////////////////////////////////////////////////////////////
 /// Moment law	END				 	 ///
 ////////////////////////////////////////////////////////////
