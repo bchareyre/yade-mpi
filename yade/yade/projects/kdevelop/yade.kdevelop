@@ -104,7 +104,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>toolboxes/Libraries/Threads</activedir>
+      <activedir>yade/yade</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>

@@ -4,6 +4,7 @@
 #include "Math.hpp"
 #include "Threadable.hpp"
 
+#include "OpenGLRenderingEngine.hpp"
 
 
 #include <qfiledialog.h>
@@ -24,12 +25,24 @@ SimulationController::SimulationController(QWidget * parent) : QtGeneratedSimula
 	setMaximumSize(size());
 	updater = shared_ptr<SimulationControllerUpdater>(new SimulationControllerUpdater(this));
 
-	renderer = dynamic_pointer_cast<RenderingEngine>(ClassFactory::instance().createShared("OpenGLRenderingEngine"));
-	guiGen.setResizeHeight(true);
-	guiGen.setResizeWidth(false);
-	guiGen.setShift(10,30);
-	guiGen.setShowButtons(false);
-	guiGen.buildGUI(renderer, fDisplay);
+//	while(! renderer )
+// FIXME - what is going on here? it was crashing rabdomly unless I added these lines...
+	shared_ptr<Factorable> tmpRenderer = ClassFactory::instance().createShared("OpenGLRenderingEngine");
+	shared_ptr<OpenGLRenderingEngine> tmp2 = dynamic_pointer_cast<OpenGLRenderingEngine>(tmpRenderer);
+	renderer = dynamic_pointer_cast<RenderingEngine>(tmp2);
+	
+	if(renderer)
+	{
+		guiGen.setResizeHeight(true);
+		guiGen.setResizeWidth(false);
+		guiGen.setShift(10,30);
+		guiGen.setShowButtons(false);
+		guiGen.buildGUI(renderer, fDisplay);
+	}
+	else
+	{
+		cerr << "renderer not created - why?!\n";
+	}
 
 }
 

@@ -3,7 +3,8 @@
 		<bv />
 		<cm />
 		<gm />
-		<actors size="4">
+		<actors size="5">
+			<actors _className_="BoundingVolumeUpdator"  bvFactories="[[Sphere AABB Sphere2AABBFactory] [Box AABB Box2AABBFactory]]" />
 			<actors _className_="SAPCollider"  />
 			<actors _className_="SimpleNarrowCollider"  collisionFunctors="[[Sphere Sphere Sphere2Sphere4SDECContactModel] [Sphere Box Box2Sphere4SDECContactModel]]" />
 			<actors _className_="SDECDynamicEngine"  />
@@ -448,14 +449,14 @@
 		<bodies _className_="BodyAssocVec" >
 			<body size="66">
 				<body _className_="SDECDiscreteElement"  id="0" isDynamic="0" velocity="{0 0 0}" angularVelocity="{0 0 0}" se3="{0 0 0 1 0 0 0}" mass="0" inertia="{0 0 0}" kn="100000" ks="10000">
-					<bv _className_="AABB"  color="{1 0 0}" center="{0 0 10}" halfSize="{200 5 200}" />
+					<bv _className_="AABB" color="{1 0 0}" />
 					<cm _className_="Box"  diffuseColor="{1 1 1}" wire="0" visible="1" shadowCaster="0" extents="{200 5 200}" />
 					<gm _className_="Box"  diffuseColor="{1 1 1}" wire="0" visible="1" shadowCaster="0" extents="{200 5 200}" />
 					<actors size="0">
 					</actors>
 				</body>
 				<body _className_="SDECDiscreteElement"  id="1" isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" se3="{-20 70 -20 1 0 0 0}" mass="105.1391" inertia="{1055.601 1055.601 1055.601}" kn="100000" ks="10000">
-					<bv _className_="AABB"  color="{0 1 0}" center="{-20 70 -20}" halfSize="{5.01 5.01 5.01}" />
+					<bv _className_="AABB" color="{0 1 0}" />
 					<cm _className_="Sphere"  diffuseColor="{0.55397 0.2777747 0.7682296}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<gm _className_="Sphere"  diffuseColor="{0.55397 0.2777747 0.7682296}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<actors size="1">
@@ -463,7 +464,7 @@
 					</actors>
 				</body>
 				<body _className_="SDECDiscreteElement"  id="2" isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" se3="{-20 70 -10 1 0 0 0}" mass="105.1391" inertia="{1055.601 1055.601 1055.601}" kn="100000" ks="10000">
-					<bv _className_="AABB"  color="{0 1 0}" center="{-20 70 -10}" halfSize="{5.01 5.01 5.01}" />
+					<bv _className_="AABB" color="{0 1 0}" />
 					<cm _className_="Sphere"  diffuseColor="{0.6357117 0.9161951 0.9522297}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<gm _className_="Sphere"  diffuseColor="{0.6357117 0.9161951 0.9522297}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<actors size="1">
@@ -471,7 +472,7 @@
 					</actors>
 				</body>
 				<body _className_="SDECDiscreteElement"  id="3" isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" se3="{-20 70 0 1 0 0 0}" mass="105.1391" inertia="{1055.601 1055.601 1055.601}" kn="100000" ks="10000">
-					<bv _className_="AABB"  color="{0 1 0}" center="{-20 70 0}" halfSize="{5.01 5.01 5.01}" />
+					<bv _className_="AABB" color="{0 1 0}" />
 					<cm _className_="Sphere"  diffuseColor="{0.8041767 0.1372316 0.2428868}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<gm _className_="Sphere"  diffuseColor="{0.8041767 0.1372316 0.2428868}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<actors size="1">
@@ -479,7 +480,7 @@
 					</actors>
 				</body>
 				<body _className_="SDECDiscreteElement"  id="4" isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" se3="{-20 70 10 1 0 0 0}" mass="105.1391" inertia="{1055.601 1055.601 1055.601}" kn="100000" ks="10000">
-					<bv _className_="AABB"  color="{0 1 0}" center="{-20 70 10}" halfSize="{5.01 5.01 5.01}" />
+					<bv _className_="AABB" color="{0 1 0}" />
 					<cm _className_="Sphere"  diffuseColor="{0.5129324 0.2182569 0.9989245}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<gm _className_="Sphere"  diffuseColor="{0.5129324 0.2182569 0.9989245}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<actors size="1">
@@ -487,7 +488,7 @@
 					</actors>
 				</body>
 				<body _className_="SDECDiscreteElement"  id="5" isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" se3="{-20 80 -20 1 0 0 0}" mass="105.1391" inertia="{1055.601 1055.601 1055.601}" kn="100000" ks="10000">
-					<bv _className_="AABB"  color="{0 1 0}" center="{-20 80 -20}" halfSize="{5.01 5.01 5.01}" />
+					<bv _className_="AABB" color="{0 1 0}" />
 					<cm _className_="Sphere"  diffuseColor="{0.972775 0.493583 0.5242872}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<gm _className_="Sphere"  diffuseColor="{0.972775 0.493583 0.5242872}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<actors size="1">
@@ -495,7 +496,7 @@
 					</actors>
 				</body>
 				<body _className_="SDECDiscreteElement"  id="6" isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" se3="{-20 80 -10 1 0 0 0}" mass="105.1391" inertia="{1055.601 1055.601 1055.601}" kn="100000" ks="10000">
-					<bv _className_="AABB"  color="{0 1 0}" center="{-20 80 -10}" halfSize="{5.01 5.01 5.01}" />
+					<bv _className_="AABB" color="{0 1 0}" />
 					<cm _className_="Sphere"  diffuseColor="{0.2833147 0.8915294 0.4002286}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<gm _className_="Sphere"  diffuseColor="{0.2833147 0.8915294 0.4002286}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<actors size="1">
@@ -503,7 +504,7 @@
 					</actors>
 				</body>
 				<body _className_="SDECDiscreteElement"  id="7" isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" se3="{-20 80 0 1 0 0 0}" mass="105.1391" inertia="{1055.601 1055.601 1055.601}" kn="100000" ks="10000">
-					<bv _className_="AABB"  color="{0 1 0}" center="{-20 80 0}" halfSize="{5.01 5.01 5.01}" />
+					<bv _className_="AABB" color="{0 1 0}" />
 					<cm _className_="Sphere"  diffuseColor="{0.08605585 0.5259954 0.9493271}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<gm _className_="Sphere"  diffuseColor="{0.08605585 0.5259954 0.9493271}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<actors size="1">
@@ -511,7 +512,7 @@
 					</actors>
 				</body>
 				<body _className_="SDECDiscreteElement"  id="8" isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" se3="{-20 80 10 1 0 0 0}" mass="105.1391" inertia="{1055.601 1055.601 1055.601}" kn="100000" ks="10000">
-					<bv _className_="AABB"  color="{0 1 0}" center="{-20 80 10}" halfSize="{5.01 5.01 5.01}" />
+					<bv _className_="AABB" color="{0 1 0}" />
 					<cm _className_="Sphere"  diffuseColor="{0.4577017 0.02002305 0.06417132}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<gm _className_="Sphere"  diffuseColor="{0.4577017 0.02002305 0.06417132}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<actors size="1">
@@ -519,7 +520,7 @@
 					</actors>
 				</body>
 				<body _className_="SDECDiscreteElement"  id="9" isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" se3="{-20 90 -20 1 0 0 0}" mass="105.1391" inertia="{1055.601 1055.601 1055.601}" kn="100000" ks="10000">
-					<bv _className_="AABB"  color="{0 1 0}" center="{-20 90 -20}" halfSize="{5.01 5.01 5.01}" />
+					<bv _className_="AABB" color="{0 1 0}" />
 					<cm _className_="Sphere"  diffuseColor="{0.5397604 0.2666658 0.8509198}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<gm _className_="Sphere"  diffuseColor="{0.5397604 0.2666658 0.8509198}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<actors size="1">
@@ -527,7 +528,7 @@
 					</actors>
 				</body>
 				<body _className_="SDECDiscreteElement"  id="10" isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" se3="{-20 90 -10 1 0 0 0}" mass="105.1391" inertia="{1055.601 1055.601 1055.601}" kn="100000" ks="10000">
-					<bv _className_="AABB"  color="{0 1 0}" center="{-20 90 -10}" halfSize="{5.01 5.01 5.01}" />
+					<bv _className_="AABB" color="{0 1 0}" />
 					<cm _className_="Sphere"  diffuseColor="{0.4376376 0.03928034 0.5316064}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<gm _className_="Sphere"  diffuseColor="{0.4376376 0.03928034 0.5316064}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<actors size="1">
@@ -535,7 +536,7 @@
 					</actors>
 				</body>
 				<body _className_="SDECDiscreteElement"  id="11" isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" se3="{-20 90 0 1 0 0 0}" mass="105.1391" inertia="{1055.601 1055.601 1055.601}" kn="100000" ks="10000">
-					<bv _className_="AABB"  color="{0 1 0}" center="{-20 90 0}" halfSize="{5.01 5.01 5.01}" />
+					<bv _className_="AABB" color="{0 1 0}" />
 					<cm _className_="Sphere"  diffuseColor="{0.3540487 0.6399788 0.7385343}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<gm _className_="Sphere"  diffuseColor="{0.3540487 0.6399788 0.7385343}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<actors size="1">
@@ -543,7 +544,7 @@
 					</actors>
 				</body>
 				<body _className_="SDECDiscreteElement"  id="12" isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" se3="{-20 90 10 1 0 0 0}" mass="105.1391" inertia="{1055.601 1055.601 1055.601}" kn="100000" ks="10000">
-					<bv _className_="AABB"  color="{0 1 0}" center="{-20 90 10}" halfSize="{5.01 5.01 5.01}" />
+					<bv _className_="AABB" color="{0 1 0}" />
 					<cm _className_="Sphere"  diffuseColor="{0.2289682 0.3303371 0.8292011}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<gm _className_="Sphere"  diffuseColor="{0.2289682 0.3303371 0.8292011}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<actors size="1">
@@ -551,7 +552,7 @@
 					</actors>
 				</body>
 				<body _className_="SDECDiscreteElement"  id="13" isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" se3="{-20 100 -20 1 0 0 0}" mass="105.1391" inertia="{1055.601 1055.601 1055.601}" kn="100000" ks="10000">
-					<bv _className_="AABB"  color="{0 1 0}" center="{-20 100 -20}" halfSize="{5.01 5.01 5.01}" />
+					<bv _className_="AABB" color="{0 1 0}" />
 					<cm _className_="Sphere"  diffuseColor="{0.8586763 0.657304 0.5886402}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<gm _className_="Sphere"  diffuseColor="{0.8586763 0.657304 0.5886402}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<actors size="1">
@@ -559,7 +560,7 @@
 					</actors>
 				</body>
 				<body _className_="SDECDiscreteElement"  id="14" isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" se3="{-20 100 -10 1 0 0 0}" mass="105.1391" inertia="{1055.601 1055.601 1055.601}" kn="100000" ks="10000">
-					<bv _className_="AABB"  color="{0 1 0}" center="{-20 100 -10}" halfSize="{5.01 5.01 5.01}" />
+					<bv _className_="AABB" color="{0 1 0}" />
 					<cm _className_="Sphere"  diffuseColor="{0.4824907 0.9109721 0.6842185}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<gm _className_="Sphere"  diffuseColor="{0.4824907 0.9109721 0.6842185}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<actors size="1">
@@ -567,7 +568,7 @@
 					</actors>
 				</body>
 				<body _className_="SDECDiscreteElement"  id="15" isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" se3="{-20 100 0 1 0 0 0}" mass="105.1391" inertia="{1055.601 1055.601 1055.601}" kn="100000" ks="10000">
-					<bv _className_="AABB"  color="{0 1 0}" center="{-20 100 0}" halfSize="{5.01 5.01 5.01}" />
+					<bv _className_="AABB" color="{0 1 0}" />
 					<cm _className_="Sphere"  diffuseColor="{0.4319534 0.6410806 0.8810622}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<gm _className_="Sphere"  diffuseColor="{0.4319534 0.6410806 0.8810622}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<actors size="1">
@@ -575,7 +576,7 @@
 					</actors>
 				</body>
 				<body _className_="SDECDiscreteElement"  id="16" isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" se3="{-20 100 10 1 0 0 0}" mass="105.1391" inertia="{1055.601 1055.601 1055.601}" kn="100000" ks="10000">
-					<bv _className_="AABB"  color="{0 1 0}" center="{-20 100 10}" halfSize="{5.01 5.01 5.01}" />
+					<bv _className_="AABB" color="{0 1 0}" />
 					<cm _className_="Sphere"  diffuseColor="{0.1875331 0.2261066 0.4470336}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<gm _className_="Sphere"  diffuseColor="{0.1875331 0.2261066 0.4470336}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<actors size="1">
@@ -583,7 +584,7 @@
 					</actors>
 				</body>
 				<body _className_="SDECDiscreteElement"  id="17" isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" se3="{-10 70 -20 1 0 0 0}" mass="105.1391" inertia="{1055.601 1055.601 1055.601}" kn="100000" ks="10000">
-					<bv _className_="AABB"  color="{0 1 0}" center="{-10 70 -20}" halfSize="{5.01 5.01 5.01}" />
+					<bv _className_="AABB" color="{0 1 0}" />
 					<cm _className_="Sphere"  diffuseColor="{0.1260753 0.1031712 0.9068039}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<gm _className_="Sphere"  diffuseColor="{0.1260753 0.1031712 0.9068039}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<actors size="1">
@@ -591,7 +592,7 @@
 					</actors>
 				</body>
 				<body _className_="SDECDiscreteElement"  id="18" isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" se3="{-10 70 -10 1 0 0 0}" mass="105.1391" inertia="{1055.601 1055.601 1055.601}" kn="100000" ks="10000">
-					<bv _className_="AABB"  color="{0 1 0}" center="{-10 70 -10}" halfSize="{5.01 5.01 5.01}" />
+					<bv _className_="AABB" color="{0 1 0}" />
 					<cm _className_="Sphere"  diffuseColor="{0.7497709 0.3831883 0.684445}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<gm _className_="Sphere"  diffuseColor="{0.7497709 0.3831883 0.684445}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<actors size="1">
@@ -599,7 +600,7 @@
 					</actors>
 				</body>
 				<body _className_="SDECDiscreteElement"  id="19" isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" se3="{-10 70 0 1 0 0 0}" mass="105.1391" inertia="{1055.601 1055.601 1055.601}" kn="100000" ks="10000">
-					<bv _className_="AABB"  color="{0 1 0}" center="{-10 70 0}" halfSize="{5.01 5.01 5.01}" />
+					<bv _className_="AABB" color="{0 1 0}" />
 					<cm _className_="Sphere"  diffuseColor="{0.7321485 0.1523898 0.2444127}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<gm _className_="Sphere"  diffuseColor="{0.7321485 0.1523898 0.2444127}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<actors size="1">
@@ -607,7 +608,7 @@
 					</actors>
 				</body>
 				<body _className_="SDECDiscreteElement"  id="20" isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" se3="{-10 70 10 1 0 0 0}" mass="105.1391" inertia="{1055.601 1055.601 1055.601}" kn="100000" ks="10000">
-					<bv _className_="AABB"  color="{0 1 0}" center="{-10 70 10}" halfSize="{5.01 5.01 5.01}" />
+					<bv _className_="AABB" color="{0 1 0}" />
 					<cm _className_="Sphere"  diffuseColor="{0.05252926 0.9501041 0.0745298}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<gm _className_="Sphere"  diffuseColor="{0.05252926 0.9501041 0.0745298}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<actors size="1">
@@ -615,7 +616,7 @@
 					</actors>
 				</body>
 				<body _className_="SDECDiscreteElement"  id="21" isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" se3="{-10 80 -20 1 0 0 0}" mass="105.1391" inertia="{1055.601 1055.601 1055.601}" kn="100000" ks="10000">
-					<bv _className_="AABB"  color="{0 1 0}" center="{-10 80 -20}" halfSize="{5.01 5.01 5.01}" />
+					<bv _className_="AABB" color="{0 1 0}" />
 					<cm _className_="Sphere"  diffuseColor="{0.9674051 0.6565636 0.7326544}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<gm _className_="Sphere"  diffuseColor="{0.9674051 0.6565636 0.7326544}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<actors size="1">
@@ -623,7 +624,7 @@
 					</actors>
 				</body>
 				<body _className_="SDECDiscreteElement"  id="22" isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" se3="{-10 80 -10 1 0 0 0}" mass="105.1391" inertia="{1055.601 1055.601 1055.601}" kn="100000" ks="10000">
-					<bv _className_="AABB"  color="{0 1 0}" center="{-10 80 -10}" halfSize="{5.01 5.01 5.01}" />
+					<bv _className_="AABB" color="{0 1 0}" />
 					<cm _className_="Sphere"  diffuseColor="{0.0699064 0.07823214 0.5202101}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<gm _className_="Sphere"  diffuseColor="{0.0699064 0.07823214 0.5202101}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<actors size="1">
@@ -631,7 +632,7 @@
 					</actors>
 				</body>
 				<body _className_="SDECDiscreteElement"  id="23" isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" se3="{-10 80 0 1 0 0 0}" mass="105.1391" inertia="{1055.601 1055.601 1055.601}" kn="100000" ks="10000">
-					<bv _className_="AABB"  color="{0 1 0}" center="{-10 80 0}" halfSize="{5.01 5.01 5.01}" />
+					<bv _className_="AABB" color="{0 1 0}" />
 					<cm _className_="Sphere"  diffuseColor="{0.1578071 0.05193882 0.7555808}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<gm _className_="Sphere"  diffuseColor="{0.1578071 0.05193882 0.7555808}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<actors size="1">
@@ -639,7 +640,7 @@
 					</actors>
 				</body>
 				<body _className_="SDECDiscreteElement"  id="24" isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" se3="{-10 80 10 1 0 0 0}" mass="105.1391" inertia="{1055.601 1055.601 1055.601}" kn="100000" ks="10000">
-					<bv _className_="AABB"  color="{0 1 0}" center="{-10 80 10}" halfSize="{5.01 5.01 5.01}" />
+					<bv _className_="AABB" color="{0 1 0}" />
 					<cm _className_="Sphere"  diffuseColor="{0.8705398 0.05405758 0.997799}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<gm _className_="Sphere"  diffuseColor="{0.8705398 0.05405758 0.997799}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<actors size="1">
@@ -647,7 +648,7 @@
 					</actors>
 				</body>
 				<body _className_="SDECDiscreteElement"  id="25" isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" se3="{-10 90 -20 1 0 0 0}" mass="105.1391" inertia="{1055.601 1055.601 1055.601}" kn="100000" ks="10000">
-					<bv _className_="AABB"  color="{0 1 0}" center="{-10 90 -20}" halfSize="{5.01 5.01 5.01}" />
+					<bv _className_="AABB" color="{0 1 0}" />
 					<cm _className_="Sphere"  diffuseColor="{0.3916902 0.1631315 0.1803723}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<gm _className_="Sphere"  diffuseColor="{0.3916902 0.1631315 0.1803723}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<actors size="1">
@@ -655,7 +656,7 @@
 					</actors>
 				</body>
 				<body _className_="SDECDiscreteElement"  id="26" isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" se3="{-10 90 -10 1 0 0 0}" mass="105.1391" inertia="{1055.601 1055.601 1055.601}" kn="100000" ks="10000">
-					<bv _className_="AABB"  color="{0 1 0}" center="{-10 90 -10}" halfSize="{5.01 5.01 5.01}" />
+					<bv _className_="AABB" color="{0 1 0}" />
 					<cm _className_="Sphere"  diffuseColor="{0.6873874 0.4525758 0.57943}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<gm _className_="Sphere"  diffuseColor="{0.6873874 0.4525758 0.57943}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<actors size="1">
@@ -663,7 +664,7 @@
 					</actors>
 				</body>
 				<body _className_="SDECDiscreteElement"  id="27" isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" se3="{-10 90 0 1 0 0 0}" mass="105.1391" inertia="{1055.601 1055.601 1055.601}" kn="100000" ks="10000">
-					<bv _className_="AABB"  color="{0 1 0}" center="{-10 90 0}" halfSize="{5.01 5.01 5.01}" />
+					<bv _className_="AABB" color="{0 1 0}" />
 					<cm _className_="Sphere"  diffuseColor="{0.8776138 0.5769711 0.9922284}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<gm _className_="Sphere"  diffuseColor="{0.8776138 0.5769711 0.9922284}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<actors size="1">
@@ -671,7 +672,7 @@
 					</actors>
 				</body>
 				<body _className_="SDECDiscreteElement"  id="28" isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" se3="{-10 90 10 1 0 0 0}" mass="105.1391" inertia="{1055.601 1055.601 1055.601}" kn="100000" ks="10000">
-					<bv _className_="AABB"  color="{0 1 0}" center="{-10 90 10}" halfSize="{5.01 5.01 5.01}" />
+					<bv _className_="AABB" color="{0 1 0}" />
 					<cm _className_="Sphere"  diffuseColor="{0.8732713 0.9253765 0.8332385}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<gm _className_="Sphere"  diffuseColor="{0.8732713 0.9253765 0.8332385}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<actors size="1">
@@ -679,7 +680,7 @@
 					</actors>
 				</body>
 				<body _className_="SDECDiscreteElement"  id="29" isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" se3="{-10 100 -20 1 0 0 0}" mass="105.1391" inertia="{1055.601 1055.601 1055.601}" kn="100000" ks="10000">
-					<bv _className_="AABB"  color="{0 1 0}" center="{-10 100 -20}" halfSize="{5.01 5.01 5.01}" />
+					<bv _className_="AABB" color="{0 1 0}" />
 					<cm _className_="Sphere"  diffuseColor="{0.4972585 0.6668803 0.9835957}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<gm _className_="Sphere"  diffuseColor="{0.4972585 0.6668803 0.9835957}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<actors size="1">
@@ -687,7 +688,7 @@
 					</actors>
 				</body>
 				<body _className_="SDECDiscreteElement"  id="30" isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" se3="{-10 100 -10 1 0 0 0}" mass="105.1391" inertia="{1055.601 1055.601 1055.601}" kn="100000" ks="10000">
-					<bv _className_="AABB"  color="{0 1 0}" center="{-10 100 -10}" halfSize="{5.01 5.01 5.01}" />
+					<bv _className_="AABB" color="{0 1 0}" />
 					<cm _className_="Sphere"  diffuseColor="{0.6294797 0.2480441 0.649707}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<gm _className_="Sphere"  diffuseColor="{0.6294797 0.2480441 0.649707}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<actors size="1">
@@ -695,7 +696,7 @@
 					</actors>
 				</body>
 				<body _className_="SDECDiscreteElement"  id="31" isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" se3="{-10 100 0 1 0 0 0}" mass="105.1391" inertia="{1055.601 1055.601 1055.601}" kn="100000" ks="10000">
-					<bv _className_="AABB"  color="{0 1 0}" center="{-10 100 0}" halfSize="{5.01 5.01 5.01}" />
+					<bv _className_="AABB" color="{0 1 0}" />
 					<cm _className_="Sphere"  diffuseColor="{0.6330722 0.07416097 0.231428}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<gm _className_="Sphere"  diffuseColor="{0.6330722 0.07416097 0.231428}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<actors size="1">
@@ -703,7 +704,7 @@
 					</actors>
 				</body>
 				<body _className_="SDECDiscreteElement"  id="32" isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" se3="{-10 100 10 1 0 0 0}" mass="105.1391" inertia="{1055.601 1055.601 1055.601}" kn="100000" ks="10000">
-					<bv _className_="AABB"  color="{0 1 0}" center="{-10 100 10}" halfSize="{5.01 5.01 5.01}" />
+					<bv _className_="AABB" color="{0 1 0}" />
 					<cm _className_="Sphere"  diffuseColor="{0.7192686 0.5461069 0.280042}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<gm _className_="Sphere"  diffuseColor="{0.7192686 0.5461069 0.280042}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<actors size="1">
@@ -711,7 +712,7 @@
 					</actors>
 				</body>
 				<body _className_="SDECDiscreteElement"  id="33" isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" se3="{0 70 -20 1 0 0 0}" mass="105.1391" inertia="{1055.601 1055.601 1055.601}" kn="100000" ks="10000">
-					<bv _className_="AABB"  color="{0 1 0}" center="{0 70 -20}" halfSize="{5.01 5.01 5.01}" />
+					<bv _className_="AABB" color="{0 1 0}" />
 					<cm _className_="Sphere"  diffuseColor="{0.8476844 0.3363511 0.4509176}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<gm _className_="Sphere"  diffuseColor="{0.8476844 0.3363511 0.4509176}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<actors size="1">
@@ -719,7 +720,7 @@
 					</actors>
 				</body>
 				<body _className_="SDECDiscreteElement"  id="34" isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" se3="{0 70 -10 1 0 0 0}" mass="105.1391" inertia="{1055.601 1055.601 1055.601}" kn="100000" ks="10000">
-					<bv _className_="AABB"  color="{0 1 0}" center="{0 70 -10}" halfSize="{5.01 5.01 5.01}" />
+					<bv _className_="AABB" color="{0 1 0}" />
 					<cm _className_="Sphere"  diffuseColor="{0.675476 0.2338917 0.8332433}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<gm _className_="Sphere"  diffuseColor="{0.675476 0.2338917 0.8332433}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<actors size="1">
@@ -727,7 +728,7 @@
 					</actors>
 				</body>
 				<body _className_="SDECDiscreteElement"  id="35" isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" se3="{0 70 0 1 0 0 0}" mass="105.1391" inertia="{1055.601 1055.601 1055.601}" kn="100000" ks="10000">
-					<bv _className_="AABB"  color="{0 1 0}" center="{0 70 0}" halfSize="{5.01 5.01 5.01}" />
+					<bv _className_="AABB" color="{0 1 0}" />
 					<cm _className_="Sphere"  diffuseColor="{0.0408643 0.6218228 0.1825558}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<gm _className_="Sphere"  diffuseColor="{0.0408643 0.6218228 0.1825558}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<actors size="1">
@@ -735,7 +736,7 @@
 					</actors>
 				</body>
 				<body _className_="SDECDiscreteElement"  id="36" isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" se3="{0 70 10 1 0 0 0}" mass="105.1391" inertia="{1055.601 1055.601 1055.601}" kn="100000" ks="10000">
-					<bv _className_="AABB"  color="{0 1 0}" center="{0 70 10}" halfSize="{5.01 5.01 5.01}" />
+					<bv _className_="AABB" color="{0 1 0}" />
 					<cm _className_="Sphere"  diffuseColor="{0.6091059 0.1846225 0.3471159}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<gm _className_="Sphere"  diffuseColor="{0.6091059 0.1846225 0.3471159}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<actors size="1">
@@ -743,7 +744,7 @@
 					</actors>
 				</body>
 				<body _className_="SDECDiscreteElement"  id="37" isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" se3="{0 80 -20 1 0 0 0}" mass="105.1391" inertia="{1055.601 1055.601 1055.601}" kn="100000" ks="10000">
-					<bv _className_="AABB"  color="{0 1 0}" center="{0 80 -20}" halfSize="{5.01 5.01 5.01}" />
+					<bv _className_="AABB" color="{0 1 0}" />
 					<cm _className_="Sphere"  diffuseColor="{0.6847565 0.9209144 0.2022128}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<gm _className_="Sphere"  diffuseColor="{0.6847565 0.9209144 0.2022128}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<actors size="1">
@@ -751,7 +752,7 @@
 					</actors>
 				</body>
 				<body _className_="SDECDiscreteElement"  id="38" isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" se3="{0 80 -10 1 0 0 0}" mass="105.1391" inertia="{1055.601 1055.601 1055.601}" kn="100000" ks="10000">
-					<bv _className_="AABB"  color="{0 1 0}" center="{0 80 -10}" halfSize="{5.01 5.01 5.01}" />
+					<bv _className_="AABB" color="{0 1 0}" />
 					<cm _className_="Sphere"  diffuseColor="{0.6861249 0.8773839 0.2604969}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<gm _className_="Sphere"  diffuseColor="{0.6861249 0.8773839 0.2604969}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<actors size="1">
@@ -759,7 +760,7 @@
 					</actors>
 				</body>
 				<body _className_="SDECDiscreteElement"  id="39" isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" se3="{0 80 0 1 0 0 0}" mass="105.1391" inertia="{1055.601 1055.601 1055.601}" kn="100000" ks="10000">
-					<bv _className_="AABB"  color="{0 1 0}" center="{0 80 0}" halfSize="{5.01 5.01 5.01}" />
+					<bv _className_="AABB" color="{0 1 0}" />
 					<cm _className_="Sphere"  diffuseColor="{0.2887778 0.6665566 0.5932115}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<gm _className_="Sphere"  diffuseColor="{0.2887778 0.6665566 0.5932115}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<actors size="1">
@@ -767,7 +768,7 @@
 					</actors>
 				</body>
 				<body _className_="SDECDiscreteElement"  id="40" isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" se3="{0 80 10 1 0 0 0}" mass="105.1391" inertia="{1055.601 1055.601 1055.601}" kn="100000" ks="10000">
-					<bv _className_="AABB"  color="{0 1 0}" center="{0 80 10}" halfSize="{5.01 5.01 5.01}" />
+					<bv _className_="AABB" color="{0 1 0}" />
 					<cm _className_="Sphere"  diffuseColor="{0.8273911 0.003578574 0.9843632}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<gm _className_="Sphere"  diffuseColor="{0.8273911 0.003578574 0.9843632}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<actors size="1">
@@ -775,7 +776,7 @@
 					</actors>
 				</body>
 				<body _className_="SDECDiscreteElement"  id="41" isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" se3="{0 90 -20 1 0 0 0}" mass="105.1391" inertia="{1055.601 1055.601 1055.601}" kn="100000" ks="10000">
-					<bv _className_="AABB"  color="{0 1 0}" center="{0 90 -20}" halfSize="{5.01 5.01 5.01}" />
+					<bv _className_="AABB" color="{0 1 0}" />
 					<cm _className_="Sphere"  diffuseColor="{0.6990754 0.7648714 0.9189304}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<gm _className_="Sphere"  diffuseColor="{0.6990754 0.7648714 0.9189304}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<actors size="1">
@@ -783,7 +784,7 @@
 					</actors>
 				</body>
 				<body _className_="SDECDiscreteElement"  id="42" isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" se3="{0 90 -10 1 0 0 0}" mass="105.1391" inertia="{1055.601 1055.601 1055.601}" kn="100000" ks="10000">
-					<bv _className_="AABB"  color="{0 1 0}" center="{0 90 -10}" halfSize="{5.01 5.01 5.01}" />
+					<bv _className_="AABB" color="{0 1 0}" />
 					<cm _className_="Sphere"  diffuseColor="{0.8619171 0.9162729 0.9430513}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<gm _className_="Sphere"  diffuseColor="{0.8619171 0.9162729 0.9430513}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<actors size="1">
@@ -791,7 +792,7 @@
 					</actors>
 				</body>
 				<body _className_="SDECDiscreteElement"  id="43" isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" se3="{0 90 0 1 0 0 0}" mass="105.1391" inertia="{1055.601 1055.601 1055.601}" kn="100000" ks="10000">
-					<bv _className_="AABB"  color="{0 1 0}" center="{0 90 0}" halfSize="{5.01 5.01 5.01}" />
+					<bv _className_="AABB" color="{0 1 0}" />
 					<cm _className_="Sphere"  diffuseColor="{0.873979 0.9096429 0.9049325}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<gm _className_="Sphere"  diffuseColor="{0.873979 0.9096429 0.9049325}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<actors size="1">
@@ -799,7 +800,7 @@
 					</actors>
 				</body>
 				<body _className_="SDECDiscreteElement"  id="44" isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" se3="{0 90 10 1 0 0 0}" mass="105.1391" inertia="{1055.601 1055.601 1055.601}" kn="100000" ks="10000">
-					<bv _className_="AABB"  color="{0 1 0}" center="{0 90 10}" halfSize="{5.01 5.01 5.01}" />
+					<bv _className_="AABB" color="{0 1 0}" />
 					<cm _className_="Sphere"  diffuseColor="{0.4636621 0.4923988 0.864579}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<gm _className_="Sphere"  diffuseColor="{0.4636621 0.4923988 0.864579}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<actors size="1">
@@ -807,7 +808,7 @@
 					</actors>
 				</body>
 				<body _className_="SDECDiscreteElement"  id="45" isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" se3="{0 100 -20 1 0 0 0}" mass="105.1391" inertia="{1055.601 1055.601 1055.601}" kn="100000" ks="10000">
-					<bv _className_="AABB"  color="{0 1 0}" center="{0 100 -20}" halfSize="{5.01 5.01 5.01}" />
+					<bv _className_="AABB" color="{0 1 0}" />
 					<cm _className_="Sphere"  diffuseColor="{0.1390582 0.7275503 0.6841784}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<gm _className_="Sphere"  diffuseColor="{0.1390582 0.7275503 0.6841784}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<actors size="1">
@@ -815,7 +816,7 @@
 					</actors>
 				</body>
 				<body _className_="SDECDiscreteElement"  id="46" isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" se3="{0 100 -10 1 0 0 0}" mass="105.1391" inertia="{1055.601 1055.601 1055.601}" kn="100000" ks="10000">
-					<bv _className_="AABB"  color="{0 1 0}" center="{0 100 -10}" halfSize="{5.01 5.01 5.01}" />
+					<bv _className_="AABB" color="{0 1 0}" />
 					<cm _className_="Sphere"  diffuseColor="{0.4985255 0.2219655 0.1782075}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<gm _className_="Sphere"  diffuseColor="{0.4985255 0.2219655 0.1782075}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<actors size="1">
@@ -823,7 +824,7 @@
 					</actors>
 				</body>
 				<body _className_="SDECDiscreteElement"  id="47" isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" se3="{0 100 0 1 0 0 0}" mass="105.1391" inertia="{1055.601 1055.601 1055.601}" kn="100000" ks="10000">
-					<bv _className_="AABB"  color="{0 1 0}" center="{0 100 0}" halfSize="{5.01 5.01 5.01}" />
+					<bv _className_="AABB" color="{0 1 0}" />
 					<cm _className_="Sphere"  diffuseColor="{0.6220955 0.9084846 0.9318953}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<gm _className_="Sphere"  diffuseColor="{0.6220955 0.9084846 0.9318953}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<actors size="1">
@@ -831,7 +832,7 @@
 					</actors>
 				</body>
 				<body _className_="SDECDiscreteElement"  id="48" isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" se3="{0 100 10 1 0 0 0}" mass="105.1391" inertia="{1055.601 1055.601 1055.601}" kn="100000" ks="10000">
-					<bv _className_="AABB"  color="{0 1 0}" center="{0 100 10}" halfSize="{5.01 5.01 5.01}" />
+					<bv _className_="AABB" color="{0 1 0}" />
 					<cm _className_="Sphere"  diffuseColor="{0.6088828 0.6588312 0.3943272}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<gm _className_="Sphere"  diffuseColor="{0.6088828 0.6588312 0.3943272}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<actors size="1">
@@ -839,7 +840,7 @@
 					</actors>
 				</body>
 				<body _className_="SDECDiscreteElement"  id="49" isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" se3="{10 70 -20 1 0 0 0}" mass="105.1391" inertia="{1055.601 1055.601 1055.601}" kn="100000" ks="10000">
-					<bv _className_="AABB"  color="{0 1 0}" center="{10 70 -20}" halfSize="{5.01 5.01 5.01}" />
+					<bv _className_="AABB" color="{0 1 0}" />
 					<cm _className_="Sphere"  diffuseColor="{0.2882695 0.3635983 0.6472074}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<gm _className_="Sphere"  diffuseColor="{0.2882695 0.3635983 0.6472074}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<actors size="1">
@@ -847,7 +848,7 @@
 					</actors>
 				</body>
 				<body _className_="SDECDiscreteElement"  id="50" isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" se3="{10 70 -10 1 0 0 0}" mass="105.1391" inertia="{1055.601 1055.601 1055.601}" kn="100000" ks="10000">
-					<bv _className_="AABB"  color="{0 1 0}" center="{10 70 -10}" halfSize="{5.01 5.01 5.01}" />
+					<bv _className_="AABB" color="{0 1 0}" />
 					<cm _className_="Sphere"  diffuseColor="{0.6587467 0.2654613 0.5835703}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<gm _className_="Sphere"  diffuseColor="{0.6587467 0.2654613 0.5835703}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<actors size="1">
@@ -855,7 +856,7 @@
 					</actors>
 				</body>
 				<body _className_="SDECDiscreteElement"  id="51" isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" se3="{10 70 0 1 0 0 0}" mass="105.1391" inertia="{1055.601 1055.601 1055.601}" kn="100000" ks="10000">
-					<bv _className_="AABB"  color="{0 1 0}" center="{10 70 0}" halfSize="{5.01 5.01 5.01}" />
+					<bv _className_="AABB" color="{0 1 0}" />
 					<cm _className_="Sphere"  diffuseColor="{0.2078436 0.5177147 0.6256653}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<gm _className_="Sphere"  diffuseColor="{0.2078436 0.5177147 0.6256653}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<actors size="1">
@@ -863,7 +864,7 @@
 					</actors>
 				</body>
 				<body _className_="SDECDiscreteElement"  id="52" isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" se3="{10 70 10 1 0 0 0}" mass="105.1391" inertia="{1055.601 1055.601 1055.601}" kn="100000" ks="10000">
-					<bv _className_="AABB"  color="{0 1 0}" center="{10 70 10}" halfSize="{5.01 5.01 5.01}" />
+					<bv _className_="AABB" color="{0 1 0}" />
 					<cm _className_="Sphere"  diffuseColor="{0.72936 0.3260135 0.244327}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<gm _className_="Sphere"  diffuseColor="{0.72936 0.3260135 0.244327}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<actors size="1">
@@ -871,7 +872,7 @@
 					</actors>
 				</body>
 				<body _className_="SDECDiscreteElement"  id="53" isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" se3="{10 80 -20 1 0 0 0}" mass="105.1391" inertia="{1055.601 1055.601 1055.601}" kn="100000" ks="10000">
-					<bv _className_="AABB"  color="{0 1 0}" center="{10 80 -20}" halfSize="{5.01 5.01 5.01}" />
+					<bv _className_="AABB" color="{0 1 0}" />
 					<cm _className_="Sphere"  diffuseColor="{0.005408548 0.4107879 0.1360746}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<gm _className_="Sphere"  diffuseColor="{0.005408548 0.4107879 0.1360746}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<actors size="1">
@@ -879,7 +880,7 @@
 					</actors>
 				</body>
 				<body _className_="SDECDiscreteElement"  id="54" isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" se3="{10 80 -10 1 0 0 0}" mass="105.1391" inertia="{1055.601 1055.601 1055.601}" kn="100000" ks="10000">
-					<bv _className_="AABB"  color="{0 1 0}" center="{10 80 -10}" halfSize="{5.01 5.01 5.01}" />
+					<bv _className_="AABB" color="{0 1 0}" />
 					<cm _className_="Sphere"  diffuseColor="{0.04916246 0.7210058 0.8655348}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<gm _className_="Sphere"  diffuseColor="{0.04916246 0.7210058 0.8655348}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<actors size="1">
@@ -887,7 +888,7 @@
 					</actors>
 				</body>
 				<body _className_="SDECDiscreteElement"  id="55" isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" se3="{10 80 0 1 0 0 0}" mass="105.1391" inertia="{1055.601 1055.601 1055.601}" kn="100000" ks="10000">
-					<bv _className_="AABB"  color="{0 1 0}" center="{10 80 0}" halfSize="{5.01 5.01 5.01}" />
+					<bv _className_="AABB" color="{0 1 0}" />
 					<cm _className_="Sphere"  diffuseColor="{0.09391951 0.8651812 0.473894}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<gm _className_="Sphere"  diffuseColor="{0.09391951 0.8651812 0.473894}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<actors size="1">
@@ -895,7 +896,7 @@
 					</actors>
 				</body>
 				<body _className_="SDECDiscreteElement"  id="56" isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" se3="{10 80 10 1 0 0 0}" mass="105.1391" inertia="{1055.601 1055.601 1055.601}" kn="100000" ks="10000">
-					<bv _className_="AABB"  color="{0 1 0}" center="{10 80 10}" halfSize="{5.01 5.01 5.01}" />
+					<bv _className_="AABB" color="{0 1 0}" />
 					<cm _className_="Sphere"  diffuseColor="{0.05150829 0.1317021 0.8090953}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<gm _className_="Sphere"  diffuseColor="{0.05150829 0.1317021 0.8090953}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<actors size="1">
@@ -903,7 +904,7 @@
 					</actors>
 				</body>
 				<body _className_="SDECDiscreteElement"  id="57" isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" se3="{10 90 -20 1 0 0 0}" mass="105.1391" inertia="{1055.601 1055.601 1055.601}" kn="100000" ks="10000">
-					<bv _className_="AABB"  color="{0 1 0}" center="{10 90 -20}" halfSize="{5.01 5.01 5.01}" />
+					<bv _className_="AABB" color="{0 1 0}" />
 					<cm _className_="Sphere"  diffuseColor="{0.5896367 0.1191113 0.4425602}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<gm _className_="Sphere"  diffuseColor="{0.5896367 0.1191113 0.4425602}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<actors size="1">
@@ -911,7 +912,7 @@
 					</actors>
 				</body>
 				<body _className_="SDECDiscreteElement"  id="58" isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" se3="{10 90 -10 1 0 0 0}" mass="105.1391" inertia="{1055.601 1055.601 1055.601}" kn="100000" ks="10000">
-					<bv _className_="AABB"  color="{0 1 0}" center="{10 90 -10}" halfSize="{5.01 5.01 5.01}" />
+					<bv _className_="AABB" color="{0 1 0}" />
 					<cm _className_="Sphere"  diffuseColor="{0.4765846 0.8887233 0.3042855}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<gm _className_="Sphere"  diffuseColor="{0.4765846 0.8887233 0.3042855}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<actors size="1">
@@ -919,7 +920,7 @@
 					</actors>
 				</body>
 				<body _className_="SDECDiscreteElement"  id="59" isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" se3="{10 90 0 1 0 0 0}" mass="105.1391" inertia="{1055.601 1055.601 1055.601}" kn="100000" ks="10000">
-					<bv _className_="AABB"  color="{0 1 0}" center="{10 90 0}" halfSize="{5.01 5.01 5.01}" />
+					<bv _className_="AABB" color="{0 1 0}" />
 					<cm _className_="Sphere"  diffuseColor="{0.8298083 0.2336562 0.5961962}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<gm _className_="Sphere"  diffuseColor="{0.8298083 0.2336562 0.5961962}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<actors size="1">
@@ -927,7 +928,7 @@
 					</actors>
 				</body>
 				<body _className_="SDECDiscreteElement"  id="60" isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" se3="{10 90 10 1 0 0 0}" mass="105.1391" inertia="{1055.601 1055.601 1055.601}" kn="100000" ks="10000">
-					<bv _className_="AABB"  color="{0 1 0}" center="{10 90 10}" halfSize="{5.01 5.01 5.01}" />
+					<bv _className_="AABB" color="{0 1 0}" />
 					<cm _className_="Sphere"  diffuseColor="{0.8267694 0.2254909 0.4817334}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<gm _className_="Sphere"  diffuseColor="{0.8267694 0.2254909 0.4817334}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<actors size="1">
@@ -935,7 +936,7 @@
 					</actors>
 				</body>
 				<body _className_="SDECDiscreteElement"  id="61" isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" se3="{10 100 -20 1 0 0 0}" mass="105.1391" inertia="{1055.601 1055.601 1055.601}" kn="100000" ks="10000">
-					<bv _className_="AABB"  color="{0 1 0}" center="{10 100 -20}" halfSize="{5.01 5.01 5.01}" />
+					<bv _className_="AABB" color="{0 1 0}" />
 					<cm _className_="Sphere"  diffuseColor="{0.0363274 0.6591461 0.8149087}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<gm _className_="Sphere"  diffuseColor="{0.0363274 0.6591461 0.8149087}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<actors size="1">
@@ -943,7 +944,7 @@
 					</actors>
 				</body>
 				<body _className_="SDECDiscreteElement"  id="62" isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" se3="{10 100 -10 1 0 0 0}" mass="105.1391" inertia="{1055.601 1055.601 1055.601}" kn="100000" ks="10000">
-					<bv _className_="AABB"  color="{0 1 0}" center="{10 100 -10}" halfSize="{5.01 5.01 5.01}" />
+					<bv _className_="AABB" color="{0 1 0}" />
 					<cm _className_="Sphere"  diffuseColor="{0.1980206 0.2210094 0.3081565}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<gm _className_="Sphere"  diffuseColor="{0.1980206 0.2210094 0.3081565}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<actors size="1">
@@ -951,7 +952,7 @@
 					</actors>
 				</body>
 				<body _className_="SDECDiscreteElement"  id="63" isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" se3="{10 100 0 1 0 0 0}" mass="105.1391" inertia="{1055.601 1055.601 1055.601}" kn="100000" ks="10000">
-					<bv _className_="AABB"  color="{0 1 0}" center="{10 100 0}" halfSize="{5.01 5.01 5.01}" />
+					<bv _className_="AABB" color="{0 1 0}" />
 					<cm _className_="Sphere"  diffuseColor="{0.4011877 0.2003524 0.7194618}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<gm _className_="Sphere"  diffuseColor="{0.4011877 0.2003524 0.7194618}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<actors size="1">
@@ -959,7 +960,7 @@
 					</actors>
 				</body>
 				<body _className_="SDECDiscreteElement"  id="64" isDynamic="1" velocity="{0 0 0}" angularVelocity="{0 0 0}" se3="{10 100 10 1 0 0 0}" mass="105.1391" inertia="{1055.601 1055.601 1055.601}" kn="100000" ks="10000">
-					<bv _className_="AABB"  color="{0 1 0}" center="{10 100 10}" halfSize="{5.01 5.01 5.01}" />
+					<bv _className_="AABB" color="{0 1 0}" />
 					<cm _className_="Sphere"  diffuseColor="{0.5553977 0.1547238 0.532846}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<gm _className_="Sphere"  diffuseColor="{0.5553977 0.1547238 0.532846}" wire="0" visible="1" shadowCaster="1" radius="5.01" />
 					<actors size="1">
@@ -967,7 +968,7 @@
 					</actors>
 				</body>
 				<body _className_="SDECDiscreteElement"  id="65" isDynamic="0" velocity="{0 0 0}" angularVelocity="{0 0 0}" mass="108.1462" inertia="{1116.847 1116.847 1116.847}" kn="100000" ks="10000" se3="{50 21 10 1 0 0 0}" >
-					<bv _className_="AABB"  color="{0 1 0}" center="{50 21 10}" halfSize="{20 20 20}" />
+					<bv _className_="AABB" color="{0 1 0}" />
 					<cm _className_="Sphere"  diffuseColor="{0.532846 0.3857482 0.230996}"  wire="0" visible="1" shadowCaster="1" radius="20" />
 					<gm _className_="Sphere"  diffuseColor="{0.532846 0.3857482 0.230996}"  wire="0" visible="1" shadowCaster="1" radius="20" />
 					<actors size="0">
