@@ -78,7 +78,12 @@ bool Archive::containsOnlyFundamentals()
 		else if (recordType==SerializableTypes::POINTER)
 		{
 			shared_ptr<Archive> tmpAc;
-			return !createPointedArchive(*this,tmpAc);
+			if(createPointedArchive(*this,tmpAc))
+				return tmpAc->containsOnlyFundamentals();
+			else
+				return true;
+//			shared_ptr<Archive> tmpAc;
+//			return !createPointedArchive(*this,tmpAc);
 		}
 		else
 			return false;

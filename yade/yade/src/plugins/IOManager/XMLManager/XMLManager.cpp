@@ -313,18 +313,25 @@ void XMLManager::serializeSmartPointer(ostream& stream, Archive& ac , int depth)
 		if (type==SerializableTypes::SERIALIZABLE)
 		{
 			Serializable * s = any_cast<Serializable*>(tmpAc->getAddress());
-			stream << " className=\"" << s->getClassName() << "\" >" << endl;
-			writeOpeningTag(stream,*tmpAc,depth);
+			stream << " _className_=\"" << s->getClassName() << "\" ";//>" << endl;
+			//writeOpeningTag(stream,*tmpAc,depth);
 			tmpAc->serialize(stream,*tmpAc,depth+1);
-			writeClosingTag(stream,*tmpAc,depth);
+			//writeClosingTag(stream,*tmpAc,depth);
+			
+			
+//			Serializable * s = any_cast<Serializable*>(tmpAc->getAddress());
+//			stream << " className=\"" << s->getClassName() << "\" >" << endl;
+//			writeOpeningTag(stream,*tmpAc,depth);
+//			tmpAc->serialize(stream,*tmpAc,depth+1);
+//			writeClosingTag(stream,*tmpAc,depth);
 		}
 		else if (type==SerializableTypes::CUSTOM_CLASS)
 		{
 			shared_ptr<Serializable> s = dynamic_pointer_cast<Serializable>(ClassFactory::instance().createShared(tmpAc->getSerializableClassName()));
-			stream << " className=\"" << s->getClassName() << "\" >" << endl;
-			writeOpeningTag(stream,*tmpAc,depth);
+			stream << " _className_=\"" << s->getClassName() << "\" ";//>" << endl;
+//			writeOpeningTag(stream,*tmpAc,depth);
 			tmpAc->serialize(stream, *tmpAc, depth+1);
-			writeClosingTag(stream,*tmpAc,depth);
+//			writeClosingTag(stream,*tmpAc,depth);
 		}
 		else
 			tmpAc->serialize(stream,*tmpAc, depth);
@@ -342,16 +349,16 @@ void XMLManager::deserializeSmartPointer(istream& stream, Archive& ac, const str
 
 	if (basicAttributes.size()!=0)
 	{
-		string className = basicAttributes["className"];
+		string className = basicAttributes["_className_"];
 
-		saxParser.readAndParseNextXmlLine(stream);
+//		saxParser.readAndParseNextXmlLine(stream);
 
 		shared_ptr<Archive> tmpAc;
 		ac.createNewPointedArchive(ac,tmpAc,className);
 
 		tmpAc->deserialize(stream, *tmpAc,"");
 
-		saxParser.readAndParseNextXmlLine(stream);
+//		saxParser.readAndParseNextXmlLine(stream);
 	}
 
 	ac.markProcessed();
