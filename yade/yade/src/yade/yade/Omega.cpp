@@ -4,8 +4,11 @@
 #include "IOManager.hpp" // is this allowed? perhaps loadTheFile should be in pimpl of Omega ? (pointer to implementation)
 #include "NonConnexBody.hpp"
 
-#include <boost/filesystem/operations.hpp>
+#include <cstdlib>
 
+#include <boost/filesystem/operations.hpp> 
+#include <boost/filesystem/convenience.hpp>
+                             
 Omega::Omega ()
 {
 	cerr << "Constructing Omega  (if multiple times - check '-rdynamic' flag!)" << endl;
@@ -52,6 +55,60 @@ void Omega::init()
 	startingSimulationTime = second_clock::local_time();
 
 	*logFile << "<Simulation" << " Date =\"" << startingSimulationTime << "\">" << endl;
+	
+
+	// build dynlib information list
+	buildDynlibList();
+	
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+void Omega::buildDynlibList()
+{
+	char * buffer ;
+	buffer = getenv ("YADEBINPATH");
+	string yadeBinPath = buffer;
+	
+	filesystem::path directory(yadeBinPath+"/dynlib/linux");
+	if ( filesystem::exists( directory ) ) 
+	{	
+		filesystem::directory_iterator di( directory );
+		filesystem::directory_iterator diEnd;
+		for ( ; di != diEnd; ++di )
+		{
+			if (!filesystem::is_directory(*di) && !filesystem::symbolic_link_exists(*di))
+			{
+				filesystem::path name(filesystem::basename((*di)));
+				int prevLength = (*di).leaf().size();
+				int length = name.leaf().size();
+				while (length!=prevLength)
+				{
+					prevLength=length;
+					name = filesystem::path(filesystem::basename(name));
+					length = name.leaf().size();
+				}
+				cout << name.leaf() << endl;
+			}	
+		}
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+bool Omega::getDynlibType(const string& libName, string& type)
+{
+	map<string,string>::iterator it = dynlibsType.find(libName);
+	if (it!=dynlibsType.end())
+	{
+		type = (*it).second;
+		return true;
+	}
+	else
+		return false;
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -106,7 +163,7 @@ string Omega::getFileName()
 void Omega::loadTheFile()
 {
 
-	if( Omega::instance().getFileName().size() != 0  &&  boost::filesystem::exists(fileName) )
+	if( Omega::instance().getFileName().size() != 0  &&  filesystem::exists(fileName) )
 	{
 
 		IOManager::loadFromFile("XMLManager",fileName,"rootBody",Omega::instance().rootBody);

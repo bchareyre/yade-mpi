@@ -24,9 +24,9 @@ LIBS += -lMesh2D \
         -lMultiMethods \
         -rdynamic 
 INCLUDEPATH = $(YADEINCLUDEPATH) 
-MOC_DIR = $(YADEDYNLIBPATH) 
-UI_DIR = $(YADEDYNLIBPATH) 
-OBJECTS_DIR = $(YADEDYNLIBPATH) 
+MOC_DIR = $(YADECOMPILATIONPATH) 
+UI_DIR = $(YADECOMPILATIONPATH) 
+OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 QMAKE_LIBDIR = ../../../plugins/GeometricalModel/Mesh2D/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../../plugins/BroadCollider/SAPCollider/$(YADEDYNLIBPATH) \

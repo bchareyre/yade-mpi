@@ -27,7 +27,6 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <sstream>
-#include <qlabel.h>
 #include <qpushbutton.h>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -38,12 +37,12 @@ QtGUIGenerator::QtGUIGenerator () : XMLManager(), QtGUISignalCatcher()
 
 	resizeHeight = true;
 	resizeWidth  = true;
+	showButtons  = true;
+		
 	translationX = 0;
 	translationY = 0;
 	shiftX       = 0;
 	shiftY       = 0;
-	showButtons  = true;
-	
 	buttonWidth  = 70;
 	buttonHeight = 30;
 }
@@ -59,96 +58,120 @@ QtGUIGenerator::~QtGUIGenerator()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+void QtGUIGenerator::addButtons(QWidget * widget)
+{		
+	QPushButton *ok    = new QPushButton( widget, "OK");
+	QPushButton *apply = new QPushButton( widget, "APPLY");
+	QPushButton *cancel = new QPushButton( widget, "CANCEL");
+	
+	int nbFundamentals = descriptors.size();
+		
+	ok->setGeometry( QRect( (widgetWidth-3*buttonWidth-2*5)/2, (20+5)*nbFundamentals+40, buttonWidth, buttonHeight ) );
+	cancel->setGeometry( QRect( (widgetWidth-3*buttonWidth-2*5)/2+buttonWidth+5, (20+5)*nbFundamentals+40, buttonWidth, buttonHeight ) );
+	apply->setGeometry( QRect( (widgetWidth-3*buttonWidth-2*5)/2+(buttonWidth+5)*2, (20+5)*nbFundamentals+40, buttonWidth, buttonHeight ) );
+
+	ok->setText("OK");
+	apply->setText("Apply");
+	cancel->setText("Cancel");
+	
+	connect( ok, SIGNAL( clicked() ), this, SLOT( pushButtonOkClicked() ) );
+	connect( apply, SIGNAL( clicked() ), this, SLOT( pushButtonApplyClicked() ) );
+	connect( cancel, SIGNAL( clicked() ), this, SLOT( pushButtonCancelClicked() ) );
+	
+	widgetHeight += 10+buttonHeight;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+void QtGUIGenerator::reArrange(QWidget * widget)
+{	
+	
+	if (resizeWidth)
+		widgetWidth = 400;
+	else
+		widgetWidth = widget->size().width();
+
+	int maxLabelLength = 0;
+	for(unsigned int i=0;i<descriptors.size();i++)
+	{
+		descriptors[i]->label->adjustSize();
+		int length = descriptors[i]->label->size().width();
+		if (length>maxLabelLength)
+			maxLabelLength = length;
+	}
+	
+	for(unsigned int i=0;i<descriptors.size();i++)
+	{
+		descriptors[i]->label->setGeometry( QRect( shiftX, shiftY+(20+5)*i, maxLabelLength, 20 ) );
+		descriptors[i]->label->setIndent(Qt::AlignRight);
+		
+		unsigned int nbStrings = descriptors[i]->strings.size();
+		unsigned int leWidth = (widgetWidth-maxLabelLength-shiftX-10-10-(nbStrings-1)*5)/nbStrings;	
+		for(unsigned int j=0;j<nbStrings;j++)
+			descriptors[i]->lineEdits[j]->setGeometry( QRect( shiftX+maxLabelLength+10+(leWidth+5)*j, shiftY+(20+5)*i, leWidth, 20 ) );
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 void QtGUIGenerator::buildGUI(shared_ptr<Serializable> s,  QWidget * widget)
 {
 
 	serializable = s;
 
 	serializable->registerAttributes();
-	widget->setCaption(serializable->getClassName().c_str());
+
 	Serializable::Archives archives = serializable->getArchives();
+
 	Serializable::Archives::iterator ai    = archives.begin();
 	Serializable::Archives::iterator aiEnd = archives.end();
-	int nbLines=0;
 	for( ; ai!=aiEnd ; ++ai)
 	{
 		if ((*ai)->isFundamental())
 		{
-			QLabel *label = new QLabel( widget, (*ai)->getName().c_str() );
-			label->setText((*ai)->getName().c_str());
-			label->setGeometry( QRect( shiftX, shiftY+(20+5)*nbLines, 150, 20 ) );
-
-			stringstream stream;
-			(*ai)->serialize(stream,*(*ai),0);
-			vector<string> tokens;
-			IOManager::parseFundamental(stream.str(), tokens);
-			if (tokens.size()==0) // FIXME : parseFundamental is not working if the string contain only 1 value
-				tokens.push_back(stream.str());
-				
 			shared_ptr<AttributeDescriptor> descriptor(new AttributeDescriptor);
 			
 			descriptor->name = (*ai)->getName();
-			descriptor->lineEdits.clear();
 			
-			unsigned int nbElements = tokens.size();
+			stringstream stream;
+			(*ai)->serialize(stream,*(*ai),0);
+			IOManager::parseFundamental(stream.str(), descriptor->strings);
+				
+			descriptor->label = new QLabel( widget);
+			descriptor->label->setText(descriptor->name);
 			
-			for(unsigned int i=0;i<nbElements;i++)
+			unsigned int nbStrings = descriptor->strings.size();
+			for(unsigned int i=0;i<nbStrings;i++)
 			{
-				QLineEdit* le = new QLineEdit(widget, (*ai)->getName().c_str());
-				le->setText(tokens[i]);
+				QLineEdit* le = new QLineEdit(widget);
+				le->setText(descriptor->strings[i]);
 				descriptor->lineEdits.push_back(le);
 			}
-			
-			unsigned int size = (100-(nbElements-1)*5)/nbElements;
-			for(unsigned int i=0;i<nbElements;i++)
-			{
-				descriptor->lineEdits[i]->setGeometry( QRect( shiftX+150+(size+5)*i, shiftY+(20+5)*nbLines, size, 20 ) );
-			}
-			
+		
 			// not possible to store descriptor into a map or set ?????!!!
 			descriptors.push_back(descriptor);
 			lookUp[descriptor->name] = descriptors.size()-1;
-			
-			nbLines++;
 		}
 	}
 
+	reArrange(widget);
 	
-	int width;
-	if (resizeWidth)
-		width = 260+20;
-	else
-		width = widget->size().width();
-
+	widgetHeight = descriptors.size()*(20+5)+40;
+	
 	if (showButtons)
-	{		
-		QPushButton *ok    = new QPushButton( widget, "OK");
-		QPushButton *apply = new QPushButton( widget, "APPLY");
-		QPushButton *cancel = new QPushButton( widget, "CANCEL");
-		ok->setGeometry( QRect( (width-3*buttonWidth-2*5)/2, (20+5)*nbLines+40, buttonWidth, buttonHeight ) );
-		cancel->setGeometry( QRect( (width-3*buttonWidth-2*5)/2+buttonWidth+5, (20+5)*nbLines+40, buttonWidth, buttonHeight ) );
-		apply->setGeometry( QRect( (width-3*buttonWidth-2*5)/2+(buttonWidth+5)*2, (20+5)*nbLines+40, buttonWidth, buttonHeight ) );
-		ok->setText("OK");
-		apply->setText("Apply");
-		cancel->setText("Cancel");
-		connect( ok, SIGNAL( clicked() ), this, SLOT( pushButtonOkClicked() ) );
-		connect( apply, SIGNAL( clicked() ), this, SLOT( pushButtonApplyClicked() ) );
-		connect( cancel, SIGNAL( clicked() ), this, SLOT( pushButtonCancelClicked() ) );
-	}
+		addButtons(widget);
 	
-	QSize newSize = widget->size();
+	QSize newSize;
 	
-	if (resizeWidth)
-		newSize.setWidth(width);
-	if (resizeHeight)
-		if (showButtons)
-			newSize.setHeight(nbLines*(20+5)+50+buttonHeight);
-		else
-			newSize.setHeight(nbLines*(20+5)+40);
+	newSize.setWidth(widgetWidth);
+	newSize.setHeight(widgetHeight);
 	
 	widget->resize(newSize);
 	widget->setMinimumSize(newSize);
 	widget->setMaximumSize(newSize);
+	
 	widget->setEnabled(true);
 	
 	QPoint p = widget->pos();
@@ -187,7 +210,6 @@ void QtGUIGenerator::deserialize(shared_ptr<Serializable> s)
 				str[str.size()-1]='}';
 				
 			}
-			//cout << str << endl;
 			stringstream voidStream;
 		
 			(*ai)->deserialize(voidStream,*(*ai),str);

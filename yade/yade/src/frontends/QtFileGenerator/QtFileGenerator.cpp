@@ -39,7 +39,8 @@
 
 QtFileGenerator::QtFileGenerator ( QWidget * parent , const char * name , WFlags f ) : QtFileGeneratorController(parent,name,f)
 {
-
+	setMinimumSize(size());
+	setMaximumSize(size());
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -85,13 +86,15 @@ void QtFileGenerator::pbLoadClicked()
 			gbGeneratorParameter = new QGroupBox(this);
 			gbGeneratorParameter->resize(s.width(),s.height());
 			gbGeneratorParameter->move(p.x(),p.y()); 
-			gbGeneratorParameter->setTitle("Generator Parameters"); 
+			gbGeneratorParameter->setTitle(fg->getClassName()+" Parameters"); 
 			
 			guiGen.buildGUI(fg,gbGeneratorParameter);
 			
 			gbGeneratorParameter->show();
 			s = gbGeneratorParameter->size();
 			p = gbGeneratorParameter->pos();
+			setMinimumSize(size().width(),s.height()+p.y()+50);
+			setMaximumSize(size().width(),s.height()+p.y()+50);
 			resize(size().width(),s.height()+p.y()+50);
 			pbGenerate->move(pbGenerate->pos().x(),s.height()+p.y()+10);
 			pbClose->move(pbClose->pos().x(),s.height()+p.y()+10);
@@ -117,6 +120,8 @@ void QtFileGenerator::pbGenerateClicked()
 	guiGen.deserialize(fg);
 	
 	fg->generate();
+	
+	
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

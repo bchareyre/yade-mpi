@@ -127,7 +127,7 @@ void YadeQtMainWindow::dynamicMenuClicked()
 	shared_ptr<QWidget> widget = dynamic_pointer_cast<QWidget>(qtWidgets.back());
 	if (widget) // the library is a QWidget so we set workspace as its parent
 	{
-		widget->reparent(workspace,QPoint(300,300));
+		widget->reparent(workspace,QPoint(10,10));
 		widget->show();
 	}
 }

@@ -93,6 +93,10 @@ void IOManager::parseFundamental(const string& top, vector<string>& eval)
 	rule<> everything = array | fundamental;
 
 	parse(top.c_str(),everything);
+	
+	//FIXME : modified by Olivier because if top contains only one string then eval is empty!
+	if (eval.size()==0)
+		eval.push_back(top);
 }
 
 

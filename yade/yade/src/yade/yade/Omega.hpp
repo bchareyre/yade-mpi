@@ -35,19 +35,15 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "Vector3.hpp"
-//#include "Chrono.hpp"
 #include <iostream>
 #include <fstream>
 #include <boost/shared_ptr.hpp>
 #include "Singleton.hpp"
-//#include "NonConnexBody.hpp"
-//#include "CollisionFunctor.hpp"
-//class CollisionFunctor;
-//template<typename Type>
-//struct Vector3; // FIXME - this is acceptable, but should be removed.
-//class Chrono;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 class NonConnexBody;
-//#include "MultiMethodsManager.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -61,6 +57,10 @@ using namespace std;
 
 class Omega : public Singleton<Omega>
 {
+	public : map<string,string> dynlibsType;
+	
+	public : bool getDynlibType(const string& libName,string& type);
+	
 	public : shared_ptr<ofstream> logFile;
 
 // FIXME - this must be a pimpl, or removed somewhere else. (circular dependency loop : 4 hours lost to find it, janek)
@@ -71,6 +71,9 @@ class Omega : public Singleton<Omega>
 
 	public : shared_ptr<NonConnexBody> rootBody;
 	public : ptime startingSimulationTime;
+
+	private : void buildDynlibList();
+	
 
 	public	: float 	dt;
 	public	: void 		setTimestep(const string);
@@ -98,9 +101,9 @@ class Omega : public Singleton<Omega>
 	public  : void		setProgress(bool);
 	public  : bool		getProgress();
 
-	//public : MultiMethodsManager<CollisionFunctor> narrowCollider;
-	//public : MultiMethodsManager narrowCollider;
-
+	
+	
+	
 	public : void init();
 	private   : Omega() ;
 	private   : ~Omega() ;

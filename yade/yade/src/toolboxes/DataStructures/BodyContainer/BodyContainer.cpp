@@ -3,38 +3,38 @@
 
 void BodyContainer::registerAttributes()
 {
-	REGISTER_ATTRIBUTE(bodyContainer);
+	REGISTER_ATTRIBUTE(bodies);
 };
 
 void BodyContainer::beforeSerialization()
 {
-	bodyContainer.clear();
+	bodies.clear();
 	shared_ptr<Body> tmp;
 	for( tmp=this->getFirst() ; this->hasCurrent() ; tmp=this->getNext() )
-		bodyContainer.push_back(tmp);
-	// now bodyContainer is full of bodyContainer
+		bodies.push_back(tmp);
+	// now bodies is full of bodies
 };
 
 void BodyContainer::afterSerialization()
 {
-	bodyContainer.clear();
+	bodies.clear();
 	// not anymore.
 };
 
 void BodyContainer::beforeDeserialization()
 {
-	// make sure that bodyContainer is ready for deserialization
-	bodyContainer.clear();
+	// make sure that bodies is ready for deserialization
+	bodies.clear();
 };
 
 void BodyContainer::afterDeserialization()
 {
-	// copy bodyContainer into real container
+	// copy bodies into real container
 	this->clear();
-	vector<shared_ptr<Body> >::iterator it    = bodyContainer.begin();
-	vector<shared_ptr<Body> >::iterator itEnd = bodyContainer.end();
+	vector<shared_ptr<Body> >::iterator it    = bodies.begin();
+	vector<shared_ptr<Body> >::iterator itEnd = bodies.end();
 	for( ; it != itEnd ; ++it)
 		this->insert(*it);
-	bodyContainer.clear();
+	bodies.clear();
 };
 

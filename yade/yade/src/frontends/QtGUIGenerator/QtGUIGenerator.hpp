@@ -39,6 +39,7 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 #include <qobject.h>
+#include <qlabel.h>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -56,15 +57,16 @@ using namespace boost;
 class QtGUIGenerator : public XMLManager,  public QtGUISignalCatcher
 {
 
-	
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Attributes											///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	class AttributeDescriptor
 	{
+		public : AttributeDescriptor() { strings.clear();lineEdits.clear();};
 		public : string name;
+		public : vector<string> strings;
+		public : QLabel* label;
 		public : vector<QLineEdit*> lineEdits;
 	};
 	
@@ -87,6 +89,8 @@ class QtGUIGenerator : public XMLManager,  public QtGUISignalCatcher
 	
 	private : int buttonWidth;
 	private : int buttonHeight;
+	private : int widgetWidth;
+	private : int widgetHeight;
 	
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Constructor/Destructor									///
@@ -104,6 +108,9 @@ class QtGUIGenerator : public XMLManager,  public QtGUISignalCatcher
 
 	public : void buildGUI(shared_ptr<Serializable> s, QWidget * widget);
 	public : void deserialize(shared_ptr<Serializable> s);
+	
+	private : void reArrange(QWidget * widget);
+	private : void addButtons(QWidget * widget);
 	
 	public slots : virtual void pushButtonOkClicked() ;
 	public slots : virtual void pushButtonApplyClicked() ;

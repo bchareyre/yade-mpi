@@ -104,7 +104,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>preprocessors/FileGenerator/RotatingBox</activedir>
+      <activedir></activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>
