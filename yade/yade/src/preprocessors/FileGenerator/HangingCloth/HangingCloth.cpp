@@ -9,10 +9,10 @@
 #include "SimpleSpringDynamicEngine.hpp"
 #include "BallisticDynamicEngine.hpp"
 #include "SAPCollider.hpp"
-//#include "Rotor.hpp"
 #include "SimpleNarrowCollider.hpp"
 #include "Cloth.hpp"
 #include "ExplicitMassSpringDynamicEngine.hpp"
+#include "Cloth2RigidBodyDynamicEngine.hpp"
 #include <fstream>
 #include "IOManager.hpp"
 
@@ -42,10 +42,11 @@ void HangingCloth::exec()
 	float mass = 10;
 	const int cellSize = 20;
 	Quaternion q;
-	int nbSpheres = 1;
+	int nbSpheres = 10;
 	q.fromAngleAxis(0, Vector3(0,0,1));
 	
 	//rootBody->dynamic	   = shared_ptr<DynamicEngine>(new SimpleSpringDynamicEngine);
+	rootBody->dynamic	   = shared_ptr<DynamicEngine>(new Cloth2RigidBodyDynamicEngine);
 	//rootBody->kinematic	   = shared_ptr<KinematicEngine>(new Rotor);
 	rootBody->broadCollider	   = shared_ptr<BroadPhaseCollider>(new SAPCollider);
 	rootBody->narrowCollider   = shared_ptr<NarrowPhaseCollider>(new SimpleNarrowCollider);
@@ -135,16 +136,17 @@ void HangingCloth::exec()
 	{
 		shared_ptr<RigidBody> s(new RigidBody);
 		shared_ptr<AABB> aabb(new AABB);
-		shared_ptr<Sphere> sphere(new Sphere);
+		shared_ptr<Sphere> csphere(new Sphere);
+		shared_ptr<Sphere> gsphere(new Sphere);
 		
 		Vector3 translation(100*Rand::symmetricRandom(),10+100*Rand::unitRandom(),100*Rand::symmetricRandom());
-		float radius = (4+10*Rand::symmetricRandom());
+		float radius = 0.5*(20+10*Rand::unitRandom());
 
 		s->dynamic		= shared_ptr<DynamicEngine>(new BallisticDynamicEngine);;
 		s->isDynamic		= true;
 		s->angularVelocity	= Vector3(0,0,0);
 		s->velocity		= Vector3(0,0,0);
-		s->mass			= 1;
+		s->mass			= 0.3;
 		s->inertia		= Vector3(1,1,1);
 		s->se3			= Se3(translation,q);
 
@@ -153,12 +155,18 @@ void HangingCloth::exec()
 		aabb->halfSize		= Vector3(radius,radius,radius);
 		s->bv			= dynamic_pointer_cast<BoundingVolume>(aabb);
 
-		sphere->radius		= radius;
-		sphere->diffuseColor	= Vector3(Rand::unitRandom(),Rand::unitRandom(),Rand::unitRandom());
-		sphere->wire		= false;
-		sphere->visible		= true;
-		s->cm			= dynamic_pointer_cast<CollisionModel>(sphere);
-		s->gm			= dynamic_pointer_cast<GeometricalModel>(sphere);
+		csphere->radius		= radius*1.1;
+		csphere->diffuseColor	= Vector3(Rand::unitRandom(),Rand::unitRandom(),Rand::unitRandom());
+		csphere->wire		= false;
+		csphere->visible	= true;
+
+		gsphere->radius		= radius;
+		gsphere->diffuseColor	= Vector3(Rand::unitRandom(),Rand::unitRandom(),Rand::unitRandom());
+		gsphere->wire		= false;
+		gsphere->visible	= true;
+		
+		s->cm			= dynamic_pointer_cast<CollisionModel>(csphere);
+		s->gm			= dynamic_pointer_cast<GeometricalModel>(gsphere);
 
 		rootBody->bodies.push_back(dynamic_pointer_cast<Body>(s));
 	}

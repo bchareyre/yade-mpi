@@ -34,7 +34,7 @@ void SimpleSpringDynamicEngine::respondToCollisions(Body * body, const std::list
 	vector<shared_ptr<Body> >& bodies = ncb->bodies;
 	
 	float stiffness = 100;
-	float damping = 1.02;
+	//float damping = 1.02;
 	Vector3 gravity = Omega::instance().gravity;
 	if (first)
 	{
@@ -43,16 +43,8 @@ void SimpleSpringDynamicEngine::respondToCollisions(Body * body, const std::list
 		prevVelocities.resize(bodies.size());
 	}
 	
-	std::vector<Vector3>::iterator fi = forces.begin();
-	std::vector<Vector3>::iterator fiEnd = forces.end();
-	std::vector<Vector3>::iterator ci = couples.begin();
-	std::vector<shared_ptr<Body> >::iterator bi = bodies.begin();
-	for( ; fi!=fiEnd; ++fi, ++ci, ++bi)
-	{
-		shared_ptr<RigidBody>  rb = dynamic_pointer_cast<RigidBody>(*bi);
-		(*fi) = (gravity - rb->velocity*damping)*rb->mass;
-		(*ci) = -(rb->angularVelocity*damping).multTerm(rb->inertia);
-	}
+	fill(forces.begin(),forces.end(),Vector3(0,0,0));
+	fill(couples.begin(),couples.end(),Vector3(0,0,0));
 	
 	std::list<shared_ptr<Interaction> >::const_iterator cti = interactions.begin();
 	std::list<shared_ptr<Interaction> >::const_iterator ctiEnd = interactions.end();
@@ -65,7 +57,7 @@ void SimpleSpringDynamicEngine::respondToCollisions(Body * body, const std::list
 		for( ; cpi!=cpiEnd ; ++cpi)
 		{	
 			Vector3 f = (*cpi).first-(*cpi).second;
-
+			
 			f *= stiffness/(float)((dynamic_pointer_cast<ClosestFeatures>(contact->interactionModel))->closestsPoints.size());
 			
 			Vector3 p = 0.5*((*cpi).first+(*cpi).second);
@@ -89,43 +81,10 @@ void SimpleSpringDynamicEngine::respondToCollisions(Body * body, const std::list
         {
 		shared_ptr<RigidBody> rb = dynamic_pointer_cast<RigidBody>(bodies[i]);
 
-		//if (rb->isDynamic)
-		//{
-			rb->acceleration = forces[i]*rb->invMass;
-
-		//	if (!first)
-		//		rb->velocity = prevVelocities[i]+0.5*dt*acc;
-
-		//	prevVelocities[i] = rb->velocity+0.5*dt*acc;
-		//	rb->se3.translation += prevVelocities[i]*dt;
-
-		//	rb->updateBoundingVolume(rb->se3);
-		//}
+		if (rb)
+			rb->acceleration += forces[i]*rb->invMass;
         }
+	
 	first = false;
-
-// 	for(unsigned int i=0; i < bodies.size(); i++)
-//         {
-// 		shared_ptr<RigidBody> rb = dynamic_pointer_cast<RigidBody>(bodies[i]);
-//
-// 		if (rb->isDynamic)
-// 		{
-// 			Vector3 acc = forces[i]*rb->invMass;
-// 		s	Vector3 mom = couples[i].multTerm(rb->invInertia);
-//
-// 			rb->velocity += dt*acc;
-// 			rb->se3.translation += dt*rb->velocity;
-//
-// 			rb->angularVelocity += dt*mom;
-// 			Vector3 axis = rb->angularVelocity;
-// 			float angle = axis.unitize();
-// 			Quaternion q;
-// 			q.fromAngleAxis(angle*dt,axis);
-// 			rb->se3.rotation = rb->se3.rotation*q;
-// 			rb->se3.rotation.normalize();
-//
-// 			rb->updateBoundingVolume(rb->se3);
-// 		}
-//         }
 }
 

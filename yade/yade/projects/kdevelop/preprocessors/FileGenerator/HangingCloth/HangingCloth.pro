@@ -18,8 +18,10 @@ LIBS += -lMesh2D \
         -lRigidBody \
         -lBallisticDynamicEngine \
         -lSimpleSpringDynamicEngine \
+        -lCloth2RigidBodyDynamicEngine \
         -rdynamic 
-INCLUDEPATH = ../../../plugins/DynamicEngine/BallisticDynamicEngine \
+INCLUDEPATH = ../../../plugins/DynamicEngine/Cloth2RigidBodyDynamicEngine \
+              ../../../plugins/DynamicEngine/BallisticDynamicEngine \
               ../../../plugins/DynamicEngine/ExplicitMassSpringDynamicEngine \
               ../../../plugins/DynamicEngine/SimpleSpringDynamicEngine \
               ../../../plugins/BroadPhaseCollider/SAPCollider \
@@ -53,6 +55,7 @@ QMAKE_LIBDIR = ../../../plugins/GeometricalModel/Mesh2D/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/RigidBody/$(YADEDYNLIBPATH) \
                ../../../plugins/DynamicEngine/BallisticDynamicEngine/$(YADEDYNLIBPATH) \
                ../../../plugins/DynamicEngine/SimpleSpringDynamicEngine/$(YADEDYNLIBPATH) \
+               ../../../plugins/DynamicEngine/Cloth2RigidBodyDynamicEngine/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
 CONFIG += debug \

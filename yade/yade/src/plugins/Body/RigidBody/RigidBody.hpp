@@ -10,7 +10,7 @@ class RigidBody : public ConnexBody
 	public : Vector3 invInertia;
 	public : Vector3 inertia;
 	public : Vector3 acceleration;
-	
+	public : Vector3 prevAcceleration;
 	// construction
 	public : RigidBody ();
 	public : ~RigidBody ();
@@ -32,3 +32,4 @@ REGISTER_CLASS(RigidBody,false);
 //REGISTER_CLASS_TO_MULTI_METHODS_MANAGER(RigidBody);
 
 #endif // __RIGIDBODY_H__
+

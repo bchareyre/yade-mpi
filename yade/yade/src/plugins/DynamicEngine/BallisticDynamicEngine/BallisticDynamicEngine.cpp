@@ -32,7 +32,7 @@ void BallisticDynamicEngine::respondToCollisions(Body * body, const std::list<sh
 	rb->acceleration += Omega::instance().gravity;
 		
 	if (!first)
-		rb->velocity = prevVelocity+0.5*dt*rb->acceleration;
+		rb->velocity = 0.99*(prevVelocity+0.5*dt*rb->acceleration);
 
 	prevVelocity = rb->velocity+0.5*dt*rb->acceleration;
 	rb->se3.translation += prevVelocity*dt;

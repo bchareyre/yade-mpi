@@ -8,7 +8,7 @@
 class NodeProperties : public Serializable
 {
 	public : float invMass;
-	public : Vector3 velocity;
+	public : Vector3 velocity; 	
 	
 	public : NodeProperties() {};
 	public : NodeProperties(float im) : invMass(im), velocity(Vector3(0,0,0)) {};
@@ -28,6 +28,7 @@ class Cloth : public ConnexBody
 	public : float damping;
  	public : vector<NodeProperties> properties;
 	public : vector<float> initialLengths;
+	public : vector<pair<int,Vector3> > externalForces;
 	
 	// construction
 	public : Cloth ();

@@ -204,13 +204,16 @@ void RotatingBox::exec()
  	rootBody->bodies.push_back(dynamic_pointer_cast<Body>(box6));
  	rootBody->bodies.push_back(dynamic_pointer_cast<Body>(box7));
 
-	for(int i=0;i<nbSpheres;i++)
+	for(int i=0;i<10;i++)
+		for(int j=0;j<10;j++)
+			for(int k=0;k<10;k++)
 	{
 		shared_ptr<RigidBody> s(new RigidBody);
 		shared_ptr<AABB> aabb(new AABB);
 		shared_ptr<Sphere> sphere(new Sphere);
 		
-		Vector3 translation(40*Rand::symmetricRandom(),40*Rand::symmetricRandom(),40*Rand::symmetricRandom());
+		Vector3 translation;
+		translation = Vector3(i,j,k)*10-Vector3(45,45,45)+Vector3(Rand::symmetricRandom(),Rand::symmetricRandom(),Rand::symmetricRandom());
 		float radius = (4+Rand::symmetricRandom());
 		
 		s->dynamic		= shared_ptr<DynamicEngine>(new BallisticDynamicEngine);;

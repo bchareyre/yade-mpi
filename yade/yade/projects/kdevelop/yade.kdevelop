@@ -104,7 +104,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>plugins/CollisionModel</activedir>
+      <activedir>yade</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>

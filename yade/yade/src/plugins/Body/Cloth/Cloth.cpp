@@ -36,7 +36,7 @@ void Cloth::registerAttributes()
 }
 
 
-void Cloth::updateBoundingVolume(Se3& se3)
+void Cloth::updateBoundingVolume(Se3& )
 {
 	Vector3 max = Vector3(-Constants::MAX_FLOAT,-Constants::MAX_FLOAT,-Constants::MAX_FLOAT);
 	Vector3 min = Vector3(Constants::MAX_FLOAT,Constants::MAX_FLOAT,Constants::MAX_FLOAT);
@@ -44,7 +44,7 @@ void Cloth::updateBoundingVolume(Se3& se3)
 	shared_ptr<Mesh2D> mesh = dynamic_pointer_cast<Mesh2D>(gm);
 	vector<Vector3>& vertices = mesh->vertices;
 	
-	for(int i=0;i<vertices.size();i++)
+	for(unsigned int i=0;i<vertices.size();i++)
 	{
 		max = max.maxTerm(vertices[i]);
 		min = min.minTerm(vertices[i]);

@@ -9,11 +9,13 @@ LIBS += -lMesh2D \
         -lConstants \
         -lSerialization \
         -lClosestFeatures \
+        -lDistances \
         -rdynamic 
 INCLUDEPATH = ../../../../plugins/GeometricalModel/Mesh2D \
               ../../../../plugins/GeometricalModel/Sphere \
               ../../../../plugins/InteractionModel/ClosestFeatures \
               ../../../../yade \
+              ../../../../toolboxes/ComputationalGeometry/Distances \
               ../../../../toolboxes/Math/M3D \
               ../../../../toolboxes/Math/Constants \
               ../../../../toolboxes/Libraries/Serialization 
@@ -26,6 +28,7 @@ QMAKE_LIBDIR = ../../../../plugins/GeometricalModel/Mesh2D/$(YADEDYNLIBPATH) \
                ../../../../toolboxes/Math/Constants/$(YADEDYNLIBPATH) \
                ../../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../../../plugins/InteractionModel/ClosestFeatures/$(YADEDYNLIBPATH) \
+               ../../../../toolboxes/ComputationalGeometry/Distances/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
 CONFIG += debug \

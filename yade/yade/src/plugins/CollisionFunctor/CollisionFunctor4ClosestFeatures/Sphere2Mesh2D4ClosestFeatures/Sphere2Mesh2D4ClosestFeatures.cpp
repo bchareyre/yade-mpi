@@ -25,6 +25,7 @@
 #include "Sphere.hpp"
 #include "Mesh2D.hpp"
 #include "ClosestFeatures.hpp"
+#include "Distances3D.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -57,27 +58,43 @@ bool Sphere2Mesh2D4ClosestFeatures::collide(const shared_ptr<CollisionModel> cm1
 	cf->closestsPoints.resize(0);
 
 	Vector3 center = se31.translation;
-
-	//cout << m->vertices.size() << endl;
 	
-	for(int i=0;i<m->vertices.size();i++)
+	/*for(int i=0;i<m->vertices.size();i++)
 	{
 		Vector3 v = m->vertices[i]-center;
 		float l = v.unitize();
 
-		//cout << i << " " << l << " " << s->radius << endl;
 		if (l<s->radius)
 		{
-			//cout << i << " " << l << " " << s->radius << endl;
-			cf->closestsPoints.push_back(std::pair<Vector3,Vector3>(m->vertices[i],center+v*s->radius));
+			cf->verticesId.push_back(i);
+			cf->closestsPoints.push_back(std::pair<Vector3,Vector3>(center+v*s->radius,m->vertices[i]));
+		}
+	}*/
+
+	std::vector<Vector3> tri;
+	tri.resize(3);
+	Vector3 pt;
+	
+	for(unsigned int i=0;i<m->faces.size();i++)
+	{
+		tri[0] = m->vertices[m->faces[i][0]];
+		tri[1] = m->vertices[m->faces[i][1]];
+		tri[2] = m->vertices[m->faces[i][2]];
+		float d = sqrDistTriPoint(center, tri, pt);
+				
+		if (d<s->radius*s->radius)
+		{
+			Vector3 v = pt-center;
+			v.unitize();
+			cf->closestsPoints.push_back(std::pair<Vector3,Vector3>(center+v*s->radius,pt));
+			cf->verticesId.push_back(i);
 		}
 	}
+	
 
 	if (cf->closestsPoints.size()>0)
 	{
-		//cout <<"______________" << cf->closestsPoints.size() << endl;
 		c->interactionModel = cf;
-		//cout << "collision!!!!!!!!!" << endl;
 		return true;
 	}
 	else

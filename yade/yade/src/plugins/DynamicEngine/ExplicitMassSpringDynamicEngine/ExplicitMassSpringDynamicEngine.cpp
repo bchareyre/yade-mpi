@@ -48,8 +48,13 @@ void ExplicitMassSpringDynamicEngine::respondToCollisions(Body * body, const std
 		for( ; pi!=piEnd ; ++pi,++pvi)
 			*pvi = (*pi).velocity;*/
 	}
-
+	
 	std::fill(forces.begin(),forces.end(),Vector3(0,0,0));
+	
+	vector<pair<int,Vector3> >::iterator efi    = cloth->externalForces.begin();
+	vector<pair<int,Vector3> >::iterator efiEnd = cloth->externalForces.end();
+	for(; efi!=efiEnd; ++efi)
+		forces[(*efi).first] += (*efi).second;
 	
 	vector<Edge>::iterator ei = edges.begin();
 	vector<Edge>::iterator eiEnd = edges.end();
@@ -76,7 +81,7 @@ void ExplicitMassSpringDynamicEngine::respondToCollisions(Body * body, const std
 			acc = Omega::instance().gravity + forces[i]*cloth->properties[i].invMass;
 					
 		if (!first)
-			cloth->properties[i].velocity = 0.999*(prevVelocities[i]+0.5*dt*acc);
+			cloth->properties[i].velocity = 0.997*(prevVelocities[i]+0.5*dt*acc); //0.995
 		
 		prevVelocities[i] = (cloth->properties[i].velocity+0.5*dt*acc);
 		
@@ -86,7 +91,7 @@ void ExplicitMassSpringDynamicEngine::respondToCollisions(Body * body, const std
 	// FIXME: where should we update bounding volume
 	body->updateBoundingVolume(body->se3);
 	first = false;
-	
 
+	cloth->externalForces.clear();
 }
 

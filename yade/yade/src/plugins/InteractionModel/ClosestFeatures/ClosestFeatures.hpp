@@ -10,7 +10,7 @@
 class ClosestFeatures : public InteractionModel
 {	
 	public : std::vector<std::pair<Vector3,Vector3> > closestsPoints;
-
+	public : std::vector<int> verticesId;
 	// construction
 	public : ClosestFeatures ();	
 	public : ~ClosestFeatures ();	

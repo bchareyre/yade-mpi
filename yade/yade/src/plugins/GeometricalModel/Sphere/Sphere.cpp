@@ -106,6 +106,12 @@ void Sphere::subdivideTriangle(Vector3& v1,Vector3& v2,Vector3& v3, int depth)
 
 void Sphere::drawSphere(int depth)
 {
+	/*glShadeModel(GL_SMOOTH);
+	GLfloat matSpecular[] = { 1.0,1.0,1.0,1.0};
+	GLfloat matShininess[] = { 50.0};
+	glMaterialfv(GL_FRONT,GL_SPECULAR,matSpecular);
+	glMaterialfv(GL_FRONT,GL_SHININESS,matShininess);*/
+	
 	for(int i=0;i<20;i++)
 		subdivideTriangle(vertices[(unsigned int)faces[i][0]],vertices[(unsigned int)faces[i][1]],vertices[(unsigned int)faces[i][2]],depth);
 }

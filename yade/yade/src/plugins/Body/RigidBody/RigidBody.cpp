@@ -2,6 +2,7 @@
 
 RigidBody::RigidBody () : ConnexBody()
 {
+	acceleration = Vector3(0,0,0);
 }
 
 
@@ -13,8 +14,8 @@ RigidBody::~RigidBody()
 void RigidBody::processAttributes()
 {
 	ConnexBody::processAttributes();
-	invMass = 1.0;
-	invInertia = Vector3(1,1,1);
+	invMass = 1.0/mass;
+	invInertia = Vector3(1/inertia[0],1/inertia[1],1/inertia[2]);
 }
 
 void RigidBody::registerAttributes()
@@ -35,7 +36,9 @@ void RigidBody::updateCollisionModel(Se3& )
 }
 
 void RigidBody::moveToNextTimeStep()
-{
-	acceleration = Vector3(0,0,0);
+{	
 	ConnexBody::moveToNextTimeStep();
+	prevAcceleration = acceleration;
+	acceleration = Vector3(0,0,0);
+	
 }

@@ -3,7 +3,7 @@
 Omega::Omega ()
 {
 	gravity = Vector3(0,-9.81,0);
-	dt = 0.01;
+	dt = 0.02;
 	logFile = shared_ptr<ofstream>(new ofstream("../data/log.xml", ofstream::out | ofstream::app));
 	startingSimulationTime = second_clock::local_time();
 	*logFile << "<Simulation" << " Date =\"" << startingSimulationTime << "\">" << endl;

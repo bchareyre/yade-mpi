@@ -65,6 +65,12 @@ void Mesh2D::glDraw()
 	}
 	else
 	{
+			glShadeModel(GL_SMOOTH);
+	GLfloat matSpecular[] = { 1.0,1.0,1.0,1.0};
+	GLfloat matShininess[] = { 50.0};
+	glMaterialfv(GL_FRONT,GL_SPECULAR,matSpecular);
+	glMaterialfv(GL_FRONT,GL_SHININESS,matShininess);
+
 		glEnable(GL_LIGHTING);
 		glDisable(GL_CULL_FACE);
 		computeNormals();
