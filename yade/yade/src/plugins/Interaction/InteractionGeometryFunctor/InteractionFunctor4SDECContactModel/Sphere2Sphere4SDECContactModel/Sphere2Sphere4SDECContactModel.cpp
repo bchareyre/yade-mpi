@@ -22,7 +22,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "Sphere2Sphere4SDECContactModel.hpp"
-#include "Sphere.hpp"
+#include "InteractionSphere.hpp"
 #include "SDECContactGeometry.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -34,8 +34,8 @@ bool Sphere2Sphere4SDECContactModel::go(	const shared_ptr<CollisionGeometry>& cm
 						const Se3r& se32,
 						shared_ptr<Interaction>& c)
 {
-	shared_ptr<Sphere> s1 = dynamic_pointer_cast<Sphere>(cm1);
-	shared_ptr<Sphere> s2 = dynamic_pointer_cast<Sphere>(cm2);
+	shared_ptr<InteractionSphere> s1 = dynamic_pointer_cast<InteractionSphere>(cm1);
+	shared_ptr<InteractionSphere> s2 = dynamic_pointer_cast<InteractionSphere>(cm2);
 
 	Vector3r normal = se32.translation-se31.translation;
 	Real penetrationDepth = s1->radius+s2->radius-normal.normalize();

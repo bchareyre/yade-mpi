@@ -8,8 +8,9 @@ LIBS += -lAABB \
         -lMath \
         -lGeometry \
         -lMultiMethods \
+        -lInteractionBox \
         -rdynamic 
-INCLUDEPATH = $(YADEINCLUDEPATH) 
+INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
@@ -18,6 +19,7 @@ QMAKE_LIBDIR = ../../../../plugins/Geometry/BoundingVolume/AABB/$(YADEDYNLIBPATH
                ../../../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
                ../../../../yade/Geometry/$(YADEDYNLIBPATH) \
                ../../../../toolboxes/Libraries/MultiMethods/$(YADEDYNLIBPATH) \
+               ../../../../plugins/Geometry/CollisionGeometry/InteractionBox/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

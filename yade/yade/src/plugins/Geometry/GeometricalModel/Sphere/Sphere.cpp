@@ -28,6 +28,7 @@
 Sphere::Sphere () : GeometricalModel()
 {
 	createIndex();
+	cout << "sphere " << getClassIndex() << endl;
 
 }
 

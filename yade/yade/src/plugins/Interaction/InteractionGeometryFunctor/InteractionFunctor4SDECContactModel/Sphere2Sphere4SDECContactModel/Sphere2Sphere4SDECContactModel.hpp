@@ -46,7 +46,7 @@ class Sphere2Sphere4SDECContactModel : public InteractionGeometryFunctor
 						const Se3r& se32,
 						shared_ptr<Interaction>& c);
 
-	DEFINE_FUNCTOR_ORDER_2D(Sphere,Sphere);
+	DEFINE_FUNCTOR_ORDER_2D(InteractionSphere,InteractionSphere);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

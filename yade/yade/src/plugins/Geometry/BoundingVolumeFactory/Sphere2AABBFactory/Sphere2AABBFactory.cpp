@@ -22,7 +22,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
  
 #include "Sphere2AABBFactory.hpp"
-#include "Sphere.hpp"
+#include "InteractionSphere.hpp"
 #include "AABB.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -32,7 +32,7 @@ void Sphere2AABBFactory::go(	const shared_ptr<CollisionGeometry>& cm,
 				shared_ptr<BoundingVolume>& bv,
 				const Se3r& se3	)
 {
-	shared_ptr<Sphere> sphere = dynamic_pointer_cast<Sphere>(cm);
+	shared_ptr<InteractionSphere> sphere = dynamic_pointer_cast<InteractionSphere>(cm);
 	
 	shared_ptr<AABB> aabb = dynamic_pointer_cast<AABB>(bv);
 	

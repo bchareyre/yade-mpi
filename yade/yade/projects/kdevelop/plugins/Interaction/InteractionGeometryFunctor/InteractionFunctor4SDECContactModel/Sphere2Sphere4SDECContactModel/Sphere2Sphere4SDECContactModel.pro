@@ -3,25 +3,25 @@
 # Subdir relative project main directory: ./plugins/Interaction/InteractionGeometryFunctor/InteractionFunctor4SDECContactModel/Sphere2Sphere4SDECContactModel
 # Target is a library:  
 
-LIBS += -lSphere \
-        -lSerialization \
+LIBS += -lSerialization \
         -lMath \
         -lGeometry \
         -lInteraction \
         -lMultiMethods \
         -lSDECContactGeometry \
+        -lInteractionSphere \
         -rdynamic 
-INCLUDEPATH = $(YADEINCLUDEPATH) 
+INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../../../plugins/Geometry/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
-               ../../../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
+QMAKE_LIBDIR = ../../../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../../../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
                ../../../../../yade/Geometry/$(YADEDYNLIBPATH) \
                ../../../../../yade/Interaction/$(YADEDYNLIBPATH) \
                ../../../../../toolboxes/Libraries/MultiMethods/$(YADEDYNLIBPATH) \
                ../../../../../plugins/Interaction/InteractionGeometry/SDECContactGeometry/$(YADEDYNLIBPATH) \
+               ../../../../../plugins/Geometry/CollisionGeometry/InteractionSphere/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

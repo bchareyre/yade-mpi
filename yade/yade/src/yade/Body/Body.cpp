@@ -76,10 +76,10 @@ void Body::registerAttributes()
 	REGISTER_ATTRIBUTE(id);
 	REGISTER_ATTRIBUTE(isDynamic); // FIXME : only used for collision : no collision between 2 non dynamic objects
 	//REGISTER_ATTRIBUTE(se3);
+	REGISTER_ATTRIBUTE(physicalParameters);
 	REGISTER_ATTRIBUTE(bv);
 	REGISTER_ATTRIBUTE(cm);
 	REGISTER_ATTRIBUTE(gm);
-	REGISTER_ATTRIBUTE(physicalParameters);
 	REGISTER_ATTRIBUTE(actors);
 // FIXME ? - must be registered or not? how about saving state during the simulation?
 	//REGISTER_ATTRIBUTE(interactions);

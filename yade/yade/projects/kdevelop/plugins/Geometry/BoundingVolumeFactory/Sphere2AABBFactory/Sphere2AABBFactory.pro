@@ -3,19 +3,19 @@
 # Subdir relative project main directory: ./plugins/Geometry/BoundingVolumeFactory/Sphere2AABBFactory
 # Target is a library:  
 
-LIBS += -lSphere \
-        -lAABB \
+LIBS += -lAABB \
         -lGeometry \
         -lMath \
+        -lInteractionSphere \
         -rdynamic 
-INCLUDEPATH = $(YADEINCLUDEPATH) 
+INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../../plugins/Geometry/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
-               ../../../../plugins/Geometry/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
+QMAKE_LIBDIR = ../../../../plugins/Geometry/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
                ../../../../yade/Geometry/$(YADEDYNLIBPATH) \
                ../../../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
+               ../../../../plugins/Geometry/CollisionGeometry/InteractionSphere/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

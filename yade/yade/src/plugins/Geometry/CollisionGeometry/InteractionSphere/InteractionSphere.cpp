@@ -25,6 +25,7 @@
 
 InteractionSphere::InteractionSphere () : CollisionGeometry()
 {
+	createIndex();
 }
 
 InteractionSphere::~InteractionSphere ()

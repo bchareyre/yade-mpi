@@ -22,7 +22,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
  
 #include "Box2AABBFactory.hpp"
-#include "Box.hpp"
+#include "InteractionBox.hpp"
 #include "AABB.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -32,7 +32,7 @@ void Box2AABBFactory::go(	const shared_ptr<CollisionGeometry>& cm,
 				shared_ptr<BoundingVolume>& bv,
 				const Se3r& se3	)
 {
-	shared_ptr<Box> box = dynamic_pointer_cast<Box>(cm);
+	shared_ptr<InteractionBox> box = dynamic_pointer_cast<InteractionBox>(cm);
 	
 	shared_ptr<AABB> aabb = dynamic_pointer_cast<AABB>(bv);
 	

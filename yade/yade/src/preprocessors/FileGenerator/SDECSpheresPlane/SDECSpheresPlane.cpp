@@ -64,15 +64,15 @@ string SDECSpheresPlane::generate()
 	q.fromAxisAngle( Vector3r(0,0,1),0);
 
 	shared_ptr<InteractionGeometryDispatcher> igd(new InteractionGeometryDispatcher);
-	igd->addInteractionGeometryFunctor("Sphere","Sphere","Sphere2Sphere4SDECContactModel");
-	igd->addInteractionGeometryFunctor("Sphere","Box","Box2Sphere4SDECContactModel");
+	igd->addInteractionGeometryFunctor("InteractionSphere","InteractionSphere","Sphere2Sphere4SDECContactModel");
+	igd->addInteractionGeometryFunctor("InteractionSphere","InteractionBox","Box2Sphere4SDECContactModel");
 
 	shared_ptr<InteractionPhysicsDispatcher> ipd(new InteractionPhysicsDispatcher);
 	ipd->addInteractionPhysicsFunctor("SDECDiscreteElement","SDECDiscreteElement","SDECLinearContactModel");
 		
 	shared_ptr<BoundingVolumeUpdator> bvu	= shared_ptr<BoundingVolumeUpdator>(new BoundingVolumeUpdator);
-	bvu->addBVFactories("Sphere","AABB","Sphere2AABBFactory");
-	bvu->addBVFactories("Box","AABB","Box2AABBFactory");
+	bvu->addBVFactories("InteractionSphere","AABB","Sphere2AABBFactory");
+	bvu->addBVFactories("InteractionBox","AABB","Box2AABBFactory");
 	bvu->addBVFactories("CollisionGeometrySet","AABB","CollisionGeometrySet2AABBFactory");
 	
 	shared_ptr<ActionDispatcher> ad(new ActionDispatcher);
@@ -87,6 +87,8 @@ string SDECSpheresPlane::generate()
 	rootBody->actors[4] 		= shared_ptr<Actor>(new SDECDynamicEngine);
 	rootBody->actors[5] 		= ad;
 
+	//FIXME : use a default one
+	rootBody->physicalParameters = shared_ptr<BodyPhysicalParameters>(new SDECDiscreteElement);
 	rootBody->permanentInteractions->clear();
 //	rootBody->permanentInteractions[0] = shared_ptr<Interaction>(new Interaction);
 //	rootBody->permanentInteractions[0]->interactionGeometry = shared_ptr<SDECPermanentLink>(new SDECPermanentLink);
@@ -140,7 +142,8 @@ string SDECSpheresPlane::generate()
 	physics->kn		= kn;
 	physics->ks		= ks;
 
-
+	box1->physicalParameters = physics;
+	
 	shared_ptr<Body> b;
 	b = dynamic_pointer_cast<Body>(box1);
 	rootBody->bodies->insert(b);
@@ -188,8 +191,9 @@ string SDECSpheresPlane::generate()
 		simple->gm			= dynamic_pointer_cast<GeometricalModel>(sphere);
 		s->kn			= kn;
 		s->ks			= ks;
-
-		b = dynamic_pointer_cast<Body>(s);
+		simple->physicalParameters = s;
+		
+		b = dynamic_pointer_cast<Body>(simple);
 		rootBody->bodies->insert(b);
 	}
 	

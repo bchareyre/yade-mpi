@@ -22,8 +22,8 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "Box2Sphere4SDECContactModel.hpp"
-#include "Sphere.hpp"
-#include "Box.hpp"
+#include "InteractionSphere.hpp"
+#include "InteractionBox.hpp"
 #include "SDECContactGeometry.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -45,8 +45,8 @@ bool Box2Sphere4SDECContactModel::go(		const shared_ptr<CollisionGeometry>& cm1,
 	Matrix3r axisT,axis;
 	Real depth;
 
-	shared_ptr<Sphere> s = dynamic_pointer_cast<Sphere>(cm2);
-	shared_ptr<Box> obb = dynamic_pointer_cast<Box>(cm1);
+	shared_ptr<InteractionSphere> s = dynamic_pointer_cast<InteractionSphere>(cm2);
+	shared_ptr<InteractionBox> obb = dynamic_pointer_cast<InteractionBox>(cm1);
 	
 	Vector3r extents = obb->extents;
 

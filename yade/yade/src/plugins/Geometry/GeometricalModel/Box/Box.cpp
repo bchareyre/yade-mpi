@@ -29,6 +29,7 @@
 Box::Box () : GeometricalModel()
 {		
 	createIndex();
+	cout << "box " << getClassIndex() << endl;
 }
 
 Box::~Box ()
