@@ -31,6 +31,10 @@ QMAKE_LIBDIR = ../../../../yade/Body/$(YADEDYNLIBPATH) \
                ../../../../plugins/GeometricalModel/Box/$(YADEDYNLIBPATH) \
                ../../../../plugins/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
+QMAKE_CXXFLAGS_RELEASE += -lpthread \
+                          -pthread 
+QMAKE_CXXFLAGS_DEBUG += -lpthread \
+                        -pthread 
 DESTDIR = $(YADEDYNLIBPATH) 
 CONFIG += debug \
           warn_on \

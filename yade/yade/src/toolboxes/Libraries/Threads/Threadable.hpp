@@ -17,7 +17,7 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
- 
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -58,19 +58,20 @@ class Threadable
 	protected   : shared_ptr<ThreadSynchronizer> synchronizer;
 	protected : int * turn;
 	protected : int * saveTurn;
-	protected : int getTurn();	
-	
+	protected : int getTurn();
+
 	public    : Threadable(shared_ptr<ThreadSynchronizer> s=shared_ptr<ThreadSynchronizer>());
 	public    : virtual ~Threadable();
-	
+
 	public : void operator()();
-	
-	public    : virtual void createThread(shared_ptr<ThreadSynchronizer> s=shared_ptr<ThreadSynchronizer>(),bool autoStart); 
+// modified by Janek - you can't have default value for argument when the argument is not the last one in argument list
+// (I'm trying to compile it with 3.3, I don't understand why it compiled with 3.4)
+	public    : virtual void createThread(bool autoStart,shared_ptr<ThreadSynchronizer> s = shared_ptr<ThreadSynchronizer>());
 	public    : virtual bool notEnd()  = 0;
 	public    : virtual void oneLoop() = 0;
-	
+
 	public    : void sleep(int ms);
-	
+
 	public    : void start();
 	public    : void stop();
 

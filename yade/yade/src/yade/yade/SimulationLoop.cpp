@@ -5,7 +5,7 @@
 
 SimulationLoop::SimulationLoop(shared_ptr<ThreadSynchronizer> s)
 {
-	createThread(s,false);
+	createThread(false,s);
 }
 
 SimulationLoop::~SimulationLoop()
@@ -17,11 +17,11 @@ bool SimulationLoop::notEnd()
 {
 	return true;
 }
-	
+
 void SimulationLoop::oneLoop()
 {
 	if (Omega::instance().rootBody)
-	{	
+	{
 		Omega::instance().rootBody->moveToNextTimeStep();
 		Omega::instance().incrementCurrentIteration();
 		Omega::instance().incrementSimulationTime();

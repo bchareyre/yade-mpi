@@ -20,7 +20,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
- 
+
 #include "BoundingVolumeUpdator.hpp"
 #include "NonConnexBody.hpp"
 
@@ -56,7 +56,7 @@ void BoundingVolumeUpdator::updateBoundingVolume(shared_ptr<Body> b)
 		}
 	}
 	else
-		bvFactoriesManager.buildBoundingVolume(b->cm,b->se3,b->bv);	
+		bvFactoriesManager.buildBoundingVolume(b->cm,b->se3,b->bv);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -73,7 +73,7 @@ void BoundingVolumeUpdator::updateBoundingVolume(Body* b)
 			updateBoundingVolume(bodies->getCurrent());
 		}
 	}
-	else	
+	else
 		bvFactoriesManager.buildBoundingVolume(b->cm,b->se3,b->bv);
 }
 

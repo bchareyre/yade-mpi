@@ -40,6 +40,10 @@ QMAKE_LIBDIR = ../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../toolboxes/DataStructures/BodyContainer/BodyRedirectionVector/$(YADEDYNLIBPATH) \
                ../../toolboxes/Libraries/Threads/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
+QMAKE_CXXFLAGS_RELEASE += -lpthread \
+                          -pthread 
+QMAKE_CXXFLAGS_DEBUG += -lpthread \
+                        -pthread 
 DESTDIR = $(YADEBINPATH) 
 CONFIG += debug \
           warn_on 

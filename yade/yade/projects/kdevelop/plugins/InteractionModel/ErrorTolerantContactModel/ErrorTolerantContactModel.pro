@@ -17,6 +17,10 @@ QMAKE_LIBDIR = ../../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/Factory/$(YADEDYNLIBPATH) \
                ../../../yade/Interaction/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
+QMAKE_CXXFLAGS_RELEASE += -lpthread \
+                          -pthread 
+QMAKE_CXXFLAGS_DEBUG += -lpthread \
+                        -pthread 
 DESTDIR = $(YADEDYNLIBPATH) 
 CONFIG += debug \
           warn_on \

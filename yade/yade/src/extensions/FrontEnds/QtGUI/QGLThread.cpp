@@ -36,14 +36,14 @@ boost::mutex resizeMutex;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-QGLThread::QGLThread(GLViewer * glv, shared_ptr<RenderingEngine> r) :	Threadable<QGLThread>(), 
-									needResizing(new bool(false)), 
-									newWidth(new int(0)), 
-									newHeight(new int(0)), 
+QGLThread::QGLThread(GLViewer * glv, shared_ptr<RenderingEngine> r) :	Threadable<QGLThread>(),
+									needResizing(new bool(false)),
+									newWidth(new int(0)),
+									newHeight(new int(0)),
 									renderer(r),
 									glViewer(glv)
 {
-	createThread(Omega::instance().synchronizer,true);
+	createThread(true,Omega::instance().synchronizer);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -60,19 +60,19 @@ QGLThread::~QGLThread()
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-	
+
 void QGLThread::resize(int w,int h)
 {
 	boost::mutex::scoped_lock lock(resizeMutex);
 	*newWidth = w;
 	*newHeight = h;
-	
-	*needResizing = true;	
+
+	*needResizing = true;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-	
+
 bool QGLThread::notEnd()
 {
 	return true;
@@ -84,27 +84,27 @@ bool QGLThread::notEnd()
 void QGLThread::oneLoop()
 {
 	glViewer->glDraw();
-	
+
 	glViewer->makeCurrent();
-	
+
 	if (*needResizing)
 	{
 		glViewer->resizeGL(*newWidth,*newHeight);
-		*needResizing=false;	
+		*needResizing=false;
 		glViewer->wm.resizeEvent(*newWidth,*newHeight);
 	}
-	
+
 	glViewer->preDraw();
-	
+
 	if (Omega::instance().rootBody)
 		renderer->render(Omega::instance().rootBody);
-		
-	glViewer->wm.glDraw(); 
+
+	glViewer->wm.glDraw();
 	dynamic_cast<FpsTracker*>(glViewer->wm.getWindow(0))->addOneAction();
-	
+
 	glViewer->postDraw();
-	
-	glViewer->swapBuffers();	
+
+	glViewer->swapBuffers();
 	glViewer->doneCurrent ();
 
 }
