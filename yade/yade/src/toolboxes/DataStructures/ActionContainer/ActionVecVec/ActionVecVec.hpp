@@ -11,6 +11,7 @@ using namespace boost;
 
 class ActionVecVec : public BodyContainer
 {
+/*
 	private	: Loki::AssocVector<unsigned int , shared_ptr<Body> > bodies;
 	private	: Loki::AssocVector<unsigned int , shared_ptr<Body> >::iterator bii;
 	private	: Loki::AssocVector<unsigned int , shared_ptr<Body> >::iterator temporaryBii;
@@ -38,6 +39,7 @@ class ActionVecVec : public BodyContainer
 	public	: virtual unsigned int size();
 
 	// serialization of this class...
+*/
 	REGISTER_CLASS_NAME(ActionVecVec);
 };
 

@@ -106,7 +106,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir></activedir>
+      <activedir>plugins/PhysicalInteractor/SDECLinearContactModel</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>

@@ -103,25 +103,3 @@ void SDECLinearContactModel::computeMechanicalParameters(Body*body)
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	

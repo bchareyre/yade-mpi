@@ -1,15 +1,17 @@
 #include "ActionVecVec.hpp"
 #include "Body.hpp"
 
+/*
 ActionVecVec::ActionVecVec()
 {
-	clear();
+//	clear();
 }
 
 ActionVecVec::~ActionVecVec()
 {
 }
-
+*/
+/*
 unsigned int ActionVecVec::insert(shared_ptr<Body>& b)
 {
 //	unsigned int max;
@@ -139,5 +141,5 @@ unsigned int ActionVecVec::size()
 {
 	return bodies.size();
 }
-
+*/
 

@@ -61,7 +61,6 @@ class ActionContainer : public Serializable
 /// Serialization										///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	// serialization of this class...
 	REGISTER_CLASS_NAME(ActionContainer);
 	// local storage for uniform serialization of all possible container concrete implementations.
 	private   : vector<shared_ptr<Action> > action;
