@@ -15,4 +15,4 @@ SUBDIRS += toolboxes \
            plugins \
            preprocessors \
            postprocessors \
-           GUI 
+           frontends 
