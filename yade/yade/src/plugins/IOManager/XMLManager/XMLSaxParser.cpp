@@ -2,13 +2,18 @@
 
 XmlSaxParser::XmlSaxParser()
 {
+	lineNumber = 0;
 }
 
 XmlSaxParser::~XmlSaxParser ()
-{		
+{
 	basicAttributes.clear();
 }
 
+unsigned long int XmlSaxParser::getLineNumber()
+{
+	return lineNumber;
+}
 
 bool XmlSaxParser::readAndParseNextXmlLine(istream& stream)
 {
@@ -19,7 +24,7 @@ bool XmlSaxParser::readAndParseNextXmlLine(istream& stream)
 	}
 	else
 		return false;
-	
+
 }
 
 bool XmlSaxParser::isWhiteSpace(char c)
@@ -29,7 +34,7 @@ bool XmlSaxParser::isWhiteSpace(char c)
 string XmlSaxParser::readNextFundamentalStringValue(istream& stream)
 {
 	string line="";
-	
+
 	if (!stream.eof())
 	{
 		while (!stream.eof() && isWhiteSpace(stream.peek()))
@@ -42,10 +47,12 @@ string XmlSaxParser::readNextFundamentalStringValue(istream& stream)
 
 bool XmlSaxParser::readNextXmlLine(istream& stream)
 {
+	++lineNumber;
+
 	int i;
 	string line;
 	bool comment=true;
-	
+
 	while (comment)
 	{
 		line.resize(1);
@@ -56,11 +63,11 @@ bool XmlSaxParser::readNextXmlLine(istream& stream)
 				line[0] = stream.get();
 			i=0;
 			while (!stream.eof() && line[i]!='>')
-			{			
+			{
 				i++;
 				line.push_back(stream.get());
 			}
-		
+
 			if (line.size()==1)
 				return false;
 			else
@@ -73,19 +80,19 @@ bool XmlSaxParser::readNextXmlLine(istream& stream)
 			return false;
 	}
 
-	return true;		
+	return true;
 }
-	
+
 void XmlSaxParser::parseCurrentXmlLine()
 {
 	int i;
 	string argName;
 	int argValueStart,argValueStop,argNameStart,argNameStop;
-		
+
 	basicAttributes.clear();
-	
+
 	currentLineCopy = currentXmlLine;
-	
+
 	if (isOpeningTag())
 	{
 		i=1;
@@ -99,37 +106,31 @@ void XmlSaxParser::parseCurrentXmlLine()
 		while (currentXmlLine[i]!='>')
 			i++;
 		tagName = currentXmlLine.substr(2,i-2);
-	}	
-	
-	argNameStop = findCar(0,'=')-1;	
+	}
+
+	argNameStop = findCar(0,'=')-1;
 	while (argNameStop>0 && currentXmlLine[argNameStop]==' ' && currentXmlLine[i]!='\n' && currentXmlLine[i]!='\t')
 		argNameStop--;
 	argNameStart = argNameStop;
-	
+
 	while (argNameStop>0) // car findCar retourne -1 si non trouve
 	{
 		while (currentXmlLine[argNameStart]!=' ' && currentXmlLine[i]!='\n' && currentXmlLine[i]!='\t')
 			argNameStart--;
 		argNameStart++; // on est sur le premier car de l'argname
-		
+
 		argName = currentLineCopy.substr(argNameStart,argNameStop-argNameStart+1);
 		argValueStart = findCar(argNameStop,'"')+1;
 		argValueStop = findCar(argValueStart,'"')-1;
-		
+
 		basicAttributes[argName] = currentLineCopy.substr(argValueStart,argValueStop-argValueStart+1);
-		
+
 		argNameStop = findCar(argValueStop,'=') - 1;
 		while (argNameStop>0 && currentXmlLine[argNameStop]==' ')
 			argNameStop--;
 		argNameStart = argNameStop;
 	}
-	
-	//basicAttributes["vv3"]="[{25.21739 117.3333 34.76191} {77.82609 99.33334 45.23809} {23.47826 126 11.42857} {75.21739 82.66666 68.09524}]";
-	//map<string,string>::iterator ii = basicAttributes.begin();
-	//map<string,string>::iterator iend = basicAttributes.end();
-	//for(;ii!=iend;++ii)
-	//	cerr << (*ii).first << " | " << (*ii).second << endl;
-		
+
 }
 
 int XmlSaxParser::findCar(int i,char c)
@@ -138,15 +139,15 @@ int XmlSaxParser::findCar(int i,char c)
 	j=i;
 	while (static_cast<unsigned int>(j)<=currentXmlLine.length() && currentXmlLine[j]!=c)
 		j++;
-	
+
 	if (static_cast<unsigned int>(j)>currentXmlLine.length())
 		j=-1;
-		
+
 	return j;
 }
 
 bool XmlSaxParser::isFullTag()
-{	
+{
 	return (isOpeningTag() && currentXmlLine[currentXmlLine.length()-2]=='/');
 }
 
@@ -164,7 +165,7 @@ bool XmlSaxParser::isComment()
 {
 	if (currentXmlLine.length()<7)
 		return false;
-	
+
 	return (currentXmlLine[1]=='!' && currentXmlLine[2]=='-' && currentXmlLine[3]=='-');
 }
 
@@ -172,11 +173,11 @@ string XmlSaxParser::getTagName()
 {
 	return tagName;
 }
-	           
+
 string XmlSaxParser::getArgumentValue(const string& argName)
 {
 	map<string,string>::iterator ita = basicAttributes.find(argName);
-	
+
 	if (ita == basicAttributes.end())
 		return NULL;
 
@@ -192,7 +193,7 @@ const map<string,string>& XmlSaxParser::getBasicAttributes()
 
 void XmlSaxParser::deleteBasicAttribute(const string& name)
 {
-	basicAttributes.erase(name);	
+	basicAttributes.erase(name);
 }
 
 

@@ -97,7 +97,10 @@ string XMLManager::beginDeserialization(istream& stream, Archive& ac)
 			return "";
 	}
 	else
-		throw SerializableError(IOManagerExceptions::WrongFileHeader);
+	{
+		string error = string(IOManagerExceptions::WrongFileHeader) + " line: " + lexical_cast<string>(saxParser.getLineNumber());
+		throw SerializableError(error.c_str());
+	}
 	//saxParser.readAndParseNextXmlLine(stream);
 }
 
@@ -254,7 +257,7 @@ void XMLManager::deserializeSerializable(istream& stream, Archive& ac, const str
 			}
 			else
 			{
-				string error=IOManagerExceptions::AttributeNotFound + saxParser.getTagName();
+				string error=IOManagerExceptions::AttributeNotFound + " " + saxParser.getTagName() + " line: " + lexical_cast<string>(saxParser.getLineNumber());
 				throw SerializableError(error.c_str());
 			}
 			saxParser.readAndParseNextXmlLine(stream);
@@ -295,7 +298,7 @@ void XMLManager::serializeContainer(ostream& stream, Archive& ac , int depth)
 			writeClosingTag(stream,*tmpAc,depth);
 		} while (ac.createNextArchive(ac,tmpAc,false));
 	}
-	
+
 	ac.markProcessed();
 }
 

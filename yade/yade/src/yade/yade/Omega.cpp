@@ -4,6 +4,8 @@
 #include "IOManager.hpp" // is this allowed? perhaps loadTheFile should be in pimpl of Omega ? (pointer to implementation)
 #include "NonConnexBody.hpp"
 
+#include <boost/filesystem/operations.hpp>
+
 Omega::Omega ()
 {
 	cerr << "Constructing Omega  (if multiple times - check '-rdynamic' flag!)" << endl;
@@ -103,14 +105,15 @@ string Omega::getFileName()
 void Omega::loadTheFile()
 {
 
-	if( Omega::instance().getFileName().size() != 0)
+	if( Omega::instance().getFileName().size() != 0  &&  boost::filesystem::exists(fileName) )
 	{
+
 		IOManager::loadFromFile("XMLManager",fileName,"rootBody",Omega::instance().rootBody);
 		Omega::instance().logMessage("Loading file " + fileName);
 	}
 	else
 	{
-		cout << "\nMissing filename, please specify filename with -f, or through your GUI.\n";
+		cout << "\nWrong filename, please specify filename with -f, or through your GUI.\n";
 		exit(1);
 	}
 }

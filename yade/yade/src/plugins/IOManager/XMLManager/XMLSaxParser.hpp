@@ -15,15 +15,18 @@ class XmlSaxParser
 	private   : string currentLineCopy;
 	private   : string tagName;
 	private   : int lineLength;
-	
+
+	private   : unsigned long int lineNumber;
+	public    : unsigned long int getLineNumber();
+
 	// construction
-	public    : XmlSaxParser ();	
+	public    : XmlSaxParser ();
 	public    : ~XmlSaxParser ();
 
-		
+
 	public    : bool readNextXmlLine(istream& stream);
 	public    : string readNextFundamentalStringValue(istream& stream);
-	public    : void parseCurrentXmlLine();	
+	public    : void parseCurrentXmlLine();
 	public    : bool readAndParseNextXmlLine(istream& stream);
 	public    : bool isFullTag();
 	public    : bool isOpeningTag();
