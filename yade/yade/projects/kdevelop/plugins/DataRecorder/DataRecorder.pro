@@ -3,6 +3,9 @@
 # Subdir relative project main directory: ./postprocessors
 # Target is a subdirs project 
 
+SUBDIRS += ForceRecorder \
+           AveragePositionRecorder \
+	   PositionOrientationRecorder
 MOC_DIR = $(YADECOMPILATIONPATH)
 UI_DIR = $(YADECOMPILATIONPATH)
 OBJECTS_DIR = $(YADECOMPILATIONPATH)
