@@ -21,6 +21,7 @@ void Cloth::registerAttributes()
 	REGISTER_ATTRIBUTE(stiffness);
 	REGISTER_ATTRIBUTE(damping);
 	REGISTER_ATTRIBUTE(properties);
+	REGISTER_ATTRIBUTE(initialLengths);
 
 }
 
@@ -35,7 +36,8 @@ void Cloth::updateCollisionModel(Se3& )
 
 }
 
-void Cloth::moveToNextTimeStep(float )
+void Cloth::moveToNextTimeStep(float dt)
 {
-	//cout << mass << " " << isDynamic << endl;
+	std::list<shared_ptr<Interaction> > interactions;
+	dynamic->respondToCollisions(this,interactions,dt);
 }

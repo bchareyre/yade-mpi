@@ -53,7 +53,6 @@ void NonConnexBody::registerAttributes()
 	REGISTER_ATTRIBUTE(narrowCollider);
 	REGISTER_ATTRIBUTE(broadCollider);
 	REGISTER_ATTRIBUTE(kinematic);
-	REGISTER_ATTRIBUTE(dynamic);
 }
 
 void NonConnexBody::updateBoundingVolume(Se3& )
@@ -73,22 +72,29 @@ void NonConnexBody::moveToNextTimeStep(float dt)
 	for(int i=0;i<nbSubStep;i++)
 	{
 		// serach for potential collision (maybe in to steps for hierarchical simulation)
-		broadCollider->broadPhaseCollisionTest(bodies,interactions);
+		if (broadCollider!=0)
+			broadCollider->broadPhaseCollisionTest(bodies,interactions);
 
 		// this has to split the contact list into several constact list according to the physical type
 		// (RigidBody,FEMBody ...) of colliding body
-		narrowCollider->narrowCollisionPhase(bodies,interactions);		
+		if (narrowCollider!=0)
+			narrowCollider->narrowCollisionPhase(bodies,interactions);		
 
 		// for each contact list we call the correct dynamic engine
-		dynamic->respondToCollisions(bodies,interactions,dt/(float)nbSubStep); //effectiveDt == dynamic->...
+		if (dynamic!=0)
+			dynamic->respondToCollisions(this,interactions,dt/(float)nbSubStep); //effectiveDt == dynamic->...
 
 		// we call each kinematic engine one after the other
-		kinematic->moveToNextTimeStep(bodies,dt/(float)nbSubStep);
+		if (kinematic!=0)
+			kinematic->moveToNextTimeStep(bodies,dt/(float)nbSubStep);
 
 		//for each body call its dynamic internal engine
 
 		// maybe use internal engine as an dynamic engine et kinematic engine
 	}
+
+	for(unsigned int i=0;i<bodies.size();i++)
+		bodies[i]->moveToNextTimeStep(dt);
 
 	
 }

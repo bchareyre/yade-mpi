@@ -12,8 +12,10 @@ LIBS += -lMesh2D \
         -lSAPCollider \
         -lAABB \
         -lSimpleNarrowCollider \
+        -lExplicitMassSpringDynamicEngine \
         -rdynamic 
-INCLUDEPATH = ../../../plugins/BroadPhaseCollider/SAPCollider \
+INCLUDEPATH = ../../../plugins/DynamicEngine/ExplicitMassSpringDynamicEngine \
+              ../../../plugins/BroadPhaseCollider/SAPCollider \
               ../../../plugins/NarrowPhaseCollider/SimpleNarrowCollider \
               ../../../plugins/GeometricalModel/Mesh2D \
               ../../../plugins/BoundingVolume/AABB \
@@ -35,6 +37,7 @@ QMAKE_LIBDIR = ../../../plugins/GeometricalModel/Mesh2D/$(YADEDYNLIBPATH) \
                ../../../plugins/BroadPhaseCollider/SAPCollider/$(YADEDYNLIBPATH) \
                ../../../plugins/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
                ../../../plugins/NarrowPhaseCollider/SimpleNarrowCollider/$(YADEDYNLIBPATH) \
+               ../../../plugins/DynamicEngine/ExplicitMassSpringDynamicEngine/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
 CONFIG += debug \

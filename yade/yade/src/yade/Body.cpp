@@ -58,6 +58,7 @@ void Body::registerAttributes()
 	REGISTER_ATTRIBUTE(bv);
 	REGISTER_ATTRIBUTE(cm);
 	REGISTER_ATTRIBUTE(gm);
+	REGISTER_ATTRIBUTE(dynamic);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -1,54 +1,53 @@
-#include "SimpleSpringDynamicEngine.hpp"
-#include "RigidBody.hpp"
-#include "ClosestFeatures.hpp"
+#include "ExplicitMassSpringDynamicEngine.hpp"
 #include "Omega.hpp"
-#include "Contact.hpp"
-#include "NonConnexBody.hpp"
+#include "Cloth.hpp"
 
-SimpleSpringDynamicEngine::SimpleSpringDynamicEngine () : DynamicEngine()
+ExplicitMassSpringDynamicEngine::ExplicitMassSpringDynamicEngine () : DynamicEngine()
 {
 	first = true;
 }
 
-SimpleSpringDynamicEngine::~SimpleSpringDynamicEngine ()
+ExplicitMassSpringDynamicEngine::~ExplicitMassSpringDynamicEngine ()
 {
 
 }
 
-void SimpleSpringDynamicEngine::processAttributes()
+void ExplicitMassSpringDynamicEngine::processAttributes()
 {
 
 }
 
-void SimpleSpringDynamicEngine::registerAttributes()
+void ExplicitMassSpringDynamicEngine::registerAttributes()
 {
 }
 
 
-void SimpleSpringDynamicEngine::respondToCollisions(Body * body, const std::list<shared_ptr<Interaction> >& interactions,float dt)
+void ExplicitMassSpringDynamicEngine::respondToCollisions(Body * body, const std::list<shared_ptr<Interaction> >& interactions,float dt)
 {
-	NonConnexBody * ncb = dynamic_cast<NonConnexBody*>(body);
-	vector<shared_ptr<Body> >& bodies = ncb->bodies;
-	
-	float stiffness = 100;
-	float damping = 1.02;
+
+	Cloth * cloth = dynamic_cast<Cloth*>(body);
+
 	Vector3 gravity = Omega::instance().gravity;
-	if (first)
+	
+	float damping	= cloth->damping;
+	float stiffness	= cloth->stiffness;
+	
+	/*if (first)
 	{
-		forces.resize(bodies.size());
-		couples.resize(bodies.size());
-		prevVelocities.resize(bodies.size());
+		forces.resize(cloth->gm->edges.size());
+		prevVelocities.resize(cloth->gm->edges.size());
 	}
 	
 	std::vector<Vector3>::iterator fi = forces.begin();
 	std::vector<Vector3>::iterator fiEnd = forces.end();
-	std::vector<Vector3>::iterator ci = couples.begin();
-	std::vector<shared_ptr<Body> >::iterator bi = bodies.begin();
-	for( ; fi!=fiEnd; ++fi, ++ci, ++bi)
+	vector<Edge>::iterator ei = cloth->gm->edges.begin();
+	for( ; fi!=fiEnd; ++fi, ++ei)
 	{
-		shared_ptr<RigidBody>  rb = dynamic_pointer_cast<RigidBody>(*bi);
-		(*fi) = (gravity - rb->velocity*damping)*rb->mass;
-		(*ci) = -(rb->angularVelocity*damping).multTerm(rb->inertia);
+		Vector3 v1 = cloth->gm->vertices[(*ei).first];
+		Vector3 v2 = cloth->gm->vertices[(*ei).second];
+		(*fi) = (v2-v1).normalize();
+		
+		(*fi) += gravity*mass;
 	}
 	
 	std::list<shared_ptr<Interaction> >::const_iterator cti = interactions.begin();
@@ -98,31 +97,8 @@ void SimpleSpringDynamicEngine::respondToCollisions(Body * body, const std::list
 
 			rb->updateBoundingVolume(rb->se3);
 		}
-        }
+        }*/
 	first = false;
 
-// 	for(unsigned int i=0; i < bodies.size(); i++)
-//         {
-// 		shared_ptr<RigidBody> rb = dynamic_pointer_cast<RigidBody>(bodies[i]);
-// 				
-// 		if (rb->isDynamic)
-// 		{
-// 			Vector3 acc = forces[i]*rb->invMass;
-// 			Vector3 mom = couples[i].multTerm(rb->invInertia);
-// 		
-// 			rb->velocity += dt*acc;
-// 			rb->se3.translation += dt*rb->velocity;
-// 
-// 			rb->angularVelocity += dt*mom;			
-// 			Vector3 axis = rb->angularVelocity;
-// 			float angle = axis.unitize();
-// 			Quaternion q;
-// 			q.fromAngleAxis(angle*dt,axis);
-// 			rb->se3.rotation = rb->se3.rotation*q;
-// 			rb->se3.rotation.normalize();			
-// 
-// 			rb->updateBoundingVolume(rb->se3);
-// 		}
-//         }
 }
 

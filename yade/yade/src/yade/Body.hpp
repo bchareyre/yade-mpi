@@ -40,7 +40,7 @@
 #include "list"
 #include "Serializable.hpp"
 #include "Indexable.hpp"
-
+#include "DynamicEngine.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -67,6 +67,9 @@ class Body : public Serializable //,Indexable
 	/*! The bouding volume of this body (AABB, K-Dop ...) */
 	public : shared_ptr<BoundingVolume> bv;
 
+
+	public : shared_ptr<DynamicEngine> dynamic;
+	
 	// FIXME : should be determined automatically or not ?? if the body has a subscription to a kinematic engine then it is not dynamic but maybe a body with no subscription can be not dynamic ??
 	/*! isDynamic is true if the state of the body is not modified by a kinematicEngine. It is useful
 	for example for collision detection : if two colliding bodies are only kinematic then it is useless to

@@ -3,10 +3,11 @@
 # Subdir relative project main directory: ./plugins/DynamicEngine
 # Target is a subdirs project 
 
-MOC_DIR = $(YADECOMPILATIONPATH) 
-UI_DIR = $(YADECOMPILATIONPATH) 
-OBJECTS_DIR = $(YADECOMPILATIONPATH) 
+SUBDIRS += SimpleSpringDynamicEngine \
+           ExplicitMassSpringDynamicEngine 
+MOC_DIR = $(YADECOMPILATIONPATH)
+UI_DIR = $(YADECOMPILATIONPATH)
+OBJECTS_DIR = $(YADECOMPILATIONPATH)
 CONFIG += debug \
-          warn_on 
-TEMPLATE = subdirs 
-SUBDIRS += SimpleSpringDynamicEngine 
+warn_on
+TEMPLATE = subdirs

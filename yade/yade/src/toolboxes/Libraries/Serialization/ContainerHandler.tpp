@@ -116,7 +116,8 @@ RecordType findType( std::vector<VectoredType>& ,bool& fundamental, string& str)
 	//cerr << str << " " << tmpFundamental << endl;
 	//fundamental = ( boost::is_fundamental<VectoredType>::value || ((t==SMART_POINTER || t==CUSTOM_CLASS || t==STL_CONTAINER) && tmpFundamental) );
 
-	RecordType t = findType(tmpV,fundamental,str);
+	//RecordType t =
+	findType(tmpV,fundamental,str);
 	
 	return STL_CONTAINER;
 };

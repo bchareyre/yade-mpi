@@ -9,7 +9,7 @@
 //#include "Rotor.hpp"
 #include "SimpleNarrowCollider.hpp"
 #include "Cloth.hpp"
-
+#include "ExplicitMassSpringDynamicEngine.hpp"
 #include <fstream>
 #include "IOManager.hpp"
 
@@ -55,7 +55,7 @@ void HangingCloth::exec()
 	shared_ptr<Cloth> cloth(new Cloth);	
 	shared_ptr<AABB> aabb(new AABB);	
 	shared_ptr<Mesh2D> mesh2d(new Mesh2D);
-
+	cloth->dynamic		= shared_ptr<DynamicEngine>(new ExplicitMassSpringDynamicEngine);
 	cloth->isDynamic	= true;
 	cloth->angularVelocity	= Vector3(0,0,0);
 	cloth->velocity		= Vector3(0,0,0);
@@ -73,7 +73,7 @@ void HangingCloth::exec()
 
 	for(int i=0;i<sqrtNbNodes;i++)
 		for(int j=0;j<sqrtNbNodes;j++)
-		mesh2d->vertices.push_back(Vector3(i*2,j*2,0));
+		mesh2d->vertices.push_back(Vector3(i*20-9*sqrtNbNodes,j*20-9*sqrtNbNodes,0));
 
 	for(int i=0;i<sqrtNbNodes-1;i++)
 		for(int j=0;j<sqrtNbNodes-1;j++)
@@ -88,8 +88,9 @@ void HangingCloth::exec()
 
 	for(int j=0;j<sqrtNbNodes-1;j++)
 		mesh2d->edges.push_back(Edge(sqrtNbNodes-1+j*sqrtNbNodes,sqrtNbNodes-1+(j+1)*sqrtNbNodes));
-		
-	mesh2d->diffuseColor	= Vector3(1,1,1);
+
+	
+	mesh2d->diffuseColor	= Vector3(0,0,1);
 	mesh2d->wire		= false;
 	mesh2d->visible		= true;
 	cloth->cm		= dynamic_pointer_cast<CollisionModel>(mesh2d);

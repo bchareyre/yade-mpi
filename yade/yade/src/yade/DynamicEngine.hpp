@@ -65,7 +65,8 @@ class DynamicEngine : public Serializable
 	public : void processAttributes();
 	public : void registerAttributes();
 	
-	public : virtual void respondToCollisions(std::vector<shared_ptr<Body> >& , const std::list<shared_ptr<Interaction> >& ,float ) {};
+	//public : virtual void respondToCollisions(std::vector<shared_ptr<Body> >& , const std::list<shared_ptr<Interaction> >& ,float ) {};
+	public : virtual void respondToCollisions(Body * , const std::list<shared_ptr<Interaction> >& ,float ) {};
 
 	public : virtual string getInteractionModelName() { return "";};
 	

@@ -30,16 +30,14 @@
 #include "Body.hpp"
 #include "BroadPhaseCollider.hpp"
 #include "KinematicEngine.hpp"
-#include "DynamicEngine.hpp"
 #include "NarrowPhaseCollider.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-
+//FIXME : NonConnexBody is abstract interface and add SetOfBodies as default simple NonConnexBody
 class NonConnexBody : public Body
 {	
 	public : vector<shared_ptr<Body> > bodies;
-	public : shared_ptr<DynamicEngine> dynamic;
 	public : shared_ptr<NarrowPhaseCollider> narrowCollider;
 	public : shared_ptr<BroadPhaseCollider> broadCollider;
 	public : shared_ptr<KinematicEngine> kinematic;

@@ -123,7 +123,7 @@ void XMLManager::finalizeSerialization(ostream& stream, Archive& ac)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-
+// FIXME : a fundamental made of a 2 fundamentalq for example is not parsed correctly ! => {1.2 {1 2 3}}
 void XMLManager::tokenizeCustomFundamental(const string& str, vector<string>& tokens)
 {
 	int openBracketId = 0;
