@@ -28,75 +28,124 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <vector>
+#include <set>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-template<class ptr2Func>
+#include "ClassFactory.hpp"
+#include "Indexable.hpp"
+#include "CollisionModel.hpp"
+#include "Se3.hpp"
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+template<class Functor>
 class MultiMethodsManager 
 {	
-	protected : std::vector<std::vector<ptr2Func> > lookUpTable;
+	protected : std::vector<std::vector<Functor> > callBacks;
+	//private   : int size;
+	private   : map<string,int> indexedClassName;
 	
-	protected : ptr2Func nullFunc;
+	// FIXME : remove nullFunc
+	protected : Functor nullFunc;
 		
 	// construction
-	public : MultiMethodsManager<ptr2Func> ()
+	public : MultiMethodsManager<Functor> ()
 	{
-		lookUpTable.resize(0);
+		callBacks.resize(0);
 	};
 
 	public : virtual ~MultiMethodsManager () {};
-	
-	private : bool pairExists(int i,int j)
+
+	public : void add(const string& name)
 	{
-		int sizeRow = lookUpTable.size();
+		if (indexedClassName.find(name)!=indexedClassName.end())
+		{			
+			shared_ptr<Indexable> indexable = shared_dynamic_cast<Indexable>(ClassFactory::instance().createShared(name));
+			int& index = indexable->getClassIndex();
+			assert(index==-1);
+			index = indexedClassName.size()-1;
+			indexedClassName[name] = index;
+			map<string,int>::iterator icni    = indexedClassName.begin();
+			map<string,int>::iterator icniEnd = indexedClassName.end();
+			for( ;icni!=icniEnd; ++icni )
+			{
+				string functorName = name+"2"+(*icni).first+"4ClosestFeatures";
+				string reverseFunctorName = (*icni).first+"2"+name+"4ClosestFeatures";
+				shared_ptr<Functor> collisionFunctor,reverseCollisionFunctor;
+				try
+				{
+					collisionFunctor = shared_dynamic_cast<Functor>(ClassFactory::instance().createShared(functorName));
+					reverseCollisionFunctor = shared_dynamic_cast<Functor>(ClassFactory::instance().createShared(functorName));
+					collisionFunctor->setReverse(false);
+					reverseCollisionFunctor->setReverse(true);
+				}
+				catch (FactoryError& fe)
+				{
+					collisionFunctor = shared_dynamic_cast<Functor>(ClassFactory::instance().createShared(reverseFunctorName));
+					reverseCollisionFunctor = shared_dynamic_cast<Functor>(ClassFactory::instance().createShared(reverseFunctorName));
+					collisionFunctor->setReverse(true);
+					reverseCollisionFunctor->setReverse(false);	
+				}
+				
+				callBacks[index][indexedClassName[(*icni).first]] = collisionFunctor;
+				callBacks[indexedClassName[(*icni).first]][index] = reverseCollisionFunctor;
+			}
+		}
+	}
+	
+	/*private : bool pairExists(int i,int j)
+	{
+		int sizeRow = callBacks.size();
 		int max = i;
 		if (max<j)
 			max = j;	
 		if (max>=sizeRow)
 			return false;
 		else
-			return (lookUpTable[i][j]!=nullFunc && lookUpTable[j][i]!=nullFunc);
+			return (callBacks[i][j]!=nullFunc && callBacks[j][i]!=nullFunc);
 	}
 	
-	protected : bool addPair(int i,int j, ptr2Func ptr2F1,ptr2Func ptr2F2)
+	protected : bool addPair(int i,int j, Functor ptr2F1,Functor ptr2F2)
 	{
 		//assert(ptf1!=NULL);
 		if (!pairExists(i,j))
 		{	
-			int sizeRow = lookUpTable.size();
+			int sizeRow = callBacks.size();
 			int max = i;
 			if (max<j)
 				max = j;
 			if (sizeRow <= max)
 			{
-				lookUpTable.resize(max+1);
+				callBacks.resize(max+1);
 				for(int k=0;k<=max;k++)
 				{
-					lookUpTable[k].resize(max+1);
+					callBacks[k].resize(max+1);
 					for(int l=0;l<=max;l++)
 					{					
 						if (k>=max || l>=max)
-							lookUpTable[k][l] = nullFunc;
+							callBacks[k][l] = nullFunc;
 					}
 				}
 			}
-			lookUpTable[i][j] = ptr2F1;
+			callBacks[i][j] = ptr2F1;
 			if (i!=j)
-				lookUpTable[j][i] = ptr2F2;
+				callBacks[j][i] = ptr2F2;
 			return true;
 		}
 		else
 			return false;
 	}
 	
-	protected : bool overwritePair(int i,int j, ptr2Func ptr2F1,ptr2Func ptr2F2)
+	protected : bool overwritePair(int i,int j, Functor ptr2F1,Functor ptr2F2)
 		    {
 			if (pairExists(i,j))
 			{
-				lookUpTable[i][j] = ptr2F1;
+				callBacks[i][j] = ptr2F1;
 				if (i!=j)
-					lookUpTable[j][i] = ptr2F2;
+					callBacks[j][i] = ptr2F2;
 				return true;
 			}
 			else
@@ -107,24 +156,28 @@ class MultiMethodsManager
 	{
 		if (pairExists(i,j))
 		{
-			lookUpTable[i][j] = nullFunc;
-			lookUpTable[j][i] = nullFunc;
+			callBacks[i][j] = nullFunc;
+			callBacks[j][i] = nullFunc;
 			return true;
 		}
+		else
+			return false;
+	}*/
+
+	public : inline bool operator() (const shared_ptr<CollisionModel> cm1, const shared_ptr<CollisionModel> cm2, const Se3& se31, const Se3& se32, shared_ptr<Contact> c)
+	{
+		assert(cm1->getClassIndex()>0);
+		assert(cm2->getClassIndex()>0);
+		assert(cm1->getClassIndex()<callBacks.size());
+		assert(cm2->getClassIndex()<callBacks.size());
+		shared_ptr<Functor> cf = callBacks[cm1->getClassIndex()][cm2->getClassIndex()];
+		if (cf!=0)
+			return (*cf)(cm1,cm2,se31,se32,c);
 		else
 			return false;
 	}
 	
 };
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-#define REGISTER_CLASS_TO_MULTI_METHODS_MANAGER(SomeClass)	\
-	namespace namespace##SomeClass				\
-	{							\
-		int a=0;					\
-	}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////

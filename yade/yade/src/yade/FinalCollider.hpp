@@ -53,7 +53,7 @@ class FinalCollider : public Serializable, public MultiMethodsManager<ptr2Collid
 
 	public : inline bool collide(const shared_ptr<CollisionModel> cm1, const shared_ptr<CollisionModel> cm2, const Se3& se31, const Se3& se32,  shared_ptr<Contact> c)
 	{
-		return (lookUpTable[cm1->type][cm2->type])(cm1,cm2,se31,se32,c);
+		return (callBacks[cm1->type][cm2->type])(cm1,cm2,se31,se32,c);
 	}
 };
 

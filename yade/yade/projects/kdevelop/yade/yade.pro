@@ -57,7 +57,8 @@ HEADERS += Archive.hpp \
            FundamentalHandler.tpp \
            PointerHandler.tpp \
            Indexable.hpp \
-           MultiMethodsManager.hpp 
+           MultiMethodsManager.hpp \
+           CollisionFunctor.hpp 
 SOURCES += Archive.cpp \
            Body.cpp \
            BoundingVolume.cpp \

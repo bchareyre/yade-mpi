@@ -104,7 +104,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>preprocessors/FileGenerator/RotatingBox</activedir>
+      <activedir>plugins/InteractionModel/ClosestFeatures</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>

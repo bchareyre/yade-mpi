@@ -1,10 +1,11 @@
 #include "SimpleNarrowCollider.hpp"
-#include "BVCFFinalCollider.hpp"
+//#include "BVCFFinalCollider.hpp"
 #include "Body.hpp"
+#include "Omega.hpp"
 
 SimpleNarrowCollider::SimpleNarrowCollider() : NarrowPhaseCollider()
 {
-	collider = shared_ptr<FinalCollider>(new BVCFFinalCollider());
+	//collider = shared_ptr<FinalCollider>(new BVCFFinalCollider());
 }
 
 SimpleNarrowCollider::~ SimpleNarrowCollider()
@@ -33,11 +34,9 @@ bool SimpleNarrowCollider::narrowCollisionPhase(const std::vector<shared_ptr<Bod
 		it++;
 		shared_ptr<Body> b1 = bodies[(*itTmp)->id1];
 		shared_ptr<Body> b2 = bodies[(*itTmp)->id2];
-		if (!(collider->collide(b1->cm,b2->cm,b1->se3,b2->se3,(*itTmp))))
-		{
-			//delete (*itTmp);
+		//if (!(collider->collide(b1->cm,b2->cm,b1->se3,b2->se3,(*itTmp))))
+		if (!(Omega::instance().narrowCollider(b1->cm,b2->cm,b1->se3,b2->se3,(*itTmp))))
 			contacts.erase(itTmp);
-		}
 	}
 
 	return true;

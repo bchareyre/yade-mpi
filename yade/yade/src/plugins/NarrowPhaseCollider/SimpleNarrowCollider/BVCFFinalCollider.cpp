@@ -317,7 +317,17 @@ bool BVCFFinalCollider::collideSphereBox(const shared_ptr<CollisionModel> cm1, c
 
 bool BVCFFinalCollider::collideBoxSphere(const shared_ptr<CollisionModel> cm1, const shared_ptr<CollisionModel> cm2,const Se3& se31, const Se3& se32, shared_ptr<Contact> c)
 {
-
+	/*bool collide = collideSphereBox(cm2,cm1,se32,se31,c);
+	if (collide)
+	{
+		shared_ptr<ClosestFeatures> cf = shared_dynamic_cast<ClosestFeatures>(c->contactModel);
+		Vector3 tmp = cf->closestsPoints[0].first;
+		cf->closestsPoints[0].first = cf->closestsPoints[0].second;		
+		cf->closestsPoints[0].second = tmp;
+	}
+	return collide;*/
+		
+	
 	if (se31.rotation == Quaternion())
 		return collideAABoxSphere(cm1,cm2,se31,se32,c);
 	

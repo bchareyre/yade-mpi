@@ -82,7 +82,7 @@ class Terrain : public CollisionModel
 };
 
 REGISTER_CLASS(Terrain,false);
-REGISTER_CLASS_TO_MULTI_METHODS_MANAGER(RigidBody);
+REGISTER_CLASS_TO_MULTI_METHODS_MANAGER(Terrain);
 
 #endif // __TERRAIN_H__
 

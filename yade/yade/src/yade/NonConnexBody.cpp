@@ -78,7 +78,7 @@ void NonConnexBody::moveToNextTimeStep(float dt)
 
 		// this has to split the contact list into several constact list according to the physical type
 		// (RigidBody,FEMBody ...) of colliding body
-		narrowCollider->narrowCollisionPhase(bodies,contacts);
+		narrowCollider->narrowCollisionPhase(bodies,contacts);		
 
 		// for each contact list we call the correct dynamic engine
 		dynamic->respondToCollisions(bodies,contacts,dt/(float)nbSubStep); //effectiveDt == dynamic->...

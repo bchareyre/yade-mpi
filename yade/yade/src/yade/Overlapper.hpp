@@ -50,7 +50,7 @@ class Overlapper : public Serializable, public MultiMethodsManager<pt2Overlappin
 
 	public : inline bool overlapp(const shared_ptr<BoundingVolume> bv1, const shared_ptr<BoundingVolume> bv2)
 	{
-		return (lookUpTable[bv1->type][bv2->type])(bv1,bv2);
+		return (callBacks[bv1->type][bv2->type])(bv1,bv2);
 	}	
 };
 

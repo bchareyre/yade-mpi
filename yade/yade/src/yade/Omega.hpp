@@ -40,6 +40,7 @@
 #include "Types.hpp"
 #include "Singleton.hpp"
 #include "NonConnexBody.hpp"
+#include "CollisionFunctor.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -56,6 +57,8 @@ class Omega : public Singleton<Omega>
 	public : Vector3 gravity;
 	public : shared_ptr<NonConnexBody> rootBody;
 	public : ptime startingSimulationTime;
+	
+	public : MultiMethodsManager<CollisionFunctor> narrowCollider;
 	
 	private   : Omega() ;
 	private   : ~Omega() ;

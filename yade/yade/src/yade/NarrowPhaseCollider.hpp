@@ -34,7 +34,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "Contact.hpp"
-#include "FinalCollider.hpp"
+//#include "FinalCollider.hpp"
 #include "Serializable.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -47,7 +47,7 @@ class Body;
 
 class NarrowPhaseCollider : public Serializable
 {
-	protected : shared_ptr<FinalCollider> collider;
+	//protected : shared_ptr<FinalCollider> collider;
 	
 	// construction
 	public : NarrowPhaseCollider ();

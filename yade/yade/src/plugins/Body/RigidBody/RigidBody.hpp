@@ -27,6 +27,7 @@ class RigidBody : public ConnexBody
 };
 
 REGISTER_CLASS(RigidBody,false);
+
 REGISTER_CLASS_TO_MULTI_METHODS_MANAGER(RigidBody);
 
 #endif // __RIGIDBODY_H__
