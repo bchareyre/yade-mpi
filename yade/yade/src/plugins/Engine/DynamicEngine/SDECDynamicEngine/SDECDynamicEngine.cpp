@@ -401,8 +401,8 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 		int id1 = contact->getId1();
 		int id2 = contact->getId2();
 
-		shared_ptr<SDECDiscreteElement> de1 	= dynamic_pointer_cast<SDECDiscreteElement>((*bodies)[id1]);
-		shared_ptr<SDECDiscreteElement> de2 	= dynamic_pointer_cast<SDECDiscreteElement>((*bodies)[id2]);
+		shared_ptr<SDECDiscreteElement> de1 	= dynamic_pointer_cast<SDECDiscreteElement>((*bodies)[id1]->physicalParameters);
+		shared_ptr<SDECDiscreteElement> de2 	= dynamic_pointer_cast<SDECDiscreteElement>((*bodies)[id2]->physicalParameters);
 		shared_ptr<SDECContactGeometry> currentContactGeometry = dynamic_pointer_cast<SDECContactGeometry>(contact->interactionGeometry);
 		shared_ptr<SDECContactPhysics> currentContactPhysics   = dynamic_pointer_cast<SDECContactPhysics> (contact->interactionPhysics);
 		
@@ -426,6 +426,8 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 		currentContactPhysics->shearForce      -= currentContactPhysics->shearForce.cross(axis);
 
 
+	
+// it will be some macro(	body->actions,	ActionType , bodyId )
 ////////////////////////////////////////////////////////////
 /// Here is the code without approximated rotations 	 ///
 ////////////////////////////////////////////////////////////
@@ -526,11 +528,8 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 	{
 		b = bodies->getCurrent();
  
-		shared_ptr<SDECDiscreteElement> de = dynamic_pointer_cast<SDECDiscreteElement>(b);
-		if (de)
-		{
-			//forces[i] += gravity*de->mass;
-			
+		shared_ptr<SDECDiscreteElement> de = dynamic_pointer_cast<SDECDiscreteElement>(b->physicalParameters);
+
 ///////////////////// PREVIOUS CONTAINER, begin
 //			af->force = gravity*de->mass;
 //			body->actions->add(af,b->getId());
@@ -559,7 +558,6 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 				//    [ BodyId] [ (x,y,z): index ]
 			}
 
-			//Real m = moments[i].length();
 			// all bodies do not have momentum so we have to test that
 			// it is different from forces, because we have added gravity to all bodies
 ///////////////////// PREVIOUS CONTAINER, begin
@@ -588,9 +586,6 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 ///////////////////// PREVIOUS CONTAINER, begin
 //			}
 ///////////////////// PREVIOUS CONTAINER, end
-			//de->acceleration += forces[i]*de->invMass;0.3*
-			//de->angularAcceleration += moments[i].multDiag(de->invInertia);
-		}
         }
 
 }

@@ -140,7 +140,7 @@ void OpenGLRenderingEngine::render(shared_ptr<ComplexBody> rootBody)
 	}
 	
 	if (drawBoundingVolume)
-		boundingVolumeDispatcher(rootBody->bv);
+		renderBoundingVolume(rootBody);
 	
 	if (drawCollisionGeometry)
 		interactionGeometryDispatcher(rootBody->cm,rootBody->physicalParameters);
@@ -317,10 +317,8 @@ void OpenGLRenderingEngine::renderGeometricalModel(shared_ptr<ComplexBody> rootB
 		for( rootBody->bodies->gotoFirst() ; rootBody->bodies->notAtEnd() ; rootBody->bodies->gotoNext() )
 		{
 			shared_ptr<Body> b = rootBody->bodies->getCurrent();
-			//FIXME : check if Se3 exist
+
 			glPushMatrix();
-			//FIXME : do not cast on RigidBody but use Parameters instead
-			//Se3r& se3 = (static_cast<Particle*>(b->physicalParameters.get()))->se3;
 			Se3r& se3 = b->physicalParameters->se3;
 			Real angle;
 			Vector3r axis;	
@@ -333,6 +331,24 @@ void OpenGLRenderingEngine::renderGeometricalModel(shared_ptr<ComplexBody> rootB
 	}
 	else
 		geometricalModelDispatcher(rootBody->gm,rootBody->physicalParameters);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+void OpenGLRenderingEngine::renderBoundingVolume(shared_ptr<ComplexBody> rootBody)
+{	
+	for( rootBody->bodies->gotoFirst() ; rootBody->bodies->notAtEnd() ; rootBody->bodies->gotoNext() )
+	{	
+		glPushMatrix();
+		shared_ptr<Body> b = rootBody->bodies->getCurrent();
+		boundingVolumeDispatcher(b->bv);
+		glPopMatrix();
+	}
+	
+	glPushMatrix();
+	boundingVolumeDispatcher(rootBody->bv);
+	glPopMatrix();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

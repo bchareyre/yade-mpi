@@ -21,50 +21,56 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include "LeapFrogIntegrator.hpp"
+#include "RigidBody.hpp"
 #include "Particle.hpp"
+#include "Omega.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-Particle::Particle() : BodyPhysicalParameters()
-{
-	createIndex();
-	acceleration = Vector3r(0,0,0);
-}
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-Particle::~Particle()
+// FIXME : should we pass timestep as parameter of functor
+// FIXME : what's with timestepper
+void LeapFrogIntegrator::go(const shared_ptr<BodyPhysicalParameters>& b,unsigned int id)
 {
 
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-void Particle::postProcessAttributes(bool deserializing)
-{
-	BodyPhysicalParameters::postProcessAttributes(deserializing);
-	
-	if(deserializing)
+	if (prevVelocities.size()<=id)
 	{
-		if (mass==0)
-			invMass = 0;
-		else
-			invMass = 1.0/mass;
+		prevVelocities.resize(id+1);
+		firsts.resize(id+1,true);
 	}
-}
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+	Particle * p = dynamic_cast<Particle*>(b.get());
 
-void Particle::registerAttributes()
-{
-	BodyPhysicalParameters::registerAttributes();
-	//REGISTER_ATTRIBUTE(se3);
-	REGISTER_ATTRIBUTE(mass);
-	REGISTER_ATTRIBUTE(velocity);
+	Real dt = Omega::instance().getTimeStep();
+
+	if (!firsts[id])
+		p->velocity = prevVelocities[id]+0.5*dt*p->acceleration;
+
+	prevVelocities[id] = p->velocity+0.5*dt*p->acceleration;
+	p->se3.translation += prevVelocities[id]*dt;
+
+	
+	// FIXME : maybe split into 2 LeapFrogIntegrator
+	RigidBody * rb = dynamic_cast<RigidBody*>(b.get());
+	if(rb)
+	{		
+		if (prevAngularVelocities.size()<=id)
+			prevAngularVelocities.resize(id+1);
+			
+		if (!firsts[id])
+			rb->angularVelocity = prevAngularVelocities[id]+0.5*dt*rb->angularAcceleration;
+	
+		prevAngularVelocities[id] = rb->angularVelocity+0.5*dt*rb->angularAcceleration;
+		Vector3r axis = rb->angularVelocity;
+		Real angle = axis.normalize();
+		Quaternionr q;
+		q.fromAxisAngle(axis,angle*dt);
+		rb->se3.rotation = q*rb->se3.rotation;
+		rb->se3.rotation.normalize();
+	}
+	firsts[id] = false;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

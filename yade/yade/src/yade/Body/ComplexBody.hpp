@@ -32,6 +32,7 @@
 //#include "BroadInteractor.hpp"
 //#include "KinematicEngine.hpp"
 //#include "InteractionGeometryDispatcher.hpp"
+#include "Actor.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -47,7 +48,8 @@ class ComplexBody : public Body
 	//public : vector<shared_ptr<Interaction> > permanentInteractions;
 	public	: shared_ptr<BodyContainer> bodies;
 	public	: shared_ptr<InteractionContainer> permanentInteractions;
-
+	public : vector<shared_ptr<Actor> > actors;
+	
 	// construction
 	public	: ComplexBody ();
 

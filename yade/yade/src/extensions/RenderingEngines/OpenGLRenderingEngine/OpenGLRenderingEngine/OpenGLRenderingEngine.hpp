@@ -72,6 +72,7 @@ class OpenGLRenderingEngine : public RenderingEngine
 	public : void render(shared_ptr<ComplexBody> body);
 	
 	private : void renderGeometricalModel(shared_ptr<ComplexBody> rootBody);
+	private : void renderBoundingVolume(shared_ptr<ComplexBody> rootBody);
 	private : void renderShadowVolumes(shared_ptr<ComplexBody> rootBody,Vector3r lightPos);
 	private : void renderSceneUsingShadowVolumes(shared_ptr<ComplexBody> rootBody,Vector3r lightPos);
 	private : void renderSceneUsingFastShadowVolumes(shared_ptr<ComplexBody> rootBody,Vector3r lightPos);

@@ -25,6 +25,7 @@
 #include "SimpleBody.hpp"
 #include "InteractionBox.hpp"
 #include "InteractionSphere.hpp"
+#include "TimeIntegratorDispatcher.hpp"
 
 SDECSpheresPlane::SDECSpheresPlane () : FileGenerator()
 {
@@ -79,16 +80,23 @@ string SDECSpheresPlane::generate()
 	ad->addActionFunctor("ActionForce","RigidBody","ActionForce2RigidBody");
 	ad->addActionFunctor("ActionMomentum","RigidBody","ActionMomentum2RigidBody");
 	
-	rootBody->actors.resize(6);
+	shared_ptr<TimeIntegratorDispatcher> ti(new TimeIntegratorDispatcher);
+	ti->addTimeIntegratorFunctor("SDECDiscreteElement","LeapFrogIntegrator");
+	
+	rootBody->actors.resize(7);
 	rootBody->actors[0] 		= bvu;	
 	rootBody->actors[1] 		= shared_ptr<Actor>(new PersistentSAPCollider);
 	rootBody->actors[2] 		= igd;
 	rootBody->actors[3] 		= ipd;
 	rootBody->actors[4] 		= shared_ptr<Actor>(new SDECDynamicEngine);
 	rootBody->actors[5] 		= ad;
+	rootBody->actors[6] 		= ti;
+	
 
 	//FIXME : use a default one
 	rootBody->physicalParameters = shared_ptr<BodyPhysicalParameters>(new SDECDiscreteElement);
+	rootBody->physicalParameters->se3 =  Se3r(Vector3r(0,0,0),q);
+	
 	rootBody->permanentInteractions->clear();
 //	rootBody->permanentInteractions[0] = shared_ptr<Interaction>(new Interaction);
 //	rootBody->permanentInteractions[0]->interactionGeometry = shared_ptr<SDECPermanentLink>(new SDECPermanentLink);
@@ -163,9 +171,9 @@ string SDECSpheresPlane::generate()
 		translation 		= Vector3r(i,j,k)*(2*maxRadius*1.1)-Vector3r(nbSpheres/2*(2*maxRadius*1.1),-7-maxRadius*2,nbSpheres/2*(2*maxRadius*1.1))+Vector3r(Mathr::symmetricRandom()*1.1,Mathr::symmetricRandom()*1.1,Mathr::symmetricRandom()*1.1);
 		Real radius 		= (Mathr::intervalRandom(minRadius,maxRadius));
 
-		shared_ptr<BallisticDynamicEngine> ballistic(new BallisticDynamicEngine);
-		ballistic->damping 	= 1.0;//0.95;
-		simple->actors.push_back(ballistic);
+// 		shared_ptr<BallisticDynamicEngine> ballistic(new BallisticDynamicEngine);
+// 		ballistic->damping 	= 1.0;//0.95;
+// 		simple->actors.push_back(ballistic);
 
 		simple->isDynamic		= true;
 		s->angularVelocity	= Vector3r(0,0,0);

@@ -34,6 +34,7 @@ void ActionForce2RigidBody::go(const shared_ptr<Action>& a, shared_ptr<BodyPhysi
 	RigidBody * rb = static_cast<RigidBody*>(b.get());
 	
 	//FIXME : should be += and we should add an Actor that reset acceleration at the beginning
+	// if another Action also acts on acceleration then we are overwritting it here
 	rb->acceleration = rb->invMass*af->force;
 }
 

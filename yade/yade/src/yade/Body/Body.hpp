@@ -41,7 +41,7 @@
 #include "Interaction.hpp"
 #include "Serializable.hpp"
 #include "Indexable.hpp"
-#include "Actor.hpp"
+
 #include "ActionContainer.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -66,7 +66,6 @@ class Body : public Serializable
 	public	: unsigned int getId() {return id;};
 	friend class BodyContainer; // only BodyContainer can set the id of a body
 
-	public : vector<shared_ptr<Actor> > actors;
 	public : bool containSubBodies;
 	
 	// FIXME : to put into nonconnex body ? but maybe useful for autocollision in connexbody - yes, useful with so generic InteractionContaier, at leas when we will implement multiple interactions....
@@ -109,14 +108,7 @@ class Body : public Serializable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Methods											///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-
-	/*! Abstract function overloaded in Connex and NonConnex body. It is called to draw the object in an opengl context */
-	public : virtual void glDrawGeometricalModel() {/*throw CallVirtualUndefinedMethod()*/};
-	public : virtual void glDrawBoundingVolume() {/*throw CallVirtualUndefinedMethod()*/};
-	public : virtual void glDrawCollisionGeometry() {/*throw CallVirtualUndefinedMethod()*/};	
-	/*! Abstract function overloaded in Connex and NonConnex body. Move the body to the next time step using its own internal dynamic engine */
-	public : virtual void moveToNextTimeStep() {};
-
+	
 	/*! If computations on the attributes are needed after serialization. For example you may want to serialize the name of a file that contains geometrical data and postProcessAttributes(bool deserializing) will load the file */
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -80,7 +80,6 @@ void Body::registerAttributes()
 	REGISTER_ATTRIBUTE(bv);
 	REGISTER_ATTRIBUTE(cm);
 	REGISTER_ATTRIBUTE(gm);
-	REGISTER_ATTRIBUTE(actors);
 // FIXME ? - must be registered or not? how about saving state during the simulation?
 	//REGISTER_ATTRIBUTE(interactions);
 }

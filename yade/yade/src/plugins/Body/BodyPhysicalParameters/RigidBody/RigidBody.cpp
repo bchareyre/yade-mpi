@@ -37,14 +37,3 @@ void RigidBody::registerAttributes()
 	REGISTER_ATTRIBUTE(angularVelocity);
 }
 
-/*
-void RigidBody::moveToNextTimeStep()
-{	
-	//FIXME : move reseting to another place
-	Particle::moveToNextTimeStep();
-	prevAcceleration = acceleration;
-	prevAngularAcceleration = angularAcceleration;
-	acceleration = Vector3r(0,0,0);
-	angularAcceleration = Vector3r(0,0,0);
-	
-}*/

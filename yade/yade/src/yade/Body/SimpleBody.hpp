@@ -44,12 +44,6 @@ class SimpleBody : public Body
 
 	public : virtual ~SimpleBody ();
 
-	public : virtual void glDrawGeometricalModel();
-	public : virtual void glDrawBoundingVolume();
-	public : virtual void glDrawCollisionGeometry();
-	
-	public : virtual void moveToNextTimeStep();
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Serialization										///
 ///////////////////////////////////////////////////////////////////////////////////////////////////

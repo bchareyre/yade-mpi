@@ -27,11 +27,9 @@ void BallisticDynamicEngine::registerAttributes()
 
 void BallisticDynamicEngine::respondToCollisions(Body * body)
 {
-	RigidBody * rb = dynamic_cast<RigidBody*>(body);
+	RigidBody * rb = dynamic_cast<RigidBody*>(body->physicalParameters.get());
 	
 	Real dt = Omega::instance().getTimeStep();
-
-	//rb->acceleration += Omega::instance().getGravity();
 
 	if (!first)
 	{
@@ -42,7 +40,6 @@ void BallisticDynamicEngine::respondToCollisions(Body * body)
 	prevVelocity = rb->velocity+0.5*dt*rb->acceleration;
 	prevAngularVelocity = rb->angularVelocity+0.5*dt*rb->angularAcceleration;
 
-
 	rb->se3.translation += prevVelocity*dt;
 
 	Vector3r axis = rb->angularVelocity;
@@ -51,8 +48,6 @@ void BallisticDynamicEngine::respondToCollisions(Body * body)
 	q.fromAxisAngle(axis,angle*dt);
 	rb->se3.rotation = q*rb->se3.rotation;
 	rb->se3.rotation.normalize();
-
-//	rb->updateBoundingVolume(rb->se3);
 
 	first = false;
 }

@@ -46,7 +46,6 @@ class Particle : public BodyPhysicalParameters
 	// FIXME : split se3 into position/orientation (Vector3r/Quaternion)
 	//public : Se3r se3;
 	public : Vector3r acceleration;
-	public : Vector3r prevAcceleration;
 	public : Vector3r velocity;
 	
 ///////////////////////////////////////////////////////////////////////////////////////////////////
