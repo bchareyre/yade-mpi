@@ -5,8 +5,9 @@
 
 class SDECParameters : public RigidBodyParameters
 {
-	public : Real kn;
-	public : Real ks;
+	public : Real young;
+	public : Real poisson;
+	public : Real frictionAngle;
 
 	public : SDECParameters ();
 	public : virtual ~SDECParameters ();

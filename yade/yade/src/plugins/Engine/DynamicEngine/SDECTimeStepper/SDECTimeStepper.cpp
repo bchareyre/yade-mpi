@@ -25,12 +25,15 @@
 #include "Interaction.hpp"
 #include "ComplexBody.hpp"
 #include "SDECParameters.hpp"
+#include "SDECContactPhysics.hpp"
+#include "SDECContactGeometry.hpp"
 #include "Sphere.hpp"
+#include "SDECLinearContactModel.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-SDECTimeStepper::SDECTimeStepper() : Actor()
+SDECTimeStepper::SDECTimeStepper() : Actor() , sdecContactModel(new SDECLinearContactModel)
 {
 	sdecGroup = 0;
 	interval = 10;
@@ -69,13 +72,25 @@ void SDECTimeStepper::findTimeStepFromBody(const Body* body)
 	if(! (sphere && sdec) )
 		return; // not possible to compute!
 
-	Real rad3 = std::pow(sphere->radius,3); // radius to the power of 3, from sphere
+	Real Dab  	= sphere->radius;
+	Real rad3 	= std::pow(Dab,2); // radius to the power of 2, from sphere
 
-	Real dt = 0.1*//min(
-			  sqrt( sdec->mass    / sdec->kn      )
-		//	, sqrt( sdec->inertia / sdec->ks*rad3 )
-		//  )
-		;
+	Real Eab 	= sdec->young;
+	Real Vab 	= sdec->poisson;
+	Real Dinit 	= 2*Dab; // assuming thet sphere is in contact with itself
+	Real Sinit 	= Mathr::PI * std::pow( Dab , 2);
+
+	Real alpha 	= sdecContactModel->alpha;
+	Real beta 	= sdecContactModel->beta;
+	Real gamma 	= sdecContactModel->gamma;
+
+	Real Kn		= abs((Eab*Sinit/Dinit)*( (1+alpha)/(beta*(1+Vab) + gamma*(1-alpha*Dab) ) ));
+	Real Ks		= abs(Kn*(1-alpha*Vab)/(1+Vab));
+
+	Real dt = 0.1*min(
+			  sqrt( sdec->mass       /  Kn       )
+			, sqrt( sdec->inertia[0] / (Ks*rad3) )
+		  );
 
 	newDt = std::min(dt,newDt);
 	computedSomething = true;
@@ -84,7 +99,7 @@ void SDECTimeStepper::findTimeStepFromBody(const Body* body)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void SDECTimeStepper::findTimeStep(const shared_ptr<Interaction>& interaction, shared_ptr<BodyContainer>& bodies)
+void SDECTimeStepper::findTimeStepFromInteraction(const shared_ptr<Interaction>& interaction, shared_ptr<BodyContainer>& bodies)
 {
 	unsigned int id1 = interaction->getId1();
 	unsigned int id2 = interaction->getId2();
@@ -92,11 +107,33 @@ void SDECTimeStepper::findTimeStep(const shared_ptr<Interaction>& interaction, s
 	if( (*bodies)[id1]->getGroup() != sdecGroup || (*bodies)[id2]->getGroup() != sdecGroup )
 		return; // skip other groups
 
-	Body* body1 = (*bodies)[id1].get();
-	Body* body2 = (*bodies)[id2].get();
+	SDECContactPhysics* sdecContact = dynamic_cast<SDECContactPhysics*>(interaction->interactionPhysics.get());
+	SDECContactGeometry* interactionGeometry = dynamic_cast<SDECContactGeometry*>(interaction->interactionGeometry.get());
+	SDECParameters * body1	= dynamic_cast<SDECParameters*>((*bodies)[id1]->physicalParameters.get());
+	SDECParameters * body2	= dynamic_cast<SDECParameters*>((*bodies)[id2]->physicalParameters.get());
 
-	findTimeStepFromBody(body1);
-	findTimeStepFromBody(body2);
+	if(! (sdecContact && interactionGeometry && body1 && body2))
+		return;
+	
+	Real mass 	= std::min( body1->mass                   , body2->mass               );
+//	if(mass == 0) 			// FIXME - remove that comment: zero mass and zero inertia are too stupid to waste time checking that.
+//		mass 	= std::max( body1->mass                   , body2->mass               );
+//	if(mass == 0)
+//		return; // not possible to compute
+	Real inertia 	= std::min( body1->inertia[0]             , body2->inertia[0]         );
+//	if( inertia == 0)
+//		inertia = std::max( body1->inertia[0]             , body2->inertia[0]         );
+//	if( inertia == 0)
+//		return;
+	Real rad3 	= std::pow( std::max(interactionGeometry->radius1 , interactionGeometry->radius2 ) , 2); // radius to the power of 2, from sphere
+
+	Real dt = 0.1*min(
+			  sqrt( mass     / abs(sdecContact->kn)      )
+			, sqrt( inertia  / abs(sdecContact->ks*rad3) )
+		  );
+
+	newDt = std::min(dt,newDt);
+	computedSomething = true;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -113,12 +150,14 @@ void SDECTimeStepper::action(Body* body)
 	computedSomething = false; // this flag is to avoid setting timestep to MAX_REAL :)
 
 	for( permanentInteractions->gotoFirst() ; permanentInteractions->notAtEnd() ; permanentInteractions->gotoNext() )
-		findTimeStep(permanentInteractions->getCurrent() , bodies);
+		findTimeStepFromInteraction(permanentInteractions->getCurrent() , bodies);
 
 	for( interactions->gotoFirst() ; interactions->notAtEnd() ; interactions->gotoNext() )
-		findTimeStep(interactions->getCurrent() , bodies);
+		findTimeStepFromInteraction(interactions->getCurrent() , bodies);
 
-	if(! computedSomething) // no interactions at all? so let's try to estimate timestep by investigating bodies
+	if(! computedSomething)
+// no interactions at all? so let's try to estimate timestep by investigating bodies,
+// simulating that a body in contact with itself. this happens only when there were not interactions at all.
 		for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext() )
 		{
 			Body* b = bodies->getCurrent().get();

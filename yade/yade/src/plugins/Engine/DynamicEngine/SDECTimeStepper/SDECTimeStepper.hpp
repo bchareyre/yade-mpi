@@ -30,6 +30,7 @@
 #include "Actor.hpp"
 class Interaction;
 class BodyContainer;
+class SDECLinearContactModel;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -39,6 +40,7 @@ class SDECTimeStepper : public Actor
 
 	public  : int sdecGroup;
 	public  : int interval;
+	private : shared_ptr<SDECLinearContactModel> sdecContactModel;
 
 	public : SDECTimeStepper();
 	public : virtual ~SDECTimeStepper();
@@ -47,7 +49,7 @@ class SDECTimeStepper : public Actor
 	public : virtual bool isActivated();
 	
 	private : void findTimeStepFromBody(const Body* );
-	private : void findTimeStep(const shared_ptr<Interaction>& , shared_ptr<BodyContainer>&);
+	private : void findTimeStepFromInteraction(const shared_ptr<Interaction>& , shared_ptr<BodyContainer>&);
 	private : Real newDt;
 	private : bool computedSomething;
 

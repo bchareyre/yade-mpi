@@ -135,7 +135,11 @@ void RotatingBox::createBox(shared_ptr<Body>& body, int i, int j, int k)
 	physics->angularVelocity	= Vector3r(0,0,0);
 	physics->velocity		= Vector3r(0,0,0);
 	physics->mass			= size[0]*size[1]*size[2]*densityBox;
-	physics->inertia		= Vector3r(physics->mass*(size[1]*size[1]+size[2]*size[2])/3,physics->mass*(size[0]*size[0]+size[2]*size[2])/3,physics->mass*(size[1]*size[1]+size[0]*size[0])/3);
+	physics->inertia		= Vector3r(
+							  physics->mass*(size[1]*size[1]+size[2]*size[2])/3
+							, physics->mass*(size[0]*size[0]+size[2]*size[2])/3
+							, physics->mass*(size[1]*size[1]+size[0]*size[0])/3
+						);
 	physics->se3			= Se3r(translation,q);
 
 	aabb->diffuseColor		= Vector3r(0,1,0);

@@ -7,14 +7,13 @@
 class SDECSpheresPlane : public FileGenerator
 {
 	private : Vector3r nbSpheres;
-	private : Real minRadius;
-	private : Real kn;
-	private : Real ks;
+	private : Real minRadius,density;
 	private : Vector3r groundSize;
 	private : Real maxRadius;
 	private : Real dampingForce;
 	private : Real dampingMomentum;
 	private : int timeStepUpdateInterval;
+	private : Real sphereYoungModulus,spherePoissonRatio,sphereFrictionDeg;
 	// construction
 	public : SDECSpheresPlane ();
 	public : ~SDECSpheresPlane ();

@@ -9,9 +9,9 @@ OBJECTS_DIR = $(YADECOMPILATIONPATH)
 CONFIG += debug \
           warn_on 
 TEMPLATE = subdirs 
-SUBDIRS += MassSpringBody2RigidBodyDynamicEngine \
+SUBDIRS += SimpleSpringDynamicEngine \
+           MassSpringBody2RigidBodyDynamicEngine \
            ExplicitMassSpringDynamicEngine \
            ErrorTolerantDynamicEngine \
-           SimpleSpringDynamicEngine \
            SDECTimeStepper \
            SDECDynamicEngine 

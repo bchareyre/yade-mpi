@@ -39,12 +39,15 @@ SDECSpheresPlane::SDECSpheresPlane () : FileGenerator()
 	nbSpheres = Vector3r(2,3,2);
 	minRadius = 5;
 	maxRadius = 5;
-	kn = 100000;
-	ks = 10000;
 	groundSize = Vector3r(200,5,200);
 	dampingForce = 0.3;
 	dampingMomentum = 0.3;
 	timeStepUpdateInterval = 300;
+	sphereYoungModulus   = 15000000.0;
+	//sphereYoungModulus   = 10000;
+	spherePoissonRatio  = 0.2;
+	sphereFrictionDeg   = 18.0;
+	density = 2600;
 }
 
 SDECSpheresPlane::~SDECSpheresPlane ()
@@ -61,8 +64,10 @@ void SDECSpheresPlane::registerAttributes()
 	REGISTER_ATTRIBUTE(nbSpheres);
 	REGISTER_ATTRIBUTE(minRadius);
 	REGISTER_ATTRIBUTE(maxRadius);
-	REGISTER_ATTRIBUTE(kn);
-	REGISTER_ATTRIBUTE(ks);
+	REGISTER_ATTRIBUTE(sphereYoungModulus);
+	REGISTER_ATTRIBUTE(spherePoissonRatio);
+	REGISTER_ATTRIBUTE(sphereFrictionDeg);
+	REGISTER_ATTRIBUTE(density);
 	REGISTER_ATTRIBUTE(groundSize);
 	REGISTER_ATTRIBUTE(dampingForce);
 	REGISTER_ATTRIBUTE(dampingMomentum);
@@ -185,11 +190,12 @@ void SDECSpheresPlane::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 	
 	physics->angularVelocity	= Vector3r(0,0,0);
 	physics->velocity		= Vector3r(0,0,0);
-	physics->mass			= 4.0/3.0*Mathr::PI*radius*radius; //*density
+	physics->mass			= 4.0/3.0*Mathr::PI*radius*radius*density;
 	physics->inertia		= Vector3r(2.0/5.0*physics->mass*radius*radius,2.0/5.0*physics->mass*radius*radius,2.0/5.0*physics->mass*radius*radius); //
 	physics->se3			= Se3r(translation,q);
-	physics->kn			= kn;
-	physics->ks			= ks;
+	physics->young			= sphereYoungModulus;
+	physics->poisson		= spherePoissonRatio;
+	physics->frictionAngle		= sphereFrictionDeg * Mathr::PI/180.0;
 
 	aabb->diffuseColor		= Vector3r(0,1,0);
 
@@ -227,11 +233,18 @@ void SDECSpheresPlane::createBox(shared_ptr<Body>& body, Vector3r position, Vect
 	
 	physics->angularVelocity	= Vector3r(0,0,0);
 	physics->velocity		= Vector3r(0,0,0);
-	physics->mass			= 0;
-	physics->inertia		= Vector3r(0,0,0);
+	physics->mass			= extents[0]*extents[1]*extents[2]*density*2; 
+	physics->inertia		= Vector3r(
+							  physics->mass*(extents[1]*extents[1]+extents[2]*extents[2])/3
+							, physics->mass*(extents[0]*extents[0]+extents[2]*extents[2])/3
+							, physics->mass*(extents[1]*extents[1]+extents[0]*extents[0])/3
+						);
+	//physics->mass			= 0;
+	//physics->inertia		= Vector3r(0,0,0);
 	physics->se3			= Se3r(position,q);
-	physics->kn			= kn;
-	physics->ks			= ks;
+	physics->young			= sphereYoungModulus;
+	physics->poisson		= spherePoissonRatio;
+	physics->frictionAngle		= sphereFrictionDeg * Mathr::PI/180.0;
 
 	aabb->diffuseColor		= Vector3r(1,0,0);
 

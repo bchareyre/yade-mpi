@@ -48,11 +48,6 @@ SDECImport::SDECImport () : FileGenerator()
 	upperCorner 		= Vector3r(-1000,-1000,-1000);
 	thickness 		= 0.01;
 	importFilename 		= "../data/small.sdec.xyz";
-	density			= 2.6;
-	kn_Spheres 		= 100000;
-	ks_Spheres 		= 10000;
-	kn_Box			= 100000;
-	ks_Box			= 10000;
 	wall_top 		= false;
 	wall_bottom 		= true;
 	wall_1			= true;
@@ -74,13 +69,21 @@ SDECImport::SDECImport () : FileGenerator()
 	recordIntervalIter	= 100;
 
 	bigBallRadius		= 1;
-	bigBallDensity		= 4;
+	bigBallDensity		= 7000;
 	bigBallDropTimeSeconds	= 50;
 	
-	dampingForce = 0.3;
-	dampingMomentum = 0.3;
+	dampingForce = 0.7;
+	dampingMomentum = 0.7;
 	timeStepUpdateInterval = 300;
-
+	
+	sphereYoungModulus  = 15000000.0;
+	spherePoissonRatio  = 0.2;
+	sphereFrictionDeg   = 18.0;
+	density			= 2600;
+	
+	boxYoungModulus   = 15000000.0;
+	boxPoissonRatio  = 0.2;
+	boxFrictionDeg   = -20.0;
 }
 
 SDECImport::~SDECImport ()
@@ -94,10 +97,15 @@ void SDECImport::registerAttributes()
 //	REGISTER_ATTRIBUTE(upperCorner);
 //	REGISTER_ATTRIBUTE(thickness);
 	REGISTER_ATTRIBUTE(importFilename);
-	REGISTER_ATTRIBUTE(kn_Spheres);
-	REGISTER_ATTRIBUTE(ks_Spheres);
-	REGISTER_ATTRIBUTE(kn_Box);
-	REGISTER_ATTRIBUTE(ks_Box);
+
+	REGISTER_ATTRIBUTE(sphereYoungModulus);
+	REGISTER_ATTRIBUTE(spherePoissonRatio);
+	REGISTER_ATTRIBUTE(sphereFrictionDeg);
+
+	REGISTER_ATTRIBUTE(boxYoungModulus);
+	REGISTER_ATTRIBUTE(boxPoissonRatio);
+	REGISTER_ATTRIBUTE(boxFrictionDeg);
+
 	REGISTER_ATTRIBUTE(density);
 	REGISTER_ATTRIBUTE(dampingForce);
 	REGISTER_ATTRIBUTE(dampingMomentum);
@@ -278,10 +286,13 @@ void SDECImport::createSphere(shared_ptr<Body>& body, Vector3r translation, Real
 	physics->angularVelocity	= Vector3r(0,0,0);
 	physics->velocity		= Vector3r(0,0,0);
 	physics->mass			= 4.0/3.0*Mathr::PI*radius*radius*density;
-	physics->inertia		= Vector3r(2.0/5.0*physics->mass*radius*radius,2.0/5.0*physics->mass*radius*radius,2.0/5.0*physics->mass*radius*radius);
+	physics->inertia		= Vector3r( 	2.0/5.0*physics->mass*radius*radius,
+							2.0/5.0*physics->mass*radius*radius,
+							2.0/5.0*physics->mass*radius*radius);
 	physics->se3			= Se3r(translation,q);
-	physics->kn			= kn_Spheres;
-	physics->ks			= ks_Spheres;
+	physics->young			= sphereYoungModulus;
+	physics->poisson		= spherePoissonRatio;
+	physics->frictionAngle		= sphereFrictionDeg * Mathr::PI/180.0;
 
 	aabb->diffuseColor		= Vector3r(0,1,0);
 
@@ -319,11 +330,19 @@ void SDECImport::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r e
 	
 	physics->angularVelocity	= Vector3r(0,0,0);
 	physics->velocity		= Vector3r(0,0,0);
-	physics->mass			= 0;
-	physics->inertia		= Vector3r(0,0,0);
+	physics->mass			= extents[0]*extents[1]*extents[2]*density*2; 
+	physics->inertia		= Vector3r(
+							  physics->mass*(extents[1]*extents[1]+extents[2]*extents[2])/3
+							, physics->mass*(extents[0]*extents[0]+extents[2]*extents[2])/3
+							, physics->mass*(extents[1]*extents[1]+extents[0]*extents[0])/3
+						);
+//	physics->mass			= 0;
+//	physics->inertia		= Vector3r(0,0,0);
 	physics->se3			= Se3r(position,q);
-	physics->kn			= 100000;
-	physics->ks			= 10000;
+
+	physics->young			= boxYoungModulus;
+	physics->poisson		= boxPoissonRatio;
+	physics->frictionAngle		= boxFrictionDeg * Mathr::PI/180.0;
 
 	aabb->diffuseColor		= Vector3r(1,0,0);
 

@@ -18,7 +18,7 @@ void SDECParameters::postProcessAttributes(bool deserializing)
 void SDECParameters::registerAttributes()
 {
 	RigidBodyParameters::registerAttributes();
-	REGISTER_ATTRIBUTE(kn);
-	REGISTER_ATTRIBUTE(ks);
+	REGISTER_ATTRIBUTE(young);
+	REGISTER_ATTRIBUTE(poisson);
 }
 

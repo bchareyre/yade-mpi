@@ -23,6 +23,7 @@ class SDECContactPhysics : public InteractionPhysics
 	public : Vector3r prevNormal;			// unit normal of the contact plane.
 	public : Vector3r normalForce;			// normal force applied on a DE
 	public : Vector3r shearForce;			// shear force applied on a DE
+	public : Real frictionAngle; 			// angle of friction, according to Coulumb criterion
 
 	REGISTER_CLASS_NAME(SDECContactPhysics);
 };

@@ -34,9 +34,17 @@
 
 class SDECLinearContactModel : public InteractionPhysicsFunctor
 {
+	// parameters of the contact, they have default values. but those values can be modifies from xml
+	public : Real alpha,beta,gamma;
+
+	public : SDECLinearContactModel();
+
 	public : virtual void go(	const shared_ptr<BodyPhysicalParameters>& b1,
 					const shared_ptr<BodyPhysicalParameters>& b2,
 					const shared_ptr<Interaction>& interaction);
+
+	protected: virtual void registerAttributes();
+
 	REGISTER_CLASS_NAME(SDECLinearContactModel);
 };
 

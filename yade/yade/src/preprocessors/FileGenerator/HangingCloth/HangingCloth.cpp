@@ -69,6 +69,10 @@ HangingCloth::HangingCloth () : FileGenerator()
 	dampingMomentum = 0.3;
 	density = 2;
 	linkSpheres = true;
+
+	sphereYoungModulus   = 10000;
+	spherePoissonRatio  = 0.2;
+	sphereFrictionDeg   = 18.0;
 }
 
 HangingCloth::~HangingCloth ()
@@ -106,6 +110,10 @@ void HangingCloth::registerAttributes()
 	REGISTER_ATTRIBUTE(dampingForce);
 	REGISTER_ATTRIBUTE(dampingMomentum);
 	REGISTER_ATTRIBUTE(linkSpheres);
+
+//	REGISTER_ATTRIBUTE(sphereYoungModulus);
+//	REGISTER_ATTRIBUTE(spherePoissonRatio);
+//	REGISTER_ATTRIBUTE(sphereFrictionDeg);
 }
 
 string HangingCloth::generate()
@@ -453,8 +461,9 @@ void HangingCloth::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 	physics->mass			= 4.0/3.0*Mathr::PI*radius*radius*density;
 	physics->inertia		= Vector3r(2.0/5.0*physics->mass*radius*radius,2.0/5.0*physics->mass*radius*radius,2.0/5.0*physics->mass*radius*radius);
 	physics->se3			= Se3r(translation,q);
-	physics->kn			= 1000000;
-	physics->ks			= 100000;
+	physics->young			= sphereYoungModulus;
+	physics->poisson		= spherePoissonRatio;
+	physics->frictionAngle		= sphereFrictionDeg * Mathr::PI/180.0;
 
 	aabb->diffuseColor		= Vector3r(0,1,0);
 
@@ -496,8 +505,9 @@ void HangingCloth::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r
 	physics->mass			= 0;
 	physics->inertia		= Vector3r(0,0,0);
 	physics->se3			= Se3r(position,q);
-	physics->kn			= 500000;
-	physics->ks			= 50000;
+	physics->young			= sphereYoungModulus;
+	physics->poisson		= spherePoissonRatio;
+	physics->frictionAngle		= sphereFrictionDeg * Mathr::PI/180.0;
 
 	aabb->diffuseColor		= Vector3r(1,0,0);
 

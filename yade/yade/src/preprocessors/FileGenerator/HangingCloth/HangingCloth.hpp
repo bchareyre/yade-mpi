@@ -21,7 +21,7 @@ class HangingCloth : public FileGenerator
 	private : bool fixPoint4;
 	private : bool ground;
 	private : Real dampingForce;
-	
+	private : Real sphereYoungModulus,spherePoissonRatio,sphereFrictionDeg;
 // spheres
 	private : Vector3r nbSpheres;
 	private : Real density;

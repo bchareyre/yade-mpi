@@ -10,18 +10,17 @@ class SDECLinkedSpheres : public FileGenerator
 {
 	private	: Vector3r nbSpheres; 
 
-	private	: Real minRadius;
+	private	: Real minRadius,density;
 	private	: Real maxRadius;
 	private	: Real disorder;
 	private	: Real spacing;
 	private	: Real supportSize;
 	private	: bool support1;
 	private	: bool support2;
-	private	: Real kn;
-	private	: Real ks;
 	private : Real dampingForce;
 	private : Real dampingMomentum;
 	private : int timeStepUpdateInterval;
+	private : Real sphereYoungModulus,spherePoissonRatio,sphereFrictionDeg;
 	
 	private : void createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents);
 	private : void createSphere(shared_ptr<Body>& body, int i, int j, int k);
