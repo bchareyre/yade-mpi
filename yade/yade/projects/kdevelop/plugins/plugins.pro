@@ -23,4 +23,5 @@ SUBDIRS += InteractionGeometry \
            CollisionFunctor \
            Body \
            KinematicEngine \
-           DynamicEngine 
+           DynamicEngine \
+	   Action
