@@ -34,3 +34,14 @@ class SimpleBroadCollider : public BroadPhaseCollider
 REGISTER_CLASS(SimpleBroadCollider,false);
 
 #endif // __SIMPLEBROADCOLLIDER_H__ 
+
+
+/*
+	protected : static bool overlappSphereSphere(const shared_ptr<BoundingVolume> bv1, const shared_ptr<BoundingVolume> bv2);
+	protected : static inline bool overlappSphereAABB(const shared_ptr<BoundingVolume> bv1, const shared_ptr<BoundingVolume> bv2)
+	{
+		return overlappAABBSphere(bv2,bv1);
+	}
+	protected : static bool overlappAABBSphere(const shared_ptr<BoundingVolume> bv1, const shared_ptr<BoundingVolume> bv2);
+	protected : static bool overlappAABBAABB(const shared_ptr<BoundingVolume> bv1, const shared_ptr<BoundingVolume> bv2);
+*/

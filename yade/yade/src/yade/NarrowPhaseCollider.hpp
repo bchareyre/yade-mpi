@@ -47,8 +47,6 @@ class Body;
 
 class NarrowPhaseCollider : public Serializable
 {
-	//protected : shared_ptr<FinalCollider> collider;
-	
 	// construction
 	public : NarrowPhaseCollider ();
 	

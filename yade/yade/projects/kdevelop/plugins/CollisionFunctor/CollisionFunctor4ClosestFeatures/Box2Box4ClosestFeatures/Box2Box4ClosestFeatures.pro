@@ -3,12 +3,22 @@
 # Subdir relative project main directory: ./plugins/CollisionFunctor/CollisionFunctor4ClosestFeatures/Box2Box4ClosestFeatures
 # Target is a library:  
 
-LIBS += -rdynamic 
+LIBS += -lBox \
+        -lClosestFeatures \
+        -rdynamic 
+INCLUDEPATH = ../../../../plugins/GeometricalModel/Box \
+              ../../../../plugins/InteractionModel/ClosestFeatures \
+              ../../../../yade 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
+QMAKE_LIBDIR = ../../../../plugins/GeometricalModel/Box/$(YADEDYNLIBPATH) \
+               ../../../../plugins/InteractionModel/ClosestFeatures/$(YADEDYNLIBPATH) \
+               $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
 CONFIG += release \
           warn_on \
           dll 
 TEMPLATE = lib 
+HEADERS += Box2Box4ClosestFeatures.hpp 
+SOURCES += Box2Box4ClosestFeatures.cpp 

@@ -35,12 +35,17 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "Vector3.hpp"
-#include "Chrono.hpp"
+//#include "Chrono.hpp"
 #include <iostream>
 #include "Types.hpp"
 #include "Singleton.hpp"
-#include "NonConnexBody.hpp"
-#include "CollisionFunctor.hpp"
+//#include "NonConnexBody.hpp"
+//#include "CollisionFunctor.hpp"
+class CollisionFunctor;
+//class Vector3;
+//class Chrono;
+class NonConnexBody;
+#include "MultiMethodsManager.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -58,7 +63,8 @@ class Omega : public Singleton<Omega>
 	public : shared_ptr<NonConnexBody> rootBody;
 	public : ptime startingSimulationTime;
 	
-	public : MultiMethodsManager<CollisionFunctor> narrowCollider;
+	//public : MultiMethodsManager<CollisionFunctor> narrowCollider;
+	public : MultiMethodsManager narrowCollider;
 	
 	private   : Omega() ;
 	private   : ~Omega() ;

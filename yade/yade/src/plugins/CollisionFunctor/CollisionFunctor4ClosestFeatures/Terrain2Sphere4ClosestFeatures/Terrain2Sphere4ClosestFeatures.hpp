@@ -21,53 +21,29 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#ifndef __COLLISIONFUNCTOR_H__
-#define __COLLISIONFUNCTOR_H__
+#ifndef __TERRAIN2SPHERE4CLOSESTFEATURES_H__
+#define __TERRAIN2SPHERE4CLOSESTFEATURES_H__
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <vector>
-#include <set>
+#include "CollisionFunctor.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "ClassFactory.hpp"
-#include "Indexable.hpp"
-#include "CollisionModel.hpp"
-#include "Se3.hpp"
-#include "Contact.hpp"
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-/*! \brief Abstract interface for all collision functor.
-
-	Every functions that describe collision between two CollisionModels must derived from CollisionFunctor.
-*/
-class CollisionFunctor 
-{	
-		
-	private : bool reverse;
-
-	public : void setReverse(bool r) { reverse = r; };
-	public : bool isReverse() { return reverse; };
-	
+/*! \brief Provide collision handling between a Terrain and a Sphere in terms of ClosestFeatures */
+class Terrain2Sphere4ClosestFeatures : public CollisionFunctor
+{		
 	// construction
-	public : CollisionFunctor () {};
-	public : virtual ~CollisionFunctor () {};
+	public : Terrain2Sphere4ClosestFeatures ();
+	public : virtual ~Terrain2Sphere4ClosestFeatures ();
 
-	protected : virtual bool collide(const shared_ptr<CollisionModel> , const shared_ptr<CollisionModel> , const Se3& , const Se3& , shared_ptr<Contact> ) { throw; };
-	protected : virtual bool reverseCollide(const shared_ptr<CollisionModel> , const shared_ptr<CollisionModel> ,  const Se3& , const Se3& , shared_ptr<Contact> ) { throw; };
+	protected : virtual bool collide(const shared_ptr<CollisionModel> cm1, const shared_ptr<CollisionModel> cm2, const Se3& se31, const Se3& se32, shared_ptr<Contact> c);
+	protected : virtual bool reverseCollide(const shared_ptr<CollisionModel> cm1, const shared_ptr<CollisionModel> cm2,  const Se3& se31, const Se3& se32, shared_ptr<Contact> c);
 
-	public    : inline bool operator() (const shared_ptr<CollisionModel> cm1, const shared_ptr<CollisionModel> cm2, const Se3& se31, const Se3& se32, shared_ptr<Contact> c)
-	{
-		if (reverse)
-			return reverseCollide(cm1,cm2,se31,se32,c);
-		else
-			return collide(cm1,cm2,se31,se32,c);
-	}
+	// FIXME : put into toolbox and serialization and everything
+	private : float sqrDistTriPoint(const Vector3& p, const std::vector<Vector3>& tri, Vector3& pt);
 	
 };
 
@@ -75,7 +51,7 @@ class CollisionFunctor
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-#endif // __COLLISIONFUNCTOR_H__
+#endif // __TERRAIN2SPHERE4CLOSESTFEATURES_H__
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////

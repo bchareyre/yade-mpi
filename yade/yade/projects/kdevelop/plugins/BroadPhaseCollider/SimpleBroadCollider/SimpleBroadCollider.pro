@@ -3,24 +3,22 @@
 # Subdir relative project main directory: ./plugins/BroadPhaseCollider/SimpleBroadCollider
 # Target is a library:  
 
+HEADERS += SimpleBroadCollider.hpp 
+SOURCES += SimpleBroadCollider.cpp 
 LIBS += -lBoundingSphere \
-        -lAABB \
-        -rdynamic 
+-lAABB \
+-rdynamic
 INCLUDEPATH = ../../../plugins/BoundingVolume/BoundingSphere \
-              ../../../plugins/BoundingVolume/AABB \
-              ../../../yade 
-MOC_DIR = $(YADECOMPILATIONPATH) 
-UI_DIR = $(YADECOMPILATIONPATH) 
-OBJECTS_DIR = $(YADECOMPILATIONPATH) 
+../../../plugins/BoundingVolume/AABB \
+../../../yade
+MOC_DIR = $(YADECOMPILATIONPATH)
+UI_DIR = $(YADECOMPILATIONPATH)
+OBJECTS_DIR = $(YADECOMPILATIONPATH)
 QMAKE_LIBDIR = ../../../plugins/BoundingVolume/BoundingSphere/$(YADEDYNLIBPATH) \
-               ../../../plugins/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
-               $(YADEDYNLIBPATH) 
-DESTDIR = $(YADEDYNLIBPATH) 
+../../../plugins/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
+$(YADEDYNLIBPATH)
+DESTDIR = $(YADEDYNLIBPATH)
 CONFIG += release \
-          warn_on \
-          dll 
-TEMPLATE = lib 
-HEADERS += BVOverlapper.hpp \
-           SimpleBroadCollider.hpp 
-SOURCES += BVOverlapper.cpp \
-           SimpleBroadCollider.cpp 
+warn_on \
+dll
+TEMPLATE = lib

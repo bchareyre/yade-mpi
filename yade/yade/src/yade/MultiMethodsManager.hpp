@@ -34,67 +34,35 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "ClassFactory.hpp"
-#include "Indexable.hpp"
-#include "CollisionModel.hpp"
-#include "Se3.hpp"
+//#include "CollisionFunctor.hpp"
+
+class Se3;
+class Contact;
+class CollisionModel;
+class CollisionFunctor;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-template<class Functor>
+//template<class Functor>
 class MultiMethodsManager 
 {	
-	protected : std::vector<std::vector<Functor> > callBacks;
+	protected : std::vector<std::vector<shared_ptr<CollisionFunctor> > > callBacks;
 	//private   : int size;
 	private   : map<string,int> indexedClassName;
 	
 	// FIXME : remove nullFunc
-	protected : Functor nullFunc;
+	//protected : Functor nullFunc;
 		
 	// construction
-	public : MultiMethodsManager<Functor> ()
+	public : MultiMethodsManager ()
 	{
 		callBacks.resize(0);
 	};
 
 	public : virtual ~MultiMethodsManager () {};
 
-	public : void add(const string& name)
-	{
-		if (indexedClassName.find(name)!=indexedClassName.end())
-		{			
-			shared_ptr<Indexable> indexable = shared_dynamic_cast<Indexable>(ClassFactory::instance().createShared(name));
-			int& index = indexable->getClassIndex();
-			assert(index==-1);
-			index = indexedClassName.size()-1;
-			indexedClassName[name] = index;
-			map<string,int>::iterator icni    = indexedClassName.begin();
-			map<string,int>::iterator icniEnd = indexedClassName.end();
-			for( ;icni!=icniEnd; ++icni )
-			{
-				string functorName = name+"2"+(*icni).first+"4ClosestFeatures";
-				string reverseFunctorName = (*icni).first+"2"+name+"4ClosestFeatures";
-				shared_ptr<Functor> collisionFunctor,reverseCollisionFunctor;
-				try
-				{
-					collisionFunctor = shared_dynamic_cast<Functor>(ClassFactory::instance().createShared(functorName));
-					reverseCollisionFunctor = shared_dynamic_cast<Functor>(ClassFactory::instance().createShared(functorName));
-					collisionFunctor->setReverse(false);
-					reverseCollisionFunctor->setReverse(true);
-				}
-				catch (FactoryError& fe)
-				{
-					collisionFunctor = shared_dynamic_cast<Functor>(ClassFactory::instance().createShared(reverseFunctorName));
-					reverseCollisionFunctor = shared_dynamic_cast<Functor>(ClassFactory::instance().createShared(reverseFunctorName));
-					collisionFunctor->setReverse(true);
-					reverseCollisionFunctor->setReverse(false);	
-				}
-				
-				callBacks[index][indexedClassName[(*icni).first]] = collisionFunctor;
-				callBacks[indexedClassName[(*icni).first]][index] = reverseCollisionFunctor;
-			}
-		}
-	}
+	public : bool add(const string& name);
 	
 	/*private : bool pairExists(int i,int j)
 	{
@@ -164,18 +132,7 @@ class MultiMethodsManager
 			return false;
 	}*/
 
-	public : inline bool operator() (const shared_ptr<CollisionModel> cm1, const shared_ptr<CollisionModel> cm2, const Se3& se31, const Se3& se32, shared_ptr<Contact> c)
-	{
-		assert(cm1->getClassIndex()>0);
-		assert(cm2->getClassIndex()>0);
-		assert(cm1->getClassIndex()<callBacks.size());
-		assert(cm2->getClassIndex()<callBacks.size());
-		shared_ptr<Functor> cf = callBacks[cm1->getClassIndex()][cm2->getClassIndex()];
-		if (cf!=0)
-			return (*cf)(cm1,cm2,se31,se32,c);
-		else
-			return false;
-	}
+	public : inline bool operator() (const shared_ptr<CollisionModel> cm1, const shared_ptr<CollisionModel> cm2, const Se3& se31, const Se3& se32, shared_ptr<Contact> c);
 	
 };
 

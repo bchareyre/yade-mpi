@@ -22,7 +22,6 @@ HEADERS += Archive.hpp \
            DynamicEngine.hpp \
            DynLibManager.hpp \
            ExceptionMessages.hpp \
-           FinalCollider.hpp \
            FpsTracker.hpp \
            FrontEnd.hpp \
            GeometricalModelFactory.hpp \
@@ -37,7 +36,6 @@ HEADERS += Archive.hpp \
            NarrowPhaseCollider.hpp \
            NonConnexBody.hpp \
            Omega.hpp \
-           Overlapper.hpp \
            QGLSubWindow.hpp \
            QtFrontEnd.hpp \
            Quaternion.hpp \
@@ -76,7 +74,6 @@ SOURCES += Archive.cpp \
            DynamicEngine.cpp \
            DynLibManager.cpp \
            ExceptionMessages.cpp \
-           FinalCollider.cpp \
            FpsTracker.cpp \
            FrontEnd.cpp \
            GeometricalModel.cpp \
@@ -89,7 +86,6 @@ SOURCES += Archive.cpp \
            NarrowPhaseCollider.cpp \
            NonConnexBody.cpp \
            Omega.cpp \
-           Overlapper.cpp \
            QGLSubWindow.cpp \
            QtFrontEnd.cpp \
            Quaternion.cpp \

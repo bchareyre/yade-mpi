@@ -3,12 +3,22 @@
 # Subdir relative project main directory: ./plugins/CollisionFunctor/CollisionFunctor4ClosestFeatures/Sphere2Sphere4ClosestFeatures
 # Target is a library:  
 
-LIBS += -rdynamic 
+LIBS += -lSphere \
+        -lClosestFeatures \
+        -rdynamic 
+INCLUDEPATH = ../../../../plugins/GeometricalModel/Sphere \
+              ../../../../plugins/InteractionModel/ClosestFeatures \
+              ../../../../yade 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
+QMAKE_LIBDIR = ../../../../plugins/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
+               ../../../../plugins/InteractionModel/ClosestFeatures/$(YADEDYNLIBPATH) \
+               $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
 CONFIG += release \
           warn_on \
           dll 
 TEMPLATE = lib 
+HEADERS += Sphere2Sphere4ClosestFeatures.hpp 
+SOURCES += Sphere2Sphere4ClosestFeatures.cpp 

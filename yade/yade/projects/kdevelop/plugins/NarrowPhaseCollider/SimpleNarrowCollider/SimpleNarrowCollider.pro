@@ -3,33 +3,31 @@
 # Subdir relative project main directory: ./plugins/NarrowPhaseCollider/SimpleNarrowCollider
 # Target is a library:  
 
+HEADERS += SimpleNarrowCollider.hpp 
+SOURCES += SimpleNarrowCollider.cpp 
 LIBS += -lClosestFeatures \
-        -lAABB \
-        -lBox \
-        -lSphere \
-        -lTerrain \
-        -rdynamic 
+-lAABB \
+-lBox \
+-lSphere \
+-lTerrain \
+-rdynamic
 INCLUDEPATH = ../../../plugins/InteractionModel/ClosestFeatures \
-              ../../../plugins/BoundingVolume/AABB \
-              ../../../plugins/GeometricalModel/Box \
-              ../../../plugins/GeometricalModel/Sphere \
-              ../../../plugins/GeometricalModel/Terrain \
-              ../../../yade 
-MOC_DIR = $(YADECOMPILATIONPATH) 
-UI_DIR = $(YADECOMPILATIONPATH) 
-OBJECTS_DIR = $(YADECOMPILATIONPATH) 
+../../../plugins/BoundingVolume/AABB \
+../../../plugins/GeometricalModel/Box \
+../../../plugins/GeometricalModel/Sphere \
+../../../plugins/GeometricalModel/Terrain \
+../../../yade
+MOC_DIR = $(YADECOMPILATIONPATH)
+UI_DIR = $(YADECOMPILATIONPATH)
+OBJECTS_DIR = $(YADECOMPILATIONPATH)
 QMAKE_LIBDIR = ../../../plugins/InteractionModel/ClosestFeatures/$(YADEDYNLIBPATH) \
-               ../../../plugins/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
-               ../../../plugins/GeometricalModel/Box/$(YADEDYNLIBPATH) \
-               ../../../plugins/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
-               ../../../plugins/GeometricalModel/Terrain/$(YADEDYNLIBPATH) \
-               $(YADEDYNLIBPATH) 
-DESTDIR = $(YADEDYNLIBPATH) 
+../../../plugins/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
+../../../plugins/GeometricalModel/Box/$(YADEDYNLIBPATH) \
+../../../plugins/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
+../../../plugins/GeometricalModel/Terrain/$(YADEDYNLIBPATH) \
+$(YADEDYNLIBPATH)
+DESTDIR = $(YADEDYNLIBPATH)
 CONFIG += release \
-          warn_on \
-          dll 
-TEMPLATE = lib 
-HEADERS += BVCFFinalCollider.hpp \
-           SimpleNarrowCollider.hpp 
-SOURCES += BVCFFinalCollider.cpp \
-           SimpleNarrowCollider.cpp 
+warn_on \
+dll
+TEMPLATE = lib

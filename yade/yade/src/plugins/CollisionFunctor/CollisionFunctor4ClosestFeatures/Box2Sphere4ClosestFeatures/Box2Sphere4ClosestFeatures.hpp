@@ -21,53 +21,26 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#ifndef __COLLISIONFUNCTOR_H__
-#define __COLLISIONFUNCTOR_H__
+#ifndef __BOX2SPHERE4CLOSESTFEATURES_H__
+#define __BOX2SPHERE4CLOSESTFEATURES_H__
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <vector>
-#include <set>
+#include "CollisionFunctor.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "ClassFactory.hpp"
-#include "Indexable.hpp"
-#include "CollisionModel.hpp"
-#include "Se3.hpp"
-#include "Contact.hpp"
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-/*! \brief Abstract interface for all collision functor.
-
-	Every functions that describe collision between two CollisionModels must derived from CollisionFunctor.
-*/
-class CollisionFunctor 
-{	
-		
-	private : bool reverse;
-
-	public : void setReverse(bool r) { reverse = r; };
-	public : bool isReverse() { return reverse; };
-	
+/*! \brief Provide collision handling between a axis aligned box and a sphere in terms of ClosestFeatures */
+class Box2Sphere4ClosestFeatures : public CollisionFunctor
+{		
 	// construction
-	public : CollisionFunctor () {};
-	public : virtual ~CollisionFunctor () {};
+	public : Box2Sphere4ClosestFeatures ();
+	public : virtual ~Box2Sphere4ClosestFeatures ();
 
-	protected : virtual bool collide(const shared_ptr<CollisionModel> , const shared_ptr<CollisionModel> , const Se3& , const Se3& , shared_ptr<Contact> ) { throw; };
-	protected : virtual bool reverseCollide(const shared_ptr<CollisionModel> , const shared_ptr<CollisionModel> ,  const Se3& , const Se3& , shared_ptr<Contact> ) { throw; };
-
-	public    : inline bool operator() (const shared_ptr<CollisionModel> cm1, const shared_ptr<CollisionModel> cm2, const Se3& se31, const Se3& se32, shared_ptr<Contact> c)
-	{
-		if (reverse)
-			return reverseCollide(cm1,cm2,se31,se32,c);
-		else
-			return collide(cm1,cm2,se31,se32,c);
-	}
+	protected : virtual bool collide(const shared_ptr<CollisionModel> cm1, const shared_ptr<CollisionModel> cm2, const Se3& se31, const Se3& se32, shared_ptr<Contact> c);
+	protected : virtual bool reverseCollide(const shared_ptr<CollisionModel> cm1, const shared_ptr<CollisionModel> cm2,  const Se3& se31, const Se3& se32, shared_ptr<Contact> c);
 	
 };
 
@@ -75,7 +48,7 @@ class CollisionFunctor
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-#endif // __COLLISIONFUNCTOR_H__
+#endif // __BOX2SPHERE4CLOSESTFEATURES_H__
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
