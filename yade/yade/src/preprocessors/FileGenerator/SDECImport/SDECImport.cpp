@@ -5,20 +5,35 @@
 #include "Sphere.hpp"
 #include "ComplexBody.hpp"
 #include "SAPCollider.hpp"
-#include "SDECParameters.hpp"
+#include "PersistentSAPCollider.hpp"
 #include <fstream>
 #include "IOManager.hpp"
+#include "Interaction.hpp"
+#include "BoundingVolumeDispatcher.hpp"
+#include "InteractionDescriptionSet2AABBFunctor.hpp"
+#include "InteractionDescriptionSet.hpp"
+
 #include "SDECDynamicEngine.hpp"
+#include "SDECLinearContactModel.hpp"
 #include "SDECParameters.hpp"
 #include "SDECLinkGeometry.hpp"
-#include "Interaction.hpp"
-#include "Actor.hpp"
-#include "ForceRecorder.hpp"
-#include "AveragePositionRecorder.hpp"
+#include "SDECLinkPhysics.hpp"
 
-#include "BoundingVolumeDispatcher.hpp"
-#include "InteractionDescriptionSet.hpp"
-#include "InteractionDescriptionSet2AABBFunctor.hpp"
+#include "ActionDispatcher.hpp"
+#include "ActionDispatcher.hpp"
+#include "CundallNonViscousForceDamping.hpp"
+#include "CundallNonViscousMomentumDamping.hpp"
+
+#include "InteractionGeometryDispatcher.hpp"
+#include "InteractionPhysicsDispatcher.hpp"
+#include "SimpleBody.hpp"
+#include "InteractionBox.hpp"
+#include "InteractionSphere.hpp"
+#include "TimeIntegratorDispatcher.hpp"
+
+#include "ActionReset.hpp"
+
+#include "AveragePositionRecorder.hpp"
 
 #include <boost/filesystem/convenience.hpp>
 #include <boost/lexical_cast.hpp>
@@ -28,39 +43,47 @@ using namespace std;
 
 SDECImport::SDECImport () : FileGenerator()
 {
-	lowerCorner 	= Vector3r(1000,1000,1000);
-	upperCorner 	= Vector3r(-1000,-1000,-1000);
-	thickness 	= 0.01;
-	importFilename 	= "";
-	kn_Spheres 	= 100000;
-	ks_Spheres 	= 10000;
-	kn_Box		= 100000;
-	ks_Box		= 10000;
-	wall_top 	= false;
-	wall_bottom 	= true;
-	wall_1		= true;
-	wall_2		= true;
-	wall_3		= true;
-	wall_4		= true;
-	wall_top_wire 	= true;
-	wall_bottom_wire= true;
-	wall_1_wire	= true;
-	wall_2_wire	= true;
-	wall_3_wire	= true;
-	wall_4_wire	= true;
-	spheresColor	= Vector3f(0.8,0.3,0.3);
-	spheresRandomColor = false;
+	lowerCorner 		= Vector3r(1000,1000,1000);
+	upperCorner 		= Vector3r(-1000,-1000,-1000);
+	thickness 		= 0.01;
+	importFilename 		= "../data/small.sdec.xyz";
+	density			= 2.6;
+	kn_Spheres 		= 100000;
+	ks_Spheres 		= 10000;
+	kn_Box			= 100000;
+	ks_Box			= 10000;
+	wall_top 		= false;
+	wall_bottom 		= true;
+	wall_1			= true;
+	wall_2			= true;
+	wall_3			= true;
+	wall_4			= true;
+	wall_top_wire 		= true;
+	wall_bottom_wire	= true;
+	wall_1_wire		= true;
+	wall_2_wire		= true;
+	wall_3_wire		= true;
+	wall_4_wire		= true;
+	spheresColor		= Vector3f(0.8,0.3,0.3);
+	spheresRandomColor	= false;
+	recordBottomForce	= true;
+	forceRecordFile		= "../data/force";
+	recordAveragePositions	= true;
+	positionRecordFile	= "../data/position";
+	recordIntervalIter	= 100;
+
+	bigBallRadius		= 1;
+	bigBallDensity		= 4;
+	bigBallDropTimeSeconds	= 50;
 	
-	outputFileName = "../data/SDECImport.xml";
+	dampingForce = 0.3;
+	dampingMomentum = 0.3;
+
 }
 
 SDECImport::~SDECImport ()
 {
 
-}
-
-void SDECImport::postProcessAttributes(bool)
-{
 }
 
 void SDECImport::registerAttributes()
@@ -73,6 +96,9 @@ void SDECImport::registerAttributes()
 	REGISTER_ATTRIBUTE(ks_Spheres);
 	REGISTER_ATTRIBUTE(kn_Box);
 	REGISTER_ATTRIBUTE(ks_Box);
+	REGISTER_ATTRIBUTE(density);
+	REGISTER_ATTRIBUTE(dampingForce);
+	REGISTER_ATTRIBUTE(dampingMomentum);
 //	REGISTER_ATTRIBUTE(wall_top);
 //	REGISTER_ATTRIBUTE(wall_bottom);
 //	REGISTER_ATTRIBUTE(wall_1);
@@ -86,397 +112,327 @@ void SDECImport::registerAttributes()
 //	REGISTER_ATTRIBUTE(wall_3_wire);
 //	REGISTER_ATTRIBUTE(wall_4_wire);
 	REGISTER_ATTRIBUTE(spheresColor);
-	REGISTER_ATTRIBUTE(spheresRandomColor);
+//	REGISTER_ATTRIBUTE(spheresRandomColor);
+	REGISTER_ATTRIBUTE(recordBottomForce);
+	REGISTER_ATTRIBUTE(forceRecordFile);
+	REGISTER_ATTRIBUTE(recordAveragePositions);
+	REGISTER_ATTRIBUTE(positionRecordFile);
+	REGISTER_ATTRIBUTE(recordIntervalIter);
+
+	REGISTER_ATTRIBUTE(bigBallRadius);
+	REGISTER_ATTRIBUTE(bigBallDensity);
+	REGISTER_ATTRIBUTE(bigBallDropTimeSeconds);
+
 }
 
 string SDECImport::generate()
 {
+	rootBody = shared_ptr<ComplexBody>(new ComplexBody);
+	createActors(rootBody);
+	positionRootBody(rootBody);
 
-// // rootBody - the whole scene
-// 	rootBody = shared_ptr<ComplexBody>(new ComplexBody);
-// 
-// // q - a quaternion that says that we ant zero rotation = rotation around axis 0,0,1 by zero radians
-// 	Quaternionr q;		q.fromAxisAngle( Vector3r(0,0,1) , 0);
-// 
-// // specify narrow collider
-// 	shared_ptr<InteractionGeometryDispatcher> nc	= shared_ptr<InteractionGeometryDispatcher>(new SimpleNarrowCollider);
-// 	nc->addCollisionFunctor("Sphere","Sphere","Sphere2Sphere4SDECContactModel");
-// 	nc->addCollisionFunctor("Sphere","Box","Box2Sphere4SDECContactModel");
-// 
-// // specify bounding volume
-// 	shared_ptr<BoundingVolumeDispatcher> bvu	= shared_ptr<BoundingVolumeDispatcher>(new BoundingVolumeDispatcher);
-// 	bvu->addBoundingVolumeFunctors("Sphere","AABB","Sphere2AABBFunctor");
-// 	bvu->addBoundingVolumeFunctors("Box","AABB","Box2AABBFunctor");
-// 	bvu->addBoundingVolumeFunctors("InteractionDescriptionSet","AABB","InteractionDescriptionSet2AABBFunctor");
-// 	
-// 	rootBody->actors.resize(4);
-// 	rootBody->actors[0] 		= bvu;
-// 	rootBody->actors[1] 		= shared_ptr<Actor>(new SAPCollider);
-// 	rootBody->actors[2] 		= nc;
-// // use SDEC law for calculations
-// 	rootBody->actors[3] 		= shared_ptr<Actor>(new SDECDynamicEngine);
-// 	
-// 	shared_ptr<AveragePositionRecorder> avgpos;
-// 	avgpos = shared_ptr<AveragePositionRecorder>(new AveragePositionRecorder);
-// 	avgpos -> outputFile 		= "../data/Position";
-// 	avgpos -> interval 		= 100;
-// 	rootBody->actors.push_back(avgpos);
-// 
-// 	rootBody->permanentInteractions->clear();
-// 
-// 	rootBody->isDynamic		= false;
-// 	rootBody->velocity		= Vector3r(0,0,0);
-// 	rootBody->angularVelocity	= Vector3r(0,0,0);
-// 	rootBody->se3			= Se3r(Vector3r(0,0,0),q);
-// 
-// // variables used for generating data
-// 	shared_ptr<AABB> aabb;
-// 	shared_ptr<Box> box;
-// 	
-// 	
-// 	shared_ptr<InteractionDescriptionSet> set(new InteractionDescriptionSet());
-// 	set->diffuseColor	= Vector3f(0,0,1);
-// 	set->wire		= false;
-// 	set->visible		= true;
-// 	set->shadowCaster	= false;
-// 	rootBody->interactionGeometry		= dynamic_pointer_cast<InteractionDescription>(set);
-// 	
-// 	aabb			= shared_ptr<AABB>(new AABB);
-// 	aabb->color		= Vector3r(0,0,1);
-// 	rootBody->boundingVolume		= dynamic_pointer_cast<BoundingVolume>(aabb);
-// 
-// 	
-// 	
-// 	
-// 	shared_ptr<SDECParameters> sdec;
-// 	shared_ptr<Body> body;
-// 	Vector3r		center,halfSize;
-// 	Vector3r translation;
-// 	shared_ptr<BallisticDynamicEngine> ballistic;
-// 
-// 	if(importFilename.size() != 0 && filesystem::exists(importFilename) )
-// 	{
-// 	
-// 		ifstream loadFile(importFilename.c_str());
-// 		long int i=0;
-// 		Real f,g,x,y,z,radius;
-// 
-// 		while( ! loadFile.eof() )
-// 		{
-// 			++i;
-// 		
-// 			shared_ptr<SDECParameters> s(new SDECParameters);
-// 			shared_ptr<AABB> aabb(new AABB);
-// 			shared_ptr<Sphere> sphere(new Sphere);
-// 	
-// 			loadFile >> x;
-// 			loadFile >> y;
-// 			loadFile >> z;
-// 			translation = Vector3r(x,z,y);
-// 			loadFile >> radius;
-// 			
-// 		
-// 			loadFile >> f;
-// 			loadFile >> g;
-// 			if(f != 1) // skip loading of SDEC walls
-// 				continue;
-// //			cout << i << " : " << x << " " << z << " " << y << " " << radius <<  endl;
-// 
-// //			if( i % 100 == 0 ) // FIXME - should display a progress BAR !!
-// //				cout << i << endl;
-// 
-// 			lowerCorner[0] = min(translation[0]-radius , lowerCorner[0]);
-// 			lowerCorner[1] = min(translation[1]-radius , lowerCorner[1]);
-// 			lowerCorner[2] = min(translation[2]-radius , lowerCorner[2]);
-// 			upperCorner[0] = max(translation[0]+radius , upperCorner[0]);
-// 			upperCorner[1] = max(translation[1]+radius , upperCorner[1]);
-// 			upperCorner[2] = max(translation[2]+radius , upperCorner[2]);
-// 			
-// 			ballistic= shared_ptr<BallisticDynamicEngine>(new BallisticDynamicEngine);
-// 			ballistic->damping 	= 1.0;
-// 			s->actors.push_back(ballistic);
-// 	
-// 			s->isDynamic		= true;
-// 			s->angularVelocity	= Vector3r(0,0,0);
-// 			s->velocity		= Vector3r(0,0,0);
-// 			s->mass			= 4.0/3.0*Mathr::PI*radius*radius;
-// 			s->inertia		= Vector3r(2.0/5.0*s->mass*radius*radius,2.0/5.0*s->mass*radius*radius,2.0/5.0*s->mass*radius*radius);
-// 			s->se3			= Se3r(translation,q);
-// 	
-// 			aabb->color		= Vector3r(0,1,0);
-// 			s->boundingVolume			= dynamic_pointer_cast<BoundingVolume>(aabb);
-// 	
-// 			sphere->radius		= radius;
-// 			if(spheresRandomColor)
-// 				sphere->diffuseColor	= Vector3f(Mathf::unitRandom(),Mathf::unitRandom(),Mathf::unitRandom());
-// 			else
-// 			sphere->diffuseColor	= spheresColor;
-// 			sphere->wire		= false;
-// 			sphere->visible		= true;
-// 			sphere->shadowCaster	= true;
-// 	
-// 			s->interactionGeometry			= dynamic_pointer_cast<InteractionDescription>(sphere);
-// 			s->geometricalModel			= dynamic_pointer_cast<GeometricalModel>(sphere);
-// 			s->kn			= kn_Spheres;
-// 			s->ks			= ks_Spheres;
-// 	
-// 			body = dynamic_pointer_cast<Body>(s);
-// 			rootBody->bodies->insert(body);
-// 		}
-// 	}
-// 
-// ///////////////////////////////////////////////////////////////////////////////
-// /// insert bottom box
-// ///////////////////////////////////////////////////////////////////////////////
-// 
-// 	sdec			= shared_ptr<SDECParameters>(new SDECParameters);
-// 	aabb			= shared_ptr<AABB>(new AABB);
-// 	box			= shared_ptr<Box>(new Box);
-// 
-// 	center			= Vector3r(
-// 					(lowerCorner[0]+upperCorner[0])/2,
-// 					lowerCorner[1]-thickness/2.0,
-// 					(lowerCorner[2]+upperCorner[2])/2);
-// 	halfSize		= Vector3r(
-// 					fabs(lowerCorner[0]-upperCorner[0])/2+thickness,
-// 					thickness/2.0,
-// 					fabs(lowerCorner[2]-upperCorner[2])/2+thickness);
-// 	
-// 	sdec->isDynamic		= false;					// is not moving
-// 	sdec->angularVelocity	= Vector3r(0,0,0);				// has no angular velocity
-// 	sdec->velocity		= Vector3r(0,0,0);				// has no velocity
-// 	sdec->mass		= 1;						// mass
-// 	sdec->inertia		= Vector3r(0,0,0);				// is not moving, so it's inertia is zero
-// 	sdec->se3		= Se3r(center,q);				// position, rotation
-// 	aabb->color		= Vector3r(1,0,0);				// AABB is red
-// 	sdec->boundingVolume		= dynamic_pointer_cast<BoundingVolume>(aabb);
-// 	box ->extents		= halfSize;					// size
-// 	box ->diffuseColor	= Vector3f(1,1,1);				// color is white
-// 	box ->wire		= wall_bottom_wire;				// draw as wireframe?
-// 	box ->visible		= true;						// draw
-// 	box ->shadowCaster	= false;					// is not casting shadows
-// 	sdec->interactionGeometry		= dynamic_pointer_cast<InteractionDescription>(box);
-// 	sdec->geometricalModel		= dynamic_pointer_cast<InteractionDescription>(box);
-// 	sdec->kn		= kn_Box;					// kn
-// 	sdec->ks		= ks_Box;					// ks
-// 	
-// 	
+	shared_ptr<Body> body;
+	if(importFilename.size() != 0 && filesystem::exists(importFilename) )
+	{
+		ifstream loadFile(importFilename.c_str());
+		long int i=0;
+		Real f,g,x,y,z,radius;
+		while( ! loadFile.eof() )
+		{
+			++i;
+			loadFile >> x;
+			loadFile >> y;
+			loadFile >> z;
+			Vector3r translation = Vector3r(x,z,y);
+			loadFile >> radius;
+		
+			loadFile >> f;
+			loadFile >> g;
+			if(f != 1) // skip loading of SDEC walls
+				continue;
+
+			if( i % 100 == 0 ) // FIXME - should display a progress BAR !!
+				cout << "loaded: " << i << endl;
+			
+			lowerCorner[0] = min(translation[0]-radius , lowerCorner[0]);
+			lowerCorner[1] = min(translation[1]-radius , lowerCorner[1]);
+			lowerCorner[2] = min(translation[2]-radius , lowerCorner[2]);
+			upperCorner[0] = max(translation[0]+radius , upperCorner[0]);
+			upperCorner[1] = max(translation[1]+radius , upperCorner[1]);
+			upperCorner[2] = max(translation[2]+radius , upperCorner[2]);
+			
+			createSphere(body,translation,radius);			
+			rootBody->bodies->insert(body);
+		}
+	}
+
+// bottom box
+ 	Vector3r center		= Vector3r(
+ 						(lowerCorner[0]+upperCorner[0])/2,
+ 						lowerCorner[1]-thickness/2.0,
+ 						(lowerCorner[2]+upperCorner[2])/2);
+ 	Vector3r halfSize	= Vector3r(
+ 						fabs(lowerCorner[0]-upperCorner[0])/2+thickness,
+						thickness/2.0,
+ 						fabs(lowerCorner[2]-upperCorner[2])/2+thickness);
+
+	createBox(body,center,halfSize,wall_bottom_wire);
+ 	if(wall_bottom)
+		rootBody->bodies->insert(body);
+
+// top box
+ 	center			= Vector3r(
+ 						(lowerCorner[0]+upperCorner[0])/2,
+ 						upperCorner[1]+thickness/2.0,
+ 						(lowerCorner[2]+upperCorner[2])/2);
+ 	halfSize		= Vector3r(
+ 						fabs(lowerCorner[0]-upperCorner[0])/2+thickness,
+ 						thickness/2.0,
+ 						fabs(lowerCorner[2]-upperCorner[2])/2+thickness);
+
+	createBox(body,center,halfSize,wall_top_wire);
+ 	if(wall_top)
+		rootBody->bodies->insert(body);
+// box 1
+
+ 	center			= Vector3r(
+ 						lowerCorner[0]-thickness/2.0,
+ 						(lowerCorner[1]+upperCorner[1])/2,
+ 						(lowerCorner[2]+upperCorner[2])/2);
+	halfSize		= Vector3r(
+						thickness/2.0,
+ 						fabs(lowerCorner[1]-upperCorner[1])/2+thickness,
+ 						fabs(lowerCorner[2]-upperCorner[2])/2+thickness);
+	createBox(body,center,halfSize,wall_1_wire);
+ 	if(wall_1)
+		rootBody->bodies->insert(body);
+// box 2
+ 	center			= Vector3r(
+ 						upperCorner[0]+thickness/2.0,
+ 						(lowerCorner[1]+upperCorner[1])/2,
+						(lowerCorner[2]+upperCorner[2])/2);
+ 	halfSize		= Vector3r(
+ 						thickness/2.0,
+ 						fabs(lowerCorner[1]-upperCorner[1])/2+thickness,
+ 						fabs(lowerCorner[2]-upperCorner[2])/2+thickness);
+ 	
+	createBox(body,center,halfSize,wall_2_wire);
+ 	if(wall_2)
+		rootBody->bodies->insert(body);
+// box 3
+ 	center			= Vector3r(
+ 						(lowerCorner[0]+upperCorner[0])/2,
+ 						(lowerCorner[1]+upperCorner[1])/2,
+ 						lowerCorner[2]-thickness/2.0);
+ 	halfSize		= Vector3r(
+ 						fabs(lowerCorner[0]-upperCorner[0])/2+thickness,
+ 						fabs(lowerCorner[1]-upperCorner[1])/2+thickness,
+ 						thickness/2.0);
+	createBox(body,center,halfSize,wall_3_wire);
+ 	if(wall_3)
+ 		rootBody->bodies->insert(body);
+
+// box 4
+ 	center			= Vector3r(
+ 						(lowerCorner[0]+upperCorner[0])/2,
+ 						(lowerCorner[1]+upperCorner[1])/2,
+ 						upperCorner[2]+thickness/2.0);
+ 	halfSize		= Vector3r(
+ 						fabs(lowerCorner[0]-upperCorner[0])/2+thickness,
+ 						fabs(lowerCorner[1]-upperCorner[1])/2+thickness,
+ 						thickness/2.0);
+	createBox(body,center,halfSize,wall_3_wire);
+ 	if(wall_4)
+ 		rootBody->bodies->insert(body);
+
+ 	return "Generated a sample inside box of dimensions: (" 
+ 		+ lexical_cast<string>(lowerCorner[0]) + "," 
+ 		+ lexical_cast<string>(lowerCorner[1]) + "," 
+ 		+ lexical_cast<string>(lowerCorner[2]) + ") and (" 
+ 		+ lexical_cast<string>(upperCorner[0]) + "," 
+ 		+ lexical_cast<string>(upperCorner[1]) + "," 
+ 		+ lexical_cast<string>(upperCorner[2]) + ").";
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+void SDECImport::createSphere(shared_ptr<Body>& body, Vector3r translation, Real radius)
+{
+	body = shared_ptr<Body>(new SimpleBody(0,10));
+	shared_ptr<SDECParameters> physics(new SDECParameters);
+	shared_ptr<AABB> aabb(new AABB);
+	shared_ptr<Sphere> gSphere(new Sphere);
+	shared_ptr<InteractionSphere> iSphere(new InteractionSphere);
+	
+	Quaternionr q;
+	q.fromAxisAngle( Vector3r(0,0,1),0);
+	
+	body->isDynamic			= true;
+	
+	physics->angularVelocity	= Vector3r(0,0,0);
+	physics->velocity		= Vector3r(0,0,0);
+	physics->mass			= 4.0/3.0*Mathr::PI*radius*radius*density;
+	physics->inertia		= Vector3r(2.0/5.0*physics->mass*radius*radius,2.0/5.0*physics->mass*radius*radius,2.0/5.0*physics->mass*radius*radius);
+	physics->se3			= Se3r(translation,q);
+	physics->kn			= kn_Spheres;
+	physics->ks			= ks_Spheres;
+
+	aabb->diffuseColor		= Vector3r(0,1,0);
+
+
+	gSphere->radius			= radius;
+	gSphere->diffuseColor		= spheresColor;
+	gSphere->wire			= false;
+	gSphere->visible		= true;
+	gSphere->shadowCaster		= true;
+	
+	iSphere->radius			= radius;
+	iSphere->diffuseColor		= Vector3f(Mathf::unitRandom(),Mathf::unitRandom(),Mathf::unitRandom());
+
+	body->interactionGeometry	= iSphere;
+	body->geometricalModel		= gSphere;
+	body->boundingVolume		= aabb;
+	body->physicalParameters	= physics;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+void SDECImport::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents, bool wire)
+{
+	body = shared_ptr<Body>(new SimpleBody(0,10));
+	shared_ptr<SDECParameters> physics(new SDECParameters);
+	shared_ptr<AABB> aabb(new AABB);
+	shared_ptr<Box> gBox(new Box);
+	shared_ptr<InteractionBox> iBox(new InteractionBox);
+	
+	Quaternionr q;
+	q.fromAxisAngle( Vector3r(0,0,1),0);
+
+	body->isDynamic			= false;
+	
+	physics->angularVelocity	= Vector3r(0,0,0);
+	physics->velocity		= Vector3r(0,0,0);
+	physics->mass			= 0;
+	physics->inertia		= Vector3r(0,0,0);
+	physics->se3			= Se3r(position,q);
+	physics->kn			= 100000;
+	physics->ks			= 10000;
+
+	aabb->diffuseColor		= Vector3r(1,0,0);
+
+	gBox->extents			= extents;
+	gBox->diffuseColor		= Vector3f(1,1,1);
+	gBox->wire			= wire;
+	gBox->visible			= true;
+	gBox->shadowCaster		= false;
+	
+	iBox->extents			= extents;
+	iBox->diffuseColor		= Vector3f(1,1,1);
+
+	body->boundingVolume		= aabb;
+	body->interactionGeometry	= iBox;
+	body->geometricalModel		= gBox;
+	body->physicalParameters	= physics;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+void SDECImport::createActors(shared_ptr<ComplexBody>& rootBody)
+{
+	shared_ptr<AveragePositionRecorder> averagePositionRecorder = shared_ptr<AveragePositionRecorder>(new AveragePositionRecorder);
+	averagePositionRecorder -> outputFile 		= positionRecordFile;
+	averagePositionRecorder -> interval 		= recordIntervalIter;
+///// FIXME - add forceRecordFile ....
+	
 // // Recording Forces
 // //	shared_ptr<ForceRecorder> forcerec;
 // //	forcerec = shared_ptr<ForceRecorder>(new ForceRecorder);
 // //	forcerec -> outputFile 	= "../data/Forces";
 // //	forcerec -> interval 	= 100;
 // //	sdec->actors.push_back(forcerec);
-// 	
-// 	body = dynamic_pointer_cast<Body>(sdec);
-// 	if(wall_bottom)
-// 		rootBody->bodies->insert(body);
-// 
-// ///////////////////////////////////////////////////////////////////////////////
-// /// insert top box
-// ///////////////////////////////////////////////////////////////////////////////
-// 
-// 	sdec			= shared_ptr<SDECParameters>(new SDECParameters);
-// 	aabb			= shared_ptr<AABB>(new AABB);
-// 	box			= shared_ptr<Box>(new Box);
-// 
-// 	center			= Vector3r(
-// 					(lowerCorner[0]+upperCorner[0])/2,
-// 					upperCorner[1]+thickness/2.0,
-// 					(lowerCorner[2]+upperCorner[2])/2);
-// 	halfSize		= Vector3r(
-// 					fabs(lowerCorner[0]-upperCorner[0])/2+thickness,
-// 					thickness/2.0,
-// 					fabs(lowerCorner[2]-upperCorner[2])/2+thickness);
-// 	
-// 	sdec->isDynamic		= false;					// is not moving
-// 	sdec->angularVelocity	= Vector3r(0,0,0);				// has no angular velocity
-// 	sdec->velocity		= Vector3r(0,0,0);				// has no velocity
-// 	sdec->mass		= 0;						// mass
-// 	sdec->inertia		= Vector3r(0,0,0);				// is not moving, so it's inertia is zero
-// 	sdec->se3		= Se3r(center,q);				// position, rotation
-// 	aabb->color		= Vector3r(1,0,0);				// AABB is red
-// 	sdec->boundingVolume		= dynamic_pointer_cast<BoundingVolume>(aabb);
-// 	box ->extents		= halfSize;					// size
-// 	box ->diffuseColor	= Vector3f(1,1,1);				// color is white
-// 	box ->wire		= wall_top_wire;				// draw as wireframe?
-// 	box ->visible		= true;						// draw
-// 	box ->shadowCaster	= false;					// is not casting shadows
-// 	sdec->interactionGeometry		= dynamic_pointer_cast<InteractionDescription>(box);
-// 	sdec->geometricalModel		= dynamic_pointer_cast<InteractionDescription>(box);
-// 	sdec->kn		= kn_Box;					// kn
-// 	sdec->ks		= ks_Box;					// ks
-// 	body = dynamic_pointer_cast<Body>(sdec);
-// 	if(wall_top)
-// 		rootBody->bodies->insert(body);
-// 
-// ///////////////////////////////////////////////////////////////////////////////
-// /// insert 1 box
-// ///////////////////////////////////////////////////////////////////////////////
-// 
-// 	sdec			= shared_ptr<SDECParameters>(new SDECParameters);
-// 	aabb			= shared_ptr<AABB>(new AABB);
-// 	box			= shared_ptr<Box>(new Box);
-// 
-// 	center			= Vector3r(
-// 					lowerCorner[0]-thickness/2.0,
-// 					(lowerCorner[1]+upperCorner[1])/2,
-// 					(lowerCorner[2]+upperCorner[2])/2);
-// 	halfSize		= Vector3r(
-// 					thickness/2.0,
-// 					fabs(lowerCorner[1]-upperCorner[1])/2+thickness,
-// 					fabs(lowerCorner[2]-upperCorner[2])/2+thickness);
-// 	
-// 	sdec->isDynamic		= false;					// is not moving
-// 	sdec->angularVelocity	= Vector3r(0,0,0);				// has no angular velocity
-// 	sdec->velocity		= Vector3r(0,0,0);				// has no velocity
-// 	sdec->mass		= 0;						// mass
-// 	sdec->inertia		= Vector3r(0,0,0);				// is not moving, so it's inertia is zero
-// 	sdec->se3		= Se3r(center,q);				// position, rotation
-// 	aabb->color		= Vector3r(1,0,0);				// AABB is red
-// 	sdec->boundingVolume		= dynamic_pointer_cast<BoundingVolume>(aabb);
-// 	box ->extents		= halfSize;					// size
-// 	box ->diffuseColor	= Vector3f(1,1,1);				// color is white
-// 	box ->wire		= wall_1_wire;					// draw as wireframe?
-// 	box ->visible		= true;						// draw
-// 	box ->shadowCaster	= false;					// is not casting shadows
-// 	sdec->interactionGeometry		= dynamic_pointer_cast<InteractionDescription>(box);
-// 	sdec->geometricalModel		= dynamic_pointer_cast<InteractionDescription>(box);
-// 	sdec->kn		= kn_Box;					// kn
-// 	sdec->ks		= ks_Box;					// ks
-// 	body = dynamic_pointer_cast<Body>(sdec);
-// 	if(wall_1)
-// 		rootBody->bodies->insert(body);
-// 
-// ///////////////////////////////////////////////////////////////////////////////
-// /// insert 2 box
-// ///////////////////////////////////////////////////////////////////////////////
-// 
-// 	sdec			= shared_ptr<SDECParameters>(new SDECParameters);
-// 	aabb			= shared_ptr<AABB>(new AABB);
-// 	box			= shared_ptr<Box>(new Box);
-// 
-// 	center			= Vector3r(
-// 					upperCorner[0]+thickness/2.0,
-// 					(lowerCorner[1]+upperCorner[1])/2,
-// 					(lowerCorner[2]+upperCorner[2])/2);
-// 	halfSize		= Vector3r(
-// 					thickness/2.0,
-// 					fabs(lowerCorner[1]-upperCorner[1])/2+thickness,
-// 					fabs(lowerCorner[2]-upperCorner[2])/2+thickness);
-// 	
-// 	sdec->isDynamic		= false;					// is not moving
-// 	sdec->angularVelocity	= Vector3r(0,0,0);				// has no angular velocity
-// 	sdec->velocity		= Vector3r(0,0,0);				// has no velocity
-// 	sdec->mass		= 0;						// mass
-// 	sdec->inertia		= Vector3r(0,0,0);				// is not moving, so it's inertia is zero
-// 	sdec->se3		= Se3r(center,q);				// position, rotation
-// 	aabb->color		= Vector3r(1,0,0);				// AABB is red
-// 	sdec->boundingVolume		= dynamic_pointer_cast<BoundingVolume>(aabb);
-// 	box ->extents		= halfSize;					// size
-// 	box ->diffuseColor	= Vector3f(1,1,1);				// color is white
-// 	box ->wire		= wall_2_wire;					// draw as wireframe?
-// 	box ->visible		= true;						// draw
-// 	box ->shadowCaster	= false;					// is not casting shadows
-// 	sdec->interactionGeometry		= dynamic_pointer_cast<InteractionDescription>(box);
-// 	sdec->geometricalModel		= dynamic_pointer_cast<InteractionDescription>(box);
-// 	sdec->kn		= kn_Box;					// kn
-// 	sdec->ks		= ks_Box;					// ks
-// 	body = dynamic_pointer_cast<Body>(sdec);
-// 	if(wall_2)
-// 		rootBody->bodies->insert(body);
-// 
-// ///////////////////////////////////////////////////////////////////////////////
-// /// insert 3 box
-// ///////////////////////////////////////////////////////////////////////////////
-// 
-// 	sdec			= shared_ptr<SDECParameters>(new SDECParameters);
-// 	aabb			= shared_ptr<AABB>(new AABB);
-// 	box			= shared_ptr<Box>(new Box);
-// 
-// 	center			= Vector3r(
-// 					(lowerCorner[0]+upperCorner[0])/2,
-// 					(lowerCorner[1]+upperCorner[1])/2,
-// 					lowerCorner[2]-thickness/2.0);
-// 	halfSize		= Vector3r(
-// 					fabs(lowerCorner[0]-upperCorner[0])/2+thickness,
-// 					fabs(lowerCorner[1]-upperCorner[1])/2+thickness,
-// 					thickness/2.0);
-// 	
-// 	sdec->isDynamic		= false;					// is not moving
-// 	sdec->angularVelocity	= Vector3r(0,0,0);				// has no angular velocity
-// 	sdec->velocity		= Vector3r(0,0,0);				// has no velocity
-// 	sdec->mass		= 0;						// mass
-// 	sdec->inertia		= Vector3r(0,0,0);				// is not moving, so it's inertia is zero
-// 	sdec->se3		= Se3r(center,q);				// position, rotation
-// 	aabb->color		= Vector3r(1,0,0);				// AABB is red
-// 	sdec->boundingVolume		= dynamic_pointer_cast<BoundingVolume>(aabb);
-// 	box ->extents		= halfSize;					// size
-// 	box ->diffuseColor	= Vector3f(1,1,1);				// color is white
-// 	box ->wire		= wall_3_wire;					// draw as wireframe?
-// 	box ->visible		= true;						// draw
-// 	box ->shadowCaster	= false;					// is not casting shadows
-// 	sdec->interactionGeometry		= dynamic_pointer_cast<InteractionDescription>(box);
-// 	sdec->geometricalModel		= dynamic_pointer_cast<InteractionDescription>(box);
-// 	sdec->kn		= kn_Box;					// kn
-// 	sdec->ks		= ks_Box;					// ks
-// 	body = dynamic_pointer_cast<Body>(sdec);
-// 	if(wall_3)
-// 		rootBody->bodies->insert(body);
-// 
-// ///////////////////////////////////////////////////////////////////////////////
-// /// insert 4 box
-// ///////////////////////////////////////////////////////////////////////////////
-// 
-// 	sdec			= shared_ptr<SDECParameters>(new SDECParameters);
-// 	aabb			= shared_ptr<AABB>(new AABB);
-// 	box			= shared_ptr<Box>(new Box);
-// 
-// 	center			= Vector3r(
-// 					(lowerCorner[0]+upperCorner[0])/2,
-// 					(lowerCorner[1]+upperCorner[1])/2,
-// 					upperCorner[2]+thickness/2.0);
-// 	halfSize		= Vector3r(
-// 					fabs(lowerCorner[0]-upperCorner[0])/2+thickness,
-// 					fabs(lowerCorner[1]-upperCorner[1])/2+thickness,
-// 					thickness/2.0);
-// 	
-// 	sdec->isDynamic		= false;					// is not moving
-// 	sdec->angularVelocity	= Vector3r(0,0,0);				// has no angular velocity
-// 	sdec->velocity		= Vector3r(0,0,0);				// has no velocity
-// 	sdec->mass		= 0;						// mass
-// 	sdec->inertia		= Vector3r(0,0,0);				// is not moving, so it's inertia is zero
-// 	sdec->se3		= Se3r(center,q);				// position, rotation
-// 	aabb->color		= Vector3r(1,0,0);				// AABB is red
-// 	sdec->boundingVolume		= dynamic_pointer_cast<BoundingVolume>(aabb);
-// 	box ->extents		= halfSize;					// size
-// 	box ->diffuseColor	= Vector3f(1,1,1);				// color is white
-// 	box ->wire		= wall_4_wire;					// draw as wireframe?
-// 	box ->visible		= true;						// draw
-// 	box ->shadowCaster	= false;					// is not casting shadows
-// 	sdec->interactionGeometry		= dynamic_pointer_cast<InteractionDescription>(box);
-// 	sdec->geometricalModel		= dynamic_pointer_cast<InteractionDescription>(box);
-// 	sdec->kn		= kn_Box;					// kn
-// 	sdec->ks		= ks_Box;					// ks
-// 	body = dynamic_pointer_cast<Body>(sdec);
-// 	if(wall_4)
-// 		rootBody->bodies->insert(body);
-// 
-// ///////////////////////////////////////////////////////////////////////////////
-// /// end of box inserting
-// ///////////////////////////////////////////////////////////////////////////////
-// 	
-// //	cerr << "lower: " << lowerCorner[0] << " "<< lowerCorner[1] << " "<< lowerCorner[2] << endl;
-// //	cerr << "upper: " << upperCorner[0] << " "<< upperCorner[1] << " "<< upperCorner[2] << endl;
-// 	
-// 	return "Generated a sample inside box of dimensions: " 
-// 		+ lexical_cast<string>(lowerCorner[0]) + "," 
-// 		+ lexical_cast<string>(lowerCorner[1]) + "," 
-// 		+ lexical_cast<string>(lowerCorner[2]) + " and " 
-// 		+ lexical_cast<string>(upperCorner[0]) + "," 
-// 		+ lexical_cast<string>(upperCorner[1]) + "," 
-// 		+ lexical_cast<string>(upperCorner[2]) + ".";
 
-	return "";
+	shared_ptr<InteractionGeometryDispatcher> interactionGeometryDispatcher(new InteractionGeometryDispatcher);
+	interactionGeometryDispatcher->add("InteractionSphere","InteractionSphere","Sphere2Sphere4SDECContactModel");
+	interactionGeometryDispatcher->add("InteractionSphere","InteractionBox","Box2Sphere4SDECContactModel");
 
+	shared_ptr<InteractionPhysicsDispatcher> interactionPhysicsDispatcher(new InteractionPhysicsDispatcher);
+	interactionPhysicsDispatcher->add("SDECParameters","SDECParameters","SDECLinearContactModel");
+		
+	shared_ptr<BoundingVolumeDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeDispatcher>(new BoundingVolumeDispatcher);
+	boundingVolumeDispatcher->add("InteractionSphere","AABB","Sphere2AABBFunctor");
+	boundingVolumeDispatcher->add("InteractionBox","AABB","Box2AABBFunctor");
+	boundingVolumeDispatcher->add("InteractionDescriptionSet","AABB","InteractionDescriptionSet2AABBFunctor");
+
+	
+
+		
+	shared_ptr<CundallNonViscousForceDamping> actionForceDamping(new CundallNonViscousForceDamping);
+	actionForceDamping->damping = dampingForce;
+	shared_ptr<CundallNonViscousMomentumDamping> actionMomentumDamping(new CundallNonViscousMomentumDamping);
+	actionMomentumDamping->damping = dampingMomentum;
+	shared_ptr<ActionDispatcher> actionDampingDispatcher(new ActionDispatcher);
+	actionDampingDispatcher->add("ActionForce","ParticleParameters","CundallNonViscousForceDamping",actionForceDamping);
+	actionDampingDispatcher->add("ActionMomentum","RigidBodyParameters","CundallNonViscousMomentumDamping",actionMomentumDamping);
+	
+	shared_ptr<ActionDispatcher> applyActionDispatcher(new ActionDispatcher);
+	applyActionDispatcher->add("ActionForce","ParticleParameters","ApplyActionForce2Particle");
+	applyActionDispatcher->add("ActionMomentum","RigidBodyParameters","ApplyActionMomentum2RigidBody");
+	
+	shared_ptr<TimeIntegratorDispatcher> timeIntegratorDispatcher(new TimeIntegratorDispatcher);
+	
+	
+	timeIntegratorDispatcher->add("SDECParameters","LeapFrogIntegrator"); // FIXME - bug in locateMultivirtualFunctionCall1D ???
+		
+	
+	
+	
+	shared_ptr<SDECDynamicEngine> sdecDynamicEngine(new SDECDynamicEngine);
+	sdecDynamicEngine->sdecGroup = 10;
+	
+	rootBody->actors.clear();
+	rootBody->actors.push_back(shared_ptr<Actor>(new ActionReset));
+	rootBody->actors.push_back(boundingVolumeDispatcher);
+	rootBody->actors.push_back(shared_ptr<Actor>(new PersistentSAPCollider));
+	rootBody->actors.push_back(interactionGeometryDispatcher);
+	rootBody->actors.push_back(interactionPhysicsDispatcher);
+	rootBody->actors.push_back(sdecDynamicEngine);
+	rootBody->actors.push_back(actionDampingDispatcher);
+	rootBody->actors.push_back(applyActionDispatcher);
+	rootBody->actors.push_back(timeIntegratorDispatcher);
+	rootBody->actors.push_back(averagePositionRecorder);
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+void SDECImport::positionRootBody(shared_ptr<ComplexBody>& rootBody)
+{
+	rootBody->isDynamic		= false;
+
+	Quaternionr q;
+	q.fromAxisAngle( Vector3r(0,0,1),0);
+	shared_ptr<ParticleParameters> physics(new ParticleParameters); // FIXME : fix indexable class BodyPhysicalParameters
+	physics->se3			= Se3r(Vector3r(0,0,0),q);
+	physics->mass			= 0;
+	physics->velocity		= Vector3r::ZERO;
+	physics->acceleration		= Vector3r::ZERO;
+	
+	shared_ptr<InteractionDescriptionSet> set(new InteractionDescriptionSet());
+	
+	set->diffuseColor		= Vector3f(0,0,1);
+
+	shared_ptr<AABB> aabb(new AABB);
+	aabb->diffuseColor		= Vector3r(0,0,1);
+	
+	rootBody->interactionGeometry	= dynamic_pointer_cast<InteractionDescription>(set);	
+	rootBody->boundingVolume	= dynamic_pointer_cast<BoundingVolume>(aabb);
+	rootBody->physicalParameters 	= physics;
+	
 }

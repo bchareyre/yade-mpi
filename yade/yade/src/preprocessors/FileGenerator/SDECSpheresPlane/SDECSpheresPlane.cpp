@@ -20,10 +20,10 @@
 #include "SDECLinearContactModel.hpp"
 
 
-#include "ActionApplyDispatcher.hpp"
-#include "ActionDampingDispatcher.hpp"
-#include "ActionForceDamping.hpp"
-#include "ActionMomentumDamping.hpp"
+#include "ActionDispatcher.hpp"
+#include "ActionDispatcher.hpp"
+#include "CundallNonViscousForceDamping.hpp"
+#include "CundallNonViscousMomentumDamping.hpp"
 
 #include "InteractionGeometryDispatcher.hpp"
 #include "InteractionPhysicsDispatcher.hpp"
@@ -85,17 +85,17 @@ string SDECSpheresPlane::generate()
 	boundingVolumeDispatcher->add("InteractionBox","AABB","Box2AABBFunctor");
 	boundingVolumeDispatcher->add("InteractionDescriptionSet","AABB","InteractionDescriptionSet2AABBFunctor");
 	
-	shared_ptr<ActionForceDamping> actionForceDamping(new ActionForceDamping);
+	shared_ptr<CundallNonViscousForceDamping> actionForceDamping(new CundallNonViscousForceDamping);
 	actionForceDamping->damping = dampingForce;
-	shared_ptr<ActionMomentumDamping> actionMomentumDamping(new ActionMomentumDamping);
+	shared_ptr<CundallNonViscousMomentumDamping> actionMomentumDamping(new CundallNonViscousMomentumDamping);
 	actionMomentumDamping->damping = dampingMomentum;
-	shared_ptr<ActionDampingDispatcher> actionDampingDispatcher(new ActionDampingDispatcher);
-	actionDampingDispatcher->add("ActionForce","RigidBodyParameters","ActionForceDamping",actionForceDamping);
-	actionDampingDispatcher->add("ActionMomentum","RigidBodyParameters","ActionMomentumDamping",actionMomentumDamping);
+	shared_ptr<ActionDispatcher> actionDampingDispatcher(new ActionDispatcher);
+	actionDampingDispatcher->add("ActionForce","RigidBodyParameters","CundallNonViscousForceDamping",actionForceDamping);
+	actionDampingDispatcher->add("ActionMomentum","RigidBodyParameters","CundallNonViscousMomentumDamping",actionMomentumDamping);
 	
-	shared_ptr<ActionApplyDispatcher> applyActionDispatcher(new ActionApplyDispatcher);
-	applyActionDispatcher->add("ActionForce","RigidBodyParameters","ActionForce2Particle");
-	applyActionDispatcher->add("ActionMomentum","RigidBodyParameters","ActionMomentum2RigidBody");
+	shared_ptr<ActionDispatcher> applyActionDispatcher(new ActionDispatcher);
+	applyActionDispatcher->add("ActionForce","RigidBodyParameters","ApplyActionForce2Particle");
+	applyActionDispatcher->add("ActionMomentum","RigidBodyParameters","ApplyActionMomentum2RigidBody");
 	
 	shared_ptr<TimeIntegratorDispatcher> timeIntegratorDispatcher(new TimeIntegratorDispatcher);
 	timeIntegratorDispatcher->add("SDECParameters","LeapFrogIntegrator");

@@ -351,7 +351,7 @@ void SDECDynamicEngine::respondToInteractions(Body* body)
 		currentContactPhysics->shearForce      -= currentContactPhysics->shearForce.cross(axis);
 	
 ////////////////////////////////////////////////////////////
-/// Here is the code without approximated rotations 	 ///
+/// Here is the code with exact rotations 		 ///
 ////////////////////////////////////////////////////////////
 
 // 		Quaternionr q;

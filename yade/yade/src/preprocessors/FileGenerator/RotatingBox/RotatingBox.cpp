@@ -15,11 +15,11 @@
 #include "InteractionBox.hpp"
 #include "InteractionSphere.hpp"
 #include "InteractionGeometryDispatcher.hpp"
-#include "ActionApplyDispatcher.hpp"
+#include "ActionDispatcher.hpp"
 #include "ActionReset.hpp"
-#include "ActionForceDamping.hpp"
-#include "ActionMomentumDamping.hpp"
-#include "ActionDampingDispatcher.hpp"
+#include "CundallNonViscousForceDamping.hpp"
+#include "CundallNonViscousMomentumDamping.hpp"
+#include "ActionDispatcher.hpp"
 
 #include "BoundingVolumeDispatcher.hpp"
 #include "InteractionDescriptionSet2AABBFunctor.hpp"
@@ -255,17 +255,17 @@ void RotatingBox::createActors(shared_ptr<ComplexBody>& rootBody)
 	boundingVolumeDispatcher->add("InteractionBox","AABB","Box2AABBFunctor");
 	boundingVolumeDispatcher->add("InteractionDescriptionSet","AABB","InteractionDescriptionSet2AABBFunctor");
 		
-	shared_ptr<ActionForceDamping> actionForceDamping(new ActionForceDamping);
+	shared_ptr<CundallNonViscousForceDamping> actionForceDamping(new CundallNonViscousForceDamping);
 	actionForceDamping->damping = dampingForce;
-	shared_ptr<ActionMomentumDamping> actionMomentumDamping(new ActionMomentumDamping);
+	shared_ptr<CundallNonViscousMomentumDamping> actionMomentumDamping(new CundallNonViscousMomentumDamping);
 	actionMomentumDamping->damping = dampingMomentum;
-	shared_ptr<ActionDampingDispatcher> actionDampingDispatcher(new ActionDampingDispatcher);
-	actionDampingDispatcher->add("ActionForce","ParticleParameters","ActionForceDamping",actionForceDamping);
-	actionDampingDispatcher->add("ActionMomentum","RigidBodyParameters","ActionMomentumDamping",actionMomentumDamping);
+	shared_ptr<ActionDispatcher> actionDampingDispatcher(new ActionDispatcher);
+	actionDampingDispatcher->add("ActionForce","ParticleParameters","CundallNonViscousForceDamping",actionForceDamping);
+	actionDampingDispatcher->add("ActionMomentum","RigidBodyParameters","CundallNonViscousMomentumDamping",actionMomentumDamping);
 	
-	shared_ptr<ActionApplyDispatcher> applyActionDispatcher(new ActionApplyDispatcher);
-	applyActionDispatcher->add("ActionForce","ParticleParameters","ActionForce2Particle");
-	applyActionDispatcher->add("ActionMomentum","RigidBodyParameters","ActionMomentum2RigidBody");
+	shared_ptr<ActionDispatcher> applyActionDispatcher(new ActionDispatcher);
+	applyActionDispatcher->add("ActionForce","ParticleParameters","ApplyActionForce2Particle");
+	applyActionDispatcher->add("ActionMomentum","RigidBodyParameters","ApplyActionMomentum2RigidBody");
 	
 	shared_ptr<TimeIntegratorDispatcher> timeIntegratorDispatcher(new TimeIntegratorDispatcher);
  	timeIntegratorDispatcher->add("RigidBodyParameters","LeapFrogIntegrator");

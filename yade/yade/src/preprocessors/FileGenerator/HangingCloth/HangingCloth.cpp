@@ -18,10 +18,10 @@
 #include "InteractionGeometryDispatcher.hpp"
 #include "InteractionPhysicsDispatcher.hpp"
 
-#include "ActionApplyDispatcher.hpp"
-#include "ActionDampingDispatcher.hpp"
-#include "ActionForceDamping.hpp"
-#include "ActionMomentumDamping.hpp"
+#include "ActionDispatcher.hpp"
+#include "ActionDispatcher.hpp"
+#include "CundallNonViscousForceDamping.hpp"
+#include "CundallNonViscousMomentumDamping.hpp"
 
 #include "BoundingVolumeDispatcher.hpp"
 #include "GeometricalModelDispatcher.hpp"
@@ -127,17 +127,17 @@ string HangingCloth::generate()
 	shared_ptr<GeometricalModelDispatcher> geometricalModelDispatcher	= shared_ptr<GeometricalModelDispatcher>(new GeometricalModelDispatcher);
 	geometricalModelDispatcher->add("ParticleSetParameters","Mesh2D","ParticleSet2Mesh2D");
 
-	shared_ptr<ActionForceDamping> actionForceDamping(new ActionForceDamping);
+	shared_ptr<CundallNonViscousForceDamping> actionForceDamping(new CundallNonViscousForceDamping);
 	actionForceDamping->damping = dampingForce;
-	shared_ptr<ActionMomentumDamping> actionMomentumDamping(new ActionMomentumDamping);
+	shared_ptr<CundallNonViscousMomentumDamping> actionMomentumDamping(new CundallNonViscousMomentumDamping);
 	actionMomentumDamping->damping = dampingMomentum;
-	shared_ptr<ActionDampingDispatcher> actionDampingDispatcher(new ActionDampingDispatcher);
-	actionDampingDispatcher->add("ActionForce","ParticleParameters","ActionForceDamping",actionForceDamping);
-	actionDampingDispatcher->add("ActionMomentum","RigidBodyParameters","ActionMomentumDamping",actionMomentumDamping);
+	shared_ptr<ActionDispatcher> actionDampingDispatcher(new ActionDispatcher);
+	actionDampingDispatcher->add("ActionForce","ParticleParameters","CundallNonViscousForceDamping",actionForceDamping);
+	actionDampingDispatcher->add("ActionMomentum","RigidBodyParameters","CundallNonViscousMomentumDamping",actionMomentumDamping);
 	
-	shared_ptr<ActionApplyDispatcher> applyActionDispatcher(new ActionApplyDispatcher);
-	applyActionDispatcher->add("ActionForce","ParticleParameters","ActionForce2Particle");
-	applyActionDispatcher->add("ActionMomentum","RigidBodyParameters","ActionMomentum2RigidBody");
+	shared_ptr<ActionDispatcher> applyActionDispatcher(new ActionDispatcher);
+	applyActionDispatcher->add("ActionForce","ParticleParameters","ApplyActionForce2Particle");
+	applyActionDispatcher->add("ActionMomentum","RigidBodyParameters","ApplyActionMomentum2RigidBody");
 
 	shared_ptr<TimeIntegratorDispatcher> timeIntegratorDispatcher(new TimeIntegratorDispatcher);
 	timeIntegratorDispatcher->add("ParticleParameters","LeapFrogIntegrator");

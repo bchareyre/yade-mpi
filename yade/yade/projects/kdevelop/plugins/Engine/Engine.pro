@@ -10,8 +10,7 @@ CONFIG += debug \
           warn_on 
 TEMPLATE = subdirs 
 SUBDIRS += Action \
-           ActionApplyFunctor \
-           ActionDampingFunctor \
+           ActionFunctor \
            TimeIntegratorFunctor \
            KinematicEngine \
            DynamicEngine 

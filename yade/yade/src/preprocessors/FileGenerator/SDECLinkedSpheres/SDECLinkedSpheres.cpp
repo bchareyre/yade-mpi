@@ -19,10 +19,10 @@
 #include "SDECLinkGeometry.hpp"
 #include "SDECLinkPhysics.hpp"
 
-#include "ActionApplyDispatcher.hpp"
-#include "ActionDampingDispatcher.hpp"
-#include "ActionForceDamping.hpp"
-#include "ActionMomentumDamping.hpp"
+#include "ActionDispatcher.hpp"
+#include "ActionDispatcher.hpp"
+#include "CundallNonViscousForceDamping.hpp"
+#include "CundallNonViscousMomentumDamping.hpp"
 
 #include "InteractionGeometryDispatcher.hpp"
 #include "InteractionPhysicsDispatcher.hpp"
@@ -179,37 +179,38 @@ void SDECLinkedSpheres::createSphere(shared_ptr<Body>& body, int i, int j, int k
 	q.fromAxisAngle( Vector3r(0,0,1),0);
 	
 		
-	Vector3r translation 	= Vector3r(i,j,k)*spacing-Vector3r(nbSpheres[0]/2*spacing,nbSpheres[1]/2*spacing-90,nbSpheres[2]/2*spacing) +
-				  Vector3r(Mathr::symmetricRandom()*disorder,Mathr::symmetricRandom()*disorder,Mathr::symmetricRandom()*disorder);
+	Vector3r translation 		= Vector3r(i,j,k)*spacing
+					  - Vector3r(nbSpheres[0]/2*spacing,nbSpheres[1]/2*spacing-90,nbSpheres[2]/2*spacing) 
+					  + Vector3r(Mathr::symmetricRandom()*disorder,Mathr::symmetricRandom()*disorder,Mathr::symmetricRandom()*disorder);
 
-	Real radius 		= (Mathr::intervalRandom(minRadius,maxRadius));
+	Real radius 			= (Mathr::intervalRandom(minRadius,maxRadius));
 	
-	body->isDynamic		= true;
+	body->isDynamic			= true;
 	
-	physics->angularVelocity= Vector3r(0,0,0);
-	physics->velocity	= Vector3r(0,0,0);
-	physics->mass		= 4.0/3.0*Mathr::PI*radius*radius; //*density
-	physics->inertia	= Vector3r(2.0/5.0*physics->mass*radius*radius,2.0/5.0*physics->mass*radius*radius,2.0/5.0*physics->mass*radius*radius); //
-	physics->se3		= Se3r(translation,q);
-	physics->kn		= 100000;
-	physics->ks		= 10000;
+	physics->angularVelocity	= Vector3r(0,0,0);
+	physics->velocity		= Vector3r(0,0,0);
+	physics->mass			= 4.0/3.0*Mathr::PI*radius*radius; //*density
+	physics->inertia		= Vector3r(2.0/5.0*physics->mass*radius*radius,2.0/5.0*physics->mass*radius*radius,2.0/5.0*physics->mass*radius*radius); //
+	physics->se3			= Se3r(translation,q);
+	physics->kn			= 100000;
+	physics->ks			= 10000;
 
-	aabb->diffuseColor	= Vector3r(0,1,0);
+	aabb->diffuseColor		= Vector3r(0,1,0);
 
 
-	gSphere->radius		= radius;
-	gSphere->diffuseColor	= Vector3f(Mathf::unitRandom(),Mathf::unitRandom(),Mathf::unitRandom());
-	gSphere->wire		= false;
-	gSphere->visible	= true;
-	gSphere->shadowCaster	= true;
+	gSphere->radius			= radius;
+	gSphere->diffuseColor		= Vector3f(Mathf::unitRandom(),Mathf::unitRandom(),Mathf::unitRandom());
+	gSphere->wire			= false;
+	gSphere->visible		= true;
+	gSphere->shadowCaster		= true;
 	
-	iSphere->radius		= radius;
-	iSphere->diffuseColor	= Vector3f(Mathf::unitRandom(),Mathf::unitRandom(),Mathf::unitRandom());
+	iSphere->radius			= radius;
+	iSphere->diffuseColor		= Vector3f(Mathf::unitRandom(),Mathf::unitRandom(),Mathf::unitRandom());
 
-	body->interactionGeometry		= iSphere;
+	body->interactionGeometry	= iSphere;
 	body->geometricalModel		= gSphere;
 	body->boundingVolume		= aabb;
-	body->physicalParameters= physics;
+	body->physicalParameters	= physics;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -247,9 +248,9 @@ void SDECLinkedSpheres::createBox(shared_ptr<Body>& body, Vector3r position, Vec
 	iBox->extents			= extents;
 	iBox->diffuseColor		= Vector3f(1,1,1);
 
-	body->boundingVolume			= aabb;
-	body->interactionGeometry			= iBox;
-	body->geometricalModel			= gBox;
+	body->boundingVolume		= aabb;
+	body->interactionGeometry	= iBox;
+	body->geometricalModel		= gBox;
 	body->physicalParameters	= physics;
 }
 
@@ -273,17 +274,17 @@ void SDECLinkedSpheres::createActors(shared_ptr<ComplexBody>& rootBody)
 	
 	
 		
-	shared_ptr<ActionForceDamping> actionForceDamping(new ActionForceDamping);
+	shared_ptr<CundallNonViscousForceDamping> actionForceDamping(new CundallNonViscousForceDamping);
 	actionForceDamping->damping = dampingForce;
-	shared_ptr<ActionMomentumDamping> actionMomentumDamping(new ActionMomentumDamping);
+	shared_ptr<CundallNonViscousMomentumDamping> actionMomentumDamping(new CundallNonViscousMomentumDamping);
 	actionMomentumDamping->damping = dampingMomentum;
-	shared_ptr<ActionDampingDispatcher> actionDampingDispatcher(new ActionDampingDispatcher);
-	actionDampingDispatcher->add("ActionForce","ParticleParameters","ActionForceDamping",actionForceDamping);
-	actionDampingDispatcher->add("ActionMomentum","RigidBodyParameters","ActionMomentumDamping",actionMomentumDamping);
+	shared_ptr<ActionDispatcher> actionDampingDispatcher(new ActionDispatcher);
+	actionDampingDispatcher->add("ActionForce","ParticleParameters","CundallNonViscousForceDamping",actionForceDamping);
+	actionDampingDispatcher->add("ActionMomentum","RigidBodyParameters","CundallNonViscousMomentumDamping",actionMomentumDamping);
 	
-	shared_ptr<ActionApplyDispatcher> applyActionDispatcher(new ActionApplyDispatcher);
-	applyActionDispatcher->add("ActionForce","ParticleParameters","ActionForce2Particle");
-	applyActionDispatcher->add("ActionMomentum","RigidBodyParameters","ActionMomentum2RigidBody");
+	shared_ptr<ActionDispatcher> applyActionDispatcher(new ActionDispatcher);
+	applyActionDispatcher->add("ActionForce","ParticleParameters","ApplyActionForce2Particle");
+	applyActionDispatcher->add("ActionMomentum","RigidBodyParameters","ApplyActionMomentum2RigidBody");
 	
 	shared_ptr<TimeIntegratorDispatcher> timeIntegratorDispatcher(new TimeIntegratorDispatcher);
 	

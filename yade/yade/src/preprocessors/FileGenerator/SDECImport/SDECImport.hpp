@@ -13,7 +13,7 @@ class SDECImport : public FileGenerator
 	private	: Real kn_Spheres;
 	private	: Real ks_Spheres;
 	private	: Real kn_Box;
-	private	: Real ks_Box;
+	private	: Real ks_Box,density;
 	private	: bool wall_top;
 	private	: bool wall_bottom;
 	private	: bool wall_1;
@@ -28,12 +28,26 @@ class SDECImport : public FileGenerator
 	private	: bool wall_4_wire;
 	private	: Vector3f spheresColor;
 	private	: bool spheresRandomColor;
+	private : bool recordBottomForce;
+	private : string forceRecordFile,positionRecordFile;
+	private : bool recordAveragePositions;
+	private : int recordIntervalIter;
+	private : Real dampingForce;
+	private : Real dampingMomentum;
+	
+	private	: Real bigBallRadius;
+	private	: Real bigBallDensity;
+	private	: Real bigBallDropTimeSeconds;
 	
 	// construction
 	public : SDECImport ();
 	public : ~SDECImport ();
+	
+	private : void createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents,bool wire);
+	private : void createSphere(shared_ptr<Body>& body, Vector3r translation, Real radius);
+	private : void createActors(shared_ptr<ComplexBody>& rootBody);
+	private : void positionRootBody(shared_ptr<ComplexBody>& rootBody);
 
-	protected : virtual void postProcessAttributes(bool deserializing);
 	public : void registerAttributes();
 
 	public : string generate();

@@ -20,8 +20,8 @@ LIBS += -lSerialization \
         -lActionReset \
         -lInteractionDescriptionSet2AABBFunctor \
         -lTranslator \
-        -lActionMomentumDamping \
-        -lActionForceDamping \
+        -lCundallNonViscousMomentumDamping \
+        -lCundallNonViscousForceDamping \
         -rdynamic 
 INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 

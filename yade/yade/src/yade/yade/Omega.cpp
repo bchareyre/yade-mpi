@@ -1,7 +1,5 @@
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 #include "Omega.hpp"
+#include "yadeExceptions.hpp"
 
 #include "Vector3.hpp"
 
@@ -35,7 +33,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-Omega::Omega ()
+Omega::Omega()
 {
 	ThreadSafe::cerr("Constructing Omega  (if multiple times - check '-rdynamic' flag!)");
 
@@ -58,7 +56,7 @@ Omega::Omega ()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-Omega::~Omega ()
+Omega::~Omega()
 {
 	//LOCK(omegaMutex);
 	
@@ -305,7 +303,7 @@ void Omega::loadSimulation()
 {
 	LOCK(Omega::instance().getRootBodyMutex());
 	
-	if( Omega::instance().getSimulationFileName().size() != 0  &&  filesystem::exists(simulationFileName) )
+	if( Omega::instance().getSimulationFileName().size() != 0  &&  filesystem::exists(simulationFileName) && filesystem::extension(simulationFileName)==".xml" )
 	{
 		freeRootBody();
 		logMessage("Loading file " + simulationFileName);
@@ -324,8 +322,9 @@ void Omega::loadSimulation()
 	}
 	else
 	{
-		ThreadSafe::cout("\nWrong filename, please specify filename using your frontend.\n");
-		exit(1);
+		std::string error = yadeExceptions::BadFile + simulationFileName;
+		cerr << error.c_str() << endl;
+		throw yadeBadFile(error.c_str());
 	}
 }
 

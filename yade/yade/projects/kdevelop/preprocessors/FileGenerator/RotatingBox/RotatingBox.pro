@@ -23,8 +23,8 @@ LIBS += -lAABB \
         -lInteractionSphere \
         -lInteractionBox \
         -lActionReset \
-        -lActionForceDamping \
-        -lActionMomentumDamping \
+        -lCundallNonViscousForceDamping \
+        -lCundallNonViscousMomentumDamping \
         -rdynamic 
 INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 

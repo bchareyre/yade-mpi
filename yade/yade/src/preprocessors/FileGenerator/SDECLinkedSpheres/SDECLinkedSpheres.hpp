@@ -24,13 +24,13 @@ class SDECLinkedSpheres : public FileGenerator
 	
 	private : void createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents);
 	private : void createSphere(shared_ptr<Body>& body, int i, int j, int k);
+	private : void createActors(shared_ptr<ComplexBody>& rootBody);
+	private : void positionRootBody(shared_ptr<ComplexBody>& rootBody);
 	
 	// construction
 	public : SDECLinkedSpheres ();
 	public : ~SDECLinkedSpheres ();
 
-	private : void createActors(shared_ptr<ComplexBody>& rootBody);
-	private : void positionRootBody(shared_ptr<ComplexBody>& rootBody);
 	
 	protected : virtual void postProcessAttributes(bool deserializing);
 	public : void registerAttributes();

@@ -148,7 +148,7 @@ void SimulationController::pbLoadClicked()
 	string selectedFilter;
 	string fileName = FileDialog::getOpenFileName("../data", "XML Yade File (*.xml)", "Choose a file to open", parentWorkspace, selectedFilter );
 		
-	if (fileName.size()!=0 && selectedFilter == "XML Yade File (*.xml)" && filesystem::exists(fileName))
+	if (fileName.size()!=0 && selectedFilter == "XML Yade File (*.xml)" && filesystem::exists(fileName) && filesystem::extension(fileName)==".xml")
 	{
 		
 		map<int,GLViewer*>::iterator gi = glViews.begin();
@@ -161,7 +161,7 @@ void SimulationController::pbLoadClicked()
 		Omega::instance().joinSimulationLoop();
 		
 		Omega::instance().setSimulationFileName(fileName);
-		
+cerr << "fileName:" << fileName << endl;
 		Omega::instance().loadSimulation();
 		
 		string fullName = string(filesystem::basename(fileName.data()))+string(filesystem::extension(fileName.data()));

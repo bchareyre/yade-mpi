@@ -69,10 +69,12 @@ HEADERS += Chrono.hpp \
            FrontEnd.hpp \
            FileGenerator.hpp \
            SimulationLoop.hpp \
-           RenderingEngine.hpp 
+           RenderingEngine.hpp \
+	   yadeExceptions.hpp
 SOURCES += Chrono.cpp \
            Omega.cpp \
            yade.cpp \
            FrontEnd.cpp \
            SimulationLoop.cpp \
-           FileGenerator.cpp 
+           FileGenerator.cpp \
+	   yadeExceptions.cpp
