@@ -3,12 +3,13 @@
 # Subdir relative project main directory: ./toolboxes
 # Target is a subdirs project 
 
-MOC_DIR = $(YADECOMPILATIONPATH) 
-UI_DIR = $(YADECOMPILATIONPATH) 
-OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-CONFIG += debug \
-          warn_on 
-TEMPLATE = subdirs 
 SUBDIRS += DataStructures \
            Libraries \
-           ComputationalGeometry 
+           ComputationalGeometry \
+           OpenGL 
+MOC_DIR = $(YADECOMPILATIONPATH)
+UI_DIR = $(YADECOMPILATIONPATH)
+OBJECTS_DIR = $(YADECOMPILATIONPATH)
+CONFIG += debug \
+warn_on
+TEMPLATE = subdirs
