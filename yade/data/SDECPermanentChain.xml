@@ -15,13 +15,13 @@
 					<actors />
 				</actors>
 				<actors className="Rotor" >
-					<actors angularVelocity="0.3" rotationAxis="{1 1 1}" subscribedBodies="[]" />
+					<actors angularVelocity="0.3" rotationAxis="{0 1 0}" subscribedBodies="[3]" />
 				</actors>
 				<actors className="Translator" >
-					<actors velocity="3" translationAxis="{1 0 0}" subscribedBodies="[3]" />
+					<actors velocity="3" translationAxis="{1 0 0}" subscribedBodies="[]" />
 				</actors>
 			</actors>
-			<permanentInteractions size="5">
+			<permanentInteractions size="8">
 				<permanentInteractions className="Contact" >
 					<permanentInteractions id1="1" id2="2">
 						<interactionGeometry className="SDECPermanentLink" >
@@ -57,8 +57,29 @@
 						</interactionGeometry>
 					</permanentInteractions>
 				</permanentInteractions>
+				<permanentInteractions className="Contact" >
+					<permanentInteractions id1="6" id2="7">
+						<interactionGeometry className="SDECPermanentLink" >
+							<interactionGeometry initialKn="500000" initialKs="50000" heta="1" initialEquilibriumDistance="5.9" radius1="3" radius2="3" knMax="750000" ksMax="7500" />
+						</interactionGeometry>
+					</permanentInteractions>
+				</permanentInteractions>
+				<permanentInteractions className="Contact" >
+					<permanentInteractions id1="1" id2="8">
+						<interactionGeometry className="SDECPermanentLink" >
+							<interactionGeometry initialKn="500000" initialKs="50000" heta="1" initialEquilibriumDistance="5.9" radius1="3" radius2="3" knMax="750000" ksMax="7500" />
+						</interactionGeometry>
+					</permanentInteractions>
+				</permanentInteractions>
+				<permanentInteractions className="Contact" >
+					<permanentInteractions id1="8" id2="9">
+						<interactionGeometry className="SDECPermanentLink" >
+							<interactionGeometry initialKn="500000" initialKs="50000" heta="1" initialEquilibriumDistance="5.9" radius1="3" radius2="3" knMax="750000" ksMax="7500" />
+						</interactionGeometry>
+					</permanentInteractions>
+				</permanentInteractions>
 			</permanentInteractions>
-			<bodies size="7">
+			<bodies size="10">
 				<bodies className="SDECDiscreteElement" >
 					<bodies isDynamic="0" se3="{{0 -50 0} {1 0 0 0}}" velocity="{0 0 0}" angularVelocity="{0 0 0}" mass="0" inertia="{0 0 0}" kn="100000" ks="10000">
 						<bv className="AABB" >
@@ -162,6 +183,60 @@
 					<bodies isDynamic="1" se3="{{0 0 -17.7} {1 0 0 0}}" velocity="{0 0 0}" angularVelocity="{0 0 0}" mass="37.699" inertia="{135.716 135.716 135.716}" kn="100000" ks="10000">
 						<bv className="AABB" >
 							<bv color="{0 1 0}" center="{0 0 -17.7}" halfSize="{3 3 3}" />
+						</bv>
+						<cm className="Sphere" >
+							<cm diffuseColor="{0.4 0.5 1.0}" wire="0" visible="1" radius="3" />
+						</cm>
+						<gm className="Sphere" >
+							<gm diffuseColor="{0.4 0.5 1.0}" wire="0" visible="1" wire="0" visible="1" radius="3" />
+						</gm>
+						<actors size="1">
+							<actors className="BallisticDynamicEngine" >
+								<actors damping="1" />
+							</actors>
+						</actors>
+					</bodies>
+				</bodies>
+				<bodies className="SDECDiscreteElement" >
+					<bodies isDynamic="1" se3="{{0 0 -23.6} {1 0 0 0}}" velocity="{0 0 0}" angularVelocity="{0 0 0}" mass="37.699" inertia="{135.716 135.716 135.716}" kn="100000" ks="10000">
+						<bv className="AABB" >
+							<bv color="{0 1 0}" center="{0 0 -23.6}" halfSize="{3 3 3}" />
+						</bv>
+						<cm className="Sphere" >
+							<cm diffuseColor="{0.4 0.5 1.0}" wire="0" visible="1" radius="3" />
+						</cm>
+						<gm className="Sphere" >
+							<gm diffuseColor="{0.4 0.5 1.0}" wire="0" visible="1" wire="0" visible="1" radius="3" />
+						</gm>
+						<actors size="1">
+							<actors className="BallisticDynamicEngine" >
+								<actors damping="1" />
+							</actors>
+						</actors>
+					</bodies>
+				</bodies>
+				<bodies className="SDECDiscreteElement" >
+					<bodies isDynamic="1" se3="{{0 0 17.7} {1 0 0 0}}" velocity="{0 0 0}" angularVelocity="{0 0 0}" mass="37.699" inertia="{135.716 135.716 135.716}" kn="100000" ks="10000">
+						<bv className="AABB" >
+							<bv color="{0 1 0}" center="{0 0 17.7}" halfSize="{3 3 3}" />
+						</bv>
+						<cm className="Sphere" >
+							<cm diffuseColor="{0.4 0.5 1.0}" wire="0" visible="1" radius="3" />
+						</cm>
+						<gm className="Sphere" >
+							<gm diffuseColor="{0.4 0.5 1.0}" wire="0" visible="1" wire="0" visible="1" radius="3" />
+						</gm>
+						<actors size="1">
+							<actors className="BallisticDynamicEngine" >
+								<actors damping="1" />
+							</actors>
+						</actors>
+					</bodies>
+				</bodies>
+				<bodies className="SDECDiscreteElement" >
+					<bodies isDynamic="1" se3="{{0 0 23.6} {1 0 0 0}}" velocity="{0 0 0}" angularVelocity="{0 0 0}" mass="37.699" inertia="{135.716 135.716 135.716}" kn="100000" ks="10000">
+						<bv className="AABB" >
+							<bv color="{0 1 0}" center="{0 0 23.6}" halfSize="{3 3 3}" />
 						</bv>
 						<cm className="Sphere" >
 							<cm diffuseColor="{0.4 0.5 1.0}" wire="0" visible="1" radius="3" />
