@@ -5,7 +5,7 @@
 
 SimulationLoop::SimulationLoop(shared_ptr<ThreadSynchronizer> s)
 {
-	createThread(s);
+	createThread(s,false);
 }
 
 SimulationLoop::~SimulationLoop()

@@ -59,7 +59,18 @@ void ThreadSynchronizer::stopAll()
 int ThreadSynchronizer::insertThread()
 { 
 	boost::mutex::scoped_lock lock(mutex);	
+	
 	redirectionId.push_back(nbThreads);
+
+	//FIXME : make that work !	
+// 	int i=0;
+// 	while (i<redirectionId.size() && redirectionId[i]!=-1)
+// 		i++;
+// 	if (i==redirectionId.size())
+// 		redirectionId.push_back(nbThreads);
+// 	else
+// 		redirectionId[i] = nbThreads;
+
 	return nbThreads++;
 }
 

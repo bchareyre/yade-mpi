@@ -46,14 +46,15 @@ OpenGLRenderingEngine::~OpenGLRenderingEngine()
 	
 void OpenGLRenderingEngine::render(shared_ptr<NonConnexBody> rootBody)
 {
-
-  //glClear(GL_STENCIL_BUFFER_BIT);
-
 	const GLfloat pos[4]	= {75.0,75.0,0.0,1.0};
 	Vector3r lightPos(pos[0],pos[1],pos[2]);
 	
-	glLightfv(GL_LIGHT1, GL_POSITION, pos);
-	glEnable(GL_LIGHT1);
+	//glLightfv(GL_LIGHT0, GL_POSITION, pos);
+	//glDisable(GL_LIGHT0);
+	
+	
+	glLightfv(GL_LIGHT0, GL_POSITION, pos);
+	glEnable(GL_LIGHT0);
 
 	float sceneRadius = 100;
 	
@@ -65,15 +66,17 @@ void OpenGLRenderingEngine::render(shared_ptr<NonConnexBody> rootBody)
 	glutSolidSphere(3,10,10);
 	glPopMatrix();	
 	
-
+	glEnable(GL_CULL_FACE);
 	
 	glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
 	renderRootBody(rootBody);  /* render scene in depth buffer */
 	
+	glClear(GL_STENCIL_BUFFER_BIT);
 	glEnable(GL_STENCIL_TEST);
 	glDepthMask(GL_FALSE);
 	glStencilFunc(GL_ALWAYS, 0, 0);
-	
+
+
 	glStencilOp(GL_KEEP, GL_KEEP, GL_INCR);
 	glCullFace(GL_BACK);  /* increment using front face of shadow volume */
 	renderShadowVolumes(rootBody,lightPos);
@@ -89,18 +92,18 @@ void OpenGLRenderingEngine::render(shared_ptr<NonConnexBody> rootBody)
 	glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
 	
 	glStencilFunc(GL_EQUAL, 1, 1);  /* draw shadowed part */
-	glDisable(GL_LIGHTING);
+	glDisable(GL_LIGHT0);
 	renderRootBody(rootBody);  /* render scene in depth buffer */
 	
 	glStencilFunc(GL_EQUAL, 0, 1);  /* draw lit part */
-	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
 	renderRootBody(rootBody);  /* render scene in depth buffer */
 	
 	glDepthFunc(GL_LESS);
 	glDisable(GL_STENCIL_TEST);
 	    
 
-	//renderShadowVolumes(rootBody,lightPos);
+//	renderShadowVolumes(rootBody,lightPos);
 	  
 
 }
@@ -121,7 +124,7 @@ void OpenGLRenderingEngine::renderShadowVolumes(shared_ptr<NonConnexBody> rootBo
 	{
 		shared_ptr<Body> b = ncb->bodies->getCurrent();
 		float p[4];
-      		glGetLightfv(GL_LIGHT1, GL_POSITION, p);
+      		glGetLightfv(GL_LIGHT0, GL_POSITION, p);
 		if (b->gm->shadowCaster)
 		{
 			shared_ptr<Sphere> s = dynamic_pointer_cast<Sphere>(b->gm);

@@ -41,8 +41,8 @@ void SimulationController::pbLoadClicked()
 		
 		if (glViews.size()==0)
  		{
-				boost::mutex resizeMutex;	
-				boost::mutex::scoped_lock lock(resizeMutex);
+			boost::mutex resizeMutex;	
+			boost::mutex::scoped_lock lock(resizeMutex);
 			
 			QGLFormat format;
 			QGLFormat::setDefaultFormat( format );
@@ -50,8 +50,11 @@ void SimulationController::pbLoadClicked()
 
 			glViews.push_back(new GLViewer(format,this->parentWidget()->parentWidget()));
 		}
+		
+		Omega::instance().createSimulationLoop();
+		
 		Omega::instance().synchronizer->startAll();
-		//Omega::instance().stopSimulationLoop();
+		Omega::instance().stopSimulationLoop();
 		
 	}
 }
@@ -64,7 +67,7 @@ void SimulationController::pbNewViewClicked()
 	QGLFormat format;
 	QGLFormat::setDefaultFormat( format );
 	format.setStencil(TRUE);
-	glViews.push_back(new GLViewer(format, this->parentWidget()->parentWidget(), glViews.front()/*->glView*/ ) );
+	glViews.push_back(new GLViewer(format, this->parentWidget()->parentWidget(), glViews.front()) );
 }
 
 void SimulationController::pbStopClicked()
@@ -89,7 +92,7 @@ void SimulationController::pbResetClicked()
 SimulationControllerUpdater::SimulationControllerUpdater(SimulationController * sc) : Threadable<SimulationControllerUpdater>()
 {
 	controller = sc;
-	createThread(Omega::instance().synchronizer);
+	createThread(Omega::instance().synchronizer,true);
 }
 
 SimulationControllerUpdater::~SimulationControllerUpdater()

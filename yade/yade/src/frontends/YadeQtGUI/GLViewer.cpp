@@ -6,7 +6,7 @@
 #include "ThreadSynchronizer.hpp"
 
 
-GLViewer::GLViewer(const QGLFormat& format, QWidget * parent, QGLWidget * shareWidget) /*: QThread() */: QGLViewer(format,parent,"glview",shareWidget), qglThread(this)
+GLViewer::GLViewer(const QGLFormat& format, QWidget * parent, QGLWidget * shareWidget) : QGLViewer(format,parent,"glview",shareWidget), qglThread(this)
 {
 
 	setAutoBufferSwap(false);
@@ -79,5 +79,3 @@ void GLViewer::keyPressEvent(QKeyEvent *e)
 	else
 		QGLViewer::keyPressEvent(e);
 }
-
-	

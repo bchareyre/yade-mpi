@@ -34,9 +34,9 @@ void ConnexBody::glDraw()
 	glPopMatrix();
 
 	//FIXME : hardcoded drawing of boundingvolume, sensor will fix that
-	glPushMatrix();
-	bv->glDraw();
-	glPopMatrix();
+	//glPushMatrix();
+	//bv->glDraw();
+	//glPopMatrix();
 }
 
 

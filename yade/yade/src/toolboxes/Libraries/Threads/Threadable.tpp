@@ -33,7 +33,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
  
 template<class Thread>
-Threadable<Thread>::Threadable(shared_ptr<ThreadSynchronizer> s)
+Threadable<Thread>::Threadable(shared_ptr<ThreadSynchronizer> s) : turn(new int(0)), saveTurn(new int(0))
 {
 	synchronizer = s;
 }
@@ -52,8 +52,13 @@ Threadable<Thread>::~Threadable()
 template<class Thread>
 void Threadable<Thread>::stop()
 { 
-	saveTurn = turn;
-	turn = -2;
+	boost::mutex mutex;	
+	boost::mutex::scoped_lock lock(mutex);
+
+//	*saveTurn = *turn;
+//	*turn = -2;	
+//	synchronizer->signal();
+	synchronizer->removeThread(*turn);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -62,7 +67,12 @@ void Threadable<Thread>::stop()
 template<class Thread>
 void Threadable<Thread>::start()
 {
-	turn = saveTurn;
+	boost::mutex mutex;	
+	boost::mutex::scoped_lock lock(mutex);
+	
+	*turn = *saveTurn;
+	*turn = synchronizer->insertThread();
+	
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -79,7 +89,7 @@ void Threadable<Thread>::operator()()
 			{
 				boost::mutex::scoped_lock lock(*(synchronizer->getMutex()));
 	
-				while (synchronizer->notMyTurn(turn))
+				while (synchronizer->notMyTurn(*turn))
 					synchronizer->wait(lock);
 				
 				oneLoop();
@@ -89,7 +99,7 @@ void Threadable<Thread>::operator()()
 				synchronizer->signal();
 			}
 		}
-		synchronizer->removeThread(turn);
+		synchronizer->removeThread(*turn);
 	}
 	else
 	{
@@ -104,21 +114,24 @@ void Threadable<Thread>::operator()()
 template<class Thread>
 int Threadable<Thread>::getTurn()
 {
-	return turn;
+	return *turn;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 template<class Thread>
-void Threadable<Thread>::createThread(shared_ptr<ThreadSynchronizer> s)
+void Threadable<Thread>::createThread(shared_ptr<ThreadSynchronizer> s,bool autoStart)
 {
+	boost::mutex mutex;	
+	boost::mutex::scoped_lock lock(mutex);
+	
 	synchronizer = s;
 	if (synchronizer)
 	{	
-		turn = synchronizer->insertThread();
-		saveTurn = turn;
-		//turn = -2;
+		*turn = synchronizer->insertThread();
+		if (!autoStart)
+			stop();
 	}
 	thread = shared_ptr<boost::thread>(new boost::thread(*(dynamic_cast<Thread*>(this))));
 }
@@ -129,6 +142,9 @@ void Threadable<Thread>::createThread(shared_ptr<ThreadSynchronizer> s)
 template<class Thread>
 void Threadable<Thread>::sleep(int ms)
 {
+	boost::mutex mutex;	
+	boost::mutex::scoped_lock lock(mutex);
+	
 	boost::xtime xt;
 	boost::xtime_get(&xt, boost::TIME_UTC);
 	xt.nsec += ms*1000000;

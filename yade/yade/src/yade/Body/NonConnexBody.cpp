@@ -34,8 +34,6 @@ void NonConnexBody::glDraw()
 	glTranslatef(se3.translation[0],se3.translation[1],se3.translation[2]);
 	glRotated(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
 
-	glDisable(GL_LIGHTING);
-
 	for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext() )
 		bodies->getCurrent()->glDraw();
 	

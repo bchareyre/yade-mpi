@@ -67,6 +67,7 @@ class Omega : public Singleton<Omega>
 
 	//private : shared_ptr<boost::thread> simulationThread;
 	private : shared_ptr<SimulationLoop> simulationLoop;
+	public : void createSimulationLoop();
 	public : void startSimulationLoop();
 	public : void stopSimulationLoop();
 	

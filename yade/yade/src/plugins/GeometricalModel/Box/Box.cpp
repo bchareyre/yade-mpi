@@ -40,6 +40,9 @@ bool Box::loadFromFile(char * )
 
 void Box::glDraw()
 {
+
+  	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, diffuseColor);
+
 	glColor3v(diffuseColor);
 	glScalef(2*extents[0],2*extents[1],2*extents[2]);
 
@@ -50,7 +53,7 @@ void Box::glDraw()
 	}
 	else
 	{
-		glEnable(GL_LIGHTING);
+		//glEnable(GL_LIGHTING);
 		glutSolidCube(1);
 	}
 }

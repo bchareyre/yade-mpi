@@ -41,7 +41,7 @@ QGLThread::QGLThread(GLViewer * glv) :	Threadable<QGLThread>(),
 					renderer(new OpenGLRenderingEngine()),
 					glViewer(glv)
 {
-	createThread(Omega::instance().synchronizer);
+	createThread(Omega::instance().synchronizer,true);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

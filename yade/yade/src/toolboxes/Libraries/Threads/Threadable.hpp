@@ -56,8 +56,8 @@ class Threadable
 
 	private     : shared_ptr<boost::thread> thread;
 	protected   : shared_ptr<ThreadSynchronizer> synchronizer;
-	protected : int turn;
-	protected : int saveTurn;
+	protected : int * turn;
+	protected : int * saveTurn;
 	protected : int getTurn();	
 	
 	public    : Threadable(shared_ptr<ThreadSynchronizer> s=shared_ptr<ThreadSynchronizer>());
@@ -65,7 +65,7 @@ class Threadable
 	
 	public : void operator()();
 	
-	public    : virtual void createThread(shared_ptr<ThreadSynchronizer> s=shared_ptr<ThreadSynchronizer>()); 
+	public    : virtual void createThread(shared_ptr<ThreadSynchronizer> s=shared_ptr<ThreadSynchronizer>(),bool autoStart); 
 	public    : virtual bool notEnd()  = 0;
 	public    : virtual void oneLoop() = 0;
 	
