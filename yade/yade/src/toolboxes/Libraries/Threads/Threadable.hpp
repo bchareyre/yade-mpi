@@ -56,6 +56,7 @@ class Threadable
 	protected : boost::mutex * mutex;
 	private  : bool  * finished;
 	private  : bool  * blocked;	
+	private  : bool  * singleLoop;	
 	protected : int * turn;
 	private     : shared_ptr<boost::thread> thread;
 	protected   : shared_ptr<ThreadSynchronizer> synchronizer;
@@ -74,6 +75,7 @@ class Threadable
 	public    : void start();
 	public    : void stop();
 	public    : bool isStopped();
+	public    : void doOneLoop();
 	public : void finish();
 
 };

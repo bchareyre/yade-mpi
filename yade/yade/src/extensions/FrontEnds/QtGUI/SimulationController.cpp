@@ -67,7 +67,7 @@ SimulationController::SimulationController(QWidget * parent) : QtGeneratedSimula
 	
 	if(renderer)
 	{
-		guiGen.setResizeHeight(true);
+		guiGen.setResizeHeight(false);
 		guiGen.setResizeWidth(false);
 		guiGen.setShift(10,30);
 		guiGen.setShowButtons(false);
@@ -180,6 +180,7 @@ void SimulationController::pbLoadClicked()
 		pbStartSimulation->setEnabled(true);
 		pbStopSimulation->setEnabled(true);
 		pbResetSimulation->setEnabled(true);
+		pbOneSimulationStep->setEnabled(true);
 	}
 } 
 
@@ -280,6 +281,19 @@ void SimulationController::pbResetClicked()
 	for(;gi!=giEnd;++gi)
 		(*gi).second->startRendering();
 
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+void SimulationController::pbOneSimulationStepClicked()
+{
+	//Omega::instance().stopSimulationLoop();
+	//updater->start();
+	//FIXME : fix real simulation time
+	Omega::instance().doOneSimulationLoop();
+	updater->doOneLoop();
+	
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

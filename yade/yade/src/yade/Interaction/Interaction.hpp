@@ -50,17 +50,15 @@ class Interaction : public Serializable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Attributes											///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+	// FIXME : better to test if InteractionPhysics==0 and remove this flag
+	public	: bool isNew;	
+	public  : bool isReal;
 	private	: unsigned int id1,id2;
 
 
 	// FIXME - why public ?!
 	public	: shared_ptr<InteractionGeometry> interactionGeometry;
 	public	: shared_ptr<InteractionPhysics> interactionPhysics;
-
-	// FIXME : better to test if InteractionPhysics==0 and remove this flag
-	public	: bool isNew;
-	
-	public  : bool isReal;
 
 	// construction
 	public	: Interaction ();

@@ -27,6 +27,10 @@ SDECSpheresPlane::SDECSpheresPlane () : FileGenerator()
 	nbSpheres = 2;
 	minRadius = 5;
 	maxRadius = 5;
+	kn = 100000;
+	ks = 10000;
+	groundSize = Vector3r(200,5,200);
+
 }
 
 SDECSpheresPlane::~SDECSpheresPlane ()
@@ -43,6 +47,9 @@ void SDECSpheresPlane::registerAttributes()
 	REGISTER_ATTRIBUTE(nbSpheres);
 	REGISTER_ATTRIBUTE(minRadius);
 	REGISTER_ATTRIBUTE(maxRadius);
+	REGISTER_ATTRIBUTE(kn);
+	REGISTER_ATTRIBUTE(ks);
+	REGISTER_ATTRIBUTE(groundSize);
 }
 
 string SDECSpheresPlane::generate()
@@ -109,15 +116,15 @@ string SDECSpheresPlane::generate()
 	box1->se3		= Se3r(Vector3r(0,0,0),q);
 	aabb->color		= Vector3r(1,0,0);
 	box1->bv		= dynamic_pointer_cast<BoundingVolume>(aabb);
-	box->extents		= Vector3r(200,5,200);
+	box->extents		= groundSize;
 	box->diffuseColor	= Vector3f(1,1,1);
 	box->wire		= false;
 	box->visible		= true;
 	box->shadowCaster	= false;
 	box1->cm		= dynamic_pointer_cast<CollisionGeometry>(box);
 	box1->gm		= dynamic_pointer_cast<CollisionGeometry>(box);
-	box1->kn		= 100000;
-	box1->ks		= 10000;
+	box1->kn		= kn;
+	box1->ks		= ks;
 
 
 	shared_ptr<Body> b;
@@ -159,8 +166,8 @@ string SDECSpheresPlane::generate()
 		
 		s->cm			= dynamic_pointer_cast<CollisionGeometry>(sphere);
 		s->gm			= dynamic_pointer_cast<GeometricalModel>(sphere);
-		s->kn			= 100000;
-		s->ks			= 10000;
+		s->kn			= kn;
+		s->ks			= ks;
 
 		b = dynamic_pointer_cast<Body>(s);
 		rootBody->bodies->insert(b);

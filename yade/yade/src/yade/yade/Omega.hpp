@@ -77,6 +77,7 @@ class Omega : public Singleton<Omega>
 	public	: void stopSimulationLoop();
 	public	: void finishSimulationLoop();
 	public  : void joinSimulationLoop();
+	public  : void doOneSimulationLoop();
 	
 	private	: shared_ptr<ThreadSynchronizer> synchronizer;
 	public  : shared_ptr<ThreadSynchronizer> getSynchronizer();

@@ -125,6 +125,48 @@ void Omega::joinSimulationLoop()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+void Omega::doOneSimulationLoop()
+{
+	if (simulationLoop)
+	{
+		//if ((simulationLoop->isStopped()))
+		//	simulationPauseDuration += microsec_clock::local_time()-msStartingPauseTime;
+		//else
+		msStartingPauseTime = microsec_clock::local_time();	
+		simulationLoop->doOneLoop();
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+void Omega::startSimulationLoop()
+{
+//	LOCK(omegaMutex);
+
+	if (simulationLoop && simulationLoop->isStopped())
+	{
+		simulationPauseDuration += microsec_clock::local_time()-msStartingPauseTime;
+		simulationLoop->start();
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+void Omega::stopSimulationLoop()
+{
+//	LOCK(omegaMutex);
+	if (simulationLoop && !(simulationLoop->isStopped()))
+	{
+		msStartingPauseTime = microsec_clock::local_time();
+		simulationLoop->stop();	
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 void Omega::registerDynlibType(const string& name)
 {	
 	// called by BuildDynLibList
@@ -294,27 +336,6 @@ void Omega::freeRootBody()
 {
 //	LOCK(rootBodyMutex);
 	rootBody = shared_ptr<NonConnexBody>();
-}
-
-void Omega::startSimulationLoop()
-{
-//	LOCK(omegaMutex);
-
-	if (simulationLoop && simulationLoop->isStopped())
-	{
-		simulationPauseDuration += microsec_clock::local_time()-msStartingPauseTime;
-		simulationLoop->start();
-	}
-}
-
-void Omega::stopSimulationLoop()
-{
-//	LOCK(omegaMutex);
-	if (simulationLoop && !(simulationLoop->isStopped()))
-	{
-		msStartingPauseTime = microsec_clock::local_time();
-		simulationLoop->stop();	
-	}
 }
 
 

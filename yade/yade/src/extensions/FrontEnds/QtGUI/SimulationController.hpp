@@ -60,6 +60,8 @@ class SimulationController : public QtGeneratedSimulationController
 	public slots : virtual void pbStartClicked();
 	public slots : virtual void pbResetClicked();
 	public slots : virtual void pbCenterSceneClicked();
+	public slots : virtual void pbOneSimulationStepClicked();
+	
 	public slots : void closeGLViewEvent(int id);
 
 	private : void addNewView();

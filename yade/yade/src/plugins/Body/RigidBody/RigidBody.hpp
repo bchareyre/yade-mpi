@@ -7,6 +7,7 @@
 
 class RigidBody : public ConnexBody
 {
+	
 	public : Vector3r invInertia;
 	public : Vector3r inertia;
 	public : Vector3r acceleration;

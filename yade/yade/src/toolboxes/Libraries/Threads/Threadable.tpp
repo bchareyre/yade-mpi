@@ -36,6 +36,7 @@ template<class Thread>
 Threadable<Thread>::Threadable(shared_ptr<ThreadSynchronizer> s) :	mutex(new boost::mutex),
 									finished(new bool(false)), 
 									blocked(new bool(true)), 
+									singleLoop(new bool(false)), 
 									turn(new int(0)),
 									synchronizer(s)
 {
@@ -78,6 +79,7 @@ void Threadable<Thread>::stop()
 {
 	boost::mutex::scoped_lock lock(*mutex);
 	*blocked = true;
+	*singleLoop = false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -88,7 +90,7 @@ void Threadable<Thread>::start()
 {
 	boost::mutex::scoped_lock lock(*mutex);
 	*blocked = false;
-
+	*singleLoop = false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -99,7 +101,8 @@ void Threadable<Thread>::finish()
 {
 	boost::mutex::scoped_lock lock(*mutex);
 	*finished = true;
-	*blocked = false;
+	//*blocked = false;	
+	*singleLoop = false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -116,28 +119,46 @@ void Threadable<Thread>::join()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 template<class Thread>
+void Threadable<Thread>::doOneLoop()
+{
+	boost::mutex::scoped_lock lock(*mutex);
+	*blocked = false;
+	*singleLoop = true;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+template<class Thread>
 void Threadable<Thread>::operator()()
 {
 	ThreadSafe::cout("beginning Of thread number : "+lexical_cast<string>(*turn));
+	
 	while (notEnd() && !*finished)
 	{
 		{	
-		//	ThreadSafe::cout(lexical_cast<string>(*turn)+" : 1");
 			boost::mutex::scoped_lock lock(synchronizer->getMutex());
-		//	ThreadSafe::cout(lexical_cast<string>(*turn)+" : 2");
+
 			while (synchronizer->notMyTurn(*turn))
 				synchronizer->wait(lock);
-		//	ThreadSafe::cout(lexical_cast<string>(*turn)+" : 3");
+
 			if (!*blocked)
 				oneLoop();
-		//	ThreadSafe::cout(lexical_cast<string>(*turn)+" : 4");
+
 			synchronizer->setNextCurrentThread();
-		//	ThreadSafe::cout(lexical_cast<string>(*turn)+" : 5");
+
+			if (*singleLoop)
+			{
+				*blocked = true;
+				*singleLoop = false;
+			}
+			
 			synchronizer->signal();
-		//	ThreadSafe::cout(lexical_cast<string>(*turn)+" : 6");
 		}
 	}
+	
 	synchronizer->removeThread(*turn);
+	
 	ThreadSafe::cout("Ending Of thread number : "+lexical_cast<string>(*turn));
 }
 

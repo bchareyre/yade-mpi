@@ -182,7 +182,11 @@ void QtGUIGenerator::buildGUI(shared_ptr<Serializable> s,  QWidget * widget)
 
 	reArrange(widget);
 	
-	widgetHeight = descriptors.size()*(20+5)+40;
+	if (resizeHeight)
+		widgetHeight = descriptors.size()*(20+5)+40;
+	else
+		widgetHeight = widget->size().height();
+	
 	
 	if (showButtons)
 		addButtons(widget);
