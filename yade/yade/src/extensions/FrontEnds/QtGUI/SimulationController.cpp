@@ -46,7 +46,6 @@ SimulationController::SimulationController(QWidget * parent) : QtGeneratedSimula
 		cerr << "renderer not created - why?!\n";
 	}
 	
-//	updater = shared_ptr<SimulationControllerUpdater>(new SimulationControllerUpdater(this));
 }
 
 SimulationController::~SimulationController()
@@ -63,11 +62,15 @@ void SimulationController::terminateAllThreads()
 {
 	for(unsigned int i=0;i<glViews.size();i++)
 		if (glViews[i])
+		{
 			glViews[i]->finishRendering();
-			
+			//glViews[i]->joinRendering();
+		}
+		
 	updater->finish();
+	//updater->join();
 	Omega::instance().finishSimulationLoop();
-	
+	//Omega::instance().joinSimulationLoop();
 	while (Omega::instance().synchronizer->getNbThreads()!=0);
 }
 
@@ -134,6 +137,8 @@ void SimulationController::pbLoadClicked()
 		for(unsigned int i=0;i<glViews.size();i++)
 			if (glViews[i])
 				glViews[i]->startRendering();
+				
+		updater = shared_ptr<SimulationControllerUpdater>(new SimulationControllerUpdater(this));
 	}
 } 
 
@@ -149,6 +154,7 @@ void SimulationController::pbNewViewClicked()
 	glViews.push_back(new GLViewer(glViews.size(),renderer, format, this->parentWidget()->parentWidget(), glViews.front()) );		
 	connect( glViews.back(), SIGNAL( closeSignal(int) ), this, SLOT( closeGLViewEvent(int) ) );
 	glViews.back()->centerScene();
+	glViews.back()->startRendering();
 }
 
 void SimulationController::closeGLViewEvent(int id)
@@ -157,8 +163,8 @@ void SimulationController::closeGLViewEvent(int id)
 	
 	for(unsigned int i=0;i<glViews.size();i++)
 		glViews[id]->finishRendering();
-	
-	while (Omega::instance().synchronizer->getNbThreads()!=n-1);
+	glViews[id]->joinRendering();
+//	while (Omega::instance().synchronizer->getNbThreads()!=n-1);
 
 	delete glViews[id];
 	glViews[id] = 0;
@@ -170,13 +176,15 @@ void SimulationController::pbStopClicked()
 	boost::mutex resizeMutex;
 	boost::mutex::scoped_lock lock(resizeMutex);
 	Omega::instance().stopSimulationLoop();
+	updater->stop();
 }
 
 void SimulationController::pbStartClicked()
 {
 	boost::mutex resizeMutex;
 	boost::mutex::scoped_lock lock(resizeMutex);
-	Omega::instance().startSimulationLoop();
+	Omega::instance().startSimulationLoop();	
+	updater->start();
 }
 
 void SimulationController::pbResetClicked()

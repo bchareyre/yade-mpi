@@ -27,7 +27,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-ThreadSynchronizer::ThreadSynchronizer() : i(0),prevI(0),nbThreads(0)
+ThreadSynchronizer::ThreadSynchronizer() : i(0),prevI(0),nbThreads(new int(0))
 {
 	 redirectionId.clear();
 }
@@ -40,7 +40,7 @@ int ThreadSynchronizer::insertThread()
 	boost::mutex::scoped_lock lock(mutex);	
 	int id = redirectionId.size();
 	redirectionId.push_back(id);
-	nbThreads++;
+	(*nbThreads)++;
 	//FIXME : make that work !	
 // 	int i=0;
 // 	while (i<redirectionId.size() && redirectionId[i]!=-1)
@@ -58,11 +58,10 @@ int ThreadSynchronizer::insertThread()
 
 void ThreadSynchronizer::removeThread(int id)
 { 
-	//boost::mutex::scoped_lock lock(mutex);
-
 	redirectionId[id] = -1;
-	nbThreads--;
+	(*nbThreads)--;
 }
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -110,5 +109,5 @@ void ThreadSynchronizer::signal()
 
 int ThreadSynchronizer::getNbThreads()
 {
-	return nbThreads;
+	return *nbThreads;
 }

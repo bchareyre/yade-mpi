@@ -53,7 +53,7 @@ class ThreadSynchronizer
 	public  : void setNextCurrentThread();
 
 	private : int prevI;
-	private : volatile int nbThreads;
+	private : int * nbThreads;
 	private : vector<int> redirectionId;
 	
 	public  : ThreadSynchronizer();
