@@ -53,12 +53,14 @@ class Singleton
 	public:
 		static T& instance()
 		{
-			//static T obj;
 			static T* ptr_obj;
 
 			if( ! ptr_obj )
 			{
 				boost::mutex::scoped_lock lock(singleton_constructor_mutex);
+
+				// WARNING : as stated in "Modern C++ Design" this sometimes may not be enough. Some processors do write to memory in bursts, not when the write is executed. It means that other processors will not know that the mutex has been locked. He writes, that in such situation we have to look at certain processor architecture documentation and write a solution specifically for given processor architecture.
+
 				if( ! ptr_obj )
 				{
 					ptr_obj = new T;
@@ -66,9 +68,6 @@ class Singleton
 			}
 
 			return *ptr_obj;
-
-
-			//return obj;
 		}
 	protected:
 		Singleton() {};

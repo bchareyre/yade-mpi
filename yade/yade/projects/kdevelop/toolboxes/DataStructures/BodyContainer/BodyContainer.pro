@@ -4,7 +4,7 @@
 # Target is a subdirs project 
 
 SUBDIRS += BodyAssocVec \
-           BodyVector 
+           BodyRedirectionVector 
 LIBS += -rdynamic 
 INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
