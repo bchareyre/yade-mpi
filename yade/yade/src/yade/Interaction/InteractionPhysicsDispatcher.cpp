@@ -1,15 +1,6 @@
 #include "InteractionPhysicsDispatcher.hpp"
 #include "ComplexBody.hpp"
 
-InteractionPhysicsDispatcher::InteractionPhysicsDispatcher () : Actor()
-{
-}
-
-InteractionPhysicsDispatcher::~InteractionPhysicsDispatcher ()
-{
-
-}
-
 void InteractionPhysicsDispatcher::postProcessAttributes(bool deserializing)
 {
 	if(deserializing)

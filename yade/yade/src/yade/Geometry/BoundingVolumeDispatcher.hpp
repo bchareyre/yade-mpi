@@ -39,33 +39,26 @@
 
 class BoundingVolumeDispatcher : public Actor
 {
-	protected: DynLibDispatcher
-		<	TYPELIST_2( InteractionDescription , BoundingVolume ) ,	// base classess for dispatch
-			BoundingVolumeFunctor,					// class that provides multivirtual call
-			void ,							// return type
-			TYPELIST_3(
+	private : DynLibDispatcher
+		<	TYPELIST_2( InteractionDescription , BoundingVolume ) ,		// base classess for dispatch
+			BoundingVolumeFunctor,						// class that provides multivirtual call
+			void ,								// return type
+			TYPELIST_4(
 					  const shared_ptr<InteractionDescription>&	// arguments
-					, shared_ptr<BoundingVolume>&
+					, const shared_ptr<BoundingVolume>&
 					, const Se3r&
+					, const Body*
 				)
-		> bvFactoriesManager;
+		> boundingVolumeDispatcher;
 
-	private : vector<vector<string> > bvFactories;
-	public  : void addBVFactories(const string& str1,const string& str2,const string& str3);
+	private : vector<vector<string> > boundingVolumeFunctors;
+	public  : void addBoundingVolumeFunctors(const string& str1,const string& str2,const string& str3);
 
-	// construction
-	public : BoundingVolumeDispatcher ();
-	public : ~BoundingVolumeDispatcher ();
-
-	public : void registerAttributes();
-	public : void postProcessAttributes(bool deserializing);
 	public : virtual void action(Body* b);
-	public : void updateBoundingVolume(Body* b);
-	public : void updateBoundingVolume(shared_ptr<Body> b);
+	
+	public : virtual void postProcessAttributes(bool deserializing);
+	public : virtual void registerAttributes();
 	REGISTER_CLASS_NAME(BoundingVolumeDispatcher);
-
-	public : bool isActivated();
-
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

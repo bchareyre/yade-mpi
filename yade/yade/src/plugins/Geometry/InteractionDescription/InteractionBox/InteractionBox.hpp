@@ -30,9 +30,7 @@ class InteractionBox : public InteractionDescription
 {
 	public : Vector3r extents;
 
-	// construction
 	public : InteractionBox ();
-	public : ~InteractionBox ();
 	
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Serialization										///

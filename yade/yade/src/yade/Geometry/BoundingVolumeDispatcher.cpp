@@ -27,83 +27,12 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//FIXME : should this class be abstract interface
-BoundingVolumeDispatcher::BoundingVolumeDispatcher () : Actor()
-{
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-BoundingVolumeDispatcher::~BoundingVolumeDispatcher ()
-{
-
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-bool BoundingVolumeDispatcher::isActivated()
-{
-	return true;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-void BoundingVolumeDispatcher::updateBoundingVolume(shared_ptr<Body> b)
-{
-	if (b->containSubBodies)
-	{
-		shared_ptr<ComplexBody>  ncb = dynamic_pointer_cast<ComplexBody>(b);
-		shared_ptr<BodyContainer> bodies = ncb->bodies;
-		for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext())
-		{
-			updateBoundingVolume(bodies->getCurrent());
-		}
-	}
-	
-	bvFactoriesManager(b->interactionGeometry,b->boundingVolume,b->physicalParameters->se3);
-
-//	buildBoundingVolumeDispatcher(cm,se3,bv);
-		
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-void BoundingVolumeDispatcher::updateBoundingVolume(Body* b)
-{
-	if (b->containSubBodies)
-	{
-		ComplexBody * ncb = dynamic_cast<ComplexBody*>(b);
-		shared_ptr<BodyContainer> bodies = ncb->bodies;
-		for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext())
-		{
-			updateBoundingVolume(bodies->getCurrent());
-		}
-	}
-	
-	bvFactoriesManager(b->interactionGeometry,b->boundingVolume,b->physicalParameters->se3);
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-void BoundingVolumeDispatcher::action(Body* b)
-{
-	updateBoundingVolume(b);
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
 void BoundingVolumeDispatcher::postProcessAttributes(bool deserializing)
 {
 	if(deserializing)
 	{
-		for(unsigned int i=0;i<bvFactories.size();i++)
-			bvFactoriesManager.add(bvFactories[i][0],bvFactories[i][1],bvFactories[i][2]);
+		for(unsigned int i=0;i<boundingVolumeFunctors.size();i++)
+			boundingVolumeDispatcher.add(boundingVolumeFunctors[i][0],boundingVolumeFunctors[i][1],boundingVolumeFunctors[i][2]);
 	}
 }
 
@@ -112,18 +41,51 @@ void BoundingVolumeDispatcher::postProcessAttributes(bool deserializing)
 
 void BoundingVolumeDispatcher::registerAttributes()
 {
-	REGISTER_ATTRIBUTE(bvFactories);
+	REGISTER_ATTRIBUTE(boundingVolumeFunctors);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void BoundingVolumeDispatcher::addBVFactories(const string& str1,const string& str2,const string& str3)
+void BoundingVolumeDispatcher::addBoundingVolumeFunctors(const string& str1,const string& str2,const string& str3)
 {
 	vector<string> v;
 	v.push_back(str1);
 	v.push_back(str2);
 	v.push_back(str3);
-	bvFactories.push_back(v);
+	boundingVolumeFunctors.push_back(v);
 
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void BoundingVolumeDispatcher::action(Body* body)
+{
+	ComplexBody * ncb = dynamic_cast<ComplexBody*>(body);
+	shared_ptr<BodyContainer>& bodies = ncb->bodies;
+	
+	for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext())
+	{
+		shared_ptr<Body>& b = bodies->getCurrent();
+		boundingVolumeDispatcher(b->interactionGeometry,b->boundingVolume,b->physicalParameters->se3,b.get());
+	}
+		
+ 	boundingVolumeDispatcher(body->interactionGeometry,body->boundingVolume,body->physicalParameters->se3,body);
+	
+	
+// 	if (b->containSubBodies)
+// 	{
+// 		ComplexBody * ncb = dynamic_cast<ComplexBody*>(b);
+// 		shared_ptr<BodyContainer> bodies = ncb->bodies;
+// 		for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext())
+// 		{
+// 			updateBoundingVolume(bodies->getCurrent());
+// 		}
+// 	}
+// 	
+// 	boundingVolumeDispatcher(b->interactionGeometry,b->boundingVolume,b->physicalParameters->se3);
+}
+
+
+

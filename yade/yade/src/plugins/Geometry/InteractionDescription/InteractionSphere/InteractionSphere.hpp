@@ -30,11 +30,7 @@ class InteractionSphere : public InteractionDescription
 {
 	public : Real radius;
 
-	// construction
 	public : InteractionSphere ();
-	public : ~InteractionSphere ();
-
-	
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Serialization										///

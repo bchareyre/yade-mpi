@@ -29,11 +29,6 @@ InteractionBox::InteractionBox () : InteractionDescription()
 	createIndex();
 }
 
-InteractionBox::~InteractionBox ()
-{
-
-}
-
 void InteractionBox::postProcessAttributes(bool deserializing)
 {
 	InteractionDescription::postProcessAttributes(deserializing);

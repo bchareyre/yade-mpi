@@ -38,7 +38,9 @@
 class GLDrawShadowVolumeFunctor : public FunctorWrapper
 		<
 		 void ,
-		 TYPELIST_3(const shared_ptr<GeometricalModel>&, const shared_ptr<BodyPhysicalParameters>&, const Vector3r&)
+		 TYPELIST_3(	  const shared_ptr<GeometricalModel>&
+		 		, const shared_ptr<BodyPhysicalParameters>&
+				, const Vector3r&)
 		>
 {
 };

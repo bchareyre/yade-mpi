@@ -49,10 +49,10 @@ class Body;
 
 class InteractionGeometryDispatcher : public Actor
 {
-	protected: DynLibDispatcher
+	private: DynLibDispatcher
 		<	TYPELIST_2( InteractionDescription , InteractionDescription ) ,	// base classess for dispatch
 			InteractionGeometryFunctor,					// class that provides multivirtual call
-			bool ,							// return type
+			bool ,								// return type
 			TYPELIST_5(
 					  const shared_ptr<InteractionDescription>&	// arguments
 					, const shared_ptr<InteractionDescription>&
@@ -60,20 +60,16 @@ class InteractionGeometryDispatcher : public Actor
 					, const Se3r&
 					, shared_ptr<Interaction>&
 				)
-			, false							// disable auto symmetry handling
+			, false								// disable auto symmetry handling
 		> interactionGeometryDispatcher;
 
-	private : vector<vector<string> > interactionGeometryFunctors;
-	public  : void addInteractionGeometryFunctor(const string& str1,const string& str2,const string& str3);
-		
-	// construction
-	public : InteractionGeometryDispatcher ();
-	public : virtual ~InteractionGeometryDispatcher ();
+	private   : vector<vector<string> > interactionGeometryFunctors;
+	public    : void addInteractionGeometryFunctor(const string& str1,const string& str2,const string& str3);
 
-	public : virtual void action(Body* body);
+	public    : virtual void action(Body* body);
 
 	protected : virtual void postProcessAttributes(bool deserializing);
-	public : void registerAttributes();
+	public    : virtual void registerAttributes();
 	REGISTER_CLASS_NAME(InteractionGeometryDispatcher);
 
 };

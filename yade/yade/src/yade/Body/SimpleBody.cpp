@@ -12,23 +12,9 @@
 
 using namespace std;
 
-SimpleBody::SimpleBody() : Body()
-{
-	containSubBodies = false;
-}
+// FIXME - delete this file
 
-SimpleBody::~SimpleBody() 
-{
-
-}
-
-void SimpleBody::postProcessAttributes(bool deserializing)
-{
-	Body::postProcessAttributes(deserializing);
-}
-
-void SimpleBody::registerAttributes()
-{
-	Body::registerAttributes();
-}
-
+// SimpleBody::SimpleBody() : Body()
+// {
+// //	containSubBodies = false;
+// }

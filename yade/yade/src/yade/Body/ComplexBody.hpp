@@ -46,9 +46,7 @@ class ComplexBody : public Body
 	// construction
 	public	: ComplexBody ();
 
-	public	: virtual ~ComplexBody ();
-
-	public	: void moveToNextTimeStep();
+	public	: void moveToNextTimeStep(); // FIXME - maybe rename this to loop() ?
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Serialization										///

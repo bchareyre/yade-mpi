@@ -22,31 +22,26 @@ ComplexBody::ComplexBody() :
 	, interactions(new InteractionVecSet)
 	, actions(new ActionVecVec)
 {	
-	containSubBodies = true;
+//	containSubBodies = true;
 }
 
-ComplexBody::~ComplexBody()
-{
-
-}
-
-#include "InteractionDescriptionSet.hpp"
+//#include "InteractionDescriptionSet.hpp"
 void ComplexBody::postProcessAttributes(bool deserializing)
 {
 	if (deserializing)
 	{
-		// FIXME : build that with InteractionDescriptionFunctor
-		shared_ptr<InteractionDescriptionSet> set = dynamic_pointer_cast<InteractionDescriptionSet>(interactionGeometry);
-		for(unsigned int i=0;i<bodies->size();i++)
-			set->interactionGeometries.push_back((*bodies)[i]->interactionGeometry);
+//		// FIXME : build that with InteractionDescriptionFunctor
+//		shared_ptr<InteractionDescriptionSet> set = dynamic_pointer_cast<InteractionDescriptionSet>(interactionGeometry);
+//		for(unsigned int i=0;i<bodies->size();i++)
+//			set->interactionGeometries.push_back((*bodies)[i]->interactionGeometry);
 
-	// to build bounding volume if there is a boundingvolume updator in the actor list
-	// FIXME : I don't know is this is so dirty to do that here
-	vector<shared_ptr<Actor> >::iterator ai    = actors.begin();
-	vector<shared_ptr<Actor> >::iterator aiEnd =  actors.end();
-	for(;ai!=aiEnd;++ai)
-		if (dynamic_pointer_cast<BoundingVolumeDispatcher>(*ai))
-			(*ai)->action(this);
+		// to build bounding volume if there is a bounding volume updator in the actor list
+		// FIXME : I don't know is this is so dirty to do that here
+		vector<shared_ptr<Actor> >::iterator ai    = actors.begin();
+		vector<shared_ptr<Actor> >::iterator aiEnd =  actors.end();
+		for(;ai!=aiEnd;++ai)
+			if (dynamic_pointer_cast<BoundingVolumeDispatcher>(*ai))
+				(*ai)->action(this);
 	}
 			
 	Body::postProcessAttributes(deserializing);

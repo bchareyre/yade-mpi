@@ -34,19 +34,15 @@
 
 class InteractionDescriptionSet : public InteractionDescription
 {
-	public : vector<shared_ptr<InteractionDescription> > interactionGeometries;
+//	public : vector<shared_ptr<InteractionDescription> > interactionGeometries;
 
-	// construction
 	public : InteractionDescriptionSet ();
-	public : ~InteractionDescriptionSet ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Serialization										///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	REGISTER_CLASS_NAME(InteractionDescriptionSet);
-	protected : virtual void postProcessAttributes(bool deserializing);
-	public : void registerAttributes();
 	
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Indexable											///

@@ -1,10 +1,12 @@
- #include "Terrain2AABBFunctor.hpp"
- #include "Terrain.hpp"
- #include "AABB.hpp"
+
+#include "Terrain2AABBFunctor.hpp"
+#include "Terrain.hpp"
+#include "AABB.hpp"
   
-void Terrain2AABBFunctor::go(	const shared_ptr<InteractionDescription>& /*cm*/,
-							shared_ptr<BoundingVolume>& /*bv*/,
-							const Se3r& 	)
+void Terrain2AABBFunctor::go(	  const shared_ptr<InteractionDescription>&
+				, const shared_ptr<BoundingVolume>&
+				, const Se3r&
+				, const Body* 	)
 {
 //	shared_ptr<Terrain> t = dynamic_pointer_cast<Terrain>(cm);
 	

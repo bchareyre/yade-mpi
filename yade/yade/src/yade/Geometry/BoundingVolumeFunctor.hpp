@@ -30,6 +30,8 @@
 #include "FunctorWrapper.hpp"
 #include "BoundingVolume.hpp"
 #include "InteractionDescription.hpp"
+#include "Body.hpp"
+#include "ComplexBody.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -54,16 +56,14 @@ class BoundingVolumeFunctor : public FunctorWrapper
 	*/
 		<
 		 void ,
-		 TYPELIST_3(
+		 TYPELIST_4(
 		 		  const shared_ptr<InteractionDescription>&
-				, shared_ptr<BoundingVolume>&
-				, const Se3r&
+				, const shared_ptr<BoundingVolume>&
+				, const Se3r& // FIXME - remove Se3r, because not everything is supposed to have it. If some function needs Se3r it must find it through Body*
+				, const Body*
 		)>
 {	
 };
-
-//FIXME : make also second class for updateBoundingVolume. In fact we can load them automatically as we do with collisionFunctor because their name are Terrain2AABB ....
-//virtual bool go(const shared_ptr<InteractionDescription> , const shared_ptr<InteractionDescription> , const Se3r& , const Se3r& , shared_ptr<Interaction> );
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////

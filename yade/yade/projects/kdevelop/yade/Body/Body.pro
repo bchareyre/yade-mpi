@@ -4,7 +4,6 @@
 # Target is a library:  
 
 LIBS += -lActionVecVec \
-        -lInteractionDescriptionSet \
         -rdynamic 
 INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 

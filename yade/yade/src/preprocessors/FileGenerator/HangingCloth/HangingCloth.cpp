@@ -82,9 +82,9 @@ string HangingCloth::generate()
 	ipd->addInteractionPhysicsFunctor("SDECDiscreteElement","SDECDiscreteElement","SDECLinearContactModel");
 		
 	shared_ptr<BoundingVolumeDispatcher> bvu	= shared_ptr<BoundingVolumeDispatcher>(new BoundingVolumeDispatcher);
-	bvu->addBVFactories("InteractionSphere","AABB","Sphere2AABBFunctor");
-	bvu->addBVFactories("InteractionBox","AABB","Box2AABBFunctor");
-	bvu->addBVFactories("InteractionDescriptionSet","AABB","InteractionDescriptionSet2AABBFunctor");
+	bvu->addBoundingVolumeFunctors("InteractionSphere","AABB","Sphere2AABBFunctor");
+	bvu->addBoundingVolumeFunctors("InteractionBox","AABB","Box2AABBFunctor");
+	bvu->addBoundingVolumeFunctors("InteractionDescriptionSet","AABB","InteractionDescriptionSet2AABBFunctor");
 	
 	shared_ptr<ActionDispatcher> ad(new ActionDispatcher);
 	ad->addActionFunctor("ActionForce","Particle","ActionForce2Particle");

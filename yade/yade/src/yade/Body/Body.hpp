@@ -68,7 +68,7 @@ class Body : public Serializable
 	// only BodyContainer can set the id of a body
 	friend class BodyContainer;
 
-	public : bool containSubBodies;
+//	public : bool containSubBodies; // FIXME - remove that, because only ComplexBody contains Actors, and this flag was used by ONLY ONE Actor !
 	
 	// group to which body belongs (maybe vector<int> , to allow multiple groups?)
 	int group;
@@ -100,9 +100,6 @@ class Body : public Serializable
 	public : Body ();
 	public : Body (unsigned int newId);
 
-	/*! Destructor */
-	public : virtual ~Body ();
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Methods											///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -114,7 +111,7 @@ class Body : public Serializable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	REGISTER_CLASS_NAME(Body);
-	protected : virtual void postProcessAttributes(bool deserializing);
+//	protected : virtual void postProcessAttributes(bool deserializing); FIXME - remove that
 	/*! Tells the IOManager which attributes should be serialized */
 	public : void registerAttributes();
 

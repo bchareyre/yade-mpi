@@ -51,9 +51,9 @@ string RotatingBox::generate()
 // 	nc->addCollisionFunctor("Sphere","Box","Box2Sphere4SDECContactModel");
 // 	
 // 	shared_ptr<BoundingVolumeDispatcher> bvu	= shared_ptr<BoundingVolumeDispatcher>(new BoundingVolumeDispatcher);
-// 	bvu->addBVFactories("Sphere","AABB","Sphere2AABBFunctor");
-// 	bvu->addBVFactories("Box","AABB","Box2AABBFunctor");
-// 	bvu->addBVFactories("InteractionDescriptionSet","AABB","InteractionDescriptionSet2AABBFunctor");
+// 	bvu->addBoundingVolumeFunctors("Sphere","AABB","Sphere2AABBFunctor");
+// 	bvu->addBoundingVolumeFunctors("Box","AABB","Box2AABBFunctor");
+// 	bvu->addBoundingVolumeFunctors("InteractionDescriptionSet","AABB","InteractionDescriptionSet2AABBFunctor");
 // 
 // 
 // 	shared_ptr<Rotor> kinematic = shared_ptr<Rotor>(new Rotor);

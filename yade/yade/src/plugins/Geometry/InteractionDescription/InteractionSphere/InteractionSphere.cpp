@@ -28,11 +28,6 @@ InteractionSphere::InteractionSphere () : InteractionDescription()
 	createIndex();
 }
 
-InteractionSphere::~InteractionSphere ()
-{
-
-}
-
 void InteractionSphere::postProcessAttributes(bool deserializing)
 {
 	InteractionDescription::postProcessAttributes(deserializing);

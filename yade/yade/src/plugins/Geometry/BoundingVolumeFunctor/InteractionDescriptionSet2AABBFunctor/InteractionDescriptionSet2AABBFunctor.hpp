@@ -35,8 +35,9 @@
 class InteractionDescriptionSet2AABBFunctor : public BoundingVolumeFunctor
 {
 	public : void go(	const shared_ptr<InteractionDescription>& cm,
-				shared_ptr<BoundingVolume>& bv,
-				const Se3r& se3	);
+				const shared_ptr<BoundingVolume>& bv,
+				const Se3r& se3,
+				const Body* );
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -29,8 +29,9 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void Box2AABBFunctor::go(	const shared_ptr<InteractionDescription>& cm,
-				shared_ptr<BoundingVolume>& bv,
-				const Se3r& se3	)
+				const shared_ptr<BoundingVolume>& bv,
+				const Se3r& se3,
+				const Body*	)
 {
 	shared_ptr<InteractionBox> box = dynamic_pointer_cast<InteractionBox>(cm);
 	

@@ -105,9 +105,9 @@ string SDECImport::generate()
 // 
 // // specify bounding volume
 // 	shared_ptr<BoundingVolumeDispatcher> bvu	= shared_ptr<BoundingVolumeDispatcher>(new BoundingVolumeDispatcher);
-// 	bvu->addBVFactories("Sphere","AABB","Sphere2AABBFunctor");
-// 	bvu->addBVFactories("Box","AABB","Box2AABBFunctor");
-// 	bvu->addBVFactories("InteractionDescriptionSet","AABB","InteractionDescriptionSet2AABBFunctor");
+// 	bvu->addBoundingVolumeFunctors("Sphere","AABB","Sphere2AABBFunctor");
+// 	bvu->addBoundingVolumeFunctors("Box","AABB","Box2AABBFunctor");
+// 	bvu->addBoundingVolumeFunctors("InteractionDescriptionSet","AABB","InteractionDescriptionSet2AABBFunctor");
 // 	
 // 	rootBody->actors.resize(4);
 // 	rootBody->actors[0] 		= bvu;

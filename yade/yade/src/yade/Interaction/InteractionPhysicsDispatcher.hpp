@@ -38,7 +38,7 @@
 
 class InteractionPhysicsDispatcher : public Actor
 {
-	protected: DynLibDispatcher
+	private: DynLibDispatcher
 		<	TYPELIST_2( BodyPhysicalParameters , BodyPhysicalParameters ) ,	// base classess for dispatch
 			InteractionPhysicsFunctor,					// class that provides multivirtual call
 			void ,							// return type
@@ -52,12 +52,6 @@ class InteractionPhysicsDispatcher : public Actor
 	private : vector<vector<string> > interactionPhysicsFunctors;
 	public  : void addInteractionPhysicsFunctor(const string& str1,const string& str2,const string& str3);
 		
-	// construction
-	public : InteractionPhysicsDispatcher ();
-
-	public : virtual ~InteractionPhysicsDispatcher ();
-
-
 	protected : virtual void postProcessAttributes(bool deserializing);
 	public : void registerAttributes();
 

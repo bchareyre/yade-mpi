@@ -1,4 +1,3 @@
-
 #ifndef __TERRAIN2AABBFACTORY_H__
 #define __TERRAIN2AABBFACTORY_H__
 
@@ -6,9 +5,10 @@
 
 class Terrain2AABBFunctor : public BoundingVolumeFunctor
 {
-	public : void go(	const shared_ptr<InteractionDescription>& cm,
-				shared_ptr<BoundingVolume>& bv,
-				const Se3r& se3	);
+	public : void go(	  const shared_ptr<InteractionDescription>&
+				, const shared_ptr<BoundingVolume>&
+				, const Se3r&
+				, const Body*	);
 };
 
 REGISTER_FACTORABLE(Terrain2AABBFunctor);
