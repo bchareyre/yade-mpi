@@ -47,7 +47,9 @@
 
 	Every functions that describe collision between two CollisionGeometrys must derived from CollisionFunctor.
 */
-class CollisionFunctor : public Indexable , // FIXME : is NOT necessery, but produces faster code ?!?!?! hows that possible???
+class CollisionFunctor : //public Indexable , // FIXME : is NOT necessery, but produces faster code ?!?!?! hows that possible???
+			// this is because of BUG in g++3.3   (faster because of bug, hmmmfphhh)
+			// is not faster in DEBUG mode. and does not compile in RELEASE mode (libInteraction libGeometry)
 			 public Factorable
 {
 
