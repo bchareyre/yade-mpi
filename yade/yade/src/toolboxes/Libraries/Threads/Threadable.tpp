@@ -33,7 +33,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 template<class Thread>
-Threadable<Thread>::Threadable(shared_ptr<ThreadSynchronizer> s) : turn(new int(0)), saveTurn(new int(0))
+Threadable<Thread>::Threadable(shared_ptr<ThreadSynchronizer> s) : finished(new bool(false)), blocked(new bool(false)), turn(new int(0)), saveTurn(new int(0))
 {
 	synchronizer = s;
 }
@@ -54,11 +54,7 @@ void Threadable<Thread>::stop()
 {
 	boost::mutex mutex;
 	boost::mutex::scoped_lock lock(mutex);
-
-//	*saveTurn = *turn;
-//	*turn = -2;
-//	synchronizer->signal();
-	synchronizer->removeThread(*turn);
+	*blocked = true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -69,10 +65,30 @@ void Threadable<Thread>::start()
 {
 	boost::mutex mutex;
 	boost::mutex::scoped_lock lock(mutex);
+	*blocked = false;
 
-	*turn = *saveTurn;
-	*turn = synchronizer->insertThread();
+}
 
+////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+template<class Thread>
+void Threadable<Thread>::finish()
+{
+	boost::mutex mutex;
+	boost::mutex::scoped_lock lock(mutex);
+	*finished = true;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+template<class Thread>
+void Threadable<Thread>::join()
+{
+	boost::mutex mutex;
+	boost::mutex::scoped_lock lock(mutex);
+	thread->join();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -84,7 +100,7 @@ void Threadable<Thread>::operator()()
 
 	if (synchronizer)
 	{
-		while (notEnd())
+		while (notEnd() && !*finished)
 		{
 			{
 				boost::mutex::scoped_lock lock(*(synchronizer->getMutex()));
@@ -92,19 +108,22 @@ void Threadable<Thread>::operator()()
 				while (synchronizer->notMyTurn(*turn))
 					synchronizer->wait(lock);
 
-				oneLoop();
-
+				if (!*blocked)
+					oneLoop();
+								
 				synchronizer->setNextCurrentThread();
-
+				
 				synchronizer->signal();
 			}
 		}
 		synchronizer->removeThread(*turn);
+		synchronizer->signal();
 	}
 	else
 	{
-		while (notEnd())
-			oneLoop();
+		while (notEnd() && !finished)
+			if (!*blocked)
+				oneLoop();
 	}
 }
 
@@ -135,7 +154,7 @@ void Threadable<Thread>::createThread(bool autoStart,shared_ptr<ThreadSynchroniz
 	}
 	thread = shared_ptr<boost::thread>(new boost::thread(*(dynamic_cast<Thread*>(this))));
 }
-
+	
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 

@@ -68,6 +68,7 @@ class Omega : public Singleton<Omega>
 	public : void createSimulationLoop();
 	public : void startSimulationLoop();
 	public : void stopSimulationLoop();
+	public : void finishSimulationLoop();
 	
 	public : shared_ptr<ThreadSynchronizer> synchronizer; // FIXME put private + add function waitMyTuren and finishedMyTurn
 

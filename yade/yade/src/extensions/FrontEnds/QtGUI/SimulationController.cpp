@@ -59,6 +59,9 @@ void SimulationController::pbApplyClicked()
 
 void SimulationController::pbLoadClicked()
 {
+	boost::mutex resizeMutex;
+	boost::mutex::scoped_lock lock(resizeMutex);
+
 	QString selectedFilter;
 	QString fileName = QFileDialog::getOpenFileName("../data", "XML Yade File (*.xml)", this,"Open File","Choose a file to open",&selectedFilter );
 
@@ -83,10 +86,7 @@ void SimulationController::pbLoadClicked()
 		}
 
 		Omega::instance().createSimulationLoop();
-
-		Omega::instance().synchronizer->startAll();
 		Omega::instance().stopSimulationLoop();
-
 	}
 }
 
@@ -104,20 +104,43 @@ void SimulationController::pbNewViewClicked()
 
 void SimulationController::pbStopClicked()
 {
-	cerr << "stop" << endl;
+	boost::mutex resizeMutex;
+	boost::mutex::scoped_lock lock(resizeMutex);
 	Omega::instance().stopSimulationLoop();
 }
 
 void SimulationController::pbStartClicked()
 {
-	cerr << "start" << endl;
+	boost::mutex resizeMutex;
+	boost::mutex::scoped_lock lock(resizeMutex);
 	Omega::instance().startSimulationLoop();
 }
 
 void SimulationController::pbResetClicked()
 {
-
+	boost::mutex resizeMutex;
+	boost::mutex::scoped_lock lock(resizeMutex);
+	Omega::instance().loadSimulation();
+	Omega::instance().stopSimulationLoop();
 }
+
+void SimulationController::closeEvent(QCloseEvent *evt)
+{
+	Omega::instance().finishSimulationLoop();
+	glViews.clear();
+	updater->finish();
+	updater->join();
+	QtGeneratedSimulationController::closeEvent(evt);
+	//destroy();
+}
+
+
+
+
+
+
+
+
 
 
 

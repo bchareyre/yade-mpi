@@ -43,7 +43,6 @@ using namespace boost;
 
 class ThreadSynchronizer
 {
-
 	private : boost::mutex mutex;
 	public  : boost::mutex* getMutex();
 	
@@ -59,8 +58,8 @@ class ThreadSynchronizer
 	
 	public  : ThreadSynchronizer();
 
-	public  : void startAll();
-	public  : void stopAll();
+	//public  : void startAll();
+	//public  : void stopAll();
 	
 	public  : int insertThread();
 	public  : void removeThread(int id);

@@ -53,7 +53,8 @@ class ThreadSynchronizer;
 template<class Thread>
 class Threadable
 {
-
+	private  : bool  * finished;
+	private  : bool  * blocked;
 	private     : shared_ptr<boost::thread> thread;
 	protected   : shared_ptr<ThreadSynchronizer> synchronizer;
 	protected : int * turn;
@@ -69,9 +70,10 @@ class Threadable
 	public    : virtual void createThread(bool autoStart,shared_ptr<ThreadSynchronizer> s = shared_ptr<ThreadSynchronizer>());
 	public    : virtual bool notEnd()  = 0;
 	public    : virtual void oneLoop() = 0;
+	public : void finish();
 
 	public    : void sleep(int ms);
-
+	public    : void join();
 	public    : void start();
 	public    : void stop();
 

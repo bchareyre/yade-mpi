@@ -46,7 +46,11 @@ void GLViewer::paintEvent(QPaintEvent *)
 
 void GLViewer::closeEvent(QCloseEvent *evt)
 {
+	qglThread.finish();
+	qglThread.join();
 	QGLViewer::closeEvent(evt);
+	
+	//destroy();
 }
 
 void GLViewer::mouseMoveEvent(QMouseEvent * e)

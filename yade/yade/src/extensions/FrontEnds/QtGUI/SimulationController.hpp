@@ -72,6 +72,9 @@ class SimulationController : public QtGeneratedSimulationController
 	public slots : virtual void pbStopClicked();
 	public slots : virtual void pbStartClicked();
 	public slots : virtual void pbResetClicked();
+	
+	protected : void closeEvent(QCloseEvent *evt);
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
