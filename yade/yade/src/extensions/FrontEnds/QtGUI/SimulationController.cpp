@@ -97,7 +97,7 @@ SimulationController::~SimulationController()
 		delete (*gi).second;
 	glViews.clear();
 	
-	Omega::instance().freeSimulation();
+	Omega::instance().freeRootBody();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -166,21 +166,6 @@ void SimulationController::pbApplyClicked()
 
 void SimulationController::pbLoadClicked()
 {
-
-	class ScopeTest
-	{
-		public : ScopeTest() { ok_=false; };
-		public : ~ScopeTest()
-		{
-			if(ok_)
-				cerr << "loading file scope left correctly\n";
-			else
-				cerr << "loading file scope left UNCORRECTLY!\n";
-		}
-		public : void ok() { ok_=true; };
-		private: bool ok_;
-	};
-
 	boost::mutex resizeMutex;
 	boost::mutex::scoped_lock lock(resizeMutex);
 
@@ -189,7 +174,6 @@ void SimulationController::pbLoadClicked()
 		
 	if (!fileName.isEmpty() && selectedFilter == "XML Yade File (*.xml)")
 	{
-		ScopeTest scopeTest;
 			
 		map<int,GLViewer*>::iterator gi = glViews.begin();
 		map<int,GLViewer*>::iterator giEnd = glViews.end();
@@ -217,8 +201,6 @@ void SimulationController::pbLoadClicked()
 			(*gi).second->centerScene();
 			(*gi).second->startRendering();
 		}
-		
-		scopeTest.ok();
 	}
 } 
 
@@ -311,10 +293,20 @@ void SimulationController::pbResetClicked()
 	boost::mutex resizeMutex;
 	boost::mutex::scoped_lock lock(resizeMutex);
 	updater->stop();
+	map<int,GLViewer*>::iterator gi = glViews.begin();
+	map<int,GLViewer*>::iterator giEnd = glViews.end();
+	for(;gi!=giEnd;++gi)
+		(*gi).second->stopRendering();
+	
 	Omega::instance().finishSimulationLoop();
 	Omega::instance().joinSimulationLoop();	
 	Omega::instance().loadSimulation();		
 	Omega::instance().createSimulationLoop();
+
+	gi = glViews.begin();
+	for(;gi!=giEnd;++gi)
+		(*gi).second->startRendering();
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

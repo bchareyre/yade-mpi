@@ -32,6 +32,7 @@ void GLViewer::initializeGL()
 {
 	QGLViewer::initializeGL();
 	qglThread.initializeGL();
+	glClearColor(0,0,0,0);
 }
 
 void GLViewer::finishRendering()

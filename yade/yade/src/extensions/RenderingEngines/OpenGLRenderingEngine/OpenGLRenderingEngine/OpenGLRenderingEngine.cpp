@@ -43,6 +43,7 @@ OpenGLRenderingEngine::OpenGLRenderingEngine() : RenderingEngine()
 	castShadow = true;
 	drawShadowVolumes = false;
 	useFastShadowVolume = true;
+	needInit = true;
 }
 
 OpenGLRenderingEngine::~OpenGLRenderingEngine()
@@ -52,14 +53,16 @@ OpenGLRenderingEngine::~OpenGLRenderingEngine()
 
 void OpenGLRenderingEngine::init()
 {
-	shared_ptr<GeometricalModel> gm = dynamic_pointer_cast<GeometricalModel>(ClassFactory::instance().createShared("Sphere"));
-	gm->buildDisplayList();
+	if (needInit)
+	{
+		shared_ptr<GeometricalModel> gm = dynamic_pointer_cast<GeometricalModel>(ClassFactory::instance().createShared("Sphere"));
+		gm->buildDisplayList();
+		needInit = false;
+	}
 }
 
 void OpenGLRenderingEngine::render(shared_ptr<NonConnexBody> rootBody)
-{
-	glClearColor(0,0,0,0);
-		
+{		
 	const GLfloat pos[4]	= {75.0,130.0,0.0,1.0};
 	Vector3r lightPos(pos[0],pos[1],pos[2]);
 	const GLfloat ambientColor[4]	= {0.5,0.5,0.5,1.0};	

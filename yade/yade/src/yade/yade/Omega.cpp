@@ -5,7 +5,7 @@
 
 #include "Vector3.hpp"
 
-#include "IOManager.hpp" // is this allowed? perhaps loadTheFile should be in pimpl of Omega ? (pointer to implementation)
+#include "IOManager.hpp"
 #include "NonConnexBody.hpp"
 
 #include "FileGenerator.hpp"
@@ -117,10 +117,7 @@ void Omega::finishSimulationLoop()
 void Omega::joinSimulationLoop()
 {
 	if (simulationLoop)
-	{
 		simulationLoop->join();
-		freeSimulation();
-	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -231,7 +228,6 @@ long int Omega::getCurrentIteration()
 	return currentIteration;
 }
 
-
 void Omega::setSimulationFileName(const string f)
 {
 	simulationFileName = f;
@@ -247,8 +243,9 @@ void Omega::loadSimulation()
 
 	if( Omega::instance().getSimulationFileName().size() != 0  &&  filesystem::exists(simulationFileName) )
 	{
-		freeSimulation();
+		freeRootBody();
 		IOManager::loadFromFile("XMLManager",simulationFileName,"rootBody",Omega::instance().rootBody);
+		
 		Omega::instance().logMessage("Loading file " + simulationFileName);
 
 		sStartingSimulationTime = second_clock::local_time();
@@ -265,19 +262,21 @@ void Omega::loadSimulation()
 	}
 }
 
-void Omega::freeSimulation()
+void Omega::freeRootBody()
 {
 	rootBody = shared_ptr<NonConnexBody>();
 }
 
 void Omega::startSimulationLoop()
 {
-	simulationLoop->start();
+	if (simulationLoop)
+		simulationLoop->start();
 }
 
 void Omega::stopSimulationLoop()
 {
-	simulationLoop->stop();
+	if (simulationLoop)
+		simulationLoop->stop();
 }
 
 
