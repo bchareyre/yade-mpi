@@ -28,10 +28,12 @@
 Box::Box (Vector3r e) : CollisionGeometry()
 {
 	extents = e;
+	createIndex();
 }
 
 Box::Box () : CollisionGeometry()
-{	
+{		
+	createIndex();
 }
 
 Box::~Box ()

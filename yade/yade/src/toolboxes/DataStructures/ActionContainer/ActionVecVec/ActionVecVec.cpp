@@ -29,19 +29,22 @@ unsigned int ActionVecVec::size()
 // if it doesn't exist, then it is appended to stored list of Actions for that body
 void ActionVecVec::add(const shared_ptr<Action>& newAction, unsigned int id)
 { 
-	int idx = newAction->getClassIndex();
-	if( actions.size() < id)
-		actions.resize(id);
+	const int& idx = newAction->getClassIndex();
+	
+	assert(idx != -1);
+
+	if( actions.size() <= id )
+		actions.resize(id+1);
 		
-	if( actions[id].size() < idx )
-		actions[id].resize(idx);
-		
+	if( actions[id].size() <= idx )
+		actions[id].resize(idx+1);
+	
 	if( actions[id][idx] )
 		actions[id][idx]->add(newAction);
 	else
-		actions[id][idx]->reset(newAction);
-
+		actions[id][idx]=newAction->clone();
 }
+
 // adds Action that acts on two bodies.
 // on first body it is substarcted,
 // to second body it is added

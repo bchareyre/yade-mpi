@@ -27,7 +27,8 @@
 
 
 Mesh2D::Mesh2D () : CollisionGeometry()
-{	
+{		
+	createIndex();
 }
 
 Mesh2D::~Mesh2D ()

@@ -39,7 +39,8 @@ Sphere::Sphere (Real r) : CollisionGeometry()
 
 Sphere::Sphere () : CollisionGeometry()
 {
-
+	createIndex();
+	
 	Real X = 0.525731112119133606;
 	Real Z = 0.850650808352039932;
 	vertices.push_back(Vector3r(-X,0,Z));
@@ -75,6 +76,7 @@ Sphere::Sphere () : CollisionGeometry()
 	faces.push_back(Vector3r(9,11,2));
 	faces.push_back(Vector3r(9,2,5));
 	faces.push_back(Vector3r(7,2,11));
+
 }
 
 Sphere::~Sphere ()

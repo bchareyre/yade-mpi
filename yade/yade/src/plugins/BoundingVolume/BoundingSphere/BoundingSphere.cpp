@@ -4,6 +4,7 @@
 BoundingSphere::BoundingSphere (Real r) : BoundingVolume()
 {
 	radius = r;
+	createIndex();
 }
 
 

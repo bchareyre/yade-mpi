@@ -3,11 +3,12 @@
 
 AABB::AABB () : BoundingVolume()
 {
-
+	createIndex();
 }
 
 AABB::AABB (Vector3r hs,Vector3r c) : BoundingVolume()
 {
+	createIndex();
 	halfSize = hs;
 	center = c;
 	postProcessAttributes(true);
@@ -58,6 +59,7 @@ void AABB::glDraw()
 	glutWireCube(1);
 }
 
+//FIXME : remove all updates and overlap function from BoundingVolume
 void AABB::update(Se3r& se3)
 {
 	//center = se3.translation;

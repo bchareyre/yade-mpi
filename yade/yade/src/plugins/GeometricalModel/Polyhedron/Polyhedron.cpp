@@ -30,6 +30,7 @@ using namespace std;
 
 Polyhedron::Polyhedron () : CollisionGeometry()
 {
+	createIndex();
 }
 
 Polyhedron::~Polyhedron ()

@@ -58,8 +58,9 @@ class ActionForce : public Action
 	
 	public : virtual void add(const shared_ptr<Action>& a);
 	public : virtual void sub(const shared_ptr<Action>& a);
-	public : virtual void reset(const shared_ptr<Action>& a);
-	
+	public : virtual void reset();
+	public : virtual shared_ptr<Action> clone();
+		
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Serialization										///
 ///////////////////////////////////////////////////////////////////////////////////////////////////

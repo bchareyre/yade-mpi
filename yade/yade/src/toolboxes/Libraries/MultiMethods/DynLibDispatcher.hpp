@@ -197,12 +197,13 @@ class DynLibDispatcher
 		
 			assert(base);
 			int& index = base->getClassIndex();
-			if(index == -1)				// assign new index
-			{
-				index = base->getMaxCurrentlyUsedClassIndex()+1;
-				// so that other dispatchers will not fall in conflict with this index
-				base->incrementMaxCurrentlyUsedClassIndex();
-			}
+ 			assert (index != -1);
+// 			if(index == -1)				// assign new index
+// 			{
+// 				index = base->getMaxCurrentlyUsedClassIndex()+1;
+// 				so that other dispatchers will not fall in conflict with this index
+// 				base->incrementMaxCurrentlyUsedClassIndex();
+// 			}
 			int maxCurrentIndex = base->getMaxCurrentlyUsedClassIndex();
 			callBacks.resize( maxCurrentIndex+1 );	// make sure that there is a place for new Functor
 
@@ -239,18 +240,20 @@ class DynLibDispatcher
 			assert(base1);
 			assert(base2);
 
-			int& index1 = base1->getClassIndex();
-			if (index1 == -1)
-			{
-				index1 = base1->getMaxCurrentlyUsedClassIndex()+1;
-				base1->incrementMaxCurrentlyUsedClassIndex();
-			}
-			int& index2 = base2->getClassIndex();
-			if (index2 == -1)
-			{
-				index2 = base2->getMaxCurrentlyUsedClassIndex()+1;
-				base2->incrementMaxCurrentlyUsedClassIndex();
-			}
+ 			int& index1 = base1->getClassIndex();
+			assert (index1 != -1);
+// 			if (index1 == -1)
+// 			{
+// 				index1 = base1->getMaxCurrentlyUsedClassIndex()+1;
+// 				base1->incrementMaxCurrentlyUsedClassIndex();
+// 			}
+ 			int& index2 = base2->getClassIndex();
+ 			assert(index2 != -1);
+// 			if (index2 == -1)
+// 			{
+// 				index2 = base2->getMaxCurrentlyUsedClassIndex()+1;
+// 				base2->incrementMaxCurrentlyUsedClassIndex();
+// 			}
 	
 			if( typeid(BaseClass1) == typeid(BaseClass2) )
 				assert(base1->getMaxCurrentlyUsedClassIndex() == base2->getMaxCurrentlyUsedClassIndex());

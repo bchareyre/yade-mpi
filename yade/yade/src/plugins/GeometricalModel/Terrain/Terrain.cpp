@@ -30,6 +30,7 @@
 
 Terrain::Terrain () : CollisionGeometry()
 {
+	createIndex();
 }
 
 Terrain::~Terrain ()

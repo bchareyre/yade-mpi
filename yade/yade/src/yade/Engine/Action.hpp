@@ -58,7 +58,8 @@ class Action : public Serializable, public Indexable
 
 	public : virtual void add(const shared_ptr<Action>& a);
 	public : virtual void sub(const shared_ptr<Action>& a);
-	public : virtual void reset(const shared_ptr<Action>& a);
+	public : virtual void reset();
+	public : virtual shared_ptr<Action> clone();
 	
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Serialization										///
@@ -74,6 +75,7 @@ class Action : public Serializable, public Indexable
 	// FIXME : why to put again getClassIndex
 	public : virtual int& getClassIndex() { throw;};
 	public : virtual const int& getClassIndex() const { throw;};
+//	REGISTER_CLASS_INDEX(Action);
 	REGISTER_INDEX_COUNTER(Action);
 };
 

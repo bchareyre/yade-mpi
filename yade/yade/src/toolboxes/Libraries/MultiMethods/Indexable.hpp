@@ -44,6 +44,8 @@ class Indexable
 	/*! Destructor */
 	public : virtual ~Indexable ();
 
+	protected : void createIndex();
+	
 	/*! Returns the id of the current class. This id is set by a multimethod manager */
 	public : virtual int& getClassIndex() { throw;};
 	public : virtual const int& getClassIndex() const { throw;};
