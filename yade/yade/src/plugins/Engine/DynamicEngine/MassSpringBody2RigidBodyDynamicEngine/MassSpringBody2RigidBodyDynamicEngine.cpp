@@ -14,15 +14,15 @@
 
 MassSpringBody2RigidBodyDynamicEngine::MassSpringBody2RigidBodyDynamicEngine ()  : DynamicEngine(), actionForce(new ActionForce) , actionMomentum(new ActionMomentum)
 {
-	springGroup = 0;
-	sdecGroup = 1;
+	springGroupMask = 2;
+	sdecGroupMask = 1;
 }
 
 
 void MassSpringBody2RigidBodyDynamicEngine::registerAttributes()
 {
-	REGISTER_ATTRIBUTE(sdecGroup);
-	REGISTER_ATTRIBUTE(springGroup);
+	REGISTER_ATTRIBUTE(sdecGroupMask);
+	REGISTER_ATTRIBUTE(springGroupMask);
 }
 
 
@@ -41,8 +41,8 @@ void MassSpringBody2RigidBodyDynamicEngine::respondToInteractions(Body * body)
 		int id2 = mixedInteraction->getId2();
 		
 		if(  !  ( 
-			( (*bodies)[id1]->getGroup() == sdecGroup   && (*bodies)[id2]->getGroup() == springGroup ) ||
-			( (*bodies)[id1]->getGroup() == springGroup && (*bodies)[id2]->getGroup() == sdecGroup   )
+			( ((*bodies)[id1]->getGroupMask() & sdecGroupMask  ) && ( (*bodies)[id2]->getGroupMask() & springGroupMask) ) ||
+			( ((*bodies)[id1]->getGroupMask() & springGroupMask) && ( (*bodies)[id2]->getGroupMask() & sdecGroupMask  ) )
 		  ))
 			continue; // skip other groups
 			

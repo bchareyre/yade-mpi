@@ -4,7 +4,7 @@
 
 #include "FileGenerator.hpp"
 #include "Vector3.hpp"
-#include "SimpleBody.hpp"
+#include "SingleBody.hpp"
 
 class SDECLinkedSpheres : public FileGenerator
 {

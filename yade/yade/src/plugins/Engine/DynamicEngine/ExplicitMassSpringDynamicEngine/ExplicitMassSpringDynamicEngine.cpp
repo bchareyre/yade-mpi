@@ -14,7 +14,7 @@ ExplicitMassSpringDynamicEngine::ExplicitMassSpringDynamicEngine () : DynamicEng
 
 void ExplicitMassSpringDynamicEngine::registerAttributes()
 {
-	REGISTER_ATTRIBUTE(springGroup);
+	REGISTER_ATTRIBUTE(springGroupMask);
 }
 
 
@@ -33,7 +33,7 @@ void ExplicitMassSpringDynamicEngine::respondToInteractions(Body * body)
 		int id1 = spring->getId1();
 		int id2 = spring->getId2();
 		
-		if( (*bodies)[id1]->getGroup() != springGroup || (*bodies)[id2]->getGroup() != springGroup )
+		if( !(  (*bodies)[id1]->getGroupMask() & (*bodies)[id2]->getGroupMask() & springGroupMask) )
 			continue; // skip other groups
 		
 		ParticleParameters * p1 = static_cast<ParticleParameters*>((*bodies)[id1]->physicalParameters.get());
@@ -68,7 +68,7 @@ void ExplicitMassSpringDynamicEngine::respondToInteractions(Body * body)
 	
 	for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext())
 	{
-		if(bodies->getCurrent()->getGroup() == springGroup)
+		if(bodies->getCurrent()->getGroupMask() & springGroupMask)
 		{
 			ParticleParameters * p = static_cast<ParticleParameters*>(bodies->getCurrent()->physicalParameters.get());
 			static_cast<ActionForce*>( massSpring->actions->find( bodies->getCurrent()->getId() , actionForce->getClassIndex() ).get() )->force += gravity*p->mass;

@@ -30,14 +30,14 @@
 Body::Body () : 
 	  Serializable()
 	, id(0)
-	, group(0)
+	, groupMask(1)
 {
 }
 
 Body::Body (unsigned int newId, int newGroup) :
 	  Serializable()
 	, id(newId)
-	, group(newGroup)
+	, groupMask(newGroup)
 {
 }
 
@@ -47,7 +47,7 @@ Body::Body (unsigned int newId, int newGroup) :
 void Body::registerAttributes()
 {
 	REGISTER_ATTRIBUTE(id);
-	REGISTER_ATTRIBUTE(group);
+	REGISTER_ATTRIBUTE(groupMask);
 	REGISTER_ATTRIBUTE(isDynamic); // FIXME? : only used for interaction : no collision between 2 non dynamic objects
 	
 	REGISTER_ATTRIBUTE(physicalParameters);

@@ -27,7 +27,7 @@
 
 #include "InteractionGeometryDispatcher.hpp"
 #include "InteractionPhysicsDispatcher.hpp"
-#include "SimpleBody.hpp"
+#include "SingleBody.hpp"
 #include "InteractionBox.hpp"
 #include "InteractionSphere.hpp"
 #include "ActionDispatcher.hpp"
@@ -181,7 +181,7 @@ string SDECLinkedSpheres::generate()
 
 void SDECLinkedSpheres::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 {
-	body = shared_ptr<Body>(new SimpleBody(0,55));
+	body = shared_ptr<Body>(new SingleBody(0,55));
 	shared_ptr<SDECParameters> physics(new SDECParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<Sphere> gSphere(new Sphere);
@@ -231,7 +231,7 @@ void SDECLinkedSpheres::createSphere(shared_ptr<Body>& body, int i, int j, int k
 
 void SDECLinkedSpheres::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents)
 {
-	body = shared_ptr<Body>(new SimpleBody(0,55));
+	body = shared_ptr<Body>(new SingleBody(0,55));
 	shared_ptr<SDECParameters> physics(new SDECParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<Box> gBox(new Box);
@@ -311,12 +311,12 @@ void SDECLinkedSpheres::createActors(shared_ptr<ComplexBody>& rootBody)
 	timeIntegratorDispatcher->add("ActionMomentum","RigidBodyParameters","LeapFrogMomentumIntegrator");
 
 	shared_ptr<SDECTimeStepper> sdecTimeStepper(new SDECTimeStepper);
-	sdecTimeStepper->sdecGroup = 55;
+	sdecTimeStepper->sdecGroupMask = 55;
 	sdecTimeStepper->interval = timeStepUpdateInterval;
 
 	
 	shared_ptr<SDECDynamicEngine> sdecDynamicEngine(new SDECDynamicEngine);
-	sdecDynamicEngine->sdecGroup = 55;
+	sdecDynamicEngine->sdecGroupMask = 55;
 	
 	rootBody->actors.clear();
 	rootBody->actors.push_back(sdecTimeStepper);

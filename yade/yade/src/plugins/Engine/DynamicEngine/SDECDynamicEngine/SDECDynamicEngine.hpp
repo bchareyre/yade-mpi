@@ -49,7 +49,7 @@ class SDECDynamicEngine : public DynamicEngine
 	private : bool first; // FIXME - remove that!
 	private : shared_ptr<Action> actionForce;
 	private : shared_ptr<Action> actionMomentum;
-	public  : int sdecGroup;
+	public  : int sdecGroupMask;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Constructor/Destructor								        ///

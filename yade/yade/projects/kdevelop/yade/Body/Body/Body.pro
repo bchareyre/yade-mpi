@@ -25,8 +25,8 @@ TEMPLATE = lib
 HEADERS += Body.hpp \
            BodyContainer.hpp \
            ComplexBody.hpp \
-           SimpleBody.hpp
+           SingleBody.hpp
 SOURCES += Body.cpp \
            BodyContainer.cpp \
            ComplexBody.cpp \
-           SimpleBody.cpp
+           SingleBody.cpp

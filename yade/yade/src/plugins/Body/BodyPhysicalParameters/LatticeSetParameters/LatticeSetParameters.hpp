@@ -34,7 +34,7 @@
 
 class LatticeSetParameters : public BodyPhysicalParameters
 {
-	public : int beamGroup;
+	public : int beamGroupMask;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Constructor/Destructor									///

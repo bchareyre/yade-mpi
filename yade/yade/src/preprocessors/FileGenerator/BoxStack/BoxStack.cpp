@@ -5,7 +5,7 @@
 #include "AABB.hpp"
 #include "Sphere.hpp"
 #include "ComplexBody.hpp"
-#include "SimpleBody.hpp"
+#include "SingleBody.hpp"
 #include "SimpleSpringDynamicEngine.hpp"
 #include "SAPCollider.hpp"
 #include "RigidBodyParameters.hpp"
@@ -98,7 +98,7 @@ string BoxStack::generate()
 // FIXME - all the functions below, are a modified copy of functions in RotatingBox.cpp
 void BoxStack::createBox(shared_ptr<Body>& body, int i, int j, int k)
 {
-	body = shared_ptr<Body>(new SimpleBody(0,0));
+	body = shared_ptr<Body>(new SingleBody(0,1));
 	shared_ptr<RigidBodyParameters> physics(new RigidBodyParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<Box> gBox(new Box);
@@ -143,7 +143,7 @@ void BoxStack::createBox(shared_ptr<Body>& body, int i, int j, int k)
 
 void BoxStack::createSphere(shared_ptr<Body>& body)
 {
-	body = shared_ptr<Body>(new SimpleBody(0,0));
+	body = shared_ptr<Body>(new SingleBody(0,1));
 	shared_ptr<RigidBodyParameters> physics(new RigidBodyParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<Sphere> gSphere(new Sphere);
@@ -187,7 +187,7 @@ void BoxStack::createSphere(shared_ptr<Body>& body)
 
 void BoxStack::createKinematicBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents,bool wire)
 {
-	body = shared_ptr<Body>(new SimpleBody(0,0));
+	body = shared_ptr<Body>(new SingleBody(0,1));
 	shared_ptr<RigidBodyParameters> physics(new RigidBodyParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<Box> gBox(new Box);

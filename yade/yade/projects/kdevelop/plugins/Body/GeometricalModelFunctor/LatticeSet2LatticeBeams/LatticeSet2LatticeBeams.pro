@@ -16,6 +16,10 @@ QMAKE_LIBDIR = ../../../../plugins/Body/BodyPhysicalParameters/ParticleParameter
                ../../../../plugins/Body/BodyPhysicalParameters/LatticeBeamParameters/$(YADEDYNLIBPATH) \
                ../../../../plugins/Body/GeometricalModel/LineSegment/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
+QMAKE_CXXFLAGS_RELEASE += -lpthread \
+                          -pthread 
+QMAKE_CXXFLAGS_DEBUG += -lpthread \
+                        -pthread 
 DESTDIR = $(YADEDYNLIBPATH) 
 CONFIG += debug \
           warn_on \

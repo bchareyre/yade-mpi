@@ -38,7 +38,7 @@
 
 SDECDynamicEngine::SDECDynamicEngine() : DynamicEngine() , actionForce(new ActionForce) , actionMomentum(new ActionMomentum)
 {
-	sdecGroup=0;
+	sdecGroupMask=1;
 	first=true;
 }
 
@@ -48,7 +48,7 @@ SDECDynamicEngine::SDECDynamicEngine() : DynamicEngine() , actionForce(new Actio
 void SDECDynamicEngine::registerAttributes()
 {
 	DynamicEngine::registerAttributes();
-	REGISTER_ATTRIBUTE(sdecGroup);
+	REGISTER_ATTRIBUTE(sdecGroupMask);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -74,7 +74,7 @@ void SDECDynamicEngine::respondToInteractions(Body* body)
 		unsigned int id1 = contact2->getId1();
 		unsigned int id2 = contact2->getId2();
 		
-		if( (*bodies)[id1]->getGroup() != sdecGroup || (*bodies)[id2]->getGroup() != sdecGroup )
+		if( !( (*bodies)[id1]->getGroupMask() & (*bodies)[id2]->getGroupMask() & sdecGroupMask) )
 			continue; // skip other groups, BTW: this is example of a good usage of 'continue' keyword
 
 		SDECParameters* de1				= dynamic_cast<SDECParameters*>((*bodies)[id1]->physicalParameters.get());
@@ -323,7 +323,7 @@ void SDECDynamicEngine::respondToInteractions(Body* body)
 		int id1 = contact->getId1();
 		int id2 = contact->getId2();
 		
-		if( (*bodies)[id1]->getGroup() != sdecGroup || (*bodies)[id2]->getGroup() != sdecGroup )
+		if( !( (*bodies)[id1]->getGroupMask() & (*bodies)[id2]->getGroupMask() & sdecGroupMask)  )
 			continue; // skip other groups, BTW: this is example of a good usage of 'continue' keyword
 
 		SDECParameters* de1 				= dynamic_cast<SDECParameters*>((*bodies)[id1]->physicalParameters.get());
@@ -411,7 +411,7 @@ void SDECDynamicEngine::respondToInteractions(Body* body)
 	for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext() )
 	{
 		shared_ptr<Body>& b = bodies->getCurrent();
-		if(b->getGroup() == sdecGroup)
+		if( b->getGroupMask() & sdecGroupMask )
 		{
 			RigidBodyParameters * de = static_cast<SDECParameters*>(b->physicalParameters.get());
 			static_cast<ActionForce*>( ncb->actions->find( b->getId() , actionForce->getClassIndex() ).get() )->force += gravity*de->mass;

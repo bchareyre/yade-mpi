@@ -28,7 +28,7 @@
 #include "LineSegment.hpp"
 #include "Sphere.hpp"
 
-#include "SimpleBody.hpp"
+#include "SingleBody.hpp"
 #include "InteractionDescriptionSet.hpp"
 #include "BoundingVolumeDispatcher.hpp"
 #include "GeometricalModelDispatcher.hpp"
@@ -45,8 +45,8 @@ using namespace std;
 
 LatticeExample::LatticeExample() : FileGenerator()
 {
-	nodeGroup 		= 10;
-	beamGroup 		= 20;
+	nodeGroupMask 		= 1;
+	beamGroupMask 		= 2;
 	
 	nbNodes 		= Vector3r(5,5,5);
 	disorder 		= 0.5;
@@ -128,7 +128,7 @@ string LatticeExample::generate()
 
 void LatticeExample::createNode(shared_ptr<Body>& body, int i, int j, int k)
 {
-	body = shared_ptr<Body>(new SimpleBody(0,nodeGroup));
+	body = shared_ptr<Body>(new SingleBody(0,nodeGroupMask));
 	shared_ptr<LatticeNodeParameters> physics(new LatticeNodeParameters);
 	shared_ptr<Sphere> gSphere(new Sphere);
 	
@@ -165,7 +165,7 @@ void LatticeExample::createNode(shared_ptr<Body>& body, int i, int j, int k)
 
 void LatticeExample::createBeam(shared_ptr<Body>& body, unsigned int i, unsigned int j)
 {
-	body = shared_ptr<Body>(new SimpleBody(0,beamGroup));
+	body = shared_ptr<Body>(new SingleBody(0,beamGroupMask));
 	shared_ptr<LatticeBeamParameters> physics(new LatticeBeamParameters);
 	shared_ptr<LineSegment> gBeam(new LineSegment);
 	
@@ -198,7 +198,7 @@ void LatticeExample::calcBeamsPositionOrientationLength(shared_ptr<ComplexBody>&
 	for( rootBody->bodies->gotoFirst(); rootBody->bodies->notAtEnd() ; rootBody->bodies->gotoNext() )
 	{
 		shared_ptr<Body>& body = rootBody->bodies->getCurrent();
-		if(body->getGroup() == beamGroup)
+		if( body->getGroupMask() & beamGroupMask )
 		{
 			LatticeBeamParameters* beam = static_cast<LatticeBeamParameters*>(body->physicalParameters.get());
 			shared_ptr<Body>& bodyA = (*(rootBody->bodies))[beam->id1];
@@ -249,7 +249,7 @@ void LatticeExample::positionRootBody(shared_ptr<ComplexBody>& rootBody)
 	q.fromAxisAngle( Vector3r(0,0,1),0);
 	shared_ptr<LatticeSetParameters> physics(new LatticeSetParameters);
 	physics->se3			= Se3r(Vector3r(0,0,0),q);
-	physics->beamGroup 		= beamGroup;
+	physics->beamGroupMask 		= beamGroupMask;
 	
 	shared_ptr<InteractionDescriptionSet> set(new InteractionDescriptionSet());
 	

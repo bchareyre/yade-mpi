@@ -54,7 +54,7 @@
 
 /*! \brief Abstract interface for bodies stored in BodyContainer
 
-	BodyContainer can store ComplexBody and SimpleBody, both derived from Body
+	BodyContainer can store ComplexBody and SingleBody, both derived from Body
 */
 
 class Body : public Serializable
@@ -66,8 +66,8 @@ class Body : public Serializable
 	private	: unsigned int id;
 	public	: unsigned int getId() const {return id;};
 	// group to which body belongs (maybe vector<int> , to allow multiple groups?)
-	private : int group;
-	public  : int getGroup() {return group; };
+	private : int groupMask;
+	public  : int getGroupMask() {return groupMask; };
 	// only BodyContainer can set the id of a body
 	friend class BodyContainer;
 

@@ -38,7 +38,7 @@ class SDECMacroMicroElasticRelationships;
 class SDECTimeStepper : public Actor
 {
 
-	public  : int sdecGroup;
+	public  : int sdecGroupMask;
 	public  : int interval;
 	private : shared_ptr<SDECMacroMicroElasticRelationships> sdecContactModel;
 

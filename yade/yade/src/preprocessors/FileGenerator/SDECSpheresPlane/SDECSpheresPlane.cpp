@@ -28,7 +28,7 @@
 
 #include "InteractionGeometryDispatcher.hpp"
 #include "InteractionPhysicsDispatcher.hpp"
-#include "SimpleBody.hpp"
+#include "SingleBody.hpp"
 #include "InteractionBox.hpp"
 #include "InteractionSphere.hpp"
 #include "ActionDispatcher.hpp"
@@ -113,7 +113,7 @@ string SDECSpheresPlane::generate()
 		timeIntegratorDispatcher->add("ActionMomentum","RigidBodyParameters","LeapFrogMomentumIntegrator");
 	
 	shared_ptr<SDECTimeStepper> sdecTimeStepper(new SDECTimeStepper);
-	sdecTimeStepper->sdecGroup = 0;
+	sdecTimeStepper->sdecGroupMask = 1;
 	sdecTimeStepper->interval = timeStepUpdateInterval;
 
 	rootBody->actors.clear();
@@ -175,7 +175,7 @@ string SDECSpheresPlane::generate()
 
 void SDECSpheresPlane::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 {
-	body = shared_ptr<Body>(new SimpleBody(0,0));
+	body = shared_ptr<Body>(new SingleBody(0,1));
 	shared_ptr<SDECParameters> physics(new SDECParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<Sphere> gSphere(new Sphere);
@@ -223,7 +223,7 @@ void SDECSpheresPlane::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 
 void SDECSpheresPlane::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents)
 {
-	body = shared_ptr<Body>(new SimpleBody(0,0));
+	body = shared_ptr<Body>(new SingleBody(0,1));
 	shared_ptr<SDECParameters> physics(new SDECParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<Box> gBox(new Box);

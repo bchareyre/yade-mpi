@@ -30,7 +30,7 @@ LatticeSetParameters::LatticeSetParameters() : BodyPhysicalParameters()
 {
 	createIndex();
 	
-	beamGroup = 1;
+	beamGroupMask = 1;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -46,5 +46,5 @@ LatticeSetParameters::~LatticeSetParameters()
 
 void LatticeSetParameters::registerAttributes()
 {
-	REGISTER_ATTRIBUTE(beamGroup);
+	REGISTER_ATTRIBUTE(beamGroupMask);
 }

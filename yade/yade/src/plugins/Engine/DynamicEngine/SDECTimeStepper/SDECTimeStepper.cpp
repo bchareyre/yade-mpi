@@ -35,7 +35,7 @@
 
 SDECTimeStepper::SDECTimeStepper() : Actor() , sdecContactModel(new SDECMacroMicroElasticRelationships)
 {
-	sdecGroup = 0;
+	sdecGroupMask = 1;
 	interval = 10;
 }
 
@@ -57,7 +57,7 @@ bool SDECTimeStepper::isActivated()
 
 void SDECTimeStepper::registerAttributes()
 {
-	REGISTER_ATTRIBUTE(sdecGroup);
+	REGISTER_ATTRIBUTE(sdecGroupMask);
 	REGISTER_ATTRIBUTE(interval);
 }
 
@@ -104,7 +104,7 @@ void SDECTimeStepper::findTimeStepFromInteraction(const shared_ptr<Interaction>&
 	unsigned int id1 = interaction->getId1();
 	unsigned int id2 = interaction->getId2();
 		
-	if( (*bodies)[id1]->getGroup() != sdecGroup || (*bodies)[id2]->getGroup() != sdecGroup )
+	if( !( (*bodies)[id1]->getGroupMask() & (*bodies)[id2]->getGroupMask() & sdecGroupMask) )
 		return; // skip other groups
 
 	SDECContactPhysics* sdecContact = dynamic_cast<SDECContactPhysics*>(interaction->interactionPhysics.get());
@@ -161,7 +161,7 @@ void SDECTimeStepper::action(Body* body)
 		for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext() )
 		{
 			Body* b = bodies->getCurrent().get();
-			if( b->getGroup() == sdecGroup)
+			if( b->getGroupMask() & sdecGroupMask)
 				findTimeStepFromBody(b);
 		}
 		

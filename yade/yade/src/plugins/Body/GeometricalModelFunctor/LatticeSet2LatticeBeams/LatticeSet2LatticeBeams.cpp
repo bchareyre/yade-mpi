@@ -34,7 +34,7 @@ void LatticeSet2LatticeBeams::go(	  const shared_ptr<BodyPhysicalParameters>& ph
 					, shared_ptr<GeometricalModel>& 
 					, const Body* body)
 {
-	int beamGroup = dynamic_cast<const LatticeSetParameters*>(ph.get())->beamGroup;
+	int beamGroupMask = dynamic_cast<const LatticeSetParameters*>(ph.get())->beamGroupMask;
 	const ComplexBody * ncb = dynamic_cast<const ComplexBody*>(body);
 	const shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	
@@ -42,7 +42,7 @@ void LatticeSet2LatticeBeams::go(	  const shared_ptr<BodyPhysicalParameters>& ph
 cerr << "qwer\n";
 	for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext() )
 	{
-		if( bodies->getCurrent()->getGroup() == beamGroup )
+		if( bodies->getCurrent()->getGroupMask() & beamGroupMask )
 		{
 			LineSegment* line 		= dynamic_cast<LineSegment*> 		(bodies->getCurrent()->geometricalModel.get());
 			LatticeBeamParameters* beam 	= dynamic_cast<LatticeBeamParameters*>  (bodies->getCurrent()->physicalParameters.get());

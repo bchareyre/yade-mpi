@@ -39,7 +39,7 @@ class LatticeExample : public FileGenerator
 		Vector3r 	nbNodes;
 		Real 		disorder;
 		Real 		maxLength;
-		int 		nodeGroup,beamGroup;
+		int 		nodeGroupMask,beamGroupMask;
 
 	public : 
 		LatticeExample();
