@@ -2,6 +2,7 @@
 #include "Body.hpp"
 #include "Interaction.hpp"
 #include "GL/glut.h"
+#include "Omega.hpp"
 
 GLViewer::GLViewer(QWidget * parent) : QGLViewer(parent)
 {
