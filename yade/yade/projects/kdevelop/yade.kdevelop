@@ -104,7 +104,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>toolboxes/Math/Rand</activedir>
+      <activedir>plugins/CollisionFunctor/CollisionFunctor4ClosestFeatures/Box2Box4ClosestFeatures</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>

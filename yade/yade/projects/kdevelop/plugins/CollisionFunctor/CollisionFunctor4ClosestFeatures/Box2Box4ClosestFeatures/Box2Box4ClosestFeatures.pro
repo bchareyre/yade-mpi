@@ -7,12 +7,14 @@ LIBS += -lBox \
         -lClosestFeatures \
         -lConstants \
         -lM3D \
+        -lIntersections \
         -rdynamic 
 INCLUDEPATH = ../../../../plugins/GeometricalModel/Box \
               ../../../../plugins/InteractionModel/ClosestFeatures \
               ../../../../yade \
-              ../../../../toolboxes/Math/Constants \
-              ../../../../toolboxes/Math/M3D 
+              ../../../../toolboxes/ComputationalGeometry/Intersections \
+              ../../../../toolboxes/Math/M3D \
+              ../../../../toolboxes/Math/Constants 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
@@ -20,6 +22,7 @@ QMAKE_LIBDIR = ../../../../plugins/GeometricalModel/Box/$(YADEDYNLIBPATH) \
                ../../../../plugins/InteractionModel/ClosestFeatures/$(YADEDYNLIBPATH) \
                ../../../../toolboxes/Math/Constants/$(YADEDYNLIBPATH) \
                ../../../../toolboxes/Math/M3D/$(YADEDYNLIBPATH) \
+               ../../../../toolboxes/ComputationalGeometry/Intersections/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 DESTDIR = $(YADEDYNLIBPATH) 
 CONFIG += release \

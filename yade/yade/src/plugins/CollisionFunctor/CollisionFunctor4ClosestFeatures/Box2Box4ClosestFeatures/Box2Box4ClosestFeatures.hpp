@@ -51,14 +51,7 @@ class Box2Box4ClosestFeatures : public CollisionFunctor
 	protected : virtual bool collide(const shared_ptr<CollisionModel> cm1, const shared_ptr<CollisionModel> cm2, const Se3& se31, const Se3& se32, shared_ptr<Interaction> c);
 	protected : virtual bool reverseCollide(const shared_ptr<CollisionModel> cm1, const shared_ptr<CollisionModel> cm2,  const Se3& se31, const Se3& se32, shared_ptr<Interaction> c);
 
-	// FIXME
-	private : void lineClosestApproach (const Vector3 pa, const Vector3 ua, const Vector3 pb, const Vector3 ub, float &alpha, float &beta);
 	private : bool testSeparatingAxis(float expr1, float expr2, Vector3 n,int c,BoxBoxCollisionInfo* bbInfo);
-	private : int clipPolygon(Vector3 quad,const std::vector<Vector3>& polygon, std::vector<Vector3>& clipped);
-	private : void clipLeft(float sizeX, std::vector<Vector3> &polygon, Vector3 v1, Vector3 v2);
-	private : void clipRight(float sizeX, std::vector<Vector3>& polygon, Vector3 v1, Vector3 v2);
-	private : void clipTop(float sizeY, std::vector<Vector3>& polygon, Vector3 v1, Vector3 v2);
-	private : void clipBottom(float sizeY, std::vector<Vector3> &polygon, Vector3 v1, Vector3 v2);
 
 // FIXME : this should be just Factorable, not Serializable !!
 	public    : virtual void registerAttributes() {};

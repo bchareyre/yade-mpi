@@ -14,9 +14,10 @@ INCLUDEPATH = ../../../../plugins/GeometricalModel/Sphere \
               ../../../../plugins/BoundingVolume/AABB \
               ../../../../plugins/InteractionModel/ClosestFeatures \
               ../../../../yade \
+              ../../../../toolboxes/ComputationalGeometry/Distances \
               ../../../../toolboxes/Math/M2D \
-              ../../../../toolboxes/Math/Constants \
-              ../../../../toolboxes/Math/M3D 
+              ../../../../toolboxes/Math/M3D \
+              ../../../../toolboxes/Math/Constants 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
