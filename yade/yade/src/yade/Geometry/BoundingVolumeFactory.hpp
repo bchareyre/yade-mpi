@@ -53,9 +53,9 @@ class BoundingVolumeFactory : public DynLibLauncher
 		<
 		 void ,
 		 TYPELIST_3(
-		 		const shared_ptr<CollisionGeometry>& ,
-				shared_ptr<BoundingVolume>& ,
-				const Se3r&
+		 		  const shared_ptr<CollisionGeometry>&
+				, shared_ptr<BoundingVolume>&
+				, const Se3r&
 		)>
 {	
 };

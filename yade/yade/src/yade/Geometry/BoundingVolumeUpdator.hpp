@@ -44,9 +44,9 @@ class BoundingVolumeUpdator : public Actor
 			BoundingVolumeFactory,					// class that provides multivirtual call
 			void ,							// return type
 			TYPELIST_3(
-					const shared_ptr<CollisionGeometry>& ,	// arguments
-					shared_ptr<BoundingVolume>& ,
-					const Se3r&
+					  const shared_ptr<CollisionGeometry>&	// arguments
+					, shared_ptr<BoundingVolume>&
+					, const Se3r&
 				)
 		> bvFactoriesManager;
 

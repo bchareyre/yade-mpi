@@ -42,8 +42,6 @@ void ForceRecorder::action(Body * body)
 			<< lexical_cast<string>(rb->acceleration[0]) << " " 
 			<< lexical_cast<string>(rb->acceleration[1]) << " " 
 			<< lexical_cast<string>(rb->acceleration[2]) << endl;
-		
-	rb->acceleration 	= Vector3r(0,0,0);
-	rb->angularAcceleration = Vector3r(0,0,0);
+
 }
 

@@ -54,7 +54,7 @@ class NarrowCollider : public Actor
 			CollisionFunctor,					// class that provides multivirtual call
 			bool ,							// return type
 			TYPELIST_5(
-					const shared_ptr<CollisionGeometry>&	// arguments
+					  const shared_ptr<CollisionGeometry>&	// arguments
 					, const shared_ptr<CollisionGeometry>&
 					, const Se3r&
 					, const Se3r&
