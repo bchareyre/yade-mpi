@@ -106,7 +106,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>plugins/Geometry</activedir>
+      <activedir>plugins/Interaction</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>
