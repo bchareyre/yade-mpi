@@ -5,12 +5,12 @@
 
 LIBS += -lBox \
         -lSphere \
-        -lSDECContactModel \
         -lSerialization \
         -lMath \
         -lGeometry \
         -lInteraction \
         -lMultiMethods \
+        -lSDECContactGeometry \
         -rdynamic 
 INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
@@ -18,11 +18,13 @@ UI_DIR = $(YADECOMPILATIONPATH)
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 QMAKE_LIBDIR = ../../../../plugins/GeometricalModel/Box/$(YADEDYNLIBPATH) \
                ../../../../plugins/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
-               ../../../../plugins/InteractionModel/SDECContactModel/$(YADEDYNLIBPATH) \
                ../../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
                ../../../../yade/Geometry/$(YADEDYNLIBPATH) \
                ../../../../yade/Interaction/$(YADEDYNLIBPATH) \
+               ../../../../toolboxes/Libraries/MultiMethods/$(YADEDYNLIBPATH) \
+               ../../../../plugins/InteractionGeometry/SDECContactGeometry/$(YADEDYNLIBPATH) \
+               ../../../../plugins/InteractionModel/SDECContactModel/$(YADEDYNLIBPATH) \
                ../../../../yade/MultiMethods/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \

@@ -7,7 +7,6 @@ LIBS += -lSerialization \
         -lSDECDiscreteElement \
         -lRigidBody \
         -lSphere \
-        -lSDECContactModel \
         -lMath \
         -lBody \
         -lEngine \
@@ -17,6 +16,7 @@ LIBS += -lSerialization \
         -lSDECPermanentLink \
         -lSDECPermanentLinkPhysics \
         -lSDECContactPhysics \
+        -lSDECContactGeometry \
         -rdynamic 
 INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
@@ -26,7 +26,6 @@ QMAKE_LIBDIR = ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/SDECDiscreteElement/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/RigidBody/$(YADEDYNLIBPATH) \
                ../../../plugins/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
-               ../../../plugins/InteractionGeometry/SDECContactModel/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
                ../../../yade/Body/$(YADEDYNLIBPATH) \
                ../../../yade/Engine/$(YADEDYNLIBPATH) \
@@ -36,6 +35,8 @@ QMAKE_LIBDIR = ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../../plugins/InteractionGeometry/SDECPermanentLink/$(YADEDYNLIBPATH) \
                ../../../plugins/InteractionPhysics/SDECPermanentLinkPhysics/$(YADEDYNLIBPATH) \
                ../../../plugins/InteractionPhysics/SDECContactPhysics/$(YADEDYNLIBPATH) \
+               ../../../plugins/InteractionGeometry/SDECContactGeometry/$(YADEDYNLIBPATH) \
+               ../../../plugins/InteractionGeometry/SDECContactModel/$(YADEDYNLIBPATH) \
                ../../../plugins/InteractionModel/SDECContactModel/$(YADEDYNLIBPATH) \
                ../../../yade/MultiMethods/$(YADEDYNLIBPATH) \
                ../../../plugins/InteractionModel/SDECPermanentLink/$(YADEDYNLIBPATH) \
