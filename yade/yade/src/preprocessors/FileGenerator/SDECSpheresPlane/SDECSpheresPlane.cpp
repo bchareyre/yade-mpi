@@ -19,7 +19,6 @@
 
 SDECSpheresPlane::SDECSpheresPlane () : FileGenerator()
 {
-	generate();
 }
 
 SDECSpheresPlane::~SDECSpheresPlane ()

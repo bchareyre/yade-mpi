@@ -89,32 +89,11 @@ void YadeQtMainWindow::createMenus()
 
 }
 
-void YadeQtMainWindow::loadSimulation(const string fileName)
-{
-	//setCaption( "Yade - "+fileName);
-
-// FIXME - resetting the rootBody shouldn't be here. It shoul dbe inside Omega. As well as all Omega variables SHOULD be private!
-// FIXME - and this doesn't work - spheres disappear!
-//	Omega::instance().rootBody = shared_ptr<NonConnexBody>(new NonConnexBody);
-	
-	//Omega::instance().setFileName(fileName);
-	//Omega::instance().loadTheFile();
-
-	//glViewer = shared_ptr<GLViewer>(new GLViewer(workspace));
-	//glViewer->show();
-}
-
 void YadeQtMainWindow::fileNewSimulation()
 {
 
 	simulationController = shared_ptr<SimulationController>(new SimulationController(workspace));
 	simulationController->show();
-	
-// 	QString selectedFilter;
-// 	QString fileName = QFileDialog::getOpenFileName("../data", "XML Yade File (*.xml)", this,"Open File","Choose a file to open",&selectedFilter );
-// 
-// 	if (!fileName.isEmpty() && selectedFilter == "XML Yade File (*.xml)")
-// 		loadSimulation( fileName );
 }
 
 void YadeQtMainWindow::fileExit()
@@ -134,4 +113,10 @@ void YadeQtMainWindow::dynamicMenuClicked()
 		widget->reparent(workspace,QPoint(10,10));
 		widget->show();
 	}
+}
+
+void YadeQtMainWindow::endOfSimulationLoop()
+{
+	if (simulationController)
+		simulationController->glViewer->draw();
 }

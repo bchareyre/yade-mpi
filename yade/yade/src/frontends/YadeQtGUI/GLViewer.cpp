@@ -25,7 +25,7 @@ void GLViewer::draw()
         glEnable(GL_NORMALIZE);
         glEnable(GL_CULL_FACE);
 
-	if (Omega::instance().rootBody!=0) // if the scene is loaded
+	if (Omega::instance().rootBody) // if the scene is loaded
 		Omega::instance().rootBody->glDraw();
 
 // 	if (frame%50==0)
@@ -34,6 +34,7 @@ void GLViewer::draw()
 // 		setSnapshotFilename(name);
 // 		saveSnapshot(true,false);
 // 	}
+	
 	frame++;
 
 	fpsTracker->glDraw();
@@ -43,20 +44,20 @@ void GLViewer::animate()
 {
 	Omega::instance().rootBody->moveToNextTimeStep();
 
-	static bool progress = Omega::instance().getProgress();
-	static long int max  = Omega::instance().getMaxiter();
-
-	if( frame % 100 == 0 )					// checks every 100th iteration
-	{
-		if(progress)
-			cout << "iteration: " << frame << endl;
-		if( max != 0 )
-			if( frame > max )
-			{
-				cerr << "Calc finished at: " << frame << endl;
-				exit(0);			// terminate.
-			}
-	}
+// 	static bool progress = Omega::instance().getProgress();
+// 	static long int max  = Omega::instance().getMaxiter();
+// 
+// 	if( frame % 100 == 0 )					// checks every 100th iteration
+// 	{
+// 		if(progress)
+// 			cout << "iteration: " << frame << endl;
+// 		if( max != 0 )
+// 			if( frame > max )
+// 			{
+// 				cerr << "Calc finished at: " << frame << endl;
+// 				exit(0);			// terminate.
+// 			}
+// 	}
 
 	fpsTracker->addOneAction();
 }

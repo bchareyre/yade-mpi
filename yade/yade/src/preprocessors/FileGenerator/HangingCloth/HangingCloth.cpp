@@ -18,7 +18,7 @@
 
 HangingCloth::HangingCloth () : FileGenerator()
 {
-	generate();
+
 }
 
 HangingCloth::~HangingCloth ()

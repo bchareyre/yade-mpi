@@ -41,6 +41,7 @@ class FrontEnd : public Factorable
 	public : virtual ~FrontEnd ();
 	
 	public : virtual int run(int , char * []) { return -1;};
+	public : virtual void endOfSimulationLoop() {};
 	
 };
 

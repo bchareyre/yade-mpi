@@ -3,6 +3,19 @@
 # Subdir relative project main directory: ./yade/yade
 # Target is an application:  
 
+HEADERS += Chrono.hpp \
+           Omega.hpp \
+           Tree.hpp \
+           Actor.hpp \
+           ActorParameter.hpp \
+           FrontEnd.hpp \
+           FileGenerator.hpp \
+           SimulationLoop.hpp 
+SOURCES += Chrono.cpp \
+           Omega.cpp \
+           yade.cpp \
+           FrontEnd.cpp \
+           SimulationLoop.cpp 
 LIBS += -lSerialization \
         -lMath \
         -lBody \
@@ -13,6 +26,7 @@ LIBS += -lSerialization \
         -lFactory \
         -lInteractionContainer \
         -lBodyContainer \
+        -lboost_thread \
         -lboost_filesystem \
         -lboost_date_time \
         -lglut \
@@ -37,14 +51,3 @@ DESTDIR = $(YADEBINPATH)
 CONFIG += debug \
           warn_on 
 TEMPLATE = app 
-HEADERS += Chrono.hpp \
-           Omega.hpp \
-           Tree.hpp \
-           Actor.hpp \
-           ActorParameter.hpp \
-           FrontEnd.hpp \
-           FileGenerator.hpp 
-SOURCES += Chrono.cpp \
-           Omega.cpp \
-           yade.cpp \
-           FrontEnd.cpp 

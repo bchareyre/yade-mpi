@@ -22,6 +22,8 @@
 #include "BoundingVolume.hpp"
 #include "InteractionGeometry.hpp"             
 
+#include "SimulationLoop.hpp"
+#include "FrontEnd.hpp"
 
 Omega::Omega ()
 {
@@ -73,7 +75,6 @@ void Omega::init()
 
 	// build dynlib information list
 	buildDynlibList();
-	
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -267,3 +268,8 @@ bool Omega::getProgress()
 	return progress;
 }
 
+
+void Omega::endOfSimulationLoop()
+{
+	gui->endOfSimulationLoop();
+}

@@ -17,7 +17,6 @@
 
 SDECLinkedSpheres::SDECLinkedSpheres () : FileGenerator()
 {
-	generate();
 }
 
 SDECLinkedSpheres::~SDECLinkedSpheres ()

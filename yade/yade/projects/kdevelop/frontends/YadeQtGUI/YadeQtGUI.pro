@@ -3,23 +3,6 @@
 # Subdir relative project main directory: ./frontends/YadeQtGUI
 # Target is a library:  
 
-FORMS += YadeQtGeneratedMainWindow.ui \
-         QtFileGeneratorController.ui \
-         QtGUISignalCatcher.ui \
-         QtGeneratedSimulationController.ui 
-IDLS += QtGeneratedSimulationController.ui 
-HEADERS += YadeQtGUI.hpp \
-           GLViewer.hpp \
-           YadeQtMainWindow.hpp \
-           QtFileGenerator.hpp \
-           QtGUIGenerator.hpp \
-           SimulationController.hpp 
-SOURCES += YadeQtGUI.cpp \
-           GLViewer.cpp \
-           YadeQtMainWindow.cpp \
-           QtFileGenerator.cpp \
-           QtGUIGenerator.cpp \
-           SimulationController.cpp 
 LIBS += -lSerialization \
         -lMath \
         -lBody \
@@ -53,6 +36,23 @@ CONFIG += debug \
 QtGeneratedSimulationController.ui.commands = $$IDL_COMPILER $$IDL_OPTIONS $$QtGeneratedSimulationController.ui.target 
 QtGeneratedSimulationController.ui.target = QtGeneratedSimulationController.ui 
 TEMPLATE = lib 
+FORMS += YadeQtGeneratedMainWindow.ui \
+         QtFileGeneratorController.ui \
+         QtGUISignalCatcher.ui \
+         QtGeneratedSimulationController.ui 
+IDLS += QtGeneratedSimulationController.ui 
+HEADERS += YadeQtGUI.hpp \
+           GLViewer.hpp \
+           YadeQtMainWindow.hpp \
+           QtFileGenerator.hpp \
+           QtGUIGenerator.hpp \
+           SimulationController.hpp 
+SOURCES += YadeQtGUI.cpp \
+           GLViewer.cpp \
+           YadeQtMainWindow.cpp \
+           QtFileGenerator.cpp \
+           QtGUIGenerator.cpp \
+           SimulationController.cpp 
 QtGUISignalCatcher.ui.target = QtGUISignalCatcher.ui
 QtFileGeneratorController.ui.target = QtFileGeneratorController.ui
 QtGeneratedFrontEnd.ui.target = QtGeneratedFrontEnd.ui

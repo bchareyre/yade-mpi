@@ -43,14 +43,10 @@
 
 class YadeQtMainWindow : public YadeQtGeneratedMainWindow
 {
-	//protected : shared_ptr<GLViewer> glViewer;
-	
 	protected : shared_ptr<SimulationController> simulationController;
 		
 	protected : QWorkspace * workspace;
-	
-	//protected : QAction* fileRotatingBoxAction;
-	
+		
 	protected : QPopupMenu *preprocessorMenu;
 	protected : map<string,QPopupMenu*> menus;
 	protected : vector<QAction*> items;
@@ -63,8 +59,9 @@ class YadeQtMainWindow : public YadeQtGeneratedMainWindow
 	public : void addMenu(string menuName);
 	public : void addItem(string menuName, string itemName);
 	public : void createMenus();
+	public : void endOfSimulationLoop();
+
 	public slots : virtual void fileNewSimulation();
-	public slots : virtual void loadSimulation(const string f);
 	public slots : virtual void fileExit();
 	public slots : virtual void dynamicMenuClicked();
 

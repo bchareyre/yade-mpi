@@ -2,6 +2,8 @@
 #include "Omega.hpp"
 
 #include <qfiledialog.h>
+ 
+
 
 SimulationController::SimulationController(QWidget * parent) : QtGeneratedSimulationController(parent,"name")
 {
@@ -32,6 +34,8 @@ void SimulationController::pbLoadClicked()
 
 		glViewer = shared_ptr<GLViewer>(new GLViewer(this->parentWidget()->parentWidget()));
 		glViewer->show();
+		//simulationLoop = shared_ptr<SimulationLoop>(new SimulationLoop());	
+
 	}
 }
 

@@ -15,7 +15,7 @@
 
 FEMRock::FEMRock () : FileGenerator()
 {
-	generate();
+
 }
 
 FEMRock::~FEMRock ()

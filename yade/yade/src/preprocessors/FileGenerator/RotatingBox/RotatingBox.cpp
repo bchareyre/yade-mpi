@@ -19,7 +19,6 @@
 
 RotatingBox::RotatingBox () : FileGenerator()
 {
-	//	exec();
 	nbSpheres = 0;
 	nbBoxes   = 0;
 	outputFileName = "../data/RotatingBox.xml";

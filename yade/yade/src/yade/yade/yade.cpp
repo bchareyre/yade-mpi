@@ -19,8 +19,9 @@
  ***************************************************************************/
 
 #include "ClassFactory.hpp"
-#include "FrontEnd.hpp"
+
 #include "Omega.hpp"
+#include "FrontEnd.hpp"
 
 #include <iostream>
 using namespace std;
@@ -68,7 +69,7 @@ int main(int argc, char *argv[])
 		return 0;
 	}
 
-	shared_ptr<FrontEnd> gui = dynamic_pointer_cast<FrontEnd>(ClassFactory::instance().createShared(frontend));
+	Omega::instance().gui = dynamic_pointer_cast<FrontEnd>(ClassFactory::instance().createShared(frontend));
 
-	return gui->run(argc,argv);
+	return Omega::instance().gui->run(argc,argv);
 }

@@ -15,7 +15,6 @@
 
 BoxStack::BoxStack () : FileGenerator()
 {
-	generate();
 }
 
 BoxStack::~BoxStack ()

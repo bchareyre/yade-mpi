@@ -57,13 +57,25 @@ int YadeQtGUI::run(int argc, char *argv[])
 
 	QApplication app( argc,argv );
 
-	YadeQtMainWindow mainWindow;
+	mainWindow = new YadeQtMainWindow();
 
-	mainWindow.show();
+	mainWindow->show();
 
-	app.setMainWidget( &mainWindow );
+	app.setMainWidget( mainWindow );
+	
+	int res =  app.exec();
+	
+	delete mainWindow;
+	
+	return res;
+}
 
-	return app.exec();
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+void YadeQtGUI::endOfSimulationLoop() 
+{
+	mainWindow->endOfSimulationLoop();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
