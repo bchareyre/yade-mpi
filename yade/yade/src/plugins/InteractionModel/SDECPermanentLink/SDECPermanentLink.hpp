@@ -5,6 +5,7 @@
 
 #include "InteractionGeometry.hpp"
 #include "Vector3.hpp"
+#include "Quaternion.hpp"
 
 class SDECPermanentLink : public InteractionGeometry
 {
@@ -29,16 +30,18 @@ class SDECPermanentLink : public InteractionGeometry
 	public : Vector3 shearForce;			// shear force applied on a DE
 
 /////////////////////////////////////////////////////// FIXME : this goes to another dynlib - MDEM
-	public : Vector3 initRotation1;
-	public : Vector3 prevRotation1;
-	public : Vector3 currentRotation1;
-	public : Vector3 initRotation2;
-	public : Vector3 prevRotation2;
-	public : Vector3 currentRotation2;
+	//public : Vector3 initRotation1;
+	//public : Vector3 initRotation2;
+
+	public : Quaternion prevRotation1;
+	//public : Quaternion currentRotation1;
+	public : Quaternion prevRotation2;
+	//public : Quaternion currentRotation2;
+	
 	public : Vector3 thetar;
 	public : float heta;
 	public : float averageRadius;
-	// kr ???????????
+	public : float kr;
 ////////////////////////////////////////////////////////
 
 	// construction

@@ -220,10 +220,10 @@ void Quaternion::toEulerAngles (Vector3& eulerAngles,float threshold)
  	eulerAngles[2] = attitude;
 	
 
-//  	Matrix3 m;
-//  	this->normalize();
-// 	this->toRotationMatrix(m);
-//  	m.ToEulerAnglesXYZ(eulerAngles[0],eulerAngles[1],eulerAngles[2]);
+ 	Matrix3 m;
+  	this->normalize();
+ 	this->toRotationMatrix(m);
+  	m.ToEulerAnglesXYZ(eulerAngles[0],eulerAngles[1],eulerAngles[2]);
 
 }
 

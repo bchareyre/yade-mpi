@@ -301,14 +301,12 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 /// Moment law					 	 ///
 ////////////////////////////////////////////////////////////
 
-		de1->se3.rotation.toEulerAngles(currentContact->currentRotation1);
-		de2->se3.rotation.toEulerAngles(currentContact->currentRotation2);
-
 		if (first)
 		{
-			currentContact->prevRotation1 = currentContact->currentRotation1;
-			currentContact->prevRotation2 = currentContact->currentRotation2;
+			currentContact->prevRotation1 = de1->se3.rotation;//currentContact->currentRotation1;
+			currentContact->prevRotation2 = de2->se3.rotation;//currentContact->currentRotation2;
 			currentContact->averageRadius = (currentContact->radius1+currentContact->radius2)*0.5;
+			currentContact->kr = currentContact->ks * currentContact->averageRadius * currentContact->averageRadius;
 		}
 
 		Vector3 n	= currentContact->normal;
@@ -316,7 +314,7 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 		Vector3 t1	= currentContact->shearForce.normalized();
 		Vector3 t2	= n.unitCross(t1);
 
-		if (n[0]!=0 && n[1]!=0 && n[2]!=0)
+		/*if (n[0]!=0 && n[1]!=0 && n[2]!=0)
 		{
 			t1 = Vector3(0,0,sqrt(1.0/(1+(n[2]*n[2]/(n[1]*n[1])))));
 			t1[1] = -n[2]/n[1]*t1[2];
@@ -355,7 +353,7 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 				t1 = Vector3(0,1,0);
 				t2 = Vector3(0,0,1);
 			}
-		}
+		}*/
 
 		Quaternion q_i_n,q_n_i;
 
@@ -363,71 +361,72 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 		//q_i_n.fromAxes(Vector3(1,0,0),Vector3(0,1,0),Vector3(0,0,1)); // use identity matrix
 		//q_i_n.invert();
 		q_n_i = q_i_n.inverse();
-	
-		Vector3 dBeta;
-		
-		/*Vector3 orientation_Nc,orientation_Nc_old;
-		for(int i=0;i<3;i++)
-		{
-			int j = (i+1)%3;
-			int k = (i+2)%3;
 
-			if (n[j]>=0)
-				orientation_Nc[k] = acos(n[i]); // what is Nc_new
-			else
-				orientation_Nc[k] = -acos(n[i]);
+////////////////////////////////////////////////////////////
+/// Using Euler angle				 	 ///
+////////////////////////////////////////////////////////////
 
-			if (prevN[j]>=0)
-				orientation_Nc_old[k] = acos(prevN[i]);
-			else
-				orientation_Nc_old[k] = -acos(prevN[i]);	
-		}
+// 		Vector3 dBeta;
+// 		Vector3 orientation_Nc,orientation_Nc_old;
+// 		for(int i=0;i<3;i++)
+// 		{
+// 			int j = (i+1)%3;
+// 			int k = (i+2)%3;
+// 
+// 			if (n[j]>=0)
+// 				orientation_Nc[k] = acos(n[i]); // what is Nc_new
+// 			else
+// 				orientation_Nc[k] = -acos(n[i]);
+// 
+// 			if (prevN[j]>=0)
+// 				orientation_Nc_old[k] = acos(prevN[i]);
+// 			else
+// 				orientation_Nc_old[k] = -acos(prevN[i]);	
+// 		}
+// 
+// 		dBeta = orientation_Nc - orientation_Nc_old;
+// 
+// 
+// 		Vector3 dRotationA,dRotationB,da,db;
+// 		de1->se3.rotation.toEulerAngles(dRotationA);
+// 		de2->se3.rotation.toEulerAngles(dRotationB);
+// 		
+// 		currentContact->prevRotation1.toEulerAngles(da);
+// 		currentContact->prevRotation2.toEulerAngles(db);
+// 		
+// 		dRotationA -= da;
+// 		dRotationB -= db;
+// 		
+// 		Vector3 dUr = 	( currentContact->radius1*(  dRotationA  -  dBeta)
+// 				- currentContact->radius2*(  dRotationB  -  dBeta) ) * 0.5;
+				
+////////////////////////////////////////////////////////////
+/// Ending of use of eurler angle		 	 ///
+////////////////////////////////////////////////////////////
 
-		dBeta = orientation_Nc - orientation_Nc_old;*/
-		
-		Quaternion q;
+////////////////////////////////////////////////////////////
+/// Using Quaternion				 	 ///
+////////////////////////////////////////////////////////////
+
+		Quaternion q,q1,q2;
+		Vector3 dRotationAMinusDBeta,dRotationBMinusDBeta;
+
 		q.alignAxis(n,prevN);
-		q.toEulerAngles(dBeta);
-		
-		Vector3 dRotationA,dRotationB;
+		q1 = (de1->se3.rotation*currentContact->prevRotation1.invert())*q.invert();
+		q2 = (de2->se3.rotation*currentContact->prevRotation2.invert())*q.invert();
+		q1.toEulerAngles(dRotationAMinusDBeta);
+		q2.toEulerAngles(dRotationBMinusDBeta);
+		Vector3 dUr = ( currentContact->radius1*dRotationAMinusDBeta - currentContact->radius2*dRotationBMinusDBeta ) * 0.5;
 
-		dRotationA = currentContact->currentRotation1-currentContact->prevRotation1;
-		dRotationB = currentContact->currentRotation2-currentContact->prevRotation2;
-
-		/*if (dRotationA[0]>Constants::TWO_PI)	dRotationA[0]-=Constants::TWO_PI;
-		if (dRotationA[1]>Constants::TWO_PI)	dRotationA[1]-=Constants::TWO_PI;
-		if (dRotationA[2]>Constants::TWO_PI)	dRotationA[2]-=Constants::TWO_PI;
+////////////////////////////////////////////////////////////
+/// Ending of use of Quaternion			 	 ///
+////////////////////////////////////////////////////////////
 		
-		if (dRotationA[0]<-Constants::TWO_PI)	dRotationA[0]+=Constants::TWO_PI;
-		if (dRotationA[1]<-Constants::TWO_PI)	dRotationA[1]+=Constants::TWO_PI;
-		if (dRotationA[2]<-Constants::TWO_PI)	dRotationA[2]+=Constants::TWO_PI;
-		
-		if (dRotationB[0]>Constants::TWO_PI)	dRotationB[0]-=Constants::TWO_PI;
-		if (dRotationB[1]>Constants::TWO_PI)	dRotationB[1]-=Constants::TWO_PI;
-		if (dRotationB[2]>Constants::TWO_PI)	dRotationB[2]-=Constants::TWO_PI;
-		
-		if (dRotationB[0]<-Constants::TWO_PI)	dRotationB[0]+=Constants::TWO_PI;
-		if (dRotationB[1]<-Constants::TWO_PI)	dRotationB[1]+=Constants::TWO_PI;
-		if (dRotationB[2]<-Constants::TWO_PI)	dRotationB[2]+=Constants::TWO_PI;
-
-		if (dBeta[0]>Constants::PI)	dBeta[0]-=Constants::PI;
-		if (dBeta[1]>Constants::PI)	dBeta[1]-=Constants::PI;
-		if (dBeta[2]>Constants::PI)	dBeta[2]-=Constants::PI;
-		
-		if (dBeta[0]<-Constants::PI)	dBeta[0]+=Constants::PI;
-		if (dBeta[1]<-Constants::PI)	dBeta[1]+=Constants::PI;
-		if (dBeta[2]<-Constants::PI)	dBeta[2]+=Constants::PI;*/
-
-		Vector3 dUr = 	( currentContact->radius1*(  dRotationA  -  dBeta)
-				- currentContact->radius2*(  dRotationB  -  dBeta) ) * 0.5;
-
-		cout << dRotationA << " || " <<dRotationB << " || " <<dBeta << endl;
-		
+				
 		Vector3 dThetar = dUr/currentContact->averageRadius;
 
 		currentContact->thetar += dThetar;
 
-		float kr = currentContact->ks  *   currentContact->averageRadius  *  currentContact->averageRadius;
 
 		float fNormal = currentContact->normalForce.length();
 
@@ -435,7 +434,7 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 
 		Vector3 thetarn = q_i_n*currentContact->thetar; // rolling angle
 
-		Vector3 mElastic = kr * thetarn;
+		Vector3 mElastic = currentContact->kr * thetarn;
 
 		//mElastic[0] = 0;  // No moment around normal direction
 
@@ -452,12 +451,12 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 		//	Vector3 mPlastic = normMPlastic*mElastic.normalized();
 		//	moments[id1]	-= q_n_i*mPlastic;
 		//	moments[id2]	+= q_n_i*mPlastic;
-		//	thetarn = mPlastic/kr;
+		//	thetarn = mPlastic/currentContact->kr;
 		//	currentContact->thetar = q_n_i*thetarn;
 		//}
 
-		currentContact->prevRotation1 = currentContact->currentRotation1;
-		currentContact->prevRotation2 = currentContact->currentRotation2;
+		currentContact->prevRotation1 = de1->se3.rotation;//currentContact->currentRotation1;
+		currentContact->prevRotation2 = de2->se3.rotation;//currentContact->currentRotation2;
 
 ////////////////////////////////////////////////////////////
 /// Moment law	END				 	 ///
@@ -554,25 +553,10 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 
 		Vector3 f = currentContact->normalForce + currentContact->shearForce;
 
-		/*float dBeta = currentContact->prevNormal.dot(currentContact->normal);
-		float dTheta1 = de1->angularVelocity.length()*dt;
-		float dTheta2 = de2->angularVelocity.length()*dt;
-		float da = currentContact->radius1*(dTheta1-dBeta);
-		float db = currentContact->radius2*(dTheta2-dBeta);
-		float dUr = (da-db)*0.5;
-		float dUs = (da+db)*0.5;
-		float r = (currentContact->radius1+currentContact->radius2)*0.5;
-		float dThetar = dUr/r;
-		float kr1 = currentContact->ks*currentContact->radius1*currentContact->radius1;
-		float kr2 = currentContact->ks*currentContact->radius2*currentContact->radius2;
-		float cr1 = kr1/1000;
-		float cr2 = kr2/1000;
-		float thetar = dThetar*dt;*/
-
 		forces[id1]	-= f;
 		forces[id2]	+= f;
-		moments[id1]	-= c1x.cross(f)/**(-kr1*thetar-cr1*dThetar)*/;
-		moments[id2]	+= c2x.cross(f)/**(-kr2*thetar-cr2*dThetar)*/;
+		moments[id1]	-= c1x.cross(f);
+		moments[id2]	+= c2x.cross(f);
 
 		currentContact->prevNormal = currentContact->normal;
 	}
