@@ -124,6 +124,7 @@ void SDECImport::generate()
 	shared_ptr<Body> body;
 	Vector3r		center,halfSize;
 	Vector3r translation;
+	shared_ptr<BallisticDynamicEngine> ballistic;
 
 	if(importFilename.size() != 0 && filesystem::exists(importFilename) )
 	{
@@ -162,7 +163,7 @@ void SDECImport::generate()
 			translation *= scale;
 			radius *= scale;
 
-			shared_ptr<BallisticDynamicEngine> ballistic(new BallisticDynamicEngine);
+			ballistic= shared_ptr<BallisticDynamicEngine>(new BallisticDynamicEngine);
 			ballistic->damping 	= 1.0;
 			s->actors.push_back(ballistic);
 	
@@ -195,8 +196,8 @@ void SDECImport::generate()
 		}
 	}
 	
-	cout << "lower: " << lowerCorner[0] << " "<< lowerCorner[1] << " "<< lowerCorner[2] << endl;
-	cout << "upper: " << upperCorner[0] << " "<< upperCorner[1] << " "<< upperCorner[2] << endl;
+	cerr << "lower: " << lowerCorner[0] << " "<< lowerCorner[1] << " "<< lowerCorner[2] << endl;
+	cerr << "upper: " << upperCorner[0] << " "<< upperCorner[1] << " "<< upperCorner[2] << endl;
 
 	
 ///////////////////////////////////////////////////////////////////////////////
@@ -219,7 +220,7 @@ void SDECImport::generate()
 	sdec->isDynamic		= false;					// is not moving
 	sdec->angularVelocity	= Vector3r(0,0,0);				// has no angular velocity
 	sdec->velocity		= Vector3r(0,0,0);				// has no velocity
-	sdec->mass		= 0;						// is not moving, so it's mass is zero
+	sdec->mass		= 1;						// mass
 	sdec->inertia		= Vector3r(0,0,0);				// is not moving, so it's inertia is zero
 	sdec->se3		= Se3r(center,q);				// position, rotation
 	aabb->color		= Vector3r(1,0,0);				// AABB is red
@@ -233,6 +234,12 @@ void SDECImport::generate()
 	sdec->gm		= dynamic_pointer_cast<CollisionGeometry>(box);
 	sdec->kn		= kn_Box;					// kn
 	sdec->ks		= ks_Box;					// ks
+	
+	ballistic= shared_ptr<BallisticDynamicEngine>(new BallisticDynamicEngine);
+	ballistic->damping 	= 1.0;
+	ballistic->recordForces = true; // FIXME - hack for recording forces
+	sdec->actors.push_back(ballistic);
+	
 	body = dynamic_pointer_cast<Body>(sdec);
 	if(wall_bottom)
 		rootBody->bodies->insert(body);
@@ -257,7 +264,7 @@ void SDECImport::generate()
 	sdec->isDynamic		= false;					// is not moving
 	sdec->angularVelocity	= Vector3r(0,0,0);				// has no angular velocity
 	sdec->velocity		= Vector3r(0,0,0);				// has no velocity
-	sdec->mass		= 0;						// is not moving, so it's mass is zero
+	sdec->mass		= 0;						// mass
 	sdec->inertia		= Vector3r(0,0,0);				// is not moving, so it's inertia is zero
 	sdec->se3		= Se3r(center,q);				// position, rotation
 	aabb->color		= Vector3r(1,0,0);				// AABB is red
@@ -295,7 +302,7 @@ void SDECImport::generate()
 	sdec->isDynamic		= false;					// is not moving
 	sdec->angularVelocity	= Vector3r(0,0,0);				// has no angular velocity
 	sdec->velocity		= Vector3r(0,0,0);				// has no velocity
-	sdec->mass		= 0;						// is not moving, so it's mass is zero
+	sdec->mass		= 0;						// mass
 	sdec->inertia		= Vector3r(0,0,0);				// is not moving, so it's inertia is zero
 	sdec->se3		= Se3r(center,q);				// position, rotation
 	aabb->color		= Vector3r(1,0,0);				// AABB is red
@@ -333,7 +340,7 @@ void SDECImport::generate()
 	sdec->isDynamic		= false;					// is not moving
 	sdec->angularVelocity	= Vector3r(0,0,0);				// has no angular velocity
 	sdec->velocity		= Vector3r(0,0,0);				// has no velocity
-	sdec->mass		= 0;						// is not moving, so it's mass is zero
+	sdec->mass		= 0;						// mass
 	sdec->inertia		= Vector3r(0,0,0);				// is not moving, so it's inertia is zero
 	sdec->se3		= Se3r(center,q);				// position, rotation
 	aabb->color		= Vector3r(1,0,0);				// AABB is red
@@ -371,7 +378,7 @@ void SDECImport::generate()
 	sdec->isDynamic		= false;					// is not moving
 	sdec->angularVelocity	= Vector3r(0,0,0);				// has no angular velocity
 	sdec->velocity		= Vector3r(0,0,0);				// has no velocity
-	sdec->mass		= 0;						// is not moving, so it's mass is zero
+	sdec->mass		= 0;						// mass
 	sdec->inertia		= Vector3r(0,0,0);				// is not moving, so it's inertia is zero
 	sdec->se3		= Se3r(center,q);				// position, rotation
 	aabb->color		= Vector3r(1,0,0);				// AABB is red
@@ -409,7 +416,7 @@ void SDECImport::generate()
 	sdec->isDynamic		= false;					// is not moving
 	sdec->angularVelocity	= Vector3r(0,0,0);				// has no angular velocity
 	sdec->velocity		= Vector3r(0,0,0);				// has no velocity
-	sdec->mass		= 0;						// is not moving, so it's mass is zero
+	sdec->mass		= 0;						// mass
 	sdec->inertia		= Vector3r(0,0,0);				// is not moving, so it's inertia is zero
 	sdec->se3		= Se3r(center,q);				// position, rotation
 	aabb->color		= Vector3r(1,0,0);				// AABB is red
