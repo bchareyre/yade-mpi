@@ -13,6 +13,9 @@ class SDECLinkedSpheres : public FileGenerator
 	private	: float maxRadius;
 	private	: float disorder;
 	private	: float spacing;
+	private	: float supportSize;
+	private	: bool support1;
+	private	: bool support2;
 	// construction
 	public : SDECLinkedSpheres ();
 	public : ~SDECLinkedSpheres ();

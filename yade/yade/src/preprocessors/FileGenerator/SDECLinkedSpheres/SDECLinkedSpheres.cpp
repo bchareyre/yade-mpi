@@ -17,13 +17,16 @@
 
 SDECLinkedSpheres::SDECLinkedSpheres () : FileGenerator()
 {
-	nbSpheresX = 3;
-	nbSpheresY = 4;
-	nbSpheresZ = 7;
+	nbSpheresX = 2;
+	nbSpheresY = 2;
+	nbSpheresZ = 20;
 	minRadius = 5.01;
 	maxRadius = 5.01;
 	disorder = 0;
 	spacing = 10;
+	supportSize = 0.5;
+	support1 = 1;
+	support2 = 1;
 }
 
 SDECLinkedSpheres::~SDECLinkedSpheres ()
@@ -44,6 +47,9 @@ void SDECLinkedSpheres::registerAttributes()
 	REGISTER_ATTRIBUTE(maxRadius);
 	REGISTER_ATTRIBUTE(disorder);
 	REGISTER_ATTRIBUTE(spacing);
+	REGISTER_ATTRIBUTE(supportSize);
+	REGISTER_ATTRIBUTE(support1);
+	REGISTER_ATTRIBUTE(support2);
 }
 
 void SDECLinkedSpheres::generate()
@@ -105,7 +111,7 @@ void SDECLinkedSpheres::generate()
 	b = dynamic_pointer_cast<Body>(box1);
 	rootBody->bodies->insert(b);
 	
-/* FIXME : MOMENT LAW is completely not working!!!!!!!
+// FIXME : MOMENT LAW is completely not working!!!!!!!
 
 /////////////////////////////////////
 	
@@ -118,9 +124,9 @@ void SDECLinkedSpheres::generate()
 	box2->velocity		= Vector3r(0,0,0);
 	box2->mass		= 0;
 	box2->inertia		= Vector3r(0,0,0);
-	box2->se3		= Se3r(Vector3r(0,0,40),q);
+	box2->se3		= Se3r(Vector3r(0,0,((float)(nbSpheresZ)/2.0-supportSize+1.5)*spacing),q);
 	aabb->color		= Vector3r(1,0,0);
-	aabb->center		= Vector3r(0,0,40);
+	aabb->center		= Vector3r(0,0,((float)(nbSpheresZ)/2.0-supportSize+1.5)*spacing);
 	aabb->halfSize		= Vector3r(20,50,20); 		// FIXME - this must be automatically computed
 	box2->bv		= dynamic_pointer_cast<BoundingVolume>(aabb);
 	box->extents		= Vector3r(20,50,20);
@@ -134,7 +140,8 @@ void SDECLinkedSpheres::generate()
 	box2->ks		= 10000;
 	shared_ptr<Body> b2;
 	b2 = dynamic_pointer_cast<Body>(box2);
-	rootBody->bodies->insert(b2);
+	if(support1)
+		rootBody->bodies->insert(b2);
 
 /////////////////////////////////////
 
@@ -147,9 +154,9 @@ void SDECLinkedSpheres::generate()
 	box3->velocity		= Vector3r(0,0,0);
 	box3->mass		= 0;
 	box3->inertia		= Vector3r(0,0,0);
-	box3->se3		= Se3r(Vector3r(0,0,-40),q);
+	box3->se3		= Se3r(Vector3r(0,0,-((float)(nbSpheresZ)/2.0-supportSize+2.5)*spacing),q);
 	aabb->color		= Vector3r(1,0,0);
-	aabb->center		= Vector3r(0,0,-40);
+	aabb->center		= Vector3r(0,0,-((float)(nbSpheresZ)/2.0-supportSize+2.5)*spacing);
 	aabb->halfSize		= Vector3r(20,50,20); 		// FIXME - this must be automatically computed
 	box3->bv		= dynamic_pointer_cast<BoundingVolume>(aabb);
 	box->extents		= Vector3r(20,50,20);
@@ -163,10 +170,11 @@ void SDECLinkedSpheres::generate()
 	box3->ks		= 10000;
 	shared_ptr<Body> b3;
 	b3 = dynamic_pointer_cast<Body>(box3);
-	rootBody->bodies->insert(b3);
+	if(support2)
+		rootBody->bodies->insert(b3);
 
 /////////////////////////////////////
-*/
+
 	Vector3r translation;
 
 	for(int i=0;i<nbSpheresX;i++)
