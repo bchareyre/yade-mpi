@@ -16,7 +16,6 @@ HEADERS += Body.hpp \
            ConnexBody.hpp \
            DynamicEngine.hpp \
            DynLibManager.hpp \
-           ExceptionMessages.hpp \
            GeometricalModelFactory.hpp \
            GeometricalModel.hpp \
            IOManager.hpp \
@@ -35,7 +34,8 @@ HEADERS += Body.hpp \
            Interaction.hpp \
            Contact.hpp \
            FrontEnd.hpp \
-           FactoryExceptions.hpp 
+           FactoryExceptions.hpp \
+           IOManagerExceptions.hpp 
 SOURCES += Body.cpp \
            BoundingVolume.cpp \
            BoundingVolumeFactory.cpp \
@@ -49,7 +49,6 @@ SOURCES += Body.cpp \
            ConnexBody.cpp \
            DynamicEngine.cpp \
            DynLibManager.cpp \
-           ExceptionMessages.cpp \
            GeometricalModel.cpp \
            GeometricalModelFactory.cpp \
            IOManager.cpp \
@@ -64,7 +63,8 @@ SOURCES += Body.cpp \
            Interaction.cpp \
            Contact.cpp \
            FrontEnd.cpp \
-           FactoryExceptions.cpp 
+           FactoryExceptions.cpp \
+           IOManagerExceptions.cpp 
 LIBS += -lM3D \
 -lConstants \
 -lSerialization \
