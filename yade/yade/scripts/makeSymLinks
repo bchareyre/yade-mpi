@@ -23,3 +23,6 @@ symlinks -rcs ./
 symlinks -rcs ./
 
 rm ./makeSymLink
+
+ln -s ../../../bin $(YADEPATH)/yade/projects/kdevelop/bin
+ 

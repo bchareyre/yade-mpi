@@ -14,15 +14,15 @@ class SDECContactModel : public InteractionGeometry
 	public : Real penetrationDepth;
 	public : Vector3r contactPoint;	
 	
-	public : Real kn;				// normal elastic constant.
-	public : Real ks;				// shear elastic constant.
-	public : Real initialKn;			// initial normal elastic constant.
-	public : Real initialKs;			// initial shear elastic constant.
-	public : Real equilibriumDistance;		// equilibrium distance
-	public : Real initialEquilibriumDistance;	// initial equilibrium distance
-	public : Vector3r prevNormal;			// unit normal of the contact plane.
-	public : Vector3r normalForce;			// normal force applied on a DE
-	public : Vector3r shearForce;			// shear force applied on a DE
+// 	public : Real kn;				// normal elastic constant.
+// 	public : Real ks;				// shear elastic constant.
+// 	public : Real initialKn;			// initial normal elastic constant.
+// 	public : Real initialKs;			// initial shear elastic constant.
+// 	public : Real equilibriumDistance;		// equilibrium distance
+// 	public : Real initialEquilibriumDistance;	// initial equilibrium distance
+// 	public : Vector3r prevNormal;			// unit normal of the contact plane.
+// 	public : Vector3r normalForce;			// normal force applied on a DE
+// 	public : Vector3r shearForce;			// shear force applied on a DE
 
 	// construction
 	public : SDECContactModel ();

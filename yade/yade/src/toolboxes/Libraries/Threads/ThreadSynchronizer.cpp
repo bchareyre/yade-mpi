@@ -56,7 +56,8 @@ void ThreadSynchronizer::removeThread(int id)
 	ids.erase(id);
 	currentId = ids.begin();
 	if (id==maxId)
-		maxId--;	
+		maxId--;
+	signal();	
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -15,34 +15,34 @@ class SDECPermanentLink : public InteractionGeometry
 	//public : Real penetrationDepth;
 	//public : Vector3r contactPoint;
 
-	public : Real kn;				// normal elastic constant.
-	public : Real ks;				// shear elastic constant.
-
-	public : Real knMax;
-	public : Real ksMax;
-
-	public : Real initialKn;			// initial normal elastic constant.
-	public : Real initialKs;			// initial shear elastic constant.
-	public : Real equilibriumDistance;		// equilibrium distance
-	public : Real initialEquilibriumDistance;	// initial equilibrium distance
-	public : Vector3r prevNormal;			// unit normal of the contact plane.
-	public : Vector3r normalForce;			// normal force applied on a DE
-	public : Vector3r shearForce;			// shear force applied on a DE
+// 	public : Real kn;				// normal elastic constant.
+// 	public : Real ks;				// shear elastic constant.
+// 
+// 	public : Real knMax;
+// 	public : Real ksMax;
+// 
+// 	public : Real initialKn;			// initial normal elastic constant.
+// 	public : Real initialKs;			// initial shear elastic constant.
+// 	public : Real equilibriumDistance;		// equilibrium distance
+// 	public : Real initialEquilibriumDistance;	// initial equilibrium distance
+// 	public : Vector3r prevNormal;			// unit normal of the contact plane.
+// 	public : Vector3r normalForce;			// normal force applied on a DE
+// 	public : Vector3r shearForce;			// shear force applied on a DE
 
 	
 /////////////////////////////////////////////////////// FIXME : this goes to another dynlib - MDEM
-	//public : Vector3r initRotation1;
-	//public : Vector3r initRotation2;
-
-	public : Quaternionr prevRotation1;
-	//public : Quaternionr currentRotation1;
-	public : Quaternionr prevRotation2;
-	//public : Quaternionr currentRotation2;
-	
-	public : Vector3r thetar;
-	public : Real heta;
-	public : Real averageRadius;
-	public : Real kr;
+//	//public : Vector3r initRotation1;
+//	//public : Vector3r initRotation2;
+//
+//	public : Quaternionr prevRotation1;
+//	//public : Quaternionr currentRotation1;
+//	public : Quaternionr prevRotation2;
+//	//public : Quaternionr currentRotation2;
+//	
+//	public : Vector3r thetar;
+//	public : Real heta;
+//	public : Real averageRadius;
+//	public : Real kr;
 ////////////////////////////////////////////////////////
 
 	// construction

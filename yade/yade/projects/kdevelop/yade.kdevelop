@@ -9,20 +9,12 @@
     <keywords>
       <keyword>Qt</keyword>
     </keywords>
-    <ignoreparts>
-      <part>KDevClearCase</part>
-      <part>KDevcopyto</part>
-      <part>KDevCTags</part>
-      <part>CvsService</part>
-      <part>KDevFileGroups</part>
-      <part>KDevdistpart</part>
-      <part>KDevPerforce</part>
-      <part>KDevsubversion</part>
-    </ignoreparts>
+    <ignoreparts/>
     <projectdirectory>.</projectdirectory>
     <absoluteprojectpath>false</absoluteprojectpath>
     <description/>
     <secondaryLanguages/>
+    <versioncontrol/>
   </general>
   <kdevfileview>
     <groups>
@@ -30,6 +22,8 @@
       <group pattern="*.ui" name="User Interface" />
       <group pattern="*.png" name="Icons" />
       <group pattern="*" name="Others" />
+      <hidenonprojectfiles>false</hidenonprojectfiles>
+      <hidenonlocation>false</hidenonlocation>
     </groups>
     <tree>
       <hidepatterns>*.o,*.lo,CVS</hidepatterns>
@@ -78,7 +72,7 @@
   <kdevdebugger>
     <general>
       <dbgshell/>
-      <programargs/>
+      <programargs>-i QtGUI</programargs>
       <gdbpath/>
       <configGdbScript/>
       <runShellScript/>
@@ -95,8 +89,8 @@
   </kdevdebugger>
   <kdevtrollproject>
     <run>
-      <mainprogram>bin/yade</mainprogram>
-      <programargs/>
+      <mainprogram>../../../bin/yade</mainprogram>
+      <programargs>-i QtGUI</programargs>
       <directoryradio>executable</directoryradio>
       <customdirectory>/</customdirectory>
       <terminal>false</terminal>
@@ -104,7 +98,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>plugins/InteractionPhysics</activedir>
+      <activedir>plugins/BoundingVolumeFactory/CollisionGeometrySet2AABBFactory</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>
@@ -157,6 +151,14 @@
       <argumentsHintDelay>400</argumentsHintDelay>
       <headerCompletionDelay>250</headerCompletionDelay>
     </codecompletion>
+    <creategettersetter>
+      <prefixGet/>
+      <prefixSet>set</prefixSet>
+      <prefixVariable>m_,_</prefixVariable>
+      <parameterName>theValue</parameterName>
+      <inlineGet>true</inlineGet>
+      <inlineSet>true</inlineSet>
+    </creategettersetter>
   </kdevcppsupport>
   <cppsupportpart>
     <filetemplates>

@@ -13,6 +13,7 @@
 #include "SDECDynamicEngine.hpp"
 #include "SDECDiscreteElement.hpp"
 #include "SDECPermanentLink.hpp"
+#include "SDECPermanentLinkPhysics.hpp"
 #include "Interaction.hpp"
 #include "CollisionGeometrySet.hpp"
 #include "CollisionGeometrySet2AABBFactory.hpp"
@@ -257,18 +258,21 @@ string SDECLinkedSpheres::generate()
 
 			{
 				shared_ptr<Interaction> 	c(new Interaction( a->getId() , b->getId() ));
-				shared_ptr<SDECPermanentLink>	link(new SDECPermanentLink);
+				shared_ptr<SDECPermanentLink>	geometry(new SDECPermanentLink);
+				shared_ptr<SDECPermanentLinkPhysics>	physics(new SDECPermanentLinkPhysics);
+				
+				geometry->radius1			= as->radius - fabs(as->radius - bs->radius)*0.5;
+				geometry->radius2			= bs->radius - fabs(as->radius - bs->radius)*0.5;
 
-				link->initialKn			= 500000;
-				link->initialKs			= 50000;
-				link->heta			= 1;
-				link->initialEquilibriumDistance= (a->se3.translation - b->se3.translation).length();
-				link->radius1			= as->radius - fabs(as->radius - bs->radius)*0.5;
-				link->radius2			= bs->radius - fabs(as->radius - bs->radius)*0.5;
-				link->knMax			= 75000;
-				link->ksMax			= 7500;
+				physics->initialKn			= 500000;
+				physics->initialKs			= 50000;
+				physics->heta			= 1;
+				physics->initialEquilibriumDistance= (a->se3.translation - b->se3.translation).length();
+				physics->knMax			= 75000;
+				physics->ksMax			= 7500;
 
-				c->interactionGeometry = link;
+				c->interactionGeometry = geometry;
+				c->interactionPhysics = physics;
 				c->isReal = true;
 				c->isNew = false;
 				rootBody->permanentInteractions->insert(c);

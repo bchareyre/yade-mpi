@@ -29,6 +29,8 @@
 #include "SDECDiscreteElement.hpp"
 #include "SDECContactModel.hpp"
 #include "SDECPermanentLink.hpp"
+#include "SDECContactPhysics.hpp"
+#include "SDECPermanentLinkPhysics.hpp"
 #include "Omega.hpp"
 #include "NonConnexBody.hpp"
 
@@ -121,19 +123,20 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 
 		shared_ptr<SDECDiscreteElement> de1		= dynamic_pointer_cast<SDECDiscreteElement>((*bodies)[id1]);
 		shared_ptr<SDECDiscreteElement> de2 		= dynamic_pointer_cast<SDECDiscreteElement>((*bodies)[id2]);
-		shared_ptr<SDECPermanentLink> currentContact	= dynamic_pointer_cast<SDECPermanentLink>(contact2->interactionGeometry);
+		shared_ptr<SDECPermanentLinkPhysics> currentContactPhysics	= dynamic_pointer_cast<SDECPermanentLinkPhysics>(contact2->interactionPhysics);
+		shared_ptr<SDECPermanentLink> currentContactGeometry	= dynamic_pointer_cast<SDECPermanentLink>(contact2->interactionGeometry);
 
 		/// FIXME : put these lines into another dynlib
-		currentContact->kn 			= currentContact->initialKn;
-		currentContact->ks 			= currentContact->initialKs;
-		currentContact->equilibriumDistance 	= currentContact->initialEquilibriumDistance;
-		currentContact->normal 			= (de2->se3.translation-de1->se3.translation);
-		currentContact->normal.normalize();
-		Real un 				= currentContact->equilibriumDistance-(de2->se3.translation-de1->se3.translation).length();
-		currentContact->normalForce		= currentContact->kn*un*currentContact->normal;
+		currentContactPhysics->kn 			= currentContactPhysics->initialKn;
+		currentContactPhysics->ks 			= currentContactPhysics->initialKs;
+		currentContactPhysics->equilibriumDistance 	= currentContactPhysics->initialEquilibriumDistance;
+		currentContactGeometry->normal 			= (de2->se3.translation-de1->se3.translation);
+		currentContactGeometry->normal.normalize();
+		Real un 				= currentContactPhysics->equilibriumDistance-(de2->se3.translation-de1->se3.translation).length();
+		currentContactPhysics->normalForce		= currentContactPhysics->kn*un*currentContactGeometry->normal;
 
 		if (first)
-			currentContact->prevNormal = currentContact->normal;
+			currentContactPhysics->prevNormal = currentContactGeometry->normal;
 
 		Vector3r axis;
 		Real angle;
@@ -142,11 +145,11 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 /// Here is the code with approximated rotations 	 ///
 ////////////////////////////////////////////////////////////
 
-		axis = currentContact->prevNormal.cross(currentContact->normal);
-		currentContact->shearForce     -= currentContact->shearForce.cross(axis);
-		angle	 			= dt*0.5*currentContact->normal.dot(de1->angularVelocity+de2->angularVelocity);
-		axis 				= angle*currentContact->normal;
-		currentContact->shearForce     -= currentContact->shearForce.cross(axis);
+		axis = currentContactPhysics->prevNormal.cross(currentContactGeometry->normal);
+		currentContactPhysics->shearForce     -= currentContactPhysics->shearForce.cross(axis);
+		angle	 			= dt*0.5*currentContactGeometry->normal.dot(de1->angularVelocity+de2->angularVelocity);
+		axis 				= angle*currentContactGeometry->normal;
+		currentContactPhysics->shearForce     -= currentContactPhysics->shearForce.cross(axis);
 
 
 ////////////////////////////////////////////////////////////
@@ -155,33 +158,33 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 
 // 		Quaternionr q;
 //
-// 		axis				= currentContact->prevNormal.cross(currentContact->normal);
-// 		angle				= acos(currentContact->normal.dot(currentContact->prevNormal));
+// 		axis				= currentContactPhysics->prevNormal.cross(currentContactGeometry->normal);
+// 		angle				= acos(currentContactGeometry->normal.dot(currentContactPhysics->prevNormal));
 // 		q.fromAngleAxis(angle,axis);
 //
-// 		currentContact->shearForce	= q*currentContact->shearForce;
+// 		currentContactPhysics->shearForce	= q*currentContactPhysics->shearForce;
 //
-// 		angle				= dt*0.5*currentContact->normal.dot(de1->angularVelocity+de2->angularVelocity);
-// 		axis				= currentContact->normal;
+// 		angle				= dt*0.5*currentContactGeometry->normal.dot(de1->angularVelocity+de2->angularVelocity);
+// 		axis				= currentContactGeometry->normal;
 // 		q.fromAngleAxis(angle,axis);
-// 		currentContact->shearForce	= q*currentContact->shearForce;
+// 		currentContactPhysics->shearForce	= q*currentContactPhysics->shearForce;
 
 ////////////////////////////////////////////////////////////
 /// 							 ///
 ////////////////////////////////////////////////////////////
 
-		Vector3r x	= de1->se3.translation+(currentContact->radius1-0.5*un)*currentContact->normal;
+		Vector3r x	= de1->se3.translation+(currentContactGeometry->radius1-0.5*un)*currentContactGeometry->normal;
 		//Vector3r x	= (de1->se3.translation+de2->se3.translation)*0.5;
 		//cout << currentContact->contactPoint << " || " << (de1->se3.translation+de2->se3.translation)*0.5 << endl;
 		Vector3r c1x	= (x - de1->se3.translation);
 		Vector3r c2x	= (x - de2->se3.translation);
 
 		Vector3r relativeVelocity 	= (de2->velocity+de2->angularVelocity.cross(c2x)) - (de1->velocity+de1->angularVelocity.cross(c1x));
-		Vector3r shearVelocity		= relativeVelocity-currentContact->normal.dot(relativeVelocity)*currentContact->normal;
+		Vector3r shearVelocity		= relativeVelocity-currentContactGeometry->normal.dot(relativeVelocity)*currentContactGeometry->normal;
 		Vector3r shearDisplacement	= shearVelocity*dt;
-		currentContact->shearForce      -=  currentContact->ks*shearDisplacement;
+		currentContactPhysics->shearForce      -=  currentContactPhysics->ks*shearDisplacement;
 
-		Vector3r f = currentContact->normalForce + currentContact->shearForce;
+		Vector3r f = currentContactPhysics->normalForce + currentContactPhysics->shearForce;
 
 		forces[id1]	-= f;
 		forces[id2]	+= f;
@@ -197,15 +200,15 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 
 		if (first)
 		{
-			currentContact->prevRotation1 = de1->se3.rotation;
-			currentContact->prevRotation2 = de2->se3.rotation;
-			currentContact->averageRadius = (currentContact->radius1+currentContact->radius2)*0.5;
-			currentContact->kr = currentContact->ks * currentContact->averageRadius * currentContact->averageRadius;
+			currentContactPhysics->prevRotation1 = de1->se3.rotation;
+			currentContactPhysics->prevRotation2 = de2->se3.rotation;
+			currentContactPhysics->averageRadius = (currentContactGeometry->radius1+currentContactGeometry->radius2)*0.5;
+			currentContactPhysics->kr = currentContactPhysics->ks * currentContactPhysics->averageRadius * currentContactPhysics->averageRadius;
 		}
 
-		Vector3r n	= currentContact->normal;
-		Vector3r prevN	= currentContact->prevNormal;
-		Vector3r t1	= currentContact->shearForce;
+		Vector3r n	= currentContactGeometry->normal;
+		Vector3r prevN	= currentContactPhysics->prevNormal;
+		Vector3r t1	= currentContactPhysics->shearForce;
 		t1.normalize();
 		Vector3r t2	= n.unitCross(t1);
 
@@ -285,14 +288,14 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 // 		de1->se3.rotation.toEulerAngles(dRotationA);
 // 		de2->se3.rotation.toEulerAngles(dRotationB);
 //
-// 		currentContact->prevRotation1.toEulerAngles(da);
-// 		currentContact->prevRotation2.toEulerAngles(db);
+// 		currentContactPhysics->prevRotation1.toEulerAngles(da);
+// 		currentContactPhysics->prevRotation2.toEulerAngles(db);
 //
 // 		dRotationA -= da;
 // 		dRotationB -= db;
 //
-// 		Vector3r dUr = 	( currentContact->radius1*(  dRotationA  -  dBeta)
-// 				- currentContact->radius2*(  dRotationB  -  dBeta) ) * 0.5;
+// 		Vector3r dUr = 	( currentContactGeometry->radius1*(  dRotationA  -  dBeta)
+// 				- currentContactGeometry->radius2*(  dRotationB  -  dBeta) ) * 0.5;
 
 ////////////////////////////////////////////////////////////
 /// Ending of use of eurler angle		 	 ///
@@ -306,29 +309,29 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 		Vector3r dRotationAMinusDBeta,dRotationBMinusDBeta;
 
 		q.align(n,prevN);
-		q1 = (de1->se3.rotation*currentContact->prevRotation1.inverse())*q.inverse();
-		q2 = (de2->se3.rotation*currentContact->prevRotation2.inverse())*q.inverse();
+		q1 = (de1->se3.rotation*currentContactPhysics->prevRotation1.inverse())*q.inverse();
+		q2 = (de2->se3.rotation*currentContactPhysics->prevRotation2.inverse())*q.inverse();
 		q1.toEulerAngles(dRotationAMinusDBeta);
 		q2.toEulerAngles(dRotationBMinusDBeta);
-		Vector3r dUr = ( currentContact->radius1*dRotationAMinusDBeta - currentContact->radius2*dRotationBMinusDBeta ) * 0.5;
+		Vector3r dUr = ( currentContactGeometry->radius1*dRotationAMinusDBeta - currentContactGeometry->radius2*dRotationBMinusDBeta ) * 0.5;
 
 ////////////////////////////////////////////////////////////
 /// Ending of use of Quaternionr			 	 ///
 ////////////////////////////////////////////////////////////
 
 
-		Vector3r dThetar = dUr/currentContact->averageRadius;
+		Vector3r dThetar = dUr/currentContactPhysics->averageRadius;
 
-		currentContact->thetar += dThetar;
+		currentContactPhysics->thetar += dThetar;
 
 
-		Real fNormal = currentContact->normalForce.length();
+		Real fNormal = currentContactPhysics->normalForce.length();
 
-		Real normMPlastic = currentContact->heta*fNormal;
+		Real normMPlastic = currentContactPhysics->heta*fNormal;
 
-		Vector3r thetarn = q_i_n*currentContact->thetar; // rolling angle
+		Vector3r thetarn = q_i_n*currentContactPhysics->thetar; // rolling angle
 
-		Vector3r mElastic = currentContact->kr * thetarn;
+		Vector3r mElastic = currentContactPhysics->kr * thetarn;
 
 		//mElastic[0] = 0;  // No moment around normal direction
 
@@ -347,18 +350,18 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 		//	mPlastic *= normMPlastic;
 		//	moments[id1]	-= q_n_i*mPlastic;
 		//	moments[id2]	+= q_n_i*mPlastic;
-		//	thetarn = mPlastic/currentContact->kr;
-		//	currentContact->thetar = q_n_i*thetarn;
+		//	thetarn = mPlastic/currentContactPhysics->kr;
+		//	currentContactPhysics->thetar = q_n_i*thetarn;
 		//}
 
-		currentContact->prevRotation1 = de1->se3.rotation;
-		currentContact->prevRotation2 = de2->se3.rotation;
+		currentContactPhysics->prevRotation1 = de1->se3.rotation;
+		currentContactPhysics->prevRotation2 = de2->se3.rotation;
 
 ////////////////////////////////////////////////////////////
 /// Moment law	END				 	 ///
 ////////////////////////////////////////////////////////////
 
-		currentContact->prevNormal = currentContact->normal;
+		currentContactPhysics->prevNormal = currentContactGeometry->normal;
 	}
 
 	first = false;
@@ -383,25 +386,30 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 
 		shared_ptr<SDECDiscreteElement> de1 	= dynamic_pointer_cast<SDECDiscreteElement>((*bodies)[id1]);
 		shared_ptr<SDECDiscreteElement> de2 	= dynamic_pointer_cast<SDECDiscreteElement>((*bodies)[id2]);
-		shared_ptr<SDECContactModel> currentContact = dynamic_pointer_cast<SDECContactModel>(contact->interactionGeometry);
-
+		shared_ptr<SDECContactModel> currentContactGeometry = dynamic_pointer_cast<SDECContactModel>(contact->interactionGeometry);
+		shared_ptr<SDECContactPhysics> currentContactPhysics;
+		
 		if ( contact->isNew)
 		{
 			// FIXME : put these lines into a dynlib - PhysicalCollider
-			currentContact->initialKn			= 2*(de1->kn*de2->kn)/(de1->kn+de2->kn);
-			currentContact->initialKs			= 2*(de1->ks*de2->ks)/(de1->ks+de2->ks);
-			currentContact->prevNormal 			= currentContact->normal;
-			currentContact->shearForce			= Vector3r(0,0,0);
-			currentContact->initialEquilibriumDistance	= currentContact->radius1+currentContact->radius2;
+			contact->interactionPhysics = shared_ptr<SDECContactPhysics>(new SDECContactPhysics());
+			currentContactPhysics = dynamic_pointer_cast<SDECContactPhysics>(contact->interactionPhysics);
+			currentContactPhysics->initialKn			= 2*(de1->kn*de2->kn)/(de1->kn+de2->kn);
+			currentContactPhysics->initialKs			= 2*(de1->ks*de2->ks)/(de1->ks+de2->ks);
+			currentContactPhysics->prevNormal 			= currentContactGeometry->normal;
+			currentContactPhysics->shearForce			= Vector3r(0,0,0);
+			currentContactPhysics->initialEquilibriumDistance	= currentContactGeometry->radius1+currentContactGeometry->radius2;
 		}
+		else
+			currentContactPhysics = dynamic_pointer_cast<SDECContactPhysics>(contact->interactionPhysics);
 		
 		// FIXME : put these lines into another dynlib
-		currentContact->kn = currentContact->initialKn;
-		currentContact->ks = currentContact->initialKs;
-		currentContact->equilibriumDistance = currentContact->initialEquilibriumDistance;
+		currentContactPhysics->kn = currentContactPhysics->initialKn;
+		currentContactPhysics->ks = currentContactPhysics->initialKs;
+		currentContactPhysics->equilibriumDistance = currentContactPhysics->initialEquilibriumDistance;
 
-		Real un 			= currentContact->penetrationDepth;
-		currentContact->normalForce	= currentContact->kn*un*currentContact->normal;
+		Real un 			= currentContactGeometry->penetrationDepth;
+		currentContactPhysics->normalForce	= currentContactPhysics->kn*un*currentContactGeometry->normal;
 
 		Vector3r axis;
 		Real angle;
@@ -410,11 +418,11 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 /// Here is the code with approximated rotations 	 ///
 ////////////////////////////////////////////////////////////
 
-		axis	 			= currentContact->prevNormal.cross(currentContact->normal);
-		currentContact->shearForce     -= currentContact->shearForce.cross(axis);
-		angle 				= dt*0.5*currentContact->normal.dot(de1->angularVelocity+de2->angularVelocity);
-		axis 				= angle*currentContact->normal;
-		currentContact->shearForce     -= currentContact->shearForce.cross(axis);
+		axis	 			= currentContactPhysics->prevNormal.cross(currentContactGeometry->normal);
+		currentContactPhysics->shearForce     -= currentContactPhysics->shearForce.cross(axis);
+		angle 				= dt*0.5*currentContactGeometry->normal.dot(de1->angularVelocity+de2->angularVelocity);
+		axis 				= angle*currentContactGeometry->normal;
+		currentContactPhysics->shearForce     -= currentContactPhysics->shearForce.cross(axis);
 
 
 ////////////////////////////////////////////////////////////
@@ -423,38 +431,38 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 
 // 		Quaternionr q;
 //
-// 		axis				= currentContact->prevNormal.cross(currentContact->normal);
-// 		angle				= acos(currentContact->normal.dot(currentContact->prevNormal));
+// 		axis				= currentContactPhysics->prevNormal.cross(currentContactGeometry->normal);
+// 		angle				= acos(currentContactGeometry->normal.dot(currentContactPhysics->prevNormal));
 // 		q.fromAngleAxis(angle,axis);
 //
-// 		currentContact->shearForce	= currentContact->q*shearForce;
+// 		currentContactPhysics->shearForce	= currentContactPhysics->shearForce*q;
 //
-// 		angle				= dt*0.5*currentContact->normal.dot(de1->angularVelocity+de2->angularVelocity);
-// 		axis				= currentContact->normal;
+// 		angle				= dt*0.5*currentContactGeometry->normal.dot(de1->angularVelocity+de2->angularVelocity);
+// 		axis				= currentContactGeometry->normal;
 // 		q.fromAngleAxis(angle,axis);
-// 		currentContact->shearForce	= q*currentContact->shearForce;
+// 		currentContactPhysics->shearForce	= q*currentContactPhysics->shearForce;
 
 ////////////////////////////////////////////////////////////
 /// 							 ///
 ////////////////////////////////////////////////////////////
 
-		Vector3r x			= currentContact->contactPoint;
+		Vector3r x			= currentContactGeometry->contactPoint;
 		Vector3r c1x			= (x - de1->se3.translation);
 		Vector3r c2x			= (x - de2->se3.translation);
 		Vector3r relativeVelocity 	= (de2->velocity+de2->angularVelocity.cross(c2x)) - (de1->velocity+de1->angularVelocity.cross(c1x));
-		Vector3r shearVelocity		= relativeVelocity-currentContact->normal.dot(relativeVelocity)*currentContact->normal;
+		Vector3r shearVelocity		= relativeVelocity-currentContactGeometry->normal.dot(relativeVelocity)*currentContactGeometry->normal;
 		Vector3r shearDisplacement	= shearVelocity*dt;
-		currentContact->shearForce     -=  currentContact->ks*shearDisplacement;
+		currentContactPhysics->shearForce     -=  currentContactPhysics->ks*shearDisplacement;
 
-		Vector3r f = currentContact->normalForce + currentContact->shearForce;
+		Vector3r f = currentContactPhysics->normalForce + currentContactPhysics->shearForce;
 
 // THIS IS for plotting with gnuplot shearForce between sphere 1 and sphere 10
 // FIXME - we really need an easy way to obtain results like this one !!!! so don't delete those lines until we FIX that problem!!!
 //		if( (id1 == 1 || id2 == 1) && (id1 == 10 || id2 == 10) )
 // 		cout	<< Omega::instance().getCurrentIteration() << " "
-// 			<< lexical_cast<string>(-currentContact->shearForce[0]) << " "
-// 			<< lexical_cast<string>(currentContact->shearForce[1]) << " " 
-// 			<< lexical_cast<string>(currentContact->shearForce[2]) << endl;
+// 			<< lexical_cast<string>(-currentContactPhysics->shearForce[0]) << " "
+// 			<< lexical_cast<string>(currentContactPhysics->shearForce[1]) << " " 
+// 			<< lexical_cast<string>(currentContactPhysics->shearForce[2]) << endl;
 // 		else 
 // 			cout	<< Omega::instance().getCurrentIteration() << endl;
 // 		
@@ -464,7 +472,7 @@ void SDECDynamicEngine::respondToCollisions(Body* body)
 		moments[id1]	-= c1x.cross(f);
 		moments[id2]	+= c2x.cross(f);
 
-		currentContact->prevNormal = currentContact->normal;
+		currentContactPhysics->prevNormal = currentContactGeometry->normal;
 	}
 
 
