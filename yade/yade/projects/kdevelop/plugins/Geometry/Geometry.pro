@@ -9,9 +9,9 @@ OBJECTS_DIR = $(YADECOMPILATIONPATH)
 CONFIG += debug \
           warn_on 
 TEMPLATE = subdirs 
-SUBDIRS += GeometricalModel \
-           GeometricalModelFactory \
-           BoundingVolume \
-           BoundingVolumeFactory \
+SUBDIRS += BoundingVolume \
+           GeometricalModel \
            CollisionGeometry \
+           BoundingVolumeFactory \
+           GeometricalModelFactory \
            CollisionGeometryFactory 

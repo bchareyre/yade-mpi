@@ -9,7 +9,7 @@ OBJECTS_DIR = $(YADECOMPILATIONPATH)
 CONFIG += debug \
           warn_on 
 TEMPLATE = subdirs 
-SUBDIRS += KinematicEngine \
-           DynamicEngine \
-           Action \
-           ActionFunctor 
+SUBDIRS += Action \
+           ActionFunctor \
+           KinematicEngine \
+           DynamicEngine 

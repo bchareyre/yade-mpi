@@ -106,7 +106,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>plugins/Interaction/InteractionPhysicsFunctor/SDECLinearContactModel</activedir>
+      <activedir>plugins/Geometry</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>
