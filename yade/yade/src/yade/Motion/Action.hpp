@@ -41,8 +41,8 @@ class Action : public Serializable, public Indexable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 	// FIXME - correct usage of this class, so that functions add(), etc.. are actually used!
-	public : virtual void add(const shared_ptr<Action>& )	{throw;};
-	public : virtual void sub(const shared_ptr<Action>& )	{throw;};
+//	public : virtual void add(const shared_ptr<Action>& )	{throw;};
+//	public : virtual void sub(const shared_ptr<Action>& )	{throw;};
 	public : virtual void reset() 				{throw;};
 	public : virtual shared_ptr<Action> clone()		{throw;};
 	

@@ -54,7 +54,7 @@ class InteractionGeometryDispatcher :
 			InteractionGeometryFunctor,					// class that provides multivirtual call
 			bool ,								// return type
 			TYPELIST_5(
-					const shared_ptr<InteractionDescription>&	// arguments
+					  const shared_ptr<InteractionDescription>&	// arguments
 					, const shared_ptr<InteractionDescription>&
 					, const Se3r&
 					, const Se3r&

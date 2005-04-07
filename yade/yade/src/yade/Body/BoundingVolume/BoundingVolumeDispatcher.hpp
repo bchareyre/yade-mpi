@@ -44,7 +44,7 @@ class BoundingVolumeDispatcher :
 			BoundingVolumeFunctor,						// class that provides multivirtual call
 			void ,								// return type
 			TYPELIST_4(
-						const shared_ptr<InteractionDescription>&	// arguments
+					  const shared_ptr<InteractionDescription>&	// arguments
 					, shared_ptr<BoundingVolume>& // is not working when const, because functors are supposed to modify it!
 					, const Se3r&
 					, const Body* // with that - functors have all the data they may need, but it's const, so they can't modify it !
