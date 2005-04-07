@@ -22,5 +22,5 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
-HEADERS += ApplyActionMomentum2RigidBody.hpp 
-SOURCES += ApplyActionMomentum2RigidBody.cpp 
+HEADERS += NewtonsMomentumLaw.hpp 
+SOURCES += NewtonsMomentumLaw.cpp 

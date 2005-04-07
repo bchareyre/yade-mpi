@@ -104,8 +104,8 @@ string SDECSpheresPlane::generate()
 	actionDampingDispatcher->add("ActionMomentum","RigidBodyParameters","CundallNonViscousMomentumDamping",actionMomentumDamping);
 	
 	shared_ptr<ActionDispatcher> applyActionDispatcher(new ActionDispatcher);
-	applyActionDispatcher->add("ActionForce","RigidBodyParameters","ApplyActionForce2Particle");
-	applyActionDispatcher->add("ActionMomentum","RigidBodyParameters","ApplyActionMomentum2RigidBody");
+	applyActionDispatcher->add("ActionForce","RigidBodyParameters","NewtonsForceLaw");
+	applyActionDispatcher->add("ActionMomentum","RigidBodyParameters","NewtonsMomentumLaw");
 	
 	shared_ptr<ActionDispatcher> timeIntegratorDispatcher(new ActionDispatcher);
 	timeIntegratorDispatcher->add("ActionForce","ParticleParameters","LeapFrogForceIntegrator");

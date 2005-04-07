@@ -22,5 +22,5 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
-HEADERS += ApplyActionForce2Particle.hpp 
-SOURCES += ApplyActionForce2Particle.cpp 
+HEADERS += NewtonsForceLaw.hpp 
+SOURCES += NewtonsForceLaw.cpp 

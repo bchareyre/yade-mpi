@@ -15,7 +15,7 @@ void SimpleSpringLaw::registerAttributes()
 }
 
 
-void SimpleSpringLaw::respondToInteractions(Body * body)
+void SimpleSpringLaw::calculateForces(Body * body)
 {
 	//Real dt = Omega::instance().dt;
 

@@ -21,23 +21,22 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "ApplyActionForce2Particle.hpp"
-#include "ParticleParameters.hpp"
-#include "ActionForce.hpp"
+#include "NewtonsMomentumLaw.hpp"
+#include "RigidBodyParameters.hpp"
+#include "ActionMomentum.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void ApplyActionForce2Particle::go( 	  const shared_ptr<Action>& a
+void NewtonsMomentumLaw::go(   const shared_ptr<Action>& a
 					, const shared_ptr<BodyPhysicalParameters>& b
 					, const Body*)
 {
-	ActionForce * af = static_cast<ActionForce*>(a.get());
-	ParticleParameters * p = static_cast<ParticleParameters*>(b.get());
+	ActionMomentum * am = static_cast<ActionMomentum*>(a.get());
+	RigidBodyParameters * rb = static_cast<RigidBodyParameters*>(b.get());
 	
 	//FIXME : should be += and we should add an Actor that reset acceleration at the beginning
-	// if another Action also acts on acceleration then we are overwritting it here
-	p->acceleration = p->invMass*af->force;
+	rb->angularAcceleration = am->momentum.multDiag(rb->invInertia);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -57,7 +57,7 @@ void SDECLaw::registerAttributes()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 //FIXME : remove bool first !!!!!
-void SDECLaw::respondToInteractions(Body* body)
+void SDECLaw::calculateForces(Body* body)
 {
 	ComplexBody * ncb = dynamic_cast<ComplexBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;

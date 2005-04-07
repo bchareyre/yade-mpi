@@ -57,7 +57,7 @@ class SDECLaw : public ConstitutiveLaw
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public : SDECLaw();
-	public : void respondToInteractions(Body* body);
+	public : void calculateForces(Body* body);
 
 	public : void registerAttributes();
 	REGISTER_CLASS_NAME(SDECLaw);

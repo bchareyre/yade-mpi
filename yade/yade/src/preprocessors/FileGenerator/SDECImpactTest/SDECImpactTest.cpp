@@ -1,4 +1,4 @@
-#include "SDECImport.hpp"
+#include "SDECImpactTest.hpp"
 
 #include "Box.hpp"
 #include "AABB.hpp"
@@ -46,7 +46,7 @@
 using namespace boost;
 using namespace std;
 
-SDECImport::SDECImport () : FileGenerator()
+SDECImpactTest::SDECImpactTest () : FileGenerator()
 {
 	lowerCorner 		= Vector3r(1000,1000,1000);
 	upperCorner 		= Vector3r(-1000,-1000,-1000);
@@ -101,13 +101,13 @@ SDECImport::SDECImport () : FileGenerator()
 	boxFrictionDeg   = -18.0;
 }
 
-SDECImport::~SDECImport ()
+SDECImpactTest::~SDECImpactTest ()
 {
 
 }
 
 
-void SDECImport::registerAttributes()
+void SDECImpactTest::registerAttributes()
 {
 //	REGISTER_ATTRIBUTE(lowerCorner);
 //	REGISTER_ATTRIBUTE(upperCorner);
@@ -160,7 +160,7 @@ void SDECImport::registerAttributes()
 
 }
 
-string SDECImport::generate()
+string SDECImpactTest::generate()
 {
 	unsigned int startId=boost::numeric::bounds<unsigned int>::highest(), endId=0; // record forces from group 2
 	
@@ -324,7 +324,7 @@ string SDECImport::generate()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void SDECImport::createSphere(shared_ptr<Body>& body, Vector3r translation, Real radius, bool big, bool dynamic )
+void SDECImpactTest::createSphere(shared_ptr<Body>& body, Vector3r translation, Real radius, bool big, bool dynamic )
 {
 	body = shared_ptr<Body>(new SingleBody(0,2));
 	shared_ptr<SDECParameters> physics(new SDECParameters);
@@ -377,7 +377,7 @@ void SDECImport::createSphere(shared_ptr<Body>& body, Vector3r translation, Real
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void SDECImport::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents, bool wire)
+void SDECImpactTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents, bool wire)
 {
 	body = shared_ptr<Body>(new SingleBody(0,2));
 	shared_ptr<SDECParameters> physics(new SDECParameters);
@@ -426,7 +426,7 @@ void SDECImport::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r e
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void SDECImport::createActors(shared_ptr<ComplexBody>& rootBody)
+void SDECImpactTest::createActors(shared_ptr<ComplexBody>& rootBody)
 {
 // recording average positions
 	averagePositionRecorder = shared_ptr<AveragePositionRecorder>(new AveragePositionRecorder);
@@ -465,8 +465,8 @@ void SDECImport::createActors(shared_ptr<ComplexBody>& rootBody)
 	actionDampingDispatcher->add("ActionMomentum","RigidBodyParameters","CundallNonViscousMomentumDamping",actionMomentumDamping);
 	
 	shared_ptr<ActionDispatcher> applyActionDispatcher(new ActionDispatcher);
-	applyActionDispatcher->add("ActionForce","ParticleParameters","ApplyActionForce2Particle");
-	applyActionDispatcher->add("ActionMomentum","RigidBodyParameters","ApplyActionMomentum2RigidBody");
+	applyActionDispatcher->add("ActionForce","ParticleParameters","NewtonsForceLaw");
+	applyActionDispatcher->add("ActionMomentum","RigidBodyParameters","NewtonsMomentumLaw");
 	
 	shared_ptr<ActionDispatcher> timeIntegratorDispatcher(new ActionDispatcher);
 	timeIntegratorDispatcher->add("ActionForce","ParticleParameters","LeapFrogForceIntegrator");
@@ -502,7 +502,7 @@ void SDECImport::createActors(shared_ptr<ComplexBody>& rootBody)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void SDECImport::positionRootBody(shared_ptr<ComplexBody>& rootBody)
+void SDECImpactTest::positionRootBody(shared_ptr<ComplexBody>& rootBody)
 {
 	rootBody->isDynamic		= false;
 

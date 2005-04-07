@@ -61,7 +61,7 @@ class ErrorTolerantLaw : public ConstitutiveLaw
 	protected : virtual void postProcessAttributes(bool deserializing);
 	public : void registerAttributes();
 
-	public : void respondToInteractions(Body* body);
+	public : void calculateForces(Body* body);
 
 	private : void multA(	ublas::vector<float>& res		, 
 				ublas::sparse_matrix<float>& J		,

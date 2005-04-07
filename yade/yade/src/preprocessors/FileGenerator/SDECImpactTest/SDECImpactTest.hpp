@@ -8,7 +8,7 @@ class ForceRecorder;
 class AveragePositionRecorder;
 class VelocityRecorder;
 
-class SDECImport : public FileGenerator
+class SDECImpactTest : public FileGenerator
 {
 	private	: Vector3r lowerCorner;
 	private	: Vector3r upperCorner;
@@ -56,8 +56,8 @@ class SDECImport : public FileGenerator
 	private : shared_ptr<AveragePositionRecorder> averagePositionRecorder;
 	
 	// construction
-	public : SDECImport ();
-	public : ~SDECImport ();
+	public : SDECImpactTest ();
+	public : ~SDECImpactTest ();
 	
 	private : void createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents,bool wire);
 	private : void createSphere(shared_ptr<Body>& body, Vector3r translation, Real radius,bool big,bool dynamic);
@@ -65,12 +65,11 @@ class SDECImport : public FileGenerator
 	private : void positionRootBody(shared_ptr<ComplexBody>& rootBody);
 
 	public : void registerAttributes();
-
 	public : string generate();
 
-	REGISTER_CLASS_NAME(SDECImport);
+	REGISTER_CLASS_NAME(SDECImpactTest);
 };
 
-REGISTER_SERIALIZABLE(SDECImport,false);
+REGISTER_SERIALIZABLE(SDECImpactTest,false);
 
 #endif // __SDECIMPORT_H__

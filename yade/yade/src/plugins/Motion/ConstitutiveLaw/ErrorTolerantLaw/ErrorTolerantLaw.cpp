@@ -71,7 +71,7 @@ void ErrorTolerantLaw::registerAttributes()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-void ErrorTolerantLaw::respondToInteractions(Body* body)
+void ErrorTolerantLaw::calculateForces(Body* body)
 {
 
 	ComplexBody * ncb = dynamic_cast<ComplexBody*>(body);

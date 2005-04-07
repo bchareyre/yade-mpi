@@ -67,5 +67,5 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
-HEADERS += SDECImport.hpp 
-SOURCES += SDECImport.cpp 
+HEADERS += SDECImpactTest.hpp 
+SOURCES += SDECImpactTest.cpp 

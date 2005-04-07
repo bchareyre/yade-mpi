@@ -8,8 +8,9 @@ SUBDIRS += RotatingBox \
            FEMRock \
            BoxStack \
            SDECSpheresPlane \
-           SDECImport \
            SDECLinkedSpheres \
+           SDECImpactTest \
+	   SDECTriaxialTest \
            LatticeExample 
 MOC_DIR = $(YADECOMPILATIONPATH)
 UI_DIR = $(YADECOMPILATIONPATH)

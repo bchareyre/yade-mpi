@@ -26,7 +26,7 @@ void MassSpringBody2RigidBodyLaw::registerAttributes()
 }
 
 
-void MassSpringBody2RigidBodyLaw::respondToInteractions(Body * body)
+void MassSpringBody2RigidBodyLaw::calculateForces(Body * body)
 {
 	ComplexBody * mixedBody = dynamic_cast<ComplexBody*>(body);
 	shared_ptr<BodyContainer>& bodies = mixedBody->bodies;

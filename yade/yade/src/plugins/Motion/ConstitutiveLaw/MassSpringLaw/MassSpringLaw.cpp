@@ -18,7 +18,7 @@ void MassSpringLaw::registerAttributes()
 }
 
 
-void MassSpringLaw::respondToInteractions(Body * body)
+void MassSpringLaw::calculateForces(Body * body)
 {
 	ComplexBody * massSpring = dynamic_cast<ComplexBody*>(body);
 	shared_ptr<BodyContainer>& bodies = massSpring->bodies;

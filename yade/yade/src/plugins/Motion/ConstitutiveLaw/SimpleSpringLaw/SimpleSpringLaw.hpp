@@ -15,7 +15,7 @@ class SimpleSpringLaw : public ConstitutiveLaw
 	
 	public : void registerAttributes();
 
-	public : void respondToInteractions(Body* body);
+	public : void calculateForces(Body* body);
 	REGISTER_CLASS_NAME(SimpleSpringLaw);
 };
 
