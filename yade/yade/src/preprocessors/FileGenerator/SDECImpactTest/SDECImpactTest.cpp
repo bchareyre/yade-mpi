@@ -52,7 +52,7 @@ SDECImpactTest::SDECImpactTest () : FileGenerator()
 	upperCorner 		= Vector3r(-1000,-1000,-1000);
 	thickness 		= 0.01;
 	importFilename 		= "../data/small.sdec.xyz";
-	wall_top 		= false;
+	wall_top 		= true;
 	wall_bottom 		= true;
 	wall_1			= true;
 	wall_2			= true;
