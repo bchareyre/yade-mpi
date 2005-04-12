@@ -1,6 +1,6 @@
 #include "HangingCloth.hpp"
 
-#include "SingleBody.hpp"
+#include "SimpleBody.hpp"
 #include "Mesh2D.hpp"
 #include "Sphere.hpp"
 #include "RigidBodyParameters.hpp"
@@ -210,7 +210,7 @@ string HangingCloth::generate()
 	for(int i=0;i<width;i++)
 		for(int j=0;j<height;j++)
 		{
-			shared_ptr<Body> node(new SingleBody(0,1));
+			shared_ptr<Body> node(new SimpleBody(0,1));
 
 			node->isDynamic		= true;
 			
@@ -410,8 +410,8 @@ string HangingCloth::generate()
 
 shared_ptr<Interaction>& HangingCloth::createSpring(const shared_ptr<ComplexBody>& rootBody,int i,int j)
 {
-	SingleBody * b1 = static_cast<SingleBody*>((*(rootBody->bodies))[i].get());
-	SingleBody * b2 = static_cast<SingleBody*>((*(rootBody->bodies))[j].get());
+	SimpleBody * b1 = static_cast<SimpleBody*>((*(rootBody->bodies))[i].get());
+	SimpleBody * b2 = static_cast<SimpleBody*>((*(rootBody->bodies))[j].get());
 
 	spring = shared_ptr<Interaction>(new Interaction( b1->getId() , b2->getId() ));
 	shared_ptr<SpringGeometry>	geometry(new SpringGeometry);
@@ -437,7 +437,7 @@ shared_ptr<Interaction>& HangingCloth::createSpring(const shared_ptr<ComplexBody
 
 void HangingCloth::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 {
-	body = shared_ptr<Body>(new SingleBody(0,2));
+	body = shared_ptr<Body>(new SimpleBody(0,2));
 	shared_ptr<SDECParameters> physics(new SDECParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<Sphere> gSphere(new Sphere);
@@ -487,7 +487,7 @@ void HangingCloth::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 
 void HangingCloth::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents)
 {
-	body = shared_ptr<Body>(new SingleBody(0,2));
+	body = shared_ptr<Body>(new SimpleBody(0,2));
 	shared_ptr<SDECParameters> physics(new SDECParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<Box> gBox(new Box);

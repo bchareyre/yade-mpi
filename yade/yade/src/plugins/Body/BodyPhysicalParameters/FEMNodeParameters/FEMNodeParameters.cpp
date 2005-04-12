@@ -5,7 +5,7 @@
 // #include "AABB.hpp"
 // #include "Math.hpp"
 // 
-// FEMNodeParameters::FEMNodeParameters () : SingleBody()
+// FEMNodeParameters::FEMNodeParameters () : SimpleBody()
 // {
 // 	createIndex();
 // }
@@ -18,7 +18,7 @@
 // 
 // void FEMNodeParameters::postProcessAttributes(bool deserializing)
 // {
-// 	SingleBody::postProcessAttributes(deserializing);
+// 	SimpleBody::postProcessAttributes(deserializing);
 // 	
 // 	if(deserializing)
 // 	{
@@ -31,7 +31,7 @@
 // 
 // void FEMNodeParameters::registerAttributes()
 // {
-// 	SingleBody::registerAttributes();
+// 	SimpleBody::registerAttributes();
 // 	REGISTER_ATTRIBUTE(stiffness);
 // 	REGISTER_ATTRIBUTE(damping);
 // 	REGISTER_ATTRIBUTE(properties);

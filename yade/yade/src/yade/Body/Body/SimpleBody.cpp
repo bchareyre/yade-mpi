@@ -5,7 +5,7 @@
 #include <GL/gl.h>
 #include <GL/glut.h>
 
-#include "SingleBody.hpp"
+#include "SimpleBody.hpp"
 #include "Math.hpp"
 
 #include <iostream>

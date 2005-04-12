@@ -1,7 +1,7 @@
 #ifndef __CLOTH_H__
 #define __CLOTH_H__
 
-// #include "SingleBody.hpp"
+// #include "SimpleBody.hpp"
 // #include "Vector3.hpp"
 // #include "Matrix3.hpp"
 // 
@@ -25,7 +25,7 @@
 // 
 // REGISTER_SERIALIZABLE(NodeProperties,false);
 // 
-// class FEMNodeParameters : public SingleBody
+// class FEMNodeParameters : public SimpleBody
 // {
 // 	public : Real stiffness;
 // 	public : Real damping;
@@ -50,7 +50,7 @@
 // /// Indexable											///
 // ///////////////////////////////////////////////////////////////////////////////////////////////////
 // 
-// 	REGISTER_CLASS_INDEX(FEMNodeParameters,SingleBody);
+// 	REGISTER_CLASS_INDEX(FEMNodeParameters,SimpleBody);
 // 	
 // };
 // 

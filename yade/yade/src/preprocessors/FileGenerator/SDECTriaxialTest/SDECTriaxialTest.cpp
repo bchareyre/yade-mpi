@@ -23,7 +23,7 @@
 
 #include "SDECTriaxialTest.hpp"
 
-#include "SingleBody.hpp"
+#include "SimpleBody.hpp"
 #include "ComplexBody.hpp"
 
 #include "Box.hpp"
@@ -123,7 +123,7 @@ string SDECTriaxialTest::generate()
 
 void SDECTriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents, bool wire)
 {
-	body = shared_ptr<Body>(new SingleBody(0,2));
+	body = shared_ptr<Body>(new SimpleBody(0,2));
 	shared_ptr<SDECParameters> physics(new SDECParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<Box> gBox(new Box);
@@ -172,7 +172,7 @@ void SDECTriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, Vect
 
 void SDECTriaxialTest::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 {
-	body = shared_ptr<Body>(new SingleBody(0,1));
+	body = shared_ptr<Body>(new SimpleBody(0,1));
 	shared_ptr<SDECParameters> physics(new SDECParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<Sphere> gSphere(new Sphere);

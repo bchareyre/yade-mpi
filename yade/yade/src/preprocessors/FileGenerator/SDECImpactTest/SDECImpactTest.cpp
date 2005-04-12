@@ -27,7 +27,7 @@
 
 #include "InteractionGeometryDispatcher.hpp"
 #include "InteractionPhysicsDispatcher.hpp"
-#include "SingleBody.hpp"
+#include "SimpleBody.hpp"
 #include "InteractionBox.hpp"
 #include "InteractionSphere.hpp"
 #include "ActionDispatcher.hpp"
@@ -326,7 +326,7 @@ string SDECImpactTest::generate()
 
 void SDECImpactTest::createSphere(shared_ptr<Body>& body, Vector3r translation, Real radius, bool big, bool dynamic )
 {
-	body = shared_ptr<Body>(new SingleBody(0,2));
+	body = shared_ptr<Body>(new SimpleBody(0,2));
 	shared_ptr<SDECParameters> physics(new SDECParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<Sphere> gSphere(new Sphere);
@@ -379,7 +379,7 @@ void SDECImpactTest::createSphere(shared_ptr<Body>& body, Vector3r translation, 
 
 void SDECImpactTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents, bool wire)
 {
-	body = shared_ptr<Body>(new SingleBody(0,2));
+	body = shared_ptr<Body>(new SimpleBody(0,2));
 	shared_ptr<SDECParameters> physics(new SDECParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<Box> gBox(new Box);

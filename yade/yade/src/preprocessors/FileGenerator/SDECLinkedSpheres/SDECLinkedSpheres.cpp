@@ -27,7 +27,7 @@
 
 #include "InteractionGeometryDispatcher.hpp"
 #include "InteractionPhysicsDispatcher.hpp"
-#include "SingleBody.hpp"
+#include "SimpleBody.hpp"
 #include "InteractionBox.hpp"
 #include "InteractionSphere.hpp"
 #include "ActionDispatcher.hpp"
@@ -183,7 +183,7 @@ string SDECLinkedSpheres::generate()
 
 void SDECLinkedSpheres::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 {
-	body = shared_ptr<Body>(new SingleBody(0,55));
+	body = shared_ptr<Body>(new SimpleBody(0,55));
 	shared_ptr<SDECParameters> physics(new SDECParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<Sphere> gSphere(new Sphere);
@@ -233,7 +233,7 @@ void SDECLinkedSpheres::createSphere(shared_ptr<Body>& body, int i, int j, int k
 
 void SDECLinkedSpheres::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents)
 {
-	body = shared_ptr<Body>(new SingleBody(0,55));
+	body = shared_ptr<Body>(new SimpleBody(0,55));
 	shared_ptr<SDECParameters> physics(new SDECParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<Box> gBox(new Box);
