@@ -7,11 +7,11 @@ LIBS += -lMath \
         -lSerialization \
         -lFactory \
         -lInteraction \
-        -lBody \
         -lMultiMethods \
         -lErrorTolerantContactModel \
         -lRigidBodyParameters \
         -lEngine \
+        -lBody \
         -rdynamic 
 INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
@@ -21,10 +21,10 @@ QMAKE_LIBDIR = ../../../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
                ../../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../../../toolboxes/Libraries/Factory/$(YADEDYNLIBPATH) \
                ../../../../yade/Interaction/Interaction/$(YADEDYNLIBPATH) \
-               ../../../../yade/Body/Body/$(YADEDYNLIBPATH) \
                ../../../../toolboxes/Libraries/MultiMethods/$(YADEDYNLIBPATH) \
                ../../../../plugins/Interaction/InteractionGeometry/ErrorTolerantContactModel/$(YADEDYNLIBPATH) \
                ../../../../plugins/Body/BodyPhysicalParameters/RigidBodyParameters/$(YADEDYNLIBPATH) \
+               ../../../../yade/Engine/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

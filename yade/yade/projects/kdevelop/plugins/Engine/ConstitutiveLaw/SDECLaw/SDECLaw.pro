@@ -10,14 +10,14 @@ LIBS += -lSerialization \
         -lMultiMethods \
         -lSDECContactPhysics \
         -lSDECContactGeometry \
-        -lActionForce \
-        -lActionMomentum \
-        -lBody \
         -lSDECLinkGeometry \
         -lSDECLinkPhysics \
         -lSDECParameters \
         -lRigidBodyParameters \
         -lEngine \
+        -lActionParameterForce \
+        -lActionParameterMomentum \
+        -lBody \
         -rdynamic 
 INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
@@ -30,13 +30,11 @@ QMAKE_LIBDIR = ../../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../../../toolboxes/Libraries/MultiMethods/$(YADEDYNLIBPATH) \
                ../../../../plugins/Interaction/InteractionPhysics/SDECContactPhysics/$(YADEDYNLIBPATH) \
                ../../../../plugins/Interaction/InteractionGeometry/SDECContactGeometry/$(YADEDYNLIBPATH) \
-               ../../../../plugins/Engine/Action/ActionForce/$(YADEDYNLIBPATH) \
-               ../../../../plugins/Engine/Action/ActionMomentum/$(YADEDYNLIBPATH) \
-               ../../../../yade/Body/Body/$(YADEDYNLIBPATH) \
                ../../../../plugins/Interaction/InteractionGeometry/SDECLinkGeometry/$(YADEDYNLIBPATH) \
                ../../../../plugins/Interaction/InteractionPhysics/SDECLinkPhysics/$(YADEDYNLIBPATH) \
                ../../../../plugins/Body/BodyPhysicalParameters/SDECParameters/$(YADEDYNLIBPATH) \
                ../../../../plugins/Body/BodyPhysicalParameters/RigidBodyParameters/$(YADEDYNLIBPATH) \
+               ../../../../yade/Engine/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

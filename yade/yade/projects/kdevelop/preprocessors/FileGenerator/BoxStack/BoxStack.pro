@@ -8,20 +8,20 @@ LIBS += -lSerialization \
         -lSphere \
         -lAABB \
         -lMath \
-        -lBody \
         -lInteraction \
         -lMultiMethods \
         -lInteractionSphere \
         -lInteractionBox \
-        -lActionReset \
         -lInteractionDescriptionSet2AABBFunctor \
-        -lCundallNonViscousMomentumDamping \
-        -lCundallNonViscousForceDamping \
         -lSAPCollider \
         -lRigidBodyParameters \
         -lEngine \
-        -lSimpleSpringLaw \
         -lTranslator \
+        -lBody \
+        -lActionReset \
+        -lCundallNonViscousMomentumDampingFunctor \
+        -lCundallNonViscousForceDampingFunctor \
+        -lSimpleSpringLaw \
         -rdynamic 
 INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
@@ -32,17 +32,15 @@ QMAKE_LIBDIR = ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
-               ../../../yade/Body/Body/$(YADEDYNLIBPATH) \
                ../../../yade/Interaction/Interaction/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/MultiMethods/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/InteractionDescription/InteractionSphere/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/InteractionDescription/InteractionBox/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/Action/ActionReset/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/BoundingVolumeFunctor/InteractionDescriptionSet2AABBFunctor/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/ActionFunctor/CundallNonViscousMomentumDamping/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/ActionFunctor/CundallNonViscousForceDamping/$(YADEDYNLIBPATH) \
                ../../../plugins/Interaction/BroadInteractor/SAPCollider/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/BodyPhysicalParameters/RigidBodyParameters/$(YADEDYNLIBPATH) \
+               ../../../yade/Engine/$(YADEDYNLIBPATH) \
+               ../../../plugins/Engine/KinematicMotion/Translator/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

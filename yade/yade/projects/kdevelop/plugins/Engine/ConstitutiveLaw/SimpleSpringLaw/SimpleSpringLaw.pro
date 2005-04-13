@@ -6,13 +6,13 @@
 LIBS += -lClosestFeatures \
         -lSerialization \
         -lMath \
-        -lBody \
         -lInteraction \
         -lMultiMethods \
-        -lActionMomentum \
-        -lActionForce \
         -lRigidBodyParameters \
         -lEngine \
+        -lBody \
+        -lActionParameterMomentum \
+        -lActionParameterForce \
         -rdynamic 
 INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
@@ -21,12 +21,10 @@ OBJECTS_DIR = $(YADECOMPILATIONPATH)
 QMAKE_LIBDIR = ../../../../plugins/Interaction/InteractionGeometry/ClosestFeatures/$(YADEDYNLIBPATH) \
                ../../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
-               ../../../../yade/Body/Body/$(YADEDYNLIBPATH) \
                ../../../../yade/Interaction/Interaction/$(YADEDYNLIBPATH) \
                ../../../../toolboxes/Libraries/MultiMethods/$(YADEDYNLIBPATH) \
-               ../../../../plugins/Engine/Action/ActionMomentum/$(YADEDYNLIBPATH) \
-               ../../../../plugins/Engine/Action/ActionForce/$(YADEDYNLIBPATH) \
                ../../../../plugins/Body/BodyPhysicalParameters/RigidBodyParameters/$(YADEDYNLIBPATH) \
+               ../../../../yade/Engine/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

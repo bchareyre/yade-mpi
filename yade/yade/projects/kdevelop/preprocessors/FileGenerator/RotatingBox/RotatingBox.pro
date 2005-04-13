@@ -8,21 +8,21 @@ LIBS += -lAABB \
         -lSphere \
         -lSerialization \
         -lMath \
-        -lBody \
         -lInteraction \
         -lMultiMethods \
         -lInteractionDescriptionSet \
         -lInteractionDescriptionSet2AABBFunctor \
         -lInteractionSphere \
         -lInteractionBox \
-        -lActionReset \
-        -lCundallNonViscousForceDamping \
-        -lCundallNonViscousMomentumDamping \
         -lSAPCollider \
         -lRigidBodyParameters \
         -lSDECParameters \
         -lEngine \
         -lRotor \
+        -lBody \
+        -lActionReset \
+        -lCundallNonViscousForceDampingFunctor \
+        -lCundallNonViscousMomentumDampingFunctor \
         -lSimpleSpringLaw \
         -lSDECLaw \
         -rdynamic 
@@ -35,19 +35,17 @@ QMAKE_LIBDIR = ../../../plugins/Body/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
-               ../../../yade/Body/Body/$(YADEDYNLIBPATH) \
                ../../../yade/Interaction/Interaction/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/MultiMethods/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/InteractionDescription/InteractionDescriptionSet/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/BoundingVolumeFunctor/InteractionDescriptionSet2AABBFunctor/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/InteractionDescription/InteractionSphere/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/InteractionDescription/InteractionBox/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/Action/ActionReset/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/ActionFunctor/CundallNonViscousForceDamping/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/ActionFunctor/CundallNonViscousMomentumDamping/$(YADEDYNLIBPATH) \
                ../../../plugins/Interaction/BroadInteractor/SAPCollider/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/BodyPhysicalParameters/RigidBodyParameters/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/BodyPhysicalParameters/SDECParameters/$(YADEDYNLIBPATH) \
+               ../../../yade/Engine/$(YADEDYNLIBPATH) \
+               ../../../plugins/Engine/KinematicMotion/Rotor/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

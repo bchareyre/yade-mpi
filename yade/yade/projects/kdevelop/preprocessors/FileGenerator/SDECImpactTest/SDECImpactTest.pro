@@ -8,10 +8,8 @@ LIBS += -lBox \
         -lAABB \
         -lSerialization \
         -lMath \
-        -lBody \
         -lMultiMethods \
         -lInteraction \
-        -lForceRecorder \
         -lAveragePositionRecorder \
         -lInteractionDescriptionSet \
         -lInteractionDescriptionSet2AABBFunctor \
@@ -19,14 +17,16 @@ LIBS += -lBox \
         -lPersistentSAPCollider \
         -lInteractionSphere \
         -lInteractionBox \
-        -lActionReset \
-        -lCundallNonViscousMomentumDamping \
-        -lCundallNonViscousForceDamping \
         -lSDECMacroMicroElasticRelationships \
         -lVelocityRecorder \
         -lSAPCollider \
         -lSDECTimeStepper \
         -lEngine \
+        -lBody \
+        -lForceRecorder \
+        -lActionReset \
+        -lCundallNonViscousMomentumDampingFunctor \
+        -lCundallNonViscousForceDampingFunctor \
         -lSDECLaw \
         -lForceRecorder \
         -rdynamic 
@@ -39,10 +39,8 @@ QMAKE_LIBDIR = ../../../plugins/Body/GeometricalModel/Box/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
-               ../../../yade/Body/Body/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/MultiMethods/$(YADEDYNLIBPATH) \
                ../../../yade/Interaction/Interaction/$(YADEDYNLIBPATH) \
-               ../../../plugins/DataRecorder/ForceRecorder/$(YADEDYNLIBPATH) \
                ../../../plugins/DataRecorder/AveragePositionRecorder/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/InteractionDescription/InteractionDescriptionSet/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/BoundingVolumeFunctor/InteractionDescriptionSet2AABBFunctor/$(YADEDYNLIBPATH) \
@@ -50,12 +48,11 @@ QMAKE_LIBDIR = ../../../plugins/Body/GeometricalModel/Box/$(YADEDYNLIBPATH) \
                ../../../plugins/Interaction/BroadInteractor/PersistentSAPCollider/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/InteractionDescription/InteractionSphere/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/InteractionDescription/InteractionBox/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/Action/ActionReset/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/ActionFunctor/CundallNonViscousMomentumDamping/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/ActionFunctor/CundallNonViscousForceDamping/$(YADEDYNLIBPATH) \
                ../../../plugins/Interaction/InteractionPhysicsFunctor/SDECContactPhysics/SDECMacroMicroElasticRelationships/$(YADEDYNLIBPATH) \
                ../../../plugins/DataRecorder/VelocityRecorder/$(YADEDYNLIBPATH) \
                ../../../plugins/Interaction/BroadInteractor/SAPCollider/$(YADEDYNLIBPATH) \
+               ../../../plugins/Engine/ConstitutiveLaw/SDECTimeStepper/$(YADEDYNLIBPATH) \
+               ../../../yade/Engine/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

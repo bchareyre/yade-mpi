@@ -8,11 +8,8 @@ LIBS += -lDistances \
         -lMesh2D \
         -lClosestFeatures \
         -lMath \
-        -lBody \
         -lInteraction \
         -lMultiMethods \
-        -lActionForce \
-        -lActionMomentum \
         -lSDECContactPhysics \
         -lSDECContactGeometry \
         -lSDECLinkPhysics \
@@ -20,6 +17,9 @@ LIBS += -lDistances \
         -lRigidBodyParameters \
         -lSDECParameters \
         -lEngine \
+        -lBody \
+        -lActionParameterForce \
+        -lActionParameterMomentum \
         -lSimpleSpringLaw \
         -rdynamic 
 INCLUDEPATH += $(YADEINCLUDEPATH) 
@@ -31,17 +31,15 @@ QMAKE_LIBDIR = ../../../../toolboxes/ComputationalGeometry/Distances/$(YADEDYNLI
                ../../../../plugins/Body/GeometricalModel/Mesh2D/$(YADEDYNLIBPATH) \
                ../../../../plugins/Interaction/InteractionGeometry/ClosestFeatures/$(YADEDYNLIBPATH) \
                ../../../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
-               ../../../../yade/Body/Body/$(YADEDYNLIBPATH) \
                ../../../../yade/Interaction/Interaction/$(YADEDYNLIBPATH) \
                ../../../../toolboxes/Libraries/MultiMethods/$(YADEDYNLIBPATH) \
-               ../../../../plugins/Engine/Action/ActionForce/$(YADEDYNLIBPATH) \
-               ../../../../plugins/Engine/Action/ActionMomentum/$(YADEDYNLIBPATH) \
                ../../../../plugins/Interaction/InteractionPhysics/SDECContactPhysics/$(YADEDYNLIBPATH) \
                ../../../../plugins/Interaction/InteractionGeometry/SDECContactGeometry/$(YADEDYNLIBPATH) \
                ../../../../plugins/Interaction/InteractionPhysics/SDECLinkPhysics/$(YADEDYNLIBPATH) \
                ../../../../plugins/Interaction/InteractionGeometry/SDECLinkGeometry/$(YADEDYNLIBPATH) \
                ../../../../plugins/Body/BodyPhysicalParameters/RigidBodyParameters/$(YADEDYNLIBPATH) \
                ../../../../plugins/Body/BodyPhysicalParameters/SDECParameters/$(YADEDYNLIBPATH) \
+               ../../../../yade/Engine/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

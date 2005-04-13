@@ -99,7 +99,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>plugins/Engine/ActionFunctor/LeapFrogMomentumIntegrator</activedir>
+      <activedir>extensions</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>

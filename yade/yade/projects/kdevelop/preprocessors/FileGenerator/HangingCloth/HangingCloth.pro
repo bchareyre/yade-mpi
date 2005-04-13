@@ -9,7 +9,6 @@ LIBS += -lMesh2D \
         -lSphere \
         -lClosestFeatures \
         -lMath \
-        -lBody \
         -lInteraction \
         -lMultiMethods \
         -lPersistentSAPCollider \
@@ -18,18 +17,19 @@ LIBS += -lMesh2D \
         -lInteractionSphere \
         -lInteractionDescriptionSet2AABBFunctor \
         -lParticleSetParameters \
-        -lActionReset \
         -lBox \
         -lInteractionBox \
         -lSDECLinkGeometry \
         -lSDECLinkPhysics \
-        -lCundallNonViscousMomentumDamping \
-        -lCundallNonViscousForceDamping \
         -lSDECMacroMicroElasticRelationships \
         -lSAPCollider \
         -lRigidBodyParameters \
         -lSDECParameters \
         -lEngine \
+        -lBody \
+        -lActionReset \
+        -lCundallNonViscousMomentumDampingFunctor \
+        -lCundallNonViscousForceDampingFunctor \
         -lSimpleSpringLaw \
         -lMassSpringBody2RigidBodyLaw \
         -lSDECLaw \
@@ -45,7 +45,6 @@ QMAKE_LIBDIR = ../../../plugins/Body/GeometricalModel/Mesh2D/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
                ../../../plugins/Interaction/InteractionGeometry/ClosestFeatures/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
-               ../../../yade/Body/Body/$(YADEDYNLIBPATH) \
                ../../../yade/Interaction/Interaction/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/MultiMethods/$(YADEDYNLIBPATH) \
                ../../../plugins/Interaction/BroadInteractor/PersistentSAPCollider/$(YADEDYNLIBPATH) \
@@ -54,17 +53,15 @@ QMAKE_LIBDIR = ../../../plugins/Body/GeometricalModel/Mesh2D/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/InteractionDescription/InteractionSphere/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/BoundingVolumeFunctor/InteractionDescriptionSet2AABBFunctor/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/BodyPhysicalParameters/ParticleSetParameters/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/Action/ActionReset/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/GeometricalModel/Box/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/InteractionDescription/InteractionBox/$(YADEDYNLIBPATH) \
                ../../../plugins/Interaction/InteractionGeometry/SDECLinkGeometry/$(YADEDYNLIBPATH) \
                ../../../plugins/Interaction/InteractionPhysics/SDECLinkPhysics/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/ActionFunctor/CundallNonViscousMomentumDamping/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/ActionFunctor/CundallNonViscousForceDamping/$(YADEDYNLIBPATH) \
                ../../../plugins/Interaction/InteractionPhysicsFunctor/SDECContactPhysics/SDECMacroMicroElasticRelationships/$(YADEDYNLIBPATH) \
                ../../../plugins/Interaction/BroadInteractor/SAPCollider/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/BodyPhysicalParameters/RigidBodyParameters/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/BodyPhysicalParameters/SDECParameters/$(YADEDYNLIBPATH) \
+               ../../../yade/Engine/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 
