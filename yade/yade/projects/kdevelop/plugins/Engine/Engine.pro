@@ -3,8 +3,8 @@
 # Subdir relative project main directory: ./plugins/Motion
 # Target is a subdirs project 
 
-SUBDIRS += Action \
-           ActionFunctor \
+SUBDIRS += ActionParameter \
+           ActionParameterFunctor \
            KinematicMotion \
            ConstitutiveLaw 
 MOC_DIR = $(YADECOMPILATIONPATH)
