@@ -151,15 +151,15 @@ string HangingCloth::generate()
 	timeIntegratorDispatcher->add("ActionParameterForce","ParticleParameters","LeapFrogForceIntegratorFunctor");
 	timeIntegratorDispatcher->add("ActionParameterMomentum","RigidBodyParameters","LeapFrogMomentumIntegratorFunctor");
 
-	shared_ptr<MassSpringLaw> explicitMassSpringDynamicEngine(new MassSpringLaw);
-	explicitMassSpringDynamicEngine->springGroupMask = 1;
+	shared_ptr<MassSpringLaw> explicitMassSpringConstitutiveLaw(new MassSpringLaw);
+	explicitMassSpringConstitutiveLaw->springGroupMask = 1;
 
-	shared_ptr<SDECLaw> sdecDynamicEngine(new SDECLaw);
-	sdecDynamicEngine->sdecGroupMask = 2;
+	shared_ptr<SDECLaw> elasticContactLaw(new SDECLaw);
+	elasticContactLaw->sdecGroupMask = 2;
 
-	shared_ptr<MassSpringBody2RigidBodyLaw> massSpringBody2RigidBodyDynamicEngine(new MassSpringBody2RigidBodyLaw);
-	massSpringBody2RigidBodyDynamicEngine->sdecGroupMask = 2;
-	massSpringBody2RigidBodyDynamicEngine->springGroupMask = 1;
+	shared_ptr<MassSpringBody2RigidBodyLaw> massSpringBody2RigidBodyConstitutiveLaw(new MassSpringBody2RigidBodyLaw);
+	massSpringBody2RigidBodyConstitutiveLaw->sdecGroupMask = 2;
+	massSpringBody2RigidBodyConstitutiveLaw->springGroupMask = 1;
 
 	rootBody->actors.clear();
 	rootBody->actors.push_back(shared_ptr<Actor>(new ActionReset));
@@ -168,9 +168,9 @@ string HangingCloth::generate()
 	rootBody->actors.push_back(shared_ptr<Actor>(new PersistentSAPCollider));
 	rootBody->actors.push_back(interactionGeometryDispatcher);
 	rootBody->actors.push_back(interactionPhysicsDispatcher);
-	rootBody->actors.push_back(explicitMassSpringDynamicEngine);
-	rootBody->actors.push_back(sdecDynamicEngine);
-//	rootBody->actors.push_back(massSpringBody2RigidBodyDynamicEngine); // FIXME - is not working...
+	rootBody->actors.push_back(explicitMassSpringConstitutiveLaw);
+	rootBody->actors.push_back(elasticContactLaw);
+//	rootBody->actors.push_back(massSpringBody2RigidBodyConstitutiveLaw); // FIXME - is not working...
 	rootBody->actors.push_back(actionDampingDispatcher);
 	rootBody->actors.push_back(applyActionDispatcher);
 	rootBody->actors.push_back(timeIntegratorDispatcher);

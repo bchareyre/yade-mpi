@@ -13,6 +13,7 @@ class SDECLinkedSpheres : public FileGenerator
 	private	: Real minRadius,density;
 	private	: Real maxRadius;
 	private	: Real disorder;
+	private : Vector3r gravity;
 	private	: Real spacing;
 	private	: Real supportSize;
 	private	: bool support1;

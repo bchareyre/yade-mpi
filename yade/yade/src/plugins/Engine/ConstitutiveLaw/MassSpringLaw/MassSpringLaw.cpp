@@ -25,8 +25,6 @@ void MassSpringLaw::calculateForces(Body * body)
 	shared_ptr<InteractionContainer>& initialInteractions = massSpring->initialInteractions;
 	shared_ptr<ActionParameterContainer>& actions = massSpring->actions;
 	
-	Vector3r gravity = Omega::instance().getGravity();
-	
 	for(initialInteractions->gotoFirst() ; initialInteractions->notAtEnd(); initialInteractions->gotoNext())
 	{
 		const shared_ptr<Interaction>& spring = initialInteractions->getCurrent();
@@ -60,19 +58,5 @@ void MassSpringLaw::calculateForces(Body * body)
 		static_cast<ActionParameterForce*>   ( actions->find( id2 , actionForce->getClassIndex() ).get() )->force    += f3;
 	}
 	
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// Gravity														///
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	
-	shared_ptr<ActionParameterForce> af(new ActionParameterForce);
-	
-	for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext())
-	{
-		if(bodies->getCurrent()->getGroupMask() & springGroupMask)
-		{
-			ParticleParameters * p = static_cast<ParticleParameters*>(bodies->getCurrent()->physicalParameters.get());
-			static_cast<ActionParameterForce*>( massSpring->actions->find( bodies->getCurrent()->getId() , actionForce->getClassIndex() ).get() )->force += gravity*p->mass;
-		}
-	}
 }
 

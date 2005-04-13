@@ -8,9 +8,10 @@ class SDECSpheresPlane : public FileGenerator
 {
 	private : Vector3r nbSpheres;
 	private : Real minRadius,density;
-	private : Vector3r groundSize;
+	private : Vector3r groundSize,gravity;
 	private : Real maxRadius;
 	private : Real dampingForce;
+	private	: Real disorder;
 	private : Real dampingMomentum;
 	private : int timeStepUpdateInterval;
 	private : bool rotationBlocked;
@@ -18,8 +19,12 @@ class SDECSpheresPlane : public FileGenerator
 	// construction
 	public : SDECSpheresPlane ();
 	public : ~SDECSpheresPlane ();
+
+
 	private : void createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents);
 	private : void createSphere(shared_ptr<Body>& body, int i, int j, int k);
+	private : void createActors(shared_ptr<ComplexBody>& rootBody);
+	private : void positionRootBody(shared_ptr<ComplexBody>& rootBody);
 
 	protected : virtual void postProcessAttributes(bool deserializing);
 	public : void registerAttributes();

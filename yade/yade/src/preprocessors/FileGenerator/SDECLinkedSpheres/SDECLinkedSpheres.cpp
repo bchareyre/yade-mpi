@@ -24,6 +24,7 @@
 #include "ActionParameterDispatcher.hpp"
 #include "CundallNonViscousForceDampingFunctor.hpp"
 #include "CundallNonViscousMomentumDampingFunctor.hpp"
+#include "GravityForceFunctor.hpp"
 
 #include "InteractionGeometryDispatcher.hpp"
 #include "InteractionPhysicsDispatcher.hpp"
@@ -53,6 +54,7 @@ SDECLinkedSpheres::SDECLinkedSpheres () : FileGenerator()
 	sphereFrictionDeg   = 18.0;
 	density = 2.6;
 	momentRotationLaw = true;
+	gravity = Vector3r(0,-9.81,0);
 }
 
 SDECLinkedSpheres::~SDECLinkedSpheres ()
@@ -76,6 +78,7 @@ void SDECLinkedSpheres::registerAttributes()
 	REGISTER_ATTRIBUTE(dampingForce);
 	REGISTER_ATTRIBUTE(dampingMomentum);
 	REGISTER_ATTRIBUTE(momentRotationLaw);
+	REGISTER_ATTRIBUTE(gravity);
 	REGISTER_ATTRIBUTE(disorder);
 	REGISTER_ATTRIBUTE(spacing);
 	REGISTER_ATTRIBUTE(supportSize);
@@ -292,10 +295,12 @@ void SDECLinkedSpheres::createActors(shared_ptr<ComplexBody>& rootBody)
 	boundingVolumeDispatcher->add("InteractionSphere","AABB","Sphere2AABBFunctor");
 	boundingVolumeDispatcher->add("InteractionBox","AABB","Box2AABBFunctor");
 	boundingVolumeDispatcher->add("InteractionDescriptionSet","AABB","InteractionDescriptionSet2AABBFunctor");
-
-	
-	
 		
+	shared_ptr<GravityForceFunctor> gravityForceFunctor(new GravityForceFunctor);
+	gravityForceFunctor->gravity = gravity;
+	shared_ptr<ActionParameterDispatcher> gravityForceDispatcher(new ActionParameterDispatcher);
+	gravityForceDispatcher->add("ActionParameterForce","ParticleParameters","GravityForceFunctor",gravityForceFunctor);
+	
 	shared_ptr<CundallNonViscousForceDampingFunctor> actionForceDamping(new CundallNonViscousForceDampingFunctor);
 	actionForceDamping->damping = dampingForce;
 	shared_ptr<CundallNonViscousMomentumDampingFunctor> actionMomentumDamping(new CundallNonViscousMomentumDampingFunctor);
@@ -310,6 +315,7 @@ void SDECLinkedSpheres::createActors(shared_ptr<ComplexBody>& rootBody)
 	
 	shared_ptr<ActionParameterDispatcher> timeIntegratorDispatcher(new ActionParameterDispatcher);
 	timeIntegratorDispatcher->add("ActionParameterForce","ParticleParameters","LeapFrogForceIntegratorFunctor");
+
 	timeIntegratorDispatcher->add("ActionParameterMomentum","RigidBodyParameters","LeapFrogMomentumIntegratorFunctor");
 
 	shared_ptr<SDECTimeStepper> sdecTimeStepper(new SDECTimeStepper);
@@ -317,9 +323,9 @@ void SDECLinkedSpheres::createActors(shared_ptr<ComplexBody>& rootBody)
 	sdecTimeStepper->interval = timeStepUpdateInterval;
 
 	
-	shared_ptr<SDECLaw> sdecDynamicEngine(new SDECLaw);
-	sdecDynamicEngine->sdecGroupMask = 55;
-	sdecDynamicEngine->momentRotationLaw = momentRotationLaw;
+	shared_ptr<SDECLaw> constitutiveLaw(new SDECLaw);
+	constitutiveLaw->sdecGroupMask = 55;
+	constitutiveLaw->momentRotationLaw = momentRotationLaw;
 	
 	rootBody->actors.clear();
 	rootBody->actors.push_back(sdecTimeStepper);
@@ -328,7 +334,8 @@ void SDECLinkedSpheres::createActors(shared_ptr<ComplexBody>& rootBody)
 	rootBody->actors.push_back(shared_ptr<Actor>(new PersistentSAPCollider));
 	rootBody->actors.push_back(interactionGeometryDispatcher);
 	rootBody->actors.push_back(interactionPhysicsDispatcher);
-	rootBody->actors.push_back(sdecDynamicEngine);
+	rootBody->actors.push_back(constitutiveLaw);
+	rootBody->actors.push_back(gravityForceDispatcher);
 	rootBody->actors.push_back(actionDampingDispatcher);
 	rootBody->actors.push_back(applyActionDispatcher);
 	rootBody->actors.push_back(timeIntegratorDispatcher);
@@ -345,6 +352,7 @@ void SDECLinkedSpheres::positionRootBody(shared_ptr<ComplexBody>& rootBody)
 	
 	Quaternionr q;
 	q.fromAxisAngle( Vector3r(0,0,1),0);
+	
 	shared_ptr<ParticleParameters> physics(new ParticleParameters); // FIXME : fix indexable class BodyPhysicalParameters
 	physics->se3			= Se3r(Vector3r(0,0,0),q);
 	physics->mass			= 0;
@@ -352,7 +360,6 @@ void SDECLinkedSpheres::positionRootBody(shared_ptr<ComplexBody>& rootBody)
 	physics->acceleration		= Vector3r::ZERO;
 	
 	shared_ptr<InteractionDescriptionSet> set(new InteractionDescriptionSet());
-	
 	set->diffuseColor		= Vector3f(0,0,1);
 
 	shared_ptr<AABB> aabb(new AABB);

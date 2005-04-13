@@ -88,10 +88,6 @@ class Omega : public Singleton<Omega>
 	private	: void buildDynlibList();
 	private	: void registerDynlibType(const string& name);
 	
-	private : Vector3r gravity; // FIXME
-	public	: Vector3r getGravity();
-	public	: void setGravity(Vector3r g);
-	
 	private	: Real dt; // FIXME
 	public	: void setTimeStep(const Real);
 	public	: Real getTimeStep();

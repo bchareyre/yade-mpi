@@ -86,8 +86,8 @@ void NullGUI::help()
 	-m number	- specify maximum number of iterations\n\
 			  ( 0 = unlimited, tested every INTERVAL iteration).\n\
 	-t number	- set time step in seconds, default is 0.01 (FIXME - inside .xml)\n\
-	-g number	- set gravity, default is 9.81 (FIXME - inside .xml)\n\
 \n";
+//	-g number	- set gravity, default is 9.81 (FIXME - inside .xml)\n
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -111,8 +111,8 @@ int NullGUI::run(int argc, char** argv)
 			case 'm'	: maxIteration = lexical_cast<long int>(optarg);	break;
 			case 't'	: Omega::instance().setTimeStep
 						(lexical_cast<Real>(optarg));			break;
-			case 'g'	: Omega::instance().setGravity
-						(Vector3r(0,-lexical_cast<Real>(optarg),0));	break;
+//			case 'g'	: Omega::instance().setGravity
+//						(Vector3r(0,-lexical_cast<Real>(optarg),0));	break;
 			default		: break;
 		}
 	return loop();

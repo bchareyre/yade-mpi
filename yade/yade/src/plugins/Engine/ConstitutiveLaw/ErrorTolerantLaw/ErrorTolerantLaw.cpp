@@ -196,11 +196,12 @@ void ErrorTolerantLaw::calculateForces(Body* body)
 		shared_ptr<RigidBodyParameters> rb = dynamic_pointer_cast<RigidBodyParameters>(b);
 		if (rb)
 		{
-			Vector3r force = Omega::instance().getGravity()*rb->mass;
+			//Vector3r force = Omega::instance().getGravity()*rb->mass;
+			Vector3r force = Vector3r(0,-9.81,0)*rb->mass; // FIXME - use GravityForceFunctor
 			int sign;
 			float f = force.length();
 
-			for(int j=0;j<3;j++)
+			for(int j=0;j<3;j++)  // FIXME - use CundallNonViscousForceDampingFunctor
 			{
 				if (rb->velocity[j]==0)
 					sign=0;

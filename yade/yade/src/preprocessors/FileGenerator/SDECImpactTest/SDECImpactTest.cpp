@@ -478,8 +478,8 @@ void SDECImpactTest::createActors(shared_ptr<ComplexBody>& rootBody)
 	sdecTimeStepper->interval = timeStepUpdateInterval;
 	
 	
-	shared_ptr<SDECLaw> sdecDynamicEngine(new SDECLaw);
-	sdecDynamicEngine->sdecGroupMask = 2;
+	shared_ptr<SDECLaw> elasticContactLaw(new SDECLaw);
+	elasticContactLaw->sdecGroupMask = 2;
 	
 	rootBody->actors.clear();
 	rootBody->actors.push_back(shared_ptr<Actor>(new ActionReset));
@@ -488,7 +488,7 @@ void SDECImpactTest::createActors(shared_ptr<ComplexBody>& rootBody)
 	rootBody->actors.push_back(shared_ptr<Actor>(new PersistentSAPCollider));
 	rootBody->actors.push_back(interactionGeometryDispatcher);
 	rootBody->actors.push_back(interactionPhysicsDispatcher);
-	rootBody->actors.push_back(sdecDynamicEngine);
+	rootBody->actors.push_back(elasticContactLaw);
 	rootBody->actors.push_back(actionDampingDispatcher);
 	rootBody->actors.push_back(applyActionDispatcher);
 	rootBody->actors.push_back(timeIntegratorDispatcher);

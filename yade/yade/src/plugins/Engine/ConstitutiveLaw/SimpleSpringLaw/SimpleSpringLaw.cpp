@@ -24,7 +24,6 @@ void SimpleSpringLaw::calculateForces(Body * body)
 
 	Real stiffness = 10000;
 	Real viscosity = 10;
-	Vector3r gravity = Omega::instance().getGravity();
 	
 	for( ncb->runtimeInteractions->gotoFirst() ; ncb->runtimeInteractions->notAtEnd() ; ncb->runtimeInteractions->gotoNext() )
 	{
@@ -67,17 +66,6 @@ void SimpleSpringLaw::calculateForces(Body * body)
 			
 		}
 	}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// Gravity														///
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	
-	for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext() )
-	{
-		shared_ptr<Body>& b = bodies->getCurrent();
-		RigidBodyParameters * de = static_cast<RigidBodyParameters*>(b->physicalParameters.get());
-		static_cast<ActionParameterForce*>( ncb->actions->find( b->getId() , actionForce->getClassIndex() ).get() )->force += gravity*de->mass;
-        }
 
 }
 

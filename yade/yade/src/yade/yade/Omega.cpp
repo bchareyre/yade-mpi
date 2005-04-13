@@ -41,7 +41,6 @@ Omega::Omega()
 		//LOCK(omegaMutex);
 		simulationFileName="";
 		currentIteration = 0;
-		gravity = Vector3r(0,-9.81,0);
 		dt = 0.01; 
 		logFile = shared_ptr<ofstream>(new ofstream("../data/log.xml", ofstream::out | ofstream::app));
 		// build simulation loop thread
@@ -334,20 +333,6 @@ void Omega::freeRootBody()
 	rootBody = shared_ptr<ComplexBody>();
 }
 
-
-// FIXME - remove that
-void Omega::setGravity(Vector3r g)
-{
-//	LOCK(omegaMutex);
-	gravity = g;
-}
-
-Vector3r Omega::getGravity()
-{
-//	LOCK(omegaMutex);
-	return gravity;
-}
-
 // FIXME - remove that
 void Omega::setTimeStep(const Real t)
 {
@@ -389,3 +374,4 @@ boost::mutex& Omega::getRootBodyMutex()
 {
 	return rootBodyMutex;
 }
+

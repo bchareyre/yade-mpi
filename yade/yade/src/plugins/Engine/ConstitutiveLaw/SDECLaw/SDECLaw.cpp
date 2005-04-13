@@ -62,7 +62,6 @@ void SDECLaw::calculateForces(Body* body)
 	ComplexBody * ncb = dynamic_cast<ComplexBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 
-	Vector3r gravity = Omega::instance().getGravity();
 	Real dt = Omega::instance().getTimeStep();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -406,21 +405,6 @@ void SDECLaw::calculateForces(Body* body)
 		
 		currentContactPhysics->prevNormal = currentContactGeometry->normal;
 	}
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// Gravity														///
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	
-	for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext() )
-	{
-		shared_ptr<Body>& b = bodies->getCurrent();
-		if( b->getGroupMask() & sdecGroupMask )
-		{
-			RigidBodyParameters * de = static_cast<SDECParameters*>(b->physicalParameters.get());
-			static_cast<ActionParameterForce*>( ncb->actions->find( b->getId() , actionForce->getClassIndex() ).get() )->force += gravity*de->mass;
-		}
-        }
 
 }
 

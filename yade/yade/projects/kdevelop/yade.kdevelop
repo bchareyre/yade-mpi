@@ -99,7 +99,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>extensions</activedir>
+      <activedir>plugins/Engine/ActionParameterFunctor/GravityForceFunctor</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>
