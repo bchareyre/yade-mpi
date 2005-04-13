@@ -40,7 +40,7 @@ void ActionReset::action(Body* body)
 	
 	if(first) // FIXME - this should be done somewhere else, or this is the right place ?
 	{
-		vector<shared_ptr<Action> > vvv; 
+		vector<shared_ptr<ActionParameter> > vvv; 
 		vvv.clear();
 		vvv.push_back(actionForce); // FIXME - should ask what Actions should be prepared !
 		vvv.push_back(actionMomentum);

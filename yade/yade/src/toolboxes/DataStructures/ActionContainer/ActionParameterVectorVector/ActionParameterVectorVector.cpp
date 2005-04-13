@@ -1,25 +1,25 @@
-#include "ActionVecVec.hpp"
+#include "ActionParameterVectorVector.hpp"
 #include "Body.hpp"
-#include "Action.hpp"
+#include "ActionParameter.hpp"
 
-ActionVecVec::ActionVecVec()
+ActionParameterVectorVector::ActionParameterVectorVector()
 {
 	clear();
 	currentIndex = -1;
 }
 
-ActionVecVec::~ActionVecVec()
+ActionParameterVectorVector::~ActionParameterVectorVector()
 {
 }
 
-void ActionVecVec::clear()
+void ActionParameterVectorVector::clear()
 {
 	actions.clear();
 	usedIds.clear();
 }
 
 // doesn't not delete all, just resets data
-void ActionVecVec::reset()
+void ActionParameterVectorVector::reset()
 {
 	vvi    = actions.begin();
 	vviEnd = actions.end();
@@ -33,13 +33,13 @@ void ActionVecVec::reset()
 	}
 }
 
-unsigned int ActionVecVec::size()
+unsigned int ActionParameterVectorVector::size()
 {
 	return actions.size();
 }
 
-// fills container with resetted fields. argument here, should be all Action types that are planned to use
-void ActionVecVec::prepare(std::vector<shared_ptr<Action> >& actionTypes)
+// fills container with resetted fields. argument here, should be all ActionParameter types that are planned to use
+void ActionParameterVectorVector::prepare(std::vector<shared_ptr<ActionParameter> >& actionTypes)
 {
 	unsigned int size = actionTypes.size();
 	int maxSize = 0;
@@ -56,10 +56,10 @@ void ActionVecVec::prepare(std::vector<shared_ptr<Action> >& actionTypes)
 
 // finds and returns action of given polymorphic type, for body of given Id,
 // should be always succesfull. if it is not - you forgot to call prepare()
-shared_ptr<Action>& ActionVecVec::find(unsigned int id , int actionIndex )
+shared_ptr<ActionParameter>& ActionParameterVectorVector::find(unsigned int id , int actionIndex )
 {
 	if( actions.size() <= id ) // this is very rarely executed, only at beginning.
-	// somebody is accesing out of bounds, make sure he will find, what he needs - a resetted Action of his type
+	// somebody is accesing out of bounds, make sure he will find, what he needs - a resetted ActionParameter of his type
 	{
 		unsigned int oldSize = actions.size();
 		unsigned int newSize = id+1;
@@ -78,7 +78,7 @@ shared_ptr<Action>& ActionVecVec::find(unsigned int id , int actionIndex )
 }
 
 // looping over Bodies, and their Actions
-void ActionVecVec::gotoFirst()
+void ActionParameterVectorVector::gotoFirst()
 {
 	currentIndex = 0;
 	vvi    = actions.begin();
@@ -96,12 +96,12 @@ void ActionVecVec::gotoFirst()
 	}
 }
 
-bool ActionVecVec::notAtEnd()
+bool ActionParameterVectorVector::notAtEnd()
 {
 	return vvi != vviEnd;
 }
 
-void ActionVecVec::gotoNext()
+void ActionParameterVectorVector::gotoNext()
 {
 	++vi;
 	if(vi == viEnd)
@@ -121,7 +121,7 @@ void ActionVecVec::gotoNext()
 	}
 }
 
-shared_ptr<Action>& ActionVecVec::getCurrent(int& id)
+shared_ptr<ActionParameter>& ActionParameterVectorVector::getCurrent(int& id)
 {
 	id = currentIndex;
 	return (*vi);
@@ -145,25 +145,25 @@ shared_ptr<Action>& ActionVecVec::getCurrent(int& id)
 
 //
 // 
-// ActionVecVec::ActionVecVec()
+// ActionParameterVectorVector::ActionParameterVectorVector()
 // {
 // 	clear();
 // 	currentActionType = -1;
-// 	empty = shared_ptr<Action>();
+// 	empty = shared_ptr<ActionParameter>();
 // 	currentIndex = -1;
 // }
 // 
-// ActionVecVec::~ActionVecVec()
+// ActionParameterVectorVector::~ActionParameterVectorVector()
 // {
 // }
 // 
 // 
-// void ActionVecVec::clear()
+// void ActionParameterVectorVector::clear()
 // {
 // 	actions.clear();
 // }
 // 
-// void ActionVecVec::reset()
+// void ActionParameterVectorVector::reset()
 // {
 // 	vvi    = actions.begin();
 // 	vviEnd = actions.end();
@@ -177,15 +177,15 @@ shared_ptr<Action>& ActionVecVec::getCurrent(int& id)
 // 	}
 // }
 // 
-// unsigned int ActionVecVec::size()
+// unsigned int ActionParameterVectorVector::size()
 // {
 // 	return actions.size();
 // }
 // 	
-// adds Action acting on one body,
-// it is mathematically added if Action of this polymorphic type already exists,
+// adds ActionParameter acting on one body,
+// it is mathematically added if ActionParameter of this polymorphic type already exists,
 // if it doesn't exist, then it is appended to stored list of Actions for that body
-// void ActionVecVec::add(const shared_ptr<Action>& newAction, unsigned int id)
+// void ActionParameterVectorVector::add(const shared_ptr<ActionParameter>& newAction, unsigned int id)
 // { 
 // 	const int& idx = newAction->getClassIndex();
 // 	
@@ -203,43 +203,43 @@ shared_ptr<Action>& ActionVecVec::getCurrent(int& id)
 // 		actions[id][idx]=newAction->clone();
 // }
 // 
-// adds Action that acts on two bodies.
+// adds ActionParameter that acts on two bodies.
 // on first body it is substarcted,
 // to second body it is added
-// void ActionVecVec::add(const shared_ptr<Action>&, unsigned int , unsigned int)
+// void ActionParameterVectorVector::add(const shared_ptr<ActionParameter>&, unsigned int , unsigned int)
 // {
 // 
 // }
 // 	
-// allows to set current polymorphic Action Type on which other functions will work:
+// allows to set current polymorphic ActionParameter Type on which other functions will work:
 // function that use this are: eraseAction, operator[]
-// void ActionVecVec::setCurrentActionType(int idx)
+// void ActionParameterVectorVector::setCurrentActionType(int idx)
 // {
 // 	currentActionType = idx;
 // }
 // 		
-// deletes Action of given polymorphic type from body that has given Id
-// bool ActionVecVec::eraseAction(unsigned int id, int idx)
+// deletes ActionParameter of given polymorphic type from body that has given Id
+// bool ActionParameterVectorVector::eraseAction(unsigned int id, int idx)
 // {
 // 	if( idx >= 0 && (unsigned int)idx < actions[id].size() && actions[id][idx] )
 // 	{
-// 		actions[id][idx] = shared_ptr<Action>();
+// 		actions[id][idx] = shared_ptr<ActionParameter>();
 // 		return true;
 // 	}
 // 	else
 // 		return false;
 // }
 // 
-// deletes Action of given polymorphic type from body that has given Id,
+// deletes ActionParameter of given polymorphic type from body that has given Id,
 // the polymorphic type is selected by setCurrentActionType()
 // returns true if action existed before deletion
-// bool ActionVecVec::eraseAction(unsigned int id)
+// bool ActionParameterVectorVector::eraseAction(unsigned int id)
 // {
 // 	if(	   currentActionType >= 0 
 // 		&& (unsigned int)currentActionType < actions[id].size()
 // 		&& actions[id][currentActionType] )
 // 	{
-// 		actions[id][currentActionType] = shared_ptr<Action>();
+// 		actions[id][currentActionType] = shared_ptr<ActionParameter>();
 // 		return true;
 // 	}
 // 	else
@@ -247,48 +247,48 @@ shared_ptr<Action>& ActionVecVec::getCurrent(int& id)
 // }
 // 
 // deletes all Actions in a body of given Id
-// void ActionVecVec::erase(unsigned int id)
+// void ActionParameterVectorVector::erase(unsigned int id)
 // {
 // 	actions[id].clear();
 // }
 // 	
 // finds and returns action of given polymorphic type, for body of given Id,
-// returns empty shared_ptr if this Action doesn't exist for chosen body
-// shared_ptr<Action> ActionVecVec::find(unsigned int id, int idx) const
+// returns empty shared_ptr if this ActionParameter doesn't exist for chosen body
+// shared_ptr<ActionParameter> ActionParameterVectorVector::find(unsigned int id, int idx) const
 // {
 // 	if( 	   idx >= 0
 // 		&& (unsigned int)idx < actions[id].size() )
 // 		return actions[id][idx];
 // 	else
-// 		return shared_ptr<Action>();
+// 		return shared_ptr<ActionParameter>();
 // }
 // 
-// same as above, polymorphic Action type is selected with setCurrentActionType
-// shared_ptr<Action>& ActionVecVec::operator[](unsigned int id)
+// same as above, polymorphic ActionParameter type is selected with setCurrentActionType
+// shared_ptr<ActionParameter>& ActionParameterVectorVector::operator[](unsigned int id)
 // {
 // 	if(	   currentActionType >=0
 // 		&& (unsigned int)currentActionType < actions[id].size() )
 // 		return actions[id][currentActionType];
 // 	else
 // 	{
-// 		empty = shared_ptr<Action>();
+// 		empty = shared_ptr<ActionParameter>();
 // 		return empty; // because returning reference is faster
 // 	}
 // }
 // 
-// const shared_ptr<Action>& ActionVecVec::operator[](unsigned int id) const
+// const shared_ptr<ActionParameter>& ActionParameterVectorVector::operator[](unsigned int id) const
 // {
 // 	if(	   currentActionType >=0
 // 		&& (unsigned int)currentActionType < actions[id].size() )
 // 		return actions[id][currentActionType];
 // 	else
 // 	{
-// 		empty = shared_ptr<Action>();
+// 		empty = shared_ptr<ActionParameter>();
 // 		return empty;
 // 	}
 // }
 // 
-// void ActionVecVec::gotoFirst()
+// void ActionParameterVectorVector::gotoFirst()
 // {
 // 	vvi    = actions.begin();
 // 	vviEnd = actions.end();
@@ -316,9 +316,9 @@ shared_ptr<Action>& ActionVecVec::getCurrent(int& id)
 // 	}
 // }
 // 
-// bool ActionVecVec::notAtEnd()
+// bool ActionParameterVectorVector::notAtEnd()
 // {
-// 	vector< shared_ptr<Action> >::iterator tmpVi = vi;
+// 	vector< shared_ptr<ActionParameter> >::iterator tmpVi = vi;
 // 	temporaryVvi = vvi;
 // 
 // 	if( vvi == vviEnd )
@@ -335,7 +335,7 @@ shared_ptr<Action>& ActionVecVec::getCurrent(int& id)
 // 	return true;
 // }
 // 
-// void ActionVecVec::gotoNext()
+// void ActionParameterVectorVector::gotoNext()
 // {
 // 	if ( vi != viEnd )
 // 		++vi;
@@ -362,13 +362,13 @@ shared_ptr<Action>& ActionVecVec::getCurrent(int& id)
 // 
 // 
 // 
-// returns Action selected by setCurrentActionType, for current Body
-// shared_ptr<Action> ActionVecVec::getCurrent(int & id)
+// returns ActionParameter selected by setCurrentActionType, for current Body
+// shared_ptr<ActionParameter> ActionParameterVectorVector::getCurrent(int & id)
 // {
 // 	if( currentActionType < (*aii).size() )
 // 		return (*aii)[currentActionType];
 // 	else
-// 		return shared_ptr<Action>();
+// 		return shared_ptr<ActionParameter>();
 // 	id = currentIndex;
 // 	return (*vi);
 // }

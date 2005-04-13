@@ -31,7 +31,7 @@ void MassSpringBody2RigidBodyLaw::calculateForces(Body * body)
 	ComplexBody * mixedBody = dynamic_cast<ComplexBody*>(body);
 	shared_ptr<BodyContainer>& bodies = mixedBody->bodies;
 	shared_ptr<InteractionContainer>& runtimeInteractions = mixedBody->runtimeInteractions;
-//	shared_ptr<ActionContainer>& actions = mixedBody->actions;
+//	shared_ptr<ActionParameterContainer>& actions = mixedBody->actions;
 	Real dt = Omega::instance().getTimeStep();
 
 	for( runtimeInteractions->gotoFirst() ; runtimeInteractions->notAtEnd() ; runtimeInteractions->gotoNext() )

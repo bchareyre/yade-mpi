@@ -32,7 +32,7 @@
 
 // FIXME : should we pass timestep as parameter of functor
 // FIXME : what's with timestepper
-void LeapFrogMomentumIntegrator::go( 	  const shared_ptr<Action>&
+void LeapFrogMomentumIntegrator::go( 	  const shared_ptr<ActionParameter>&
 					, const shared_ptr<BodyPhysicalParameters>& b
 					, const Body* body)
 {

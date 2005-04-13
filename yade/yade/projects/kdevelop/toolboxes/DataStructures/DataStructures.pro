@@ -5,7 +5,7 @@
 
 SUBDIRS += BodyContainer \
 	   InteractionContainer \
-	   ActionContainer
+	   ActionParameterContainer
 MOC_DIR = $(YADECOMPILATIONPATH)
 UI_DIR = $(YADECOMPILATIONPATH)
 OBJECTS_DIR = $(YADECOMPILATIONPATH)

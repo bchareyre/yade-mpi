@@ -2,13 +2,13 @@
 #define __SIMPLESPRINGDYNAMICENGINE_H__
 
 #include "ConstitutiveLaw.hpp"
-class Action;
+class ActionParameter;
 
 
 class SimpleSpringLaw : public ConstitutiveLaw
 {
-	private : shared_ptr<Action> actionForce;
-	private : shared_ptr<Action> actionMomentum;
+	private : shared_ptr<ActionParameter> actionForce;
+	private : shared_ptr<ActionParameter> actionMomentum;
 
 	// construction
 	public : SimpleSpringLaw ();

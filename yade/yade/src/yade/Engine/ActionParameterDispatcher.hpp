@@ -21,38 +21,46 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "ActionDispatcher.hpp"
-#include "ComplexBody.hpp"
+#ifndef ACTION_DAMPING_DISPATCHER_HPP
+#define ACTION_DAMPING_DISPATCHER_HPP
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void ActionDispatcher::postProcessAttributes(bool deserializing)
+#include "Actor.hpp"
+#include "DynLibDispatcher.hpp"
+#include "ActionParameter.hpp"
+#include "ActionParameterFunctor.hpp"
+
+class Body;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+class ActionParameterDispatcher : 
+	  public Actor
+	, public DynLibDispatcher
+		<	  TYPELIST_2( ActionParameter , BodyPhysicalParameters )	// base classess for dispatch
+			, ActionParameterFunctor				// class that provides multivirtual call
+			, void						// return type
+			, TYPELIST_3(	  const shared_ptr<ActionParameter>&	// function arguments
+					, const shared_ptr<BodyPhysicalParameters>& 
+					, const Body *
+				    )
+		>
 {
-	postProcessDispatcher2D(deserializing);
-}
+	public 		: virtual void action(Body* body);
+	public		: virtual void registerAttributes();
+	protected	: virtual void postProcessAttributes(bool deserializing);
+	REGISTER_CLASS_NAME(ActionParameterDispatcher);
+};
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void ActionDispatcher::registerAttributes()
-{
-	REGISTER_ATTRIBUTE(functorNames);
-	REGISTER_ATTRIBUTE(functorArguments);
-}
+REGISTER_SERIALIZABLE(ActionParameterDispatcher,false);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void ActionDispatcher::action(Body* body)
-{
-	ComplexBody * ncb = dynamic_cast<ComplexBody*>(body);
-	shared_ptr<BodyContainer>& bodies = ncb->bodies;
-
-	int id;
-	for( ncb->actions->gotoFirst() ; ncb->actions->notAtEnd() ; ncb->actions->gotoNext())
-	{
-		shared_ptr<Action>& action = ncb->actions->getCurrent(id);
-		operator()( action , (*bodies)[id]->physicalParameters , (*bodies)[id].get() );
-	}
-}
+#endif // ACTION_DAMPING_DISPATCHER_HPP

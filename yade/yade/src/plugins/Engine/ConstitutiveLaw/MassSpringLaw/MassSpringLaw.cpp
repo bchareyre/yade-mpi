@@ -23,7 +23,7 @@ void MassSpringLaw::calculateForces(Body * body)
 	ComplexBody * massSpring = dynamic_cast<ComplexBody*>(body);
 	shared_ptr<BodyContainer>& bodies = massSpring->bodies;
 	shared_ptr<InteractionContainer>& initialInteractions = massSpring->initialInteractions;
-	shared_ptr<ActionContainer>& actions = massSpring->actions;
+	shared_ptr<ActionParameterContainer>& actions = massSpring->actions;
 	
 	Vector3r gravity = Omega::instance().getGravity();
 	

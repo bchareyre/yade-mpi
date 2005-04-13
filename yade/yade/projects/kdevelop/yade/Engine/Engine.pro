@@ -3,14 +3,14 @@
 # Subdir relative project main directory: ./yade/Engine
 # Target is a library:  
 
-HEADERS += ActionDispatcher.hpp \
-           ActionFunctor.hpp \
-           ActionContainer.hpp \
-           Action.hpp \
+HEADERS += ActionParameterDispatcher.hpp \
+           ActionParameterFunctor.hpp \
+           ActionParameterContainer.hpp \
+           ActionParameter.hpp \
            ConstitutiveLaw.hpp \
            KinematicMotion.hpp 
-SOURCES += ActionDispatcher.cpp \
-           ActionContainer.cpp \
+SOURCES += ActionParameterDispatcher.cpp \
+           ActionParameterContainer.cpp \
            ConstitutiveLaw.cpp \
            KinematicMotion.cpp 
 LIBS += -rdynamic

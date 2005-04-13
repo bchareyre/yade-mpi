@@ -29,7 +29,7 @@
 
 #include "Actor.hpp"
 class Body;
-class Action;
+class ActionParameter;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -37,8 +37,8 @@ class Action;
 class ActionReset : public Actor
 {
 	public : ActionReset();
-	private : shared_ptr<Action> actionForce;	
-	private : shared_ptr<Action> actionMomentum;
+	private : shared_ptr<ActionParameter> actionForce;	
+	private : shared_ptr<ActionParameter> actionMomentum;
 	private : bool first;
 	public : virtual void action(Body* body);
 	REGISTER_CLASS_NAME(ActionReset);

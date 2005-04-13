@@ -8,8 +8,8 @@
 class MassSpringBody2RigidBodyLaw : public ConstitutiveLaw
 {
 	public : MassSpringBody2RigidBodyLaw ();
-	private : shared_ptr<Action> actionForce;	
-	private : shared_ptr<Action> actionMomentum;
+	private : shared_ptr<ActionParameter> actionForce;	
+	private : shared_ptr<ActionParameter> actionMomentum;
 	public  : int sdecGroupMask;
 	public  : int springGroupMask;
 

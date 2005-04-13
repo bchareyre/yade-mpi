@@ -15,17 +15,17 @@
 #include "InteractionBox.hpp"
 #include "InteractionSphere.hpp"
 #include "InteractionGeometryDispatcher.hpp"
-#include "ActionDispatcher.hpp"
+#include "ActionParameterDispatcher.hpp"
 #include "ActionReset.hpp"
 #include "CundallNonViscousForceDamping.hpp"
 #include "CundallNonViscousMomentumDamping.hpp"
-#include "ActionDispatcher.hpp"
+#include "ActionParameterDispatcher.hpp"
 
 #include "BoundingVolumeDispatcher.hpp"
 #include "InteractionDescriptionSet2AABBFunctor.hpp"
 #include "InteractionDescriptionSet.hpp"
 
-#include "ActionDispatcher.hpp"
+#include "ActionParameterDispatcher.hpp"
 
 BoxStack::BoxStack () : FileGenerator()
 {
@@ -240,15 +240,15 @@ void BoxStack::createActors(shared_ptr<ComplexBody>& rootBody)
 	actionForceDamping->damping = dampingForce;
 	shared_ptr<CundallNonViscousMomentumDamping> actionMomentumDamping(new CundallNonViscousMomentumDamping);
 	actionMomentumDamping->damping = dampingMomentum;
-	shared_ptr<ActionDispatcher> actionDampingDispatcher(new ActionDispatcher);
+	shared_ptr<ActionParameterDispatcher> actionDampingDispatcher(new ActionParameterDispatcher);
 	actionDampingDispatcher->add("ActionForce","ParticleParameters","CundallNonViscousForceDamping",actionForceDamping);
 	actionDampingDispatcher->add("ActionMomentum","RigidBodyParameters","CundallNonViscousMomentumDamping",actionMomentumDamping);
 	
-	shared_ptr<ActionDispatcher> applyActionDispatcher(new ActionDispatcher);
+	shared_ptr<ActionParameterDispatcher> applyActionDispatcher(new ActionParameterDispatcher);
 	applyActionDispatcher->add("ActionForce","ParticleParameters","NewtonsForceLaw");
 	applyActionDispatcher->add("ActionMomentum","RigidBodyParameters","NewtonsMomentumLaw");
 	
-	shared_ptr<ActionDispatcher> timeIntegratorDispatcher(new ActionDispatcher);
+	shared_ptr<ActionParameterDispatcher> timeIntegratorDispatcher(new ActionParameterDispatcher);
 	timeIntegratorDispatcher->add("ActionForce","ParticleParameters","LeapFrogForceIntegrator");
 	timeIntegratorDispatcher->add("ActionMomentum","RigidBodyParameters","LeapFrogMomentumIntegrator");
  	

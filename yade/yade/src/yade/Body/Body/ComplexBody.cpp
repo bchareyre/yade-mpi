@@ -13,7 +13,7 @@
 #include "BodyAssocVector.hpp"
 #include "BoundingVolumeDispatcher.hpp"
 #include "GeometricalModelDispatcher.hpp"
-#include "ActionVecVec.hpp"
+#include "ActionParameterVectorVector.hpp"
 
 // FIXME - who is to decide which class to use by default?
 ComplexBody::ComplexBody() :
@@ -21,7 +21,7 @@ ComplexBody::ComplexBody() :
 	, bodies(new BodyRedirectionVector)
 	, initialInteractions(new InteractionVecSet)
 	, runtimeInteractions(new InteractionVecSet)
-	, actions(new ActionVecVec)
+	, actions(new ActionParameterVectorVector)
 {	
 }
 

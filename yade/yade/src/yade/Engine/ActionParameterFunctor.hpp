@@ -1,6 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2004 by Olivier Galizzi                                 *
- *   olivier.galizzi@imag.fr                                               *
+ *   Copyright (C) 2004 by Janek Kozicki                                   *
+ *   cosurgi@berlios.de                                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -21,63 +21,39 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "ActionContainer.hpp"
-#include "Action.hpp"
+#ifndef ACTION_DAMPING_FUNCTOR_HPP
+#define ACTION_DAMPING_FUNCTOR_HPP
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-ActionContainer::ActionContainer() : Serializable()
+#include "FunctorWrapper.hpp"
+#include "ActionParameter.hpp"
+#include "BodyPhysicalParameters.hpp"
+#include "Body.hpp"
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+class ActionParameterFunctor : public FunctorWrapper
+		<
+		 void ,
+		 TYPELIST_3(	  const shared_ptr<ActionParameter>&
+				, const shared_ptr<BodyPhysicalParameters>&
+				, const Body*
+			   )
+		>
 {
-	action.clear();
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-ActionContainer::~ActionContainer()
-{
-
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-void ActionContainer::registerAttributes()
-{
-	REGISTER_ATTRIBUTE(action);
+	REGISTER_CLASS_NAME(ActionParameterFunctor);
 };
 
-/* FIXME - this is needed or not?
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void ActionContainer::preProcessAttributes(bool deserializing)
-{
-	if(deserializing)
-	{
-		action.clear();
-	}
-	else
-	{
-		action.clear();
-		for( this->gotoFirst() ; this->notAtEnd() ; this->gotoNext() )
-			action.push_back(this->getCurrent());
-	}
-};
+REGISTER_SERIALIZABLE(ActionParameterFunctor,false);
 
-void ActionContainer::postProcessAttributes(bool deserializing)
-{
-	if(deserializing)
-	{
-		this->clear();
-		vector<shared_ptr<Action> >::iterator it    = action.begin();
-		vector<shared_ptr<Action> >::iterator itEnd = action.end();
-		for( ; it != itEnd ; ++it)
-			this->insert(*it);
-		action.clear();
-	}
-	else
-	{
-		action.clear();
-	}
-};
-*/
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+#endif // ACTION_DAMPING_FUNCTOR_HPP

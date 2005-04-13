@@ -28,7 +28,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void NewtonsForceLaw::go( 	  const shared_ptr<Action>& a
+void NewtonsForceLaw::go( 	  const shared_ptr<ActionParameter>& a
 					, const shared_ptr<BodyPhysicalParameters>& b
 					, const Body*)
 {
@@ -36,7 +36,7 @@ void NewtonsForceLaw::go( 	  const shared_ptr<Action>& a
 	ParticleParameters * p = static_cast<ParticleParameters*>(b.get());
 	
 	//FIXME : should be += and we should add an Actor that reset acceleration at the beginning
-	// if another Action also acts on acceleration then we are overwritting it here
+	// if another ActionParameter also acts on acceleration then we are overwritting it here
 	p->acceleration = p->invMass*af->force;
 }
 

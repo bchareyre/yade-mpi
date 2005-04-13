@@ -3,7 +3,7 @@
 # Subdir relative project main directory: ./toolboxes/DataStructures/BodyContainer
 # Target is a subdirs project 
 
-SUBDIRS += ActionVecVec
+SUBDIRS += ActionParameterVectorVector
 LIBS += -rdynamic 
 INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 

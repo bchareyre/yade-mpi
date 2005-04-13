@@ -6,7 +6,7 @@
 #include <string>
 #include <fstream>
 
-class Action;
+class ActionParameter;
 
 class ForceRecorder : public Actor
 {
@@ -15,7 +15,7 @@ class ForceRecorder : public Actor
 	public : unsigned int startId,endId;
 	public : int bigBallId; // FIXME !!!!!!!!!!
 	public : Real bigBallReleaseTime; // FIXME !!!!!!!!!!
-	private : shared_ptr<Action> actionForce;
+	private : shared_ptr<ActionParameter> actionForce;
 	
 	private : std::ofstream ofile; 
 

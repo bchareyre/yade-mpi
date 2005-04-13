@@ -21,8 +21,8 @@
 #include "SDECTimeStepper.hpp"
 
 
-#include "ActionDispatcher.hpp"
-#include "ActionDispatcher.hpp"
+#include "ActionParameterDispatcher.hpp"
+#include "ActionParameterDispatcher.hpp"
 #include "CundallNonViscousForceDamping.hpp"
 #include "CundallNonViscousMomentumDamping.hpp"
 
@@ -31,7 +31,7 @@
 #include "SimpleBody.hpp"
 #include "InteractionBox.hpp"
 #include "InteractionSphere.hpp"
-#include "ActionDispatcher.hpp"
+#include "ActionParameterDispatcher.hpp"
 #include "ActionReset.hpp"
 
 SDECSpheresPlane::SDECSpheresPlane () : FileGenerator()
@@ -99,15 +99,15 @@ string SDECSpheresPlane::generate()
 	actionForceDamping->damping = dampingForce;
 	shared_ptr<CundallNonViscousMomentumDamping> actionMomentumDamping(new CundallNonViscousMomentumDamping);
 	actionMomentumDamping->damping = dampingMomentum;
-	shared_ptr<ActionDispatcher> actionDampingDispatcher(new ActionDispatcher);
+	shared_ptr<ActionParameterDispatcher> actionDampingDispatcher(new ActionParameterDispatcher);
 	actionDampingDispatcher->add("ActionForce","RigidBodyParameters","CundallNonViscousForceDamping",actionForceDamping);
 	actionDampingDispatcher->add("ActionMomentum","RigidBodyParameters","CundallNonViscousMomentumDamping",actionMomentumDamping);
 	
-	shared_ptr<ActionDispatcher> applyActionDispatcher(new ActionDispatcher);
+	shared_ptr<ActionParameterDispatcher> applyActionDispatcher(new ActionParameterDispatcher);
 	applyActionDispatcher->add("ActionForce","RigidBodyParameters","NewtonsForceLaw");
 	applyActionDispatcher->add("ActionMomentum","RigidBodyParameters","NewtonsMomentumLaw");
 	
-	shared_ptr<ActionDispatcher> timeIntegratorDispatcher(new ActionDispatcher);
+	shared_ptr<ActionParameterDispatcher> timeIntegratorDispatcher(new ActionParameterDispatcher);
 	timeIntegratorDispatcher->add("ActionForce","ParticleParameters","LeapFrogForceIntegrator");
 	if(!rotationBlocked)
 		timeIntegratorDispatcher->add("ActionMomentum","RigidBodyParameters","LeapFrogMomentumIntegrator");

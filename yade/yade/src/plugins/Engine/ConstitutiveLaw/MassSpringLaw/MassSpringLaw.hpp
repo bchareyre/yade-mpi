@@ -2,12 +2,12 @@
 #define __EXPLICITMASSSPRINGDYNAMICENGINE_H__
 
 #include "ConstitutiveLaw.hpp"
-#include "Action.hpp"
+#include "ActionParameter.hpp"
 
 class MassSpringLaw : public ConstitutiveLaw
 {
-	private : shared_ptr<Action> actionForce;	
-	private : shared_ptr<Action> actionMomentum;
+	private : shared_ptr<ActionParameter> actionForce;	
+	private : shared_ptr<ActionParameter> actionMomentum;
 	public  : int springGroupMask;
 
 	// construction

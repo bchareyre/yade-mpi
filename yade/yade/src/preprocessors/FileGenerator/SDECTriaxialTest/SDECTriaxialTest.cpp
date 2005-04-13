@@ -44,7 +44,7 @@
 #include "SDECTimeStepper.hpp"
 
 
-#include "ActionDispatcher.hpp"
+#include "ActionParameterDispatcher.hpp"
 #include "CundallNonViscousForceDamping.hpp"
 #include "CundallNonViscousMomentumDamping.hpp"
 
@@ -52,7 +52,7 @@
 #include "InteractionPhysicsDispatcher.hpp"
 #include "InteractionBox.hpp"
 #include "InteractionSphere.hpp"
-#include "ActionDispatcher.hpp"
+#include "ActionParameterDispatcher.hpp"
 #include "ActionReset.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

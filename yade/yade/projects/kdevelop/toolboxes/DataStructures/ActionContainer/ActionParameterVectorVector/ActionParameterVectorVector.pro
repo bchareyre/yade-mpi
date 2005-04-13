@@ -17,5 +17,5 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
-HEADERS += ActionVecVec.hpp 
-SOURCES += ActionVecVec.cpp 
+HEADERS += ActionParameterVectorVector.hpp
+SOURCES += ActionParameterVectorVector.cpp
