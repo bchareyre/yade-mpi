@@ -3,9 +3,7 @@
 # Subdir relative project main directory: ./plugins/Engine/ActionParameter/ActionReset
 # Target is a library:  
 
-LIBS += -lActionParameterForce \
-        -lActionParameterMomentum \
-        -rdynamic 
+LIBS += -rdynamic 
 INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
@@ -20,5 +18,5 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
-HEADERS += ActionReset.hpp 
-SOURCES += ActionReset.cpp 
+HEADERS += ActionParameterInitializer.hpp
+SOURCES += ActionParameterInitializer.cpp

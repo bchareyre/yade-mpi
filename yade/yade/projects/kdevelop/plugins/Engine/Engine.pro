@@ -5,6 +5,8 @@
 
 SUBDIRS += ActionParameter \
            ActionParameterFunctor \
+	   ActionParameterInitializer \
+	   ActionParameterReset \
            KinematicMotion \
            ConstitutiveLaw 
 MOC_DIR = $(YADECOMPILATIONPATH)
