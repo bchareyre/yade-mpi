@@ -10,6 +10,7 @@ class VelocityRecorder;
 
 class SDECImpactTest : public FileGenerator
 {
+	private	: Vector3r gravity;
 	private	: Vector3r lowerCorner;
 	private	: Vector3r upperCorner;
 	private	: Real thickness;

@@ -49,7 +49,7 @@ void Body::registerAttributes()
 	REGISTER_ATTRIBUTE(id);
 	REGISTER_ATTRIBUTE(groupMask);
 	REGISTER_ATTRIBUTE(isDynamic); // FIXME? : only used for interaction : no collision between 2 non dynamic objects
-	
+
 	REGISTER_ATTRIBUTE(physicalParameters);
 	REGISTER_ATTRIBUTE(geometricalModel);
 	REGISTER_ATTRIBUTE(interactionGeometry);

@@ -43,6 +43,7 @@
 #include "MassSpringBody2RigidBodyLaw.hpp"
 
 #include "ActionReset.hpp"
+#include "GravityForceFunctor.hpp"
 
 HangingCloth::HangingCloth () : FileGenerator()
 {
@@ -73,6 +74,7 @@ HangingCloth::HangingCloth () : FileGenerator()
 	sphereYoungModulus   = 10000;
 	spherePoissonRatio  = 0.2;
 	sphereFrictionDeg   = 18.0;
+	gravity 	= Vector3r(0,-9.81,0);
 }
 
 HangingCloth::~HangingCloth ()
@@ -107,6 +109,7 @@ void HangingCloth::registerAttributes()
 	REGISTER_ATTRIBUTE(disorder);
 //	REGISTER_ATTRIBUTE(spacing);		// I commented that, because there are too many parameters, and window is too big
 	
+	REGISTER_ATTRIBUTE(gravity);
 	REGISTER_ATTRIBUTE(dampingForce);
 	REGISTER_ATTRIBUTE(dampingMomentum);
 	REGISTER_ATTRIBUTE(linkSpheres);
@@ -127,6 +130,11 @@ string HangingCloth::generate()
 	shared_ptr<InteractionPhysicsDispatcher> interactionPhysicsDispatcher(new InteractionPhysicsDispatcher);
 	interactionPhysicsDispatcher->add("SDECParameters","SDECParameters","SDECMacroMicroElasticRelationships");
 
+	shared_ptr<GravityForceFunctor> gravityForceFunctor(new GravityForceFunctor);
+	gravityForceFunctor->gravity = gravity;
+	shared_ptr<ActionParameterDispatcher> gravityForceDispatcher(new ActionParameterDispatcher);
+	gravityForceDispatcher->add("ActionParameterForce","ParticleParameters","GravityForceFunctor",gravityForceFunctor);
+	
 	shared_ptr<BoundingVolumeDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeDispatcher>(new BoundingVolumeDispatcher);
 	boundingVolumeDispatcher->add("InteractionSphere","AABB","Sphere2AABBFunctor");
 	boundingVolumeDispatcher->add("InteractionBox","AABB","Box2AABBFunctor");
@@ -171,6 +179,7 @@ string HangingCloth::generate()
 	rootBody->actors.push_back(explicitMassSpringConstitutiveLaw);
 	rootBody->actors.push_back(elasticContactLaw);
 //	rootBody->actors.push_back(massSpringBody2RigidBodyConstitutiveLaw); // FIXME - is not working...
+	rootBody->actors.push_back(gravityForceDispatcher);
 	rootBody->actors.push_back(actionDampingDispatcher);
 	rootBody->actors.push_back(applyActionDispatcher);
 	rootBody->actors.push_back(timeIntegratorDispatcher);

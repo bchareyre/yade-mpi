@@ -3,60 +3,6 @@
 # Subdir relative project main directory: ./yade/yade
 # Target is an application:  
 
-LIBS += -lSerialization \
-        -lMath \
-        -lBody \
-        -lInteraction \
-        -lMultiMethods \
-        -lFactory \
-        -lInteractionVecSet \
-        -lInteractionHashMap \
-        -lBodyRedirectionVector \
-        -lThreads \
-        -lBodyAssocVector \
-        -lInteractionPhysics \
-        -lInteractionGeometry \
-        -lBoundingVolume \
-        -lInteractionDescription \
-        -lGeometricalModel \
-        -lBodyPhysicalParameters \
-        -lEngine \
-        -lboost_thread \
-        -lboost_filesystem \
-        -lboost_date_time \
-        -lglut \
-        -lQGLViewer \
-        -rdynamic 
-INCLUDEPATH += $(YADEINCLUDEPATH) 
-MOC_DIR = $(YADECOMPILATIONPATH) 
-UI_DIR = $(YADECOMPILATIONPATH) 
-OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
-               ../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
-               ../../yade/Body/Body/$(YADEDYNLIBPATH) \
-               ../../yade/Interaction/Interaction/$(YADEDYNLIBPATH) \
-               ../../toolboxes/Libraries/MultiMethods/$(YADEDYNLIBPATH) \
-               ../../toolboxes/Libraries/Factory/$(YADEDYNLIBPATH) \
-               ../../toolboxes/DataStructures/InteractionContainer/InteractionVecSet/$(YADEDYNLIBPATH) \
-               ../../toolboxes/DataStructures/InteractionContainer/InteractionHashMap/$(YADEDYNLIBPATH) \
-               ../../toolboxes/DataStructures/BodyContainer/BodyRedirectionVector/$(YADEDYNLIBPATH) \
-               ../../toolboxes/Libraries/Threads/$(YADEDYNLIBPATH) \
-               ../../toolboxes/DataStructures/BodyContainer/BodyAssocVector/$(YADEDYNLIBPATH) \
-               ../../yade/Interaction/InteractionPhysics/$(YADEDYNLIBPATH) \
-               ../../yade/Interaction/InteractionGeometry/$(YADEDYNLIBPATH) \
-               ../../yade/Body/BoundingVolume/$(YADEDYNLIBPATH) \
-               ../../yade/Body/InteractionDescription/$(YADEDYNLIBPATH) \
-               ../../yade/Body/GeometricalModel/$(YADEDYNLIBPATH) \
-               ../../yade/Body/BodyPhysicalParameters/$(YADEDYNLIBPATH) \
-               $(YADEDYNLIBPATH) 
-QMAKE_CXXFLAGS_RELEASE += -lpthread \
-                          -pthread 
-QMAKE_CXXFLAGS_DEBUG += -lpthread \
-                        -pthread 
-DESTDIR = $(YADEBINPATH) 
-CONFIG += debug \
-          warn_on 
-TEMPLATE = app 
 HEADERS += Chrono.hpp \
            Omega.hpp \
            Actor.hpp \
@@ -64,7 +10,8 @@ HEADERS += Chrono.hpp \
            FileGenerator.hpp \
            SimulationLoop.hpp \
            RenderingEngine.hpp \
-           yadeExceptions.hpp 
+           yadeExceptions.hpp \
+           Initializer.hpp 
 SOURCES += Chrono.cpp \
            Omega.cpp \
            yade.cpp \
@@ -72,3 +19,57 @@ SOURCES += Chrono.cpp \
            SimulationLoop.cpp \
            FileGenerator.cpp \
            yadeExceptions.cpp 
+LIBS += -lSerialization \
+-lMath \
+-lBody \
+-lInteraction \
+-lMultiMethods \
+-lFactory \
+-lInteractionVecSet \
+-lInteractionHashMap \
+-lBodyRedirectionVector \
+-lThreads \
+-lBodyAssocVector \
+-lInteractionPhysics \
+-lInteractionGeometry \
+-lBoundingVolume \
+-lInteractionDescription \
+-lGeometricalModel \
+-lBodyPhysicalParameters \
+-lEngine \
+-lboost_thread \
+-lboost_filesystem \
+-lboost_date_time \
+-lglut \
+-lQGLViewer \
+-rdynamic
+INCLUDEPATH += $(YADEINCLUDEPATH)
+MOC_DIR = $(YADECOMPILATIONPATH)
+UI_DIR = $(YADECOMPILATIONPATH)
+OBJECTS_DIR = $(YADECOMPILATIONPATH)
+QMAKE_LIBDIR = ../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
+../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
+../../yade/Body/Body/$(YADEDYNLIBPATH) \
+../../yade/Interaction/Interaction/$(YADEDYNLIBPATH) \
+../../toolboxes/Libraries/MultiMethods/$(YADEDYNLIBPATH) \
+../../toolboxes/Libraries/Factory/$(YADEDYNLIBPATH) \
+../../toolboxes/DataStructures/InteractionContainer/InteractionVecSet/$(YADEDYNLIBPATH) \
+../../toolboxes/DataStructures/InteractionContainer/InteractionHashMap/$(YADEDYNLIBPATH) \
+../../toolboxes/DataStructures/BodyContainer/BodyRedirectionVector/$(YADEDYNLIBPATH) \
+../../toolboxes/Libraries/Threads/$(YADEDYNLIBPATH) \
+../../toolboxes/DataStructures/BodyContainer/BodyAssocVector/$(YADEDYNLIBPATH) \
+../../yade/Interaction/InteractionPhysics/$(YADEDYNLIBPATH) \
+../../yade/Interaction/InteractionGeometry/$(YADEDYNLIBPATH) \
+../../yade/Body/BoundingVolume/$(YADEDYNLIBPATH) \
+../../yade/Body/InteractionDescription/$(YADEDYNLIBPATH) \
+../../yade/Body/GeometricalModel/$(YADEDYNLIBPATH) \
+../../yade/Body/BodyPhysicalParameters/$(YADEDYNLIBPATH) \
+$(YADEDYNLIBPATH)
+QMAKE_CXXFLAGS_RELEASE += -lpthread \
+-pthread
+QMAKE_CXXFLAGS_DEBUG += -lpthread \
+-pthread
+DESTDIR = $(YADEBINPATH)
+CONFIG += debug \
+warn_on
+TEMPLATE = app

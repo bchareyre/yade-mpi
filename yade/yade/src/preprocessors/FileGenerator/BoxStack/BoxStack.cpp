@@ -26,6 +26,7 @@
 #include "InteractionDescriptionSet.hpp"
 
 #include "ActionParameterDispatcher.hpp"
+#include "GravityForceFunctor.hpp"
 
 BoxStack::BoxStack () : FileGenerator()
 {
@@ -39,6 +40,7 @@ BoxStack::BoxStack () : FileGenerator()
 	dampingForce	= 0.6;
 	dampingMomentum = 0.9;
 	kinematicBullet	= false;
+	gravity 	= Vector3r(0,-9.81,0);
 }
 
 BoxStack::~BoxStack ()
@@ -57,6 +59,7 @@ void BoxStack::registerAttributes()
 	REGISTER_ATTRIBUTE(bulletDensity);
 	REGISTER_ATTRIBUTE(bulletPosition);
 	REGISTER_ATTRIBUTE(bulletVelocity);
+	REGISTER_ATTRIBUTE(gravity);
 	REGISTER_ATTRIBUTE(dampingForce);
 	REGISTER_ATTRIBUTE(dampingMomentum);
 }
@@ -236,6 +239,11 @@ void BoxStack::createActors(shared_ptr<ComplexBody>& rootBody)
 	boundingVolumeDispatcher->add("InteractionBox","AABB","Box2AABBFunctor");
 	boundingVolumeDispatcher->add("InteractionDescriptionSet","AABB","InteractionDescriptionSet2AABBFunctor");
 		
+	shared_ptr<GravityForceFunctor> gravityForceFunctor(new GravityForceFunctor);
+	gravityForceFunctor->gravity = gravity;
+	shared_ptr<ActionParameterDispatcher> gravityForceDispatcher(new ActionParameterDispatcher);
+	gravityForceDispatcher->add("ActionParameterForce","ParticleParameters","GravityForceFunctor",gravityForceFunctor);
+	
 	shared_ptr<CundallNonViscousForceDampingFunctor> actionForceDamping(new CundallNonViscousForceDampingFunctor);
 	actionForceDamping->damping = dampingForce;
 	shared_ptr<CundallNonViscousMomentumDampingFunctor> actionMomentumDamping(new CundallNonViscousMomentumDampingFunctor);
@@ -266,6 +274,7 @@ void BoxStack::createActors(shared_ptr<ComplexBody>& rootBody)
 	rootBody->actors.push_back(shared_ptr<Actor>(new SAPCollider));
 	rootBody->actors.push_back(interactionGeometryDispatcher);
 	rootBody->actors.push_back(shared_ptr<Actor>(new SimpleSpringLaw));
+	rootBody->actors.push_back(gravityForceDispatcher);
 	rootBody->actors.push_back(actionDampingDispatcher);
 	rootBody->actors.push_back(applyActionDispatcher);
 	rootBody->actors.push_back(timeIntegratorDispatcher);

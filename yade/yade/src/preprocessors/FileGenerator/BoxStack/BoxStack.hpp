@@ -11,7 +11,7 @@ class BoxStack : public FileGenerator
 	private : Real boxDensity;
 	private : Real bulletSize;
 	private : Real bulletDensity;
-	private : Vector3r bulletVelocity;
+	private : Vector3r bulletVelocity,gravity;
 	private : bool kinematicBullet;
 	private : Real dampingForce;
 	private : Real dampingMomentum;

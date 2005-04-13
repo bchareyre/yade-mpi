@@ -8,7 +8,7 @@ class RotatingBox : public FileGenerator
 {
 	private : Vector3r nbSpheres;
 	private : Vector3r nbBoxes;
-	private : Vector3r rotationAxis;
+	private : Vector3r rotationAxis,gravity;
 	private	: Real minSize;
 	private	: Real maxSize;
 	private	: Real disorder;

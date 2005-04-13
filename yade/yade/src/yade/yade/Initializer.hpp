@@ -1,6 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2004 by Olivier Galizzi                                 *
- *   olivier.galizzi@imag.fr                                               *
+ *   Copyright (C) 2004 by Janek Kozicki                                   *
+ *   cosurgi@berlios.de                                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -18,27 +18,22 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+#ifndef INITIALIZER_HPP
+#define INITIALIZER_HPP 
 
-#include "NewtonsMomentumLaw.hpp"
-#include "RigidBodyParameters.hpp"
-#include "ActionMomentum.hpp"
+#include "Actor.hpp"
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-void NewtonsMomentumLaw::go(   const shared_ptr<Action>& a
-					, const shared_ptr<BodyPhysicalParameters>& b
-					, const Body*)
+class Initializer : public Actor
 {
-	ActionMomentum * am = static_cast<ActionMomentum*>(a.get());
-	RigidBodyParameters * rb = static_cast<RigidBodyParameters*>(b.get());
+	public : Initializer() {};
+	public : virtual ~Initializer() {};
 	
-	//FIXME : should be += and we should add an Actor that reset acceleration at the beginning
-	rb->angularAcceleration = am->momentum.multDiag(rb->invInertia);
-}
+	public : virtual bool removeAfter() { throw; }; // FIXME - add exception "Initializer::removeAfter() not specified for class typeid().name"
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+	REGISTER_CLASS_NAME(Initializer);
+};
+
+REGISTER_SERIALIZABLE(Initializer,false);
+
+#endif // INITIALIZER_HPP 
 
