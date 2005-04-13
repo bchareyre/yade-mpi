@@ -12,7 +12,7 @@
 #include "SDECContactPhysics.hpp"
 #include "SDECLinkPhysics.hpp"
 
-MassSpringBody2RigidBodyLaw::MassSpringBody2RigidBodyLaw ()  : ConstitutiveLaw(), actionForce(new ActionForce) , actionMomentum(new ActionMomentum)
+MassSpringBody2RigidBodyLaw::MassSpringBody2RigidBodyLaw ()  : ConstitutiveLaw(), actionForce(new ActionParameterForce) , actionMomentum(new ActionParameterMomentum)
 {
 	springGroupMask = 2;
 	sdecGroupMask = 1;
@@ -94,11 +94,11 @@ void MassSpringBody2RigidBodyLaw::calculateForces(Body * body)
 
 		Vector3r f				= currentContactPhysics->normalForce + currentContactPhysics->shearForce;
 
-		static_cast<ActionForce*>   ( mixedBody->actions->find( id1 , actionForce   ->getClassIndex() ).get() )->force    -= f;
-		static_cast<ActionForce*>   ( mixedBody->actions->find( id2 , actionForce   ->getClassIndex() ).get() )->force    += f;
+		static_cast<ActionParameterForce*>   ( mixedBody->actions->find( id1 , actionForce   ->getClassIndex() ).get() )->force    -= f;
+		static_cast<ActionParameterForce*>   ( mixedBody->actions->find( id2 , actionForce   ->getClassIndex() ).get() )->force    += f;
 		
-		static_cast<ActionMomentum*>( mixedBody->actions->find( id1 , actionMomentum->getClassIndex() ).get() )->momentum -= c1x.cross(f);
-		static_cast<ActionMomentum*>( mixedBody->actions->find( id2 , actionMomentum->getClassIndex() ).get() )->momentum += c2x.cross(f);
+		static_cast<ActionParameterMomentum*>( mixedBody->actions->find( id1 , actionMomentum->getClassIndex() ).get() )->momentum -= c1x.cross(f);
+		static_cast<ActionParameterMomentum*>( mixedBody->actions->find( id2 , actionMomentum->getClassIndex() ).get() )->momentum += c2x.cross(f);
 		
 		currentContactPhysics->prevNormal = currentContactGeometry->normal;
 // END										

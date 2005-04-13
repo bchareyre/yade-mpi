@@ -3,10 +3,10 @@
 #include "ClosestFeatures.hpp"
 #include "Omega.hpp"
 #include "ComplexBody.hpp"
-#include "ActionForce.hpp"
-#include "ActionMomentum.hpp"
+#include "ActionParameterForce.hpp"
+#include "ActionParameterMomentum.hpp"
 
-SimpleSpringLaw::SimpleSpringLaw () : ConstitutiveLaw(), actionForce(new ActionForce) , actionMomentum(new ActionMomentum)
+SimpleSpringLaw::SimpleSpringLaw () : ConstitutiveLaw(), actionForce(new ActionParameterForce) , actionMomentum(new ActionParameterMomentum)
 {
 }
 
@@ -59,11 +59,11 @@ void SimpleSpringLaw::calculateForces(Body * body)
 			Real relativeVelocity = dir.dot(v2-v1);
 			Vector3r f = (elongation*stiffness+relativeVelocity*viscosity)/size*dir;
 
-			static_cast<ActionForce*>   ( ncb->actions->find( id1 , actionForce   ->getClassIndex() ).get() )->force    += f;
-			static_cast<ActionForce*>   ( ncb->actions->find( id2 , actionForce   ->getClassIndex() ).get() )->force    -= f;
+			static_cast<ActionParameterForce*>   ( ncb->actions->find( id1 , actionForce   ->getClassIndex() ).get() )->force    += f;
+			static_cast<ActionParameterForce*>   ( ncb->actions->find( id2 , actionForce   ->getClassIndex() ).get() )->force    -= f;
 		
-			static_cast<ActionMomentum*>( ncb->actions->find( id1 , actionMomentum->getClassIndex() ).get() )->momentum += o1p.cross(f);
-			static_cast<ActionMomentum*>( ncb->actions->find( id2 , actionMomentum->getClassIndex() ).get() )->momentum -= o2p.cross(f);
+			static_cast<ActionParameterMomentum*>( ncb->actions->find( id1 , actionMomentum->getClassIndex() ).get() )->momentum += o1p.cross(f);
+			static_cast<ActionParameterMomentum*>( ncb->actions->find( id2 , actionMomentum->getClassIndex() ).get() )->momentum -= o2p.cross(f);
 			
 		}
 	}
@@ -76,7 +76,7 @@ void SimpleSpringLaw::calculateForces(Body * body)
 	{
 		shared_ptr<Body>& b = bodies->getCurrent();
 		RigidBodyParameters * de = static_cast<RigidBodyParameters*>(b->physicalParameters.get());
-		static_cast<ActionForce*>( ncb->actions->find( b->getId() , actionForce->getClassIndex() ).get() )->force += gravity*de->mass;
+		static_cast<ActionParameterForce*>( ncb->actions->find( b->getId() , actionForce->getClassIndex() ).get() )->force += gravity*de->mass;
         }
 
 }

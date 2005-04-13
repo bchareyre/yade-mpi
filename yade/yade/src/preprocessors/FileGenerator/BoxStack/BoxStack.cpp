@@ -17,8 +17,8 @@
 #include "InteractionGeometryDispatcher.hpp"
 #include "ActionParameterDispatcher.hpp"
 #include "ActionReset.hpp"
-#include "CundallNonViscousForceDamping.hpp"
-#include "CundallNonViscousMomentumDamping.hpp"
+#include "CundallNonViscousForceDampingFunctor.hpp"
+#include "CundallNonViscousMomentumDampingFunctor.hpp"
 #include "ActionParameterDispatcher.hpp"
 
 #include "BoundingVolumeDispatcher.hpp"
@@ -236,21 +236,21 @@ void BoxStack::createActors(shared_ptr<ComplexBody>& rootBody)
 	boundingVolumeDispatcher->add("InteractionBox","AABB","Box2AABBFunctor");
 	boundingVolumeDispatcher->add("InteractionDescriptionSet","AABB","InteractionDescriptionSet2AABBFunctor");
 		
-	shared_ptr<CundallNonViscousForceDamping> actionForceDamping(new CundallNonViscousForceDamping);
+	shared_ptr<CundallNonViscousForceDampingFunctor> actionForceDamping(new CundallNonViscousForceDampingFunctor);
 	actionForceDamping->damping = dampingForce;
-	shared_ptr<CundallNonViscousMomentumDamping> actionMomentumDamping(new CundallNonViscousMomentumDamping);
+	shared_ptr<CundallNonViscousMomentumDampingFunctor> actionMomentumDamping(new CundallNonViscousMomentumDampingFunctor);
 	actionMomentumDamping->damping = dampingMomentum;
 	shared_ptr<ActionParameterDispatcher> actionDampingDispatcher(new ActionParameterDispatcher);
-	actionDampingDispatcher->add("ActionForce","ParticleParameters","CundallNonViscousForceDamping",actionForceDamping);
-	actionDampingDispatcher->add("ActionMomentum","RigidBodyParameters","CundallNonViscousMomentumDamping",actionMomentumDamping);
+	actionDampingDispatcher->add("ActionParameterForce","ParticleParameters","CundallNonViscousForceDampingFunctor",actionForceDamping);
+	actionDampingDispatcher->add("ActionParameterMomentum","RigidBodyParameters","CundallNonViscousMomentumDampingFunctor",actionMomentumDamping);
 	
 	shared_ptr<ActionParameterDispatcher> applyActionDispatcher(new ActionParameterDispatcher);
-	applyActionDispatcher->add("ActionForce","ParticleParameters","NewtonsForceLaw");
-	applyActionDispatcher->add("ActionMomentum","RigidBodyParameters","NewtonsMomentumLaw");
+	applyActionDispatcher->add("ActionParameterForce","ParticleParameters","NewtonsForceLawFunctor");
+	applyActionDispatcher->add("ActionParameterMomentum","RigidBodyParameters","NewtonsMomentumLawFunctor");
 	
 	shared_ptr<ActionParameterDispatcher> timeIntegratorDispatcher(new ActionParameterDispatcher);
-	timeIntegratorDispatcher->add("ActionForce","ParticleParameters","LeapFrogForceIntegrator");
-	timeIntegratorDispatcher->add("ActionMomentum","RigidBodyParameters","LeapFrogMomentumIntegrator");
+	timeIntegratorDispatcher->add("ActionParameterForce","ParticleParameters","LeapFrogForceIntegratorFunctor");
+	timeIntegratorDispatcher->add("ActionParameterMomentum","RigidBodyParameters","LeapFrogMomentumIntegratorFunctor");
  	
 // 	shared_ptr<Rotor> kinematic = shared_ptr<Rotor>(new Rotor);
 // 	kinematic->angularVelocity  = rotationSpeed;

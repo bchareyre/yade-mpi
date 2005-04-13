@@ -2,11 +2,11 @@
 #include "RigidBodyParameters.hpp"
 #include "Omega.hpp"
 #include "ComplexBody.hpp"
-#include "ActionForce.hpp"
+#include "ActionParameterForce.hpp"
 
 #include <boost/lexical_cast.hpp>
 
-ForceRecorder::ForceRecorder () : Actor(), actionForce(new ActionForce)
+ForceRecorder::ForceRecorder () : Actor(), actionForce(new ActionParameterForce)
 {
 	outputFile = "";
 	interval = 50;
@@ -46,7 +46,7 @@ void ForceRecorder::action(Body * body)
 	
 	for( unsigned int i = startId ; i <= endId ; ++i )
 	{
-		Vector3r force = dynamic_cast<ActionForce*>(ncb->actions->find( i , actionForce->getClassIndex() ) . get() )->force;
+		Vector3r force = dynamic_cast<ActionParameterForce*>(ncb->actions->find( i , actionForce->getClassIndex() ) . get() )->force;
 		
 		x+=force[0];
 		y+=force[1];

@@ -21,81 +21,53 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#ifndef __ACTIONCONTAINER_HPP__
-#define __ACTIONCONTAINER_HPP__
+#include "ActionParameterMomentum.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "Serializable.hpp"
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-class ActionParameter;
-
-// this container is different: it has ALWAYS data inside, not empty pointers at all. Every field has
-// inside the right pointer type so it can be safely (and quickly) static_casted, so that the user himself
-// is doing addition, substraction, and whatever he wants.
-//
-// you should never have to create new ActionParameter ! (that takes too much time), except for calling prepare, which is done only once
-
-class ActionParameterContainer : public Serializable
+ActionParameterMomentum::ActionParameterMomentum() : ActionParameter()
 {
+	createIndex();
+}
+
+ActionParameterMomentum::~ActionParameterMomentum()
+{
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-/// Constructor/Destructor									///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-
-	public : ActionParameterContainer();
-	public : virtual ~ActionParameterContainer();
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-/// Methods											///
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-	public    : virtual void clear() 							{throw;};
-	// doesn't not delete all, just resets data
-	public    : virtual void reset() 							{throw;};
-	public    : virtual unsigned int size() 						{throw;};
-	// fills container with resetted fields. argument here, should be all ActionParameter types that are planned to use
-	public    : virtual void prepare(std::vector<shared_ptr<ActionParameter> >& )			{throw;};
-	
-	// finds and returns action of given polymorphic type, for body of given Id,
-	// should be always succesfull. if it is not - you forgot to call prepare()
-	public    : virtual shared_ptr<ActionParameter>& find(
-					  unsigned int /*Body->getId() */
-					, int /*ActionParameterForce::getClassIndexStatic()*/)		{throw;};
-
-	// looping over Bodies, and their Actions
-	public    : virtual void gotoFirst() 							{throw;};
-	public    : virtual bool notAtEnd() 							{throw;};
-	public    : virtual void gotoNext() 							{throw;};
-	public    : virtual shared_ptr<ActionParameter>& getCurrent(int& )				{throw;};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-/// Serialization										///
-///////////////////////////////////////////////////////////////////////////////////////////////////
-	
-	REGISTER_CLASS_NAME(ActionParameterContainer);
-	// local storage for uniform serialization of all possible container concrete implementations.
-	private   : vector<shared_ptr<ActionParameter> > action;
-	public    : virtual void registerAttributes();
-	//protected : virtual void preProcessAttributes(bool deserializing);
-	//protected : virtual void postProcessAttributes(bool deserializing);
-
-};
+/* FIXME - not used
+void ActionParameterMomentum::add(const shared_ptr<ActionParameter>& a)
+{
+	ActionParameterMomentum * m = static_cast<ActionParameterMomentum*>(a.get());
+	momentum += m->momentum;
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-REGISTER_SERIALIZABLE(ActionParameterContainer,false);
+void ActionParameterMomentum::sub(const shared_ptr<ActionParameter>& a)
+{
+	ActionParameterMomentum * m = static_cast<ActionParameterMomentum*>(a.get());
+	momentum -= m->momentum;
+}
+*/
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+void ActionParameterMomentum::reset()
+{
+	momentum = Vector3r::ZERO;
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#endif // __ACTIONCONTAINER_HPP__
+shared_ptr<ActionParameter> ActionParameterMomentum::clone()
+{
+	return shared_ptr<ActionParameterMomentum>(new ActionParameterMomentum(*this));
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-

@@ -21,34 +21,48 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "ActionReset.hpp"
-#include "ComplexBody.hpp"
-#include "ActionParameterForce.hpp"
-#include "ActionParameterMomentum.hpp"
+#include "LeapFrogMomentumIntegratorFunctor.hpp"
+#include "RigidBodyParameters.hpp"
+#include "ParticleParameters.hpp"
+#include "Omega.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-ActionReset::ActionReset() : actionForce(new ActionParameterForce) , actionMomentum(new ActionParameterMomentum)
-{
-	first = true;
-}
 
-void ActionReset::action(Body* body)
+// FIXME : should we pass timestep as parameter of functor
+// FIXME : what's with timestepper
+void LeapFrogMomentumIntegratorFunctor::go( 	  const shared_ptr<ActionParameter>&
+					, const shared_ptr<BodyPhysicalParameters>& b
+					, const Body* body)
 {
-	ComplexBody * ncb = dynamic_cast<ComplexBody*>(body);
+	if(! body->isDynamic)
+		return;
+		
+	unsigned int id = body->getId();
 	
-	if(first) // FIXME - this should be done somewhere else, or this is the right place ?
+	if (prevAngularVelocities.size()<=id)
 	{
-		vector<shared_ptr<ActionParameter> > vvv; 
-		vvv.clear();
-		vvv.push_back(actionForce); // FIXME - should ask what Actions should be prepared !
-		vvv.push_back(actionMomentum);
-		ncb->actions->prepare(vvv);
-		first = false;
+		prevAngularVelocities.resize(id+1);
+		firsts.resize(id+1,true);
 	}
+
+	RigidBodyParameters * rb = dynamic_cast<RigidBodyParameters*>(b.get());
 	
-	ncb->actions->reset();
+	Real dt = Omega::instance().getTimeStep();
+		
+	if (!firsts[id])
+		rb->angularVelocity = prevAngularVelocities[id]+0.5*dt*rb->angularAcceleration;
+		
+	prevAngularVelocities[id] = rb->angularVelocity+0.5*dt*rb->angularAcceleration;
+	Vector3r axis = rb->angularVelocity;
+	Real angle = axis.normalize();
+	Quaternionr q;
+	q.fromAxisAngle(axis,angle*dt);
+	rb->se3.orientation = q*rb->se3.orientation;
+	rb->se3.orientation.normalize();
+
+	firsts[id] = false;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

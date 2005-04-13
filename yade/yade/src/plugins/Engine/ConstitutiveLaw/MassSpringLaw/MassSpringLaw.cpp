@@ -5,10 +5,10 @@
 #include "SpringGeometry.hpp"
 #include "SpringPhysics.hpp"
 #include "ParticleParameters.hpp"
-#include "ActionForce.hpp"
-#include "ActionMomentum.hpp"
+#include "ActionParameterForce.hpp"
+#include "ActionParameterMomentum.hpp"
 
-MassSpringLaw::MassSpringLaw () : ConstitutiveLaw(), actionForce(new ActionForce) , actionMomentum(new ActionMomentum)
+MassSpringLaw::MassSpringLaw () : ConstitutiveLaw(), actionForce(new ActionParameterForce) , actionMomentum(new ActionParameterMomentum)
 {
 }
 
@@ -56,22 +56,22 @@ void MassSpringLaw::calculateForces(Body * body)
 		Real relativeVelocity = dir.dot((p1->velocity-p2->velocity));
 		Vector3r f3 = (e*physics->stiffness + relativeVelocity* ( 1.0 - physics->damping )  )*dir;
 		
-		static_cast<ActionForce*>   ( actions->find( id1 , actionForce->getClassIndex() ).get() )->force    -= f3;
-		static_cast<ActionForce*>   ( actions->find( id2 , actionForce->getClassIndex() ).get() )->force    += f3;
+		static_cast<ActionParameterForce*>   ( actions->find( id1 , actionForce->getClassIndex() ).get() )->force    -= f3;
+		static_cast<ActionParameterForce*>   ( actions->find( id2 , actionForce->getClassIndex() ).get() )->force    += f3;
 	}
 	
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// Gravity														///
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	shared_ptr<ActionForce> af(new ActionForce);
+	shared_ptr<ActionParameterForce> af(new ActionParameterForce);
 	
 	for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext())
 	{
 		if(bodies->getCurrent()->getGroupMask() & springGroupMask)
 		{
 			ParticleParameters * p = static_cast<ParticleParameters*>(bodies->getCurrent()->physicalParameters.get());
-			static_cast<ActionForce*>( massSpring->actions->find( bodies->getCurrent()->getId() , actionForce->getClassIndex() ).get() )->force += gravity*p->mass;
+			static_cast<ActionParameterForce*>( massSpring->actions->find( bodies->getCurrent()->getId() , actionForce->getClassIndex() ).get() )->force += gravity*p->mass;
 		}
 	}
 }

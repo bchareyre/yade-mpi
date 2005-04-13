@@ -21,80 +21,43 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#ifndef __ACTIONCONTAINER_HPP__
-#define __ACTIONCONTAINER_HPP__
+#ifndef __LEAPFROGINTEGRATOR_HPP__
+#define __LEAPFROGINTEGRATOR_HPP__
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "Serializable.hpp"
+#include "ActionParameterFunctor.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-class ActionParameter;
-
-// this container is different: it has ALWAYS data inside, not empty pointers at all. Every field has
-// inside the right pointer type so it can be safely (and quickly) static_casted, so that the user himself
-// is doing addition, substraction, and whatever he wants.
-//
-// you should never have to create new ActionParameter ! (that takes too much time), except for calling prepare, which is done only once
-
-class ActionParameterContainer : public Serializable
+class LeapFrogForceIntegratorFunctor : public ActionParameterFunctor
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-/// Constructor/Destructor									///
+/// Attributes											///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public : ActionParameterContainer();
-	public : virtual ~ActionParameterContainer();
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-/// Methods											///
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-	public    : virtual void clear() 							{throw;};
-	// doesn't not delete all, just resets data
-	public    : virtual void reset() 							{throw;};
-	public    : virtual unsigned int size() 						{throw;};
-	// fills container with resetted fields. argument here, should be all ActionParameter types that are planned to use
-	public    : virtual void prepare(std::vector<shared_ptr<ActionParameter> >& )			{throw;};
+	private : vector<Vector3r> prevVelocities;
+	private : vector<bool> firsts;
 	
-	// finds and returns action of given polymorphic type, for body of given Id,
-	// should be always succesfull. if it is not - you forgot to call prepare()
-	public    : virtual shared_ptr<ActionParameter>& find(
-					  unsigned int /*Body->getId() */
-					, int /*ActionParameterForce::getClassIndexStatic()*/)		{throw;};
-
-	// looping over Bodies, and their Actions
-	public    : virtual void gotoFirst() 							{throw;};
-	public    : virtual bool notAtEnd() 							{throw;};
-	public    : virtual void gotoNext() 							{throw;};
-	public    : virtual shared_ptr<ActionParameter>& getCurrent(int& )				{throw;};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-/// Serialization										///
-///////////////////////////////////////////////////////////////////////////////////////////////////
+	public : virtual void go( 	  const shared_ptr<ActionParameter>&
+					, const shared_ptr<BodyPhysicalParameters>&
+					, const Body*);
 	
-	REGISTER_CLASS_NAME(ActionParameterContainer);
-	// local storage for uniform serialization of all possible container concrete implementations.
-	private   : vector<shared_ptr<ActionParameter> > action;
-	public    : virtual void registerAttributes();
-	//protected : virtual void preProcessAttributes(bool deserializing);
-	//protected : virtual void postProcessAttributes(bool deserializing);
-
+	REGISTER_CLASS_NAME(LeapFrogForceIntegratorFunctor);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-REGISTER_SERIALIZABLE(ActionParameterContainer,false);
+REGISTER_SERIALIZABLE(LeapFrogForceIntegratorFunctor,false);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#endif // __ACTIONCONTAINER_HPP__
+#endif // __LEAPFROGINTEGRATOR_HPP__
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////

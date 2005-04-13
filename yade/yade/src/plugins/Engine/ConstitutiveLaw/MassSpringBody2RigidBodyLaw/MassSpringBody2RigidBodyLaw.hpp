@@ -2,8 +2,8 @@
 #define __MASSSPRINGBODY2RIGIDBODYNAMICENGINE_H__
 
 #include "ConstitutiveLaw.hpp"
-#include "ActionForce.hpp"
-#include "ActionMomentum.hpp"
+#include "ActionParameterForce.hpp"
+#include "ActionParameterMomentum.hpp"
 
 class MassSpringBody2RigidBodyLaw : public ConstitutiveLaw
 {

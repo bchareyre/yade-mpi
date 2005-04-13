@@ -1,6 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2004 by Janek Kozicki                                   *
- *   cosurgi@berlios.de                                                    *
+ *   Copyright (C) 2004 by Olivier Galizzi                                 *
+ *   olivier.galizzi@imag.fr                                               *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -21,36 +21,44 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "ActionReset.hpp"
-#include "ComplexBody.hpp"
-#include "ActionParameterForce.hpp"
-#include "ActionParameterMomentum.hpp"
+#include "LeapFrogForceIntegratorFunctor.hpp"
+#include "RigidBodyParameters.hpp"
+#include "ParticleParameters.hpp"
+#include "Omega.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-ActionReset::ActionReset() : actionForce(new ActionParameterForce) , actionMomentum(new ActionParameterMomentum)
-{
-	first = true;
-}
 
-void ActionReset::action(Body* body)
+// FIXME : should we pass timestep as parameter of functor
+// FIXME : what's with timestepper
+void LeapFrogForceIntegratorFunctor::go( 	  const shared_ptr<ActionParameter>&
+					, const shared_ptr<BodyPhysicalParameters>& b
+					, const Body* body)
 {
-	ComplexBody * ncb = dynamic_cast<ComplexBody*>(body);
+	if(! body->isDynamic)
+		return;
+		
+	unsigned int id = body->getId();
 	
-	if(first) // FIXME - this should be done somewhere else, or this is the right place ?
+	if (prevVelocities.size()<=id)
 	{
-		vector<shared_ptr<ActionParameter> > vvv; 
-		vvv.clear();
-		vvv.push_back(actionForce); // FIXME - should ask what Actions should be prepared !
-		vvv.push_back(actionMomentum);
-		ncb->actions->prepare(vvv);
-		first = false;
+		prevVelocities.resize(id+1);
+		firsts.resize(id+1,true);
 	}
-	
-	ncb->actions->reset();
+
+	ParticleParameters * p = dynamic_cast<ParticleParameters*>(b.get());
+
+	Real dt = Omega::instance().getTimeStep();
+
+	if (!firsts[id])
+		p->velocity = prevVelocities[id]+0.5*dt*p->acceleration;
+
+	prevVelocities[id] = p->velocity+0.5*dt*p->acceleration;
+	p->se3.position += prevVelocities[id]*dt;
+
+	firsts[id] = false;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-

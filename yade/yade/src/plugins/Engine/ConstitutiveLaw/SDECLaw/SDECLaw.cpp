@@ -29,14 +29,14 @@
 #include "SDECLinkPhysics.hpp"
 #include "Omega.hpp"
 #include "ComplexBody.hpp"
-#include "ActionForce.hpp"
-#include "ActionMomentum.hpp"
+#include "ActionParameterForce.hpp"
+#include "ActionParameterMomentum.hpp"
 #include "ActionParameter.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-SDECLaw::SDECLaw() : ConstitutiveLaw() , actionForce(new ActionForce) , actionMomentum(new ActionMomentum)
+SDECLaw::SDECLaw() : ConstitutiveLaw() , actionForce(new ActionParameterForce) , actionMomentum(new ActionParameterMomentum)
 {
 	sdecGroupMask=1;
 	first=true;
@@ -137,11 +137,11 @@ void SDECLaw::calculateForces(Body* body)
 
 		Vector3r f = currentContactPhysics->normalForce + currentContactPhysics->shearForce;
 
-		static_cast<ActionForce*>   ( ncb->actions->find( id1 , actionForce   ->getClassIndex() ).get() )->force    -= f;
-		static_cast<ActionForce*>   ( ncb->actions->find( id2 , actionForce   ->getClassIndex() ).get() )->force    += f;
+		static_cast<ActionParameterForce*>   ( ncb->actions->find( id1 , actionForce   ->getClassIndex() ).get() )->force    -= f;
+		static_cast<ActionParameterForce*>   ( ncb->actions->find( id2 , actionForce   ->getClassIndex() ).get() )->force    += f;
 		
-		static_cast<ActionMomentum*>( ncb->actions->find( id1 , actionMomentum->getClassIndex() ).get() )->momentum -= c1x.cross(f);
-		static_cast<ActionMomentum*>( ncb->actions->find( id2 , actionMomentum->getClassIndex() ).get() )->momentum += c2x.cross(f);
+		static_cast<ActionParameterMomentum*>( ncb->actions->find( id1 , actionMomentum->getClassIndex() ).get() )->momentum -= c1x.cross(f);
+		static_cast<ActionParameterMomentum*>( ncb->actions->find( id2 , actionMomentum->getClassIndex() ).get() )->momentum += c2x.cross(f);
 
 
 
@@ -287,8 +287,8 @@ void SDECLaw::calculateForces(Body* body)
 
 		//if (normElastic<=normMPlastic)
 		//{
-		static_cast<ActionMomentum*>( ncb->actions->find( id1 , actionMomentum->getClassIndex() ).get() )->momentum -= q_n_i*mElastic;
-		static_cast<ActionMomentum*>( ncb->actions->find( id2 , actionMomentum->getClassIndex() ).get() )->momentum += q_n_i*mElastic;
+		static_cast<ActionParameterMomentum*>( ncb->actions->find( id1 , actionMomentum->getClassIndex() ).get() )->momentum -= q_n_i*mElastic;
+		static_cast<ActionParameterMomentum*>( ncb->actions->find( id2 , actionMomentum->getClassIndex() ).get() )->momentum += q_n_i*mElastic;
 
 		//}
 		//else
@@ -398,11 +398,11 @@ void SDECLaw::calculateForces(Body* body)
 		Vector3r f				= currentContactPhysics->normalForce + shearForce;
 		
 // it will be some macro(	body->actions,	ActionType , bodyId )
-		static_cast<ActionForce*>   ( ncb->actions->find( id1 , actionForce   ->getClassIndex() ).get() )->force    -= f;
-		static_cast<ActionForce*>   ( ncb->actions->find( id2 , actionForce   ->getClassIndex() ).get() )->force    += f;
+		static_cast<ActionParameterForce*>   ( ncb->actions->find( id1 , actionForce   ->getClassIndex() ).get() )->force    -= f;
+		static_cast<ActionParameterForce*>   ( ncb->actions->find( id2 , actionForce   ->getClassIndex() ).get() )->force    += f;
 		
-		static_cast<ActionMomentum*>( ncb->actions->find( id1 , actionMomentum->getClassIndex() ).get() )->momentum -= c1x.cross(f);
-		static_cast<ActionMomentum*>( ncb->actions->find( id2 , actionMomentum->getClassIndex() ).get() )->momentum += c2x.cross(f);
+		static_cast<ActionParameterMomentum*>( ncb->actions->find( id1 , actionMomentum->getClassIndex() ).get() )->momentum -= c1x.cross(f);
+		static_cast<ActionParameterMomentum*>( ncb->actions->find( id2 , actionMomentum->getClassIndex() ).get() )->momentum += c2x.cross(f);
 		
 		currentContactPhysics->prevNormal = currentContactGeometry->normal;
 	}
@@ -418,7 +418,7 @@ void SDECLaw::calculateForces(Body* body)
 		if( b->getGroupMask() & sdecGroupMask )
 		{
 			RigidBodyParameters * de = static_cast<SDECParameters*>(b->physicalParameters.get());
-			static_cast<ActionForce*>( ncb->actions->find( b->getId() , actionForce->getClassIndex() ).get() )->force += gravity*de->mass;
+			static_cast<ActionParameterForce*>( ncb->actions->find( b->getId() , actionForce->getClassIndex() ).get() )->force += gravity*de->mass;
 		}
         }
 

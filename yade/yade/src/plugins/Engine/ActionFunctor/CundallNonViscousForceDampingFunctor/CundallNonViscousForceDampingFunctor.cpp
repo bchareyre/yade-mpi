@@ -21,34 +21,50 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "ActionReset.hpp"
-#include "ComplexBody.hpp"
+#include "CundallNonViscousForceDampingFunctor.hpp"
+#include "ParticleParameters.hpp"
 #include "ActionParameterForce.hpp"
-#include "ActionParameterMomentum.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-ActionReset::ActionReset() : actionForce(new ActionParameterForce) , actionMomentum(new ActionParameterMomentum)
+CundallNonViscousForceDampingFunctor::CundallNonViscousForceDampingFunctor() : damping(0)
 {
-	first = true;
 }
 
-void ActionReset::action(Body* body)
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+void CundallNonViscousForceDampingFunctor::registerAttributes()
 {
-	ComplexBody * ncb = dynamic_cast<ComplexBody*>(body);
+	REGISTER_ATTRIBUTE(damping);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+// this is Cundall non-viscous local damping, applied to force (ActionParameterForce)
+
+void CundallNonViscousForceDampingFunctor::go(   const shared_ptr<ActionParameter>& a
+					, const shared_ptr<BodyPhysicalParameters>& b
+					, const Body*)
+{
+	ActionParameterForce * af = static_cast<ActionParameterForce*>(a.get());
+	ParticleParameters * p = static_cast<ParticleParameters*>(b.get());
 	
-	if(first) // FIXME - this should be done somewhere else, or this is the right place ?
+	Vector3r& f  = af->force;
+	register int sign;
+	for(int j=0;j<3;j++)
 	{
-		vector<shared_ptr<ActionParameter> > vvv; 
-		vvv.clear();
-		vvv.push_back(actionForce); // FIXME - should ask what Actions should be prepared !
-		vvv.push_back(actionMomentum);
-		ncb->actions->prepare(vvv);
-		first = false;
+		if (p->velocity[j] == 0)
+			sign = 0;
+		else if (p->velocity[j] > 0)
+			sign = 1;
+		else
+			sign = -1;
+			
+		f[j] -= damping * std::abs(f[j]) * sign;
 	}
-	
-	ncb->actions->reset();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

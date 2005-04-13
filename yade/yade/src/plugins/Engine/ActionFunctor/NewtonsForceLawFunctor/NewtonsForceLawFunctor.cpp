@@ -1,6 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2004 by Janek Kozicki                                   *
- *   cosurgi@berlios.de                                                    *
+ *   Copyright (C) 2004 by Olivier Galizzi                                 *
+ *   olivier.galizzi@imag.fr                                               *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -21,34 +21,23 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "ActionReset.hpp"
-#include "ComplexBody.hpp"
+#include "NewtonsForceLawFunctor.hpp"
+#include "ParticleParameters.hpp"
 #include "ActionParameterForce.hpp"
-#include "ActionParameterMomentum.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-ActionReset::ActionReset() : actionForce(new ActionParameterForce) , actionMomentum(new ActionParameterMomentum)
+void NewtonsForceLawFunctor::go( 	  const shared_ptr<ActionParameter>& a
+					, const shared_ptr<BodyPhysicalParameters>& b
+					, const Body*)
 {
-	first = true;
-}
-
-void ActionReset::action(Body* body)
-{
-	ComplexBody * ncb = dynamic_cast<ComplexBody*>(body);
+	ActionParameterForce * af = static_cast<ActionParameterForce*>(a.get());
+	ParticleParameters * p = static_cast<ParticleParameters*>(b.get());
 	
-	if(first) // FIXME - this should be done somewhere else, or this is the right place ?
-	{
-		vector<shared_ptr<ActionParameter> > vvv; 
-		vvv.clear();
-		vvv.push_back(actionForce); // FIXME - should ask what Actions should be prepared !
-		vvv.push_back(actionMomentum);
-		ncb->actions->prepare(vvv);
-		first = false;
-	}
-	
-	ncb->actions->reset();
+	//FIXME : should be += and we should add an Actor that reset acceleration at the beginning
+	// if another ActionParameter also acts on acceleration then we are overwritting it here
+	p->acceleration = p->invMass*af->force;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

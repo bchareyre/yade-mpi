@@ -9,6 +9,6 @@ OBJECTS_DIR = $(YADECOMPILATIONPATH)
 CONFIG += debug \
           warn_on 
 TEMPLATE = subdirs 
-SUBDIRS += ActionMomentum \
-           ActionForce \
+SUBDIRS += ActionParameterMomentum \
+           ActionParameterForce \
            ActionReset 

@@ -1,6 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2004 by Janek Kozicki                                   *
- *   cosurgi@berlios.de                                                    *
+ *   Copyright (C) 2004 by Olivier Galizzi                                 *
+ *   olivier.galizzi@imag.fr                                               *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -21,35 +21,34 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "ActionReset.hpp"
-#include "ComplexBody.hpp"
-#include "ActionParameterForce.hpp"
-#include "ActionParameterMomentum.hpp"
+#ifndef __ACTIONMOMENTUM2RIGIDBODY_HPP__
+#define __ACTIONMOMENTUM2RIGIDBODY_HPP__
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-ActionReset::ActionReset() : actionForce(new ActionParameterForce) , actionMomentum(new ActionParameterMomentum)
-{
-	first = true;
-}
+#include "ActionParameterFunctor.hpp"
 
-void ActionReset::action(Body* body)
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+class NewtonsMomentumLawFunctor : public ActionParameterFunctor
 {
-	ComplexBody * ncb = dynamic_cast<ComplexBody*>(body);
-	
-	if(first) // FIXME - this should be done somewhere else, or this is the right place ?
-	{
-		vector<shared_ptr<ActionParameter> > vvv; 
-		vvv.clear();
-		vvv.push_back(actionForce); // FIXME - should ask what Actions should be prepared !
-		vvv.push_back(actionMomentum);
-		ncb->actions->prepare(vvv);
-		first = false;
-	}
-	
-	ncb->actions->reset();
-}
+	public : virtual void go( 	  const shared_ptr<ActionParameter>&
+					, const shared_ptr<BodyPhysicalParameters>&
+					, const Body*);
+	REGISTER_CLASS_NAME(NewtonsMomentumLawFunctor);
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+REGISTER_SERIALIZABLE(NewtonsMomentumLawFunctor,false);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+#endif // __ACTIONMOMENTUM2RIGIDBODY_HPP__
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
