@@ -35,7 +35,7 @@ void GLDrawBoxShadowVolume::go(const shared_ptr<GeometricalModel>& gm , const sh
 	Se3r& se3 = pp->se3;
 	Vector3r& extents = (static_cast<Box*>(gm.get()))->extents;
 	
-	Vector3r pos = lightPos-se3.translation;
+	Vector3r pos = lightPos-se3.position;
 	unsigned char zone=0; // bits 7 and 8 are always equal to 0
 	
 	if (pos[0]>extents[0])
@@ -283,8 +283,8 @@ void GLDrawBoxShadowVolume::go(const shared_ptr<GeometricalModel>& gm , const sh
 	
 	Real angle;
 	Vector3r axis;	
-	se3.rotation.toAxisAngle(axis,angle);	
-	glTranslatef(se3.translation[0],se3.translation[1],se3.translation[2]);
+	se3.orientation.toAxisAngle(axis,angle);	
+	glTranslatef(se3.position[0],se3.position[1],se3.position[2]);
 	glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);	
 
 	Vector3r p1,p2;

@@ -43,14 +43,14 @@ void PositionOrientationRecorder::action(Body * body)
 		Real tx=0, ty=0, tz=0, rw=0, rx=0, ry=0, rz=0;
 		for( ncb->bodies->gotoFirst() ; ncb->bodies->notAtEnd() ; ncb->bodies->gotoNext() )
 		{
-			tx = ncb->bodies->getCurrent()->physicalParameters->se3.translation[0];
-			ty = ncb->bodies->getCurrent()->physicalParameters->se3.translation[1];
-			tz = ncb->bodies->getCurrent()->physicalParameters->se3.translation[2];
+			tx = ncb->bodies->getCurrent()->physicalParameters->se3.position[0];
+			ty = ncb->bodies->getCurrent()->physicalParameters->se3.position[1];
+			tz = ncb->bodies->getCurrent()->physicalParameters->se3.position[2];
 		
-			rw = ncb->bodies->getCurrent()->physicalParameters->se3.rotation[0];
-			rx = ncb->bodies->getCurrent()->physicalParameters->se3.rotation[1];
-			ry = ncb->bodies->getCurrent()->physicalParameters->se3.rotation[2];
-			rz = ncb->bodies->getCurrent()->physicalParameters->se3.rotation[2];
+			rw = ncb->bodies->getCurrent()->physicalParameters->se3.orientation[0];
+			rx = ncb->bodies->getCurrent()->physicalParameters->se3.orientation[1];
+			ry = ncb->bodies->getCurrent()->physicalParameters->se3.orientation[2];
+			rz = ncb->bodies->getCurrent()->physicalParameters->se3.orientation[2];
 			
 			ofile << lexical_cast<string>(Omega::instance().getSimulationTime()) << " "
 				<< lexical_cast<string>(tx) << " " 

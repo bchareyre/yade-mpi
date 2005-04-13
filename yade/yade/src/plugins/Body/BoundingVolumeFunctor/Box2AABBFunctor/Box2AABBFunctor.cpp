@@ -36,10 +36,10 @@ void Box2AABBFunctor::go(	const shared_ptr<InteractionDescription>& cm,
 	InteractionBox* box = static_cast<InteractionBox*>(cm.get());
 	AABB* aabb = static_cast<AABB*>(bv.get());
 	
-	aabb->center = se3.translation;
+	aabb->center = se3.position;
 
 	Matrix3r r;
-	se3.rotation.toRotationMatrix(r);
+	se3.orientation.toRotationMatrix(r);
 	aabb->halfSize = Vector3r(0,0,0);
 	for( int i=0; i<3; ++i )
 		for( int j=0; j<3; ++j )

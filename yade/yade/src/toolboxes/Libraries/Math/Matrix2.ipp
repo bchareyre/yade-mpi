@@ -521,7 +521,7 @@ RealType Matrix2<RealType>::qForm (const Vector2<RealType>& rkU,
 template <class RealType>
 void Matrix2<RealType>::toAngle (RealType& rfAngle) const
 {
-    // assert:  matrix is a rotation
+    // assert:  matrix is a orientation
     rfAngle = Math<RealType>::ATan2(m_afEntry[2],m_afEntry[0]);
 }
 //----------------------------------------------------------------------------

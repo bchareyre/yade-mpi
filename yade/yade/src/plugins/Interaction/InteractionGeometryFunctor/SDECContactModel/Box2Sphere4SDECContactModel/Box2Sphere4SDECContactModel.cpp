@@ -36,7 +36,7 @@ bool Box2Sphere4SDECContactModel::go(		const shared_ptr<InteractionDescription>&
 						const shared_ptr<Interaction>& c)
 {
 
-	//if (se31.rotation == Quaternionr())
+	//if (se31.orientation == Quaternionr())
 	//	return collideAABoxSphere(cm1,cm2,se31,se32,c);
 	
 	Vector3r l,t,p,q,r;
@@ -50,10 +50,10 @@ bool Box2Sphere4SDECContactModel::go(		const shared_ptr<InteractionDescription>&
 	
 	Vector3r extents = obb->extents;
 
-	se31.rotation.toRotationMatrix(axisT);
+	se31.orientation.toRotationMatrix(axisT);
 	axis = axisT.transpose();
 	
-	p = se32.translation-se31.translation;
+	p = se32.position-se31.position;
 	
 	l[0] = extents[0];
 	t[0] = axis.getRow(0).dot(p); 
@@ -94,8 +94,8 @@ bool Box2Sphere4SDECContactModel::go(		const shared_ptr<InteractionDescription>&
 		
 		normal.normalize();
 		
-		pt1 = se32.translation + normal*min;
-		pt2 = se32.translation - normal*s->radius;	
+		pt1 = se32.position + normal*min;
+		pt2 = se32.position - normal*s->radius;	
 
 		// FIXME : remove those uncommented lines
 		shared_ptr<SDECContactGeometry> scm;
@@ -133,12 +133,12 @@ bool Box2Sphere4SDECContactModel::go(		const shared_ptr<InteractionDescription>&
 	if (depth < 0) 
 		return false;
 
-	pt1 = q + se31.translation;
+	pt1 = q + se31.position;
 
 	normal = r;
 	normal.normalize();
 
-	pt2 = se32.translation - normal * s->radius;
+	pt2 = se32.position - normal * s->radius;
 	
 	// FIXME : remove those uncommented lines
 	shared_ptr<SDECContactGeometry> scm;

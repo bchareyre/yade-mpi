@@ -49,20 +49,20 @@ void InteractionPhysicsDispatcher::action(Body* body)
 	ComplexBody * ncb = dynamic_cast<ComplexBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	
-	shared_ptr<InteractionContainer>& permanentInteractions = ncb->permanentInteractions;
-	for( permanentInteractions->gotoFirstPotential() ; permanentInteractions->notAtEndPotential() ; permanentInteractions->gotoNextPotential())
+	shared_ptr<InteractionContainer>& initialInteractions = ncb->initialInteractions;
+	for( initialInteractions->gotoFirstPotential() ; initialInteractions->notAtEndPotential() ; initialInteractions->gotoNextPotential())
 	{
-		const shared_ptr<Interaction>& interaction = permanentInteractions->getCurrent();
+		const shared_ptr<Interaction>& interaction = initialInteractions->getCurrent();
 
 		shared_ptr<Body>& b1 = (*bodies)[interaction->getId1()];
 		shared_ptr<Body>& b2 = (*bodies)[interaction->getId2()];
 		operator()( b1->physicalParameters , b2->physicalParameters , interaction );
 	}
 
-	shared_ptr<InteractionContainer>& interactions = ncb->interactions;
-	for( interactions->gotoFirstPotential() ; interactions->notAtEndPotential() ; interactions->gotoNextPotential())
+	shared_ptr<InteractionContainer>& runtimeInteractions = ncb->runtimeInteractions;
+	for( runtimeInteractions->gotoFirstPotential() ; runtimeInteractions->notAtEndPotential() ; runtimeInteractions->gotoNextPotential())
 	{
-		const shared_ptr<Interaction>& interaction = interactions->getCurrent();
+		const shared_ptr<Interaction>& interaction = runtimeInteractions->getCurrent();
 		
 		shared_ptr<Body>& b1 = (*bodies)[interaction->getId1()];
 		shared_ptr<Body>& b2 = (*bodies)[interaction->getId2()];

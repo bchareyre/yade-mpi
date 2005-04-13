@@ -31,19 +31,19 @@
 // (0 <= i < N*N).
 
 // The (x,y,z) coordinate system is assumed to be right-handed.  Coordinate
-// axis rotation matrices are of the form
+// axis orientation matrices are of the form
 //   RX =    1       0       0
 //           0     cos(t) -sin(t)
 //           0     sin(t)  cos(t)
-// where t > 0 indicates a counterclockwise rotation in the yz-plane
+// where t > 0 indicates a counterclockwise orientation in the yz-plane
 //   RY =  cos(t)    0     sin(t)
 //           0       1       0
 //        -sin(t)    0     cos(t)
-// where t > 0 indicates a counterclockwise rotation in the zx-plane
+// where t > 0 indicates a counterclockwise orientation in the zx-plane
 //   RZ =  cos(t) -sin(t)    0
 //         sin(t)  cos(t)    0
 //           0       0       1
-// where t > 0 indicates a counterclockwise rotation in the xy-plane.
+// where t > 0 indicates a counterclockwise orientation in the xy-plane.
 
 #include "Vector3.hpp"
 
@@ -82,7 +82,7 @@ public:
     // create a diagonal matrix
     Matrix3 (RealType fM00, RealType fM11, RealType fM22);
 
-    // Create rotation matrices (positive angle - counterclockwise).  The
+    // Create orientation matrices (positive angle - counterclockwise).  The
     // angle must be in radians, not degrees.
     Matrix3 (const Vector3<RealType>& rkAxis, RealType fAngle);
 
@@ -150,23 +150,23 @@ public:
     Matrix3 timesDiagonal (const Vector3<RealType>& rkDiag) const;  // M*D
     Matrix3 diagonalTimes (const Vector3<RealType>& rkDiag) const;  // D*M
 
-    // The matrix must be a rotation for these functions to be valid.  The
+    // The matrix must be a orientation for these functions to be valid.  The
     // last function uses Gram-Schmidt orthonormalization applied to the
-    // columns of the rotation matrix.  The angle must be in radians, not
+    // columns of the orientation matrix.  The angle must be in radians, not
     // degrees.
     void toAxisAngle (Vector3<RealType>& rkAxis, RealType& rfAngle) const;
     void orthonormalize ();
 
     // The matrix must be symmetric.  Factor M = R * D * R^T where
-    // R = [u0|u1|u2] is a rotation matrix with columns u0, u1, and u2 and
+    // R = [u0|u1|u2] is a orientation matrix with columns u0, u1, and u2 and
     // D = diag(d0,d1,d2) is a diagonal matrix whose diagonal entries are d0,
     // d1, and d2.  The eigenvector u[i] corresponds to eigenvector d[i].
     // The eigenvalues are ordered as d0 <= d1 <= d2.
     void eigenDecomposition (Matrix3& rkRot, Matrix3& rkDiag) const;
 
     // The matrix must be orthonormal.  The decomposition is yaw*pitch*roll
-    // where yaw is rotation about the Up vector, pitch is rotation about the
-    // Right axis, and roll is rotation about the Direction axis.
+    // where yaw is orientation about the Up vector, pitch is orientation about the
+    // Right axis, and roll is orientation about the Direction axis.
     Matrix3& fromEulerAnglesXYZ (RealType fYAngle, RealType fPAngle, RealType fRAngle);
     Matrix3& fromEulerAnglesXZY (RealType fYAngle, RealType fPAngle, RealType fRAngle);
     Matrix3& fromEulerAnglesYXZ (RealType fYAngle, RealType fPAngle, RealType fRAngle);
@@ -187,9 +187,9 @@ public:
         RealType& rfRAngle) const;
 
     // SLERP (spherical linear interpolation) without quaternions.  Computes
-    // R(t) = R0*(Transpose(R0)*R1)^t.  If Q is a rotation matrix with
-    // unit-length axis U and angle A, then Q^t is a rotation matrix with
-    // unit-length axis U and rotation angle t*A.
+    // R(t) = R0*(Transpose(R0)*R1)^t.  If Q is a orientation matrix with
+    // unit-length axis U and angle A, then Q^t is a orientation matrix with
+    // unit-length axis U and orientation angle t*A.
     static Matrix3 slerp (RealType fT, const Matrix3& rkR0,
         const Matrix3& rkR1);
 

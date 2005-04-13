@@ -30,7 +30,7 @@ class InteractionHashMap : public InteractionContainer
 		};
 
 	private : typedef hash_map<pair<unsigned int,unsigned int>, shared_ptr<Interaction>, hashPair, eqPair > IHashMap;
-	private : IHashMap interactions;
+	private : IHashMap runtimeInteractions;
 	private : IHashMap::iterator hmii;
 	private : IHashMap::iterator hmiiEnd;
 	private : shared_ptr<Interaction> empty;

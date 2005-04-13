@@ -44,7 +44,7 @@ bool Sphere2Mesh2D4ClosestFeatures::go(		const shared_ptr<InteractionDescription
 
 	cf->closestsPoints.resize(0);
 
-	Vector3r center = se31.translation;
+	Vector3r center = se31.position;
 	
 	/*for(int i=0;i<m->vertices.size();i++)
 	{

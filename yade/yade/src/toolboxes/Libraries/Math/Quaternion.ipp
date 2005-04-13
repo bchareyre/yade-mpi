@@ -429,7 +429,7 @@ Quaternion<RealType>& Quaternion<RealType>::fromAxisAngle (
 {
     // assert:  axis[] is unit length
     //
-    // The quaternion representing the rotation is
+    // The quaternion representing the orientation is
     //   q = cos(A/2)+sin(A/2)*(x*i+y*j+z*k)
 
     RealType fHalfAngle = ((RealType)0.5)*fAngle;
@@ -446,7 +446,7 @@ template <class RealType>
 void Quaternion<RealType>::toAxisAngle (Vector3<RealType>& rkAxis, RealType& rfAngle)
     const
 {
-    // The quaternion representing the rotation is
+    // The quaternion representing the orientation is
     //   q = cos(A/2)+sin(A/2)*(x*i+y*j+z*k)
 
     RealType fSqrLength = m_afTuple[1]*m_afTuple[1] + m_afTuple[2]*m_afTuple[2]
@@ -626,7 +626,7 @@ Vector3<RealType> Quaternion<RealType>::rotate (const Vector3<RealType>& rkVecto
 {
     // Given a vector u = (x0,y0,z0) and a unit length quaternion
     // q = <w,x,y,z>, the vector v = (x1,y1,z1) which represents the
-    // rotation of u by q is v = q*u*q^{-1} where * indicates quaternion
+    // orientation of u by q is v = q*u*q^{-1} where * indicates quaternion
     // multiplication and where u is treated as the quaternion <0,x0,y0,z0>.
     // Note that q^{-1} = <w,-x,-y,-z>, so no real work is required to
     // invert q.  Now
@@ -636,9 +636,9 @@ Vector3<RealType> Quaternion<RealType>::rotate (const Vector3<RealType>& rkVecto
     //     = x0*(q*i*q^{-1})+y0*(q*j*q^{-1})+z0*(q*k*q^{-1})
     //
     // As 3-vectors, q*i*q^{-1}, q*j*q^{-1}, and 2*k*q^{-1} are the columns
-    // of the rotation matrix computed in Quaternion<RealType>::ToRotationMatrix.
-    // The vector v is obtained as the product of that rotation matrix with
-    // vector u.  As such, the quaternion representation of a rotation
+    // of the orientation matrix computed in Quaternion<RealType>::ToRotationMatrix.
+    // The vector v is obtained as the product of that orientation matrix with
+    // vector u.  As such, the quaternion representation of a orientation
     // matrix requires less space than the matrix and more time to compute
     // the rotated vector.  Typical space-time tradeoff...
 
@@ -723,9 +723,9 @@ template <class RealType>
 Quaternion<RealType>& Quaternion<RealType>::align (const Vector3<RealType>& rkV1,
     const Vector3<RealType>& rkV2)
 {
-    // If V1 and V2 are not parallel, the axis of rotation is the unit-length
-    // vector U = Cross(V1,V2)/Length(Cross(V1,V2)).  The angle of rotation,
-    // A, is the angle between V1 and V2.  The quaternion for the rotation is
+    // If V1 and V2 are not parallel, the axis of orientation is the unit-length
+    // vector U = Cross(V1,V2)/Length(Cross(V1,V2)).  The angle of orientation,
+    // A, is the angle between V1 and V2.  The quaternion for the orientation is
     // q = cos(A/2) + sin(A/2)*(ux*i+uy*j+uz*k) where U = (ux,uy,uz).
     //
     // (1) Rather than extract A = acos(Dot(V1,V2)), multiply by 1/2, then
@@ -733,7 +733,7 @@ Quaternion<RealType>& Quaternion<RealType>::align (const Vector3<RealType>& rkV1
     //     computing the bisector B = (V1+V2)/Length(V1+V2), so cos(A/2) =
     //     Dot(V1,B).
     //
-    // (2) The rotation axis is U = Cross(V1,B)/Length(Cross(V1,B)), but
+    // (2) The orientation axis is U = Cross(V1,B)/Length(Cross(V1,B)), but
     //     Length(Cross(V1,B)) = Length(V1)*Length(B)*sin(A/2) = sin(A/2), in
     //     which case sin(A/2)*(ux*i+uy*j+uz*k) = (cx*i+cy*j+cz*k) where
     //     C = Cross(V1,B).
@@ -914,7 +914,7 @@ Vector3<RealType> Quaternion<RealType>::operator* (const Vector3<RealType>& v) c
 {
     // Given a vector u = (x0,y0,z0) and a unit length quaternion
     // q = <w,x,y,z>, the vector v = (x1,y1,z1) which represents the
-    // rotation of u by q is v = q*u*q^{-1} where * indicates quaternion
+    // orientation of u by q is v = q*u*q^{-1} where * indicates quaternion
     // multiplication and where u is treated as the quaternion <0,x0,y0,z0>.
     // Note that q^{-1} = <w,-x,-y,-z>, so no float work is required to
     // invert q.  Now
@@ -924,9 +924,9 @@ Vector3<RealType> Quaternion<RealType>::operator* (const Vector3<RealType>& v) c
     //     = x0*(q*i*q^{-1})+y0*(q*j*q^{-1})+z0*(q*k*q^{-1})
     //
     // As 3-vectors, q*i*q^{-1}, q*j*q^{-1}, and 2*k*q^{-1} are the columns
-    // of the rotation matrix computed in Quaternion::ToRotationMatrix.
-    // The vector v is obtained as the product of that rotation matrix with
-    // vector u.  As such, the quaternion representation of a rotation
+    // of the orientation matrix computed in Quaternion::ToRotationMatrix.
+    // The vector v is obtained as the product of that orientation matrix with
+    // vector u.  As such, the quaternion representation of a orientation
     // matrix requires less space than the matrix and more time to compute
     // the rotated vector.  Typical space-time tradeoff...
 

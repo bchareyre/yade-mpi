@@ -20,7 +20,7 @@ void BoundingSphere::registerAttributes() // FIXME - remove that function, dispa
 // void BoundingSphere::update(Se3r& se3)
 // {
 // 	Vector3r v(radius,radius,radius);
-// 	center = se3.translation;
+// 	center = se3.position;
 // 	min = center-v;
 // 	max = center+v;	
 // }

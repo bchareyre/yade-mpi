@@ -19,8 +19,8 @@
 ComplexBody::ComplexBody() :
 	  Body()
 	, bodies(new BodyRedirectionVector)
-	, permanentInteractions(new InteractionVecSet)
-	, interactions(new InteractionVecSet)
+	, initialInteractions(new InteractionVecSet)
+	, runtimeInteractions(new InteractionVecSet)
 	, actions(new ActionVecVec)
 {	
 }
@@ -50,8 +50,8 @@ void ComplexBody::registerAttributes()
 	Body::registerAttributes();
 	REGISTER_ATTRIBUTE(actors);
 	REGISTER_ATTRIBUTE(bodies);
-	REGISTER_ATTRIBUTE(interactions);
-	REGISTER_ATTRIBUTE(permanentInteractions);
+	REGISTER_ATTRIBUTE(runtimeInteractions);
+	REGISTER_ATTRIBUTE(initialInteractions);
 //	REGISTER_ATTRIBUTE(actions); // FIXME - needed or not ?
 }
 

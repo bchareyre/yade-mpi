@@ -201,7 +201,7 @@ string HangingCloth::generate()
 	rootBody->boundingVolume			= aabb;
 	rootBody->physicalParameters	= physics2;
 
-	rootBody->permanentInteractions->clear();
+	rootBody->initialInteractions->clear();
 
 //////////////////////////////////////////////////////
 // make mesh
@@ -245,7 +245,7 @@ string HangingCloth::generate()
 			node->physicalParameters= particle;
 
 			rootBody->bodies->insert(node);
-			mesh2d->vertices.push_back(particle->se3.translation);
+			mesh2d->vertices.push_back(particle->se3.position);
 		}
 
 	for(int i=0;i<width-1;i++)
@@ -255,9 +255,9 @@ string HangingCloth::generate()
 			mesh2d->edges.push_back(Edge(offset(i,j),offset(i,j+1)));
 			mesh2d->edges.push_back(Edge(offset(i,j+1),offset(i+1,j)));
 
-			rootBody->permanentInteractions->insert(createSpring(rootBody,offset(i,j),offset(i+1,j)));
-			rootBody->permanentInteractions->insert(createSpring(rootBody,offset(i,j),offset(i,j+1)));
-			rootBody->permanentInteractions->insert(createSpring(rootBody,offset(i,j+1),offset(i+1,j)));
+			rootBody->initialInteractions->insert(createSpring(rootBody,offset(i,j),offset(i+1,j)));
+			rootBody->initialInteractions->insert(createSpring(rootBody,offset(i,j),offset(i,j+1)));
+			rootBody->initialInteractions->insert(createSpring(rootBody,offset(i,j+1),offset(i+1,j)));
 
 			vector<int> face1,face2;
 			face1.push_back(offset(i,j));
@@ -275,14 +275,14 @@ string HangingCloth::generate()
 	for(int i=0;i<width-1;i++)
 	{
 		mesh2d->edges.push_back(Edge(offset(i,height-1),offset(i+1,height-1)));
-		rootBody->permanentInteractions->insert(createSpring(rootBody,offset(i,height-1),offset(i+1,height-1)));
+		rootBody->initialInteractions->insert(createSpring(rootBody,offset(i,height-1),offset(i+1,height-1)));
 
 	}
 
 	for(int j=0;j<height-1;j++)
 	{
 		mesh2d->edges.push_back(Edge(offset(width-1,j),offset(width-1,j+1)));
-		rootBody->permanentInteractions->insert(createSpring(rootBody,offset(width-1,j),offset(width-1,j+1)));
+		rootBody->initialInteractions->insert(createSpring(rootBody,offset(width-1,j),offset(width-1,j+1)));
 	}
 
 	if (fixPoint1)
@@ -372,7 +372,7 @@ string HangingCloth::generate()
 				shared_ptr<InteractionSphere>	as = dynamic_pointer_cast<InteractionSphere>(bodyA->interactionGeometry);
 				shared_ptr<InteractionSphere>	bs = dynamic_pointer_cast<InteractionSphere>(bodyB->interactionGeometry);
 	
-				if ( a && b && as && bs && (a->se3.translation - b->se3.translation).length() < (as->radius + bs->radius))  
+				if ( a && b && as && bs && (a->se3.position - b->se3.position).length() < (as->radius + bs->radius))  
 				{
 					shared_ptr<Interaction> 		link(new Interaction( bodyA->getId() , bodyB->getId() ));
 					shared_ptr<SDECLinkGeometry>		geometry(new SDECLinkGeometry);
@@ -384,7 +384,7 @@ string HangingCloth::generate()
 					physics->initialKn			= 500000;
 					physics->initialKs			= 50000;
 					physics->heta				= 1;
-					physics->initialEquilibriumDistance	= (a->se3.translation - b->se3.translation).length();
+					physics->initialEquilibriumDistance	= (a->se3.position - b->se3.position).length();
 					physics->knMax				= 75000;
 					physics->ksMax				= 7500;
 	
@@ -393,7 +393,7 @@ string HangingCloth::generate()
 					link->isReal 				= true;
 					link->isNew 				= false;
 					
-					rootBody->permanentInteractions->insert(link);
+					rootBody->initialInteractions->insert(link);
 					++linksNum;
 				}
 			}
@@ -417,8 +417,8 @@ shared_ptr<Interaction>& HangingCloth::createSpring(const shared_ptr<ComplexBody
 	shared_ptr<SpringGeometry>	geometry(new SpringGeometry);
 	shared_ptr<SpringPhysics>	physics(new SpringPhysics);
 
-	geometry->p1			= b1->physicalParameters->se3.translation;
-	geometry->p2			= b2->physicalParameters->se3.translation;
+	geometry->p1			= b1->physicalParameters->se3.position;
+	geometry->p2			= b2->physicalParameters->se3.position;
 
 	physics->initialLength		= (geometry->p1-geometry->p2).length();
 	physics->stiffness		= springStiffness;
@@ -447,7 +447,7 @@ void HangingCloth::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 	q.fromAxisAngle( Vector3r(0,0,1),0);
 	
 		
-	Vector3r translation 		=   Vector3r(i,j,k) * spacing 
+	Vector3r position 		=   Vector3r(i,j,k) * spacing 
 					  - Vector3r( nbSpheres[0]/2*spacing  ,  nbSpheres[1]/2*spacing-90  ,  nbSpheres[2]/2*spacing)
 					  + Vector3r( Mathr::symmetricRandom()*disorder ,  Mathr::symmetricRandom()*disorder , Mathr::symmetricRandom()*disorder );
 
@@ -459,7 +459,7 @@ void HangingCloth::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 	physics->velocity		= Vector3r(0,0,0);
 	physics->mass			= 4.0/3.0*Mathr::PI*radius*radius*radius*density; // FIXME!!!!!!!!!!!!!! I had a mistake everywhre - it was 4/3*PI*radius*radius, EVERYWHERE!!!. the volume of a sphere should be calculated in ONLY one place!!!
 	physics->inertia		= Vector3r(2.0/5.0*physics->mass*radius*radius,2.0/5.0*physics->mass*radius*radius,2.0/5.0*physics->mass*radius*radius);
-	physics->se3			= Se3r(translation,q);
+	physics->se3			= Se3r(position,q);
 	physics->young			= sphereYoungModulus;
 	physics->poisson		= spherePoissonRatio;
 	physics->frictionAngle		= sphereFrictionDeg * Mathr::PI/180.0;

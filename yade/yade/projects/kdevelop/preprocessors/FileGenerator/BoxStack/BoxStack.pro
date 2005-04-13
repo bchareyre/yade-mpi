@@ -17,10 +17,10 @@ LIBS += -lSerialization \
         -lInteractionDescriptionSet2AABBFunctor \
         -lCundallNonViscousMomentumDamping \
         -lCundallNonViscousForceDamping \
-        -lMotion \
         -lSAPCollider \
-        -lSimpleSpringLaw \
         -lRigidBodyParameters \
+        -lEngine \
+        -lSimpleSpringLaw \
         -lTranslator \
         -rdynamic 
 INCLUDEPATH += $(YADEINCLUDEPATH) 
@@ -37,11 +37,12 @@ QMAKE_LIBDIR = ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/MultiMethods/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/InteractionDescription/InteractionSphere/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/InteractionDescription/InteractionBox/$(YADEDYNLIBPATH) \
-               ../../../plugins/Motion/Action/ActionReset/$(YADEDYNLIBPATH) \
+               ../../../plugins/Engine/Action/ActionReset/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/BoundingVolumeFunctor/InteractionDescriptionSet2AABBFunctor/$(YADEDYNLIBPATH) \
-               ../../../plugins/Motion/ActionFunctor/CundallNonViscousMomentumDamping/$(YADEDYNLIBPATH) \
-               ../../../plugins/Motion/ActionFunctor/CundallNonViscousForceDamping/$(YADEDYNLIBPATH) \
-               ../../../yade/Motion/$(YADEDYNLIBPATH) \
+               ../../../plugins/Engine/ActionFunctor/CundallNonViscousMomentumDamping/$(YADEDYNLIBPATH) \
+               ../../../plugins/Engine/ActionFunctor/CundallNonViscousForceDamping/$(YADEDYNLIBPATH) \
+               ../../../plugins/Interaction/BroadInteractor/SAPCollider/$(YADEDYNLIBPATH) \
+               ../../../plugins/Body/BodyPhysicalParameters/RigidBodyParameters/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

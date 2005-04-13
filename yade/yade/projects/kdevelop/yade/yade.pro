@@ -12,5 +12,5 @@ CONFIG += debug \
 TEMPLATE = subdirs 
 SUBDIRS += Body \
            Interaction \
-           Motion \
+           Engine \
            yade 

@@ -26,17 +26,17 @@ void InteractionGeometryDispatcher::action(Body* body)
 	ComplexBody * ncb = dynamic_cast<ComplexBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	
-	shared_ptr<InteractionContainer>& permanentInteractions = ncb->permanentInteractions;
-	for( permanentInteractions->gotoFirstPotential() ; permanentInteractions->notAtEndPotential() ; permanentInteractions->gotoNextPotential())
+	shared_ptr<InteractionContainer>& initialInteractions = ncb->initialInteractions;
+	for( initialInteractions->gotoFirstPotential() ; initialInteractions->notAtEndPotential() ; initialInteractions->gotoNextPotential())
 	{
-		const shared_ptr<Interaction>& interaction = permanentInteractions->getCurrent();
+		const shared_ptr<Interaction>& interaction = initialInteractions->getCurrent();
 		
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// FIXME : those lines are dirty !	They were in SDECLaw, but they belong to this place		///
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	// FIXME - this is much shorter but still dirty (but now in different aspect - the way we store interactions)
-		const shared_ptr<Interaction>& interaction2 = ncb->interactions->find(interaction->getId1(),interaction->getId2());
+	// FIXME - this is much shorter but still dirty (but now in different aspect - the way we store runtimeInteractions)
+		const shared_ptr<Interaction>& interaction2 = ncb->runtimeInteractions->find(interaction->getId1(),interaction->getId2());
 		if (interaction2)
 			interaction2->isNonPermanent = false;
 			
@@ -50,10 +50,10 @@ void InteractionGeometryDispatcher::action(Body* body)
 		operator()( b1->interactionGeometry , b2->interactionGeometry , b1->physicalParameters->se3 , b2->physicalParameters->se3 , interaction );
 	}
 	
-	shared_ptr<InteractionContainer>& interactions = ncb->interactions;
-	for( interactions->gotoFirstPotential() ; interactions->notAtEndPotential() ; interactions->gotoNextPotential())
+	shared_ptr<InteractionContainer>& runtimeInteractions = ncb->runtimeInteractions;
+	for( runtimeInteractions->gotoFirstPotential() ; runtimeInteractions->notAtEndPotential() ; runtimeInteractions->gotoNextPotential())
 	{
-		const shared_ptr<Interaction>& interaction = interactions->getCurrent();
+		const shared_ptr<Interaction>& interaction = runtimeInteractions->getCurrent();
 		
 		shared_ptr<Body>& b1 = (*bodies)[interaction->getId1()];
 		shared_ptr<Body>& b2 = (*bodies)[interaction->getId2()];

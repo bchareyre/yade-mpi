@@ -20,7 +20,7 @@ LIBS += -lSerialization \
         -lInteractionDescription \
         -lGeometricalModel \
         -lBodyPhysicalParameters \
-        -lMotion \
+        -lEngine \
         -lboost_thread \
         -lboost_filesystem \
         -lboost_date_time \
@@ -48,12 +48,6 @@ QMAKE_LIBDIR = ../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../yade/Body/InteractionDescription/$(YADEDYNLIBPATH) \
                ../../yade/Body/GeometricalModel/$(YADEDYNLIBPATH) \
                ../../yade/Body/BodyPhysicalParameters/$(YADEDYNLIBPATH) \
-               ../../yade/Engine/$(YADEDYNLIBPATH) \
-               ../../yade/Body/$(YADEDYNLIBPATH) \
-               ../../yade/Geometry/$(YADEDYNLIBPATH) \
-               ../../yade/Interaction/$(YADEDYNLIBPATH) \
-               ../../toolboxes/DataStructures/BodyContainer/BodyAssocVec/$(YADEDYNLIBPATH) \
-               ../../yade/MultiMethods/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

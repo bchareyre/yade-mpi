@@ -365,14 +365,14 @@ struct FundamentalHandler< Se3<RealType> >
 		
 		RealType angle;
 		Vector3<RealType> axis;
-		Vector3<RealType> translation;
-		Quaternion<RealType> rotation;
+		Vector3<RealType> position;
+		Quaternion<RealType> orientation;
 		
 		if (tokens.size()==6) // Quaternion is writted as axis which norm is the angle in radian
 		{
-			translation[0]	= lexical_cast<RealType>(tokens[0]);
-			translation[1]	= lexical_cast<RealType>(tokens[1]);
-			translation[2]	= lexical_cast<RealType>(tokens[2]);
+			position[0]	= lexical_cast<RealType>(tokens[0]);
+			position[1]	= lexical_cast<RealType>(tokens[1]);
+			position[2]	= lexical_cast<RealType>(tokens[2]);
 			axis[0]		= lexical_cast<RealType>(tokens[4]);
 			axis[1]		= lexical_cast<RealType>(tokens[3]);
 			axis[2]		= lexical_cast<RealType>(tokens[5]);
@@ -380,16 +380,16 @@ struct FundamentalHandler< Se3<RealType> >
 		}
 		else // tokens.size()==7 Quaternion is writted as axis angle
 		{
-			translation[0]	= lexical_cast<RealType>(tokens[0]);
-			translation[1]	= lexical_cast<RealType>(tokens[1]);
-			translation[2]	= lexical_cast<RealType>(tokens[2]);
+			position[0]	= lexical_cast<RealType>(tokens[0]);
+			position[1]	= lexical_cast<RealType>(tokens[1]);
+			position[2]	= lexical_cast<RealType>(tokens[2]);
 			axis[0]		= lexical_cast<RealType>(tokens[3]);
 			axis[1]		= lexical_cast<RealType>(tokens[4]);
 			axis[2]		= lexical_cast<RealType>(tokens[5]);
 			angle		= lexical_cast<RealType>(tokens[6]);
 		}
-		rotation.fromAxisAngle(axis,angle);
-		*tmp = Se3<RealType>(translation,rotation);
+		orientation.fromAxisAngle(axis,angle);
+		*tmp = Se3<RealType>(position,orientation);
 	}
 	
 	static void accessor(Archive& ac, any& a)
@@ -399,19 +399,19 @@ struct FundamentalHandler< Se3<RealType> >
 		
 		RealType angle;
 		Vector3<RealType> axis;
-		Vector3<RealType> translation;
+		Vector3<RealType> position;
 		
-		tmp->rotation.toAxisAngle(axis,angle);
+		tmp->orientation.toAxisAngle(axis,angle);
 		axis.normalize();
-		translation = tmp->translation;
+		position = tmp->position;
 		
 		//*tmpStr =	IOManager::getCustomFundamentalOpeningBracket();
 		*tmpStr =	IOManager::getCustomFundamentalOpeningBracket()	+
-					lexical_cast<string>(translation[0])		+
+					lexical_cast<string>(position[0])		+
 					IOManager::getCustomFundamentalSeparator()	+
-					lexical_cast<string>(translation[1])		+
+					lexical_cast<string>(position[1])		+
 					IOManager::getCustomFundamentalSeparator()	+
-					lexical_cast<string>(translation[2])		+
+					lexical_cast<string>(position[2])		+
 					//IOManager::getCustomFundamentalClosingBracket()	+
 					IOManager::getCustomFundamentalSeparator()	+
 					//IOManager::getCustomFundamentalOpeningBracket()	+

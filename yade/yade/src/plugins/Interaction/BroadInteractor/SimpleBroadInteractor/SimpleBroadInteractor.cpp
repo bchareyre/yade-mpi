@@ -42,7 +42,7 @@ void SimpleBroadInteractor::broadInteractionTest(Body * /*body*/)
 {
 	//nbPotentialInteractions=0;
 
-	//interactions.clear();
+	//runtimeInteractions.clear();
 
 	/*for(unsigned int i=0;i<bodies.size()-1 ; i++)
 	{
@@ -52,7 +52,7 @@ void SimpleBroadInteractor::broadInteractionTest(Body * /*body*/)
 			shared_ptr<BoundingVolume> bv2 = bodies[j]->bv;
 			if ( !(bodies[i]->isDynamic==false && bodies[j]->isDynamic==false) && overlapper->overlapp(bv1,bv2))
 			{
-				interactions.push_back(shared_ptr<Interaction>(new Interaction(i,j)));
+				runtimeInteractions.push_back(shared_ptr<Interaction>(new Interaction(i,j)));
 				nbPotentialInteractions++;
 			}
 		}

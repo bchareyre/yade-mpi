@@ -21,7 +21,7 @@ class InteractionVecSet : public InteractionContainer
 			}
 		};
 
-	private : vector<set<pair<unsigned int,shared_ptr<Interaction> >,lessThanPair > > interactions;
+	private : vector<set<pair<unsigned int,shared_ptr<Interaction> >,lessThanPair > > runtimeInteractions;
 	private : vector<set<pair<unsigned int,shared_ptr<Interaction> >,lessThanPair > >::iterator vii;
 	private : vector<set<pair<unsigned int,shared_ptr<Interaction> >,lessThanPair > >::iterator viiEnd;
 	private : set<pair<unsigned int,shared_ptr<Interaction> >,lessThanPair >::iterator sii;

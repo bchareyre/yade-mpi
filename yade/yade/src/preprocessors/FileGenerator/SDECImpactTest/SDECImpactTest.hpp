@@ -60,7 +60,7 @@ class SDECImpactTest : public FileGenerator
 	public : ~SDECImpactTest ();
 	
 	private : void createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents,bool wire);
-	private : void createSphere(shared_ptr<Body>& body, Vector3r translation, Real radius,bool big,bool dynamic);
+	private : void createSphere(shared_ptr<Body>& body, Vector3r position, Real radius,bool big,bool dynamic);
 	private : void createActors(shared_ptr<ComplexBody>& rootBody);
 	private : void positionRootBody(shared_ptr<ComplexBody>& rootBody);
 

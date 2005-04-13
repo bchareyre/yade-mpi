@@ -32,8 +32,8 @@ inline Se3<RealType>::Se3()
 template <class RealType>
 inline Se3<RealType>::Se3(const Se3<RealType>& s) 
 { 
-	translation = s.translation;
-	rotation = s.rotation;
+	position = s.position;
+	orientation = s.orientation;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -42,8 +42,8 @@ inline Se3<RealType>::Se3(const Se3<RealType>& s)
 template <class RealType>
 inline Se3<RealType>::Se3(Vector3<RealType> p, Quaternion<RealType> r) 
 {
-	translation = p;
-	rotation = r;
+	position = p;
+	orientation = r;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -52,7 +52,7 @@ inline Se3<RealType>::Se3(Vector3<RealType> p, Quaternion<RealType> r)
 template <class RealType>
 inline Se3<RealType> Se3<RealType>::inverse()
 {
-	return Se3(-(rotation.inverse()*translation), rotation.inverse());
+	return Se3(-(orientation.inverse()*position), orientation.inverse());
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -61,8 +61,8 @@ inline Se3<RealType> Se3<RealType>::inverse()
 template <class RealType>
 inline Se3<RealType>::Se3(Se3<RealType>& a,Se3<RealType>& b) 
 {
-	translation  = b.rotation.inverse()*(a.translation - b.translation) ;  
-	rotation = b.rotation.inverse()*a.rotation  ;
+	position  = b.orientation.inverse()*(a.position - b.position) ;  
+	orientation = b.orientation.inverse()*a.orientation  ;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -72,10 +72,10 @@ template <class RealType>
 inline void Se3<RealType>::toGLMatrix(float m[16])
 {
 
-	rotation.toGLMatrix(m);
- 	m[12] = translation[0];
-	m[13] = translation[1];
-	m[14] = translation[2];
+	orientation.toGLMatrix(m);
+ 	m[12] = position[0];
+	m[13] = position[1];
+	m[14] = position[2];
 		
 }
 
@@ -85,7 +85,7 @@ inline void Se3<RealType>::toGLMatrix(float m[16])
 template <class RealType>
 inline Vector3<RealType> Se3<RealType>::operator * (const Vector3<RealType>& b ) 
 {
-	return rotation*b+translation; 
+	return orientation*b+position; 
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -94,7 +94,7 @@ inline Vector3<RealType> Se3<RealType>::operator * (const Vector3<RealType>& b )
 template <class RealType>
 inline Se3<RealType> Se3<RealType>::operator * (const Se3<RealType>& b ) 
 {
-	return Se3<RealType>(rotation*b.translation+translation,rotation*b.rotation); 
+	return Se3<RealType>(orientation*b.position+position,orientation*b.orientation); 
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -103,7 +103,7 @@ inline Se3<RealType> Se3<RealType>::operator * (const Se3<RealType>& b )
 template <class RealType>
 inline Se3<RealType> Se3<RealType>::operator * (const Quaternion<RealType>& b )
 {
-	return Se3<RealType>(translation , rotation*b);
+	return Se3<RealType>(position , orientation*b);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

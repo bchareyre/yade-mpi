@@ -36,7 +36,7 @@ bool Box2Sphere4ErrorTolerant::go(		const shared_ptr<InteractionDescription>& cm
 						const shared_ptr<Interaction>& c)
 {
 
-	//if (se31.rotation == Quaternionr())
+	//if (se31.orientation == Quaternionr())
 	//	return collideAABoxSphere(cm1,cm2,se31,se32,c);
 	
 	Vector3r l,t,p,q,r;
@@ -50,10 +50,10 @@ bool Box2Sphere4ErrorTolerant::go(		const shared_ptr<InteractionDescription>& cm
 	
 	Vector3r extents = obb->extents;
 
-	se31.rotation.toRotationMatrix(axisT);
+	se31.orientation.toRotationMatrix(axisT);
 	axis = axisT.transpose();
 	
-	p = se32.translation-se31.translation;
+	p = se32.position-se31.position;
 	
 	l[0] = extents[0];
 	t[0] = axis.getRow(0).dot(p); 
@@ -94,14 +94,14 @@ bool Box2Sphere4ErrorTolerant::go(		const shared_ptr<InteractionDescription>& cm
 		
 		normal.normalize();
 		
-		pt1 = se32.translation + normal*min;
-		pt2 = se32.translation - normal*s->radius;	
+		pt1 = se32.position + normal*min;
+		pt2 = se32.position - normal*s->radius;	
 	
 		shared_ptr<ErrorTolerantContactModel> cm = shared_ptr<ErrorTolerantContactModel>(new ErrorTolerantContactModel());
 		cm->closestPoints.push_back(std::pair<Vector3r,Vector3r>(pt1,pt2));
 		cm->normal = pt1-pt2;
-		cm->o1p1 = pt1-se31.translation;
-		cm->o2p2 = pt2-se32.translation;
+		cm->o1p1 = pt1-se31.position;
+		cm->o2p2 = pt2-se32.position;
 		c->interactionGeometry = cm;
 		
 		return true;	
@@ -116,18 +116,18 @@ bool Box2Sphere4ErrorTolerant::go(		const shared_ptr<InteractionDescription>& cm
 	if (depth < 0) 
 		return false;
 
-	pt1 = q + se31.translation;
+	pt1 = q + se31.position;
 
 	normal = r;
 	normal.normalize();
 
-	pt2 = se32.translation - normal * s->radius;
+	pt2 = se32.position - normal * s->radius;
 		
 	shared_ptr<ErrorTolerantContactModel> cm = shared_ptr<ErrorTolerantContactModel>(new ErrorTolerantContactModel());
 	cm->closestPoints.push_back(std::pair<Vector3r,Vector3r>(pt1,pt2));
 	cm->normal = pt1-pt2;
-	cm->o1p1 = pt1-se31.translation;
-	cm->o2p2 = pt2-se32.translation;
+	cm->o1p1 = pt1-se31.position;
+	cm->o2p2 = pt2-se32.position;
 	c->interactionGeometry = cm;
 
 

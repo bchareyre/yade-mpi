@@ -11,9 +11,9 @@ LIBS += -lSerialization \
         -lBody \
         -lInteraction \
         -lMultiMethods \
-        -lMotion \
         -lFEMNodeParameters \
         -lRigidBodyParameters \
+        -lEngine \
         -rdynamic 
 INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
@@ -27,6 +27,8 @@ QMAKE_LIBDIR = ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../../yade/Body/Body/$(YADEDYNLIBPATH) \
                ../../../yade/Interaction/Interaction/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/MultiMethods/$(YADEDYNLIBPATH) \
+               ../../../plugins/Body/BodyPhysicalParameters/FEMNodeParameters/$(YADEDYNLIBPATH) \
+               ../../../plugins/Body/BodyPhysicalParameters/RigidBodyParameters/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

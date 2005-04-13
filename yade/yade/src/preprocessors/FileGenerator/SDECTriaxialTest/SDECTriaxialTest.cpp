@@ -181,7 +181,7 @@ void SDECTriaxialTest::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 	Quaternionr q;
 	q.fromAxisAngle( Vector3r(0,0,1),0);
 	
-	Vector3r translation		= ( Vector3r(i,j,k)
+	Vector3r position		= ( Vector3r(i,j,k)
 					  + Vector3r(Mathr::symmetricRandom(),Mathr::symmetricRandom(),Mathr::symmetricRandom())*disorder)*spacing;
 	
 	Real radius 			= (Mathr::intervalRandom(minRadius,maxRadius));
@@ -192,7 +192,7 @@ void SDECTriaxialTest::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 	physics->velocity		= Vector3r(0,0,0);
 	physics->mass			= 4.0/3.0*Mathr::PI*radius*radius*radius*density;
 	physics->inertia		= Vector3r(2.0/5.0*physics->mass*radius*radius,2.0/5.0*physics->mass*radius*radius,2.0/5.0*physics->mass*radius*radius); //
-	physics->se3			= Se3r(translation,q);
+	physics->se3			= Se3r(position,q);
 	physics->young			= sphereYoungModulus;
 	physics->poisson		= spherePoissonRatio;
 	physics->frictionAngle		= sphereFrictionDeg * Mathr::PI/180.0;

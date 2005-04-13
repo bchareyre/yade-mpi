@@ -47,9 +47,9 @@ void AveragePositionRecorder::action(Body * body)
 		if( body->isDynamic && body->getId() != bigBallId )
 		{ 
 			size+=1.0;
-			x+=body->physicalParameters->se3.translation[0];
-			y+=body->physicalParameters->se3.translation[1];
-			z+=body->physicalParameters->se3.translation[2];
+			x+=body->physicalParameters->se3.position[0];
+			y+=body->physicalParameters->se3.position[1];
+			z+=body->physicalParameters->se3.position[2];
 		}
 	}
 
@@ -62,8 +62,8 @@ void AveragePositionRecorder::action(Body * body)
 		<< lexical_cast<string>(y) << " " 
 		<< lexical_cast<string>(z) << " "
 
-		<< lexical_cast<string>((*bodies)[bigBallId]->physicalParameters->se3.translation[0]) << " " // big ball
-		<< lexical_cast<string>((*bodies)[bigBallId]->physicalParameters->se3.translation[1]) << " " 
-		<< lexical_cast<string>((*bodies)[bigBallId]->physicalParameters->se3.translation[2]) << endl;
+		<< lexical_cast<string>((*bodies)[bigBallId]->physicalParameters->se3.position[0]) << " " // big ball
+		<< lexical_cast<string>((*bodies)[bigBallId]->physicalParameters->se3.position[1]) << " " 
+		<< lexical_cast<string>((*bodies)[bigBallId]->physicalParameters->se3.position[2]) << endl;
 }
 

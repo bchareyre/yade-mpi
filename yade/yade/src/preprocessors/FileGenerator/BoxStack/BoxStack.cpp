@@ -107,7 +107,7 @@ void BoxStack::createBox(shared_ptr<Body>& body, int i, int j, int k)
 	Quaternionr q;
 	q.fromAxisAngle( Vector3r(0,0,1),0);
 		
-	Vector3r translation		= Vector3r(i*boxSize[0],j*boxSize[1],k*boxSize[2])*2
+	Vector3r position		= Vector3r(i*boxSize[0],j*boxSize[1],k*boxSize[2])*2
 					  - Vector3r(0,-boxSize[1],nbBoxes[2]*boxSize[2]-boxSize[2])
 					  + Vector3r(0,0,(j%2)*boxSize[2]);
 				  
@@ -118,7 +118,7 @@ void BoxStack::createBox(shared_ptr<Body>& body, int i, int j, int k)
 	physics->velocity		= Vector3r(0,0,0);
 	physics->mass			= size[0]*size[1]*size[2]*boxDensity;
 	physics->inertia		= Vector3r(physics->mass*(size[1]*size[1]+size[2]*size[2])/3,physics->mass*(size[0]*size[0]+size[2]*size[2])/3,physics->mass*(size[1]*size[1]+size[0]*size[0])/3);
-	physics->se3			= Se3r(translation,q);
+	physics->se3			= Se3r(position,q);
 
 	aabb->diffuseColor		= Vector3r(0,1,0);
 	
@@ -152,7 +152,7 @@ void BoxStack::createSphere(shared_ptr<Body>& body)
 	Quaternionr q;
 	q.fromAxisAngle( Vector3r(0,0,1),0);
 		
-	Vector3r translation 		= Vector3r(0,nbBoxes[1]*boxSize[1],0)
+	Vector3r position 		= Vector3r(0,nbBoxes[1]*boxSize[1],0)
 					  + bulletPosition;
 				  
 	Real radius 			= bulletSize;
@@ -163,7 +163,7 @@ void BoxStack::createSphere(shared_ptr<Body>& body)
 	physics->velocity		= bulletVelocity;
 	physics->mass			= 4.0/3.0*Mathr::PI*radius*radius*bulletDensity;
 	physics->inertia		= Vector3r(2.0/5.0*physics->mass*radius*radius,2.0/5.0*physics->mass*radius*radius,2.0/5.0*physics->mass*radius*radius); //
-	physics->se3			= Se3r(translation,q);
+	physics->se3			= Se3r(position,q);
 
 	aabb->diffuseColor		= Vector3r(0,1,0);
 	

@@ -49,23 +49,23 @@ bool Box2Box4ClosestFeatures::go(		const shared_ptr<InteractionDescription>& cm1
 
 	int nbInteractions = 0;
 	
-	se31.rotation.toRotationMatrix(axis1T);
+	se31.orientation.toRotationMatrix(axis1T);
 	axis1 = axis1T.transpose();
 	
-	se32.rotation.toRotationMatrix(axis2T);
+	se32.orientation.toRotationMatrix(axis2T);
 	axis2 = axis2T.transpose();
 		
 	extents1 = obb1->extents;
 	extents2 = obb2->extents;
 	
-	//translation, in parent frame
-	Vector3r p = se32.translation-se31.translation;
+	//position, in parent frame
+	Vector3r p = se32.position-se31.position;
 
-	//translation of p in A's frame
+	//position of p in A's frame
 	Vector3r pp;
 	pp = axis1*p;
 
-	//calculate rotation matrix			
+	//calculate orientation matrix			
 	r11 = (axis1.getRow(0)).dot(axis2.getRow(0)); r12 = (axis1.getRow(0)).dot(axis2.getRow(1)); r13 = (axis1.getRow(0)).dot(axis2.getRow(2));
 	r21 = (axis1.getRow(1)).dot(axis2.getRow(0)); r22 = (axis1.getRow(1)).dot(axis2.getRow(1)); r23 = (axis1.getRow(1)).dot(axis2.getRow(2));
 	r31 = (axis1.getRow(2)).dot(axis2.getRow(0)); r32 = (axis1.getRow(2)).dot(axis2.getRow(1)); r33 = (axis1.getRow(2)).dot(axis2.getRow(2));
@@ -164,7 +164,7 @@ bool Box2Box4ClosestFeatures::go(		const shared_ptr<InteractionDescription>& cm1
 		Vector3r pa,pb;
 		Vector3r sign;
 
-		pa = se31.translation;
+		pa = se31.position;
 		sign[0] = (axis1.getRow(0).dot(normal) > 0) ? 1.0 : -1.0;
 		sign[1] = (axis1.getRow(1).dot(normal) > 0) ? 1.0 : -1.0;
 		sign[2] = (axis1.getRow(2).dot(normal) > 0) ? 1.0 : -1.0;
@@ -173,7 +173,7 @@ bool Box2Box4ClosestFeatures::go(		const shared_ptr<InteractionDescription>& cm1
 		pa+=(sign[2]*extents1[2])*axis1.getRow(2);
 
 		// find a point pb on the intersecting edge of box 2
-		pb = se32.translation;
+		pb = se32.position;
 		sign[0] = (axis2.getRow(0).dot(normal) > 0) ? -1.0 : 1.0;
 		sign[1] = (axis2.getRow(1).dot(normal) > 0) ? -1.0 : 1.0;
 		sign[2] = (axis2.getRow(2).dot(normal) > 0) ? -1.0 : 1.0;
@@ -213,8 +213,8 @@ bool Box2Box4ClosestFeatures::go(		const shared_ptr<InteractionDescription>& cm1
 	{
 		Ra = axis1;
 		Rb = axis2;
-		pa = se31.translation;
-		pb = se32.translation;
+		pa = se31.position;
+		pb = se32.position;
 		Sa = extents1;
 		Sb = extents2;
 	}
@@ -222,8 +222,8 @@ bool Box2Box4ClosestFeatures::go(		const shared_ptr<InteractionDescription>& cm1
 	{
 		Ra = axis2;
 		Rb = axis1;
-		pa = se32.translation;
-		pb = se31.translation;
+		pa = se32.position;
+		pb = se31.position;
 		Sa = extents2;
 		Sb = extents1;
 	}

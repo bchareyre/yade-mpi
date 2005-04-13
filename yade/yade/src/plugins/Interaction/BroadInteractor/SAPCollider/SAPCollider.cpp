@@ -96,8 +96,8 @@ void SAPCollider::broadInteractionTest(Body* body)
 	std::set<unsigned int>::iterator it;
 	std::set<unsigned int>::iterator itEnd;
 
-	/*std::list<Interaction*>::iterator ci = interactions.begin();
-	std::list<Interaction*>::iterator ciEnd = interactions.end();
+	/*std::list<Interaction*>::iterator ci = runtimeInteractions.begin();
+	std::list<Interaction*>::iterator ciEnd = runtimeInteractions.end();
 	for(;ci!=ciEnd;++ci)
 	{
 		delete (*ci)->interactionGeometry;
@@ -105,7 +105,7 @@ void SAPCollider::broadInteractionTest(Body* body)
 	}*/
 
 // FIXME : correct that
-	ncb->interactions->clear();
+	ncb->runtimeInteractions->clear();
 
 	nbPotentialInteractions = 0;
 	for(i=0;i<nbObjects;i++)
@@ -120,7 +120,7 @@ void SAPCollider::broadInteractionTest(Body* body)
 			{
 				nbPotentialInteractions++;
 				shared_ptr<Interaction> inter(new Interaction(i,*it));
-				ncb->interactions->insert(inter);
+				ncb->runtimeInteractions->insert(inter);
 			}
 		}
 	}

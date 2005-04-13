@@ -327,8 +327,8 @@ void OpenGLRenderingEngine::renderGeometricalModel(const shared_ptr<ComplexBody>
 				Se3r& se3 = b->physicalParameters->se3;
 				Real angle;
 				Vector3r axis;	
-				se3.rotation.toAxisAngle(axis,angle);	
-				glTranslatef(se3.translation[0],se3.translation[1],se3.translation[2]);
+				se3.orientation.toAxisAngle(axis,angle);	
+				glTranslatef(se3.position[0],se3.position[1],se3.position[2]);
 				glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
 				geometricalModelDispatcher(b->geometricalModel,b->physicalParameters,drawWireFrame);
 				glPopMatrix();
@@ -372,8 +372,8 @@ void OpenGLRenderingEngine::renderInteractionGeometry(const shared_ptr<ComplexBo
 		Se3r& se3 = b->physicalParameters->se3;
 		Real angle;
 		Vector3r axis;	
-		se3.rotation.toAxisAngle(axis,angle);	
-		glTranslatef(se3.translation[0],se3.translation[1],se3.translation[2]);
+		se3.orientation.toAxisAngle(axis,angle);	
+		glTranslatef(se3.position[0],se3.position[1],se3.position[2]);
 		glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
 		if(b->interactionGeometry)
 			interactionGeometryDispatcher(b->interactionGeometry,b->physicalParameters);

@@ -136,7 +136,7 @@ string SDECSpheresPlane::generate()
 	physics2->velocity	= Vector3r(0,0,0);
 	rootBody->physicalParameters = physics2;
 		
-	rootBody->permanentInteractions->clear();
+	rootBody->initialInteractions->clear();
 
 	rootBody->isDynamic		= false;
 
@@ -184,7 +184,7 @@ void SDECSpheresPlane::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 	Quaternionr q;
 	q.fromAxisAngle( Vector3r(0,0,1),0);
 	
-	Vector3r translation		= Vector3r(i,j,k)*(2*maxRadius*1.1) // this formula is crazy !!
+	Vector3r position		= Vector3r(i,j,k)*(2*maxRadius*1.1) // this formula is crazy !!
 					  - Vector3r( nbSpheres[0]/2*(2*maxRadius*1.1) , -7-maxRadius*2 , nbSpheres[2]/2*(2*maxRadius*1.1) )
 					  + Vector3r(Mathr::symmetricRandom()*1.1,Mathr::symmetricRandom()*1.1,Mathr::symmetricRandom()*1.1);
 	
@@ -196,7 +196,7 @@ void SDECSpheresPlane::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 	physics->velocity		= Vector3r(0,0,0);
 	physics->mass			= 4.0/3.0*Mathr::PI*radius*radius*radius*density;
 	physics->inertia		= Vector3r(2.0/5.0*physics->mass*radius*radius,2.0/5.0*physics->mass*radius*radius,2.0/5.0*physics->mass*radius*radius); //
-	physics->se3			= Se3r(translation,q);
+	physics->se3			= Se3r(position,q);
 	physics->young			= sphereYoungModulus;
 	physics->poisson		= spherePoissonRatio;
 	physics->frictionAngle		= sphereFrictionDeg * Mathr::PI/180.0;

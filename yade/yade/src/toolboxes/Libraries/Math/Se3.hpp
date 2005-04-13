@@ -36,8 +36,8 @@
 template <class RealType>
 class Se3
 {
-	public : Vector3<RealType> translation;
-	public : Quaternion<RealType> rotation;
+	public : Vector3<RealType> position;
+	public : Quaternion<RealType> orientation;
 
 	// Construction
 	public : Se3();

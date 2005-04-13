@@ -51,8 +51,8 @@ void InteractionDescriptionSet2AABBFunctor::go(	  const shared_ptr<InteractionDe
 		} 
 		else
 		{
-	 		max = max.maxVector(b->physicalParameters->se3.translation);
- 			min = min.minVector(b->physicalParameters->se3.translation);
+	 		max = max.maxVector(b->physicalParameters->se3.position);
+ 			min = min.minVector(b->physicalParameters->se3.position);
 		}
 	}
 	

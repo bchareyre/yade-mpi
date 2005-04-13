@@ -37,13 +37,13 @@ bool Sphere2Sphere4ClosestFeatures::go(		const shared_ptr<InteractionDescription
 	shared_ptr<InteractionSphere> s1 = dynamic_pointer_cast<InteractionSphere>(cm1);
 	shared_ptr<InteractionSphere> s2 = dynamic_pointer_cast<InteractionSphere>(cm2);
 	
-	Vector3r v = se31.translation-se32.translation;
+	Vector3r v = se31.position-se32.position;
 	Real l = v.normalize();
 	
 	if (l<s1->radius+s2->radius)
 	{
 		shared_ptr<ClosestFeatures> cf = shared_ptr<ClosestFeatures>(new ClosestFeatures());
-		cf->closestsPoints.push_back(std::pair<Vector3r,Vector3r>(se31.translation-v*s1->radius,se32.translation+v*s2->radius));
+		cf->closestsPoints.push_back(std::pair<Vector3r,Vector3r>(se31.position-v*s1->radius,se32.position+v*s2->radius));
 		c->interactionGeometry = cf;
 		return true;
 	}

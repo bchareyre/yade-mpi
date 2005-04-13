@@ -119,7 +119,7 @@ string SDECLinkedSpheres::generate()
 	
 /////////////////////////////////////
 
-	rootBody->permanentInteractions->clear();
+	rootBody->initialInteractions->clear();
 	
 	shared_ptr<Body> bodyA;
 	rootBody->bodies->gotoFirst();
@@ -147,7 +147,7 @@ string SDECLinkedSpheres::generate()
 			shared_ptr<InteractionSphere>	as = dynamic_pointer_cast<InteractionSphere>(bodyA->interactionGeometry);
 			shared_ptr<InteractionSphere>	bs = dynamic_pointer_cast<InteractionSphere>(bodyB->interactionGeometry);
 
-			if ((a->se3.translation - b->se3.translation).length() < (as->radius + bs->radius))  
+			if ((a->se3.position - b->se3.position).length() < (as->radius + bs->radius))  
 			{
 				shared_ptr<Interaction> 		link(new Interaction( bodyA->getId() , bodyB->getId() ));
 				shared_ptr<SDECLinkGeometry>		geometry(new SDECLinkGeometry);
@@ -159,7 +159,7 @@ string SDECLinkedSpheres::generate()
 				physics->initialKn			= 500000; // FIXME - BIG problem here.
 				physics->initialKs			= 50000;
 				physics->heta				= 1;
-				physics->initialEquilibriumDistance	= (a->se3.translation - b->se3.translation).length();
+				physics->initialEquilibriumDistance	= (a->se3.position - b->se3.position).length();
 				physics->knMax				= 75000;
 				physics->ksMax				= 7500;
 
@@ -168,14 +168,14 @@ string SDECLinkedSpheres::generate()
 				link->isReal 				= true;
 				link->isNew 				= false;
 				
-				rootBody->permanentInteractions->insert(link);
+				rootBody->initialInteractions->insert(link);
 			}
 		}
 
 		rootBody->bodies->popIterator();
 	}
 	
-	return "total number of permament links created: " + lexical_cast<string>(rootBody->permanentInteractions->size());
+	return "total number of permament links created: " + lexical_cast<string>(rootBody->initialInteractions->size());
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -193,7 +193,7 @@ void SDECLinkedSpheres::createSphere(shared_ptr<Body>& body, int i, int j, int k
 	q.fromAxisAngle( Vector3r(0,0,1),0);
 	
 		
-	Vector3r translation 		= Vector3r(i,j,k)*spacing
+	Vector3r position 		= Vector3r(i,j,k)*spacing
 					  - Vector3r(nbSpheres[0]/2*spacing,nbSpheres[1]/2*spacing-90,nbSpheres[2]/2*spacing) 
 					  + Vector3r(Mathr::symmetricRandom()*disorder,Mathr::symmetricRandom()*disorder,Mathr::symmetricRandom()*disorder);
 
@@ -205,7 +205,7 @@ void SDECLinkedSpheres::createSphere(shared_ptr<Body>& body, int i, int j, int k
 	physics->velocity		= Vector3r(0,0,0);
 	physics->mass			= 4.0/3.0*Mathr::PI*radius*radius*radius*density;
 	physics->inertia		= Vector3r(2.0/5.0*physics->mass*radius*radius,2.0/5.0*physics->mass*radius*radius,2.0/5.0*physics->mass*radius*radius); //
-	physics->se3			= Se3r(translation,q);
+	physics->se3			= Se3r(position,q);
 	physics->young			= sphereYoungModulus;
 	physics->poisson		= spherePoissonRatio;
 	physics->frictionAngle		= sphereFrictionDeg * Mathr::PI/180.0;

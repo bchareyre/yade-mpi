@@ -180,7 +180,7 @@ string SDECImpactTest::generate()
 			loadFile >> x;
 			loadFile >> y;
 			loadFile >> z;
-			Vector3r translation = Vector3r(x,z,y);
+			Vector3r position = Vector3r(x,z,y);
 			loadFile >> radius;
 		
 			loadFile >> f;
@@ -194,14 +194,14 @@ string SDECImpactTest::generate()
 	//			cout << "loaded: " << i << endl;
 			if(f==1)
 			{
-				lowerCorner[0] = min(translation[0]-radius , lowerCorner[0]);
-				lowerCorner[1] = min(translation[1]-radius , lowerCorner[1]);
-				lowerCorner[2] = min(translation[2]-radius , lowerCorner[2]);
-				upperCorner[0] = max(translation[0]+radius , upperCorner[0]);
-				upperCorner[1] = max(translation[1]+radius , upperCorner[1]);
-				upperCorner[2] = max(translation[2]+radius , upperCorner[2]);
+				lowerCorner[0] = min(position[0]-radius , lowerCorner[0]);
+				lowerCorner[1] = min(position[1]-radius , lowerCorner[1]);
+				lowerCorner[2] = min(position[2]-radius , lowerCorner[2]);
+				upperCorner[0] = max(position[0]+radius , upperCorner[0]);
+				upperCorner[1] = max(position[1]+radius , upperCorner[1]);
+				upperCorner[2] = max(position[2]+radius , upperCorner[2]);
 			}
-			createSphere(body,translation,radius,false,f==1);
+			createSphere(body,position,radius,false,f==1);
 			rootBody->bodies->insert(body);
 			if(f == 2)
 			{
@@ -213,8 +213,8 @@ string SDECImpactTest::generate()
 	}
 
 // create bigBall
-	Vector3r translation = (upperCorner+lowerCorner)*0.5 + Vector3r(0,bigBallDropHeight,0);
-	createSphere(body,translation,bigBallRadius,true,false);	
+	Vector3r position = (upperCorner+lowerCorner)*0.5 + Vector3r(0,bigBallDropHeight,0);
+	createSphere(body,position,bigBallRadius,true,false);	
 	int bigId = 0;
 	if(bigBall)
 		rootBody->bodies->insert(body);
@@ -324,7 +324,7 @@ string SDECImpactTest::generate()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void SDECImpactTest::createSphere(shared_ptr<Body>& body, Vector3r translation, Real radius, bool big, bool dynamic )
+void SDECImpactTest::createSphere(shared_ptr<Body>& body, Vector3r position, Real radius, bool big, bool dynamic )
 {
 	body = shared_ptr<Body>(new SimpleBody(0,2));
 	shared_ptr<SDECParameters> physics(new SDECParameters);
@@ -344,7 +344,7 @@ void SDECImpactTest::createSphere(shared_ptr<Body>& body, Vector3r translation, 
 	physics->inertia		= Vector3r( 	2.0/5.0*physics->mass*radius*radius,
 							2.0/5.0*physics->mass*radius*radius,
 							2.0/5.0*physics->mass*radius*radius);
-	physics->se3			= Se3r(translation,q);
+	physics->se3			= Se3r(position,q);
 	physics->young			= big ? bigBallYoungModulus : sphereYoungModulus;
 	physics->poisson		= big ? bigBallPoissonRatio : spherePoissonRatio;
 	physics->frictionAngle		= (big ? bigBallFrictDeg : sphereFrictionDeg ) * Mathr::PI/180.0;

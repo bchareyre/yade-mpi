@@ -11,30 +11,29 @@ LIBS += -lPersistentSAPCollider \
         -lInteractionBox \
         -lActionReset \
         -lInteractionDescriptionSet2AABBFunctor \
-        -lSDECLaw \
-        -lSDECTimeStepper \
         -lSphere \
         -lBox \
         -lSDECParameters \
         -lSDECMacroMicroElasticRelationships \
+        -lSDECLaw \
+        -lSDECTimeStepper \
         -rdynamic 
 INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 QMAKE_LIBDIR = ../../../plugins/Interaction/BroadInteractor/PersistentSAPCollider/$(YADEDYNLIBPATH) \
-               ../../../plugins/Motion/ActionFunctor/CundallNonViscousMomentumDamping/$(YADEDYNLIBPATH) \
-               ../../../plugins/Motion/ActionFunctor/CundallNonViscousForceDamping/$(YADEDYNLIBPATH) \
+               ../../../plugins/Engine/ActionFunctor/CundallNonViscousMomentumDamping/$(YADEDYNLIBPATH) \
+               ../../../plugins/Engine/ActionFunctor/CundallNonViscousForceDamping/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/InteractionDescription/InteractionSphere/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/InteractionDescription/InteractionBox/$(YADEDYNLIBPATH) \
-               ../../../plugins/Motion/Action/ActionReset/$(YADEDYNLIBPATH) \
+               ../../../plugins/Engine/Action/ActionReset/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/BoundingVolumeFunctor/InteractionDescriptionSet2AABBFunctor/$(YADEDYNLIBPATH) \
-               ../../../plugins/Motion/ConstitutiveLaw/SDECLaw/$(YADEDYNLIBPATH) \
-               ../../../plugins/Motion/ConstitutiveLaw/SDECTimeStepper/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/GeometricalModel/Box/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/BodyPhysicalParameters/SDECParameters/$(YADEDYNLIBPATH) \
+               ../../../plugins/Interaction/InteractionPhysicsFunctor/SDECContactPhysics/SDECMacroMicroElasticRelationships/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

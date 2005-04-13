@@ -26,12 +26,12 @@ LIBS += -lMesh2D \
         -lCundallNonViscousMomentumDamping \
         -lCundallNonViscousForceDamping \
         -lSDECMacroMicroElasticRelationships \
-        -lMotion \
         -lSAPCollider \
-        -lSimpleSpringLaw \
-        -lMassSpringBody2RigidBodyLaw \
         -lRigidBodyParameters \
         -lSDECParameters \
+        -lEngine \
+        -lSimpleSpringLaw \
+        -lMassSpringBody2RigidBodyLaw \
         -lSDECLaw \
         -lMassSpringLaw \
         -rdynamic 
@@ -54,21 +54,17 @@ QMAKE_LIBDIR = ../../../plugins/Body/GeometricalModel/Mesh2D/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/InteractionDescription/InteractionSphere/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/BoundingVolumeFunctor/InteractionDescriptionSet2AABBFunctor/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/BodyPhysicalParameters/ParticleSetParameters/$(YADEDYNLIBPATH) \
-               ../../../plugins/Motion/Action/ActionReset/$(YADEDYNLIBPATH) \
+               ../../../plugins/Engine/Action/ActionReset/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/GeometricalModel/Box/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/InteractionDescription/InteractionBox/$(YADEDYNLIBPATH) \
                ../../../plugins/Interaction/InteractionGeometry/SDECLinkGeometry/$(YADEDYNLIBPATH) \
                ../../../plugins/Interaction/InteractionPhysics/SDECLinkPhysics/$(YADEDYNLIBPATH) \
-               ../../../plugins/Motion/ActionFunctor/CundallNonViscousMomentumDamping/$(YADEDYNLIBPATH) \
-               ../../../plugins/Motion/ActionFunctor/CundallNonViscousForceDamping/$(YADEDYNLIBPATH) \
+               ../../../plugins/Engine/ActionFunctor/CundallNonViscousMomentumDamping/$(YADEDYNLIBPATH) \
+               ../../../plugins/Engine/ActionFunctor/CundallNonViscousForceDamping/$(YADEDYNLIBPATH) \
                ../../../plugins/Interaction/InteractionPhysicsFunctor/SDECContactPhysics/SDECMacroMicroElasticRelationships/$(YADEDYNLIBPATH) \
-               ../../../yade/Motion/$(YADEDYNLIBPATH) \
                ../../../plugins/Interaction/BroadInteractor/SAPCollider/$(YADEDYNLIBPATH) \
-               ../../../plugins/Motion/ConstitutiveLaw/SimpleSpringLaw/$(YADEDYNLIBPATH) \
-               ../../../plugins/Motion/ConstitutiveLaw/MassSpringBody2RigidBodyLaw/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/BodyPhysicalParameters/RigidBodyParameters/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/BodyPhysicalParameters/SDECParameters/$(YADEDYNLIBPATH) \
-               ../../../plugins/Motion/ConstitutiveLaw/SDECLaw/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

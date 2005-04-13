@@ -46,8 +46,8 @@ bool Terrain2Sphere4ClosestFeatures::go(	const shared_ptr<InteractionDescription
 	
 	Vector3r min,max;
 	Vector3r radius = Vector3r(s->radius,s->radius,s->radius);
-	min = se32.translation-radius;
-	max = se32.translation+radius;
+	min = se32.position-radius;
+	max = se32.position+radius;
 	
 	AABB aabb;
 	aabb.center  =(max-min)*0.5;
@@ -60,16 +60,16 @@ bool Terrain2Sphere4ClosestFeatures::go(	const shared_ptr<InteractionDescription
 	for(unsigned int i=0;i<faces.size();i++)
 	{
 		int faceId = faces[i];
-		tri[0] = t->vertices[t->faces[faceId][0]]+se31.translation;
-		tri[1] = t->vertices[t->faces[faceId][1]]+se31.translation;
-		tri[2] = t->vertices[t->faces[faceId][2]]+se31.translation;
-		Real d = sqrDistTriPoint(se32.translation, tri, pt);
+		tri[0] = t->vertices[t->faces[faceId][0]]+se31.position;
+		tri[1] = t->vertices[t->faces[faceId][1]]+se31.position;
+		tri[2] = t->vertices[t->faces[faceId][2]]+se31.position;
+		Real d = sqrDistTriPoint(se32.position, tri, pt);
 				
 		if (d<s->radius*s->radius)
 		{
-			Vector3r v = pt-se32.translation;
+			Vector3r v = pt-se32.position;
 			v.normalize();
-			cf->closestsPoints.push_back(std::pair<Vector3r,Vector3r>(pt,se32.translation+v*s->radius));
+			cf->closestsPoints.push_back(std::pair<Vector3r,Vector3r>(pt,se32.position+v*s->radius));
 			inInteraction =  true;
 		}
 	}

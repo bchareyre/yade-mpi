@@ -38,7 +38,7 @@ bool Sphere2Sphere4SDECContactModel::go(	const shared_ptr<InteractionDescription
 	shared_ptr<InteractionSphere> s1 = dynamic_pointer_cast<InteractionSphere>(cm1);
 	shared_ptr<InteractionSphere> s2 = dynamic_pointer_cast<InteractionSphere>(cm2);
 
-	Vector3r normal = se32.translation-se31.translation;
+	Vector3r normal = se32.position-se31.position;
 	Real penetrationDepth = s1->radius+s2->radius-normal.normalize();
 
 	shared_ptr<SDECContactGeometry> scm;
@@ -53,7 +53,7 @@ bool Sphere2Sphere4SDECContactModel::go(	const shared_ptr<InteractionDescription
 //			assert(linkGeometry);
 			if(linkGeometry)
 			{
-				linkGeometry->normal 			= se32.translation-se31.translation;
+				linkGeometry->normal 			= se32.position-se31.position;
 				linkGeometry->normal.normalize();
 				return true;
 			}
@@ -66,7 +66,7 @@ bool Sphere2Sphere4SDECContactModel::go(	const shared_ptr<InteractionDescription
 		
 	if (penetrationDepth>0)
 	{
-		scm->contactPoint = se31.translation+(s1->radius-0.5*penetrationDepth)*normal;//0.5*(pt1+pt2);
+		scm->contactPoint = se31.position+(s1->radius-0.5*penetrationDepth)*normal;//0.5*(pt1+pt2);
 		scm->normal = normal;
 		scm->penetrationDepth = penetrationDepth;
 		scm->radius1 = s1->radius;

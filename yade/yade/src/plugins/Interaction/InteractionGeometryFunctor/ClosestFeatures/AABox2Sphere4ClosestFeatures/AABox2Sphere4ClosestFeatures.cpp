@@ -44,7 +44,7 @@ bool AABox2Sphere4ClosestFeatures::go(		const shared_ptr<InteractionDescription>
 	shared_ptr<InteractionSphere> s = dynamic_pointer_cast<InteractionSphere>(cm2);
 	shared_ptr<InteractionBox>  aaBox = dynamic_pointer_cast<InteractionBox>(cm1);
 	
-	p = se32.translation-se31.translation;
+	p = se32.position-se31.position;
 	
 	l[0] = aaBox->extents[0];
 	t[0] = p[0]; 
@@ -86,8 +86,8 @@ bool AABox2Sphere4ClosestFeatures::go(		const shared_ptr<InteractionDescription>
 		
 		normal.normalize();
 		
-		pt1 = se32.translation + normal*min;
-		pt2 = se32.translation - normal*s->radius;
+		pt1 = se32.position + normal*min;
+		pt2 = se32.position - normal*s->radius;
 	
 		shared_ptr<ClosestFeatures> cf = shared_ptr<ClosestFeatures>(new ClosestFeatures());
 		cf->closestsPoints.push_back(std::pair<Vector3r,Vector3r>(pt1,pt2));
@@ -105,12 +105,12 @@ bool AABox2Sphere4ClosestFeatures::go(		const shared_ptr<InteractionDescription>
 	if (depth < 0)
 		return false;
 	
-	pt1 = q + se31.translation;
+	pt1 = q + se31.position;
 
 	normal = r;
 	normal.normalize();
 
-	pt2 = se32.translation - normal * s->radius;
+	pt2 = se32.position - normal * s->radius;
 		
 	shared_ptr<ClosestFeatures> cf = shared_ptr<ClosestFeatures>(new ClosestFeatures());
 	cf->closestsPoints.push_back(std::pair<Vector3r,Vector3r>(pt1,pt2));

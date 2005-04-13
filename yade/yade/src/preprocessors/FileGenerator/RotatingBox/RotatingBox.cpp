@@ -122,7 +122,7 @@ void RotatingBox::createBox(shared_ptr<Body>& body, int i, int j, int k)
 	Quaternionr q;
 	q.fromAxisAngle( Vector3r(0,0,1),0);
 		
-	Vector3r translation		= Vector3r(i,j,k)*10
+	Vector3r position		= Vector3r(i,j,k)*10
 					  - Vector3r(15,35,25)
 					  + Vector3r(Mathr::symmetricRandom(),Mathr::symmetricRandom(),Mathr::symmetricRandom());
 				  
@@ -140,7 +140,7 @@ void RotatingBox::createBox(shared_ptr<Body>& body, int i, int j, int k)
 							, physics->mass*(size[0]*size[0]+size[2]*size[2])/3
 							, physics->mass*(size[1]*size[1]+size[0]*size[0])/3
 						);
-	physics->se3			= Se3r(translation,q);
+	physics->se3			= Se3r(position,q);
 
 	aabb->diffuseColor		= Vector3r(0,1,0);
 	
@@ -174,7 +174,7 @@ void RotatingBox::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 	Quaternionr q;
 	q.fromAxisAngle( Vector3r(0,0,1),0);
 		
-	Vector3r translation 		= Vector3r(i,j,k)*10
+	Vector3r position 		= Vector3r(i,j,k)*10
 					  - Vector3r(45,45,45)
 					  + Vector3r(Mathr::symmetricRandom(),Mathr::symmetricRandom(),Mathr::symmetricRandom());
 				  
@@ -186,7 +186,7 @@ void RotatingBox::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 	physics->velocity		= Vector3r(0,0,0);
 	physics->mass			= 4.0/3.0*Mathr::PI*radius*radius*radius*densitySphere;
 	physics->inertia		= Vector3r(2.0/5.0*physics->mass*radius*radius,2.0/5.0*physics->mass*radius*radius,2.0/5.0*physics->mass*radius*radius); //
-	physics->se3			= Se3r(translation,q);
+	physics->se3			= Se3r(position,q);
 
 	aabb->diffuseColor		= Vector3r(0,1,0);
 	

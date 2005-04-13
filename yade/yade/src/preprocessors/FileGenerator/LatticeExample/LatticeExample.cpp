@@ -102,7 +102,7 @@ string LatticeExample::generate()
 			shared_ptr<LatticeNodeParameters> a = dynamic_pointer_cast<LatticeNodeParameters>(bodyA->physicalParameters);
 			shared_ptr<LatticeNodeParameters> b = dynamic_pointer_cast<LatticeNodeParameters>(bodyB->physicalParameters);
 
-			if (a && b && (a->se3.translation - b->se3.translation).length() < (maxLength))  
+			if (a && b && (a->se3.position - b->se3.position).length() < (maxLength))  
 			{
 				shared_ptr<Body> beam;
 				createBeam(beam,bodyA->getId(),bodyB->getId());
@@ -135,7 +135,7 @@ void LatticeExample::createNode(shared_ptr<Body>& body, int i, int j, int k)
 	Quaternionr q;
 	q.fromAxisAngle( Vector3r(Mathr::unitRandom(),Mathr::unitRandom(),Mathr::unitRandom()) , Mathr::unitRandom()*Mathr::PI );
 	
-	Vector3r translation		=   Vector3r(i,j,k)
+	Vector3r position		=   Vector3r(i,j,k)
 					  + Vector3r( 	  Mathr::symmetricRandom()*disorder
 					  		, Mathr::symmetricRandom()*disorder
 							, Mathr::symmetricRandom()*disorder);
@@ -148,7 +148,7 @@ void LatticeExample::createNode(shared_ptr<Body>& body, int i, int j, int k)
 	physics->velocity		= Vector3r(0,0,0);
 	physics->mass			= 1;
 	physics->inertia		= Vector3r(1,1,1);
-	physics->se3			= Se3r(translation,q);
+	physics->se3			= Se3r(position,q);
 
 	gSphere->radius			= radius;
 	gSphere->diffuseColor		= Vector3f(0.9,0.9,0.3);
@@ -207,14 +207,14 @@ void LatticeExample::calcBeamsPositionOrientationLength(shared_ptr<ComplexBody>&
 			Se3r& se3B 		= bodyB->physicalParameters->se3;
 			
 			Se3r se3Beam;
-			se3Beam.translation 	= (se3A.translation + se3B.translation)*0.5;
-			Vector3r dist 		= se3A.translation - se3B.translation;
+			se3Beam.position 	= (se3A.position + se3B.position)*0.5;
+			Vector3r dist 		= se3A.position - se3B.position;
 			
 			Real length 		= dist.normalize();
 			beam->length 		= length;
 			beam->initialLength 	= length;
 			
-			se3Beam.rotation.align( Vector3r::UNIT_X , dist );
+			se3Beam.orientation.align( Vector3r::UNIT_X , dist );
 			beam->se3 		= se3Beam;
 		}
 	}

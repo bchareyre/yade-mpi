@@ -56,7 +56,7 @@ class BroadInteractor : public Actor
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 	//FIXME :all the virtual method should throw ???
-	/*! Common interface for all broad phase collider. This method find the bodies which are a potentially in interaction and store the potential interactions into a list
+	/*! Common interface for all broad phase collider. This method find the bodies which are a potentially in interaction and store the potential runtimeInteractions into a list
 		\param const std::vector<shared_ptr<Body> > vector of body you want to test for potential interaction
 		\param std::list<shared_ptr<Interaction> > list of potential interaction found by the broad phase collider
 	*/

@@ -134,13 +134,13 @@ void PersistentSAPCollider::broadInteractionTest(Body* body)
 		maximums[offset+2] = max[2];
 	}
 	
-	interactions = ncb->interactions;
-	for( interactions->gotoFirstPotential() ; interactions->notAtEndPotential() ; interactions->gotoNextPotential())
+	runtimeInteractions = ncb->runtimeInteractions;
+	for( runtimeInteractions->gotoFirstPotential() ; runtimeInteractions->notAtEndPotential() ; runtimeInteractions->gotoNextPotential())
 	{
 		// FIXME : remove this isNew flag and test if interactionPhysic ?
-		if (interactions->getCurrent()->isReal) // if a interaction was only potential then no geometry was created for it and so this time it is still a new one
-			interactions->getCurrent()->isNew = false;
-		interactions->getCurrent()->isReal = false;
+		if (runtimeInteractions->getCurrent()->isReal) // if a interaction was only potential then no geometry was created for it and so this time it is still a new one
+			runtimeInteractions->getCurrent()->isNew = false;
+		runtimeInteractions->getCurrent()->isReal = false;
 	}
 	
 	updateIds(bodies->size());
@@ -235,7 +235,7 @@ void PersistentSAPCollider::updateOverlapingBBSet(int id1,int id2)
 {
 
 // 	// look if the paiur (id1,id2) already exists in the overleppingBB collection
-	bool found = (interactions->find(id1,id2)!=0);
+	bool found = (runtimeInteractions->find(id1,id2)!=0);
 	
 	// test if the AABBs of the spheres number "id1" and "id2" are overlapping
 	int offset1 = 3*id1;
@@ -246,10 +246,10 @@ void PersistentSAPCollider::updateOverlapingBBSet(int id1,int id2)
 
 	// inserts the pair p=(id1,id2) if the two AABB overlapps and if p does not exists in the overlappingBB
 	if (overlapp && !found)
-		interactions->insert(id1,id2);
+		runtimeInteractions->insert(id1,id2);
 	// removes the pair p=(id1,id2) if the two AABB do not overlapp any more and if p already exists in the overlappingBB
 	else if (!overlapp && found)
-		interactions->erase(id1,id2);
+		runtimeInteractions->erase(id1,id2);
 
 }
 

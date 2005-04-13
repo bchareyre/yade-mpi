@@ -33,7 +33,7 @@
 // Rotation matrices are of the form
 //   R = cos(t) -sin(t)
 //       sin(t)  cos(t)
-// where t > 0 indicates a counterclockwise rotation in the xy-plane.
+// where t > 0 indicates a counterclockwise orientation in the xy-plane.
 
 #include "Vector2.hpp"
 
@@ -70,7 +70,7 @@ public:
     // create a diagonal matrix
     Matrix2 (RealType fM00, RealType fM11);
 
-    // create a rotation matrix (positive angle - counterclockwise)
+    // create a orientation matrix (positive angle - counterclockwise)
     Matrix2 (RealType fAngle);
 
     // create a tensor product U*V^T
@@ -135,15 +135,15 @@ public:
     RealType qForm (const Vector2<RealType>& rkU,
         const Vector2<RealType>& rkV) const;  // u^T*M*v
 
-    // The matrix must be a rotation for these functions to be valid.  The
+    // The matrix must be a orientation for these functions to be valid.  The
     // last function uses Gram-Schmidt orthonormalization applied to the
-    // columns of the rotation matrix.  The angle must be in radians, not
+    // columns of the orientation matrix.  The angle must be in radians, not
     // degrees.
     void toAngle (RealType& rfAngle) const;
     void orthonormalize ();
 
     // The matrix must be symmetric.  Factor M = R * D * R^T where
-    // R = [u0|u1] is a rotation matrix with columns u0 and u1 and
+    // R = [u0|u1] is a orientation matrix with columns u0 and u1 and
     // D = diag(d0,d1) is a diagonal matrix whose diagonal entries are d0 and
     // d1.  The eigenvector u[i] corresponds to eigenvector d[i].  The
     // eigenvalues are ordered as d0 <= d1.

@@ -36,7 +36,7 @@ void Sphere2AABBFunctor::go(	  const shared_ptr<InteractionDescription>& cm
 	InteractionSphere* sphere = static_cast<InteractionSphere*>(cm.get());
 	AABB* aabb = static_cast<AABB*>(bv.get());
 	
-	aabb->center = se3.translation;
+	aabb->center = se3.position;
 	
 	aabb->halfSize = Vector3r(sphere->radius,sphere->radius,sphere->radius);
 	

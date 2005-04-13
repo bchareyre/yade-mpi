@@ -22,6 +22,8 @@ QMAKE_LIBDIR = ../../../plugins/Body/BodyPhysicalParameters/ParticleParameters/$
                ../../../plugins/Body/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/GeometricalModel/LineSegment/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/BodyPhysicalParameters/LatticeSetParameters/$(YADEDYNLIBPATH) \
+               ../../../plugins/Body/BodyPhysicalParameters/LatticeBeamParameters/$(YADEDYNLIBPATH) \
+               ../../../plugins/Body/BodyPhysicalParameters/LatticeNodeParameters/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

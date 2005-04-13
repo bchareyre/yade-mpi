@@ -630,8 +630,8 @@ Matrix3<RealType> Matrix3<RealType>::diagonalTimes (const Vector3<RealType>& rkD
 template <class RealType>
 void Matrix3<RealType>::toAxisAngle (Vector3<RealType>& rkAxis, RealType& rfAngle) const
 {
-    // Let (x,y,z) be the unit-length axis and let A be an angle of rotation.
-    // The rotation matrix is R = I + sin(A)*P + (1-cos(A))*P^2 where
+    // Let (x,y,z) be the unit-length axis and let A be an angle of orientation.
+    // The orientation matrix is R = I + sin(A)*P + (1-cos(A))*P^2 where
     // I is the identity and
     //
     //       +-        -+
@@ -640,7 +640,7 @@ void Matrix3<RealType>::toAxisAngle (Vector3<RealType>& rkAxis, RealType& rfAngl
     //       | -y +x  0 |
     //       +-        -+
     //
-    // If A > 0, R represents a counterclockwise rotation about the axis in
+    // If A > 0, R represents a counterclockwise orientation about the axis in
     // the sense of looking from the tip of the axis vector towards the
     // origin.  Some algebra will show that
     //
@@ -1366,7 +1366,7 @@ bool Matrix3<RealType>::QLAlgorithm (RealType afDiag[3], RealType afSubd[2])
             fEValue0 = 0.5f*(fSum - fDiscr);
             fEValue1 = 0.5f*(fSum + fDiscr);
 
-            // Compute the Givens rotation.
+            // Compute the Givens orientation.
             if ( fDiff >= 0.0f )
             {
                 fCos = afSubd[1];
@@ -1382,7 +1382,7 @@ bool Matrix3<RealType>::QLAlgorithm (RealType afDiag[3], RealType afSubd[2])
             fSin *= fTmp;
 
             // Postmultiply the current orthogonal matrix with the Givens
-            // rotation.
+            // orientation.
             for (iRow = 0; iRow < 3; iRow++)
             {
                 fTmp = m_afEntry[I(iRow,2)];
@@ -1415,7 +1415,7 @@ bool Matrix3<RealType>::QLAlgorithm (RealType afDiag[3], RealType afSubd[2])
             fEValue0 = 0.5f*(fSum - fDiscr);
             fEValue1 = 0.5f*(fSum + fDiscr);
 
-            // Compute the Givens rotation.
+            // Compute the Givens orientation.
             if ( fDiff >= 0.0f )
             {
                 fCos = afSubd[0];
@@ -1431,7 +1431,7 @@ bool Matrix3<RealType>::QLAlgorithm (RealType afDiag[3], RealType afSubd[2])
             fSin *= fTmp;
 
             // Postmultiply the current orthogonal matrix with the Givens
-            // rotation.
+            // orientation.
             for (iRow = 0; iRow < 3; iRow++)
             {
                 fTmp = m_afEntry[I(iRow,1)];
@@ -1466,7 +1466,7 @@ bool Matrix3<RealType>::QLAlgorithm (RealType afDiag[3], RealType afSubd[2])
         else
             fA += afSubd[0]/(fRatio - fRoot);
 
-        // Compute the Givens rotation for the first pass.
+        // Compute the Givens orientation for the first pass.
         if ( Mathf::fAbs(fB) >= Mathf::fAbs(fA) )
         {
             fRatio = fA/fB;
@@ -1481,7 +1481,7 @@ bool Matrix3<RealType>::QLAlgorithm (RealType afDiag[3], RealType afSubd[2])
         }
 
         // Postmultiply the current orthogonal matrix with the Givens
-        // rotation.
+        // orientation.
         for (iRow = 0; iRow < 3; iRow++)
         {
             fTmp = m_afEntry[I(iRow,2)];
@@ -1498,7 +1498,7 @@ bool Matrix3<RealType>::QLAlgorithm (RealType afDiag[3], RealType afSubd[2])
         fA = fCos*fTmp0 - afSubd[1];
         fTmp0 *= fSin;
 
-        // Compute the Givens rotation for the second pass.  The subdiagonal
+        // Compute the Givens orientation for the second pass.  The subdiagonal
         // term S[1] in the tridiagonal matrix is updated at this time.
         if ( Mathf::fAbs(fB) >= Mathf::fAbs(fA) )
         {
@@ -1518,7 +1518,7 @@ bool Matrix3<RealType>::QLAlgorithm (RealType afDiag[3], RealType afSubd[2])
         }
 
         // Postmultiply the current orthogonal matrix with the Givens
-        // rotation.
+        // orientation.
         for (iRow = 0; iRow < 3; iRow++)
         {
             fTmp = m_afEntry[I(iRow,1)];
@@ -1907,7 +1907,7 @@ template <class RealType>
 void Matrix3<RealType>::QDUDecomposition (Matrix3& rkQ, Matrix3& rkD,
     Matrix3& rkU) const
 {
-    // Factor M = QR = QDU where Q is orthogonal (rotation), D is diagonal
+    // Factor M = QR = QDU where Q is orthogonal (orientation), D is diagonal
     // (scaling),  and U is upper triangular with ones on its diagonal
     // (shear).  Algorithm uses Gram-Schmidt orthogonalization (the QR
     // algorithm).

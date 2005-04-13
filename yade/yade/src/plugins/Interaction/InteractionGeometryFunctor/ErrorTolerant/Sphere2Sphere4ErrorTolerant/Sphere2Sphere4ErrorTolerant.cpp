@@ -37,18 +37,18 @@ bool Sphere2Sphere4ErrorTolerant::go(		const shared_ptr<InteractionDescription>&
 	shared_ptr<Sphere> s1 = dynamic_pointer_cast<Sphere>(cm1);
 	shared_ptr<Sphere> s2 = dynamic_pointer_cast<Sphere>(cm2);
 
-	Vector3r normal = se32.translation-se31.translation;
+	Vector3r normal = se32.position-se31.position;
 	float penetrationDepth = s1->radius+s2->radius-normal.normalize();
 
 	if (penetrationDepth>0)
 	{
 		shared_ptr<ErrorTolerantContactModel> cm = shared_ptr<ErrorTolerantContactModel>(new ErrorTolerantContactModel());
 
-		Vector3r pt1 = se31.translation+normal*s1->radius;
-		Vector3r pt2 = se32.translation-normal*s2->radius;
+		Vector3r pt1 = se31.position+normal*s1->radius;
+		Vector3r pt2 = se32.position-normal*s2->radius;
 		cm->closestPoints.push_back(std::pair<Vector3r,Vector3r>(pt1,pt2));
-		cm->o1p1 = pt1-se31.translation;
-		cm->o2p2 = pt2-se32.translation;
+		cm->o1p1 = pt1-se31.position;
+		cm->o2p2 = pt2-se32.position;
 		cm->normal = normal;
 		c->interactionGeometry = cm;
 		return true;
