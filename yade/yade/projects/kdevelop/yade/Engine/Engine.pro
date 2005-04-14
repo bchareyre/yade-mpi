@@ -8,11 +8,11 @@ HEADERS += ActionParameterDispatcher.hpp \
            ActionParameterContainer.hpp \
            ActionParameter.hpp \
            ConstitutiveLaw.hpp \
-           KinematicMotion.hpp 
+           Condition.hpp 
 SOURCES += ActionParameterDispatcher.cpp \
            ActionParameterContainer.cpp \
            ConstitutiveLaw.cpp \
-           KinematicMotion.cpp 
+           Condition.cpp 
 LIBS += -rdynamic
 INCLUDEPATH = $(YADEINCLUDEPATH)
 MOC_DIR = $(YADECOMPILATIONPATH)

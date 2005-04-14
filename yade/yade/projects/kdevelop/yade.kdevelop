@@ -99,7 +99,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>preprocessors/FileGenerator/LatticeExample</activedir>
+      <activedir>plugins/Body/BodyPhysicalParametersFunctor/LeapFrogPositionIntegratorFunctor</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>
