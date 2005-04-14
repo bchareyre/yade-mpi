@@ -30,5 +30,5 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
-HEADERS += SDECMacroMicroElasticRelationships.hpp 
-SOURCES += SDECMacroMicroElasticRelationships.cpp 
+HEADERS += MacroMicroElasticRelationships.hpp 
+SOURCES += MacroMicroElasticRelationships.cpp 

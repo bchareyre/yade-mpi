@@ -18,5 +18,5 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
-HEADERS += SDECContactPhysics.hpp 
-SOURCES += SDECContactPhysics.cpp 
+HEADERS += ElasticContactParameters.hpp 
+SOURCES += ElasticContactParameters.cpp 

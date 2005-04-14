@@ -99,7 +99,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>preprocessors/FileGenerator/HangingCloth</activedir>
+      <activedir>extensions</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>

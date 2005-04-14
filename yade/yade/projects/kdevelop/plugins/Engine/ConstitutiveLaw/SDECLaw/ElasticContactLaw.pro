@@ -45,5 +45,5 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
-HEADERS += SDECLaw.hpp 
-SOURCES += SDECLaw.cpp 
+HEADERS += ElasticContactLaw.hpp 
+SOURCES += ElasticContactLaw.cpp 
