@@ -5,7 +5,7 @@
 
 SUBDIRS += SpringGeometry \
            ClosestFeatures \
-           SDECContactGeometry \
+           MacroMicroContactGeometry \
            SDECLinkGeometry \
            ErrorTolerantContactModel 
 MOC_DIR = $(YADECOMPILATIONPATH)
