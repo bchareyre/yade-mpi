@@ -13,9 +13,9 @@
 #include "InteractionDescriptionSet2AABBFunctor.hpp"
 #include "InteractionDescriptionSet.hpp"
 
-#include "SDECLaw.hpp"
-#include "SDECMacroMicroElasticRelationships.hpp"
-#include "SDECParameters.hpp"
+#include "ElasticContactLaw.hpp"
+#include "MacroMicroElasticRelationships.hpp"
+#include "BodyMacroParameters.hpp"
 #include "SDECLinkGeometry.hpp"
 #include "SDECLinkPhysics.hpp"
 #include "SDECTimeStepper.hpp"
@@ -333,7 +333,7 @@ string SDECImpactTest::generate()
 void SDECImpactTest::createSphere(shared_ptr<Body>& body, Vector3r position, Real radius, bool big, bool dynamic )
 {
 	body = shared_ptr<Body>(new SimpleBody(0,2));
-	shared_ptr<SDECParameters> physics(new SDECParameters);
+	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<Sphere> gSphere(new Sphere);
 	shared_ptr<InteractionSphere> iSphere(new InteractionSphere);
@@ -386,7 +386,7 @@ void SDECImpactTest::createSphere(shared_ptr<Body>& body, Vector3r position, Rea
 void SDECImpactTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents, bool wire)
 {
 	body = shared_ptr<Body>(new SimpleBody(0,2));
-	shared_ptr<SDECParameters> physics(new SDECParameters);
+	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<Box> gBox(new Box);
 	shared_ptr<InteractionBox> iBox(new InteractionBox);
@@ -452,11 +452,11 @@ void SDECImpactTest::createActors(shared_ptr<ComplexBody>& rootBody)
 	actionParameterInitializer->actionParameterNames.push_back("ActionParameterMomentum");
 	
 	shared_ptr<InteractionGeometryDispatcher> interactionGeometryDispatcher(new InteractionGeometryDispatcher);
-	interactionGeometryDispatcher->add("InteractionSphere","InteractionSphere","Sphere2Sphere4SDECContactModel");
-	interactionGeometryDispatcher->add("InteractionSphere","InteractionBox","Box2Sphere4SDECContactModel");
+	interactionGeometryDispatcher->add("InteractionSphere","InteractionSphere","Sphere2Sphere4MacroMicroContactGeometry");
+	interactionGeometryDispatcher->add("InteractionSphere","InteractionBox","Box2Sphere4MacroMicroContactGeometry");
 
 	shared_ptr<InteractionPhysicsDispatcher> interactionPhysicsDispatcher(new InteractionPhysicsDispatcher);
-	interactionPhysicsDispatcher->add("SDECParameters","SDECParameters","SDECMacroMicroElasticRelationships");
+	interactionPhysicsDispatcher->add("BodyMacroParameters","BodyMacroParameters","MacroMicroElasticRelationships");
 		
 	shared_ptr<BoundingVolumeDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeDispatcher>(new BoundingVolumeDispatcher);
 	boundingVolumeDispatcher->add("InteractionSphere","AABB","Sphere2AABBFunctor");
@@ -491,7 +491,7 @@ void SDECImpactTest::createActors(shared_ptr<ComplexBody>& rootBody)
 	sdecTimeStepper->interval = timeStepUpdateInterval;
 	
 	
-	shared_ptr<SDECLaw> elasticContactLaw(new SDECLaw);
+	shared_ptr<ElasticContactLaw> elasticContactLaw(new ElasticContactLaw);
 	elasticContactLaw->sdecGroupMask = 2;
 	
 	rootBody->actors.clear();

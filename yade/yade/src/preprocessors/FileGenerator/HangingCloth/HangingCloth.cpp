@@ -34,9 +34,9 @@
 #include "ActionParameterDispatcher.hpp"
 #include "InteractionSphere.hpp"
 
-#include "SDECLaw.hpp"
-#include "SDECMacroMicroElasticRelationships.hpp"
-#include "SDECParameters.hpp"
+#include "ElasticContactLaw.hpp"
+#include "MacroMicroElasticRelationships.hpp"
+#include "BodyMacroParameters.hpp"
 #include "SDECLinkGeometry.hpp"
 #include "SDECLinkPhysics.hpp"
 #include "MassSpringBody2RigidBodyLaw.hpp"
@@ -131,11 +131,11 @@ string HangingCloth::generate()
 	actionParameterInitializer->actionParameterNames.push_back("ActionParameterMomentum");
 	
 	shared_ptr<InteractionGeometryDispatcher> interactionGeometryDispatcher(new InteractionGeometryDispatcher);
-	interactionGeometryDispatcher->add("InteractionSphere","InteractionSphere","Sphere2Sphere4SDECContactModel");
-	interactionGeometryDispatcher->add("InteractionSphere","InteractionBox","Box2Sphere4SDECContactModel");
+	interactionGeometryDispatcher->add("InteractionSphere","InteractionSphere","Sphere2Sphere4MacroMicroContactGeometry");
+	interactionGeometryDispatcher->add("InteractionSphere","InteractionBox","Box2Sphere4MacroMicroContactGeometry");
 
 	shared_ptr<InteractionPhysicsDispatcher> interactionPhysicsDispatcher(new InteractionPhysicsDispatcher);
-	interactionPhysicsDispatcher->add("SDECParameters","SDECParameters","SDECMacroMicroElasticRelationships");
+	interactionPhysicsDispatcher->add("BodyMacroParameters","BodyMacroParameters","MacroMicroElasticRelationships");
 
 	shared_ptr<GravityCondition> gravityCondition(new GravityCondition);
 	gravityCondition->gravity = gravity;
@@ -168,7 +168,7 @@ string HangingCloth::generate()
 	shared_ptr<MassSpringLaw> explicitMassSpringConstitutiveLaw(new MassSpringLaw);
 	explicitMassSpringConstitutiveLaw->springGroupMask = 1;
 
-	shared_ptr<SDECLaw> elasticContactLaw(new SDECLaw);
+	shared_ptr<ElasticContactLaw> elasticContactLaw(new ElasticContactLaw);
 	elasticContactLaw->sdecGroupMask = 2;
 
 	shared_ptr<MassSpringBody2RigidBodyLaw> massSpringBody2RigidBodyConstitutiveLaw(new MassSpringBody2RigidBodyLaw);
@@ -243,7 +243,7 @@ string HangingCloth::generate()
 // END									
 
 // BEGIN HACK - to have collision between SDEC spheres and cloth	
-// 			shared_ptr<SDECParameters> particle(new SDECParameters);
+// 			shared_ptr<BodyMacroParameters> particle(new BodyMacroParameters);
 // 			particle->angularVelocity	= Vector3r(0,0,0);
 // 			particle->velocity		= Vector3r(0,0,0);
 // 			particle->mass			= clothMass/(Real)(width*height);
@@ -384,8 +384,8 @@ string HangingCloth::generate()
 				shared_ptr<Body> bodyB;
 				bodyB = rootBody->bodies->getCurrent();
 	
-				shared_ptr<SDECParameters> a = dynamic_pointer_cast<SDECParameters>(bodyA->physicalParameters);
-				shared_ptr<SDECParameters> b = dynamic_pointer_cast<SDECParameters>(bodyB->physicalParameters);
+				shared_ptr<BodyMacroParameters> a = dynamic_pointer_cast<BodyMacroParameters>(bodyA->physicalParameters);
+				shared_ptr<BodyMacroParameters> b = dynamic_pointer_cast<BodyMacroParameters>(bodyB->physicalParameters);
 				shared_ptr<InteractionSphere>	as = dynamic_pointer_cast<InteractionSphere>(bodyA->interactionGeometry);
 				shared_ptr<InteractionSphere>	bs = dynamic_pointer_cast<InteractionSphere>(bodyB->interactionGeometry);
 	
@@ -455,7 +455,7 @@ shared_ptr<Interaction>& HangingCloth::createSpring(const shared_ptr<ComplexBody
 void HangingCloth::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 {
 	body = shared_ptr<Body>(new SimpleBody(0,2));
-	shared_ptr<SDECParameters> physics(new SDECParameters);
+	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<Sphere> gSphere(new Sphere);
 	shared_ptr<InteractionSphere> iSphere(new InteractionSphere);
@@ -505,7 +505,7 @@ void HangingCloth::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 void HangingCloth::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents)
 {
 	body = shared_ptr<Body>(new SimpleBody(0,2));
-	shared_ptr<SDECParameters> physics(new SDECParameters);
+	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<Box> gBox(new Box);
 	shared_ptr<InteractionBox> iBox(new InteractionBox);

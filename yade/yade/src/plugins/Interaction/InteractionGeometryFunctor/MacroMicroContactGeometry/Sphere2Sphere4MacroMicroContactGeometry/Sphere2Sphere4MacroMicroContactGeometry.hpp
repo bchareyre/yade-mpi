@@ -33,7 +33,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /*! \brief Provide interaction handling between a axis aligned box and a sphere in terms of ClosestFeatures */
-class Sphere2Sphere4SDECContactModel : public InteractionGeometryFunctor
+class Sphere2Sphere4MacroMicroContactGeometry : public InteractionGeometryFunctor
 {
 	public : virtual bool go(		const shared_ptr<InteractionDescription>& cm1,
 						const shared_ptr<InteractionDescription>& cm2,
@@ -46,14 +46,14 @@ class Sphere2Sphere4SDECContactModel : public InteractionGeometryFunctor
 						const Se3r& se32,
 						const shared_ptr<Interaction>& c);
 
-	REGISTER_CLASS_NAME(Sphere2Sphere4SDECContactModel);
+	REGISTER_CLASS_NAME(Sphere2Sphere4MacroMicroContactGeometry);
 	DEFINE_FUNCTOR_ORDER_2D(InteractionSphere,InteractionSphere);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-REGISTER_SERIALIZABLE(Sphere2Sphere4SDECContactModel,false);
+REGISTER_SERIALIZABLE(Sphere2Sphere4MacroMicroContactGeometry,false);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////

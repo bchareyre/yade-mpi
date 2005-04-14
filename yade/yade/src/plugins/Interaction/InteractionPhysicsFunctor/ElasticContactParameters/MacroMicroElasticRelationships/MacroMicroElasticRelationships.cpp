@@ -21,21 +21,21 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "SDECMacroMicroElasticRelationships.hpp"
-#include "SDECContactGeometry.hpp"
-#include "SDECContactPhysics.hpp"
+#include "MacroMicroElasticRelationships.hpp"
+#include "MacroMicroContactGeometry.hpp"
+#include "ElasticContactParameters.hpp"
 
-#include "SDECLinkGeometry.hpp" // FIXME - I can't dispatch by SDECLinkGeometry <-> SDECContactGeometry !!?
+#include "SDECLinkGeometry.hpp" // FIXME - I can't dispatch by SDECLinkGeometry <-> MacroMicroContactGeometry !!?
 #include "SDECLinkPhysics.hpp"  // FIXME
 
 #include "Omega.hpp"
 #include "ComplexBody.hpp"
-#include "SDECParameters.hpp"
+#include "BodyMacroParameters.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-SDECMacroMicroElasticRelationships::SDECMacroMicroElasticRelationships()
+MacroMicroElasticRelationships::MacroMicroElasticRelationships()
 {
 	alpha 	= 2.5;
 	beta 	= 2.0;
@@ -45,7 +45,7 @@ SDECMacroMicroElasticRelationships::SDECMacroMicroElasticRelationships()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void SDECMacroMicroElasticRelationships::registerAttributes()
+void MacroMicroElasticRelationships::registerAttributes()
 {
 	REGISTER_ATTRIBUTE(alpha);
 	REGISTER_ATTRIBUTE(beta);
@@ -55,26 +55,26 @@ void SDECMacroMicroElasticRelationships::registerAttributes()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void SDECMacroMicroElasticRelationships::go(	  const shared_ptr<BodyPhysicalParameters>& b1 // SDECParameters
-					, const shared_ptr<BodyPhysicalParameters>& b2 // SDECParameters
+void MacroMicroElasticRelationships::go(	  const shared_ptr<BodyPhysicalParameters>& b1 // BodyMacroParameters
+					, const shared_ptr<BodyPhysicalParameters>& b2 // BodyMacroParameters
 					, const shared_ptr<Interaction>& interaction)
 {
-	SDECParameters* sdec1 = static_cast<SDECParameters*>(b1.get());
-	SDECParameters* sdec2 = static_cast<SDECParameters*>(b2.get());
-	SDECContactGeometry* interactionGeometry = dynamic_cast<SDECContactGeometry*>(interaction->interactionGeometry.get());
+	BodyMacroParameters* sdec1 = static_cast<BodyMacroParameters*>(b1.get());
+	BodyMacroParameters* sdec2 = static_cast<BodyMacroParameters*>(b2.get());
+	MacroMicroContactGeometry* interactionGeometry = dynamic_cast<MacroMicroContactGeometry*>(interaction->interactionGeometry.get());
 	
-	if(interactionGeometry) // so it is SDECContactGeometry  - NON PERMANENT LINK
+	if(interactionGeometry) // so it is MacroMicroContactGeometry  - NON PERMANENT LINK
 	{
 
 /* OLD VERSION  this is a LinearContactModel, different class, model different that MicroMacroElasticRelationships
 another would be HerzMindlinContactModel
 
-		shared_ptr<SDECContactPhysics> contactPhysics;
+		shared_ptr<ElasticContactParameters> contactPhysics;
 		
 		if ( interaction->isNew)
 		{
-			interaction->interactionPhysics = shared_ptr<SDECContactPhysics>(new SDECContactPhysics());
-			contactPhysics = dynamic_pointer_cast<SDECContactPhysics>(interaction->interactionPhysics);
+			interaction->interactionPhysics = shared_ptr<ElasticContactParameters>(new ElasticContactParameters());
+			contactPhysics = dynamic_pointer_cast<ElasticContactParameters>(interaction->interactionPhysics);
 			
 			contactPhysics->initialKn			= 2*(sdec1->kn*sdec2->kn)/(sdec1->kn+sdec2->kn);
 			contactPhysics->initialKs			= 2*(sdec1->ks*sdec2->ks)/(sdec1->ks+sdec2->ks);
@@ -82,7 +82,7 @@ another would be HerzMindlinContactModel
 			contactPhysics->initialEquilibriumDistance	= interactionGeometry->radius1+interactionGeometry->radius2;
 		}
 		else
-			contactPhysics = dynamic_pointer_cast<SDECContactPhysics>(interaction->interactionPhysics);
+			contactPhysics = dynamic_pointer_cast<ElasticContactParameters>(interaction->interactionPhysics);
 		
 		contactPhysics->kn = contactPhysics->initialKn;
 		contactPhysics->ks = contactPhysics->initialKs;
@@ -90,8 +90,8 @@ another would be HerzMindlinContactModel
 */
 		if( interaction->isNew)
 		{
-			interaction->interactionPhysics = shared_ptr<SDECContactPhysics>(new SDECContactPhysics());
-			SDECContactPhysics* contactPhysics = dynamic_cast<SDECContactPhysics*>(interaction->interactionPhysics.get());
+			interaction->interactionPhysics = shared_ptr<ElasticContactParameters>(new ElasticContactParameters());
+			ElasticContactParameters* contactPhysics = dynamic_cast<ElasticContactParameters*>(interaction->interactionPhysics.get());
 
 			Real Ea 	= sdec1->young;
 			Real Eb 	= sdec2->young;
@@ -126,7 +126,7 @@ another would be HerzMindlinContactModel
 		}
 		else
 		{	// FIXME - are those lines necessary ???? what they are doing in fact ???
-			SDECContactPhysics* contactPhysics = dynamic_cast<SDECContactPhysics*>(interaction->interactionPhysics.get());
+			ElasticContactParameters* contactPhysics = dynamic_cast<ElasticContactParameters*>(interaction->interactionPhysics.get());
 
 			contactPhysics->kn = contactPhysics->initialKn;
 			contactPhysics->ks = contactPhysics->initialKs;

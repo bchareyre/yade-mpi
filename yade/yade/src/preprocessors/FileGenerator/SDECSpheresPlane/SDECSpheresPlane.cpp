@@ -7,17 +7,17 @@
 #include "ComplexBody.hpp"
 #include "SAPCollider.hpp"
 #include "PersistentSAPCollider.hpp"
-#include "SDECParameters.hpp"
+#include "BodyMacroParameters.hpp"
 #include <fstream>
 #include "IOManager.hpp"
-#include "SDECLaw.hpp"
-#include "SDECParameters.hpp"
+#include "ElasticContactLaw.hpp"
+#include "BodyMacroParameters.hpp"
 #include "SDECLinkGeometry.hpp"
 #include "Interaction.hpp"
 #include "BoundingVolumeDispatcher.hpp"
 #include "InteractionDescriptionSet2AABBFunctor.hpp"
 #include "InteractionDescriptionSet.hpp"
-#include "SDECMacroMicroElasticRelationships.hpp"
+#include "MacroMicroElasticRelationships.hpp"
 #include "SDECTimeStepper.hpp"
 
 #include "ActionParameterReset.hpp"
@@ -116,7 +116,7 @@ string SDECSpheresPlane::generate()
 void SDECSpheresPlane::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 {
 	body = shared_ptr<Body>(new SimpleBody(0,1));
-	shared_ptr<SDECParameters> physics(new SDECParameters);
+	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<Sphere> gSphere(new Sphere);
 	shared_ptr<InteractionSphere> iSphere(new InteractionSphere);
@@ -164,7 +164,7 @@ void SDECSpheresPlane::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 void SDECSpheresPlane::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents)
 {
 	body = shared_ptr<Body>(new SimpleBody(0,1));
-	shared_ptr<SDECParameters> physics(new SDECParameters);
+	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<Box> gBox(new Box);
 	shared_ptr<InteractionBox> iBox(new InteractionBox);
@@ -217,11 +217,11 @@ void SDECSpheresPlane::createActors(shared_ptr<ComplexBody>& rootBody)
 	actionParameterInitializer->actionParameterNames.push_back("ActionParameterMomentum");
 	
 	shared_ptr<InteractionGeometryDispatcher> interactionGeometryDispatcher(new InteractionGeometryDispatcher);
-	interactionGeometryDispatcher->add("InteractionSphere","InteractionSphere","Sphere2Sphere4SDECContactModel");
-	interactionGeometryDispatcher->add("InteractionSphere","InteractionBox","Box2Sphere4SDECContactModel");
+	interactionGeometryDispatcher->add("InteractionSphere","InteractionSphere","Sphere2Sphere4MacroMicroContactGeometry");
+	interactionGeometryDispatcher->add("InteractionSphere","InteractionBox","Box2Sphere4MacroMicroContactGeometry");
 
 	shared_ptr<InteractionPhysicsDispatcher> interactionPhysicsDispatcher(new InteractionPhysicsDispatcher);
-	interactionPhysicsDispatcher->add("SDECParameters","SDECParameters","SDECMacroMicroElasticRelationships");
+	interactionPhysicsDispatcher->add("BodyMacroParameters","BodyMacroParameters","MacroMicroElasticRelationships");
 		
 	shared_ptr<BoundingVolumeDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeDispatcher>(new BoundingVolumeDispatcher);
 	boundingVolumeDispatcher->add("InteractionSphere","AABB","Sphere2AABBFunctor");
@@ -261,7 +261,7 @@ void SDECSpheresPlane::createActors(shared_ptr<ComplexBody>& rootBody)
 	rootBody->actors.push_back(shared_ptr<Actor>(new PersistentSAPCollider));
 	rootBody->actors.push_back(interactionGeometryDispatcher);
 	rootBody->actors.push_back(interactionPhysicsDispatcher);
-	rootBody->actors.push_back(shared_ptr<Actor>(new SDECLaw));
+	rootBody->actors.push_back(shared_ptr<Actor>(new ElasticContactLaw));
 	rootBody->actors.push_back(gravityCondition);
 	rootBody->actors.push_back(actionDampingDispatcher);
 	rootBody->actors.push_back(applyActionDispatcher);

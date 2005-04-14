@@ -31,16 +31,16 @@
 #include "Sphere.hpp"
 #include "ComplexBody.hpp"
 #include "PersistentSAPCollider.hpp"
-#include "SDECParameters.hpp"
+#include "BodyMacroParameters.hpp"
 #include <fstream>
 #include "IOManager.hpp"
-#include "SDECLaw.hpp"
-#include "SDECParameters.hpp"
+#include "ElasticContactLaw.hpp"
+#include "BodyMacroParameters.hpp"
 #include "Interaction.hpp"
 #include "BoundingVolumeDispatcher.hpp"
 #include "InteractionDescriptionSet2AABBFunctor.hpp"
 #include "InteractionDescriptionSet.hpp"
-#include "SDECMacroMicroElasticRelationships.hpp"
+#include "MacroMicroElasticRelationships.hpp"
 #include "SDECTimeStepper.hpp"
 
 
@@ -123,7 +123,7 @@ string SDECTriaxialTest::generate()
 void SDECTriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents, bool wire)
 {
 	body = shared_ptr<Body>(new SimpleBody(0,2));
-	shared_ptr<SDECParameters> physics(new SDECParameters);
+	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<Box> gBox(new Box);
 	shared_ptr<InteractionBox> iBox(new InteractionBox);
@@ -172,7 +172,7 @@ void SDECTriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, Vect
 void SDECTriaxialTest::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 {
 	body = shared_ptr<Body>(new SimpleBody(0,1));
-	shared_ptr<SDECParameters> physics(new SDECParameters);
+	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<Sphere> gSphere(new Sphere);
 	shared_ptr<InteractionSphere> iSphere(new InteractionSphere);

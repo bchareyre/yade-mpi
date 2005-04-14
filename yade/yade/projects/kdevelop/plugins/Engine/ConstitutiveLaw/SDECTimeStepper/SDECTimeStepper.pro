@@ -4,18 +4,15 @@
 # Target is a library:  
 
 LIBS += -lSphere \
-        -lSDECContactPhysics \
-        -lSDECContactGeometry \
-        -lSDECMacroMicroElasticRelationships \
+        -lElasticContactParameters \
+        -lMacroMicroContactGeometry \
+        -lMacroMicroElasticRelationships \
         -rdynamic 
 INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 QMAKE_LIBDIR = ../../../../plugins/Body/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
-               ../../../../plugins/Interaction/InteractionPhysics/SDECContactPhysics/$(YADEDYNLIBPATH) \
-               ../../../../plugins/Interaction/InteractionGeometry/SDECContactGeometry/$(YADEDYNLIBPATH) \
-               ../../../../plugins/Interaction/InteractionPhysicsFunctor/SDECContactPhysics/SDECMacroMicroElasticRelationships/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

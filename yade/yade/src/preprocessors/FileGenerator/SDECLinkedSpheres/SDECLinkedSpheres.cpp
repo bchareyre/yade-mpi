@@ -13,9 +13,9 @@
 #include "InteractionDescriptionSet2AABBFunctor.hpp"
 #include "InteractionDescriptionSet.hpp"
 
-#include "SDECLaw.hpp"
-#include "SDECMacroMicroElasticRelationships.hpp"
-#include "SDECParameters.hpp"
+#include "ElasticContactLaw.hpp"
+#include "MacroMicroElasticRelationships.hpp"
+#include "BodyMacroParameters.hpp"
 #include "SDECLinkGeometry.hpp"
 #include "SDECLinkPhysics.hpp"
 #include "SDECTimeStepper.hpp"
@@ -147,8 +147,8 @@ string SDECLinkedSpheres::generate()
 			shared_ptr<Body> bodyB;
 			bodyB = rootBody->bodies->getCurrent();
 
-			shared_ptr<SDECParameters> a = dynamic_pointer_cast<SDECParameters>(bodyA->physicalParameters);
-			shared_ptr<SDECParameters> b = dynamic_pointer_cast<SDECParameters>(bodyB->physicalParameters);
+			shared_ptr<BodyMacroParameters> a = dynamic_pointer_cast<BodyMacroParameters>(bodyA->physicalParameters);
+			shared_ptr<BodyMacroParameters> b = dynamic_pointer_cast<BodyMacroParameters>(bodyB->physicalParameters);
 			shared_ptr<InteractionSphere>	as = dynamic_pointer_cast<InteractionSphere>(bodyA->interactionGeometry);
 			shared_ptr<InteractionSphere>	bs = dynamic_pointer_cast<InteractionSphere>(bodyB->interactionGeometry);
 
@@ -189,7 +189,7 @@ string SDECLinkedSpheres::generate()
 void SDECLinkedSpheres::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 {
 	body = shared_ptr<Body>(new SimpleBody(0,55));
-	shared_ptr<SDECParameters> physics(new SDECParameters);
+	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<Sphere> gSphere(new Sphere);
 	shared_ptr<InteractionSphere> iSphere(new InteractionSphere);
@@ -239,7 +239,7 @@ void SDECLinkedSpheres::createSphere(shared_ptr<Body>& body, int i, int j, int k
 void SDECLinkedSpheres::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents)
 {
 	body = shared_ptr<Body>(new SimpleBody(0,55));
-	shared_ptr<SDECParameters> physics(new SDECParameters);
+	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<Box> gBox(new Box);
 	shared_ptr<InteractionBox> iBox(new InteractionBox);
@@ -291,11 +291,11 @@ void SDECLinkedSpheres::createActors(shared_ptr<ComplexBody>& rootBody)
 	actionParameterInitializer->actionParameterNames.push_back("ActionParameterMomentum");
 	
 	shared_ptr<InteractionGeometryDispatcher> interactionGeometryDispatcher(new InteractionGeometryDispatcher);
-	interactionGeometryDispatcher->add("InteractionSphere","InteractionSphere","Sphere2Sphere4SDECContactModel");
-	interactionGeometryDispatcher->add("InteractionSphere","InteractionBox","Box2Sphere4SDECContactModel");
+	interactionGeometryDispatcher->add("InteractionSphere","InteractionSphere","Sphere2Sphere4MacroMicroContactGeometry");
+	interactionGeometryDispatcher->add("InteractionSphere","InteractionBox","Box2Sphere4MacroMicroContactGeometry");
 
 	shared_ptr<InteractionPhysicsDispatcher> interactionPhysicsDispatcher(new InteractionPhysicsDispatcher);
-	interactionPhysicsDispatcher->add("SDECParameters","SDECParameters","SDECMacroMicroElasticRelationships");
+	interactionPhysicsDispatcher->add("BodyMacroParameters","BodyMacroParameters","MacroMicroElasticRelationships");
 		
 	shared_ptr<BoundingVolumeDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeDispatcher>(new BoundingVolumeDispatcher);
 	boundingVolumeDispatcher->add("InteractionSphere","AABB","Sphere2AABBFunctor");
@@ -327,7 +327,7 @@ void SDECLinkedSpheres::createActors(shared_ptr<ComplexBody>& rootBody)
 	sdecTimeStepper->interval = timeStepUpdateInterval;
 
 	
-	shared_ptr<SDECLaw> constitutiveLaw(new SDECLaw);
+	shared_ptr<ElasticContactLaw> constitutiveLaw(new ElasticContactLaw);
 	constitutiveLaw->sdecGroupMask = 55;
 	constitutiveLaw->momentRotationLaw = momentRotationLaw;
 	

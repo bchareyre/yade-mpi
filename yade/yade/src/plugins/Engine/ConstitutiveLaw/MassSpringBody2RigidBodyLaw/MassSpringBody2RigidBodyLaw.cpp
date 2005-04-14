@@ -6,10 +6,10 @@
 #include "SimpleSpringLaw.hpp"
 #include "Mesh2D.hpp"
 
-#include "SDECParameters.hpp"
-#include "SDECContactGeometry.hpp"
+#include "BodyMacroParameters.hpp"
+#include "MacroMicroContactGeometry.hpp"
 #include "SDECLinkGeometry.hpp"
-#include "SDECContactPhysics.hpp"
+#include "ElasticContactParameters.hpp"
 #include "SDECLinkPhysics.hpp"
 
 MassSpringBody2RigidBodyLaw::MassSpringBody2RigidBodyLaw ()  : ConstitutiveLaw(), actionForce(new ActionParameterForce) , actionMomentum(new ActionParameterMomentum)
@@ -49,24 +49,24 @@ void MassSpringBody2RigidBodyLaw::calculateForces(Body * body)
 		
 //		if(!  mixedInteraction->interactionPhysics)
 //	------------------------ this is bad and will not work, InetractionPhysicsFunctor should create this
-//			mixedInteraction->interactionPhysics = shared_ptr<SDECContactPhysics>(new SDECContactPhysics);
+//			mixedInteraction->interactionPhysics = shared_ptr<ElasticContactParameters>(new ElasticContactParameters);
 //		if(! ((*bodies)[id1]->physicalParameters) )
-//			(*bodies)[id1]->physicalParameters = shared_ptr<SDECParameters>(new SDECParameters);
+//			(*bodies)[id1]->physicalParameters = shared_ptr<BodyMacroParameters>(new BodyMacroParameters);
 //		if(! ((*bodies)[id2]->physicalParameters) )
-//			(*bodies)[id2]->physicalParameters = shared_ptr<SDECParameters>(new SDECParameters);
+//			(*bodies)[id2]->physicalParameters = shared_ptr<BodyMacroParameters>(new BodyMacroParameters);
 		
 
 // here (*bodies)[id]->physicalParameters are:
-//  - SDECParameters
+//  - BodyMacroParameters
 //  - ParticleParameters
 //		cerr << "this is: " << ((*bodies)[id1]->physicalParameters)->getClassName() << endl;
 //		cerr << "this is: " << ((*bodies)[id2]->physicalParameters)->getClassName() << endl;
 
-// BEGIN - this is code just duplicated from SDECLaw for non-permanent links
-		shared_ptr<SDECParameters> de1 	= dynamic_pointer_cast<SDECParameters>((*bodies)[id1]->physicalParameters);
-		shared_ptr<SDECParameters> de2 	= dynamic_pointer_cast<SDECParameters>((*bodies)[id2]->physicalParameters);
-		shared_ptr<SDECContactGeometry> currentContactGeometry = dynamic_pointer_cast<SDECContactGeometry>(mixedInteraction->interactionGeometry);
-		shared_ptr<SDECContactPhysics> currentContactPhysics   = dynamic_pointer_cast<SDECContactPhysics> (mixedInteraction->interactionPhysics);
+// BEGIN - this is code just duplicated from ElasticContactLaw for non-permanent links
+		shared_ptr<BodyMacroParameters> de1 	= dynamic_pointer_cast<BodyMacroParameters>((*bodies)[id1]->physicalParameters);
+		shared_ptr<BodyMacroParameters> de2 	= dynamic_pointer_cast<BodyMacroParameters>((*bodies)[id2]->physicalParameters);
+		shared_ptr<MacroMicroContactGeometry> currentContactGeometry = dynamic_pointer_cast<MacroMicroContactGeometry>(mixedInteraction->interactionGeometry);
+		shared_ptr<ElasticContactParameters> currentContactPhysics   = dynamic_pointer_cast<ElasticContactParameters> (mixedInteraction->interactionPhysics);
 		
 		if ( mixedInteraction->isNew)
 			currentContactPhysics->shearForce			= Vector3r(0,0,0);

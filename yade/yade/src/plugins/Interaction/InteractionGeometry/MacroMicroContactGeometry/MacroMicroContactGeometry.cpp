@@ -1,19 +1,19 @@
-#include "SDECContactGeometry.hpp"
+#include "MacroMicroContactGeometry.hpp"
 
-// SDECContactGeometry::SDECContactGeometry() : InteractionGeometry()
+// MacroMicroContactGeometry::MacroMicroContactGeometry() : InteractionGeometry()
 // {
 // }
 // 
 // 
-SDECContactGeometry::~SDECContactGeometry ()
+MacroMicroContactGeometry::~MacroMicroContactGeometry ()
 {
 }
 // 
-// void SDECContactGeometry::postProcessAttributes(bool)
+// void MacroMicroContactGeometry::postProcessAttributes(bool)
 // {
 // 
 // }
 // 
-// void SDECContactGeometry::registerAttributes()
+// void MacroMicroContactGeometry::registerAttributes()
 // {
 // }

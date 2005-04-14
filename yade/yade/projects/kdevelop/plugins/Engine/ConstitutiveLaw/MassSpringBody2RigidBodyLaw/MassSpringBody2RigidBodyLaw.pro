@@ -10,17 +10,17 @@ LIBS += -lDistances \
         -lMath \
         -lInteraction \
         -lMultiMethods \
-        -lSDECContactPhysics \
-        -lSDECContactGeometry \
         -lSDECLinkPhysics \
         -lSDECLinkGeometry \
         -lRigidBodyParameters \
-        -lSDECParameters \
         -lEngine \
         -lBody \
         -lActionParameterForce \
         -lActionParameterMomentum \
         -lSimpleSpringLaw \
+        -lMacroMicroContactGeometry \
+        -lBodyMacroParameters \
+        -lElasticContactParameters \
         -rdynamic 
 INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
@@ -33,13 +33,16 @@ QMAKE_LIBDIR = ../../../../toolboxes/ComputationalGeometry/Distances/$(YADEDYNLI
                ../../../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
                ../../../../yade/Interaction/Interaction/$(YADEDYNLIBPATH) \
                ../../../../toolboxes/Libraries/MultiMethods/$(YADEDYNLIBPATH) \
-               ../../../../plugins/Interaction/InteractionPhysics/SDECContactPhysics/$(YADEDYNLIBPATH) \
-               ../../../../plugins/Interaction/InteractionGeometry/SDECContactGeometry/$(YADEDYNLIBPATH) \
                ../../../../plugins/Interaction/InteractionPhysics/SDECLinkPhysics/$(YADEDYNLIBPATH) \
                ../../../../plugins/Interaction/InteractionGeometry/SDECLinkGeometry/$(YADEDYNLIBPATH) \
                ../../../../plugins/Body/BodyPhysicalParameters/RigidBodyParameters/$(YADEDYNLIBPATH) \
-               ../../../../plugins/Body/BodyPhysicalParameters/SDECParameters/$(YADEDYNLIBPATH) \
                ../../../../yade/Engine/$(YADEDYNLIBPATH) \
+               ../../../../yade/Body/Body/$(YADEDYNLIBPATH) \
+               ../../../../plugins/Engine/ActionParameter/ActionParameterForce/$(YADEDYNLIBPATH) \
+               ../../../../plugins/Engine/ActionParameter/ActionParameterMomentum/$(YADEDYNLIBPATH) \
+               ../../../../plugins/Engine/ConstitutiveLaw/SimpleSpringLaw/$(YADEDYNLIBPATH) \
+               ../../../../plugins/Interaction/InteractionGeometry/MacroMicroContactGeometry/$(YADEDYNLIBPATH) \
+               ../../../../plugins/Body/BodyPhysicalParameters/BodyMacroParameters/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

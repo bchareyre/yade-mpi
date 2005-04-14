@@ -32,7 +32,7 @@ void InteractionGeometryDispatcher::action(Body* body)
 		const shared_ptr<Interaction>& interaction = initialInteractions->getCurrent();
 		
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// FIXME : those lines are dirty !	They were in SDECLaw, but they belong to this place		///
+/// FIXME : those lines are dirty !	They were in ElasticContactLaw, but they belong to this place		///
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	// FIXME - this is much shorter but still dirty (but now in different aspect - the way we store runtimeInteractions)

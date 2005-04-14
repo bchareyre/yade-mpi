@@ -21,15 +21,15 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "Sphere2Sphere4SDECContactModel.hpp"
+#include "Sphere2Sphere4MacroMicroContactGeometry.hpp"
 #include "InteractionSphere.hpp"
-#include "SDECContactGeometry.hpp"
+#include "MacroMicroContactGeometry.hpp"
 #include "SDECLinkGeometry.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool Sphere2Sphere4SDECContactModel::go(	const shared_ptr<InteractionDescription>& cm1,
+bool Sphere2Sphere4MacroMicroContactGeometry::go(	const shared_ptr<InteractionDescription>& cm1,
 						const shared_ptr<InteractionDescription>& cm2,
 						const Se3r& se31,
 						const Se3r& se32,
@@ -41,12 +41,12 @@ bool Sphere2Sphere4SDECContactModel::go(	const shared_ptr<InteractionDescription
 	Vector3r normal = se32.position-se31.position;
 	Real penetrationDepth = s1->radius+s2->radius-normal.normalize();
 
-	shared_ptr<SDECContactGeometry> scm;
+	shared_ptr<MacroMicroContactGeometry> scm;
 	if (c->interactionGeometry)
 	{
-		scm = dynamic_pointer_cast<SDECContactGeometry>(c->interactionGeometry);
+		scm = dynamic_pointer_cast<MacroMicroContactGeometry>(c->interactionGeometry);
 		
-		if(! scm) // this is not SDECContactGeometry, so it is SDECLinkGeometry, dispatcher should do this job.
+		if(! scm) // this is not MacroMicroContactGeometry, so it is SDECLinkGeometry, dispatcher should do this job.
 		{
 			shared_ptr<SDECLinkGeometry> linkGeometry = dynamic_pointer_cast<SDECLinkGeometry>(c->interactionGeometry);
 //			cerr << "it is SpringGeometry ???: " << c->interactionGeometry->getClassName() << endl;
@@ -62,7 +62,7 @@ bool Sphere2Sphere4SDECContactModel::go(	const shared_ptr<InteractionDescription
 		}
 	}
 	else
-		scm = shared_ptr<SDECContactGeometry>(new SDECContactGeometry());
+		scm = shared_ptr<MacroMicroContactGeometry>(new MacroMicroContactGeometry());
 		
 	if (penetrationDepth>0)
 	{
@@ -84,7 +84,7 @@ bool Sphere2Sphere4SDECContactModel::go(	const shared_ptr<InteractionDescription
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool Sphere2Sphere4SDECContactModel::goReverse(	const shared_ptr<InteractionDescription>& cm1,
+bool Sphere2Sphere4MacroMicroContactGeometry::goReverse(	const shared_ptr<InteractionDescription>& cm1,
 						const shared_ptr<InteractionDescription>& cm2,
 						const Se3r& se31,
 						const Se3r& se32,

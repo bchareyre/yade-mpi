@@ -1,15 +1,15 @@
-#include "SDECParameters.hpp"
+#include "BodyMacroParameters.hpp"
 
-SDECParameters::SDECParameters () : RigidBodyParameters()
+BodyMacroParameters::BodyMacroParameters () : RigidBodyParameters()
 {
 	createIndex();
 }
 
-SDECParameters::~SDECParameters()
+BodyMacroParameters::~BodyMacroParameters()
 {
 }
 
-void SDECParameters::registerAttributes()
+void BodyMacroParameters::registerAttributes()
 {
 	RigidBodyParameters::registerAttributes();
 	REGISTER_ATTRIBUTE(young);

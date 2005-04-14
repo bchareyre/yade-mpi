@@ -21,11 +21,11 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "SDECLaw.hpp"
-#include "SDECParameters.hpp"
-#include "SDECContactGeometry.hpp"
+#include "ElasticContactLaw.hpp"
+#include "BodyMacroParameters.hpp"
+#include "MacroMicroContactGeometry.hpp"
 #include "SDECLinkGeometry.hpp"
-#include "SDECContactPhysics.hpp"
+#include "ElasticContactParameters.hpp"
 #include "SDECLinkPhysics.hpp"
 #include "Omega.hpp"
 #include "ComplexBody.hpp"
@@ -36,7 +36,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-SDECLaw::SDECLaw() : ConstitutiveLaw() , actionForce(new ActionParameterForce) , actionMomentum(new ActionParameterMomentum)
+ElasticContactLaw::ElasticContactLaw() : ConstitutiveLaw() , actionForce(new ActionParameterForce) , actionMomentum(new ActionParameterMomentum)
 {
 	sdecGroupMask=1;
 	first=true;
@@ -46,7 +46,7 @@ SDECLaw::SDECLaw() : ConstitutiveLaw() , actionForce(new ActionParameterForce) ,
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void SDECLaw::registerAttributes()
+void ElasticContactLaw::registerAttributes()
 {
 	ConstitutiveLaw::registerAttributes();
 	REGISTER_ATTRIBUTE(sdecGroupMask);
@@ -57,7 +57,7 @@ void SDECLaw::registerAttributes()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 //FIXME : remove bool first !!!!!
-void SDECLaw::calculateForces(Body* body)
+void ElasticContactLaw::calculateForces(Body* body)
 {
 	ComplexBody * ncb = dynamic_cast<ComplexBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
@@ -78,8 +78,8 @@ void SDECLaw::calculateForces(Body* body)
 		if( !( (*bodies)[id1]->getGroupMask() & (*bodies)[id2]->getGroupMask() & sdecGroupMask) )
 			continue; // skip other groups, BTW: this is example of a good usage of 'continue' keyword
 
-		SDECParameters* de1				= dynamic_cast<SDECParameters*>((*bodies)[id1]->physicalParameters.get());
-		SDECParameters* de2				= dynamic_cast<SDECParameters*>((*bodies)[id2]->physicalParameters.get());
+		BodyMacroParameters* de1				= dynamic_cast<BodyMacroParameters*>((*bodies)[id1]->physicalParameters.get());
+		BodyMacroParameters* de2				= dynamic_cast<BodyMacroParameters*>((*bodies)[id2]->physicalParameters.get());
 		SDECLinkPhysics* currentContactPhysics		= dynamic_cast<SDECLinkPhysics*>(contact2->interactionPhysics.get());
 		SDECLinkGeometry* currentContactGeometry	= dynamic_cast<SDECLinkGeometry*>(contact2->interactionGeometry.get());
 
@@ -330,10 +330,10 @@ void SDECLaw::calculateForces(Body* body)
 		if( !( (*bodies)[id1]->getGroupMask() & (*bodies)[id2]->getGroupMask() & sdecGroupMask)  )
 			continue; // skip other groups, BTW: this is example of a good usage of 'continue' keyword
 
-		SDECParameters* de1 				= dynamic_cast<SDECParameters*>((*bodies)[id1]->physicalParameters.get());
-		SDECParameters* de2 				= dynamic_cast<SDECParameters*>((*bodies)[id2]->physicalParameters.get());
-		SDECContactGeometry* currentContactGeometry 	= dynamic_cast<SDECContactGeometry*>(contact->interactionGeometry.get());
-		SDECContactPhysics* currentContactPhysics   	= dynamic_cast<SDECContactPhysics*> (contact->interactionPhysics.get());
+		BodyMacroParameters* de1 				= dynamic_cast<BodyMacroParameters*>((*bodies)[id1]->physicalParameters.get());
+		BodyMacroParameters* de2 				= dynamic_cast<BodyMacroParameters*>((*bodies)[id2]->physicalParameters.get());
+		MacroMicroContactGeometry* currentContactGeometry 	= dynamic_cast<MacroMicroContactGeometry*>(contact->interactionGeometry.get());
+		ElasticContactParameters* currentContactPhysics   	= dynamic_cast<ElasticContactParameters*> (contact->interactionPhysics.get());
 		
 		Vector3r& shearForce 			= currentContactPhysics->shearForce;
 

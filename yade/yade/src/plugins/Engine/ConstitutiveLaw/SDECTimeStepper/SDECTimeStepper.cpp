@@ -24,16 +24,16 @@
 #include "SDECTimeStepper.hpp"
 #include "Interaction.hpp"
 #include "ComplexBody.hpp"
-#include "SDECParameters.hpp"
-#include "SDECContactPhysics.hpp"
-#include "SDECContactGeometry.hpp"
+#include "BodyMacroParameters.hpp"
+#include "ElasticContactParameters.hpp"
+#include "MacroMicroContactGeometry.hpp"
 #include "Sphere.hpp"
-#include "SDECMacroMicroElasticRelationships.hpp"
+#include "MacroMicroElasticRelationships.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-SDECTimeStepper::SDECTimeStepper() : Actor() , sdecContactModel(new SDECMacroMicroElasticRelationships)
+SDECTimeStepper::SDECTimeStepper() : Actor() , sdecContactModel(new MacroMicroElasticRelationships)
 {
 	sdecGroupMask = 1;
 	interval = 10;
@@ -66,7 +66,7 @@ void SDECTimeStepper::registerAttributes()
 
 void SDECTimeStepper::findTimeStepFromBody(const Body* body)
 {
-	SDECParameters * sdec	= dynamic_cast<SDECParameters*>(body->physicalParameters.get());
+	BodyMacroParameters * sdec	= dynamic_cast<BodyMacroParameters*>(body->physicalParameters.get());
 	Sphere* sphere 		= dynamic_cast<Sphere*>(body->geometricalModel.get());
 
 	if(! (sphere && sdec) )
@@ -107,10 +107,10 @@ void SDECTimeStepper::findTimeStepFromInteraction(const shared_ptr<Interaction>&
 	if( !( (*bodies)[id1]->getGroupMask() & (*bodies)[id2]->getGroupMask() & sdecGroupMask) )
 		return; // skip other groups
 
-	SDECContactPhysics* sdecContact = dynamic_cast<SDECContactPhysics*>(interaction->interactionPhysics.get());
-	SDECContactGeometry* interactionGeometry = dynamic_cast<SDECContactGeometry*>(interaction->interactionGeometry.get());
-	SDECParameters * body1	= dynamic_cast<SDECParameters*>((*bodies)[id1]->physicalParameters.get());
-	SDECParameters * body2	= dynamic_cast<SDECParameters*>((*bodies)[id2]->physicalParameters.get());
+	ElasticContactParameters* sdecContact = dynamic_cast<ElasticContactParameters*>(interaction->interactionPhysics.get());
+	MacroMicroContactGeometry* interactionGeometry = dynamic_cast<MacroMicroContactGeometry*>(interaction->interactionGeometry.get());
+	BodyMacroParameters * body1	= dynamic_cast<BodyMacroParameters*>((*bodies)[id1]->physicalParameters.get());
+	BodyMacroParameters * body2	= dynamic_cast<BodyMacroParameters*>((*bodies)[id2]->physicalParameters.get());
 
 	if(! (sdecContact && interactionGeometry && body1 && body2))
 		return;

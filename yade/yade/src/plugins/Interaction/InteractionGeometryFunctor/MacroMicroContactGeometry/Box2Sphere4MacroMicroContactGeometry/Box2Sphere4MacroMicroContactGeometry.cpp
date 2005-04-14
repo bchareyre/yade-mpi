@@ -21,15 +21,15 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "Box2Sphere4SDECContactModel.hpp"
+#include "Box2Sphere4MacroMicroContactGeometry.hpp"
 #include "InteractionSphere.hpp"
 #include "InteractionBox.hpp"
-#include "SDECContactGeometry.hpp"
+#include "MacroMicroContactGeometry.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //FIXME return type should be shared_ptr<Interaction>
-bool Box2Sphere4SDECContactModel::go(		const shared_ptr<InteractionDescription>& cm1,
+bool Box2Sphere4MacroMicroContactGeometry::go(		const shared_ptr<InteractionDescription>& cm1,
 						const shared_ptr<InteractionDescription>& cm2,
 						const Se3r& se31,
 						const Se3r& se32,
@@ -98,11 +98,11 @@ bool Box2Sphere4SDECContactModel::go(		const shared_ptr<InteractionDescription>&
 		pt2 = se32.position - normal*s->radius;	
 
 		// FIXME : remove those uncommented lines
-		shared_ptr<SDECContactGeometry> scm;
+		shared_ptr<MacroMicroContactGeometry> scm;
 		if (c->isNew)
-			scm = shared_ptr<SDECContactGeometry>(new SDECContactGeometry());
+			scm = shared_ptr<MacroMicroContactGeometry>(new MacroMicroContactGeometry());
 		else
-			scm = dynamic_pointer_cast<SDECContactGeometry>(c->interactionGeometry);
+			scm = dynamic_pointer_cast<MacroMicroContactGeometry>(c->interactionGeometry);
 			
 		scm->contactPoint = 0.5*(pt1+pt2);
 		scm->normal = pt1-pt2;
@@ -113,7 +113,7 @@ bool Box2Sphere4SDECContactModel::go(		const shared_ptr<InteractionDescription>&
 		
 // FIXME : uncommente those lines	
 /////////////////////////////////////////////////
-// 		shared_ptr<SDECContactGeometry> scm = shared_ptr<SDECContactGeometry>(new SDECContactGeometry());
+// 		shared_ptr<MacroMicroContactGeometry> scm = shared_ptr<MacroMicroContactGeometry>(new MacroMicroContactGeometry());
 // 		scm->contactPoint = 0.5*(pt1+pt2);
 // 		scm->normal = pt1-pt2;
 // 		scm->penetrationDepth = scm->normal.normalize();
@@ -141,11 +141,11 @@ bool Box2Sphere4SDECContactModel::go(		const shared_ptr<InteractionDescription>&
 	pt2 = se32.position - normal * s->radius;
 	
 	// FIXME : remove those uncommented lines
-	shared_ptr<SDECContactGeometry> scm;
+	shared_ptr<MacroMicroContactGeometry> scm;
 	if (c->isNew)
-		scm = shared_ptr<SDECContactGeometry>(new SDECContactGeometry());
+		scm = shared_ptr<MacroMicroContactGeometry>(new MacroMicroContactGeometry());
 	else
-		scm = dynamic_pointer_cast<SDECContactGeometry>(c->interactionGeometry);	
+		scm = dynamic_pointer_cast<MacroMicroContactGeometry>(c->interactionGeometry);	
 	scm->contactPoint = 0.5*(pt1+pt2);
 	scm->normal = pt1-pt2;
 	scm->penetrationDepth = scm->normal.normalize();
@@ -154,7 +154,7 @@ bool Box2Sphere4SDECContactModel::go(		const shared_ptr<InteractionDescription>&
 	c->interactionGeometry = scm;
 // FIXME : uncommente those lines	
 /////////////////////////////////////////////////	
-// 	shared_ptr<SDECContactGeometry> scm = shared_ptr<SDECContactGeometry>(new SDECContactGeometry());
+// 	shared_ptr<MacroMicroContactGeometry> scm = shared_ptr<MacroMicroContactGeometry>(new MacroMicroContactGeometry());
 // 	scm->contactPoint = 0.5*(pt1+pt2);
 // 	scm->normal = pt1-pt2;
 // 	scm->penetrationDepth = scm->normal.normalize();
@@ -168,7 +168,7 @@ bool Box2Sphere4SDECContactModel::go(		const shared_ptr<InteractionDescription>&
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool Box2Sphere4SDECContactModel::goReverse(	const shared_ptr<InteractionDescription>& cm1,
+bool Box2Sphere4MacroMicroContactGeometry::goReverse(	const shared_ptr<InteractionDescription>& cm1,
 						const shared_ptr<InteractionDescription>& cm2,
 						const Se3r& se31,
 						const Se3r& se32,
@@ -177,7 +177,7 @@ bool Box2Sphere4SDECContactModel::goReverse(	const shared_ptr<InteractionDescrip
 	bool isInteracting = go(cm2,cm1,se32,se31,c);
 	if (isInteracting)
 	{
-		shared_ptr<SDECContactGeometry> scm = dynamic_pointer_cast<SDECContactGeometry>(c->interactionGeometry);
+		shared_ptr<MacroMicroContactGeometry> scm = dynamic_pointer_cast<MacroMicroContactGeometry>(c->interactionGeometry);
 		//Vector3r tmp = scm->closestsPoints[0].first;		
 		//scm->closestsPoints[0].first = scm->closestsPoints[0].second;
 		//scm->closestsPoints[0].second = tmp;

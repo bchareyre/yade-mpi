@@ -7,9 +7,9 @@
 #include "Vector3.hpp"
 
 
-class SDECContactGeometry : public InteractionGeometry
+class MacroMicroContactGeometry : public InteractionGeometry
 {
-	public : virtual ~SDECContactGeometry();
+	public : virtual ~MacroMicroContactGeometry();
 
 	public : Real radius1;
 	public : Real radius2;
@@ -17,9 +17,9 @@ class SDECContactGeometry : public InteractionGeometry
 	public : Real penetrationDepth;
 	public : Vector3r contactPoint;	
 	
-	REGISTER_CLASS_NAME(SDECContactGeometry);
+	REGISTER_CLASS_NAME(MacroMicroContactGeometry);
 };
 
-REGISTER_SERIALIZABLE(SDECContactGeometry,false);
+REGISTER_SERIALIZABLE(MacroMicroContactGeometry,false);
 
 #endif // __SDECCONTACTMODEL_H__

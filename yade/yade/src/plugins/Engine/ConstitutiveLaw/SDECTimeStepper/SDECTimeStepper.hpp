@@ -30,7 +30,7 @@
 #include "Actor.hpp"
 class Interaction;
 class BodyContainer;
-class SDECMacroMicroElasticRelationships;
+class MacroMicroElasticRelationships;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -40,7 +40,7 @@ class SDECTimeStepper : public Actor
 
 	public  : int sdecGroupMask;
 	public  : int interval;
-	private : shared_ptr<SDECMacroMicroElasticRelationships> sdecContactModel;
+	private : shared_ptr<MacroMicroElasticRelationships> sdecContactModel;
 
 	public : SDECTimeStepper();
 	public : virtual ~SDECTimeStepper();

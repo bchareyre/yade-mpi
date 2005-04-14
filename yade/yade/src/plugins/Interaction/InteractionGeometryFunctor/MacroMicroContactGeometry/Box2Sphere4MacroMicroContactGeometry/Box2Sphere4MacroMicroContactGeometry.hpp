@@ -33,7 +33,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /*! \brief Provide interaction handling between an oriented box and a sphere in terms of ClosestFeatures */
-class Box2Sphere4SDECContactModel : public InteractionGeometryFunctor
+class Box2Sphere4MacroMicroContactGeometry : public InteractionGeometryFunctor
 {
 	public : virtual bool go(		const shared_ptr<InteractionDescription>& cm1,
 						const shared_ptr<InteractionDescription>& cm2,
@@ -46,14 +46,14 @@ class Box2Sphere4SDECContactModel : public InteractionGeometryFunctor
 						const Se3r& se32,
 						const shared_ptr<Interaction>& c);
 
-	REGISTER_CLASS_NAME(Box2Sphere4SDECContactModel);
+	REGISTER_CLASS_NAME(Box2Sphere4MacroMicroContactGeometry);
 	DEFINE_FUNCTOR_ORDER_2D(InteractionBox,InteractionSphere);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-REGISTER_SERIALIZABLE(Box2Sphere4SDECContactModel,false);
+REGISTER_SERIALIZABLE(Box2Sphere4MacroMicroContactGeometry,false);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
