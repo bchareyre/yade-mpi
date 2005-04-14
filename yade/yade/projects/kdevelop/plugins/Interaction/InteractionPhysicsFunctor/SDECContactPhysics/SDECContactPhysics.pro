@@ -3,7 +3,7 @@
 # Subdir relative project main directory: ./plugins/InteractionPhysicsFunctor
 # Target is a subdirs project 
 
-SUBDIRS += SDECMacroMicroElasticRelationships
+SUBDIRS += MacroMicroElasticRelationships
 CONFIG += release \
           warn_on 
 TEMPLATE = subdirs 

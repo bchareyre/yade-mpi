@@ -7,7 +7,7 @@ SUBDIRS += SimpleSpringLaw \
            MassSpringBody2RigidBodyLaw \
            ErrorTolerantLaw \
            SDECTimeStepper \
-           SDECLaw \
+           ElasticContactLaw \
            MassSpringLaw 
 MOC_DIR = $(YADECOMPILATIONPATH)
 UI_DIR = $(YADECOMPILATIONPATH)
