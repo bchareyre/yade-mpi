@@ -5,7 +5,7 @@
 
 SUBDIRS += RotatingBox \
            HangingCloth \
-           FEMRock \
+           FEMBeam \
            BoxStack \
            SDECSpheresPlane \
            SDECLinkedSpheres \

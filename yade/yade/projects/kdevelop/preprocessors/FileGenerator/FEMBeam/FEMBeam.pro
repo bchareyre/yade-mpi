@@ -40,5 +40,5 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
-HEADERS += FEMRock.hpp 
-SOURCES += FEMRock.cpp 
+HEADERS += FEMBeam.hpp 
+SOURCES += FEMBeam.cpp 

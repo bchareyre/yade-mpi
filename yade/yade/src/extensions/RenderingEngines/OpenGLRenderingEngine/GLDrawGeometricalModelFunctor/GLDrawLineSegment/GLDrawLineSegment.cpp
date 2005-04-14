@@ -17,8 +17,11 @@ void GLDrawLineSegment::go(const shared_ptr<GeometricalModel>& gm, const shared_
 
 	if (gm->wire || wire)
 	{
+		glBegin(GL_LINES);
 		glDisable(GL_LIGHTING);
-		glutWireCube(1);
+		glVertex3(-0.5,0.0,0.0);
+		glVertex3( 0.5,0.0,0.0);
+		glEnd();
 	}
 	else
 	{

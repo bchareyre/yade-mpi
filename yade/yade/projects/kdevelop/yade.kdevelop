@@ -99,7 +99,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>preprocessors/FileGenerator/SDECTriaxialTest</activedir>
+      <activedir>plugins/Body/BodyPhysicalParameters/FEMSetParameters</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>
