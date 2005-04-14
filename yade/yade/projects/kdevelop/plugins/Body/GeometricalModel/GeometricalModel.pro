@@ -9,7 +9,8 @@ SUBDIRS += LatticeSetGeometry \
            Sphere \
            Box \
            Mesh2D \
-           Polyhedron 
+           Polyhedron \
+	   MarchingCubes
 MOC_DIR = $(YADECOMPILATIONPATH)
 UI_DIR = $(YADECOMPILATIONPATH)
 OBJECTS_DIR = $(YADECOMPILATIONPATH)

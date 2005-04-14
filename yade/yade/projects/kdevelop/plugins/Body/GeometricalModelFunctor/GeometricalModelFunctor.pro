@@ -11,5 +11,6 @@ CONFIG += debug \
 TEMPLATE = subdirs 
 SUBDIRS += LatticeSet2LatticeBeams \
            ParticleSet2Mesh2D \
-           VRML2TerrainFunctor
+           VRML2TerrainFunctor \
+	   LatticeSet2MarchingCubes
 
