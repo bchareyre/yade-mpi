@@ -18,5 +18,8 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
-HEADERS += BodyPhysicalParameters.hpp 
-SOURCES += BodyPhysicalParameters.cpp 
+HEADERS += BodyPhysicalParameters.hpp \
+	   BodyPhysicalParametersDispatcher.hpp \
+	   BodyPhysicalParametersFunctor.hpp
+SOURCES += BodyPhysicalParameters.cpp \
+	   BodyPhysicalParametersDispatcher.cpp

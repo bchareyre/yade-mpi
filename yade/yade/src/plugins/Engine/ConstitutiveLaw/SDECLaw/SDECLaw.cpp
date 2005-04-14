@@ -136,11 +136,11 @@ void SDECLaw::calculateForces(Body* body)
 
 		Vector3r f = currentContactPhysics->normalForce + currentContactPhysics->shearForce;
 
-		static_cast<ActionParameterForce*>   ( ncb->actions->find( id1 , actionForce   ->getClassIndex() ).get() )->force    -= f;
-		static_cast<ActionParameterForce*>   ( ncb->actions->find( id2 , actionForce   ->getClassIndex() ).get() )->force    += f;
+		static_cast<ActionParameterForce*>   ( ncb->actionParameters->find( id1 , actionForce   ->getClassIndex() ).get() )->force    -= f;
+		static_cast<ActionParameterForce*>   ( ncb->actionParameters->find( id2 , actionForce   ->getClassIndex() ).get() )->force    += f;
 		
-		static_cast<ActionParameterMomentum*>( ncb->actions->find( id1 , actionMomentum->getClassIndex() ).get() )->momentum -= c1x.cross(f);
-		static_cast<ActionParameterMomentum*>( ncb->actions->find( id2 , actionMomentum->getClassIndex() ).get() )->momentum += c2x.cross(f);
+		static_cast<ActionParameterMomentum*>( ncb->actionParameters->find( id1 , actionMomentum->getClassIndex() ).get() )->momentum -= c1x.cross(f);
+		static_cast<ActionParameterMomentum*>( ncb->actionParameters->find( id2 , actionMomentum->getClassIndex() ).get() )->momentum += c2x.cross(f);
 
 
 
@@ -286,8 +286,8 @@ void SDECLaw::calculateForces(Body* body)
 
 		//if (normElastic<=normMPlastic)
 		//{
-		static_cast<ActionParameterMomentum*>( ncb->actions->find( id1 , actionMomentum->getClassIndex() ).get() )->momentum -= q_n_i*mElastic;
-		static_cast<ActionParameterMomentum*>( ncb->actions->find( id2 , actionMomentum->getClassIndex() ).get() )->momentum += q_n_i*mElastic;
+		static_cast<ActionParameterMomentum*>( ncb->actionParameters->find( id1 , actionMomentum->getClassIndex() ).get() )->momentum -= q_n_i*mElastic;
+		static_cast<ActionParameterMomentum*>( ncb->actionParameters->find( id2 , actionMomentum->getClassIndex() ).get() )->momentum += q_n_i*mElastic;
 
 		//}
 		//else
@@ -396,12 +396,12 @@ void SDECLaw::calculateForces(Body* body)
 
 		Vector3r f				= currentContactPhysics->normalForce + shearForce;
 		
-// it will be some macro(	body->actions,	ActionType , bodyId )
-		static_cast<ActionParameterForce*>   ( ncb->actions->find( id1 , actionForce   ->getClassIndex() ).get() )->force    -= f;
-		static_cast<ActionParameterForce*>   ( ncb->actions->find( id2 , actionForce   ->getClassIndex() ).get() )->force    += f;
+// it will be some macro(	body->actionParameters,	ActionType , bodyId )
+		static_cast<ActionParameterForce*>   ( ncb->actionParameters->find( id1 , actionForce   ->getClassIndex() ).get() )->force    -= f;
+		static_cast<ActionParameterForce*>   ( ncb->actionParameters->find( id2 , actionForce   ->getClassIndex() ).get() )->force    += f;
 		
-		static_cast<ActionParameterMomentum*>( ncb->actions->find( id1 , actionMomentum->getClassIndex() ).get() )->momentum -= c1x.cross(f);
-		static_cast<ActionParameterMomentum*>( ncb->actions->find( id2 , actionMomentum->getClassIndex() ).get() )->momentum += c2x.cross(f);
+		static_cast<ActionParameterMomentum*>( ncb->actionParameters->find( id1 , actionMomentum->getClassIndex() ).get() )->momentum -= c1x.cross(f);
+		static_cast<ActionParameterMomentum*>( ncb->actionParameters->find( id2 , actionMomentum->getClassIndex() ).get() )->momentum += c2x.cross(f);
 		
 		currentContactPhysics->prevNormal = currentContactGeometry->normal;
 	}

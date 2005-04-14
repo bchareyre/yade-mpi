@@ -16,17 +16,17 @@
 #include "InteractionSphere.hpp"
 #include "InteractionGeometryDispatcher.hpp"
 #include "ActionParameterDispatcher.hpp"
-#include "ActionReset.hpp"
 #include "CundallNonViscousForceDampingFunctor.hpp"
 #include "CundallNonViscousMomentumDampingFunctor.hpp"
 #include "ActionParameterDispatcher.hpp"
+#include "ActionParameterReset.hpp"
+#include "ActionParameterInitializer.hpp"
 
 #include "BoundingVolumeDispatcher.hpp"
 #include "InteractionDescriptionSet2AABBFunctor.hpp"
 #include "InteractionDescriptionSet.hpp"
 #include "GravityForceFunctor.hpp"
 
-#include "ActionParameterDispatcher.hpp"
 
 RotatingBox::RotatingBox () : FileGenerator()
 {
@@ -252,6 +252,10 @@ void RotatingBox::createKinematicBox(shared_ptr<Body>& body, Vector3r position, 
 
 void RotatingBox::createActors(shared_ptr<ComplexBody>& rootBody)
 {
+	shared_ptr<ActionParameterInitializer> actionParameterInitializer(new ActionParameterInitializer);
+	actionParameterInitializer->actionParameterNames.push_back("ActionParameterForce");
+	actionParameterInitializer->actionParameterNames.push_back("ActionParameterMomentum");
+	
 	shared_ptr<InteractionGeometryDispatcher> interactionGeometryDispatcher(new InteractionGeometryDispatcher);
 	interactionGeometryDispatcher->add("InteractionSphere","InteractionSphere","Sphere2Sphere4ClosestFeatures");
 	interactionGeometryDispatcher->add("InteractionSphere","InteractionBox","Box2Sphere4ClosestFeatures");
@@ -293,7 +297,8 @@ void RotatingBox::createActors(shared_ptr<ComplexBody>& rootBody)
  		kinematic->subscribedBodies.push_back(i);
 	
 	rootBody->actors.clear();
-	rootBody->actors.push_back(shared_ptr<Actor>(new ActionReset));
+	rootBody->actors.push_back(actionParameterInitializer);
+	rootBody->actors.push_back(shared_ptr<Actor>(new ActionParameterReset));
 	rootBody->actors.push_back(boundingVolumeDispatcher);
 	rootBody->actors.push_back(shared_ptr<Actor>(new SAPCollider));
 	rootBody->actors.push_back(interactionGeometryDispatcher);

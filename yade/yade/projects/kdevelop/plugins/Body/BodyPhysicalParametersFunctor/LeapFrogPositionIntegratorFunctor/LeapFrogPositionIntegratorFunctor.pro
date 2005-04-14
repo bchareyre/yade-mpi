@@ -22,5 +22,5 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
-HEADERS += LeapFrogMomentumIntegratorFunctor.hpp 
-SOURCES += LeapFrogMomentumIntegratorFunctor.cpp 
+HEADERS += LeapFrogPositionIntegratorFunctor.hpp 
+SOURCES += LeapFrogPositionIntegratorFunctor.cpp 

@@ -50,9 +50,9 @@ void ActionParameterDispatcher::action(Body* body)
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 
 	int id;
-	for( ncb->actions->gotoFirst() ; ncb->actions->notAtEnd() ; ncb->actions->gotoNext())
+	for( ncb->actionParameters->gotoFirst() ; ncb->actionParameters->notAtEnd() ; ncb->actionParameters->gotoNext())
 	{
-		shared_ptr<ActionParameter>& action = ncb->actions->getCurrent(id);
+		shared_ptr<ActionParameter>& action = ncb->actionParameters->getCurrent(id);
 		// FIXME - solve the problem of Body's id
 		operator()( action , (*bodies)[id]->physicalParameters , (*bodies)[id].get() );
 	}

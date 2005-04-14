@@ -31,7 +31,7 @@ void MassSpringBody2RigidBodyLaw::calculateForces(Body * body)
 	ComplexBody * mixedBody = dynamic_cast<ComplexBody*>(body);
 	shared_ptr<BodyContainer>& bodies = mixedBody->bodies;
 	shared_ptr<InteractionContainer>& runtimeInteractions = mixedBody->runtimeInteractions;
-//	shared_ptr<ActionParameterContainer>& actions = mixedBody->actions;
+//	shared_ptr<ActionParameterContainer>& actionParameters = mixedBody->actionParameters;
 	Real dt = Omega::instance().getTimeStep();
 
 	for( runtimeInteractions->gotoFirst() ; runtimeInteractions->notAtEnd() ; runtimeInteractions->gotoNext() )
@@ -94,11 +94,11 @@ void MassSpringBody2RigidBodyLaw::calculateForces(Body * body)
 
 		Vector3r f				= currentContactPhysics->normalForce + currentContactPhysics->shearForce;
 
-		static_cast<ActionParameterForce*>   ( mixedBody->actions->find( id1 , actionForce   ->getClassIndex() ).get() )->force    -= f;
-		static_cast<ActionParameterForce*>   ( mixedBody->actions->find( id2 , actionForce   ->getClassIndex() ).get() )->force    += f;
+		static_cast<ActionParameterForce*>   ( mixedBody->actionParameters->find( id1 , actionForce   ->getClassIndex() ).get() )->force    -= f;
+		static_cast<ActionParameterForce*>   ( mixedBody->actionParameters->find( id2 , actionForce   ->getClassIndex() ).get() )->force    += f;
 		
-		static_cast<ActionParameterMomentum*>( mixedBody->actions->find( id1 , actionMomentum->getClassIndex() ).get() )->momentum -= c1x.cross(f);
-		static_cast<ActionParameterMomentum*>( mixedBody->actions->find( id2 , actionMomentum->getClassIndex() ).get() )->momentum += c2x.cross(f);
+		static_cast<ActionParameterMomentum*>( mixedBody->actionParameters->find( id1 , actionMomentum->getClassIndex() ).get() )->momentum -= c1x.cross(f);
+		static_cast<ActionParameterMomentum*>( mixedBody->actionParameters->find( id2 , actionMomentum->getClassIndex() ).get() )->momentum += c2x.cross(f);
 		
 		currentContactPhysics->prevNormal = currentContactGeometry->normal;
 // END										

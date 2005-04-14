@@ -24,11 +24,12 @@ LIBS += -lBox \
         -lEngine \
         -lBody \
         -lForceRecorder \
-        -lActionReset \
         -lCundallNonViscousMomentumDampingFunctor \
         -lCundallNonViscousForceDampingFunctor \
         -lSDECLaw \
         -lGravityForceFunctor \
+        -lActionParameterReset \
+        -lActionParameterInitializer \
         -lForceRecorder \
         -rdynamic 
 INCLUDEPATH += $(YADEINCLUDEPATH) 
@@ -56,10 +57,11 @@ QMAKE_LIBDIR = ../../../plugins/Body/GeometricalModel/Box/$(YADEDYNLIBPATH) \
                ../../../yade/Engine/$(YADEDYNLIBPATH) \
                ../../../yade/Body/Body/$(YADEDYNLIBPATH) \
                ../../../plugins/DataRecorder/ForceRecorder/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/ActionParameter/ActionReset/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/ActionParameterFunctor/CundallNonViscousMomentumDampingFunctor/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/ActionParameterFunctor/CundallNonViscousForceDampingFunctor/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/ConstitutiveLaw/SDECLaw/$(YADEDYNLIBPATH) \
+               ../../../plugins/Engine/ActionParameterFunctor/GravityForceFunctor/$(YADEDYNLIBPATH) \
+               ../../../plugins/Engine/ActionParameterReset/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

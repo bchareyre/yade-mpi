@@ -99,7 +99,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>plugins/Engine/ActionParameterFunctor/GravityForceFunctor</activedir>
+      <activedir>yade/Body/BodyPhysicalParameters</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>

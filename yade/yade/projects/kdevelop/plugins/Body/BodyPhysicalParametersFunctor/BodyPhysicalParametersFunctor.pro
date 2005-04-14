@@ -9,3 +9,5 @@ OBJECTS_DIR = $(YADECOMPILATIONPATH)
 CONFIG += debug \
           warn_on 
 TEMPLATE = subdirs 
+SUBDIRS += LeapFrogOrientationIntegratorFunctor \
+	   LeapFrogPositionIntegratorFunctor

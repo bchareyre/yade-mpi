@@ -28,7 +28,7 @@ class ActionParameterVectorVector : public ActionParameterContainer
 	// in this two-dimensional table:
 	// 	- first  dimension is Body->getId() number
 	//	- second dimension is ActionParameter->getClassIndex() number
-	private	  : vector< vector< shared_ptr<ActionParameter> > > actions;
+	private	  : vector< vector< shared_ptr<ActionParameter> > > actionParameters;
 	private	  :         vector< shared_ptr<ActionParameter> >   actionTypesResetted;
 	private	  : vector< bool > usedIds;
 	
@@ -95,7 +95,7 @@ REGISTER_SERIALIZABLE(ActionParameterVectorVector,false);
 // 	// in this two-dimensional table:
 // 	// 	- first  dimension is Body->getId() number
 // 	//	- second dimension is ActionParameter->getClassIndex() number
-// 	private	  : vector< vector< shared_ptr<ActionParameter> > > actions;
+// 	private	  : vector< vector< shared_ptr<ActionParameter> > > actionParameters;
 // 	private	  : vector< vector< shared_ptr<ActionParameter> > >::iterator vvi;
 // 	private	  : vector< vector< shared_ptr<ActionParameter> > >::iterator temporaryVvi;
 // 	private	  : vector< vector< shared_ptr<ActionParameter> > >::iterator vviEnd;

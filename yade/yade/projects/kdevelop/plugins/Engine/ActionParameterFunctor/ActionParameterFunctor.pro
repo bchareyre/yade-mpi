@@ -7,9 +7,7 @@ SUBDIRS += GravityForceFunctor \
            NewtonsForceLawFunctor \
 	   NewtonsMomentumLawFunctor \
 	   CundallNonViscousForceDampingFunctor \
-	   CundallNonViscousMomentumDampingFunctor \
-	   LeapFrogForceIntegratorFunctor \
-	   LeapFrogMomentumIntegratorFunctor
+	   CundallNonViscousMomentumDampingFunctor
 CONFIG += release \
           warn_on 
 TEMPLATE = subdirs 

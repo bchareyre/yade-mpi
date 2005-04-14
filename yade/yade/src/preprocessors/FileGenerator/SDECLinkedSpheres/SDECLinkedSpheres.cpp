@@ -33,7 +33,8 @@
 #include "InteractionSphere.hpp"
 #include "ActionParameterDispatcher.hpp"
 
-#include "ActionReset.hpp"
+#include "ActionParameterReset.hpp"
+#include "ActionParameterInitializer.hpp"
 
 SDECLinkedSpheres::SDECLinkedSpheres () : FileGenerator()
 {
@@ -284,6 +285,10 @@ void SDECLinkedSpheres::createBox(shared_ptr<Body>& body, Vector3r position, Vec
 
 void SDECLinkedSpheres::createActors(shared_ptr<ComplexBody>& rootBody)
 {
+	shared_ptr<ActionParameterInitializer> actionParameterInitializer(new ActionParameterInitializer);
+	actionParameterInitializer->actionParameterNames.push_back("ActionParameterForce");
+	actionParameterInitializer->actionParameterNames.push_back("ActionParameterMomentum");
+	
 	shared_ptr<InteractionGeometryDispatcher> interactionGeometryDispatcher(new InteractionGeometryDispatcher);
 	interactionGeometryDispatcher->add("InteractionSphere","InteractionSphere","Sphere2Sphere4SDECContactModel");
 	interactionGeometryDispatcher->add("InteractionSphere","InteractionBox","Box2Sphere4SDECContactModel");
@@ -328,8 +333,9 @@ void SDECLinkedSpheres::createActors(shared_ptr<ComplexBody>& rootBody)
 	constitutiveLaw->momentRotationLaw = momentRotationLaw;
 	
 	rootBody->actors.clear();
+	rootBody->actors.push_back(actionParameterInitializer);
 	rootBody->actors.push_back(sdecTimeStepper);
-	rootBody->actors.push_back(shared_ptr<Actor>(new ActionReset));
+	rootBody->actors.push_back(shared_ptr<Actor>(new ActionParameterReset));
 	rootBody->actors.push_back(boundingVolumeDispatcher);
 	rootBody->actors.push_back(shared_ptr<Actor>(new PersistentSAPCollider));
 	rootBody->actors.push_back(interactionGeometryDispatcher);

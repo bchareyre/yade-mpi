@@ -19,7 +19,6 @@
 #include "InteractionPhysicsDispatcher.hpp"
 
 #include "ActionParameterDispatcher.hpp"
-#include "ActionParameterDispatcher.hpp"
 #include "CundallNonViscousForceDampingFunctor.hpp"
 #include "CundallNonViscousMomentumDampingFunctor.hpp"
 
@@ -42,7 +41,8 @@
 #include "SDECLinkPhysics.hpp"
 #include "MassSpringBody2RigidBodyLaw.hpp"
 
-#include "ActionReset.hpp"
+#include "ActionParameterReset.hpp"
+#include "ActionParameterInitializer.hpp"
 #include "GravityForceFunctor.hpp"
 
 HangingCloth::HangingCloth () : FileGenerator()
@@ -123,6 +123,10 @@ string HangingCloth::generate()
 {
 	rootBody = shared_ptr<ComplexBody>(new ComplexBody);
 
+	shared_ptr<ActionParameterInitializer> actionParameterInitializer(new ActionParameterInitializer);
+	actionParameterInitializer->actionParameterNames.push_back("ActionParameterForce");
+	actionParameterInitializer->actionParameterNames.push_back("ActionParameterMomentum");
+	
 	shared_ptr<InteractionGeometryDispatcher> interactionGeometryDispatcher(new InteractionGeometryDispatcher);
 	interactionGeometryDispatcher->add("InteractionSphere","InteractionSphere","Sphere2Sphere4SDECContactModel");
 	interactionGeometryDispatcher->add("InteractionSphere","InteractionBox","Box2Sphere4SDECContactModel");
@@ -170,7 +174,8 @@ string HangingCloth::generate()
 	massSpringBody2RigidBodyConstitutiveLaw->springGroupMask = 1;
 
 	rootBody->actors.clear();
-	rootBody->actors.push_back(shared_ptr<Actor>(new ActionReset));
+	rootBody->actors.push_back(actionParameterInitializer);
+	rootBody->actors.push_back(shared_ptr<Actor>(new ActionParameterReset));
 	rootBody->actors.push_back(boundingVolumeDispatcher);
 	rootBody->actors.push_back(geometricalModelDispatcher);
 	rootBody->actors.push_back(shared_ptr<Actor>(new PersistentSAPCollider));

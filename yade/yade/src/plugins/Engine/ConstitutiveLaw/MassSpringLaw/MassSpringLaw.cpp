@@ -23,7 +23,7 @@ void MassSpringLaw::calculateForces(Body * body)
 	ComplexBody * massSpring = dynamic_cast<ComplexBody*>(body);
 	shared_ptr<BodyContainer>& bodies = massSpring->bodies;
 	shared_ptr<InteractionContainer>& initialInteractions = massSpring->initialInteractions;
-	shared_ptr<ActionParameterContainer>& actions = massSpring->actions;
+	shared_ptr<ActionParameterContainer>& actionParameters = massSpring->actionParameters;
 	
 	for(initialInteractions->gotoFirst() ; initialInteractions->notAtEnd(); initialInteractions->gotoNext())
 	{
@@ -54,8 +54,8 @@ void MassSpringLaw::calculateForces(Body * body)
 		Real relativeVelocity = dir.dot((p1->velocity-p2->velocity));
 		Vector3r f3 = (e*physics->stiffness + relativeVelocity* ( 1.0 - physics->damping )  )*dir;
 		
-		static_cast<ActionParameterForce*>   ( actions->find( id1 , actionForce->getClassIndex() ).get() )->force    -= f3;
-		static_cast<ActionParameterForce*>   ( actions->find( id2 , actionForce->getClassIndex() ).get() )->force    += f3;
+		static_cast<ActionParameterForce*>   ( actionParameters->find( id1 , actionForce->getClassIndex() ).get() )->force    -= f3;
+		static_cast<ActionParameterForce*>   ( actionParameters->find( id2 , actionForce->getClassIndex() ).get() )->force    += f3;
 	}
 	
 }

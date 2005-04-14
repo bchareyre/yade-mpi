@@ -14,15 +14,15 @@ ActionParameterVectorVector::~ActionParameterVectorVector()
 
 void ActionParameterVectorVector::clear()
 {
-	actions.clear();
+	actionParameters.clear();
 	usedIds.clear();
 }
 
 // doesn't not delete all, just resets data
 void ActionParameterVectorVector::reset()
 {
-	vvi    = actions.begin();
-	vviEnd = actions.end();
+	vvi    = actionParameters.begin();
+	vviEnd = actionParameters.end();
 	for( ; vvi != vviEnd ; ++vvi )
 	{
 		vi    = (*vvi).begin();
@@ -35,7 +35,7 @@ void ActionParameterVectorVector::reset()
 
 unsigned int ActionParameterVectorVector::size()
 {
-	return actions.size();
+	return actionParameters.size();
 }
 
 // fills container with resetted fields. argument here, should be all ActionParameter types that are planned to use
@@ -58,31 +58,31 @@ void ActionParameterVectorVector::prepare(std::vector<shared_ptr<ActionParameter
 // should be always succesfull. if it is not - you forgot to call prepare()
 shared_ptr<ActionParameter>& ActionParameterVectorVector::find(unsigned int id , int actionIndex )
 {
-	if( actions.size() <= id ) // this is very rarely executed, only at beginning.
+	if( actionParameters.size() <= id ) // this is very rarely executed, only at beginning.
 	// somebody is accesing out of bounds, make sure he will find, what he needs - a resetted ActionParameter of his type
 	{
-		unsigned int oldSize = actions.size();
+		unsigned int oldSize = actionParameters.size();
 		unsigned int newSize = id+1;
 		usedIds.resize(newSize,false);
-		actions.resize(newSize);
+		actionParameters.resize(newSize);
 		for(unsigned int i = oldSize ; i < newSize ; ++i )
 		{
 			unsigned int actionTypesSize = actionTypesResetted.size();
-			actions[i].resize(actionTypesSize);
+			actionParameters[i].resize(actionTypesSize);
 			for( unsigned int j = 0 ; j < actionTypesSize ; ++j )
-				actions[i][j] = actionTypesResetted[j]->clone();
+				actionParameters[i][j] = actionTypesResetted[j]->clone();
 		}
 	}
 	usedIds[id] = true;
-	return actions[id][actionIndex];
+	return actionParameters[id][actionIndex];
 }
 
 // looping over Bodies, and their Actions
 void ActionParameterVectorVector::gotoFirst()
 {
 	currentIndex = 0;
-	vvi    = actions.begin();
-	vviEnd = actions.end();
+	vvi    = actionParameters.begin();
+	vviEnd = actionParameters.end();
 	
 	while( (! usedIds[currentIndex]) && (vvi != vviEnd) )
 	{
@@ -160,13 +160,13 @@ shared_ptr<ActionParameter>& ActionParameterVectorVector::getCurrent(int& id)
 // 
 // void ActionParameterVectorVector::clear()
 // {
-// 	actions.clear();
+// 	actionParameters.clear();
 // }
 // 
 // void ActionParameterVectorVector::reset()
 // {
-// 	vvi    = actions.begin();
-// 	vviEnd = actions.end();
+// 	vvi    = actionParameters.begin();
+// 	vviEnd = actionParameters.end();
 // 	for( ; vvi < vviEnd ; ++vvi )
 // 	{
 // 		vi    = (*vvi).begin();
@@ -179,7 +179,7 @@ shared_ptr<ActionParameter>& ActionParameterVectorVector::getCurrent(int& id)
 // 
 // unsigned int ActionParameterVectorVector::size()
 // {
-// 	return actions.size();
+// 	return actionParameters.size();
 // }
 // 	
 // adds ActionParameter acting on one body,
@@ -191,16 +191,16 @@ shared_ptr<ActionParameter>& ActionParameterVectorVector::getCurrent(int& id)
 // 	
 // 	assert(idx >= 0);
 // 
-// 	if( actions.size() <= id )
-// 		actions.resize(id+1);
+// 	if( actionParameters.size() <= id )
+// 		actionParameters.resize(id+1);
 // 		
-// 	if( actions[id].size() <= (unsigned int)idx )
-// 		actions[id].resize(idx+1);
+// 	if( actionParameters[id].size() <= (unsigned int)idx )
+// 		actionParameters[id].resize(idx+1);
 // 	
-// 	if( actions[id][idx] )
-// 		actions[id][idx]->add(newAction);
+// 	if( actionParameters[id][idx] )
+// 		actionParameters[id][idx]->add(newAction);
 // 	else
-// 		actions[id][idx]=newAction->clone();
+// 		actionParameters[id][idx]=newAction->clone();
 // }
 // 
 // adds ActionParameter that acts on two bodies.
@@ -221,9 +221,9 @@ shared_ptr<ActionParameter>& ActionParameterVectorVector::getCurrent(int& id)
 // deletes ActionParameter of given polymorphic type from body that has given Id
 // bool ActionParameterVectorVector::eraseAction(unsigned int id, int idx)
 // {
-// 	if( idx >= 0 && (unsigned int)idx < actions[id].size() && actions[id][idx] )
+// 	if( idx >= 0 && (unsigned int)idx < actionParameters[id].size() && actionParameters[id][idx] )
 // 	{
-// 		actions[id][idx] = shared_ptr<ActionParameter>();
+// 		actionParameters[id][idx] = shared_ptr<ActionParameter>();
 // 		return true;
 // 	}
 // 	else
@@ -236,10 +236,10 @@ shared_ptr<ActionParameter>& ActionParameterVectorVector::getCurrent(int& id)
 // bool ActionParameterVectorVector::eraseAction(unsigned int id)
 // {
 // 	if(	   currentActionType >= 0 
-// 		&& (unsigned int)currentActionType < actions[id].size()
-// 		&& actions[id][currentActionType] )
+// 		&& (unsigned int)currentActionType < actionParameters[id].size()
+// 		&& actionParameters[id][currentActionType] )
 // 	{
-// 		actions[id][currentActionType] = shared_ptr<ActionParameter>();
+// 		actionParameters[id][currentActionType] = shared_ptr<ActionParameter>();
 // 		return true;
 // 	}
 // 	else
@@ -249,7 +249,7 @@ shared_ptr<ActionParameter>& ActionParameterVectorVector::getCurrent(int& id)
 // deletes all Actions in a body of given Id
 // void ActionParameterVectorVector::erase(unsigned int id)
 // {
-// 	actions[id].clear();
+// 	actionParameters[id].clear();
 // }
 // 	
 // finds and returns action of given polymorphic type, for body of given Id,
@@ -257,8 +257,8 @@ shared_ptr<ActionParameter>& ActionParameterVectorVector::getCurrent(int& id)
 // shared_ptr<ActionParameter> ActionParameterVectorVector::find(unsigned int id, int idx) const
 // {
 // 	if( 	   idx >= 0
-// 		&& (unsigned int)idx < actions[id].size() )
-// 		return actions[id][idx];
+// 		&& (unsigned int)idx < actionParameters[id].size() )
+// 		return actionParameters[id][idx];
 // 	else
 // 		return shared_ptr<ActionParameter>();
 // }
@@ -267,8 +267,8 @@ shared_ptr<ActionParameter>& ActionParameterVectorVector::getCurrent(int& id)
 // shared_ptr<ActionParameter>& ActionParameterVectorVector::operator[](unsigned int id)
 // {
 // 	if(	   currentActionType >=0
-// 		&& (unsigned int)currentActionType < actions[id].size() )
-// 		return actions[id][currentActionType];
+// 		&& (unsigned int)currentActionType < actionParameters[id].size() )
+// 		return actionParameters[id][currentActionType];
 // 	else
 // 	{
 // 		empty = shared_ptr<ActionParameter>();
@@ -279,8 +279,8 @@ shared_ptr<ActionParameter>& ActionParameterVectorVector::getCurrent(int& id)
 // const shared_ptr<ActionParameter>& ActionParameterVectorVector::operator[](unsigned int id) const
 // {
 // 	if(	   currentActionType >=0
-// 		&& (unsigned int)currentActionType < actions[id].size() )
-// 		return actions[id][currentActionType];
+// 		&& (unsigned int)currentActionType < actionParameters[id].size() )
+// 		return actionParameters[id][currentActionType];
 // 	else
 // 	{
 // 		empty = shared_ptr<ActionParameter>();
@@ -290,8 +290,8 @@ shared_ptr<ActionParameter>& ActionParameterVectorVector::getCurrent(int& id)
 // 
 // void ActionParameterVectorVector::gotoFirst()
 // {
-// 	vvi    = actions.begin();
-// 	vviEnd = actions.end();
+// 	vvi    = actionParameters.begin();
+// 	vviEnd = actionParameters.end();
 // 	currentIndex=0;
 // 
 // 	if (vvi!=vviEnd)

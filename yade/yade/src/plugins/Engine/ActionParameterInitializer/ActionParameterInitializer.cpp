@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2004 by Janek Kozicki                                   *
+ *   Copyright (C) 2005 by Janek Kozicki                                   *
  *   cosurgi@berlios.de                                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -21,34 +21,43 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "ActionReset.hpp"
+#include "ActionParameterInitializer.hpp"
 #include "ComplexBody.hpp"
-#include "ActionParameterForce.hpp"
-#include "ActionParameterMomentum.hpp"
+#include "ClassFactory.hpp"
+#include "ActionParameter.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-ActionReset::ActionReset() : actionForce(new ActionParameterForce) , actionMomentum(new ActionParameterMomentum)
+ActionParameterInitializer::ActionParameterInitializer() 
 {
-	first = true;
+	actionParameterNames.clear();
 }
 
-void ActionReset::action(Body* body)
+ActionParameterInitializer::~ActionParameterInitializer() 
+{
+}
+
+void ActionParameterInitializer::registerAttributes()
+{
+	REGISTER_ATTRIBUTE(actionParameterNames);
+}
+
+void ActionParameterInitializer::action(Body* body)
 {
 	ComplexBody * ncb = dynamic_cast<ComplexBody*>(body);
 	
-	if(first) // FIXME - this should be done somewhere else, or this is the right place ?
-	{
-		vector<shared_ptr<ActionParameter> > vvv; 
-		vvv.clear();
-		vvv.push_back(actionForce); // FIXME - should ask what Actions should be prepared !
-		vvv.push_back(actionMomentum);
-		ncb->actions->prepare(vvv);
-		first = false;
-	}
+	vector<shared_ptr<ActionParameter> > actionParameters;
+	actionParameters.clear();
 	
-	ncb->actions->reset();
+	for(unsigned int i = 0 ; i < actionParameterNames.size() ; ++i )
+		actionParameters.push_back(
+			dynamic_pointer_cast<ActionParameter>
+				(ClassFactory::instance().createShared(actionParameterNames[i]))
+		);
+	
+	ncb->actionParameters->prepare(actionParameters);
+	
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

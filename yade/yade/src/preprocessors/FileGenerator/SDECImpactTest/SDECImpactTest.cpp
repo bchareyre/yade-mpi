@@ -33,7 +33,8 @@
 #include "InteractionSphere.hpp"
 #include "ActionParameterDispatcher.hpp"
 
-#include "ActionReset.hpp"
+#include "ActionParameterReset.hpp"
+#include "ActionParameterInitializer.hpp"
 
 #include "AveragePositionRecorder.hpp"
 #include "ForceRecorder.hpp"
@@ -445,6 +446,10 @@ void SDECImpactTest::createActors(shared_ptr<ComplexBody>& rootBody)
 	velocityRecorder-> outputFile 	= velocityRecordFile;
 	velocityRecorder-> interval 	= recordIntervalIter;
 
+	shared_ptr<ActionParameterInitializer> actionParameterInitializer(new ActionParameterInitializer);
+	actionParameterInitializer->actionParameterNames.push_back("ActionParameterForce");
+	actionParameterInitializer->actionParameterNames.push_back("ActionParameterMomentum");
+	
 	shared_ptr<InteractionGeometryDispatcher> interactionGeometryDispatcher(new InteractionGeometryDispatcher);
 	interactionGeometryDispatcher->add("InteractionSphere","InteractionSphere","Sphere2Sphere4SDECContactModel");
 	interactionGeometryDispatcher->add("InteractionSphere","InteractionBox","Box2Sphere4SDECContactModel");
@@ -491,7 +496,8 @@ void SDECImpactTest::createActors(shared_ptr<ComplexBody>& rootBody)
 	elasticContactLaw->sdecGroupMask = 2;
 	
 	rootBody->actors.clear();
-	rootBody->actors.push_back(shared_ptr<Actor>(new ActionReset));
+	rootBody->actors.push_back(actionParameterInitializer);
+	rootBody->actors.push_back(shared_ptr<Actor>(new ActionParameterReset));
 	rootBody->actors.push_back(sdecTimeStepper);
 	rootBody->actors.push_back(boundingVolumeDispatcher);
 	rootBody->actors.push_back(shared_ptr<Actor>(new PersistentSAPCollider));

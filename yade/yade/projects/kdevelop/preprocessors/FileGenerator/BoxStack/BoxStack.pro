@@ -18,11 +18,12 @@ LIBS += -lSerialization \
         -lEngine \
         -lTranslator \
         -lBody \
-        -lActionReset \
         -lCundallNonViscousMomentumDampingFunctor \
         -lCundallNonViscousForceDampingFunctor \
         -lSimpleSpringLaw \
         -lGravityForceFunctor \
+        -lActionParameterReset \
+        -lActionParameterInitializer \
         -rdynamic 
 INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
@@ -43,10 +44,11 @@ QMAKE_LIBDIR = ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../../yade/Engine/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/KinematicMotion/Translator/$(YADEDYNLIBPATH) \
                ../../../yade/Body/Body/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/ActionParameter/ActionReset/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/ActionParameterFunctor/CundallNonViscousMomentumDampingFunctor/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/ActionParameterFunctor/CundallNonViscousForceDampingFunctor/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/ConstitutiveLaw/SimpleSpringLaw/$(YADEDYNLIBPATH) \
+               ../../../plugins/Engine/ActionParameterFunctor/GravityForceFunctor/$(YADEDYNLIBPATH) \
+               ../../../plugins/Engine/ActionParameterReset/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

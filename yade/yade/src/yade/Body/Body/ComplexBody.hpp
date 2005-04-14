@@ -41,7 +41,7 @@ class ComplexBody : public Body
 	
 	public	: shared_ptr<InteractionContainer> initialInteractions;
 	public	: shared_ptr<InteractionContainer> runtimeInteractions;	
-	public	: shared_ptr<ActionParameterContainer> actions;
+	public	: shared_ptr<ActionParameterContainer> actionParameters;
 	
 	// construction
 	public	: ComplexBody ();

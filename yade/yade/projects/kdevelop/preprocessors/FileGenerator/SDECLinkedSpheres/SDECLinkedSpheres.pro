@@ -22,11 +22,12 @@ LIBS += -lBox \
         -lSDECTimeStepper \
         -lEngine \
         -lBody \
-        -lActionReset \
         -lCundallNonViscousMomentumDampingFunctor \
         -lCundallNonViscousForceDampingFunctor \
         -lSDECLaw \
         -lGravityForceFunctor \
+        -lActionParameterReset \
+        -lActionParameterInitializer \
         -rdynamic 
 INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
@@ -51,10 +52,11 @@ QMAKE_LIBDIR = ../../../plugins/Body/GeometricalModel/Box/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/ConstitutiveLaw/SDECTimeStepper/$(YADEDYNLIBPATH) \
                ../../../yade/Engine/$(YADEDYNLIBPATH) \
                ../../../yade/Body/Body/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/ActionParameter/ActionReset/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/ActionParameterFunctor/CundallNonViscousMomentumDampingFunctor/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/ActionParameterFunctor/CundallNonViscousForceDampingFunctor/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/ConstitutiveLaw/SDECLaw/$(YADEDYNLIBPATH) \
+               ../../../plugins/Engine/ActionParameterFunctor/GravityForceFunctor/$(YADEDYNLIBPATH) \
+               ../../../plugins/Engine/ActionParameterReset/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

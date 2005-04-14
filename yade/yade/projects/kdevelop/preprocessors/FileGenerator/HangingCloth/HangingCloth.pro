@@ -27,7 +27,6 @@ LIBS += -lMesh2D \
         -lSDECParameters \
         -lEngine \
         -lBody \
-        -lActionReset \
         -lCundallNonViscousMomentumDampingFunctor \
         -lCundallNonViscousForceDampingFunctor \
         -lSimpleSpringLaw \
@@ -35,6 +34,8 @@ LIBS += -lMesh2D \
         -lSDECLaw \
         -lMassSpringLaw \
         -lGravityForceFunctor \
+        -lActionParameterReset \
+        -lActionParameterInitializer \
         -rdynamic 
 INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
@@ -64,13 +65,14 @@ QMAKE_LIBDIR = ../../../plugins/Body/GeometricalModel/Mesh2D/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/BodyPhysicalParameters/SDECParameters/$(YADEDYNLIBPATH) \
                ../../../yade/Engine/$(YADEDYNLIBPATH) \
                ../../../yade/Body/Body/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/ActionParameter/ActionReset/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/ActionParameterFunctor/CundallNonViscousMomentumDampingFunctor/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/ActionParameterFunctor/CundallNonViscousForceDampingFunctor/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/ConstitutiveLaw/SimpleSpringLaw/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/ConstitutiveLaw/MassSpringBody2RigidBodyLaw/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/ConstitutiveLaw/SDECLaw/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/ConstitutiveLaw/MassSpringLaw/$(YADEDYNLIBPATH) \
+               ../../../plugins/Engine/ActionParameterFunctor/GravityForceFunctor/$(YADEDYNLIBPATH) \
+               ../../../plugins/Engine/ActionParameterReset/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

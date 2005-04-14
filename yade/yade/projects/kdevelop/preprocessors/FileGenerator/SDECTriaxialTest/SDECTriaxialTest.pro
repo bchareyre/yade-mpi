@@ -15,8 +15,8 @@ LIBS += -lPersistentSAPCollider \
         -lSDECTimeStepper \
         -lCundallNonViscousMomentumDampingFunctor \
         -lCundallNonViscousForceDampingFunctor \
-        -lActionReset \
         -lSDECLaw \
+        -lActionParameterReset \
         -rdynamic 
 INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
@@ -32,6 +32,9 @@ QMAKE_LIBDIR = ../../../plugins/Interaction/BroadInteractor/PersistentSAPCollide
                ../../../plugins/Body/BodyPhysicalParameters/SDECParameters/$(YADEDYNLIBPATH) \
                ../../../plugins/Interaction/InteractionPhysicsFunctor/SDECContactPhysics/SDECMacroMicroElasticRelationships/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/ConstitutiveLaw/SDECTimeStepper/$(YADEDYNLIBPATH) \
+               ../../../plugins/Engine/ActionParameterFunctor/CundallNonViscousMomentumDampingFunctor/$(YADEDYNLIBPATH) \
+               ../../../plugins/Engine/ActionParameterFunctor/CundallNonViscousForceDampingFunctor/$(YADEDYNLIBPATH) \
+               ../../../plugins/Engine/ConstitutiveLaw/SDECLaw/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 
