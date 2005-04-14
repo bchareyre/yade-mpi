@@ -3,8 +3,8 @@
 # Subdir relative project main directory: ./plugins/KinematicEngine
 # Target is a subdirs project 
 
-SUBDIRS += Rotor \
-           Translator 
+SUBDIRS += RotationCondition \
+           TranslationCondition 
 MOC_DIR = $(YADECOMPILATIONPATH)
 UI_DIR = $(YADECOMPILATIONPATH)
 OBJECTS_DIR = $(YADECOMPILATIONPATH)
