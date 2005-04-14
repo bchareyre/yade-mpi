@@ -36,5 +36,5 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
-HEADERS += Box2Sphere4SDECContactModel.hpp 
-SOURCES += Box2Sphere4SDECContactModel.cpp 
+HEADERS += Box2Sphere4SDECContactGeometry.hpp 
+SOURCES += Box2Sphere4SDECContactGeometry.cpp 
