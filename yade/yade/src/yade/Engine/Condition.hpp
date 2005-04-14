@@ -46,7 +46,7 @@ class Body;
 
 	All kinematic engines must derived from this class. A kinematic engine is used to modify the state of an object (position,veloity ...) according to a predefined law (mathematical function, stored data ...) and not according to a dynamic law as dynamic engines do. A kinematic engine contains a list of bodies to act on, and a bodie can subscribe to several kinematic engines.
 */
-class KinematicMotion : public Actor
+class Condition : public Actor
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -65,7 +65,7 @@ class KinematicMotion : public Actor
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/*! Constructor */
-	public : KinematicMotion ();
+	public : Condition ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Methods											///
@@ -74,21 +74,21 @@ class KinematicMotion : public Actor
 	/*! Common interface for all kinematic engines. This method move all registered bodies from time t to time t+dt according to its internal law
 		\param const std::vector<shared_ptr<Body> > vector of body that contains the registered one
 	*/
-	public : virtual void moveToNextTimeStep(Body* ) { throw; };
+	public : virtual void applyCondition(Body* ) { throw; };
 
 	public : void registerAttributes();
 	
 	//public : virtual bool isActivated();
 	public : virtual void action(Body* b);
 
-	REGISTER_CLASS_NAME(KinematicMotion);
+	REGISTER_CLASS_NAME(Condition);
 
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-REGISTER_SERIALIZABLE(KinematicMotion,false);
+REGISTER_SERIALIZABLE(Condition,false);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////

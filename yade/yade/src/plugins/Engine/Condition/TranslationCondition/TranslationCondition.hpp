@@ -1,7 +1,7 @@
 #ifndef __TRANSLATOR_H__
 #define __TRANSLATOR_H__
 
-#include "KinematicMotion.hpp"
+#include "Condition.hpp"
 
 #ifdef WIN32
 #include <windows.h>
@@ -9,19 +9,19 @@
 
 #include "Vector3.hpp"
 
-class Translator : public KinematicMotion
+class TranslationCondition : public Condition
 {
 
 	public : Real velocity;
 	public : Vector3r translationAxis;
 	
-	public : void moveToNextTimeStep(Body * body);
+	public : void applyCondition(Body * body);
 
 	protected : virtual void postProcessAttributes(bool deserializing);
 	public : void registerAttributes();
-	REGISTER_CLASS_NAME(Translator);
+	REGISTER_CLASS_NAME(TranslationCondition);
 };
 
-REGISTER_SERIALIZABLE(Translator,false);
+REGISTER_SERIALIZABLE(TranslationCondition,false);
 
 #endif // __TRANSLATOR_H__

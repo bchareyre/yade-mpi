@@ -1,25 +1,25 @@
-#include "Translator.hpp"
+#include "TranslationCondition.hpp"
 #include "RigidBodyParameters.hpp"
 #include "ComplexBody.hpp"
 
-void Translator::postProcessAttributes(bool deserializing)
+void TranslationCondition::postProcessAttributes(bool deserializing)
 {
 	if(deserializing)
 		translationAxis.normalize();
 }
 
-void Translator::registerAttributes()
+void TranslationCondition::registerAttributes()
 {
-	KinematicMotion::registerAttributes();
+	Condition::registerAttributes();
 	REGISTER_ATTRIBUTE(velocity);
 	REGISTER_ATTRIBUTE(translationAxis);
 }
 
-void Translator::moveToNextTimeStep(Body * body)
+void TranslationCondition::applyCondition(Body * body)
 {
 
 	ComplexBody * ncb = dynamic_cast<ComplexBody*>(body);
-	shared_ptr<BodyContainer> bodies = ncb->bodies;
+	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 
 	std::vector<int>::const_iterator ii = subscribedBodies.begin();
 	std::vector<int>::const_iterator iiEnd = subscribedBodies.end();

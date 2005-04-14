@@ -41,7 +41,7 @@ string FEMRock::generate()
 // 	q.fromAxisAngle(Vector3r(0,0,1),0);
 // 
 // 	//rootBody->dynamic	   = shared_ptr<ConstitutiveLaw>(new SimpleSpringLaw);
-// 	//rootBody->kinematic	   = shared_ptr<KinematicMotion>(new Rotor);
+// 	//rootBody->kinematic	   = shared_ptr<Condition>(new RotationCondition);
 // 	//rootBody->broadCollider  = shared_ptr<BroadInteractor>(new SAPCollider);
 // 	//rootBody->narrowCollider  = shared_ptr<InteractionGeometryDispatcher>(new SimpleNarrowCollider);
 // 	rootBody->isDynamic      = false;

@@ -1,7 +1,7 @@
-#include "KinematicMotion.hpp"
+#include "Condition.hpp"
 
 
-KinematicMotion::KinematicMotion() : Actor()
+Condition::Condition() : Actor()
 {
 	//startTime = -1;
 	//stopTime = -1;
@@ -9,13 +9,13 @@ KinematicMotion::KinematicMotion() : Actor()
 	subscribedBodies.resize(0);
 }
 
-void KinematicMotion::registerAttributes()
+void Condition::registerAttributes()
 {
 	REGISTER_ATTRIBUTE(subscribedBodies);
 }
 
 
-void KinematicMotion::action(Body* b)
+void Condition::action(Body* b)
 {
-	this->moveToNextTimeStep(b);
+	this->applyCondition(b);
 }

@@ -8,7 +8,7 @@
 
 #include "FileGenerator.hpp"
 #include "ConstitutiveLaw.hpp"
-#include "KinematicMotion.hpp"
+#include "Condition.hpp"
 #include "Body.hpp"
 #include "InteractionGeometryFunctor.hpp"
 #include "IOManager.hpp"
@@ -180,8 +180,8 @@ void Omega::registerDynlibType(const string& name)
 		dynlibsType[name]="FileGenerator";
 	else if (dynamic_pointer_cast<ConstitutiveLaw>(f))
 		dynlibsType[name]="ConstitutiveLaw";
-	else if (dynamic_pointer_cast<KinematicMotion>(f))
-		dynlibsType[name]="KinematicMotion";
+	else if (dynamic_pointer_cast<Condition>(f))
+		dynlibsType[name]="Condition";
 	else if (dynamic_pointer_cast<Body>(f))
 		dynlibsType[name]="Body";
 	else if (dynamic_pointer_cast<InteractionGeometryFunctor>(f))

@@ -9,7 +9,7 @@
 #include "SimpleSpringLaw.hpp"
 #include "SAPCollider.hpp"
 #include "RigidBodyParameters.hpp"
-#include "Translator.hpp"
+#include "TranslationCondition.hpp"
 #include <fstream>
 #include "IOManager.hpp"
 #include "InteractionBox.hpp"
@@ -27,7 +27,7 @@
 
 #include "ActionParameterDispatcher.hpp"
 #include "ActionParameterInitializer.hpp"
-#include "GravityForceFunctor.hpp"
+#include "GravityCondition.hpp"
 #include "BodyPhysicalParametersDispatcher.hpp"
 
 BoxStack::BoxStack () : FileGenerator()
@@ -245,10 +245,8 @@ void BoxStack::createActors(shared_ptr<ComplexBody>& rootBody)
 	boundingVolumeDispatcher->add("InteractionBox","AABB","Box2AABBFunctor");
 	boundingVolumeDispatcher->add("InteractionDescriptionSet","AABB","InteractionDescriptionSet2AABBFunctor");
 		
-	shared_ptr<GravityForceFunctor> gravityForceFunctor(new GravityForceFunctor);
-	gravityForceFunctor->gravity = gravity;
-	shared_ptr<ActionParameterDispatcher> gravityForceDispatcher(new ActionParameterDispatcher);
-	gravityForceDispatcher->add("ActionParameterForce","ParticleParameters","GravityForceFunctor",gravityForceFunctor);
+	shared_ptr<GravityCondition> gravityCondition(new GravityCondition);
+	gravityCondition->gravity = gravity;
 	
 	shared_ptr<CundallNonViscousForceDampingFunctor> actionForceDamping(new CundallNonViscousForceDampingFunctor);
 	actionForceDamping->damping = dampingForce;
@@ -267,7 +265,7 @@ void BoxStack::createActors(shared_ptr<ComplexBody>& rootBody)
 	shared_ptr<BodyPhysicalParametersDispatcher> orientationIntegrator(new BodyPhysicalParametersDispatcher);
 	orientationIntegrator->add("RigidBodyParameters","LeapFrogOrientationIntegratorFunctor");
  	
-// 	shared_ptr<Rotor> kinematic = shared_ptr<Rotor>(new Rotor);
+// 	shared_ptr<RotationCondition> kinematic = shared_ptr<RotationCondition>(new RotationCondition);
 // 	kinematic->angularVelocity  = rotationSpeed;
 // 	rotationAxis.normalize();
 // 	kinematic->rotationAxis  = rotationAxis;
@@ -282,7 +280,7 @@ void BoxStack::createActors(shared_ptr<ComplexBody>& rootBody)
 	rootBody->actors.push_back(shared_ptr<Actor>(new SAPCollider));
 	rootBody->actors.push_back(interactionGeometryDispatcher);
 	rootBody->actors.push_back(shared_ptr<Actor>(new SimpleSpringLaw));
-	rootBody->actors.push_back(gravityForceDispatcher);
+	rootBody->actors.push_back(gravityCondition);
 	rootBody->actors.push_back(actionDampingDispatcher);
 	rootBody->actors.push_back(applyActionDispatcher);
 	rootBody->actors.push_back(positionIntegrator);

@@ -20,7 +20,7 @@
 #include "SDECLinkPhysics.hpp"
 #include "SDECTimeStepper.hpp"
 
-#include "GravityForceFunctor.hpp"
+#include "GravityCondition.hpp"
 #include "ActionParameterDispatcher.hpp"
 #include "ActionParameterDispatcher.hpp"
 #include "CundallNonViscousForceDampingFunctor.hpp"
@@ -466,10 +466,8 @@ void SDECImpactTest::createActors(shared_ptr<ComplexBody>& rootBody)
 	
 
 		
-	shared_ptr<GravityForceFunctor> gravityForceFunctor(new GravityForceFunctor);
-	gravityForceFunctor->gravity = gravity;
-	shared_ptr<ActionParameterDispatcher> gravityForceDispatcher(new ActionParameterDispatcher);
-	gravityForceDispatcher->add("ActionParameterForce","ParticleParameters","GravityForceFunctor",gravityForceFunctor);
+	shared_ptr<GravityCondition> gravityCondition(new GravityCondition);
+	gravityCondition->gravity = gravity;
 	
 	shared_ptr<CundallNonViscousForceDampingFunctor> actionForceDamping(new CundallNonViscousForceDampingFunctor);
 	actionForceDamping->damping = dampingForce;
@@ -505,7 +503,7 @@ void SDECImpactTest::createActors(shared_ptr<ComplexBody>& rootBody)
 	rootBody->actors.push_back(interactionGeometryDispatcher);
 	rootBody->actors.push_back(interactionPhysicsDispatcher);
 	rootBody->actors.push_back(elasticContactLaw);
-	rootBody->actors.push_back(gravityForceDispatcher);
+	rootBody->actors.push_back(gravityCondition);
 	rootBody->actors.push_back(actionDampingDispatcher);
 	rootBody->actors.push_back(applyActionDispatcher);
 	rootBody->actors.push_back(positionIntegrator);

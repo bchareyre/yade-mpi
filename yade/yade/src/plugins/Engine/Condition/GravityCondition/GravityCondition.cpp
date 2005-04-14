@@ -21,21 +21,26 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "GravityForceFunctor.hpp"
+#include "GravityCondition.hpp"
 #include "ParticleParameters.hpp"
 #include "ActionParameterForce.hpp"
+#include "ComplexBody.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-GravityForceFunctor::GravityForceFunctor() : gravity(Vector3r::ZERO)
+GravityCondition::GravityCondition() : gravity(Vector3r::ZERO) , actionParameterForce(new ActionParameterForce)
+{
+}
+
+GravityCondition::~GravityCondition()
 {
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void GravityForceFunctor::registerAttributes()
+void GravityCondition::registerAttributes()
 {
 	REGISTER_ATTRIBUTE(gravity);
 }
@@ -43,14 +48,18 @@ void GravityForceFunctor::registerAttributes()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void GravityForceFunctor::go( 		  const shared_ptr<ActionParameter>& a
-					, const shared_ptr<BodyPhysicalParameters>& b
-					, const Body*)
+void GravityCondition::applyCondition(Body* body)
 {
-	ActionParameterForce * af = static_cast<ActionParameterForce*>(a.get());
-	ParticleParameters * p = static_cast<ParticleParameters*>(b.get());
+	ComplexBody * ncb = dynamic_cast<ComplexBody*>(body);
+	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	
-	af->force += gravity * p->mass;
+	for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext() )
+	{
+		shared_ptr<Body>& b = bodies->getCurrent();
+		ParticleParameters* p = dynamic_cast<ParticleParameters*>(b->physicalParameters.get());
+		if(p)
+			static_cast<ActionParameterForce*>( ncb->actionParameters->find( b->getId() , actionParameterForce->getClassIndex() ).get() )->force += gravity * p->mass;
+        }
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -43,7 +43,7 @@
 
 #include "ActionParameterReset.hpp"
 #include "ActionParameterInitializer.hpp"
-#include "GravityForceFunctor.hpp"
+#include "GravityCondition.hpp"
 
 #include "BodyPhysicalParametersDispatcher.hpp"
 
@@ -137,10 +137,8 @@ string HangingCloth::generate()
 	shared_ptr<InteractionPhysicsDispatcher> interactionPhysicsDispatcher(new InteractionPhysicsDispatcher);
 	interactionPhysicsDispatcher->add("SDECParameters","SDECParameters","SDECMacroMicroElasticRelationships");
 
-	shared_ptr<GravityForceFunctor> gravityForceFunctor(new GravityForceFunctor);
-	gravityForceFunctor->gravity = gravity;
-	shared_ptr<ActionParameterDispatcher> gravityForceDispatcher(new ActionParameterDispatcher);
-	gravityForceDispatcher->add("ActionParameterForce","ParticleParameters","GravityForceFunctor",gravityForceFunctor);
+	shared_ptr<GravityCondition> gravityCondition(new GravityCondition);
+	gravityCondition->gravity = gravity;
 	
 	shared_ptr<BoundingVolumeDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeDispatcher>(new BoundingVolumeDispatcher);
 	boundingVolumeDispatcher->add("InteractionSphere","AABB","Sphere2AABBFunctor");
@@ -188,7 +186,7 @@ string HangingCloth::generate()
 	rootBody->actors.push_back(explicitMassSpringConstitutiveLaw);
 	rootBody->actors.push_back(elasticContactLaw);
 //	rootBody->actors.push_back(massSpringBody2RigidBodyConstitutiveLaw); // FIXME - is not working...
-	rootBody->actors.push_back(gravityForceDispatcher);
+	rootBody->actors.push_back(gravityCondition);
 	rootBody->actors.push_back(actionDampingDispatcher);
 	rootBody->actors.push_back(applyActionDispatcher);
 	rootBody->actors.push_back(positionIntegrator);

@@ -26,7 +26,7 @@
 #include "ActionParameterDispatcher.hpp"
 #include "CundallNonViscousForceDampingFunctor.hpp"
 #include "CundallNonViscousMomentumDampingFunctor.hpp"
-#include "GravityForceFunctor.hpp"
+#include "GravityCondition.hpp"
 
 #include "InteractionGeometryDispatcher.hpp"
 #include "InteractionPhysicsDispatcher.hpp"
@@ -228,10 +228,8 @@ void SDECSpheresPlane::createActors(shared_ptr<ComplexBody>& rootBody)
 	boundingVolumeDispatcher->add("InteractionBox","AABB","Box2AABBFunctor");
 	boundingVolumeDispatcher->add("InteractionDescriptionSet","AABB","InteractionDescriptionSet2AABBFunctor");
 	
-	shared_ptr<GravityForceFunctor> gravityForceFunctor(new GravityForceFunctor);
-	gravityForceFunctor->gravity = gravity;
-	shared_ptr<ActionParameterDispatcher> gravityForceDispatcher(new ActionParameterDispatcher);
-	gravityForceDispatcher->add("ActionParameterForce","ParticleParameters","GravityForceFunctor",gravityForceFunctor);
+	shared_ptr<GravityCondition> gravityCondition(new GravityCondition);
+	gravityCondition->gravity = gravity;
 	
 	shared_ptr<CundallNonViscousForceDampingFunctor> actionForceDamping(new CundallNonViscousForceDampingFunctor);
 	actionForceDamping->damping = dampingForce;
@@ -264,7 +262,7 @@ void SDECSpheresPlane::createActors(shared_ptr<ComplexBody>& rootBody)
 	rootBody->actors.push_back(interactionGeometryDispatcher);
 	rootBody->actors.push_back(interactionPhysicsDispatcher);
 	rootBody->actors.push_back(shared_ptr<Actor>(new SDECLaw));
-	rootBody->actors.push_back(gravityForceDispatcher);
+	rootBody->actors.push_back(gravityCondition);
 	rootBody->actors.push_back(actionDampingDispatcher);
 	rootBody->actors.push_back(applyActionDispatcher);
 	rootBody->actors.push_back(positionIntegrator);

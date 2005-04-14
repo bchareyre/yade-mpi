@@ -3,8 +3,7 @@
 # Subdir relative project main directory: ./plugins/ActionFunctor
 # Target is a subdirs project 
 
-SUBDIRS += GravityForceFunctor \
-           NewtonsForceLawFunctor \
+SUBDIRS += NewtonsForceLawFunctor \
 	   NewtonsMomentumLawFunctor \
 	   CundallNonViscousForceDampingFunctor \
 	   CundallNonViscousMomentumDampingFunctor

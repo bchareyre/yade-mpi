@@ -1,7 +1,7 @@
 #ifndef __OSCILLATOR_H__
 #define __OSCILLATOR_H__
 
-#include "KinematicMotion.hpp"
+#include "Condition.hpp"
 
 #ifdef WIN32
 #include <windows.h>
@@ -9,20 +9,20 @@
 
 #include "Vector3.hpp"
 
-class Rotor : public KinematicMotion
+class RotationCondition : public Condition
 {
-	public : Rotor();
+	public : RotationCondition();
 
 	public : Real angularVelocity;
 	public : Vector3r rotationAxis;
 	public : bool rotateAroundZero;
 
-	public : void moveToNextTimeStep(Body * body);
+	public : void applyCondition(Body * body);
 
 	public : void registerAttributes();
-	REGISTER_CLASS_NAME(Rotor);
+	REGISTER_CLASS_NAME(RotationCondition);
 };
 
-REGISTER_SERIALIZABLE(Rotor,false);
+REGISTER_SERIALIZABLE(RotationCondition,false);
 
 #endif // __OSCILLATOR_H__

@@ -1,21 +1,21 @@
-#include "Rotor.hpp"
+#include "RotationCondition.hpp"
 #include "RigidBodyParameters.hpp"
 #include "ComplexBody.hpp"
 
-Rotor::Rotor()
+RotationCondition::RotationCondition()
 {
 	rotateAroundZero = false;
 }
 
-void Rotor::registerAttributes()
+void RotationCondition::registerAttributes()
 {
-	KinematicMotion::registerAttributes();
+	Condition::registerAttributes();
 	REGISTER_ATTRIBUTE(angularVelocity);
 	REGISTER_ATTRIBUTE(rotationAxis);
 	REGISTER_ATTRIBUTE(rotateAroundZero);
 }
 
-void Rotor::moveToNextTimeStep(Body * body)
+void RotationCondition::applyCondition(Body * body)
 {
 
 	ComplexBody * ncb = dynamic_cast<ComplexBody*>(body);
