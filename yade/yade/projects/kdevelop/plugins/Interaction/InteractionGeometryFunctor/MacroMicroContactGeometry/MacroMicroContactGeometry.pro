@@ -3,8 +3,8 @@
 # Subdir relative project main directory: ./plugins/CollisionFunctor/CollisionFunctor4SDECContactModel
 # Target is a subdirs project 
 
-SUBDIRS += Sphere2Sphere4SDECContactGeometry \
-           Box2Sphere4SDECContactGeometry 
+SUBDIRS += Sphere2Sphere4MacroMicroContactGeometry \
+           Box2Sphere4MacroMicroContactGeometry 
 CONFIG += debug \
 warn_on
 TEMPLATE = subdirs
