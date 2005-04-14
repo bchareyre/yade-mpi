@@ -13,4 +13,4 @@ SUBDIRS += LatticeSetParameters \
 	   LatticeBeamParameters \
            LatticeNodeParameters \
            FEMNodeParameters \
-	   SDECParameters
+	   BodyMacroParameters

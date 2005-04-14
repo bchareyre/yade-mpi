@@ -24,5 +24,5 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
-HEADERS += SDECContactGeometry.hpp 
-SOURCES += SDECContactGeometry.cpp 
+HEADERS += MacroMicroContactGeometry.hpp 
+SOURCES += MacroMicroContactGeometry.cpp 

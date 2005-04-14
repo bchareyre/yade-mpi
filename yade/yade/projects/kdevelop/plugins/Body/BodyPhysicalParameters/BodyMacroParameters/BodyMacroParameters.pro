@@ -42,5 +42,5 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
-HEADERS += SDECParameters.hpp 
-SOURCES += SDECParameters.cpp 
+HEADERS += BodyMacroParameters.hpp 
+SOURCES += BodyMacroParameters.cpp 
