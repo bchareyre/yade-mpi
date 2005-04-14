@@ -33,6 +33,7 @@
 #include "SimpleBody.hpp"
 #include "InteractionBox.hpp"
 #include "InteractionSphere.hpp"
+#include "BodyPhysicalParametersDispatcher.hpp"
 
 
 
@@ -244,11 +245,12 @@ void SDECSpheresPlane::createActors(shared_ptr<ComplexBody>& rootBody)
 	applyActionDispatcher->add("ActionParameterForce","RigidBodyParameters","NewtonsForceLawFunctor");
 	applyActionDispatcher->add("ActionParameterMomentum","RigidBodyParameters","NewtonsMomentumLawFunctor");
 	
-	shared_ptr<ActionParameterDispatcher> timeIntegratorDispatcher(new ActionParameterDispatcher);
-	timeIntegratorDispatcher->add("ActionParameterForce","ParticleParameters","LeapFrogForceIntegratorFunctor");
-	if(!rotationBlocked)
-		timeIntegratorDispatcher->add("ActionParameterMomentum","RigidBodyParameters","LeapFrogMomentumIntegratorFunctor");
-	
+	shared_ptr<BodyPhysicalParametersDispatcher> positionIntegrator(new BodyPhysicalParametersDispatcher);
+	positionIntegrator->add("ParticleParameters","LeapFrogPositionIntegratorFunctor");
+	shared_ptr<BodyPhysicalParametersDispatcher> orientationIntegrator(new BodyPhysicalParametersDispatcher);
+	orientationIntegrator->add("RigidBodyParameters","LeapFrogOrientationIntegratorFunctor");
+ 	
+
 	shared_ptr<SDECTimeStepper> sdecTimeStepper(new SDECTimeStepper);
 	sdecTimeStepper->sdecGroupMask = 1;
 	sdecTimeStepper->interval = timeStepUpdateInterval;
@@ -265,7 +267,9 @@ void SDECSpheresPlane::createActors(shared_ptr<ComplexBody>& rootBody)
 	rootBody->actors.push_back(gravityForceDispatcher);
 	rootBody->actors.push_back(actionDampingDispatcher);
 	rootBody->actors.push_back(applyActionDispatcher);
-	rootBody->actors.push_back(timeIntegratorDispatcher);
+	rootBody->actors.push_back(positionIntegrator);
+	if(!rotationBlocked)
+		rootBody->actors.push_back(orientationIntegrator);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

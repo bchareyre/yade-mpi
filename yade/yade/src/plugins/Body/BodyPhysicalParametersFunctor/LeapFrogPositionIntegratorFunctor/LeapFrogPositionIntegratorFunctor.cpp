@@ -21,8 +21,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "LeapFrogForceIntegratorFunctor.hpp"
-#include "RigidBodyParameters.hpp"
+#include "LeapFrogPositionIntegratorFunctor.hpp" 
 #include "ParticleParameters.hpp"
 #include "Omega.hpp"
 
@@ -32,13 +31,12 @@
 
 // FIXME : should we pass timestep as parameter of functor
 // FIXME : what's with timestepper
-void LeapFrogForceIntegratorFunctor::go( 	  const shared_ptr<ActionParameter>&
-					, const shared_ptr<BodyPhysicalParameters>& b
+void LeapFrogPositionIntegratorFunctor::go(  const shared_ptr<BodyPhysicalParameters>& b
 					, const Body* body)
 {
 	if(! body->isDynamic)
 		return;
-		
+
 	unsigned int id = body->getId();
 	
 	if (prevVelocities.size()<=id)

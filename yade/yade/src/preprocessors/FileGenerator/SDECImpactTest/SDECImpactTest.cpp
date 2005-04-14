@@ -39,6 +39,7 @@
 #include "AveragePositionRecorder.hpp"
 #include "ForceRecorder.hpp"
 #include "VelocityRecorder.hpp"
+#include "BodyPhysicalParametersDispatcher.hpp"
 
 #include <boost/filesystem/convenience.hpp>
 #include <boost/lexical_cast.hpp>
@@ -482,11 +483,11 @@ void SDECImpactTest::createActors(shared_ptr<ComplexBody>& rootBody)
 	applyActionDispatcher->add("ActionParameterForce","ParticleParameters","NewtonsForceLawFunctor");
 	applyActionDispatcher->add("ActionParameterMomentum","RigidBodyParameters","NewtonsMomentumLawFunctor");
 	
-	shared_ptr<ActionParameterDispatcher> timeIntegratorDispatcher(new ActionParameterDispatcher);
-	timeIntegratorDispatcher->add("ActionParameterForce","ParticleParameters","LeapFrogForceIntegratorFunctor");
-	if(!rotationBlocked)
-		timeIntegratorDispatcher->add("ActionParameterMomentum","RigidBodyParameters","LeapFrogMomentumIntegratorFunctor");
-	
+	shared_ptr<BodyPhysicalParametersDispatcher> positionIntegrator(new BodyPhysicalParametersDispatcher);
+	positionIntegrator->add("ParticleParameters","LeapFrogPositionIntegratorFunctor");
+	shared_ptr<BodyPhysicalParametersDispatcher> orientationIntegrator(new BodyPhysicalParametersDispatcher);
+	orientationIntegrator->add("RigidBodyParameters","LeapFrogOrientationIntegratorFunctor");
+
 	shared_ptr<SDECTimeStepper> sdecTimeStepper(new SDECTimeStepper);
 	sdecTimeStepper->sdecGroupMask = 2;
 	sdecTimeStepper->interval = timeStepUpdateInterval;
@@ -507,7 +508,9 @@ void SDECImpactTest::createActors(shared_ptr<ComplexBody>& rootBody)
 	rootBody->actors.push_back(gravityForceDispatcher);
 	rootBody->actors.push_back(actionDampingDispatcher);
 	rootBody->actors.push_back(applyActionDispatcher);
-	rootBody->actors.push_back(timeIntegratorDispatcher);
+	rootBody->actors.push_back(positionIntegrator);
+	if(!rotationBlocked)
+		rootBody->actors.push_back(orientationIntegrator);
 	rootBody->actors.push_back(averagePositionRecorder);
 	rootBody->actors.push_back(velocityRecorder);
 	rootBody->actors.push_back(forcerec);

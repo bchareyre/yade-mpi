@@ -55,6 +55,7 @@ QMAKE_LIBDIR = ../../../plugins/Body/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/ConstitutiveLaw/SDECLaw/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/ActionParameterFunctor/GravityForceFunctor/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/ActionParameterReset/$(YADEDYNLIBPATH) \
+               ../../../plugins/Engine/ActionParameterInitializer/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

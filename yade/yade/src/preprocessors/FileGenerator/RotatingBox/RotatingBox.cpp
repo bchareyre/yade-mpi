@@ -26,7 +26,7 @@
 #include "InteractionDescriptionSet2AABBFunctor.hpp"
 #include "InteractionDescriptionSet.hpp"
 #include "GravityForceFunctor.hpp"
-
+#include "BodyPhysicalParametersDispatcher.hpp"
 
 RotatingBox::RotatingBox () : FileGenerator()
 {
@@ -283,9 +283,10 @@ void RotatingBox::createActors(shared_ptr<ComplexBody>& rootBody)
 	applyActionDispatcher->add("ActionParameterForce","ParticleParameters","NewtonsForceLawFunctor");
 	applyActionDispatcher->add("ActionParameterMomentum","RigidBodyParameters","NewtonsMomentumLawFunctor");
 	
-	shared_ptr<ActionParameterDispatcher> timeIntegratorDispatcher(new ActionParameterDispatcher);
-	timeIntegratorDispatcher->add("ActionParameterForce","ParticleParameters","LeapFrogForceIntegratorFunctor");
-	timeIntegratorDispatcher->add("ActionParameterMomentum","RigidBodyParameters","LeapFrogMomentumIntegratorFunctor");
+	shared_ptr<BodyPhysicalParametersDispatcher> positionIntegrator(new BodyPhysicalParametersDispatcher);
+	positionIntegrator->add("ParticleParameters","LeapFrogPositionIntegratorFunctor");
+	shared_ptr<BodyPhysicalParametersDispatcher> orientationIntegrator(new BodyPhysicalParametersDispatcher);
+	orientationIntegrator->add("RigidBodyParameters","LeapFrogOrientationIntegratorFunctor");
  	
 	shared_ptr<Rotor> kinematic = shared_ptr<Rotor>(new Rotor);
  	kinematic->angularVelocity  = rotationSpeed;
@@ -306,7 +307,8 @@ void RotatingBox::createActors(shared_ptr<ComplexBody>& rootBody)
 	rootBody->actors.push_back(gravityForceDispatcher);
 	rootBody->actors.push_back(actionDampingDispatcher);
 	rootBody->actors.push_back(applyActionDispatcher);
-	rootBody->actors.push_back(timeIntegratorDispatcher);
+	rootBody->actors.push_back(positionIntegrator);
+	rootBody->actors.push_back(orientationIntegrator);
 	if(isRotating)
 		rootBody->actors.push_back(kinematic);
 }

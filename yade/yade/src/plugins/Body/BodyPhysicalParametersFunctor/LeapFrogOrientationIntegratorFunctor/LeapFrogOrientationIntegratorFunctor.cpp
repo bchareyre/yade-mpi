@@ -21,9 +21,8 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "LeapFrogMomentumIntegratorFunctor.hpp"
+#include "LeapFrogOrientationIntegratorFunctor.hpp"
 #include "RigidBodyParameters.hpp"
-#include "ParticleParameters.hpp"
 #include "Omega.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -32,9 +31,8 @@
 
 // FIXME : should we pass timestep as parameter of functor
 // FIXME : what's with timestepper
-void LeapFrogMomentumIntegratorFunctor::go( 	  const shared_ptr<ActionParameter>&
-					, const shared_ptr<BodyPhysicalParameters>& b
-					, const Body* body)
+void LeapFrogOrientationIntegratorFunctor::go(	  const shared_ptr<BodyPhysicalParameters>& b
+						, const Body* body)
 {
 	if(! body->isDynamic)
 		return;

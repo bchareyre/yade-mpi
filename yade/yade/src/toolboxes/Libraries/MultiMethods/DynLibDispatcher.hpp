@@ -316,6 +316,13 @@ class DynLibDispatcher
 				else
 					if(callBacks[index_tmp])
 					{
+						// BEGIN FIXME - this should be a separate function to resize stuff
+						//std::cerr << index << " " << index_tmp << std::endl;
+						if( callBacksInfo.size() <= (unsigned int)index )
+							callBacksInfo.resize(index+1);
+						if( callBacks.size() <= (unsigned int)index )
+							callBacks.resize(index+1);
+						// END
 						callBacksInfo[index] = callBacksInfo[index_tmp];
 						callBacks    [index] = callBacks    [index_tmp];
 						return true;
@@ -448,7 +455,8 @@ class DynLibDispatcher
 						return false;
 					else
 						if(callBacks[index1    ][index2_tmp])
-						{
+						{ // FIXME - this is not working, when index1 or index2 is out-of-boundary. I have to resize callBacks and callBacksInfo tables.
+						//  - this should be a separate function to resize stuff
 							callBacksInfo[index1][index2] = callBacksInfo[index1][index2_tmp];
 							callBacks    [index1][index2] = callBacks    [index1][index2_tmp];
 //							index2 = index2_tmp;

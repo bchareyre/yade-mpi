@@ -52,9 +52,11 @@ void BodyPhysicalParametersDispatcher::action(Body* body)
 	for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext())
 	{
 		shared_ptr<Body>& b = bodies->getCurrent();
-		operator()(b->physicalParameters,b.get());
+//		if(b->physicalParameters)
+			operator()(b->physicalParameters,b.get());
 	}
 	
- 	operator()(body->physicalParameters,body);
+//	if(body->physicalParameters)
+	 	operator()(body->physicalParameters,body);
 }
 
