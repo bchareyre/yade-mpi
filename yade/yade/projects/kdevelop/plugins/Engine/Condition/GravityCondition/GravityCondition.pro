@@ -21,5 +21,5 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
-HEADERS += GravityForceFunctor.hpp 
-SOURCES += GravityForceFunctor.cpp 
+HEADERS += GravityCondition.hpp 
+SOURCES += GravityCondition.cpp 

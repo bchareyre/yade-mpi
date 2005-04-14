@@ -4,7 +4,9 @@
 # Target is a subdirs project 
 
 SUBDIRS += RotationCondition \
-           TranslationCondition 
+           TranslationCondition \
+	   ForceCondition \
+	   GravityCondition
 MOC_DIR = $(YADECOMPILATIONPATH)
 UI_DIR = $(YADECOMPILATIONPATH)
 OBJECTS_DIR = $(YADECOMPILATIONPATH)
