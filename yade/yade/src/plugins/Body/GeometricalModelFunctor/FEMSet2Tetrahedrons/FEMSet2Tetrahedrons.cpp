@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2004 by Janek Kozicki                                   *
+ *   Copyright (C) 2005 by Janek Kozicki                                   *
  *   cosurgi@berlios.de                                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -21,31 +21,35 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "LatticeSetParameters.hpp"
+#include "FEMSet2Tetrahedrons.hpp"
+#include "FEMSetParameters.hpp"
+#include "FEMTetrahedronParameters.hpp"
+#include "Tetrahedron.hpp"
+#include "ComplexBody.hpp"
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////
 
-LatticeSetParameters::LatticeSetParameters() : BodyPhysicalParameters()
+void FEMSet2Tetrahedrons::go(	  const shared_ptr<BodyPhysicalParameters>& ph
+				, shared_ptr<GeometricalModel>& 
+				, const Body* body)
 {
-	createIndex();
+	/*
+	int tetrahedronGroupMask = dynamic_cast<const FEMSetParameters*>(ph.get())->tetrahedronGroupMask;
+	const ComplexBody * ncb = dynamic_cast<const ComplexBody*>(body);
+	const shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	
-	beamGroupMask = 1;
-}
+// FIXME - this copying of data! 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-LatticeSetParameters::~LatticeSetParameters()
-{
-
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-void LatticeSetParameters::registerAttributes()
-{
-	REGISTER_ATTRIBUTE(beamGroupMask);
+	for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext() )
+	{
+		if( bodies->getCurrent()->getGroupMask() & tetrahedronGroupMask )
+		{
+			LatticeBeamParameters* beam 	= dynamic_cast<LatticeBeamParameters*>  (bodies->getCurrent()->physicalParameters.get());
+			
+			line->length = beam->length;
+		}
+	}
+	*/
 }
 

@@ -99,7 +99,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>plugins/Body/BodyPhysicalParameters/FEMSetParameters</activedir>
+      <activedir>plugins/Body/BodyPhysicalParameters/FEMNodeParameters</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>

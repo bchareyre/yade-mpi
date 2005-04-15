@@ -27,7 +27,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "Initializer.hpp"
+#include "Actor.hpp"
 #include "DynLibDispatcher.hpp"
 #include "InteractionDescription.hpp"
 #include "BoundingVolume.hpp"
@@ -38,7 +38,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class BoundingVolumeDispatcher : 
-	  public Initializer
+	  public Actor 
 	, public DynLibDispatcher
 		<	TYPELIST_2( InteractionDescription , BoundingVolume ) ,		// base classess for dispatch
 			BoundingVolumeFunctor,						// class that provides multivirtual call
@@ -52,7 +52,8 @@ class BoundingVolumeDispatcher :
 		>
 {
 	public		: virtual void action(Body* b);
-	public		: virtual bool removeAfter() {return false;};
+	public		: virtual bool removeAfter() { return false; };
+	public		: virtual bool isInitializer() { return true; };
 	public		: virtual void registerAttributes();
 	public		: virtual void postProcessAttributes(bool deserializing);
 	REGISTER_CLASS_NAME(BoundingVolumeDispatcher);

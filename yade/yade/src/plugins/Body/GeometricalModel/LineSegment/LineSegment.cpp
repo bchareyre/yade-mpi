@@ -23,11 +23,6 @@
 
 #include "LineSegment.hpp"
 
-
-#include "OpenGLWrapper.hpp"
-#include <iostream>
-
-
 LineSegment::LineSegment () : GeometricalModel()
 {		
 	createIndex();
@@ -40,6 +35,6 @@ LineSegment::~LineSegment ()
 void LineSegment::registerAttributes()
 {
 	GeometricalModel::registerAttributes();
-	REGISTER_ATTRIBUTE(length);
+//	REGISTER_ATTRIBUTE(length); // no need to save it
 }
 

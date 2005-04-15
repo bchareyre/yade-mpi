@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2004 by Janek Kozicki                                   *
+ *   Copyright (C) 2005 by Janek Kozicki                                   *
  *   cosurgi@berlios.de                                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -18,22 +18,27 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef INITIALIZER_HPP
-#define INITIALIZER_HPP 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "Actor.hpp"
+#include "FEMSetGeometry.hpp"
 
-class Initializer : public Actor
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+FEMSetGeometry::FEMSetGeometry() : GeometricalModel()
 {
-	public : Initializer() {};
-	public : virtual ~Initializer() {};
-	
-	public : virtual bool removeAfter() { throw; }; // FIXME - add exception "Initializer::removeAfter() not specified for class typeid().name"
+	createIndex();
+}
 
-	REGISTER_CLASS_NAME(Initializer);
-};
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
-REGISTER_SERIALIZABLE(Initializer,false);
+FEMSetGeometry::~FEMSetGeometry()
+{
 
-#endif // INITIALIZER_HPP 
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
 

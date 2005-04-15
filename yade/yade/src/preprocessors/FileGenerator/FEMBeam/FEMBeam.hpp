@@ -1,44 +1,39 @@
-
-#ifndef __FEMROCK_H__
-#define __FEMROCK_H__
+#ifndef FEM_BEAM_HPP
+#define FEM_BEAM_HPP 
 
 #include "FileGenerator.hpp"
-#include "Vector3.hpp"
-/*class NodeProperties : public Serializable
+
+#include <string>
+
+class FEMBeam : public FileGenerator
 {
-	public : Real invMass;
-	public : Vector3r velocity;
+	private :
+		Vector3r gravity;
+		std::string femTxtFile;
+		int nodeGroupMask;
+		int tetrahedronGroupMask;
+//	private : Real dampingForce;
+//	private : Real dampingMomentum;
 
-	public : NodeProperties() {};
-	public : NodeProperties(Real im) : invMass(im), velocity(Vector3r(0,0,0)) {};
-	protected : virtual void postProcessAttributes(bool deserializing) {};
-	public : void registerAttributes()
-	{
-		REGISTER_ATTRIBUTE(invMass);
-		REGISTER_ATTRIBUTE(velocity);
-	};
-	REGISTER_CLASS_NAME(NodeProperties);
-};
-REGISTER_CLASS(NodeProperties,false);*/
+// construction
+	public : FEMBeam ();
+	public : ~FEMBeam ();
 
-class FEMRock : public FileGenerator
-{
-	public : vector<Vector3r> nodes;
-	public : vector<vector<int> > tetrahedrons;
 
-	// construction
-	public : FEMRock ();
-	public : ~FEMRock ();
+	private : void createNode(shared_ptr<Body>& body, Vector3r,unsigned int);
+	private : void createTetrahedron(shared_ptr<ComplexBody>&, shared_ptr<Body>&, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int);
+	private : void createActors(shared_ptr<ComplexBody>& rootBody);
+	private : void positionRootBody(shared_ptr<ComplexBody>& rootBody);
 
 	protected : virtual void postProcessAttributes(bool deserializing);
 	public : void registerAttributes();
 
 	public : string generate();
 
-	REGISTER_CLASS_NAME(FEMRock);
+	REGISTER_CLASS_NAME(FEMBeam);
 };
 
-REGISTER_SERIALIZABLE(FEMRock,false);
+REGISTER_SERIALIZABLE(FEMBeam,false);
 
-#endif // __FEMROCK_H__
+#endif // SDEC_SPHERES_PLANE_HPP 
 

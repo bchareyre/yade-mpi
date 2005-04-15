@@ -1,7 +1,7 @@
 #include "Math.hpp"
 
 #include "ComplexBody.hpp"
-#include "Initializer.hpp"
+#include "Actor.hpp"
 
 ////////// Containers
 #include "InteractionVecSet.hpp"
@@ -29,17 +29,16 @@ void ComplexBody::postProcessAttributes(bool deserializing)
 		vector<shared_ptr<Actor> >::iterator ai    = actors.begin();
 		vector<shared_ptr<Actor> >::iterator aiEnd = actors.end();
 		for(;ai!=aiEnd;++ai)
-			if ( dynamic_cast<Initializer*>((*ai).get()) )
+			if ( (*ai)->isInitializer() )
 				(*ai)->action(this);
 				
 		for( ai = actors.begin() , aiEnd = actors.end() ; ai != aiEnd ; ++ai)
-			if( Initializer* init = dynamic_cast<Initializer*>((*ai).get()) )
-				if(init -> removeAfter())
-				{ // delete from actors, and start searching again.
-					actors.erase(ai);
-					ai = actors.begin();
-					aiEnd = actors.end();
-				} 
+			if( (*ai)->isInitializer() && (*ai)->removeAfter() )
+			{
+				actors.erase(ai); // delete from actors, and start searching again.
+				ai = actors.begin();
+				aiEnd = actors.end();
+			} 
 	}
 }
 

@@ -1,59 +1,59 @@
-#ifndef __CLOTH_H__
-#define __CLOTH_H__
+/***************************************************************************
+ *   Copyright (C) 2004 by Janek Kozicki                                   *
+ *   cosurgi@berlios.de                                                    *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ ***************************************************************************/
 
-// #include "SimpleBody.hpp"
-// #include "Vector3.hpp"
-// #include "Matrix3.hpp"
-// 
-// // FIXME - class class NodeProperties is duplicated in FEMNodeParameters and MassSpringBody
-// 
-// class NodeProperties : public Serializable
-// {
-// 	public : Real invMass;
-// 	public : Vector3r velocity;
-// 
-// 	public : NodeProperties() {};
-// 	public : NodeProperties(Real im) : invMass(im), velocity(Vector3r(0,0,0)) {};
-// 	protected : virtual void postProcessAttributes(bool) {};
-// 	public : void registerAttributes()
-// 	{
-// 		REGISTER_ATTRIBUTE(invMass);
-// 		REGISTER_ATTRIBUTE(velocity);
-// 	};
-// 	REGISTER_CLASS_NAME(NodeProperties);
-// };
-// 
-// REGISTER_SERIALIZABLE(NodeProperties,false);
-// 
-// class FEMNodeParameters : public SimpleBody
-// {
-// 	public : Real stiffness;
-// 	public : Real damping;
-//  	public : vector<NodeProperties> properties;
-// 	public : vector<Real> initialLengths;
-// 	public : vector<pair<int,Vector3r> > externalForces;
-// 
-// 	// construction
-// 	public : FEMNodeParameters ();
-// 	public : virtual FEMNodeParameters ();
-// 
-// 
-// ///////////////////////////////////////////////////////////////////////////////////////////////////
-// /// Serialization										///
-// ///////////////////////////////////////////////////////////////////////////////////////////////////
-// 	
-// 	REGISTER_CLASS_NAME(FEMNodeParameters);
-// 	protected : virtual void postProcessAttributes(bool deserializing);
-// 	public : void registerAttributes();
-// 
-// ///////////////////////////////////////////////////////////////////////////////////////////////////
-// /// Indexable											///
-// ///////////////////////////////////////////////////////////////////////////////////////////////////
-// 
-// 	REGISTER_CLASS_INDEX(FEMNodeParameters,SimpleBody);
-// 	
-// };
-// 
-// REGISTER_SERIALIZABLE(FEMNodeParameters,false);
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#endif // __CLOTH_H__
+#ifndef FEM_NODE_PARAMETERS_HPP 
+#define FEM_NODE_PARAMETERS_HPP 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+#include "RigidBodyParameters.hpp"
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+class FEMNodeParameters : public RigidBodyParameters
+{
+	public : FEMNodeParameters();
+	public : virtual ~FEMNodeParameters();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+/// Serialization										///
+///////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	REGISTER_CLASS_NAME(FEMNodeParameters);
+	public : void registerAttributes();
+	
+///////////////////////////////////////////////////////////////////////////////////////////////////
+/// Indexable											///
+///////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	REGISTER_CLASS_INDEX(FEMNodeParameters,RigidBodyParameters);
+
+};
+
+REGISTER_SERIALIZABLE(FEMNodeParameters,false);
+
+#endif // __LATTICENODEPARAMETERS_HPP__
+
+

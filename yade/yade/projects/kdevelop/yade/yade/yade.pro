@@ -10,8 +10,7 @@ HEADERS += Chrono.hpp \
            FileGenerator.hpp \
            SimulationLoop.hpp \
            RenderingEngine.hpp \
-           yadeExceptions.hpp \
-           Initializer.hpp 
+           yadeExceptions.hpp
 SOURCES += Chrono.cpp \
            Omega.cpp \
            yade.cpp \

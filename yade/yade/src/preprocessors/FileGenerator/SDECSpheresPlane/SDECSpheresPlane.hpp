@@ -1,6 +1,6 @@
 
-#ifndef __ROTATINGBOX_H__
-#define __ROTATINGBOX_H__
+#ifndef SDEC_SPHERES_PLANE_HPP
+#define SDEC_SPHERES_PLANE_HPP
 
 #include "FileGenerator.hpp"
 
@@ -36,5 +36,5 @@ class SDECSpheresPlane : public FileGenerator
 
 REGISTER_SERIALIZABLE(SDECSpheresPlane,false);
 
-#endif // __ROTATINGBOX_H__
+#endif // SDEC_SPHERES_PLANE_HPP 
 

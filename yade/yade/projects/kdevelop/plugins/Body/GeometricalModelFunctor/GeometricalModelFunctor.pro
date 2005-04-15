@@ -3,11 +3,12 @@
 # Subdir relative project main directory: ./plugins/Body/GeometricalModelFunctor
 # Target is a subdirs project 
 
-SUBDIRS += LatticeSet2LatticeBeams \
-           ParticleSet2Mesh2D \
+SUBDIRS += ParticleSet2Mesh2D \
            VRML2TerrainFunctor \
            LatticeSet2MarchingCubes \
-           FEMSet2MarchingCubes 
+	   LatticeSet2LatticeBeams \
+           FEMSet2MarchingCubes \
+	   FEMSet2Tetrahedrons
 MOC_DIR = $(YADECOMPILATIONPATH)
 UI_DIR = $(YADECOMPILATIONPATH)
 OBJECTS_DIR = $(YADECOMPILATIONPATH)

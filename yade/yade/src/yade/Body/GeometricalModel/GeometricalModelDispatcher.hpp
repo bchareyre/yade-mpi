@@ -27,7 +27,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "Initializer.hpp"
+#include "Actor.hpp"
 #include "DynLibDispatcher.hpp"
 #include "BodyPhysicalParameters.hpp"
 #include "GeometricalModel.hpp"
@@ -38,7 +38,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class GeometricalModelDispatcher :
-	  public Initializer 
+	  public Actor 
 	, public DynLibDispatcher
 		<	TYPELIST_2( BodyPhysicalParameters , GeometricalModel ) ,
 			GeometricalModelFunctor,
@@ -52,6 +52,7 @@ class GeometricalModelDispatcher :
 {
 	public		: virtual void action(Body* b);
 	public		: virtual bool removeAfter() {return false;};
+	public		: virtual bool isInitializer() { return true; };
 	public		: virtual void registerAttributes();
 	public		: virtual void postProcessAttributes(bool deserializing);
 	REGISTER_CLASS_NAME(GeometricalModelDispatcher);

@@ -3,14 +3,14 @@
 # Subdir relative project main directory: ./plugins/Body/BodyPhysicalParameters
 # Target is a subdirs project 
 
-SUBDIRS += LatticeSetParameters \
-           ParticleParameters \
+SUBDIRS += ParticleParameters \
            ParticleSetParameters \
            RigidBodyParameters \
-           LatticeBeamParameters \
-           LatticeNodeParameters \
-           FEMNodeParameters \
            BodyMacroParameters \
+           LatticeNodeParameters \
+           LatticeBeamParameters \
+	   LatticeSetParameters \
+           FEMNodeParameters \
            FEMTetrahedronParameters \
            FEMSetParameters 
 CONFIG += release \

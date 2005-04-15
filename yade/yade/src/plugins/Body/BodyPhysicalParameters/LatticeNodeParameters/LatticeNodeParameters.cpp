@@ -24,3 +24,4 @@ void LatticeNodeParameters::registerAttributes()
 	RigidBodyParameters::registerAttributes();
 //	REGISTER_ATTRIBUTE(length);
 }
+

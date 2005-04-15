@@ -26,12 +26,6 @@ QMAKE_LIBDIR = ../../../../../yade/Body/Body/$(YADEDYNLIBPATH) \
                ../../../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../../../../plugins/Body/GeometricalModel/Box/$(YADEDYNLIBPATH) \
                ../../../../../plugins/Body/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
-               ../../../../../yade/Engine/$(YADEDYNLIBPATH) \
-               ../../../../../plugins/Geometry/GeometricalModel/Box/$(YADEDYNLIBPATH) \
-               ../../../../../plugins/Geometry/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
-               ../../../../../yade/Body/$(YADEDYNLIBPATH) \
-               ../../../../../yade/Interaction/$(YADEDYNLIBPATH) \
-               ../../../../../yade/Geometry/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 
