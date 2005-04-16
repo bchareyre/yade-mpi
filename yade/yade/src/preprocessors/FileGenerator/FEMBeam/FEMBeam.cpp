@@ -5,7 +5,7 @@
 #include "Sphere.hpp"
 #include "Tetrahedron.hpp"
 #include "FEMSetParameters.hpp"
-#include "FEMTetrahedronParameters.hpp"
+#include "FEMTetrahedronData.hpp"
 #include "FEMNodeData.hpp"
 #include "InteractionDescriptionSet.hpp"
 
@@ -131,7 +131,7 @@ void FEMBeam::createTetrahedron(shared_ptr<ComplexBody>& rootBody, shared_ptr<Bo
 {
 	
 	body = shared_ptr<Body>(new SimpleBody(id,tetrahedronGroupMask));
-	shared_ptr<FEMTetrahedronParameters> physics(new FEMTetrahedronParameters);
+	shared_ptr<FEMTetrahedronData> physics(new FEMTetrahedronData);
 	shared_ptr<Tetrahedron> gTet(new Tetrahedron);
 	
 	body->isDynamic			= true;

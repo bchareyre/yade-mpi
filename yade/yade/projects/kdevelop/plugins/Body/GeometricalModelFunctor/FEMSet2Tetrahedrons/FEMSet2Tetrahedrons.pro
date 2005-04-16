@@ -4,7 +4,7 @@
 # Target is a library:  
 
 LIBS += -lFEMNodeData \
-        -lFEMTetrahedronParameters \
+        -lFEMTetrahedronData \
         -lTetrahedron \
         -lFEMSetParameters \
         -rdynamic 

@@ -23,7 +23,7 @@
 
 #include "FEMSet2Tetrahedrons.hpp"
 #include "FEMSetParameters.hpp"
-#include "FEMTetrahedronParameters.hpp"
+#include "FEMTetrahedronData.hpp"
 #include "Tetrahedron.hpp"
 #include "ComplexBody.hpp"
 

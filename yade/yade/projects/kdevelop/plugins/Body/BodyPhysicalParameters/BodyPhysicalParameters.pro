@@ -11,7 +11,7 @@ SUBDIRS += ParticleParameters \
            LatticeBeamParameters \
 	   LatticeSetParameters \
            FEMNodeData \
-           FEMTetrahedronParameters \
+           FEMTetrahedronData \
            FEMSetParameters 
 CONFIG += release \
 warn_on

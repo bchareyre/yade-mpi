@@ -7,7 +7,7 @@ LIBS += -lParticleParameters \
         -lRigidBodyParameters \
 	-lFEMSetParameters \
 	-lFEMNodeData \
-	-lFEMTetrahedronParameters \
+	-lFEMTetrahedronData \
         -rdynamic 
 INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 

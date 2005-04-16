@@ -36,30 +36,30 @@
 	
 // FIXME - remove Se3 - FEMTetrahedron DOES NOT need Se3 !
 	
-class FEMTetrahedronParameters : public BodyPhysicalParameters
+class FEMTetrahedronData : public BodyPhysicalParameters
 {
 	public :
 		std::vector<unsigned int> 	ids; // FIXME - stupid serialization is not recognizing array: unsigned int ids[4]
 	
-	public : FEMTetrahedronParameters();
-	public : virtual ~FEMTetrahedronParameters();
+	public : FEMTetrahedronData();
+	public : virtual ~FEMTetrahedronData();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Serialization										///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	REGISTER_CLASS_NAME(FEMTetrahedronParameters);
+	REGISTER_CLASS_NAME(FEMTetrahedronData);
 	public : void registerAttributes();
 	
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Indexable											///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	REGISTER_CLASS_INDEX(FEMTetrahedronParameters,RigidBodyParameters);
+	REGISTER_CLASS_INDEX(FEMTetrahedronData,RigidBodyParameters);
 
 };
 
-REGISTER_SERIALIZABLE(FEMTetrahedronParameters,false);
+REGISTER_SERIALIZABLE(FEMTetrahedronData,false);
 
 #endif // __LATTICEBEAMPARAMETERS_HPP__
 
