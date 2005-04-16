@@ -1,5 +1,14 @@
 #! /bin/sh
 
+echo ""
+echo "You have decided to rename class $1 to a new name $2, very good."
+echo "But first make sure that : "
+echo " - you have exectued script ./prepareForSubversion"
+echo " - svn status in main yade/ directory displays NO CHANGES at all, well, actually changes"
+echo "   totally unrelated to those classes should work... "
+echo ""
+echo -n " > Do you want to continue? (enter 'n' to abort) : "; read x; if [ "$x" = "n" ]; then exit; fi
+
 echo ' '									>  ./empty
 
 
