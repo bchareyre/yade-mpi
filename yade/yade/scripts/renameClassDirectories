@@ -48,8 +48,6 @@ rm ./proRenameClass*
 rm ./hppRenameClass*
 
 echo ""
-echo "All filenames modifed, you should commit now. Next step: ./renameClassFilenames $1 $2"
-echo ""
-echo "this operation canNOT be fully reverted by command ./renameClassDirectories $2 $1"
+echo "All directories modifed, you should commit now. Renaming class $1 to $2 finished!"
 echo ""
 
