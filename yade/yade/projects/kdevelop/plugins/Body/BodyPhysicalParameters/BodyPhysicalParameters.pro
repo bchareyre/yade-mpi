@@ -10,7 +10,7 @@ SUBDIRS += ParticleParameters \
            LatticeNodeParameters \
            LatticeBeamParameters \
 	   LatticeSetParameters \
-           FEMNodeParameters \
+           FEMNodeData \
            FEMTetrahedronParameters \
            FEMSetParameters 
 CONFIG += release \

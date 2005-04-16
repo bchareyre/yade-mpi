@@ -22,7 +22,7 @@ LIBS += -lSerialization \
         -lInteractionDescriptionSet \
         -lFEMSetParameters \
         -lFEMTetrahedronParameters \
-        -lFEMNodeParameters \
+        -lFEMNodeData \
         -lTetrahedron \
         -rdynamic 
 INCLUDEPATH += $(YADEINCLUDEPATH) 
@@ -48,7 +48,7 @@ QMAKE_LIBDIR = ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/InteractionDescription/InteractionDescriptionSet/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/BodyPhysicalParameters/FEMSetParameters/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/BodyPhysicalParameters/FEMTetrahedronParameters/$(YADEDYNLIBPATH) \
-               ../../../plugins/Body/BodyPhysicalParameters/FEMNodeParameters/$(YADEDYNLIBPATH) \
+               ../../../plugins/Body/BodyPhysicalParameters/FEMNodeData/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

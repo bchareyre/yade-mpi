@@ -3,7 +3,7 @@
 # Subdir relative project main directory: ./plugins/Body/GeometricalModelFunctor/LatticeSet2LatticeBeams
 # Target is a library:  
 
-LIBS += -lFEMNodeParameters \
+LIBS += -lFEMNodeData \
         -lFEMTetrahedronParameters \
         -lTetrahedron \
         -lFEMSetParameters \

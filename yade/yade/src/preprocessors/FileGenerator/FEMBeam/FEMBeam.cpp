@@ -6,7 +6,7 @@
 #include "Tetrahedron.hpp"
 #include "FEMSetParameters.hpp"
 #include "FEMTetrahedronParameters.hpp"
-#include "FEMNodeParameters.hpp"
+#include "FEMNodeData.hpp"
 #include "InteractionDescriptionSet.hpp"
 
 #include "ActionParameterReset.hpp"
@@ -98,7 +98,7 @@ string FEMBeam::generate()
 void FEMBeam::createNode(shared_ptr<Body>& body, Vector3r position, unsigned int id)
 {
 	body = shared_ptr<Body>(new SimpleBody(id,nodeGroupMask));
-	shared_ptr<FEMNodeParameters> physics(new FEMNodeParameters);
+	shared_ptr<FEMNodeData> physics(new FEMNodeData);
 	shared_ptr<Sphere> gSphere(new Sphere);
 	
 	Quaternionr q;

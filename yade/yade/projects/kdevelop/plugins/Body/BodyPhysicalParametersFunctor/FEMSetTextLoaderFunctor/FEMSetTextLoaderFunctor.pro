@@ -6,7 +6,7 @@
 LIBS += -lParticleParameters \
         -lRigidBodyParameters \
 	-lFEMSetParameters \
-	-lFEMNodeParameters \
+	-lFEMNodeData \
 	-lFEMTetrahedronParameters \
         -rdynamic 
 INCLUDEPATH += $(YADEINCLUDEPATH) 
