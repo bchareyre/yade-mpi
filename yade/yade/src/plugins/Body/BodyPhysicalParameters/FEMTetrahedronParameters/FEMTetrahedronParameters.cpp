@@ -3,7 +3,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-FEMTetrahedronParameters::FEMTetrahedronParameters() : RigidBodyParameters()
+FEMTetrahedronParameters::FEMTetrahedronParameters() : BodyPhysicalParameters()
 { 
 	createIndex();
 	ids.clear();
@@ -22,7 +22,7 @@ FEMTetrahedronParameters::~FEMTetrahedronParameters()
 
 void FEMTetrahedronParameters::registerAttributes()
 {
-	RigidBodyParameters::registerAttributes();
+	BodyPhysicalParameters::registerAttributes();
 	REGISTER_ATTRIBUTE(ids);
 }
 

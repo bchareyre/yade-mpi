@@ -36,7 +36,7 @@
 	
 // FIXME - remove Se3 - FEMTetrahedron DOES NOT need Se3 !
 	
-class FEMTetrahedronParameters : public RigidBodyParameters
+class FEMTetrahedronParameters : public BodyPhysicalParameters
 {
 	public :
 		std::vector<unsigned int> 	ids; // FIXME - stupid serialization is not recognizing array: unsigned int ids[4]

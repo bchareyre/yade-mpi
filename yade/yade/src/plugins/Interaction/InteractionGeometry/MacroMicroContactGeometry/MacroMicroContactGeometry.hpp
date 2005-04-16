@@ -13,6 +13,9 @@ class MacroMicroContactGeometry : public InteractionGeometry
 
 	public : Real radius1;
 	public : Real radius2;
+
+
+
 	public : Vector3r normal;			// new unit normal of the contact plane.
 	public : Real penetrationDepth;
 	public : Vector3r contactPoint;	

@@ -3,7 +3,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-FEMNodeParameters::FEMNodeParameters() : RigidBodyParameters()
+FEMNodeParameters::FEMNodeParameters() : BodyPhysicalParameters()
 {
 	createIndex();
 }
@@ -21,6 +21,6 @@ FEMNodeParameters::~FEMNodeParameters()
 
 void FEMNodeParameters::registerAttributes()
 {
-	RigidBodyParameters::registerAttributes();
+	BodyPhysicalParameters::registerAttributes();
 }
 

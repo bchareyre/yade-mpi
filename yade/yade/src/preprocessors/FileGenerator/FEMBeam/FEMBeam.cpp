@@ -108,10 +108,10 @@ void FEMBeam::createNode(shared_ptr<Body>& body, Vector3r position, unsigned int
 	
 	body->isDynamic			= true;
 //cerr << position << endl;	
-	physics->angularVelocity	= Vector3r(0,0,0);
-	physics->velocity		= Vector3r(0,0,0);
-	physics->mass			= 1;
-	physics->inertia		= Vector3r(1,1,1);
+//	physics->angularVelocity	= Vector3r(0,0,0);
+//	physics->velocity		= Vector3r(0,0,0);
+//	physics->mass			= 1;
+//	physics->inertia		= Vector3r(1,1,1);
 	physics->se3			= Se3r(position,q);
 
 	gSphere->radius			= radius;
@@ -136,10 +136,10 @@ void FEMBeam::createTetrahedron(shared_ptr<ComplexBody>& rootBody, shared_ptr<Bo
 	
 	body->isDynamic			= true;
 	
-	physics->angularVelocity	= Vector3r(0,0,0);
-	physics->velocity		= Vector3r(0,0,0);
-	physics->mass			= 1; // FIXME
-	physics->inertia		= Vector3r(1,1,1); // FIXME
+//	physics->angularVelocity	= Vector3r(0,0,0);
+//	physics->velocity		= Vector3r(0,0,0);
+//	physics->mass			= 1; // FIXME
+//	physics->inertia		= Vector3r(1,1,1); // FIXME
 	physics->ids.clear();
 	physics->ids.push_back(id1);
 	physics->ids.push_back(id2);
