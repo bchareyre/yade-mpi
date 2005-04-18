@@ -46,8 +46,6 @@ class ActionParameterInitializer : public Actor
 	public    : ActionParameterInitializer();
 	public    : virtual ~ActionParameterInitializer();
 	public    : virtual void action(Body* body);
-	public    : virtual bool removeAfter() { return true; };
-	public    : virtual bool isInitializer() { return true; };
 	
 	protected : virtual void registerAttributes();
 	REGISTER_CLASS_NAME(ActionParameterInitializer);

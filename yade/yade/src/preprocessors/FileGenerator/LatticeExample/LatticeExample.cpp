@@ -233,9 +233,14 @@ void LatticeExample::createActors(shared_ptr<ComplexBody>& )
 	geometricalModelDispatcher->add("LatticeSetParameters","LatticeSetGeometry","LatticeSet2LatticeBeams");
 	
 	rootBody->actors.clear();
-	rootBody->actors.push_back(boundingVolumeDispatcher);
-	rootBody->actors.push_back(geometricalModelDispatcher);
-}
+//	rootBody->actors.push_back(boundingVolumeDispatcher);
+//	rootBody->actors.push_back(geometricalModelDispatcher);
+
+	rootBody->initializers.clear();
+//	rootBody->initializers.push_back(actionParameterInitializer);
+	rootBody->initializers.push_back(boundingVolumeDispatcher);
+	rootBody->initializers.push_back(geometricalModelDispatcher);
+}	
  
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

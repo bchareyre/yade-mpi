@@ -51,8 +51,6 @@ class GeometricalModelDispatcher :
 		>
 {
 	public		: virtual void action(Body* b);
-	public		: virtual bool removeAfter() {return false;};
-	public		: virtual bool isInitializer() { return true; };
 	public		: virtual void registerAttributes();
 	public		: virtual void postProcessAttributes(bool deserializing);
 	REGISTER_CLASS_NAME(GeometricalModelDispatcher);

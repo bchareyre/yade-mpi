@@ -20,25 +20,20 @@ ComplexBody::ComplexBody() :
 	, runtimeInteractions(new InteractionVecSet)
 	, actionParameters(new ActionParameterVectorVector)
 {	
+	initializers.clear();
 }
 
 void ComplexBody::postProcessAttributes(bool deserializing)
 {
 	if (deserializing)
 	{
-		vector<shared_ptr<Actor> >::iterator ai    = actors.begin();
-		vector<shared_ptr<Actor> >::iterator aiEnd = actors.end();
-		for(;ai!=aiEnd;++ai)
-			if ( (*ai)->isInitializer() )
-				(*ai)->action(this);
+		vector<shared_ptr<Actor> >::iterator i    = initializers.begin();
+		vector<shared_ptr<Actor> >::iterator iEnd = initializers.end();
+		for( ; i != iEnd ; ++i)
+			if ((*i)->isActivated())
+				(*i)->action(this);
 				
-		for( ai = actors.begin() , aiEnd = actors.end() ; ai != aiEnd ; ++ai)
-			if( (*ai)->isInitializer() && (*ai)->removeAfter() )
-			{
-				actors.erase(ai); // delete from actors, and start searching again.
-				ai = actors.begin();
-				aiEnd = actors.end();
-			} 
+		initializers.clear();
 	}
 }
 
@@ -46,6 +41,7 @@ void ComplexBody::registerAttributes()
 {
 	Body::registerAttributes();
 	REGISTER_ATTRIBUTE(actors);
+	REGISTER_ATTRIBUTE(initializers);
 	REGISTER_ATTRIBUTE(bodies);
 	REGISTER_ATTRIBUTE(runtimeInteractions);
 	REGISTER_ATTRIBUTE(initialInteractions);

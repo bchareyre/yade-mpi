@@ -24,6 +24,7 @@ LIBS += -lSerialization \
         -lFEMTetrahedronData \
         -lFEMNodeData \
         -lTetrahedron \
+        -lFEMSetTextLoaderFunctor \
         -rdynamic 
 INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
@@ -49,6 +50,7 @@ QMAKE_LIBDIR = ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/BodyPhysicalParameters/FEMSetParameters/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/BodyPhysicalParameters/FEMTetrahedronData/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/BodyPhysicalParameters/FEMNodeData/$(YADEDYNLIBPATH) \
+               ../../../plugins/Body/GeometricalModel/Tetrahedron/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

@@ -26,3 +26,4 @@ class MacroMicroContactGeometry : public InteractionGeometry
 REGISTER_SERIALIZABLE(MacroMicroContactGeometry,false);
 
 #endif // __SDECCONTACTMODEL_H__
+

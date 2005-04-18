@@ -213,7 +213,7 @@ echo ' > $1' >> addSubProject
 
 chmod 777 addSubProject
 
-addSubProject `ls *.pro` 
+./addSubProject `ls *.pro` 
 
 rm addSubProject
 

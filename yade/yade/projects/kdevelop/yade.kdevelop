@@ -99,7 +99,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>plugins/Body/BodyPhysicalParameters/FEMNodeData</activedir>
+      <activedir>plugins/Body/BodyPhysicalParametersFunctor/FEMSetTextLoaderFunctor</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>

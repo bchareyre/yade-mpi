@@ -19,9 +19,6 @@ class FEMBeam : public FileGenerator
 	public : FEMBeam ();
 	public : ~FEMBeam ();
 
-
-	private : void createNode(shared_ptr<Body>& body, Vector3r,unsigned int);
-	private : void createTetrahedron(shared_ptr<ComplexBody>&, shared_ptr<Body>&, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int);
 	private : void createActors(shared_ptr<ComplexBody>& rootBody);
 	private : void positionRootBody(shared_ptr<ComplexBody>& rootBody);
 

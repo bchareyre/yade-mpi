@@ -20,3 +20,4 @@ class ClosestFeatures : public InteractionGeometry
 REGISTER_SERIALIZABLE(ClosestFeatures,false);
 
 #endif // __CLOSESTSFEATURES_H__
+

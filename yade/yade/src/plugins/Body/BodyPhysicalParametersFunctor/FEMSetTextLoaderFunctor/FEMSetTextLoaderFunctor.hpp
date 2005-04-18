@@ -22,22 +22,40 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #ifndef FEM_SET_TEXT_LOADER_HPP
-#define FE
+#define FEM_SET_TEXT_LOADER_HPP
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "BodyPhysicalParametersFunctor.hpp"
+#include "SimpleBody.hpp"
+#include "ComplexBody.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 class FEMSetTextLoaderFunctor : public BodyPhysicalParametersFunctor
 {
+	private 	: 	int nodeGroupMask, tetrahedronGroupMask;
+	public  	:	string fileName; 
 
-	public : virtual void go(	  const shared_ptr<BodyPhysicalParameters>&
-					, const Body*);
+	public 		: 	virtual void go(	  const shared_ptr<BodyPhysicalParameters>&
+							, const Body*);
 	
+	public 		: 	void createNode( 	  shared_ptr<Body>& body
+							, Vector3r position
+							, unsigned int id);
+					
+	public 		: 	void createTetrahedron(   const ComplexBody* rootBody
+							, shared_ptr<Body>& body
+							, unsigned int id
+							, unsigned int id1
+							, unsigned int id2
+							, unsigned int id3
+							, unsigned int id4);
+	
+
+	protected: virtual void registerAttributes();	
 	REGISTER_CLASS_NAME(FEMSetTextLoaderFunctor);
 };
 

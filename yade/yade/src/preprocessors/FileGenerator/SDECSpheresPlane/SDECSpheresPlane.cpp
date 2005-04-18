@@ -254,7 +254,6 @@ void SDECSpheresPlane::createActors(shared_ptr<ComplexBody>& rootBody)
 	sdecTimeStepper->interval = timeStepUpdateInterval;
 
 	rootBody->actors.clear();
-	rootBody->actors.push_back(actionParameterInitializer);
 	rootBody->actors.push_back(shared_ptr<Actor>(new ActionParameterReset));
 	rootBody->actors.push_back(sdecTimeStepper);
 	rootBody->actors.push_back(boundingVolumeDispatcher);	
@@ -268,6 +267,10 @@ void SDECSpheresPlane::createActors(shared_ptr<ComplexBody>& rootBody)
 	rootBody->actors.push_back(positionIntegrator);
 	if(!rotationBlocked)
 		rootBody->actors.push_back(orientationIntegrator);
+	
+	rootBody->initializers.clear();
+	rootBody->initializers.push_back(actionParameterInitializer);
+	rootBody->initializers.push_back(boundingVolumeDispatcher);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

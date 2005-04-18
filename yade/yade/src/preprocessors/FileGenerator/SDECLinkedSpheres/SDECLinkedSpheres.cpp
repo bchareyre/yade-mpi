@@ -332,7 +332,6 @@ void SDECLinkedSpheres::createActors(shared_ptr<ComplexBody>& rootBody)
 	constitutiveLaw->momentRotationLaw = momentRotationLaw;
 	
 	rootBody->actors.clear();
-	rootBody->actors.push_back(actionParameterInitializer);
 	rootBody->actors.push_back(sdecTimeStepper);
 	rootBody->actors.push_back(shared_ptr<Actor>(new ActionParameterReset));
 	rootBody->actors.push_back(boundingVolumeDispatcher);
@@ -345,7 +344,12 @@ void SDECLinkedSpheres::createActors(shared_ptr<ComplexBody>& rootBody)
 	rootBody->actors.push_back(applyActionDispatcher);
 	rootBody->actors.push_back(positionIntegrator);
 	rootBody->actors.push_back(orientationIntegrator);
+
+	rootBody->initializers.clear();
+	rootBody->initializers.push_back(actionParameterInitializer);
+	rootBody->initializers.push_back(boundingVolumeDispatcher);
 }
+	
 
 
 

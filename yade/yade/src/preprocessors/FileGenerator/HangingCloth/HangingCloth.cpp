@@ -176,7 +176,6 @@ string HangingCloth::generate()
 	massSpringBody2RigidBodyConstitutiveLaw->springGroupMask = 1;
 
 	rootBody->actors.clear();
-	rootBody->actors.push_back(actionParameterInitializer);
 	rootBody->actors.push_back(shared_ptr<Actor>(new ActionParameterReset));
 	rootBody->actors.push_back(boundingVolumeDispatcher);
 	rootBody->actors.push_back(geometricalModelDispatcher);
@@ -192,6 +191,11 @@ string HangingCloth::generate()
 	rootBody->actors.push_back(positionIntegrator);
 	rootBody->actors.push_back(orientationIntegrator);
 
+	rootBody->initializers.clear();
+	rootBody->initializers.push_back(actionParameterInitializer);
+	rootBody->initializers.push_back(boundingVolumeDispatcher);
+	rootBody->initializers.push_back(geometricalModelDispatcher);
+	
 	Quaternionr q;
 	q.fromAxisAngle( Vector3r(0,0,1),0);
 
