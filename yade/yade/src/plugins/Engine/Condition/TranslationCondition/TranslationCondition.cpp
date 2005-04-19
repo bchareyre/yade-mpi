@@ -1,5 +1,5 @@
 #include "TranslationCondition.hpp"
-#include "RigidBodyParameters.hpp"
+#include "ParticleParameters.hpp"
 #include "ComplexBody.hpp"
 
 void TranslationCondition::postProcessAttributes(bool deserializing)
@@ -34,18 +34,27 @@ void TranslationCondition::applyCondition(Body * body)
 	//	sign = -1;
 
 	for(;ii!=iiEnd;++ii)
-	{
-		RigidBodyParameters * rb = static_cast<RigidBodyParameters*>((*bodies)[*ii]->physicalParameters.get());
+		if(ParticleParameters* p = dynamic_cast<ParticleParameters*>((*bodies)[*ii]->physicalParameters.get()))
+		{
 
 		// FIXME - specify intervals of activity for an actor => use isActivated method
 		//if( Omega::instance().getIter() > 1000 )
 		//	b->velocity		= Vector3r(0,0,0);
 		//else
 		//{
-			rb->se3.position	+= sign*dt*velocity*translationAxis;
-			rb->velocity		=  sign*velocity*translationAxis;
+			p->se3.position		+= sign*dt*velocity*translationAxis;
+			p->velocity		=  sign*velocity*translationAxis;
 		//}
-	}
+		
+		}
+		else if(BodyPhysicalParameters* b = dynamic_cast<BodyPhysicalParameters*>((*bodies)[*ii]->physicalParameters.get()))
+		{ // NOT everyone has velocity !
+			b->se3.position		+= sign*dt*velocity*translationAxis;
+		}
+		else
+		{
+			std::cerr << "TranslationCondition::applyCondition, WARNING! dynamic_cast failed! for id: " << *ii << std::endl; // FUCK! I've literally spent two days - 10hours to find a mistake caused by static_cast!!, we should never use static_cast when in DEBUG mode !!!!!
+		}
 
 
 }

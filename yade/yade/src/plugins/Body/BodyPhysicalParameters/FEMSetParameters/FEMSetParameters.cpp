@@ -46,6 +46,7 @@ FEMSetParameters::~FEMSetParameters()
 
 void FEMSetParameters::registerAttributes()
 {
+	BodyPhysicalParameters::registerAttributes();
 	REGISTER_ATTRIBUTE(nodeGroupMask);
 	REGISTER_ATTRIBUTE(tetrahedronGroupMask);
 }

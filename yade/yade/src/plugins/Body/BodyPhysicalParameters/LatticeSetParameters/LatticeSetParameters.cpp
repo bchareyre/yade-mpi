@@ -46,6 +46,7 @@ LatticeSetParameters::~LatticeSetParameters()
 
 void LatticeSetParameters::registerAttributes()
 {
+	BodyPhysicalParameters::registerAttributes();
 	REGISTER_ATTRIBUTE(beamGroupMask);
 }
 

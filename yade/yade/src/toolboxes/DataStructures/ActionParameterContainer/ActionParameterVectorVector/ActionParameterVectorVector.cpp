@@ -84,7 +84,7 @@ void ActionParameterVectorVector::gotoFirst()
 	vvi    = actionParameters.begin();
 	vviEnd = actionParameters.end();
 	
-	while( (! usedIds[currentIndex]) && (vvi != vviEnd) )
+	while( (vvi != vviEnd) && (! usedIds[currentIndex]) )
 	{
 		++currentIndex;
 		++vvi;

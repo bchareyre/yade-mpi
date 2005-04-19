@@ -27,8 +27,11 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include "ComplexBody.hpp"
 #include "RigidBodyParameters.hpp"
-
+#include <boost/numeric/ublas/matrix.hpp>
+#include <boost/numeric/ublas/vector.hpp>
+using namespace boost::numeric;
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -40,6 +43,13 @@ class FEMTetrahedronData : public BodyPhysicalParameters
 {
 	public :
 		std::vector<unsigned int> 	ids; // FIXME - stupid serialization is not recognizing array: unsigned int ids[4]
+	private : // FIXME - this is actually interaction property
+		ublas::matrix<Real>	Ke_;
+		Real damping, mass;
+	private : void localCalcKeMatrix( ublas::matrix<Real>& nodesCoordinates );
+	
+	public  : void calcKeMatrix(ComplexBody* femBody);
+	
 	
 	public : FEMTetrahedronData();
 	public : virtual ~FEMTetrahedronData();

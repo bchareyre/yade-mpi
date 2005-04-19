@@ -34,22 +34,23 @@ void FEMSet2Tetrahedrons::go(	  const shared_ptr<BodyPhysicalParameters>& ph
 				, shared_ptr<GeometricalModel>& 
 				, const Body* body)
 {
-	/*
 	int tetrahedronGroupMask = dynamic_cast<const FEMSetParameters*>(ph.get())->tetrahedronGroupMask;
-	const ComplexBody * ncb = dynamic_cast<const ComplexBody*>(body);
-	const shared_ptr<BodyContainer>& bodies = ncb->bodies;
+	const ComplexBody * cb = dynamic_cast<const ComplexBody*>(body);
+	const shared_ptr<BodyContainer>& bodies = cb->bodies;
 	
 // FIXME - this copying of data! 
-
 	for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext() )
 	{
 		if( bodies->getCurrent()->getGroupMask() & tetrahedronGroupMask )
 		{
-			LatticeBeamParameters* beam 	= dynamic_cast<LatticeBeamParameters*>  (bodies->getCurrent()->physicalParameters.get());
+			Tetrahedron* tet 		= dynamic_cast<Tetrahedron*>        (bodies->getCurrent()->geometricalModel.get());
+			FEMTetrahedronData* tetData	= dynamic_cast<FEMTetrahedronData*> (bodies->getCurrent()->physicalParameters.get());
 			
-			line->length = beam->length;
+			tet->v1 			= (*(cb->bodies))[tetData->ids[0]]->physicalParameters->se3.position;
+			tet->v2 			= (*(cb->bodies))[tetData->ids[1]]->physicalParameters->se3.position;
+			tet->v3 			= (*(cb->bodies))[tetData->ids[2]]->physicalParameters->se3.position;
+			tet->v4 			= (*(cb->bodies))[tetData->ids[3]]->physicalParameters->se3.position;
 		}
 	}
-	*/
 }
 

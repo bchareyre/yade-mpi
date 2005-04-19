@@ -40,7 +40,7 @@ class FEMSetTextLoaderFunctor : public BodyPhysicalParametersFunctor
 	public  	:	string fileName; 
 
 	public 		: 	virtual void go(	  const shared_ptr<BodyPhysicalParameters>&
-							, const Body*);
+							, Body*);
 	
 	public 		: 	void createNode( 	  shared_ptr<Body>& body
 							, Vector3r position
@@ -53,8 +53,10 @@ class FEMSetTextLoaderFunctor : public BodyPhysicalParametersFunctor
 							, unsigned int id2
 							, unsigned int id3
 							, unsigned int id4);
-	
 
+	public 		: 	void parseCommand(        ComplexBody* rootBody
+							, ifstream& loadFile);
+	
 	protected: virtual void registerAttributes();	
 	REGISTER_CLASS_NAME(FEMSetTextLoaderFunctor);
 };

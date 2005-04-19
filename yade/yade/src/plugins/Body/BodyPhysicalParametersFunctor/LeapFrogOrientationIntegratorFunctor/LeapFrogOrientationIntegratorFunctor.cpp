@@ -32,7 +32,7 @@
 // FIXME : should we pass timestep as parameter of functor
 // FIXME : what's with timestepper
 void LeapFrogOrientationIntegratorFunctor::go(	  const shared_ptr<BodyPhysicalParameters>& b
-						, const Body* body)
+						, Body* body)
 {
 	if(! body->isDynamic)
 		return;

@@ -40,7 +40,7 @@ class BodyPhysicalParametersFunctor : public FunctorWrapper
 		 void ,
 		 TYPELIST_2(
 		 		  const shared_ptr<BodyPhysicalParameters>&
-				, const Body*
+				, Body*
 			   )
 		>
 {	

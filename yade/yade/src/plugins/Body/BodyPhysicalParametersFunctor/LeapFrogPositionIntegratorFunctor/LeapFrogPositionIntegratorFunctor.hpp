@@ -39,7 +39,7 @@ class LeapFrogPositionIntegratorFunctor : public BodyPhysicalParametersFunctor
 	private : vector<bool> firsts;
 	
 	public : virtual void go(	  const shared_ptr<BodyPhysicalParameters>&
-					, const Body*);
+					, Body*);
 	
 	REGISTER_CLASS_NAME(LeapFrogPositionIntegratorFunctor);
 };

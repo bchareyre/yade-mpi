@@ -8,6 +8,7 @@
 #include "FEMTetrahedronData.hpp"
 #include "FEMSetTextLoaderFunctor.hpp"
 #include "FEMNodeData.hpp"
+#include "FEMLaw.hpp"
 #include "InteractionDescriptionSet.hpp"
 
 #include "ActionParameterReset.hpp"
@@ -27,6 +28,7 @@
 #include "InteractionPhysicsDispatcher.hpp"
 #include "ActionParameterDispatcher.hpp"
 #include "BoundingVolumeDispatcher.hpp"
+#include "GeometricalModelDispatcher.hpp"
 
 #include <boost/filesystem/convenience.hpp>
 
@@ -77,12 +79,35 @@ void FEMBeam::createActors(shared_ptr<ComplexBody>& rootBody)
 	shared_ptr<BodyPhysicalParametersDispatcher> bodyPhysicalParametersDispatcher(new BodyPhysicalParametersDispatcher);
 	bodyPhysicalParametersDispatcher->add("FEMSetParameters","FEMSetTextLoaderFunctor",femSetTextLoaderFunctor);
 	
+	shared_ptr<GeometricalModelDispatcher> geometricalModelDispatcher	= shared_ptr<GeometricalModelDispatcher>(new GeometricalModelDispatcher);
+	geometricalModelDispatcher->add("FEMSetParameters","FEMSetGeometry","FEMSet2Tetrahedrons");
+	
+	shared_ptr<BodyPhysicalParametersDispatcher> positionIntegrator(new BodyPhysicalParametersDispatcher);
+	positionIntegrator->add("ParticleParameters","LeapFrogPositionIntegratorFunctor");
+	
+	shared_ptr<FEMLaw> femLaw(new FEMLaw);
+	femLaw->nodeGroupMask = nodeGroupMask;
+	femLaw->tetrahedronGroupMask = tetrahedronGroupMask;
+
+	shared_ptr<ActionParameterDispatcher> applyActionDispatcher(new ActionParameterDispatcher);
+	applyActionDispatcher->add("ActionParameterForce","RigidBodyParameters","NewtonsForceLawFunctor");
+	
 	rootBody->actors.clear();
+	rootBody->actors.push_back(shared_ptr<Actor>(new ActionParameterReset));
 	rootBody->actors.push_back(boundingVolumeDispatcher);
+	rootBody->actors.push_back(geometricalModelDispatcher);
+	rootBody->actors.push_back(femLaw);
+	rootBody->actors.push_back(applyActionDispatcher);
+	rootBody->actors.push_back(positionIntegrator);
+	
+	shared_ptr<ActionParameterInitializer> actionParameterInitializer(new ActionParameterInitializer);
+	actionParameterInitializer->actionParameterNames.push_back("ActionParameterForce");
 	
 	rootBody->initializers.clear();
+	rootBody->initializers.push_back(actionParameterInitializer);
 	rootBody->initializers.push_back(bodyPhysicalParametersDispatcher);
 	rootBody->initializers.push_back(boundingVolumeDispatcher);
+	rootBody->initializers.push_back(geometricalModelDispatcher);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

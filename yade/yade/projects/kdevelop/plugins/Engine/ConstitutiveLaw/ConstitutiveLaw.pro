@@ -3,7 +3,8 @@
 # Subdir relative project main directory: ./plugins/Motion/InteractionLaw
 # Target is a subdirs project 
 
-SUBDIRS += SimpleSpringLaw \
+SUBDIRS += FEMLaw \
+           SimpleSpringLaw \
            MassSpringBody2RigidBodyLaw \
            ErrorTolerantLaw \
            SDECTimeStepper \

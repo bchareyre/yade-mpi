@@ -10,7 +10,7 @@ LIBS += -lSerialization \
         -lBody \
         -lInteraction \
         -lMultiMethods \
-        -lRigidBodyParameters \
+        -lParticleParameters \
         -rdynamic 
 INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 

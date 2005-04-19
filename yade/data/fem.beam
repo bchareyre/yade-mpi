@@ -117,3 +117,8 @@
      71      33      21      28      38
      72      36      39      40      34
 
+Region min 9 -2 -20 max 10 20 20
+
+TranslationCondition velocity 0.1 translationAxis 0 1 0
+
+

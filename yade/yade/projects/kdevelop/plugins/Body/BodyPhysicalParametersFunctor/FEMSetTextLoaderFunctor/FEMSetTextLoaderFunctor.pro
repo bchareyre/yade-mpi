@@ -10,6 +10,7 @@ LIBS += -lParticleParameters \
         -lFEMTetrahedronData \
         -lSphere \
         -lTetrahedron \
+        -lTranslationCondition \
         -rdynamic 
 INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
@@ -21,6 +22,7 @@ QMAKE_LIBDIR = ../../../../plugins/Body/BodyPhysicalParameters/ParticleParameter
                ../../../../plugins/Body/BodyPhysicalParameters/FEMNodeData/$(YADEDYNLIBPATH) \
                ../../../../plugins/Body/BodyPhysicalParameters/FEMTetrahedronData/$(YADEDYNLIBPATH) \
                ../../../../plugins/Body/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
+               ../../../../plugins/Body/GeometricalModel/Tetrahedron/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

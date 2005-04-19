@@ -20,6 +20,7 @@ ComplexBody::ComplexBody() :
 	, runtimeInteractions(new InteractionVecSet)
 	, actionParameters(new ActionParameterVectorVector)
 {	
+	actors.clear();
 	initializers.clear();
 }
 
@@ -33,7 +34,7 @@ void ComplexBody::postProcessAttributes(bool deserializing)
 			if ((*i)->isActivated())
 				(*i)->action(this);
 				
-		initializers.clear();
+		initializers.clear(); // FIXME - we want to delate ONLY some of them!
 	}
 }
 
@@ -52,7 +53,7 @@ void ComplexBody::registerAttributes()
 void ComplexBody::moveToNextTimeStep()
 {
 	vector<shared_ptr<Actor> >::iterator ai    = actors.begin();
-	vector<shared_ptr<Actor> >::iterator aiEnd =  actors.end();
+	vector<shared_ptr<Actor> >::iterator aiEnd = actors.end();
 	for(;ai!=aiEnd;++ai)
 		if ((*ai)->isActivated())
 			(*ai)->action(this);

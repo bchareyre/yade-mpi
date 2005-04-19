@@ -99,7 +99,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>plugins/Body/BodyPhysicalParametersFunctor/FEMSetTextLoaderFunctor</activedir>
+      <activedir>preprocessors/FileGenerator/FEMBeam</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>

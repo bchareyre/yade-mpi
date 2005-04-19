@@ -3,7 +3,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-FEMNodeData::FEMNodeData() : BodyPhysicalParameters()
+FEMNodeData::FEMNodeData() : ParticleParameters()
 {
 	createIndex();
 }
@@ -21,6 +21,6 @@ FEMNodeData::~FEMNodeData()
 
 void FEMNodeData::registerAttributes()
 {
-	BodyPhysicalParameters::registerAttributes();
+	ParticleParameters::registerAttributes();
 }
 

@@ -5,6 +5,7 @@
 #include "FEMTetrahedronData.hpp"
 #include "Sphere.hpp"
 #include "Tetrahedron.hpp"
+#include "TranslationCondition.hpp"
 
 #include <boost/filesystem/convenience.hpp>
 
@@ -14,10 +15,10 @@ void FEMSetTextLoaderFunctor::registerAttributes()
 }
 
 void FEMSetTextLoaderFunctor::go(	  const shared_ptr<BodyPhysicalParameters>& par
-					, const Body* body)
+					, Body* body)
 
 {
-	const ComplexBody* rootBody = dynamic_cast<const ComplexBody*>(body);
+	ComplexBody* rootBody = dynamic_cast<ComplexBody*>(body);
 	shared_ptr<FEMSetParameters> physics = dynamic_pointer_cast<FEMSetParameters>(par);
 	nodeGroupMask = physics->nodeGroupMask;
 	tetrahedronGroupMask = physics->tetrahedronGroupMask;
@@ -26,7 +27,6 @@ void FEMSetTextLoaderFunctor::go(	  const shared_ptr<BodyPhysicalParameters>& pa
 	if(fileName.size() != 0 && filesystem::exists(fileName) )
 	{
 		ifstream loadFile(fileName.c_str());
-//		while( ! loadFile.eof() )
 		unsigned int nbNodes,nbTetrahedrons;
 		loadFile >> nbNodes;
 		loadFile >> nbTetrahedrons;
@@ -48,8 +48,81 @@ void FEMSetTextLoaderFunctor::go(	  const shared_ptr<BodyPhysicalParameters>& pa
 			createTetrahedron(rootBody,femTetrahedron,id,id1,id2,id3,id4);
 			rootBody->bodies->insert(femTetrahedron);
 		}
+		while( ! loadFile.eof() )
+			parseCommand(rootBody,loadFile);
 	}
 	
+	for( rootBody->bodies->gotoFirst() ; rootBody->bodies->notAtEnd() ; rootBody->bodies->gotoNext() )  // FIXME - this loop should be somewhere in InteractionPhysicsDispatcher
+	{
+		if(rootBody->bodies->getCurrent()->getGroupMask() & tetrahedronGroupMask)
+			dynamic_cast<FEMTetrahedronData*>( rootBody->bodies->getCurrent()->physicalParameters.get() )->calcKeMatrix(rootBody); // FIXME - that should be done inside InteractionPhysicsFunctor
+	}
+	
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+void FEMSetTextLoaderFunctor::parseCommand(       ComplexBody* rootBody
+						, ifstream& loadFile)
+{ // FIXME - all that stuff should use TXTManager, to deserialize TXT file.
+	Vector3r regionMin, regionMax;
+	string command;
+	loadFile >> command;
+	
+	if(command == "Region")
+	{
+		loadFile >> command;
+		assert(command == "min");
+		loadFile >> regionMin[0] >> regionMin[1] >> regionMin[2];
+		
+		loadFile >> command;
+		assert(command == "max");
+		loadFile >> regionMax[0] >> regionMax[1] >> regionMax[2];
+		
+		loadFile >> command;
+		
+		if(command == "TranslationCondition")
+		{
+			Vector3r translationAxis;
+			Real velocity;
+			
+			loadFile >> command;
+			assert(command == "velocity" );
+			loadFile >> velocity;
+			loadFile >> command;
+			assert(command == "translationAxis");
+			loadFile >> translationAxis[0] >> translationAxis[1] >> translationAxis[2];
+			
+			shared_ptr<TranslationCondition> translationCondition = shared_ptr<TranslationCondition>(new TranslationCondition);
+		 	translationCondition->velocity  = velocity;
+			translationAxis.normalize();
+		 	translationCondition->translationAxis = translationAxis;
+			
+			rootBody->actors.push_back(translationCondition);
+			translationCondition->subscribedBodies.clear();
+			
+			for(rootBody->bodies->gotoFirst() ; rootBody->bodies->notAtEnd() ; rootBody->bodies->gotoNext() )
+			{
+				if( rootBody->bodies->getCurrent()->getGroupMask() & nodeGroupMask )
+				{
+					Vector3r pos = rootBody->bodies->getCurrent()->physicalParameters->se3.position;
+					if(        pos[0] > regionMin[0] 
+						&& pos[1] > regionMin[1] 
+						&& pos[2] > regionMin[2] 
+						&& pos[0] < regionMax[0] 
+						&& pos[1] < regionMax[1] 
+						&& pos[2] < regionMax[2] )
+					{
+						rootBody->bodies->getCurrent()->geometricalModel->diffuseColor = Vector3r(1,0,0);
+						translationCondition->subscribedBodies.push_back(rootBody->bodies->getCurrent()->getId());
+					}
+				}
+			}
+		}
+		else
+			std::cerr << "Unknown command in FEM file: " << command << "\n";
+	} 
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -71,7 +144,8 @@ void FEMSetTextLoaderFunctor::createNode( shared_ptr<Body>& body
 	body->isDynamic			= true;
 //cerr << position << endl;	
 //	physics->angularVelocity	= Vector3r(0,0,0);
-//	physics->velocity		= Vector3r(0,0,0);
+	physics->velocity		= Vector3r(0,0,0);
+	physics->acceleration		= Vector3r(0,0,0);
 //	physics->mass			= 1;
 //	physics->inertia		= Vector3r(1,1,1);
 	physics->se3			= Se3r(position,q);
@@ -102,7 +176,7 @@ void FEMSetTextLoaderFunctor::createTetrahedron(  const ComplexBody* rootBody
 	shared_ptr<FEMTetrahedronData> physics(new FEMTetrahedronData);
 	shared_ptr<Tetrahedron> gTet(new Tetrahedron);
 	
-	body->isDynamic			= true;
+	body->isDynamic			= false;
 	
 //	physics->angularVelocity	= Vector3r(0,0,0);
 //	physics->velocity		= Vector3r(0,0,0);
@@ -120,10 +194,10 @@ void FEMSetTextLoaderFunctor::createTetrahedron(  const ComplexBody* rootBody
 	gTet->wire			= false;
 	gTet->visible			= true;
 	gTet->shadowCaster		= true;
-	gTet->v1 			= (*(rootBody->bodies))[id1]->physicalParameters->se3.position;
-	gTet->v2 			= (*(rootBody->bodies))[id2]->physicalParameters->se3.position;
-	gTet->v3 			= (*(rootBody->bodies))[id3]->physicalParameters->se3.position;
-	gTet->v4 			= (*(rootBody->bodies))[id4]->physicalParameters->se3.position;
+//	gTet->v1 			= (*(rootBody->bodies))[id1]->physicalParameters->se3.position;
+//	gTet->v2 			= (*(rootBody->bodies))[id2]->physicalParameters->se3.position;
+//	gTet->v3 			= (*(rootBody->bodies))[id3]->physicalParameters->se3.position;
+//	gTet->v4 			= (*(rootBody->bodies))[id4]->physicalParameters->se3.position;
 	
 	body->geometricalModel		= gTet;
 	body->physicalParameters	= physics;

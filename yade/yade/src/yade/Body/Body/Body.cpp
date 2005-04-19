@@ -38,6 +38,11 @@ Body::Body (unsigned int newId, int newGroup) :
 	  Serializable()
 	, id(newId)
 	, groupMask(newGroup)
+	, physicalParameters(shared_ptr<BodyPhysicalParameters>())
+	, geometricalModel(shared_ptr<GeometricalModel>())
+	, interactionGeometry(shared_ptr<InteractionDescription>())
+	, boundingVolume(shared_ptr<BoundingVolume>())
+	
 {
 }
 

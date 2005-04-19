@@ -44,7 +44,7 @@ class BodyPhysicalParametersDispatcher :
 			void ,
 			TYPELIST_2(
 					  const shared_ptr<BodyPhysicalParameters>&
-					, const Body*
+					, Body*
 				  )
 		>
 {
