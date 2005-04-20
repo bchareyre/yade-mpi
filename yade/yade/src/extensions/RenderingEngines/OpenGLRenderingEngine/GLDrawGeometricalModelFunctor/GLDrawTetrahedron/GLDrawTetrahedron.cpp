@@ -13,38 +13,55 @@ void GLDrawTetrahedron::go(const shared_ptr<GeometricalModel>& gm, const shared_
 	
 	Tetrahedron* tet = static_cast<Tetrahedron*>(gm.get());
 	
-//	glScalef(len,len/20,len/20); // it's a box, not a line. looks better :)
-
-//	if (gm->wire || wire) // FIXME - draws only wire
-//	{
+	if (gm->wire || wire) // FIXME - draws only wire
+	{
 		glBegin(GL_LINES);
-		glDisable(GL_LIGHTING);
-		
-		// FIXME - stupid method to draw lines of tetrahedron
-		glVertex3v(tet->v1);
-		glVertex3v(tet->v2);
-		
-		glVertex3v(tet->v1);
-		glVertex3v(tet->v3);
-		
-		glVertex3v(tet->v1);
-		glVertex3v(tet->v4);
-		
-		glVertex3v(tet->v3);
-		glVertex3v(tet->v4);
-		
-		glVertex3v(tet->v2);
-		glVertex3v(tet->v4);
-		
-		glVertex3v(tet->v2);
-		glVertex3v(tet->v3);
-		
+			glDisable(GL_LIGHTING);
+			
+			// FIXME - stupid method to draw lines of tetrahedron
+			glVertex3v(tet->v1);
+			glVertex3v(tet->v2);
+			
+			glVertex3v(tet->v1);
+			glVertex3v(tet->v3);
+			
+			glVertex3v(tet->v1);
+			glVertex3v(tet->v4);
+			
+			glVertex3v(tet->v3);
+			glVertex3v(tet->v4);
+			
+			glVertex3v(tet->v2);
+			glVertex3v(tet->v4);
+			
+			glVertex3v(tet->v2);
+			glVertex3v(tet->v3);
+			
 		glEnd();
-//	}
-//	else
-//	{
-//		glEnable(GL_LIGHTING);
-//		glutSolidCube(1);
-//	}
+	}
+	else
+	{
+		glBegin(GL_TRIANGLE_STRIP);
+			glEnable(GL_LIGHTING); 
+			
+			glNormal3v (tet->v4);
+			glVertex3fv(tet->v4);
+			
+			glNormal3v (tet->v1);
+			glVertex3fv(tet->v1);
+			
+			glNormal3v (tet->v2);
+			glVertex3fv(tet->v2);
+			
+			glNormal3v (tet->v3);
+			glVertex3fv(tet->v3);
+			
+			glNormal3v (tet->v4);
+			glVertex3fv(tet->v4);
+			
+			glNormal3v (tet->v1);
+			glVertex3fv(tet->v1);
+		glEnd();
+	}
 }
 
