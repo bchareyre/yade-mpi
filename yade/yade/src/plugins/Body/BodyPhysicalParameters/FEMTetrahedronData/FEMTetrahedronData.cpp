@@ -58,10 +58,17 @@ void FEMTetrahedronData::localCalcKeMatrix( ublas::matrix<Real>& coord )
 {
 	double h1, h2, G, h3;
 	double Youn, nu, rho, Damp;
-	Youn = 210E9;
+
+	Youn = 1;
 	nu = 0.28 ;
-	rho = 7800;
-	Damp = 1000;
+	rho = 1;
+	Damp = 1;
+
+//	Youn = 210E9;
+//	nu = 0.28 ;
+//	rho = 7800;
+//	Damp = 1000;
+	
 	h1=Youn/((1+nu)*(1-nu));
 	h2=nu*h1;
 	G=Youn/(2*(1+nu));
@@ -126,8 +133,8 @@ void FEMTetrahedronData::localCalcKeMatrix( ublas::matrix<Real>& coord )
 	for (int i = 0 ; i<3 ; i++)
 		for (int j = 0 ; j<3 ; j++)
 			invJacT(i,j) = invjac (j,i);
-	ublas::matrix<double> toto ;
-	toto.resize( 3,3);
+//	ublas::matrix<double> toto ;
+//	toto.resize( 3,3);
 	ublas::matrix<double> resultinv ;
 	resultinv.resize( 3,3);
 	ublas::matrix<double> verifInv2 ;
@@ -135,7 +142,7 @@ void FEMTetrahedronData::localCalcKeMatrix( ublas::matrix<Real>& coord )
 	verifInv2 = prod (invJacT, jac);
 	for (int i = 0 ; i<3 ; i++)
 		for (int j = 0 ; j<3 ; j++)
-			resultinv(i,j) = verifInv2(i,j)-toto(i,j);
+			resultinv(i,j) = verifInv2(i,j);//-toto(i,j);
 	ublas::matrix<double> nix;
 	nix.resize(  4,3);
 	nix.clear();

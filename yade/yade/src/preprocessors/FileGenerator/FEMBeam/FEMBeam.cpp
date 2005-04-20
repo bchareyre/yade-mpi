@@ -37,7 +37,7 @@ using namespace std;
 
 FEMBeam::FEMBeam () : FileGenerator()
 {
-	gravity 		= Vector3r(0,-9.81,0);
+//	gravity 		= Vector3r(0,-9.81,0);
 	femTxtFile 		= "../data/fem.beam";
 	nodeGroupMask 		= 1;
 	tetrahedronGroupMask 	= 2;
@@ -54,7 +54,7 @@ void FEMBeam::postProcessAttributes(bool)
 void FEMBeam::registerAttributes()
 {
 	REGISTER_ATTRIBUTE(femTxtFile);
-	REGISTER_ATTRIBUTE(gravity);
+//	REGISTER_ATTRIBUTE(gravity);
 }
 
 string FEMBeam::generate()
@@ -90,7 +90,11 @@ void FEMBeam::createActors(shared_ptr<ComplexBody>& rootBody)
 	femLaw->tetrahedronGroupMask = tetrahedronGroupMask;
 
 	shared_ptr<ActionParameterDispatcher> applyActionDispatcher(new ActionParameterDispatcher);
-	applyActionDispatcher->add("ActionParameterForce","RigidBodyParameters","NewtonsForceLawFunctor");
+	applyActionDispatcher->add("ActionParameterForce","ParticleParameters","NewtonsForceLawFunctor");
+	
+	shared_ptr<ActionParameterInitializer> actionParameterInitializer(new ActionParameterInitializer);
+	actionParameterInitializer->actionParameterNames.push_back("ActionParameterForce");
+	actionParameterInitializer->actionParameterNames.push_back("ActionParameterMomentum"); // FIXME - should be unnecessery, but BUG in ActionParameterVectorVector
 	
 	rootBody->actors.clear();
 	rootBody->actors.push_back(shared_ptr<Actor>(new ActionParameterReset));
@@ -100,14 +104,11 @@ void FEMBeam::createActors(shared_ptr<ComplexBody>& rootBody)
 	rootBody->actors.push_back(applyActionDispatcher);
 	rootBody->actors.push_back(positionIntegrator);
 	
-	shared_ptr<ActionParameterInitializer> actionParameterInitializer(new ActionParameterInitializer);
-	actionParameterInitializer->actionParameterNames.push_back("ActionParameterForce");
-	
 	rootBody->initializers.clear();
-	rootBody->initializers.push_back(actionParameterInitializer);
 	rootBody->initializers.push_back(bodyPhysicalParametersDispatcher);
 	rootBody->initializers.push_back(boundingVolumeDispatcher);
 	rootBody->initializers.push_back(geometricalModelDispatcher);
+	rootBody->initializers.push_back(actionParameterInitializer);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

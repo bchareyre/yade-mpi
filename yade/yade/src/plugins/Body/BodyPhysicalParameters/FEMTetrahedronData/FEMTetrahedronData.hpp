@@ -41,18 +41,16 @@ using namespace boost::numeric;
 	
 class FEMTetrahedronData : public BodyPhysicalParameters
 {
-	public :
-		std::vector<unsigned int> 	ids; // FIXME - stupid serialization is not recognizing array: unsigned int ids[4]
-	private : // FIXME - this is actually interaction property
-		ublas::matrix<Real>	Ke_;
-		Real damping, mass;
+	public  : std::vector<unsigned int> 	ids; // FIXME - stupid serialization is not recognizing array: unsigned int ids[4]
+	public  : ublas::matrix<Real>	Ke_; // FIXME - this is actually interaction property
+	private : Real damping, mass;
 	private : void localCalcKeMatrix( ublas::matrix<Real>& nodesCoordinates );
 	
 	public  : void calcKeMatrix(ComplexBody* femBody);
 	
 	
-	public : FEMTetrahedronData();
-	public : virtual ~FEMTetrahedronData();
+	public  : FEMTetrahedronData();
+	public  : virtual ~FEMTetrahedronData();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Serialization										///

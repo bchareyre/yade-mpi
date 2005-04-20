@@ -114,6 +114,7 @@ void FEMSetTextLoaderFunctor::parseCommand(       ComplexBody* rootBody
 						&& pos[1] < regionMax[1] 
 						&& pos[2] < regionMax[2] )
 					{
+						rootBody->bodies->getCurrent()->isDynamic = false;
 						rootBody->bodies->getCurrent()->geometricalModel->diffuseColor = Vector3r(1,0,0);
 						translationCondition->subscribedBodies.push_back(rootBody->bodies->getCurrent()->getId());
 					}
@@ -146,9 +147,11 @@ void FEMSetTextLoaderFunctor::createNode( shared_ptr<Body>& body
 //	physics->angularVelocity	= Vector3r(0,0,0);
 	physics->velocity		= Vector3r(0,0,0);
 	physics->acceleration		= Vector3r(0,0,0);
-//	physics->mass			= 1;
+	physics->mass			= 1;
+	physics->invMass		= 1;
 //	physics->inertia		= Vector3r(1,1,1);
 	physics->se3			= Se3r(position,q);
+	physics->initialPosition	= position;
 
 	gSphere->radius			= radius;
 	gSphere->diffuseColor		= Vector3f(0.9,0.9,0.3);

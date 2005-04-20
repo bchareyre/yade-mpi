@@ -8,7 +8,7 @@
 class FEMBeam : public FileGenerator
 {
 	private :
-		Vector3r gravity;
+//		Vector3r gravity;
 		std::string femTxtFile;
 		int nodeGroupMask;
 		int tetrahedronGroupMask;

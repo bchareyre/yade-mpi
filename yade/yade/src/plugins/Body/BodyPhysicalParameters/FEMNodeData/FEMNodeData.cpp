@@ -22,5 +22,6 @@ FEMNodeData::~FEMNodeData()
 void FEMNodeData::registerAttributes()
 {
 	ParticleParameters::registerAttributes();
+	REGISTER_ATTRIBUTE(initialPosition);
 }
 

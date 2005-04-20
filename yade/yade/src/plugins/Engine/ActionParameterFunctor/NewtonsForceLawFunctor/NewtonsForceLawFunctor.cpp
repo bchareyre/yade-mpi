@@ -25,18 +25,26 @@
 #include "ParticleParameters.hpp"
 #include "ActionParameterForce.hpp"
 
+//#include <string>
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void NewtonsForceLawFunctor::go( 	  const shared_ptr<ActionParameter>& a
 					, const shared_ptr<BodyPhysicalParameters>& b
-					, const Body*)
+					, const Body* bb)
 {
-	ActionParameterForce * af = static_cast<ActionParameterForce*>(a.get());
-	ParticleParameters * p = static_cast<ParticleParameters*>(b.get());
+	ActionParameterForce * af = dynamic_cast<ActionParameterForce*>(a.get());
+	ParticleParameters * p = dynamic_cast<ParticleParameters*>(b.get());
 	
 	//FIXME : should be += and we should add an Actor that reset acceleration at the beginning
 	// if another ActionParameter also acts on acceleration then we are overwritting it here
+	
+//	std::cout << bb->getId() << std::endl;
+//	std::cout << a->getClassIndex() << " " << a->getClassName() << std::endl;
+//	std::string ch;
+//	std::cin >> ch;
+	
 	p->acceleration = p->invMass*af->force;
 }
 
