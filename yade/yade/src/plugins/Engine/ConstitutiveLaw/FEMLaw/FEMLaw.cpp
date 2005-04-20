@@ -71,7 +71,7 @@ void FEMLaw::calculateForces(Body* body)
 	Ue1.resize(12,1);
 	fe.resize(12,1);
 	
-	for(bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext())
+	for(bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext()) // loop over all tetrahedrons
 	{
 		const shared_ptr<Body>& body = bodies->getCurrent();
 		if( ! ( body->getGroupMask() & tetrahedronGroupMask ) )
@@ -92,7 +92,7 @@ void FEMLaw::calculateForces(Body* body)
 		
 		fe = - prod( femTet->Ke_ , Ue1 ); // solve this tetrahedron
 		
-		for ( int i = 0 ; i < 4 ; ++i ) // loop again over all tetrahedrons
+		for ( int i = 0 ; i < 4 ; ++i ) // loop again over all tetrahedron nodes
 		{
 			Vector3r force = Vector3r(	  fe( i*3     , 0 )
 							, fe( i*3 + 1 , 0 )
@@ -101,6 +101,8 @@ void FEMLaw::calculateForces(Body* body)
 			static_cast<ActionParameterForce*>( actionParameters
 				->find( femTet->ids[i] , actionForce ->getClassIndex() ).get() )
 					->force  += force;
+					
+			// FIXME - check what's up with invMass in NewtonsForceLawFunctor ???
 		}
 	}
 }
