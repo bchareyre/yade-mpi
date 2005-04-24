@@ -38,7 +38,7 @@ class FEMNodeData : public ParticleParameters
 /// Attributes 											///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	public: Vector3r initialPosition;
+	public: Vector3r initialPosition; // mayber this should be stored in FEMTetrahedron? (but then this data will be stored multiple times, since each tetrahedron will copy the same coordinades for each of its nodes...)
 	
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Methods 											///

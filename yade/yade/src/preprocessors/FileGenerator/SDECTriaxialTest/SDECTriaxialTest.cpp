@@ -77,6 +77,8 @@ SDECTriaxialTest::SDECTriaxialTest() : FileGenerator()
 	boxFrictionDeg 		= -18.0;
 	
 	density			= 2600;
+	
+	doesNothingYet_TM 	= 1;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -89,6 +91,7 @@ SDECTriaxialTest::~SDECTriaxialTest()
 
 void SDECTriaxialTest::registerAttributes()
 {
+	/*
 	REGISTER_ATTRIBUTE(sphereYoungModulus);
 	REGISTER_ATTRIBUTE(spherePoissonRatio);
 	
@@ -107,6 +110,8 @@ void SDECTriaxialTest::registerAttributes()
 	REGISTER_ATTRIBUTE(boxFrictionDeg);
 	
 	REGISTER_ATTRIBUTE(density);
+	*/
+	REGISTER_ATTRIBUTE(doesNothingYet_TM);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -114,7 +119,7 @@ void SDECTriaxialTest::registerAttributes()
 
 string SDECTriaxialTest::generate()
 {
-	return "";
+	return "Not ready yet.";
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

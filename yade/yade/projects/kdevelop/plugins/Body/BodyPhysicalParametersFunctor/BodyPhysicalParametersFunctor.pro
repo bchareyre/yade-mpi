@@ -11,4 +11,5 @@ CONFIG += debug \
 TEMPLATE = subdirs 
 SUBDIRS += LeapFrogOrientationIntegratorFunctor \
 	   LeapFrogPositionIntegratorFunctor \
-	   FEMSetTextLoaderFunctor
+	   FEMSetTextLoaderFunctor \
+	   FEMTetrahedronStiffness

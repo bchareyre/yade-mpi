@@ -1,5 +1,6 @@
 #include "FEMTetrahedronData.hpp"
-//#include <boost/numeric/ublas/io.hpp>
+#include "FEMNodeData.hpp"
+// #include <boost/numeric/ublas/io.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -33,21 +34,21 @@ void FEMTetrahedronData::calcKeMatrix(ComplexBody* femBody)
 	nodesCoordinates.resize(3,4);
 	nodesCoordinates.clear();
 	
-	nodesCoordinates(0,0) = (*(femBody->bodies))[ids[0]]->physicalParameters->se3.position[0];
-	nodesCoordinates(1,0) = (*(femBody->bodies))[ids[0]]->physicalParameters->se3.position[1];
-	nodesCoordinates(2,0) = (*(femBody->bodies))[ids[0]]->physicalParameters->se3.position[2];
+	nodesCoordinates(0,0) = dynamic_cast<FEMNodeData*>((*(femBody->bodies))[ids[0]]->physicalParameters.get())->initialPosition[0];
+	nodesCoordinates(1,0) = dynamic_cast<FEMNodeData*>((*(femBody->bodies))[ids[0]]->physicalParameters.get())->initialPosition[1];
+	nodesCoordinates(2,0) = dynamic_cast<FEMNodeData*>((*(femBody->bodies))[ids[0]]->physicalParameters.get())->initialPosition[2];
 
-	nodesCoordinates(0,1) = (*(femBody->bodies))[ids[1]]->physicalParameters->se3.position[0];
-	nodesCoordinates(1,1) = (*(femBody->bodies))[ids[1]]->physicalParameters->se3.position[1];
-	nodesCoordinates(2,1) = (*(femBody->bodies))[ids[1]]->physicalParameters->se3.position[2];
+	nodesCoordinates(0,1) = dynamic_cast<FEMNodeData*>((*(femBody->bodies))[ids[1]]->physicalParameters.get())->initialPosition[0];
+	nodesCoordinates(1,1) = dynamic_cast<FEMNodeData*>((*(femBody->bodies))[ids[1]]->physicalParameters.get())->initialPosition[1];
+	nodesCoordinates(2,1) = dynamic_cast<FEMNodeData*>((*(femBody->bodies))[ids[1]]->physicalParameters.get())->initialPosition[2];
 
-	nodesCoordinates(0,2) = (*(femBody->bodies))[ids[2]]->physicalParameters->se3.position[0];
-	nodesCoordinates(1,2) = (*(femBody->bodies))[ids[2]]->physicalParameters->se3.position[1];
-	nodesCoordinates(2,2) = (*(femBody->bodies))[ids[2]]->physicalParameters->se3.position[2];
+	nodesCoordinates(0,2) = dynamic_cast<FEMNodeData*>((*(femBody->bodies))[ids[2]]->physicalParameters.get())->initialPosition[0];
+	nodesCoordinates(1,2) = dynamic_cast<FEMNodeData*>((*(femBody->bodies))[ids[2]]->physicalParameters.get())->initialPosition[1];
+	nodesCoordinates(2,2) = dynamic_cast<FEMNodeData*>((*(femBody->bodies))[ids[2]]->physicalParameters.get())->initialPosition[2];
 
-	nodesCoordinates(0,3) = (*(femBody->bodies))[ids[3]]->physicalParameters->se3.position[0];
-	nodesCoordinates(1,3) = (*(femBody->bodies))[ids[3]]->physicalParameters->se3.position[1];
-	nodesCoordinates(2,3) = (*(femBody->bodies))[ids[3]]->physicalParameters->se3.position[2]; 
+	nodesCoordinates(0,3) = dynamic_cast<FEMNodeData*>((*(femBody->bodies))[ids[3]]->physicalParameters.get())->initialPosition[0];
+	nodesCoordinates(1,3) = dynamic_cast<FEMNodeData*>((*(femBody->bodies))[ids[3]]->physicalParameters.get())->initialPosition[1];
+	nodesCoordinates(2,3) = dynamic_cast<FEMNodeData*>((*(femBody->bodies))[ids[3]]->physicalParameters.get())->initialPosition[2]; 
 	
 	localCalcKeMatrix(nodesCoordinates);
 	
@@ -58,11 +59,17 @@ void FEMTetrahedronData::localCalcKeMatrix( ublas::matrix<Real>& coord )
 {
 	double h1, h2, G, h3;
 	double Youn, nu, rho, Damp;
+// FIXME - those are parameters
+	Youn = 150; // young modulus I guess?
+	nu = 0.28 ; // and what is this one?
+	rho = 1; // what is this ? density maybe?
+	Damp = 1; // how this one works?
 
-	Youn = 1;
-	nu = 0.28 ;
-	rho = 1;
-	Damp = 1;
+
+//	Youn = 1; // young modulus I guess?
+//	nu = 0.28 ; // and what is this one?
+//	rho = 1; // what is this ?
+//	Damp = 1; // how this one works?
 
 //	Youn = 210E9;
 //	nu = 0.28 ;

@@ -41,6 +41,8 @@ class SDECTriaxialTest : public FileGenerator
 	private : Vector3r nbSpheres;
 	private : Real boxYoungModulus,boxPoissonRatio,boxFrictionDeg;
 	private : Real sphereYoungModulus,spherePoissonRatio,sphereFrictionDeg,density;
+	
+	private : Real doesNothingYet_TM;
 
 
 	public : SDECTriaxialTest();

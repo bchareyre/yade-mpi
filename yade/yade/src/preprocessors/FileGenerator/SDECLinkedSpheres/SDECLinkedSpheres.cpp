@@ -47,11 +47,11 @@ SDECLinkedSpheres::SDECLinkedSpheres () : FileGenerator()
 	supportSize = 0.5;
 	support1 = 1;
 	support2 = 1;
-	dampingForce = 0.7;
-	dampingMomentum = 0.7;
+	dampingForce = 0.2;
+	dampingMomentum = 0.2;
 	timeStepUpdateInterval = 300;
 	//sphereYoungModulus  = 15000000.0;
-	sphereYoungModulus  = 100000;
+	sphereYoungModulus  =   10000000;
 	spherePoissonRatio  = 0.2;
 	sphereFrictionDeg   = 18.0;
 	density = 2.6;
@@ -161,12 +161,12 @@ string SDECLinkedSpheres::generate()
 				geometry->radius1			= as->radius - fabs(as->radius - bs->radius)*0.5;
 				geometry->radius2			= bs->radius - fabs(as->radius - bs->radius)*0.5;
 
-				physics->initialKn			= 500000; // FIXME - BIG problem here.
-				physics->initialKs			= 50000;
+				physics->initialKn			= 50000000; // FIXME - BIG problem here.
+				physics->initialKs			= 5000000;
 				physics->heta				= 1;
 				physics->initialEquilibriumDistance	= (a->se3.position - b->se3.position).length();
-				physics->knMax				= 75000;
-				physics->ksMax				= 7500;
+				physics->knMax				= 5500000;
+				physics->ksMax				= 550000;
 
 				link->interactionGeometry 		= geometry;
 				link->interactionPhysics 		= physics;

@@ -1,108 +1,146 @@
-#include "FEMBeam.hpp"
+/***************************************************************************
+ *   Copyright (C) 2004 by Olivier Galizzi                                 *
+ *   olivier.galizzi@imag.fr                                               *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ ***************************************************************************/
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+#include "FEMDEMCouplingTest.hpp"
+
+// dispatchers
+#include "BoundingVolumeDispatcher.hpp"
+#include "BodyPhysicalParametersDispatcher.hpp"
+#include "GeometricalModelDispatcher.hpp"
+#include "ActionParameterDispatcher.hpp"
+
+// actors
+#include "FEMLaw.hpp"
+#include "ActionParameterInitializer.hpp"
+#include "ActionParameterReset.hpp"
+#include "FEMSetTextLoaderFunctor.hpp"
+#include "GravityCondition.hpp"
 
 // data
 #include "AABB.hpp"
-#include "Sphere.hpp"
-#include "Tetrahedron.hpp"
 #include "FEMSetParameters.hpp"
-#include "FEMTetrahedronData.hpp"
-#include "FEMNodeData.hpp"
 #include "InteractionDescriptionSet.hpp"
 
-// actors
-#include "FEMTetrahedronStiffness.hpp"
-#include "CundallNonViscousMomentumDampingFunctor.hpp"
-#include "CundallNonViscousForceDampingFunctor.hpp"
-#include "ActionParameterInitializer.hpp"
-#include "ActionParameterReset.hpp"
-#include "FEMLaw.hpp"
-#include "FEMSetTextLoaderFunctor.hpp"
-#include "GravityCondition.hpp"
-#include "TranslationCondition.hpp"
 
-// body
-#include "ComplexBody.hpp"
-#include "SimpleBody.hpp"
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
-// dispatchers
-#include "BodyPhysicalParametersDispatcher.hpp"
-#include "InteractionGeometryDispatcher.hpp"
-#include "InteractionPhysicsDispatcher.hpp"
-#include "ActionParameterDispatcher.hpp"
-#include "BoundingVolumeDispatcher.hpp"
-#include "GeometricalModelDispatcher.hpp"
-
-#include <boost/filesystem/convenience.hpp>
-
-using namespace boost;
-using namespace std;
-
-FEMBeam::FEMBeam () : FileGenerator()
+FEMDEMCouplingTest::FEMDEMCouplingTest() : FileGenerator()
 {
-	gravity 		= Vector3r(0,-9.81,0);
 	femTxtFile 		= "../data/fem.beam";
 	nodeGroupMask 		= 1;
 	tetrahedronGroupMask 	= 2;
-
+	demGroupMask 		= 4;
+	gravity 		= Vector3r(0,-9.81,0);
+		
 	regionMin1 		= Vector3r(9,-20,-20);
 	regionMax1 		= Vector3r(10,20,20);
-	translationAxis1 	= Vector3r(1,0,0);
-	velocity1 		= 0;
+	radiusFEMDEM1 		= 5.1;
 	
 	regionMin2 		= Vector3r(-8,-2,6);
 	regionMax2 		= Vector3r(-8,0,20);
-	translationAxis2 	= Vector3r(-1,0,0); 
-	velocity2 		= 0.0;
+	radiusFEMDEM2 		= 5.1;
 
-/*	
-	regionMin1 		= Vector3r(9,0,-20);
-	regionMax1 		= Vector3r(10,20,20);
-	translationAxis1 	= Vector3r(1,0,0);
-	velocity1 		= 0.5;
+	dampingForce 		= 0.2;
+	dampingMomentum 	= 0.2;
 	
-	regionMin2 		= Vector3r(-11,-2,6);
-	regionMax2 		= Vector3r(-8,0,20);
-	translationAxis2 	= Vector3r(-1,0,0);
-	velocity2 		= 0.0;
-*/		
+	spheresOrigin 		= Vector3r(10,10,10);
+	nbSpheres 		= Vector3r(5,5,10);
+	radiusDEM 		= 5.01;
+	density 		= 2.6;
+	supportSize 		= 0.5;
+	support1 		= true;
+	support2 		= true;
+	timeStepUpdateInterval 	= 200;
+		
+	sphereYoungModulus 	=   10000000;
+	spherePoissonRatio 	= 0.2;
+	sphereFrictionDeg 	= 18.0;
+				
+	momentRotationLaw  	= true;
+	
 }
 
-FEMBeam::~FEMBeam ()
-{ 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+FEMDEMCouplingTest::~FEMDEMCouplingTest()
+{
+
 }
 
-void FEMBeam::registerAttributes()
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+void FEMDEMCouplingTest::registerAttributes()
 {
 	REGISTER_ATTRIBUTE(femTxtFile);
 	REGISTER_ATTRIBUTE(gravity);
-	
+		
 	REGISTER_ATTRIBUTE(regionMin1);
 	REGISTER_ATTRIBUTE(regionMax1);
-	REGISTER_ATTRIBUTE(translationAxis1);
-	REGISTER_ATTRIBUTE(velocity1);
+	REGISTER_ATTRIBUTE(radiusFEMDEM1);
 	
 	REGISTER_ATTRIBUTE(regionMin2);
 	REGISTER_ATTRIBUTE(regionMax2);
-	REGISTER_ATTRIBUTE(translationAxis2);
-	REGISTER_ATTRIBUTE(velocity2);
+	REGISTER_ATTRIBUTE(radiusFEMDEM2);
+
+	REGISTER_ATTRIBUTE(dampingForce);
+	REGISTER_ATTRIBUTE(dampingMomentum);
+	
+	REGISTER_ATTRIBUTE(spheresOrigin);
+	REGISTER_ATTRIBUTE(nbSpheres);
+	REGISTER_ATTRIBUTE(radiusDEM);
+	REGISTER_ATTRIBUTE(density);
+	REGISTER_ATTRIBUTE(supportSize);
+	REGISTER_ATTRIBUTE(support1);
+	REGISTER_ATTRIBUTE(support2);
+	REGISTER_ATTRIBUTE(timeStepUpdateInterval);
+		
+//	REGISTER_ATTRIBUTE(sphereYoungModulus);
+//	REGISTER_ATTRIBUTE(spherePoissonRatio);
+//	REGISTER_ATTRIBUTE(sphereFrictionDeg);
+				
+	momentRotationLaw  	= true;
+	
 }
 
-string FEMBeam::generate()
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+string FEMDEMCouplingTest::generate()
 {
 	rootBody = shared_ptr<ComplexBody>(new ComplexBody);
 	positionRootBody(rootBody);
 	createActors(rootBody);
-	imposeTranslation(rootBody,regionMin1,regionMax1,translationAxis1,velocity1);
-	imposeTranslation(rootBody,regionMin2,regionMax2,translationAxis2,velocity2);
 
-	return "";
+	return "Not ready yet.";
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void FEMBeam::createActors(shared_ptr<ComplexBody>& rootBody)
+void FEMDEMCouplingTest::createActors(shared_ptr<ComplexBody>& rootBody)
 {
 	shared_ptr<BoundingVolumeDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeDispatcher>(new BoundingVolumeDispatcher);
 	boundingVolumeDispatcher->add("InteractionDescriptionSet","AABB","InteractionDescriptionSet2AABBFunctor");
@@ -161,7 +199,7 @@ void FEMBeam::createActors(shared_ptr<ComplexBody>& rootBody)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void FEMBeam::positionRootBody(shared_ptr<ComplexBody>& rootBody) 
+void FEMDEMCouplingTest::positionRootBody(shared_ptr<ComplexBody>& rootBody) 
 {
 	rootBody->isDynamic			= false;
 
@@ -189,41 +227,9 @@ void FEMBeam::positionRootBody(shared_ptr<ComplexBody>& rootBody)
 	rootBody->boundingVolume		= dynamic_pointer_cast<BoundingVolume>(aabb);
 	rootBody->geometricalModel 		= gm;
 	rootBody->physicalParameters 		= physics;
+	
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
- 
-void FEMBeam::imposeTranslation(shared_ptr<ComplexBody>& rootBody, Vector3r min, Vector3r max, Vector3r direction, Real velocity)
-{
-	shared_ptr<TranslationCondition> translationCondition = shared_ptr<TranslationCondition>(new TranslationCondition);
- 	translationCondition->velocity  = velocity;
-	direction.normalize();
- 	translationCondition->translationAxis = direction;
-	
-	rootBody->actors.push_back(translationCondition);
-	translationCondition->subscribedBodies.clear();
-	
-	for(rootBody->bodies->gotoFirst() ; rootBody->bodies->notAtEnd() ; rootBody->bodies->gotoNext() )
-	{
-		if( rootBody->bodies->getCurrent()->getGroupMask() & nodeGroupMask )
-		{
-			Vector3r pos = rootBody->bodies->getCurrent()->physicalParameters->se3.position;
-			if(        pos[0] > min[0] 
-				&& pos[1] > min[1] 
-				&& pos[2] > min[2] 
-				&& pos[0] < max[0] 
-				&& pos[1] < max[1] 
-				&& pos[2] < max[2] )
-			{
-				rootBody->bodies->getCurrent()->isDynamic = false;
-				rootBody->bodies->getCurrent()->geometricalModel->diffuseColor = Vector3r(1,0,0);
-				translationCondition->subscribedBodies.push_back(rootBody->bodies->getCurrent()->getId());
-			}
-		}
-	}
-}
-
-/////////////////////////////////////////////////////////////////////////////////////////////////// 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
  
