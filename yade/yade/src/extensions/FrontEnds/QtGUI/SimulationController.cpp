@@ -55,10 +55,19 @@ using namespace boost;
 SimulationController::SimulationController(QWidget * parent) : QtGeneratedSimulationController(parent,"SimulationController")
 {
 	setMinimumSize(size());
-	setMaximumSize(size());
+	//setMaximumSize(size());
 
 	parentWorkspace = parent;
 	
+	scrollViewFrame = new QFrame();	
+
+	scrollView = new QScrollView( gbRenderingEngineParameters, "scrollView" );
+	scrollView->setVScrollBarMode(QScrollView::Auto);
+	scrollView->setHScrollBarMode(QScrollView::Auto);
+	gbRenderingEngineParametersLayout->addWidget( scrollView );
+	scrollView->show();	
+
+		
 //	while(! renderer )
 // FIXME - what is going on here? it was crashing rabdomly unless I added these lines...
 	shared_ptr<Factorable> tmpRenderer = ClassFactory::instance().createShared("OpenGLRenderingEngine");
@@ -67,11 +76,14 @@ SimulationController::SimulationController(QWidget * parent) : QtGeneratedSimula
 	
 	if(renderer)
 	{
-		guiGen.setResizeHeight(false);
-		guiGen.setResizeWidth(false);
+		guiGen.setResizeHeight(true);
+		guiGen.setResizeWidth(true);
 		guiGen.setShift(10,30);
 		guiGen.setShowButtons(false);
-		guiGen.buildGUI(renderer, gbRenderingEngineParameters);
+		QSize s = scrollView->size();
+		scrollViewFrame->resize(s.width(),s.height());
+		guiGen.buildGUI(renderer, scrollViewFrame);
+		scrollView->addChild(scrollViewFrame);
 	}
 	else
 	{
@@ -82,6 +94,7 @@ SimulationController::SimulationController(QWidget * parent) : QtGeneratedSimula
 	addNewView();
 
 	updater = shared_ptr<SimulationControllerUpdater>(new SimulationControllerUpdater(this));
+	
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

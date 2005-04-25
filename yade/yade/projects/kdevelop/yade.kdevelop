@@ -99,7 +99,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>toolboxes/Libraries/Factory</activedir>
+      <activedir>extensions/FrontEnds/QtGUI</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>

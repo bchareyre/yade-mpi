@@ -42,8 +42,9 @@
 
 QtFileGenerator::QtFileGenerator ( QWidget * parent , const char * name) : QtFileGeneratorController(parent,name)
 {
-	setMinimumSize(size());
-	setMaximumSize(size());	
+	QSize s = size();
+	setMinimumSize(s);
+	setMaximumSize(QSize(s.width(),32000));	
 	
 	map<string,string>::const_iterator di    = Omega::instance().getDynlibsType().begin();
 	map<string,string>::const_iterator diEnd = Omega::instance().getDynlibsType().end();
@@ -56,7 +57,18 @@ QtFileGenerator::QtFileGenerator ( QWidget * parent , const char * name) : QtFil
 	}
 	leOutputFileName->setText("../data/scene.xml");
 
+	scrollViewFrame = new QFrame();	
+	
+	scrollViewLayout = new QVBoxLayout( gbGeneratorParameters, 20, 10, "scrollViewLayout"); 
+	
+	scrollView = new QScrollView( gbGeneratorParameters, "scrollView" );
+	scrollView->setVScrollBarMode(QScrollView::AlwaysOn);
+	scrollView->setHScrollBarMode(QScrollView::AlwaysOff);
+	scrollViewLayout->addWidget( scrollView );
+	scrollView->show();	
+
 	cbGeneratorNameActivated(cbGeneratorName->currentText());
+	cbGeneratorNameActivated(cbGeneratorName->currentText()); // FIXME : I need to call this function 2 times to have good display of scrollView
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -84,6 +96,7 @@ void QtFileGenerator::pbChooseClicked()
 
 void QtFileGenerator::cbGeneratorNameActivated(const QString& s)
 {
+
 	try
 	{
 		//FIXME dynamic_cast is not working ???
@@ -94,26 +107,27 @@ void QtFileGenerator::cbGeneratorNameActivated(const QString& s)
 		guiGen.setShift(10,30);
 		guiGen.setShowButtons(false);
 		
-		QSize s = gbGeneratorParameter->size();
-		QPoint p = gbGeneratorParameter->pos();
-		delete gbGeneratorParameter;
-		gbGeneratorParameter = new QGroupBox(this);
-		gbGeneratorParameter->resize(s.width(),s.height());
-		gbGeneratorParameter->move(p.x(),p.y()); 
-		gbGeneratorParameter->setTitle(fg->getClassName()+" Parameters"); 
+		QSize s = scrollView->size();
+		QPoint p = scrollView->pos();	
+
+		delete scrollViewFrame;
+		scrollViewFrame = new QFrame();
+		scrollViewFrame->resize(s.width()-17,s.height());
 		
-		guiGen.buildGUI(fg,gbGeneratorParameter);
+		gbGeneratorParameters->setTitle(fg->getClassName()+" Parameters");
 		
-		gbGeneratorParameter->show();
-		s = gbGeneratorParameter->size();
-		p = gbGeneratorParameter->pos();
-		setMinimumSize(size().width(),s.height()+p.y()+50);
-		setMaximumSize(size().width(),s.height()+p.y()+50);
-		resize(size().width(),s.height()+p.y()+50);
-		pbGenerate->move(pbGenerate->pos().x(),s.height()+p.y()+10);
-		pbClose->move(pbClose->pos().x(),s.height()+p.y()+10);
-		pbLoad->move(pbLoad->pos().x(),s.height()+p.y()+10);
-		pbSave->move(pbSave->pos().x(),s.height()+p.y()+10);
+		guiGen.buildGUI(fg,scrollViewFrame);
+			
+			
+		if (s.height()>scrollViewFrame->size().height())
+		{
+			scrollViewFrame->setMinimumSize(s.width()-17,s.height());
+			scrollViewFrame->setMaximumSize(s.width()-17,s.height());
+		}
+			
+		scrollView->addChild(scrollViewFrame);
+		scrollViewFrame->show();
+		
 	}
 	catch (FactoryError&)
 	{

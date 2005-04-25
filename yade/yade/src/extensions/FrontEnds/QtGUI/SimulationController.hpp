@@ -33,6 +33,10 @@
 #include "RenderingEngine.hpp"
 #include "SimulationControllerUpdater.hpp"
 
+#include <qlayout.h>
+#include <qframe.h>
+#include <qscrollview.h>
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -47,6 +51,10 @@ class SimulationController : public QtGeneratedSimulationController
 	private : int maxNbViews;
 		
 	private : shared_ptr<SimulationControllerUpdater> updater;
+	
+	private : QScrollView * scrollView;
+	private : QFrame * scrollViewFrame;
+
 	
 	// construction
 	public : SimulationController (QWidget * parent=0);
