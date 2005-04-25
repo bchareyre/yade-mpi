@@ -99,7 +99,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>extensions/FrontEnds/QtGUI</activedir>
+      <activedir>extensions</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>

@@ -8,7 +8,7 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>316</width>
+            <width>354</width>
             <height>599</height>
         </rect>
     </property>
@@ -411,6 +411,9 @@
                                 <property name="name">
                                     <cstring>rbFixed</cstring>
                                 </property>
+                                <property name="enabled">
+                                    <bool>false</bool>
+                                </property>
                                 <property name="text">
                                     <string>Fixed</string>
                                 </property>
@@ -419,15 +422,24 @@
                                 <property name="name">
                                     <cstring>spinBox1_2</cstring>
                                 </property>
+                                <property name="enabled">
+                                    <bool>false</bool>
+                                </property>
                             </widget>
                             <widget class="QSpinBox" row="2" column="1">
                                 <property name="name">
                                     <cstring>spinBox1</cstring>
                                 </property>
+                                <property name="enabled">
+                                    <bool>false</bool>
+                                </property>
                             </widget>
                             <widget class="QLabel" row="2" column="2">
                                 <property name="name">
                                     <cstring>tl10Power</cstring>
+                                </property>
+                                <property name="enabled">
+                                    <bool>false</bool>
                                 </property>
                                 <property name="text">
                                     <string>x10</string>
@@ -440,6 +452,9 @@
                                 <property name="name">
                                     <cstring>rbRealTime</cstring>
                                 </property>
+                                <property name="enabled">
+                                    <bool>false</bool>
+                                </property>
                                 <property name="text">
                                     <string>Real Time</string>
                                 </property>
@@ -447,6 +462,9 @@
                             <widget class="QRadioButton" row="0" column="0">
                                 <property name="name">
                                     <cstring>rbTimeStepper</cstring>
+                                </property>
+                                <property name="enabled">
+                                    <bool>false</bool>
                                 </property>
                                 <property name="text">
                                     <string>Time Stepper</string>
@@ -477,6 +495,9 @@
                                 <property name="name">
                                     <cstring>rbUnlimited</cstring>
                                 </property>
+                                <property name="enabled">
+                                    <bool>false</bool>
+                                </property>
                                 <property name="text">
                                     <string>Unlimited</string>
                                 </property>
@@ -484,6 +505,9 @@
                             <widget class="QRadioButton" row="1" column="0">
                                 <property name="name">
                                     <cstring>rbFixedIteration</cstring>
+                                </property>
+                                <property name="enabled">
+                                    <bool>false</bool>
                                 </property>
                                 <property name="text">
                                     <string>Fixed Iterations</string>
@@ -493,6 +517,9 @@
                                 <property name="name">
                                     <cstring>rbFixedTime</cstring>
                                 </property>
+                                <property name="enabled">
+                                    <bool>false</bool>
+                                </property>
                                 <property name="text">
                                     <string>Fixed Time</string>
                                 </property>
@@ -500,6 +527,9 @@
                             <widget class="QSpinBox" row="1" column="1" rowspan="1" colspan="3">
                                 <property name="name">
                                     <cstring>sbFixedIteration</cstring>
+                                </property>
+                                <property name="enabled">
+                                    <bool>false</bool>
                                 </property>
                                 <property name="maxValue">
                                     <number>1000000000</number>
@@ -512,10 +542,16 @@
                                 <property name="name">
                                     <cstring>spinBox1_3</cstring>
                                 </property>
+                                <property name="enabled">
+                                    <bool>false</bool>
+                                </property>
                             </widget>
                             <widget class="QLabel" row="2" column="2">
                                 <property name="name">
                                     <cstring>tl10Power_2</cstring>
+                                </property>
+                                <property name="enabled">
+                                    <bool>false</bool>
                                 </property>
                                 <property name="text">
                                     <string>x10</string>
@@ -527,6 +563,9 @@
                             <widget class="QSpinBox" row="2" column="3">
                                 <property name="name">
                                     <cstring>spinBox1_2_2</cstring>
+                                </property>
+                                <property name="enabled">
+                                    <bool>false</bool>
                                 </property>
                             </widget>
                         </grid>
