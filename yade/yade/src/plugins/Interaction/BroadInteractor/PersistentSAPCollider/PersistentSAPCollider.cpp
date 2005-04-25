@@ -124,14 +124,17 @@ void PersistentSAPCollider::broadInteractionTest(Body* body)
 		b = bodies->getCurrent();
 		
 		offset = 3*i;
-		min = b->boundingVolume->min;
-		max = b->boundingVolume->max;
-		minimums[offset+0] = min[0];
-		minimums[offset+1] = min[1];
-		minimums[offset+2] = min[2];
-		maximums[offset+0] = max[0];
-		maximums[offset+1] = max[1];
-		maximums[offset+2] = max[2];
+		if(b->boundingVolume) // can't assume that everybody has BoundingVolume
+		{
+			min = b->boundingVolume->min;
+			max = b->boundingVolume->max;
+			minimums[offset+0] = min[0];
+			minimums[offset+1] = min[1];
+			minimums[offset+2] = min[2];
+			maximums[offset+0] = max[0];
+			maximums[offset+1] = max[1];
+			maximums[offset+2] = max[2];
+		}
 	}
 	
 	runtimeInteractions = ncb->runtimeInteractions;

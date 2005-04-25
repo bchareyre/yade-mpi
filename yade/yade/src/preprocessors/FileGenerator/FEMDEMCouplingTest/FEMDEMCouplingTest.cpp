@@ -28,19 +28,32 @@
 #include "BodyPhysicalParametersDispatcher.hpp"
 #include "GeometricalModelDispatcher.hpp"
 #include "ActionParameterDispatcher.hpp"
+#include "InteractionGeometryDispatcher.hpp"
+#include "InteractionPhysicsDispatcher.hpp"
 
 // actors
+#include "GravityCondition.hpp"
+#include "CundallNonViscousForceDampingFunctor.hpp"
+#include "CundallNonViscousMomentumDampingFunctor.hpp"
+// actors FEM
 #include "FEMLaw.hpp"
 #include "ActionParameterInitializer.hpp"
 #include "ActionParameterReset.hpp"
 #include "FEMSetTextLoaderFunctor.hpp"
-#include "GravityCondition.hpp"
+//actors DEM
+#include "SDECTimeStepper.hpp"
+#include "ElasticContactLaw.hpp"
+#include "PersistentSAPCollider.hpp"
 
 // data
 #include "AABB.hpp"
+// data FEM
 #include "FEMSetParameters.hpp"
 #include "InteractionDescriptionSet.hpp"
-
+// data DEM
+#include "BodyMacroParameters.hpp"
+#include "Box.hpp"
+#include "InteractionBox.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -51,7 +64,10 @@ FEMDEMCouplingTest::FEMDEMCouplingTest() : FileGenerator()
 	nodeGroupMask 		= 1;
 	tetrahedronGroupMask 	= 2;
 	demGroupMask 		= 4;
+	
 	gravity 		= Vector3r(0,-9.81,0);
+	groundSize 		= Vector3r(100,1,100);
+	groundPosition 		= Vector3r(0,-8,0);
 		
 	regionMin1 		= Vector3r(9,-20,-20);
 	regionMax1 		= Vector3r(10,20,20);
@@ -73,7 +89,7 @@ FEMDEMCouplingTest::FEMDEMCouplingTest() : FileGenerator()
 	support2 		= true;
 	timeStepUpdateInterval 	= 200;
 		
-	sphereYoungModulus 	=   10000000;
+	sphereYoungModulus 	= 10000000;
 	spherePoissonRatio 	= 0.2;
 	sphereFrictionDeg 	= 18.0;
 				
@@ -96,6 +112,8 @@ void FEMDEMCouplingTest::registerAttributes()
 {
 	REGISTER_ATTRIBUTE(femTxtFile);
 	REGISTER_ATTRIBUTE(gravity);
+	REGISTER_ATTRIBUTE(groundSize);
+	REGISTER_ATTRIBUTE(groundPosition);
 		
 	REGISTER_ATTRIBUTE(regionMin1);
 	REGISTER_ATTRIBUTE(regionMax1);
@@ -130,10 +148,12 @@ void FEMDEMCouplingTest::registerAttributes()
 
 string FEMDEMCouplingTest::generate()
 {
+	/*
 	rootBody = shared_ptr<ComplexBody>(new ComplexBody);
 	positionRootBody(rootBody);
 	createActors(rootBody);
-
+	insertGround(rootBody);
+	*/
 	return "Not ready yet.";
 }
 
@@ -144,7 +164,17 @@ void FEMDEMCouplingTest::createActors(shared_ptr<ComplexBody>& rootBody)
 {
 	shared_ptr<BoundingVolumeDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeDispatcher>(new BoundingVolumeDispatcher);
 	boundingVolumeDispatcher->add("InteractionDescriptionSet","AABB","InteractionDescriptionSet2AABBFunctor");
+	boundingVolumeDispatcher->add("InteractionSphere","AABB","Sphere2AABBFunctor");
+	boundingVolumeDispatcher->add("InteractionBox","AABB","Box2AABBFunctor");
+	boundingVolumeDispatcher->add("InteractionDescriptionSet","AABB","InteractionDescriptionSet2AABBFunctor");
 
+	shared_ptr<InteractionGeometryDispatcher> interactionGeometryDispatcher(new InteractionGeometryDispatcher);
+	interactionGeometryDispatcher->add("InteractionSphere","InteractionSphere","Sphere2Sphere4MacroMicroContactGeometry");
+	interactionGeometryDispatcher->add("InteractionSphere","InteractionBox","Box2Sphere4MacroMicroContactGeometry");
+
+	shared_ptr<InteractionPhysicsDispatcher> interactionPhysicsDispatcher(new InteractionPhysicsDispatcher);
+	interactionPhysicsDispatcher->add("BodyMacroParameters","BodyMacroParameters","MacroMicroElasticRelationships");
+		
 	shared_ptr<FEMSetTextLoaderFunctor> femSetTextLoaderFunctor	= shared_ptr<FEMSetTextLoaderFunctor>(new FEMSetTextLoaderFunctor);
 	femSetTextLoaderFunctor->fileName = femTxtFile;
 
@@ -156,29 +186,54 @@ void FEMDEMCouplingTest::createActors(shared_ptr<ComplexBody>& rootBody)
 	
 	shared_ptr<BodyPhysicalParametersDispatcher> positionIntegrator(new BodyPhysicalParametersDispatcher);
 	positionIntegrator->add("ParticleParameters","LeapFrogPositionIntegratorFunctor");
+	shared_ptr<BodyPhysicalParametersDispatcher> orientationIntegrator(new BodyPhysicalParametersDispatcher);
+	orientationIntegrator->add("RigidBodyParameters","LeapFrogOrientationIntegratorFunctor");
 	
 	shared_ptr<FEMLaw> femLaw(new FEMLaw);
 	femLaw->nodeGroupMask = nodeGroupMask;
 	femLaw->tetrahedronGroupMask = tetrahedronGroupMask;
 
+	shared_ptr<SDECTimeStepper> sdecTimeStepper(new SDECTimeStepper);
+	sdecTimeStepper->sdecGroupMask = demGroupMask;
+	sdecTimeStepper->interval = timeStepUpdateInterval;
+	
+	shared_ptr<ElasticContactLaw> demLaw(new ElasticContactLaw);
+	demLaw->sdecGroupMask = demGroupMask;
+	demLaw->momentRotationLaw = momentRotationLaw;
+	
+	shared_ptr<CundallNonViscousForceDampingFunctor> actionForceDamping(new CundallNonViscousForceDampingFunctor);
+	actionForceDamping->damping = dampingForce;
+	shared_ptr<CundallNonViscousMomentumDampingFunctor> actionMomentumDamping(new CundallNonViscousMomentumDampingFunctor);
+	actionMomentumDamping->damping = dampingMomentum;
+	shared_ptr<ActionParameterDispatcher> actionDampingDispatcher(new ActionParameterDispatcher);
+	actionDampingDispatcher->add("ActionParameterForce","ParticleParameters","CundallNonViscousForceDampingFunctor",actionForceDamping);
+	actionDampingDispatcher->add("ActionParameterMomentum","RigidBodyParameters","CundallNonViscousMomentumDampingFunctor",actionMomentumDamping);
+	
 	shared_ptr<GravityCondition> gravityCondition(new GravityCondition);
 	gravityCondition->gravity = gravity;
 	
 	shared_ptr<ActionParameterDispatcher> applyActionDispatcher(new ActionParameterDispatcher);
 	applyActionDispatcher->add("ActionParameterForce","ParticleParameters","NewtonsForceLawFunctor");
+	applyActionDispatcher->add("ActionParameterMomentum","RigidBodyParameters","NewtonsMomentumLawFunctor");
 	
 	shared_ptr<ActionParameterInitializer> actionParameterInitializer(new ActionParameterInitializer);
 	actionParameterInitializer->actionParameterNames.push_back("ActionParameterForce");
-	actionParameterInitializer->actionParameterNames.push_back("ActionParameterMomentum"); // FIXME - should be unnecessery, but BUG in ActionParameterVectorVector
+	actionParameterInitializer->actionParameterNames.push_back("ActionParameterMomentum");
 	
 	rootBody->actors.clear();
+	rootBody->actors.push_back(sdecTimeStepper);
 	rootBody->actors.push_back(shared_ptr<Actor>(new ActionParameterReset));
 	rootBody->actors.push_back(boundingVolumeDispatcher);
+	rootBody->actors.push_back(shared_ptr<Actor>(new PersistentSAPCollider));
 	rootBody->actors.push_back(geometricalModelDispatcher);
+	rootBody->actors.push_back(interactionGeometryDispatcher);
+	rootBody->actors.push_back(interactionPhysicsDispatcher);
 	rootBody->actors.push_back(femLaw);
 	rootBody->actors.push_back(gravityCondition);
+	rootBody->actors.push_back(actionDampingDispatcher);
 	rootBody->actors.push_back(applyActionDispatcher);
 	rootBody->actors.push_back(positionIntegrator);
+	rootBody->actors.push_back(orientationIntegrator);
 	
 	rootBody->initializers.clear();
 	rootBody->initializers.push_back(bodyPhysicalParametersDispatcher);
@@ -233,3 +288,67 @@ void FEMDEMCouplingTest::positionRootBody(shared_ptr<ComplexBody>& rootBody)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
  
+void FEMDEMCouplingTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents)
+{
+	body = shared_ptr<Body>(new SimpleBody(0,demGroupMask));
+	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
+	shared_ptr<AABB> aabb(new AABB);
+	shared_ptr<Box> gBox(new Box);
+	shared_ptr<InteractionBox> iBox(new InteractionBox);
+	
+	Quaternionr q;
+	q.fromAxisAngle( Vector3r(0,0,1),0);
+
+	body->isDynamic			= false;
+	
+	physics->angularVelocity	= Vector3r(0,0,0);
+	physics->velocity		= Vector3r(0,0,0);
+	physics->mass			= extents[0]*extents[1]*extents[2]*density*2; 
+	physics->inertia		= Vector3r(
+							  physics->mass*(extents[1]*extents[1]+extents[2]*extents[2])/3
+							, physics->mass*(extents[0]*extents[0]+extents[2]*extents[2])/3
+							, physics->mass*(extents[1]*extents[1]+extents[0]*extents[0])/3
+						);
+	physics->se3			= Se3r(position,q);
+	physics->young			= sphereYoungModulus;
+	physics->poisson		= spherePoissonRatio;
+	physics->frictionAngle		= sphereFrictionDeg * Mathr::PI/180.0;
+
+	aabb->diffuseColor		= Vector3r(1,0,0);
+
+	gBox->extents			= extents;
+	gBox->diffuseColor		= Vector3f(1,1,1);
+	gBox->wire			= false;
+	gBox->visible			= true;
+	gBox->shadowCaster		= true;
+	
+	iBox->extents			= extents;
+	iBox->diffuseColor		= Vector3f(1,1,1);
+
+	body->boundingVolume		= aabb;
+	body->interactionGeometry	= iBox;
+	body->geometricalModel		= gBox;
+	body->physicalParameters	= physics;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+ 
+void FEMDEMCouplingTest::insertGround(shared_ptr<ComplexBody>& rootBody) 
+{
+	shared_ptr<Body> ground;
+//	shared_ptr<Body> supportBox1;
+//	shared_ptr<Body> supportBox2;
+	
+	createBox(ground, groundPosition , groundSize );
+//	createBox(supportBox1, Vector3r(0,0,((Real)(nbSpheres[2])/2.0-supportSize+1.5)*spacing), Vector3r(20,50,20));
+//	createBox(supportBox2, Vector3r(0,0,-((Real)(nbSpheres[2])/2.0-supportSize+2.5)*spacing), Vector3r(20,50,20));
+			
+	rootBody->bodies->insert(ground);
+//	if (support1)
+///		rootBody->bodies->insert(supportBox1);
+//	if (support2)
+//		rootBody->bodies->insert(supportBox2);
+		
+}
+	

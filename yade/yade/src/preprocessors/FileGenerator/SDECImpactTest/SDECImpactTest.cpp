@@ -77,9 +77,11 @@ SDECImpactTest::SDECImpactTest () : FileGenerator()
 	velocityRecordFile 	= "../data/velocities";
 	rotationBlocked = true;
 	
-	boxWalls 		= false;
+//	boxWalls 		= false;
+	boxWalls 		= true;
 
-	bigBall 		= true;
+//	bigBall 		= true;
+	bigBall 		= false;
 	bigBallRadius		= 0.075;
 	bigBallPoissonRatio 	= 0.3;
 	bigBallYoungModulus 	= 40000000000.0;

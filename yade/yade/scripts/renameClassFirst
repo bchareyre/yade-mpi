@@ -1,7 +1,7 @@
 #! /bin/sh
 
 echo ""
-echo "You have decided to rename class $1 to a new name $2, very good."
+echo "You have decided to rename class: $1 to a new name: $2, very good."
 echo "But first make sure that : "
 echo " - you have exectued script ./prepareForSubversion"
 echo " - svn status in main yade/ directory displays NO CHANGES at all, well, actually changes"
