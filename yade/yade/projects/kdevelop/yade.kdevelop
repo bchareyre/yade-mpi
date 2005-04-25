@@ -99,7 +99,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>preprocessors/FileGenerator/FEMDEMCouplingTest</activedir>
+      <activedir>toolboxes/Libraries/Factory</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>
