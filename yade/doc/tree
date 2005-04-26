@@ -1,0 +1,519 @@
+
+|-- plugins
+|   |-- Body
+|   |   |-- BoundingVolume
+|   |   |   |-- AABB
+|   |   |   |   |-- AABB.cpp
+|   |   |   |   `-- AABB.hpp
+|   |   |   `-- BoundingSphere
+|   |   |       |-- BoundingSphere.cpp
+|   |   |       `-- BoundingSphere.hpp
+|   |   |-- BoundingVolumeFunctor
+|   |   |   |-- Box2AABBFunctor
+|   |   |   |   |-- Box2AABBFunctor.cpp
+|   |   |   |   `-- Box2AABBFunctor.hpp
+|   |   |   |-- InteractionDescriptionSet2AABBFunctor
+|   |   |   |   |-- InteractionDescriptionSet2AABBFunctor.cpp
+|   |   |   |   `-- InteractionDescriptionSet2AABBFunctor.hpp
+|   |   |   |-- Sphere2AABBFunctor
+|   |   |   |   |-- Sphere2AABBFunctor.cpp
+|   |   |   |   `-- Sphere2AABBFunctor.hpp
+|   |   |   `-- Terrain2AABBFunctor
+|   |   |       |-- Terrain2AABBFunctor.cpp
+|   |   |       `-- Terrain2AABBFunctor.hpp
+|   |   |-- GeometricalModel
+|   |   |   |-- Box
+|   |   |   |   |-- Box.cpp
+|   |   |   |   `-- Box.hpp
+|   |   |   |-- FEMSetGeometry
+|   |   |   |   |-- FEMSetGeometry.cpp
+|   |   |   |   `-- FEMSetGeometry.hpp
+|   |   |   |-- LatticeSetGeometry
+|   |   |   |   |-- LatticeSetGeometry.cpp
+|   |   |   |   `-- LatticeSetGeometry.hpp
+|   |   |   |-- LineSegment
+|   |   |   |   |-- LineSegment.cpp
+|   |   |   |   `-- LineSegment.hpp
+|   |   |   |-- MarchingCubes
+|   |   |   |   |-- MarchingCubes.cpp
+|   |   |   |   `-- MarchingCubes.hpp
+|   |   |   |-- Mesh2D
+|   |   |   |   |-- Mesh2D.cpp
+|   |   |   |   `-- Mesh2D.hpp
+|   |   |   |-- Polyhedron
+|   |   |   |   |-- Polyhedron.cpp
+|   |   |   |   `-- Polyhedron.hpp
+|   |   |   |-- Sphere
+|   |   |   |   |-- Sphere.cpp
+|   |   |   |   `-- Sphere.hpp
+|   |   |   |-- Terrain
+|   |   |   |   |-- Terrain.cpp
+|   |   |   |   `-- Terrain.hpp
+|   |   |   `-- Tetrahedron
+|   |   |       |-- Tetrahedron.cpp
+|   |   |       `-- Tetrahedron.hpp
+|   |   |-- GeometricalModelFunctor
+|   |   |   |-- FEMSet2MarchingCubes
+|   |   |   |   |-- FEMSet2MarchingCubes.cpp
+|   |   |   |   `-- FEMSet2MarchingCubes.hpp
+|   |   |   |-- FEMSet2Tetrahedrons
+|   |   |   |   |-- FEMSet2Tetrahedrons.cpp
+|   |   |   |   `-- FEMSet2Tetrahedrons.hpp
+|   |   |   |-- LatticeSet2LatticeBeams
+|   |   |   |   |-- LatticeSet2LatticeBeams.cpp
+|   |   |   |   `-- LatticeSet2LatticeBeams.hpp
+|   |   |   |-- LatticeSet2MarchingCubes
+|   |   |   |   |-- LatticeSet2MarchingCubes.cpp
+|   |   |   |   `-- LatticeSet2MarchingCubes.hpp
+|   |   |   |-- ParticleSet2Mesh2D
+|   |   |   |   |-- ParticleSet2Mesh2D.cpp
+|   |   |   |   `-- ParticleSet2Mesh2D.hpp
+|   |   |   `-- VRML2TerrainFunctor
+|   |   |       |-- VRML2TerrainFunctor.cpp
+|   |   |       `-- VRML2TerrainFunctor.hpp
+|   |   |-- InteractingGeometry
+|   |   |   |-- InteractingBox
+|   |   |   |   |-- InteractingBox.cpp
+|   |   |   |   `-- InteractingBox.hpp
+|   |   |   |-- InteractingSphere
+|   |   |   |   |-- InteractingSphere.cpp
+|   |   |   |   `-- InteractingSphere.hpp
+|   |   |   `-- MetaInteractingGeometry
+|   |   |       |-- MetaInteractingGeometry.cpp
+|   |   |       `-- MetaInteractingGeometry.hpp
+|   |   |-- InteractingGeometryFunctor
+|   |   |-- PhysicalParameters
+|   |   |   |-- BodyMacroParameters
+|   |   |   |   |-- BodyMacroParameters.cpp
+|   |   |   |   `-- BodyMacroParameters.hpp
+|   |   |   |-- FEMNodeData
+|   |   |   |   |-- FEMNodeData.cpp
+|   |   |   |   `-- FEMNodeData.hpp
+|   |   |   |-- FEMSetParameters
+|   |   |   |   |-- FEMSetParameters.cpp
+|   |   |   |   `-- FEMSetParameters.hpp
+|   |   |   |-- FEMTetrahedronData
+|   |   |   |   |-- FEMTetrahedronData.cpp
+|   |   |   |   `-- FEMTetrahedronData.hpp
+|   |   |   |-- LatticeBeamParameters
+|   |   |   |   |-- LatticeBeamParameters.cpp
+|   |   |   |   `-- LatticeBeamParameters.hpp
+|   |   |   |-- LatticeNodeParameters
+|   |   |   |   |-- LatticeNodeParameters.cpp
+|   |   |   |   `-- LatticeNodeParameters.hpp
+|   |   |   |-- LatticeSetParameters
+|   |   |   |   |-- LatticeSetParameters.cpp
+|   |   |   |   `-- LatticeSetParameters.hpp
+|   |   |   |-- ParticleParameters
+|   |   |   |   |-- ParticleParameters.cpp
+|   |   |   |   `-- ParticleParameters.hpp
+|   |   |   |-- ParticleSetParameters
+|   |   |   |   |-- ParticleSetParameters.cpp
+|   |   |   |   `-- ParticleSetParameters.hpp
+|   |   |   `-- RigidBodyParameters
+|   |   |       |-- RigidBodyParameters.cpp
+|   |   |       `-- RigidBodyParameters.hpp
+|   |   `-- PhysicalParametersFunctor
+|   |       |-- FEMSetTextLoaderFunctor
+|   |       |   |-- FEMSetTextLoaderFunctor.cpp
+|   |       |   `-- FEMSetTextLoaderFunctor.hpp
+|   |       |-- FEMTetrahedronStiffness
+|   |       |   |-- FEMTetrahedronStiffness.cpp
+|   |       |   `-- FEMTetrahedronStiffness.hpp
+|   |       |-- LeapFrogOrientationIntegratorFunctor
+|   |       |   |-- LeapFrogOrientationIntegratorFunctor.cpp
+|   |       |   `-- LeapFrogOrientationIntegratorFunctor.hpp
+|   |       `-- LeapFrogPositionIntegratorFunctor
+|   |           |-- LeapFrogPositionIntegratorFunctor.cpp
+|   |           `-- LeapFrogPositionIntegratorFunctor.hpp
+|   |-- DataRecorder
+|   |   |-- AveragePositionRecorder
+|   |   |   |-- AveragePositionRecorder.cpp
+|   |   |   `-- AveragePositionRecorder.hpp
+|   |   |-- ForceRecorder
+|   |   |   |-- ForceRecorder.cpp
+|   |   |   `-- ForceRecorder.hpp
+|   |   |-- PositionOrientationRecorder
+|   |   |   |-- PositionOrientationRecorder.cpp
+|   |   |   `-- PositionOrientationRecorder.hpp
+|   |   `-- VelocityRecorder
+|   |       |-- VelocityRecorder.cpp
+|   |       `-- VelocityRecorder.hpp
+|   |-- Engine
+|   |   |-- ActionParameter
+|   |   |   |-- ActionParameterForce
+|   |   |   |   |-- ActionParameterForce.cpp
+|   |   |   |   `-- ActionParameterForce.hpp
+|   |   |   `-- ActionParameterMomentum
+|   |   |       |-- ActionParameterMomentum.cpp
+|   |   |       `-- ActionParameterMomentum.hpp
+|   |   |-- ActionParameterFunctor
+|   |   |   |-- CundallNonViscousForceDampingFunctor
+|   |   |   |   |-- CundallNonViscousForceDampingFunctor.cpp
+|   |   |   |   `-- CundallNonViscousForceDampingFunctor.hpp
+|   |   |   |-- CundallNonViscousMomentumDampingFunctor
+|   |   |   |   |-- CundallNonViscousMomentumDampingFunctor.cpp
+|   |   |   |   `-- CundallNonViscousMomentumDampingFunctor.hpp
+|   |   |   |-- NewtonsForceLawFunctor
+|   |   |   |   |-- NewtonsForceLawFunctor.cpp
+|   |   |   |   `-- NewtonsForceLawFunctor.hpp
+|   |   |   `-- NewtonsMomentumLawFunctor
+|   |   |       |-- NewtonsMomentumLawFunctor.cpp
+|   |   |       `-- NewtonsMomentumLawFunctor.hpp
+|   |   |-- ActionParameterInitializer
+|   |   |   |-- ActionParameterInitializer.cpp
+|   |   |   `-- ActionParameterInitializer.hpp
+|   |   |-- DeusExMachina
+|   |   |   |-- ForceCondition					ForceApplier
+|   |   |   |   |-- ForceCondition.cpp
+|   |   |   |   `-- ForceCondition.hpp
+|   |   |   |-- GravityCondition				GravityApplier
+|   |   |   |   |-- GravityCondition.cpp
+|   |   |   |   `-- GravityCondition.hpp
+|   |   |   |-- RotationCondition				Rotor
+|   |   |   |   |-- RotationCondition.cpp
+|   |   |   |   `-- RotationCondition.hpp
+|   |   |   `-- TranslationCondition				Translator
+|   |   |       |-- TranslationCondition.cpp
+|   |   |       `-- TranslationCondition.hpp
+|   |   |   -- ActionParameterReset				ter
+|   |   |      |-- ActionParameterReset.cpp
+|   |   |      `-- ActionParameterReset.hpp
+|   |   `-- InteractionSolver
+|   |       |-- ElasticContactLaw
+|   |       |   |-- ElasticContactLaw.cpp
+|   |       |   `-- ElasticContactLaw.hpp
+|   |       |-- ErrorTolerantLaw
+|   |       |   |-- ErrorTolerantLaw.cpp
+|   |       |   `-- ErrorTolerantLaw.hpp
+|   |       |-- FEMLaw
+|   |       |   |-- FEMLaw.cpp
+|   |       |   `-- FEMLaw.hpp
+|   |       |-- MassSpringBody2RigidBodyLaw
+|   |       |   |-- MassSpringBody2RigidBodyLaw.cpp
+|   |       |   `-- MassSpringBody2RigidBodyLaw.hpp
+|   |       |-- MassSpringLaw
+|   |       |   |-- MassSpringLaw.cpp
+|   |       |   `-- MassSpringLaw.hpp
+|   |       |-- SDECTimeStepper
+|   |       |   |-- SDECTimeStepper.cpp
+|   |       |   `-- SDECTimeStepper.hpp
+|   |       `-- SimpleSpringLaw
+|   |           |-- SimpleSpringLaw.cpp
+|   |           `-- SimpleSpringLaw.hpp
+|   `-- Interaction
+|       |-- BroadInteractor
+|       |   |-- PersistentSAPCollider
+|       |   |   |-- PersistentSAPCollider.cpp
+|       |   |   `-- PersistentSAPCollider.hpp
+|       |   |-- SAPCollider
+|       |   |   |-- SAPCollider.cpp
+|       |   |   `-- SAPCollider.hpp
+|       |   `-- SimpleBroadInteractor
+|       |       |-- SimpleBroadInteractor.cpp
+|       |       `-- SimpleBroadInteractor.hpp
+|       |-- InteractionGeometry
+|       |   |-- ClosestFeatures
+|       |   |   |-- ClosestFeatures.cpp
+|       |   |   `-- ClosestFeatures.hpp
+|       |   |-- ErrorTolerantContactModel
+|       |   |   |-- ErrorTolerantContactModel.cpp
+|       |   |   `-- ErrorTolerantContactModel.hpp
+|       |   |-- MacroMicroContactGeometry
+|       |   |   |-- MacroMicroContactGeometry.cpp
+|       |   |   `-- MacroMicroContactGeometry.hpp
+|       |   |-- SDECLinkGeometry
+|       |   |   |-- SDECLinkGeometry.cpp
+|       |   |   `-- SDECLinkGeometry.hpp
+|       |   `-- SpringGeometry
+|       |       |-- SpringGeometry.cpp
+|       |       `-- SpringGeometry.hpp
+|       |-- InteractionGeometryFunctor
+|       |   |-- ClosestFeatures
+|       |   |   |-- AABox2Sphere4ClosestFeatures
+|       |   |   |   |-- AABox2Sphere4ClosestFeatures.cpp
+|       |   |   |   `-- AABox2Sphere4ClosestFeatures.hpp
+|       |   |   |-- Box2Box4ClosestFeatures
+|       |   |   |   |-- Box2Box4ClosestFeatures.cpp
+|       |   |   |   `-- Box2Box4ClosestFeatures.hpp
+|       |   |   |-- Box2Sphere4ClosestFeatures
+|       |   |   |   |-- Box2Sphere4ClosestFeatures.cpp
+|       |   |   |   `-- Box2Sphere4ClosestFeatures.hpp
+|       |   |   |-- Sphere2Mesh2D4ClosestFeatures
+|       |   |   |   |-- Sphere2Mesh2D4ClosestFeatures.cpp
+|       |   |   |   `-- Sphere2Mesh2D4ClosestFeatures.hpp
+|       |   |   |-- Sphere2Sphere4ClosestFeatures
+|       |   |   |   |-- Sphere2Sphere4ClosestFeatures.cpp
+|       |   |   |   `-- Sphere2Sphere4ClosestFeatures.hpp
+|       |   |   `-- Terrain2Sphere4ClosestFeatures
+|       |   |       |-- Terrain2Sphere4ClosestFeatures.cpp
+|       |   |       `-- Terrain2Sphere4ClosestFeatures.hpp
+|       |   |-- ErrorTolerant
+|       |   |   |-- Box2Sphere4ErrorTolerant
+|       |   |   |   |-- Box2Sphere4ErrorTolerant.cpp
+|       |   |   |   `-- Box2Sphere4ErrorTolerant.hpp
+|       |   |   `-- Sphere2Sphere4ErrorTolerant
+|       |   |       |-- Sphere2Sphere4ErrorTolerant.cpp
+|       |   |       `-- Sphere2Sphere4ErrorTolerant.hpp
+|       |   `-- MacroMicroContactGeometry
+|       |       |-- Box2Sphere4MacroMicroContactGeometry
+|       |       |   |-- Box2Sphere4MacroMicroContactGeometry.cpp
+|       |       |   `-- Box2Sphere4MacroMicroContactGeometry.hpp
+|       |       `-- Sphere2Sphere4MacroMicroContactGeometry
+|       |           |-- Sphere2Sphere4MacroMicroContactGeometry.cpp
+|       |           `-- Sphere2Sphere4MacroMicroContactGeometry.hpp
+|       |-- InteractionPhysics
+|       |   |-- ElasticContactParameters
+|       |   |   |-- ElasticContactParameters.cpp
+|       |   |   `-- ElasticContactParameters.hpp
+|       |   |-- SDECLinkPhysics
+|       |   |   |-- SDECLinkPhysics.cpp
+|       |   |   `-- SDECLinkPhysics.hpp
+|       |   `-- SpringPhysics
+|       |       |-- SpringPhysics.cpp
+|       |       `-- SpringPhysics.hpp
+|       `-- InteractionPhysicsFunctor
+|           `-- ElasticContactParameters
+|               `-- MacroMicroElasticRelationships
+|                   |-- MacroMicroElasticRelationships.cpp
+|                   `-- MacroMicroElasticRelationships.hpp
+|-- postprocessors
+|-- preprocessors
+|   `-- FileGenerator
+|       |-- BoxStack
+|       |   |-- BoxStack.cpp
+|       |   `-- BoxStack.hpp
+|       |-- FEMBeam
+|       |   |-- FEMBeam.cpp
+|       |   `-- FEMBeam.hpp
+|       |-- FEMDEMCouplingTest
+|       |   |-- FEMDEMCouplingTest.cpp
+|       |   `-- FEMDEMCouplingTest.hpp
+|       |-- HangingCloth
+|       |   |-- HangingCloth.cpp
+|       |   `-- HangingCloth.hpp
+|       |-- LatticeExample
+|       |   |-- LatticeExample.cpp
+|       |   `-- LatticeExample.hpp
+|       |-- RotatingBox
+|       |   |-- RotatingBox.cpp
+|       |   `-- RotatingBox.hpp
+|       |-- SDECImpactTest
+|       |   |-- SDECImpactTest.cpp
+|       |   `-- SDECImpactTest.hpp
+|       |-- SDECLinkedSpheres
+|       |   |-- SDECLinkedSpheres.cpp
+|       |   `-- SDECLinkedSpheres.hpp
+|       |-- SDECSpheresPlane
+|       |   |-- SDECSpheresPlane.cpp
+|       |   `-- SDECSpheresPlane.hpp
+|       `-- SDECTriaxialTest
+|           |-- SDECTriaxialTest.cpp
+|           `-- SDECTriaxialTest.hpp
+|-- toolboxes
+|   |-- ComputationalGeometry
+|   |   |-- Distances
+|   |   |   |-- Distances3D.cpp
+|   |   |   `-- Distances3D.hpp
+|   |   `-- Intersections
+|   |       |-- Intersections2D.cpp
+|   |       |-- Intersections2D.hpp
+|   |       |-- Intersections3D.cpp
+|   |       `-- Intersections3D.hpp
+|   |-- DataStructures
+|   |   |-- ActionParameterContainer
+|   |   |   `-- ActionParameterVectorVector
+|   |   |       |-- ActionParameterVectorVector.cpp
+|   |   |       `-- ActionParameterVectorVector.hpp
+|   |   |-- BodyContainer
+|   |   |   |-- BodyAssocVector
+|   |   |   |   |-- BodyAssocVec.cpp
+|   |   |   |   |-- BodyAssocVec.hpp
+|   |   |   |   |-- BodyAssocVector.cpp
+|   |   |   |   `-- BodyAssocVector.hpp
+|   |   |   `-- BodyRedirectionVector
+|   |   |       |-- BodyRedirectionVector.cpp
+|   |   |       `-- BodyRedirectionVector.hpp
+|   |   `-- InteractionContainer
+|   |       |-- InteractionHashMap
+|   |       |   |-- InteractionHashMap.cpp
+|   |       |   `-- InteractionHashMap.hpp
+|   |       `-- InteractionVecSet
+|   |           |-- InteractionVecSet.cpp
+|   |           `-- InteractionVecSet.hpp
+|   |-- Libraries
+|   |   |-- Factory
+|   |   |   |-- ClassFactory.cpp
+|   |   |   |-- ClassFactory.hpp
+|   |   |   |-- DynLibManager.cpp
+|   |   |   |-- DynLibManager.hpp
+|   |   |   |-- Factorable.cpp
+|   |   |   |-- Factorable.hpp
+|   |   |   |-- FactoryExceptions.cpp
+|   |   |   `-- FactoryExceptions.hpp
+|   |   |-- Loki
+|   |   |   |-- AssocVector.hpp
+|   |   |   |-- EmptyType.hpp
+|   |   |   |-- Functor.hpp
+|   |   |   |-- NullType.hpp
+|   |   |   |-- Singleton.hpp
+|   |   |   |-- TypeManip.hpp
+|   |   |   |-- TypeTraits.hpp
+|   |   |   `-- Typelist.hpp
+|   |   |-- Math
+|   |   |   |-- Math.cpp
+|   |   |   |-- Math.hpp
+|   |   |   |-- Math.ipp
+|   |   |   |-- Matrix2.cpp
+|   |   |   |-- Matrix2.hpp
+|   |   |   |-- Matrix2.ipp
+|   |   |   |-- Matrix3.cpp
+|   |   |   |-- Matrix3.hpp
+|   |   |   |-- Matrix3.ipp
+|   |   |   |-- Matrix4.cpp
+|   |   |   |-- Matrix4.hpp
+|   |   |   |-- Matrix4.ipp
+|   |   |   |-- Quaternion.cpp
+|   |   |   |-- Quaternion.hpp
+|   |   |   |-- Quaternion.ipp
+|   |   |   |-- Se3.cpp
+|   |   |   |-- Se3.hpp
+|   |   |   |-- Se3.ipp
+|   |   |   |-- Vector2.cpp
+|   |   |   |-- Vector2.hpp
+|   |   |   |-- Vector2.ipp
+|   |   |   |-- Vector3.cpp
+|   |   |   |-- Vector3.hpp
+|   |   |   |-- Vector3.ipp
+|   |   |   |-- Vector4.cpp
+|   |   |   |-- Vector4.hpp
+|   |   |   `-- Vector4.ipp
+|   |   |-- MultiMethods
+|   |   |   |-- DynLibDispatcher.hpp
+|   |   |   |-- FunctorWrapper.hpp
+|   |   |   |-- Indexable.cpp
+|   |   |   |-- Indexable.hpp
+|   |   |   |-- MultiMethodsExceptions.cpp
+|   |   |   `-- MultiMethodsExceptions.hpp
+|   |   |-- Serialization
+|   |   |   |-- Archive.cpp
+|   |   |   |-- Archive.hpp
+|   |   |   |-- Archive.tpp
+|   |   |   |-- ArchiveTypes.hpp
+|   |   |   |-- ContainerHandler.tpp
+|   |   |   |-- FundamentalHandler.tpp
+|   |   |   |-- IOManager.cpp
+|   |   |   |-- IOManager.hpp
+|   |   |   |-- IOManager.tpp
+|   |   |   |-- IOManagerExceptions.cpp
+|   |   |   |-- IOManagerExceptions.hpp
+|   |   |   |-- KnownFundamentalsHandler.tpp
+|   |   |   |-- MultiTypeHandler.tpp
+|   |   |   |-- PointerHandler.tpp
+|   |   |   |-- Serializable.cpp
+|   |   |   |-- Serializable.hpp
+|   |   |   |-- SerializableSingleton.cpp
+|   |   |   |-- SerializableSingleton.hpp
+|   |   |   |-- SerializableTypes.hpp
+|   |   |   |-- SerializationExceptions.cpp
+|   |   |   `-- SerializationExceptions.hpp
+|   |   `-- Threads
+|   |       |-- ThreadSafe.cpp
+|   |       |-- ThreadSafe.hpp
+|   |       |-- ThreadSynchronizer.cpp
+|   |       |-- ThreadSynchronizer.hpp
+|   |       |-- Threadable.hpp
+|   |       `-- Threadable.tpp
+|   `-- OpenGL
+|       |-- GLWindowManager
+|       |   |-- FpsTracker.cpp
+|       |   |-- FpsTracker.hpp
+|       |   |-- GLTextLabel.cpp
+|       |   |-- GLTextLabel.hpp
+|       |   |-- GLWindow.cpp
+|       |   |-- GLWindow.hpp
+|       |   |-- GLWindowsManager.cpp
+|       |   `-- GLWindowsManager.hpp
+|       `-- OpenGLWrapper
+|           `-- OpenGLWrapper.hpp
+|-- tree
+`-- yade
+    |-- Body
+    |   |-- Body
+    |   |   |-- Body.cpp
+    |   |   |-- Body.hpp
+    |   |   |-- BodyContainer.cpp
+    |   |   |-- BodyContainer.hpp
+    |   |   |-- MetaBody.cpp
+    |   |   `-- MetaBody.hpp
+    |   |-- BoundingVolume
+    |   |   |-- BoundingVolume.cpp
+    |   |   |-- BoundingVolume.hpp
+    |   |   |-- BoundingVolumeFunctor.hpp			BoundingVolumeEngine.hpp
+    |   |   |-- BoundingVolumeMetaEngine.cpp
+    |   |   `-- BoundingVolumeMetaEngine.hpp
+    |   |-- GeometricalModel
+    |   |   |-- GeometricalModel.cpp
+    |   |   |-- GeometricalModel.hpp
+    |   |   |-- GeometricalModelDispatcher.cpp			metaengine
+    |   |   |-- GeometricalModelDispatcher.hpp
+    |   |   `-- GeometricalModelFunctor.hpp			engine
+    |   |-- InteractingGeometry
+    |   |   |-- InteractingGeometry.cpp
+    |   |   |-- InteractingGeometry.hpp
+    |   |   |-- InteractingGeometryDispatcher.cpp
+    |   |   |-- InteractingGeometryDispatcher.hpp
+    |   |   `-- InteractingGeometryFunctor.hpp
+    |   `-- PhysicalParameters
+    |       |-- PhysicalParameters.cpp
+    |       |-- PhysicalParameters.hpp
+    |       |-- PhysicalParametersDispatcher.cpp
+    |       |-- PhysicalParametersDispatcher.hpp
+    |       `-- PhysicalParametersFunctor.hpp
+    |-- Engine
+    |   |-- ActionParameter.hpp					Modifier
+    |   |-- ActionParameterContainer.cpp
+    |   |-- ActionParameterContainer.hpp
+    |   |-- ActionParameterDispatcher.cpp			ModifierMetaEngine
+    |   |-- ActionParameterDispatcher.hpp
+    |   |-- ActionParameterFunctor.hpp				ModifierEngine
+    |   |-- DeusExMachina.cpp
+    |   |-- DeusExMachina.hpp
+    |   |-- InteractionSolver.cpp
+    |   `-- InteractionSolver.hpp
+    |-- Interaction
+    |   |-- Interaction
+    |   |   |-- BroadInteractor.cpp
+    |   |   |-- BroadInteractor.hpp
+    |   |   |-- Interaction.cpp
+    |   |   |-- Interaction.hpp
+    |   |   |-- InteractionContainer.cpp
+    |   |   `-- InteractionContainer.hpp
+    |   |-- InteractionGeometry
+    |   |   |-- InteractionGeometry.hpp
+    |   |   |-- InteractionGeometryDispatcher.cpp
+    |   |   |-- InteractionGeometryDispatcher.hpp
+    |   |   `-- InteractionGeometryFunctor.hpp
+    |   `-- InteractionPhysics
+    |       |-- InteractionPhysics.hpp
+    |       |-- InteractionPhysicsDispatcher.cpp
+    |       |-- InteractionPhysicsDispatcher.hpp
+    |       `-- InteractionPhysicsFunctor.hpp
+    `-- yade
+        |-- Chrono.cpp
+        |-- Chrono.hpp
+        |-- Engine.hpp
+        |-- FileGenerator.cpp
+        |-- FileGenerator.hpp
+        |-- FrontEnd.cpp
+        |-- FrontEnd.hpp
+        |-- Omega.cpp
+        |-- Omega.hpp
+        |-- RenderingEngine.hpp
+        |-- SimulationLoop.cpp
+        |-- SimulationLoop.hpp
+        |-- yade.cpp
+        |-- yadeExceptions.cpp
+        `-- yadeExceptions.hpp
+
+185 directories, 424 files
