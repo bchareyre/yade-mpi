@@ -6,7 +6,7 @@
 #include "ActionParameterForce.hpp"
 #include "ActionParameterMomentum.hpp"
 
-SimpleSpringLaw::SimpleSpringLaw () : ConstitutiveLaw(), actionForce(new ActionParameterForce) , actionMomentum(new ActionParameterMomentum)
+SimpleSpringLaw::SimpleSpringLaw () : InteractionSolver(), actionForce(new ActionParameterForce) , actionMomentum(new ActionParameterMomentum)
 {
 }
 

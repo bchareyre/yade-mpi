@@ -65,8 +65,8 @@ QMAKE_LIBDIR = ../../../plugins/Body/GeometricalModel/Mesh2D/$(YADEDYNLIBPATH) \
                ../../../yade/Body/Body/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/ActionParameterFunctor/CundallNonViscousMomentumDampingFunctor/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/ActionParameterFunctor/CundallNonViscousForceDampingFunctor/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/ConstitutiveLaw/SimpleSpringLaw/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/ConstitutiveLaw/MassSpringLaw/$(YADEDYNLIBPATH) \
+               ../../../plugins/Engine/InteractionSolver/SimpleSpringLaw/$(YADEDYNLIBPATH) \
+               ../../../plugins/Engine/InteractionSolver/MassSpringLaw/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/ActionParameterReset/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/ActionParameterInitializer/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/DeusExMachina/GravityCondition/$(YADEDYNLIBPATH) \

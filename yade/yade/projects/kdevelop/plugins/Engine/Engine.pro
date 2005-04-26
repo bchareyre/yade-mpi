@@ -8,7 +8,7 @@ SUBDIRS += ActionParameter \
 	   ActionParameterInitializer \
 	   ActionParameterReset \
            DeusExMachina \
-           ConstitutiveLaw 
+           InteractionSolver 
 MOC_DIR = $(YADECOMPILATIONPATH)
 UI_DIR = $(YADECOMPILATIONPATH)
 OBJECTS_DIR = $(YADECOMPILATIONPATH)

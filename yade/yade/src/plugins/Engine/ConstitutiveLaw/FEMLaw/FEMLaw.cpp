@@ -34,7 +34,7 @@ using namespace boost::numeric;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-FEMLaw::FEMLaw() : ConstitutiveLaw() , actionForce(new ActionParameterForce)
+FEMLaw::FEMLaw() : InteractionSolver() , actionForce(new ActionParameterForce)
 {
 	nodeGroupMask = 1;
 	tetrahedronGroupMask = 2;
@@ -53,7 +53,7 @@ FEMLaw::~FEMLaw()
 
 void FEMLaw::registerAttributes()
 {
-	ConstitutiveLaw::registerAttributes();
+	InteractionSolver::registerAttributes();
 	REGISTER_ATTRIBUTE(nodeGroupMask);
 	REGISTER_ATTRIBUTE(tetrahedronGroupMask);
 }

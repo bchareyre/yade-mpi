@@ -12,7 +12,7 @@
 #include "ElasticContactParameters.hpp"
 #include "SDECLinkPhysics.hpp"
 
-MassSpringBody2RigidBodyLaw::MassSpringBody2RigidBodyLaw ()  : ConstitutiveLaw(), actionForce(new ActionParameterForce) , actionMomentum(new ActionParameterMomentum)
+MassSpringBody2RigidBodyLaw::MassSpringBody2RigidBodyLaw ()  : InteractionSolver(), actionForce(new ActionParameterForce) , actionMomentum(new ActionParameterMomentum)
 {
 	springGroupMask = 2;
 	sdecGroupMask = 1;

@@ -1,10 +1,10 @@
 #ifndef __EXPLICITMASSSPRINGDYNAMICENGINE_H__
 #define __EXPLICITMASSSPRINGDYNAMICENGINE_H__
 
-#include "ConstitutiveLaw.hpp"
+#include "InteractionSolver.hpp"
 #include "ActionParameter.hpp"
 
-class MassSpringLaw : public ConstitutiveLaw
+class MassSpringLaw : public InteractionSolver
 {
 	private : shared_ptr<ActionParameter> actionForce;	
 	private : shared_ptr<ActionParameter> actionMomentum;

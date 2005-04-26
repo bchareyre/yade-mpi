@@ -55,7 +55,7 @@ QMAKE_LIBDIR = ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/BodyPhysicalParameters/FEMNodeData/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/GeometricalModel/Tetrahedron/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/BodyPhysicalParametersFunctor/FEMSetTextLoaderFunctor/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/ConstitutiveLaw/FEMLaw/$(YADEDYNLIBPATH) \
+               ../../../plugins/Engine/InteractionSolver/FEMLaw/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

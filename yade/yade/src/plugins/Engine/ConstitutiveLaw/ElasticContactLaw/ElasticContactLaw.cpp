@@ -36,7 +36,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-ElasticContactLaw::ElasticContactLaw() : ConstitutiveLaw() , actionForce(new ActionParameterForce) , actionMomentum(new ActionParameterMomentum)
+ElasticContactLaw::ElasticContactLaw() : InteractionSolver() , actionForce(new ActionParameterForce) , actionMomentum(new ActionParameterMomentum)
 {
 	sdecGroupMask=1;
 	first=true;
@@ -48,7 +48,7 @@ ElasticContactLaw::ElasticContactLaw() : ConstitutiveLaw() , actionForce(new Act
 
 void ElasticContactLaw::registerAttributes()
 {
-	ConstitutiveLaw::registerAttributes();
+	InteractionSolver::registerAttributes();
 	REGISTER_ATTRIBUTE(sdecGroupMask);
 	REGISTER_ATTRIBUTE(momentRotationLaw);
 }

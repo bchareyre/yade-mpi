@@ -8,7 +8,7 @@
 #include "ActionParameterForce.hpp"
 #include "ActionParameterMomentum.hpp"
 
-MassSpringLaw::MassSpringLaw () : ConstitutiveLaw(), actionForce(new ActionParameterForce) , actionMomentum(new ActionParameterMomentum)
+MassSpringLaw::MassSpringLaw () : InteractionSolver(), actionForce(new ActionParameterForce) , actionMomentum(new ActionParameterMomentum)
 {
 }
 

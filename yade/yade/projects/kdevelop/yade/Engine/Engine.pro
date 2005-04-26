@@ -7,11 +7,11 @@ HEADERS += ActionParameterDispatcher.hpp \
            ActionParameterFunctor.hpp \
            ActionParameterContainer.hpp \
            ActionParameter.hpp \
-           ConstitutiveLaw.hpp \
+           InteractionSolver.hpp \
            DeusExMachina.hpp 
 SOURCES += ActionParameterDispatcher.cpp \
            ActionParameterContainer.cpp \
-           ConstitutiveLaw.cpp \
+           InteractionSolver.cpp \
            DeusExMachina.cpp 
 LIBS += -rdynamic
 INCLUDEPATH = $(YADEINCLUDEPATH)

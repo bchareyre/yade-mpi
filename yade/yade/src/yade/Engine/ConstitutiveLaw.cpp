@@ -1,6 +1,6 @@
-#include "ConstitutiveLaw.hpp"
+#include "InteractionSolver.hpp"
 
-void ConstitutiveLaw::action(Body* b)
+void InteractionSolver::action(Body* b)
 {
 	this->calculateForces(b);
 }

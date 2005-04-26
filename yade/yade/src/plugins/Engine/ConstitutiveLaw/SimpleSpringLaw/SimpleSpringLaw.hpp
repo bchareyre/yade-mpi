@@ -1,11 +1,11 @@
 #ifndef __SIMPLESPRINGDYNAMICENGINE_H__
 #define __SIMPLESPRINGDYNAMICENGINE_H__
 
-#include "ConstitutiveLaw.hpp"
+#include "InteractionSolver.hpp"
 class ActionParameter;
 
 
-class SimpleSpringLaw : public ConstitutiveLaw
+class SimpleSpringLaw : public InteractionSolver
 {
 	private : shared_ptr<ActionParameter> actionForce;
 	private : shared_ptr<ActionParameter> actionMomentum;

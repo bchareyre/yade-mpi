@@ -56,8 +56,8 @@ QMAKE_LIBDIR = ../../../plugins/Body/GeometricalModel/Box/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/ActionParameterInitializer/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/DeusExMachina/GravityCondition/$(YADEDYNLIBPATH) \
                ../../../plugins/Interaction/InteractionPhysicsFunctor/ElasticContactParameters/MacroMicroElasticRelationships/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/ConstitutiveLaw/SDECTimeStepper/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/ConstitutiveLaw/ElasticContactLaw/$(YADEDYNLIBPATH) \
+               ../../../plugins/Engine/InteractionSolver/SDECTimeStepper/$(YADEDYNLIBPATH) \
+               ../../../plugins/Engine/InteractionSolver/ElasticContactLaw/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

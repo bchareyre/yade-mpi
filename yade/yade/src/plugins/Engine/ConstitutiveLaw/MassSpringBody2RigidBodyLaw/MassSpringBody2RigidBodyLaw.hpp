@@ -1,11 +1,11 @@
 #ifndef __MASSSPRINGBODY2RIGIDBODYNAMICENGINE_H__
 #define __MASSSPRINGBODY2RIGIDBODYNAMICENGINE_H__
 
-#include "ConstitutiveLaw.hpp"
+#include "InteractionSolver.hpp"
 #include "ActionParameterForce.hpp"
 #include "ActionParameterMomentum.hpp"
 
-class MassSpringBody2RigidBodyLaw : public ConstitutiveLaw
+class MassSpringBody2RigidBodyLaw : public InteractionSolver
 {
 	public : MassSpringBody2RigidBodyLaw ();
 	private : shared_ptr<ActionParameter> actionForce;	

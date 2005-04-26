@@ -34,7 +34,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-ErrorTolerantLaw::ErrorTolerantLaw() : ConstitutiveLaw()
+ErrorTolerantLaw::ErrorTolerantLaw() : InteractionSolver()
 {
 	maxReactivations = 100;
 	maxIterations    = 5;
@@ -54,7 +54,7 @@ ErrorTolerantLaw::~ErrorTolerantLaw()
 
 void ErrorTolerantLaw::postProcessAttributes(bool deserializing)
 {
-	ConstitutiveLaw::postProcessAttributes(deserializing);
+	InteractionSolver::postProcessAttributes(deserializing);
 	// PROCESS DESIRED ATTRIBUTES HERE
 }
 
@@ -63,7 +63,7 @@ void ErrorTolerantLaw::postProcessAttributes(bool deserializing)
 
 void ErrorTolerantLaw::registerAttributes()
 {
-	ConstitutiveLaw::registerAttributes();
+	InteractionSolver::registerAttributes();
 	// REGISTER DESIRED ATTRIBUTES HERE
 }
 
