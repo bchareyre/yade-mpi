@@ -1,7 +1,7 @@
 #ifndef __OSCILLATOR_H__
 #define __OSCILLATOR_H__
 
-#include "Condition.hpp"
+#include "DeusExMachina.hpp"
 
 #ifdef WIN32
 #include <windows.h>
@@ -9,7 +9,7 @@
 
 #include "Vector3.hpp"
 
-class RotationCondition : public Condition
+class RotationCondition : public DeusExMachina
 {
 	public : RotationCondition();
 

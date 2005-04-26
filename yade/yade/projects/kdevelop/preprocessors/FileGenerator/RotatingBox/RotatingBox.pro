@@ -50,8 +50,8 @@ QMAKE_LIBDIR = ../../../plugins/Body/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/ConstitutiveLaw/SimpleSpringLaw/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/ActionParameterReset/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/ActionParameterInitializer/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/Condition/RotationCondition/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/Condition/GravityCondition/$(YADEDYNLIBPATH) \
+               ../../../plugins/Engine/DeusExMachina/RotationCondition/$(YADEDYNLIBPATH) \
+               ../../../plugins/Engine/DeusExMachina/GravityCondition/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

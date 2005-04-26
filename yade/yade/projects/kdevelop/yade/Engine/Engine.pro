@@ -8,11 +8,11 @@ HEADERS += ActionParameterDispatcher.hpp \
            ActionParameterContainer.hpp \
            ActionParameter.hpp \
            ConstitutiveLaw.hpp \
-           Condition.hpp 
+           DeusExMachina.hpp 
 SOURCES += ActionParameterDispatcher.cpp \
            ActionParameterContainer.cpp \
            ConstitutiveLaw.cpp \
-           Condition.cpp 
+           DeusExMachina.cpp 
 LIBS += -rdynamic
 INCLUDEPATH = $(YADEINCLUDEPATH)
 MOC_DIR = $(YADECOMPILATIONPATH)

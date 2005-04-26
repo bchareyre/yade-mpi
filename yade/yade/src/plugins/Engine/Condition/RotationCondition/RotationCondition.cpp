@@ -9,7 +9,7 @@ RotationCondition::RotationCondition()
 
 void RotationCondition::registerAttributes()
 {
-	Condition::registerAttributes();
+	DeusExMachina::registerAttributes();
 	REGISTER_ATTRIBUTE(angularVelocity);
 	REGISTER_ATTRIBUTE(rotationAxis);
 	REGISTER_ATTRIBUTE(rotateAroundZero);

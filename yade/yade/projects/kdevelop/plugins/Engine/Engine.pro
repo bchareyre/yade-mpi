@@ -7,7 +7,7 @@ SUBDIRS += ActionParameter \
            ActionParameterFunctor \
 	   ActionParameterInitializer \
 	   ActionParameterReset \
-           Condition \
+           DeusExMachina \
            ConstitutiveLaw 
 MOC_DIR = $(YADECOMPILATIONPATH)
 UI_DIR = $(YADECOMPILATIONPATH)

@@ -1,7 +1,7 @@
-#include "Condition.hpp"
+#include "DeusExMachina.hpp"
 
 
-Condition::Condition() : Actor()
+DeusExMachina::DeusExMachina() : Actor()
 {
 	//startTime = -1;
 	//stopTime = -1;
@@ -9,13 +9,13 @@ Condition::Condition() : Actor()
 	subscribedBodies.resize(0);
 }
 
-void Condition::registerAttributes()
+void DeusExMachina::registerAttributes()
 {
 	REGISTER_ATTRIBUTE(subscribedBodies);
 }
 
 
-void Condition::action(Body* b)
+void DeusExMachina::action(Body* b)
 {
 	this->applyCondition(b);
 }

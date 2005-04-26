@@ -1,7 +1,7 @@
 #ifndef __TRANSLATOR_H__
 #define __TRANSLATOR_H__
 
-#include "Condition.hpp"
+#include "DeusExMachina.hpp"
 
 #ifdef WIN32
 #include <windows.h>
@@ -9,7 +9,7 @@
 
 #include "Vector3.hpp"
 
-class TranslationCondition : public Condition
+class TranslationCondition : public DeusExMachina
 {
 
 	public : Real velocity;

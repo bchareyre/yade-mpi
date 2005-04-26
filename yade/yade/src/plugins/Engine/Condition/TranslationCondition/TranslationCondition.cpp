@@ -10,7 +10,7 @@ void TranslationCondition::postProcessAttributes(bool deserializing)
 
 void TranslationCondition::registerAttributes()
 {
-	Condition::registerAttributes();
+	DeusExMachina::registerAttributes();
 	REGISTER_ATTRIBUTE(velocity);
 	REGISTER_ATTRIBUTE(translationAxis);
 }
