@@ -9,7 +9,7 @@
 #include <fstream>
 #include "IOManager.hpp"
 #include "Interaction.hpp"
-#include "BoundingVolumeDispatcher.hpp"
+#include "BoundingVolumeMetaEngine.hpp"
 #include "InteractionDescriptionSet2AABBFunctor.hpp"
 #include "MetaInteractingGeometry.hpp"
 
@@ -35,7 +35,7 @@
 
 #include "ActionParameterReset.hpp"
 #include "ActionParameterInitializer.hpp"
-#include "BodyPhysicalParametersDispatcher.hpp"
+#include "PhysicalParametersDispatcher.hpp"
 
 SDECLinkedSpheres::SDECLinkedSpheres () : FileGenerator()
 {
@@ -297,7 +297,7 @@ void SDECLinkedSpheres::createActors(shared_ptr<MetaBody>& rootBody)
 	shared_ptr<InteractionPhysicsDispatcher> interactionPhysicsDispatcher(new InteractionPhysicsDispatcher);
 	interactionPhysicsDispatcher->add("BodyMacroParameters","BodyMacroParameters","MacroMicroElasticRelationships");
 		
-	shared_ptr<BoundingVolumeDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeDispatcher>(new BoundingVolumeDispatcher);
+	shared_ptr<BoundingVolumeMetaEngine> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeMetaEngine>(new BoundingVolumeMetaEngine);
 	boundingVolumeDispatcher->add("InteractingSphere","AABB","Sphere2AABBFunctor");
 	boundingVolumeDispatcher->add("InteractingBox","AABB","Box2AABBFunctor");
 	boundingVolumeDispatcher->add("MetaInteractingGeometry","AABB","InteractionDescriptionSet2AABBFunctor");
@@ -317,9 +317,9 @@ void SDECLinkedSpheres::createActors(shared_ptr<MetaBody>& rootBody)
 	applyActionDispatcher->add("ActionParameterForce","ParticleParameters","NewtonsForceLawFunctor");
 	applyActionDispatcher->add("ActionParameterMomentum","RigidBodyParameters","NewtonsMomentumLawFunctor");
 	
-	shared_ptr<BodyPhysicalParametersDispatcher> positionIntegrator(new BodyPhysicalParametersDispatcher);
+	shared_ptr<PhysicalParametersDispatcher> positionIntegrator(new PhysicalParametersDispatcher);
 	positionIntegrator->add("ParticleParameters","LeapFrogPositionIntegratorFunctor");
-	shared_ptr<BodyPhysicalParametersDispatcher> orientationIntegrator(new BodyPhysicalParametersDispatcher);
+	shared_ptr<PhysicalParametersDispatcher> orientationIntegrator(new PhysicalParametersDispatcher);
 	orientationIntegrator->add("RigidBodyParameters","LeapFrogOrientationIntegratorFunctor");
  	
 	shared_ptr<SDECTimeStepper> sdecTimeStepper(new SDECTimeStepper);

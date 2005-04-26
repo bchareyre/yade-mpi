@@ -20,6 +20,6 @@ CONFIG += debug \
 TEMPLATE = lib 
 HEADERS += BoundingVolume.hpp \
            BoundingVolumeFunctor.hpp \
-           BoundingVolumeDispatcher.hpp
+           BoundingVolumeMetaEngine.hpp
 SOURCES += BoundingVolume.cpp \
-           BoundingVolumeDispatcher.cpp
+           BoundingVolumeMetaEngine.cpp

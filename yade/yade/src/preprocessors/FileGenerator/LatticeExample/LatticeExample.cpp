@@ -30,7 +30,7 @@
 
 #include "Body.hpp"
 #include "MetaInteractingGeometry.hpp"
-#include "BoundingVolumeDispatcher.hpp"
+#include "BoundingVolumeMetaEngine.hpp"
 #include "GeometricalModelDispatcher.hpp"
 
 #include "AABB.hpp"
@@ -226,7 +226,7 @@ void LatticeExample::calcBeamsPositionOrientationLength(shared_ptr<MetaBody>& bo
 
 void LatticeExample::createActors(shared_ptr<MetaBody>& )
 {
-	shared_ptr<BoundingVolumeDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeDispatcher>(new BoundingVolumeDispatcher);
+	shared_ptr<BoundingVolumeMetaEngine> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeMetaEngine>(new BoundingVolumeMetaEngine);
 	boundingVolumeDispatcher->add("MetaInteractingGeometry","AABB","InteractionDescriptionSet2AABBFunctor");
 
 	shared_ptr<GeometricalModelDispatcher> geometricalModelDispatcher	= shared_ptr<GeometricalModelDispatcher>(new GeometricalModelDispatcher);

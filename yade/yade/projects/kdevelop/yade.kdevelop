@@ -99,7 +99,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>plugins/Engine/ActionParameterFunctor/CundallNonViscousMomentumDampingFunctor</activedir>
+      <activedir>yade/Body/PhysicalParameters</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>

@@ -22,7 +22,7 @@
 #include "CundallNonViscousForceDampingFunctor.hpp"
 #include "CundallNonViscousMomentumDampingFunctor.hpp"
 
-#include "BoundingVolumeDispatcher.hpp"
+#include "BoundingVolumeMetaEngine.hpp"
 #include "GeometricalModelDispatcher.hpp"
 
 #include "InteractionDescriptionSet2AABBFunctor.hpp"
@@ -45,7 +45,7 @@
 #include "ActionParameterInitializer.hpp"
 #include "GravityCondition.hpp"
 
-#include "BodyPhysicalParametersDispatcher.hpp"
+#include "PhysicalParametersDispatcher.hpp"
 
 
 HangingCloth::HangingCloth () : FileGenerator()
@@ -140,7 +140,7 @@ string HangingCloth::generate()
 	shared_ptr<GravityCondition> gravityCondition(new GravityCondition);
 	gravityCondition->gravity = gravity;
 	
-	shared_ptr<BoundingVolumeDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeDispatcher>(new BoundingVolumeDispatcher);
+	shared_ptr<BoundingVolumeMetaEngine> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeMetaEngine>(new BoundingVolumeMetaEngine);
 	boundingVolumeDispatcher->add("InteractingSphere","AABB","Sphere2AABBFunctor");
 	boundingVolumeDispatcher->add("InteractingBox","AABB","Box2AABBFunctor");
 	boundingVolumeDispatcher->add("MetaInteractingGeometry","AABB","InteractionDescriptionSet2AABBFunctor");
@@ -160,9 +160,9 @@ string HangingCloth::generate()
 	applyActionDispatcher->add("ActionParameterForce","ParticleParameters","NewtonsForceLawFunctor");
 	applyActionDispatcher->add("ActionParameterMomentum","RigidBodyParameters","NewtonsMomentumLawFunctor");
 
-	shared_ptr<BodyPhysicalParametersDispatcher> positionIntegrator(new BodyPhysicalParametersDispatcher);
+	shared_ptr<PhysicalParametersDispatcher> positionIntegrator(new PhysicalParametersDispatcher);
 	positionIntegrator->add("ParticleParameters","LeapFrogPositionIntegratorFunctor");
-	shared_ptr<BodyPhysicalParametersDispatcher> orientationIntegrator(new BodyPhysicalParametersDispatcher);
+	shared_ptr<PhysicalParametersDispatcher> orientationIntegrator(new PhysicalParametersDispatcher);
 	orientationIntegrator->add("RigidBodyParameters","LeapFrogOrientationIntegratorFunctor");
  	
 	shared_ptr<MassSpringLaw> explicitMassSpringConstitutiveLaw(new MassSpringLaw);

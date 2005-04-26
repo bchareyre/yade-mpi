@@ -24,8 +24,8 @@
 #include "FEMDEMCouplingTest.hpp"
 
 // dispatchers
-#include "BoundingVolumeDispatcher.hpp"
-#include "BodyPhysicalParametersDispatcher.hpp"
+#include "BoundingVolumeMetaEngine.hpp"
+#include "PhysicalParametersDispatcher.hpp"
 #include "GeometricalModelDispatcher.hpp"
 #include "ActionParameterDispatcher.hpp"
 #include "InteractionGeometryDispatcher.hpp"
@@ -162,7 +162,7 @@ string FEMDEMCouplingTest::generate()
 
 void FEMDEMCouplingTest::createActors(shared_ptr<MetaBody>& rootBody)
 {
-	shared_ptr<BoundingVolumeDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeDispatcher>(new BoundingVolumeDispatcher);
+	shared_ptr<BoundingVolumeMetaEngine> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeMetaEngine>(new BoundingVolumeMetaEngine);
 	boundingVolumeDispatcher->add("MetaInteractingGeometry","AABB","InteractionDescriptionSet2AABBFunctor");
 	boundingVolumeDispatcher->add("InteractingSphere","AABB","Sphere2AABBFunctor");
 	boundingVolumeDispatcher->add("InteractingBox","AABB","Box2AABBFunctor");
@@ -178,15 +178,15 @@ void FEMDEMCouplingTest::createActors(shared_ptr<MetaBody>& rootBody)
 	shared_ptr<FEMSetTextLoaderFunctor> femSetTextLoaderFunctor	= shared_ptr<FEMSetTextLoaderFunctor>(new FEMSetTextLoaderFunctor);
 	femSetTextLoaderFunctor->fileName = femTxtFile;
 
-	shared_ptr<BodyPhysicalParametersDispatcher> bodyPhysicalParametersDispatcher(new BodyPhysicalParametersDispatcher);
+	shared_ptr<PhysicalParametersDispatcher> bodyPhysicalParametersDispatcher(new PhysicalParametersDispatcher);
 	bodyPhysicalParametersDispatcher->add("FEMSetParameters","FEMTetrahedronStiffness");
 	
 	shared_ptr<GeometricalModelDispatcher> geometricalModelDispatcher	= shared_ptr<GeometricalModelDispatcher>(new GeometricalModelDispatcher);
 	geometricalModelDispatcher->add("FEMSetParameters","FEMSetGeometry","FEMSet2Tetrahedrons");
 	
-	shared_ptr<BodyPhysicalParametersDispatcher> positionIntegrator(new BodyPhysicalParametersDispatcher);
+	shared_ptr<PhysicalParametersDispatcher> positionIntegrator(new PhysicalParametersDispatcher);
 	positionIntegrator->add("ParticleParameters","LeapFrogPositionIntegratorFunctor");
-	shared_ptr<BodyPhysicalParametersDispatcher> orientationIntegrator(new BodyPhysicalParametersDispatcher);
+	shared_ptr<PhysicalParametersDispatcher> orientationIntegrator(new PhysicalParametersDispatcher);
 	orientationIntegrator->add("RigidBodyParameters","LeapFrogOrientationIntegratorFunctor");
 	
 	shared_ptr<FEMLaw> femLaw(new FEMLaw);

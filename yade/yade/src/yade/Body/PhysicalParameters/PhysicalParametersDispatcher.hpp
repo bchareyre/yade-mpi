@@ -30,17 +30,17 @@
 #include "Engine.hpp"
 #include "DynLibDispatcher.hpp"
 #include "PhysicalParameters.hpp"
-#include "BodyPhysicalParametersFunctor.hpp"
+#include "PhysicalParametersFunctor.hpp"
 #include "Body.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class BodyPhysicalParametersDispatcher :
+class PhysicalParametersDispatcher :
 	  public Engine 
 	, public DynLibDispatcher
 		<	PhysicalParameters ,
-			BodyPhysicalParametersFunctor,
+			PhysicalParametersFunctor,
 			void ,
 			TYPELIST_2(
 					  const shared_ptr<PhysicalParameters>&
@@ -51,13 +51,13 @@ class BodyPhysicalParametersDispatcher :
 	public		: virtual void action(Body* b);
 	public		: virtual void registerAttributes();
 	public		: virtual void postProcessAttributes(bool deserializing);
-	REGISTER_CLASS_NAME(BodyPhysicalParametersDispatcher);
+	REGISTER_CLASS_NAME(PhysicalParametersDispatcher);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-REGISTER_SERIALIZABLE(BodyPhysicalParametersDispatcher,false);
+REGISTER_SERIALIZABLE(PhysicalParametersDispatcher,false);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////

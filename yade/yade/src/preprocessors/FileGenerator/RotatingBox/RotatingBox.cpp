@@ -22,11 +22,11 @@
 #include "ActionParameterReset.hpp"
 #include "ActionParameterInitializer.hpp"
 
-#include "BoundingVolumeDispatcher.hpp"
+#include "BoundingVolumeMetaEngine.hpp"
 #include "InteractionDescriptionSet2AABBFunctor.hpp"
 #include "MetaInteractingGeometry.hpp"
 #include "GravityCondition.hpp"
-#include "BodyPhysicalParametersDispatcher.hpp"
+#include "PhysicalParametersDispatcher.hpp"
 
 RotatingBox::RotatingBox () : FileGenerator()
 {
@@ -261,7 +261,7 @@ void RotatingBox::createActors(shared_ptr<MetaBody>& rootBody)
 	interactionGeometryDispatcher->add("InteractingSphere","InteractingBox","Box2Sphere4ClosestFeatures");
 	interactionGeometryDispatcher->add("InteractingBox","InteractingBox","Box2Box4ClosestFeatures");
 
-	shared_ptr<BoundingVolumeDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeDispatcher>(new BoundingVolumeDispatcher);
+	shared_ptr<BoundingVolumeMetaEngine> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeMetaEngine>(new BoundingVolumeMetaEngine);
 	boundingVolumeDispatcher->add("InteractingSphere","AABB","Sphere2AABBFunctor");
 	boundingVolumeDispatcher->add("InteractingBox","AABB","Box2AABBFunctor");
 	boundingVolumeDispatcher->add("MetaInteractingGeometry","AABB","InteractionDescriptionSet2AABBFunctor");
@@ -281,9 +281,9 @@ void RotatingBox::createActors(shared_ptr<MetaBody>& rootBody)
 	applyActionDispatcher->add("ActionParameterForce","ParticleParameters","NewtonsForceLawFunctor");
 	applyActionDispatcher->add("ActionParameterMomentum","RigidBodyParameters","NewtonsMomentumLawFunctor");
 	
-	shared_ptr<BodyPhysicalParametersDispatcher> positionIntegrator(new BodyPhysicalParametersDispatcher);
+	shared_ptr<PhysicalParametersDispatcher> positionIntegrator(new PhysicalParametersDispatcher);
 	positionIntegrator->add("ParticleParameters","LeapFrogPositionIntegratorFunctor");
-	shared_ptr<BodyPhysicalParametersDispatcher> orientationIntegrator(new BodyPhysicalParametersDispatcher);
+	shared_ptr<PhysicalParametersDispatcher> orientationIntegrator(new PhysicalParametersDispatcher);
 	orientationIntegrator->add("RigidBodyParameters","LeapFrogOrientationIntegratorFunctor");
  	
 	shared_ptr<RotationCondition> kinematic = shared_ptr<RotationCondition>(new RotationCondition);

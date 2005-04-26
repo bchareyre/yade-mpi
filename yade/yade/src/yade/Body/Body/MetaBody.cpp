@@ -35,7 +35,7 @@ void MetaBody::postProcessAttributes(bool deserializing)
 				(*i)->action(this);
 				
 	//	initializers.clear(); // FIXME - we want to delate ONLY some of them!
-	//                                       because when you save and load file, you still want some initializers, but not all of them. Eg - you don't want VRML loader, or FEM loader, but you want BoundingVolumeDispatcher. Maybe we need two list of initilizers? One that 'survive' between load and save, and others that are deleted on first time?
+	//                                       because when you save and load file, you still want some initializers, but not all of them. Eg - you don't want VRML loader, or FEM loader, but you want BoundingVolumeMetaEngine. Maybe we need two list of initilizers? One that 'survive' between load and save, and others that are deleted on first time?
 	}
 }
 

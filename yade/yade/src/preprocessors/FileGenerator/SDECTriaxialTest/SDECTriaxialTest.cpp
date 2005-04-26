@@ -37,7 +37,7 @@
 #include "ElasticContactLaw.hpp"
 #include "BodyMacroParameters.hpp"
 #include "Interaction.hpp"
-#include "BoundingVolumeDispatcher.hpp"
+#include "BoundingVolumeMetaEngine.hpp"
 #include "InteractionDescriptionSet2AABBFunctor.hpp"
 #include "MetaInteractingGeometry.hpp"
 #include "MacroMicroElasticRelationships.hpp"
