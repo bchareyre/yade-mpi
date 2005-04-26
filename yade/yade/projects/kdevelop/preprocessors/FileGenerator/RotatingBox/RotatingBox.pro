@@ -42,7 +42,7 @@ QMAKE_LIBDIR = ../../../plugins/Body/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/InteractingGeometry/InteractionSphere/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/InteractingGeometry/InteractionBox/$(YADEDYNLIBPATH) \
                ../../../plugins/Interaction/BroadInteractor/SAPCollider/$(YADEDYNLIBPATH) \
-               ../../../plugins/Body/BodyPhysicalParameters/RigidBodyParameters/$(YADEDYNLIBPATH) \
+               ../../../plugins/Body/PhysicalParameters/RigidBodyParameters/$(YADEDYNLIBPATH) \
                ../../../yade/Engine/$(YADEDYNLIBPATH) \
                ../../../yade/Body/Body/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/ActionParameterFunctor/CundallNonViscousForceDampingFunctor/$(YADEDYNLIBPATH) \

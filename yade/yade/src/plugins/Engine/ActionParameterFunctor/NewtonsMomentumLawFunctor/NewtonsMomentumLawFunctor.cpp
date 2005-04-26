@@ -29,7 +29,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void NewtonsMomentumLawFunctor::go(   const shared_ptr<ActionParameter>& a
-					, const shared_ptr<BodyPhysicalParameters>& b
+					, const shared_ptr<PhysicalParameters>& b
 					, const Body*)
 {
 	ActionParameterMomentum * am = static_cast<ActionParameterMomentum*>(a.get());

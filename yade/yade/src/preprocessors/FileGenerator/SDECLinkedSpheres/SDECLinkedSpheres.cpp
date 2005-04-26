@@ -363,7 +363,7 @@ void SDECLinkedSpheres::positionRootBody(shared_ptr<MetaBody>& rootBody)
 	Quaternionr q;
 	q.fromAxisAngle( Vector3r(0,0,1),0);
 	
-	shared_ptr<ParticleParameters> physics(new ParticleParameters); // FIXME : fix indexable class BodyPhysicalParameters
+	shared_ptr<ParticleParameters> physics(new ParticleParameters); // FIXME : fix indexable class PhysicalParameters
 	physics->se3			= Se3r(Vector3r(0,0,0),q);
 	physics->mass			= 0;
 	physics->velocity		= Vector3r::ZERO;

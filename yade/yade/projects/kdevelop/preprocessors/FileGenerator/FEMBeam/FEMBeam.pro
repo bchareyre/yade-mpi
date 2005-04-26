@@ -41,7 +41,7 @@ QMAKE_LIBDIR = ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../../yade/Body/Body/$(YADEDYNLIBPATH) \
                ../../../yade/Interaction/Interaction/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/MultiMethods/$(YADEDYNLIBPATH) \
-               ../../../plugins/Body/BodyPhysicalParameters/RigidBodyParameters/$(YADEDYNLIBPATH) \
+               ../../../plugins/Body/PhysicalParameters/RigidBodyParameters/$(YADEDYNLIBPATH) \
                ../../../yade/Engine/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/ActionParameterInitializer/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/ActionParameterReset/$(YADEDYNLIBPATH) \
@@ -50,9 +50,9 @@ QMAKE_LIBDIR = ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/ActionParameterFunctor/CundallNonViscousForceDampingFunctor/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/InteractingGeometry/InteractionDescriptionSet/$(YADEDYNLIBPATH) \
-               ../../../plugins/Body/BodyPhysicalParameters/FEMSetParameters/$(YADEDYNLIBPATH) \
-               ../../../plugins/Body/BodyPhysicalParameters/FEMTetrahedronData/$(YADEDYNLIBPATH) \
-               ../../../plugins/Body/BodyPhysicalParameters/FEMNodeData/$(YADEDYNLIBPATH) \
+               ../../../plugins/Body/PhysicalParameters/FEMSetParameters/$(YADEDYNLIBPATH) \
+               ../../../plugins/Body/PhysicalParameters/FEMTetrahedronData/$(YADEDYNLIBPATH) \
+               ../../../plugins/Body/PhysicalParameters/FEMNodeData/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/GeometricalModel/Tetrahedron/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/BodyPhysicalParametersFunctor/FEMSetTextLoaderFunctor/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/InteractionSolver/FEMLaw/$(YADEDYNLIBPATH) \

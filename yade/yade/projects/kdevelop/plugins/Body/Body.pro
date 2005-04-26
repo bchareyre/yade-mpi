@@ -12,7 +12,7 @@ TEMPLATE = subdirs
 SUBDIRS += BoundingVolume \
            GeometricalModel \
            InteractingGeometry \
-           BodyPhysicalParameters \
+           PhysicalParameters \
            BoundingVolumeFunctor \
            GeometricalModelFunctor \
            InteractingGeometryFunctor \

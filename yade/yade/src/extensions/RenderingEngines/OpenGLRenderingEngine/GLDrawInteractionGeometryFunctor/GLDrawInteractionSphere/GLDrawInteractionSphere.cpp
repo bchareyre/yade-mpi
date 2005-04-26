@@ -37,7 +37,7 @@ vector<Vector3r> GLDrawInteractionSphere::faces;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void GLDrawInteractionSphere::go(const shared_ptr<InteractingGeometry>& cm, const shared_ptr<BodyPhysicalParameters>& )
+void GLDrawInteractionSphere::go(const shared_ptr<InteractingGeometry>& cm, const shared_ptr<PhysicalParameters>& )
 {
 	static bool first=true;
 	

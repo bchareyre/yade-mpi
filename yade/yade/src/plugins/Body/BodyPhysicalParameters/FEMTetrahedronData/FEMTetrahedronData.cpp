@@ -5,7 +5,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-FEMTetrahedronData::FEMTetrahedronData() : BodyPhysicalParameters()
+FEMTetrahedronData::FEMTetrahedronData() : PhysicalParameters()
 { 
 	createIndex();
 	ids.clear();
@@ -24,7 +24,7 @@ FEMTetrahedronData::~FEMTetrahedronData()
 
 void FEMTetrahedronData::registerAttributes()
 {
-	BodyPhysicalParameters::registerAttributes();
+	PhysicalParameters::registerAttributes();
 	REGISTER_ATTRIBUTE(ids);
 }
 

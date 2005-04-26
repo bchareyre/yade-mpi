@@ -46,7 +46,7 @@ void CundallNonViscousForceDampingFunctor::registerAttributes()
 // this is Cundall non-viscous local damping, applied to force (ActionParameterForce)
 
 void CundallNonViscousForceDampingFunctor::go(    const shared_ptr<ActionParameter>& a
-						, const shared_ptr<BodyPhysicalParameters>& b
+						, const shared_ptr<PhysicalParameters>& b
 						, const Body*)
 {
 	ActionParameterForce * af = static_cast<ActionParameterForce*>(a.get());

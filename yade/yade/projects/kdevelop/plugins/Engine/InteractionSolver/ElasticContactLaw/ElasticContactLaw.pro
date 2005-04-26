@@ -30,7 +30,7 @@ QMAKE_LIBDIR = ../../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../../../toolboxes/Libraries/MultiMethods/$(YADEDYNLIBPATH) \
                ../../../../plugins/Interaction/InteractionGeometry/SDECLinkGeometry/$(YADEDYNLIBPATH) \
                ../../../../plugins/Interaction/InteractionPhysics/SDECLinkPhysics/$(YADEDYNLIBPATH) \
-               ../../../../plugins/Body/BodyPhysicalParameters/RigidBodyParameters/$(YADEDYNLIBPATH) \
+               ../../../../plugins/Body/PhysicalParameters/RigidBodyParameters/$(YADEDYNLIBPATH) \
                ../../../../yade/Engine/$(YADEDYNLIBPATH) \
                ../../../../plugins/Engine/ActionParameter/ActionParameterForce/$(YADEDYNLIBPATH) \
                ../../../../plugins/Engine/ActionParameter/ActionParameterMomentum/$(YADEDYNLIBPATH) \

@@ -27,7 +27,7 @@ QMAKE_LIBDIR = ../../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../../../toolboxes/Libraries/MultiMethods/$(YADEDYNLIBPATH) \
                ../../../../plugins/Interaction/InteractionPhysics/SpringPhysics/$(YADEDYNLIBPATH) \
                ../../../../plugins/Interaction/InteractionGeometry/SpringGeometry/$(YADEDYNLIBPATH) \
-               ../../../../plugins/Body/BodyPhysicalParameters/ParticleParameters/$(YADEDYNLIBPATH) \
+               ../../../../plugins/Body/PhysicalParameters/ParticleParameters/$(YADEDYNLIBPATH) \
                ../../../../yade/Engine/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \

@@ -34,7 +34,7 @@
 
 class GLDrawTetrahedron : public GLDrawGeometricalModelFunctor
 {
-	public : virtual void go(const shared_ptr<GeometricalModel>&, const shared_ptr<BodyPhysicalParameters>&,bool);
+	public : virtual void go(const shared_ptr<GeometricalModel>&, const shared_ptr<PhysicalParameters>&,bool);
 	REGISTER_CLASS_NAME(GLDrawTetrahedron);
 };
 

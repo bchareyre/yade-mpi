@@ -26,7 +26,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-LatticeSetParameters::LatticeSetParameters() : BodyPhysicalParameters()
+LatticeSetParameters::LatticeSetParameters() : PhysicalParameters()
 {
 	createIndex();
 	
@@ -46,7 +46,7 @@ LatticeSetParameters::~LatticeSetParameters()
 
 void LatticeSetParameters::registerAttributes()
 {
-	BodyPhysicalParameters::registerAttributes();
+	PhysicalParameters::registerAttributes();
 	REGISTER_ATTRIBUTE(beamGroupMask);
 }
 

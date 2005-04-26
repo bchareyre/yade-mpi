@@ -54,13 +54,13 @@ QMAKE_LIBDIR = ../../../plugins/Body/GeometricalModel/Mesh2D/$(YADEDYNLIBPATH) \
                ../../../plugins/Interaction/InteractionPhysics/SpringPhysics/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/InteractingGeometry/InteractionSphere/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/BoundingVolumeFunctor/InteractionDescriptionSet2AABBFunctor/$(YADEDYNLIBPATH) \
-               ../../../plugins/Body/BodyPhysicalParameters/ParticleSetParameters/$(YADEDYNLIBPATH) \
+               ../../../plugins/Body/PhysicalParameters/ParticleSetParameters/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/GeometricalModel/Box/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/InteractingGeometry/InteractionBox/$(YADEDYNLIBPATH) \
                ../../../plugins/Interaction/InteractionGeometry/SDECLinkGeometry/$(YADEDYNLIBPATH) \
                ../../../plugins/Interaction/InteractionPhysics/SDECLinkPhysics/$(YADEDYNLIBPATH) \
                ../../../plugins/Interaction/BroadInteractor/SAPCollider/$(YADEDYNLIBPATH) \
-               ../../../plugins/Body/BodyPhysicalParameters/RigidBodyParameters/$(YADEDYNLIBPATH) \
+               ../../../plugins/Body/PhysicalParameters/RigidBodyParameters/$(YADEDYNLIBPATH) \
                ../../../yade/Engine/$(YADEDYNLIBPATH) \
                ../../../yade/Body/Body/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/ActionParameterFunctor/CundallNonViscousMomentumDampingFunctor/$(YADEDYNLIBPATH) \

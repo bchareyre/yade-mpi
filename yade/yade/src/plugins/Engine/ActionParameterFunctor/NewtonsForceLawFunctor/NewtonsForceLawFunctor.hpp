@@ -35,7 +35,7 @@
 class NewtonsForceLawFunctor : public ActionParameterFunctor
 {
 	public : virtual void go( 	  const shared_ptr<ActionParameter>&
-					, const shared_ptr<BodyPhysicalParameters>&
+					, const shared_ptr<PhysicalParameters>&
 					, const Body*);
 	REGISTER_CLASS_NAME(NewtonsForceLawFunctor);
 };

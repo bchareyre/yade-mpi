@@ -5,7 +5,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void GLDrawLineSegment::go(const shared_ptr<GeometricalModel>& gm, const shared_ptr<BodyPhysicalParameters>&,bool wire)
+void GLDrawLineSegment::go(const shared_ptr<GeometricalModel>& gm, const shared_ptr<PhysicalParameters>&,bool wire)
 {
 	// FIXME : check that : one of those 2 lines are useless
   	glMaterialv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, gm->diffuseColor);

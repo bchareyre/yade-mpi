@@ -30,7 +30,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "FunctorWrapper.hpp"
-#include "BodyPhysicalParameters.hpp"
+#include "PhysicalParameters.hpp"
 #include "Interaction.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -50,8 +50,8 @@
 class InteractionPhysicsFunctor : public FunctorWrapper
 		<
 		 void ,
-		 TYPELIST_3(	  const shared_ptr<BodyPhysicalParameters>&
-				, const shared_ptr<BodyPhysicalParameters>&
+		 TYPELIST_3(	  const shared_ptr<PhysicalParameters>&
+				, const shared_ptr<PhysicalParameters>&
 				, const shared_ptr<Interaction>&
 			   ) 
 		>

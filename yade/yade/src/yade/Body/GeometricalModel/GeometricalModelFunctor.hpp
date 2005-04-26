@@ -28,7 +28,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "Serializable.hpp"
-#include "BodyPhysicalParameters.hpp"
+#include "PhysicalParameters.hpp"
 #include "GeometricalModel.hpp"
 #include "Body.hpp"
 #include "FunctorWrapper.hpp"
@@ -53,7 +53,7 @@ class GeometricalModelFunctor : public FunctorWrapper
 		<
 		 void ,
 		 TYPELIST_3(
-		 		  const shared_ptr<BodyPhysicalParameters>&
+		 		  const shared_ptr<PhysicalParameters>&
 				, shared_ptr<GeometricalModel>&
 				, const Body*
 			   )

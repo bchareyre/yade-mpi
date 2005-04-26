@@ -26,7 +26,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-ParticleParameters::ParticleParameters() : BodyPhysicalParameters()
+ParticleParameters::ParticleParameters() : PhysicalParameters()
 {
 	createIndex();
 	acceleration = Vector3r(0,0,0);
@@ -41,7 +41,7 @@ ParticleParameters::~ParticleParameters()
 
 void ParticleParameters::postProcessAttributes(bool deserializing)
 {
-	BodyPhysicalParameters::postProcessAttributes(deserializing);
+	PhysicalParameters::postProcessAttributes(deserializing);
 	
 	if(deserializing)
 	{
@@ -57,7 +57,7 @@ void ParticleParameters::postProcessAttributes(bool deserializing)
 
 void ParticleParameters::registerAttributes()
 {
-	BodyPhysicalParameters::registerAttributes();
+	PhysicalParameters::registerAttributes();
 	//REGISTER_ATTRIBUTE(se3);
 	REGISTER_ATTRIBUTE(mass);
 	REGISTER_ATTRIBUTE(velocity);

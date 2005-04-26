@@ -23,7 +23,7 @@ QMAKE_LIBDIR = ../../../../plugins/Interaction/InteractionGeometry/ClosestFeatur
                ../../../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
                ../../../../yade/Interaction/Interaction/$(YADEDYNLIBPATH) \
                ../../../../toolboxes/Libraries/MultiMethods/$(YADEDYNLIBPATH) \
-               ../../../../plugins/Body/BodyPhysicalParameters/RigidBodyParameters/$(YADEDYNLIBPATH) \
+               ../../../../plugins/Body/PhysicalParameters/RigidBodyParameters/$(YADEDYNLIBPATH) \
                ../../../../yade/Engine/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \

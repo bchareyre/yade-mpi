@@ -39,7 +39,7 @@ class FEMSetTextLoaderFunctor : public BodyPhysicalParametersFunctor
 	private 	: 	int nodeGroupMask, tetrahedronGroupMask;
 	public  	:	string fileName; 
 
-	public 		: 	virtual void go(	  const shared_ptr<BodyPhysicalParameters>&
+	public 		: 	virtual void go(	  const shared_ptr<PhysicalParameters>&
 							, Body*);
 	
 	public 		: 	void createNode( 	  shared_ptr<Body>& body

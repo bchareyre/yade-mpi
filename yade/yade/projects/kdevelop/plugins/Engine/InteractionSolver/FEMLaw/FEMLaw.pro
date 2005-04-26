@@ -13,9 +13,9 @@ MOC_DIR = $(YADECOMPILATIONPATH)
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 QMAKE_LIBDIR = ../../../../plugins/Engine/ActionParameter/ActionParameterForce/$(YADEDYNLIBPATH) \
-               ../../../../plugins/Body/BodyPhysicalParameters/ParticleParameters/$(YADEDYNLIBPATH) \
-               ../../../../plugins/Body/BodyPhysicalParameters/FEMTetrahedronData/$(YADEDYNLIBPATH) \
-               ../../../../plugins/Body/BodyPhysicalParameters/FEMNodeData/$(YADEDYNLIBPATH) \
+               ../../../../plugins/Body/PhysicalParameters/ParticleParameters/$(YADEDYNLIBPATH) \
+               ../../../../plugins/Body/PhysicalParameters/FEMTetrahedronData/$(YADEDYNLIBPATH) \
+               ../../../../plugins/Body/PhysicalParameters/FEMNodeData/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

@@ -40,11 +40,11 @@ class Body;
 class ActionParameterDispatcher : 
 	  public Engine
 	, public DynLibDispatcher
-		<	  TYPELIST_2( ActionParameter , BodyPhysicalParameters )	// base classess for dispatch
+		<	  TYPELIST_2( ActionParameter , PhysicalParameters )	// base classess for dispatch
 			, ActionParameterFunctor				// class that provides multivirtual call
 			, void						// return type
 			, TYPELIST_3(	  const shared_ptr<ActionParameter>&	// function arguments
-					, const shared_ptr<BodyPhysicalParameters>& 
+					, const shared_ptr<PhysicalParameters>& 
 					, const Body *
 				    )
 		>

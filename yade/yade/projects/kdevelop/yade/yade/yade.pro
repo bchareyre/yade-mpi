@@ -34,7 +34,7 @@ LIBS += -lSerialization \
 -lBoundingVolume \
 -lInteractingGeometry \
 -lGeometricalModel \
--lBodyPhysicalParameters \
+-lPhysicalParameters \
 -lEngine \
 -lboost_thread \
 -lboost_filesystem \
@@ -62,7 +62,7 @@ QMAKE_LIBDIR = ../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
 ../../yade/Body/BoundingVolume/$(YADEDYNLIBPATH) \
 ../../yade/Body/InteractingGeometry/$(YADEDYNLIBPATH) \
 ../../yade/Body/GeometricalModel/$(YADEDYNLIBPATH) \
-../../yade/Body/BodyPhysicalParameters/$(YADEDYNLIBPATH) \
+../../yade/Body/PhysicalParameters/$(YADEDYNLIBPATH) \
 $(YADEDYNLIBPATH)
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
 -pthread

@@ -29,7 +29,7 @@
 
 #include "Engine.hpp"
 #include "DynLibDispatcher.hpp"
-#include "BodyPhysicalParameters.hpp"
+#include "PhysicalParameters.hpp"
 #include "Interaction.hpp"
 #include "InteractionPhysicsFunctor.hpp"
 
@@ -39,11 +39,11 @@
 class InteractionPhysicsDispatcher : 
 	  public Engine
 	, public DynLibDispatcher
-		<	TYPELIST_2( BodyPhysicalParameters , BodyPhysicalParameters ) ,	// base classess for dispatch
+		<	TYPELIST_2( PhysicalParameters , PhysicalParameters ) ,	// base classess for dispatch
 			InteractionPhysicsFunctor,					// class that provides multivirtual call
 			void ,								// return type
-			TYPELIST_3(	  const shared_ptr<BodyPhysicalParameters>&	// arguments
-					, const shared_ptr<BodyPhysicalParameters>&
+			TYPELIST_3(	  const shared_ptr<PhysicalParameters>&	// arguments
+					, const shared_ptr<PhysicalParameters>&
 					, const shared_ptr<Interaction>&
 				)
 		>

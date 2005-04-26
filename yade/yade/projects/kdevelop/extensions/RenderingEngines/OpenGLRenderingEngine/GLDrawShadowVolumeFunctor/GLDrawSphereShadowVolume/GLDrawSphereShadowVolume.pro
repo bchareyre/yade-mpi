@@ -13,11 +13,11 @@ UI_DIR = $(YADECOMPILATIONPATH)
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 QMAKE_LIBDIR = ../../../../../plugins/Body/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
                ../../../../../yade/Body/Body/$(YADEDYNLIBPATH) \
-               ../../../../../plugins/Body/BodyPhysicalParameters/ParticleParameters/$(YADEDYNLIBPATH) \
+               ../../../../../plugins/Body/PhysicalParameters/ParticleParameters/$(YADEDYNLIBPATH) \
                ../../../../../plugins/Geometry/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
                ../../../../../yade/Body/$(YADEDYNLIBPATH) \
                ../../../../../yade/Geometry/$(YADEDYNLIBPATH) \
-               ../../../../../plugins/Body/BodyPhysicalParameters/Particle/$(YADEDYNLIBPATH) \
+               ../../../../../plugins/Body/PhysicalParameters/Particle/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

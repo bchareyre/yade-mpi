@@ -35,14 +35,14 @@ QMAKE_LIBDIR = ../../../../toolboxes/ComputationalGeometry/Distances/$(YADEDYNLI
                ../../../../toolboxes/Libraries/MultiMethods/$(YADEDYNLIBPATH) \
                ../../../../plugins/Interaction/InteractionPhysics/SDECLinkPhysics/$(YADEDYNLIBPATH) \
                ../../../../plugins/Interaction/InteractionGeometry/SDECLinkGeometry/$(YADEDYNLIBPATH) \
-               ../../../../plugins/Body/BodyPhysicalParameters/RigidBodyParameters/$(YADEDYNLIBPATH) \
+               ../../../../plugins/Body/PhysicalParameters/RigidBodyParameters/$(YADEDYNLIBPATH) \
                ../../../../yade/Engine/$(YADEDYNLIBPATH) \
                ../../../../yade/Body/Body/$(YADEDYNLIBPATH) \
                ../../../../plugins/Engine/ActionParameter/ActionParameterForce/$(YADEDYNLIBPATH) \
                ../../../../plugins/Engine/ActionParameter/ActionParameterMomentum/$(YADEDYNLIBPATH) \
                ../../../../plugins/Engine/InteractionSolver/SimpleSpringLaw/$(YADEDYNLIBPATH) \
                ../../../../plugins/Interaction/InteractionGeometry/MacroMicroContactGeometry/$(YADEDYNLIBPATH) \
-               ../../../../plugins/Body/BodyPhysicalParameters/BodyMacroParameters/$(YADEDYNLIBPATH) \
+               ../../../../plugins/Body/PhysicalParameters/BodyMacroParameters/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

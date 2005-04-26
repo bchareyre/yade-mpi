@@ -38,7 +38,7 @@ Body::Body (unsigned int newId, int newGroup) :
 	  Serializable()
 	, id(newId)
 	, groupMask(newGroup)
-	, physicalParameters(shared_ptr<BodyPhysicalParameters>())
+	, physicalParameters(shared_ptr<PhysicalParameters>())
 	, geometricalModel(shared_ptr<GeometricalModel>())
 	, interactionGeometry(shared_ptr<InteractingGeometry>())
 	, boundingVolume(shared_ptr<BoundingVolume>())

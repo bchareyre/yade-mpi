@@ -55,8 +55,8 @@ void MacroMicroElasticRelationships::registerAttributes()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MacroMicroElasticRelationships::go(	  const shared_ptr<BodyPhysicalParameters>& b1 // BodyMacroParameters
-					, const shared_ptr<BodyPhysicalParameters>& b2 // BodyMacroParameters
+void MacroMicroElasticRelationships::go(	  const shared_ptr<PhysicalParameters>& b1 // BodyMacroParameters
+					, const shared_ptr<PhysicalParameters>& b2 // BodyMacroParameters
 					, const shared_ptr<Interaction>& interaction)
 {
 	BodyMacroParameters* sdec1 = static_cast<BodyMacroParameters*>(b1.get());

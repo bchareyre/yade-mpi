@@ -39,7 +39,7 @@ using namespace boost::numeric;
 	
 // FIXME - remove Se3 - FEMTetrahedron DOES NOT need Se3 !
 	
-class FEMTetrahedronData : public BodyPhysicalParameters
+class FEMTetrahedronData : public PhysicalParameters
 {
 	public  : std::vector<unsigned int> 	ids; // FIXME - stupid serialization is not recognizing array: unsigned int ids[4]
 	public  : ublas::matrix<Real>	Ke_; // FIXME - this is actually interaction property

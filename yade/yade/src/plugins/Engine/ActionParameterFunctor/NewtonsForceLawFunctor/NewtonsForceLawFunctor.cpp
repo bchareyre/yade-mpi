@@ -31,7 +31,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void NewtonsForceLawFunctor::go( 	  const shared_ptr<ActionParameter>& a
-					, const shared_ptr<BodyPhysicalParameters>& b
+					, const shared_ptr<PhysicalParameters>& b
 					, const Body* bb)
 {
 	ActionParameterForce * af = dynamic_cast<ActionParameterForce*>(a.get());

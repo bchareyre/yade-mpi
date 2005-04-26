@@ -47,7 +47,7 @@ void TranslationCondition::applyCondition(Body * body)
 		//}
 		
 		}
-		else if(BodyPhysicalParameters* b = dynamic_cast<BodyPhysicalParameters*>((*bodies)[*ii]->physicalParameters.get()))
+		else if(PhysicalParameters* b = dynamic_cast<PhysicalParameters*>((*bodies)[*ii]->physicalParameters.get()))
 		{ // NOT everyone has velocity !
 			b->se3.position		+= sign*dt*velocity*translationAxis;
 		}

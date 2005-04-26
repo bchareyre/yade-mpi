@@ -25,7 +25,7 @@ MOC_DIR = $(YADECOMPILATIONPATH)
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 QMAKE_LIBDIR = ../../../plugins/Body/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
-               ../../../plugins/Body/BodyPhysicalParameters/FEMSetParameters/$(YADEDYNLIBPATH) \
+               ../../../plugins/Body/PhysicalParameters/FEMSetParameters/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/ActionParameterInitializer/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/ActionParameterReset/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/InteractingGeometry/InteractionDescriptionSet/$(YADEDYNLIBPATH) \
@@ -34,7 +34,7 @@ QMAKE_LIBDIR = ../../../plugins/Body/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/DeusExMachina/GravityCondition/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/GeometricalModel/Box/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/InteractingGeometry/InteractionBox/$(YADEDYNLIBPATH) \
-               ../../../plugins/Body/BodyPhysicalParameters/BodyMacroParameters/$(YADEDYNLIBPATH) \
+               ../../../plugins/Body/PhysicalParameters/BodyMacroParameters/$(YADEDYNLIBPATH) \
                ../../../plugins/Interaction/BroadInteractor/PersistentSAPCollider/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/InteractionSolver/SDECTimeStepper/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/ActionParameterFunctor/CundallNonViscousForceDampingFunctor/$(YADEDYNLIBPATH) \

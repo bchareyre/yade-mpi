@@ -36,7 +36,7 @@
 #include "GeometricalModel.hpp"
 #include "InteractingGeometry.hpp"
 #include "BoundingVolume.hpp"
-#include "BodyPhysicalParameters.hpp"
+#include "PhysicalParameters.hpp"
 #include "InteractionContainer.hpp"
 #include "Interaction.hpp"
 #include "Serializable.hpp"
@@ -73,7 +73,7 @@ class Body : public Serializable
 
 		
 	/*! Mechanical parameters of the body (mass, sitffness ...) */
-	public : shared_ptr<BodyPhysicalParameters> physicalParameters;
+	public : shared_ptr<PhysicalParameters> physicalParameters;
 
 	/*! The geometrical model of this body (polyhedron, box ...) */
 	public : shared_ptr<GeometricalModel> geometricalModel;

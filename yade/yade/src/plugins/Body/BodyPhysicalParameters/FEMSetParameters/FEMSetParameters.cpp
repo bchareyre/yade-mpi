@@ -26,7 +26,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-FEMSetParameters::FEMSetParameters() : BodyPhysicalParameters()
+FEMSetParameters::FEMSetParameters() : PhysicalParameters()
 {
 	createIndex();
 	nodeGroupMask = 1;
@@ -46,7 +46,7 @@ FEMSetParameters::~FEMSetParameters()
 
 void FEMSetParameters::registerAttributes()
 {
-	BodyPhysicalParameters::registerAttributes();
+	PhysicalParameters::registerAttributes();
 	REGISTER_ATTRIBUTE(nodeGroupMask);
 	REGISTER_ATTRIBUTE(tetrahedronGroupMask);
 }

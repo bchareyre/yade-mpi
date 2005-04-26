@@ -27,7 +27,7 @@
 
 // FIXME - uh, libnames FEMTetrahedronData and FEMTetrahedronStiffness are maybe wrong! it will be fixed, when whole tetrahedron-as-interaction mess will be cleaned up
 
-void FEMTetrahedronStiffness::go(	  const shared_ptr<BodyPhysicalParameters>& par
+void FEMTetrahedronStiffness::go(	  const shared_ptr<PhysicalParameters>& par
 					, Body* body)
 
 {

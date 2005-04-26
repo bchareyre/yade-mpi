@@ -14,7 +14,7 @@ void FEMSetTextLoaderFunctor::registerAttributes()
 	REGISTER_ATTRIBUTE(fileName);
 }
 
-void FEMSetTextLoaderFunctor::go(	  const shared_ptr<BodyPhysicalParameters>& par
+void FEMSetTextLoaderFunctor::go(	  const shared_ptr<PhysicalParameters>& par
 					, Body* body)
 
 {

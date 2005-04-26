@@ -15,11 +15,11 @@ INCLUDEPATH += $(YADEINCLUDEPATH)
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../../plugins/Body/BodyPhysicalParameters/ParticleParameters/$(YADEDYNLIBPATH) \
-               ../../../../plugins/Body/BodyPhysicalParameters/RigidBodyParameters/$(YADEDYNLIBPATH) \
-               ../../../../plugins/Body/BodyPhysicalParameters/FEMSetParameters/$(YADEDYNLIBPATH) \
-               ../../../../plugins/Body/BodyPhysicalParameters/FEMNodeData/$(YADEDYNLIBPATH) \
-               ../../../../plugins/Body/BodyPhysicalParameters/FEMTetrahedronData/$(YADEDYNLIBPATH) \
+QMAKE_LIBDIR = ../../../../plugins/Body/PhysicalParameters/ParticleParameters/$(YADEDYNLIBPATH) \
+               ../../../../plugins/Body/PhysicalParameters/RigidBodyParameters/$(YADEDYNLIBPATH) \
+               ../../../../plugins/Body/PhysicalParameters/FEMSetParameters/$(YADEDYNLIBPATH) \
+               ../../../../plugins/Body/PhysicalParameters/FEMNodeData/$(YADEDYNLIBPATH) \
+               ../../../../plugins/Body/PhysicalParameters/FEMTetrahedronData/$(YADEDYNLIBPATH) \
                ../../../../plugins/Body/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
                ../../../../plugins/Body/GeometricalModel/Tetrahedron/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 

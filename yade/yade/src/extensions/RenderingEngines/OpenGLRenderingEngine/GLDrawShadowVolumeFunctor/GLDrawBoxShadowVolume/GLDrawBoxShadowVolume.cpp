@@ -29,7 +29,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void GLDrawBoxShadowVolume::go(const shared_ptr<GeometricalModel>& gm , const shared_ptr<BodyPhysicalParameters>& pp, const Vector3r& lightPos)
+void GLDrawBoxShadowVolume::go(const shared_ptr<GeometricalModel>& gm , const shared_ptr<PhysicalParameters>& pp, const Vector3r& lightPos)
 {
 	//Se3r& se3 = (static_cast<RigidBodyParameters*>(pp.get()))->se3;
 	Se3r& se3 = pp->se3;

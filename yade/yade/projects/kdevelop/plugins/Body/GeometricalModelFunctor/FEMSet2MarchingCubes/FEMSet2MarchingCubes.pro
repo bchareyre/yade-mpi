@@ -12,8 +12,8 @@ INCLUDEPATH += $(YADEINCLUDEPATH)
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../../plugins/Body/BodyPhysicalParameters/ParticleParameters/$(YADEDYNLIBPATH) \
-               ../../../../plugins/Body/BodyPhysicalParameters/LatticeBeamParameters/$(YADEDYNLIBPATH) \
+QMAKE_LIBDIR = ../../../../plugins/Body/PhysicalParameters/ParticleParameters/$(YADEDYNLIBPATH) \
+               ../../../../plugins/Body/PhysicalParameters/LatticeBeamParameters/$(YADEDYNLIBPATH) \
                ../../../../plugins/Body/GeometricalModel/LineSegment/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \

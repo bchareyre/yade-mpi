@@ -30,7 +30,7 @@ QMAKE_LIBDIR = ../../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../../../plugins/Interaction/InteractionGeometry/SpringGeometry/$(YADEDYNLIBPATH) \
                ../../../../plugins/Motion/Action/ActionForce/$(YADEDYNLIBPATH) \
                ../../../../plugins/Motion/Action/ActionMomentum/$(YADEDYNLIBPATH) \
-               ../../../../plugins/Body/BodyPhysicalParameters/ParticleParameters/$(YADEDYNLIBPATH) \
+               ../../../../plugins/Body/PhysicalParameters/ParticleParameters/$(YADEDYNLIBPATH) \
                ../../../../yade/Engine/$(YADEDYNLIBPATH) \
                ../../../../plugins/Engine/Action/ActionForce/$(YADEDYNLIBPATH) \
                ../../../../plugins/Engine/Action/ActionMomentum/$(YADEDYNLIBPATH) \

@@ -43,7 +43,7 @@ class GLDrawSphere : public GLDrawGeometricalModelFunctor
 	private : void subdivideTriangle(Vector3r& v1,Vector3r& v2,Vector3r& v3, int depth);
 	private : void drawSphere(int depth);
 	
-	public : virtual void go(const shared_ptr<GeometricalModel>&, const shared_ptr<BodyPhysicalParameters>&,bool);
+	public : virtual void go(const shared_ptr<GeometricalModel>&, const shared_ptr<PhysicalParameters>&,bool);
 	REGISTER_CLASS_NAME(GLDrawSphere);
 };
 

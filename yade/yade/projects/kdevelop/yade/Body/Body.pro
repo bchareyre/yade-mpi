@@ -14,4 +14,4 @@ SUBDIRS += Body \
            BoundingVolume \
            GeometricalModel \
            InteractingGeometry \
-           BodyPhysicalParameters 
+           PhysicalParameters 

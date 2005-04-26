@@ -38,7 +38,7 @@ class LeapFrogOrientationIntegratorFunctor : public BodyPhysicalParametersFuncto
 	private : vector<Vector3r> prevAngularVelocities;
 	private : vector<bool> firsts;
 	
-	public : virtual void go( 	  const shared_ptr<BodyPhysicalParameters>&
+	public : virtual void go( 	  const shared_ptr<PhysicalParameters>&
 					, Body*);
 	
 	REGISTER_CLASS_NAME(LeapFrogOrientationIntegratorFunctor);

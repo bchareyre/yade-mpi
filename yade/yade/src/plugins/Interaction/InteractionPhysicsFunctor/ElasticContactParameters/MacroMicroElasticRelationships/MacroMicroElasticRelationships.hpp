@@ -39,8 +39,8 @@ class MacroMicroElasticRelationships : public InteractionPhysicsFunctor
 
 	public : MacroMicroElasticRelationships();
 
-	public : virtual void go(	const shared_ptr<BodyPhysicalParameters>& b1,
-					const shared_ptr<BodyPhysicalParameters>& b2,
+	public : virtual void go(	const shared_ptr<PhysicalParameters>& b1,
+					const shared_ptr<PhysicalParameters>& b2,
 					const shared_ptr<Interaction>& interaction);
 
 	protected: virtual void registerAttributes();

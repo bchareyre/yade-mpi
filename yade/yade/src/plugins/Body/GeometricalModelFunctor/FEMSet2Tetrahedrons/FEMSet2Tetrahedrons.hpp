@@ -34,7 +34,7 @@
 
 class FEMSet2Tetrahedrons : public GeometricalModelFunctor
 {
-	public : void go(	  const shared_ptr<BodyPhysicalParameters>&
+	public : void go(	  const shared_ptr<PhysicalParameters>&
 				, shared_ptr<GeometricalModel>&
 				, const Body*);
 	REGISTER_CLASS_NAME(FEMSet2Tetrahedrons);

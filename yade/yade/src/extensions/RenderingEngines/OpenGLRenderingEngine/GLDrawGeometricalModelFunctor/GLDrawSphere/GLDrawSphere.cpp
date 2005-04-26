@@ -37,7 +37,7 @@ vector<Vector3r> GLDrawSphere::faces;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void GLDrawSphere::go(const shared_ptr<GeometricalModel>& gm, const shared_ptr<BodyPhysicalParameters>&,bool wire)
+void GLDrawSphere::go(const shared_ptr<GeometricalModel>& gm, const shared_ptr<PhysicalParameters>&,bool wire)
 {
 	static bool first=true;
 	

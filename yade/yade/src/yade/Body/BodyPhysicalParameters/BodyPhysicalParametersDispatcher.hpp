@@ -29,7 +29,7 @@
 
 #include "Engine.hpp"
 #include "DynLibDispatcher.hpp"
-#include "BodyPhysicalParameters.hpp"
+#include "PhysicalParameters.hpp"
 #include "BodyPhysicalParametersFunctor.hpp"
 #include "Body.hpp"
 
@@ -39,11 +39,11 @@
 class BodyPhysicalParametersDispatcher :
 	  public Engine 
 	, public DynLibDispatcher
-		<	BodyPhysicalParameters ,
+		<	PhysicalParameters ,
 			BodyPhysicalParametersFunctor,
 			void ,
 			TYPELIST_2(
-					  const shared_ptr<BodyPhysicalParameters>&
+					  const shared_ptr<PhysicalParameters>&
 					, Body*
 				  )
 		>
