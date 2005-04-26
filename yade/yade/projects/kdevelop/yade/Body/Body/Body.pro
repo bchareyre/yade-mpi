@@ -21,9 +21,7 @@ CONFIG += debug \
 TEMPLATE = lib 
 HEADERS += Body.hpp \
            BodyContainer.hpp \
-           ComplexBody.hpp \
-           SimpleBody.hpp 
+           MetaBody.hpp
 SOURCES += Body.cpp \
            BodyContainer.cpp \
-           ComplexBody.cpp \
-           SimpleBody.cpp 
+           MetaBody.cpp

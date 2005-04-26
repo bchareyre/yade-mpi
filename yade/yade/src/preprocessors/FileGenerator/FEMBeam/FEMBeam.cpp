@@ -23,7 +23,7 @@
 
 // body
 #include "ComplexBody.hpp"
-#include "SimpleBody.hpp"
+#include "Body.hpp"
 
 // dispatchers
 #include "BodyPhysicalParametersDispatcher.hpp"

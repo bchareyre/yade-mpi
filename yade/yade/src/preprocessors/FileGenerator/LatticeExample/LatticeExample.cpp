@@ -28,7 +28,7 @@
 #include "LineSegment.hpp"
 #include "Sphere.hpp"
 
-#include "SimpleBody.hpp"
+#include "Body.hpp"
 #include "InteractionDescriptionSet.hpp"
 #include "BoundingVolumeDispatcher.hpp"
 #include "GeometricalModelDispatcher.hpp"
@@ -128,7 +128,7 @@ string LatticeExample::generate()
 
 void LatticeExample::createNode(shared_ptr<Body>& body, int i, int j, int k)
 {
-	body = shared_ptr<Body>(new SimpleBody(0,nodeGroupMask));
+	body = shared_ptr<Body>(new Body(0,nodeGroupMask));
 	shared_ptr<LatticeNodeParameters> physics(new LatticeNodeParameters);
 	shared_ptr<Sphere> gSphere(new Sphere);
 	
@@ -165,7 +165,7 @@ void LatticeExample::createNode(shared_ptr<Body>& body, int i, int j, int k)
 
 void LatticeExample::createBeam(shared_ptr<Body>& body, unsigned int i, unsigned int j)
 {
-	body = shared_ptr<Body>(new SimpleBody(0,beamGroupMask));
+	body = shared_ptr<Body>(new Body(0,beamGroupMask));
 	shared_ptr<LatticeBeamParameters> physics(new LatticeBeamParameters);
 	shared_ptr<LineSegment> gBeam(new LineSegment);
 	

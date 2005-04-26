@@ -62,7 +62,7 @@ void FEMSetTextLoaderFunctor::createNode( shared_ptr<Body>& body
 					, Vector3r position
 					, unsigned int id)
 {
-	body = shared_ptr<Body>(new SimpleBody(id,nodeGroupMask));
+	body = shared_ptr<Body>(new Body(id,nodeGroupMask));
 	shared_ptr<FEMNodeData> physics(new FEMNodeData);
 	shared_ptr<Sphere> gSphere(new Sphere);
 	
@@ -104,7 +104,7 @@ void FEMSetTextLoaderFunctor::createTetrahedron(  const ComplexBody* rootBody
 						, unsigned int id4)
 {
 	
-	body = shared_ptr<Body>(new SimpleBody(id,tetrahedronGroupMask));
+	body = shared_ptr<Body>(new Body(id,tetrahedronGroupMask));
 	shared_ptr<FEMTetrahedronData> physics(new FEMTetrahedronData);
 	shared_ptr<Tetrahedron> gTet(new Tetrahedron);
 	

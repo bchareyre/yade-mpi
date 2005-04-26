@@ -290,7 +290,7 @@ void FEMDEMCouplingTest::positionRootBody(shared_ptr<ComplexBody>& rootBody)
  
 void FEMDEMCouplingTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents)
 {
-	body = shared_ptr<Body>(new SimpleBody(0,demGroupMask));
+	body = shared_ptr<Body>(new Body(0,demGroupMask));
 	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<Box> gBox(new Box);

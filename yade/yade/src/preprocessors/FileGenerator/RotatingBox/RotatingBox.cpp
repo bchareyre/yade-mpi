@@ -5,7 +5,7 @@
 #include "AABB.hpp"
 #include "Sphere.hpp"
 #include "ComplexBody.hpp"
-#include "SimpleBody.hpp"
+#include "Body.hpp"
 #include "SimpleSpringLaw.hpp"
 #include "SAPCollider.hpp"
 #include "RigidBodyParameters.hpp"
@@ -116,7 +116,7 @@ string RotatingBox::generate()
 
 void RotatingBox::createBox(shared_ptr<Body>& body, int i, int j, int k)
 {
-	body = shared_ptr<Body>(new SimpleBody(0,0));
+	body = shared_ptr<Body>(new Body(0,0));
 	shared_ptr<RigidBodyParameters> physics(new RigidBodyParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<Box> gBox(new Box);
@@ -168,7 +168,7 @@ void RotatingBox::createBox(shared_ptr<Body>& body, int i, int j, int k)
 
 void RotatingBox::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 {
-	body = shared_ptr<Body>(new SimpleBody(0,0));
+	body = shared_ptr<Body>(new Body(0,0));
 	shared_ptr<RigidBodyParameters> physics(new RigidBodyParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<Sphere> gSphere(new Sphere);
@@ -213,7 +213,7 @@ void RotatingBox::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 
 void RotatingBox::createKinematicBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents,bool wire)
 {
-	body = shared_ptr<Body>(new SimpleBody(0,0));
+	body = shared_ptr<Body>(new Body(0,0));
 	shared_ptr<RigidBodyParameters> physics(new RigidBodyParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<Box> gBox(new Box);
