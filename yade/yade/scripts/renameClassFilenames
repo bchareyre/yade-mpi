@@ -15,11 +15,11 @@ find ../src/  -name "*.tpp" -exec fgrep -l "$2" {} \;				> ./tppRenameClass
 echo "finding .ipp files ... "
 find ../src/  -name "*.ipp" -exec fgrep -l "$2" {} \;				> ./ippRenameClass
 
-cat ./proRenameClass  | grep -e "\<$1\>"					> ./proRenameClass2
-cat ./hppRenameClass  | grep -e "\<$1\>"					> ./hppRenameClass2
-cat ./cppRenameClass  | grep -e "\<$1\>"					> ./cppRenameClass2
-cat ./tppRenameClass  | grep -e "\<$1\>"					> ./tppRenameClass2
-cat ./ippRenameClass  | grep -e "\<$1\>"					> ./ippRenameClass2
+cat ./proRenameClass  | grep -e "\<$1\>.pro"					> ./proRenameClass2
+cat ./hppRenameClass  | grep -e "\<$1\>.hpp"					> ./hppRenameClass2
+cat ./cppRenameClass  | grep -e "\<$1\>.cpp"					> ./cppRenameClass2
+cat ./tppRenameClass  | grep -e "\<$1\>.tpp"					> ./tppRenameClass2
+cat ./ippRenameClass  | grep -e "\<$1\>.ipp"					> ./ippRenameClass2
 
 cat ./proRenameClass2 | grep -e "\<$1\>" | sed -e "s/\<$1\>\.pro/$2.pro/"	> ./proRenameClass3
 cat ./hppRenameClass2 | grep -e "\<$1\>" | sed -e "s/\<$1\>\.hpp/$2.hpp/"	> ./hppRenameClass3
