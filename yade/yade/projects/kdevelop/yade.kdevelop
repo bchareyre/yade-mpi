@@ -99,7 +99,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>yade/Body/Body</activedir>
+      <activedir>yade/Engine</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>

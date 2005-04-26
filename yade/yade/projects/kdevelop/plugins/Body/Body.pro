@@ -15,5 +15,5 @@ SUBDIRS += BoundingVolume \
            BodyPhysicalParameters \
            BoundingVolumeFunctor \
            GeometricalModelFunctor \
-           InteractionDescriptionFunctor \
+           InteractingGeometryFunctor \
 	   BodyPhysicalParametersFunctor
