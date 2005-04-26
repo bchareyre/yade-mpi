@@ -44,13 +44,13 @@ class Box2Box4ClosestFeatures : public InteractionGeometryFunctor
 		Vector3r normal;
 	} BoxBoxInteractionInfo;
 
-	public : virtual bool go(		const shared_ptr<InteractionDescription>& cm1,
-						const shared_ptr<InteractionDescription>& cm2,
+	public : virtual bool go(		const shared_ptr<InteractingGeometry>& cm1,
+						const shared_ptr<InteractingGeometry>& cm2,
 						const Se3r& se31,
 						const Se3r& se32,
 						const shared_ptr<Interaction>& c);
-	public : virtual bool goReverse(	const shared_ptr<InteractionDescription>& cm1,
-						const shared_ptr<InteractionDescription>& cm2,
+	public : virtual bool goReverse(	const shared_ptr<InteractingGeometry>& cm1,
+						const shared_ptr<InteractingGeometry>& cm2,
 						const Se3r& se31,
 						const Se3r& se32,
 						const shared_ptr<Interaction>& c);

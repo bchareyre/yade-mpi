@@ -32,7 +32,7 @@ LIBS += -lSerialization \
 -lInteractionPhysics \
 -lInteractionGeometry \
 -lBoundingVolume \
--lInteractionDescription \
+-lInteractingGeometry \
 -lGeometricalModel \
 -lBodyPhysicalParameters \
 -lEngine \
@@ -60,7 +60,7 @@ QMAKE_LIBDIR = ../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
 ../../yade/Interaction/InteractionPhysics/$(YADEDYNLIBPATH) \
 ../../yade/Interaction/InteractionGeometry/$(YADEDYNLIBPATH) \
 ../../yade/Body/BoundingVolume/$(YADEDYNLIBPATH) \
-../../yade/Body/InteractionDescription/$(YADEDYNLIBPATH) \
+../../yade/Body/InteractingGeometry/$(YADEDYNLIBPATH) \
 ../../yade/Body/GeometricalModel/$(YADEDYNLIBPATH) \
 ../../yade/Body/BodyPhysicalParameters/$(YADEDYNLIBPATH) \
 $(YADEDYNLIBPATH)

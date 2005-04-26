@@ -23,7 +23,7 @@
 
 #include "InteractionSphere.hpp"
 
-InteractionSphere::InteractionSphere () : InteractionDescription()
+InteractionSphere::InteractionSphere () : InteractingGeometry()
 {
 	createIndex();
 }
@@ -34,7 +34,7 @@ InteractionSphere::~InteractionSphere ()
 
 void InteractionSphere::registerAttributes()
 {
-	InteractionDescription::registerAttributes();
+	InteractingGeometry::registerAttributes();
 	REGISTER_ATTRIBUTE(radius);
 }
 

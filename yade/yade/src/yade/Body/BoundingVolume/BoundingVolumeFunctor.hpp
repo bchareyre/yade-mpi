@@ -29,7 +29,7 @@
 
 #include "FunctorWrapper.hpp"
 #include "BoundingVolume.hpp"
-#include "InteractionDescription.hpp"
+#include "InteractingGeometry.hpp"
 #include "Body.hpp"
 #include "ComplexBody.hpp"
 
@@ -52,7 +52,7 @@
 */
 class BoundingVolumeFunctor : public FunctorWrapper
 	/*! Method called to build a given bounding volume from a given collision model and a 3D transformation
-		\param const shared_ptr<InteractionDescription>& the collision model from wich we want
+		\param const shared_ptr<InteractingGeometry>& the collision model from wich we want
 		to extract the bounding volume
 		\param Se3r& the 3D transformation to apply to the collision model before building
 		the bounding volume
@@ -62,7 +62,7 @@ class BoundingVolumeFunctor : public FunctorWrapper
 		<
 		 void ,
 		 TYPELIST_4(
-		 		  const shared_ptr<InteractionDescription>&
+		 		  const shared_ptr<InteractingGeometry>&
 				, shared_ptr<BoundingVolume>& // is not working when const, because functors are supposed to modify it!
 				, const Se3r& // FIXME - remove Se3r, because not everything is supposed to have it. If some function needs Se3r it must find it through Body*
 				, const Body* // with that - functors have all the data they may need, but it's const, so they can't modify it !

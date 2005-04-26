@@ -7,7 +7,7 @@ LIBS += -lPersistentSAPCollider \
         -lAABB \
         -lInteractionSphere \
         -lInteractionBox \
-        -lInteractionDescriptionSet2AABBFunctor \
+        -lInteractingGeometrySet2AABBFunctor \
         -lSphere \
         -lBox \
         -lCundallNonViscousMomentumDampingFunctor \
@@ -24,8 +24,8 @@ UI_DIR = $(YADECOMPILATIONPATH)
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 QMAKE_LIBDIR = ../../../plugins/Interaction/BroadInteractor/PersistentSAPCollider/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
-               ../../../plugins/Body/InteractionDescription/InteractionSphere/$(YADEDYNLIBPATH) \
-               ../../../plugins/Body/InteractionDescription/InteractionBox/$(YADEDYNLIBPATH) \
+               ../../../plugins/Body/InteractingGeometry/InteractionSphere/$(YADEDYNLIBPATH) \
+               ../../../plugins/Body/InteractingGeometry/InteractionBox/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/BoundingVolumeFunctor/InteractionDescriptionSet2AABBFunctor/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/GeometricalModel/Box/$(YADEDYNLIBPATH) \

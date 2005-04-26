@@ -35,13 +35,13 @@
 /*! \brief Provide interaction handling between a axis aligned box and a sphere in terms of ClosestFeatures */
 class Sphere2Sphere4ErrorTolerant : public InteractionGeometryFunctor
 {
-	public : virtual bool go(		const shared_ptr<InteractionDescription>& cm1,
-						const shared_ptr<InteractionDescription>& cm2,
+	public : virtual bool go(		const shared_ptr<InteractingGeometry>& cm1,
+						const shared_ptr<InteractingGeometry>& cm2,
 						const Se3r& se31,
 						const Se3r& se32,
 						const shared_ptr<Interaction>& c);
-	public : virtual bool goReverse(	const shared_ptr<InteractionDescription>& cm1,
-						const shared_ptr<InteractionDescription>& cm2,
+	public : virtual bool goReverse(	const shared_ptr<InteractingGeometry>& cm1,
+						const shared_ptr<InteractingGeometry>& cm2,
 						const Se3r& se31,
 						const Se3r& se32,
 						const shared_ptr<Interaction>& c);

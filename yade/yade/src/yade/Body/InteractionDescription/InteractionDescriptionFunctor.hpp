@@ -28,7 +28,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "GeometricalModel.hpp"
-#include "InteractionDescription.hpp"
+#include "InteractingGeometry.hpp"
 #include "Serializable.hpp"
 #include "Se3.hpp"
 

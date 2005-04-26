@@ -30,7 +30,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "FunctorWrapper.hpp"
-#include "InteractionDescription.hpp"
+#include "InteractingGeometry.hpp"
 #include "Se3.hpp"
 #include "Interaction.hpp"
 
@@ -52,8 +52,8 @@ class InteractionGeometryFunctor : public FunctorWrapper
 		<
 		 bool ,
 		 TYPELIST_5(
-				  const shared_ptr<InteractionDescription>&
-				, const shared_ptr<InteractionDescription>&
+				  const shared_ptr<InteractingGeometry>&
+				, const shared_ptr<InteractingGeometry>&
 				, const Se3r&
 				, const Se3r&
 				, const shared_ptr<Interaction>&

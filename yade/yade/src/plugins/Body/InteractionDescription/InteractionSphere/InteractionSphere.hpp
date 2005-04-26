@@ -24,9 +24,9 @@
 #ifndef __INTERACTIONSPHERE_H__
 #define __INTERACTIONSPHERE_H__
 
-#include "InteractionDescription.hpp"
+#include "InteractingGeometry.hpp"
 
-class InteractionSphere : public InteractionDescription
+class InteractionSphere : public InteractingGeometry
 {
 	public : Real radius;
 
@@ -44,7 +44,7 @@ class InteractionSphere : public InteractionDescription
 /// Indexable											///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	REGISTER_CLASS_INDEX(InteractionSphere,InteractionDescription);
+	REGISTER_CLASS_INDEX(InteractionSphere,InteractingGeometry);
 	
 };
 

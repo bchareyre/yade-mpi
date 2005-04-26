@@ -13,8 +13,8 @@ LIBS += -lBox \
         -lPersistentSAPCollider \
         -lInteractionSphere \
         -lInteractionBox \
-        -lInteractionDescriptionSet \
-        -lInteractionDescriptionSet2AABBFunctor \
+        -lInteractingGeometrySet \
+        -lInteractingGeometrySet2AABBFunctor \
         -lParticleParameters \
         -lSDECLinkGeometry \
         -lSAPCollider \
@@ -41,9 +41,9 @@ QMAKE_LIBDIR = ../../../plugins/Body/GeometricalModel/Box/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/MultiMethods/$(YADEDYNLIBPATH) \
                ../../../yade/Interaction/Interaction/$(YADEDYNLIBPATH) \
                ../../../plugins/Interaction/BroadInteractor/PersistentSAPCollider/$(YADEDYNLIBPATH) \
-               ../../../plugins/Body/InteractionDescription/InteractionSphere/$(YADEDYNLIBPATH) \
-               ../../../plugins/Body/InteractionDescription/InteractionBox/$(YADEDYNLIBPATH) \
-               ../../../plugins/Body/InteractionDescription/InteractionDescriptionSet/$(YADEDYNLIBPATH) \
+               ../../../plugins/Body/InteractingGeometry/InteractionSphere/$(YADEDYNLIBPATH) \
+               ../../../plugins/Body/InteractingGeometry/InteractionBox/$(YADEDYNLIBPATH) \
+               ../../../plugins/Body/InteractingGeometry/InteractionDescriptionSet/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/BoundingVolumeFunctor/InteractionDescriptionSet2AABBFunctor/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/BodyPhysicalParameters/ParticleParameters/$(YADEDYNLIBPATH) \
                ../../../plugins/Interaction/InteractionGeometry/SDECLinkGeometry/$(YADEDYNLIBPATH) \

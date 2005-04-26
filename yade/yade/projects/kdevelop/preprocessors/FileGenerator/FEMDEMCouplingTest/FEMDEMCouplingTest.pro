@@ -7,7 +7,7 @@ LIBS += -lAABB \
         -lFEMSetParameters \
         -lActionParameterInitializer \
         -lActionParameterReset \
-        -lInteractionDescriptionSet \
+        -lInteractingGeometrySet \
         -lFEMSetTextLoaderFunctor \
         -lFEMLaw \
         -lGravityCondition \
@@ -28,12 +28,12 @@ QMAKE_LIBDIR = ../../../plugins/Body/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/BodyPhysicalParameters/FEMSetParameters/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/ActionParameterInitializer/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/ActionParameterReset/$(YADEDYNLIBPATH) \
-               ../../../plugins/Body/InteractionDescription/InteractionDescriptionSet/$(YADEDYNLIBPATH) \
+               ../../../plugins/Body/InteractingGeometry/InteractionDescriptionSet/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/BodyPhysicalParametersFunctor/FEMSetTextLoaderFunctor/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/ConstitutiveLaw/FEMLaw/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/Condition/GravityCondition/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/GeometricalModel/Box/$(YADEDYNLIBPATH) \
-               ../../../plugins/Body/InteractionDescription/InteractionBox/$(YADEDYNLIBPATH) \
+               ../../../plugins/Body/InteractingGeometry/InteractionBox/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/BodyPhysicalParameters/BodyMacroParameters/$(YADEDYNLIBPATH) \
                ../../../plugins/Interaction/BroadInteractor/PersistentSAPCollider/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/ConstitutiveLaw/SDECTimeStepper/$(YADEDYNLIBPATH) \

@@ -4,7 +4,7 @@
 # Target is a library:  
 
 LIBS += -lParticleParameters \
-        -lInteractionDescriptionSet \
+        -lInteractingGeometrySet \
         -lAABB \
         -lSphere \
         -lLineSegment \
@@ -17,7 +17,7 @@ MOC_DIR = $(YADECOMPILATIONPATH)
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 QMAKE_LIBDIR = ../../../plugins/Body/BodyPhysicalParameters/ParticleParameters/$(YADEDYNLIBPATH) \
-               ../../../plugins/Body/InteractionDescription/InteractionDescriptionSet/$(YADEDYNLIBPATH) \
+               ../../../plugins/Body/InteractingGeometry/InteractionDescriptionSet/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/GeometricalModel/LineSegment/$(YADEDYNLIBPATH) \

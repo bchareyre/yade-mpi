@@ -1,6 +1,6 @@
-#include "InteractionDescription.hpp"
+#include "InteractingGeometry.hpp"
 
-void InteractionDescription::registerAttributes()
+void InteractingGeometry::registerAttributes()
 {
 	REGISTER_ATTRIBUTE(diffuseColor);
 }

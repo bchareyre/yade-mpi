@@ -185,7 +185,7 @@ void FEMBeam::positionRootBody(shared_ptr<ComplexBody>& rootBody)
 	gm->visible 				= true;
 	gm->shadowCaster 			= true;
 	
-	rootBody->interactionGeometry 		= dynamic_pointer_cast<InteractionDescription>(set);	
+	rootBody->interactionGeometry 		= dynamic_pointer_cast<InteractingGeometry>(set);	
 	rootBody->boundingVolume		= dynamic_pointer_cast<BoundingVolume>(aabb);
 	rootBody->geometricalModel 		= gm;
 	rootBody->physicalParameters 		= physics;

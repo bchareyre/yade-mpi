@@ -36,7 +36,7 @@
 #include "Interaction.hpp"
 #include "DynLibDispatcher.hpp"
 #include "Actor.hpp"
-#include "InteractionDescription.hpp"
+#include "InteractingGeometry.hpp"
 #include "InteractionGeometryFunctor.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -50,12 +50,12 @@ class Body;
 class InteractionGeometryDispatcher : 
 	  public Actor
 	, public DynLibDispatcher
-		<	TYPELIST_2( InteractionDescription , InteractionDescription ) ,	// base classess for dispatch
+		<	TYPELIST_2( InteractingGeometry , InteractingGeometry ) ,	// base classess for dispatch
 			InteractionGeometryFunctor,					// class that provides multivirtual call
 			bool ,								// return type
 			TYPELIST_5(
-					  const shared_ptr<InteractionDescription>&	// arguments
-					, const shared_ptr<InteractionDescription>&
+					  const shared_ptr<InteractingGeometry>&	// arguments
+					, const shared_ptr<InteractingGeometry>&
 					, const Se3r&
 					, const Se3r&
 					, const shared_ptr<Interaction>&

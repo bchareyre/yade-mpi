@@ -12,7 +12,7 @@ LIBS += -lSerialization \
         -lMultiMethods \
         -lInteractionSphere \
         -lInteractionBox \
-        -lInteractionDescriptionSet2AABBFunctor \
+        -lInteractingGeometrySet2AABBFunctor \
         -lSAPCollider \
         -lRigidBodyParameters \
         -lEngine \
@@ -36,8 +36,8 @@ QMAKE_LIBDIR = ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
                ../../../yade/Interaction/Interaction/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/MultiMethods/$(YADEDYNLIBPATH) \
-               ../../../plugins/Body/InteractionDescription/InteractionSphere/$(YADEDYNLIBPATH) \
-               ../../../plugins/Body/InteractionDescription/InteractionBox/$(YADEDYNLIBPATH) \
+               ../../../plugins/Body/InteractingGeometry/InteractionSphere/$(YADEDYNLIBPATH) \
+               ../../../plugins/Body/InteractingGeometry/InteractionBox/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/BoundingVolumeFunctor/InteractionDescriptionSet2AABBFunctor/$(YADEDYNLIBPATH) \
                ../../../plugins/Interaction/BroadInteractor/SAPCollider/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/BodyPhysicalParameters/RigidBodyParameters/$(YADEDYNLIBPATH) \

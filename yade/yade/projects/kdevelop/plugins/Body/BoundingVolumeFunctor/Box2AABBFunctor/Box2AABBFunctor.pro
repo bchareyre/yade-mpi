@@ -18,11 +18,11 @@ QMAKE_LIBDIR = ../../../../plugins/Body/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
                ../../../../plugins/Body/GeometricalModel/Box/$(YADEDYNLIBPATH) \
                ../../../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
                ../../../../toolboxes/Libraries/MultiMethods/$(YADEDYNLIBPATH) \
-               ../../../../plugins/Body/InteractionDescription/InteractionBox/$(YADEDYNLIBPATH) \
+               ../../../../plugins/Body/InteractingGeometry/InteractionBox/$(YADEDYNLIBPATH) \
                ../../../../yade/Body/BoundingVolume/$(YADEDYNLIBPATH) \
                ../../../../plugins/Geometry/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
                ../../../../plugins/Geometry/GeometricalModel/Box/$(YADEDYNLIBPATH) \
-               ../../../../plugins/Geometry/InteractionDescription/InteractionBox/$(YADEDYNLIBPATH) \
+               ../../../../plugins/Geometry/InteractingGeometry/InteractionBox/$(YADEDYNLIBPATH) \
                ../../../../yade/Geometry/$(YADEDYNLIBPATH) \
                ../../../../plugins/Geometry/CollisionGeometry/InteractionBox/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 

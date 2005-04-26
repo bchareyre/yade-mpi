@@ -24,7 +24,7 @@
 #include "InteractionBox.hpp"
 
 
-InteractionBox::InteractionBox () : InteractionDescription()
+InteractionBox::InteractionBox () : InteractingGeometry()
 {		
 	createIndex();
 }
@@ -35,7 +35,7 @@ InteractionBox::~InteractionBox ()
 
 void InteractionBox::registerAttributes()
 {
-	InteractionDescription::registerAttributes();
+	InteractingGeometry::registerAttributes();
 	REGISTER_ATTRIBUTE(extents);
 }
 

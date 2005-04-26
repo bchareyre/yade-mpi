@@ -18,8 +18,8 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
-HEADERS += InteractionDescription.hpp \
+HEADERS += InteractingGeometry.hpp \
            InteractionDescriptionFunctor.hpp \
            InteractionDescriptionDispatcher.hpp
-SOURCES += InteractionDescription.cpp \
+SOURCES += InteractingGeometry.cpp \
            InteractionDescriptionDispatcher.cpp

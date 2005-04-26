@@ -28,8 +28,8 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool Sphere2Sphere4ErrorTolerant::go(		const shared_ptr<InteractionDescription>& cm1,
-						const shared_ptr<InteractionDescription>& cm2,
+bool Sphere2Sphere4ErrorTolerant::go(		const shared_ptr<InteractingGeometry>& cm1,
+						const shared_ptr<InteractingGeometry>& cm2,
 						const Se3r& se31,
 						const Se3r& se32,
 						const shared_ptr<Interaction>& c)
@@ -61,8 +61,8 @@ bool Sphere2Sphere4ErrorTolerant::go(		const shared_ptr<InteractionDescription>&
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool Sphere2Sphere4ErrorTolerant::goReverse(	const shared_ptr<InteractionDescription>& cm1,
-						const shared_ptr<InteractionDescription>& cm2,
+bool Sphere2Sphere4ErrorTolerant::goReverse(	const shared_ptr<InteractingGeometry>& cm1,
+						const shared_ptr<InteractingGeometry>& cm2,
 						const Se3r& se31,
 						const Se3r& se32,
 						const shared_ptr<Interaction>& c)

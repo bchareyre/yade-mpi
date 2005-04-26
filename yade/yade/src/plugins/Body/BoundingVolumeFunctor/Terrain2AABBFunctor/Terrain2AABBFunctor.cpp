@@ -3,7 +3,7 @@
 #include "Terrain.hpp"
 #include "AABB.hpp"
   
-void Terrain2AABBFunctor::go(	  const shared_ptr<InteractionDescription>&
+void Terrain2AABBFunctor::go(	  const shared_ptr<InteractingGeometry>&
 				, shared_ptr<BoundingVolume>&
 				, const Se3r&
 				, const Body* 	)

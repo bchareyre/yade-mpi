@@ -375,7 +375,7 @@ void SDECLinkedSpheres::positionRootBody(shared_ptr<ComplexBody>& rootBody)
 	shared_ptr<AABB> aabb(new AABB);
 	aabb->diffuseColor		= Vector3r(0,0,1);
 	
-	rootBody->interactionGeometry	= dynamic_pointer_cast<InteractionDescription>(set);	
+	rootBody->interactionGeometry	= dynamic_pointer_cast<InteractingGeometry>(set);	
 	rootBody->boundingVolume	= dynamic_pointer_cast<BoundingVolume>(aabb);
 	rootBody->physicalParameters 	= physics;
 	

@@ -13,5 +13,5 @@ TEMPLATE = subdirs
 SUBDIRS += Body \
            BoundingVolume \
            GeometricalModel \
-           InteractionDescription \
+           InteractingGeometry \
            BodyPhysicalParameters 

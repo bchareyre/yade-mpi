@@ -19,7 +19,7 @@ LIBS += -lSerialization \
         -lCundallNonViscousMomentumDampingFunctor \
         -lCundallNonViscousForceDampingFunctor \
         -lSphere \
-        -lInteractionDescriptionSet \
+        -lInteractingGeometrySet \
         -lFEMSetParameters \
         -lFEMTetrahedronData \
         -lFEMNodeData \
@@ -49,7 +49,7 @@ QMAKE_LIBDIR = ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/ActionParameterFunctor/CundallNonViscousMomentumDampingFunctor/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/ActionParameterFunctor/CundallNonViscousForceDampingFunctor/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
-               ../../../plugins/Body/InteractionDescription/InteractionDescriptionSet/$(YADEDYNLIBPATH) \
+               ../../../plugins/Body/InteractingGeometry/InteractionDescriptionSet/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/BodyPhysicalParameters/FEMSetParameters/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/BodyPhysicalParameters/FEMTetrahedronData/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/BodyPhysicalParameters/FEMNodeData/$(YADEDYNLIBPATH) \

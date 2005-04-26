@@ -15,7 +15,7 @@
 #include "BroadInteractor.hpp"
 #include "InteractionGeometryDispatcher.hpp"
 #include "GeometricalModel.hpp"
-#include "InteractionDescription.hpp"
+#include "InteractingGeometry.hpp"
 #include "BoundingVolume.hpp"
 #include "InteractionGeometry.hpp"
 #include "InteractionPhysics.hpp"
@@ -192,8 +192,8 @@ void Omega::registerDynlibType(const string& name)
 		dynlibsType[name]="BroadInteractor";
 	else if (dynamic_pointer_cast<GeometricalModel>(f))
 		dynlibsType[name]="GeometricalModel";
-	else if (dynamic_pointer_cast<InteractionDescription>(f))
-		dynlibsType[name]="InteractionDescription";
+	else if (dynamic_pointer_cast<InteractingGeometry>(f))
+		dynlibsType[name]="InteractingGeometry";
 	else if (dynamic_pointer_cast<BoundingVolume>(f))
 		dynlibsType[name]="BoundingVolume";
 	else if (dynamic_pointer_cast<InteractionGeometry>(f))

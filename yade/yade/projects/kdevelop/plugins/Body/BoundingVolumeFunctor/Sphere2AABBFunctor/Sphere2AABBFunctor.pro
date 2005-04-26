@@ -14,7 +14,7 @@ UI_DIR = $(YADECOMPILATIONPATH)
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 QMAKE_LIBDIR = ../../../../plugins/Geometry/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
                ../../../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
-               ../../../../plugins/Geometry/InteractionDescription/InteractionSphere/$(YADEDYNLIBPATH) \
+               ../../../../plugins/Geometry/InteractingGeometry/InteractionSphere/$(YADEDYNLIBPATH) \
                ../../../../yade/Geometry/$(YADEDYNLIBPATH) \
                ../../../../plugins/Geometry/CollisionGeometry/InteractionSphere/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 

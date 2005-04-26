@@ -5,7 +5,7 @@
 
 class Terrain2AABBFunctor : public BoundingVolumeFunctor
 {
-	public : void go(	  const shared_ptr<InteractionDescription>&
+	public : void go(	  const shared_ptr<InteractingGeometry>&
 				, shared_ptr<BoundingVolume>&
 				, const Se3r&
 				, const Body*	);
