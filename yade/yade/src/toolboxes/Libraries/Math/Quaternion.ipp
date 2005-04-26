@@ -407,14 +407,14 @@ Quaternion<RealType>& Quaternion<RealType>::fromRotationMatrix (
         kRot(1,iCol) = akRotColumn[iCol][1];
         kRot(2,iCol) = akRotColumn[iCol][2];
     }
-    return FromRotationMatrix(kRot);
+    return fromRotationMatrix(kRot);
 }
 //----------------------------------------------------------------------------
 template <class RealType>
 void Quaternion<RealType>::toRotationMatrix (Vector3<RealType> akRotColumn[3]) const
 {
     Matrix3<RealType> kRot;
-    ToRotationMatrix(kRot);
+    toRotationMatrix(kRot);
     for (int iCol = 0; iCol < 3; iCol++)
     {
         akRotColumn[iCol][0] = kRot(0,iCol);
