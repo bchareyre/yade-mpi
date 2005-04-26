@@ -99,7 +99,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>yade/Interaction/InteractionGeometry</activedir>
+      <activedir></activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>

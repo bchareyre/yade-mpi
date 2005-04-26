@@ -19,7 +19,7 @@ CONFIG += debug \
           dll 
 TEMPLATE = lib 
 HEADERS += InteractingGeometry.hpp \
-           InteractionDescriptionFunctor.hpp \
-           InteractionDescriptionDispatcher.hpp
+           InteractingGeometryFunctor.hpp \
+           InteractingGeometryDispatcher.hpp
 SOURCES += InteractingGeometry.cpp \
-           InteractionDescriptionDispatcher.cpp
+           InteractingGeometryDispatcher.cpp
