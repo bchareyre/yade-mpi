@@ -5,7 +5,7 @@
 
 LIBS += -lAABB \
         -lMath \
-        -lInteractionSphere \
+        -lInteractingSphere \
         -lBoundingVolume \
         -rdynamic 
 INCLUDEPATH = $(YADEINCLUDEPATH) 
@@ -14,9 +14,9 @@ UI_DIR = $(YADECOMPILATIONPATH)
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 QMAKE_LIBDIR = ../../../../plugins/Geometry/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
                ../../../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
-               ../../../../plugins/Geometry/InteractingGeometry/InteractionSphere/$(YADEDYNLIBPATH) \
+               ../../../../plugins/Geometry/InteractingGeometry/InteractingSphere/$(YADEDYNLIBPATH) \
                ../../../../yade/Geometry/$(YADEDYNLIBPATH) \
-               ../../../../plugins/Geometry/CollisionGeometry/InteractionSphere/$(YADEDYNLIBPATH) \
+               ../../../../plugins/Geometry/CollisionGeometry/InteractingSphere/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

@@ -22,7 +22,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "Sphere2Sphere4MacroMicroContactGeometry.hpp"
-#include "InteractionSphere.hpp"
+#include "InteractingSphere.hpp"
 #include "MacroMicroContactGeometry.hpp"
 #include "SDECLinkGeometry.hpp"
 
@@ -35,8 +35,8 @@ bool Sphere2Sphere4MacroMicroContactGeometry::go(	const shared_ptr<InteractingGe
 						const Se3r& se32,
 						const shared_ptr<Interaction>& c)
 {
-	shared_ptr<InteractionSphere> s1 = dynamic_pointer_cast<InteractionSphere>(cm1);
-	shared_ptr<InteractionSphere> s2 = dynamic_pointer_cast<InteractionSphere>(cm2);
+	shared_ptr<InteractingSphere> s1 = dynamic_pointer_cast<InteractingSphere>(cm1);
+	shared_ptr<InteractingSphere> s2 = dynamic_pointer_cast<InteractingSphere>(cm2);
 
 	Vector3r normal = se32.position-se31.position;
 	Real penetrationDepth = s1->radius+s2->radius-normal.normalize();

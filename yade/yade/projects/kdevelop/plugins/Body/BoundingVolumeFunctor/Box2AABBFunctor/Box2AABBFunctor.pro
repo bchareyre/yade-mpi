@@ -7,7 +7,7 @@ LIBS += -lAABB \
         -lBox \
         -lMath \
         -lMultiMethods \
-        -lInteractionBox \
+        -lInteractingBox \
         -lBoundingVolume \
         -rdynamic 
 INCLUDEPATH = $(YADEINCLUDEPATH) 
@@ -18,13 +18,13 @@ QMAKE_LIBDIR = ../../../../plugins/Body/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
                ../../../../plugins/Body/GeometricalModel/Box/$(YADEDYNLIBPATH) \
                ../../../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
                ../../../../toolboxes/Libraries/MultiMethods/$(YADEDYNLIBPATH) \
-               ../../../../plugins/Body/InteractingGeometry/InteractionBox/$(YADEDYNLIBPATH) \
+               ../../../../plugins/Body/InteractingGeometry/InteractingBox/$(YADEDYNLIBPATH) \
                ../../../../yade/Body/BoundingVolume/$(YADEDYNLIBPATH) \
                ../../../../plugins/Geometry/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
                ../../../../plugins/Geometry/GeometricalModel/Box/$(YADEDYNLIBPATH) \
-               ../../../../plugins/Geometry/InteractingGeometry/InteractionBox/$(YADEDYNLIBPATH) \
+               ../../../../plugins/Geometry/InteractingGeometry/InteractingBox/$(YADEDYNLIBPATH) \
                ../../../../yade/Geometry/$(YADEDYNLIBPATH) \
-               ../../../../plugins/Geometry/CollisionGeometry/InteractionBox/$(YADEDYNLIBPATH) \
+               ../../../../plugins/Geometry/CollisionGeometry/InteractingBox/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

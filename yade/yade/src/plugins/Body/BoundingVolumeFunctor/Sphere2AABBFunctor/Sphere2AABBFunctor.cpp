@@ -22,7 +22,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
  
 #include "Sphere2AABBFunctor.hpp"
-#include "InteractionSphere.hpp"
+#include "InteractingSphere.hpp"
 #include "AABB.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -33,7 +33,7 @@ void Sphere2AABBFunctor::go(	  const shared_ptr<InteractingGeometry>& cm
 				, const Se3r& se3
 				, const Body*	)
 {
-	InteractionSphere* sphere = static_cast<InteractionSphere*>(cm.get());
+	InteractingSphere* sphere = static_cast<InteractingSphere*>(cm.get());
 	AABB* aabb = static_cast<AABB*>(bv.get());
 	
 	aabb->center = se3.position;

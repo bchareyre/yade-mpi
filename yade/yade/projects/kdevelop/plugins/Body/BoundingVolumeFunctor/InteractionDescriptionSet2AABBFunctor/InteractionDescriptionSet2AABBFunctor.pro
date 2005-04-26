@@ -11,7 +11,7 @@ MOC_DIR = $(YADECOMPILATIONPATH)
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 QMAKE_LIBDIR = ../../../../plugins/Geometry/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
-               ../../../../plugins/Geometry/InteractingGeometry/InteractionDescriptionSet/$(YADEDYNLIBPATH) \
+               ../../../../plugins/Geometry/InteractingGeometry/MetaInteractingGeometry/$(YADEDYNLIBPATH) \
                ../../../../plugins/Geometry/CollisionGeometry/CollisionGeometrySet/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \

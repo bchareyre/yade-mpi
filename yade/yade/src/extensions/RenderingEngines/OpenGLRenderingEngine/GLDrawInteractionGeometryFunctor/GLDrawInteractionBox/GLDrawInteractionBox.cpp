@@ -22,7 +22,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "GLDrawInteractionBox.hpp"
-#include "InteractionBox.hpp"
+#include "InteractingBox.hpp"
 #include "OpenGLWrapper.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -34,7 +34,7 @@ void GLDrawInteractionBox::go(const shared_ptr<InteractingGeometry>& cg, const s
   	glMaterialv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, cg->diffuseColor);
 	glColor3v(cg->diffuseColor);
 	
-	Vector3r &extents = (static_cast<InteractionBox*>(cg.get()))->extents;
+	Vector3r &extents = (static_cast<InteractingBox*>(cg.get()))->extents;
 	
 	glScalef(2*extents[0],2*extents[1],2*extents[2]);
 

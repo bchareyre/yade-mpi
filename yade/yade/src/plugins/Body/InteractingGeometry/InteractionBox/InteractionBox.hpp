@@ -26,29 +26,29 @@
 
 #include "InteractingGeometry.hpp"
 
-class InteractionBox : public InteractingGeometry
+class InteractingBox : public InteractingGeometry
 {
 	public : Vector3r extents;
 
-	public : InteractionBox ();
-	public : virtual ~InteractionBox ();
+	public : InteractingBox ();
+	public : virtual ~InteractingBox ();
 	
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Serialization										///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	REGISTER_CLASS_NAME(InteractionBox);
+	REGISTER_CLASS_NAME(InteractingBox);
 	public : void registerAttributes();
 	
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Indexable											///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	REGISTER_CLASS_INDEX(InteractionBox,InteractingGeometry);
+	REGISTER_CLASS_INDEX(InteractingBox,InteractingGeometry);
 
 };
 
 
-REGISTER_SERIALIZABLE(InteractionBox,false);
+REGISTER_SERIALIZABLE(InteractingBox,false);
 
 #endif // __INTERACIONBOX_H__

@@ -26,28 +26,28 @@
 
 #include "InteractingGeometry.hpp"
 
-class InteractionSphere : public InteractingGeometry
+class InteractingSphere : public InteractingGeometry
 {
 	public : Real radius;
 
-	public : InteractionSphere ();
-	public : virtual ~InteractionSphere ();
+	public : InteractingSphere ();
+	public : virtual ~InteractingSphere ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Serialization										///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	REGISTER_CLASS_NAME(InteractionSphere);
+	REGISTER_CLASS_NAME(InteractingSphere);
 	public : void registerAttributes();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Indexable											///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	REGISTER_CLASS_INDEX(InteractionSphere,InteractingGeometry);
+	REGISTER_CLASS_INDEX(InteractingSphere,InteractingGeometry);
 	
 };
 
-REGISTER_SERIALIZABLE(InteractionSphere,false);
+REGISTER_SERIALIZABLE(InteractingSphere,false);
 
 #endif // __INTERACTIONSPHERE_H__

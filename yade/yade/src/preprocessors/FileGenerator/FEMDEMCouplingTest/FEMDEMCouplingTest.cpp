@@ -49,11 +49,11 @@
 #include "AABB.hpp"
 // data FEM
 #include "FEMSetParameters.hpp"
-#include "InteractionDescriptionSet.hpp"
+#include "MetaInteractingGeometry.hpp"
 // data DEM
 #include "BodyMacroParameters.hpp"
 #include "Box.hpp"
-#include "InteractionBox.hpp"
+#include "InteractingBox.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -163,14 +163,14 @@ string FEMDEMCouplingTest::generate()
 void FEMDEMCouplingTest::createActors(shared_ptr<MetaBody>& rootBody)
 {
 	shared_ptr<BoundingVolumeDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeDispatcher>(new BoundingVolumeDispatcher);
-	boundingVolumeDispatcher->add("InteractionDescriptionSet","AABB","InteractionDescriptionSet2AABBFunctor");
-	boundingVolumeDispatcher->add("InteractionSphere","AABB","Sphere2AABBFunctor");
-	boundingVolumeDispatcher->add("InteractionBox","AABB","Box2AABBFunctor");
-	boundingVolumeDispatcher->add("InteractionDescriptionSet","AABB","InteractionDescriptionSet2AABBFunctor");
+	boundingVolumeDispatcher->add("MetaInteractingGeometry","AABB","InteractionDescriptionSet2AABBFunctor");
+	boundingVolumeDispatcher->add("InteractingSphere","AABB","Sphere2AABBFunctor");
+	boundingVolumeDispatcher->add("InteractingBox","AABB","Box2AABBFunctor");
+	boundingVolumeDispatcher->add("MetaInteractingGeometry","AABB","InteractionDescriptionSet2AABBFunctor");
 
 	shared_ptr<InteractionGeometryDispatcher> interactionGeometryDispatcher(new InteractionGeometryDispatcher);
-	interactionGeometryDispatcher->add("InteractionSphere","InteractionSphere","Sphere2Sphere4MacroMicroContactGeometry");
-	interactionGeometryDispatcher->add("InteractionSphere","InteractionBox","Box2Sphere4MacroMicroContactGeometry");
+	interactionGeometryDispatcher->add("InteractingSphere","InteractingSphere","Sphere2Sphere4MacroMicroContactGeometry");
+	interactionGeometryDispatcher->add("InteractingSphere","InteractingBox","Box2Sphere4MacroMicroContactGeometry");
 
 	shared_ptr<InteractionPhysicsDispatcher> interactionPhysicsDispatcher(new InteractionPhysicsDispatcher);
 	interactionPhysicsDispatcher->add("BodyMacroParameters","BodyMacroParameters","MacroMicroElasticRelationships");
@@ -265,7 +265,7 @@ void FEMDEMCouplingTest::positionRootBody(shared_ptr<MetaBody>& rootBody)
 	physics->nodeGroupMask 			= nodeGroupMask;
 	physics->tetrahedronGroupMask 		= tetrahedronGroupMask;
 	
-	shared_ptr<InteractionDescriptionSet> set(new InteractionDescriptionSet());
+	shared_ptr<MetaInteractingGeometry> set(new MetaInteractingGeometry());
 	
 	set->diffuseColor			= Vector3f(0,0,1);
 
@@ -294,7 +294,7 @@ void FEMDEMCouplingTest::createBox(shared_ptr<Body>& body, Vector3r position, Ve
 	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<Box> gBox(new Box);
-	shared_ptr<InteractionBox> iBox(new InteractionBox);
+	shared_ptr<InteractingBox> iBox(new InteractingBox);
 	
 	Quaternionr q;
 	q.fromAxisAngle( Vector3r(0,0,1),0);

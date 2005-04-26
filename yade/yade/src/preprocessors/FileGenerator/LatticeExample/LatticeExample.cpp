@@ -29,7 +29,7 @@
 #include "Sphere.hpp"
 
 #include "Body.hpp"
-#include "InteractionDescriptionSet.hpp"
+#include "MetaInteractingGeometry.hpp"
 #include "BoundingVolumeDispatcher.hpp"
 #include "GeometricalModelDispatcher.hpp"
 
@@ -227,7 +227,7 @@ void LatticeExample::calcBeamsPositionOrientationLength(shared_ptr<MetaBody>& bo
 void LatticeExample::createActors(shared_ptr<MetaBody>& )
 {
 	shared_ptr<BoundingVolumeDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeDispatcher>(new BoundingVolumeDispatcher);
-	boundingVolumeDispatcher->add("InteractionDescriptionSet","AABB","InteractionDescriptionSet2AABBFunctor");
+	boundingVolumeDispatcher->add("MetaInteractingGeometry","AABB","InteractionDescriptionSet2AABBFunctor");
 
 	shared_ptr<GeometricalModelDispatcher> geometricalModelDispatcher	= shared_ptr<GeometricalModelDispatcher>(new GeometricalModelDispatcher);
 	geometricalModelDispatcher->add("LatticeSetParameters","LatticeSetGeometry","LatticeSet2LatticeBeams");
@@ -256,7 +256,7 @@ void LatticeExample::positionRootBody(shared_ptr<MetaBody>& rootBody)
 	physics->se3			= Se3r(Vector3r(0,0,0),q);
 	physics->beamGroupMask 		= beamGroupMask;
 	
-	shared_ptr<InteractionDescriptionSet> set(new InteractionDescriptionSet());
+	shared_ptr<MetaInteractingGeometry> set(new MetaInteractingGeometry());
 	
 	set->diffuseColor		= Vector3f(0,0,1);
 

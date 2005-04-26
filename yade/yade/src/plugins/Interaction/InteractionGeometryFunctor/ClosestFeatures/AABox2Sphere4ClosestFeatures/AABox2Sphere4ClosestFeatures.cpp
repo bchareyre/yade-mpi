@@ -23,8 +23,8 @@
 
 #include "AABox2Sphere4ClosestFeatures.hpp"
 #include "Sphere.hpp"
-#include "InteractionBox.hpp"
-#include "InteractionSphere.hpp"
+#include "InteractingBox.hpp"
+#include "InteractingSphere.hpp"
 #include "ClosestFeatures.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -41,8 +41,8 @@ bool AABox2Sphere4ClosestFeatures::go(		const shared_ptr<InteractingGeometry>& c
 	Vector3r pt1,pt2,normal;
 	Real depth;
 	
-	shared_ptr<InteractionSphere> s = dynamic_pointer_cast<InteractionSphere>(cm2);
-	shared_ptr<InteractionBox>  aaBox = dynamic_pointer_cast<InteractionBox>(cm1);
+	shared_ptr<InteractingSphere> s = dynamic_pointer_cast<InteractingSphere>(cm2);
+	shared_ptr<InteractingBox>  aaBox = dynamic_pointer_cast<InteractingBox>(cm1);
 	
 	p = se32.position-se31.position;
 	

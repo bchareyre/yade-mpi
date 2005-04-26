@@ -22,7 +22,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
  
 #include "Box2AABBFunctor.hpp"
-#include "InteractionBox.hpp"
+#include "InteractingBox.hpp"
 #include "AABB.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -33,7 +33,7 @@ void Box2AABBFunctor::go(	const shared_ptr<InteractingGeometry>& cm,
 				const Se3r& se3,
 				const Body*	)
 {
-	InteractionBox* box = static_cast<InteractionBox*>(cm.get());
+	InteractingBox* box = static_cast<InteractingBox*>(cm.get());
 	AABB* aabb = static_cast<AABB*>(bv.get());
 	
 	aabb->center = se3.position;

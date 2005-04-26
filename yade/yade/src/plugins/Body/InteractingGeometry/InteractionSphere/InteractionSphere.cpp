@@ -21,18 +21,18 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "InteractionSphere.hpp"
+#include "InteractingSphere.hpp"
 
-InteractionSphere::InteractionSphere () : InteractingGeometry()
+InteractingSphere::InteractingSphere () : InteractingGeometry()
 {
 	createIndex();
 }
 
-InteractionSphere::~InteractionSphere ()
+InteractingSphere::~InteractingSphere ()
 {
 }
 
-void InteractionSphere::registerAttributes()
+void InteractingSphere::registerAttributes()
 {
 	InteractingGeometry::registerAttributes();
 	REGISTER_ATTRIBUTE(radius);

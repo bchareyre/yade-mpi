@@ -22,7 +22,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "GLDrawInteractionSphere.hpp"
-#include "InteractionSphere.hpp"
+#include "InteractingSphere.hpp"
 #include "OpenGLWrapper.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -94,7 +94,7 @@ void GLDrawInteractionSphere::go(const shared_ptr<InteractingGeometry>& cm, cons
 		first = false;
 	}
 	
-	Real radius = (static_cast<InteractionSphere*>(cm.get()))->radius;
+	Real radius = (static_cast<InteractingSphere*>(cm.get()))->radius;
 	
 	glMaterialv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, cm->diffuseColor);
 	glColor3v(cm->diffuseColor);

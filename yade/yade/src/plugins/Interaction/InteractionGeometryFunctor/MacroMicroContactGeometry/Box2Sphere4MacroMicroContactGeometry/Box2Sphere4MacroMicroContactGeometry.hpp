@@ -47,7 +47,7 @@ class Box2Sphere4MacroMicroContactGeometry : public InteractionGeometryFunctor
 						const shared_ptr<Interaction>& c);
 
 	REGISTER_CLASS_NAME(Box2Sphere4MacroMicroContactGeometry);
-	DEFINE_FUNCTOR_ORDER_2D(InteractionBox,InteractionSphere);
+	DEFINE_FUNCTOR_ORDER_2D(InteractingBox,InteractingSphere);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

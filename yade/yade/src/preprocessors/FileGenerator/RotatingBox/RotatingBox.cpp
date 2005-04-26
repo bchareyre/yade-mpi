@@ -12,8 +12,8 @@
 #include "RotationCondition.hpp"
 #include <fstream>
 #include "IOManager.hpp"
-#include "InteractionBox.hpp"
-#include "InteractionSphere.hpp"
+#include "InteractingBox.hpp"
+#include "InteractingSphere.hpp"
 #include "InteractionGeometryDispatcher.hpp"
 #include "ActionParameterDispatcher.hpp"
 #include "CundallNonViscousForceDampingFunctor.hpp"
@@ -24,7 +24,7 @@
 
 #include "BoundingVolumeDispatcher.hpp"
 #include "InteractionDescriptionSet2AABBFunctor.hpp"
-#include "InteractionDescriptionSet.hpp"
+#include "MetaInteractingGeometry.hpp"
 #include "GravityCondition.hpp"
 #include "BodyPhysicalParametersDispatcher.hpp"
 
@@ -120,7 +120,7 @@ void RotatingBox::createBox(shared_ptr<Body>& body, int i, int j, int k)
 	shared_ptr<RigidBodyParameters> physics(new RigidBodyParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<Box> gBox(new Box);
-	shared_ptr<InteractionBox> iBox(new InteractionBox);
+	shared_ptr<InteractingBox> iBox(new InteractingBox);
 	
 	Quaternionr q;
 	q.fromAxisAngle( Vector3r(0,0,1),0);
@@ -172,7 +172,7 @@ void RotatingBox::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 	shared_ptr<RigidBodyParameters> physics(new RigidBodyParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<Sphere> gSphere(new Sphere);
-	shared_ptr<InteractionSphere> iSphere(new InteractionSphere);
+	shared_ptr<InteractingSphere> iSphere(new InteractingSphere);
 	
 	Quaternionr q;
 	q.fromAxisAngle( Vector3r(0,0,1),0);
@@ -217,7 +217,7 @@ void RotatingBox::createKinematicBox(shared_ptr<Body>& body, Vector3r position, 
 	shared_ptr<RigidBodyParameters> physics(new RigidBodyParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<Box> gBox(new Box);
-	shared_ptr<InteractionBox> iBox(new InteractionBox);
+	shared_ptr<InteractingBox> iBox(new InteractingBox);
 	
 	Quaternionr q;
 	q.fromAxisAngle( Vector3r(0,0,1),0);
@@ -257,14 +257,14 @@ void RotatingBox::createActors(shared_ptr<MetaBody>& rootBody)
 	actionParameterInitializer->actionParameterNames.push_back("ActionParameterMomentum");
 	
 	shared_ptr<InteractionGeometryDispatcher> interactionGeometryDispatcher(new InteractionGeometryDispatcher);
-	interactionGeometryDispatcher->add("InteractionSphere","InteractionSphere","Sphere2Sphere4ClosestFeatures");
-	interactionGeometryDispatcher->add("InteractionSphere","InteractionBox","Box2Sphere4ClosestFeatures");
-	interactionGeometryDispatcher->add("InteractionBox","InteractionBox","Box2Box4ClosestFeatures");
+	interactionGeometryDispatcher->add("InteractingSphere","InteractingSphere","Sphere2Sphere4ClosestFeatures");
+	interactionGeometryDispatcher->add("InteractingSphere","InteractingBox","Box2Sphere4ClosestFeatures");
+	interactionGeometryDispatcher->add("InteractingBox","InteractingBox","Box2Box4ClosestFeatures");
 
 	shared_ptr<BoundingVolumeDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeDispatcher>(new BoundingVolumeDispatcher);
-	boundingVolumeDispatcher->add("InteractionSphere","AABB","Sphere2AABBFunctor");
-	boundingVolumeDispatcher->add("InteractionBox","AABB","Box2AABBFunctor");
-	boundingVolumeDispatcher->add("InteractionDescriptionSet","AABB","InteractionDescriptionSet2AABBFunctor");
+	boundingVolumeDispatcher->add("InteractingSphere","AABB","Sphere2AABBFunctor");
+	boundingVolumeDispatcher->add("InteractingBox","AABB","Box2AABBFunctor");
+	boundingVolumeDispatcher->add("MetaInteractingGeometry","AABB","InteractionDescriptionSet2AABBFunctor");
 		
 	shared_ptr<GravityCondition> gravityCondition(new GravityCondition);
 	gravityCondition->gravity = gravity;
@@ -328,7 +328,7 @@ void RotatingBox::positionRootBody(shared_ptr<MetaBody>& rootBody)
 	physics->velocity			= Vector3r::ZERO;
 	physics->acceleration			= Vector3r::ZERO;
 	
-	shared_ptr<InteractionDescriptionSet> set(new InteractionDescriptionSet());
+	shared_ptr<MetaInteractingGeometry> set(new MetaInteractingGeometry());
 	set->diffuseColor			= Vector3f(0,0,1);
 
 	shared_ptr<AABB> aabb(new AABB);

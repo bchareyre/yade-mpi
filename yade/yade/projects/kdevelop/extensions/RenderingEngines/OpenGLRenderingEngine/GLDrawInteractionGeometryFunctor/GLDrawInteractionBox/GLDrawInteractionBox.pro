@@ -3,14 +3,14 @@
 # Subdir relative project main directory: ./extensions/RenderingEngines/OpenGLRenderingEngine/GLDrawInteractionGeometryFunctor/GLDrawInteractionBox
 # Target is a library:  
 
-LIBS += -lInteractionBox \
+LIBS += -lInteractingBox \
         -rdynamic 
 INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../../../plugins/Body/InteractingGeometry/InteractionBox/$(YADEDYNLIBPATH) \
-               ../../../../../plugins/Geometry/CollisionGeometry/InteractionBox/$(YADEDYNLIBPATH) \
+QMAKE_LIBDIR = ../../../../../plugins/Body/InteractingGeometry/InteractingBox/$(YADEDYNLIBPATH) \
+               ../../../../../plugins/Geometry/CollisionGeometry/InteractingBox/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

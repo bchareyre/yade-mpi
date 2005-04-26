@@ -22,7 +22,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "Box2Box4ClosestFeatures.hpp"
-#include "InteractionBox.hpp"
+#include "InteractingBox.hpp"
 #include "ClosestFeatures.hpp"
 #include "Math.hpp"
 #include "Intersections2D.hpp"
@@ -44,8 +44,8 @@ bool Box2Box4ClosestFeatures::go(		const shared_ptr<InteractingGeometry>& cm1,
 	Vector3r pt1, pt2, o1p1, o2p2;
 	Vector3r extents1,extents2;
 	
-	shared_ptr<InteractionBox> obb1 = shared_dynamic_cast<InteractionBox>(cm1);
-	shared_ptr<InteractionBox> obb2 = shared_dynamic_cast<InteractionBox>(cm2);
+	shared_ptr<InteractingBox> obb1 = shared_dynamic_cast<InteractingBox>(cm1);
+	shared_ptr<InteractingBox> obb2 = shared_dynamic_cast<InteractingBox>(cm2);
 
 	int nbInteractions = 0;
 	

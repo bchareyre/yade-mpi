@@ -52,8 +52,8 @@ OpenGLRenderingEngine::OpenGLRenderingEngine() : RenderingEngine()
 	addBoundingVolumeFunctor("AABB","GLDrawAABB");
 	addBoundingVolumeFunctor("BoundingSphere","GLDrawBoundingSphere");
 	
-	addInteractionGeometryFunctor("InteractionSphere","GLDrawInteractionSphere");
-	addInteractionGeometryFunctor("InteractionBox","GLDrawInteractionBox");
+	addInteractionGeometryFunctor("InteractingSphere","GLDrawInteractionSphere");
+	addInteractionGeometryFunctor("InteractingBox","GLDrawInteractionBox");
 		
 	addGeometricalModelFunctor("Box","GLDrawBox");
 	addGeometricalModelFunctor("Sphere","GLDrawSphere");

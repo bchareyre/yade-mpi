@@ -47,7 +47,7 @@ class Sphere2Mesh2D4ClosestFeatures : public InteractionGeometryFunctor
 						const shared_ptr<Interaction>& c);
 	
 	REGISTER_CLASS_NAME(Sphere2Mesh2D4ClosestFeatures);
-	DEFINE_FUNCTOR_ORDER_2D(InteractionSphere,InteractionMesh2D);
+	DEFINE_FUNCTOR_ORDER_2D(InteractingSphere,InteractionMesh2D);
 
 };
 

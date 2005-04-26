@@ -39,7 +39,7 @@
 #include "Interaction.hpp"
 #include "BoundingVolumeDispatcher.hpp"
 #include "InteractionDescriptionSet2AABBFunctor.hpp"
-#include "InteractionDescriptionSet.hpp"
+#include "MetaInteractingGeometry.hpp"
 #include "MacroMicroElasticRelationships.hpp"
 #include "SDECTimeStepper.hpp"
 
@@ -50,8 +50,8 @@
 
 #include "InteractionGeometryDispatcher.hpp"
 #include "InteractionPhysicsDispatcher.hpp"
-#include "InteractionBox.hpp"
-#include "InteractionSphere.hpp"
+#include "InteractingBox.hpp"
+#include "InteractingSphere.hpp"
 #include "ActionParameterDispatcher.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -131,7 +131,7 @@ void SDECTriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, Vect
 	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<Box> gBox(new Box);
-	shared_ptr<InteractionBox> iBox(new InteractionBox);
+	shared_ptr<InteractingBox> iBox(new InteractingBox);
 	
 	Quaternionr q;
 	q.fromAxisAngle( Vector3r(0,0,1),0);
@@ -180,7 +180,7 @@ void SDECTriaxialTest::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<Sphere> gSphere(new Sphere);
-	shared_ptr<InteractionSphere> iSphere(new InteractionSphere);
+	shared_ptr<InteractingSphere> iSphere(new InteractingSphere);
 	
 	Quaternionr q;
 	q.fromAxisAngle( Vector3r(0,0,1),0);

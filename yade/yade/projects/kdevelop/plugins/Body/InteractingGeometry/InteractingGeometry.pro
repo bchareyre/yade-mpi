@@ -3,9 +3,9 @@
 # Subdir relative project main directory: ./plugins/CollisionGeometry
 # Target is a subdirs project 
 
-SUBDIRS += InteractionBox \
-           InteractionSphere \
-           InteractionDescriptionSet
+SUBDIRS += InteractingBox \
+           InteractingSphere \
+           MetaInteractingGeometry
 MOC_DIR = $(YADECOMPILATIONPATH)
 UI_DIR = $(YADECOMPILATIONPATH)
 OBJECTS_DIR = $(YADECOMPILATIONPATH)

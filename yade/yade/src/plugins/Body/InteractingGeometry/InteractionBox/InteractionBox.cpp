@@ -21,19 +21,19 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "InteractionBox.hpp"
+#include "InteractingBox.hpp"
 
 
-InteractionBox::InteractionBox () : InteractingGeometry()
+InteractingBox::InteractingBox () : InteractingGeometry()
 {		
 	createIndex();
 }
 
-InteractionBox::~InteractionBox ()
+InteractingBox::~InteractingBox ()
 {		
 }
 
-void InteractionBox::registerAttributes()
+void InteractingBox::registerAttributes()
 {
 	InteractingGeometry::registerAttributes();
 	REGISTER_ATTRIBUTE(extents);

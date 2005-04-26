@@ -6,7 +6,7 @@
 #include "RigidBodyParameters.hpp"
 #include "Box.hpp"
 #include "AABB.hpp"
-#include "InteractionBox.hpp"
+#include "InteractingBox.hpp"
 #include "MetaBody.hpp"
 #include "SimpleSpringLaw.hpp"
 #include "PersistentSAPCollider.hpp"
@@ -26,13 +26,13 @@
 #include "GeometricalModelDispatcher.hpp"
 
 #include "InteractionDescriptionSet2AABBFunctor.hpp"
-#include "InteractionDescriptionSet.hpp"
+#include "MetaInteractingGeometry.hpp"
 #include "ParticleParameters.hpp"
 #include "ParticleSetParameters.hpp"
 #include "SpringGeometry.hpp"
 #include "SpringPhysics.hpp"
 #include "ActionParameterDispatcher.hpp"
-#include "InteractionSphere.hpp"
+#include "InteractingSphere.hpp"
 
 #include "ElasticContactLaw.hpp"
 #include "MacroMicroElasticRelationships.hpp"
@@ -131,8 +131,8 @@ string HangingCloth::generate()
 	actionParameterInitializer->actionParameterNames.push_back("ActionParameterMomentum");
 	
 	shared_ptr<InteractionGeometryDispatcher> interactionGeometryDispatcher(new InteractionGeometryDispatcher);
-	interactionGeometryDispatcher->add("InteractionSphere","InteractionSphere","Sphere2Sphere4MacroMicroContactGeometry");
-	interactionGeometryDispatcher->add("InteractionSphere","InteractionBox","Box2Sphere4MacroMicroContactGeometry");
+	interactionGeometryDispatcher->add("InteractingSphere","InteractingSphere","Sphere2Sphere4MacroMicroContactGeometry");
+	interactionGeometryDispatcher->add("InteractingSphere","InteractingBox","Box2Sphere4MacroMicroContactGeometry");
 
 	shared_ptr<InteractionPhysicsDispatcher> interactionPhysicsDispatcher(new InteractionPhysicsDispatcher);
 	interactionPhysicsDispatcher->add("BodyMacroParameters","BodyMacroParameters","MacroMicroElasticRelationships");
@@ -141,9 +141,9 @@ string HangingCloth::generate()
 	gravityCondition->gravity = gravity;
 	
 	shared_ptr<BoundingVolumeDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeDispatcher>(new BoundingVolumeDispatcher);
-	boundingVolumeDispatcher->add("InteractionSphere","AABB","Sphere2AABBFunctor");
-	boundingVolumeDispatcher->add("InteractionBox","AABB","Box2AABBFunctor");
-	boundingVolumeDispatcher->add("InteractionDescriptionSet","AABB","InteractionDescriptionSet2AABBFunctor");
+	boundingVolumeDispatcher->add("InteractingSphere","AABB","Sphere2AABBFunctor");
+	boundingVolumeDispatcher->add("InteractingBox","AABB","Box2AABBFunctor");
+	boundingVolumeDispatcher->add("MetaInteractingGeometry","AABB","InteractionDescriptionSet2AABBFunctor");
 
 	shared_ptr<GeometricalModelDispatcher> geometricalModelDispatcher	= shared_ptr<GeometricalModelDispatcher>(new GeometricalModelDispatcher);
 	geometricalModelDispatcher->add("ParticleSetParameters","Mesh2D","ParticleSet2Mesh2D");
@@ -205,7 +205,7 @@ string HangingCloth::generate()
 
 	rootBody->isDynamic	= false;
 
-	shared_ptr<InteractionDescriptionSet> set(new InteractionDescriptionSet());
+	shared_ptr<MetaInteractingGeometry> set(new MetaInteractingGeometry());
 	set->diffuseColor	= Vector3f(0,0,1);
 
 	shared_ptr<AABB> aabb(new AABB);
@@ -235,7 +235,7 @@ string HangingCloth::generate()
 
 			node->isDynamic		= true;
 			
-			shared_ptr<InteractionSphere> iSphere(new InteractionSphere);
+			shared_ptr<InteractingSphere> iSphere(new InteractingSphere);
 			iSphere->diffuseColor	= Vector3f(0,0,1);
 			iSphere->radius		= cellSize/1.5;// /2.0;
 
@@ -390,8 +390,8 @@ string HangingCloth::generate()
 	
 				shared_ptr<BodyMacroParameters> a = dynamic_pointer_cast<BodyMacroParameters>(bodyA->physicalParameters);
 				shared_ptr<BodyMacroParameters> b = dynamic_pointer_cast<BodyMacroParameters>(bodyB->physicalParameters);
-				shared_ptr<InteractionSphere>	as = dynamic_pointer_cast<InteractionSphere>(bodyA->interactionGeometry);
-				shared_ptr<InteractionSphere>	bs = dynamic_pointer_cast<InteractionSphere>(bodyB->interactionGeometry);
+				shared_ptr<InteractingSphere>	as = dynamic_pointer_cast<InteractingSphere>(bodyA->interactionGeometry);
+				shared_ptr<InteractingSphere>	bs = dynamic_pointer_cast<InteractingSphere>(bodyB->interactionGeometry);
 	
 				if ( a && b && as && bs && (a->se3.position - b->se3.position).length() < (as->radius + bs->radius))  
 				{
@@ -462,7 +462,7 @@ void HangingCloth::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<Sphere> gSphere(new Sphere);
-	shared_ptr<InteractionSphere> iSphere(new InteractionSphere);
+	shared_ptr<InteractingSphere> iSphere(new InteractingSphere);
 	
 	Quaternionr q;
 	q.fromAxisAngle( Vector3r(0,0,1),0);
@@ -512,7 +512,7 @@ void HangingCloth::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r
 	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<Box> gBox(new Box);
-	shared_ptr<InteractionBox> iBox(new InteractionBox);
+	shared_ptr<InteractingBox> iBox(new InteractingBox);
 	
 	
 	Quaternionr q;

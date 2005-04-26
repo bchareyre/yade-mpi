@@ -9,8 +9,8 @@ LIBS += -lBox \
         -lMath \
         -lInteraction \
         -lMultiMethods \
-        -lInteractionSphere \
-        -lInteractionBox \
+        -lInteractingSphere \
+        -lInteractingBox \
         -rdynamic 
 INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 

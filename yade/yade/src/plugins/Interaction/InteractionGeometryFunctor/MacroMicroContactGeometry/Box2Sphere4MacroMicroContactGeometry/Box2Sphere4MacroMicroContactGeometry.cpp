@@ -22,8 +22,8 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "Box2Sphere4MacroMicroContactGeometry.hpp"
-#include "InteractionSphere.hpp"
-#include "InteractionBox.hpp"
+#include "InteractingSphere.hpp"
+#include "InteractingBox.hpp"
 #include "MacroMicroContactGeometry.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -45,8 +45,8 @@ bool Box2Sphere4MacroMicroContactGeometry::go(		const shared_ptr<InteractingGeom
 	Matrix3r axisT,axis;
 	Real depth;
 
-	shared_ptr<InteractionSphere> s = dynamic_pointer_cast<InteractionSphere>(cm2);
-	shared_ptr<InteractionBox> obb = dynamic_pointer_cast<InteractionBox>(cm1);
+	shared_ptr<InteractingSphere> s = dynamic_pointer_cast<InteractingSphere>(cm2);
+	shared_ptr<InteractingBox> obb = dynamic_pointer_cast<InteractingBox>(cm1);
 	
 	Vector3r extents = obb->extents;
 

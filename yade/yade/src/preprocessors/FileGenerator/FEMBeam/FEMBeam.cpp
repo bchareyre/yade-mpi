@@ -8,7 +8,7 @@
 #include "FEMSetParameters.hpp"
 #include "FEMTetrahedronData.hpp"
 #include "FEMNodeData.hpp"
-#include "InteractionDescriptionSet.hpp"
+#include "MetaInteractingGeometry.hpp"
 
 // actors
 #include "FEMTetrahedronStiffness.hpp"
@@ -105,7 +105,7 @@ string FEMBeam::generate()
 void FEMBeam::createActors(shared_ptr<MetaBody>& rootBody)
 {
 	shared_ptr<BoundingVolumeDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeDispatcher>(new BoundingVolumeDispatcher);
-	boundingVolumeDispatcher->add("InteractionDescriptionSet","AABB","InteractionDescriptionSet2AABBFunctor");
+	boundingVolumeDispatcher->add("MetaInteractingGeometry","AABB","InteractionDescriptionSet2AABBFunctor");
 
 	shared_ptr<FEMSetTextLoaderFunctor> femSetTextLoaderFunctor	= shared_ptr<FEMSetTextLoaderFunctor>(new FEMSetTextLoaderFunctor);
 	femSetTextLoaderFunctor->fileName = femTxtFile;
@@ -172,7 +172,7 @@ void FEMBeam::positionRootBody(shared_ptr<MetaBody>& rootBody)
 	physics->nodeGroupMask 			= nodeGroupMask;
 	physics->tetrahedronGroupMask 		= tetrahedronGroupMask;
 	
-	shared_ptr<InteractionDescriptionSet> set(new InteractionDescriptionSet());
+	shared_ptr<MetaInteractingGeometry> set(new MetaInteractingGeometry());
 	
 	set->diffuseColor			= Vector3f(0,0,1);
 

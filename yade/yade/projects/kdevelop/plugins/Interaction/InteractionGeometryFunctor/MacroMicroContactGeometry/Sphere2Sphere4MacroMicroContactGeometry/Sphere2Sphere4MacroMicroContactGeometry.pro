@@ -7,7 +7,7 @@ LIBS += -lSerialization \
         -lMath \
         -lInteraction \
         -lMultiMethods \
-        -lInteractionSphere \
+        -lInteractingSphere \
         -lSDECLinkGeometry \
         -lMacroMicroContactGeometry \
         -rdynamic 
@@ -19,7 +19,7 @@ QMAKE_LIBDIR = ../../../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH
                ../../../../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
                ../../../../../yade/Interaction/Interaction/$(YADEDYNLIBPATH) \
                ../../../../../toolboxes/Libraries/MultiMethods/$(YADEDYNLIBPATH) \
-               ../../../../../plugins/Body/InteractingGeometry/InteractionSphere/$(YADEDYNLIBPATH) \
+               ../../../../../plugins/Body/InteractingGeometry/InteractingSphere/$(YADEDYNLIBPATH) \
                ../../../../../plugins/Interaction/InteractionGeometry/SDECLinkGeometry/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
