@@ -7,7 +7,6 @@ LIBS += -lAABB \
         -lFEMSetParameters \
         -lActionParameterInitializer \
         -lActionParameterReset \
-        -lInteractingGeometrySet \
         -lFEMSetTextLoaderFunctor \
         -lFEMLaw \
         -lGravityCondition \
@@ -19,8 +18,9 @@ LIBS += -lAABB \
         -lCundallNonViscousForceDampingFunctor \
         -lCundallNonViscousMomentumDampingFunctor \
         -lElasticContactLaw \
+        -lMetaInteractingGeometry \
         -rdynamic 
-INCLUDEPATH += $(YADEINCLUDEPATH) 
+INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
@@ -28,8 +28,7 @@ QMAKE_LIBDIR = ../../../plugins/Body/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/PhysicalParameters/FEMSetParameters/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/ActionParameterInitializer/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/ActionParameterReset/$(YADEDYNLIBPATH) \
-               ../../../plugins/Body/InteractingGeometry/MetaInteractingGeometry/$(YADEDYNLIBPATH) \
-               ../../../plugins/Body/BodyPhysicalParametersFunctor/FEMSetTextLoaderFunctor/$(YADEDYNLIBPATH) \
+               ../../../plugins/Body/PhysicalParametersFunctor/FEMSetTextLoaderFunctor/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/InteractionSolver/FEMLaw/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/DeusExMachina/GravityCondition/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/GeometricalModel/Box/$(YADEDYNLIBPATH) \
@@ -39,6 +38,8 @@ QMAKE_LIBDIR = ../../../plugins/Body/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/InteractionSolver/SDECTimeStepper/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/ActionParameterFunctor/CundallNonViscousForceDampingFunctor/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/ActionParameterFunctor/CundallNonViscousMomentumDampingFunctor/$(YADEDYNLIBPATH) \
+               ../../../plugins/Engine/InteractionSolver/ElasticContactLaw/$(YADEDYNLIBPATH) \
+               ../../../plugins/Body/BodyPhysicalParametersFunctor/FEMSetTextLoaderFunctor/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

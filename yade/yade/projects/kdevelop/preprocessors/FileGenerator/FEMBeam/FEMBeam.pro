@@ -19,7 +19,6 @@ LIBS += -lSerialization \
         -lCundallNonViscousMomentumDampingFunctor \
         -lCundallNonViscousForceDampingFunctor \
         -lSphere \
-        -lInteractingGeometrySet \
         -lFEMSetParameters \
         -lFEMTetrahedronData \
         -lFEMNodeData \
@@ -28,8 +27,9 @@ LIBS += -lSerialization \
         -lFEMLaw \
         -lTranslationCondition \
         -lFEMTetrahedronStiffness \
+        -lMetaInteractingGeometry \
         -rdynamic 
-INCLUDEPATH += $(YADEINCLUDEPATH) 
+INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
@@ -49,13 +49,15 @@ QMAKE_LIBDIR = ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/ActionParameterFunctor/CundallNonViscousMomentumDampingFunctor/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/ActionParameterFunctor/CundallNonViscousForceDampingFunctor/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
-               ../../../plugins/Body/InteractingGeometry/MetaInteractingGeometry/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/PhysicalParameters/FEMSetParameters/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/PhysicalParameters/FEMTetrahedronData/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/PhysicalParameters/FEMNodeData/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/GeometricalModel/Tetrahedron/$(YADEDYNLIBPATH) \
-               ../../../plugins/Body/BodyPhysicalParametersFunctor/FEMSetTextLoaderFunctor/$(YADEDYNLIBPATH) \
+               ../../../plugins/Body/PhysicalParametersFunctor/FEMSetTextLoaderFunctor/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/InteractionSolver/FEMLaw/$(YADEDYNLIBPATH) \
+               ../../../plugins/Engine/DeusExMachina/TranslationCondition/$(YADEDYNLIBPATH) \
+               ../../../plugins/Body/PhysicalParametersFunctor/FEMTetrahedronStiffness/$(YADEDYNLIBPATH) \
+               ../../../plugins/Body/BodyPhysicalParametersFunctor/FEMSetTextLoaderFunctor/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

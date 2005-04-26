@@ -15,7 +15,6 @@ LIBS += -lMesh2D \
         -lSpringGeometry \
         -lSpringPhysics \
         -lInteractingSphere \
-        -lInteractingGeometrySet2AABBFunctor \
         -lParticleSetParameters \
         -lBox \
         -lInteractingBox \
@@ -36,8 +35,9 @@ LIBS += -lMesh2D \
         -lBodyMacroParameters \
         -lMassSpringBody2RigidBodyLaw \
         -lElasticContactLaw \
+        -lInteractionDescriptionSet2AABBFunctor \
         -rdynamic 
-INCLUDEPATH += $(YADEINCLUDEPATH) 
+INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
@@ -53,7 +53,6 @@ QMAKE_LIBDIR = ../../../plugins/Body/GeometricalModel/Mesh2D/$(YADEDYNLIBPATH) \
                ../../../plugins/Interaction/InteractionGeometry/SpringGeometry/$(YADEDYNLIBPATH) \
                ../../../plugins/Interaction/InteractionPhysics/SpringPhysics/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/InteractingGeometry/InteractingSphere/$(YADEDYNLIBPATH) \
-               ../../../plugins/Body/BoundingVolumeFunctor/InteractionDescriptionSet2AABBFunctor/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/PhysicalParameters/ParticleSetParameters/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/GeometricalModel/Box/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/InteractingGeometry/InteractingBox/$(YADEDYNLIBPATH) \
@@ -70,6 +69,10 @@ QMAKE_LIBDIR = ../../../plugins/Body/GeometricalModel/Mesh2D/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/ActionParameterReset/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/ActionParameterInitializer/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/DeusExMachina/GravityCondition/$(YADEDYNLIBPATH) \
+               ../../../plugins/Interaction/InteractionPhysicsFunctor/ElasticContactParameters/MacroMicroElasticRelationships/$(YADEDYNLIBPATH) \
+               ../../../plugins/Body/PhysicalParameters/BodyMacroParameters/$(YADEDYNLIBPATH) \
+               ../../../plugins/Engine/InteractionSolver/MassSpringBody2RigidBodyLaw/$(YADEDYNLIBPATH) \
+               ../../../plugins/Engine/InteractionSolver/ElasticContactLaw/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 
