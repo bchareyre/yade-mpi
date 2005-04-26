@@ -1,7 +1,7 @@
 #include "Math.hpp"
 
 #include "MetaBody.hpp"
-#include "Actor.hpp"
+#include "Engine.hpp"
 
 ////////// Containers
 #include "InteractionVecSet.hpp"
@@ -28,8 +28,8 @@ void MetaBody::postProcessAttributes(bool deserializing)
 {
 	if (deserializing)
 	{
-		vector<shared_ptr<Actor> >::iterator i    = initializers.begin();
-		vector<shared_ptr<Actor> >::iterator iEnd = initializers.end();
+		vector<shared_ptr<Engine> >::iterator i    = initializers.begin();
+		vector<shared_ptr<Engine> >::iterator iEnd = initializers.end();
 		for( ; i != iEnd ; ++i)
 			if ((*i)->isActivated())
 				(*i)->action(this);
@@ -53,8 +53,8 @@ void MetaBody::registerAttributes()
 
 void MetaBody::moveToNextTimeStep()
 {
-	vector<shared_ptr<Actor> >::iterator ai    = actors.begin();
-	vector<shared_ptr<Actor> >::iterator aiEnd = actors.end();
+	vector<shared_ptr<Engine> >::iterator ai    = actors.begin();
+	vector<shared_ptr<Engine> >::iterator aiEnd = actors.end();
 	for(;ai!=aiEnd;++ai)
 		if ((*ai)->isActivated())
 			(*ai)->action(this);

@@ -134,7 +134,7 @@ void FEMBeam::createActors(shared_ptr<MetaBody>& rootBody)
 	actionParameterInitializer->actionParameterNames.push_back("ActionParameterMomentum"); // FIXME - should be unnecessery, but BUG in ActionParameterVectorVector
 	
 	rootBody->actors.clear();
-	rootBody->actors.push_back(shared_ptr<Actor>(new ActionParameterReset));
+	rootBody->actors.push_back(shared_ptr<Engine>(new ActionParameterReset));
 	rootBody->actors.push_back(boundingVolumeDispatcher);
 	rootBody->actors.push_back(geometricalModelDispatcher);
 	rootBody->actors.push_back(femLaw);

@@ -35,7 +35,7 @@
 
 #include "Interaction.hpp"
 #include "DynLibDispatcher.hpp"
-#include "Actor.hpp"
+#include "Engine.hpp"
 #include "InteractingGeometry.hpp"
 #include "InteractionGeometryFunctor.hpp"
 
@@ -48,7 +48,7 @@ class Body;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 class InteractionGeometryDispatcher : 
-	  public Actor
+	  public Engine
 	, public DynLibDispatcher
 		<	TYPELIST_2( InteractingGeometry , InteractingGeometry ) ,	// base classess for dispatch
 			InteractionGeometryFunctor,					// class that provides multivirtual call

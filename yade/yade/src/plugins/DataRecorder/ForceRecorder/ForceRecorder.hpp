@@ -1,14 +1,14 @@
 #ifndef FORCE_RECORDER_HPP_
 #define FORCE_RECORDER_HPP_
 
-#include "Actor.hpp"
+#include "Engine.hpp"
 
 #include <string>
 #include <fstream>
 
 class ActionParameter;
 
-class ForceRecorder : public Actor
+class ForceRecorder : public Engine
 {
 	public : std::string outputFile;
 	public : unsigned int interval;

@@ -5,7 +5,7 @@
 
 HEADERS += Chrono.hpp \
            Omega.hpp \
-           Actor.hpp \
+           Engine.hpp \
            FrontEnd.hpp \
            FileGenerator.hpp \
            SimulationLoop.hpp \

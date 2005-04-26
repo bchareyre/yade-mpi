@@ -37,7 +37,7 @@ void NewtonsForceLawFunctor::go( 	  const shared_ptr<ActionParameter>& a
 	ActionParameterForce * af = dynamic_cast<ActionParameterForce*>(a.get());
 	ParticleParameters * p = dynamic_cast<ParticleParameters*>(b.get());
 	
-	//FIXME : should be += and we should add an Actor that reset acceleration at the beginning
+	//FIXME : should be += and we should add an Engine that reset acceleration at the beginning
 	// if another ActionParameter also acts on acceleration then we are overwritting it here
 	
 //	std::cout << bb->getId() << std::endl;

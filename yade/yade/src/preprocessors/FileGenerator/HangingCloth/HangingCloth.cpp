@@ -176,10 +176,10 @@ string HangingCloth::generate()
 	massSpringBody2RigidBodyConstitutiveLaw->springGroupMask = 1;
 
 	rootBody->actors.clear();
-	rootBody->actors.push_back(shared_ptr<Actor>(new ActionParameterReset));
+	rootBody->actors.push_back(shared_ptr<Engine>(new ActionParameterReset));
 	rootBody->actors.push_back(boundingVolumeDispatcher);
 	rootBody->actors.push_back(geometricalModelDispatcher);
-	rootBody->actors.push_back(shared_ptr<Actor>(new PersistentSAPCollider));
+	rootBody->actors.push_back(shared_ptr<Engine>(new PersistentSAPCollider));
 	rootBody->actors.push_back(interactionGeometryDispatcher);
 	rootBody->actors.push_back(interactionPhysicsDispatcher);
 	rootBody->actors.push_back(explicitMassSpringConstitutiveLaw);

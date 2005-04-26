@@ -27,7 +27,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "Actor.hpp"
+#include "Engine.hpp"
 #include "DynLibDispatcher.hpp"
 #include "BodyPhysicalParameters.hpp"
 #include "Interaction.hpp"
@@ -37,7 +37,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 class InteractionPhysicsDispatcher : 
-	  public Actor
+	  public Engine
 	, public DynLibDispatcher
 		<	TYPELIST_2( BodyPhysicalParameters , BodyPhysicalParameters ) ,	// base classess for dispatch
 			InteractionPhysicsFunctor,					// class that provides multivirtual call

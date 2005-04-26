@@ -274,11 +274,11 @@ void BoxStack::createActors(shared_ptr<MetaBody>& rootBody)
 // 		kinematic->subscribedBodies.push_back(i);
 	
 	rootBody->actors.clear();
-	rootBody->actors.push_back(shared_ptr<Actor>(new ActionParameterReset));
+	rootBody->actors.push_back(shared_ptr<Engine>(new ActionParameterReset));
 	rootBody->actors.push_back(boundingVolumeDispatcher);
-	rootBody->actors.push_back(shared_ptr<Actor>(new SAPCollider));
+	rootBody->actors.push_back(shared_ptr<Engine>(new SAPCollider));
 	rootBody->actors.push_back(interactionGeometryDispatcher);
-	rootBody->actors.push_back(shared_ptr<Actor>(new SimpleSpringLaw));
+	rootBody->actors.push_back(shared_ptr<Engine>(new SimpleSpringLaw));
 	rootBody->actors.push_back(gravityCondition);
 	rootBody->actors.push_back(actionDampingDispatcher);
 	rootBody->actors.push_back(applyActionDispatcher);

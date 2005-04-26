@@ -29,7 +29,7 @@
 
 #include "Body.hpp"
 #include "BodyContainer.hpp"
-#include "Actor.hpp"
+#include "Engine.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -37,8 +37,8 @@
 class MetaBody : public Body
 {
 	public	: shared_ptr<BodyContainer> bodies;
-	public  : vector<shared_ptr<Actor> > actors;
-	public  : vector<shared_ptr<Actor> > initializers;
+	public  : vector<shared_ptr<Engine> > actors;
+	public  : vector<shared_ptr<Engine> > initializers;
 	
 	public	: shared_ptr<InteractionContainer> persistentInteractions;  // disappear, reappear according to physical (or any other non-spatial) criterion
 	public	: shared_ptr<InteractionContainer> volatileInteractions; // disappear, reappear according to spatial criterion

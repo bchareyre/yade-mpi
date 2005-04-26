@@ -35,7 +35,7 @@ void NewtonsMomentumLawFunctor::go(   const shared_ptr<ActionParameter>& a
 	ActionParameterMomentum * am = static_cast<ActionParameterMomentum*>(a.get());
 	RigidBodyParameters * rb = static_cast<RigidBodyParameters*>(b.get());
 	
-	//FIXME : should be += and we should add an Actor that reset acceleration at the beginning
+	//FIXME : should be += and we should add an Engine that reset acceleration at the beginning
 	rb->angularAcceleration = am->momentum.multDiag(rb->invInertia);
 }
 

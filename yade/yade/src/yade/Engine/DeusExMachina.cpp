@@ -1,7 +1,7 @@
 #include "DeusExMachina.hpp"
 
 
-DeusExMachina::DeusExMachina() : Actor()
+DeusExMachina::DeusExMachina() : Engine()
 {
 	//startTime = -1;
 	//stopTime = -1;
