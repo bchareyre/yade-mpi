@@ -47,11 +47,11 @@ class LatticeExample : public FileGenerator
 
 		string generate();
 	
-		void createActors(shared_ptr<ComplexBody>& rootBody);
-		void positionRootBody(shared_ptr<ComplexBody>& rootBody);
+		void createActors(shared_ptr<MetaBody>& rootBody);
+		void positionRootBody(shared_ptr<MetaBody>& rootBody);
 		void createNode(shared_ptr<Body>& body, int i, int j, int k);
 		void createBeam(shared_ptr<Body>& body, unsigned int i, unsigned int j);
-		void calcBeamsPositionOrientationLength(shared_ptr<ComplexBody>& body);
+		void calcBeamsPositionOrientationLength(shared_ptr<MetaBody>& body);
 
 		virtual void registerAttributes();
 		REGISTER_CLASS_NAME(LatticeExample);

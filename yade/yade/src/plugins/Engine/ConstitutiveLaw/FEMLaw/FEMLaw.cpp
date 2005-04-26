@@ -63,7 +63,7 @@ void FEMLaw::registerAttributes()
 
 void FEMLaw::calculateForces(Body* body)
 {
-	ComplexBody * fem = static_cast<ComplexBody*>(body);
+	MetaBody * fem = static_cast<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = fem->bodies;
 	shared_ptr<ActionParameterContainer>& actionParameters = fem->actionParameters;
 	

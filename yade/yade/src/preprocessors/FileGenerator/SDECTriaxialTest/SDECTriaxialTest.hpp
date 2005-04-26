@@ -52,8 +52,8 @@ class SDECTriaxialTest : public FileGenerator
 
 	private : void createSphere(shared_ptr<Body>& body, int i, int j, int k);
 	private : void createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents,bool wire);
-	private : void createActors(shared_ptr<ComplexBody>& rootBody);
-	private : void positionRootBody(shared_ptr<ComplexBody>& rootBody);
+	private : void createActors(shared_ptr<MetaBody>& rootBody);
+	private : void positionRootBody(shared_ptr<MetaBody>& rootBody);
 	
 	public : void registerAttributes();
 	REGISTER_CLASS_NAME(SDECTriaxialTest);

@@ -54,7 +54,7 @@
 
 /*! \brief Abstract interface for bodies stored in BodyContainer
 
-	BodyContainer can store ComplexBody and Body, both derived from Body
+	BodyContainer can store MetaBody and Body, both derived from Body
 */
 
 class Body : public Serializable

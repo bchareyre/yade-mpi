@@ -28,7 +28,7 @@
 #include "ElasticContactParameters.hpp"
 #include "SDECLinkPhysics.hpp"
 #include "Omega.hpp"
-#include "ComplexBody.hpp"
+#include "MetaBody.hpp"
 #include "ActionParameterForce.hpp"
 #include "ActionParameterMomentum.hpp"
 #include "ActionParameter.hpp"
@@ -59,7 +59,7 @@ void ElasticContactLaw::registerAttributes()
 //FIXME : remove bool first !!!!!
 void ElasticContactLaw::calculateForces(Body* body)
 {
-	ComplexBody * ncb = dynamic_cast<ComplexBody*>(body);
+	MetaBody * ncb = dynamic_cast<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 
 	Real dt = Omega::instance().getTimeStep();

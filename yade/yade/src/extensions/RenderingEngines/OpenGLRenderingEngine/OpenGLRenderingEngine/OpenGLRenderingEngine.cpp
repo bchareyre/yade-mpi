@@ -84,7 +84,7 @@ void OpenGLRenderingEngine::init()
 	}
 }
 
-void OpenGLRenderingEngine::render(const shared_ptr<ComplexBody>& rootBody)
+void OpenGLRenderingEngine::render(const shared_ptr<MetaBody>& rootBody)
 {		
 	const GLfloat pos[4]	= {lightPos[0],lightPos[1],lightPos[2],1.0};
 	const GLfloat ambientColor[4]	= {0.5,0.5,0.5,1.0};	
@@ -154,7 +154,7 @@ void OpenGLRenderingEngine::render(const shared_ptr<ComplexBody>& rootBody)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void OpenGLRenderingEngine::renderSceneUsingShadowVolumes(const shared_ptr<ComplexBody>& rootBody,Vector3r lightPos)
+void OpenGLRenderingEngine::renderSceneUsingShadowVolumes(const shared_ptr<MetaBody>& rootBody,Vector3r lightPos)
 {
 	glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
 	glEnable(GL_CULL_FACE);
@@ -201,7 +201,7 @@ void OpenGLRenderingEngine::renderSceneUsingShadowVolumes(const shared_ptr<Compl
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void OpenGLRenderingEngine::renderSceneUsingFastShadowVolumes(const shared_ptr<ComplexBody>& rootBody,Vector3r lightPos)
+void OpenGLRenderingEngine::renderSceneUsingFastShadowVolumes(const shared_ptr<MetaBody>& rootBody,Vector3r lightPos)
 {
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_NORMALIZE);
@@ -296,7 +296,7 @@ void OpenGLRenderingEngine::renderSceneUsingFastShadowVolumes(const shared_ptr<C
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void OpenGLRenderingEngine::renderShadowVolumes(const shared_ptr<ComplexBody>& rootBody,Vector3r lightPos)
+void OpenGLRenderingEngine::renderShadowVolumes(const shared_ptr<MetaBody>& rootBody,Vector3r lightPos)
 {	
 	if (!rootBody->geometricalModel)
 	{
@@ -314,7 +314,7 @@ void OpenGLRenderingEngine::renderShadowVolumes(const shared_ptr<ComplexBody>& r
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void OpenGLRenderingEngine::renderGeometricalModel(const shared_ptr<ComplexBody>& rootBody)
+void OpenGLRenderingEngine::renderGeometricalModel(const shared_ptr<MetaBody>& rootBody)
 {	
 	shared_ptr<BodyContainer>& bodies = rootBody->bodies;
 
@@ -343,7 +343,7 @@ void OpenGLRenderingEngine::renderGeometricalModel(const shared_ptr<ComplexBody>
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void OpenGLRenderingEngine::renderBoundingVolume(const shared_ptr<ComplexBody>& rootBody)
+void OpenGLRenderingEngine::renderBoundingVolume(const shared_ptr<MetaBody>& rootBody)
 {	
 	for( rootBody->bodies->gotoFirst() ; rootBody->bodies->notAtEnd() ; rootBody->bodies->gotoNext() )
 	{	
@@ -364,7 +364,7 @@ void OpenGLRenderingEngine::renderBoundingVolume(const shared_ptr<ComplexBody>& 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void OpenGLRenderingEngine::renderInteractionGeometry(const shared_ptr<ComplexBody>& rootBody)
+void OpenGLRenderingEngine::renderInteractionGeometry(const shared_ptr<MetaBody>& rootBody)
 {
 	for( rootBody->bodies->gotoFirst() ; rootBody->bodies->notAtEnd() ; rootBody->bodies->gotoNext() )
 	{	

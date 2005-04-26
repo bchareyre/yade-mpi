@@ -1,5 +1,5 @@
 #include "SimulationLoop.hpp"
-#include "ComplexBody.hpp"
+#include "MetaBody.hpp"
 #include "Omega.hpp"
 #include "ThreadSynchronizer.hpp"
 

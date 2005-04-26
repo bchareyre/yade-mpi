@@ -25,7 +25,7 @@
 #include "FEMSetParameters.hpp"
 #include "FEMTetrahedronData.hpp"
 #include "Tetrahedron.hpp"
-#include "ComplexBody.hpp"
+#include "MetaBody.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@ void FEMSet2Tetrahedrons::go(	  const shared_ptr<BodyPhysicalParameters>& ph
 				, const Body* body)
 {
 	int tetrahedronGroupMask = dynamic_cast<const FEMSetParameters*>(ph.get())->tetrahedronGroupMask;
-	const ComplexBody * cb = dynamic_cast<const ComplexBody*>(body);
+	const MetaBody * cb = dynamic_cast<const MetaBody*>(body);
 	const shared_ptr<BodyContainer>& bodies = cb->bodies;
 	
 // FIXME - this copying of data! 

@@ -23,7 +23,7 @@
 
 #include "ErrorTolerantLaw.hpp"
 #include "RigidBodyParameters.hpp"
-#include "ComplexBody.hpp"
+#include "MetaBody.hpp"
 #include "ErrorTolerantContactModel.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -74,7 +74,7 @@ void ErrorTolerantLaw::registerAttributes()
 void ErrorTolerantLaw::calculateForces(Body* body)
 {
 
-	ComplexBody * ncb = dynamic_cast<ComplexBody*>(body);
+	MetaBody * ncb = dynamic_cast<MetaBody*>(body);
 	shared_ptr<BodyContainer> bodies = ncb->bodies;
 
 	if (ncb->volatileInteractions->size() > 0)

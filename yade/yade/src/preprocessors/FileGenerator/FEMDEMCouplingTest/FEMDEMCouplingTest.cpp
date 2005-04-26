@@ -149,7 +149,7 @@ void FEMDEMCouplingTest::registerAttributes()
 string FEMDEMCouplingTest::generate()
 {
 	/*
-	rootBody = shared_ptr<ComplexBody>(new ComplexBody);
+	rootBody = shared_ptr<MetaBody>(new MetaBody);
 	positionRootBody(rootBody);
 	createActors(rootBody);
 	insertGround(rootBody);
@@ -160,7 +160,7 @@ string FEMDEMCouplingTest::generate()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void FEMDEMCouplingTest::createActors(shared_ptr<ComplexBody>& rootBody)
+void FEMDEMCouplingTest::createActors(shared_ptr<MetaBody>& rootBody)
 {
 	shared_ptr<BoundingVolumeDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeDispatcher>(new BoundingVolumeDispatcher);
 	boundingVolumeDispatcher->add("InteractionDescriptionSet","AABB","InteractionDescriptionSet2AABBFunctor");
@@ -254,7 +254,7 @@ void FEMDEMCouplingTest::createActors(shared_ptr<ComplexBody>& rootBody)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void FEMDEMCouplingTest::positionRootBody(shared_ptr<ComplexBody>& rootBody) 
+void FEMDEMCouplingTest::positionRootBody(shared_ptr<MetaBody>& rootBody) 
 {
 	rootBody->isDynamic			= false;
 
@@ -334,7 +334,7 @@ void FEMDEMCouplingTest::createBox(shared_ptr<Body>& body, Vector3r position, Ve
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
  
-void FEMDEMCouplingTest::insertGround(shared_ptr<ComplexBody>& rootBody) 
+void FEMDEMCouplingTest::insertGround(shared_ptr<MetaBody>& rootBody) 
 {
 	shared_ptr<Body> ground;
 //	shared_ptr<Body> supportBox1;

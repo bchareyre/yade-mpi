@@ -22,7 +22,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "ActionParameterInitializer.hpp"
-#include "ComplexBody.hpp"
+#include "MetaBody.hpp"
 #include "ClassFactory.hpp"
 #include "ActionParameter.hpp"
 
@@ -45,7 +45,7 @@ void ActionParameterInitializer::registerAttributes()
 
 void ActionParameterInitializer::action(Body* body)
 {
-	ComplexBody * ncb = dynamic_cast<ComplexBody*>(body);
+	MetaBody * ncb = dynamic_cast<MetaBody*>(body);
 	
 	vector<shared_ptr<ActionParameter> > actionParameters;
 	actionParameters.clear();

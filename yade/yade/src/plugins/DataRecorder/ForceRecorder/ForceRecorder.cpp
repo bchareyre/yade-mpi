@@ -1,7 +1,7 @@
 #include "ForceRecorder.hpp"
 #include "RigidBodyParameters.hpp"
 #include "Omega.hpp"
-#include "ComplexBody.hpp"
+#include "MetaBody.hpp"
 #include "ActionParameterForce.hpp"
 
 #include <boost/lexical_cast.hpp>
@@ -41,7 +41,7 @@ bool ForceRecorder::isActivated()
 
 void ForceRecorder::action(Body * body)
 {
-	ComplexBody * ncb = dynamic_cast<ComplexBody*>(body);
+	MetaBody * ncb = dynamic_cast<MetaBody*>(body);
 	Real x=0, y=0, z=0;
 	
 	for( unsigned int i = startId ; i <= endId ; ++i )

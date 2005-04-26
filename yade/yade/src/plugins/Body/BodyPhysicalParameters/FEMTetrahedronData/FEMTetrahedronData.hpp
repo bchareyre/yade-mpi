@@ -27,7 +27,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "ComplexBody.hpp"
+#include "MetaBody.hpp"
 #include "RigidBodyParameters.hpp"
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/vector.hpp>
@@ -46,7 +46,7 @@ class FEMTetrahedronData : public BodyPhysicalParameters
 	private : Real damping, mass;
 	private : void localCalcKeMatrix( ublas::matrix<Real>& nodesCoordinates );
 	
-	public  : void calcKeMatrix(ComplexBody* femBody);
+	public  : void calcKeMatrix(MetaBody* femBody);
 	
 	
 	public  : FEMTetrahedronData();

@@ -25,7 +25,7 @@
 #include "LatticeSetParameters.hpp"
 #include "LatticeBeamParameters.hpp"
 #include "LineSegment.hpp"
-#include "ComplexBody.hpp"
+#include "MetaBody.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -35,10 +35,10 @@ void LatticeSet2LatticeBeams::go(	  const shared_ptr<BodyPhysicalParameters>& ph
 					, const Body* body)
 {
 	int beamGroupMask = dynamic_cast<const LatticeSetParameters*>(ph.get())->beamGroupMask;
-	const ComplexBody * ncb = dynamic_cast<const ComplexBody*>(body);
+	const MetaBody * ncb = dynamic_cast<const MetaBody*>(body);
 	const shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	
-// FIXME - this copying of length between latticeBeam geometry and physics, inside ComplexBody could be done just once, if length was inside shared_ptr. This can be improved once we make indexable Parameters: Velocity, Position, Orientation, ....
+// FIXME - this copying of length between latticeBeam geometry and physics, inside MetaBody could be done just once, if length was inside shared_ptr. This can be improved once we make indexable Parameters: Velocity, Position, Orientation, ....
 cerr << "qwer\n";
 	for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext() )
 	{

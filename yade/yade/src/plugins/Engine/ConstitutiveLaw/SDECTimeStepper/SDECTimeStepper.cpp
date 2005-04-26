@@ -23,7 +23,7 @@
 
 #include "SDECTimeStepper.hpp"
 #include "Interaction.hpp"
-#include "ComplexBody.hpp"
+#include "MetaBody.hpp"
 #include "BodyMacroParameters.hpp"
 #include "ElasticContactParameters.hpp"
 #include "MacroMicroContactGeometry.hpp"
@@ -141,7 +141,7 @@ void SDECTimeStepper::findTimeStepFromInteraction(const shared_ptr<Interaction>&
 
 void SDECTimeStepper::action(Body* body)
 {
-	ComplexBody * ncb = dynamic_cast<ComplexBody*>(body);
+	MetaBody * ncb = dynamic_cast<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	shared_ptr<InteractionContainer>& persistentInteractions = ncb->persistentInteractions;
 	shared_ptr<InteractionContainer>& volatileInteractions = ncb->volatileInteractions;

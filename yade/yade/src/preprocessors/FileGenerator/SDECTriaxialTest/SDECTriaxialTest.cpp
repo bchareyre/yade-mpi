@@ -24,12 +24,12 @@
 #include "SDECTriaxialTest.hpp"
 
 #include "Body.hpp"
-#include "ComplexBody.hpp"
+#include "MetaBody.hpp"
 
 #include "Box.hpp"
 #include "AABB.hpp"
 #include "Sphere.hpp"
-#include "ComplexBody.hpp"
+#include "MetaBody.hpp"
 #include "PersistentSAPCollider.hpp"
 #include "BodyMacroParameters.hpp"
 #include <fstream>

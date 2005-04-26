@@ -2,7 +2,7 @@
 #include "RigidBodyParameters.hpp"
 #include "ClosestFeatures.hpp"
 #include "Omega.hpp"
-#include "ComplexBody.hpp"
+#include "MetaBody.hpp"
 #include "ActionParameterForce.hpp"
 #include "ActionParameterMomentum.hpp"
 
@@ -19,7 +19,7 @@ void SimpleSpringLaw::calculateForces(Body * body)
 {
 	//Real dt = Omega::instance().dt;
 
-	ComplexBody * ncb = dynamic_cast<ComplexBody*>(body);
+	MetaBody * ncb = dynamic_cast<MetaBody*>(body);
 	shared_ptr<BodyContainer> bodies = ncb->bodies;
 
 	Real stiffness = 10000;

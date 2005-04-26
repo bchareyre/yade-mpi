@@ -1,5 +1,5 @@
 #include "InteractionGeometryDispatcher.hpp"
-#include "ComplexBody.hpp"
+#include "MetaBody.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -23,7 +23,7 @@ void InteractionGeometryDispatcher::registerAttributes()
 
 void InteractionGeometryDispatcher::action(Body* body)
 {
-	ComplexBody * ncb = dynamic_cast<ComplexBody*>(body);
+	MetaBody * ncb = dynamic_cast<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	
 	shared_ptr<InteractionContainer>& persistentInteractions = ncb->persistentInteractions;

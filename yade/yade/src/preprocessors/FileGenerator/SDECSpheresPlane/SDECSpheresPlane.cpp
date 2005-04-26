@@ -4,7 +4,7 @@
 #include "Box.hpp"
 #include "AABB.hpp"
 #include "Sphere.hpp"
-#include "ComplexBody.hpp"
+#include "MetaBody.hpp"
 #include "SAPCollider.hpp"
 #include "PersistentSAPCollider.hpp"
 #include "BodyMacroParameters.hpp"
@@ -85,7 +85,7 @@ void SDECSpheresPlane::registerAttributes()
 
 string SDECSpheresPlane::generate()
 {
-	rootBody = shared_ptr<ComplexBody>(new ComplexBody);
+	rootBody = shared_ptr<MetaBody>(new MetaBody);
 	createActors(rootBody);
 	positionRootBody(rootBody);
 
@@ -210,7 +210,7 @@ void SDECSpheresPlane::createBox(shared_ptr<Body>& body, Vector3r position, Vect
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void SDECSpheresPlane::createActors(shared_ptr<ComplexBody>& rootBody)
+void SDECSpheresPlane::createActors(shared_ptr<MetaBody>& rootBody)
 {
 	shared_ptr<ActionParameterInitializer> actionParameterInitializer(new ActionParameterInitializer);
 	actionParameterInitializer->actionParameterNames.push_back("ActionParameterForce");
@@ -276,7 +276,7 @@ void SDECSpheresPlane::createActors(shared_ptr<ComplexBody>& rootBody)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void SDECSpheresPlane::positionRootBody(shared_ptr<ComplexBody>& rootBody) 
+void SDECSpheresPlane::positionRootBody(shared_ptr<MetaBody>& rootBody) 
 {
 	rootBody->isDynamic		= false;
 	

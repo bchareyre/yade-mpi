@@ -87,9 +87,9 @@ class FEMDEMCouplingTest : public FileGenerator
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public : string generate();
-	private : void createActors(shared_ptr<ComplexBody>& rootBody);
-	private : void positionRootBody(shared_ptr<ComplexBody>& rootBody);
-	private : void insertGround(shared_ptr<ComplexBody>& rootBody);
+	private : void createActors(shared_ptr<MetaBody>& rootBody);
+	private : void positionRootBody(shared_ptr<MetaBody>& rootBody);
+	private : void insertGround(shared_ptr<MetaBody>& rootBody);
 	private : void createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents);
 	private : void createSphere(shared_ptr<Body>& body, int i, int j, int k);
 

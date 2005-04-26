@@ -27,9 +27,9 @@ class FEMBeam : public FileGenerator
 	public : FEMBeam ();
 	public : ~FEMBeam ();
 
-	private : void createActors(shared_ptr<ComplexBody>& rootBody);
-	private : void positionRootBody(shared_ptr<ComplexBody>& rootBody);
-	private : void imposeTranslation(shared_ptr<ComplexBody>& rootBody, Vector3r min, Vector3r max, Vector3r direction, Real velocity);
+	private : void createActors(shared_ptr<MetaBody>& rootBody);
+	private : void positionRootBody(shared_ptr<MetaBody>& rootBody);
+	private : void imposeTranslation(shared_ptr<MetaBody>& rootBody, Vector3r min, Vector3r max, Vector3r direction, Real velocity);
 
 	public : void registerAttributes();
 

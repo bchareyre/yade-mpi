@@ -73,7 +73,7 @@ void LatticeExample::registerAttributes()
 
 string LatticeExample::generate()
 {
-	rootBody = shared_ptr<ComplexBody>(new ComplexBody);
+	rootBody = shared_ptr<MetaBody>(new MetaBody);
 	createActors(rootBody);
 	positionRootBody(rootBody);
 
@@ -193,7 +193,7 @@ void LatticeExample::createBeam(shared_ptr<Body>& body, unsigned int i, unsigned
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void LatticeExample::calcBeamsPositionOrientationLength(shared_ptr<ComplexBody>& body)
+void LatticeExample::calcBeamsPositionOrientationLength(shared_ptr<MetaBody>& body)
 {
 	for( rootBody->bodies->gotoFirst(); rootBody->bodies->notAtEnd() ; rootBody->bodies->gotoNext() )
 	{
@@ -224,7 +224,7 @@ void LatticeExample::calcBeamsPositionOrientationLength(shared_ptr<ComplexBody>&
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void LatticeExample::createActors(shared_ptr<ComplexBody>& )
+void LatticeExample::createActors(shared_ptr<MetaBody>& )
 {
 	shared_ptr<BoundingVolumeDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeDispatcher>(new BoundingVolumeDispatcher);
 	boundingVolumeDispatcher->add("InteractionDescriptionSet","AABB","InteractionDescriptionSet2AABBFunctor");
@@ -246,7 +246,7 @@ void LatticeExample::createActors(shared_ptr<ComplexBody>& )
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void LatticeExample::positionRootBody(shared_ptr<ComplexBody>& rootBody)
+void LatticeExample::positionRootBody(shared_ptr<MetaBody>& rootBody)
 {
 	rootBody->isDynamic		= false;
 

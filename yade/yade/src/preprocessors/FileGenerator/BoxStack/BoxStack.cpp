@@ -4,7 +4,7 @@
 #include "Box.hpp"
 #include "AABB.hpp"
 #include "Sphere.hpp"
-#include "ComplexBody.hpp"
+#include "MetaBody.hpp"
 #include "Body.hpp"
 #include "SimpleSpringLaw.hpp"
 #include "SAPCollider.hpp"
@@ -68,7 +68,7 @@ void BoxStack::registerAttributes()
 
 string BoxStack::generate()
 {
-	rootBody = shared_ptr<ComplexBody>(new ComplexBody);
+	rootBody = shared_ptr<MetaBody>(new MetaBody);
 
 	createActors(rootBody);
 	positionRootBody(rootBody);
@@ -229,7 +229,7 @@ void BoxStack::createKinematicBox(shared_ptr<Body>& body, Vector3r position, Vec
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void BoxStack::createActors(shared_ptr<ComplexBody>& rootBody)
+void BoxStack::createActors(shared_ptr<MetaBody>& rootBody)
 {
 	shared_ptr<ActionParameterInitializer> actionParameterInitializer(new ActionParameterInitializer);
 	actionParameterInitializer->actionParameterNames.push_back("ActionParameterForce");
@@ -297,7 +297,7 @@ void BoxStack::createActors(shared_ptr<ComplexBody>& rootBody)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void BoxStack::positionRootBody(shared_ptr<ComplexBody>& rootBody)
+void BoxStack::positionRootBody(shared_ptr<MetaBody>& rootBody)
 {
 	rootBody->isDynamic			= false;
 	Quaternionr q;	q.fromAxisAngle( Vector3r(0,0,1),0);

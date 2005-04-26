@@ -22,7 +22,7 @@
 #include "TranslationCondition.hpp"
 
 // body
-#include "ComplexBody.hpp"
+#include "MetaBody.hpp"
 #include "Body.hpp"
 
 // dispatchers
@@ -90,7 +90,7 @@ void FEMBeam::registerAttributes()
 
 string FEMBeam::generate()
 {
-	rootBody = shared_ptr<ComplexBody>(new ComplexBody);
+	rootBody = shared_ptr<MetaBody>(new MetaBody);
 	positionRootBody(rootBody);
 	createActors(rootBody);
 	imposeTranslation(rootBody,regionMin1,regionMax1,translationAxis1,velocity1);
@@ -102,7 +102,7 @@ string FEMBeam::generate()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void FEMBeam::createActors(shared_ptr<ComplexBody>& rootBody)
+void FEMBeam::createActors(shared_ptr<MetaBody>& rootBody)
 {
 	shared_ptr<BoundingVolumeDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeDispatcher>(new BoundingVolumeDispatcher);
 	boundingVolumeDispatcher->add("InteractionDescriptionSet","AABB","InteractionDescriptionSet2AABBFunctor");
@@ -161,7 +161,7 @@ void FEMBeam::createActors(shared_ptr<ComplexBody>& rootBody)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void FEMBeam::positionRootBody(shared_ptr<ComplexBody>& rootBody) 
+void FEMBeam::positionRootBody(shared_ptr<MetaBody>& rootBody) 
 {
 	rootBody->isDynamic			= false;
 
@@ -194,7 +194,7 @@ void FEMBeam::positionRootBody(shared_ptr<ComplexBody>& rootBody)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
  
-void FEMBeam::imposeTranslation(shared_ptr<ComplexBody>& rootBody, Vector3r min, Vector3r max, Vector3r direction, Real velocity)
+void FEMBeam::imposeTranslation(shared_ptr<MetaBody>& rootBody, Vector3r min, Vector3r max, Vector3r direction, Real velocity)
 {
 	shared_ptr<TranslationCondition> translationCondition = shared_ptr<TranslationCondition>(new TranslationCondition);
  	translationCondition->velocity  = velocity;

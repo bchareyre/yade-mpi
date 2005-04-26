@@ -7,10 +7,10 @@
 #include "Box.hpp"
 #include "AABB.hpp"
 #include "InteractionBox.hpp"
-#include "ComplexBody.hpp"
+#include "MetaBody.hpp"
 #include "SimpleSpringLaw.hpp"
 #include "PersistentSAPCollider.hpp"
-#include "ComplexBody.hpp"
+#include "MetaBody.hpp"
 #include "MassSpringLaw.hpp"
 #include "MassSpringBody2RigidBodyLaw.hpp"
 
@@ -124,7 +124,7 @@ void HangingCloth::registerAttributes()
 
 string HangingCloth::generate()
 {
-	rootBody = shared_ptr<ComplexBody>(new ComplexBody);
+	rootBody = shared_ptr<MetaBody>(new MetaBody);
 
 	shared_ptr<ActionParameterInitializer> actionParameterInitializer(new ActionParameterInitializer);
 	actionParameterInitializer->actionParameterNames.push_back("ActionParameterForce");
@@ -429,7 +429,7 @@ string HangingCloth::generate()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-shared_ptr<Interaction>& HangingCloth::createSpring(const shared_ptr<ComplexBody>& rootBody,int i,int j)
+shared_ptr<Interaction>& HangingCloth::createSpring(const shared_ptr<MetaBody>& rootBody,int i,int j)
 {
 	Body * b1 = static_cast<Body*>((*(rootBody->bodies))[i].get());
 	Body * b2 = static_cast<Body*>((*(rootBody->bodies))[j].get());

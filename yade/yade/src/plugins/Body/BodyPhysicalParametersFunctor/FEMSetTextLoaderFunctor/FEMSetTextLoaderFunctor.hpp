@@ -29,7 +29,7 @@
 
 #include "BodyPhysicalParametersFunctor.hpp"
 #include "Body.hpp"
-#include "ComplexBody.hpp"
+#include "MetaBody.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -46,7 +46,7 @@ class FEMSetTextLoaderFunctor : public BodyPhysicalParametersFunctor
 							, Vector3r position
 							, unsigned int id);
 					
-	public 		: 	void createTetrahedron(   const ComplexBody* rootBody
+	public 		: 	void createTetrahedron(   const MetaBody* rootBody
 							, shared_ptr<Body>& body
 							, unsigned int id
 							, unsigned int id1

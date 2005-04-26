@@ -38,7 +38,7 @@ void InteractionDescriptionSet2AABBFunctor::go(	  const shared_ptr<InteractingGe
 	Vector3r max(-Mathr::MAX_REAL,-Mathr::MAX_REAL,-Mathr::MAX_REAL);
 	Vector3r min( Mathr::MAX_REAL, Mathr::MAX_REAL, Mathr::MAX_REAL);
 	
-	const ComplexBody * ncb = dynamic_cast<const ComplexBody*>(body);
+	const MetaBody * ncb = dynamic_cast<const MetaBody*>(body);
 	const shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	
 	for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext())

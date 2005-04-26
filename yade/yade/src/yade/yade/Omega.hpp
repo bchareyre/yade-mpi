@@ -43,7 +43,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-class ComplexBody;
+class MetaBody;
 class SimulationLoop;
 class FrontEnd;
 class ThreadSynchronizer;
@@ -92,8 +92,8 @@ class Omega : public Singleton<Omega>
 	public	: void setTimeStep(const Real);
 	public	: Real getTimeStep();
 	
-	private	: shared_ptr<ComplexBody> rootBody;
-	public	: const shared_ptr<ComplexBody>& getRootBody();
+	private	: shared_ptr<MetaBody> rootBody;
+	public	: const shared_ptr<MetaBody>& getRootBody();
 	public  : void freeRootBody();
 	
 	private	: ptime	sStartingSimulationTime;

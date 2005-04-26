@@ -1,7 +1,7 @@
 #include "PositionOrientationRecorder.hpp"
 #include "RigidBodyParameters.hpp"
 #include "Omega.hpp"
-#include "ComplexBody.hpp"
+#include "MetaBody.hpp"
 
 #include <boost/lexical_cast.hpp>
 
@@ -34,7 +34,7 @@ void PositionOrientationRecorder::registerAttributes()
 
 void PositionOrientationRecorder::action(Body * body)
 {
-	ComplexBody * ncb = dynamic_cast<ComplexBody*>(body);
+	MetaBody * ncb = dynamic_cast<MetaBody*>(body);
 	
 	if( Omega::instance().getCurrentIteration() % interval == 0 /*&& ofile*/ )
 	{

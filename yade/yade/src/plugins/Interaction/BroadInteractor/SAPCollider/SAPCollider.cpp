@@ -1,6 +1,6 @@
 #include "SAPCollider.hpp"
 #include "Body.hpp"
-#include "ComplexBody.hpp"
+#include "MetaBody.hpp"
 #include "BodyContainer.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -56,7 +56,7 @@ SAPCollider::~SAPCollider ()
 void SAPCollider::broadInteractionTest(Body* body)
 {
 
-	ComplexBody * ncb = dynamic_cast<ComplexBody*>(body);
+	MetaBody * ncb = dynamic_cast<MetaBody*>(body);
 	shared_ptr<BodyContainer> bodies = ncb->bodies;
 
 	unsigned int i;

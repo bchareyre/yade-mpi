@@ -18,7 +18,7 @@ void FEMSetTextLoaderFunctor::go(	  const shared_ptr<BodyPhysicalParameters>& pa
 					, Body* body)
 
 {
-	ComplexBody* rootBody = dynamic_cast<ComplexBody*>(body);
+	MetaBody* rootBody = dynamic_cast<MetaBody*>(body);
 	shared_ptr<FEMSetParameters> physics = dynamic_pointer_cast<FEMSetParameters>(par);
 	nodeGroupMask = physics->nodeGroupMask;
 	tetrahedronGroupMask = physics->tetrahedronGroupMask;
@@ -95,7 +95,7 @@ void FEMSetTextLoaderFunctor::createNode( shared_ptr<Body>& body
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void FEMSetTextLoaderFunctor::createTetrahedron(  const ComplexBody* rootBody
+void FEMSetTextLoaderFunctor::createTetrahedron(  const MetaBody* rootBody
 						, shared_ptr<Body>& body
 						, unsigned int id
 						, unsigned int id1

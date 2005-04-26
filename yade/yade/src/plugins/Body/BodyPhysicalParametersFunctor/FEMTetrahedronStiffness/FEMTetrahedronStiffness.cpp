@@ -31,7 +31,7 @@ void FEMTetrahedronStiffness::go(	  const shared_ptr<BodyPhysicalParameters>& pa
 					, Body* body)
 
 {
-	ComplexBody* rootBody = dynamic_cast<ComplexBody*>(body);
+	MetaBody* rootBody = dynamic_cast<MetaBody*>(body);
 	shared_ptr<FEMSetParameters> physics = dynamic_pointer_cast<FEMSetParameters>(par);
 	nodeGroupMask = physics->nodeGroupMask;
 	tetrahedronGroupMask = physics->tetrahedronGroupMask;

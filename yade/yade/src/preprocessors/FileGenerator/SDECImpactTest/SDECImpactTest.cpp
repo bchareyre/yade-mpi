@@ -3,7 +3,7 @@
 #include "Box.hpp"
 #include "AABB.hpp"
 #include "Sphere.hpp"
-#include "ComplexBody.hpp"
+#include "MetaBody.hpp"
 #include "SAPCollider.hpp"
 #include "PersistentSAPCollider.hpp"
 #include <fstream>
@@ -172,7 +172,7 @@ string SDECImpactTest::generate()
 {
 	unsigned int startId=boost::numeric::bounds<unsigned int>::highest(), endId=0; // record forces from group 2
 	
-	rootBody = shared_ptr<ComplexBody>(new ComplexBody);
+	rootBody = shared_ptr<MetaBody>(new MetaBody);
 	createActors(rootBody);
 	positionRootBody(rootBody);
 
@@ -434,7 +434,7 @@ void SDECImpactTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void SDECImpactTest::createActors(shared_ptr<ComplexBody>& rootBody)
+void SDECImpactTest::createActors(shared_ptr<MetaBody>& rootBody)
 {
 // recording average positions
 	averagePositionRecorder = shared_ptr<AveragePositionRecorder>(new AveragePositionRecorder);
@@ -525,7 +525,7 @@ void SDECImpactTest::createActors(shared_ptr<ComplexBody>& rootBody)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void SDECImpactTest::positionRootBody(shared_ptr<ComplexBody>& rootBody)
+void SDECImpactTest::positionRootBody(shared_ptr<MetaBody>& rootBody)
 {
 	rootBody->isDynamic		= false;
 

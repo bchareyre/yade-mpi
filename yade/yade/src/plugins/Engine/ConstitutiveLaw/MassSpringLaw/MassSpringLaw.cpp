@@ -1,6 +1,6 @@
 #include "MassSpringLaw.hpp"
 #include "Omega.hpp"
-#include "ComplexBody.hpp"
+#include "MetaBody.hpp"
 #include "Mesh2D.hpp"
 #include "SpringGeometry.hpp"
 #include "SpringPhysics.hpp"
@@ -20,7 +20,7 @@ void MassSpringLaw::registerAttributes()
 
 void MassSpringLaw::calculateForces(Body * body)
 {
-	ComplexBody * massSpring = dynamic_cast<ComplexBody*>(body);
+	MetaBody * massSpring = dynamic_cast<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = massSpring->bodies;
 	shared_ptr<InteractionContainer>& persistentInteractions = massSpring->persistentInteractions;
 	shared_ptr<ActionParameterContainer>& actionParameters = massSpring->actionParameters;

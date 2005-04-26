@@ -4,7 +4,7 @@
 #include "Vector3.hpp"
 
 #include "IOManager.hpp"
-#include "ComplexBody.hpp"
+#include "MetaBody.hpp"
 
 #include "FileGenerator.hpp"
 #include "ConstitutiveLaw.hpp"
@@ -330,7 +330,7 @@ void Omega::loadSimulation()
 void Omega::freeRootBody()
 {
 //	LOCK(rootBodyMutex);
-	rootBody = shared_ptr<ComplexBody>();
+	rootBody = shared_ptr<MetaBody>();
 }
 
 // FIXME - remove that
@@ -352,7 +352,7 @@ shared_ptr<ThreadSynchronizer> Omega::getSynchronizer()
 	return synchronizer;
 }
 
-const shared_ptr<ComplexBody>& Omega::getRootBody()
+const shared_ptr<MetaBody>& Omega::getRootBody()
 {
 //	LOCK(omegaMutex);
 	return rootBody;

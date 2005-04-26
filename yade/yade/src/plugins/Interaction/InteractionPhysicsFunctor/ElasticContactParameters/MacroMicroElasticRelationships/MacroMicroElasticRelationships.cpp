@@ -29,7 +29,7 @@
 #include "SDECLinkPhysics.hpp"  // FIXME
 
 #include "Omega.hpp"
-#include "ComplexBody.hpp"
+#include "MetaBody.hpp"
 #include "BodyMacroParameters.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

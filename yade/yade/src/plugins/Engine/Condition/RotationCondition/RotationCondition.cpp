@@ -1,6 +1,6 @@
 #include "RotationCondition.hpp"
 #include "RigidBodyParameters.hpp"
-#include "ComplexBody.hpp"
+#include "MetaBody.hpp"
 
 RotationCondition::RotationCondition()
 {
@@ -18,7 +18,7 @@ void RotationCondition::registerAttributes()
 void RotationCondition::applyCondition(Body * body)
 {
 
-	ComplexBody * ncb = dynamic_cast<ComplexBody*>(body);
+	MetaBody * ncb = dynamic_cast<MetaBody*>(body);
 	shared_ptr<BodyContainer> bodies = ncb->bodies;
 
 	std::vector<int>::const_iterator ii = subscribedBodies.begin();

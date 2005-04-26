@@ -1,7 +1,7 @@
 #include "VelocityRecorder.hpp"
 #include "ParticleParameters.hpp"
 #include "Omega.hpp"
-#include "ComplexBody.hpp"
+#include "MetaBody.hpp"
 
 #include <boost/lexical_cast.hpp>
 
@@ -36,7 +36,7 @@ bool VelocityRecorder::isActivated()
 
 void VelocityRecorder::action(Body * body)
 {
-	ComplexBody * ncb = dynamic_cast<ComplexBody*>(body);
+	MetaBody * ncb = dynamic_cast<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	
 	Real x=0, y=0, z=0, size=0;//, totalMass=0; FIXME- how many recorders/Actors to make simple stuff?

@@ -28,7 +28,7 @@ void FEMTetrahedronData::registerAttributes()
 	REGISTER_ATTRIBUTE(ids);
 }
 
-void FEMTetrahedronData::calcKeMatrix(ComplexBody* femBody)
+void FEMTetrahedronData::calcKeMatrix(MetaBody* femBody)
 {
 	ublas::matrix<Real> nodesCoordinates;
 	nodesCoordinates.resize(3,4);

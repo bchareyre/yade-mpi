@@ -4,7 +4,7 @@
 #include "Box.hpp"
 #include "AABB.hpp"
 #include "Sphere.hpp"
-#include "ComplexBody.hpp"
+#include "MetaBody.hpp"
 #include "Body.hpp"
 #include "SimpleSpringLaw.hpp"
 #include "SAPCollider.hpp"
@@ -71,7 +71,7 @@ void RotatingBox::registerAttributes()
 
 string RotatingBox::generate()
 {
-	rootBody = shared_ptr<ComplexBody>(new ComplexBody);
+	rootBody = shared_ptr<MetaBody>(new MetaBody);
 
 	createActors(rootBody);
 	positionRootBody(rootBody);
@@ -250,7 +250,7 @@ void RotatingBox::createKinematicBox(shared_ptr<Body>& body, Vector3r position, 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void RotatingBox::createActors(shared_ptr<ComplexBody>& rootBody)
+void RotatingBox::createActors(shared_ptr<MetaBody>& rootBody)
 {
 	shared_ptr<ActionParameterInitializer> actionParameterInitializer(new ActionParameterInitializer);
 	actionParameterInitializer->actionParameterNames.push_back("ActionParameterForce");
@@ -318,7 +318,7 @@ void RotatingBox::createActors(shared_ptr<ComplexBody>& rootBody)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void RotatingBox::positionRootBody(shared_ptr<ComplexBody>& rootBody)
+void RotatingBox::positionRootBody(shared_ptr<MetaBody>& rootBody)
 {
 	rootBody->isDynamic			= false;
 	Quaternionr q;	q.fromAxisAngle( Vector3r(0,0,1),0);

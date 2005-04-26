@@ -39,7 +39,7 @@ class HangingCloth : public FileGenerator
 	protected : virtual void postProcessAttributes(bool deserializing);
 	public : void registerAttributes();
 	
-	private : shared_ptr<Interaction>& createSpring(const shared_ptr<ComplexBody>& rootBody,int i,int j);
+	private : shared_ptr<Interaction>& createSpring(const shared_ptr<MetaBody>& rootBody,int i,int j);
 	private : void createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents);
 	private : void createSphere(shared_ptr<Body>& body, int i, int j, int k);
 	

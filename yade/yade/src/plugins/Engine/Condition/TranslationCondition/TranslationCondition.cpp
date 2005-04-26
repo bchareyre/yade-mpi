@@ -1,6 +1,6 @@
 #include "TranslationCondition.hpp"
 #include "ParticleParameters.hpp"
-#include "ComplexBody.hpp"
+#include "MetaBody.hpp"
 
 void TranslationCondition::postProcessAttributes(bool deserializing)
 {
@@ -18,7 +18,7 @@ void TranslationCondition::registerAttributes()
 void TranslationCondition::applyCondition(Body * body)
 {
 
-	ComplexBody * ncb = dynamic_cast<ComplexBody*>(body);
+	MetaBody * ncb = dynamic_cast<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 
 	std::vector<int>::const_iterator ii = subscribedBodies.begin();

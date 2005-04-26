@@ -1,7 +1,7 @@
 #include "MassSpringBody2RigidBodyLaw.hpp"
 #include "RigidBodyParameters.hpp"
 #include "Omega.hpp"
-#include "ComplexBody.hpp"
+#include "MetaBody.hpp"
 #include "ClosestFeatures.hpp"
 #include "SimpleSpringLaw.hpp"
 #include "Mesh2D.hpp"
@@ -28,7 +28,7 @@ void MassSpringBody2RigidBodyLaw::registerAttributes()
 
 void MassSpringBody2RigidBodyLaw::calculateForces(Body * body)
 {
-	ComplexBody * mixedBody = dynamic_cast<ComplexBody*>(body);
+	MetaBody * mixedBody = dynamic_cast<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = mixedBody->bodies;
 	shared_ptr<InteractionContainer>& volatileInteractions = mixedBody->volatileInteractions;
 //	shared_ptr<ActionParameterContainer>& actionParameters = mixedBody->actionParameters;

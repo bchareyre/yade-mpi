@@ -1,6 +1,6 @@
 #include "Math.hpp"
 
-#include "ComplexBody.hpp"
+#include "MetaBody.hpp"
 #include "Actor.hpp"
 
 ////////// Containers
@@ -13,7 +13,7 @@
 
 
 // FIXME - who is to decide which class to use by default?
-ComplexBody::ComplexBody() :
+MetaBody::MetaBody() :
 	  Body()
 	, bodies(new BodyRedirectionVector)
 	, persistentInteractions(new InteractionVecSet)
@@ -24,7 +24,7 @@ ComplexBody::ComplexBody() :
 	initializers.clear();
 }
 
-void ComplexBody::postProcessAttributes(bool deserializing)
+void MetaBody::postProcessAttributes(bool deserializing)
 {
 	if (deserializing)
 	{
@@ -39,7 +39,7 @@ void ComplexBody::postProcessAttributes(bool deserializing)
 	}
 }
 
-void ComplexBody::registerAttributes()
+void MetaBody::registerAttributes()
 {
 	Body::registerAttributes();
 	REGISTER_ATTRIBUTE(actors);
@@ -51,7 +51,7 @@ void ComplexBody::registerAttributes()
 }
 
 
-void ComplexBody::moveToNextTimeStep()
+void MetaBody::moveToNextTimeStep()
 {
 	vector<shared_ptr<Actor> >::iterator ai    = actors.begin();
 	vector<shared_ptr<Actor> >::iterator aiEnd = actors.end();

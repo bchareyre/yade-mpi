@@ -26,8 +26,8 @@ class SDECLinkedSpheres : public FileGenerator
 	
 	private : void createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents);
 	private : void createSphere(shared_ptr<Body>& body, int i, int j, int k);
-	private : void createActors(shared_ptr<ComplexBody>& rootBody);
-	private : void positionRootBody(shared_ptr<ComplexBody>& rootBody);
+	private : void createActors(shared_ptr<MetaBody>& rootBody);
+	private : void positionRootBody(shared_ptr<MetaBody>& rootBody);
 	
 	// construction
 	public : SDECLinkedSpheres ();
