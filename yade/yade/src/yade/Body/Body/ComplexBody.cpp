@@ -16,8 +16,8 @@
 ComplexBody::ComplexBody() :
 	  Body()
 	, bodies(new BodyRedirectionVector)
-	, initialInteractions(new InteractionVecSet)
-	, runtimeInteractions(new InteractionVecSet)
+	, persistentInteractions(new InteractionVecSet)
+	, volatileInteractions(new InteractionVecSet)
 	, actionParameters(new ActionParameterVectorVector)
 {	
 	actors.clear();
@@ -45,8 +45,8 @@ void ComplexBody::registerAttributes()
 	REGISTER_ATTRIBUTE(actors);
 	REGISTER_ATTRIBUTE(initializers);
 	REGISTER_ATTRIBUTE(bodies);
-	REGISTER_ATTRIBUTE(runtimeInteractions);
-	REGISTER_ATTRIBUTE(initialInteractions);
+	REGISTER_ATTRIBUTE(volatileInteractions);
+	REGISTER_ATTRIBUTE(persistentInteractions);
 //	REGISTER_ATTRIBUTE(actionParameters); // FIXME - needed or not ?
 }
 

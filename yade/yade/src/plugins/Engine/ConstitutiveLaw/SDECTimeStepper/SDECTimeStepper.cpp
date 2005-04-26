@@ -143,21 +143,21 @@ void SDECTimeStepper::action(Body* body)
 {
 	ComplexBody * ncb = dynamic_cast<ComplexBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
-	shared_ptr<InteractionContainer>& initialInteractions = ncb->initialInteractions;
-	shared_ptr<InteractionContainer>& runtimeInteractions = ncb->runtimeInteractions;
+	shared_ptr<InteractionContainer>& persistentInteractions = ncb->persistentInteractions;
+	shared_ptr<InteractionContainer>& volatileInteractions = ncb->volatileInteractions;
 
 	newDt = Mathr::MAX_REAL;
 	computedSomething = false; // this flag is to avoid setting timestep to MAX_REAL :)
 
-	for( initialInteractions->gotoFirst() ; initialInteractions->notAtEnd() ; initialInteractions->gotoNext() )
-		findTimeStepFromInteraction(initialInteractions->getCurrent() , bodies);
+	for( persistentInteractions->gotoFirst() ; persistentInteractions->notAtEnd() ; persistentInteractions->gotoNext() )
+		findTimeStepFromInteraction(persistentInteractions->getCurrent() , bodies);
 
-	for( runtimeInteractions->gotoFirst() ; runtimeInteractions->notAtEnd() ; runtimeInteractions->gotoNext() )
-		findTimeStepFromInteraction(runtimeInteractions->getCurrent() , bodies);
+	for( volatileInteractions->gotoFirst() ; volatileInteractions->notAtEnd() ; volatileInteractions->gotoNext() )
+		findTimeStepFromInteraction(volatileInteractions->getCurrent() , bodies);
 
 	if(! computedSomething)
-// no runtimeInteractions at all? so let's try to estimate timestep by investigating bodies,
-// simulating that a body in contact with itself. this happens only when there were not runtimeInteractions at all.
+// no volatileInteractions at all? so let's try to estimate timestep by investigating bodies,
+// simulating that a body in contact with itself. this happens only when there were not volatileInteractions at all.
 		for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext() )
 		{
 			Body* b = bodies->getCurrent().get();

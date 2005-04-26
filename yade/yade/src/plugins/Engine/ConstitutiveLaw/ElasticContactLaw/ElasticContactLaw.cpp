@@ -68,9 +68,9 @@ void ElasticContactLaw::calculateForces(Body* body)
 /// Permanents Links													///
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	for( ncb->initialInteractions->gotoFirst() ; ncb->initialInteractions->notAtEnd() ; ncb->initialInteractions->gotoNext() )
+	for( ncb->persistentInteractions->gotoFirst() ; ncb->persistentInteractions->notAtEnd() ; ncb->persistentInteractions->gotoNext() )
 	{
-		const shared_ptr<Interaction>& contact2 = ncb->initialInteractions->getCurrent();
+		const shared_ptr<Interaction>& contact2 = ncb->persistentInteractions->getCurrent();
 
 		unsigned int id1 = contact2->getId1();
 		unsigned int id2 = contact2->getId2();
@@ -321,9 +321,9 @@ void ElasticContactLaw::calculateForces(Body* body)
 /// Non Permanents Links												///
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	for( ncb->runtimeInteractions->gotoFirst() ; ncb->runtimeInteractions->notAtEnd() ; ncb->runtimeInteractions->gotoNext() )
+	for( ncb->volatileInteractions->gotoFirst() ; ncb->volatileInteractions->notAtEnd() ; ncb->volatileInteractions->gotoNext() )
 	{
-		const shared_ptr<Interaction>& contact = ncb->runtimeInteractions->getCurrent();
+		const shared_ptr<Interaction>& contact = ncb->volatileInteractions->getCurrent();
 		int id1 = contact->getId1();
 		int id2 = contact->getId2();
 		

@@ -23,9 +23,14 @@ class InteractionContainer : public Serializable
 	public    : virtual void gotoFirst() 									{throw;};
 	public    : virtual bool notAtEnd() 									{throw;};
 	public    : virtual void gotoNext() 									{throw;};
+
+// BEGIN - delete that! we shouldn't check isReal flag inside contaier, because we will make iterators
 	public    : virtual void gotoFirstPotential() 								{throw;};
 	public    : virtual void gotoNextPotential() 								{throw;};
-	public    : virtual bool notAtEndPotential() 								{throw;};	
+	public    : virtual bool notAtEndPotential() 								{throw;};
+// END
+
+	
  	public    : virtual const shared_ptr<Interaction>& getCurrent() 						{throw;};
 
 	// deletes currently pointed element, and goes to the next one.

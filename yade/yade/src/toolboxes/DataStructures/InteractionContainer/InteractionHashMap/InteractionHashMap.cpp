@@ -16,7 +16,7 @@ bool InteractionHashMap::insert(shared_ptr<Interaction>& i)
 	if (id1>id2)
 		swap(id1,id2);
 
-	return runtimeInteractions.insert( IHashMap::value_type( pair<unsigned int,unsigned int>(id1,id2) , i )).second;
+	return volatileInteractions.insert( IHashMap::value_type( pair<unsigned int,unsigned int>(id1,id2) , i )).second;
 }
 
 bool InteractionHashMap::insert(unsigned int id1,unsigned int id2)
@@ -27,7 +27,7 @@ bool InteractionHashMap::insert(unsigned int id1,unsigned int id2)
 
 void InteractionHashMap::clear()
 {
-	runtimeInteractions.clear();
+	volatileInteractions.clear();
 }
 
 bool InteractionHashMap::erase(unsigned int id1,unsigned int id2)
@@ -35,9 +35,9 @@ bool InteractionHashMap::erase(unsigned int id1,unsigned int id2)
 	if (id1>id2)
 		swap(id1,id2);
 
-	unsigned int oldSize = runtimeInteractions.size();
+	unsigned int oldSize = volatileInteractions.size();
 	pair<unsigned int,unsigned int> p(id1,id2);
-	unsigned int size = runtimeInteractions.erase(p);
+	unsigned int size = volatileInteractions.erase(p);
 
 	return size!=oldSize;
 
@@ -48,8 +48,8 @@ const shared_ptr<Interaction>& InteractionHashMap::find(unsigned int id1,unsigne
 	if (id1>id2)
 		swap(id1,id2);
 
-	hmii = runtimeInteractions.find(pair<unsigned int,unsigned int>(id1,id2));
-	if (hmii!=runtimeInteractions.end())
+	hmii = volatileInteractions.find(pair<unsigned int,unsigned int>(id1,id2));
+	if (hmii!=volatileInteractions.end())
 		return (*hmii).second;
 	else
 	{
@@ -60,8 +60,8 @@ const shared_ptr<Interaction>& InteractionHashMap::find(unsigned int id1,unsigne
 
 void InteractionHashMap::gotoFirstPotential()
 {
-	hmii    = runtimeInteractions.begin();
-	hmiiEnd = runtimeInteractions.end();
+	hmii    = volatileInteractions.begin();
+	hmiiEnd = volatileInteractions.end();
 }
 
 bool InteractionHashMap::notAtEndPotential()
@@ -105,7 +105,7 @@ void InteractionHashMap::eraseCurrentAndGotoNextPotential()
 	{
 		IHashMap::iterator tmpHmii=hmii;
 		++hmii;
-		runtimeInteractions.erase(tmpHmii);
+		volatileInteractions.erase(tmpHmii);
 	}
 }
 
@@ -114,10 +114,10 @@ void InteractionHashMap::eraseCurrentAndGotoNext()
 	IHashMap::iterator tmpHmii=hmii;	
 	while (notAtEnd() && !((*hmii).second->isReal))
 		++hmii;	
-	runtimeInteractions.erase(tmpHmii);
+	volatileInteractions.erase(tmpHmii);
 }
 
 unsigned int InteractionHashMap::size()
 {
-	return runtimeInteractions.size();
+	return volatileInteractions.size();
 }

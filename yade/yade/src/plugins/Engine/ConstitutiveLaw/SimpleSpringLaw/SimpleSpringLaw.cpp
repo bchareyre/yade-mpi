@@ -25,9 +25,9 @@ void SimpleSpringLaw::calculateForces(Body * body)
 	Real stiffness = 10000;
 	Real viscosity = 10;
 	
-	for( ncb->runtimeInteractions->gotoFirst() ; ncb->runtimeInteractions->notAtEnd() ; ncb->runtimeInteractions->gotoNext() )
+	for( ncb->volatileInteractions->gotoFirst() ; ncb->volatileInteractions->notAtEnd() ; ncb->volatileInteractions->gotoNext() )
 	{
-		const shared_ptr<Interaction>& contact = ncb->runtimeInteractions->getCurrent();
+		const shared_ptr<Interaction>& contact = ncb->volatileInteractions->getCurrent();
 		int id1 = contact->getId1();
 		int id2 = contact->getId2();
 

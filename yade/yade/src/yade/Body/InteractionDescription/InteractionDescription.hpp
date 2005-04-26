@@ -38,6 +38,14 @@ class BoundingVolume;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+// the geometry through which the body zill interact:
+// - planet emitting gravity has just radius of influence
+// - magnet has also just volume of influence
+// - for tetrahedrons we can use sphere tree or sweptshpere volume
+//
+// in general we can use it to initialize interaction, and sometimes to terminate it
+// (depending in which container it is stored).
+
 class InteractionDescription : public Serializable, public Indexable
 {
 

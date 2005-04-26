@@ -26,23 +26,10 @@ void InteractionGeometryDispatcher::action(Body* body)
 	ComplexBody * ncb = dynamic_cast<ComplexBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	
-	shared_ptr<InteractionContainer>& initialInteractions = ncb->initialInteractions;
-	for( initialInteractions->gotoFirstPotential() ; initialInteractions->notAtEndPotential() ; initialInteractions->gotoNextPotential())
+	shared_ptr<InteractionContainer>& persistentInteractions = ncb->persistentInteractions;
+	for( persistentInteractions->gotoFirstPotential() ; persistentInteractions->notAtEndPotential() ; persistentInteractions->gotoNextPotential())
 	{
-		const shared_ptr<Interaction>& interaction = initialInteractions->getCurrent();
-		
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// FIXME : those lines are dirty !	They were in ElasticContactLaw, but they belong to this place		///
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	
-	// FIXME - this is much shorter but still dirty (but now in different aspect - the way we store runtimeInteractions)
-		const shared_ptr<Interaction>& interaction2 = ncb->runtimeInteractions->find(interaction->getId1(),interaction->getId2());
-		if (interaction2)
-			interaction2->isNonPermanent = false;
-			
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// those lines are dirty !	END										///
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		const shared_ptr<Interaction>& interaction = persistentInteractions->getCurrent();
 		
 		shared_ptr<Body>& b1 = (*bodies)[interaction->getId1()];
 		shared_ptr<Body>& b2 = (*bodies)[interaction->getId2()];
@@ -50,13 +37,22 @@ void InteractionGeometryDispatcher::action(Body* body)
 		operator()( b1->interactionGeometry , b2->interactionGeometry , b1->physicalParameters->se3 , b2->physicalParameters->se3 , interaction );
 	}
 	
-	shared_ptr<InteractionContainer>& runtimeInteractions = ncb->runtimeInteractions;
-	for( runtimeInteractions->gotoFirstPotential() ; runtimeInteractions->notAtEndPotential() ; runtimeInteractions->gotoNextPotential())
+	shared_ptr<InteractionContainer>& volatileInteractions = ncb->volatileInteractions;
+	for( volatileInteractions->gotoFirstPotential() ; volatileInteractions->notAtEndPotential() ; volatileInteractions->gotoNextPotential())
 	{
-		const shared_ptr<Interaction>& interaction = runtimeInteractions->getCurrent();
+		const shared_ptr<Interaction>& interaction = volatileInteractions->getCurrent();
 		
 		shared_ptr<Body>& b1 = (*bodies)[interaction->getId1()];
 		shared_ptr<Body>& b2 = (*bodies)[interaction->getId2()];
-		interaction->isReal = interaction->isNonPermanent && operator()( b1->interactionGeometry , b2->interactionGeometry , b1->physicalParameters->se3 , b2->physicalParameters->se3 , interaction );
+		
+		interaction->isReal =
+
+		// FIXME put this inside VolatileInteractionCriterion dynlib
+			( persistentInteractions->find(interaction->getId1(),interaction->getId2()) == 0 )
+
+			
+		 	&&
+			operator()( b1->interactionGeometry , b2->interactionGeometry , b1->physicalParameters->se3 , b2->physicalParameters->se3 , interaction );
+			
 	}
 }

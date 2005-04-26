@@ -20,10 +20,10 @@ bool InteractionVecSet::insert(shared_ptr<Interaction>& i)
 	if (id1>id2)
 		swap(id1,id2);
 
-	if ( id1 >=runtimeInteractions.size())
-		runtimeInteractions.resize(id1+1);
+	if ( id1 >=volatileInteractions.size())
+		volatileInteractions.resize(id1+1);
 
-	if (runtimeInteractions[id1].insert(pair<unsigned int,shared_ptr<Interaction> >(id2,i)).second)
+	if (volatileInteractions[id1].insert(pair<unsigned int,shared_ptr<Interaction> >(id2,i)).second)
 	{
 		currentSize++;
 		return true;
@@ -40,7 +40,7 @@ bool InteractionVecSet::insert(unsigned int id1,unsigned int id2)
 
 void InteractionVecSet::clear()
 {
-	runtimeInteractions.clear();
+	volatileInteractions.clear();
 	currentSize=0;
 }
 
@@ -49,10 +49,10 @@ bool InteractionVecSet::erase(unsigned int id1,unsigned int id2)
 	if (id1>id2)
 		swap(id1,id2);
 
-	if ( id1 < runtimeInteractions.size())
+	if ( id1 < volatileInteractions.size())
 	{
 		shared_ptr<Interaction> tmpI;
-		if (runtimeInteractions[id1].erase(pair<unsigned int,shared_ptr<Interaction> >(id2,tmpI)))
+		if (volatileInteractions[id1].erase(pair<unsigned int,shared_ptr<Interaction> >(id2,tmpI)))
 		{
 			currentSize--;
 			return true;
@@ -70,11 +70,11 @@ const shared_ptr<Interaction>& InteractionVecSet::find(unsigned int id1,unsigned
 	if (id1>id2)
 		swap(id1,id2);
 
-	if (static_cast<unsigned int>(id1)<runtimeInteractions.size())
+	if (static_cast<unsigned int>(id1)<volatileInteractions.size())
 	{
 		shared_ptr<Interaction> tmpI;
-		sii = runtimeInteractions[id1].find(pair<unsigned int,shared_ptr<Interaction> >(id2,tmpI));
-		if (sii!=runtimeInteractions[id1].end())
+		sii = volatileInteractions[id1].find(pair<unsigned int,shared_ptr<Interaction> >(id2,tmpI));
+		if (sii!=volatileInteractions[id1].end())
 			return (*sii).second;
 		else
 		{
@@ -91,8 +91,8 @@ const shared_ptr<Interaction>& InteractionVecSet::find(unsigned int id1,unsigned
 
 void InteractionVecSet::gotoFirstPotential()
 {
-	vii    = runtimeInteractions.begin();
-	viiEnd = runtimeInteractions.end();
+	vii    = volatileInteractions.begin();
+	viiEnd = volatileInteractions.end();
 
 	if (vii!=viiEnd)
 	{

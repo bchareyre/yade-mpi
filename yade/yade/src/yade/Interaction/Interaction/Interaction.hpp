@@ -53,8 +53,7 @@ class Interaction : public Serializable
 	
 	public	: bool isNew;		// FIXME : better to test if InteractionPhysics==0 and remove this flag
 	public  : bool isReal;		// maybe we can remove this, and check if InteractionDescription, and InteractionPhysics are empty?
-	public  : bool isNonPermanent;	// FIXME - how to solve problem of permanet runtimeInteractions and broad collider ???
-	private	: unsigned int id1,id2;
+	private	: unsigned int id1,id2; // this should be           vector<unsigned int> ids;
 
 
 	// FIXME - why public ?!

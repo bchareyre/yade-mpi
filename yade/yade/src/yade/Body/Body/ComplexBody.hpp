@@ -40,8 +40,8 @@ class ComplexBody : public Body
 	public  : vector<shared_ptr<Actor> > actors;
 	public  : vector<shared_ptr<Actor> > initializers;
 	
-	public	: shared_ptr<InteractionContainer> initialInteractions;
-	public	: shared_ptr<InteractionContainer> runtimeInteractions;	
+	public	: shared_ptr<InteractionContainer> persistentInteractions;  // disappear, reappear according to physical (or any other non-spatial) criterion
+	public	: shared_ptr<InteractionContainer> volatileInteractions; // disappear, reappear according to spatial criterion
 	public	: shared_ptr<ActionParameterContainer> actionParameters;
 	
 	// construction

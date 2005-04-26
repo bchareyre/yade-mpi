@@ -3,18 +3,16 @@
 Interaction::Interaction ()
 {
 	// FIXME : -1
-	id1 = 0;
+	id1 = 0; 
 	id2 = 0;
 	isNew = true;
 	isReal = false; // maybe we can remove this, and check if InteractionDescription, and InteractionPhysics are empty?
-	isNonPermanent = true;  // FIXME - how to solve problem of permanet runtimeInteractions and broad collider ???
 }
 
 Interaction::Interaction(unsigned int newId1,unsigned int newId2) : id1(newId1) , id2(newId2)
 {	
 	isNew = true;
 	isReal = false;
-	isNonPermanent = true;
 }
 
 void Interaction::registerAttributes()

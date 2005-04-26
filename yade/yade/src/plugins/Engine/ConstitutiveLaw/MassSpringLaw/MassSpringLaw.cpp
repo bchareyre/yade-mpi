@@ -22,12 +22,12 @@ void MassSpringLaw::calculateForces(Body * body)
 {
 	ComplexBody * massSpring = dynamic_cast<ComplexBody*>(body);
 	shared_ptr<BodyContainer>& bodies = massSpring->bodies;
-	shared_ptr<InteractionContainer>& initialInteractions = massSpring->initialInteractions;
+	shared_ptr<InteractionContainer>& persistentInteractions = massSpring->persistentInteractions;
 	shared_ptr<ActionParameterContainer>& actionParameters = massSpring->actionParameters;
 	
-	for(initialInteractions->gotoFirst() ; initialInteractions->notAtEnd(); initialInteractions->gotoNext())
+	for(persistentInteractions->gotoFirst() ; persistentInteractions->notAtEnd(); persistentInteractions->gotoNext())
 	{
-		const shared_ptr<Interaction>& spring = initialInteractions->getCurrent();
+		const shared_ptr<Interaction>& spring = persistentInteractions->getCurrent();
 		int id1 = spring->getId1();
 		int id2 = spring->getId2();
 		

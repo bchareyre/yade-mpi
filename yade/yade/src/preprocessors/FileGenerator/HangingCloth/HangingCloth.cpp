@@ -222,7 +222,7 @@ string HangingCloth::generate()
 	rootBody->boundingVolume			= aabb;
 	rootBody->physicalParameters	= physics2;
 
-	rootBody->initialInteractions->clear();
+	rootBody->persistentInteractions->clear();
 
 //////////////////////////////////////////////////////
 // make mesh
@@ -276,9 +276,9 @@ string HangingCloth::generate()
 			mesh2d->edges.push_back(Edge(offset(i,j),offset(i,j+1)));
 			mesh2d->edges.push_back(Edge(offset(i,j+1),offset(i+1,j)));
 
-			rootBody->initialInteractions->insert(createSpring(rootBody,offset(i,j),offset(i+1,j)));
-			rootBody->initialInteractions->insert(createSpring(rootBody,offset(i,j),offset(i,j+1)));
-			rootBody->initialInteractions->insert(createSpring(rootBody,offset(i,j+1),offset(i+1,j)));
+			rootBody->persistentInteractions->insert(createSpring(rootBody,offset(i,j),offset(i+1,j)));
+			rootBody->persistentInteractions->insert(createSpring(rootBody,offset(i,j),offset(i,j+1)));
+			rootBody->persistentInteractions->insert(createSpring(rootBody,offset(i,j+1),offset(i+1,j)));
 
 			vector<int> face1,face2;
 			face1.push_back(offset(i,j));
@@ -296,14 +296,14 @@ string HangingCloth::generate()
 	for(int i=0;i<width-1;i++)
 	{
 		mesh2d->edges.push_back(Edge(offset(i,height-1),offset(i+1,height-1)));
-		rootBody->initialInteractions->insert(createSpring(rootBody,offset(i,height-1),offset(i+1,height-1)));
+		rootBody->persistentInteractions->insert(createSpring(rootBody,offset(i,height-1),offset(i+1,height-1)));
 
 	}
 
 	for(int j=0;j<height-1;j++)
 	{
 		mesh2d->edges.push_back(Edge(offset(width-1,j),offset(width-1,j+1)));
-		rootBody->initialInteractions->insert(createSpring(rootBody,offset(width-1,j),offset(width-1,j+1)));
+		rootBody->persistentInteractions->insert(createSpring(rootBody,offset(width-1,j),offset(width-1,j+1)));
 	}
 
 	if (fixPoint1)
@@ -414,7 +414,7 @@ string HangingCloth::generate()
 					link->isReal 				= true;
 					link->isNew 				= false;
 					
-					rootBody->initialInteractions->insert(link);
+					rootBody->persistentInteractions->insert(link);
 					++linksNum;
 				}
 			}

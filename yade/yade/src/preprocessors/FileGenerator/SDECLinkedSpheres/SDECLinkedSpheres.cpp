@@ -124,7 +124,7 @@ string SDECLinkedSpheres::generate()
 	
 /////////////////////////////////////
 
-	rootBody->initialInteractions->clear();
+	rootBody->persistentInteractions->clear();
 	
 	shared_ptr<Body> bodyA;
 	rootBody->bodies->gotoFirst();
@@ -173,14 +173,14 @@ string SDECLinkedSpheres::generate()
 				link->isReal 				= true;
 				link->isNew 				= false;
 				
-				rootBody->initialInteractions->insert(link);
+				rootBody->persistentInteractions->insert(link);
 			}
 		}
 
 		rootBody->bodies->popIterator();
 	}
 	
-	return "total number of permament links created: " + lexical_cast<string>(rootBody->initialInteractions->size());
+	return "total number of permament links created: " + lexical_cast<string>(rootBody->persistentInteractions->size());
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -74,7 +74,7 @@ class PersistentSAPCollider : public BroadInteractor
 /// Attributes										      	///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-	// number of potential runtimeInteractions = number of interacting AABB
+	// number of potential volatileInteractions = number of interacting AABB
 	protected : int nbPotentialInteractions;
 
 	// maximum number of object that that collider can handle
@@ -94,7 +94,7 @@ class PersistentSAPCollider : public BroadInteractor
 
 	// collection of AABB that are in interaction
 	//protected : vector< set<unsigned int> > overlappingBB;
-	protected : shared_ptr<InteractionContainer> runtimeInteractions;
+	protected : shared_ptr<InteractionContainer> volatileInteractions;
 	// upper right corner of the AABB of the objects =>  for spheres = center[i]-radius
 	protected : vector<Real> maximums;
 
@@ -124,7 +124,7 @@ class PersistentSAPCollider : public BroadInteractor
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-	// return a list "runtimeInteractions" of pairs of Body which Bounding volume are in potential interaction
+	// return a list "volatileInteractions" of pairs of Body which Bounding volume are in potential interaction
 	public : void broadInteractionTest(Body * body);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -77,7 +77,7 @@ void ErrorTolerantLaw::calculateForces(Body* body)
 	ComplexBody * ncb = dynamic_cast<ComplexBody*>(body);
 	shared_ptr<BodyContainer> bodies = ncb->bodies;
 
-	if (ncb->runtimeInteractions->size() > 0)
+	if (ncb->volatileInteractions->size() > 0)
 	{
 		// Build inverse of masses matrix and store it into a vector
 		ublas::banded_matrix<float> invM(6*bodies->size(),6*bodies->size(),1,1);
@@ -102,8 +102,8 @@ void ErrorTolerantLaw::calculateForces(Body* body)
 		}
 
 		// Build the jacobian and transpose of jacobian
-		ublas::sparse_matrix<float> J (6*bodies->size(), ncb->runtimeInteractions->size(), ncb->runtimeInteractions->size()*2/*6*bodies.size()*body->runtimeInteractions.size()*/);
-		ublas::sparse_matrix<float> Jt (ncb->runtimeInteractions->size(), 6*bodies->size(), ncb->runtimeInteractions->size()*2/*6*bodies.size()*body->runtimeInteractions.size()*/);
+		ublas::sparse_matrix<float> J (6*bodies->size(), ncb->volatileInteractions->size(), ncb->volatileInteractions->size()*2/*6*bodies.size()*body->volatileInteractions.size()*/);
+		ublas::sparse_matrix<float> Jt (ncb->volatileInteractions->size(), 6*bodies->size(), ncb->volatileInteractions->size()*2/*6*bodies.size()*body->volatileInteractions.size()*/);
 
 		static ublas::vector<float> penetrationDepthes;
 		static ublas::vector<float> penetrationVelocities;
@@ -118,12 +118,12 @@ void ErrorTolerantLaw::calculateForces(Body* body)
 
 		shared_ptr<Interaction> contact;
 		i=0;
-//		list<shared_ptr<Interaction> >::const_iterator cti = ncb->runtimeInteractions.begin();
-//		list<shared_ptr<Interaction> >::const_iterator ctiEnd = ncb->runtimeInteractions.end();
+//		list<shared_ptr<Interaction> >::const_iterator cti = ncb->volatileInteractions.begin();
+//		list<shared_ptr<Interaction> >::const_iterator ctiEnd = ncb->volatileInteractions.end();
 //		for(int i=0 ; cti!=ctiEnd ; ++cti,i++)
-		for( ncb->runtimeInteractions->gotoFirst() ; ncb->runtimeInteractions->notAtEnd() ; ncb->runtimeInteractions->gotoNext() )
+		for( ncb->volatileInteractions->gotoFirst() ; ncb->volatileInteractions->notAtEnd() ; ncb->volatileInteractions->gotoNext() )
 		{
-			contact = ncb->runtimeInteractions->getCurrent();
+			contact = ncb->volatileInteractions->getCurrent();
 
 			shared_ptr<ErrorTolerantContactModel> cm = dynamic_pointer_cast<ErrorTolerantContactModel>(contact->interactionGeometry);
 

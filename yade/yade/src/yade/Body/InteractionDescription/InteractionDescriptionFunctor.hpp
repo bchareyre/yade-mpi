@@ -42,11 +42,6 @@
 class InteractionDescriptionFunctor : public Factorable
 {	
 	
-	// construction
-	public : InteractionDescriptionFunctor ();
-	public : virtual ~InteractionDescriptionFunctor ();
-	
-	public : virtual shared_ptr<InteractionDescription> buildInteractionGeometry(const shared_ptr<GeometricalModel> gm, const Se3r& se3) = 0;
 
 };
 
