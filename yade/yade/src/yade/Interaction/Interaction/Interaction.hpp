@@ -52,6 +52,11 @@ class Interaction : public Serializable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	public	: bool isNew;		// FIXME : better to test if InteractionPhysics==0 and remove this flag
+
+
+
+	// we can remove this flag, if we make another container for PotetntialInteraction with only ids
+	
 	public  : bool isReal;		// maybe we can remove this, and check if InteractingGeometry, and InteractionPhysics are empty?
 	private	: unsigned int id1,id2; // this should be           vector<unsigned int> ids;
 

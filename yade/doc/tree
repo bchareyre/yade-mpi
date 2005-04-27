@@ -209,7 +209,7 @@
 |       |   |-- SAPCollider
 |       |   |   |-- SAPCollider.cpp
 |       |   |   `-- SAPCollider.hpp
-|       |   `-- SimpleBroadInteractor
+|       |   `-- SimpleBroadInteractor					BroadInteractionMetaEngine
 |       |       |-- SimpleBroadInteractor.cpp
 |       |       `-- SimpleBroadInteractor.hpp
 |       |-- InteractionGeometry
@@ -277,166 +277,6 @@
 |               `-- MacroMicroElasticRelationships
 |                   |-- MacroMicroElasticRelationships.cpp
 |                   `-- MacroMicroElasticRelationships.hpp
-|-- postprocessors
-|-- preprocessors
-|   `-- FileGenerator
-|       |-- BoxStack
-|       |   |-- BoxStack.cpp
-|       |   `-- BoxStack.hpp
-|       |-- FEMBeam
-|       |   |-- FEMBeam.cpp
-|       |   `-- FEMBeam.hpp
-|       |-- FEMDEMCouplingTest
-|       |   |-- FEMDEMCouplingTest.cpp
-|       |   `-- FEMDEMCouplingTest.hpp
-|       |-- HangingCloth
-|       |   |-- HangingCloth.cpp
-|       |   `-- HangingCloth.hpp
-|       |-- LatticeExample
-|       |   |-- LatticeExample.cpp
-|       |   `-- LatticeExample.hpp
-|       |-- RotatingBox
-|       |   |-- RotatingBox.cpp
-|       |   `-- RotatingBox.hpp
-|       |-- SDECImpactTest
-|       |   |-- SDECImpactTest.cpp
-|       |   `-- SDECImpactTest.hpp
-|       |-- SDECLinkedSpheres
-|       |   |-- SDECLinkedSpheres.cpp
-|       |   `-- SDECLinkedSpheres.hpp
-|       |-- SDECSpheresPlane
-|       |   |-- SDECSpheresPlane.cpp
-|       |   `-- SDECSpheresPlane.hpp
-|       `-- SDECTriaxialTest
-|           |-- SDECTriaxialTest.cpp
-|           `-- SDECTriaxialTest.hpp
-|-- toolboxes
-|   |-- ComputationalGeometry
-|   |   |-- Distances
-|   |   |   |-- Distances3D.cpp
-|   |   |   `-- Distances3D.hpp
-|   |   `-- Intersections
-|   |       |-- Intersections2D.cpp
-|   |       |-- Intersections2D.hpp
-|   |       |-- Intersections3D.cpp
-|   |       `-- Intersections3D.hpp
-|   |-- DataStructures
-|   |   |-- ActionParameterContainer
-|   |   |   `-- ActionParameterVectorVector
-|   |   |       |-- ActionParameterVectorVector.cpp
-|   |   |       `-- ActionParameterVectorVector.hpp
-|   |   |-- BodyContainer
-|   |   |   |-- BodyAssocVector
-|   |   |   |   |-- BodyAssocVec.cpp
-|   |   |   |   |-- BodyAssocVec.hpp
-|   |   |   |   |-- BodyAssocVector.cpp
-|   |   |   |   `-- BodyAssocVector.hpp
-|   |   |   `-- BodyRedirectionVector
-|   |   |       |-- BodyRedirectionVector.cpp
-|   |   |       `-- BodyRedirectionVector.hpp
-|   |   `-- InteractionContainer
-|   |       |-- InteractionHashMap
-|   |       |   |-- InteractionHashMap.cpp
-|   |       |   `-- InteractionHashMap.hpp
-|   |       `-- InteractionVecSet
-|   |           |-- InteractionVecSet.cpp
-|   |           `-- InteractionVecSet.hpp
-|   |-- Libraries
-|   |   |-- Factory
-|   |   |   |-- ClassFactory.cpp
-|   |   |   |-- ClassFactory.hpp
-|   |   |   |-- DynLibManager.cpp
-|   |   |   |-- DynLibManager.hpp
-|   |   |   |-- Factorable.cpp
-|   |   |   |-- Factorable.hpp
-|   |   |   |-- FactoryExceptions.cpp
-|   |   |   `-- FactoryExceptions.hpp
-|   |   |-- Loki
-|   |   |   |-- AssocVector.hpp
-|   |   |   |-- EmptyType.hpp
-|   |   |   |-- Functor.hpp
-|   |   |   |-- NullType.hpp
-|   |   |   |-- Singleton.hpp
-|   |   |   |-- TypeManip.hpp
-|   |   |   |-- TypeTraits.hpp
-|   |   |   `-- Typelist.hpp
-|   |   |-- Math
-|   |   |   |-- Math.cpp
-|   |   |   |-- Math.hpp
-|   |   |   |-- Math.ipp
-|   |   |   |-- Matrix2.cpp
-|   |   |   |-- Matrix2.hpp
-|   |   |   |-- Matrix2.ipp
-|   |   |   |-- Matrix3.cpp
-|   |   |   |-- Matrix3.hpp
-|   |   |   |-- Matrix3.ipp
-|   |   |   |-- Matrix4.cpp
-|   |   |   |-- Matrix4.hpp
-|   |   |   |-- Matrix4.ipp
-|   |   |   |-- Quaternion.cpp
-|   |   |   |-- Quaternion.hpp
-|   |   |   |-- Quaternion.ipp
-|   |   |   |-- Se3.cpp
-|   |   |   |-- Se3.hpp
-|   |   |   |-- Se3.ipp
-|   |   |   |-- Vector2.cpp
-|   |   |   |-- Vector2.hpp
-|   |   |   |-- Vector2.ipp
-|   |   |   |-- Vector3.cpp
-|   |   |   |-- Vector3.hpp
-|   |   |   |-- Vector3.ipp
-|   |   |   |-- Vector4.cpp
-|   |   |   |-- Vector4.hpp
-|   |   |   `-- Vector4.ipp
-|   |   |-- MultiMethods
-|   |   |   |-- DynLibDispatcher.hpp
-|   |   |   |-- FunctorWrapper.hpp
-|   |   |   |-- Indexable.cpp
-|   |   |   |-- Indexable.hpp
-|   |   |   |-- MultiMethodsExceptions.cpp
-|   |   |   `-- MultiMethodsExceptions.hpp
-|   |   |-- Serialization
-|   |   |   |-- Archive.cpp
-|   |   |   |-- Archive.hpp
-|   |   |   |-- Archive.tpp
-|   |   |   |-- ArchiveTypes.hpp
-|   |   |   |-- ContainerHandler.tpp
-|   |   |   |-- FundamentalHandler.tpp
-|   |   |   |-- IOManager.cpp
-|   |   |   |-- IOManager.hpp
-|   |   |   |-- IOManager.tpp
-|   |   |   |-- IOManagerExceptions.cpp
-|   |   |   |-- IOManagerExceptions.hpp
-|   |   |   |-- KnownFundamentalsHandler.tpp
-|   |   |   |-- MultiTypeHandler.tpp
-|   |   |   |-- PointerHandler.tpp
-|   |   |   |-- Serializable.cpp
-|   |   |   |-- Serializable.hpp
-|   |   |   |-- SerializableSingleton.cpp
-|   |   |   |-- SerializableSingleton.hpp
-|   |   |   |-- SerializableTypes.hpp
-|   |   |   |-- SerializationExceptions.cpp
-|   |   |   `-- SerializationExceptions.hpp
-|   |   `-- Threads
-|   |       |-- ThreadSafe.cpp
-|   |       |-- ThreadSafe.hpp
-|   |       |-- ThreadSynchronizer.cpp
-|   |       |-- ThreadSynchronizer.hpp
-|   |       |-- Threadable.hpp
-|   |       `-- Threadable.tpp
-|   `-- OpenGL
-|       |-- GLWindowManager
-|       |   |-- FpsTracker.cpp
-|       |   |-- FpsTracker.hpp
-|       |   |-- GLTextLabel.cpp
-|       |   |-- GLTextLabel.hpp
-|       |   |-- GLWindow.cpp
-|       |   |-- GLWindow.hpp
-|       |   |-- GLWindowsManager.cpp
-|       |   `-- GLWindowsManager.hpp
-|       `-- OpenGLWrapper
-|           `-- OpenGLWrapper.hpp
-|-- tree
 `-- yade
     |-- Body
     |   |-- Body
@@ -461,44 +301,83 @@
     |   |-- InteractingGeometry
     |   |   |-- InteractingGeometry.cpp
     |   |   |-- InteractingGeometry.hpp
-    |   |   |-- InteractingGeometryDispatcher.cpp
+    |   |   |-- InteractingGeometryDispatcher.cpp 		==========MetaEngine
     |   |   |-- InteractingGeometryDispatcher.hpp
-    |   |   `-- InteractingGeometryFunctor.hpp
-    |   `-- PhysicalParameters
+    |   |   `-- InteractingGeometryFunctor.hpp 			==========Engine
+    |   `-- PhysicalParameters					split into State  and   PhysicalParameters  (and Body will contain 5 classes)
     |       |-- PhysicalParameters.cpp
     |       |-- PhysicalParameters.hpp
-    |       |-- PhysicalParametersDispatcher.cpp
+    |       |-- PhysicalParametersDispatcher.cpp		===========MetaEngine
     |       |-- PhysicalParametersDispatcher.hpp
-    |       `-- PhysicalParametersFunctor.hpp
+    |       `-- PhysicalParametersFunctor.hpp 			===========Engine
+    |   `-- State					split into State  and   PhysicalParameters  (and Body will contain 5 classes)
+    |       |-- State.cpp
+    |       |-- State.hpp
+    |       |-- StateMetaEngine.cpp				===========MetaEngine
+    |       |-- StateMetaEngine.hpp
+    |       `-- StateEngine.hpp 				===========Engine
+
     |-- Engine
-    |   |-- ActionParameter.hpp					Modifier
+    |   |-- ActionParameter.hpp					PhysicalAction
     |   |-- ActionParameterContainer.cpp
     |   |-- ActionParameterContainer.hpp
-    |   |-- ActionParameterDispatcher.cpp			ModifierMetaEngine
+    |   |-- ActionParameterDispatcher.cpp			PhysicalActionMetaEngine
     |   |-- ActionParameterDispatcher.hpp
-    |   |-- ActionParameterFunctor.hpp				ModifierEngine
+    |   |-- ActionParameterFunctor.hpp				PhysicalActionEngine
+							
+								PhysicalActionModifierEngine
+								PhysicalActionUpdatorEngine
+								PhysicalActionCreatorEngine
+								PhysicalActionDeleterEngine
+
+
+?????????????????????????????????????????????????????????????????????? BEGIN
+								GeometricalModelModifier
+								Geomet==========ModifierMetaEngine
+								Geomet==========ModifierEngine
+
+								PhysicalParamatersModifier
+								P=======ParamatersModifierMetaEngine
+								P=======ParamatersModifierEngine
+?????????????????????????????????????????????????????????????????????? END
+
+
+
+?????????????????????????????????????????????????????????????????????????????????????? BEGIN
+								InetarctionGeometryModifier
+								InetarctionGeometryModifierMetaEngine
+								InetarctionGeometryModifierEngine
+
+								InetarctionPhysicsModifier
+								InetarctionPhysicsModifierMetaEngine
+								InetarctionPhysicsModifierEngine
+??????????????????????????????????????????????????????????????????????????????????????? END
+								
+
+
+
     |   |-- DeusExMachina.cpp
     |   |-- DeusExMachina.hpp
     |   |-- InteractionSolver.cpp
     |   `-- InteractionSolver.hpp
     |-- Interaction
     |   |-- Interaction
-    |   |   |-- BroadInteractor.cpp
+    |   |   |-- BroadInteractor.cpp				BroadInteractionEngine
     |   |   |-- BroadInteractor.hpp
     |   |   |-- Interaction.cpp
     |   |   |-- Interaction.hpp
     |   |   |-- InteractionContainer.cpp
     |   |   `-- InteractionContainer.hpp
     |   |-- InteractionGeometry
-    |   |   |-- InteractionGeometry.hpp
-    |   |   |-- InteractionGeometryDispatcher.cpp
-    |   |   |-- InteractionGeometryDispatcher.hpp
-    |   |   `-- InteractionGeometryFunctor.hpp
+    |   |   |-- InteractionGeometry.hpp				NarrowInteractionGeometry
+    |   |   |-- InteractionGeometryDispatcher.cpp		Narro====================MetaEngine
+    |   |   |-- InteractionGeometryDispatcher.hpp		
+    |   |   `-- InteractionGeometryFunctor.hpp			Narro====================Engine
     |   `-- InteractionPhysics
     |       |-- InteractionPhysics.hpp
-    |       |-- InteractionPhysicsDispatcher.cpp
+    |       |-- InteractionPhysicsDispatcher.cpp 		InteractionPhysicsMetaEngine
     |       |-- InteractionPhysicsDispatcher.hpp
-    |       `-- InteractionPhysicsFunctor.hpp
+    |       `-- InteractionPhysicsFunctor.hpp			In================Engine
     `-- yade
         |-- Chrono.cpp
         |-- Chrono.hpp
@@ -517,3 +396,63 @@
         `-- yadeExceptions.hpp
 
 185 directories, 424 files
+
+
+
+
+
+
+
+
+IDEA
+
+
+    |-- Interaction
+    |   |-- Interaction
+    |   |   |-- BroadInteractor.cpp				BroadInteractionEngine
+    |   |   |-- BroadInteractor.hpp
+    |   |   |-- Interaction.cpp
+    |   |   |-- Interaction.hpp
+    |   |   |-- InteractionContainer.cpp
+    |   |   `-- InteractionContainer.hpp
+
+            PotentialInteraction
+
+		RealInteraction
+                
+
+    |   |-- InteractionGeometry
+    |   |   |-- InteractionGeometry.hpp				NarrowInteractionGeometry
+    |   |   |-- InteractionGeometryDispatcher.cpp		Narro====================MetaEngine
+    |   |   |-- InteractionGeometryDispatcher.hpp		
+    |   |   `-- InteractionGeometryFunctor.hpp			Narro====================Engine
+    |   `-- InteractionPhysics
+    |       |-- InteractionPhysics.hpp
+    |       |-- InteractionPhysicsDispatcher.cpp 		InteractionPhysicsMetaEngine
+    |       |-- InteractionPhysicsDispatcher.hpp
+    |       `-- InteractionPhysicsFunctor.hpp			In================Engine
+
+
+
+broad interactor will fill a container with ids.
+
+
+
+Broad     Narrow            Physics
+
+ids       geometry+isNew    physics
+
+
+
+
+
+
+
+BoundingVolume 			InteractingGeometry 		GeometricalModel 	State		PhysicalParameters
+
+
+NarrowInteractionGeometry	InteractionPhysics
+
+
+PhysicalAction
+

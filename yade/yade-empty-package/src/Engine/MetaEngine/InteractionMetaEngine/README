@@ -1,0 +1,14 @@
+BroadInteractionMetaEngine is just an example of InteractionMetaEngine
+
+another exaple is to create artificially an interaction when dispatchng on State - for example
+if position of the Body is below some threshold we want to create an Interaction
+
+
+
+
+????????????????
+and for example if you want to delete (not create) an Interaction depending on some criterion it
+will be in this directory, for example:
+
+CoulombCriterionMetaEngine
+DruckerPragerMetaEngine

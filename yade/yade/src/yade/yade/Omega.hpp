@@ -88,7 +88,7 @@ class Omega : public Singleton<Omega>
 	private	: void buildDynlibList();
 	private	: void registerDynlibType(const string& name);
 	
-	private	: Real dt; // FIXME
+	private	: Real dt; // FIXME - maybe ???????? move this to MetaBody.hpp OR MAYBE NOT ??
 	public	: void setTimeStep(const Real);
 	public	: Real getTimeStep();
 	

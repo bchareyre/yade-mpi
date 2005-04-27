@@ -65,9 +65,20 @@ class Body : public Serializable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 	private	: unsigned int id;
 	public	: unsigned int getId() const {return id;};
+
+
 	// group to which body belongs (maybe vector<int> , to allow multiple groups?)
+
+	// we can use them to make group one yellow, and group two red, or to record data from some
+	// selected bodies
+
+	// FIXME - but we SHOULDN'T use them in InteractionSolver, because it allows
+	//         to have flat simulation. We should make tree simulation and see...
 	private : int groupMask;
 	public  : int getGroupMask() {return groupMask; };
+
+	
+	
 	// only BodyContainer can set the id of a body
 	friend class BodyContainer;
 

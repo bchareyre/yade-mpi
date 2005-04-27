@@ -1,0 +1,7 @@
+if at least one parameter used to make computation is using parameters related to the exterior then it's DeusExMachina
+
+eg.
+Force applied from outside, gravity from outside, translation/rotation...
+
+for timestep - an arbitrary alpha multiplier is chosen.
+
