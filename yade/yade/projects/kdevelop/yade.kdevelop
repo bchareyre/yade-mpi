@@ -99,7 +99,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>plugins/Engine/EngineUnit/BodyEngineUnit/StateEngineUnit/PhysicalActionApplier/NewtonsMomemtumForceLaw</activedir>
+      <activedir>yade/yade</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>
