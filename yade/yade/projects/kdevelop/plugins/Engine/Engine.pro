@@ -7,7 +7,10 @@ SUBDIRS += ActionParameterFunctor \
            ActionParameterInitializer \
            ActionParameterReset \
            DeusExMachina \
-           InteractionSolver 
+           InteractionSolver \
+           Engine \
+           MetaEngine \
+           EngineUnit 
 MOC_DIR = $(YADECOMPILATIONPATH)
 UI_DIR = $(YADECOMPILATIONPATH)
 OBJECTS_DIR = $(YADECOMPILATIONPATH)
