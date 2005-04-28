@@ -3,7 +3,8 @@
 # Subdir relative project main directory: ./plugins/Engine/EngineUnit/BodyEngineUnit/StateEngineUnit
 # Target is a subdirs project 
 
-SUBDIRS += TimeIntegrator 
+SUBDIRS += TimeIntegrator \
+           PhysicalActionApplier 
 CONFIG += release \
-          warn_on 
-TEMPLATE = subdirs 
+warn_on
+TEMPLATE = subdirs
