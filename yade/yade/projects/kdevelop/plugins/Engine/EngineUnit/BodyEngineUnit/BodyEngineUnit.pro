@@ -3,6 +3,11 @@
 # Subdir relative project main directory: ./plugins/Engine/EngineUnit/BodyEngineUnit
 # Target is a subdirs project 
 
+SUBDIRS += StateEngineUnit \
+           BoundingVolumeEngineUnit \
+           GeometricalModelEngineUnit \
+           InteractingGeometryEngineUnit \
+           PhysicalParametersEngineUnit 
 CONFIG += release \
           warn_on 
 TEMPLATE = subdirs 
