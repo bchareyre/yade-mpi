@@ -3,7 +3,7 @@
 
 #include "BroadInteractor.hpp"
 
-class SimpleBroadInteractor : public BroadInteractor
+class BroadInteractionEngineUnit : public BroadInteractor
 {
 	// number of potential interacions = number of interacting AABB
 	protected : int nbPotentialInteractions;
@@ -12,8 +12,8 @@ class SimpleBroadInteractor : public BroadInteractor
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 	// construction
-	public : SimpleBroadInteractor ();
-	public : ~SimpleBroadInteractor ();
+	public : BroadInteractionEngineUnit ();
+	public : ~BroadInteractionEngineUnit ();
 
 	protected : virtual void postProcessAttributes(bool deserializing);
 	public : void registerAttributes();
@@ -27,11 +27,11 @@ class SimpleBroadInteractor : public BroadInteractor
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-	REGISTER_CLASS_NAME(SimpleBroadInteractor);
+	REGISTER_CLASS_NAME(BroadInteractionEngineUnit);
 
 };
 
-REGISTER_SERIALIZABLE(SimpleBroadInteractor,false);
+REGISTER_SERIALIZABLE(BroadInteractionEngineUnit,false);
 
 #endif // __SIMPLEBROADCOLLIDER_H__
 
