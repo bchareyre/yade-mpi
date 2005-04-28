@@ -15,7 +15,7 @@
 #include "SDECLinkGeometry.hpp"
 #include "Interaction.hpp"
 #include "BoundingVolumeMetaEngine.hpp"
-#include "InteractionDescriptionSet2AABBFunctor.hpp"
+#include "InteractionDescriptionSet2AABB.hpp"
 #include "MetaInteractingGeometry.hpp"
 #include "MacroMicroElasticRelationships.hpp"
 #include "SDECTimeStepper.hpp"
@@ -224,9 +224,9 @@ void SDECSpheresPlane::createActors(shared_ptr<MetaBody>& rootBody)
 	interactionPhysicsDispatcher->add("BodyMacroParameters","BodyMacroParameters","MacroMicroElasticRelationships");
 		
 	shared_ptr<BoundingVolumeMetaEngine> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeMetaEngine>(new BoundingVolumeMetaEngine);
-	boundingVolumeDispatcher->add("InteractingSphere","AABB","Sphere2AABBFunctor");
+	boundingVolumeDispatcher->add("InteractingSphere","AABB","Sphere2AABB");
 	boundingVolumeDispatcher->add("InteractingBox","AABB","Box2AABB");
-	boundingVolumeDispatcher->add("MetaInteractingGeometry","AABB","InteractionDescriptionSet2AABBFunctor");
+	boundingVolumeDispatcher->add("MetaInteractingGeometry","AABB","InteractionDescriptionSet2AABB");
 	
 	shared_ptr<GravityCondition> gravityCondition(new GravityCondition);
 	gravityCondition->gravity = gravity;

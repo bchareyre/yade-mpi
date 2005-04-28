@@ -16,7 +16,7 @@ LIBS += -lPersistentSAPCollider \
         -lMacroMicroElasticRelationships \
         -lSDECTimeStepper \
         -lElasticContactLaw \
-        -lInteractionDescriptionSet2AABBFunctor \
+        -lInteractionDescriptionSet2AABB \
         -rdynamic 
 INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 

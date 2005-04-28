@@ -25,7 +25,7 @@
 #include "BoundingVolumeMetaEngine.hpp"
 #include "GeometricalModelDispatcher.hpp"
 
-#include "InteractionDescriptionSet2AABBFunctor.hpp"
+#include "InteractionDescriptionSet2AABB.hpp"
 #include "MetaInteractingGeometry.hpp"
 #include "ParticleParameters.hpp"
 #include "ParticleSetParameters.hpp"
@@ -141,9 +141,9 @@ string HangingCloth::generate()
 	gravityCondition->gravity = gravity;
 	
 	shared_ptr<BoundingVolumeMetaEngine> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeMetaEngine>(new BoundingVolumeMetaEngine);
-	boundingVolumeDispatcher->add("InteractingSphere","AABB","Sphere2AABBFunctor");
+	boundingVolumeDispatcher->add("InteractingSphere","AABB","Sphere2AABB");
 	boundingVolumeDispatcher->add("InteractingBox","AABB","Box2AABB");
-	boundingVolumeDispatcher->add("MetaInteractingGeometry","AABB","InteractionDescriptionSet2AABBFunctor");
+	boundingVolumeDispatcher->add("MetaInteractingGeometry","AABB","InteractionDescriptionSet2AABB");
 
 	shared_ptr<GeometricalModelDispatcher> geometricalModelDispatcher	= shared_ptr<GeometricalModelDispatcher>(new GeometricalModelDispatcher);
 	geometricalModelDispatcher->add("ParticleSetParameters","Mesh2D","ParticleSet2Mesh2D");

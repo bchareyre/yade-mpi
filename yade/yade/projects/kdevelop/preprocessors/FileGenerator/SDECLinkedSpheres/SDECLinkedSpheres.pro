@@ -27,7 +27,7 @@ LIBS += -lBox \
         -lSDECTimeStepper \
         -lElasticContactLaw \
         -lMetaInteractingGeometry \
-        -lInteractionDescriptionSet2AABBFunctor \
+        -lInteractionDescriptionSet2AABB \
         -rdynamic 
 INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 

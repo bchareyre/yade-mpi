@@ -29,7 +29,7 @@ LIBS += -lBox \
         -lSDECTimeStepper \
         -lElasticContactLaw \
         -lMetaInteractingGeometry \
-        -lInteractionDescriptionSet2AABBFunctor \
+        -lInteractionDescriptionSet2AABB \
         -lForceRecorder \
         -rdynamic 
 INCLUDEPATH = $(YADEINCLUDEPATH) 

@@ -4,9 +4,9 @@
 # Target is a subdirs project 
 
 SUBDIRS += Box2AABB \
-           Terrain2AABBFunctor \
-           Sphere2AABBFunctor \
-           InteractionDescriptionSet2AABBFunctor
+           Terrain2AABB \
+           Sphere2AABB \
+           InteractionDescriptionSet2AABB
 MOC_DIR = $(YADECOMPILATIONPATH)
 UI_DIR = $(YADECOMPILATIONPATH)
 OBJECTS_DIR = $(YADECOMPILATIONPATH)

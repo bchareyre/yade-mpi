@@ -23,7 +23,7 @@ LIBS += -lSerialization \
         -lActionParameterInitializer \
         -lTranslationCondition \
         -lGravityCondition \
-        -lInteractionDescriptionSet2AABBFunctor \
+        -lInteractionDescriptionSet2AABB \
         -rdynamic 
 INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 

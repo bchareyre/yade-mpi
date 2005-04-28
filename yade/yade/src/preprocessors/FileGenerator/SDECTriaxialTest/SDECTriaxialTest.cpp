@@ -38,7 +38,7 @@
 #include "BodyMacroParameters.hpp"
 #include "Interaction.hpp"
 #include "BoundingVolumeMetaEngine.hpp"
-#include "InteractionDescriptionSet2AABBFunctor.hpp"
+#include "InteractionDescriptionSet2AABB.hpp"
 #include "MetaInteractingGeometry.hpp"
 #include "MacroMicroElasticRelationships.hpp"
 #include "SDECTimeStepper.hpp"
