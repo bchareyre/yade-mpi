@@ -3,7 +3,7 @@
 # Subdir relative project main directory: ./plugins/Geometry/BoundingVolumeFactory
 # Target is a subdirs project 
 
-SUBDIRS += Box2AABBFunctor \
+SUBDIRS += Box2AABB \
            Terrain2AABBFunctor \
            Sphere2AABBFunctor \
            InteractionDescriptionSet2AABBFunctor

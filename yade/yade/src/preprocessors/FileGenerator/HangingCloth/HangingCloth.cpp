@@ -142,7 +142,7 @@ string HangingCloth::generate()
 	
 	shared_ptr<BoundingVolumeMetaEngine> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeMetaEngine>(new BoundingVolumeMetaEngine);
 	boundingVolumeDispatcher->add("InteractingSphere","AABB","Sphere2AABBFunctor");
-	boundingVolumeDispatcher->add("InteractingBox","AABB","Box2AABBFunctor");
+	boundingVolumeDispatcher->add("InteractingBox","AABB","Box2AABB");
 	boundingVolumeDispatcher->add("MetaInteractingGeometry","AABB","InteractionDescriptionSet2AABBFunctor");
 
 	shared_ptr<GeometricalModelDispatcher> geometricalModelDispatcher	= shared_ptr<GeometricalModelDispatcher>(new GeometricalModelDispatcher);
