@@ -9,5 +9,5 @@ OBJECTS_DIR = $(YADECOMPILATIONPATH)
 CONFIG += debug \
           warn_on 
 TEMPLATE = subdirs 
-SUBDIRS += Engine \
-           Data 
+SUBDIRS += Data \
+           Engine
