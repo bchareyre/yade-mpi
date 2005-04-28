@@ -19,8 +19,8 @@
 #include "InteractionPhysicsDispatcher.hpp"
 
 #include "ActionParameterDispatcher.hpp"
-#include "CundallNonViscousForceDampingFunctor.hpp"
-#include "CundallNonViscousMomentumDampingFunctor.hpp"
+#include "CundallNonViscousForceDamping.hpp"
+#include "CundallNonViscousMomentumDamping.hpp"
 
 #include "BoundingVolumeMetaEngine.hpp"
 #include "GeometricalModelDispatcher.hpp"
@@ -148,13 +148,13 @@ string HangingCloth::generate()
 	shared_ptr<GeometricalModelDispatcher> geometricalModelDispatcher	= shared_ptr<GeometricalModelDispatcher>(new GeometricalModelDispatcher);
 	geometricalModelDispatcher->add("ParticleSetParameters","Mesh2D","ParticleSet2Mesh2D");
 
-	shared_ptr<CundallNonViscousForceDampingFunctor> actionForceDamping(new CundallNonViscousForceDampingFunctor);
+	shared_ptr<CundallNonViscousForceDamping> actionForceDamping(new CundallNonViscousForceDamping);
 	actionForceDamping->damping = dampingForce;
-	shared_ptr<CundallNonViscousMomentumDampingFunctor> actionMomentumDamping(new CundallNonViscousMomentumDampingFunctor);
+	shared_ptr<CundallNonViscousMomentumDamping> actionMomentumDamping(new CundallNonViscousMomentumDamping);
 	actionMomentumDamping->damping = dampingMomentum;
 	shared_ptr<ActionParameterDispatcher> actionDampingDispatcher(new ActionParameterDispatcher);
-	actionDampingDispatcher->add("ActionParameterForce","ParticleParameters","CundallNonViscousForceDampingFunctor",actionForceDamping);
-	actionDampingDispatcher->add("ActionParameterMomentum","RigidBodyParameters","CundallNonViscousMomentumDampingFunctor",actionMomentumDamping);
+	actionDampingDispatcher->add("ActionParameterForce","ParticleParameters","CundallNonViscousForceDamping",actionForceDamping);
+	actionDampingDispatcher->add("ActionParameterMomentum","RigidBodyParameters","CundallNonViscousMomentumDamping",actionMomentumDamping);
 	
 	shared_ptr<ActionParameterDispatcher> applyActionDispatcher(new ActionParameterDispatcher);
 	applyActionDispatcher->add("ActionParameterForce","ParticleParameters","NewtonsForceLaw");

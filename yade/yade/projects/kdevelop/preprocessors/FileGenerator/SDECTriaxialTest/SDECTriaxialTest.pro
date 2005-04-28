@@ -9,8 +9,8 @@ LIBS += -lPersistentSAPCollider \
         -lInteractingBox \
         -lSphere \
         -lBox \
-        -lCundallNonViscousMomentumDampingFunctor \
-        -lCundallNonViscousForceDampingFunctor \
+        -lCundallNonViscousMomentumDamping \
+        -lCundallNonViscousForceDamping \
         -lActionParameterReset \
         -lBodyMacroParameters \
         -lMacroMicroElasticRelationships \
@@ -28,8 +28,8 @@ QMAKE_LIBDIR = ../../../plugins/Interaction/BroadInteractor/PersistentSAPCollide
                ../../../plugins/Body/InteractingGeometry/InteractingBox/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/GeometricalModel/Box/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/ActionParameterFunctor/CundallNonViscousMomentumDampingFunctor/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/ActionParameterFunctor/CundallNonViscousForceDampingFunctor/$(YADEDYNLIBPATH) \
+               ../../../plugins/Engine/ActionParameterFunctor/CundallNonViscousMomentumDamping/$(YADEDYNLIBPATH) \
+               ../../../plugins/Engine/ActionParameterFunctor/CundallNonViscousForceDamping/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/ActionParameterReset/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/PhysicalParameters/BodyMacroParameters/$(YADEDYNLIBPATH) \
                ../../../plugins/Interaction/InteractionPhysicsFunctor/ElasticContactParameters/MacroMicroElasticRelationships/$(YADEDYNLIBPATH) \

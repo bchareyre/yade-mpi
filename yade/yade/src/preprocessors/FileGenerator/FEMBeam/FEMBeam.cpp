@@ -12,8 +12,8 @@
 
 // actors
 #include "FEMTetrahedronStiffness.hpp"
-#include "CundallNonViscousMomentumDampingFunctor.hpp"
-#include "CundallNonViscousForceDampingFunctor.hpp"
+#include "CundallNonViscousMomentumDamping.hpp"
+#include "CundallNonViscousForceDamping.hpp"
 #include "ActionParameterInitializer.hpp"
 #include "ActionParameterReset.hpp"
 #include "FEMLaw.hpp"

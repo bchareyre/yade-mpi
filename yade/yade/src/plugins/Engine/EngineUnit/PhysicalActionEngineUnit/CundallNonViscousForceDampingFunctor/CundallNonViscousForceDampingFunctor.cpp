@@ -21,21 +21,21 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "CundallNonViscousForceDampingFunctor.hpp"
+#include "CundallNonViscousForceDamping.hpp"
 #include "ParticleParameters.hpp"
 #include "ActionParameterForce.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-CundallNonViscousForceDampingFunctor::CundallNonViscousForceDampingFunctor() : damping(0)
+CundallNonViscousForceDamping::CundallNonViscousForceDamping() : damping(0)
 {
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void CundallNonViscousForceDampingFunctor::registerAttributes()
+void CundallNonViscousForceDamping::registerAttributes()
 {
 	REGISTER_ATTRIBUTE(damping);
 }
@@ -45,7 +45,7 @@ void CundallNonViscousForceDampingFunctor::registerAttributes()
 
 // this is Cundall non-viscous local damping, applied to force (ActionParameterForce)
 
-void CundallNonViscousForceDampingFunctor::go(    const shared_ptr<ActionParameter>& a
+void CundallNonViscousForceDamping::go(    const shared_ptr<ActionParameter>& a
 						, const shared_ptr<PhysicalParameters>& b
 						, const Body*)
 {

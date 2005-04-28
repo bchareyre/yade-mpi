@@ -24,8 +24,8 @@
 #include "ActionParameterInitializer.hpp"
 
 #include "ActionParameterDispatcher.hpp"
-#include "CundallNonViscousForceDampingFunctor.hpp"
-#include "CundallNonViscousMomentumDampingFunctor.hpp"
+#include "CundallNonViscousForceDamping.hpp"
+#include "CundallNonViscousMomentumDamping.hpp"
 #include "GravityCondition.hpp"
 
 #include "InteractionGeometryDispatcher.hpp"
@@ -231,13 +231,13 @@ void SDECSpheresPlane::createActors(shared_ptr<MetaBody>& rootBody)
 	shared_ptr<GravityCondition> gravityCondition(new GravityCondition);
 	gravityCondition->gravity = gravity;
 	
-	shared_ptr<CundallNonViscousForceDampingFunctor> actionForceDamping(new CundallNonViscousForceDampingFunctor);
+	shared_ptr<CundallNonViscousForceDamping> actionForceDamping(new CundallNonViscousForceDamping);
 	actionForceDamping->damping = dampingForce;
-	shared_ptr<CundallNonViscousMomentumDampingFunctor> actionMomentumDamping(new CundallNonViscousMomentumDampingFunctor);
+	shared_ptr<CundallNonViscousMomentumDamping> actionMomentumDamping(new CundallNonViscousMomentumDamping);
 	actionMomentumDamping->damping = dampingMomentum;
 	shared_ptr<ActionParameterDispatcher> actionDampingDispatcher(new ActionParameterDispatcher);
-	actionDampingDispatcher->add("ActionParameterForce","RigidBodyParameters","CundallNonViscousForceDampingFunctor",actionForceDamping);
-	actionDampingDispatcher->add("ActionParameterMomentum","RigidBodyParameters","CundallNonViscousMomentumDampingFunctor",actionMomentumDamping);
+	actionDampingDispatcher->add("ActionParameterForce","RigidBodyParameters","CundallNonViscousForceDamping",actionForceDamping);
+	actionDampingDispatcher->add("ActionParameterMomentum","RigidBodyParameters","CundallNonViscousMomentumDamping",actionMomentumDamping);
 	
 	shared_ptr<ActionParameterDispatcher> applyActionDispatcher(new ActionParameterDispatcher);
 	applyActionDispatcher->add("ActionParameterForce","RigidBodyParameters","NewtonsForceLaw");

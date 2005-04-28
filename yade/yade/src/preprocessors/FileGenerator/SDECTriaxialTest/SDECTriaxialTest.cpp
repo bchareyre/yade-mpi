@@ -45,8 +45,8 @@
 
 
 #include "ActionParameterDispatcher.hpp"
-#include "CundallNonViscousForceDampingFunctor.hpp"
-#include "CundallNonViscousMomentumDampingFunctor.hpp"
+#include "CundallNonViscousForceDamping.hpp"
+#include "CundallNonViscousMomentumDamping.hpp"
 
 #include "InteractionGeometryDispatcher.hpp"
 #include "InteractionPhysicsDispatcher.hpp"

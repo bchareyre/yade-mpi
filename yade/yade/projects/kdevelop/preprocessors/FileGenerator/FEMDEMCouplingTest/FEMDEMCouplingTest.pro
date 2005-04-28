@@ -15,8 +15,8 @@ LIBS += -lAABB \
         -lBodyMacroParameters \
         -lPersistentSAPCollider \
         -lSDECTimeStepper \
-        -lCundallNonViscousForceDampingFunctor \
-        -lCundallNonViscousMomentumDampingFunctor \
+        -lCundallNonViscousForceDamping \
+        -lCundallNonViscousMomentumDamping \
         -lElasticContactLaw \
         -lMetaInteractingGeometry \
         -rdynamic 
@@ -36,8 +36,8 @@ QMAKE_LIBDIR = ../../../plugins/Body/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/PhysicalParameters/BodyMacroParameters/$(YADEDYNLIBPATH) \
                ../../../plugins/Interaction/BroadInteractor/PersistentSAPCollider/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/InteractionSolver/SDECTimeStepper/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/ActionParameterFunctor/CundallNonViscousForceDampingFunctor/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/ActionParameterFunctor/CundallNonViscousMomentumDampingFunctor/$(YADEDYNLIBPATH) \
+               ../../../plugins/Engine/ActionParameterFunctor/CundallNonViscousForceDamping/$(YADEDYNLIBPATH) \
+               ../../../plugins/Engine/ActionParameterFunctor/CundallNonViscousMomentumDamping/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/InteractionSolver/ElasticContactLaw/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/BodyPhysicalParametersFunctor/FEMSetTextLoaderFunctor/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 

@@ -201,7 +201,7 @@ void ErrorTolerantLaw::calculateForces(Body* body)
 			int sign;
 			float f = force.length();
 
-			for(int j=0;j<3;j++)  // FIXME - use CundallNonViscousForceDampingFunctor
+			for(int j=0;j<3;j++)  // FIXME - use CundallNonViscousForceDamping
 			{
 				if (rb->velocity[j]==0)
 					sign=0;

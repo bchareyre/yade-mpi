@@ -33,8 +33,8 @@
 
 // actors
 #include "GravityCondition.hpp"
-#include "CundallNonViscousForceDampingFunctor.hpp"
-#include "CundallNonViscousMomentumDampingFunctor.hpp"
+#include "CundallNonViscousForceDamping.hpp"
+#include "CundallNonViscousMomentumDamping.hpp"
 // actors FEM
 #include "FEMLaw.hpp"
 #include "ActionParameterInitializer.hpp"
@@ -201,13 +201,13 @@ void FEMDEMCouplingTest::createActors(shared_ptr<MetaBody>& rootBody)
 	demLaw->sdecGroupMask = demGroupMask;
 	demLaw->momentRotationLaw = momentRotationLaw;
 	
-	shared_ptr<CundallNonViscousForceDampingFunctor> actionForceDamping(new CundallNonViscousForceDampingFunctor);
+	shared_ptr<CundallNonViscousForceDamping> actionForceDamping(new CundallNonViscousForceDamping);
 	actionForceDamping->damping = dampingForce;
-	shared_ptr<CundallNonViscousMomentumDampingFunctor> actionMomentumDamping(new CundallNonViscousMomentumDampingFunctor);
+	shared_ptr<CundallNonViscousMomentumDamping> actionMomentumDamping(new CundallNonViscousMomentumDamping);
 	actionMomentumDamping->damping = dampingMomentum;
 	shared_ptr<ActionParameterDispatcher> actionDampingDispatcher(new ActionParameterDispatcher);
-	actionDampingDispatcher->add("ActionParameterForce","ParticleParameters","CundallNonViscousForceDampingFunctor",actionForceDamping);
-	actionDampingDispatcher->add("ActionParameterMomentum","RigidBodyParameters","CundallNonViscousMomentumDampingFunctor",actionMomentumDamping);
+	actionDampingDispatcher->add("ActionParameterForce","ParticleParameters","CundallNonViscousForceDamping",actionForceDamping);
+	actionDampingDispatcher->add("ActionParameterMomentum","RigidBodyParameters","CundallNonViscousMomentumDamping",actionMomentumDamping);
 	
 	shared_ptr<GravityCondition> gravityCondition(new GravityCondition);
 	gravityCondition->gravity = gravity;

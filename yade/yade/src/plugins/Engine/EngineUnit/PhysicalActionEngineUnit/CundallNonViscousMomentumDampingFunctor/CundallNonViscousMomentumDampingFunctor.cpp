@@ -21,21 +21,21 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "CundallNonViscousMomentumDampingFunctor.hpp"
+#include "CundallNonViscousMomentumDamping.hpp"
 #include "RigidBodyParameters.hpp"
 #include "ActionParameterMomentum.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-CundallNonViscousMomentumDampingFunctor::CundallNonViscousMomentumDampingFunctor() : damping(0)
+CundallNonViscousMomentumDamping::CundallNonViscousMomentumDamping() : damping(0)
 {
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void CundallNonViscousMomentumDampingFunctor::registerAttributes()
+void CundallNonViscousMomentumDamping::registerAttributes()
 {
 	REGISTER_ATTRIBUTE(damping);
 }
@@ -45,7 +45,7 @@ void CundallNonViscousMomentumDampingFunctor::registerAttributes()
 
 // this is Cundall non-viscous local damping, applied to momentum (ActionParameterMomentum)
 
-void CundallNonViscousMomentumDampingFunctor::go( 	  const shared_ptr<ActionParameter>& a
+void CundallNonViscousMomentumDamping::go( 	  const shared_ptr<ActionParameter>& a
 						, const shared_ptr<PhysicalParameters>& b
 						, const Body*)
 {

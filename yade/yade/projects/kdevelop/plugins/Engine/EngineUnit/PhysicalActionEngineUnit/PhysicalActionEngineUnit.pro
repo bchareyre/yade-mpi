@@ -3,8 +3,8 @@
 # Subdir relative project main directory: ./plugins/Engine/EngineUnit/PhysicalActionEngineUnit
 # Target is a subdirs project 
 
-SUBDIRS += CundallNonViscousForceDampingFunctor \
-           CundallNonViscousMomentumDampingFunctor 
+SUBDIRS += CundallNonViscousForceDamping \
+           CundallNonViscousMomentumDamping 
 CONFIG += release \
           warn_on 
 TEMPLATE = subdirs 

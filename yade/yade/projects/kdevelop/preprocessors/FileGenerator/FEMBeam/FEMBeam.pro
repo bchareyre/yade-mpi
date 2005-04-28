@@ -16,8 +16,8 @@ LIBS += -lSerialization \
         -lActionParameterInitializer \
         -lActionParameterReset \
         -lGravityCondition \
-        -lCundallNonViscousMomentumDampingFunctor \
-        -lCundallNonViscousForceDampingFunctor \
+        -lCundallNonViscousMomentumDamping \
+        -lCundallNonViscousForceDamping \
         -lSphere \
         -lFEMSetParameters \
         -lFEMTetrahedronData \
@@ -46,8 +46,8 @@ QMAKE_LIBDIR = ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/ActionParameterInitializer/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/ActionParameterReset/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/DeusExMachina/GravityCondition/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/ActionParameterFunctor/CundallNonViscousMomentumDampingFunctor/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/ActionParameterFunctor/CundallNonViscousForceDampingFunctor/$(YADEDYNLIBPATH) \
+               ../../../plugins/Engine/ActionParameterFunctor/CundallNonViscousMomentumDamping/$(YADEDYNLIBPATH) \
+               ../../../plugins/Engine/ActionParameterFunctor/CundallNonViscousForceDamping/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/PhysicalParameters/FEMSetParameters/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/PhysicalParameters/FEMTetrahedronData/$(YADEDYNLIBPATH) \

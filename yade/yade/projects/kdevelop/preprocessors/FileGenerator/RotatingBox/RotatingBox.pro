@@ -16,8 +16,8 @@ LIBS += -lAABB \
         -lRigidBodyParameters \
         -lEngine \
         -lBody \
-        -lCundallNonViscousForceDampingFunctor \
-        -lCundallNonViscousMomentumDampingFunctor \
+        -lCundallNonViscousForceDamping \
+        -lCundallNonViscousMomentumDamping \
         -lSimpleSpringLaw \
         -lActionParameterReset \
         -lActionParameterInitializer \
@@ -43,8 +43,8 @@ QMAKE_LIBDIR = ../../../plugins/Body/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/PhysicalParameters/RigidBodyParameters/$(YADEDYNLIBPATH) \
                ../../../yade/Engine/$(YADEDYNLIBPATH) \
                ../../../yade/Body/Body/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/ActionParameterFunctor/CundallNonViscousForceDampingFunctor/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/ActionParameterFunctor/CundallNonViscousMomentumDampingFunctor/$(YADEDYNLIBPATH) \
+               ../../../plugins/Engine/ActionParameterFunctor/CundallNonViscousForceDamping/$(YADEDYNLIBPATH) \
+               ../../../plugins/Engine/ActionParameterFunctor/CundallNonViscousMomentumDamping/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/InteractionSolver/SimpleSpringLaw/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/ActionParameterReset/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/ActionParameterInitializer/$(YADEDYNLIBPATH) \

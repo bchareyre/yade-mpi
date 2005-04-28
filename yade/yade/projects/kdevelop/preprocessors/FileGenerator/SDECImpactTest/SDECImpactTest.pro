@@ -20,8 +20,8 @@ LIBS += -lBox \
         -lEngine \
         -lBody \
         -lForceRecorder \
-        -lCundallNonViscousMomentumDampingFunctor \
-        -lCundallNonViscousForceDampingFunctor \
+        -lCundallNonViscousMomentumDamping \
+        -lCundallNonViscousForceDamping \
         -lActionParameterReset \
         -lActionParameterInitializer \
         -lGravityCondition \
@@ -53,8 +53,8 @@ QMAKE_LIBDIR = ../../../plugins/Body/GeometricalModel/Box/$(YADEDYNLIBPATH) \
                ../../../yade/Engine/$(YADEDYNLIBPATH) \
                ../../../yade/Body/Body/$(YADEDYNLIBPATH) \
                ../../../plugins/DataRecorder/ForceRecorder/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/ActionParameterFunctor/CundallNonViscousMomentumDampingFunctor/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/ActionParameterFunctor/CundallNonViscousForceDampingFunctor/$(YADEDYNLIBPATH) \
+               ../../../plugins/Engine/ActionParameterFunctor/CundallNonViscousMomentumDamping/$(YADEDYNLIBPATH) \
+               ../../../plugins/Engine/ActionParameterFunctor/CundallNonViscousForceDamping/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/ActionParameterReset/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/ActionParameterInitializer/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/DeusExMachina/GravityCondition/$(YADEDYNLIBPATH) \
