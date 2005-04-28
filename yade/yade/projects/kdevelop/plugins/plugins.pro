@@ -4,7 +4,6 @@
 # Target is a subdirs project 
 
 SUBDIRS += Engine \
-           Sensor \
            Data 
 MOC_DIR = $(YADECOMPILATIONPATH)
 UI_DIR = $(YADECOMPILATIONPATH)

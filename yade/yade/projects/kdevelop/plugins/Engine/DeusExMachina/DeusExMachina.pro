@@ -3,6 +3,10 @@
 # Subdir relative project main directory: ./plugins/Engine/DeusExMachina
 # Target is a subdirs project 
 
+SUBDIRS += ForceEngine \
+           GravityEngine \
+           RotationEngine \
+           TranslationEngine 
 MOC_DIR = $(YADECOMPILATIONPATH)
 UI_DIR = $(YADECOMPILATIONPATH)
 OBJECTS_DIR = $(YADECOMPILATIONPATH)

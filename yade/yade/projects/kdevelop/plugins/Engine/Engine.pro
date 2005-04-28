@@ -3,11 +3,7 @@
 # Subdir relative project main directory: ./plugins/Engine
 # Target is a subdirs project 
 
-SUBDIRS += ActionParameterFunctor \
-           ActionParameterInitializer \
-           ActionParameterReset \
-           DeusExMachina \
-           InteractionSolver \
+SUBDIRS += DeusExMachina \
            Engine \
            MetaEngine \
            EngineUnit 
