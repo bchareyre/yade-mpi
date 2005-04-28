@@ -4,7 +4,7 @@
 # Target is a subdirs project 
 
 SUBDIRS += NewtonsForceLaw \
-           NewtonsMomemtumForceLaw 
+           NewtonsMomemtumLaw 
 CONFIG += release \
-          warn_on 
-TEMPLATE = subdirs 
+warn_on
+TEMPLATE = subdirs

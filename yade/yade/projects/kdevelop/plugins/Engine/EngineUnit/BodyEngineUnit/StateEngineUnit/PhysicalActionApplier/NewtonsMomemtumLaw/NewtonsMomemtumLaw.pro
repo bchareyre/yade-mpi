@@ -22,5 +22,5 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
-HEADERS += NewtonsMomemtumForceLaw.hpp 
-SOURCES += NewtonsMomemtumForceLaw.cpp 
+HEADERS += NewtonsMomemtumLaw.hpp 
+SOURCES += NewtonsMomemtumLaw.cpp 
