@@ -99,7 +99,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>plugins/Sensor</activedir>
+      <activedir>plugins/Data/Interaction</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>

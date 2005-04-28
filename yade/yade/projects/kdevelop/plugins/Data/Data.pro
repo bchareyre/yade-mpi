@@ -4,7 +4,8 @@
 # Target is a subdirs project 
 
 SUBDIRS += Body \
-           Interaction 
+           Interaction \
+           PhysicalAction 
 CONFIG += release \
 warn_on
 TEMPLATE = subdirs
