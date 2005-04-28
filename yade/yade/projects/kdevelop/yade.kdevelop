@@ -99,7 +99,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>extensions</activedir>
+      <activedir>plugins/Sensor</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>
