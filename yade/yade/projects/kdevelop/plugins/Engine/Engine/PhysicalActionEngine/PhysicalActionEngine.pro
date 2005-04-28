@@ -3,6 +3,9 @@
 # Subdir relative project main directory: ./plugins/Engine/Engine/PhysicalActionEngine
 # Target is a subdirs project 
 
+SUBDIRS += ActionParameterInitializer \
+           ActionParameterReset \
+           InteractionSolver 
 CONFIG += release \
-          warn_on 
-TEMPLATE = subdirs 
+warn_on
+TEMPLATE = subdirs
