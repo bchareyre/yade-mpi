@@ -1,21 +1,21 @@
-#include "TranslationCondition.hpp"
+#include "TranslationEngine.hpp"
 #include "ParticleParameters.hpp"
 #include "MetaBody.hpp"
 
-void TranslationCondition::postProcessAttributes(bool deserializing)
+void TranslationEngine::postProcessAttributes(bool deserializing)
 {
 	if(deserializing)
 		translationAxis.normalize();
 }
 
-void TranslationCondition::registerAttributes()
+void TranslationEngine::registerAttributes()
 {
 	DeusExMachina::registerAttributes();
 	REGISTER_ATTRIBUTE(velocity);
 	REGISTER_ATTRIBUTE(translationAxis);
 }
 
-void TranslationCondition::applyCondition(Body * body)
+void TranslationEngine::applyCondition(Body * body)
 {
 
 	MetaBody * ncb = dynamic_cast<MetaBody*>(body);
@@ -53,7 +53,7 @@ void TranslationCondition::applyCondition(Body * body)
 		}
 		else
 		{
-			std::cerr << "TranslationCondition::applyCondition, WARNING! dynamic_cast failed! for id: " << *ii << std::endl; // FUCK! I've literally spent two days - 10hours to find a mistake caused by static_cast!!, we should never use static_cast when in DEBUG mode !!!!!
+			std::cerr << "TranslationEngine::applyCondition, WARNING! dynamic_cast failed! for id: " << *ii << std::endl; // FUCK! I've literally spent two days - 10hours to find a mistake caused by static_cast!!, we should never use static_cast when in DEBUG mode !!!!!
 		}
 
 

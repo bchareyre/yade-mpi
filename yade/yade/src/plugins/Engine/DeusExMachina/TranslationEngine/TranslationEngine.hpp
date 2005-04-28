@@ -9,7 +9,7 @@
 
 #include "Vector3.hpp"
 
-class TranslationCondition : public DeusExMachina
+class TranslationEngine : public DeusExMachina
 {
 
 	public : Real velocity;
@@ -19,9 +19,9 @@ class TranslationCondition : public DeusExMachina
 
 	protected : virtual void postProcessAttributes(bool deserializing);
 	public : void registerAttributes();
-	REGISTER_CLASS_NAME(TranslationCondition);
+	REGISTER_CLASS_NAME(TranslationEngine);
 };
 
-REGISTER_SERIALIZABLE(TranslationCondition,false);
+REGISTER_SERIALIZABLE(TranslationEngine,false);
 
 #endif // __TRANSLATOR_H__

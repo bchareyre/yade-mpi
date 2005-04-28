@@ -197,7 +197,7 @@ void ErrorTolerantLaw::calculateForces(Body* body)
 		if (rb)
 		{
 			//Vector3r force = Omega::instance().getGravity()*rb->mass;
-			Vector3r force = Vector3r(0,-9.81,0)*rb->mass; // FIXME - use GravityCondition
+			Vector3r force = Vector3r(0,-9.81,0)*rb->mass; // FIXME - use GravityEngine
 			int sign;
 			float f = force.length();
 

@@ -32,7 +32,7 @@
 #include "InteractionPhysicsDispatcher.hpp"
 
 // actors
-#include "GravityCondition.hpp"
+#include "GravityEngine.hpp"
 #include "CundallNonViscousForceDamping.hpp"
 #include "CundallNonViscousMomentumDamping.hpp"
 // actors FEM
@@ -209,7 +209,7 @@ void FEMDEMCouplingTest::createActors(shared_ptr<MetaBody>& rootBody)
 	actionDampingDispatcher->add("ActionParameterForce","ParticleParameters","CundallNonViscousForceDamping",actionForceDamping);
 	actionDampingDispatcher->add("ActionParameterMomentum","RigidBodyParameters","CundallNonViscousMomentumDamping",actionMomentumDamping);
 	
-	shared_ptr<GravityCondition> gravityCondition(new GravityCondition);
+	shared_ptr<GravityEngine> gravityCondition(new GravityEngine);
 	gravityCondition->gravity = gravity;
 	
 	shared_ptr<ActionParameterDispatcher> applyActionDispatcher(new ActionParameterDispatcher);

@@ -1,13 +1,13 @@
-#include "RotationCondition.hpp"
+#include "RotationEngine.hpp"
 #include "RigidBodyParameters.hpp"
 #include "MetaBody.hpp"
 
-RotationCondition::RotationCondition()
+RotationEngine::RotationEngine()
 {
 	rotateAroundZero = false;
 }
 
-void RotationCondition::registerAttributes()
+void RotationEngine::registerAttributes()
 {
 	DeusExMachina::registerAttributes();
 	REGISTER_ATTRIBUTE(angularVelocity);
@@ -15,7 +15,7 @@ void RotationCondition::registerAttributes()
 	REGISTER_ATTRIBUTE(rotateAroundZero);
 }
 
-void RotationCondition::applyCondition(Body * body)
+void RotationEngine::applyCondition(Body * body)
 {
 
 	MetaBody * ncb = dynamic_cast<MetaBody*>(body);

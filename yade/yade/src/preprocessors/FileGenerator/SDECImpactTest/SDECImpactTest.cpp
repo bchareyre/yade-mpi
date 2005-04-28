@@ -20,7 +20,7 @@
 #include "SDECLinkPhysics.hpp"
 #include "SDECTimeStepper.hpp"
 
-#include "GravityCondition.hpp"
+#include "GravityEngine.hpp"
 #include "ActionParameterDispatcher.hpp"
 #include "ActionParameterDispatcher.hpp"
 #include "CundallNonViscousForceDamping.hpp"
@@ -468,7 +468,7 @@ void SDECImpactTest::createActors(shared_ptr<MetaBody>& rootBody)
 	
 
 		
-	shared_ptr<GravityCondition> gravityCondition(new GravityCondition);
+	shared_ptr<GravityEngine> gravityCondition(new GravityEngine);
 	gravityCondition->gravity = gravity;
 	
 	shared_ptr<CundallNonViscousForceDamping> actionForceDamping(new CundallNonViscousForceDamping);

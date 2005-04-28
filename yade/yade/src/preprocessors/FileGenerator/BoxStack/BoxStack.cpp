@@ -9,7 +9,7 @@
 #include "SimpleSpringLaw.hpp"
 #include "SAPCollider.hpp"
 #include "RigidBodyParameters.hpp"
-#include "TranslationCondition.hpp"
+#include "TranslationEngine.hpp"
 #include <fstream>
 #include "IOManager.hpp"
 #include "InteractingBox.hpp"
@@ -27,7 +27,7 @@
 
 #include "ActionParameterDispatcher.hpp"
 #include "ActionParameterInitializer.hpp"
-#include "GravityCondition.hpp"
+#include "GravityEngine.hpp"
 #include "PhysicalParametersDispatcher.hpp"
 
 BoxStack::BoxStack () : FileGenerator()
@@ -245,7 +245,7 @@ void BoxStack::createActors(shared_ptr<MetaBody>& rootBody)
 	boundingVolumeDispatcher->add("InteractingBox","AABB","Box2AABB");
 	boundingVolumeDispatcher->add("MetaInteractingGeometry","AABB","InteractionDescriptionSet2AABB");
 		
-	shared_ptr<GravityCondition> gravityCondition(new GravityCondition);
+	shared_ptr<GravityEngine> gravityCondition(new GravityEngine);
 	gravityCondition->gravity = gravity;
 	
 	shared_ptr<CundallNonViscousForceDamping> actionForceDamping(new CundallNonViscousForceDamping);
@@ -265,7 +265,7 @@ void BoxStack::createActors(shared_ptr<MetaBody>& rootBody)
 	shared_ptr<PhysicalParametersDispatcher> orientationIntegrator(new PhysicalParametersDispatcher);
 	orientationIntegrator->add("RigidBodyParameters","LeapFrogOrientationIntegrator");
  	
-// 	shared_ptr<RotationCondition> kinematic = shared_ptr<RotationCondition>(new RotationCondition);
+// 	shared_ptr<RotationEngine> kinematic = shared_ptr<RotationEngine>(new RotationEngine);
 // 	kinematic->angularVelocity  = rotationSpeed;
 // 	rotationAxis.normalize();
 // 	kinematic->rotationAxis  = rotationAxis;

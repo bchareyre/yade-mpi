@@ -43,7 +43,7 @@
 
 #include "ActionParameterReset.hpp"
 #include "ActionParameterInitializer.hpp"
-#include "GravityCondition.hpp"
+#include "GravityEngine.hpp"
 
 #include "PhysicalParametersDispatcher.hpp"
 
@@ -137,7 +137,7 @@ string HangingCloth::generate()
 	shared_ptr<InteractionPhysicsDispatcher> interactionPhysicsDispatcher(new InteractionPhysicsDispatcher);
 	interactionPhysicsDispatcher->add("BodyMacroParameters","BodyMacroParameters","MacroMicroElasticRelationships");
 
-	shared_ptr<GravityCondition> gravityCondition(new GravityCondition);
+	shared_ptr<GravityEngine> gravityCondition(new GravityEngine);
 	gravityCondition->gravity = gravity;
 	
 	shared_ptr<BoundingVolumeMetaEngine> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeMetaEngine>(new BoundingVolumeMetaEngine);

@@ -9,9 +9,9 @@
 
 #include "Vector3.hpp"
 
-class RotationCondition : public DeusExMachina
+class RotationEngine : public DeusExMachina
 {
-	public : RotationCondition();
+	public : RotationEngine();
 
 	public : Real angularVelocity;
 	public : Vector3r rotationAxis;
@@ -20,9 +20,9 @@ class RotationCondition : public DeusExMachina
 	public : void applyCondition(Body * body);
 
 	public : void registerAttributes();
-	REGISTER_CLASS_NAME(RotationCondition);
+	REGISTER_CLASS_NAME(RotationEngine);
 };
 
-REGISTER_SERIALIZABLE(RotationCondition,false);
+REGISTER_SERIALIZABLE(RotationEngine,false);
 
 #endif // __OSCILLATOR_H__

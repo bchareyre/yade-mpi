@@ -18,8 +18,8 @@
 #include "ActionParameterReset.hpp"
 #include "FEMLaw.hpp"
 #include "FEMSetTextLoaderFunctor.hpp"
-#include "GravityCondition.hpp"
-#include "TranslationCondition.hpp"
+#include "GravityEngine.hpp"
+#include "TranslationEngine.hpp"
 
 // body
 #include "MetaBody.hpp"
@@ -123,7 +123,7 @@ void FEMBeam::createActors(shared_ptr<MetaBody>& rootBody)
 	femLaw->nodeGroupMask = nodeGroupMask;
 	femLaw->tetrahedronGroupMask = tetrahedronGroupMask;
 
-	shared_ptr<GravityCondition> gravityCondition(new GravityCondition);
+	shared_ptr<GravityEngine> gravityCondition(new GravityEngine);
 	gravityCondition->gravity = gravity;
 	
 	shared_ptr<ActionParameterDispatcher> applyActionDispatcher(new ActionParameterDispatcher);
@@ -196,7 +196,7 @@ void FEMBeam::positionRootBody(shared_ptr<MetaBody>& rootBody)
  
 void FEMBeam::imposeTranslation(shared_ptr<MetaBody>& rootBody, Vector3r min, Vector3r max, Vector3r direction, Real velocity)
 {
-	shared_ptr<TranslationCondition> translationCondition = shared_ptr<TranslationCondition>(new TranslationCondition);
+	shared_ptr<TranslationEngine> translationCondition = shared_ptr<TranslationEngine>(new TranslationEngine);
  	translationCondition->velocity  = velocity;
 	direction.normalize();
  	translationCondition->translationAxis = direction;

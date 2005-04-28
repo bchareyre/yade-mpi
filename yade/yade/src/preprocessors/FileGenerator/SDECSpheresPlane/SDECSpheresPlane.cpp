@@ -26,7 +26,7 @@
 #include "ActionParameterDispatcher.hpp"
 #include "CundallNonViscousForceDamping.hpp"
 #include "CundallNonViscousMomentumDamping.hpp"
-#include "GravityCondition.hpp"
+#include "GravityEngine.hpp"
 
 #include "InteractionGeometryDispatcher.hpp"
 #include "InteractionPhysicsDispatcher.hpp"
@@ -228,7 +228,7 @@ void SDECSpheresPlane::createActors(shared_ptr<MetaBody>& rootBody)
 	boundingVolumeDispatcher->add("InteractingBox","AABB","Box2AABB");
 	boundingVolumeDispatcher->add("MetaInteractingGeometry","AABB","InteractionDescriptionSet2AABB");
 	
-	shared_ptr<GravityCondition> gravityCondition(new GravityCondition);
+	shared_ptr<GravityEngine> gravityCondition(new GravityEngine);
 	gravityCondition->gravity = gravity;
 	
 	shared_ptr<CundallNonViscousForceDamping> actionForceDamping(new CundallNonViscousForceDamping);

@@ -9,7 +9,7 @@
 #include "SimpleSpringLaw.hpp"
 #include "SAPCollider.hpp"
 #include "RigidBodyParameters.hpp"
-#include "RotationCondition.hpp"
+#include "RotationEngine.hpp"
 #include <fstream>
 #include "IOManager.hpp"
 #include "InteractingBox.hpp"
@@ -25,7 +25,7 @@
 #include "BoundingVolumeMetaEngine.hpp"
 #include "InteractionDescriptionSet2AABB.hpp"
 #include "MetaInteractingGeometry.hpp"
-#include "GravityCondition.hpp"
+#include "GravityEngine.hpp"
 #include "PhysicalParametersDispatcher.hpp"
 
 RotatingBox::RotatingBox () : FileGenerator()
@@ -266,7 +266,7 @@ void RotatingBox::createActors(shared_ptr<MetaBody>& rootBody)
 	boundingVolumeDispatcher->add("InteractingBox","AABB","Box2AABB");
 	boundingVolumeDispatcher->add("MetaInteractingGeometry","AABB","InteractionDescriptionSet2AABB");
 		
-	shared_ptr<GravityCondition> gravityCondition(new GravityCondition);
+	shared_ptr<GravityEngine> gravityCondition(new GravityEngine);
 	gravityCondition->gravity = gravity;
 	
 	shared_ptr<CundallNonViscousForceDamping> actionForceDamping(new CundallNonViscousForceDamping);
@@ -286,7 +286,7 @@ void RotatingBox::createActors(shared_ptr<MetaBody>& rootBody)
 	shared_ptr<PhysicalParametersDispatcher> orientationIntegrator(new PhysicalParametersDispatcher);
 	orientationIntegrator->add("RigidBodyParameters","LeapFrogOrientationIntegrator");
  	
-	shared_ptr<RotationCondition> kinematic = shared_ptr<RotationCondition>(new RotationCondition);
+	shared_ptr<RotationEngine> kinematic = shared_ptr<RotationEngine>(new RotationEngine);
  	kinematic->angularVelocity  = rotationSpeed;
 	rotationAxis.normalize();
  	kinematic->rotationAxis  = rotationAxis;
