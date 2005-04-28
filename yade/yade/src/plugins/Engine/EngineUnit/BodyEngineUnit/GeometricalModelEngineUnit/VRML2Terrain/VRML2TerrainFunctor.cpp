@@ -1,7 +1,7 @@
-#include "VRML2TerrainFunctor.hpp"
+#include "VRML2Terrain.hpp"
 #include "Terrain.hpp"
 
-// void VRML2TerrainFunctor::go(int)
+// void VRML2Terrain::go(int)
 // {
 // //	return boost::shared_ptr<GeometricalModel>(new Terrain);
 // }

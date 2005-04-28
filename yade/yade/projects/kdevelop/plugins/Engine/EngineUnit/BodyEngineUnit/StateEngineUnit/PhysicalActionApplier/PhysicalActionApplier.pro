@@ -3,8 +3,8 @@
 # Subdir relative project main directory: ./plugins/Engine/EngineUnit/BodyEngineUnit/StateEngineUnit/PhysicalActionApplier
 # Target is a subdirs project 
 
-SUBDIRS += NewtonsForceLawFunctor \
-           NewtonsMomentumLawFunctor 
+SUBDIRS += NewtonsForceLaw \
+           NewtonsMomemtumForceLaw 
 CONFIG += release \
           warn_on 
 TEMPLATE = subdirs 

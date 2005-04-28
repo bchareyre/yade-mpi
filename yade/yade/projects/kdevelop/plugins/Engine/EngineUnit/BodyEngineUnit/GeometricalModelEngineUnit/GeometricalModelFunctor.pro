@@ -4,7 +4,7 @@
 # Target is a subdirs project 
 
 SUBDIRS += ParticleSet2Mesh2D \
-           VRML2TerrainFunctor \
+           VRML2Terrain \
            LatticeSet2MarchingCubes \
            LatticeSet2LatticeBeams \
            FEMSet2MarchingCubes \

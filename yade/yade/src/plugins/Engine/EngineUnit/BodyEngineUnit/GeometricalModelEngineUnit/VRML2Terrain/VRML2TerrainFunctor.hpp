@@ -3,11 +3,11 @@
 
 #include "GeometricalModelFunctor.hpp"
 
-class VRML2TerrainFunctor : public GeometricalModelFunctor
+class VRML2Terrain : public GeometricalModelFunctor
 {
-	REGISTER_CLASS_NAME(VRML2TerrainFunctor);
+	REGISTER_CLASS_NAME(VRML2Terrain);
 };
 
-REGISTER_SERIALIZABLE(VRML2TerrainFunctor,false);
+REGISTER_SERIALIZABLE(VRML2Terrain,false);
 
 #endif // __TERRAINFROMWRL1FILEFACTORY_H__

@@ -314,13 +314,13 @@ void SDECLinkedSpheres::createActors(shared_ptr<MetaBody>& rootBody)
 	actionDampingDispatcher->add("ActionParameterMomentum","RigidBodyParameters","CundallNonViscousMomentumDampingFunctor",actionMomentumDamping);
 	
 	shared_ptr<ActionParameterDispatcher> applyActionDispatcher(new ActionParameterDispatcher);
-	applyActionDispatcher->add("ActionParameterForce","ParticleParameters","NewtonsForceLawFunctor");
-	applyActionDispatcher->add("ActionParameterMomentum","RigidBodyParameters","NewtonsMomentumLawFunctor");
+	applyActionDispatcher->add("ActionParameterForce","ParticleParameters","NewtonsForceLaw");
+	applyActionDispatcher->add("ActionParameterMomentum","RigidBodyParameters","NewtonsMomemtumForceLaw");
 	
 	shared_ptr<PhysicalParametersDispatcher> positionIntegrator(new PhysicalParametersDispatcher);
-	positionIntegrator->add("ParticleParameters","LeapFrogPositionIntegratorFunctor");
+	positionIntegrator->add("ParticleParameters","LeapFrogPositionIntegrator");
 	shared_ptr<PhysicalParametersDispatcher> orientationIntegrator(new PhysicalParametersDispatcher);
-	orientationIntegrator->add("RigidBodyParameters","LeapFrogOrientationIntegratorFunctor");
+	orientationIntegrator->add("RigidBodyParameters","LeapFrogOrientationIntegrator");
  	
 	shared_ptr<SDECTimeStepper> sdecTimeStepper(new SDECTimeStepper);
 	sdecTimeStepper->sdecGroupMask = 55;

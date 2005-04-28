@@ -117,7 +117,7 @@ void FEMBeam::createActors(shared_ptr<MetaBody>& rootBody)
 	geometricalModelDispatcher->add("FEMSetParameters","FEMSetGeometry","FEMSet2Tetrahedrons");
 	
 	shared_ptr<PhysicalParametersDispatcher> positionIntegrator(new PhysicalParametersDispatcher);
-	positionIntegrator->add("ParticleParameters","LeapFrogPositionIntegratorFunctor");
+	positionIntegrator->add("ParticleParameters","LeapFrogPositionIntegrator");
 	
 	shared_ptr<FEMLaw> femLaw(new FEMLaw);
 	femLaw->nodeGroupMask = nodeGroupMask;
@@ -127,7 +127,7 @@ void FEMBeam::createActors(shared_ptr<MetaBody>& rootBody)
 	gravityCondition->gravity = gravity;
 	
 	shared_ptr<ActionParameterDispatcher> applyActionDispatcher(new ActionParameterDispatcher);
-	applyActionDispatcher->add("ActionParameterForce","ParticleParameters","NewtonsForceLawFunctor");
+	applyActionDispatcher->add("ActionParameterForce","ParticleParameters","NewtonsForceLaw");
 	
 	shared_ptr<ActionParameterInitializer> actionParameterInitializer(new ActionParameterInitializer);
 	actionParameterInitializer->actionParameterNames.push_back("ActionParameterForce");
