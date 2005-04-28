@@ -3,6 +3,9 @@
 # Subdir relative project main directory: ./plugins/Engine/EngineUnit
 # Target is a subdirs project 
 
+SUBDIRS += BodyEngineUnit \
+           InteractionEngineUnit \
+           PhysicalActionEngineUnit 
 CONFIG += release \
-          warn_on 
-TEMPLATE = subdirs 
+warn_on
+TEMPLATE = subdirs
