@@ -6,7 +6,8 @@
 SUBDIRS += DeusExMachina \
            Engine \
            MetaEngine \
-           EngineUnit 
+           EngineUnit \
+           Sensor 
 MOC_DIR = $(YADECOMPILATIONPATH)
 UI_DIR = $(YADECOMPILATIONPATH)
 OBJECTS_DIR = $(YADECOMPILATIONPATH)

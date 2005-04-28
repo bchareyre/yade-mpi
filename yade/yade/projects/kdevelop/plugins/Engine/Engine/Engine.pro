@@ -4,8 +4,8 @@
 # Target is a subdirs project 
 
 SUBDIRS += BodyEngine \
-           InteractionEngine \
-           PhysicalActionEngine 
+           PhysicalActionEngine \
+           InteractionEngine 
 CONFIG += release \
-          warn_on 
-TEMPLATE = subdirs 
+warn_on
+TEMPLATE = subdirs

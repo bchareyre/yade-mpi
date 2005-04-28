@@ -3,6 +3,10 @@
 # Subdir relative project main directory: ./plugins/Engine/Engine/InteractionEngine
 # Target is a subdirs project 
 
+SUBDIRS += BroadInteractionEngine \
+           NarrowInteractionGeometryEngine \
+           PersistentInteractionCriterion \
+           VolatileInteractionCriterion 
 CONFIG += release \
-          warn_on 
-TEMPLATE = subdirs 
+warn_on
+TEMPLATE = subdirs
