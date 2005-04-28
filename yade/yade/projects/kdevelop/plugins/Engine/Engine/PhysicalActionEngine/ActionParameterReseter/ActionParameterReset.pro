@@ -18,5 +18,5 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
-HEADERS += ActionParameterReset.hpp
-SOURCES += ActionParameterReset.cpp
+HEADERS += ActionParameterReseter.hpp
+SOURCES += ActionParameterReseter.cpp

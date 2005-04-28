@@ -3,8 +3,8 @@
 # Subdir relative project main directory: ./plugins/Engine/Engine/PhysicalActionEngine
 # Target is a subdirs project 
 
-SUBDIRS += ActionParameterInitializer \
-           ActionParameterReset \
+SUBDIRS += ActionParameterReseter \
+           ActionParameterInitializer \
            InteractionSolver 
 CONFIG += release \
 warn_on
