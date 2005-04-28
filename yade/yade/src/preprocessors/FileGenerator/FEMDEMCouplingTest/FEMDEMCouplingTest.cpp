@@ -38,8 +38,8 @@
 // actors FEM
 #include "FEMLaw.hpp"
 #include "ActionParameterInitializer.hpp"
-#include "ActionParameterReset.hpp"
-#include "FEMSetTextLoaderFunctor.hpp"
+#include "ActionParameterReseter.hpp"
+#include "FEMSetTextLoader.hpp"
 //actors DEM
 #include "SDECTimeStepper.hpp"
 #include "ElasticContactLaw.hpp"
@@ -175,7 +175,7 @@ void FEMDEMCouplingTest::createActors(shared_ptr<MetaBody>& rootBody)
 	shared_ptr<InteractionPhysicsDispatcher> interactionPhysicsDispatcher(new InteractionPhysicsDispatcher);
 	interactionPhysicsDispatcher->add("BodyMacroParameters","BodyMacroParameters","MacroMicroElasticRelationships");
 		
-	shared_ptr<FEMSetTextLoaderFunctor> femSetTextLoaderFunctor	= shared_ptr<FEMSetTextLoaderFunctor>(new FEMSetTextLoaderFunctor);
+	shared_ptr<FEMSetTextLoader> femSetTextLoaderFunctor	= shared_ptr<FEMSetTextLoader>(new FEMSetTextLoader);
 	femSetTextLoaderFunctor->fileName = femTxtFile;
 
 	shared_ptr<PhysicalParametersDispatcher> bodyPhysicalParametersDispatcher(new PhysicalParametersDispatcher);
@@ -214,7 +214,7 @@ void FEMDEMCouplingTest::createActors(shared_ptr<MetaBody>& rootBody)
 	
 	shared_ptr<ActionParameterDispatcher> applyActionDispatcher(new ActionParameterDispatcher);
 	applyActionDispatcher->add("ActionParameterForce","ParticleParameters","NewtonsForceLaw");
-	applyActionDispatcher->add("ActionParameterMomentum","RigidBodyParameters","NewtonsMomemtumForceLaw");
+	applyActionDispatcher->add("ActionParameterMomentum","RigidBodyParameters","NewtonsMomentumLaw");
 	
 	shared_ptr<ActionParameterInitializer> actionParameterInitializer(new ActionParameterInitializer);
 	actionParameterInitializer->actionParameterNames.push_back("ActionParameterForce");
@@ -222,7 +222,7 @@ void FEMDEMCouplingTest::createActors(shared_ptr<MetaBody>& rootBody)
 	
 	rootBody->actors.clear();
 	rootBody->actors.push_back(sdecTimeStepper);
-	rootBody->actors.push_back(shared_ptr<Engine>(new ActionParameterReset));
+	rootBody->actors.push_back(shared_ptr<Engine>(new ActionParameterReseter));
 	rootBody->actors.push_back(boundingVolumeDispatcher);
 	rootBody->actors.push_back(shared_ptr<Engine>(new PersistentSAPCollider));
 	rootBody->actors.push_back(geometricalModelDispatcher);

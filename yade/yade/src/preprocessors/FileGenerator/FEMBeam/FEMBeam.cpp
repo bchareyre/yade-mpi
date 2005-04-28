@@ -15,9 +15,9 @@
 #include "CundallNonViscousMomentumDamping.hpp"
 #include "CundallNonViscousForceDamping.hpp"
 #include "ActionParameterInitializer.hpp"
-#include "ActionParameterReset.hpp"
+#include "ActionParameterReseter.hpp"
 #include "FEMLaw.hpp"
-#include "FEMSetTextLoaderFunctor.hpp"
+#include "FEMSetTextLoader.hpp"
 #include "GravityEngine.hpp"
 #include "TranslationEngine.hpp"
 
@@ -107,7 +107,7 @@ void FEMBeam::createActors(shared_ptr<MetaBody>& rootBody)
 	shared_ptr<BoundingVolumeMetaEngine> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeMetaEngine>(new BoundingVolumeMetaEngine);
 	boundingVolumeDispatcher->add("MetaInteractingGeometry","AABB","InteractionDescriptionSet2AABB");
 
-	shared_ptr<FEMSetTextLoaderFunctor> femSetTextLoaderFunctor	= shared_ptr<FEMSetTextLoaderFunctor>(new FEMSetTextLoaderFunctor);
+	shared_ptr<FEMSetTextLoader> femSetTextLoaderFunctor	= shared_ptr<FEMSetTextLoader>(new FEMSetTextLoader);
 	femSetTextLoaderFunctor->fileName = femTxtFile;
 
 	shared_ptr<PhysicalParametersDispatcher> bodyPhysicalParametersDispatcher(new PhysicalParametersDispatcher);
@@ -134,7 +134,7 @@ void FEMBeam::createActors(shared_ptr<MetaBody>& rootBody)
 	actionParameterInitializer->actionParameterNames.push_back("ActionParameterMomentum"); // FIXME - should be unnecessery, but BUG in ActionParameterVectorVector
 	
 	rootBody->actors.clear();
-	rootBody->actors.push_back(shared_ptr<Engine>(new ActionParameterReset));
+	rootBody->actors.push_back(shared_ptr<Engine>(new ActionParameterReseter));
 	rootBody->actors.push_back(boundingVolumeDispatcher);
 	rootBody->actors.push_back(geometricalModelDispatcher);
 	rootBody->actors.push_back(femLaw);

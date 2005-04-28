@@ -20,7 +20,7 @@
 #include "MacroMicroElasticRelationships.hpp"
 #include "SDECTimeStepper.hpp"
 
-#include "ActionParameterReset.hpp"
+#include "ActionParameterReseter.hpp"
 #include "ActionParameterInitializer.hpp"
 
 #include "ActionParameterDispatcher.hpp"
@@ -241,7 +241,7 @@ void SDECSpheresPlane::createActors(shared_ptr<MetaBody>& rootBody)
 	
 	shared_ptr<ActionParameterDispatcher> applyActionDispatcher(new ActionParameterDispatcher);
 	applyActionDispatcher->add("ActionParameterForce","RigidBodyParameters","NewtonsForceLaw");
-	applyActionDispatcher->add("ActionParameterMomentum","RigidBodyParameters","NewtonsMomemtumForceLaw");
+	applyActionDispatcher->add("ActionParameterMomentum","RigidBodyParameters","NewtonsMomentumLaw");
 	
 	shared_ptr<PhysicalParametersDispatcher> positionIntegrator(new PhysicalParametersDispatcher);
 	positionIntegrator->add("ParticleParameters","LeapFrogPositionIntegrator");
@@ -254,7 +254,7 @@ void SDECSpheresPlane::createActors(shared_ptr<MetaBody>& rootBody)
 	sdecTimeStepper->interval = timeStepUpdateInterval;
 
 	rootBody->actors.clear();
-	rootBody->actors.push_back(shared_ptr<Engine>(new ActionParameterReset));
+	rootBody->actors.push_back(shared_ptr<Engine>(new ActionParameterReseter));
 	rootBody->actors.push_back(sdecTimeStepper);
 	rootBody->actors.push_back(boundingVolumeDispatcher);	
 	rootBody->actors.push_back(shared_ptr<Engine>(new PersistentSAPCollider));

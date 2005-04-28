@@ -41,7 +41,7 @@
 #include "SDECLinkPhysics.hpp"
 #include "MassSpringBody2RigidBodyLaw.hpp"
 
-#include "ActionParameterReset.hpp"
+#include "ActionParameterReseter.hpp"
 #include "ActionParameterInitializer.hpp"
 #include "GravityEngine.hpp"
 
@@ -158,7 +158,7 @@ string HangingCloth::generate()
 	
 	shared_ptr<ActionParameterDispatcher> applyActionDispatcher(new ActionParameterDispatcher);
 	applyActionDispatcher->add("ActionParameterForce","ParticleParameters","NewtonsForceLaw");
-	applyActionDispatcher->add("ActionParameterMomentum","RigidBodyParameters","NewtonsMomemtumForceLaw");
+	applyActionDispatcher->add("ActionParameterMomentum","RigidBodyParameters","NewtonsMomentumLaw");
 
 	shared_ptr<PhysicalParametersDispatcher> positionIntegrator(new PhysicalParametersDispatcher);
 	positionIntegrator->add("ParticleParameters","LeapFrogPositionIntegrator");
@@ -176,7 +176,7 @@ string HangingCloth::generate()
 	massSpringBody2RigidBodyConstitutiveLaw->springGroupMask = 1;
 
 	rootBody->actors.clear();
-	rootBody->actors.push_back(shared_ptr<Engine>(new ActionParameterReset));
+	rootBody->actors.push_back(shared_ptr<Engine>(new ActionParameterReseter));
 	rootBody->actors.push_back(boundingVolumeDispatcher);
 	rootBody->actors.push_back(geometricalModelDispatcher);
 	rootBody->actors.push_back(shared_ptr<Engine>(new PersistentSAPCollider));

@@ -1,5 +1,5 @@
 
-#include "FEMSetTextLoaderFunctor.hpp"
+#include "FEMSetTextLoader.hpp"
 
 #include "FEMSetParameters.hpp"
 #include "FEMNodeData.hpp"
@@ -9,12 +9,12 @@
 
 #include <boost/filesystem/convenience.hpp>
 
-void FEMSetTextLoaderFunctor::registerAttributes()
+void FEMSetTextLoader::registerAttributes()
 {
 	REGISTER_ATTRIBUTE(fileName);
 }
 
-void FEMSetTextLoaderFunctor::go(	  const shared_ptr<PhysicalParameters>& par
+void FEMSetTextLoader::go(	  const shared_ptr<PhysicalParameters>& par
 					, Body* body)
 
 {
@@ -58,7 +58,7 @@ void FEMSetTextLoaderFunctor::go(	  const shared_ptr<PhysicalParameters>& par
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void FEMSetTextLoaderFunctor::createNode( shared_ptr<Body>& body
+void FEMSetTextLoader::createNode( shared_ptr<Body>& body
 					, Vector3r position
 					, unsigned int id)
 {
@@ -95,7 +95,7 @@ void FEMSetTextLoaderFunctor::createNode( shared_ptr<Body>& body
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void FEMSetTextLoaderFunctor::createTetrahedron(  const MetaBody* rootBody
+void FEMSetTextLoader::createTetrahedron(  const MetaBody* rootBody
 						, shared_ptr<Body>& body
 						, unsigned int id
 						, unsigned int id1

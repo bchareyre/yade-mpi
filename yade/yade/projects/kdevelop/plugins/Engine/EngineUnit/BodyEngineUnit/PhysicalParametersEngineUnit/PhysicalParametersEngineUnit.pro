@@ -3,8 +3,8 @@
 # Subdir relative project main directory: ./plugins/Engine/EngineUnit/BodyEngineUnit/PhysicalParametersEngineUnit
 # Target is a subdirs project 
 
-SUBDIRS += FEMSetTextLoaderFunctor \
-           FEMTetrahedronStiffness 
+SUBDIRS += FEMTetrahedronStiffness \
+           FEMSetTextLoader 
 MOC_DIR = $(YADECOMPILATIONPATH)
 UI_DIR = $(YADECOMPILATIONPATH)
 OBJECTS_DIR = $(YADECOMPILATIONPATH)

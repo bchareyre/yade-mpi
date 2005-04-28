@@ -23,7 +23,7 @@ LIBS += -lSerialization \
         -lFEMTetrahedronData \
         -lFEMNodeData \
         -lTetrahedron \
-        -lFEMSetTextLoaderFunctor \
+        -lFEMSetTextLoader \
         -lFEMLaw \
         -lTranslationCondition \
         -lFEMTetrahedronStiffness \
@@ -53,11 +53,11 @@ QMAKE_LIBDIR = ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/PhysicalParameters/FEMTetrahedronData/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/PhysicalParameters/FEMNodeData/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/GeometricalModel/Tetrahedron/$(YADEDYNLIBPATH) \
-               ../../../plugins/Body/PhysicalParametersFunctor/FEMSetTextLoaderFunctor/$(YADEDYNLIBPATH) \
+               ../../../plugins/Body/PhysicalParametersFunctor/FEMSetTextLoader/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/InteractionSolver/FEMLaw/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/DeusExMachina/TranslationCondition/$(YADEDYNLIBPATH) \
                ../../../plugins/Body/PhysicalParametersFunctor/FEMTetrahedronStiffness/$(YADEDYNLIBPATH) \
-               ../../../plugins/Body/BodyPhysicalParametersFunctor/FEMSetTextLoaderFunctor/$(YADEDYNLIBPATH) \
+               ../../../plugins/Body/BodyPhysicalParametersFunctor/FEMSetTextLoader/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

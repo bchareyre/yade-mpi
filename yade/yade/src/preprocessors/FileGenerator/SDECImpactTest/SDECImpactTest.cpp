@@ -33,7 +33,7 @@
 #include "InteractingSphere.hpp"
 #include "ActionParameterDispatcher.hpp"
 
-#include "ActionParameterReset.hpp"
+#include "ActionParameterReseter.hpp"
 #include "ActionParameterInitializer.hpp"
 
 #include "AveragePositionRecorder.hpp"
@@ -481,7 +481,7 @@ void SDECImpactTest::createActors(shared_ptr<MetaBody>& rootBody)
 	
 	shared_ptr<ActionParameterDispatcher> applyActionDispatcher(new ActionParameterDispatcher);
 	applyActionDispatcher->add("ActionParameterForce","ParticleParameters","NewtonsForceLaw");
-	applyActionDispatcher->add("ActionParameterMomentum","RigidBodyParameters","NewtonsMomemtumForceLaw");
+	applyActionDispatcher->add("ActionParameterMomentum","RigidBodyParameters","NewtonsMomentumLaw");
 	
 	shared_ptr<PhysicalParametersDispatcher> positionIntegrator(new PhysicalParametersDispatcher);
 	positionIntegrator->add("ParticleParameters","LeapFrogPositionIntegrator");
@@ -497,7 +497,7 @@ void SDECImpactTest::createActors(shared_ptr<MetaBody>& rootBody)
 	elasticContactLaw->sdecGroupMask = 2;
 	
 	rootBody->actors.clear();
-	rootBody->actors.push_back(shared_ptr<Engine>(new ActionParameterReset));
+	rootBody->actors.push_back(shared_ptr<Engine>(new ActionParameterReseter));
 	rootBody->actors.push_back(sdecTimeStepper);
 	rootBody->actors.push_back(boundingVolumeDispatcher);
 	rootBody->actors.push_back(shared_ptr<Engine>(new PersistentSAPCollider));

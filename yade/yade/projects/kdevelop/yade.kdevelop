@@ -99,7 +99,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>yade/yade</activedir>
+      <activedir>plugins/Engine/EngineUnit/BodyEngineUnit/PhysicalParametersEngineUnit/FEMSetTextLoaderFunctor</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>
