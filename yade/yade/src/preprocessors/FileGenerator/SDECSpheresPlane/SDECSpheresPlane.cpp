@@ -23,7 +23,7 @@
 #include "ActionParameterReseter.hpp"
 #include "ActionParameterInitializer.hpp"
 
-#include "ActionParameterDispatcher.hpp"
+#include "PhysicalActionApplierMetaEngine.hpp"
 #include "CundallNonViscousForceDamping.hpp"
 #include "CundallNonViscousMomentumDamping.hpp"
 #include "GravityEngine.hpp"
@@ -245,11 +245,11 @@ void SDECSpheresPlane::createActors(shared_ptr<MetaBody>& rootBody)
 	actionForceDamping->damping = dampingForce;
 	shared_ptr<CundallNonViscousMomentumDamping> actionMomentumDamping(new CundallNonViscousMomentumDamping);
 	actionMomentumDamping->damping = dampingMomentum;
-	shared_ptr<ActionParameterDispatcher> actionDampingDispatcher(new ActionParameterDispatcher);
+	shared_ptr<PhysicalActionApplierMetaEngine> actionDampingDispatcher(new PhysicalActionApplierMetaEngine);
 	actionDampingDispatcher->add("ActionParameterForce","RigidBodyParameters","CundallNonViscousForceDamping",actionForceDamping);
 	actionDampingDispatcher->add("ActionParameterMomentum","RigidBodyParameters","CundallNonViscousMomentumDamping",actionMomentumDamping);
 	
-	shared_ptr<ActionParameterDispatcher> applyActionDispatcher(new ActionParameterDispatcher);
+	shared_ptr<PhysicalActionApplierMetaEngine> applyActionDispatcher(new PhysicalActionApplierMetaEngine);
 	applyActionDispatcher->add("ActionParameterForce","RigidBodyParameters","NewtonsForceLaw");
 	applyActionDispatcher->add("ActionParameterMomentum","RigidBodyParameters","NewtonsMomentumLaw");
 	

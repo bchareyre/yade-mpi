@@ -29,7 +29,7 @@
 #include "PhysicalParametersMetaEngine.hpp"
 #include "InteractionGeometryMetaEngine.hpp"
 #include "InteractionPhysicsMetaEngine.hpp"
-#include "ActionParameterDispatcher.hpp"
+#include "PhysicalActionApplierMetaEngine.hpp"
 #include "BoundingVolumeMetaEngine.hpp"
 #include "GeometricalModelMetaEngine.hpp"
 
@@ -139,7 +139,7 @@ void FEMBeam::createActors(shared_ptr<MetaBody>& rootBody)
 	shared_ptr<GravityEngine> gravityCondition(new GravityEngine);
 	gravityCondition->gravity = gravity;
 	
-	shared_ptr<ActionParameterDispatcher> applyActionDispatcher(new ActionParameterDispatcher);
+	shared_ptr<PhysicalActionApplierMetaEngine> applyActionDispatcher(new PhysicalActionApplierMetaEngine);
 	applyActionDispatcher->add("ActionParameterForce","ParticleParameters","NewtonsForceLaw");
 	
 	shared_ptr<ActionParameterInitializer> actionParameterInitializer(new ActionParameterInitializer);
