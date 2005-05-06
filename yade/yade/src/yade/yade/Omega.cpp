@@ -10,10 +10,10 @@
 #include "InteractionSolver.hpp"
 #include "DeusExMachina.hpp"
 #include "Body.hpp"
-#include "InteractionGeometryFunctor.hpp"
+#include "InteractionGeometryEngineUnit.hpp"
 #include "IOManager.hpp"
 #include "BroadInteractor.hpp"
-#include "InteractionGeometryDispatcher.hpp"
+#include "InteractionGeometryMetaEngine.hpp"
 #include "GeometricalModel.hpp"
 #include "InteractingGeometry.hpp"
 #include "BoundingVolume.hpp"
@@ -184,8 +184,8 @@ void Omega::registerDynlibType(const string& name)
 		dynlibsType[name]="DeusExMachina";
 	else if (dynamic_pointer_cast<Body>(f))
 		dynlibsType[name]="Body";
-	else if (dynamic_pointer_cast<InteractionGeometryFunctor>(f))
-		dynlibsType[name]="InteractionGeometryFunctor";
+	else if (dynamic_pointer_cast<InteractionGeometryEngineUnit>(f))
+		dynlibsType[name]="InteractionGeometryEngineUnit";
 	else if (dynamic_pointer_cast<IOManager>(f))
 		dynlibsType[name]="IOManager";
 	else if (dynamic_pointer_cast<BroadInteractor>(f))

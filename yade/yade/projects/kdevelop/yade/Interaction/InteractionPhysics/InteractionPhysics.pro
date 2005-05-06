@@ -21,6 +21,6 @@ CONFIG += debug \
           dll 
 TEMPLATE = lib 
 HEADERS += InteractionPhysics.hpp \
-           InteractionPhysicsDispatcher.hpp \
-           InteractionPhysicsFunctor.hpp 
-SOURCES += InteractionPhysicsDispatcher.cpp 
+           InteractionPhysicsMetaEngine.hpp \
+           InteractionPhysicsEngineUnit.hpp 
+SOURCES += InteractionPhysicsMetaEngine.cpp 

@@ -24,7 +24,7 @@
 #ifndef FEM_TETRAHEDRON_PARAMETERS_HPP
 #define FEM_TETRAHEDRON_PARAMETERS_HPP 
 
-// FIXME - this file should be located in: /plugins/Interaction/InteractionPhysicsFunctor/FEMParameters/FEMTetrahedronStiffness
+// FIXME - this file should be located in: /plugins/Interaction/InteractionPhysicsEngineUnit/FEMParameters/FEMTetrahedronStiffness
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////

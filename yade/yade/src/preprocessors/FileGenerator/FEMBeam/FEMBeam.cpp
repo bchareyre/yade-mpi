@@ -27,8 +27,8 @@
 
 // dispatchers
 #include "PhysicalParametersMetaEngine.hpp"
-#include "InteractionGeometryDispatcher.hpp"
-#include "InteractionPhysicsDispatcher.hpp"
+#include "InteractionGeometryMetaEngine.hpp"
+#include "InteractionPhysicsMetaEngine.hpp"
 #include "ActionParameterDispatcher.hpp"
 #include "BoundingVolumeMetaEngine.hpp"
 #include "GeometricalModelMetaEngine.hpp"

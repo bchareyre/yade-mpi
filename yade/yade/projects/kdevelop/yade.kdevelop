@@ -99,7 +99,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>yade/Body/BoundingVolume</activedir>
+      <activedir>plugins/Data/Body</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>

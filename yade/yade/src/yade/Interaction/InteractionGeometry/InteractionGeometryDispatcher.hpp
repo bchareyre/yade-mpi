@@ -37,7 +37,7 @@
 #include "DynLibDispatcher.hpp"
 #include "Engine.hpp"
 #include "InteractingGeometry.hpp"
-#include "InteractionGeometryFunctor.hpp"
+#include "InteractionGeometryEngineUnit.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -47,11 +47,11 @@ class Body;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-class InteractionGeometryDispatcher : 
+class InteractionGeometryMetaEngine : 
 	  public Engine
 	, public DynLibDispatcher
 		<	TYPELIST_2( InteractingGeometry , InteractingGeometry ) ,	// base classess for dispatch
-			InteractionGeometryFunctor,					// class that provides multivirtual call
+			InteractionGeometryEngineUnit,					// class that provides multivirtual call
 			bool ,								// return type
 			TYPELIST_5(
 					  const shared_ptr<InteractingGeometry>&	// arguments
@@ -66,13 +66,13 @@ class InteractionGeometryDispatcher :
 	public    	: virtual void action(Body* body);
 	public    	: virtual void registerAttributes();
 	protected 	: virtual void postProcessAttributes(bool deserializing);
-	REGISTER_CLASS_NAME(InteractionGeometryDispatcher);
+	REGISTER_CLASS_NAME(InteractionGeometryMetaEngine);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-REGISTER_SERIALIZABLE(InteractionGeometryDispatcher,false);
+REGISTER_SERIALIZABLE(InteractionGeometryMetaEngine,false);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////

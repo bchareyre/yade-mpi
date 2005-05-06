@@ -48,8 +48,8 @@
 #include "CundallNonViscousForceDamping.hpp"
 #include "CundallNonViscousMomentumDamping.hpp"
 
-#include "InteractionGeometryDispatcher.hpp"
-#include "InteractionPhysicsDispatcher.hpp"
+#include "InteractionGeometryMetaEngine.hpp"
+#include "InteractionPhysicsMetaEngine.hpp"
 #include "InteractingBox.hpp"
 #include "InteractingSphere.hpp"
 #include "ActionParameterDispatcher.hpp"

@@ -44,10 +44,10 @@
 
 /*! \brief Abstract interface for all interaction functor.
 
-	Every functions that describe interaction between two InteractionGeometries must derive from InteractionGeometryFunctor.
+	Every functions that describe interaction between two InteractionGeometries must derive from InteractionGeometryEngineUnit.
 */
 
-class InteractionPhysicsFunctor : public FunctorWrapper
+class InteractionPhysicsEngineUnit : public FunctorWrapper
 		<
 		 void ,
 		 TYPELIST_3(	  const shared_ptr<PhysicalParameters>&
@@ -56,10 +56,10 @@ class InteractionPhysicsFunctor : public FunctorWrapper
 			   ) 
 		>
 {
-	REGISTER_CLASS_NAME(InteractionPhysicsFunctor);
+	REGISTER_CLASS_NAME(InteractionPhysicsEngineUnit);
 };
 
-REGISTER_SERIALIZABLE(InteractionPhysicsFunctor,false);
+REGISTER_SERIALIZABLE(InteractionPhysicsEngineUnit,false);
 
 #endif // __INTERACTIONPHYSICSFUNCTOR_H__
 

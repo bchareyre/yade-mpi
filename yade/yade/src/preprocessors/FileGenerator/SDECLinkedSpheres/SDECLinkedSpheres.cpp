@@ -26,8 +26,8 @@
 #include "CundallNonViscousMomentumDamping.hpp"
 #include "GravityEngine.hpp"
 
-#include "InteractionGeometryDispatcher.hpp"
-#include "InteractionPhysicsDispatcher.hpp"
+#include "InteractionGeometryMetaEngine.hpp"
+#include "InteractionPhysicsMetaEngine.hpp"
 #include "Body.hpp"
 #include "InteractingBox.hpp"
 #include "InteractingSphere.hpp"
@@ -301,11 +301,11 @@ void SDECLinkedSpheres::createActors(shared_ptr<MetaBody>& rootBody)
 	actionParameterInitializer->actionParameterNames.push_back("ActionParameterForce");
 	actionParameterInitializer->actionParameterNames.push_back("ActionParameterMomentum");
 	
-	shared_ptr<InteractionGeometryDispatcher> interactionGeometryDispatcher(new InteractionGeometryDispatcher);
+	shared_ptr<InteractionGeometryMetaEngine> interactionGeometryDispatcher(new InteractionGeometryMetaEngine);
 	interactionGeometryDispatcher->add("InteractingSphere","InteractingSphere","Sphere2Sphere4MacroMicroContactGeometry");
 	interactionGeometryDispatcher->add("InteractingSphere","InteractingBox","Box2Sphere4MacroMicroContactGeometry");
 
-	shared_ptr<InteractionPhysicsDispatcher> interactionPhysicsDispatcher(new InteractionPhysicsDispatcher);
+	shared_ptr<InteractionPhysicsMetaEngine> interactionPhysicsDispatcher(new InteractionPhysicsMetaEngine);
 	interactionPhysicsDispatcher->add("BodyMacroParameters","BodyMacroParameters","MacroMicroElasticRelationships");
 		
 	shared_ptr<BoundingVolumeMetaEngine> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeMetaEngine>(new BoundingVolumeMetaEngine);

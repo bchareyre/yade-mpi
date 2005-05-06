@@ -28,8 +28,8 @@
 #include "PhysicalParametersMetaEngine.hpp"
 #include "GeometricalModelMetaEngine.hpp"
 #include "ActionParameterDispatcher.hpp"
-#include "InteractionGeometryDispatcher.hpp"
-#include "InteractionPhysicsDispatcher.hpp"
+#include "InteractionGeometryMetaEngine.hpp"
+#include "InteractionPhysicsMetaEngine.hpp"
 
 // actors
 #include "GravityEngine.hpp"
@@ -177,11 +177,11 @@ void FEMDEMCouplingTest::createActors(shared_ptr<MetaBody>& rootBody)
 	boundingVolumeDispatcher->add("InteractingBox","AABB","Box2AABB");
 	boundingVolumeDispatcher->add("MetaInteractingGeometry","AABB","InteractionDescriptionSet2AABB");
 
-	shared_ptr<InteractionGeometryDispatcher> interactionGeometryDispatcher(new InteractionGeometryDispatcher);
+	shared_ptr<InteractionGeometryMetaEngine> interactionGeometryDispatcher(new InteractionGeometryMetaEngine);
 	interactionGeometryDispatcher->add("InteractingSphere","InteractingSphere","Sphere2Sphere4MacroMicroContactGeometry");
 	interactionGeometryDispatcher->add("InteractingSphere","InteractingBox","Box2Sphere4MacroMicroContactGeometry");
 
-	shared_ptr<InteractionPhysicsDispatcher> interactionPhysicsDispatcher(new InteractionPhysicsDispatcher);
+	shared_ptr<InteractionPhysicsMetaEngine> interactionPhysicsDispatcher(new InteractionPhysicsMetaEngine);
 	interactionPhysicsDispatcher->add("BodyMacroParameters","BodyMacroParameters","MacroMicroElasticRelationships");
 		
 	shared_ptr<FEMSetTextLoader> femSetTextLoaderFunctor	= shared_ptr<FEMSetTextLoader>(new FEMSetTextLoader);

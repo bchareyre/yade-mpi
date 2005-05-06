@@ -1,10 +1,10 @@
-#include "InteractionGeometryDispatcher.hpp"
+#include "InteractionGeometryMetaEngine.hpp"
 #include "MetaBody.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void InteractionGeometryDispatcher::postProcessAttributes(bool deserializing)
+void InteractionGeometryMetaEngine::postProcessAttributes(bool deserializing)
 {
 	postProcessDispatcher2D(deserializing);
 }
@@ -12,7 +12,7 @@ void InteractionGeometryDispatcher::postProcessAttributes(bool deserializing)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void InteractionGeometryDispatcher::registerAttributes()
+void InteractionGeometryMetaEngine::registerAttributes()
 {
 	REGISTER_ATTRIBUTE(functorNames);
 	REGISTER_ATTRIBUTE(functorArguments);
@@ -21,7 +21,7 @@ void InteractionGeometryDispatcher::registerAttributes()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void InteractionGeometryDispatcher::action(Body* body)
+void InteractionGeometryMetaEngine::action(Body* body)
 {
 	MetaBody * ncb = dynamic_cast<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;

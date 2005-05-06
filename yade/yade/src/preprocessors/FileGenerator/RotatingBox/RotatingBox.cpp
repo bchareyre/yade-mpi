@@ -14,7 +14,7 @@
 #include "IOManager.hpp"
 #include "InteractingBox.hpp"
 #include "InteractingSphere.hpp"
-#include "InteractionGeometryDispatcher.hpp"
+#include "InteractionGeometryMetaEngine.hpp"
 #include "ActionParameterDispatcher.hpp"
 #include "CundallNonViscousForceDamping.hpp"
 #include "CundallNonViscousMomentumDamping.hpp"
@@ -267,7 +267,7 @@ void RotatingBox::createActors(shared_ptr<MetaBody>& rootBody)
 	actionParameterInitializer->actionParameterNames.push_back("ActionParameterForce");
 	actionParameterInitializer->actionParameterNames.push_back("ActionParameterMomentum");
 	
-	shared_ptr<InteractionGeometryDispatcher> interactionGeometryDispatcher(new InteractionGeometryDispatcher);
+	shared_ptr<InteractionGeometryMetaEngine> interactionGeometryDispatcher(new InteractionGeometryMetaEngine);
 	interactionGeometryDispatcher->add("InteractingSphere","InteractingSphere","Sphere2Sphere4ClosestFeatures");
 	interactionGeometryDispatcher->add("InteractingSphere","InteractingBox","Box2Sphere4ClosestFeatures");
 	interactionGeometryDispatcher->add("InteractingBox","InteractingBox","Box2Box4ClosestFeatures");

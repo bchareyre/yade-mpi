@@ -45,10 +45,10 @@
 
 /*! \brief Abstract interface for all interaction functor.
 
-	Every functions that describe interaction between two InteractionGeometries must derive from InteractionGeometryFunctor.
+	Every functions that describe interaction between two InteractionGeometries must derive from InteractionGeometryEngineUnit.
 */
 
-class InteractionGeometryFunctor : public FunctorWrapper
+class InteractionGeometryEngineUnit : public FunctorWrapper
 		<
 		 bool ,
 		 TYPELIST_5(
@@ -60,10 +60,10 @@ class InteractionGeometryFunctor : public FunctorWrapper
 			  ) 
 		>
 {
-	REGISTER_CLASS_NAME(InteractionGeometryFunctor);
+	REGISTER_CLASS_NAME(InteractionGeometryEngineUnit);
 };
 
-REGISTER_SERIALIZABLE(InteractionGeometryFunctor,false);
+REGISTER_SERIALIZABLE(InteractionGeometryEngineUnit,false);
 
 #endif // __INTERACTIONGEOMETRYFUNCTOR_H__
 

@@ -21,6 +21,6 @@ CONFIG += debug \
           dll 
 TEMPLATE = lib 
 HEADERS += InteractionGeometry.hpp \
-           InteractionGeometryDispatcher.hpp \
-           InteractionGeometryFunctor.hpp 
-SOURCES += InteractionGeometryDispatcher.cpp 
+           InteractionGeometryMetaEngine.hpp \
+           InteractionGeometryEngineUnit.hpp 
+SOURCES += InteractionGeometryMetaEngine.cpp 

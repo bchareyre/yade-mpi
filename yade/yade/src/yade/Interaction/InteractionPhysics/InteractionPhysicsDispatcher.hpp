@@ -31,16 +31,16 @@
 #include "DynLibDispatcher.hpp"
 #include "PhysicalParameters.hpp"
 #include "Interaction.hpp"
-#include "InteractionPhysicsFunctor.hpp"
+#include "InteractionPhysicsEngineUnit.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-class InteractionPhysicsDispatcher : 
+class InteractionPhysicsMetaEngine : 
 	  public Engine
 	, public DynLibDispatcher
 		<	TYPELIST_2( PhysicalParameters , PhysicalParameters ) ,	// base classess for dispatch
-			InteractionPhysicsFunctor,					// class that provides multivirtual call
+			InteractionPhysicsEngineUnit,					// class that provides multivirtual call
 			void ,								// return type
 			TYPELIST_3(	  const shared_ptr<PhysicalParameters>&	// arguments
 					, const shared_ptr<PhysicalParameters>&
@@ -51,13 +51,13 @@ class InteractionPhysicsDispatcher :
 	public 		: virtual void action(Body* body);
 	public 		: virtual void registerAttributes();
 	protected 	: virtual void postProcessAttributes(bool deserializing);
-	REGISTER_CLASS_NAME(InteractionPhysicsDispatcher);
+	REGISTER_CLASS_NAME(InteractionPhysicsMetaEngine);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-REGISTER_SERIALIZABLE(InteractionPhysicsDispatcher,false);
+REGISTER_SERIALIZABLE(InteractionPhysicsMetaEngine,false);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
