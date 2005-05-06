@@ -15,17 +15,17 @@
 #include "InteractingBox.hpp"
 #include "InteractingSphere.hpp"
 #include "InteractionGeometryMetaEngine.hpp"
-#include "PhysicalActionApplierMetaEngine.hpp"
+#include "PhysicalActionMetaEngine.hpp"
 #include "ActionParameterReseter.hpp"
 #include "CundallNonViscousForceDamping.hpp"
 #include "CundallNonViscousMomentumDamping.hpp"
-#include "PhysicalActionApplierMetaEngine.hpp"
+#include "PhysicalActionMetaEngine.hpp"
 
 #include "BoundingVolumeMetaEngine.hpp"
 #include "InteractionDescriptionSet2AABB.hpp"
 #include "MetaInteractingGeometry.hpp"
 
-#include "PhysicalActionApplierMetaEngine.hpp"
+#include "PhysicalActionMetaEngine.hpp"
 #include "ActionParameterInitializer.hpp"
 #include "GravityEngine.hpp"
 #include "PhysicalParametersMetaEngine.hpp"
@@ -265,11 +265,11 @@ void BoxStack::createActors(shared_ptr<MetaBody>& rootBody)
 	actionForceDamping->damping = dampingForce;
 	shared_ptr<CundallNonViscousMomentumDamping> actionMomentumDamping(new CundallNonViscousMomentumDamping);
 	actionMomentumDamping->damping = dampingMomentum;
-	shared_ptr<PhysicalActionApplierMetaEngine> actionDampingDispatcher(new PhysicalActionApplierMetaEngine);
+	shared_ptr<PhysicalActionMetaEngine> actionDampingDispatcher(new PhysicalActionMetaEngine);
 	actionDampingDispatcher->add("ActionParameterForce","ParticleParameters","CundallNonViscousForceDamping",actionForceDamping);
 	actionDampingDispatcher->add("ActionParameterMomentum","RigidBodyParameters","CundallNonViscousMomentumDamping",actionMomentumDamping);
 	
-	shared_ptr<PhysicalActionApplierMetaEngine> applyActionDispatcher(new PhysicalActionApplierMetaEngine);
+	shared_ptr<PhysicalActionMetaEngine> applyActionDispatcher(new PhysicalActionMetaEngine);
 	applyActionDispatcher->add("ActionParameterForce","ParticleParameters","NewtonsForceLaw");
 	applyActionDispatcher->add("ActionParameterMomentum","RigidBodyParameters","NewtonsMomentumLaw");
 	

@@ -3,13 +3,13 @@
 # Subdir relative project main directory: ./yade/Engine
 # Target is a library:  
 
-HEADERS += PhysicalActionApplierMetaEngine.hpp \
-           PhysicalActionApplierEngineUnit.hpp \
+HEADERS += PhysicalActionMetaEngine.hpp \
+           PhysicalActionEngineUnit.hpp \
            ActionParameterContainer.hpp \
            ActionParameter.hpp \
            InteractionSolver.hpp \
            DeusExMachina.hpp 
-SOURCES += PhysicalActionApplierMetaEngine.cpp \
+SOURCES += PhysicalActionMetaEngine.cpp \
            ActionParameterContainer.cpp \
            InteractionSolver.cpp \
            DeusExMachina.cpp 

@@ -27,7 +27,7 @@
 #include "BoundingVolumeMetaEngine.hpp"
 #include "PhysicalParametersMetaEngine.hpp"
 #include "GeometricalModelMetaEngine.hpp"
-#include "PhysicalActionApplierMetaEngine.hpp"
+#include "PhysicalActionMetaEngine.hpp"
 #include "InteractionGeometryMetaEngine.hpp"
 #include "InteractionPhysicsMetaEngine.hpp"
 
@@ -214,14 +214,14 @@ void FEMDEMCouplingTest::createActors(shared_ptr<MetaBody>& rootBody)
 	actionForceDamping->damping = dampingForce;
 	shared_ptr<CundallNonViscousMomentumDamping> actionMomentumDamping(new CundallNonViscousMomentumDamping);
 	actionMomentumDamping->damping = dampingMomentum;
-	shared_ptr<PhysicalActionApplierMetaEngine> actionDampingDispatcher(new PhysicalActionApplierMetaEngine);
+	shared_ptr<PhysicalActionMetaEngine> actionDampingDispatcher(new PhysicalActionMetaEngine);
 	actionDampingDispatcher->add("ActionParameterForce","ParticleParameters","CundallNonViscousForceDamping",actionForceDamping);
 	actionDampingDispatcher->add("ActionParameterMomentum","RigidBodyParameters","CundallNonViscousMomentumDamping",actionMomentumDamping);
 	
 	shared_ptr<GravityEngine> gravityCondition(new GravityEngine);
 	gravityCondition->gravity = gravity;
 	
-	shared_ptr<PhysicalActionApplierMetaEngine> applyActionDispatcher(new PhysicalActionApplierMetaEngine);
+	shared_ptr<PhysicalActionMetaEngine> applyActionDispatcher(new PhysicalActionMetaEngine);
 	applyActionDispatcher->add("ActionParameterForce","ParticleParameters","NewtonsForceLaw");
 	applyActionDispatcher->add("ActionParameterMomentum","RigidBodyParameters","NewtonsMomentumLaw");
 	

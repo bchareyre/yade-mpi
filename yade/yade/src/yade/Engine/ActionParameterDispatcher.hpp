@@ -30,18 +30,18 @@
 #include "Engine.hpp"
 #include "DynLibDispatcher.hpp"
 #include "ActionParameter.hpp"
-#include "PhysicalActionApplierEngineUnit.hpp"
+#include "PhysicalActionEngineUnit.hpp"
 
 class Body;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-class PhysicalActionApplierMetaEngine : 
+class PhysicalActionMetaEngine : 
 	  public Engine
 	, public DynLibDispatcher
 		<	  TYPELIST_2( ActionParameter , PhysicalParameters )	// base classess for dispatch
-			, PhysicalActionApplierEngineUnit				// class that provides multivirtual call
+			, PhysicalActionEngineUnit				// class that provides multivirtual call
 			, void						// return type
 			, TYPELIST_3(	  const shared_ptr<ActionParameter>&	// function arguments
 					, const shared_ptr<PhysicalParameters>& 
@@ -52,13 +52,13 @@ class PhysicalActionApplierMetaEngine :
 	public 		: virtual void action(Body* body);
 	public		: virtual void registerAttributes();
 	protected	: virtual void postProcessAttributes(bool deserializing);
-	REGISTER_CLASS_NAME(PhysicalActionApplierMetaEngine);
+	REGISTER_CLASS_NAME(PhysicalActionMetaEngine);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-REGISTER_SERIALIZABLE(PhysicalActionApplierMetaEngine,false);
+REGISTER_SERIALIZABLE(PhysicalActionMetaEngine,false);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
