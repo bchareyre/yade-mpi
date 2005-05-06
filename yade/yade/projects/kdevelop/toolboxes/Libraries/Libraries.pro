@@ -8,7 +8,9 @@ SUBDIRS += yade-lib-factory \
            yade-lib-multimethods \
            yade-lib-serialization \
            yade-lib-threads \
-           yade-lib-wm3-math 
+           yade-lib-wm3-math \
+           yade-lib-computational-geometry \
+           yade-lib-opengl 
 MOC_DIR = $(YADECOMPILATIONPATH)
 UI_DIR = $(YADECOMPILATIONPATH)
 OBJECTS_DIR = $(YADECOMPILATIONPATH)

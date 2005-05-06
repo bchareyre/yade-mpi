@@ -4,9 +4,7 @@
 # Target is a subdirs project 
 
 SUBDIRS += DataStructures \
-           Libraries \
-           ComputationalGeometry \
-           OpenGL 
+           Libraries 
 MOC_DIR = $(YADECOMPILATIONPATH)
 UI_DIR = $(YADECOMPILATIONPATH)
 OBJECTS_DIR = $(YADECOMPILATIONPATH)

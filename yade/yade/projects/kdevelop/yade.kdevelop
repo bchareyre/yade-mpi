@@ -99,7 +99,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>toolboxes/Libraries</activedir>
+      <activedir>toolboxes</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>
