@@ -15,19 +15,19 @@ LIBS += -lBox \
         -lEngine \
         -lCundallNonViscousMomentumDamping \
         -lCundallNonViscousForceDamping \
-        -lActionParameterInitializer \
+        -lPhysicalActionInitializer \
         -lMacroMicroElasticRelationships \
         -lSDECTimeStepper \
         -lElasticContactLaw \
         -lMetaInteractingGeometry \
         -lInteractionDescriptionSet2AABB \
-        -lActionParameterReseter \
+        -lPhysicalActionReseter \
         -lGravityEngine \
         -lyade-lib-serialization \
         -lyade-lib-wm3-math \
         -lyade-lib-multimethods \
         -lInteraction \
-        -lActionParameterVectorVector \
+        -lPhysicalActionVectorVector \
         -lInteractionVecSet \
         -lBodyRedirectionVector \
         -lBody \

@@ -19,17 +19,17 @@ LIBS += -lAveragePositionRecorder \
         -lSAPCollider \
         -lCundallNonViscousMomentumDamping \
         -lCundallNonViscousForceDamping \
-        -lActionParameterInitializer \
+        -lPhysicalActionInitializer \
         -lMacroMicroElasticRelationships \
         -lSDECTimeStepper \
         -lElasticContactLaw \
         -lMetaInteractingGeometry \
         -lInteractionDescriptionSet2AABB \
-        -lActionParameterReseter \
+        -lPhysicalActionReseter \
         -lGravityEngine \
         -lyade-lib-serialization \
         -lInteraction \
-        -lActionParameterVectorVector \
+        -lPhysicalActionVectorVector \
         -lInteractionVecSet \
         -lBodyRedirectionVector \
         -lBody \

@@ -34,7 +34,7 @@
 
 class NewtonsMomentumLaw : public PhysicalActionEngineUnit
 {
-	public : virtual void go( 	  const shared_ptr<ActionParameter>&
+	public : virtual void go( 	  const shared_ptr<PhysicalAction>&
 					, const shared_ptr<PhysicalParameters>&
 					, const Body*);
 	REGISTER_CLASS_NAME(NewtonsMomentumLaw);

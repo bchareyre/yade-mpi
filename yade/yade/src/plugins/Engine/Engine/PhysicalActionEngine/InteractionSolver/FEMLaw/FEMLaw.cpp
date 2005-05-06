@@ -65,7 +65,7 @@ void FEMLaw::calculateForces(Body* body)
 {
 	MetaBody * fem = static_cast<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = fem->bodies;
-	shared_ptr<ActionParameterContainer>& actionParameters = fem->actionParameters;
+	shared_ptr<PhysicalActionContainer>& actionParameters = fem->actionParameters;
 	
 	ublas::matrix<double> Ue1 , fe;
 	Ue1.resize(12,1);

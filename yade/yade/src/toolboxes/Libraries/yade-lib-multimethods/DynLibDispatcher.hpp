@@ -51,7 +51,7 @@
 template 
 <
 	class BaseClass,	//	a typelist with base classess involved in the dispatch (or single class, for 1D )
-				// 		FIXME : should use shared_ptr references, like this: DynLibDispatcher< TYPELIST_2( shared_ptr<ActionParameter>& , shared_ptr<Body>& ) , ....
+				// 		FIXME : should use shared_ptr references, like this: DynLibDispatcher< TYPELIST_2( shared_ptr<PhysicalAction>& , shared_ptr<Body>& ) , ....
 	class Executor,		//	class which gives multivirtual function
 	class ResultType,	//	type returned by multivirtual function
 	class TList,		//	typelist of arguments passed to multivirtual function

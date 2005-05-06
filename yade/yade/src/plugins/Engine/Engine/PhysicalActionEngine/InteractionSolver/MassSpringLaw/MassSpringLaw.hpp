@@ -2,12 +2,12 @@
 #define __EXPLICITMASSSPRINGDYNAMICENGINE_H__
 
 #include "InteractionSolver.hpp"
-#include "ActionParameter.hpp"
+#include "PhysicalAction.hpp"
 
 class MassSpringLaw : public InteractionSolver
 {
-	private : shared_ptr<ActionParameter> actionForce;	
-	private : shared_ptr<ActionParameter> actionMomentum;
+	private : shared_ptr<PhysicalAction> actionForce;	
+	private : shared_ptr<PhysicalAction> actionMomentum;
 	public  : int springGroupMask;
 
 	// construction

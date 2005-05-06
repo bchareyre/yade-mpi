@@ -31,7 +31,7 @@ void MassSpringBody2RigidBodyLaw::calculateForces(Body * body)
 	MetaBody * mixedBody = dynamic_cast<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = mixedBody->bodies;
 	shared_ptr<InteractionContainer>& volatileInteractions = mixedBody->volatileInteractions;
-//	shared_ptr<ActionParameterContainer>& actionParameters = mixedBody->actionParameters;
+//	shared_ptr<PhysicalActionContainer>& actionParameters = mixedBody->actionParameters;
 	Real dt = Omega::instance().getTimeStep();
 
 	for( volatileInteractions->gotoFirst() ; volatileInteractions->notAtEnd() ; volatileInteractions->gotoNext() )

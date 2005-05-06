@@ -16,8 +16,8 @@ LIBS += -lPersistentSAPCollider \
         -lSDECTimeStepper \
         -lElasticContactLaw \
         -lInteractionDescriptionSet2AABB \
-        -lActionParameterReseter \
-        -lActionParameterVectorVector \
+        -lPhysicalActionReseter \
+        -lPhysicalActionVectorVector \
         -lInteractionVecSet \
         -lBodyRedirectionVector \
         -rdynamic 

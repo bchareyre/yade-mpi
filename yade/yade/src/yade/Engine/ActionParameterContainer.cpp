@@ -21,13 +21,13 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "ActionParameterContainer.hpp"
-#include "ActionParameter.hpp"
+#include "PhysicalActionContainer.hpp"
+#include "PhysicalAction.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-ActionParameterContainer::ActionParameterContainer() : Serializable()
+PhysicalActionContainer::PhysicalActionContainer() : Serializable()
 {
 	action.clear();
 }
@@ -35,7 +35,7 @@ ActionParameterContainer::ActionParameterContainer() : Serializable()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-ActionParameterContainer::~ActionParameterContainer()
+PhysicalActionContainer::~PhysicalActionContainer()
 {
 
 }
@@ -43,14 +43,14 @@ ActionParameterContainer::~ActionParameterContainer()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void ActionParameterContainer::registerAttributes()
+void PhysicalActionContainer::registerAttributes()
 {
 	REGISTER_ATTRIBUTE(action);
 };
 
 /* FIXME - this is needed or not?
 
-void ActionParameterContainer::preProcessAttributes(bool deserializing)
+void PhysicalActionContainer::preProcessAttributes(bool deserializing)
 {
 	if(deserializing)
 	{
@@ -64,13 +64,13 @@ void ActionParameterContainer::preProcessAttributes(bool deserializing)
 	}
 };
 
-void ActionParameterContainer::postProcessAttributes(bool deserializing)
+void PhysicalActionContainer::postProcessAttributes(bool deserializing)
 {
 	if(deserializing)
 	{
 		this->clear();
-		vector<shared_ptr<ActionParameter> >::iterator it    = action.begin();
-		vector<shared_ptr<ActionParameter> >::iterator itEnd = action.end();
+		vector<shared_ptr<PhysicalAction> >::iterator it    = action.begin();
+		vector<shared_ptr<PhysicalAction> >::iterator itEnd = action.end();
 		for( ; it != itEnd ; ++it)
 			this->insert(*it);
 		action.clear();

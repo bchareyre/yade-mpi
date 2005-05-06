@@ -30,7 +30,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void NewtonsForceLaw::go( 	  const shared_ptr<ActionParameter>& a
+void NewtonsForceLaw::go( 	  const shared_ptr<PhysicalAction>& a
 					, const shared_ptr<PhysicalParameters>& b
 					, const Body* bb)
 {
@@ -38,7 +38,7 @@ void NewtonsForceLaw::go( 	  const shared_ptr<ActionParameter>& a
 	ParticleParameters * p = dynamic_cast<ParticleParameters*>(b.get());
 	
 	//FIXME : should be += and we should add an Engine that reset acceleration at the beginning
-	// if another ActionParameter also acts on acceleration then we are overwritting it here
+	// if another PhysicalAction also acts on acceleration then we are overwritting it here
 	
 //	std::cout << bb->getId() << std::endl;
 //	std::cout << a->getClassIndex() << " " << a->getClassName() << std::endl;

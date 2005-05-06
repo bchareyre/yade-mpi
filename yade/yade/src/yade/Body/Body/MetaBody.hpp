@@ -42,7 +42,7 @@ class MetaBody : public Body
 	
 	public	: shared_ptr<InteractionContainer> persistentInteractions;  // disappear, reappear according to physical (or any other non-spatial) criterion
 	public	: shared_ptr<InteractionContainer> volatileInteractions; // disappear, reappear according to spatial criterion
-	public	: shared_ptr<ActionParameterContainer> actionParameters;
+	public	: shared_ptr<PhysicalActionContainer> actionParameters;
 	
 	// construction
 	public	: MetaBody ();

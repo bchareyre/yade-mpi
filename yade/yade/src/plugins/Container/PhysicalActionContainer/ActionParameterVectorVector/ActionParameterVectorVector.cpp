@@ -1,6 +1,6 @@
 #include "ActionParameterVectorVector.hpp"
 #include "Body.hpp"
-#include "ActionParameter.hpp"
+#include "PhysicalAction.hpp"
 
 ActionParameterVectorVector::ActionParameterVectorVector()
 {
@@ -38,8 +38,8 @@ unsigned int ActionParameterVectorVector::size()
 	return actionParameters.size();
 }
 
-// fills container with resetted fields. argument here, should be all ActionParameter types that are planned to use
-void ActionParameterVectorVector::prepare(std::vector<shared_ptr<ActionParameter> >& actionTypes)
+// fills container with resetted fields. argument here, should be all PhysicalAction types that are planned to use
+void ActionParameterVectorVector::prepare(std::vector<shared_ptr<PhysicalAction> >& actionTypes)
 {
 	unsigned int size = actionTypes.size();
 	int maxSize = 0;
@@ -56,10 +56,10 @@ void ActionParameterVectorVector::prepare(std::vector<shared_ptr<ActionParameter
 
 // finds and returns action of given polymorphic type, for body of given Id,
 // should be always succesfull. if it is not - you forgot to call prepare()
-shared_ptr<ActionParameter>& ActionParameterVectorVector::find(unsigned int id , int actionIndex )
+shared_ptr<PhysicalAction>& ActionParameterVectorVector::find(unsigned int id , int actionIndex )
 {
 	if( actionParameters.size() <= id ) // this is very rarely executed, only at beginning.
-	// somebody is accesing out of bounds, make sure he will find, what he needs - a resetted ActionParameter of his type
+	// somebody is accesing out of bounds, make sure he will find, what he needs - a resetted PhysicalAction of his type
 	{
 		unsigned int oldSize = actionParameters.size();
 		unsigned int newSize = id+1;
@@ -121,7 +121,7 @@ void ActionParameterVectorVector::gotoNext()
 	}
 }
 
-shared_ptr<ActionParameter>& ActionParameterVectorVector::getCurrent(int& id)
+shared_ptr<PhysicalAction>& ActionParameterVectorVector::getCurrent(int& id)
 {
 	id = currentIndex;
 	return (*vi);
@@ -149,7 +149,7 @@ shared_ptr<ActionParameter>& ActionParameterVectorVector::getCurrent(int& id)
 // {
 // 	clear();
 // 	currentActionType = -1;
-// 	empty = shared_ptr<ActionParameter>();
+// 	empty = shared_ptr<PhysicalAction>();
 // 	currentIndex = -1;
 // }
 // 
@@ -182,10 +182,10 @@ shared_ptr<ActionParameter>& ActionParameterVectorVector::getCurrent(int& id)
 // 	return actionParameters.size();
 // }
 // 	
-// adds ActionParameter acting on one body,
-// it is mathematically added if ActionParameter of this polymorphic type already exists,
+// adds PhysicalAction acting on one body,
+// it is mathematically added if PhysicalAction of this polymorphic type already exists,
 // if it doesn't exist, then it is appended to stored list of Actions for that body
-// void ActionParameterVectorVector::add(const shared_ptr<ActionParameter>& newAction, unsigned int id)
+// void ActionParameterVectorVector::add(const shared_ptr<PhysicalAction>& newAction, unsigned int id)
 // { 
 // 	const int& idx = newAction->getClassIndex();
 // 	
@@ -203,34 +203,34 @@ shared_ptr<ActionParameter>& ActionParameterVectorVector::getCurrent(int& id)
 // 		actionParameters[id][idx]=newAction->clone();
 // }
 // 
-// adds ActionParameter that acts on two bodies.
+// adds PhysicalAction that acts on two bodies.
 // on first body it is substarcted,
 // to second body it is added
-// void ActionParameterVectorVector::add(const shared_ptr<ActionParameter>&, unsigned int , unsigned int)
+// void ActionParameterVectorVector::add(const shared_ptr<PhysicalAction>&, unsigned int , unsigned int)
 // {
 // 
 // }
 // 	
-// allows to set current polymorphic ActionParameter Type on which other functions will work:
+// allows to set current polymorphic PhysicalAction Type on which other functions will work:
 // function that use this are: eraseAction, operator[]
 // void ActionParameterVectorVector::setCurrentActionType(int idx)
 // {
 // 	currentActionType = idx;
 // }
 // 		
-// deletes ActionParameter of given polymorphic type from body that has given Id
+// deletes PhysicalAction of given polymorphic type from body that has given Id
 // bool ActionParameterVectorVector::eraseAction(unsigned int id, int idx)
 // {
 // 	if( idx >= 0 && (unsigned int)idx < actionParameters[id].size() && actionParameters[id][idx] )
 // 	{
-// 		actionParameters[id][idx] = shared_ptr<ActionParameter>();
+// 		actionParameters[id][idx] = shared_ptr<PhysicalAction>();
 // 		return true;
 // 	}
 // 	else
 // 		return false;
 // }
 // 
-// deletes ActionParameter of given polymorphic type from body that has given Id,
+// deletes PhysicalAction of given polymorphic type from body that has given Id,
 // the polymorphic type is selected by setCurrentActionType()
 // returns true if action existed before deletion
 // bool ActionParameterVectorVector::eraseAction(unsigned int id)
@@ -239,7 +239,7 @@ shared_ptr<ActionParameter>& ActionParameterVectorVector::getCurrent(int& id)
 // 		&& (unsigned int)currentActionType < actionParameters[id].size()
 // 		&& actionParameters[id][currentActionType] )
 // 	{
-// 		actionParameters[id][currentActionType] = shared_ptr<ActionParameter>();
+// 		actionParameters[id][currentActionType] = shared_ptr<PhysicalAction>();
 // 		return true;
 // 	}
 // 	else
@@ -253,37 +253,37 @@ shared_ptr<ActionParameter>& ActionParameterVectorVector::getCurrent(int& id)
 // }
 // 	
 // finds and returns action of given polymorphic type, for body of given Id,
-// returns empty shared_ptr if this ActionParameter doesn't exist for chosen body
-// shared_ptr<ActionParameter> ActionParameterVectorVector::find(unsigned int id, int idx) const
+// returns empty shared_ptr if this PhysicalAction doesn't exist for chosen body
+// shared_ptr<PhysicalAction> ActionParameterVectorVector::find(unsigned int id, int idx) const
 // {
 // 	if( 	   idx >= 0
 // 		&& (unsigned int)idx < actionParameters[id].size() )
 // 		return actionParameters[id][idx];
 // 	else
-// 		return shared_ptr<ActionParameter>();
+// 		return shared_ptr<PhysicalAction>();
 // }
 // 
-// same as above, polymorphic ActionParameter type is selected with setCurrentActionType
-// shared_ptr<ActionParameter>& ActionParameterVectorVector::operator[](unsigned int id)
+// same as above, polymorphic PhysicalAction type is selected with setCurrentActionType
+// shared_ptr<PhysicalAction>& ActionParameterVectorVector::operator[](unsigned int id)
 // {
 // 	if(	   currentActionType >=0
 // 		&& (unsigned int)currentActionType < actionParameters[id].size() )
 // 		return actionParameters[id][currentActionType];
 // 	else
 // 	{
-// 		empty = shared_ptr<ActionParameter>();
+// 		empty = shared_ptr<PhysicalAction>();
 // 		return empty; // because returning reference is faster
 // 	}
 // }
 // 
-// const shared_ptr<ActionParameter>& ActionParameterVectorVector::operator[](unsigned int id) const
+// const shared_ptr<PhysicalAction>& ActionParameterVectorVector::operator[](unsigned int id) const
 // {
 // 	if(	   currentActionType >=0
 // 		&& (unsigned int)currentActionType < actionParameters[id].size() )
 // 		return actionParameters[id][currentActionType];
 // 	else
 // 	{
-// 		empty = shared_ptr<ActionParameter>();
+// 		empty = shared_ptr<PhysicalAction>();
 // 		return empty;
 // 	}
 // }
@@ -318,7 +318,7 @@ shared_ptr<ActionParameter>& ActionParameterVectorVector::getCurrent(int& id)
 // 
 // bool ActionParameterVectorVector::notAtEnd()
 // {
-// 	vector< shared_ptr<ActionParameter> >::iterator tmpVi = vi;
+// 	vector< shared_ptr<PhysicalAction> >::iterator tmpVi = vi;
 // 	temporaryVvi = vvi;
 // 
 // 	if( vvi == vviEnd )
@@ -362,13 +362,13 @@ shared_ptr<ActionParameter>& ActionParameterVectorVector::getCurrent(int& id)
 // 
 // 
 // 
-// returns ActionParameter selected by setCurrentActionType, for current Body
-// shared_ptr<ActionParameter> ActionParameterVectorVector::getCurrent(int & id)
+// returns PhysicalAction selected by setCurrentActionType, for current Body
+// shared_ptr<PhysicalAction> ActionParameterVectorVector::getCurrent(int & id)
 // {
 // 	if( currentActionType < (*aii).size() )
 // 		return (*aii)[currentActionType];
 // 	else
-// 		return shared_ptr<ActionParameter>();
+// 		return shared_ptr<PhysicalAction>();
 // 	id = currentIndex;
 // 	return (*vi);
 // }

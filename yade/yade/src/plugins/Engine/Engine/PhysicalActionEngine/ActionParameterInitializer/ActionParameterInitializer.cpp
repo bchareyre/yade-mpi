@@ -24,7 +24,7 @@
 #include "ActionParameterInitializer.hpp"
 #include "MetaBody.hpp"
 #include "ClassFactory.hpp"
-#include "ActionParameter.hpp"
+#include "PhysicalAction.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -47,12 +47,12 @@ void ActionParameterInitializer::action(Body* body)
 {
 	MetaBody * ncb = dynamic_cast<MetaBody*>(body);
 	
-	vector<shared_ptr<ActionParameter> > actionParameters;
+	vector<shared_ptr<PhysicalAction> > actionParameters;
 	actionParameters.clear();
 	
 	for(unsigned int i = 0 ; i < actionParameterNames.size() ; ++i )
 		actionParameters.push_back(
-			dynamic_pointer_cast<ActionParameter>
+			dynamic_pointer_cast<PhysicalAction>
 				(ClassFactory::instance().createShared(actionParameterNames[i]))
 		);
 	

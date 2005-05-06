@@ -11,7 +11,7 @@ LIBS += -lParticleParameters \
         -lLatticeBeamParameters \
         -lLatticeNodeParameters \
         -lMetaInteractingGeometry \
-        -lActionParameterVectorVector \
+        -lPhysicalActionVectorVector \
         -lInteractionVecSet \
         -lBodyRedirectionVector \
         -rdynamic 

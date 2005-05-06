@@ -4,7 +4,7 @@
 # Target is a library:  
 
 LIBS += -lRigidBodyParameters \
-        -lActionParameterMomentum \
+        -lPhysicalActionMomentum \
         -rdynamic 
 INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 

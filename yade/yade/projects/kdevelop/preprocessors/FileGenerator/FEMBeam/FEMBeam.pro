@@ -8,7 +8,7 @@ LIBS += -lAABB \
         -lPolyhedron \
         -lRigidBodyParameters \
         -lEngine \
-        -lActionParameterInitializer \
+        -lPhysicalActionInitializer \
         -lCundallNonViscousMomentumDamping \
         -lCundallNonViscousForceDamping \
         -lSphere \
@@ -20,14 +20,14 @@ LIBS += -lAABB \
         -lFEMLaw \
         -lFEMTetrahedronStiffness \
         -lMetaInteractingGeometry \
-        -lActionParameterReseter \
+        -lPhysicalActionReseter \
         -lGravityEngine \
         -lTranslationEngine \
         -lyade-lib-serialization \
         -lyade-lib-wm3-math \
         -lInteraction \
         -lyade-lib-multimethods \
-        -lActionParameterVectorVector \
+        -lPhysicalActionVectorVector \
         -lInteractionVecSet \
         -lBodyRedirectionVector \
         -lBody \

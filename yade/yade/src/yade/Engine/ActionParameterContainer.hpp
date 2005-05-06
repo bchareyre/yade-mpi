@@ -32,23 +32,23 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-class ActionParameter;
+class PhysicalAction;
 
 // this container is different: it has ALWAYS data inside, not empty pointers at all. Every field has
 // inside the right pointer type so it can be safely (and quickly) static_casted, so that the user himself
 // is doing addition, substraction, and whatever he wants.
 //
-// you should never have to create new ActionParameter ! (that takes too much time), except for calling prepare, which is done only once
+// you should never have to create new PhysicalAction ! (that takes too much time), except for calling prepare, which is done only once
 
-class ActionParameterContainer : public Serializable
+class PhysicalActionContainer : public Serializable
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Constructor/Destructor									///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public : ActionParameterContainer();
-	public : virtual ~ActionParameterContainer();
+	public : PhysicalActionContainer();
+	public : virtual ~PhysicalActionContainer();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Methods											///
@@ -58,12 +58,12 @@ class ActionParameterContainer : public Serializable
 	// doesn't not delete all, just resets data
 	public    : virtual void reset() 							{throw;};
 	public    : virtual unsigned int size() 						{throw;};
-	// fills container with resetted fields. argument here, should be all ActionParameter types that are planned to use
-	public    : virtual void prepare(std::vector<shared_ptr<ActionParameter> >& )			{throw;};
+	// fills container with resetted fields. argument here, should be all PhysicalAction types that are planned to use
+	public    : virtual void prepare(std::vector<shared_ptr<PhysicalAction> >& )			{throw;};
 	
 	// finds and returns action of given polymorphic type, for body of given Id,
 	// should be always succesfull. if it is not - you forgot to call prepare()
-	public    : virtual shared_ptr<ActionParameter>& find(
+	public    : virtual shared_ptr<PhysicalAction>& find(
 					  unsigned int /*Body->getId() */
 					, int /*ActionParameterForce::getClassIndexStatic()*/)		{throw;};
 
@@ -71,15 +71,15 @@ class ActionParameterContainer : public Serializable
 	public    : virtual void gotoFirst() 							{throw;};
 	public    : virtual bool notAtEnd() 							{throw;};
 	public    : virtual void gotoNext() 							{throw;};
-	public    : virtual shared_ptr<ActionParameter>& getCurrent(int& )				{throw;};
+	public    : virtual shared_ptr<PhysicalAction>& getCurrent(int& )				{throw;};
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Serialization										///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	REGISTER_CLASS_NAME(ActionParameterContainer);
+	REGISTER_CLASS_NAME(PhysicalActionContainer);
 	// local storage for uniform serialization of all possible container concrete implementations.
-	private   : vector<shared_ptr<ActionParameter> > action;
+	private   : vector<shared_ptr<PhysicalAction> > action;
 	public    : virtual void registerAttributes();
 	//protected : virtual void preProcessAttributes(bool deserializing);
 	//protected : virtual void postProcessAttributes(bool deserializing);
@@ -89,7 +89,7 @@ class ActionParameterContainer : public Serializable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-REGISTER_SERIALIZABLE(ActionParameterContainer,false);
+REGISTER_SERIALIZABLE(PhysicalActionContainer,false);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////

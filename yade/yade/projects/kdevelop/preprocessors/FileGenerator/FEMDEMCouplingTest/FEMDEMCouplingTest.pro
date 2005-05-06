@@ -5,7 +5,7 @@
 
 LIBS += -lAABB \
         -lFEMSetParameters \
-        -lActionParameterInitializer \
+        -lPhysicalActionInitializer \
         -lFEMSetTextLoader \
         -lFEMLaw \
         -lBox \
@@ -17,9 +17,9 @@ LIBS += -lAABB \
         -lCundallNonViscousMomentumDamping \
         -lElasticContactLaw \
         -lMetaInteractingGeometry \
-        -lActionParameterReseter \
+        -lPhysicalActionReseter \
         -lGravityEngine \
-        -lActionParameterVectorVector \
+        -lPhysicalActionVectorVector \
         -lInteractionVecSet \
         -lBodyRedirectionVector \
         -rdynamic 

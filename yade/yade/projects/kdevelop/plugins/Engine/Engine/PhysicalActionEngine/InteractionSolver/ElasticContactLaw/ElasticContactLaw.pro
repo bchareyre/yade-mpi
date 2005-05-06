@@ -13,8 +13,8 @@ LIBS += -lEngine \
         -lSDECLinkGeometry \
         -lSDECLinkPhysics \
         -lRigidBodyParameters \
-        -lActionParameterForce \
-        -lActionParameterMomentum \
+        -lPhysicalActionForce \
+        -lPhysicalActionMomentum \
         -lElasticContactParameters \
         -lMacroMicroContactGeometry \
         -lBodyMacroParameters \

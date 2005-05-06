@@ -23,19 +23,19 @@ LIBS += -lMesh2D \
         -lCundallNonViscousForceDamping \
         -lSimpleSpringLaw \
         -lMassSpringLaw \
-        -lActionParameterInitializer \
+        -lPhysicalActionInitializer \
         -lMacroMicroElasticRelationships \
         -lBodyMacroParameters \
         -lMassSpringBody2RigidBodyLaw \
         -lElasticContactLaw \
         -lInteractionDescriptionSet2AABB \
-        -lActionParameterReseter \
+        -lPhysicalActionReseter \
         -lGravityEngine \
         -lyade-lib-serialization \
         -lyade-lib-wm3-math \
         -lInteraction \
         -lyade-lib-multimethods \
-        -lActionParameterVectorVector \
+        -lPhysicalActionVectorVector \
         -lInteractionVecSet \
         -lBodyRedirectionVector \
         -lBody \

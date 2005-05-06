@@ -45,7 +45,7 @@ void CundallNonViscousMomentumDamping::registerAttributes()
 
 // this is Cundall non-viscous local damping, applied to momentum (ActionParameterMomentum)
 
-void CundallNonViscousMomentumDamping::go( 	  const shared_ptr<ActionParameter>& a
+void CundallNonViscousMomentumDamping::go( 	  const shared_ptr<PhysicalAction>& a
 						, const shared_ptr<PhysicalParameters>& b
 						, const Body*)
 {

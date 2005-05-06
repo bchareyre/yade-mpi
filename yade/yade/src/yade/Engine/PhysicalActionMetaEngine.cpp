@@ -52,7 +52,7 @@ void PhysicalActionMetaEngine::action(Body* body)
 	int id;
 	for( ncb->actionParameters->gotoFirst() ; ncb->actionParameters->notAtEnd() ; ncb->actionParameters->gotoNext())
 	{
-		shared_ptr<ActionParameter>& action = ncb->actionParameters->getCurrent(id);
+		shared_ptr<PhysicalAction>& action = ncb->actionParameters->getCurrent(id);
 		// FIXME - solve the problem of Body's id
 		operator()( action , (*bodies)[id]->physicalParameters , (*bodies)[id].get() );
 	}

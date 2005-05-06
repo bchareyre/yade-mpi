@@ -5,12 +5,12 @@
 
 HEADERS += PhysicalActionMetaEngine.hpp \
            PhysicalActionEngineUnit.hpp \
-           ActionParameterContainer.hpp \
-           ActionParameter.hpp \
+           PhysicalActionContainer.hpp \
+           PhysicalAction.hpp \
            InteractionSolver.hpp \
            DeusExMachina.hpp 
 SOURCES += PhysicalActionMetaEngine.cpp \
-           ActionParameterContainer.cpp \
+           PhysicalActionContainer.cpp \
            InteractionSolver.cpp \
            DeusExMachina.cpp 
 LIBS += -rdynamic

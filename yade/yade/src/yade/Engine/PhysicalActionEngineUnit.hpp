@@ -28,7 +28,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "FunctorWrapper.hpp"
-#include "ActionParameter.hpp"
+#include "PhysicalAction.hpp"
 #include "PhysicalParameters.hpp"
 #include "Body.hpp"
 
@@ -38,7 +38,7 @@
 class PhysicalActionEngineUnit : public FunctorWrapper
 		<
 		 void ,
-		 TYPELIST_3(	  const shared_ptr<ActionParameter>&
+		 TYPELIST_3(	  const shared_ptr<PhysicalAction>&
 				, const shared_ptr<PhysicalParameters>&
 				, const Body*
 			   )

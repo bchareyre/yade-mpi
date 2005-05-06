@@ -29,7 +29,7 @@
 
 #include "Engine.hpp"
 #include "DynLibDispatcher.hpp"
-#include "ActionParameter.hpp"
+#include "PhysicalAction.hpp"
 #include "PhysicalActionEngineUnit.hpp"
 
 class Body;
@@ -40,10 +40,10 @@ class Body;
 class PhysicalActionMetaEngine : 
 	  public Engine
 	, public DynLibDispatcher
-		<	  TYPELIST_2( ActionParameter , PhysicalParameters )	// base classess for dispatch
+		<	  TYPELIST_2( PhysicalAction , PhysicalParameters )	// base classess for dispatch
 			, PhysicalActionEngineUnit				// class that provides multivirtual call
 			, void						// return type
-			, TYPELIST_3(	  const shared_ptr<ActionParameter>&	// function arguments
+			, TYPELIST_3(	  const shared_ptr<PhysicalAction>&	// function arguments
 					, const shared_ptr<PhysicalParameters>& 
 					, const Body *
 				    )

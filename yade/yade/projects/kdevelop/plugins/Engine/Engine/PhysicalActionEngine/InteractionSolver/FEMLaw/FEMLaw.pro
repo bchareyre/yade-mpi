@@ -3,7 +3,7 @@
 # Subdir relative project main directory: ./plugins/Engine/Engine/PhysicalActionEngine/InteractionSolver/FEMLaw
 # Target is a library:  
 
-LIBS += -lActionParameterForce \
+LIBS += -lPhysicalActionForce \
         -lParticleParameters \
         -lFEMTetrahedronData \
         -lFEMNodeData \

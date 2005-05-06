@@ -23,7 +23,7 @@ void MassSpringLaw::calculateForces(Body * body)
 	MetaBody * massSpring = dynamic_cast<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = massSpring->bodies;
 	shared_ptr<InteractionContainer>& persistentInteractions = massSpring->persistentInteractions;
-	shared_ptr<ActionParameterContainer>& actionParameters = massSpring->actionParameters;
+	shared_ptr<PhysicalActionContainer>& actionParameters = massSpring->actionParameters;
 	
 	for(persistentInteractions->gotoFirst() ; persistentInteractions->notAtEnd(); persistentInteractions->gotoNext())
 	{

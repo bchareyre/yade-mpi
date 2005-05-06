@@ -2,13 +2,13 @@
 #define __SIMPLESPRINGDYNAMICENGINE_H__
 
 #include "InteractionSolver.hpp"
-class ActionParameter;
+class PhysicalAction;
 
 
 class SimpleSpringLaw : public InteractionSolver
 {
-	private : shared_ptr<ActionParameter> actionForce;
-	private : shared_ptr<ActionParameter> actionMomentum;
+	private : shared_ptr<PhysicalAction> actionForce;
+	private : shared_ptr<PhysicalAction> actionMomentum;
 
 	// construction
 	public : SimpleSpringLaw ();

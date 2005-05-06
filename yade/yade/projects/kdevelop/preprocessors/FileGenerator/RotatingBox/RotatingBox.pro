@@ -14,17 +14,17 @@ LIBS += -lAABB \
         -lCundallNonViscousForceDamping \
         -lCundallNonViscousMomentumDamping \
         -lSimpleSpringLaw \
-        -lActionParameterInitializer \
+        -lPhysicalActionInitializer \
         -lMetaInteractingGeometry \
         -lInteractionDescriptionSet2AABB \
-        -lActionParameterReseter \
+        -lPhysicalActionReseter \
         -lRotationEngine \
         -lGravityEngine \
         -lyade-lib-serialization \
         -lyade-lib-wm3-math \
         -lInteraction \
         -lyade-lib-multimethods \
-        -lActionParameterVectorVector \
+        -lPhysicalActionVectorVector \
         -lInteractionVecSet \
         -lBodyRedirectionVector \
         -lBody \

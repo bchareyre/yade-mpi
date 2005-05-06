@@ -13,8 +13,8 @@ LIBS += -lEngine \
         -lSpringPhysics \
         -lSpringGeometry \
         -lParticleParameters \
-        -lActionParameterForce \
-        -lActionParameterMomentum \
+        -lPhysicalActionForce \
+        -lPhysicalActionMomentum \
         -rdynamic 
 INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 

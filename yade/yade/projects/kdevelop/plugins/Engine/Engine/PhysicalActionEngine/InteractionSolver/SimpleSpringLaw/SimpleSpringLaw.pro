@@ -11,8 +11,8 @@ LIBS += -lEngine \
         -lInteraction \
         -lyade-lib-multimethods \
         -lRigidBodyParameters \
-        -lActionParameterMomentum \
-        -lActionParameterForce \
+        -lPhysicalActionMomentum \
+        -lPhysicalActionForce \
         -rdynamic 
 INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 

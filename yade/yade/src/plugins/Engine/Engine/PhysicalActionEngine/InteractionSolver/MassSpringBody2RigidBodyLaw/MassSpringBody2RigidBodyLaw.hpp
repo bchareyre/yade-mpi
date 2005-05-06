@@ -8,8 +8,8 @@
 class MassSpringBody2RigidBodyLaw : public InteractionSolver
 {
 	public : MassSpringBody2RigidBodyLaw ();
-	private : shared_ptr<ActionParameter> actionForce;	
-	private : shared_ptr<ActionParameter> actionMomentum;
+	private : shared_ptr<PhysicalAction> actionForce;	
+	private : shared_ptr<PhysicalAction> actionMomentum;
 	public  : int sdecGroupMask;
 	public  : int springGroupMask;
 

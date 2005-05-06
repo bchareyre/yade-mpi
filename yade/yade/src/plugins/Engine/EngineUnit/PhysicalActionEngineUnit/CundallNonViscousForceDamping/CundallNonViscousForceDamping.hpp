@@ -37,7 +37,7 @@ class CundallNonViscousForceDamping : public PhysicalActionEngineUnit
 	public		: Real damping;
 	public		: CundallNonViscousForceDamping();
 	
-	public : virtual void go( 	  const shared_ptr<ActionParameter>&
+	public : virtual void go( 	  const shared_ptr<PhysicalAction>&
 					, const shared_ptr<PhysicalParameters>&
 					, const Body*);
 	
