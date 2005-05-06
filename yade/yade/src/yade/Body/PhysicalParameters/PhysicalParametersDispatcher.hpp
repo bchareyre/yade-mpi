@@ -30,7 +30,7 @@
 #include "Engine.hpp"
 #include "DynLibDispatcher.hpp"
 #include "PhysicalParameters.hpp"
-#include "PhysicalParametersFunctor.hpp"
+#include "PhysicalParametersEngineUnit.hpp"
 #include "Body.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -40,7 +40,7 @@ class PhysicalParametersMetaEngine :
 	  public Engine 
 	, public DynLibDispatcher
 		<	PhysicalParameters ,
-			PhysicalParametersFunctor,
+			PhysicalParametersEngineUnit,
 			void ,
 			TYPELIST_2(
 					  const shared_ptr<PhysicalParameters>&

@@ -20,6 +20,6 @@ CONFIG += debug \
 TEMPLATE = lib 
 HEADERS += PhysicalParameters.hpp \
 	   PhysicalParametersMetaEngine.hpp \
-	   PhysicalParametersFunctor.hpp
+	   PhysicalParametersEngineUnit.hpp
 SOURCES += PhysicalParameters.cpp \
 	   PhysicalParametersMetaEngine.cpp
