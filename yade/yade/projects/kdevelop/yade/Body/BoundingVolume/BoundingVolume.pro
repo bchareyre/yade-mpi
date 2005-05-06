@@ -19,7 +19,7 @@ CONFIG += debug \
           dll 
 TEMPLATE = lib 
 HEADERS += BoundingVolume.hpp \
-           BoundingVolumeFunctor.hpp \
+           BoundingVolumeEngineUnit.hpp \
            BoundingVolumeMetaEngine.hpp
 SOURCES += BoundingVolume.cpp \
            BoundingVolumeMetaEngine.cpp

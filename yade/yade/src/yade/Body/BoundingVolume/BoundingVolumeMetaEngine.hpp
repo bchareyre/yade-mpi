@@ -31,7 +31,7 @@
 #include "DynLibDispatcher.hpp"
 #include "InteractingGeometry.hpp"
 #include "BoundingVolume.hpp"
-#include "BoundingVolumeFunctor.hpp"
+#include "BoundingVolumeEngineUnit.hpp"
 #include "Body.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -41,7 +41,7 @@ class BoundingVolumeMetaEngine :
 	  public Engine 
 	, public DynLibDispatcher
 		<	TYPELIST_2( InteractingGeometry , BoundingVolume ) ,		// base classess for dispatch
-			BoundingVolumeFunctor,						// class that provides multivirtual call
+			BoundingVolumeEngineUnit,						// class that provides multivirtual call
 			void ,								// return type
 			TYPELIST_4(
 					  const shared_ptr<InteractingGeometry>&	// arguments

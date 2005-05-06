@@ -48,9 +48,9 @@
 	 
 	For example if you want to build an AABB from a box which is not initially aligned with the world
 	axis, it is not easy to write by hand into the configuration file the center and size of this AABB.
-	Instead you can use a BoundingVolumeFunctor that will compute for you the correct value	
+	Instead you can use a BoundingVolumeEngineUnit that will compute for you the correct value	
 */
-class BoundingVolumeFunctor : public FunctorWrapper
+class BoundingVolumeEngineUnit : public FunctorWrapper
 	/*! Method called to build a given bounding volume from a given collision model and a 3D transformation
 		\param const shared_ptr<InteractingGeometry>& the collision model from wich we want
 		to extract the bounding volume
@@ -69,13 +69,13 @@ class BoundingVolumeFunctor : public FunctorWrapper
 			  )
 		>
 {	
-	REGISTER_CLASS_NAME(BoundingVolumeFunctor);
+	REGISTER_CLASS_NAME(BoundingVolumeEngineUnit);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-REGISTER_SERIALIZABLE(BoundingVolumeFunctor,false);
+REGISTER_SERIALIZABLE(BoundingVolumeEngineUnit,false);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
