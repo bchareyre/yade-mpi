@@ -3,8 +3,7 @@
 # Subdir relative project main directory: ./toolboxes
 # Target is a subdirs project 
 
-SUBDIRS += DataStructures \
-           Libraries 
+SUBDIRS += Libraries 
 MOC_DIR = $(YADECOMPILATIONPATH)
 UI_DIR = $(YADECOMPILATIONPATH)
 OBJECTS_DIR = $(YADECOMPILATIONPATH)
