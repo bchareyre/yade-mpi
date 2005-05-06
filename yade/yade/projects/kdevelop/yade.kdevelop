@@ -99,7 +99,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>plugins/Engine/Sensor/RenderingEngine/OpenGLRenderingEngine/GLDrawInteractingGeometry/GLDrawInteractionSphere</activedir>
+      <activedir>toolboxes/Libraries</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>
