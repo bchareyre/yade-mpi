@@ -99,7 +99,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>toolboxes</activedir>
+      <activedir>toolboxes/Libraries/yade-lib-wm3-math</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>
