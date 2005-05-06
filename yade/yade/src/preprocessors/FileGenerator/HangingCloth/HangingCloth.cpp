@@ -47,6 +47,9 @@
 
 #include "PhysicalParametersDispatcher.hpp"
 
+#include "BodyRedirectionVector.hpp"
+#include "InteractionVecSet.hpp"
+#include "ActionParameterVectorVector.hpp"
 
 HangingCloth::HangingCloth () : FileGenerator()
 {
@@ -125,6 +128,11 @@ void HangingCloth::registerAttributes()
 string HangingCloth::generate()
 {
 	rootBody = shared_ptr<MetaBody>(new MetaBody);
+
+	rootBody->persistentInteractions	= shared_ptr<InteractionContainer>(new InteractionVecSet);
+	rootBody->volatileInteractions		= shared_ptr<InteractionContainer>(new InteractionVecSet);
+	rootBody->actionParameters		= shared_ptr<ActionParameterContainer>(new ActionParameterVectorVector);
+	rootBody->bodies 			= shared_ptr<BodyContainer>(new BodyRedirectionVector);
 
 	shared_ptr<ActionParameterInitializer> actionParameterInitializer(new ActionParameterInitializer);
 	actionParameterInitializer->actionParameterNames.push_back("ActionParameterForce");

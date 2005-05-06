@@ -36,6 +36,8 @@
 #include "AABB.hpp"
 
 #include "BodyRedirectionVector.hpp"
+#include "InteractionVecSet.hpp"
+#include "ActionParameterVectorVector.hpp"
 
 using namespace boost;
 using namespace std;
@@ -77,6 +79,13 @@ string LatticeExample::generate()
 	createActors(rootBody);
 	positionRootBody(rootBody);
 
+	
+	rootBody->persistentInteractions	= shared_ptr<InteractionContainer>(new InteractionVecSet);
+	rootBody->volatileInteractions		= shared_ptr<InteractionContainer>(new InteractionVecSet);
+	rootBody->actionParameters		= shared_ptr<ActionParameterContainer>(new ActionParameterVectorVector);
+	rootBody->bodies 			= shared_ptr<BodyContainer>(new BodyRedirectionVector);
+
+	
 	shared_ptr<Body> body;
 	
 	for( int i=0 ; i<nbNodes[0] ; i++ )

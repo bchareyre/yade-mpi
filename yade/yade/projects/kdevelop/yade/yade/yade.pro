@@ -3,12 +3,7 @@
 # Subdir relative project main directory: ./yade/yade
 # Target is an application:  
 
-LIBS += -lBody \
-        -lInteraction \
-        -lInteractionVecSet \
-        -lInteractionHashMap \
-        -lBodyRedirectionVector \
-        -lBodyAssocVector \
+LIBS += -lInteraction \
         -lInteractionPhysics \
         -lInteractionGeometry \
         -lBoundingVolume \
@@ -21,6 +16,7 @@ LIBS += -lBody \
         -lyade-lib-multimethods \
         -lyade-lib-factory \
         -lyade-lib-threads \
+        -lBody \
         -lboost_thread \
         -lboost_filesystem \
         -lboost_date_time \
@@ -31,12 +27,7 @@ INCLUDEPATH += $(YADEINCLUDEPATH)
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../yade/Body/Body/$(YADEDYNLIBPATH) \
-               ../../yade/Interaction/Interaction/$(YADEDYNLIBPATH) \
-               ../../toolboxes/DataStructures/InteractionContainer/InteractionVecSet/$(YADEDYNLIBPATH) \
-               ../../toolboxes/DataStructures/InteractionContainer/InteractionHashMap/$(YADEDYNLIBPATH) \
-               ../../toolboxes/DataStructures/BodyContainer/BodyRedirectionVector/$(YADEDYNLIBPATH) \
-               ../../toolboxes/DataStructures/BodyContainer/BodyAssocVector/$(YADEDYNLIBPATH) \
+QMAKE_LIBDIR = ../../yade/Interaction/Interaction/$(YADEDYNLIBPATH) \
                ../../yade/Interaction/InteractionPhysics/$(YADEDYNLIBPATH) \
                ../../yade/Interaction/InteractionGeometry/$(YADEDYNLIBPATH) \
                ../../yade/Body/BoundingVolume/$(YADEDYNLIBPATH) \
@@ -44,11 +35,11 @@ QMAKE_LIBDIR = ../../yade/Body/Body/$(YADEDYNLIBPATH) \
                ../../yade/Body/GeometricalModel/$(YADEDYNLIBPATH) \
                ../../yade/Body/PhysicalParameters/$(YADEDYNLIBPATH) \
                ../../yade/Engine/$(YADEDYNLIBPATH) \
-               ../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
-               ../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
-               ../../toolboxes/Libraries/MultiMethods/$(YADEDYNLIBPATH) \
-               ../../toolboxes/Libraries/Factory/$(YADEDYNLIBPATH) \
-               ../../toolboxes/Libraries/Threads/$(YADEDYNLIBPATH) \
+               ../../toolboxes/Libraries/yade-lib-serialization/$(YADEDYNLIBPATH) \
+               ../../toolboxes/Libraries/yade-lib-wm3-math/$(YADEDYNLIBPATH) \
+               ../../toolboxes/Libraries/yade-lib-multimethods/$(YADEDYNLIBPATH) \
+               ../../toolboxes/Libraries/yade-lib-factory/$(YADEDYNLIBPATH) \
+               ../../toolboxes/Libraries/yade-lib-threads/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

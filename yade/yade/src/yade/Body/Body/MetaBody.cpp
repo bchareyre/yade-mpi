@@ -4,21 +4,21 @@
 #include "Engine.hpp"
 
 ////////// Containers
-#include "InteractionVecSet.hpp"
-#include "InteractionHashMap.hpp"
-#include "BodyRedirectionVector.hpp"
-#include "BodyAssocVector.hpp"
-#include "ActionParameterVectorVector.hpp"
+//#include "InteractionVecSet.hpp"
+//#include "InteractionHashMap.hpp"
+//#include "BodyRedirectionVector.hpp"
+//#include "BodyAssocVector.hpp"
+//#include "ActionParameterVectorVector.hpp"
 //////////
 
 
-// FIXME - who is to decide which class to use by default?
+// FIXME - who is to decide which class to use by default? -- Olivier : I think nobody ! It will be done automatically while deserializing
 MetaBody::MetaBody() :
 	  Body()
-	, bodies(new BodyRedirectionVector)
-	, persistentInteractions(new InteractionVecSet)
-	, volatileInteractions(new InteractionVecSet)
-	, actionParameters(new ActionParameterVectorVector)
+	//, bodies(new BodyRedirectionVector)
+	//, persistentInteractions(new InteractionVecSet)
+	//, volatileInteractions(new InteractionVecSet)
+	//, actionParameters(new ActionParameterVectorVector)
 {	
 	actors.clear();
 	initializers.clear();
@@ -47,7 +47,7 @@ void MetaBody::registerAttributes()
 	REGISTER_ATTRIBUTE(bodies);
 	REGISTER_ATTRIBUTE(volatileInteractions);
 	REGISTER_ATTRIBUTE(persistentInteractions);
-//	REGISTER_ATTRIBUTE(actionParameters); // FIXME - needed or not ?
+	REGISTER_ATTRIBUTE(actionParameters); // FIXME - needed or not ? - Olivier : yes it is needed if there is no default initialization into constructor
 }
 
 

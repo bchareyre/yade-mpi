@@ -54,6 +54,11 @@
 #include "InteractingSphere.hpp"
 #include "ActionParameterDispatcher.hpp"
 
+
+#include "BodyRedirectionVector.hpp"
+#include "InteractionVecSet.hpp"
+#include "ActionParameterVectorVector.hpp"
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -119,6 +124,11 @@ void SDECTriaxialTest::registerAttributes()
 
 string SDECTriaxialTest::generate()
 {
+// 	rootBody->persistentInteractions	= shared_ptr<InteractionContainer>(new InteractionVecSet);
+// 	rootBody->volatileInteractions		= shared_ptr<InteractionContainer>(new InteractionVecSet);
+// 	rootBody->actionParameters		= shared_ptr<ActionParameterContainer>(new ActionParameterVectorVector);
+// 	rootBody->bodies 			= shared_ptr<BodyContainer>(new BodyRedirectionVector);
+
 	return "Not ready yet.";
 }
 

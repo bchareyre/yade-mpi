@@ -30,6 +30,11 @@
 #include "GravityEngine.hpp"
 #include "PhysicalParametersDispatcher.hpp"
 
+#include "BodyRedirectionVector.hpp"
+#include "InteractionVecSet.hpp"
+#include "ActionParameterVectorVector.hpp"
+
+
 BoxStack::BoxStack () : FileGenerator()
 {
 	nbBoxes		= Vector3r(1,5,7);
@@ -72,6 +77,14 @@ string BoxStack::generate()
 
 	createActors(rootBody);
 	positionRootBody(rootBody);
+	
+	////////////////////////////////////
+
+	rootBody->persistentInteractions	= shared_ptr<InteractionContainer>(new InteractionVecSet);
+	rootBody->volatileInteractions		= shared_ptr<InteractionContainer>(new InteractionVecSet);
+	rootBody->actionParameters		= shared_ptr<ActionParameterContainer>(new ActionParameterVectorVector);
+	rootBody->bodies 			= shared_ptr<BodyContainer>(new BodyRedirectionVector);
+
 	shared_ptr<Body> body;
 	
 	createKinematicBox(body, Vector3r(0,  -5,  0), Vector3r(  200, 5, 200), false);

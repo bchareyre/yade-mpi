@@ -35,7 +35,9 @@
 #include "InteractingSphere.hpp"
 #include "PhysicalParametersDispatcher.hpp"
 
-
+#include "BodyRedirectionVector.hpp"
+#include "InteractionVecSet.hpp"
+#include "ActionParameterVectorVector.hpp"
 
 SDECSpheresPlane::SDECSpheresPlane () : FileGenerator()
 {
@@ -89,6 +91,14 @@ string SDECSpheresPlane::generate()
 	createActors(rootBody);
 	positionRootBody(rootBody);
 
+////////////////////////////////////
+///////// Container
+	
+	rootBody->persistentInteractions	= shared_ptr<InteractionContainer>(new InteractionVecSet);
+	rootBody->volatileInteractions		= shared_ptr<InteractionContainer>(new InteractionVecSet);
+	rootBody->actionParameters		= shared_ptr<ActionParameterContainer>(new ActionParameterVectorVector);
+	rootBody->bodies 			= shared_ptr<BodyContainer>(new BodyRedirectionVector);
+		
 ////////////////////////////////////
 ///////// ground
 

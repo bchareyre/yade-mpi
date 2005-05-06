@@ -28,6 +28,10 @@
 #include "GravityEngine.hpp"
 #include "PhysicalParametersDispatcher.hpp"
 
+#include "BodyRedirectionVector.hpp"
+#include "InteractionVecSet.hpp"
+#include "ActionParameterVectorVector.hpp"
+
 RotatingBox::RotatingBox () : FileGenerator()
 {
 	nbSpheres	= Vector3r(3,3,5);
@@ -75,6 +79,13 @@ string RotatingBox::generate()
 
 	createActors(rootBody);
 	positionRootBody(rootBody);
+	
+	rootBody->persistentInteractions	= shared_ptr<InteractionContainer>(new InteractionVecSet);
+	rootBody->volatileInteractions		= shared_ptr<InteractionContainer>(new InteractionVecSet);
+	rootBody->actionParameters		= shared_ptr<ActionParameterContainer>(new ActionParameterVectorVector);
+	rootBody->bodies 			= shared_ptr<BodyContainer>(new BodyRedirectionVector);
+
+	
 	shared_ptr<Body> body;
 	
 	createKinematicBox(body, Vector3r(  0,  0, 10), Vector3r( 50,  5, 40),middleWireFrame);	rootBody->bodies->insert(body);

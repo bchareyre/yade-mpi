@@ -3,8 +3,7 @@
 # Subdir relative project main directory: ./yade/Body/Body
 # Target is a library:  
 
-LIBS += -lActionParameterVectorVector \
-        -rdynamic 
+LIBS += -rdynamic 
 INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
@@ -21,7 +20,7 @@ CONFIG += debug \
 TEMPLATE = lib 
 HEADERS += Body.hpp \
            BodyContainer.hpp \
-           MetaBody.hpp
+           MetaBody.hpp 
 SOURCES += Body.cpp \
            BodyContainer.cpp \
-           MetaBody.cpp
+           MetaBody.cpp 

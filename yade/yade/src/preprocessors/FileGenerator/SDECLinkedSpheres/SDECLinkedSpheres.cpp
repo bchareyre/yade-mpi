@@ -37,6 +37,10 @@
 #include "ActionParameterInitializer.hpp"
 #include "PhysicalParametersDispatcher.hpp"
 
+#include "BodyRedirectionVector.hpp"
+#include "InteractionVecSet.hpp"
+#include "ActionParameterVectorVector.hpp"
+
 SDECLinkedSpheres::SDECLinkedSpheres () : FileGenerator()
 {
 	nbSpheres = Vector3r(2,2,20);
@@ -94,6 +98,13 @@ string SDECLinkedSpheres::generate()
 	rootBody = shared_ptr<MetaBody>(new MetaBody);
 	createActors(rootBody);
 	positionRootBody(rootBody);
+
+////////////////////////////////////
+	
+	rootBody->persistentInteractions	= shared_ptr<InteractionContainer>(new InteractionVecSet);
+	rootBody->volatileInteractions		= shared_ptr<InteractionContainer>(new InteractionVecSet);
+	rootBody->actionParameters		= shared_ptr<ActionParameterContainer>(new ActionParameterVectorVector);
+	rootBody->bodies 			= shared_ptr<BodyContainer>(new BodyRedirectionVector);
 
 ////////////////////////////////////
 
