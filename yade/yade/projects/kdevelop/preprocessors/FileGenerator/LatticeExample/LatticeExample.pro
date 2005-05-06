@@ -12,18 +12,18 @@ LIBS += -lParticleParameters \
         -lLatticeNodeParameters \
         -lMetaInteractingGeometry \
         -rdynamic 
-INCLUDEPATH = $(YADEINCLUDEPATH) 
+INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../plugins/Body/PhysicalParameters/ParticleParameters/$(YADEDYNLIBPATH) \
-               ../../../plugins/Body/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
-               ../../../plugins/Body/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
-               ../../../plugins/Body/GeometricalModel/LineSegment/$(YADEDYNLIBPATH) \
-               ../../../plugins/Body/PhysicalParameters/LatticeSetParameters/$(YADEDYNLIBPATH) \
-               ../../../plugins/Body/PhysicalParameters/LatticeBeamParameters/$(YADEDYNLIBPATH) \
-               ../../../plugins/Body/PhysicalParameters/LatticeNodeParameters/$(YADEDYNLIBPATH) \
-               ../../../plugins/Body/InteractingGeometry/MetaInteractingGeometry/$(YADEDYNLIBPATH) \
+QMAKE_LIBDIR = ../../../plugins/Data/Body/PhysicalParameters/ParticleParameters/$(YADEDYNLIBPATH) \
+               ../../../plugins/Data/Body/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
+               ../../../plugins/Data/Body/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
+               ../../../plugins/Data/Body/GeometricalModel/LineSegment/$(YADEDYNLIBPATH) \
+               ../../../plugins/Data/Body/PhysicalParameters/LatticeSetParameters/$(YADEDYNLIBPATH) \
+               ../../../plugins/Data/Body/PhysicalParameters/LatticeBeamParameters/$(YADEDYNLIBPATH) \
+               ../../../plugins/Data/Body/PhysicalParameters/LatticeNodeParameters/$(YADEDYNLIBPATH) \
+               ../../../plugins/Data/Body/InteractingGeometry/MetaInteractingGeometry/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

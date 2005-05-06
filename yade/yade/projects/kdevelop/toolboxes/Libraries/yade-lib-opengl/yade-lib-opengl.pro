@@ -3,15 +3,6 @@
 # Subdir relative project main directory: ./toolboxes/Libraries/yade-lib-opengl
 # Target is a library:  
 
-HEADERS += FpsTracker.hpp \
-           GLTextLabel.hpp \
-           GLWindow.hpp \
-           GLWindowsManager.hpp \
-           OpenGLWrapper.hpp 
-SOURCES += FpsTracker.cpp \
-           GLTextLabel.cpp \
-           GLWindow.cpp \
-           GLWindowsManager.cpp 
 INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
@@ -22,3 +13,12 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
+HEADERS += FpsTracker.hpp \
+           GLTextLabel.hpp \
+           GLWindow.hpp \
+           GLWindowsManager.hpp \
+           OpenGLWrapper.hpp 
+SOURCES += FpsTracker.cpp \
+           GLTextLabel.cpp \
+           GLWindow.cpp \
+           GLWindowsManager.cpp 

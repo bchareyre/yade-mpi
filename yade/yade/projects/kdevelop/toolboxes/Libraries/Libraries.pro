@@ -3,12 +3,12 @@
 # Subdir relative project main directory: ./toolboxes/Libraries
 # Target is a subdirs project 
 
-SUBDIRS += yade-lib-factory \
-           yade-lib-loki \
-           yade-lib-multimethods \
+SUBDIRS += yade-lib-loki \
+	   yade-lib-wm3-math \
+           yade-lib-factory \
+	   yade-lib-multimethods \
            yade-lib-serialization \
            yade-lib-threads \
-           yade-lib-wm3-math \
            yade-lib-computational-geometry \
            yade-lib-opengl 
 MOC_DIR = $(YADECOMPILATIONPATH)

@@ -3,34 +3,27 @@
 # Subdir relative project main directory: ./plugins/Engine/EngineUnit/BodyEngineUnit/PhysicalParametersEngineUnit/FEMSetTextLoader
 # Target is a library:  
 
+LIBS += -lParticleParameters \
+        -lRigidBodyParameters \
+        -lFEMSetParameters \
+        -lFEMNodeData \
+        -lFEMTetrahedronData \
+        -lSphere \
+        -lTetrahedron \
+        -rdynamic 
+INCLUDEPATH += $(YADEINCLUDEPATH) 
+MOC_DIR = $(YADECOMPILATIONPATH) 
+UI_DIR = $(YADECOMPILATIONPATH) 
+OBJECTS_DIR = $(YADECOMPILATIONPATH) 
+QMAKE_LIBDIR = $(YADEDYNLIBPATH) 
+QMAKE_CXXFLAGS_RELEASE += -lpthread \
+                          -pthread 
+QMAKE_CXXFLAGS_DEBUG += -lpthread \
+                        -pthread 
+DESTDIR = $(YADEDYNLIBPATH) 
+CONFIG += debug \
+          warn_on \
+          dll 
+TEMPLATE = lib 
 HEADERS += FEMSetTextLoader.hpp 
 SOURCES += FEMSetTextLoader.cpp 
-LIBS += -lParticleParameters \
--lRigidBodyParameters \
--lFEMSetParameters \
--lFEMNodeData \
--lFEMTetrahedronData \
--lSphere \
--lTetrahedron \
--rdynamic
-INCLUDEPATH += $(YADEINCLUDEPATH)
-MOC_DIR = $(YADECOMPILATIONPATH)
-UI_DIR = $(YADECOMPILATIONPATH)
-OBJECTS_DIR = $(YADECOMPILATIONPATH)
-QMAKE_LIBDIR = ../../../../plugins/Body/PhysicalParameters/ParticleParameters/$(YADEDYNLIBPATH) \
-../../../../plugins/Body/PhysicalParameters/RigidBodyParameters/$(YADEDYNLIBPATH) \
-../../../../plugins/Body/PhysicalParameters/FEMSetParameters/$(YADEDYNLIBPATH) \
-../../../../plugins/Body/PhysicalParameters/FEMNodeData/$(YADEDYNLIBPATH) \
-../../../../plugins/Body/PhysicalParameters/FEMTetrahedronData/$(YADEDYNLIBPATH) \
-../../../../plugins/Body/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
-../../../../plugins/Body/GeometricalModel/Tetrahedron/$(YADEDYNLIBPATH) \
-$(YADEDYNLIBPATH)
-QMAKE_CXXFLAGS_RELEASE += -lpthread \
--pthread
-QMAKE_CXXFLAGS_DEBUG += -lpthread \
--pthread
-DESTDIR = $(YADEDYNLIBPATH)
-CONFIG += debug \
-warn_on \
-dll
-TEMPLATE = lib

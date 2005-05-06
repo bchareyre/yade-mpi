@@ -7,16 +7,16 @@ QtGeneratedSimulationController.ui.target = QtGeneratedSimulationController.ui
 QtGeneratedFrontEnd.ui.target = QtGeneratedFrontEnd.ui 
 QtGUISignalCatcher.ui.target = QtGUISignalCatcher.ui 
 QtFileGeneratorController.ui.target = QtFileGeneratorController.ui 
-LIBS += -lSerialization \
-        -lMath \
-        -lBody \
-        -lInteraction \
-        -lMultiMethods \
-        -lXMLManager \
-        -lFactory \
-        -lGLWindowManager \
-        -lThreads \
+LIBS += -lBody \
         -lOpenGLRenderingEngine \
+        -lyade-lib-wm3-math \
+        -lyade-lib-multimethods \
+        -lyade-lib-factory \
+        -lyade-lib-opengl \
+        -lyade-lib-threads \
+        -lXMLManager \
+        -lyade-lib-serialization \
+        -lInteraction \
         -lboost_date_time \
         -lboost_filesystem \
         -rdynamic 
@@ -24,16 +24,13 @@ INCLUDEPATH += $(YADEINCLUDEPATH)
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
-               ../../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
-               ../../../yade/Body/Body/$(YADEDYNLIBPATH) \
-               ../../../yade/Interaction/Interaction/$(YADEDYNLIBPATH) \
-               ../../../toolboxes/Libraries/MultiMethods/$(YADEDYNLIBPATH) \
-               ../../../extensions/IOManager/XMLManager/$(YADEDYNLIBPATH) \
-               ../../../toolboxes/Libraries/Factory/$(YADEDYNLIBPATH) \
-               ../../../toolboxes/OpenGL/GLWindowManager/$(YADEDYNLIBPATH) \
-               ../../../toolboxes/Libraries/Threads/$(YADEDYNLIBPATH) \
-               ../../../extensions/RenderingEngines/OpenGLRenderingEngine/OpenGLRenderingEngine/$(YADEDYNLIBPATH) \
+QMAKE_LIBDIR = ../../../yade/Body/Body/$(YADEDYNLIBPATH) \
+               ../../../plugins/Engine/Sensor/RenderingEngine/OpenGLRenderingEngine/OpenGLRenderingEngine/$(YADEDYNLIBPATH) \
+               ../../../toolboxes/Libraries/yade-lib-wm3-math/$(YADEDYNLIBPATH) \
+               ../../../toolboxes/Libraries/yade-lib-multimethods/$(YADEDYNLIBPATH) \
+               ../../../toolboxes/Libraries/yade-lib-factory/$(YADEDYNLIBPATH) \
+               ../../../toolboxes/Libraries/yade-lib-opengl/$(YADEDYNLIBPATH) \
+               ../../../toolboxes/Libraries/yade-lib-threads/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 
