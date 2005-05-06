@@ -31,7 +31,7 @@
 #include "Body.hpp"
 #include "MetaInteractingGeometry.hpp"
 #include "BoundingVolumeMetaEngine.hpp"
-#include "GeometricalModelDispatcher.hpp"
+#include "GeometricalModelMetaEngine.hpp"
 
 #include "AABB.hpp"
 
@@ -238,7 +238,7 @@ void LatticeExample::createActors(shared_ptr<MetaBody>& )
 	shared_ptr<BoundingVolumeMetaEngine> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeMetaEngine>(new BoundingVolumeMetaEngine);
 	boundingVolumeDispatcher->add("MetaInteractingGeometry","AABB","InteractionDescriptionSet2AABB");
 
-	shared_ptr<GeometricalModelDispatcher> geometricalModelDispatcher	= shared_ptr<GeometricalModelDispatcher>(new GeometricalModelDispatcher);
+	shared_ptr<GeometricalModelMetaEngine> geometricalModelDispatcher	= shared_ptr<GeometricalModelMetaEngine>(new GeometricalModelMetaEngine);
 	geometricalModelDispatcher->add("LatticeSetParameters","LatticeSetGeometry","LatticeSet2LatticeBeams");
 	
 	rootBody->actors.clear();

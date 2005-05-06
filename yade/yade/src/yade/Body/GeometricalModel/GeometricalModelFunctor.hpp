@@ -49,7 +49,7 @@
 	Parameters of the Body can affect "perfect geometrical representation"(GeometricalModel) of
 	the Body. So it is given as first argument.
 */
-class GeometricalModelFunctor : public FunctorWrapper
+class GeometricalModelEngineUnit : public FunctorWrapper
 		<
 		 void ,
 		 TYPELIST_3(
@@ -59,13 +59,13 @@ class GeometricalModelFunctor : public FunctorWrapper
 			   )
 		>
 {	
-	REGISTER_CLASS_NAME(GeometricalModelFunctor);
+	REGISTER_CLASS_NAME(GeometricalModelEngineUnit);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-REGISTER_SERIALIZABLE(GeometricalModelFunctor,false);
+REGISTER_SERIALIZABLE(GeometricalModelEngineUnit,false);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////

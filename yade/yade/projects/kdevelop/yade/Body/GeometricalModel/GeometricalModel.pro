@@ -19,7 +19,7 @@ CONFIG += debug \
           dll 
 TEMPLATE = lib 
 HEADERS += GeometricalModel.hpp \
-           GeometricalModelFunctor.hpp \
-           GeometricalModelDispatcher.hpp 
+           GeometricalModelEngineUnit.hpp \
+           GeometricalModelMetaEngine.hpp 
 SOURCES += GeometricalModel.cpp \
-           GeometricalModelDispatcher.cpp 
+           GeometricalModelMetaEngine.cpp 

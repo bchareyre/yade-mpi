@@ -31,17 +31,17 @@
 #include "DynLibDispatcher.hpp"
 #include "PhysicalParameters.hpp"
 #include "GeometricalModel.hpp"
-#include "GeometricalModelFunctor.hpp"
+#include "GeometricalModelEngineUnit.hpp"
 #include "Body.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class GeometricalModelDispatcher :
+class GeometricalModelMetaEngine :
 	  public Engine 
 	, public DynLibDispatcher
 		<	TYPELIST_2( PhysicalParameters , GeometricalModel ) ,
-			GeometricalModelFunctor,
+			GeometricalModelEngineUnit,
 			void ,
 			TYPELIST_3(
 					const shared_ptr<PhysicalParameters>&
@@ -53,13 +53,13 @@ class GeometricalModelDispatcher :
 	public		: virtual void action(Body* b);
 	public		: virtual void registerAttributes();
 	public		: virtual void postProcessAttributes(bool deserializing);
-	REGISTER_CLASS_NAME(GeometricalModelDispatcher);
+	REGISTER_CLASS_NAME(GeometricalModelMetaEngine);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-REGISTER_SERIALIZABLE(GeometricalModelDispatcher,false);
+REGISTER_SERIALIZABLE(GeometricalModelMetaEngine,false);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////

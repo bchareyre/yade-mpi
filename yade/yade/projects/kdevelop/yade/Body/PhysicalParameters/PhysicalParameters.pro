@@ -19,7 +19,7 @@ CONFIG += debug \
           dll 
 TEMPLATE = lib 
 HEADERS += PhysicalParameters.hpp \
-	   PhysicalParametersDispatcher.hpp \
+	   PhysicalParametersMetaEngine.hpp \
 	   PhysicalParametersFunctor.hpp
 SOURCES += PhysicalParameters.cpp \
-	   PhysicalParametersDispatcher.cpp
+	   PhysicalParametersMetaEngine.cpp

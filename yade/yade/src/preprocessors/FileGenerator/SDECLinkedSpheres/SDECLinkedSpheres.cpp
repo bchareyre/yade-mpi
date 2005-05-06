@@ -35,7 +35,7 @@
 
 #include "ActionParameterReseter.hpp"
 #include "ActionParameterInitializer.hpp"
-#include "PhysicalParametersDispatcher.hpp"
+#include "PhysicalParametersMetaEngine.hpp"
 
 #include "BodyRedirectionVector.hpp"
 #include "InteractionVecSet.hpp"
@@ -328,9 +328,9 @@ void SDECLinkedSpheres::createActors(shared_ptr<MetaBody>& rootBody)
 	applyActionDispatcher->add("ActionParameterForce","ParticleParameters","NewtonsForceLaw");
 	applyActionDispatcher->add("ActionParameterMomentum","RigidBodyParameters","NewtonsMomentumLaw");
 	
-	shared_ptr<PhysicalParametersDispatcher> positionIntegrator(new PhysicalParametersDispatcher);
+	shared_ptr<PhysicalParametersMetaEngine> positionIntegrator(new PhysicalParametersMetaEngine);
 	positionIntegrator->add("ParticleParameters","LeapFrogPositionIntegrator");
-	shared_ptr<PhysicalParametersDispatcher> orientationIntegrator(new PhysicalParametersDispatcher);
+	shared_ptr<PhysicalParametersMetaEngine> orientationIntegrator(new PhysicalParametersMetaEngine);
 	orientationIntegrator->add("RigidBodyParameters","LeapFrogOrientationIntegrator");
  	
 	shared_ptr<SDECTimeStepper> sdecTimeStepper(new SDECTimeStepper);

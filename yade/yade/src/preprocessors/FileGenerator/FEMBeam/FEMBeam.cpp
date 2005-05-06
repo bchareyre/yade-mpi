@@ -26,12 +26,12 @@
 #include "Body.hpp"
 
 // dispatchers
-#include "PhysicalParametersDispatcher.hpp"
+#include "PhysicalParametersMetaEngine.hpp"
 #include "InteractionGeometryDispatcher.hpp"
 #include "InteractionPhysicsDispatcher.hpp"
 #include "ActionParameterDispatcher.hpp"
 #include "BoundingVolumeMetaEngine.hpp"
-#include "GeometricalModelDispatcher.hpp"
+#include "GeometricalModelMetaEngine.hpp"
 
 #include <boost/filesystem/convenience.hpp>
 
@@ -123,13 +123,13 @@ void FEMBeam::createActors(shared_ptr<MetaBody>& rootBody)
 	shared_ptr<FEMSetTextLoader> femSetTextLoaderFunctor	= shared_ptr<FEMSetTextLoader>(new FEMSetTextLoader);
 	femSetTextLoaderFunctor->fileName = femTxtFile;
 
-	shared_ptr<PhysicalParametersDispatcher> bodyPhysicalParametersDispatcher(new PhysicalParametersDispatcher);
+	shared_ptr<PhysicalParametersMetaEngine> bodyPhysicalParametersDispatcher(new PhysicalParametersMetaEngine);
 	bodyPhysicalParametersDispatcher->add("FEMSetParameters","FEMTetrahedronStiffness");
 	
-	shared_ptr<GeometricalModelDispatcher> geometricalModelDispatcher	= shared_ptr<GeometricalModelDispatcher>(new GeometricalModelDispatcher);
+	shared_ptr<GeometricalModelMetaEngine> geometricalModelDispatcher	= shared_ptr<GeometricalModelMetaEngine>(new GeometricalModelMetaEngine);
 	geometricalModelDispatcher->add("FEMSetParameters","FEMSetGeometry","FEMSet2Tetrahedrons");
 	
-	shared_ptr<PhysicalParametersDispatcher> positionIntegrator(new PhysicalParametersDispatcher);
+	shared_ptr<PhysicalParametersMetaEngine> positionIntegrator(new PhysicalParametersMetaEngine);
 	positionIntegrator->add("ParticleParameters","LeapFrogPositionIntegrator");
 	
 	shared_ptr<FEMLaw> femLaw(new FEMLaw);

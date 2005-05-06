@@ -1,9 +1,9 @@
 #ifndef __TERRAINFROMWRL1FILEFACTORY_H__
 #define __TERRAINFROMWRL1FILEFACTORY_H__
 
-#include "GeometricalModelFunctor.hpp"
+#include "GeometricalModelEngineUnit.hpp"
 
-class VRML2Terrain : public GeometricalModelFunctor
+class VRML2Terrain : public GeometricalModelEngineUnit
 {
 	REGISTER_CLASS_NAME(VRML2Terrain);
 };
