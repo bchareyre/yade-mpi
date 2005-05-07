@@ -14,9 +14,7 @@ LIBS += -lBox \
         -lCundallNonViscousMomentumDamping \
         -lCundallNonViscousForceDamping \
         -lSimpleSpringLaw \
-        -lPhysicalActionInitializer \
         -lInteractionDescriptionSet2AABB \
-        -lPhysicalActionReseter \
         -lTranslationEngine \
         -lGravityEngine \
         -lyade-lib-serialization \
@@ -27,6 +25,8 @@ LIBS += -lBox \
         -lInteractionVecSet \
         -lBodyRedirectionVector \
         -lBody \
+        -lPhysicalActionContainerInitializer \
+        -lPhysicalActionContainerReseter \
         -rdynamic 
 INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
@@ -43,9 +43,7 @@ QMAKE_LIBDIR = ../../../plugins/Data/Body/GeometricalModel/Box/$(YADEDYNLIBPATH)
                ../../../plugins/Engine/EngineUnit/PhysicalActionEngineUnit/CundallNonViscousMomentumDamping/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/EngineUnit/PhysicalActionEngineUnit/CundallNonViscousForceDamping/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/Engine/PhysicalActionEngine/InteractionSolver/SimpleSpringLaw/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/Engine/PhysicalActionEngine/PhysicalActionContainerInitializer/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/EngineUnit/BodyEngineUnit/BoundingVolumeEngineUnit/InteractionDescriptionSet2AABB/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/Engine/PhysicalActionEngine/PhysicalActionContainerReseter/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/DeusExMachina/TranslationEngine/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/DeusExMachina/GravityEngine/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/yade-lib-serialization/$(YADEDYNLIBPATH) \

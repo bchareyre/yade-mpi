@@ -15,13 +15,11 @@ LIBS += -lBox \
         -lEngine \
         -lCundallNonViscousMomentumDamping \
         -lCundallNonViscousForceDamping \
-        -lPhysicalActionInitializer \
         -lMacroMicroElasticRelationships \
         -lSDECTimeStepper \
         -lElasticContactLaw \
         -lMetaInteractingGeometry \
         -lInteractionDescriptionSet2AABB \
-        -lPhysicalActionReseter \
         -lGravityEngine \
         -lyade-lib-serialization \
         -lyade-lib-wm3-math \
@@ -31,6 +29,8 @@ LIBS += -lBox \
         -lInteractionVecSet \
         -lBodyRedirectionVector \
         -lBody \
+        -lPhysicalActionContainerInitializer \
+        -lPhysicalActionContainerReseter \
         -rdynamic 
 INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
@@ -48,13 +48,11 @@ QMAKE_LIBDIR = ../../../plugins/Data/Body/GeometricalModel/Box/$(YADEDYNLIBPATH)
                ../../../yade/Engine/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/EngineUnit/PhysicalActionEngineUnit/CundallNonViscousMomentumDamping/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/EngineUnit/PhysicalActionEngineUnit/CundallNonViscousForceDamping/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/Engine/PhysicalActionEngine/PhysicalActionContainerInitializer/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/EngineUnit/InteractionEngineUnit/InteractionPhysicsEngineUnit/ElasticContactParameters/MacroMicroElasticRelationships/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/TimeStepper/SDECTimeStepper/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/Engine/PhysicalActionEngine/InteractionSolver/ElasticContactLaw/$(YADEDYNLIBPATH) \
                ../../../plugins/Data/Body/InteractingGeometry/MetaInteractingGeometry/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/EngineUnit/BodyEngineUnit/BoundingVolumeEngineUnit/InteractionDescriptionSet2AABB/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/Engine/PhysicalActionEngine/PhysicalActionContainerReseter/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/DeusExMachina/GravityEngine/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/yade-lib-serialization/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/yade-lib-wm3-math/$(YADEDYNLIBPATH) \

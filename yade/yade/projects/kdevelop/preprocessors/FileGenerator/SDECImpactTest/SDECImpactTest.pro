@@ -19,13 +19,11 @@ LIBS += -lAveragePositionRecorder \
         -lSAPCollider \
         -lCundallNonViscousMomentumDamping \
         -lCundallNonViscousForceDamping \
-        -lPhysicalActionInitializer \
         -lMacroMicroElasticRelationships \
         -lSDECTimeStepper \
         -lElasticContactLaw \
         -lMetaInteractingGeometry \
         -lInteractionDescriptionSet2AABB \
-        -lPhysicalActionReseter \
         -lGravityEngine \
         -lyade-lib-serialization \
         -lInteraction \
@@ -33,6 +31,8 @@ LIBS += -lAveragePositionRecorder \
         -lInteractionVecSet \
         -lBodyRedirectionVector \
         -lBody \
+        -lPhysicalActionContainerInitializer \
+        -lPhysicalActionContainerReseter \
         -lForceRecorder \
         -rdynamic 
 INCLUDEPATH += $(YADEINCLUDEPATH) 
@@ -55,13 +55,11 @@ QMAKE_LIBDIR = ../../../plugins/Engine/Sensor/DataRecorderEngine/AveragePosition
                ../../../plugins/Engine/Engine/InteractionEngine/BroadInteractionEngine/SAPCollider/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/EngineUnit/PhysicalActionEngineUnit/CundallNonViscousMomentumDamping/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/EngineUnit/PhysicalActionEngineUnit/CundallNonViscousForceDamping/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/Engine/PhysicalActionEngine/PhysicalActionContainerInitializer/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/EngineUnit/InteractionEngineUnit/InteractionPhysicsEngineUnit/ElasticContactParameters/MacroMicroElasticRelationships/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/TimeStepper/SDECTimeStepper/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/Engine/PhysicalActionEngine/InteractionSolver/ElasticContactLaw/$(YADEDYNLIBPATH) \
                ../../../plugins/Data/Body/InteractingGeometry/MetaInteractingGeometry/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/EngineUnit/BodyEngineUnit/BoundingVolumeEngineUnit/InteractionDescriptionSet2AABB/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/Engine/PhysicalActionEngine/PhysicalActionContainerReseter/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/DeusExMachina/GravityEngine/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/yade-lib-serialization/$(YADEDYNLIBPATH) \
                ../../../yade/Interaction/Interaction/$(YADEDYNLIBPATH) \
