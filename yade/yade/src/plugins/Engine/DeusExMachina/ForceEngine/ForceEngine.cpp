@@ -23,13 +23,13 @@
 
 #include "ForceEngine.hpp"
 #include "ParticleParameters.hpp"
-#include "ActionParameterForce.hpp"
+#include "Force.hpp"
 #include "MetaBody.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-ForceEngine::ForceEngine() : force(Vector3r::ZERO) , actionParameterForce(new ActionParameterForce)
+ForceEngine::ForceEngine() : force(Vector3r::ZERO) , actionParameterForce(new Force)
 {
 }
 
@@ -56,7 +56,7 @@ void ForceEngine::applyCondition(Body* body)
 	for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext() )
 	{
 		shared_ptr<Body>& b = bodies->getCurrent();
-		static_cast<ActionParameterForce*>( ncb->actionParameters->find( b->getId() , actionParameterForce->getClassIndex() ).get() )->force += force;
+		static_cast<Force*>( ncb->actionParameters->find( b->getId() , actionParameterForce->getClassIndex() ).get() )->force += force;
         }
 }
 

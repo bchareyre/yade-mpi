@@ -41,8 +41,8 @@
 #include "SDECLinkPhysics.hpp"
 #include "MassSpringBody2RigidBodyLaw.hpp"
 
-#include "ActionParameterReseter.hpp"
-#include "ActionParameterInitializer.hpp"
+#include "PhysicalActionContainerReseter.hpp"
+#include "PhysicalActionContainerInitializer.hpp"
 #include "GravityEngine.hpp"
 
 #include "PhysicalParametersMetaEngine.hpp"
@@ -134,9 +134,9 @@ string HangingCloth::generate()
 	rootBody->actionParameters		= shared_ptr<PhysicalActionContainer>(new ActionParameterVectorVector);
 	rootBody->bodies 			= shared_ptr<BodyContainer>(new BodyRedirectionVector);
 
-	shared_ptr<ActionParameterInitializer> actionParameterInitializer(new ActionParameterInitializer);
-	actionParameterInitializer->actionParameterNames.push_back("ActionParameterForce");
-	actionParameterInitializer->actionParameterNames.push_back("ActionParameterMomentum");
+	shared_ptr<PhysicalActionContainerInitializer> actionParameterInitializer(new PhysicalActionContainerInitializer);
+	actionParameterInitializer->actionParameterNames.push_back("Force");
+	actionParameterInitializer->actionParameterNames.push_back("Momentum");
 	
 	shared_ptr<InteractionGeometryMetaEngine> interactionGeometryDispatcher(new InteractionGeometryMetaEngine);
 	interactionGeometryDispatcher->add("InteractingSphere","InteractingSphere","Sphere2Sphere4MacroMicroContactGeometry");
@@ -161,12 +161,12 @@ string HangingCloth::generate()
 	shared_ptr<CundallNonViscousMomentumDamping> actionMomentumDamping(new CundallNonViscousMomentumDamping);
 	actionMomentumDamping->damping = dampingMomentum;
 	shared_ptr<PhysicalActionMetaEngine> actionDampingDispatcher(new PhysicalActionMetaEngine);
-	actionDampingDispatcher->add("ActionParameterForce","ParticleParameters","CundallNonViscousForceDamping",actionForceDamping);
-	actionDampingDispatcher->add("ActionParameterMomentum","RigidBodyParameters","CundallNonViscousMomentumDamping",actionMomentumDamping);
+	actionDampingDispatcher->add("Force","ParticleParameters","CundallNonViscousForceDamping",actionForceDamping);
+	actionDampingDispatcher->add("Momentum","RigidBodyParameters","CundallNonViscousMomentumDamping",actionMomentumDamping);
 	
 	shared_ptr<PhysicalActionMetaEngine> applyActionDispatcher(new PhysicalActionMetaEngine);
-	applyActionDispatcher->add("ActionParameterForce","ParticleParameters","NewtonsForceLaw");
-	applyActionDispatcher->add("ActionParameterMomentum","RigidBodyParameters","NewtonsMomentumLaw");
+	applyActionDispatcher->add("Force","ParticleParameters","NewtonsForceLaw");
+	applyActionDispatcher->add("Momentum","RigidBodyParameters","NewtonsMomentumLaw");
 
 	shared_ptr<PhysicalParametersMetaEngine> positionIntegrator(new PhysicalParametersMetaEngine);
 	positionIntegrator->add("ParticleParameters","LeapFrogPositionIntegrator");
@@ -184,7 +184,7 @@ string HangingCloth::generate()
 	massSpringBody2RigidBodyConstitutiveLaw->springGroupMask = 1;
 
 	rootBody->actors.clear();
-	rootBody->actors.push_back(shared_ptr<Engine>(new ActionParameterReseter));
+	rootBody->actors.push_back(shared_ptr<Engine>(new PhysicalActionContainerReseter));
 	rootBody->actors.push_back(boundingVolumeDispatcher);
 	rootBody->actors.push_back(geometricalModelDispatcher);
 	rootBody->actors.push_back(shared_ptr<Engine>(new PersistentSAPCollider));

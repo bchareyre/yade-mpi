@@ -21,24 +21,24 @@ LIBS += -lMesh2D \
         -lEngine \
         -lCundallNonViscousMomentumDamping \
         -lCundallNonViscousForceDamping \
-        -lSimpleSpringLaw \
-        -lMassSpringLaw \
-        -lPhysicalActionInitializer \
         -lMacroMicroElasticRelationships \
         -lBodyMacroParameters \
-        -lMassSpringBody2RigidBodyLaw \
-        -lElasticContactLaw \
         -lInteractionDescriptionSet2AABB \
-        -lPhysicalActionReseter \
-        -lGravityEngine \
         -lyade-lib-serialization \
         -lyade-lib-wm3-math \
         -lInteraction \
         -lyade-lib-multimethods \
-        -lPhysicalActionVectorVector \
         -lInteractionVecSet \
         -lBodyRedirectionVector \
         -lBody \
+        -lSimpleSpringLaw \
+        -lMassSpringLaw \
+        -lPhysicalActionContainerInitializer \
+        -lMassSpringBody2RigidBodyLaw \
+        -lElasticContactLaw \
+        -lPhysicalActionContainerReseter \
+        -lGravityEngine \
+        -lPhysicalActionVectorVector \
         -rdynamic 
 INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
@@ -62,23 +62,16 @@ QMAKE_LIBDIR = ../../../plugins/Data/Body/GeometricalModel/Mesh2D/$(YADEDYNLIBPA
                ../../../yade/Engine/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/EngineUnit/PhysicalActionEngineUnit/CundallNonViscousMomentumDamping/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/EngineUnit/PhysicalActionEngineUnit/CundallNonViscousForceDamping/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/Engine/PhysicalActionEngine/InteractionSolver/SimpleSpringLaw/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/Engine/PhysicalActionEngine/InteractionSolver/MassSpringLaw/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/Engine/PhysicalActionEngine/ActionParameterInitializer/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/EngineUnit/InteractionEngineUnit/InteractionPhysicsEngineUnit/ElasticContactParameters/MacroMicroElasticRelationships/$(YADEDYNLIBPATH) \
                ../../../plugins/Data/Body/PhysicalParameters/BodyMacroParameters/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/Engine/PhysicalActionEngine/InteractionSolver/MassSpringBody2RigidBodyLaw/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/Engine/PhysicalActionEngine/InteractionSolver/ElasticContactLaw/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/EngineUnit/BodyEngineUnit/BoundingVolumeEngineUnit/InteractionDescriptionSet2AABB/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/Engine/PhysicalActionEngine/ActionParameterReseter/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/DeusExMachina/GravityEngine/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/yade-lib-serialization/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/yade-lib-wm3-math/$(YADEDYNLIBPATH) \
                ../../../yade/Interaction/Interaction/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/yade-lib-multimethods/$(YADEDYNLIBPATH) \
-               ../../../plugins/Container/PhysicalActionContainer/ActionParameterVectorVector/$(YADEDYNLIBPATH) \
                ../../../plugins/Container/InteractionContainer/InteractionVecSet/$(YADEDYNLIBPATH) \
                ../../../plugins/Container/BodyContainer/BodyRedirectionVector/$(YADEDYNLIBPATH) \
+               ../../../yade/Body/Body/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

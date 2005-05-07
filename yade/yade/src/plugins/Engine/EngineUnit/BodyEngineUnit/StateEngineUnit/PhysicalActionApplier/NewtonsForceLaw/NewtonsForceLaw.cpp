@@ -23,7 +23,7 @@
 
 #include "NewtonsForceLaw.hpp"
 #include "ParticleParameters.hpp"
-#include "ActionParameterForce.hpp"
+#include "Force.hpp"
 
 //#include <string>
 
@@ -34,7 +34,7 @@ void NewtonsForceLaw::go( 	  const shared_ptr<PhysicalAction>& a
 					, const shared_ptr<PhysicalParameters>& b
 					, const Body* bb)
 {
-	ActionParameterForce * af = dynamic_cast<ActionParameterForce*>(a.get());
+	Force * af = dynamic_cast<Force*>(a.get());
 	ParticleParameters * p = dynamic_cast<ParticleParameters*>(b.get());
 	
 	//FIXME : should be += and we should add an Engine that reset acceleration at the beginning

@@ -13,21 +13,21 @@ LIBS += -lAABB \
         -lEngine \
         -lCundallNonViscousForceDamping \
         -lCundallNonViscousMomentumDamping \
-        -lSimpleSpringLaw \
-        -lPhysicalActionInitializer \
         -lMetaInteractingGeometry \
         -lInteractionDescriptionSet2AABB \
-        -lPhysicalActionReseter \
         -lRotationEngine \
-        -lGravityEngine \
         -lyade-lib-serialization \
         -lyade-lib-wm3-math \
         -lInteraction \
         -lyade-lib-multimethods \
-        -lPhysicalActionVectorVector \
         -lInteractionVecSet \
         -lBodyRedirectionVector \
         -lBody \
+        -lSimpleSpringLaw \
+        -lPhysicalActionContainerInitializer \
+        -lPhysicalActionContainerReseter \
+        -lGravityEngine \
+        -lPhysicalActionVectorVector \
         -rdynamic 
 INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
@@ -43,18 +43,13 @@ QMAKE_LIBDIR = ../../../plugins/Data/Body/BoundingVolume/AABB/$(YADEDYNLIBPATH) 
                ../../../yade/Engine/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/EngineUnit/PhysicalActionEngineUnit/CundallNonViscousForceDamping/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/EngineUnit/PhysicalActionEngineUnit/CundallNonViscousMomentumDamping/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/Engine/PhysicalActionEngine/InteractionSolver/SimpleSpringLaw/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/Engine/PhysicalActionEngine/ActionParameterInitializer/$(YADEDYNLIBPATH) \
                ../../../plugins/Data/Body/InteractingGeometry/MetaInteractingGeometry/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/EngineUnit/BodyEngineUnit/BoundingVolumeEngineUnit/InteractionDescriptionSet2AABB/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/Engine/PhysicalActionEngine/ActionParameterReseter/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/DeusExMachina/RotationEngine/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/DeusExMachina/GravityEngine/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/yade-lib-serialization/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/yade-lib-wm3-math/$(YADEDYNLIBPATH) \
                ../../../yade/Interaction/Interaction/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/yade-lib-multimethods/$(YADEDYNLIBPATH) \
-               ../../../plugins/Container/PhysicalActionContainer/ActionParameterVectorVector/$(YADEDYNLIBPATH) \
                ../../../plugins/Container/InteractionContainer/InteractionVecSet/$(YADEDYNLIBPATH) \
                ../../../plugins/Container/BodyContainer/BodyRedirectionVector/$(YADEDYNLIBPATH) \
                ../../../yade/Body/Body/$(YADEDYNLIBPATH) \

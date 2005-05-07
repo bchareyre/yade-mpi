@@ -29,7 +29,7 @@
 
 #include "DeusExMachina.hpp"
 
-class ActionParameterForce;
+class Force;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -37,7 +37,7 @@ class ActionParameterForce;
 class GravityEngine : public DeusExMachina 
 {
 	public		: Vector3r gravity;
-	private 	: shared_ptr<ActionParameterForce> actionParameterForce;
+	private 	: shared_ptr<Force> actionParameterForce;
 	public		: GravityEngine();
 	public		: virtual ~GravityEngine();
 	

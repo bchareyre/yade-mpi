@@ -3,8 +3,8 @@
 # Subdir relative project main directory: ./plugins/Data/PhysicalAction
 # Target is a subdirs project 
 
-SUBDIRS += ActionParameterForce \
-           ActionParameterMomentum 
+SUBDIRS += Force \
+           Momentum 
 CONFIG += release \
           warn_on 
 TEMPLATE = subdirs 

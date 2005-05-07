@@ -21,7 +21,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "ActionParameterInitializer.hpp"
+#include "PhysicalActionContainerInitializer.hpp"
 #include "MetaBody.hpp"
 #include "ClassFactory.hpp"
 #include "PhysicalAction.hpp"
@@ -29,21 +29,21 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-ActionParameterInitializer::ActionParameterInitializer() 
+PhysicalActionContainerInitializer::PhysicalActionContainerInitializer() 
 {
 	actionParameterNames.clear();
 }
 
-ActionParameterInitializer::~ActionParameterInitializer() 
+PhysicalActionContainerInitializer::~PhysicalActionContainerInitializer() 
 {
 }
 
-void ActionParameterInitializer::registerAttributes()
+void PhysicalActionContainerInitializer::registerAttributes()
 {
 	REGISTER_ATTRIBUTE(actionParameterNames);
 }
 
-void ActionParameterInitializer::action(Body* body)
+void PhysicalActionContainerInitializer::action(Body* body)
 {
 	MetaBody * ncb = dynamic_cast<MetaBody*>(body);
 	

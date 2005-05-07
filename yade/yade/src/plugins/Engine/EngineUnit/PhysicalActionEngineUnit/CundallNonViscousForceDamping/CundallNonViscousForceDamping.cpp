@@ -23,7 +23,7 @@
 
 #include "CundallNonViscousForceDamping.hpp"
 #include "ParticleParameters.hpp"
-#include "ActionParameterForce.hpp"
+#include "Force.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -43,13 +43,13 @@ void CundallNonViscousForceDamping::registerAttributes()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-// this is Cundall non-viscous local damping, applied to force (ActionParameterForce)
+// this is Cundall non-viscous local damping, applied to force (Force)
 
 void CundallNonViscousForceDamping::go(    const shared_ptr<PhysicalAction>& a
 						, const shared_ptr<PhysicalParameters>& b
 						, const Body*)
 {
-	ActionParameterForce * af = static_cast<ActionParameterForce*>(a.get());
+	Force * af = static_cast<Force*>(a.get());
 	ParticleParameters * p = static_cast<ParticleParameters*>(b.get());
 	
 	Vector3r& f  = af->force;

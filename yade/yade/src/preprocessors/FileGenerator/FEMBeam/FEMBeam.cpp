@@ -14,8 +14,8 @@
 #include "FEMTetrahedronStiffness.hpp"
 #include "CundallNonViscousMomentumDamping.hpp"
 #include "CundallNonViscousForceDamping.hpp"
-#include "ActionParameterInitializer.hpp"
-#include "ActionParameterReseter.hpp"
+#include "PhysicalActionContainerInitializer.hpp"
+#include "PhysicalActionContainerReseter.hpp"
 #include "FEMLaw.hpp"
 #include "FEMSetTextLoader.hpp"
 #include "GravityEngine.hpp"
@@ -140,14 +140,14 @@ void FEMBeam::createActors(shared_ptr<MetaBody>& rootBody)
 	gravityCondition->gravity = gravity;
 	
 	shared_ptr<PhysicalActionMetaEngine> applyActionDispatcher(new PhysicalActionMetaEngine);
-	applyActionDispatcher->add("ActionParameterForce","ParticleParameters","NewtonsForceLaw");
+	applyActionDispatcher->add("Force","ParticleParameters","NewtonsForceLaw");
 	
-	shared_ptr<ActionParameterInitializer> actionParameterInitializer(new ActionParameterInitializer);
-	actionParameterInitializer->actionParameterNames.push_back("ActionParameterForce");
-	actionParameterInitializer->actionParameterNames.push_back("ActionParameterMomentum"); // FIXME - should be unnecessery, but BUG in ActionParameterVectorVector
+	shared_ptr<PhysicalActionContainerInitializer> actionParameterInitializer(new PhysicalActionContainerInitializer);
+	actionParameterInitializer->actionParameterNames.push_back("Force");
+	actionParameterInitializer->actionParameterNames.push_back("Momentum"); // FIXME - should be unnecessery, but BUG in ActionParameterVectorVector
 	
 	rootBody->actors.clear();
-	rootBody->actors.push_back(shared_ptr<Engine>(new ActionParameterReseter));
+	rootBody->actors.push_back(shared_ptr<Engine>(new PhysicalActionContainerReseter));
 	rootBody->actors.push_back(boundingVolumeDispatcher);
 	rootBody->actors.push_back(geometricalModelDispatcher);
 	rootBody->actors.push_back(femLaw);

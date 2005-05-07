@@ -2,8 +2,8 @@
 #define __MASSSPRINGBODY2RIGIDBODYNAMICENGINE_H__
 
 #include "InteractionSolver.hpp"
-#include "ActionParameterForce.hpp"
-#include "ActionParameterMomentum.hpp"
+#include "Force.hpp"
+#include "Momentum.hpp"
 
 class MassSpringBody2RigidBodyLaw : public InteractionSolver
 {

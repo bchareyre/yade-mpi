@@ -3,16 +3,19 @@
 # Subdir relative project main directory: ./plugins/Engine/Engine/PhysicalActionEngine/InteractionSolver/FEMLaw
 # Target is a library:  
 
-LIBS += -lPhysicalActionForce \
-        -lParticleParameters \
+LIBS += -lParticleParameters \
         -lFEMTetrahedronData \
         -lFEMNodeData \
+        -lForce \
         -rdynamic 
 INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = $(YADEDYNLIBPATH) 
+QMAKE_LIBDIR = ../../../../../../plugins/Data/Body/PhysicalParameters/ParticleParameters/$(YADEDYNLIBPATH) \
+               ../../../../../../plugins/Data/Body/PhysicalParameters/FEMTetrahedronData/$(YADEDYNLIBPATH) \
+               ../../../../../../plugins/Data/Body/PhysicalParameters/FEMNodeData/$(YADEDYNLIBPATH) \
+               $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 
 QMAKE_CXXFLAGS_DEBUG += -lpthread \

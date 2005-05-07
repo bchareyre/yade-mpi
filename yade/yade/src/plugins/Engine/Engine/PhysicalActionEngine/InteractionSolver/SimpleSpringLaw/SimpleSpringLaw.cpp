@@ -3,10 +3,10 @@
 #include "ClosestFeatures.hpp"
 #include "Omega.hpp"
 #include "MetaBody.hpp"
-#include "ActionParameterForce.hpp"
-#include "ActionParameterMomentum.hpp"
+#include "Force.hpp"
+#include "Momentum.hpp"
 
-SimpleSpringLaw::SimpleSpringLaw () : InteractionSolver(), actionForce(new ActionParameterForce) , actionMomentum(new ActionParameterMomentum)
+SimpleSpringLaw::SimpleSpringLaw () : InteractionSolver(), actionForce(new Force) , actionMomentum(new Momentum)
 {
 }
 
@@ -58,11 +58,11 @@ void SimpleSpringLaw::calculateForces(Body * body)
 			Real relativeVelocity = dir.dot(v2-v1);
 			Vector3r f = (elongation*stiffness+relativeVelocity*viscosity)/size*dir;
 
-			static_cast<ActionParameterForce*>   ( ncb->actionParameters->find( id1 , actionForce   ->getClassIndex() ).get() )->force    += f;
-			static_cast<ActionParameterForce*>   ( ncb->actionParameters->find( id2 , actionForce   ->getClassIndex() ).get() )->force    -= f;
+			static_cast<Force*>   ( ncb->actionParameters->find( id1 , actionForce   ->getClassIndex() ).get() )->force    += f;
+			static_cast<Force*>   ( ncb->actionParameters->find( id2 , actionForce   ->getClassIndex() ).get() )->force    -= f;
 		
-			static_cast<ActionParameterMomentum*>( ncb->actionParameters->find( id1 , actionMomentum->getClassIndex() ).get() )->momentum += o1p.cross(f);
-			static_cast<ActionParameterMomentum*>( ncb->actionParameters->find( id2 , actionMomentum->getClassIndex() ).get() )->momentum -= o2p.cross(f);
+			static_cast<Momentum*>( ncb->actionParameters->find( id1 , actionMomentum->getClassIndex() ).get() )->momentum += o1p.cross(f);
+			static_cast<Momentum*>( ncb->actionParameters->find( id2 , actionMomentum->getClassIndex() ).get() )->momentum -= o2p.cross(f);
 			
 		}
 	}

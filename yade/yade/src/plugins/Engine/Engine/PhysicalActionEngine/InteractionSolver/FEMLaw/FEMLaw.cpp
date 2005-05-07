@@ -24,7 +24,7 @@
 #include "FEMLaw.hpp"
 #include "FEMTetrahedronData.hpp"
 #include "FEMNodeData.hpp"
-#include "ActionParameterForce.hpp"
+#include "Force.hpp"
 
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/vector.hpp>
@@ -34,7 +34,7 @@ using namespace boost::numeric;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-FEMLaw::FEMLaw() : InteractionSolver() , actionForce(new ActionParameterForce)
+FEMLaw::FEMLaw() : InteractionSolver() , actionForce(new Force)
 {
 	nodeGroupMask = 1;
 	tetrahedronGroupMask = 2;
@@ -98,7 +98,7 @@ void FEMLaw::calculateForces(Body* body)
 							, fe( i*3 + 1 , 0 )
 							, fe( i*3 + 2 , 0 ));
 			
-			static_cast<ActionParameterForce*>( actionParameters
+			static_cast<Force*>( actionParameters
 				->find( femTet->ids[i] , actionForce ->getClassIndex() ).get() )
 					->force  += force;
 					

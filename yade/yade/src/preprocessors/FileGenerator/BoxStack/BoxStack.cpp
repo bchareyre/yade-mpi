@@ -16,7 +16,7 @@
 #include "InteractingSphere.hpp"
 #include "InteractionGeometryMetaEngine.hpp"
 #include "PhysicalActionMetaEngine.hpp"
-#include "ActionParameterReseter.hpp"
+#include "PhysicalActionContainerReseter.hpp"
 #include "CundallNonViscousForceDamping.hpp"
 #include "CundallNonViscousMomentumDamping.hpp"
 #include "PhysicalActionMetaEngine.hpp"
@@ -26,7 +26,7 @@
 #include "MetaInteractingGeometry.hpp"
 
 #include "PhysicalActionMetaEngine.hpp"
-#include "ActionParameterInitializer.hpp"
+#include "PhysicalActionContainerInitializer.hpp"
 #include "GravityEngine.hpp"
 #include "PhysicalParametersMetaEngine.hpp"
 
@@ -244,9 +244,9 @@ void BoxStack::createKinematicBox(shared_ptr<Body>& body, Vector3r position, Vec
 
 void BoxStack::createActors(shared_ptr<MetaBody>& rootBody)
 {
-	shared_ptr<ActionParameterInitializer> actionParameterInitializer(new ActionParameterInitializer);
-	actionParameterInitializer->actionParameterNames.push_back("ActionParameterForce");
-	actionParameterInitializer->actionParameterNames.push_back("ActionParameterMomentum");
+	shared_ptr<PhysicalActionContainerInitializer> actionParameterInitializer(new PhysicalActionContainerInitializer);
+	actionParameterInitializer->actionParameterNames.push_back("Force");
+	actionParameterInitializer->actionParameterNames.push_back("Momentum");
 	
 	shared_ptr<InteractionGeometryMetaEngine> interactionGeometryDispatcher(new InteractionGeometryMetaEngine);
 	interactionGeometryDispatcher->add("InteractingSphere","InteractingSphere","Sphere2Sphere4ClosestFeatures");
@@ -266,12 +266,12 @@ void BoxStack::createActors(shared_ptr<MetaBody>& rootBody)
 	shared_ptr<CundallNonViscousMomentumDamping> actionMomentumDamping(new CundallNonViscousMomentumDamping);
 	actionMomentumDamping->damping = dampingMomentum;
 	shared_ptr<PhysicalActionMetaEngine> actionDampingDispatcher(new PhysicalActionMetaEngine);
-	actionDampingDispatcher->add("ActionParameterForce","ParticleParameters","CundallNonViscousForceDamping",actionForceDamping);
-	actionDampingDispatcher->add("ActionParameterMomentum","RigidBodyParameters","CundallNonViscousMomentumDamping",actionMomentumDamping);
+	actionDampingDispatcher->add("Force","ParticleParameters","CundallNonViscousForceDamping",actionForceDamping);
+	actionDampingDispatcher->add("Momentum","RigidBodyParameters","CundallNonViscousMomentumDamping",actionMomentumDamping);
 	
 	shared_ptr<PhysicalActionMetaEngine> applyActionDispatcher(new PhysicalActionMetaEngine);
-	applyActionDispatcher->add("ActionParameterForce","ParticleParameters","NewtonsForceLaw");
-	applyActionDispatcher->add("ActionParameterMomentum","RigidBodyParameters","NewtonsMomentumLaw");
+	applyActionDispatcher->add("Force","ParticleParameters","NewtonsForceLaw");
+	applyActionDispatcher->add("Momentum","RigidBodyParameters","NewtonsMomentumLaw");
 	
 	shared_ptr<PhysicalParametersMetaEngine> positionIntegrator(new PhysicalParametersMetaEngine);
 	positionIntegrator->add("ParticleParameters","LeapFrogPositionIntegrator");
@@ -287,7 +287,7 @@ void BoxStack::createActors(shared_ptr<MetaBody>& rootBody)
 // 		kinematic->subscribedBodies.push_back(i);
 	
 	rootBody->actors.clear();
-	rootBody->actors.push_back(shared_ptr<Engine>(new ActionParameterReseter));
+	rootBody->actors.push_back(shared_ptr<Engine>(new PhysicalActionContainerReseter));
 	rootBody->actors.push_back(boundingVolumeDispatcher);
 	rootBody->actors.push_back(shared_ptr<Engine>(new SAPCollider));
 	rootBody->actors.push_back(interactionGeometryDispatcher);

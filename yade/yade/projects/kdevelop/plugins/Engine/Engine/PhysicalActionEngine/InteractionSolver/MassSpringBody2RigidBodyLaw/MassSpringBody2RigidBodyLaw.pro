@@ -15,12 +15,12 @@ LIBS += -lEngine \
         -lSDECLinkPhysics \
         -lSDECLinkGeometry \
         -lRigidBodyParameters \
-        -lPhysicalActionForce \
-        -lPhysicalActionMomentum \
-        -lSimpleSpringLaw \
         -lMacroMicroContactGeometry \
         -lBodyMacroParameters \
         -lElasticContactParameters \
+        -lForce \
+        -lMomentum \
+        -lSimpleSpringLaw \
         -rdynamic 
 INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
@@ -28,6 +28,20 @@ UI_DIR = $(YADECOMPILATIONPATH)
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 QMAKE_LIBDIR = ../../../../../../yade/Engine/$(YADEDYNLIBPATH) \
                ../../../../../../yade/Body/Body/$(YADEDYNLIBPATH) \
+               ../../../../../../toolboxes/Libraries/yade-lib-computational-geometry/$(YADEDYNLIBPATH) \
+               ../../../../../../toolboxes/Libraries/yade-lib-serialization/$(YADEDYNLIBPATH) \
+               ../../../../../../plugins/Data/Body/GeometricalModel/Mesh2D/$(YADEDYNLIBPATH) \
+               ../../../../../../toolboxes/Libraries/yade-lib-wm3-math/$(YADEDYNLIBPATH) \
+               ../../../../../../plugins/Data/Interaction/NarrowInteractionGeometry/ClosestFeatures/$(YADEDYNLIBPATH) \
+               ../../../../../../yade/Interaction/Interaction/$(YADEDYNLIBPATH) \
+               ../../../../../../toolboxes/Libraries/yade-lib-multimethods/$(YADEDYNLIBPATH) \
+               ../../../../../../plugins/Data/Interaction/InteractionPhysics/SDECLinkPhysics/$(YADEDYNLIBPATH) \
+               ../../../../../../plugins/Data/Interaction/NarrowInteractionGeometry/SDECLinkGeometry/$(YADEDYNLIBPATH) \
+               ../../../../../../plugins/Data/Body/PhysicalParameters/RigidBodyParameters/$(YADEDYNLIBPATH) \
+               ../../../../../../plugins/Data/Interaction/NarrowInteractionGeometry/MacroMicroContactGeometry/$(YADEDYNLIBPATH) \
+               ../../../../../../plugins/Data/Body/PhysicalParameters/BodyMacroParameters/$(YADEDYNLIBPATH) \
+               ../../../../../../plugins/Data/Interaction/InteractionPhysics/ElasticContactParameters/$(YADEDYNLIBPATH) \
+               ../../../../../../plugins/Data/PhysicalAction/Force/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

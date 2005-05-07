@@ -23,13 +23,13 @@
 
 #include "GravityEngine.hpp"
 #include "ParticleParameters.hpp"
-#include "ActionParameterForce.hpp"
+#include "Force.hpp"
 #include "MetaBody.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-GravityEngine::GravityEngine() : gravity(Vector3r::ZERO) , actionParameterForce(new ActionParameterForce)
+GravityEngine::GravityEngine() : gravity(Vector3r::ZERO) , actionParameterForce(new Force)
 {
 }
 
@@ -58,7 +58,7 @@ void GravityEngine::applyCondition(Body* body)
 		shared_ptr<Body>& b = bodies->getCurrent();
 		ParticleParameters* p = dynamic_cast<ParticleParameters*>(b->physicalParameters.get());
 		if(p)
-			static_cast<ActionParameterForce*>( ncb->actionParameters->find( b->getId() , actionParameterForce->getClassIndex() ).get() )
+			static_cast<Force*>( ncb->actionParameters->find( b->getId() , actionParameterForce->getClassIndex() ).get() )
 				->force += gravity * p->mass;
         }
 }

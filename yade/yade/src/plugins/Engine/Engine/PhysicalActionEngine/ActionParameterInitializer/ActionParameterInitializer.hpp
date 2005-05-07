@@ -39,19 +39,19 @@ class Body;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-class ActionParameterInitializer : public Engine
+class PhysicalActionContainerInitializer : public Engine
 {
 	public    : std::vector<std::string> actionParameterNames;
 	
-	public    : ActionParameterInitializer();
-	public    : virtual ~ActionParameterInitializer();
+	public    : PhysicalActionContainerInitializer();
+	public    : virtual ~PhysicalActionContainerInitializer();
 	public    : virtual void action(Body* body);
 	
 	protected : virtual void registerAttributes();
-	REGISTER_CLASS_NAME(ActionParameterInitializer);
+	REGISTER_CLASS_NAME(PhysicalActionContainerInitializer);
 };
 
-REGISTER_SERIALIZABLE(ActionParameterInitializer,false);
+REGISTER_SERIALIZABLE(PhysicalActionContainerInitializer,false);
 
 #endif // ACTION_PARAMETER_INITIALIZER_HPP
 

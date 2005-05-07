@@ -65,7 +65,7 @@ class PhysicalActionContainer : public Serializable
 	// should be always succesfull. if it is not - you forgot to call prepare()
 	public    : virtual shared_ptr<PhysicalAction>& find(
 					  unsigned int /*Body->getId() */
-					, int /*ActionParameterForce::getClassIndexStatic()*/)		{throw;};
+					, int /*Force::getClassIndexStatic()*/)		{throw;};
 
 	// looping over Bodies, and their Actions
 	public    : virtual void gotoFirst() 							{throw;};
