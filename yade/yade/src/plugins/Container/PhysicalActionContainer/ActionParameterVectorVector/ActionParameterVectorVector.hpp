@@ -12,7 +12,7 @@ using namespace std;
 
 // NEW CONTAINER version - faster
 
-class ActionParameterVectorVector : public PhysicalActionContainer
+class PhysicalActionVectorVector : public PhysicalActionContainer
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -41,8 +41,8 @@ class ActionParameterVectorVector : public PhysicalActionContainer
 /// Constructor/Destructor									///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public	  : ActionParameterVectorVector();
-	public	  : virtual ~ActionParameterVectorVector();
+	public	  : PhysicalActionVectorVector();
+	public	  : virtual ~PhysicalActionVectorVector();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Methods											///
@@ -71,14 +71,14 @@ class ActionParameterVectorVector : public PhysicalActionContainer
 /// Serialization										///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	REGISTER_CLASS_NAME(ActionParameterVectorVector);
+	REGISTER_CLASS_NAME(PhysicalActionVectorVector);
 };
 
-REGISTER_SERIALIZABLE(ActionParameterVectorVector,false);
+REGISTER_SERIALIZABLE(PhysicalActionVectorVector,false);
 
 
 //
-// class ActionParameterVectorVector : public PhysicalActionContainer
+// class PhysicalActionVectorVector : public PhysicalActionContainer
 // {
 // 
 // ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -110,8 +110,8 @@ REGISTER_SERIALIZABLE(ActionParameterVectorVector,false);
 // /// Constructor/Destructor									///
 // ///////////////////////////////////////////////////////////////////////////////////////////////////
 // 
-// 	public	  : ActionParameterVectorVector();
-// 	public	  : virtual ~ActionParameterVectorVector();
+// 	public	  : PhysicalActionVectorVector();
+// 	public	  : virtual ~PhysicalActionVectorVector();
 // 
 // ///////////////////////////////////////////////////////////////////////////////////////////////////
 // /// Methods											///
@@ -165,9 +165,9 @@ REGISTER_SERIALIZABLE(ActionParameterVectorVector,false);
 // /// Serialization										///
 // ///////////////////////////////////////////////////////////////////////////////////////////////////
 // 	
-// 	REGISTER_CLASS_NAME(ActionParameterVectorVector);
+// 	REGISTER_CLASS_NAME(PhysicalActionVectorVector);
 // };
 // 
-// REGISTER_SERIALIZABLE(ActionParameterVectorVector,false);
+// REGISTER_SERIALIZABLE(PhysicalActionVectorVector,false);
 //
 #endif // __ACTION_VEC_VEC_HPP__

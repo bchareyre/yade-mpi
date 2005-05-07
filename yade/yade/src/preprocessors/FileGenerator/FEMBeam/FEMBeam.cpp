@@ -37,7 +37,7 @@
 
 #include "BodyRedirectionVector.hpp"
 #include "InteractionVecSet.hpp"
-#include "ActionParameterVectorVector.hpp"
+#include "PhysicalActionVectorVector.hpp"
 
 using namespace boost;
 using namespace std;
@@ -100,7 +100,7 @@ string FEMBeam::generate()
 	
 	rootBody->persistentInteractions	= shared_ptr<InteractionContainer>(new InteractionVecSet);
 	rootBody->volatileInteractions		= shared_ptr<InteractionContainer>(new InteractionVecSet);
-	rootBody->actionParameters		= shared_ptr<PhysicalActionContainer>(new ActionParameterVectorVector);
+	rootBody->actionParameters		= shared_ptr<PhysicalActionContainer>(new PhysicalActionVectorVector);
 	rootBody->bodies 			= shared_ptr<BodyContainer>(new BodyRedirectionVector);
 	
 	
@@ -144,7 +144,7 @@ void FEMBeam::createActors(shared_ptr<MetaBody>& rootBody)
 	
 	shared_ptr<PhysicalActionContainerInitializer> actionParameterInitializer(new PhysicalActionContainerInitializer);
 	actionParameterInitializer->actionParameterNames.push_back("Force");
-	actionParameterInitializer->actionParameterNames.push_back("Momentum"); // FIXME - should be unnecessery, but BUG in ActionParameterVectorVector
+	actionParameterInitializer->actionParameterNames.push_back("Momentum"); // FIXME - should be unnecessery, but BUG in PhysicalActionVectorVector
 	
 	rootBody->actors.clear();
 	rootBody->actors.push_back(shared_ptr<Engine>(new PhysicalActionContainerReseter));

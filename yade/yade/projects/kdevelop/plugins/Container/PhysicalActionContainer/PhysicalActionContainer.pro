@@ -3,7 +3,7 @@
 # Subdir relative project main directory: ./plugins/Container/PhysicalActionContainer
 # Target is a subdirs project 
 
-SUBDIRS += ActionParameterVectorVector 
+SUBDIRS += PhysicalActionVectorVector 
 CONFIG += release \
           warn_on 
 TEMPLATE = subdirs 

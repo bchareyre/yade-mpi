@@ -99,7 +99,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>plugins/Engine/EngineUnit/PhysicalActionEngineUnit/CundallNonViscousForceDamping</activedir>
+      <activedir>preprocessors/FileGenerator/FEMBeam</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>

@@ -8,7 +8,7 @@
 //#include "InteractionHashMap.hpp"
 //#include "BodyRedirectionVector.hpp"
 //#include "BodyAssocVector.hpp"
-//#include "ActionParameterVectorVector.hpp"
+//#include "PhysicalActionVectorVector.hpp"
 //////////
 
 
@@ -18,7 +18,7 @@ MetaBody::MetaBody() :
 	//, bodies(new BodyRedirectionVector)
 	//, persistentInteractions(new InteractionVecSet)
 	//, volatileInteractions(new InteractionVecSet)
-	//, actionParameters(new ActionParameterVectorVector)
+	//, actionParameters(new PhysicalActionVectorVector)
 {	
 	actors.clear();
 	initializers.clear();

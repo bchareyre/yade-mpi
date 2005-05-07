@@ -43,7 +43,7 @@
 
 #include "BodyRedirectionVector.hpp"
 #include "InteractionVecSet.hpp"
-#include "ActionParameterVectorVector.hpp"
+#include "PhysicalActionVectorVector.hpp"
 
 #include <boost/filesystem/convenience.hpp>
 #include <boost/lexical_cast.hpp>
@@ -182,7 +182,7 @@ string SDECImpactTest::generate()
 
 	rootBody->persistentInteractions	= shared_ptr<InteractionContainer>(new InteractionVecSet);
 	rootBody->volatileInteractions		= shared_ptr<InteractionContainer>(new InteractionVecSet);
-	rootBody->actionParameters		= shared_ptr<PhysicalActionContainer>(new ActionParameterVectorVector);
+	rootBody->actionParameters		= shared_ptr<PhysicalActionContainer>(new PhysicalActionVectorVector);
 	rootBody->bodies 			= shared_ptr<BodyContainer>(new BodyRedirectionVector);
 
 	shared_ptr<Body> body;

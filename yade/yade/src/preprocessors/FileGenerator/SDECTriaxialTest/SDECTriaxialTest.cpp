@@ -57,7 +57,7 @@
 
 #include "BodyRedirectionVector.hpp"
 #include "InteractionVecSet.hpp"
-#include "ActionParameterVectorVector.hpp"
+#include "PhysicalActionVectorVector.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -126,7 +126,7 @@ string SDECTriaxialTest::generate()
 {
 // 	rootBody->persistentInteractions	= shared_ptr<InteractionContainer>(new InteractionVecSet);
 // 	rootBody->volatileInteractions		= shared_ptr<InteractionContainer>(new InteractionVecSet);
-// 	rootBody->actionParameters		= shared_ptr<PhysicalActionContainer>(new ActionParameterVectorVector);
+// 	rootBody->actionParameters		= shared_ptr<PhysicalActionContainer>(new PhysicalActionVectorVector);
 // 	rootBody->bodies 			= shared_ptr<BodyContainer>(new BodyRedirectionVector);
 
 	return "Not ready yet.";
