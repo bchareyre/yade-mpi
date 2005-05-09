@@ -13,10 +13,11 @@ SUBDIRS += yade-lib-loki \
            yade-lib-time \
            yade-lib-opengl \
            yade-lib-serialization-qt \
-           yade-lib-serialization-xml 
-MOC_DIR = $(YADECOMPILATIONPATH) 
-UI_DIR = $(YADECOMPILATIONPATH) 
-OBJECTS_DIR = $(YADECOMPILATIONPATH) 
+           yade-lib-serialization-xml \
+           yade-lib-gui-qt 
+MOC_DIR = $(YADECOMPILATIONPATH)
+UI_DIR = $(YADECOMPILATIONPATH)
+OBJECTS_DIR = $(YADECOMPILATIONPATH)
 CONFIG += debug \
-          warn_on 
-TEMPLATE = subdirs 
+warn_on
+TEMPLATE = subdirs

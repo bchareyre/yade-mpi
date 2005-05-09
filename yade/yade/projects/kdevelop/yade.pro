@@ -6,7 +6,6 @@
 SUBDIRS += libraries \
            yade \
            plugins \
-           gui \
            postprocessors \
            preprocessors 
 MOC_DIR = $(YADECOMPILATIONPATH)

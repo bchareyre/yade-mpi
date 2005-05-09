@@ -99,7 +99,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>libraries</activedir>
+      <activedir>libraries/yade-lib-serialization-xml</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>
