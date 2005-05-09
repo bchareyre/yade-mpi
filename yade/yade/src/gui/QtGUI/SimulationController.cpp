@@ -145,7 +145,7 @@ void SimulationController::pbApplyClicked()
 // 	
 // 	d->setEnabled(true);
 // 	
-// 	IOManager::loadFromFile("XMLManager",Omega::instance().getSimulationFileName(),"rootBody",Omega::instance().rootBody);
+// 	IOManager::loadFromFile("yade-lib-serialization-xml",Omega::instance().getSimulationFileName(),"rootBody",Omega::instance().rootBody);
 // 	
 // 	parentWorkspace->setEnabled(true);
 // 	

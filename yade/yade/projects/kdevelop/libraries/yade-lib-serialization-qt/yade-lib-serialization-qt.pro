@@ -3,7 +3,7 @@
 # Subdir relative project main directory: ./libraries/yade-lib-serialization-qt
 # Target is a library:  
 
-LIBS += -lXMLManager \
+LIBS += -lyade-lib-serialization-xml \
         -rdynamic 
 INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 

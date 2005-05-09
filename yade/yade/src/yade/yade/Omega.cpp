@@ -312,7 +312,7 @@ void Omega::loadSimulation()
 		
 		//{
 		//	LOCK(rootBodyMutex);
-			IOManager::loadFromFile("XMLManager",simulationFileName,"rootBody",rootBody);
+			IOManager::loadFromFile("yade-lib-serialization-xml",simulationFileName,"rootBody",rootBody);
 			sStartingSimulationTime = second_clock::local_time();
 			msStartingSimulationTime = microsec_clock::local_time();
 			simulationPauseDuration = msStartingSimulationTime-msStartingSimulationTime;
