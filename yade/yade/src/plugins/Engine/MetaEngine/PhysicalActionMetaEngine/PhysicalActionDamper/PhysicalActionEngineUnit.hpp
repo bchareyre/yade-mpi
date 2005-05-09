@@ -21,46 +21,39 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#ifndef ACTION_DAMPING_DISPATCHER_HPP
-#define ACTION_DAMPING_DISPATCHER_HPP
+#ifndef ACTION_DAMPING_FUNCTOR_HPP
+#define ACTION_DAMPING_FUNCTOR_HPP
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "Engine.hpp"
-#include "DynLibDispatcher.hpp"
+#include "FunctorWrapper.hpp"
 #include "PhysicalAction.hpp"
-#include "PhysicalActionEngineUnit.hpp"
-
-class Body;
+#include "PhysicalParameters.hpp"
+#include "Body.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-class PhysicalActionMetaEngine : 
-	  public Engine
-	, public DynLibDispatcher
-		<	  TYPELIST_2( PhysicalAction , PhysicalParameters )	// base classess for dispatch
-			, PhysicalActionEngineUnit				// class that provides multivirtual call
-			, void						// return type
-			, TYPELIST_3(	  const shared_ptr<PhysicalAction>&	// function arguments
-					, const shared_ptr<PhysicalParameters>& 
-					, const Body *
-				    )
+class PhysicalActionEngineUnit : public FunctorWrapper
+		<
+		 void ,
+		 TYPELIST_3(	  const shared_ptr<PhysicalAction>&
+				, const shared_ptr<PhysicalParameters>&
+				, const Body*
+			   )
 		>
 {
-	public 		: virtual void action(Body* body);
-	public		: virtual void registerAttributes();
-	protected	: virtual void postProcessAttributes(bool deserializing);
-	REGISTER_CLASS_NAME(PhysicalActionMetaEngine);
+	REGISTER_CLASS_NAME(PhysicalActionEngineUnit);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-REGISTER_SERIALIZABLE(PhysicalActionMetaEngine,false);
+REGISTER_SERIALIZABLE(PhysicalActionEngineUnit,false);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#endif // ACTION_DAMPING_DISPATCHER_HPP
+
+#endif // ACTION_DAMPING_FUNCTOR_HPP
