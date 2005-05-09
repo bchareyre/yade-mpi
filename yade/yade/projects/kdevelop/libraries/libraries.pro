@@ -17,6 +17,6 @@ SUBDIRS += yade-lib-loki \
            XMLManager \
            yade-lib-threads \
            yade-lib-computational-geometry \
-           yade-lib-opengl \
            yade-lib-time \
+           yade-lib-opengl \
            yade-lib-serialization-qt 
