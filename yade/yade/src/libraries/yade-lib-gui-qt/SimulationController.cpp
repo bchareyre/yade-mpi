@@ -26,7 +26,7 @@
 #include "ThreadSynchronizer.hpp"
 #include "Math.hpp"
 #include "Threadable.hpp"
-#include "OpenGLRenderingEngine.hpp"
+//#include "OpenGLRenderingEngine.hpp"
 #include "MessageDialog.hpp"
 #include "FileDialog.hpp"
 
@@ -71,8 +71,9 @@ SimulationController::SimulationController(QWidget * parent) : QtGeneratedSimula
 //	while(! renderer )
 // FIXME - what is going on here? it was crashing rabdomly unless I added these lines...
 	shared_ptr<Factorable> tmpRenderer = ClassFactory::instance().createShared("OpenGLRenderingEngine");
-	shared_ptr<OpenGLRenderingEngine> tmp2 = dynamic_pointer_cast<OpenGLRenderingEngine>(tmpRenderer);
-	renderer = dynamic_pointer_cast<RenderingEngine>(tmp2);
+	//shared_ptr<OpenGLRenderingEngine> tmp2 = dynamic_pointer_cast<OpenGLRenderingEngine>(tmpRenderer);
+	//renderer = dynamic_pointer_cast<RenderingEngine>(tmp2);
+	renderer = static_pointer_cast<RenderingEngine>(tmpRenderer);
 	
 	if(renderer)
 	{

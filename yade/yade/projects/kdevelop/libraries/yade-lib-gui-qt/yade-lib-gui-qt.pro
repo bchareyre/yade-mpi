@@ -3,8 +3,7 @@
 # Subdir relative project main directory: ./libraries/yade-lib-gui-qt
 # Target is a library:  QtGUI
 
-LIBS += -lOpenGLRenderingEngine \
-        -lyade-lib-wm3-math \
+LIBS += -lyade-lib-wm3-math \
         -lyade-lib-multimethods \
         -lyade-lib-factory \
         -lyade-lib-opengl \
@@ -20,8 +19,7 @@ INCLUDEPATH = $(YADEINCLUDEPATH)
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../plugins/Engine/Sensor/RenderingEngine/OpenGLRenderingEngine/OpenGLRenderingEngine/$(YADEDYNLIBPATH) \
-               ../../libraries/yade-lib-wm3-math/$(YADEDYNLIBPATH) \
+QMAKE_LIBDIR = ../../libraries/yade-lib-wm3-math/$(YADEDYNLIBPATH) \
                ../../libraries/yade-lib-multimethods/$(YADEDYNLIBPATH) \
                ../../libraries/yade-lib-factory/$(YADEDYNLIBPATH) \
                ../../libraries/yade-lib-opengl/$(YADEDYNLIBPATH) \
