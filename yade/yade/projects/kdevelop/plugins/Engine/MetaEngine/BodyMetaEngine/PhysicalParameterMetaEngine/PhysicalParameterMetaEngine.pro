@@ -3,6 +3,7 @@
 # Subdir relative project main directory: ./plugins/Engine/MetaEngine/BodyMetaEngine/PhysicalParameterMetaEngine
 # Target is a subdirs project 
 
+SUBDIRS += PhysicalParametersMetaEngine 
 CONFIG += release \
-          warn_on 
-TEMPLATE = subdirs 
+warn_on
+TEMPLATE = subdirs

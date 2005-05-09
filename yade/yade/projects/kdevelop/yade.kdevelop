@@ -99,7 +99,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>libraries/yade-lib-serialization</activedir>
+      <activedir>plugins/Engine/MetaEngine/InteractionMetaEngine/NarrowInteractionGeometryMetaEngine</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>

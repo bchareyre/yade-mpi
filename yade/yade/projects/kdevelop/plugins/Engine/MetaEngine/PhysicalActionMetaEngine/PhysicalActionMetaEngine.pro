@@ -3,6 +3,8 @@
 # Subdir relative project main directory: ./plugins/Engine/MetaEngine/PhysicalActionMetaEngine
 # Target is a subdirs project 
 
+SUBDIRS += PhysicalActionApplier \
+           PhysicalActionDamper 
 CONFIG += release \
-          warn_on 
-TEMPLATE = subdirs 
+warn_on
+TEMPLATE = subdirs

@@ -3,6 +3,7 @@
 # Subdir relative project main directory: ./plugins/Engine/MetaEngine/BodyMetaEngine/InteractingGeometryMetaEngine
 # Target is a subdirs project 
 
+SUBDIRS += InteractingGeometryMetaEngine 
 CONFIG += release \
-          warn_on 
-TEMPLATE = subdirs 
+warn_on
+TEMPLATE = subdirs

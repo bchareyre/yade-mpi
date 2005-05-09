@@ -3,6 +3,7 @@
 # Subdir relative project main directory: ./plugins/Engine/MetaEngine/InteractionMetaEngine/InteractionPhysicsMetaEngine
 # Target is a subdirs project 
 
+SUBDIRS += InteractionPhysicsMetaEngine 
 CONFIG += release \
-          warn_on 
-TEMPLATE = subdirs 
+warn_on
+TEMPLATE = subdirs
