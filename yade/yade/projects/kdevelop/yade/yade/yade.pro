@@ -3,64 +3,62 @@
 # Subdir relative project main directory: ./yade/yade
 # Target is an application:  
 
-LIBS += -lInteraction \
-        -lInteractionPhysics \
-        -lInteractionGeometry \
-        -lBoundingVolume \
-        -lInteractingGeometry \
-        -lGeometricalModel \
-        -lPhysicalParameters \
-        -lEngine \
-        -lyade-lib-serialization \
-        -lyade-lib-wm3-math \
-        -lyade-lib-multimethods \
-        -lyade-lib-factory \
-        -lyade-lib-threads \
-        -lBody \
-        -lboost_thread \
-        -lboost_filesystem \
-        -lboost_date_time \
-        -lglut \
-        -lQGLViewer \
-        -rdynamic 
-INCLUDEPATH += $(YADEINCLUDEPATH) 
-MOC_DIR = $(YADECOMPILATIONPATH) 
-UI_DIR = $(YADECOMPILATIONPATH) 
-OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../yade/Interaction/Interaction/$(YADEDYNLIBPATH) \
-               ../../yade/Interaction/InteractionPhysics/$(YADEDYNLIBPATH) \
-               ../../yade/Interaction/InteractionGeometry/$(YADEDYNLIBPATH) \
-               ../../yade/Body/BoundingVolume/$(YADEDYNLIBPATH) \
-               ../../yade/Body/InteractingGeometry/$(YADEDYNLIBPATH) \
-               ../../yade/Body/GeometricalModel/$(YADEDYNLIBPATH) \
-               ../../yade/Body/PhysicalParameters/$(YADEDYNLIBPATH) \
-               ../../yade/Engine/$(YADEDYNLIBPATH) \
-               ../../toolboxes/Libraries/yade-lib-serialization/$(YADEDYNLIBPATH) \
-               ../../toolboxes/Libraries/yade-lib-wm3-math/$(YADEDYNLIBPATH) \
-               ../../toolboxes/Libraries/yade-lib-multimethods/$(YADEDYNLIBPATH) \
-               ../../toolboxes/Libraries/yade-lib-factory/$(YADEDYNLIBPATH) \
-               ../../toolboxes/Libraries/yade-lib-threads/$(YADEDYNLIBPATH) \
-               $(YADEDYNLIBPATH) 
-QMAKE_CXXFLAGS_RELEASE += -lpthread \
-                          -pthread 
-QMAKE_CXXFLAGS_DEBUG += -lpthread \
-                        -pthread 
-DESTDIR = $(YADEBINPATH) 
-CONFIG += debug \
-          warn_on 
-TEMPLATE = app 
-HEADERS += Chrono.hpp \
-           Omega.hpp \
+HEADERS += Omega.hpp \
            Engine.hpp \
            FrontEnd.hpp \
            FileGenerator.hpp \
            SimulationLoop.hpp \
            RenderingEngine.hpp \
            yadeExceptions.hpp 
-SOURCES += Chrono.cpp \
-           Omega.cpp \
+SOURCES += Omega.cpp \
            yade.cpp \
            FrontEnd.cpp \
            SimulationLoop.cpp \
            FileGenerator.cpp \
            yadeExceptions.cpp 
+LIBS += -lInteraction \
+-lInteractionPhysics \
+-lInteractionGeometry \
+-lBoundingVolume \
+-lInteractingGeometry \
+-lGeometricalModel \
+-lPhysicalParameters \
+-lEngine \
+-lyade-lib-serialization \
+-lyade-lib-wm3-math \
+-lyade-lib-multimethods \
+-lyade-lib-factory \
+-lyade-lib-threads \
+-lBody \
+-lboost_thread \
+-lboost_filesystem \
+-lboost_date_time \
+-lglut \
+-lQGLViewer \
+-rdynamic
+INCLUDEPATH += $(YADEINCLUDEPATH)
+MOC_DIR = $(YADECOMPILATIONPATH)
+UI_DIR = $(YADECOMPILATIONPATH)
+OBJECTS_DIR = $(YADECOMPILATIONPATH)
+QMAKE_LIBDIR = ../../yade/Interaction/Interaction/$(YADEDYNLIBPATH) \
+../../yade/Interaction/InteractionPhysics/$(YADEDYNLIBPATH) \
+../../yade/Interaction/InteractionGeometry/$(YADEDYNLIBPATH) \
+../../yade/Body/BoundingVolume/$(YADEDYNLIBPATH) \
+../../yade/Body/InteractingGeometry/$(YADEDYNLIBPATH) \
+../../yade/Body/GeometricalModel/$(YADEDYNLIBPATH) \
+../../yade/Body/PhysicalParameters/$(YADEDYNLIBPATH) \
+../../yade/Engine/$(YADEDYNLIBPATH) \
+../../toolboxes/Libraries/yade-lib-serialization/$(YADEDYNLIBPATH) \
+../../toolboxes/Libraries/yade-lib-wm3-math/$(YADEDYNLIBPATH) \
+../../toolboxes/Libraries/yade-lib-multimethods/$(YADEDYNLIBPATH) \
+../../toolboxes/Libraries/yade-lib-factory/$(YADEDYNLIBPATH) \
+../../toolboxes/Libraries/yade-lib-threads/$(YADEDYNLIBPATH) \
+$(YADEDYNLIBPATH)
+QMAKE_CXXFLAGS_RELEASE += -lpthread \
+-pthread
+QMAKE_CXXFLAGS_DEBUG += -lpthread \
+-pthread
+DESTDIR = $(YADEBINPATH)
+CONFIG += debug \
+warn_on
+TEMPLATE = app

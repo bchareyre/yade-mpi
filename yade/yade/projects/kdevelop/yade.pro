@@ -13,7 +13,7 @@ TEMPLATE = subdirs
 SUBDIRS += libraries \
            yade \
            plugins \
-           gui \
            serialization \
+           gui \
            postprocessors \
            preprocessors 
