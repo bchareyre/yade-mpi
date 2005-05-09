@@ -3,23 +3,20 @@
 # Subdir relative project main directory: ./yade/Body/GeometricalModel
 # Target is a library:  
 
-LIBS += -rdynamic 
-INCLUDEPATH += $(YADEINCLUDEPATH) 
-MOC_DIR = $(YADECOMPILATIONPATH) 
-UI_DIR = $(YADECOMPILATIONPATH) 
-OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = $(YADEDYNLIBPATH) 
+HEADERS += GeometricalModel.hpp 
+SOURCES += GeometricalModel.cpp 
+LIBS += -rdynamic
+INCLUDEPATH += $(YADEINCLUDEPATH)
+MOC_DIR = $(YADECOMPILATIONPATH)
+UI_DIR = $(YADECOMPILATIONPATH)
+OBJECTS_DIR = $(YADECOMPILATIONPATH)
+QMAKE_LIBDIR = $(YADEDYNLIBPATH)
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
-                          -pthread 
+-pthread
 QMAKE_CXXFLAGS_DEBUG += -lpthread \
-                        -pthread 
-DESTDIR = $(YADEDYNLIBPATH) 
+-pthread
+DESTDIR = $(YADEDYNLIBPATH)
 CONFIG += debug \
-          warn_on \
-          dll 
-TEMPLATE = lib 
-HEADERS += GeometricalModel.hpp \
-           GeometricalModelEngineUnit.hpp \
-           GeometricalModelMetaEngine.hpp 
-SOURCES += GeometricalModel.cpp \
-           GeometricalModelMetaEngine.cpp 
+warn_on \
+dll
+TEMPLATE = lib

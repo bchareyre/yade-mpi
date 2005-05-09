@@ -3,23 +3,20 @@
 # Subdir relative project main directory: ./yade/Body/PhysicalParameters
 # Target is a library:  
 
-LIBS += -rdynamic 
-INCLUDEPATH += $(YADEINCLUDEPATH) 
-MOC_DIR = $(YADECOMPILATIONPATH) 
-UI_DIR = $(YADECOMPILATIONPATH) 
-OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = $(YADEDYNLIBPATH) 
+HEADERS += PhysicalParameters.hpp 
+SOURCES += PhysicalParameters.cpp 
+LIBS += -rdynamic
+INCLUDEPATH += $(YADEINCLUDEPATH)
+MOC_DIR = $(YADECOMPILATIONPATH)
+UI_DIR = $(YADECOMPILATIONPATH)
+OBJECTS_DIR = $(YADECOMPILATIONPATH)
+QMAKE_LIBDIR = $(YADEDYNLIBPATH)
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
-                          -pthread 
+-pthread
 QMAKE_CXXFLAGS_DEBUG += -lpthread \
-                        -pthread 
-DESTDIR = $(YADEDYNLIBPATH) 
+-pthread
+DESTDIR = $(YADEDYNLIBPATH)
 CONFIG += debug \
-          warn_on \
-          dll 
-TEMPLATE = lib 
-HEADERS += PhysicalParameters.hpp \
-	   PhysicalParametersMetaEngine.hpp \
-	   PhysicalParametersEngineUnit.hpp
-SOURCES += PhysicalParameters.cpp \
-	   PhysicalParametersMetaEngine.cpp
+warn_on \
+dll
+TEMPLATE = lib
