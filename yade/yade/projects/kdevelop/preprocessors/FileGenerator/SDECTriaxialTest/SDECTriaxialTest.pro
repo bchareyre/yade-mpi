@@ -20,8 +20,11 @@ LIBS += -lPersistentSAPCollider \
         -lInteractionVecSet \
         -lBodyRedirectionVector \
         -lPhysicalActionContainerReseter \
+        -lInteractionGeometryMetaEngine \
+        -lInteractionPhysicsMetaEngine \
+        -lBoundingVolumeMetaEngine \
         -rdynamic 
-INCLUDEPATH += $(YADEINCLUDEPATH) 
+INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
@@ -41,6 +44,9 @@ QMAKE_LIBDIR = ../../../plugins/Engine/Engine/InteractionEngine/BroadInteraction
                ../../../plugins/Container/PhysicalActionContainer/PhysicalActionVectorVector/$(YADEDYNLIBPATH) \
                ../../../plugins/Container/InteractionContainer/InteractionVecSet/$(YADEDYNLIBPATH) \
                ../../../plugins/Container/BodyContainer/BodyRedirectionVector/$(YADEDYNLIBPATH) \
+               ../../../plugins/Engine/Engine/PhysicalActionEngine/PhysicalActionContainerReseter/$(YADEDYNLIBPATH) \
+               ../../../plugins/Engine/MetaEngine/InteractionMetaEngine/NarrowInteractionGeometryMetaEngine/InteractionGeometryMetaEngine/$(YADEDYNLIBPATH) \
+               ../../../plugins/Engine/MetaEngine/InteractionMetaEngine/InteractionPhysicsMetaEngine/InteractionPhysicsMetaEngine/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

@@ -14,8 +14,11 @@ LIBS += -lParticleParameters \
         -lPhysicalActionVectorVector \
         -lInteractionVecSet \
         -lBodyRedirectionVector \
+        -lGeometricalModelMetaEngine \
+        -lInteractionPhysicsMetaEngine \
+        -lBoundingVolumeMetaEngine \
         -rdynamic 
-INCLUDEPATH += $(YADEINCLUDEPATH) 
+INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
@@ -30,6 +33,8 @@ QMAKE_LIBDIR = ../../../plugins/Data/Body/PhysicalParameters/ParticleParameters/
                ../../../plugins/Container/PhysicalActionContainer/PhysicalActionVectorVector/$(YADEDYNLIBPATH) \
                ../../../plugins/Container/InteractionContainer/InteractionVecSet/$(YADEDYNLIBPATH) \
                ../../../plugins/Container/BodyContainer/BodyRedirectionVector/$(YADEDYNLIBPATH) \
+               ../../../plugins/Engine/MetaEngine/BodyMetaEngine/GeometricalModelMetaEngine/GeometricalModelMetaEngine/$(YADEDYNLIBPATH) \
+               ../../../plugins/Engine/MetaEngine/InteractionMetaEngine/InteractionPhysicsMetaEngine/InteractionPhysicsMetaEngine/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

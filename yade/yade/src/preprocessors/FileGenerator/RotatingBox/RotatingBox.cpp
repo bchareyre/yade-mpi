@@ -15,10 +15,8 @@
 #include "InteractingBox.hpp"
 #include "InteractingSphere.hpp"
 #include "InteractionGeometryMetaEngine.hpp"
-#include "PhysicalActionMetaEngine.hpp"
 #include "CundallNonViscousForceDamping.hpp"
 #include "CundallNonViscousMomentumDamping.hpp"
-#include "PhysicalActionMetaEngine.hpp"
 #include "PhysicalActionContainerReseter.hpp"
 #include "PhysicalActionContainerInitializer.hpp"
 
@@ -31,6 +29,9 @@
 #include "BodyRedirectionVector.hpp"
 #include "InteractionVecSet.hpp"
 #include "PhysicalActionVectorVector.hpp"
+
+#include "PhysicalActionDamper.hpp"
+#include "PhysicalActionApplier.hpp"
 
 RotatingBox::RotatingBox () : FileGenerator()
 {
@@ -284,11 +285,11 @@ void RotatingBox::createActors(shared_ptr<MetaBody>& rootBody)
 	actionForceDamping->damping = dampingForce;
 	shared_ptr<CundallNonViscousMomentumDamping> actionMomentumDamping(new CundallNonViscousMomentumDamping);
 	actionMomentumDamping->damping = dampingMomentum;
-	shared_ptr<PhysicalActionMetaEngine> actionDampingDispatcher(new PhysicalActionMetaEngine);
+	shared_ptr<PhysicalActionDamper> actionDampingDispatcher(new PhysicalActionDamper);
 	actionDampingDispatcher->add("Force","ParticleParameters","CundallNonViscousForceDamping",actionForceDamping);
 	actionDampingDispatcher->add("Momentum","RigidBodyParameters","CundallNonViscousMomentumDamping",actionMomentumDamping);
 	
-	shared_ptr<PhysicalActionMetaEngine> applyActionDispatcher(new PhysicalActionMetaEngine);
+	shared_ptr<PhysicalActionApplier> applyActionDispatcher(new PhysicalActionApplier);
 	applyActionDispatcher->add("Force","ParticleParameters","NewtonsForceLaw");
 	applyActionDispatcher->add("Momentum","RigidBodyParameters","NewtonsMomentumLaw");
 	

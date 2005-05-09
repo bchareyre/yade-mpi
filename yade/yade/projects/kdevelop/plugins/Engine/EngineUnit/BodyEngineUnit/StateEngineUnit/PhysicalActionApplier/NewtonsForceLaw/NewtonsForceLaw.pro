@@ -5,12 +5,15 @@
 
 LIBS += -lParticleParameters \
         -lForce \
+        -lPhysicalActionApplier \
         -rdynamic 
-INCLUDEPATH += $(YADEINCLUDEPATH) 
+INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 QMAKE_LIBDIR = ../../../../../../../plugins/Data/Body/PhysicalParameters/ParticleParameters/$(YADEDYNLIBPATH) \
+               ../../../../../../../plugins/Data/PhysicalAction/Force/$(YADEDYNLIBPATH) \
+               ../../../../../../../plugins/Engine/MetaEngine/PhysicalActionMetaEngine/PhysicalActionApplier/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

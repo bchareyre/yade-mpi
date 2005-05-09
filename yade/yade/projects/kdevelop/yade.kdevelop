@@ -99,7 +99,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>plugins/Engine/MetaEngine/InteractionMetaEngine/NarrowInteractionGeometryMetaEngine</activedir>
+      <activedir></activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>
