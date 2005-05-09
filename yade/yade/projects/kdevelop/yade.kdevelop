@@ -99,7 +99,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>gui</activedir>
+      <activedir>libraries/yade-lib-serialization</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>
