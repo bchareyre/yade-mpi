@@ -3,24 +3,21 @@
 # Subdir relative project main directory: ./yade/Interaction/InteractionPhysics
 # Target is a library:  
 
+HEADERS += InteractionPhysics.hpp 
 LIBS += -lyade-lib-multimethods \
-        -rdynamic 
-INCLUDEPATH += $(YADEINCLUDEPATH) 
-MOC_DIR = $(YADECOMPILATIONPATH) 
-UI_DIR = $(YADECOMPILATIONPATH) 
-OBJECTS_DIR = $(YADECOMPILATIONPATH) 
+-rdynamic
+INCLUDEPATH += $(YADEINCLUDEPATH)
+MOC_DIR = $(YADECOMPILATIONPATH)
+UI_DIR = $(YADECOMPILATIONPATH)
+OBJECTS_DIR = $(YADECOMPILATIONPATH)
 QMAKE_LIBDIR = ../../toolboxes/Libraries/MultiMethods/$(YADEDYNLIBPATH) \
-               $(YADEDYNLIBPATH) 
+$(YADEDYNLIBPATH)
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
-                          -pthread 
+-pthread
 QMAKE_CXXFLAGS_DEBUG += -lpthread \
-                        -pthread 
-DESTDIR = $(YADEDYNLIBPATH) 
+-pthread
+DESTDIR = $(YADEDYNLIBPATH)
 CONFIG += debug \
-          warn_on \
-          dll 
-TEMPLATE = lib 
-HEADERS += InteractionPhysics.hpp \
-           InteractionPhysicsMetaEngine.hpp \
-           InteractionPhysicsEngineUnit.hpp 
-SOURCES += InteractionPhysicsMetaEngine.cpp 
+warn_on \
+dll
+TEMPLATE = lib
