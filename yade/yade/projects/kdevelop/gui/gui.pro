@@ -3,7 +3,7 @@
 # Subdir relative project main directory: ./gui
 # Target is a subdirs project 
 
-SUBDIRS += yade-gui-qt 
+SUBDIRS += QtGUI 
 CONFIG += release \
-          warn_on 
-TEMPLATE = subdirs 
+warn_on
+TEMPLATE = subdirs
