@@ -7,9 +7,9 @@ SUBDIRS += yade \
            plugins \
            postprocessors \
            preprocessors \
-           extensions \
            libraries \
-           gui 
+           gui \
+           serialization 
 MOC_DIR = $(YADECOMPILATIONPATH)
 UI_DIR = $(YADECOMPILATIONPATH)
 OBJECTS_DIR = $(YADECOMPILATIONPATH)
