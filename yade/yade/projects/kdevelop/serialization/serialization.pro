@@ -3,7 +3,6 @@
 # Subdir relative project main directory: ./serialization
 # Target is a subdirs project 
 
-SUBDIRS += XMLManager 
 CONFIG += release \
-          warn_on 
-TEMPLATE = subdirs 
+warn_on
+TEMPLATE = subdirs
