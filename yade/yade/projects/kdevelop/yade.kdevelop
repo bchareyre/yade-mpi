@@ -99,7 +99,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>plugins/Engine/Engine/PhysicalActionEngine/InteractionSolver/ElasticContactLaw</activedir>
+      <activedir>plugins/Engine/MetaEngine/PhysicalActionMetaEngine/PhysicalActionApplier</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>
