@@ -207,7 +207,7 @@ void BoxStack::createSphere(shared_ptr<Body>& body)
 
 void BoxStack::createKinematicBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents,bool wire)
 {
-	body = shared_ptr<Body>(new Body(0,1));
+	body = shared_ptr<Body>(new Body(0,2));
 	shared_ptr<RigidBodyParameters> physics(new RigidBodyParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<Box> gBox(new Box);

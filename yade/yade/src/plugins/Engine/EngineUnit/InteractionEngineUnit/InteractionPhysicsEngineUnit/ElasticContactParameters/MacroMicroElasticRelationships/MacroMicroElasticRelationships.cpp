@@ -137,13 +137,13 @@ another would be HerzMindlinContactModel
 	else   // this is PERMANENT LINK because previous dynamic_cast failed, dispatcher should do this job
 	{
 		SDECLinkGeometry* sdecLinkGeometry =  dynamic_cast<SDECLinkGeometry*>(interaction->interactionGeometry.get());
-		assert( sdecLinkGeometry );
-		
-		shared_ptr<SDECLinkPhysics> linkPhysics = dynamic_pointer_cast<SDECLinkPhysics>(interaction->interactionPhysics);
-
-//		linkPhysics->frictionAngle 		= ?? //FIXME - uninitialized 
-		linkPhysics->kn 			= linkPhysics->initialKn;
-		linkPhysics->ks 			= linkPhysics->initialKs;
-		linkPhysics->equilibriumDistance 	= linkPhysics->initialEquilibriumDistance;
+		if (sdecLinkGeometry)
+		{		
+			shared_ptr<SDECLinkPhysics> linkPhysics = dynamic_pointer_cast<SDECLinkPhysics>(interaction->interactionPhysics);
+	//		linkPhysics->frictionAngle 		= ?? //FIXME - uninitialized 
+			linkPhysics->kn 			= linkPhysics->initialKn;
+			linkPhysics->ks 			= linkPhysics->initialKs;
+			linkPhysics->equilibriumDistance 	= linkPhysics->initialEquilibriumDistance;
+		}
 	}
 };

@@ -56,10 +56,10 @@ HangingCloth::HangingCloth () : FileGenerator()
 {
 	width = 20;
 	height = 20;
-	springStiffness = 500;
+	springStiffness = 400000;//500;
 	springDamping   = 1.0;
 	particleDamping = 0.997;
-	clothMass = 10;
+	clothMass = 4000;//10;
 	cellSize = 20;
 	fixPoint1 = true;
 	fixPoint2 = true;
@@ -97,10 +97,10 @@ void HangingCloth::registerAttributes()
 {
 	REGISTER_ATTRIBUTE(width);
 	REGISTER_ATTRIBUTE(height);
-//	REGISTER_ATTRIBUTE(springStiffness);	// I commented that, because there are too many parameters, and window is too big
-//	REGISTER_ATTRIBUTE(springDamping); 	// I commented that, because there are too many parameters, and window is too big
+	REGISTER_ATTRIBUTE(springStiffness);
+	REGISTER_ATTRIBUTE(springDamping);
 	//REGISTER_ATTRIBUTE(particleDamping); 	// FIXME - ignored - delete it, or start using it
-//	REGISTER_ATTRIBUTE(clothMass); 		// I commented that, because there are too many parameters, and window is too big
+	REGISTER_ATTRIBUTE(clothMass);
 	REGISTER_ATTRIBUTE(cellSize);
 	REGISTER_ATTRIBUTE(fixPoint1);
 	REGISTER_ATTRIBUTE(fixPoint2);
@@ -109,17 +109,17 @@ void HangingCloth::registerAttributes()
 	REGISTER_ATTRIBUTE(ground);
 	
 	// spheres
-	REGISTER_ATTRIBUTE(nbSpheres);
-	REGISTER_ATTRIBUTE(minRadius);
-	REGISTER_ATTRIBUTE(maxRadius);
-//	REGISTER_ATTRIBUTE(density); 		// I commented that, because there are too many parameters, and window is too big
-	REGISTER_ATTRIBUTE(disorder);
-//	REGISTER_ATTRIBUTE(spacing);		// I commented that, because there are too many parameters, and window is too big
+	//REGISTER_ATTRIBUTE(nbSpheres);
+	//REGISTER_ATTRIBUTE(minRadius);
+	//REGISTER_ATTRIBUTE(maxRadius);
+	//rEGISTER_ATTRIBUTE(density); 		
+	//REGISTER_ATTRIBUTE(disorder);
+	//REGISTER_ATTRIBUTE(spacing);		
 	
 	REGISTER_ATTRIBUTE(gravity);
 	REGISTER_ATTRIBUTE(dampingForce);
 	REGISTER_ATTRIBUTE(dampingMomentum);
-	REGISTER_ATTRIBUTE(linkSpheres);
+	//REGISTER_ATTRIBUTE(linkSpheres);
 
 //	REGISTER_ATTRIBUTE(sphereYoungModulus);
 //	REGISTER_ATTRIBUTE(spherePoissonRatio);
@@ -180,9 +180,9 @@ string HangingCloth::generate()
 	shared_ptr<ElasticContactLaw> elasticContactLaw(new ElasticContactLaw);
 	elasticContactLaw->sdecGroupMask = 2;
 
-	shared_ptr<MassSpringBody2RigidBodyLaw> massSpringBody2RigidBodyConstitutiveLaw(new MassSpringBody2RigidBodyLaw);
-	massSpringBody2RigidBodyConstitutiveLaw->sdecGroupMask = 2;
-	massSpringBody2RigidBodyConstitutiveLaw->springGroupMask = 1;
+	//shared_ptr<MassSpringBody2RigidBodyLaw> massSpringBody2RigidBodyConstitutiveLaw(new MassSpringBody2RigidBodyLaw);
+	//massSpringBody2RigidBodyConstitutiveLaw->sdecGroupMask = 2;
+	//massSpringBody2RigidBodyConstitutiveLaw->springGroupMask = 1;
 
 	rootBody->actors.clear();
 	rootBody->actors.push_back(shared_ptr<Engine>(new PhysicalActionContainerReseter));
@@ -240,30 +240,31 @@ string HangingCloth::generate()
 	for(int i=0;i<width;i++)
 		for(int j=0;j<height;j++)
 		{
-			shared_ptr<Body> node(new Body(0,1));
+			shared_ptr<Body> node(new Body(0,1|2));
 
 			node->isDynamic		= true;
 			
 			shared_ptr<InteractingSphere> iSphere(new InteractingSphere);
 			iSphere->diffuseColor	= Vector3f(0,0,1);
-			iSphere->radius		= cellSize/1.5;// /2.0;
+			iSphere->radius		= cellSize/2.2;
 
 // BEGIN ORIGINAL							
-			shared_ptr<ParticleParameters> particle(new ParticleParameters);
-			particle->velocity		= Vector3r(0,0,0);
-			particle->mass			= clothMass/(Real)(width*height);
-			particle->se3			= Se3r(Vector3r(i*cellSize-(cellSize*(width-1))*0.5,0,j*cellSize-(cellSize*(height-1))*0.5),q);
+//			shared_ptr<ParticleParameters> particle(new ParticleParameters);
+//			particle->velocity		= Vector3r(0,0,0);
+//			particle->mass			= clothMass/(Real)(width*height);
+//			particle->se3			= Se3r(Vector3r(i*cellSize-(cellSize*(width-1))*0.5,0,j*cellSize-(cellSize*(height-1))*0.5),q);
 // END									
 
 // BEGIN HACK - to have collision between SDEC spheres and cloth	
-// 			shared_ptr<BodyMacroParameters> particle(new BodyMacroParameters);
-// 			particle->angularVelocity	= Vector3r(0,0,0);
-// 			particle->velocity		= Vector3r(0,0,0);
-// 			particle->mass			= clothMass/(Real)(width*height);
-// 			particle->inertia		= Vector3r(2.0/5.0*particle->mass*iSphere->radius*iSphere->radius,2.0/5.0*particle->mass*iSphere->radius*iSphere->radius,2.0/5.0*particle->mass*iSphere->radius*iSphere->radius);
-// 			particle->se3			= Se3r(Vector3r(i*cellSize-(cellSize*(width-1))*0.5,0,j*cellSize-(cellSize*(height-1))*0.5),q);
-// 			particle->kn			= 1000000;
-// 			particle->ks			= 100000;
+			shared_ptr<BodyMacroParameters> particle(new BodyMacroParameters);
+			particle->angularVelocity	= Vector3r(0,0,0);
+			particle->velocity		= Vector3r(0,0,0);
+			particle->mass			= clothMass/(Real)(width*height);
+			particle->inertia		= Vector3r(2.0/5.0*particle->mass*iSphere->radius*iSphere->radius,2.0/5.0*particle->mass*iSphere->radius*iSphere->radius,2.0/5.0*particle->mass*iSphere->radius*iSphere->radius);
+			particle->se3			= Se3r(Vector3r(i*cellSize-(cellSize*(width-1))*0.5,0,j*cellSize-(cellSize*(height-1))*0.5),q);
+			particle->young			= sphereYoungModulus;
+			particle->poisson		= spherePoissonRatio;
+			particle->frictionAngle		= sphereFrictionDeg * Mathr::PI/180.0;
 // END HACK								
 
 			shared_ptr<AABB> aabb(new AABB);
@@ -365,14 +366,14 @@ string HangingCloth::generate()
 // make spheres
 //////////////////////////////////////////////////////
 	
-	for(int i=0;i<nbSpheres[0];i++)
-		for(int j=0;j<nbSpheres[1];j++)
-			for(int k=0;k<nbSpheres[2];k++)
-			{
-				shared_ptr<Body> sphere;
-				createSphere(sphere,i,j,k);
-				rootBody->bodies->insert(sphere);
-			}
+// 	for(int i=0;i<nbSpheres[0];i++)
+// 		for(int j=0;j<nbSpheres[1];j++)
+// 			for(int k=0;k<nbSpheres[2];k++)
+// 			{
+// 				shared_ptr<Body> sphere;
+// 				createSphere(sphere,i,j,k);
+// 				rootBody->bodies->insert(sphere);
+// 			}
 
 			
 
@@ -514,6 +515,7 @@ void HangingCloth::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 void HangingCloth::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents)
 {

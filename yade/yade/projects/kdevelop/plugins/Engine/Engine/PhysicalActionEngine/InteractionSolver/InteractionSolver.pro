@@ -3,7 +3,8 @@
 # Subdir relative project main directory: ./plugins/Engine/Engine/PhysicalActionEngine/InteractionSolver
 # Target is a subdirs project 
 
-SUBDIRS += FEMLaw \
+SUBDIRS += ElasticCohesiveLaw \
+           FEMLaw \
            SimpleSpringLaw \
            MassSpringBody2RigidBodyLaw \
            ErrorTolerantLaw \

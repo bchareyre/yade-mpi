@@ -99,7 +99,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>libraries/yade-lib-gui-qt</activedir>
+      <activedir>preprocessors/FileGenerator/FEMBeam</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>
