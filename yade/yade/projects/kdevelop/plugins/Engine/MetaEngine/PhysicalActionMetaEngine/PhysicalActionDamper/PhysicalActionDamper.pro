@@ -3,17 +3,17 @@
 # Subdir relative project main directory: ./plugins/Engine/MetaEngine/PhysicalActionMetaEngine/PhysicalActionDamper
 # Target is a library:  
 
-LIBS += -rdynamic 
-INCLUDEPATH = $(YADEINCLUDEPATH) 
-MOC_DIR = $(YADECOMPILATIONPATH) 
-UI_DIR = $(YADECOMPILATIONPATH) 
-OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = $(YADEDYNLIBPATH) 
-DESTDIR = $(YADEDYNLIBPATH) 
-CONFIG += debug \
-          warn_on \
-          dll 
-TEMPLATE = lib 
 HEADERS += PhysicalActionDamper.hpp \
-           PhysicalActionEngineUnit.hpp 
+           PhysicalActionDamperUnit.hpp 
 SOURCES += PhysicalActionDamper.cpp 
+LIBS += -rdynamic
+INCLUDEPATH = $(YADEINCLUDEPATH)
+MOC_DIR = $(YADECOMPILATIONPATH)
+UI_DIR = $(YADECOMPILATIONPATH)
+OBJECTS_DIR = $(YADECOMPILATIONPATH)
+QMAKE_LIBDIR = $(YADEDYNLIBPATH)
+DESTDIR = $(YADEDYNLIBPATH)
+CONFIG += debug \
+warn_on \
+dll
+TEMPLATE = lib

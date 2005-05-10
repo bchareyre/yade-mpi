@@ -48,6 +48,7 @@ class MetaBody;
 class SimulationLoop;
 class FrontEnd;
 class ThreadSynchronizer;
+class Preferences;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -62,6 +63,9 @@ using namespace std;
 
 class Omega : public Singleton<Omega>
 {
+
+	public	: shared_ptr<Preferences> preferences;
+	
 	private	: shared_ptr<ofstream> logFile;
 	public	: void logMessage(const string& str);
 	public	: void logError(const string& str);

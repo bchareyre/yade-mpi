@@ -40,6 +40,7 @@
 #include <string>
 #include <iostream>
 #include <map>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -66,7 +67,9 @@ class DynLibManager
 /// Attributes											///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private : string baseDir;
+	private : vector<string> baseDirs;
+	public : void addBaseDirectory(const string& dir);
+	
 	private : bool autoUnload;
 	
 	// construction
@@ -74,7 +77,7 @@ class DynLibManager
 	public : DynLibManager (const string libName);
 	public : ~DynLibManager ();
 
-	public : void setBaseDirectory(string dir);
+
 //	public : Factory resolve (const string libName, const string symb );
 	public : bool load (const string libName);
 	public : bool unload (const string libName);

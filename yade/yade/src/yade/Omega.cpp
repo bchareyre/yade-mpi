@@ -23,6 +23,7 @@
 #include "SimulationLoop.hpp"
 #include "FrontEnd.hpp"
 
+#include "Preferences.hpp"
 //#include "InteractionGeometryMetaEngine.hpp"
 //#include "InteractionGeometryEngineUnit.hpp"
 
@@ -40,16 +41,36 @@ Omega::Omega()
 {
 	ThreadSafe::cerr("Constructing Omega  (if multiple times - check '-rdynamic' flag!)");
 
+	simulationFileName="";
+	currentIteration = 0;
+	dt = 0.01;
+	logFile = shared_ptr<ofstream>(new ofstream("../data/log.xml", ofstream::out | ofstream::app));
+	// build simulation loop thread
+	synchronizer = shared_ptr<ThreadSynchronizer>(new ThreadSynchronizer()); // FIXME - this should be optional
+
+	preferences = shared_ptr<Preferences>(new Preferences);
+
+	filesystem::path yadeConfigPath = filesystem::path(string(getenv("HOME")) + string("/.yade"), filesystem::native);
+
+	if ( filesystem::exists( yadeConfigPath ) )
 	{
-		//LOCK(omegaMutex);
-		simulationFileName="";
-		currentIteration = 0;
-		dt = 0.01; 
-		logFile = shared_ptr<ofstream>(new ofstream("../data/log.xml", ofstream::out | ofstream::app));
-		// build simulation loop thread
-		synchronizer = shared_ptr<ThreadSynchronizer>(new ThreadSynchronizer()); // FIXME - this should be optional
+		IOManager::loadFromFile("XMLManager",yadeConfigPath.string()+"/preferences.xml","preferences",preferences);
 	}
-	
+	else
+	{
+		filesystem::create_directories(yadeConfigPath);
+		char * buffer ;
+		buffer = getenv ("YADEBINPATH"); // FIXME : to modify after splitting
+		string yadeBinPath = buffer;
+		preferences->dynlibsDirectories.push_back(yadeBinPath+"/dynlib/linux");
+		IOManager::saveToFile("XMLManager",yadeConfigPath.string()+"/preferences.xml","preferences",preferences);
+	}
+
+	vector<string>::iterator dldi    = preferences->dynlibsDirectories.begin();
+	vector<string>::iterator dldiEnd = preferences->dynlibsDirectories.end();
+	for( ; dldi != dldiEnd ; ++dldi)
+		ClassFactory::instance().addBaseDirectory((*dldi));
+			
 	// build dynlib information list
 	buildDynlibList();
 
@@ -214,31 +235,37 @@ void Omega::registerDynlibType(const string& name)
 void Omega::buildDynlibList()
 {
 	//LOCK(omegaMutex);
-	
-	char * buffer ;
-	buffer = getenv ("YADEBINPATH"); // FIXME - yade should use config file, to check /usr/lib/yade and /home/joe/yade/lib, etc..
-	string yadeBinPath = buffer;
-
-	filesystem::path directory(yadeBinPath+"/dynlib/linux");
-	if ( filesystem::exists( directory ) )
+	vector<string>::iterator si = preferences->dynlibsDirectories.begin();
+	vector<string>::iterator siEnd = preferences->dynlibsDirectories.end();
+	for( ; si != siEnd ; ++si)
 	{
-		filesystem::directory_iterator di( directory );
-		filesystem::directory_iterator diEnd;
-		for ( ; di != diEnd; ++di )
+//		char * buffer ;
+//		buffer = getenv ("YADEBINPATH"); // FIXME - yade should use config file, to check /usr/lib/yade and /home/joe/yade/lib, etc..
+//		string yadeBinPath = buffer;
+//		filesystem::path directory(yadeBinPath+"/dynlib/linux");
+
+		filesystem::path directory((*si));
+		
+		if ( filesystem::exists( directory ) )
 		{
-			if (!filesystem::is_directory(*di) && !filesystem::symbolic_link_exists(*di) && filesystem::extension(*di)!=".a")
+			filesystem::directory_iterator di( directory );
+			filesystem::directory_iterator diEnd;
+			for ( ; di != diEnd; ++di )
 			{
-				filesystem::path name(filesystem::basename((*di)));
-				int prevLength = (*di).leaf().size();
-				int length = name.leaf().size();
-				while (length!=prevLength)
+				if (!filesystem::is_directory(*di) && !filesystem::symbolic_link_exists(*di) && filesystem::extension(*di)!=".a")
 				{
-					prevLength=length;
-					name = filesystem::path(filesystem::basename(name));
-					length = name.leaf().size();
+					filesystem::path name(filesystem::basename((*di)));
+					int prevLength = (*di).leaf().size();
+					int length = name.leaf().size();
+					while (length!=prevLength)
+					{
+						prevLength=length;
+						name = filesystem::path(filesystem::basename(name));
+						length = name.leaf().size();
+					}
+					registerDynlibType(name.leaf().substr(3,name.leaf().size()-3));
+					//cout << name.leaf() << endl;
 				}
-				registerDynlibType(name.leaf().substr(3,name.leaf().size()-3));
-				//cout << name.leaf() << endl;
 			}
 		}
 	}

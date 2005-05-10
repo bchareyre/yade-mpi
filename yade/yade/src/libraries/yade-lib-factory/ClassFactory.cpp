@@ -25,7 +25,10 @@
 class Factorable;
 
 
-
+void ClassFactory::addBaseDirectory(const string& dir)
+{
+	dlm.addBaseDirectory(dir);
+}
 
 bool ClassFactory::registerFactorable( std::string name 			   , CreateFactorableFnPtr create,
 					 CreateSharedFactorableFnPtr createShared, CreatePureCustomFnPtr createPureCustom)

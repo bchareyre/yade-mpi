@@ -1,18 +1,21 @@
 #include "DynLibManager.hpp"
 #include <fstream>
+#include <boost/filesystem/operations.hpp>
+#include <boost/filesystem/convenience.hpp>
 
 using namespace std;
+using namespace boost;
 
 DynLibManager::DynLibManager ( const string libName )
 {
-	setBaseDirectory("");
+	baseDirs.clear();
 	autoUnload = true;
 	load(libName);
 }
 
 DynLibManager::DynLibManager ()
 {
-	setBaseDirectory("");
+	baseDirs.clear();
 	autoUnload = true;
 }
 
@@ -22,9 +25,15 @@ DynLibManager::~DynLibManager ()
 		unloadAll();
 }
 
-void DynLibManager::setBaseDirectory(string dir)
+void DynLibManager::addBaseDirectory(const string& dir)
 {
-	baseDir = dir;
+	string tmpDir;
+	if ( dir[dir.size()-1]=='/' || dir[dir.size()-1]=='\\' )
+		tmpDir = dir.substr(0,dir.size()-1);
+	else
+		tmpDir = dir;
+
+	baseDirs.push_back(tmpDir);
 }
 
 /*Factory DynLibManager::resolve(const string libName, const string symb )
@@ -59,58 +68,68 @@ void DynLibManager::setBaseDirectory(string dir)
 bool DynLibManager::load (const string libName )
 {
 	
-//	if (libName!=NULL)
-//	{
-		if (autoUnload && isLoaded(libName))
-			closeLib(libName);
+	if (libName.empty())
+		return false;
+
+	string baseDir="";
+	vector<string>::iterator bdi    = baseDirs.begin();
+	vector<string>::iterator bdiEnd = baseDirs.end();
+	for( ; bdi != bdiEnd ; ++bdi)
+	{
+		filesystem::path name = filesystem::path((*bdi)+"/"+libName);
+		if ( filesystem::exists( name ) )
+		{
+			baseDir = (*bdi);
+			break;
+		}
+	}
+
+	if (autoUnload && isLoaded(libName))
+		closeLib(libName);
 		
-		string file;	
-
-		file = baseDir;
+	string file = baseDir;
 		
-		#ifdef WIN32
-			file.append(libName);
-			file.append(".dll");
+	#ifdef WIN32
+		file.append(libName);
+		file.append(".dll");
 
-			unsigned short * file2 = new unsigned short[file.length()+1];
-			int i=0;
-			while (file[i]!='\0')
-			{
-				file2[i] = file[i];
-				i++;
-			}
-			file2[i] = '\0';
+		unsigned short * file2 = new unsigned short[file.length()+1];
+		int i=0;
+		while (file[i]!='\0')
+		{
+			file2[i] = file[i];
+			i++;
+		}
+		file2[i] = '\0';
 
-			HINSTANCE hinstLib = LoadLibrary(file2); 
+		HINSTANCE hinstLib = LoadLibrary(file2);
 
-			if (hinstLib == NULL)
-				return !error();
-			else
-			{
-				handles[libName] = hinstLib;
-				return true;
-			}
-		#else	
-			
-			file.append("lib");
-			file.append(libName);
-			file.append(".so");		
-		
-			void * handle = dlopen(file.data(), RTLD_NOW);
-	
-			if (!handle) 
-			{
-				return !error();
-        	}		
-			else
-			{
-				handles[libName] = handle;
-				return true;
-			}
-		#endif
-//	}
-//	else
-//		return false;
+		if (hinstLib == NULL)
+			return !error();
+		else
+		{
+			handles[libName] = hinstLib;
+			return true;
+		}
+	#else
+
+		file.append("lib");
+		file.append(libName);
+		file.append(".so");
+
+		void * handle = dlopen(file.data(), RTLD_NOW);
+
+		if (!handle)
+		{
+			return !error();
+		}
+		else
+		{
+			handles[libName] = handle;
+			return true;
+		}
+	#endif
+
 }
 
 bool DynLibManager::unload (const string libName)

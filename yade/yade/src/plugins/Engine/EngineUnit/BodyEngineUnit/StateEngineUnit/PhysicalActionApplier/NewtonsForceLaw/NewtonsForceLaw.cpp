@@ -30,9 +30,9 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void NewtonsForceLaw::go( 	  const shared_ptr<PhysicalAction>& a
-					, const shared_ptr<PhysicalParameters>& b
-					, const Body* bb)
+void NewtonsForceLaw::go( const shared_ptr<PhysicalAction>& a
+			, const shared_ptr<PhysicalParameters>& b
+			, const Body* bb)
 {
 	Force * af = dynamic_cast<Force*>(a.get());
 	ParticleParameters * p = dynamic_cast<ParticleParameters*>(b.get());

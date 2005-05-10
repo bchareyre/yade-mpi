@@ -52,7 +52,8 @@ HEADERS += BodyContainer.hpp \
            PhysicalParameters.hpp \
            RenderingEngine.hpp \
            SimulationLoop.hpp \
-           yadeExceptions.hpp 
+           yadeExceptions.hpp \
+           Preferences.hpp 
 SOURCES += BodyContainer.cpp \
            Body.cpp \
            BoundingVolume.cpp \
@@ -72,4 +73,5 @@ SOURCES += BodyContainer.cpp \
            PhysicalParameters.cpp \
            SimulationLoop.cpp \
            yade.cpp \
-           yadeExceptions.cpp 
+           yadeExceptions.cpp \
+           Preferences.cpp 

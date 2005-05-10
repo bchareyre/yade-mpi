@@ -88,7 +88,7 @@ class ClassFactory : public Singleton< ClassFactory >
 	private   : typedef Factorable* ( *CreateFactorableFnPtr )();
 	/*! Pointer on a function that create an instance of a custom class (i.e. not serializable) and return a void C pointer on it */
 	private   : typedef void* ( *CreatePureCustomFnPtr )();
-
+	
 	/*! Description of a class that is stored inside the factory.*/
 	private   : class FactorableCreators
 		    {
@@ -132,7 +132,6 @@ class ClassFactory : public Singleton< ClassFactory >
 	private   : DynLibManager dlm;
 	/*! Map that contains the name of the registered class and their description */
 	private   : FactorableCreatorsMap map;
-
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Constructor/Destructor									///
@@ -186,6 +185,8 @@ class ClassFactory : public Singleton< ClassFactory >
 	*/
 	public 	  : bool isFactorable(const type_info& tp,bool& fundamental);
 
+	public 	  : void addBaseDirectory(const string& dir);
+	
 	FRIEND_SINGLETON(ClassFactory);
 };
 
