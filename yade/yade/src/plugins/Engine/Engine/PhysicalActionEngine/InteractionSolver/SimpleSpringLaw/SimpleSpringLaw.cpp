@@ -1,4 +1,4 @@
-#include "SimpleSpringLaw.hpp"
+#include "FrictionLessElasticContactLaw.hpp"
 #include <yade-common/RigidBodyParameters.hpp>
 #include <yade-common/ClosestFeatures.hpp>
 #include <yade/Omega.hpp>
@@ -6,16 +6,16 @@
 #include <yade-common/Force.hpp>
 #include <yade-common/Momentum.hpp>
 
-SimpleSpringLaw::SimpleSpringLaw () : InteractionSolver(), actionForce(new Force) , actionMomentum(new Momentum)
+FrictionLessElasticContactLaw::FrictionLessElasticContactLaw () : InteractionSolver(), actionForce(new Force) , actionMomentum(new Momentum)
 {
 }
 
-void SimpleSpringLaw::registerAttributes()
+void FrictionLessElasticContactLaw::registerAttributes()
 {
 }
 
 
-void SimpleSpringLaw::calculateForces(Body * body)
+void FrictionLessElasticContactLaw::calculateForces(Body * body)
 {
 	//Real dt = Omega::instance().dt;
 

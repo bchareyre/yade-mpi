@@ -28,7 +28,7 @@ LIBS += -lMesh2D \
         -lyade-lib-multimethods \
         -lInteractionVecSet \
         -lBodyRedirectionVector \
-        -lSimpleSpringLaw \
+        -lFrictionLessElasticContactLaw \
         -lMassSpringLaw \
         -lPhysicalActionContainerInitializer \
         -lMassSpringBody2RigidBodyLaw \
@@ -72,7 +72,7 @@ QMAKE_LIBDIR = ../../../plugins/Data/Body/GeometricalModel/Mesh2D/$(YADEDYNLIBPA
                ../../../libraries/yade-lib-multimethods/$(YADEDYNLIBPATH) \
                ../../../plugins/Container/InteractionContainer/InteractionVecSet/$(YADEDYNLIBPATH) \
                ../../../plugins/Container/BodyContainer/BodyRedirectionVector/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/Engine/PhysicalActionEngine/InteractionSolver/SimpleSpringLaw/$(YADEDYNLIBPATH) \
+               ../../../plugins/Engine/Engine/PhysicalActionEngine/InteractionSolver/FrictionLessElasticContactLaw/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/Engine/PhysicalActionEngine/InteractionSolver/MassSpringLaw/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/Engine/PhysicalActionEngine/PhysicalActionContainerInitializer/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/Engine/PhysicalActionEngine/InteractionSolver/MassSpringBody2RigidBodyLaw/$(YADEDYNLIBPATH) \

@@ -8,7 +8,7 @@
 #include <yade-common/AABB.hpp>
 #include <yade-common/InteractingBox.hpp>
 #include <yade/MetaBody.hpp>
-#include <yade-common/SimpleSpringLaw.hpp>
+#include <yade-common/FrictionLessElasticContactLaw.hpp>
 #include <yade-common/PersistentSAPCollider.hpp>
 #include <yade/MetaBody.hpp>
 #include <yade-common/MassSpringLaw.hpp>

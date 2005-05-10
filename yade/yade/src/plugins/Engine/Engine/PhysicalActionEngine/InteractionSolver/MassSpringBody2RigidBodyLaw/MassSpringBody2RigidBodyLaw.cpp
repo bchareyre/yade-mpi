@@ -3,7 +3,7 @@
 #include <yade/Omega.hpp>
 #include <yade/MetaBody.hpp>
 #include <yade-common/ClosestFeatures.hpp>
-#include <yade-common/SimpleSpringLaw.hpp>
+#include <yade-common/FrictionLessElasticContactLaw.hpp>
 #include <yade-common/Mesh2D.hpp>
 
 #include <yade-common/BodyMacroParameters.hpp>

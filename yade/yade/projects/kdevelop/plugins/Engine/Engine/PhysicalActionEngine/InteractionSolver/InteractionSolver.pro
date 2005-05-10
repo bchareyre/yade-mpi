@@ -5,7 +5,7 @@
 
 SUBDIRS += ElasticCohesiveLaw \
            FEMLaw \
-           SimpleSpringLaw \
+           FrictionLessElasticContactLaw \
            MassSpringBody2RigidBodyLaw \
            ErrorTolerantLaw \
            ElasticContactLaw \

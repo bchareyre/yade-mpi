@@ -6,7 +6,7 @@
 #include <yade-common/Sphere.hpp>
 #include <yade/MetaBody.hpp>
 #include <yade/Body.hpp>
-#include <yade-common/SimpleSpringLaw.hpp>
+#include <yade-common/FrictionLessElasticContactLaw.hpp>
 #include <yade-common/SAPCollider.hpp>
 #include <yade-common/RigidBodyParameters.hpp>
 #include <yade-common/TranslationEngine.hpp>
@@ -293,7 +293,7 @@ void BoxStack::createActors(shared_ptr<MetaBody>& rootBody)
 	rootBody->actors.push_back(boundingVolumeDispatcher);
 	rootBody->actors.push_back(shared_ptr<Engine>(new SAPCollider));
 	rootBody->actors.push_back(interactionGeometryDispatcher);
-	rootBody->actors.push_back(shared_ptr<Engine>(new SimpleSpringLaw));
+	rootBody->actors.push_back(shared_ptr<Engine>(new FrictionLessElasticContactLaw));
 	rootBody->actors.push_back(gravityCondition);
 	rootBody->actors.push_back(actionDampingDispatcher);
 	rootBody->actors.push_back(applyActionDispatcher);

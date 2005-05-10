@@ -17,7 +17,7 @@ LIBS += -lyade-lib-computational-geometry \
         -lElasticContactParameters \
         -lForce \
         -lMomentum \
-        -lSimpleSpringLaw \
+        -lFrictionLessElasticContactLaw \
         -rdynamic 
 INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
@@ -37,7 +37,7 @@ QMAKE_LIBDIR = ../../../../../../libraries/yade-lib-computational-geometry/$(YAD
                ../../../../../../plugins/Data/Interaction/InteractionPhysics/ElasticContactParameters/$(YADEDYNLIBPATH) \
                ../../../../../../plugins/Data/PhysicalAction/Force/$(YADEDYNLIBPATH) \
                ../../../../../../plugins/Data/PhysicalAction/Momentum/$(YADEDYNLIBPATH) \
-               ../../../../../../plugins/Engine/Engine/PhysicalActionEngine/InteractionSolver/SimpleSpringLaw/$(YADEDYNLIBPATH) \
+               ../../../../../../plugins/Engine/Engine/PhysicalActionEngine/InteractionSolver/FrictionLessElasticContactLaw/$(YADEDYNLIBPATH) \
                ../../../../../../yade/Engine/$(YADEDYNLIBPATH) \
                ../../../../../../yade/Body/Body/$(YADEDYNLIBPATH) \
                ../../../../../../toolboxes/Libraries/yade-lib-computational-geometry/$(YADEDYNLIBPATH) \

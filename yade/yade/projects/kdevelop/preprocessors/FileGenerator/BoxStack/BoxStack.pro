@@ -12,7 +12,7 @@ LIBS += -lBox \
         -lRigidBodyParameters \
         -lCundallNonViscousMomentumDamping \
         -lCundallNonViscousForceDamping \
-        -lSimpleSpringLaw \
+        -lFrictionLessElasticContactLaw \
         -lInteractionDescriptionSet2AABB \
         -lTranslationEngine \
         -lGravityEngine \
@@ -42,7 +42,7 @@ QMAKE_LIBDIR = ../../../plugins/Data/Body/GeometricalModel/Box/$(YADEDYNLIBPATH)
                ../../../plugins/Data/Body/PhysicalParameters/RigidBodyParameters/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/EngineUnit/PhysicalActionEngineUnit/CundallNonViscousMomentumDamping/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/EngineUnit/PhysicalActionEngineUnit/CundallNonViscousForceDamping/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/Engine/PhysicalActionEngine/InteractionSolver/SimpleSpringLaw/$(YADEDYNLIBPATH) \
+               ../../../plugins/Engine/Engine/PhysicalActionEngine/InteractionSolver/FrictionLessElasticContactLaw/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/EngineUnit/BodyEngineUnit/BoundingVolumeEngineUnit/InteractionDescriptionSet2AABB/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/DeusExMachina/TranslationEngine/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/DeusExMachina/GravityEngine/$(YADEDYNLIBPATH) \

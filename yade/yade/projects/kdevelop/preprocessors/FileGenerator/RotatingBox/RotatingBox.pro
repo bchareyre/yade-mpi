@@ -20,7 +20,7 @@ LIBS += -lAABB \
         -lyade-lib-multimethods \
         -lInteractionVecSet \
         -lBodyRedirectionVector \
-        -lSimpleSpringLaw \
+        -lFrictionLessElasticContactLaw \
         -lPhysicalActionContainerInitializer \
         -lPhysicalActionContainerReseter \
         -lGravityEngine \
@@ -51,7 +51,7 @@ QMAKE_LIBDIR = ../../../plugins/Data/Body/BoundingVolume/AABB/$(YADEDYNLIBPATH) 
                ../../../libraries/yade-lib-multimethods/$(YADEDYNLIBPATH) \
                ../../../plugins/Container/InteractionContainer/InteractionVecSet/$(YADEDYNLIBPATH) \
                ../../../plugins/Container/BodyContainer/BodyRedirectionVector/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/Engine/PhysicalActionEngine/InteractionSolver/SimpleSpringLaw/$(YADEDYNLIBPATH) \
+               ../../../plugins/Engine/Engine/PhysicalActionEngine/InteractionSolver/FrictionLessElasticContactLaw/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/Engine/PhysicalActionEngine/PhysicalActionContainerInitializer/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/Engine/PhysicalActionEngine/PhysicalActionContainerReseter/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/DeusExMachina/GravityEngine/$(YADEDYNLIBPATH) \

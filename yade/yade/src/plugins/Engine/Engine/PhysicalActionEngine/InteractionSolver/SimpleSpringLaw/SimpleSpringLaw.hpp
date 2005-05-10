@@ -5,20 +5,20 @@
 class PhysicalAction;
 
 
-class SimpleSpringLaw : public InteractionSolver
+class FrictionLessElasticContactLaw : public InteractionSolver
 {
 	private : shared_ptr<PhysicalAction> actionForce;
 	private : shared_ptr<PhysicalAction> actionMomentum;
 
 	// construction
-	public : SimpleSpringLaw ();
+	public : FrictionLessElasticContactLaw ();
 	
 	public : void registerAttributes();
 
 	public : void calculateForces(Body* body);
-	REGISTER_CLASS_NAME(SimpleSpringLaw);
+	REGISTER_CLASS_NAME(FrictionLessElasticContactLaw);
 };
 
-REGISTER_SERIALIZABLE(SimpleSpringLaw,false);
+REGISTER_SERIALIZABLE(FrictionLessElasticContactLaw,false);
 
 #endif // __SIMPLESPRINGDYNAMICENGINE_H__
