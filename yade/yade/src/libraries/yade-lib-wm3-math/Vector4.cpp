@@ -8,7 +8,7 @@
 // may not be copied or disclosed except in accordance with the terms of that
 // agreement.
 
-#include <yade-lib-wm3-math/Vector4.hpp>
+#include "Vector4.hpp"
 //using namespace Wm3;
 
 template<> const Vector4<float> Vector4<float>::ZERO(0.0f,0.0f,0.0f,0.0f);

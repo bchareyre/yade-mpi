@@ -8,7 +8,8 @@
 // may not be copied or disclosed except in accordance with the terms of that
 // agreement.
 
-#include <yade-lib-wm3-math/Matrix2.hpp>
+#include "Matrix2.hpp"
+
 //using namespace Wm3;
 
 template<> const Matrix2<float> Matrix2<float>::ZERO(

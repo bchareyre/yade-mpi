@@ -1,3 +1,26 @@
+/***************************************************************************
+ *   Copyright (C) 2004 by Olivier Galizzi                                 *
+ *   galizzi@stalactite                                                    *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ ***************************************************************************/
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 #include "Chrono.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -101,7 +124,7 @@ int Chrono::readCpuFrequency ()
 		double Tcpu_avant, Tcpu_apres;
 		double Fcpu;
 
-		// Lit la frequence du Chronomêtre Windows
+		// Lit la frequence du Chronomï¿½re Windows
 		if (!QueryPerformanceFrequency((LARGE_INTEGER*)&Fwin)) 
 			return 0;	
 
@@ -109,7 +132,7 @@ int Chrono::readCpuFrequency ()
 		Tcpu_avant = RDTSC();
 		QueryPerformanceCounter((LARGE_INTEGER*)&Twin_avant);
 
-		// Attend quelques itérations (10 000) du Chronomètre Windows
+		// Attend quelques itï¿½ations (10 000) du Chronomï¿½re Windows
 		do
 		{
 			QueryPerformanceCounter((LARGE_INTEGER*)&Twin_apres);
@@ -119,7 +142,7 @@ int Chrono::readCpuFrequency ()
 		Tcpu_apres = RDTSC();
 		QueryPerformanceCounter((LARGE_INTEGER*)&Twin_apres);
 
-		// Calcule la fréquence en MHz
+		// Calcule la frï¿½uence en MHz
 		Fcpu  = (Tcpu_apres - Tcpu_avant);
 		Fcpu *= uint64_to_double(Fwin);
 		Fcpu /= uint64_to_double(Twin_apres - Twin_avant);

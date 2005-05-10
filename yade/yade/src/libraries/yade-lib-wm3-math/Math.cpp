@@ -8,7 +8,7 @@
 // may not be copied or disclosed except in accordance with the terms of that
 // agreement.
 
-#include <yade-lib-wm3-math/Math.hpp>
+#include "Math.hpp"
 //using namespace Wm3;
 
 template<> const float Math<float>::EPSILON = FLT_EPSILON;

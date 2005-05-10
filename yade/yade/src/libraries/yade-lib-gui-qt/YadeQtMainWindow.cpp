@@ -2,7 +2,6 @@
 
 #include <yade-lib-serialization/IOManager.hpp>
 
-
 #include <qvbox.h>
 #include <qfiledialog.h>
 #include <qvariant.h>

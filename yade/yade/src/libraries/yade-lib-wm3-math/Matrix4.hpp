@@ -31,8 +31,8 @@
 // (0 <= i < N*N).
 
 //#include "Wm3Plane3.h"
-#include <yade-lib-wm3-math/Vector4.hpp>
-#include <yade-lib-wm3-math/Vector3.hpp>
+#include "Vector4.hpp"
+#include "Vector3.hpp"
 
 //namespace Wm3
 //{

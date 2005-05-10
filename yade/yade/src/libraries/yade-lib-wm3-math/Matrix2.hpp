@@ -35,7 +35,7 @@
 //       sin(t)  cos(t)
 // where t > 0 indicates a counterclockwise orientation in the xy-plane.
 
-#include <yade-lib-wm3-math/Vector2.hpp>
+#include "Vector2.hpp"
 
 //namespace Wm3
 //{

@@ -8,7 +8,7 @@
 // may not be copied or disclosed except in accordance with the terms of that
 // agreement.
 
-#include <yade-lib-wm3-math/Vector2.hpp>
+#include "Vector2.hpp"
 //using namespace Wm3;
 
 template<> const Vector2<float> Vector2<float>::ZERO(0.0f,0.0f);

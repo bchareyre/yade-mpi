@@ -22,11 +22,6 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "SimulationController.hpp"
-#include <yade/Omega.hpp>
-#include <yade-lib-threads/ThreadSynchronizer.hpp>
-#include <yade-lib-wm3-math/Math.hpp>
-#include <yade-lib-threads/Threadable.hpp>
-//#include "OpenGLRenderingEngine.hpp"
 #include "MessageDialog.hpp"
 #include "FileDialog.hpp"
 
@@ -37,12 +32,18 @@
 #include <qlabel.h>
 #include <qpushbutton.h>
 #include <qgroupbox.h>
+
 #include <boost/lexical_cast.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
 #include <unistd.h>
+
+#include <yade/Omega.hpp>
+#include <yade-lib-threads/ThreadSynchronizer.hpp>
+#include <yade-lib-wm3-math/Math.hpp>
+#include <yade-lib-threads/Threadable.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////

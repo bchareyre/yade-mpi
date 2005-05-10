@@ -32,6 +32,7 @@
 #include <qframe.h>
 #include <qscrollview.h>
 #include <QtFileGeneratorController.h>
+
 #include <yade-lib-factory/Factorable.hpp>
 #include <yade-lib-serialization-qt/QtGUIGenerator.hpp>
 
