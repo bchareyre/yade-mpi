@@ -3,18 +3,22 @@
 # Subdir relative project main directory: ./plugins/Engine/EngineUnit/BodyEngineUnit/BoundingVolumeEngineUnit/Box2AABB
 # Target is a library:  
 
-LIBS += -lBoundingVolume \
-        -lAABB \
+LIBS += -lAABB \
         -lBox \
         -lyade-lib-wm3-math \
         -lyade-lib-multimethods \
         -lInteractingBox \
         -rdynamic 
-INCLUDEPATH += $(YADEINCLUDEPATH) 
+INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../../../../yade/Body/BoundingVolume/$(YADEDYNLIBPATH) \
+QMAKE_LIBDIR = ../../../../../../plugins/Data/Body/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
+               ../../../../../../plugins/Data/Body/GeometricalModel/Box/$(YADEDYNLIBPATH) \
+               ../../../../../../libraries/yade-lib-wm3-math/$(YADEDYNLIBPATH) \
+               ../../../../../../libraries/yade-lib-multimethods/$(YADEDYNLIBPATH) \
+               ../../../../../../plugins/Data/Body/InteractingGeometry/InteractingBox/$(YADEDYNLIBPATH) \
+               ../../../../../../yade/Body/BoundingVolume/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

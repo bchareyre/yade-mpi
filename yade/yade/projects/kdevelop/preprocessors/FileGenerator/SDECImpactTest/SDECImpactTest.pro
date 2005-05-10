@@ -5,7 +5,6 @@
 
 LIBS += -lAveragePositionRecorder \
         -lVelocityRecorder \
-        -lEngine \
         -lForceRecorder \
         -lyade-lib-wm3-math \
         -lyade-lib-multimethods \
@@ -26,11 +25,9 @@ LIBS += -lAveragePositionRecorder \
         -lInteractionDescriptionSet2AABB \
         -lGravityEngine \
         -lyade-lib-serialization \
-        -lInteraction \
         -lPhysicalActionVectorVector \
         -lInteractionVecSet \
         -lBodyRedirectionVector \
-        -lBody \
         -lPhysicalActionContainerInitializer \
         -lPhysicalActionContainerReseter \
         -lInteractionGeometryMetaEngine \
@@ -38,7 +35,6 @@ LIBS += -lAveragePositionRecorder \
         -lPhysicalActionApplier \
         -lPhysicalParametersMetaEngine \
         -lBoundingVolumeMetaEngine \
-        -lForceRecorder \
         -rdynamic 
 INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
@@ -46,7 +42,6 @@ UI_DIR = $(YADECOMPILATIONPATH)
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 QMAKE_LIBDIR = ../../../plugins/Engine/Sensor/DataRecorderEngine/AveragePositionRecorder/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/Sensor/DataRecorderEngine/VelocityRecorder/$(YADEDYNLIBPATH) \
-               ../../../yade/Engine/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/Sensor/DataRecorderEngine/ForceRecorder/$(YADEDYNLIBPATH) \
                ../../../libraries/yade-lib-wm3-math/$(YADEDYNLIBPATH) \
                ../../../libraries/yade-lib-multimethods/$(YADEDYNLIBPATH) \
@@ -67,17 +62,19 @@ QMAKE_LIBDIR = ../../../plugins/Engine/Sensor/DataRecorderEngine/AveragePosition
                ../../../plugins/Engine/EngineUnit/BodyEngineUnit/BoundingVolumeEngineUnit/InteractionDescriptionSet2AABB/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/DeusExMachina/GravityEngine/$(YADEDYNLIBPATH) \
                ../../../libraries/yade-lib-serialization/$(YADEDYNLIBPATH) \
-               ../../../yade/Interaction/Interaction/$(YADEDYNLIBPATH) \
                ../../../plugins/Container/PhysicalActionContainer/PhysicalActionVectorVector/$(YADEDYNLIBPATH) \
                ../../../plugins/Container/InteractionContainer/InteractionVecSet/$(YADEDYNLIBPATH) \
                ../../../plugins/Container/BodyContainer/BodyRedirectionVector/$(YADEDYNLIBPATH) \
-               ../../../yade/Body/Body/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/Engine/PhysicalActionEngine/PhysicalActionContainerInitializer/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/Engine/PhysicalActionEngine/PhysicalActionContainerReseter/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/MetaEngine/InteractionMetaEngine/NarrowInteractionGeometryMetaEngine/InteractionGeometryMetaEngine/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/MetaEngine/InteractionMetaEngine/InteractionPhysicsMetaEngine/InteractionPhysicsMetaEngine/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/MetaEngine/PhysicalActionMetaEngine/PhysicalActionApplier/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/MetaEngine/BodyMetaEngine/PhysicalParameterMetaEngine/PhysicalParametersMetaEngine/$(YADEDYNLIBPATH) \
+               ../../../plugins/Engine/MetaEngine/BodyMetaEngine/BoundingVolumeMetaEngine/BoundingVolumeMetaEngine/$(YADEDYNLIBPATH) \
+               ../../../yade/Engine/$(YADEDYNLIBPATH) \
+               ../../../yade/Interaction/Interaction/$(YADEDYNLIBPATH) \
+               ../../../yade/Body/Body/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/yade-lib-wm3-math/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/yade-lib-multimethods/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/yade-lib-serialization/$(YADEDYNLIBPATH) \

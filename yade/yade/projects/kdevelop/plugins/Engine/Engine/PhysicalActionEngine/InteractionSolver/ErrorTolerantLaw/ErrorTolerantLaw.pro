@@ -3,21 +3,24 @@
 # Subdir relative project main directory: ./plugins/Engine/Engine/PhysicalActionEngine/InteractionSolver/ErrorTolerantLaw
 # Target is a library:  
 
-LIBS += -lEngine \
-        -lBody \
-        -lyade-lib-wm3-math \
+LIBS += -lyade-lib-wm3-math \
         -lyade-lib-serialization \
         -lyade-lib-factory \
-        -lInteraction \
         -lyade-lib-multimethods \
         -lErrorTolerantContactModel \
         -lRigidBodyParameters \
         -rdynamic 
-INCLUDEPATH += $(YADEINCLUDEPATH) 
+INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../../../../yade/Engine/$(YADEDYNLIBPATH) \
+QMAKE_LIBDIR = ../../../../../../libraries/yade-lib-wm3-math/$(YADEDYNLIBPATH) \
+               ../../../../../../libraries/yade-lib-serialization/$(YADEDYNLIBPATH) \
+               ../../../../../../libraries/yade-lib-factory/$(YADEDYNLIBPATH) \
+               ../../../../../../libraries/yade-lib-multimethods/$(YADEDYNLIBPATH) \
+               ../../../../../../plugins/Data/Interaction/NarrowInteractionGeometry/ErrorTolerantContactModel/$(YADEDYNLIBPATH) \
+               ../../../../../../plugins/Data/Body/PhysicalParameters/RigidBodyParameters/$(YADEDYNLIBPATH) \
+               ../../../../../../yade/Engine/$(YADEDYNLIBPATH) \
                ../../../../../../yade/Body/Body/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \

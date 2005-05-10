@@ -10,8 +10,8 @@ LIBS += -lyade-lib-wm3-math \
         -lyade-lib-threads \
         -lXMLManager \
         -lyade-lib-serialization \
-        -lInteraction \
         -lyade-lib-serialization-qt \
+        -lQGLViewer \
         -lboost_date_time \
         -lboost_filesystem \
         -rdynamic 
@@ -26,8 +26,8 @@ QMAKE_LIBDIR = ../../libraries/yade-lib-wm3-math/$(YADEDYNLIBPATH) \
                ../../libraries/yade-lib-threads/$(YADEDYNLIBPATH) \
                ../../libraries/yade-lib-serialization-xml/$(YADEDYNLIBPATH) \
                ../../libraries/yade-lib-serialization/$(YADEDYNLIBPATH) \
-               ../../yade/Interaction/Interaction/$(YADEDYNLIBPATH) \
                ../../libraries/yade-lib-serialization-qt/$(YADEDYNLIBPATH) \
+               ../../yade/Interaction/Interaction/$(YADEDYNLIBPATH) \
                ../../serialization/XMLManager/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/yade-lib-wm3-math/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/yade-lib-multimethods/$(YADEDYNLIBPATH) \
@@ -43,6 +43,7 @@ TARGET = QtGUI
 DESTDIR = $(YADEDYNLIBPATH) 
 CONFIG += debug \
           warn_on \
+          qt \
           dll 
 TEMPLATE = lib 
 FORMS += YadeQtGeneratedMainWindow.ui \

@@ -3,18 +3,20 @@
 # Subdir relative project main directory: ./plugins/Data/Body/PhysicalParameters/LatticeBeamParameters
 # Target is a library:  
 
-LIBS += -lBody \
-        -lyade-lib-wm3-math \
+LIBS += -lyade-lib-wm3-math \
         -lyade-lib-multimethods \
         -lyade-lib-serialization \
-        -lInteraction \
         -lRigidBodyParameters \
         -rdynamic 
-INCLUDEPATH += $(YADEINCLUDEPATH) 
+INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../../../yade/Body/Body/$(YADEDYNLIBPATH) \
+QMAKE_LIBDIR = ../../../../../libraries/yade-lib-wm3-math/$(YADEDYNLIBPATH) \
+               ../../../../../libraries/yade-lib-multimethods/$(YADEDYNLIBPATH) \
+               ../../../../../libraries/yade-lib-serialization/$(YADEDYNLIBPATH) \
+               ../../../../../plugins/Data/Body/PhysicalParameters/RigidBodyParameters/$(YADEDYNLIBPATH) \
+               ../../../../../yade/Body/Body/$(YADEDYNLIBPATH) \
                ../../../../../toolboxes/Libraries/yade-lib-wm3-math/$(YADEDYNLIBPATH) \
                ../../../../../toolboxes/Libraries/yade-lib-multimethods/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 

@@ -18,7 +18,6 @@ LIBS += -lMesh2D \
         -lSDECLinkPhysics \
         -lSAPCollider \
         -lRigidBodyParameters \
-        -lEngine \
         -lCundallNonViscousMomentumDamping \
         -lCundallNonViscousForceDamping \
         -lMacroMicroElasticRelationships \
@@ -26,11 +25,9 @@ LIBS += -lMesh2D \
         -lInteractionDescriptionSet2AABB \
         -lyade-lib-serialization \
         -lyade-lib-wm3-math \
-        -lInteraction \
         -lyade-lib-multimethods \
         -lInteractionVecSet \
         -lBodyRedirectionVector \
-        -lBody \
         -lSimpleSpringLaw \
         -lMassSpringLaw \
         -lPhysicalActionContainerInitializer \
@@ -65,7 +62,6 @@ QMAKE_LIBDIR = ../../../plugins/Data/Body/GeometricalModel/Mesh2D/$(YADEDYNLIBPA
                ../../../plugins/Data/Interaction/InteractionPhysics/SDECLinkPhysics/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/Engine/InteractionEngine/BroadInteractionEngine/SAPCollider/$(YADEDYNLIBPATH) \
                ../../../plugins/Data/Body/PhysicalParameters/RigidBodyParameters/$(YADEDYNLIBPATH) \
-               ../../../yade/Engine/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/EngineUnit/PhysicalActionEngineUnit/CundallNonViscousMomentumDamping/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/EngineUnit/PhysicalActionEngineUnit/CundallNonViscousForceDamping/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/EngineUnit/InteractionEngineUnit/InteractionPhysicsEngineUnit/ElasticContactParameters/MacroMicroElasticRelationships/$(YADEDYNLIBPATH) \
@@ -73,11 +69,9 @@ QMAKE_LIBDIR = ../../../plugins/Data/Body/GeometricalModel/Mesh2D/$(YADEDYNLIBPA
                ../../../plugins/Engine/EngineUnit/BodyEngineUnit/BoundingVolumeEngineUnit/InteractionDescriptionSet2AABB/$(YADEDYNLIBPATH) \
                ../../../libraries/yade-lib-serialization/$(YADEDYNLIBPATH) \
                ../../../libraries/yade-lib-wm3-math/$(YADEDYNLIBPATH) \
-               ../../../yade/Interaction/Interaction/$(YADEDYNLIBPATH) \
                ../../../libraries/yade-lib-multimethods/$(YADEDYNLIBPATH) \
                ../../../plugins/Container/InteractionContainer/InteractionVecSet/$(YADEDYNLIBPATH) \
                ../../../plugins/Container/BodyContainer/BodyRedirectionVector/$(YADEDYNLIBPATH) \
-               ../../../yade/Body/Body/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/Engine/PhysicalActionEngine/InteractionSolver/SimpleSpringLaw/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/Engine/PhysicalActionEngine/InteractionSolver/MassSpringLaw/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/Engine/PhysicalActionEngine/PhysicalActionContainerInitializer/$(YADEDYNLIBPATH) \
@@ -91,6 +85,10 @@ QMAKE_LIBDIR = ../../../plugins/Data/Body/GeometricalModel/Mesh2D/$(YADEDYNLIBPA
                ../../../plugins/Engine/MetaEngine/BodyMetaEngine/GeometricalModelMetaEngine/GeometricalModelMetaEngine/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/MetaEngine/PhysicalActionMetaEngine/PhysicalActionApplier/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/MetaEngine/BodyMetaEngine/PhysicalParameterMetaEngine/PhysicalParametersMetaEngine/$(YADEDYNLIBPATH) \
+               ../../../plugins/Engine/MetaEngine/BodyMetaEngine/BoundingVolumeMetaEngine/BoundingVolumeMetaEngine/$(YADEDYNLIBPATH) \
+               ../../../yade/Engine/$(YADEDYNLIBPATH) \
+               ../../../yade/Interaction/Interaction/$(YADEDYNLIBPATH) \
+               ../../../yade/Body/Body/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/yade-lib-serialization/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/yade-lib-wm3-math/$(YADEDYNLIBPATH) \
                ../../../toolboxes/Libraries/yade-lib-multimethods/$(YADEDYNLIBPATH) \

@@ -3,18 +3,20 @@
 # Subdir relative project main directory: ./plugins/Data/Body/PhysicalParameters/RigidBodyParameters
 # Target is a library:  
 
-LIBS += -lBody \
-        -lyade-lib-serialization \
+LIBS += -lyade-lib-serialization \
         -lyade-lib-wm3-math \
-        -lInteraction \
         -lyade-lib-multimethods \
         -lParticleParameters \
         -rdynamic 
-INCLUDEPATH += $(YADEINCLUDEPATH) 
+INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../../../yade/Body/Body/$(YADEDYNLIBPATH) \
+QMAKE_LIBDIR = ../../../../../libraries/yade-lib-serialization/$(YADEDYNLIBPATH) \
+               ../../../../../libraries/yade-lib-wm3-math/$(YADEDYNLIBPATH) \
+               ../../../../../libraries/yade-lib-multimethods/$(YADEDYNLIBPATH) \
+               ../../../../../plugins/Data/Body/PhysicalParameters/ParticleParameters/$(YADEDYNLIBPATH) \
+               ../../../../../yade/Body/Body/$(YADEDYNLIBPATH) \
                ../../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
                ../../../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
                ../../../../yade/Body/Body/$(YADEDYNLIBPATH) \

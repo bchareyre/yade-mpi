@@ -3,7 +3,8 @@
 # Subdir relative project main directory: ./libraries/yade-lib-opengl
 # Target is a library:  
 
-LIBS += -lyade-lib-time 
+LIBS += -lyade-lib-time \
+        -lglut 
 INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 

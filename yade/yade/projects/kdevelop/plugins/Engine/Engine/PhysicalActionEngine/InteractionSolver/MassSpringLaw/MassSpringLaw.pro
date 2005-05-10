@@ -3,12 +3,9 @@
 # Subdir relative project main directory: ./plugins/Engine/Engine/PhysicalActionEngine/InteractionSolver/MassSpringLaw
 # Target is a library:  
 
-LIBS += -lEngine \
-        -lBody \
-        -lyade-lib-serialization \
+LIBS += -lyade-lib-serialization \
         -lMesh2D \
         -lyade-lib-wm3-math \
-        -lInteraction \
         -lyade-lib-multimethods \
         -lSpringPhysics \
         -lSpringGeometry \
@@ -16,20 +13,25 @@ LIBS += -lEngine \
         -lForce \
         -lMomentum \
         -rdynamic 
-INCLUDEPATH += $(YADEINCLUDEPATH) 
+INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../../../../yade/Engine/$(YADEDYNLIBPATH) \
-               ../../../../../../yade/Body/Body/$(YADEDYNLIBPATH) \
-               ../../../../../../toolboxes/Libraries/yade-lib-serialization/$(YADEDYNLIBPATH) \
+QMAKE_LIBDIR = ../../../../../../libraries/yade-lib-serialization/$(YADEDYNLIBPATH) \
                ../../../../../../plugins/Data/Body/GeometricalModel/Mesh2D/$(YADEDYNLIBPATH) \
-               ../../../../../../toolboxes/Libraries/yade-lib-wm3-math/$(YADEDYNLIBPATH) \
-               ../../../../../../yade/Interaction/Interaction/$(YADEDYNLIBPATH) \
-               ../../../../../../toolboxes/Libraries/yade-lib-multimethods/$(YADEDYNLIBPATH) \
+               ../../../../../../libraries/yade-lib-wm3-math/$(YADEDYNLIBPATH) \
+               ../../../../../../libraries/yade-lib-multimethods/$(YADEDYNLIBPATH) \
                ../../../../../../plugins/Data/Interaction/InteractionPhysics/SpringPhysics/$(YADEDYNLIBPATH) \
                ../../../../../../plugins/Data/Interaction/NarrowInteractionGeometry/SpringGeometry/$(YADEDYNLIBPATH) \
                ../../../../../../plugins/Data/Body/PhysicalParameters/ParticleParameters/$(YADEDYNLIBPATH) \
+               ../../../../../../plugins/Data/PhysicalAction/Force/$(YADEDYNLIBPATH) \
+               ../../../../../../plugins/Data/PhysicalAction/Momentum/$(YADEDYNLIBPATH) \
+               ../../../../../../yade/Engine/$(YADEDYNLIBPATH) \
+               ../../../../../../yade/Body/Body/$(YADEDYNLIBPATH) \
+               ../../../../../../toolboxes/Libraries/yade-lib-serialization/$(YADEDYNLIBPATH) \
+               ../../../../../../toolboxes/Libraries/yade-lib-wm3-math/$(YADEDYNLIBPATH) \
+               ../../../../../../yade/Interaction/Interaction/$(YADEDYNLIBPATH) \
+               ../../../../../../toolboxes/Libraries/yade-lib-multimethods/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

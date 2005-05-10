@@ -3,15 +3,18 @@
 # Subdir relative project main directory: ./plugins/Engine/Sensor/RenderingEngine/OpenGLRenderingEngine/GLDrawShadowVolume/GLDrawSphereShadowVolume
 # Target is a library:  
 
-LIBS += -lBody \
-        -lSphere \
+LIBS += -lSphere \
         -lParticleParameters \
+        -lyade-lib-opengl \
         -rdynamic 
-INCLUDEPATH += $(YADEINCLUDEPATH) 
+INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../../../../../yade/Body/Body/$(YADEDYNLIBPATH) \
+QMAKE_LIBDIR = ../../../../../../../plugins/Data/Body/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
+               ../../../../../../../plugins/Data/Body/PhysicalParameters/ParticleParameters/$(YADEDYNLIBPATH) \
+               ../../../../../../../libraries/yade-lib-opengl/$(YADEDYNLIBPATH) \
+               ../../../../../../../yade/Body/Body/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

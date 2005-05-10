@@ -8,11 +8,15 @@ LIBS += -lParticleParameters \
         -lLineSegment \
         -lLatticeSetParameters \
         -rdynamic 
-INCLUDEPATH += $(YADEINCLUDEPATH) 
+INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = $(YADEDYNLIBPATH) 
+QMAKE_LIBDIR = ../../../../../../plugins/Data/Body/PhysicalParameters/ParticleParameters/$(YADEDYNLIBPATH) \
+               ../../../../../../plugins/Data/Body/PhysicalParameters/LatticeBeamParameters/$(YADEDYNLIBPATH) \
+               ../../../../../../plugins/Data/Body/GeometricalModel/LineSegment/$(YADEDYNLIBPATH) \
+               ../../../../../../plugins/Data/Body/PhysicalParameters/LatticeSetParameters/$(YADEDYNLIBPATH) \
+               $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 
 QMAKE_CXXFLAGS_DEBUG += -lpthread \

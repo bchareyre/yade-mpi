@@ -66,7 +66,7 @@ class GLViewer : public QGLViewer
 	
 	public : void paintGL();	
 	public slots: void updateGL();
-	public : void initializeGL();
+	public : void initializeGL(); 
 	protected : void mouseMoveEvent(QMouseEvent * e);
 	protected : void mousePressEvent(QMouseEvent *e);
 	protected : void mouseReleaseEvent(QMouseEvent *e);

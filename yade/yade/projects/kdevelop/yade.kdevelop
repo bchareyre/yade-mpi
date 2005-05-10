@@ -99,7 +99,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>libraries</activedir>
+      <activedir>libraries/yade-lib-gui-qt</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>

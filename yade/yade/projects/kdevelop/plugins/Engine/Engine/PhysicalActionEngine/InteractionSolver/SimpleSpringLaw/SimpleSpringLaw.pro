@@ -3,29 +3,31 @@
 # Subdir relative project main directory: ./plugins/Engine/Engine/PhysicalActionEngine/InteractionSolver/SimpleSpringLaw
 # Target is a library:  
 
-LIBS += -lEngine \
-        -lBody \
-        -lClosestFeatures \
+LIBS += -lClosestFeatures \
         -lyade-lib-serialization \
         -lyade-lib-wm3-math \
-        -lInteraction \
         -lyade-lib-multimethods \
         -lRigidBodyParameters \
         -lMomentum \
         -lForce \
         -rdynamic 
-INCLUDEPATH += $(YADEINCLUDEPATH) 
+INCLUDEPATH = $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../../../../yade/Engine/$(YADEDYNLIBPATH) \
+QMAKE_LIBDIR = ../../../../../../plugins/Data/Interaction/NarrowInteractionGeometry/ClosestFeatures/$(YADEDYNLIBPATH) \
+               ../../../../../../libraries/yade-lib-serialization/$(YADEDYNLIBPATH) \
+               ../../../../../../libraries/yade-lib-wm3-math/$(YADEDYNLIBPATH) \
+               ../../../../../../libraries/yade-lib-multimethods/$(YADEDYNLIBPATH) \
+               ../../../../../../plugins/Data/Body/PhysicalParameters/RigidBodyParameters/$(YADEDYNLIBPATH) \
+               ../../../../../../plugins/Data/PhysicalAction/Momentum/$(YADEDYNLIBPATH) \
+               ../../../../../../plugins/Data/PhysicalAction/Force/$(YADEDYNLIBPATH) \
+               ../../../../../../yade/Engine/$(YADEDYNLIBPATH) \
                ../../../../../../yade/Body/Body/$(YADEDYNLIBPATH) \
-               ../../../../../../plugins/Data/Interaction/NarrowInteractionGeometry/ClosestFeatures/$(YADEDYNLIBPATH) \
                ../../../../../../toolboxes/Libraries/yade-lib-serialization/$(YADEDYNLIBPATH) \
                ../../../../../../toolboxes/Libraries/yade-lib-wm3-math/$(YADEDYNLIBPATH) \
                ../../../../../../yade/Interaction/Interaction/$(YADEDYNLIBPATH) \
                ../../../../../../toolboxes/Libraries/yade-lib-multimethods/$(YADEDYNLIBPATH) \
-               ../../../../../../plugins/Data/Body/PhysicalParameters/RigidBodyParameters/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

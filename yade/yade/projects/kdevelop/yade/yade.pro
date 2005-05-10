@@ -9,6 +9,7 @@ LIBS += -lyade-lib-threads \
         -lyade-lib-wm3-math \
         -lyade-lib-loki \
         -lyade-lib-multimethods \
+        -rdynamic \
         -lboost_date_time \
         -lboost_filesystem \
         -lboost_thread 
