@@ -2,7 +2,7 @@
 #define __GLTEXTLABEL_H__
 
 #include "GLWindow.hpp"
-#include "Vector3.hpp"
+#include <yade-lib-wm3-math/Vector3.hpp>
 
 class GLTextLabel : public GLWindow
 {	

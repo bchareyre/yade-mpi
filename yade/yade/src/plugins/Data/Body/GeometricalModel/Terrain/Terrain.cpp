@@ -26,7 +26,7 @@
 #include <iostream>
 #include <GL/gl.h>
 #include <set>
-#include "OpenGLWrapper.hpp"
+#include <yade-lib-opengl/OpenGLWrapper.hpp>
 
 Terrain::Terrain () : GeometricalModel()
 {

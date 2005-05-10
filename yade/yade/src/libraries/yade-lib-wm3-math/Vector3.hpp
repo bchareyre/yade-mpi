@@ -11,7 +11,7 @@
 #ifndef WM3VECTOR3_H
 #define WM3VECTOR3_H
 
-#include "Math.hpp"
+#include <yade-lib-wm3-math/Math.hpp>
 #include <algorithm>
 
 #include <iostream>

@@ -1,7 +1,7 @@
 #ifndef __ACTION_VEC_VEC_HPP__
 #define __ACTION_VEC_VEC_HPP__
 
-#include "PhysicalActionContainer.hpp"
+#include <yade/PhysicalActionContainer.hpp>
 #include <list>
 #include <vector>
 

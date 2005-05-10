@@ -1,5 +1,5 @@
 #include "BodyRedirectionVector.hpp"
-#include "Body.hpp"
+#include <yade/Body.hpp>
 
 
 BodyRedirectionVector::BodyRedirectionVector()

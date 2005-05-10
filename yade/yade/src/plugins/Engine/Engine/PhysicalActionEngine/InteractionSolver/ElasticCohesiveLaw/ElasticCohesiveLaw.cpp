@@ -27,11 +27,11 @@
 #include "SDECLinkGeometry.hpp"
 #include "ElasticContactParameters.hpp"
 #include "SDECLinkPhysics.hpp"
-#include "Omega.hpp"
-#include "MetaBody.hpp"
+#include <yade/Omega.hpp>
+#include <yade/MetaBody.hpp>
 #include "Force.hpp"
 #include "Momentum.hpp"
-#include "PhysicalAction.hpp"
+#include <yade/PhysicalAction.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////

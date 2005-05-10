@@ -28,8 +28,8 @@
 #include "SDECLinkGeometry.hpp" // FIXME - I can't dispatch by SDECLinkGeometry <-> MacroMicroContactGeometry !!?
 #include "SDECLinkPhysics.hpp"  // FIXME
 
-#include "Omega.hpp"
-#include "MetaBody.hpp"
+#include <yade/Omega.hpp>
+#include <yade/MetaBody.hpp>
 #include "BodyMacroParameters.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

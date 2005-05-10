@@ -28,7 +28,7 @@
 #include "LineSegment.hpp"
 #include "Sphere.hpp"
 
-#include "Body.hpp"
+#include <yade/Body.hpp>
 #include "MetaInteractingGeometry.hpp"
 #include "BoundingVolumeMetaEngine.hpp"
 #include "GeometricalModelMetaEngine.hpp"

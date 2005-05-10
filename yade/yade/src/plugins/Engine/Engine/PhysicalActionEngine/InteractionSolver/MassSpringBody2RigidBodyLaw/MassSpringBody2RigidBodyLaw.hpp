@@ -1,7 +1,7 @@
 #ifndef __MASSSPRINGBODY2RIGIDBODYNAMICENGINE_H__
 #define __MASSSPRINGBODY2RIGIDBODYNAMICENGINE_H__
 
-#include "InteractionSolver.hpp"
+#include <yade/InteractionSolver.hpp>
 #include "Force.hpp"
 #include "Momentum.hpp"
 

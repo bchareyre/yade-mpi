@@ -25,14 +25,14 @@
 #ifndef DYNLIB_DISPATCHER_HPP
 #define DYNLIB_DISPATCHER_HPP
 
-#include "Indexable.hpp"
-#include "ClassFactory.hpp"
-#include "Serializable.hpp"
-#include "MultiMethodsExceptions.hpp"
-#include "Functor.hpp"
-#include "Typelist.hpp"
-#include "TypeManip.hpp"
-#include "NullType.hpp"
+#include <yade-lib-multimethods/Indexable.hpp>
+#include <yade-lib-factory/ClassFactory.hpp>
+#include <yade-lib-serialization/Serializable.hpp>
+#include <yade-lib-multimethods/MultiMethodsExceptions.hpp>
+#include <yade-lib-loki/Functor.hpp>
+#include <yade-lib-loki/Typelist.hpp>
+#include <yade-lib-loki/TypeManip.hpp>
+#include <yade-lib-loki/NullType.hpp>
 
 #include <vector>
 #include <list>

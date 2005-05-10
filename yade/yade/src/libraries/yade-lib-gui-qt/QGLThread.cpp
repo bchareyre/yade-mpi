@@ -23,9 +23,9 @@
 
 #include "QGLThread.hpp"
 #include "GLViewer.hpp"
-#include "FpsTracker.hpp"
+#include <yade-lib-opengl/FpsTracker.hpp>
 
-#include "ClassFactory.hpp"
+#include <yade-lib-factory/ClassFactory.hpp>
 //#include "OpenGLRenderingEngine.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -1,7 +1,7 @@
 #ifndef __SIMPLESPRINGDYNAMICENGINE_H__
 #define __SIMPLESPRINGDYNAMICENGINE_H__
 
-#include "InteractionSolver.hpp"
+#include <yade/InteractionSolver.hpp>
 class PhysicalAction;
 
 

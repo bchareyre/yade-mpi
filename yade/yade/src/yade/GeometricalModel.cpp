@@ -1,4 +1,4 @@
-#include "GeometricalModel.hpp"
+#include <yade/GeometricalModel.hpp>
 
 
 void GeometricalModel::registerAttributes()

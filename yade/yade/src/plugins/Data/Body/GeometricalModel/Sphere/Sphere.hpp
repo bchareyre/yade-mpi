@@ -24,7 +24,7 @@
 #ifndef __SPHERE_H__
 #define __SPHERE_H__
 
-#include "GeometricalModel.hpp"
+#include <yade/GeometricalModel.hpp>
 
 class Sphere : public GeometricalModel
 {

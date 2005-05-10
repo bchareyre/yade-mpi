@@ -1,7 +1,7 @@
 #ifndef FEM_BEAM_HPP
 #define FEM_BEAM_HPP 
 
-#include "FileGenerator.hpp"
+#include <yade/FileGenerator.hpp>
 
 #include <string>
 

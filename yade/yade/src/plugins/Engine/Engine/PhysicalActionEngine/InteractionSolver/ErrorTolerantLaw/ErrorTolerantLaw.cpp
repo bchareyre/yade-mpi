@@ -23,7 +23,7 @@
 
 #include "ErrorTolerantLaw.hpp"
 #include "RigidBodyParameters.hpp"
-#include "MetaBody.hpp"
+#include <yade/MetaBody.hpp>
 #include "ErrorTolerantContactModel.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

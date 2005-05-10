@@ -1,5 +1,5 @@
 #include "InteractionContainer.hpp"
-#include "Interaction.hpp"
+#include <yade/Interaction.hpp>
 
 void InteractionContainer::registerAttributes()
 {

@@ -2,7 +2,7 @@
 #ifndef SDEC_SPHERES_PLANE_HPP
 #define SDEC_SPHERES_PLANE_HPP
 
-#include "FileGenerator.hpp"
+#include <yade/FileGenerator.hpp>
 
 class SDECSpheresPlane : public FileGenerator
 {

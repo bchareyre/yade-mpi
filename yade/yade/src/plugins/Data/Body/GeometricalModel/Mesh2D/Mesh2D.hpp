@@ -24,7 +24,7 @@
 #ifndef __MESH2D_H__
 #define __MESH2D_H__
 
-#include "GeometricalModel.hpp"
+#include <yade/GeometricalModel.hpp>
 
 #define offset(i,j) ((i)*height+(j))
 

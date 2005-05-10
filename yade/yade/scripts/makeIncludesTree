@@ -1,0 +1,100 @@
+
+#! /bin/sh
+
+echo 'ORGDIR=`pwd`'					> makeSymLinkIncl
+echo 'ONLYNAME=`basename $1`'				>> makeSymLinkIncl
+echo 'TMPNAME=$2/$ONLYNAME'				>> makeSymLinkIncl
+echo 'echo symlinking $ORGDIR/$1 to `dirname $TMPNAME`'	>> makeSymLinkIncl
+echo 'TMPDIR=`dirname $TMPNAME`'			>> makeSymLinkIncl
+echo 'cd $TMPDIR'					>> makeSymLinkIncl
+echo 'ln -s $ORGDIR/$1 `basename $TMPNAME`'		>> makeSymLinkIncl
+echo 'cd $ORGDIR'					>> makeSymLinkIncl
+
+rm -rf ../include/*
+
+chmod a+x ./makeSymLinkIncl
+
+find ../src/plugins/ -name "*.hpp" -exec ./makeSymLinkIncl {} ../include \;
+find ../src/plugins/ -name "*.tpp" -exec ./makeSymLinkIncl {} ../include \;
+find ../src/plugins/ -name "*.ipp" -exec ./makeSymLinkIncl {} ../include \;
+
+find ../src/postprocessors/ -name "*.hpp" -exec ./makeSymLinkIncl {} ../include \;
+find ../src/postprocessors/ -name "*.tpp" -exec ./makeSymLinkIncl {} ../include \;
+find ../src/postprocessors/ -name "*.ipp" -exec ./makeSymLinkIncl {} ../include \;
+
+find ../src/preprocessors/ -name "*.hpp" -exec ./makeSymLinkIncl {} ../include \;
+find ../src/preprocessors/ -name "*.tpp" -exec ./makeSymLinkIncl {} ../include \;
+find ../src/preprocessors/ -name "*.ipp" -exec ./makeSymLinkIncl {} ../include \;
+
+mkdir ../include/yade
+find ../src/yade/ -name "*.hpp" -exec ./makeSymLinkIncl {} ../include/yade \;
+find ../src/yade/ -name "*.tpp" -exec ./makeSymLinkIncl {} ../include/yade \;
+find ../src/yade/ -name "*.ipp" -exec ./makeSymLinkIncl {} ../include/yade \;
+
+mkdir ../include/yade-lib-computational-geometry
+find ../src/libraries/yade-lib-computational-geometry/ -name "*.hpp" -exec ./makeSymLinkIncl {} ../include/yade-lib-computational-geometry \;
+find ../src/libraries/yade-lib-computational-geometry/ -name "*.tpp" -exec ./makeSymLinkIncl {} ../include/yade-lib-computational-geometry \;
+find ../src/libraries/yade-lib-computational-geometry/ -name "*.ipp" -exec ./makeSymLinkIncl {} ../include/yade-lib-computational-geometry \;
+
+mkdir ../include/yade-lib-factory
+find ../src/libraries/yade-lib-factory -name "*.hpp" -exec ./makeSymLinkIncl {} ../include/yade-lib-factory \;
+find ../src/libraries/yade-lib-factory -name "*.tpp" -exec ./makeSymLinkIncl {} ../include/yade-lib-factory \;
+find ../src/libraries/yade-lib-factory -name "*.ipp" -exec ./makeSymLinkIncl {} ../include/yade-lib-factory \;
+
+mkdir ../include/yade-lib-loki
+find ../src/libraries/yade-lib-loki -name "*.hpp" -exec ./makeSymLinkIncl {} ../include/yade-lib-loki \;
+find ../src/libraries/yade-lib-loki -name "*.tpp" -exec ./makeSymLinkIncl {} ../include/yade-lib-loki \;
+find ../src/libraries/yade-lib-loki -name "*.ipp" -exec ./makeSymLinkIncl {} ../include/yade-lib-loki \;
+
+mkdir ../include/yade-lib-multimethods
+find ../src/libraries/yade-lib-multimethods -name "*.hpp" -exec ./makeSymLinkIncl {} ../include/yade-lib-multimethods \;
+find ../src/libraries/yade-lib-multimethods -name "*.tpp" -exec ./makeSymLinkIncl {} ../include/yade-lib-multimethods \;
+find ../src/libraries/yade-lib-multimethods -name "*.ipp" -exec ./makeSymLinkIncl {} ../include/yade-lib-multimethods \;
+
+mkdir ../include/yade-lib-opengl
+find ../src/libraries/yade-lib-opengl -name "*.hpp" -exec ./makeSymLinkIncl {} ../include/yade-lib-opengl \;
+find ../src/libraries/yade-lib-opengl -name "*.tpp" -exec ./makeSymLinkIncl {} ../include/yade-lib-opengl \;
+find ../src/libraries/yade-lib-opengl -name "*.ipp" -exec ./makeSymLinkIncl {} ../include/yade-lib-opengl \;
+
+mkdir ../include/yade-lib-serialization
+find ../src/libraries/yade-lib-serialization -name "*.hpp" -exec ./makeSymLinkIncl {} ../include/yade-lib-serialization \;
+find ../src/libraries/yade-lib-serialization -name "*.tpp" -exec ./makeSymLinkIncl {} ../include/yade-lib-serialization \;
+find ../src/libraries/yade-lib-serialization -name "*.ipp" -exec ./makeSymLinkIncl {} ../include/yade-lib-serialization \;
+
+mkdir ../include/yade-lib-serialization-qt
+find ../src/libraries/yade-lib-serialization-qt -name "*.hpp" -exec ./makeSymLinkIncl {} ../include/yade-lib-serialization-qt \;
+find ../src/libraries/yade-lib-serialization-qt -name "*.tpp" -exec ./makeSymLinkIncl {} ../include/yade-lib-serialization-qt \;
+find ../src/libraries/yade-lib-serialization-qt -name "*.ipp" -exec ./makeSymLinkIncl {} ../include/yade-lib-serialization-qt \;
+
+mkdir ../include/yade-lib-serialization-xml
+find ../src/libraries/yade-lib-serialization-xml -name "*.hpp" -exec ./makeSymLinkIncl {} ../include/yade-lib-serialization-xml \;
+find ../src/libraries/yade-lib-serialization-xml -name "*.tpp" -exec ./makeSymLinkIncl {} ../include/yade-lib-serialization-xml \;
+find ../src/libraries/yade-lib-serialization-xml -name "*.ipp" -exec ./makeSymLinkIncl {} ../include/yade-lib-serialization-xml \;
+
+mkdir ../include/yade-lib-threads
+find ../src/libraries/yade-lib-threads -name "*.hpp" -exec ./makeSymLinkIncl {} ../include/yade-lib-threads \;
+find ../src/libraries/yade-lib-threads -name "*.tpp" -exec ./makeSymLinkIncl {} ../include/yade-lib-threads \;
+find ../src/libraries/yade-lib-threads -name "*.ipp" -exec ./makeSymLinkIncl {} ../include/yade-lib-threads \;
+
+mkdir ../include/yade-lib-time
+find ../src/libraries/yade-lib-time -name "*.hpp" -exec ./makeSymLinkIncl {} ../include/yade-lib-time \;
+find ../src/libraries/yade-lib-time -name "*.tpp" -exec ./makeSymLinkIncl {} ../include/yade-lib-time \;
+find ../src/libraries/yade-lib-time -name "*.ipp" -exec ./makeSymLinkIncl {} ../include/yade-lib-time \;
+
+mkdir ../include/yade-lib-wm3-math
+find ../src/libraries/yade-lib-wm3-math -name "*.hpp" -exec ./makeSymLinkIncl {} ../include/yade-lib-wm3-math \;
+find ../src/libraries/yade-lib-wm3-math -name "*.tpp" -exec ./makeSymLinkIncl {} ../include/yade-lib-wm3-math \;
+find ../src/libraries/yade-lib-wm3-math -name "*.ipp" -exec ./makeSymLinkIncl {} ../include/yade-lib-wm3-math \;
+
+mkdir ../include/yade-lib-gui-qt
+find ../src/libraries/yade-lib-gui-qt -name "*.hpp" -exec ./makeSymLinkIncl {} ../include/yade-lib-gui-qt \;
+find ../src/libraries/yade-lib-gui-qt -name "*.tpp" -exec ./makeSymLinkIncl {} ../include/yade-lib-gui-qt \;
+find ../src/libraries/yade-lib-gui-qt -name "*.ipp" -exec ./makeSymLinkIncl {} ../include/yade-lib-gui-qt \;
+
+
+
+symlinks -rcs ./
+symlinks -rcs ./
+
+rm ./makeSymLinkIncl
+

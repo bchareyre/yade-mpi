@@ -1,7 +1,7 @@
 #ifndef __SIMPLEBROADCOLLIDER_H__
 #define __SIMPLEBROADCOLLIDER_H__
 
-#include "BroadInteractor.hpp"
+#include <yade/BroadInteractor.hpp>
 
 class BroadInteractionEngineUnit : public BroadInteractor
 {

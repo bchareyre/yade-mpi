@@ -1,8 +1,8 @@
 #ifndef __BODYASSOCVEC_HPP__
 #define __BODYASSOCVEC_HPP__
 
-#include "BodyContainer.hpp"
-#include "AssocVector.hpp"
+#include <yade/BodyContainer.hpp>
+#include <yade-lib-loki/AssocVector.hpp>
 #include <list>
 
 class Body;

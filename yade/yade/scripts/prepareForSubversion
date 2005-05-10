@@ -43,13 +43,14 @@ fi
 # YADEINCLUDEPATH
 if [ "${YADEINCLUDEPATH:-nothing}" = "nothing" ];
 then
-  echo "ERROR:  YADEINCLUDEPATHis not defined, you forgot to run:";
+  echo "ERROR:  YADEINCLUDEPATH is not defined, you forgot to run:";
   echo "        source ./yadeEnv YOUR_PATH_TO_YADE";
   exit 0;
 else
   echo "I'm using YADEINCLUDEPATH="${YADEINCLUDEPATH};
 fi
 
+rm -rf $YADEINCLUDEPATH/*
 ./removeSymLinks
 ./removeBackupFiles
 ./removeBinFiles

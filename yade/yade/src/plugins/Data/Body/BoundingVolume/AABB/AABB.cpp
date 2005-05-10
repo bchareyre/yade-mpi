@@ -1,5 +1,5 @@
 #include "AABB.hpp"
-#include "OpenGLWrapper.hpp"
+#include <yade-lib-opengl/OpenGLWrapper.hpp>
 
 AABB::AABB () : BoundingVolume()
 {

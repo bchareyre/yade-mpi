@@ -1,10 +1,10 @@
 #include "GLViewer.hpp"
-#include "Body.hpp"
-#include "Interaction.hpp"
+#include <yade/Body.hpp>
+#include <yade/Interaction.hpp>
 #include "GL/glut.h"
-#include "Omega.hpp"
-#include "ThreadSynchronizer.hpp"
-#include "FpsTracker.hpp"
+#include <yade/Omega.hpp>
+#include <yade-lib-threads/ThreadSynchronizer.hpp>
+#include <yade-lib-opengl/FpsTracker.hpp>
 
 GLViewer::GLViewer(int id, shared_ptr<RenderingEngine> renderer, const QGLFormat& format, QWidget * parent, QGLWidget * shareWidget) : QGLViewer(format,parent,"glview",shareWidget), qglThread(this,renderer)
 {

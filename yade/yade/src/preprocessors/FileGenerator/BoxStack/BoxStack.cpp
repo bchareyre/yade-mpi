@@ -4,14 +4,14 @@
 #include "Box.hpp"
 #include "AABB.hpp"
 #include "Sphere.hpp"
-#include "MetaBody.hpp"
-#include "Body.hpp"
+#include <yade/MetaBody.hpp>
+#include <yade/Body.hpp>
 #include "SimpleSpringLaw.hpp"
 #include "SAPCollider.hpp"
 #include "RigidBodyParameters.hpp"
 #include "TranslationEngine.hpp"
 #include <fstream>
-#include "IOManager.hpp"
+#include <yade-lib-serialization/IOManager.hpp>
 #include "InteractingBox.hpp"
 #include "InteractingSphere.hpp"
 #include "InteractionGeometryMetaEngine.hpp"

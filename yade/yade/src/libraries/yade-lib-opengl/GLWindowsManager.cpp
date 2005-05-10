@@ -1,4 +1,4 @@
-#include "GLWindowsManager.hpp"
+#include <yade-lib-opengl/GLWindowsManager.hpp>
 
 #ifdef WIN32
 	#include <windows.h>

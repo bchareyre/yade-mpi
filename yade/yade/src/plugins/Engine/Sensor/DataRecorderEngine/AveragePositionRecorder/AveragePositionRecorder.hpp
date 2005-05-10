@@ -1,7 +1,7 @@
 #ifndef AVERAGE_POSISTION_RECORDER_HPP_
 #define AVERAGE_POSISTION_RECORDER_HPP_
 
-#include "Engine.hpp"
+#include <yade/Engine.hpp>
 
 #include <string>
 #include <fstream>

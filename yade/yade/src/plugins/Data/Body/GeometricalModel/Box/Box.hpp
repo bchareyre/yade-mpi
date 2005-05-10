@@ -24,7 +24,7 @@
 #ifndef __BOX_H__
 #define __BOX_H__
 
-#include "GeometricalModel.hpp"
+#include <yade/GeometricalModel.hpp>
 
 class Box : public GeometricalModel
 {

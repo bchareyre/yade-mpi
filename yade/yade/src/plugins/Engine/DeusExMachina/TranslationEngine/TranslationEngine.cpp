@@ -1,6 +1,6 @@
 #include "TranslationEngine.hpp"
 #include "ParticleParameters.hpp"
-#include "MetaBody.hpp"
+#include <yade/MetaBody.hpp>
 
 void TranslationEngine::postProcessAttributes(bool deserializing)
 {

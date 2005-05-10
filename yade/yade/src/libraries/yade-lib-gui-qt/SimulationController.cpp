@@ -22,10 +22,10 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "SimulationController.hpp"
-#include "Omega.hpp"
-#include "ThreadSynchronizer.hpp"
-#include "Math.hpp"
-#include "Threadable.hpp"
+#include <yade/Omega.hpp>
+#include <yade-lib-threads/ThreadSynchronizer.hpp>
+#include <yade-lib-wm3-math/Math.hpp>
+#include <yade-lib-threads/Threadable.hpp>
 //#include "OpenGLRenderingEngine.hpp"
 #include "MessageDialog.hpp"
 #include "FileDialog.hpp"

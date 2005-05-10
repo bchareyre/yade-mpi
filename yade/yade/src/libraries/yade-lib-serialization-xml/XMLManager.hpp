@@ -1,7 +1,7 @@
 #ifndef __XMLMANAGER__
 #define __XMLMANAGER__
 
-#include "IOManager.hpp"
+#include <yade-lib-serialization/IOManager.hpp>
 #include "XMLSaxParser.hpp"
 
 

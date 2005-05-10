@@ -1,4 +1,4 @@
-#include "Factorable.hpp"
+#include <yade-lib-factory/Factorable.hpp>
 
 Factorable::Factorable()
 {

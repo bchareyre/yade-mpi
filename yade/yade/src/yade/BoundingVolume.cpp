@@ -1,4 +1,4 @@
-#include "BoundingVolume.hpp"
+#include <yade/BoundingVolume.hpp>
 
 
 void BoundingVolume::registerAttributes()

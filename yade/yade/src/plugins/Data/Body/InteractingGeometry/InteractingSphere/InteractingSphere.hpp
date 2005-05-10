@@ -24,7 +24,7 @@
 #ifndef __INTERACTIONSPHERE_H__
 #define __INTERACTIONSPHERE_H__
 
-#include "InteractingGeometry.hpp"
+#include <yade/InteractingGeometry.hpp>
 
 class InteractingSphere : public InteractingGeometry
 {

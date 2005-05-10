@@ -1,6 +1,6 @@
 #include "RotationEngine.hpp"
 #include "RigidBodyParameters.hpp"
-#include "MetaBody.hpp"
+#include <yade/MetaBody.hpp>
 
 RotationEngine::RotationEngine()
 {

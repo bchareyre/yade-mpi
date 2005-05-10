@@ -3,8 +3,8 @@
 
 #include <vector>
 
-#include "InteractionGeometry.hpp"
-#include "Vector3.hpp"
+#include <yade/InteractionGeometry.hpp>
+#include <yade-lib-wm3-math/Vector3.hpp>
 
 
 class MacroMicroContactGeometry : public InteractionGeometry

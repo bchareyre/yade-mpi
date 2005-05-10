@@ -32,17 +32,17 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "Se3.hpp"
-#include "GeometricalModel.hpp"
-#include "InteractingGeometry.hpp"
-#include "BoundingVolume.hpp"
-#include "PhysicalParameters.hpp"
+#include <yade-lib-wm3-math/Se3.hpp>
+#include <yade/GeometricalModel.hpp>
+#include <yade/InteractingGeometry.hpp>
+#include <yade/BoundingVolume.hpp>
+#include <yade/PhysicalParameters.hpp>
 #include "InteractionContainer.hpp"
-#include "Interaction.hpp"
-#include "Serializable.hpp"
-#include "Indexable.hpp"
+#include <yade/Interaction.hpp>
+#include <yade-lib-serialization/Serializable.hpp>
+#include <yade-lib-multimethods/Indexable.hpp>
 
-#include "PhysicalActionContainer.hpp"
+#include <yade/PhysicalActionContainer.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////

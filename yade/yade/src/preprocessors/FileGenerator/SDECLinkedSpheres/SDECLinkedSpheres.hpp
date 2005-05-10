@@ -2,9 +2,9 @@
 #ifndef __LINKEDSPHERES_H__
 #define __LINKEDSPHERES_H__
 
-#include "FileGenerator.hpp"
-#include "Vector3.hpp"
-#include "Body.hpp"
+#include <yade/FileGenerator.hpp>
+#include <yade-lib-wm3-math/Vector3.hpp>
+#include <yade/Body.hpp>
 
 class SDECLinkedSpheres : public FileGenerator
 {

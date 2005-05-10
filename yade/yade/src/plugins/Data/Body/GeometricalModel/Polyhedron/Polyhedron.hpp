@@ -24,7 +24,7 @@
 // #ifndef __MESH3D_H__
 // #define __MESH3D_H__
 // 
-// #include "InteractingGeometry.hpp"
+// #include <yade/InteractingGeometry.hpp>
 // 
 // class Polyhedron : public InteractingGeometry
 // {

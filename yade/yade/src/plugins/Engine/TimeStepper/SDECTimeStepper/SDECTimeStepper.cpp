@@ -22,8 +22,8 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "SDECTimeStepper.hpp"
-#include "Interaction.hpp"
-#include "MetaBody.hpp"
+#include <yade/Interaction.hpp>
+#include <yade/MetaBody.hpp>
 #include "BodyMacroParameters.hpp"
 #include "ElasticContactParameters.hpp"
 #include "MacroMicroContactGeometry.hpp"

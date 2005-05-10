@@ -18,10 +18,10 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "ClassFactory.hpp"
+#include <yade-lib-factory/ClassFactory.hpp>
 
-#include "Omega.hpp"
-#include "FrontEnd.hpp"
+#include <yade/Omega.hpp>
+#include <yade/FrontEnd.hpp>
 
 #include <iostream>
 #include <getopt.h>

@@ -1,7 +1,7 @@
 #ifndef __BOUNDINGSPHERE_H__
 #define __BOUNDINGSPHERE_H__
 
-#include "BoundingVolume.hpp"
+#include <yade/BoundingVolume.hpp>
 
 class BoundingSphere : public BoundingVolume
 {

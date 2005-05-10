@@ -2,7 +2,7 @@
 #ifndef __ROTATINGBOX_H__
 #define __ROTATINGBOX_H__
 
-#include "FileGenerator.hpp"
+#include <yade/FileGenerator.hpp>
 
 class RotatingBox : public FileGenerator
 {

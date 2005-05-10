@@ -1,8 +1,8 @@
 #ifndef __InteractionHashMap_HPP__
 #define __InteractionHashMap_HPP__
 
-#include "InteractionContainer.hpp"
-#include "Interaction.hpp"
+#include <yade/InteractionContainer.hpp>
+#include <yade/Interaction.hpp>
 #include <ext/hash_map>
 
 using namespace std;

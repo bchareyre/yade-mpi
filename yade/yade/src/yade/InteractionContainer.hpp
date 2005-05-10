@@ -1,7 +1,7 @@
 #ifndef __INTERACTIONCONTAINER_HPP__
 #define __INTERACTIONCONTAINER_HPP__
 
-#include "Serializable.hpp"
+#include <yade-lib-serialization/Serializable.hpp>
 
 class Interaction;
 

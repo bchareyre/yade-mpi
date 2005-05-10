@@ -1,20 +1,20 @@
 #include "HangingCloth.hpp"
 
-#include "Body.hpp"
+#include <yade/Body.hpp>
 #include "Mesh2D.hpp"
 #include "Sphere.hpp"
 #include "RigidBodyParameters.hpp"
 #include "Box.hpp"
 #include "AABB.hpp"
 #include "InteractingBox.hpp"
-#include "MetaBody.hpp"
+#include <yade/MetaBody.hpp>
 #include "SimpleSpringLaw.hpp"
 #include "PersistentSAPCollider.hpp"
-#include "MetaBody.hpp"
+#include <yade/MetaBody.hpp>
 #include "MassSpringLaw.hpp"
 #include "MassSpringBody2RigidBodyLaw.hpp"
 
-#include "IOManager.hpp"
+#include <yade-lib-serialization/IOManager.hpp>
 #include "InteractionGeometryMetaEngine.hpp"
 #include "InteractionPhysicsMetaEngine.hpp"
 

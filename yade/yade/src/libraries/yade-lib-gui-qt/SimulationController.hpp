@@ -29,8 +29,8 @@
 
 #include "GLViewer.hpp"
 #include "QtGeneratedSimulationController.h"
-#include "QtGUIGenerator.hpp"
-#include "RenderingEngine.hpp"
+#include <yade-lib-serialization-qt/QtGUIGenerator.hpp>
+#include <yade/RenderingEngine.hpp>
 #include "SimulationControllerUpdater.hpp"
 
 #include <qlayout.h>

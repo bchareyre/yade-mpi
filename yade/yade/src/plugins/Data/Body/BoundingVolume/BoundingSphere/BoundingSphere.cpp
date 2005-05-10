@@ -1,5 +1,5 @@
 #include "BoundingSphere.hpp"
-#include "OpenGLWrapper.hpp"
+#include <yade-lib-opengl/OpenGLWrapper.hpp>
 
 BoundingSphere::BoundingSphere () : BoundingVolume()
 {

@@ -1,4 +1,4 @@
-#include "FrontEnd.hpp"
+#include <yade/FrontEnd.hpp>
 
 FrontEnd::FrontEnd()
 {	

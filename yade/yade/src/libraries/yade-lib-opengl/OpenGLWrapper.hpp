@@ -24,7 +24,7 @@
 #ifndef __OPENGLWRAPPER_HPP__
 #define __OPENGLWRAPPER_HPP__
 
-#include "Vector3.hpp"
+#include <yade-lib-wm3-math/Vector3.hpp>
 #include <GL/gl.h>
 #include <GL/glut.h>
 

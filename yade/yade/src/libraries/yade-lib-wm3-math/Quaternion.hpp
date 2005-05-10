@@ -11,8 +11,8 @@
 #ifndef WM3QUATERNION_H
 #define WM3QUATERNION_H
 
-#include "Matrix3.hpp"
-#include "Vector3.hpp"
+#include <yade-lib-wm3-math/Matrix3.hpp>
+#include <yade-lib-wm3-math/Vector3.hpp>
 //namespace Wm3
 //{
 

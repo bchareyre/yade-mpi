@@ -1,7 +1,7 @@
 #include "PositionOrientationRecorder.hpp"
 #include "RigidBodyParameters.hpp"
-#include "Omega.hpp"
-#include "MetaBody.hpp"
+#include <yade/Omega.hpp>
+#include <yade/MetaBody.hpp>
 
 #include <boost/lexical_cast.hpp>
 

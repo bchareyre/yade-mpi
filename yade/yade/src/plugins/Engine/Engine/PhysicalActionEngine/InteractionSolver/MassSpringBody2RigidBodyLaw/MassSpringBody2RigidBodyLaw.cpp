@@ -1,7 +1,7 @@
 #include "MassSpringBody2RigidBodyLaw.hpp"
 #include "RigidBodyParameters.hpp"
-#include "Omega.hpp"
-#include "MetaBody.hpp"
+#include <yade/Omega.hpp>
+#include <yade/MetaBody.hpp>
 #include "ClosestFeatures.hpp"
 #include "SimpleSpringLaw.hpp"
 #include "Mesh2D.hpp"

@@ -99,7 +99,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>preprocessors/FileGenerator/FEMDEMCouplingTest</activedir>
+      <activedir>libraries/yade-lib-loki</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>

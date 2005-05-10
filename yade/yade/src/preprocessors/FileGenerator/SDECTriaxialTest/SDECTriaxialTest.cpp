@@ -23,20 +23,20 @@
 
 #include "SDECTriaxialTest.hpp"
 
-#include "Body.hpp"
-#include "MetaBody.hpp"
+#include <yade/Body.hpp>
+#include <yade/MetaBody.hpp>
 
 #include "Box.hpp"
 #include "AABB.hpp"
 #include "Sphere.hpp"
-#include "MetaBody.hpp"
+#include <yade/MetaBody.hpp>
 #include "PersistentSAPCollider.hpp"
 #include "BodyMacroParameters.hpp"
 #include <fstream>
-#include "IOManager.hpp"
+#include <yade-lib-serialization/IOManager.hpp>
 #include "ElasticContactLaw.hpp"
 #include "BodyMacroParameters.hpp"
-#include "Interaction.hpp"
+#include <yade/Interaction.hpp>
 #include "BoundingVolumeMetaEngine.hpp"
 #include "InteractionDescriptionSet2AABB.hpp"
 #include "MetaInteractingGeometry.hpp"

@@ -24,7 +24,7 @@
 #ifndef __INTERACIONBOX_H__
 #define __INTERACIONBOX_H__
 
-#include "InteractingGeometry.hpp"
+#include <yade/InteractingGeometry.hpp>
 
 class InteractingBox : public InteractingGeometry
 {

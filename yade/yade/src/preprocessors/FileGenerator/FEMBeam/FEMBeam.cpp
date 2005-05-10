@@ -22,8 +22,8 @@
 #include "TranslationEngine.hpp"
 
 // body
-#include "MetaBody.hpp"
-#include "Body.hpp"
+#include <yade/MetaBody.hpp>
+#include <yade/Body.hpp>
 
 // dispatchers
 #include "PhysicalParametersMetaEngine.hpp"

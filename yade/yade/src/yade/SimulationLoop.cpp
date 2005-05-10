@@ -1,7 +1,7 @@
 #include "SimulationLoop.hpp"
-#include "MetaBody.hpp"
-#include "Omega.hpp"
-#include "ThreadSynchronizer.hpp"
+#include <yade/MetaBody.hpp>
+#include <yade/Omega.hpp>
+#include <yade-lib-threads/ThreadSynchronizer.hpp>
 
 SimulationLoop::SimulationLoop() : Threadable<SimulationLoop>(Omega::instance().getSynchronizer())
 {

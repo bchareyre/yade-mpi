@@ -22,7 +22,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "Sphere.hpp"
-#include "OpenGLWrapper.hpp"
+#include <yade-lib-opengl/OpenGLWrapper.hpp>
 
 
 Sphere::Sphere () : GeometricalModel()

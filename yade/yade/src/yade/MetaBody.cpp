@@ -1,6 +1,6 @@
-#include "Math.hpp"
+#include <yade-lib-wm3-math/Math.hpp>
 
-#include "MetaBody.hpp"
+#include <yade/MetaBody.hpp>
 #include "Engine.hpp"
 
 ////////// Containers

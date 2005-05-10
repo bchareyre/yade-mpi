@@ -1,5 +1,5 @@
-#include "FpsTracker.hpp"
-#include "OpenGLWrapper.hpp"
+#include <yade-lib-opengl/FpsTracker.hpp>
+#include <yade-lib-opengl/OpenGLWrapper.hpp>
 
 #include <GL/glut.h>
 #include <boost/lexical_cast.hpp>

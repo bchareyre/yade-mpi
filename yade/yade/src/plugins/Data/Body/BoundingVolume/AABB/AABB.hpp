@@ -1,7 +1,7 @@
 #ifndef __AABB_H__
 #define __AABB_H__
 
-#include "BoundingVolume.hpp"
+#include <yade/BoundingVolume.hpp>
 
 class AABB : public BoundingVolume
 {

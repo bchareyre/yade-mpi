@@ -1,27 +1,27 @@
-#include "Omega.hpp"
+#include <yade/Omega.hpp>
 #include "yadeExceptions.hpp"
 
-#include "Vector3.hpp"
+#include <yade-lib-wm3-math/Vector3.hpp>
 
-#include "IOManager.hpp"
-#include "MetaBody.hpp"
+#include <yade-lib-serialization/IOManager.hpp>
+#include <yade/MetaBody.hpp>
 
 #include "FileGenerator.hpp"
 #include "InteractionSolver.hpp"
 #include "DeusExMachina.hpp"
-#include "Body.hpp"
+#include <yade/Body.hpp>
 
-#include "IOManager.hpp"
+#include <yade-lib-serialization/IOManager.hpp>
 #include "BroadInteractor.hpp"
 
-#include "GeometricalModel.hpp"
-#include "InteractingGeometry.hpp"
-#include "BoundingVolume.hpp"
+#include <yade/GeometricalModel.hpp>
+#include <yade/InteractingGeometry.hpp>
+#include <yade/BoundingVolume.hpp>
 #include "InteractionGeometry.hpp"
 #include "InteractionPhysics.hpp"
-#include "ThreadSynchronizer.hpp"
+#include <yade-lib-threads/ThreadSynchronizer.hpp>
 #include "SimulationLoop.hpp"
-#include "FrontEnd.hpp"
+#include <yade/FrontEnd.hpp>
 
 #include "Preferences.hpp"
 //#include "InteractionGeometryMetaEngine.hpp"

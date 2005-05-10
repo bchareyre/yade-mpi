@@ -1,6 +1,6 @@
 #include "PhysicalActionVectorVector.hpp"
-#include "Body.hpp"
-#include "PhysicalAction.hpp"
+#include <yade/Body.hpp>
+#include <yade/PhysicalAction.hpp>
 
 PhysicalActionVectorVector::PhysicalActionVectorVector()
 {

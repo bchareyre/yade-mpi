@@ -27,10 +27,10 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "Serializable.hpp"
-#include "Typelist.hpp"
-#include "Functor.hpp"
-#include "MultiMethodsExceptions.hpp"
+#include <yade-lib-serialization/Serializable.hpp>
+#include <yade-lib-loki/Typelist.hpp>
+#include <yade-lib-loki/Functor.hpp>
+#include <yade-lib-multimethods/MultiMethodsExceptions.hpp>
 
 #include <string>
 #include <boost/shared_ptr.hpp>

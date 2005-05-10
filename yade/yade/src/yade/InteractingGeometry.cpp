@@ -1,4 +1,4 @@
-#include "InteractingGeometry.hpp"
+#include <yade/InteractingGeometry.hpp>
 
 void InteractingGeometry::registerAttributes()
 {

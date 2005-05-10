@@ -32,7 +32,7 @@
 #include "SerializationExceptions.hpp"
 #include "Archive.hpp"
 //class Serializable;
-//#include "Serializable.hpp"
+//#include <yade-lib-serialization/Serializable.hpp>
 #include <utility>
 #include <boost/tuple/tuple.hpp>
 

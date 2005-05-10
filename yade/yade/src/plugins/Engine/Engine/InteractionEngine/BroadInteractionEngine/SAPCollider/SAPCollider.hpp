@@ -6,7 +6,7 @@
 #include <vector>
 #include <algorithm>
 
-#include "BroadInteractor.hpp"
+#include <yade/BroadInteractor.hpp>
 
 class SAPCollider : public BroadInteractor
 {

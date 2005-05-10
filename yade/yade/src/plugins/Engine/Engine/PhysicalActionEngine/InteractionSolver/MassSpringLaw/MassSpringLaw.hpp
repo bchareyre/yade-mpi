@@ -1,8 +1,8 @@
 #ifndef __EXPLICITMASSSPRINGDYNAMICENGINE_H__
 #define __EXPLICITMASSSPRINGDYNAMICENGINE_H__
 
-#include "InteractionSolver.hpp"
-#include "PhysicalAction.hpp"
+#include <yade/InteractionSolver.hpp>
+#include <yade/PhysicalAction.hpp>
 
 class MassSpringLaw : public InteractionSolver
 {

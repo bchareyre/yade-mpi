@@ -4,16 +4,16 @@
 #include "Box.hpp"
 #include "AABB.hpp"
 #include "Sphere.hpp"
-#include "MetaBody.hpp"
+#include <yade/MetaBody.hpp>
 #include "SAPCollider.hpp"
 #include "PersistentSAPCollider.hpp"
 #include "BodyMacroParameters.hpp"
 #include <fstream>
-#include "IOManager.hpp"
+#include <yade-lib-serialization/IOManager.hpp>
 #include "ElasticContactLaw.hpp"
 #include "BodyMacroParameters.hpp"
 #include "SDECLinkGeometry.hpp"
-#include "Interaction.hpp"
+#include <yade/Interaction.hpp>
 #include "BoundingVolumeMetaEngine.hpp"
 #include "InteractionDescriptionSet2AABB.hpp"
 #include "MetaInteractingGeometry.hpp"
@@ -32,7 +32,7 @@
 
 #include "InteractionGeometryMetaEngine.hpp"
 #include "InteractionPhysicsMetaEngine.hpp"
-#include "Body.hpp"
+#include <yade/Body.hpp>
 #include "InteractingBox.hpp"
 #include "InteractingSphere.hpp"
 #include "PhysicalParametersMetaEngine.hpp"

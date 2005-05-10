@@ -1,6 +1,6 @@
 #include "YadeQtMainWindow.hpp"
 
-#include "IOManager.hpp"
+#include <yade-lib-serialization/IOManager.hpp>
 
 
 #include <qvbox.h>

@@ -1,4 +1,4 @@
-#include "Interaction.hpp"
+#include <yade/Interaction.hpp>
 
 Interaction::Interaction ()
 {

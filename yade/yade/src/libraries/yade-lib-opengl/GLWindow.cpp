@@ -6,7 +6,7 @@
 #endif
 #include <GL/gl.h>
 
-#include "GLWindowsManager.hpp"
+#include <yade-lib-opengl/GLWindowsManager.hpp>
 
 
 GLWindow::GLWindow(int minX,int minY, int sizeX,int sizeY)

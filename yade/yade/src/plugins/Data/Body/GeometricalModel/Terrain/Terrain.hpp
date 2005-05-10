@@ -24,11 +24,11 @@
 #ifndef __TERRAIN_H__
 #define __TERRAIN_H__
 
-#include "GeometricalModel.hpp"
+#include <yade/GeometricalModel.hpp>
 
 #include <vector>
 #include <fstream>
-#include "Vector2.hpp"
+#include <yade-lib-wm3-math/Vector2.hpp>
 #include "AABB.hpp"
 
 using namespace std;

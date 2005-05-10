@@ -1,6 +1,6 @@
 #include "MassSpringLaw.hpp"
-#include "Omega.hpp"
-#include "MetaBody.hpp"
+#include <yade/Omega.hpp>
+#include <yade/MetaBody.hpp>
 #include "Mesh2D.hpp"
 #include "SpringGeometry.hpp"
 #include "SpringPhysics.hpp"

@@ -1,8 +1,8 @@
 #ifndef __SDECIMPORT_H__
 #define __SDECIMPORT_H__
 
-#include "FileGenerator.hpp"
-#include "Vector3.hpp"
+#include <yade/FileGenerator.hpp>
+#include <yade-lib-wm3-math/Vector3.hpp>
 
 class ForceRecorder;
 class AveragePositionRecorder;

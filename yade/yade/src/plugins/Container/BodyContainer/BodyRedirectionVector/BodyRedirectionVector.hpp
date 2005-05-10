@@ -1,7 +1,7 @@
 #ifndef __BODYVECTOR_HPP__
 #define __BODYVECTOR_HPP__
 
-#include "BodyContainer.hpp"
+#include <yade/BodyContainer.hpp>
 #include <vector>
 
 class Body;

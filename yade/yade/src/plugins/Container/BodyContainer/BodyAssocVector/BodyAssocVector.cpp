@@ -1,5 +1,5 @@
 #include "BodyAssocVector.hpp"
-#include "Body.hpp"
+#include <yade/Body.hpp>
 
 BodyAssocVector::BodyAssocVector()
 {

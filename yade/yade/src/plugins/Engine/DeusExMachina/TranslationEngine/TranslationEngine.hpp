@@ -1,13 +1,13 @@
 #ifndef __TRANSLATOR_H__
 #define __TRANSLATOR_H__
 
-#include "DeusExMachina.hpp"
+#include <yade/DeusExMachina.hpp>
 
 #ifdef WIN32
 #include <windows.h>
 #endif
 
-#include "Vector3.hpp"
+#include <yade-lib-wm3-math/Vector3.hpp>
 
 class TranslationEngine : public DeusExMachina
 {

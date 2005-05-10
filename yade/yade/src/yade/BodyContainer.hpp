@@ -1,7 +1,7 @@
 #ifndef __BODYCONTAINER_HPP__
 #define __BODYCONTAINER_HPP__
 
-#include "Serializable.hpp"
+#include <yade-lib-serialization/Serializable.hpp>
 
 class Body;
 

@@ -2,7 +2,7 @@
 #ifndef __BOXSTACK_H__
 #define __BOXSTACK_H__
 
-#include "FileGenerator.hpp"
+#include <yade/FileGenerator.hpp>
 
 class BoxStack : public FileGenerator
 {

@@ -1,13 +1,13 @@
 #ifndef __OSCILLATOR_H__
 #define __OSCILLATOR_H__
 
-#include "DeusExMachina.hpp"
+#include <yade/DeusExMachina.hpp>
 
 #ifdef WIN32
 #include <windows.h>
 #endif
 
-#include "Vector3.hpp"
+#include <yade-lib-wm3-math/Vector3.hpp>
 
 class RotationEngine : public DeusExMachina
 {

@@ -2,8 +2,8 @@
 #define __INTERACTIONVECSET_HPP__
 
 
-#include "InteractionContainer.hpp"
-#include "Interaction.hpp"
+#include <yade/InteractionContainer.hpp>
+#include <yade/Interaction.hpp>
 
 #include <vector>
 #include <set>

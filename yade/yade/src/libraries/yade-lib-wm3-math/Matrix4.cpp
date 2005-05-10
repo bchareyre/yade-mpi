@@ -8,7 +8,7 @@
 // may not be copied or disclosed except in accordance with the terms of that
 // agreement.
 
-#include "Matrix4.hpp"
+#include <yade-lib-wm3-math/Matrix4.hpp>
 //using namespace Wm3;
 
 template<> const Matrix4<float> Matrix4<float>::ZERO(

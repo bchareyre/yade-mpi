@@ -1,5 +1,5 @@
 #include "BodyContainer.hpp"
-#include "Body.hpp"
+#include <yade/Body.hpp>
 
 void BodyContainer::registerAttributes()
 {

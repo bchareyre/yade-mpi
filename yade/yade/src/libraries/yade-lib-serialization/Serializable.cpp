@@ -18,7 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "Serializable.hpp"
+#include <yade-lib-serialization/Serializable.hpp>
 
 Serializable::Serializable() : Factorable()
 {

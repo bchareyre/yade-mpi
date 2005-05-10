@@ -2,7 +2,7 @@
 #define __RIGIDBODY_H__
 
 #include "ParticleParameters.hpp"
-#include "Matrix3.hpp"
+#include <yade-lib-wm3-math/Matrix3.hpp>
 
 class RigidBodyParameters : public ParticleParameters
 {	

@@ -18,7 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "MultiMethodsExceptions.hpp"
+#include <yade-lib-multimethods/MultiMethodsExceptions.hpp>
 
 
 const char* MultiMethodsExceptions::NotExistingClass	= "DynLibDispatcher::add - cannot find class (or load a library) named : ";

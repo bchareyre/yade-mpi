@@ -45,7 +45,7 @@
 //           0       0       1
 // where t > 0 indicates a counterclockwise orientation in the xy-plane.
 
-#include "Vector3.hpp"
+#include <yade-lib-wm3-math/Vector3.hpp>
 
 //namespace Wm3
 //{

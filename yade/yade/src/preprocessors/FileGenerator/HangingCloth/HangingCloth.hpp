@@ -2,7 +2,7 @@
 #ifndef __HANGINGCLOTH_H__
 #define __HANGINGCLOTH_H__
 
-#include "FileGenerator.hpp"
+#include <yade/FileGenerator.hpp>
 
 
 class HangingCloth : public FileGenerator
