@@ -39,7 +39,6 @@
 ElasticContactLaw::ElasticContactLaw() : InteractionSolver() , actionForce(new Force) , actionMomentum(new Momentum)
 {
 	sdecGroupMask=1;
-	first=true;
 	momentRotationLaw = true;
 }
 

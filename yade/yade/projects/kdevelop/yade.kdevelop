@@ -99,7 +99,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>preprocessors/FileGenerator/LatticeExample</activedir>
+      <activedir>plugins/Engine/Engine/PhysicalActionEngine/InteractionSolver/ElasticContactLaw</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>
