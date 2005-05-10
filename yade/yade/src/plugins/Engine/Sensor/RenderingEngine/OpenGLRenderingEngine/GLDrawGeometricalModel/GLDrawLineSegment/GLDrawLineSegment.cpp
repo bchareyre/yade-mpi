@@ -1,5 +1,5 @@
 #include "GLDrawLineSegment.hpp"
-#include "LineSegment.hpp"
+#include <yade-common/LineSegment.hpp>
 #include <yade-lib-opengl/OpenGLWrapper.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

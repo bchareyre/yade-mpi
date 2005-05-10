@@ -29,7 +29,7 @@
 #include <vector>
 #include <fstream>
 #include <yade-lib-wm3-math/Vector2.hpp>
-#include "AABB.hpp"
+#include <yade-common/AABB.hpp>
 
 using namespace std;
 

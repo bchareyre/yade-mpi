@@ -1,5 +1,5 @@
 #include "VelocityRecorder.hpp"
-#include "ParticleParameters.hpp"
+#include <yade-common/ParticleParameters.hpp>
 #include <yade/Omega.hpp>
 #include <yade/MetaBody.hpp>
 

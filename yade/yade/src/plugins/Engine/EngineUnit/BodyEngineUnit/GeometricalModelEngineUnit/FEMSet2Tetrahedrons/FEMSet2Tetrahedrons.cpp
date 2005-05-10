@@ -22,9 +22,9 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "FEMSet2Tetrahedrons.hpp"
-#include "FEMSetParameters.hpp"
-#include "FEMTetrahedronData.hpp"
-#include "Tetrahedron.hpp"
+#include <yade-common/FEMSetParameters.hpp>
+#include <yade-common/FEMTetrahedronData.hpp>
+#include <yade-common/Tetrahedron.hpp>
 #include <yade/MetaBody.hpp>
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

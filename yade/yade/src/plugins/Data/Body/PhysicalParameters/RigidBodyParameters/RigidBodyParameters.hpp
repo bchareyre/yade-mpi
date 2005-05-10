@@ -1,7 +1,7 @@
 #ifndef __RIGIDBODY_H__
 #define __RIGIDBODY_H__
 
-#include "ParticleParameters.hpp"
+#include <yade-common/ParticleParameters.hpp>
 #include <yade-lib-wm3-math/Matrix3.hpp>
 
 class RigidBodyParameters : public ParticleParameters

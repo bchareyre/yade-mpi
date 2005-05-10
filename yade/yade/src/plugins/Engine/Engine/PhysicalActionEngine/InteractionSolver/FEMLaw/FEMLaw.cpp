@@ -22,9 +22,9 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "FEMLaw.hpp"
-#include "FEMTetrahedronData.hpp"
-#include "FEMNodeData.hpp"
-#include "Force.hpp"
+#include <yade-common/FEMTetrahedronData.hpp>
+#include <yade-common/FEMNodeData.hpp>
+#include <yade-common/Force.hpp>
 
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/vector.hpp>

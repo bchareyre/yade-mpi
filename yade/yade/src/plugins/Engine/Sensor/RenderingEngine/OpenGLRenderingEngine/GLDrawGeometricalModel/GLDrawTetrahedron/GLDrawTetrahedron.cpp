@@ -1,5 +1,5 @@
 #include "GLDrawTetrahedron.hpp"
-#include "Tetrahedron.hpp"
+#include <yade-common/Tetrahedron.hpp>
 #include <yade-lib-opengl/OpenGLWrapper.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

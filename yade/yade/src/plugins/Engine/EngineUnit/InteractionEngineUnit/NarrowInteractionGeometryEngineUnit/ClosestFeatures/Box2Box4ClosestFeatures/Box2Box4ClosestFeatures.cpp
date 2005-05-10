@@ -22,8 +22,8 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "Box2Box4ClosestFeatures.hpp"
-#include "InteractingBox.hpp"
-#include "ClosestFeatures.hpp"
+#include <yade-common/InteractingBox.hpp>
+#include <yade-common/ClosestFeatures.hpp>
 #include <yade-lib-wm3-math/Math.hpp>
 #include <yade-lib-computational-geometry/Intersections2D.hpp>
 #include <yade-lib-computational-geometry/Intersections3D.hpp>

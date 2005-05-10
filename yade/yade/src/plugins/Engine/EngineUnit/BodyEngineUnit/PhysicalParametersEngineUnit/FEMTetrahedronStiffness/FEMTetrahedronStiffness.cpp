@@ -21,9 +21,9 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "FEMSetParameters.hpp"
+#include <yade-common/FEMSetParameters.hpp>
 #include "FEMTetrahedronStiffness.hpp"
-#include "FEMTetrahedronData.hpp"
+#include <yade-common/FEMTetrahedronData.hpp>
 
 // FIXME - uh, libnames FEMTetrahedronData and FEMTetrahedronStiffness are maybe wrong! it will be fixed, when whole tetrahedron-as-interaction mess will be cleaned up
 

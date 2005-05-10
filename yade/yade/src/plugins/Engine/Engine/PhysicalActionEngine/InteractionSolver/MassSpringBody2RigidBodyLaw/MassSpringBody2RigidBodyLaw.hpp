@@ -2,8 +2,8 @@
 #define __MASSSPRINGBODY2RIGIDBODYNAMICENGINE_H__
 
 #include <yade/InteractionSolver.hpp>
-#include "Force.hpp"
-#include "Momentum.hpp"
+#include <yade-common/Force.hpp>
+#include <yade-common/Momentum.hpp>
 
 class MassSpringBody2RigidBodyLaw : public InteractionSolver
 {

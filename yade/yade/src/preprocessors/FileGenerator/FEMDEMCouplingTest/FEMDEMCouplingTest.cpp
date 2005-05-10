@@ -24,42 +24,42 @@
 #include "FEMDEMCouplingTest.hpp"
 
 // dispatchers
-#include "BoundingVolumeMetaEngine.hpp"
-#include "PhysicalParametersMetaEngine.hpp"
-#include "GeometricalModelMetaEngine.hpp"
-#include "PhysicalActionDamper.hpp"
-#include "PhysicalActionApplier.hpp"
+#include <yade-common/BoundingVolumeMetaEngine.hpp>
+#include <yade-common/PhysicalParametersMetaEngine.hpp>
+#include <yade-common/GeometricalModelMetaEngine.hpp>
+#include <yade-common/PhysicalActionDamper.hpp>
+#include <yade-common/PhysicalActionApplier.hpp>
 
-#include "InteractionGeometryMetaEngine.hpp"
-#include "InteractionPhysicsMetaEngine.hpp"
+#include <yade-common/InteractionGeometryMetaEngine.hpp>
+#include <yade-common/InteractionPhysicsMetaEngine.hpp>
 
 // actors
-#include "GravityEngine.hpp"
-#include "CundallNonViscousForceDamping.hpp"
-#include "CundallNonViscousMomentumDamping.hpp"
+#include <yade-common/GravityEngine.hpp>
+#include <yade-common/CundallNonViscousForceDamping.hpp>
+#include <yade-common/CundallNonViscousMomentumDamping.hpp>
 // actors FEM
-#include "FEMLaw.hpp"
-#include "PhysicalActionContainerInitializer.hpp"
-#include "PhysicalActionContainerReseter.hpp"
-#include "FEMSetTextLoader.hpp"
+#include <yade-common/FEMLaw.hpp>
+#include <yade-common/PhysicalActionContainerInitializer.hpp>
+#include <yade-common/PhysicalActionContainerReseter.hpp>
+#include <yade-common/FEMSetTextLoader.hpp>
 //actors DEM
-#include "SDECTimeStepper.hpp"
-#include "ElasticContactLaw.hpp"
-#include "PersistentSAPCollider.hpp"
+#include <yade-common/SDECTimeStepper.hpp>
+#include <yade-common/ElasticContactLaw.hpp>
+#include <yade-common/PersistentSAPCollider.hpp>
 
 // data
-#include "AABB.hpp"
+#include <yade-common/AABB.hpp>
 // data FEM
-#include "FEMSetParameters.hpp"
-#include "MetaInteractingGeometry.hpp"
+#include <yade-common/FEMSetParameters.hpp>
+#include <yade-common/MetaInteractingGeometry.hpp>
 // data DEM
-#include "BodyMacroParameters.hpp"
-#include "Box.hpp"
-#include "InteractingBox.hpp"
+#include <yade-common/BodyMacroParameters.hpp>
+#include <yade-common/Box.hpp>
+#include <yade-common/InteractingBox.hpp>
 
-#include "BodyRedirectionVector.hpp"
-#include "InteractionVecSet.hpp"
-#include "PhysicalActionVectorVector.hpp"
+#include <yade-common/BodyRedirectionVector.hpp>
+#include <yade-common/InteractionVecSet.hpp>
+#include <yade-common/PhysicalActionVectorVector.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////

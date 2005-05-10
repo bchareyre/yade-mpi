@@ -99,7 +99,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>libraries/yade-lib-loki</activedir>
+      <activedir>preprocessors/FileGenerator/LatticeExample</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>

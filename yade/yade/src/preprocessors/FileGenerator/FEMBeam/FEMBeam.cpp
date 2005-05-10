@@ -2,44 +2,44 @@
 
 
 // data
-#include "AABB.hpp"
-#include "Sphere.hpp"
-#include "Tetrahedron.hpp"
-#include "FEMSetParameters.hpp"
-#include "FEMTetrahedronData.hpp"
-#include "FEMNodeData.hpp"
-#include "MetaInteractingGeometry.hpp"
+#include <yade-common/AABB.hpp>
+#include <yade-common/Sphere.hpp>
+#include <yade-common/Tetrahedron.hpp>
+#include <yade-common/FEMSetParameters.hpp>
+#include <yade-common/FEMTetrahedronData.hpp>
+#include <yade-common/FEMNodeData.hpp>
+#include <yade-common/MetaInteractingGeometry.hpp>
 
 // actors
-#include "FEMTetrahedronStiffness.hpp"
-#include "CundallNonViscousMomentumDamping.hpp"
-#include "CundallNonViscousForceDamping.hpp"
-#include "PhysicalActionContainerInitializer.hpp"
-#include "PhysicalActionContainerReseter.hpp"
-#include "FEMLaw.hpp"
-#include "FEMSetTextLoader.hpp"
-#include "GravityEngine.hpp"
-#include "TranslationEngine.hpp"
+#include <yade-common/FEMTetrahedronStiffness.hpp>
+#include <yade-common/CundallNonViscousMomentumDamping.hpp>
+#include <yade-common/CundallNonViscousForceDamping.hpp>
+#include <yade-common/PhysicalActionContainerInitializer.hpp>
+#include <yade-common/PhysicalActionContainerReseter.hpp>
+#include <yade-common/FEMLaw.hpp>
+#include <yade-common/FEMSetTextLoader.hpp>
+#include <yade-common/GravityEngine.hpp>
+#include <yade-common/TranslationEngine.hpp>
 
 // body
 #include <yade/MetaBody.hpp>
 #include <yade/Body.hpp>
 
 // dispatchers
-#include "PhysicalParametersMetaEngine.hpp"
-#include "InteractionGeometryMetaEngine.hpp"
-#include "InteractionPhysicsMetaEngine.hpp"
-#include "PhysicalActionApplier.hpp"
-#include "PhysicalActionDamper.hpp"
+#include <yade-common/PhysicalParametersMetaEngine.hpp>
+#include <yade-common/InteractionGeometryMetaEngine.hpp>
+#include <yade-common/InteractionPhysicsMetaEngine.hpp>
+#include <yade-common/PhysicalActionApplier.hpp>
+#include <yade-common/PhysicalActionDamper.hpp>
 
-#include "BoundingVolumeMetaEngine.hpp"
-#include "GeometricalModelMetaEngine.hpp"
+#include <yade-common/BoundingVolumeMetaEngine.hpp>
+#include <yade-common/GeometricalModelMetaEngine.hpp>
 
 #include <boost/filesystem/convenience.hpp>
 
-#include "BodyRedirectionVector.hpp"
-#include "InteractionVecSet.hpp"
-#include "PhysicalActionVectorVector.hpp"
+#include <yade-common/BodyRedirectionVector.hpp>
+#include <yade-common/InteractionVecSet.hpp>
+#include <yade-common/PhysicalActionVectorVector.hpp>
 
 using namespace boost;
 using namespace std;

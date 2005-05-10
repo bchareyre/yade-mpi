@@ -1,7 +1,7 @@
 #ifndef __TERRAIN2AABBFACTORY_H__
 #define __TERRAIN2AABBFACTORY_H__
 
-#include "BoundingVolumeEngineUnit.hpp"
+#include <yade-common/BoundingVolumeEngineUnit.hpp>
 
 class Terrain2AABB : public BoundingVolumeEngineUnit
 {

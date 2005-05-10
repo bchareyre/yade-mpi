@@ -1,7 +1,7 @@
 #ifndef __TERRAINFROMWRL1FILEFACTORY_H__
 #define __TERRAINFROMWRL1FILEFACTORY_H__
 
-#include "GeometricalModelEngineUnit.hpp"
+#include <yade-common/GeometricalModelEngineUnit.hpp>
 
 class VRML2Terrain : public GeometricalModelEngineUnit
 {

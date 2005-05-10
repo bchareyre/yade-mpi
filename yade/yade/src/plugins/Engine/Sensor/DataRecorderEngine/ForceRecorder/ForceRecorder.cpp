@@ -1,8 +1,8 @@
 #include "ForceRecorder.hpp"
-#include "RigidBodyParameters.hpp"
+#include <yade-common/RigidBodyParameters.hpp>
 #include <yade/Omega.hpp>
 #include <yade/MetaBody.hpp>
-#include "Force.hpp"
+#include <yade-common/Force.hpp>
 
 #include <boost/lexical_cast.hpp>
 

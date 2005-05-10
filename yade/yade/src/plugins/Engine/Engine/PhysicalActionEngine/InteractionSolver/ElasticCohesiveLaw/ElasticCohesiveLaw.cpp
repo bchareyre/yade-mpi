@@ -22,15 +22,15 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "ElasticCohesiveLaw.hpp"
-#include "BodyMacroParameters.hpp"
-#include "MacroMicroContactGeometry.hpp"
-#include "SDECLinkGeometry.hpp"
-#include "ElasticContactParameters.hpp"
-#include "SDECLinkPhysics.hpp"
+#include <yade-common/BodyMacroParameters.hpp>
+#include <yade-common/MacroMicroContactGeometry.hpp>
+#include <yade-common/SDECLinkGeometry.hpp>
+#include <yade-common/ElasticContactParameters.hpp>
+#include <yade-common/SDECLinkPhysics.hpp>
 #include <yade/Omega.hpp>
 #include <yade/MetaBody.hpp>
-#include "Force.hpp"
-#include "Momentum.hpp"
+#include <yade-common/Force.hpp>
+#include <yade-common/Momentum.hpp>
 #include <yade/PhysicalAction.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

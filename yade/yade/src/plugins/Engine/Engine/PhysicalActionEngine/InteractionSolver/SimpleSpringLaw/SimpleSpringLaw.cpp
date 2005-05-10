@@ -1,10 +1,10 @@
 #include "SimpleSpringLaw.hpp"
-#include "RigidBodyParameters.hpp"
-#include "ClosestFeatures.hpp"
+#include <yade-common/RigidBodyParameters.hpp>
+#include <yade-common/ClosestFeatures.hpp>
 #include <yade/Omega.hpp>
 #include <yade/MetaBody.hpp>
-#include "Force.hpp"
-#include "Momentum.hpp"
+#include <yade-common/Force.hpp>
+#include <yade-common/Momentum.hpp>
 
 SimpleSpringLaw::SimpleSpringLaw () : InteractionSolver(), actionForce(new Force) , actionMomentum(new Momentum)
 {

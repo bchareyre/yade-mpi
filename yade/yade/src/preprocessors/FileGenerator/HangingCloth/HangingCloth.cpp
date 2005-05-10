@@ -1,56 +1,56 @@
 #include "HangingCloth.hpp"
 
 #include <yade/Body.hpp>
-#include "Mesh2D.hpp"
-#include "Sphere.hpp"
-#include "RigidBodyParameters.hpp"
-#include "Box.hpp"
-#include "AABB.hpp"
-#include "InteractingBox.hpp"
+#include <yade-common/Mesh2D.hpp>
+#include <yade-common/Sphere.hpp>
+#include <yade-common/RigidBodyParameters.hpp>
+#include <yade-common/Box.hpp>
+#include <yade-common/AABB.hpp>
+#include <yade-common/InteractingBox.hpp>
 #include <yade/MetaBody.hpp>
-#include "SimpleSpringLaw.hpp"
-#include "PersistentSAPCollider.hpp"
+#include <yade-common/SimpleSpringLaw.hpp>
+#include <yade-common/PersistentSAPCollider.hpp>
 #include <yade/MetaBody.hpp>
-#include "MassSpringLaw.hpp"
-#include "MassSpringBody2RigidBodyLaw.hpp"
+#include <yade-common/MassSpringLaw.hpp>
+#include <yade-common/MassSpringBody2RigidBodyLaw.hpp>
 
 #include <yade-lib-serialization/IOManager.hpp>
-#include "InteractionGeometryMetaEngine.hpp"
-#include "InteractionPhysicsMetaEngine.hpp"
+#include <yade-common/InteractionGeometryMetaEngine.hpp>
+#include <yade-common/InteractionPhysicsMetaEngine.hpp>
 
-#include "PhysicalActionApplier.hpp"
-#include "PhysicalActionDamper.hpp"
+#include <yade-common/PhysicalActionApplier.hpp>
+#include <yade-common/PhysicalActionDamper.hpp>
 
-#include "CundallNonViscousForceDamping.hpp"
-#include "CundallNonViscousMomentumDamping.hpp"
+#include <yade-common/CundallNonViscousForceDamping.hpp>
+#include <yade-common/CundallNonViscousMomentumDamping.hpp>
 
-#include "BoundingVolumeMetaEngine.hpp"
-#include "GeometricalModelMetaEngine.hpp"
+#include <yade-common/BoundingVolumeMetaEngine.hpp>
+#include <yade-common/GeometricalModelMetaEngine.hpp>
 
-#include "InteractionDescriptionSet2AABB.hpp"
-#include "MetaInteractingGeometry.hpp"
-#include "ParticleParameters.hpp"
-#include "ParticleSetParameters.hpp"
-#include "SpringGeometry.hpp"
-#include "SpringPhysics.hpp"
-#include "InteractingSphere.hpp"
+#include <yade-common/InteractionDescriptionSet2AABB.hpp>
+#include <yade-common/MetaInteractingGeometry.hpp>
+#include <yade-common/ParticleParameters.hpp>
+#include <yade-common/ParticleSetParameters.hpp>
+#include <yade-common/SpringGeometry.hpp>
+#include <yade-common/SpringPhysics.hpp>
+#include <yade-common/InteractingSphere.hpp>
 
-#include "ElasticContactLaw.hpp"
-#include "MacroMicroElasticRelationships.hpp"
-#include "BodyMacroParameters.hpp"
-#include "SDECLinkGeometry.hpp"
-#include "SDECLinkPhysics.hpp"
-#include "MassSpringBody2RigidBodyLaw.hpp"
+#include <yade-common/ElasticContactLaw.hpp>
+#include <yade-common/MacroMicroElasticRelationships.hpp>
+#include <yade-common/BodyMacroParameters.hpp>
+#include <yade-common/SDECLinkGeometry.hpp>
+#include <yade-common/SDECLinkPhysics.hpp>
+#include <yade-common/MassSpringBody2RigidBodyLaw.hpp>
 
-#include "PhysicalActionContainerReseter.hpp"
-#include "PhysicalActionContainerInitializer.hpp"
-#include "GravityEngine.hpp"
+#include <yade-common/PhysicalActionContainerReseter.hpp>
+#include <yade-common/PhysicalActionContainerInitializer.hpp>
+#include <yade-common/GravityEngine.hpp>
 
-#include "PhysicalParametersMetaEngine.hpp"
+#include <yade-common/PhysicalParametersMetaEngine.hpp>
 
-#include "BodyRedirectionVector.hpp"
-#include "InteractionVecSet.hpp"
-#include "PhysicalActionVectorVector.hpp"
+#include <yade-common/BodyRedirectionVector.hpp>
+#include <yade-common/InteractionVecSet.hpp>
+#include <yade-common/PhysicalActionVectorVector.hpp>
 
 HangingCloth::HangingCloth () : FileGenerator()
 {

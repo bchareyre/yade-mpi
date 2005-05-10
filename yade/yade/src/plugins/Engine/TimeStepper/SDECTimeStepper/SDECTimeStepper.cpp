@@ -24,11 +24,11 @@
 #include "SDECTimeStepper.hpp"
 #include <yade/Interaction.hpp>
 #include <yade/MetaBody.hpp>
-#include "BodyMacroParameters.hpp"
-#include "ElasticContactParameters.hpp"
-#include "MacroMicroContactGeometry.hpp"
-#include "Sphere.hpp"
-#include "MacroMicroElasticRelationships.hpp"
+#include <yade-common/BodyMacroParameters.hpp>
+#include <yade-common/ElasticContactParameters.hpp>
+#include <yade-common/MacroMicroContactGeometry.hpp>
+#include <yade-common/Sphere.hpp>
+#include <yade-common/MacroMicroElasticRelationships.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////

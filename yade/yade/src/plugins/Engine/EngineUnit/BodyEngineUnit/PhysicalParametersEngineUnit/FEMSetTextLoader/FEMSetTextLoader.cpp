@@ -1,11 +1,11 @@
 
 #include "FEMSetTextLoader.hpp"
 
-#include "FEMSetParameters.hpp"
-#include "FEMNodeData.hpp"
-#include "FEMTetrahedronData.hpp"
-#include "Sphere.hpp"
-#include "Tetrahedron.hpp"
+#include <yade-common/FEMSetParameters.hpp>
+#include <yade-common/FEMNodeData.hpp>
+#include <yade-common/FEMTetrahedronData.hpp>
+#include <yade-common/Sphere.hpp>
+#include <yade-common/Tetrahedron.hpp>
 
 #include <boost/filesystem/convenience.hpp>
 

@@ -1,48 +1,48 @@
 #include "SDECImpactTest.hpp"
 
-#include "Box.hpp"
-#include "AABB.hpp"
-#include "Sphere.hpp"
+#include <yade-common/Box.hpp>
+#include <yade-common/AABB.hpp>
+#include <yade-common/Sphere.hpp>
 #include <yade/MetaBody.hpp>
-#include "SAPCollider.hpp"
-#include "PersistentSAPCollider.hpp"
+#include <yade-common/SAPCollider.hpp>
+#include <yade-common/PersistentSAPCollider.hpp>
 #include <fstream>
 #include <yade-lib-serialization/IOManager.hpp>
 #include <yade/Interaction.hpp>
-#include "BoundingVolumeMetaEngine.hpp"
-#include "InteractionDescriptionSet2AABB.hpp"
-#include "MetaInteractingGeometry.hpp"
+#include <yade-common/BoundingVolumeMetaEngine.hpp>
+#include <yade-common/InteractionDescriptionSet2AABB.hpp>
+#include <yade-common/MetaInteractingGeometry.hpp>
 
-#include "ElasticContactLaw.hpp"
-#include "MacroMicroElasticRelationships.hpp"
-#include "BodyMacroParameters.hpp"
-#include "SDECLinkGeometry.hpp"
-#include "SDECLinkPhysics.hpp"
-#include "SDECTimeStepper.hpp"
+#include <yade-common/ElasticContactLaw.hpp>
+#include <yade-common/MacroMicroElasticRelationships.hpp>
+#include <yade-common/BodyMacroParameters.hpp>
+#include <yade-common/SDECLinkGeometry.hpp>
+#include <yade-common/SDECLinkPhysics.hpp>
+#include <yade-common/SDECTimeStepper.hpp>
 
-#include "GravityEngine.hpp"
-#include "PhysicalActionApplier.hpp"
-#include "PhysicalActionDamper.hpp"
-#include "CundallNonViscousForceDamping.hpp"
-#include "CundallNonViscousMomentumDamping.hpp"
+#include <yade-common/GravityEngine.hpp>
+#include <yade-common/PhysicalActionApplier.hpp>
+#include <yade-common/PhysicalActionDamper.hpp>
+#include <yade-common/CundallNonViscousForceDamping.hpp>
+#include <yade-common/CundallNonViscousMomentumDamping.hpp>
 
-#include "InteractionGeometryMetaEngine.hpp"
-#include "InteractionPhysicsMetaEngine.hpp"
+#include <yade-common/InteractionGeometryMetaEngine.hpp>
+#include <yade-common/InteractionPhysicsMetaEngine.hpp>
 #include <yade/Body.hpp>
-#include "InteractingBox.hpp"
-#include "InteractingSphere.hpp"
+#include <yade-common/InteractingBox.hpp>
+#include <yade-common/InteractingSphere.hpp>
 
-#include "PhysicalActionContainerReseter.hpp"
-#include "PhysicalActionContainerInitializer.hpp"
+#include <yade-common/PhysicalActionContainerReseter.hpp>
+#include <yade-common/PhysicalActionContainerInitializer.hpp>
 
-#include "AveragePositionRecorder.hpp"
-#include "ForceRecorder.hpp"
-#include "VelocityRecorder.hpp"
-#include "PhysicalParametersMetaEngine.hpp"
+#include <yade-common/AveragePositionRecorder.hpp>
+#include <yade-common/ForceRecorder.hpp>
+#include <yade-common/VelocityRecorder.hpp>
+#include <yade-common/PhysicalParametersMetaEngine.hpp>
 
-#include "BodyRedirectionVector.hpp"
-#include "InteractionVecSet.hpp"
-#include "PhysicalActionVectorVector.hpp"
+#include <yade-common/BodyRedirectionVector.hpp>
+#include <yade-common/InteractionVecSet.hpp>
+#include <yade-common/PhysicalActionVectorVector.hpp>
 
 #include <boost/filesystem/convenience.hpp>
 #include <boost/lexical_cast.hpp>

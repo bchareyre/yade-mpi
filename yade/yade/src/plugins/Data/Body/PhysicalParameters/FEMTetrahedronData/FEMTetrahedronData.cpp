@@ -1,5 +1,5 @@
 #include "FEMTetrahedronData.hpp"
-#include "FEMNodeData.hpp"
+#include <yade-common/FEMNodeData.hpp>
 // #include <boost/numeric/ublas/io.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -22,9 +22,9 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "Sphere2Mesh2D4ClosestFeatures.hpp"
-#include "Sphere.hpp"
-#include "Mesh2D.hpp"
-#include "ClosestFeatures.hpp"
+#include <yade-common/Sphere.hpp>
+#include <yade-common/Mesh2D.hpp>
+#include <yade-common/ClosestFeatures.hpp>
 #include <yade-lib-computational-geometry/Distances3D.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -1,7 +1,7 @@
 #ifndef __SDECDISCRETEELEMENT_H__
 #define __SDECDISCRETEELEMENT_H__
 
-#include "RigidBodyParameters.hpp"
+#include <yade-common/RigidBodyParameters.hpp>
 
 class BodyMacroParameters : public RigidBodyParameters
 {

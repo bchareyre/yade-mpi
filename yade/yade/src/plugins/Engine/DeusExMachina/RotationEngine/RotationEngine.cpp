@@ -1,5 +1,5 @@
 #include "RotationEngine.hpp"
-#include "RigidBodyParameters.hpp"
+#include <yade-common/RigidBodyParameters.hpp>
 #include <yade/MetaBody.hpp>
 
 RotationEngine::RotationEngine()

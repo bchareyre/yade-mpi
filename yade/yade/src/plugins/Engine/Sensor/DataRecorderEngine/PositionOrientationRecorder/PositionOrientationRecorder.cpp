@@ -1,5 +1,5 @@
 #include "PositionOrientationRecorder.hpp"
-#include "RigidBodyParameters.hpp"
+#include <yade-common/RigidBodyParameters.hpp>
 #include <yade/Omega.hpp>
 #include <yade/MetaBody.hpp>
 

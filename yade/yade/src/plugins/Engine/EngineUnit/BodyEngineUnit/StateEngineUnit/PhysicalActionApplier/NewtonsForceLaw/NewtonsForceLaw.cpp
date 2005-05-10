@@ -22,8 +22,8 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "NewtonsForceLaw.hpp"
-#include "ParticleParameters.hpp"
-#include "Force.hpp"
+#include <yade-common/ParticleParameters.hpp>
+#include <yade-common/Force.hpp>
 
 //#include <string>
 

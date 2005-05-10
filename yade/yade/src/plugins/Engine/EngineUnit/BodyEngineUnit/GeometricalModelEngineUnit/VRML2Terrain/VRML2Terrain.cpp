@@ -1,5 +1,5 @@
 #include "VRML2Terrain.hpp"
-#include "Terrain.hpp"
+#include <yade-common/Terrain.hpp>
 
 // void VRML2Terrain::go(int)
 // {

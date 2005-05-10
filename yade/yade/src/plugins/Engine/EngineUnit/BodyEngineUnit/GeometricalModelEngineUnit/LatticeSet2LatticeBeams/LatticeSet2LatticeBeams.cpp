@@ -22,9 +22,9 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "LatticeSet2LatticeBeams.hpp"
-#include "LatticeSetParameters.hpp"
-#include "LatticeBeamParameters.hpp"
-#include "LineSegment.hpp"
+#include <yade-common/LatticeSetParameters.hpp>
+#include <yade-common/LatticeBeamParameters.hpp>
+#include <yade-common/LineSegment.hpp>
 #include <yade/MetaBody.hpp>
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

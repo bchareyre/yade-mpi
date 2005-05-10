@@ -1,16 +1,16 @@
 #include "MassSpringBody2RigidBodyLaw.hpp"
-#include "RigidBodyParameters.hpp"
+#include <yade-common/RigidBodyParameters.hpp>
 #include <yade/Omega.hpp>
 #include <yade/MetaBody.hpp>
-#include "ClosestFeatures.hpp"
-#include "SimpleSpringLaw.hpp"
-#include "Mesh2D.hpp"
+#include <yade-common/ClosestFeatures.hpp>
+#include <yade-common/SimpleSpringLaw.hpp>
+#include <yade-common/Mesh2D.hpp>
 
-#include "BodyMacroParameters.hpp"
-#include "MacroMicroContactGeometry.hpp"
-#include "SDECLinkGeometry.hpp"
-#include "ElasticContactParameters.hpp"
-#include "SDECLinkPhysics.hpp"
+#include <yade-common/BodyMacroParameters.hpp>
+#include <yade-common/MacroMicroContactGeometry.hpp>
+#include <yade-common/SDECLinkGeometry.hpp>
+#include <yade-common/ElasticContactParameters.hpp>
+#include <yade-common/SDECLinkPhysics.hpp>
 
 MassSpringBody2RigidBodyLaw::MassSpringBody2RigidBodyLaw ()  : InteractionSolver(), actionForce(new Force) , actionMomentum(new Momentum)
 {

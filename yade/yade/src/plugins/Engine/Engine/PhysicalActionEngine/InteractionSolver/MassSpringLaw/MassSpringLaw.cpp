@@ -1,12 +1,12 @@
 #include "MassSpringLaw.hpp"
 #include <yade/Omega.hpp>
 #include <yade/MetaBody.hpp>
-#include "Mesh2D.hpp"
-#include "SpringGeometry.hpp"
-#include "SpringPhysics.hpp"
-#include "ParticleParameters.hpp"
-#include "Force.hpp"
-#include "Momentum.hpp"
+#include <yade-common/Mesh2D.hpp>
+#include <yade-common/SpringGeometry.hpp>
+#include <yade-common/SpringPhysics.hpp>
+#include <yade-common/ParticleParameters.hpp>
+#include <yade-common/Force.hpp>
+#include <yade-common/Momentum.hpp>
 
 MassSpringLaw::MassSpringLaw () : InteractionSolver(), actionForce(new Force) , actionMomentum(new Momentum)
 {

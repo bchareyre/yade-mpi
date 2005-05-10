@@ -1,7 +1,7 @@
 
 #include "Terrain2AABB.hpp"
-#include "Terrain.hpp"
-#include "AABB.hpp"
+#include <yade-common/Terrain.hpp>
+#include <yade-common/AABB.hpp>
   
 void Terrain2AABB::go(	  const shared_ptr<InteractingGeometry>&
 				, shared_ptr<BoundingVolume>&

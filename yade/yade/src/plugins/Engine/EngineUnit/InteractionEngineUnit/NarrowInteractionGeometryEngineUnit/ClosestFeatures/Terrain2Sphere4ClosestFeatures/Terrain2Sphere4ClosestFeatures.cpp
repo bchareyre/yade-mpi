@@ -22,9 +22,9 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "Terrain2Sphere4ClosestFeatures.hpp"
-#include "Sphere.hpp"
-#include "Terrain.hpp"
-#include "ClosestFeatures.hpp"
+#include <yade-common/Sphere.hpp>
+#include <yade-common/Terrain.hpp>
+#include <yade-common/ClosestFeatures.hpp>
 #include <yade-lib-computational-geometry/Distances3D.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
