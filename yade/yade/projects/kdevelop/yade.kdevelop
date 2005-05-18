@@ -99,7 +99,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>plugins/Engine/MetaEngine/PhysicalActionMetaEngine/PhysicalActionApplier</activedir>
+      <activedir>libraries/yade-lib-opengl</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>
