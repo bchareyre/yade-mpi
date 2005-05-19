@@ -99,7 +99,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>libraries/yade-lib-opengl</activedir>
+      <activedir>plugins/Engine/Engine/PhysicalActionEngine/InteractionSolver/ElasticCohesiveLaw</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>
