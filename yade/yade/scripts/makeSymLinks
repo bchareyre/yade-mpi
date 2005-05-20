@@ -18,6 +18,8 @@ find ../src/ -name "*.ui" -exec ./makeSymLink {} \;
 find ../src/ -name "*.cw" -exec ./makeSymLink {} \;
 find ../src/ -name "*.tpp" -exec ./makeSymLink {} \;
 find ../src/ -name "*.ipp" -exec ./makeSymLink {} \;
+find ../src/ -name "*.h" -exec ./makeSymLink {} \;
+find ../src/ -name "*.c" -exec ./makeSymLink {} \;
 
 symlinks -rcs ./
 symlinks -rcs ./

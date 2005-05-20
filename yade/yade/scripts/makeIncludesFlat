@@ -16,6 +16,7 @@ chmod a+x ./makeSymLinkIncl
 find ../src/ -name "*.hpp" -exec ./makeSymLinkIncl {} \;
 find ../src/ -name "*.tpp" -exec ./makeSymLinkIncl {} \;
 find ../src/ -name "*.ipp" -exec ./makeSymLinkIncl {} \;
+find ../src/ -name "*.h" -exec ./makeSymLinkIncl {} \;
 
 symlinks -rcs ./
 symlinks -rcs ./

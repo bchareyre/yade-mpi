@@ -97,7 +97,11 @@ find ../src/libraries/yade-lib-gui-qt -name "*.hpp" -exec ./makeSymLinkIncl {} .
 find ../src/libraries/yade-lib-gui-qt -name "*.tpp" -exec ./makeSymLinkIncl {} ../include/yade-lib-gui-qt \;
 find ../src/libraries/yade-lib-gui-qt -name "*.ipp" -exec ./makeSymLinkIncl {} ../include/yade-lib-gui-qt \;
 
+mkdir ../include/yade-lib-swift++
+find ../src/libraries/yade-lib-swift++ -name "*.h" -exec ./makeSymLinkIncl {} ../include/yade-lib-swift++ \;
 
+mkdir ../include/yade-lib-qhull
+find ../src/libraries/yade-lib-qhull -name "*.h" -exec ./makeSymLinkIncl {} ../include/yade-lib-qhull \;
 
 symlinks -rcs ./
 symlinks -rcs ./
