@@ -24,12 +24,13 @@ SOURCES += geom2.c \
            qset.c \
            stat.c \
            unix.c \
-           user.c 
-MOC_DIR = $(YADECOMPILATIONPATH) 
-UI_DIR = $(YADECOMPILATIONPATH) 
-OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-DESTDIR = $(YADEDYNLIBPATH) 
+           user.c \
+           qhull.c 
+MOC_DIR = $(YADECOMPILATIONPATH)
+UI_DIR = $(YADECOMPILATIONPATH)
+OBJECTS_DIR = $(YADECOMPILATIONPATH)
+DESTDIR = $(YADEDYNLIBPATH)
 CONFIG += debug \
-          warn_on \
-          dll 
-TEMPLATE = lib 
+warn_on \
+dll
+TEMPLATE = lib

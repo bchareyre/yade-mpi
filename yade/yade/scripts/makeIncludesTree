@@ -103,6 +103,11 @@ find ../src/libraries/yade-lib-swift++ -name "*.h" -exec ./makeSymLinkIncl {} ..
 mkdir ../include/yade-lib-qhull
 find ../src/libraries/yade-lib-qhull -name "*.h" -exec ./makeSymLinkIncl {} ../include/yade-lib-qhull \;
 
+mkdir ../include/yade-lib-algorithms
+find ../src/libraries/yade-lib-algorithms -name "*.hpp" -exec ./makeSymLinkIncl {} ../include/yade-lib-algorithms \;
+find ../src/libraries/yade-lib-algorithms -name "*.tpp" -exec ./makeSymLinkIncl {} ../include/yade-lib-algorithms \;
+find ../src/libraries/yade-lib-algorithms -name "*.ipp" -exec ./makeSymLinkIncl {} ../include/yade-lib-algorithms \;
+
 symlinks -rcs ./
 symlinks -rcs ./
 
