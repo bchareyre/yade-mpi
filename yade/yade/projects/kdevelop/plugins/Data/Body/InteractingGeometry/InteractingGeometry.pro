@@ -3,7 +3,8 @@
 # Subdir relative project main directory: ./plugins/CollisionGeometry
 # Target is a subdirs project 
 
-SUBDIRS += InteractingBox \
+SUBDIRS += PolyhedralSweptSphere \
+           InteractingBox \
            InteractingSphere \
            MetaInteractingGeometry
 MOC_DIR = $(YADECOMPILATIONPATH)

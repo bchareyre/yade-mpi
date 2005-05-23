@@ -3,16 +3,18 @@
 # Subdir relative project main directory: ./preprocessors/FileGenerator
 # Target is a subdirs project 
 
-SUBDIRS += RotatingBox \
+SUBDIRS += TetrahedronsTest \
+           RotatingBox \
            HangingCloth \
            FEMBeam \
-	   FEMDEMCouplingTest \
+           FEMDEMCouplingTest \
            BoxStack \
            SDECSpheresPlane \
            SDECLinkedSpheres \
            SDECImpactTest \
-	   SDECTriaxialTest \
-           LatticeExample 
+           SDECTriaxialTest \
+           LatticeExample \
+           Funnel 
 MOC_DIR = $(YADECOMPILATIONPATH)
 UI_DIR = $(YADECOMPILATIONPATH)
 OBJECTS_DIR = $(YADECOMPILATIONPATH)

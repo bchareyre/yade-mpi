@@ -3,7 +3,7 @@
 # Subdir relative project main directory: ./plugins/Engine/Engine/InteractionEngine/NarrowInteractionGeometryEngine
 # Target is a subdirs project 
 
-SUBDIRS += SWIFTCollider 
+SUBDIRS += SwiftPolyhedronProximityModeler 
 CONFIG += release \
-          warn_on 
-TEMPLATE = subdirs 
+warn_on
+TEMPLATE = subdirs
