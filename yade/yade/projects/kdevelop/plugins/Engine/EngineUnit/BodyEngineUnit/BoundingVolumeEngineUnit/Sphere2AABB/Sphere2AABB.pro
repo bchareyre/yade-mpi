@@ -6,8 +6,9 @@
 LIBS += -lAABB \
         -lyade-lib-wm3-math \
         -lInteractingSphere \
+        -lBoundingVolumeMetaEngine \
         -rdynamic 
-INCLUDEPATH = $(YADEINCLUDEPATH) 
+INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 

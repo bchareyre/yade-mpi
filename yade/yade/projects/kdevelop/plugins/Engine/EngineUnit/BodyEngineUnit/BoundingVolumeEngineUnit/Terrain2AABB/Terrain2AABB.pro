@@ -7,9 +7,9 @@ LIBS += -lAABB \
         -lTerrain \
         -lyade-lib-wm3-math \
         -lyade-lib-multimethods \
-        -lyade-lib-serialization \
+        -lBoundingVolumeMetaEngine \
         -rdynamic 
-INCLUDEPATH = $(YADEINCLUDEPATH) 
+INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
@@ -17,8 +17,6 @@ QMAKE_LIBDIR = ../../../../../../plugins/Data/Body/BoundingVolume/AABB/$(YADEDYN
                ../../../../../../plugins/Data/Body/GeometricalModel/Terrain/$(YADEDYNLIBPATH) \
                ../../../../../../libraries/yade-lib-wm3-math/$(YADEDYNLIBPATH) \
                ../../../../../../libraries/yade-lib-multimethods/$(YADEDYNLIBPATH) \
-               ../../../../../../libraries/yade-lib-serialization/$(YADEDYNLIBPATH) \
-               ../../../../../../yade/Body/BoundingVolume/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

@@ -3,19 +3,18 @@
 # Subdir relative project main directory: ./plugins/Engine/EngineUnit/InteractionEngineUnit/NarrowInteractionGeometryEngineUnit/MacroMicroContactGeometry/Box2Sphere4MacroMicroContactGeometry
 # Target is a library:  
 
-LIBS += -lyade-lib-serialization \
-        -lyade-lib-wm3-math \
+LIBS += -lyade-lib-wm3-math \
         -lyade-lib-multimethods \
         -lInteractingSphere \
         -lInteractingBox \
         -lMacroMicroContactGeometry \
+        -lInteractionGeometryMetaEngine \
         -rdynamic 
-INCLUDEPATH = $(YADEINCLUDEPATH) 
+INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../../../../../libraries/yade-lib-serialization/$(YADEDYNLIBPATH) \
-               ../../../../../../../libraries/yade-lib-wm3-math/$(YADEDYNLIBPATH) \
+QMAKE_LIBDIR = ../../../../../../../libraries/yade-lib-wm3-math/$(YADEDYNLIBPATH) \
                ../../../../../../../libraries/yade-lib-multimethods/$(YADEDYNLIBPATH) \
                ../../../../../../../plugins/Data/Body/InteractingGeometry/InteractingSphere/$(YADEDYNLIBPATH) \
                ../../../../../../../plugins/Data/Body/InteractingGeometry/InteractingBox/$(YADEDYNLIBPATH) \

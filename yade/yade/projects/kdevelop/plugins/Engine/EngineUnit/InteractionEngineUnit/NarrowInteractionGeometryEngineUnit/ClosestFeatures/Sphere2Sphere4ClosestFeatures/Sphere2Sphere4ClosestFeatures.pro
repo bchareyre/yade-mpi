@@ -8,8 +8,9 @@ LIBS += -lSphere \
         -lyade-lib-wm3-math \
         -lyade-lib-multimethods \
         -lInteractingSphere \
+        -lInteractionGeometryMetaEngine \
         -rdynamic 
-INCLUDEPATH = $(YADEINCLUDEPATH) 
+INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 

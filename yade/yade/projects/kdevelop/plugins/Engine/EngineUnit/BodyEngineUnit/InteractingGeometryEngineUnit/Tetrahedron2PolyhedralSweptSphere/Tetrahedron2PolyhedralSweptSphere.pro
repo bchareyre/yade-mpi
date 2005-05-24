@@ -5,6 +5,7 @@
 
 LIBS += -lPolyhedralSweptSphere \
         -lTetrahedron \
+        -lInteractingGeometryMetaEngine \
         -rdynamic 
 INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 

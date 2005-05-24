@@ -10,8 +10,9 @@ LIBS += -lBox \
         -lyade-lib-multimethods \
         -lInteractingBox \
         -lInteractingSphere \
+        -lInteractionGeometryMetaEngine \
         -rdynamic 
-INCLUDEPATH = $(YADEINCLUDEPATH) 
+INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 

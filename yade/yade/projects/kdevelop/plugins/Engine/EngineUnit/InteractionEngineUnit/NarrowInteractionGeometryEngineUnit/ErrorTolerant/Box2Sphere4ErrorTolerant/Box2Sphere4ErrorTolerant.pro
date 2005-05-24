@@ -7,11 +7,11 @@ LIBS += -lyade-lib-multimethods \
         -lyade-lib-factory \
         -lyade-lib-wm3-math \
         -lErrorTolerantContactModel \
-        -lyade-lib-serialization \
         -lBox \
         -lSphere \
+        -lInteractionGeometryMetaEngine \
         -rdynamic 
-INCLUDEPATH = $(YADEINCLUDEPATH) 
+INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
@@ -19,10 +19,8 @@ QMAKE_LIBDIR = ../../../../../../../libraries/yade-lib-multimethods/$(YADEDYNLIB
                ../../../../../../../libraries/yade-lib-factory/$(YADEDYNLIBPATH) \
                ../../../../../../../libraries/yade-lib-wm3-math/$(YADEDYNLIBPATH) \
                ../../../../../../../plugins/Data/Interaction/NarrowInteractionGeometry/ErrorTolerantContactModel/$(YADEDYNLIBPATH) \
-               ../../../../../../../libraries/yade-lib-serialization/$(YADEDYNLIBPATH) \
                ../../../../../../../plugins/Data/Body/GeometricalModel/Box/$(YADEDYNLIBPATH) \
                ../../../../../../../plugins/Data/Body/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
-               ../../../../../../../yade/Body/Body/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

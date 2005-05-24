@@ -99,7 +99,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>preprocessors/FileGenerator/FEMDEMCouplingTest</activedir>
+      <activedir>plugins/Engine/EngineUnit/BodyEngineUnit/StateEngineUnit/PhysicalActionApplier/NewtonsMomentumLaw</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>

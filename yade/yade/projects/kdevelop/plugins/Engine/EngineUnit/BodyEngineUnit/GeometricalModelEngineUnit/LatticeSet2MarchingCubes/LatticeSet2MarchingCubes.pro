@@ -7,8 +7,9 @@ LIBS += -lParticleParameters \
         -lLatticeBeamParameters \
         -lLineSegment \
         -lLatticeSetParameters \
+        -lGeometricalModelMetaEngine \
         -rdynamic 
-INCLUDEPATH = $(YADEINCLUDEPATH) 
+INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 

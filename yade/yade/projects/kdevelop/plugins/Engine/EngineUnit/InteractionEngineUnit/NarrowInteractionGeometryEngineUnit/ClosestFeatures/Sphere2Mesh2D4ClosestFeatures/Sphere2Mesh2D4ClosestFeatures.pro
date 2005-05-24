@@ -5,19 +5,18 @@
 
 LIBS += -lMesh2D \
         -lSphere \
-        -lyade-lib-serialization \
         -lClosestFeatures \
         -lyade-lib-computational-geometry \
         -lyade-lib-wm3-math \
         -lyade-lib-multimethods \
+        -lInteractionGeometryMetaEngine \
         -rdynamic 
-INCLUDEPATH = $(YADEINCLUDEPATH) 
+INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 QMAKE_LIBDIR = ../../../../../../../plugins/Data/Body/GeometricalModel/Mesh2D/$(YADEDYNLIBPATH) \
                ../../../../../../../plugins/Data/Body/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
-               ../../../../../../../libraries/yade-lib-serialization/$(YADEDYNLIBPATH) \
                ../../../../../../../plugins/Data/Interaction/NarrowInteractionGeometry/ClosestFeatures/$(YADEDYNLIBPATH) \
                ../../../../../../../libraries/yade-lib-computational-geometry/$(YADEDYNLIBPATH) \
                ../../../../../../../libraries/yade-lib-wm3-math/$(YADEDYNLIBPATH) \

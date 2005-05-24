@@ -5,6 +5,7 @@
 
 LIBS += -lPolyhedralSweptSphere \
         -lBox \
+        -lInteractingGeometryMetaEngine \
         -rdynamic 
 INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
