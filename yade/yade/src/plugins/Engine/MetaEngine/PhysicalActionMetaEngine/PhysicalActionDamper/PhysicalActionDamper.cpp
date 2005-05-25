@@ -37,6 +37,7 @@ void PhysicalActionDamper::postProcessAttributes(bool deserializing)
 
 void PhysicalActionDamper::registerAttributes()
 {
+	Engine::registerAttributes();
 	REGISTER_ATTRIBUTE(functorNames);
 	REGISTER_ATTRIBUTE(functorArguments);
 }

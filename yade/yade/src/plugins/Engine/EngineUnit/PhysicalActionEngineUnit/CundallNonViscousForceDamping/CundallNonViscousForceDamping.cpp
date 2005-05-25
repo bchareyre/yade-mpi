@@ -37,6 +37,7 @@ CundallNonViscousForceDamping::CundallNonViscousForceDamping() : damping(0)
 
 void CundallNonViscousForceDamping::registerAttributes()
 {
+	PhysicalActionDamperUnit::registerAttributes();
 	REGISTER_ATTRIBUTE(damping);
 }
 

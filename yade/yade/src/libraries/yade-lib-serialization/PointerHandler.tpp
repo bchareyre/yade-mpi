@@ -73,25 +73,26 @@ struct PointerHandler<shared_ptr<PointedType> >
 		{
 			// FIXME : isn't it the same code code Serializable and custom ???
 			if(boost::is_base_and_derived<Serializable,PointedType>::value)
-			{
-				shared_ptr<Serializable> newInstance = dynamic_pointer_cast<Serializable>(ClassFactory::instance().createShared(typeStr));
-				tmpPtr		= any_cast< shared_ptr<PointedType>* >(ac.getAddress());
-				
+			{				
 				// WARNING: this will not compile if you have 'int' or 'float' inside shared_ptr
 				// but I'm not going to change this into reinterpret_cast just because of that.
 				// nobody will have 'int' inside shared_ptr, and reinterpret_cast is here too risky hack.
 				//
 				// proper solution is to write template specialization for PointerHandler< int >
 				// if you need it - then write it.
-				
-				*tmpPtr 	= dynamic_pointer_cast<PointedType>(newInstance);
-				newAc 		= Archive::create(name,**tmpPtr);
+
+//				shared_ptr<Serializable> newInstance = dynamic_pointer_cast<Serializable>(ClassFactory::instance().createShared(typeStr));
+//				tmpPtr		= any_cast< shared_ptr<PointedType>* >(ac.getAddress());	
+//				*tmpPtr 	= dynamic_pointer_cast<PointedType>(newInstance);
+//				newAc 		= Archive::create(name,**tmpPtr);
 
 // original h4x00r lines .....
-//				Serializable * newInstance = dynamic_cast<Serializable*>(ClassFactory::instance().createPure(typeStr));
-//				tmpPtr		= any_cast< shared_ptr<PointedType>* >(ac.getAddress());
-//				*tmpPtr 	= shared_ptr<PointedType>(reinterpret_cast<PointedType*>(newInstance));
-//				newAc 		= Archive::create(name,**tmpPtr);
+// Olivier : I uncommented back those lines because deserialization of arguments of functor was not working anymore with new directory tree !!
+// The dynamic_pointer_cast was not working I don't know why !!! It would be good if we find the problem because I agree that this reinterpret_cast is quite dirty here !!
+				Serializable * newInstance = dynamic_cast<Serializable*>(ClassFactory::instance().createPure(typeStr));
+				tmpPtr		= any_cast< shared_ptr<PointedType>* >(ac.getAddress());
+				*tmpPtr 	= shared_ptr<PointedType>(reinterpret_cast<PointedType*>(newInstance));
+				newAc 		= Archive::create(name,**tmpPtr);
 			}
 			else
 			{

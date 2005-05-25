@@ -6,7 +6,6 @@
 LIBS += -lParticleParameters \
         -lForce \
         -lPhysicalActionDamper \
-        -lPhysicalActionDamper \
         -rdynamic 
 INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
