@@ -50,17 +50,17 @@
 
 using namespace std; 
 
-#include <SWIFT.h>
-#include <SWIFT_config.h>
-#include <SWIFT_common.h>
-#include <SWIFT_linalg.h>
-#include <SWIFT_array.h>
-#include <SWIFT_mesh.h>
-#include <SWIFT_mesh_utils.h>
-#include <SWIFT_boxnode.h>
-#include <SWIFT_object.h>
-#include <SWIFT_pair.h>
-#include <SWIFT_fileio.h>
+#include "SWIFT.h"
+#include "SWIFT_config.h"
+#include "SWIFT_common.h"
+#include "SWIFT_linalg.h"
+#include "SWIFT_array.h"
+#include "SWIFT_mesh.h"
+#include "SWIFT_mesh_utils.h"
+#include "SWIFT_boxnode.h"
+#include "SWIFT_object.h"
+#include "SWIFT_pair.h"
+#include "SWIFT_fileio.h"
 
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -21,69 +21,85 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "PolyhedralSweptSphere.hpp"
+#include "GLDrawPolyhedralSweptSphere.hpp"
+
+#include <yade-common/PolyhedralSweptSphere.hpp>
+#include <yade-lib-opengl/OpenGLWrapper.hpp>
+#include <yade-lib-opengl/OpenGLWrapper.hpp>
+
+#include <GL/gl.h>
+#include <GL/glut.h>
+#include <GL/freeglut_ext.h>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-PolyhedralSweptSphere::PolyhedralSweptSphere() : InteractingGeometry()
+void GLDrawPolyhedralSweptSphere::go(const shared_ptr<InteractingGeometry>& cg, const shared_ptr<PhysicalParameters>&)
 {
-	createIndex();
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-PolyhedralSweptSphere::~PolyhedralSweptSphere()
-{
-
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-void PolyhedralSweptSphere::registerAttributes()
-{
-	InteractingGeometry::registerAttributes();
-	REGISTER_ATTRIBUTE(vertices);
-	REGISTER_ATTRIBUTE(faces);
-	REGISTER_ATTRIBUTE(radius);
-
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-void PolyhedralSweptSphere::postProcessAttributes(bool deserializing)
-{
-	if (deserializing)
+  	glMaterialv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, cg->diffuseColor);
+	glColor3v(cg->diffuseColor);
+	
+	PolyhedralSweptSphere * pss = static_cast<PolyhedralSweptSphere*>(cg.get());
+	
+	const vector<Vector3r>& vertices = pss->vertices;
+	const vector<vector<int> >& faces = pss->faces;
+	const vector<pair<int,int> >& edges = pss->edges;
+	Real radius = pss->radius;
+	
+	for(unsigned int i=0 ; i<vertices.size() ; i++)
 	{
-		set<pair<int,int>, ltPair > tmpEdges;
-		for(unsigned int i=0 ; i<faces.size() ; i++)
-		{
-			for(unsigned int j=0 ; j<faces[i].size() ; j++)
-			{
-				int j2 = (j+1)%faces[i].size();
-				if (faces[i][j]<faces[i][j2])
-					tmpEdges.insert(pair<int,int>(faces[i][j],faces[i][j2]));
-				else
-					tmpEdges.insert(pair<int,int>(faces[i][j2],faces[i][j]));
-			}
-		}
-		edges.clear();
-		set<pair<int,int> >::iterator ei = tmpEdges.begin();
-		set<pair<int,int> >::iterator eiEnd = tmpEdges.end();
-		minEdge = Mathr::MAX_REAL;
-		Real tmpMinEdge;
-		for( ; ei!=eiEnd ; ++ei)
-		{
-			edges.push_back((*ei));
-			tmpMinEdge = (vertices[(*ei).first]-vertices[(*ei).second]).length();
-			if (tmpMinEdge<minEdge)
-				minEdge = tmpMinEdge;
-		}
+		glPushMatrix();
+		glTranslatef(vertices[i][0],vertices[i][1],vertices[i][2]);
+		glutSolidSphere(radius,30,30);
+		glPopMatrix();
 	}
+
+	for(unsigned int i=0 ; i<edges.size() ; i++)
+	{
+		glPushMatrix();
+		Vector3r v1 = vertices[edges[i].first];
+		Vector3r v2 = vertices[edges[i].second];
+		
+		Quaternionr q;
+		Vector3r dir = (v2-v1);
+		dir.normalize();
+		Vector3r initDir = Vector3r(0,0,1);
+		initDir.normalize();
+		q.align(initDir,dir);
+		Vector3r axis;
+		Real angle;
+		q.toAxisAngle(axis,angle);
+		
+		glTranslatef(v1[0],v1[1],v1[2]);
+		glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
+		
+		Real height = (v1-v2).length();
+		
+		glutSolidCylinder( radius, height, 30, 30);
+		
+		glPopMatrix();
+	}
+	
+	for(unsigned int i=0 ; i<faces.size() ; i++)
+	{	
+		Vector3r v1 = vertices[faces[i][0]];
+		Vector3r v2 = vertices[faces[i][1]];
+		Vector3r v3 = vertices[faces[i][2]];
+		Vector3r n = (v1-v2).unitCross(v1-v3);
+		glNormal3f(n[0],n[1],n[2]);
+		n *= radius;
+
+		glBegin(GL_POLYGON);
+		for(unsigned int j=0 ; j<faces[i].size() ; j++)
+			glVertex3fv(vertices[faces[i][j]]+n);
+		glEnd();
+	}
+
+
+
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+

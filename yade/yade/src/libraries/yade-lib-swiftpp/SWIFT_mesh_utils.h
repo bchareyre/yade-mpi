@@ -54,10 +54,10 @@
 
 #include <math.h>
 
-#include <SWIFT_config.h>
-#include <SWIFT_common.h>
-#include <SWIFT_linalg.h>
-#include <SWIFT_array.h>
+#include "SWIFT_config.h"
+#include "SWIFT_common.h"
+#include "SWIFT_linalg.h"
+#include "SWIFT_array.h"
 
 extern "C" {
 #include <yade-lib-qhull/qhull_a.h>

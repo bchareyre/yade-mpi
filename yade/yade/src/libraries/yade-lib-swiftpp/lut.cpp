@@ -49,11 +49,11 @@
 
 #include <math.h>
 
-#include <SWIFT_config.h>
-#include <SWIFT_common.h>
-#include <SWIFT_linalg.h>
-#include <SWIFT_mesh.h>
-#include <SWIFT_lut.h>
+#include "SWIFT_config.h"
+#include "SWIFT_common.h"
+#include "SWIFT_linalg.h"
+#include "SWIFT_mesh.h"
+#include "SWIFT_lut.h"
 
 //////////////////////////////////////////////////////////////////////////////
 // Global lookup table definitions

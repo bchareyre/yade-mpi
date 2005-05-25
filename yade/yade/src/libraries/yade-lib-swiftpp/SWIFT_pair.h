@@ -53,11 +53,11 @@
 #define _SWIFT_PAIR_H_
 
 
-#include <SWIFT_config.h>
-#include <SWIFT_common.h>
-#include <SWIFT_linalg.h>
+#include "SWIFT_config.h"
+#include "SWIFT_common.h"
+#include "SWIFT_linalg.h"
 #ifdef SWIFT_FRONT_TRACKING
-#include <SWIFT_front.h>
+#include "SWIFT_front.h"
 #endif
 
 class SWIFT_Object;

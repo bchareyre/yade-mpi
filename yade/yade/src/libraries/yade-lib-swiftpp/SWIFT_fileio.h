@@ -57,9 +57,9 @@
 
 using namespace std;
 
-#include <SWIFT_config.h>
-#include <SWIFT_common.h>
-#include <SWIFT_array.h>
+#include "SWIFT_config.h"
+#include "SWIFT_common.h"
+#include "SWIFT_array.h"
 
 
 //////////////////////////////////////////////////////////////////////////////

@@ -52,9 +52,9 @@
 #ifndef _SWIFT_FRONT_H_
 #define _SWIFT_FRONT_H_
 
-#include <SWIFT_config.h>
-#include <SWIFT_common.h>
-#include <SWIFT_linalg.h>
+#include "SWIFT_config.h"
+#include "SWIFT_common.h"
+#include "SWIFT_linalg.h"
 
 //////////////////////////////////////////////////////////////////////////////
 // SWIFT_Front_Node

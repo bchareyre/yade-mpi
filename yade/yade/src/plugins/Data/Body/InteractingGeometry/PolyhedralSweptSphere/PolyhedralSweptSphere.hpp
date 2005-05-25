@@ -39,9 +39,23 @@ class PolyhedralSweptSphere : public InteractingGeometry
 /// Attributes											///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public  : vector<Vector3r> vertices;
-	public  : vector<vector<int> > faces;
+	private : 
+	
+	struct ltPair
+	{
+		bool operator()(const pair<int,int>& p1, const pair<int,int>& p2)
+		{
+			
+			return ((p1.first<p2.first) || (p1.first==p2.first && p1.second<p2.second));
+		}
+	};
 
+	public : vector<Vector3r> vertices;
+	public : vector<vector<int> > faces;
+	public : vector<pair<int,int> > edges;
+	public : float radius;
+	public : Real minEdge;
+	
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Constructor/Destructor									///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -58,6 +72,7 @@ class PolyhedralSweptSphere : public InteractingGeometry
 	
 	REGISTER_CLASS_NAME(PolyhedralSweptSphere);
 	public : void registerAttributes();
+	protected : virtual void postProcessAttributes(bool deserializing);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Methods											///

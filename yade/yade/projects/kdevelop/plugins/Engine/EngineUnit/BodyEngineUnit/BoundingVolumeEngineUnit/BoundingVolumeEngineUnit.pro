@@ -3,7 +3,8 @@
 # Subdir relative project main directory: ./plugins/Geometry/BoundingVolumeFactory
 # Target is a subdirs project 
 
-SUBDIRS += Box2AABB \
+SUBDIRS += PolyhedralSweptSphere2AABB \
+           Box2AABB \
            Terrain2AABB \
            Sphere2AABB \
            InteractionDescriptionSet2AABB

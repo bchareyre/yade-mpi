@@ -168,6 +168,7 @@ void SDECTimeStepper::action(Body* body)
 	if(computedSomething)
 	{
 		Omega::instance().setTimeStep(newDt);
+		Omega::instance().setTimeStep(0.001);
 		cerr << "SDECTimeStepper, timestep chosen is:" << Omega::instance().getTimeStep() << endl;
 	}
 }

@@ -54,6 +54,8 @@ OpenGLRenderingEngine::OpenGLRenderingEngine() : RenderingEngine()
 	
 	addInteractionGeometryFunctor("InteractingSphere","GLDrawInteractionSphere");
 	addInteractionGeometryFunctor("InteractingBox","GLDrawInteractionBox");
+	
+	addInteractionGeometryFunctor("PolyhedralSweptSphere","GLDrawPolyhedralSweptSphere");
 		
 	addGeometricalModelFunctor("Box","GLDrawBox");
 	addGeometricalModelFunctor("Sphere","GLDrawSphere");
@@ -147,7 +149,11 @@ void OpenGLRenderingEngine::render(const shared_ptr<MetaBody>& rootBody)
 		renderBoundingVolume(rootBody);
 	
 	if (drawInteractionGeometry)
+	{
+		glEnable(GL_LIGHTING);
+		glEnable(GL_CULL_FACE);
 		renderInteractionGeometry(rootBody);
+	}
 
 }
 

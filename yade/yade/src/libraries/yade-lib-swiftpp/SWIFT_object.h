@@ -56,12 +56,12 @@
 
 using namespace std;
 
-#include <SWIFT_config.h>
-#include <SWIFT_common.h>
-#include <SWIFT_linalg.h>
-#include <SWIFT_mesh.h>
-#include <SWIFT_pair.h>
-#include <SWIFT_boxnode.h>
+#include "SWIFT_config.h"
+#include "SWIFT_common.h"
+#include "SWIFT_linalg.h"
+#include "SWIFT_mesh.h"
+#include "SWIFT_pair.h"
+#include "SWIFT_boxnode.h"
 
 //////////////////////////////////////////////////////////////////////////////
 // SWIFT_Object

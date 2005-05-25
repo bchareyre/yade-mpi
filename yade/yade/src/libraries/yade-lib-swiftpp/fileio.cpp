@@ -51,12 +51,12 @@
 #include <string>
 #include <stdlib.h>
 
-#include <SWIFT.h>
-#include <SWIFT_config.h>
-#include <SWIFT_common.h>
-#include <SWIFT_array.h>
-#include <SWIFT_mesh.h>
-#include <SWIFT_fileio.h>
+#include "SWIFT.h"
+#include "SWIFT_config.h"
+#include "SWIFT_common.h"
+#include "SWIFT_array.h"
+#include "SWIFT_mesh.h"
+#include "SWIFT_fileio.h"
 
 bool machine_is_big_endian;
 

@@ -48,19 +48,19 @@
 
 #include <math.h>
 
-#include <SWIFT_config.h>
-#include <SWIFT_common.h>
-#include <SWIFT_linalg.h>
-#include <SWIFT_array.h>
-#include <SWIFT_mesh.h>
-#include <SWIFT_object.h>
+#include "SWIFT_config.h"
+#include "SWIFT_common.h"
+#include "SWIFT_linalg.h"
+#include "SWIFT_array.h"
+#include "SWIFT_mesh.h"
+#include "SWIFT_object.h"
 #ifdef SWIFT_FRONT_TRACKING
-#include <SWIFT_front.h>
+#include "SWIFT_front.h"
 #endif
 #ifdef SWIFT_PRIORITY_DIRECTION
-#include <SWIFT_pqueue.h>
+#include "SWIFT_pqueue.h"
 #endif
-#include <SWIFT_pair.h>
+#include "SWIFT_pair.h"
 
 #define CYCLE_DETECTION
 #ifdef NO_CYCLE_DETECTION

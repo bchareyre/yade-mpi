@@ -52,8 +52,8 @@
 #ifndef _SWIFT_BOXNODE_H_
 #define _SWIFT_BOXNODE_H_
 
-#include <SWIFT_config.h>
-#include <SWIFT_common.h>
+#include "SWIFT_config.h"
+#include "SWIFT_common.h"
 
 //////////////////////////////////////////////////////////////////////////////
 // SWIFT_Box_Node

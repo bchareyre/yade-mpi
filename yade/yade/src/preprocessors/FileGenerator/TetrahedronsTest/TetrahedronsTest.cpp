@@ -3,7 +3,6 @@
 
 #include <yade-common/Box.hpp>
 #include <yade-common/AABB.hpp>
-#include <yade-common/Sphere.hpp>
 #include <yade/MetaBody.hpp>
 #include <yade-common/SAPCollider.hpp>
 #include <yade-common/PersistentSAPCollider.hpp>
@@ -30,7 +29,7 @@
 #include <yade-common/CundallNonViscousMomentumDamping.hpp>
 #include <yade-common/GravityEngine.hpp>
 
-#include <yade-common/InteractionGeometryMetaEngine.hpp>
+#include <yade-common/SwiftPolyhedronProximityModeler.hpp>
 #include <yade-common/InteractionPhysicsMetaEngine.hpp>
 #include <yade/Body.hpp>
 #include <yade-common/InteractingBox.hpp>
@@ -43,10 +42,10 @@
 
 TetrahedronsTest::TetrahedronsTest () : FileGenerator()
 {
-	nbSpheres = Vector3r(2,3,2);
+	nbTetrahedrons = Vector3r(1,1,1);
 	minRadius = 5;
 	maxRadius = 5;
-	groundSize = Vector3r(200,5,200);
+	groundSize = Vector3r(50,5,50);
 	dampingForce = 0.3;
 	dampingMomentum = 0.3;
 	timeStepUpdateInterval = 300;
@@ -71,7 +70,7 @@ void TetrahedronsTest::postProcessAttributes(bool)
 
 void TetrahedronsTest::registerAttributes()
 {
-	REGISTER_ATTRIBUTE(nbSpheres);
+	REGISTER_ATTRIBUTE(nbTetrahedrons);
 	REGISTER_ATTRIBUTE(minRadius);
 	REGISTER_ATTRIBUTE(maxRadius);
 	REGISTER_ATTRIBUTE(sphereYoungModulus);
@@ -108,15 +107,15 @@ string TetrahedronsTest::generate()
 	createBox(ground, Vector3r(0,0,0), groundSize);
 	rootBody->bodies->insert(ground);
 
-///////// spheres
+///////// tetrahedrons
 
-	for(int i=0;i<nbSpheres[0];i++)
-		for(int j=0;j<nbSpheres[1];j++)
-			for(int k=0;k<nbSpheres[2];k++)
+	for(int i=0;i<nbTetrahedrons[0];i++)
+		for(int j=0;j<nbTetrahedrons[1];j++)
+			for(int k=0;k<nbTetrahedrons[2];k++)
 			{
-				shared_ptr<Body> sphere;
-				createSphere(sphere,i,j,k);
-				rootBody->bodies->insert(sphere);
+				shared_ptr<Body> tet;
+				createTetrahedron(tet,i,j,k);
+				rootBody->bodies->insert(tet);
 			}
 	
 	return "";
@@ -125,19 +124,19 @@ string TetrahedronsTest::generate()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void TetrahedronsTest::createSphere(shared_ptr<Body>& body, int i, int j, int k)
+void TetrahedronsTest::createTetrahedron(shared_ptr<Body>& body, int i, int j, int k)
 {
 	body = shared_ptr<Body>(new Body(0,1));
 	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
 	shared_ptr<AABB> aabb(new AABB);
-	shared_ptr<Sphere> gSphere(new Sphere);
-	shared_ptr<InteractingSphere> iSphere(new InteractingSphere);
+	shared_ptr<Tetrahedron> tet(new Tetrahedron);
+	shared_ptr<PolyhedralSweptSphere> pss(new PolyhedralSweptSphere);
 	
 	Quaternionr q;
 	q.fromAxisAngle( Vector3r(0,0,1),0);
 	
 	Vector3r position		= Vector3r(i,j,k)*(2*maxRadius*1.1) // this formula is crazy !!
-					  - Vector3r( nbSpheres[0]/2*(2*maxRadius*1.1) , -7-maxRadius*2 , nbSpheres[2]/2*(2*maxRadius*1.1) )
+					  - Vector3r( nbTetrahedrons[0]/2*(2*maxRadius*1.1) , -7-maxRadius*2 , nbTetrahedrons[2]/2*(2*maxRadius*1.1) )
 					  + Vector3r(Mathr::symmetricRandom(),Mathr::symmetricRandom(),Mathr::symmetricRandom())*disorder*maxRadius;
 	
 	Real radius 			= (Mathr::intervalRandom(minRadius,maxRadius));
@@ -155,17 +154,41 @@ void TetrahedronsTest::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 
 	aabb->diffuseColor		= Vector3r(0,1,0);
 
-	gSphere->radius			= radius;
-	gSphere->diffuseColor		= Vector3f(Mathf::unitRandom(),Mathf::unitRandom(),Mathf::unitRandom());
-	gSphere->wire			= false;
-	gSphere->visible		= true;
-	gSphere->shadowCaster		= true;
+	loadTRI(tet,"../data/tetra1.tri");
+	tet->diffuseColor		= Vector3f(Mathf::unitRandom(),Mathf::unitRandom(),Mathf::unitRandom());
+	tet->wire			= false;
+	tet->visible			= true;
+	tet->shadowCaster		= false;
 	
-	iSphere->radius			= radius;
-	iSphere->diffuseColor		= Vector3f(0.8,0.3,0.3);
-
-	body->interactionGeometry	= iSphere;
-	body->geometricalModel		= gSphere;
+	pss->radius			= 1;
+	pss->diffuseColor		= Vector3f(0.8,0.3,0.3);
+	pss->vertices.clear();
+	pss->vertices.push_back(tet->v1);
+	pss->vertices.push_back(tet->v2);
+	pss->vertices.push_back(tet->v3);
+	pss->vertices.push_back(tet->v4);
+	pss->faces.clear();
+	vector<int> face;
+	face.resize(3);
+	face[0] = 2;
+	face[1] = 1;
+	face[2] = 0;
+	pss->faces.push_back(face);
+	face[0] = 3;
+	face[1] = 2;
+	face[2] = 0;
+	pss->faces.push_back(face);
+	face[0] = 1;
+	face[1] = 3;
+	face[2] = 0;
+	pss->faces.push_back(face);
+	face[0] = 1;
+	face[1] = 2;
+	face[2] = 3;
+	pss->faces.push_back(face);
+	
+	body->interactionGeometry	= pss;
+	body->geometricalModel		= tet;
 	body->boundingVolume		= aabb;
 	body->physicalParameters	= physics;
 }
@@ -179,7 +202,7 @@ void TetrahedronsTest::createBox(shared_ptr<Body>& body, Vector3r position, Vect
 	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<Box> gBox(new Box);
-	shared_ptr<InteractingBox> iBox(new InteractingBox);
+	shared_ptr<PolyhedralSweptSphere> pss(new PolyhedralSweptSphere);
 	
 	
 	Quaternionr q;
@@ -210,11 +233,55 @@ void TetrahedronsTest::createBox(shared_ptr<Body>& body, Vector3r position, Vect
 	gBox->visible			= true;
 	gBox->shadowCaster		= true;
 	
-	iBox->extents			= extents;
-	iBox->diffuseColor		= Vector3f(1,1,1);
+	pss->diffuseColor		= Vector3f(1,0,0);
+	pss->vertices.clear();
+	
+	pss->vertices.push_back(Vector3r(-extents[0],-extents[1],-extents[2]));
+	pss->vertices.push_back(Vector3r(extents[0],-extents[1],-extents[2]));
+	pss->vertices.push_back(Vector3r(extents[0],extents[1],-extents[2]));
+	pss->vertices.push_back(Vector3r(-extents[0],extents[1],-extents[2]));
+	
+	pss->vertices.push_back(Vector3r(-extents[0],-extents[1],extents[2]));
+	pss->vertices.push_back(Vector3r(extents[0],-extents[1],extents[2]));
+	pss->vertices.push_back(Vector3r(extents[0],extents[1],extents[2]));
+	pss->vertices.push_back(Vector3r(-extents[0],extents[1],extents[2]));
 
+	pss->faces.clear();
+	vector<int> face;
+	face.resize(4);
+	face[0] = 0;
+	face[1] = 4;
+	face[2] = 7;
+	face[3] = 3;			//	      7         4
+	pss->faces.push_back(face);	//	3         0
+	face[0] = 1;			//	
+	face[1] = 2;			//
+	face[2] = 6;			//
+	face[3] = 5;			//	       6         5
+	pss->faces.push_back(face);	//	2         1
+	face[0] = 2;
+	face[1] = 3;
+	face[2] = 7;
+	face[3] = 6;
+	pss->faces.push_back(face);
+	face[0] = 0;
+	face[1] = 1;
+	face[2] = 5;
+	face[3] = 4;
+	pss->faces.push_back(face);
+	face[0] = 4;
+	face[1] = 5;
+	face[2] = 6;
+	face[3] = 7;
+	pss->faces.push_back(face);
+	face[0] = 3;
+	face[1] = 2;
+	face[2] = 1;
+	face[3] = 0;
+	pss->faces.push_back(face);
+	pss->radius = 1;
 	body->boundingVolume		= aabb;
-	body->interactionGeometry	= iBox;
+	body->interactionGeometry	= pss;
 	body->geometricalModel		= gBox;
 	body->physicalParameters	= physics;
 }
@@ -228,16 +295,13 @@ void TetrahedronsTest::createActors(shared_ptr<MetaBody>& rootBody)
 	actionParameterInitializer->actionParameterNames.push_back("Force");
 	actionParameterInitializer->actionParameterNames.push_back("Momentum");
 	
-	shared_ptr<InteractionGeometryMetaEngine> interactionGeometryDispatcher(new InteractionGeometryMetaEngine);
-	interactionGeometryDispatcher->add("InteractingSphere","InteractingSphere","Sphere2Sphere4MacroMicroContactGeometry");
-	interactionGeometryDispatcher->add("InteractingSphere","InteractingBox","Box2Sphere4MacroMicroContactGeometry");
+	shared_ptr<SwiftPolyhedronProximityModeler> swiftPolyhedronProximityModeler(new SwiftPolyhedronProximityModeler);
 
 	shared_ptr<InteractionPhysicsMetaEngine> interactionPhysicsDispatcher(new InteractionPhysicsMetaEngine);
 	interactionPhysicsDispatcher->add("BodyMacroParameters","BodyMacroParameters","MacroMicroElasticRelationships");
 		
 	shared_ptr<BoundingVolumeMetaEngine> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeMetaEngine>(new BoundingVolumeMetaEngine);
-	boundingVolumeDispatcher->add("InteractingSphere","AABB","Sphere2AABB");
-	boundingVolumeDispatcher->add("InteractingBox","AABB","Box2AABB");
+	boundingVolumeDispatcher->add("PolyhedralSweptSphere","AABB","PolyhedralSweptSphere2AABB");
 	boundingVolumeDispatcher->add("MetaInteractingGeometry","AABB","InteractionDescriptionSet2AABB");
 	
 	shared_ptr<GravityEngine> gravityCondition(new GravityEngine);
@@ -270,7 +334,7 @@ void TetrahedronsTest::createActors(shared_ptr<MetaBody>& rootBody)
 	rootBody->actors.push_back(sdecTimeStepper);
 	rootBody->actors.push_back(boundingVolumeDispatcher);	
 	rootBody->actors.push_back(shared_ptr<Engine>(new PersistentSAPCollider));
-	rootBody->actors.push_back(interactionGeometryDispatcher);
+	rootBody->actors.push_back(swiftPolyhedronProximityModeler);
 	rootBody->actors.push_back(interactionPhysicsDispatcher);
 	rootBody->actors.push_back(shared_ptr<Engine>(new ElasticContactLaw));
 	rootBody->actors.push_back(gravityCondition);
@@ -315,3 +379,98 @@ void TetrahedronsTest::positionRootBody(shared_ptr<MetaBody>& rootBody)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+void TetrahedronsTest::loadTRI(shared_ptr<Tetrahedron>& tet, const string& fileName)
+{
+	ifstream f(fileName.c_str());
+	
+	string type;
+	int nbFaces;
+	int nbVertices;
+	f >> type;
+	f >> nbVertices;
+	f >> nbFaces;
+	
+	Vector3r v;
+	vector<int> face;
+	vector<vector<int> > faces;
+	
+// 	for(int i=0 ; i<nbVertices ; i++)
+// 	{
+// 		f >> tet->v[0] >> v[1] >> v[2];
+// 		tet->vertices.push_back(v);	
+// 	}
+	f >> tet->v1[0] >> tet->v1[1] >> tet->v1[2];
+	f >> tet->v2[0] >> tet->v2[1] >> tet->v2[2];
+	f >> tet->v3[0] >> tet->v3[1] >> tet->v3[2];
+	f >> tet->v4[0] >> tet->v4[1] >> tet->v4[2];
+
+	face.resize(3);
+	faces.clear();
+	for(int i=0 ; i<nbFaces ; i++)
+	{
+		
+		f >> face[0] >> face[1] >> face[2];
+		//faces.push_back(face);	
+	}	
+	
+	f.close();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// /*
+// void Viewer::polyhedron2PolyhedralSS(const shared_ptr<PointCloud>& poly, shared_ptr<PolyhedralSS>& ss)
+// {
+// 	ss->vertices = poly->vertices;
+// 	ss->se3	     = poly->se3;
+// 	ss->radius = 0.2;
+// 	
+// 	shared_ptr<IFSPolyhedron> ifsp = dynamic_pointer_cast<IFSPolyhedron>(poly);
+// 	if (ifsp)
+// 	{
+// 		ss->faces    = ifsp->faces;
+// 		FIXME : not working yet !
+// 		for(unsigned int i=0 ; i<ss->faces.size() ; i++)
+// 		{	
+// 			Vector3r v1 = ss->vertices[ss->faces[i][0]];
+// 			Vector3r v2 = ss->vertices[ss->faces[i][1]];
+// 			Vector3r v3 = ss->vertices[ss->faces[i][2]];
+// 			Vector3r n = (v1-v2).unitCross(v1-v3);
+// 			ss->vertices[ss->faces[i][0]] -= n*ss->radius;
+// 			ss->vertices[ss->faces[i][1]] -= n*ss->radius;
+// 			ss->vertices[ss->faces[i][2]] -= n*ss->radius;
+// 			
+// 		}
+// 	}
+// 		
+// 	shared_ptr<Tetrahedron> tet = dynamic_pointer_cast<Tetrahedron>(poly);
+// 	if (tet)
+// 	{
+// 		ss->faces.clear();
+// 		
+// 		vector<int> face;
+// 		face.resize(3);
+// 		
+// 		face[0] = 0;
+// 		face[1] = 1;
+// 		face[2] = 2;
+// 		ss->faces.push_back(face);
+// 		
+// 		face[0] = 0;
+// 		face[1] = 2;
+// 		face[2] = 3;
+// 		ss->faces.push_back(face);
+// 		
+// 		face[0] = 0;
+// 		face[1] = 3;
+// 		face[2] = 1;
+// 		ss->faces.push_back(face);
+// 		
+// 		face[0] = 3;
+// 		face[1] = 2;
+// 		face[2] = 1;
+// 		ss->faces.push_back(face);
+// 	}
+// 	
+// 	ss->computeEdges();
+// }*/

@@ -3,7 +3,8 @@
 # Subdir relative project main directory: ./extensions/RenderingEngines/OpenGLRenderingEngine/GLDrawInteractionGeometryFunctor
 # Target is a subdirs project 
 
-SUBDIRS += GLDrawInteractionBox \
+SUBDIRS += GLDrawPolyhedralSweptSphere \
+           GLDrawInteractionBox \
            GLDrawInteractionSphere \
            GLDrawInteractionGeometrySet 
 CONFIG += release \

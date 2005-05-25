@@ -49,12 +49,12 @@
 #ifdef SWIFT_PRIORITY_DIRECTION
 #include <iostream.h>
 
-#include <SWIFT_config.h>
-#include <SWIFT_common.h>
-#include <SWIFT_linalg.h>
-#include <SWIFT_array.h>
-#include <SWIFT_mesh.h>
-#include <SWIFT_pqueue.h>
+#include "SWIFT_config.h"
+#include "SWIFT_common.h"
+#include "SWIFT_linalg.h"
+#include "SWIFT_array.h"
+#include "SWIFT_mesh.h"
+#include "SWIFT_pqueue.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // Scene Creation methods

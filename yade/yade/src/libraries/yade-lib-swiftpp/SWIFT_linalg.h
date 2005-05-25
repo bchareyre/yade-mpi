@@ -60,8 +60,8 @@
 #include <GL/gl.h>  // We have calls to OpenGL directly from here for
                     // efficiency purposes
 
-#include <SWIFT_config.h>
-#include <SWIFT_common.h>
+#include "SWIFT_config.h"
+#include "SWIFT_common.h"
 
 using namespace std;
 

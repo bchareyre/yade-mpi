@@ -51,12 +51,12 @@
 
 using namespace std;
 
-#include <SWIFT_config.h>
-#include <SWIFT_common.h>
-#include <SWIFT_linalg.h>
-#include <SWIFT_array.h>
-#include <SWIFT_mesh.h>
-#include <SWIFT_mesh_utils.h> 
+#include "SWIFT_config.h"
+#include "SWIFT_common.h"
+#include "SWIFT_linalg.h"
+#include "SWIFT_array.h"
+#include "SWIFT_mesh.h"
+#include "SWIFT_mesh_utils.h"
 
 char * qh_version = "SWIFT_NON_CONVEX";
 char options[200];

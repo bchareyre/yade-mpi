@@ -52,9 +52,9 @@
 #ifndef _SWIFT_LUT_H_
 #define _SWIFT_LUT_H_
 
-#include <SWIFT_config.h>
-#include <SWIFT_common.h>
-#include <SWIFT_linalg.h>
+#include "SWIFT_config.h"
+#include "SWIFT_common.h"
+#include "SWIFT_linalg.h"
 
 typedef enum { LUT_NONE = -1, LUT_22_5 = 0, LUT_11_25 = 1, LUT_5_625 = 2 }
                                                                     LUT_TYPE;

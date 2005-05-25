@@ -51,11 +51,11 @@
 
 using namespace std;
 
-#include <SWIFT_config.h>
-#include <SWIFT_common.h>
-#include <SWIFT_linalg.h>
-#include <SWIFT_mesh.h>
-#include <SWIFT_object.h>
+#include "SWIFT_config.h"
+#include "SWIFT_common.h"
+#include "SWIFT_linalg.h"
+#include "SWIFT_mesh.h"
+#include "SWIFT_object.h"
 
 
 //////////////////////////////////////////////////////////////////////////////

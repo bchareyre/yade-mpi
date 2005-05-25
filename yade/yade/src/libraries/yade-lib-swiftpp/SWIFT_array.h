@@ -59,8 +59,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <SWIFT_config.h>
-#include <SWIFT_common.h>
+#include "SWIFT_config.h"
+#include "SWIFT_common.h"
 
 //////////////////////////////////////////////////////////////////////////////
 // SWIFT_Array
