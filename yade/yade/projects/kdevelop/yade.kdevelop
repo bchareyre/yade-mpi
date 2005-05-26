@@ -99,7 +99,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>plugins/Engine/TimeStepper/SDECTimeStepper</activedir>
+      <activedir>preprocessors/FileGenerator/TetrahedronsTest</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>

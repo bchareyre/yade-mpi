@@ -5,6 +5,7 @@
 
 LIBS += -lSphere \
         -lyade-lib-opengl \
+        -lMacroMicroContactGeometry \
         -lglut \
         -lGLU \
         -lGL \

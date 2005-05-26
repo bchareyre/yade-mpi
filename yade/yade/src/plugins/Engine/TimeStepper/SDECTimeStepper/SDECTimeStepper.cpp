@@ -141,6 +141,9 @@ void SDECTimeStepper::findTimeStepFromInteraction(const shared_ptr<Interaction>&
 
 void SDECTimeStepper::action(Body* body)
 {
+	Omega::instance().setTimeStep(0.001);
+	return;
+
 	MetaBody * ncb = dynamic_cast<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	shared_ptr<InteractionContainer>& persistentInteractions = ncb->persistentInteractions;
@@ -167,8 +170,7 @@ void SDECTimeStepper::action(Body* body)
 		
 	if(computedSomething)
 	{
-		Omega::instance().setTimeStep(newDt);
-		Omega::instance().setTimeStep(0.001);
+		Omega::instance().setTimeStep(newDt);		
 		cerr << "SDECTimeStepper, timestep chosen is:" << Omega::instance().getTimeStep() << endl;
 	}
 }

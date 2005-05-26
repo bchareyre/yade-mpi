@@ -22,8 +22,8 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "OpenGLRenderingEngine.hpp"
-//#include "Sphere.hpp"
-//#include "ParticleParameters.hpp"
+#include <yade-common/MacroMicroContactGeometry.hpp>
+#include <yade-lib-opengl/OpenGLWrapper.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -155,6 +155,35 @@ void OpenGLRenderingEngine::render(const shared_ptr<MetaBody>& rootBody)
 		renderInteractionGeometry(rootBody);
 	}
 
+
+	shared_ptr<BodyContainer> bodies = rootBody->bodies;
+	shared_ptr<InteractionContainer>& collisions = rootBody->volatileInteractions;
+	for( collisions->gotoFirst() ; collisions->notAtEnd() ; collisions->gotoNext())
+	{
+		const shared_ptr<Interaction>& col = collisions->getCurrent();
+
+		shared_ptr<Body>& b1 = (*bodies)[col->getId1()];
+		shared_ptr<Body>& b2 = (*bodies)[col->getId2()];
+
+		MacroMicroContactGeometry * mmcg = static_cast<MacroMicroContactGeometry*>(col->interactionGeometry.get());
+
+		Vector3r v1 = mmcg->contactPoint+mmcg->normal*mmcg->penetrationDepth*0.5;
+		Vector3r v2 = mmcg->contactPoint-mmcg->normal*mmcg->penetrationDepth*0.5;
+		glBegin(GL_LINES);
+			glVertex3v(v1);
+			glVertex3v(v2);
+		glEnd();
+		glPushMatrix();
+			glColor3v(b1->geometricalModel->diffuseColor);
+			glTranslate(v1[0],v1[1],v1[2]);
+			glutSolidSphere(1,10,10);
+		glPopMatrix();
+		glPushMatrix();
+			glColor3v(b2->geometricalModel->diffuseColor);
+			glTranslate(v2[0],v2[1],v2[2]);
+			glutSolidSphere(1,10,10);
+		glPopMatrix();
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

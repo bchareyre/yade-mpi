@@ -132,11 +132,12 @@ void TetrahedronsTest::createTetrahedron(shared_ptr<Body>& body, int i, int j, i
 	shared_ptr<Tetrahedron> tet(new Tetrahedron);
 	shared_ptr<PolyhedralSweptSphere> pss(new PolyhedralSweptSphere);
 	
-	Quaternionr q;
-	q.fromAxisAngle( Vector3r(0,0,1),0);
+	Quaternionr q = Quaternionr::IDENTITY;
+	//q.fromAxisAngle( Vector3r(Mathr::symmetricRandom(),Mathr::symmetricRandom(),Mathr::symmetricRandom()),Mathr::symmetricRandom());
+	//q.normalize();
 	
-	Vector3r position		= Vector3r(i,j,k)*(2*maxRadius*1.1) // this formula is crazy !!
-					  - Vector3r( nbTetrahedrons[0]/2*(2*maxRadius*1.1) , -7-maxRadius*2 , nbTetrahedrons[2]/2*(2*maxRadius*1.1) )
+	Vector3r position		= Vector3r(i,j,k)*(5*maxRadius*1.1) // this formula is crazy !!
+					  - Vector3r( nbTetrahedrons[0]/2*(2*maxRadius*1.1) , -9-maxRadius*2 , nbTetrahedrons[2]/2*(2*maxRadius*1.1) )
 					  + Vector3r(Mathr::symmetricRandom(),Mathr::symmetricRandom(),Mathr::symmetricRandom())*disorder*maxRadius;
 	
 	Real radius 			= (Mathr::intervalRandom(minRadius,maxRadius));
@@ -160,7 +161,7 @@ void TetrahedronsTest::createTetrahedron(shared_ptr<Body>& body, int i, int j, i
 	tet->visible			= true;
 	tet->shadowCaster		= false;
 	
-	pss->radius			= 1;
+	pss->radius			= 3;
 	pss->diffuseColor		= Vector3f(0.8,0.3,0.3);
 	pss->vertices.clear();
 	pss->vertices.push_back(tet->v1);
@@ -279,7 +280,7 @@ void TetrahedronsTest::createBox(shared_ptr<Body>& body, Vector3r position, Vect
 	face[2] = 1;
 	face[3] = 0;
 	pss->faces.push_back(face);
-	pss->radius = 1;
+	pss->radius = 3;
 	body->boundingVolume		= aabb;
 	body->interactionGeometry	= pss;
 	body->geometricalModel		= gBox;

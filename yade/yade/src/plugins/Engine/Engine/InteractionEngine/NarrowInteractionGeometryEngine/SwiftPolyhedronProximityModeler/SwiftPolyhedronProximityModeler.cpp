@@ -89,42 +89,47 @@ void SwiftPolyhedronProximityModeler::action(Body* body)
 			scene->Set_Object_Transformation( id, (SWIFT_Real*)R, (SWIFT_Real*)T );
 		}	
 		first = false;
+
+/*		scene->Activate();
+		int nbPairs;
+		int * oids;
+		int * nbContacts;
+		SWIFT_Real * nearestPts;
+		SWIFT_Real * distances;
+		SWIFT_Real * normals;
+		scene->Query_Contact_Determination(true,SWIFT_INFINITY,nbPairs,&oids,&nbContacts,&distances,&nearestPts,&normals);*/
 	}
 		
 	scene->Deactivate();
 
 // FIXME : object trnasfor can be initilized 2 or more times		
 	
-	
+	set<int> bodiesToUpdates;
 	shared_ptr<InteractionContainer>& potentialCollisions = ncb->volatileInteractions;
 	for( potentialCollisions->gotoFirstPotential() ; potentialCollisions->notAtEndPotential() ; potentialCollisions->gotoNextPotential())
 	{
 		const shared_ptr<Interaction>& interaction = potentialCollisions->getCurrent();
-		
-		shared_ptr<Body>& b1 = (*bodies)[interaction->getId1()];
-		shared_ptr<Body>& b2 = (*bodies)[interaction->getId2()];
-		
+		bodiesToUpdates.insert(interaction->getId1());
+		bodiesToUpdates.insert(interaction->getId2());
 		scene->Activate(interaction->getId1(),interaction->getId2());
+	}
+	
+	set<int>::iterator b2ui = bodiesToUpdates.begin();
+	set<int>::iterator b2uiEnd = bodiesToUpdates.end();
+	for( ; b2ui != b2uiEnd ; ++b2ui)
+	{	
+		shared_ptr<Body>& b = (*bodies)[*b2ui];
 
 		Vector3r rotColumn[3];
 		Vector3r p;
 				
-		b1->physicalParameters->se3.orientation.toRotationMatrix(rotColumn);
+		b->physicalParameters->se3.orientation.toRotationMatrix(rotColumn);
 		R[0] = rotColumn[0][0]; R[1] = rotColumn[1][0]; R[2] = rotColumn[2][0];
 		R[3] = rotColumn[0][1]; R[4] = rotColumn[1][1]; R[5] = rotColumn[2][1];
 		R[6] = rotColumn[0][2]; R[7] = rotColumn[1][2]; R[8] = rotColumn[2][2];
-		p = b1->physicalParameters->se3.position;
+		p = b->physicalParameters->se3.position;
 		T[0] = p[0]; T[1] = p[1]; T[2] = p[2];
-		scene->Set_Object_Transformation( ids[interaction->getId1()], (SWIFT_Real*)R, (SWIFT_Real*)T );
-
-		b2->physicalParameters->se3.orientation.toRotationMatrix(rotColumn);
-		R[0] = rotColumn[0][0]; R[1] = rotColumn[1][0]; R[2] = rotColumn[2][0];
-		R[3] = rotColumn[0][1]; R[4] = rotColumn[1][1]; R[5] = rotColumn[2][1];
-		R[6] = rotColumn[0][2]; R[7] = rotColumn[1][2]; R[8] = rotColumn[2][2];
-		p = b2->physicalParameters->se3.position;
-		T[0] = p[0]; T[1] = p[1]; T[2] = p[2];
-		scene->Set_Object_Transformation( ids[interaction->getId2()], (SWIFT_Real*)R, (SWIFT_Real*)T );
-			
+		scene->Set_Object_Transformation( *b2ui, (SWIFT_Real*)R, (SWIFT_Real*)T );
 	}
 
 		
@@ -133,43 +138,92 @@ void SwiftPolyhedronProximityModeler::action(Body* body)
 	int * nbContacts;
 	SWIFT_Real * nearestPts;
 	SWIFT_Real * distances;
-	
-	scene->Query_Contact_Determination(true,SWIFT_INFINITY,nbPairs,&oids,&nbContacts,&distances,&nearestPts);
-	cout << nbPairs << endl;
-	for(int i=0 ; i<nbPairs;i++)
+	SWIFT_Real * normals;
+	int * featuresType;
+	int * featuresId;
+	scene->Query_Contact_Determination(true,SWIFT_INFINITY,nbPairs,&oids,&nbContacts,&distances,&nearestPts,&normals,&featuresType,&featuresId);
+
+	for(int i=0 ; i<nbPairs ; i++)
 	{
 		int id1 = oids[2*i];
 		int id2 = oids[2*i+1];
-		if (id1<id2)
-			swap(id1,id2);
-		
+		//cout << id1 << " " << id2 << endl;
+		if (oids[2*i]>oids[2*i+1]) cout << "greater" << endl;
 		shared_ptr<Body> b1, b2;
+			
 		bodies->find(id1,b1);
 		bodies->find(id2,b2);
 		
 		PolyhedralSweptSphere * pss1 = static_cast<PolyhedralSweptSphere*>(b1->interactionGeometry.get());
 		PolyhedralSweptSphere * pss2 = static_cast<PolyhedralSweptSphere*>(b2->interactionGeometry.get());
-		
-		if (distances[2*i]<pss1->radius+pss2->radius)
+
+		if (distances[i]<pss1->radius+pss2->radius)
 		{
 			shared_ptr<Interaction> collision = potentialCollisions->find(id1,id2);
 
 			collision->isReal = true;
 			
-			shared_ptr<MacroMicroContactGeometry> cg(new MacroMicroContactGeometry);
-			
-			Vector3r p1(nearestPts[3*i],nearestPts[3*i+1],nearestPts[3*i+2]);
-			Vector3r p2(nearestPts[3*i+3],nearestPts[3*i+4],nearestPts[3*i+5]);
+			shared_ptr<MacroMicroContactGeometry> cg;
+			if (collision->interactionGeometry)
+				cg = dynamic_pointer_cast<MacroMicroContactGeometry>(collision->interactionGeometry);
+			else
+				cg = shared_ptr<MacroMicroContactGeometry>(new MacroMicroContactGeometry());
+
+			Vector3r p1(nearestPts[6*i],nearestPts[6*i+1],nearestPts[6*i+2]);
+			Vector3r p2(nearestPts[6*i+3],nearestPts[6*i+4],nearestPts[6*i+5]);
+
 			p1 = b1->physicalParameters->se3*p1;
 			p2 = b2->physicalParameters->se3*p2;
-	
+
+			cg->normal[0] = normals[3*i+0];
+			cg->normal[1] = normals[3*i+1];
+			cg->normal[2] = normals[3*i+2];
+			
+			//cg->normal = p1-p2;
+			//cg->normal.normalize();
+
+			//cout << cg->normal << " | " << normals[3*i+0] << " " << normals[3*i+1] << " "  << normals[3*i+2] << endl;
+			
+			if (featuresType[2*i]==SWIFT_VERTEX && featuresType[2*i+1]==SWIFT_VERTEX)
+				cout << "vv" << endl;
+			else if (featuresType[2*i]==SWIFT_EDGE && featuresType[2*i+1]==SWIFT_VERTEX)
+				cout << "ev" << endl;
+			else if (featuresType[2*i]==SWIFT_VERTEX && featuresType[2*i+1]==SWIFT_EDGE)
+				cout << "ve" << endl;
+			else if (featuresType[2*i]==SWIFT_VERTEX && featuresType[2*i+1]==SWIFT_FACE)
+				cout << "vf" << endl;
+			else if (featuresType[2*i]==SWIFT_FACE && featuresType[2*i+1]==SWIFT_VERTEX)
+				cout << "fv" << endl;
+			else if (featuresType[2*i]==SWIFT_EDGE && featuresType[2*i+1]==SWIFT_EDGE)
+				cout << "ee" << endl;
+
+			p1 -= cg->normal*pss1->radius;
+			p2 += cg->normal*pss2->radius;
+			
+// 			if (featuresType[2*i]==SWIFT_VERTEX && featuresType[2*i+1]==SWIFT_EDGE ||
+// 			    featuresType[2*i]==SWIFT_EDGE && featuresType[2*i+1]==SWIFT_VERTEX ||
+// 			    featuresType[2*i]==SWIFT_EDGE && featuresType[2*i+1]==SWIFT_EDGE)
+// 			{
+// 				Vector3r tmpp=p1;
+// 				p1 = p2;
+// 				p2 = tmpp;
+// 				cg->normal = -cg->normal;
+//  			}
+// 			else
+// 			{
+// 				p1 -= cg->normal*pss1->radius;
+// 				p2 += cg->normal*pss2->radius;
+// 				cg->normal = -cg->normal;				
+// 			}
 			cg->contactPoint = 0.5*(p1+p2);
-			cg->normal = p2-p1;
-			cg->penetrationDepth = cg->normal.normalize();
+
+			cg->penetrationDepth = fabs(distances[i]-pss1->radius-pss2->radius);//(p2-p1).length();
+			
 			cg->radius1 = 0.5*(b1->boundingVolume->max-b1->boundingVolume->min).length();
 			cg->radius2 = 0.5*(b2->boundingVolume->max-b2->boundingVolume->min).length();
-	
-			collision->interactionGeometry = cg;
+
+			if (!collision->interactionGeometry)
+				collision->interactionGeometry = cg;
 		}
 	}
 
@@ -185,7 +239,7 @@ void SwiftPolyhedronProximityModeler::getSwiftInfo(const PolyhedralSweptSphere* 
 	fv = new int[nbFaces];
 	
 	int totValence = 0;
-	for(int i=0;i<pss->faces.size();i++)
+	for(unsigned int i=0;i<pss->faces.size();i++)
 	{
 		totValence += pss->faces[i].size();
 		fv[i] = pss->faces[i].size();
@@ -202,8 +256,8 @@ void SwiftPolyhedronProximityModeler::getSwiftInfo(const PolyhedralSweptSphere* 
 	}	
 
 	int k=0;
-	for(int i=0;i<pss->faces.size();i++)
-		for(int j=0;j<pss->faces[i].size();j++)
+	for(unsigned int i=0;i<pss->faces.size();i++)
+		for(unsigned int j=0;j<pss->faces[i].size();j++)
 		{
 			f[k] = pss->faces[i][j];
 			k++;
