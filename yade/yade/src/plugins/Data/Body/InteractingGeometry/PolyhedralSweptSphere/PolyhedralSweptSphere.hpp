@@ -78,6 +78,8 @@ class PolyhedralSweptSphere : public InteractingGeometry
 /// Methods											///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+	public  : void computeEdges();
+
 	REGISTER_CLASS_INDEX(PolyhedralSweptSphere,InteractingGeometry);
 
 };

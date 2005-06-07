@@ -39,6 +39,7 @@ class Tetrahedron : public GeometricalModel
 	public : Vector3r v1,v2,v3,v4; // vertices of tetrahedron
 
 	public : Tetrahedron();
+	public : Tetrahedron(Vector3r& p1,Vector3r& p2,Vector3r& p3,Vector3r& p4);
 	public : virtual ~Tetrahedron();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

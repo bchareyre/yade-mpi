@@ -99,7 +99,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>preprocessors/FileGenerator/TetrahedronsTest</activedir>
+      <activedir>plugins/Data/Body/GeometricalModel/Tetrahedron</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>

@@ -31,6 +31,15 @@ Tetrahedron::Tetrahedron() : GeometricalModel()
 	createIndex();
 }
 
+Tetrahedron::Tetrahedron(Vector3r& p1,Vector3r& p2,Vector3r& p3,Vector3r& p4) : GeometricalModel()
+{
+	createIndex();
+	v1 = p1;
+	v2 = p2;
+	v3 = p3;
+	v4 = p4;
+}
+
 Tetrahedron::~Tetrahedron()
 {
 }
