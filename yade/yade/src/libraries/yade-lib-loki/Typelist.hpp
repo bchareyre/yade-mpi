@@ -515,9 +515,9 @@ namespace Loki
         struct IndexOf<Typelist<Head, Tail>, T>
         {
         private:
-            enum { temp = IndexOf<Tail, T>::value };
+            enum enum1 { temp = IndexOf<Tail, T>::value }; // olivier : enum needs a name with gcc 4
         public:
-            enum { value = (temp == -1 ? -1 : 1 + temp) };
+            enum enum2 { value = (temp == -1 ? -1 : 1 + temp) }; // olivier : enum needs a name with gcc 4
         };
 
 ////////////////////////////////////////////////////////////////////////////////
