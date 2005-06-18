@@ -58,7 +58,7 @@ using namespace std;
 #include "SWIFT_mesh.h"
 #include "SWIFT_mesh_utils.h"
 
-char * qh_version = "SWIFT_NON_CONVEX";
+//char * qh_version = "SWIFT_NON_CONVEX"; // Janek - this is a duplicate variable declaration - actually I don't know how it did compiled previously
 char options[200];
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -318,60 +318,64 @@ Except for 'F.' and 'PG', upper-case options take an argument.\n\
     writes the output
     frees memory
 */
-int main(int argc, char *argv[]) {
-  int curlong, totlong; /* used !qh_NOmem */
-  int exitcode, numpoints, dim;
-  coordT *points;
-  boolT ismalloc;
 
-#if __MWERKS__ && __POWERPC__
-  char inBuf[BUFSIZ], outBuf[BUFSIZ], errBuf[BUFSIZ];
-  SIOUXSettings.showstatusline= false;
-  SIOUXSettings.tabspaces= 1;
-  SIOUXSettings.rows= 40;
-  if (setvbuf (stdin, inBuf, _IOFBF, sizeof(inBuf)) < 0   /* w/o, SIOUX I/O is slow*/
-  || setvbuf (stdout, outBuf, _IOFBF, sizeof(outBuf)) < 0
-  || (stdout != stderr && setvbuf (stderr, errBuf, _IOFBF, sizeof(errBuf)) < 0))
-    fprintf (stderr, "qhull internal warning (main): could not change stdio to fully buffered.\n");
-  argc= ccommand(&argv);
-#endif
 
-  if ((argc == 1) && isatty( 0 /*stdin*/)) {
-    fprintf(stdout, qh_prompt2, qh_version);
-    exit(qh_ERRnone);
-  }
-  if (argc > 1 && *argv[1] == '-' && !*(argv[1]+1)) {
-    fprintf(stdout, qh_prompta, qh_version, qh_DEFAULTbox,
-		qh_promptb, qh_promptc, qh_promptd, qh_prompte);
-    exit(qh_ERRnone);
-  }
-  if (argc >1 && *argv[1] == '.' && !*(argv[1]+1)) {
-    fprintf(stdout, qh_prompt3, qh_version);
-    exit(qh_ERRnone);
-  }
-  qh_init_A (stdin, stdout, stderr, argc, argv);  /* sets qh qhull_command */
-  exitcode= setjmp (qh errexit); /* simple statement for CRAY J916 */
-  if (!exitcode) {
-    qh_initflags (qh qhull_command);
-    points= qh_readpoints (&numpoints, &dim, &ismalloc);
-    qh_init_B (points, numpoints, dim, ismalloc);
-    qh_qhull();
-    qh_check_output();
-    qh_produce_output();
-    if (qh VERIFYoutput && !qh FORCEoutput && !qh STOPpoint && !qh STOPcone)
-      qh_check_points();
-    exitcode= qh_ERRnone;
-  }
-  qh NOerrexit= True;  /* no more setjmp */
-#ifdef qh_NOmem
-  qh_freeqhull( True);
-#else
-  qh_freeqhull( False);
-  qh_memfreeshort (&curlong, &totlong);
-  if (curlong || totlong)
-    fprintf (stderr, "qhull internal warning (main): did not free %d bytes of long memory (%d pieces)\n",
-       totlong, curlong);
-#endif
-  return exitcode;
-} /* main */
+// Janek - it is allowed to have only one int main in a single program :)
+
+// int main(int argc, char *argv[]) {
+//   int curlong, totlong; /* used !qh_NOmem */
+//   int exitcode, numpoints, dim;
+//   coordT *points;
+//   boolT ismalloc;
+// 
+// #if __MWERKS__ && __POWERPC__
+//   char inBuf[BUFSIZ], outBuf[BUFSIZ], errBuf[BUFSIZ];
+//   SIOUXSettings.showstatusline= false;
+//   SIOUXSettings.tabspaces= 1;
+//   SIOUXSettings.rows= 40;
+//   if (setvbuf (stdin, inBuf, _IOFBF, sizeof(inBuf)) < 0   /* w/o, SIOUX I/O is slow*/
+//   || setvbuf (stdout, outBuf, _IOFBF, sizeof(outBuf)) < 0
+//   || (stdout != stderr && setvbuf (stderr, errBuf, _IOFBF, sizeof(errBuf)) < 0))
+//     fprintf (stderr, "qhull internal warning (main): could not change stdio to fully buffered.\n");
+//   argc= ccommand(&argv);
+// #endif
+// 
+//   if ((argc == 1) && isatty( 0 /*stdin*/)) {
+//     fprintf(stdout, qh_prompt2, qh_version);
+//     exit(qh_ERRnone);
+//   }
+//   if (argc > 1 && *argv[1] == '-' && !*(argv[1]+1)) {
+//     fprintf(stdout, qh_prompta, qh_version, qh_DEFAULTbox,
+// 		qh_promptb, qh_promptc, qh_promptd, qh_prompte);
+//     exit(qh_ERRnone);
+//   }
+//   if (argc >1 && *argv[1] == '.' && !*(argv[1]+1)) {
+//     fprintf(stdout, qh_prompt3, qh_version);
+//     exit(qh_ERRnone);
+//   }
+//   qh_init_A (stdin, stdout, stderr, argc, argv);  /* sets qh qhull_command */
+//   exitcode= setjmp (qh errexit); /* simple statement for CRAY J916 */
+//   if (!exitcode) {
+//     qh_initflags (qh qhull_command);
+//     points= qh_readpoints (&numpoints, &dim, &ismalloc);
+//     qh_init_B (points, numpoints, dim, ismalloc);
+//     qh_qhull();
+//     qh_check_output();
+//     qh_produce_output();
+//     if (qh VERIFYoutput && !qh FORCEoutput && !qh STOPpoint && !qh STOPcone)
+//       qh_check_points();
+//     exitcode= qh_ERRnone;
+//   }
+//   qh NOerrexit= True;  /* no more setjmp */
+// #ifdef qh_NOmem
+//   qh_freeqhull( True);
+// #else
+//   qh_freeqhull( False);
+//   qh_memfreeshort (&curlong, &totlong);
+//   if (curlong || totlong)
+//     fprintf (stderr, "qhull internal warning (main): did not free %d bytes of long memory (%d pieces)\n",
+//        totlong, curlong);
+// #endif
+//   return exitcode;
+// } /* main */
 

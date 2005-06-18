@@ -268,6 +268,8 @@ void Omega::buildDynlibList()
 				}
 			}
 		}
+		else
+			cerr << "ERROR: trying to scan non existing directory for plugins: "<< directory.native_directory_string() << endl;
 	}
 }
 

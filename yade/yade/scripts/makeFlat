@@ -14,6 +14,8 @@ echo 'cd $ORGDIR'										>> makeSymLinkFlat
 
 chmod a+x ./makeSymLinkFlat
 
+find ../src/ -name "*.h" -exec ./makeSymLinkFlat {} \;
+find ../src/ -name "*.c" -exec ./makeSymLinkFlat {} \;
 find ../src/ -name "*.hpp" -exec ./makeSymLinkFlat {} \;
 find ../src/ -name "*.tpp" -exec ./makeSymLinkFlat {} \;
 find ../src/ -name "*.ipp" -exec ./makeSymLinkFlat {} \;
