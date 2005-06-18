@@ -33,7 +33,6 @@ LIBS += -lBox \
         -lPhysicalActionApplier \
         -lPhysicalParametersMetaEngine \
         -lBoundingVolumeMetaEngine \
-         \
         -lPolyhedralSweptSphere \
         -lTetrahedron \
         -lSwiftPolyhedronProximityModeler \
@@ -75,6 +74,10 @@ QMAKE_LIBDIR = ../../../plugins/Data/Body/GeometricalModel/Box/$(YADEDYNLIBPATH)
                ../../../plugins/Data/Body/InteractingGeometry/PolyhedralSweptSphere/$(YADEDYNLIBPATH) \
                ../../../plugins/Data/Body/GeometricalModel/Tetrahedron/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
+QMAKE_CXXFLAGS_RELEASE += -lpthread \
+                          -pthread 
+QMAKE_CXXFLAGS_DEBUG += -lpthread \
+                        -pthread 
 DESTDIR = $(YADEDYNLIBPATH) 
 CONFIG += debug \
           warn_on \

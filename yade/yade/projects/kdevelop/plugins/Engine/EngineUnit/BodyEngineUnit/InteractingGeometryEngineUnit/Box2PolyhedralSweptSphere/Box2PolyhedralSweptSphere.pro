@@ -13,7 +13,12 @@ UI_DIR = $(YADECOMPILATIONPATH)
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 QMAKE_LIBDIR = ../../../../../../plugins/Data/Body/InteractingGeometry/PolyhedralSweptSphere/$(YADEDYNLIBPATH) \
                ../../../../../../plugins/Data/Body/GeometricalModel/Box/$(YADEDYNLIBPATH) \
+               ../../../../../../plugins/Engine/MetaEngine/BodyMetaEngine/InteractingGeometryMetaEngine/InteractingGeometryMetaEngine/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
+QMAKE_CXXFLAGS_RELEASE += -lpthread \
+                          -pthread 
+QMAKE_CXXFLAGS_DEBUG += -lpthread \
+                        -pthread 
 DESTDIR = $(YADEDYNLIBPATH) 
 CONFIG += debug \
           warn_on \
