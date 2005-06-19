@@ -52,6 +52,7 @@ class LatticeExample : public FileGenerator
 		void createNode(shared_ptr<Body>& body, int i, int j, int k);
 		void createBeam(shared_ptr<Body>& body, unsigned int i, unsigned int j);
 		void calcBeamsPositionOrientationLength(shared_ptr<MetaBody>& body);
+		void imposeTranslation(shared_ptr<MetaBody>& rootBody, Vector3r min, Vector3r max, Vector3r direction, Real velocity);
 
 		virtual void registerAttributes();
 		REGISTER_CLASS_NAME(LatticeExample);

@@ -40,6 +40,12 @@
 #include <yade-common/InteractionVecSet.hpp>
 #include <yade-common/PhysicalActionVectorVector.hpp>
 
+#include <yade-common/TranslationEngine.hpp>
+#include <yade-common/PhysicalParametersMetaEngine.hpp>
+#include <yade-common/PhysicalActionApplier.hpp>
+
+#include <yade-common/LatticeLaw.hpp>
+
 using namespace boost;
 using namespace std;
 
@@ -51,7 +57,7 @@ LatticeExample::LatticeExample() : FileGenerator()
 	nodeGroupMask 		= 1;
 	beamGroupMask 		= 2;
 	
-	nbNodes 		= Vector3r(15,4,4);
+	nbNodes 		= Vector3r(6,4,4);
 	disorder 		= 0.23;
 	maxLength 		= 1.4;
 }
@@ -127,6 +133,8 @@ string LatticeExample::generate()
 		rootBody->bodies->insert(bc.getCurrent());
 		
 	calcBeamsPositionOrientationLength(rootBody);
+
+	imposeTranslation(rootBody,Vector3r(-1,-1,-1),Vector3r(3,3,3),Vector3r(0,1,0),0.5);
 
  	return ""; 
 
@@ -243,10 +251,24 @@ void LatticeExample::createActors(shared_ptr<MetaBody>& )
 	shared_ptr<GeometricalModelMetaEngine> geometricalModelDispatcher	= shared_ptr<GeometricalModelMetaEngine>(new GeometricalModelMetaEngine);
 	geometricalModelDispatcher->add("LatticeSetParameters","LatticeSetGeometry","LatticeSet2LatticeBeams");
 	
-	rootBody->actors.clear();
-//	rootBody->actors.push_back(boundingVolumeDispatcher);
-//	rootBody->actors.push_back(geometricalModelDispatcher);
+	shared_ptr<PhysicalParametersMetaEngine> positionIntegrator(new PhysicalParametersMetaEngine);
+	positionIntegrator->add("ParticleParameters","LeapFrogPositionIntegrator");
+	
+	shared_ptr<PhysicalActionApplier> applyActionDispatcher(new PhysicalActionApplier);
+	applyActionDispatcher->add("Force","ParticleParameters","NewtonsForceLaw");
+	
+	shared_ptr<LatticeLaw> latticeLaw(new LatticeLaw);
+	latticeLaw->nodeGroupMask = nodeGroupMask;
+	latticeLaw->beamGroupMask = beamGroupMask;
 
+	rootBody->actors.clear();
+	rootBody->actors.push_back(boundingVolumeDispatcher);
+	rootBody->actors.push_back(geometricalModelDispatcher);
+	rootBody->actors.push_back(latticeLaw);
+	rootBody->actors.push_back(applyActionDispatcher); // ????
+	rootBody->actors.push_back(positionIntegrator);
+	
+	
 	rootBody->initializers.clear();
 //	rootBody->initializers.push_back(actionParameterInitializer);
 	rootBody->initializers.push_back(boundingVolumeDispatcher);
@@ -286,3 +308,41 @@ void LatticeExample::positionRootBody(shared_ptr<MetaBody>& rootBody)
 	rootBody->physicalParameters 	= physics;
 }
 	
+/////////////////////////////////////////////////////////////////////////////////////////////////// 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+ 
+void LatticeExample::imposeTranslation(shared_ptr<MetaBody>& rootBody, Vector3r min, Vector3r max, Vector3r direction, Real velocity)
+{
+	shared_ptr<TranslationEngine> translationCondition = shared_ptr<TranslationEngine>(new TranslationEngine);
+ 	translationCondition->velocity  = velocity;
+	direction.normalize();
+ 	translationCondition->translationAxis = direction;
+	
+	rootBody->actors.push_back(translationCondition);
+	translationCondition->subscribedBodies.clear();
+	
+	for(rootBody->bodies->gotoFirst() ; rootBody->bodies->notAtEnd() ; rootBody->bodies->gotoNext() )
+	{
+		if( rootBody->bodies->getCurrent()->getGroupMask() & nodeGroupMask )
+		{
+			Vector3r pos = rootBody->bodies->getCurrent()->physicalParameters->se3.position;
+			if(        pos[0] > min[0] 
+				&& pos[1] > min[1] 
+				&& pos[2] > min[2] 
+				&& pos[0] < max[0] 
+				&& pos[1] < max[1] 
+				&& pos[2] < max[2] 
+				&& (rootBody->bodies->getCurrent()->getGroupMask() & nodeGroupMask)
+				)
+			{
+				rootBody->bodies->getCurrent()->isDynamic = false;
+				rootBody->bodies->getCurrent()->geometricalModel->diffuseColor = Vector3r(1,0,0);
+				translationCondition->subscribedBodies.push_back(rootBody->bodies->getCurrent()->getId());
+			}
+		}
+	}
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////// 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+ 

@@ -37,6 +37,7 @@ class LatticeBeamParameters : public RigidBodyParameters
 	public :
 		unsigned int 	id1,id2;
 		Real  		initialLength,length;
+		Vector3r 	direction;
 	
 	public : LatticeBeamParameters();
 	public : virtual ~LatticeBeamParameters();

@@ -9,7 +9,8 @@ SUBDIRS += ElasticCohesiveLaw \
            MassSpringBody2RigidBodyLaw \
            ErrorTolerantLaw \
            ElasticContactLaw \
-           MassSpringLaw 
+           MassSpringLaw \
+	   LatticeLaw
 MOC_DIR = $(YADECOMPILATIONPATH)
 UI_DIR = $(YADECOMPILATIONPATH)
 OBJECTS_DIR = $(YADECOMPILATIONPATH)
