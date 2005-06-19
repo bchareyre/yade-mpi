@@ -44,6 +44,8 @@
 #include <yade-common/PhysicalParametersMetaEngine.hpp>
 #include <yade-common/PhysicalActionApplier.hpp>
 
+#include <yade-common/PhysicalActionContainerInitializer.hpp>
+
 #include <yade-common/LatticeLaw.hpp>
 
 using namespace boost;
@@ -57,9 +59,20 @@ LatticeExample::LatticeExample() : FileGenerator()
 	nodeGroupMask 		= 1;
 	beamGroupMask 		= 2;
 	
-	nbNodes 		= Vector3r(6,4,4);
+	nbNodes 		= Vector3r(4,10,4);
 	disorder 		= 0.23;
-	maxLength 		= 1.4;
+	maxLength 		= 1.7;
+	
+	regionA_min 		= Vector3r(-1,-1,-1);
+	regionA_max 		= Vector3r(11,0.6,11);
+	direction_A 		= Vector3r(0,-1,0);
+	velocity_A 		= 0.01;
+	regionB_min 		= Vector3r(-1,8.4,-1);
+	regionB_max 		= Vector3r(11,11,11);
+	direction_B 		= Vector3r(0,1,0);
+	velocity_B 		= 0.01;
+	
+	maxDeformationSquared 	= 0.0004;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -78,6 +91,22 @@ void LatticeExample::registerAttributes()
 	REGISTER_ATTRIBUTE(nbNodes); 
 	REGISTER_ATTRIBUTE(disorder);
 	REGISTER_ATTRIBUTE(maxLength);
+//	REGISTER_ATTRIBUTE(stiffness);
+	REGISTER_ATTRIBUTE(regionA_min);
+	REGISTER_ATTRIBUTE(regionA_max);
+	REGISTER_ATTRIBUTE(direction_A);
+	REGISTER_ATTRIBUTE(velocity_A);
+	REGISTER_ATTRIBUTE(regionB_min);
+	REGISTER_ATTRIBUTE(regionB_max);
+	REGISTER_ATTRIBUTE(direction_B);
+	REGISTER_ATTRIBUTE(velocity_B);
+//	REGISTER_ATTRIBUTE(regionC_min);
+//	REGISTER_ATTRIBUTE(regionC_max);
+//	REGISTER_ATTRIBUTE(direction_C);
+//	REGISTER_ATTRIBUTE(velocity_C);
+
+	REGISTER_ATTRIBUTE(maxDeformationSquared);
+
 }
 
 string LatticeExample::generate()
@@ -110,6 +139,7 @@ string LatticeExample::generate()
 	for( rootBody->bodies->gotoFirst(); rootBody->bodies->notAtEnd() ; rootBody->bodies->gotoNext() )
 	{
 		shared_ptr<Body>& bodyA = rootBody->bodies->getCurrent();
+		cerr << "creating beams: " << bodyA->getId() << endl;
 		rootBody->bodies->pushIterator();
 		rootBody->bodies->gotoNext();
 		for( ; rootBody->bodies->notAtEnd() ; rootBody->bodies->gotoNext() )
@@ -118,7 +148,7 @@ string LatticeExample::generate()
 			shared_ptr<LatticeNodeParameters> a = dynamic_pointer_cast<LatticeNodeParameters>(bodyA->physicalParameters);
 			shared_ptr<LatticeNodeParameters> b = dynamic_pointer_cast<LatticeNodeParameters>(bodyB->physicalParameters);
 
-			if (a && b && (a->se3.position - b->se3.position).length() < (maxLength))  
+			if (a && b && (a->se3.position - b->se3.position).squaredLength() < (maxLength*maxLength))  
 			{
 				shared_ptr<Body> beam;
 				createBeam(beam,bodyA->getId(),bodyB->getId());
@@ -131,10 +161,15 @@ string LatticeExample::generate()
 	
 	for( bc.gotoFirst(); bc.notAtEnd() ; bc.gotoNext() )
 		rootBody->bodies->insert(bc.getCurrent());
-		
+	
+	cerr<< "calcBeamsPositionOrientationLength\n";
 	calcBeamsPositionOrientationLength(rootBody);
 
-	imposeTranslation(rootBody,Vector3r(-1,-1,-1),Vector3r(3,3,3),Vector3r(0,1,0),0.5);
+	imposeTranslation(rootBody,regionA_min,regionA_max,direction_A,velocity_A);
+	imposeTranslation(rootBody,regionB_min,regionB_max,direction_B,velocity_B);
+//	imposeTranslation(rootBody,regionC_min,regionC_max,direction_C,velocity_C);
+
+	cerr << "finished.. saving\n";
 
  	return ""; 
 
@@ -219,6 +254,8 @@ void LatticeExample::calcBeamsPositionOrientationLength(shared_ptr<MetaBody>& bo
 		shared_ptr<Body>& body = rootBody->bodies->getCurrent();
 		if( body->getGroupMask() & beamGroupMask )
 		{
+			cerr << "calcBeamsPositionOrientationLength: " << body->getId() << endl;
+			
 			LatticeBeamParameters* beam = static_cast<LatticeBeamParameters*>(body->physicalParameters.get());
 			shared_ptr<Body>& bodyA = (*(rootBody->bodies))[beam->id1];
 			shared_ptr<Body>& bodyB = (*(rootBody->bodies))[beam->id2];
@@ -251,26 +288,31 @@ void LatticeExample::createActors(shared_ptr<MetaBody>& )
 	shared_ptr<GeometricalModelMetaEngine> geometricalModelDispatcher	= shared_ptr<GeometricalModelMetaEngine>(new GeometricalModelMetaEngine);
 	geometricalModelDispatcher->add("LatticeSetParameters","LatticeSetGeometry","LatticeSet2LatticeBeams");
 	
-	shared_ptr<PhysicalParametersMetaEngine> positionIntegrator(new PhysicalParametersMetaEngine);
-	positionIntegrator->add("ParticleParameters","LeapFrogPositionIntegrator");
+//	shared_ptr<PhysicalParametersMetaEngine> positionIntegrator(new PhysicalParametersMetaEngine);
+//	positionIntegrator->add("ParticleParameters","LeapFrogPositionIntegrator");
 	
-	shared_ptr<PhysicalActionApplier> applyActionDispatcher(new PhysicalActionApplier);
-	applyActionDispatcher->add("Force","ParticleParameters","NewtonsForceLaw");
+//	shared_ptr<PhysicalActionApplier> applyActionDispatcher(new PhysicalActionApplier);
+//	applyActionDispatcher->add("Force","ParticleParameters","NewtonsForceLaw");
+	
+//	shared_ptr<PhysicalActionContainerInitializer> actionParameterInitializer(new PhysicalActionContainerInitializer);
+//	actionParameterInitializer->actionParameterNames.push_back("Force");
+//	actionParameterInitializer->actionParameterNames.push_back("Momentum"); // FIXME - should be unnecessery, but BUG in PhysicalActionVectorVector
 	
 	shared_ptr<LatticeLaw> latticeLaw(new LatticeLaw);
 	latticeLaw->nodeGroupMask = nodeGroupMask;
 	latticeLaw->beamGroupMask = beamGroupMask;
+	latticeLaw->maxDispl = maxDeformationSquared;
 
 	rootBody->actors.clear();
 	rootBody->actors.push_back(boundingVolumeDispatcher);
 	rootBody->actors.push_back(geometricalModelDispatcher);
 	rootBody->actors.push_back(latticeLaw);
-	rootBody->actors.push_back(applyActionDispatcher); // ????
-	rootBody->actors.push_back(positionIntegrator);
+//	rootBody->actors.push_back(applyActionDispatcher); // ????
+//	rootBody->actors.push_back(positionIntegrator);
 	
 	
 	rootBody->initializers.clear();
-//	rootBody->initializers.push_back(actionParameterInitializer);
+//	rootBody->initializers.push_back(actionParameterInitializer); // FIXME - should be automatic!
 	rootBody->initializers.push_back(boundingVolumeDispatcher);
 	rootBody->initializers.push_back(geometricalModelDispatcher);
 }	

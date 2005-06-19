@@ -99,11 +99,11 @@
       <envvars/>
     </run>
     <general>
-      <activedir>plugins/Engine/Engine/PhysicalActionEngine/InteractionSolver/LatticeLaw</activedir>
+      <activedir>preprocessors</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>
-      <numberofjobs>4</numberofjobs>
+      <numberofjobs>1</numberofjobs>
       <dontact>false</dontact>
       <makebin/>
       <prio>0</prio>

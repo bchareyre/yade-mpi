@@ -40,6 +40,16 @@ class LatticeExample : public FileGenerator
 		Real 		disorder;
 		Real 		maxLength;
 		int 		nodeGroupMask,beamGroupMask;
+		Real 		maxDeformationSquared;
+		
+		Vector3r 	regionA_min;
+		Vector3r 	regionA_max;
+		Vector3r 	direction_A;
+		Real 		velocity_A;
+		Vector3r 	regionB_min;
+		Vector3r 	regionB_max;
+		Vector3r 	direction_B;
+		Real 		velocity_B;
 
 	public : 
 		LatticeExample();

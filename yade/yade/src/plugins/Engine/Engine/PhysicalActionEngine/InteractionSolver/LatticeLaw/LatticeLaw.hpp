@@ -41,6 +41,7 @@ class LatticeLaw : public InteractionSolver
 	private : shared_ptr<PhysicalAction> actionForce;
 	public  : int nodeGroupMask;
 	public  : int beamGroupMask;
+	public  : Real maxDispl;
 
 // DECLARE YOU ATTRIBUTES HERE
 

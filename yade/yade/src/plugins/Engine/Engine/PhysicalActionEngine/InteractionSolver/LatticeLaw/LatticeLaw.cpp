@@ -36,6 +36,8 @@ LatticeLaw::LatticeLaw() : InteractionSolver() , actionForce(new Force)
 {
 	nodeGroupMask = 1;
 	beamGroupMask = 2;
+	
+	maxDispl     = 0.0004;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -54,6 +56,7 @@ void LatticeLaw::registerAttributes()
 	InteractionSolver::registerAttributes();
 	REGISTER_ATTRIBUTE(nodeGroupMask);
 	REGISTER_ATTRIBUTE(beamGroupMask);
+	REGISTER_ATTRIBUTE(maxDispl);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -66,44 +69,64 @@ void LatticeLaw::calculateForces(Body* body)
 	shared_ptr<BodyContainer>& bodies = lattice->bodies;
 	shared_ptr<PhysicalActionContainer>& actionParameters = lattice->actionParameters;
 	
+//	Real dt = Omega::instance().getTimeStep();
+	
 	for(bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext()) // loop over all beams
 	{
 		const shared_ptr<Body>& body = bodies->getCurrent();
 		if( ! ( body->getGroupMask() & beamGroupMask ) )
 			continue; // skip non-beams
 		
-		LatticeBeamParameters* beam = dynamic_cast<LatticeBeamParameters*>(body->physicalParameters.get() );
+		LatticeBeamParameters* beam = static_cast<LatticeBeamParameters*>(body->physicalParameters.get() );
 		
-		Vector3r  force = beam->direction * ((beam->length/beam->initialLength)-1.0)*10.0;
-//		cerr << force << endl;
-//		static_cast<Force*> ( actionParameters->find( beam->id1 , actionForce ->getClassIndex() ).get() )->force  -= force;
-//		static_cast<Force*> ( actionParameters->find( beam->id2 , actionForce ->getClassIndex() ).get() )->force  += force;
-/*		
-		for ( int i = 0 ; i < 4 ; ++i ) // loop over all tetrahedron nodes
+//		Vector3r  force = beam->direction * ((beam->length/beam->initialLength)-1.0)/stiffness;
+
+		Vector3r  displacement = beam->direction * (beam->length - beam->initialLength) * 0.5;
+		
+		if( displacement.squaredLength() > maxDispl /*FIXME - different name*/ ) // delete beam
 		{
-			FEMNodeData* femNode = static_cast<FEMNodeData*>( (*bodies)[femTet->ids[i]]->physicalParameters.get() );
-			
-			Vector3r displacement = femNode->se3.position - femNode->initialPosition;
-			
-			Ue1( i*3    , 0 ) = displacement[0]; // x displacement of node
-			Ue1( i*3 + 1, 0 ) = displacement[1]; // y displacement of node
-			Ue1( i*3 + 2, 0 ) = displacement[2]; // z displacement of node
+			bodies->erase(body->getId());
+			continue;
 		}
 		
-		fe = - prod( femTet->Ke_ , Ue1 ); // solve this tetrahedron
+//		cerr << beam->direction.length() << endl;
+//		static_cast<Force*> ( actionParameters->find( beam->id1 , actionForce ->getClassIndex() ).get() )->force  -= force;
+//		static_cast<Force*> ( actionParameters->find( beam->id2 , actionForce ->getClassIndex() ).get() )->force  += force;
+
+//		shared_ptr<Body>& bodyA = (*(rootBody->bodies))[beam->id1];
+//		shared_ptr<Body>& bodyB = (*(rootBody->bodies))[beam->id2];
 		
-		for ( int i = 0 ; i < 4 ; ++i ) // loop again over all tetrahedron nodes
-		{
-			Vector3r force = Vector3r(	  fe( i*3     , 0 )
-							, fe( i*3 + 1 , 0 )
-							, fe( i*3 + 2 , 0 ));
-			
-			static_cast<Force*>( actionParameters
-				->find( femTet->ids[i] , actionForce ->getClassIndex() ).get() )
-					->force  += force;
-					
-			// FIXME - check what's up with invMass in NewtonsForceLaw ???
-		}*/
+		LatticeNodeParameters* node1 = static_cast<LatticeNodeParameters*>(((*(bodies))[beam->id1])->physicalParameters.get());
+		LatticeNodeParameters* node2 = static_cast<LatticeNodeParameters*>(((*(bodies))[beam->id2])->physicalParameters.get());
+
+//		cerr << node1 << endl;
+//		cerr << node2 << endl; 
+	
+		++(node1->count);
+		++(node2->count);
+		
+		node1->displacement -= displacement;
+		node2->displacement += displacement;
+
+	}
+
+	for(bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext()) // loop over all nodes
+	{
+		const shared_ptr<Body>& body = bodies->getCurrent();
+		if( ! ( body->getGroupMask() & nodeGroupMask ) )
+			continue; // skip non-nodes
+		
+		LatticeNodeParameters* node = static_cast<LatticeNodeParameters*>(body->physicalParameters.get() );
+		
+		if(node->count == 0) 
+			continue; 
+		
+		Vector3r displacement 	= node->displacement / node->count;
+		node->displacement  	= Vector3r(0.0,0.0,0.0);
+		node->count 		= 0.0;
+		
+		if(body->isDynamic)
+			node->se3.position 	+= displacement;
 	}
 
 }

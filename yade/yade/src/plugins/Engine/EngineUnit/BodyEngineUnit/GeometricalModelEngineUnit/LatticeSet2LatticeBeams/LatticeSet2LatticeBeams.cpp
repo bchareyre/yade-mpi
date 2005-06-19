@@ -59,7 +59,7 @@ void LatticeSet2LatticeBeams::calcBeamsPositionOrientationNewLength(shared_ptr<B
 	
 	
 	line->length       		= beam->length;
-	line->diffuseColor 		= Vector3f(0.8,0.8,0.8) + ((beam->length / beam->initialLength)-1.0) * Vector3f(0.0,0.0,2.5);
+	line->diffuseColor 		= Vector3f(0.8,0.8,0.8) + ((beam->length / beam->initialLength)-1.0) * Vector3f(-1.0,0.0,1.0) * 10.0;
 
 }
 

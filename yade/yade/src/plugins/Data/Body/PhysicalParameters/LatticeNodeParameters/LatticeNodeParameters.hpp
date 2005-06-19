@@ -34,6 +34,11 @@
 
 class LatticeNodeParameters : public RigidBodyParameters
 {
+	public : 
+		Real count;
+		Vector3r displacement;
+	
+	
 	public : LatticeNodeParameters();
 	public : virtual ~LatticeNodeParameters();
 

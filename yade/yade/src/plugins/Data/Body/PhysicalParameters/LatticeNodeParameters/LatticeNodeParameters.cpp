@@ -6,6 +6,9 @@
 LatticeNodeParameters::LatticeNodeParameters() : RigidBodyParameters()
 {
 	createIndex();
+	
+	count = 0;
+	displacement = Vector3r(0,0,0);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
