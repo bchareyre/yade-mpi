@@ -51,7 +51,7 @@ class QGLThread : public Threadable<QGLThread>
 	public : void centerScene();
 	
 	public : QGLThread (GLViewer * glv,shared_ptr<RenderingEngine> r);
-	public : ~QGLThread ();
+	public : virtual ~QGLThread ();
 	
 	public : void resize(int w,int h);
 	public : bool notEnd();

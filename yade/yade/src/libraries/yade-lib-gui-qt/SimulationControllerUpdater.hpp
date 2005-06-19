@@ -41,7 +41,7 @@ class SimulationControllerUpdater : public Threadable<SimulationControllerUpdate
 {	
 	private : SimulationController * controller;
 	public : SimulationControllerUpdater(SimulationController * sc);
-	public : ~SimulationControllerUpdater();
+	public : virtual ~SimulationControllerUpdater();
 	public : void oneLoop();
 	public : bool notEnd();
 };

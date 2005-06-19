@@ -51,9 +51,9 @@ LatticeExample::LatticeExample() : FileGenerator()
 	nodeGroupMask 		= 1;
 	beamGroupMask 		= 2;
 	
-	nbNodes 		= Vector3r(5,5,5);
-	disorder 		= 0.5;
-	maxLength 		= 1.3;
+	nbNodes 		= Vector3r(15,4,4);
+	disorder 		= 0.23;
+	maxLength 		= 1.4;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -161,7 +161,7 @@ void LatticeExample::createNode(shared_ptr<Body>& body, int i, int j, int k)
 	physics->se3			= Se3r(position,q);
 
 	gSphere->radius			= radius;
-	gSphere->diffuseColor		= Vector3f(0.9,0.9,0.3);
+	gSphere->diffuseColor		= Vector3f(0.5,0.5,0.5);
 	gSphere->wire			= false;
 	gSphere->visible		= true;
 	gSphere->shadowCaster		= true;
@@ -191,7 +191,8 @@ void LatticeExample::createBeam(shared_ptr<Body>& body, unsigned int i, unsigned
 	physics->id2 			= j;
 
 	gBeam->length			= length;
-	gBeam->diffuseColor		= Vector3f(Mathf::unitRandom(),Mathf::unitRandom(),Mathf::unitRandom());
+//	gBeam->diffuseColor		= Vector3f(Mathf::unitRandom(),Mathf::unitRandom(),Mathf::unitRandom());
+	gBeam->diffuseColor		= Vector3f(0.8,0.8,0.8);
 	gBeam->wire			= false;
 	gBeam->visible			= true;
 	gBeam->shadowCaster		= true;

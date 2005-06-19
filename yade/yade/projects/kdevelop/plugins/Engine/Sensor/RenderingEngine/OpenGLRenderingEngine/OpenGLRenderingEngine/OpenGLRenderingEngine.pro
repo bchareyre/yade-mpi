@@ -3,19 +3,16 @@
 # Subdir relative project main directory: ./plugins/Engine/Sensor/RenderingEngine/OpenGLRenderingEngine/OpenGLRenderingEngine
 # Target is a library:  
 
-LIBS += -lSphere \
-        -lyade-lib-opengl \
-        -lMacroMicroContactGeometry \
+LIBS += -lMacroMicroContactGeometry \
         -lglut \
         -lGLU \
         -lGL \
         -rdynamic 
-INCLUDEPATH = $(YADEINCLUDEPATH) 
+INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../../../../plugins/Data/Body/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
-               ../../../../../../libraries/yade-lib-opengl/$(YADEDYNLIBPATH) \
+QMAKE_LIBDIR = ../../../../../../plugins/Data/Interaction/NarrowInteractionGeometry/MacroMicroContactGeometry/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

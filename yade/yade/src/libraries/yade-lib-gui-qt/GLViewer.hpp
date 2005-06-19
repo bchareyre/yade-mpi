@@ -47,7 +47,7 @@ class GLViewer : public QGLViewer
 	
 	// construction
 	public : GLViewer (int id, shared_ptr<RenderingEngine> renderer, const QGLFormat& format, QWidget * parent=0, QGLWidget * shareWidget=0);
-	public : ~GLViewer ();
+	public : virtual ~GLViewer ();
 
 	private : QGLThread qglThread;
 	friend class QGLThread;

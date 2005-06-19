@@ -64,7 +64,7 @@ class SimulationController : public QtGeneratedSimulationController
 	// construction
 	public : SimulationController (QWidget * parent=0);
 
-	public : ~SimulationController (); 
+	public : virtual ~SimulationController (); 
 	
 	public slots : virtual void pbApplyClicked();
 	public slots : virtual void pbLoadClicked();

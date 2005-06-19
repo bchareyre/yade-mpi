@@ -53,7 +53,7 @@ class XmlSaxParser
 
 	// construction
 	public    : XmlSaxParser ();
-	public    : ~XmlSaxParser ();
+	public    : virtual ~XmlSaxParser ();
 
 
 	public    : bool readNextXmlLine(istream& stream);

@@ -31,10 +31,6 @@ FORMS += QtFileGeneratorController.ui \
          QtGeneratedMessageDialog.ui \
          QtGeneratedSimulationController.ui \
          YadeQtGeneratedMainWindow.ui 
-IDLS += QtFileGeneratorController.ui \
-        QtGeneratedMessageDialog.ui \
-        QtGeneratedSimulationController.ui \
-        YadeQtGeneratedMainWindow.ui 
 HEADERS += AABB.hpp \
            AABox2Sphere4ClosestFeatures.hpp \
            Archive.hpp \

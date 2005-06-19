@@ -68,7 +68,7 @@ class OpenGLRenderingEngine : public RenderingEngine
 
 			
 	public : OpenGLRenderingEngine();
-	public : ~OpenGLRenderingEngine();
+	public : virtual ~OpenGLRenderingEngine();
 	
 	public : void init();
 	public : void render(const shared_ptr<MetaBody>& body);

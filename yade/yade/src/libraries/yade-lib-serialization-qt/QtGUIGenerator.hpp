@@ -66,7 +66,7 @@ class QtGUIGenerator : public QObject
 		public : typedef enum {INTEGER,FLOATING,BOOLEAN} AttributeType;
 		
 		public : AttributeDescriptor() { strings.clear();widgets.clear();types.clear();};
-		public : ~AttributeDescriptor()
+		public : virtual ~AttributeDescriptor()
 		{
 
 			//if (label)

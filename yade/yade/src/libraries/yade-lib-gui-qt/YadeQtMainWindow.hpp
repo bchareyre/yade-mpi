@@ -53,7 +53,7 @@ class YadeQtMainWindow : public YadeQtGeneratedMainWindow
 
 	// construction
 	public : YadeQtMainWindow ();
-	public : ~YadeQtMainWindow ();
+	public : virtual ~YadeQtMainWindow ();
 
 	public : void addMenu(string menuName);
 	public : void addItem(string menuName, string itemName);
