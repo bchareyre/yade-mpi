@@ -26,6 +26,8 @@ YadeQtMainWindow::YadeQtMainWindow() : YadeQtGeneratedMainWindow()
 	
 	
 	addItem("Preprocessor","QtFileGenerator");
+	addItem("Preprocessor","QtEngineEditor");
+
 	createMenus();
 
 

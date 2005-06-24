@@ -47,7 +47,7 @@ GLWindow::GLWindow(int minX,int minY, int sizeX,int sizeY)
 	oldX				= 0;
 	oldY				= 0;	
 	selectedComponent 		= -1;	
-	displayed 			= false;
+	displayed 			= true;
 	resizable			= true;
 
 	setBackgroundColor(77.0/255.0,238.0/255.0,234.0/255.0);
@@ -332,18 +332,23 @@ bool GLWindow::mouseMoveEvent(int x, int y)
 					break;
 			default:	break;			
 		}	
-		if (minX<-sizeX+5) 
-			minX = -sizeX+5;
-		if (minX>glWindowWidth-5) 
-			minX = glWindowWidth-5;
-		if (minY<-sizeY+5) 
-			minY = -sizeY+5;
-		if (minY>glWindowHeight-5) 
-			minY = glWindowHeight-5;
+
+		if (minX<5) 
+			minX = 5;
+		if (minX+sizeX>glWindowWidth-5) 
+			minX = glWindowWidth-5-sizeX;
+
+		if (minY<5) 
+			minY = 5;
+		if (minY+sizeY>glWindowHeight-5) 
+			minY = glWindowHeight-5-sizeY;
+
+
 		if (minSizeX!=-1 && sizeX<minSizeX) 
 			sizeX=minSizeX;
 		if (minSizeY!=-1 && sizeY<minSizeY) 
 			sizeY=minSizeY;
+
 		if (maxSizeX!=-1 && sizeX>maxSizeX) 
 			sizeX=maxSizeX;
 		if (maxSizeY!=-1 && sizeY>maxSizeY) 
@@ -351,7 +356,7 @@ bool GLWindow::mouseMoveEvent(int x, int y)
 		
 		oldX = x;
 		oldY = y;
-	}
+  	}
 	
 	return mousePress;
 

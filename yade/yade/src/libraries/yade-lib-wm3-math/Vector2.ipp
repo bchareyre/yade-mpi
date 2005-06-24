@@ -244,7 +244,7 @@ Vector2<RealType>& Vector2<RealType>::operator/= (RealType fScalar)
 template <class RealType>
 RealType Vector2<RealType>::length () const
 {
-    return Math<RealType>::Sqrt(
+    return Math<RealType>::sqRoot(
         m_afTuple[0]*m_afTuple[0] +
         m_afTuple[1]*m_afTuple[1]);
 }

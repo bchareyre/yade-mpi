@@ -26,6 +26,126 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+bool segments2DIntersect(Vector2r& p1,Vector2r& p2,Vector2r& p3,Vector2r& p4)
+{
+        //restart = false;
+
+        Vector2r n1 = Vector2r(p2[1]-p1[1],p1[0]-p2[0]);
+        n1.normalize();
+        Real o1 = n1.dot(p1);
+        Vector2r n2 = Vector2r(p4[1]-p3[1],p3[0]-p4[0]);
+        n2.normalize();
+        Real o2 = n2.dot(p3);
+
+        //if (fabs(n1.dot(n2))<Mathr::EPSILON) // approx angle between n1 and n2
+        //{
+                //restart = true;
+                //return false;
+        //}
+
+        Real d1 = n1.dot(p3-o1*n1);
+        Real d2 = n1.dot(p4-o1*n1);
+
+        Real d3 = n2.dot(p1-o2*n2);
+        Real d4 = n2.dot(p2-o2*n2);
+
+        //if (fabs(d1)<Mathr::EPSILON || fabs(d2)<Mathr::EPSILON || fabs(d3)<Mathr::EPSILON || fabs(d4)<Mathr::EPSILON) // we consider that on point is on the other segment
+        //{
+                //restart = true;
+        //      return false;
+        //}
+        //else
+        return (d1*d2<0 && d3*d4<0); // if d1 and d2 don't have the same side ie are nont on the same side of the other segment
+
+}
+
+
+bool lines2DIntersection(Vector2r p1, Vector2r d1, Vector2r p2,Vector2r d2, bool& same, Vector2r& iPoint)
+{
+    // Intersection is a solution to P0+s*D0 = P1+t*D1.  Rewrite as
+    // s*D0 - t*D1 = P1 - P0, a 2x2 system of equations.  If D0 = (x0,y0)
+    // and D1 = (x1,y1) and P1 - P0 = (c0,c1), then the system is
+    // x0*s - x1*t = c0 and y0*s - y1*t = c1.  The error tests are relative
+    // to the size of the direction vectors, |Cross(D0,D1)| >= e*|D0|*|D1|
+    // rather than absolute tests |Cross(D0,D1)| >= e.  The quantities
+    // P1-P0, |D0|^2, and |D1|^2 are returned for use by calling functions.
+
+    Real det = d2.dotPerp(d1);
+    Vector2r v = p2 - p1;
+    Real d1SqrL = d1.squaredLength();
+        bool intersect = false;
+        same=false;
+
+    if ( det*det > Mathr::EPSILON*d1SqrL*d2.squaredLength() )
+    {
+        Real invDet = ((Real)1.0)/det;
+                intersect = true;
+        //s = d2.Kross(v)*invDet;
+        //t = d1.Kross(v)*invDet;
+                iPoint = p1+d1*d2.dotPerp(v)*invDet;
+    }
+    else // lines are parallel
+    {
+        det = d1.dotPerp(v);
+        Real rhs = Mathr::EPSILON*d1SqrL*v.squaredLength();
+        if ( det*det <= rhs )// lines are the same
+        {
+                        same = true;
+                        intersect = true;
+                }
+    }
+
+    return intersect;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+bool segments2DIntersection(Vector2r p1,Vector2r p2, Vector2r a,Vector2r b, bool& same, Vector2r& iPoint)
+{
+    if (segments2DIntersect(p1,p2,a,b))
+    {
+                lines2DIntersection(p1, p2-p1, a ,b-a,same,iPoint);
+                return true;
+        }
+        else
+                return false;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+bool pointOnSegment2D(Vector2r& s1, Vector2r& s2, Vector2r& p, Real& c)
+{
+        if ( (s1-p).squaredLength()<Mathr::EPSILON)
+        {
+                c= 0;
+                return true;
+        }
+
+        if ((s2-p).squaredLength()<Mathr::EPSILON)
+        {
+                c=1;
+                return true;
+        }
+
+        Vector2r v1 = s2-s1;
+        Vector2r v2 = p-s1;
+        Real l1 = v1.length();
+        Real l2 = v2.length();
+        Real cosangle = v1.dot(v2)/(l1*l2);
+        if (fabs(cosangle-1)<Mathr::EPSILON) // v1 and v2 colinear and in the the way
+        {
+                c =l2/l1;
+                return (c>0 && c<1); // if p between s1 and s2
+        }
+        else
+                return false;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 int clipPolygon(Vector3r quad,const std::vector<Vector3r>& polygon, std::vector<Vector3r>& clipped)
 {
 

@@ -207,6 +207,7 @@ void GLWindowsManager::resizeEvent(int w, int h)
 
 void GLWindowsManager::addWindow(GLWindow * w, EventSubscription * s)
 {
+	w->resizeGlWindow(width,height);
 	windows.push_back(w);
 	subscriptions.push_back(s);
 	order.push_back(windows.size()-1);
