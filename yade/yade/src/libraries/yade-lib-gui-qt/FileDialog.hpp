@@ -47,6 +47,8 @@ class FileDialog : public QFileDialog
 	
 	public : static string getOpenFileName(const string& directory,const string& filters,const string& caption,QWidget* parent,string& selectedFilter );
 	public : static string getSaveFileName(const string& directory,const string& filters,const string& caption,QWidget* parent,string& selectedFilter );
+	public : static string getExistingDirectory ( const string& directory,const string& caption,QWidget* parent);
+
 
 };
 

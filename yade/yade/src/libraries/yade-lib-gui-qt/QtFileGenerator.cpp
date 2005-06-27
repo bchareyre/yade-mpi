@@ -60,9 +60,9 @@ QtFileGenerator::QtFileGenerator ( QWidget * parent , const char * name) : QtFil
 
 	scrollViewFrame = new QFrame();	
 	
-	scrollViewLayout = new QVBoxLayout( gbGeneratorParameters, 20, 10, "scrollViewLayout"); 
+	scrollViewLayout = new QVBoxLayout( scrollViewOutsideFrame, 0, 0, "scrollViewLayout"); 
 	
-	scrollView = new QScrollView( gbGeneratorParameters, "scrollView" );
+	scrollView = new QScrollView( scrollViewOutsideFrame, "scrollView" );
 	scrollView->setVScrollBarMode(QScrollView::AlwaysOn);
 	scrollView->setHScrollBarMode(QScrollView::AlwaysOff);
 	scrollViewLayout->addWidget( scrollView );
@@ -105,7 +105,7 @@ void QtFileGenerator::cbGeneratorNameActivated(const QString& s)
 
 		guiGen.setResizeHeight(true);
 		guiGen.setResizeWidth(false);
-		guiGen.setShift(10,30);
+		guiGen.setShift(10,10);
 		guiGen.setShowButtons(false);
 		
 		QSize s = scrollView->size();
@@ -113,7 +113,7 @@ void QtFileGenerator::cbGeneratorNameActivated(const QString& s)
 
 		delete scrollViewFrame;
 		scrollViewFrame = new QFrame();
-		scrollViewFrame->resize(s.width()-17,s.height());
+		scrollViewFrame->resize(s.width()-17,s.height()); // -17 because of the size of the scrollbar
 		
 		gbGeneratorParameters->setTitle(fg->getClassName()+" Parameters");
 		
