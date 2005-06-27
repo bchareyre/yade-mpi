@@ -21,11 +21,14 @@
 #include "InteractionPhysics.hpp"
 #include <yade-lib-threads/ThreadSynchronizer.hpp>
 #include "SimulationLoop.hpp"
-#include <yade/FrontEnd.hpp>
+
+#include "FrontEnd.hpp"
+
+#include "MetaEngine.hpp"
 
 #include "Preferences.hpp"
-//#include "InteractionGeometryMetaEngine.hpp"
-//#include "InteractionGeometryEngineUnit.hpp"
+
+#include <yade-lib-multimethods/FunctorWrapper.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -208,8 +211,6 @@ void Omega::registerDynlibType(const string& name)
 		dynlibsType[name]="DeusExMachina";
 	else if (dynamic_pointer_cast<Body>(f))
 		dynlibsType[name]="Body";
-//	else if (dynamic_pointer_cast<InteractionGeometryEngineUnit>(f))
-//		dynlibsType[name]="InteractionGeometryEngineUnit";
 	else if (dynamic_pointer_cast<IOManager>(f))
 		dynlibsType[name]="IOManager";
 	else if (dynamic_pointer_cast<BroadInteractor>(f))
@@ -224,7 +225,10 @@ void Omega::registerDynlibType(const string& name)
 		dynlibsType[name]="InteractionGeometry";
 	else if (dynamic_pointer_cast<InteractionPhysics>(f))
 		dynlibsType[name]="InteractionPhysics";
-
+	else if (dynamic_pointer_cast<MetaEngine>(f))
+		dynlibsType[name]="MetaEngine"; // FIXME : be calling getEngineUnitType possibility to classify all engine unit in the map
+	else if (dynamic_pointer_cast<Engine>(f))
+		dynlibsType[name]="Engine";
 	else
 		dynlibsType[name]="Unknown";
 }

@@ -31,6 +31,9 @@ class QtEngineEditor : public QtGeneratedEngineEditor, public Factorable
 {
 	public : QtEngineEditor();
 	public : ~QtEngineEditor();
+
+	public slots: void pbAddEngineClicked();
+
 };
 
 

@@ -328,11 +328,11 @@ bool GLEngineEditor::selectRelation(int x, int y, float threshold, int &a, int &
 }
 
 
-void GLEngineEditor::pbAddEngineClicked()
+void GLEngineEditor::addEngine(const string& engineName )
 {
 
 	GLTextLabel * tl = new GLTextLabel();
-	tl->setText("Engine");
+	tl->setText(const_cast<char*>(engineName.c_str()));
 	tl->setTextColor(1,0,0);
 	tl->setBorderColor(1,0,1);
 	tl->fitTextSize();
@@ -343,7 +343,9 @@ void GLEngineEditor::pbAddEngineClicked()
 	tl->setMinX(10);
 	tl->setMinY(10);	
 
-	wm.addWindow(tl,new GLWindowsManager::EventSubscription());
+	GLWindowsManager::EventSubscription * es = new GLWindowsManager::EventSubscription();
+	es->mouseDoubleClick = false;
+	wm.addWindow(tl,es);
 
 	updateGL();
 }

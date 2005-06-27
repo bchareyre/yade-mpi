@@ -21,12 +21,15 @@ using namespace std;
 YadeQtMainWindow::YadeQtMainWindow() : YadeQtGeneratedMainWindow()
 {
 
+	resize(1024,768);
+
 	addMenu("Preprocessor");
 	addMenu("Postprocessor");
 	
 	
 	addItem("Preprocessor","QtFileGenerator");
 	addItem("Preprocessor","QtEngineEditor");
+	addItem("Preprocessor","QtCodeGenerator");
 
 	createMenus();
 

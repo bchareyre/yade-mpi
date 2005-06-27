@@ -62,9 +62,7 @@ class GLEngineEditor : public QGLViewer
 	public : int getWindowMinX(int i) { return wm.getWindow(i)->getMinX(); };
 	public : int getWindowMinY(int i) { return wm.getWindow(i)->getMinY(); };
 
-
-
-	public slots: void pbAddEngineClicked();
+	public : void addEngine(const string& engineName );
 	
 };
 

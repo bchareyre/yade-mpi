@@ -17,32 +17,27 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "QtEngineEditor.hpp"
 
-#include <yade/Omega.hpp>
-#include <qcombobox.h>
-#include <qgroupbox.h>
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "GLEngineEditor.hpp"
-
-QtEngineEditor::QtEngineEditor() : QtGeneratedEngineEditor()
-{
-	map<string,string>::const_iterator di    = Omega::instance().getDynlibsType().begin();
-	map<string,string>::const_iterator diEnd = Omega::instance().getDynlibsType().end();
-	for(;di!=diEnd;++di)
-	{
-		if ((*di).second=="Engine")
-			cbEnginesList->insertItem((*di).first);
-	}
-}
-
-
-QtEngineEditor::~QtEngineEditor()
-{
-}
-
-
-void QtEngineEditor::pbAddEngineClicked()
-{
-	glEngineEditor->addEngine(cbEnginesList->currentText());
-}
+// #include "MetaDispatchingEngine2D.hpp"
+// 
+// ///////////////////////////////////////////////////////////////////////////////////////////////////
+// ///////////////////////////////////////////////////////////////////////////////////////////////////
+// 
+// void MetaDispatchingEngine2D::postProcessAttributes(bool deserializing)
+// {
+// 	MetaEngine::postProcessAttributes();
+// 	postProcessDispatcher2D(deserializing);
+// }
+// 
+// ///////////////////////////////////////////////////////////////////////////////////////////////////
+// ///////////////////////////////////////////////////////////////////////////////////////////////////
+// 
+// void MetaDispatchingEngine2D::registerAttributes()
+// {
+// 	MetaEngine::registerAttributes();
+// 	REGISTER_ATTRIBUTE(functorNames);
+// 	REGISTER_ATTRIBUTE(functorArguments);
+// }

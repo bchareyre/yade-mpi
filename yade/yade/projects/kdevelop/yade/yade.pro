@@ -3,37 +3,6 @@
 # Subdir relative project main directory: ./yade
 # Target is an application:  
 
-LIBS += -lyade-lib-threads \
-        -lyade-lib-serialization \
-        -lyade-lib-factory \
-        -lyade-lib-wm3-math \
-        -lyade-lib-loki \
-        -lyade-lib-multimethods \
-        -lglut \
-        -rdynamic \
-        -lboost_date_time \
-        -lboost_filesystem \
-        -lboost_thread 
-INCLUDEPATH += $(YADEINCLUDEPATH) 
-MOC_DIR = $(YADECOMPILATIONPATH) 
-UI_DIR = $(YADECOMPILATIONPATH) 
-OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../libraries/yade-lib-threads/$(YADEDYNLIBPATH) \
-               ../libraries/yade-lib-serialization/$(YADEDYNLIBPATH) \
-               ../libraries/yade-lib-factory/$(YADEDYNLIBPATH) \
-               ../libraries/yade-lib-wm3-math/$(YADEDYNLIBPATH) \
-               ../libraries/yade-lib-loki/$(YADEDYNLIBPATH) \
-               ../libraries/yade-lib-multimethods/$(YADEDYNLIBPATH) \
-               $(YADEDYNLIBPATH) 
-QMAKE_CXXFLAGS_RELEASE += -lpthread \
-                          -pthread 
-QMAKE_CXXFLAGS_DEBUG += -lpthread \
-                        -pthread 
-DEFINES = DEBUG 
-DESTDIR = $(YADEBINPATH) 
-CONFIG += debug \
-          warn_on 
-TEMPLATE = app 
 HEADERS += BodyContainer.hpp \
            Body.hpp \
            BoundingVolume.hpp \
@@ -58,7 +27,10 @@ HEADERS += BodyContainer.hpp \
            RenderingEngine.hpp \
            SimulationLoop.hpp \
            yadeExceptions.hpp \
-           Preferences.hpp 
+           Preferences.hpp \
+           MetaEngine.hpp \
+           MetaDispatchingEngine1D.hpp \
+           MetaDispatchingEngine2D.hpp 
 SOURCES += BodyContainer.cpp \
            Body.cpp \
            BoundingVolume.cpp \
@@ -79,4 +51,37 @@ SOURCES += BodyContainer.cpp \
            SimulationLoop.cpp \
            yade.cpp \
            yadeExceptions.cpp \
-           Preferences.cpp 
+           Preferences.cpp \
+           MetaDispatchingEngine1D.cpp \
+           MetaDispatchingEngine2D.cpp 
+LIBS += -lyade-lib-threads \
+-lyade-lib-serialization \
+-lyade-lib-factory \
+-lyade-lib-wm3-math \
+-lyade-lib-loki \
+-lyade-lib-multimethods \
+-lglut \
+-rdynamic \
+-lboost_date_time \
+-lboost_filesystem \
+-lboost_thread
+INCLUDEPATH += $(YADEINCLUDEPATH)
+MOC_DIR = $(YADECOMPILATIONPATH)
+UI_DIR = $(YADECOMPILATIONPATH)
+OBJECTS_DIR = $(YADECOMPILATIONPATH)
+QMAKE_LIBDIR = ../libraries/yade-lib-threads/$(YADEDYNLIBPATH) \
+../libraries/yade-lib-serialization/$(YADEDYNLIBPATH) \
+../libraries/yade-lib-factory/$(YADEDYNLIBPATH) \
+../libraries/yade-lib-wm3-math/$(YADEDYNLIBPATH) \
+../libraries/yade-lib-loki/$(YADEDYNLIBPATH) \
+../libraries/yade-lib-multimethods/$(YADEDYNLIBPATH) \
+$(YADEDYNLIBPATH)
+QMAKE_CXXFLAGS_RELEASE += -lpthread \
+-pthread
+QMAKE_CXXFLAGS_DEBUG += -lpthread \
+-pthread
+DEFINES = DEBUG
+DESTDIR = $(YADEBINPATH)
+CONFIG += debug \
+warn_on
+TEMPLATE = app
