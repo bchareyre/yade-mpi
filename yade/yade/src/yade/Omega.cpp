@@ -204,33 +204,37 @@ void Omega::registerDynlibType(const string& name)
 	}
 
 	if (dynamic_pointer_cast<FileGenerator>(f))
-		dynlibsType[name]="FileGenerator";
+		dynlibsType[name].baseClass = "FileGenerator";
 	else if (dynamic_pointer_cast<InteractionSolver>(f))
-		dynlibsType[name]="InteractionSolver";
+		dynlibsType[name].baseClass = "InteractionSolver";
 	else if (dynamic_pointer_cast<DeusExMachina>(f))
-		dynlibsType[name]="DeusExMachina";
+		dynlibsType[name].baseClass = "DeusExMachina";
 	else if (dynamic_pointer_cast<Body>(f))
-		dynlibsType[name]="Body";
+		dynlibsType[name].baseClass = "Body";
 	else if (dynamic_pointer_cast<IOManager>(f))
-		dynlibsType[name]="IOManager";
+		dynlibsType[name].baseClass = "IOManager";
 	else if (dynamic_pointer_cast<BroadInteractor>(f))
-		dynlibsType[name]="BroadInteractor";
+		dynlibsType[name].baseClass = "BroadInteractor";
 	else if (dynamic_pointer_cast<GeometricalModel>(f))
-		dynlibsType[name]="GeometricalModel";
+		dynlibsType[name].baseClass = "GeometricalModel";
 	else if (dynamic_pointer_cast<InteractingGeometry>(f))
-		dynlibsType[name]="InteractingGeometry";
+		dynlibsType[name].baseClass = "InteractingGeometry";
 	else if (dynamic_pointer_cast<BoundingVolume>(f))
-		dynlibsType[name]="BoundingVolume";
+		dynlibsType[name].baseClass = "BoundingVolume";
 	else if (dynamic_pointer_cast<InteractionGeometry>(f))
-		dynlibsType[name]="InteractionGeometry";
+		dynlibsType[name].baseClass = "InteractionGeometry";
 	else if (dynamic_pointer_cast<InteractionPhysics>(f))
-		dynlibsType[name]="InteractionPhysics";
+		dynlibsType[name].baseClass = "InteractionPhysics";
 	else if (dynamic_pointer_cast<MetaEngine>(f))
-		dynlibsType[name]="MetaEngine"; // FIXME : be calling getEngineUnitType possibility to classify all engine unit in the map
+		dynlibsType[name].baseClass = "MetaEngine"; // FIXME : be calling getEngineUnitType possibility to classify all engine unit in the map
 	else if (dynamic_pointer_cast<Engine>(f))
-		dynlibsType[name]="Engine";
+		dynlibsType[name].baseClass = "Engine";
 	else
-		dynlibsType[name]="Unknown";
+		dynlibsType[name].baseClass = "Unknown";
+
+	dynlibsType[name].isIndexable    = (dynamic_pointer_cast<Indexable>(f));
+	dynlibsType[name].isFactorable   = (dynamic_pointer_cast<Indexable>(f));
+	dynlibsType[name].isSerializable = (dynamic_pointer_cast<Indexable>(f));
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -284,10 +288,10 @@ bool Omega::getDynlibType(const string& libName, string& type)
 {
 	//LOCK(omegaMutex);
 		
-	map<string,string>::iterator it = dynlibsType.find(libName);
+	map<string,DynlibType>::iterator it = dynlibsType.find(libName);
 	if (it!=dynlibsType.end())
 	{
-		type = (*it).second;
+		type = (*it).second.baseClass;
 		return true;
 	}
 	else
@@ -296,7 +300,7 @@ bool Omega::getDynlibType(const string& libName, string& type)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-const map<string,string>& Omega::getDynlibsType()
+const map<string,DynlibType>& Omega::getDynlibsType()
 {
 	//LOCK(omegaMutex);
 		

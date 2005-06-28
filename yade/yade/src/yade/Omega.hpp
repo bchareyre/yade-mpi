@@ -60,6 +60,13 @@ using namespace std;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+struct DynlibType
+{
+	string baseClass;
+	bool isIndexable;
+	bool isFactorable;
+	bool isSerializable;
+};	
 
 class Omega : public Singleton<Omega>
 {
@@ -87,8 +94,8 @@ class Omega : public Singleton<Omega>
 	private	: shared_ptr<ThreadSynchronizer> synchronizer;
 	public  : shared_ptr<ThreadSynchronizer> getSynchronizer();
 
-	private : map<string,string> dynlibsType;
-	public  : const map<string,string>& getDynlibsType();	
+	private : map<string,DynlibType> dynlibsType; // FIXME : should store that into class factory ???
+	public  : const map<string,DynlibType>& getDynlibsType();	
 	public	: bool getDynlibType(const string& libName,string& type);
 	private	: void buildDynlibList();
 	private	: void registerDynlibType(const string& name);

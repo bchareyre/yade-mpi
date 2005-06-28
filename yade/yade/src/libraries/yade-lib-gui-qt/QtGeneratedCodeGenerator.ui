@@ -9,17 +9,17 @@
             <x>0</x>
             <y>0</y>
             <width>509</width>
-            <height>530</height>
+            <height>478</height>
         </rect>
     </property>
     <property name="caption">
         <string>Code Generator</string>
     </property>
-    <vbox>
+    <grid>
         <property name="name">
             <cstring>unnamed</cstring>
         </property>
-        <widget class="QToolBox">
+        <widget class="QToolBox" row="0" column="0">
             <property name="name">
                 <cstring>toolBox</cstring>
             </property>
@@ -36,13 +36,63 @@
                 <attribute name="label">
                     <string>New Data Class ...</string>
                 </attribute>
-                <vbox>
+                <grid>
                     <property name="name">
                         <cstring>unnamed</cstring>
                     </property>
-                    <widget class="QButtonGroup">
+                    <widget class="QGroupBox" row="0" column="0" rowspan="1" colspan="3">
+                        <property name="name">
+                            <cstring>gbYouData</cstring>
+                        </property>
+                        <property name="title">
+                            <string>Personnal Information</string>
+                        </property>
+                        <grid>
+                            <property name="name">
+                                <cstring>unnamed</cstring>
+                            </property>
+                            <widget class="QLineEdit" row="0" column="1">
+                                <property name="name">
+                                    <cstring>leDataYourName</cstring>
+                                </property>
+                            </widget>
+                            <widget class="QLineEdit" row="1" column="1">
+                                <property name="name">
+                                    <cstring>leDataYourEmail</cstring>
+                                </property>
+                                <property name="text">
+                                    <string></string>
+                                </property>
+                            </widget>
+                            <widget class="QLabel" row="0" column="0">
+                                <property name="name">
+                                    <cstring>tlDataYourName</cstring>
+                                </property>
+                                <property name="text">
+                                    <string>Name :</string>
+                                </property>
+                            </widget>
+                            <widget class="QLabel" row="1" column="0">
+                                <property name="name">
+                                    <cstring>tlDataYourEmail</cstring>
+                                </property>
+                                <property name="text">
+                                    <string>Email : </string>
+                                </property>
+                            </widget>
+                        </grid>
+                    </widget>
+                    <widget class="QButtonGroup" row="1" column="0" rowspan="1" colspan="3">
                         <property name="name">
                             <cstring>bgDataType</cstring>
+                        </property>
+                        <property name="sizePolicy">
+                            <sizepolicy>
+                                <hsizetype>5</hsizetype>
+                                <vsizetype>1</vsizetype>
+                                <horstretch>0</horstretch>
+                                <verstretch>0</verstretch>
+                            </sizepolicy>
                         </property>
                         <property name="maximumSize">
                             <size>
@@ -150,9 +200,17 @@
                             </widget>
                         </grid>
                     </widget>
-                    <widget class="QGroupBox">
+                    <widget class="QGroupBox" row="2" column="0" rowspan="1" colspan="3">
                         <property name="name">
                             <cstring>gbDataClass</cstring>
+                        </property>
+                        <property name="sizePolicy">
+                            <sizepolicy>
+                                <hsizetype>5</hsizetype>
+                                <vsizetype>1</vsizetype>
+                                <horstretch>0</horstretch>
+                                <verstretch>0</verstretch>
+                            </sizepolicy>
                         </property>
                         <property name="maximumSize">
                             <size>
@@ -198,7 +256,7 @@
                             </widget>
                             <widget class="QComboBox" row="1" column="1" rowspan="1" colspan="2">
                                 <property name="name">
-                                    <cstring>cbInheritsFrom</cstring>
+                                    <cstring>cbDataInheritsFrom</cstring>
                                 </property>
                             </widget>
                             <widget class="QLineEdit" row="0" column="1" rowspan="1" colspan="2">
@@ -219,9 +277,17 @@
                             </widget>
                         </grid>
                     </widget>
-                    <widget class="QGroupBox">
+                    <widget class="QGroupBox" row="3" column="0" rowspan="1" colspan="3">
                         <property name="name">
-                            <cstring>gbDataSerialization</cstring>
+                            <cstring>gbDataMethod</cstring>
+                        </property>
+                        <property name="sizePolicy">
+                            <sizepolicy>
+                                <hsizetype>5</hsizetype>
+                                <vsizetype>1</vsizetype>
+                                <horstretch>0</horstretch>
+                                <verstretch>0</verstretch>
+                            </sizepolicy>
                         </property>
                         <property name="maximumSize">
                             <size>
@@ -230,7 +296,7 @@
                             </size>
                         </property>
                         <property name="title">
-                            <string>Serialization Properties</string>
+                            <string>Method</string>
                         </property>
                         <vbox>
                             <property name="name">
@@ -238,7 +304,15 @@
                             </property>
                             <widget class="QCheckBox">
                                 <property name="name">
-                                    <cstring>cbGenerateDataRegisterAttributes</cstring>
+                                    <cstring>cbDataGenerateDestructor</cstring>
+                                </property>
+                                <property name="text">
+                                    <string>Generate destructor</string>
+                                </property>
+                            </widget>
+                            <widget class="QCheckBox">
+                                <property name="name">
+                                    <cstring>cbDataGenerateRegisterAttributes</cstring>
                                 </property>
                                 <property name="text">
                                     <string>Generate registerAttribute method</string>
@@ -246,7 +320,7 @@
                             </widget>
                             <widget class="QCheckBox">
                                 <property name="name">
-                                    <cstring>cbGenerateDataPostProcessAttributes</cstring>
+                                    <cstring>cbDataGeneratePostProcessAttributes</cstring>
                                 </property>
                                 <property name="text">
                                     <string>Generate postProcessAttributes method</string>
@@ -254,7 +328,7 @@
                             </widget>
                             <widget class="QCheckBox">
                                 <property name="name">
-                                    <cstring>cbGenerateDataPreProcessAttributes</cstring>
+                                    <cstring>cbDataGeneratePreProcessAttributes</cstring>
                                 </property>
                                 <property name="text">
                                     <string>Generate preProcessAttributes method</string>
@@ -262,7 +336,35 @@
                             </widget>
                         </vbox>
                     </widget>
-                    <widget class="QPushButton">
+                    <widget class="QPushButton" row="4" column="0">
+                        <property name="name">
+                            <cstring>pbSaveDataClass</cstring>
+                        </property>
+                        <property name="maximumSize">
+                            <size>
+                                <width>32767</width>
+                                <height>32767</height>
+                            </size>
+                        </property>
+                        <property name="text">
+                            <string>Save</string>
+                        </property>
+                    </widget>
+                    <widget class="QPushButton" row="4" column="1">
+                        <property name="name">
+                            <cstring>pbLoadDataClass</cstring>
+                        </property>
+                        <property name="maximumSize">
+                            <size>
+                                <width>32767</width>
+                                <height>32767</height>
+                            </size>
+                        </property>
+                        <property name="text">
+                            <string>Load</string>
+                        </property>
+                    </widget>
+                    <widget class="QPushButton" row="4" column="2">
                         <property name="name">
                             <cstring>pbGenerateDataClass</cstring>
                         </property>
@@ -276,7 +378,7 @@
                             <string>Generate</string>
                         </property>
                     </widget>
-                </vbox>
+                </grid>
             </widget>
             <widget class="QWidget">
                 <property name="name">
@@ -288,64 +390,16 @@
                 <attribute name="label">
                     <string>New Engine ...</string>
                 </attribute>
-                <vbox>
+                <grid>
                     <property name="name">
                         <cstring>unnamed</cstring>
                     </property>
-                    <widget class="QButtonGroup">
-                        <property name="name">
-                            <cstring>bgEngineType</cstring>
-                        </property>
-                        <property name="maximumSize">
-                            <size>
-                                <width>32767</width>
-                                <height>32767</height>
-                            </size>
-                        </property>
-                        <property name="title">
-                            <string>Engine Type</string>
-                        </property>
-                        <grid>
-                            <property name="name">
-                                <cstring>unnamed</cstring>
-                            </property>
-                            <widget class="QRadioButton" row="0" column="0">
-                                <property name="name">
-                                    <cstring>rbStantAloneEngine</cstring>
-                                </property>
-                                <property name="text">
-                                    <string>Stand Alone Engine</string>
-                                </property>
-                            </widget>
-                            <widget class="QRadioButton" row="0" column="1">
-                                <property name="name">
-                                    <cstring>rbMetaDispatchingEngine1D</cstring>
-                                </property>
-                                <property name="text">
-                                    <string>Meta Engine With 1D Dispatching</string>
-                                </property>
-                            </widget>
-                            <widget class="QRadioButton" row="1" column="0">
-                                <property name="name">
-                                    <cstring>rbEngineUnit</cstring>
-                                </property>
-                                <property name="text">
-                                    <string>Engine Unit</string>
-                                </property>
-                            </widget>
-                            <widget class="QRadioButton" row="1" column="1">
-                                <property name="name">
-                                    <cstring>rbMetaDispatchingEngine2D</cstring>
-                                </property>
-                                <property name="text">
-                                    <string>Meta Engine With 2D Dispatching</string>
-                                </property>
-                            </widget>
-                        </grid>
-                    </widget>
-                    <widget class="QGroupBox">
+                    <widget class="QGroupBox" row="2" column="0" rowspan="1" colspan="3">
                         <property name="name">
                             <cstring>gbMetaDispatchingEngineProperties</cstring>
+                        </property>
+                        <property name="enabled">
+                            <bool>false</bool>
                         </property>
                         <property name="maximumSize">
                             <size>
@@ -360,117 +414,109 @@
                             <property name="name">
                                 <cstring>unnamed</cstring>
                             </property>
-                            <widget class="QTable" row="5" column="0" rowspan="1" colspan="2">
-                                <column>
-                                    <property name="text">
-                                        <string>Engine Unit Parameters</string>
-                                    </property>
-                                </column>
+                            <widget class="QListBox" row="5" column="0" rowspan="2" colspan="1">
                                 <property name="name">
-                                    <cstring>tableMetaEngineParameters</cstring>
+                                    <cstring>lbMetaEngineParam</cstring>
                                 </property>
-                                <property name="maximumSize">
-                                    <size>
-                                        <width>32767</width>
-                                        <height>150</height>
-                                    </size>
+                                <property name="columnMode">
+                                    <enum>FixedNumber</enum>
                                 </property>
-                                <property name="lineWidth">
-                                    <number>2</number>
-                                </property>
-                                <property name="margin">
-                                    <number>0</number>
-                                </property>
-                                <property name="midLineWidth">
-                                    <number>0</number>
-                                </property>
-                                <property name="resizePolicy">
-                                    <enum>AutoOne</enum>
-                                </property>
-                                <property name="hScrollBarMode">
-                                    <enum>Auto</enum>
-                                </property>
-                                <property name="numRows">
-                                    <number>20</number>
-                                </property>
-                                <property name="numCols">
-                                    <number>1</number>
-                                </property>
-                                <property name="showGrid">
-                                    <bool>true</bool>
-                                </property>
-                                <property name="columnMovingEnabled">
-                                    <bool>false</bool>
-                                </property>
-                                <property name="focusStyle">
-                                    <enum>SpreadSheet</enum>
+                                <property name="rowMode">
+                                    <enum>Variable</enum>
                                 </property>
                             </widget>
-                            <widget class="QLineEdit" row="3" column="1">
+                            <widget class="QPushButton" row="5" column="2">
                                 <property name="name">
-                                    <cstring>leEngineUnitReturnType</cstring>
-                                </property>
-                            </widget>
-                            <widget class="QLabel" row="3" column="0">
-                                <property name="name">
-                                    <cstring>tlEngineUnitReturnType</cstring>
+                                    <cstring>pbAddMetaEngineParam</cstring>
                                 </property>
                                 <property name="text">
-                                    <string>Engine Unit Return Type : </string>
+                                    <string>Add</string>
                                 </property>
                             </widget>
-                            <widget class="QLineEdit" row="2" column="1">
+                            <widget class="QLineEdit" row="5" column="1">
                                 <property name="name">
-                                    <cstring>leEngineUnitName</cstring>
+                                    <cstring>leMetaEngineParam</cstring>
                                 </property>
                             </widget>
-                            <widget class="QLabel" row="2" column="0">
+                            <widget class="QLabel" row="4" column="0" rowspan="1" colspan="3">
                                 <property name="name">
-                                    <cstring>tlEngineUnitName</cstring>
+                                    <cstring>tlEngineUnitParameters_2</cstring>
                                 </property>
                                 <property name="text">
-                                    <string>Engine Unit Name : </string>
-                                </property>
-                            </widget>
-                            <widget class="QComboBox" row="1" column="1">
-                                <property name="name">
-                                    <cstring>cbBaseClass2</cstring>
-                                </property>
-                            </widget>
-                            <widget class="QLabel" row="1" column="0">
-                                <property name="name">
-                                    <cstring>tlBaseClass2</cstring>
-                                </property>
-                                <property name="text">
-                                    <string>Base Class 2 :</string>
-                                </property>
-                            </widget>
-                            <widget class="QComboBox" row="0" column="1">
-                                <property name="name">
-                                    <cstring>cbBaseClass1</cstring>
+                                    <string>Engine Unit Extra Parameters :</string>
                                 </property>
                             </widget>
                             <widget class="QLabel" row="0" column="0">
                                 <property name="name">
-                                    <cstring>tlBaseClass1</cstring>
+                                    <cstring>tlMetaEngineBaseClass1</cstring>
                                 </property>
                                 <property name="text">
                                     <string>Base Class 1 :</string>
                                 </property>
                             </widget>
-                            <widget class="QLabel" row="4" column="0" rowspan="1" colspan="2">
+                            <widget class="QLabel" row="1" column="0">
                                 <property name="name">
-                                    <cstring>tlEngineUnitParameters_2</cstring>
+                                    <cstring>tlMetaEngineBaseClass2</cstring>
                                 </property>
                                 <property name="text">
-                                    <string>Engine Unit Parameters :</string>
+                                    <string>Base Class 2 :</string>
+                                </property>
+                            </widget>
+                            <widget class="QLabel" row="2" column="0">
+                                <property name="name">
+                                    <cstring>tlMetaEngineEngineUnitName</cstring>
+                                </property>
+                                <property name="text">
+                                    <string>Engine Unit Name : </string>
+                                </property>
+                            </widget>
+                            <widget class="QLabel" row="3" column="0">
+                                <property name="name">
+                                    <cstring>tlMetaEngineEngineUnitReturnType</cstring>
+                                </property>
+                                <property name="text">
+                                    <string>Engine Unit Return Type : </string>
+                                </property>
+                            </widget>
+                            <widget class="QLineEdit" row="3" column="1" rowspan="1" colspan="2">
+                                <property name="name">
+                                    <cstring>leMetaEngineEngineUnitReturnType</cstring>
+                                </property>
+                                <property name="text">
+                                    <string>void</string>
+                                </property>
+                            </widget>
+                            <widget class="QLineEdit" row="2" column="1" rowspan="1" colspan="2">
+                                <property name="name">
+                                    <cstring>leMetaEngineEngineUnitName</cstring>
+                                </property>
+                            </widget>
+                            <widget class="QComboBox" row="1" column="1" rowspan="1" colspan="2">
+                                <property name="name">
+                                    <cstring>cbMetaEngineBaseClass2</cstring>
+                                </property>
+                            </widget>
+                            <widget class="QComboBox" row="0" column="1" rowspan="1" colspan="2">
+                                <property name="name">
+                                    <cstring>cbMetaEngineBaseClass1</cstring>
+                                </property>
+                            </widget>
+                            <widget class="QCheckBox" row="6" column="1" rowspan="1" colspan="2">
+                                <property name="name">
+                                    <cstring>cbMetaEngineAutoSymmetry</cstring>
+                                </property>
+                                <property name="text">
+                                    <string>Auto Symmetry</string>
                                 </property>
                             </widget>
                         </grid>
                     </widget>
-                    <widget class="QGroupBox">
+                    <widget class="QGroupBox" row="3" column="0" rowspan="1" colspan="3">
                         <property name="name">
                             <cstring>gbEngineUnitProperties</cstring>
+                        </property>
+                        <property name="enabled">
+                            <bool>false</bool>
                         </property>
                         <property name="title">
                             <string>Engine Unit Properties</string>
@@ -479,54 +525,6 @@
                             <property name="name">
                                 <cstring>unnamed</cstring>
                             </property>
-                            <widget class="QLabel" row="1" column="0" rowspan="1" colspan="2">
-                                <property name="name">
-                                    <cstring>tlEngineUnitParameters</cstring>
-                                </property>
-                                <property name="text">
-                                    <string>Engine Unit Parameters :</string>
-                                </property>
-                            </widget>
-                            <widget class="QTable" row="2" column="0" rowspan="1" colspan="2">
-                                <column>
-                                    <property name="text">
-                                        <string>Engine Unit Parameters</string>
-                                    </property>
-                                </column>
-                                <property name="name">
-                                    <cstring>tableEngineUnitParameters</cstring>
-                                </property>
-                                <property name="maximumSize">
-                                    <size>
-                                        <width>32000</width>
-                                        <height>150</height>
-                                    </size>
-                                </property>
-                                <property name="lineWidth">
-                                    <number>2</number>
-                                </property>
-                                <property name="margin">
-                                    <number>0</number>
-                                </property>
-                                <property name="midLineWidth">
-                                    <number>0</number>
-                                </property>
-                                <property name="hScrollBarMode">
-                                    <enum>Auto</enum>
-                                </property>
-                                <property name="numRows">
-                                    <number>20</number>
-                                </property>
-                                <property name="numCols">
-                                    <number>1</number>
-                                </property>
-                                <property name="showGrid">
-                                    <bool>true</bool>
-                                </property>
-                                <property name="columnMovingEnabled">
-                                    <bool>false</bool>
-                                </property>
-                            </widget>
                             <widget class="QLabel" row="0" column="0">
                                 <property name="name">
                                     <cstring>tlEngineUnitBaseClass</cstring>
@@ -535,14 +533,70 @@
                                     <string>Engine Unit Base Class:</string>
                                 </property>
                             </widget>
-                            <widget class="QLineEdit" row="0" column="1">
+                            <widget class="QListBox" row="3" column="0" rowspan="2" colspan="1">
+                                <property name="name">
+                                    <cstring>lbEngineUnitParam</cstring>
+                                </property>
+                                <property name="columnMode">
+                                    <enum>FixedNumber</enum>
+                                </property>
+                                <property name="rowMode">
+                                    <enum>Variable</enum>
+                                </property>
+                            </widget>
+                            <widget class="QPushButton" row="3" column="2">
+                                <property name="name">
+                                    <cstring>pbAddEngineUnitParam</cstring>
+                                </property>
+                                <property name="text">
+                                    <string>Add</string>
+                                </property>
+                            </widget>
+                            <widget class="QLabel" row="2" column="0" rowspan="1" colspan="3">
+                                <property name="name">
+                                    <cstring>tlEngineUnitParameters</cstring>
+                                </property>
+                                <property name="text">
+                                    <string>Engine Unit Extra Parameters :</string>
+                                </property>
+                            </widget>
+                            <widget class="QLineEdit" row="3" column="1">
+                                <property name="name">
+                                    <cstring>leEngineUnitParam</cstring>
+                                </property>
+                            </widget>
+                            <widget class="QLabel" row="1" column="0">
+                                <property name="name">
+                                    <cstring>tlEngineUnitReturnType</cstring>
+                                </property>
+                                <property name="text">
+                                    <string>Engine Unit Return Type : </string>
+                                </property>
+                            </widget>
+                            <widget class="QCheckBox" row="4" column="1" rowspan="1" colspan="2">
+                                <property name="name">
+                                    <cstring>cbMetaEngineAutoSymmetry_2</cstring>
+                                </property>
+                                <property name="text">
+                                    <string>Auto Symmetry</string>
+                                </property>
+                            </widget>
+                            <widget class="QLineEdit" row="1" column="1" rowspan="1" colspan="2">
+                                <property name="name">
+                                    <cstring>leEngineUnitReturnType</cstring>
+                                </property>
+                                <property name="text">
+                                    <string>void</string>
+                                </property>
+                            </widget>
+                            <widget class="QLineEdit" row="0" column="1" rowspan="1" colspan="2">
                                 <property name="name">
                                     <cstring>leEngineUnitBaseClass</cstring>
                                 </property>
                             </widget>
                         </grid>
                     </widget>
-                    <widget class="QGroupBox">
+                    <widget class="QGroupBox" row="4" column="0" rowspan="1" colspan="3">
                         <property name="name">
                             <cstring>gbEngineSerialization</cstring>
                         </property>
@@ -555,37 +609,88 @@
                         <property name="title">
                             <string>Serialization Properties</string>
                         </property>
-                        <vbox>
+                        <widget class="QCheckBox">
                             <property name="name">
-                                <cstring>unnamed</cstring>
+                                <cstring>cbEngineGenerateConstructor</cstring>
                             </property>
-                            <widget class="QCheckBox">
-                                <property name="name">
-                                    <cstring>cbGenerateEngineRegisterAttributes</cstring>
-                                </property>
-                                <property name="text">
-                                    <string>Generate registerAttribute method</string>
-                                </property>
-                            </widget>
-                            <widget class="QCheckBox">
-                                <property name="name">
-                                    <cstring>cbGenerateEnginePostProcessAttributes</cstring>
-                                </property>
-                                <property name="text">
-                                    <string>Generate postProcessAttributes method</string>
-                                </property>
-                            </widget>
-                            <widget class="QCheckBox">
-                                <property name="name">
-                                    <cstring>cbGenerateEnginePreProcessAttributes</cstring>
-                                </property>
-                                <property name="text">
-                                    <string>Generate preProcessAttributes method</string>
-                                </property>
-                            </widget>
-                        </vbox>
+                            <property name="geometry">
+                                <rect>
+                                    <x>11</x>
+                                    <y>31</y>
+                                    <width>437</width>
+                                    <height>30</height>
+                                </rect>
+                            </property>
+                            <property name="text">
+                                <string>Generate constructor</string>
+                            </property>
+                        </widget>
+                        <widget class="QCheckBox">
+                            <property name="name">
+                                <cstring>cbEngineGenerateDestructor</cstring>
+                            </property>
+                            <property name="geometry">
+                                <rect>
+                                    <x>11</x>
+                                    <y>67</y>
+                                    <width>437</width>
+                                    <height>30</height>
+                                </rect>
+                            </property>
+                            <property name="text">
+                                <string>Generate destructor</string>
+                            </property>
+                        </widget>
+                        <widget class="QCheckBox">
+                            <property name="name">
+                                <cstring>cbEngineGenerateRegisterAttributes</cstring>
+                            </property>
+                            <property name="geometry">
+                                <rect>
+                                    <x>11</x>
+                                    <y>103</y>
+                                    <width>437</width>
+                                    <height>30</height>
+                                </rect>
+                            </property>
+                            <property name="text">
+                                <string>Generate registerAttribute method</string>
+                            </property>
+                        </widget>
+                        <widget class="QCheckBox">
+                            <property name="name">
+                                <cstring>cbEngineGeneratePostProcessAttributes</cstring>
+                            </property>
+                            <property name="geometry">
+                                <rect>
+                                    <x>11</x>
+                                    <y>139</y>
+                                    <width>437</width>
+                                    <height>30</height>
+                                </rect>
+                            </property>
+                            <property name="text">
+                                <string>Generate postProcessAttributes method</string>
+                            </property>
+                        </widget>
+                        <widget class="QCheckBox">
+                            <property name="name">
+                                <cstring>cbEngineGeneratePreProcessAttributes</cstring>
+                            </property>
+                            <property name="geometry">
+                                <rect>
+                                    <x>11</x>
+                                    <y>175</y>
+                                    <width>437</width>
+                                    <height>30</height>
+                                </rect>
+                            </property>
+                            <property name="text">
+                                <string>Generate preProcessAttributes method</string>
+                            </property>
+                        </widget>
                     </widget>
-                    <widget class="QGroupBox">
+                    <widget class="QGroupBox" row="5" column="0" rowspan="1" colspan="3">
                         <property name="name">
                             <cstring>gbEngineClassParameters</cstring>
                         </property>
@@ -641,7 +746,7 @@
                             </widget>
                         </grid>
                     </widget>
-                    <widget class="QPushButton">
+                    <widget class="QPushButton" row="6" column="2">
                         <property name="name">
                             <cstring>pbGenerateEngineClass</cstring>
                         </property>
@@ -649,7 +754,125 @@
                             <string>Generate</string>
                         </property>
                     </widget>
-                </vbox>
+                    <widget class="QPushButton" row="6" column="0">
+                        <property name="name">
+                            <cstring>pbSaveEngineClass</cstring>
+                        </property>
+                        <property name="text">
+                            <string>Save</string>
+                        </property>
+                    </widget>
+                    <widget class="QPushButton" row="6" column="1">
+                        <property name="name">
+                            <cstring>pbLoadEngineClass</cstring>
+                        </property>
+                        <property name="text">
+                            <string>Load</string>
+                        </property>
+                    </widget>
+                    <widget class="QGroupBox" row="0" column="0" rowspan="1" colspan="3">
+                        <property name="name">
+                            <cstring>gbYouEngine</cstring>
+                        </property>
+                        <property name="title">
+                            <string>Personnal Information</string>
+                        </property>
+                        <grid>
+                            <property name="name">
+                                <cstring>unnamed</cstring>
+                            </property>
+                            <widget class="QLineEdit" row="0" column="1">
+                                <property name="name">
+                                    <cstring>leEngineYourName</cstring>
+                                </property>
+                            </widget>
+                            <widget class="QLineEdit" row="1" column="1">
+                                <property name="name">
+                                    <cstring>leEngineYourEmail</cstring>
+                                </property>
+                                <property name="text">
+                                    <string></string>
+                                </property>
+                            </widget>
+                            <widget class="QLabel" row="0" column="0">
+                                <property name="name">
+                                    <cstring>tlEngineYourName</cstring>
+                                </property>
+                                <property name="text">
+                                    <string>Name :</string>
+                                </property>
+                            </widget>
+                            <widget class="QLabel" row="1" column="0">
+                                <property name="name">
+                                    <cstring>tlEngineYourEmail</cstring>
+                                </property>
+                                <property name="text">
+                                    <string>Email : </string>
+                                </property>
+                            </widget>
+                        </grid>
+                    </widget>
+                    <widget class="QButtonGroup" row="1" column="0" rowspan="1" colspan="3">
+                        <property name="name">
+                            <cstring>bgEngineType</cstring>
+                        </property>
+                        <property name="maximumSize">
+                            <size>
+                                <width>32767</width>
+                                <height>32767</height>
+                            </size>
+                        </property>
+                        <property name="title">
+                            <string>Engine Type</string>
+                        </property>
+                        <grid>
+                            <property name="name">
+                                <cstring>unnamed</cstring>
+                            </property>
+                            <widget class="QRadioButton" row="0" column="0">
+                                <property name="name">
+                                    <cstring>rbStantAloneEngine</cstring>
+                                </property>
+                                <property name="text">
+                                    <string>Stand Alone Engine</string>
+                                </property>
+                                <property name="checked">
+                                    <bool>true</bool>
+                                </property>
+                            </widget>
+                            <widget class="QRadioButton" row="0" column="1">
+                                <property name="name">
+                                    <cstring>rbMetaDispatchingEngine1D</cstring>
+                                </property>
+                                <property name="text">
+                                    <string>Meta Engine With 1D Dispatching</string>
+                                </property>
+                                <property name="buttonGroupId">
+                                    <number>2</number>
+                                </property>
+                            </widget>
+                            <widget class="QRadioButton" row="1" column="0">
+                                <property name="name">
+                                    <cstring>rbEngineUnit</cstring>
+                                </property>
+                                <property name="text">
+                                    <string>Engine Unit</string>
+                                </property>
+                                <property name="buttonGroupId">
+                                    <number>1</number>
+                                </property>
+                            </widget>
+                            <widget class="QRadioButton" row="1" column="1">
+                                <property name="name">
+                                    <cstring>rbMetaDispatchingEngine2D</cstring>
+                                </property>
+                                <property name="text">
+                                    <string>Meta Engine With 2D Dispatching</string>
+                                </property>
+                            </widget>
+                        </grid>
+                    </widget>
+                </grid>
             </widget>
             <widget class="QWidget">
                 <property name="name">
@@ -663,7 +886,7 @@
                 </attribute>
             </widget>
         </widget>
-    </vbox>
+    </grid>
 </widget>
 <images>
     <image name="image0">
@@ -678,10 +901,34 @@
         <slot>bgDataTypeClicked(int)</slot>
     </connection>
     <connection>
+        <sender>bgEngineType</sender>
+        <signal>clicked(int)</signal>
+        <receiver>QtGeneratedCodeGenerator</receiver>
+        <slot>bgEngineTypeClicked(int)</slot>
+    </connection>
+    <connection>
+        <sender>pbAddEngineUnitParam</sender>
+        <signal>clicked()</signal>
+        <receiver>QtGeneratedCodeGenerator</receiver>
+        <slot>pbAddEngineUnitParamClicked()</slot>
+    </connection>
+    <connection>
+        <sender>pbAddMetaEngineParam</sender>
+        <signal>clicked()</signal>
+        <receiver>QtGeneratedCodeGenerator</receiver>
+        <slot>pbAddMetaEngineParamClicked()</slot>
+    </connection>
+    <connection>
         <sender>pbDataPath</sender>
         <signal>clicked()</signal>
         <receiver>QtGeneratedCodeGenerator</receiver>
         <slot>pbDataPathClicked()</slot>
+    </connection>
+    <connection>
+        <sender>pbEnginePath</sender>
+        <signal>clicked()</signal>
+        <receiver>QtGeneratedCodeGenerator</receiver>
+        <slot>pbEnginePathClicked()</slot>
     </connection>
     <connection>
         <sender>pbGenerateDataClass</sender>
@@ -689,11 +936,50 @@
         <receiver>QtGeneratedCodeGenerator</receiver>
         <slot>pbGenerateDataClassClicked()</slot>
     </connection>
+    <connection>
+        <sender>pbGenerateEngineClass</sender>
+        <signal>clicked()</signal>
+        <receiver>QtGeneratedCodeGenerator</receiver>
+        <slot>pbGenerateEngineClassClicked()</slot>
+    </connection>
+    <connection>
+        <sender>pbLoadEngineClass</sender>
+        <signal>clicked()</signal>
+        <receiver>QtGeneratedCodeGenerator</receiver>
+        <slot>pbLoadEngineClassClicked()</slot>
+    </connection>
+    <connection>
+        <sender>pbSaveEngineClass</sender>
+        <signal>clicked()</signal>
+        <receiver>QtGeneratedCodeGenerator</receiver>
+        <slot>pbSaveEngineClassClicked()</slot>
+    </connection>
+    <connection>
+        <sender>pbLoadDataClass</sender>
+        <signal>clicked()</signal>
+        <receiver>QtGeneratedCodeGenerator</receiver>
+        <slot>pbLoadDataClassClicked()</slot>
+    </connection>
+    <connection>
+        <sender>pbSaveDataClass</sender>
+        <signal>clicked()</signal>
+        <receiver>QtGeneratedCodeGenerator</receiver>
+        <slot>pbSaveDataClassClicked()</slot>
+    </connection>
 </connections>
 <slots>
     <slot>bgDataTypeClicked(int)</slot>
     <slot>pbDataPathClicked()</slot>
     <slot>pbGenerateDataClassClicked()</slot>
+    <slot>bgEngineTypeClicked(int)</slot>
+    <slot>pbEnginePathClicked()</slot>
+    <slot>pbGenerateEngineClassClicked()</slot>
+    <slot>pbAddEngineUnitParamClicked()</slot>
+    <slot>pbAddMetaEngineParamClicked()</slot>
+    <slot>pbLoadEngineClassClicked()</slot>
+    <slot>pbSaveEngineClassClicked()</slot>
+    <slot>pbLoadDataClassClicked()</slot>
+    <slot>pbSaveDataClassClicked()</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

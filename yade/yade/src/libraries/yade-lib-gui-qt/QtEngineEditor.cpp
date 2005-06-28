@@ -27,11 +27,11 @@
 
 QtEngineEditor::QtEngineEditor() : QtGeneratedEngineEditor()
 {
-	map<string,string>::const_iterator di    = Omega::instance().getDynlibsType().begin();
-	map<string,string>::const_iterator diEnd = Omega::instance().getDynlibsType().end();
+	map<string,DynlibType>::const_iterator di    = Omega::instance().getDynlibsType().begin();
+	map<string,DynlibType>::const_iterator diEnd = Omega::instance().getDynlibsType().end();
 	for(;di!=diEnd;++di)
 	{
-		if ((*di).second=="Engine")
+		if ((*di).second.baseClass=="Engine")
 			cbEnginesList->insertItem((*di).first);
 	}
 }

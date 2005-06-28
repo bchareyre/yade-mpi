@@ -47,13 +47,13 @@ QtFileGenerator::QtFileGenerator ( QWidget * parent , const char * name) : QtFil
 	setMinimumSize(s);
 	setMaximumSize(QSize(s.width(),32000));	
 	
-	map<string,string>::const_iterator di    = Omega::instance().getDynlibsType().begin();
-	map<string,string>::const_iterator diEnd = Omega::instance().getDynlibsType().end();
+	map<string,DynlibType>::const_iterator di    = Omega::instance().getDynlibsType().begin();
+	map<string,DynlibType>::const_iterator diEnd = Omega::instance().getDynlibsType().end();
 	for(;di!=diEnd;++di)
 	{
-		if ((*di).second=="IOManager")
+		if ((*di).second.baseClass=="IOManager")
 			cbSerializationName->insertItem((*di).first);
-		else if ((*di).second=="FileGenerator")
+		else if ((*di).second.baseClass=="FileGenerator")
 			cbGeneratorName->insertItem((*di).first);
 	}
 	leOutputFileName->setText("../data/scene.xml");
