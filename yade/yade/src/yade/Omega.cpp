@@ -62,20 +62,14 @@ Omega::Omega()
 	else
 	{
 		filesystem::create_directories(yadeConfigPath);
-		char * buffer ;
-		buffer = getenv ("YADEBINPATH"); // FIXME : to modify after splitting
-		string yadeBinPath = buffer;
-		preferences->dynlibsDirectories.push_back(yadeBinPath+"/dynlib/linux");
+		//char * buffer ;
+		//buffer = getenv ("YADEBINPATH"); // FIXME : to modify after splitting
+		//string yadeBinPath = buffer;
+		//preferences->dynlibDirectories.push_back(yadeBinPath+"/dynlib/linux");
 		IOManager::saveToFile("XMLManager",yadeConfigPath.string()+"/preferences.xml","preferences",preferences);
 	}
 
-	vector<string>::iterator dldi    = preferences->dynlibsDirectories.begin();
-	vector<string>::iterator dldiEnd = preferences->dynlibsDirectories.end();
-	for( ; dldi != dldiEnd ; ++dldi)
-		ClassFactory::instance().addBaseDirectory((*dldi));
-			
-	// build dynlib information list
-	buildDynlibList();
+	scanPlugins();
 
 }
 
@@ -233,8 +227,25 @@ void Omega::registerDynlibType(const string& name)
 		dynlibsType[name].baseClass = "Unknown";
 
 	dynlibsType[name].isIndexable    = (dynamic_pointer_cast<Indexable>(f));
-	dynlibsType[name].isFactorable   = (dynamic_pointer_cast<Indexable>(f));
-	dynlibsType[name].isSerializable = (dynamic_pointer_cast<Indexable>(f));
+	dynlibsType[name].isFactorable   = (dynamic_pointer_cast<Factorable>(f));
+	dynlibsType[name].isSerializable = (dynamic_pointer_cast<Serializable>(f));
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+void Omega::scanPlugins()
+{
+
+//	ClassFactory::instance().unloadAll();
+
+	vector<string>::iterator dldi    = preferences->dynlibDirectories.begin();
+	vector<string>::iterator dldiEnd = preferences->dynlibDirectories.end();
+	for( ; dldi != dldiEnd ; ++dldi)
+		ClassFactory::instance().addBaseDirectory((*dldi));
+			
+	// build dynlib information list
+	buildDynlibList();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -243,8 +254,8 @@ void Omega::registerDynlibType(const string& name)
 void Omega::buildDynlibList()
 {
 	//LOCK(omegaMutex);
-	vector<string>::iterator si = preferences->dynlibsDirectories.begin();
-	vector<string>::iterator siEnd = preferences->dynlibsDirectories.end();
+	vector<string>::iterator si = preferences->dynlibDirectories.begin();
+	vector<string>::iterator siEnd = preferences->dynlibDirectories.end();
 	for( ; si != siEnd ; ++si)
 	{
 //		char * buffer ;
@@ -253,7 +264,7 @@ void Omega::buildDynlibList()
 //		filesystem::path directory(yadeBinPath+"/dynlib/linux");
 
 		filesystem::path directory((*si));
-		
+// FIXME : #ifndef WIN32  !!!
 		if ( filesystem::exists( directory ) )
 		{
 			filesystem::directory_iterator di( directory );
@@ -272,6 +283,7 @@ void Omega::buildDynlibList()
 						length = name.leaf().size();
 					}
 					registerDynlibType(name.leaf().substr(3,name.leaf().size()-3));
+					//ClassFactory::instance().load(name.leaf().substr(3,name.leaf().size()-3));
 					//cout << name.leaf() << endl;
 				}
 			}

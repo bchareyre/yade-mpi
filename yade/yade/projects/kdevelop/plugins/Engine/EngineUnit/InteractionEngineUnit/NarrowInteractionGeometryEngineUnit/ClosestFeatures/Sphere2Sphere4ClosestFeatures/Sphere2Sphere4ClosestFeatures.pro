@@ -3,22 +3,22 @@
 # Subdir relative project main directory: ./plugins/Engine/EngineUnit/InteractionEngineUnit/NarrowInteractionGeometryEngineUnit/ClosestFeatures/Sphere2Sphere4ClosestFeatures
 # Target is a library:  
 
-LIBS += -lSphere \
-        -lClosestFeatures \
-        -lyade-lib-wm3-math \
+LIBS += -lyade-lib-wm3-math \
         -lyade-lib-multimethods \
         -lInteractingSphere \
         -lInteractionGeometryMetaEngine \
+        -lSphere \
+        -lClosestFeatures \
         -rdynamic 
 INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../../../../../plugins/Data/Body/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
-               ../../../../../../../plugins/Data/Interaction/NarrowInteractionGeometry/ClosestFeatures/$(YADEDYNLIBPATH) \
-               ../../../../../../../libraries/yade-lib-wm3-math/$(YADEDYNLIBPATH) \
-               ../../../../../../../libraries/yade-lib-multimethods/$(YADEDYNLIBPATH) \
+QMAKE_LIBDIR = ../../../../../../../libraries/yade-lib-wm3-math/$(YADEDYNLIBPATH)/yade-libs \
+               ../../../../../../../libraries/yade-lib-multimethods/$(YADEDYNLIBPATH)/yade-libs \
                ../../../../../../../plugins/Data/Body/InteractingGeometry/InteractingSphere/$(YADEDYNLIBPATH) \
+               ../../../../../../../plugins/Engine/MetaEngine/InteractionMetaEngine/NarrowInteractionGeometryMetaEngine/InteractionGeometryMetaEngine/$(YADEDYNLIBPATH) \
+               $(YADEDYNLIBPATH)/yade-libs \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

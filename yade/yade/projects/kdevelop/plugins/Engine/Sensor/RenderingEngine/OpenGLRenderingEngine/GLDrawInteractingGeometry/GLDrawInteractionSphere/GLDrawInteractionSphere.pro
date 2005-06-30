@@ -6,12 +6,13 @@
 LIBS += -lInteractingSphere \
         -lyade-lib-opengl \
         -rdynamic 
-INCLUDEPATH = $(YADEINCLUDEPATH) 
+INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 QMAKE_LIBDIR = ../../../../../../../plugins/Data/Body/InteractingGeometry/InteractingSphere/$(YADEDYNLIBPATH) \
-               ../../../../../../../libraries/yade-lib-opengl/$(YADEDYNLIBPATH) \
+               ../../../../../../../libraries/yade-lib-opengl/$(YADEDYNLIBPATH)/yade-libs \
+               $(YADEDYNLIBPATH)/yade-libs \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

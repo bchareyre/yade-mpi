@@ -3,15 +3,15 @@
 # Subdir relative project main directory: ./plugins/Engine/Sensor/RenderingEngine/OpenGLRenderingEngine/GLDrawGeometricalModel/GLDrawTetrahedron
 # Target is a library:  
 
-LIBS += -lTetrahedron \
-        -lyade-lib-opengl \
+LIBS += -lyade-lib-opengl \
+        -lTetrahedron \
         -rdynamic 
-INCLUDEPATH = $(YADEINCLUDEPATH) 
+INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../../../../../plugins/Data/Body/GeometricalModel/Tetrahedron/$(YADEDYNLIBPATH) \
-               ../../../../../../../libraries/yade-lib-opengl/$(YADEDYNLIBPATH) \
+QMAKE_LIBDIR = ../../../../../../../libraries/yade-lib-opengl/$(YADEDYNLIBPATH)/yade-libs \
+               $(YADEDYNLIBPATH)/yade-libs \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

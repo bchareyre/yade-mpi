@@ -5,16 +5,16 @@
 
 LIBS += -lboost_filesystem \
         -rdynamic 
-INCLUDEPATH = $(YADEINCLUDEPATH) 
+INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = $(YADEDYNLIBPATH) 
+QMAKE_LIBDIR = $(YADEDYNLIBPATH)/yade-libs 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 
 QMAKE_CXXFLAGS_DEBUG += -lpthread \
                         -pthread 
-DESTDIR = $(YADEDYNLIBPATH) 
+DESTDIR = $(YADEDYNLIBPATH)/yade-libs 
 CONFIG += debug \
           warn_on \
           dll 

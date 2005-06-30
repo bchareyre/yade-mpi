@@ -3,36 +3,19 @@
 # Subdir relative project main directory: ./preprocessors/FileGenerator/HangingCloth
 # Target is a library:  
 
-LIBS += -lMesh2D \
-        -lAABB \
-        -lSphere \
-        -lClosestFeatures \
-        -lPersistentSAPCollider \
-        -lSpringGeometry \
+LIBS += -lSpringGeometry \
         -lSpringPhysics \
         -lInteractingSphere \
-        -lParticleSetParameters \
-        -lBox \
         -lInteractingBox \
-        -lSDECLinkGeometry \
         -lSDECLinkPhysics \
-        -lSAPCollider \
-        -lRigidBodyParameters \
         -lCundallNonViscousMomentumDamping \
         -lCundallNonViscousForceDamping \
         -lMacroMicroElasticRelationships \
-        -lBodyMacroParameters \
-        -lInteractionDescriptionSet2AABB \
         -lyade-lib-serialization \
         -lyade-lib-wm3-math \
-        -lyade-lib-multimethods \
         -lInteractionVecSet \
         -lBodyRedirectionVector \
-        -lFrictionLessElasticContactLaw \
-        -lMassSpringLaw \
         -lPhysicalActionContainerInitializer \
-        -lMassSpringBody2RigidBodyLaw \
-        -lElasticContactLaw \
         -lPhysicalActionContainerReseter \
         -lGravityEngine \
         -lPhysicalActionVectorVector \
@@ -42,41 +25,41 @@ LIBS += -lMesh2D \
         -lPhysicalActionApplier \
         -lPhysicalParametersMetaEngine \
         -lBoundingVolumeMetaEngine \
+        -lMesh2D \
+        -lAABB \
+        -lSphere \
+        -lClosestFeatures \
+        -lPersistentSAPCollider \
+        -lParticleSetParameters \
+        -lBox \
+        -lSDECLinkGeometry \
+        -lSAPCollider \
+        -lRigidBodyParameters \
+        -lBodyMacroParameters \
+        -lInteractionDescriptionSet2AABB \
+        -lyade-lib-multimethods \
+        -lFrictionLessElasticContactLaw \
+        -lMassSpringLaw \
+        -lMassSpringBody2RigidBodyLaw \
+        -lElasticContactLaw \
         -rdynamic 
-INCLUDEPATH = $(YADEINCLUDEPATH) 
+INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../plugins/Data/Body/GeometricalModel/Mesh2D/$(YADEDYNLIBPATH) \
-               ../../../plugins/Data/Body/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
-               ../../../plugins/Data/Body/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
-               ../../../plugins/Data/Interaction/NarrowInteractionGeometry/ClosestFeatures/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/Engine/InteractionEngine/BroadInteractionEngine/PersistentSAPCollider/$(YADEDYNLIBPATH) \
-               ../../../plugins/Data/Interaction/NarrowInteractionGeometry/SpringGeometry/$(YADEDYNLIBPATH) \
+QMAKE_LIBDIR = ../../../plugins/Data/Interaction/NarrowInteractionGeometry/SpringGeometry/$(YADEDYNLIBPATH) \
                ../../../plugins/Data/Interaction/InteractionPhysics/SpringPhysics/$(YADEDYNLIBPATH) \
                ../../../plugins/Data/Body/InteractingGeometry/InteractingSphere/$(YADEDYNLIBPATH) \
-               ../../../plugins/Data/Body/PhysicalParameters/ParticleSetParameters/$(YADEDYNLIBPATH) \
-               ../../../plugins/Data/Body/GeometricalModel/Box/$(YADEDYNLIBPATH) \
                ../../../plugins/Data/Body/InteractingGeometry/InteractingBox/$(YADEDYNLIBPATH) \
-               ../../../plugins/Data/Interaction/NarrowInteractionGeometry/SDECLinkGeometry/$(YADEDYNLIBPATH) \
                ../../../plugins/Data/Interaction/InteractionPhysics/SDECLinkPhysics/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/Engine/InteractionEngine/BroadInteractionEngine/SAPCollider/$(YADEDYNLIBPATH) \
-               ../../../plugins/Data/Body/PhysicalParameters/RigidBodyParameters/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/EngineUnit/PhysicalActionEngineUnit/CundallNonViscousMomentumDamping/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/EngineUnit/PhysicalActionEngineUnit/CundallNonViscousForceDamping/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/EngineUnit/InteractionEngineUnit/InteractionPhysicsEngineUnit/ElasticContactParameters/MacroMicroElasticRelationships/$(YADEDYNLIBPATH) \
-               ../../../plugins/Data/Body/PhysicalParameters/BodyMacroParameters/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/EngineUnit/BodyEngineUnit/BoundingVolumeEngineUnit/InteractionDescriptionSet2AABB/$(YADEDYNLIBPATH) \
-               ../../../libraries/yade-lib-serialization/$(YADEDYNLIBPATH) \
-               ../../../libraries/yade-lib-wm3-math/$(YADEDYNLIBPATH) \
-               ../../../libraries/yade-lib-multimethods/$(YADEDYNLIBPATH) \
+               ../../../libraries/yade-lib-serialization/$(YADEDYNLIBPATH)/yade-libs \
+               ../../../libraries/yade-lib-wm3-math/$(YADEDYNLIBPATH)/yade-libs \
                ../../../plugins/Container/InteractionContainer/InteractionVecSet/$(YADEDYNLIBPATH) \
                ../../../plugins/Container/BodyContainer/BodyRedirectionVector/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/Engine/PhysicalActionEngine/InteractionSolver/FrictionLessElasticContactLaw/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/Engine/PhysicalActionEngine/InteractionSolver/MassSpringLaw/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/Engine/PhysicalActionEngine/PhysicalActionContainerInitializer/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/Engine/PhysicalActionEngine/InteractionSolver/MassSpringBody2RigidBodyLaw/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/Engine/PhysicalActionEngine/InteractionSolver/ElasticContactLaw/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/Engine/PhysicalActionEngine/PhysicalActionContainerReseter/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/DeusExMachina/GravityEngine/$(YADEDYNLIBPATH) \
                ../../../plugins/Container/PhysicalActionContainer/PhysicalActionVectorVector/$(YADEDYNLIBPATH) \
@@ -86,12 +69,7 @@ QMAKE_LIBDIR = ../../../plugins/Data/Body/GeometricalModel/Mesh2D/$(YADEDYNLIBPA
                ../../../plugins/Engine/MetaEngine/PhysicalActionMetaEngine/PhysicalActionApplier/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/MetaEngine/BodyMetaEngine/PhysicalParameterMetaEngine/PhysicalParametersMetaEngine/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/MetaEngine/BodyMetaEngine/BoundingVolumeMetaEngine/BoundingVolumeMetaEngine/$(YADEDYNLIBPATH) \
-               ../../../yade/Engine/$(YADEDYNLIBPATH) \
-               ../../../yade/Interaction/Interaction/$(YADEDYNLIBPATH) \
-               ../../../yade/Body/Body/$(YADEDYNLIBPATH) \
-               ../../../toolboxes/Libraries/yade-lib-serialization/$(YADEDYNLIBPATH) \
-               ../../../toolboxes/Libraries/yade-lib-wm3-math/$(YADEDYNLIBPATH) \
-               ../../../toolboxes/Libraries/yade-lib-multimethods/$(YADEDYNLIBPATH) \
+               $(YADEDYNLIBPATH)/yade-libs \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

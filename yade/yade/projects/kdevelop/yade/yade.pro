@@ -18,13 +18,7 @@ INCLUDEPATH += $(YADEINCLUDEPATH)
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../libraries/yade-lib-threads/$(YADEDYNLIBPATH) \
-               ../libraries/yade-lib-serialization/$(YADEDYNLIBPATH) \
-               ../libraries/yade-lib-factory/$(YADEDYNLIBPATH) \
-               ../libraries/yade-lib-wm3-math/$(YADEDYNLIBPATH) \
-               ../libraries/yade-lib-loki/$(YADEDYNLIBPATH) \
-               ../libraries/yade-lib-multimethods/$(YADEDYNLIBPATH) \
-               $(YADEDYNLIBPATH) 
+QMAKE_LIBDIR = $(YADEDYNLIBPATH)/yade-libs 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 
 QMAKE_CXXFLAGS_DEBUG += -lpthread \

@@ -5,13 +5,12 @@
 
 LIBS += -lyade-lib-time \
         -lglut 
-INCLUDEPATH = $(YADEINCLUDEPATH) 
+INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../libraries/yade-lib-time/$(YADEDYNLIBPATH) \
-               $(YADEDYNLIBPATH) 
-DESTDIR = $(YADEDYNLIBPATH) 
+QMAKE_LIBDIR = $(YADEDYNLIBPATH)/yade-libs 
+DESTDIR = $(YADEDYNLIBPATH)/yade-libs 
 CONFIG += debug \
           warn_on \
           dll 

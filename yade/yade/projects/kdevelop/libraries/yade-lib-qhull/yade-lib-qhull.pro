@@ -3,6 +3,15 @@
 # Subdir relative project main directory: ./libraries/yade-lib-qhull
 # Target is a library:  
 
+MOC_DIR = $(YADECOMPILATIONPATH) 
+UI_DIR = $(YADECOMPILATIONPATH) 
+OBJECTS_DIR = $(YADECOMPILATIONPATH) 
+QMAKE_LIBDIR = $(YADEDYNLIBPATH)/yade-libs 
+DESTDIR = $(YADEDYNLIBPATH)/yade-libs 
+CONFIG += debug \
+          warn_on \
+          dll 
+TEMPLATE = lib 
 HEADERS += geom.h \
            io.h \
            mem.h \
@@ -26,11 +35,3 @@ SOURCES += geom2.c \
            unix.c \
            user.c \
            qhull.c 
-MOC_DIR = $(YADECOMPILATIONPATH)
-UI_DIR = $(YADECOMPILATIONPATH)
-OBJECTS_DIR = $(YADECOMPILATIONPATH)
-DESTDIR = $(YADEDYNLIBPATH)
-CONFIG += debug \
-warn_on \
-dll
-TEMPLATE = lib

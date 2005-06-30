@@ -3,19 +3,17 @@
 # Subdir relative project main directory: ./plugins/Engine/Engine/PhysicalActionEngine/InteractionSolver/LatticeLaw
 # Target is a library:  
 
-LIBS += -lParticleParameters \
+LIBS += -lForce \
+        -lParticleParameters \
         -lLatticeBeamParameters \
         -lLatticeNodeParameters \
-        -lForce \
         -rdynamic 
 INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../../../../plugins/Data/Body/PhysicalParameters/ParticleParameters/$(YADEDYNLIBPATH) \
-               ../../../../../../plugins/Data/Body/PhysicalParameters/LatticeBeamParameters/$(YADEDYNLIBPATH) \
-               ../../../../../../plugins/Data/Body/PhysicalParameters/LatticeNodeParameters/$(YADEDYNLIBPATH) \
-               ../../../../../../plugins/Data/PhysicalAction/Force/$(YADEDYNLIBPATH) \
+QMAKE_LIBDIR = ../../../../../../plugins/Data/PhysicalAction/Force/$(YADEDYNLIBPATH) \
+               $(YADEDYNLIBPATH)/yade-libs \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

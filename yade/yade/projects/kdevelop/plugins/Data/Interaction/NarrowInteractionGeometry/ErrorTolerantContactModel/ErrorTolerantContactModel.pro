@@ -7,13 +7,14 @@ LIBS += -lyade-lib-wm3-math \
         -lyade-lib-serialization \
         -lyade-lib-factory \
         -rdynamic 
-INCLUDEPATH = $(YADEINCLUDEPATH) 
+INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../../../libraries/yade-lib-wm3-math/$(YADEDYNLIBPATH) \
-               ../../../../../libraries/yade-lib-serialization/$(YADEDYNLIBPATH) \
-               ../../../../../libraries/yade-lib-factory/$(YADEDYNLIBPATH) \
+QMAKE_LIBDIR = ../../../../../libraries/yade-lib-wm3-math/$(YADEDYNLIBPATH)/yade-libs \
+               ../../../../../libraries/yade-lib-serialization/$(YADEDYNLIBPATH)/yade-libs \
+               ../../../../../libraries/yade-lib-factory/$(YADEDYNLIBPATH)/yade-libs \
+               $(YADEDYNLIBPATH)/yade-libs \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

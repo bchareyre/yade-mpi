@@ -4,40 +4,30 @@
 # Target is a library:  
 
 LIBS += -lyade-lib-serialization \
-        -lSphere \
         -lyade-lib-wm3-math \
         -lyade-lib-multimethods \
-        -lSDECLinkGeometry \
         -lSDECLinkPhysics \
-        -lRigidBodyParameters \
         -lElasticContactParameters \
-        -lMacroMicroContactGeometry \
-        -lBodyMacroParameters \
         -lForce \
         -lMomentum \
+        -lSphere \
+        -lSDECLinkGeometry \
+        -lRigidBodyParameters \
+        -lMacroMicroContactGeometry \
+        -lBodyMacroParameters \
         -rdynamic 
-INCLUDEPATH = $(YADEINCLUDEPATH) 
+INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../../../../libraries/yade-lib-serialization/$(YADEDYNLIBPATH) \
-               ../../../../../../plugins/Data/Body/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
-               ../../../../../../libraries/yade-lib-wm3-math/$(YADEDYNLIBPATH) \
-               ../../../../../../libraries/yade-lib-multimethods/$(YADEDYNLIBPATH) \
-               ../../../../../../plugins/Data/Interaction/NarrowInteractionGeometry/SDECLinkGeometry/$(YADEDYNLIBPATH) \
+QMAKE_LIBDIR = ../../../../../../libraries/yade-lib-serialization/$(YADEDYNLIBPATH)/yade-libs \
+               ../../../../../../libraries/yade-lib-wm3-math/$(YADEDYNLIBPATH)/yade-libs \
+               ../../../../../../libraries/yade-lib-multimethods/$(YADEDYNLIBPATH)/yade-libs \
                ../../../../../../plugins/Data/Interaction/InteractionPhysics/SDECLinkPhysics/$(YADEDYNLIBPATH) \
-               ../../../../../../plugins/Data/Body/PhysicalParameters/RigidBodyParameters/$(YADEDYNLIBPATH) \
                ../../../../../../plugins/Data/Interaction/InteractionPhysics/ElasticContactParameters/$(YADEDYNLIBPATH) \
-               ../../../../../../plugins/Data/Interaction/NarrowInteractionGeometry/MacroMicroContactGeometry/$(YADEDYNLIBPATH) \
-               ../../../../../../plugins/Data/Body/PhysicalParameters/BodyMacroParameters/$(YADEDYNLIBPATH) \
                ../../../../../../plugins/Data/PhysicalAction/Force/$(YADEDYNLIBPATH) \
                ../../../../../../plugins/Data/PhysicalAction/Momentum/$(YADEDYNLIBPATH) \
-               ../../../../../../yade/Engine/$(YADEDYNLIBPATH) \
-               ../../../../../../yade/Body/Body/$(YADEDYNLIBPATH) \
-               ../../../../../../toolboxes/Libraries/yade-lib-serialization/$(YADEDYNLIBPATH) \
-               ../../../../../../toolboxes/Libraries/yade-lib-wm3-math/$(YADEDYNLIBPATH) \
-               ../../../../../../yade/Interaction/Interaction/$(YADEDYNLIBPATH) \
-               ../../../../../../toolboxes/Libraries/yade-lib-multimethods/$(YADEDYNLIBPATH) \
+               $(YADEDYNLIBPATH)/yade-libs \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

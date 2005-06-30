@@ -3,48 +3,41 @@
 # Subdir relative project main directory: ./preprocessors/FileGenerator/LatticeExample
 # Target is a library:  
 
-LIBS += -lParticleParameters \
-        -lAABB \
-        -lSphere \
-        -lLineSegment \
-        -lLatticeSetParameters \
-        -lLatticeBeamParameters \
-        -lLatticeNodeParameters \
-        -lMetaInteractingGeometry \
+LIBS += -lMetaInteractingGeometry \
         -lPhysicalActionVectorVector \
         -lInteractionVecSet \
         -lBodyRedirectionVector \
         -lGeometricalModelMetaEngine \
         -lInteractionPhysicsMetaEngine \
         -lBoundingVolumeMetaEngine \
-        -lTranslationEngine \
         -lPhysicalActionApplier \
         -lPhysicalParametersMetaEngine \
-        -lLatticeLaw \
         -lPhysicalActionContainerInitializer \
+        -lParticleParameters \
+        -lAABB \
+        -lSphere \
+        -lLineSegment \
+        -lLatticeSetParameters \
+        -lLatticeBeamParameters \
+        -lLatticeNodeParameters \
+        -lTranslationEngine \
+        -lLatticeLaw \
         -rdynamic 
 INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../plugins/Data/Body/PhysicalParameters/ParticleParameters/$(YADEDYNLIBPATH) \
-               ../../../plugins/Data/Body/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
-               ../../../plugins/Data/Body/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
-               ../../../plugins/Data/Body/GeometricalModel/LineSegment/$(YADEDYNLIBPATH) \
-               ../../../plugins/Data/Body/PhysicalParameters/LatticeSetParameters/$(YADEDYNLIBPATH) \
-               ../../../plugins/Data/Body/PhysicalParameters/LatticeBeamParameters/$(YADEDYNLIBPATH) \
-               ../../../plugins/Data/Body/PhysicalParameters/LatticeNodeParameters/$(YADEDYNLIBPATH) \
-               ../../../plugins/Data/Body/InteractingGeometry/MetaInteractingGeometry/$(YADEDYNLIBPATH) \
+QMAKE_LIBDIR = ../../../plugins/Data/Body/InteractingGeometry/MetaInteractingGeometry/$(YADEDYNLIBPATH) \
                ../../../plugins/Container/PhysicalActionContainer/PhysicalActionVectorVector/$(YADEDYNLIBPATH) \
                ../../../plugins/Container/InteractionContainer/InteractionVecSet/$(YADEDYNLIBPATH) \
                ../../../plugins/Container/BodyContainer/BodyRedirectionVector/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/MetaEngine/BodyMetaEngine/GeometricalModelMetaEngine/GeometricalModelMetaEngine/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/MetaEngine/InteractionMetaEngine/InteractionPhysicsMetaEngine/InteractionPhysicsMetaEngine/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/MetaEngine/BodyMetaEngine/BoundingVolumeMetaEngine/BoundingVolumeMetaEngine/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/DeusExMachina/TranslationEngine/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/MetaEngine/PhysicalActionMetaEngine/PhysicalActionApplier/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/MetaEngine/BodyMetaEngine/PhysicalParameterMetaEngine/PhysicalParametersMetaEngine/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/Engine/PhysicalActionEngine/InteractionSolver/LatticeLaw/$(YADEDYNLIBPATH) \
+               ../../../plugins/Engine/Engine/PhysicalActionEngine/PhysicalActionContainerInitializer/$(YADEDYNLIBPATH) \
+               $(YADEDYNLIBPATH)/yade-libs \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

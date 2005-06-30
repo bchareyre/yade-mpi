@@ -21,127 +21,78 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#ifndef __OMEGA_H__
-#define __OMEGA_H__
+#ifndef __QTPREFERENCESEDITOR_HPP__
+#define __QTPREFERENCESEDITOR_HPP__
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <boost/date_time/posix_time/posix_time.hpp>
-#include <fstream>
-#include <time.h>
-#include <boost/thread/thread.hpp>
-#include <iostream>
-#include <boost/shared_ptr.hpp>
+#include <QtGeneratedPreferencesEditor.h>
+#include <yade-lib-factory/Factorable.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <yade-lib-wm3-math/Vector3.hpp>
-#include <yade-lib-loki/Singleton.hpp>
-#include <yade-lib-factory/ClassFactory.hpp>
+/*! \brief 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-class MetaBody;
-class SimulationLoop;
-class FrontEnd;
-class ThreadSynchronizer;
-class Preferences;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-using namespace boost;
-using namespace boost::posix_time;
-using namespace std;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-struct DynlibType
-{
-	string baseClass;
-	bool isIndexable;
-	bool isFactorable;
-	bool isSerializable;
-};	
-
-class Omega : public Singleton<Omega>
+	
+*/
+class QtPreferencesEditor : public QtGeneratedPreferencesEditor, public Factorable
 {
 
-	public	: shared_ptr<Preferences> preferences;
-	
-	private	: shared_ptr<ofstream> logFile;
-	public	: void logMessage(const string& str);
-	public	: void logError(const string& str);
-		
-	private	: boost::mutex omegaMutex;
-	//public	: boost::mutex& getOmegaMutex();
+///////////////////////////////////////////////////////////////////////////////////////////////////
+/// Attributes											///
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private	: boost::mutex rootBodyMutex;
-	public	: boost::mutex& getRootBodyMutex();
-	
-	private	: shared_ptr<SimulationLoop> simulationLoop;
-	public	: void createSimulationLoop();
-	public	: void startSimulationLoop();
-	public	: void stopSimulationLoop();
-	public	: void finishSimulationLoop();
-	public  : void joinSimulationLoop();
-	public  : void doOneSimulationLoop();
-	
-	private	: shared_ptr<ThreadSynchronizer> synchronizer;
-	public  : shared_ptr<ThreadSynchronizer> getSynchronizer();
 
-	private : map<string,DynlibType> dynlibsType; // FIXME : should store that into class factory ???
-	public  : const map<string,DynlibType>& getDynlibsType();	
-	public	: bool getDynlibType(const string& libName,string& type);
-	private	: void buildDynlibList();
-	private	: void registerDynlibType(const string& name);
-	public  : void scanPlugins();
+///////////////////////////////////////////////////////////////////////////////////////////////////
+/// Constructor/Destructor									///
+///////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	/*! Constructor */
+	public : QtPreferencesEditor (QWidget * parent = 0, const char * name = 0 );
 
-	private	: Real dt; // FIXME - maybe ???????? move this to MetaBody.hpp OR MAYBE NOT ??
-	public	: void setTimeStep(const Real);
-	public	: Real getTimeStep();
-	
-	private	: shared_ptr<MetaBody> rootBody;
-	public	: const shared_ptr<MetaBody>& getRootBody();
-	public  : void freeRootBody();
-	
-	private	: ptime	sStartingSimulationTime;
-	private	: ptime msStartingSimulationTime;
-	private	: ptime msStartingPauseTime;
-	private : time_duration simulationPauseDuration;
-	public  : ptime getMsStartingSimulationTime();
-	public  : time_duration getSimulationPauseDuration();
-	
-	private	: string simulationFileName;
-	public	: void setSimulationFileName(const string);
-	public	: string getSimulationFileName();
-	public	: void loadSimulation();
+	/*! Destructor */
+	public : virtual ~QtPreferencesEditor ();
 
-	private : long int currentIteration;
-	public  : long int getCurrentIteration();
-	public  : void incrementCurrentIteration();
+///////////////////////////////////////////////////////////////////////////////////////////////////
+/// Methods											///
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+	private : bool testDirectory(const string& dirName);
+	private : void savePreferences();
+	private : void loadPreferences();
+	private : void scanPlugins();
+
+	protected : void closeEvent(QCloseEvent *evt);
+
+	public slots : virtual void lbPreferencesListHighlighted(int i);
 	
-	private : Real simulationTime;
-	public	: Real getSimulationTime() { return simulationTime;};
-	public	: void incrementSimulationTime() { simulationTime+=dt;};
-	
-	private	: Omega();
-	private	: ~Omega();
-	private	: Omega(const Omega&);
-	private	: Omega& operator=(const Omega&);
-	
-	FRIEND_SINGLETON(Omega);
+ 	public slots : virtual void pbAddIncludeFolderClicked();
+	public slots : virtual void pbDeleteIncludeFolderClicked();
+	public slots : virtual void pbIncludePathClicked();
+	public slots : virtual void lvIncludeFoldersSelectionChanged(QListViewItem* lvi);
+	public slots : virtual void leIncludeFolderReturnPressed();
+
+ 	public slots : virtual void pbAddPluginFolderClicked();
+	public slots : virtual void pbDeletePluginFolderClicked();
+	public slots : virtual void pbPluginPathClicked();
+	public slots : virtual void lvPluginFoldersSelectionChanged(QListViewItem* lvi);
+	public slots : virtual void lePluginFolderReturnPressed();
+
+	public slots : virtual void pbRescanPluginsClicked();
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-#endif // __OMEGA_H__
+REGISTER_FACTORABLE(QtPreferencesEditor);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+
+#endif // __QTPREFERENCESEDITOR_HPP__
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+

@@ -24,22 +24,14 @@ INCLUDEPATH += $(YADEINCLUDEPATH)
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../libraries/yade-lib-wm3-math/$(YADEDYNLIBPATH) \
-               ../../libraries/yade-lib-multimethods/$(YADEDYNLIBPATH) \
-               ../../libraries/yade-lib-factory/$(YADEDYNLIBPATH) \
-               ../../libraries/yade-lib-opengl/$(YADEDYNLIBPATH) \
-               ../../libraries/yade-lib-threads/$(YADEDYNLIBPATH) \
-               ../../libraries/yade-lib-serialization-xml/$(YADEDYNLIBPATH) \
-               ../../libraries/yade-lib-serialization/$(YADEDYNLIBPATH) \
-               ../../libraries/yade-lib-serialization-qt/$(YADEDYNLIBPATH) \
-               ../../libraries/yade-lib-computational-geometry/$(YADEDYNLIBPATH) \
+QMAKE_LIBDIR = $(YADEDYNLIBPATH)/yade-libs \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 
 QMAKE_CXXFLAGS_DEBUG += -lpthread \
                         -pthread 
 TARGET = QtGUI 
-DESTDIR = $(YADEDYNLIBPATH) 
+DESTDIR = $(YADEDYNLIBPATH)/yade-libs 
 CONFIG += debug \
           warn_on \
           qt \
@@ -50,7 +42,8 @@ FORMS += YadeQtGeneratedMainWindow.ui \
          QtGeneratedSimulationController.ui \
          QtGeneratedMessageDialog.ui \
          QtGeneratedEngineEditor.ui \
-         QtGeneratedCodeGenerator.ui 
+         QtGeneratedCodeGenerator.ui \
+         QtGeneratedPreferencesEditor.ui 
 HEADERS += QtGUI.hpp \
            GLViewer.hpp \
            YadeQtMainWindow.hpp \
@@ -62,7 +55,8 @@ HEADERS += QtGUI.hpp \
            FileDialog.hpp \
            QtEngineEditor.hpp \
            GLEngineEditor.hpp \
-           QtCodeGenerator.hpp 
+           QtCodeGenerator.hpp \
+           QtPreferencesEditor.hpp 
 SOURCES += QtGUI.cpp \
            GLViewer.cpp \
            YadeQtMainWindow.cpp \
@@ -74,4 +68,5 @@ SOURCES += QtGUI.cpp \
            FileDialog.cpp \
            QtEngineEditor.cpp \
            GLEngineEditor.cpp \
-           QtCodeGenerator.cpp 
+           QtCodeGenerator.cpp \
+           QtPreferencesEditor.cpp 

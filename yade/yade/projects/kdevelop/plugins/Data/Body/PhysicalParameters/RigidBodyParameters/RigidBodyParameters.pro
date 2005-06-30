@@ -8,33 +8,15 @@ LIBS += -lyade-lib-serialization \
         -lyade-lib-multimethods \
         -lParticleParameters \
         -rdynamic 
-INCLUDEPATH = $(YADEINCLUDEPATH) 
+INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../../../libraries/yade-lib-serialization/$(YADEDYNLIBPATH) \
-               ../../../../../libraries/yade-lib-wm3-math/$(YADEDYNLIBPATH) \
-               ../../../../../libraries/yade-lib-multimethods/$(YADEDYNLIBPATH) \
+QMAKE_LIBDIR = ../../../../../libraries/yade-lib-serialization/$(YADEDYNLIBPATH)/yade-libs \
+               ../../../../../libraries/yade-lib-wm3-math/$(YADEDYNLIBPATH)/yade-libs \
+               ../../../../../libraries/yade-lib-multimethods/$(YADEDYNLIBPATH)/yade-libs \
                ../../../../../plugins/Data/Body/PhysicalParameters/ParticleParameters/$(YADEDYNLIBPATH) \
-               ../../../../../yade/Body/Body/$(YADEDYNLIBPATH) \
-               ../../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
-               ../../../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
-               ../../../../yade/Body/Body/$(YADEDYNLIBPATH) \
-               ../../../../yade/Interaction/Interaction/$(YADEDYNLIBPATH) \
-               ../../../../toolboxes/Libraries/MultiMethods/$(YADEDYNLIBPATH) \
-               ../../../../plugins/Body/PhysicalParameters/ParticleParameters/$(YADEDYNLIBPATH) \
-               ../../../../yade/Engine/$(YADEDYNLIBPATH) \
-               ../../../../yade/Body/$(YADEDYNLIBPATH) \
-               ../../../../yade/Geometry/$(YADEDYNLIBPATH) \
-               ../../../../yade/Interaction/$(YADEDYNLIBPATH) \
-               ../../../../plugins/Body/PhysicalParameters/Particle/$(YADEDYNLIBPATH) \
-               ../../../toolboxes/Libraries/Serialization/$(YADEDYNLIBPATH) \
-               ../../../toolboxes/Libraries/Math/$(YADEDYNLIBPATH) \
-               ../../../yade/Body/$(YADEDYNLIBPATH) \
-               ../../../yade/Engine/$(YADEDYNLIBPATH) \
-               ../../../yade/Geometry/$(YADEDYNLIBPATH) \
-               ../../../yade/Interaction/$(YADEDYNLIBPATH) \
-               ../../../toolboxes/Libraries/MultiMethods/$(YADEDYNLIBPATH) \
+               $(YADEDYNLIBPATH)/yade-libs \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

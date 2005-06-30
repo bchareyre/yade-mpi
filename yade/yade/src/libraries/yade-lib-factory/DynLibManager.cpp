@@ -115,16 +115,29 @@ void DynLibManager::addBaseDirectory(const string& dir)
 
 bool DynLibManager::load (const string libName )
 {
-	
+cerr << "###################" << endl;
+cerr << "Wants to load : " <<libName << endl;
+
 	if (libName.empty())
 		return false;
 
-	string baseDir="";
+	string libFileName;
+	#ifdef WIN32
+		libFileName.append(libName);
+		libFileName.append(".dll");
+	#else
+		libFileName.append("lib");
+		libFileName.append(libName);
+		libFileName.append(".so");
+	#endif 
+
+	string baseDir;
+	baseDir.clear();
 	vector<string>::iterator bdi    = baseDirs.begin();
 	vector<string>::iterator bdiEnd = baseDirs.end();
 	for( ; bdi != bdiEnd ; ++bdi)
 	{
-		filesystem::path name = filesystem::path((*bdi)+"/"+libName);
+		filesystem::path name = filesystem::path((*bdi)+"/"+libFileName);
 		if ( filesystem::exists( name ) )
 		{
 			baseDir = (*bdi);
@@ -132,20 +145,24 @@ bool DynLibManager::load (const string libName )
 		}
 	}
 
+cerr << "Directory found: " << baseDir << endl;
+
 	if (autoUnload && isLoaded(libName))
 		closeLib(libName);
 		
-	string file = baseDir;
+	string fullLibName;
+	if (baseDir.length()==0)
+		fullLibName = libFileName;
+	else
+		fullLibName = baseDir+"/"+libFileName;
 		
 	#ifdef WIN32
-		file.append(libName);
-		file.append(".dll");
 
-		unsigned short * file2 = new unsigned short[file.length()+1];
+		unsigned short * file2 = new unsigned short[fullLibName.length()+1];
 		int i=0;
-		while (file[i]!='\0')
+		while (fullLibName[i]!='\0')
 		{
-			file2[i] = file[i];
+			file2[i] = fullLibName[i];
 			i++;
 		}
 		file2[i] = '\0';
@@ -160,19 +177,18 @@ bool DynLibManager::load (const string libName )
 			return true;
 		}
 	#else
+cerr << "File to load : " << fullLibName << endl;
 
-		file.append("lib");
-		file.append(libName);
-		file.append(".so");
-
-		void * handle = dlopen(file.data(), RTLD_NOW);
+		void * handle = dlopen(fullLibName.data(), RTLD_NOW);
 
 		if (!handle)
 		{
+cerr << "File not loaded " << endl;
 			return !error();
 		}
 		else
 		{
+cerr << "File loaded successfully" << endl;
 			handles[libName] = handle;
 			return true;
 		}

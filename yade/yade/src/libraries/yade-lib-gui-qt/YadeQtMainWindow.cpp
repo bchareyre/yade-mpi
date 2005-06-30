@@ -23,14 +23,15 @@ YadeQtMainWindow::YadeQtMainWindow() : YadeQtGeneratedMainWindow()
 
 	resize(1024,768);
 
+	addMenu("Edit");
 	addMenu("Preprocessor");
 	addMenu("Postprocessor");
-	
-	
-	addItem("Preprocessor","QtFileGenerator");
-	addItem("Preprocessor","QtEngineEditor");
-	addItem("Preprocessor","QtCodeGenerator");
+		
+	addItem("Preprocessor","File Generator...","QtFileGenerator");
+	addItem("Preprocessor","Engine Editor...","QtEngineEditor");
+	addItem("Preprocessor","Code Generator...","QtCodeGenerator");
 
+	addItem("Edit","Preferences...","QtPreferencesEditor");
 	createMenus();
 
 
@@ -59,15 +60,16 @@ void YadeQtMainWindow::addMenu(string menuName)
 
 }
 
-void YadeQtMainWindow::addItem(string menuName, string itemName)
+void YadeQtMainWindow::addItem(string menuName, string itemName,string className)
 {
 	map<string,QPopupMenu*>::iterator mi = menus.find(menuName);
 	if (mi!=menus.end())
 	{
+		item2ClassName[itemName] = className;
 		items.push_back(new QAction(this, itemName.c_str()));
 		items.back()->setText( itemName.c_str() );
 		items.back()->setMenuText( itemName.c_str() );
-		items.back()->setToolTip( ("Load library lib"+itemName+".so").c_str() );
+		items.back()->setToolTip( ("Load library lib"+className+".so").c_str() );
 		items.back()->addTo((*mi).second);
 		connect( items.back(), SIGNAL( activated() ), this, SLOT( dynamicMenuClicked() ) );
 	}
@@ -90,13 +92,11 @@ void YadeQtMainWindow::fileNewSimulation()
 	fileNewSimulationAction->setEnabled(false);
 }
 
-
-
 void YadeQtMainWindow::dynamicMenuClicked()
 {
 	QAction * action = (QAction*)(this->sender());
 	string name = action->text();
-	qtWidgets.push_back(ClassFactory::instance().createShared(name));
+	qtWidgets.push_back(ClassFactory::instance().createShared(item2ClassName[name]));
 
 	shared_ptr<QWidget> widget = dynamic_pointer_cast<QWidget>(qtWidgets.back());
 	if (widget) // the library is a QWidget so we set workspace as its parent

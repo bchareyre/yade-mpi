@@ -1,0 +1,493 @@
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
+<class>QtGeneratedPreferencesEditor</class>
+<widget class="QDialog">
+    <property name="name">
+        <cstring>QtGeneratedPreferencesEditor</cstring>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>626</width>
+            <height>341</height>
+        </rect>
+    </property>
+    <property name="caption">
+        <string>Preferences</string>
+    </property>
+    <hbox>
+        <property name="name">
+            <cstring>unnamed</cstring>
+        </property>
+        <widget class="QListBox">
+            <item>
+                <property name="text">
+                    <string>Plugins Folders</string>
+                </property>
+            </item>
+            <item>
+                <property name="text">
+                    <string>Include Folders</string>
+                </property>
+            </item>
+            <item>
+                <property name="text">
+                    <string>Plugins</string>
+                </property>
+            </item>
+            <property name="name">
+                <cstring>lbPreferencesList</cstring>
+            </property>
+            <property name="maximumSize">
+                <size>
+                    <width>150</width>
+                    <height>32767</height>
+                </size>
+            </property>
+        </widget>
+        <widget class="QWidgetStack">
+            <property name="name">
+                <cstring>wsPreferences</cstring>
+            </property>
+            <property name="sizePolicy">
+                <sizepolicy>
+                    <hsizetype>7</hsizetype>
+                    <vsizetype>5</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                </sizepolicy>
+            </property>
+            <widget class="QWidget">
+                <property name="name">
+                    <cstring>WStackPage</cstring>
+                </property>
+                <attribute name="id">
+                    <number>0</number>
+                </attribute>
+                <grid>
+                    <property name="name">
+                        <cstring>unnamed</cstring>
+                    </property>
+                    <widget class="QPushButton" row="1" column="3">
+                        <property name="name">
+                            <cstring>pbPluginPath</cstring>
+                        </property>
+                        <property name="text">
+                            <string></string>
+                        </property>
+                        <property name="pixmap">
+                            <pixmap>image0</pixmap>
+                        </property>
+                    </widget>
+                    <widget class="QPushButton" row="1" column="1">
+                        <property name="name">
+                            <cstring>pbDeletePluginFolder</cstring>
+                        </property>
+                        <property name="text">
+                            <string>Delete</string>
+                        </property>
+                    </widget>
+                    <widget class="QListView" row="2" column="0" rowspan="1" colspan="4">
+                        <column>
+                            <property name="text">
+                                <string>Folder</string>
+                            </property>
+                            <property name="pixmap">
+                                <pixmap>image0</pixmap>
+                            </property>
+                            <property name="clickable">
+                                <bool>true</bool>
+                            </property>
+                            <property name="resizable">
+                                <bool>true</bool>
+                            </property>
+                        </column>
+                        <property name="name">
+                            <cstring>lvPluginFolders</cstring>
+                        </property>
+                        <property name="resizeMode">
+                            <enum>AllColumns</enum>
+                        </property>
+                    </widget>
+                    <widget class="QPushButton" row="1" column="0">
+                        <property name="name">
+                            <cstring>pbAddPluginFolder</cstring>
+                        </property>
+                        <property name="text">
+                            <string>Add</string>
+                        </property>
+                    </widget>
+                    <widget class="QLineEdit" row="1" column="2">
+                        <property name="name">
+                            <cstring>lePluginFolder</cstring>
+                        </property>
+                    </widget>
+                    <widget class="QFrame" row="0" column="0" rowspan="1" colspan="4">
+                        <property name="name">
+                            <cstring>fPluginFoldersTitle</cstring>
+                        </property>
+                        <property name="minimumSize">
+                            <size>
+                                <width>0</width>
+                                <height>75</height>
+                            </size>
+                        </property>
+                        <property name="maximumSize">
+                            <size>
+                                <width>32767</width>
+                                <height>75</height>
+                            </size>
+                        </property>
+                        <property name="frameShape">
+                            <enum>StyledPanel</enum>
+                        </property>
+                        <property name="frameShadow">
+                            <enum>Raised</enum>
+                        </property>
+                        <hbox>
+                            <property name="name">
+                                <cstring>unnamed</cstring>
+                            </property>
+                            <widget class="QLabel">
+                                <property name="name">
+                                    <cstring>tlPluginFoldersTitle</cstring>
+                                </property>
+                                <property name="text">
+                                    <string>&lt;h2&gt;&lt;b&gt;Plugin Folders&lt;/b&gt;&lt;/h2&gt;</string>
+                                </property>
+                            </widget>
+                            <widget class="QLabel">
+                                <property name="name">
+                                    <cstring>plPluginFoldersTitle</cstring>
+                                </property>
+                                <property name="text">
+                                    <string></string>
+                                </property>
+                                <property name="pixmap">
+                                    <pixmap>image0</pixmap>
+                                </property>
+                                <property name="scaledContents">
+                                    <bool>false</bool>
+                                </property>
+                                <property name="alignment">
+                                    <set>WordBreak|AlignVCenter|AlignRight</set>
+                                </property>
+                            </widget>
+                        </hbox>
+                    </widget>
+                </grid>
+            </widget>
+            <widget class="QWidget">
+                <property name="name">
+                    <cstring>includeFoldersPage</cstring>
+                </property>
+                <attribute name="id">
+                    <number>1</number>
+                </attribute>
+                <grid>
+                    <property name="name">
+                        <cstring>unnamed</cstring>
+                    </property>
+                    <widget class="QFrame" row="0" column="0" rowspan="1" colspan="4">
+                        <property name="name">
+                            <cstring>fIncludeFoldersTitle</cstring>
+                        </property>
+                        <property name="minimumSize">
+                            <size>
+                                <width>0</width>
+                                <height>75</height>
+                            </size>
+                        </property>
+                        <property name="maximumSize">
+                            <size>
+                                <width>32767</width>
+                                <height>75</height>
+                            </size>
+                        </property>
+                        <property name="frameShape">
+                            <enum>StyledPanel</enum>
+                        </property>
+                        <property name="frameShadow">
+                            <enum>Raised</enum>
+                        </property>
+                        <hbox>
+                            <property name="name">
+                                <cstring>unnamed</cstring>
+                            </property>
+                            <widget class="QLabel">
+                                <property name="name">
+                                    <cstring>tlIncludeFoldersTitle</cstring>
+                                </property>
+                                <property name="text">
+                                    <string>&lt;h2&gt;&lt;b&gt;Include Folders&lt;/b&gt;&lt;/h2&gt;</string>
+                                </property>
+                            </widget>
+                            <widget class="QLabel">
+                                <property name="name">
+                                    <cstring>plIncludeFoldersTitle</cstring>
+                                </property>
+                                <property name="text">
+                                    <string></string>
+                                </property>
+                                <property name="pixmap">
+                                    <pixmap>image0</pixmap>
+                                </property>
+                                <property name="scaledContents">
+                                    <bool>false</bool>
+                                </property>
+                                <property name="alignment">
+                                    <set>WordBreak|AlignVCenter|AlignRight</set>
+                                </property>
+                            </widget>
+                        </hbox>
+                    </widget>
+                    <widget class="QPushButton" row="1" column="0">
+                        <property name="name">
+                            <cstring>pbAddIncludeFolder</cstring>
+                        </property>
+                        <property name="text">
+                            <string>Add</string>
+                        </property>
+                    </widget>
+                    <widget class="QPushButton" row="1" column="1">
+                        <property name="name">
+                            <cstring>pbDeleteIncludeFolder</cstring>
+                        </property>
+                        <property name="text">
+                            <string>Delete</string>
+                        </property>
+                    </widget>
+                    <widget class="QPushButton" row="1" column="3">
+                        <property name="name">
+                            <cstring>pbIncludePath</cstring>
+                        </property>
+                        <property name="text">
+                            <string></string>
+                        </property>
+                        <property name="pixmap">
+                            <pixmap>image0</pixmap>
+                        </property>
+                    </widget>
+                    <widget class="QLineEdit" row="1" column="2">
+                        <property name="name">
+                            <cstring>leIncludeFolder</cstring>
+                        </property>
+                    </widget>
+                    <widget class="QListView" row="2" column="0" rowspan="1" colspan="4">
+                        <column>
+                            <property name="text">
+                                <string>Folder</string>
+                            </property>
+                            <property name="pixmap">
+                                <pixmap>image0</pixmap>
+                            </property>
+                            <property name="clickable">
+                                <bool>true</bool>
+                            </property>
+                            <property name="resizable">
+                                <bool>true</bool>
+                            </property>
+                        </column>
+                        <property name="name">
+                            <cstring>lvIncludeFolders</cstring>
+                        </property>
+                        <property name="resizeMode">
+                            <enum>AllColumns</enum>
+                        </property>
+                    </widget>
+                </grid>
+            </widget>
+            <widget class="QWidget">
+                <property name="name">
+                    <cstring>WStackPage</cstring>
+                </property>
+                <attribute name="id">
+                    <number>2</number>
+                </attribute>
+                <grid>
+                    <property name="name">
+                        <cstring>unnamed</cstring>
+                    </property>
+                    <widget class="QPushButton" row="1" column="0">
+                        <property name="name">
+                            <cstring>pbRescanPlugins</cstring>
+                        </property>
+                        <property name="text">
+                            <string>Rescan</string>
+                        </property>
+                    </widget>
+                    <widget class="QListView" row="2" column="0" rowspan="1" colspan="4">
+                        <column>
+                            <property name="text">
+                                <string>Plugins List</string>
+                            </property>
+                            <property name="pixmap">
+                                <pixmap>image0</pixmap>
+                            </property>
+                            <property name="clickable">
+                                <bool>true</bool>
+                            </property>
+                            <property name="resizable">
+                                <bool>true</bool>
+                            </property>
+                        </column>
+                        <property name="name">
+                            <cstring>lvPluginsList</cstring>
+                        </property>
+                        <property name="resizeMode">
+                            <enum>AllColumns</enum>
+                        </property>
+                    </widget>
+                    <widget class="QFrame" row="0" column="0" rowspan="1" colspan="4">
+                        <property name="name">
+                            <cstring>fPlugins</cstring>
+                        </property>
+                        <property name="minimumSize">
+                            <size>
+                                <width>0</width>
+                                <height>75</height>
+                            </size>
+                        </property>
+                        <property name="maximumSize">
+                            <size>
+                                <width>32767</width>
+                                <height>75</height>
+                            </size>
+                        </property>
+                        <property name="frameShape">
+                            <enum>StyledPanel</enum>
+                        </property>
+                        <property name="frameShadow">
+                            <enum>Raised</enum>
+                        </property>
+                        <hbox>
+                            <property name="name">
+                                <cstring>unnamed</cstring>
+                            </property>
+                            <widget class="QLabel">
+                                <property name="name">
+                                    <cstring>tlPluginsTitle</cstring>
+                                </property>
+                                <property name="text">
+                                    <string>&lt;h2&gt;&lt;b&gt;Plugins&lt;/b&gt;&lt;/h2&gt;</string>
+                                </property>
+                            </widget>
+                            <widget class="QLabel">
+                                <property name="name">
+                                    <cstring>plPluginsTitle</cstring>
+                                </property>
+                                <property name="text">
+                                    <string></string>
+                                </property>
+                                <property name="pixmap">
+                                    <pixmap>image0</pixmap>
+                                </property>
+                                <property name="scaledContents">
+                                    <bool>false</bool>
+                                </property>
+                                <property name="alignment">
+                                    <set>WordBreak|AlignVCenter|AlignRight</set>
+                                </property>
+                            </widget>
+                        </hbox>
+                    </widget>
+                </grid>
+            </widget>
+        </widget>
+    </hbox>
+</widget>
+<images>
+    <image name="image0">
+        <data format="PNG" length="892">89504e470d0a1a0a0000000d4948445200000018000000180806000000e0773df800000343494441544889ed95cf6f146518c73f5d5a8b96a5ab6de84230b6b02858b134023d28743de8414d6a8c7f01ff801aaf24c24d2f0ac6709693f1a0f5e4c5c42e8907f560a736c4d616322dd275b7753bdb617766f6fdf17898e9b26db798102f263ec924cfccfbe4f3fd3ecffb2403ffc743c408f00e3099493fbafefc338704986a53370e7c909c6dd6f46e2fea68c92780cfcf9d3e92397f26c7f8991ce363c748a552bcffe1249f5e2f5c023ce0cdde7d7bf3e74e1fe5a5178ef0daf967393cd0cbb52f7ee0e2d56f2f0197771398aafc319b4ffbdfd3914a01202288152a5e8deb5fff8888f0e2e810c3b92cc65a8cb1186dd0da50a9d6197dfb6307186d15e86c7df1aa1efb3ac03434d65aac8d018fa4e0c25b679b40dfafa38dc1688bd686a8a1d0da72b03f7daab8e64f259dbe0b2cb50a384b6595ef4f871863304630d6a055ecb01d501bc37a790d43378ff53dc5b5cfae706ae444fe9bafbee4bd8b571de072ab80e7380ec363d0084394d2281d0b6c07d6ea0d0e0c8d923994e3f8cbc364d25d1094e347cde3955c0077fb880a9ee761f61cc6f7570942454369362a1eb55a83fd0347c9648f317af669b2d9be045882fa34d40191982250f8690ea0b0e30e5cd7258a0ee0fb012b772b3c79f2154e8e3d4736fb440c0bca102d4269710b50442059082b961b3fcf7bc0d27601d7755d3a7bdee0aefb1df90b1f9131b720b809c5c4e12633015a2b8858ac3548b214337377009c765bb404201d5d74f6f493e98e60b5747f5d45106b6390c430b1a6b96db1806171b9d81ccf8e1101186bd9d3bd1fa915b15a379dd90420d292b7f9eefcb6bc85b745c07166101106064fa0c27be830481c9b16973be156ee9f19ad77efa05aad22081beb1542df60a260db185af264f69bc2c618b4d6fcba50dcbd03e2dd1ddcdb9326dc28b5779d8063a0a1d1d0440d451429eefc59e5e6ad32c08ddd054406b343c78956969b176713874a1b948a6161a49873d798febd84b350667671955aa80ac0950775c0bd0d9f747f1f4150472b4d4369c22886ce2dad313d5f6266a1cceced55af1628279977a1d5f503051e3f98a3abd3e216ffe297f9620c5c2c737ba5ead502b5092b0033ed80ff149f4c4cbc2eafe6c704580726897f3e230f03db2dc6ff6de07f3bfe067d9f88db21915f870000000049454e44ae426082</data>
+    </image>
+</images>
+<connections>
+    <connection>
+        <sender>pbAddPluginFolder</sender>
+        <signal>clicked()</signal>
+        <receiver>QtGeneratedPreferencesEditor</receiver>
+        <slot>pbAddPluginFolderClicked()</slot>
+    </connection>
+    <connection>
+        <sender>pbDeletePluginFolder</sender>
+        <signal>clicked()</signal>
+        <receiver>QtGeneratedPreferencesEditor</receiver>
+        <slot>pbDeletePluginFolderClicked()</slot>
+    </connection>
+    <connection>
+        <sender>pbPluginPath</sender>
+        <signal>clicked()</signal>
+        <receiver>QtGeneratedPreferencesEditor</receiver>
+        <slot>pbPluginPathClicked()</slot>
+    </connection>
+    <connection>
+        <sender>pbAddIncludeFolder</sender>
+        <signal>clicked()</signal>
+        <receiver>QtGeneratedPreferencesEditor</receiver>
+        <slot>pbAddIncludeFolderClicked()</slot>
+    </connection>
+    <connection>
+        <sender>pbDeleteIncludeFolder</sender>
+        <signal>clicked()</signal>
+        <receiver>QtGeneratedPreferencesEditor</receiver>
+        <slot>pbDeleteIncludeFolderClicked()</slot>
+    </connection>
+    <connection>
+        <sender>lvIncludeFolders</sender>
+        <signal>selectionChanged(QListViewItem*)</signal>
+        <receiver>QtGeneratedPreferencesEditor</receiver>
+        <slot>lvIncludeFoldersSelectionChanged(QListViewItem*)</slot>
+    </connection>
+    <connection>
+        <sender>lvPluginFolders</sender>
+        <signal>selectionChanged(QListViewItem*)</signal>
+        <receiver>QtGeneratedPreferencesEditor</receiver>
+        <slot>lvPluginFoldersSelectionChanged(QListViewItem*)</slot>
+    </connection>
+    <connection>
+        <sender>lePluginFolder</sender>
+        <signal>returnPressed()</signal>
+        <receiver>QtGeneratedPreferencesEditor</receiver>
+        <slot>lePluginFolderReturnPressed()</slot>
+    </connection>
+    <connection>
+        <sender>leIncludeFolder</sender>
+        <signal>returnPressed()</signal>
+        <receiver>QtGeneratedPreferencesEditor</receiver>
+        <slot>leIncludeFolderReturnPressed()</slot>
+    </connection>
+    <connection>
+        <sender>lbPreferencesList</sender>
+        <signal>highlighted(int)</signal>
+        <receiver>QtGeneratedPreferencesEditor</receiver>
+        <slot>lbPreferencesListHighlighted(int)</slot>
+    </connection>
+    <connection>
+        <sender>pbIncludePath</sender>
+        <signal>clicked()</signal>
+        <receiver>QtGeneratedPreferencesEditor</receiver>
+        <slot>pbIncludePathClicked()</slot>
+    </connection>
+    <connection>
+        <sender>pbRescanPlugins</sender>
+        <signal>clicked()</signal>
+        <receiver>QtGeneratedPreferencesEditor</receiver>
+        <slot>pbRescanPluginsClicked()</slot>
+    </connection>
+</connections>
+<slots>
+    <slot>pbAddIncludeFolderClicked()</slot>
+    <slot>pbAddPluginFolderClicked()</slot>
+    <slot>pbDeleteIncludeFolderClicked()</slot>
+    <slot>pbDeletePluginFolderClicked()</slot>
+    <slot>pbPluginPathClicked()</slot>
+    <slot>lvIncludeFoldersSelectionChanged(QListViewItem*)</slot>
+    <slot>lvPluginFoldersSelectionChanged(QListViewItem*)</slot>
+    <slot>lePluginFolderReturnPressed()</slot>
+    <slot>leIncludeFolderReturnPressed()</slot>
+    <slot>lbPreferencesListHighlighted(int)</slot>
+    <slot>pbIncludePathClicked()</slot>
+    <slot>pbRescanPluginsClicked()</slot>
+</slots>
+<layoutdefaults spacing="6" margin="11"/>
+</UI>

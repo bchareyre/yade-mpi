@@ -3,15 +3,15 @@
 # Subdir relative project main directory: ./plugins/Engine/Sensor/RenderingEngine/OpenGLRenderingEngine/GLDrawBoundingVolume/GLDrawBoundingSphere
 # Target is a library:  
 
-LIBS += -lBoundingSphere \
-        -lyade-lib-opengl \
+LIBS += -lyade-lib-opengl \
+        -lBoundingSphere \
         -rdynamic 
-INCLUDEPATH = $(YADEINCLUDEPATH) 
+INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../../../../../plugins/Data/Body/BoundingVolume/BoundingSphere/$(YADEDYNLIBPATH) \
-               ../../../../../../../libraries/yade-lib-opengl/$(YADEDYNLIBPATH) \
+QMAKE_LIBDIR = ../../../../../../../libraries/yade-lib-opengl/$(YADEDYNLIBPATH)/yade-libs \
+               $(YADEDYNLIBPATH)/yade-libs \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

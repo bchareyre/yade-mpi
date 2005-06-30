@@ -189,6 +189,8 @@ class ClassFactory : public Singleton< ClassFactory >
 
 	public 	  : void addBaseDirectory(const string& dir);
 	
+	public    : void load( std::string name );
+
 	FRIEND_SINGLETON(ClassFactory);
 };
 

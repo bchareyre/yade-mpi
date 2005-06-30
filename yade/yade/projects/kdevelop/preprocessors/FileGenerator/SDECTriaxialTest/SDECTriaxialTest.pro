@@ -3,19 +3,12 @@
 # Subdir relative project main directory: ./preprocessors/FileGenerator/SDECTriaxialTest
 # Target is a library:  
 
-LIBS += -lPersistentSAPCollider \
-        -lAABB \
-        -lInteractingSphere \
+LIBS += -lInteractingSphere \
         -lInteractingBox \
-        -lSphere \
-        -lBox \
         -lCundallNonViscousMomentumDamping \
         -lCundallNonViscousForceDamping \
-        -lBodyMacroParameters \
         -lMacroMicroElasticRelationships \
         -lSDECTimeStepper \
-        -lElasticContactLaw \
-        -lInteractionDescriptionSet2AABB \
         -lPhysicalActionVectorVector \
         -lInteractionVecSet \
         -lBodyRedirectionVector \
@@ -23,24 +16,24 @@ LIBS += -lPersistentSAPCollider \
         -lInteractionGeometryMetaEngine \
         -lInteractionPhysicsMetaEngine \
         -lBoundingVolumeMetaEngine \
+        -lPersistentSAPCollider \
+        -lAABB \
+        -lSphere \
+        -lBox \
+        -lBodyMacroParameters \
+        -lElasticContactLaw \
+        -lInteractionDescriptionSet2AABB \
         -rdynamic 
-INCLUDEPATH = $(YADEINCLUDEPATH) 
+INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../plugins/Engine/Engine/InteractionEngine/BroadInteractionEngine/PersistentSAPCollider/$(YADEDYNLIBPATH) \
-               ../../../plugins/Data/Body/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
-               ../../../plugins/Data/Body/InteractingGeometry/InteractingSphere/$(YADEDYNLIBPATH) \
+QMAKE_LIBDIR = ../../../plugins/Data/Body/InteractingGeometry/InteractingSphere/$(YADEDYNLIBPATH) \
                ../../../plugins/Data/Body/InteractingGeometry/InteractingBox/$(YADEDYNLIBPATH) \
-               ../../../plugins/Data/Body/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
-               ../../../plugins/Data/Body/GeometricalModel/Box/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/EngineUnit/PhysicalActionEngineUnit/CundallNonViscousMomentumDamping/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/EngineUnit/PhysicalActionEngineUnit/CundallNonViscousForceDamping/$(YADEDYNLIBPATH) \
-               ../../../plugins/Data/Body/PhysicalParameters/BodyMacroParameters/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/EngineUnit/InteractionEngineUnit/InteractionPhysicsEngineUnit/ElasticContactParameters/MacroMicroElasticRelationships/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/TimeStepper/SDECTimeStepper/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/Engine/PhysicalActionEngine/InteractionSolver/ElasticContactLaw/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/EngineUnit/BodyEngineUnit/BoundingVolumeEngineUnit/InteractionDescriptionSet2AABB/$(YADEDYNLIBPATH) \
                ../../../plugins/Container/PhysicalActionContainer/PhysicalActionVectorVector/$(YADEDYNLIBPATH) \
                ../../../plugins/Container/InteractionContainer/InteractionVecSet/$(YADEDYNLIBPATH) \
                ../../../plugins/Container/BodyContainer/BodyRedirectionVector/$(YADEDYNLIBPATH) \
@@ -48,6 +41,7 @@ QMAKE_LIBDIR = ../../../plugins/Engine/Engine/InteractionEngine/BroadInteraction
                ../../../plugins/Engine/MetaEngine/InteractionMetaEngine/NarrowInteractionGeometryMetaEngine/InteractionGeometryMetaEngine/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/MetaEngine/InteractionMetaEngine/InteractionPhysicsMetaEngine/InteractionPhysicsMetaEngine/$(YADEDYNLIBPATH) \
                ../../../plugins/Engine/MetaEngine/BodyMetaEngine/BoundingVolumeMetaEngine/BoundingVolumeMetaEngine/$(YADEDYNLIBPATH) \
+               $(YADEDYNLIBPATH)/yade-libs \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

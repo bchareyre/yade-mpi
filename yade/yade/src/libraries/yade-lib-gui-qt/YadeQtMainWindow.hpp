@@ -50,13 +50,14 @@ class YadeQtMainWindow : public YadeQtGeneratedMainWindow
 	protected : map<string,QPopupMenu*> menus;
 	protected : vector<QAction*> items;
 	protected : vector<shared_ptr<Factorable> > qtWidgets;
+	protected : map<string,string> item2ClassName;
 
 	// construction
 	public : YadeQtMainWindow ();
 	public : virtual ~YadeQtMainWindow ();
 
 	public : void addMenu(string menuName);
-	public : void addItem(string menuName, string itemName);
+	public : void addItem(string menuName, string itemName,string className);
 	public : void createMenus();
 
 	public slots : virtual void fileNewSimulation();

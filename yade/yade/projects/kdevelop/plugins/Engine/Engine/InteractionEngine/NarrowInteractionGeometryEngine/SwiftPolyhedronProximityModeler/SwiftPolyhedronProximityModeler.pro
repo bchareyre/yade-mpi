@@ -4,16 +4,16 @@
 # Target is a library:  
 
 LIBS += -lyade-lib-swiftpp \
-        -lMacroMicroContactGeometry \
         -lPolyhedralSweptSphere \
+        -lMacroMicroContactGeometry \
         -rdynamic 
 INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../../../../libraries/yade-lib-swiftpp/$(YADEDYNLIBPATH) \
-               ../../../../../../plugins/Data/Interaction/NarrowInteractionGeometry/MacroMicroContactGeometry/$(YADEDYNLIBPATH) \
+QMAKE_LIBDIR = ../../../../../../libraries/yade-lib-swiftpp/$(YADEDYNLIBPATH)/yade-libs \
                ../../../../../../plugins/Data/Body/InteractingGeometry/PolyhedralSweptSphere/$(YADEDYNLIBPATH) \
+               $(YADEDYNLIBPATH)/yade-libs \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

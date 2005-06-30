@@ -4,25 +4,23 @@
 # Target is a library:  
 
 LIBS += -lyade-lib-serialization \
-        -lAABB \
-        -lPolyhedron \
         -lyade-lib-wm3-math \
         -lyade-lib-multimethods \
         -lRigidBodyParameters \
         -lFEMNodeData \
+        -lAABB \
+        -lPolyhedron \
         -rdynamic 
-INCLUDEPATH = $(YADEINCLUDEPATH) 
+INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../../../libraries/yade-lib-serialization/$(YADEDYNLIBPATH) \
-               ../../../../../plugins/Data/Body/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
-               ../../../../../plugins/Data/Body/GeometricalModel/Polyhedron/$(YADEDYNLIBPATH) \
-               ../../../../../libraries/yade-lib-wm3-math/$(YADEDYNLIBPATH) \
-               ../../../../../libraries/yade-lib-multimethods/$(YADEDYNLIBPATH) \
+QMAKE_LIBDIR = ../../../../../libraries/yade-lib-serialization/$(YADEDYNLIBPATH)/yade-libs \
+               ../../../../../libraries/yade-lib-wm3-math/$(YADEDYNLIBPATH)/yade-libs \
+               ../../../../../libraries/yade-lib-multimethods/$(YADEDYNLIBPATH)/yade-libs \
                ../../../../../plugins/Data/Body/PhysicalParameters/RigidBodyParameters/$(YADEDYNLIBPATH) \
                ../../../../../plugins/Data/Body/PhysicalParameters/FEMNodeData/$(YADEDYNLIBPATH) \
-               ../../../../../yade/Body/Body/$(YADEDYNLIBPATH) \
+               $(YADEDYNLIBPATH)/yade-libs \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

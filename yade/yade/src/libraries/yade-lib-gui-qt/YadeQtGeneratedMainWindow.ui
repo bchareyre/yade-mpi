@@ -25,7 +25,7 @@
             <x>0</x>
             <y>0</y>
             <width>839</width>
-            <height>24</height>
+            <height>33</height>
         </rect>
     </property>
     <item text="&amp;File" name="fileMenu">
@@ -69,6 +69,17 @@
         </property>
         <property name="accel">
             <string></string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>editPreferences_Action</cstring>
+        </property>
+        <property name="text">
+            <string>Preferences ...</string>
+        </property>
+        <property name="menuText">
+            <string>Preferences ...</string>
         </property>
     </action>
 </actions>

@@ -317,7 +317,7 @@ void QtCodeGenerator::bgEngineTypeClicked(int v )
 		cbMetaEngineBaseClass2->setEnabled(true);
 	}
 	
-	if (baseEngineClass=="MetaDispatchingEngine1D")
+	if (baseEngineClass=="MetaDispatchingEngine1D" || baseEngineClass=="MetaDispatchingEngine1D")
 	{
 		cbMetaEngineBaseClass1->clear();
 		map<string,DynlibType>::const_iterator di    = Omega::instance().getDynlibsType().begin();
@@ -424,11 +424,17 @@ void QtCodeGenerator::pbGenerateEngineClassClicked()
 		
 		writeSperarationLines(hpp);
 		
-		if (baseEngineClass=="Engine" || baseEngineClass=="MetaDispatchingEngine1D" || baseEngineClass=="MetaDispatchingEngine2D")	
+		if (baseEngineClass=="Engine")
 			hpp << "#include <Engine.hpp>" << endl;
-		if (baseEngineClass=="EngineUnit")	
+		else if (baseEngineClass=="EngineUnit")	
 			hpp << "#include <" << engineUnitBaseClass << ".hpp>" << endl;
-		
+		else if (baseEngineClass=="MetaDispatchingEngine1D" || baseEngineClass=="MetaDispatchingEngine2D")
+		{
+			hpp << "#include <Engine.hpp>" << endl;
+			hpp << "#include <yade-lib-multimethods/DynLibDispatcher.hpp>" << endl;
+			hpp << "#include \"" << metaEngineEngineUnitName << "\"" << endl;
+		}
+
 		writeSperarationLines(hpp);
 	
 		if (baseEngineClass=="Engine")

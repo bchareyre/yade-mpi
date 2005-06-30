@@ -99,7 +99,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>plugins/Engine/MetaEngine/PhysicalActionMetaEngine/PhysicalActionDamper</activedir>
+      <activedir>plugins</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>

@@ -5,46 +5,34 @@
 
 LIBS += -lyade-lib-computational-geometry \
         -lyade-lib-serialization \
-        -lMesh2D \
         -lyade-lib-wm3-math \
-        -lClosestFeatures \
         -lyade-lib-multimethods \
         -lSDECLinkPhysics \
-        -lSDECLinkGeometry \
-        -lRigidBodyParameters \
-        -lMacroMicroContactGeometry \
-        -lBodyMacroParameters \
         -lElasticContactParameters \
         -lForce \
         -lMomentum \
         -lFrictionLessElasticContactLaw \
+        -lMesh2D \
+        -lClosestFeatures \
+        -lSDECLinkGeometry \
+        -lRigidBodyParameters \
+        -lMacroMicroContactGeometry \
+        -lBodyMacroParameters \
         -rdynamic 
-INCLUDEPATH = $(YADEINCLUDEPATH) 
+INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../../../../libraries/yade-lib-computational-geometry/$(YADEDYNLIBPATH) \
-               ../../../../../../libraries/yade-lib-serialization/$(YADEDYNLIBPATH) \
-               ../../../../../../plugins/Data/Body/GeometricalModel/Mesh2D/$(YADEDYNLIBPATH) \
-               ../../../../../../libraries/yade-lib-wm3-math/$(YADEDYNLIBPATH) \
-               ../../../../../../plugins/Data/Interaction/NarrowInteractionGeometry/ClosestFeatures/$(YADEDYNLIBPATH) \
-               ../../../../../../libraries/yade-lib-multimethods/$(YADEDYNLIBPATH) \
+QMAKE_LIBDIR = ../../../../../../libraries/yade-lib-computational-geometry/$(YADEDYNLIBPATH)/yade-libs \
+               ../../../../../../libraries/yade-lib-serialization/$(YADEDYNLIBPATH)/yade-libs \
+               ../../../../../../libraries/yade-lib-wm3-math/$(YADEDYNLIBPATH)/yade-libs \
+               ../../../../../../libraries/yade-lib-multimethods/$(YADEDYNLIBPATH)/yade-libs \
                ../../../../../../plugins/Data/Interaction/InteractionPhysics/SDECLinkPhysics/$(YADEDYNLIBPATH) \
-               ../../../../../../plugins/Data/Interaction/NarrowInteractionGeometry/SDECLinkGeometry/$(YADEDYNLIBPATH) \
-               ../../../../../../plugins/Data/Body/PhysicalParameters/RigidBodyParameters/$(YADEDYNLIBPATH) \
-               ../../../../../../plugins/Data/Interaction/NarrowInteractionGeometry/MacroMicroContactGeometry/$(YADEDYNLIBPATH) \
-               ../../../../../../plugins/Data/Body/PhysicalParameters/BodyMacroParameters/$(YADEDYNLIBPATH) \
                ../../../../../../plugins/Data/Interaction/InteractionPhysics/ElasticContactParameters/$(YADEDYNLIBPATH) \
                ../../../../../../plugins/Data/PhysicalAction/Force/$(YADEDYNLIBPATH) \
                ../../../../../../plugins/Data/PhysicalAction/Momentum/$(YADEDYNLIBPATH) \
                ../../../../../../plugins/Engine/Engine/PhysicalActionEngine/InteractionSolver/FrictionLessElasticContactLaw/$(YADEDYNLIBPATH) \
-               ../../../../../../yade/Engine/$(YADEDYNLIBPATH) \
-               ../../../../../../yade/Body/Body/$(YADEDYNLIBPATH) \
-               ../../../../../../toolboxes/Libraries/yade-lib-computational-geometry/$(YADEDYNLIBPATH) \
-               ../../../../../../toolboxes/Libraries/yade-lib-serialization/$(YADEDYNLIBPATH) \
-               ../../../../../../toolboxes/Libraries/yade-lib-wm3-math/$(YADEDYNLIBPATH) \
-               ../../../../../../yade/Interaction/Interaction/$(YADEDYNLIBPATH) \
-               ../../../../../../toolboxes/Libraries/yade-lib-multimethods/$(YADEDYNLIBPATH) \
+               $(YADEDYNLIBPATH)/yade-libs \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

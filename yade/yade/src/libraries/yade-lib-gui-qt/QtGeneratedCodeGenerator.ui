@@ -9,7 +9,7 @@
             <x>0</x>
             <y>0</y>
             <width>509</width>
-            <height>478</height>
+            <height>485</height>
         </rect>
     </property>
     <property name="caption">
@@ -24,7 +24,7 @@
                 <cstring>toolBox</cstring>
             </property>
             <property name="currentIndex">
-                <number>0</number>
+                <number>1</number>
             </property>
             <widget class="QWidget">
                 <property name="name">
