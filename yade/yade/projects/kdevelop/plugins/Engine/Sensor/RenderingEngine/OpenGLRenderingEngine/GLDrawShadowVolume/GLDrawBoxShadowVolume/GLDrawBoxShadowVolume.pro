@@ -4,6 +4,8 @@
 # Target is a library:  
 
 LIBS += -lyade-lib-opengl \
+        -lRigidBodyParameters \
+        -lParticleParameters \
         -lBox \
         -rdynamic 
 INCLUDEPATH += $(YADEINCLUDEPATH) 
@@ -11,6 +13,7 @@ MOC_DIR = $(YADECOMPILATIONPATH)
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 QMAKE_LIBDIR = ../../../../../../../libraries/yade-lib-opengl/$(YADEDYNLIBPATH)/yade-libs \
+               ../../../../../../../plugins/Data/Body/GeometricalModel/Box/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH)/yade-libs \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \

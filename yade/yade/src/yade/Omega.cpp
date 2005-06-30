@@ -251,9 +251,21 @@ void Omega::scanPlugins()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+
+
+struct lessThanTimet
+{
+	bool operator()(const pair<string,time_t>& p1, const pair<string,time_t>& p2)
+	{
+		return p1.second<p2.second;
+	}
+
+};
+
 void Omega::buildDynlibList()
 {
-	//LOCK(omegaMutex);
+///	set< pair<string,time_t>, lessThanTimet > lastModified;
+
 	vector<string>::iterator si = preferences->dynlibDirectories.begin();
 	vector<string>::iterator siEnd = preferences->dynlibDirectories.end();
 	for( ; si != siEnd ; ++si)
@@ -285,12 +297,26 @@ void Omega::buildDynlibList()
 					registerDynlibType(name.leaf().substr(3,name.leaf().size()-3));
 					//ClassFactory::instance().load(name.leaf().substr(3,name.leaf().size()-3));
 					//cout << name.leaf() << endl;
+					///time_t t = last_write_time( filesystem::path( (*si)+"/"+(*di).leaf()) );
+					///lastModified.insert(pair<string,time_t>( name.leaf().substr(3,name.leaf().size()-3), t ));
 				}
 			}
 		}
 		else
 			cerr << "ERROR: trying to scan non existing directory for plugins: "<< directory.native_directory_string() << endl;
 	}
+
+	
+// 	set< pair<string,time_t>, lessThanTimet >::iterator lmi    = lastModified.begin();
+// 	set< pair<string,time_t>, lessThanTimet >::iterator lmiEnd = lastModified.end();
+// 	for( ; lmi!=lmiEnd ; ++lmi)
+// 		ClassFactory::instance().load((*lmi).first);
+// 
+// 	lmi    = lastModified.begin();
+// 	lmiEnd = lastModified.end();
+// 	for( ; lmi!=lmiEnd ; ++lmi)
+// 		registerDynlibType((*lmi).first);
+// 
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

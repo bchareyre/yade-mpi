@@ -3,8 +3,7 @@
 # Subdir relative project main directory: ./plugins/Engine/Sensor/RenderingEngine/OpenGLRenderingEngine/OpenGLRenderingEngine
 # Target is a library:  
 
-LIBS += -lMacroMicroContactGeometry \
-        -lglut \
+LIBS += -lglut \
         -lGLU \
         -lGL \
         -rdynamic 

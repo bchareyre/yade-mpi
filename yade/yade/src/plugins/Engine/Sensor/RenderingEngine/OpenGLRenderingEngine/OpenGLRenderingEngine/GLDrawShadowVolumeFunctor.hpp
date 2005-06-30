@@ -43,7 +43,6 @@ class GLDrawShadowVolumeFunctor : public FunctorWrapper
 				, const Vector3r&)
 		>
 {
-	public : virtual ~GLDrawShadowVolumeFunctor() {};
 	REGISTER_CLASS_NAME(GLDrawShadowVolumeFunctor);
 };
 

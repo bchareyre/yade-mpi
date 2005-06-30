@@ -76,6 +76,11 @@ void DynLibManager::addBaseDirectory(const string& dir)
 		tmpDir = dir;
 
 	baseDirs.push_back(tmpDir);
+
+	string ldLibraryPath = getenv("LD_LIBRARY_PATH");
+	ldLibraryPath = dir+":"+ldLibraryPath;
+	setenv("LD_LIBRARY_PATH", ldLibraryPath.c_str(),true);
+	cout <<ldLibraryPath<<endl;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -116,6 +121,8 @@ void DynLibManager::addBaseDirectory(const string& dir)
 bool DynLibManager::load (const string libName )
 {
 cerr << "###################" << endl;
+
+cerr << "LD_LIBRARY_PATH : " << getenv("LD_LIBRARY_PATH")<<endl;
 cerr << "Wants to load : " <<libName << endl;
 
 	if (libName.empty())
@@ -145,7 +152,7 @@ cerr << "Wants to load : " <<libName << endl;
 		}
 	}
 
-cerr << "Directory found: " << baseDir << endl;
+	cerr << "Directory found: " << baseDir << endl;
 
 	if (autoUnload && isLoaded(libName))
 		closeLib(libName);
@@ -155,7 +162,11 @@ cerr << "Directory found: " << baseDir << endl;
 		fullLibName = libFileName;
 	else
 		fullLibName = baseDir+"/"+libFileName;
-		
+	
+
+//FIXME : problem without this line !
+	fullLibName = libFileName;
+	
 	#ifdef WIN32
 
 		unsigned short * file2 = new unsigned short[fullLibName.length()+1];

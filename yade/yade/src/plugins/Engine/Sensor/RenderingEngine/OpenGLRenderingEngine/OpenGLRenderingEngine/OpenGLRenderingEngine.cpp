@@ -22,7 +22,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "OpenGLRenderingEngine.hpp"
-#include <yade-common/MacroMicroContactGeometry.hpp>
+//#include <yade-common/MacroMicroContactGeometry.hpp>
 #include <yade-lib-opengl/OpenGLWrapper.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -63,8 +63,8 @@ OpenGLRenderingEngine::OpenGLRenderingEngine() : RenderingEngine()
 	addGeometricalModelFunctor("LineSegment","GLDrawLineSegment");
 	addGeometricalModelFunctor("Tetrahedron","GLDrawTetrahedron");
 	
-	addShadowVolumeFunctor("Box","GLDrawBoxShadowVolume");
-	addShadowVolumeFunctor("Sphere","GLDrawSphereShadowVolume");
+//	addShadowVolumeFunctor("Box","GLDrawBoxShadowVolume");
+//	addShadowVolumeFunctor("Sphere","GLDrawSphereShadowVolume");
 	
 	postProcessAttributes(true);
 	
@@ -156,7 +156,7 @@ void OpenGLRenderingEngine::render(const shared_ptr<MetaBody>& rootBody)
 	}
 
 
-	shared_ptr<BodyContainer> bodies = rootBody->bodies;
+/*	shared_ptr<BodyContainer> bodies = rootBody->bodies;
 	shared_ptr<InteractionContainer>& collisions = rootBody->volatileInteractions;
 	for( collisions->gotoFirst() ; collisions->notAtEnd() ; collisions->gotoNext())
 	{
@@ -183,7 +183,7 @@ void OpenGLRenderingEngine::render(const shared_ptr<MetaBody>& rootBody)
 			glTranslate(v2[0],v2[1],v2[2]);
 			glutSolidSphere(1,10,10);
 		glPopMatrix();
-	}
+	}*/
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -26,12 +26,13 @@ YadeQtMainWindow::YadeQtMainWindow() : YadeQtGeneratedMainWindow()
 	addMenu("Edit");
 	addMenu("Preprocessor");
 	addMenu("Postprocessor");
+
+	addItem("Edit","Preferences...","QtPreferencesEditor");
 		
 	addItem("Preprocessor","File Generator...","QtFileGenerator");
 	addItem("Preprocessor","Engine Editor...","QtEngineEditor");
 	addItem("Preprocessor","Code Generator...","QtCodeGenerator");
 
-	addItem("Edit","Preferences...","QtPreferencesEditor");
 	createMenus();
 
 
