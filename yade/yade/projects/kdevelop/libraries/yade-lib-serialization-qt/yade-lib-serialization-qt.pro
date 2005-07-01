@@ -9,7 +9,8 @@ INCLUDEPATH += $(YADEINCLUDEPATH)
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../libraries/yade-lib-serialization-xml/$(YADEDYNLIBPATH)/yade-libs \
+QMAKE_LIBDIR = ../../libraries/yade-lib-serialization-xml/$(YADEDYNLIBPATH) \
+               $(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH)/yade-libs 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

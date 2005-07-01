@@ -128,7 +128,7 @@ void QGLThread::oneLoop()
 		if (halfSize[2]>radius)
 			radius = halfSize[2];
 		
-		glViewer->setSceneCenter(center[0],center[1],center[2]);
+		glViewer->setSceneCenter(qglviewer::Vec(center[0],center[1],center[2]));
 		glViewer->setSceneRadius(radius*1.5);
 		glViewer->showEntireScene();
 		*needCentering = false;
