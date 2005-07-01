@@ -43,34 +43,6 @@
 Omega::Omega()
 {
 	ThreadSafe::cerr("Constructing Omega  (if multiple times - check '-rdynamic' flag!)");
-
-	simulationFileName="";
-	currentIteration = 0;
-	dt = 0.01;
-	logFile = shared_ptr<ofstream>(new ofstream("../data/log.xml", ofstream::out | ofstream::app));
-	// build simulation loop thread
-	synchronizer = shared_ptr<ThreadSynchronizer>(new ThreadSynchronizer()); // FIXME - this should be optional
-
-	preferences = shared_ptr<Preferences>(new Preferences);
-
-	filesystem::path yadeConfigPath = filesystem::path(string(getenv("HOME")) + string("/.yade"), filesystem::native);
-
-	if ( filesystem::exists( yadeConfigPath ) )
-	{
-		IOManager::loadFromFile("XMLManager",yadeConfigPath.string()+"/preferences.xml","preferences",preferences);
-	}
-	else
-	{
-		filesystem::create_directories(yadeConfigPath);
-		//char * buffer ;
-		//buffer = getenv ("YADEBINPATH"); // FIXME : to modify after splitting
-		//string yadeBinPath = buffer;
-		//preferences->dynlibDirectories.push_back(yadeBinPath+"/dynlib/linux");
-		IOManager::saveToFile("XMLManager",yadeConfigPath.string()+"/preferences.xml","preferences",preferences);
-	}
-
-	scanPlugins();
-
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -83,6 +55,19 @@ Omega::~Omega()
 	*logFile << "\t" << "<Summary Duration=\"" << sStartingSimulationTime-second_clock::local_time() << "\">" <<endl;
 	*logFile << "</Simulation>" << endl << endl;
 	logFile->close();
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+void Omega::init()
+{
+	simulationFileName="";
+	currentIteration = 0;
+	dt = 0.01;
+	logFile = shared_ptr<ofstream>(new ofstream("../data/log.xml", ofstream::out | ofstream::app));
+	// build simulation loop thread
+	synchronizer = shared_ptr<ThreadSynchronizer>(new ThreadSynchronizer()); // FIXME - this should be optional
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -184,7 +169,7 @@ void Omega::stopSimulationLoop()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void Omega::registerDynlibType(const string& name)
+void Omega::registerPluginType(const string& name)
 {	
 	// called by BuildDynLibList
 	shared_ptr<Factorable> f;
@@ -244,39 +229,14 @@ void Omega::scanPlugins()
 	for( ; dldi != dldiEnd ; ++dldi)
 		ClassFactory::instance().addBaseDirectory((*dldi));
 			
-	// build dynlib information list
-	buildDynlibList();
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
-struct lessThanTimet
-{
-	bool operator()(const pair<string,time_t>& p1, const pair<string,time_t>& p2)
-	{
-		return p1.second<p2.second;
-	}
-
-};
-
-void Omega::buildDynlibList()
-{
-///	set< pair<string,time_t>, lessThanTimet > lastModified;
+	vector< string > dynlibsList;
 
 	vector<string>::iterator si = preferences->dynlibDirectories.begin();
 	vector<string>::iterator siEnd = preferences->dynlibDirectories.end();
 	for( ; si != siEnd ; ++si)
 	{
-//		char * buffer ;
-//		buffer = getenv ("YADEBINPATH"); // FIXME - yade should use config file, to check /usr/lib/yade and /home/joe/yade/lib, etc..
-//		string yadeBinPath = buffer;
-//		filesystem::path directory(yadeBinPath+"/dynlib/linux");
-
 		filesystem::path directory((*si));
-// FIXME : #ifndef WIN32  !!!
+
 		if ( filesystem::exists( directory ) )
 		{
 			filesystem::directory_iterator di( directory );
@@ -293,12 +253,8 @@ void Omega::buildDynlibList()
 						prevLength=length;
 						name = filesystem::path(filesystem::basename(name));
 						length = name.leaf().size();
-					}
-					registerDynlibType(name.leaf().substr(3,name.leaf().size()-3));
-					//ClassFactory::instance().load(name.leaf().substr(3,name.leaf().size()-3));
-					//cout << name.leaf() << endl;
-					///time_t t = last_write_time( filesystem::path( (*si)+"/"+(*di).leaf()) );
-					///lastModified.insert(pair<string,time_t>( name.leaf().substr(3,name.leaf().size()-3), t ));
+					}					
+					dynlibsList.push_back(ClassFactory::instance().systemNameToLibName(name.leaf()));
 				}
 			}
 		}
@@ -306,17 +262,21 @@ void Omega::buildDynlibList()
 			cerr << "ERROR: trying to scan non existing directory for plugins: "<< directory.native_directory_string() << endl;
 	}
 
-	
-// 	set< pair<string,time_t>, lessThanTimet >::iterator lmi    = lastModified.begin();
-// 	set< pair<string,time_t>, lessThanTimet >::iterator lmiEnd = lastModified.end();
-// 	for( ; lmi!=lmiEnd ; ++lmi)
-// 		ClassFactory::instance().load((*lmi).first);
-// 
-// 	lmi    = lastModified.begin();
-// 	lmiEnd = lastModified.end();
-// 	for( ; lmi!=lmiEnd ; ++lmi)
-// 		registerDynlibType((*lmi).first);
-// 
+	bool allLoaded = false;
+	while (!allLoaded)
+	{	
+		vector< string >::iterator dlli    = dynlibsList.begin();
+		vector< string >::iterator dlliEnd = dynlibsList.end();
+		allLoaded = true;
+		for( ; dlli!=dlliEnd ; ++dlli)
+			allLoaded &= ClassFactory::instance().load((*dlli));
+	}
+
+	vector< string >::iterator dlli    = dynlibsList.begin();
+	vector< string >::iterator dlliEnd = dynlibsList.end();
+	for( ; dlli!=dlliEnd ; ++dlli)
+		registerPluginType((*dlli));
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

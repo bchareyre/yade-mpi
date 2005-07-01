@@ -47,7 +47,13 @@
 QtPreferencesEditor::QtPreferencesEditor ( QWidget * parent , const char * name) : QtGeneratedPreferencesEditor(parent,name)
 {
 	loadPreferences();
-	//scanPlugins();
+
+	const map<string,DynlibType>& dynlibs = Omega::instance().getDynlibsType();
+
+	map<string,DynlibType>::const_iterator dli    = dynlibs.begin();
+	map<string,DynlibType>::const_iterator dliEnd = dynlibs.end();
+	for( ; dli!=dliEnd ; ++dli)
+		lvPluginsList->insertItem(new QListViewItem(lvPluginsList,(*dli).first));
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -268,8 +274,8 @@ void QtPreferencesEditor::scanPlugins()
 	
 	lvPluginsList->clear();
 
+	
 	Omega::instance().scanPlugins();
-cerr << "scan finished" << endl;
 	const map<string,DynlibType>& dynlibs = Omega::instance().getDynlibsType();
 
 	map<string,DynlibType>::const_iterator dli    = dynlibs.begin();

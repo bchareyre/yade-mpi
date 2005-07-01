@@ -51,11 +51,10 @@ QtFileGenerator::QtFileGenerator ( QWidget * parent , const char * name) : QtFil
 	map<string,DynlibType>::const_iterator diEnd = Omega::instance().getDynlibsType().end();
 	for(;di!=diEnd;++di)
 	{
-		if ((*di).second.baseClass=="IOManager")
-			cbSerializationName->insertItem((*di).first);
-		else if ((*di).second.baseClass=="FileGenerator")
+		if ((*di).second.baseClass=="FileGenerator")
 			cbGeneratorName->insertItem((*di).first);
 	}
+
 	leOutputFileName->setText("../data/scene.xml");
 
 	scrollViewFrame = new QFrame();	
@@ -148,7 +147,7 @@ void QtFileGenerator::pbGenerateClicked()
 	shared_ptr<FileGenerator> fg = static_pointer_cast<FileGenerator>(ClassFactory::instance().createShared(cbGeneratorName->currentText()));
 	
 	fg->setFileName(leOutputFileName->text());
-	fg->setSerializationLibrary(cbSerializationName->currentText());
+	fg->setSerializationLibrary(leSerializationName->text());
 	
 	guiGen.deserialize(fg);
 	

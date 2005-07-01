@@ -30,21 +30,13 @@
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
 
+#include "ClassFactory.hpp"
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 using namespace std;
 using namespace boost;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-DynLibManager::DynLibManager ( const string libName )
-{
-	baseDirs.clear();
-	autoUnload = true;
-	load(libName);
-}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -76,11 +68,6 @@ void DynLibManager::addBaseDirectory(const string& dir)
 		tmpDir = dir;
 
 	baseDirs.push_back(tmpDir);
-
-	string ldLibraryPath = getenv("LD_LIBRARY_PATH");
-	ldLibraryPath = dir+":"+ldLibraryPath;
-	setenv("LD_LIBRARY_PATH", ldLibraryPath.c_str(),true);
-	cout <<ldLibraryPath<<endl;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -118,58 +105,33 @@ void DynLibManager::addBaseDirectory(const string& dir)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool DynLibManager::load (const string libName )
+bool DynLibManager::loadFromDirectoryList (const string& libName )
 {
-cerr << "###################" << endl;
-
-cerr << "LD_LIBRARY_PATH : " << getenv("LD_LIBRARY_PATH")<<endl;
-cerr << "Wants to load : " <<libName << endl;
-
 	if (libName.empty())
 		return false;
 
-	string libFileName;
-	#ifdef WIN32
-		libFileName.append(libName);
-		libFileName.append(".dll");
-	#else
-		libFileName.append("lib");
-		libFileName.append(libName);
-		libFileName.append(".so");
-	#endif 
+	string libFileName = libNameToSystemName(libName);
 
-	string baseDir;
-	baseDir.clear();
-	vector<string>::iterator bdi    = baseDirs.begin();
-	vector<string>::iterator bdiEnd = baseDirs.end();
-	for( ; bdi != bdiEnd ; ++bdi)
-	{
-		filesystem::path name = filesystem::path((*bdi)+"/"+libFileName);
-		if ( filesystem::exists( name ) )
-		{
-			baseDir = (*bdi);
-			break;
-		}
-	}
+	string baseDir = findLibDir(libName);
 
-	cerr << "Directory found: " << baseDir << endl;
-
-	if (autoUnload && isLoaded(libName))
-		closeLib(libName);
-		
 	string fullLibName;
 	if (baseDir.length()==0)
-		fullLibName = libFileName;
+		return load(libFileName,libName);
 	else
-		fullLibName = baseDir+"/"+libFileName;
+		return load(baseDir+"/"+libFileName,libName);
 	
+}
 
-//FIXME : problem without this line !
-	fullLibName = libFileName;
-	
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+bool DynLibManager::load (const string& fullLibName, const string& libName )
+{
+	if (libName.empty() || fullLibName.empty())
+		return false;
+
 	#ifdef WIN32
-
-		unsigned short * file2 = new unsigned short[fullLibName.length()+1];
+		unsigned short * file2 = new unsigned short[libName.length()+1];
 		int i=0;
 		while (fullLibName[i]!='\0')
 		{
@@ -188,23 +150,16 @@ cerr << "Wants to load : " <<libName << endl;
 			return true;
 		}
 	#else
-cerr << "File to load : " << fullLibName << endl;
-
 		void * handle = dlopen(fullLibName.data(), RTLD_NOW);
 
 		if (!handle)
-		{
-cerr << "File not loaded " << endl;
 			return !error();
-		}
 		else
 		{
-cerr << "File loaded successfully" << endl;
 			handles[libName] = handle;
 			return true;
 		}
 	#endif
-
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -288,21 +243,81 @@ bool DynLibManager::error()
 
     		FormatMessage( FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, NULL, GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR) &lpMsgBuf, 0, NULL );
 
-		ofstream f; 
-		f.open("log.txt");
-		f << "Error " << dw << " : " << lpMsgBuf << endl;
-		f.close();
+// 		ofstream f; 
+// 		f.open("log.txt");
+// 		f << "Error " << dw << " : " << lpMsgBuf << endl;
+// 		f.close();
 		
 		return (dw!=0);
 	#else
-		char * error = dlerror();
-		if (error != NULL)  
-		{
-			cout << error << endl;
-			//Omega::printErrorLog(error);
-		}
+ 		char * error = dlerror();
+// 		if (error != NULL)  
+// 		{
+// 			cout << error << endl;
+// 			//Omega::printErrorLog(error);
+// 		}
 		return (error!=NULL);
 	#endif
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+string DynLibManager::libNameToSystemName(const string& name)
+{
+	string systemName;
+
+	#ifdef WIN32
+		systemName = name;
+		systemName.append(".dll");
+	#else
+		systemName = "lib";
+		systemName.append(name);
+		systemName.append(".so");
+	#endif 
+
+	return systemName;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+string DynLibManager::systemNameToLibName(const string& name)
+{
+	string libName;
+
+	#ifdef WIN32
+		libName = name.substr(0,name.size()-4);
+	#else
+		libName = name.substr(3,name.size()-3);
+	#endif 
+
+	return libName;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+string DynLibManager::findLibDir(const string& name)
+{
+	string libFileName = libNameToSystemName(name);
+
+	string baseDir;
+	baseDir.clear();
+
+	vector<string>::iterator bdi    = baseDirs.begin();
+	vector<string>::iterator bdiEnd = baseDirs.end();
+	for( ; bdi != bdiEnd ; ++bdi)
+	{
+		filesystem::path name = filesystem::path((*bdi)+"/"+libFileName);
+		if ( filesystem::exists( name ) )
+		{
+			baseDir = (*bdi);
+			break;
+		}
+	}
+
+	return baseDir;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

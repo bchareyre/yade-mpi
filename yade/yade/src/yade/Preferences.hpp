@@ -53,6 +53,8 @@ class Preferences : public Serializable
 	public	: int version;	
 	public	: vector<string> dynlibDirectories;
 	public	: vector<string> includeDirectories;
+	public	: string defaultGUILibName;
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Constructor/Destructor									///

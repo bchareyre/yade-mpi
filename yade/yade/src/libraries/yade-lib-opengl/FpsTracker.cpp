@@ -46,7 +46,8 @@ FpsTracker::FpsTracker (int minX,int minY, int sizeX,int sizeY) : GLWindow(minX,
 	maxFps		= 0;
 	minFps 		= 1000000;
 	nbActions	= 0;
-		
+	displayed 	= false;
+
 	setCurveColor(1.0,0.0,0.0);
 	setMoyColor(0.0,0.0,1.0);	
 	setMinNbActions(10);

@@ -97,8 +97,7 @@ class Omega : public Singleton<Omega>
 	private : map<string,DynlibType> dynlibsType; // FIXME : should store that into class factory ???
 	public  : const map<string,DynlibType>& getDynlibsType();	
 	public	: bool getDynlibType(const string& libName,string& type);
-	private	: void buildDynlibList();
-	private	: void registerDynlibType(const string& name);
+	private	: void registerPluginType(const string& name);
 	public  : void scanPlugins();
 
 	private	: Real dt; // FIXME - maybe ???????? move this to MetaBody.hpp OR MAYBE NOT ??
@@ -129,6 +128,8 @@ class Omega : public Singleton<Omega>
 	public	: Real getSimulationTime() { return simulationTime;};
 	public	: void incrementSimulationTime() { simulationTime+=dt;};
 	
+	public  : void init();
+
 	private	: Omega();
 	private	: ~Omega();
 	private	: Omega(const Omega&);

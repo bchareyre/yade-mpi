@@ -124,6 +124,7 @@ string XMLManager::beginDeserialization(istream& stream, Archive& ac)
 		throw SerializableError(error.c_str());
 	}
 	//saxParser.readAndParseNextXmlLine(stream);
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -144,7 +145,6 @@ void XMLManager::beginSerialization(ostream& stream, Archive& ac)
 {
 	stream << "<Yade>" << endl;
 	writeOpeningTag(stream,ac,0);
-
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

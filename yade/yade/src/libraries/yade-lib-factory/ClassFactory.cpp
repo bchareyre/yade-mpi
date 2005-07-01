@@ -66,7 +66,7 @@ boost::shared_ptr<Factorable> ClassFactory::createShared( std::string name )
 	FactorableCreatorsMap::const_iterator i = map.find( name );
 	if( i == map.end() )
 	{
-		dlm.load(name);
+		dlm.loadFromDirectoryList(name);
 		if (dlm.isLoaded(name))
 		{
 			if( map.find( name ) == map.end() )
@@ -91,7 +91,7 @@ Factorable* ClassFactory::createPure( std::string name )
 	if( i == map.end() )
 	{
 		//cerr << "------------ going to load something" << endl;
-		dlm.load(name);
+		dlm.loadFromDirectoryList(name);
 		if (dlm.isLoaded(name))
 		{
 			if( map.find( name ) == map.end() )
@@ -124,9 +124,25 @@ void * ClassFactory::createPureCustom( std::string name )
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void ClassFactory::load( std::string name )
+bool ClassFactory::load(const string& name)
 {
-	dlm.load(name);
+	return dlm.loadFromDirectoryList(name);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+string ClassFactory::libNameToSystemName(const string& name)
+{
+	return dlm.libNameToSystemName(name);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+string ClassFactory::systemNameToLibName(const string& name)
+{
+	return dlm.systemNameToLibName(name);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

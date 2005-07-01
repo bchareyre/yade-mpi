@@ -31,6 +31,7 @@ QMAKE_LIBDIR = ../../libraries/yade-lib-wm3-math/$(YADEDYNLIBPATH)/yade-libs \
                ../../libraries/yade-lib-threads/$(YADEDYNLIBPATH)/yade-libs \
                ../../libraries/yade-lib-serialization/$(YADEDYNLIBPATH)/yade-libs \
                ../../libraries/yade-lib-computational-geometry/$(YADEDYNLIBPATH)/yade-libs \
+               ../../libraries/yade-lib-serialization-xml/$(YADEDYNLIBPATH) \
                $(YADEDYNLIBPATH)/yade-libs \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
@@ -38,7 +39,7 @@ QMAKE_CXXFLAGS_RELEASE += -lpthread \
 QMAKE_CXXFLAGS_DEBUG += -lpthread \
                         -pthread 
 TARGET = QtGUI 
-DESTDIR = $(YADEDYNLIBPATH) 
+DESTDIR = $(YADEDYNLIBPATH)/yade-guis 
 CONFIG += debug \
           warn_on \
           qt \

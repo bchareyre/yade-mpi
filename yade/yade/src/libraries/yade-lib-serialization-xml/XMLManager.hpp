@@ -44,10 +44,10 @@ class XMLManager : public IOManager
 	public    : XMLManager();
 	public    : virtual ~XMLManager();
 
-	public    : void beginSerialization(ostream& stream, Archive& ac);
-	public    : void finalizeSerialization(ostream& stream, Archive& ac);
-	public    : string beginDeserialization(istream& stream, Archive& ac);
-	public    : void finalizeDeserialization(istream& stream, Archive& ac);
+	public    : virtual void beginSerialization(ostream& stream, Archive& ac);
+	public    : virtual void finalizeSerialization(ostream& stream, Archive& ac);
+	public    : virtual string beginDeserialization(istream& stream, Archive& ac);
+	public    : virtual void finalizeDeserialization(istream& stream, Archive& ac);
 
 	public    : static void serializeSerializable(ostream& stream, Archive& ac, int depth);
 	public    : static void serializeContainer(ostream& stream, Archive& ac , int depth);

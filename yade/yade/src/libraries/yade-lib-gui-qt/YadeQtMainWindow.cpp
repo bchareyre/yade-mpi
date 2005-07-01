@@ -70,7 +70,7 @@ void YadeQtMainWindow::addItem(string menuName, string itemName,string className
 		items.push_back(new QAction(this, itemName.c_str()));
 		items.back()->setText( itemName.c_str() );
 		items.back()->setMenuText( itemName.c_str() );
-		items.back()->setToolTip( ("Load library lib"+className+".so").c_str() );
+		items.back()->setToolTip( ("Load library "+ClassFactory::instance().libNameToSystemName(className)).c_str() );
 		items.back()->addTo((*mi).second);
 		connect( items.back(), SIGNAL( activated() ), this, SLOT( dynamicMenuClicked() ) );
 	}

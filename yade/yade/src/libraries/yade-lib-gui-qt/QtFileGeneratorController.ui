@@ -84,11 +84,6 @@
                         <set>AlignVCenter|AlignRight</set>
                     </property>
                 </widget>
-                <widget class="QComboBox" row="1" column="1" rowspan="1" colspan="2">
-                    <property name="name">
-                        <cstring>cbSerializationName</cstring>
-                    </property>
-                </widget>
                 <widget class="QLabel" row="2" column="0">
                     <property name="name">
                         <cstring>tlGeneratorName</cstring>
@@ -119,6 +114,14 @@
                     </property>
                     <property name="pixmap">
                         <pixmap>image0</pixmap>
+                    </property>
+                </widget>
+                <widget class="QLineEdit" row="1" column="1" rowspan="1" colspan="2">
+                    <property name="name">
+                        <cstring>leSerializationName</cstring>
+                    </property>
+                    <property name="text">
+                        <string>IOManager</string>
                     </property>
                 </widget>
             </grid>

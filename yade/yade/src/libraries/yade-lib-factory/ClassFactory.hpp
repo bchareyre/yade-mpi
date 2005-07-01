@@ -189,7 +189,10 @@ class ClassFactory : public Singleton< ClassFactory >
 
 	public 	  : void addBaseDirectory(const string& dir);
 	
-	public    : void load( std::string name );
+	public    : bool load(const string& name );
+
+	public    : string libNameToSystemName(const string& name);
+	public	  : string systemNameToLibName(const string& name);
 
 	FRIEND_SINGLETON(ClassFactory);
 };

@@ -16,7 +16,7 @@ QMAKE_CXXFLAGS_RELEASE += -lpthread \
 QMAKE_CXXFLAGS_DEBUG += -lpthread \
                         -pthread 
 TARGET = XMLManager 
-DESTDIR = $(YADEDYNLIBPATH) 
+DESTDIR = $(YADEDYNLIBPATH)/yade-libs 
 CONFIG += debug \
           warn_on \
           dll 

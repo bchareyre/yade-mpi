@@ -74,16 +74,23 @@ class DynLibManager
 	
 	// construction
 	public : DynLibManager ();
-	public : DynLibManager (const string libName);
 	public : ~DynLibManager ();
 
-
 //	public : Factory resolve (const string libName, const string symb );
-	public : bool load (const string libName);
+	public : bool load (const string& libName, const string& libName);
+	public : bool loadFromDirectoryList (const string& fullLibName);
+
+
 	public : bool unload (const string libName);
 	public : bool isLoaded (const string libName);
 	public : bool unloadAll ();
 	public : void setAutoUnload ( bool enabled );
+
+	public : string libNameToSystemName(const string& name);
+	public : string systemNameToLibName(const string& name);
+	public : string findLibDir(const string& name);
+
+
 	private : bool closeLib(const string libName);
 	private : bool error();
 };
