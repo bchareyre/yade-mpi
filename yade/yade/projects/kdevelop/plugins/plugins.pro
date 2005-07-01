@@ -5,7 +5,8 @@
 
 SUBDIRS += Data \
            Engine \
-           Container 
+           Container \
+           Gui 
 MOC_DIR = $(YADECOMPILATIONPATH)
 UI_DIR = $(YADECOMPILATIONPATH)
 OBJECTS_DIR = $(YADECOMPILATIONPATH)

@@ -4,12 +4,14 @@
 # Target is a library:  XMLManager
 
 LIBS += -lyade-lib-serialization \
+        -lyade-lib-factory \
         -rdynamic 
 INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 QMAKE_LIBDIR = ../../libraries/yade-lib-serialization/$(YADEDYNLIBPATH)/yade-libs \
+               ../../libraries/yade-lib-factory/$(YADEDYNLIBPATH)/yade-libs \
                $(YADEDYNLIBPATH)/yade-libs 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

@@ -63,8 +63,8 @@ OpenGLRenderingEngine::OpenGLRenderingEngine() : RenderingEngine()
 	addGeometricalModelFunctor("LineSegment","GLDrawLineSegment");
 	addGeometricalModelFunctor("Tetrahedron","GLDrawTetrahedron");
 	
-//	addShadowVolumeFunctor("Box","GLDrawBoxShadowVolume");
-//	addShadowVolumeFunctor("Sphere","GLDrawSphereShadowVolume");
+	addShadowVolumeFunctor("Box","GLDrawBoxShadowVolume");
+	addShadowVolumeFunctor("Sphere","GLDrawSphereShadowVolume");
 	
 	postProcessAttributes(true);
 	

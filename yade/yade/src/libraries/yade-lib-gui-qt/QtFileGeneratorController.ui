@@ -121,7 +121,7 @@
                         <cstring>leSerializationName</cstring>
                     </property>
                     <property name="text">
-                        <string>IOManager</string>
+                        <string>XMLManager</string>
                     </property>
                 </widget>
             </grid>

@@ -37,10 +37,16 @@
 template<typename Type>
 void IOManager::loadFromFile(const string& libName, const string& fileName,const string& name, Type& t)
 {
+	ifstream filei(fileName.c_str());
+
 	shared_ptr<IOManager> ioManager;
 	ioManager = dynamic_pointer_cast<IOManager>(ClassFactory::instance().createShared(libName));
-	ifstream filei(fileName.c_str());
-	ioManager->loadArchive(filei,t,name);
+
+	shared_ptr<Archive> ac = Archive::create(name,t);
+	string str = ioManager->beginDeserialization(filei,*ac);
+	ac->deserialize(filei, *ac, str);
+	ioManager->finalizeDeserialization(filei,*ac);
+
 	filei.close();
 }
 
@@ -50,10 +56,16 @@ void IOManager::loadFromFile(const string& libName, const string& fileName,const
 template<typename Type>
 void IOManager::saveToFile(const string& libName, const string& fileName,const string& name, Type& t)
 {
-	shared_ptr<IOManager> ioManager;
-	ioManager = dynamic_pointer_cast<IOManager>(ClassFactory::instance().createShared(libName));
 	ofstream fileo(fileName.c_str());
-	ioManager->saveArchive(fileo,t,name);
+	
+	shared_ptr<IOManager> ioManager;
+	ioManager = static_pointer_cast<IOManager>(ClassFactory::instance().createShared(libName));
+
+	shared_ptr<Archive> ac = Archive::create(name,t);
+	ioManager->beginSerialization(fileo, *ac);
+	ac->serialize(fileo, *ac, 1);
+	ioManager->finalizeSerialization(fileo, *ac);
+
 	fileo.close();
 }
 
@@ -61,24 +73,30 @@ void IOManager::saveToFile(const string& libName, const string& fileName,const s
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 template<typename Type>
-void IOManager::loadArchive(istream& stream, Type& t, const string& name)
+void IOManager::loadArchive(const string& libName, istream& stream, Type& t, const string& name)
 {
+	shared_ptr<IOManager> ioManager;
+	ioManager = dynamic_pointer_cast<IOManager>(ClassFactory::instance().createShared(libName));
+
 	shared_ptr<Archive> ac = Archive::create(name,t);
-	string str = beginDeserialization(stream,*ac);
+	string str = ioManager->beginDeserialization(stream,*ac);
 	ac->deserialize(stream, *ac, str);
-	finalizeDeserialization(stream,*ac);
+	ioManager->finalizeDeserialization(stream,*ac);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 template<typename Type>
-void IOManager::saveArchive(ostream& stream, Type& t, const string& name)
+void IOManager::saveArchive(const string& libName, ostream& stream, Type& t, const string& name)
 {
+	shared_ptr<IOManager> ioManager;
+	ioManager = dynamic_pointer_cast<IOManager>(ClassFactory::instance().createShared(libName));
+
 	shared_ptr<Archive> ac = Archive::create(name,t);
-	beginSerialization(stream, *ac);
+	ioManager->beginSerialization(stream, *ac);
 	ac->serialize(stream, *ac, 1);
-	finalizeSerialization(stream, *ac);
+	ioManager->finalizeSerialization(stream, *ac);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

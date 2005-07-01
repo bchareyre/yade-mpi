@@ -334,6 +334,12 @@
                         <property name="name">
                             <cstring>lvPluginsList</cstring>
                         </property>
+                        <property name="showSortIndicator">
+                            <bool>true</bool>
+                        </property>
+                        <property name="rootIsDecorated">
+                            <bool>true</bool>
+                        </property>
                         <property name="resizeMode">
                             <enum>AllColumns</enum>
                         </property>

@@ -63,6 +63,7 @@ class QtPreferencesEditor : public QtGeneratedPreferencesEditor, public Factorab
 	private : void savePreferences();
 	private : void loadPreferences();
 	private : void scanPlugins();
+	private : void buildPluginsListView();
 
 	protected : void closeEvent(QCloseEvent *evt);
 

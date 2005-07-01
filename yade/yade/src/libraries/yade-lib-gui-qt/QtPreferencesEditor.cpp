@@ -48,12 +48,7 @@ QtPreferencesEditor::QtPreferencesEditor ( QWidget * parent , const char * name)
 {
 	loadPreferences();
 
-	const map<string,DynlibType>& dynlibs = Omega::instance().getDynlibsType();
-
-	map<string,DynlibType>::const_iterator dli    = dynlibs.begin();
-	map<string,DynlibType>::const_iterator dliEnd = dynlibs.end();
-	for( ; dli!=dliEnd ; ++dli)
-		lvPluginsList->insertItem(new QListViewItem(lvPluginsList,(*dli).first));
+	buildPluginsListView();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -272,17 +267,41 @@ void QtPreferencesEditor::scanPlugins()
 {
 	savePreferences();
 	
+	Omega::instance().scanPlugins();
+	
+	buildPluginsListView();
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+#include <qpixmap.h>
+
+void QtPreferencesEditor::buildPluginsListView()
+{
 	lvPluginsList->clear();
 
-	
-	Omega::instance().scanPlugins();
+// 	QCheckListItem * data		= new QCheckListItem(lvPluginsList,"Data",);
+// 	QCheckListItem * engine		= new QCheckListItem(lvPluginsList,"Engine");
+// 	QCheckListItem * container	= new QCheckListItem(lvPluginsList,"Container");
+// 
+// 	QCheckListItem * state			= new QCheckListItem(data,"State");
+// 	QCheckListItem * physicalParameters	= new QCheckListItem(data,"PhysicalParameters");
+// 	QCheckListItem * geometricalModel	= new QCheckListItem(data,"GeometricalModel");
+// 	QCheckListItem * interactingGeometry	= new QCheckListItem(data,"InteractingGeometry");
+// 	QCheckListItem * boundingVolume		= new QCheckListItem(data,"BoundingVolume");
+// 	QCheckListItem * interactionGeometry	= new QCheckListItem(data,"InteractionGeometry");
+// 	QCheckListItem * interactionPhysics	= new QCheckListItem(data,"InteractionPhysics");
+// 	QCheckListItem * physicalAction 	= new QCheckListItem(data,"PhysicalAction");
+
+	//QCheckListItem * engine = new QCheckListItem(lvPluginsList,"Engine")
+	//QCheckListItem * container = new QCheckListItem(lvPluginsList,"Container")
+
 	const map<string,DynlibType>& dynlibs = Omega::instance().getDynlibsType();
 
 	map<string,DynlibType>::const_iterator dli    = dynlibs.begin();
 	map<string,DynlibType>::const_iterator dliEnd = dynlibs.end();
 	for( ; dli!=dliEnd ; ++dli)
 		lvPluginsList->insertItem(new QListViewItem(lvPluginsList,(*dli).first));
-}
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+}

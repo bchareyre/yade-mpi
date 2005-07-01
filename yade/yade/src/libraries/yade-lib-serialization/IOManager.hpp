@@ -63,10 +63,10 @@ class IOManager : public Factorable
 	public   : IOManager();
 	public   : virtual ~IOManager();
 
-	public  : virtual void beginSerialization(ostream& ,  Archive& )     {};
-	public  : virtual void finalizeSerialization(ostream& ,  Archive& )  {};
-	public  : virtual string beginDeserialization(istream& ,  Archive& ) { return "";};
-	public  : virtual void finalizeDeserialization(istream& , Archive& ) {};
+	public  : virtual void beginSerialization(ostream& ,  Archive& );
+	public  : virtual void finalizeSerialization(ostream& ,  Archive& );
+	public  : virtual string beginDeserialization(istream& ,  Archive& );
+	public  : virtual void finalizeDeserialization(istream& , Archive& );
 	
 	private    : static char cOB;	// containerOpeningBracket 
 	private    : static char cCB;	// containerClosingBracket
@@ -118,10 +118,10 @@ class IOManager : public Factorable
 
 
 	public : template<typename Type>
-		 void loadArchive(istream& stream, Type& t, const string& name);
+		 void loadArchive(const string& libName, istream& stream, Type& t, const string& name);
 
 	public : template<typename Type>
-		 void saveArchive(ostream& stream, Type& t, const string& name);
+		 void saveArchive(const string& libName, ostream& stream, Type& t, const string& name);
 
 };
 ///////////////////////////////////////////////////////////////////////////////////////////////////
