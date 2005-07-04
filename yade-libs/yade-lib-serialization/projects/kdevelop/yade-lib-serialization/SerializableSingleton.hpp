@@ -1,0 +1,1 @@
+../../../src/SerializableSingleton.hpp
