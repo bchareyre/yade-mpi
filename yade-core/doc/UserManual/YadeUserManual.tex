@@ -5,7 +5,7 @@
 \usepackage[dvips]{color}
 \usepackage{amsmath}
 \usepackage[T1]{fontenc}
-\usepackage{algorithmic}
+%\usepackage{algorithmic}
 
 \pagestyle{empty}
 
@@ -96,7 +96,7 @@
 
 	\section{What is Yade ?}
 
-	YADE is a simulation framework composed by one main software, libraries and plugins that helps the developper to implement new algorithms linked to a simulation proccess (i.e. collision detection, constitutive law etc). For now, it is well suited for 3D lagrangians simulations, as rigid-bodies simulations, discrete elements simulations, smooth particle hydrodynamic systems, mass spring systems, finite element simulations and so on. We do not plan to add support for 2D simulations and eulerian simulations (like usual fluid simulation) since their requirement are not compatible with the current framework underlyings. Yade is an open source software based on the GPL license. It is available for Unix/Linux system and we hope soon for Windows.
+	YADE is a simulation framework composed by one main software, libraries and plugins that helps the developper to implement new algorithms linked to a simulation proccess (i.e. collision detection, constitutive law etc). For now, it is well suited for 3D lagrangians simulations, as rigid-bodies simulations, discrete elements simulations, smooth particle hydrodynamic systems, mass spring systems, finite element simulations and so on. We do not plan to add support for 2D simulations and eulerian simulations (like usual fluid simulation) since their requirement are not compatible with the current framework underlyings. Yade is an open source software licensed under GPL. It is available for Unix/Linux system and we hope soon for Windows.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -137,7 +137,7 @@
 
 
 \begin{itemize}
-	\item tatic cast and dynamic cast
+	\item static cast and dynamic cast
 	\item Standard template library (STL) (vector,list,map no float[])
 	\item Boost library (shared\_ptr no float*)
 	\item Singleton pattern
@@ -462,7 +462,7 @@ They are as describe more in details in next sections.
 
 	A physical action is everything that can be applied to a body to modify its state usually in response to some interaction. For a rigidbody, it can be :
 	\begin{itemize}
-		\item a force $[kg m/s^2]$
+		\item a force $[{{kg m}\over{s^2}}]$
 		\item an acceleration $[m/s^2]$
 		\item an impulse $[kg m/s]$
 		\item a displacement $[\Delta m]$
