@@ -6,7 +6,8 @@ INSTALL_DIR=/usr/local
 
 #######################
 
-yade_subdir=yade-lib-loki
+yade_include_subdir=yade-lib-loki
+yade_lib_subdir=yade-libs
 
 
 all:
@@ -15,6 +16,7 @@ all:
 clean:
 	rm bin/*
 	find ./projects/kdevelop -name "Makefile" -exec rm {} \;
+	find ./projects/kdevelop -name "*.o" -exec rm {} \;
 
 install:
 	mkdir --parents ${PREFIX_DIR}/${INSTALL_DIR}/lib/yade/${yade_subdir}

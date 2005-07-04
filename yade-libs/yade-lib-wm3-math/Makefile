@@ -6,7 +6,7 @@ INSTALL_DIR=/usr/local
 
 #######################
 
-yade_include_subdir=yade-lib-loki
+yade_include_subdir=yade-lib-wm3-math
 yade_lib_subdir=yade-libs
 
 
@@ -25,4 +25,5 @@ install:
 	cp src/*.hpp ${PREFIX_DIR}/${INSTALL_DIR}/include/yade/${yade_include_subdir}
 	-cp src/*.ipp ${PREFIX_DIR}/${INSTALL_DIR}/include/yade/${yade_include_subdir}
 	-cp src/*.tpp ${PREFIX_DIR}/${INSTALL_DIR}/include/yade/${yade_include_subdir}
+
 
