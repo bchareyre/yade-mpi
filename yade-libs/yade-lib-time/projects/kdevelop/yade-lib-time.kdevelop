@@ -10,15 +10,10 @@
       <keyword>Qt</keyword>
     </keywords>
     <ignoreparts/>
-    <projectdirectory>.</projectdirectory>
-    <absoluteprojectpath>false</absoluteprojectpath>
-    <description/>
-    <secondaryLanguages/>
-    <versioncontrol/>
   </general>
   <kdevfileview>
     <groups>
-      <group pattern="*.cpp;*.cxx;*.h;*.hpp;*.tpp;*.ipp" name="Sources" />
+      <group pattern="*.cpp;*.cxx;*.h" name="Sources" />
       <group pattern="*.ui" name="User Interface" />
       <group pattern="*.png" name="Icons" />
       <group pattern="*" name="Others" />
@@ -28,7 +23,6 @@
     <tree>
       <hidepatterns>*.o,*.lo,CVS</hidepatterns>
       <hidenonprojectfiles>false</hidenonprojectfiles>
-      <showvcsfields>false</showvcsfields>
     </tree>
   </kdevfileview>
   <kdevdoctreeview>
@@ -73,46 +67,20 @@
   <kdevdebugger>
     <general>
       <dbgshell/>
-      <programargs/>
-      <gdbpath/>
-      <configGdbScript/>
-      <runShellScript/>
-      <runGdbScript/>
-      <breakonloadinglibs>true</breakonloadinglibs>
-      <separatetty>false</separatetty>
-      <floatingtoolbar>false</floatingtoolbar>
     </general>
-    <display>
-      <staticmembers>false</staticmembers>
-      <demanglenames>true</demanglenames>
-      <outputradix>10</outputradix>
-    </display>
   </kdevdebugger>
   <kdevtrollproject>
     <run>
-      <mainprogram>bin/yade</mainprogram>
+      <mainprogram>./bin/yadelibtime</mainprogram>
       <programargs/>
       <directoryradio>executable</directoryradio>
-      <customdirectory>/</customdirectory>
-      <terminal>false</terminal>
-      <autocompile>true</autocompile>
-      <envvars/>
     </run>
     <general>
-      <activedir>libraries/yade-lib-loki</activedir>
+      <activedir>yade-lib-time</activedir>
     </general>
-    <make>
-      <abortonerror>false</abortonerror>
-      <numberofjobs>1</numberofjobs>
-      <dontact>false</dontact>
-      <makebin/>
-      <prio>0</prio>
-      <envvars/>
-    </make>
     <subclassing/>
   </kdevtrollproject>
   <kdevfilecreate>
-    <filetypes/>
     <useglobaltypes>
       <type ext="ui" />
       <type ext="cpp" />
@@ -123,20 +91,21 @@
   <kdevdocumentation>
     <projectdoc>
       <docsystem>Doxygen Documentation Collection</docsystem>
-      <docurl>yade.tag</docurl>
-      <usermanualurl/>
+      <docurl>yadelibtime.tag</docurl>
     </projectdoc>
   </kdevdocumentation>
   <substmap>
-    <APPNAME>yade</APPNAME>
-    <APPNAMELC>yade</APPNAMELC>
-    <APPNAMEUC>YADE</APPNAMEUC>
+    <APPNAME>yadelibtime</APPNAME>
+    <APPNAMELC>yadelibtime</APPNAMELC>
+    <APPNAMESC>Yadelibtime</APPNAMESC>
+    <APPNAMEUC>YADELIBTIME</APPNAMEUC>
     <AUTHOR>Olivier Galizzi</AUTHOR>
     <EMAIL>olivier.galizzi@imag.fr</EMAIL>
     <LICENSE>GPL</LICENSE>
     <LICENSEFILE>COPYING</LICENSEFILE>
     <VERSION>0.1</VERSION>
-    <dest>/home/evasion/galizzi/devel/yade/yade/projects/yade</dest>
+    <YEAR>2005</YEAR>
+    <dest>/disc/devel/trunk/yade-libs/yade-lib-time/projects/yadelibtime</dest>
   </substmap>
   <kdevcppsupport>
     <references/>
@@ -152,32 +121,5 @@
       <argumentsHintDelay>400</argumentsHintDelay>
       <headerCompletionDelay>250</headerCompletionDelay>
     </codecompletion>
-    <creategettersetter>
-      <prefixGet/>
-      <prefixSet>set</prefixSet>
-      <prefixVariable>m_,_</prefixVariable>
-      <parameterName>theValue</parameterName>
-      <inlineGet>true</inlineGet>
-      <inlineSet>true</inlineSet>
-    </creategettersetter>
   </kdevcppsupport>
-  <cppsupportpart>
-    <filetemplates>
-      <interfacesuffix>.hpp</interfacesuffix>
-      <implementationsuffix>.cpp</implementationsuffix>
-    </filetemplates>
-  </cppsupportpart>
-  <kdevvisualadvance>
-    <emulator>VisualBoyAdvance</emulator>
-    <binary/>
-    <addOptions/>
-    <terminal>false</terminal>
-    <fullscreen>false</fullscreen>
-    <graphicFilter>-f0</graphicFilter>
-    <scaling>-1</scaling>
-  </kdevvisualadvance>
-  <ctagspart>
-    <customArguments/>
-    <customTagfilePath/>
-  </ctagspart>
 </kdevelop>
