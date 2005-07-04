@@ -1,34 +1,52 @@
-#include <yade/Omega.hpp>
+/***************************************************************************
+ *   Copyright (C) 2004 by Olivier Galizzi                                 *
+ *   olivier.galizzi@imag.fr                                               *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ ***************************************************************************/
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+#include "Omega.hpp"
 #include "yadeExceptions.hpp"
-
-#include <yade-lib-wm3-math/Vector3.hpp>
-
-#include <yade-lib-serialization/IOManager.hpp>
-#include <yade/MetaBody.hpp>
-
+#include "MetaBody.hpp"
 #include "FileGenerator.hpp"
 #include "InteractionSolver.hpp"
 #include "DeusExMachina.hpp"
-#include <yade/Body.hpp>
-
-#include <yade-lib-serialization/IOManager.hpp>
-#include "BroadInteractor.hpp"
-
-#include <yade/GeometricalModel.hpp>
-#include <yade/InteractingGeometry.hpp>
-#include <yade/BoundingVolume.hpp>
+#include "Body.hpp"
+#include "GeometricalModel.hpp"
+#include "InteractingGeometry.hpp"
+#include "BoundingVolume.hpp"
 #include "InteractionGeometry.hpp"
 #include "InteractionPhysics.hpp"
-#include <yade-lib-threads/ThreadSynchronizer.hpp>
+#include "BroadInteractor.hpp"
 #include "SimulationLoop.hpp"
-
 #include "FrontEnd.hpp"
-
 #include "MetaEngine.hpp"
-
 #include "Preferences.hpp"
 
-#include <yade-lib-multimethods/FunctorWrapper.hpp>
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+#include <yade/yade-lib-wm3-math/Vector3.hpp>
+#include <yade/yade-lib-serialization/IOManager.hpp>
+#include <yade/yade-lib-serialization/IOManager.hpp>
+#include <yade/yade-lib-threads/ThreadSynchronizer.hpp>
+#include <yade/yade-lib-multimethods/FunctorWrapper.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////

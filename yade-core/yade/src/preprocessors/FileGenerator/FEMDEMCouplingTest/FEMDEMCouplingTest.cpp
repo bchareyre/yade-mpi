@@ -23,43 +23,46 @@
 
 #include "FEMDEMCouplingTest.hpp"
 
-// dispatchers
-#include <yade-common/BoundingVolumeMetaEngine.hpp>
-#include <yade-common/PhysicalParametersMetaEngine.hpp>
-#include <yade-common/GeometricalModelMetaEngine.hpp>
-#include <yade-common/PhysicalActionDamper.hpp>
-#include <yade-common/PhysicalActionApplier.hpp>
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <yade-common/InteractionGeometryMetaEngine.hpp>
-#include <yade-common/InteractionPhysicsMetaEngine.hpp>
+// dispatchers
+#include <yade/yade-common/BoundingVolumeMetaEngine.hpp>
+#include <yade/yade-common/PhysicalParametersMetaEngine.hpp>
+#include <yade/yade-common/GeometricalModelMetaEngine.hpp>
+#include <yade/yade-common/PhysicalActionDamper.hpp>
+#include <yade/yade-common/PhysicalActionApplier.hpp>
+
+#include <yade/yade-common/InteractionGeometryMetaEngine.hpp>
+#include <yade/yade-common/InteractionPhysicsMetaEngine.hpp>
 
 // actors
-#include <yade-common/GravityEngine.hpp>
-#include <yade-common/CundallNonViscousForceDamping.hpp>
-#include <yade-common/CundallNonViscousMomentumDamping.hpp>
+#include <yade/yade-common/GravityEngine.hpp>
+#include <yade/yade-common/CundallNonViscousForceDamping.hpp>
+#include <yade/yade-common/CundallNonViscousMomentumDamping.hpp>
 // actors FEM
-#include <yade-common/FEMLaw.hpp>
-#include <yade-common/PhysicalActionContainerInitializer.hpp>
-#include <yade-common/PhysicalActionContainerReseter.hpp>
-#include <yade-common/FEMSetTextLoader.hpp>
+#include <yade/yade-common/FEMLaw.hpp>
+#include <yade/yade-common/PhysicalActionContainerInitializer.hpp>
+#include <yade/yade-common/PhysicalActionContainerReseter.hpp>
+#include <yade/yade-common/FEMSetTextLoader.hpp>
 //actors DEM
-#include <yade-common/SDECTimeStepper.hpp>
-#include <yade-common/ElasticContactLaw.hpp>
-#include <yade-common/PersistentSAPCollider.hpp>
+#include <yade/yade-common/SDECTimeStepper.hpp>
+#include <yade/yade-common/ElasticContactLaw.hpp>
+#include <yade/yade-common/PersistentSAPCollider.hpp>
 
 // data
-#include <yade-common/AABB.hpp>
+#include <yade/yade-common/AABB.hpp>
 // data FEM
-#include <yade-common/FEMSetParameters.hpp>
-#include <yade-common/MetaInteractingGeometry.hpp>
+#include <yade/yade-common/FEMSetParameters.hpp>
+#include <yade/yade-common/MetaInteractingGeometry.hpp>
 // data DEM
-#include <yade-common/BodyMacroParameters.hpp>
-#include <yade-common/Box.hpp>
-#include <yade-common/InteractingBox.hpp>
+#include <yade/yade-common/BodyMacroParameters.hpp>
+#include <yade/yade-common/Box.hpp>
+#include <yade/yade-common/InteractingBox.hpp>
 
-#include <yade-common/BodyRedirectionVector.hpp>
-#include <yade-common/InteractionVecSet.hpp>
-#include <yade-common/PhysicalActionVectorVector.hpp>
+#include <yade/yade-common/BodyRedirectionVector.hpp>
+#include <yade/yade-common/InteractionVecSet.hpp>
+#include <yade/yade-common/PhysicalActionVectorVector.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////

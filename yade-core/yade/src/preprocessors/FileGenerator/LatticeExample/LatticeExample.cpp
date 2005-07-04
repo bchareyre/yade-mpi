@@ -23,30 +23,36 @@
 
 #include "LatticeExample.hpp"
 
-#include <yade-common/LatticeSetParameters.hpp>
-#include <yade-common/LatticeBeamParameters.hpp>
-#include <yade-common/LatticeNodeParameters.hpp>
-#include <yade-common/LineSegment.hpp>
-#include <yade-common/Sphere.hpp>
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <yade/Body.hpp>
-#include <yade-common/MetaInteractingGeometry.hpp>
-#include <yade-common/BoundingVolumeMetaEngine.hpp>
-#include <yade-common/GeometricalModelMetaEngine.hpp>
+#include <yade/yade-common/LatticeSetParameters.hpp>
+#include <yade/yade-common/LatticeBeamParameters.hpp>
+#include <yade/yade-common/LatticeNodeParameters.hpp>
+#include <yade/yade-common/LineSegment.hpp>
+#include <yade/yade-common/Sphere.hpp>
 
-#include <yade-common/AABB.hpp>
+#include <yade/yade-core/Body.hpp>
+#include <yade/yade-common/MetaInteractingGeometry.hpp>
+#include <yade/yade-common/BoundingVolumeMetaEngine.hpp>
+#include <yade/yade-common/GeometricalModelMetaEngine.hpp>
 
-#include <yade-common/BodyRedirectionVector.hpp>
-#include <yade-common/InteractionVecSet.hpp>
-#include <yade-common/PhysicalActionVectorVector.hpp>
+#include <yade/yade-common/AABB.hpp>
 
-#include <yade-common/TranslationEngine.hpp>
-#include <yade-common/PhysicalParametersMetaEngine.hpp>
-#include <yade-common/PhysicalActionApplier.hpp>
+#include <yade/yade-common/BodyRedirectionVector.hpp>
+#include <yade/yade-common/InteractionVecSet.hpp>
+#include <yade/yade-common/PhysicalActionVectorVector.hpp>
 
-#include <yade-common/PhysicalActionContainerInitializer.hpp>
+#include <yade/yade-common/TranslationEngine.hpp>
+#include <yade/yade-common/PhysicalParametersMetaEngine.hpp>
+#include <yade/yade-common/PhysicalActionApplier.hpp>
 
-#include <yade-common/LatticeLaw.hpp>
+#include <yade/yade-common/PhysicalActionContainerInitializer.hpp>
+
+#include <yade/yade-common/LatticeLaw.hpp>
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 using namespace boost;
 using namespace std;

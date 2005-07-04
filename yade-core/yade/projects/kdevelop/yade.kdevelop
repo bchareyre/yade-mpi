@@ -99,7 +99,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir>plugins/Engine/Sensor/RenderingEngine/OpenGLRenderingEngine/OpenGLRenderingEngine</activedir>
+      <activedir>libraries/yade-lib-qhull</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>

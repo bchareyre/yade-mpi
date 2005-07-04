@@ -1,56 +1,84 @@
+/***************************************************************************
+ *   Copyright (C) 2004 by Olivier Galizzi                                 *
+ *   olivier.galizzi@imag.fr                                               *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ ***************************************************************************/
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 #include "HangingCloth.hpp"
 
-#include <yade/Body.hpp>
-#include <yade-common/Mesh2D.hpp>
-#include <yade-common/Sphere.hpp>
-#include <yade-common/RigidBodyParameters.hpp>
-#include <yade-common/Box.hpp>
-#include <yade-common/AABB.hpp>
-#include <yade-common/InteractingBox.hpp>
-#include <yade/MetaBody.hpp>
-#include <yade-common/FrictionLessElasticContactLaw.hpp>
-#include <yade-common/PersistentSAPCollider.hpp>
-#include <yade/MetaBody.hpp>
-#include <yade-common/MassSpringLaw.hpp>
-#include <yade-common/MassSpringBody2RigidBodyLaw.hpp>
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <yade-lib-serialization/IOManager.hpp>
-#include <yade-common/InteractionGeometryMetaEngine.hpp>
-#include <yade-common/InteractionPhysicsMetaEngine.hpp>
+#include <yade/yade-core/Body.hpp>
+#include <yade/yade-common/Mesh2D.hpp>
+#include <yade/yade-common/Sphere.hpp>
+#include <yade/yade-common/RigidBodyParameters.hpp>
+#include <yade/yade-common/Box.hpp>
+#include <yade/yade-common/AABB.hpp>
+#include <yade/yade-common/InteractingBox.hpp>
+#include <yade/yade-core/MetaBody.hpp>
+#include <yade/yade-common/FrictionLessElasticContactLaw.hpp>
+#include <yade/yade-common/PersistentSAPCollider.hpp>
+#include <yade/yade-common/MassSpringLaw.hpp>
+#include <yade/yade-common/MassSpringBody2RigidBodyLaw.hpp>
 
-#include <yade-common/PhysicalActionApplier.hpp>
-#include <yade-common/PhysicalActionDamper.hpp>
+#include <yade/yade-lib-serialization/IOManager.hpp>
+#include <yade/yade-common/InteractionGeometryMetaEngine.hpp>
+#include <yade/yade-common/InteractionPhysicsMetaEngine.hpp>
 
-#include <yade-common/CundallNonViscousForceDamping.hpp>
-#include <yade-common/CundallNonViscousMomentumDamping.hpp>
+#include <yade/yade-common/PhysicalActionApplier.hpp>
+#include <yade/yade-common/PhysicalActionDamper.hpp>
 
-#include <yade-common/BoundingVolumeMetaEngine.hpp>
-#include <yade-common/GeometricalModelMetaEngine.hpp>
+#include <yade/yade-common/CundallNonViscousForceDamping.hpp>
+#include <yade/yade-common/CundallNonViscousMomentumDamping.hpp>
 
-#include <yade-common/InteractionDescriptionSet2AABB.hpp>
-#include <yade-common/MetaInteractingGeometry.hpp>
-#include <yade-common/ParticleParameters.hpp>
-#include <yade-common/ParticleSetParameters.hpp>
-#include <yade-common/SpringGeometry.hpp>
-#include <yade-common/SpringPhysics.hpp>
-#include <yade-common/InteractingSphere.hpp>
+#include <yade/yade-common/BoundingVolumeMetaEngine.hpp>
+#include <yade/yade-common/GeometricalModelMetaEngine.hpp>
 
-#include <yade-common/ElasticContactLaw.hpp>
-#include <yade-common/MacroMicroElasticRelationships.hpp>
-#include <yade-common/BodyMacroParameters.hpp>
-#include <yade-common/SDECLinkGeometry.hpp>
-#include <yade-common/SDECLinkPhysics.hpp>
-#include <yade-common/MassSpringBody2RigidBodyLaw.hpp>
+#include <yade/yade-common/InteractionDescriptionSet2AABB.hpp>
+#include <yade/yade-common/MetaInteractingGeometry.hpp>
+#include <yade/yade-common/ParticleParameters.hpp>
+#include <yade/yade-common/ParticleSetParameters.hpp>
+#include <yade/yade-common/SpringGeometry.hpp>
+#include <yade/yade-common/SpringPhysics.hpp>
+#include <yade/yade-common/InteractingSphere.hpp>
 
-#include <yade-common/PhysicalActionContainerReseter.hpp>
-#include <yade-common/PhysicalActionContainerInitializer.hpp>
-#include <yade-common/GravityEngine.hpp>
+#include <yade/yade-common/ElasticContactLaw.hpp>
+#include <yade/yade-common/MacroMicroElasticRelationships.hpp>
+#include <yade/yade-common/BodyMacroParameters.hpp>
+#include <yade/yade-common/SDECLinkGeometry.hpp>
+#include <yade/yade-common/SDECLinkPhysics.hpp>
+#include <yade/yade-common/MassSpringBody2RigidBodyLaw.hpp>
 
-#include <yade-common/PhysicalParametersMetaEngine.hpp>
+#include <yade/yade-common/PhysicalActionContainerReseter.hpp>
+#include <yade/yade-common/PhysicalActionContainerInitializer.hpp>
+#include <yade/yade-common/GravityEngine.hpp>
 
-#include <yade-common/BodyRedirectionVector.hpp>
-#include <yade-common/InteractionVecSet.hpp>
-#include <yade-common/PhysicalActionVectorVector.hpp>
+#include <yade/yade-common/PhysicalParametersMetaEngine.hpp>
+
+#include <yade/yade-common/BodyRedirectionVector.hpp>
+#include <yade/yade-common/InteractionVecSet.hpp>
+#include <yade/yade-common/PhysicalActionVectorVector.hpp>
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 HangingCloth::HangingCloth () : FileGenerator()
 {
@@ -84,14 +112,23 @@ HangingCloth::HangingCloth () : FileGenerator()
 	gravity 	= Vector3r(0,-9.81,0);
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 HangingCloth::~HangingCloth ()
 {
 
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 void HangingCloth::postProcessAttributes(bool)
 {
 }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void HangingCloth::registerAttributes()
 {
@@ -125,6 +162,9 @@ void HangingCloth::registerAttributes()
 //	REGISTER_ATTRIBUTE(spherePoissonRatio);
 //	REGISTER_ATTRIBUTE(sphereFrictionDeg);
 }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 string HangingCloth::generate()
 {
@@ -516,7 +556,6 @@ void HangingCloth::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-
 void HangingCloth::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents)
 {
 	body = shared_ptr<Body>(new Body(0,2));
@@ -557,3 +596,5 @@ void HangingCloth::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r
 	body->physicalParameters	= physics;
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////

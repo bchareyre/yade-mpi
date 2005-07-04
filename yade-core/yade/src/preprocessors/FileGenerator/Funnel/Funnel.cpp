@@ -18,48 +18,55 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 #include "Funnel.hpp"
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <yade-common/Box.hpp>
-#include <yade-common/AABB.hpp>
-#include <yade-common/Sphere.hpp>
-#include <yade/MetaBody.hpp>
-#include <yade-common/SAPCollider.hpp>
-#include <yade-common/PersistentSAPCollider.hpp>
-#include <yade-common/BodyMacroParameters.hpp>
-#include <fstream>
-#include <yade-lib-serialization/IOManager.hpp>
-#include <yade-common/ElasticContactLaw.hpp>
-#include <yade-common/BodyMacroParameters.hpp>
-#include <yade-common/SDECLinkGeometry.hpp>
-#include <yade/Interaction.hpp>
-#include <yade-common/BoundingVolumeMetaEngine.hpp>
-#include <yade-common/InteractionDescriptionSet2AABB.hpp>
-#include <yade-common/MetaInteractingGeometry.hpp>
-#include <yade-common/MacroMicroElasticRelationships.hpp>
-#include <yade-common/SDECTimeStepper.hpp>
+#include <yade/yade-common/Box.hpp>
+#include <yade/yade-common/AABB.hpp>
+#include <yade/yade-common/Sphere.hpp>
+#include <yade/yade-core/MetaBody.hpp>
+#include <yade/yade-common/SAPCollider.hpp>
+#include <yade/yade-common/PersistentSAPCollider.hpp>
+#include <yade/yade-common/BodyMacroParameters.hpp>
+#include <yade/yade-lib-serialization/IOManager.hpp>
+#include <yade/yade-common/ElasticContactLaw.hpp>
+#include <yade/yade-common/BodyMacroParameters.hpp>
+#include <yade/yade-common/SDECLinkGeometry.hpp>
+#include <yade/yade-core/Interaction.hpp>
+#include <yade/yade-common/BoundingVolumeMetaEngine.hpp>
+#include <yade/yade-common/InteractionDescriptionSet2AABB.hpp>
+#include <yade/yade-common/MetaInteractingGeometry.hpp>
+#include <yade/yade-common/MacroMicroElasticRelationships.hpp>
+#include <yade/yade-common/SDECTimeStepper.hpp>
 
-#include <yade-common/PhysicalActionContainerReseter.hpp>
-#include <yade-common/PhysicalActionContainerInitializer.hpp>
+#include <yade/yade-common/PhysicalActionContainerReseter.hpp>
+#include <yade/yade-common/PhysicalActionContainerInitializer.hpp>
 
-#include <yade-common/PhysicalActionDamper.hpp>
-#include <yade-common/PhysicalActionApplier.hpp>
+#include <yade/yade-common/PhysicalActionDamper.hpp>
+#include <yade/yade-common/PhysicalActionApplier.hpp>
 
-#include <yade-common/CundallNonViscousForceDamping.hpp>
-#include <yade-common/CundallNonViscousMomentumDamping.hpp>
-#include <yade-common/GravityEngine.hpp>
+#include <yade/yade-common/CundallNonViscousForceDamping.hpp>
+#include <yade/yade-common/CundallNonViscousMomentumDamping.hpp>
+#include <yade/yade-common/GravityEngine.hpp>
 
-#include <yade-common/InteractionGeometryMetaEngine.hpp>
-#include <yade-common/InteractionPhysicsMetaEngine.hpp>
-#include <yade/Body.hpp>
-#include <yade-common/InteractingBox.hpp>
-#include <yade-common/InteractingSphere.hpp>
-#include <yade-common/PhysicalParametersMetaEngine.hpp>
+#include <yade/yade-common/InteractionGeometryMetaEngine.hpp>
+#include <yade/yade-common/InteractionPhysicsMetaEngine.hpp>
+#include <yade/yade-core/Body.hpp>
+#include <yade/yade-common/InteractingBox.hpp>
+#include <yade/yade-common/InteractingSphere.hpp>
+#include <yade/yade-common/PhysicalParametersMetaEngine.hpp>
 
-#include <yade-common/BodyRedirectionVector.hpp>
-#include <yade-common/InteractionVecSet.hpp>
-#include <yade-common/PhysicalActionVectorVector.hpp>
+#include <yade/yade-common/BodyRedirectionVector.hpp>
+#include <yade/yade-common/InteractionVecSet.hpp>
+#include <yade/yade-common/PhysicalActionVectorVector.hpp>
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 Funnel::Funnel () : FileGenerator()
 {
@@ -80,14 +87,23 @@ Funnel::Funnel () : FileGenerator()
 	disorder = 0.2;
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 Funnel::~Funnel ()
 {
 
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 void Funnel::postProcessAttributes(bool)
 {
 }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void Funnel::registerAttributes()
 {
@@ -106,6 +122,9 @@ void Funnel::registerAttributes()
 	REGISTER_ATTRIBUTE(rotationBlocked);
 	REGISTER_ATTRIBUTE(timeStepUpdateInterval);
 }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 string Funnel::generate()
 {
