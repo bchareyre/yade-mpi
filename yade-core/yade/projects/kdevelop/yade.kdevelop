@@ -99,7 +99,7 @@
       <envvars/>
     </run>
     <general>
-      <activedir></activedir>
+      <activedir>preprocessors/FileGenerator/TetrahedronsTest</activedir>
     </general>
     <make>
       <abortonerror>false</abortonerror>

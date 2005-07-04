@@ -3,6 +3,14 @@
 # Subdir relative project main directory: ./yade-lib-swiftpp
 # Target is a library:  ../../../bin/yade-lib-swiftpp
 
+LIBS += -lyade-lib-qhull 
+INCLUDEPATH += /usr/local/include/yade 
+QMAKE_LIBDIR = /usr/local/lib/yade/yade-libs/ 
+TARGET = ../../../bin/yade-lib-swiftpp 
+CONFIG += release \
+          warn_on \
+          dll 
+TEMPLATE = lib 
 HEADERS += SWIFT_array.h \
            SWIFT_boxnode.h \
            SWIFT_common.h \
@@ -25,9 +33,3 @@ SOURCES += fileio.cpp \
            pair.cpp \
            pqueue.cpp \
            scene.cpp 
-INCLUDEPATH += /usr/local/include/yade
-TARGET = ../../../bin/yade-lib-swiftpp
-CONFIG += release \
-warn_on \
-dll
-TEMPLATE = lib

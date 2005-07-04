@@ -253,6 +253,7 @@ void Omega::scanPlugins()
 	vector<string>::iterator siEnd = preferences->dynlibDirectories.end();
 	for( ; si != siEnd ; ++si)
 	{
+		cerr << "Loading from : " << (*si) << endl;
 		filesystem::path directory((*si));
 
 		if ( filesystem::exists( directory ) )
@@ -287,7 +288,12 @@ void Omega::scanPlugins()
 		vector< string >::iterator dlliEnd = dynlibsList.end();
 		allLoaded = true;
 		for( ; dlli!=dlliEnd ; ++dlli)
-			allLoaded &= ClassFactory::instance().load((*dlli));
+		{
+			bool thisLoaded = ClassFactory::instance().load((*dlli));
+			if (!thisLoaded)
+				cerr << "Can load : " << (*dlli) << endl;
+			allLoaded &= thisLoaded;
+		}
 	}
 
 	vector< string >::iterator dlli    = dynlibsList.begin();

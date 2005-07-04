@@ -254,11 +254,11 @@ bool DynLibManager::error()
 		return (dw!=0);
 	#else
  		char * error = dlerror();
-// 		if (error != NULL)  
-// 		{
-// 			cout << error << endl;
-// 			//Omega::printErrorLog(error);
-// 		}
+/*		if (error != NULL)  
+		{
+			cout << error << endl;
+			//Omega::printErrorLog(error);
+		}*/
 		return (error!=NULL);
 	#endif
 }
