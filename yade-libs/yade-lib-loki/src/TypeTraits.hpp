@@ -21,7 +21,7 @@ namespace Loki
     struct IsCustomUnsignedInt
     {
         enum { value = 0 };
-    };        
+    };
 
 ////////////////////////////////////////////////////////////////////////////////
 // class template IsCustomSignedInt

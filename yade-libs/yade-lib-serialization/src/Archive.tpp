@@ -32,14 +32,14 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <yade-lib-wm3-math/Vector2.hpp>
-#include <yade-lib-wm3-math/Vector3.hpp>
-#include <yade-lib-wm3-math/Vector4.hpp>
-#include <yade-lib-wm3-math/Matrix2.hpp>
-#include <yade-lib-wm3-math/Matrix3.hpp>
-#include <yade-lib-wm3-math/Matrix4.hpp>
-#include <yade-lib-wm3-math/Quaternion.hpp>
-#include <yade-lib-wm3-math/Se3.hpp>
+#include <yade/yade-lib-wm3-math/Vector2.hpp>
+#include <yade/yade-lib-wm3-math/Vector3.hpp>
+#include <yade/yade-lib-wm3-math/Vector4.hpp>
+#include <yade/yade-lib-wm3-math/Matrix2.hpp>
+#include <yade/yade-lib-wm3-math/Matrix3.hpp>
+#include <yade/yade-lib-wm3-math/Matrix4.hpp>
+#include <yade/yade-lib-wm3-math/Quaternion.hpp>
+#include <yade/yade-lib-wm3-math/Se3.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////

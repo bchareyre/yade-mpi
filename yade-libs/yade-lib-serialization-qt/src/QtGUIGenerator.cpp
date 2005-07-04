@@ -27,8 +27,10 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <sstream>
-#include <qpushbutton.h>
+
 #include <boost/any.hpp>
+
+#include <qpushbutton.h>
 #include <qlineedit.h>
 #include <qcheckbox.h>
 

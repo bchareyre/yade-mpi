@@ -33,13 +33,16 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <yade-lib-factory/ClassFactory.hpp>
-#include <yade-lib-serialization/Serializable.hpp>
-#include <yade-lib-multimethods/MultiMethodsExceptions.hpp>
-#include <yade-lib-loki/Functor.hpp>
-#include <yade-lib-loki/Typelist.hpp>
-#include <yade-lib-loki/TypeManip.hpp>
-#include <yade-lib-loki/NullType.hpp>
+#include <yade/yade-lib-factory/ClassFactory.hpp>
+#include <yade/yade-lib-serialization/Serializable.hpp>
+#include <yade/yade-lib-multimethods/MultiMethodsExceptions.hpp>
+#include <yade/yade-lib-loki/Functor.hpp>
+#include <yade/yade-lib-loki/Typelist.hpp>
+#include <yade/yade-lib-loki/TypeManip.hpp>
+#include <yade/yade-lib-loki/NullType.hpp>
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <vector>
 #include <list>
