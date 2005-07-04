@@ -1,1 +1,1 @@
-/disc/devel/trunk/yade-libs/yade-lib-qhull/src/poly.h
+../../../src/poly.h

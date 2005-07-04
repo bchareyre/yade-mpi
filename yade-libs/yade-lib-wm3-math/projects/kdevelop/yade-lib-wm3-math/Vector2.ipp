@@ -1,1 +1,1 @@
-/disc/devel/trunk/yade-libs/yade-lib-wm3-math/src/Vector2.ipp
+../../../src/Vector2.ipp

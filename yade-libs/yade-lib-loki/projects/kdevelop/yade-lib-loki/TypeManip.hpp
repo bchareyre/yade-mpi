@@ -1,1 +1,1 @@
-/disc/devel/trunk/yade-libs/yade-lib-loki/src/TypeManip.hpp
+../../../src/TypeManip.hpp

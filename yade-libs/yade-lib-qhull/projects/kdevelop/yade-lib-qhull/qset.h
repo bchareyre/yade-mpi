@@ -1,1 +1,1 @@
-/disc/devel/trunk/yade-libs/yade-lib-qhull/src/qset.h
+../../../src/qset.h

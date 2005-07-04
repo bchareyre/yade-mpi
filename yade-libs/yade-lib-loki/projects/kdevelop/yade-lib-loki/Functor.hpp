@@ -1,1 +1,1 @@
-/disc/devel/trunk/yade-libs/yade-lib-loki/src/Functor.hpp
+../../../src/Functor.hpp

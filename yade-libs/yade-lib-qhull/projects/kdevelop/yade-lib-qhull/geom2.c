@@ -1,1 +1,1 @@
-/disc/devel/trunk/yade-libs/yade-lib-qhull/src/geom2.c
+../../../src/geom2.c
