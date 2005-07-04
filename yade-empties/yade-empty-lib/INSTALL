@@ -1,0 +1,27 @@
+
+
+INSTALLING:
+
+to compile and install this library execute following commands:
+
+	make
+	make install
+	make clean		# to clean afterwards
+
+by default everything is installed in directory /usr/local, if for example
+you want to install in /usr instead, you can do this:
+
+	make install INSTALL_DIR='/usr'
+
+Or if you are a package maintaner, you may want to install everything in
+different directory tree:
+
+	make install PREFIX_DIR='/tmp/foo' INSTALL_DIR='/usr'
+
+
+
+DOCUMENTATION:
+
+for documentation check doc/ directory, maybe there is something useful.
+
+
