@@ -1,22 +1,57 @@
+/***************************************************************************
+ *   Copyright (C) 2004 by Olivier Galizzi                                 *
+ *   olivier.galizzi@imag.fr                                               *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ ***************************************************************************/
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 #include "MassSpringLaw.hpp"
-#include <yade/Omega.hpp>
-#include <yade/MetaBody.hpp>
-#include <yade-common/Mesh2D.hpp>
-#include <yade-common/SpringGeometry.hpp>
-#include <yade-common/SpringPhysics.hpp>
-#include <yade-common/ParticleParameters.hpp>
-#include <yade-common/Force.hpp>
-#include <yade-common/Momentum.hpp>
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+#include <yade/yade-core/Omega.hpp>
+#include <yade/yade-core/MetaBody.hpp>
+#include <yade/yade-common/Mesh2D.hpp>
+#include <yade/yade-common/SpringGeometry.hpp>
+#include <yade/yade-common/SpringPhysics.hpp>
+#include <yade/yade-common/ParticleParameters.hpp>
+#include <yade/yade-common/Force.hpp>
+#include <yade/yade-common/Momentum.hpp>
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 MassSpringLaw::MassSpringLaw () : InteractionSolver(), actionForce(new Force) , actionMomentum(new Momentum)
 {
 }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void MassSpringLaw::registerAttributes()
 {
 	REGISTER_ATTRIBUTE(springGroupMask);
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void MassSpringLaw::calculateForces(Body * body)
 {
@@ -60,3 +95,5 @@ void MassSpringLaw::calculateForces(Body * body)
 	
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////

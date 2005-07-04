@@ -60,7 +60,7 @@
 #include "SWIFT_array.h"
 
 extern "C" {
-#include <yade-lib-qhull/qhull_a.h>
+#include <yade/yade-lib-qhull/qhull_a.h>
 }
 
 // Call this before calling any other mesh utils functions
