@@ -3,9 +3,9 @@
 # Subdir relative project main directory: ./plugins/Engine/EngineUnit/BodyEngineUnit/BoundingVolumeEngineUnit/Terrain2AABB
 # Target is a library:  
 
-LIBS += -lyade-lib-wm3-math \
+LIBS += -lBoundingVolumeMetaEngine \
+        -lyade-lib-wm3-math \
         -lyade-lib-multimethods \
-        -lBoundingVolumeMetaEngine \
         -lAABB \
         -lTerrain \
         -rdynamic 
@@ -13,10 +13,8 @@ INCLUDEPATH += $(YADEINCLUDEPATH)
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../../../../libraries/yade-lib-wm3-math/$(YADEDYNLIBPATH)/yade-libs \
-               ../../../../../../libraries/yade-lib-multimethods/$(YADEDYNLIBPATH)/yade-libs \
-               ../../../../../../plugins/Engine/MetaEngine/BodyMetaEngine/BoundingVolumeMetaEngine/BoundingVolumeMetaEngine/$(YADEDYNLIBPATH) \
-               $(YADEDYNLIBPATH)/yade-libs \
+QMAKE_LIBDIR = ../../../../../../plugins/Engine/MetaEngine/BodyMetaEngine/BoundingVolumeMetaEngine/BoundingVolumeMetaEngine/$(YADEDYNLIBPATH) \
+               /usr/local/lib/yade/yade-libs/ \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

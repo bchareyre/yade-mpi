@@ -3,19 +3,17 @@
 # Subdir relative project main directory: ./plugins/Data/Body/GeometricalModel/Mesh2D
 # Target is a library:  
 
-LIBS += -lyade-lib-wm3-math \
+LIBS += -lAABB \
+        -lyade-lib-wm3-math \
         -lyade-lib-multimethods \
         -lyade-lib-serialization \
-        -lAABB \
         -rdynamic 
 INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../../../libraries/yade-lib-wm3-math/$(YADEDYNLIBPATH)/yade-libs \
-               ../../../../../libraries/yade-lib-multimethods/$(YADEDYNLIBPATH)/yade-libs \
-               ../../../../../libraries/yade-lib-serialization/$(YADEDYNLIBPATH)/yade-libs \
-               $(YADEDYNLIBPATH)/yade-libs \
+QMAKE_LIBDIR = ../../../../../plugins/Data/Body/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
+               /usr/local/lib/yade/yade-libs/ \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

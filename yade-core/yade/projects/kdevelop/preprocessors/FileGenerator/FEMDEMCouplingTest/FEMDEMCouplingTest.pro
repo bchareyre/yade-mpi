@@ -3,16 +3,16 @@
 # Subdir relative project main directory: ./preprocessors/FileGenerator/FEMDEMCouplingTest
 # Target is a library:  
 
-LIBS += -lFEMSetTextLoader \
+LIBS += -lPhysicalActionVectorVector \
+        -lInteractionVecSet \
+        -lBodyRedirectionVector \
+        -lFEMSetTextLoader \
         -lInteractingBox \
         -lSDECTimeStepper \
         -lCundallNonViscousForceDamping \
         -lCundallNonViscousMomentumDamping \
         -lMetaInteractingGeometry \
         -lGravityEngine \
-        -lPhysicalActionVectorVector \
-        -lInteractionVecSet \
-        -lBodyRedirectionVector \
         -lPhysicalActionContainerInitializer \
         -lPhysicalActionContainerReseter \
         -lInteractionGeometryMetaEngine \
@@ -33,25 +33,10 @@ INCLUDEPATH += $(YADEINCLUDEPATH)
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../plugins/Engine/EngineUnit/BodyEngineUnit/PhysicalParametersEngineUnit/FEMSetTextLoader/$(YADEDYNLIBPATH) \
-               ../../../plugins/Data/Body/InteractingGeometry/InteractingBox/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/TimeStepper/SDECTimeStepper/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/EngineUnit/PhysicalActionEngineUnit/CundallNonViscousForceDamping/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/EngineUnit/PhysicalActionEngineUnit/CundallNonViscousMomentumDamping/$(YADEDYNLIBPATH) \
-               ../../../plugins/Data/Body/InteractingGeometry/MetaInteractingGeometry/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/DeusExMachina/GravityEngine/$(YADEDYNLIBPATH) \
-               ../../../plugins/Container/PhysicalActionContainer/PhysicalActionVectorVector/$(YADEDYNLIBPATH) \
+QMAKE_LIBDIR = ../../../plugins/Container/PhysicalActionContainer/PhysicalActionVectorVector/$(YADEDYNLIBPATH) \
                ../../../plugins/Container/InteractionContainer/InteractionVecSet/$(YADEDYNLIBPATH) \
                ../../../plugins/Container/BodyContainer/BodyRedirectionVector/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/Engine/PhysicalActionEngine/PhysicalActionContainerInitializer/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/Engine/PhysicalActionEngine/PhysicalActionContainerReseter/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/MetaEngine/InteractionMetaEngine/NarrowInteractionGeometryMetaEngine/InteractionGeometryMetaEngine/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/MetaEngine/InteractionMetaEngine/InteractionPhysicsMetaEngine/InteractionPhysicsMetaEngine/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/MetaEngine/BodyMetaEngine/GeometricalModelMetaEngine/GeometricalModelMetaEngine/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/MetaEngine/PhysicalActionMetaEngine/PhysicalActionApplier/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/MetaEngine/BodyMetaEngine/PhysicalParameterMetaEngine/PhysicalParametersMetaEngine/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/MetaEngine/BodyMetaEngine/BoundingVolumeMetaEngine/BoundingVolumeMetaEngine/$(YADEDYNLIBPATH) \
-               $(YADEDYNLIBPATH)/yade-libs \
+               /usr/local/lib/yade/yade-libs/ \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

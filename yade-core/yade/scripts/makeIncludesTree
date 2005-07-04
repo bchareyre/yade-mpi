@@ -14,26 +14,27 @@ rm -rf ../include/*
 
 chmod a+x ./makeSymLinkIncl
 
-mkdir ../include/yade-common
-
-find ../src/plugins/ -name "*.hpp" -exec ./makeSymLinkIncl {} ../include/yade-common \;
-find ../src/plugins/ -name "*.tpp" -exec ./makeSymLinkIncl {} ../include/yade-common \;
-find ../src/plugins/ -name "*.ipp" -exec ./makeSymLinkIncl {} ../include/yade-common \;
-
-find ../src/postprocessors/ -name "*.hpp" -exec ./makeSymLinkIncl {} ../include/yade-common \;
-find ../src/postprocessors/ -name "*.tpp" -exec ./makeSymLinkIncl {} ../include/yade-common \;
-find ../src/postprocessors/ -name "*.ipp" -exec ./makeSymLinkIncl {} ../include/yade-common \;
-
-find ../src/preprocessors/ -name "*.hpp" -exec ./makeSymLinkIncl {} ../include/yade-common \;
-find ../src/preprocessors/ -name "*.tpp" -exec ./makeSymLinkIncl {} ../include/yade-common \;
-find ../src/preprocessors/ -name "*.ipp" -exec ./makeSymLinkIncl {} ../include/yade-common \;
-
-
-
 mkdir ../include/yade
-find ../src/yade/ -name "*.hpp" -exec ./makeSymLinkIncl {} ../include/yade \;
-find ../src/yade/ -name "*.tpp" -exec ./makeSymLinkIncl {} ../include/yade \;
-find ../src/yade/ -name "*.ipp" -exec ./makeSymLinkIncl {} ../include/yade \;
+mkdir ../include/yade/yade-common
+
+find ../src/plugins/ -name "*.hpp" -exec ./makeSymLinkIncl {} ../include/yade/yade-common \;
+find ../src/plugins/ -name "*.tpp" -exec ./makeSymLinkIncl {} ../include/yade/yade-common \;
+find ../src/plugins/ -name "*.ipp" -exec ./makeSymLinkIncl {} ../include/yade/yade-common \;
+
+find ../src/postprocessors/ -name "*.hpp" -exec ./makeSymLinkIncl {} ../include/yade/yade-common \;
+find ../src/postprocessors/ -name "*.tpp" -exec ./makeSymLinkIncl {} ../include/yade/yade-common \;
+find ../src/postprocessors/ -name "*.ipp" -exec ./makeSymLinkIncl {} ../include/yade/yade-common \;
+
+find ../src/preprocessors/ -name "*.hpp" -exec ./makeSymLinkIncl {} ../include/yade/yade-common \;
+find ../src/preprocessors/ -name "*.tpp" -exec ./makeSymLinkIncl {} ../include/yade/yade-common \;
+find ../src/preprocessors/ -name "*.ipp" -exec ./makeSymLinkIncl {} ../include/yade/yade-common \;
+
+
+
+mkdir ../include/yade/yade-core
+find ../src/yade/ -name "*.hpp" -exec ./makeSymLinkIncl {} ../include/yade/yade-core \;
+find ../src/yade/ -name "*.tpp" -exec ./makeSymLinkIncl {} ../include/yade/yade-core \;
+find ../src/yade/ -name "*.ipp" -exec ./makeSymLinkIncl {} ../include/yade/yade-core \;
 
 
 

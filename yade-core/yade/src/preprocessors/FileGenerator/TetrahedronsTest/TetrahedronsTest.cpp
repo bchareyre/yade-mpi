@@ -31,7 +31,7 @@
 #include <yade/yade-core/MetaBody.hpp>
 #include <yade/yade-common/SAPCollider.hpp>
 #include <yade/yade-common/PersistentSAPCollider.hpp>
-#include <yade/yade/yade-common/BodyMacroParameters.hpp>
+#include <yade/yade-common/BodyMacroParameters.hpp>
 #include <yade/yade-lib-serialization/IOManager.hpp>
 #include <yade/yade-common/ElasticContactLaw.hpp>
 #include <yade/yade-common/BodyMacroParameters.hpp>

@@ -8,14 +8,12 @@ LIBS += -lMacroMicroElasticRelationships \
         -lElasticContactParameters \
         -lMacroMicroContactGeometry \
         -rdynamic 
-INCLUDEPATH = $(YADEINCLUDEPATH) 
+INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
 QMAKE_LIBDIR = ../../../../plugins/Engine/EngineUnit/InteractionEngineUnit/InteractionPhysicsEngineUnit/ElasticContactParameters/MacroMicroElasticRelationships/$(YADEDYNLIBPATH) \
-               ../../../../plugins/Data/Body/GeometricalModel/Sphere/$(YADEDYNLIBPATH) \
-               ../../../../plugins/Data/Interaction/InteractionPhysics/ElasticContactParameters/$(YADEDYNLIBPATH) \
-               ../../../../plugins/Data/Interaction/NarrowInteractionGeometry/MacroMicroContactGeometry/$(YADEDYNLIBPATH) \
+               /usr/local/lib/yade/yade-libs/ \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

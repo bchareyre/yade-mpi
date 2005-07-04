@@ -3,16 +3,16 @@
 # Subdir relative project main directory: ./plugins/Engine/EngineUnit/BodyEngineUnit/StateEngineUnit/TimeIntegrator/LeapFrogOrientationIntegrator
 # Target is a library:  
 
-LIBS += -lRigidBodyParameters \
+LIBS += -lPhysicalParametersMetaEngine \
+        -lRigidBodyParameters \
         -lParticleParameters \
-        -lPhysicalParametersMetaEngine \
         -rdynamic 
 INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../../../../../plugins/Data/Body/PhysicalParameters/RigidBodyParameters/$(YADEDYNLIBPATH) \
-               ../../../../../../../plugins/Data/Body/PhysicalParameters/ParticleParameters/$(YADEDYNLIBPATH) \
+QMAKE_LIBDIR = ../../../../../../../plugins/Engine/MetaEngine/BodyMetaEngine/PhysicalParameterMetaEngine/PhysicalParametersMetaEngine/$(YADEDYNLIBPATH) \
+               /usr/local/lib/yade/yade-libs/ \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

@@ -3,20 +3,17 @@
 # Subdir relative project main directory: ./plugins/Data/Body/PhysicalParameters/RigidBodyParameters
 # Target is a library:  
 
-LIBS += -lyade-lib-serialization \
+LIBS += -lParticleParameters \
+        -lyade-lib-serialization \
         -lyade-lib-wm3-math \
         -lyade-lib-multimethods \
-        -lParticleParameters \
         -rdynamic 
 INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../../../libraries/yade-lib-serialization/$(YADEDYNLIBPATH)/yade-libs \
-               ../../../../../libraries/yade-lib-wm3-math/$(YADEDYNLIBPATH)/yade-libs \
-               ../../../../../libraries/yade-lib-multimethods/$(YADEDYNLIBPATH)/yade-libs \
-               ../../../../../plugins/Data/Body/PhysicalParameters/ParticleParameters/$(YADEDYNLIBPATH) \
-               $(YADEDYNLIBPATH)/yade-libs \
+QMAKE_LIBDIR = ../../../../../plugins/Data/Body/PhysicalParameters/ParticleParameters/$(YADEDYNLIBPATH) \
+               /usr/local/lib/yade/yade-libs/ \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

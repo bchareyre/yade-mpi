@@ -171,7 +171,6 @@ int main(int argc, char *argv[])
 ///
 	int ch;
 	bool useNullGUI = false;
-	bool useNonDefaultGUI = false;
 	if( ( ch = getopt(argc,argv,"hngd") ) != -1)
 		switch(ch)
 		{

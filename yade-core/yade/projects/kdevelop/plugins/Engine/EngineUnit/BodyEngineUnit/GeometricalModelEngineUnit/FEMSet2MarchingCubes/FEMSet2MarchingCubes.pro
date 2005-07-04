@@ -3,20 +3,18 @@
 # Subdir relative project main directory: ./plugins/Engine/EngineUnit/BodyEngineUnit/GeometricalModelEngineUnit/FEMSet2MarchingCubes
 # Target is a library:  
 
-LIBS += -lParticleParameters \
+LIBS += -lGeometricalModelMetaEngine \
+        -lParticleParameters \
         -lLatticeBeamParameters \
         -lLineSegment \
         -lLatticeSetParameters \
-        -lGeometricalModelMetaEngine \
         -rdynamic 
 INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../../../../plugins/Data/Body/PhysicalParameters/ParticleParameters/$(YADEDYNLIBPATH) \
-               ../../../../../../plugins/Data/Body/PhysicalParameters/LatticeBeamParameters/$(YADEDYNLIBPATH) \
-               ../../../../../../plugins/Data/Body/GeometricalModel/LineSegment/$(YADEDYNLIBPATH) \
-               ../../../../../../plugins/Data/Body/PhysicalParameters/LatticeSetParameters/$(YADEDYNLIBPATH) \
+QMAKE_LIBDIR = ../../../../../../plugins/Engine/MetaEngine/BodyMetaEngine/GeometricalModelMetaEngine/GeometricalModelMetaEngine/$(YADEDYNLIBPATH) \
+               /usr/local/lib/yade/yade-libs/ \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

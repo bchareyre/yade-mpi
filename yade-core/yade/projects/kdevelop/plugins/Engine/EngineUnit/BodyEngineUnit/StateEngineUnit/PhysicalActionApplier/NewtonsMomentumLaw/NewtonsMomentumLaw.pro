@@ -3,19 +3,18 @@
 # Subdir relative project main directory: ./plugins/Engine/EngineUnit/BodyEngineUnit/StateEngineUnit/PhysicalActionApplier/NewtonsMomentumLaw
 # Target is a library:  
 
-LIBS += -lRigidBodyParameters \
+LIBS += -lPhysicalActionApplier \
+        -lRigidBodyParameters \
         -lMomentum \
-        -lPhysicalActionApplier \
         -lPhysicalActionApplier \
         -rdynamic 
 INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../../../../../plugins/Data/Body/PhysicalParameters/RigidBodyParameters/$(YADEDYNLIBPATH) \
-               ../../../../../../../plugins/Data/PhysicalAction/Momentum/$(YADEDYNLIBPATH) \
-               ../../../../../../../plugins/Engine/MetaEngine/PhysicalActionMetaEngine/PhysicalActionApplier/$(YADEDYNLIBPATH) \
-               $(YADEDYNLIBPATH) 
+QMAKE_LIBDIR = ../../../../../../../plugins/Engine/MetaEngine/PhysicalActionMetaEngine/PhysicalActionApplier/$(YADEDYNLIBPATH) \
+               $(YADEDYNLIBPATH) \
+               /usr/local/lib/yade/yade-libs/ 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 
 QMAKE_CXXFLAGS_DEBUG += -lpthread \

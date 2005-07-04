@@ -3,20 +3,18 @@
 # Subdir relative project main directory: ./plugins/Engine/EngineUnit/BodyEngineUnit/GeometricalModelEngineUnit/FEMSet2Tetrahedrons
 # Target is a library:  
 
-LIBS += -lFEMNodeData \
+LIBS += -lGeometricalModelMetaEngine \
+        -lFEMNodeData \
         -lFEMTetrahedronData \
         -lTetrahedron \
         -lFEMSetParameters \
-        -lGeometricalModelMetaEngine \
         -rdynamic 
 INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../../../../plugins/Data/Body/PhysicalParameters/FEMNodeData/$(YADEDYNLIBPATH) \
-               ../../../../../../plugins/Data/Body/PhysicalParameters/FEMTetrahedronData/$(YADEDYNLIBPATH) \
-               ../../../../../../plugins/Data/Body/GeometricalModel/Tetrahedron/$(YADEDYNLIBPATH) \
-               ../../../../../../plugins/Data/Body/PhysicalParameters/FEMSetParameters/$(YADEDYNLIBPATH) \
+QMAKE_LIBDIR = ../../../../../../plugins/Engine/MetaEngine/BodyMetaEngine/GeometricalModelMetaEngine/GeometricalModelMetaEngine/$(YADEDYNLIBPATH) \
+               /usr/local/lib/yade/yade-libs/ \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

@@ -3,16 +3,16 @@
 # Subdir relative project main directory: ./plugins/Engine/EngineUnit/BodyEngineUnit/GeometricalModelEngineUnit/ParticleSet2Mesh2D
 # Target is a library:  
 
-LIBS += -lParticleSetParameters \
+LIBS += -lGeometricalModelMetaEngine \
+        -lParticleSetParameters \
         -lMesh2D \
-        -lGeometricalModelMetaEngine \
         -rdynamic 
 INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../../../../plugins/Data/Body/PhysicalParameters/ParticleSetParameters/$(YADEDYNLIBPATH) \
-               ../../../../../../plugins/Data/Body/GeometricalModel/Mesh2D/$(YADEDYNLIBPATH) \
+QMAKE_LIBDIR = ../../../../../../plugins/Engine/MetaEngine/BodyMetaEngine/GeometricalModelMetaEngine/GeometricalModelMetaEngine/$(YADEDYNLIBPATH) \
+               /usr/local/lib/yade/yade-libs/ \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

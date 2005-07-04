@@ -3,17 +3,16 @@
 # Subdir relative project main directory: ./plugins/Engine/EngineUnit/PhysicalActionEngineUnit/CundallNonViscousMomentumDamping
 # Target is a library:  
 
-LIBS += -lRigidBodyParameters \
+LIBS += -lPhysicalActionDamper \
+        -lRigidBodyParameters \
         -lMomentum \
-        -lPhysicalActionDamper \
         -rdynamic 
 INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../../../plugins/Data/Body/PhysicalParameters/RigidBodyParameters/$(YADEDYNLIBPATH) \
-               ../../../../../plugins/Data/PhysicalAction/Momentum/$(YADEDYNLIBPATH) \
-               ../../../../../plugins/Engine/MetaEngine/PhysicalActionMetaEngine/PhysicalActionDamper/$(YADEDYNLIBPATH) \
+QMAKE_LIBDIR = ../../../../../plugins/Engine/MetaEngine/PhysicalActionMetaEngine/PhysicalActionDamper/$(YADEDYNLIBPATH) \
+               /usr/local/lib/yade/yade-libs/ \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

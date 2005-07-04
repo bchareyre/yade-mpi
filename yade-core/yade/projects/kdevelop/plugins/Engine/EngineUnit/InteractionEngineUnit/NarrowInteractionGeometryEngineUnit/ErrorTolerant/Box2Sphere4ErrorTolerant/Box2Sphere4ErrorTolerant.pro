@@ -3,9 +3,9 @@
 # Subdir relative project main directory: ./plugins/Engine/EngineUnit/InteractionEngineUnit/NarrowInteractionGeometryEngineUnit/ErrorTolerant/Box2Sphere4ErrorTolerant
 # Target is a library:  
 
-LIBS += -lyade-lib-factory \
+LIBS += -lInteractionGeometryMetaEngine \
+        -lyade-lib-factory \
         -lyade-lib-wm3-math \
-        -lInteractionGeometryMetaEngine \
         -lyade-lib-multimethods \
         -lErrorTolerantContactModel \
         -lBox \
@@ -15,10 +15,8 @@ INCLUDEPATH += $(YADEINCLUDEPATH)
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../../../../../libraries/yade-lib-factory/$(YADEDYNLIBPATH)/yade-libs \
-               ../../../../../../../libraries/yade-lib-wm3-math/$(YADEDYNLIBPATH)/yade-libs \
-               ../../../../../../../plugins/Engine/MetaEngine/InteractionMetaEngine/NarrowInteractionGeometryMetaEngine/InteractionGeometryMetaEngine/$(YADEDYNLIBPATH) \
-               $(YADEDYNLIBPATH)/yade-libs \
+QMAKE_LIBDIR = ../../../../../../../plugins/Engine/MetaEngine/InteractionMetaEngine/NarrowInteractionGeometryMetaEngine/InteractionGeometryMetaEngine/$(YADEDYNLIBPATH) \
+               /usr/local/lib/yade/yade-libs/ \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

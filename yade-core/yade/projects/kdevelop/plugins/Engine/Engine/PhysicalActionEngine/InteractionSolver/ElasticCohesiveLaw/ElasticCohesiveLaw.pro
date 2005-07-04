@@ -20,14 +20,7 @@ INCLUDEPATH += $(YADEINCLUDEPATH)
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../../../../libraries/yade-lib-serialization/$(YADEDYNLIBPATH)/yade-libs \
-               ../../../../../../libraries/yade-lib-wm3-math/$(YADEDYNLIBPATH)/yade-libs \
-               ../../../../../../libraries/yade-lib-multimethods/$(YADEDYNLIBPATH)/yade-libs \
-               ../../../../../../plugins/Data/Interaction/InteractionPhysics/SDECLinkPhysics/$(YADEDYNLIBPATH) \
-               ../../../../../../plugins/Data/Interaction/InteractionPhysics/ElasticContactParameters/$(YADEDYNLIBPATH) \
-               ../../../../../../plugins/Data/PhysicalAction/Force/$(YADEDYNLIBPATH) \
-               ../../../../../../plugins/Data/PhysicalAction/Momentum/$(YADEDYNLIBPATH) \
-               $(YADEDYNLIBPATH)/yade-libs \
+QMAKE_LIBDIR = /usr/local/lib/yade/yade-libs/ \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

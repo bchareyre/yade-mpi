@@ -3,14 +3,15 @@
 # Subdir relative project main directory: ./plugins/Engine/EngineUnit/BodyEngineUnit/GeometricalModelEngineUnit/VRML2Terrain
 # Target is a library:  
 
-LIBS += -lTerrain \
-        -lGeometricalModelMetaEngine \
+LIBS += -lGeometricalModelMetaEngine \
+        -lTerrain \
         -rdynamic 
 INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../../../../plugins/Data/Body/GeometricalModel/Terrain/$(YADEDYNLIBPATH) \
+QMAKE_LIBDIR = ../../../../../../plugins/Engine/MetaEngine/BodyMetaEngine/GeometricalModelMetaEngine/GeometricalModelMetaEngine/$(YADEDYNLIBPATH) \
+               /usr/local/lib/yade/yade-libs/ \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

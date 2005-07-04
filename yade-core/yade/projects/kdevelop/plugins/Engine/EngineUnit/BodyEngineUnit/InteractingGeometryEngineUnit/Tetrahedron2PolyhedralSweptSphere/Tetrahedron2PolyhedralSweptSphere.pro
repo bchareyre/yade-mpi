@@ -3,17 +3,16 @@
 # Subdir relative project main directory: ./plugins/Engine/EngineUnit/BodyEngineUnit/InteractingGeometryEngineUnit/Tetrahedron2PolyhedralSweptSphere
 # Target is a library:  
 
-LIBS += -lPolyhedralSweptSphere \
+LIBS += -lInteractingGeometryMetaEngine \
+        -lPolyhedralSweptSphere \
         -lTetrahedron \
-        -lInteractingGeometryMetaEngine \
         -rdynamic 
 INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../../../../plugins/Data/Body/InteractingGeometry/PolyhedralSweptSphere/$(YADEDYNLIBPATH) \
-               ../../../../../../plugins/Data/Body/GeometricalModel/Tetrahedron/$(YADEDYNLIBPATH) \
-               ../../../../../../plugins/Engine/MetaEngine/BodyMetaEngine/InteractingGeometryMetaEngine/InteractingGeometryMetaEngine/$(YADEDYNLIBPATH) \
+QMAKE_LIBDIR = ../../../../../../plugins/Engine/MetaEngine/BodyMetaEngine/InteractingGeometryMetaEngine/InteractingGeometryMetaEngine/$(YADEDYNLIBPATH) \
+               /usr/local/lib/yade/yade-libs/ \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

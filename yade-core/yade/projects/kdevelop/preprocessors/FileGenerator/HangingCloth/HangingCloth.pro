@@ -3,7 +3,10 @@
 # Subdir relative project main directory: ./preprocessors/FileGenerator/HangingCloth
 # Target is a library:  
 
-LIBS += -lSpringGeometry \
+LIBS += -lInteractionVecSet \
+        -lBodyRedirectionVector \
+        -lPhysicalActionVectorVector \
+        -lSpringGeometry \
         -lSpringPhysics \
         -lInteractingSphere \
         -lInteractingBox \
@@ -13,12 +16,9 @@ LIBS += -lSpringGeometry \
         -lMacroMicroElasticRelationships \
         -lyade-lib-serialization \
         -lyade-lib-wm3-math \
-        -lInteractionVecSet \
-        -lBodyRedirectionVector \
         -lPhysicalActionContainerInitializer \
         -lPhysicalActionContainerReseter \
         -lGravityEngine \
-        -lPhysicalActionVectorVector \
         -lInteractionGeometryMetaEngine \
         -lInteractionPhysicsMetaEngine \
         -lGeometricalModelMetaEngine \
@@ -47,29 +47,10 @@ INCLUDEPATH += $(YADEINCLUDEPATH)
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../plugins/Data/Interaction/NarrowInteractionGeometry/SpringGeometry/$(YADEDYNLIBPATH) \
-               ../../../plugins/Data/Interaction/InteractionPhysics/SpringPhysics/$(YADEDYNLIBPATH) \
-               ../../../plugins/Data/Body/InteractingGeometry/InteractingSphere/$(YADEDYNLIBPATH) \
-               ../../../plugins/Data/Body/InteractingGeometry/InteractingBox/$(YADEDYNLIBPATH) \
-               ../../../plugins/Data/Interaction/InteractionPhysics/SDECLinkPhysics/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/EngineUnit/PhysicalActionEngineUnit/CundallNonViscousMomentumDamping/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/EngineUnit/PhysicalActionEngineUnit/CundallNonViscousForceDamping/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/EngineUnit/InteractionEngineUnit/InteractionPhysicsEngineUnit/ElasticContactParameters/MacroMicroElasticRelationships/$(YADEDYNLIBPATH) \
-               ../../../libraries/yade-lib-serialization/$(YADEDYNLIBPATH)/yade-libs \
-               ../../../libraries/yade-lib-wm3-math/$(YADEDYNLIBPATH)/yade-libs \
-               ../../../plugins/Container/InteractionContainer/InteractionVecSet/$(YADEDYNLIBPATH) \
+QMAKE_LIBDIR = ../../../plugins/Container/InteractionContainer/InteractionVecSet/$(YADEDYNLIBPATH) \
                ../../../plugins/Container/BodyContainer/BodyRedirectionVector/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/Engine/PhysicalActionEngine/PhysicalActionContainerInitializer/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/Engine/PhysicalActionEngine/PhysicalActionContainerReseter/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/DeusExMachina/GravityEngine/$(YADEDYNLIBPATH) \
                ../../../plugins/Container/PhysicalActionContainer/PhysicalActionVectorVector/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/MetaEngine/InteractionMetaEngine/NarrowInteractionGeometryMetaEngine/InteractionGeometryMetaEngine/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/MetaEngine/InteractionMetaEngine/InteractionPhysicsMetaEngine/InteractionPhysicsMetaEngine/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/MetaEngine/BodyMetaEngine/GeometricalModelMetaEngine/GeometricalModelMetaEngine/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/MetaEngine/PhysicalActionMetaEngine/PhysicalActionApplier/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/MetaEngine/BodyMetaEngine/PhysicalParameterMetaEngine/PhysicalParametersMetaEngine/$(YADEDYNLIBPATH) \
-               ../../../plugins/Engine/MetaEngine/BodyMetaEngine/BoundingVolumeMetaEngine/BoundingVolumeMetaEngine/$(YADEDYNLIBPATH) \
-               $(YADEDYNLIBPATH)/yade-libs \
+               /usr/local/lib/yade/yade-libs/ \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

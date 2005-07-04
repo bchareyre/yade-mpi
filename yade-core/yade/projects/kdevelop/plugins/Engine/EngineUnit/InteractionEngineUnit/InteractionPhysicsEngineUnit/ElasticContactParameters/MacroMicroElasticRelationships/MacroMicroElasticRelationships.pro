@@ -3,23 +3,19 @@
 # Subdir relative project main directory: ./plugins/Engine/EngineUnit/InteractionEngineUnit/InteractionPhysicsEngineUnit/ElasticContactParameters/MacroMicroElasticRelationships
 # Target is a library:  
 
-LIBS += -lSDECLinkPhysics \
+LIBS += -lInteractionPhysicsMetaEngine \
+        -lSDECLinkPhysics \
         -lSDECLinkGeometry \
         -lElasticContactParameters \
         -lMacroMicroContactGeometry \
         -lBodyMacroParameters \
-        -lInteractionPhysicsMetaEngine \
         -rdynamic 
 INCLUDEPATH += $(YADEINCLUDEPATH) 
 MOC_DIR = $(YADECOMPILATIONPATH) 
 UI_DIR = $(YADECOMPILATIONPATH) 
 OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-QMAKE_LIBDIR = ../../../../../../../plugins/Data/Interaction/InteractionPhysics/SDECLinkPhysics/$(YADEDYNLIBPATH) \
-               ../../../../../../../plugins/Data/Interaction/NarrowInteractionGeometry/SDECLinkGeometry/$(YADEDYNLIBPATH) \
-               ../../../../../../../plugins/Data/Interaction/InteractionPhysics/ElasticContactParameters/$(YADEDYNLIBPATH) \
-               ../../../../../../../plugins/Data/Interaction/NarrowInteractionGeometry/MacroMicroContactGeometry/$(YADEDYNLIBPATH) \
-               ../../../../../../../plugins/Data/Body/PhysicalParameters/BodyMacroParameters/$(YADEDYNLIBPATH) \
-               ../../../../../../../plugins/Engine/MetaEngine/InteractionMetaEngine/InteractionPhysicsMetaEngine/InteractionPhysicsMetaEngine/$(YADEDYNLIBPATH) \
+QMAKE_LIBDIR = ../../../../../../../plugins/Engine/MetaEngine/InteractionMetaEngine/InteractionPhysicsMetaEngine/InteractionPhysicsMetaEngine/$(YADEDYNLIBPATH) \
+               /usr/local/lib/yade/yade-libs/ \
                $(YADEDYNLIBPATH) 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 
