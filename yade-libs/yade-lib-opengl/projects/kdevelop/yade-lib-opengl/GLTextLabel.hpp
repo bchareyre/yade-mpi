@@ -1,1 +1,1 @@
-/disc/devel/trunk/yade-libs/yade-lib-opengl/src/GLTextLabel.hpp
+../../../src/GLTextLabel.hpp

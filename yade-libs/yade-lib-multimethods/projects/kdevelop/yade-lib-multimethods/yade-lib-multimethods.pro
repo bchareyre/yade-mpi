@@ -10,7 +10,7 @@ HEADERS += DynLibDispatcher.hpp \
 SOURCES += Indexable.cpp \
            MultiMethodsExceptions.cpp 
 INCLUDEPATH += /usr/local/include/yade
-TARGET = ../bin/../../yade-lib-multimethods
+TARGET = ../../../bin/yade-lib-multimethods
 CONFIG += release \
 warn_on \
 dll

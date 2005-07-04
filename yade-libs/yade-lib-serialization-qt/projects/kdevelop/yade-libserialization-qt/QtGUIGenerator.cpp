@@ -1,1 +1,1 @@
-/disc/devel/trunk/yade-libs/yade-lib-serialization-qt/src/QtGUIGenerator.cpp
+../../../src/QtGUIGenerator.cpp

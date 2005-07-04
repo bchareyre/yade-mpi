@@ -1,1 +1,1 @@
-/disc/devel/trunk/yade-libs/yade-lib-opengl/src/GLWindowsManager.hpp
+../../../src/GLWindowsManager.hpp

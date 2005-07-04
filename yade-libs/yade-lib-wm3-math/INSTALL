@@ -19,6 +19,10 @@ different directory tree:
 	make install PREFIX_DIR='/tmp/foo' INSTALL_DIR='/usr'
 
 
+    WARNING: if you are compiling with gcc3.3, you need to pass additional argument:
+	
+	make CXXFLAGS='-pthread -lpthread'
+
 
 DOCUMENTATION:
 
