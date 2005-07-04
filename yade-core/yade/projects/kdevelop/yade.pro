@@ -3,15 +3,14 @@
 # Subdir relative project main directory: .
 # Target is a subdirs project 
 
-MOC_DIR = $(YADECOMPILATIONPATH) 
-UI_DIR = $(YADECOMPILATIONPATH) 
-OBJECTS_DIR = $(YADECOMPILATIONPATH) 
-DEFINES = DEBUG 
-CONFIG += debug \
-          warn_on 
-TEMPLATE = subdirs 
-SUBDIRS += libraries \
-           yade \
+SUBDIRS += yade \
            plugins \
            postprocessors \
            preprocessors 
+MOC_DIR = $(YADECOMPILATIONPATH)
+UI_DIR = $(YADECOMPILATIONPATH)
+OBJECTS_DIR = $(YADECOMPILATIONPATH)
+DEFINES = DEBUG
+CONFIG += debug \
+warn_on
+TEMPLATE = subdirs
