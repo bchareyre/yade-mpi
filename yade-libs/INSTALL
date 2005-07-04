@@ -29,6 +29,12 @@ different directory tree:
 
         make compile_install CXXFLAGS='-pthread -lpthread'
 	
+	
+OTHER MAKE COMMANDS
+
+	make uninstall          # to uninstall (you have to provide correct 
+	                        #               INSTALL_DIR, and PREFIX_DIR ) 
+	
 
 DOCUMENTATION:
 

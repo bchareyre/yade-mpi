@@ -6,7 +6,6 @@ to compile and install this library execute following commands:
 
 	make
 	make install
-	make clean		# to clean afterwards
 
 by default everything is installed in directory /usr/local, if for example
 you want to install in /usr instead, you can do this:
@@ -22,6 +21,14 @@ different directory tree:
     WARNING: if you are compiling with gcc3.3, you need to pass additional argument:
 	
 	make CXXFLAGS='-pthread -lpthread'
+
+
+OTHER MAKE COMMANDS
+
+	make clean		# to clean afterwards
+	make uninstall          # to uninstall (you have to provide
+	                        #               correct INSTALL_DIR, and PREFIX_DIR )
+
 
 
 DOCUMENTATION:

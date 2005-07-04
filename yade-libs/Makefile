@@ -1,6 +1,6 @@
 all:
 	@echo --
-	@echo Please invoke \'make install\' because \'make\' itself
+	@echo Please invoke \'make compile_install\' because \'make\' itself
 	@echo is unable to do everything needed. See INSTALL for details
 	@echo --
 
