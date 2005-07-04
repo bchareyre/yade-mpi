@@ -7,9 +7,13 @@ INSTALLING:
 
 to compile and install all yade libraries execute following commands:
 
-	make
 	make install
 	make clean		# to clean afterwards
+
+    WARNING: command 'make install' is compiling and installing, this is because
+    compiling next library requires the previous one to be already installed
+    otherwise compilation will fail. (normally we should invoke
+    'make && make install', so here is an exception)
 
 by default everything is installed in directory /usr/local, if for example
 you want to install in /usr instead, you can do this:
