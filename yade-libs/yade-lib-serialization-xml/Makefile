@@ -8,7 +8,7 @@ INSTALL_DIR=/usr/local
 
 yade_include_subdir=yade-lib-serialization-xml
 yade_lib_subdir=yade-libs
-yade_libnames_basename=yade-lib-serialization-xml
+yade_libnames_basename=XMLManager
 
 all:
 	cd projects/kdevelop ; qmake && $(MAKE)
