@@ -1,4 +1,9 @@
+FIRST STEP :
 
+copy this directory somewhere.
+execute ./changeLibName yade-lib-newname
+This will rename all the kdevelop projects files to use name yade-lib-newname
+After that you can start to develop your library
 
 INSTALLING:
 
