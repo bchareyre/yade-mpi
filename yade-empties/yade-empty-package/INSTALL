@@ -1,14 +1,13 @@
 FIRST STEP :
 
 copy this directory somewhere.
-execute ./changeLibName nameofyourlibrary yourfirstname yourlastname youremail
-This will rename all the kdevelop projects files to use name "nameofyourlibrary"
-After that you can start to develop your library
-
+execute ./changePackageName nameofyourpackage yourfirstname yourlastname youremail
+This will rename all the kdevelop projects files to use name "nameofyourpackage"
+After that you can start to develop your package
 
 INSTALLING:
 
-to compile and install this library execute following commands:
+to compile and install this package execute following commands:
 
 	make
 	make install

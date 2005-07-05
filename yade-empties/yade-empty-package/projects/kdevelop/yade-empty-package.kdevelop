@@ -71,12 +71,12 @@
   </kdevdebugger>
   <kdevtrollproject>
     <run>
-      <mainprogram>./bin/yadeemptylib</mainprogram>
+      <mainprogram>./bin/yadeemptypackage</mainprogram>
       <programargs/>
       <directoryradio>executable</directoryradio>
     </run>
     <general>
-      <activedir>yade-empty-lib</activedir>
+      <activedir>Engine</activedir>
     </general>
     <subclassing/>
   </kdevtrollproject>
@@ -91,21 +91,21 @@
   <kdevdocumentation>
     <projectdoc>
       <docsystem>Doxygen Documentation Collection</docsystem>
-      <docurl>yadeemptylib.tag</docurl>
+      <docurl>yadeemptypackage.tag</docurl>
     </projectdoc>
   </kdevdocumentation>
   <substmap>
-    <APPNAME>yadeemptylib</APPNAME>
-    <APPNAMELC>yadeemptylib</APPNAMELC>
-    <APPNAMESC>Yadeemptylib</APPNAMESC>
-    <APPNAMEUC>YADEEMPTYLIB</APPNAMEUC>
+    <APPNAME>yadeemptypackage</APPNAME>
+    <APPNAMELC>yadeemptypackage</APPNAMELC>
+    <APPNAMESC>Yadeemptypackage</APPNAMESC>
+    <APPNAMEUC>YADEEMPTYPACKAGE</APPNAMEUC>
     <AUTHOR>Your Name</AUTHOR>
     <EMAIL>your.email@your.domain</EMAIL>
     <LICENSE>GPL</LICENSE>
     <LICENSEFILE>COPYING</LICENSEFILE>
     <VERSION>0.1</VERSION>
     <YEAR>2005</YEAR>
-    <dest>/disc/devel/trunk/yade-empties/yade-empty-lib/projects/yadeemptylib</dest>
+    <dest>/disc/devel/trunk/yade-empties/yade-empty-package/projects/yadeemptypackage</dest>
   </substmap>
   <kdevcppsupport>
     <references/>

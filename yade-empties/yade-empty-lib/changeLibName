@@ -1,11 +1,47 @@
 #! /bin/sh
 
+if [ "${1:-nothing}" = "nothing" ];
+then
+  echo 'Usage: ./changeLibName "newLibName" "yourFirstName" "yourLastName" "yourEmail"';
+  exit 0;
+fi
+
+if [ "${2:-nothing}" = "nothing" ];
+then
+  echo 'Usage: ./changeLibName "newLibName" "yourFirstName" "yourLastName" "yourEmail"';
+  exit 0;
+fi
+
+if [ "${3:-nothing}" = "nothing" ];
+then
+  echo 'Usage: ./changeLibName "newLibName" "yourFirstName" "yourLastName" "yourEmail"';
+  exit 0;
+fi
+
+if [ "${4:-nothing}" = "nothing" ];
+then
+  echo 'Usage: ./changeLibName "newLibName" "yourFirstName" "yourLastName" "yourEmail"';
+  exit 0;
+fi
+
 find . -name .svn -exec rm -rf {} \;
 
 cd projects
 cd kdevelop
 
 mv yade-empty-lib.kdevelop $1.kdevelop
+cat $1.kdevelop | sed -e "s/YourName/"$2" "$3"/"  > $1.kdevelop
+cat $1.kdevelop | sed -e "s/YourEmail/"$4"/" > $1.kdevelop
+
+cd templates
+
+cat h | sed -e "s/YourName/"$2" "$3"/"  > h
+cat h | sed -e "s/YourEmail/"$4"/" > h
+
+cat cpp | sed -e "s/YourName/"$2" "$3"/"  > cpp
+cat cpp | sed -e "s/YourEmail/"$4"/" > cpp
+
+cd ..
 
 rm -f yade-empty-lib.pro
 
