@@ -6,9 +6,7 @@ INSTALL_DIR=/usr/local
 
 #######################
 
-yade_include_subdir=
-yade_lib_subdir=yade-libs
-yade_libnames_basename=
+yade_include_subdir=yade-core
 
 all:
 	cd projects/kdevelop ; qmake && make
@@ -19,17 +17,15 @@ clean:
 	-find ./projects/kdevelop -name "*.o" -exec rm {} \;
 
 install:
-	mkdir --parents ${PREFIX_DIR}/${INSTALL_DIR}/lib/yade/${yade_lib_subdir}
 	mkdir --parents ${PREFIX_DIR}/${INSTALL_DIR}/include/yade/${yade_include_subdir}
-	cp bin/* ${PREFIX_DIR}/${INSTALL_DIR}/lib/yade/${yade_lib_subdir}
+	cp bin/* ${PREFIX_DIR}/${INSTALL_DIR}/bin
 	cp src/*.hpp ${PREFIX_DIR}/${INSTALL_DIR}/include/yade/${yade_include_subdir}
 	-cp src/*.ipp ${PREFIX_DIR}/${INSTALL_DIR}/include/yade/${yade_include_subdir}
 	-cp src/*.tpp ${PREFIX_DIR}/${INSTALL_DIR}/include/yade/${yade_include_subdir}
 
 uninstall:
-	rm -f ${PREFIX_DIR}/${INSTALL_DIR}/lib/yade/${yade_lib_subdir}/lib${yade_libnames_basename}*
+	rm -f ${PREFIX_DIR}/${INSTALL_DIR}/bin/yade
 	rm -rf  ${PREFIX_DIR}/${INSTALL_DIR}/include/yade/${yade_include_subdir}
-	rmdir --ignore-fail-on-non-empty ${PREFIX_DIR}/${INSTALL_DIR}/lib/yade/${yade_lib_subdir}
 	rmdir --ignore-fail-on-non-empty ${PREFIX_DIR}/${INSTALL_DIR}/lib/yade
 	rmdir --ignore-fail-on-non-empty ${PREFIX_DIR}/${INSTALL_DIR}/include/yade
 

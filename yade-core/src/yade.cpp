@@ -46,6 +46,21 @@ using namespace std;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+bool containOnlyWhiteSpaces(const string& str)
+{
+	if (str.size()==0)
+		return true;
+
+	unsigned int i=0;
+	while (i<str.size() && (str[i]==' ' || str[i]=='\t' || str[i]=='\n'))
+		i++;
+
+	return (i==str.size());
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 void printHelp()
 {
 	cout << endl;
@@ -55,6 +70,7 @@ void printHelp()
 	cout << "	-n	: use NullGUI instead of default one" << endl;
 	cout << "	-g	: change default GUI" << endl;
 	cout << "	-d	: add plugin directory" << endl;
+	cout << "	-r	: reset current preferences" << endl;
 	cout << endl;
 }
 
@@ -66,16 +82,25 @@ void changeDefaultGUI(shared_ptr<Preferences>& pref)
 	string guiName;
 	string guiDir;
 	filesystem::path guiFullPath;
+	char tmpStr1[1000];
+	char tmpStr2[1000];
 
 	do 
 	{
 		cout << endl;
 		cout << endl;
-		cout << "1. Specify default GUI name [QtGUI/NullGUI/...] : " ;
-		cin >> guiName;
+		cout << "1. Specify default GUI name [QtGUI] : " ;
+		cin.getline(tmpStr1, 1000);
+		guiName = tmpStr1;
+		while (containOnlyWhiteSpaces(guiName))
+			guiName = "QtGUI";
+
 		cout << endl;
-		cout << "2. Specify the path where to find it : " ;
-		cin >> guiDir;
+		cout << "2. Specify the path where to find it [/usr/local/lib/yade/yade-guis] : " ;
+		cin.getline(tmpStr2, 1000);
+		guiDir = tmpStr2;
+		while (containOnlyWhiteSpaces(guiDir))
+			guiDir = "/usr/local/lib/yade/yade-guis";
 		cout << endl;
 
 		if (guiDir[guiDir.size()-1]!='/')
@@ -149,8 +174,12 @@ int main(int argc, char *argv[])
 /// First time yade is loaded
 ///
 	Omega::instance().preferences = shared_ptr<Preferences>(new Preferences);
-
 	filesystem::path yadeConfigPath = filesystem::path(string(getenv("HOME")) + string("/.yade"), filesystem::native);
+
+	if( ( getopt(argc,argv,"r") ) == 'r')
+		filesystem::remove_all(yadeConfigPath);
+		
+
 	if ( !filesystem::exists( yadeConfigPath ) )
 	{
 		filesystem::create_directories(yadeConfigPath);
