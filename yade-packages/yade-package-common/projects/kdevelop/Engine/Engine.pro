@@ -6,7 +6,7 @@
 SUBDIRS += DeusExMachina \
            EngineUnit \
            MetaEngine \
-           StandAlone 
+           StandAloneEngine 
 CONFIG += release \
           warn_on 
 TEMPLATE = subdirs 

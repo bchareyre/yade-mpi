@@ -3,15 +3,11 @@
 # Subdir relative project main directory: ./DataClass/GeometricalModel/Mesh2D
 # Target is a library:  
 
-HEADERS += Mesh2D.hpp 
-SOURCES += Mesh2D.cpp 
-LIBS += -lAABB \
-        -lyade-lib-wm3-math \
+LIBS += -lyade-lib-wm3-math \
         -lyade-lib-multimethods \
         -lyade-lib-serialization \
         -rdynamic 
-QMAKE_LIBDIR = ../../../DataClass/BoundingVolume/AABB/$(YADEDYNLIBPATH) \
-               /usr/local/lib/yade/yade-libs/ 
+QMAKE_LIBDIR = /usr/local/lib/yade/yade-libs/ 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 
 QMAKE_CXXFLAGS_DEBUG += -lpthread \
@@ -21,3 +17,5 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
+HEADERS += Mesh2D.hpp 
+SOURCES += Mesh2D.cpp 
