@@ -17,6 +17,8 @@ clean:
 	-rm bin/*
 	-find ./projects/kdevelop -name "Makefile" -exec rm {} \;
 	-find ./projects/kdevelop -name "*.o" -exec rm {} \;
+	-find ./projects/kdevelop -name "*.kdevses" -exec rm {} \;
+	-find ./projects/kdevelop -name "*.kdevelop.pcs" -exec rm {} \;
 
 install:
 	mkdir --parents ${PREFIX_DIR}/${INSTALL_DIR}/lib/yade/${yade_gui_subdir}
