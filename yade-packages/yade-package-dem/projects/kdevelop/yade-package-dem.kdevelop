@@ -76,7 +76,7 @@
       <directoryradio>executable</directoryradio>
     </run>
     <general>
-      <activedir>DataClass/InteractingGeometry</activedir>
+      <activedir>Engine/StandAloneEngine/ElasticCohesiveLaw</activedir>
     </general>
     <subclassing/>
   </kdevtrollproject>

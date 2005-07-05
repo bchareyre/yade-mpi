@@ -76,7 +76,7 @@
       <directoryradio>executable</directoryradio>
     </run>
     <general>
-      <activedir>Engine/StandAlone</activedir>
+      <activedir>Engine/StandAloneEngine/PhysicalActionContainerInitializer</activedir>
     </general>
     <subclassing/>
   </kdevtrollproject>
