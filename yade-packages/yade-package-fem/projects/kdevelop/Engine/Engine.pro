@@ -3,7 +3,7 @@
 # Subdir relative project main directory: ./Engine
 # Target is a subdirs project 
 
-SUBDIRS += DeusExMachina \          
+SUBDIRS += DeusExMachina \
            MetaEngine \
            EngineUnit \
            StandAloneEngine 
