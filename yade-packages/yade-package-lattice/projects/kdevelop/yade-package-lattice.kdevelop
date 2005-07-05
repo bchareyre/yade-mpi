@@ -76,7 +76,7 @@
       <directoryradio>executable</directoryradio>
     </run>
     <general>
-      <activedir>DataClass/GeometricalModel/LatticeSetGeometry</activedir>
+      <activedir>PreProcessor/LatticeExample</activedir>
     </general>
     <subclassing/>
   </kdevtrollproject>

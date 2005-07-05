@@ -76,7 +76,7 @@
       <directoryradio>executable</directoryradio>
     </run>
     <general>
-      <activedir>DataClass/PhysicalParameters/RigidBodyParameters</activedir>
+      <activedir>PreProcessor/RotatingBox</activedir>
     </general>
     <subclassing/>
   </kdevtrollproject>

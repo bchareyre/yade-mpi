@@ -76,7 +76,7 @@
       <directoryradio>executable</directoryradio>
     </run>
     <general>
-      <activedir>DataClass/InteractionPhysics/SpringPhysics</activedir>
+      <activedir>PreProcessor/HangingCloth</activedir>
     </general>
     <subclassing/>
   </kdevtrollproject>

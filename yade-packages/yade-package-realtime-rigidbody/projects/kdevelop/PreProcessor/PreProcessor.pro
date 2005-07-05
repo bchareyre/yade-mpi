@@ -3,6 +3,8 @@
 # Subdir relative project main directory: ./PreProcessor
 # Target is a subdirs project 
 
+SUBDIRS += BoxStack \
+           RotatingBox 
 CONFIG += release \
-          warn_on 
-TEMPLATE = subdirs 
+warn_on
+TEMPLATE = subdirs

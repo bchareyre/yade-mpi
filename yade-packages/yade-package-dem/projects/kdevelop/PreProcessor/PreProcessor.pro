@@ -3,6 +3,12 @@
 # Subdir relative project main directory: ./PreProcessor
 # Target is a subdirs project 
 
+SUBDIRS += Funnel \
+           SDECImpactTest \
+           SDECLinkedSpheres \
+           SDECSpheresPlane \
+           SDECTriaxialTest \
+           TetrahedronsTest 
 CONFIG += release \
-          warn_on 
-TEMPLATE = subdirs 
+warn_on
+TEMPLATE = subdirs

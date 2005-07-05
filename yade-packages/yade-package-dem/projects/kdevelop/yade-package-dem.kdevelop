@@ -76,7 +76,7 @@
       <directoryradio>executable</directoryradio>
     </run>
     <general>
-      <activedir>Engine/StandAloneEngine/ElasticCohesiveLaw</activedir>
+      <activedir>PreProcessor/TetrahedronsTest</activedir>
     </general>
     <subclassing/>
   </kdevtrollproject>

@@ -4,5 +4,5 @@
 # Target is a subdirs project 
 
 CONFIG += release \
-          warn_on 
-TEMPLATE = subdirs 
+warn_on
+TEMPLATE = subdirs
