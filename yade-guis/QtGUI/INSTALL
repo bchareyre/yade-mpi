@@ -1,0 +1,44 @@
+FIRST STEP :
+
+copy this directory somewhere.
+execute ./changeLibName nameofyourlibrary yourfirstname yourlastname youremail
+This will rename all the kdevelop projects files to use name "nameofyourlibrary"
+After that you can start to develop your library
+
+
+INSTALLING:
+
+to compile and install this library execute following commands:
+
+	make
+	make install
+
+by default everything is installed in directory /usr/local, if for example
+you want to install in /usr instead, you can do this:
+
+	make install INSTALL_DIR='/usr'
+
+Or if you are a package maintaner, you may want to install everything in
+different directory tree:
+
+	make install PREFIX_DIR='/tmp/foo' INSTALL_DIR='/usr'
+
+
+    WARNING: if you are compiling with gcc3.3, you need to pass additional argument:
+	
+	make CXXFLAGS='-pthread -lpthread'
+
+
+OTHER MAKE COMMANDS
+
+	make clean		# to clean afterwards
+	make uninstall          # to uninstall (you have to provide
+	                        # correct INSTALL_DIR, and PREFIX_DIR )
+
+
+
+DOCUMENTATION:
+
+for documentation check doc/ directory, maybe there is something useful.
+
+
