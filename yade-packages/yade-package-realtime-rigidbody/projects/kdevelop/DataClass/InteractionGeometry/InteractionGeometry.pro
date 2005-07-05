@@ -3,6 +3,7 @@
 # Subdir relative project main directory: ./DataClass/InteractionGeometry
 # Target is a subdirs project 
 
+SUBDIRS += ErrorTolerantContactModel 
 CONFIG += release \
-          warn_on 
-TEMPLATE = subdirs 
+warn_on
+TEMPLATE = subdirs

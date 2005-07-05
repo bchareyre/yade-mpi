@@ -76,7 +76,7 @@
       <directoryradio>executable</directoryradio>
     </run>
     <general>
-      <activedir>Engine</activedir>
+      <activedir>DataClass/GeometricalModel/LatticeSetGeometry</activedir>
     </general>
     <subclassing/>
   </kdevtrollproject>
