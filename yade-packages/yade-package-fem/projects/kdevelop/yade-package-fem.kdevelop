@@ -76,7 +76,7 @@
       <directoryradio>executable</directoryradio>
     </run>
     <general>
-      <activedir>PreProcessor/FEMBeam</activedir>
+      <activedir>Engine/StandAloneEngine/FEMLaw</activedir>
     </general>
     <subclassing/>
   </kdevtrollproject>

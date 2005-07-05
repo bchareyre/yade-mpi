@@ -76,7 +76,7 @@
       <directoryradio>executable</directoryradio>
     </run>
     <general>
-      <activedir>PreProcessor/LatticeExample</activedir>
+      <activedir>Container</activedir>
     </general>
     <subclassing/>
   </kdevtrollproject>

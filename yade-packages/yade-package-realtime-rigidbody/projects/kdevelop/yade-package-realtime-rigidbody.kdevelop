@@ -76,7 +76,7 @@
       <directoryradio>executable</directoryradio>
     </run>
     <general>
-      <activedir>PreProcessor/RotatingBox</activedir>
+      <activedir>Engine/StandAloneEngine/ErrorTolerantLaw</activedir>
     </general>
     <subclassing/>
   </kdevtrollproject>
