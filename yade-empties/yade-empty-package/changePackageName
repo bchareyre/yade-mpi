@@ -27,6 +27,10 @@ fi
 
 find . -name .svn -exec rm -rf {} \;
 
+cat Makefile | sed -e "s/yade_include_subdir=/yade_include_subdir="$1"/"	> Makefile
+cat Makefile | sed -e "s/yade_package_subdir=/yade_package_subdir="$1"/"  	> Makefile
+cat Makefile | sed -e "s/yade_libnames_basename=/yade_libnames_basename="$1"/"  > Makefile
+
 cd projects
 cd kdevelop
 

@@ -7,7 +7,7 @@ INSTALL_DIR=/usr/local
 #######################
 
 yade_include_subdir=
-yade_package_subdir=
+yade_gui_subdir=yade-guis
 yade_libnames_basename=
 
 all:
@@ -19,17 +19,17 @@ clean:
 	-find ./projects/kdevelop -name "*.o" -exec rm {} \;
 
 install:
-	mkdir --parents ${PREFIX_DIR}/${INSTALL_DIR}/lib/yade/${yade_package_subdir}
+	mkdir --parents ${PREFIX_DIR}/${INSTALL_DIR}/lib/yade/${yade_gui_subdir}
 	mkdir --parents ${PREFIX_DIR}/${INSTALL_DIR}/include/yade/${yade_include_subdir}
-	cp bin/* ${PREFIX_DIR}/${INSTALL_DIR}/lib/yade/${yade_package_subdir}
+	cp bin/* ${PREFIX_DIR}/${INSTALL_DIR}/lib/yade/${yade_gui_subdir}
 	cp src/*.hpp ${PREFIX_DIR}/${INSTALL_DIR}/include/yade/${yade_include_subdir}
 	-cp src/*.ipp ${PREFIX_DIR}/${INSTALL_DIR}/include/yade/${yade_include_subdir}
 	-cp src/*.tpp ${PREFIX_DIR}/${INSTALL_DIR}/include/yade/${yade_include_subdir}
 
 uninstall:
-	rm -f ${PREFIX_DIR}/${INSTALL_DIR}/lib/yade/${yade_package_subdir}/*
+	rm -f ${PREFIX_DIR}/${INSTALL_DIR}/lib/yade/${yade_gui_subdir}/lib${yade_libnames_basename}*
 	rm -rf  ${PREFIX_DIR}/${INSTALL_DIR}/include/yade/${yade_include_subdir}
-	rmdir --ignore-fail-on-non-empty ${PREFIX_DIR}/${INSTALL_DIR}/lib/yade/${yade_package_subdir}
+	rmdir --ignore-fail-on-non-empty ${PREFIX_DIR}/${INSTALL_DIR}/lib/yade/${yade_gui_subdir}
 	rmdir --ignore-fail-on-non-empty ${PREFIX_DIR}/${INSTALL_DIR}/lib/yade
 	rmdir --ignore-fail-on-non-empty ${PREFIX_DIR}/${INSTALL_DIR}/include/yade
 

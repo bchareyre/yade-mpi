@@ -6,9 +6,9 @@ INSTALL_DIR=/usr/local
 
 #######################
 
-yade_include_subdir=yade-lib-loki
+yade_include_subdir=
 yade_lib_subdir=yade-libs
-yade_libnames_basename=yade-lib-loki
+yade_libnames_basename=
 
 all:
 	cd projects/kdevelop ; qmake && make
