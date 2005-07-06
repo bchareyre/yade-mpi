@@ -3,6 +3,7 @@
 # Subdir relative project main directory: ./Engine/EngineUnit
 # Target is a subdirs project 
 
+SUBDIRS += ParticleSet2Mesh2D 
 CONFIG += release \
-          warn_on 
-TEMPLATE = subdirs 
+warn_on
+TEMPLATE = subdirs
