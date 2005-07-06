@@ -3,7 +3,7 @@
 # Subdir relative project main directory: ./DataClass/PhysicalParameters/FEMTetrahedronData
 # Target is a library:  
 
-LIBS +=  \
+LIBS += -lFEMNodeData \
         -lRigidBodyParameters \
         -lAABB \
         -lPolyhedron \
@@ -12,7 +12,8 @@ LIBS +=  \
         -lyade-lib-multimethods \
         -rdynamic 
 INCLUDEPATH += ../../../DataClass/PhysicalParameters/FEMNodeData 
-QMAKE_LIBDIR = /usr/local/lib/yade/yade-package-common/ \
+QMAKE_LIBDIR = ../../../../../bin \
+               /usr/local/lib/yade/yade-package-common/ \
                /usr/local/lib/yade/yade-libs/ 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

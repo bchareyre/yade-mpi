@@ -3,11 +3,12 @@
 # Subdir relative project main directory: ./Engine/EngineUnit/PolyhedralSweptSphere2AABB
 # Target is a library:  
 
-LIBS +=  \
+LIBS += -lPolyhedralSweptSphere \
         -lAABB \
         -rdynamic 
 INCLUDEPATH += ../../../DataClass/InteractingGeometry/PolyhedralSweptSphere 
-QMAKE_LIBDIR = /usr/local/lib/yade/yade-package-common/ \
+QMAKE_LIBDIR = ../../../../../bin \
+               /usr/local/lib/yade/yade-package-common/ \
                /usr/local/lib/yade/yade-libs/ 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

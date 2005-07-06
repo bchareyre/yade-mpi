@@ -3,8 +3,6 @@
 # Subdir relative project main directory: ./DataClass/GeometricalModel/Tetrahedron
 # Target is a library:  
 
-HEADERS += Tetrahedron.hpp 
-SOURCES += Tetrahedron.cpp 
 LIBS += -lyade-lib-multimethods \
         -rdynamic 
 QMAKE_LIBDIR = /usr/local/lib/yade/yade-libs/ 
@@ -17,3 +15,5 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
+HEADERS += Tetrahedron.hpp 
+SOURCES += Tetrahedron.cpp 

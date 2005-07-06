@@ -3,9 +3,15 @@
 # Subdir relative project main directory: ./Engine/StandAloneEngine/LatticeLaw
 # Target is a library:  
 
+LIBS += -lLatticeBeamParameters \
+        -lLatticeNodeParameters \
+        -lForce \
+        -lParticleParameters 
 INCLUDEPATH += ../../../DataClass/PhysicalParameters/LatticeNodeParameters \
                ../../../DataClass/PhysicalParameters/LatticeBeamParameters 
-QMAKE_LIBDIR = /usr/local/lib/yade/yade-package-common/ \
+QMAKE_LIBDIR = ../../../../../bin \
+               ../../../../../bin \
+               /usr/local/lib/yade/yade-package-common/ \
                /usr/local/lib/yade/yade-libs/ 
 DESTDIR = ../../../../../bin 
 CONFIG += release \

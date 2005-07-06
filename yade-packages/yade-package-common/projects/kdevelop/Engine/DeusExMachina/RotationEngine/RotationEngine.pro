@@ -3,14 +3,17 @@
 # Subdir relative project main directory: ./Engine/DeusExMachina/RotationEngine
 # Target is a library:  
 
-LIBS +=  \
+LIBS += -lParticleParameters \
+        -lRigidBodyParameters \
         -lyade-lib-serialization \
         -lyade-lib-wm3-math \
         -lyade-lib-multimethods \
         -rdynamic 
 INCLUDEPATH += ../../../DataClass/PhysicalParameters/RigidBodyParameters \
                ../../../DataClass/PhysicalParameters/ParticleParameters 
-QMAKE_LIBDIR = /usr/local/lib/yade/yade-libs/ 
+QMAKE_LIBDIR = ../../../../../bin \
+               ../../../../../bin \
+               /usr/local/lib/yade/yade-libs/ 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 
 QMAKE_CXXFLAGS_DEBUG += -lpthread \

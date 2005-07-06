@@ -3,8 +3,6 @@
 # Subdir relative project main directory: ./DataClass/GeometricalModel/Sphere
 # Target is a library:  
 
-HEADERS += Sphere.hpp 
-SOURCES += Sphere.cpp 
 LIBS += -lyade-lib-wm3-math \
         -lyade-lib-multimethods \
         -lyade-lib-serialization \
@@ -19,3 +17,5 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
+HEADERS += Sphere.hpp 
+SOURCES += Sphere.cpp 

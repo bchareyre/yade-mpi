@@ -3,8 +3,6 @@
 # Subdir relative project main directory: ./DataClass/GeometricalModel/FEMSetGeometry
 # Target is a library:  
 
-HEADERS += FEMSetGeometry.hpp 
-SOURCES += FEMSetGeometry.cpp 
 LIBS += -lyade-lib-multimethods \
         -rdynamic 
 QMAKE_LIBDIR = /usr/local/lib/yade/yade-libs/ 
@@ -17,3 +15,5 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
+HEADERS += FEMSetGeometry.hpp 
+SOURCES += FEMSetGeometry.cpp 

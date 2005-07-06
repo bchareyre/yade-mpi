@@ -7,7 +7,9 @@ LIBS += -lSDECLinkPhysics \
         -lSDECLinkGeometry \
         -lElasticContactParameters \
         -lMacroMicroContactGeometry \
-         \
+        -lBodyMacroParameters \
+        -lRigidBodyParameters \
+        -lParticleParameters \
         -lInteractionPhysicsMetaEngine \
         -rdynamic 
 INCLUDEPATH += ../../../DataClass/InteractionPhysics/SDECLinkPhysics \
@@ -16,6 +18,7 @@ INCLUDEPATH += ../../../DataClass/InteractionPhysics/SDECLinkPhysics \
                ../../../DataClass/InteractionGeometry/MacroMicroContactGeometry \
                ../../../DataClass/PhysicalParameters/BodyMacroParameters 
 QMAKE_LIBDIR = ../../../../../bin \
+               ../../../../../bin \
                ../../../../../bin \
                ../../../../../bin \
                ../../../../../bin \

@@ -3,14 +3,14 @@
 # Subdir relative project main directory: ./Engine/StandAloneEngine/FEMLaw
 # Target is a library:  
 
-LIBS +=  \
-         \
+LIBS += -lFEMTetrahedronData \
         -lForce \
         -lParticleParameters \
         -rdynamic 
 INCLUDEPATH += ../../../DataClass/PhysicalParameters/FEMTetrahedronData \
                ../../../DataClass/PhysicalParameters/FEMNodeData 
-QMAKE_LIBDIR = /usr/local/lib/yade/yade-package-common/ \
+QMAKE_LIBDIR = ../../../../../bin \
+               /usr/local/lib/yade/yade-package-common/ \
                /usr/local/lib/yade/yade-libs/ 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

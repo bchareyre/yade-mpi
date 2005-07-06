@@ -7,7 +7,7 @@ LIBS += -lSDECLinkPhysics \
         -lElasticContactParameters \
         -lSDECLinkGeometry \
         -lMacroMicroContactGeometry \
-         \
+        -lBodyMacroParameters \
         -lyade-lib-serialization \
         -lyade-lib-wm3-math \
         -lyade-lib-multimethods \
@@ -22,6 +22,7 @@ INCLUDEPATH += ../../../DataClass/InteractionPhysics/SDECLinkPhysics \
                ../../../DataClass/InteractionGeometry/MacroMicroContactGeometry \
                ../../../DataClass/PhysicalParameters/BodyMacroParameters 
 QMAKE_LIBDIR = ../../../../../bin \
+               ../../../../../bin \
                ../../../../../bin \
                ../../../../../bin \
                ../../../../../bin \
