@@ -3,6 +3,9 @@
 # Subdir relative project main directory: ./Engine/EngineUnit
 # Target is a subdirs project 
 
+SUBDIRS += FEMSet2Tetrahedrons \
+           FEMSetTextLoader \
+           FEMTetrahedronStiffness 
 CONFIG += release \
-          warn_on 
-TEMPLATE = subdirs 
+warn_on
+TEMPLATE = subdirs

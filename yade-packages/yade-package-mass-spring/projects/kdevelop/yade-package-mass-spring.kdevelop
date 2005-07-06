@@ -76,7 +76,7 @@
       <directoryradio>executable</directoryradio>
     </run>
     <general>
-      <activedir>Engine/StandAloneEngine/MassSpringLaw</activedir>
+      <activedir>Engine/EngineUnit/ParticleSet2Mesh2D</activedir>
     </general>
     <subclassing/>
   </kdevtrollproject>

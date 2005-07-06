@@ -76,7 +76,7 @@
       <directoryradio>executable</directoryradio>
     </run>
     <general>
-      <activedir>Engine/StandAloneEngine/LatticeLaw</activedir>
+      <activedir>Engine/EngineUnit/LatticeSet2LatticeBeams</activedir>
     </general>
     <subclassing/>
   </kdevtrollproject>

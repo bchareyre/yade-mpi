@@ -76,7 +76,7 @@
       <directoryradio>executable</directoryradio>
     </run>
     <general>
-      <activedir>Engine/EngineUnit/PolyhedralSweptSphere2AABB</activedir>
+      <activedir>Engine/EngineUnit/Box2PolyhedralSweptSphere</activedir>
     </general>
     <subclassing/>
   </kdevtrollproject>

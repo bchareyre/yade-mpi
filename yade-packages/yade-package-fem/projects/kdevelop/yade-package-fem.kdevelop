@@ -76,7 +76,7 @@
       <directoryradio>executable</directoryradio>
     </run>
     <general>
-      <activedir>Engine/StandAloneEngine/FEMLaw</activedir>
+      <activedir>Engine/EngineUnit/FEMTetrahedronStiffness</activedir>
     </general>
     <subclassing/>
   </kdevtrollproject>
