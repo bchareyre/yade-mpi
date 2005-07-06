@@ -3,8 +3,6 @@
 # Subdir relative project main directory: ./Engine/EngineUnit/Box2Sphere4MacroMicroContactGeometry
 # Target is a library:  
 
-HEADERS += Box2Sphere4MacroMicroContactGeometry.hpp 
-SOURCES += Box2Sphere4MacroMicroContactGeometry.cpp 
 LIBS += -lMacroMicroContactGeometry \
         -lInteractionGeometryMetaEngine \
         -lyade-lib-wm3-math \
@@ -12,7 +10,9 @@ LIBS += -lMacroMicroContactGeometry \
         -lInteractingSphere \
         -lInteractingBox \
         -rdynamic 
+INCLUDEPATH += ../../../DataClass/InteractionGeometry/MacroMicroContactGeometry 
 QMAKE_LIBDIR = ../../../../../bin \
+               /usr/local/lib/yade/yade-package-common/ \
                /usr/local/lib/yade/yade-libs/ 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 
@@ -23,3 +23,5 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
+HEADERS += Box2Sphere4MacroMicroContactGeometry.hpp 
+SOURCES += Box2Sphere4MacroMicroContactGeometry.cpp 

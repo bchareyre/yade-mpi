@@ -3,15 +3,18 @@
 # Subdir relative project main directory: ./Engine/StandAloneEngine/SDECTimeStepper
 # Target is a library:  
 
-HEADERS += SDECTimeStepper.hpp 
-SOURCES += SDECTimeStepper.cpp 
 LIBS += -lElasticContactParameters \
         -lMacroMicroContactGeometry \
         -lMacroMicroElasticRelationships \
         -lSphere \
         -rdynamic 
+INCLUDEPATH += ../../../Engine/EngineUnit/MacroMicroElasticRelationships \
+               ../../../DataClass/InteractionPhysics/ElasticContactParameters \
+               ../../../DataClass/InteractionGeometry/MacroMicroContactGeometry \
+               ../../../DataClass/PhysicalParameters/BodyMacroParameters 
 QMAKE_LIBDIR = ../../../../../bin \
                ../../../../../bin \
+               /usr/local/lib/yade/yade-package-common/ \
                /usr/local/lib/yade/yade-libs/ 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 
@@ -22,3 +25,5 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
+HEADERS += SDECTimeStepper.hpp 
+SOURCES += SDECTimeStepper.cpp 

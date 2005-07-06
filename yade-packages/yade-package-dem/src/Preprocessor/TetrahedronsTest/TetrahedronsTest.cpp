@@ -23,46 +23,46 @@
 
 #include "TetrahedronsTest.hpp"
 
+#include "BodyMacroParameters.hpp"
+#include "ElasticContactLaw.hpp"
+#include "SDECLinkGeometry.hpp"
+#include "MacroMicroElasticRelationships.hpp"
+#include "SDECTimeStepper.hpp"
+#include "SwiftPolyhedronProximityModeler.hpp"
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <yade/yade-common/Box.hpp>
-#include <yade/yade-common/AABB.hpp>
+#include <yade/yade-package-common/Box.hpp>
+#include <yade/yade-package-common/AABB.hpp>
 #include <yade/yade-core/MetaBody.hpp>
-#include <yade/yade-common/SAPCollider.hpp>
-#include <yade/yade-common/PersistentSAPCollider.hpp>
-#include <yade/yade-common/BodyMacroParameters.hpp>
+#include <yade/yade-package-common/SAPCollider.hpp>
+#include <yade/yade-package-common/PersistentSAPCollider.hpp>
 #include <yade/yade-lib-serialization/IOManager.hpp>
-#include <yade/yade-common/ElasticContactLaw.hpp>
-#include <yade/yade-common/BodyMacroParameters.hpp>
-#include <yade/yade-common/SDECLinkGeometry.hpp>
 #include <yade/yade-core/Interaction.hpp>
-#include <yade/yade-common/BoundingVolumeMetaEngine.hpp>
-#include <yade/yade-common/InteractionDescriptionSet2AABB.hpp>
-#include <yade/yade-common/MetaInteractingGeometry.hpp>
-#include <yade/yade-common/MacroMicroElasticRelationships.hpp>
-#include <yade/yade-common/SDECTimeStepper.hpp>
+#include <yade/yade-package-common/BoundingVolumeMetaEngine.hpp>
+#include <yade/yade-package-common/InteractionDescriptionSet2AABB.hpp>
+#include <yade/yade-package-common/MetaInteractingGeometry.hpp>
 
-#include <yade/yade-common/PhysicalActionContainerReseter.hpp>
-#include <yade/yade-common/PhysicalActionContainerInitializer.hpp>
+#include <yade/yade-package-common/PhysicalActionContainerReseter.hpp>
+#include <yade/yade-package-common/PhysicalActionContainerInitializer.hpp>
 
-#include <yade/yade-common/PhysicalActionDamper.hpp>
-#include <yade/yade-common/PhysicalActionApplier.hpp>
+#include <yade/yade-package-common/PhysicalActionDamper.hpp>
+#include <yade/yade-package-common/PhysicalActionApplier.hpp>
 
-#include <yade/yade-common/CundallNonViscousForceDamping.hpp>
-#include <yade/yade-common/CundallNonViscousMomentumDamping.hpp>
-#include <yade/yade-common/GravityEngine.hpp>
+#include <yade/yade-package-common/CundallNonViscousForceDamping.hpp>
+#include <yade/yade-package-common/CundallNonViscousMomentumDamping.hpp>
+#include <yade/yade-package-common/GravityEngine.hpp>
 
-#include <yade/yade-common/SwiftPolyhedronProximityModeler.hpp>
-#include <yade/yade-common/InteractionPhysicsMetaEngine.hpp>
+#include <yade/yade-package-common/InteractionPhysicsMetaEngine.hpp>
 #include <yade/yade-core/Body.hpp>
-#include <yade/yade-common/InteractingBox.hpp>
-#include <yade/yade-common/InteractingSphere.hpp>
-#include <yade/yade-common/PhysicalParametersMetaEngine.hpp>
+#include <yade/yade-package-common/InteractingBox.hpp>
+#include <yade/yade-package-common/InteractingSphere.hpp>
+#include <yade/yade-package-common/PhysicalParametersMetaEngine.hpp>
 
-#include <yade/yade-common/BodyRedirectionVector.hpp>
-#include <yade/yade-common/InteractionVecSet.hpp>
-#include <yade/yade-common/PhysicalActionVectorVector.hpp>
+#include <yade/yade-package-common/BodyRedirectionVector.hpp>
+#include <yade/yade-package-common/InteractionVecSet.hpp>
+#include <yade/yade-package-common/PhysicalActionVectorVector.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////

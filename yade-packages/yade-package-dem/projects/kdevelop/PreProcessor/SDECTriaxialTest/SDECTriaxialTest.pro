@@ -3,10 +3,10 @@
 # Subdir relative project main directory: ./PreProcessor/SDECTriaxialTest
 # Target is a library:  
 
-HEADERS += SDECTriaxialTest.hpp 
-SOURCES += SDECTriaxialTest.cpp 
 LIBS += -lBodyMacroParameters \
         -lElasticContactLaw \
+        -lMacroMicroElasticRelationships \
+        -lSDECTimeStepper \
         -lPhysicalActionVectorVector \
         -lInteractionVecSet \
         -lBodyRedirectionVector \
@@ -14,8 +14,6 @@ LIBS += -lBodyMacroParameters \
         -lInteractingBox \
         -lCundallNonViscousMomentumDamping \
         -lCundallNonViscousForceDamping \
-        -lMacroMicroElasticRelationships \
-        -lSDECTimeStepper \
         -lPhysicalActionContainerReseter \
         -lInteractionGeometryMetaEngine \
         -lInteractionPhysicsMetaEngine \
@@ -26,8 +24,15 @@ LIBS += -lBodyMacroParameters \
         -lBox \
         -lInteractionDescriptionSet2AABB \
         -rdynamic 
+INCLUDEPATH += ../../Engine/StandAloneEngine/SDECTimeStepper \
+               ../../Engine/StandAloneEngine/ElasticContactLaw \
+               ../../Engine/EngineUnit/MacroMicroElasticRelationships \
+               ../../DataClass/PhysicalParameters/BodyMacroParameters 
 QMAKE_LIBDIR = ../../../../bin \
                ../../../../bin \
+               ../../../../bin \
+               ../../../../bin \
+               /usr/local/lib/yade/yade-package-common/ \
                /usr/local/lib/yade/yade-libs/ 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 
@@ -38,3 +43,5 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
+HEADERS += SDECTriaxialTest.hpp 
+SOURCES += SDECTriaxialTest.cpp 

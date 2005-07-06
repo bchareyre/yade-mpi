@@ -3,14 +3,11 @@
 # Subdir relative project main directory: ./Engine/StandAloneEngine/ElasticCohesiveLaw
 # Target is a library:  
 
-HEADERS += ElasticCohesiveLaw.hpp 
-SOURCES += ElasticCohesiveLaw.cpp 
 LIBS += -lSDECLinkPhysics \
         -lElasticContactParameters \
         -lSDECLinkGeometry \
         -lMacroMicroContactGeometry \
-        -lBodyMacroParameters \
-        -lyade-lib-serialization \
+         \
         -lyade-lib-wm3-math \
         -lyade-lib-multimethods \
         -lForce \
@@ -18,11 +15,16 @@ LIBS += -lSDECLinkPhysics \
         -lSphere \
         -lRigidBodyParameters \
         -rdynamic 
+INCLUDEPATH += ../../../DataClass/InteractionPhysics/SDECLinkPhysics \
+               ../../../DataClass/InteractionPhysics/ElasticContactParameters \
+               ../../../DataClass/InteractionGeometry/SDECLinkGeometry \
+               ../../../DataClass/InteractionGeometry/MacroMicroContactGeometry \
+               ../../../DataClass/PhysicalParameters/BodyMacroParameters 
 QMAKE_LIBDIR = ../../../../../bin \
                ../../../../../bin \
                ../../../../../bin \
                ../../../../../bin \
-               ../../../../../bin \
+               /usr/local/lib/yade/yade-package-common \
                /usr/local/lib/yade/yade-libs/ 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 
@@ -33,3 +35,5 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
+HEADERS += ElasticCohesiveLaw.hpp 
+SOURCES += ElasticCohesiveLaw.cpp 

@@ -3,21 +3,16 @@
 # Subdir relative project main directory: ./DataClass/InteractingGeometry/PolyhedralSweptSphere
 # Target is a library:  
 
+LIBS += -rdynamic 
+QMAKE_LIBDIR = /usr/local/lib/yade/yade-libs/ 
+QMAKE_CXXFLAGS_RELEASE += -lpthread \
+                          -pthread 
+QMAKE_CXXFLAGS_DEBUG += -lpthread \
+                        -pthread 
+DESTDIR = ../../../../../bin 
+CONFIG += debug \
+          warn_on \
+          dll 
+TEMPLATE = lib 
 HEADERS += PolyhedralSweptSphere.hpp 
 SOURCES += PolyhedralSweptSphere.cpp 
-LIBS += -rdynamic
-INCLUDEPATH += $(YADEINCLUDEPATH)
-MOC_DIR = $(YADECOMPILATIONPATH)
-UI_DIR = $(YADECOMPILATIONPATH)
-OBJECTS_DIR = $(YADECOMPILATIONPATH)
-QMAKE_LIBDIR = /usr/local/lib/yade/yade-libs/ \
-$(YADEDYNLIBPATH)
-QMAKE_CXXFLAGS_RELEASE += -lpthread \
--pthread
-QMAKE_CXXFLAGS_DEBUG += -lpthread \
--pthread
-DESTDIR = $(YADEDYNLIBPATH)
-CONFIG += debug \
-warn_on \
-dll
-TEMPLATE = lib

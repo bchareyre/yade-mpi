@@ -23,18 +23,19 @@
 
 #include "MacroMicroElasticRelationships.hpp"
 
+#include "MacroMicroContactGeometry.hpp"
+#include "ElasticContactParameters.hpp"
+
+#include "SDECLinkGeometry.hpp" // FIXME - I can't dispatch by SDECLinkGeometry <-> MacroMicroContactGeometry !!?
+#include "SDECLinkPhysics.hpp" // FIXME
+
+#include "BodyMacroParameters.hpp"
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-
-#include <yade/yade-common/MacroMicroContactGeometry.hpp>
-#include <yade/yade-common/ElasticContactParameters.hpp>
-
-#include <yade/yade-common/SDECLinkGeometry.hpp> // FIXME - I can't dispatch by SDECLinkGeometry <-> MacroMicroContactGeometry !!?
-#include <yade/yade-common/SDECLinkPhysics.hpp> // FIXME
 
 #include <yade/yade-core/Omega.hpp>
 #include <yade/yade-core/MetaBody.hpp>
-#include <yade/yade-common/BodyMacroParameters.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////

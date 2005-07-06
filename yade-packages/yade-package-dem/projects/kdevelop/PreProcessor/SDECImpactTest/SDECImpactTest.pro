@@ -3,23 +3,21 @@
 # Subdir relative project main directory: ./PreProcessor/SDECImpactTest
 # Target is a library:  
 
-HEADERS += SDECImpactTest.hpp 
-SOURCES += SDECImpactTest.cpp 
 LIBS += -lSDECLinkGeometry \
         -lElasticContactLaw \
-        -lPhysicalActionVectorVector \
-        -lInteractionVecSet \
-        -lBodyRedirectionVector \
         -lAveragePositionRecorder \
         -lVelocityRecorder \
         -lForceRecorder \
+        -lMacroMicroElasticRelationships \
+        -lSDECTimeStepper \
+        -lPhysicalActionVectorVector \
+        -lInteractionVecSet \
+        -lBodyRedirectionVector \
         -lyade-lib-wm3-math \
         -lInteractingSphere \
         -lInteractingBox \
         -lCundallNonViscousMomentumDamping \
         -lCundallNonViscousForceDamping \
-        -lMacroMicroElasticRelationships \
-        -lSDECTimeStepper \
         -lMetaInteractingGeometry \
         -lGravityEngine \
         -lyade-lib-serialization \
@@ -38,8 +36,23 @@ LIBS += -lSDECLinkGeometry \
         -lSAPCollider \
         -lInteractionDescriptionSet2AABB \
         -rdynamic 
+INCLUDEPATH += ../../Engine/StandAloneEngine/VelocityRecorder \
+               ../../Engine/StandAloneEngine/ForceRecorder \
+               ../../Engine/StandAloneEngine/AveragePositionRecorder \
+               ../../Engine/StandAloneEngine/SDECTimeStepper \
+               ../../Engine/StandAloneEngine/ElasticContactLaw \
+               ../../Engine/EngineUnit/MacroMicroElasticRelationships \
+               ../../DataClass/InteractionPhysics/SDECLinkPhysics \
+               ../../DataClass/InteractionGeometry/SDECLinkGeometry \
+               ../../DataClass/PhysicalParameters/BodyMacroParameters 
 QMAKE_LIBDIR = ../../../../bin \
                ../../../../bin \
+               ../../../../bin \
+               ../../../../bin \
+               ../../../../bin \
+               ../../../../bin \
+               ../../../../bin \
+               /usr/local/lib/yade/yade-package-common/ \
                /usr/local/lib/yade/yade-libs/ 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 
@@ -50,3 +63,5 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
+HEADERS += SDECImpactTest.hpp 
+SOURCES += SDECImpactTest.cpp 
