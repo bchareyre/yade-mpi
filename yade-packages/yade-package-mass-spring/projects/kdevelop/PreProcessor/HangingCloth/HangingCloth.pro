@@ -3,8 +3,6 @@
 # Subdir relative project main directory: ./PreProcessor/HangingCloth
 # Target is a library:  
 
-HEADERS += HangingCloth.hpp 
-SOURCES += HangingCloth.cpp 
 LIBS += -lSpringGeometry \
         -lSpringPhysics \
         -lParticleSetParameters \
@@ -40,14 +38,19 @@ LIBS += -lSpringGeometry \
         -lBodyMacroParameters \
         -lInteractionDescriptionSet2AABB \
         -lyade-lib-multimethods \
-        -lFrictionLessElasticContactLaw \
         -lMassSpringLaw \
-        -lMassSpringBody2RigidBodyLaw \
         -lElasticContactLaw \
         -rdynamic 
+INCLUDEPATH += ../../Engine/StandAloneEngine/MassSpringLaw \
+               ../../Engine/EngineUnit/ParticleSet2Mesh2D \
+               ../../DataClass/InteractionPhysics/SpringPhysics \
+               ../../DataClass/InteractionGeometry/SpringGeometry \
+               ../../DataClass/PhysicalParameters/ParticleSetParameters 
 QMAKE_LIBDIR = ../../../../bin \
                ../../../../bin \
                ../../../../bin \
+               /usr/local/lib/yade/yade-package-dem \
+               /usr/local/lib/yade/yade-package-common/ \
                /usr/local/lib/yade/yade-libs/ 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 
@@ -58,3 +61,5 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
+HEADERS += HangingCloth.hpp 
+SOURCES += HangingCloth.cpp 

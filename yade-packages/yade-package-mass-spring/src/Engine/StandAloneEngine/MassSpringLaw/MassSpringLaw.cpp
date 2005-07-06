@@ -23,17 +23,18 @@
 
 #include "MassSpringLaw.hpp"
 
+#include "SpringGeometry.hpp"
+#include "SpringPhysics.hpp"
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <yade/yade-core/Omega.hpp>
 #include <yade/yade-core/MetaBody.hpp>
-#include <yade/yade-common/Mesh2D.hpp>
-#include <yade/yade-common/SpringGeometry.hpp>
-#include <yade/yade-common/SpringPhysics.hpp>
-#include <yade/yade-common/ParticleParameters.hpp>
-#include <yade/yade-common/Force.hpp>
-#include <yade/yade-common/Momentum.hpp>
+#include <yade/yade-package-common/Mesh2D.hpp>
+#include <yade/yade-package-common/ParticleParameters.hpp>
+#include <yade/yade-package-common/Force.hpp>
+#include <yade/yade-package-common/Momentum.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////

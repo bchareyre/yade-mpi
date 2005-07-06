@@ -3,13 +3,13 @@
 # Subdir relative project main directory: ./Engine/EngineUnit/ParticleSet2Mesh2D
 # Target is a library:  
 
-HEADERS += ParticleSet2Mesh2D.hpp 
-SOURCES += ParticleSet2Mesh2D.cpp 
 LIBS += -lParticleSetParameters \
         -lGeometricalModelMetaEngine \
         -lMesh2D \
         -rdynamic 
+INCLUDEPATH += ../../../DataClass/PhysicalParameters/ParticleSetParameters 
 QMAKE_LIBDIR = ../../../../../bin \
+               /usr/local/lib/yade/yade-package-common/ \
                /usr/local/lib/yade/yade-libs/ 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 
@@ -20,3 +20,5 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
+HEADERS += ParticleSet2Mesh2D.hpp 
+SOURCES += ParticleSet2Mesh2D.cpp 

@@ -3,8 +3,6 @@
 # Subdir relative project main directory: ./Engine/StandAloneEngine/MassSpringLaw
 # Target is a library:  
 
-HEADERS += MassSpringLaw.hpp 
-SOURCES += MassSpringLaw.cpp 
 LIBS += -lSpringPhysics \
         -lSpringGeometry \
         -lParticleParameters \
@@ -15,9 +13,11 @@ LIBS += -lSpringPhysics \
         -lMomentum \
         -lMesh2D \
         -rdynamic 
+INCLUDEPATH += ../../../DataClass/InteractionPhysics/SpringPhysics \
+               ../../../DataClass/InteractionGeometry/SpringGeometry 
 QMAKE_LIBDIR = ../../../../../bin \
                ../../../../../bin \
-               ../../../../../bin \
+               /usr/local/lib/yade/yade-package-common/ \
                /usr/local/lib/yade/yade-libs/ 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 
@@ -28,3 +28,5 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
+HEADERS += MassSpringLaw.hpp 
+SOURCES += MassSpringLaw.cpp 
