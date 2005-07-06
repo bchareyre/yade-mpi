@@ -23,12 +23,13 @@
 
 #include "LatticeLaw.hpp"
 
+#include "LatticeBeamParameters.hpp"
+#include "LatticeNodeParameters.hpp"
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <yade/yade-common/LatticeBeamParameters.hpp>
-#include <yade/yade-common/LatticeNodeParameters.hpp>
-#include <yade/yade-common/Force.hpp>
+#include <yade/yade-package-common/Force.hpp>
 
 #include <yade/yade-core/BodyContainer.hpp>
 #include <yade/yade-core/MetaBody.hpp>

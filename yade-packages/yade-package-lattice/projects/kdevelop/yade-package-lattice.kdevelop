@@ -76,7 +76,7 @@
       <directoryradio>executable</directoryradio>
     </run>
     <general>
-      <activedir>RenderingEngine/GLDrawLineSegment</activedir>
+      <activedir>PreProcessor/LatticeExample</activedir>
     </general>
     <subclassing/>
   </kdevtrollproject>

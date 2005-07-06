@@ -3,17 +3,18 @@
 # Subdir relative project main directory: ./Engine/EngineUnit/LatticeSet2LatticeBeams
 # Target is a library:  
 
-HEADERS += LatticeSet2LatticeBeams.hpp 
-SOURCES += LatticeSet2LatticeBeams.cpp 
-LIBS += -lLatticeBeamParameters \
-        -lLineSegment \
+LIBS += -lLineSegment \
         -lLatticeSetParameters \
+        -lLatticeBeamParameters \
         -lGeometricalModelMetaEngine \
         -lParticleParameters \
         -rdynamic 
+INCLUDEPATH += ../../../DataClass/PhysicalParameters/LatticeSetParameters \
+               ../../../DataClass/PhysicalParameters/LatticeBeamParameters \
+               ../../../DataClass/GeometricalModel/LineSegment 
 QMAKE_LIBDIR = ../../../../../bin \
                ../../../../../bin \
-               ../../../../../bin \
+               /usr/local/lib/yade/yade-package-common/ \
                /usr/local/lib/yade/yade-libs 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 
@@ -24,3 +25,5 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
+HEADERS += LatticeSet2LatticeBeams.hpp 
+SOURCES += LatticeSet2LatticeBeams.cpp 

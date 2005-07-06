@@ -3,11 +3,14 @@
 # Subdir relative project main directory: ./Engine/StandAloneEngine/LatticeLaw
 # Target is a library:  
 
-HEADERS += LatticeLaw.hpp 
-SOURCES += LatticeLaw.cpp 
-QMAKE_LIBDIR = /usr/local/lib/yade/yade-libs/ 
+INCLUDEPATH += ../../../DataClass/PhysicalParameters/LatticeNodeParameters \
+               ../../../DataClass/PhysicalParameters/LatticeBeamParameters 
+QMAKE_LIBDIR = /usr/local/lib/yade/yade-package-common/ \
+               /usr/local/lib/yade/yade-libs/ 
 DESTDIR = ../../../../../bin 
 CONFIG += release \
           warn_on \
           dll 
 TEMPLATE = lib 
+HEADERS += LatticeLaw.hpp 
+SOURCES += LatticeLaw.cpp 

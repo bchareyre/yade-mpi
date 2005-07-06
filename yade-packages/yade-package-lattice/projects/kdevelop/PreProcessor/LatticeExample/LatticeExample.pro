@@ -3,8 +3,6 @@
 # Subdir relative project main directory: ./PreProcessor/LatticeExample
 # Target is a library:  
 
-HEADERS += LatticeExample.hpp 
-SOURCES += LatticeExample.cpp 
 LIBS += -lLineSegment \
         -lLatticeSetParameters \
         -lLatticeBeamParameters \
@@ -25,10 +23,14 @@ LIBS += -lLineSegment \
         -lTranslationEngine \
         -lLatticeLaw \
         -rdynamic 
+INCLUDEPATH += ../../Engine/StandAloneEngine/LatticeLaw \
+               ../../DataClass/PhysicalParameters/LatticeSetParameters \
+               ../../DataClass/PhysicalParameters/LatticeNodeParameters \
+               ../../DataClass/PhysicalParameters/LatticeBeamParameters \
+               ../../DataClass/GeometricalModel/LineSegment 
 QMAKE_LIBDIR = ../../../../bin \
                ../../../../bin \
-               ../../../../bin \
-               ../../../../bin \
+               /usr/local/lib/yade/yade-package-common/ \
                /usr/local/lib/yade/yade-libs/ 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 
@@ -39,3 +41,5 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
+HEADERS += LatticeExample.hpp 
+SOURCES += LatticeExample.cpp 

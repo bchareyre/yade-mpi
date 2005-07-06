@@ -3,18 +3,21 @@
 # Subdir relative project main directory: ./RenderingEngine/GLDrawLineSegment
 # Target is a library:  
 
+LIBS += -lLineSegment \
+        -lyade-lib-opengl \
+        -rdynamic 
+INCLUDEPATH += ../../DataClass/GeometricalModel/LineSegment 
+QMAKE_LIBDIR = ../../../../bin \
+               /usr/local/lib/yade/yade-package-common/ \
+               /usr/local/lib/yade/yade-libs/ 
+QMAKE_CXXFLAGS_RELEASE += -lpthread \
+                          -pthread 
+QMAKE_CXXFLAGS_DEBUG += -lpthread \
+                        -pthread 
+DESTDIR = ../../../../../bin 
+CONFIG += debug \
+          warn_on \
+          dll 
+TEMPLATE = lib 
 HEADERS += GLDrawLineSegment.hpp 
 SOURCES += GLDrawLineSegment.cpp 
-LIBS += -lyade-lib-opengl \
--lLineSegment \
--rdynamic
-QMAKE_LIBDIR = /usr/local/lib/yade/yade-libs/
-QMAKE_CXXFLAGS_RELEASE += -lpthread \
--pthread
-QMAKE_CXXFLAGS_DEBUG += -lpthread \
--pthread
-DESTDIR = ../../../../../bin
-CONFIG += debug \
-warn_on \
-dll
-TEMPLATE = lib
