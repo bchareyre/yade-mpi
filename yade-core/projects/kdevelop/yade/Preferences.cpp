@@ -1,1 +1,1 @@
-/disc/devel/trunk/yade-core/src/Preferences.cpp
+../../../src/Preferences.cpp

@@ -1,1 +1,1 @@
-/disc/devel/trunk/yade-core/src/InteractionContainer.hpp
+../../../src/InteractionContainer.hpp

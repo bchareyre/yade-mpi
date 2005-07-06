@@ -1,1 +1,1 @@
-/disc/devel/trunk/yade-core/src/BoundingVolume.cpp
+../../../src/BoundingVolume.cpp

@@ -1,1 +1,1 @@
-/disc/devel/trunk/yade-core/src/RenderingEngine.hpp
+../../../src/RenderingEngine.hpp

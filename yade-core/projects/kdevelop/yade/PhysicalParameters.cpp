@@ -1,1 +1,1 @@
-/disc/devel/trunk/yade-core/src/PhysicalParameters.cpp
+../../../src/PhysicalParameters.cpp

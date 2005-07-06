@@ -1,1 +1,1 @@
-/disc/devel/trunk/yade-core/src/GeometricalModel.hpp
+../../../src/GeometricalModel.hpp

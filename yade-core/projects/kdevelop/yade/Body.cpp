@@ -1,1 +1,1 @@
-/disc/devel/trunk/yade-core/src/Body.cpp
+../../../src/Body.cpp

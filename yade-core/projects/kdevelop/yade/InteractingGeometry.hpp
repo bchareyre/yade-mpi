@@ -1,1 +1,1 @@
-/disc/devel/trunk/yade-core/src/InteractingGeometry.hpp
+../../../src/InteractingGeometry.hpp

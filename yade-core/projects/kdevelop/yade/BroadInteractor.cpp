@@ -1,1 +1,1 @@
-/disc/devel/trunk/yade-core/src/BroadInteractor.cpp
+../../../src/BroadInteractor.cpp

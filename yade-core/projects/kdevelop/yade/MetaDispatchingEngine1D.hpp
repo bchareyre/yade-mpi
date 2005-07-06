@@ -1,1 +1,1 @@
-/disc/devel/trunk/yade-core/src/MetaDispatchingEngine1D.hpp
+../../../src/MetaDispatchingEngine1D.hpp

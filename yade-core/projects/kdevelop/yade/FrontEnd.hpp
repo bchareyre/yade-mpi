@@ -1,1 +1,1 @@
-/disc/devel/trunk/yade-core/src/FrontEnd.hpp
+../../../src/FrontEnd.hpp

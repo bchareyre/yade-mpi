@@ -1,1 +1,1 @@
-/disc/devel/trunk/yade-core/src/Preferences.hpp
+../../../src/Preferences.hpp

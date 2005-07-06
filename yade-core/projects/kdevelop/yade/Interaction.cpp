@@ -1,1 +1,1 @@
-/disc/devel/trunk/yade-core/src/Interaction.cpp
+../../../src/Interaction.cpp

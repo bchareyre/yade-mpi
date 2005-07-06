@@ -1,1 +1,1 @@
-/disc/devel/trunk/yade-core/src/FileGenerator.hpp
+../../../src/FileGenerator.hpp

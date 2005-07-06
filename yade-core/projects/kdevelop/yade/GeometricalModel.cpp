@@ -1,1 +1,1 @@
-/disc/devel/trunk/yade-core/src/GeometricalModel.cpp
+../../../src/GeometricalModel.cpp

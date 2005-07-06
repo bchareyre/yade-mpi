@@ -1,1 +1,1 @@
-/disc/devel/trunk/yade-core/src/yadeExceptions.hpp
+../../../src/yadeExceptions.hpp

@@ -1,1 +1,1 @@
-/disc/devel/trunk/yade-core/src/BodyContainer.hpp
+../../../src/BodyContainer.hpp

@@ -1,1 +1,1 @@
-/disc/devel/trunk/yade-core/src/DeusExMachina.hpp
+../../../src/DeusExMachina.hpp

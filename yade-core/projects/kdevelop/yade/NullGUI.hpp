@@ -1,1 +1,1 @@
-/disc/devel/trunk/yade-core/src/NullGUI.hpp
+../../../src/NullGUI.hpp

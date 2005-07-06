@@ -1,1 +1,1 @@
-/disc/devel/trunk/yade-core/src/MetaEngine.hpp
+../../../src/MetaEngine.hpp

@@ -1,1 +1,1 @@
-/disc/devel/trunk/yade-core/src/Omega.cpp
+../../../src/Omega.cpp

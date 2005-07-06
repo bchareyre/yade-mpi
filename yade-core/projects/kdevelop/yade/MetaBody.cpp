@@ -1,1 +1,1 @@
-/disc/devel/trunk/yade-core/src/MetaBody.cpp
+../../../src/MetaBody.cpp
