@@ -3,6 +3,13 @@
 # Subdir relative project main directory: ./Engine/EngineUnit
 # Target is a subdirs project 
 
+SUBDIRS += Box2AABB \
+           InteractionDescriptionSet2AABB \
+           LeapFrogOrientationIntegrator \
+           LeapFrogPositionIntegrator \
+           NewtonsForceLaw \
+           NewtonsMomentumLaw \
+           Sphere2AABB 
 CONFIG += release \
-          warn_on 
-TEMPLATE = subdirs 
+warn_on
+TEMPLATE = subdirs
