@@ -6,7 +6,9 @@
 SUBDIRS += PolyhedralSweptSphere2AABB \
            Box2PolyhedralSweptSphere \
            Tetrahedron2PolyhedralSweptSphere \
-           MacroMicroElasticRelationships 
+           MacroMicroElasticRelationships \
+           Box2Sphere4MacroMicroContactGeometry \
+           Sphere2Sphere4MacroMicroContactGeometry 
 CONFIG += release \
 warn_on
 TEMPLATE = subdirs

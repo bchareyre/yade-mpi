@@ -3,6 +3,12 @@
 # Subdir relative project main directory: ./Engine/EngineUnit
 # Target is a subdirs project 
 
+SUBDIRS += AABox2Sphere4ClosestFeatures \
+           Box2Box4ClosestFeatures \
+           Box2Sphere4ClosestFeatures \
+           Box2Sphere4ErrorTolerant \
+           Sphere2Sphere4ClosestFeatures \
+           Sphere2Sphere4ErrorTolerant 
 CONFIG += release \
-          warn_on 
-TEMPLATE = subdirs 
+warn_on
+TEMPLATE = subdirs

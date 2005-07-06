@@ -76,7 +76,7 @@
       <directoryradio>executable</directoryradio>
     </run>
     <general>
-      <activedir>Engine/StandAloneEngine/ErrorTolerantLaw</activedir>
+      <activedir>Engine/EngineUnit/Sphere2Sphere4ErrorTolerant</activedir>
     </general>
     <subclassing/>
   </kdevtrollproject>

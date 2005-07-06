@@ -3,7 +3,8 @@
 # Subdir relative project main directory: ./Engine/StandAloneEngine
 # Target is a subdirs project 
 
-SUBDIRS += ErrorTolerantLaw 
+SUBDIRS += ErrorTolerantLaw \
+           FrictionLessElasticContactLaw 
 CONFIG += release \
 warn_on
 TEMPLATE = subdirs
