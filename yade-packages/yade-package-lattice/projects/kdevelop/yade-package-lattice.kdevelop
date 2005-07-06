@@ -76,7 +76,7 @@
       <directoryradio>executable</directoryradio>
     </run>
     <general>
-      <activedir>Engine/EngineUnit/LatticeSet2LatticeBeams</activedir>
+      <activedir>RenderingEngine/GLDrawLineSegment</activedir>
     </general>
     <subclassing/>
   </kdevtrollproject>

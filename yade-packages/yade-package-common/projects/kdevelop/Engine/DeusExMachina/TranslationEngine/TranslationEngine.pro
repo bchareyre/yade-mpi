@@ -3,15 +3,15 @@
 # Subdir relative project main directory: ./Engine/DeusExMachina/TranslationEngine
 # Target is a library:  
 
-HEADERS += TranslationEngine.hpp 
-SOURCES += TranslationEngine.cpp 
-LIBS += -lyade-lib-factory \
+LIBS += -lParticleParameters \
+        -lyade-lib-factory \
         -lyade-lib-wm3-math \
         -lyade-lib-serialization \
         -lyade-lib-multimethods \
-        -lParticleParameters \
         -rdynamic 
-QMAKE_LIBDIR = /usr/local/lib/yade/yade-libs/ 
+INCLUDEPATH += ../../../DataClass/PhysicalParameters/ParticleParameters 
+QMAKE_LIBDIR = ../../../../../bin \
+               /usr/local/lib/yade/yade-libs/ 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 
 QMAKE_CXXFLAGS_DEBUG += -lpthread \
@@ -21,3 +21,5 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
+HEADERS += TranslationEngine.hpp 
+SOURCES += TranslationEngine.cpp 

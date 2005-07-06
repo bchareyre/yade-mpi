@@ -3,11 +3,11 @@
 # Subdir relative project main directory: ./RenderingEngine/GLDrawGeometricalModel/GLDrawSphere
 # Target is a library:  
 
-HEADERS += GLDrawSphere.hpp 
-SOURCES += GLDrawSphere.cpp 
 LIBS += -lSphere \
         -lyade-lib-opengl \
         -rdynamic 
+INCLUDEPATH += ../../../DataClass/GeometricalModel/Sphere \
+               ../../../RenderingEngine/OpenGLRenderingEngine 
 QMAKE_LIBDIR = ../../../../../bin \
                /usr/local/lib/yade/yade-libs/ 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
@@ -19,3 +19,5 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
+HEADERS += GLDrawSphere.hpp 
+SOURCES += GLDrawSphere.cpp 

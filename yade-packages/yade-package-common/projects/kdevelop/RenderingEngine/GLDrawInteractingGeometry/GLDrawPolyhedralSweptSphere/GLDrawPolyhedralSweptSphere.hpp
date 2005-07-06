@@ -1,1 +1,0 @@
-../../../../../src/RenderingEngine/GLDrawInteractingGeometry/GLDrawPolyhedralSweptSphere/GLDrawPolyhedralSweptSphere.hpp

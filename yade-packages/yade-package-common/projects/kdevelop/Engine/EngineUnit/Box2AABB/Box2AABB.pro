@@ -3,8 +3,6 @@
 # Subdir relative project main directory: ./Engine/EngineUnit/Box2AABB
 # Target is a library:  
 
-HEADERS += Box2AABB.hpp 
-SOURCES += Box2AABB.cpp 
 LIBS += -lBoundingVolumeMetaEngine \
         -lInteractingBox \
         -lAABB \
@@ -12,6 +10,9 @@ LIBS += -lBoundingVolumeMetaEngine \
         -lyade-lib-wm3-math \
         -lyade-lib-multimethods \
         -rdynamic 
+INCLUDEPATH += ../../../DataClass/InteractingGeometry/InteractingBox \
+               ../../../DataClass/BoundingVolume/AABB \
+               ../../../Engine/MetaEngine/BoundingVolumeMetaEngine 
 QMAKE_LIBDIR = ../../../../../bin \
                ../../../../../bin \
                ../../../../../bin \
@@ -26,3 +27,5 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
+HEADERS += Box2AABB.hpp 
+SOURCES += Box2AABB.cpp 

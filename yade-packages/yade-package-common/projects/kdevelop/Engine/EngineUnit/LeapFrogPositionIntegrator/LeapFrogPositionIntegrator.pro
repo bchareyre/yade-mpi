@@ -3,13 +3,14 @@
 # Subdir relative project main directory: ./Engine/EngineUnit/LeapFrogPositionIntegrator
 # Target is a library:  
 
-HEADERS += LeapFrogPositionIntegrator.hpp 
-SOURCES += LeapFrogPositionIntegrator.cpp 
 LIBS += -lPhysicalParametersMetaEngine \
         -lParticleParameters \
         -lRigidBodyParameters \
         -rdynamic 
+INCLUDEPATH += ../../../DataClass/PhysicalParameters/ParticleParameters \
+               ../../../Engine/MetaEngine/PhysicalParametersMetaEngine 
 QMAKE_LIBDIR = ../../../../../bin \
+               ../../../../../bin \
                /usr/local/lib/yade/yade-libs/ 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 
@@ -20,3 +21,5 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
+HEADERS += LeapFrogPositionIntegrator.hpp 
+SOURCES += LeapFrogPositionIntegrator.cpp 

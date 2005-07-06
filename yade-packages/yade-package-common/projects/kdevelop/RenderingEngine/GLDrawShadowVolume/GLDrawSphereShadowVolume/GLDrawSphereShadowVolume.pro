@@ -3,13 +3,14 @@
 # Subdir relative project main directory: ./RenderingEngine/GLDrawShadowVolume/GLDrawSphereShadowVolume
 # Target is a library:  
 
-HEADERS += GLDrawSphereShadowVolume.hpp 
-SOURCES += GLDrawSphereShadowVolume.cpp 
 LIBS += -lSphere \
-        -lyade-lib-opengl \
         -lParticleParameters \
+        -lyade-lib-opengl \
         -rdynamic 
+INCLUDEPATH += ../../../DataClass/GeometricalModel/Sphere \
+               ../../../RenderingEngine/OpenGLRenderingEngine 
 QMAKE_LIBDIR = ../../../../../bin \
+               ../../../../../bin \
                /usr/local/lib/yade/yade-libs/ 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 
@@ -20,3 +21,5 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
+HEADERS += GLDrawSphereShadowVolume.hpp 
+SOURCES += GLDrawSphereShadowVolume.cpp 

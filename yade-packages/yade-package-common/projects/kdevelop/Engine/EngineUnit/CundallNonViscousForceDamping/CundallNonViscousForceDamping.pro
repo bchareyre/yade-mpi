@@ -3,13 +3,15 @@
 # Subdir relative project main directory: ./Engine/EngineUnit/CundallNonViscousForceDamping
 # Target is a library:  
 
-HEADERS += CundallNonViscousForceDamping.hpp 
-SOURCES += CundallNonViscousForceDamping.cpp 
 LIBS += -lPhysicalActionDamper \
         -lForce \
         -lParticleParameters \
         -rdynamic 
+INCLUDEPATH += ../../../DataClass/PhysicalAction/Force \
+               ../../../DataClass/PhysicalParameters/ParticleParameters \
+               ../../../Engine/MetaEngine/PhysicalActionDamper 
 QMAKE_LIBDIR = ../../../../../bin \
+               ../../../../../bin \
                ../../../../../bin \
                /usr/local/lib/yade/yade-libs/ 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
@@ -21,3 +23,5 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
+HEADERS += CundallNonViscousForceDamping.hpp 
+SOURCES += CundallNonViscousForceDamping.cpp 

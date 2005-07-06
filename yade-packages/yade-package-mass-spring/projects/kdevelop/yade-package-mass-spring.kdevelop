@@ -76,7 +76,7 @@
       <directoryradio>executable</directoryradio>
     </run>
     <general>
-      <activedir>Engine/EngineUnit/ParticleSet2Mesh2D</activedir>
+      <activedir>DataClass/PhysicalParameters</activedir>
     </general>
     <subclassing/>
   </kdevtrollproject>

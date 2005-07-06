@@ -3,10 +3,10 @@
 # Subdir relative project main directory: .
 # Target is a subdirs project 
 
-SUBDIRS += PostProcessor \
-           PreProcessor \
-           RenderingEngine \
-           Engine \
+SUBDIRS += Container \
            DataClass \
-           Container 
+           Engine \
+           RenderingEngine \
+           PreProcessor \
+           PostProcessor
 TEMPLATE=subdirs

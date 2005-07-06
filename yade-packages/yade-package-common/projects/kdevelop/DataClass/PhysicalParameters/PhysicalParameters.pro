@@ -3,6 +3,8 @@
 # Subdir relative project main directory: ./DataClass/PhysicalParameters
 # Target is a subdirs project 
 
+SUBDIRS += ParticleParameters \
+           RigidBodyParameters 
 CONFIG += release \
-          warn_on 
-TEMPLATE = subdirs 
+warn_on
+TEMPLATE = subdirs

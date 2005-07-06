@@ -3,12 +3,13 @@
 # Subdir relative project main directory: ./Engine/EngineUnit/InteractionDescriptionSet2AABB
 # Target is a library:  
 
-HEADERS += InteractionDescriptionSet2AABB.hpp 
-SOURCES += InteractionDescriptionSet2AABB.cpp 
 LIBS += -lBoundingVolumeMetaEngine \
         -lMetaInteractingGeometry \
         -lAABB \
         -rdynamic 
+INCLUDEPATH += ../../../DataClass/InteractingGeometry/MetaInteractingGeometry \
+               ../../../DataClass/BoundingVolume/AABB \
+               ../../../Engine/MetaEngine/BoundingVolumeMetaEngine 
 QMAKE_LIBDIR = ../../../../../bin \
                ../../../../../bin \
                ../../../../../bin \
@@ -22,3 +23,5 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
+HEADERS += InteractionDescriptionSet2AABB.hpp 
+SOURCES += InteractionDescriptionSet2AABB.cpp 

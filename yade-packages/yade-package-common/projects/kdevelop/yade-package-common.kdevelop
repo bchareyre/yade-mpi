@@ -76,7 +76,7 @@
       <directoryradio>executable</directoryradio>
     </run>
     <general>
-      <activedir>RenderingEngine/GLDrawBoundingVolume/GLDrawBoundingSphere</activedir>
+      <activedir></activedir>
     </general>
     <subclassing/>
   </kdevtrollproject>

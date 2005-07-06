@@ -3,10 +3,10 @@
 # Subdir relative project main directory: ./RenderingEngine/GLDrawInteractingGeometry/GLDrawInteractionGeometrySet
 # Target is a library:  
 
-HEADERS += GLDrawInteractionGeometrySet.hpp 
-SOURCES += GLDrawInteractionGeometrySet.cpp 
 LIBS += -lyade-lib-opengl \
         -rdynamic 
+INCLUDEPATH += ../../../DataClass/InteractingGeometry/MetaInteractingGeometry \
+               ../../../RenderingEngine/OpenGLRenderingEngine 
 QMAKE_LIBDIR = /usr/local/lib/yade/yade-libs/ 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 
@@ -17,3 +17,5 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
+HEADERS += GLDrawInteractionGeometrySet.hpp 
+SOURCES += GLDrawInteractionGeometrySet.cpp 

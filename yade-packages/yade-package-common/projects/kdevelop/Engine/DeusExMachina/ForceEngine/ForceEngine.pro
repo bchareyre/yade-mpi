@@ -3,12 +3,13 @@
 # Subdir relative project main directory: ./Engine/DeusExMachina/ForceEngine
 # Target is a library:  
 
-HEADERS += ForceEngine.hpp 
-SOURCES += ForceEngine.cpp 
 LIBS += -lForce \
         -lParticleParameters \
         -rdynamic 
+INCLUDEPATH += ../../../DataClass/PhysicalAction/Force \
+               ../../../DataClass/PhysicalParameters/ParticleParameters 
 QMAKE_LIBDIR = ../../../../../bin \
+               ../../../../../bin \
                /usr/local/lib/yade/yade-libs/ 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 
@@ -19,3 +20,5 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
+HEADERS += ForceEngine.hpp 
+SOURCES += ForceEngine.cpp 

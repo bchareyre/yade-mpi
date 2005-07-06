@@ -3,11 +3,11 @@
 # Subdir relative project main directory: ./RenderingEngine/GLDrawInteractingGeometry/GLDrawInteractionBox
 # Target is a library:  
 
-HEADERS += GLDrawInteractionBox.hpp 
-SOURCES += GLDrawInteractionBox.cpp 
 LIBS += -lInteractingBox \
         -lyade-lib-opengl \
         -rdynamic 
+INCLUDEPATH += ../../../DataClass/InteractingGeometry/InteractingBox \
+               ../../../RenderingEngine/OpenGLRenderingEngine 
 QMAKE_LIBDIR = ../../../../../bin \
                /usr/local/lib/yade/yade-libs/ 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
@@ -19,3 +19,5 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
+HEADERS += GLDrawInteractionBox.hpp 
+SOURCES += GLDrawInteractionBox.cpp 

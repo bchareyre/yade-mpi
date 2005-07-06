@@ -3,14 +3,14 @@
 # Subdir relative project main directory: ./DataClass/PhysicalParameters/RigidBodyParameters
 # Target is a library:  
 
-HEADERS += RigidBodyParameters.hpp 
-SOURCES += RigidBodyParameters.cpp 
 LIBS += -lParticleParameters \
         -lyade-lib-serialization \
         -lyade-lib-wm3-math \
         -lyade-lib-multimethods \
         -rdynamic 
-QMAKE_LIBDIR = /usr/local/lib/yade/yade-libs/ 
+INCLUDEPATH += ../../../DataClass/PhysicalParameters/ParticleParameters 
+QMAKE_LIBDIR = ../../../../../bin \
+               /usr/local/lib/yade/yade-libs/ 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 
 QMAKE_CXXFLAGS_DEBUG += -lpthread \
@@ -20,3 +20,5 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
+HEADERS += RigidBodyParameters.hpp 
+SOURCES += RigidBodyParameters.cpp 

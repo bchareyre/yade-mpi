@@ -3,6 +3,7 @@
 # Subdir relative project main directory: ./RenderingEngine
 # Target is a subdirs project 
 
+SUBDIRS += GLDrawPolyhedralSweptSphere 
 CONFIG += release \
-          warn_on 
-TEMPLATE = subdirs 
+warn_on
+TEMPLATE = subdirs

@@ -3,11 +3,11 @@
 # Subdir relative project main directory: ./RenderingEngine/GLDrawBoundingVolume/GLDrawAABB
 # Target is a library:  
 
-HEADERS += GLDrawAABB.hpp 
-SOURCES += GLDrawAABB.cpp 
 LIBS += -lAABB \
         -lyade-lib-opengl \
         -rdynamic 
+INCLUDEPATH += ../../../DataClass/BoundingVolume/AABB \
+               ../../../RenderingEngine/OpenGLRenderingEngine 
 QMAKE_LIBDIR = ../../../../../bin \
                /usr/local/lib/yade/yade-libs/ 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
@@ -19,3 +19,5 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
+HEADERS += GLDrawAABB.hpp 
+SOURCES += GLDrawAABB.cpp 

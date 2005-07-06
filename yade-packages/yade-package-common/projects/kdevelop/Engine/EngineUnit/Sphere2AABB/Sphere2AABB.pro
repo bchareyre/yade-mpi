@@ -3,13 +3,14 @@
 # Subdir relative project main directory: ./Engine/EngineUnit/Sphere2AABB
 # Target is a library:  
 
-HEADERS += Sphere2AABB.hpp 
-SOURCES += Sphere2AABB.cpp 
 LIBS += -lBoundingVolumeMetaEngine \
         -lInteractingSphere \
         -lAABB \
         -lyade-lib-wm3-math \
         -rdynamic 
+INCLUDEPATH += ../../../DataClass/InteractingGeometry/InteractingSphere \
+               ../../../DataClass/BoundingVolume/AABB \
+               ../../../Engine/MetaEngine/BoundingVolumeMetaEngine 
 QMAKE_LIBDIR = ../../../../../bin \
                ../../../../../bin \
                ../../../../../bin \
@@ -23,3 +24,5 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
+HEADERS += Sphere2AABB.hpp 
+SOURCES += Sphere2AABB.cpp 

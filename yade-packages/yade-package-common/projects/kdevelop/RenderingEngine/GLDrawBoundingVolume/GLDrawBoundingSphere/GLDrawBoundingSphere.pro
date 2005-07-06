@@ -3,11 +3,11 @@
 # Subdir relative project main directory: ./RenderingEngine/GLDrawBoundingVolume/GLDrawBoundingSphere
 # Target is a library:  
 
-HEADERS += GLDrawBoundingSphere.hpp 
-SOURCES += GLDrawBoundingSphere.cpp 
 LIBS += -lBoundingSphere \
         -lyade-lib-opengl \
         -rdynamic 
+INCLUDEPATH += ../../../DataClass/BoundingVolume/BoundingSphere \
+               ../../../RenderingEngine/OpenGLRenderingEngine 
 QMAKE_LIBDIR = ../../../../../bin \
                /usr/local/lib/yade/yade-libs/ 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
@@ -19,3 +19,5 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
+HEADERS += GLDrawBoundingSphere.hpp 
+SOURCES += GLDrawBoundingSphere.cpp 

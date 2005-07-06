@@ -3,13 +3,15 @@
 # Subdir relative project main directory: ./Engine/EngineUnit/NewtonsMomentumLaw
 # Target is a library:  
 
-HEADERS += NewtonsMomentumLaw.hpp 
-SOURCES += NewtonsMomentumLaw.cpp 
 LIBS += -lPhysicalActionApplier \
         -lMomentum \
         -lRigidBodyParameters \
         -lPhysicalActionApplier \
         -rdynamic 
+INCLUDEPATH += ../../../DataClass/PhysicalAction/Momentum \
+               ../../../DataClass/PhysicalParameters/RigidBodyParameters \
+               ../../../DataClass/PhysicalParameters/ParticleParameters \
+               ../../../Engine/MetaEngine/PhysicalActionApplier 
 QMAKE_LIBDIR = ../../../../../bin \
                ../../../../../bin \
                /usr/local/lib/yade/yade-libs 
@@ -22,3 +24,5 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
+HEADERS += NewtonsMomentumLaw.hpp 
+SOURCES += NewtonsMomentumLaw.cpp 

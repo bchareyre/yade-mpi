@@ -3,11 +3,11 @@
 # Subdir relative project main directory: ./RenderingEngine/GLDrawGeometricalModel/GLDrawTetrahedron
 # Target is a library:  
 
-HEADERS += GLDrawTetrahedron.hpp 
-SOURCES += GLDrawTetrahedron.cpp 
 LIBS += -lTetrahedron \
         -lyade-lib-opengl \
         -rdynamic 
+INCLUDEPATH += ../../../DataClass/GeometricalModel/Tetrahedron \
+               ../../../RenderingEngine/OpenGLRenderingEngine 
 QMAKE_LIBDIR = ../../../../../bin \
                /usr/local/lib/yade/yade-libs/ 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
@@ -19,3 +19,5 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
+HEADERS += GLDrawTetrahedron.hpp 
+SOURCES += GLDrawTetrahedron.cpp 
