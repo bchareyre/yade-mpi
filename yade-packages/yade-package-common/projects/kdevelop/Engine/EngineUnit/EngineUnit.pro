@@ -9,7 +9,9 @@ SUBDIRS += Box2AABB \
            LeapFrogPositionIntegrator \
            NewtonsForceLaw \
            NewtonsMomentumLaw \
-           Sphere2AABB 
+           Sphere2AABB \
+           CundallNonViscousForceDamping \
+           CundallNonViscousMomentumDamping 
 CONFIG += release \
 warn_on
 TEMPLATE = subdirs
