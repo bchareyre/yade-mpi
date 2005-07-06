@@ -3,6 +3,10 @@
 # Subdir relative project main directory: ./Engine/DeusExMachina
 # Target is a subdirs project 
 
+SUBDIRS += ForceEngine \
+           GravityEngine \
+           RotationEngine \
+           TranslationEngine 
 CONFIG += release \
-          warn_on 
-TEMPLATE = subdirs 
+warn_on
+TEMPLATE = subdirs

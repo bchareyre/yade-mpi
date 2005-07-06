@@ -76,7 +76,7 @@
       <directoryradio>executable</directoryradio>
     </run>
     <general>
-      <activedir>Engine/StandAloneEngine/SDECTimeStepper</activedir>
+      <activedir>Engine/StandAloneEngine/VelocityRecorder</activedir>
     </general>
     <subclassing/>
   </kdevtrollproject>

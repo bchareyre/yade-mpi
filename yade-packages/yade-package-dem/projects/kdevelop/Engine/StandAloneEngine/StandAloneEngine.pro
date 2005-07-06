@@ -7,7 +7,11 @@ SUBDIRS += ElasticCohesiveLaw \
            ElasticContactLaw \
            SwiftPolyhedronProximityModeler \
            FrictionLessElasticContactLaw \
-           SDECTimeStepper 
+           SDECTimeStepper \
+           AveragePositionRecorder \
+           ForceRecorder \
+           PositionOrientationRecorder \
+           VelocityRecorder 
 CONFIG += release \
 warn_on
 TEMPLATE = subdirs
