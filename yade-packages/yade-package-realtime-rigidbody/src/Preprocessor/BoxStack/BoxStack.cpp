@@ -23,41 +23,42 @@
 
 #include "BoxStack.hpp"
 
+#include "FrictionLessElasticContactLaw.hpp"
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <yade/yade-common/Box.hpp>
-#include <yade/yade-common/AABB.hpp>
-#include <yade/yade-common/Sphere.hpp>
+#include <yade/yade-package-common/Box.hpp>
+#include <yade/yade-package-common/AABB.hpp>
+#include <yade/yade-package-common/Sphere.hpp>
 #include <yade/yade-core/MetaBody.hpp>
 #include <yade/yade-core/Body.hpp>
-#include <yade/yade-common/FrictionLessElasticContactLaw.hpp>
-#include <yade/yade-common/SAPCollider.hpp>
-#include <yade/yade-common/RigidBodyParameters.hpp>
-#include <yade/yade-common/TranslationEngine.hpp>
+#include <yade/yade-package-common/SAPCollider.hpp>
+#include <yade/yade-package-common/RigidBodyParameters.hpp>
+#include <yade/yade-package-common/TranslationEngine.hpp>
 #include <yade/yade-lib-serialization/IOManager.hpp>
-#include <yade/yade-common/InteractingBox.hpp>
-#include <yade/yade-common/InteractingSphere.hpp>
-#include <yade/yade-common/InteractionGeometryMetaEngine.hpp>
+#include <yade/yade-package-common/InteractingBox.hpp>
+#include <yade/yade-package-common/InteractingSphere.hpp>
+#include <yade/yade-package-common/InteractionGeometryMetaEngine.hpp>
 
-#include <yade/yade-common/PhysicalActionDamper.hpp>
-#include <yade/yade-common/PhysicalActionApplier.hpp>
+#include <yade/yade-package-common/PhysicalActionDamper.hpp>
+#include <yade/yade-package-common/PhysicalActionApplier.hpp>
 
-#include <yade/yade-common/PhysicalActionContainerReseter.hpp>
-#include <yade/yade-common/CundallNonViscousForceDamping.hpp>
-#include <yade/yade-common/CundallNonViscousMomentumDamping.hpp>
+#include <yade/yade-package-common/PhysicalActionContainerReseter.hpp>
+#include <yade/yade-package-common/CundallNonViscousForceDamping.hpp>
+#include <yade/yade-package-common/CundallNonViscousMomentumDamping.hpp>
 
-#include <yade/yade-common/BoundingVolumeMetaEngine.hpp>
-#include <yade/yade-common/InteractionDescriptionSet2AABB.hpp>
-#include <yade/yade-common/MetaInteractingGeometry.hpp>
+#include <yade/yade-package-common/BoundingVolumeMetaEngine.hpp>
+#include <yade/yade-package-common/InteractionDescriptionSet2AABB.hpp>
+#include <yade/yade-package-common/MetaInteractingGeometry.hpp>
 
-#include <yade/yade-common/PhysicalActionContainerInitializer.hpp>
-#include <yade/yade-common/GravityEngine.hpp>
-#include <yade/yade-common/PhysicalParametersMetaEngine.hpp>
+#include <yade/yade-package-common/PhysicalActionContainerInitializer.hpp>
+#include <yade/yade-package-common/GravityEngine.hpp>
+#include <yade/yade-package-common/PhysicalParametersMetaEngine.hpp>
 
-#include <yade/yade-common/BodyRedirectionVector.hpp>
-#include <yade/yade-common/InteractionVecSet.hpp>
-#include <yade/yade-common/PhysicalActionVectorVector.hpp>
+#include <yade/yade-package-common/BodyRedirectionVector.hpp>
+#include <yade/yade-package-common/InteractionVecSet.hpp>
+#include <yade/yade-package-common/PhysicalActionVectorVector.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////

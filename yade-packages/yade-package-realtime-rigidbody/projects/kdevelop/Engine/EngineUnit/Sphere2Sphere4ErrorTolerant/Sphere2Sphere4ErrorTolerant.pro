@@ -3,8 +3,6 @@
 # Subdir relative project main directory: ./Engine/EngineUnit/Sphere2Sphere4ErrorTolerant
 # Target is a library:  
 
-HEADERS += Sphere2Sphere4ErrorTolerant.hpp 
-SOURCES += Sphere2Sphere4ErrorTolerant.cpp 
 LIBS += -lErrorTolerantContactModel \
         -lInteractionGeometryMetaEngine \
         -lyade-lib-multimethods \
@@ -12,7 +10,9 @@ LIBS += -lErrorTolerantContactModel \
         -lyade-lib-wm3-math \
         -lSphere \
         -rdynamic 
+INCLUDEPATH += ../../../DataClass/InteractionGeometry/ErrorTolerantContactModel 
 QMAKE_LIBDIR = ../../../../../bin \
+               /usr/local/lib/yade/yade-package-common/ \
                /usr/local/lib/yade/yade-libs/ 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 
@@ -23,3 +23,5 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
+HEADERS += Sphere2Sphere4ErrorTolerant.hpp 
+SOURCES += Sphere2Sphere4ErrorTolerant.cpp 

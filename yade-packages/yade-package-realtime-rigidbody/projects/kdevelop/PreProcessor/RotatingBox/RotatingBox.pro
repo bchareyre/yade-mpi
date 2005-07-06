@@ -3,9 +3,8 @@
 # Subdir relative project main directory: ./PreProcessor/RotatingBox
 # Target is a library:  
 
-HEADERS += RotatingBox.hpp 
-SOURCES += RotatingBox.cpp 
-LIBS += -lRigidBodyParameters \
+LIBS +=  \
+        -lRigidBodyParameters \
         -lInteractionVecSet \
         -lBodyRedirectionVector \
         -lPhysicalActionVectorVector \
@@ -30,9 +29,9 @@ LIBS += -lRigidBodyParameters \
         -lInteractionDescriptionSet2AABB \
         -lRotationEngine \
         -lyade-lib-multimethods \
-        -lFrictionLessElasticContactLaw \
         -rdynamic 
-QMAKE_LIBDIR = ../../../../bin \
+INCLUDEPATH += ../../Engine/StandAloneEngine/FrictionLessElasticContactLaw 
+QMAKE_LIBDIR = /usr/local/lib/yade/yade-package-common/ \
                /usr/local/lib/yade/yade-libs/ 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 
@@ -43,3 +42,5 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
+HEADERS += RotatingBox.hpp 
+SOURCES += RotatingBox.cpp 

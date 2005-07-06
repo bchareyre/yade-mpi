@@ -3,9 +3,8 @@
 # Subdir relative project main directory: ./PreProcessor/BoxStack
 # Target is a library:  
 
-HEADERS += BoxStack.hpp 
-SOURCES += BoxStack.cpp 
-LIBS += -lRigidBodyParameters \
+LIBS +=  \
+        -lRigidBodyParameters \
         -lPhysicalActionVectorVector \
         -lInteractionVecSet \
         -lBodyRedirectionVector \
@@ -26,12 +25,12 @@ LIBS += -lRigidBodyParameters \
         -lSphere \
         -lAABB \
         -lSAPCollider \
-        -lFrictionLessElasticContactLaw \
         -lInteractionDescriptionSet2AABB \
         -lTranslationEngine \
         -lyade-lib-multimethods \
         -rdynamic 
-QMAKE_LIBDIR = ../../../../bin \
+INCLUDEPATH += ../../Engine/StandAloneEngine/FrictionLessElasticContactLaw 
+QMAKE_LIBDIR = /usr/local/lib/yade/yade-package-common/ \
                /usr/local/lib/yade/yade-libs/ 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 
@@ -42,3 +41,5 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
+HEADERS += BoxStack.hpp 
+SOURCES += BoxStack.cpp 

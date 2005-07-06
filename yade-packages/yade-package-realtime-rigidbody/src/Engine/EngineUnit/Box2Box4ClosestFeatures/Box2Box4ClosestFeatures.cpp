@@ -26,8 +26,8 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <yade/yade-common/InteractingBox.hpp>
-#include <yade/yade-common/ClosestFeatures.hpp>
+#include <yade/yade-package-common/InteractingBox.hpp>
+#include <yade/yade-package-common/ClosestFeatures.hpp>
 #include <yade/yade-lib-wm3-math/Math.hpp>
 #include <yade/yade-lib-computational-geometry/Intersections2D.hpp>
 #include <yade/yade-lib-computational-geometry/Intersections3D.hpp>

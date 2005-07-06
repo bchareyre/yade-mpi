@@ -3,8 +3,6 @@
 # Subdir relative project main directory: ./Engine/EngineUnit/Sphere2Sphere4ClosestFeatures
 # Target is a library:  
 
-HEADERS += Sphere2Sphere4ClosestFeatures.hpp 
-SOURCES += Sphere2Sphere4ClosestFeatures.cpp 
 LIBS += -lInteractionGeometryMetaEngine \
         -lyade-lib-wm3-math \
         -lyade-lib-multimethods \
@@ -12,7 +10,8 @@ LIBS += -lInteractionGeometryMetaEngine \
         -lSphere \
         -lClosestFeatures \
         -rdynamic 
-QMAKE_LIBDIR = /usr/local/lib/yade/yade-libs/ 
+QMAKE_LIBDIR = /usr/local/lib/yade/yade-package-common/ \
+               /usr/local/lib/yade/yade-libs/ 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 
 QMAKE_CXXFLAGS_DEBUG += -lpthread \
@@ -22,3 +21,5 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
+HEADERS += Sphere2Sphere4ClosestFeatures.hpp 
+SOURCES += Sphere2Sphere4ClosestFeatures.cpp 
