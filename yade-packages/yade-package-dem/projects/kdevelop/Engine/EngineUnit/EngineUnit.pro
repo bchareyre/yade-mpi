@@ -5,7 +5,8 @@
 
 SUBDIRS += PolyhedralSweptSphere2AABB \
            Box2PolyhedralSweptSphere \
-           Tetrahedron2PolyhedralSweptSphere 
+           Tetrahedron2PolyhedralSweptSphere \
+           MacroMicroElasticRelationships 
 CONFIG += release \
 warn_on
 TEMPLATE = subdirs

@@ -76,7 +76,7 @@
       <directoryradio>executable</directoryradio>
     </run>
     <general>
-      <activedir>Engine/EngineUnit/Box2AABB</activedir>
+      <activedir>Engine/MetaEngine/GeometricalModelMetaEngine</activedir>
     </general>
     <subclassing/>
   </kdevtrollproject>
