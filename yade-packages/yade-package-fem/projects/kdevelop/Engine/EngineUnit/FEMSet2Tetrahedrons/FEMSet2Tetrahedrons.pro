@@ -3,17 +3,13 @@
 # Subdir relative project main directory: ./Engine/EngineUnit/FEMSet2Tetrahedrons
 # Target is a library:  
 
-HEADERS += FEMSet2Tetrahedrons.hpp 
-SOURCES += FEMSet2Tetrahedrons.cpp 
-LIBS += -lFEMNodeData \
-        -lFEMTetrahedronData \
-        -lFEMSetParameters \
+LIBS +=  \
         -lGeometricalModelMetaEngine \
         -lTetrahedron \
         -rdynamic 
-QMAKE_LIBDIR = ../../../../../bin \
-               ../../../../../bin \
-               ../../../../../bin \
+INCLUDEPATH += ../../../DataClass/PhysicalParameters/FEMTetrahedronData \
+               ../../../DataClass/PhysicalParameters/FEMSetParameters 
+QMAKE_LIBDIR = /usr/local/lib/yade/yade-package-common/ \
                /usr/local/lib/yade/yade-libs/ 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 
@@ -24,3 +20,5 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
+HEADERS += FEMSet2Tetrahedrons.hpp 
+SOURCES += FEMSet2Tetrahedrons.cpp 

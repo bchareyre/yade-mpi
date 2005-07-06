@@ -3,18 +3,13 @@
 # Subdir relative project main directory: ./PreProcessor/FEMBeam
 # Target is a library:  
 
-HEADERS += FEMBeam.hpp 
-SOURCES += FEMBeam.cpp 
-LIBS += -lFEMSetParameters \
-        -lFEMTetrahedronData \
-        -lFEMNodeData \
+LIBS +=  \
+         \
         -lPhysicalActionVectorVector \
         -lInteractionVecSet \
         -lBodyRedirectionVector \
         -lCundallNonViscousMomentumDamping \
         -lCundallNonViscousForceDamping \
-        -lFEMSetTextLoader \
-        -lFEMTetrahedronStiffness \
         -lMetaInteractingGeometry \
         -lGravityEngine \
         -lyade-lib-serialization \
@@ -33,13 +28,16 @@ LIBS += -lFEMSetParameters \
         -lRigidBodyParameters \
         -lSphere \
         -lTetrahedron \
-        -lFEMLaw \
         -lTranslationEngine \
         -lyade-lib-multimethods \
         -rdynamic 
-QMAKE_LIBDIR = ../../../../bin \
-               ../../../../bin \
-               ../../../../bin \
+INCLUDEPATH += ../../Engine/StandAloneEngine/FEMLaw \
+               ../../Engine/EngineUnit/FEMTetrahedronStiffness \
+               ../../Engine/EngineUnit/FEMSetTextLoader \
+               ../../DataClass/PhysicalParameters/FEMTetrahedronData \
+               ../../DataClass/PhysicalParameters/FEMSetParameters \
+               ../../DataClass/PhysicalParameters/FEMNodeData 
+QMAKE_LIBDIR = /usr/local/lib/yade/yade-package-common \
                /usr/local/lib/yade/yade-libs/ 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 
@@ -50,3 +48,5 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
+HEADERS += FEMBeam.hpp 
+SOURCES += FEMBeam.cpp 

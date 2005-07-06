@@ -3,20 +3,17 @@
 # Subdir relative project main directory: ./Engine/EngineUnit/FEMSetTextLoader
 # Target is a library:  
 
-HEADERS += FEMSetTextLoader.hpp 
-SOURCES += FEMSetTextLoader.cpp 
-LIBS += -lFEMSetParameters \
-        -lFEMNodeData \
-        -lFEMTetrahedronData \
+LIBS +=  \
         -lPhysicalParametersMetaEngine \
         -lParticleParameters \
         -lRigidBodyParameters \
         -lSphere \
         -lTetrahedron \
         -rdynamic 
-QMAKE_LIBDIR = ../../../../../bin \
-               ../../../../../bin \
-               ../../../../../bin \
+INCLUDEPATH += ../../../DataClass/PhysicalParameters/FEMTetrahedronData \
+               ../../../DataClass/PhysicalParameters/FEMSetParameters \
+               ../../../DataClass/PhysicalParameters/FEMNodeData 
+QMAKE_LIBDIR = /usr/local/lib/yade/yade-package-common/ \
                /usr/local/lib/yade/yade-libs/ 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 
@@ -27,3 +24,5 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
+HEADERS += FEMSetTextLoader.hpp 
+SOURCES += FEMSetTextLoader.cpp 

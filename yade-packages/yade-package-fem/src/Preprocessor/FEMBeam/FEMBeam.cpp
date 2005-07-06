@@ -23,46 +23,47 @@
 
 #include "FEMBeam.hpp"
 
+#include "FEMSetParameters.hpp"
+#include "FEMTetrahedronData.hpp"
+#include "FEMNodeData.hpp"
+#include "FEMTetrahedronStiffness.hpp"
+#include "FEMLaw.hpp"
+#include "FEMSetTextLoader.hpp"
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 // data
-#include <yade/yade-common/AABB.hpp>
-#include <yade/yade-common/Sphere.hpp>
-#include <yade/yade-common/Tetrahedron.hpp>
-#include <yade/yade-common/FEMSetParameters.hpp>
-#include <yade/yade-common/FEMTetrahedronData.hpp>
-#include <yade/yade-common/FEMNodeData.hpp>
-#include <yade/yade-common/MetaInteractingGeometry.hpp>
+#include <yade/yade-package-common/AABB.hpp>
+#include <yade/yade-package-common/Sphere.hpp>
+#include <yade/yade-package-common/Tetrahedron.hpp>
+#include <yade/yade-package-common/MetaInteractingGeometry.hpp>
 
 // actors
-#include <yade/yade-common/FEMTetrahedronStiffness.hpp>
-#include <yade/yade-common/CundallNonViscousMomentumDamping.hpp>
-#include <yade/yade-common/CundallNonViscousForceDamping.hpp>
-#include <yade/yade-common/PhysicalActionContainerInitializer.hpp>
-#include <yade/yade-common/PhysicalActionContainerReseter.hpp>
-#include <yade/yade-common/FEMLaw.hpp>
-#include <yade/yade-common/FEMSetTextLoader.hpp>
-#include <yade/yade-common/GravityEngine.hpp>
-#include <yade/yade-common/TranslationEngine.hpp>
+#include <yade/yade-package-common/CundallNonViscousMomentumDamping.hpp>
+#include <yade/yade-package-common/CundallNonViscousForceDamping.hpp>
+#include <yade/yade-package-common/PhysicalActionContainerInitializer.hpp>
+#include <yade/yade-package-common/PhysicalActionContainerReseter.hpp>
+#include <yade/yade-package-common/GravityEngine.hpp>
+#include <yade/yade-package-common/TranslationEngine.hpp>
 
 // body
 #include <yade/yade-core/MetaBody.hpp>
 #include <yade/yade-core/Body.hpp>
 
 // dispatchers
-#include <yade/yade-common/PhysicalParametersMetaEngine.hpp>
-#include <yade/yade-common/InteractionGeometryMetaEngine.hpp>
-#include <yade/yade-common/InteractionPhysicsMetaEngine.hpp>
-#include <yade/yade-common/PhysicalActionApplier.hpp>
-#include <yade/yade-common/PhysicalActionDamper.hpp>
+#include <yade/yade-package-common/PhysicalParametersMetaEngine.hpp>
+#include <yade/yade-package-common/InteractionGeometryMetaEngine.hpp>
+#include <yade/yade-package-common/InteractionPhysicsMetaEngine.hpp>
+#include <yade/yade-package-common/PhysicalActionApplier.hpp>
+#include <yade/yade-package-common/PhysicalActionDamper.hpp>
 
-#include <yade/yade-common/BoundingVolumeMetaEngine.hpp>
-#include <yade/yade-common/GeometricalModelMetaEngine.hpp>
+#include <yade/yade-package-common/BoundingVolumeMetaEngine.hpp>
+#include <yade/yade-package-common/GeometricalModelMetaEngine.hpp>
 
-#include <yade/yade-common/BodyRedirectionVector.hpp>
-#include <yade/yade-common/InteractionVecSet.hpp>
-#include <yade/yade-common/PhysicalActionVectorVector.hpp>
+#include <yade/yade-package-common/BodyRedirectionVector.hpp>
+#include <yade/yade-package-common/InteractionVecSet.hpp>
+#include <yade/yade-package-common/PhysicalActionVectorVector.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////

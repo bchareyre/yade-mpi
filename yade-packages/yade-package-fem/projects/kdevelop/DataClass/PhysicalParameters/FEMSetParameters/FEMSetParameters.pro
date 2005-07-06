@@ -3,15 +3,14 @@
 # Subdir relative project main directory: ./DataClass/PhysicalParameters/FEMSetParameters
 # Target is a library:  
 
-HEADERS += FEMSetParameters.hpp 
-SOURCES += FEMSetParameters.cpp 
 LIBS += -lAABB \
         -lPolyhedron \
         -lyade-lib-serialization \
         -lyade-lib-wm3-math \
         -lyade-lib-multimethods \
         -rdynamic 
-QMAKE_LIBDIR = /usr/local/lib/yade/yade-libs/ 
+QMAKE_LIBDIR = /usr/local/lib/yade/yade-package-common/ \
+               /usr/local/lib/yade/yade-libs/ 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 
 QMAKE_CXXFLAGS_DEBUG += -lpthread \
@@ -21,3 +20,5 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
+HEADERS += FEMSetParameters.hpp 
+SOURCES += FEMSetParameters.cpp 
