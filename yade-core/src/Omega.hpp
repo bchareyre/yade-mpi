@@ -103,7 +103,9 @@ class Omega : public Singleton<Omega>
 	private	: Real dt; // FIXME - maybe ???????? move this to MetaBody.hpp OR MAYBE NOT ??
 	public	: void setTimeStep(const Real);
 	public	: Real getTimeStep();
-	
+	public  : void skipTimeStepper(bool s);
+	public  : bool containTimeStepper();
+
 	private	: shared_ptr<MetaBody> rootBody;
 	public	: const shared_ptr<MetaBody>& getRootBody();
 	public  : void freeRootBody();

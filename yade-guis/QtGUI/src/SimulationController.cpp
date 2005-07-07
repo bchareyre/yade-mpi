@@ -31,6 +31,7 @@
 #include <qlabel.h>
 #include <qpushbutton.h>
 #include <qgroupbox.h>
+#include <qradiobutton.h>
 
 #include <boost/lexical_cast.hpp>
 #include <boost/filesystem/operations.hpp>
@@ -98,7 +99,6 @@ SimulationController::SimulationController(QWidget * parent) : QtGeneratedSimula
 	addNewView();
 
 	updater = shared_ptr<SimulationControllerUpdater>(new SimulationControllerUpdater(this));
-	
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -198,6 +198,20 @@ void SimulationController::pbLoadClicked()
 		pbStopSimulation->setEnabled(true);
 		pbResetSimulation->setEnabled(true);
 		pbOneSimulationStep->setEnabled(true);
+
+		changeSkipTimeStepper = true;
+		if (Omega::instance().containTimeStepper())
+		{
+			rbTimeStepper->setEnabled(true);
+			rbTimeStepper->setChecked(true);
+			wasUsingTimeStepper = true;
+		}
+		else
+		{
+			rbTimeStepper->setEnabled(false);
+			rbFixed->setChecked(true);
+			wasUsingTimeStepper = false;
+		}
 	}
 } 
 
@@ -298,7 +312,12 @@ void SimulationController::pbResetClicked()
 	for(;gi!=giEnd;++gi)
 		(*gi).second->startRendering();
 
-	pbCenterSceneClicked();
+	changeSkipTimeStepper = true;
+	skipTimeStepper = !wasUsingTimeStepper;
+
+	rbTimeStepper->setEnabled(Omega::instance().containTimeStepper());
+
+	//pbCenterSceneClicked();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -332,6 +351,50 @@ void SimulationController::pbCenterSceneClicked()
 void SimulationController::closeEvent(QCloseEvent *)
 {
 	emit closeSignal();
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+void SimulationController::bgTimeStepClicked(int i)
+{
+	switch (i)
+	{
+		case 0 : //Use timeStepper
+			changeSkipTimeStepper = true;
+			skipTimeStepper = false;
+			wasUsingTimeStepper=true;
+			break;
+		case 1 : // Try RealTime
+			changeSkipTimeStepper = true;
+			skipTimeStepper = true;
+			wasUsingTimeStepper=false;
+			break;
+		case 2 : // use fixed time Step
+			changeSkipTimeStepper = true;
+			skipTimeStepper = true;
+			changeTimeStep = true;
+			wasUsingTimeStepper=false;
+			break;
+		default: break;
+	}
+
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+void SimulationController::sb10PowerSecondValueChanged(int i)
+{
+	changeTimeStep = true;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+void SimulationController::sbSecondValueChanged(int i)
+{
+	changeTimeStep = true;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

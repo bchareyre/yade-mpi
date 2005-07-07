@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>354</width>
-            <height>599</height>
+            <width>397</width>
+            <height>793</height>
         </rect>
     </property>
     <property name="caption">
@@ -48,50 +48,7 @@
                 <property name="name">
                     <cstring>unnamed</cstring>
                 </property>
-                <widget class="QLabel" row="3" column="4">
-                    <property name="name">
-                        <cstring>tlNSecond</cstring>
-                    </property>
-                    <property name="text">
-                        <string>ns</string>
-                    </property>
-                    <property name="alignment">
-                        <set>AlignCenter</set>
-                    </property>
-                </widget>
-                <widget class="QLCDNumber" row="0" column="0">
-                    <property name="name">
-                        <cstring>lcdDay</cstring>
-                    </property>
-                    <property name="numDigits">
-                        <number>2</number>
-                    </property>
-                </widget>
-                <widget class="QLCDNumber" row="2" column="3">
-                    <property name="name">
-                        <cstring>lcdMiSecondv</cstring>
-                    </property>
-                    <property name="numDigits">
-                        <number>3</number>
-                    </property>
-                </widget>
-                <widget class="QLCDNumber" row="2" column="1">
-                    <property name="name">
-                        <cstring>lcdSecondv</cstring>
-                    </property>
-                    <property name="numDigits">
-                        <number>2</number>
-                    </property>
-                </widget>
-                <widget class="QLCDNumber" row="2" column="4">
-                    <property name="name">
-                        <cstring>lcdNSecondv</cstring>
-                    </property>
-                    <property name="numDigits">
-                        <number>3</number>
-                    </property>
-                </widget>
-                <widget class="QLCDNumber" row="0" column="3">
+                <widget class="QLCDNumber" row="0" column="4">
                     <property name="name">
                         <cstring>lcdSecond</cstring>
                     </property>
@@ -99,56 +56,7 @@
                         <number>2</number>
                     </property>
                 </widget>
-                <widget class="QLabel" row="3" column="2">
-                    <property name="name">
-                        <cstring>tlNSecond_2</cstring>
-                    </property>
-                    <property name="text">
-                        <string>ms</string>
-                    </property>
-                    <property name="alignment">
-                        <set>AlignCenter</set>
-                    </property>
-                </widget>
-                <widget class="QLCDNumber" row="0" column="2">
-                    <property name="name">
-                        <cstring>lcdMinute</cstring>
-                    </property>
-                    <property name="numDigits">
-                        <number>2</number>
-                    </property>
-                </widget>
-                <widget class="QLabel" row="3" column="0">
-                    <property name="name">
-                        <cstring>tlMinute_2</cstring>
-                    </property>
-                    <property name="text">
-                        <string>min</string>
-                    </property>
-                    <property name="alignment">
-                        <set>AlignCenter</set>
-                    </property>
-                </widget>
-                <widget class="QLabel" row="3" column="1">
-                    <property name="name">
-                        <cstring>tlSecond_2</cstring>
-                    </property>
-                    <property name="text">
-                        <string>sec</string>
-                    </property>
-                    <property name="alignment">
-                        <set>AlignCenter</set>
-                    </property>
-                </widget>
-                <widget class="QLCDNumber" row="2" column="2">
-                    <property name="name">
-                        <cstring>lcdMSecondv</cstring>
-                    </property>
-                    <property name="numDigits">
-                        <number>3</number>
-                    </property>
-                </widget>
-                <widget class="QLCDNumber" row="0" column="4">
+                <widget class="QLCDNumber" row="0" column="5" rowspan="1" colspan="2">
                     <property name="name">
                         <cstring>lcdMSecond</cstring>
                     </property>
@@ -156,18 +64,15 @@
                         <number>3</number>
                     </property>
                 </widget>
-                <widget class="QLabel" row="3" column="3">
+                <widget class="QLCDNumber" row="0" column="3">
                     <property name="name">
-                        <cstring>tlNSecond_3</cstring>
+                        <cstring>lcdMinute</cstring>
                     </property>
-                    <property name="text">
-                        <string>µs</string>
-                    </property>
-                    <property name="alignment">
-                        <set>WordBreak|AlignCenter</set>
+                    <property name="numDigits">
+                        <number>2</number>
                     </property>
                 </widget>
-                <widget class="QLCDNumber" row="0" column="1">
+                <widget class="QLCDNumber" row="0" column="2">
                     <property name="name">
                         <cstring>lcdHour</cstring>
                     </property>
@@ -175,7 +80,47 @@
                         <number>2</number>
                     </property>
                 </widget>
-                <widget class="QLCDNumber" row="2" column="0">
+                <widget class="QLCDNumber" row="0" column="1">
+                    <property name="name">
+                        <cstring>lcdDay</cstring>
+                    </property>
+                    <property name="numDigits">
+                        <number>2</number>
+                    </property>
+                </widget>
+                <widget class="QLCDNumber" row="2" column="5" rowspan="1" colspan="2">
+                    <property name="name">
+                        <cstring>lcdNSecondv</cstring>
+                    </property>
+                    <property name="numDigits">
+                        <number>3</number>
+                    </property>
+                </widget>
+                <widget class="QLCDNumber" row="2" column="4">
+                    <property name="name">
+                        <cstring>lcdMiSecondv</cstring>
+                    </property>
+                    <property name="numDigits">
+                        <number>3</number>
+                    </property>
+                </widget>
+                <widget class="QLCDNumber" row="2" column="3">
+                    <property name="name">
+                        <cstring>lcdMSecondv</cstring>
+                    </property>
+                    <property name="numDigits">
+                        <number>3</number>
+                    </property>
+                </widget>
+                <widget class="QLCDNumber" row="2" column="2">
+                    <property name="name">
+                        <cstring>lcdSecondv</cstring>
+                    </property>
+                    <property name="numDigits">
+                        <number>2</number>
+                    </property>
+                </widget>
+                <widget class="QLCDNumber" row="2" column="1">
                     <property name="name">
                         <cstring>lcdMinutev</cstring>
                     </property>
@@ -183,51 +128,7 @@
                         <number>2</number>
                     </property>
                 </widget>
-                <widget class="QLabel" row="1" column="4">
-                    <property name="name">
-                        <cstring>tlMSecond</cstring>
-                    </property>
-                    <property name="text">
-                        <string>ms</string>
-                    </property>
-                    <property name="alignment">
-                        <set>AlignCenter</set>
-                    </property>
-                </widget>
-                <widget class="QLabel" row="1" column="2">
-                    <property name="name">
-                        <cstring>tlMinute</cstring>
-                    </property>
-                    <property name="text">
-                        <string>min</string>
-                    </property>
-                    <property name="alignment">
-                        <set>AlignCenter</set>
-                    </property>
-                </widget>
-                <widget class="QLabel" row="1" column="3">
-                    <property name="name">
-                        <cstring>tlSecond</cstring>
-                    </property>
-                    <property name="text">
-                        <string>sec</string>
-                    </property>
-                    <property name="alignment">
-                        <set>AlignCenter</set>
-                    </property>
-                </widget>
                 <widget class="QLabel" row="1" column="1">
-                    <property name="name">
-                        <cstring>tlHour</cstring>
-                    </property>
-                    <property name="text">
-                        <string>h</string>
-                    </property>
-                    <property name="alignment">
-                        <set>AlignCenter</set>
-                    </property>
-                </widget>
-                <widget class="QLabel" row="1" column="0">
                     <property name="name">
                         <cstring>tlDay</cstring>
                     </property>
@@ -238,12 +139,198 @@
                         <set>AlignCenter</set>
                     </property>
                 </widget>
-                <widget class="QLCDNumber" row="4" column="1" rowspan="1" colspan="3">
+                <widget class="QLabel" row="1" column="2">
+                    <property name="name">
+                        <cstring>tlHour</cstring>
+                    </property>
+                    <property name="text">
+                        <string>h</string>
+                    </property>
+                    <property name="alignment">
+                        <set>AlignCenter</set>
+                    </property>
+                </widget>
+                <widget class="QLabel" row="1" column="3">
+                    <property name="name">
+                        <cstring>tlMinute</cstring>
+                    </property>
+                    <property name="text">
+                        <string>min</string>
+                    </property>
+                    <property name="alignment">
+                        <set>AlignCenter</set>
+                    </property>
+                </widget>
+                <widget class="QLabel" row="1" column="4">
+                    <property name="name">
+                        <cstring>tlSecond</cstring>
+                    </property>
+                    <property name="text">
+                        <string>sec</string>
+                    </property>
+                    <property name="alignment">
+                        <set>AlignCenter</set>
+                    </property>
+                </widget>
+                <widget class="QLabel" row="1" column="5" rowspan="1" colspan="2">
+                    <property name="name">
+                        <cstring>tlMSecond</cstring>
+                    </property>
+                    <property name="text">
+                        <string>ms</string>
+                    </property>
+                    <property name="alignment">
+                        <set>AlignCenter</set>
+                    </property>
+                </widget>
+                <widget class="QLabel" row="3" column="1">
+                    <property name="name">
+                        <cstring>tlMinute_2</cstring>
+                    </property>
+                    <property name="text">
+                        <string>min</string>
+                    </property>
+                    <property name="alignment">
+                        <set>AlignCenter</set>
+                    </property>
+                </widget>
+                <widget class="QLabel" row="3" column="2">
+                    <property name="name">
+                        <cstring>tlSecond_2</cstring>
+                    </property>
+                    <property name="text">
+                        <string>sec</string>
+                    </property>
+                    <property name="alignment">
+                        <set>AlignCenter</set>
+                    </property>
+                </widget>
+                <widget class="QLabel" row="3" column="3">
+                    <property name="name">
+                        <cstring>tlNSecond_2</cstring>
+                    </property>
+                    <property name="text">
+                        <string>ms</string>
+                    </property>
+                    <property name="alignment">
+                        <set>AlignCenter</set>
+                    </property>
+                </widget>
+                <widget class="QLabel" row="3" column="4">
+                    <property name="name">
+                        <cstring>tlNSecond_3</cstring>
+                    </property>
+                    <property name="text">
+                        <string>µs</string>
+                    </property>
+                    <property name="alignment">
+                        <set>WordBreak|AlignCenter</set>
+                    </property>
+                </widget>
+                <widget class="QLabel" row="3" column="5" rowspan="1" colspan="2">
+                    <property name="name">
+                        <cstring>tlNSecond</cstring>
+                    </property>
+                    <property name="text">
+                        <string>ns</string>
+                    </property>
+                    <property name="alignment">
+                        <set>AlignCenter</set>
+                    </property>
+                </widget>
+                <widget class="QLCDNumber" row="4" column="1" rowspan="1" colspan="6">
                     <property name="name">
                         <cstring>lcdCurrentIteration</cstring>
                     </property>
+                    <property name="smallDecimalPoint">
+                        <bool>false</bool>
+                    </property>
                     <property name="numDigits">
                         <number>10</number>
+                    </property>
+                    <property name="segmentStyle">
+                        <enum>Outline</enum>
+                    </property>
+                    <property name="intValue" stdset="0">
+                        <number>0</number>
+                    </property>
+                </widget>
+                <widget class="QLabel" row="5" column="0">
+                    <property name="name">
+                        <cstring>tlCurrentTimeStep</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Time Step</string>
+                    </property>
+                    <property name="alignment">
+                        <set>AlignVCenter|AlignRight</set>
+                    </property>
+                </widget>
+                <widget class="QLabel" row="4" column="0">
+                    <property name="name">
+                        <cstring>tlIterations</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Iterations</string>
+                    </property>
+                    <property name="alignment">
+                        <set>AlignVCenter|AlignRight</set>
+                    </property>
+                </widget>
+                <widget class="QLabel" row="0" column="0">
+                    <property name="name">
+                        <cstring>tlRealTime</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Real Time</string>
+                    </property>
+                    <property name="textFormat">
+                        <enum>AutoText</enum>
+                    </property>
+                    <property name="alignment">
+                        <set>AlignVCenter|AlignRight</set>
+                    </property>
+                </widget>
+                <widget class="QLabel" row="2" column="0">
+                    <property name="name">
+                        <cstring>tlSimulationTime</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Simulation Time</string>
+                    </property>
+                    <property name="alignment">
+                        <set>AlignVCenter|AlignRight</set>
+                    </property>
+                </widget>
+                <widget class="QLabel" row="5" column="6">
+                    <property name="name">
+                        <cstring>tlTimeStepUnit</cstring>
+                    </property>
+                    <property name="text">
+                        <string>sec</string>
+                    </property>
+                </widget>
+                <widget class="QLabel" row="5" column="1" rowspan="1" colspan="5">
+                    <property name="name">
+                        <cstring>tlTimeStep</cstring>
+                    </property>
+                    <property name="maximumSize">
+                        <size>
+                            <width>32767</width>
+                            <height>25</height>
+                        </size>
+                    </property>
+                    <property name="frameShape">
+                        <enum>Box</enum>
+                    </property>
+                    <property name="frameShadow">
+                        <enum>Raised</enum>
+                    </property>
+                    <property name="text">
+                        <string>&lt;b&gt;0.04&lt;/b&gt;</string>
+                    </property>
+                    <property name="alignment">
+                        <set>WordBreak|AlignVCenter|AlignRight</set>
                     </property>
                 </widget>
             </grid>
@@ -407,47 +494,6 @@
                             <property name="name">
                                 <cstring>unnamed</cstring>
                             </property>
-                            <widget class="QRadioButton" row="2" column="0">
-                                <property name="name">
-                                    <cstring>rbFixed</cstring>
-                                </property>
-                                <property name="enabled">
-                                    <bool>false</bool>
-                                </property>
-                                <property name="text">
-                                    <string>Fixed</string>
-                                </property>
-                            </widget>
-                            <widget class="QSpinBox" row="2" column="3">
-                                <property name="name">
-                                    <cstring>spinBox1_2</cstring>
-                                </property>
-                                <property name="enabled">
-                                    <bool>false</bool>
-                                </property>
-                            </widget>
-                            <widget class="QSpinBox" row="2" column="1">
-                                <property name="name">
-                                    <cstring>spinBox1</cstring>
-                                </property>
-                                <property name="enabled">
-                                    <bool>false</bool>
-                                </property>
-                            </widget>
-                            <widget class="QLabel" row="2" column="2">
-                                <property name="name">
-                                    <cstring>tl10Power</cstring>
-                                </property>
-                                <property name="enabled">
-                                    <bool>false</bool>
-                                </property>
-                                <property name="text">
-                                    <string>x10</string>
-                                </property>
-                                <property name="alignment">
-                                    <set>AlignCenter</set>
-                                </property>
-                            </widget>
                             <widget class="QRadioButton" row="1" column="0">
                                 <property name="name">
                                     <cstring>rbRealTime</cstring>
@@ -464,10 +510,83 @@
                                     <cstring>rbTimeStepper</cstring>
                                 </property>
                                 <property name="enabled">
-                                    <bool>false</bool>
+                                    <bool>true</bool>
                                 </property>
                                 <property name="text">
                                     <string>Time Stepper</string>
+                                </property>
+                                <property name="buttonGroupId">
+                                    <number>0</number>
+                                </property>
+                            </widget>
+                            <widget class="QSpinBox" row="2" column="1">
+                                <property name="name">
+                                    <cstring>sbSecond</cstring>
+                                </property>
+                                <property name="enabled">
+                                    <bool>true</bool>
+                                </property>
+                                <property name="value">
+                                    <number>40</number>
+                                </property>
+                            </widget>
+                            <widget class="QSpinBox" row="2" column="3">
+                                <property name="name">
+                                    <cstring>sb10PowerSecond</cstring>
+                                </property>
+                                <property name="enabled">
+                                    <bool>true</bool>
+                                </property>
+                                <property name="maxValue">
+                                    <number>20</number>
+                                </property>
+                                <property name="minValue">
+                                    <number>-20</number>
+                                </property>
+                                <property name="value">
+                                    <number>-3</number>
+                                </property>
+                            </widget>
+                            <widget class="QRadioButton" row="2" column="0">
+                                <property name="name">
+                                    <cstring>rbFixed</cstring>
+                                </property>
+                                <property name="enabled">
+                                    <bool>true</bool>
+                                </property>
+                                <property name="text">
+                                    <string>Fixed</string>
+                                </property>
+                                <property name="buttonGroupId">
+                                    <number>2</number>
+                                </property>
+                            </widget>
+                            <widget class="QLabel" row="2" column="2">
+                                <property name="name">
+                                    <cstring>tl10Power</cstring>
+                                </property>
+                                <property name="enabled">
+                                    <bool>true</bool>
+                                </property>
+                                <property name="text">
+                                    <string>x10</string>
+                                </property>
+                                <property name="alignment">
+                                    <set>AlignVCenter|AlignRight</set>
+                                </property>
+                            </widget>
+                            <widget class="QLabel" row="2" column="4">
+                                <property name="name">
+                                    <cstring>tlSecondUnit</cstring>
+                                </property>
+                                <property name="enabled">
+                                    <bool>true</bool>
+                                </property>
+                                <property name="text">
+                                    <string>sec</string>
+                                </property>
+                                <property name="alignment">
+                                    <set>AlignVCenter|AlignRight</set>
                                 </property>
                             </widget>
                         </grid>
@@ -728,6 +847,24 @@
         <receiver>QtGeneratedSimulationController</receiver>
         <slot>pbOneSimulationStepClicked()</slot>
     </connection>
+    <connection>
+        <sender>bgTimeStep</sender>
+        <signal>clicked(int)</signal>
+        <receiver>QtGeneratedSimulationController</receiver>
+        <slot>bgTimeStepClicked(int)</slot>
+    </connection>
+    <connection>
+        <sender>sbSecond</sender>
+        <signal>valueChanged(int)</signal>
+        <receiver>QtGeneratedSimulationController</receiver>
+        <slot>sbSecondValueChanged(int)</slot>
+    </connection>
+    <connection>
+        <sender>sb10PowerSecond</sender>
+        <signal>valueChanged(int)</signal>
+        <receiver>QtGeneratedSimulationController</receiver>
+        <slot>sb10PowerSecondValueChanged(int)</slot>
+    </connection>
 </connections>
 <signals>
     <signal>closeSignal()</signal>
@@ -742,6 +879,9 @@
     <slot>pbCenterSceneClicked()</slot>
     <slot>closeGLViewEvent(int)</slot>
     <slot>pbOneSimulationStepClicked()</slot>
+    <slot>bgTimeStepClicked(int)</slot>
+    <slot>sbSecondValueChanged(int)</slot>
+    <slot>sb10PowerSecondValueChanged(int)</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

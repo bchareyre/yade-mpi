@@ -28,6 +28,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <qlcdnumber.h>
+#include <qspinbox.h>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -88,6 +89,36 @@ void SimulationControllerUpdater::oneLoop()
 	controller->lcdSecond->display(lexical_cast<string>(seconds));
 	controller->lcdMSecond->display(lexical_cast<string>(mseconds));
 
+	if (controller->changeSkipTimeStepper)
+			Omega::instance().skipTimeStepper(controller->skipTimeStepper);
+
+	if (controller->changeTimeStep)
+	{
+		Real second = (Real)(controller->sbSecond->value());
+		Real powerSecond = (Real)(controller->sb10PowerSecond->value());
+		Omega::instance().setTimeStep(second*Mathr::power(10,powerSecond));
+	}
+
+// 	Real dt = Omega::instance().getTimeStep();
+// 	int i=0;
+// 	while (dt<1)
+// 	{
+// 		dt *=10;
+// 		i++;
+// 	}
+// 
+// 	controller->lcdDtSecond->display((int)dt);
+// 
+// 	dt = dt-(int)dt;
+// 	while (dt-(int)dt!=0)
+// 		dt*=10;
+// 
+// 	controller->lcdDt10PowerSecond->display((int)dt);
+	string strDt = lexical_cast<string>(Omega::instance().getTimeStep());
+	controller->tlTimeStep->setText(strDt);
+
+	controller->changeSkipTimeStepper = false;
+	controller->changeTimeStep = false;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -30,7 +30,8 @@ HEADERS += BodyContainer.hpp \
            Preferences.hpp \
            RenderingEngine.hpp \
            SimulationLoop.hpp \
-           yadeExceptions.hpp 
+           yadeExceptions.hpp \
+           TimeStepper.hpp 
 SOURCES += BodyContainer.cpp \
            Body.cpp \
            BoundingVolume.cpp \
@@ -53,7 +54,8 @@ SOURCES += BodyContainer.cpp \
            Preferences.cpp \
            SimulationLoop.cpp \
            yade.cpp \
-           yadeExceptions.cpp 
+           yadeExceptions.cpp \
+           TimeStepper.cpp 
 LIBS += -lyade-lib-threads \
 -lyade-lib-serialization \
 -lyade-lib-factory \

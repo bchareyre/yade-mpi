@@ -302,7 +302,7 @@ void SDECSpheresPlane::createActors(shared_ptr<MetaBody>& rootBody)
 
 	shared_ptr<SDECTimeStepper> sdecTimeStepper(new SDECTimeStepper);
 	sdecTimeStepper->sdecGroupMask = 1;
-	sdecTimeStepper->interval = timeStepUpdateInterval;
+	sdecTimeStepper->timeStepUpdateInterval = timeStepUpdateInterval;
 
 	rootBody->actors.clear();
 	rootBody->actors.push_back(shared_ptr<Engine>(new PhysicalActionContainerReseter));

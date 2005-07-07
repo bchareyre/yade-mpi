@@ -76,7 +76,7 @@
       <directoryradio>executable</directoryradio>
     </run>
     <general>
-      <activedir>PreProcessor/TetrahedronsTest</activedir>
+      <activedir>Engine/StandAloneEngine/SDECTimeStepper</activedir>
     </general>
     <subclassing/>
   </kdevtrollproject>

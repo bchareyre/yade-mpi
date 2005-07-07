@@ -540,7 +540,7 @@ void SDECImpactTest::createActors(shared_ptr<MetaBody>& rootBody)
 
 	shared_ptr<SDECTimeStepper> sdecTimeStepper(new SDECTimeStepper);
 	sdecTimeStepper->sdecGroupMask = 2;
-	sdecTimeStepper->interval = timeStepUpdateInterval;
+	sdecTimeStepper->timeStepUpdateInterval = timeStepUpdateInterval;
 	
 	
 	shared_ptr<ElasticContactLaw> elasticContactLaw(new ElasticContactLaw);

@@ -50,6 +50,8 @@
 
 class SimulationController : public QtGeneratedSimulationController
 {
+
+	public :  bool changeSkipTimeStepper, skipTimeStepper, changeTimeStep,wasUsingTimeStepper;
 	private : boost::mutex mutex;
 	private : QtGUIGenerator guiGen;	
 	private : /*static*/ QWidget * parentWorkspace;	
@@ -77,7 +79,10 @@ class SimulationController : public QtGeneratedSimulationController
 	public slots : virtual void pbResetClicked();
 	public slots : virtual void pbCenterSceneClicked();
 	public slots : virtual void pbOneSimulationStepClicked();
-	
+	public slots : virtual void bgTimeStepClicked(int i);
+	public slots : virtual void sb10PowerSecondValueChanged(int i);
+	public slots : virtual void sbSecondValueChanged(int i);
+
 	public slots : void closeGLViewEvent(int id);
 
 	private : void addNewView();

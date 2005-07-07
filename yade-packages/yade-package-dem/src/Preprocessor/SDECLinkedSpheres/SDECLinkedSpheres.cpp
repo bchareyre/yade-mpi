@@ -381,7 +381,7 @@ void SDECLinkedSpheres::createActors(shared_ptr<MetaBody>& rootBody)
  	
 	shared_ptr<SDECTimeStepper> sdecTimeStepper(new SDECTimeStepper);
 	sdecTimeStepper->sdecGroupMask = 55;
-	sdecTimeStepper->interval = timeStepUpdateInterval;
+	sdecTimeStepper->timeStepUpdateInterval = timeStepUpdateInterval;
 
 	
 	shared_ptr<ElasticContactLaw> constitutiveLaw(new ElasticContactLaw);
