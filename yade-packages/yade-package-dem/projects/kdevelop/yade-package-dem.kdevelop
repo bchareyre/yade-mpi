@@ -76,7 +76,7 @@
       <directoryradio>executable</directoryradio>
     </run>
     <general>
-      <activedir>RenderingEngine/GLDrawPolyhedralSweptSphere</activedir>
+      <activedir>PreProcessor/TetrahedronsTest</activedir>
     </general>
     <subclassing/>
   </kdevtrollproject>

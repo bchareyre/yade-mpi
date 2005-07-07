@@ -4,8 +4,8 @@
 # Target is a subdirs project 
 
 SUBDIRS += DeusExMachina \
-           EngineUnit \
-           MetaEngine \
+	MetaEngine \           
+	EngineUnit \
            StandAloneEngine 
 CONFIG += release \
           warn_on 
