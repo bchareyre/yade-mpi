@@ -47,10 +47,13 @@ class YadeQtMainWindow : public YadeQtGeneratedMainWindow
 	protected : QWorkspace * workspace;
 		
 	protected : QPopupMenu *preprocessorMenu;
-	protected : map<string,QPopupMenu*> menus;
+	protected : vector<pair<string,QPopupMenu*> > menus;
 	protected : vector<QAction*> items;
 	protected : vector<shared_ptr<Factorable> > qtWidgets;
 	protected : map<string,string> item2ClassName;
+
+	private   : bool menuNameExists(const string name);
+	private   : QPopupMenu* getPopupMenu(const string name);
 
 	// construction
 	public : YadeQtMainWindow ();

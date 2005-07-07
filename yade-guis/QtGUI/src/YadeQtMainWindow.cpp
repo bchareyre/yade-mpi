@@ -95,9 +95,8 @@ YadeQtMainWindow::~YadeQtMainWindow()
 
 void YadeQtMainWindow::addMenu(string menuName)
 {
-	map<string,QPopupMenu*>::iterator mi = menus.find(menuName);
-	if (mi==menus.end())
-		menus[menuName] = new QPopupMenu( this );
+	if (!menuNameExists(menuName))
+		menus.push_back(pair<string,QPopupMenu*>(menuName,new QPopupMenu(this)));
 
 }
 
@@ -106,15 +105,14 @@ void YadeQtMainWindow::addMenu(string menuName)
 
 void YadeQtMainWindow::addItem(string menuName, string itemName,string className)
 {
-	map<string,QPopupMenu*>::iterator mi = menus.find(menuName);
-	if (mi!=menus.end())
+	if (menuNameExists(menuName))
 	{
 		item2ClassName[itemName] = className;
 		items.push_back(new QAction(this, itemName.c_str()));
 		items.back()->setText( itemName.c_str() );
 		items.back()->setMenuText( itemName.c_str() );
 		items.back()->setToolTip( ("Load library "+ClassFactory::instance().libNameToSystemName(className)).c_str() );
-		items.back()->addTo((*mi).second);
+		items.back()->addTo(getPopupMenu(menuName));
 		connect( items.back(), SIGNAL( activated() ), this, SLOT( dynamicMenuClicked() ) );
 	}
 }
@@ -124,8 +122,8 @@ void YadeQtMainWindow::addItem(string menuName, string itemName,string className
 
 void YadeQtMainWindow::createMenus()
 {
-	map<string,QPopupMenu*>::reverse_iterator mi    = menus.rbegin();
-	map<string,QPopupMenu*>::reverse_iterator miEnd = menus.rend();
+	vector<pair<string,QPopupMenu*> >::iterator mi    = menus.begin();
+	vector<pair<string,QPopupMenu*> >::iterator miEnd = menus.end();
 	for(;mi!=miEnd;++mi)
 		MenuBar->insertItem( QString((*mi).first), (*mi).second);
 
@@ -169,7 +167,7 @@ void YadeQtMainWindow::closeSimulationControllerEvent()
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////
 
 void YadeQtMainWindow::fileExit()
 {
@@ -188,3 +186,30 @@ void YadeQtMainWindow::closeEvent(QCloseEvent *e)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+
+bool YadeQtMainWindow::menuNameExists(const string name)
+{
+	vector<pair<string,QPopupMenu*> >::iterator mi    = menus.begin();
+	vector<pair<string,QPopupMenu*> >::iterator miEnd = menus.end();
+	for( ; mi!=miEnd ; ++mi)
+		if ((*mi).first==name)
+			return true;
+	return false;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+QPopupMenu* YadeQtMainWindow::getPopupMenu(const string name)
+{
+	vector<pair<string,QPopupMenu*> >::iterator mi    = menus.begin();
+	vector<pair<string,QPopupMenu*> >::iterator miEnd = menus.end();
+	for( ; mi!=miEnd ; ++mi)
+		if ((*mi).first==name)
+			return (*mi).second;
+	return 0;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
