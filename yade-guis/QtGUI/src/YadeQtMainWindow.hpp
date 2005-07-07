@@ -36,12 +36,16 @@
 
 #include "YadeQtGeneratedMainWindow.h"
 #include "SimulationController.hpp"
+#include "QtGUIPreferences.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 class YadeQtMainWindow : public YadeQtGeneratedMainWindow
 {
+	protected : shared_ptr<QtGUIPreferences> preferences;
+
+
 	protected : SimulationController * simulationController;
 		
 	protected : QWorkspace * workspace;

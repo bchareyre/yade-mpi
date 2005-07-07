@@ -290,8 +290,8 @@ void Omega::scanPlugins()
 		for( ; dlli!=dlliEnd ; ++dlli)
 		{
 			bool thisLoaded = ClassFactory::instance().load((*dlli));
-			if (!thisLoaded)
-				cerr << "Can load : " << (*dlli) << endl;
+			//if (!thisLoaded)
+			//	cerr << "Can load : " << (*dlli) << endl;
 			allLoaded &= thisLoaded;
 		}
 	}

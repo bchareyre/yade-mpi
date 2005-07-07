@@ -27,6 +27,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <yade/yade-lib-serialization/IOManager.hpp>
+#include <yade/yade-lib-factory/ClassFactory.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -44,6 +45,9 @@
 #include <qimage.h>
 #include <qpixmap.h>
 
+#include <boost/filesystem/operations.hpp>
+#include <boost/filesystem/convenience.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -55,7 +59,30 @@ using namespace std;
 YadeQtMainWindow::YadeQtMainWindow() : YadeQtGeneratedMainWindow()
 {
 
-	resize(1024,768);
+	preferences = shared_ptr<QtGUIPreferences>(new QtGUIPreferences);
+	filesystem::path yadeQtGUIPrefPath = filesystem::path(string(getenv("HOME")) + string("/.yade/QtGUIPreferences.xml"), filesystem::native);
+
+	if ( !filesystem::exists( yadeQtGUIPrefPath ) )
+	{
+		preferences->mainWindowPositionX	= 50;
+		preferences->mainWindowPositionY	= 50;
+		preferences->mainWindowSizeX		= 1024;
+		preferences->mainWindowSizeY		= 768;
+		preferences->maximized			= false;
+		IOManager::saveToFile("XMLManager",yadeQtGUIPrefPath.string(),"preferences",preferences);
+	}
+
+	IOManager::loadFromFile("XMLManager",yadeQtGUIPrefPath.string(),"preferences",preferences);
+
+	if (preferences->maximized)
+	{
+		showMaximized();
+	}
+	else	
+	{
+		resize(preferences->mainWindowSizeX,preferences->mainWindowSizeY);
+		move(preferences->mainWindowPositionX,preferences->mainWindowPositionY);
+	}
 
 	addMenu("Edit");
 	addMenu("Preprocessor");
@@ -87,7 +114,14 @@ YadeQtMainWindow::YadeQtMainWindow() : YadeQtGeneratedMainWindow()
 
 YadeQtMainWindow::~YadeQtMainWindow()
 {
+	filesystem::path yadeQtGUIPrefPath = filesystem::path(string(getenv("HOME")) + string("/.yade/QtGUIPreferences.xml"), filesystem::native);
 
+	preferences->mainWindowPositionX	= pos().x();
+	preferences->mainWindowPositionY	= pos().y();
+	preferences->mainWindowSizeX		= size().width();
+	preferences->mainWindowSizeY		= size().height();
+	preferences->maximized			= isMaximized();
+	IOManager::saveToFile("XMLManager",yadeQtGUIPrefPath.string(),"preferences",preferences);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

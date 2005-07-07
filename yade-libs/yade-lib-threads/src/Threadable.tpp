@@ -132,7 +132,7 @@ void Threadable<Thread>::doOneLoop()
 template<class Thread>
 void Threadable<Thread>::operator()()
 {
-	ThreadSafe::cout("beginning Of thread number : "+lexical_cast<string>(*turn));
+	//ThreadSafe::cout("beginning Of thread number : "+lexical_cast<string>(*turn));
 	
 	while (notEnd() && !*finished)
 	{
@@ -159,7 +159,7 @@ void Threadable<Thread>::operator()()
 	
 	synchronizer->removeThread(*turn);
 	
-	ThreadSafe::cout("Ending Of thread number : "+lexical_cast<string>(*turn));
+	//ThreadSafe::cout("Ending Of thread number : "+lexical_cast<string>(*turn));
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

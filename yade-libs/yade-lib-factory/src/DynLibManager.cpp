@@ -256,7 +256,7 @@ bool DynLibManager::error()
  		char * error = dlerror();
 		if (error != NULL)  
 		{
-			cout << error << endl;
+			//cout << error << endl;
 			//Omega::printErrorLog(error);
 		}
 		return (error!=NULL);
