@@ -38,57 +38,83 @@ using namespace boost;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-class BodyIterator;
-
-template<class Type>
-class BodyIteratorSharedPtr : public shared_ptr<Type>
-{
-	public : BodyIteratorSharedPtr(Type* bi) : shared_ptr<Type>(bi) {};
-	public : BodyIteratorSharedPtr() : shared_ptr<Type>(new Type) {};
-
-	public : bool operator!=(const BodyIteratorSharedPtr<BodyIterator>& bi)
-	{			
-		return this->get()->operator!=(*(bi.get()));
-	};
-
-	public : BodyIteratorSharedPtr<BodyIterator> operator++()
-	{
-		this->get()->operator++();
-		return *this;
-	};
-
-	public : BodyIteratorSharedPtr<BodyIterator> operator++(int)
-	{
-		this->get()->operator++(0);
-		return *this;
-	};
-
-	public : BodyIteratorSharedPtr<BodyIterator> operator=(const BodyIteratorSharedPtr<BodyIterator>& bi)
-	{
-		this->get()->operator=(*(bi.get()));
-		return *this;
-	};
-
-	public : int operator*()
-	{
-		return this->get()->getCurrent();
-	};
-};
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 class BodyIterator 
 {
 	public : BodyIterator() {};
 	public : virtual ~BodyIterator() {};
 	
-	public : virtual bool operator!=(const BodyIterator&) { throw;};
-	public : virtual void operator=(const BodyIterator&) { throw;};
-	public : virtual void operator++()    { throw; };	
-	public : virtual void operator++(int) { throw; };
-	public : virtual int getCurrent() {throw;};
+	public : virtual bool isDifferent(const BodyIterator&) { throw;};
+	public : virtual void affect(const BodyIterator&) { throw;};
+	public : virtual void increment()    { throw; };	
+	public : virtual int getValue() {throw;};
+	public : virtual shared_ptr<BodyIterator> createPtr() {throw;};
+};
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class BodyIteratorPointer
+{
+	private : shared_ptr<BodyIterator> ptr;
+	public  : BodyIterator& getRef() {return *ptr;};
+	public  : BodyIterator& getRef() const {return *ptr;};
+	public  : shared_ptr<BodyIterator> get() {return ptr;};
+	public  : shared_ptr<BodyIterator> get() const {return ptr;};
+
+
+	public  : BodyIteratorPointer(const BodyIteratorPointer& bi) 
+	{
+		allocate(bi);
+		ptr->affect(bi.getRef());
+	};
+
+	public  : BodyIteratorPointer(const shared_ptr<BodyIterator>& i) 
+	{
+		ptr = i;
+	};
+
+	public  : BodyIteratorPointer() 
+	{
+		ptr = shared_ptr<BodyIterator>();
+	};
+
+	public  : bool operator!=(const BodyIteratorPointer& bi)
+	{
+		return ptr->isDifferent(bi.getRef());
+	};
+
+	public  : BodyIteratorPointer& operator++()
+	{
+		ptr->increment();
+		return *this;
+	};
+
+	public  : BodyIteratorPointer& operator++(int)
+	{
+		ptr->increment();
+		return *this;
+	};
+
+	public  : BodyIteratorPointer& operator=(const BodyIteratorPointer& bi)
+	{
+		allocate(bi);
+			
+		ptr->affect(bi.getRef());
+		return *this;
+	};
+
+	public  : int operator*()
+	{
+		return ptr->getValue();
+	};
+
+	
+	private : void allocate(const BodyIteratorPointer& bi)
+	{
+		if (ptr==0)
+			ptr = bi.get()->createPtr();
+	}	
+
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -96,14 +122,13 @@ class BodyIterator
 
 class BodyContainer
 {
-	public : typedef BodyIteratorSharedPtr<BodyIterator> iterator;
+	public : typedef BodyIteratorPointer iterator;
  
 	public : BodyContainer() {};
 	public : virtual ~BodyContainer() {};	
 	
-	public : virtual BodyIteratorSharedPtr<BodyIterator> begin() { throw;} ;
-	public : virtual BodyIteratorSharedPtr<BodyIterator> end() { throw;} ;	
-	public : virtual BodyIteratorSharedPtr<BodyIterator> emptyIterator() { throw;} ;	
+	public : virtual BodyIteratorPointer begin() { throw;} ;
+	public : virtual BodyIteratorPointer end() { throw;} ;	
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////

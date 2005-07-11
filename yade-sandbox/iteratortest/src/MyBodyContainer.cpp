@@ -32,32 +32,25 @@ MyBodyContainer::MyBodyContainer() : BodyContainer()
 	vec.push_back(2);	
 	vec.push_back(3);
 	vec.push_back(4);
-	vec.push_back(5);			
+	vec.push_back(5);	
 }
 
 MyBodyContainer::~MyBodyContainer()
 {
 }
 
-BodyIteratorSharedPtr<BodyIterator> MyBodyContainer::begin()
+BodyIteratorPointer MyBodyContainer::begin()
 {
-	BodyContainer::iterator spi(new MyIterator);
-	MyIterator* it = static_cast<MyIterator*>(spi.get());
+	shared_ptr<MyIterator> it(new MyIterator());
 	it->vi = vec.begin();
-	return spi;
+	return BodyContainer::iterator(it);
 }
 
-BodyIteratorSharedPtr<BodyIterator> MyBodyContainer::end()
+BodyIteratorPointer MyBodyContainer::end()
 {
-	BodyContainer::iterator spi(new MyIterator);
-	MyIterator* it = static_cast<MyIterator*>(spi.get());
+	shared_ptr<MyIterator> it(new MyIterator());
 	it->vi = vec.end();
-	return spi;
-}
-
-BodyIteratorSharedPtr<BodyIterator> MyBodyContainer::emptyIterator() 
-{
-	return BodyContainer::iterator(new MyIterator);
+	return BodyContainer::iterator(it);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -73,27 +66,27 @@ MyIterator::~MyIterator()
 
 }
 
-bool MyIterator::operator!=(const BodyIterator& i)
+bool MyIterator::isDifferent(const BodyIterator& i)
 {
 	return (vi != static_cast<const MyIterator&>(i).vi );
 }
 
-void MyIterator::operator++()
+void MyIterator::increment()
 {
 	++vi;
 }
 
-void MyIterator::operator++(int)
-{
-	vi++;
-}
-
-void MyIterator::operator=(const BodyIterator& i)
+void MyIterator::affect(const BodyIterator& i)
 {
 	vi = static_cast<const MyIterator&>(i).vi;
 }
 
-int MyIterator::getCurrent()
+int MyIterator::getValue()
 {
 	return *vi;
+}
+
+shared_ptr<BodyIterator> MyIterator::createPtr()
+{
+	return shared_ptr<BodyIterator>(new MyIterator());
 }

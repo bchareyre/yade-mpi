@@ -37,12 +37,12 @@ int main(int , char **)
 	MyBodyContainer c;
 
 	BodyContainer::iterator bci    = c.begin();
-	BodyContainer::iterator bci2   = c.emptyIterator();
 	BodyContainer::iterator bciEnd = c.end();
+	BodyContainer::iterator bci2;
 
 	for( ; bci!=bciEnd ; ++bci)	
 		for( (bci2=bci)++ ; bci2!=bciEnd ; ++bci2)
-			cout << *bci << "  " << *bci2 << endl;	
+			cout << *bci << "  " << *bci2 << endl;
 
 	return EXIT_SUCCESS;
 }

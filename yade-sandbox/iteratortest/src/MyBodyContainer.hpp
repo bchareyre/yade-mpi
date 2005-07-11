@@ -50,9 +50,8 @@ class MyBodyContainer : public BodyContainer
 	public  : MyBodyContainer();
 	public  : virtual ~MyBodyContainer();
 
-	public : virtual BodyIteratorSharedPtr<BodyIterator> begin();
-	public : virtual BodyIteratorSharedPtr<BodyIterator> end();	
-	public : virtual BodyIteratorSharedPtr<BodyIterator> emptyIterator();
+	public : virtual BodyIteratorPointer begin();
+	public : virtual BodyIteratorPointer end();
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -66,11 +65,12 @@ class MyIterator : public BodyIterator
 	
 	public : ~MyIterator();
 
-	public : virtual bool operator!=(const BodyIterator& i);
-	public : virtual void operator=(const BodyIterator& i);
-	public : virtual void operator++();
-	public : virtual void operator++(int);
-	public : virtual int getCurrent();
+	public : virtual bool isDifferent(const BodyIterator& i);
+	public : virtual void affect(const BodyIterator& i);
+	public : virtual void increment();
+	public : virtual int getValue();
+	public : virtual shared_ptr<BodyIterator> createPtr();
+
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
