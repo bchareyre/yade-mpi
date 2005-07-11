@@ -1,6 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2005 by Olivier Galizzi                                 *
- *   olivier.galizzi@imag.fr                                               *
+ *   Copyright (C) 2005 by Olivier Galizzi   *
+ *   olivier.galizzi@imag.fr   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -21,37 +21,84 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#ifndef __MYBODYCONTAINER__
-#define __MYBODYCONTAINER__
+#ifndef __BODYITERATORPOINTER__
+#define __BODYITERATORPOINTER__
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "BodyContainer.hpp"
+#include "BodyIterator.hpp"
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <vector>
+class BodyIteratorPointer
+{
+	private : shared_ptr<BodyIterator> ptr;
+	public  : BodyIterator& getRef() {return *ptr;};
+	public  : BodyIterator& getRef() const {return *ptr;};
+	public  : shared_ptr<BodyIterator> get() {return ptr;};
+	public  : shared_ptr<BodyIterator> get() const {return ptr;};
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class MyBodyContainer : public BodyContainer
-{ 
-	private : vector<int> vec;
-		
-	public  : MyBodyContainer();
-	public  : virtual ~MyBodyContainer();
+	public  : BodyIteratorPointer(const BodyIteratorPointer& bi) 
+	{
+		allocate(bi);
+		ptr->affect(bi.getRef());
+	};
 
-	public : virtual BodyIteratorPointer begin();
-	public : virtual BodyIteratorPointer end();
+	public  : BodyIteratorPointer(const shared_ptr<BodyIterator>& i)
+	{
+		ptr = i;
+	};
+
+	public  : BodyIteratorPointer() 
+	{
+		ptr = shared_ptr<BodyIterator>();
+	};
+
+	private : void allocate(const BodyIteratorPointer& bi)
+	{
+		if (ptr==0)
+			ptr = bi.get()->createPtr();
+	}
+
+	public  : bool operator!=(const BodyIteratorPointer& bi)
+	{
+		return ptr->isDifferent(bi.getRef());
+	};
+
+	public  : BodyIteratorPointer& operator++()
+	{
+		ptr->increment();
+		return *this;
+	};
+
+	public  : BodyIteratorPointer& operator++(int)
+	{
+		ptr->increment();
+		return *this;
+	};
+
+	public  : BodyIteratorPointer& operator=(const BodyIteratorPointer& bi)
+	{
+		allocate(bi);
+			
+		ptr->affect(bi.getRef());
+		return *this;
+	};
+
+	public  : int operator*()
+	{
+		return ptr->getValue();
+	};	
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#endif // __MYBODYCONTAINER__
+#endif // __BODYITERATORPOINTER__
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
