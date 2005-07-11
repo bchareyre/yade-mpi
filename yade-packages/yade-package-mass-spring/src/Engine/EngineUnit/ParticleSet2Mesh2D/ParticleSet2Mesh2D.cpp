@@ -46,10 +46,14 @@ void ParticleSet2Mesh2D::go(	  const shared_ptr<PhysicalParameters>&
 
 	int particleSetMask = 1; // FIXME - make this a class variable
  	unsigned int i=0;
-	for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext() , ++i )
+
+	BodyContainer::iterator bi    = bodies->begin();
+	BodyContainer::iterator biEnd = bodies->end();
+	for(  ; bi!=biEnd ; ++bi,++i )
 	{
-		if( bodies->getCurrent()->getGroupMask() & particleSetMask )// FIXME - this line is a bad hack, to make things work, we should have TWO ComplexBodies, one with cloth, second with spheres. here I assume that spheres and cloth are in the same MetaBody, and that cloth belongs to group 1
-			mesh2d->vertices[i]=bodies->getCurrent()->physicalParameters->se3.position;
+		shared_ptr<Body> b = *bi;
+		if( b->getGroupMask() & particleSetMask )// FIXME - this line is a bad hack, to make things work, we should have TWO ComplexBodies, one with cloth, second with spheres. here I assume that spheres and cloth are in the same MetaBody, and that cloth belongs to group 1
+			mesh2d->vertices[i]=b->physicalParameters->se3.position;
 	}
 }
 	

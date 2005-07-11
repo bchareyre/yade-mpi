@@ -44,7 +44,7 @@ class PhysicalAction : public Serializable, public Indexable
 //	public : virtual void add(const shared_ptr<PhysicalAction>& )	{throw;};
 //	public : virtual void sub(const shared_ptr<PhysicalAction>& )	{throw;};
 	public : virtual void reset() 				{throw;};
-	public : virtual shared_ptr<PhysicalAction> clone()		{throw;};
+	public : virtual shared_ptr<PhysicalAction> clone()	{throw;};
 	
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Serialization										///

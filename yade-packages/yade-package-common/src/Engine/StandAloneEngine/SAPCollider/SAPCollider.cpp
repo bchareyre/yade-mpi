@@ -95,10 +95,12 @@ void SAPCollider::broadInteractionTest(Body* body)
 	//for(i=0; i < bodies->size(); i++)
 	shared_ptr<Body> b;
 	i=0;
-//	for( b = bodies->getFirst() ; bodies->hasCurrent() ; b = bodies->getNext() , i++ )
-	for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext() , ++i )
+
+	BodyContainer::iterator bi    = bodies->begin();
+	BodyContainer::iterator biEnd = bodies->end();
+	for(; bi!=biEnd ; ++bi,i++ )
 	{
-		b = bodies->getCurrent();
+		b = *bi;
 		
 		offset = 3*i;
 		min = b->boundingVolume->min;

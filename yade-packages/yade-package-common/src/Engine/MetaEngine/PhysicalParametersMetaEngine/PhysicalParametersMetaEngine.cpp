@@ -53,14 +53,14 @@ void PhysicalParametersMetaEngine::action(Body* body)
 	MetaBody * ncb = dynamic_cast<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	
-	for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext())
+	BodyContainer::iterator bi    = bodies->begin();
+	BodyContainer::iterator biEnd = bodies->end();
+	for( ; bi!=biEnd ; ++bi )
 	{
-		shared_ptr<Body>& b = bodies->getCurrent();
-//		if(b->physicalParameters)
-			operator()(b->physicalParameters,b.get());
+		shared_ptr<Body> b = *bi;
+		operator()(b->physicalParameters,b.get());
 	}
 	
-//	if(body->physicalParameters)
-	 	operator()(body->physicalParameters,body);
+ 	operator()(body->physicalParameters,body);
 }
 

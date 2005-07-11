@@ -184,25 +184,25 @@ string SDECLinkedSpheres::generate()
 	rootBody->persistentInteractions->clear();
 	
 	shared_ptr<Body> bodyA;
-	rootBody->bodies->gotoFirst();
-	rootBody->bodies->gotoNext(); // skips ground
-	if (support1)
-		rootBody->bodies->gotoNext(); // skips supportBox1
-	if (support2)
-		rootBody->bodies->gotoNext(); // skips supportBox2
-		
-		
-	for( ; rootBody->bodies->notAtEnd() ; rootBody->bodies->gotoNext() )
-	{
-		bodyA = rootBody->bodies->getCurrent();
-		
-		rootBody->bodies->pushIterator();
 
-		rootBody->bodies->gotoNext();
-		for( ; rootBody->bodies->notAtEnd() ; rootBody->bodies->gotoNext() )
+	BodyContainer::iterator bi    = rootBody->bodies->begin();
+	BodyContainer::iterator biEnd = rootBody->bodies->end();
+	BodyContainer::iterator bi2;
+
+	bi++; // skips ground
+	if (support1)
+		bi++; // skips supportBox1
+	if (support2)
+		bi++; // skips supportBox2
+		
+		
+	for( ; bi!=biEnd ; ++bi )
+	{
+		bodyA =*bi;
+		
+		for((bi2=bi)++ ; bi2!=biEnd ; ++bi2 )
 		{
-			shared_ptr<Body> bodyB;
-			bodyB = rootBody->bodies->getCurrent();
+			shared_ptr<Body> bodyB = *bi2;
 
 			shared_ptr<BodyMacroParameters> a = dynamic_pointer_cast<BodyMacroParameters>(bodyA->physicalParameters);
 			shared_ptr<BodyMacroParameters> b = dynamic_pointer_cast<BodyMacroParameters>(bodyB->physicalParameters);
@@ -233,8 +233,6 @@ string SDECLinkedSpheres::generate()
 				rootBody->persistentInteractions->insert(link);
 			}
 		}
-
-		rootBody->bodies->popIterator();
 	}
 	
 	return "total number of permament links created: " + lexical_cast<string>(rootBody->persistentInteractions->size());

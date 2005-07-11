@@ -62,7 +62,7 @@ void SDECTimeStepper::registerAttributes()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void SDECTimeStepper::findTimeStepFromBody(const Body* body)
+void SDECTimeStepper::findTimeStepFromBody(const shared_ptr<Body>& body)
 {
 	BodyMacroParameters * sdec	= dynamic_cast<BodyMacroParameters*>(body->physicalParameters.get());
 	Sphere* sphere 		= dynamic_cast<Sphere*>(body->geometricalModel.get());
@@ -147,22 +147,29 @@ void SDECTimeStepper::computeTimeStep(Body* body)
 	newDt = Mathr::MAX_REAL;
 	computedSomething = false; // this flag is to avoid setting timestep to MAX_REAL :)
 
-	for( persistentInteractions->gotoFirst() ; persistentInteractions->notAtEnd() ; persistentInteractions->gotoNext() )
-		findTimeStepFromInteraction(persistentInteractions->getCurrent() , bodies);
+	InteractionContainer::iterator ii    = persistentInteractions->begin();
+	InteractionContainer::iterator iiEnd = persistentInteractions->end();
+	for(  ; ii!=iiEnd ; ++ii )
+		findTimeStepFromInteraction(*ii , bodies);
 
-	for( volatileInteractions->gotoFirst() ; volatileInteractions->notAtEnd() ; volatileInteractions->gotoNext() )
-		findTimeStepFromInteraction(volatileInteractions->getCurrent() , bodies);
+	ii    = volatileInteractions->begin();
+	iiEnd = volatileInteractions->end();
+	for(  ; ii!=iiEnd ; ++ii )
+		findTimeStepFromInteraction(*ii , bodies);
 
 	if(! computedSomething)
+	{
 // no volatileInteractions at all? so let's try to estimate timestep by investigating bodies,
 // simulating that a body in contact with itself. this happens only when there were not volatileInteractions at all.
-		for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext() )
+		BodyContainer::iterator bi    = bodies->begin();
+		BodyContainer::iterator biEnd = bodies->end();
+		for(  ; bi!=biEnd ; ++bi )
 		{
-			Body* b = bodies->getCurrent().get();
+			shared_ptr<Body> b = *bi;
 			if( b->getGroupMask() & sdecGroupMask)
 				findTimeStepFromBody(b);
 		}
-		
+	}	
 	if(computedSomething)
 	{
 		Omega::instance().setTimeStep(newDt);		

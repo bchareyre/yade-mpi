@@ -122,10 +122,12 @@ void PersistentSAPCollider::broadInteractionTest(Body* body)
 	int offset;
 	Vector3r min,max;
 	shared_ptr<Body> b;
-	unsigned int i=0;
-	for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext() , ++i )
+
+	BodyContainer::iterator bi    = bodies->begin();
+	BodyContainer::iterator biEnd = bodies->end();
+	for(unsigned int i=0 ; bi!=biEnd ; ++bi,i++ )
 	{
-		b = bodies->getCurrent();
+		b = *bi;
 		
 		offset = 3*i;
 		if(b->boundingVolume) // can't assume that everybody has BoundingVolume
@@ -142,12 +144,15 @@ void PersistentSAPCollider::broadInteractionTest(Body* body)
 	}
 	
 	volatileInteractions = ncb->volatileInteractions;
-	for( volatileInteractions->gotoFirstPotential() ; volatileInteractions->notAtEndPotential() ; volatileInteractions->gotoNextPotential())
+	InteractionContainer::iterator ii    = volatileInteractions->begin();
+	InteractionContainer::iterator iiEnd = volatileInteractions->end();
+	for( ; ii!=iiEnd ; ++ii)
 	{
+		shared_ptr<Interaction> interaction = *ii;
 		// FIXME : remove this isNew flag and test if interactionPhysic ?
-		if (volatileInteractions->getCurrent()->isReal) // if a interaction was only potential then no geometry was created for it and so this time it is still a new one
-			volatileInteractions->getCurrent()->isNew = false;
-		volatileInteractions->getCurrent()->isReal = false;
+		if (interaction->isReal) // if a interaction was only potential then no geometry was created for it and so this time it is still a new one
+			interaction->isNew = false;
+		interaction->isReal = false;
 	}
 	
 	updateIds(bodies->size());

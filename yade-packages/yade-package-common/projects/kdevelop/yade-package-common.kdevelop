@@ -76,7 +76,7 @@
       <directoryradio>executable</directoryradio>
     </run>
     <general>
-      <activedir>PostProcessor</activedir>
+      <activedir>Container/BodyContainer/BodyRedirectionVector</activedir>
     </general>
     <subclassing/>
   </kdevtrollproject>

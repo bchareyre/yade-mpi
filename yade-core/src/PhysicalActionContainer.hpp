@@ -32,6 +32,11 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include "PhysicalActionContainerIteratorPointer.hpp"
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 class PhysicalAction;
 
 // this container is different: it has ALWAYS data inside, not empty pointers at all. Every field has
@@ -39,7 +44,7 @@ class PhysicalAction;
 // is doing addition, substraction, and whatever he wants.
 //
 // you should never have to create new PhysicalAction ! (that takes too much time), except for calling prepare, which is done only once
-
+ 
 class PhysicalActionContainer : public Serializable
 {
 
@@ -68,10 +73,14 @@ class PhysicalActionContainer : public Serializable
 					, int /*Force::getClassIndexStatic()*/)		{throw;};
 
 	// looping over Bodies, and their Actions
-	public    : virtual void gotoFirst() 							{throw;};
-	public    : virtual bool notAtEnd() 							{throw;};
-	public    : virtual void gotoNext() 							{throw;};
-	public    : virtual shared_ptr<PhysicalAction>& getCurrent(int& )				{throw;};
+//	public    : virtual void gotoFirst() 							{throw;};
+//	public    : virtual bool notAtEnd() 							{throw;};
+//	public    : virtual void gotoNext() 							{throw;};
+//	public    : virtual shared_ptr<PhysicalAction>& getCurrent(int& )				{throw;};
+
+	public    : typedef PhysicalActionContainerIteratorPointer iterator;
+        public    : virtual PhysicalActionContainer::iterator begin()			{throw;};
+        public    : virtual PhysicalActionContainer::iterator end()			{throw;};
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Serialization										///

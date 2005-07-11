@@ -32,6 +32,11 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include "InteractionContainerIteratorPointer.hpp"
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 class Interaction;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -55,22 +60,28 @@ class InteractionContainer : public Serializable
 	public    : virtual const shared_ptr<Interaction>& find(unsigned int /*id1*/,unsigned int /*id2*/) 		{throw;};
 
 	// looping over the data
-	public    : virtual void gotoFirst() 									{throw;};
-	public    : virtual bool notAtEnd() 									{throw;};
-	public    : virtual void gotoNext() 									{throw;};
+//	public    : virtual void gotoFirst() 									{throw;};
+//	public    : virtual bool notAtEnd() 									{throw;};
+//	public    : virtual void gotoNext() 									{throw;};
 
 // BEGIN - delete that! we shouldn't check isReal flag inside contaier, because we will make iterators
-	public    : virtual void gotoFirstPotential() 								{throw;};
-	public    : virtual void gotoNextPotential() 								{throw;};
-	public    : virtual bool notAtEndPotential() 								{throw;};
+//	public    : virtual void gotoFirstPotential() 								{throw;};
+//	public    : virtual void gotoNextPotential() 								{throw;};
+//	public    : virtual bool notAtEndPotential() 								{throw;};
 // END
 
+
+
+	public    : typedef InteractionContainerIteratorPointer iterator;
+        public    : virtual InteractionContainer::iterator begin()			{throw;};
+        public    : virtual InteractionContainer::iterator end()			{throw;};
+
 	
- 	public    : virtual const shared_ptr<Interaction>& getCurrent() 						{throw;};
+ 	//public    : virtual const shared_ptr<Interaction>& getCurrent() 						{throw;};
 
 	// deletes currently pointed element, and goes to the next one.
-	public    : virtual void eraseCurrentAndGotoNext() 							{throw;};
-	public    : virtual void eraseCurrentAndGotoNextPotential()						{throw;};
+	//public    : virtual void eraseCurrentAndGotoNext() 							{throw;};
+	//public    : virtual void eraseCurrentAndGotoNextPotential()						{throw;};
 	public    : virtual unsigned int size() 								{throw;};
 
 

@@ -44,31 +44,32 @@ using namespace __gnu_cxx;
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+struct eqPair
+{
+	bool operator()(const pair<unsigned int,unsigned int>& p1, const pair<unsigned int,unsigned int>& p2) const
+	{
+		return (p1.first==p2.first && p1.second==p2.second);
+	}
+};
+
+struct hashPair
+{
+	unsigned int operator()(const pair<unsigned int,unsigned int>& p) const
+	{
+		//return (p.first);
+		//return (p.first+p.second);
+		return (p.first+p.second)%182501621;
+	}
+};
+
+typedef hash_map<pair<unsigned int,unsigned int>, shared_ptr<Interaction>, hashPair, eqPair > IHashMap;
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
 class InteractionHashMap : public InteractionContainer
 {
-
-	private : struct eqPair
-		{
-			bool operator()(const pair<unsigned int,unsigned int>& p1, const pair<unsigned int,unsigned int>& p2) const
-			{
-				return (p1.first==p2.first && p1.second==p2.second);
-			}
-		};
-
-	private : struct hashPair
-		{
-			unsigned int operator()(const pair<unsigned int,unsigned int>& p) const
-			{
-				//return (p.first);
-				//return (p.first+p.second);
-				return (p.first+p.second)%182501621;
-			}
-		};
-
-	private : typedef hash_map<pair<unsigned int,unsigned int>, shared_ptr<Interaction>, hashPair, eqPair > IHashMap;
-	private : IHashMap volatileInteractions;
-	private : IHashMap::iterator hmii;
-	private : IHashMap::iterator hmiiEnd;
+	private : IHashMap interactions;
 	private : shared_ptr<Interaction> empty;
 
 
@@ -81,17 +82,20 @@ class InteractionHashMap : public InteractionContainer
 	public : virtual bool erase(unsigned int id1,unsigned int id2);
 	public : virtual const shared_ptr<Interaction>& find(unsigned int id1,unsigned int id2);
 
-	public	: virtual void gotoFirst();
-	public	: virtual bool notAtEnd();
-	public	: virtual void gotoNext();
-	public	: virtual void gotoFirstPotential();
-	public	: virtual bool notAtEndPotential();
-	public	: virtual void gotoNextPotential();
-	
-	public	: virtual const shared_ptr<Interaction>& getCurrent();
+	public    : virtual InteractionContainer::iterator begin();
+        public    : virtual InteractionContainer::iterator end();
 
-	public : virtual void eraseCurrentAndGotoNext();
-	public  : virtual void eraseCurrentAndGotoNextPotential();
+// 	public	: virtual void gotoFirst();
+// 	public	: virtual bool notAtEnd();
+// 	public	: virtual void gotoNext();
+// 	public	: virtual void gotoFirstPotential();
+// 	public	: virtual bool notAtEndPotential();
+// 	public	: virtual void gotoNextPotential();
+	
+	//public	: virtual const shared_ptr<Interaction>& getCurrent();
+
+	//public : virtual void eraseCurrentAndGotoNext();
+	//public  : virtual void eraseCurrentAndGotoNextPotential();
 
 	public : virtual unsigned int size();
 

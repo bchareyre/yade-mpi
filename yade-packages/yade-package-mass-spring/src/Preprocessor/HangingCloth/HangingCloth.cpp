@@ -425,19 +425,16 @@ string HangingCloth::generate()
 	int linksNum=0;
 	if(linkSpheres)
 	{
-		shared_ptr<Body> bodyA;
-			
-		for( rootBody->bodies->gotoFirst() ; rootBody->bodies->notAtEnd() ; rootBody->bodies->gotoNext() )
+		BodyContainer::iterator bi    = rootBody->bodies->begin();
+		BodyContainer::iterator bi2;
+		BodyContainer::iterator biEnd = rootBody->bodies->end();
+		for(  ; bi!=biEnd ; ++bi )
 		{
-			bodyA = rootBody->bodies->getCurrent();
+			shared_ptr<Body> bodyA = *bi;
 			
-			rootBody->bodies->pushIterator();
-	
-			rootBody->bodies->gotoNext();
-			for( ; rootBody->bodies->notAtEnd() ; rootBody->bodies->gotoNext() )
+			for( (bi2=bi)++ ; bi2!=biEnd ; ++bi2 )
 			{
-				shared_ptr<Body> bodyB;
-				bodyB = rootBody->bodies->getCurrent();
+				shared_ptr<Body> bodyB = *bi2;
 	
 				shared_ptr<BodyMacroParameters> a = dynamic_pointer_cast<BodyMacroParameters>(bodyA->physicalParameters);
 				shared_ptr<BodyMacroParameters> b = dynamic_pointer_cast<BodyMacroParameters>(bodyB->physicalParameters);
@@ -469,8 +466,6 @@ string HangingCloth::generate()
 					++linksNum;
 				}
 			}
-	
-			rootBody->bodies->popIterator();
 		}
 	}
 			

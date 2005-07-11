@@ -85,16 +85,20 @@ void PositionOrientationRecorder::action(Body * body)
 		ofile.open( string(outputFile+"_"+lexical_cast<string>( Omega::instance().getCurrentIteration() )).c_str() );
 	
 		Real tx=0, ty=0, tz=0, rw=0, rx=0, ry=0, rz=0;
-		for( ncb->bodies->gotoFirst() ; ncb->bodies->notAtEnd() ; ncb->bodies->gotoNext() )
+			
+		BodyContainer::iterator bi    = ncb->bodies->begin();
+		BodyContainer::iterator biEnd = ncb->bodies->end();
+		for(  ; bi!=biEnd ; ++bi )
 		{
-			tx = ncb->bodies->getCurrent()->physicalParameters->se3.position[0];
-			ty = ncb->bodies->getCurrent()->physicalParameters->se3.position[1];
-			tz = ncb->bodies->getCurrent()->physicalParameters->se3.position[2];
+			shared_ptr<Body> b = *bi;
+			tx = b->physicalParameters->se3.position[0];
+			ty = b->physicalParameters->se3.position[1];
+			tz = b->physicalParameters->se3.position[2];
 		
-			rw = ncb->bodies->getCurrent()->physicalParameters->se3.orientation[0];
-			rx = ncb->bodies->getCurrent()->physicalParameters->se3.orientation[1];
-			ry = ncb->bodies->getCurrent()->physicalParameters->se3.orientation[2];
-			rz = ncb->bodies->getCurrent()->physicalParameters->se3.orientation[2];
+			rw = b->physicalParameters->se3.orientation[0];
+			rx = b->physicalParameters->se3.orientation[1];
+			ry = b->physicalParameters->se3.orientation[2];
+			rz = b->physicalParameters->se3.orientation[2];
 			
 			ofile << lexical_cast<string>(Omega::instance().getSimulationTime()) << " "
 				<< lexical_cast<string>(tx) << " " 

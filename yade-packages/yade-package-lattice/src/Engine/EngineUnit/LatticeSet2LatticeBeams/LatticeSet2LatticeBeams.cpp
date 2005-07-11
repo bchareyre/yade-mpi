@@ -75,8 +75,13 @@ void LatticeSet2LatticeBeams::go(	  const shared_ptr<PhysicalParameters>& ph
 	int beamGroupMask = dynamic_cast<const LatticeSetParameters*>(ph.get())->beamGroupMask;
 	const MetaBody * ncb = dynamic_cast<const MetaBody*>(body);
 	const shared_ptr<BodyContainer>& bodies = ncb->bodies;
-	
-	for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext() )
-		if( bodies->getCurrent()->getGroupMask() & beamGroupMask )
-			calcBeamsPositionOrientationNewLength(bodies->getCurrent(),bodies);
+
+	BodyContainer::iterator bi    = bodies->begin();
+	BodyContainer::iterator biEnd = bodies->end();
+	for(  ; bi!=biEnd ; ++bi )
+	{
+		shared_ptr<Body> b = *bi;	
+		if( b->getGroupMask() & beamGroupMask )
+			calcBeamsPositionOrientationNewLength(b,bodies);
+	}
 }

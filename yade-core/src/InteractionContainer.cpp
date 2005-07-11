@@ -44,8 +44,10 @@ void InteractionContainer::preProcessAttributes(bool deserializing)
 	else
 	{
 		interaction.clear();
-		for( this->gotoFirst() ; this->notAtEnd() ; this->gotoNext() )
-			interaction.push_back(this->getCurrent());
+		InteractionContainer::iterator i    = this->begin();
+		InteractionContainer::iterator iEnd = this->end();
+		for( ; i!=iEnd ; ++i )
+			interaction.push_back(*i);
 	}
 }
 

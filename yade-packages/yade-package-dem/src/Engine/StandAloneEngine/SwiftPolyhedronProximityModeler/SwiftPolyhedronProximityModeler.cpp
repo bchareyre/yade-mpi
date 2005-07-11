@@ -62,9 +62,12 @@ void SwiftPolyhedronProximityModeler::action(Body* body)
 
 		shared_ptr<Body> b;
 		PolyhedralSweptSphere * pss;
-		for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext())
+
+		BodyContainer::iterator bi    = bodies->begin();
+		BodyContainer::iterator biEnd = bodies->end();
+		for(  ; bi!=biEnd ; ++bi )
 		{
-			b = bodies->getCurrent();
+			b = *bi;
 			pss = static_cast<PolyhedralSweptSphere*>(b->interactionGeometry.get());
 			getSwiftInfo(pss,vs,fs,fv,vn,fn); //FIXME : need to make a new inside getSwiftInfo ??
 			scene->Add_Convex_Object( (SWIFT_Real*)vs, fs, vn, fn, id , 
@@ -110,9 +113,12 @@ void SwiftPolyhedronProximityModeler::action(Body* body)
 	
 	set<int> bodiesToUpdates;
 	shared_ptr<InteractionContainer>& potentialCollisions = ncb->volatileInteractions;
-	for( potentialCollisions->gotoFirstPotential() ; potentialCollisions->notAtEndPotential() ; potentialCollisions->gotoNextPotential())
+
+	InteractionContainer::iterator ii    = ncb->volatileInteractions->begin();
+	InteractionContainer::iterator iiEnd = ncb->volatileInteractions->end();
+	for(  ; ii!=iiEnd ; ++ii )
 	{
-		const shared_ptr<Interaction>& interaction = potentialCollisions->getCurrent();
+		const shared_ptr<Interaction>& interaction = *ii;
 		bodiesToUpdates.insert(interaction->getId1());
 		bodiesToUpdates.insert(interaction->getId2());
 		scene->Activate(interaction->getId1(),interaction->getId2());

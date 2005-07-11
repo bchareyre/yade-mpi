@@ -50,7 +50,7 @@ class SDECTimeStepper : public TimeStepper
 	
 	public : virtual void computeTimeStep(Body* body);
 	
-	private : void findTimeStepFromBody(const Body* );
+	private : void findTimeStepFromBody(const shared_ptr<Body>&);
 	private : void findTimeStepFromInteraction(const shared_ptr<Interaction>& , shared_ptr<BodyContainer>&);
 	private : Real newDt;
 	private : bool computedSomething;

@@ -85,9 +85,11 @@ void AveragePositionRecorder::action(Body * body)
 	
 	Real x=0, y=0, z=0, size=0;
 	
-	for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext() )
+	BodyContainer::iterator bi    = bodies->begin();
+	BodyContainer::iterator biEnd = bodies->end();
+	for(  ; bi!=biEnd ; ++bi )
 	{
-		shared_ptr<Body>& body = bodies->getCurrent();
+		shared_ptr<Body> body = *bi;
 		if( body->isDynamic && body->getId() != bigBallId )
 		{ 
 			size+=1.0;

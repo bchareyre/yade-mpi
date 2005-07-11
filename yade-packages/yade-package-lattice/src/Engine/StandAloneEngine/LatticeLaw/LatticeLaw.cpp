@@ -76,9 +76,11 @@ void LatticeLaw::calculateForces(Body* body)
 	
 //	Real dt = Omega::instance().getTimeStep();
 	
-	for(bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext()) // loop over all beams
+	BodyContainer::iterator bi    = bodies->begin();
+	BodyContainer::iterator biEnd = bodies->end();
+	for(  ; bi!=biEnd ; ++bi )  // loop over all beams
 	{
-		const shared_ptr<Body>& body = bodies->getCurrent();
+		shared_ptr<Body> body = *bi;
 		if( ! ( body->getGroupMask() & beamGroupMask ) )
 			continue; // skip non-beams
 		
@@ -115,9 +117,12 @@ void LatticeLaw::calculateForces(Body* body)
 
 	}
 
-	for(bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext()) // loop over all nodes
+	bi    = bodies->begin();
+	biEnd    = bodies->end();
+	for(  ; bi!=biEnd ; ++bi )  // loop over all nodes
 	{
-		const shared_ptr<Body>& body = bodies->getCurrent();
+		shared_ptr<Body> body = *bi;
+
 		if( ! ( body->getGroupMask() & nodeGroupMask ) )
 			continue; // skip non-nodes
 		

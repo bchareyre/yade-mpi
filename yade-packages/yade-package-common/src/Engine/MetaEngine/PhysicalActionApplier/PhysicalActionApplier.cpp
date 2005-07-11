@@ -53,10 +53,12 @@ void PhysicalActionApplier::action(Body* body)
 	MetaBody * ncb = dynamic_cast<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 
-	int id;
-	for( ncb->actionParameters->gotoFirst() ; ncb->actionParameters->notAtEnd() ; ncb->actionParameters->gotoNext())
+	PhysicalActionContainer::iterator pai    = ncb->actionParameters->begin();
+	PhysicalActionContainer::iterator paiEnd = ncb->actionParameters->end(); 
+	for( ; pai!=paiEnd ; ++pai)
 	{
-		shared_ptr<PhysicalAction>& action = ncb->actionParameters->getCurrent(id);
+		shared_ptr<PhysicalAction> action = *pai;
+		int id = pai.getCurrentIndex();
 		// FIXME - solve the problem of Body's id
 		operator()( action , (*bodies)[id]->physicalParameters , (*bodies)[id].get() );
 	}

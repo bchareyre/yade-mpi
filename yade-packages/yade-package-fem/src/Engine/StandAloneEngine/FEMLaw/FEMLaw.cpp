@@ -79,9 +79,11 @@ void FEMLaw::calculateForces(Body* body)
 	Ue1.resize(12,1);
 	fe.resize(12,1);
 	
-	for(bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext()) // loop over all tetrahedrons
+	BodyContainer::iterator bi    = bodies->begin();
+	BodyContainer::iterator biEnd = bodies->end();
+	for(  ; bi!=biEnd ; ++bi )
 	{
-		const shared_ptr<Body>& body = bodies->getCurrent();
+		shared_ptr<Body> body = *bi;
 		if( ! ( body->getGroupMask() & tetrahedronGroupMask ) )
 			continue; // skip non-tetraherons
 		

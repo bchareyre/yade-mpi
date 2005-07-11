@@ -31,7 +31,13 @@ HEADERS += BodyContainer.hpp \
            RenderingEngine.hpp \
            SimulationLoop.hpp \
            yadeExceptions.hpp \
-           TimeStepper.hpp 
+           TimeStepper.hpp \
+           BodyContainerIterator.hpp \
+           BodyContainerIteratorPointer.hpp \
+           InteractionContainerIterator.hpp \
+           InteractionContainerIteratorPointer.hpp \
+           PhysicalActionContainerIterator.hpp \
+           PhysicalActionContainerIteratorPointer.hpp 
 SOURCES += BodyContainer.cpp \
            Body.cpp \
            BoundingVolume.cpp \

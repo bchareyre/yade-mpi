@@ -338,9 +338,11 @@ void OpenGLRenderingEngine::renderShadowVolumes(const shared_ptr<MetaBody>& root
 {	
 	if (!rootBody->geometricalModel)
 	{
-		for( rootBody->bodies->gotoFirst() ; rootBody->bodies->notAtEnd() ; rootBody->bodies->gotoNext() )
+		BodyContainer::iterator bi    = rootBody->bodies->begin();
+		BodyContainer::iterator biEnd = rootBody->bodies->end();
+		for(; bi!=biEnd ; ++bi )
 		{
-			shared_ptr<Body>& b = rootBody->bodies->getCurrent();
+			shared_ptr<Body> b = *bi;
 			if (b->geometricalModel->shadowCaster)
 				shadowVolumeDispatcher(b->geometricalModel,b->physicalParameters,lightPos);
 		}
@@ -357,9 +359,13 @@ void OpenGLRenderingEngine::renderGeometricalModel(const shared_ptr<MetaBody>& r
 	shared_ptr<BodyContainer>& bodies = rootBody->bodies;
 
 	if((rootBody->geometricalModel || drawInside) && drawInside)
-		for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext() )
+	{
+		BodyContainer::iterator bi    = bodies->begin();
+		BodyContainer::iterator biEnd = bodies->end();
+		for( ; bi!=biEnd ; ++bi)
 		{
-			shared_ptr<Body>& b = rootBody->bodies->getCurrent();
+
+			shared_ptr<Body> b = *bi;
 			if(b->geometricalModel)
 			{
 				glPushMatrix();
@@ -373,7 +379,8 @@ void OpenGLRenderingEngine::renderGeometricalModel(const shared_ptr<MetaBody>& r
 				glPopMatrix();
 			}
 		}
-		
+	}
+	
 	if(rootBody->geometricalModel)
 		geometricalModelDispatcher(rootBody->geometricalModel,rootBody->physicalParameters,drawWireFrame);
 }
@@ -383,10 +390,12 @@ void OpenGLRenderingEngine::renderGeometricalModel(const shared_ptr<MetaBody>& r
 
 void OpenGLRenderingEngine::renderBoundingVolume(const shared_ptr<MetaBody>& rootBody)
 {	
-	for( rootBody->bodies->gotoFirst() ; rootBody->bodies->notAtEnd() ; rootBody->bodies->gotoNext() )
-	{	
+	BodyContainer::iterator bi    = rootBody->bodies->begin();
+	BodyContainer::iterator biEnd = rootBody->bodies->end();
+	for( ; bi!=biEnd ; ++bi)
+	{
+		shared_ptr<Body> b = *bi;
 		glPushMatrix();
-		shared_ptr<Body>& b = rootBody->bodies->getCurrent();
 		if(b->boundingVolume)
 			boundingVolumeDispatcher(b->boundingVolume);
 		glPopMatrix();
@@ -404,9 +413,11 @@ void OpenGLRenderingEngine::renderBoundingVolume(const shared_ptr<MetaBody>& roo
 
 void OpenGLRenderingEngine::renderInteractionGeometry(const shared_ptr<MetaBody>& rootBody)
 {
-	for( rootBody->bodies->gotoFirst() ; rootBody->bodies->notAtEnd() ; rootBody->bodies->gotoNext() )
-	{	
-		shared_ptr<Body>& b = rootBody->bodies->getCurrent();
+	BodyContainer::iterator bi    = rootBody->bodies->begin();
+	BodyContainer::iterator biEnd = rootBody->bodies->end();
+	for( ; bi!=biEnd ; ++bi)
+	{
+		shared_ptr<Body> b = *bi;
 		glPushMatrix();
 		Se3r& se3 = b->physicalParameters->se3;
 		Real angle;

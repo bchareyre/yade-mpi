@@ -56,9 +56,11 @@ void InteractionGeometryMetaEngine::action(Body* body)
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	
 	shared_ptr<InteractionContainer>& persistentInteractions = ncb->persistentInteractions;
-	for( persistentInteractions->gotoFirstPotential() ; persistentInteractions->notAtEndPotential() ; persistentInteractions->gotoNextPotential())
+	InteractionContainer::iterator ii    = persistentInteractions->begin();
+	InteractionContainer::iterator iiEnd = persistentInteractions->end(); 
+	for( ; ii!=iiEnd ; ++ii)
 	{
-		const shared_ptr<Interaction>& interaction = persistentInteractions->getCurrent();
+		const shared_ptr<Interaction> interaction = *ii;
 		
 		shared_ptr<Body>& b1 = (*bodies)[interaction->getId1()];
 		shared_ptr<Body>& b2 = (*bodies)[interaction->getId2()];
@@ -67,9 +69,11 @@ void InteractionGeometryMetaEngine::action(Body* body)
 	}
 	
 	shared_ptr<InteractionContainer>& volatileInteractions = ncb->volatileInteractions;
-	for( volatileInteractions->gotoFirstPotential() ; volatileInteractions->notAtEndPotential() ; volatileInteractions->gotoNextPotential())
+	ii    = volatileInteractions->begin();
+	iiEnd = volatileInteractions->end(); 
+	for(  ; ii!=iiEnd ; ++ii)
 	{
-		const shared_ptr<Interaction>& interaction = volatileInteractions->getCurrent();
+		const shared_ptr<Interaction> interaction = *ii;
 		
 		shared_ptr<Body>& b1 = (*bodies)[interaction->getId1()];
 		shared_ptr<Body>& b2 = (*bodies)[interaction->getId2()];
@@ -78,8 +82,6 @@ void InteractionGeometryMetaEngine::action(Body* body)
 
 		// FIXME put this inside VolatileInteractionCriterion dynlib
 			( persistentInteractions->find(interaction->getId1(),interaction->getId2()) == 0 )
-
-			
 		 	&&
 			operator()( b1->interactionGeometry , b2->interactionGeometry , b1->physicalParameters->se3 , b2->physicalParameters->se3 , interaction );
 			

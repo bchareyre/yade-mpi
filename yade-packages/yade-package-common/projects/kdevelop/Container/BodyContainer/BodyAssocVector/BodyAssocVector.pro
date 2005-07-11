@@ -3,15 +3,17 @@
 # Subdir relative project main directory: ./Container/BodyContainer/BodyAssocVector
 # Target is a library:  
 
-LIBS += -rdynamic 
+HEADERS += BodyAssocVector.hpp \
+           BodyAssocVectorIterator.hpp 
+SOURCES += BodyAssocVector.cpp \
+           BodyAssocVectorIterator.cpp 
+LIBS += -rdynamic
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
-                          -pthread 
+-pthread
 QMAKE_CXXFLAGS_DEBUG += -lpthread \
-                        -pthread 
-DESTDIR = ../../../../../bin 
+-pthread
+DESTDIR = ../../../../../bin
 CONFIG += debug \
-          warn_on \
-          dll 
-TEMPLATE = lib 
-HEADERS += BodyAssocVector.hpp 
-SOURCES += BodyAssocVector.cpp 
+warn_on \
+dll
+TEMPLATE = lib

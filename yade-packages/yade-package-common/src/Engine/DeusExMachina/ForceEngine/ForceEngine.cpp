@@ -57,9 +57,11 @@ void ForceEngine::applyCondition(Body* body)
 	MetaBody * ncb = dynamic_cast<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	
-	for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext() )
+	BodyContainer::iterator bi    = bodies->begin();
+	BodyContainer::iterator biEnd = bodies->end();
+	for( ; bi!=biEnd ; ++bi )
 	{
-		shared_ptr<Body>& b = bodies->getCurrent();
+		shared_ptr<Body> b = *bi;
 		static_cast<Force*>( ncb->actionParameters->find( b->getId() , actionParameterForce->getClassIndex() ).get() )->force += force;
         }
 }

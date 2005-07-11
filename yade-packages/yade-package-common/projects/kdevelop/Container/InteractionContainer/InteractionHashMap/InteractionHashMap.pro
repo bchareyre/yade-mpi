@@ -3,15 +3,17 @@
 # Subdir relative project main directory: ./Container/InteractionContainer/InteractionHashMap
 # Target is a library:  
 
-LIBS += -rdynamic 
+HEADERS += InteractionHashMap.hpp \
+           InteractionHashMapIterator.hpp 
+SOURCES += InteractionHashMap.cpp \
+           InteractionHashMapIterator.cpp 
+LIBS += -rdynamic
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
-                          -pthread 
+-pthread
 QMAKE_CXXFLAGS_DEBUG += -lpthread \
-                        -pthread 
-DESTDIR = ../../../../../bin 
+-pthread
+DESTDIR = ../../../../../bin
 CONFIG += debug \
-          warn_on \
-          dll 
-TEMPLATE = lib 
-HEADERS += InteractionHashMap.hpp 
-SOURCES += InteractionHashMap.cpp 
+warn_on \
+dll
+TEMPLATE = lib

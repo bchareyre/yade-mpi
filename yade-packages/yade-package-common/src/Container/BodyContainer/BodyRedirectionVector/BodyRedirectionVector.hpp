@@ -51,10 +51,10 @@ class BodyRedirectionVector : public BodyContainer
 {
 	private	: std::vector< shared_ptr<Body> > bodies;
 	private	: std::vector< long int > indexes;
-	private	: std::vector< shared_ptr<Body> >::iterator vii;
-	private	: std::vector< shared_ptr<Body> >::iterator temporaryVii;
-	private	: std::vector< shared_ptr<Body> >::iterator viiEnd;
-	private	: std::list< std::vector< shared_ptr<Body> >::iterator > iteratorList;
+//	private	: std::vector< shared_ptr<Body> >::iterator vii;
+//	private	: std::vector< shared_ptr<Body> >::iterator temporaryVii;
+//	private	: std::vector< shared_ptr<Body> >::iterator viiEnd;
+//	private	: std::list< std::vector< shared_ptr<Body> >::iterator > iteratorList;
 
 	public	: BodyRedirectionVector();
 	public	: virtual ~BodyRedirectionVector();
@@ -66,13 +66,17 @@ class BodyRedirectionVector : public BodyContainer
 	public	: virtual bool find(unsigned int , shared_ptr<Body>&) const;
 	public	: virtual shared_ptr<Body>& operator[](unsigned int);
 	public	: virtual const shared_ptr<Body>& operator[](unsigned int) const;
-	public	: virtual void pushIterator();
-	public	: virtual void popIterator();
 
-	public	: virtual void gotoFirst();
-	public	: virtual bool notAtEnd();
-	public	: virtual void gotoNext();
-	public	: virtual shared_ptr<Body>& getCurrent();
+//	public	: virtual void pushIterator();
+//	public	: virtual void popIterator();
+//	public	: virtual void gotoFirst();
+//	public	: virtual bool notAtEnd();
+//	public	: virtual void gotoNext();
+//	public	: virtual shared_ptr<Body>& getCurrent();
+
+	public    : virtual BodyContainer::iterator begin();
+        public    : virtual BodyContainer::iterator end();
+
 
 	public	: virtual unsigned int size();
 

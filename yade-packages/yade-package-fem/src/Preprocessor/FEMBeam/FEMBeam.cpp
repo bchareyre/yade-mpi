@@ -263,12 +263,14 @@ void FEMBeam::imposeTranslation(shared_ptr<MetaBody>& rootBody, Vector3r min, Ve
 	
 	rootBody->actors.push_back(translationCondition);
 	translationCondition->subscribedBodies.clear();
-	
-	for(rootBody->bodies->gotoFirst() ; rootBody->bodies->notAtEnd() ; rootBody->bodies->gotoNext() )
+	BodyContainer::iterator bi    = rootBody->bodies->begin();
+	BodyContainer::iterator biEnd = rootBody->bodies->end();
+	for(  ; bi!=biEnd ; ++bi )
 	{
-		if( rootBody->bodies->getCurrent()->getGroupMask() & nodeGroupMask )
+		shared_ptr<Body> b = *bi;
+		if( b->getGroupMask() & nodeGroupMask )
 		{
-			Vector3r pos = rootBody->bodies->getCurrent()->physicalParameters->se3.position;
+			Vector3r pos = b->physicalParameters->se3.position;
 			if(        pos[0] > min[0] 
 				&& pos[1] > min[1] 
 				&& pos[2] > min[2] 
@@ -276,9 +278,9 @@ void FEMBeam::imposeTranslation(shared_ptr<MetaBody>& rootBody, Vector3r min, Ve
 				&& pos[1] < max[1] 
 				&& pos[2] < max[2] )
 			{
-				rootBody->bodies->getCurrent()->isDynamic = false;
-				rootBody->bodies->getCurrent()->geometricalModel->diffuseColor = Vector3r(1,0,0);
-				translationCondition->subscribedBodies.push_back(rootBody->bodies->getCurrent()->getId());
+				b->isDynamic = false;
+				b->geometricalModel->diffuseColor = Vector3r(1,0,0);
+				translationCondition->subscribedBodies.push_back(b->getId());
 			}
 		}
 	}

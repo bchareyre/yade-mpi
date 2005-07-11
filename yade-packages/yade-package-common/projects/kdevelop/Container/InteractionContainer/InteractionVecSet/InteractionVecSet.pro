@@ -3,15 +3,17 @@
 # Subdir relative project main directory: ./Container/InteractionContainer/InteractionVecSet
 # Target is a library:  
 
-LIBS += -rdynamic 
+HEADERS += InteractionVecSet.hpp \
+           InteractionVecSetIterator.hpp 
+SOURCES += InteractionVecSet.cpp \
+           InteractionVecSetIterator.cpp 
+LIBS += -rdynamic
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
-                          -pthread 
+-pthread
 QMAKE_CXXFLAGS_DEBUG += -lpthread \
-                        -pthread 
-DESTDIR = ../../../../../bin 
+-pthread
+DESTDIR = ../../../../../bin
 CONFIG += debug \
-          warn_on \
-          dll 
-TEMPLATE = lib 
-HEADERS += InteractionVecSet.hpp 
-SOURCES += InteractionVecSet.cpp 
+warn_on \
+dll
+TEMPLATE = lib

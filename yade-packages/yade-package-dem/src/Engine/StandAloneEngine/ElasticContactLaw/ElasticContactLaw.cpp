@@ -72,89 +72,94 @@ void ElasticContactLaw::calculateForces(Body* body)
 /// Non Permanents Links												///
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	for( ncb->volatileInteractions->gotoFirst() ; ncb->volatileInteractions->notAtEnd() ; ncb->volatileInteractions->gotoNext() )
+	InteractionContainer::iterator ii    = ncb->volatileInteractions->begin();
+	InteractionContainer::iterator iiEnd = ncb->volatileInteractions->end();
+	for(  ; ii!=iiEnd ; ++ii )
 	{
-		const shared_ptr<Interaction>& contact = ncb->volatileInteractions->getCurrent();
-		int id1 = contact->getId1();
-		int id2 = contact->getId2();
-		
-		if( !( (*bodies)[id1]->getGroupMask() & (*bodies)[id2]->getGroupMask() & sdecGroupMask)  )
-			continue; // skip other groups, BTW: this is example of a good usage of 'continue' keyword
-
-		BodyMacroParameters* de1 				= dynamic_cast<BodyMacroParameters*>((*bodies)[id1]->physicalParameters.get());
-		BodyMacroParameters* de2 				= dynamic_cast<BodyMacroParameters*>((*bodies)[id2]->physicalParameters.get());
-		MacroMicroContactGeometry* currentContactGeometry 	= dynamic_cast<MacroMicroContactGeometry*>(contact->interactionGeometry.get());
-		ElasticContactParameters* currentContactPhysics   	= dynamic_cast<ElasticContactParameters*> (contact->interactionPhysics.get());
-		
-		Vector3r& shearForce 			= currentContactPhysics->shearForce;
-
-		if ( contact->isNew)
-			shearForce			= Vector3r(0,0,0);
-				
-		Real un 				= currentContactGeometry->penetrationDepth;
-		currentContactPhysics->normalForce	= currentContactPhysics->kn*un*currentContactGeometry->normal;
-
-		Vector3r axis;
-		Real angle;
-
-////////////////////////////////////////////////////////////
-/// Here is the code with approximated rotations 	 ///
-////////////////////////////////////////////////////////////
-		
-		axis	 		= currentContactPhysics->prevNormal.cross(currentContactGeometry->normal);
-		shearForce 	       -= shearForce.cross(axis);
-		angle 			= dt*0.5*currentContactGeometry->normal.dot(de1->angularVelocity+de2->angularVelocity);
-		axis 			= angle*currentContactGeometry->normal;
-		shearForce 	       -= shearForce.cross(axis);
-	
-////////////////////////////////////////////////////////////
-/// Here is the code with exact rotations 		 ///
-////////////////////////////////////////////////////////////
-
-// 		Quaternionr q;
-//
-// 		axis					= currentContactPhysics->prevNormal.cross(currentContactGeometry->normal);
-// 		angle					= acos(currentContactGeometry->normal.dot(currentContactPhysics->prevNormal));
-// 		q.fromAngleAxis(angle,axis);
-//
-// 		currentContactPhysics->shearForce	= currentContactPhysics->shearForce*q;
-//
-// 		angle					= dt*0.5*currentContactGeometry->normal.dot(de1->angularVelocity+de2->angularVelocity);
-// 		axis					= currentContactGeometry->normal;
-// 		q.fromAngleAxis(angle,axis);
-// 		currentContactPhysics->shearForce	= q*currentContactPhysics->shearForce;
-
-////////////////////////////////////////////////////////////
-/// 							 ///
-////////////////////////////////////////////////////////////
-
-		Vector3r x				= currentContactGeometry->contactPoint;
-		Vector3r c1x				= (x - de1->se3.position);
-		Vector3r c2x				= (x - de2->se3.position);
-		Vector3r relativeVelocity		= (de2->velocity+de2->angularVelocity.cross(c2x)) - (de1->velocity+de1->angularVelocity.cross(c1x));
-		Vector3r shearVelocity			= relativeVelocity-currentContactGeometry->normal.dot(relativeVelocity)*currentContactGeometry->normal;
-		Vector3r shearDisplacement		= shearVelocity*dt;
-		shearForce 			       -= currentContactPhysics->ks*shearDisplacement;
-
-// PFC3d SlipModel, is using friction angle. CoulombCriterion
-		Real maxFs = currentContactPhysics->normalForce.squaredLength() * std::pow(currentContactPhysics->tangensOfFrictionAngle,2);
-		if( shearForce.squaredLength() > maxFs )
+		if ((*ii)->isReal)
 		{
-			maxFs = Mathr::sqRoot(maxFs) / shearForce.length();
-			shearForce *= maxFs;
+			const shared_ptr<Interaction>& contact = *ii;
+			int id1 = contact->getId1();
+			int id2 = contact->getId2();
+			
+			if( !( (*bodies)[id1]->getGroupMask() & (*bodies)[id2]->getGroupMask() & sdecGroupMask)  )
+				continue; // skip other groups, BTW: this is example of a good usage of 'continue' keyword
+	
+			BodyMacroParameters* de1 				= dynamic_cast<BodyMacroParameters*>((*bodies)[id1]->physicalParameters.get());
+			BodyMacroParameters* de2 				= dynamic_cast<BodyMacroParameters*>((*bodies)[id2]->physicalParameters.get());
+			MacroMicroContactGeometry* currentContactGeometry 	= dynamic_cast<MacroMicroContactGeometry*>(contact->interactionGeometry.get());
+			ElasticContactParameters* currentContactPhysics   	= dynamic_cast<ElasticContactParameters*> (contact->interactionPhysics.get());
+			
+			Vector3r& shearForce 			= currentContactPhysics->shearForce;
+	
+			if ( contact->isNew)
+				shearForce			= Vector3r(0,0,0);
+					
+			Real un 				= currentContactGeometry->penetrationDepth;
+			currentContactPhysics->normalForce	= currentContactPhysics->kn*un*currentContactGeometry->normal;
+	
+			Vector3r axis;
+			Real angle;
+	
+	////////////////////////////////////////////////////////////
+	/// Here is the code with approximated rotations 	 ///
+	////////////////////////////////////////////////////////////
+			
+			axis	 		= currentContactPhysics->prevNormal.cross(currentContactGeometry->normal);
+			shearForce 	       -= shearForce.cross(axis);
+			angle 			= dt*0.5*currentContactGeometry->normal.dot(de1->angularVelocity+de2->angularVelocity);
+			axis 			= angle*currentContactGeometry->normal;
+			shearForce 	       -= shearForce.cross(axis);
+		
+	////////////////////////////////////////////////////////////
+	/// Here is the code with exact rotations 		 ///
+	////////////////////////////////////////////////////////////
+	
+	// 		Quaternionr q;
+	//
+	// 		axis					= currentContactPhysics->prevNormal.cross(currentContactGeometry->normal);
+	// 		angle					= acos(currentContactGeometry->normal.dot(currentContactPhysics->prevNormal));
+	// 		q.fromAngleAxis(angle,axis);
+	//
+	// 		currentContactPhysics->shearForce	= currentContactPhysics->shearForce*q;
+	//
+	// 		angle					= dt*0.5*currentContactGeometry->normal.dot(de1->angularVelocity+de2->angularVelocity);
+	// 		axis					= currentContactGeometry->normal;
+	// 		q.fromAngleAxis(angle,axis);
+	// 		currentContactPhysics->shearForce	= q*currentContactPhysics->shearForce;
+	
+	////////////////////////////////////////////////////////////
+	/// 							 ///
+	////////////////////////////////////////////////////////////
+	
+			Vector3r x				= currentContactGeometry->contactPoint;
+			Vector3r c1x				= (x - de1->se3.position);
+			Vector3r c2x				= (x - de2->se3.position);
+			Vector3r relativeVelocity		= (de2->velocity+de2->angularVelocity.cross(c2x)) - (de1->velocity+de1->angularVelocity.cross(c1x));
+			Vector3r shearVelocity			= relativeVelocity-currentContactGeometry->normal.dot(relativeVelocity)*currentContactGeometry->normal;
+			Vector3r shearDisplacement		= shearVelocity*dt;
+			shearForce 			       -= currentContactPhysics->ks*shearDisplacement;
+	
+	// PFC3d SlipModel, is using friction angle. CoulombCriterion
+			Real maxFs = currentContactPhysics->normalForce.squaredLength() * std::pow(currentContactPhysics->tangensOfFrictionAngle,2);
+			if( shearForce.squaredLength() > maxFs )
+			{
+				maxFs = Mathr::sqRoot(maxFs) / shearForce.length();
+				shearForce *= maxFs;
+			}
+	////////// PFC3d SlipModel
+	
+			Vector3r f				= currentContactPhysics->normalForce + shearForce;
+			
+	// it will be some macro(	body->actionParameters,	ActionType , bodyId )
+			static_cast<Force*>   ( ncb->actionParameters->find( id1 , actionForce   ->getClassIndex() ).get() )->force    -= f;
+			static_cast<Force*>   ( ncb->actionParameters->find( id2 , actionForce   ->getClassIndex() ).get() )->force    += f;
+			
+			static_cast<Momentum*>( ncb->actionParameters->find( id1 , actionMomentum->getClassIndex() ).get() )->momentum -= c1x.cross(f);
+			static_cast<Momentum*>( ncb->actionParameters->find( id2 , actionMomentum->getClassIndex() ).get() )->momentum += c2x.cross(f);
+			
+			currentContactPhysics->prevNormal = currentContactGeometry->normal;
 		}
-////////// PFC3d SlipModel
-
-		Vector3r f				= currentContactPhysics->normalForce + shearForce;
-		
-// it will be some macro(	body->actionParameters,	ActionType , bodyId )
-		static_cast<Force*>   ( ncb->actionParameters->find( id1 , actionForce   ->getClassIndex() ).get() )->force    -= f;
-		static_cast<Force*>   ( ncb->actionParameters->find( id2 , actionForce   ->getClassIndex() ).get() )->force    += f;
-		
-		static_cast<Momentum*>( ncb->actionParameters->find( id1 , actionMomentum->getClassIndex() ).get() )->momentum -= c1x.cross(f);
-		static_cast<Momentum*>( ncb->actionParameters->find( id2 , actionMomentum->getClassIndex() ).get() )->momentum += c2x.cross(f);
-		
-		currentContactPhysics->prevNormal = currentContactGeometry->normal;
 	}
 
 }

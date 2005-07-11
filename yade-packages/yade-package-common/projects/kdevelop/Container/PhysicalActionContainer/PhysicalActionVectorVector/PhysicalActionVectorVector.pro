@@ -3,15 +3,17 @@
 # Subdir relative project main directory: ./Container/PhysicalActionContainer/PhysicalActionVectorVector
 # Target is a library:  
 
-LIBS += -rdynamic 
+HEADERS += PhysicalActionVectorVector.hpp \
+           PhysicalActionVectorVectorIterator.hpp 
+SOURCES += PhysicalActionVectorVector.cpp \
+           PhysicalActionVectorVectorIterator.cpp 
+LIBS += -rdynamic
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
-                          -pthread 
+-pthread
 QMAKE_CXXFLAGS_DEBUG += -lpthread \
-                        -pthread 
-DESTDIR = ../../../../../bin 
+-pthread
+DESTDIR = ../../../../../bin
 CONFIG += debug \
-          warn_on \
-          dll 
-TEMPLATE = lib 
-HEADERS += PhysicalActionVectorVector.hpp 
-SOURCES += PhysicalActionVectorVector.cpp 
+warn_on \
+dll
+TEMPLATE = lib

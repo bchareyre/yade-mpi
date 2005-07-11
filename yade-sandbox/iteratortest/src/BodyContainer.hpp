@@ -39,8 +39,8 @@ class BodyContainer
 	public : BodyContainer() {};
 	public : virtual ~BodyContainer() {};	
 	
-	public : virtual BodyIteratorPointer begin() { throw;} ;
-	public : virtual BodyIteratorPointer end() { throw;} ;	
+	public : virtual BodyContainer::iterator begin() { throw;} ;
+	public : virtual BodyContainer::iterator end() { throw;} ;	
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////

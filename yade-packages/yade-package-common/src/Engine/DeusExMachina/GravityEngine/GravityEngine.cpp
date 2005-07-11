@@ -60,9 +60,11 @@ void GravityEngine::applyCondition(Body* body)
 	MetaBody * ncb = dynamic_cast<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	
-	for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext() )
+	BodyContainer::iterator bi    = bodies->begin();
+	BodyContainer::iterator biEnd = bodies->end();
+	for( ; bi!=biEnd ; ++bi )
 	{
-		shared_ptr<Body>& b = bodies->getCurrent();
+		shared_ptr<Body> b = *bi;
 		ParticleParameters* p = dynamic_cast<ParticleParameters*>(b->physicalParameters.get());
 		if(p)
 			static_cast<Force*>( ncb->actionParameters->find( b->getId() , actionParameterForce->getClassIndex() ).get() )

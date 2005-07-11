@@ -76,7 +76,7 @@
       <directoryradio>executable</directoryradio>
     </run>
     <general>
-      <activedir>PreProcessor/HangingCloth</activedir>
+      <activedir>PostProcessor</activedir>
     </general>
     <subclassing/>
   </kdevtrollproject>

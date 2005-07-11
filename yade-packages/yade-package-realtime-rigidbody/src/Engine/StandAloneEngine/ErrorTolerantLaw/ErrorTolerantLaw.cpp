@@ -92,9 +92,12 @@ void ErrorTolerantLaw::calculateForces(Body* body)
 		unsigned int i=0;
 // FIXME - this loop assumes that id's of all bodies start from zero and increment by one?
 //		for(unsigned int i=0;i<bodies->size();i++)
-		for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext() , ++i )
+
+		BodyContainer::iterator bi    = bodies->begin();
+		BodyContainer::iterator biEnd = bodies->end();
+		for(  ; bi!=biEnd ; ++bi,++i )
 		{
-			b = bodies->getCurrent();
+			b = *bi;
 
 			int offset = 6*i;
 			shared_ptr<RigidBodyParameters> rb = dynamic_pointer_cast<RigidBodyParameters>(b);
@@ -123,59 +126,61 @@ void ErrorTolerantLaw::calculateForces(Body* body)
 
 		shared_ptr<Interaction> contact;
 		i=0;
-//		list<shared_ptr<Interaction> >::const_iterator cti = ncb->volatileInteractions.begin();
-//		list<shared_ptr<Interaction> >::const_iterator ctiEnd = ncb->volatileInteractions.end();
-//		for(int i=0 ; cti!=ctiEnd ; ++cti,i++)
-		for( ncb->volatileInteractions->gotoFirst() ; ncb->volatileInteractions->notAtEnd() ; ncb->volatileInteractions->gotoNext() )
+
+		InteractionContainer::iterator ii = ncb->volatileInteractions->begin();
+		InteractionContainer::iterator iiEnd = ncb->volatileInteractions->end();
+		for( ; ii!=iiEnd; ++ii )
 		{
-			contact = ncb->volatileInteractions->getCurrent();
+			contact = *ii;
+			if (contact->isReal)
+			{
 
-			shared_ptr<ErrorTolerantContactModel> cm = dynamic_pointer_cast<ErrorTolerantContactModel>(contact->interactionGeometry);
-
-			id1 		= contact->getId1();
-			id2 		= contact->getId2();
-			o1p1 		= cm->o1p1;
-			o2p2 		= cm->o2p2;
-			n 		= cm->normal;
-			o1p1CrossN 	= o1p1.cross(n);
-			o2p2CrossN 	= o2p2.cross(n);
-
-			offset1		= 6*id1;
-			offset2		= 6*id2;
-
-			J(offset1++,i)	= n[0];
-			J(offset1++,i)	= n[1];
-			J(offset1++,i)	= n[2];
-			J(offset1++,i)	= o1p1CrossN[0];
-			J(offset1++,i)	= o1p1CrossN[1];
-			J(offset1,i)	= o1p1CrossN[2];
-			J(offset2++,i)	= -n[0];
-			J(offset2++,i)	= -n[1];
-			J(offset2++,i)	= -n[2];
-			J(offset2++,i)	= -o2p2CrossN[0];
-			J(offset2++,i)	= -o2p2CrossN[1];
-			J(offset2,i)	= -o2p2CrossN[2];
-
-			offset1		= 6*id1;
-			offset2		= 6*id2;
-
-			Jt(i,offset1++)	= n[0];
-			Jt(i,offset1++)	= n[1];
-			Jt(i,offset1++)	= n[2];
-			Jt(i,offset1++)	= o1p1CrossN[0];
-			Jt(i,offset1++)	= o1p1CrossN[1];
-			Jt(i,offset1)	= o1p1CrossN[2];
-			Jt(i,offset2++)	= -n[0];
-			Jt(i,offset2++)	= -n[1];
-			Jt(i,offset2++)	= -n[2];
-			Jt(i,offset2++)	= -o2p2CrossN[0];
-			Jt(i,offset2++)	= -o2p2CrossN[1];
-			Jt(i,offset2)	= -o2p2CrossN[2];
-
-			penetrationDepthes[i] = (cm->closestPoints[0].first-cm->closestPoints[0].second).length();
-
-			//penetrationVelocities[i] = ( ((*bodies)[id1]->velocity+o1p1.cross((*bodies)[id1]->angularVelocity)) - ((*bodies)[id2]->velocity+o2p2.cross((*bodies)[id2]->angularVelocity)) ).dot(n);
-
+				shared_ptr<ErrorTolerantContactModel> cm = dynamic_pointer_cast<ErrorTolerantContactModel>(contact->interactionGeometry);
+	
+				id1 		= contact->getId1();
+				id2 		= contact->getId2();
+				o1p1 		= cm->o1p1;
+				o2p2 		= cm->o2p2;
+				n 		= cm->normal;
+				o1p1CrossN 	= o1p1.cross(n);
+				o2p2CrossN 	= o2p2.cross(n);
+	
+				offset1		= 6*id1;
+				offset2		= 6*id2;
+	
+				J(offset1++,i)	= n[0];
+				J(offset1++,i)	= n[1];
+				J(offset1++,i)	= n[2];
+				J(offset1++,i)	= o1p1CrossN[0];
+				J(offset1++,i)	= o1p1CrossN[1];
+				J(offset1,i)	= o1p1CrossN[2];
+				J(offset2++,i)	= -n[0];
+				J(offset2++,i)	= -n[1];
+				J(offset2++,i)	= -n[2];
+				J(offset2++,i)	= -o2p2CrossN[0];
+				J(offset2++,i)	= -o2p2CrossN[1];
+				J(offset2,i)	= -o2p2CrossN[2];
+	
+				offset1		= 6*id1;
+				offset2		= 6*id2;
+	
+				Jt(i,offset1++)	= n[0];
+				Jt(i,offset1++)	= n[1];
+				Jt(i,offset1++)	= n[2];
+				Jt(i,offset1++)	= o1p1CrossN[0];
+				Jt(i,offset1++)	= o1p1CrossN[1];
+				Jt(i,offset1)	= o1p1CrossN[2];
+				Jt(i,offset2++)	= -n[0];
+				Jt(i,offset2++)	= -n[1];
+				Jt(i,offset2++)	= -n[2];
+				Jt(i,offset2++)	= -o2p2CrossN[0];
+				Jt(i,offset2++)	= -o2p2CrossN[1];
+				Jt(i,offset2)	= -o2p2CrossN[2];
+	
+				penetrationDepthes[i] = (cm->closestPoints[0].first-cm->closestPoints[0].second).length();
+	
+				//penetrationVelocities[i] = ( ((*bodies)[id1]->velocity+o1p1.cross((*bodies)[id1]->angularVelocity)) - ((*bodies)[id2]->velocity+o2p2.cross((*bodies)[id2]->angularVelocity)) ).dot(n);
+			}
 		}
 
 		ublas::vector<float> impulses;
@@ -193,9 +198,11 @@ void ErrorTolerantLaw::calculateForces(Body* body)
 	unsigned int i=0;
 // FIXME - this loop assumes that id's of all bodies start from zero and increment by one?
 //	for(unsigned int i=0; i < bodies->size(); i++)
-	for( bodies->gotoFirst() ; bodies->notAtEnd() ; bodies->gotoNext() , ++i )
+	BodyContainer::iterator bi    = bodies->begin();
+	BodyContainer::iterator biEnd = bodies->end();
+	for(  ; bi!=biEnd ; ++bi,++i )
 	{
-		b = bodies->getCurrent();
+		b = *bi;
 
 
 		shared_ptr<RigidBodyParameters> rb = dynamic_pointer_cast<RigidBodyParameters>(b);

@@ -141,16 +141,18 @@ string LatticeExample::generate()
 			
 	BodyRedirectionVector bc;
 	bc.clear();
-	
-	for( rootBody->bodies->gotoFirst(); rootBody->bodies->notAtEnd() ; rootBody->bodies->gotoNext() )
+
+	BodyContainer::iterator bi    = rootBody->bodies->begin();
+	BodyContainer::iterator bi2;
+	BodyContainer::iterator biEnd = rootBody->bodies->end();
+	for(  ; bi!=biEnd ; ++bi )  // loop over all beams
 	{
-		shared_ptr<Body>& bodyA = rootBody->bodies->getCurrent();
+		shared_ptr<Body> bodyA = *bi;
+	
 		cerr << "creating beams: " << bodyA->getId() << endl;
-		rootBody->bodies->pushIterator();
-		rootBody->bodies->gotoNext();
-		for( ; rootBody->bodies->notAtEnd() ; rootBody->bodies->gotoNext() )
+		for((bi2=bi)++ ; bi2!=biEnd ; ++bi2 )
 		{
-			shared_ptr<Body>& bodyB = rootBody->bodies->getCurrent();
+			shared_ptr<Body> bodyB = *bi2;
 			shared_ptr<LatticeNodeParameters> a = dynamic_pointer_cast<LatticeNodeParameters>(bodyA->physicalParameters);
 			shared_ptr<LatticeNodeParameters> b = dynamic_pointer_cast<LatticeNodeParameters>(bodyB->physicalParameters);
 
@@ -161,12 +163,15 @@ string LatticeExample::generate()
 				bc.insert(beam);
 			}
 		}
-		rootBody->bodies->popIterator();
 	}
 
-	
-	for( bc.gotoFirst(); bc.notAtEnd() ; bc.gotoNext() )
-		rootBody->bodies->insert(bc.getCurrent());
+	bi    = bc.begin();
+	biEnd = bc.end();
+	for(  ; bi!=biEnd ; ++bi )  // loop over all beams
+	{
+		shared_ptr<Body> b = *bi;
+		rootBody->bodies->insert(b);
+	}
 	
 	cerr<< "calcBeamsPositionOrientationLength\n";
 	calcBeamsPositionOrientationLength(rootBody);
@@ -255,9 +260,11 @@ void LatticeExample::createBeam(shared_ptr<Body>& body, unsigned int i, unsigned
 
 void LatticeExample::calcBeamsPositionOrientationLength(shared_ptr<MetaBody>& body)
 {
-	for( rootBody->bodies->gotoFirst(); rootBody->bodies->notAtEnd() ; rootBody->bodies->gotoNext() )
+	BodyContainer::iterator bi    = body->bodies->begin();
+	BodyContainer::iterator biEnd = body->bodies->end();
+	for(  ; bi!=biEnd ; ++bi )  // loop over all beams
 	{
-		shared_ptr<Body>& body = rootBody->bodies->getCurrent();
+		shared_ptr<Body> body = *bi;
 		if( body->getGroupMask() & beamGroupMask )
 		{
 			cerr << "calcBeamsPositionOrientationLength: " << body->getId() << endl;
@@ -369,23 +376,27 @@ void LatticeExample::imposeTranslation(shared_ptr<MetaBody>& rootBody, Vector3r 
 	rootBody->actors.push_back(translationCondition);
 	translationCondition->subscribedBodies.clear();
 	
-	for(rootBody->bodies->gotoFirst() ; rootBody->bodies->notAtEnd() ; rootBody->bodies->gotoNext() )
+	BodyContainer::iterator bi    = rootBody->bodies->begin();
+	BodyContainer::iterator biEnd = rootBody->bodies->end();
+	for(  ; bi!=biEnd ; ++bi )
 	{
-		if( rootBody->bodies->getCurrent()->getGroupMask() & nodeGroupMask )
+		shared_ptr<Body> b = *bi;
+	
+		if( b->getGroupMask() & nodeGroupMask )
 		{
-			Vector3r pos = rootBody->bodies->getCurrent()->physicalParameters->se3.position;
+			Vector3r pos = b->physicalParameters->se3.position;
 			if(        pos[0] > min[0] 
 				&& pos[1] > min[1] 
 				&& pos[2] > min[2] 
 				&& pos[0] < max[0] 
 				&& pos[1] < max[1] 
 				&& pos[2] < max[2] 
-				&& (rootBody->bodies->getCurrent()->getGroupMask() & nodeGroupMask)
+				&& (b->getGroupMask() & nodeGroupMask)
 				)
 			{
-				rootBody->bodies->getCurrent()->isDynamic = false;
-				rootBody->bodies->getCurrent()->geometricalModel->diffuseColor = Vector3r(1,0,0);
-				translationCondition->subscribedBodies.push_back(rootBody->bodies->getCurrent()->getId());
+				b->isDynamic = false;
+				b->geometricalModel->diffuseColor = Vector3r(1,0,0);
+				translationCondition->subscribedBodies.push_back(b->getId());
 			}
 		}
 	}

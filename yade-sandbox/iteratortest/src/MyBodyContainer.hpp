@@ -44,8 +44,8 @@ class MyBodyContainer : public BodyContainer
 	public  : MyBodyContainer();
 	public  : virtual ~MyBodyContainer();
 
-	public : virtual BodyIteratorPointer begin();
-	public : virtual BodyIteratorPointer end();
+	public : virtual BodyContainer::iterator begin();
+	public : virtual BodyContainer::iterator end();
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
