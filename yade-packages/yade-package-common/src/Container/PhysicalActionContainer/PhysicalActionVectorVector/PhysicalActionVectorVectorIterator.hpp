@@ -48,6 +48,7 @@ class PhysicalActionVectorVectorIterator : public PhysicalActionContainerIterato
 	public	  : vector< vector< shared_ptr<PhysicalAction> > >::iterator vviEnd;
 	public	  :         vector< shared_ptr<PhysicalAction> >  ::iterator vi;
 	public	  :         vector< shared_ptr<PhysicalAction> >  ::iterator viEnd;
+ 	public    : vector< bool > * usedIds;
 
 	public : PhysicalActionVectorVectorIterator();
 	public : ~PhysicalActionVectorVectorIterator();

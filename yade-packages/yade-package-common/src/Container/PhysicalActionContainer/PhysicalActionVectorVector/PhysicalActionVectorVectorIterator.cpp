@@ -44,7 +44,11 @@ PhysicalActionVectorVectorIterator::~PhysicalActionVectorVectorIterator()
 
 bool PhysicalActionVectorVectorIterator::isDifferent(const PhysicalActionContainerIterator& i)
 {
-	return (vi != static_cast<const PhysicalActionVectorVectorIterator&>(i).vi );
+	const PhysicalActionVectorVectorIterator& it = static_cast<const PhysicalActionVectorVectorIterator&>(i);
+	if (it.vvi==it.vviEnd)
+		return !(vvi==vviEnd);
+	else
+		return (vi != it.vi );
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -57,7 +61,7 @@ void PhysicalActionVectorVectorIterator::increment()
 	{
 		++vvi;
 		++currentIndex;
-		while(vvi != vviEnd)
+		while(!(*usedIds)[currentIndex] && vvi != vviEnd)
 		{
 			++currentIndex;
 			++vvi;
@@ -80,6 +84,8 @@ void PhysicalActionVectorVectorIterator::affect(const PhysicalActionContainerIte
 	viEnd  = tmpi.viEnd;
 	vvi    = tmpi.vvi;
 	vviEnd = tmpi.vviEnd;
+	currentIndex = tmpi.currentIndex;
+	usedIds	= tmpi.usedIds;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////

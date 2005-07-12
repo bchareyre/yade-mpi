@@ -59,13 +59,13 @@ void FrictionLessElasticContactLaw::calculateForces(Body * body)
 	Real stiffness = 10000;
 	Real viscosity = 10;
 	
-		InteractionContainer::iterator ii = ncb->volatileInteractions->begin();
-		InteractionContainer::iterator iiEnd = ncb->volatileInteractions->end();
-		for( ; ii!=iiEnd; ++ii )
+	InteractionContainer::iterator ii = ncb->volatileInteractions->begin();
+	InteractionContainer::iterator iiEnd = ncb->volatileInteractions->end();
+	for( ; ii!=iiEnd; ++ii )
+	{
+		shared_ptr<Interaction> contact = *ii;
+		if (contact->isReal)
 		{
-			shared_ptr<Interaction> contact = *ii;
-			if (contact->isReal)
-			{
 			int id1 = contact->getId1();
 			int id2 = contact->getId2();
 	
@@ -101,7 +101,6 @@ void FrictionLessElasticContactLaw::calculateForces(Body * body)
 			
 				static_cast<Momentum*>( ncb->actionParameters->find( id1 , actionMomentum->getClassIndex() ).get() )->momentum += o1p.cross(f);
 				static_cast<Momentum*>( ncb->actionParameters->find( id2 , actionMomentum->getClassIndex() ).get() )->momentum -= o2p.cross(f);
-				
 			}
 		}
 	}
@@ -165,7 +164,6 @@ void FrictionLessElasticContactLaw::calculateForces(Body * body)
 // 
 // 		//currentContactPhysics->prevNormal = currentContactGeometry->normal;
 // 	}
-
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

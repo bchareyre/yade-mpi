@@ -53,13 +53,12 @@ void PhysicalActionDamper::action(Body* body)
 {
 	MetaBody * ncb = dynamic_cast<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
-
 	PhysicalActionContainer::iterator pai    = ncb->actionParameters->begin();
 	PhysicalActionContainer::iterator paiEnd = ncb->actionParameters->end();
 	for( ; pai!=paiEnd ; ++pai)
 	{
 		shared_ptr<PhysicalAction> action = *pai;
-		int id = pai.getCurrentIndex(); 
+		int id = pai.getCurrentIndex();
 		// FIXME - solve the problem of Body's id
 		operator()( action , (*bodies)[id]->physicalParameters , (*bodies)[id].get() );
 	}

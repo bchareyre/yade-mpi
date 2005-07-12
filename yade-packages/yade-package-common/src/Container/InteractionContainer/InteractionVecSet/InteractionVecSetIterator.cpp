@@ -44,7 +44,11 @@ InteractionVecSetIterator::~InteractionVecSetIterator()
 
 bool InteractionVecSetIterator::isDifferent(const InteractionContainerIterator& i)
 {
-	return (sii != static_cast<const InteractionVecSetIterator&>(i).sii );
+	const InteractionVecSetIterator& it = static_cast<const InteractionVecSetIterator&>(i);
+	if (it.vii == it.viiEnd) // we are at end of container
+		return !(vii==viiEnd);
+	else
+		return (sii != it.sii );
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////

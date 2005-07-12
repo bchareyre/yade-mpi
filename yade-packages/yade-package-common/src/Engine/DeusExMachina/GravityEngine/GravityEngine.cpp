@@ -66,9 +66,8 @@ void GravityEngine::applyCondition(Body* body)
 	{
 		shared_ptr<Body> b = *bi;
 		ParticleParameters* p = dynamic_cast<ParticleParameters*>(b->physicalParameters.get());
-		if(p)
-			static_cast<Force*>( ncb->actionParameters->find( b->getId() , actionParameterForce->getClassIndex() ).get() )
-				->force += gravity * p->mass;
+		if (p)
+			static_cast<Force*>( ncb->actionParameters->find( b->getId() , actionParameterForce->getClassIndex() ).get() )->force += gravity * p->mass;
         }
 }
 

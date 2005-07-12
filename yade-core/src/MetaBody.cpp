@@ -86,8 +86,10 @@ void MetaBody::moveToNextTimeStep()
 	vector<shared_ptr<Engine> >::iterator ai    = actors.begin();
 	vector<shared_ptr<Engine> >::iterator aiEnd = actors.end();
 	for(int i=0;ai!=aiEnd;++ai,i++)
+	{
 		if ((*ai)->isActivated())
 			(*ai)->action(this);
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

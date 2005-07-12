@@ -133,9 +133,10 @@ PhysicalActionContainer::iterator PhysicalActionVectorVector::begin()
 {
 	shared_ptr<PhysicalActionVectorVectorIterator> it(new PhysicalActionVectorVectorIterator());
 	it->currentIndex = 0;
+	it->usedIds	 = &usedIds;
 	it->vvi		 = actionParameters.begin();
 	it->vviEnd	 = actionParameters.end();
-	while(it->vvi != it->vviEnd)
+	while(it->vvi!=it->vviEnd && !usedIds[it->currentIndex])
 	{
 		++(it->currentIndex);
 		++(it->vvi);

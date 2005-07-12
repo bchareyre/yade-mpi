@@ -93,7 +93,7 @@ class PhysicalActionContainerIteratorPointer
 		return ptr->getValue();
 	};
 
-	public : virtual int getCurrentIndex()
+	public : int getCurrentIndex()
 	{
 		return ptr->getCurrentIndex();
 	};
