@@ -45,6 +45,8 @@ GLEngineEditor::GLEngineEditor(QWidget * parent, const char * name) : QGLViewer(
 
 	relation.first = -1;
 	relation.second = -1;
+	selectedEngine = -1;
+	firstEngine = -1;
 
 	updateGL();
 
@@ -70,7 +72,7 @@ void GLEngineEditor::draw()
 
 	startScreenCoordinatesSystem();
 	glDisable(GL_DEPTH_TEST);	
-	GLWindow * glw1,*glw2;
+	shared_ptr<GLWindow> glw1,glw2;
 	int x1,y1,x2,y2;
 
 	set<pair<int,int> >::iterator li = loop.begin();
@@ -110,6 +112,17 @@ void GLEngineEditor::draw()
 		glEnd();
 	}
 
+	if (selectedEngine!=-1)
+	{
+		glw1 = wm.getWindow(selectedEngine);
+		glBegin(GL_LINE_LOOP);
+			glColor3f(1.0,0.0,0.0);
+			glVertex2i(glw1->getMinX()-4,glw1->getMinY()-3);
+			glVertex2i(glw1->getMinX()+glw1->getSizeX()+3,glw1->getMinY()-3);
+			glVertex2i(glw1->getMinX()+glw1->getSizeX()+3,glw1->getMinY()+glw1->getSizeY()+4);
+			glVertex2i(glw1->getMinX()-4,glw1->getMinY()+glw1->getSizeY()+4);
+		glEnd();
+	}		
 
 	glEnable(GL_DEPTH_TEST);
 	stopScreenCoordinatesSystem();
@@ -179,6 +192,7 @@ void GLEngineEditor::mouseMoveEvent(QMouseEvent * e)
 	
 	if (wm.mouseMoveEvent(e->x(),e->y())==-1)
 		QGLViewer::mouseMoveEvent(e);
+
 	updateGL();
 }
 
@@ -194,9 +208,9 @@ void GLEngineEditor::mousePressEvent(QMouseEvent *e)
 		if (id!=-1)
 		{
 			relation.first = id;
-			relation.second = -1;			
+			relation.second = -1;
 			startRelation = true;
-			GLWindow * glw = wm.getWindow(id);
+			shared_ptr<GLWindow> glw = wm.getWindow(id);
 			startX = glw->getMinX()+glw->getSizeX()/2;
 			startY = glw->getMinY()+glw->getSizeY()/2;
 			endX = e->x();
@@ -206,16 +220,23 @@ void GLEngineEditor::mousePressEvent(QMouseEvent *e)
 		{
 			relation.first = -1;
 			relation.second = -1;
+			startRelation = false;
 		}
 	}
 	else if ((e->state() & Qt::KeyButtonMask)==Qt::ShiftButton)
-		relationSelected = selectRelation(e->x(), e->y(), 3.0, selectedRelation.first, selectedRelation.second);
+	{
+		selectedEngine = selectEngine(e->x(), e->y());
+		if (selectedEngine==-1)
+			relationSelected = selectRelation(e->x(), e->y(), 3.0, selectedRelation.first, selectedRelation.second);
+	}
 	else if (wm.mousePressEvent(e->x(),e->y())==-1)
 		QGLViewer::mousePressEvent(e);
 
 	updateGL();
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void GLEngineEditor::mouseReleaseEvent(QMouseEvent *e)
 {
@@ -239,8 +260,21 @@ void GLEngineEditor::mouseReleaseEvent(QMouseEvent *e)
 
 void GLEngineEditor::mouseDoubleClickEvent(QMouseEvent *e)
 {
-	if (wm.mouseDoubleClickEvent(e->x(),e->y())==-1)	
-		QGLViewer::mouseDoubleClickEvent(e);
+	//if (wm.mouseDoubleClickEvent(e->x(),e->y())==-1)
+	//	QGLViewer::mouseDoubleClickEvent(e);
+
+	
+	int tmp = wm.getPointedWindow(e->x(),e->y());
+	if (firstEngine!=-1)
+		wm.getWindow(firstEngine)->setBackgroundColor(savedColor[0],savedColor[1],savedColor[2]);
+	
+	firstEngine = tmp;
+	if (firstEngine!=-1)
+	{		
+		wm.getWindow(firstEngine)->getBackgroundColor(savedColor[0],savedColor[1],savedColor[2]);
+		wm.getWindow(firstEngine)->setBackgroundColor(1,1,0);
+	}
+	
 	updateGL();
 }
 
@@ -249,19 +283,32 @@ void GLEngineEditor::mouseDoubleClickEvent(QMouseEvent *e)
 
 void GLEngineEditor::keyPressEvent(QKeyEvent *e)
 {	
-	if (relationSelected && (e->key()==Qt::Key_Backspace || e->key()==Qt::Key_Delete))
+	if (e->key()==Qt::Key_Backspace || e->key()==Qt::Key_Delete)
 	{
-		int size,i;
-			i=0;
+		if (relationSelected)
+		{
 			loop.erase(selectedRelation);
-// 			size = data->belowFractures[selectedRelation.first].size();
-// 			while (i<size && data->belowFractures[selectedRelation.first][i]!=selectedRelation.second)
-// 				i++;
-// 			data->belowFractures[selectedRelation.first][i] = data->belowFractures[selectedRelation.first][size-1];
-// 			data->belowFractures[selectedRelation.first].resize(size-1);			
-		relationSelected=false;
-		updateGL();
+			relationSelected=false;
+		}
+		else if (selectedEngine!=-1)
+		{
+			//if (relationSelected && (selectedRelation.first==selectedEngine || selectedRelation.second==selectedEngine))
+			//	relationSelected=false;
+		
+			set<pair<int,int>, lessThanPair >::iterator li = loop.begin();
+			set<pair<int,int>, lessThanPair >::iterator liEnd = loop.end();
+			for( ; li!=liEnd ; ++li)
+				if ((*li).first==selectedEngine || (*li).second==selectedEngine)
+					loop.erase(*li);
+
+			wm.deleteWindow(selectedEngine);
+			if (firstEngine==selectedEngine)
+				firstEngine=-1;
+			selectedEngine = -1;
+		}
 	}
+
+	updateGL();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -276,20 +323,9 @@ void GLEngineEditor::resizeEvent(QResizeEvent * e)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void GLEngineEditor::newFractureDeleted(int i)
-{
-	wm.deleteWindow(i);
-	if (relationSelected && (selectedRelation.first==i || selectedRelation.second==i))
-		relationSelected = false;
-	updateGL();
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 void GLEngineEditor::updateLabel(int i)
 {
-	GLTextLabel * tl = (GLTextLabel*)(wm.getWindow(i));
+	shared_ptr<GLTextLabel> tl = dynamic_pointer_cast<GLTextLabel>(wm.getWindow(i));
 	//tl->setText(data->fracProperties[i]->name);
 	//tl->setBorderColor(data->fractures[i]->color[0],data->fractures[i]->color[1],data->fractures[i]->color[2]);
 	tl->fitTextSize();
@@ -302,7 +338,7 @@ void GLEngineEditor::updateLabel(int i)
 void GLEngineEditor::cutSegmentWithRectangles(int& x1,int& y1,int& x2,int& y2, int label1, int label2)
 {
 	Vector2r box[4];
-	GLWindow * glw;
+	shared_ptr<GLWindow> glw;
 
 	bool same;
 	Vector2r iPoint;
@@ -356,7 +392,7 @@ void GLEngineEditor::cutSegmentWithRectangles(int& x1,int& y1,int& x2,int& y2, i
 bool GLEngineEditor::selectRelation(int x, int y, float threshold, int &a, int &b)
 {
 
-	GLWindow * glw1,*glw2;
+	shared_ptr<GLWindow> glw1,glw2;
 	int x1,y1,x2,y2;
 	float minD = threshold;
 	bool selected = false;
@@ -383,6 +419,9 @@ bool GLEngineEditor::selectRelation(int x, int y, float threshold, int &a, int &
 		}
 	}
 
+	if (selected)
+		selectedEngine = -1;
+
 	return selected;
 }
 
@@ -391,8 +430,7 @@ bool GLEngineEditor::selectRelation(int x, int y, float threshold, int &a, int &
 
 void GLEngineEditor::addEngine(const string& engineName )
 {
-
-	GLTextLabel * tl = new GLTextLabel();
+	shared_ptr<GLTextLabel> tl(new GLTextLabel());
 	tl->setText(const_cast<char*>(engineName.c_str()));
 	tl->setTextColor(1,0,0);
 	tl->setBorderColor(1,0,1);
@@ -404,7 +442,7 @@ void GLEngineEditor::addEngine(const string& engineName )
 	tl->setMinX(10);
 	tl->setMinY(10);	
 
-	GLWindowsManager::EventSubscription * es = new GLWindowsManager::EventSubscription();
+	shared_ptr<GLWindowsManager::EventSubscription> es(new GLWindowsManager::EventSubscription());
 	es->mouseDoubleClick = false;
 	wm.addWindow(tl,es);
 
@@ -413,3 +451,64 @@ void GLEngineEditor::addEngine(const string& engineName )
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+
+int GLEngineEditor::selectEngine(int x, int y)
+{
+	int selected = wm.getPointedWindow(x,y);
+
+	if (selected!=-1)
+		relationSelected = false;
+
+	return selected;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+bool GLEngineEditor::verify()
+{
+	int last = -1;
+
+	// for each n engine should have only n arrows
+	if (wm.nbWindows()==1)
+		return true;
+	if (wm.nbWindows()==0)
+		return false;
+	if (firstEngine==-1)
+		return false;
+	if (loop.size()!=wm.nbWindows())
+		return false;
+
+
+	last = firstEngine;
+	// for each engine we should have only 1 incoming and 1 outcoming arrow
+	for(unsigned int i=0;i<wm.nbWindows();i++)
+	{
+		last = findRelationStartingWith(last);
+		if (last==-1)
+			return false;
+	}
+
+	return (last==firstEngine);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+int GLEngineEditor::findRelationStartingWith(int first)
+{
+	set<pair<int,int>, lessThanPair >::iterator li    =  loop.begin();
+	set<pair<int,int>, lessThanPair >::iterator liEnd =  loop.end();
+
+	for( ; li!=liEnd ; ++li)
+	{
+		if ((*li).first == first)
+			return (*li).second;
+	}
+
+	return -1;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+

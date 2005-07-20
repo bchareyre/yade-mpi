@@ -68,22 +68,14 @@ YadeQtMainWindow::YadeQtMainWindow() : YadeQtGeneratedMainWindow()
 		preferences->mainWindowPositionY	= 50;
 		preferences->mainWindowSizeX		= 1024;
 		preferences->mainWindowSizeY		= 768;
-		preferences->maximized			= false;
 		IOManager::saveToFile("XMLManager",yadeQtGUIPrefPath.string(),"preferences",preferences);
 	}
 
 	IOManager::loadFromFile("XMLManager",yadeQtGUIPrefPath.string(),"preferences",preferences);
 
-	if (preferences->maximized)
-	{
-		showMaximized();
-	}
-	else	
-	{
-		resize(preferences->mainWindowSizeX,preferences->mainWindowSizeY);
+			resize(preferences->mainWindowSizeX,preferences->mainWindowSizeY);
 		move(preferences->mainWindowPositionX,preferences->mainWindowPositionY);
-	}
-
+	
 	addMenu("Edit");
 	addMenu("Preprocessor");
 	addMenu("Postprocessor");
@@ -120,7 +112,6 @@ YadeQtMainWindow::~YadeQtMainWindow()
 	preferences->mainWindowPositionY	= pos().y();
 	preferences->mainWindowSizeX		= size().width();
 	preferences->mainWindowSizeY		= size().height();
-	preferences->maximized			= isMaximized();
 	IOManager::saveToFile("XMLManager",yadeQtGUIPrefPath.string(),"preferences",preferences);
 }
 

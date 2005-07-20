@@ -140,7 +140,7 @@ void QGLThread::oneLoop()
 		renderer->render(Omega::instance().getRootBody());
 	
 	glViewer->wm.glDraw();
-	dynamic_cast<FpsTracker*>(glViewer->wm.getWindow(0))->addOneAction();
+	dynamic_pointer_cast<FpsTracker>(glViewer->wm.getWindow(0))->addOneAction();
 
 	glViewer->postDraw();
 

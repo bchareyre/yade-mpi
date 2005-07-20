@@ -53,7 +53,7 @@ GLViewer::GLViewer(int id, shared_ptr<RenderingEngine> renderer, const QGLFormat
 		setCaption("Secondary View number "+lexical_cast<string>(id));
 	show();
 
-	wm.addWindow(new FpsTracker(),new GLWindowsManager::EventSubscription());
+	wm.addWindow(shared_ptr<GLWindow>(new FpsTracker()),shared_ptr<GLWindowsManager::EventSubscription>(new GLWindowsManager::EventSubscription()));
 	
 }
 

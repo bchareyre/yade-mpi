@@ -41,7 +41,6 @@ void QtGUIPreferences::registerAttributes()
 	REGISTER_ATTRIBUTE(mainWindowPositionY);
 	REGISTER_ATTRIBUTE(mainWindowSizeX);
 	REGISTER_ATTRIBUTE(mainWindowSizeY);
-	REGISTER_ATTRIBUTE(maximized);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

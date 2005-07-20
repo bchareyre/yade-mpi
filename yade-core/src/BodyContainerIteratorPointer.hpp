@@ -76,8 +76,9 @@ class BodyContainerIteratorPointer
 
 	public  : BodyContainerIteratorPointer& operator++(int)
 	{
+		BodyContainerIteratorPointer& tmp = *this;
 		ptr->increment();
-		return *this;
+		return tmp;
 	};
 
 	public  : BodyContainerIteratorPointer& operator=(const BodyContainerIteratorPointer& bi)

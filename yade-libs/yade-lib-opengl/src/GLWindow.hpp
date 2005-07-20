@@ -80,8 +80,11 @@ class GLWindow
 
 	protected : int threshold;
 	public    : void setThreshold(int t) { threshold = t;};
+
 	protected : float color[3];
 	public    : void setBackgroundColor(float r, float g, float b) { color[0] = r; color[1] = g; color[2] = b;};	
+	public    : void getBackgroundColor(float& r, float& g, float& b) { r=color[0]; g=color[1]; b=color[2];};	
+
 	protected : float selectionColor[3];
 	public    : void setSelectionColor(float r, float g, float b) { selectionColor[0] = r; selectionColor[1] = g; selectionColor[2] = b;};		
 	protected : float borderColor[3];

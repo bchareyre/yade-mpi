@@ -76,8 +76,9 @@ class PhysicalActionContainerIteratorPointer
 
 	public  : PhysicalActionContainerIteratorPointer& operator++(int)
 	{
+		PhysicalActionContainerIteratorPointer& tmp = *this;
 		ptr->increment();
-		return *this;
+		return tmp;
 	};
 
 	public  : PhysicalActionContainerIteratorPointer& operator=(const PhysicalActionContainerIteratorPointer& bi)

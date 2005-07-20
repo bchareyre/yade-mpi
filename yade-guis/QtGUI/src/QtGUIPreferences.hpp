@@ -53,8 +53,6 @@ class QtGUIPreferences : public Serializable
 	public	: int version;
 	public	: int mainWindowPositionX,mainWindowPositionY;	
 	public	: int mainWindowSizeX,mainWindowSizeY;
-	public	: bool maximized;
-
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Constructor/Destructor									///

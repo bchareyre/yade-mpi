@@ -33,6 +33,15 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <vector>
+#include <map>
+#include <set>
+#include <boost/shared_ptr.hpp>
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+using namespace std;
+using namespace boost;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -55,9 +64,25 @@ class GLWindowsManager
 		bool mouseDoubleClick;
 	} EventSubscription;
 
-	protected : std::vector<GLWindow*> windows;
-	protected : std::vector<EventSubscription*> subscriptions;
-	protected : std::vector<int> order;
+	public : typedef struct WindowDescription
+	{
+		shared_ptr<GLWindow> window;
+		shared_ptr<EventSubscription> eventSubscription;
+		int order;
+		int id;
+	} WindowDescription;
+
+	public : struct lessThanWindow
+	{
+		bool operator()(const shared_ptr<WindowDescription>& w1,const shared_ptr<WindowDescription>& w2)
+		{
+			return w1->order<w2->order;
+		}
+	} ;
+
+
+	protected : map<int,shared_ptr<WindowDescription> > windows;
+	protected : set<shared_ptr<WindowDescription>, lessThanWindow > orderedWindows;
 
 	protected : int selectedWindow;
 
@@ -77,12 +102,16 @@ class GLWindowsManager
 
 	public : void resizeEvent(int w, int h);
 
-	public : void addWindow(GLWindow * w, EventSubscription * s);
+	public : int addWindow(shared_ptr<GLWindow> w, shared_ptr<EventSubscription> s);
 	public : void deleteWindow(int i);
-	public : void moveWindowOnTop(int i);
+	public : void moveWindowOnTop(const shared_ptr<WindowDescription>& wd);
 
 	public : int getPointedWindow(int x,int y);
-	public : GLWindow * getWindow(int i) { return windows[i]; };
+	public : shared_ptr<GLWindow> getWindow(int i);
+
+	private : void rebuildOrderedWindowsList();
+	public : unsigned int nbWindows();
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

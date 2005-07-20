@@ -76,8 +76,9 @@ class InteractionContainerIteratorPointer
 
 	public  : InteractionContainerIteratorPointer& operator++(int)
 	{
+		InteractionContainerIteratorPointer& tmp = *this;
 		ptr->increment();
-		return *this;
+		return tmp;
 	};
 
 	public  : InteractionContainerIteratorPointer& operator=(const InteractionContainerIteratorPointer& bi)

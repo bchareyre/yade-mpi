@@ -31,16 +31,20 @@
 #endif
 #include <GL/gl.h>
 
+#include <iostream>
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+using namespace std;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 GLWindowsManager::GLWindowsManager()
 {
 	windows.clear();
-	subscriptions.clear();
 	selectedWindow = -1;
-	order.clear();
 
 	width = 0;
 	height = 0;
@@ -52,15 +56,7 @@ GLWindowsManager::GLWindowsManager()
 
 GLWindowsManager::~GLWindowsManager ()
 {
-	for(unsigned int i=0;i<windows.size();i++)
-	{
-		delete windows[i];
-		delete subscriptions[i];
-	}
-	windows.clear();
-	subscriptions.clear();
-	order.clear();
-	
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -82,10 +78,10 @@ void GLWindowsManager::glDraw()
 
 	glDisable(GL_LIGHTING);
 
-	std::vector<int>::iterator oi	 = order.begin();
-	std::vector<int>::iterator oiEnd = order.end();
+	set<shared_ptr<WindowDescription>, lessThanWindow >::reverse_iterator oi    = orderedWindows.rbegin();
+	set<shared_ptr<WindowDescription>, lessThanWindow >::reverse_iterator oiEnd = orderedWindows.rend();
 	for( ; oi!=oiEnd ; ++oi)
-		windows[(*oi)]->glDraw();	
+		(*oi)->window->glDraw();
 
 	glMatrixMode(GL_MODELVIEW);
 	glPopMatrix(); 
@@ -104,13 +100,13 @@ int GLWindowsManager::mouseMoveEvent(int x, int y)
 {
 	if (selectedWindow==-1)
 	{
-		std::vector<int>::reverse_iterator oi		= order.rbegin();
-		std::vector<int>::reverse_iterator oiEnd	= order.rend();	
+		set<shared_ptr<WindowDescription>, lessThanWindow >::iterator oi    = orderedWindows.begin();
+		set<shared_ptr<WindowDescription>, lessThanWindow >::iterator oiEnd = orderedWindows.end();
 		bool found = false;
-		for(; oi!=oiEnd && !found; ++oi)
-			found = windows[(*oi)]->selectComponent(x,y);		
+		for( ; oi!=oiEnd && !found; ++oi)
+			found = (*oi)->window->selectComponent(x,y);
 	}
-	else if (subscriptions[selectedWindow]->mouseMove && windows[selectedWindow]->mouseMoveEvent(x,y))
+	else if (windows[selectedWindow]->eventSubscription->mouseMove && windows[selectedWindow]->window->mouseMoveEvent(x,y))
 		return selectedWindow;
 	
 	return -1;
@@ -121,44 +117,44 @@ int GLWindowsManager::mouseMoveEvent(int x, int y)
 
 int GLWindowsManager::mousePressEvent(int x, int y)
 {
-	std::vector<int>::reverse_iterator oi		= order.rbegin();
-	std::vector<int>::reverse_iterator oiEnd	= order.rend();
-	
+	set<shared_ptr<WindowDescription>, lessThanWindow >::iterator oi    = orderedWindows.begin();
+	set<shared_ptr<WindowDescription>, lessThanWindow >::iterator oiEnd = orderedWindows.end();	
 	for(; oi!=oiEnd ; ++oi)
 	{
-		int id = (*oi);
-		if (subscriptions[id]->mousePress && windows[id]->mousePressEvent(x,y))
-		{
-			moveWindowOnTop(id);
-			selectedWindow = id;
+		if ((*oi)->eventSubscription->mousePress && (*oi)->window->mousePressEvent(x,y))
+		{			
+			selectedWindow = (*oi)->id;
+			moveWindowOnTop(*oi);
 			return selectedWindow;
 		}
 	}
 
 	selectedWindow = -1;
-	return -1;
+	return selectedWindow;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 int GLWindowsManager::mouseReleaseEvent(int x, int y)
-{	
+{
+	selectedWindow = -1;	
+
 	if (selectedWindow!=-1)
 	{		
-		windows[selectedWindow]->mouseReleaseEvent(x,y);
+		windows[selectedWindow]->window->mouseReleaseEvent(x,y);
 		int tmpS = selectedWindow;
 		selectedWindow = -1;
 
-		std::vector<int>::reverse_iterator oi		= order.rbegin();
-		std::vector<int>::reverse_iterator oiEnd	= order.rend();
+		set<shared_ptr<WindowDescription>, lessThanWindow >::iterator oi    = orderedWindows.begin();
+		set<shared_ptr<WindowDescription>, lessThanWindow >::iterator oiEnd = orderedWindows.end();	
 		for(; oi!=oiEnd ; ++oi)
 		{
-			int id = (*oi);
-			if (subscriptions[id]->mouseRelease && windows[id]->mouseReleaseEvent(x,y))
-			{
-				moveWindowOnTop(id);
-				return id;
+			if ((*oi)->eventSubscription->mouseRelease && (*oi)->window->mouseReleaseEvent(x,y))
+			{	
+				int tmp = (*oi)->id;
+				moveWindowOnTop(*oi);
+				return tmp;
 			}
 		}
 		
@@ -173,16 +169,14 @@ int GLWindowsManager::mouseReleaseEvent(int x, int y)
 
 int GLWindowsManager::mouseDoubleClickEvent(int x, int y)
 {
-	std::vector<int>::reverse_iterator oi		= order.rbegin();
-	std::vector<int>::reverse_iterator oiEnd	= order.rend();
-	
+	set<shared_ptr<WindowDescription>, lessThanWindow >::iterator oi    = orderedWindows.begin();
+	set<shared_ptr<WindowDescription>, lessThanWindow >::iterator oiEnd = orderedWindows.end();	
 	for(; oi!=oiEnd ; ++oi)
 	{
-		int id = (*oi);
-		if (subscriptions[id]->mouseDoubleClick && windows[id]->mouseDoubleClickEvent(x,y))
+		if ((*oi)->eventSubscription->mouseDoubleClick && (*oi)->window->mouseDoubleClickEvent(x,y))
 		{
-			moveWindowOnTop(id);
-			selectedWindow = id;
+			selectedWindow = (*oi)->id;
+			moveWindowOnTop(*oi);
 			return selectedWindow;
 		}
 	}
@@ -198,19 +192,40 @@ void GLWindowsManager::resizeEvent(int w, int h)
 {
 	width = w;
 	height = h;
-	for(unsigned int i=0;i<windows.size();i++)
-		windows[i]->resizeGlWindow(w,h);
+	set<shared_ptr<WindowDescription>, lessThanWindow >::iterator oi    = orderedWindows.begin();
+	set<shared_ptr<WindowDescription>, lessThanWindow >::iterator oiEnd = orderedWindows.end();	
+	for(; oi!=oiEnd ; ++oi)
+		(*oi)->window->resizeGlWindow(w,h);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void GLWindowsManager::addWindow(GLWindow * w, EventSubscription * s)
+int GLWindowsManager::addWindow(shared_ptr<GLWindow> w, shared_ptr<EventSubscription> s)
 {
 	w->resizeGlWindow(width,height);
-	windows.push_back(w);
-	subscriptions.push_back(s);
-	order.push_back(windows.size()-1);
+	shared_ptr<WindowDescription> wd(new WindowDescription);
+	wd->window = w;
+	wd->eventSubscription = s;
+
+	wd->id=0;
+	wd->order=0;
+
+	map<int,shared_ptr<WindowDescription> >::iterator wi    = windows.begin();
+	map<int,shared_ptr<WindowDescription> >::iterator wiEnd = windows.end();
+	for( ; wi!=wiEnd ; ++wi)
+	{
+		if ((*wi).second->id>=wd->id)
+			wd->id = (*wi).second->id+1;
+		if ((*wi).second->order>=wd->id)
+			wd->id = (*wi).second->order+1;
+	}
+
+	windows[wd->id] = wd;
+
+	moveWindowOnTop(wd);
+
+	return wd->id;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -218,52 +233,23 @@ void GLWindowsManager::addWindow(GLWindow * w, EventSubscription * s)
 
 void GLWindowsManager::deleteWindow(int i)
 {
-	delete subscriptions[i];
-	delete windows[i];
-
-	unsigned int j;
-	
-	for(j=i;j<windows.size()-1;j++)
-	{
-		windows[j] = windows[j+1];
-		subscriptions[j] = subscriptions[j+1];		
-	}
-	
-	int id=0;
-	for(j=0;j<order.size()-1;j++)
-		if (order[j]==i)
-			id = j;
-
-	for(j=id;j<order.size()-1;j++)
-		order[j] = order[j+1];
-			
-	windows.resize(windows.size()-1);
-	subscriptions.resize(subscriptions.size()-1);
-	order.resize(order.size()-1);
-
-	for(j=0;j<order.size();j++)
-		if (order[j]>i)
-			order[j]--;
-
+	windows.erase(i);
+	rebuildOrderedWindowsList();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void GLWindowsManager::moveWindowOnTop(int i)
+void GLWindowsManager::moveWindowOnTop(const shared_ptr<WindowDescription>& wd)
 {
-	unsigned int j = 0;
+	map<int, shared_ptr<WindowDescription> >::iterator wi    = windows.begin();
+	map<int, shared_ptr<WindowDescription> >::iterator wiEnd = windows.end();
+	for( ; wi!=wiEnd ; ++wi)
+		((*wi).second->order)++;
 
-	while (j<order.size() && order[j]!=i)
-		j++;
+	windows[wd->id]->order = 0;
 
-	while (j<order.size()-1)
-	{
-		order[j] = order[j+1];
-		j++;
-	}
-
-	order[j] = i;
+	rebuildOrderedWindowsList();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -271,14 +257,12 @@ void GLWindowsManager::moveWindowOnTop(int i)
 
 int GLWindowsManager::getPointedWindow(int x,int y)
 {
-	std::vector<int>::reverse_iterator oi		= order.rbegin();
-	std::vector<int>::reverse_iterator oiEnd	= order.rend();
-	
+	set<shared_ptr<WindowDescription>, lessThanWindow >::iterator oi    = orderedWindows.begin();
+	set<shared_ptr<WindowDescription>, lessThanWindow >::iterator oiEnd = orderedWindows.end();	
 	for(; oi!=oiEnd ; ++oi)
 	{
-		int id = (*oi);
-		if (windows[id]->mouseIsOnWindows(x,y))
-			return id;
+		if ((*oi)->window->mouseIsOnWindows(x,y))
+			return (*oi)->id;
 	}
 
 	return -1;
@@ -286,3 +270,32 @@ int GLWindowsManager::getPointedWindow(int x,int y)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+
+shared_ptr<GLWindow> GLWindowsManager::getWindow(int i)
+{
+	return windows[i]->window;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+void GLWindowsManager::rebuildOrderedWindowsList()
+{
+	orderedWindows.clear();
+	map<int,shared_ptr<WindowDescription> >::iterator wi    = windows.begin();
+	map<int,shared_ptr<WindowDescription> >::iterator wiEnd = windows.end();
+	for( ; wi!=wiEnd ; ++wi)
+		orderedWindows.insert((*wi).second);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+unsigned int GLWindowsManager::nbWindows()
+{
+	return windows.size();
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
