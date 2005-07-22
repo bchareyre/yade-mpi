@@ -29,9 +29,9 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <yade/yade-lib-multimethods/FunctorWrapper.hpp>
 #include <yade/yade-core/PhysicalParameters.hpp>
 #include <yade/yade-core/Interaction.hpp>
+#include <yade/yade-core/EngineUnit2D.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -47,14 +47,14 @@
 	Every functions that describe interaction between two InteractionGeometries must derive from InteractionGeometryEngineUnit.
 */
 
-class InteractionPhysicsEngineUnit : public FunctorWrapper
-		<
-		 void ,
-		 TYPELIST_3(	  const shared_ptr<PhysicalParameters>&
-				, const shared_ptr<PhysicalParameters>&
-				, const shared_ptr<Interaction>&
-			   ) 
-		>
+class InteractionPhysicsEngineUnit : 	public EngineUnit2D
+					<
+		 				void ,
+		 				TYPELIST_3(	  const shared_ptr<PhysicalParameters>&
+								, const shared_ptr<PhysicalParameters>&
+								, const shared_ptr<Interaction>&
+			   				  ) 
+					>
 {
 	REGISTER_CLASS_NAME(InteractionPhysicsEngineUnit);
 };

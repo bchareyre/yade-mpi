@@ -27,11 +27,11 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <yade/yade-lib-multimethods/FunctorWrapper.hpp>
 #include <yade/yade-core/InteractingGeometry.hpp>
 #include <yade/yade-core/GeometricalModel.hpp>
 #include <yade/yade-core/Body.hpp>
 #include <yade/yade-core/MetaBody.hpp>
+#include <yade/yade-core/EngineUnit2D.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -50,7 +50,7 @@
 	axis, it is not easy to write by hand into the configuration file the center and size of this AABB.
 	Instead you can use a InteractingGeometryEngineUnit that will compute for you the correct value	
 */
-class InteractingGeometryEngineUnit : public FunctorWrapper
+class InteractingGeometryEngineUnit : 	public EngineUnit2D
 	/*! Method called to build a given bounding volume from a given collision model and a 3D transformation
 		\param const shared_ptr<InteractingGeometry>& the collision model from wich we want
 		to extract the bounding volume
@@ -59,15 +59,14 @@ class InteractingGeometryEngineUnit : public FunctorWrapper
 		\param Body* the Body inside which operation takes place
 		\return shared_ptr<InteractingGeometry>& shared pointer to the bounding volume
 	*/
-		<
-		 void ,
-		 TYPELIST_4(
-		 		  const shared_ptr<GeometricalModel>&
-				, shared_ptr<InteractingGeometry>& // is not working when const, because functors are supposed to modify it!
-				, const Se3r& // FIXME - remove Se3r, because not everything is supposed to have it. If some function needs Se3r it must find it through Body*
-				, const Body* // with that - functors have all the data they may need, but it's const, so they can't modify it !
-			  )
-		>
+					<
+		 				void ,
+		 				TYPELIST_4(	  const shared_ptr<GeometricalModel>&
+								, shared_ptr<InteractingGeometry>& // is not working when const, because functors are supposed to modify it!
+								, const Se3r& // FIXME - remove Se3r, because not everything is supposed to have it. If some function needs Se3r it must find it through Body*
+								, const Body* // with that - functors have all the data they may need, but it's const, so they can't modify it !
+			  				  )
+					>
 {	
 	REGISTER_CLASS_NAME(InteractingGeometryEngineUnit);
 };

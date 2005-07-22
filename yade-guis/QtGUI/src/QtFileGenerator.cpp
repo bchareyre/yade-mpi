@@ -34,6 +34,7 @@
 #include <qcombobox.h>
 #include <qlineedit.h>
 
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -99,7 +100,6 @@ void QtFileGenerator::pbChooseClicked()
 
 void QtFileGenerator::cbGeneratorNameActivated(const QString& s)
 {
-
 	try
 	{
 		//FIXME dynamic_cast is not working ???
@@ -130,7 +130,6 @@ void QtFileGenerator::cbGeneratorNameActivated(const QString& s)
 			
 		scrollView->addChild(scrollViewFrame);
 		scrollViewFrame->show();
-		
 	}
 	catch (FactoryError&)
 	{

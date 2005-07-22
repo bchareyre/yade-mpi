@@ -32,7 +32,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <yade/yade-core/Engine.hpp>
+#include <yade/yade-core/MetaDispatchingEngine2D.hpp>
 #include <yade/yade-lib-multimethods/DynLibDispatcher.hpp>
 #include <yade/yade-core/InteractingGeometry.hpp>
 #include <yade/yade-core/BoundingVolume.hpp>
@@ -41,23 +41,22 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class BoundingVolumeMetaEngine : 
-	  public Engine 
-	, public DynLibDispatcher
-		<	TYPELIST_2( InteractingGeometry , BoundingVolume ) ,		// base classess for dispatch
-			BoundingVolumeEngineUnit,						// class that provides multivirtual call
-			void ,								// return type
-			TYPELIST_4(
-					  const shared_ptr<InteractingGeometry>&	// arguments
-					, shared_ptr<BoundingVolume>& // is not working when const, because functors are supposed to modify it!
-					, const Se3r&
-					, const Body* // with that - functors have all the data they may need, but it's const, so they can't modify it !
-					)
-		>
+class BoundingVolumeMetaEngine :	public MetaDispatchingEngine2D
+					<	
+						InteractingGeometry,						// base classe for dispatch
+						BoundingVolume,							// base classe for dispatch
+						BoundingVolumeEngineUnit,					// class that provides multivirtual call
+						void,								// return type
+						TYPELIST_4(	  const shared_ptr<InteractingGeometry>&	// arguments
+								, shared_ptr<BoundingVolume>& 			// is not working when const, because functors are supposed to modify it!
+								, const Se3r&
+								, const Body* 					// with that - functors have all the data they may need, but it's const, so they can't modify it !
+							  )
+					>
 {
 	public		: virtual void action(Body* b);
-	public		: virtual void registerAttributes();
-	public		: virtual void postProcessAttributes(bool deserializing);
+	//public		: virtual void registerAttributes();
+	//public		: virtual void postProcessAttributes(bool deserializing);
 	REGISTER_CLASS_NAME(BoundingVolumeMetaEngine);
 };
 

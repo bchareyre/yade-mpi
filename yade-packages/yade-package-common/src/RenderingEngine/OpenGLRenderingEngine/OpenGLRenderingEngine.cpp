@@ -397,7 +397,7 @@ void OpenGLRenderingEngine::renderBoundingVolume(const shared_ptr<MetaBody>& roo
 		shared_ptr<Body> b = *bi;
 		glPushMatrix();
 		if(b->boundingVolume)
-			boundingVolumeDispatcher(b->boundingVolume);
+			(b->boundingVolume);
 		glPopMatrix();
 	}
 	
@@ -465,16 +465,16 @@ void OpenGLRenderingEngine::postProcessAttributes(bool deserializing)
 	if(deserializing)
 	{
 		for(unsigned int i=0;i<boundingVolumeFunctorNames.size();i++)
-			boundingVolumeDispatcher.add(boundingVolumeFunctorNames[i][0],boundingVolumeFunctorNames[i][1]);
+			boundingVolumeDispatcher.add1DEntry(boundingVolumeFunctorNames[i][0],boundingVolumeFunctorNames[i][1]);
 			
 		for(unsigned int i=0;i<interactionGeometryFunctorNames.size();i++)
-			interactionGeometryDispatcher.add(interactionGeometryFunctorNames[i][0],interactionGeometryFunctorNames[i][1]);
+			interactionGeometryDispatcher.add1DEntry(interactionGeometryFunctorNames[i][0],interactionGeometryFunctorNames[i][1]);
 			
 		for(unsigned int i=0;i<geometricalModelFunctorNames.size();i++)
-			geometricalModelDispatcher.add(geometricalModelFunctorNames[i][0],geometricalModelFunctorNames[i][1]);
+			geometricalModelDispatcher.add1DEntry(geometricalModelFunctorNames[i][0],geometricalModelFunctorNames[i][1]);
 		
 		for(unsigned int i=0;i<shadowVolumeFunctorNames.size();i++)
-			shadowVolumeDispatcher.add(shadowVolumeFunctorNames[i][0],shadowVolumeFunctorNames[i][1]);
+			shadowVolumeDispatcher.add1DEntry(shadowVolumeFunctorNames[i][0],shadowVolumeFunctorNames[i][1]);
 	}
 }
 

@@ -26,12 +26,17 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <yade/yade-core/Omega.hpp>
+#include <yade/yade-core/FileGenerator.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <qcombobox.h>
 #include <qgroupbox.h>
+#include <qcolor.h>
+#include <qlabel.h>
+#include <qpushbutton.h>
+#include <qlineedit.h>
 
 #include "GLEngineEditor.hpp"
 
@@ -47,6 +52,23 @@ QtEngineEditor::QtEngineEditor() : QtGeneratedEngineEditor()
 		if ((*di).second.baseClass=="Engine" || (*di).second.baseClass=="MetaEngine" || (*di).second.baseClass=="TimeStepper")
 			cbEnginesList->insertItem((*di).first);
 	}
+
+	connect( glEngineEditor, SIGNAL( verifyValidity() ), this, SLOT( verifyValidity() ) );
+	connect( glEngineEditor, SIGNAL( engineSelected() ), this, SLOT( engineSelected() ) );
+
+
+	scrollViewFrame = new QFrame();	
+	
+	scrollViewLayout = new QVBoxLayout( scrollViewOutsideFrame, 0, 0, "scrollViewLayout"); 
+	
+	scrollView = new QScrollView( scrollViewOutsideFrame, "scrollView" );
+	scrollView->setVScrollBarMode(QScrollView::AlwaysOn);
+	scrollView->setHScrollBarMode(QScrollView::AlwaysOff);
+	scrollViewLayout->addWidget( scrollView );
+	scrollView->show();	
+
+
+	verifyValidity();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -69,10 +91,7 @@ void QtEngineEditor::pbAddEngineClicked()
 
 void QtEngineEditor::pbSaveClicked()
 {
-	if (glEngineEditor->verify())
-		cout << "ok" << endl;
-	else
-		cout << "pas ok" << endl;
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -94,3 +113,59 @@ void QtEngineEditor::pbPathClicked()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+void QtEngineEditor::verifyValidity()
+{
+	string message;
+	bool enabled;
+	if (enabled=glEngineEditor->verify(message))
+		tlStatus->setBackgroundColor(QColor(0,255,0));
+	else
+		tlStatus->setBackgroundColor(QColor(255,0,0));
+
+	tlStatus->setText(message.c_str());
+
+	leFileName->setEnabled(enabled);
+	pbPath->setEnabled(enabled);
+	pbSave->setEnabled(enabled);
+	pbLoad->setEnabled(enabled);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+void QtEngineEditor::engineSelected()
+{
+
+	try
+	{
+		//FIXME dynamic_cast is not working ???
+		shared_ptr<FileGenerator> fg = static_pointer_cast<FileGenerator>(ClassFactory::instance().createShared("PhysicalActionApplier"));
+
+		guiGen.setResizeHeight(true);
+		guiGen.setResizeWidth(false);
+		guiGen.setShift(10,10);
+		guiGen.setShowButtons(false);
+		
+		QSize s = scrollView->size();
+		QPoint p = scrollView->pos();	
+
+		delete scrollViewFrame;
+		scrollViewFrame = new QFrame();
+		scrollViewFrame->resize(s.width()-17,s.height()); // -17 because of the size of the scrollbar
+
+		guiGen.buildGUI(fg,scrollViewFrame);
+			
+		if (s.height()>scrollViewFrame->size().height())
+		{
+			scrollViewFrame->setMinimumSize(s.width()-17,s.height());
+			scrollViewFrame->setMaximumSize(s.width()-17,s.height());
+		}
+			
+		scrollView->addChild(scrollViewFrame);
+		scrollViewFrame->show();
+	}
+	catch (FactoryError&)
+	{
+	
+	}
+}

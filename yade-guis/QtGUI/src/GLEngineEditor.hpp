@@ -101,10 +101,12 @@ class GLEngineEditor : public QGLViewer
 
 	public : void addEngine(const string& engineName );
 	
-	public : bool verify();
+	public : bool verify(string& errorMessage);
 	private : int findRelationStartingWith(int first);
 	
-	
+	signals : void verifyValidity();
+	signals : void engineSelected();
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

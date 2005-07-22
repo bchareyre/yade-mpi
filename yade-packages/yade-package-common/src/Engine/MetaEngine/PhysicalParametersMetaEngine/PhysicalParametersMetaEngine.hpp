@@ -32,7 +32,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <yade/yade-core/Engine.hpp>
+#include <yade/yade-core/MetaDispatchingEngine1D.hpp>
 #include <yade/yade-lib-multimethods/DynLibDispatcher.hpp>
 #include <yade/yade-core/PhysicalParameters.hpp>
 #include <yade/yade-core/Body.hpp>
@@ -40,21 +40,19 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class PhysicalParametersMetaEngine :
-	  public Engine 
-	, public DynLibDispatcher
-		<	PhysicalParameters ,
-			PhysicalParametersEngineUnit,
-			void ,
-			TYPELIST_2(
-					  const shared_ptr<PhysicalParameters>&
-					, Body*
-				  )
-		>
+class PhysicalParametersMetaEngine :	public MetaDispatchingEngine1D
+					<	
+						PhysicalParameters ,
+						PhysicalParametersEngineUnit,
+						void ,
+						TYPELIST_2(	  const shared_ptr<PhysicalParameters>&
+								, Body*
+				  			  )
+					>
 {
 	public		: virtual void action(Body* b);
-	public		: virtual void registerAttributes();
-	public		: virtual void postProcessAttributes(bool deserializing);
+	//public		: virtual void registerAttributes();
+	//public		: virtual void postProcessAttributes(bool deserializing);
 	REGISTER_CLASS_NAME(PhysicalParametersMetaEngine);
 };
 

@@ -28,10 +28,15 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <QtGeneratedEngineEditor.h>
+#include <qlayout.h>
+#include <qframe.h>
+#include <qscrollview.h>
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <yade/yade-lib-factory/Factorable.hpp>
+#include <yade/yade-lib-serialization-qt/QtGUIGenerator.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -41,6 +46,12 @@
 */
 class QtEngineEditor : public QtGeneratedEngineEditor, public Factorable
 {
+
+	private : QtGUIGenerator guiGen;	
+	private : QScrollView * scrollView;
+	private : QFrame * scrollViewFrame;
+	private : QVBoxLayout* scrollViewLayout;
+
 	public : QtEngineEditor();
 	public : ~QtEngineEditor();
 
@@ -48,6 +59,10 @@ class QtEngineEditor : public QtGeneratedEngineEditor, public Factorable
 	public slots : void pbSaveClicked();
 	public slots : void pbLoadClicked();
 	public slots : void pbPathClicked();
+
+	public slots : void verifyValidity();
+	public slots : void engineSelected();
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

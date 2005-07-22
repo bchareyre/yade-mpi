@@ -53,11 +53,15 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+using namespace std;
+using namespace boost;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 ///
 /// base classes involved in multiple dispatch must be derived from Indexable
 ///
-
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// base template for all dispatchers								///
@@ -70,7 +74,7 @@ template
 	class Executor,		//	class which gives multivirtual function
 	class ResultType,	//	type returned by multivirtual function
 	class TList,		//	typelist of arguments passed to multivirtual function
-				//	WARNING: first arguments must be boost::shared_ptr<BaseClass>, for details see FunctorWrapper
+				//	WARNING: first arguments must be shared_ptr<BaseClass>, for details see FunctorWrapper
 				
 	bool autoSymmetry=true	//	true -	the function called is always the same,
 				//		only order of arguments is rearranged
@@ -84,111 +88,115 @@ template
 >
 class DynLibDispatcher
 {
-	private:
+
 		// this template recursively defines a type for callBacks matrix, with required number of dimensions
-		template<class T > struct Matrix
-		{
+	private : template<class T > struct Matrix
+		  {
 			typedef Loki::NullType ResultIterator;
 			typedef Loki::NullType ResultIteratorInt;
-		};
-		template<class Head >
-		struct Matrix< Loki::Typelist< Head, Loki::NullType > >
-		{
-			typedef typename std::vector< boost::shared_ptr< Executor > > 		Result;
-			typedef typename std::vector< int > 					ResultInt;
-			typedef typename std::vector< boost::shared_ptr< Executor > >::iterator ResultIterator;
-			typedef typename std::vector< int >::iterator 				ResultIteratorInt;
-		};
-		template<class Head, class Tail >
-		struct Matrix< Loki::Typelist< Head, Tail > >
-		{
+		  };
+
+	private : template<class Head > struct Matrix< Loki::Typelist< Head, Loki::NullType > >
+		  {
+			typedef vector< shared_ptr< Executor > > 			Result;
+			typedef vector< int > 						ResultInt;
+			typedef typename vector< shared_ptr< Executor > >::iterator 	ResultIterator;
+			typedef vector< int >::iterator 				ResultIteratorInt;
+		  };
+
+	private : template<class Head, class Tail >
+		  struct Matrix< Loki::Typelist< Head, Tail > >
+		  {
 			// recursive typedef to get matrix of required dimensions
 			typedef typename Matrix< Tail >::Result 		InsideType;
 			typedef typename Matrix< Tail >::ResultInt 		InsideTypeInt;
-			typedef typename std::vector< InsideType > 		Result;
-			typedef typename std::vector< InsideTypeInt > 		ResultInt;
-			typedef typename std::vector< InsideType >::iterator 	ResultIterator;
-			typedef typename std::vector< InsideTypeInt >::iterator ResultIteratorInt;
-		};
+			typedef vector< InsideType > 				Result;
+			typedef vector< InsideTypeInt > 			ResultInt;
+			typedef typename vector< InsideType >::iterator 	ResultIterator;
+			typedef typename vector< InsideTypeInt >::iterator 	ResultIteratorInt;
+		  };
 		
 		// this template helps declaring iterators for each dimension of callBacks matrix
-		template<class T > struct GetTail
-		{
+	private : template<class T > struct GetTail
+		  {
 			typedef Loki::NullType Result;
-		};
-		template<class Head, class Tail>
-		struct GetTail< Loki::Typelist< Head , Tail > >
-		{
-			typedef Tail Result;
-		};
-		template<class Head >
-		struct GetTail< Loki::Typelist< Head , Loki::NullType > >
-		{
-			typedef Loki::NullType Result;
-		};
-		template <typename G, typename T, typename U>
-		struct Select
-		{
-			typedef T Result;
-		};
-		template <typename T, typename U>
-		struct Select<Loki::NullType, T, U>
-		{
-			typedef U Result;
-		};
-    
+		  };
 
-		typedef typename Loki::TL::Append<  Loki::NullType , BaseClass >::Result BaseClassList;
-		typedef typename Loki::TL::TypeAtNonStrict<BaseClassList , 0>::Result	BaseClass1;  // 1D
-		typedef typename Loki::TL::TypeAtNonStrict<BaseClassList , 1>::Result	BaseClass2;  // 2D
-		typedef typename Loki::TL::TypeAtNonStrict<BaseClassList , 2>::Result	BaseClass3;  // 3D
+	private : template<class Head, class Tail>
+		  struct GetTail< Loki::Typelist< Head , Tail > >
+		  {
+			typedef Tail Result;
+		  };
+
+	private : template<class Head >
+		  struct GetTail< Loki::Typelist< Head , Loki::NullType > >
+		  {
+			typedef Loki::NullType Result;
+		  };
+
+	private : template <typename G, typename T, typename U>
+		  struct Select
+		  {
+			typedef T Result;
+		  };
+	
+	private : template <typename T, typename U>
+		  struct Select<Loki::NullType, T, U>
+		  {
+			typedef U Result;
+		  };
+
+	private : typedef typename Loki::TL::Append<  Loki::NullType , BaseClass >::Result BaseClassList;
+	private : typedef typename Loki::TL::TypeAtNonStrict<BaseClassList , 0>::Result	BaseClass1;  // 1D
+	private : typedef typename Loki::TL::TypeAtNonStrict<BaseClassList , 1>::Result	BaseClass2;  // 2D
+	private : typedef typename Loki::TL::TypeAtNonStrict<BaseClassList , 2>::Result	BaseClass3;  // 3D
 		
-		typedef typename GetTail< BaseClassList >::Result			Tail2; // 2D
-		typedef typename GetTail< Tail2 >::Result				Tail3; // 3D
-		typedef typename GetTail< Tail3 >::Result				Tail4; // 4D ...
+	private : typedef typename GetTail< BaseClassList >::Result			Tail2; // 2D
+	private : typedef typename GetTail< Tail2 >::Result				Tail3; // 3D
+	private : typedef typename GetTail< Tail3 >::Result				Tail4; // 4D ...
 		
-		typedef typename Matrix< BaseClassList >::ResultIterator 		Iterator2; // outer iterator 2D
-		typedef typename Matrix< Tail2 >::ResultIterator			Iterator3; // inner iterator 3D
-		typedef typename Matrix< Tail3 >::ResultIterator			Iterator4; // more inner iterator 4D
+	private : typedef typename Matrix< BaseClassList >::ResultIterator 		Iterator2; // outer iterator 2D
+	private : typedef typename Matrix< Tail2 >::ResultIterator			Iterator3; // inner iterator 3D
+	private : typedef typename Matrix< Tail3 >::ResultIterator			Iterator4; // more inner iterator 4D
 		
-		typedef typename Matrix< BaseClassList >::ResultIteratorInt		IteratorInfo2;
-		typedef typename Matrix< Tail2 >::ResultIteratorInt			IteratorInfo3;
-		typedef typename Matrix< Tail3 >::ResultIteratorInt			IteratorInfo4;
+	private : typedef typename Matrix< BaseClassList >::ResultIteratorInt		IteratorInfo2;
+	private : typedef typename Matrix< Tail2 >::ResultIteratorInt			IteratorInfo3;
+	private : typedef typename Matrix< Tail3 >::ResultIteratorInt			IteratorInfo4;
 		
-		typedef typename Matrix< BaseClassList >::Result MatrixType;
-		typedef typename Matrix< BaseClassList >::ResultInt MatrixIntType;
-		MatrixType callBacks;		// multidimensional matrix that stores functors ( 1D, 2D, 3D, 4D, ....)
-		MatrixIntType callBacksInfo;	// multidimensional matrix for extra information about functors in the matrix
-						//                       currently used to remember if it is reversed functor
+	private : typedef typename Matrix< BaseClassList >::Result MatrixType;
+	private : typedef typename Matrix< BaseClassList >::ResultInt MatrixIntType;
+	private : MatrixType callBacks;		// multidimensional matrix that stores functors ( 1D, 2D, 3D, 4D, ....)
+	private : MatrixIntType callBacksInfo;	// multidimensional matrix for extra information about functors in the matrix
+						// currently used to remember if it is reversed functor
 						
-		// ParmNReal is defined to avoid ambigious function call for different dimensions of multimethod
-		typedef Loki::FunctorImpl<ResultType, TList > Impl;
-		typedef TList ParmList;
-		typedef 	 Loki::NullType Parm1; 						// it's always at least 1D
-		typedef typename Impl::Parm2 Parm2Real;
-		typedef typename Select< Tail2 , Loki::NullType , Parm2Real >::Result Parm2; 	// 2D
-		typedef typename Impl::Parm3 Parm3Real;
-		typedef typename Select< Tail3 , Loki::NullType , Parm3Real >::Result Parm3; 	// 3D - to have 3D just working, without symmetry handling - change this line to be: typedef typename Impl::Parm3 Parm3;
-		typedef typename Impl::Parm4 Parm4Real;
-		typedef typename Select< Tail4 , Loki::NullType , Parm4Real >::Result Parm4;	// 4D - same as above
-		typedef typename Impl::Parm5 Parm5;
-		typedef typename Impl::Parm6 Parm6;
-		typedef typename Impl::Parm7 Parm7;
-		typedef typename Impl::Parm8 Parm8;
-		typedef typename Impl::Parm9 Parm9;
-		typedef typename Impl::Parm10 Parm10;
-		typedef typename Impl::Parm11 Parm11;
-		typedef typename Impl::Parm12 Parm12;
-		typedef typename Impl::Parm13 Parm13;
-		typedef typename Impl::Parm14 Parm14;
-		typedef typename Impl::Parm15 Parm15;
+	// ParmNReal is defined to avoid ambigious function call for different dimensions of multimethod
+	private : typedef Loki::FunctorImpl<ResultType, TList > Impl;
+	private : typedef TList ParmList;
+	private : typedef Loki::NullType Parm1; 						// it's always at least 1D
+	private : typedef typename Impl::Parm2 Parm2Real;
+	private : typedef typename Select< Tail2 , Loki::NullType , Parm2Real >::Result Parm2; 	// 2D
+	private : typedef typename Impl::Parm3 Parm3Real;
+	private : typedef typename Select< Tail3 , Loki::NullType , Parm3Real >::Result Parm3; 	// 3D - to have 3D just working, without symmetry handling - change this line to be: typedef typename Impl::Parm3 Parm3;
+	private : typedef typename Impl::Parm4 Parm4Real;
+	private : typedef typename Select< Tail4 , Loki::NullType , Parm4Real >::Result Parm4;	// 4D - same as above
+	private : typedef typename Impl::Parm5 Parm5;
+	private : typedef typename Impl::Parm6 Parm6;
+	private : typedef typename Impl::Parm7 Parm7;
+	private : typedef typename Impl::Parm8 Parm8;
+	private : typedef typename Impl::Parm9 Parm9;
+	private : typedef typename Impl::Parm10 Parm10;
+	private : typedef typename Impl::Parm11 Parm11;
+	private : typedef typename Impl::Parm12 Parm12;
+	private : typedef typename Impl::Parm13 Parm13;
+	private : typedef typename Impl::Parm14 Parm14;
+	private : typedef typename Impl::Parm15 Parm15;
 	
 	// Serialization stuff.. - FIXME - maybe this should be done in separate class...
-		bool deserializing;
-	protected:
-		std::vector<std::vector<std::string> >	functorNames;
-		std::list<boost::shared_ptr<Executor> > functorArguments;
-		typedef typename std::list<boost::shared_ptr<Executor> >::iterator executorListIterator;
+//		bool deserializing;
+// //	protected:
+// // 		vector<vector<string> >	functorNames;
+// // 		list<shared_ptr<Executor> > functorArguments;
+// // 		typedef typename list<shared_ptr<Executor> >::iterator executorListIterator;
 			
 // 			virtual void registerAttributes()
 // 			{
@@ -197,107 +205,93 @@ class DynLibDispatcher
 // 					REGISTER_ATTRIBUTE(functors);
 // 			}
 			
- 	public:
-		DynLibDispatcher()
-		{
+ 	public  : DynLibDispatcher()
+		  {
 			// FIXME - static_assert( typeid(BaseClass1) == typeid(Parm1) ); // 1D
 			// FIXME - static_assert( typeid(BaseClass2) == typeid(Parm2) ); // 2D
 			callBacks.clear();
 			callBacksInfo.clear();
-			functorNames.clear();
-			functorArguments.clear();
-			deserializing = false;
-		};
+		  };
 		
-		shared_ptr<Executor> makeExecutor(string libName)
-		{
-			boost::shared_ptr<Executor> executor;
+ 	public  : shared_ptr<Executor> makeExecutor(string libName)
+		  {
+			shared_ptr<Executor> executor;
 			try
 			{
-				executor = boost::dynamic_pointer_cast<Executor>(ClassFactory::instance().createShared(libName));
-				if(! executor )
-				{
-					//static bool first=true;
-					//if(first)
-					//{
-					//	cerr << "WARNING: DynLibDispatcher::makeExecutor, dynamic_pointer_cast on library: " << libName << " failed - trying static_pointer_cast instead. Check that you have a virtual desctructor.\n";
-					//	first = false;
-					//}
-					executor = boost::static_pointer_cast<Executor>(ClassFactory::instance().createShared(libName));
-				}
+				executor = dynamic_pointer_cast<Executor>(ClassFactory::instance().createShared(libName));
+				if (!executor) //dynamic_cast_failed for some reason so try with static_cast
+					executor = static_pointer_cast<Executor>(ClassFactory::instance().createShared(libName));
 			}
 			catch (FactoryCantCreate& fe)
 			{
-				std::string error = string(fe.what()) 
-						+ " -- " + MultiMethodsExceptions::NotExistingClass + libName;	
+				string error = string(fe.what()) + " -- " + MultiMethodsExceptions::NotExistingClass + libName;	
 				throw MultiMethodsNotExistingClass(error.c_str());
-			}	
+			}
+
 			assert(executor);
 			
 			return executor;
-		}
+		  }
 		
-		void storeFunctorArguments(boost::shared_ptr<Executor>& ex)
-		{
-			if(! ex) return;
-			bool dupe = false;
-			executorListIterator it    = functorArguments.begin();
-			executorListIterator itEnd = functorArguments.end();
-			for( ; it != itEnd ; ++it )
-				if( (*it)->getClassName() == ex->getClassName() )
-					dupe = true;
-			
-			if(! dupe) functorArguments.push_back(ex);
-		}
-		
-		boost::shared_ptr<Executor> findFunctorArguments(std::string libName)
-		{
-			executorListIterator it    = functorArguments.begin();
-			executorListIterator itEnd = functorArguments.end();
-			for( ; it != itEnd ; ++it )
-				if( (*it)->getClassName() == libName )
-					return *it;
-			
-			return boost::shared_ptr<Executor>();
-		}
+// // 		void storeFunctorArguments(shared_ptr<Executor>& ex)
+// // 		{
+// // 			if(! ex) return;
+// // 			bool dupe = false;
+// // 			executorListIterator it    = functorArguments.begin();
+// // 			executorListIterator itEnd = functorArguments.end();
+// // 			for( ; it != itEnd ; ++it )
+// // 				if( (*it)->getClassName() == ex->getClassName() )
+// // 					dupe = true;
+// // 			
+// // 			if(! dupe) functorArguments.push_back(ex);
+// // 		}
+// // 		
+// // 		shared_ptr<Executor> findFunctorArguments(string libName)
+// // 		{
+// // 			executorListIterator it    = functorArguments.begin();
+// // 			executorListIterator itEnd = functorArguments.end();
+// // 			for( ; it != itEnd ; ++it )
+// // 				if( (*it)->getClassName() == libName )
+// // 					return *it;
+// // 			
+// // 			return shared_ptr<Executor>();
+// // 		}
 
 ////////////////////////////////////////////////////////////////////////////////
 // add multivirtual function to 1D
 ////////////////////////////////////////////////////////////////////////////////
-		void postProcessDispatcher1D(bool d)
-		{
-			if(d)
-			{
-				deserializing = true;
-				for(unsigned int i=0;i<functorNames.size();i++)
-					add(functorNames[i][0],functorNames[i][1],findFunctorArguments(functorNames[i][1]));
-				deserializing = false;
-			}
-		}
+// // 		void postProcessDispatcher1D(bool d)
+// // 		{
+// // 			if(d)
+// // 			{
+// // 				deserializing = true;
+// // 				for(unsigned int i=0;i<functorNames.size();i++)
+// // 					add(functorNames[i][0],functorNames[i][1],findFunctorArguments(functorNames[i][1]));
+// // 				deserializing = false;
+// // 			}
+// // 		}
 		
-		void storeFunctorName(	  const std::string& baseClassName
-					, const std::string& libName
-					, boost::shared_ptr<Executor>& ex)
-		{
-			std::vector<std::string> v;
-			v.push_back(baseClassName);
-			v.push_back(libName);
-			functorNames.push_back(v);
-			storeFunctorArguments(ex);
-		}
+// // 		void storeFunctorName(	  const string& baseClassName
+// // 					, const string& libName
+// // 					, shared_ptr<Executor>& ex)
+// // 		{
+// // 			vector<string> v;
+// // 			v.push_back(baseClassName);
+// // 			v.push_back(libName);
+// // 			functorNames.push_back(v);
+// // 			storeFunctorArguments(ex);
+// // 		}
 		
-		void add(	  std::string baseClassName
-				, std::string libName
-				, boost::shared_ptr<Executor> ex = boost::shared_ptr<Executor>()
-			)
-		{
+ 	public  : void add1DEntry( string baseClassName, string libName, shared_ptr<Executor> ex = shared_ptr<Executor>())
+		  {
+
 			// create base class, to access its index. (we can't access static variable, because
 			// the class might not exist in memory at all, and we have to load dynamic library,
 			// so that a static variable is created and accessible)
-			boost::shared_ptr<BaseClass1> baseClass = 
-				boost::dynamic_pointer_cast<BaseClass1>(ClassFactory::instance().createShared(baseClassName));
+			shared_ptr<BaseClass1> baseClass = 
+				dynamic_pointer_cast<BaseClass1>(ClassFactory::instance().createShared(baseClassName));
 			// this is a strange tweak without which it won't work.
-			boost::shared_ptr<Indexable> base = boost::dynamic_pointer_cast<Indexable>(baseClass);
+			shared_ptr<Indexable> base = dynamic_pointer_cast<Indexable>(baseClass);
 		
 			assert(base);
 			int& index = base->getClassIndex();
@@ -306,18 +300,16 @@ class DynLibDispatcher
 			int maxCurrentIndex = base->getMaxCurrentlyUsedClassIndex();
 			callBacks.resize( maxCurrentIndex+1 );	// make sure that there is a place for new Functor
 
-			boost::shared_ptr<Executor> executor = ex ? ex : makeExecutor(libName);	// create the requested functor
+			shared_ptr<Executor> executor = ex ? ex : makeExecutor(libName);	// create the requested functor
 			callBacks[index] = executor;
-			
-			if(!deserializing) storeFunctorName(baseClassName,libName,ex);
-			
+						
 			#ifdef DEBUG
 				cerr <<" New class added to DynLibDispatcher 1D: " << libName << endl;
 			#endif
-		};
+		  };
 		
-		bool locateMultivirtualFunctor1D(int& index, boost::shared_ptr<BaseClass1>& base)
-		{
+ 	public  : bool locateMultivirtualFunctor1D(int& index, shared_ptr<BaseClass1>& base)
+		  {
 			index = base->getClassIndex();
 			assert( index >= 0 && (unsigned int)( index ) < callBacks.size());
 			if( callBacks[index] )
@@ -332,7 +324,7 @@ class DynLibDispatcher
 					if(callBacks[index_tmp])
 					{
 						// BEGIN FIXME - this should be a separate function to resize stuff
-						//std::cerr << index << " " << index_tmp << std::endl;
+						//cerr << index << " " << index_tmp << endl;
 						if( callBacksInfo.size() <= (unsigned int)index )
 							callBacksInfo.resize(index+1);
 						if( callBacks.size() <= (unsigned int)index )
@@ -346,48 +338,42 @@ class DynLibDispatcher
 						index_tmp = base->getBaseClassIndex(++depth);
 		
 			return false; // FIXME - this line should be not needed
-		}
+		  }
 
 		
 ////////////////////////////////////////////////////////////////////////////////
 // add multivirtual function to 2D
 ////////////////////////////////////////////////////////////////////////////////
-		void postProcessDispatcher2D(bool d)
-		{
-			if(d)
-			{
-				deserializing = true;
-				for(unsigned int i=0;i<functorNames.size();i++)
-					add(functorNames[i][0],functorNames[i][1],functorNames[i][2],findFunctorArguments(functorNames[i][2]));
-				deserializing = false;
-			}
-		}
+// // 		void postProcessDispatcher2D(bool d)
+// // 		{
+// // 			if(d)
+// // 			{
+// // 				deserializing = true;
+// // 				for(unsigned int i=0;i<functorNames.size();i++)
+// // 					add(functorNames[i][0],functorNames[i][1],functorNames[i][2],findFunctorArguments(functorNames[i][2]));
+// // 				deserializing = false;
+// // 			}
+// // 		}
 		
-		void storeFunctorName(	  const std::string& baseClassName1
-					, const std::string& baseClassName2
-					, const std::string& libName
-					, boost::shared_ptr<Executor>& ex) // 2D
-		{
-			std::vector<std::string> v;
-			v.push_back(baseClassName1);
-			v.push_back(baseClassName2);
-			v.push_back(libName);
-			functorNames.push_back(v);
-			storeFunctorArguments(ex);
-		}
+// // 		void storeFunctorName(	  const string& baseClassName1
+// // 					, const string& baseClassName2
+// // 					, const string& libName
+// // 					, shared_ptr<Executor>& ex) // 2D
+// // 		{
+// // 			vector<string> v;
+// // 			v.push_back(baseClassName1);
+// // 			v.push_back(baseClassName2);
+// // 			v.push_back(libName);
+// // 			functorNames.push_back(v);
+// // 			storeFunctorArguments(ex);
+// // 		}
 		
-		void add(	  std::string baseClassName1
-				, std::string baseClassName2
-				, std::string libName
-				, boost::shared_ptr<Executor> ex = boost::shared_ptr<Executor>()
-			)
-		{
-			boost::shared_ptr<BaseClass1> baseClass1 =
-				boost::dynamic_pointer_cast<BaseClass1>(ClassFactory::instance().createShared(baseClassName1));
-			boost::shared_ptr<BaseClass2> baseClass2 =
-				boost::dynamic_pointer_cast<BaseClass2>(ClassFactory::instance().createShared(baseClassName2));
-			boost::shared_ptr<Indexable> base1 = boost::dynamic_pointer_cast<Indexable>(baseClass1);
-			boost::shared_ptr<Indexable> base2 = boost::dynamic_pointer_cast<Indexable>(baseClass2);
+	public  : void add2DEntry( string baseClassName1, string baseClassName2, string libName, shared_ptr<Executor> ex = shared_ptr<Executor>())
+		  {
+			shared_ptr<BaseClass1> baseClass1 = dynamic_pointer_cast<BaseClass1>(ClassFactory::instance().createShared(baseClassName1));
+			shared_ptr<BaseClass2> baseClass2 = dynamic_pointer_cast<BaseClass2>(ClassFactory::instance().createShared(baseClassName2));
+			shared_ptr<Indexable> base1 = dynamic_pointer_cast<Indexable>(baseClass1);
+			shared_ptr<Indexable> base2 = dynamic_pointer_cast<Indexable>(baseClass2);
 			
 			assert(base1);
 			assert(base2);
@@ -411,8 +397,8 @@ class DynLibDispatcher
 			for( IteratorInfo2 cii = callBacksInfo.begin() ; cii != callBacksInfo.end() ; ++cii )
 				cii->resize(maxCurrentIndex2+1);
 
-			boost::shared_ptr<Executor> executor = ex ? ex : makeExecutor(libName);	// create the requested functor
-			
+			shared_ptr<Executor> executor = ex ? ex : makeExecutor(libName);	// create the requested functor
+		
 			if( typeid(BaseClass1) == typeid(BaseClass2) ) // both base classes are the same
 			{
 				callBacks	[index2][index1] = executor;
@@ -432,7 +418,7 @@ class DynLibDispatcher
 					callBacksInfo	[index1][index2] = 1; // this is reversed call
 				} else
 				{
-					std::string err = MultiMethodsExceptions::UndefinedOrder + libName;
+					string err = MultiMethodsExceptions::UndefinedOrder + libName;
 					throw MultiMethodsUndefinedOrder(err.c_str());
 				}
 			}
@@ -441,16 +427,14 @@ class DynLibDispatcher
 				callBacks	[index1][index2] = executor;
 				callBacksInfo	[index1][index2] = 0;
 			}
-			
-			if(!deserializing) storeFunctorName(baseClassName1,baseClassName2,libName,ex);
-			
+
 			#ifdef DEBUG
 				cerr <<" New class added to MultiMethodsManager 2D: " << libName << endl;
 			#endif
-		}
+		  }
 		
-		bool locateMultivirtualFunctor2D(int& index1, int& index2, boost::shared_ptr<BaseClass1>& base1,boost::shared_ptr<BaseClass2>& base2)
-		{
+	public  : bool locateMultivirtualFunctor2D(int& index1, int& index2, shared_ptr<BaseClass1>& base1,shared_ptr<BaseClass2>& base2)
+		  {
 			index1 = base1->getClassIndex();
 			index2 = base2->getClassIndex();
 			assert( index1 >= 0 && (unsigned int)( index1 ) < callBacks.size() &&
@@ -465,13 +449,14 @@ class DynLibDispatcher
 			int index2_tmp = base2->getBaseClassIndex(depth2);
 			
 			if( index1_tmp == -1 )
+			{
 				while(1)
+				{
 					if(index2_tmp == -1)
 						return false;
 					else
-						if(callBacks[index1    ][index2_tmp])
-						{ // FIXME - this is not working, when index1 or index2 is out-of-boundary. I have to resize callBacks and callBacksInfo tables.
-						//  - this should be a separate function to resize stuff
+					{	if(callBacks[index1][index2_tmp]) // FIXME - this is not working, when index1 or index2 is out-of-boundary. I have to resize callBacks and callBacksInfo tables.  - this should be a separate function to resize stuff
+						{ 
 							callBacksInfo[index1][index2] = callBacksInfo[index1][index2_tmp];
 							callBacks    [index1][index2] = callBacks    [index1][index2_tmp];
 //							index2 = index2_tmp;
@@ -479,12 +464,17 @@ class DynLibDispatcher
 						}
 						else
 							index2_tmp = base2->getBaseClassIndex(++depth2);
-			else
-			if( index2_tmp == -1 )
+					}
+				}
+			}
+			else if( index2_tmp == -1 )
+			{
 				while(1)
+				{
 					if(index1_tmp == -1)
 						return false;
 					else
+					{
 						if(callBacks[index1_tmp][index2    ])
 						{
 							callBacksInfo[index1][index2] = callBacksInfo[index1_tmp][index2];
@@ -494,12 +484,14 @@ class DynLibDispatcher
 						}
 						else
 							index1_tmp = base1->getBaseClassIndex(++depth1);
-			else
-			if( index1_tmp != -1 && index2_tmp != -1 )
+					}
+				}
+			}
+			else if( index1_tmp != -1 && index2_tmp != -1 )
 				cerr << "DynLibDispatcher: ambigious dispatch, could not determine which multivirtual function should be called\n";
 			
 			return false;
-		};
+		  };
 
 		
 ////////////////////////////////////////////////////////////////////////////////
@@ -507,29 +499,29 @@ class DynLibDispatcher
 ////////////////////////////////////////////////////////////////////////////////
 
 //  to be written when needed.... - not too difficult
-		void postProcessDispatcher3D(bool d)
-		{
-		}
-		
-		void storeFunctorName(const std::string& str1,const std::string& str2,const std::string& str3,const std::string& str4,boost::shared_ptr<Executor>& ex)
-		{
-		}
-		
-		void add(std::string baseClassName1 , std::string baseClassName2 , std::string baseClassName3 , std::string libName)
-		{
-		}
-		
-		bool locateMultivirtualFunctor3D(int& index1, int& index2, int& index3,
-			boost::shared_ptr<BaseClass1>& base1, boost::shared_ptr<BaseClass2>& base2, boost::shared_ptr<BaseClass3>& base3 )
-		{
-			return false;
-		}
+// // 		void postProcessDispatcher3D(bool d)
+// // 		{
+// // 		}
+// // 		
+// // 		void storeFunctorName(const string& str1,const string& str2,const string& str3,const string& str4,shared_ptr<Executor>& ex)
+// // 		{
+// // 		}
+// 		
+// 		void add(string baseClassName1 , string baseClassName2 , string baseClassName3 , string libName)
+// 		{
+// 		}
+// 		
+// 		bool locateMultivirtualFunctor3D(int& index1, int& index2, int& index3,
+// 			shared_ptr<BaseClass1>& base1, shared_ptr<BaseClass2>& base2, shared_ptr<BaseClass3>& base3 )
+// 		{
+// 			return false;
+// 		}
 		
 ////////////////////////////////////////////////////////////////////////////////
 // calling multivirtual function, 1D
 ////////////////////////////////////////////////////////////////////////////////
 
-		ResultType operator() (boost::shared_ptr<BaseClass1>& base)
+		ResultType operator() (shared_ptr<BaseClass1>& base)
 		{
 			int index;
 			if( locateMultivirtualFunctor1D(index,base) )
@@ -537,7 +529,7 @@ class DynLibDispatcher
 			else	return ResultType();
 		}
 		
-		ResultType operator() (boost::shared_ptr<BaseClass1>& base, Parm2 p2)
+		ResultType operator() (shared_ptr<BaseClass1>& base, Parm2 p2)
 		{
 			int index;
 			if( locateMultivirtualFunctor1D(index,base) )
@@ -545,7 +537,7 @@ class DynLibDispatcher
 			else	return ResultType();
 		}
 		
-		ResultType operator() (boost::shared_ptr<BaseClass1>& base, Parm2 p2, Parm3 p3)
+		ResultType operator() (shared_ptr<BaseClass1>& base, Parm2 p2, Parm3 p3)
 		{
 			int index;
 			if( locateMultivirtualFunctor1D(index,base) )
@@ -553,7 +545,7 @@ class DynLibDispatcher
 			else	return ResultType();
 		}
 		
-		ResultType operator() (boost::shared_ptr<BaseClass1>& base, Parm2 p2, Parm3 p3, Parm4 p4)
+		ResultType operator() (shared_ptr<BaseClass1>& base, Parm2 p2, Parm3 p3, Parm4 p4)
 		{
 			int index;
 			if( locateMultivirtualFunctor1D(index,base) )
@@ -561,7 +553,7 @@ class DynLibDispatcher
 			else	return ResultType();
 		}
 		
-		ResultType operator() (boost::shared_ptr<BaseClass1>& base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5)
+		ResultType operator() (shared_ptr<BaseClass1>& base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5)
 		{
 			int index;
 			if( locateMultivirtualFunctor1D(index,base) )
@@ -569,7 +561,7 @@ class DynLibDispatcher
 			else	return ResultType();
 		}
 		
-		ResultType operator() (boost::shared_ptr<BaseClass1>& base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6)
+		ResultType operator() (shared_ptr<BaseClass1>& base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6)
 		{
 			int index;
 			if( locateMultivirtualFunctor1D(index,base) )
@@ -577,7 +569,7 @@ class DynLibDispatcher
 			else	return ResultType();
 		}
 		
-		ResultType operator() (boost::shared_ptr<BaseClass1>& base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6, Parm7 p7)
+		ResultType operator() (shared_ptr<BaseClass1>& base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6, Parm7 p7)
 		{
 			int index;
 			if( locateMultivirtualFunctor1D(index,base) )
@@ -585,7 +577,7 @@ class DynLibDispatcher
 			else	return ResultType();
 		}
 		
-		ResultType operator() (boost::shared_ptr<BaseClass1>& base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6, Parm7 p7, Parm8 p8)
+		ResultType operator() (shared_ptr<BaseClass1>& base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6, Parm7 p7, Parm8 p8)
 		{
 			int index;
 			if( locateMultivirtualFunctor1D(index,base) )
@@ -593,7 +585,7 @@ class DynLibDispatcher
 			else	return ResultType();
 		}
 		
-		ResultType operator() (boost::shared_ptr<BaseClass1>& base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6, Parm7 p7, Parm8 p8, Parm9 p9)
+		ResultType operator() (shared_ptr<BaseClass1>& base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6, Parm7 p7, Parm8 p8, Parm9 p9)
 		{
 			int index;
 			if( locateMultivirtualFunctor1D(index,base) )
@@ -601,7 +593,7 @@ class DynLibDispatcher
 			else	return ResultType();
 		}
 		
-		ResultType operator() (boost::shared_ptr<BaseClass1>& base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6, Parm7 p7, Parm8 p8, Parm9 p9,
+		ResultType operator() (shared_ptr<BaseClass1>& base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6, Parm7 p7, Parm8 p8, Parm9 p9,
 									Parm10 p10)
 		{
 			int index;
@@ -610,7 +602,7 @@ class DynLibDispatcher
 			else	return ResultType();
 		}
 		
-		ResultType operator() (boost::shared_ptr<BaseClass1>& base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6, Parm7 p7, Parm8 p8, Parm9 p9,
+		ResultType operator() (shared_ptr<BaseClass1>& base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6, Parm7 p7, Parm8 p8, Parm9 p9,
 									Parm10 p10, Parm11 p11)
 		{
 			int index;
@@ -619,7 +611,7 @@ class DynLibDispatcher
 			else	return ResultType();
 		}
 		
-		ResultType operator() (boost::shared_ptr<BaseClass1>& base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6, Parm7 p7, Parm8 p8, Parm9 p9,
+		ResultType operator() (shared_ptr<BaseClass1>& base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6, Parm7 p7, Parm8 p8, Parm9 p9,
 									Parm10 p10, Parm11 p11, Parm12 p12)
 		{
 			int index;
@@ -628,7 +620,7 @@ class DynLibDispatcher
 			else	return ResultType();
 		}
 		
-		ResultType operator() (boost::shared_ptr<BaseClass1>& base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6, Parm7 p7, Parm8 p8, Parm9 p9,
+		ResultType operator() (shared_ptr<BaseClass1>& base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6, Parm7 p7, Parm8 p8, Parm9 p9,
 									Parm10 p10, Parm11 p11, Parm12 p12, Parm13 p13)
 		{
 			int index;
@@ -637,7 +629,7 @@ class DynLibDispatcher
 			else	return ResultType();
 		}
 		
-		ResultType operator() (boost::shared_ptr<BaseClass1>& base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6, Parm7 p7, Parm8 p8, Parm9 p9,
+		ResultType operator() (shared_ptr<BaseClass1>& base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6, Parm7 p7, Parm8 p8, Parm9 p9,
 									Parm10 p10, Parm11 p11, Parm12 p12, Parm13 p13, Parm14 p14)
 		{
 			int index;
@@ -646,7 +638,7 @@ class DynLibDispatcher
 			else	return ResultType();
 		}
 	
-		ResultType operator() (boost::shared_ptr<BaseClass1>& base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6, Parm7 p7, Parm8 p8, Parm9 p9,
+		ResultType operator() (shared_ptr<BaseClass1>& base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6, Parm7 p7, Parm8 p8, Parm9 p9,
 									Parm10 p10, Parm11 p11, Parm12 p12, Parm13 p13, Parm14 p14, Parm15 p15)
 		{
 			int index;
@@ -665,73 +657,73 @@ class DynLibDispatcher
 				class ParmTrait14, class ParmTrait15 >
 		struct InvocationTraits
 		{
-			static ResultType doDispatch( boost::shared_ptr<Executor>& ex, boost::shared_ptr<BaseClassTrait1> base1, boost::shared_ptr<BaseClassTrait2> base2 )
+			static ResultType doDispatch( shared_ptr<Executor>& ex, shared_ptr<BaseClassTrait1> base1, shared_ptr<BaseClassTrait2> base2 )
 			{	
 				return ex->goReverse	(base1, base2);	
 			}	
-			static ResultType doDispatch( boost::shared_ptr<Executor>& ex, boost::shared_ptr<BaseClassTrait1> base1, boost::shared_ptr<BaseClassTrait2> base2, ParmTrait3 p3)
+			static ResultType doDispatch( shared_ptr<Executor>& ex, shared_ptr<BaseClassTrait1> base1, shared_ptr<BaseClassTrait2> base2, ParmTrait3 p3)
 			{
 				return ex->goReverse	(base1, base2, p3);
 			}
-			static ResultType doDispatch( boost::shared_ptr<Executor>& ex, boost::shared_ptr<BaseClassTrait1> base1, boost::shared_ptr<BaseClassTrait2> base2, ParmTrait3 p3,
+			static ResultType doDispatch( shared_ptr<Executor>& ex, shared_ptr<BaseClassTrait1> base1, shared_ptr<BaseClassTrait2> base2, ParmTrait3 p3,
 						ParmTrait4 p4)
 			{
 				return ex->goReverse	(base1, base2, p3, p4);
 			}
-			static ResultType doDispatch( boost::shared_ptr<Executor>& ex, boost::shared_ptr<BaseClassTrait1> base1, boost::shared_ptr<BaseClassTrait2> base2, ParmTrait3 p3,
+			static ResultType doDispatch( shared_ptr<Executor>& ex, shared_ptr<BaseClassTrait1> base1, shared_ptr<BaseClassTrait2> base2, ParmTrait3 p3,
 						ParmTrait4 p4, ParmTrait5 p5)
 			{
 				return ex->goReverse	(base1, base2, p3, p4, p5);
 			}
-			static ResultType doDispatch( boost::shared_ptr<Executor>& ex, boost::shared_ptr<BaseClassTrait1> base1, boost::shared_ptr<BaseClassTrait2> base2, ParmTrait3 p3,
+			static ResultType doDispatch( shared_ptr<Executor>& ex, shared_ptr<BaseClassTrait1> base1, shared_ptr<BaseClassTrait2> base2, ParmTrait3 p3,
 						ParmTrait4 p4, ParmTrait5 p5, ParmTrait6 p6)
 			{	
 				return ex->goReverse	(base1, base2, p3, p4, p5, p6);
 			}
-			static ResultType doDispatch( boost::shared_ptr<Executor>& ex, boost::shared_ptr<BaseClassTrait1> base1, boost::shared_ptr<BaseClassTrait2> base2, ParmTrait3 p3,
+			static ResultType doDispatch( shared_ptr<Executor>& ex, shared_ptr<BaseClassTrait1> base1, shared_ptr<BaseClassTrait2> base2, ParmTrait3 p3,
 						ParmTrait4 p4, ParmTrait5 p5, ParmTrait6 p6, ParmTrait7 p7)
 			{	
 				return ex->goReverse	(base1, base2, p3, p4, p5, p6, p7);
 			}
-			static ResultType doDispatch( boost::shared_ptr<Executor>& ex, boost::shared_ptr<BaseClassTrait1> base1, boost::shared_ptr<BaseClassTrait2> base2, ParmTrait3 p3,
+			static ResultType doDispatch( shared_ptr<Executor>& ex, shared_ptr<BaseClassTrait1> base1, shared_ptr<BaseClassTrait2> base2, ParmTrait3 p3,
 						ParmTrait4 p4, ParmTrait5 p5, ParmTrait6 p6, ParmTrait7 p7, ParmTrait8 p8)
 			{	
 				return ex->goReverse	(base1, base2, p3, p4, p5, p6, p7, p8);
 			}
-			static ResultType doDispatch( boost::shared_ptr<Executor>& ex, boost::shared_ptr<BaseClassTrait1> base1, boost::shared_ptr<BaseClassTrait2> base2, ParmTrait3 p3,
+			static ResultType doDispatch( shared_ptr<Executor>& ex, shared_ptr<BaseClassTrait1> base1, shared_ptr<BaseClassTrait2> base2, ParmTrait3 p3,
 						ParmTrait4 p4, ParmTrait5 p5, ParmTrait6 p6, ParmTrait7 p7, ParmTrait8 p8, ParmTrait9 p9)
 			{	
 				return ex->goReverse	(base1, base2, p3, p4, p5, p6, p7, p8, p9);
 			}
-			static ResultType doDispatch( boost::shared_ptr<Executor>& ex, boost::shared_ptr<BaseClassTrait1> base1, boost::shared_ptr<BaseClassTrait2> base2, ParmTrait3 p3,
+			static ResultType doDispatch( shared_ptr<Executor>& ex, shared_ptr<BaseClassTrait1> base1, shared_ptr<BaseClassTrait2> base2, ParmTrait3 p3,
 						ParmTrait4 p4, ParmTrait5 p5, ParmTrait6 p6, ParmTrait7 p7, ParmTrait8 p8, ParmTrait9 p9, ParmTrait10 p10)
 			{	
 				return ex->goReverse	(base1, base2, p3, p4, p5, p6, p7, p8, p9, p10);
 			}
-			static ResultType doDispatch( boost::shared_ptr<Executor>& ex, boost::shared_ptr<BaseClassTrait1> base1, boost::shared_ptr<BaseClassTrait2> base2, ParmTrait3 p3,
+			static ResultType doDispatch( shared_ptr<Executor>& ex, shared_ptr<BaseClassTrait1> base1, shared_ptr<BaseClassTrait2> base2, ParmTrait3 p3,
 						ParmTrait4 p4, ParmTrait5 p5, ParmTrait6 p6, ParmTrait7 p7, ParmTrait8 p8, ParmTrait9 p9, ParmTrait10 p10, ParmTrait11 p11)
 			{	
 				return ex->goReverse	(base1, base2, p3, p4, p5, p6, p7, p8, p9, p10, p11);
 			}
-			static ResultType doDispatch( boost::shared_ptr<Executor>& ex, boost::shared_ptr<BaseClassTrait1> base1, boost::shared_ptr<BaseClassTrait2> base2, ParmTrait3 p3,
+			static ResultType doDispatch( shared_ptr<Executor>& ex, shared_ptr<BaseClassTrait1> base1, shared_ptr<BaseClassTrait2> base2, ParmTrait3 p3,
 						ParmTrait4 p4, ParmTrait5 p5, ParmTrait6 p6, ParmTrait7 p7, ParmTrait8 p8, ParmTrait9 p9, ParmTrait10 p10, ParmTrait11 p11,
 						ParmTrait12 p12)
 			{	
 				return ex->goReverse	(base1, base2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12);
 			}
-			static ResultType doDispatch( boost::shared_ptr<Executor>& ex, boost::shared_ptr<BaseClassTrait1> base1, boost::shared_ptr<BaseClassTrait2> base2, ParmTrait3 p3,
+			static ResultType doDispatch( shared_ptr<Executor>& ex, shared_ptr<BaseClassTrait1> base1, shared_ptr<BaseClassTrait2> base2, ParmTrait3 p3,
 						ParmTrait4 p4, ParmTrait5 p5, ParmTrait6 p6, ParmTrait7 p7, ParmTrait8 p8, ParmTrait9 p9, ParmTrait10 p10, ParmTrait11 p11,
 						ParmTrait12 p12, ParmTrait13 p13)
 			{	
 				return ex->goReverse	(base1, base2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13);
 			}
-			static ResultType doDispatch( boost::shared_ptr<Executor>& ex, boost::shared_ptr<BaseClassTrait1> base1, boost::shared_ptr<BaseClassTrait2> base2, ParmTrait3 p3,
+			static ResultType doDispatch( shared_ptr<Executor>& ex, shared_ptr<BaseClassTrait1> base1, shared_ptr<BaseClassTrait2> base2, ParmTrait3 p3,
 						ParmTrait4 p4, ParmTrait5 p5, ParmTrait6 p6, ParmTrait7 p7, ParmTrait8 p8, ParmTrait9 p9, ParmTrait10 p10, ParmTrait11 p11,
 						ParmTrait12 p12, ParmTrait13 p13, ParmTrait14 p14)
 			{	
 				return ex->goReverse	(base1, base2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14);
 			}
-			static ResultType doDispatch( boost::shared_ptr<Executor>& ex, boost::shared_ptr<BaseClassTrait1> base1, boost::shared_ptr<BaseClassTrait2> base2, ParmTrait3 p3,
+			static ResultType doDispatch( shared_ptr<Executor>& ex, shared_ptr<BaseClassTrait1> base1, shared_ptr<BaseClassTrait2> base2, ParmTrait3 p3,
 						ParmTrait4 p4, ParmTrait5 p5, ParmTrait6 p6, ParmTrait7 p7, ParmTrait8 p8, ParmTrait9 p9, ParmTrait10 p10, ParmTrait11 p11,
 						ParmTrait12 p12, ParmTrait13 p13, ParmTrait14 p14, ParmTrait15 p15)
 			{	
@@ -745,73 +737,73 @@ class DynLibDispatcher
 					, ParmTrait7, ParmTrait8, ParmTrait9, ParmTrait10, ParmTrait11, ParmTrait12
 					, ParmTrait13, ParmTrait14, ParmTrait15 >
 		{
-			static ResultType doDispatch( boost::shared_ptr<Executor>& ex , boost::shared_ptr<BaseClassTrait> base1, boost::shared_ptr<BaseClassTrait> base2 )
+			static ResultType doDispatch( shared_ptr<Executor>& ex , shared_ptr<BaseClassTrait> base1, shared_ptr<BaseClassTrait> base2 )
 			{
 				return ex->go		(base2, base1 );
 			}
-			static ResultType doDispatch( boost::shared_ptr<Executor>& ex , boost::shared_ptr<BaseClassTrait> base1, boost::shared_ptr<BaseClassTrait> base2, ParmTrait3 p3)
+			static ResultType doDispatch( shared_ptr<Executor>& ex , shared_ptr<BaseClassTrait> base1, shared_ptr<BaseClassTrait> base2, ParmTrait3 p3)
 			{
 				return ex->go		(base2, base1, p3);
 			}
-			static ResultType doDispatch( boost::shared_ptr<Executor>& ex , boost::shared_ptr<BaseClassTrait> base1, boost::shared_ptr<BaseClassTrait> base2, ParmTrait3 p3,
+			static ResultType doDispatch( shared_ptr<Executor>& ex , shared_ptr<BaseClassTrait> base1, shared_ptr<BaseClassTrait> base2, ParmTrait3 p3,
 						ParmTrait4 p4)
 			{
 				return ex->go		(base2, base1, p3, p4);
 			}
-			static ResultType doDispatch( boost::shared_ptr<Executor>& ex , boost::shared_ptr<BaseClassTrait> base1, boost::shared_ptr<BaseClassTrait> base2, ParmTrait3 p3,
+			static ResultType doDispatch( shared_ptr<Executor>& ex , shared_ptr<BaseClassTrait> base1, shared_ptr<BaseClassTrait> base2, ParmTrait3 p3,
 						ParmTrait4 p4, ParmTrait5 p5)
 			{	
 				return ex->go		(base2, base1, p3, p4, p5);
 			}
-			static ResultType doDispatch( boost::shared_ptr<Executor>& ex , boost::shared_ptr<BaseClassTrait> base1, boost::shared_ptr<BaseClassTrait> base2, ParmTrait3 p3,
+			static ResultType doDispatch( shared_ptr<Executor>& ex , shared_ptr<BaseClassTrait> base1, shared_ptr<BaseClassTrait> base2, ParmTrait3 p3,
 						ParmTrait4 p4, ParmTrait5 p5, ParmTrait6 p6)
 			{	
 				return ex->go		(base2, base1, p3, p4, p5, p6);
 			}
-			static ResultType doDispatch( boost::shared_ptr<Executor>& ex , boost::shared_ptr<BaseClassTrait> base1, boost::shared_ptr<BaseClassTrait> base2, ParmTrait3 p3,
+			static ResultType doDispatch( shared_ptr<Executor>& ex , shared_ptr<BaseClassTrait> base1, shared_ptr<BaseClassTrait> base2, ParmTrait3 p3,
 						ParmTrait4 p4, ParmTrait5 p5, ParmTrait6 p6, ParmTrait7 p7)
 			{	
 				return ex->go		(base2, base1, p3, p4, p5, p6, p7);
 			}
-			static ResultType doDispatch( boost::shared_ptr<Executor>& ex , boost::shared_ptr<BaseClassTrait> base1, boost::shared_ptr<BaseClassTrait> base2, ParmTrait3 p3,
+			static ResultType doDispatch( shared_ptr<Executor>& ex , shared_ptr<BaseClassTrait> base1, shared_ptr<BaseClassTrait> base2, ParmTrait3 p3,
 						ParmTrait4 p4, ParmTrait5 p5, ParmTrait6 p6, ParmTrait7 p7, ParmTrait8 p8)
 			{	
 				return ex->go		(base2, base1, p3, p4, p5, p6, p7, p8);
 			}
-			static ResultType doDispatch( boost::shared_ptr<Executor>& ex , boost::shared_ptr<BaseClassTrait> base1, boost::shared_ptr<BaseClassTrait> base2, ParmTrait3 p3,
+			static ResultType doDispatch( shared_ptr<Executor>& ex , shared_ptr<BaseClassTrait> base1, shared_ptr<BaseClassTrait> base2, ParmTrait3 p3,
 						ParmTrait4 p4, ParmTrait5 p5, ParmTrait6 p6, ParmTrait7 p7, ParmTrait8 p8, ParmTrait9 p9)
 			{	
 				return ex->go		(base2, base1, p3, p4, p5, p6, p7, p8, p9);
 			}
-			static ResultType doDispatch( boost::shared_ptr<Executor>& ex , boost::shared_ptr<BaseClassTrait> base1, boost::shared_ptr<BaseClassTrait> base2, ParmTrait3 p3,
+			static ResultType doDispatch( shared_ptr<Executor>& ex , shared_ptr<BaseClassTrait> base1, shared_ptr<BaseClassTrait> base2, ParmTrait3 p3,
 						ParmTrait4 p4, ParmTrait5 p5, ParmTrait6 p6, ParmTrait7 p7, ParmTrait8 p8, ParmTrait9 p9, ParmTrait10 p10)
 			{	
 				return ex->go		(base2, base1, p3, p4, p5, p6, p7, p8, p9, p10);
 			}
-			static ResultType doDispatch( boost::shared_ptr<Executor>& ex , boost::shared_ptr<BaseClassTrait> base1, boost::shared_ptr<BaseClassTrait> base2, ParmTrait3 p3,
+			static ResultType doDispatch( shared_ptr<Executor>& ex , shared_ptr<BaseClassTrait> base1, shared_ptr<BaseClassTrait> base2, ParmTrait3 p3,
 						ParmTrait4 p4, ParmTrait5 p5, ParmTrait6 p6, ParmTrait7 p7, ParmTrait8 p8, ParmTrait9 p9, ParmTrait10 p10, ParmTrait11 p11)
 			{	
 				return ex->go		(base2, base1, p3, p4, p5, p6, p7, p8, p9, p10, p11);
 			}	
-			static ResultType doDispatch( boost::shared_ptr<Executor>& ex , boost::shared_ptr<BaseClassTrait> base1, boost::shared_ptr<BaseClassTrait> base2, ParmTrait3 p3,
+			static ResultType doDispatch( shared_ptr<Executor>& ex , shared_ptr<BaseClassTrait> base1, shared_ptr<BaseClassTrait> base2, ParmTrait3 p3,
 						ParmTrait4 p4, ParmTrait5 p5, ParmTrait6 p6, ParmTrait7 p7, ParmTrait8 p8, ParmTrait9 p9, ParmTrait10 p10, ParmTrait11 p11,
 						ParmTrait12 p12)
 			{	
 				return ex->go		(base2, base1, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12);
 			}
-			static ResultType doDispatch( boost::shared_ptr<Executor>& ex , boost::shared_ptr<BaseClassTrait> base1, boost::shared_ptr<BaseClassTrait> base2, ParmTrait3 p3,
+			static ResultType doDispatch( shared_ptr<Executor>& ex , shared_ptr<BaseClassTrait> base1, shared_ptr<BaseClassTrait> base2, ParmTrait3 p3,
 						ParmTrait4 p4, ParmTrait5 p5, ParmTrait6 p6, ParmTrait7 p7, ParmTrait8 p8, ParmTrait9 p9, ParmTrait10 p10, ParmTrait11 p11,
 						ParmTrait12 p12, ParmTrait13 p13)
 			{	
 				return ex->go		(base2, base1, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13);
 			}
-			static ResultType doDispatch( boost::shared_ptr<Executor>& ex , boost::shared_ptr<BaseClassTrait> base1, boost::shared_ptr<BaseClassTrait> base2, ParmTrait3 p3,
+			static ResultType doDispatch( shared_ptr<Executor>& ex , shared_ptr<BaseClassTrait> base1, shared_ptr<BaseClassTrait> base2, ParmTrait3 p3,
 						ParmTrait4 p4, ParmTrait5 p5, ParmTrait6 p6, ParmTrait7 p7, ParmTrait8 p8, ParmTrait9 p9, ParmTrait10 p10, ParmTrait11 p11,
 						ParmTrait12 p12, ParmTrait13 p13, ParmTrait14 p14)
 			{	
 				return ex->go		(base2, base1, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14);
 			}
-			static ResultType doDispatch( boost::shared_ptr<Executor>& ex , boost::shared_ptr<BaseClassTrait> base1, boost::shared_ptr<BaseClassTrait> base2, ParmTrait3 p3,
+			static ResultType doDispatch( shared_ptr<Executor>& ex , shared_ptr<BaseClassTrait> base1, shared_ptr<BaseClassTrait> base2, ParmTrait3 p3,
 						ParmTrait4 p4, ParmTrait5 p5, ParmTrait6 p6, ParmTrait7 p7, ParmTrait8 p8, ParmTrait9 p9, ParmTrait10 p10, ParmTrait11 p11,
 						ParmTrait12 p12, ParmTrait13 p13, ParmTrait14 p14, ParmTrait15 p15)
 			{	
@@ -823,7 +815,7 @@ class DynLibDispatcher
 // calling multivirtual function, 2D, public interface
 ////////////////////////////////////////////////////////////////////////////////
 	public:
-		ResultType operator() (boost::shared_ptr<BaseClass1>& base1,boost::shared_ptr<BaseClass2>& base2)
+		ResultType operator() (shared_ptr<BaseClass1>& base1,shared_ptr<BaseClass2>& base2)
 		{
 			int index1, index2;
 			if( locateMultivirtualFunctor2D(index1,index2,base1,base2) )
@@ -840,7 +832,7 @@ class DynLibDispatcher
 			else	return ResultType();
 		}
 		
-		ResultType operator() (boost::shared_ptr<BaseClass1>& base1,boost::shared_ptr<BaseClass2>& base2, Parm3 p3)
+		ResultType operator() (shared_ptr<BaseClass1>& base1,shared_ptr<BaseClass2>& base2, Parm3 p3)
 		{
 			int index1, index2;
 			if( locateMultivirtualFunctor2D(index1,index2,base1,base2) )
@@ -857,7 +849,7 @@ class DynLibDispatcher
 			else	return ResultType();
 		}
 		
-		ResultType operator() (boost::shared_ptr<BaseClass1>& base1,boost::shared_ptr<BaseClass2>& base2, Parm3 p3, Parm4 p4)
+		ResultType operator() (shared_ptr<BaseClass1>& base1,shared_ptr<BaseClass2>& base2, Parm3 p3, Parm4 p4)
 		{
 			int index1, index2;
 			if( locateMultivirtualFunctor2D(index1,index2,base1,base2) )
@@ -874,7 +866,7 @@ class DynLibDispatcher
 			else	return ResultType();
 		}
 		
-		ResultType operator() (boost::shared_ptr<BaseClass1>& base1,boost::shared_ptr<BaseClass2>& base2, Parm3 p3, Parm4 p4, Parm5 p5)
+		ResultType operator() (shared_ptr<BaseClass1>& base1,shared_ptr<BaseClass2>& base2, Parm3 p3, Parm4 p4, Parm5 p5)
 		{
 			int index1, index2;
 			if( locateMultivirtualFunctor2D(index1,index2,base1,base2) )
@@ -891,7 +883,7 @@ class DynLibDispatcher
 			else	return ResultType();
 		}
 		
-		ResultType operator() (boost::shared_ptr<BaseClass1>& base1,boost::shared_ptr<BaseClass2>& base2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6)
+		ResultType operator() (shared_ptr<BaseClass1>& base1,shared_ptr<BaseClass2>& base2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6)
 		{
 			int index1, index2;
 			if( locateMultivirtualFunctor2D(index1,index2,base1,base2) )
@@ -908,7 +900,7 @@ class DynLibDispatcher
 			else	return ResultType();
 		}
 		
-		ResultType operator() (boost::shared_ptr<BaseClass1>& base1,boost::shared_ptr<BaseClass2>& base2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6,
+		ResultType operator() (shared_ptr<BaseClass1>& base1,shared_ptr<BaseClass2>& base2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6,
 						Parm7 p7)
 		{
 			int index1, index2;
@@ -926,7 +918,7 @@ class DynLibDispatcher
 			else	return ResultType();
 		}
 		
-		ResultType operator() (boost::shared_ptr<BaseClass1>& base1,boost::shared_ptr<BaseClass2>& base2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6,
+		ResultType operator() (shared_ptr<BaseClass1>& base1,shared_ptr<BaseClass2>& base2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6,
 						Parm7 p7, Parm8 p8)
 		{
 			int index1, index2;
@@ -944,7 +936,7 @@ class DynLibDispatcher
 			else	return ResultType();
 		}
 		
-		ResultType operator() (boost::shared_ptr<BaseClass1>& base1,boost::shared_ptr<BaseClass2>& base2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6,
+		ResultType operator() (shared_ptr<BaseClass1>& base1,shared_ptr<BaseClass2>& base2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6,
 						Parm7 p7, Parm8 p8, Parm9 p9)
 		{
 			int index1, index2;
@@ -962,7 +954,7 @@ class DynLibDispatcher
 			else	return ResultType();
 		}
 		
-		ResultType operator() (boost::shared_ptr<BaseClass1>& base1,boost::shared_ptr<BaseClass2>& base2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6,
+		ResultType operator() (shared_ptr<BaseClass1>& base1,shared_ptr<BaseClass2>& base2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6,
 						Parm7 p7, Parm8 p8, Parm9 p9, Parm10 p10)
 		{
 			int index1, index2;
@@ -980,7 +972,7 @@ class DynLibDispatcher
 			else	return ResultType();
 		}
 		
-		ResultType operator() (boost::shared_ptr<BaseClass1>& base1,boost::shared_ptr<BaseClass2>& base2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6,
+		ResultType operator() (shared_ptr<BaseClass1>& base1,shared_ptr<BaseClass2>& base2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6,
 						Parm7 p7, Parm8 p8, Parm9 p9, Parm10 p10, Parm11 p11)
 		{
 			int index1, index2;
@@ -998,7 +990,7 @@ class DynLibDispatcher
 			else	return ResultType();
 		}
 		
-		ResultType operator() (boost::shared_ptr<BaseClass1>& base1,boost::shared_ptr<BaseClass2>& base2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6,
+		ResultType operator() (shared_ptr<BaseClass1>& base1,shared_ptr<BaseClass2>& base2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6,
 						Parm7 p7, Parm8 p8, Parm9 p9, Parm10 p10, Parm11 p11, Parm12 p12)
 		{
 			int index1, index2;
@@ -1016,7 +1008,7 @@ class DynLibDispatcher
 			else	return ResultType();
 		}
 		
-		ResultType operator() (boost::shared_ptr<BaseClass1>& base1,boost::shared_ptr<BaseClass2>& base2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6,
+		ResultType operator() (shared_ptr<BaseClass1>& base1,shared_ptr<BaseClass2>& base2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6,
 						Parm7 p7, Parm8 p8, Parm9 p9, Parm10 p10, Parm11 p11, Parm12 p12, Parm13 p13)
 		{
 			int index1, index2;
@@ -1034,7 +1026,7 @@ class DynLibDispatcher
 			else	return ResultType();
 		}
 		
-		ResultType operator() (boost::shared_ptr<BaseClass1>& base1,boost::shared_ptr<BaseClass2>& base2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6,
+		ResultType operator() (shared_ptr<BaseClass1>& base1,shared_ptr<BaseClass2>& base2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6,
 						Parm7 p7, Parm8 p8, Parm9 p9, Parm10 p10, Parm11 p11, Parm12 p12, Parm13 p13, Parm14 p14)
 		{
 			int index1, index2;
@@ -1052,7 +1044,7 @@ class DynLibDispatcher
 			else	return ResultType();
 		}
 		
-		ResultType operator() (boost::shared_ptr<BaseClass1>& base1,boost::shared_ptr<BaseClass2>& base2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6,
+		ResultType operator() (shared_ptr<BaseClass1>& base1,shared_ptr<BaseClass2>& base2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6,
 						Parm7 p7, Parm8 p8, Parm9 p9, Parm10 p10, Parm11 p11, Parm12 p12, Parm13 p13, Parm14 p14, Parm15 p15)
 		{
 			int index1, index2;

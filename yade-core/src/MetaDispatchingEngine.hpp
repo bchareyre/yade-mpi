@@ -21,102 +21,68 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#ifndef __METADISPATCHINGENGINE2D_HPP__
-#define __METADISPATCHINGENGINE2D_HPP__
+#ifndef __METADISPATCHINGENGINE_HPP__
+#define __METADISPATCHINGENGINE_HPP__
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "MetaDispatchingEngine.hpp"
+#include "MetaEngine.hpp"
+#include "EngineUnit.hpp"
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <yade/yade-lib-multimethods/DynLibDispatcher.hpp>
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-template
-<
-	class baseClass1, 
-	class baseClass2,
-	class EngineUnitType,
-	class EngineUnitReturnType,
-	class EngineUnitArguments,
-	bool autoSymmetry=true
->
-class MetaDispatchingEngine2D : public MetaDispatchingEngine,
-				public DynLibDispatcher
-				<	  TYPELIST_2(baseClass1,baseClass2)	// base classes for dispatch
-					, EngineUnitType			// class that provides multivirtual call
-					, EngineUnitReturnType			// return type
-					, EngineUnitArguments			// argument of engine unit
-					, autoSymmetry
-				>
+class MetaDispatchingEngine : public MetaEngine
 {
 
-	public : void add( string baseClassName1, string baseClassName2, string libName, shared_ptr<EngineUnitType> eu = shared_ptr<EngineUnitType>())
-	{
-		storeFunctorName(baseClassName1,baseClassName2,libName,eu);
-		add2DEntry(baseClassName1,baseClassName2,libName,eu);
-	}
+	protected : vector<vector<string> > functorNames;
+	protected : list<shared_ptr<EngineUnit> > functorArguments;
 
-	protected : void postProcessAttributes(bool deserializing)
-	{
-		MetaDispatchingEngine::postProcessAttributes(deserializing);
-	
-		if(deserializing)
-		{
-			for(unsigned int i=0;i<functorNames.size();i++)
-				add2DEntry(functorNames[i][0],functorNames[i][1],functorNames[i][2],static_pointer_cast<EngineUnitType>(findFunctorArguments(functorNames[i][2])));
-		}
-/*		else
-		{
-			for(unsigned int i=0;i<functorNames.size();i++)
-			{
-				storeFunctorName(functorNames[i][0],functorNames[i][1],functorNames[i][2],findFunctorArguments(functorNames[i][2]));
-				add2DEntry(functorNames[i][0],functorNames[i][1],functorNames[i][2],dynamic_pointer_cast<EngineUnitType>(findFunctorArguments(functorNames[i][2])));
-			}
-		}*/
-	}
+	public    : typedef list<shared_ptr<EngineUnit> >::iterator EngineUnitListIterator;
 
-	public : void registerAttributes()
-	{
-		MetaDispatchingEngine::registerAttributes();
-	}
 
-	public    : virtual int getDimension() { return 2; };
+
+
+	protected : void storeFunctorName(const string& baseClassName1, const string& libName, shared_ptr<EngineUnit> eu);
+	protected : void storeFunctorName(const string& baseClassName1, const string& baseClassName2, const string& libName, shared_ptr<EngineUnit> eu);
+	protected : void storeFunctorName(const string& baseClassName1, const string& baseClassName2, const string& baseClassName3, const string& libName, shared_ptr<EngineUnit> eu);
+	protected : void storeFunctorArguments(shared_ptr<EngineUnit> eu);
+	protected : shared_ptr<EngineUnit> findFunctorArguments(const string& libName);
+
+	public    : MetaDispatchingEngine();
+	public    : virtual ~MetaDispatchingEngine();
+
+	public	  : virtual void registerAttributes();
+	protected : virtual void postProcessAttributes(bool deserializing);
+
 	public    : virtual string getEngineUnitType() { throw; };
+	public    : virtual int getDimension() { throw; };
 	public    : virtual string getBaseClassType(unsigned int ) { throw; };
 
-//	REGISTER_CLASS_NAME(MetaDispatchingEngine2D);
-
+	REGISTER_CLASS_NAME(MetaDispatchingEngine);
 };
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
-//REGISTER_SERIALIZABLE(MetaDispatchingEngine2D,false);
+REGISTER_SERIALIZABLE(MetaDispatchingEngine,false);
+/*
+class MetaDispatcher2D : public MetaDispatchingEngine<EngineUnit2D>
+{
+	REGISTER_CLASS_NAME(MetaDispatcher);
+}*/
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////
 
-#define REGISTER_BASE_CLASS_TYPE_2D(name1,name2)			\
-	public : virtual string getBaseClassType(unsigned int i)	\
-	{								\
-		switch (i)						\
-		{							\
-			case 0  : return name1;				\
-			case 1  : return name2;				\
-			default : return "";				\
-		}							\
-	}	
+#define REGISTER_ENGINE_UNIT_TYPE(name)		\
+	public     : virtual string getEngineUnitType() { return #name; };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#endif // __METADISPATCHINGENGINE2D_HPP__
+#endif // __METADISPATCHINGENGINE_HPP__
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////

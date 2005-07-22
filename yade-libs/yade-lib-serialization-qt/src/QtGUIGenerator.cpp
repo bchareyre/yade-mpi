@@ -178,7 +178,7 @@ void QtGUIGenerator::buildGUI(shared_ptr<Serializable> s,  QWidget * widget)
 				}
 			}
 		
-			// not possible to store descriptor into a map or set ?????!!!
+			// not possible to store descriptor into a map or set ?????!!! I don't know why but it is crashing, so I use a vector and lookup table
 			descriptors.push_back(descriptor);
 			lookUp[descriptor->name] = descriptors.size()-1;
 		}

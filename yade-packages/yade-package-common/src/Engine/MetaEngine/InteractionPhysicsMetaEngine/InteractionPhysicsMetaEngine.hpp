@@ -27,7 +27,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <yade/yade-core/Engine.hpp>
+#include <yade/yade-core/MetaDispatchingEngine2D.hpp>
 #include <yade/yade-lib-multimethods/DynLibDispatcher.hpp>
 #include <yade/yade-core/PhysicalParameters.hpp>
 #include <yade/yade-core/Interaction.hpp>
@@ -40,21 +40,21 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-class InteractionPhysicsMetaEngine : 
-	  public Engine
-	, public DynLibDispatcher
-		<	TYPELIST_2( PhysicalParameters , PhysicalParameters ) ,	// base classess for dispatch
-			InteractionPhysicsEngineUnit,					// class that provides multivirtual call
-			void ,								// return type
-			TYPELIST_3(	  const shared_ptr<PhysicalParameters>&	// arguments
-					, const shared_ptr<PhysicalParameters>&
-					, const shared_ptr<Interaction>&
-				)
-		>
+class InteractionPhysicsMetaEngine : 	public MetaDispatchingEngine2D
+					<	
+						PhysicalParameters,					// base classe for dispatch
+						PhysicalParameters,					// base classe for dispatch
+						InteractionPhysicsEngineUnit,				// class that provides multivirtual call
+						void,							// return type
+						TYPELIST_3(	  const shared_ptr<PhysicalParameters>&	// arguments
+								, const shared_ptr<PhysicalParameters>&
+								, const shared_ptr<Interaction>&
+							  )
+					>
 {		
 	public 		: virtual void action(Body* body);
-	public 		: virtual void registerAttributes();
-	protected 	: virtual void postProcessAttributes(bool deserializing);
+	//public 		: virtual void registerAttributes();
+	//protected 	: virtual void postProcessAttributes(bool deserializing);
 	REGISTER_CLASS_NAME(InteractionPhysicsMetaEngine);
 };
 

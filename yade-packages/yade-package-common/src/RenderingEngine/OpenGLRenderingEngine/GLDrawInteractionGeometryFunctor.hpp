@@ -27,6 +27,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include <yade/yade-core/EngineUnit1D.hpp>
 #include <yade/yade-lib-multimethods/FunctorWrapper.hpp>
 #include <yade/yade-core/InteractingGeometry.hpp>
 #include <yade/yade-core/PhysicalParameters.hpp>
@@ -34,11 +35,11 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-class GLDrawInteractionGeometryFunctor : public FunctorWrapper
-		<
-		 void ,
-		 TYPELIST_2(const shared_ptr<InteractingGeometry>&, const shared_ptr<PhysicalParameters>&) 
-		>
+class GLDrawInteractionGeometryFunctor :	public EngineUnit1D
+						<
+		 					void ,
+		 					TYPELIST_2(const shared_ptr<InteractingGeometry>&, const shared_ptr<PhysicalParameters>&) 
+						>
 {
 	public : virtual ~GLDrawInteractionGeometryFunctor() {};
 	REGISTER_CLASS_NAME(GLDrawInteractionGeometryFunctor);

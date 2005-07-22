@@ -29,15 +29,16 @@
 
 #include <yade/yade-lib-multimethods/FunctorWrapper.hpp>
 #include <yade/yade-core/BoundingVolume.hpp>
+#include <yade/yade-core/EngineUnit1D.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-class GLDrawBoundingVolumeFunctor : public FunctorWrapper
-		<
-		 void ,
-		 TYPELIST_1(const shared_ptr<BoundingVolume>&) 
-		>
+class GLDrawBoundingVolumeFunctor : 	public EngineUnit1D
+					<
+		 				void ,
+		 				TYPELIST_1(const shared_ptr<BoundingVolume>&) 
+					>
 {
 	public : virtual ~GLDrawBoundingVolumeFunctor() {};
 	REGISTER_CLASS_NAME(GLDrawBoundingVolumeFunctor);

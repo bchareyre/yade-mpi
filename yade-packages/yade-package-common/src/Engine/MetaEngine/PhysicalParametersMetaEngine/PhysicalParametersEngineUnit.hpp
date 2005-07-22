@@ -27,22 +27,20 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <yade/yade-lib-serialization/Serializable.hpp>
 #include <yade/yade-core/PhysicalParameters.hpp>
 #include <yade/yade-core/Body.hpp>
-#include <yade/yade-lib-multimethods/FunctorWrapper.hpp>
+#include <yade/yade-core/EngineUnit1D.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-class PhysicalParametersEngineUnit : public FunctorWrapper
-		<
-		 void ,
-		 TYPELIST_2(
-		 		  const shared_ptr<PhysicalParameters>&
-				, Body*
-			   )
-		>
+class PhysicalParametersEngineUnit :    public EngineUnit1D
+					<
+		 				void ,
+		 				TYPELIST_2(	  const shared_ptr<PhysicalParameters>&
+								, Body*
+			   				  )
+					>
 {	
 	REGISTER_CLASS_NAME(PhysicalParametersEngineUnit);
 };

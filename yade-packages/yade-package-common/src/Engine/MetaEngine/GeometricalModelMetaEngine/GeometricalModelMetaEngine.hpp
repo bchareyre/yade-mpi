@@ -32,7 +32,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <yade/yade-core/Engine.hpp>
+#include <yade/yade-core/MetaDispatchingEngine2D.hpp>
 #include <yade/yade-lib-multimethods/DynLibDispatcher.hpp>
 #include <yade/yade-core/PhysicalParameters.hpp>
 #include <yade/yade-core/GeometricalModel.hpp>
@@ -41,22 +41,21 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class GeometricalModelMetaEngine :
-	  public Engine 
-	, public DynLibDispatcher
-		<	TYPELIST_2( PhysicalParameters , GeometricalModel ) ,
-			GeometricalModelEngineUnit,
-			void ,
-			TYPELIST_3(
-					const shared_ptr<PhysicalParameters>&
-					, shared_ptr<GeometricalModel>&
-					, const Body*
-				  )
-		>
+class GeometricalModelMetaEngine :	public MetaDispatchingEngine2D
+					<	
+						PhysicalParameters,
+						GeometricalModel,
+						GeometricalModelEngineUnit,
+						void ,
+						TYPELIST_3(	  const shared_ptr<PhysicalParameters>&
+								, shared_ptr<GeometricalModel>&
+								, const Body*
+				  			  )
+					>
 {
 	public		: virtual void action(Body* b);
-	public		: virtual void registerAttributes();
-	public		: virtual void postProcessAttributes(bool deserializing);
+	//public		: virtual void registerAttributes();
+	//public		: virtual void postProcessAttributes(bool deserializing);
 	REGISTER_CLASS_NAME(GeometricalModelMetaEngine);
 };
 

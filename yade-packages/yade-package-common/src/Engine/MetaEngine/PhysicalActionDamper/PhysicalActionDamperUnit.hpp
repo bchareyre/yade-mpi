@@ -27,22 +27,22 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <yade/yade-lib-multimethods/FunctorWrapper.hpp>
 #include <yade/yade-core/PhysicalAction.hpp>
 #include <yade/yade-core/PhysicalParameters.hpp>
 #include <yade/yade-core/Body.hpp>
+#include <yade/yade-core/EngineUnit2D.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-class PhysicalActionDamperUnit : public FunctorWrapper
-		<
-		 void ,
-		 TYPELIST_3(	  const shared_ptr<PhysicalAction>&
-				, const shared_ptr<PhysicalParameters>&
-				, const Body*
-			   )
-		>
+class PhysicalActionDamperUnit : public EngineUnit2D
+				 <
+		 			void ,
+		 			TYPELIST_3(	  const shared_ptr<PhysicalAction>&
+							, const shared_ptr<PhysicalParameters>&
+							, const Body*
+						   )
+				>
 {
 	REGISTER_CLASS_NAME(PhysicalActionDamperUnit);
 };

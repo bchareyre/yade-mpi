@@ -32,7 +32,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <yade/yade-core/Engine.hpp>
+#include <yade/yade-core/MetaDispatchingEngine2D.hpp>
 #include <yade/yade-lib-multimethods/DynLibDispatcher.hpp>
 #include <yade/yade-core/PhysicalAction.hpp>
 
@@ -42,21 +42,21 @@ class Body;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-class PhysicalActionApplier :
-	  public Engine
-	, public DynLibDispatcher
-		<	  TYPELIST_2( PhysicalAction , PhysicalParameters )	// base classess for dispatch
-			, PhysicalActionApplierUnit				// class that provides multivirtual call
-			, void						// return type
-			, TYPELIST_3(	  const shared_ptr<PhysicalAction>&	// function arguments
-					, const shared_ptr<PhysicalParameters>& 
-					, const Body *
-				    )
-		>
+class PhysicalActionApplier :	public MetaDispatchingEngine2D
+				<
+					PhysicalAction ,					// base classe for dispatch
+					PhysicalParameters,					// base classe for dispatch
+					PhysicalActionApplierUnit,				// class that provides multivirtual call
+					void,							// return type
+					TYPELIST_3(	  const shared_ptr<PhysicalAction>&	// function arguments
+							, const shared_ptr<PhysicalParameters>& 
+							, const Body *
+				    		  )
+				>
 {
 	public 		: virtual void action(Body* body);
-	public		: virtual void registerAttributes();
-	protected	: virtual void postProcessAttributes(bool deserializing);
+	//public		: virtual void registerAttributes();
+	//protected	: virtual void postProcessAttributes(bool deserializing);
 	REGISTER_CLASS_NAME(PhysicalActionApplier);
 };
 

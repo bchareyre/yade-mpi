@@ -115,9 +115,9 @@ template
 <	class ResultType, 		// type returned by multivirtual function
 	class ArgumentTypeList		// TypeList of arguments accepted by multivirtual function,
 >
-class FunctorWrapper : public Serializable
+class FunctorWrapper //: public Serializable // FIXME functor shouldn't be serializable
 {
-	private:
+	private : 
 		typedef Loki::FunctorImpl<ResultType, ArgumentTypeList > Impl;
 		typedef ArgumentTypeList ParmList;
 		typedef typename Impl::Parm1 Parm1;
@@ -136,8 +136,8 @@ class FunctorWrapper : public Serializable
 		typedef typename Impl::Parm14 Parm14;
 		typedef typename Impl::Parm15 Parm15;
 	
-		ResultType error(int n)
-		{
+	private : ResultType error(int n)
+		 {
 			std::string err = std::string(MultiMethodsExceptions::BadVirtualCall) + "types are:\n" 
 			+ "1. " + typeid(Parm1).name() + "\n" 
 			+ "2. " + typeid(Parm2).name() + "\n"
@@ -151,62 +151,61 @@ class FunctorWrapper : public Serializable
 			+ "number of types used in the call: " + boost::lexical_cast<string>(n);
 			cerr << err.c_str();
 			throw MultiMethodsBadVirtualCall(err.c_str());
-		}
+		 }
 
-	public:
-			FunctorWrapper () {};
-		virtual ~FunctorWrapper () {};
-		virtual std::string checkOrder() const { return ""; };
+	public : FunctorWrapper () {};
+	public : virtual ~FunctorWrapper () {};
+	public : virtual string checkOrder() const { return ""; };
 
 // FIXME : we can save some memory by writing specializations for each number of parameters, like FunctorImpl, but it will not make call faster - always it's one virtual redirection. So I'll do that later.
 
 // in following functions a second throw was added - just to bypass compiler warnings - it will never be executed.
 
-		virtual ResultType go	(	Parm1) 							{ return error(1); };
-		virtual ResultType go	(	Parm1,Parm2) 						{ return error(2); };
-		virtual ResultType go	(	Parm1,Parm2,Parm3) 					{ return error(3); };
-		virtual ResultType go	(	Parm1,Parm2,Parm3,Parm4) 				{ return error(4); };
-		virtual ResultType go	(	Parm1,Parm2,Parm3,Parm4,Parm5) 				{ return error(5); };
-		virtual ResultType go	(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6) 			{ return error(6); };
-		virtual ResultType go	(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7) 		{ return error(7); };
-		virtual ResultType go	(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7,Parm8)	{ return error(8); };
-		virtual ResultType go	(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7,Parm8,
-						Parm9)							{ return error(9); };
-		virtual ResultType go	(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7,Parm8,
-						Parm9,Parm10)						{ return error(10); };
-		virtual ResultType go	(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7,Parm8,
-						Parm9,Parm10,Parm11)					{ return error(11); };
-		virtual ResultType go	(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7,Parm8,
-						Parm9,Parm10,Parm11,Parm12)				{ return error(12); };
-		virtual ResultType go	(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7,Parm8,
-						Parm9,Parm10,Parm11,Parm12,Parm13)			{ return error(13); };
-		virtual ResultType go	(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7,Parm8,
-						Parm9,Parm10,Parm11,Parm12,Parm13,Parm14)		{ return error(14); };
-		virtual ResultType go	(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7,Parm8,
-						Parm9,Parm10,Parm11,Parm12,Parm13,Parm14,Parm15)	{ return error(15); };
-		
-		virtual ResultType goReverse(	Parm1) 							{ return error(1); };
-		virtual ResultType goReverse(	Parm1,Parm2) 						{ return error(2); };
-		virtual ResultType goReverse(	Parm1,Parm2,Parm3) 					{ return error(3); };
-		virtual ResultType goReverse(	Parm1,Parm2,Parm3,Parm4) 				{ return error(4); };
-		virtual ResultType goReverse(	Parm1,Parm2,Parm3,Parm4,Parm5) 				{ return error(5); };
-		virtual ResultType goReverse(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6) 			{ return error(6); };
-		virtual ResultType goReverse(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7) 		{ return error(7); };
-		virtual ResultType goReverse(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7,Parm8)	{ return error(8); };
-		virtual ResultType goReverse(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7,Parm8,
-						Parm9)							{ return error(9); };
-		virtual ResultType goReverse(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7,Parm8,
-						Parm9,Parm10)						{ return error(10); };
-		virtual ResultType goReverse(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7,Parm8,
-						Parm9,Parm10,Parm11)					{ return error(11); };
-		virtual ResultType goReverse(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7,Parm8,
-						Parm9,Parm10,Parm11,Parm12)				{ return error(12); };
-		virtual ResultType goReverse(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7,Parm8,
-						Parm9,Parm10,Parm11,Parm12,Parm13)			{ return error(13); };
-		virtual ResultType goReverse(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7,Parm8,
-						Parm9,Parm10,Parm11,Parm12,Parm13,Parm14)		{ return error(14); };
-		virtual ResultType goReverse(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7,Parm8,
-						Parm9,Parm10,Parm11,Parm12,Parm13,Parm14,Parm15)	{ return error(15); };
+	virtual ResultType go	(	Parm1) 							{ return error(1); };
+	virtual ResultType go	(	Parm1,Parm2) 						{ return error(2); };
+	virtual ResultType go	(	Parm1,Parm2,Parm3) 					{ return error(3); };
+	virtual ResultType go	(	Parm1,Parm2,Parm3,Parm4) 				{ return error(4); };
+	virtual ResultType go	(	Parm1,Parm2,Parm3,Parm4,Parm5) 				{ return error(5); };
+	virtual ResultType go	(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6) 			{ return error(6); };
+	virtual ResultType go	(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7) 		{ return error(7); };
+	virtual ResultType go	(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7,Parm8)	{ return error(8); };
+	virtual ResultType go	(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7,Parm8,
+					Parm9)							{ return error(9); };
+	virtual ResultType go	(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7,Parm8,
+					Parm9,Parm10)						{ return error(10); };
+	virtual ResultType go	(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7,Parm8,
+					Parm9,Parm10,Parm11)					{ return error(11); };
+	virtual ResultType go	(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7,Parm8,
+					Parm9,Parm10,Parm11,Parm12)				{ return error(12); };
+	virtual ResultType go	(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7,Parm8,
+					Parm9,Parm10,Parm11,Parm12,Parm13)			{ return error(13); };
+	virtual ResultType go	(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7,Parm8,
+					Parm9,Parm10,Parm11,Parm12,Parm13,Parm14)		{ return error(14); };
+	virtual ResultType go	(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7,Parm8,
+					Parm9,Parm10,Parm11,Parm12,Parm13,Parm14,Parm15)	{ return error(15); };
+	
+	virtual ResultType goReverse(	Parm1) 							{ return error(1); };
+	virtual ResultType goReverse(	Parm1,Parm2) 						{ return error(2); };
+	virtual ResultType goReverse(	Parm1,Parm2,Parm3) 					{ return error(3); };
+	virtual ResultType goReverse(	Parm1,Parm2,Parm3,Parm4) 				{ return error(4); };
+	virtual ResultType goReverse(	Parm1,Parm2,Parm3,Parm4,Parm5) 				{ return error(5); };
+	virtual ResultType goReverse(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6) 			{ return error(6); };
+	virtual ResultType goReverse(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7) 		{ return error(7); };
+	virtual ResultType goReverse(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7,Parm8)	{ return error(8); };
+	virtual ResultType goReverse(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7,Parm8,
+					Parm9)							{ return error(9); };
+	virtual ResultType goReverse(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7,Parm8,
+					Parm9,Parm10)						{ return error(10); };
+	virtual ResultType goReverse(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7,Parm8,
+					Parm9,Parm10,Parm11)					{ return error(11); };
+	virtual ResultType goReverse(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7,Parm8,
+					Parm9,Parm10,Parm11,Parm12)				{ return error(12); };
+	virtual ResultType goReverse(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7,Parm8,
+					Parm9,Parm10,Parm11,Parm12,Parm13)			{ return error(13); };
+	virtual ResultType goReverse(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7,Parm8,
+					Parm9,Parm10,Parm11,Parm12,Parm13,Parm14)		{ return error(14); };
+	virtual ResultType goReverse(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7,Parm8,
+					Parm9,Parm10,Parm11,Parm12,Parm13,Parm14,Parm15)	{ return error(15); };
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -227,6 +226,7 @@ class FunctorWrapper : public Serializable
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 #endif // DYNLIB_LAUNCHER_HPP
 

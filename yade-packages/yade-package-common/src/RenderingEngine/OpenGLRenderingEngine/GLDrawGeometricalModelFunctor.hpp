@@ -27,6 +27,8 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+
+#include <yade/yade-core/EngineUnit1D.hpp>
 #include <yade/yade-lib-multimethods/FunctorWrapper.hpp>
 #include <yade/yade-core/GeometricalModel.hpp>
 #include <yade/yade-core/PhysicalParameters.hpp>
@@ -34,11 +36,11 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-class GLDrawGeometricalModelFunctor : public FunctorWrapper
-		<
-		 void ,
-		 TYPELIST_3(const shared_ptr<GeometricalModel>&, const shared_ptr<PhysicalParameters>&,bool) 
-		>
+class GLDrawGeometricalModelFunctor : 	public EngineUnit1D
+					<
+		 				void ,
+		 				TYPELIST_3(const shared_ptr<GeometricalModel>&, const shared_ptr<PhysicalParameters>&,bool) 
+					>
 {
 	public : bool wire;
 	public : virtual ~GLDrawGeometricalModelFunctor() {};

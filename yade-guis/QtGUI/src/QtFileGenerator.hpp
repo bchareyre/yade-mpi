@@ -28,9 +28,9 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <qlayout.h>
-#include <qlabel.h>
 #include <qframe.h>
 #include <qscrollview.h>
+
 #include <QtFileGeneratorController.h>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -56,7 +56,6 @@ class QtFileGenerator : public QtFileGeneratorController, public Factorable
 	private : QtGUIGenerator guiGen;	
 	private : QScrollView * scrollView;
 	private : QFrame * scrollViewFrame;
-	//private : QLabel * tlGeneratorParameters;
 	private : QVBoxLayout* scrollViewLayout;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

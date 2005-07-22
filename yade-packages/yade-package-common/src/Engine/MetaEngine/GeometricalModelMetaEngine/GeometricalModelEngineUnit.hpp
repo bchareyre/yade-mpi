@@ -27,11 +27,10 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <yade/yade-lib-serialization/Serializable.hpp>
 #include <yade/yade-core/PhysicalParameters.hpp>
 #include <yade/yade-core/GeometricalModel.hpp>
 #include <yade/yade-core/Body.hpp>
-#include <yade/yade-lib-multimethods/FunctorWrapper.hpp>
+#include <yade/yade-core/EngineUnit2D.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -49,15 +48,14 @@
 	Parameters of the Body can affect "perfect geometrical representation"(GeometricalModel) of
 	the Body. So it is given as first argument.
 */
-class GeometricalModelEngineUnit : public FunctorWrapper
-		<
-		 void ,
-		 TYPELIST_3(
-		 		  const shared_ptr<PhysicalParameters>&
-				, shared_ptr<GeometricalModel>&
-				, const Body*
-			   )
-		>
+class GeometricalModelEngineUnit : 	public EngineUnit2D
+					<
+		 				void ,
+		 				TYPELIST_3(	  const shared_ptr<PhysicalParameters>&
+								, shared_ptr<GeometricalModel>&
+								, const Body*
+			   				  )
+					>
 {	
 	REGISTER_CLASS_NAME(GeometricalModelEngineUnit);
 };

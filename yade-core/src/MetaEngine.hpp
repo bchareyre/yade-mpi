@@ -32,15 +32,23 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#define REGISTER_ENGINE_UNIT_TYPE(name)		\
-	public : virtual string getEngineUnitType() { return name; };
-
 class MetaEngine : public Engine
 {
 	public : MetaEngine() {};
 	public : virtual ~MetaEngine() {};
 
 	public : virtual string getEngineUnitType() { throw; };
+
+
+	public	  : virtual void registerAttributes()
+	{
+		Engine::registerAttributes();
+	};
+
+	protected : virtual void postProcessAttributes(bool deserializing)
+	{
+		Engine::postProcessAttributes(deserializing);
+	}
 
 	REGISTER_CLASS_NAME(MetaEngine);
 

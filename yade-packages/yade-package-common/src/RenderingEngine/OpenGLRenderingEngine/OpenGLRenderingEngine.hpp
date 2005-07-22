@@ -29,6 +29,7 @@
 
 #include <yade/yade-core/RenderingEngine.hpp>
 #include <yade/yade-lib-multimethods/DynLibDispatcher.hpp>
+#include <yade/yade-core/MetaDispatchingEngine1D.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -57,6 +58,12 @@ class OpenGLRenderingEngine : public RenderingEngine
 	private : DynLibDispatcher< InteractingGeometry , GLDrawInteractionGeometryFunctor, void , TYPELIST_2(const shared_ptr<InteractingGeometry>&, const shared_ptr<PhysicalParameters>&) >interactionGeometryDispatcher;
 	private : DynLibDispatcher< GeometricalModel  , GLDrawGeometricalModelFunctor, void , TYPELIST_3(const shared_ptr<GeometricalModel>&, const shared_ptr<PhysicalParameters>&,bool) > geometricalModelDispatcher;
 	private : DynLibDispatcher< GeometricalModel  , GLDrawShadowVolumeFunctor, void , TYPELIST_3(const shared_ptr<GeometricalModel>&, const shared_ptr<PhysicalParameters>&, const Vector3r& ) > shadowVolumeDispatcher;
+
+// 	private : MetaDispatchingEngine1D< BoundingVolume    , GLDrawBoundingVolumeFunctor, void , TYPELIST_1(const shared_ptr<BoundingVolume>&) > boundingVolumeDispatcher;
+// 	private : MetaDispatchingEngine1D< InteractingGeometry , GLDrawInteractionGeometryFunctor, void , TYPELIST_2(const shared_ptr<InteractingGeometry>&, const shared_ptr<PhysicalParameters>&) >interactionGeometryDispatcher;
+// 	private : MetaDispatchingEngine1D< GeometricalModel  , GLDrawGeometricalModelFunctor, void , TYPELIST_3(const shared_ptr<GeometricalModel>&, const shared_ptr<PhysicalParameters>&,bool) > geometricalModelDispatcher;
+// 	private : MetaDispatchingEngine1D< GeometricalModel  , GLDrawShadowVolumeFunctor, void , TYPELIST_3(const shared_ptr<GeometricalModel>&, const shared_ptr<PhysicalParameters>&, const Vector3r& ) > shadowVolumeDispatcher;
+
 
 	private : vector<vector<string> >  boundingVolumeFunctorNames;
 	private : vector<vector<string> >  interactionGeometryFunctorNames;

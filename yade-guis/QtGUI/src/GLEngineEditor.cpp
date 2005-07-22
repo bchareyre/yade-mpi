@@ -49,7 +49,6 @@ GLEngineEditor::GLEngineEditor(QWidget * parent, const char * name) : QGLViewer(
 	firstEngine = -1;
 
 	updateGL();
-
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -194,6 +193,7 @@ void GLEngineEditor::mouseMoveEvent(QMouseEvent * e)
 		QGLViewer::mouseMoveEvent(e);
 
 	updateGL();
+	emit verifyValidity();
 }
 
 
@@ -233,6 +233,7 @@ void GLEngineEditor::mousePressEvent(QMouseEvent *e)
 		QGLViewer::mousePressEvent(e);
 
 	updateGL();
+	emit verifyValidity();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -253,6 +254,7 @@ void GLEngineEditor::mouseReleaseEvent(QMouseEvent *e)
 	else if (wm.mouseReleaseEvent(e->x(),e->y())==-1)	
 		QGLViewer::mouseReleaseEvent(e);
 	updateGL();
+	emit verifyValidity();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -273,9 +275,11 @@ void GLEngineEditor::mouseDoubleClickEvent(QMouseEvent *e)
 	{		
 		wm.getWindow(firstEngine)->getBackgroundColor(savedColor[0],savedColor[1],savedColor[2]);
 		wm.getWindow(firstEngine)->setBackgroundColor(1,1,0);
+		emit engineSelected();
 	}
 	
 	updateGL();
+	emit verifyValidity();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -309,6 +313,7 @@ void GLEngineEditor::keyPressEvent(QKeyEvent *e)
 	}
 
 	updateGL();
+	emit verifyValidity();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -447,6 +452,9 @@ void GLEngineEditor::addEngine(const string& engineName )
 	wm.addWindow(tl,es);
 
 	updateGL();
+
+	emit verifyValidity();
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -465,31 +473,45 @@ int GLEngineEditor::selectEngine(int x, int y)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool GLEngineEditor::verify()
+bool GLEngineEditor::verify(string& errorMessage)
 {
-	int last = -1;
+	errorMessage = "OK : You can save now";
 
 	// for each n engine should have only n arrows
 	if (wm.nbWindows()==1)
 		return true;
+	
 	if (wm.nbWindows()==0)
+	{
+		errorMessage = "ERROR : No engine added";
 		return false;
+	}
+	
 	if (firstEngine==-1)
+	{
+		errorMessage = "ERROR : No initial engine";
 		return false;
+	}
+	
 	if (loop.size()!=wm.nbWindows())
+	{
+		errorMessage = "ERROR : No loop defined";
 		return false;
+	}
 
-
-	last = firstEngine;
+	int last = firstEngine;
 	// for each engine we should have only 1 incoming and 1 outcoming arrow
-	for(unsigned int i=0;i<wm.nbWindows();i++)
+	for(unsigned int i=0;i<wm.nbWindows();i++) 
 	{
 		last = findRelationStartingWith(last);
 		if (last==-1)
+		{
+			errorMessage = "ERROR : No loop defined";
 			return false;
+		}
 	}
 
-	return (last==firstEngine);
+	return true;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -511,4 +533,3 @@ int GLEngineEditor::findRelationStartingWith(int first)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-

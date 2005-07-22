@@ -27,46 +27,90 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-// #include "MetaEngine.hpp"
-// #include <yade-lib-multimethods/DynLibDispatcher.hpp>
-// 
-// /////////////////////////////////////////////////////////////////////////////////////////////
-// /////////////////////////////////////////////////////////////////////////////////////////////
-// 
-// #define REGISTER_ENGINE_UNIT_TYPE(name)		\
-// 	public : virtual string getEngineUnitType() { return name; };
-// 
-// template
-// <
-// 	class baseClass,
-// 	class EngineUnit,
-// 	class EngineUnitReturnType,
-// 	class EngineUnitArguments
-// >
-// class MetaDispatchingEngine1D : public MetaEngine,
-// 				public DynLibDispatcher
-// 				<	  TYPELIST_1(baseClass)		// base classes for dispatch
-// 					, EngineUnit			// class that provides multivirtual call
-// 					, EngineUnitReturnType		// return type
-// 					, EngineUnitArguments
-// 				>
-// {
-// 	public : MetaDispatchingEngine1D() {};
-// 	public : virtual ~MetaDispatchingEngine1D() {};
-// 
-// 	public		: virtual void registerAttributes();
-// 	protected	: virtual void postProcessAttributes(bool deserializing);
-// 
-// 	public : virtual string getEngineUnitType() { throw; };
-// 
-// 	REGISTER_CLASS_NAME(MetaDispatchingEngine1D);
-// 
-// };
-// 
-// /////////////////////////////////////////////////////////////////////////////////////////////////
-// /////////////////////////////////////////////////////////////////////////////////////////////////
-// 
-// REGISTER_SERIALIZABLE(MetaDispatchingEngine1D,false);
+#include "MetaDispatchingEngine.hpp"
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+#include <yade/yade-lib-multimethods/DynLibDispatcher.hpp>
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+template
+<
+	class baseClass,
+	class EngineUnitType,
+	class EngineUnitReturnType,
+	class EngineUnitArguments,
+	bool autoSymmetry=true
+>
+class MetaDispatchingEngine1D : public MetaDispatchingEngine,
+				public DynLibDispatcher
+				<	  TYPELIST_1(baseClass)		// base classes for dispatch
+					, EngineUnitType		// class that provides multivirtual call
+					, EngineUnitReturnType		// return type
+					, EngineUnitArguments
+					, autoSymmetry
+				>
+{
+
+	public : void add( string baseClassName1, string libName, shared_ptr<EngineUnitType> eu = shared_ptr<EngineUnitType>())
+	{
+		storeFunctorName(baseClassName1,libName,eu);
+		add1DEntry(baseClassName1,libName,eu);
+	}
+
+	void postProcessAttributes(bool deserializing)
+	{
+		MetaDispatchingEngine::postProcessAttributes(deserializing);
+	
+		if(deserializing)
+		{
+			for(unsigned int i=0;i<functorNames.size();i++)
+				add1DEntry(functorNames[i][0],functorNames[i][1],static_pointer_cast<EngineUnitType>(findFunctorArguments(functorNames[i][1])));	
+		}
+// 		else
+// 		{
+// 			for(unsigned int i=0;i<functorNames.size();i++)
+// 			{
+// 				add1DEntry(functorNames[i][0],functorNames[i][1],dynamic_pointer_cast<EngineUnitType>(findFunctorArguments(functorNames[i][1])));
+// 				storeFunctorName(functorNames[i][0],functorNames[i][1],findFunctorArguments(functorNames[i][1]));
+// 			}
+// 		}
+	}
+	
+	void registerAttributes()
+	{
+		MetaDispatchingEngine::registerAttributes();
+	}
+
+
+	public    : virtual string getEngineUnitType() { throw; };
+	public    : int getDimension() { return 1; };
+	public : virtual string getBaseClassType(unsigned int) { throw;} ;
+
+//	REGISTER_CLASS_NAME(MetaDispatchingEngine1D);
+
+};
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////
+
+//REGISTER_SERIALIZABLE(MetaDispatchingEngine1D,false);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+#define REGISTER_BASE_CLASS_TYPE_1D(name1,name2)			\
+	public : virtual string getBaseClassType(unsigned int i)	\
+	{								\
+		switch (i)						\
+		{							\
+			case 0  : return name1;				\
+			default : return "";				\
+		}							\
+	}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -75,4 +119,3 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-

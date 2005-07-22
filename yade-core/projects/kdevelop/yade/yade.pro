@@ -37,7 +37,11 @@ HEADERS += BodyContainer.hpp \
            InteractionContainerIterator.hpp \
            InteractionContainerIteratorPointer.hpp \
            PhysicalActionContainerIterator.hpp \
-           PhysicalActionContainerIteratorPointer.hpp 
+           PhysicalActionContainerIteratorPointer.hpp \
+           MetaDispatchingEngine.hpp \
+           EngineUnit.hpp \
+           EngineUnit1D.hpp \
+           EngineUnit2D.hpp 
 SOURCES += BodyContainer.cpp \
            Body.cpp \
            BoundingVolume.cpp \
@@ -51,8 +55,6 @@ SOURCES += BodyContainer.cpp \
            Interaction.cpp \
            InteractionSolver.cpp \
            MetaBody.cpp \
-           MetaDispatchingEngine1D.cpp \
-           MetaDispatchingEngine2D.cpp \
            NullGUI.cpp \
            Omega.cpp \
            PhysicalActionContainer.cpp \
@@ -61,7 +63,8 @@ SOURCES += BodyContainer.cpp \
            SimulationLoop.cpp \
            yade.cpp \
            yadeExceptions.cpp \
-           TimeStepper.cpp 
+           TimeStepper.cpp \
+           MetaDispatchingEngine.cpp 
 LIBS += -lyade-lib-threads \
 -lyade-lib-serialization \
 -lyade-lib-factory \
