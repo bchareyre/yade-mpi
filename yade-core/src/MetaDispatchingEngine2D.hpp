@@ -71,14 +71,6 @@ class MetaDispatchingEngine2D : public MetaDispatchingEngine,
 			for(unsigned int i=0;i<functorNames.size();i++)
 				add2DEntry(functorNames[i][0],functorNames[i][1],functorNames[i][2],static_pointer_cast<EngineUnitType>(findFunctorArguments(functorNames[i][2])));
 		}
-/*		else
-		{
-			for(unsigned int i=0;i<functorNames.size();i++)
-			{
-				storeFunctorName(functorNames[i][0],functorNames[i][1],functorNames[i][2],findFunctorArguments(functorNames[i][2]));
-				add2DEntry(functorNames[i][0],functorNames[i][1],functorNames[i][2],dynamic_pointer_cast<EngineUnitType>(findFunctorArguments(functorNames[i][2])));
-			}
-		}*/
 	}
 
 	public : void registerAttributes()
@@ -107,8 +99,8 @@ class MetaDispatchingEngine2D : public MetaDispatchingEngine,
 	{								\
 		switch (i)						\
 		{							\
-			case 0  : return name1;				\
-			case 1  : return name2;				\
+			case 0  : return #name1;			\
+			case 1  : return #name2;			\
 			default : return "";				\
 		}							\
 	}	

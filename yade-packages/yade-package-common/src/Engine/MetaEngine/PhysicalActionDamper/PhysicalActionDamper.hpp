@@ -56,8 +56,9 @@ class PhysicalActionDamper : public MetaDispatchingEngine2D
 				>
 {
 	public 		: virtual void action(Body* body);
-	//public		: virtual void registerAttributes();
-	//protected	: virtual void postProcessAttributes(bool deserializing);
+
+	REGISTER_ENGINE_UNIT_TYPE(PhysicalActionDamperUnit);
+	REGISTER_BASE_CLASS_TYPE_2D(PhysicalAction,PhysicalParameters);
 	REGISTER_CLASS_NAME(PhysicalActionDamper);
 };
 

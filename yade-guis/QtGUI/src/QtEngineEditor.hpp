@@ -56,6 +56,9 @@ class QtEngineEditor : public QtGeneratedEngineEditor, public Factorable
 	public : ~QtEngineEditor();
 
 	public slots : void pbAddEngineClicked();
+	public slots : void pbAddMetaEngineClicked();
+	public slots : void pbAddDeusExMachinaClicked();
+
 	public slots : void pbSaveClicked();
 	public slots : void pbLoadClicked();
 	public slots : void pbPathClicked();

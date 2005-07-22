@@ -226,6 +226,7 @@ void GLEngineEditor::mousePressEvent(QMouseEvent *e)
 	else if ((e->state() & Qt::KeyButtonMask)==Qt::ShiftButton)
 	{
 		selectedEngine = selectEngine(e->x(), e->y());
+		///emit engineSelected();
 		if (selectedEngine==-1)
 			relationSelected = selectRelation(e->x(), e->y(), 3.0, selectedRelation.first, selectedRelation.second);
 	}
@@ -274,8 +275,7 @@ void GLEngineEditor::mouseDoubleClickEvent(QMouseEvent *e)
 	if (firstEngine!=-1)
 	{		
 		wm.getWindow(firstEngine)->getBackgroundColor(savedColor[0],savedColor[1],savedColor[2]);
-		wm.getWindow(firstEngine)->setBackgroundColor(1,1,0);
-		emit engineSelected();
+		wm.getWindow(firstEngine)->setBackgroundColor(1,1,0.5);
 	}
 	
 	updateGL();
@@ -433,12 +433,13 @@ bool GLEngineEditor::selectRelation(int x, int y, float threshold, int &a, int &
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void GLEngineEditor::addEngine(const string& engineName )
+void GLEngineEditor::createNewTextLabel(const string& name, float r, float g, float b )
 {
 	shared_ptr<GLTextLabel> tl(new GLTextLabel());
-	tl->setText(const_cast<char*>(engineName.c_str()));
-	tl->setTextColor(1,0,0);
+	tl->setText(const_cast<char*>(name.c_str()));
+	tl->setTextColor(0,0,0);
 	tl->setBorderColor(1,0,1);
+	tl->setBackgroundColor(r,g,b);
 	tl->fitTextSize();
 	tl->setResizable(false);
 	tl->setWinTranslucenty(0.7);
@@ -450,11 +451,50 @@ void GLEngineEditor::addEngine(const string& engineName )
 	shared_ptr<GLWindowsManager::EventSubscription> es(new GLWindowsManager::EventSubscription());
 	es->mouseDoubleClick = false;
 	wm.addWindow(tl,es);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+void GLEngineEditor::addEngine(const string& engineName )
+{
+	createNewTextLabel(engineName,0,0.67,1);
 
 	updateGL();
-
 	emit verifyValidity();
+}
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+void GLEngineEditor::addDeusExMachina	(const string& engineName )
+{
+	createNewTextLabel(engineName,0.67,0.33,1);
+
+	updateGL();
+	emit verifyValidity();
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+void GLEngineEditor::addMetaDispatchingEngine2D(const string& engineName, const string& engineUnitName, const string& baseClass1Name,  const string& baseClass2Name)
+{
+	createNewTextLabel(engineName,0,1,0.5);
+
+	updateGL();
+	emit verifyValidity();
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+void GLEngineEditor::addMetaDispatchingEngine1D(const string& engineName, const string& engineUnitName, const string& baseClass1Name)
+{
+	createNewTextLabel(engineName,0,1,0.5);
+
+	updateGL();
+	emit verifyValidity();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

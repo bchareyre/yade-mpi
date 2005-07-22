@@ -76,7 +76,7 @@
       <directoryradio>executable</directoryradio>
     </run>
     <general>
-      <activedir>PreProcessor/BoxStack</activedir>
+      <activedir>Engine/MetaEngine</activedir>
     </general>
     <subclassing/>
   </kdevtrollproject>

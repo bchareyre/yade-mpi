@@ -76,7 +76,7 @@
       <directoryradio>executable</directoryradio>
     </run>
     <general>
-      <activedir>PostProcessor</activedir>
+      <activedir>Engine</activedir>
     </general>
     <subclassing/>
   </kdevtrollproject>

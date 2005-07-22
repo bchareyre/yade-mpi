@@ -67,8 +67,9 @@ class InteractionGeometryMetaEngine :	public MetaDispatchingEngine2D
 					>
 {
 	public    	: virtual void action(Body* body);
-	//public    	: virtual void registerAttributes();
-	//protected 	: virtual void postProcessAttributes(bool deserializing);
+
+	REGISTER_ENGINE_UNIT_TYPE(InteractionGeometryEngineUnit);
+	REGISTER_BASE_CLASS_TYPE_2D(InteractingGeometry,InteractingGeometry);
 	REGISTER_CLASS_NAME(InteractionGeometryMetaEngine);
 };
 

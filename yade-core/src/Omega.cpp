@@ -39,6 +39,8 @@
 #include "MetaEngine.hpp"
 #include "Preferences.hpp"
 #include "TimeStepper.hpp"
+#include "EngineUnit.hpp"
+#include "MetaDispatchingEngine.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -223,6 +225,10 @@ void Omega::registerPluginType(const string& name)
 		dynlibsType[name].baseClass = "InteractionGeometry";
 	else if (dynamic_pointer_cast<InteractionPhysics>(f))
 		dynlibsType[name].baseClass = "InteractionPhysics";
+	else if (dynamic_pointer_cast<EngineUnit>(f))
+		dynlibsType[name].baseClass = "EngineUnit";
+	else if (dynamic_pointer_cast<MetaDispatchingEngine>(f))
+		dynlibsType[name].baseClass = "MetaDispatchingEngine";
 	else if (dynamic_pointer_cast<MetaEngine>(f))
 		dynlibsType[name].baseClass = "MetaEngine"; // FIXME : be calling getEngineUnitType possibility to classify all engine unit in the map
 	else if (dynamic_pointer_cast<TimeStepper>(f))

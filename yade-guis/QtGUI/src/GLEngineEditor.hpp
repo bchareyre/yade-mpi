@@ -80,6 +80,8 @@ class GLEngineEditor : public QGLViewer
 	private : bool selectRelation(int x, int y, float threshold, int &a, int &b);
  	private : int selectEngine(int x, int y);
 
+	private : void createNewTextLabel(const string& name, float r, float g, float b );
+
 	// construction
 	public : GLEngineEditor(QWidget * parent=0, const char * name=0);
 	public : ~GLEngineEditor();
@@ -100,7 +102,10 @@ class GLEngineEditor : public QGLViewer
 	public : int getWindowMinY(int i) { return wm.getWindow(i)->getMinY(); };
 
 	public : void addEngine(const string& engineName );
-	
+	public : void addDeusExMachina	(const string& engineName );
+	public : void addMetaDispatchingEngine2D(const string& engineName, const string& engineUnitName, const string& baseClass1Name,  const string& baseClass2Name);
+	public : void addMetaDispatchingEngine1D(const string& engineName, const string& engineUnitName, const string& baseClass1Name);
+
 	public : bool verify(string& errorMessage);
 	private : int findRelationStartingWith(int first);
 	

@@ -70,14 +70,6 @@ class MetaDispatchingEngine1D : public MetaDispatchingEngine,
 			for(unsigned int i=0;i<functorNames.size();i++)
 				add1DEntry(functorNames[i][0],functorNames[i][1],static_pointer_cast<EngineUnitType>(findFunctorArguments(functorNames[i][1])));	
 		}
-// 		else
-// 		{
-// 			for(unsigned int i=0;i<functorNames.size();i++)
-// 			{
-// 				add1DEntry(functorNames[i][0],functorNames[i][1],dynamic_pointer_cast<EngineUnitType>(findFunctorArguments(functorNames[i][1])));
-// 				storeFunctorName(functorNames[i][0],functorNames[i][1],findFunctorArguments(functorNames[i][1]));
-// 			}
-// 		}
 	}
 	
 	void registerAttributes()
@@ -102,12 +94,12 @@ class MetaDispatchingEngine1D : public MetaDispatchingEngine,
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#define REGISTER_BASE_CLASS_TYPE_1D(name1,name2)			\
+#define REGISTER_BASE_CLASS_TYPE_1D(name1)				\
 	public : virtual string getBaseClassType(unsigned int i)	\
 	{								\
 		switch (i)						\
 		{							\
-			case 0  : return name1;				\
+			case 0  : return #name1;				\
 			default : return "";				\
 		}							\
 	}

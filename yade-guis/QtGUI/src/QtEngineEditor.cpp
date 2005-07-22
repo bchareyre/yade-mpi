@@ -27,6 +27,7 @@
 
 #include <yade/yade-core/Omega.hpp>
 #include <yade/yade-core/FileGenerator.hpp>
+#include <yade/yade-core/MetaDispatchingEngine.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -49,8 +50,12 @@ QtEngineEditor::QtEngineEditor() : QtGeneratedEngineEditor()
 	map<string,DynlibType>::const_iterator diEnd = Omega::instance().getDynlibsType().end();
 	for(;di!=diEnd;++di)
 	{
-		if ((*di).second.baseClass=="Engine" || (*di).second.baseClass=="MetaEngine" || (*di).second.baseClass=="TimeStepper")
+		if ((*di).second.baseClass=="Engine" || (*di).second.baseClass=="TimeStepper")
 			cbEnginesList->insertItem((*di).first);
+		else if ((*di).second.baseClass=="MetaEngine" || (*di).second.baseClass=="MetaDispatchingEngine")
+			cbMetaEnginesList->insertItem((*di).first);
+		else if ((*di).second.baseClass=="DeusExMachina")
+			cbDeusExMachinaList->insertItem((*di).first);
 	}
 
 	connect( glEngineEditor, SIGNAL( verifyValidity() ), this, SLOT( verifyValidity() ) );
@@ -84,6 +89,34 @@ QtEngineEditor::~QtEngineEditor()
 void QtEngineEditor::pbAddEngineClicked()
 {
 	glEngineEditor->addEngine(cbEnginesList->currentText());
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+void QtEngineEditor::pbAddMetaEngineClicked()
+{
+	string engineName = cbMetaEnginesList->currentText();
+	
+	shared_ptr<MetaDispatchingEngine> mde = dynamic_pointer_cast<MetaDispatchingEngine>(ClassFactory::instance().createShared(engineName));
+
+	if (mde)
+	{
+		if (mde->getDimension()==1)
+			glEngineEditor->addMetaDispatchingEngine1D(engineName, mde->getEngineUnitType(), mde->getBaseClassType(0));
+		else if (mde->getDimension()==2)
+			glEngineEditor->addMetaDispatchingEngine2D(engineName, mde->getEngineUnitType(), mde->getBaseClassType(0), mde->getBaseClassType(0));
+	}
+	else
+		glEngineEditor->addEngine(engineName);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+void QtEngineEditor::pbAddDeusExMachinaClicked()
+{
+	glEngineEditor->addDeusExMachina(cbDeusExMachinaList->currentText());
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -169,3 +202,6 @@ void QtEngineEditor::engineSelected()
 	
 	}
 }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
