@@ -1,1 +1,1 @@
-/home/galizzi/devel/trunk/yade-core/src/MetaDispatchingEngine.cpp
+../../../src/MetaDispatchingEngine.cpp
