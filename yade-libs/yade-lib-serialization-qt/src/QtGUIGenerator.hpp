@@ -92,6 +92,7 @@ class QtGUIGenerator : public QObject
 	public : vector<shared_ptr<AttributeDescriptor> > descriptors;
 	public : map<string,int> lookUp;
 	public : shared_ptr<Serializable> serializable;	
+	private : QWidget * currentWidget;
 
 	private : bool resizeHeight;
 	private : bool resizeWidth;

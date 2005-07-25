@@ -37,6 +37,12 @@
 
 #include <yade/yade-lib-factory/Factorable.hpp>
 #include <yade/yade-lib-serialization-qt/QtGUIGenerator.hpp>
+#include <yade/yade-core/Engine.hpp>
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+#include "QtMetaDispatchingEngineProperties.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -48,9 +54,19 @@ class QtEngineEditor : public QtGeneratedEngineEditor, public Factorable
 {
 
 	private : QtGUIGenerator guiGen;	
-	private : QScrollView * scrollView;
-	private : QFrame * scrollViewFrame;
-	private : QVBoxLayout* scrollViewLayout;
+	private : QFrame * engineFrame;
+	private : QtMetaDispatchingEngineProperties * metaDispatchingEngineFrame;
+
+	enum EngineType { STANDALONEENGINE, DEUSEXMACHINA, METADISPATCHINGENGINE1D, METADISPATCHINGENGINE2D, METAENGINE };
+	private : typedef struct EngineDescriptor
+		  {
+			shared_ptr<Engine> engine;
+			EngineType type;
+			
+		  } EngineDescriptor;
+
+	private : map<int,EngineDescriptor> engines;
+	private : shared_ptr<Engine> currentEngine;
 
 	public : QtEngineEditor();
 	public : ~QtEngineEditor();
@@ -62,9 +78,13 @@ class QtEngineEditor : public QtGeneratedEngineEditor, public Factorable
 	public slots : void pbSaveClicked();
 	public slots : void pbLoadClicked();
 	public slots : void pbPathClicked();
+	public slots : void pbApplyClicked();
+
 
 	public slots : void verifyValidity();
-	public slots : void engineSelected();
+	public slots : void engineSelected(int i);
+	public slots : void deleteEngine(int i);
+
 
 };
 

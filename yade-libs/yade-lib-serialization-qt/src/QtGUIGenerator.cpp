@@ -128,13 +128,17 @@ void QtGUIGenerator::reArrange(QWidget * widget)
 void QtGUIGenerator::buildGUI(shared_ptr<Serializable> s,  QWidget * widget)
 {
 
+	currentWidget = widget;
+
 	XMLManager xmlManager;
+
 	descriptors.clear();
 	lookUp.clear();
 
 	serializable = s;
 
-	serializable->registerAttributes();
+	if (serializable->getArchives().empty()) // attributes are not registered
+		serializable->registerAttributes();
 
 	Serializable::Archives archives = serializable->getArchives();
 
@@ -288,7 +292,7 @@ string QtGUIGenerator::getString(shared_ptr<AttributeDescriptor> d, int widgetNu
 void QtGUIGenerator::pushButtonOkClicked()
 {
 	deserialize(serializable);
-	cout << "pushButtonOkClicked" << endl;
+	currentWidget->close();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -296,7 +300,7 @@ void QtGUIGenerator::pushButtonOkClicked()
 
 void QtGUIGenerator::pushButtonApplyClicked()
 {
-	cout << "pushButtonApplyClicked" << endl;
+	deserialize(serializable);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -304,5 +308,5 @@ void QtGUIGenerator::pushButtonApplyClicked()
 
 void QtGUIGenerator::pushButtonCancelClicked()
 {
-	cout << "pushButtonCancelClicked" << endl;
+	currentWidget->close();
 }

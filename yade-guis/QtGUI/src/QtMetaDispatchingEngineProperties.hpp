@@ -21,79 +21,58 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#ifndef __SIMULATIONCONTROLLER_H__
-#define __SIMULATIONCONTROLLER_H__
+#ifndef __QTMETADISPATCHINGENGINEPROPERTIES_HPP__
+#define __QTMETADISPATCHINGENGINEPROPERTIES_HPP__
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <yade/yade-lib-opengl/GLWindowsManager.hpp>
-#include <yade/yade-lib-serialization-qt/QtGUIGenerator.hpp>
-#include <yade/yade-core/RenderingEngine.hpp>
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
+#include <QtGeneratedMetaDispatchingEngineProperties.h>
 #include <qlayout.h>
-#include <qframe.h>
-#include <qscrollview.h>
+#include <qcombobox.h>
+#include <qpixmap.h>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "GLViewer.hpp"
-#include "QtGeneratedSimulationController.h"
-#include "SimulationControllerUpdater.hpp"
+#include <yade/yade-core/Engine.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-class SimulationController : public QtGeneratedSimulationController
+/**
+@author Olivier Galizzi
+*/
+class QtMetaDispatchingEngineProperties : public QtGeneratedMetaDispatchingEngineProperties
 {
+	protected : vector<vector<QWidget*> > cbs;
+	protected : string baseClass1;
+	protected : string baseClass2;
+	protected : string baseFunctor;
+	protected : int dimension;
 
-	public :  bool changeSkipTimeStepper, skipTimeStepper, changeTimeStep,wasUsingTimeStepper;
-	private : boost::mutex mutex;
-	private : QtGUIGenerator guiGen;	
-	private : QWidget * parentWorkspace;	
-	private : shared_ptr<RenderingEngine> renderer;
-	private : map<int,GLViewer* > glViews;
-	private : int maxNbViews;
-		
-	private : shared_ptr<SimulationControllerUpdater> updater;
+	protected : vector<vector<string> > baseClasses;
 
-	private : QScrollView * scrollView;
-	private : QFrame * scrollViewFrame;
-	private : QVBoxLayout* scrollViewLayout;
-	
-	// construction
-	public : SimulationController (QWidget * parent=0);
+	protected : void buildDynlibList();
 
-	public : virtual ~SimulationController (); 
-	
-	public slots : virtual void pbApplyClicked();
-	public slots : virtual void pbLoadClicked();
-	public slots : virtual void pbNewViewClicked();
-	public slots : virtual void pbStopClicked();
-	public slots : virtual void pbStartClicked();
-	public slots : virtual void pbResetClicked();
-	public slots : virtual void pbCenterSceneClicked();
-	public slots : virtual void pbOneSimulationStepClicked();
-	public slots : virtual void bgTimeStepClicked(int i);
-	public slots : virtual void sb10PowerSecondValueChanged(int);
-	public slots : virtual void sbSecondValueChanged(int);
+	private   : QPixmap image0;
+	private   : QPixmap image1;
 
-	public slots : void closeGLViewEvent(int id);
+	public    : QtMetaDispatchingEngineProperties(const string& baseClass1, const string& baseClass2, const string& baseFunctor, QWidget* parent=0,  const char* name=0 );
+	public    : QtMetaDispatchingEngineProperties(const string& baseClass1, const string& baseFunctor, QWidget* parent=0,  const char* name=0 );
+	public    : QtMetaDispatchingEngineProperties(QWidget* parent=0,  const char* name=0);
+	public    : ~QtMetaDispatchingEngineProperties();
 
-	private : void addNewView();
-	
-	protected : void closeEvent(QCloseEvent *evt);
-
+	public slots : void pbAddClicked();
+	public slots : void pbOkClicked();
+	public slots : void pbRemoveClicked();
+	public slots : void pbSerializationClicked();
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#endif // __SIMULATIONCONTROLLER_H__
+#endif // __QTMETADISPATCHINGENGINEPROPERTIES_HPP__
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////

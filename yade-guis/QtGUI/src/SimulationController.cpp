@@ -58,25 +58,19 @@ using namespace boost;
 
 SimulationController::SimulationController(QWidget * parent) : QtGeneratedSimulationController(parent,"SimulationController")
 {
-	setMinimumSize(size());
-	//setMaximumSize(size());
-
 	parentWorkspace = parent;
-	
-	scrollViewFrame = new QFrame();	
 
-	scrollView = new QScrollView( gbRenderingEngineParameters, "scrollView" );
+	scrollViewFrame = new QFrame();	
+	
+	scrollViewLayout = new QVBoxLayout( scrollViewOutsideFrame, 0, 0, "scrollViewLayout"); 
+	
+	scrollView = new QScrollView( scrollViewOutsideFrame, "scrollView" );
 	scrollView->setVScrollBarMode(QScrollView::Auto);
 	scrollView->setHScrollBarMode(QScrollView::Auto);
-	gbRenderingEngineParametersLayout->addWidget( scrollView );
+	scrollViewLayout->addWidget( scrollView );
 	scrollView->show();	
 
-		
-//	while(! renderer )
-// FIXME - what is going on here? it was crashing rabdomly unless I added these lines...
 	shared_ptr<Factorable> tmpRenderer = ClassFactory::instance().createShared("OpenGLRenderingEngine");
-	//shared_ptr<OpenGLRenderingEngine> tmp2 = dynamic_pointer_cast<OpenGLRenderingEngine>(tmpRenderer);
-	//renderer = dynamic_pointer_cast<RenderingEngine>(tmp2);
 	renderer = static_pointer_cast<RenderingEngine>(tmpRenderer);
 	
 	if(renderer)
@@ -139,26 +133,6 @@ void SimulationController::pbApplyClicked()
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-
-//QWidget* SimulationController::parentWorkspace=0;
-// void SimulationController::load()
-// {
-// 	MessageDialog * d = new MessageDialog("Loading file "+Omega::instance().getSimulationFileName()+". Please wait...", parentWorkspace,"Message Dialog",true);
-// 	
-// 	parentWorkspace->setEnabled(false);
-// 	
-// 	d->setEnabled(true);
-// 	
-/// 	IOManager::loadFromFile("yade-lib-serialization-xml",Omega::instance().getSimulationFileName(),"rootBody",Omega::instance().rootBody);
-// 	IOManager::loadFromFile("XMLManager",Omega::instance().getSimulationFileName(),"rootBody",Omega::instance().rootBody);
-// 	
-// 	parentWorkspace->setEnabled(true);
-// 	
-// 	delete d;
-// 	d = new MessageDialog("File "+Omega::instance().getSimulationFileName()+" was  correctly loaded...", parentWorkspace);
-// 	d->exec();
-// 	delete d;
-// }
 
 void SimulationController::pbLoadClicked()
 {
@@ -384,7 +358,7 @@ void SimulationController::bgTimeStepClicked(int i)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void SimulationController::sb10PowerSecondValueChanged(int i)
+void SimulationController::sb10PowerSecondValueChanged(int)
 {
 	changeTimeStep = true;
 }
@@ -392,7 +366,7 @@ void SimulationController::sb10PowerSecondValueChanged(int i)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void SimulationController::sbSecondValueChanged(int i)
+void SimulationController::sbSecondValueChanged(int)
 {
 	changeTimeStep = true;
 }

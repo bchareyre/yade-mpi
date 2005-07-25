@@ -17,6 +17,7 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -59,19 +60,11 @@ QtEngineEditor::QtEngineEditor() : QtGeneratedEngineEditor()
 	}
 
 	connect( glEngineEditor, SIGNAL( verifyValidity() ), this, SLOT( verifyValidity() ) );
-	connect( glEngineEditor, SIGNAL( engineSelected() ), this, SLOT( engineSelected() ) );
+	connect( glEngineEditor, SIGNAL( engineSelected(int) ), this, SLOT( engineSelected(int) ) );
+	connect( glEngineEditor, SIGNAL( deleteEngine(int) ), this, SLOT( deleteEngine(int) ) );
 
-
-	scrollViewFrame = new QFrame();	
-	
-	scrollViewLayout = new QVBoxLayout( scrollViewOutsideFrame, 0, 0, "scrollViewLayout"); 
-	
-	scrollView = new QScrollView( scrollViewOutsideFrame, "scrollView" );
-	scrollView->setVScrollBarMode(QScrollView::AlwaysOn);
-	scrollView->setHScrollBarMode(QScrollView::AlwaysOff);
-	scrollViewLayout->addWidget( scrollView );
-	scrollView->show();	
-
+	engineFrame = new QFrame();	
+	metaDispatchingEngineFrame = new QtMetaDispatchingEngineProperties();
 
 	verifyValidity();
 }
@@ -88,7 +81,13 @@ QtEngineEditor::~QtEngineEditor()
 
 void QtEngineEditor::pbAddEngineClicked()
 {
-	glEngineEditor->addEngine(cbEnginesList->currentText());
+	string engineName = cbEnginesList->currentText();
+	int id = glEngineEditor->addEngine(engineName);
+
+	EngineDescriptor ed;
+	ed.engine = dynamic_pointer_cast<Engine>(ClassFactory::instance().createShared(engineName));
+	ed.type = STANDALONEENGINE;
+	engines[id] = ed;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -96,19 +95,34 @@ void QtEngineEditor::pbAddEngineClicked()
 
 void QtEngineEditor::pbAddMetaEngineClicked()
 {
+	int id;
+	EngineDescriptor ed;
+
 	string engineName = cbMetaEnginesList->currentText();
-	
 	shared_ptr<MetaDispatchingEngine> mde = dynamic_pointer_cast<MetaDispatchingEngine>(ClassFactory::instance().createShared(engineName));
 
 	if (mde)
 	{
 		if (mde->getDimension()==1)
-			glEngineEditor->addMetaDispatchingEngine1D(engineName, mde->getEngineUnitType(), mde->getBaseClassType(0));
+		{
+			id = glEngineEditor->addMetaDispatchingEngine1D(engineName, mde->getEngineUnitType(), mde->getBaseClassType(0));
+			ed.type = METADISPATCHINGENGINE1D;
+		}
 		else if (mde->getDimension()==2)
-			glEngineEditor->addMetaDispatchingEngine2D(engineName, mde->getEngineUnitType(), mde->getBaseClassType(0), mde->getBaseClassType(0));
+		{
+			id = glEngineEditor->addMetaDispatchingEngine2D(engineName, mde->getEngineUnitType(), mde->getBaseClassType(0), mde->getBaseClassType(0));
+			ed.type = METADISPATCHINGENGINE2D;
+		}
 	}
-	else
-		glEngineEditor->addEngine(engineName);
+	else // it is a meta engine
+	{
+		id = glEngineEditor->addEngine(engineName);
+		ed.type = METAENGINE;
+	}
+
+	ed.engine = mde;
+
+	engines[id] = ed;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -116,7 +130,13 @@ void QtEngineEditor::pbAddMetaEngineClicked()
 
 void QtEngineEditor::pbAddDeusExMachinaClicked()
 {
-	glEngineEditor->addDeusExMachina(cbDeusExMachinaList->currentText());
+	string engineName = cbDeusExMachinaList->currentText();
+	int id = glEngineEditor->addDeusExMachina(engineName);
+
+	EngineDescriptor ed;
+	ed.engine = dynamic_pointer_cast<Engine>(ClassFactory::instance().createShared(engineName));
+	ed.type = DEUSEXMACHINA;
+	engines[id] = ed;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -166,41 +186,74 @@ void QtEngineEditor::verifyValidity()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void QtEngineEditor::engineSelected()
+void QtEngineEditor::engineSelected(int i)
+{
+	if (i>=0  && currentEngine!=engines[i].engine) // otherwise the GUI is already created
+	{
+		try
+		{
+			currentEngine = engines[i].engine;
+	
+			guiGen.setResizeHeight(true);
+			guiGen.setResizeWidth(true);
+			guiGen.setShift(10,20);
+			guiGen.setShowButtons(true);
+	
+			QWidget * parent   = this->parentWidget()->parentWidget();
+
+			if (engines[i].type==DEUSEXMACHINA || engines[i].type==STANDALONEENGINE)
+			{
+				delete engineFrame;
+				engineFrame = new QFrame(parent);
+				engineFrame->setCaption(currentEngine->getClassName());
+				guiGen.buildGUI(currentEngine,engineFrame);
+				engineFrame->show();
+			}
+			else if (engines[i].type==METADISPATCHINGENGINE2D)
+			{	
+				delete metaDispatchingEngineFrame;
+				shared_ptr<MetaDispatchingEngine> mde = dynamic_pointer_cast<MetaDispatchingEngine>(currentEngine);
+				string baseClass1  = mde->getBaseClassType(0);
+				string baseClass2  = mde->getBaseClassType(1);
+				string baseFunctor = mde->getEngineUnitType();
+				metaDispatchingEngineFrame = new QtMetaDispatchingEngineProperties(baseClass1,baseClass2,baseFunctor,parent);
+				metaDispatchingEngineFrame->setCaption(currentEngine->getClassName());
+				metaDispatchingEngineFrame->show();
+			}
+			else if (engines[i].type==METADISPATCHINGENGINE1D)
+			{	
+				delete metaDispatchingEngineFrame;
+				shared_ptr<MetaDispatchingEngine> mde = dynamic_pointer_cast<MetaDispatchingEngine>(currentEngine);
+				string baseClass1  = mde->getBaseClassType(0);
+				string baseFunctor = mde->getEngineUnitType();
+				metaDispatchingEngineFrame = new QtMetaDispatchingEngineProperties(baseClass1,baseFunctor,parent);
+				metaDispatchingEngineFrame->setCaption(currentEngine->getClassName());
+				metaDispatchingEngineFrame->show();
+			}
+		}
+		catch (FactoryError&)
+		{
+		
+		}
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+void QtEngineEditor::deleteEngine(int i)
 {
 
-	try
-	{
-		//FIXME dynamic_cast is not working ???
-		shared_ptr<FileGenerator> fg = static_pointer_cast<FileGenerator>(ClassFactory::instance().createShared("PhysicalActionApplier"));
-
-		guiGen.setResizeHeight(true);
-		guiGen.setResizeWidth(false);
-		guiGen.setShift(10,10);
-		guiGen.setShowButtons(false);
-		
-		QSize s = scrollView->size();
-		QPoint p = scrollView->pos();	
-
-		delete scrollViewFrame;
-		scrollViewFrame = new QFrame();
-		scrollViewFrame->resize(s.width()-17,s.height()); // -17 because of the size of the scrollbar
-
-		guiGen.buildGUI(fg,scrollViewFrame);
-			
-		if (s.height()>scrollViewFrame->size().height())
-		{
-			scrollViewFrame->setMinimumSize(s.width()-17,s.height());
-			scrollViewFrame->setMaximumSize(s.width()-17,s.height());
-		}
-			
-		scrollView->addChild(scrollViewFrame);
-		scrollViewFrame->show();
-	}
-	catch (FactoryError&)
-	{
+	engines.erase(i);
 	
-	}
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+void QtEngineEditor::pbApplyClicked()
+{
+	guiGen.deserialize(currentEngine);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
