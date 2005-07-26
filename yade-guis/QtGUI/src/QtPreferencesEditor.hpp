@@ -85,7 +85,12 @@ class QtPreferencesEditor : public QtGeneratedPreferencesEditor, public Factorab
 	public slots : virtual void lvPluginFoldersSelectionChanged(QListViewItem* lvi);
 	public slots : virtual void lePluginFolderReturnPressed();
 
-	public slots : virtual void pbRescanPluginsClicked();
+	public slots : virtual void pbRescanPluginsClicked();	
+	
+	REGISTER_CLASS_NAME(QtPreferencesEditor);
+	REGISTER_BASE_CLASS_NAME(Factorable);
+
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

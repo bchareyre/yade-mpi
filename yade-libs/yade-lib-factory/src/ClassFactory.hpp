@@ -154,7 +154,7 @@ class ClassFactory : public Singleton< ClassFactory >
 	/*! Destructor
 		\note  the destructor is private because ClassFactory is a Singleton
 	*/
-	private   : ~ClassFactory() {};
+	private   : virtual ~ClassFactory() {};
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Methods											///
@@ -196,6 +196,9 @@ class ClassFactory : public Singleton< ClassFactory >
 
 	public    : string libNameToSystemName(const string& name);
 	public	  : string systemNameToLibName(const string& name);
+
+	public    : virtual string getClassName() const { return "Factorable"; };
+	public    : virtual string getBaseClassName(int ) const { return "";};
 
 	FRIEND_SINGLETON(ClassFactory);
 };

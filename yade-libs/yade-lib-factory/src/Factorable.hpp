@@ -33,6 +33,46 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <string>
+#include <sstream>
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+#define REGISTER_CLASS_NAME(cn)								\
+	public : virtual string getClassName() const { return #cn; };
+
+#define REGISTER_BASE_CLASS_NAME(bcn)							\
+	public : virtual string getBaseClassName(unsigned int i=0) const		\
+	{										\
+		string token;								\
+		vector<string> tokens;							\
+		string str=#bcn;							\
+		istringstream iss(str);							\
+		iss >> token;								\
+		while (!iss.eof())							\
+		{									\
+			tokens.push_back(token);					\
+			iss >> token;							\
+		}									\
+		if (i>=token.size())							\
+			return "";							\
+		else									\
+			return tokens[i];						\
+	}										\
+	public : virtual int getBaseClassNumber()		 			\
+	{										\
+		string token;								\
+		vector<string> tokens;							\
+		string str=#bcn;							\
+		istringstream iss(str);							\
+		iss >> token;								\
+		while (!iss.eof())							\
+		{									\
+			tokens.push_back(token);					\
+			iss >> token;							\
+		}									\
+		return tokens.size();							\
+	}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////

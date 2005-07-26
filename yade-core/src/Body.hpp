@@ -118,6 +118,8 @@ class Body : public Serializable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	REGISTER_CLASS_NAME(Body);
+	REGISTER_BASE_CLASS_NAME(Serializable);
+
 	/*! Tells the IOManager which attributes should be serialized */
 	public : void registerAttributes();
 

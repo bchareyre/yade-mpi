@@ -78,11 +78,33 @@ class MetaDispatchingEngine2D : public MetaDispatchingEngine,
 		MetaDispatchingEngine::registerAttributes();
 	}
 
-	public    : virtual int getDimension() { return 2; };
-	public    : virtual string getEngineUnitType() { throw; };
-	public    : virtual string getBaseClassType(unsigned int ) { throw; };
+	public    : virtual int getDimension() { return 2; }
 
-//	REGISTER_CLASS_NAME(MetaDispatchingEngine2D);
+	public    : virtual string getEngineUnitType() 
+	{
+		shared_ptr<EngineUnitType> eu(new EngineUnitType);
+		return eu->getClassName();
+	}
+
+	public    : virtual string getBaseClassType(unsigned int i)
+	{
+		if (i==0)
+		{
+			shared_ptr<baseClass1> bc(new baseClass1);
+			return bc->getClassName();
+		}
+		else if (i==1)
+		{
+			shared_ptr<baseClass2> bc(new baseClass2);
+			return bc->getClassName();
+		}
+		else
+			return "";
+	}
+
+
+	REGISTER_CLASS_NAME(MetaDispatchingEngine2D);
+	REGISTER_BASE_CLASS_NAME(MetaDispatchingEngine DynLibDispatcher);
 
 };
 
@@ -94,16 +116,16 @@ class MetaDispatchingEngine2D : public MetaDispatchingEngine,
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////
 
-#define REGISTER_BASE_CLASS_TYPE_2D(name1,name2)			\
-	public : virtual string getBaseClassType(unsigned int i)	\
-	{								\
-		switch (i)						\
-		{							\
-			case 0  : return #name1;			\
-			case 1  : return #name2;			\
-			default : return "";				\
-		}							\
-	}	
+// #define REGISTER_BASE_CLASS_TYPE_2D(name1,name2)			\
+// 	public : virtual string getBaseClassType(unsigned int i)	\
+// 	{								\
+// 		switch (i)						\
+// 		{							\
+// 			case 0  : return #name1;			\
+// 			case 1  : return #name2;			\
+// 			default : return "";				\
+// 		}							\
+// 	}	
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////

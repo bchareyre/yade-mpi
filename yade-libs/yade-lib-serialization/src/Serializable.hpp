@@ -60,9 +60,6 @@ using namespace ArchiveTypes;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#define REGISTER_CLASS_NAME(cn)						\
-	public : virtual string getClassName() const { return #cn; };
-
 #define DECLARE_POINTER_TO_MY_CUSTOM_CLASS(Type,attribute,any)		\
 	Type * attribute=any_cast< Type * >(any);
 
@@ -111,8 +108,11 @@ class Serializable : public Factorable
 			archives.push_back(ac);
 		    }
 	public    : bool containsOnlyFundamentals();
-	public    : virtual string getClassName() const = 0;
 	public    : virtual void registerAttributes() {};
+
+
+	REGISTER_CLASS_NAME(Serializable);
+	REGISTER_BASE_CLASS_NAME(Factorable);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

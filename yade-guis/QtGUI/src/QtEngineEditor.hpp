@@ -84,7 +84,9 @@ class QtEngineEditor : public QtGeneratedEngineEditor, public Factorable
 	public slots : void verifyValidity();
 	public slots : void engineSelected(int i);
 	public slots : void deleteEngine(int i);
-
+	
+	REGISTER_CLASS_NAME(QtEngineEditor);
+	REGISTER_BASE_CLASS_NAME(Factorable);
 
 };
 

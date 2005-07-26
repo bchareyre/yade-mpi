@@ -35,6 +35,7 @@
 class InteractionGeometry : public Serializable
 {
 	REGISTER_CLASS_NAME(InteractionGeometry);
+	REGISTER_BASE_CLASS_NAME(Serializable);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

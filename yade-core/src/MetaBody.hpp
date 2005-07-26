@@ -56,6 +56,8 @@ class MetaBody : public Body
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	REGISTER_CLASS_NAME(MetaBody);
+	REGISTER_BASE_CLASS_NAME(Body);
+
 	protected : virtual void postProcessAttributes(bool deserializing);
 	public	: void registerAttributes();
 };

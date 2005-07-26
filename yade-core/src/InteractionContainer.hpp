@@ -87,6 +87,7 @@ class InteractionContainer : public Serializable
 
 	// serialization of this class...
 	REGISTER_CLASS_NAME(InteractionContainer);
+	REGISTER_BASE_CLASS_NAME(Serializable);
 
 	private   : vector<shared_ptr<Interaction> > interaction;
 	public    : virtual void registerAttributes();

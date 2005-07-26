@@ -68,6 +68,8 @@ class Preferences : public Serializable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	REGISTER_CLASS_NAME(Preferences);
+	REGISTER_BASE_CLASS_NAME(Serializable);
+
 	public : void registerAttributes();
 
 };

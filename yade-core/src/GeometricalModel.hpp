@@ -54,6 +54,7 @@ class GeometricalModel : public Serializable, public Indexable
 
 	public : void registerAttributes();
 	REGISTER_CLASS_NAME(GeometricalModel);
+	REGISTER_BASE_CLASS_NAME(Serializable Indexable);
 	REGISTER_INDEX_COUNTER(GeometricalModel);
 };
 

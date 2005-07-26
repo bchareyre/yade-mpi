@@ -80,7 +80,8 @@ class BodyContainer : public Serializable
 
 	// serialization of this class...
 	REGISTER_CLASS_NAME(BodyContainer);
-	
+	REGISTER_BASE_CLASS_NAME(Serializable);
+
 	// local storage for uniform serialization of all possible container concrete implementations.
 	private   : vector<shared_ptr<Body> > body; 
 	

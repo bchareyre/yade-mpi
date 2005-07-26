@@ -62,6 +62,7 @@ class InteractionSolver : public Engine
 	public : virtual void calculateForces(Body* ) { throw; };
 
 	REGISTER_CLASS_NAME(InteractionSolver);
+	REGISTER_BASE_CLASS_NAME(Engine);
 
 };
 

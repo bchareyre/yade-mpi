@@ -101,6 +101,9 @@ class QtCodeGenerator : public QtGeneratedCodeGenerator, public Factorable
 	public slots : virtual void pbSaveEngineClassClicked();
 	public slots : virtual void pbLoadEngineClassClicked();
 
+	REGISTER_CLASS_NAME(QtCodeGenerator);
+	REGISTER_BASE_CLASS_NAME(Factorable);
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

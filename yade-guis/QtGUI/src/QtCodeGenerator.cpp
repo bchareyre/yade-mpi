@@ -634,9 +634,9 @@ void QtCodeGenerator::pbLoadEngineClassClicked()
 void QtCodeGenerator::writeHeader(ofstream& s, const string& name, const string& email)
 {
 	string space1,space2;
-	for(int i=0;i<=48-name.size();i++)
+	for(unsigned int i=0;i<=48-name.size();i++)
 		space1.push_back(' ');
-	for(int i=0;i<=70-email.size();i++)
+	for(unsigned int i=0;i<=70-email.size();i++)
 		space2.push_back(' ');
 
 	s << "/***************************************************************************" << endl;

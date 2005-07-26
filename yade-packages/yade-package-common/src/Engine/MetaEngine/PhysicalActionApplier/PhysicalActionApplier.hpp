@@ -56,8 +56,6 @@ class PhysicalActionApplier :	public MetaDispatchingEngine2D
 {
 	public 		: virtual void action(Body* body);
 
-	REGISTER_ENGINE_UNIT_TYPE(PhysicalActionApplierUnit);
-	REGISTER_BASE_CLASS_TYPE_2D(PhysicalAction,PhysicalParameters);
 	REGISTER_CLASS_NAME(PhysicalActionApplier);
 };
 

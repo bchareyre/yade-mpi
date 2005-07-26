@@ -78,11 +78,28 @@ class MetaDispatchingEngine1D : public MetaDispatchingEngine,
 	}
 
 
-	public    : virtual string getEngineUnitType() { throw; };
-	public    : int getDimension() { return 1; };
-	public : virtual string getBaseClassType(unsigned int) { throw;} ;
+	public    : int getDimension() { return 1; }
+	
+	public    : virtual string getEngineUnitType() 
+	{
+		shared_ptr<EngineUnitType> eu(new EngineUnitType);
+		return eu->getClassName();
+	}
 
-//	REGISTER_CLASS_NAME(MetaDispatchingEngine1D);
+	public    : virtual string getBaseClassType(unsigned int i)
+	{
+		if (i==0)
+		{
+			shared_ptr<baseClass> bc(new baseClass);
+			return bc->getClassName();
+		}
+		else
+			return "";
+	}
+
+	REGISTER_CLASS_NAME(MetaDispatchingEngine1D);
+	REGISTER_BASE_CLASS_NAME(MetaDispatchingEngine DynLibDispatcher);
+
 
 };
 
@@ -94,15 +111,15 @@ class MetaDispatchingEngine1D : public MetaDispatchingEngine,
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#define REGISTER_BASE_CLASS_TYPE_1D(name1)				\
-	public : virtual string getBaseClassType(unsigned int i)	\
-	{								\
-		switch (i)						\
-		{							\
-			case 0  : return #name1;				\
-			default : return "";				\
-		}							\
-	}
+// #define REGISTER_BASE_CLASS_TYPE_1D(name1)				\
+// 	public : virtual string getBaseClassType(unsigned int i)	\
+// 	{								\
+// 		switch (i)						\
+// 		{							\
+// 			case 0  : return #name1;			\
+// 			default : return "";				\
+// 		}							\
+// 	}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////

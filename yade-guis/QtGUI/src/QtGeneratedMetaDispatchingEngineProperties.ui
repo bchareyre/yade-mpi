@@ -9,7 +9,7 @@
             <x>0</x>
             <y>0</y>
             <width>415</width>
-            <height>113</height>
+            <height>116</height>
         </rect>
     </property>
     <property name="sizePolicy">
@@ -142,6 +142,7 @@
     <slot>pbAddClicked()</slot>
     <slot>pbOkClicked()</slot>
     <slot>pbRemoveClicked()</slot>
+    <slot>pbSerializationClicked()</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

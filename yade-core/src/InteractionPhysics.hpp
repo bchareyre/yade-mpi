@@ -35,6 +35,8 @@
 class InteractionPhysics : public Serializable
 {
 	REGISTER_CLASS_NAME(InteractionPhysics);
+	REGISTER_BASE_CLASS_NAME(Serializable);
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

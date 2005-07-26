@@ -52,8 +52,6 @@ class PhysicalParametersMetaEngine :	public MetaDispatchingEngine1D
 {
 	public		: virtual void action(Body* b);
 
-	REGISTER_ENGINE_UNIT_TYPE(PhysicalParametersEngineUnit);
-	REGISTER_BASE_CLASS_TYPE_1D(PhysicalParameters);
 	REGISTER_CLASS_NAME(PhysicalParametersMetaEngine);
 };
 

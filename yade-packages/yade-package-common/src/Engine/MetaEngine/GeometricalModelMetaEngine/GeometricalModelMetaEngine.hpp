@@ -55,8 +55,6 @@ class GeometricalModelMetaEngine :	public MetaDispatchingEngine2D
 {
 	public		: virtual void action(Body* b);
 
-	REGISTER_ENGINE_UNIT_TYPE(GeometricalModelEngineUnit);
-	REGISTER_BASE_CLASS_TYPE_2D(PhysicalParameters,GeometricalModel);
 	REGISTER_CLASS_NAME(GeometricalModelMetaEngine);
 };
 

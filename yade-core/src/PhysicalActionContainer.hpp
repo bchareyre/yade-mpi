@@ -87,6 +87,8 @@ class PhysicalActionContainer : public Serializable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	REGISTER_CLASS_NAME(PhysicalActionContainer);
+	REGISTER_BASE_CLASS_NAME(Serializable);
+
 	// local storage for uniform serialization of all possible container concrete implementations.
 	private   : vector<shared_ptr<PhysicalAction> > action;
 	public    : virtual void registerAttributes();

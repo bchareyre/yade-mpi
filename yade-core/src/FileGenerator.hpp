@@ -56,6 +56,7 @@ class FileGenerator : public Serializable
 	public : string generateAndSave();
 	
 	REGISTER_CLASS_NAME(FileGenerator);
+	REGISTER_BASE_CLASS_NAME(Serializable);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

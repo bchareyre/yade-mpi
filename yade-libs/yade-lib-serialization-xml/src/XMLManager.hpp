@@ -70,6 +70,9 @@ class XMLManager : public IOManager
 	//public    : static void deserializeCustomFundamental(istream& stream, Archive& ac,const string& str);
 	//public    : static void deserializeContainerOfFundamental(istream& stream, Archive& ac, const string& str);
 	//public    : static void deserializeFundamentalSerializable(istream& stream, Archive& ac, const string& str);
+
+	REGISTER_CLASS_NAME(XMLManager);
+	REGISTER_BASE_CLASS_NAME(IOManager);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

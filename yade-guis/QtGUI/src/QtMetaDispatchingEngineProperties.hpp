@@ -35,7 +35,9 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include <yade/yade-core/MetaDispatchingEngine.hpp>
 #include <yade/yade-core/Engine.hpp>
+#include <yade/yade-lib-serialization-qt/QtGUIGenerator.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -46,20 +48,20 @@
 class QtMetaDispatchingEngineProperties : public QtGeneratedMetaDispatchingEngineProperties
 {
 	protected : vector<vector<QWidget*> > cbs;
-	protected : string baseClass1;
-	protected : string baseClass2;
-	protected : string baseFunctor;
+	protected : vector<string> baseClasses;
 	protected : int dimension;
+	protected : QtGUIGenerator guiGen;
+	protected : QFrame * engineUnitFrame;
+	protected : shared_ptr<MetaDispatchingEngine> metaEngine;
 
-	protected : vector<vector<string> > baseClasses;
+	protected : vector<vector<string> > inheritedClasses;
 
 	protected : void buildDynlibList();
 
 	private   : QPixmap image0;
 	private   : QPixmap image1;
 
-	public    : QtMetaDispatchingEngineProperties(const string& baseClass1, const string& baseClass2, const string& baseFunctor, QWidget* parent=0,  const char* name=0 );
-	public    : QtMetaDispatchingEngineProperties(const string& baseClass1, const string& baseFunctor, QWidget* parent=0,  const char* name=0 );
+	public    : QtMetaDispatchingEngineProperties(shared_ptr<MetaDispatchingEngine>& mde, QWidget* parent=0,  const char* name=0 );
 	public    : QtMetaDispatchingEngineProperties(QWidget* parent=0,  const char* name=0);
 	public    : ~QtMetaDispatchingEngineProperties();
 

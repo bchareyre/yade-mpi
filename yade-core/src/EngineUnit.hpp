@@ -35,7 +35,7 @@
 class EngineUnit : public Serializable
 {
 	REGISTER_CLASS_NAME(EngineUnit);
-
+	REGISTER_BASE_CLASS_NAME(Serializable);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

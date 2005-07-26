@@ -209,24 +209,11 @@ void QtEngineEditor::engineSelected(int i)
 				guiGen.buildGUI(currentEngine,engineFrame);
 				engineFrame->show();
 			}
-			else if (engines[i].type==METADISPATCHINGENGINE2D)
+			else if (engines[i].type==METADISPATCHINGENGINE2D || engines[i].type==METADISPATCHINGENGINE1D)
 			{	
 				delete metaDispatchingEngineFrame;
 				shared_ptr<MetaDispatchingEngine> mde = dynamic_pointer_cast<MetaDispatchingEngine>(currentEngine);
-				string baseClass1  = mde->getBaseClassType(0);
-				string baseClass2  = mde->getBaseClassType(1);
-				string baseFunctor = mde->getEngineUnitType();
-				metaDispatchingEngineFrame = new QtMetaDispatchingEngineProperties(baseClass1,baseClass2,baseFunctor,parent);
-				metaDispatchingEngineFrame->setCaption(currentEngine->getClassName());
-				metaDispatchingEngineFrame->show();
-			}
-			else if (engines[i].type==METADISPATCHINGENGINE1D)
-			{	
-				delete metaDispatchingEngineFrame;
-				shared_ptr<MetaDispatchingEngine> mde = dynamic_pointer_cast<MetaDispatchingEngine>(currentEngine);
-				string baseClass1  = mde->getBaseClassType(0);
-				string baseFunctor = mde->getEngineUnitType();
-				metaDispatchingEngineFrame = new QtMetaDispatchingEngineProperties(baseClass1,baseFunctor,parent);
+				metaDispatchingEngineFrame = new QtMetaDispatchingEngineProperties(mde,parent);
 				metaDispatchingEngineFrame->setCaption(currentEngine->getClassName());
 				metaDispatchingEngineFrame->show();
 			}

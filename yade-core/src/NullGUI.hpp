@@ -69,6 +69,11 @@ class NullGUI : public FrontEnd
 		int		snapshotInterval;
 		string		snapshotName;
 		long int	maxIteration;
+
+
+	REGISTER_CLASS_NAME(NullGUI);
+	REGISTER_BASE_CLASS_NAME(FrontEnd);
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

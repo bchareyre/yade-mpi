@@ -1,1 +1,1 @@
-/home/galizzi/devel/trunk/yade-guis/QtGUI/src/QtMetaDispatchingEngineProperties.cpp
+../../../src/QtMetaDispatchingEngineProperties.cpp

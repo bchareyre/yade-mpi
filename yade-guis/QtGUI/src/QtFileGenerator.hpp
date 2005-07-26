@@ -81,6 +81,9 @@ class QtFileGenerator : public QtFileGeneratorController, public Factorable
 	
 	protected : void closeEvent(QCloseEvent *evt);
 
+	REGISTER_CLASS_NAME(QtFileGenerator);
+	REGISTER_BASE_CLASS_NAME(Factorable);
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

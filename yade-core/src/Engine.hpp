@@ -61,6 +61,7 @@ class Engine : public Serializable/*, public Indexable*/
 	//public : virtual const int& getClassIndex() const { throw;};
 
 	REGISTER_CLASS_NAME(Engine);
+	REGISTER_BASE_CLASS_NAME(Serializable);
 
 };
 

@@ -74,6 +74,7 @@ class Interaction : public Serializable
 	public	: void registerAttributes();
 
 	REGISTER_CLASS_NAME(Interaction);
+	REGISTER_BASE_CLASS_NAME(Serializable);
 
 };
 ///////////////////////////////////////////////////////////////////////////////////////////////////

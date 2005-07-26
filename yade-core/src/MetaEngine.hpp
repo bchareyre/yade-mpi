@@ -50,8 +50,8 @@ class MetaEngine : public Engine
 		Engine::postProcessAttributes(deserializing);
 	}
 
-	REGISTER_CLASS_NAME(MetaEngine);
-
+	REGISTER_CLASS_NAME(MetaEngine);	
+	REGISTER_BASE_CLASS_NAME(Engine);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

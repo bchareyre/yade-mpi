@@ -40,6 +40,11 @@ class RenderingEngine :  public Serializable
 	
 	public : virtual void render(const shared_ptr<MetaBody>& ) {throw;};
 	public : virtual void init() {throw;};
+
+	REGISTER_CLASS_NAME(RenderingEngine);
+	REGISTER_BASE_CLASS_NAME(Serializable);
+
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

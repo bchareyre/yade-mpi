@@ -82,7 +82,7 @@ class DeusExMachina : public Engine
 	public : virtual void action(Body* b);
 
 	REGISTER_CLASS_NAME(DeusExMachina);
-
+	REGISTER_BASE_CLASS_NAME(Engine);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

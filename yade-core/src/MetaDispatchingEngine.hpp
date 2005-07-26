@@ -41,9 +41,6 @@ class MetaDispatchingEngine : public MetaEngine
 
 	public    : typedef list<shared_ptr<EngineUnit> >::iterator EngineUnitListIterator;
 
-
-
-
 	protected : void storeFunctorName(const string& baseClassName1, const string& libName, shared_ptr<EngineUnit> eu);
 	protected : void storeFunctorName(const string& baseClassName1, const string& baseClassName2, const string& libName, shared_ptr<EngineUnit> eu);
 	protected : void storeFunctorName(const string& baseClassName1, const string& baseClassName2, const string& baseClassName3, const string& libName, shared_ptr<EngineUnit> eu);
@@ -60,7 +57,9 @@ class MetaDispatchingEngine : public MetaEngine
 	public    : virtual int getDimension() { throw; };
 	public    : virtual string getBaseClassType(unsigned int ) { throw; };
 
+
 	REGISTER_CLASS_NAME(MetaDispatchingEngine);
+	REGISTER_BASE_CLASS_NAME(MetaEngine);
 };
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -72,8 +71,8 @@ REGISTER_SERIALIZABLE(MetaDispatchingEngine,false);
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////
 
-#define REGISTER_ENGINE_UNIT_TYPE(name)		\
-	public     : virtual string getEngineUnitType() { return #name; };
+// #define REGISTER_ENGINE_UNIT_TYPE(name)		\
+// 	public     : virtual string getEngineUnitType() { return #name; };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////

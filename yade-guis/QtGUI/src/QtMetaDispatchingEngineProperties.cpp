@@ -26,6 +26,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include <yade/yade-core/EngineUnit.hpp>
 #include <yade/yade-core/Omega.hpp>
 #include <yade/yade-lib-multimethods/Indexable.hpp>
 
@@ -36,6 +37,13 @@
 #include <qpushbutton.h>
 #include <qimage.h>
 #include <qaction.h>
+
+#include <boost/type_traits.hpp>
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+using namespace boost;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -181,45 +189,24 @@ static const unsigned char image1_data[] = {
 
 QtMetaDispatchingEngineProperties::QtMetaDispatchingEngineProperties(QWidget* parent,  const char*name ) : QtGeneratedMetaDispatchingEngineProperties( parent, name )
 {
-	QImage img;
-	img.loadFromData( image0_data, sizeof( image0_data ), "PNG" );
-	image0 = img;
-
-	img.loadFromData( image1_data, sizeof( image1_data ), "PNG" );
-	image1 = img;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-QtMetaDispatchingEngineProperties::QtMetaDispatchingEngineProperties(const string& baseClass1, const string& baseClass2, const string& baseFunctor, QWidget* parent,  const char* name ) 
+QtMetaDispatchingEngineProperties::QtMetaDispatchingEngineProperties(shared_ptr<MetaDispatchingEngine>& mde, QWidget* parent,  const char* name ) 
 	: QtGeneratedMetaDispatchingEngineProperties( parent, name )
 {
-	dimension = 2;
-	this->baseClass1  = baseClass1;
-	this->baseClass2  = baseClass2;
-	this->baseFunctor = baseFunctor;
-
-	QImage img;
-	img.loadFromData( image0_data, sizeof( image0_data ), "PNG" );
-	image0 = img;
-
-	img.loadFromData( image1_data, sizeof( image1_data ), "PNG" );
-	image1 = img;
-
-	buildDynlibList();
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-QtMetaDispatchingEngineProperties::QtMetaDispatchingEngineProperties(const string& baseClass1, const string& baseFunctor, QWidget* parent,  const char* name ) 
-	: QtGeneratedMetaDispatchingEngineProperties( parent, name )
-{
-	dimension = 1;
-	this->baseClass1  = baseClass1;
-	this->baseFunctor = baseFunctor;
+	dimension = mde->getDimension();
 	
+	for(int i=0;i<dimension;i++)
+		baseClasses.push_back(mde->getBaseClassType(i));
+
+	baseClasses.push_back(mde->getEngineUnitType());
+	
+	metaEngine = mde;
+
 	QImage img;
 	img.loadFromData( image0_data, sizeof( image0_data ), "PNG" );
 	image0 = img;
@@ -228,6 +215,9 @@ QtMetaDispatchingEngineProperties::QtMetaDispatchingEngineProperties(const strin
 	image1 = img;
 
 	buildDynlibList();
+
+	engineUnitFrame = new QFrame();	
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -239,27 +229,64 @@ QtMetaDispatchingEngineProperties::~QtMetaDispatchingEngineProperties()
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+#include <yade/yade-package-common/PhysicalActionApplierUnit.hpp>
 
 void QtMetaDispatchingEngineProperties::buildDynlibList()
 {
 
-	baseClasses.resize(dimension+1);
+	inheritedClasses.resize(baseClasses.size());
 
 	map<string,DynlibType>::const_iterator di    = Omega::instance().getDynlibsType().begin();
 	map<string,DynlibType>::const_iterator diEnd = Omega::instance().getDynlibsType().end();
 	for(;di!=diEnd;++di)
 	{
 		shared_ptr<Factorable> f = ClassFactory::instance().createShared((*di).first);
-		
-		if ((*di).second.baseClass=="EngineUnit")
-			baseClasses[dimension].push_back((*di).first);
+
+		/*if ((*di).second.baseClass=="EngineUnit")
+			inheritedClasses[dimension].push_back((*di).first);
 		else
 		{
 			shared_ptr<Indexable> i = dynamic_pointer_cast<Indexable>(f);
 			if (i)
 			{
 				for(int j=0;j<dimension;j++)
-					baseClasses[j].push_back((*di).first);
+					inheritedClasses[j].push_back((*di).first);
+			}
+		}*/
+
+		if (dynamic_pointer_cast<EngineUnit>(f))
+		{
+			//shared_ptr<EngineUnit> eu = dynamic_pointer_cast<EngineUnit>(ClassFactory::instance().createShared(baseClasses.back()));
+
+			//if (is_base_and_derived<typeof(*f),PhysicalActionApplierUnit>::value)
+			//if (dynamic_pointer_cast<typeof(*)>(f))
+			//if (metaEngine->isValidEngineUnit((*di).first))
+			shared_ptr<PhysicalActionApplierUnit> paau =  static_pointer_cast<PhysicalActionApplierUnit>(f);
+			try
+			{	
+				paau->getClassName();
+				cout << (*di).first << " " << paau->getClassName() << " success" << endl;
+				inheritedClasses.back().push_back((*di).first);
+			}
+			catch(...)
+			{
+				cout << (*di).first << " failure" << endl;
+			}
+			//cout << (*di).first << " " << dynamic_pointer_cast<PhysicalActionApplierUnit>(static_pointer_cast<EngineUnit>(f)) << endl;
+			//if (dynamic_pointer_cast<PhysicalActionApplierUnit>(f))
+			//	inheritedClasses.back().push_back((*di).first);
+		}
+		else if (dynamic_pointer_cast<Indexable>(f))
+		{
+			for(unsigned int i=0;i<baseClasses.size()-1;i++)
+			{
+				shared_ptr<Factorable> f2 = ClassFactory::instance().createShared(baseClasses[i]);
+	
+				if (is_base_and_derived<typeof(f2.get()),typeof(f.get())>::value)
+				{
+					shared_ptr<Serializable> s = dynamic_pointer_cast<Serializable>(f2);
+					inheritedClasses[i].push_back(s->getClassName());
+				}
 			}
 		}
 	}
@@ -270,7 +297,6 @@ void QtMetaDispatchingEngineProperties::buildDynlibList()
 
 void QtMetaDispatchingEngineProperties::pbAddClicked()
 {
-
 	vector<QWidget*> v;
 
 	for(int i=0;i<=dimension;i++)
@@ -279,8 +305,8 @@ void QtMetaDispatchingEngineProperties::pbAddClicked()
     		cb->setSizePolicy( QSizePolicy( (QSizePolicy::SizeType)1, (QSizePolicy::SizeType)1, 0, 0, cb->sizePolicy().hasHeightForWidth() ) );
 		cb->show();
 
-		for(unsigned int j=0;j<baseClasses[i].size();j++)
-			cb->insertItem(baseClasses[i][j]);
+		for(unsigned int j=0;j<inheritedClasses[i].size();j++)
+			cb->insertItem(inheritedClasses[i][j]);
 
 		v.push_back(cb);
 	}
@@ -307,7 +333,6 @@ void QtMetaDispatchingEngineProperties::pbAddClicked()
 	connect( pbSerialization, SIGNAL( clicked() ), this, SLOT( pbSerializationClicked() ) );
 
 	v.push_back(pbSerialization);
-
 
 	cbs.push_back(v);
 
@@ -350,6 +375,37 @@ void QtMetaDispatchingEngineProperties::pbRemoveClicked()
 void QtMetaDispatchingEngineProperties::pbSerializationClicked()
 {
 
+	QPushButton * pb = (QPushButton*)(this->sender());
+	string name;
+	
+	vector<vector<QWidget*> >::iterator cbsi    = cbs.begin();
+	vector<vector<QWidget*> >::iterator cbsiEnd = cbs.end();
+	for( ; cbsi!=cbsiEnd; ++cbsi)
+	{
+		QPushButton * tmppb = (QPushButton*)(*cbsi)[dimension+2];
+		if (tmppb->name()==pb->name())
+		{
+			QComboBox *  cb = (QComboBox*)((*cbsi)[dimension]);
+			const char * str = cb->currentText();
+			name = str;
+		}
+	}
+
+	guiGen.setResizeHeight(true);
+	guiGen.setResizeWidth(true);
+	guiGen.setShift(10,20);
+	guiGen.setShowButtons(true);
+
+	QWidget * parent   = this->parentWidget()->parentWidget();
+
+	delete engineUnitFrame;
+	engineUnitFrame = new QFrame(parent);
+	engineUnitFrame->setCaption(name);
+
+	shared_ptr<EngineUnit> eu = dynamic_pointer_cast<EngineUnit>(ClassFactory::instance().createShared(name));
+
+	guiGen.buildGUI(eu,engineUnitFrame);
+	engineUnitFrame->show();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -45,7 +45,8 @@ template
 class EngineUnit2D :	public EngineUnit,
 			public FunctorWrapper<ReturnType, AttributesType>
 {
-
+	REGISTER_CLASS_NAME(EngineUnit2D);
+	REGISTER_BASE_CLASS_NAME(EngineUnit FunctorWrapper);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

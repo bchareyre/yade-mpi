@@ -70,6 +70,8 @@ class TimeStepper : public Engine
 	public : virtual void registerAttributes();
 
 	REGISTER_CLASS_NAME(TimeStepper);
+	REGISTER_BASE_CLASS_NAME(Engine);
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
