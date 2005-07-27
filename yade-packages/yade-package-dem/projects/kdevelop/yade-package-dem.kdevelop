@@ -76,7 +76,7 @@
       <directoryradio>executable</directoryradio>
     </run>
     <general>
-      <activedir>DataClass/InteractingGeometry/PolyhedralSweptSphere</activedir>
+      <activedir>PreProcessor/TetrahedronsTest</activedir>
     </general>
     <subclassing/>
   </kdevtrollproject>

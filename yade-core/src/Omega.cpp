@@ -25,7 +25,6 @@
 #include "yadeExceptions.hpp"
 #include "MetaBody.hpp"
 #include "FileGenerator.hpp"
-#include "InteractionSolver.hpp"
 #include "DeusExMachina.hpp"
 #include "Body.hpp"
 #include "GeometricalModel.hpp"
@@ -33,7 +32,6 @@
 #include "BoundingVolume.hpp"
 #include "InteractionGeometry.hpp"
 #include "InteractionPhysics.hpp"
-#include "BroadInteractor.hpp"
 #include "SimulationLoop.hpp"
 #include "FrontEnd.hpp"
 #include "MetaEngine.hpp"
@@ -205,16 +203,12 @@ void Omega::registerPluginType(const string& name)
 
 	if (dynamic_pointer_cast<FileGenerator>(f))
 		dynlibsType[name].baseClass = "FileGenerator";
-	else if (dynamic_pointer_cast<InteractionSolver>(f))
-		dynlibsType[name].baseClass = "InteractionSolver";
 	else if (dynamic_pointer_cast<DeusExMachina>(f))
 		dynlibsType[name].baseClass = "DeusExMachina";
 	else if (dynamic_pointer_cast<Body>(f))
 		dynlibsType[name].baseClass = "Body";
 	else if (dynamic_pointer_cast<IOManager>(f))
 		dynlibsType[name].baseClass = "IOManager";
-	else if (dynamic_pointer_cast<BroadInteractor>(f))
-		dynlibsType[name].baseClass = "BroadInteractor";
 	else if (dynamic_pointer_cast<GeometricalModel>(f))
 		dynlibsType[name].baseClass = "GeometricalModel";
 	else if (dynamic_pointer_cast<InteractingGeometry>(f))
