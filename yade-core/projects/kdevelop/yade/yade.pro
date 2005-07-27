@@ -6,7 +6,6 @@
 HEADERS += BodyContainer.hpp \
            Body.hpp \
            BoundingVolume.hpp \
-           BroadInteractor.hpp \
            DeusExMachina.hpp \
            Engine.hpp \
            FileGenerator.hpp \
@@ -17,7 +16,6 @@ HEADERS += BodyContainer.hpp \
            InteractionGeometry.hpp \
            Interaction.hpp \
            InteractionPhysics.hpp \
-           InteractionSolver.hpp \
            MetaBody.hpp \
            MetaDispatchingEngine1D.hpp \
            MetaDispatchingEngine2D.hpp \
@@ -45,7 +43,6 @@ HEADERS += BodyContainer.hpp \
 SOURCES += BodyContainer.cpp \
            Body.cpp \
            BoundingVolume.cpp \
-           BroadInteractor.cpp \
            DeusExMachina.cpp \
            FileGenerator.cpp \
            FrontEnd.cpp \
@@ -53,7 +50,6 @@ SOURCES += BodyContainer.cpp \
            InteractingGeometry.cpp \
            InteractionContainer.cpp \
            Interaction.cpp \
-           InteractionSolver.cpp \
            MetaBody.cpp \
            NullGUI.cpp \
            Omega.cpp \
