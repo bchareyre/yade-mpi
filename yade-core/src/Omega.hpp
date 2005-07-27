@@ -29,6 +29,7 @@
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <fstream>
+#include <set>
 #include <time.h>
 #include <boost/thread/thread.hpp>
 #include <iostream>
@@ -46,7 +47,7 @@
 
 class MetaBody;
 class SimulationLoop;
-class FrontEnd;
+//class FrontEnd;
 class ThreadSynchronizer;
 class Preferences;
 
@@ -60,9 +61,9 @@ using namespace std;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-struct DynlibType
+struct DynlibDescriptor
 {
-	string baseClass;
+	set<string> baseClasses;
 	bool isIndexable;
 	bool isFactorable;
 	bool isSerializable;
@@ -94,11 +95,12 @@ class Omega : public Singleton<Omega>
 	private	: shared_ptr<ThreadSynchronizer> synchronizer;
 	public  : shared_ptr<ThreadSynchronizer> getSynchronizer();
 
-	private : map<string,DynlibType> dynlibsType; // FIXME : should store that into class factory ???
-	public  : const map<string,DynlibType>& getDynlibsType();	
-	public	: bool getDynlibType(const string& libName,string& type);
-	private	: void registerPluginType(const string& name);
+	private : map<string,DynlibDescriptor> dynlibs; // FIXME : should store that into class factory ???
+	public  : const map<string,DynlibDescriptor>& getDynlibsDescriptor();
+	//public	: bool getDynlibDescriptor(const string& libName,string& type);
+	private : void buildDynlibDatabase(const vector<string>& dynlibsList);
 	public  : void scanPlugins();
+	public  : bool isInheritingFrom(const string& className, const string& baseClassName );
 
 	private	: Real dt; // FIXME - maybe ???????? move this to MetaBody.hpp OR MAYBE NOT ??
 	public	: void setTimeStep(const Real);

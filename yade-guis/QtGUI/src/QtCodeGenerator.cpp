@@ -88,11 +88,11 @@ void QtCodeGenerator::bgDataTypeClicked(int v)
 
 	cbDataInheritsFrom->clear();
 	cbDataInheritsFrom->insertItem(baseDataClass);
-	map<string,DynlibType>::const_iterator di    = Omega::instance().getDynlibsType().begin();
-	map<string,DynlibType>::const_iterator diEnd = Omega::instance().getDynlibsType().end();
+	map<string,DynlibDescriptor>::const_iterator di    = Omega::instance().getDynlibsDescriptor().begin();
+	map<string,DynlibDescriptor>::const_iterator diEnd = Omega::instance().getDynlibsDescriptor().end();
 	for(;di!=diEnd;++di)
 	{
-		if ((*di).second.baseClass==baseDataClass)
+		if (Omega::instance().isInheritingFrom((*di).first,baseDataClass))
 			cbDataInheritsFrom->insertItem((*di).first);
 	}
 
@@ -320,20 +320,21 @@ void QtCodeGenerator::bgEngineTypeClicked(int v )
 	if (baseEngineClass=="MetaDispatchingEngine1D" || baseEngineClass=="MetaDispatchingEngine1D")
 	{
 		cbMetaEngineBaseClass1->clear();
-		map<string,DynlibType>::const_iterator di    = Omega::instance().getDynlibsType().begin();
-		map<string,DynlibType>::const_iterator diEnd = Omega::instance().getDynlibsType().end();
+		map<string,DynlibDescriptor>::const_iterator di    = Omega::instance().getDynlibsDescriptor().begin();
+		map<string,DynlibDescriptor>::const_iterator diEnd = Omega::instance().getDynlibsDescriptor().end();
 		for(;di!=diEnd;++di)
 		{
 			if ((*di).second.isIndexable)
 				cbMetaEngineBaseClass1->insertItem((*di).first);
 		}
+
 	}
 
 	if (baseEngineClass=="MetaDispatchingEngine2D")
 	{
 		cbMetaEngineBaseClass2->clear();
-		map<string,DynlibType>::const_iterator di    = Omega::instance().getDynlibsType().begin();
-		map<string,DynlibType>::const_iterator diEnd = Omega::instance().getDynlibsType().end();
+		map<string,DynlibDescriptor>::const_iterator di    = Omega::instance().getDynlibsDescriptor().begin();
+		map<string,DynlibDescriptor>::const_iterator diEnd = Omega::instance().getDynlibsDescriptor().end();
 		for(;di!=diEnd;++di)
 		{
 			if ((*di).second.isIndexable)

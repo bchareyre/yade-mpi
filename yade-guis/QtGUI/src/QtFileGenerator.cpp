@@ -51,11 +51,11 @@ QtFileGenerator::QtFileGenerator ( QWidget * parent , const char * name) : QtFil
 	setMinimumSize(s);
 	setMaximumSize(QSize(s.width(),32000));	
 	
-	map<string,DynlibType>::const_iterator di    = Omega::instance().getDynlibsType().begin();
-	map<string,DynlibType>::const_iterator diEnd = Omega::instance().getDynlibsType().end();
+	map<string,DynlibDescriptor>::const_iterator di    = Omega::instance().getDynlibsDescriptor().begin();
+	map<string,DynlibDescriptor>::const_iterator diEnd = Omega::instance().getDynlibsDescriptor().end();
 	for(;di!=diEnd;++di)
 	{
-		if ((*di).second.baseClass=="FileGenerator")
+		if (Omega::instance().isInheritingFrom((*di).first,"FileGenerator"))
 			cbGeneratorName->insertItem((*di).first);
 	}
 

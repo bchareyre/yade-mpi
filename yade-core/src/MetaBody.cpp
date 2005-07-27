@@ -101,12 +101,15 @@ void MetaBody::setTimeSteppersActive(bool a)
 	vector<shared_ptr<Engine> >::iterator aiEnd = actors.end();
 	for(int i=0;ai!=aiEnd;++ai,i++)
 	{
-		map<string,DynlibType>::const_iterator dli = Omega::instance().getDynlibsType().find((*ai)->getClassName());
+		if (Omega::instance().isInheritingFrom((*ai)->getClassName(),"TimeStepper"))
+			(dynamic_pointer_cast<TimeStepper>(*ai))->setActive(a);
+		
+/*		map<string,DynlibType>::const_iterator dli = Omega::instance().getDynlibsType().find((*ai)->getClassName());
 		if (dli!=Omega::instance().getDynlibsType().end())
 		{
 			if ((*dli).second.baseClass=="TimeStepper")
 				(dynamic_pointer_cast<TimeStepper>(*ai))->setActive(a);
-		}
+		}*/
 	}
 }
 

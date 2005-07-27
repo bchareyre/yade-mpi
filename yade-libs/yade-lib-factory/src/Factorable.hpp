@@ -48,11 +48,10 @@
 		vector<string> tokens;							\
 		string str=#bcn;							\
 		istringstream iss(str);							\
-		iss >> token;								\
 		while (!iss.eof())							\
 		{									\
-			tokens.push_back(token);					\
 			iss >> token;							\
+			tokens.push_back(token);					\
 		}									\
 		if (i>=token.size())							\
 			return "";							\
@@ -65,11 +64,10 @@
 		vector<string> tokens;							\
 		string str=#bcn;							\
 		istringstream iss(str);							\
-		iss >> token;								\
 		while (!iss.eof())							\
 		{									\
-			tokens.push_back(token);					\
 			iss >> token;							\
+			tokens.push_back(token);					\
 		}									\
 		return tokens.size();							\
 	}
@@ -81,6 +79,10 @@ class Factorable
 {
 	public    : Factorable();
 	public    : virtual ~Factorable();
+
+	REGISTER_CLASS_NAME(Factorable);
+	public : virtual string getBaseClassName(unsigned int i=0) const { return "";}
+	public : virtual int getBaseClassNumber() { return 0;}
 
 // FIXME - virtual function to return version, long and short description, OR
 //         maybe just a file with the same name as class with description inside

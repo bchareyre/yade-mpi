@@ -24,21 +24,21 @@
 #include "Omega.hpp"
 #include "yadeExceptions.hpp"
 #include "MetaBody.hpp"
-#include "FileGenerator.hpp"
-#include "DeusExMachina.hpp"
-#include "Body.hpp"
-#include "GeometricalModel.hpp"
-#include "InteractingGeometry.hpp"
-#include "BoundingVolume.hpp"
-#include "InteractionGeometry.hpp"
-#include "InteractionPhysics.hpp"
+//#include "FileGenerator.hpp"
+//#include "DeusExMachina.hpp"
+//#include "Body.hpp"
+//#include "GeometricalModel.hpp"
+//#include "InteractingGeometry.hpp"
+//#include "BoundingVolume.hpp"
+//#include "InteractionGeometry.hpp"
+//#include "InteractionPhysics.hpp"
 #include "SimulationLoop.hpp"
-#include "FrontEnd.hpp"
-#include "MetaEngine.hpp"
+//#include "FrontEnd.hpp"
+//#include "MetaEngine.hpp"
 #include "Preferences.hpp"
-#include "TimeStepper.hpp"
-#include "EngineUnit.hpp"
-#include "MetaDispatchingEngine.hpp"
+//#include "TimeStepper.hpp"
+//#include "EngineUnit.hpp"
+//#include "MetaDispatchingEngine.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -47,7 +47,9 @@
 #include <yade/yade-lib-serialization/IOManager.hpp>
 #include <yade/yade-lib-serialization/IOManager.hpp>
 #include <yade/yade-lib-threads/ThreadSynchronizer.hpp>
+#include <yade/yade-lib-threads/ThreadSafe.hpp>
 #include <yade/yade-lib-multimethods/FunctorWrapper.hpp>
+#include <yade/yade-lib-multimethods/Indexable.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -188,53 +190,73 @@ void Omega::stopSimulationLoop()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void Omega::registerPluginType(const string& name)
+void Omega::buildDynlibDatabase(const vector<string>& dynlibsList)
 {	
-	// called by BuildDynLibList
-	shared_ptr<Factorable> f;
-	try
+
+	vector< string >::const_iterator dlli    = dynlibsList.begin();
+	vector< string >::const_iterator dlliEnd = dynlibsList.end();
+	for( ; dlli!=dlliEnd ; ++dlli)
 	{
-		f = ClassFactory::instance().createShared(name);
-	}
-	catch (FactoryError&)
-	{
-		return;
+		string name = *dlli;
+		shared_ptr<Factorable> f;
+		try
+		{
+			f = ClassFactory::instance().createShared(name);
+			dynlibs[name].isIndexable    = dynamic_pointer_cast<Indexable>(f);
+			dynlibs[name].isFactorable   = dynamic_pointer_cast<Factorable>(f);
+			dynlibs[name].isSerializable = dynamic_pointer_cast<Serializable>(f);
+			for(int i=0;i<f->getBaseClassNumber();i++)
+				dynlibs[name].baseClasses.insert(f->getBaseClassName(i));
+		}
+		catch (FactoryError&)
+		{
+		}
 	}
 
-	if (dynamic_pointer_cast<FileGenerator>(f))
-		dynlibsType[name].baseClass = "FileGenerator";
-	else if (dynamic_pointer_cast<DeusExMachina>(f))
-		dynlibsType[name].baseClass = "DeusExMachina";
-	else if (dynamic_pointer_cast<Body>(f))
-		dynlibsType[name].baseClass = "Body";
-	else if (dynamic_pointer_cast<IOManager>(f))
-		dynlibsType[name].baseClass = "IOManager";
-	else if (dynamic_pointer_cast<GeometricalModel>(f))
-		dynlibsType[name].baseClass = "GeometricalModel";
-	else if (dynamic_pointer_cast<InteractingGeometry>(f))
-		dynlibsType[name].baseClass = "InteractingGeometry";
-	else if (dynamic_pointer_cast<BoundingVolume>(f))
-		dynlibsType[name].baseClass = "BoundingVolume";
-	else if (dynamic_pointer_cast<InteractionGeometry>(f))
-		dynlibsType[name].baseClass = "InteractionGeometry";
-	else if (dynamic_pointer_cast<InteractionPhysics>(f))
-		dynlibsType[name].baseClass = "InteractionPhysics";
-	else if (dynamic_pointer_cast<EngineUnit>(f))
-		dynlibsType[name].baseClass = "EngineUnit";
-	else if (dynamic_pointer_cast<MetaDispatchingEngine>(f))
-		dynlibsType[name].baseClass = "MetaDispatchingEngine";
-	else if (dynamic_pointer_cast<MetaEngine>(f))
-		dynlibsType[name].baseClass = "MetaEngine"; // FIXME : be calling getEngineUnitType possibility to classify all engine unit in the map
-	else if (dynamic_pointer_cast<TimeStepper>(f))
-		dynlibsType[name].baseClass = "TimeStepper";
-	else if (dynamic_pointer_cast<Engine>(f))
-		dynlibsType[name].baseClass = "Engine";
-	else
-		dynlibsType[name].baseClass = "Unknown";
+	map<string,DynlibDescriptor>::iterator dli    = dynlibs.begin();
+	map<string,DynlibDescriptor>::iterator dliEnd = dynlibs.end();
+	for( ; dli!=dliEnd ; ++dli)
+	{
+		set<string>::iterator bci    = (*dli).second.baseClasses.begin();
+		set<string>::iterator bciEnd = (*dli).second.baseClasses.end();
+		for( ; bci!=bciEnd ; ++bci)
+		{
+			string name = *bci;
+			if (name=="MetaDispatchingEngine1D" || name=="MetaDispatchingEngine2D")
+				(*dli).second.baseClasses.insert("MetaEngine");
+			else if (name=="EngineUnit1D" || name=="EngineUnit2D")
+				(*dli).second.baseClasses.insert("EngineUnit");
+			else if (name=="Serializable")
+				(*dli).second.baseClasses.insert("Factorable");
+			else if (name!="Factorable" && name!="Indexable")
+			{
+				shared_ptr<Factorable> f = ClassFactory::instance().createShared(name);
+				for(int i=0;i<f->getBaseClassNumber();i++)
+					dynlibs[name].baseClasses.insert(f->getBaseClassName(i));
+			}
+		}
+	}
 
-	dynlibsType[name].isIndexable    = (dynamic_pointer_cast<Indexable>(f));
-	dynlibsType[name].isFactorable   = (dynamic_pointer_cast<Factorable>(f));
-	dynlibsType[name].isSerializable = (dynamic_pointer_cast<Serializable>(f));
+/*
+	dli    = dynlibs.begin();
+	dliEnd = dynlibs.end();
+	for( ; dli!=dliEnd ; ++dli)
+	{
+		cerr << (*dli).first << " : " ;
+		set<string>::iterator bci    = (*dli).second.baseClasses.begin();
+		set<string>::iterator bciEnd = (*dli).second.baseClasses.end();
+		for( ; bci!=bciEnd ; ++bci)
+			cerr << *bci << endl;
+		cerr << endl;
+	}*/
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+bool Omega::isInheritingFrom(const string& className, const string& baseClassName )
+{
+	return (dynlibs[className].baseClasses.find(baseClassName)!=dynlibs[className].baseClasses.end());
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -298,38 +320,36 @@ void Omega::scanPlugins()
 			allLoaded &= thisLoaded;
 		}
 	}
-
-	vector< string >::iterator dlli    = dynlibsList.begin();
-	vector< string >::iterator dlliEnd = dynlibsList.end();
-	for( ; dlli!=dlliEnd ; ++dlli)
-		registerPluginType((*dlli));
+	
+	buildDynlibDatabase(dynlibsList);
 
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool Omega::getDynlibType(const string& libName, string& type)
-{
-	//LOCK(omegaMutex);
-		
-	map<string,DynlibType>::iterator it = dynlibsType.find(libName);
-	if (it!=dynlibsType.end())
-	{
-		type = (*it).second.baseClass;
-		return true;
-	}
-	else
-		return false;
-}
+// bool Omega::getDynlibDescriptor(const string& libName, string& type)
+// {
+// 	//LOCK(omegaMutex);
+// 		
+// 	map<string,DynlibDescriptor>::iterator it = dynlibs.find(libName);
+// 	if (it!=dynlibs.end())
+// 	{
+// 		type = (*it).second.baseClass;
+// 		return true;
+// 	}
+// 	else
+// 		return false;
+// }
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-const map<string,DynlibType>& Omega::getDynlibsType()
+const map<string,DynlibDescriptor>& Omega::getDynlibsDescriptor()
 {
 	//LOCK(omegaMutex);
 		
-	return dynlibsType;
+	return dynlibs;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -450,12 +470,15 @@ bool Omega::containTimeStepper()
 	vector<shared_ptr<Engine> >::iterator aiEnd = rootBody->actors.end();
 	for(int i=0;ai!=aiEnd;++ai,i++)
 	{
-		map<string,DynlibType>::const_iterator dli = Omega::instance().getDynlibsType().find((*ai)->getClassName());
+		if (isInheritingFrom((*ai)->getClassName(),"TimeStepper"))
+			return true;
+// 
+/*		map<string,DynlibDescriptor>::const_iterator dli = Omega::instance().getDynlibsType().find((*ai)->getClassName());
 		if (dli!=Omega::instance().getDynlibsType().end())
 		{
 			if ((*dli).second.baseClass=="TimeStepper")
 				return true;
-		}
+		}*/
 	}
 	return false;
 }

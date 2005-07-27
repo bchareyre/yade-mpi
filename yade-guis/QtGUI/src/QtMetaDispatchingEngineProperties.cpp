@@ -235,57 +235,23 @@ void QtMetaDispatchingEngineProperties::buildDynlibList()
 
 	inheritedClasses.resize(baseClasses.size());
 
-	map<string,DynlibType>::const_iterator di    = Omega::instance().getDynlibsType().begin();
-	map<string,DynlibType>::const_iterator diEnd = Omega::instance().getDynlibsType().end();
+	map<string,DynlibDescriptor>::const_iterator di    = Omega::instance().getDynlibsDescriptor().begin();
+	map<string,DynlibDescriptor>::const_iterator diEnd = Omega::instance().getDynlibsDescriptor().end();
 	for(;di!=diEnd;++di)
 	{
 		shared_ptr<Factorable> f = ClassFactory::instance().createShared((*di).first);
 
-		/*if ((*di).second.baseClass=="EngineUnit")
-			inheritedClasses[dimension].push_back((*di).first);
-		else
-		{
-			shared_ptr<Indexable> i = dynamic_pointer_cast<Indexable>(f);
-			if (i)
-			{
-				for(int j=0;j<dimension;j++)
-					inheritedClasses[j].push_back((*di).first);
-			}
-		}*/
-
 		if (dynamic_pointer_cast<EngineUnit>(f))
 		{
-			//shared_ptr<EngineUnit> eu = dynamic_pointer_cast<EngineUnit>(ClassFactory::instance().createShared(baseClasses.back()));
-
-			//if (is_base_and_derived<typeof(*f),PhysicalActionApplierUnit>::value)
-			//if (dynamic_pointer_cast<typeof(*)>(f))
-			//if (metaEngine->isValidEngineUnit((*di).first))
-			//shared_ptr<PhysicalActionApplierUnit> paau =  static_pointer_cast<PhysicalActionApplierUnit>(f);
-// 			try
-// 			{	
-// 				paau->getClassName();
-// 				cout << (*di).first << " " << paau->getClassName() << " success" << endl;
-// 				inheritedClasses.back().push_back((*di).first);
-// 			}
-// 			catch(...)
-// 			{
-// 				cout << (*di).first << " failure" << endl;
-// 			}
-			//cout << (*di).first << " " << dynamic_pointer_cast<PhysicalActionApplierUnit>(static_pointer_cast<EngineUnit>(f)) << endl;
-			//if (dynamic_pointer_cast<PhysicalActionApplierUnit>(f))
-			//	inheritedClasses.back().push_back((*di).first);
+			if (Omega::instance().isInheritingFrom((*di).first,metaEngine->getEngineUnitType()))
+				inheritedClasses.back().push_back((*di).first);
 		}
 		else if (dynamic_pointer_cast<Indexable>(f))
 		{
 			for(unsigned int i=0;i<baseClasses.size()-1;i++)
 			{
-				shared_ptr<Factorable> f2 = ClassFactory::instance().createShared(baseClasses[i]);
-	
-				if (is_base_and_derived<typeof(f2.get()),typeof(f.get())>::value)
-				{
-					shared_ptr<Serializable> s = dynamic_pointer_cast<Serializable>(f2);
-					inheritedClasses[i].push_back(s->getClassName());
-				}
+				if (Omega::instance().isInheritingFrom((*di).first,metaEngine->getBaseClassType(i)))
+					inheritedClasses[i].push_back((*di).first);
 			}
 		}
 	}
@@ -412,7 +378,7 @@ void QtMetaDispatchingEngineProperties::pbSerializationClicked()
 
 void QtMetaDispatchingEngineProperties::pbOkClicked()
 {
-
+	close();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

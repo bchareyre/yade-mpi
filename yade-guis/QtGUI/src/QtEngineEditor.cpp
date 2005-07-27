@@ -47,16 +47,17 @@
 
 QtEngineEditor::QtEngineEditor() : QtGeneratedEngineEditor()
 {
-	map<string,DynlibType>::const_iterator di    = Omega::instance().getDynlibsType().begin();
-	map<string,DynlibType>::const_iterator diEnd = Omega::instance().getDynlibsType().end();
+	map<string,DynlibDescriptor>::const_iterator di    = Omega::instance().getDynlibsDescriptor().begin();
+	map<string,DynlibDescriptor>::const_iterator diEnd = Omega::instance().getDynlibsDescriptor().end();
 	for(;di!=diEnd;++di)
 	{
-		if ((*di).second.baseClass=="Engine" || (*di).second.baseClass=="TimeStepper")
-			cbEnginesList->insertItem((*di).first);
-		else if ((*di).second.baseClass=="MetaEngine" || (*di).second.baseClass=="MetaDispatchingEngine")
+		if (Omega::instance().isInheritingFrom((*di).first,"MetaEngine"))
 			cbMetaEnginesList->insertItem((*di).first);
-		else if ((*di).second.baseClass=="DeusExMachina")
+		else if (Omega::instance().isInheritingFrom((*di).first,"DeusExMachina"))
 			cbDeusExMachinaList->insertItem((*di).first);
+		else if (Omega::instance().isInheritingFrom((*di).first,"Engine"))
+			cbEnginesList->insertItem((*di).first);
+
 	}
 
 	connect( glEngineEditor, SIGNAL( verifyValidity() ), this, SLOT( verifyValidity() ) );

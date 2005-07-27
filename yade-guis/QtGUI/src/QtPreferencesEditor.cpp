@@ -297,11 +297,9 @@ void QtPreferencesEditor::buildPluginsListView()
 	//QCheckListItem * engine = new QCheckListItem(lvPluginsList,"Engine")
 	//QCheckListItem * container = new QCheckListItem(lvPluginsList,"Container")
 
-	const map<string,DynlibType>& dynlibs = Omega::instance().getDynlibsType();
-
-	map<string,DynlibType>::const_iterator dli    = dynlibs.begin();
-	map<string,DynlibType>::const_iterator dliEnd = dynlibs.end();
-	for( ; dli!=dliEnd ; ++dli)
-		lvPluginsList->insertItem(new QListViewItem(lvPluginsList,(*dli).first));
+	map<string,DynlibDescriptor>::const_iterator di    = Omega::instance().getDynlibsDescriptor().begin();
+	map<string,DynlibDescriptor>::const_iterator diEnd = Omega::instance().getDynlibsDescriptor().end();
+	for(;di!=diEnd;++di)
+		lvPluginsList->insertItem(new QListViewItem(lvPluginsList,(*di).first));
 
 }
