@@ -37,7 +37,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-LatticeLaw::LatticeLaw() : InteractionSolver() , actionForce(new Force)
+LatticeLaw::LatticeLaw() : Engine() , actionForce(new Force)
 {
 	nodeGroupMask = 1;
 	beamGroupMask = 2;
@@ -58,7 +58,7 @@ LatticeLaw::~LatticeLaw()
 
 void LatticeLaw::registerAttributes()
 {
-	InteractionSolver::registerAttributes();
+	Engine::registerAttributes();
 	REGISTER_ATTRIBUTE(nodeGroupMask);
 	REGISTER_ATTRIBUTE(beamGroupMask);
 	REGISTER_ATTRIBUTE(maxDispl);
@@ -67,7 +67,7 @@ void LatticeLaw::registerAttributes()
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
-void LatticeLaw::calculateForces(Body* body)
+void LatticeLaw::action(Body* body)
 {
 
 	MetaBody * lattice = static_cast<MetaBody*>(body);

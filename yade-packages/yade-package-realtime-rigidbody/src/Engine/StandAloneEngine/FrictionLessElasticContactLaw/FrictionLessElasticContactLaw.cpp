@@ -36,7 +36,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-FrictionLessElasticContactLaw::FrictionLessElasticContactLaw () : InteractionSolver(), actionForce(new Force) , actionMomentum(new Momentum)
+FrictionLessElasticContactLaw::FrictionLessElasticContactLaw () : Engine(), actionForce(new Force) , actionMomentum(new Momentum)
 {
 }
 
@@ -45,13 +45,13 @@ FrictionLessElasticContactLaw::FrictionLessElasticContactLaw () : InteractionSol
 
 void FrictionLessElasticContactLaw::registerAttributes()
 {
-	InteractionSolver::registerAttributes();
+	Engine::registerAttributes();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void FrictionLessElasticContactLaw::calculateForces(Body * body)
+void FrictionLessElasticContactLaw::action(Body * body)
 {
 	MetaBody * ncb = dynamic_cast<MetaBody*>(body);
 	shared_ptr<BodyContainer> bodies = ncb->bodies;

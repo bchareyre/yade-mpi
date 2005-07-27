@@ -76,7 +76,7 @@
       <directoryradio>executable</directoryradio>
     </run>
     <general>
-      <activedir>RenderingEngine</activedir>
+      <activedir>Container/BodyContainer/BodyAssocVector</activedir>
     </general>
     <subclassing/>
   </kdevtrollproject>

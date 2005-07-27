@@ -36,6 +36,7 @@ class GLDrawBox : public GLDrawGeometricalModelFunctor
 {
 	public : virtual void go(const shared_ptr<GeometricalModel>&, const shared_ptr<PhysicalParameters>&,bool);
 	REGISTER_CLASS_NAME(GLDrawBox);
+	REGISTER_BASE_CLASS_NAME(GLDrawGeometricalModelFunctor);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

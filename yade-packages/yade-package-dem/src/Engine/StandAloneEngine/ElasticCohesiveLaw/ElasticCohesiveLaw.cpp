@@ -40,7 +40,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-ElasticCohesiveLaw::ElasticCohesiveLaw() : InteractionSolver() , actionForce(new Force) , actionMomentum(new Momentum)
+ElasticCohesiveLaw::ElasticCohesiveLaw() : Engine() , actionForce(new Force) , actionMomentum(new Momentum)
 {
 	sdecGroupMask=1;
 	first=true;
@@ -52,7 +52,7 @@ ElasticCohesiveLaw::ElasticCohesiveLaw() : InteractionSolver() , actionForce(new
 
 void ElasticCohesiveLaw::registerAttributes()
 {
-	InteractionSolver::registerAttributes();
+	Engine::registerAttributes();
 	REGISTER_ATTRIBUTE(sdecGroupMask);
 	REGISTER_ATTRIBUTE(momentRotationLaw);
 }
@@ -61,7 +61,7 @@ void ElasticCohesiveLaw::registerAttributes()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 //FIXME : remove bool first !!!!!
-void ElasticCohesiveLaw::calculateForces(Body* body)
+void ElasticCohesiveLaw::action(Body* body)
 {
 	MetaBody * ncb = dynamic_cast<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;

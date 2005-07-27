@@ -39,6 +39,8 @@ class Tetrahedron2PolyhedralSweptSphere : public InteractingGeometryEngineUnit
 				, const Se3r& se3
 				, const Body*	);
 	REGISTER_CLASS_NAME(Tetrahedron2PolyhedralSweptSphere);
+	REGISTER_BASE_CLASS_NAME(InteractingGeometryEngineUnit);
+
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

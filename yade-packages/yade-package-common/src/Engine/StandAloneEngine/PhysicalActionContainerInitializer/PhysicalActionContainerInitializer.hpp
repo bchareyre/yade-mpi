@@ -53,6 +53,7 @@ class PhysicalActionContainerInitializer : public Engine
 	
 	protected : virtual void registerAttributes();
 	REGISTER_CLASS_NAME(PhysicalActionContainerInitializer);
+	REGISTER_BASE_CLASS_NAME(Engine);
 };
 
 REGISTER_SERIALIZABLE(PhysicalActionContainerInitializer,false);

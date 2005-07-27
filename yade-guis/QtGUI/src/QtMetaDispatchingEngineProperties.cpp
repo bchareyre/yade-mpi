@@ -229,7 +229,6 @@ QtMetaDispatchingEngineProperties::~QtMetaDispatchingEngineProperties()
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-#include <yade/yade-package-common/PhysicalActionApplierUnit.hpp>
 
 void QtMetaDispatchingEngineProperties::buildDynlibList()
 {
@@ -261,17 +260,17 @@ void QtMetaDispatchingEngineProperties::buildDynlibList()
 			//if (is_base_and_derived<typeof(*f),PhysicalActionApplierUnit>::value)
 			//if (dynamic_pointer_cast<typeof(*)>(f))
 			//if (metaEngine->isValidEngineUnit((*di).first))
-			shared_ptr<PhysicalActionApplierUnit> paau =  static_pointer_cast<PhysicalActionApplierUnit>(f);
-			try
-			{	
-				paau->getClassName();
-				cout << (*di).first << " " << paau->getClassName() << " success" << endl;
-				inheritedClasses.back().push_back((*di).first);
-			}
-			catch(...)
-			{
-				cout << (*di).first << " failure" << endl;
-			}
+			//shared_ptr<PhysicalActionApplierUnit> paau =  static_pointer_cast<PhysicalActionApplierUnit>(f);
+// 			try
+// 			{	
+// 				paau->getClassName();
+// 				cout << (*di).first << " " << paau->getClassName() << " success" << endl;
+// 				inheritedClasses.back().push_back((*di).first);
+// 			}
+// 			catch(...)
+// 			{
+// 				cout << (*di).first << " failure" << endl;
+// 			}
 			//cout << (*di).first << " " << dynamic_pointer_cast<PhysicalActionApplierUnit>(static_pointer_cast<EngineUnit>(f)) << endl;
 			//if (dynamic_pointer_cast<PhysicalActionApplierUnit>(f))
 			//	inheritedClasses.back().push_back((*di).first);

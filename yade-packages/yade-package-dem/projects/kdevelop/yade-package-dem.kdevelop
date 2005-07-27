@@ -76,7 +76,7 @@
       <directoryradio>executable</directoryradio>
     </run>
     <general>
-      <activedir>Engine/MetaEngine</activedir>
+      <activedir>DataClass/InteractingGeometry/PolyhedralSweptSphere</activedir>
     </general>
     <subclassing/>
   </kdevtrollproject>

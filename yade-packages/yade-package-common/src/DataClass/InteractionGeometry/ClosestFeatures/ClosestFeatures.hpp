@@ -47,6 +47,8 @@ class ClosestFeatures : public InteractionGeometry
 	public : std::vector<int> verticesId;
 
 	REGISTER_CLASS_NAME(ClosestFeatures);
+	REGISTER_BASE_CLASS_NAME(InteractionGeometry);
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

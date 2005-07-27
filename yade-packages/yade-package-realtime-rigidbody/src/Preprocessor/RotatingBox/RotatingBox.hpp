@@ -62,6 +62,8 @@ class RotatingBox : public FileGenerator
 	public : virtual string generate();
 
 	REGISTER_CLASS_NAME(RotatingBox);
+	REGISTER_BASE_CLASS_NAME(FileGenerator);
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

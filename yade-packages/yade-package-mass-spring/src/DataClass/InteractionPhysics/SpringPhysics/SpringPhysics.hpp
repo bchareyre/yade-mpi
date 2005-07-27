@@ -51,6 +51,8 @@ class SpringPhysics : public InteractionPhysics
 	public : void registerAttributes();
 
 	REGISTER_CLASS_NAME(SpringPhysics);
+	REGISTER_BASE_CLASS_NAME(InteractionPhysics);
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

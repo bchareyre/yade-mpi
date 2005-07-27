@@ -52,6 +52,7 @@ class RotationEngine : public DeusExMachina
 
 	public : void registerAttributes();
 	REGISTER_CLASS_NAME(RotationEngine);
+	REGISTER_BASE_CLASS_NAME(DeusExMachina);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

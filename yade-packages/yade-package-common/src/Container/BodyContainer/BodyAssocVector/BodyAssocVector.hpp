@@ -77,6 +77,8 @@ class BodyAssocVector : public BodyContainer
 
 	// serialization of this class...
 	REGISTER_CLASS_NAME(BodyAssocVector);
+	REGISTER_BASE_CLASS_NAME(BodyContainer);
+
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

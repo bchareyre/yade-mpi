@@ -48,6 +48,7 @@ class ForceEngine : public DeusExMachina
 	
 	protected	: virtual void registerAttributes();
 	REGISTER_CLASS_NAME(ForceEngine);
+	REGISTER_BASE_CLASS_NAME(DeusExMachina);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

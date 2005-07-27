@@ -72,6 +72,8 @@ class SwiftPolyhedronProximityModeler : public Engine
 	public    : virtual void action(Body* body);
 	
 	REGISTER_CLASS_NAME(SwiftPolyhedronProximityModeler);
+	REGISTER_BASE_CLASS_NAME(Engine);
+
 	
 	private : void getSwiftInfo(const PolyhedralSweptSphere* pss, double *& v, int *& f,  int*& fv,int& nbVertices, int& nbFaces);
 

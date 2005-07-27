@@ -56,6 +56,8 @@ class FEMSetTextLoader : public PhysicalParametersEngineUnit
 
 	protected: virtual void registerAttributes();	
 	REGISTER_CLASS_NAME(FEMSetTextLoader);
+	REGISTER_BASE_CLASS_NAME(PhysicalParametersEngineUnit);
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

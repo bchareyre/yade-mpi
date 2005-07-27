@@ -43,6 +43,7 @@ class PhysicalParametersEngineUnit :    public EngineUnit1D
 					>
 {	
 	REGISTER_CLASS_NAME(PhysicalParametersEngineUnit);
+	REGISTER_BASE_CLASS_NAME(EngineUnit1D);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

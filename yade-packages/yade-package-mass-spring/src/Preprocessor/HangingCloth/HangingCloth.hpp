@@ -73,6 +73,7 @@ class HangingCloth : public FileGenerator
 	public : string generate();
 
 	REGISTER_CLASS_NAME(HangingCloth);
+	REGISTER_BASE_CLASS_NAME(FileGenerator);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -36,6 +36,8 @@ class GLDrawLineSegment : public GLDrawGeometricalModelFunctor
 {
 	public : virtual void go(const shared_ptr<GeometricalModel>&, const shared_ptr<PhysicalParameters>&,bool);
 	REGISTER_CLASS_NAME(GLDrawLineSegment);
+	REGISTER_BASE_CLASS_NAME(GLDrawGeometricalModelFunctor);
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

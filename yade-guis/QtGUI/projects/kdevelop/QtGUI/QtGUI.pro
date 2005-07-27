@@ -18,8 +18,7 @@ QtGeneratedCodeGenerator.ui.commands = $$IDL_COMPILER
 QtFileGeneratorController.ui.target = QtFileGeneratorController.ui 
 QtFileGeneratorController.ui.commands = $$IDL_COMPILER 
 QMAKE_gDIR = /usr/local/lib/yade/yade-libs/ 
-LIBS += -lPhysicalActionApplier \
-        -lyade-lib-wm3-math \
+LIBS += -lyade-lib-wm3-math \
         -lyade-lib-multimethods \
         -lyade-lib-factory \
         -lyade-lib-opengl \
@@ -32,8 +31,7 @@ LIBS += -lPhysicalActionApplier \
         -lboost_date_time \
         -lboost_filesystem \
         -rdynamic 
-QMAKE_LIBDIR = /usr/local/lib/yade/yade-package-common/ \
-               /usr/local/lib/yade/yade-libs 
+QMAKE_LIBDIR = /usr/local/lib/yade/yade-libs 
 TARGET = ../../../bin/QtGUI 
 CONFIG += debug \
           warn_on \

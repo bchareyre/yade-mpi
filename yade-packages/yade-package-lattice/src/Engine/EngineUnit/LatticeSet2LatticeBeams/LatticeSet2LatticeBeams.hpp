@@ -39,6 +39,8 @@ class LatticeSet2LatticeBeams : public GeometricalModelEngineUnit
 				, const Body*);
 		 void calcBeamsPositionOrientationNewLength(shared_ptr<Body>& body, const shared_ptr<BodyContainer>& bodies);
 	REGISTER_CLASS_NAME(LatticeSet2LatticeBeams);
+	REGISTER_BASE_CLASS_NAME(GeometricalModelEngineUnit);
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

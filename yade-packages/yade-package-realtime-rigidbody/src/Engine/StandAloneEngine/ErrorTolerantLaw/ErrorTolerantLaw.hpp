@@ -26,7 +26,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <yade/yade-core/InteractionSolver.hpp>
+#include <yade/yade-core/Engine.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -46,7 +46,7 @@ using namespace boost::numeric;
 /**
 @author Olivier Galizzi
 */
-class ErrorTolerantLaw : public InteractionSolver
+class ErrorTolerantLaw : public Engine
 {
 	typedef enum{VANISHING,CLAMPED} ContactState;
 	vector<ContactState> contactStates;
@@ -61,7 +61,7 @@ class ErrorTolerantLaw : public InteractionSolver
 	protected : virtual void postProcessAttributes(bool deserializing);
 	public : void registerAttributes();
 
-	public : void calculateForces(Body* body);
+	public : void action(Body* body);
 
 	private : void multA(	ublas::vector<float>& res		, 
 				ublas::sparse_matrix<float>& J		,
@@ -87,6 +87,7 @@ class ErrorTolerantLaw : public InteractionSolver
 
 	
 	REGISTER_CLASS_NAME(ErrorTolerantLaw);
+	REGISTER_BASE_CLASS_NAME(Engine);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

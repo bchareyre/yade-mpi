@@ -57,7 +57,7 @@ class SDECTimeStepper : public TimeStepper
 
 	protected: virtual void registerAttributes();
 	REGISTER_CLASS_NAME(SDECTimeStepper);
-
+	REGISTER_BASE_CLASS_NAME(TimeStepper);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

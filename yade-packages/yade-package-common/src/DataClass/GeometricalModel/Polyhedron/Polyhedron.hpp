@@ -59,6 +59,7 @@
 // ///////////////////////////////////////////////////////////////////////////////////////////////////
 // 
 // 	REGISTER_CLASS_NAME(Polyhedron);
+//	REGISTER_BASE_CLASS_NAME(GeometricalModel);
 // 	protected : virtual void postProcessAttributes(bool deserializing);
 // 	public : void registerAttributes();
 // 

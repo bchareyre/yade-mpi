@@ -47,6 +47,7 @@ class Box2Sphere4ErrorTolerant : public InteractionGeometryEngineUnit
 						const shared_ptr<Interaction>& c);
 
 	REGISTER_CLASS_NAME(Box2Sphere4ErrorTolerant);
+	REGISTER_BASE_CLASS_NAME(InteractionGeometryEngineUnit);
 	DEFINE_FUNCTOR_ORDER_2D(Box,Sphere);
 };
 

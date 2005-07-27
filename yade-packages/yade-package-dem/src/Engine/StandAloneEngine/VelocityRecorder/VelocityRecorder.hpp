@@ -56,6 +56,7 @@ class VelocityRecorder : public Engine
 	public : virtual void action(Body* b);
 	public : virtual bool isActivated();
 	REGISTER_CLASS_NAME(VelocityRecorder);
+	REGISTER_BASE_CLASS_NAME(Engine);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

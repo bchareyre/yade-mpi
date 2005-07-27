@@ -100,6 +100,8 @@ class InteractionHashMap : public InteractionContainer
 	public : virtual unsigned int size();
 
 	REGISTER_CLASS_NAME(InteractionHashMap);
+	REGISTER_BASE_CLASS_NAME(InteractionContainer);
+
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

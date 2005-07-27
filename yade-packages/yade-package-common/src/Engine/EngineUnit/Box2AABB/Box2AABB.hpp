@@ -39,6 +39,7 @@ class Box2AABB : public BoundingVolumeEngineUnit
 				, const Se3r& se3
 				, const Body*	);
 	REGISTER_CLASS_NAME(Box2AABB);
+	REGISTER_BASE_CLASS_NAME(BoundingVolumeEngineUnit);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

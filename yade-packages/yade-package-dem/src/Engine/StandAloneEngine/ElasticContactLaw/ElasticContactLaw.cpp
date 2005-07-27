@@ -41,7 +41,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-ElasticContactLaw::ElasticContactLaw() : InteractionSolver() , actionForce(new Force) , actionMomentum(new Momentum)
+ElasticContactLaw::ElasticContactLaw() : Engine() , actionForce(new Force) , actionMomentum(new Momentum)
 {
 	sdecGroupMask=1;
 	momentRotationLaw = true;
@@ -52,7 +52,7 @@ ElasticContactLaw::ElasticContactLaw() : InteractionSolver() , actionForce(new F
 
 void ElasticContactLaw::registerAttributes()
 {
-	InteractionSolver::registerAttributes();
+	Engine::registerAttributes();
 	REGISTER_ATTRIBUTE(sdecGroupMask);
 	REGISTER_ATTRIBUTE(momentRotationLaw);
 }
@@ -61,7 +61,7 @@ void ElasticContactLaw::registerAttributes()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 //FIXME : remove bool first !!!!!
-void ElasticContactLaw::calculateForces(Body* body)
+void ElasticContactLaw::action(Body* body)
 {
 	MetaBody * ncb = dynamic_cast<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;

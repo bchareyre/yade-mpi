@@ -42,6 +42,7 @@ class GLDrawBoundingVolumeFunctor : 	public EngineUnit1D
 {
 	public : virtual ~GLDrawBoundingVolumeFunctor() {};
 	REGISTER_CLASS_NAME(GLDrawBoundingVolumeFunctor);
+	REGISTER_BASE_CLASS_NAME(EngineUnit1D);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

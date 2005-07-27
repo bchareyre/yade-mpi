@@ -54,6 +54,7 @@ class PositionOrientationRecorder : public Engine
 
 	public : virtual void action(Body* b);
 	REGISTER_CLASS_NAME(PositionOrientationRecorder);
+	REGISTER_BASE_CLASS_NAME(Engine);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

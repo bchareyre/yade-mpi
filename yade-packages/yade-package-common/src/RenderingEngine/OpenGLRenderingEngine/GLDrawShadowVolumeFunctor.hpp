@@ -46,6 +46,7 @@ class GLDrawShadowVolumeFunctor : 	public EngineUnit1D
 					>
 {
 	REGISTER_CLASS_NAME(GLDrawShadowVolumeFunctor);
+	REGISTER_BASE_CLASS_NAME(EngineUnit1D);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

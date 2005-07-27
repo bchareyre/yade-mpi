@@ -69,6 +69,8 @@ class BoundingVolumeEngineUnit : public EngineUnit2D
 				>
 {	
 	REGISTER_CLASS_NAME(BoundingVolumeEngineUnit);
+	REGISTER_BASE_CLASS_NAME(EngineUnit2D);
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

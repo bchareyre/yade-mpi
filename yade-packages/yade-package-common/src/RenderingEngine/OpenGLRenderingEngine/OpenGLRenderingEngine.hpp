@@ -91,6 +91,7 @@ class OpenGLRenderingEngine : public RenderingEngine
 	private : void renderSceneUsingFastShadowVolumes(const shared_ptr<MetaBody>& rootBody,Vector3r lightPos);
 	
 	REGISTER_CLASS_NAME(OpenGLRenderingEngine);
+	REGISTER_BASE_CLASS_NAME(RenderingEngine);
 	public : void postProcessAttributes(bool deserializing);
 	
 	public : void registerAttributes();

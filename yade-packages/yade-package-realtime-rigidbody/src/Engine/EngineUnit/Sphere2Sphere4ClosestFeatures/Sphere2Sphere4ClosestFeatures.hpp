@@ -47,6 +47,7 @@ class Sphere2Sphere4ClosestFeatures : public InteractionGeometryEngineUnit
 						const shared_ptr<Interaction>& c);
 
 	REGISTER_CLASS_NAME(Sphere2Sphere4ClosestFeatures);
+	REGISTER_BASE_CLASS_NAME(InteractionGeometryEngineUnit);
 	DEFINE_FUNCTOR_ORDER_2D(InteractingSphere,InteractingSphere);
 };
 

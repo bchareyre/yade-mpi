@@ -45,6 +45,7 @@ class GLDrawGeometricalModelFunctor : 	public EngineUnit1D
 	public : bool wire;
 	public : virtual ~GLDrawGeometricalModelFunctor() {};
 	REGISTER_CLASS_NAME(GLDrawGeometricalModelFunctor);
+	REGISTER_BASE_CLASS_NAME(EngineUnit1D);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -51,6 +51,8 @@ class TranslationEngine : public DeusExMachina
 	protected : virtual void postProcessAttributes(bool deserializing);
 	public : void registerAttributes();
 	REGISTER_CLASS_NAME(TranslationEngine);
+	REGISTER_BASE_CLASS_NAME(DeusExMachina);
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

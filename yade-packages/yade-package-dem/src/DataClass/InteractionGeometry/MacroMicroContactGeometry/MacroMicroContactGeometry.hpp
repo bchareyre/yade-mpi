@@ -52,6 +52,8 @@ class MacroMicroContactGeometry : public InteractionGeometry
 	public : Vector3r contactPoint;	
 	
 	REGISTER_CLASS_NAME(MacroMicroContactGeometry);
+	REGISTER_BASE_CLASS_NAME(InteractionGeometry);
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

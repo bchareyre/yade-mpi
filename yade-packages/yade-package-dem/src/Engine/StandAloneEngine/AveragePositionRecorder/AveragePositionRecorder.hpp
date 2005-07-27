@@ -57,6 +57,8 @@ class AveragePositionRecorder : public Engine
 	public : virtual void action(Body* b);
 	public : virtual bool isActivated();
 	REGISTER_CLASS_NAME(AveragePositionRecorder);
+	REGISTER_BASE_CLASS_NAME(Engine);
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

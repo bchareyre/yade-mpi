@@ -54,6 +54,7 @@ class ErrorTolerantContactModel : public InteractionGeometry
 	public : void registerAttributes();
 
 	REGISTER_CLASS_NAME(ErrorTolerantContactModel);
+	REGISTER_BASE_CLASS_NAME(InteractionGeometry);
 	//REGISTER_CLASS_INDEX(ErrorTolerantContactModel);
 };
 

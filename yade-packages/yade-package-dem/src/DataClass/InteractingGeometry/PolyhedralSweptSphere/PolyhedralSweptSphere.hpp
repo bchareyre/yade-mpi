@@ -71,6 +71,8 @@ class PolyhedralSweptSphere : public InteractingGeometry
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	REGISTER_CLASS_NAME(PolyhedralSweptSphere);
+	REGISTER_BASE_CLASS_NAME(InteractingGeometry);
+
 	public : void registerAttributes();
 	protected : virtual void postProcessAttributes(bool deserializing);
 

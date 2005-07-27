@@ -50,6 +50,8 @@ class SDECLinkGeometry : public InteractionGeometry
 	public : void registerAttributes();
 
 	REGISTER_CLASS_NAME(SDECLinkGeometry);
+	REGISTER_BASE_CLASS_NAME(InteractionGeometry);
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

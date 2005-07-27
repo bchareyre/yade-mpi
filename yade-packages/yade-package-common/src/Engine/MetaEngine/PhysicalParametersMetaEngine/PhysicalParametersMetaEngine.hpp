@@ -53,6 +53,8 @@ class PhysicalParametersMetaEngine :	public MetaDispatchingEngine1D
 	public		: virtual void action(Body* b);
 
 	REGISTER_CLASS_NAME(PhysicalParametersMetaEngine);
+	REGISTER_BASE_CLASS_NAME(MetaDispatchingEngine1D);
+
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

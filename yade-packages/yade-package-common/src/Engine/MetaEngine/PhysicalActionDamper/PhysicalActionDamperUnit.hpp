@@ -45,6 +45,7 @@ class PhysicalActionDamperUnit : public EngineUnit2D
 				>
 {
 	REGISTER_CLASS_NAME(PhysicalActionDamperUnit);
+	REGISTER_BASE_CLASS_NAME(EngineUnit2D);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -57,6 +57,8 @@ class SDECTriaxialTest : public FileGenerator
 	
 	public : void registerAttributes();
 	REGISTER_CLASS_NAME(SDECTriaxialTest);
+	REGISTER_BASE_CLASS_NAME(FileGenerator);
+
 
 };
 

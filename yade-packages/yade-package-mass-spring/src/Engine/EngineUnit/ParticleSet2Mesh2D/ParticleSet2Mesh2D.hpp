@@ -38,6 +38,7 @@ class ParticleSet2Mesh2D : public GeometricalModelEngineUnit
 				, shared_ptr<GeometricalModel>&
 				, const Body*);
 	REGISTER_CLASS_NAME(ParticleSet2Mesh2D);
+	REGISTER_BASE_CLASS_NAME(GeometricalModelEngineUnit);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

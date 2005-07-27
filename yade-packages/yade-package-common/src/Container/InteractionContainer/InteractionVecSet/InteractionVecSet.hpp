@@ -83,6 +83,8 @@ class InteractionVecSet : public InteractionContainer
 	public : virtual unsigned int size();
 
 	REGISTER_CLASS_NAME(InteractionVecSet);
+	REGISTER_BASE_CLASS_NAME(InteractionContainer);
+
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

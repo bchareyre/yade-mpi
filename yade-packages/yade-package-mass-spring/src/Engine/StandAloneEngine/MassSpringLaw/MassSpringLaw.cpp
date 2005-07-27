@@ -39,7 +39,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-MassSpringLaw::MassSpringLaw () : InteractionSolver(), actionForce(new Force) , actionMomentum(new Momentum)
+MassSpringLaw::MassSpringLaw () : Engine(), actionForce(new Force) , actionMomentum(new Momentum)
 {
 }
 
@@ -48,13 +48,14 @@ MassSpringLaw::MassSpringLaw () : InteractionSolver(), actionForce(new Force) , 
 
 void MassSpringLaw::registerAttributes()
 {
+	Engine::registerAttributes();
 	REGISTER_ATTRIBUTE(springGroupMask);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MassSpringLaw::calculateForces(Body * body)
+void MassSpringLaw::action(Body * body)
 {
 	MetaBody * massSpring = dynamic_cast<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = massSpring->bodies;

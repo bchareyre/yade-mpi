@@ -59,6 +59,8 @@ class BoxStack : public FileGenerator
 	public : virtual string generate();
 
 	REGISTER_CLASS_NAME(BoxStack);
+	REGISTER_BASE_CLASS_NAME(FileGenerator);
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

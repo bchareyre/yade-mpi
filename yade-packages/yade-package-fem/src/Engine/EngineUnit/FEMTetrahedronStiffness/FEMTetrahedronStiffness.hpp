@@ -44,6 +44,8 @@ class FEMTetrahedronStiffness : public PhysicalParametersEngineUnit
 	
 
 	REGISTER_CLASS_NAME(FEMTetrahedronStiffness);
+	REGISTER_BASE_CLASS_NAME(PhysicalParametersEngineUnit);
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

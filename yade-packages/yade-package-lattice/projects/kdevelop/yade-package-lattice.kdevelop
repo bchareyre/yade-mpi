@@ -76,7 +76,7 @@
       <directoryradio>executable</directoryradio>
     </run>
     <general>
-      <activedir>Engine/MetaEngine</activedir>
+      <activedir>Container</activedir>
     </general>
     <subclassing/>
   </kdevtrollproject>

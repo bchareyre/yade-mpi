@@ -43,6 +43,7 @@ class PhysicalActionContainerReseter : public Engine
 	public : virtual ~PhysicalActionContainerReseter();
 	public : virtual void action(Body* body);
 	REGISTER_CLASS_NAME(PhysicalActionContainerReseter);
+	REGISTER_BASE_CLASS_NAME(Engine);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

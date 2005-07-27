@@ -57,6 +57,7 @@ class BoundingVolumeMetaEngine :	public MetaDispatchingEngine2D
 	public		: virtual void action(Body* b);
 
 	REGISTER_CLASS_NAME(BoundingVolumeMetaEngine);
+	REGISTER_BASE_CLASS_NAME(MetaDispatchingEngine2D);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

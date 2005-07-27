@@ -37,6 +37,8 @@ class GLDrawPolyhedralSweptSphere : public GLDrawInteractionGeometryFunctor
 {		
 	public : virtual void go(const shared_ptr<InteractingGeometry>&, const shared_ptr<PhysicalParameters>&);
 	REGISTER_CLASS_NAME(GLDrawPolyhedralSweptSphere);
+	REGISTER_BASE_CLASS_NAME(GLDrawInteractionGeometryFunctor);
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

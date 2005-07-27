@@ -50,6 +50,8 @@ class ElasticContactParameters : public InteractionPhysics
 	public : Real tangensOfFrictionAngle;
 
 	REGISTER_CLASS_NAME(ElasticContactParameters);
+	REGISTER_BASE_CLASS_NAME(InteractionPhysics);
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

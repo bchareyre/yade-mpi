@@ -52,6 +52,8 @@ class RigidBodyParameters : public ParticleParameters
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	REGISTER_CLASS_NAME(RigidBodyParameters);
+	REGISTER_BASE_CLASS_NAME(ParticleParameters);
+
 	protected : virtual void postProcessAttributes(bool deserializing);
 	public : void registerAttributes();
 	

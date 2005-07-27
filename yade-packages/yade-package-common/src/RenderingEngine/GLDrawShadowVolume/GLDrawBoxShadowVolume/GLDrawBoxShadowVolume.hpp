@@ -36,6 +36,7 @@ class GLDrawBoxShadowVolume : public GLDrawShadowVolumeFunctor
 {
 	public : virtual void go(const shared_ptr<GeometricalModel>&, const shared_ptr<PhysicalParameters>&, const Vector3r&);
 	REGISTER_CLASS_NAME(GLDrawBoxShadowVolume);
+	REGISTER_BASE_CLASS_NAME(GLDrawShadowVolumeFunctor);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

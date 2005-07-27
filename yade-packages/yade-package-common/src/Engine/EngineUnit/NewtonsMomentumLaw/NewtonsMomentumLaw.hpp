@@ -38,6 +38,7 @@ class NewtonsMomentumLaw : public PhysicalActionApplierUnit
 					, const shared_ptr<PhysicalParameters>&
 					, const Body*);
 	REGISTER_CLASS_NAME(NewtonsMomentumLaw);
+	REGISTER_BASE_CLASS_NAME(PhysicalActionApplierUnit);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -43,6 +43,7 @@ class GLDrawInteractionGeometryFunctor :	public EngineUnit1D
 {
 	public : virtual ~GLDrawInteractionGeometryFunctor() {};
 	REGISTER_CLASS_NAME(GLDrawInteractionGeometryFunctor);
+	REGISTER_BASE_CLASS_NAME(EngineUnit1D);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

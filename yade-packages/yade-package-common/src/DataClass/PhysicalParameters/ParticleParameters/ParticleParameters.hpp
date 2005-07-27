@@ -61,6 +61,8 @@ class ParticleParameters : public PhysicalParameters
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 	REGISTER_CLASS_NAME(ParticleParameters);
+	REGISTER_BASE_CLASS_NAME(PhysicalParameters);
+
 	protected : virtual void postProcessAttributes(bool deserializing);
 	public : void registerAttributes();
 	

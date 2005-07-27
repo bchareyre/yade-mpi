@@ -39,7 +39,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-ErrorTolerantLaw::ErrorTolerantLaw() : InteractionSolver()
+ErrorTolerantLaw::ErrorTolerantLaw() : Engine()
 {
 	maxReactivations = 100;
 	maxIterations    = 5;
@@ -59,7 +59,7 @@ ErrorTolerantLaw::~ErrorTolerantLaw()
 
 void ErrorTolerantLaw::postProcessAttributes(bool deserializing)
 {
-	InteractionSolver::postProcessAttributes(deserializing);
+	Engine::postProcessAttributes(deserializing);
 	// PROCESS DESIRED ATTRIBUTES HERE
 }
 
@@ -68,7 +68,7 @@ void ErrorTolerantLaw::postProcessAttributes(bool deserializing)
 
 void ErrorTolerantLaw::registerAttributes()
 {
-	InteractionSolver::registerAttributes();
+	Engine::registerAttributes();
 	// REGISTER DESIRED ATTRIBUTES HERE
 }
 
@@ -76,7 +76,7 @@ void ErrorTolerantLaw::registerAttributes()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-void ErrorTolerantLaw::calculateForces(Body* body)
+void ErrorTolerantLaw::action(Body* body)
 {
 
 	MetaBody * ncb = dynamic_cast<MetaBody*>(body);

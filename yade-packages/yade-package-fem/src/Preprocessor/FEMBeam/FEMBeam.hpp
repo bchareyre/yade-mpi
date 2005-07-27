@@ -68,6 +68,7 @@ class FEMBeam : public FileGenerator
 	public : string generate();
 
 	REGISTER_CLASS_NAME(FEMBeam);
+	REGISTER_BASE_CLASS_NAME(FileGenerator);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

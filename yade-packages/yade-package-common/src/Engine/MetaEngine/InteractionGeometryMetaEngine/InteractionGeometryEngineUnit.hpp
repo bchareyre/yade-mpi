@@ -60,6 +60,7 @@ class InteractionGeometryEngineUnit : 	public EngineUnit2D
 					>
 {
 	REGISTER_CLASS_NAME(InteractionGeometryEngineUnit);
+	REGISTER_BASE_CLASS_NAME(EngineUnit2D);
 };
 
 REGISTER_SERIALIZABLE(InteractionGeometryEngineUnit,false);

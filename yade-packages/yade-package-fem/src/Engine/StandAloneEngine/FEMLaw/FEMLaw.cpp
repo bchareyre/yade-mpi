@@ -42,7 +42,7 @@ using namespace boost::numeric;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-FEMLaw::FEMLaw() : InteractionSolver() , actionForce(new Force)
+FEMLaw::FEMLaw() : Engine() , actionForce(new Force)
 {
 	nodeGroupMask = 1;
 	tetrahedronGroupMask = 2;
@@ -61,7 +61,7 @@ FEMLaw::~FEMLaw()
 
 void FEMLaw::registerAttributes()
 {
-	InteractionSolver::registerAttributes();
+	Engine::registerAttributes();
 	REGISTER_ATTRIBUTE(nodeGroupMask);
 	REGISTER_ATTRIBUTE(tetrahedronGroupMask);
 }
@@ -69,7 +69,7 @@ void FEMLaw::registerAttributes()
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
-void FEMLaw::calculateForces(Body* body)
+void FEMLaw::action(Body* body)
 {
 	MetaBody * fem = static_cast<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = fem->bodies;

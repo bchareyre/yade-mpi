@@ -44,7 +44,9 @@ class BoundingSphere : public BoundingVolume
 /// Serialization										///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	REGISTER_CLASS_NAME(BoundingSphere);	
+	REGISTER_CLASS_NAME(BoundingSphere);
+	REGISTER_BASE_CLASS_NAME(BoundingVolume);
+
 	public : void registerAttributes(); // FIXME - remove that function, dispatcher should take care of that
 	
 ///////////////////////////////////////////////////////////////////////////////////////////////////

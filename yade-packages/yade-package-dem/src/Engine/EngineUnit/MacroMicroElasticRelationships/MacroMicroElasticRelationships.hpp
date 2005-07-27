@@ -46,6 +46,8 @@ class MacroMicroElasticRelationships : public InteractionPhysicsEngineUnit
 	protected: virtual void registerAttributes();
 
 	REGISTER_CLASS_NAME(MacroMicroElasticRelationships);
+	REGISTER_BASE_CLASS_NAME(InteractionPhysicsEngineUnit);
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

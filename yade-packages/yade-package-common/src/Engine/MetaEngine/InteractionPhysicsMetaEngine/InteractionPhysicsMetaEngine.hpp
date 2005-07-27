@@ -55,6 +55,7 @@ class InteractionPhysicsMetaEngine : 	public MetaDispatchingEngine2D
 	public 		: virtual void action(Body* body);
 
 	REGISTER_CLASS_NAME(InteractionPhysicsMetaEngine);
+	REGISTER_BASE_CLASS_NAME(MetaDispatchingEngine2D);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -82,6 +82,8 @@ class BodyRedirectionVector : public BodyContainer
 
 	// serialization of this class...
 	REGISTER_CLASS_NAME(BodyRedirectionVector);
+	REGISTER_BASE_CLASS_NAME(BodyContainer);
+
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

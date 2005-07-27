@@ -38,6 +38,8 @@ class FEMSet2Tetrahedrons : public GeometricalModelEngineUnit
 				, shared_ptr<GeometricalModel>&
 				, const Body*);
 	REGISTER_CLASS_NAME(FEMSet2Tetrahedrons);
+	REGISTER_BASE_CLASS_NAME(GeometricalModelEngineUnit);
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

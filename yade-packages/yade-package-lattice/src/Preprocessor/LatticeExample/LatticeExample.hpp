@@ -66,6 +66,8 @@ class LatticeExample : public FileGenerator
 
 		virtual void registerAttributes();
 		REGISTER_CLASS_NAME(LatticeExample);
+		REGISTER_BASE_CLASS_NAME(FileGenerator);
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -39,6 +39,8 @@ class PolyhedralSweptSphere2AABB: public BoundingVolumeEngineUnit
 				, const Se3r& se3
 				, const Body* body);
 	REGISTER_CLASS_NAME(PolyhedralSweptSphere2AABB);
+	REGISTER_BASE_CLASS_NAME(BoundingVolumeEngineUnit);
+
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -45,6 +45,7 @@ class PhysicalActionApplierUnit :	public EngineUnit2D
 					>
 {
 	REGISTER_CLASS_NAME(PhysicalActionApplierUnit);
+	REGISTER_BASE_CLASS_NAME(EngineUnit2D);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

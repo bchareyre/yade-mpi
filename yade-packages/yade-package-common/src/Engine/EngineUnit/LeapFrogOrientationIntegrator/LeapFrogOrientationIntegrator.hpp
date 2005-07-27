@@ -42,6 +42,7 @@ class LeapFrogOrientationIntegrator : public PhysicalParametersEngineUnit
 					, Body*);
 	
 	REGISTER_CLASS_NAME(LeapFrogOrientationIntegrator);
+	REGISTER_BASE_CLASS_NAME(PhysicalParametersEngineUnit);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
