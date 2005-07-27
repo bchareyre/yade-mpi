@@ -23,6 +23,9 @@
 
 #include "QtEngineEditor.hpp"
 
+#include "GLEngineEditor.hpp"
+#include "FileDialog.hpp"
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -39,8 +42,6 @@
 #include <qlabel.h>
 #include <qpushbutton.h>
 #include <qlineedit.h>
-
-#include "GLEngineEditor.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -64,8 +65,8 @@ QtEngineEditor::QtEngineEditor() : QtGeneratedEngineEditor()
 	connect( glEngineEditor, SIGNAL( engineSelected(int) ), this, SLOT( engineSelected(int) ) );
 	connect( glEngineEditor, SIGNAL( deleteEngine(int) ), this, SLOT( deleteEngine(int) ) );
 
-	engineFrame = new QFrame();	
-	metaDispatchingEngineFrame = new QtMetaDispatchingEngineProperties();
+	engineFrame = 0;	
+	//metaDispatchingEngineFrame = new QtMetaDispatchingEngineProperties();
 
 	verifyValidity();
 }
@@ -145,6 +146,20 @@ void QtEngineEditor::pbAddDeusExMachinaClicked()
 
 void QtEngineEditor::pbSaveClicked()
 {
+	enginesVec.clear();
+	int next = glEngineEditor->getFirstEngine();
+	
+	enginesVec.push_back(engines[next].engine);
+	
+	for(int i=0;i<engines.size()-1;i++)
+	{
+		next = glEngineEditor->findRelationStartingWith(next);
+		enginesVec.push_back(engines[next].engine);
+	}
+
+	//FIXME : add combobox in GUI to select IOManager
+	
+	IOManager::saveToFile("XMLManager",leFileName->text(),"actors",enginesVec);
 
 }
 
@@ -161,6 +176,11 @@ void QtEngineEditor::pbLoadClicked()
 
 void QtEngineEditor::pbPathClicked()
 {
+	string selectedFilter;
+	string fileName = FileDialog::getSaveFileName("../data", "XML Yade File (*.xml)", "Choose a file to save", this->parentWidget()->parentWidget(),selectedFilter );
+
+	if (fileName.size()!=0 && selectedFilter == "XML Yade File (*.xml)")
+		leFileName->setText(fileName);
 
 }
 
@@ -189,39 +209,48 @@ void QtEngineEditor::verifyValidity()
 
 void QtEngineEditor::engineSelected(int i)
 {
-	if (i>=0  && currentEngine!=engines[i].engine) // otherwise the GUI is already created
+	if (i>=0)
 	{
-		try
+		if (currentEngine!=engines[i].engine || (currentEngine==engines[i].engine && engineFrame->isHidden())) // otherwise the GUI is already created
 		{
+			if (engineFrame)
+			{
+				delete engineFrame;
+				engineFrame = 0;
+			}
+
 			currentEngine = engines[i].engine;
-	
+
 			guiGen.setResizeHeight(true);
 			guiGen.setResizeWidth(true);
 			guiGen.setShift(10,20);
 			guiGen.setShowButtons(true);
-	
+
 			QWidget * parent   = this->parentWidget()->parentWidget();
 
 			if (engines[i].type==DEUSEXMACHINA || engines[i].type==STANDALONEENGINE)
 			{
-				delete engineFrame;
 				engineFrame = new QFrame(parent);
 				engineFrame->setCaption(currentEngine->getClassName());
 				guiGen.buildGUI(currentEngine,engineFrame);
-				engineFrame->show();
 			}
 			else if (engines[i].type==METADISPATCHINGENGINE2D || engines[i].type==METADISPATCHINGENGINE1D)
 			{	
-				delete metaDispatchingEngineFrame;
 				shared_ptr<MetaDispatchingEngine> mde = dynamic_pointer_cast<MetaDispatchingEngine>(currentEngine);
-				metaDispatchingEngineFrame = new QtMetaDispatchingEngineProperties(mde,parent);
-				metaDispatchingEngineFrame->setCaption(currentEngine->getClassName());
-				metaDispatchingEngineFrame->show();
+				engineFrame = new QtMetaDispatchingEngineProperties(mde,parent);
+				engineFrame->setCaption(currentEngine->getClassName());
 			}
 		}
-		catch (FactoryError&)
+		if (engineFrame)
+			engineFrame->show();
+	}
+	else
+	{
+		currentEngine = shared_ptr<Engine>();
+		if (engineFrame)
 		{
-		
+			delete engineFrame;
+			engineFrame = 0;
 		}
 	}
 }
@@ -239,9 +268,10 @@ void QtEngineEditor::deleteEngine(int i)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void QtEngineEditor::pbApplyClicked()
+void QtEngineEditor::closeEvent(QCloseEvent *e)
 {
-	guiGen.deserialize(currentEngine);
+	QtGeneratedEngineEditor::closeEvent(e);
+	
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

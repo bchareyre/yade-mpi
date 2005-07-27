@@ -73,6 +73,7 @@ class GLEngineEditor : public QGLViewer
 	private : int selectedEngine;
 	private : Vector3r savedColor;
 	private : int firstEngine;
+	public  :  int getFirstEngine() { return firstEngine;};
 
 	private : void drawGrid();
 	private : void drawArrow(int x1,int y1, int x2, int y2);
@@ -107,7 +108,7 @@ class GLEngineEditor : public QGLViewer
 	public : int addMetaDispatchingEngine1D(const string& engineName, const string& engineUnitName, const string& baseClass1Name);
 
 	public : bool verify(string& errorMessage);
-	private : int findRelationStartingWith(int first);
+	public : int findRelationStartingWith(int first);
 	
 	signals : void verifyValidity();
 	signals : void engineSelected(int);

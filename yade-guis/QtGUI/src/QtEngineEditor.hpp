@@ -55,7 +55,7 @@ class QtEngineEditor : public QtGeneratedEngineEditor, public Factorable
 
 	private : QtGUIGenerator guiGen;	
 	private : QFrame * engineFrame;
-	private : QtMetaDispatchingEngineProperties * metaDispatchingEngineFrame;
+	//private : QtMetaDispatchingEngineProperties * metaDispatchingEngineFrame;
 
 	enum EngineType { STANDALONEENGINE, DEUSEXMACHINA, METADISPATCHINGENGINE1D, METADISPATCHINGENGINE2D, METAENGINE };
 	private : typedef struct EngineDescriptor
@@ -65,6 +65,8 @@ class QtEngineEditor : public QtGeneratedEngineEditor, public Factorable
 			
 		  } EngineDescriptor;
 
+	private : vector<shared_ptr<Engine> > enginesVec;
+	
 	private : map<int,EngineDescriptor> engines;
 	private : shared_ptr<Engine> currentEngine;
 
@@ -78,13 +80,13 @@ class QtEngineEditor : public QtGeneratedEngineEditor, public Factorable
 	public slots : void pbSaveClicked();
 	public slots : void pbLoadClicked();
 	public slots : void pbPathClicked();
-	public slots : void pbApplyClicked();
-
 
 	public slots : void verifyValidity();
 	public slots : void engineSelected(int i);
 	public slots : void deleteEngine(int i);
 	
+ 	protected    : void closeEvent(QCloseEvent *);
+
 	REGISTER_CLASS_NAME(QtEngineEditor);
 	REGISTER_BASE_CLASS_NAME(Factorable);
 

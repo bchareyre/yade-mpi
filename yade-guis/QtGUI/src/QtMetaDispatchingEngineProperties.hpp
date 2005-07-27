@@ -48,6 +48,8 @@
 class QtMetaDispatchingEngineProperties : public QtGeneratedMetaDispatchingEngineProperties
 {
 	protected : vector<vector<QWidget*> > cbs;
+	protected : vector<shared_ptr<EngineUnit> > engineUnitParameters;
+
 	protected : vector<string> baseClasses;
 	protected : int dimension;
 	protected : QtGUIGenerator guiGen;
@@ -69,6 +71,8 @@ class QtMetaDispatchingEngineProperties : public QtGeneratedMetaDispatchingEngin
 	public slots : void pbOkClicked();
 	public slots : void pbRemoveClicked();
 	public slots : void pbSerializationClicked();
+
+	protected  : void showEvent( QShowEvent * );
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

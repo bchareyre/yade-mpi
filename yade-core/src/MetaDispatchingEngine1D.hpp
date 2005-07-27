@@ -55,10 +55,10 @@ class MetaDispatchingEngine1D : public MetaDispatchingEngine,
 				>
 {
 
-	public : void add( string baseClassName1, string libName, shared_ptr<EngineUnitType> eu = shared_ptr<EngineUnitType>())
+	public : virtual void add( string baseClassName1, string libName, shared_ptr<EngineUnit> eu = shared_ptr<EngineUnitType>())
 	{
-		storeFunctorName(baseClassName1,libName,eu);
-		add1DEntry(baseClassName1,libName,eu);
+		storeFunctorName(baseClassName1,libName,static_pointer_cast<EngineUnitType>(eu));
+		add1DEntry(baseClassName1,libName,static_pointer_cast<EngineUnitType>(eu));
 	}
 
 	void postProcessAttributes(bool deserializing)
@@ -105,24 +105,6 @@ class MetaDispatchingEngine1D : public MetaDispatchingEngine,
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////
-
-//REGISTER_SERIALIZABLE(MetaDispatchingEngine1D,false);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-// #define REGISTER_BASE_CLASS_TYPE_1D(name1)				\
-// 	public : virtual string getBaseClassType(unsigned int i)	\
-// 	{								\
-// 		switch (i)						\
-// 		{							\
-// 			case 0  : return #name1;			\
-// 			default : return "";				\
-// 		}							\
-// 	}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #endif // __METADISPATCHINGENGINE1D_HPP__
 

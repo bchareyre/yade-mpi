@@ -56,10 +56,10 @@ class MetaDispatchingEngine2D : public MetaDispatchingEngine,
 				>
 {
 
-	public : void add( string baseClassName1, string baseClassName2, string libName, shared_ptr<EngineUnitType> eu = shared_ptr<EngineUnitType>())
+	public : virtual void add( string baseClassName1, string baseClassName2, string libName, shared_ptr<EngineUnit> eu = shared_ptr<EngineUnitType>())
 	{
-		storeFunctorName(baseClassName1,baseClassName2,libName,eu);
-		add2DEntry(baseClassName1,baseClassName2,libName,eu);
+		storeFunctorName(baseClassName1,baseClassName2,libName,static_pointer_cast<EngineUnitType>(eu));
+		add2DEntry(baseClassName1,baseClassName2,libName,static_pointer_cast<EngineUnitType>(eu));
 	}
 
 	protected : void postProcessAttributes(bool deserializing)

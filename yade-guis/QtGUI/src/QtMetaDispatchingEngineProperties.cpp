@@ -216,7 +216,20 @@ QtMetaDispatchingEngineProperties::QtMetaDispatchingEngineProperties(shared_ptr<
 
 	buildDynlibList();
 
-	engineUnitFrame = new QFrame();	
+	engineUnitFrame = new QFrame();
+
+	engineUnitParameters.clear();
+	cbs.clear();
+
+	vector<vector<string> > functorNames = mde->getFunctorNames();
+
+	for(int i=0;i<functorNames.size() ;i++)
+	{
+		pbAddClicked();
+		for(int j=0;j<functorNames[i].size();j++)
+			((QComboBox*)cbs[i][j])->setCurrentText(functorNames[i][j]);
+		engineUnitParameters.back() = mde->findFunctorArguments(functorNames[i].back());
+	}
 
 }
 
@@ -225,6 +238,14 @@ QtMetaDispatchingEngineProperties::QtMetaDispatchingEngineProperties(shared_ptr<
 
 QtMetaDispatchingEngineProperties::~QtMetaDispatchingEngineProperties()
 {
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+void QtMetaDispatchingEngineProperties::showEvent( QShowEvent * )
+{
+	adjustSize();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -301,6 +322,13 @@ void QtMetaDispatchingEngineProperties::pbAddClicked()
 
 	cbs.push_back(v);
 
+	engineUnitParameters.push_back(shared_ptr<EngineUnit>());
+
+	// if no attributes are registered then the button to open the serialization frame is not enabled
+	shared_ptr<EngineUnit> eu = dynamic_pointer_cast<EngineUnit>(ClassFactory::instance().createShared(((QComboBox*)v[v.size()-3])->currentText()));
+	eu->registerAttributes();
+	v.back()->setEnabled(eu->getArchives().size()!=0);
+
 	for(unsigned int j=0;j<v.size();j++)
 		centralFrameLayout->addWidget( v[j], cbs.size()-1, j );
 
@@ -315,8 +343,11 @@ void QtMetaDispatchingEngineProperties::pbRemoveClicked()
 {
 	QPushButton * pb = (QPushButton*)(this->sender());
 	vector<vector<QWidget*> >::iterator cbsi    = cbs.begin();
-	vector<vector<QWidget*> >::iterator cbsiEnd = cbs.end();
-	for( ; cbsi!=cbsiEnd; ++cbsi)
+	vector<vector<QWidget*> >::iterator cbsiEnd = cbs.end();adjustSize();
+
+	vector<shared_ptr<EngineUnit> >::iterator eui    = engineUnitParameters.begin();
+
+	for( ; cbsi!=cbsiEnd; ++cbsi,++eui)
 	{
 		QPushButton * tmppb = (QPushButton*)(*cbsi)[dimension+1];
 		if (tmppb->name()==pb->name())
@@ -327,11 +358,11 @@ void QtMetaDispatchingEngineProperties::pbRemoveClicked()
 				(*cbsi)[i]->hide();
 			}
 			cbs.erase(cbsi);
+			engineUnitParameters.erase(eui);
 			adjustSize();
 			return;
 		}
 	}
-
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -341,11 +372,14 @@ void QtMetaDispatchingEngineProperties::pbSerializationClicked()
 {
 
 	QPushButton * pb = (QPushButton*)(this->sender());
+
 	string name;
-	
+	shared_ptr<EngineUnit> eu;
+
 	vector<vector<QWidget*> >::iterator cbsi    = cbs.begin();
 	vector<vector<QWidget*> >::iterator cbsiEnd = cbs.end();
-	for( ; cbsi!=cbsiEnd; ++cbsi)
+	vector<shared_ptr<EngineUnit> >::iterator eui    = engineUnitParameters.begin();
+	for( ; cbsi!=cbsiEnd; ++cbsi,++eui)
 	{
 		QPushButton * tmppb = (QPushButton*)(*cbsi)[dimension+2];
 		if (tmppb->name()==pb->name())
@@ -353,6 +387,10 @@ void QtMetaDispatchingEngineProperties::pbSerializationClicked()
 			QComboBox *  cb = (QComboBox*)((*cbsi)[dimension]);
 			const char * str = cb->currentText();
 			name = str;
+
+			if ((*eui)==shared_ptr<EngineUnit>() || (*eui)!=shared_ptr<EngineUnit>() && (*eui)->getClassName()!=name)
+				*eui = shared_ptr<EngineUnit>(dynamic_pointer_cast<EngineUnit>(ClassFactory::instance().createShared(name)));
+			eu = *eui;
 		}
 	}
 
@@ -367,8 +405,6 @@ void QtMetaDispatchingEngineProperties::pbSerializationClicked()
 	engineUnitFrame = new QFrame(parent);
 	engineUnitFrame->setCaption(name);
 
-	shared_ptr<EngineUnit> eu = dynamic_pointer_cast<EngineUnit>(ClassFactory::instance().createShared(name));
-
 	guiGen.buildGUI(eu,engineUnitFrame);
 	engineUnitFrame->show();
 }
@@ -378,6 +414,34 @@ void QtMetaDispatchingEngineProperties::pbSerializationClicked()
 
 void QtMetaDispatchingEngineProperties::pbOkClicked()
 {
+
+	metaEngine->clear();
+
+	vector<vector<QWidget*> >::iterator cbsi    = cbs.begin();
+	vector<vector<QWidget*> >::iterator cbsiEnd = cbs.end();
+	vector<shared_ptr<EngineUnit> >::iterator eui    = engineUnitParameters.begin();
+	for( ; cbsi!=cbsiEnd; ++cbsi,++eui)
+	{
+		string baseClass1 = ((QComboBox*)(*cbsi)[0])->currentText();
+		if (metaEngine->getDimension()==1)
+		{			
+			string baseFunctor = ((QComboBox*)(*cbsi)[1])->currentText();
+			if (*eui!=shared_ptr<EngineUnit>())
+				metaEngine->add(baseClass1, baseFunctor,*eui);
+			else
+				metaEngine->add(baseClass1, baseFunctor);
+		}
+		else if (metaEngine->getDimension()==2)
+		{
+			string baseClass2 = ((QComboBox*)(*cbsi)[1])->currentText();
+			string baseFunctor = ((QComboBox*)(*cbsi)[2])->currentText();
+			if (*eui!=shared_ptr<EngineUnit>())
+				metaEngine->add(baseClass1, baseClass2, baseFunctor,*eui);
+			else
+				metaEngine->add(baseClass1, baseClass2, baseFunctor);
+		}
+	}
+
 	close();
 }
 

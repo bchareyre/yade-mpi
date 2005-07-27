@@ -39,13 +39,19 @@ class MetaDispatchingEngine : public MetaEngine
 	protected : vector<vector<string> > functorNames;
 	protected : list<shared_ptr<EngineUnit> > functorArguments;
 
+	public    : vector<vector<string> >& getFunctorNames();
+
 	public    : typedef list<shared_ptr<EngineUnit> >::iterator EngineUnitListIterator;
 
-	protected : void storeFunctorName(const string& baseClassName1, const string& libName, shared_ptr<EngineUnit> eu);
-	protected : void storeFunctorName(const string& baseClassName1, const string& baseClassName2, const string& libName, shared_ptr<EngineUnit> eu);
-	protected : void storeFunctorName(const string& baseClassName1, const string& baseClassName2, const string& baseClassName3, const string& libName, shared_ptr<EngineUnit> eu);
+	public : virtual void add( string , string , shared_ptr<EngineUnit> eu = shared_ptr<EngineUnit>()) {throw;}
+	public : virtual void add( string , string , string , shared_ptr<EngineUnit> eu = shared_ptr<EngineUnit>()) {throw;}
+
+	public    : void storeFunctorName(const string& baseClassName1, const string& libName, shared_ptr<EngineUnit> eu);
+	public    : void storeFunctorName(const string& baseClassName1, const string& baseClassName2, const string& libName, shared_ptr<EngineUnit> eu);
+	public    : void storeFunctorName(const string& baseClassName1, const string& baseClassName2, const string& baseClassName3, const string& libName, shared_ptr<EngineUnit> eu);
 	protected : void storeFunctorArguments(shared_ptr<EngineUnit> eu);
-	protected : shared_ptr<EngineUnit> findFunctorArguments(const string& libName);
+	public    : shared_ptr<EngineUnit> findFunctorArguments(const string& libName);
+	public    : void clear();
 
 	public    : MetaDispatchingEngine();
 	public    : virtual ~MetaDispatchingEngine();
@@ -70,12 +76,6 @@ REGISTER_SERIALIZABLE(MetaDispatchingEngine,false);
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////
-
-// #define REGISTER_ENGINE_UNIT_TYPE(name)		\
-// 	public     : virtual string getEngineUnitType() { return #name; };
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #endif // __METADISPATCHINGENGINE_HPP__
 
