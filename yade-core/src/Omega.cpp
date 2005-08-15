@@ -297,7 +297,8 @@ void Omega::scanPlugins()
 						prevLength=length;
 						name = filesystem::path(filesystem::basename(name));
 						length = name.leaf().size();
-					}					
+					}
+//					cerr << name.leaf() << endl;
 					dynlibsList.push_back(ClassFactory::instance().systemNameToLibName(name.leaf()));
 				}
 			}
@@ -307,7 +308,8 @@ void Omega::scanPlugins()
 	}
 
 	bool allLoaded = false;
-	while (!allLoaded)
+	int overflow = 30;
+	while (!allLoaded && --overflow > 0)
 	{	
 		vector< string >::iterator dlli    = dynlibsList.begin();
 		vector< string >::iterator dlliEnd = dynlibsList.end();
@@ -315,11 +317,16 @@ void Omega::scanPlugins()
 		for( ; dlli!=dlliEnd ; ++dlli)
 		{
 			bool thisLoaded = ClassFactory::instance().load((*dlli));
-			//if (!thisLoaded)
-			//	cerr << "Can load : " << (*dlli) << endl;
+			if (!thisLoaded && overflow == 1)
+				cerr << "load unsuccesfull : " << (*dlli) << endl;
+//			else
+//				cerr << "loaded: " << *dlli << endl;
 			allLoaded &= thisLoaded;
 		}
 	}
+
+	if(!allLoaded)
+		cerr << "Couldn't load everything, some stuff may work incorrectly\n";
 	
 	buildDynlibDatabase(dynlibsList);
 

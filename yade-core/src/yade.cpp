@@ -176,10 +176,6 @@ int main(int argc, char *argv[])
 	Omega::instance().preferences = shared_ptr<Preferences>(new Preferences);
 	filesystem::path yadeConfigPath = filesystem::path(string(getenv("HOME")) + string("/.yade"), filesystem::native);
 
-	if( ( getopt(argc,argv,"r") ) == 'r')
-		filesystem::remove_all(yadeConfigPath);
-		
-
 	if ( !filesystem::exists( yadeConfigPath ) )
 	{
 		filesystem::create_directories(yadeConfigPath);
@@ -200,7 +196,7 @@ int main(int argc, char *argv[])
 ///
 	int ch;
 	bool useNullGUI = false;
-	if( ( ch = getopt(argc,argv,"hngd") ) != -1)
+	if( ( ch = getopt(argc,argv,"hngdr") ) != -1)
 		switch(ch)
 		{
 			case 'h' :	printHelp();
@@ -210,6 +206,8 @@ int main(int argc, char *argv[])
 			case 'g' :	changeDefaultGUI(Omega::instance().preferences);
 					break;
 			case 'd' :	addPluginDirectory(Omega::instance().preferences);
+					break;
+			case 'r' :	filesystem::remove_all(yadeConfigPath);
 					break;
 			default	 :	printHelp();
 					return 1;
@@ -234,3 +232,4 @@ int main(int argc, char *argv[])
 
 	return ok;
 }
+

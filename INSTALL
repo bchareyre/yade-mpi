@@ -1,0 +1,43 @@
+from this directory level you can install all libraries at once.
+It's a good solution when installing yade for the first time. When you
+install something next time, it is better to install only from directories
+that have changed their version numers - you will save on compilation time.
+
+INSTALLING:
+
+to compile and install all yade libraries execute following commands:
+
+	make compile_install
+	make clean		# to clean afterwards
+
+    WARNING: command 'make compile_install' is compiling and installing,
+    this is because compiling next library requires the previous one to
+    be already installed otherwise compilation will fail. (normally we
+    should invoke 'make && make install', so here is an exception)
+
+by default everything is installed in directory /usr/local, if for example
+you want to install in /usr instead, you can do this:
+
+	make compile_install INSTALL_DIR='/usr'
+
+Or if you are a package maintaner, you may want to install everything in
+different directory tree:
+
+	make compile_install PREFIX_DIR='/tmp/foo' INSTALL_DIR='/usr'
+
+    WARNING: if you are compiling with gcc3.3, you need to pass additional argument:
+
+        make compile_install CXXFLAGS='-pthread -lpthread'
+	
+	
+OTHER MAKE COMMANDS
+
+	make uninstall          # to uninstall (you have to provide correct 
+	                        #               INSTALL_DIR, and PREFIX_DIR ) 
+	
+
+DOCUMENTATION:
+
+we plan to have documentation in doc/ directory of each library, but for now
+nothing is there.
+

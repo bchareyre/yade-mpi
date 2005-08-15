@@ -76,7 +76,7 @@
       <directoryradio>executable</directoryradio>
     </run>
     <general>
-      <activedir>Container/BodyContainer</activedir>
+      <activedir>PreProcessor/FEMBeam</activedir>
     </general>
     <subclassing/>
   </kdevtrollproject>
