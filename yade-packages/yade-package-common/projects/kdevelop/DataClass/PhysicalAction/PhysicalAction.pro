@@ -5,6 +5,6 @@
 
 SUBDIRS += Force \
            Momentum 
-CONFIG += release \
+CONFIG += debug \
 warn_on
 TEMPLATE = subdirs

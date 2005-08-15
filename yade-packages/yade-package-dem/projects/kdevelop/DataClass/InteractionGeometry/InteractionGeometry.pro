@@ -5,6 +5,6 @@
 
 SUBDIRS += MacroMicroContactGeometry \
            SDECLinkGeometry 
-CONFIG += release \
+CONFIG += debug \
 warn_on
 TEMPLATE = subdirs

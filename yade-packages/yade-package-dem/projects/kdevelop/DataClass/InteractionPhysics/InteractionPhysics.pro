@@ -5,6 +5,6 @@
 
 SUBDIRS += ElasticContactParameters \
            SDECLinkPhysics 
-CONFIG += release \
+CONFIG += debug \
 warn_on
 TEMPLATE = subdirs

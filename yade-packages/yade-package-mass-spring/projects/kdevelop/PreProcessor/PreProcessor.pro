@@ -4,6 +4,6 @@
 # Target is a subdirs project 
 
 SUBDIRS += HangingCloth 
-CONFIG += release \
+CONFIG += debug \
 warn_on
 TEMPLATE = subdirs

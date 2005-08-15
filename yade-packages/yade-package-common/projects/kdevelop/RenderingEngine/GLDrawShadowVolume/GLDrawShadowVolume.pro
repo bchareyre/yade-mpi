@@ -5,6 +5,6 @@
 
 SUBDIRS += GLDrawBoxShadowVolume \
            GLDrawSphereShadowVolume 
-CONFIG += release \
+CONFIG += debug \
 warn_on
 TEMPLATE = subdirs

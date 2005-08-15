@@ -7,6 +7,6 @@ SUBDIRS += GLDrawTetrahedron \
            GLDrawBox \
            GLDrawMesh2D \
            GLDrawSphere 
-CONFIG += release \
+CONFIG += debug \
 warn_on
 TEMPLATE = subdirs

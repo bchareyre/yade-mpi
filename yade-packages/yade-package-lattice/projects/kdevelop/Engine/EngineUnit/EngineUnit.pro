@@ -4,6 +4,6 @@
 # Target is a subdirs project 
 
 SUBDIRS += LatticeSet2LatticeBeams 
-CONFIG += release \
+CONFIG += debug \
 warn_on
 TEMPLATE = subdirs

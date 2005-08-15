@@ -7,7 +7,7 @@ LIBS += -lyade-lib-qhull
 INCLUDEPATH += /usr/local/include/yade 
 QMAKE_LIBDIR = /usr/local/lib/yade/yade-libs/ 
 TARGET = ../../../bin/yade-lib-swiftpp 
-CONFIG += release \
+CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 

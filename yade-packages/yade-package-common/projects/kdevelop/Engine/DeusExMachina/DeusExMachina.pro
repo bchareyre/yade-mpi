@@ -7,6 +7,6 @@ SUBDIRS += ForceEngine \
            GravityEngine \
            RotationEngine \
            TranslationEngine 
-CONFIG += release \
+CONFIG += debug \
 warn_on
 TEMPLATE = subdirs

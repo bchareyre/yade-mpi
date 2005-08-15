@@ -3,6 +3,6 @@
 # Subdir relative project main directory: ./DataClass/State
 # Target is a subdirs project 
 
-CONFIG += release \
+CONFIG += debug \
           warn_on 
 TEMPLATE = subdirs 

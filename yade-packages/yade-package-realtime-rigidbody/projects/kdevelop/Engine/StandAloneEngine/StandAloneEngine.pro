@@ -5,6 +5,6 @@
 
 SUBDIRS += ErrorTolerantLaw \
            FrictionLessElasticContactLaw 
-CONFIG += release \
+CONFIG += debug \
 warn_on
 TEMPLATE = subdirs

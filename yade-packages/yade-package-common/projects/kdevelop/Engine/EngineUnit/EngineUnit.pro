@@ -12,6 +12,6 @@ SUBDIRS += Box2AABB \
            Sphere2AABB \
            CundallNonViscousForceDamping \
            CundallNonViscousMomentumDamping 
-CONFIG += release \
+CONFIG += debug \
 warn_on
 TEMPLATE = subdirs

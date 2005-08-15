@@ -11,6 +11,6 @@ SUBDIRS += BoundingVolume \
            InteractionGeometry \
            InteractionPhysics \
            PhysicalAction 
-CONFIG += release \
+CONFIG += debug \
           warn_on 
 TEMPLATE = subdirs 

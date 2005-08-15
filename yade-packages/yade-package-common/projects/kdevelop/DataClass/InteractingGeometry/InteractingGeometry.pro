@@ -6,6 +6,6 @@
 SUBDIRS += InteractingBox \
            InteractingSphere \
            MetaInteractingGeometry 
-CONFIG += release \
+CONFIG += debug \
 warn_on
 TEMPLATE = subdirs

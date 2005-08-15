@@ -8,6 +8,6 @@ SUBDIRS += GLDrawBoundingVolume \
            GLDrawInteractingGeometry \
            GLDrawShadowVolume \
            OpenGLRenderingEngine 
-CONFIG += release \
+CONFIG += debug \
 warn_on
 TEMPLATE = subdirs

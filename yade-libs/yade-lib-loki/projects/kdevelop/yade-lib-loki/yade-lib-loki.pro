@@ -4,7 +4,7 @@
 # Target is a library:  ../../../bin/yade-lib-loki
 
 TARGET = ../../../bin/yade-lib-loki 
-CONFIG += release \
+CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 

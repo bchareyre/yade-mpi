@@ -7,7 +7,7 @@ LIBS += -lXMLManager
 INCLUDEPATH += /usr/local/include/yade 
 QMAKE_LIBDIR = /usr/local/lib/yade/yade-libs/ 
 TARGET = ../../../bin/yade-lib-serialization-qt 
-CONFIG += release \
+CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 

@@ -6,6 +6,6 @@
 SUBDIRS += FEMSet2Tetrahedrons \
            FEMSetTextLoader \
            FEMTetrahedronStiffness 
-CONFIG += release \
+CONFIG += debug \
 warn_on
 TEMPLATE = subdirs

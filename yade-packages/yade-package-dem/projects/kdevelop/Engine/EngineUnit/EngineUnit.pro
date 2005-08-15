@@ -9,6 +9,6 @@ SUBDIRS += PolyhedralSweptSphere2AABB \
            MacroMicroElasticRelationships \
            Box2Sphere4MacroMicroContactGeometry \
            Sphere2Sphere4MacroMicroContactGeometry 
-CONFIG += release \
+CONFIG += debug \
 warn_on
 TEMPLATE = subdirs

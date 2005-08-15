@@ -9,6 +9,6 @@ SUBDIRS += AABox2Sphere4ClosestFeatures \
            Box2Sphere4ErrorTolerant \
            Sphere2Sphere4ClosestFeatures \
            Sphere2Sphere4ErrorTolerant 
-CONFIG += release \
+CONFIG += debug \
 warn_on
 TEMPLATE = subdirs

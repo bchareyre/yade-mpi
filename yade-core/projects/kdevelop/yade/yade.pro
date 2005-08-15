@@ -16,7 +16,7 @@ LIBS += -lyade-lib-threads \
         -lboost_thread 
 QMAKE_LIBDIR = /usr/local/lib/yade/yade-libs 
 TARGET = ../../../bin/yade 
-CONFIG += release \
+CONFIG += debug \
           warn_on 
 TEMPLATE = app 
 HEADERS += BodyContainer.hpp \

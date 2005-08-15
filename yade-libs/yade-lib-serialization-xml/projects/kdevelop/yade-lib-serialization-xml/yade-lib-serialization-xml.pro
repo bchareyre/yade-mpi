@@ -5,7 +5,7 @@
 
 INCLUDEPATH += /usr/local/include/yade 
 TARGET = ../../../bin/XMLManager 
-CONFIG += release \
+CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 

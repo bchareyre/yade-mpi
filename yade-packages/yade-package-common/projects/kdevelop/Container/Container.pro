@@ -6,6 +6,6 @@
 SUBDIRS += BodyContainer \
            InteractionContainer \
            PhysicalActionContainer 
-CONFIG += release \
+CONFIG += debug \
           warn_on 
 TEMPLATE = subdirs 

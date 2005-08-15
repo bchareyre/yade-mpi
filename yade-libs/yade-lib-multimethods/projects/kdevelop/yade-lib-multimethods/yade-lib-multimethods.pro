@@ -11,7 +11,7 @@ SOURCES += Indexable.cpp \
            MultiMethodsExceptions.cpp 
 INCLUDEPATH += /usr/local/include/yade
 TARGET = ../../../bin/yade-lib-multimethods
-CONFIG += release \
+CONFIG += debug \
 warn_on \
 dll
 TEMPLATE = lib

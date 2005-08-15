@@ -4,7 +4,7 @@
 # Target is a library:  ../../../bin/yade-lib-time
 
 TARGET = ../../../bin/yade-lib-time 
-CONFIG += release \
+CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 

@@ -4,6 +4,6 @@
 # Target is a subdirs project 
 
 SUBDIRS += ParticleSet2Mesh2D 
-CONFIG += release \
+CONFIG += debug \
 warn_on
 TEMPLATE = subdirs

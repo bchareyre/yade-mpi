@@ -12,3 +12,6 @@ SOURCES += iteratortest.cpp \
            MyBodyContainer.cpp \
            MyBodyContainerIterator.cpp 
 TARGET=../bin/iteratortest
+CONFIG += debug \
+          warn_on
+

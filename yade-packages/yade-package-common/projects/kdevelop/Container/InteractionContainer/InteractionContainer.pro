@@ -5,6 +5,6 @@
 
 SUBDIRS += InteractionHashMap \
            InteractionVecSet 
-CONFIG += release \
+CONFIG += debug \
 warn_on
 TEMPLATE = subdirs

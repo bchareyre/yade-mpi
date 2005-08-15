@@ -4,7 +4,7 @@
 # Target is a library:  ../bin/yade-lib-qhull
 
 TARGET = ../../../bin/yade-lib-qhull 
-CONFIG += release \
+CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 

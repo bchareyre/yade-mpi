@@ -10,3 +10,6 @@ SUBDIRS += Container \
            PreProcessor \
            PostProcessor
 TEMPLATE=subdirs
+CONFIG	+= debug \
+warn_on
+

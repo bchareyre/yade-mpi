@@ -15,7 +15,7 @@ SOURCES += Distances2D.cpp \
            MarchingCube.cpp 
 INCLUDEPATH += /usr/local/include/yade
 TARGET = ../../../bin/yade-lib-computational-geometry
-CONFIG += release \
+CONFIG += debug \
 warn_on \
 dll
 TEMPLATE = lib

@@ -5,6 +5,6 @@
 
 SUBDIRS += ParticleParameters \
            RigidBodyParameters 
-CONFIG += release \
+CONFIG += debug \
 warn_on
 TEMPLATE = subdirs

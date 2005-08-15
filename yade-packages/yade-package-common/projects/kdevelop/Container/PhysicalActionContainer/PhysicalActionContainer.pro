@@ -4,6 +4,6 @@
 # Target is a subdirs project 
 
 SUBDIRS += PhysicalActionVectorVector 
-CONFIG += release \
+CONFIG += debug \
 warn_on
 TEMPLATE = subdirs

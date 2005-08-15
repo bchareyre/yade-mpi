@@ -11,6 +11,6 @@ SUBDIRS += BoundingVolumeMetaEngine \
            InteractionPhysicsMetaEngine \
            PhysicalActionApplier \
            PhysicalActionDamper 
-CONFIG += release \
+CONFIG += debug \
 warn_on
 TEMPLATE = subdirs

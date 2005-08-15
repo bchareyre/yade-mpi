@@ -1,9 +1,7 @@
 #! /bin/sh
 
-find ../projects/kdevelop/  -name "*.pro" -exec fgrep -l "= release" {} \;	> ./proFilesRelease
-
+find . -iname "*.pro" -print | while read name; do grep -l CONFIG $name; done	>  ./proFilesRelease
 echo './empty'                                                                  >> ./proFilesRelease
-
 echo ' '                                                                        >  ./empty
 
 echo 'echo CHANGING $1'								>  ./changeSet
@@ -15,8 +13,24 @@ chmod a+x ./changeSet
 
 find `cat proFilesRelease` -exec ./changeSet {} \;
 
+## now add CONFIG entry to all .pro that do not have it.
+
+find . -iname "*.pro" -print | while read name; do grep -L CONFIG $name; done	>  ./proFilesRelease
+echo './empty'                                                                  >> ./proFilesRelease
+
+echo 'echo CHANGING $1'								>  ./changeSet
+echo 'echo "CONFIG += debug \\" >> $1'						>> ./changeSet
+echo 'echo "          warn_on" >> $1'						>> ./changeSet
+echo 'echo "" >> $1'								>> ./changeSet
+
+chmod a+x ./changeSet
+
+find `cat proFilesRelease` -exec ./changeSet {} \;
+
+
+## should also change the output dir and temporary compilation dir
+
 rm ./changeSet
 rm ./empty
 rm ./proFilesRelease
 
-## should also change the output dir and temporary compilation dir

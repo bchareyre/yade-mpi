@@ -4,7 +4,7 @@
 # Target is a library:  ../../../bin/yade-lib-wm3-math
 
 TARGET = ../../../bin/yade-lib-wm3-math 
-CONFIG += release \
+CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 

@@ -9,6 +9,6 @@ SUBDIRS += Funnel \
            SDECSpheresPlane \
            SDECTriaxialTest \
            TetrahedronsTest 
-CONFIG += release \
+CONFIG += debug \
 warn_on
 TEMPLATE = subdirs

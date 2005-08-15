@@ -26,7 +26,7 @@ SOURCES += Archive.cpp \
            SerializationExceptions.cpp 
 INCLUDEPATH += /usr/local/include/yade
 TARGET = ../../../bin/yade-lib-serialization
-CONFIG += release \
+CONFIG += debug \
 warn_on \
 dll
 TEMPLATE = lib

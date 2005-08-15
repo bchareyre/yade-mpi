@@ -11,6 +11,6 @@ SUBDIRS += ElasticCohesiveLaw \
            ForceRecorder \
            PositionOrientationRecorder \
            VelocityRecorder 
-CONFIG += release \
+CONFIG += debug \
 warn_on
 TEMPLATE = subdirs

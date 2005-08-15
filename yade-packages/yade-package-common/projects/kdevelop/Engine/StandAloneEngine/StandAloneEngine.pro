@@ -7,6 +7,6 @@ SUBDIRS += PersistentSAPCollider \
            SAPCollider \
            PhysicalActionContainerInitializer \
            PhysicalActionContainerReseter 
-CONFIG += release \
+CONFIG += debug \
 warn_on
 TEMPLATE = subdirs

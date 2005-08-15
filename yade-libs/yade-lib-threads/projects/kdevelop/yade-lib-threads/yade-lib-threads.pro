@@ -10,7 +10,7 @@ HEADERS += Threadable.hpp \
 SOURCES += ThreadSafe.cpp \
            ThreadSynchronizer.cpp 
 TARGET = ../../../bin/yade-lib-threads
-CONFIG += release \
+CONFIG += debug \
 warn_on \
 dll
 TEMPLATE = lib

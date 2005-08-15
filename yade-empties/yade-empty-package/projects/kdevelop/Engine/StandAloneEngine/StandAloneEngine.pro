@@ -3,6 +3,6 @@
 # Subdir relative project main directory: ./Engine/StandAlone
 # Target is a subdirs project 
 
-CONFIG += release \
+CONFIG += debug \
           warn_on 
 TEMPLATE = subdirs 

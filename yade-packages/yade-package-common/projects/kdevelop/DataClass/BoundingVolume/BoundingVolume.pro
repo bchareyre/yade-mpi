@@ -5,6 +5,6 @@
 
 SUBDIRS += AABB \
            BoundingSphere 
-CONFIG += release \
+CONFIG += debug \
 warn_on
 TEMPLATE = subdirs
