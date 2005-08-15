@@ -20,6 +20,10 @@ compile_install:
 	$(MAKE) -C yade-guis install
 	
 	$(MAKE) -C yade-packages compile_install
+	
+	@echo --
+	@echo Compilation finished. Check above for possible errors.
+	@echo --
 
 uninstall:
 	$(MAKE) -C yade-libs uninstall

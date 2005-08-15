@@ -20,6 +20,9 @@ if for example you want to install in /usr instead, you can do this:
 
 	make compile_install INSTALL_DIR='/usr'
 
+Both INSTALL_DIR and PREFIX_DIR should start with / and shouldn't have
+trailing slash.
+
 Or if you are a package maintaner, you may want to install everything in
 different directory tree:
 
