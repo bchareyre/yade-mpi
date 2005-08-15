@@ -1,8 +1,8 @@
 <?xml version = '1.0'?>
 <kdevelop>
   <general>
-    <author>Olivier Galizzi</author>
-    <email>olivier.galizzi@imag.fr</email>
+    <author>Janek Kozicki</author>
+    <email>cosurgi@berlios.de</email>
     <version>0.1</version>
     <projectmanagement>KDevTrollProject</projectmanagement>
     <primarylanguage>C++</primarylanguage>
@@ -10,6 +10,9 @@
       <keyword>Qt</keyword>
     </keywords>
     <ignoreparts/>
+    <projectdirectory>.</projectdirectory>
+    <absoluteprojectpath>false</absoluteprojectpath>
+    <description></description>
   </general>
   <kdevfileview>
     <groups>
@@ -66,18 +69,43 @@
   </kdevdoctreeview>
   <kdevdebugger>
     <general>
-      <dbgshell/>
+      <dbgshell></dbgshell>
+      <programargs> -i QtGUI</programargs>
+      <gdbpath></gdbpath>
+      <configGdbScript></configGdbScript>
+      <runShellScript></runShellScript>
+      <runGdbScript></runGdbScript>
+      <breakonloadinglibs>true</breakonloadinglibs>
+      <separatetty>false</separatetty>
+      <floatingtoolbar>false</floatingtoolbar>
     </general>
+    <display>
+      <staticmembers>true</staticmembers>
+      <demanglenames>true</demanglenames>
+      <outputradix>10</outputradix>
+    </display>
   </kdevdebugger>
   <kdevtrollproject>
     <run>
-      <mainprogram>./bin/yadeemptypackage</mainprogram>
-      <programargs/>
+      <mainprogram>bin/yade</mainprogram>
+      <programargs> -iQtGUI</programargs>
       <directoryradio>executable</directoryradio>
+      <customdirectory>/</customdirectory>
+      <terminal>false</terminal>
+      <autocompile>true</autocompile>
+      <envvars/>
     </run>
     <general>
-      <activedir>Container/InteractionContainer</activedir>
+      <activedir>src</activedir>
     </general>
+    <make>
+      <abortonerror>true</abortonerror>
+      <numberofjobs>3</numberofjobs>
+      <dontact>false</dontact>
+      <makebin></makebin>
+      <prio>0</prio>
+      <envvars/>
+    </make>
     <subclassing/>
   </kdevtrollproject>
   <kdevfilecreate>
@@ -91,21 +119,19 @@
   <kdevdocumentation>
     <projectdoc>
       <docsystem>Doxygen Documentation Collection</docsystem>
-      <docurl>yadeemptypackage.tag</docurl>
+      <docurl>${APPNAMELC}.tag</docurl>
     </projectdoc>
   </kdevdocumentation>
   <substmap>
-    <APPNAME>yadeemptypackage</APPNAME>
-    <APPNAMELC>yadeemptypackage</APPNAMELC>
-    <APPNAMESC>Yadeemptypackage</APPNAMESC>
-    <APPNAMEUC>YADEEMPTYPACKAGE</APPNAMEUC>
-    <AUTHOR>Your Name</AUTHOR>
-    <EMAIL>your.email@your.domain</EMAIL>
+    <APPNAME>flat</APPNAME>
+    <APPNAMELC>flat</APPNAMELC>
+    <APPNAMEUC>FLAT</APPNAMEUC>
+    <AUTHOR>Janek Kozicki</AUTHOR>
+    <EMAIL>cosurgi@berlios.de</EMAIL>
     <LICENSE>GPL</LICENSE>
     <LICENSEFILE>COPYING</LICENSEFILE>
     <VERSION>0.1</VERSION>
-    <YEAR>2005</YEAR>
-    <dest>/disc/devel/trunk/yade-empties/yade-empty-package/projects/yadeemptypackage</dest>
+    <dest>/home/janek/devel/yade/yade/projects/flat</dest>
   </substmap>
   <kdevcppsupport>
     <references/>
@@ -121,5 +147,28 @@
       <argumentsHintDelay>400</argumentsHintDelay>
       <headerCompletionDelay>250</headerCompletionDelay>
     </codecompletion>
+    <creategettersetter>
+      <prefixGet></prefixGet>
+      <prefixSet>set</prefixSet>
+      <prefixVariable>m_,_</prefixVariable>
+      <parameterName>theValue</parameterName>
+      <inlineGet>true</inlineGet>
+      <inlineSet>true</inlineSet>
+    </creategettersetter>
   </kdevcppsupport>
+  <cppsupportpart>
+    <filetemplates>
+      <interfacesuffix>.h</interfacesuffix>
+      <implementationsuffix>.cpp</implementationsuffix>
+    </filetemplates>
+  </cppsupportpart>
+  <kdevvisualadvance>
+    <emulator>VisualBoyAdvance</emulator>
+    <binary></binary>
+    <addOptions></addOptions>
+    <terminal>false</terminal>
+    <fullscreen>false</fullscreen>
+    <graphicFilter>-f0</graphicFilter>
+    <scaling>-1</scaling>
+  </kdevvisualadvance>
 </kdevelop>

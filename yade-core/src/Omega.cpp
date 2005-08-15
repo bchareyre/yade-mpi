@@ -273,6 +273,7 @@ void Omega::scanPlugins()
 		ClassFactory::instance().addBaseDirectory((*dldi));
 			
 	vector< string > dynlibsList;
+	vector< int >    dynlibsListLoaded;
 
 	vector<string>::iterator si = preferences->dynlibDirectories.begin();
 	vector<string>::iterator siEnd = preferences->dynlibDirectories.end();
@@ -299,7 +300,13 @@ void Omega::scanPlugins()
 						length = name.leaf().size();
 					}
 //					cerr << name.leaf() << endl;
-					dynlibsList.push_back(ClassFactory::instance().systemNameToLibName(name.leaf()));
+					if( 	dynlibsList.size()==0 || 
+						ClassFactory::instance().systemNameToLibName(name.leaf()) != dynlibsList.back() 
+					)
+					{
+						dynlibsList.push_back(ClassFactory::instance().systemNameToLibName(name.leaf()));
+						dynlibsListLoaded.push_back(false);
+					}
 				}
 			}
 		}
@@ -308,25 +315,34 @@ void Omega::scanPlugins()
 	}
 
 	bool allLoaded = false;
-	int overflow = 30;
+	int overflow = 30; // to prevent infinite loop
+	assert(dynlibsList.size() == dynlibsListLoaded.size() ); 
 	while (!allLoaded && --overflow > 0)
 	{	
 		vector< string >::iterator dlli    = dynlibsList.begin();
 		vector< string >::iterator dlliEnd = dynlibsList.end();
+		int loaded = 0;
 		allLoaded = true;
-		for( ; dlli!=dlliEnd ; ++dlli)
+		for( ; dlli!=dlliEnd ; ++dlli , ++loaded )
 		{
-			bool thisLoaded = ClassFactory::instance().load((*dlli));
-			if (!thisLoaded && overflow == 1)
-				cerr << "load unsuccesfull : " << (*dlli) << endl;
-//			else
-//				cerr << "loaded: " << *dlli << endl;
-			allLoaded &= thisLoaded;
+			if( dynlibsListLoaded[loaded] == false )
+			{
+				bool thisLoaded = ClassFactory::instance().load((*dlli));
+				if (!thisLoaded && overflow == 1)
+//				if (!thisLoaded)
+					cerr << "load unsuccesfull : " << (*dlli) << endl;
+//				else
+//					cerr << "loaded            : " << *dlli << endl;
+
+				allLoaded &= thisLoaded;
+				if(thisLoaded)
+					dynlibsListLoaded[loaded] = true; 
+			}
 		}
 	}
 
 	if(!allLoaded)
-		cerr << "Couldn't load everything, some stuff may work incorrectly\n";
+		cerr << "Couldn't load everything, some stuff may work incorrectly.\n";
 	
 	buildDynlibDatabase(dynlibsList);
 

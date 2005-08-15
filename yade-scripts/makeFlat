@@ -5,7 +5,7 @@
 
 echo 'ORGDIR=`pwd`'										> makeSymLinkFlat
 echo 'ONLYNAME=`basename $1`'									>> makeSymLinkFlat
-echo 'TMPNAME=../projects/flat/src/$ONLYNAME'							>> makeSymLinkFlat
+echo 'TMPNAME=./yade-flat/src/$ONLYNAME'							>> makeSymLinkFlat
 echo 'echo symlinking $ORGDIR/$1 to `dirname $TMPNAME`'						>> makeSymLinkFlat
 echo 'TMPDIR=`dirname $TMPNAME`'								>> makeSymLinkFlat
 echo 'cd $TMPDIR'										>> makeSymLinkFlat
@@ -14,15 +14,22 @@ echo 'cd $ORGDIR'										>> makeSymLinkFlat
 
 chmod a+x ./makeSymLinkFlat
 
-find ../src/ -name "*.h" -exec ./makeSymLinkFlat {} \;
-find ../src/ -name "*.c" -exec ./makeSymLinkFlat {} \;
-find ../src/ -name "*.hpp" -exec ./makeSymLinkFlat {} \;
-find ../src/ -name "*.tpp" -exec ./makeSymLinkFlat {} \;
-find ../src/ -name "*.ipp" -exec ./makeSymLinkFlat {} \;
-find ../src/ -name "*.cpp" -exec ./makeSymLinkFlat {} \;
-find ../src/ -name "*.ui" -exec ./makeSymLinkFlat {} \;
+mv yade-sandbox .yade-sandbox
 
-symlinks -rcs ./
-symlinks -rcs ./
+find ./ -name "*.h"   -exec ./makeSymLinkFlat {} \;
+find ./ -name "*.c"   -exec ./makeSymLinkFlat {} \;
+find ./ -name "*.hpp" -exec ./makeSymLinkFlat {} \;
+find ./ -name "*.tpp" -exec ./makeSymLinkFlat {} \;
+find ./ -name "*.ipp" -exec ./makeSymLinkFlat {} \;
+find ./ -name "*.cpp" -exec ./makeSymLinkFlat {} \;
+find ./ -name "*.ui"  -exec ./makeSymLinkFlat {} \;
+
+mv .yade-sandbox yade-sandbox
+
+cd yade-flat
+symlinks -rcsd ./
+symlinks -rcsd ./
+cd ..
 
 rm ./makeSymLinkFlat
+

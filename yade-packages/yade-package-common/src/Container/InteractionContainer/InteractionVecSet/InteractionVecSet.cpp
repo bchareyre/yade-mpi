@@ -160,8 +160,14 @@ InteractionContainer::iterator InteractionVecSet::end()
 
 	it->vii		= interactions.end();
 	it->viiEnd	= interactions.end();
-	it->sii		= (*it->vii).end();
-	it->siiEnd	= (*it->vii).end();
+	
+// in fact it is not possible to assign ssi, because it doesn't exist at all. (both begin() and end() do not exist)
+
+//	it->sii		= interactions.begin()->end();
+//	it->siiEnd	= interactions.begin()->end();
+// trying to access out of memory bounds: end() points behind LAST element. so accessing it causes segfault.
+//	it->sii		= (*it->vii).end();
+//	it->siiEnd	= (*it->vii).end();
 
 	return InteractionContainer::iterator(it);
 

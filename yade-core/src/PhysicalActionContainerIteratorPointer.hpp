@@ -74,12 +74,15 @@ class PhysicalActionContainerIteratorPointer
 		return *this;
 	};
 
-	public  : PhysicalActionContainerIteratorPointer& operator++(int)
-	{
-		PhysicalActionContainerIteratorPointer& tmp = *this;
-		ptr->increment();
-		return tmp;
-	};
+//	public  : PhysicalActionContainerIteratorPointer& operator++(int)
+//	{
+		// FIXME - this is bad. because it returns incremented value.
+		//         the real solution is to copy whole class (duplicate in memory)
+		//         but it is ineffective. so it's better to disable this operator.
+//		PhysicalActionContainerIteratorPointer& tmp = *this;
+//		ptr->increment();
+//		return tmp;
+//	};
 
 	public  : PhysicalActionContainerIteratorPointer& operator=(const PhysicalActionContainerIteratorPointer& bi)
 	{

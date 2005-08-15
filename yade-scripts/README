@@ -8,7 +8,7 @@ they will be in subversion history).
 So working scripts are in this directory, all other scripts are in
 directory 'untested'
 
-Olivier: if you test any of those scripts in 'untested', please move
+Olivier: if you test any of those scripts from 'untested', please move
 it back to yade-scripts. After some time we will delete obsolete
 scripts from 'untested'.
 
@@ -29,4 +29,7 @@ svndiff num1 num2 : prints svn diff between revisions num1 and num2. useful in
                     connection with kompare:
 		      svndiff 800 820 > tmpfile ; kompare tmpfile
 
-
+makeFlat          : invoke from trunk/
+                    make symlinks of all source files (.cpp, .tpp, .h, .c, .ipp)
+		    in yade-flat.
+		    

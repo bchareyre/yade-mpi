@@ -1,22 +1,22 @@
-from this directory level you can install all libraries at once.
+from this directory level you can install whole yade at once.
 It's a good solution when installing yade for the first time. When you
 install something next time, it is better to install only from directories
 that have changed their version numers - you will save on compilation time.
 
 INSTALLING:
 
-to compile and install all yade libraries execute following commands:
+to compile and install whole yade execute following commands:
 
 	make compile_install
 	make clean		# to clean afterwards
 
     WARNING: command 'make compile_install' is compiling and installing,
-    this is because compiling next library requires the previous one to
+    this is because compiling next packege requires the previous one to
     be already installed otherwise compilation will fail. (normally we
     should invoke 'make && make install', so here is an exception)
 
-by default everything is installed in directory /usr/local, if for example
-you want to install in /usr instead, you can do this:
+by default everything is installed in directory INSTALL_DIR=/usr/local,
+if for example you want to install in /usr instead, you can do this:
 
 	make compile_install INSTALL_DIR='/usr'
 

@@ -74,12 +74,15 @@ class InteractionContainerIteratorPointer
 		return *this;
 	};
 
-	public  : InteractionContainerIteratorPointer& operator++(int)
-	{
-		InteractionContainerIteratorPointer& tmp = *this;
-		ptr->increment();
-		return tmp;
-	};
+//	public  : InteractionContainerIteratorPointer& operator++(int)
+//	{
+		// FIXME - this is bad. because it returns incremented value.
+		//         the real solution is to copy whole class (duplicate in memory)
+		//         but it is ineffective. so it's better to disable this operator.
+//		InteractionContainerIteratorPointer& tmp = *this;
+//		ptr->increment();
+//		return tmp;
+//	};
 
 	public  : InteractionContainerIteratorPointer& operator=(const InteractionContainerIteratorPointer& bi)
 	{
