@@ -11,7 +11,7 @@ yade_lib_subdir=yade-libs
 yade_libnames_basename=
 
 all:
-	cd projects/kdevelop ; qmake && make
+	cd projects/kdevelop ; qmake && $(MAKE)
 
 clean:
 	-rm bin/*

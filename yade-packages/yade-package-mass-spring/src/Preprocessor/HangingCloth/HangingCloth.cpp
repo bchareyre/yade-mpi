@@ -431,8 +431,10 @@ string HangingCloth::generate()
 		for(  ; bi!=biEnd ; ++bi )
 		{
 			shared_ptr<Body> bodyA = *bi;
+			bi2=bi;
+			++bi2;
 			
-			for( (bi2=bi)++ ; bi2!=biEnd ; ++bi2 )
+			for( ; bi2!=biEnd ; ++bi2 )
 			{
 				shared_ptr<Body> bodyB = *bi2;
 	

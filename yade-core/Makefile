@@ -9,7 +9,7 @@ INSTALL_DIR=/usr/local
 yade_include_subdir=yade-core
 
 all:
-	cd projects/kdevelop ; qmake && make
+	cd projects/kdevelop ; qmake && $(MAKE)
 
 clean:
 	-rm bin/*

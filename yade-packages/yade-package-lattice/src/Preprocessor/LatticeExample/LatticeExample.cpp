@@ -150,7 +150,10 @@ string LatticeExample::generate()
 		shared_ptr<Body> bodyA = *bi;
 	
 		cerr << "creating beams: " << bodyA->getId() << endl;
-		for((bi2=bi)++ ; bi2!=biEnd ; ++bi2 )
+		bi2 = bi;
+		++bi2;
+		
+		for( ; bi2!=biEnd ; ++bi2 )
 		{
 			shared_ptr<Body> bodyB = *bi2;
 			shared_ptr<LatticeNodeParameters> a = dynamic_pointer_cast<LatticeNodeParameters>(bodyA->physicalParameters);

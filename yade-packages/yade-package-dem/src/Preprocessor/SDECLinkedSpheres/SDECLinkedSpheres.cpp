@@ -189,18 +189,19 @@ string SDECLinkedSpheres::generate()
 	BodyContainer::iterator biEnd = rootBody->bodies->end();
 	BodyContainer::iterator bi2;
 
-	bi++; // skips ground
+	++bi; // skips ground
 	if (support1)
-		bi++; // skips supportBox1
+		++bi; // skips supportBox1
 	if (support2)
-		bi++; // skips supportBox2
+		++bi; // skips supportBox2
 		
 		
 	for( ; bi!=biEnd ; ++bi )
 	{
 		bodyA =*bi;
-		
-		for((bi2=bi)++ ; bi2!=biEnd ; ++bi2 )
+		bi2=bi;
+		++bi2;
+		for( ; bi2!=biEnd ; ++bi2 )
 		{
 			shared_ptr<Body> bodyB = *bi2;
 

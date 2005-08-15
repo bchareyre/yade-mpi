@@ -11,7 +11,7 @@ yade_package_subdir=yade-package-lattice
 yade_libnames_basename=yade-package-lattice
 
 all:
-	cd projects/kdevelop ; qmake && make
+	cd projects/kdevelop ; qmake && $(MAKE)
 
 clean:
 	-rm bin/*
