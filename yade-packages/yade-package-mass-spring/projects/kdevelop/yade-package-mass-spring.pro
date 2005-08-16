@@ -13,3 +13,5 @@ TEMPLATE=subdirs
 CONFIG += debug \
           warn_on
 
+INCLUDEPATH += /usr/local/include
+

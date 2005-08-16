@@ -7,7 +7,8 @@ LIBS += -lPhysicalParametersMetaEngine \
         -lParticleParameters \
         -lRigidBodyParameters \
         -rdynamic 
-INCLUDEPATH += ../../../DataClass/PhysicalParameters/ParticleParameters \
+INCLUDEPATH += /usr/local/include/ \
+               ../../../DataClass/PhysicalParameters/ParticleParameters \
                ../../../Engine/MetaEngine/PhysicalParametersMetaEngine 
 QMAKE_LIBDIR = ../../../../../bin \
                ../../../../../bin \

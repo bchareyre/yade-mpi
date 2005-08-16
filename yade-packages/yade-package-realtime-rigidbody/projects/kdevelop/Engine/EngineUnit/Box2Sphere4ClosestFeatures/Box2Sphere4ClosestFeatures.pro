@@ -25,3 +25,5 @@ CONFIG += debug \
 TEMPLATE = lib 
 HEADERS += Box2Sphere4ClosestFeatures.hpp 
 SOURCES += Box2Sphere4ClosestFeatures.cpp 
+INCLUDEPATH += /usr/local/include
+

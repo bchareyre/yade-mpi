@@ -5,7 +5,8 @@
 
 LIBS += -lyade-lib-opengl \
         -rdynamic 
-INCLUDEPATH += ../../../DataClass/InteractingGeometry/MetaInteractingGeometry \
+INCLUDEPATH += /usr/local/include/ \
+               ../../../DataClass/InteractingGeometry/MetaInteractingGeometry \
                ../../../RenderingEngine/OpenGLRenderingEngine 
 QMAKE_LIBDIR = /usr/local/lib/yade/yade-libs/ 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \

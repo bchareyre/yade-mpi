@@ -13,7 +13,8 @@ LIBS += -lSpringPhysics \
         -lMomentum \
         -lMesh2D \
         -rdynamic 
-INCLUDEPATH += ../../../DataClass/InteractionPhysics/SpringPhysics \
+INCLUDEPATH += /usr/local/include/ \
+               ../../../DataClass/InteractionPhysics/SpringPhysics \
                ../../../DataClass/InteractionGeometry/SpringGeometry 
 QMAKE_LIBDIR = ../../../../../bin \
                ../../../../../bin \

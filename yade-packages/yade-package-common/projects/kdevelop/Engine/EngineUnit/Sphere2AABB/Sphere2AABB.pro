@@ -8,7 +8,8 @@ LIBS += -lBoundingVolumeMetaEngine \
         -lAABB \
         -lyade-lib-wm3-math \
         -rdynamic 
-INCLUDEPATH += ../../../DataClass/InteractingGeometry/InteractingSphere \
+INCLUDEPATH += /usr/local/include/ \
+               ../../../DataClass/InteractingGeometry/InteractingSphere \
                ../../../DataClass/BoundingVolume/AABB \
                ../../../Engine/MetaEngine/BoundingVolumeMetaEngine 
 QMAKE_LIBDIR = ../../../../../bin \

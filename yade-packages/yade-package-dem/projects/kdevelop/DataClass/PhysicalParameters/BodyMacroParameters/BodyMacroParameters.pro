@@ -21,3 +21,5 @@ CONFIG += debug \
 TEMPLATE = lib 
 HEADERS += BodyMacroParameters.hpp 
 SOURCES += BodyMacroParameters.cpp 
+INCLUDEPATH += /usr/local/include
+

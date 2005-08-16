@@ -24,3 +24,5 @@ CONFIG += debug \
 TEMPLATE = lib 
 HEADERS += Box2Box4ClosestFeatures.hpp 
 SOURCES += Box2Box4ClosestFeatures.cpp 
+INCLUDEPATH += /usr/local/include
+

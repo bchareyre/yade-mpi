@@ -17,3 +17,5 @@ CONFIG += debug \
 TEMPLATE = lib 
 HEADERS += FEMSetGeometry.hpp 
 SOURCES += FEMSetGeometry.cpp 
+INCLUDEPATH += /usr/local/include
+

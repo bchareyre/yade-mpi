@@ -29,7 +29,8 @@ LIBS += -lFrictionLessElasticContactLaw \
         -lTranslationEngine \
         -lyade-lib-multimethods \
         -rdynamic 
-INCLUDEPATH += ../../Engine/StandAloneEngine/FrictionLessElasticContactLaw 
+INCLUDEPATH += /usr/local/include/ \
+               ../../Engine/StandAloneEngine/FrictionLessElasticContactLaw 
 QMAKE_LIBDIR = ../../../../bin \
                /usr/local/lib/yade/yade-package-common/ \
                /usr/local/lib/yade/yade-libs/ 

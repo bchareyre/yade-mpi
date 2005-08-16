@@ -31,3 +31,5 @@ SOURCES += geom2.c \
            stat.c \
            unix.c \
            user.c 
+INCLUDEPATH += /usr/local/include
+

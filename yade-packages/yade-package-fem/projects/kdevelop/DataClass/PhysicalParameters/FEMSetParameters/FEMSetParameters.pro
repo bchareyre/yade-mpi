@@ -22,3 +22,5 @@ CONFIG += debug \
 TEMPLATE = lib 
 HEADERS += FEMSetParameters.hpp 
 SOURCES += FEMSetParameters.cpp 
+INCLUDEPATH += /usr/local/include
+

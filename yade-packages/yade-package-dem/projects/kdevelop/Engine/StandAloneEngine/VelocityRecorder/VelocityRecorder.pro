@@ -18,3 +18,5 @@ CONFIG += debug \
 TEMPLATE = lib 
 HEADERS += VelocityRecorder.hpp 
 SOURCES += VelocityRecorder.cpp 
+INCLUDEPATH += /usr/local/include
+

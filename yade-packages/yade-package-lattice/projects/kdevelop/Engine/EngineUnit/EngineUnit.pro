@@ -7,3 +7,5 @@ SUBDIRS += LatticeSet2LatticeBeams
 CONFIG += debug \
 warn_on
 TEMPLATE = subdirs
+INCLUDEPATH += /usr/local/include
+

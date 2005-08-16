@@ -4,7 +4,7 @@
 # Target is a library:  ../../../bin/yade-lib-swiftpp
 
 LIBS += -lyade-lib-qhull 
-INCLUDEPATH += /usr/local/include/yade 
+INCLUDEPATH += /usr/local/include 
 QMAKE_LIBDIR = /usr/local/lib/yade/yade-libs/ 
 TARGET = ../../../bin/yade-lib-swiftpp 
 CONFIG += debug \

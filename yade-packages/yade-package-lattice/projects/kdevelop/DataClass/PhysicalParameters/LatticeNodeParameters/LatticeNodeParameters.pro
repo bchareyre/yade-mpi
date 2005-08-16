@@ -21,3 +21,5 @@ CONFIG += debug \
 TEMPLATE = lib 
 HEADERS += LatticeNodeParameters.hpp 
 SOURCES += LatticeNodeParameters.cpp 
+INCLUDEPATH += /usr/local/include
+

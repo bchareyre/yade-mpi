@@ -3,7 +3,7 @@
 # Subdir relative project main directory: ./yade-lib-factory
 # Target is a library:  ../../../bin/yade-lib-factory
 
-INCLUDEPATH += /usr/local/include/yade 
+INCLUDEPATH += /usr/local/include 
 TARGET = ../../../bin/yade-lib-factory 
 CONFIG += debug \
           warn_on \

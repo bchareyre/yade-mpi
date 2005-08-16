@@ -10,7 +10,8 @@ LIBS += -lSDECLinkGeometry \
         -lyade-lib-multimethods \
         -lInteractingSphere \
         -rdynamic 
-INCLUDEPATH += ../../../DataClass/InteractionGeometry/SDECLinkGeometry \
+INCLUDEPATH += /usr/local/include/ \
+               ../../../DataClass/InteractionGeometry/SDECLinkGeometry \
                ../../../DataClass/InteractionGeometry/MacroMicroContactGeometry 
 QMAKE_LIBDIR = ../../../../../bin \
                ../../../../../bin \

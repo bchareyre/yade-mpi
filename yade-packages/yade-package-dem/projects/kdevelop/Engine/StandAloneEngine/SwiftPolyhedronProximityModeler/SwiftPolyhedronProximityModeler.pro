@@ -7,7 +7,8 @@ LIBS += -lMacroMicroContactGeometry \
         -lPolyhedralSweptSphere \
         -lyade-lib-swiftpp \
         -rdynamic 
-INCLUDEPATH += ../../../DataClass/InteractionGeometry/MacroMicroContactGeometry \
+INCLUDEPATH += /usr/local/include/ \
+               ../../../DataClass/InteractionGeometry/MacroMicroContactGeometry \
                ../../../DataClass/InteractingGeometry/PolyhedralSweptSphere 
 QMAKE_LIBDIR = ../../../../../bin \
                /usr/local/lib/yade/yade-libs/ 

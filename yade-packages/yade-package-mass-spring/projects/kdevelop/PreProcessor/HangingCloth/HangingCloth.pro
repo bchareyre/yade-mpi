@@ -41,7 +41,8 @@ LIBS += -lSpringGeometry \
         -lMassSpringLaw \
         -lElasticContactLaw \
         -rdynamic 
-INCLUDEPATH += ../../Engine/StandAloneEngine/MassSpringLaw \
+INCLUDEPATH += /usr/local/include/ \
+               ../../Engine/StandAloneEngine/MassSpringLaw \
                ../../Engine/EngineUnit/ParticleSet2Mesh2D \
                ../../DataClass/InteractionPhysics/SpringPhysics \
                ../../DataClass/InteractionGeometry/SpringGeometry \

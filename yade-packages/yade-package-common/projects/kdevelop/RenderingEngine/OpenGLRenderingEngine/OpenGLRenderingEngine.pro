@@ -23,3 +23,5 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
+INCLUDEPATH += /usr/local/include
+

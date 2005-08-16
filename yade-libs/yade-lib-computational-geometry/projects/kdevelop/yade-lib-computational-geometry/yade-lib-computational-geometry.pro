@@ -13,7 +13,7 @@ SOURCES += Distances2D.cpp \
            Intersections2D.cpp \
            Intersections3D.cpp \
            MarchingCube.cpp 
-INCLUDEPATH += /usr/local/include/yade
+INCLUDEPATH += /usr/local/include
 TARGET = ../../../bin/yade-lib-computational-geometry
 CONFIG += debug \
 warn_on \

@@ -5,7 +5,7 @@
 
 HEADERS += PerlinNoise.hpp 
 SOURCES += PerlinNoise.cpp 
-INCLUDEPATH += /usr/local/include/yade
+INCLUDEPATH += /usr/local/include/
 TARGET = ../../../bin/yade-lib-algorithms
 CONFIG += debug \
 warn_on \

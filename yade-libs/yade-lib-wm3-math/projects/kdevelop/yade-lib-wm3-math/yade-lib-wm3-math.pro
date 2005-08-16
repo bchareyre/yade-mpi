@@ -35,3 +35,5 @@ SOURCES += Math.cpp \
            Vector2.cpp \
            Vector3.cpp \
            Vector4.cpp 
+INCLUDEPATH += /usr/local/include
+

@@ -23,7 +23,8 @@ LIBS += -lLineSegment \
         -lTranslationEngine \
         -lLatticeLaw \
         -rdynamic 
-INCLUDEPATH += ../../Engine/StandAloneEngine/LatticeLaw \
+INCLUDEPATH += /usr/local/include/ \
+               ../../Engine/StandAloneEngine/LatticeLaw \
                ../../DataClass/PhysicalParameters/LatticeSetParameters \
                ../../DataClass/PhysicalParameters/LatticeNodeParameters \
                ../../DataClass/PhysicalParameters/LatticeBeamParameters \

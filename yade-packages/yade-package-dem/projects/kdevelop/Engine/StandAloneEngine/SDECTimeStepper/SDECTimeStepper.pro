@@ -8,7 +8,8 @@ LIBS += -lElasticContactParameters \
         -lMacroMicroElasticRelationships \
         -lSphere \
         -rdynamic 
-INCLUDEPATH += ../../../Engine/EngineUnit/MacroMicroElasticRelationships \
+INCLUDEPATH += /usr/local/include/ \
+               ../../../Engine/EngineUnit/MacroMicroElasticRelationships \
                ../../../DataClass/InteractionPhysics/ElasticContactParameters \
                ../../../DataClass/InteractionGeometry/MacroMicroContactGeometry \
                ../../../DataClass/PhysicalParameters/BodyMacroParameters 

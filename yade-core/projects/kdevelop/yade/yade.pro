@@ -77,3 +77,5 @@ SOURCES += BodyContainer.cpp \
            yadeExceptions.cpp \
            TimeStepper.cpp \
            MetaDispatchingEngine.cpp 
+INCLUDEPATH += /usr/local/include
+

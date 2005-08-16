@@ -8,7 +8,8 @@ LIBS += -lBox \
         -lyade-lib-opengl \
         -lRigidBodyParameters \
         -rdynamic 
-INCLUDEPATH += ../../../DataClass/GeometricalModel/Box \
+INCLUDEPATH += /usr/local/include/ \
+               ../../../DataClass/GeometricalModel/Box \
                ../../../RenderingEngine/OpenGLRenderingEngine 
 QMAKE_LIBDIR = ../../../../../bin \
                ../../../../../bin \

@@ -16,3 +16,5 @@ CONFIG += debug \
 TEMPLATE = lib 
 HEADERS += PolyhedralSweptSphere.hpp 
 SOURCES += PolyhedralSweptSphere.cpp 
+INCLUDEPATH += /usr/local/include
+

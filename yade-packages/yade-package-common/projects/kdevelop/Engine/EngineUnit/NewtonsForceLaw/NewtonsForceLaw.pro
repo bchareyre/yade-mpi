@@ -8,7 +8,8 @@ LIBS += -lPhysicalActionApplier \
         -lParticleParameters \
         -lPhysicalActionApplier \
         -rdynamic 
-INCLUDEPATH += ../../../DataClass/PhysicalAction/Force \
+INCLUDEPATH += /usr/local/include/ \
+               ../../../DataClass/PhysicalAction/Force \
                ../../../DataClass/PhysicalParameters/ParticleParameters \
                ../../../Engine/MetaEngine/PhysicalActionApplier 
 QMAKE_LIBDIR = ../../../../../bin \

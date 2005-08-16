@@ -6,7 +6,8 @@
 LIBS += -lPolyhedralSweptSphere \
         -lyade-lib-opengl \
         -rdynamic 
-INCLUDEPATH += ../../DataClass/InteractingGeometry/PolyhedralSweptSphere 
+INCLUDEPATH += /usr/local/include/ \
+               ../../DataClass/InteractingGeometry/PolyhedralSweptSphere 
 QMAKE_LIBDIR = ../../../../bin \
                /usr/local/lib/yade/yade-libs/ 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \

@@ -10,7 +10,8 @@ LIBS += -lMacroMicroContactGeometry \
         -lInteractingSphere \
         -lInteractingBox \
         -rdynamic 
-INCLUDEPATH += ../../../DataClass/InteractionGeometry/MacroMicroContactGeometry 
+INCLUDEPATH += /usr/local/include/ \
+               ../../../DataClass/InteractionGeometry/MacroMicroContactGeometry 
 QMAKE_LIBDIR = ../../../../../bin \
                /usr/local/lib/yade/yade-package-common/ \
                /usr/local/lib/yade/yade-libs/ 

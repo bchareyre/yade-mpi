@@ -9,7 +9,8 @@ LIBS += -lLineSegment \
         -lGeometricalModelMetaEngine \
         -lParticleParameters \
         -rdynamic 
-INCLUDEPATH += ../../../DataClass/PhysicalParameters/LatticeSetParameters \
+INCLUDEPATH += /usr/local/include/ \
+               ../../../DataClass/PhysicalParameters/LatticeSetParameters \
                ../../../DataClass/PhysicalParameters/LatticeBeamParameters \
                ../../../DataClass/GeometricalModel/LineSegment 
 QMAKE_LIBDIR = ../../../../../bin \

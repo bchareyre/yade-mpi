@@ -6,7 +6,8 @@
 LIBS += -lMesh2D \
         -lyade-lib-opengl \
         -rdynamic 
-INCLUDEPATH += ../../../DataClass/GeometricalModel/Mesh2D \
+INCLUDEPATH += /usr/local/include/ \
+               ../../../DataClass/GeometricalModel/Mesh2D \
                ../../../RenderingEngine/OpenGLRenderingEngine 
 QMAKE_LIBDIR = ../../../../../bin \
                /usr/local/lib/yade/yade-libs/ 

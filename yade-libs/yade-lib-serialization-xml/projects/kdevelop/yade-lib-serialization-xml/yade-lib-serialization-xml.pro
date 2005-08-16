@@ -3,7 +3,7 @@
 # Subdir relative project main directory: ./yade-lib-serialization-xml
 # Target is a library:  ../../../bin/XMLManager
 
-INCLUDEPATH += /usr/local/include/yade 
+INCLUDEPATH += /usr/local/include 
 TARGET = ../../../bin/XMLManager 
 CONFIG += debug \
           warn_on \

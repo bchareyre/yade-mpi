@@ -9,7 +9,7 @@ HEADERS += DynLibDispatcher.hpp \
            MultiMethodsExceptions.hpp 
 SOURCES += Indexable.cpp \
            MultiMethodsExceptions.cpp 
-INCLUDEPATH += /usr/local/include/yade
+INCLUDEPATH += /usr/local/include
 TARGET = ../../../bin/yade-lib-multimethods
 CONFIG += debug \
 warn_on \

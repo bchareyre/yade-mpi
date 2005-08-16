@@ -15,7 +15,8 @@ LIBS += -lSDECLinkPhysics \
         -lSphere \
         -lRigidBodyParameters \
         -rdynamic 
-INCLUDEPATH += ../../../DataClass/InteractionPhysics/SDECLinkPhysics \
+INCLUDEPATH += /usr/local/include/ \
+               ../../../DataClass/InteractionPhysics/SDECLinkPhysics \
                ../../../DataClass/InteractionPhysics/ElasticContactParameters \
                ../../../DataClass/InteractionGeometry/SDECLinkGeometry \
                ../../../DataClass/InteractionGeometry/MacroMicroContactGeometry \

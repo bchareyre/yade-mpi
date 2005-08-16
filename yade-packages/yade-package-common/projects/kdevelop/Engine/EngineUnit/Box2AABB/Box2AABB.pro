@@ -10,7 +10,8 @@ LIBS += -lBoundingVolumeMetaEngine \
         -lyade-lib-wm3-math \
         -lyade-lib-multimethods \
         -rdynamic 
-INCLUDEPATH += ../../../DataClass/InteractingGeometry/InteractingBox \
+INCLUDEPATH += /usr/local/include/ \
+               ../../../DataClass/InteractingGeometry/InteractingBox \
                ../../../DataClass/BoundingVolume/AABB \
                ../../../Engine/MetaEngine/BoundingVolumeMetaEngine 
 QMAKE_LIBDIR = ../../../../../bin \

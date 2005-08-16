@@ -6,7 +6,8 @@
 LIBS += -lBoundingSphere \
         -lyade-lib-opengl \
         -rdynamic 
-INCLUDEPATH += ../../../DataClass/BoundingVolume/BoundingSphere \
+INCLUDEPATH += /usr/local/include/ \
+               ../../../DataClass/BoundingVolume/BoundingSphere \
                ../../../RenderingEngine/OpenGLRenderingEngine 
 QMAKE_LIBDIR = ../../../../../bin \
                /usr/local/lib/yade/yade-libs/ 

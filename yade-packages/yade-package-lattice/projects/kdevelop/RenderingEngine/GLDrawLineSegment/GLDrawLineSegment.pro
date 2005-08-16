@@ -6,7 +6,8 @@
 LIBS += -lLineSegment \
         -lyade-lib-opengl \
         -rdynamic 
-INCLUDEPATH += ../../DataClass/GeometricalModel/LineSegment 
+INCLUDEPATH += /usr/local/include/ \
+               ../../DataClass/GeometricalModel/LineSegment 
 QMAKE_LIBDIR = ../../../../bin \
                /usr/local/lib/yade/yade-package-common/ \
                /usr/local/lib/yade/yade-libs/ 

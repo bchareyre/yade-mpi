@@ -23,3 +23,5 @@ CONFIG += debug \
 TEMPLATE = lib 
 HEADERS += FEMNodeData.hpp 
 SOURCES += FEMNodeData.cpp 
+INCLUDEPATH += /usr/local/include
+

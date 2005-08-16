@@ -6,7 +6,8 @@
 LIBS += -lTetrahedron \
         -lyade-lib-opengl \
         -rdynamic 
-INCLUDEPATH += ../../../RenderingEngine/OpenGLRenderingEngine \
+INCLUDEPATH += /usr/local/include/ \
+               ../../../RenderingEngine/OpenGLRenderingEngine \
                ../../../DataClass/GeometricalModel/Tetrahedron 
 QMAKE_LIBDIR = ../../../../../bin \
                /usr/local/lib/yade/yade-libs/ 

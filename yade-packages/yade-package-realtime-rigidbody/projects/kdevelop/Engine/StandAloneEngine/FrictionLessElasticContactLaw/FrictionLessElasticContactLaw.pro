@@ -24,3 +24,5 @@ CONFIG += debug \
 TEMPLATE = lib 
 HEADERS += FrictionLessElasticContactLaw.hpp 
 SOURCES += FrictionLessElasticContactLaw.cpp 
+INCLUDEPATH += /usr/local/include
+

@@ -34,7 +34,8 @@ LIBS += -lFEMTetrahedronData \
         -lTranslationEngine \
         -lyade-lib-multimethods \
         -rdynamic 
-INCLUDEPATH += ../../Engine/StandAloneEngine/FEMLaw \
+INCLUDEPATH += /usr/local/include/ \
+               ../../Engine/StandAloneEngine/FEMLaw \
                ../../Engine/EngineUnit/FEMTetrahedronStiffness \
                ../../Engine/EngineUnit/FEMSetTextLoader \
                ../../DataClass/PhysicalParameters/FEMTetrahedronData \

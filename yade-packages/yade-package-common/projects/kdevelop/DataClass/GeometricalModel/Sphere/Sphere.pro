@@ -19,3 +19,5 @@ CONFIG += debug \
 TEMPLATE = lib 
 HEADERS += Sphere.hpp 
 SOURCES += Sphere.cpp 
+INCLUDEPATH += /usr/local/include
+

@@ -18,3 +18,5 @@ CONFIG += debug \
 TEMPLATE = lib 
 HEADERS += AveragePositionRecorder.hpp 
 SOURCES += AveragePositionRecorder.cpp 
+INCLUDEPATH += /usr/local/include
+

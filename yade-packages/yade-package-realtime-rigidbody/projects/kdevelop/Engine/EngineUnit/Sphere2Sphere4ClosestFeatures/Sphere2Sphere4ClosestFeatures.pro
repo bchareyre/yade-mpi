@@ -23,3 +23,5 @@ CONFIG += debug \
 TEMPLATE = lib 
 HEADERS += Sphere2Sphere4ClosestFeatures.hpp 
 SOURCES += Sphere2Sphere4ClosestFeatures.cpp 
+INCLUDEPATH += /usr/local/include
+

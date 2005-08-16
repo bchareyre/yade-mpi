@@ -7,7 +7,8 @@ LIBS += -lLatticeBeamParameters \
         -lLatticeNodeParameters \
         -lForce \
         -lParticleParameters 
-INCLUDEPATH += ../../../DataClass/PhysicalParameters/LatticeNodeParameters \
+INCLUDEPATH += /usr/local/include/ \
+               ../../../DataClass/PhysicalParameters/LatticeNodeParameters \
                ../../../DataClass/PhysicalParameters/LatticeBeamParameters 
 QMAKE_LIBDIR = ../../../../../bin \
                ../../../../../bin \

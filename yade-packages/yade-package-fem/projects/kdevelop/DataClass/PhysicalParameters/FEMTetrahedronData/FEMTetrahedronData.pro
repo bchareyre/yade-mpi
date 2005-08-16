@@ -11,7 +11,8 @@ LIBS += -lFEMNodeData \
         -lyade-lib-wm3-math \
         -lyade-lib-multimethods \
         -rdynamic 
-INCLUDEPATH += ../../../DataClass/PhysicalParameters/FEMNodeData 
+INCLUDEPATH += /usr/local/include/ \
+               ../../../DataClass/PhysicalParameters/FEMNodeData 
 QMAKE_LIBDIR = ../../../../../bin \
                /usr/local/lib/yade/yade-package-common/ \
                /usr/local/lib/yade/yade-libs/ 

@@ -16,3 +16,5 @@ HEADERS += AssocVector.hpp \
            Typelist.hpp \
            TypeManip.hpp \
            TypeTraits.hpp 
+INCLUDEPATH += /usr/local/include
+

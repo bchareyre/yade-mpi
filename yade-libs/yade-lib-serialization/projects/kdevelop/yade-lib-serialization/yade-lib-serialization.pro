@@ -24,7 +24,7 @@ SOURCES += Archive.cpp \
            Serializable.cpp \
            SerializableSingleton.cpp \
            SerializationExceptions.cpp 
-INCLUDEPATH += /usr/local/include/yade
+INCLUDEPATH += /usr/local/include
 TARGET = ../../../bin/yade-lib-serialization
 CONFIG += debug \
 warn_on \

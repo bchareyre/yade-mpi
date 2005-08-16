@@ -19,3 +19,5 @@ CONFIG += debug \
 TEMPLATE = lib 
 HEADERS += Mesh2D.hpp 
 SOURCES += Mesh2D.cpp 
+INCLUDEPATH += /usr/local/include
+

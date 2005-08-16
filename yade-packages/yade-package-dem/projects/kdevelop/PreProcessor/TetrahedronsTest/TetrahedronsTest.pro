@@ -37,7 +37,8 @@ LIBS += -lPolyhedralSweptSphere \
         -lyade-lib-wm3-math \
         -lyade-lib-multimethods \
         -rdynamic 
-INCLUDEPATH += ../../Engine/StandAloneEngine/SDECTimeStepper \
+INCLUDEPATH += /usr/local/include/ \
+               ../../Engine/StandAloneEngine/SDECTimeStepper \
                ../../Engine/StandAloneEngine/SwiftPolyhedronProximityModeler \
                ../../Engine/StandAloneEngine/ElasticContactLaw \
                ../../Engine/EngineUnit/MacroMicroElasticRelationships \

@@ -8,7 +8,8 @@ LIBS += -lParticleParameters \
         -lyade-lib-wm3-math \
         -lyade-lib-multimethods \
         -rdynamic 
-INCLUDEPATH += ../../../DataClass/PhysicalParameters/ParticleParameters 
+INCLUDEPATH += /usr/local/include/ \
+               ../../../DataClass/PhysicalParameters/ParticleParameters 
 QMAKE_LIBDIR = ../../../../../bin \
                /usr/local/lib/yade/yade-libs/ 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \

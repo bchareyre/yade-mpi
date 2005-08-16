@@ -36,7 +36,8 @@ LIBS += -lSDECLinkGeometry \
         -lSAPCollider \
         -lInteractionDescriptionSet2AABB \
         -rdynamic 
-INCLUDEPATH += ../../Engine/StandAloneEngine/VelocityRecorder \
+INCLUDEPATH += /usr/local/include/ \
+               ../../Engine/StandAloneEngine/VelocityRecorder \
                ../../Engine/StandAloneEngine/ForceRecorder \
                ../../Engine/StandAloneEngine/AveragePositionRecorder \
                ../../Engine/StandAloneEngine/SDECTimeStepper \

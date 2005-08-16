@@ -25,3 +25,5 @@ CONFIG += debug \
 TEMPLATE = lib 
 HEADERS += AABox2Sphere4ClosestFeatures.hpp 
 SOURCES += AABox2Sphere4ClosestFeatures.cpp 
+INCLUDEPATH += /usr/local/include
+

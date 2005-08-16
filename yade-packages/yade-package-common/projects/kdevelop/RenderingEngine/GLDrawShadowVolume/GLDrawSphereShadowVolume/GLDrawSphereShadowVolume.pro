@@ -7,7 +7,8 @@ LIBS += -lSphere \
         -lParticleParameters \
         -lyade-lib-opengl \
         -rdynamic 
-INCLUDEPATH += ../../../DataClass/GeometricalModel/Sphere \
+INCLUDEPATH += /usr/local/include/ \
+               ../../../DataClass/GeometricalModel/Sphere \
                ../../../RenderingEngine/OpenGLRenderingEngine 
 QMAKE_LIBDIR = ../../../../../bin \
                ../../../../../bin \

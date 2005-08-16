@@ -8,7 +8,8 @@ LIBS += -lFEMSetParameters \
         -lPhysicalParametersMetaEngine \
         -lParticleParameters \
         -rdynamic 
-INCLUDEPATH += ../../../DataClass/PhysicalParameters/FEMTetrahedronData \
+INCLUDEPATH += /usr/local/include/ \
+               ../../../DataClass/PhysicalParameters/FEMTetrahedronData \
                ../../../DataClass/PhysicalParameters/FEMSetParameters 
 QMAKE_LIBDIR = ../../../../../bin \
                ../../../../../bin \

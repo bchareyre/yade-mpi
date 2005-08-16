@@ -6,7 +6,8 @@
 LIBS += -lInteractingSphere \
         -lyade-lib-opengl \
         -rdynamic 
-INCLUDEPATH += ../../../DataClass/InteractingGeometry/InteractingSphere \
+INCLUDEPATH += /usr/local/include/ \
+               ../../../DataClass/InteractingGeometry/InteractingSphere \
                ../../../RenderingEngine/OpenGLRenderingEngine 
 QMAKE_LIBDIR = ../../../../../bin \
                /usr/local/lib/yade/yade-libs/ 

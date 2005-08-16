@@ -8,7 +8,8 @@ LIBS += -lPhysicalActionApplier \
         -lRigidBodyParameters \
         -lPhysicalActionApplier \
         -rdynamic 
-INCLUDEPATH += ../../../DataClass/PhysicalAction/Momentum \
+INCLUDEPATH += /usr/local/include/ \
+               ../../../DataClass/PhysicalAction/Momentum \
                ../../../DataClass/PhysicalParameters/RigidBodyParameters \
                ../../../DataClass/PhysicalParameters/ParticleParameters \
                ../../../Engine/MetaEngine/PhysicalActionApplier 

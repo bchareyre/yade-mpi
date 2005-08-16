@@ -21,3 +21,5 @@ CONFIG += debug \
 TEMPLATE = lib 
 HEADERS += LatticeBeamParameters.hpp 
 SOURCES += LatticeBeamParameters.cpp 
+INCLUDEPATH += /usr/local/include
+

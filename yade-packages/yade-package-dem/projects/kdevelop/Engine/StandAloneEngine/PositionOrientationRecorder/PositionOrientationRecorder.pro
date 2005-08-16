@@ -18,3 +18,5 @@ CONFIG += debug \
 TEMPLATE = lib 
 HEADERS += PositionOrientationRecorder.hpp 
 SOURCES += PositionOrientationRecorder.cpp 
+INCLUDEPATH += /usr/local/include
+

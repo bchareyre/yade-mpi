@@ -7,7 +7,8 @@ LIBS += -lParticleSetParameters \
         -lGeometricalModelMetaEngine \
         -lMesh2D \
         -rdynamic 
-INCLUDEPATH += ../../../DataClass/PhysicalParameters/ParticleSetParameters 
+INCLUDEPATH += /usr/local/include/ \
+               ../../../DataClass/PhysicalParameters/ParticleSetParameters 
 QMAKE_LIBDIR = ../../../../../bin \
                /usr/local/lib/yade/yade-package-common/ \
                /usr/local/lib/yade/yade-libs/ 

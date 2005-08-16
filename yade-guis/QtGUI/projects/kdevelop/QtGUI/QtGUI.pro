@@ -75,3 +75,5 @@ SOURCES += FileDialog.cpp \
            YadeQtMainWindow.cpp \
            QtGUIPreferences.cpp \
            QtMetaDispatchingEngineProperties.cpp 
+INCLUDEPATH += /usr/local/include
+

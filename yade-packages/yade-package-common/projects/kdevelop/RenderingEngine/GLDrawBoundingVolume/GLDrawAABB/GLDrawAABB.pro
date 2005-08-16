@@ -6,7 +6,8 @@
 LIBS += -lAABB \
         -lyade-lib-opengl \
         -rdynamic 
-INCLUDEPATH += ../../../DataClass/BoundingVolume/AABB \
+INCLUDEPATH += /usr/local/include/ \
+               ../../../DataClass/BoundingVolume/AABB \
                ../../../RenderingEngine/OpenGLRenderingEngine 
 QMAKE_LIBDIR = ../../../../../bin \
                /usr/local/lib/yade/yade-libs/ 

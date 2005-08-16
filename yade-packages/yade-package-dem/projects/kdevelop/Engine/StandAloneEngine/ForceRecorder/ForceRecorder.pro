@@ -19,3 +19,5 @@ CONFIG += debug \
 TEMPLATE = lib 
 HEADERS += ForceRecorder.hpp 
 SOURCES += ForceRecorder.cpp 
+INCLUDEPATH += /usr/local/include
+

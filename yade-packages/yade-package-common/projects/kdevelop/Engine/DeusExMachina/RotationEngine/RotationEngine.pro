@@ -9,7 +9,8 @@ LIBS += -lParticleParameters \
         -lyade-lib-wm3-math \
         -lyade-lib-multimethods \
         -rdynamic 
-INCLUDEPATH += ../../../DataClass/PhysicalParameters/RigidBodyParameters \
+INCLUDEPATH += /usr/local/include/ \
+               ../../../DataClass/PhysicalParameters/RigidBodyParameters \
                ../../../DataClass/PhysicalParameters/ParticleParameters 
 QMAKE_LIBDIR = ../../../../../bin \
                ../../../../../bin \

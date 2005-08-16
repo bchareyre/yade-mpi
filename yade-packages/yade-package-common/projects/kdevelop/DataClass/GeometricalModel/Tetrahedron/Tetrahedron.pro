@@ -17,3 +17,5 @@ CONFIG += debug \
 TEMPLATE = lib 
 HEADERS += Tetrahedron.hpp 
 SOURCES += Tetrahedron.cpp 
+INCLUDEPATH += /usr/local/include
+

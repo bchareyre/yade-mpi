@@ -7,7 +7,8 @@ LIBS += -lFEMTetrahedronData \
         -lForce \
         -lParticleParameters \
         -rdynamic 
-INCLUDEPATH += ../../../DataClass/PhysicalParameters/FEMTetrahedronData \
+INCLUDEPATH += /usr/local/include/ \
+               ../../../DataClass/PhysicalParameters/FEMTetrahedronData \
                ../../../DataClass/PhysicalParameters/FEMNodeData 
 QMAKE_LIBDIR = ../../../../../bin \
                /usr/local/lib/yade/yade-package-common/ \

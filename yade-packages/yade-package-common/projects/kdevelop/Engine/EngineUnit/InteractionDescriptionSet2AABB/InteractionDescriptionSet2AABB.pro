@@ -7,7 +7,8 @@ LIBS += -lBoundingVolumeMetaEngine \
         -lMetaInteractingGeometry \
         -lAABB \
         -rdynamic 
-INCLUDEPATH += ../../../DataClass/InteractingGeometry/MetaInteractingGeometry \
+INCLUDEPATH += /usr/local/include/ \
+               ../../../DataClass/InteractingGeometry/MetaInteractingGeometry \
                ../../../DataClass/BoundingVolume/AABB \
                ../../../Engine/MetaEngine/BoundingVolumeMetaEngine 
 QMAKE_LIBDIR = ../../../../../bin \

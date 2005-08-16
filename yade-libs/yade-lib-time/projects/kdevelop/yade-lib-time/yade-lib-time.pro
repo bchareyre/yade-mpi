@@ -10,3 +10,5 @@ CONFIG += debug \
 TEMPLATE = lib 
 HEADERS += Chrono.hpp 
 SOURCES += Chrono.cpp 
+INCLUDEPATH += /usr/local/include
+

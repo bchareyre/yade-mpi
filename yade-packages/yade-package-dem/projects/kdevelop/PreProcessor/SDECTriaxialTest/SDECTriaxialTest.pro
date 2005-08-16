@@ -24,7 +24,8 @@ LIBS += -lBodyMacroParameters \
         -lBox \
         -lInteractionDescriptionSet2AABB \
         -rdynamic 
-INCLUDEPATH += ../../Engine/StandAloneEngine/SDECTimeStepper \
+INCLUDEPATH += /usr/local/include/ \
+               ../../Engine/StandAloneEngine/SDECTimeStepper \
                ../../Engine/StandAloneEngine/ElasticContactLaw \
                ../../Engine/EngineUnit/MacroMicroElasticRelationships \
                ../../DataClass/PhysicalParameters/BodyMacroParameters 
