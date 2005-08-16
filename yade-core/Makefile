@@ -29,7 +29,7 @@ all:
 	
 	find . -name "*.pro" -print | \
 		while read name; \
-			do grep -l ${PREFIX_DIR}/${INSTALL_DIR} $${name}; \
+			do grep -l $(subst //,/,$(subst //,/,${PREFIX_DIR}/${INSTALL_DIR})) $${name}; \
 		done | while read name2; \
 			do mv $${name2} $${name2}.tmp; \
 			cat $${name2}.tmp | sed -e "s/$(subst /,\/,$(subst //,/,$(subst //,/,${PREFIX_DIR}/${INSTALL_DIR})))/\/usr\/local/" > $${name2}; \
@@ -44,7 +44,8 @@ clean:
 	-find ./projects/kdevelop -name "*.kdevelop.pcs" -exec rm {} \;
 
 install:
-	mkdir --parents ${PREFIX_DIR}/${INSTALL_DIR}/include/yade/${yade_include_subdir}
+	mkdir  --parents ${PREFIX_DIR}/${INSTALL_DIR}/include/yade/${yade_include_subdir}
+	-mkdir --parents ${PREFIX_DIR}/${INSTALL_DIR}/bin
 	cp bin/* ${PREFIX_DIR}/${INSTALL_DIR}/bin
 	cp src/*.hpp ${PREFIX_DIR}/${INSTALL_DIR}/include/yade/${yade_include_subdir}
 
