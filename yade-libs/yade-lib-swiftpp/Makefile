@@ -44,7 +44,7 @@ clean:
 install:
 	mkdir --parents ${PREFIX_DIR}/${INSTALL_DIR}/lib/yade/${yade_lib_subdir}
 	mkdir --parents ${PREFIX_DIR}/${INSTALL_DIR}/include/yade/${yade_include_subdir}
-	cp bin/* ${PREFIX_DIR}/${INSTALL_DIR}/lib/yade/${yade_lib_subdir}
+	cp --no-dereference bin/* ${PREFIX_DIR}/${INSTALL_DIR}/lib/yade/${yade_lib_subdir}
 	cp src/*.h ${PREFIX_DIR}/${INSTALL_DIR}/include/yade/${yade_include_subdir}
 
 uninstall:

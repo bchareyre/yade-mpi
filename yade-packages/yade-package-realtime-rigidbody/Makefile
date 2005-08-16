@@ -44,7 +44,7 @@ clean:
 install:
 	mkdir --parents ${PREFIX_DIR}/${INSTALL_DIR}/lib/yade/${yade_package_subdir}
 	mkdir --parents ${PREFIX_DIR}/${INSTALL_DIR}/include/yade/${yade_include_subdir}
-	cp bin/* ${PREFIX_DIR}/${INSTALL_DIR}/lib/yade/${yade_package_subdir}
+	cp --no-dereference bin/* ${PREFIX_DIR}/${INSTALL_DIR}/lib/yade/${yade_package_subdir}
 	find . -name "*.hpp" -exec cp {}  ${PREFIX_DIR}/${INSTALL_DIR}/include/yade/${yade_include_subdir} \;
 
 uninstall:
