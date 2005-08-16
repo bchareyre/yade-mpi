@@ -22,7 +22,7 @@ compile_install:
 	$(MAKE) -C yade-packages compile_install
 	
 	@echo --
-	@echo Compilation finished. Check above for possible errors.
+	@echo Compilation and installation finished.
 	@echo --
 
 uninstall:

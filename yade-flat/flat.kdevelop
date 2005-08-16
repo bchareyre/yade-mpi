@@ -100,7 +100,7 @@
     </general>
     <make>
       <abortonerror>true</abortonerror>
-      <numberofjobs>3</numberofjobs>
+      <numberofjobs>4</numberofjobs>
       <dontact>false</dontact>
       <makebin></makebin>
       <prio>0</prio>

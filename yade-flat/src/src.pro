@@ -3,6 +3,38 @@
 # Subdir relative project main directory: ./src
 # Target is an application:  ../bin/yade
 
+YadeQtGeneratedMainWindow.ui.target = YadeQtGeneratedMainWindow.ui 
+YadeQtGeneratedMainWindow.ui.commands = $$IDL_COMPILER 
+QtGeneratedSimulationController.ui.target = QtGeneratedSimulationController.ui 
+QtGeneratedSimulationController.ui.commands = $$IDL_COMPILER 
+QtGeneratedPreferencesEditor.ui.target = QtGeneratedPreferencesEditor.ui 
+QtGeneratedPreferencesEditor.ui.commands = $$IDL_COMPILER 
+QtGeneratedMetaDispatchingEngineProperties.ui.target = QtGeneratedMetaDispatchingEngineProperties.ui 
+QtGeneratedMetaDispatchingEngineProperties.ui.commands = $$IDL_COMPILER 
+QtGeneratedMessageDialog.ui.target = QtGeneratedMessageDialog.ui 
+QtGeneratedMessageDialog.ui.commands = $$IDL_COMPILER 
+QtGeneratedEngineEditor.ui.target = QtGeneratedEngineEditor.ui 
+QtGeneratedEngineEditor.ui.commands = $$IDL_COMPILER 
+QtGeneratedCodeGenerator.ui.target = QtGeneratedCodeGenerator.ui 
+QtGeneratedCodeGenerator.ui.commands = $$IDL_COMPILER 
+QtFileGeneratorController.ui.target = QtFileGeneratorController.ui 
+QtFileGeneratorController.ui.commands = $$IDL_COMPILER 
+LIBS += -lboost_thread \
+        -lboost_filesystem \
+        -lboost_date_time \
+        -lglut \
+        -lQGLViewer \
+        -rdynamic 
+INCLUDEPATH += ../src \
+               /home/janek/YADE2/include/ 
+QMAKE_CXXFLAGS_RELEASE += -lpthread \
+                          -pthread 
+QMAKE_CXXFLAGS_DEBUG += -lpthread \
+                        -pthread 
+TARGET = ../bin/yade 
+CONFIG += release \
+          warn_on 
+TEMPLATE = app 
 FORMS += QtFileGeneratorController.ui \
          QtGeneratedMessageDialog.ui \
          QtGeneratedSimulationController.ui \
@@ -509,38 +541,3 @@ SOURCES += yade.cpp \
            XMLSaxParser.cpp \
            yadeExceptions.cpp \
            YadeQtMainWindow.cpp 
-YadeQtGeneratedMainWindow.ui.target = YadeQtGeneratedMainWindow.ui
-YadeQtGeneratedMainWindow.ui.commands = $$IDL_COMPILER
-QtGeneratedSimulationController.ui.target = QtGeneratedSimulationController.ui
-QtGeneratedSimulationController.ui.commands = $$IDL_COMPILER
-QtGeneratedMessageDialog.ui.target = QtGeneratedMessageDialog.ui
-QtGeneratedMessageDialog.ui.commands = $$IDL_COMPILER
-QtFileGeneratorController.ui.target = QtFileGeneratorController.ui
-QtFileGeneratorController.ui.commands = $$IDL_COMPILER
-LIBS += -lboost_thread \
--lboost_filesystem \
--lboost_date_time \
--lglut \
--lQGLViewer \
--rdynamic
-INCLUDEPATH += ../src
-QMAKE_CXXFLAGS_RELEASE += -lpthread \
--pthread
-QMAKE_CXXFLAGS_DEBUG += -lpthread \
--pthread
-TARGET = ../bin/yade
-CONFIG += debug \
-warn_on
-QtGeneratedPreferencesEditor.ui.commands = $$IDL_COMPILER $$IDL_OPTIONS $$QtGeneratedPreferencesEditor.ui.target
-QtGeneratedPreferencesEditor.ui.target = QtGeneratedPreferencesEditor.ui
-QtGeneratedMetaDispatchingEngineProperties.ui.commands = $$IDL_COMPILER $$IDL_OPTIONS $$QtGeneratedMetaDispatchingEngineProperties.ui.target
-QtGeneratedMetaDispatchingEngineProperties.ui.target = QtGeneratedMetaDispatchingEngineProperties.ui
-QtGeneratedEngineEditor.ui.commands = $$IDL_COMPILER $$IDL_OPTIONS $$QtGeneratedEngineEditor.ui.target
-QtGeneratedEngineEditor.ui.target = QtGeneratedEngineEditor.ui
-QtGeneratedCodeGenerator.ui.commands = $$IDL_COMPILER $$IDL_OPTIONS $$QtGeneratedCodeGenerator.ui.target
-QtGeneratedCodeGenerator.ui.target = QtGeneratedCodeGenerator.ui
-TEMPLATE = app
-QtGeneratedPreferencesEditor.ui.target = QtGeneratedPreferencesEditor.ui
-QtGeneratedMetaDispatchingEngineProperties.ui.target = QtGeneratedMetaDispatchingEngineProperties.ui
-QtGeneratedEngineEditor.ui.target = QtGeneratedEngineEditor.ui
-QtGeneratedCodeGenerator.ui.target = QtGeneratedCodeGenerator.ui
