@@ -148,6 +148,6 @@ echo "if you didn't commit in previous step, you had some svn errors, and nothin
 echo ""
 echo "All filenames renamed, you should commit now. Next step:"
 echo " - MAKE A FRESH CHECKOUT from repository, otherwise svn will fuck up process of renaming directories."
-echo " - then you can do:   ./renameClassDirectories $1 $2"
+echo " - then you can do:   ./yade-scripts/renameClassDirectories $1 $2"
 echo ""
 
