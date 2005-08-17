@@ -3,12 +3,12 @@
 # Subdir relative project main directory: ./Engine/StandAloneEngine/SwiftPolyhedronProximityModeler
 # Target is a library:  
 
-LIBS += -lMacroMicroContactGeometry \
+LIBS += -lSpheresContactGeometry \
         -lPolyhedralSweptSphere \
         -lyade-lib-swiftpp \
         -rdynamic 
 INCLUDEPATH += /usr/local/include/ \
-               ../../../DataClass/InteractionGeometry/MacroMicroContactGeometry \
+               ../../../DataClass/InteractionGeometry/SpheresContactGeometry \
                ../../../DataClass/InteractingGeometry/PolyhedralSweptSphere 
 QMAKE_LIBDIR = ../../../../../bin \
                /usr/local/lib/yade/yade-libs/ 

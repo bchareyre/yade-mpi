@@ -1,10 +1,18 @@
 #! /bin/sh
 
 echo "finding .pro files ... "
-find ../projects/kdevelop/  -name "*.pro" -exec fgrep -l "$2" {} \;		> ./proRenameClass
+find ./  -name "*.pro" -exec fgrep -l "$2" {} \;				> ./proRenameClass
 
 echo "finding .hpp files ... "
-find ../src/  -name "*.hpp" -exec fgrep -l "$2" {} \;				> ./hppRenameClass
+find ./  -name "*.hpp" -exec fgrep -l "$2" {} \;				> ./hppRenameClass6
+cat ./hppRenameClass6 | while read name; do
+  if [ -L $name ]; then
+    echo skipping .hpp symlink..
+  else
+    echo $name									> ./hppRenameClass
+  fi;
+done
+
 
 cat ./proRenameClass  | grep -e "\<$1\>"					> ./proRenameClass2
 cat ./hppRenameClass  | grep -e "\<$1\>"					> ./hppRenameClass2

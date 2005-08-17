@@ -3,7 +3,7 @@
 # Subdir relative project main directory: ./Engine/EngineUnit/Box2Sphere4MacroMicroContactGeometry
 # Target is a library:  
 
-LIBS += -lMacroMicroContactGeometry \
+LIBS += -lSpheresContactGeometry \
         -lInteractionGeometryMetaEngine \
         -lyade-lib-wm3-math \
         -lyade-lib-multimethods \
@@ -11,7 +11,7 @@ LIBS += -lMacroMicroContactGeometry \
         -lInteractingBox \
         -rdynamic 
 INCLUDEPATH += /usr/local/include/ \
-               ../../../DataClass/InteractionGeometry/MacroMicroContactGeometry 
+               ../../../DataClass/InteractionGeometry/SpheresContactGeometry 
 QMAKE_LIBDIR = ../../../../../bin \
                /usr/local/lib/yade/yade-package-common/ \
                /usr/local/lib/yade/yade-libs/ 

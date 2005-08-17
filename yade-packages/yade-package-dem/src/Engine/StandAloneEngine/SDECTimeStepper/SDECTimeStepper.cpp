@@ -24,7 +24,7 @@
 #include "SDECTimeStepper.hpp"
 #include "BodyMacroParameters.hpp"
 #include "ElasticContactParameters.hpp"
-#include "MacroMicroContactGeometry.hpp"
+#include "SpheresContactGeometry.hpp"
 #include "MacroMicroElasticRelationships.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -106,7 +106,7 @@ void SDECTimeStepper::findTimeStepFromInteraction(const shared_ptr<Interaction>&
 		return; // skip other groups
 
 	ElasticContactParameters* sdecContact = dynamic_cast<ElasticContactParameters*>(interaction->interactionPhysics.get());
-	MacroMicroContactGeometry* interactionGeometry = dynamic_cast<MacroMicroContactGeometry*>(interaction->interactionGeometry.get());
+	SpheresContactGeometry* interactionGeometry = dynamic_cast<SpheresContactGeometry*>(interaction->interactionGeometry.get());
 	BodyMacroParameters * body1	= dynamic_cast<BodyMacroParameters*>((*bodies)[id1]->physicalParameters.get());
 	BodyMacroParameters * body2	= dynamic_cast<BodyMacroParameters*>((*bodies)[id2]->physicalParameters.get());
 

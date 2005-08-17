@@ -22,7 +22,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "Box2Sphere4MacroMicroContactGeometry.hpp"
-#include "MacroMicroContactGeometry.hpp"
+#include "SpheresContactGeometry.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -102,11 +102,11 @@ bool Box2Sphere4MacroMicroContactGeometry::go(		const shared_ptr<InteractingGeom
 		pt2 = se32.position - normal*s->radius;	
 
 		// FIXME : remove those uncommented lines
-		shared_ptr<MacroMicroContactGeometry> scm;
+		shared_ptr<SpheresContactGeometry> scm;
 		if (c->isNew)
-			scm = shared_ptr<MacroMicroContactGeometry>(new MacroMicroContactGeometry());
+			scm = shared_ptr<SpheresContactGeometry>(new SpheresContactGeometry());
 		else
-			scm = dynamic_pointer_cast<MacroMicroContactGeometry>(c->interactionGeometry);
+			scm = dynamic_pointer_cast<SpheresContactGeometry>(c->interactionGeometry);
 			
 		scm->contactPoint = 0.5*(pt1+pt2);
 		scm->normal = pt1-pt2;
@@ -117,7 +117,7 @@ bool Box2Sphere4MacroMicroContactGeometry::go(		const shared_ptr<InteractingGeom
 		
 // FIXME : uncommente those lines	
 /////////////////////////////////////////////////
-// 		shared_ptr<MacroMicroContactGeometry> scm = shared_ptr<MacroMicroContactGeometry>(new MacroMicroContactGeometry());
+// 		shared_ptr<SpheresContactGeometry> scm = shared_ptr<SpheresContactGeometry>(new SpheresContactGeometry());
 // 		scm->contactPoint = 0.5*(pt1+pt2);
 // 		scm->normal = pt1-pt2;
 // 		scm->penetrationDepth = scm->normal.normalize();
@@ -145,11 +145,11 @@ bool Box2Sphere4MacroMicroContactGeometry::go(		const shared_ptr<InteractingGeom
 	pt2 = se32.position - normal * s->radius;
 	
 	// FIXME : remove those uncommented lines
-	shared_ptr<MacroMicroContactGeometry> scm;
+	shared_ptr<SpheresContactGeometry> scm;
 	if (c->isNew)
-		scm = shared_ptr<MacroMicroContactGeometry>(new MacroMicroContactGeometry());
+		scm = shared_ptr<SpheresContactGeometry>(new SpheresContactGeometry());
 	else
-		scm = dynamic_pointer_cast<MacroMicroContactGeometry>(c->interactionGeometry);	
+		scm = dynamic_pointer_cast<SpheresContactGeometry>(c->interactionGeometry);	
 	scm->contactPoint = 0.5*(pt1+pt2);
 	scm->normal = pt1-pt2;
 	scm->penetrationDepth = scm->normal.normalize();
@@ -158,7 +158,7 @@ bool Box2Sphere4MacroMicroContactGeometry::go(		const shared_ptr<InteractingGeom
 	c->interactionGeometry = scm;
 // FIXME : uncommente those lines	
 /////////////////////////////////////////////////	
-// 	shared_ptr<MacroMicroContactGeometry> scm = shared_ptr<MacroMicroContactGeometry>(new MacroMicroContactGeometry());
+// 	shared_ptr<SpheresContactGeometry> scm = shared_ptr<SpheresContactGeometry>(new SpheresContactGeometry());
 // 	scm->contactPoint = 0.5*(pt1+pt2);
 // 	scm->normal = pt1-pt2;
 // 	scm->penetrationDepth = scm->normal.normalize();
@@ -181,7 +181,7 @@ bool Box2Sphere4MacroMicroContactGeometry::goReverse(	const shared_ptr<Interacti
 	bool isInteracting = go(cm2,cm1,se32,se31,c);
 	if (isInteracting)
 	{
-		shared_ptr<MacroMicroContactGeometry> scm = dynamic_pointer_cast<MacroMicroContactGeometry>(c->interactionGeometry);
+		shared_ptr<SpheresContactGeometry> scm = dynamic_pointer_cast<SpheresContactGeometry>(c->interactionGeometry);
 		//Vector3r tmp = scm->closestsPoints[0].first;		
 		//scm->closestsPoints[0].first = scm->closestsPoints[0].second;
 		//scm->closestsPoints[0].second = tmp;

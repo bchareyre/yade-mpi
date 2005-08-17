@@ -3,8 +3,7 @@
 echo ""
 echo "You have decided to rename class: $1 to a new name: $2, very good."
 echo "But first make sure that : "
-echo " - you have exectued script ./prepareForSubversion"
-echo " - svn status in main yade/ directory displays NO CHANGES at all, well, actually changes"
+echo " - svn status in trunk/ directory displays NO CHANGES at all, well, actually changes"
 echo "   totally unrelated to those classes should work... "
 echo ""
 echo -n " > Do you want to continue? (enter 'n' to abort) : "; read x; if [ "$x" = "n" ]; then exit; fi
@@ -14,43 +13,51 @@ echo ' '									>  ./empty
 
 echo '#! /bin/sh'								>  ./changeWholeWord
 echo 'echo CHANGING $1'								>> ./changeWholeWord
-echo 'mv $1 $1.tmp'								>> ./changeWholeWord
-echo 'cat $1.tmp | sed -e "s/\<$2\>/$3/g" > $1'					>> ./changeWholeWord
-echo 'rm $1.tmp'								>> ./changeWholeWord
+echo 'if [ -L $1 ]; then'							>> ./changeWholeWord
+echo '  echo it is a symbolic link.'						>> ./changeWholeWord
+echo 'else'									>> ./changeWholeWord
+echo '  mv $1 $1.tmp'								>> ./changeWholeWord
+echo '  cat $1.tmp | sed -e "s/\<$2\>/$3/g" > $1'				>> ./changeWholeWord
+echo '  rm $1.tmp'								>> ./changeWholeWord
+echo 'fi'									>> ./changeWholeWord
 
 chmod a+x ./changeWholeWord
 
 echo '#! /bin/sh'								>  ./changeLibWord
 echo 'echo CHANGING $1'								>> ./changeLibWord
-echo 'mv $1 $1.tmp'								>> ./changeLibWord
-echo 'cat $1.tmp | sed -e "s/-l$2/-l$3/" > $1'					>> ./changeLibWord
-echo 'rm $1.tmp'								>> ./changeLibWord
+echo 'if [ -L $1 ]; then'							>> ./changeLibWord
+echo '  echo it is a symbolic link.'						>> ./changeLibWord
+echo 'else'									>> ./changeLibWord
+echo '  mv $1 $1.tmp'								>> ./changeLibWord
+echo '  cat $1.tmp | sed -e "s/-l$2/-l$3/" > $1'				>> ./changeLibWord
+echo '  rm $1.tmp'								>> ./changeLibWord
+echo 'fi'									>> ./changeLibWord
 
 chmod a+x ./changeLibWord
 
 echo "finding .pro files ... "
-find ../projects/kdevelop/  -name "*.pro" -exec fgrep -l "$1" {} \;		> ./proRenameClass
+find ./ -name "*.pro" -exec fgrep -l "$1" {} \;					>  ./proRenameClass
 echo './empty'									>> ./proRenameClass
 find `cat proRenameClass` -exec ./changeWholeWord {} $1 $2 \;
 find `cat proRenameClass` -exec ./changeLibWord {} $1 $2 \;
 
 echo "finding .hpp files ... "
-find ../src/  -name "*.hpp" -exec fgrep -l "$1" {} \;				> ./hppRenameClass
+find ./  -name "*.hpp" -exec fgrep -l "$1" {} \;				>  ./hppRenameClass
 echo './empty'									>> ./hppRenameClass
 find `cat hppRenameClass` -exec ./changeWholeWord {} $1 $2 \;
 
 echo "finding .cpp files ... "
-find ../src/  -name "*.cpp" -exec fgrep -l "$1" {} \;				> ./cppRenameClass
+find ./  -name "*.cpp" -exec fgrep -l "$1" {} \;				>  ./cppRenameClass
 echo './empty'									>> ./cppRenameClass
 find `cat cppRenameClass` -exec ./changeWholeWord {} $1 $2 \;
 
 echo "finding .tpp files ... "
-find ../src/  -name "*.tpp" -exec fgrep -l "$1" {} \;				> ./tppRenameClass
+find ./  -name "*.tpp" -exec fgrep -l "$1" {} \;				>  ./tppRenameClass
 echo './empty'									>> ./tppRenameClass
 find `cat tppRenameClass` -exec ./changeWholeWord {} $1 $2 \;
 
 echo "finding .ipp files ... "
-find ../src/  -name "*.ipp" -exec fgrep -l "$1" {} \;				> ./ippRenameClass
+find ./  -name "*.ipp" -exec fgrep -l "$1" {} \;				>  ./ippRenameClass
 echo './empty'									>> ./ippRenameClass
 find `cat ippRenameClass` -exec ./changeWholeWord {} $1 $2 \;
 
@@ -65,8 +72,8 @@ rm ./ippRenameClass
 
 
 echo ""
-echo "All files modifed, you should commit now. Next step: ./renameClassFilenames $1 $2"
+echo "All files modifed, you should commit now. Next step: ./yade-scripts/renameClassFilenames $1 $2"
 echo ""
-echo "this operation can be fully reverted by command ./renameClassFirst $2 $1"
+echo "this operation can be fully reverted by command ./yade-scripts/renameClassFirst $2 $1"
 echo ""
 

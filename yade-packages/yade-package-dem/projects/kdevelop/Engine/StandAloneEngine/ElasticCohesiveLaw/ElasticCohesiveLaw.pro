@@ -6,7 +6,7 @@
 LIBS += -lSDECLinkPhysics \
         -lElasticContactParameters \
         -lSDECLinkGeometry \
-        -lMacroMicroContactGeometry \
+        -lSpheresContactGeometry \
         -lBodyMacroParameters \
         -lyade-lib-wm3-math \
         -lyade-lib-multimethods \
@@ -19,7 +19,7 @@ INCLUDEPATH += /usr/local/include/ \
                ../../../DataClass/InteractionPhysics/SDECLinkPhysics \
                ../../../DataClass/InteractionPhysics/ElasticContactParameters \
                ../../../DataClass/InteractionGeometry/SDECLinkGeometry \
-               ../../../DataClass/InteractionGeometry/MacroMicroContactGeometry \
+               ../../../DataClass/InteractionGeometry/SpheresContactGeometry \
                ../../../DataClass/PhysicalParameters/BodyMacroParameters 
 QMAKE_LIBDIR = ../../../../../bin \
                ../../../../../bin \

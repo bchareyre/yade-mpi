@@ -34,7 +34,7 @@
 #include <yade/yade-common/Mesh2D.hpp>
 
 #include <yade/yade-common/BodyMacroParameters.hpp>
-#include <yade/yade-common/MacroMicroContactGeometry.hpp>
+#include <yade/yade-common/SpheresContactGeometry.hpp>
 #include <yade/yade-common/SDECLinkGeometry.hpp>
 #include <yade/yade-common/ElasticContactParameters.hpp>
 #include <yade/yade-common/SDECLinkPhysics.hpp>
@@ -99,7 +99,7 @@ void MassSpringBody2RigidBodyLaw::calculateForces(Body * body)
 // BEGIN - this is code just duplicated from ElasticContactLaw for non-permanent links
 		shared_ptr<BodyMacroParameters> de1 	= dynamic_pointer_cast<BodyMacroParameters>((*bodies)[id1]->physicalParameters);
 		shared_ptr<BodyMacroParameters> de2 	= dynamic_pointer_cast<BodyMacroParameters>((*bodies)[id2]->physicalParameters);
-		shared_ptr<MacroMicroContactGeometry> currentContactGeometry = dynamic_pointer_cast<MacroMicroContactGeometry>(mixedInteraction->interactionGeometry);
+		shared_ptr<SpheresContactGeometry> currentContactGeometry = dynamic_pointer_cast<SpheresContactGeometry>(mixedInteraction->interactionGeometry);
 		shared_ptr<ElasticContactParameters> currentContactPhysics   = dynamic_pointer_cast<ElasticContactParameters> (mixedInteraction->interactionPhysics);
 		
 		if ( mixedInteraction->isNew)

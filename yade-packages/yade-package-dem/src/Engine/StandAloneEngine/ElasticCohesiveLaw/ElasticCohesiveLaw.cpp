@@ -23,7 +23,7 @@
 
 #include "ElasticCohesiveLaw.hpp"
 #include "BodyMacroParameters.hpp"
-#include "MacroMicroContactGeometry.hpp"
+#include "SpheresContactGeometry.hpp"
 #include "SDECLinkGeometry.hpp"
 #include "ElasticContactParameters.hpp"
 #include "SDECLinkPhysics.hpp"

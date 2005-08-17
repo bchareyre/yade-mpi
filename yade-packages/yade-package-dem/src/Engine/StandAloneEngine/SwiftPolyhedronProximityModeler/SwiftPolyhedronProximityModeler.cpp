@@ -22,7 +22,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "SwiftPolyhedronProximityModeler.hpp"
-#include "MacroMicroContactGeometry.hpp"
+#include "SpheresContactGeometry.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -173,11 +173,11 @@ void SwiftPolyhedronProximityModeler::action(Body* body)
 
 			collision->isReal = true;
 			
-			shared_ptr<MacroMicroContactGeometry> cg;
+			shared_ptr<SpheresContactGeometry> cg;
 			if (collision->interactionGeometry)
-				cg = dynamic_pointer_cast<MacroMicroContactGeometry>(collision->interactionGeometry);
+				cg = dynamic_pointer_cast<SpheresContactGeometry>(collision->interactionGeometry);
 			else
-				cg = shared_ptr<MacroMicroContactGeometry>(new MacroMicroContactGeometry());
+				cg = shared_ptr<SpheresContactGeometry>(new SpheresContactGeometry());
 
 			Vector3r p1(nearestPts[6*i],nearestPts[6*i+1],nearestPts[6*i+2]);
 			Vector3r p2(nearestPts[6*i+3],nearestPts[6*i+4],nearestPts[6*i+5]);

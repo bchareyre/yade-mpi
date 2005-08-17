@@ -1,33 +1,91 @@
 #! /bin/sh
 
 echo "finding .pro files ... "
-find ../projects/kdevelop/  -name "*.pro" -exec fgrep -l "$2" {} \;		> ./proRenameClass
+find ./  -name "*.pro" -exec fgrep -l "$2" {} \;				> ./proRenameClass
 
 echo "finding .hpp files ... "
-find ../src/  -name "*.hpp" -exec fgrep -l "$2" {} \;				> ./hppRenameClass
+find ./  -name "*.hpp" -exec fgrep -l "$2" {} \;				> ./hppRenameClass
 
 echo "finding .cpp files ... "
-find ../src/  -name "*.cpp" -exec fgrep -l "$2" {} \;				> ./cppRenameClass
+find ./  -name "*.cpp" -exec fgrep -l "$2" {} \;				> ./cppRenameClass
 
 echo "finding .tpp files ... "
-find ../src/  -name "*.tpp" -exec fgrep -l "$2" {} \;				> ./tppRenameClass
+find ./  -name "*.tpp" -exec fgrep -l "$2" {} \;				> ./tppRenameClass
 
 echo "finding .ipp files ... "
-find ../src/  -name "*.ipp" -exec fgrep -l "$2" {} \;				> ./ippRenameClass
+find ./  -name "*.ipp" -exec fgrep -l "$2" {} \;				> ./ippRenameClass
 
-cat ./proRenameClass  | grep -e "\<$1\>.pro"					> ./proRenameClass2
-cat ./hppRenameClass  | grep -e "\<$1\>.hpp"					> ./hppRenameClass2
-cat ./cppRenameClass  | grep -e "\<$1\>.cpp"					> ./cppRenameClass2
-cat ./tppRenameClass  | grep -e "\<$1\>.tpp"					> ./tppRenameClass2
-cat ./ippRenameClass  | grep -e "\<$1\>.ipp"					> ./ippRenameClass2
+cat ./proRenameClass  | grep -e "\<$1\>.pro"					> ./proRenameClass4
+cat ./hppRenameClass  | grep -e "\<$1\>.hpp"					> ./hppRenameClass4
+cat ./cppRenameClass  | grep -e "\<$1\>.cpp"					> ./cppRenameClass4
+cat ./tppRenameClass  | grep -e "\<$1\>.tpp"					> ./tppRenameClass4
+cat ./ippRenameClass  | grep -e "\<$1\>.ipp"					> ./ippRenameClass4
+
+cat ./proRenameClass4 | while read name; do
+  if [ -L $name ]; then
+    ls -l $name | awk '{print $10}' | sed -e "s/\<$1\>\.pro/$2.pro/" | read target
+    svn rm $name
+    echo $name | sed -e "s/\<$1\>\.pro/$2.pro/" | read linkname
+    ln -s $target $linkname
+    svn add $linkname
+  else
+    echo $name									> ./proRenameClass2
+  fi;
+done;
+
+cat ./hppRenameClass4 | while read name; do
+  if [ -L $name ]; then
+    ls -l $name | awk '{print $10}' | sed -e "s/\<$1\>\.hpp/$2.hpp/" | read target
+    svn rm $name
+    echo $name | sed -e "s/\<$1\>\.hpp/$2.hpp/" | read linkname
+    ln -s $target $linkname
+    svn add $linkname
+  else
+    echo $name									> ./hppRenameClass2
+  fi;
+done;
+
+cat ./cppRenameClass4 | while read name; do
+  if [ -L $name ]; then
+    ls -l $name | awk '{print $10}' | sed -e "s/\<$1\>\.cpp/$2.cpp/" | read target
+    svn rm $name
+    echo $name | sed -e "s/\<$1\>\.cpp/$2.cpp/" | read linkname
+    ln -s $target $linkname
+    svn add $linkname
+  else
+    echo $name									> ./cppRenameClass2
+  fi;
+done;
+
+cat ./tppRenameClass4 | while read name; do
+  if [ -L $name ]; then
+    ls -l $name | awk '{print $10}' | sed -e "s/\<$1\>\.tpp/$2.tpp/" | read target
+    svn rm $name
+    echo $name | sed -e "s/\<$1\>\.tpp/$2.tpp/" | read linkname
+    ln -s $target $linkname
+    svn add $linkname
+  else
+    echo $name									> ./tppRenameClass2
+  fi;
+done;
+
+cat ./ippRenameClass4 | while read name; do
+  if [ -L $name ]; then
+    ls -l $name | awk '{print $10}' | sed -e "s/\<$1\>\.ipp/$2.ipp/" | read target
+    svn rm $name
+    echo $name | sed -e "s/\<$1\>\.ipp/$2.ipp/" | read linkname
+    ln -s $target $linkname
+    svn add $linkname
+  else
+    echo $name									> ./ippRenameClass2
+  fi;
+done;
 
 cat ./proRenameClass2 | grep -e "\<$1\>" | sed -e "s/\<$1\>\.pro/$2.pro/"	> ./proRenameClass3
 cat ./hppRenameClass2 | grep -e "\<$1\>" | sed -e "s/\<$1\>\.hpp/$2.hpp/"	> ./hppRenameClass3
 cat ./cppRenameClass2 | grep -e "\<$1\>" | sed -e "s/\<$1\>\.cpp/$2.cpp/"	> ./cppRenameClass3
 cat ./tppRenameClass2 | grep -e "\<$1\>" | sed -e "s/\<$1\>\.tpp/$2.tpp/"	> ./tppRenameClass3
 cat ./ippRenameClass2 | grep -e "\<$1\>" | sed -e "s/\<$1\>\.ipp/$2.ipp/"	> ./ippRenameClass3
-
-
 
 if [ -s ./proRenameClass2 ]; then
   if [ -e `cat ./proRenameClass2` ]; then

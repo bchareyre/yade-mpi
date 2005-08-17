@@ -3,7 +3,7 @@
 # Subdir relative project main directory: ./DataClass/InteractionGeometry
 # Target is a subdirs project 
 
-SUBDIRS += MacroMicroContactGeometry \
+SUBDIRS += SpheresContactGeometry \
            SDECLinkGeometry 
 CONFIG += debug \
 warn_on

@@ -168,7 +168,7 @@ void OpenGLRenderingEngine::render(const shared_ptr<MetaBody>& rootBody)
 		shared_ptr<Body>& b1 = (*bodies)[col->getId1()];
 		shared_ptr<Body>& b2 = (*bodies)[col->getId2()];
 
-		MacroMicroContactGeometry * mmcg = static_cast<MacroMicroContactGeometry*>(col->interactionGeometry.get());
+		SpheresContactGeometry * mmcg = static_cast<SpheresContactGeometry*>(col->interactionGeometry.get());
 
 		Vector3r v1 = mmcg->contactPoint+mmcg->normal*mmcg->penetrationDepth*0.5;
 		Vector3r v2 = mmcg->contactPoint-mmcg->normal*mmcg->penetrationDepth*0.5;

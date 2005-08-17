@@ -4,7 +4,7 @@
 # Target is a library:  
 
 LIBS += -lSDECLinkGeometry \
-        -lMacroMicroContactGeometry \
+        -lSpheresContactGeometry \
         -lInteractionGeometryMetaEngine \
         -lyade-lib-wm3-math \
         -lyade-lib-multimethods \
@@ -12,7 +12,7 @@ LIBS += -lSDECLinkGeometry \
         -rdynamic 
 INCLUDEPATH += /usr/local/include/ \
                ../../../DataClass/InteractionGeometry/SDECLinkGeometry \
-               ../../../DataClass/InteractionGeometry/MacroMicroContactGeometry 
+               ../../../DataClass/InteractionGeometry/SpheresContactGeometry 
 QMAKE_LIBDIR = ../../../../../bin \
                ../../../../../bin \
                /usr/local/lib/yade/yade-package-common/ \

@@ -1,19 +1,19 @@
-#include "MacroMicroContactGeometry.hpp"
+#include "SpheresContactGeometry.hpp"
 
-// MacroMicroContactGeometry::MacroMicroContactGeometry() : InteractionGeometry()
+// SpheresContactGeometry::SpheresContactGeometry() : InteractionGeometry()
 // {
 // }
 // 
 // 
-MacroMicroContactGeometry::~MacroMicroContactGeometry ()
+SpheresContactGeometry::~SpheresContactGeometry ()
 {
 }
 // 
-// void MacroMicroContactGeometry::postProcessAttributes(bool)
+// void SpheresContactGeometry::postProcessAttributes(bool)
 // {
 // 
 // }
 // 
-// void MacroMicroContactGeometry::registerAttributes()
+// void SpheresContactGeometry::registerAttributes()
 // {
 // }

@@ -118,7 +118,7 @@ void FrictionLessElasticContactLaw::action(Body * body)
 // 
 // 		BodyMacroParameters* de1 				= dynamic_cast<BodyMacroParameters*>((*bodies)[id1]->physicalParameters.get());
 // 		BodyMacroParameters* de2 				= dynamic_cast<BodyMacroParameters*>((*bodies)[id2]->physicalParameters.get());
-// 		MacroMicroContactGeometry* currentContactGeometry 	= dynamic_cast<MacroMicroContactGeometry*>(contact->interactionGeometry.get());
+// 		SpheresContactGeometry* currentContactGeometry 	= dynamic_cast<SpheresContactGeometry*>(contact->interactionGeometry.get());
 // 		ElasticContactParameters* currentContactPhysics   	= dynamic_cast<ElasticContactParameters*> (contact->interactionPhysics.get());
 // 
 // 		//Vector3r& shearForce 			= currentContactPhysics->shearForce;

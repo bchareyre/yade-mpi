@@ -4,14 +4,14 @@
 # Target is a library:  
 
 LIBS += -lElasticContactParameters \
-        -lMacroMicroContactGeometry \
+        -lSpheresContactGeometry \
         -lMacroMicroElasticRelationships \
         -lSphere \
         -rdynamic 
 INCLUDEPATH += /usr/local/include/ \
                ../../../Engine/EngineUnit/MacroMicroElasticRelationships \
                ../../../DataClass/InteractionPhysics/ElasticContactParameters \
-               ../../../DataClass/InteractionGeometry/MacroMicroContactGeometry \
+               ../../../DataClass/InteractionGeometry/SpheresContactGeometry \
                ../../../DataClass/PhysicalParameters/BodyMacroParameters 
 QMAKE_LIBDIR = ../../../../../bin \
                ../../../../../bin \

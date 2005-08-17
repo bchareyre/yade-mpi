@@ -6,7 +6,7 @@
 LIBS += -lSDECLinkPhysics \
         -lSDECLinkGeometry \
         -lElasticContactParameters \
-        -lMacroMicroContactGeometry \
+        -lSpheresContactGeometry \
         -lBodyMacroParameters \
         -lRigidBodyParameters \
         -lParticleParameters \
@@ -16,7 +16,7 @@ INCLUDEPATH += /usr/local/include/ \
                ../../../DataClass/InteractionPhysics/SDECLinkPhysics \
                ../../../DataClass/InteractionPhysics/ElasticContactParameters \
                ../../../DataClass/InteractionGeometry/SDECLinkGeometry \
-               ../../../DataClass/InteractionGeometry/MacroMicroContactGeometry \
+               ../../../DataClass/InteractionGeometry/SpheresContactGeometry \
                ../../../DataClass/PhysicalParameters/BodyMacroParameters 
 QMAKE_LIBDIR = ../../../../../bin \
                ../../../../../bin \

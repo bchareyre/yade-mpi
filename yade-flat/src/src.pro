@@ -176,7 +176,7 @@ HEADERS += AABB.hpp \
            LeapFrogOrientationIntegrator.hpp \
            LeapFrogPositionIntegrator.hpp \
            LineSegment.hpp \
-           MacroMicroContactGeometry.hpp \
+           SpheresContactGeometry.hpp \
            MacroMicroElasticRelationships.hpp \
            MarchingCube.hpp \
            MassSpringLaw.hpp \
@@ -436,7 +436,7 @@ SOURCES += yade.cpp \
            LeapFrogPositionIntegrator.cpp \
            LineSegment.cpp \
            lut.cpp \
-           MacroMicroContactGeometry.cpp \
+           SpheresContactGeometry.cpp \
            MacroMicroElasticRelationships.cpp \
            MarchingCube.cpp \
            MassSpringLaw.cpp \

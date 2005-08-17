@@ -23,10 +23,10 @@
 
 #include "MacroMicroElasticRelationships.hpp"
 
-#include "MacroMicroContactGeometry.hpp"
+#include "SpheresContactGeometry.hpp"
 #include "ElasticContactParameters.hpp"
 
-#include "SDECLinkGeometry.hpp" // FIXME - I can't dispatch by SDECLinkGeometry <-> MacroMicroContactGeometry !!?
+#include "SDECLinkGeometry.hpp" // FIXME - I can't dispatch by SDECLinkGeometry <-> SpheresContactGeometry !!?
 #include "SDECLinkPhysics.hpp" // FIXME
 
 #include "BodyMacroParameters.hpp"
@@ -66,9 +66,9 @@ void MacroMicroElasticRelationships::go(	  const shared_ptr<PhysicalParameters>&
 {
 	BodyMacroParameters* sdec1 = static_cast<BodyMacroParameters*>(b1.get());
 	BodyMacroParameters* sdec2 = static_cast<BodyMacroParameters*>(b2.get());
-	MacroMicroContactGeometry* interactionGeometry = dynamic_cast<MacroMicroContactGeometry*>(interaction->interactionGeometry.get());
+	SpheresContactGeometry* interactionGeometry = dynamic_cast<SpheresContactGeometry*>(interaction->interactionGeometry.get());
 	
-	if(interactionGeometry) // so it is MacroMicroContactGeometry  - NON PERMANENT LINK
+	if(interactionGeometry) // so it is SpheresContactGeometry  - NON PERMANENT LINK
 	{
 
 /* OLD VERSION  this is a LinearContactModel, different class, model different that MicroMacroElasticRelationships
