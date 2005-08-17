@@ -20,15 +20,21 @@ if for example you want to install in /usr instead, you can do this:
 
 	make compile_install INSTALL_DIR='/usr'
 
-Both INSTALL_DIR and PREFIX_DIR should start with / and shouldn't have
-trailing slash.
+NOTES:
+ 1. Both INSTALL_DIR and PREFIX_DIR should start with / and shouldn't have
+    trailing slash.
+ 2. If compilation is interrupted (eg. due to some compilation error), and
+    then resumed with different INSTALL_DIR or PREFIX_DIR, then all *.pro
+    files (used by qmake) will be damaged (wrong INSTALL_DIR and PREFIX_DIR
+    inside)
 
 Or if you are a package maintaner, you may want to install everything in
 different directory tree:
 
 	make compile_install PREFIX_DIR='/tmp/foo' INSTALL_DIR='/usr'
 
-    WARNING: if you are compiling with gcc3.3, you need to pass additional argument:
+!!  WARNING: if you are compiling with gcc3.3, you need to pass additional
+    argument:
 
         make compile_install CXXFLAGS='-pthread -lpthread'
 	

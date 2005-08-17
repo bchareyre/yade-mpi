@@ -123,7 +123,7 @@ void changeDefaultGUI(shared_ptr<Preferences>& pref)
 	pref->defaultGUILibName = guiName;
 
 	string yadeConfigPath = string(getenv("HOME")) + string("/.yade");
-	IOManager::saveToFile("XMLManager",yadeConfigPath+"/preferences.xml","preferences",pref);
+	IOFormatManager::saveToFile("XMLFormatManager",yadeConfigPath+"/preferences.xml","preferences",pref);
 
 }
 
@@ -161,7 +161,7 @@ void addPluginDirectory(shared_ptr<Preferences>& pref)
 	pref->dynlibDirectories.push_back(directory.substr(0,directory.size()-1));
 
 	string yadeConfigPath = string(getenv("HOME")) + string("/.yade");
-	IOManager::saveToFile("XMLManager",yadeConfigPath+"/preferences.xml","preferences",pref);
+	IOFormatManager::saveToFile("XMLFormatManager",yadeConfigPath+"/preferences.xml","preferences",pref);
 
 }
 
@@ -189,7 +189,7 @@ int main(int argc, char *argv[])
 		changeDefaultGUI(Omega::instance().preferences);
 	}
 
-	IOManager::loadFromFile("XMLManager",yadeConfigPath.string()+"/preferences.xml","preferences",Omega::instance().preferences);
+	IOFormatManager::loadFromFile("XMLFormatManager",yadeConfigPath.string()+"/preferences.xml","preferences",Omega::instance().preferences);
 
 ///
 /// Checks for command line argument

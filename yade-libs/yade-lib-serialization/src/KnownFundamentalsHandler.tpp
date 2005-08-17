@@ -39,7 +39,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "IOManager.hpp"
+#include "IOFormatManager.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -53,7 +53,7 @@ struct FundamentalHandler< Vector2<RealType> >
 		Vector2<RealType> * tmp = any_cast<Vector2<RealType>*>(ac.getAddress());
 		
 		vector<string> tokens;
-		IOManager::parseFundamental(*tmpStr, tokens);
+		IOFormatManager::parseFundamental(*tmpStr, tokens);
 		
 		tmp->x() = lexical_cast<RealType>(tokens[0]);
 		tmp->y() = lexical_cast<RealType>(tokens[1]);
@@ -62,11 +62,11 @@ struct FundamentalHandler< Vector2<RealType> >
 	{
 		string * tmpStr = any_cast<string*>(a);
 		Vector2<RealType> * tmp = any_cast<Vector2<RealType>*>(ac.getAddress());
-		*tmpStr =	IOManager::getCustomFundamentalOpeningBracket()	+
+		*tmpStr =	IOFormatManager::getCustomFundamentalOpeningBracket()	+
 				lexical_cast<string>(tmp->x())			+
-				IOManager::getCustomFundamentalSeparator()	+
+				IOFormatManager::getCustomFundamentalSeparator()	+
 				lexical_cast<string>(tmp->y())			+
-				IOManager::getCustomFundamentalClosingBracket();
+				IOFormatManager::getCustomFundamentalClosingBracket();
 	}
 };
 
@@ -82,7 +82,7 @@ struct FundamentalHandler< Vector3<RealType> >
 		Vector3<RealType> * tmp = any_cast<Vector3<RealType>*>(ac.getAddress());
 		
 		vector<string> tokens;
-		IOManager::parseFundamental(*tmpStr, tokens);
+		IOFormatManager::parseFundamental(*tmpStr, tokens);
 		
 		tmp->x() = lexical_cast<RealType>(tokens[0]);
 		tmp->y() = lexical_cast<RealType>(tokens[1]);
@@ -92,13 +92,13 @@ struct FundamentalHandler< Vector3<RealType> >
 	{
 		string * tmpStr = any_cast<string*>(a);
 		Vector3<RealType> * tmp = any_cast<Vector3<RealType>*>(ac.getAddress());
-		*tmpStr =	IOManager::getCustomFundamentalOpeningBracket()	+
+		*tmpStr =	IOFormatManager::getCustomFundamentalOpeningBracket()	+
 				lexical_cast<string>(tmp->x())			+
-				IOManager::getCustomFundamentalSeparator()	+
+				IOFormatManager::getCustomFundamentalSeparator()	+
 				lexical_cast<string>(tmp->y())			+
-				IOManager::getCustomFundamentalSeparator()	+
+				IOFormatManager::getCustomFundamentalSeparator()	+
 				lexical_cast<string>(tmp->z())			+
-				IOManager::getCustomFundamentalClosingBracket();
+				IOFormatManager::getCustomFundamentalClosingBracket();
 	}
 };
 
@@ -114,7 +114,7 @@ struct FundamentalHandler< Vector4<RealType> >
 		Vector4<RealType> * tmp = any_cast<Vector4<RealType>*>(ac.getAddress());
 		
 		vector<string> tokens;
-		IOManager::parseFundamental(*tmpStr, tokens);
+		IOFormatManager::parseFundamental(*tmpStr, tokens);
 		
 		tmp->x() = lexical_cast<RealType>(tokens[0]);
 		tmp->y() = lexical_cast<RealType>(tokens[1]);
@@ -125,15 +125,15 @@ struct FundamentalHandler< Vector4<RealType> >
 	{
 		string * tmpStr = any_cast<string*>(a);
 		Vector4<RealType> * tmp = any_cast<Vector4<RealType>*>(ac.getAddress());
-		*tmpStr =	IOManager::getCustomFundamentalOpeningBracket()	+
+		*tmpStr =	IOFormatManager::getCustomFundamentalOpeningBracket()	+
 				lexical_cast<string>(tmp->x())			+
-				IOManager::getCustomFundamentalSeparator()	+
+				IOFormatManager::getCustomFundamentalSeparator()	+
 				lexical_cast<string>(tmp->y())			+
-				IOManager::getCustomFundamentalSeparator()	+
+				IOFormatManager::getCustomFundamentalSeparator()	+
 				lexical_cast<string>(tmp->z())			+
-				IOManager::getCustomFundamentalSeparator()	+
+				IOFormatManager::getCustomFundamentalSeparator()	+
 				lexical_cast<string>(tmp->w())			+
-				IOManager::getCustomFundamentalClosingBracket();
+				IOFormatManager::getCustomFundamentalClosingBracket();
 	}
 };
 
@@ -149,7 +149,7 @@ struct FundamentalHandler< Matrix2<RealType> >
 		Matrix2<RealType> * tmp = any_cast<Matrix2<RealType>*>(ac.getAddress());
 		
 		vector<string> tokens;
-		IOManager::parseFundamental(*tmpStr, tokens);
+		IOFormatManager::parseFundamental(*tmpStr, tokens);
 		
 		*tmp = Matrix2<RealType>(	lexical_cast<RealType>(tokens[0]),
 						lexical_cast<RealType>(tokens[1]),
@@ -160,15 +160,15 @@ struct FundamentalHandler< Matrix2<RealType> >
 	{
 		string * tmpStr = any_cast<string*>(a);
 		Matrix2<RealType> * tmp = any_cast<Matrix2<RealType>*>(ac.getAddress());
-		*tmpStr =	IOManager::getCustomFundamentalOpeningBracket()	+
+		*tmpStr =	IOFormatManager::getCustomFundamentalOpeningBracket()	+
 				lexical_cast<string>((*tmp)(0,0))		+
-				IOManager::getCustomFundamentalSeparator()	+
+				IOFormatManager::getCustomFundamentalSeparator()	+
 				lexical_cast<string>((*tmp)(0,1))		+
-				IOManager::getCustomFundamentalSeparator()	+
+				IOFormatManager::getCustomFundamentalSeparator()	+
 				lexical_cast<string>((*tmp)(1,0))		+
-				IOManager::getCustomFundamentalSeparator()	+
+				IOFormatManager::getCustomFundamentalSeparator()	+
 				lexical_cast<string>((*tmp)(1,1))		+
-				IOManager::getCustomFundamentalClosingBracket();
+				IOFormatManager::getCustomFundamentalClosingBracket();
 	}
 };
 
@@ -184,7 +184,7 @@ struct FundamentalHandler< Matrix3<RealType> >
 		Matrix3<RealType> * tmp = any_cast<Matrix3<RealType>*>(ac.getAddress());
 		
 		vector<string> tokens;
-		IOManager::parseFundamental(*tmpStr, tokens);
+		IOFormatManager::parseFundamental(*tmpStr, tokens);
 		
 		*tmp = Matrix3<RealType>(	lexical_cast<RealType>(tokens[0]),
 						lexical_cast<RealType>(tokens[1]),
@@ -200,25 +200,25 @@ struct FundamentalHandler< Matrix3<RealType> >
 	{
 		string * tmpStr = any_cast<string*>(a);
 		Matrix3<RealType> * tmp = any_cast<Matrix3<RealType>*>(ac.getAddress());
-		*tmpStr =	IOManager::getCustomFundamentalOpeningBracket()	+
+		*tmpStr =	IOFormatManager::getCustomFundamentalOpeningBracket()	+
 				lexical_cast<string>((*tmp)(0,0))		+
-				IOManager::getCustomFundamentalSeparator()	+
+				IOFormatManager::getCustomFundamentalSeparator()	+
 				lexical_cast<string>((*tmp)(0,1))		+
-				IOManager::getCustomFundamentalSeparator()	+
+				IOFormatManager::getCustomFundamentalSeparator()	+
 				lexical_cast<string>((*tmp)(0,2))		+
-				IOManager::getCustomFundamentalSeparator()	+
+				IOFormatManager::getCustomFundamentalSeparator()	+
 				lexical_cast<string>((*tmp)(1,0))		+
-				IOManager::getCustomFundamentalSeparator()	+
+				IOFormatManager::getCustomFundamentalSeparator()	+
 				lexical_cast<string>((*tmp)(1,1))		+
-				IOManager::getCustomFundamentalSeparator()	+
+				IOFormatManager::getCustomFundamentalSeparator()	+
 				lexical_cast<string>((*tmp)(1,2))		+
-				IOManager::getCustomFundamentalSeparator()	+
+				IOFormatManager::getCustomFundamentalSeparator()	+
 				lexical_cast<string>((*tmp)(2,0))		+
-				IOManager::getCustomFundamentalSeparator()	+
+				IOFormatManager::getCustomFundamentalSeparator()	+
 				lexical_cast<string>((*tmp)(2,1))		+
-				IOManager::getCustomFundamentalSeparator()	+
+				IOFormatManager::getCustomFundamentalSeparator()	+
 				lexical_cast<string>((*tmp)(2,2))		+
-				IOManager::getCustomFundamentalClosingBracket();
+				IOFormatManager::getCustomFundamentalClosingBracket();
 	}
 };
 
@@ -234,7 +234,7 @@ struct FundamentalHandler< Matrix4<RealType> >
 		Matrix4<RealType> * tmp = any_cast<Matrix4<RealType>*>(ac.getAddress());
 		
 		vector<string> tokens;
-		IOManager::parseFundamental(*tmpStr, tokens);
+		IOFormatManager::parseFundamental(*tmpStr, tokens);
 		
 		*tmp = Matrix4<RealType>(	lexical_cast<RealType>(tokens[0]),
 						lexical_cast<RealType>(tokens[1]),
@@ -258,39 +258,39 @@ struct FundamentalHandler< Matrix4<RealType> >
 	{
 		string * tmpStr = any_cast<string*>(a);
 		Matrix4<RealType> * tmp = any_cast<Matrix4<RealType>*>(ac.getAddress());
-		*tmpStr =	IOManager::getCustomFundamentalOpeningBracket()	+
+		*tmpStr =	IOFormatManager::getCustomFundamentalOpeningBracket()	+
 				lexical_cast<string>((*tmp)(0,0))		+
-				IOManager::getCustomFundamentalSeparator()	+
+				IOFormatManager::getCustomFundamentalSeparator()	+
 				lexical_cast<string>((*tmp)(0,1))		+
-				IOManager::getCustomFundamentalSeparator()	+
+				IOFormatManager::getCustomFundamentalSeparator()	+
 				lexical_cast<string>((*tmp)(0,2))		+
-				IOManager::getCustomFundamentalSeparator()	+
+				IOFormatManager::getCustomFundamentalSeparator()	+
 				lexical_cast<string>((*tmp)(0,3))		+
-				IOManager::getCustomFundamentalSeparator()	+
+				IOFormatManager::getCustomFundamentalSeparator()	+
 				lexical_cast<string>((*tmp)(1,0))		+
-				IOManager::getCustomFundamentalSeparator()	+
+				IOFormatManager::getCustomFundamentalSeparator()	+
 				lexical_cast<string>((*tmp)(1,1))		+
-				IOManager::getCustomFundamentalSeparator()	+
+				IOFormatManager::getCustomFundamentalSeparator()	+
 				lexical_cast<string>((*tmp)(1,2))		+
-				IOManager::getCustomFundamentalSeparator()	+
+				IOFormatManager::getCustomFundamentalSeparator()	+
 				lexical_cast<string>((*tmp)(1,3))		+
-				IOManager::getCustomFundamentalSeparator()	+
+				IOFormatManager::getCustomFundamentalSeparator()	+
 				lexical_cast<string>((*tmp)(2,0))		+
-				IOManager::getCustomFundamentalSeparator()	+
+				IOFormatManager::getCustomFundamentalSeparator()	+
 				lexical_cast<string>((*tmp)(2,1))		+
-				IOManager::getCustomFundamentalSeparator()	+
+				IOFormatManager::getCustomFundamentalSeparator()	+
 				lexical_cast<string>((*tmp)(2,2))		+
-				IOManager::getCustomFundamentalSeparator()	+
+				IOFormatManager::getCustomFundamentalSeparator()	+
 				lexical_cast<string>((*tmp)(2,3))		+
-				IOManager::getCustomFundamentalSeparator()	+
+				IOFormatManager::getCustomFundamentalSeparator()	+
 				lexical_cast<string>((*tmp)(3,0))		+
-				IOManager::getCustomFundamentalSeparator()	+
+				IOFormatManager::getCustomFundamentalSeparator()	+
 				lexical_cast<string>((*tmp)(3,1))		+
-				IOManager::getCustomFundamentalSeparator()	+
+				IOFormatManager::getCustomFundamentalSeparator()	+
 				lexical_cast<string>((*tmp)(3,2))		+
-				IOManager::getCustomFundamentalSeparator()	+
+				IOFormatManager::getCustomFundamentalSeparator()	+
 				lexical_cast<string>((*tmp)(3,3))		+
-				IOManager::getCustomFundamentalClosingBracket();
+				IOFormatManager::getCustomFundamentalClosingBracket();
 	}
 };
 
@@ -306,7 +306,7 @@ struct FundamentalHandler< Quaternion<RealType> >
 		Quaternion<RealType> * tmp = any_cast<Quaternion<RealType>*>(ac.getAddress());
 		
 		vector<string> tokens;
-		IOManager::parseFundamental(*tmpStr, tokens);
+		IOFormatManager::parseFundamental(*tmpStr, tokens);
 		
 		RealType angle;
 		Vector3<RealType> axis;
@@ -338,15 +338,15 @@ struct FundamentalHandler< Quaternion<RealType> >
 		tmp->toAxisAngle(axis,angle);
 		axis.normalize();
 
-		*tmpStr =	IOManager::getCustomFundamentalOpeningBracket()	+
+		*tmpStr =	IOFormatManager::getCustomFundamentalOpeningBracket()	+
 				lexical_cast<string>(axis[0])			+
-				IOManager::getCustomFundamentalSeparator()	+
+				IOFormatManager::getCustomFundamentalSeparator()	+
 				lexical_cast<string>(axis[1])			+
-				IOManager::getCustomFundamentalSeparator()	+
+				IOFormatManager::getCustomFundamentalSeparator()	+
 				lexical_cast<string>(axis[2])			+
-				IOManager::getCustomFundamentalSeparator()	+
+				IOFormatManager::getCustomFundamentalSeparator()	+
 				lexical_cast<string>(angle)			+
-				IOManager::getCustomFundamentalClosingBracket();
+				IOFormatManager::getCustomFundamentalClosingBracket();
 	}
 };
 
@@ -362,9 +362,9 @@ struct FundamentalHandler< Se3<RealType> >
 		Se3<RealType> * tmp = any_cast<Se3<RealType>*>(ac.getAddress());
 		
 		vector<string> tokens;//,translationTokens,rotationTokens;
-		IOManager::parseFundamental(*tmpStr, tokens);
-		//IOManager::parseFundamental(tokens[0], translationTokens);
-		//IOManager::parseFundamental(tokens[1], rotationTokens);
+		IOFormatManager::parseFundamental(*tmpStr, tokens);
+		//IOFormatManager::parseFundamental(tokens[0], translationTokens);
+		//IOFormatManager::parseFundamental(tokens[1], rotationTokens);
 		
 		RealType angle;
 		Vector3<RealType> axis;
@@ -408,25 +408,25 @@ struct FundamentalHandler< Se3<RealType> >
 		axis.normalize();
 		position = tmp->position;
 		
-		//*tmpStr =	IOManager::getCustomFundamentalOpeningBracket();
-		*tmpStr =	IOManager::getCustomFundamentalOpeningBracket()	+
+		//*tmpStr =	IOFormatManager::getCustomFundamentalOpeningBracket();
+		*tmpStr =	IOFormatManager::getCustomFundamentalOpeningBracket()	+
 					lexical_cast<string>(position[0])		+
-					IOManager::getCustomFundamentalSeparator()	+
+					IOFormatManager::getCustomFundamentalSeparator()	+
 					lexical_cast<string>(position[1])		+
-					IOManager::getCustomFundamentalSeparator()	+
+					IOFormatManager::getCustomFundamentalSeparator()	+
 					lexical_cast<string>(position[2])		+
-					//IOManager::getCustomFundamentalClosingBracket()	+
-					IOManager::getCustomFundamentalSeparator()	+
-					//IOManager::getCustomFundamentalOpeningBracket()	+
+					//IOFormatManager::getCustomFundamentalClosingBracket()	+
+					IOFormatManager::getCustomFundamentalSeparator()	+
+					//IOFormatManager::getCustomFundamentalOpeningBracket()	+
 					lexical_cast<string>(axis[0])			+
-					IOManager::getCustomFundamentalSeparator()	+
+					IOFormatManager::getCustomFundamentalSeparator()	+
 					lexical_cast<string>(axis[1])			+
-					IOManager::getCustomFundamentalSeparator()	+
+					IOFormatManager::getCustomFundamentalSeparator()	+
 					lexical_cast<string>(axis[2])			+
-					IOManager::getCustomFundamentalSeparator()	+
+					IOFormatManager::getCustomFundamentalSeparator()	+
 					lexical_cast<string>(angle)			+
-				IOManager::getCustomFundamentalClosingBracket();
-		//		IOManager::getCustomFundamentalClosingBracket();
+				IOFormatManager::getCustomFundamentalClosingBracket();
+		//		IOFormatManager::getCustomFundamentalClosingBracket();
 	}
 };
 

@@ -164,7 +164,7 @@ HEADERS += AABB.hpp \
            Intersections2D.hpp \
            Intersections3D.hpp \
            io.h \
-           IOManager.hpp \
+           IOFormatManager.hpp \
            IOManagerExceptions.hpp \
            LatticeBeamParameters.hpp \
            LatticeExample.hpp \
@@ -302,14 +302,14 @@ HEADERS += AABB.hpp \
            Vector3.hpp \
            Vector4.hpp \
            VelocityRecorder.hpp \
-           XMLManager.hpp \
+           XMLFormatManager.hpp \
            XMLSaxParser.hpp \
            yadeExceptions.hpp \
            YadeQtMainWindow.hpp \
            Archive.tpp \
            ContainerHandler.tpp \
            FundamentalHandler.tpp \
-           IOManager.tpp \
+           IOFormatManager.tpp \
            KnownFundamentalsHandler.tpp \
            Math.ipp \
            Matrix2.ipp \
@@ -423,7 +423,7 @@ SOURCES += yade.cpp \
            Intersections2D.cpp \
            Intersections3D.cpp \
            io.c \
-           IOManager.cpp \
+           IOFormatManager.cpp \
            IOManagerExceptions.cpp \
            LatticeBeamParameters.cpp \
            LatticeExample.cpp \
@@ -537,7 +537,7 @@ SOURCES += yade.cpp \
            Vector3.cpp \
            Vector4.cpp \
            VelocityRecorder.cpp \
-           XMLManager.cpp \
+           XMLFormatManager.cpp \
            XMLSaxParser.cpp \
            yadeExceptions.cpp \
            YadeQtMainWindow.cpp 

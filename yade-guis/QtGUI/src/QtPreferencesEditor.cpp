@@ -220,7 +220,7 @@ bool QtPreferencesEditor::testDirectory(const string& dirName)
 void QtPreferencesEditor::loadPreferences()
 {
 	filesystem::path yadeConfigPath = filesystem::path(string(getenv("HOME")) + string("/.yade"), filesystem::native);
-	IOManager::loadFromFile("XMLManager",yadeConfigPath.string()+"/preferences.xml","preferences",Omega::instance().preferences);
+	IOFormatManager::loadFromFile("XMLFormatManager",yadeConfigPath.string()+"/preferences.xml","preferences",Omega::instance().preferences);
 
 	vector<string>::iterator idi    = Omega::instance().preferences->includeDirectories.begin();
 	vector<string>::iterator idiEnd = Omega::instance().preferences->includeDirectories.end();
@@ -257,7 +257,7 @@ void QtPreferencesEditor::savePreferences()
 		currentItem=currentItem->nextSibling();	
 	}
 
-	IOManager::saveToFile("XMLManager",yadeConfigPath.string()+"/preferences.xml","preferences",Omega::instance().preferences);
+	IOFormatManager::saveToFile("XMLFormatManager",yadeConfigPath.string()+"/preferences.xml","preferences",Omega::instance().preferences);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

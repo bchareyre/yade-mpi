@@ -26,7 +26,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <yade/yade-lib-serialization/IOManager.hpp>
+#include <yade/yade-lib-serialization/IOFormatManager.hpp>
 #include <yade/yade-lib-factory/ClassFactory.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -68,10 +68,10 @@ YadeQtMainWindow::YadeQtMainWindow() : YadeQtGeneratedMainWindow()
 		preferences->mainWindowPositionY	= 50;
 		preferences->mainWindowSizeX		= 1024;
 		preferences->mainWindowSizeY		= 768;
-		IOManager::saveToFile("XMLManager",yadeQtGUIPrefPath.string(),"preferences",preferences);
+		IOFormatManager::saveToFile("XMLFormatManager",yadeQtGUIPrefPath.string(),"preferences",preferences);
 	}
 
-	IOManager::loadFromFile("XMLManager",yadeQtGUIPrefPath.string(),"preferences",preferences);
+	IOFormatManager::loadFromFile("XMLFormatManager",yadeQtGUIPrefPath.string(),"preferences",preferences);
 
 			resize(preferences->mainWindowSizeX,preferences->mainWindowSizeY);
 		move(preferences->mainWindowPositionX,preferences->mainWindowPositionY);
@@ -112,7 +112,7 @@ YadeQtMainWindow::~YadeQtMainWindow()
 	preferences->mainWindowPositionY	= pos().y();
 	preferences->mainWindowSizeX		= size().width();
 	preferences->mainWindowSizeY		= size().height();
-	IOManager::saveToFile("XMLManager",yadeQtGUIPrefPath.string(),"preferences",preferences);
+	IOFormatManager::saveToFile("XMLFormatManager",yadeQtGUIPrefPath.string(),"preferences",preferences);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

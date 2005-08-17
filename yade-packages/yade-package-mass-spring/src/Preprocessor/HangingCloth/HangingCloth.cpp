@@ -43,7 +43,7 @@
 #include <yade/yade-package-common/PersistentSAPCollider.hpp>
 //#include <yade/yade-package-common/MassSpringBody2RigidBodyLaw.hpp>
 
-#include <yade/yade-lib-serialization/IOManager.hpp>
+#include <yade/yade-lib-serialization/IOFormatManager.hpp>
 #include <yade/yade-package-common/InteractionGeometryMetaEngine.hpp>
 #include <yade/yade-package-common/InteractionPhysicsMetaEngine.hpp>
 

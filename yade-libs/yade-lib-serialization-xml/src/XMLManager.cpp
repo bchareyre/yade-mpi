@@ -21,7 +21,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "XMLManager.hpp"
+#include "XMLFormatManager.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -41,17 +41,17 @@ using namespace std;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-XmlSaxParser XMLManager::saxParser;
+XmlSaxParser XMLFormatManager::saxParser;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-XMLManager::XMLManager() : IOManager()
+XMLFormatManager::XMLFormatManager() : IOFormatManager()
 {
 	Archive::addSerializablePointer(SerializableTypes::SERIALIZABLE, false, serializeSerializable, deserializeSerializable);
 	Archive::addSerializablePointer(SerializableTypes::POINTER, false, serializeSmartPointer, deserializeSmartPointer);
 	Archive::addSerializablePointer(SerializableTypes::CONTAINER, false, serializeContainer, deserializeContainer);
-	Archive::addSerializablePointer(SerializableTypes::FUNDAMENTAL, true , IOManager::serializeFundamental, deserializeFundamental);
+	Archive::addSerializablePointer(SerializableTypes::FUNDAMENTAL, true , IOFormatManager::serializeFundamental, deserializeFundamental);
 
 	setContainerOpeningBracket('[');
 	setContainerClosingBracket(']');
@@ -65,7 +65,7 @@ XMLManager::XMLManager() : IOManager()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-XMLManager::~XMLManager()
+XMLFormatManager::~XMLFormatManager()
 {
 
 }
@@ -73,7 +73,7 @@ XMLManager::~XMLManager()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void XMLManager::writeTabs(ostream& stream, int depth)
+void XMLFormatManager::writeTabs(ostream& stream, int depth)
 {
 	for(int i=0;i<depth+1;i++)
 		stream << '\t';
@@ -82,7 +82,7 @@ void XMLManager::writeTabs(ostream& stream, int depth)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void XMLManager::writeOpeningTag(ostream& stream, Archive& ac, int depth)
+void XMLFormatManager::writeOpeningTag(ostream& stream, Archive& ac, int depth)
 {
 	writeTabs(stream, depth);
 	stream << "<" << ac.getName();
@@ -94,7 +94,7 @@ void XMLManager::writeOpeningTag(ostream& stream, Archive& ac, int depth)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void XMLManager::writeClosingTag(ostream& stream, Archive& ac, int depth)
+void XMLFormatManager::writeClosingTag(ostream& stream, Archive& ac, int depth)
 {
 	if (ac.isFundamental())
 		stream << "</" << ac.getName() << ">" << endl;
@@ -110,7 +110,7 @@ void XMLManager::writeClosingTag(ostream& stream, Archive& ac, int depth)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-string XMLManager::beginDeserialization(istream& stream, Archive& ac)
+string XMLFormatManager::beginDeserialization(istream& stream, Archive& ac)
 {
 	saxParser.readAndParseNextXmlLine(stream);
 	if (saxParser.getTagName()=="Yade")
@@ -133,7 +133,7 @@ string XMLManager::beginDeserialization(istream& stream, Archive& ac)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void XMLManager::finalizeDeserialization(istream& , Archive&)
+void XMLFormatManager::finalizeDeserialization(istream& , Archive&)
 {
 	//saxParser.readAndParseNextXmlLine(stream);
 
@@ -144,7 +144,7 @@ void XMLManager::finalizeDeserialization(istream& , Archive&)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void XMLManager::beginSerialization(ostream& stream, Archive& ac)
+void XMLFormatManager::beginSerialization(ostream& stream, Archive& ac)
 {
 	stream << "<Yade>" << endl;
 	writeOpeningTag(stream,ac,0);
@@ -153,7 +153,7 @@ void XMLManager::beginSerialization(ostream& stream, Archive& ac)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void XMLManager::finalizeSerialization(ostream& stream, Archive& ac)
+void XMLFormatManager::finalizeSerialization(ostream& stream, Archive& ac)
 {
 	writeClosingTag(stream,ac,0);
 	stream << "</Yade>" << endl;
@@ -167,7 +167,7 @@ void XMLManager::finalizeSerialization(ostream& stream, Archive& ac)
 /// Serialization and Deserialization of Serializable						///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void XMLManager::serializeSerializable(ostream& stream, Archive& ac, int depth)
+void XMLFormatManager::serializeSerializable(ostream& stream, Archive& ac, int depth)
 {
 	Serializable * s;
 
@@ -212,7 +212,7 @@ void XMLManager::serializeSerializable(ostream& stream, Archive& ac, int depth)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void XMLManager::deserializeSerializable(istream& stream, Archive& ac, const string& )
+void XMLFormatManager::deserializeSerializable(istream& stream, Archive& ac, const string& )
 {
 	shared_ptr<Archive> tmpAc;
 
@@ -267,7 +267,7 @@ void XMLManager::deserializeSerializable(istream& stream, Archive& ac, const str
 /// Serialization and Deserialization of Container						///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void XMLManager::serializeContainer(ostream& stream, Archive& ac , int depth)
+void XMLFormatManager::serializeContainer(ostream& stream, Archive& ac , int depth)
 {
 	shared_ptr<Archive> tmpAc;
 
@@ -292,7 +292,7 @@ void XMLManager::serializeContainer(ostream& stream, Archive& ac , int depth)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void XMLManager::deserializeContainer(istream& stream, Archive& ac, const string& str)
+void XMLFormatManager::deserializeContainer(istream& stream, Archive& ac, const string& str)
 {
 	map<string,string> basicAttributes = saxParser.getBasicAttributes();
 	unsigned int size = lexical_cast<unsigned int>(basicAttributes["size"]);
@@ -321,7 +321,7 @@ void XMLManager::deserializeContainer(istream& stream, Archive& ac, const string
 /// Serialization and Deserialization of Smart Pointer						///
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void XMLManager::serializeSmartPointer(ostream& stream, Archive& ac , int depth)
+void XMLFormatManager::serializeSmartPointer(ostream& stream, Archive& ac , int depth)
 {
 	shared_ptr<Archive> tmpAc;
 
@@ -350,7 +350,7 @@ void XMLManager::serializeSmartPointer(ostream& stream, Archive& ac , int depth)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void XMLManager::deserializeSmartPointer(istream& stream, Archive& ac, const string& )
+void XMLFormatManager::deserializeSmartPointer(istream& stream, Archive& ac, const string& )
 {
 	map<string,string> basicAttributes = saxParser.getBasicAttributes();
 
@@ -368,11 +368,11 @@ void XMLManager::deserializeSmartPointer(istream& stream, Archive& ac, const str
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void XMLManager::deserializeFundamental(istream& stream, Archive& ac, const string& str)
+void XMLFormatManager::deserializeFundamental(istream& stream, Archive& ac, const string& str)
 {
 	try
 	{
-		IOManager::deserializeFundamental(stream,ac,str);
+		IOFormatManager::deserializeFundamental(stream,ac,str);
 	}
 	catch(boost::bad_lexical_cast& )
 	{

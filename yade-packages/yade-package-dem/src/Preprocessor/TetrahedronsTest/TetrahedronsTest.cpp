@@ -38,7 +38,7 @@
 #include <yade/yade-core/MetaBody.hpp>
 #include <yade/yade-package-common/SAPCollider.hpp>
 #include <yade/yade-package-common/PersistentSAPCollider.hpp>
-#include <yade/yade-lib-serialization/IOManager.hpp>
+#include <yade/yade-lib-serialization/IOFormatManager.hpp>
 #include <yade/yade-core/Interaction.hpp>
 #include <yade/yade-package-common/BoundingVolumeMetaEngine.hpp>
 #include <yade/yade-package-common/InteractionDescriptionSet2AABB.hpp>

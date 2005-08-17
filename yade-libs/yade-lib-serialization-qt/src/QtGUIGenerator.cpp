@@ -130,7 +130,7 @@ void QtGUIGenerator::buildGUI(shared_ptr<Serializable> s,  QWidget * widget)
 
 	currentWidget = widget;
 
-	XMLManager xmlManager;
+	XMLFormatManager xmlManager;
 
 	descriptors.clear();
 	lookUp.clear();
@@ -154,7 +154,7 @@ void QtGUIGenerator::buildGUI(shared_ptr<Serializable> s,  QWidget * widget)
 			
 			stringstream stream;
 			(*ai)->serialize(stream,*(*ai),0);
-			IOManager::parseFundamental(stream.str(), descriptor->strings);
+			IOFormatManager::parseFundamental(stream.str(), descriptor->strings);
 				
 			descriptor->label = new QLabel( widget);
 			descriptor->label->setText(descriptor->name+" : ");

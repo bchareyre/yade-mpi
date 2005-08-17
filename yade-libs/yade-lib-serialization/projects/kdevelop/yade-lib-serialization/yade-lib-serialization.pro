@@ -6,7 +6,7 @@
 HEADERS += Archive.hpp \
            ArchiveTypes.hpp \
            IOManagerExceptions.hpp \
-           IOManager.hpp \
+           IOFormatManager.hpp \
            Serializable.hpp \
            SerializableSingleton.hpp \
            SerializableTypes.hpp \
@@ -14,12 +14,12 @@ HEADERS += Archive.hpp \
            Archive.tpp \
            ContainerHandler.tpp \
            FundamentalHandler.tpp \
-           IOManager.tpp \
+           IOFormatManager.tpp \
            KnownFundamentalsHandler.tpp \
            MultiTypeHandler.tpp \
            PointerHandler.tpp 
 SOURCES += Archive.cpp \
-           IOManager.cpp \
+           IOFormatManager.cpp \
            IOManagerExceptions.cpp \
            Serializable.cpp \
            SerializableSingleton.cpp \

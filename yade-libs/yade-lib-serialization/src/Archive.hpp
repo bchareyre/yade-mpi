@@ -77,10 +77,10 @@ using namespace ArchiveTypes;
 	This class is designed for serialization purpose. For each attribute of a class to serialize, an Archive
 	is build, based on its <a href="../ArchiveTypes.html">type</a>. Once this archive is built it is possible
 	to write it down to a stream (e.g. a file) of any type (XML, YAML, GNUPLOT ....) via a dynamic library
-	derived from <a href="../IOManager.html">IOManager</a>. This not on the fly serialization process using
+	derived from <a href="../IOFormatManager.html">IOFormatManager</a>. This not on the fly serialization process using
 	an abstract representation an data gives the possibility to be independant of the file type and so to
 	create a new one without recompiling anything.
-	\warning You will need to use this class only if you want to create your own IOManager
+	\warning You will need to use this class only if you want to create your own IOFormatManager
 	
 	All this serialization stuff needs rewriting, especially class Archive is a total mess. Rewriting should
 	make it clean, while preserving original client interface.
@@ -256,7 +256,7 @@ class Archive
 	public    : bool containsOnlyFundamentals();
 
 	/*! This function is used to fill the maps serializationMap and serializationMapOfFundamental
-	You should call it only from your own IOManager to tell the Archive which function to use for
+	You should call it only from your own IOFormatManager to tell the Archive which function to use for
 	(de)-serializing a given type
 	\param rt Type attribute that the function sp and dsp are designed to (de)-serialized
 	\param fundamental is true if the function sp and dsp are designed to (de)-serialized a fundamental type

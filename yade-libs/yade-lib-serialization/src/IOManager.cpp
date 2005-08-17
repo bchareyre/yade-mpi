@@ -21,7 +21,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "IOManager.hpp"
+#include "IOFormatManager.hpp"
 #include "Serializable.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -37,17 +37,17 @@ using namespace boost::spirit;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-char IOManager::cOB	= ' ';
-char IOManager::cCB	= ' ';
-char IOManager::cS	= ' ';
-char IOManager::cfOB	= ' ';
-char IOManager::cfCB	= ' ';
-char IOManager::cfS	= ' ';
+char IOFormatManager::cOB	= ' ';
+char IOFormatManager::cCB	= ' ';
+char IOFormatManager::cS	= ' ';
+char IOFormatManager::cfOB	= ' ';
+char IOFormatManager::cfCB	= ' ';
+char IOFormatManager::cfS	= ' ';
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-IOManager::IOManager()
+IOFormatManager::IOFormatManager()
 {
 	Archive::addSerializablePointer(SerializableTypes::CUSTOM_CLASS, false, serializeCustomClass, deserializeCustomClass);
 	Archive::addSerializablePointer(SerializableTypes::FUNDAMENTAL, true,serializeFundamental, deserializeFundamental);
@@ -62,14 +62,14 @@ IOManager::IOManager()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-IOManager::~IOManager()
+IOFormatManager::~IOFormatManager()
 {
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void IOManager::beginSerialization(ostream& ,  Archive& )
+void IOFormatManager::beginSerialization(ostream& ,  Archive& )
 {
 	cout << "bad begin"<<endl;
 	throw; 
@@ -78,7 +78,7 @@ void IOManager::beginSerialization(ostream& ,  Archive& )
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void IOManager::finalizeSerialization(ostream& ,  Archive& )
+void IOFormatManager::finalizeSerialization(ostream& ,  Archive& )
 {
 	throw; 
 }
@@ -86,7 +86,7 @@ void IOManager::finalizeSerialization(ostream& ,  Archive& )
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-string IOManager::beginDeserialization(istream& ,  Archive& )
+string IOFormatManager::beginDeserialization(istream& ,  Archive& )
 {
 	throw;
 }
@@ -94,7 +94,7 @@ string IOManager::beginDeserialization(istream& ,  Archive& )
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void IOManager::finalizeDeserialization(istream& , Archive& )
+void IOFormatManager::finalizeDeserialization(istream& , Archive& )
 {
 	throw; 
 }
@@ -104,7 +104,7 @@ void IOManager::finalizeDeserialization(istream& , Archive& )
 
 // FIXME : this spirit stuff works currently only with ' ' - space - separators.
 
-void IOManager::parseFundamental(const string& top, vector<string>& eval)
+void IOFormatManager::parseFundamental(const string& top, vector<string>& eval)
 {
 	eval.clear();
 
@@ -170,7 +170,7 @@ void IOManager::parseFundamental(const string& top, vector<string>& eval)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-void IOManager::deserializeFundamental(istream& , Archive& ac,const string& str)
+void IOFormatManager::deserializeFundamental(istream& , Archive& ac,const string& str)
 {
 	any v = &str;
 //	cout << "deserializing : |" << str << "|" << endl;
@@ -178,7 +178,7 @@ void IOManager::deserializeFundamental(istream& , Archive& ac,const string& str)
 	ac.markProcessed();
 }
 
-void IOManager::serializeFundamental(ostream& stream, Archive& ac,int )
+void IOFormatManager::serializeFundamental(ostream& stream, Archive& ac,int )
 {
 	string str;
 	any v = &str;
@@ -192,7 +192,7 @@ void IOManager::serializeFundamental(ostream& stream, Archive& ac,int )
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-void IOManager::deserializeCustomClass(istream& stream, Archive& ac, const string& str)
+void IOFormatManager::deserializeCustomClass(istream& stream, Archive& ac, const string& str)
 {
 	shared_ptr<Serializable> s = dynamic_pointer_cast<Serializable>(ClassFactory::instance().createShared(ac.getSerializableClassName()));
 
@@ -203,7 +203,7 @@ void IOManager::deserializeCustomClass(istream& stream, Archive& ac, const strin
 	ac.markProcessed();
 }
 
-void IOManager::serializeCustomClass(ostream& stream, Archive& ac,int depth)
+void IOFormatManager::serializeCustomClass(ostream& stream, Archive& ac,int depth)
 {
 	shared_ptr<Serializable> s = dynamic_pointer_cast<Serializable>(ClassFactory::instance().createShared(ac.getSerializableClassName()));
 	s->serialize(ac.getAddress());
@@ -217,7 +217,7 @@ void IOManager::serializeCustomClass(ostream& stream, Archive& ac,int depth)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-void IOManager::deserializeSmartPointerOfFundamental(istream& stream, Archive& ac, const string& str)
+void IOFormatManager::deserializeSmartPointerOfFundamental(istream& stream, Archive& ac, const string& str)
 {
 	if (str.size() != 0)
 	{
@@ -228,7 +228,7 @@ void IOManager::deserializeSmartPointerOfFundamental(istream& stream, Archive& a
 	ac.markProcessed();
 }
 
-void IOManager::serializeSmartPointerOfFundamental(ostream& stream, Archive& ac , int depth)
+void IOFormatManager::serializeSmartPointerOfFundamental(ostream& stream, Archive& ac , int depth)
 {
 	shared_ptr<Archive> tmpAc;
 
@@ -243,9 +243,9 @@ void IOManager::serializeSmartPointerOfFundamental(ostream& stream, Archive& ac 
 
 
 // FIXME : provide a tokenize function pointer to parse customfundamental and container of fundamental
-// then put (de)-serializeCustomFundamental/(de)-serializeContainerOfFundamental into IOManager
+// then put (de)-serializeCustomFundamental/(de)-serializeContainerOfFundamental into IOFormatManager
 // or better provide a regexp
-void IOManager::deserializeCustomFundamental(istream& stream, Archive& ac,const string& str)
+void IOFormatManager::deserializeCustomFundamental(istream& stream, Archive& ac,const string& str)
 {
 	shared_ptr<Serializable> s = dynamic_pointer_cast<Serializable>(ClassFactory::instance().createShared(ac.getSerializableClassName()));
 
@@ -267,7 +267,7 @@ void IOManager::deserializeCustomFundamental(istream& stream, Archive& ac,const 
 }
 
 
-void IOManager::serializeCustomFundamental(ostream& stream, Archive& ac,int depth)
+void IOFormatManager::serializeCustomFundamental(ostream& stream, Archive& ac,int depth)
 {
 	shared_ptr<Serializable> ss = dynamic_pointer_cast<Serializable>(ClassFactory::instance().createShared(ac.getSerializableClassName()));
 	ss->serialize(ac.getAddress());
@@ -294,7 +294,7 @@ void IOManager::serializeCustomFundamental(ostream& stream, Archive& ac,int dept
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-void IOManager::deserializeContainerOfFundamental(istream& stream, Archive& ac, const string& str)
+void IOFormatManager::deserializeContainerOfFundamental(istream& stream, Archive& ac, const string& str)
 {
 	vector<string> tokens;
 	parseFundamental(str,tokens);
@@ -320,7 +320,7 @@ void IOManager::deserializeContainerOfFundamental(istream& stream, Archive& ac, 
 	ac.markProcessed();
 }
 
-void IOManager::serializeContainerOfFundamental(ostream& stream, Archive& ac, int depth)
+void IOFormatManager::serializeContainerOfFundamental(ostream& stream, Archive& ac, int depth)
 {
 	shared_ptr<Archive> tmpAc;
 	int size=ac.createNextArchive(ac,tmpAc,true);
@@ -351,7 +351,7 @@ void IOManager::serializeContainerOfFundamental(ostream& stream, Archive& ac, in
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-void IOManager::deserializeFundamentalSerializable(istream& stream, Archive& ac, const string& str)
+void IOFormatManager::deserializeFundamentalSerializable(istream& stream, Archive& ac, const string& str)
 {
 	shared_ptr<Archive> tmpAc;
 
@@ -373,7 +373,7 @@ void IOManager::deserializeFundamentalSerializable(istream& stream, Archive& ac,
 	s->unregisterSerializableAttributes(true);
 }
 
-void IOManager::serializeFundamentalSerializable(ostream& stream, Archive& ac, int depth)
+void IOFormatManager::serializeFundamentalSerializable(ostream& stream, Archive& ac, int depth)
 {
 	Serializable * s;
 	s = any_cast<Serializable*>(ac.getAddress());

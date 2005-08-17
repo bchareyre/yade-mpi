@@ -37,7 +37,7 @@
 #include <yade/yade-package-common/RigidBodyParameters.hpp>
 #include <yade/yade-package-common/RotationEngine.hpp>
 
-#include <yade/yade-lib-serialization/IOManager.hpp>
+#include <yade/yade-lib-serialization/IOFormatManager.hpp>
 #include <yade/yade-package-common/InteractingBox.hpp>
 #include <yade/yade-package-common/InteractingSphere.hpp>
 #include <yade/yade-package-common/InteractionGeometryMetaEngine.hpp>

@@ -158,11 +158,11 @@ int NullGUI::loop()
 			if( ( snapshotInterval != -1 ) && (intervals % snapshotInterval == 0) )
 			{
 				shared_ptr<MetaBody> rootBody = Omega::instance().getRootBody();
-				//IOManager::saveToFile(	"yade-lib-serialization-xml",
+				//IOFormatManager::saveToFile(	"yade-lib-serialization-xml",
 				//			"../data/" + snapshotName + "_" + lexical_cast<string>(Omega::instance().getCurrentIteration()) + ".xml",
 				//			"rootBody", 
 				//			rootBody);
-				IOManager::saveToFile(	"XMLManager",
+				IOFormatManager::saveToFile(	"XMLFormatManager",
 							"../data/" + snapshotName + "_" + lexical_cast<string>(Omega::instance().getCurrentIteration()) + ".xml",
 							"rootBody",
 							rootBody);

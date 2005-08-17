@@ -25,7 +25,7 @@ LIBS += -lyade-lib-wm3-math \
         -lyade-lib-threads \
         -lyade-lib-serialization \
         -lyade-lib-computational-geometry \
-        -lXMLManager \
+        -lXMLFormatManager \
         -lyade-lib-serialization-qt \
         -lQGLViewer \
         -lboost_date_time \

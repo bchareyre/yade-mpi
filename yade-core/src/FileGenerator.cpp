@@ -29,7 +29,7 @@
 FileGenerator::FileGenerator () : Serializable() 
 {
 	outputFileName = "../data/scene.xml";
-	serializationDynlib = "XMLManager";
+	serializationDynlib = "XMLFormatManager";
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -86,7 +86,7 @@ string FileGenerator::generate()
 string FileGenerator::generateAndSave()
 {
 	string message = generate();
-	IOManager::saveToFile(serializationDynlib, outputFileName, "rootBody", rootBody);
+	IOFormatManager::saveToFile(serializationDynlib, outputFileName, "rootBody", rootBody);
 	return message;
 }
 

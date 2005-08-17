@@ -157,9 +157,9 @@ void QtEngineEditor::pbSaveClicked()
 		enginesVec.push_back(engines[next].engine);
 	}
 
-	//FIXME : add combobox in GUI to select IOManager
+	//FIXME : add combobox in GUI to select IOFormatManager
 	
-	IOManager::saveToFile("XMLManager",leFileName->text(),"actors",enginesVec);
+	IOFormatManager::saveToFile("XMLFormatManager",leFileName->text(),"actors",enginesVec);
 
 }
 

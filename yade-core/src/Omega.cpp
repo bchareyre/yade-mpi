@@ -44,8 +44,8 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <yade/yade-lib-wm3-math/Vector3.hpp>
-#include <yade/yade-lib-serialization/IOManager.hpp>
-#include <yade/yade-lib-serialization/IOManager.hpp>
+#include <yade/yade-lib-serialization/IOFormatManager.hpp>
+#include <yade/yade-lib-serialization/IOFormatManager.hpp>
 #include <yade/yade-lib-threads/ThreadSynchronizer.hpp>
 #include <yade/yade-lib-threads/ThreadSafe.hpp>
 #include <yade/yade-lib-multimethods/FunctorWrapper.hpp>
@@ -429,8 +429,8 @@ void Omega::loadSimulation()
 		
 		//{
 		//	LOCK(rootBodyMutex);
-		//	IOManager::loadFromFile("yade-lib-serialization-xml",simulationFileName,"rootBody",rootBody);
-			IOManager::loadFromFile("XMLManager",simulationFileName,"rootBody",rootBody);
+		//	IOFormatManager::loadFromFile("yade-lib-serialization-xml",simulationFileName,"rootBody",rootBody);
+			IOFormatManager::loadFromFile("XMLFormatManager",simulationFileName,"rootBody",rootBody);
 			sStartingSimulationTime = second_clock::local_time();
 			msStartingSimulationTime = microsec_clock::local_time();
 			simulationPauseDuration = msStartingSimulationTime-msStartingSimulationTime;
