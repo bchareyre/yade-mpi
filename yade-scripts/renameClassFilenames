@@ -23,9 +23,9 @@ cat ./ippRenameClass  | grep -e "\<$1\>.ipp"					> ./ippRenameClass4
 
 cat ./proRenameClass4 | while read name; do
   if [ -L $name ]; then
-    ls -l $name | awk '{print $10}' | sed -e "s/\<$1\>\.pro/$2.pro/" | read target
+    target=`ls -l $name | awk '{print $10}' | sed -e "s/\<$1\>\.pro/$2.pro/" | sed -e "s/\/\<$1\>\//\/$2\//"`
+    linkname=`echo $name | sed -e "s/\<$1\>\.pro/$2.pro/"`
     svn rm $name
-    echo $name | sed -e "s/\<$1\>\.pro/$2.pro/" | read linkname
     ln -s $target $linkname
     svn add $linkname
   else
@@ -35,9 +35,9 @@ done;
 
 cat ./hppRenameClass4 | while read name; do
   if [ -L $name ]; then
-    ls -l $name | awk '{print $10}' | sed -e "s/\<$1\>\.hpp/$2.hpp/" | read target
+    target=`ls -l $name | awk '{print $10}' | sed -e "s/\<$1\>\.hpp/$2.hpp/" | sed -e "s/\/\<$1\>\//\/$2\//"`
+    linkname=`echo $name | sed -e "s/\<$1\>\.hpp/$2.hpp/"`
     svn rm $name
-    echo $name | sed -e "s/\<$1\>\.hpp/$2.hpp/" | read linkname
     ln -s $target $linkname
     svn add $linkname
   else
@@ -47,9 +47,9 @@ done;
 
 cat ./cppRenameClass4 | while read name; do
   if [ -L $name ]; then
-    ls -l $name | awk '{print $10}' | sed -e "s/\<$1\>\.cpp/$2.cpp/" | read target
+    target=`ls -l $name | awk '{print $10}' | sed -e "s/\<$1\>\.cpp/$2.cpp/" | sed -e "s/\/\<$1\>\//\/$2\//"`
+    linkname=`echo $name | sed -e "s/\<$1\>\.cpp/$2.cpp/"`
     svn rm $name
-    echo $name | sed -e "s/\<$1\>\.cpp/$2.cpp/" | read linkname
     ln -s $target $linkname
     svn add $linkname
   else
@@ -59,9 +59,9 @@ done;
 
 cat ./tppRenameClass4 | while read name; do
   if [ -L $name ]; then
-    ls -l $name | awk '{print $10}' | sed -e "s/\<$1\>\.tpp/$2.tpp/" | read target
+    target=`ls -l $name | awk '{print $10}' | sed -e "s/\<$1\>\.tpp/$2.tpp/" | sed -e "s/\/\<$1\>\//\/$2\//"`
+    linkname=`echo $name | sed -e "s/\<$1\>\.tpp/$2.tpp/"`
     svn rm $name
-    echo $name | sed -e "s/\<$1\>\.tpp/$2.tpp/" | read linkname
     ln -s $target $linkname
     svn add $linkname
   else
@@ -71,9 +71,9 @@ done;
 
 cat ./ippRenameClass4 | while read name; do
   if [ -L $name ]; then
-    ls -l $name | awk '{print $10}' | sed -e "s/\<$1\>\.ipp/$2.ipp/" | read target
+    target=`ls -l $name | awk '{print $10}' | sed -e "s/\<$1\>\.ipp/$2.ipp/" | sed -e "s/\/\<$1\>\//\/$2\//"`
+    linkname=`echo $name | sed -e "s/\<$1\>\.ipp/$2.ipp/"`
     svn rm $name
-    echo $name | sed -e "s/\<$1\>\.ipp/$2.ipp/" | read linkname
     ln -s $target $linkname
     svn add $linkname
   else
