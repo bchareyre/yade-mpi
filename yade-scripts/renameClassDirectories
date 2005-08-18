@@ -5,11 +5,15 @@ find ./  -name "*.pro" -exec fgrep -l "$2" {} \;				> ./proRenameClass
 
 echo "finding .hpp files ... "
 find ./  -name "*.hpp" -exec fgrep -l "$2" {} \;				> ./hppRenameClass6
+
+rm ./hppRenameClass
+touch ./hppRenameClass
+
 cat ./hppRenameClass6 | while read name; do
   if [ -L $name ]; then
-    echo skipping .hpp symlink..
+    echo skipping .hpp symlink.. $name
   else
-    echo $name									> ./hppRenameClass
+    echo $name									>> ./hppRenameClass
   fi;
 done
 

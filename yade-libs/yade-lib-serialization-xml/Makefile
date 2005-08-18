@@ -8,7 +8,7 @@ INSTALL_DIR=/usr/local
 
 yade_include_subdir=yade-lib-serialization-xml
 yade_lib_subdir=yade-libs
-yade_libnames_basename=XMLManager
+yade_libnames_basename=XMLFormatManager
 
 all:
 	@echo === some dirty replaces are going on. If it will not be foolproof
