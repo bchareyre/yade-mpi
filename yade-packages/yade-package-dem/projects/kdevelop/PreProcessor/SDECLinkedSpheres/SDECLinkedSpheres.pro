@@ -31,7 +31,7 @@ LIBS += -lSDECLinkGeometry \
         -lPersistentSAPCollider \
         -lParticleParameters \
         -lSAPCollider \
-        -lInteractionDescriptionSet2AABB \
+        -lMetaInteractingGeometry2AABB \
         -lyade-lib-multimethods \
         -rdynamic 
 INCLUDEPATH += /usr/local/include/ \

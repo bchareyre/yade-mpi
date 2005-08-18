@@ -34,7 +34,7 @@ LIBS += -lSDECLinkGeometry \
         -lAABB \
         -lPersistentSAPCollider \
         -lSAPCollider \
-        -lInteractionDescriptionSet2AABB \
+        -lMetaInteractingGeometry2AABB \
         -rdynamic 
 INCLUDEPATH += /usr/local/include/ \
                ../../Engine/StandAloneEngine/VelocityRecorder \

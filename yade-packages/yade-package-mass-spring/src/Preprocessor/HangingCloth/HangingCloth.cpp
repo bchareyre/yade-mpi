@@ -56,7 +56,7 @@
 #include <yade/yade-package-common/BoundingVolumeMetaEngine.hpp>
 #include <yade/yade-package-common/GeometricalModelMetaEngine.hpp>
 
-#include <yade/yade-package-common/InteractionDescriptionSet2AABB.hpp>
+#include <yade/yade-package-common/MetaInteractingGeometry2AABB.hpp>
 #include <yade/yade-package-common/MetaInteractingGeometry.hpp>
 #include <yade/yade-package-common/ParticleParameters.hpp>
 #include <yade/yade-package-common/InteractingSphere.hpp>
@@ -193,7 +193,7 @@ string HangingCloth::generate()
 	shared_ptr<BoundingVolumeMetaEngine> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeMetaEngine>(new BoundingVolumeMetaEngine);
 	boundingVolumeDispatcher->add("InteractingSphere","AABB","Sphere2AABB");
 	boundingVolumeDispatcher->add("InteractingBox","AABB","Box2AABB");
-	boundingVolumeDispatcher->add("MetaInteractingGeometry","AABB","InteractionDescriptionSet2AABB");
+	boundingVolumeDispatcher->add("MetaInteractingGeometry","AABB","MetaInteractingGeometry2AABB");
 
 	shared_ptr<GeometricalModelMetaEngine> geometricalModelDispatcher	= shared_ptr<GeometricalModelMetaEngine>(new GeometricalModelMetaEngine);
 	geometricalModelDispatcher->add("ParticleSetParameters","Mesh2D","ParticleSet2Mesh2D");

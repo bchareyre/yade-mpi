@@ -22,7 +22,7 @@ LIBS += -lBodyMacroParameters \
         -lAABB \
         -lSphere \
         -lBox \
-        -lInteractionDescriptionSet2AABB \
+        -lMetaInteractingGeometry2AABB \
         -rdynamic 
 INCLUDEPATH += /usr/local/include/ \
                ../../Engine/StandAloneEngine/ElasticCriterionTimeStepper \

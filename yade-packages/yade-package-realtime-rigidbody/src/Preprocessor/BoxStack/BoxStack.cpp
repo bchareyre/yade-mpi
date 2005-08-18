@@ -49,7 +49,7 @@
 #include <yade/yade-package-common/CundallNonViscousMomentumDamping.hpp>
 
 #include <yade/yade-package-common/BoundingVolumeMetaEngine.hpp>
-#include <yade/yade-package-common/InteractionDescriptionSet2AABB.hpp>
+#include <yade/yade-package-common/MetaInteractingGeometry2AABB.hpp>
 #include <yade/yade-package-common/MetaInteractingGeometry.hpp>
 
 #include <yade/yade-package-common/PhysicalActionContainerInitializer.hpp>
@@ -292,7 +292,7 @@ void BoxStack::createActors(shared_ptr<MetaBody>& rootBody)
 	shared_ptr<BoundingVolumeMetaEngine> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeMetaEngine>(new BoundingVolumeMetaEngine);
 	boundingVolumeDispatcher->add("InteractingSphere","AABB","Sphere2AABB");
 	boundingVolumeDispatcher->add("InteractingBox","AABB","Box2AABB");
-	boundingVolumeDispatcher->add("MetaInteractingGeometry","AABB","InteractionDescriptionSet2AABB");
+	boundingVolumeDispatcher->add("MetaInteractingGeometry","AABB","MetaInteractingGeometry2AABB");
 		
 	shared_ptr<GravityEngine> gravityCondition(new GravityEngine);
 	gravityCondition->gravity = gravity;

@@ -150,7 +150,7 @@ HEADERS += AABB.hpp \
            InteractionContainer.hpp \
            InteractionContainerIterator.hpp \
            InteractionContainerIteratorPointer.hpp \
-           InteractionDescriptionSet2AABB.hpp \
+           MetaInteractingGeometry2AABB.hpp \
            InteractionGeometry.hpp \
            InteractionGeometryEngineUnit.hpp \
            InteractionGeometryMetaEngine.hpp \
@@ -413,7 +413,7 @@ SOURCES += yade.cpp \
            InteractingSphere.cpp \
            Interaction.cpp \
            InteractionContainer.cpp \
-           InteractionDescriptionSet2AABB.cpp \
+           MetaInteractingGeometry2AABB.cpp \
            InteractionGeometryMetaEngine.cpp \
            InteractionHashMap.cpp \
            InteractionHashMapIterator.cpp \

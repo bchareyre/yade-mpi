@@ -42,7 +42,7 @@
 #include <yade/yade-lib-serialization/IOFormatManager.hpp>
 #include <yade/yade-core/Interaction.hpp>
 #include <yade/yade-package-common/BoundingVolumeMetaEngine.hpp>
-#include <yade/yade-package-common/InteractionDescriptionSet2AABB.hpp>
+#include <yade/yade-package-common/MetaInteractingGeometry2AABB.hpp>
 #include <yade/yade-package-common/MetaInteractingGeometry.hpp>
 
 #include <yade/yade-package-common/CundallNonViscousForceDamping.hpp>

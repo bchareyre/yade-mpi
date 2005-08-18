@@ -36,7 +36,7 @@ LIBS += -lSpringGeometry \
         -lSAPCollider \
         -lRigidBodyParameters \
         -lBodyMacroParameters \
-        -lInteractionDescriptionSet2AABB \
+        -lMetaInteractingGeometry2AABB \
         -lyade-lib-multimethods \
         -lMassSpringLaw \
         -lElasticContactLaw \

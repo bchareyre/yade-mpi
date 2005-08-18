@@ -26,7 +26,7 @@ LIBS += -lFrictionLessElasticContactLaw \
         -lBox \
         -lSphere \
         -lSAPCollider \
-        -lInteractionDescriptionSet2AABB \
+        -lMetaInteractingGeometry2AABB \
         -lRotationEngine \
         -lyade-lib-multimethods \
         -rdynamic 

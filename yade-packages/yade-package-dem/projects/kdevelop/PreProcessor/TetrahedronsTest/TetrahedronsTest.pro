@@ -31,7 +31,7 @@ LIBS += -lPolyhedralSweptSphere \
         -lPersistentSAPCollider \
         -lParticleParameters \
         -lSAPCollider \
-        -lInteractionDescriptionSet2AABB \
+        -lMetaInteractingGeometry2AABB \
         -lTetrahedron \
         -lyade-lib-serialization \
         -lyade-lib-wm3-math \

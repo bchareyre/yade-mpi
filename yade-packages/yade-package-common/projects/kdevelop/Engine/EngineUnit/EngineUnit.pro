@@ -4,7 +4,7 @@
 # Target is a subdirs project 
 
 SUBDIRS += Box2AABB \
-           InteractionDescriptionSet2AABB \
+           MetaInteractingGeometry2AABB \
            LeapFrogOrientationIntegrator \
            LeapFrogPositionIntegrator \
            NewtonsForceLaw \
