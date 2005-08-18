@@ -6,7 +6,7 @@
 SUBDIRS += ElasticCohesiveLaw \
            ElasticContactLaw \
            SwiftPolyhedronProximityModeler \
-           SDECTimeStepper \
+           ElasticCriterionTimeStepper \
            AveragePositionRecorder \
            ForceRecorder \
            PositionOrientationRecorder \

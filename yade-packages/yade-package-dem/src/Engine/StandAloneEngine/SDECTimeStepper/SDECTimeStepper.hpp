@@ -39,14 +39,14 @@ class MacroMicroElasticRelationships;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-class SDECTimeStepper : public TimeStepper
+class ElasticCriterionTimeStepper : public TimeStepper
 {
 
 	public  : int sdecGroupMask;
 	private : shared_ptr<MacroMicroElasticRelationships> sdecContactModel;
 
-	public : SDECTimeStepper();
-	public : virtual ~SDECTimeStepper();
+	public : ElasticCriterionTimeStepper();
+	public : virtual ~ElasticCriterionTimeStepper();
 	
 	public : virtual void computeTimeStep(Body* body);
 	
@@ -56,14 +56,14 @@ class SDECTimeStepper : public TimeStepper
 	private : bool computedSomething;
 
 	protected: virtual void registerAttributes();
-	REGISTER_CLASS_NAME(SDECTimeStepper);
+	REGISTER_CLASS_NAME(ElasticCriterionTimeStepper);
 	REGISTER_BASE_CLASS_NAME(TimeStepper);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-REGISTER_SERIALIZABLE(SDECTimeStepper,false);
+REGISTER_SERIALIZABLE(ElasticCriterionTimeStepper,false);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////

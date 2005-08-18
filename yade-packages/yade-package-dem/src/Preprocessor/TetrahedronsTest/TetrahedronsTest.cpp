@@ -27,7 +27,7 @@
 #include "ElasticContactLaw.hpp"
 #include "SDECLinkGeometry.hpp"
 #include "MacroMicroElasticRelationships.hpp"
-#include "SDECTimeStepper.hpp"
+#include "ElasticCriterionTimeStepper.hpp"
 #include "SwiftPolyhedronProximityModeler.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -365,7 +365,7 @@ void TetrahedronsTest::createActors(shared_ptr<MetaBody>& rootBody)
 	orientationIntegrator->add("RigidBodyParameters","LeapFrogOrientationIntegrator");
  	
 
-	shared_ptr<SDECTimeStepper> sdecTimeStepper(new SDECTimeStepper);
+	shared_ptr<ElasticCriterionTimeStepper> sdecTimeStepper(new ElasticCriterionTimeStepper);
 	sdecTimeStepper->sdecGroupMask = 1;
 	sdecTimeStepper->timeStepUpdateInterval = timeStepUpdateInterval;
 

@@ -35,7 +35,7 @@
 #include "BodyMacroParameters.hpp"
 #include "SDECLinkGeometry.hpp"
 #include "SDECLinkPhysics.hpp"
-#include "SDECTimeStepper.hpp"
+#include "ElasticCriterionTimeStepper.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -378,7 +378,7 @@ void SDECLinkedSpheres::createActors(shared_ptr<MetaBody>& rootBody)
 	shared_ptr<PhysicalParametersMetaEngine> orientationIntegrator(new PhysicalParametersMetaEngine);
 	orientationIntegrator->add("RigidBodyParameters","LeapFrogOrientationIntegrator");
  	
-	shared_ptr<SDECTimeStepper> sdecTimeStepper(new SDECTimeStepper);
+	shared_ptr<ElasticCriterionTimeStepper> sdecTimeStepper(new ElasticCriterionTimeStepper);
 	sdecTimeStepper->sdecGroupMask = 55;
 	sdecTimeStepper->timeStepUpdateInterval = timeStepUpdateInterval;
 

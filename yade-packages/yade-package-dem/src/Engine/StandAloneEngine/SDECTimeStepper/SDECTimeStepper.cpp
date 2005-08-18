@@ -21,7 +21,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "SDECTimeStepper.hpp"
+#include "ElasticCriterionTimeStepper.hpp"
 #include "BodyMacroParameters.hpp"
 #include "ElasticContactParameters.hpp"
 #include "SpheresContactGeometry.hpp"
@@ -37,7 +37,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-SDECTimeStepper::SDECTimeStepper() : TimeStepper() , sdecContactModel(new MacroMicroElasticRelationships)
+ElasticCriterionTimeStepper::ElasticCriterionTimeStepper() : TimeStepper() , sdecContactModel(new MacroMicroElasticRelationships)
 {
 	sdecGroupMask = 1;
 }
@@ -45,7 +45,7 @@ SDECTimeStepper::SDECTimeStepper() : TimeStepper() , sdecContactModel(new MacroM
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-SDECTimeStepper::~SDECTimeStepper()
+ElasticCriterionTimeStepper::~ElasticCriterionTimeStepper()
 {
 
 }
@@ -53,7 +53,7 @@ SDECTimeStepper::~SDECTimeStepper()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void SDECTimeStepper::registerAttributes()
+void ElasticCriterionTimeStepper::registerAttributes()
 {
 	TimeStepper::registerAttributes();
 	REGISTER_ATTRIBUTE(sdecGroupMask);
@@ -62,7 +62,7 @@ void SDECTimeStepper::registerAttributes()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void SDECTimeStepper::findTimeStepFromBody(const shared_ptr<Body>& body)
+void ElasticCriterionTimeStepper::findTimeStepFromBody(const shared_ptr<Body>& body)
 {
 	BodyMacroParameters * sdec	= dynamic_cast<BodyMacroParameters*>(body->physicalParameters.get());
 	Sphere* sphere 		= dynamic_cast<Sphere*>(body->geometricalModel.get());
@@ -97,7 +97,7 @@ void SDECTimeStepper::findTimeStepFromBody(const shared_ptr<Body>& body)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void SDECTimeStepper::findTimeStepFromInteraction(const shared_ptr<Interaction>& interaction, shared_ptr<BodyContainer>& bodies)
+void ElasticCriterionTimeStepper::findTimeStepFromInteraction(const shared_ptr<Interaction>& interaction, shared_ptr<BodyContainer>& bodies)
 {
 	unsigned int id1 = interaction->getId1();
 	unsigned int id2 = interaction->getId2();
@@ -137,7 +137,7 @@ void SDECTimeStepper::findTimeStepFromInteraction(const shared_ptr<Interaction>&
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void SDECTimeStepper::computeTimeStep(Body* body)
+void ElasticCriterionTimeStepper::computeTimeStep(Body* body)
 {
 	MetaBody * ncb = dynamic_cast<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
@@ -173,7 +173,7 @@ void SDECTimeStepper::computeTimeStep(Body* body)
 	if(computedSomething)
 	{
 		Omega::instance().setTimeStep(newDt);		
-		//cerr << "SDECTimeStepper, timestep chosen is:" << Omega::instance().getTimeStep() << endl;
+		//cerr << "ElasticCriterionTimeStepper, timestep chosen is:" << Omega::instance().getTimeStep() << endl;
 	}
 }
 

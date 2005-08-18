@@ -33,3 +33,7 @@ makeFlat          : invoke from trunk/
                     make symlinks of all source files (.cpp, .tpp, .h, .c, .ipp)
 		    in yade-flat.
 		    
+renameClassFirst        name1 name2
+renameClassFilenames    name1 name2
+renameClassDirectories  name1 name2    : scripts that make it easier to change
+                                         globally class names (very useful).

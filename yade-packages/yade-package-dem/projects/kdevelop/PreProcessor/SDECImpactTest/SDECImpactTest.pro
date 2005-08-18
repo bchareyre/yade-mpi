@@ -9,7 +9,7 @@ LIBS += -lSDECLinkGeometry \
         -lVelocityRecorder \
         -lForceRecorder \
         -lMacroMicroElasticRelationships \
-        -lSDECTimeStepper \
+        -lElasticCriterionTimeStepper \
         -lPhysicalActionVectorVector \
         -lInteractionVecSet \
         -lBodyRedirectionVector \
@@ -40,7 +40,7 @@ INCLUDEPATH += /usr/local/include/ \
                ../../Engine/StandAloneEngine/VelocityRecorder \
                ../../Engine/StandAloneEngine/ForceRecorder \
                ../../Engine/StandAloneEngine/AveragePositionRecorder \
-               ../../Engine/StandAloneEngine/SDECTimeStepper \
+               ../../Engine/StandAloneEngine/ElasticCriterionTimeStepper \
                ../../Engine/StandAloneEngine/ElasticContactLaw \
                ../../Engine/EngineUnit/MacroMicroElasticRelationships \
                ../../DataClass/InteractionPhysics/SDECLinkPhysics \

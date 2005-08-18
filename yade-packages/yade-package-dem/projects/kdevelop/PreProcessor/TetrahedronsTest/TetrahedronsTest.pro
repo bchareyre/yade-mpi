@@ -8,7 +8,7 @@ LIBS += -lPolyhedralSweptSphere \
         -lElasticContactLaw \
         -lSwiftPolyhedronProximityModeler \
         -lMacroMicroElasticRelationships \
-        -lSDECTimeStepper \
+        -lElasticCriterionTimeStepper \
         -lPhysicalActionVectorVector \
         -lInteractionVecSet \
         -lBodyRedirectionVector \
@@ -38,7 +38,7 @@ LIBS += -lPolyhedralSweptSphere \
         -lyade-lib-multimethods \
         -rdynamic 
 INCLUDEPATH += /usr/local/include/ \
-               ../../Engine/StandAloneEngine/SDECTimeStepper \
+               ../../Engine/StandAloneEngine/ElasticCriterionTimeStepper \
                ../../Engine/StandAloneEngine/SwiftPolyhedronProximityModeler \
                ../../Engine/StandAloneEngine/ElasticContactLaw \
                ../../Engine/EngineUnit/MacroMicroElasticRelationships \

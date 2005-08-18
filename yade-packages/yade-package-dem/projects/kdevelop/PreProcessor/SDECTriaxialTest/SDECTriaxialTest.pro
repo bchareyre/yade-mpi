@@ -6,7 +6,7 @@
 LIBS += -lBodyMacroParameters \
         -lElasticContactLaw \
         -lMacroMicroElasticRelationships \
-        -lSDECTimeStepper \
+        -lElasticCriterionTimeStepper \
         -lPhysicalActionVectorVector \
         -lInteractionVecSet \
         -lBodyRedirectionVector \
@@ -25,7 +25,7 @@ LIBS += -lBodyMacroParameters \
         -lInteractionDescriptionSet2AABB \
         -rdynamic 
 INCLUDEPATH += /usr/local/include/ \
-               ../../Engine/StandAloneEngine/SDECTimeStepper \
+               ../../Engine/StandAloneEngine/ElasticCriterionTimeStepper \
                ../../Engine/StandAloneEngine/ElasticContactLaw \
                ../../Engine/EngineUnit/MacroMicroElasticRelationships \
                ../../DataClass/PhysicalParameters/BodyMacroParameters 

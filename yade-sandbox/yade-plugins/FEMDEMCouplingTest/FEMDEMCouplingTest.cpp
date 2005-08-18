@@ -46,7 +46,7 @@
 #include <yade/yade-common/PhysicalActionContainerReseter.hpp>
 #include <yade/yade-common/FEMSetTextLoader.hpp>
 //actors DEM
-#include <yade/yade-common/SDECTimeStepper.hpp>
+#include <yade/yade-common/ElasticCriterionTimeStepper.hpp>
 #include <yade/yade-common/ElasticContactLaw.hpp>
 #include <yade/yade-common/PersistentSAPCollider.hpp>
 
@@ -207,7 +207,7 @@ void FEMDEMCouplingTest::createActors(shared_ptr<MetaBody>& rootBody)
 	femLaw->nodeGroupMask = nodeGroupMask;
 	femLaw->tetrahedronGroupMask = tetrahedronGroupMask;
 
-	shared_ptr<SDECTimeStepper> sdecTimeStepper(new SDECTimeStepper);
+	shared_ptr<ElasticCriterionTimeStepper> sdecTimeStepper(new ElasticCriterionTimeStepper);
 	sdecTimeStepper->sdecGroupMask = demGroupMask;
 	sdecTimeStepper->interval = timeStepUpdateInterval;
 	

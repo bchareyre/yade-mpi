@@ -25,7 +25,7 @@
 
 #include "BodyMacroParameters.hpp"
 #include "ElasticContactLaw.hpp"
-#include "SDECTimeStepper.hpp"
+#include "ElasticCriterionTimeStepper.hpp"
 #include "MacroMicroElasticRelationships.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

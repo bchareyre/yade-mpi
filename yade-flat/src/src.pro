@@ -252,7 +252,7 @@ HEADERS += AABB.hpp \
            SDECLinkGeometry.hpp \
            SDECLinkPhysics.hpp \
            SDECSpheresPlane.hpp \
-           SDECTimeStepper.hpp \
+           ElasticCriterionTimeStepper.hpp \
            SDECTriaxialTest.hpp \
            Se3.hpp \
            Serializable.hpp \
@@ -506,7 +506,7 @@ SOURCES += yade.cpp \
            SDECLinkGeometry.cpp \
            SDECLinkPhysics.cpp \
            SDECSpheresPlane.cpp \
-           SDECTimeStepper.cpp \
+           ElasticCriterionTimeStepper.cpp \
            SDECTriaxialTest.cpp \
            Se3.cpp \
            Serializable.cpp \

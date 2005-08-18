@@ -6,7 +6,7 @@
 LIBS += -lSDECLinkGeometry \
         -lElasticContactLaw \
         -lMacroMicroElasticRelationships \
-        -lSDECTimeStepper \
+        -lElasticCriterionTimeStepper \
         -lPhysicalActionVectorVector \
         -lInteractionVecSet \
         -lBodyRedirectionVector \
@@ -35,7 +35,7 @@ LIBS += -lSDECLinkGeometry \
         -lyade-lib-multimethods \
         -rdynamic 
 INCLUDEPATH += /usr/local/include/ \
-               ../../Engine/StandAloneEngine/SDECTimeStepper \
+               ../../Engine/StandAloneEngine/ElasticCriterionTimeStepper \
                ../../Engine/StandAloneEngine/ElasticContactLaw \
                ../../Engine/EngineUnit/MacroMicroElasticRelationships \
                ../../DataClass/InteractionGeometry/SDECLinkGeometry \
