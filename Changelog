@@ -302,8 +302,8 @@ r.373
 r.368
   Added BodyPhysics class and moved all type of bodies into subdirectory, BodyPhysics
 
-r.367 version 0.6.9
-  tagging v.0.6.9
+r.367 version 0.6.8
+  tagging v.0.6.8
   - Added single step button in QtGUI
   - Better SpheresPlanes FileGenerator
   - HangingCloth is working again but it is designed using Yade framework
@@ -314,8 +314,8 @@ r.366
 r.355
   InteractionPhysicsDispatcher starts to works. But we have to make BodyPhysics
 
-r.352 (*) (****) version 0.6.8
-  tagging v.0.6.8
+r.352 (*) (****) version 0.6.7
+  tagging v.0.6.7
   - small change in ActionDispatcher.cpp, is faster, but if Action was holding body's id it is possible that it can be faster result: 107 seconds is faster compared to 111 seconds
   - tere are a lot of places where we can do improvement like this. if we do code change like here - in every possible places - yade can gain a lot of speed.
   - basically I've discovered that every temporary variable of type shared_ptr<> costs 3 seconds, so we should avoid creating them and instead pass them around by references - whenever possible. 
@@ -324,8 +324,8 @@ r.352 (*) (****) version 0.6.8
 r.351
   renamed CollisionFunctor to InteractionFunctor
 
-r.345 version 0.6.7
-  tagging v.0.6.7
+r.345 version 0.6.6
+  tagging v.0.6.6
   - possibly faster DynLibDispatcher, 
   - I was also trying to fix problem that Singleton is not deleted at end, but finally I made only some improvement, but it is still not fixed.
 
