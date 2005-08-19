@@ -419,7 +419,7 @@ r.245
 
 r.232 version 0.5.1
   tagging v.0.5.1
-  small fixes, little faster
+  - small fixes, little faster
 
 r.227 version 0.5.0
   tagging v.0.5.0
@@ -492,7 +492,7 @@ r.165 version 0.4.3
 
 r.155 version 0.4.2
   tagging v.0.4.2
-  better serialization for math stuff.
+  - better serialization for math stuff.
 
 r.154 
   math classes are separate from serialization, and done with templates (but with wild-magic license)
@@ -517,14 +517,15 @@ r.122
   moment rotation law added, mess inside SDECDynamicEngine (three enegines in one!)
 
 r.112 version 0.3.1
-  added NullGUI, so commandline computation is possible
+  tagging v.0.3.1
+  - added NullGUI, so commandline computation is possible
 
 r.108
   started ErrorTolerant DynamicEngine
 
 r.90 version 0.3.0
   tagging v.0.3.0
-  SDEC (DEM) added and works with contact law
+  - SDEC (DEM) added and works with contact law
 
 r.83
   SDECDynamicEngine starts to work with SDEC contact law
@@ -537,7 +538,7 @@ r.76
 
 r.74 version 0.2.0
   tagging v.0.2.0 with working cloth, rotatingbox and falling boxes. before adding SDEC
-  ClassFactory is now reusable
+  - ClassFactory is now reusable
   
 r.56
   ClassFactory is now reusable
@@ -549,7 +550,7 @@ r.30
   cloth simulation added
 
 r.26 version 0.1.1
-  Tagging version v.0.1.1 after adding multimethods and before adding Cloth
+  tagging version v.0.1.1 after adding multimethods and before adding Cloth
 
 r.17
   first try at multimethods, added class Indexable, and multimethods are used for collision
