@@ -1,398 +1,565 @@
-r.842
-renaming:
-XMLManager -> XMLFormatManager
-IOManager  -> IOFormatManager
-MacroMicroContactGeometry -> SpheresContactGeometry
-SDECTimeStepper -> ElasticCriterionTimeStepper
+r.8?? version 0.9.1
+  tagging v.0.9.1
+  - huge improvement in Makefile. 'make compile_install' and yade is ready to
+  release to the wild world.
+  - some class renamed to better reflect their functions,
+  - some cleaning,
+  - Simulation loop editing through GUI starts to work,
+  - added REGSITER_BASE_CLASS_NAME, so we can build class tree on runtime (used by simulation loop GUI),
+  - removed all references from Serialization stuff to yade-lib-multimethod as
+  they are totally unrelated,
+  - plugins of yade containers are now using ::iterator, just like STL !
+  - Tetrahedron Discrete Model, and Lattice Discrete Model start to work, but
+  not good enough to increment a major revision number.
+  - FEM, DEM, Mass Spring and Rigid Body are working good.
+  
+
+r.845
+  renaming:
+  XMLManager -> XMLFormatManager
+  IOManager  -> IOFormatManager
+  MacroMicroContactGeometry -> SpheresContactGeometry
+  SDECTimeStepper -> ElasticCriterionTimeStepper
+  InteractionDescriptionSet2AABB -> MetaInteractingGeometry2AABB
 
 r.832 (*)
-hug improvement in Makefile. now the mechanism of make is ready to release
-yade to the wild world.
+  huge improvement in Makefile. now the mechanism of make is ready to release yade to the wild world.
 
 r.821
-Simulation loop editing is now working. There are still some random crashes to
-fix and for now it is not possible to load a simulation loop.
+  Simulation loop editing is now working. There are still some random crashes to fix and for now it is not possible to load a simulation loop.
 
 r.818 (*) (fix article)
-Removed unused classes.
-D    yade-core/src/InteractionSolver.cpp
-D    yade-core/src/InteractionSolver.hpp
-D    yade-core/src/BroadInteractor.cpp
-D    yade-core/src/BroadInteractor.hpp
-D    yade-core/projects/kdevelop/yade/InteractionSolver.cpp
-D    yade-core/projects/kdevelop/yade/BroadInteractor.cpp
-M    yade-core/projects/kdevelop/yade/yade.pro
-D    yade-core/projects/kdevelop/yade/InteractionSolver.hpp
-D    yade-core/projects/kdevelop/yade/BroadInteractor.hpp
+  Removed unused classes.
+  D    yade-core/src/InteractionSolver.cpp
+  D    yade-core/src/InteractionSolver.hpp
+  D    yade-core/src/BroadInteractor.cpp
+  D    yade-core/src/BroadInteractor.hpp
+  D    yade-core/projects/kdevelop/yade/InteractionSolver.cpp
+  D    yade-core/projects/kdevelop/yade/BroadInteractor.cpp
+  M    yade-core/projects/kdevelop/yade/yade.pro
+  D    yade-core/projects/kdevelop/yade/InteractionSolver.hpp
+  D    yade-core/projects/kdevelop/yade/BroadInteractor.hpp
 
 
 r.817
-added REGSITER_BASE_CLASS_NAME, so we can build class tree on runtime.
+  added REGSITER_BASE_CLASS_NAME, so we can build class tree on runtime.
 
 r.815
-Improvements into QtEngineEditor. Now it is olamost possible to create
-graphically a simultation loop.Now I have to make something to set parameter of
-MetaEngines.
+  Improvements in QtEngineEditor. Now it is almost possible to create graphically a simultation loop.Now I have to make something to set parameter of MetaEngines.
 
 r.812 (*)
-Better design : added class related to MetaEngine. Removed all references to Serialization stuff into yade-lib-multimethod. They are now into newly added classes.
+  Better design : added class related to MetaEngine. Removed all references to Serialization stuff into yade-lib-multimethod. They are now into newly added classes.
 
 r.809 (*)
-plugin containers for yade use ::iterator, just like STL !
+  plugin containers for yade use ::iterator, just like STL !
 
 r.808
-I have introduced iterators for all types of containers in order to remove the
-dirty gotoFirst, gotoNext, hasNext and notAtEnd methods. Now it looks like
-more like STL iterators. It is compiling but unfortunately it is segfaulting at runtime, probably some problems in ++,* operators.
+  I have introduced iterators for all types of containers in order to remove the dirty gotoFirst, gotoNext, hasNext and notAtEnd methods. Now it looks like more like STL iterators. It is compiling but unfortunately it is segfaulting at runtime, probably some problems in ++,* operators.
 
 r.804
-Better YadeQtMainWindow. Now menus are displayed in menu bar in the same order
-they are added in the program. Added preferences for QtGUI. Now it remembers size and position and exit. Now it is possible to choose time step from GUI.
+  Better YadeQtMainWindow. Now menus are displayed in menu bar in the same order they are added in the program. Added preferences for QtGUI. Now it remembers size and position and exit. Now it is possible to choose time step from GUI.
 
-r.801 (*)
-second directory tree finished.
+r.801 (*) version 0.9.0
+  tagging v.0.9.0
+  - second redesign of directory tree finished.
+  - yade-core is clean
+  - yade-empties contain templates for whole packages.
+  - New yade-empty-package which is simpler than previous one.
+  - Makefiles install correctly.
+  - Yade is now compiling with separate libraries projects
+
 
 r.758
-yade-core is clean
+  yade-core is clean
 
 r.754
-yade-empties contain templates for whole packages.
+  yade-empties contain templates for whole packages.
 
 r.748
-New yade-empty-package which is simpler than previous one. Makefiles install
-correctly. Yade is now compiling with separate libraries projects
+  New yade-empty-package which is simpler than previous one. Makefiles install correctly. Yade is now compiling with separate libraries projects
 
 r.746
-fixed all #include paths, started Makefiles
+  fixed all #include paths, started Makefiles
 
-r.732 (*)
-second directory tree redesign started. much better now.
+r.732
+  second directory tree redesign started. much better now.
 
-r.714 (*)
-added user manual to doc/, without pictures, and still a draft.
+r.714 (*) version 0.8.6
+  tagging v.0.8.6
+  - All those extra environment variables are no longer needed. Currently only LD_LIBRARY_PATH is used by dlopen. Dunno how to remove it.
+  - added user manual to doc/, without pictures, and still a draft.
+  - Small change so that yade is compiling with qglviewer 2.0
+  - Updates in Omega : now foreach plugins we store if it is indexable, factorable or serializable.
+  - Improved GUI for code generation : Data class, engine and dispatching engine works. No stuff is done for generation of kdevelop projects.
+
 
 r.709 (*)
-All those extra environment variables are no longer needed. Currently only
-LD_LIBRARY_PATH is used by dlopen. Dunno how to remove it.
+  All those extra environment variables are no longer needed. Currently only LD_LIBRARY_PATH is used by dlopen. Dunno how to remove it.
 
 r.708
-Small change so that yade is compiling with qglviewer 2.0
+  Small change so that yade is compiling with qglviewer 2.0
 
 r.705
-Updates in Omega : now foreach plugins we store if it is indexable, factorable
-or serializable. Improved GUI for code generation : Data class, engine and dispatching engine works. No stuff is done for generation of kdevelop projects.
+  Updates in Omega : now foreach plugins we store if it is indexable, factorable or serializable. Improved GUI for code generation : Data class, engine and dispatching engine works. No stuff is done for generation of kdevelop projects.
 
 r.701
-Added some functions into yade-lib-computational-geometry. Started to and graphical interface for buliding simulation loop and initializer list
+  Added some functions into yade-lib-computational-geometry. Started to and graphical interface for buliding simulation loop and initializer list
 
-r.700 (*)
-Lattice works with rods, but dirty, of course - as always when something is implemented for the first time :>
+r.700 (*) version 0.8.5
+  tagging v.0.8.5
+  - Lattice works with rods, but dirty, of course - as always when something is implemented for the first time :>
 
 r.691 (*)
-Added some dynlibs for handling swept sphere volume.
+  Added some dynlibs for handling swept sphere volume.
 
-r.690 (*)
-To make yade deserialization working I had to modify PointerHandler.tpp around line 90.
-Basically I just remplaced a dynamic_cast by a reinterpret_cast. We have to
-find why dynamic_cast is not working anymore.
+r.690
+  To make yade deserialization working I had to modify PointerHandler.tpp around line 90. Basically I just replaced a dynamic_cast by a reinterpret_cast. We have to find why dynamic_cast is not working anymore.
 
-r.688 (*)
-Added new file generator Funnel and TetrahedronsTest (*)
-Added new InteractingGeometry PolyhedralSweptSphere (*)
-Added new NarrowInteractionGeometryEngine SwiftPolyhedronProximityModeler that
-will use SWIFT++ library and PolyhedralSweptSphere (*)
-Added EngineUnit Tetrahedron2PolyhedralSweptSphere and Box2PolyhedralSweptSphere
-that will build InteractingGeometry
+r.688 (*) version 0.8.4
+  tagging v.0.8.4
+  - Added new file generator Funnel and TetrahedronsTest (*)
+  - Added new InteractingGeometry PolyhedralSweptSphere (*)
+  - Added new NarrowInteractionGeometryEngine SwiftPolyhedronProximityModeler that will use SWIFT++ library and PolyhedralSweptSphere (*)
+  - Added EngineUnit Tetrahedron2PolyhedralSweptSphere and Box2PolyhedralSweptSphere that will build InteractingGeometry
 
 r.687 (*)
-Lets consider here that splitting is done. (but almost)
+  Lets consider here that splitting is done. (but almost)
 
 r.686
-Added MarchingCube algorithm into yade-lib-computationnal-geometry
-Created lib yade-lib-algorithms were to gather algorithms of different type :
-for now there is only a PerlinNoise algorithm, but we can put here sorting
-algorithm ...
+  Added MarchingCube algorithm into yade-lib-computationnal-geometry
+  Created lib yade-lib-algorithms were to gather algorithms of different type : for now there is only a PerlinNoise algorithm, but we can put here sorting algorithm ...
 
 r.684
-Added librarie swift++ and qhull.
-Modified scripts so that they work with .h and .c files. improved
-documentation (*)
+  Added libraries swift++ and qhull.
+  Modified scripts so that they work with .h and .c files. improved documentation
 
 r.680
-SimpleSpringLaw renamed to FrictionLessElasticContactLaw.
+  SimpleSpringLaw renamed to FrictionLessElasticContactLaw.
 
 r.671
-Renaming:
-PhysicalActionEngineUnit -> PhysicalActionDamperUnit, PhysicalActionApplierUnit
-Added class Preferences that contains directory to dynlibs (*). Modification
-of library yade-lib-factory so that it is using multiple directories to look
-for requested dynlib (*)
+  Renaming:
+  PhysicalActionEngineUnit -> PhysicalActionDamperUnit, PhysicalActionApplierUnit
+  Added class Preferences that contains directory to dynlibs.
+  Modification of library yade-lib-factory so that it is using multiple directories to look for requested dynlib
 
-r.669 (*)
-Splitted ElasticContactLaw into 2 : ElasticContactLaw and ElasticCohesiveLaw.
-Autocollision for hanging cloth is working without hack. (*)
+r.669 version 0.8.3
+  tagging v.0.8.3
+  - Splitted ElasticContactLaw into 2 : ElasticContactLaw and ElasticCohesiveLaw.
+  - Autocollision for hanging cloth is working without hack.
 
 r.668
-Removing all references to libraries Interactions, Body and Engine that no longer
-exist. Yade should now compile.
+  Removing all references to libraries Interactions, Body and Engine that no longer exist. Yade should now compile.
 
 r.639
-renamed ActionParameter to PhysicalAction
+  renamed ActionParameter to PhysicalAction
 
-r.637
-new directory structure almost splitted, we start to have packages. Yade is
-now compiling on the first try. removed initialization in constructor of
-bodyContainer, InteractionContainer ... because now container are in plugins
-and so compiled after yade itself. Changed name Dispatcher/funtor to MetaEngine/EngineUnit
+r.637 version 0.8.2
+  tagging v.0.8.2
+  - new directory structure almost splitted, we start to have packages. 
+  - Yade is now compiling on the first try.
+  - removed initialization in constructor of bodyContainer, InteractionContainer ... because now container are in plugins and so compiled after yade itself.
+  - Changed name Dispatcher/funtor to MetaEngine/EngineUnit
 
-r.562
-we have made a great yade-empty directory structure. This is a design for
-future split of yade into several packages.
+r.562 version 0.8.1
+  tagging v.0.8.1
+  - we have made a great yade-empty directory structure. This is a design for future split of yade into several packages.
 
 r.554
-Renaming classes. First draft of documentation.
+  Renaming classes. First draft of documentation.
 
 r.512
-Added layout and scrollview to QTGUI
+  Added layout and scrollview to QTGUI
 
 r.510 (*)
-better openGL tetrahedron display. created empty directories for splitting to packages.
+  better openGL tetrahedron display. created empty directories for splitting to packages.
 
-r.486 (*)
-FEM works!
+r.486 version 0.8.0
+  tagging v.0.8.0
+  - FEM works!
 
-r.482 (*)
-FEM is half done - generation works. and other stuff. Only Constitutive Law for FEM is empty - waiting to be written. But there is a compilation problem we have to compile twice now, because of linker errors in fem loader.
+r.482
+  FEM is half done - generation works. and other stuff. Only Constitutive Law for FEM is empty - waiting to be written. But there is a compilation problem we have to compile twice now, because of linker errors in fem loader.
 
 r.481
-ComplexBody has now actors and initializers, and thanks to that FEMSetTextLoaderFunctor is working. loading terrain from VRML file will work in a similar way that FEMSetTextLoaderFunctor
+  ComplexBody has now actors and initializers, and thanks to that FEMSetTextLoaderFunctor is working. loading terrain from VRML file will work in a similar way that FEMSetTextLoaderFunctor
 
-r.470 (*)
-FEMBeam loads the file correctly
+r.480 version 0.7.5
+  tagging v.0.7.5
+  - Quite stable version used for course (teaching how to use yade) with Frederic, Emmanuel and Julien.
+
+r.470
+  FEMBeam loads the file correctly
 
 r.469
-renamed:
-SDECParameters -> BodyMacroParameters
-SDECContactGeometry -> MacroMicroContactGeometry, and all functors
-SDECMacroMicroElasticRelationships -> MacroMicroElasticRelationships
-SDECContactPhysics -> ElasticContactParameters
-SDECLaw -> ElasticContactLaw
-
-added epmty classes:
-FEMTetrahedronParameters
-FEMSetParameters
-FEMSet2MarchingCubes
-LatticeSet2MarchingCubes
-MarchingCubes
-FEMSetTextLoaderFunctor
+  renamed:
+  SDECParameters -> BodyMacroParameters
+  SDECContactGeometry -> MacroMicroContactGeometry, and all functors
+  SDECMacroMicroElasticRelationships -> MacroMicroElasticRelationships
+  SDECContactPhysics -> ElasticContactParameters
+  SDECLaw -> ElasticContactLaw
+  added epmty classes:
+  FEMTetrahedronParameters
+  FEMSetParameters
+  FEMSet2MarchingCubes
+  LatticeSet2MarchingCubes
+  MarchingCubes
+  FEMSetTextLoaderFunctor
 
 r.458
-ActionParameterInitializer and ActionParameterReset,
-LeapFrogOrientationIntegratorFunctor and LeapFrogPositionIntegratorFunctor, ForceCondition GravityCondition RotationCondition TranslationCondition
+  ActionParameterInitializer and ActionParameterReset, LeapFrogOrientationIntegratorFunctor and LeapFrogPositionIntegratorFunctor, ForceCondition GravityCondition RotationCondition TranslationCondition
 
 r.450
-separating gravity to GravityForceFunctor
+  separating gravity to GravityForceFunctor
 
-r.444 (*)
-version used for training with Julien, Frederic, and Luc
+r.444 version 0.7.4
+  tagging v.0.7.4
+  - version used for training with Julien, Frederic, and Luc
 
 r.441
-renaming:
-DynamicEngine -> ConsitutiveLaw
-KinematicEngine -> KinematicMotion
-ApplyActionForce2Particle -> NewtonsForceLaw
-ApplyActionMomentum2RigidBody -> NewtonsMomentumLaw
+  renaming:
+  DynamicEngine -> ConsitutiveLaw
+  KinematicEngine -> KinematicMotion
+  ApplyActionForce2Particle -> NewtonsForceLaw
+  ApplyActionMomentum2RigidBody -> NewtonsMomentumLaw
 
 r.435
-fixed stupid and embarassing error when calculating sphere volume. All
-physical results are totally different now. comparing results again with SDEC.
+  fixed stupid and embarassing error when calculating sphere volume. All physical results are totally different now. comparing results again with SDEC.
 
-r.434 (*)
-Body::group changed into Body::groupMask (so bodies can belong to many groups
-- max. 16 groups, because we have 16 bits here). added fem.beam, so that we can start with FEM
+r.434
+  Body::group changed into Body::groupMask (so bodies can belong to many groups - max. 16 groups, because we have 16 bits here). added fem.beam, so that we can start with FEM
 
-r.432 (*)
-started lattice model. Generation works.
+r.432
+  started lattice model. Generation works.
 
 r.430
-Splitted leapfrom integrator into two parts (position and orientation)
+  Splitted leapfrog integrator into two parts (position and orientation)
 
 r.427
-internal shearing angle is added, and yade is ready to compare results with
-sdec, although force recorder is little dirty, because it is releasing the big ball
+  internal shearing angle is added, and yade is ready to compare results with
+  sdec, although force recorder is little dirty, because it is releasing the big ball
 
-r.426
-RotatingBox example with spheres and boxes inside is working quite good - with SimpleSpringDynamicEngine. BoxStack example is working quite good. meybe it should be renamed to WallImpact. the real name for damping is: Cundall Non Viscous Local Damping. TimeStepper is working quite nice, and now - even SDECLinkedSpheres example is stable. SDECParameters is now holding shearingAngle, young modulus and posiions ratio - as it should. timestepper is working good with that. All examples filegenerators exept FEM are working!
+r.426 version 0.7.3
+  tagging v.0.7.3
+  - RotatingBox example with spheres and boxes inside is working quite good - with SimpleSpringDynamicEngine.
+  - BoxStack example is working quite good. meybe it should be renamed to WallImpact.
+  - the real name for damping is: Cundall Non Viscous Local Damping.
+  - TimeStepper is working quite nice, and now - even SDECLinkedSpheres example is stable.
+  - SDECParameters is now holding shearingAngle, young modulus and posions ratio - as it should. 
+  - timestepper is working good with that. All examples filegenerators exept FEM are working!
 
 r.419
-added ActionReset - it is not inside SDECDynamicEngine - because for cloth example we have two/three engines, so they can't do a reset - because they will delete results from other engine
+  added ActionReset - it is not inside SDECDynamicEngine - because for cloth example we have two/three engines, so they can't do a reset - because they will delete results from other engine
+  also changed arguments to InteractionGeometryFunctor - from shared_ptr<Interaction>& to const shared_ptr<Interaction>&, because InteractionContainer is returning cont reference. So by passing this const& - we avoid making extra copy of shared_ptr so it is faster - lot of files were changed.
+  I also started separating computation of InteractionGeometry and InteractionPhysics for permanent links. Currently this calculation is inside SDECDynamicEngine ! it is very bad, and must be moved outside, because for lattice model I want to make those calculations in a clean way - outside of dynamic engine. To do that I had to modify dispatcher - so now dispatcher is doing two loops - one over permanentInteractions and second over interactions. So this dirty part of deleting duplicated interactions was moved from SDECDynamicEngine to InteractionGeometryDispatcher. It is still dirty and must be solved, but now it is dirty outside of dynamic engine, so it is possible to work on dynamic engine in a clean way.
 
-also changed arguments to InteractionGeometryFunctor - from shared_ptr<Interaction>& to const shared_ptr<Interaction>&, because InteractionContainer is returning cont reference. So by passing this const& - we avoid making extra copy of shared_ptr so it is faster - lot of files were changed.
+r.417 version 0.7.2
+  tagging v.0.7.2
+  - damping is separated from SDECDynamicEngine and works, strange is that ActionDampingDispatcher and ActionApplyDispatcher are exactly the same! so they should be merged into one dispatcher. maybe Action2BodyPhysicalParametersDispatcher
 
-I also started separating computation of InteractionGeometry and InteractionPhysics for permanent links. Currently this calculation is inside SDECDynamicEngine !! it is very bad, and must be moved outside, because for lattice model I want to make those calculations in a clean way - outside of dynamic engine. To do that I had to modify dispatcher - so now dispatcher is doing two loops - one over permanentInteractions and second over interactions. So this dirty part of deleting duplicated interactions was moved from SDECDynamicEngine to InteractionGeometryDispatcher. It is still dirty and must be solved, but now it is dirty outside of dynamic engine, so it is possible to work on dynamic engine in a clean way.
+r.416 version 0.7.1
+  tagging v.0.7.1
+  - I have done some general cleaning - removed unnecessary constructors, deleted unused postProcessAttributes, etc..
+  - FunctorWrapper is Serializable, now - because we want Dispatcher to work with serialization, so that Functors can get extra arguments from .xml
 
 r.413
-FunctorWrapper is Serializable, now - because we want Dispatcher to work with serialization, so that Functors can get extra arguments from .xml
+  FunctorWrapper is Serializable, now - because we want Dispatcher to work with serialization, so that Functors can get extra arguments from .xml
 
 r.410
-finished all renaming. update of GeometricalModel for cloth is working
+  finished all renaming. update of GeometricalModel for cloth is working
 
 r.407
-OK/Cancel works now in file selection dialog,
-ActionForce2RigidBody was deleted, because ActionForce2Particle does the same job
-now I'm staring to work on updating GeometricalModel of Mesh2D, so that cloth will be displayed properly
+  OK/Cancel works now in file selection dialog, 
+  ActionForce2RigidBody was deleted, because ActionForce2Particle does the same job 
+  now I'm starting to work on updating GeometricalModel of Mesh2D, so that cloth will be displayed properly
 
 r.406
-I have done some general cleaning - removed unnecessary constructors, deleted unused postProcessAttributes, etc..
-and I have discovered that when class has no virtual destructor then dunamic_cast fails! I wanted to remove all unused destructor, and then all dynamic_cast were failing. So instead I added virtual destructor everywhere :)
-
+  I have done some general cleaning - removed unnecessary constructors, deleted unused postProcessAttributes, etc.. and I have discovered that when class has no virtual destructor then dunamic_cast fails! I wanted to remove all unused destructor, and then all dynamic_cast were failing. So instead I added virtual destructor everywhere :)
 
 r.399
-We have now: ( <- means 'aggregates' )
-Interaction <- InteractionGeometry
-Interaction <- InteractionPhysics
-Body <- BodyPhysicalParameters
-Body <- BoundingVolume
-Body <- GeometricalModel
-Body <- InteractionDescription
+  We have now: ( <- means 'aggregates' )
+  Interaction <- InteractionGeometry
+  Interaction <- InteractionPhysics
+  Body <- BodyPhysicalParameters
+  Body <- BoundingVolume
+  Body <- GeometricalModel
+  Body <- InteractionDescription
 
 r.395
-lots of class renaming. openGL improvement, Loki stored in single place.
+  lots of class renaming. openGL improvement, Loki stored in single place.
+
+r.379 version 0.7.0
+  tagging v.0.7.0
+  - To add BodyPhysicalParameter the OpenGLDispatchers have been added. This greatly separates display from numerics.
+  -  MassSpring cloth is now working : but we still have to update geometricalModel. Created TimeIntegratorFunctor and Dispatcher. BallisticDynamicEngine is now LeapFrogIntegrator
+  
 
 r.374
-MassSpring cloth is now working : but we still have to update geometricalModel. Created TimeIntegratorFunctor and Dispatcher. BallisticDynamicEngine is now LeapFrogIntegrator
+  MassSpring cloth is now working : but we still have to update geometricalModel. Created TimeIntegratorFunctor and Dispatcher. BallisticDynamicEngine is now LeapFrogIntegrator
 
-r.373 (**)
-To add BodyPhysicalParameter the OpenGLDispatchers have been added. This
-greatly separates display from numerics.
+r.373
+  To add BodyPhysicalParameter the OpenGLDispatchers have been added. This greatly separates display from numerics.
 
 r.368
-Added BodyPhysics class and moved all type of bodies into subdirectory
-BodyPhysics
+  Added BodyPhysics class and moved all type of bodies into subdirectory, BodyPhysics
+
+r.367 version 0.6.9
+  tagging v.0.6.9
+  - Added single step button in QtGUI
+  - Better SpheresPlanes FileGenerator
+  - HangingCloth is working again but it is designed using Yade framework
 
 r.366
-HangingCloth is working again but it is designed adhering to Yade framework.
+  HangingCloth is working again but it is designed adhering to Yade framework.
 
 r.355
-InteractionPhysicsDispatcher starts to works. But we have to make BodyPhysics
+  InteractionPhysicsDispatcher starts to works. But we have to make BodyPhysics
 
-r.352 (*)
-small change in ActionDispatcher.cpp, is faster, but if Action was holding
-body's id it is possible that it can be faster
-result: 107 seconds is faster compared to 111 seconds
-
-tere are a lot of places where we can do improvement like this. if we do code change like here - in every possible places - yade can gain a lot of speed.
-
-basically I've discovered that every temporary variable of type shared_ptr<> costs 3 seconds, so we should avoid creating them and instead pass them around by references - whenever possible. 
-
-And very iportant to note is that this speed improvement is possible ONLY because we have introduced Action, which is more generic! without this class it would be impossible to get faster. So it means that good generic code allows faster code - at least sometimes - as we have example if this here. The same was with containers - introducing containers made code slower, but it made possible to make improvements in other places (because containers increased genericity) and as a result the code got faster.
+r.352 (*) (****) version 0.6.8
+  tagging v.0.6.8
+  - small change in ActionDispatcher.cpp, is faster, but if Action was holding body's id it is possible that it can be faster result: 107 seconds is faster compared to 111 seconds
+  - tere are a lot of places where we can do improvement like this. if we do code change like here - in every possible places - yade can gain a lot of speed.
+  - basically I've discovered that every temporary variable of type shared_ptr<> costs 3 seconds, so we should avoid creating them and instead pass them around by references - whenever possible. 
+  - And very iportant to note is that this speed improvement is possible ONLY because we have introduced Action, which is more generic! without this class it would be impossible to get faster. So it means that good generic code allows faster code - at least sometimes - as we have example if this here. The same was with containers - introducing containers made code slower, but it made possible to make improvements in other places (because containers increased genericity) and as a result the code got faster.
 
 r.351
-renamed CollisionFunctor to InteractionFunctor
+  renamed CollisionFunctor to InteractionFunctor
+
+r.345 version 0.6.7
+  tagging v.0.6.7
+  - possibly faster DynLibDispatcher, 
+  - I was also trying to fix problem that Singleton is not deleted at end, but finally I made only some improvement, but it is still not fixed.
 
 r.344
-some optimizations by using references. Multimethods now support inheritance in Indexable objects, I had to modify in Indexable class:
-#define REGISTER_CLASS_INDEX(SomeClass,BaseClass)
+  some optimizations by using references. Multimethods now support inheritance in Indexable objects, I had to modify in Indexable class:
+  #define REGISTER_CLASS_INDEX(SomeClass,BaseClass)
+
+r.342 version 0.6.5
+  tagging v.0.6.5
+  - containers return references (no temporary objects are created)
+
+r.340 version 0.6.4
+  tagging v.0.6.4
+  - ActionContainer, without creating new pointers everytime.
+
+r.339 version 0.6.3
+  tagging v.0.6.3
+  - ActionContainer->reset() - faster code.
+  - benchmark tests.
+
+r.338 version 0.6.2
+  tagging v.0.6.2
+  - ActionDispatcher is working
+  - dispatcher for creating actions need createIndex() in constructor of all Actions
+  - Added classes: Action, ActionVecVec, ActionContainer, ActionForce, ActionMomentum, etc.. but they are empty. And it is compiling
 
 r.337
-ActionDispatcher is working
+  ActionDispatcher is working
 
-r.334 dispatcher for creating actions need createIndex() in constructor of all
-Actions
+r.334
+  dispatcher for creating actions need createIndex() in constructor of all Actions
 
 r.330
-Added classes: Action, ActionVecVec, ActionContainer, ActionForce, ActionMomentum, etc.. but they are empty. And it is compiling
+  Added classes: Action, ActionVecVec, ActionContainer, ActionForce, ActionMomentum, etc.. but they are empty. And it is compiling
 
 r.323
-Added Action, ActionContainer, SDECLinearContactModel, PhysicalInteractor.
-We started redesign to introduce Action which are the response of a DynamicEngine to an
-Interaction and acts on body.
+  Added Action, ActionContainer, SDECLinearContactModel, PhysicalInteractor. We started redesign to introduce Action which are the response of a DynamicEngine to an Interaction and acts on body.
+
+r.315 version 0.6.1
+  tagging v.0.6.1
+  - versioon used for benchmark checks
+  - small fixes.
+  - Real used everywhere instead of floar or double.
 
 r.312 (*)
-now Real is used everywhere instead of double or float. Specify with
-compilation flag #define DOUBLE_PRECISION, whether you want float or double.
+  now Real is used everywhere instead of double or float. Specify with compilation flag #define DOUBLE_PRECISION, whether you want float or double.
 
 r.307
-splitting InteractionModel to InteractionGeometry and InteractionPhysics
+  splitting InteractionModel to InteractionGeometry and InteractionPhysics
 
 r.303
-iterating containers in done with: gotoFirst, gotoNext, notAtEnd
-gotoFirstPotential, gotoNextPotential, notAtEndPotential.
+  iterating containers in done with: gotoFirst, gotoNext, notAtEnd gotoFirstPotential, gotoNextPotential, notAtEndPotential.
 
-r.300	RELEASE  x.y.z
-- moment rotation law added, mess inside SDECDynamicEngine (three enegines in one!)
-- Serialization now supports almost all std, boost and Loki containers and more
-- math classes are separate from serialization, and done with templates (but with wild-magic license)
-- for storing Bodies and Interactions we now use polymorphic classes InteractionContainer and BodyContainer
-- yade uses threads now, but still not fully stable
-- switch at compile time to select float/double precision of calculation
-- displayed objects are now casting really cool shadows
-- some examples are not updated, and therefor not working. it is guaranteed that SDECBenchmark8k will always work.
-- BoundingVolume optimized for each kind of GeometricalModel makes computation almost twice faster
-- new very generic MultiMethods are added, allowing multivirtual call with extra parameters, and easy code reuse
+r.300 version 0.6.0
+  tagging v.0.6.0
+  - moment rotation law added, mess inside SDECDynamicEngine (three enegines in one!)
+  - Serialization now supports almost all std, boost and Loki containers and more
+  - math classes are separate from serialization, and done with templates (but with wild-magic license)
+  - for storing Bodies and Interactions we now use polymorphic classes InteractionContainer and BodyContainer
+  - yade uses threads now, but still not fully stable
+  - switch at compile time to select float/double precision of calculation
+  - displayed objects are now casting really cool shadows
+  - some examples are not updated, and therefor not working. it is guaranteed that SDECBenchmark8k will always work.
+  - BoundingVolume optimized for each kind of GeometricalModel makes computation almost twice faster
+  - new very generic MultiMethods are added, allowing multivirtual call with extra parameters, and easy code reuse
 
 r.298
-- new very generic MultiMethods are added, allowing multivirtual call with extra parameters, and easy code reuse
+  new very generic MultiMethods are added, allowing multivirtual call with extra parameters, and easy code reuse
 
 r.291
-- better handling of threads, but still not fully stable
+  better handling of threads, but still not fully stable
+
+r.254 version 0.5.2
+  tagging v.0.5.2
+  - Finished rearranging subdirectories. Now we have directory extensions (we can rename it,
+  - if there is a better name), and ClassFactory is in toolbox/Libraries,
+  - yade is now compiling (and works) with g++ 3.3,
+  - all .xml examples except ErrorTolerant, are now working,
+  - Improved version of QtGUIGenerator. Now boolean are represented by
+  - checkboxes instead of linedits,
+  - Better handling of start,stop and reload simulation. Thread now terminate
+  - when associated window is closed,
+  - NullGUI is now saving results during computations. Those results can be opened with QtGUI and we can see what is computed.
+  - added filegenerator that can import data files from SDEC,
+  - Boxes are now casting shadows,
+  - Better handling of thread into GUI.
+  - is compiling with double.
 
 r.245
-- BoundingVolume now can be used to center scene for display
+  BoundingVolume now can be used to center scene for display
 
-r.227
-- BoundingVolume optimized for each kind of GeometricalModel makes computation almost twice faster
+r.232 version 0.5.1
+  tagging v.0.5.1
+  small fixes, little faster
+
+r.227 version 0.5.0
+  tagging v.0.5.0
+  - Bounding volume are now both indexalbe and a GeometricalModel,
+  - BoundingVolume update is now done in an actor,
+  - Improved version of GLWindowManager library,
+  - BoundingVolume optimized for each kind of GeometricalModel makes computation almost twice faster
 
 r.225
-- some examples are not updated, and therefore not working. it is guaranteed that SDECBenchmark8k will always work.
+  some examples are not updated, and therefore not working. it is guaranteed that SDECBenchmark8k will always work.
 
+r.223 version 0.4.8
+  tagging v.0.4.8
+  - scripts are checking all Environement Variables - more safety,
+  - fixed missing is_base_and_derived in Indexable.hpp,
+  - Much better version of Thread library and multithreaded QGLViewer,
+  - Reenabling GUI updater thread,
+  - Now we use InteractionHashMap by default because InteractionVecSet is not ready yet,
+  - Added RenderingEngines,
+  - OpenGLWrapper 50% done  - and #DOUBLE_PRECISION works! (float/double),
+  - Shadows are working
+  - SDECCollision.xml and SDECTetrahedronWithLinks.xml work for dt=0.003,
+  - comparing results with older versions.
+  
 r.219
-- displayed objects are now casting really cool shadows
+  displayed objects are now casting really cool shadows
 
 r.209
-- switch at compile time to select float/double precision of calculation
+  switch at compile time to select float/double precision of calculation
+
+r.196 version 0.4.7
+  tagging v.0.4.7
+  - Improved thread management. Multiple views are now working,
+  - Improved GUI.
+  - scripts that allow easy switching between relative paths and paths in environemnt YADE*PATH variables
+  - XMLManager writes pointers in a shorter way, with _className_
+  - NullGUI works - for benchmars of Vector3 not in Serializable, etc..
 
 r.182
-- yade uses threads now, but still not fully stable
+  yade uses threads now, but still not fully stable
 
+r.184 version 0.4.6
+  tagging version 0.4.6
+  - New SimulationController is now working
+  - Started moving simulation loop from glViewer to a specific thread
+  - InteractionContainer and BodyContainer integration completed. but container classes quality/speed is not good (and tested) yet
+  - InteractionVecSet and BodyVector done.
+  - Added ThreadSynchronizer. Yade is now working with external simulation loop
+  - FIXED threading on multi-processor machine (not real multiprocessor, just hyper threading...)
+  - rename BodyVector to BodyRedirectionVector
+  
 r.180
-- for storing Bodies and Interactions we now use polymorphic classes InteractionContainer and BodyContainer
+  for storing Bodies and Interactions we now use polymorphic classes InteractionContainer and BodyContainer
 
-r.154
-- math classes are separate from serialization, and done with templates (but with wild-magic license)
+r.175 version 0.4.5
+  tagging 0.4.5
+  - Add QtFileGenerator, for automatic file generation with Qt GUI (not completely working yet)
+  - QtGuiGenerator and QtFileGenerator are now working
+  - BodyContainer starts to work
+  - All Qt libraries are now in one library.
+  - Created new qt controller for simulation and new opengl library
+
+r.168 version 0.4.4
+  tagging v.0.4.4
+  InteractionContainer starts working
+
+r.165 version 0.4.3
+  tagging v.0.4.3
+  praparing for InteractionContainer. small fixes
+
+r.155 version 0.4.2
+  tagging v.0.4.2
+  better serialization for math stuff.
+
+r.154 
+  math classes are separate from serialization, and done with templates (but with wild-magic license)
+
+r.147 version 0.4.1
+  tagging v.0.4.1
+  - Serialization now supports almost all STL containers from std namespace, boost and Loki containers and more
+  - comparing resluts with older revisions.
 
 r.140
-- Serialization now supports almost all STL containers from std namespace, boost and Loki containers and more
+  Serialization now supports almost all STL containers from std namespace, boost and Loki containers and more
+
+r.129 version 0.4.0
+  moment rotation law added,
+  - unit tests of SDEC with r.90 (checking results correctness)
+  - LPC solver for ErrorTolerant computations
 
 r.127
-- LPC solver for ErrorTolerant computations
+  LPC solver for ErrorTolerant computations
 
 r.122
-- moment rotation law added, mess inside SDECDynamicEngine (three enegines in one!)
+  moment rotation law added, mess inside SDECDynamicEngine (three enegines in one!)
 
-r.112
-- added NullGUI, so commandline computation is possible
+r.112 version 0.3.1
+  added NullGUI, so commandline computation is possible
 
 r.108
-- started ErrorTolerant DynamicEngine
+  started ErrorTolerant DynamicEngine
+
+r.90 version 0.3.0
+  tagging v.0.3.0
+  SDEC (DEM) added and works with contact law
 
 r.83
-- SDECDynamicEngine starts to work with SDEC contact law
+  SDECDynamicEngine starts to work with SDEC contact law
 
 r.80
-- simple example for SDEC added
+  simple example for SDEC added
 
 r.76
-- Serialization uses boost::spirit
+  Serialization uses boost::spirit
 
+r.74 version 0.2.0
+  tagging v.0.2.0 with working cloth, rotatingbox and falling boxes. before adding SDEC
+  ClassFactory is now reusable
+  
 r.56
-- ClassFactory is now reusable
+  ClassFactory is now reusable
 
 r.40
-- setDebug, setRelease scripts added
+  setDebug, setRelease scripts added
 
 r.30
-- cloth simulation added
+  cloth simulation added
+
+r.26 version 0.1.1
+  Tagging version v.0.1.1 after adding multimethods and before adding Cloth
 
 r.17
-- first try at multimethods, added class Indexable, and multimethods are used for collision
+  first try at multimethods, added class Indexable, and multimethods are used for collision
+
+r.6 version 0.1.0
+  tagging v.0.1.0
+  - initial yade version imported (after 6 months of work by Olivier alone)
+  - tagging this version before adding multimethods
+  - Rigid Body example works
+  
+r.1
+  rigid body example works
+
