@@ -355,7 +355,7 @@ void LatticeExample::positionRootBody(shared_ptr<MetaBody>& rootBody)
 	aabb->diffuseColor		= Vector3r(0,0,1);
 
 	shared_ptr<GeometricalModel> gm = dynamic_pointer_cast<GeometricalModel>(ClassFactory::instance().createShared("LatticeSetGeometry"));
-	gm->diffuseColor 		= Vector3r(1,1,1);
+	gm->diffuseColor 		= Vector3f(1,1,1);
 	gm->wire 			= false;
 	gm->visible 			= true;
 	gm->shadowCaster 		= true;
@@ -398,7 +398,7 @@ void LatticeExample::imposeTranslation(shared_ptr<MetaBody>& rootBody, Vector3r 
 				)
 			{
 				b->isDynamic = false;
-				b->geometricalModel->diffuseColor = Vector3r(1,0,0);
+				b->geometricalModel->diffuseColor = Vector3f(1,0,0);
 				translationCondition->subscribedBodies.push_back(b->getId());
 			}
 		}

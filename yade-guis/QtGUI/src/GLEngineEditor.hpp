@@ -71,7 +71,7 @@ class GLEngineEditor : public QGLViewer
 	private : int endX;
 	private : int endY;
 	private : int selectedEngine;
-	private : Vector3r savedColor;
+	private : Vector3f savedColor;
 	private : int firstEngine;
 	public  :  int getFirstEngine() { return firstEngine;};
 

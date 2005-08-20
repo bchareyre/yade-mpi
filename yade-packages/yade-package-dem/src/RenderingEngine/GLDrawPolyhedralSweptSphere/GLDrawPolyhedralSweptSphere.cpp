@@ -96,7 +96,7 @@ void GLDrawPolyhedralSweptSphere::go(const shared_ptr<InteractingGeometry>& cg, 
 
 		glBegin(GL_POLYGON);
 		for(unsigned int j=0 ; j<faces[i].size() ; j++)
-			glVertex3fv(vertices[faces[i][j]]+n);
+			glVertex3v(vertices[faces[i][j]]+n);
 		glEnd();
 	}
 
