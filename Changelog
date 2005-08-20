@@ -1,18 +1,44 @@
-r.8?? version 0.9.1
-  tagging v.0.9.1
-  - huge improvement in Makefile. 'make compile_install' and yade is ready to
-  release to the wild world.
+r.8?? yade-core version 0.9.0
+  - split of packages done. Now each package can be developed separately and has own version numbers.
+  - Initial version numbers are choosen arbitrally to reflect their advancement state.
+  - huge improvement in Makefile. 'make compile_install' and yade is ready to release to the wild world.
   - some class renamed to better reflect their functions,
   - some cleaning,
   - Simulation loop editing through GUI starts to work,
   - added REGSITER_BASE_CLASS_NAME, so we can build class tree on runtime (used by simulation loop GUI),
-  - removed all references from Serialization stuff to yade-lib-multimethod as
-  they are totally unrelated,
+  - removed all references from Serialization stuff to yade-lib-multimethod as they are totally unrelated,
   - plugins of yade containers are now using ::iterator, just like STL !
-  - Tetrahedron Discrete Model, and Lattice Discrete Model start to work, but
-  not good enough to increment a major revision number.
+  - Tetrahedron Discrete Model, and Lattice Discrete Model start to work, but not good enough to increment a major revision number.
   - FEM, DEM, Mass Spring and Rigid Body are working good.
-  
+
+ yade-core                                      version 0.9.0
+ yade-libs:         
+        yade-lib-algorithms                     version 0.1.0
+        yade-lib-computational-geometry         version 0.5.0
+        yade-lib-factory                        version 1.0.0
+        yade-lib-loki                           version 1.0.0
+        yade-lib-multimethods                   version 1.0.0
+        yade-lib-opengl                         version 0.5.0
+        yade-lib-qhull                          version 1.0.0
+        yade-lib-serialization                  version 1.0.0
+        yade-lib-serialization-qt               version 1.0.0
+        yade-lib-serialization-xml              version 1.0.0
+        yade-lib-swiftpp                        version 1.0.0
+        yade-lib-threads                        version 0.5.0
+        yade-lib-time                           version 0.5.0
+        yade-lib-wm3-math                       version 0.3.0
+ yade-guis:         
+        QtGUI                                   version 0.9.0
+ yade-packages:         
+        yade-package-common                     version 0.9.0
+        yade-package-dem                        version 0.9.0
+        yade-package-fem                        version 0.7.0
+        yade-package-lattice                    version 0.3.0
+        yade-package-mass-spring                version 0.9.0
+        yade-package-realtime-rigidbody         version 0.9.0
+
+r.890
+  preparing for release.
 
 r.845
   renaming:
@@ -59,8 +85,8 @@ r.808
 r.804
   Better YadeQtMainWindow. Now menus are displayed in menu bar in the same order they are added in the program. Added preferences for QtGUI. Now it remembers size and position and exit. Now it is possible to choose time step from GUI.
 
-r.801 (*) version 0.9.0
-  tagging v.0.9.0
+r.801 (*) version 0.8.7
+  tagging v.0.8.7
   - second redesign of directory tree finished.
   - yade-core is clean
   - yade-empties contain templates for whole packages.

@@ -1,0 +1,7 @@
+
+FIRST STEP :
+
+copy this directory somewhere.
+execute ./changeLibName nameofyourlibrary yourfirstname yourlastname youremail
+This will rename all the kdevelop projects files to use name "nameofyourlibrary"
+After that you can start to develop your library

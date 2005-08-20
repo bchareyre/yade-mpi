@@ -38,6 +38,11 @@ different directory tree:
 
         make compile_install CXXFLAGS='-pthread -lpthread'
 	
+You can also install as non-root user:
+
+        mkdir ~/YADE
+        make compile_install INSTALL_DIR='/YADE' PREFIX_DIR='/home/joeuser'
+
 	
 OTHER MAKE COMMANDS
 

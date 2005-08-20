@@ -1,9 +1,4 @@
-FIRST STEP :
 
-copy this directory somewhere.
-execute ./changePackageName nameofyourpackage yourfirstname yourlastname youremail
-This will rename all the kdevelop projects files to use name "nameofyourpackage"
-After that you can start to develop your package
 
 INSTALLING:
 
@@ -11,21 +6,35 @@ to compile and install this package execute following commands:
 
 	make
 	make install
+	make clean		# to clean afterwards
 
-by default everything is installed in directory /usr/local, if for example
-you want to install in /usr instead, you can do this:
+by default everything is installed in directory INSTALL_DIR=/usr/local,
+if for example you want to install in /usr instead, you can do this:
 
-	make install INSTALL_DIR='/usr'
+	make compile_install INSTALL_DIR='/usr'
+
+NOTES:
+ 1. Both INSTALL_DIR and PREFIX_DIR should start with / and shouldn't have
+    trailing slash.
+ 2. If compilation is interrupted (eg. due to some compilation error), and
+    then resumed with different INSTALL_DIR or PREFIX_DIR, then all *.pro
+    files (used by qmake) will be damaged (wrong INSTALL_DIR and PREFIX_DIR
+    inside)
 
 Or if you are a package maintaner, you may want to install everything in
 different directory tree:
 
 	make install PREFIX_DIR='/tmp/foo' INSTALL_DIR='/usr'
 
+!!  WARNING: if you are compiling with gcc3.3, you need to pass additional
+    argument:
 
-    WARNING: if you are compiling with gcc3.3, you need to pass additional argument:
-	
 	make CXXFLAGS='-pthread -lpthread'
+
+You can also install as non-root user:
+
+        mkdir ~/YADE
+        make install INSTALL_DIR='/YADE' PREFIX_DIR='/home/joeuser'
 
 
 OTHER MAKE COMMANDS
@@ -33,11 +42,4 @@ OTHER MAKE COMMANDS
 	make clean		# to clean afterwards
 	make uninstall          # to uninstall (you have to provide
 	                        # correct INSTALL_DIR, and PREFIX_DIR )
-
-
-
-DOCUMENTATION:
-
-for documentation check doc/ directory, maybe there is something useful.
-
 
