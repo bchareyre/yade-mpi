@@ -1,4 +1,4 @@
-r.8?? yade-core version 0.9.0
+r.890 yade-core version 0.9.0
   - split of packages done. Now each package can be developed separately and has own version numbers.
   - Initial version numbers are choosen arbitrally to reflect their advancement state.
   - huge improvement in Makefile. 'make compile_install' and yade is ready to release to the wild world.
@@ -16,7 +16,7 @@ r.8?? yade-core version 0.9.0
         yade-lib-algorithms                     version 0.1.0
         yade-lib-computational-geometry         version 0.5.0
         yade-lib-factory                        version 1.0.0
-        yade-lib-loki                           version 1.0.0
+        yade-lib-loki                           version 0.9.5
         yade-lib-multimethods                   version 1.0.0
         yade-lib-opengl                         version 0.5.0
         yade-lib-qhull                          version 1.0.0
