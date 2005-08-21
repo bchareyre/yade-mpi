@@ -32,7 +32,7 @@ QMAKE_CXXFLAGS_RELEASE += -lpthread \
 QMAKE_CXXFLAGS_DEBUG += -lpthread \
                         -pthread 
 TARGET = ../bin/yade 
-CONFIG += release \
+CONFIG += debug \
           warn_on 
 TEMPLATE = app 
 FORMS += QtFileGeneratorController.ui \

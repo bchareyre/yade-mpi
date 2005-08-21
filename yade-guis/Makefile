@@ -1,11 +1,11 @@
 all:
-	$(MAKE) -C QtGUI
+	$(MAKE) -C yade-gui-qt
 
 clean:
-	$(MAKE) -C QtGUI clean
+	$(MAKE) -C yade-gui-qt clean
 
 install:
-	$(MAKE) -C QtGUI install
+	$(MAKE) -C yade-gui-qt install
 
 uninstall:
-	$(MAKE) -C QtGUI uninstall
+	$(MAKE) -C yade-gui-qt uninstall
