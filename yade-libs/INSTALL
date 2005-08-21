@@ -16,7 +16,7 @@ to compile and install all yade libraries execute following commands:
     should invoke 'make && make install', so here is an exception)
 
 by default everything is installed in directory INSTALL_DIR=/usr/local,
-if for example you want to install in /usr instead, you can do this:
+if for example you want to install somewhere else instead, you can do this:
 
 As a root user:
 

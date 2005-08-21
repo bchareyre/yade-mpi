@@ -1,0 +1,24 @@
+This directory contains some examples for filegenerators:
+
+2 examples for FEM
+1 example for SDEC Impact test
+2 examples for tetrahedrons
+
+Other filegenerators work without need for any input file. They generate examples
+just by parameters given to them. In the future here will appear more examples.
+
+
+By default yade filegenerators are looking for those files in ../data directory.
+You can specify another directory in filegenerator, but for now you would have to
+change it everytime (bug #004853). To avoid the hassle you can just copy content
+of this directory to ../data relative to path from where you are starting yade
+( most probably bin/ ).
+
+For example my directory tree with yade looks like this:
+
+YADE
+|-- bin
+|-- data
+|-- include
+`-- lib
+
