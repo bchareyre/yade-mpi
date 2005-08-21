@@ -35,6 +35,7 @@ different directory tree:
 NOTES:
  1. Both INSTALL_DIR and PREFIX_DIR should start with / and shouldn't have
     trailing slash.
+
  2. If compilation is interrupted (eg. due to some compilation error), and
     then resumed with *different* INSTALL_DIR or PREFIX_DIR, then all *.pro
     files (used by qmake) will be damaged (wrong INSTALL_DIR and PREFIX_DIR

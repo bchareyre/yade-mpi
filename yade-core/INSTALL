@@ -1,5 +1,3 @@
-
-
 INSTALLING:
 
 to compile and install yade-core execute following commands:
@@ -11,31 +9,40 @@ to compile and install yade-core execute following commands:
 by default everything is installed in directory INSTALL_DIR=/usr/local,
 if for example you want to install in /usr instead, you can do this:
 
-	make compile_install INSTALL_DIR='/usr'
+As a root user:
 
-NOTES:
- 1. Both INSTALL_DIR and PREFIX_DIR should start with / and shouldn't have
-    trailing slash.
- 2. If compilation is interrupted (eg. due to some compilation error), and
-    then resumed with different INSTALL_DIR or PREFIX_DIR, then all *.pro
-    files (used by qmake) will be damaged (wrong INSTALL_DIR and PREFIX_DIR
-    inside)
+	make install INSTALL_DIR='/usr'
 
-Or if you are a package maintaner, you may want to install everything in
-different directory tree:
-
-	make install PREFIX_DIR='/tmp/foo' INSTALL_DIR='/usr'
-
-!!  WARNING: if you are compiling with gcc3.3, you need to pass additional
-    argument:
-
-	make CXXFLAGS='-pthread -lpthread'
-
-You can also install as non-root user:
+As a user without root privileages:
 
         mkdir ~/YADE
         make install INSTALL_DIR='/YADE' PREFIX_DIR='/home/joeuser'
 
+If you are a package maintaner, you may want to install everything in
+different directory tree:
+
+	make install PREFIX_DIR='/tmp/foo' INSTALL_DIR='/usr'
+
+NOTES:
+ 1. Both INSTALL_DIR and PREFIX_DIR should start with / and shouldn't have
+    trailing slash.
+
+ 2. If compilation is interrupted (eg. due to some compilation error), and
+    then resumed with *different* INSTALL_DIR or PREFIX_DIR, then all *.pro
+    files (used by qmake) will be damaged (wrong INSTALL_DIR and PREFIX_DIR
+    inside)
+
+ 3. If you are compiling with gcc3.3, you need to pass additional argument:
+
+	make CXXFLAGS='-pthread -lpthread'
+
+ 4. flag CXXFLAGS can be used to set some compilation options, like:
+
+        CXXFLAGS='-O3'                     : optimize code for speed
+	CXXFLAGS='-pthread -lpthread -O3'  : gcc3.3, and optimize for speed
+	CXXFLAGS='-g'                      : debugging symbols
+	CXXFLAGS='-DDOUBLE_PRECISION -O3'  : for calculation use double precision
+	                                     instead of float and optimize for speed
 
 OTHER MAKE COMMANDS
 
