@@ -1,4 +1,4 @@
-r.890 yade-core version 0.9.0
+r.904 yade-core version 0.9.0
   - split of packages done. Now each package can be developed separately and has own version numbers.
   - Initial version numbers are choosen arbitrally to reflect their advancement state.
   - huge improvement in Makefile. 'make compile_install' and yade is ready to release to the wild world.
@@ -16,19 +16,19 @@ r.890 yade-core version 0.9.0
         yade-lib-algorithms                     version 0.1.0
         yade-lib-computational-geometry         version 0.5.0
         yade-lib-factory                        version 1.0.0
-        yade-lib-loki                           version 0.9.5
+        yade-lib-loki                           version 0.9.5  because is different than Loki
         yade-lib-multimethods                   version 1.0.0
         yade-lib-opengl                         version 0.5.0
         yade-lib-qhull                          version 1.0.0
         yade-lib-serialization                  version 1.0.0
-        yade-lib-serialization-qt               version 1.0.0
+        yade-lib-serialization-qt               version 0.8.0  because is not serializing containers
         yade-lib-serialization-xml              version 1.0.0
         yade-lib-swiftpp                        version 1.0.0
-        yade-lib-threads                        version 0.5.0
+        yade-lib-threads                        version 0.3.0  because is not supporting multithreaded calculations
         yade-lib-time                           version 0.5.0
-        yade-lib-wm3-math                       version 0.3.0
+        yade-lib-wm3-math                       version 0.7.0
  yade-guis:         
-        QtGUI                                   version 0.9.0
+        yade-gui-qt                             version 0.7.0
  yade-packages:         
         yade-package-common                     version 0.9.0
         yade-package-dem                        version 0.9.0
