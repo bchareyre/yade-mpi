@@ -79,6 +79,7 @@ YadeQtMainWindow::YadeQtMainWindow() : YadeQtGeneratedMainWindow()
 	addMenu("Edit");
 	addMenu("Preprocessor");
 	addMenu("Postprocessor");
+	addMenu("Extra");
 
 	addItem("Edit","Preferences...","QtPreferencesEditor");
 		
@@ -86,8 +87,9 @@ YadeQtMainWindow::YadeQtMainWindow() : YadeQtGeneratedMainWindow()
 	addItem("Preprocessor","Engine Editor...","QtEngineEditor");
 	addItem("Preprocessor","Code Generator...","QtCodeGenerator");
 
-	createMenus();
+	addItem("Extra","Spherical DEM Simulator...","QtSphericalDEM");
 
+	createMenus();
 
 	QVBox *vbox = new QVBox( this );
 	vbox->setFrameStyle( QFrame::StyledPanel | QFrame::Sunken );

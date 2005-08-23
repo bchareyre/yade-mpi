@@ -9,6 +9,7 @@ clean:
 	$(MAKE) -C yade-core clean
 	$(MAKE) -C yade-guis clean
 	$(MAKE) -C yade-packages clean
+	$(MAKE) -C yade-extra clean
 
 compile_install:
 	$(MAKE) -C yade-libs compile_install
@@ -20,6 +21,9 @@ compile_install:
 	$(MAKE) -C yade-guis install
 	
 	$(MAKE) -C yade-packages compile_install
+
+	$(MAKE) -C yade-extra
+	$(MAKE) -C yade-extra install
 	
 	@echo --
 	@echo Compilation and installation finished.
@@ -30,3 +34,4 @@ uninstall:
 	$(MAKE) -C yade-core uninstall
 	$(MAKE) -C yade-guis uninstall
 	$(MAKE) -C yade-packages uninstall
+	$(MAKE) -C yade-extra uninstall
