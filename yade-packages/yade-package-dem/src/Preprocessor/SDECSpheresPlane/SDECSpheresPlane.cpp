@@ -85,6 +85,8 @@ SDECSpheresPlane::SDECSpheresPlane () : FileGenerator()
 	rotationBlocked = false;
 	gravity = Vector3r(0,-9.81,0);
 	disorder = 0.2;
+	useSpheresAsGround = false;
+	spheresHeight = 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -100,6 +102,7 @@ SDECSpheresPlane::~SDECSpheresPlane ()
 
 void SDECSpheresPlane::postProcessAttributes(bool)
 {
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -110,6 +113,7 @@ void SDECSpheresPlane::registerAttributes()
 	REGISTER_ATTRIBUTE(nbSpheres);
 	REGISTER_ATTRIBUTE(minRadius);
 	REGISTER_ATTRIBUTE(maxRadius);
+	REGISTER_ATTRIBUTE(spheresHeight);
 	REGISTER_ATTRIBUTE(sphereYoungModulus);
 	REGISTER_ATTRIBUTE(spherePoissonRatio);
 	REGISTER_ATTRIBUTE(sphereFrictionDeg);
@@ -117,6 +121,7 @@ void SDECSpheresPlane::registerAttributes()
 	REGISTER_ATTRIBUTE(density);
 	REGISTER_ATTRIBUTE(disorder);
 	REGISTER_ATTRIBUTE(groundSize);
+	REGISTER_ATTRIBUTE(useSpheresAsGround);
 	REGISTER_ATTRIBUTE(dampingForce);
 	REGISTER_ATTRIBUTE(dampingMomentum);
 	REGISTER_ATTRIBUTE(rotationBlocked);
@@ -143,9 +148,35 @@ string SDECSpheresPlane::generate()
 ////////////////////////////////////
 ///////// ground
 
-	shared_ptr<Body> ground;
-	createBox(ground, Vector3r(0,0,0), groundSize);
-	rootBody->bodies->insert(ground);
+	if (!useSpheresAsGround)
+	{
+		shared_ptr<Body> ground;
+		createBox(ground, Vector3r(0,0,0), groundSize);
+		rootBody->bodies->insert(ground);
+	}
+	else
+	{
+		int nbSpheresi,nbSpheresj,nbSpheresk;
+		Real radius = groundSize[0];
+
+		if (groundSize[1]<radius)
+			radius = groundSize[1];
+		if (groundSize[2]<radius)
+			radius = groundSize[2];
+
+		nbSpheresi = (int)(groundSize[0]/radius);
+		nbSpheresj = (int)(groundSize[1]/radius);
+		nbSpheresk = (int)(groundSize[2]/radius);
+
+		for(int i=0;i<nbSpheresi;i++)
+			for(int j=0;j<nbSpheresj;j++)
+				for(int k=0;k<nbSpheresk;k++)
+				{
+					shared_ptr<Body> sphere;
+					createGroundSphere(sphere,radius,radius*(i-nbSpheresi*0.5+0.5),radius*(j-nbSpheresj*0.5+0.5),radius*(k-nbSpheresk*0.5+0.5));
+					rootBody->bodies->insert(sphere);
+				}
+	}
 
 ///////// spheres
 
@@ -164,6 +195,50 @@ string SDECSpheresPlane::generate()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+void SDECSpheresPlane::createGroundSphere(shared_ptr<Body>& body,Real radius, Real i, Real j, Real k)
+{
+	body = shared_ptr<Body>(new Body(0,1));
+	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
+	shared_ptr<AABB> aabb(new AABB);
+	shared_ptr<Sphere> gSphere(new Sphere);
+	shared_ptr<InteractingSphere> iSphere(new InteractingSphere);
+	
+	Quaternionr q;
+	q.fromAxisAngle( Vector3r(0,0,1),0);
+	
+	Vector3r position		= Vector3r(i,j,k);
+	
+	body->isDynamic			= false;
+	
+	physics->angularVelocity	= Vector3r(0,0,0);
+	physics->velocity		= Vector3r(0,0,0);
+	physics->mass			= 0;
+	physics->inertia		= Vector3r(0,0,0);
+	physics->se3			= Se3r(position,q);
+	physics->young			= sphereYoungModulus;
+	physics->poisson		= spherePoissonRatio;
+	physics->frictionAngle		= sphereFrictionDeg * Mathr::PI/180.0;
+
+	aabb->diffuseColor		= Vector3r(0,1,0);
+
+	gSphere->radius			= radius;
+	gSphere->diffuseColor		= Vector3f(0.7,0.7,0.7);
+	gSphere->wire			= false;
+	gSphere->visible		= true;
+	gSphere->shadowCaster		= true;
+	
+	iSphere->radius			= radius;
+	iSphere->diffuseColor		= Vector3f(0.8,0.3,0.3);
+
+	body->interactionGeometry	= iSphere;
+	body->geometricalModel		= gSphere;
+	body->boundingVolume		= aabb;
+	body->physicalParameters	= physics;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 void SDECSpheresPlane::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 {
 	body = shared_ptr<Body>(new Body(0,1));
@@ -175,7 +250,7 @@ void SDECSpheresPlane::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 	Quaternionr q;
 	q.fromAxisAngle( Vector3r(0,0,1),0);
 	
-	Vector3r position		= Vector3r(i,j,k)*(2*maxRadius*1.1) // this formula is crazy !!
+	Vector3r position		= Vector3r(i,j+spheresHeight,k)*(2*maxRadius*1.1) // this formula is crazy !!
 					  - Vector3r( nbSpheres[0]/2*(2*maxRadius*1.1) , -7-maxRadius*2 , nbSpheres[2]/2*(2*maxRadius*1.1) )
 					  + Vector3r(Mathr::symmetricRandom(),Mathr::symmetricRandom(),Mathr::symmetricRandom())*disorder*maxRadius;
 	

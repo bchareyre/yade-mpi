@@ -35,12 +35,15 @@
 class SDECSpheresPlane : public FileGenerator
 {
 	private : Vector3r nbSpheres;
+	private : bool useSpheresAsGround;
 	private : Real minRadius,density;
 	private : Vector3r groundSize,gravity;
 	private : Real maxRadius;
 	private : Real dampingForce;
 	private	: Real disorder;
 	private : Real dampingMomentum;
+	private : Real spheresHeight;
+
 	private : int timeStepUpdateInterval;
 	private : bool rotationBlocked;
 	private : Real sphereYoungModulus,spherePoissonRatio,sphereFrictionDeg;
@@ -51,6 +54,7 @@ class SDECSpheresPlane : public FileGenerator
 
 	private : void createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents);
 	private : void createSphere(shared_ptr<Body>& body, int i, int j, int k);
+	private : void createGroundSphere(shared_ptr<Body>& body,Real radius, Real i, Real j, Real k);
 	private : void createActors(shared_ptr<MetaBody>& rootBody);
 	private : void positionRootBody(shared_ptr<MetaBody>& rootBody);
 

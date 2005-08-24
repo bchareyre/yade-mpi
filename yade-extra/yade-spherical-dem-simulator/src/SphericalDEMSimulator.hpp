@@ -29,16 +29,18 @@
 
 #include "Sphere.hpp"
 #include "Contact.hpp"
+#include "PersistentSAPCollider.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <yade/yade-lib-factory/Factorable.hpp>
+#include <yade/yade-core/StandAloneSimulator.hpp>
+#include <yade/yade-core/MetaBody.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-class SphericalDEMSimulator : public Factorable
+class SphericalDEMSimulator : public StandAloneSimulator
 {
 	private : shared_ptr<MetaBody> rootBody;
 	private : vector<Sphere> spheres;
@@ -52,7 +54,8 @@ class SphericalDEMSimulator : public Factorable
 	private : Vector3r gravity;
 	private : Real forceDamping;
 	private : Real momentumDamping;
-
+	private : bool useTimeStepper;
+	private : PersistentSAPCollider sap;
 
 	private : void findRealCollision(const vector<Sphere>& spheres, ContactVecSet& contacts);
 	private : void computeResponse(vector<Sphere>& spheres, ContactVecSet& contacts);
@@ -67,11 +70,13 @@ class SphericalDEMSimulator : public Factorable
 	public : SphericalDEMSimulator();
 	public : ~SphericalDEMSimulator();
 
-	public : void run(int nbIterations);
-	public : void loadXMLFile(const string& fileName);
+	public : virtual void setTimeStep(Real dt);
+	public : virtual void doOneIteration();
+	public : virtual void run(int nbIterations);
+	public : virtual void loadConfigurationFile(const string& fileName);
 
 	REGISTER_CLASS_NAME(SphericalDEMSimulator);
-	REGISTER_BASE_CLASS_NAME(Factorable);
+	REGISTER_BASE_CLASS_NAME(StandAloneSimulator);
 
 };
 

@@ -6,7 +6,7 @@ INSTALL_DIR=/usr/local
 
 #######################
 
-yade_include_subdir=QtGUI
+yade_include_subdir=yade-extra
 yade_gui_subdir=yade-extra
 yade_libnames_basename=SphericalDEMSimulator
 

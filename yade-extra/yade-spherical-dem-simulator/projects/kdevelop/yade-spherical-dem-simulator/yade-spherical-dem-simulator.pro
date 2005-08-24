@@ -9,7 +9,7 @@ LIBS += -lyade-lib-multimethods \
         -lyade-lib-wm3-math 
 INCLUDEPATH += /usr/local/include 
 QMAKE_LIBDIR = /usr/local/lib/yade/yade-libs 
-TARGET = ../../../bin/SpericalDEMSimulator 
+TARGET = ../../../bin/SphericalDEMSimulator 
 CONFIG += release \
           warn_on \
           dll 

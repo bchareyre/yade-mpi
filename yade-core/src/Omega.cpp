@@ -311,7 +311,7 @@ void Omega::scanPlugins()
 			}
 		}
 		else
-			cerr << "ERROR: trying to scan non existing directory for plugins: "<< directory.native_directory_string() << endl;
+			cerr << "ERROR: trying to scan plugins in non existing directory : "<< directory.native_directory_string() << endl;
 	}
 
 	bool allLoaded = false;

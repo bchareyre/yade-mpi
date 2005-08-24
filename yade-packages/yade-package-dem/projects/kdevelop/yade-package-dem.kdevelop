@@ -76,7 +76,7 @@
       <directoryradio>executable</directoryradio>
     </run>
     <general>
-      <activedir>PreProcessor/SDECLinkedSpheres</activedir>
+      <activedir>PreProcessor/SDECSpheresPlane</activedir>
     </general>
     <subclassing/>
   </kdevtrollproject>

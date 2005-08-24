@@ -35,7 +35,6 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "SphericalDEMSimulator.hpp"
-#include "PersistentSAPCollider.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -45,7 +44,7 @@ using namespace std;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-SphericalDEMSimulator::SphericalDEMSimulator() : Factorable()
+SphericalDEMSimulator::SphericalDEMSimulator() : StandAloneSimulator()
 {
 	alpha	= 2.5;
 	beta	= 2.0;
@@ -54,6 +53,8 @@ SphericalDEMSimulator::SphericalDEMSimulator() : Factorable()
 	gravity = Vector3r(0,-9.8,0);
 	forceDamping = 0.3;
 	momentumDamping = 0.3;
+
+	useTimeStepper = true;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -67,40 +68,60 @@ SphericalDEMSimulator::~SphericalDEMSimulator()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void SphericalDEMSimulator::run(int nbIterations)
+void SphericalDEMSimulator::setTimeStep(Real dt)
 {
-	PersistentSAPCollider sap;
-
-	// do the simulation loop
-	for(int i=0;i<nbIterations;i++)
+	if (dt<=0)
+		useTimeStepper = true;
+	else
 	{
-		// compute dt
-		computeDt(spheres,contacts);
-
-		// detect potential collision
-		sap.action(spheres,contacts);
-		
-		// detect real collision
-		findRealCollision(spheres,contacts);
-		
-		// compute response
-		computeResponse(spheres,contacts);
-
-		// add damping
-		addDamping(spheres);
-
-		// apply response
-		applyResponse(spheres);
-
-		// time integration
-		timeIntegration(spheres);
+		useTimeStepper = false;
+		this->dt = dt;
 	}
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void SphericalDEMSimulator::loadXMLFile(const string& fileName)
+void SphericalDEMSimulator::doOneIteration()
+{
+	// compute dt
+	if (useTimeStepper)
+		dt = computeDt(spheres,contacts);
+
+	// detect potential collision
+	sap.action(spheres,contacts);
+	
+	// detect real collision
+	findRealCollision(spheres,contacts);
+	
+	// compute response
+	computeResponse(spheres,contacts);
+
+	// add damping
+	addDamping(spheres);
+
+	// apply response
+	applyResponse(spheres);
+
+	// time integration
+	timeIntegration(spheres);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+void SphericalDEMSimulator::run(int nbIterations)
+{
+	// do the simulation loop
+	for(int i=0;i<nbIterations;i++)
+		doOneIteration();
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+void SphericalDEMSimulator::loadConfigurationFile(const string& fileName)
 {
 	IOFormatManager::loadFromFile("XMLFormatManager",fileName,"rootBody",rootBody);
 
