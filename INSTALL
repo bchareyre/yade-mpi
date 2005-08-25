@@ -64,3 +64,68 @@ DOCUMENTATION:
 we plan to have documentation in doc/ directory of each library, but for now
 nothing is there.
 
+RUNNING
+
+To start correctly, yade must be able to find its libraries. It means that you
+should set LD_LIBRARY_PATH environment variable to point to the right
+directory. Depending on where yade is installed, it can be one of those:
+
+   /usr/local/lib/yade/yade-libs
+   /home/joeuser/YADE/lib/yade/yade-libs
+   /usr/lib/yade/yade-libs
+
+You can do this in following ways:
+
+   1. add following line to your /home/janek/.bashrc or /home/janek/.zshenv
+
+         export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/lib/yade/yade-libs
+
+   2. or everytime before you first start yade in a given terminal issue a command:
+
+         export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/lib/yade/yade-libs
+
+note: csh uses setenv instead of export
+
+If you fail to do what is described above, you will get the following error:
+
+./yade: error while loading shared libraries: libyade-lib-threads.so.1: cannot open shared object file: No such file or directory
+
+
+
+FIRST TIME SETUP
+
+After launching yade for the first time, you will be welcomed by "Yade first
+use wizard". You will be asked questions, and your answers will be saved in the
+directory /home/janek/.yade
+
+1. Specify default GUI name [QtGUI] :
+
+You can safely press enter here. Yade can use many different GUI plugins,
+currently there are only two: QtGUI and NullGUI. QtGUI is currently a standard
+graphical frontend for yade. NullGUI is a command line interface for yade. In
+the future more GUIs can appear, like: ncurses based, GTK, etc.
+
+2. Specify the path where to find it [/usr/local/lib/yade/yade-guis] :
+
+Here you should specify path to yade-guis, it can be one of the following:
+
+   /usr/local/lib/yade/yade-guis
+   /home/joeuser/YADE/lib/yade/yade-guis
+   /usr/lib/yade/yade-guislibs
+
+Then a graphical window should appear. Next step is to add directories with all
+other plugins used by yade. To do so click "Edit-Preferences-Plugin Folders",
+and add all directories from lib/yade/ path. This is a daunting task, since
+there are currently 8 directories to add (will be fixed with bug #004858). But
+you should do it only once. If you are developing your own plugins, and they
+reside in some other directory, you should add this directory here.
+
+Then click Plugins on the left, and click a button Rescan. You should see
+all C++ classes that are recognized by yade from those plugins.
+
+After that you can normally use yade.
+
+MORE INFORMATION
+
+For more (and up to date!) information about working with yade see: http://yade.berlios.de/index.php?m=700
+
