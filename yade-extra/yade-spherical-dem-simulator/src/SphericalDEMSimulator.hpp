@@ -27,7 +27,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "Sphere.hpp"
+#include "SphericalDEM.hpp"
 #include "Contact.hpp"
 #include "PersistentSAPCollider.hpp"
 
@@ -43,7 +43,7 @@
 class SphericalDEMSimulator : public StandAloneSimulator
 {
 	private : shared_ptr<MetaBody> rootBody;
-	private : vector<Sphere> spheres;
+	private : vector<SphericalDEM> spheres;
 	private : ContactVecSet contacts;
 	private : Real alpha;
 	private : Real beta;
@@ -57,18 +57,18 @@ class SphericalDEMSimulator : public StandAloneSimulator
 	private : bool useTimeStepper;
 	private : PersistentSAPCollider sap;
 
-	private : void findRealCollision(const vector<Sphere>& spheres, ContactVecSet& contacts);
-	private : void computeResponse(vector<Sphere>& spheres, ContactVecSet& contacts);
-	private : void addDamping(vector<Sphere>& spheres);
-	private : void applyResponse(vector<Sphere>& spheres);
-	private : void timeIntegration(vector<Sphere>& spheres);
-	private : Real computeDt(const vector<Sphere>& spheres, const ContactVecSet& contacts);
+	private : void findRealCollision(const vector<SphericalDEM>& spheres, ContactVecSet& contacts);
+	private : void computeResponse(vector<SphericalDEM>& spheres, ContactVecSet& contacts);
+	private : void addDamping(vector<SphericalDEM>& spheres);
+	private : void applyResponse(vector<SphericalDEM>& spheres);
+	private : void timeIntegration(vector<SphericalDEM>& spheres);
+	private : Real computeDt(const vector<SphericalDEM>& spheres, const ContactVecSet& contacts);
 
-	private : void SphericalDEMSimulator::findTimeStepFromBody(const Sphere& sphere);
-	private : void findTimeStepFromInteraction(unsigned int id1, const Contact& contact, const vector<Sphere>& spheres);
+	private : void SphericalDEMSimulator::findTimeStepFromBody(const SphericalDEM& sphere);
+	private : void findTimeStepFromInteraction(unsigned int id1, const Contact& contact, const vector<SphericalDEM>& spheres);
 
 	public : SphericalDEMSimulator();
-	public : ~SphericalDEMSimulator();
+	public : virtual ~SphericalDEMSimulator();
 
 	public : virtual void setTimeStep(Real dt);
 	public : virtual void doOneIteration();

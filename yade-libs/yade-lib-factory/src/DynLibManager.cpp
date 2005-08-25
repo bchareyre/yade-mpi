@@ -238,11 +238,11 @@ bool DynLibManager::closeLib(const string libName)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 bool DynLibManager::error() 
-{    
-	#ifdef WIN32    
-    		TCHAR szBuf[80]; 
+{
+	#ifdef WIN32
+    		TCHAR szBuf[80];
     		LPVOID lpMsgBuf;
-    		DWORD dw = GetLastError(); 
+    		DWORD dw = GetLastError();
 
     		FormatMessage( FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, NULL, GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR) &lpMsgBuf, 0, NULL );
 

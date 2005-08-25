@@ -83,17 +83,25 @@ void QtSphericalDEM::pbLoadClicked()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+///FIXME : use thread here !
 void QtSphericalDEM::pbStartClicked()
 {
 	maxIteration = sbNbIterations->value();
 	currentIteration = 0;
 	stop = false;
-	while (currentIteration!=maxIteration && !stop)
+	chron.start();
+/*	while (currentIteration!=maxIteration && !stop)
 	{
 		currentIteration++;
 		tlIteration->setText(lexical_cast<string>(currentIteration).c_str());
 		simulator->doOneIteration();
-	}
+		tlDurationValue->setText(lexical_cast<string>(chron.getTime()).c_str());
+		repaint();
+	}*/
+
+	simulator->run(maxIteration);
+	tlDurationValue->setText(lexical_cast<string>(chron.stop()).c_str());
+	tlIteration->setText(lexical_cast<string>(maxIteration).c_str());
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -112,7 +120,7 @@ void QtSphericalDEM::bgTimeStepClicked(int i)
 	if (i==0)
 	{
 		Real dt = lexical_cast<Real>(leTimeStep->text().data());
-		//simulator->setTimeStep(dt);
+		simulator->setTimeStep(dt);
 	}
 	else
 		simulator->setTimeStep(-1);

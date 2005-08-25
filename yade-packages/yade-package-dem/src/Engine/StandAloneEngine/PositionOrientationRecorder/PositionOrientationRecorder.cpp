@@ -40,7 +40,7 @@
 
 PositionOrientationRecorder::PositionOrientationRecorder () : Engine()//, ofile("")
 {
-	outputFile = "";
+	outputFile = "positionorientation";
 	interval = 50;
 }
 
@@ -98,16 +98,15 @@ void PositionOrientationRecorder::action(Body * body)
 			rw = b->physicalParameters->se3.orientation[0];
 			rx = b->physicalParameters->se3.orientation[1];
 			ry = b->physicalParameters->se3.orientation[2];
-			rz = b->physicalParameters->se3.orientation[2];
+			rz = b->physicalParameters->se3.orientation[3];
 			
-			ofile << lexical_cast<string>(Omega::instance().getSimulationTime()) << " "
-				<< lexical_cast<string>(tx) << " " 
-				<< lexical_cast<string>(ty) << " " 
-				<< lexical_cast<string>(tz) << " "
-				<< lexical_cast<string>(rw) << " "
-				<< lexical_cast<string>(rx) << " "
-				<< lexical_cast<string>(ry) << " "
-				<< lexical_cast<string>(rz) << endl;
+			ofile <<	lexical_cast<string>(tx) << " " 
+					<< lexical_cast<string>(ty) << " " 
+					<< lexical_cast<string>(tz) << " "
+					<< lexical_cast<string>(rw) << " "
+					<< lexical_cast<string>(rx) << " "
+					<< lexical_cast<string>(ry) << " "
+					<< lexical_cast<string>(rz) << endl;
 		}
 		ofile.close();
 	}

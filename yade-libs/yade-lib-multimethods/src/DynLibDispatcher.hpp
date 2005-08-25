@@ -1,4 +1,4 @@
-/***************************************************************************
+/*********************************************callBacks******************************
  *   Copyright (C) 2005 by Janek Kozicki                                   *
  *   cosurgi@berlios.de                                                    *
  *                                                                         *
@@ -213,6 +213,41 @@ class DynLibDispatcher
 			callBacksInfo.clear();
 		  };
 		
+ 	public  : shared_ptr<Executor> getExecutor(const string& baseClassName1,const string& baseClassName2)
+		  {
+
+			shared_ptr<BaseClass1> baseClass1 = dynamic_pointer_cast<BaseClass1>(ClassFactory::instance().createShared(baseClassName1));
+			shared_ptr<Indexable> base1	  = dynamic_pointer_cast<Indexable>(baseClass1);
+			assert(base1);
+			int& index1 = base1->getClassIndex();
+ 			assert (index1 != -1);
+
+			shared_ptr<BaseClass2> baseClass2 = dynamic_pointer_cast<BaseClass2>(ClassFactory::instance().createShared(baseClassName2));
+			shared_ptr<Indexable> base2	  = dynamic_pointer_cast<Indexable>(baseClass2);
+			assert(base2);
+			int& index2 = base2->getClassIndex();
+ 			assert (index2 != -1);
+
+			assert(callBacks.size()>=(unsigned int)index1);
+			assert(callBacks[index1].size()>=(unsigned int)index2);
+
+			return callBacks[index1][index2];
+		  }
+
+ 	public  : shared_ptr<Executor> getExecutor(const string& baseClassName)
+		  {
+
+			shared_ptr<BaseClass1> baseClass = dynamic_pointer_cast<BaseClass1>(ClassFactory::instance().createShared(baseClassName));
+			shared_ptr<Indexable> base	  = dynamic_pointer_cast<Indexable>(baseClass);
+			assert(base);
+			int& index = base->getClassIndex();
+ 			assert (index != -1);
+
+			assert(callBacks.size()>=(unsigned int)index);
+
+			return callBacks[index];
+		  }
+
  	public  : shared_ptr<Executor> makeExecutor(string libName)
 		  {
 			shared_ptr<Executor> executor;

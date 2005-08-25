@@ -59,7 +59,7 @@ PersistentSAPCollider::~PersistentSAPCollider()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void PersistentSAPCollider::action(const vector<Sphere>& spheres, ContactVecSet& contacts)
+void PersistentSAPCollider::action(const vector<SphericalDEM>& spheres, ContactVecSet& contacts)
 {
 	if (2*spheres.size()!=xBounds.size())
 	{
@@ -71,13 +71,16 @@ void PersistentSAPCollider::action(const vector<Sphere>& spheres, ContactVecSet&
 		maximums.resize(3*spheres.size());
 	}
 
+	if (contacts.size()!=spheres.size())
+		contacts.resize(spheres.size());
+
 	// Updates the minimums and maximums arrays according to the new center and radius of the spheres
 	int offset;
 	Vector3r min,max;
 
-	Sphere s;
-	vector<Sphere>::const_iterator si    = spheres.begin();
-	vector<Sphere>::const_iterator siEnd = spheres.end();
+	SphericalDEM s;
+	vector<SphericalDEM>::const_iterator si    = spheres.begin();
+	vector<SphericalDEM>::const_iterator siEnd = spheres.end();
 	for(unsigned int i=0 ; si!=siEnd ; ++si,i++ )
 	{
 		Real r = (*si).radius;
@@ -85,14 +88,14 @@ void PersistentSAPCollider::action(const vector<Sphere>& spheres, ContactVecSet&
 
 		offset = 3*i;
 
-		minimums[offset+0] = r-p[0];
-		minimums[offset+1] = r-p[1];
-		minimums[offset+2] = r-p[2];
-		maximums[offset+0] = r+p[0];
-		maximums[offset+1] = r+p[1];
-		maximums[offset+2] = r+p[2];
+		minimums[offset+0] = p[0]-r;
+		minimums[offset+1] = p[1]-r;
+		minimums[offset+2] = p[2]-r;
+		maximums[offset+0] = p[0]+r;
+		maximums[offset+1] = p[1]+r;
+		maximums[offset+2] = p[2]+r;
 	}
-	
+
 	ContactVecSet::iterator sci    = contacts.begin();
 	ContactVecSet::iterator sciEnd = contacts.end();
 	for( ; sci!=sciEnd ; ++sci)
@@ -102,13 +105,16 @@ void PersistentSAPCollider::action(const vector<Sphere>& spheres, ContactVecSet&
 		for( ; ci!=ciEnd ; ++ci)
 		{
 			if ((*ci).isReal) // if a interaction was only potential then no geometry was created for it and so this time it is still a new one
-				const_cast<Contact *>(&(*ci))->isNew = false;
-	
-			const_cast<Contact *>(&(*ci))->isReal = false;
+			{
+				Contact * c = const_cast<Contact *>(&(*ci));
+				c->isNew = false;
+				c->isReal = false;
+			}
 		}
 	}
 	
 	updateIds(spheres.size(),contacts);
+
 	nbObjects = spheres.size();
 
 	// permutation sort of the AABBBounds along the 3 axis performed in a independant manner
@@ -209,7 +215,7 @@ void PersistentSAPCollider::updateOverlapingBBSet(int id1,int id2, ContactVecSet
 // 	// look if the paiur (id1,id2) already exists in the overleppingBB collection
 	ContactSet::iterator csi = contacts[id1].find(c);
 	bool found = (csi!=contacts[id1].end());
-	
+
 	// test if the AABBs of the spheres number "id1" and "id2" are overlapping
 	int offset1 = 3*id1;
 	int offset2 = 3*id2;

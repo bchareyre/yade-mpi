@@ -76,7 +76,7 @@
       <directoryradio>executable</directoryradio>
     </run>
     <general>
-      <activedir>Container/PhysicalActionContainer</activedir>
+      <activedir>DataClass/PhysicalParameters/ParticleParameters</activedir>
     </general>
     <subclassing/>
   </kdevtrollproject>

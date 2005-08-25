@@ -7,6 +7,7 @@ LIBS += -lSDECLinkGeometry \
         -lElasticContactLaw \
         -lMacroMicroElasticRelationships \
         -lElasticCriterionTimeStepper \
+        -lPositionOrientationRecorder \
         -lPhysicalActionVectorVector \
         -lInteractionVecSet \
         -lBodyRedirectionVector \
@@ -34,13 +35,15 @@ LIBS += -lSDECLinkGeometry \
         -lMetaInteractingGeometry2AABB \
         -lyade-lib-multimethods \
         -rdynamic 
-INCLUDEPATH += /usr/local/include/ \
+INCLUDEPATH += ../../Engine/StandAloneEngine/PositionOrientationRecorder \
                ../../Engine/StandAloneEngine/ElasticCriterionTimeStepper \
                ../../Engine/StandAloneEngine/ElasticContactLaw \
                ../../Engine/EngineUnit/MacroMicroElasticRelationships \
                ../../DataClass/InteractionGeometry/SDECLinkGeometry \
-               ../../DataClass/PhysicalParameters/BodyMacroParameters 
+               ../../DataClass/PhysicalParameters/BodyMacroParameters \
+               /usr/local/include/ 
 QMAKE_LIBDIR = ../../../../bin \
+               ../../../../bin \
                ../../../../bin \
                ../../../../bin \
                ../../../../bin \

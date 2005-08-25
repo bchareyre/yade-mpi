@@ -23,12 +23,24 @@
 
 #include <iostream>
 #include <vector>
-#include <set>
+#include <set> 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <yade/yade-core/MetaBody.hpp>
+#include <yade/yade-core/MetaBody.hpp> 
+#include <yade/yade-core/Engine.hpp>
+
+#include <yade/yade-package-common/Sphere.hpp>
+#include <yade/yade-package-common/GravityEngine.hpp>
+#include <yade/yade-package-common/InteractionPhysicsMetaEngine.hpp>
+#include <yade/yade-package-common/PhysicalActionDamper.hpp>
+#include <yade/yade-package-common/CundallNonViscousForceDamping.hpp>
+#include <yade/yade-package-common/CundallNonViscousMomentumDamping.hpp>
+
+#include <yade/yade-package-dem/BodyMacroParameters.hpp>
+#include <yade/yade-package-dem/MacroMicroElasticRelationships.hpp>
+
 #include <yade/yade-lib-serialization/IOFormatManager.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -49,7 +61,7 @@ SphericalDEMSimulator::SphericalDEMSimulator() : StandAloneSimulator()
 	alpha	= 2.5;
 	beta	= 2.0;
 	gamma	= 2.65;
-	dt	= 0.001;
+	dt	= 0.01;
 	gravity = Vector3r(0,-9.8,0);
 	forceDamping = 0.3;
 	momentumDamping = 0.3;
@@ -69,7 +81,7 @@ SphericalDEMSimulator::~SphericalDEMSimulator()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void SphericalDEMSimulator::setTimeStep(Real dt)
-{
+{ 
 	if (dt<=0)
 		useTimeStepper = true;
 	else
@@ -86,15 +98,15 @@ void SphericalDEMSimulator::setTimeStep(Real dt)
 void SphericalDEMSimulator::doOneIteration()
 {
 	// compute dt
-	if (useTimeStepper)
-		dt = computeDt(spheres,contacts);
-
+	//if (useTimeStepper)
+	//	dt = computeDt(spheres,contacts);
+	dt=0.01;
 	// detect potential collision
 	sap.action(spheres,contacts);
-	
+
 	// detect real collision
 	findRealCollision(spheres,contacts);
-	
+
 	// compute response
 	computeResponse(spheres,contacts);
 
@@ -116,6 +128,34 @@ void SphericalDEMSimulator::run(int nbIterations)
 	// do the simulation loop
 	for(int i=0;i<nbIterations;i++)
 		doOneIteration();
+
+	ofstream ofile("SphericalDEMSimulator.res");
+
+	vector<SphericalDEM>::iterator si    = spheres.begin();
+	vector<SphericalDEM>::iterator siEnd = spheres.end();
+	for( ; si!=siEnd ; ++si)
+	{
+		Real tx=0, ty=0, tz=0, rw=0, rx=0, ry=0, rz=0;
+
+		tx = si->position[0];
+		ty = si->position[1];
+		tz = si->position[2];
+	
+		rw = si->orientation[0];
+		rx = si->orientation[1];
+		ry = si->orientation[2];
+		rz = si->orientation[3];
+		
+		ofile <<	lexical_cast<string>(tx) << " " 
+				<< lexical_cast<string>(ty) << " " 
+				<< lexical_cast<string>(tz) << " "
+				<< lexical_cast<string>(rw) << " "
+				<< lexical_cast<string>(rx) << " "
+				<< lexical_cast<string>(ry) << " "
+				<< lexical_cast<string>(rz) << endl;
+	}
+		ofile.close();
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -124,28 +164,89 @@ void SphericalDEMSimulator::run(int nbIterations)
 void SphericalDEMSimulator::loadConfigurationFile(const string& fileName)
 {
 	IOFormatManager::loadFromFile("XMLFormatManager",fileName,"rootBody",rootBody);
+	
+	spheres.clear();
 
 	//copy rootBody to more simple data structure
 	BodyContainer::iterator bi    = rootBody->bodies->begin();
 	BodyContainer::iterator biEnd = rootBody->bodies->end();
 	for( ; bi!=biEnd ; ++bi)
 	{
+		Sphere * s = static_cast<Sphere*>((*bi)->geometricalModel.get());
+		BodyMacroParameters * bmp = static_cast<BodyMacroParameters*>((*bi)->physicalParameters.get());
+		SphericalDEM sd;
 		
+		sd.isDynamic		= (*bi)->isDynamic;
+		sd.radius		= s->radius;
+		sd.position		= bmp->se3.position;
+		sd.orientation		= bmp->se3.orientation;
+		sd.velocity		= bmp->velocity;
+		sd.angularVelocity	= bmp->angularVelocity;
 
+		sd.mass			= bmp->mass;
+		sd.invMass		= bmp->invMass;
+		sd.inertia		= bmp->inertia;
+		sd.invInertia		= bmp->invInertia;
+
+		sd.young		= bmp->young;
+		sd.poisson		= bmp->poisson;
+		sd.frictionAngle	= bmp->frictionAngle;
+
+		//sd.acceleration;
+		//sd.angularAcceleration;	
+		//sd.prevVelocity;
+		//sd.prevAngularVelocity;
+		//sd.force;
+		//sd.momentum;
+
+		spheres.push_back(sd);
+	}
+
+	vector<shared_ptr<Engine> >::iterator ei    = rootBody->actors.begin();
+	vector<shared_ptr<Engine> >::iterator eiEnd = rootBody->actors.end();
+	for( ; ei!=eiEnd ; ++ei)
+	{
+		shared_ptr<Engine> e = *ei;
+
+		shared_ptr<GravityEngine> ge = dynamic_pointer_cast<GravityEngine>(e);
+		if (ge)
+			gravity = ge->gravity;
+
+		shared_ptr<InteractionPhysicsMetaEngine> ipme = dynamic_pointer_cast<InteractionPhysicsMetaEngine>(e);
+		if (ipme)
+		{
+			shared_ptr<MacroMicroElasticRelationships> mmer = dynamic_pointer_cast<MacroMicroElasticRelationships>(ipme->getExecutor("BodyMacroParameters","BodyMacroParameters"));
+			assert(e);
+			alpha	= mmer->alpha;
+			beta	= mmer->beta;
+			gamma	= mmer->gamma;
+		}
+
+		shared_ptr<PhysicalActionDamper> pade = dynamic_pointer_cast<PhysicalActionDamper>(e);
+		if (pade)
+		{	
+			shared_ptr<CundallNonViscousForceDamping> cnvfd = dynamic_pointer_cast<CundallNonViscousForceDamping>(pade->getExecutor("Force","RigidBodyParameters"));
+			shared_ptr<CundallNonViscousMomentumDamping> cnvmd = dynamic_pointer_cast<CundallNonViscousMomentumDamping>(pade->getExecutor("Momentum","RigidBodyParameters"));
+			assert(cnvfd);
+			assert(cnvmd);
+			forceDamping 	= cnvfd->damping;
+			momentumDamping = cnvmd->damping;
+		}
 	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void SphericalDEMSimulator::findRealCollision(const vector<Sphere>& spheres, ContactVecSet& contacts)
+void SphericalDEMSimulator::findRealCollision(const vector<SphericalDEM>& spheres, ContactVecSet& contacts)
 {
+
 	ContactVecSet::iterator cvsi    = contacts.begin();
 	ContactVecSet::iterator cvsiEnd = contacts.end();
 	for(int id1=0 ; cvsi!=cvsiEnd ; ++cvsi, ++id1)
 	{
 		ContactSet::iterator csi    = cvsi->begin();
-		ContactSet::iterator csiEnd = cvsiEnd->begin();
+		ContactSet::iterator csiEnd = cvsi->end();
 		for( ; csi!=csiEnd ; ++csi)
 		{
 			Contact * c = const_cast<Contact*>(&(*csi));
@@ -213,62 +314,61 @@ void SphericalDEMSimulator::findRealCollision(const vector<Sphere>& spheres, Con
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-void SphericalDEMSimulator::computeResponse(vector<Sphere>& spheres, ContactVecSet& contacts)
+void SphericalDEMSimulator::computeResponse(vector<SphericalDEM>& spheres, ContactVecSet& contacts)
 {
 
 	/// PhysicalActionContainerReseter+GravityEngine
-	vector<Sphere>::iterator si    = spheres.begin();
-	vector<Sphere>::iterator siEnd = spheres.end();
+	vector<SphericalDEM>::iterator si    = spheres.begin();
+	vector<SphericalDEM>::iterator siEnd = spheres.end();
 	for( ; si!=siEnd ; ++si)
 	{
 		(*si).force    = gravity * (*si).mass;
 		(*si).momentum = Vector3r(0,0,0);
 	}
-
+int nbCollision=0;
 	///ElasticContactLaw
 	ContactVecSet::iterator cvsi    = contacts.begin();
 	ContactVecSet::iterator cvsiEnd = contacts.end();
 	for(int id1=0 ; cvsi!=cvsiEnd ; ++cvsi, ++id1)
 	{
 		ContactSet::iterator csi    = cvsi->begin();
-		ContactSet::iterator csiEnd = cvsiEnd->begin();
+		ContactSet::iterator csiEnd = cvsi->end();
 		for( ; csi!=csiEnd ; ++csi)
 		{
-			Contact c = *csi;
+			Contact * c = const_cast<Contact*>(&(*csi));
 
-			if (c.isReal)
+			if (c->isReal)
 			{
-				int id2 = c.id;
-				Sphere s1 = spheres[id1];
-				Sphere s2 = spheres[id2];
+nbCollision++;
+				int id2 = c->id;
 
-				Vector3r& shearForce = c.shearForce;
+				Vector3r& shearForce = c->shearForce;
 		
-				if ( c.isNew)
+				if ( c->isNew)
 					shearForce = Vector3r(0,0,0);
 						
-				Real un		= c.penetrationDepth;
-				c.normalForce	= c.kn*un*c.normal;
+				Real un		= c->penetrationDepth;
+				c->normalForce	= c->kn*un*c->normal;
 		
 				Vector3r axis;
 				Real angle;
 		
-				axis	 	= c.prevNormal.cross(c.normal);
+				axis	 	= c->prevNormal.cross(c->normal);
 				shearForce	-= shearForce.cross(axis);
-				angle		= dt*0.5*c.normal.dot(s1.angularVelocity+s2.angularVelocity);
-				axis		= angle*c.normal;
+				angle		= dt*0.5*c->normal.dot(spheres[id1].angularVelocity+spheres[id2].angularVelocity);
+				axis		= angle*c->normal;
 				shearForce	-= shearForce.cross(axis);
 			
-				Vector3r x			= c.contactPoint;
-				Vector3r c1x			= (x - s1.position);
-				Vector3r c2x			= (x - s2.position);
-				Vector3r relativeVelocity	= (s2.velocity+s2.angularVelocity.cross(c2x)) - (s1.velocity+s1.angularVelocity.cross(c1x));
-				Vector3r shearVelocity		= relativeVelocity-c.normal.dot(relativeVelocity)*c.normal;
+				Vector3r x			= c->contactPoint;
+				Vector3r c1x			= (x - spheres[id1].position);
+				Vector3r c2x			= (x - spheres[id2].position);
+				Vector3r relativeVelocity	= (spheres[id2].velocity+spheres[id2].angularVelocity.cross(c2x)) - (spheres[id1].velocity+spheres[id1].angularVelocity.cross(c1x));
+				Vector3r shearVelocity		= relativeVelocity-c->normal.dot(relativeVelocity)*c->normal;
 				Vector3r shearDisplacement	= shearVelocity*dt;
-				shearForce 			-= c.ks*shearDisplacement;
+				shearForce 			-= c->ks*shearDisplacement;
 		
 				/// PFC3d SlipModel, is using friction angle and CoulombCriterion
-				Real maxFs = c.normalForce.squaredLength() * pow(c.tangensOfFrictionAngle,2);
+				Real maxFs = c->normalForce.squaredLength() * pow(c->tangensOfFrictionAngle,2);
 				if( shearForce.squaredLength() > maxFs )
 				{
 					maxFs = Mathr::sqRoot(maxFs) / shearForce.length();
@@ -276,15 +376,15 @@ void SphericalDEMSimulator::computeResponse(vector<Sphere>& spheres, ContactVecS
 				}
 				/// PFC3d SlipModel
 		
-				Vector3r f	= c.normalForce + shearForce;
+				Vector3r f	= c->normalForce + shearForce;
 				
-				s1.force -= f;
-				s2.force += f;
+				spheres[id1].force -= f;
+				spheres[id2].force += f;
 
-				s1.momentum -= c1x.cross(f);
-				s2.momentum += c2x.cross(f);
+				spheres[id1].momentum -= c1x.cross(f);
+				spheres[id2].momentum += c2x.cross(f);
 				
-				c.prevNormal = c.normal;
+				c->prevNormal = c->normal;
 			}
 		}
 	}
@@ -293,21 +393,20 @@ void SphericalDEMSimulator::computeResponse(vector<Sphere>& spheres, ContactVecS
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void SphericalDEMSimulator::addDamping(vector<Sphere>& spheres)
+void SphericalDEMSimulator::addDamping(vector<SphericalDEM>& spheres)
 {
-	vector<Sphere>::iterator si    = spheres.begin();
-	vector<Sphere>::iterator siEnd = spheres.end();
+	vector<SphericalDEM>::iterator si    = spheres.begin();
+	vector<SphericalDEM>::iterator siEnd = spheres.end();
 	for( ; si!=siEnd ; ++si)
 	{
-		Sphere s = *si;
 		///CundallNonViscousForceDamping
-		Vector3r& f  = s.force;
+		Vector3r& f  = si->force;
 		register int sign;
 		for(int j=0;j<3;j++)
 		{
-			if (s.velocity[j] == 0)
+			if (si->velocity[j] == 0)
 				sign = 0;
-			else if (s.velocity[j] > 0)
+			else if (si->velocity[j] > 0)
 				sign = 1;
 			else
 				sign = -1;
@@ -316,12 +415,12 @@ void SphericalDEMSimulator::addDamping(vector<Sphere>& spheres)
 		}
 
 		///CundallNonViscousMomentumDamping
-		Vector3r& m  = s.momentum;
+		Vector3r& m  = si->momentum;
 		for(int j=0;j<3;j++)
 		{
-			if (s.angularVelocity[j]==0)
+			if (si->angularVelocity[j]==0)
 				sign = 0;
-			else if (s.angularVelocity[j]>0)
+			else if (si->angularVelocity[j]>0)
 				sign = 1;
 			else
 				sign = -1;
@@ -334,14 +433,14 @@ void SphericalDEMSimulator::addDamping(vector<Sphere>& spheres)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void SphericalDEMSimulator::applyResponse(vector<Sphere>& spheres)
+void SphericalDEMSimulator::applyResponse(vector<SphericalDEM>& spheres)
 {
-	vector<Sphere>::iterator si    = spheres.begin();
-	vector<Sphere>::iterator siEnd = spheres.end();
+	vector<SphericalDEM>::iterator si    = spheres.begin();
+	vector<SphericalDEM>::iterator siEnd = spheres.end();
 	for( ; si!=siEnd ; ++si)
 	{
 		///NewtonsForceLaw 
-		(*si).acceleration =(*si).invMass*(*si).force;
+		(*si).acceleration = (*si).invMass*(*si).force;
 		
 		///NewtonsMomentumLaw 
 		(*si).angularAcceleration = (*si).momentum.multDiag((*si).invInertia);
@@ -351,12 +450,12 @@ void SphericalDEMSimulator::applyResponse(vector<Sphere>& spheres)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void SphericalDEMSimulator::timeIntegration(vector<Sphere>& spheres)
+void SphericalDEMSimulator::timeIntegration(vector<SphericalDEM>& spheres)
 {
 	static bool first = true;
 
-	vector<Sphere>::iterator si    = spheres.begin();
-	vector<Sphere>::iterator siEnd = spheres.end();
+	vector<SphericalDEM>::iterator si    = spheres.begin();
+	vector<SphericalDEM>::iterator siEnd = spheres.end();
 	for( ; si!=siEnd ; ++si)
 	{
 		if ((*si).isDynamic)
@@ -388,7 +487,7 @@ void SphericalDEMSimulator::timeIntegration(vector<Sphere>& spheres)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-Real SphericalDEMSimulator::computeDt(const vector<Sphere>& spheres, const ContactVecSet& contacts)
+Real SphericalDEMSimulator::computeDt(const vector<SphericalDEM>& spheres, const ContactVecSet& contacts)
 {
 	///ElasticCriterionTimeStepper
 
@@ -400,15 +499,15 @@ Real SphericalDEMSimulator::computeDt(const vector<Sphere>& spheres, const Conta
 	for(int id1=0 ; cvsi!=cvsiEnd ; ++cvsi, ++id1)
 	{
 		ContactSet::const_iterator csi    = cvsi->begin();
-		ContactSet::const_iterator csiEnd = cvsiEnd->begin();
+		ContactSet::const_iterator csiEnd = cvsi->end();
 		for( ; csi!=csiEnd ; ++csi)
 			findTimeStepFromInteraction(id1,*csi , spheres);
 	}
 
 	if(! computedSomething)
 	{
-		vector<Sphere>::const_iterator si    = spheres.begin();
-		vector<Sphere>::const_iterator siEnd = spheres.end();
+		vector<SphericalDEM>::const_iterator si    = spheres.begin();
+		vector<SphericalDEM>::const_iterator siEnd = spheres.end();
 		for( ; si!=siEnd ; ++si)
 			findTimeStepFromBody(*si);
 	}	
@@ -422,7 +521,7 @@ Real SphericalDEMSimulator::computeDt(const vector<Sphere>& spheres, const Conta
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void SphericalDEMSimulator::findTimeStepFromBody(const Sphere& sphere)
+void SphericalDEMSimulator::findTimeStepFromBody(const SphericalDEM& sphere)
 {
 	Real Dab  	= sphere.radius;
 	Real rad3 	= pow(Dab,2); // radius to the power of 2, from sphere
@@ -447,7 +546,7 @@ void SphericalDEMSimulator::findTimeStepFromBody(const Sphere& sphere)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void SphericalDEMSimulator::findTimeStepFromInteraction(unsigned int id1, const Contact& contact, const vector<Sphere>& spheres)
+void SphericalDEMSimulator::findTimeStepFromInteraction(unsigned int id1, const Contact& contact, const vector<SphericalDEM>& spheres)
 {
 	unsigned int id2 = contact.id;
 			

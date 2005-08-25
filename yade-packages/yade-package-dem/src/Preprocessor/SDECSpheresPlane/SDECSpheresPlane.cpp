@@ -28,6 +28,7 @@
 #include "SDECLinkGeometry.hpp"
 #include "MacroMicroElasticRelationships.hpp"
 #include "ElasticCriterionTimeStepper.hpp"
+#include "PositionOrientationRecorder.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -391,9 +392,13 @@ void SDECSpheresPlane::createActors(shared_ptr<MetaBody>& rootBody)
 	rootBody->actors.push_back(actionDampingDispatcher);
 	rootBody->actors.push_back(applyActionDispatcher);
 	rootBody->actors.push_back(positionIntegrator);
+
 	if(!rotationBlocked)
 		rootBody->actors.push_back(orientationIntegrator);
-	
+
+	shared_ptr<PositionOrientationRecorder> positionOrientationRecorder(new PositionOrientationRecorder);
+	rootBody->actors.push_back(positionOrientationRecorder);
+
 	rootBody->initializers.clear();
 	rootBody->initializers.push_back(actionParameterInitializer);
 	rootBody->initializers.push_back(boundingVolumeDispatcher);

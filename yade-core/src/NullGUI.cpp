@@ -140,6 +140,7 @@ int NullGUI::loop()
 			<< "to filename: " << snapshotName << "_[0-9]" << endl;
 
 	long int intervals = 0;
+	chron.start();
 	while(1)
 	{
 		Omega::instance().getRootBody()->moveToNextTimeStep();
@@ -173,10 +174,12 @@ int NullGUI::loop()
 			if( ( maxIteration !=0 ) &&  (Omega::instance().getCurrentIteration() > maxIteration) )
 			{
 				cerr << "Calc finished at: " << Omega::instance().getCurrentIteration() << endl;
+				cerr << "Computation time: " << chron.stop() << endl;
 				exit(0);
 			}
 		}
 	}
+	
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

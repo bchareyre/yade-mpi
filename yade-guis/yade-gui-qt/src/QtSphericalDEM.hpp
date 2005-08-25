@@ -35,6 +35,8 @@
 
 #include <boost/shared_ptr.hpp>
 
+#include <yade/yade-lib-time/Chrono.hpp>
+
 using namespace boost;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -61,6 +63,7 @@ class QtSphericalDEM : public QtGeneratedSphericalDEMSimulator, public Factorabl
 	private : int currentIteration;
 	private : int maxIteration;
 	private : bool stop;
+	private : Chrono chron;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Constructor/Destructor									///
