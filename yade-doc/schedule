@@ -1,0 +1,67 @@
+Milestone 1 (completed: September 2004)                                                                                                                                     Done
+
+Initial version of yade framework                                                                                                                                           Done
+SimpleSpring RigidBody, spherical element for testing (explicit calculations)                                                                                               Done
+Plugin support (ClassFactory, class Factorable)                                                                                                                             Done
+Easy extensibility for arbitrary element type (class Serialization)                                                                                                         Mostly Done
+XML Serialization                                                                                                                                                           Done
+Interaction support between different physical models (Multimethods)                                                                                                        Done
+Add new physical element type, Cloth (mass spring system, explicit) for testing multimethods and interactions                                                               Done
+Implicit Cloth, to test framework extensibility                                                                                                                             Postponed
+FEM beam element, explicit, to test framework extensibility                                                                                                                 Done
+SDEC element, explicit, to test framework extensibility                                                                                                                     Done
+Their interactions (collisions and glueing)                                                                                                                                 Mostly Donne
+Redesign Yade, based on previous tests                                                                                                                                      Done
+Complete doxygen documentation reference                                                                                                                                    Half Done
+
+Milestone 2 (Completed: June 2005)                                                                                                                                          Done
+
+Load FEM mesh from file (gmsh or netgen)                                                                                                                                    Done
+Start documentation - explain Yade priciples, ideas and design                                                                                                              Done
+Start documentation - explain how to use Yade as easy framework for physical modelling                                                                                      Done
+Start documentation - explain adding plugins                                                                                                                                Done
+Start documentation - explain preprocessing, postprocessing and debugging                                                                                                   Done
+Yade runs without a GUI                                                                                                                                                     Done
+Add automatic plugin detection                                                                                                                                              Done
+Start adding serious element types: SDEC with rotation conserved, traingle-cylinder-sphere, SDEC cubical, Finite Element Method various elements, Lattice Beam model        Done (started)
+Start resolving their interactions                                                                                                                                          Done (started)
+
+Milestone 3                                                                                                                                                                 Ongoing
+
+Release beta version of yade framework                                                                                                                                      Done
+Release documentation (initial version)                                                                                                                                     Ongoing
+GUI to build time loop with actors                                                                                                                                          Ongoing
+Compare speed of DEM in yade with totally unextensible, focused on speed spherical dem simulator (to see the cost of extensibility)                                         Ongoing
+Binary Serialization                                                                                                                                                        Todo
+Rewrite Interaction Containers, so that they can store interaction between any number of bodies (currently only two (bi-associative) are supported)                         Todo
+Clean FEM in yade using new Interaction Containers                                                                                                                          Todo
+Split DEM calculations into: HookesLaw, ElasticContactLaw, ElasticBondLaw                                                                                                   Mostly Done
+Resolve license problems of Magic Software math library                                                                                                                     Ongoing
+Add two virtual functions to plugin interface: string longDescription() and string shortDescription(), so that yade can print information about them from within the GUI    Todo
+
+Milestone 4                                                                                                                                                                 Todo
+
+Save/Load configurations in File Generator dialog box                                                                                                                       Todo
+Add InteractionMatrix as another way to store interactions                                                                                                                  Todo
+Gas Example, <a href="http://www.compsoc.man.ac.uk/~lucky/Democritus/Theory/lenjon.html">Lennard-Jones</a> Forces                                                           Todo
+Add GridCollider to compare it with existing Sweep and Prune Collider                                                                                                       Todo
+Display graphical inheritance tree of all loaded plugins                                                                                                                    Todo
+Perform benchmarks to compare speed of different revisions, and learn from that what changes are making slower/faster code                                                  Todo
+Perform (more) unit tests, to verify that working with code does not infer with the calculation results                                                                     Todo
+Investigate again concept of 'parameters singleton', to see if it's still suitable                                                                                          Todo
+Use physical units, from dimnum or SIunits library                                                                                                                          Todo
+Explore disturbed computing capabilities of yade (should make yade faster than unextensible, focused on speed spherical dem simulator)                                      Todo
+
+Milestone 5                                                                                                                                                                 Todo
+
+GUI gives better control over the model, possibly add preprocessing capabilities to GUI                                                                                     Ongoing
+Possibly split yade into yade_server and yade_gui, or another way to prepare yade for multiprocessor/disturbed calculations                                                 Todo
+Easier preprocessing of data, import objects from blender, gmsh, netgen, autocad, dxf                                                                                       Todo
+yade_server communicates with yade_gui over the network                                                                                                                     Todo
+yade_server uses multiple processors                                                                                                                                        Todo
+yade is doing calculations using disturbed computing                                                                                                                        Todo
+
+Milestone 6
+
+not planned yet.
+
