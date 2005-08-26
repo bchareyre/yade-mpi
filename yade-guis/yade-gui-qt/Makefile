@@ -71,6 +71,10 @@ clean:
 	-rm ./projects/kdevelop/QtGUI/moc_QtGeneratedSphericalDEMSimulator.cpp
 	-rm ./projects/kdevelop/QtGUI/QtGeneratedSphericalDEMSimulator.h
 	-rm ./projects/kdevelop/QtGUI/QtGeneratedSphericalDEMSimulator.cpp
+	-rm ./projects/kdevelop/QtGUI/moc_QtGeneratedSimulationPlayer.cpp
+	-rm ./projects/kdevelop/QtGUI/QtGeneratedSimulationPlayer.h
+	-rm ./projects/kdevelop/QtGUI/QtGeneratedSimulationPlayer.cpp
+
 install:
 	mkdir --parents ${PREFIX_DIR}/${INSTALL_DIR}/lib/yade/${yade_gui_subdir}
 	mkdir --parents ${PREFIX_DIR}/${INSTALL_DIR}/include/yade/${yade_include_subdir}

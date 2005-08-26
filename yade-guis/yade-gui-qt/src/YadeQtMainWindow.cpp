@@ -87,6 +87,8 @@ YadeQtMainWindow::YadeQtMainWindow() : YadeQtGeneratedMainWindow()
 	addItem("Preprocessor","Engine Editor...","QtEngineEditor");
 	addItem("Preprocessor","Code Generator...","QtCodeGenerator");
 
+	addItem("Postprocessor","Simulation Player...","QtSimulationPlayer");
+
 	addItem("Extra","Spherical DEM Simulator...","QtSphericalDEM");
 
 	createMenus();

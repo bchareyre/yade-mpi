@@ -38,6 +38,10 @@ TARGET = ../../../bin/QtGUI
 CONFIG += debug \
           warn_on \
           dll 
+QtGeneratedSimulationPlayer.ui.commands = $$IDL_COMPILER $$IDL_OPTIONS $$QtGeneratedSimulationPlayer.ui.target 
+QtGeneratedSimulationPlayer.ui.target = QtGeneratedSimulationPlayer.ui 
+QtGeneratedSimulationPlayerController.ui.commands = $$IDL_COMPILER $$IDL_OPTIONS $$QtGeneratedSimulationPlayerController.ui.target 
+QtGeneratedSimulationPlayerController.ui.target = QtGeneratedSimulationPlayerController.ui 
 TEMPLATE = lib 
 FORMS += QtFileGeneratorController.ui \
          QtGeneratedCodeGenerator.ui \
@@ -47,7 +51,10 @@ FORMS += QtFileGeneratorController.ui \
          QtGeneratedSimulationController.ui \
          YadeQtGeneratedMainWindow.ui \
          QtGeneratedMetaDispatchingEngineProperties.ui \
-         QtGeneratedSphericalDEMSimulator.ui 
+         QtGeneratedSphericalDEMSimulator.ui \
+         QtGeneratedSimulationPlayer.ui 
+IDLS += QtGeneratedSimulationPlayerController.ui \
+        QtGeneratedSimulationPlayer.ui 
 HEADERS += FileDialog.hpp \
            GLEngineEditor.hpp \
            GLViewer.hpp \
@@ -63,7 +70,9 @@ HEADERS += FileDialog.hpp \
            YadeQtMainWindow.hpp \
            QtGUIPreferences.hpp \
            QtMetaDispatchingEngineProperties.hpp \
-           QtSphericalDEM.hpp 
+           QtSphericalDEM.hpp \
+           QtSimulationPlayer.hpp \
+           GLSimulationPlayerViewer.hpp 
 SOURCES += FileDialog.cpp \
            GLEngineEditor.cpp \
            GLViewer.cpp \
@@ -79,4 +88,8 @@ SOURCES += FileDialog.cpp \
            YadeQtMainWindow.cpp \
            QtGUIPreferences.cpp \
            QtMetaDispatchingEngineProperties.cpp \
-           QtSphericalDEM.cpp 
+           QtSphericalDEM.cpp \
+           QtSimulationPlayer.cpp \
+           GLSimulationPlayerViewer.cpp 
+QtGeneratedSimulationPlayer.ui.target = QtGeneratedSimulationPlayer.ui 
+QtGeneratedSimulationPlayerController.ui.target = QtGeneratedSimulationPlayerController.ui 
