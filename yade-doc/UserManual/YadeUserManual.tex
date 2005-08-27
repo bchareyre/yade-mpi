@@ -94,30 +94,29 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-	\section{What is Yade ?}
-
-	YADE is a simulation framework composed by one main software, libraries and plugins that helps the developper to implement new algorithms linked to a simulation proccess (i.e. collision detection, constitutive law etc). For now, it is well suited for 3D lagrangians simulations, as rigid-bodies simulations, discrete elements simulations, smooth particle hydrodynamic systems, mass spring systems, finite element simulations and so on. We do not plan to add support for 2D simulations and eulerian simulations (like usual fluid simulation) since their requirement are not compatible with the current framework underlyings. Yade is an open source software licensed under GPL. It is available for Unix/Linux system and we hope soon for Windows.
+	\section{What is Yade?}
+YADE is a framework for performing simulations. It consists of software, libraries and plug-ins. Those help the developer to implement new algorithms linked to a simulation process (i.e. collision detection, constitutive law etc.). It is suited for 3D lagrangians simulations, like rigid-bodies simulations, discrete elements simulations, smooth particle hydrodynamic systems, mass spring systems, finite element method simulations and so on. It is not planned to add any support for 2D and eulerian simulations (like common fluid simulation) since their requirement are not compatibile with the current framework underlyings. Yade is an open source software licensed under GPL It is available for Unix/Linux system and soon for Windows.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	
-	\section{Why Yade ?}
+	\section{Why Yade?}
 
-	The purpose of YADE is to provide a common framework for all user, that allows them to speak the same "language", to reduce the lines of code to write and to increase compatibility between different simulation algorithms. This last point  may be interresting to have a coupling between different models. Such a framework also facilitate comparison between different algorithm (speed, stability, memory usage etc). To achieve that goal we need a common and fixed central core that will be used by everybody. Developpers only have to create plugins that are loaded by this central core.  So nobody will never have to modify this core. This is basic requirement to have a common platform. The framework is also designed to increase reusability of code : math library, computationnal geometry library and several others are provided into separate packages. They can be used without YADE if needed. But the main purpose of them is to gather thos most used algorithms as quaternion or matrixes implementation, distances or intersections computation and many other computationnal geometry algorithms. All these kind of algorithms are oftently well known by the community but they are all spread everywhere and a lot of time has to be spent to find them on the internet or papers and then to adapt them to particular data types or code structure. Reusability is also increased through the plugins : a plugin can be build on top of another one and you can use different combination of plugins to achieve the same goal without recompiling nor modifying existing one.
+	YADE provides a common framework for all users that allows them to use the same standard for developing and performing simulations. It reduces the writing of code lines and increases its compatibility between different simulation algorithms, which allows coupling them (eg. FEM with DEM). Such a framework also facilitates comparison between different algorithms (speed, stability, memory usage etc). To achieve it a common and fixed central core is needed that all the users use. Developers have to create plugins that are loaded by this central core first. The core should not be modified in future. This is the basic requirement to have a common platform. The framework is also designed to increase reusability of code: math library, computational geometry library and several others are provided into separate packages. They can be used without YADE if needed. However, their main purpose is to gather the most used algorithms, like: quaternion or matrices implementation, distances or intersections computation and many other computationnal geometry algorithms. All these kinds of algorithm are often well known by the community but they are all spread everywhere and a lot of time has to be spent to find them on the internet or papers, and then to adapt them to particular data types or code structure. Reusability is also increased through the plugins: a plugin can be build on the top of another one and can be used in different combinations of plugins to achieve the same goal without recompiling nor modifying the existing one.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-	\section{How is designed Yade ?}
+	\section{How is designed Yade?}
 	
 	\subsection{Reusability and extensibility}
 	
-	So the two main caracteristics of YADE to remember are reusability and extensibility. Everything was implemented in that way. The plugins are the key to those two criterions. They allow developpers to add new functionnalities without recompiling everything and so they allow them to focus on their particular problems : if you want to add a new collision dectection algorithm no need to understand how dynamics works and vice versa ! Of course, each plugin can be compiled independently. The developper will always deal with small pieces of code that are easy to compile and easy to maintain. Of course dependencies can be created between plugins if, for example, you want to reuse another plugin to create your own one. 
+	The two main caracteristics of YADE to remember are reusability and extensibility. Everything was implemented in that way. The plugins are the key to those two criterions. They allow developers to add new functions without recompiling everything and so they allow to focus on  particular problems. If a user wants to add a new collision dectection algorithm there is no need to understand how dynamics works and vice versa. Of course, each plugin can be compiled independently. The developper will always deal with small pieces of code that are easy to compile and easy to maintain. Of course dependencies can be created between plugins if, for example, a user wants to reuse another plugin to create their own one. 
 
 
 	\subsection{Philosophy and internal structure}
 
-	The bet taken into YADE is to say that almost all lagrangian discrete simulation can be reduced to objects (the one we want to simulate) that are called \emph{\bold{bodies}} into the framework and \emph{\bold{interactions}} between those bodies. Most of the time, interactions between bodies has to be detected and a model of the interaction is then created. Finally responses are computed for each interactions. Those responses are called \emph{\bold{physical action}} into the framework (the physical action can be a force which will be applied in response to a contact in a force/displacement method). Applying those responses to the bodies will modify some variable of the bodies in such a way that after taking the time into account, they are in a new state at the next time step. All the algorithms that perform the detection of the interactions, the computation of the responses, the application of the responses and the time integration are called here \emph{\bold{engines}}.
+	 YADE is created to reduce almost all lagrangian discrete simulation into objects (the one we want to simulate) that are called \emph{\bold{bodies}} and \emph{\bold{interactions}} between those bodies. Most of the time interactions between bodies has to be detected and a model of the interaction is then created. Finally, responses are computed for each interactions. Those responses are called \emph{\bold{physical action}} in the framework (the physical action can be a force which will be applied in response to a contact in a force/displacement method). Applying those responses to the bodies will modify some variations of the bodies in such way that after the modification they are in a new state at the next step. All the algorithms that perform the detection of the interactions, the computation of the responses, the application of the responses and the time integration are called here \emph{\bold{engines}}.
 	
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -187,15 +186,15 @@
 
 Yade is splitted into several packages :
 	\begin{itemize}
-		\item \bold{yade-core}	: this package contains the core of YADE. All abstract classes that needs to be specified into plugins to make something with this core are here. All the data structure to store the object you want to simulate ... are also defined here.
+		\item \bold{yade-core}	: this package contains the core of YADE. All abstract classes that need to be specified as plugins to make a specific action with this core are given below. All the data structure to store the object you want to simulate ... are also defined here.
 		\item \bold{yade-lib-*}: to compile yade-core you will have to compile first those libraries because they are all used by YADE. 
 			\begin{itemize}
 				\item \bold{yade-lib-gui-*}
 				\item \bold{yade-lib-serialization-*}
 			\end{itemize}
 				
-		\item \bold{yade-common}	: this package contains most common implementation of abstract classes defined into yade-core. It laso has to be installed because others packages are based on it.
-		\item \bold{yade-packages-*}	: For each type of simulation a package is defined. For example you have yade-package-fem, yade-package-dem ... Each of them contains implementations of abstract classes defined into yade-core related to a specific field. Most of the time they contain all plugins used to perform dem or fem ... simulation. So if you do only DEM simulation, no needs to install the FEM package.
+		\item \bold{yade-common}	: this package contains the most common implementation of abstract classes defined into yade-core. It has to be installed also because others packages base on it.
+		\item \bold{yade-packages-*}	: each type of simulation of a package is defined. For example, you have yade-package-fem, yade-package-dem . Each contains implementations of abstract classes defined into yade-core related to a specific field. Most of the time they contain all plugins thet are used to perform dem or fem simulation. So if you do only DEM simulation, there is no need to install the FEM package.
 	\end{itemize}
 
 //				\\
@@ -205,7 +204,7 @@ Yade is splitted into several packages :
 //				\\
 	
 	
-\section{Where and how to download Yade}
+\section{Where from and how to download Yade}
 
 Berlios web site : http://yade.berlios.de
 
@@ -237,7 +236,7 @@ Berlios web site : http://yade.berlios.de
 
 \section{Global architecture}
 
-	The main issue when developping a simulation framework is to find the good trade off between enough genericity and strong concepts that guide the developpers and structure the simulations code while keeping them compatible. Basically, too much genericity generally leads to something too abstract were everything tends to fit into. It also leads to a slower code. This is useless. It is better to develop your own code ! On the contrary too strong concepts will limit too much what it is possible to do with the framework in term of diversity of simulation. The solution implemented into Yade to address this issue is a double layered structure (see \figref{fig:doublelayer}):
+	When developping a simulation framework the main issue is to find the good trade off between enough genericity and strong concepts that guide the developers and structure the simulations code while keeping them compatible. Basically, too much genericity generally leads to something too abstract where everything tends to fit into. It also leads to a slower code. This is useless. It is better to develop your own code! On the contrary, too strong concepts will limit more in terms of diversity of simulation. The solution implemented into Yade to address this issue is a double layered structure (see \figref{fig:doublelayer}):
 
 \begin{itemize}
 	\item The first layer is quite generic. It is implemented into the core of Yade mentionned in previous chapter.
@@ -246,10 +245,10 @@ Berlios web site : http://yade.berlios.de
 
 \epsfigure{19cm}{images/doublelayer.eps}{Double layered architecture of Yade.}{fig:doublelayer}
 
-We hope that we have found with this structure a good balance between genericity and efficienty as well as between fexibility and something too embedded.
+We hope that we have found with this structure a good balance between genericity and efficienty as well as between flexibility and something too embedded.
 
 \paragraph{}	
-	Each package that belongs to the specialized layer is composed by many plugins that will be plugged onto the core and comes with its own specificities. For example the discrete element package define collision detection engines for rigidbodies, the constitutive law to apply at each contact, the parameters that define a rigid body (mass, intertia, young modulus etc) and so on. This aggregation of plugins into packages has been choosen to simplify the global vision of Yade. As the number of plugins grows it become more and more difficult to know easily which one is dedicated to such or such task especially if they are all stored into one place. On top of that packaging and in order to simplify the developpement of new packages an intermediate one is available. It is called \emph{yade common} and contains some basic plugins not specific to a particular field, and which can be reused by others packages. The \figref{fig:archigenerale} shows a more precise vision of the architecture of Yade. In term of different types of elements, we can consider a total of four layers. The specialized layer is build on top of libraries that are the roots of the whome system. The core is working on top or together with those packages. Of course a \bold{G}raphical \bold{U}ser \bold{I}nterface (GUI) is needed to let the user talk with the core and have feedback from it.
+	Each package that belongs to the specialized layer is composed by many plugins that will be plugged into the core and comes with its own specificities. For example the discrete element package defines collision detection engines for rigidbodies, the constitutive law to apply at each contact, the parameters that define a rigid body (mass, intertia, young modulus etc) and so on. This aggregation of plugins into packages has been chosen to simplify the global vision of Yade. As the number of plugins grows it becomes more and more difficult to find easily which one is dedicated to this or that task, especially if they are all stored in one place. On the top of that packaging, and in order to simplify the developement of new packages an intermediate one is available. It is called \emph{yade common} and contains some basic plugins, not specific to a particular field, and which can be reused by other packages. The \figref{fig:archigenerale} shows more precise vision of the architecture of Yade. In terms of different types of elements it can be considered as a whole for four layers. The specialized layer is build on the top of libraries that are the roots of the whole system. The core is working on the top or together with those packages. Of course a \bold{G}raphical \bold{U}ser \bold{I}nterface (GUI) is needed to let the user talk with the core and have feedback from it.
 
 \epsfigure{19cm}{images/archigenerale.eps}{Global architecture of Yade.}{fig:archigenerale}
 
@@ -261,12 +260,12 @@ We hope that we have found with this structure a good balance between genericity
 \subsection{Global structure}
 
 
-	This layer contains all the abstract classes and common concepts that will be used further by plugins. It contains 3 main modules. The main program, the Omega singleton and the class factory singleton as described by \figref{fig:mainmodules} : 
+	This layer contains all the abstract classes and common concepts that will be used further by plugins. It is composed of 3 main modules. The main program, the Omega singleton and the class factory singleton, as it is described by \figref{fig:mainmodules} : 
 	
 	\begin{itemize}
 		\item The main program is just in charge of launching the GUI. The singletons are also constructed when this program starts.
-		\item The factory singleton holds a database about all the available plugins and other dynamic libraries. Dynamic libraries stored on the hard drive are all scanned when yade is launched, so you never have to take care of loading a plugin when you need it. Just ask the factory singleton to create an instance for you (you can find information about the class factory further). But anyway when you ask for a plugin, either it is already in memory then an instance is created, otherwise the plugin is loaded from hard drive, but in any case it is transparent for the user. If you are developping plugins you do not have to care about this factory, just use it and this will go fine.
-		\item The Omega singleton holds all the data that you need to make your simulation, as the current iteration, various information about the time and time step. It also contains what we have called the \emph{root body} which holds informations about the simulated bodies, the current interactions between them , the simulation loop and some others informations described later (explanation about rootbody can be found in next section). A independent thread is in charge of calling iteratively the simulation loop contained into this root body. Finally a thread synchronizer is needed to synchronize the calls to the simulation loop and to others threads as the 3D display of the bodies for example. If you just want to develop plugins you don't have to care about the threads synchronization.
+		\item The factory singleton holds a database about all the available plugins and other dynamic libraries. Dynamic libraries stored on the hard drive are all scanned when yade is launched, so you do not have to take care of loading a plugin when you need it. Just ask the factory singleton to create an instance for you (you can find information about the class factory further). Anyway, when you ask for a plugin, either it is already in memory then an instance is created, otherwise the plugin is loaded from hard drive, but in any case it is transparent for the user. If you are developing plugins you do not have to care about this factory, it is ready to use.
+		\item The Omega singleton holds all the data that you need to make your simulation, as the current iteration, various information about the time and time step. It also contains what is called the \emph{root body} which holds information about the simulated bodies, the current interactions between them, the simulation loop and some others information described later (explanation about rootbody can be found in next section). An independent thread is in charge of calling iteratively the simulation loop contained in this root body. Finally, a thread synchronizer is needed to synchronize the calls to the simulation loop and to other threads as the 3D display of the bodies for example. If the user wants to develop plugins he does not have to care about the threads synchronization.
 	\end{itemize}
 	
 	
@@ -275,60 +274,60 @@ We hope that we have found with this structure a good balance between genericity
 
 \subsection{The rootbody}
 
-	We can now go deeper in the details with the structure of the root body. As said in the introduction, the philosophy of yade is to deal with objects in interaction that need a response to be applied onto them, to go to a new state after taking the time factor into account. 
+	As it is said in the introduction, the philosophy of yade is to deal with objects in interaction that need a response to be applied onto them, to go to a new state after taking the time factor into account. 
 	
 \paragraph{}
-	So in this framework how and where is stored the simulation itself ? This means the bodies, the interactions, the simulation loop, the responses and so on. Here comes the concept of \emph{metabody}. Into Yade you have two kind of bodies : 
+	Description of how and where the simulation itself is stored in the yade framework follows (like bodies, interactions, the simulation loop, the responses, etc.). Here is the concept of \emph{metabody} given. In Yade there are two kind of bodies : 
 	
 	\begin{itemize}
-		\item "simple" bodies (we will call them bodies in the future by opposition of metabodies) which can be one discrete element, one particle, one tetrahedron. Such a body can't do anything by itself, neither move nor interact with others bodies. It just store information related to its state, geometry etc.
-		\item metabodies are a collection of bodies including metabodies, with the capacity of interacting and moving over the time. So the rootbody is a metabody which is at the top the the tree defined by all the bodies and metabodies that participates into the simulation. So it can be according to what you want to simulate :
+		\item "simple" bodies (we will call them bodies in the future by opposition of metabodies) which can be one discrete element, one particle, one tetrahedron. Such a body cannot do anything by itself, neither move nor interact with others bodies. It is just stored information related to its state, geometry etc.
+		\item metabodies are a collection of bodies including metabodies, with the capacity of interacting and moving over the time. So the rootbody is a metabody which is at the top the the tree defined by all the bodies and metabodies that participate into the simulation. So it can be according to what you want to simulate :
 		\begin{itemize}
 			\item a finite element beam
 			\item a rigid bodies crumbling 
 			\item an piece of cloth that interact with discrete element
 		\end{itemize}
 		
-		It is made of several bodies in interaction, that's why it is of type MetaBody. As you can see in \figref{fig:hierarchy}, a metaBody can be composed by bodies and/or others metabodies. The root of the tree called the rootbody is stored into Omega. In the given example the rootbody is composed by two metabody. The first one is a discrete element simulation and is made of rigid spheres (which are simple bodies) and the second one is a mass spring system made of particles. In this example the rootbody will take care of the interaction between the cloth and the sphere set, whereas the two others metabodies will only take care of their own sub bodies and the interaction between them. This is a way of having a hierarchical simulation and reuse modules to make them work together with a new one. Of course you don't have to use this tree structure. If you just want to run a rigid body simulation you can use a flat structure : a rootbody with all the rigidbodies just under it.
+		It is made of several bodies in interaction, that is why it is of type MetaBody. As it can be seen in \figref{fig:hierarchy}, a metaBody can be composed by bodies and/or others metabodies. The root of the tree, called the rootbody, is stored into Omega. In the given example the rootbody is composed by two metabodies. The first one is a discrete element simulation and is made of rigid spheres (which are simple bodies), and the second one is a mass spring system made of particles. In this example the rootbody will take care of the interaction between the cloth and the sphere set, whereas the two other metabodies will only take care of their own sub-bodies and the interaction between them. This is a way of having a hierarchical simulation and reusing modules to make them work together with a new one. Of course, this tree structure may not be used. If there is a rigid body simulation to run only a flat structure can be used: a rootbody with all the rigidbodies just under it.
 	\end{itemize}
 
 \epsfigure{19cm}{images/hierarchy.eps}{Hierarchy.}{fig:hierarchy}
 
-Let's see now, the full structure of a metabody to understand how it store all the needed information and how it can "compute". As shown in \figref{fig:metabody} a metabody is composed by different types of elements :
+Here is shown the full structure of a metabody to understand how it stores all the needed information and how it can "compute". As shown in \figref{fig:metabody} a metabody is composed by different types of elements :
 
 	\begin{itemize}
-		\item Data		: all data classes are passive. They are classes that only contains information (and almost no method).  For example the properties of a rigid body (mass,inertia,geometry....). We can subdivide data classes into three as said previously :
+		\item Data		: all data classes are passive. They are classes that contain only information (and almost no method).  For example, the properties of a rigid body (mass, inertia, geometry....). Data classes can be subdivided into three of them, as it is said previously :
 			\begin{itemize}
 				\item Body
 				\item Interaction
 				\item PhysicalAction
 			\end{itemize}
-		\item Containers		:  Containers are standard database were all the data classes are stored. They provide basic database interace such as insertion, deletion, research of an element. Because we have three type of data we also have three type of containers :
+		\item Containers		:  Containers are standard databases where all the data classes are stored. They provide basic database interaction, such as: insertion, deletion, research of an element. Because there are three types of data there are also three types of containers :
 			\begin{itemize}
 				\item A container to store the bodies called BodyContainer 
 				\item A container to store the interactions called InteractionContainer
 				\item A container to store the physical actions called PhysicalPhysicalAction
 			\end{itemize}
-		Each container has its own specificities acording to the type of data it stores.
-		\item Engines		: Engine classes active classes, which means that they are the classes that "compute". An engine reads and/or procude some data from or to containers. Usually they contain almost only methods and some parameters. Collision detection, damping application,  recording data to hard drive, computing forces in response to collision are all operations performed by engines. A particular list of engines called only once are called initializers. They are used to perform operation that has to be made only once. All the other engines compose together the simulation loop.
+		Each container has its own specific features according to the type of data it stores.
+		\item Engines		: Engine classes active classes, which means that they are the classes that "compute". An engine reads and/or produce some data from, or to, containers. Usually, they contain methods and some parameters. Collision detection, damping application, recording data to hard drive, computing forces in response to collision. Those are all operations performed by engines. A particular list of engines called only once is called initializers. They are used to perform operation that has to be made only once. All the other engines compose together the simulation loop.
 	\end{itemize}
 
 \epsfigure{19cm}{images/MetaBody.eps}{Structure of a metaBody.}{fig:metabody}
 
 \paragraph{}
-	What is importent to remember here is the separation of methods (stored into engine classes) and information (stored into data classes ) which is a recurent pattern into Yade. It allows the user to define multiple different methods for one type of data class into different engines without either modifying neither recompiling the data class. This imply that you don't have to edit the code of the data class to make new engines. Doing that way allow the data class to remain the same for everybody which ensures compatibility and using such or such engine to act on this class provides different behavior which ensure reusability. Everybody can use and share the same data class and is able to define his own personnal methods that act on that class without the source code of it. This point is described more in details in section about \emph{multimethods}. Basically information is stored into one plugin, and then others plugins define the methods of that data class then an automatic mechanism is here to call the right engine on the right type of data. This process of externalisation of methods outside of the classes is really powerfull. For example let's consider a class Sphere that contains only a radius and a center. Then everyone can define his onwn method to draw the sphere, his own method to do collision detection between two spheres. As a result, the final user will be able to choose between such or such engine according to its needs (performance, accuracy etc).
+	What is important to remember is the separation of methods (stored into engine classes) and information (stored into data classes) which is a recurrent pattern into Yade. It allows the user to define multiple different methods for one type of data class into different engines without either modifying, neither recompiling the data class. That implies the redundance of editing the code of the data class to make new engines. That method allows the data class to remain the same for everybody, that ensures compatibility, and using such or such engine to act on this class provides different behavior, that ensures reusability. The same data class can be used and shared widely and enable defining personnal methods that act on that class without the source code of it. This point is described in details in section about \emph{multimethods}. Basically, information is stored into one plugin, and then others plugins define the methods of that data class, then an automatic mechanism is instantly in use to call the right engine for the right type of data. This process of externalisation of methods outside of the classes is really powerfull. For example, consider a class Sphere that contains only a radius and a center. Every user can define his own method to draw the sphere, his own method to do collision detection between two spheres. As a result, the final user will be able to choose between this or that engine according to his needs (performance, accuracy etc).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Data classes}
 
-	The first type of classes we are going to explain is data classes. As already said the data classes only hold information but almost no methods, no algorithms ... This a basic rule to respect because most of the methods will be defined outside the data classes. Let's develop again the example with the sphere (radius+center). Image you write the draw method inside the sphere class. If somebody else thinks your drawing method is not good enough, too slow or simply not adapted to his own case and decide to rewrite it, both classes will no more be the same : your code may not work anymore with the new draw method ; this class can no more be shared among the users. Two versions of the class sphere will exist and each time a new user needs it, he will have to choose between one of them and his code will not be compatible with either your or the other code.
+	The first type of classes we are going to explain is data classes. As already said the data classes only holds information, but almost no methods, no algorithms. This is a basic rule to respect because most of the methods will be defined outside the data classes. Let's develop again the example with the sphere (radius+center). Imaginee you write the draw method inside the sphere class. If somebody else thinks your drawing method is not good enough, too slow or simply not adapted to his own case and decide to rewrite it, both classes will no more be the same: your code may not work anymore with the new draw method; this class can no more be shared among the users. Two versions of the class sphere will exist and each time a new user needs it, he will have to choose between one of them and his code will not be compatible with either your or the other code.
 	
 	
 \subsection{Body}
 
-	In this section we will describe what is a "simple" body only, since the metabody class is already explained in previous section. A body contains five properties that entirely defined it :
+	In this section it will be described what is a "simple" body only, since the metabody class is already explained in previous section. A body contains five properties that entirely defined it :
 	\begin{itemize}
 		\item a GeometricalModel
 		\item an InteractingGeometry
@@ -337,59 +336,59 @@ Let's see now, the full structure of a metabody to understand how it store all t
 		\item PhyisicalParameters
 	\end{itemize}
 	
-	Actually there are only four : State and PhysicalParameters are still merged but we plan soon to split them into two. Those properties are described more in details in the following paragraphes. Each properties corerspond to an abstract class store in the core and has to be specified by inheriting them to be usefull.
+	In fact, there are four of them: State and PhysicalParameters are still merged but it is planned to to split them into two soon. Those properties are described in details in the following paragraphes. Each property corersponds to an abstract class store in the core and has to be specified by inheriting them to be useful.
 	
 	
 \subsubsection{GeometricalModel}
 
-	The \emph{GeometricalModel} of a body is simply its shape. It can be a sphere, a tetrahedron, a box, a polyhedron, a point cloud, a mesh or whatever you want as soon as it is something geometric. From the simulation point of view, it is the best modelisation you can have of the corresponding real life object you want to simulate. For now, the \emph{GeometricalModel} is mainly used to for display. It is also important in the way that InteractingGeometry is build on top of it.
+	The \emph{GeometricalModel} of a body is simply its shape. It can be a sphere, a tetrahedron, a box, a polyhedron, a point cloud, a mesh or whatever you want, if it is a geometric shape. From the simulation point of view it is the best representation that can be in use of the corresponding real life object you want to simulate. For now, the \emph{GeometricalModel} is mainly used for display. It is also important in the way that InteractingGeometry is build on the top of it.
 
 \paragraph{}
-	Both body and metaBody can have a geometricalModel. In a case of a piece of cloth, the metabody is composed of bodies which are particles. Its geometry can be a 2D mesh defined on top of the particles, by using a particular connectivity.
+	Both body and metaBody can have a geometrical Model. In a case of a piece of cloth, the metabody is composed of bodies which are particles. Its geometry can be a 2D mesh defined on top of the particles, by using a particular connectivity.
 	
 \subsubsection{InteractingGeometry}
 
-	This is the actual geometry through which the objects interacts with other objects. It is very usefull to make a distinction between the \emph{geometricalModel} and the \emph{interactingGeometry} because your \emph{geometricalModel} may be too complex to handle interaction detection. For example in a rigidbodies simulation your objects may be arbitrary polyhedrons. This is nice and pretty accurate, but it may be extremely difficult to perform collision detection between such polyhedrons. The solution is to use the polyhedron as a \emph{geometricalModel} which is good enough for display and then to fill it with spheres. This union of spheres will be stored as the \emph{interactingGeometry} of your body and can be used collision detection, since it is easy to detect collision between spheres. The second interesting point is that you can build another \emph{interactingGeometry} on top of  your polyhedral geometry and compare it with the sphere union, in term of accuracy, speed and final behavior of your simulations (see \figref{fig:geometry}). Of course if one day you know how to make collision detection between two arbitrary polyhedrons you can use the polyhedral model for both  \emph{geometricalModel} and \emph{interactingGeometry}. This often appends : for example if the \emph{geometricalModel} is a sphere then they are no simpler model than the sphere to make collision detection, so the spherical model will also be used as \emph{interactingGeometry}.
+	This is the actual geometry through which the objects interacts with other objects. It is very useful to make a distinction between the \emph{geometricalModel} and the \emph{interactingGeometry} because one \emph{geometricalModel} may be too complex to handle interaction detection. For example, in a rigidbodies simulation objects may be arbitrary polyhedrons. This is  accurate, but may be extremely difficult to perform collision detection between such polyhedrons. The solution is to use the polyhedron as a \emph{geometricalModel} which is good enough for display and then to fill it with spheres. This union of spheres will be stored as the \emph{interactingGeometry} of your body and can be used collision detection, since it is easy to detect collision between spheres. The second interesting point is that you can build another \emph{interactingGeometry} on top of  your polyhedral geometry and compare it with the sphere union, in terms of accuracy, speed and final behavior of your simulations (see \figref{fig:geometry}). Of course, if you know how to make collision detection between two arbitrary polyhedrons you can use the polyhedral model for both  \emph{geometricalModel} and \emph{interactingGeometry}. This often appends: for example if the \emph{geometricalModel} is a sphere then they are no simpler model than the sphere to make collision detection, so the spherical model will also be used as \emph{interactingGeometry}.
 
 \subsubsection{BoundingVolume}
 
-	In general to speed up collision detection or more generaly interaction detection, it has to be defined a \emph{bounding volume} around the geometry of the object. A bounding volume is a very simple shape that surround the geometry and fits it as better as possible. This volume is then used to perform a preliminary test to check for the possibility of interaction of the two underliyng geometries. If this test fails then there is no possibility of interaction between the two objects, but if it succeeds then there may be an interaction and the \emph{interactionGeometry} will be checked. Of course the better the bounding volume fits the geometry the more accurate this check is, but as usual the longer it takes to perform.
+	In general to speed up collision detection, or more generally interaction detection, it has to be defined a \emph{bounding volume} around the geometry of the object. A bounding volume is a very simple shape that surrounds the geometry and fits it as well as possible. This volume is then used to perform a preliminary test to check for the possibility of interaction of the two underliyng geometries. If this test fails then there is no possibility of interaction between the two objects, but if it succeeds then there may be an interaction and the \emph{interactionGeometry} will be checked. Of course, the better the bounding volume fits the geometry the more accurate this check is, but as usual it takes more time to perform.
 
 \epsfigure{14cm}{images/geometry.eps}{Geometry.}{fig:geometry}
 
 
 \paragraph{}
-	The good point here is that it is possible to define different \emph{geometricalModel}, \emph{interactingGeometry} and \emph{boundingVolume} and test different combinations to see which one suits the most your application in term of performances or memory usage. Of course the union of sphere can be reused with different geometrical model such as a box or an implicite surface as long as you know how to build it from such a model.
+	One of the advantages here is the possibility to define different \emph{geometricalModel}, \emph{interactingGeometry} and \emph{boundingVolume} and test different combinations to see which one suits better your application in terms of performance or memory usage. Of course, the union of sphere can be reused with different geometrical model such as a box or an implicite surface as long as you know how to build it from such a model.
 	
 	
 	
 \subsubsection{State}
 
-	This is simply the state of your body. For a rigid body it is the position and orientation as well as the velocity and the angular velocity. For a particle it is only the position and velocity. Because we are in a dynamic framework informations stored here should vary along with the time according ti time integration, because the objects move, accelerate.
+	This is the state of the body. For a rigid body it is the position and orientation as well as the velocity and the angular velocity. For a particle it is only the position and velocity. Because this is a dynamic framework informations stored here should vary along with the time according the time integration, because the objects move and accelerate.
 
 \subsubsection{PhysicalParameters}
 
-	This property correspond to the remaining information about a body that is not related to any geometrical informations or information about the state of the body. For a rigid body it can contain the mass, the inertia matrix, the young modulus and the poisson's ratio. For a finite element it can contain the stiffness matrix and the mass. Usually the informations stored here are not variable.
+	This property corresponds to the remaining information about a body that is not related to any geometrical informations or information about the state of the body. For a rigid body it can contain the mass, the inertia matrix, the young modulus and the poisson's ratio. For a finite element it can contain the stiffness matrix and the mass. Usually the information stored here is not variable.
 
 \subsubsection{Conclusion on body}
 
-To sum up, in Yade core you will find six abstract classes that fully define what is a body :
+To sum up, Yade core contains six abstract classes that fully define what is a body :
 \begin{itemize}
 	\item \emph{Body}
-	\item \emph{geometricalModel}
-	\item \emph{interactingGeometry}
+	\item \emph{GeometricalModel}
+	\item \emph{InteractingGeometry}
 	\item \emph{BoundingVolume}
 	\item \emph{State}
 	\item \emph{PhysicalParameters}
 \end{itemize}
 
-You shoud not have to inherits the class Body to define you own body but is there are no other choices. By choosing one combination of the five remaining classes you create one type of body. The \figref{fig:bodyexample} shows an example that define a rigid body with a polyhedral geometry, a union of sphere as interacting geometry and an axis aligned bounding box as bounding volume.
+You should not use the class Body to define you own body but there are no other choices. By choosing one combination of the five remaining classes you create one type of body. The \figref{fig:bodyexample} shows an example that define a rigid body with a polyhedral geometry, a union of sphere as interacting geometry and an axis aligned bounding box as bounding volume.
 
 \epsfigure{19cm}{images/bodyexample.eps}{Example of body. Here is defined a rigid body.}{fig:bodyexample}
 
 
 
-They are a lot a possible dispatcher according to the number of different data we are using. Because a dispatcher is identified by the dispatched type and the returned type.
+There are a lot of possible dispatchers according to the number of different data used. Because a dispatcher is identified by the dispatched type and the returned type.
 Currently we use 8 type of data :
 	\begin{itemize}
 		\item BoundingVolume
@@ -405,29 +404,29 @@ Currently we use 8 type of data :
 	
 \subsection{Interactions}
 
-	They are mainly two types of interactions :
+	There are mainly two types of interactions :
 	\begin{itemize}
-		\item interactions that appears due to spatial proximity and that disappear by themselve when spatial proximity no longer exists. This kind of interaction is called \emph{volatileInteraction} into Yade framework. For example a collsion between two rigib bodies is one type of \emph{volatileInteraction}.
-		\item By opposition of \emph{volatileInteraction} there are \emph{persistentInteraction} that are defined manually into configuration file most of the time but they also can occur during runtime. They are not disappearring by themselve as with \emph{volatileInteraction} but somebody has to define an arbitrary criterion that, when reached will cause the destruction or modification of \emph{persistentInteraction}. For example you may want to create some cohesive links between between rigid bodies, that will be created when the configuration file is loaded. Those links will be destroyed when an arbitrary strengh criterion is reached. You may also want to glue two bodies when they collide : this glue will not disappear when the collision no longer exists but when a specific criterion is overcome as for example a distance threshold. In both cases, the type of the interaction is persistent interaction because the interaction does not disappear spontaneously but according to a criterion that the user has defined.
+		\item interactions that appear due to spatial proximity and that disappear by themselves when spatial proximity no longer exists. This kind of interaction is called \emph{volatileInteraction} in the Yade framework. For example, a collsion between two rigid bodies is one type of \emph{volatileInteraction}.
+		\item By opposition of \emph{volatileInteraction} there is a \emph{persistentInteraction} that is defined manually in the configuration file most of the time but they also can occur during runtime. They are not disappearing by themselves like \emph{volatileInteraction} but they have to be defined by an arbitrary criterion. That will cause the destruction or modification of \emph{persistentInteraction}. For example, you may want to create some cohesive links between rigid bodies, that will be created when the configuration file is loaded. Those links will be destroyed when an arbitrary strengh criterion is reached. You may also want to glue two bodies when they collide: this "glue" will not disappear when the collision no longer exists but when a specific criterion is overcome, as for example a distance threshold. In both cases, the type of the interaction is persistent interaction because the interaction does not disappear spontaneously but according to a criterion that the user has defined.
 	\end{itemize}
 	
 	\paragraph{}
-	The only difference between them is that they are store in two different containers so you can access them more quickly. Both of them are composed of the two following properties : 
+	The only difference between them is that they are stored in two different containers to be in a quick access. Both of them are composed of the two following properties: 
 	\begin{itemize}
 		\item an interaction geometry
 		\item an interaction physics
 	\end{itemize}
 	
-They are as describe more in details in next sections. 
+They are described in details in next sections. 
 	
 \subsubsection{InteractionGeometry}
 
-	This is a snapshot of the geometry of the contact at current time step. This property is build by taking into account the \emph{interactingGeometry} of two (if you are dealing with binary interaction such as contact) or more bodies. It should contain enough information so that a after its detection and modelisation, there is no need to access again the interacting geometry of the corresponding bodies to make any further computation or to access more information. The \figref{fig:interactionGeometry} shows two examples of interaction geometry.
+	This is a snapshot of the geometry of the contact at current time step. This property is build by taking into account the \emph{interactingGeometry} of two (if you are dealing with binary interaction such as contact) or more bodies. It should contain enough information so that after its detection and modelisation, there is no need to access again the interacting geometry of the corresponding bodies to make any further computation or to access more information. The \figref{fig:interactionGeometry} shows two examples of interaction geometry.
 	
 	\epsfigure{19cm}{images/interactionGeometry.eps}{Two examples of interaction geometry.}{fig:interactionGeometry}
 
 \paragraph{}
-	 Of course once is defined a new type of \emph{interactionGeometry}, the corresponding engine(s) which will construct this property if an interaction is found between two bodies have to be defined ! The fewer information you need to build the \emph{interactionGeometry} the more reusable will be this class and also the engines that come with it. It is quite important because usually the engines in charge of detecting and modelising interactions such as contact can be quite complex. So if they can be reused by many simulations it is much better. 
+	 Of course once a new type of \emph{interactionGeometry}is defined, the corresponding engine(s) which will construct this property if an interaction is found between two bodies, have to be defined. The fewer information you need to build the \emph{interactionGeometry} the more reusable will be this class and also the engines that come with it. It is quite important because usually the engines in charge of detecting and modelising interactions such as contact can be quite complex. So it is much better when they can be reused by many simulations . 
 	
 
 \paragraph{Caution :} Be careful to not confuse between the \emph{interactingGeometry} of a body which is the actual geometry through which the body interacts and the \emph{interactionGeometry} which is the geometry of an interaction.
@@ -435,11 +434,11 @@ They are as describe more in details in next sections.
 
 \subsubsection{InteractionPhysics}
 
-	This contain all the physical parameters of the interaction which are not especially related to some geometric information. For example you may need to compute the normal and shearing stiffness at a contact between two objects from their young modulus and poisson's ratio. These stiffnesses will be used as long as the contact remains and they should be stored into a specific interactionPhysics class maybe aside with other properties.
+	This contains all the physical parameters of the interaction which are rather not related to some geometric information. For example, you may need to compute the normal and shearing stiffness at a contact between two objects from their young modulus and poisson's ratio. These stiffnesses will be used as long as the contact remains and they should be stored into a specific interactionPhysics class, maybe aside with other properties.
 	
 \paragraph{}
 	
-	 This property can be much more specific than the \emph{interactionGeometry} because it is usually easier to build. Let's take an example. In some discrete element simulation, the previous normal at the contact point is required to compute the shearing force. This previous normal has to be stored into the \emph{InteractionPhysics} property even if it is seems to be related to some geometrical information and so stored into the \emph{interactionGeometry} property. The point is that this normal is really specific to a particular method so if it is stored into the \emph{interactionGeometry} of the contact then in every simulation method that do not need it, this attribute will be defined and not used : so both memory and CPU usage will be waste to store and compute it.
+	 This property can be much more specific than the \emph{interactionGeometry} because it is usually easier to build. Let's take an example. In some discrete element simulation, the previous normal at the contact point is required to compute the shearing force. This previous normal has to be stored into the \emph{InteractionPhysics} property even if it seems to be related to some geometrical information and so stored into the \emph{interactionGeometry} property. The point is that this normal is really specific to a particular method so if it is stored into the \emph{interactionGeometry} of the contact then in every simulation method that do not need it, this attribute will be defined and not used: so both memory and CPU usage will be wasted to store and compute it.
 
 \subsubsection{Conclusion on interaction}
 
@@ -456,7 +455,7 @@ They are as describe more in details in next sections.
 		\item \emph{InteractionPhysics}
 	\end{itemize}
 	
-	To define your own Interaction you have to overload both \emph{InteractionGeometry} and \emph{InteractionPhysics}. Of course it would have been possible to use here only one property which is the merge between the geometry and the physicals parameters of the interaction. But to increase reusability of code it has been choosen to split them. Of course it is up to you to think of what should be inside the geometry and inside the physical parameters !
+	To define your own Interaction you have to overload both \emph{InteractionGeometry} and \emph{InteractionPhysics}. Of course it would have been possible to use here only one property which is the merge between the geometry and the physicals parameters of the interaction. But to increase reusability of code it has been choosen to split them. Of course, it is up to the user to think of what should be inside the geometry and inside the physical parameters.
 
 \subsection{PhysicalAction}
 
@@ -499,7 +498,7 @@ By inheriting them you can define your own bodies, interactions and physical act
 	
 \section{Containers}
 
-	For each type of data we need a way to store them. That's why three types of containers are defined : 
+	For each type of data we need a way to store it. That's why three types of containers are defined : 
 	\begin{itemize}
 		\item a container that stores the bodies
 		\item a container that stores the interactions
@@ -507,11 +506,11 @@ By inheriting them you can define your own bodies, interactions and physical act
 	\end{itemize}
 	
 	\paragraph{}
-	We have choosen to encapsulate the containers in which the data classes are stored so that it is possible to define several one. One will be made with chain list and will have fast insertion, an other will be made with vector and will have fast access etc. The big advantage, is that, depending of your application, you will be able to privilege such or such property of your containers. For example if you know that you are not going to add or remove bodies on runtime, there is no need to use a container that is able to preserve the ids of the bodies (which are used to identify them into the interaction for example). If you know that you are dealing only with binary interactions, then you may implement an optimized container that is able to store only binary interactions.
-	The counterpart is, as always, by adding one level of abstraction we may loose some performances in term of speed of access, insertion but we think the is negligible compared to the benefits.
+	We have choosen to encapsulate the containers in which the data classes are stored so that it is possible to define different container types. One will be made with chain list and will have fast insertion, an other will be made with vector and will have a fast access to it, etc. The big advantage, is that depending of your application, you will be able to privilege such or such property of your containers. For example, if you know that you are not going to add or remove bodies on runtime, there is no need to use a container that is able to preserve the ids of the bodies (which are used to identify them into the interaction for example). If you know that you are dealing only with binary interactions, then you may implement an optimized container that is able to store only binary interactions.
+	The counterpart is that by adding one level of abstraction we may loose some performances in terms of speed of access or insertion, but we think this is negligible compared to the benefits.
 
 	\paragraph{}
-	Of course, it is up to you to choose the one which is the best suited for your particular application. You may want fast insertion or fast access and this affect the type of the container used. Most of the containers will be stored into yade common package because there are highly reusable.
+	Of course, it is up to you to choose the one which is the best suited for your particular application. You may want fast insertion or fast access and this affects the type of the container used. Most of the containers will be stored into yade common package because these are highly reusable.
 
 \subsection{BodyContainer}
 
@@ -545,33 +544,33 @@ By inheriting them you can define your own bodies, interactions and physical act
 
 \section{Engines}
 
-	Engines read and/or produce  some data from/to containers. Some engines are modifying or reading data, some others a creating data, some others can delete data.
-	For now engines only perform thoses basic operations but we plan to make engine that are able to do complex operations such as splitting bodies, merging bodies, transforming a body into another. The engines are stored into two places :
+	Engines read and/or produce  some data from/to containers. Some engines are modifying or reading data, some others are creating data, some others can delete data.
+	For now engines only perform those basic operations but we plan to make engines that are able to do complex operations such as splitting bodies, merging bodies, transforming a body into another. The engines are stored into two places :
 	\begin{itemize}
 		\item in the simulation loop
 		\item in the initializer list
 	\end{itemize}
 	
-Those placed into the initializers list are called once when a new configuration file is loaded. For example they can compute the bounding volume of the bodies from their interacting geometry. Those placed into the simulation loop are called one after each other in loop until the simulation ends. Here can be find engines that detect collision, compute responses to collision and so on.
+Those placed in the initializers list are called once when a new configuration file is loaded. For example they can compute the bounding volume of the bodies from their interacting geometry. Those placed into the simulation loop are called one after each other in loop, until the simulation ends. Here can be found engines that detect collision, compute responses to collision, save results, etc.
 
 \paragraph{}
-	Here are some common concrete example. A engine can :
+	Here are some common concrete examples. A engine can :
 	\begin{itemize}
 		\item access data from \emph{BodyContainer} and use the \emph{BoundingVolume} property of the bodies to find all potential pair of interacting bodies
 		\item read data from \emph{BodyContainer} and \emph{InteractionContainer} and use the \emph{InteractingGeometry} property as well as all the potential collision to modelise the \emph{InteractionGeometry} of collision that really occur.
 		\item produce \emph{GeometricalModel} for bodies. For example create a Polyhedron from WRML file.
 		\item access all the forces stored into \emph{PhysicalActionContainer} and update data to BodyContainer by applying those forces to rigid bodies.
-		\item updates all forces stored into \emph{PhysicalActionContainer} by applying some damping
-		\item access the collisions stored into  \emph{volatileInteractionContainer}, then compute a forces in response to those collision and finally store those forces into \emph{PhysicalActionContainer}
+		\item update all forces stored into \emph{PhysicalActionContainer} by applying some damping
+		\item access the collisions stored in the \emph{volatileInteractionContainer}, then compute forces in response to those collisions and finally store those forces into \emph{PhysicalActionContainer}
 		\item read data from one of the containers to write them down on the hard drive
 	\end{itemize}
 
-All engines classes are serializable, because an engine often uses parameters that you may want to tune yourself in the configuration file. Different type of engines can be found into Yade :
+All engines classes are serializable, because an engine often uses parameters that you may want to tune yourself in the configuration file. Different type of engines can be found in Yade :
 	\begin{itemize}
 		\item stand alone engines
-		\item Meta engine which are engine composed of engine 
+		\item Meta engine which are engines composed of engine 
 		\item engine unit which is a part of an meta engines
-		\item DeusExMachina engine 
+		\item DeusExMachina engines 
 	\end{itemize}
 
 	
@@ -606,7 +605,7 @@ All engines classes are serializable, because an engine often uses parameters th
 		\> \virtual \void action(Body*);
 	}
 	
-	In the simulation loop the calls to engines are made in two time. First a call is made to \emph{isActivated} to know if the engine is active or not. By default this function return \emph{true} so if it is not overloaded (which is the case most of the time, the engine is always considered as active. You can define in this method your own criterion of activity. For example if you want to check for new contact each 10 iteration you just have to write :
+	In the simulation loop the calls to engines are made in two steps. First a call is made to \emph{isActivated} to know if the engine is active or not. By default this function returns \emph{true} so if it is not overloaded (which is the case most of the time, the engine is always considered as active. You can define in this method your own criterion of activity. For example, if you want to check for new contact each 10 iterations you just have to write :
 	
 	\code
 	{
@@ -616,27 +615,27 @@ All engines classes are serializable, because an engine often uses parameters th
 		\>	\}
 	}	
 	
-	If and only if and engine is active the method action is called. The parameter \emph{Body} is usually a MetaBody that contains all the information you may need to make any task : collision detection, responses computation ... 
+	Only if an engine is active the method action is called. The parameter \emph{Body} is usually a MetaBody that contains all the information you may need to make any task: collision detection, responses computation. 
 	
 \subsection{MetaEngine and EngineUnit}
 
-	A meta engine is an engine made of engines. It usually inherits from both the Engine class and the DynlibDispatcher class from multimethod library. This kind of engine is used to perform specialised operation on particular type of data. As previously said, they usually highly use the multimethod library which allows dispatching.
-They are very usefull to handle the method of the data classes as we will see.	For now there ara mainly two types of  meta engines. One dimensionnal meta engine and two dimensionnal meta engine. Both of them are composed by EngineUnit that inherits from FunctorWrapper class. Basically, according to the type of data they work with, a meta engine will call the correct Engine unit. So first, when a metaengine is defined, the abstract class for all the engine unit has also to be defined. One metaengine works with one type of engine unit.
+	A meta engine is an engine made of engines. It usually inherits from both the Engine class and the DynlibDispatcher class from multimethod library. This kind of engine is used to perform specialized operation on particular type of data. As previously said, they usually use a lot the multimethod library which allows dispatching.
+They are very useful to handle the method of the data classes as we will see. For now there are mainly two types of  meta engines. One-dimensional meta engine and two-dimensional meta engine. Both of them are composed by EngineUnit that inherits from FunctorWrapper class. Basically, according to the type of data they work with, a meta engine will call the correct Engine unit. So first, when a metaengine is defined, the abstract class for all the engine unit has also to be defined. One metaengine works with one type of engine unit.
 
 \paragraph{}
-	One dimensionnal meta engines are mainly used to externalize virtual method of one of the data classes. You just have to specify which type of engine unit to use on which type of data then when the metaengine is looping over the data classes it is dealing with, the correct engine units are automatically called. For example you can externalize the draw method out of the geometricalModel. Then you define a 1d metaengine that works with one engine unit that take one \emph{geometricalModel} as parameter and define how to draw it. If you are dealing with tetrahedrons and cubes you have to make 2 engine units. One will know how to draw a tetrahedron, the other how to draw a cube. The metaengine will then call the correct engine unit when  you will ask to draw a sphere or a cube. This is illustrated by \figref{fig:1dmetaengine}.
+	One dimensional meta engines are mainly used to externalize virtual method of one of the data classes. You just have to specify which type of engine unit to use on which type of data, then, when the metaengine is looping over the data classes it is dealing with, the correct engine units are automatically called. For example you can externalize the draw method out of the geometricalModel. Then you define a 1d metaengine that works with one engine unit that takes one \emph{geometricalModel} as parameter and define how to draw it. If you are dealing with tetrahedrons and cubes you have to make 2 engine units. One will know how to draw a tetrahedron, the other how to draw a cube. The metaengine will then call the correct engine unit when you will ask to draw a sphere or a cube. This is illustrated by \figref{fig:1dmetaengine}.
 
 \epsfigure{19cm}{images/1DMetaEngine.eps}{1DMetaEngine.}{fig:1dmetaengine}
 
 \paragraph{}
-	Two dimensionnal meta engines are the same as one dimensionnal but they dispatch on two types of data. This is the most interresting type of meta engine. The \figref{fig:2dmetaengine} shows an meta engine that knows which engine unit to call when you ask for collision detection between a sphere and a cube or 2 spheres.
+	Two dimensional meta engines are the same as one dimensional but they dispatch on two types of data. This is the most interresting type of meta engine. The \figref{fig:2dmetaengine} shows an meta engine that knows which engine unit to call when you ask for collision detection between a sphere and a cube or 2 spheres.
 
 \epsfigure{11cm}{images/2DMetaEngine.eps}{2DMetaEngine.}{fig:2dmetaengine}
 
 
 \subsection{DeusExMachina}
 	
-	It is a stand alone engine which contain a list of subscribed bodies. For each subscribed body it applies a particular movement or condition according to an arbitrary law defined by the user. It can be used to apply border condition to apply gravity to all bodies and so on.
+	It is a stand alone engine which contains a list of subscribed bodies. For each subscribed body it applies a particular movement or condition according to an arbitrary law defined by the user. It can be used to apply border condition to apply gravity to all bodies and so on.
 	
 	
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -653,9 +652,9 @@ They are very usefull to handle the method of the data classes as we will see.	F
 \section{Serialization}
 
 	Serialization is the process of taking an object and converting it to a format in which it can be transported across a network or persisted to a storage location (ie hard drive disk). The storage location could be as simple as using a file or a database. The serialized format contains the object's state information. Deserialization is the process of using the serialized state information to reconstruct the object from the serialized state to its original state. In essence, the process of serialization allows an object to be serialized, shipped across the network for remoting or persisted in a storage location such as an XML file, and then be reconstructed for use at a later point in time. 
-	Through the library yade-lib-serialization, Yade propose an easy way for serializing objects to a C++ stream.  This stream can be a file on the disk, a chunk of memory or a network stream. For now the format used to save and restore the state of  a class is XML. But it is possible to define new format, as binary, YAML and so on without modifying or recompiling the  yade-lib-serialization library. This is a very powerfull capacity, since you can define your own format with minimal work to do according to what your needs : a compact format, a more descriptive one ...
+	Through the library yade-lib-serialization, Yade proposes an easy way for serializing objects to a C++ stream.  This stream can be a file on the disk, a chunk of memory or a network stream. For now the format used to save and restore the state of  a class is XML. But it is possible to define new format, as binary, YAML and so on without modifying or recompiling the  yade-lib-serialization library. This is a very powerfull capacity, since you can define your own format with minimal work to do according to what your needs: a compact format, a more descriptive one.
 
-	On top of that we provide a very easy way to make an object serializable. Let's consider the class A defined as follow :
+	On the top of that we provide a very easy way to make an object serializable. Let's consider the class A defined as follow :
 	
 		\code
 		{
@@ -689,7 +688,7 @@ They are very usefull to handle the method of the data classes as we will see.	F
 				\> (7)	\>\>       REGISTER\_SERIALIZABLE(A,\false); 								       
 		}
 
-	Line (1) is needed to include the class Serializable which is the basic interface to all serializable classes. That's why on line (2) you have to make tour class inheriting the Serializable one.
+	Line (1) is needed to include the class Serializable which is the basic interface to all serializable classes. That's why on line (2) you have to make your class inheriting the Serializable one.
 	On line (3) is defined the registerAttributes function which you have to overload. With this example you will have : 
 	
 	\code
@@ -721,7 +720,7 @@ They are very usefull to handle the method of the data classes as we will see.	F
 		\> \>	REGISTER\_SERIALIZABLE(B,\false);		\\
 	}
 
-	You need to call from the registerAttributes function of B the registerAttributes function of A. If you don't, attributes that comes from A won't be serialized when B is serialized. So it is better to always call the registerAttributes of the mother class so that you are sure that is new attributes are defined in the future into this mother class, they will be taken into account in your own class.
+	You need to call from the registerAttributes function of B the registerAttributes function of A. If you do not, attributes that comes from A won't be serialized when B is serialized. So it is better to call always the registerAttributes of the mother class so that you are sure that a new attributes are defined in future into this mother class, and they will be taken into account in your own class.
 
 	\code
 	{
@@ -732,7 +731,7 @@ They are very usefull to handle the method of the data classes as we will see.	F
 		\> \>	\}					
 	}
 	
-	On line (4) and (5) you can overload if you want (but it is not necessary) the postProcessAttributes and preProcessAttributes functions. The preProcessAttributes function is called before the serialization and deserialization of the class. The same is for function postProcessAttributes which is called after serialization and deserialisation. Inside the function you can know if you are in a serializing or deserializing process by checking the boolean value d. If it is true then you are currently deserializing the object, if it is false then you are serializing the object. It may be very usefull for example if you don't need to serialize one attribute because you can compute it from one or more others attributes. In class A you may not want to serialize attribute average because it is just the average between f1 and f2. So to restore A in a correct state after deserialisation you can overload postProcessAttributes as follow : 
+	On line (4) and (5) you can overload if you want (but it is not necessary) the postProcessAttributes and preProcessAttributes functions. The preProcessAttributes function is called before the serialization and deserialization of the class. The same is needed for function postProcessAttributes which is called after serialization and deserialisation. Inside the function you know if you are in a serializing or deserializing process by checking the boolean value d. If it is true then you are currently deserializing the object, if it is false then you are serializing the object. It may be very usefull for example if you do not need to serialize one attribute because you can compute it from one or more others attributes. In class A you may not want to serialize attribute average because it is just the average between f1 and f2. So to restore A in a correct state after deserialisation you can overload postProcessAttributes as follow : 
 
 	\code
 	{
@@ -743,7 +742,7 @@ They are very usefull to handle the method of the data classes as we will see.	F
 		\> \>	\}						
 	}
 
-	Of course if you are into B it is better to do as follow for the same reason mentionned with the function registerAttributes.
+	Of course if you are into B it is better to do as follows for the same reason mentionned with the function registerAttributes.
 	\code
 	{
 		\> \> 	\void B::postProcessAttributes(bool d)		\\
@@ -755,7 +754,7 @@ They are very usefull to handle the method of the data classes as we will see.	F
 	Finally you have to register your class to the serialization system by calling the macro REGISTER\_SERIALIZABLE after the definition of your class. This macro takes two parameters. The first one is the name of your class. The second one is not improtant for now and should be false.
 
 
-	The serializable library can't work alone. You have to define what we have called an IOManager that will be in charge of defining all the specificities to a particular format. That's why it is possible to define your own format, by defining your own IOManager. As said before, for now the only IOManager defined is the XMLManager that serializes object to the XML format. Let's see how to use an IOManager together with the serialization library. First of all you have to put your IOManager into a library. XMLManager is stored into the yade-lib-serialization-xml library.
+	The serializable library can't work alone. You have to define what we have called an IOFormatManager that will be in charge of defining all the specificities to a particular format. That's why it is possible to define your own format, by defining your own IOFormatManager. As said before, for now the only IOFormatManager defined is the XMLFormatManager that serializes object to the XML format. Let's see how to use an IOForamtManager together with the serialization library. First of all you have to put your IOFormatManager into a library. XMLFormatManager is stored into the yade-lib-serialization-xml library.
 
 To deserialize the serializable object A from a stream :
 
@@ -772,7 +771,7 @@ To deserialize the serializable object A from a stream :
 		\> \> 	fileStream.close();									
 	}
 	
-	The result of thoses lines is a file whose name is fileA.xml and which contain the following : 
+	The result of those lines is a file whose name is fileA.xml and which contain the following : 
 
 	\code
 	{
@@ -789,25 +788,25 @@ To deserialize the serializable object A from a stream :
 		\> \> fileStream.close();							
 	}
 	
-	This loads to the content of file fileA.xml into object A.
+	And this load to the content of file fileA.xml into object A.
 
 
 	For (de-)serialization to and from files facilities are provided. To serialize an serializable object "s" to a file named "fileName.xml" using the "XMLManager" class  as IOManager, you just have to write : 
 
 	\code
 	{
-		\> \> IOManager::saveToFile("XMLManager", "fileName.xml","S",s);
+		\> \> IOFormatManager::saveToFile("XMLFormatManager", "fileName.xml","S",s);
 	}
 
 To restore the state of object "s" from the same file you just have to write : 
 
 	\code
 	{
-		\> \> IOManager::loadFromFile("XMLManager","fileName.xml","S",s);
+		\> \> IOFormatManager::loadFromFile("XMLFormatManager","fileName.xml","S",s);
 	}
 
 
-	Of course you can do much complex things if your object hold pointer on others serializable object, or if it contains vector of vector of int ... Any combinations works as long as you use STL standard types. For example :
+	Of course you can do much complex operations if your object holds pointer on others serializable object, or if it contains vector of vector of int. Any combinations work as long as you use STL standard types. For example :
 
 	\code
 	{
@@ -898,7 +897,7 @@ To restore the state of object "s" from the same file you just have to write :
 		\> \> 	<\bs b>
 	}
 
-	Whith this library, it is even possible to serialize STL container, basic type such as int, float and types defined into yade-lib-wm3-math, which means you can do something like that : 
+	With this library, it is even possible to serialize STL container, basic type such as int, float and types defined into yade-lib-wm3-math, which means you can do something like that : 
 
 	\code
 	{
@@ -925,7 +924,7 @@ and in file filev.xml :
 		\> \> <v>[ {10 20 30} {2.3 1.7 4.7} {0 0 0} ]<\bs v>	
 	}
 
-	The nice last feature of this library is the possibility to (de-)serialize to graphical widget. For now only QT library is supported, only few basic types are supported but it is planned to improve a lot this feature since it is providing automatic generation of graphical user interface. This is what is used to generate the center part of the file generator used into yade to generate initial configuration.
+	The nice last feature of this library is the possibility to (de-)serialize to graphical widget. For now only QT library is supported, only few basic types are supported but it is planned to improve a lot this feature, since it is providing automatic generation of graphical user interface. This is what is used to generate the center part of the file generator used into yade to generate initial configuration.
 
 
 \epsfigure{8cm}{images/serialization2QT.eps}{serialization2QT.}{fig:serialization2qt}
@@ -936,7 +935,7 @@ and in file filev.xml :
 
 \section{Class factory}
 
-	The class factory provides an easy way of creating new instances of classes. All classes that register themselves into class factory can be asked for instanciation. From a user point of view it is very easy to create a new intance by just calling one of the three functions stored into the class factory singleton : 
+	The class factory provides an easy way of creating new instances of classes. All classes that register themselves into class factory can be asked for instatination. From a user point of view it is very easy to create a new intance by just calling one of the three functions stored into the class factory singleton : 
 
 	\begin{itemize}
 		\item \sharedptr{Factorable} createShared(\str name) : this function creates a shared pointer that points on a factorable class of the given name
@@ -944,7 +943,7 @@ and in file filev.xml :
 		\item void * createPureCustom(\str name ) : same for this one but it is returning a void C pointer.
 	\end{itemize}
 	
-Of course this is mainly used to create instances of classes stored into dynamic library. From a used point of view, you asked for a specific instance and the class factory will create it if the class is already in memory, or it will look on the hard drive if a dynamic library has the same name as the requested class instance, then will load the dynamic library and finally will return an instance of this class. This process is totally transparent for the user, so you don't have to care about loading plugin in your code, just ask the factory as follow : 
+Of course this is mainly used to create instances of classes stored into dynamic library. In this example you ask for a specific instance and the class factory will create it if the class is already in memory, or it will look on the hard drive if a dynamic library has the same name as the requested class instance, then will load the dynamic library and finally will return an instance of this class. This process is totally transparent for the user, so you don't have to care about loading plugin in your code, just ask the factory as follow : 
 
 	\code
 	{
@@ -995,7 +994,7 @@ or
 		\> \>	REGISTER\_FACTORABLE(A);
 	}
 
-	All serializable classes also are Factorable that's why you have to call this macro into all classes that inherits Serializable. The REGISTER\_SERIALIZABLE\_CLASS macro calls automatically the REGISTER\_FACTORABLE one that's why you don't have to do it by hand.
+	All serializable classes also are Factorable that's why you have to call this macro in all classes that inherit Serializable. The REGISTER\_SERIALIZABLE\_CLASS macro calls automatically the REGISTER\_FACTORABLE one that's why you do not have to do it by hand.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1037,7 +1036,7 @@ using SWIFT and its global scene object make all the objects not independent eit
 
 \chapter{The second layer : the packages and plugins}
 
-	In this layer specific to a field, we are going to define our own bodies, interactions, physicals actions, containers, and engines. Basicaly everything described in previous section can be redifined : new geometricalModel, new interactingGeometry, new boundingVolume, new interactionGeometry, new engines. Even new containers that are specific to your own problem can be rewrited : for exemple if you need fast insertion, fast acccess or fast deletion, you can write a specific container as long as you implement the standard interface.
+	In this layer specific to a field, we are going to define our own bodies, interactions, physicals actions, containers, and engines. Basicaly everything described in previous section can be redifined: new geometricalModel, new interactingGeometry, new boundingVolume, new interactionGeometry, new engines. Even new containers that are specific to your own problem can be rewrited: for exemple if you need fast insertion, fast acccess or fast deletion, you can write a specific container as long as you implement the standard interface.
 
 You have to specify all the customizable element described in previous section.
 
