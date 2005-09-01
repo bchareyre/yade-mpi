@@ -41,7 +41,7 @@ class StandAloneSimulator : public Serializable
 
 	public : virtual void setTimeStep(Real dt) {};
 	public : virtual void doOneIteration() {};
-	public : virtual void run(int nbIterations) {};
+	public : virtual void run(int nbIterations,bool record=false,int interval=1, const string& outputDirectory=".",const string& outputBaseName="simulation",int paddle=4);
 	public : virtual void loadConfigurationFile(const string& fileName) {};
 
 	REGISTER_CLASS_NAME(StandAloneSimulator);

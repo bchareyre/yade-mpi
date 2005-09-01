@@ -64,6 +64,7 @@ class QtSphericalDEM : public QtGeneratedSphericalDEMSimulator, public Factorabl
 	private : int maxIteration;
 	private : bool stop;
 	private : Chrono chron;
+	private : bool record;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Constructor/Destructor									///
@@ -84,6 +85,8 @@ class QtSphericalDEM : public QtGeneratedSphericalDEMSimulator, public Factorabl
 	public slots : virtual void pbStartClicked();
 	public slots : virtual void pbStopClicked();
 	public slots : virtual void bgTimeStepClicked(int i);
+	public slots : virtual void pbOutputDirectoryClicked();
+	public slots : virtual void cbRecordToggled(bool b) { record = b;};
 
 	protected : void closeEvent(QCloseEvent *evt);
 

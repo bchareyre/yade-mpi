@@ -76,7 +76,7 @@
       <directoryradio>executable</directoryradio>
     </run>
     <general>
-      <activedir>PreProcessor/SDECSpheresPlane</activedir>
+      <activedir>Engine/EngineUnit/Sphere2Sphere4MacroMicroContactGeometry</activedir>
     </general>
     <subclassing/>
   </kdevtrollproject>

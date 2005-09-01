@@ -50,13 +50,6 @@ GLSimulationPlayerViewer::GLSimulationPlayerViewer(QWidget * parent,char* name) 
 	showEntireScene();
 	resize(720, 576);
 	
-	se3s.resize(125002);
-	fileName = "/disc/yade/Compressed/bigsimu_";
-	frameNumber = 0;
-	for(int i=0;i<125002;i++)
-		se3s[i].resize(7);
-
-	setSnapshotFilename("/disc/yade/images/Spheres");
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -85,7 +78,7 @@ void GLSimulationPlayerViewer::draw()
 	{
 		//renderer->drawBoundingVolume = false;
 		//renderer->drawGeometricalModel = true;
-		//renderer->render(rootBody);
+		renderer->render(rootBody);
 	}
 }
 
@@ -98,7 +91,7 @@ void GLSimulationPlayerViewer::fastDraw()
 	{
 		//renderer->drawBoundingVolume = true;
 		//renderer->drawGeometricalModel = false;
-		//renderer->render(rootBody);
+		renderer->render(rootBody);
 	}
 }
 
@@ -107,13 +100,7 @@ void GLSimulationPlayerViewer::fastDraw()
 
 void GLSimulationPlayerViewer::animate()
 {
-	system(("cp "+fileName+lexical_cast<string>(frameNumber)+".bz2 tmp.bz2").c_str());
-	system("bzip2 -d tmp.bz2");
-		
- 	ifstream f("tmp",ifstream::binary);
-	
-	for(int i=0;i<125002;i++)
-		f >> se3s[i][0] >>se3s[i][1] >>se3s[i][2] >>se3s[i][3] >>se3s[i][4] >>se3s[i][5] >>se3s[i][6];
+	loadPositionOrientationFile();
 
 	shared_ptr<BodyContainer> bodies = rootBody->bodies;
 	shared_ptr<Body> b;
@@ -128,48 +115,80 @@ void GLSimulationPlayerViewer::animate()
 		b->physicalParameters->se3 = Se3r(Vector3r(se3s[i][0],se3s[i][1],se3s[i][2]),Quaternionr(se3s[i][3], se3s[i][4], se3s[i][5], se3s[i][6]));
 	}
 
- 	f.close();
-	system("rm tmp");
+	if (saveSnapShots)
+	{
+		setSnapshotFilename(outputBaseDirectory+"/"+outputBaseName);
+		setSnapshotFormat("BMP");
+		saveSnapshot(true);
+	}
 
-	setSnapshotFormat("BMP");
-	saveSnapshot(true);
 	frameNumber++;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-// void SimulationPlayer::generate(QWidget * parent)
-// {
-// 	viewer		= new SimulationViewer(parent);
-// 	controller	= new SimulationPlayerController(parent);
-// 	viewer->show();
-// 	controller->show();
-// 	
-// 	IOManager::loadFromFile("XMLManager","/disc/yade/125000Spheres.xml","rootBody",rootBody);
-// 
-// 	shared_ptr<BodyContainer> bodies = rootBody->bodies;
-// 	shared_ptr<Body> b;
-// 	int i=0;
-// 	bodies->gotoFirst();
-// 	bodies->gotoNext();
-// 	for( ; bodies->notAtEnd() ; bodies->gotoNext() , ++i )
-// 	{
-// 		b = bodies->getCurrent();
-// 		if (b->physicalParameters->se3.position[0]<-200)
-// 			b->geometricalModel->diffuseColor = Vector3r(1,0,1);
-// 		else if (b->physicalParameters->se3.position[0]<-100)
-// 			b->geometricalModel->diffuseColor = Vector3r(0,1,1);
-// 		else if (b->physicalParameters->se3.position[0]<0)
-// 			b->geometricalModel->diffuseColor = Vector3r(1,1,0);
-// 		else if (b->physicalParameters->se3.position[0]<100)
-// 			b->geometricalModel->diffuseColor = Vector3r(0,1,0);
-// 		else if (b->physicalParameters->se3.position[0]<200)
-// 			b->geometricalModel->diffuseColor = Vector3r(1,0,0);
-// 		else if (b->physicalParameters->se3.position[0]<300)
-// 			b->geometricalModel->diffuseColor = Vector3r(0,0,1);
-// 	}
-// 	
-// 	viewer->setRootBody(rootBody);
-// 	
-// }
+void GLSimulationPlayerViewer::load(const string& fileName)
+{
+	IOFormatManager::loadFromFile("XMLFormatManager",fileName,"rootBody",rootBody);
+	updateGL();
+	frameNumber=0;
+	setSnapshotCounter(0);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+void GLSimulationPlayerViewer::doOneStep()
+{
+	loadPositionOrientationFile();
+	frameNumber++;
+	updateGL();
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+void GLSimulationPlayerViewer::reset()
+{
+	frameNumber = 0;
+	setSnapshotCounter(0);
+	loadPositionOrientationFile();
+	frameNumber++;
+	updateGL();
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+void GLSimulationPlayerViewer::loadPositionOrientationFile()
+{
+	fileName = inputBaseDirectory+"/"+inputBaseName;
+
+	string num = lexical_cast<string>(frameNumber);
+	while (num.size()<inputPaddle)
+		num.insert(num.begin(),'0');
+
+	fileName += num;
+
+	//system(("cp "+fileName+lexical_cast<string>(frameNumber)+".bz2 tmp.bz2").c_str());
+	//system("bzip2 -d tmp.bz2");
+		
+ 	ifstream f(fileName.c_str());
+
+	int nbElements;
+
+	f >> nbElements;
+
+	se3s.resize(nbElements);
+	for(int i=0;i<nbElements;i++)
+		f >> se3s[i][0] >>se3s[i][1] >>se3s[i][2] >>se3s[i][3] >>se3s[i][4] >>se3s[i][5] >>se3s[i][6];
+
+ 	f.close();
+	//system("rm tmp");
+
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+

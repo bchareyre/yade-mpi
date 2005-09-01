@@ -144,7 +144,7 @@ another would be HerzMindlinContactModel
 		SDECLinkGeometry* sdecLinkGeometry =  dynamic_cast<SDECLinkGeometry*>(interaction->interactionGeometry.get());
 		if (sdecLinkGeometry)
 		{		
-			shared_ptr<SDECLinkPhysics> linkPhysics = dynamic_pointer_cast<SDECLinkPhysics>(interaction->interactionPhysics);
+			SDECLinkPhysics* linkPhysics = static_cast<SDECLinkPhysics*>(interaction->interactionPhysics.get());
 	//		linkPhysics->frictionAngle 		= ?? //FIXME - uninitialized 
 			linkPhysics->kn 			= linkPhysics->initialKn;
 			linkPhysics->ks 			= linkPhysics->initialKs;

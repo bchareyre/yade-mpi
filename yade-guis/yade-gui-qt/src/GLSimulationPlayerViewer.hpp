@@ -47,9 +47,20 @@ class GLSimulationPlayerViewer : public QGLViewer
 
 	private : shared_ptr<RenderingEngine> renderer;
 	private : shared_ptr<MetaBody> rootBody;
-	private   : vector<vector<float> > se3s;
-	private   : string fileName;
-	private   : int frameNumber;
+	private : vector<vector<float> > se3s;
+	
+	private : string fileName;
+
+	private : string inputBaseName;
+	private : string inputBaseDirectory;
+	private : int inputPaddle;
+
+	private : string outputBaseName;
+	private : string outputBaseDirectory;
+	
+	private : bool saveSnapShots;
+
+	private : int frameNumber;
 	
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Constructor/Destructor								      ///
@@ -66,10 +77,26 @@ class GLSimulationPlayerViewer : public QGLViewer
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public : void setRootBody(shared_ptr<MetaBody> rb) { rootBody = rb;};
+	public : void load(const string& fileName);
+
+	private : void loadPositionOrientationFile();
+
 	protected : virtual void draw();
 	protected : virtual void fastDraw();
 	protected : virtual void animate();
 	protected : virtual void initializeGL();
+
+	public : void setInputPaddle(int p) { inputPaddle = p;};
+	public : void setInputBaseName(const string& baseName) { inputBaseName = baseName;};
+	public : void setInputDirectory(const string& baseDirectory) { inputBaseDirectory = baseDirectory;};
+	
+	public : void setOutputBaseName(const string& baseName) { outputBaseName = baseName;};
+	public : void setOutputDirectory(const string& baseDirectory) { outputBaseDirectory = baseDirectory;};
+	public : void setSaveSnapShots(bool b) { saveSnapShots = b;};
+	
+	public : void doOneStep();
+	public : void reset();
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -9,7 +9,7 @@
             <x>0</x>
             <y>0</y>
             <width>712</width>
-            <height>436</height>
+            <height>666</height>
         </rect>
     </property>
     <property name="caption">
@@ -133,6 +133,128 @@
         </widget>
         <widget class="QGroupBox">
             <property name="name">
+                <cstring>gbRecorder</cstring>
+            </property>
+            <property name="title">
+                <string>Recorder</string>
+            </property>
+            <grid>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <widget class="QPushButton" row="4" column="2">
+                    <property name="name">
+                        <cstring>pbOutputDirectory</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>4</hsizetype>
+                            <vsizetype>4</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="text">
+                        <string></string>
+                    </property>
+                    <property name="pixmap">
+                        <pixmap>image0</pixmap>
+                    </property>
+                </widget>
+                <widget class="QSpinBox" row="3" column="1" rowspan="1" colspan="2">
+                    <property name="name">
+                        <cstring>sbPaddle</cstring>
+                    </property>
+                    <property name="value">
+                        <number>4</number>
+                    </property>
+                </widget>
+                <widget class="QCheckBox" row="0" column="0" rowspan="1" colspan="3">
+                    <property name="name">
+                        <cstring>cbRecord</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Record Position Orientation</string>
+                    </property>
+                </widget>
+                <widget class="QLabel" row="2" column="0">
+                    <property name="name">
+                        <cstring>tlOuputBaseName</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Base Name : </string>
+                    </property>
+                </widget>
+                <widget class="QLabel" row="1" column="0">
+                    <property name="name">
+                        <cstring>tlInterval</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Interval : </string>
+                    </property>
+                </widget>
+                <widget class="QLabel" row="4" column="0">
+                    <property name="name">
+                        <cstring>tlOutputDirectory</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Directory : </string>
+                    </property>
+                </widget>
+                <widget class="QLabel" row="3" column="0">
+                    <property name="name">
+                        <cstring>tlPaddle</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Paddle : </string>
+                    </property>
+                </widget>
+                <widget class="QLineEdit" row="4" column="1">
+                    <property name="name">
+                        <cstring>leOutputDirectory</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>1</hsizetype>
+                            <vsizetype>1</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                </widget>
+                <widget class="QLineEdit" row="2" column="1" rowspan="1" colspan="2">
+                    <property name="name">
+                        <cstring>leOutputBaseName</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>1</hsizetype>
+                            <vsizetype>1</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                </widget>
+                <widget class="QSpinBox" row="1" column="1" rowspan="1" colspan="2">
+                    <property name="name">
+                        <cstring>sbInterval</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>1</hsizetype>
+                            <vsizetype>0</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="value">
+                        <number>1</number>
+                    </property>
+                </widget>
+            </grid>
+        </widget>
+        <widget class="QGroupBox">
+            <property name="name">
                 <cstring>gbSimulation</cstring>
             </property>
             <property name="title">
@@ -195,17 +317,6 @@
                         <string>Current Iteration : </string>
                     </property>
                 </widget>
-                <widget class="QLabel" row="0" column="1" rowspan="1" colspan="2">
-                    <property name="name">
-                        <cstring>tlIteration</cstring>
-                    </property>
-                    <property name="text">
-                        <string>0</string>
-                    </property>
-                    <property name="alignment">
-                        <set>AlignVCenter|AlignRight</set>
-                    </property>
-                </widget>
                 <widget class="QLabel" row="1" column="0">
                     <property name="name">
                         <cstring>tlDuration</cstring>
@@ -221,7 +332,7 @@
                     <property name="sizePolicy">
                         <sizepolicy>
                             <hsizetype>1</hsizetype>
-                            <vsizetype>5</vsizetype>
+                            <vsizetype>1</vsizetype>
                             <horstretch>0</horstretch>
                             <verstretch>0</verstretch>
                         </sizepolicy>
@@ -247,6 +358,25 @@
                     </property>
                     <property name="text">
                         <string>sec</string>
+                    </property>
+                </widget>
+                <widget class="QLabel" row="0" column="1" rowspan="1" colspan="2">
+                    <property name="name">
+                        <cstring>tlIteration</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>1</hsizetype>
+                            <vsizetype>1</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="text">
+                        <string>0</string>
+                    </property>
+                    <property name="alignment">
+                        <set>AlignVCenter|AlignRight</set>
                     </property>
                 </widget>
             </grid>
@@ -289,6 +419,18 @@
         <receiver>QtGeneratedSphericalDEMSimulator</receiver>
         <slot>pbPathClicked()</slot>
     </connection>
+    <connection>
+        <sender>pbOutputDirectory</sender>
+        <signal>clicked()</signal>
+        <receiver>QtGeneratedSphericalDEMSimulator</receiver>
+        <slot>pbOutputDirectoryClicked()</slot>
+    </connection>
+    <connection>
+        <sender>cbRecord</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>QtGeneratedSphericalDEMSimulator</receiver>
+        <slot>cbRecordToggled(bool)</slot>
+    </connection>
 </connections>
 <slots>
     <slot>pbLoadClicked()</slot>
@@ -296,6 +438,8 @@
     <slot>pbStopClicked()</slot>
     <slot>bgTimeStepClicked(int)</slot>
     <slot>pbPathClicked()</slot>
+    <slot>pbOutputDirectoryClicked()</slot>
+    <slot>cbRecordToggled(bool)</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

@@ -42,13 +42,22 @@
 */
 class QtSimulationPlayer : public QtGeneratedSimulationPlayer, public Factorable
 {
-
 	public : QtSimulationPlayer();
 	public : ~QtSimulationPlayer();
 
-	public slots : void pbSaveClicked();
-	public slots : void pbLoadClicked();
-	public slots : void pbPathClicked();
+	private : void setParameters();
+
+	public slots : virtual void pbInputDirectoryClicked();
+	public slots : virtual void pbLoadClicked();
+	public slots : virtual void pbInputConfigFileClicked();
+
+	public slots : virtual void pbOutputDirectoryClicked();
+	public slots : virtual void cbSaveSnapShotsToggled(bool b);
+
+	public slots : virtual void pbPlayClicked();
+	public slots : virtual void pbPauseClicked();
+	public slots : virtual void pbStepClicked();
+	public slots : virtual void pbResetClicked();
 	
  	protected    : void closeEvent(QCloseEvent *);
 

@@ -3,24 +3,6 @@
 # Subdir relative project main directory: ./yade
 # Target is an application:  ../../../bin/yade
 
-LIBS += -lyade-lib-time \
-        -lyade-lib-threads \
-        -lyade-lib-serialization \
-        -lyade-lib-factory \
-        -lyade-lib-wm3-math \
-        -lyade-lib-loki \
-        -lyade-lib-multimethods \
-        -lglut \
-        -rdynamic \
-        -lboost_date_time \
-        -lboost_filesystem \
-        -lboost_thread 
-INCLUDEPATH += /usr/local/include 
-QMAKE_LIBDIR = /usr/local/lib/yade/yade-libs 
-TARGET = ../../../bin/yade 
-CONFIG += debug \
-          warn_on 
-TEMPLATE = app 
 HEADERS += BodyContainer.hpp \
            Body.hpp \
            BoundingVolume.hpp \
@@ -57,7 +39,8 @@ HEADERS += BodyContainer.hpp \
            MetaDispatchingEngine.hpp \
            EngineUnit.hpp \
            EngineUnit1D.hpp \
-           EngineUnit2D.hpp 
+           EngineUnit2D.hpp \
+           StandAloneSimulator.hpp 
 SOURCES += BodyContainer.cpp \
            Body.cpp \
            BoundingVolume.cpp \
@@ -79,3 +62,21 @@ SOURCES += BodyContainer.cpp \
            yadeExceptions.cpp \
            TimeStepper.cpp \
            MetaDispatchingEngine.cpp 
+LIBS += -lyade-lib-time \
+-lyade-lib-threads \
+-lyade-lib-serialization \
+-lyade-lib-factory \
+-lyade-lib-wm3-math \
+-lyade-lib-loki \
+-lyade-lib-multimethods \
+-lglut \
+-rdynamic \
+-lboost_date_time \
+-lboost_filesystem \
+-lboost_thread
+INCLUDEPATH += /usr/local/include
+QMAKE_LIBDIR = /usr/local/lib/yade/yade-libs
+TARGET = ../../../bin/yade
+CONFIG += debug \
+warn_on
+TEMPLATE = app

@@ -49,8 +49,8 @@ bool Box2Sphere4MacroMicroContactGeometry::go(		const shared_ptr<InteractingGeom
 	Matrix3r axisT,axis;
 	Real depth;
 
-	shared_ptr<InteractingSphere> s = dynamic_pointer_cast<InteractingSphere>(cm2);
-	shared_ptr<InteractingBox> obb = dynamic_pointer_cast<InteractingBox>(cm1);
+	InteractingSphere* s = static_cast<InteractingSphere*>(cm2.get());
+	InteractingBox* obb = static_cast<InteractingBox*>(cm1.get());
 	
 	Vector3r extents = obb->extents;
 
@@ -181,7 +181,7 @@ bool Box2Sphere4MacroMicroContactGeometry::goReverse(	const shared_ptr<Interacti
 	bool isInteracting = go(cm2,cm1,se32,se31,c);
 	if (isInteracting)
 	{
-		shared_ptr<SpheresContactGeometry> scm = dynamic_pointer_cast<SpheresContactGeometry>(c->interactionGeometry);
+		SpheresContactGeometry* scm = static_cast<SpheresContactGeometry*>(c->interactionGeometry.get());
 		//Vector3r tmp = scm->closestsPoints[0].first;		
 		//scm->closestsPoints[0].first = scm->closestsPoints[0].second;
 		//scm->closestsPoints[0].second = tmp;

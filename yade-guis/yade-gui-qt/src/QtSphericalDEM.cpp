@@ -99,9 +99,19 @@ void QtSphericalDEM::pbStartClicked()
 		repaint();
 	}*/
 
-	simulator->run(maxIteration);
+	simulator->run(maxIteration,record,sbInterval->value(),leOutputDirectory->text(),leOutputBaseName->text(),sbPaddle->value());
 	tlDurationValue->setText(lexical_cast<string>(chron.stop()).c_str());
 	tlIteration->setText(lexical_cast<string>(maxIteration).c_str());
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+void QtSphericalDEM::pbOutputDirectoryClicked()
+{
+	string directory = FileDialog::getExistingDirectory ( "../data","Choose the directory where to save the data", this->parentWidget()->parentWidget());
+	if (!directory.empty())
+		leOutputDirectory->setText(directory.c_str());
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -39,8 +39,8 @@ bool Sphere2Sphere4MacroMicroContactGeometry::go(	const shared_ptr<InteractingGe
 						const Se3r& se32,
 						const shared_ptr<Interaction>& c)
 {
-	shared_ptr<InteractingSphere> s1 = dynamic_pointer_cast<InteractingSphere>(cm1);
-	shared_ptr<InteractingSphere> s2 = dynamic_pointer_cast<InteractingSphere>(cm2);
+	InteractingSphere* s1 = static_cast<InteractingSphere*>(cm1.get());
+	InteractingSphere* s2 = static_cast<InteractingSphere*>(cm2.get());
 
 	Vector3r normal = se32.position-se31.position;
 	Real penetrationDepth = s1->radius+s2->radius-normal.normalize();
@@ -50,7 +50,7 @@ bool Sphere2Sphere4MacroMicroContactGeometry::go(	const shared_ptr<InteractingGe
 	{
 		scm = dynamic_pointer_cast<SpheresContactGeometry>(c->interactionGeometry);
 		
-		if(! scm) // this is not SpheresContactGeometry, so it is SDECLinkGeometry, dispatcher should do this job.
+/*		if(! scm) // this is not SpheresContactGeometry, so it is SDECLinkGeometry, dispatcher should do this job.
 		{
 			shared_ptr<SDECLinkGeometry> linkGeometry = dynamic_pointer_cast<SDECLinkGeometry>(c->interactionGeometry);
 //			cerr << "it is SpringGeometry ???: " << c->interactionGeometry->getClassName() << endl;
@@ -63,7 +63,7 @@ bool Sphere2Sphere4MacroMicroContactGeometry::go(	const shared_ptr<InteractingGe
 			}
 			else
 				return false; // SpringGeometry !!!???????
-		}
+		}*/
 	}
 	else
 		scm = shared_ptr<SpheresContactGeometry>(new SpheresContactGeometry());
@@ -81,7 +81,7 @@ bool Sphere2Sphere4MacroMicroContactGeometry::go(	const shared_ptr<InteractingGe
 	
 		return true;
 	}
-	else	
+	else
 		return false;
 }
 

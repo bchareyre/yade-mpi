@@ -123,38 +123,51 @@ void SphericalDEMSimulator::doOneIteration()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void SphericalDEMSimulator::run(int nbIterations)
+void SphericalDEMSimulator::run(int nbIterations,bool record,int interval, const string& outputDirectory,const string& outputBaseName,int paddle)
 {
 	// do the simulation loop
+	int recordedIter = 0;
 	for(int i=0;i<nbIterations;i++)
-		doOneIteration();
-
-	ofstream ofile("SphericalDEMSimulator.res");
-
-	vector<SphericalDEM>::iterator si    = spheres.begin();
-	vector<SphericalDEM>::iterator siEnd = spheres.end();
-	for( ; si!=siEnd ; ++si)
 	{
-		Real tx=0, ty=0, tz=0, rw=0, rx=0, ry=0, rz=0;
-
-		tx = si->position[0];
-		ty = si->position[1];
-		tz = si->position[2];
-	
-		rw = si->orientation[0];
-		rx = si->orientation[1];
-		ry = si->orientation[2];
-		rz = si->orientation[3];
+		doOneIteration();
+		if (record && (interval%i)==0)
+		{
+			string fileName = outputDirectory+"/"+outputBaseName;
 		
-		ofile <<	lexical_cast<string>(tx) << " " 
-				<< lexical_cast<string>(ty) << " " 
-				<< lexical_cast<string>(tz) << " "
-				<< lexical_cast<string>(rw) << " "
-				<< lexical_cast<string>(rx) << " "
-				<< lexical_cast<string>(ry) << " "
-				<< lexical_cast<string>(rz) << endl;
+			string num = lexical_cast<string>(recordedIter);
+			while (num.size()<paddle)
+				num.insert(num.begin(),'0');
+		
+			fileName += num;
+			ofstream ofile(fileName.c_str());
+		
+			vector<SphericalDEM>::iterator si    = spheres.begin();
+			vector<SphericalDEM>::iterator siEnd = spheres.end();
+			for( ; si!=siEnd ; ++si)
+			{
+				Real tx=0, ty=0, tz=0, rw=0, rx=0, ry=0, rz=0;
+		
+				tx = si->position[0];
+				ty = si->position[1];
+				tz = si->position[2];
+			
+				rw = si->orientation[0];
+				rx = si->orientation[1];
+				ry = si->orientation[2];
+				rz = si->orientation[3];
+				
+				ofile <<	lexical_cast<string>(tx) << " " 
+						<< lexical_cast<string>(ty) << " " 
+						<< lexical_cast<string>(tz) << " "
+						<< lexical_cast<string>(rw) << " "
+						<< lexical_cast<string>(rx) << " "
+						<< lexical_cast<string>(ry) << " "
+						<< lexical_cast<string>(rz) << endl;
+			}
+			ofile.close();
+			recordedIter++;
+		}
 	}
-		ofile.close();
 
 }
 
@@ -254,19 +267,20 @@ void SphericalDEMSimulator::findRealCollision(const vector<SphericalDEM>& sphere
 			int id2 = c->id;
 			
 			/// Sphere2Sphere4MacroMicroContactGeometry
-			Real r = spheres[id1].radius+spheres[id2].radius;
-			Vector3r n = spheres[id2].position-spheres[id1].position;
-			Real pd = r-n.normalize();
-			if (pd>0)
+			Vector3r normal = spheres[id2].position-spheres[id1].position;
+			Real penetrationDepth = spheres[id1].radius+spheres[id2].radius-normal.normalize();
+	
+			if (penetrationDepth>0)
 			{
 				c->isReal = true;
-				c->contactPoint = spheres[id1].position+n*(spheres[id1].radius-pd*0.5);
-
+				c->contactPoint = spheres[id1].position+(spheres[id1].radius-0.5*penetrationDepth)*normal;//0.5*(pt1+pt2);
+				c->normal = normal;
+				c->penetrationDepth = penetrationDepth;
 				c->radius1 = spheres[id1].radius;
 				c->radius2 = spheres[id2].radius;
-				c->normal  = n;
-				c->penetrationDepth = pd;
 			}
+			else	
+				return;
 
 			///MacroMicroElasticRelationships
 			if( c->isNew)
@@ -309,6 +323,7 @@ void SphericalDEMSimulator::findRealCollision(const vector<SphericalDEM>& sphere
 		}
 	}
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
