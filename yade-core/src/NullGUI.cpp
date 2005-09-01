@@ -169,15 +169,16 @@ int NullGUI::loop()
 							rootBody);
 				cerr << "saved snapshot: " << snapshotName + "_" + lexical_cast<string>(Omega::instance().getCurrentIteration()) + ".xml\n";
 			}
-
-			// finish computation
-			if( ( maxIteration !=0 ) &&  (Omega::instance().getCurrentIteration() > maxIteration) )
-			{
-				cerr << "Calc finished at: " << Omega::instance().getCurrentIteration() << endl;
-				cerr << "Computation time: " << chron.stop() << endl;
-				exit(0);
-			}
 		}
+
+		// finish computation
+		if( ( maxIteration !=0 ) &&  (Omega::instance().getCurrentIteration() >= maxIteration) )
+		{
+			cerr << "Calc finished at: " << Omega::instance().getCurrentIteration() << endl;
+			cerr << "Computation time: " << chron.stop() << endl;
+			exit(0);
+		}
+
 	}
 	
 }
