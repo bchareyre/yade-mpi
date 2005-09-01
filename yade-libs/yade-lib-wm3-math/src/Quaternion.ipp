@@ -64,10 +64,10 @@ template <class RealType>
 RealType Quaternion<RealType>::operator[] (int i) const
 {
     assert( 0 <= i && i <= 3 );
-    if ( i < 0 )
-        i = 0;
-    else if ( i > 3 )
-        i = 3;
+//    if ( i < 0 )
+//        i = 0;
+//    else if ( i > 3 )
+//        i = 3;
 
     return m_afTuple[i];
 }
@@ -76,10 +76,10 @@ template <class RealType>
 RealType& Quaternion<RealType>::operator[] (int i)
 {
     assert( 0 <= i && i <= 3 );
-    if ( i < 0 )
-        i = 0;
-    else if ( i > 3 )
-        i = 3;
+//   if ( i < 0 )
+//        i = 0;
+//    else if ( i > 3 )
+//        i = 3;
 
     return m_afTuple[i];
 }

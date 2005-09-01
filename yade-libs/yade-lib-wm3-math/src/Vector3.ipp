@@ -47,10 +47,10 @@ template <class RealType>
 RealType Vector3<RealType>::operator[] (int i) const
 {
     assert( 0 <= i && i <= 2 );
-    if ( i < 0 )
-        i = 0;
-    else if ( i > 2 )
-        i = 2;
+//    if ( i < 0 )
+//        i = 0;
+//    else if ( i > 2 )
+//        i = 2;
 
     return m_afTuple[i];
 }
@@ -59,10 +59,10 @@ template <class RealType>
 RealType& Vector3<RealType>::operator[] (int i)
 {
     assert( 0 <= i && i <= 2 );
-    if ( i < 0 )
-        i = 0;
-    else if ( i > 2 )
-        i = 2;
+//    if ( i < 0 )
+//        i = 0;
+//    else if ( i > 2 )
+//        i = 2;
 
     return m_afTuple[i];
 }
