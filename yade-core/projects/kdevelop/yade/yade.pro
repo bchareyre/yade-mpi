@@ -61,7 +61,8 @@ SOURCES += BodyContainer.cpp \
            yade.cpp \
            yadeExceptions.cpp \
            TimeStepper.cpp \
-           MetaDispatchingEngine.cpp 
+           MetaDispatchingEngine.cpp \
+           StandAloneSimulator.cpp 
 LIBS += -lyade-lib-time \
 -lyade-lib-threads \
 -lyade-lib-serialization \
@@ -69,7 +70,6 @@ LIBS += -lyade-lib-time \
 -lyade-lib-wm3-math \
 -lyade-lib-loki \
 -lyade-lib-multimethods \
--lglut \
 -rdynamic \
 -lboost_date_time \
 -lboost_filesystem \

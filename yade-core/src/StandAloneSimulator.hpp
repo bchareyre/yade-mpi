@@ -36,13 +36,22 @@
 class StandAloneSimulator : public Serializable
 {
 
-	public : StandAloneSimulator() {};
-	public : ~StandAloneSimulator() {};
+	protected : bool record;
+	protected : int interval;
+	protected : string outputDirectory;
+	protected : string outputBaseName;
+	protected : int paddle;
+
+	public : StandAloneSimulator();
+	public : virtual ~StandAloneSimulator() {};
 
 	public : virtual void setTimeStep(Real dt) {};
 	public : virtual void doOneIteration() {};
-	public : virtual void run(int nbIterations,bool record=false,int interval=1, const string& outputDirectory=".",const string& outputBaseName="simulation",int paddle=4);
+	public : virtual void run(int nbIterations) {};
 	public : virtual void loadConfigurationFile(const string& fileName) {};
+
+	public : void setRecording(bool record);
+	public : void setRecordingProperties(int interval, const string& outputDirectory,const string& outputBaseName,int paddle);
 
 	REGISTER_CLASS_NAME(StandAloneSimulator);
 	REGISTER_BASE_CLASS_NAME(Serializable);

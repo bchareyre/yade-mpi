@@ -31,6 +31,8 @@
 #include <fstream>
 #include <string>
 #include <boost/lexical_cast.hpp>
+#include <boost/filesystem/operations.hpp>
+#include <boost/filesystem/convenience.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -49,6 +51,8 @@ GLSimulationPlayerViewer::GLSimulationPlayerViewer(QWidget * parent,char* name) 
 	setSceneRadius(2000);
 	showEntireScene();
 	resize(720, 576);
+	setAnimationPeriod(1);
+	saveSnapShots = false;
 	
 }
 
@@ -100,29 +104,32 @@ void GLSimulationPlayerViewer::fastDraw()
 
 void GLSimulationPlayerViewer::animate()
 {
-	loadPositionOrientationFile();
-
-	shared_ptr<BodyContainer> bodies = rootBody->bodies;
-	shared_ptr<Body> b;
-	int i=1;
-
-	BodyContainer::iterator bci = bodies->begin();
-	BodyContainer::iterator bciEnd = bodies->end();
-	++bci;
-	for( ; bci!=bciEnd ; ++bci , ++i )
+	if (!loadPositionOrientationFile())
 	{
-		b = *bci;		
-		b->physicalParameters->se3 = Se3r(Vector3r(se3s[i][0],se3s[i][1],se3s[i][2]),Quaternionr(se3s[i][3], se3s[i][4], se3s[i][5], se3s[i][6]));
+		frameNumber=0;
+		stopAnimation();
 	}
-
-	if (saveSnapShots)
+	else
 	{
-		setSnapshotFilename(outputBaseDirectory+"/"+outputBaseName);
-		setSnapshotFormat("BMP");
-		saveSnapshot(true);
-	}
+		shared_ptr<BodyContainer>& bodies = rootBody->bodies;
+	
+		int i=0;
+	
+		BodyContainer::iterator bci = bodies->begin();
+		BodyContainer::iterator bciEnd = bodies->end();
+	
+		for( ; bci!=bciEnd ; ++bci , ++i )
+			(*bci)->physicalParameters->se3 = Se3r(Vector3r(se3s[i][0],se3s[i][1],se3s[i][2]),Quaternionr(se3s[i][3], se3s[i][4], se3s[i][5], se3s[i][6]));
+	
+		if (saveSnapShots)
+		{
+			setSnapshotFilename(outputBaseDirectory+"/"+outputBaseName);
+			setSnapshotFormat("BMP");
+			saveSnapshot(true);
+		}
 
-	frameNumber++;
+		frameNumber++;
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -141,8 +148,13 @@ void GLSimulationPlayerViewer::load(const string& fileName)
 
 void GLSimulationPlayerViewer::doOneStep()
 {
-	loadPositionOrientationFile();
-	frameNumber++;
+	if (!loadPositionOrientationFile())
+	{
+		frameNumber=0;
+		stopAnimation();
+	}
+	else
+		frameNumber++;
 	updateGL();
 }
 
@@ -161,8 +173,9 @@ void GLSimulationPlayerViewer::reset()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void GLSimulationPlayerViewer::loadPositionOrientationFile()
+bool GLSimulationPlayerViewer::loadPositionOrientationFile()
 {
+
 	fileName = inputBaseDirectory+"/"+inputBaseName;
 
 	string num = lexical_cast<string>(frameNumber);
@@ -173,20 +186,30 @@ void GLSimulationPlayerViewer::loadPositionOrientationFile()
 
 	//system(("cp "+fileName+lexical_cast<string>(frameNumber)+".bz2 tmp.bz2").c_str());
 	//system("bzip2 -d tmp.bz2");
-		
- 	ifstream f(fileName.c_str());
-
-	int nbElements;
-
-	f >> nbElements;
-
-	se3s.resize(nbElements);
-	for(int i=0;i<nbElements;i++)
-		f >> se3s[i][0] >>se3s[i][1] >>se3s[i][2] >>se3s[i][3] >>se3s[i][4] >>se3s[i][5] >>se3s[i][6];
-
- 	f.close();
-	//system("rm tmp");
-
+	if (filesystem::exists( fileName ))
+	{	
+		ifstream f(fileName.c_str());
+	
+		int nbElements;
+	
+		f >> nbElements;
+	
+		int oldSize = se3s.size();
+		if (oldSize!=nbElements)
+		{
+			se3s.resize(nbElements);
+			for(int i=oldSize;i<nbElements;i++)
+				se3s[i].resize(7);
+		}
+	
+		for(int i=0;i<nbElements;i++)
+			f >> se3s[i][0] >>se3s[i][1] >>se3s[i][2] >>se3s[i][3] >>se3s[i][4] >>se3s[i][5] >>se3s[i][6];
+	
+		f.close();
+		//system("rm tmp");
+		return true;
+	}
+		return false;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -3,7 +3,8 @@
 # Subdir relative project main directory: ./yade-lib-opengl
 # Target is a library:  ../../../bin/yade-lib-opengl
 
-LIBS += -lyade-lib-time 
+LIBS += -lglut \
+        -lyade-lib-time 
 INCLUDEPATH += /usr/local/include 
 QMAKE_LIBDIR = /usr/local/lib/yade/yade-libs/ 
 TARGET = ../../../bin/yade-lib-opengl 

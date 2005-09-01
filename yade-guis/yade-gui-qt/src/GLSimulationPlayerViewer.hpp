@@ -79,7 +79,7 @@ class GLSimulationPlayerViewer : public QGLViewer
 	public : void setRootBody(shared_ptr<MetaBody> rb) { rootBody = rb;};
 	public : void load(const string& fileName);
 
-	private : void loadPositionOrientationFile();
+	private : bool loadPositionOrientationFile();
 
 	protected : virtual void draw();
 	protected : virtual void fastDraw();

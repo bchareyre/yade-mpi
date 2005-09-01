@@ -99,7 +99,9 @@ void QtSphericalDEM::pbStartClicked()
 		repaint();
 	}*/
 
-	simulator->run(maxIteration,record,sbInterval->value(),leOutputDirectory->text(),leOutputBaseName->text(),sbPaddle->value());
+	simulator->setRecording(record);
+	simulator->setRecordingProperties(sbInterval->value(),leOutputDirectory->text(),leOutputBaseName->text(),sbPaddle->value());
+	simulator->run(maxIteration);
 	tlDurationValue->setText(lexical_cast<string>(chron.stop()).c_str());
 	tlIteration->setText(lexical_cast<string>(maxIteration).c_str());
 }

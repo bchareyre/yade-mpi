@@ -65,7 +65,6 @@ SphericalDEMSimulator::SphericalDEMSimulator() : StandAloneSimulator()
 	gravity = Vector3r(0,-9.8,0);
 	forceDamping = 0.3;
 	momentumDamping = 0.3;
-
 	useTimeStepper = true;
 }
 
@@ -123,14 +122,14 @@ void SphericalDEMSimulator::doOneIteration()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void SphericalDEMSimulator::run(int nbIterations,bool record,int interval, const string& outputDirectory,const string& outputBaseName,int paddle)
+void SphericalDEMSimulator::run(int nbIterations)
 {
 	// do the simulation loop
 	int recordedIter = 0;
 	for(int i=0;i<nbIterations;i++)
 	{
 		doOneIteration();
-		if (record && (interval%i)==0)
+		if (record && (i%interval)==0)
 		{
 			string fileName = outputDirectory+"/"+outputBaseName;
 		
@@ -141,6 +140,8 @@ void SphericalDEMSimulator::run(int nbIterations,bool record,int interval, const
 			fileName += num;
 			ofstream ofile(fileName.c_str());
 		
+			ofile << spheres.size() << endl;
+
 			vector<SphericalDEM>::iterator si    = spheres.begin();
 			vector<SphericalDEM>::iterator siEnd = spheres.end();
 			for( ; si!=siEnd ; ++si)
@@ -279,8 +280,8 @@ void SphericalDEMSimulator::findRealCollision(const vector<SphericalDEM>& sphere
 				c->radius1 = spheres[id1].radius;
 				c->radius2 = spheres[id2].radius;
 			}
-			else	
-				return;
+			//else	
+			//	return;
 
 			///MacroMicroElasticRelationships
 			if( c->isNew)

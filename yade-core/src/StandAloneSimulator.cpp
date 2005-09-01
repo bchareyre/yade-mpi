@@ -21,75 +21,37 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#ifndef __SPERICALDEMSIMULATOR_HPP__
-#define __SPERICALDEMSIMULATOR_HPP__
+#include "StandAloneSimulator.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "SphericalDEM.hpp"
-#include "Contact.hpp"
-#include "PersistentSAPCollider.hpp"
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-#include <yade/yade-core/StandAloneSimulator.hpp>
-#include <yade/yade-core/MetaBody.hpp>
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-class SphericalDEMSimulator : public StandAloneSimulator
+StandAloneSimulator::StandAloneSimulator() : Serializable()
 {
-	private : shared_ptr<MetaBody> rootBody;
-	private : vector<SphericalDEM> spheres;
-	private : ContactVecSet contacts;
-	private : Real alpha;
-	private : Real beta;
-	private : Real gamma;
-	private : Real dt;
-	private : Real newDt;
-	private : bool computedSomething;
-	private : Vector3r gravity;
-	private : Real forceDamping;
-	private : Real momentumDamping;
-	private : bool useTimeStepper;
-	private : PersistentSAPCollider sap;
-
-	private : void findRealCollision(const vector<SphericalDEM>& spheres, ContactVecSet& contacts);
-	private : void computeResponse(vector<SphericalDEM>& spheres, ContactVecSet& contacts);
-	private : void addDamping(vector<SphericalDEM>& spheres);
-	private : void applyResponse(vector<SphericalDEM>& spheres);
-	private : void timeIntegration(vector<SphericalDEM>& spheres);
-	private : Real computeDt(const vector<SphericalDEM>& spheres, const ContactVecSet& contacts);
-
-	private : void findTimeStepFromBody(const SphericalDEM& sphere);
-	private : void findTimeStepFromInteraction(unsigned int id1, const Contact& contact, const vector<SphericalDEM>& spheres);
-
-	public : SphericalDEMSimulator();
-	public : virtual ~SphericalDEMSimulator();
-
-	public : virtual void setTimeStep(Real dt);
-	public : virtual void doOneIteration();
-	public : virtual void run(int nbIterations);
-
-	public : virtual void loadConfigurationFile(const string& fileName);
-
-	REGISTER_CLASS_NAME(SphericalDEMSimulator);
-	REGISTER_BASE_CLASS_NAME(StandAloneSimulator);
-
-};
+	record = false;
+	interval = 1;
+	outputDirectory=".";
+	outputBaseName="simulation_";
+	paddle=4;
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-REGISTER_FACTORABLE(SphericalDEMSimulator);
-
+void StandAloneSimulator::setRecording(bool record) 
+{
+	this->record = record;
+}
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#endif // __SPERICALDEMSIMULATOR_HPP__
+void StandAloneSimulator::setRecordingProperties(int interval, const string& outputDirectory,const string& outputBaseName,int paddle) 
+{
+	this->interval=interval;
+	this->outputDirectory=outputDirectory;
+	this->outputBaseName=outputBaseName;
+	this->paddle=paddle;
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
