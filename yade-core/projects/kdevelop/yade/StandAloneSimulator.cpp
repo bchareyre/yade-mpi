@@ -1,1 +1,1 @@
-/home/evasion/galizzi/devel/trunk/yade-core/src/StandAloneSimulator.cpp
+../../../src/StandAloneSimulator.cpp

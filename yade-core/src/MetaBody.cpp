@@ -85,7 +85,7 @@ void MetaBody::moveToNextTimeStep()
 {
 	vector<shared_ptr<Engine> >::iterator ai    = actors.begin();
 	vector<shared_ptr<Engine> >::iterator aiEnd = actors.end();
-	for(int i=0;ai!=aiEnd;++ai,i++)
+	for( ; ai!=aiEnd ; ++ai )
 	{
 		if ((*ai)->isActivated())
 			(*ai)->action(this);
@@ -99,7 +99,7 @@ void MetaBody::setTimeSteppersActive(bool a)
 {
 	vector<shared_ptr<Engine> >::iterator ai    = actors.begin();
 	vector<shared_ptr<Engine> >::iterator aiEnd = actors.end();
-	for(int i=0;ai!=aiEnd;++ai,i++)
+	for( ; ai!=aiEnd ; ++ai )
 	{
 		if (Omega::instance().isInheritingFrom((*ai)->getClassName(),"TimeStepper"))
 			(dynamic_pointer_cast<TimeStepper>(*ai))->setActive(a);
