@@ -64,10 +64,20 @@ class ErrorTolerantLaw : public Engine
 	public : void action(Body* body);
 
 	private : void multA(	ublas::vector<float>& res		, 
-				ublas::sparse_matrix<float>& J		,
+				ublas::matrix<float>& J		,
 				ublas::banded_matrix<float>& invM	,
-				ublas::sparse_matrix<float>& Jt		,
+				ublas::matrix<float>& Jt		,
 				ublas::vector<float>& v	);
+// I changed sparse_matrix to matrix, because of boost 1.33. why? Maybe there is another name for this matrix?
+// Or maybe sparse matrix is no longer necessery, because matrix is efficient when sparse?
+//
+//								Janek
+//
+//	private : void multA(	ublas::vector<float>& res		, 
+//				ublas::sparse_matrix<float>& J		,
+//				ublas::banded_matrix<float>& invM	,
+//				ublas::sparse_matrix<float>& Jt		,
+//				ublas::vector<float>& v	);
 	
 	private : void initInitialGuess(ublas::vector<float>& v);
 	
@@ -79,11 +89,21 @@ class ErrorTolerantLaw : public Engine
 	
 	private : bool wrong(ublas::vector<float>& f, const ublas::vector<float>& a) ;
 
-	private : void BCGSolve(	ublas::sparse_matrix<float>& J		,
+	private : void BCGSolve(	ublas::matrix<float>& J		,
 					ublas::banded_matrix<float>& invM	,
-					ublas::sparse_matrix<float>& Jt		,
+					ublas::matrix<float>& Jt		,
 					ublas::vector<float>& constantTerm	,
 					ublas::vector<float>& res);
+// I changed sparse_matrix to matrix, because of boost 1.33. why? Maybe there is another name for this matrix?
+// Or maybe sparse matrix is no longer necessery, because matrix is efficient when sparse?
+//
+//								Janek
+//
+//	private : void BCGSolve(	ublas::sparse_matrix<float>& J		,
+//					ublas::banded_matrix<float>& invM	,
+//					ublas::sparse_matrix<float>& Jt		,
+//					ublas::vector<float>& constantTerm	,
+//					ublas::vector<float>& res);
 
 	
 	REGISTER_CLASS_NAME(ErrorTolerantLaw);

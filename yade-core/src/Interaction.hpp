@@ -61,7 +61,7 @@ class Interaction : public Serializable
 
 
 	// FIXME - why public ?!
-	public	: shared_ptr<InteractionGeometry> interactionGeometry;
+	public	: shared_ptr<InteractionGeometry> interactionGeometry; // should return InteractionGeometry*
 	public	: shared_ptr<InteractionPhysics> interactionPhysics;
 
 	// construction

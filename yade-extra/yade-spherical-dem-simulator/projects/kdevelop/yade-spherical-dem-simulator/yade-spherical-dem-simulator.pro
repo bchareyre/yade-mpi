@@ -21,7 +21,7 @@ QMAKE_LIBDIR = /usr/local/lib/yade/yade-package-dem \
                /usr/local/lib/yade/yade-package-common \
                /usr/local/lib/yade/yade-libs 
 TARGET = ../../../bin/SphericalDEMSimulator 
-CONFIG += release \
+CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 

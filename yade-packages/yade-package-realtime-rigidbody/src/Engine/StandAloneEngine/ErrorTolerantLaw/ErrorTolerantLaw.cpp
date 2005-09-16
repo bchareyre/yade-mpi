@@ -110,8 +110,16 @@ void ErrorTolerantLaw::action(Body* body)
 		}
 
 		// Build the jacobian and transpose of jacobian
-		ublas::sparse_matrix<float> J (6*bodies->size(), ncb->volatileInteractions->size(), ncb->volatileInteractions->size()*2/*6*bodies.size()*body->volatileInteractions.size()*/);
-		ublas::sparse_matrix<float> Jt (ncb->volatileInteractions->size(), 6*bodies->size(), ncb->volatileInteractions->size()*2/*6*bodies.size()*body->volatileInteractions.size()*/);
+		//
+		// I'm compiling YADE with boost 1.33, and this line is not compiling. I don't understand it, so I can't fix it.
+		// This totally kills ErrorTolerantLaw, I know - so if you start working on that - first you have to correct this line,
+		// I'm sorry, but boost 1.33 is 30% faster !
+		//                                              Janek
+		//
+		ublas::matrix<float> J;
+		ublas::matrix<float> Jt;
+		//ublas::sparse_matrix<float> J (6*bodies->size(), ncb->volatileInteractions->size(), ncb->volatileInteractions->size()*2/*6*bodies.size()*body->volatileInteractions.size()*/);
+		//ublas::sparse_matrix<float> Jt (ncb->volatileInteractions->size(), 6*bodies->size(), ncb->volatileInteractions->size()*2/*6*bodies.size()*body->volatileInteractions.size()*/);
 
 		static ublas::vector<float> penetrationDepthes;
 		static ublas::vector<float> penetrationVelocities;
@@ -248,10 +256,21 @@ void ErrorTolerantLaw::action(Body* body)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void ErrorTolerantLaw::multA(	ublas::vector<float>& res		,
-					ublas::sparse_matrix<float>& J		,
+					ublas::matrix<float>& J		,
 					ublas::banded_matrix<float>& invM	,
-					ublas::sparse_matrix<float>& Jt		,
+					ublas::matrix<float>& Jt		,
 					ublas::vector<float>& v		)
+
+// I changed sparse_matrix to matrix, because of boost 1.33. why? Maybe there is another name for this matrix?
+// Or maybe sparse matrix is no longer necessery, because matrix is efficient when sparse?
+//
+//							Janek
+//
+//void ErrorTolerantLaw::multA(	ublas::vector<float>& res		,
+//					ublas::sparse_matrix<float>& J		,
+//					ublas::banded_matrix<float>& invM	,
+//					ublas::sparse_matrix<float>& Jt		,
+//					ublas::vector<float>& v		)
 {
 
 	ublas::vector<float> Jtv = ublas::prod(Jt,v);
@@ -352,11 +371,21 @@ bool ErrorTolerantLaw::wrong(ublas::vector<float>& f, const ublas::vector<float>
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void ErrorTolerantLaw::BCGSolve(	ublas::sparse_matrix<float>& J		,
+void ErrorTolerantLaw::BCGSolve(	ublas::matrix<float>& J		,
 						ublas::banded_matrix<float>& invM	,
-						ublas::sparse_matrix<float>& Jt		,
+						ublas::matrix<float>& Jt		,
 						ublas::vector<float>& constantTerm	,
 						ublas::vector<float>& res)
+// I changed sparse_matrix to matrix, because of boost 1.33. why? Maybe there is another name for this matrix?
+// Or maybe sparse matrix is no longer necessery, because matrix is efficient when sparse?
+//
+//								Janek
+//
+//void ErrorTolerantLaw::BCGSolve(	ublas::sparse_matrix<float>& J		,
+//						ublas::banded_matrix<float>& invM	,
+//						ublas::sparse_matrix<float>& Jt		,
+//						ublas::vector<float>& constantTerm	,
+//						ublas::vector<float>& res)
 {
 	bool modif=true;
 	float residu,oldResidu;
