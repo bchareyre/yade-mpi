@@ -1,4 +1,4 @@
-/*********************************************callBacks******************************
+/***************************************************************************
  *   Copyright (C) 2005 by Janek Kozicki                                   *
  *   cosurgi@berlios.de                                                    *
  *                                                                         *
@@ -686,6 +686,8 @@ class DynLibDispatcher
 // calling multivirtual function, 2D, 
 // symmetry handling in private struct
 ////////////////////////////////////////////////////////////////////////////////
+
+/// @cond 
 	private:
 		template< bool useSymmetry, class BaseClassTrait1, class BaseClassTrait2, class ParmTrait3, class ParmTrait4, class ParmTrait5, class ParmTrait6,
 				class ParmTrait7, class ParmTrait8, class ParmTrait9, class ParmTrait10, class ParmTrait11, class ParmTrait12, class ParmTrait13,
@@ -845,6 +847,7 @@ class DynLibDispatcher
 				return ex->go		(base2, base1, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15);
 			}
 		};
+/// @endcond 
 
 ////////////////////////////////////////////////////////////////////////////////
 // calling multivirtual function, 2D, public interface
