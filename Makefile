@@ -21,7 +21,7 @@ compile_install:
 	$(MAKE) -C yade-guis install
 	
 	$(MAKE) -C yade-packages compile_install
-
+	
 	$(MAKE) -C yade-extra
 	$(MAKE) -C yade-extra install
 	

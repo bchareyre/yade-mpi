@@ -31,7 +31,14 @@ QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 
 QMAKE_CXXFLAGS_DEBUG += -lpthread \
                         -pthread 
+win32 {
+TARGET = ../../bin/yade 
+CONFIG += console
+}
+!win32 {
 TARGET = ../bin/yade 
+}
+
 CONFIG += debug \
           warn_on 
 TEMPLATE = app 

@@ -20,14 +20,13 @@ compile_install:
 	
 	$(MAKE) -C yade-package-dem 
 	$(MAKE) -C yade-package-dem install
-
+	
 	$(MAKE) -C yade-package-fem 
 	$(MAKE) -C yade-package-fem install
 	
 	$(MAKE) -C yade-package-lattice
 	$(MAKE) -C yade-package-lattice install
-
-
+	
 	$(MAKE) -C yade-package-mass-spring
 	$(MAKE) -C yade-package-mass-spring install
 	
