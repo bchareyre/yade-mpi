@@ -77,8 +77,8 @@
 
 class Factorable
 {
-	public    : Factorable();
-	public    : virtual ~Factorable();
+	public    : Factorable() {}
+	public    : virtual ~Factorable() {}
 
 	REGISTER_CLASS_NAME(Factorable);
 	public : virtual string getBaseClassName(unsigned int i=0) const { return "";}

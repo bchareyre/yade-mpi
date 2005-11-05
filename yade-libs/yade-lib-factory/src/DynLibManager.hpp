@@ -29,9 +29,8 @@
 
 #ifdef WIN32
 	#define OS "Windows"
-	#include <stdio.h> 
+	#define WIN32_LEAN_AND_MEAN
 	#include <windows.h> 
-	typedef int (*MYPROC)(LPTSTR); 
 #else
 	#include <dlfcn.h>
 	#define OS "Linux"

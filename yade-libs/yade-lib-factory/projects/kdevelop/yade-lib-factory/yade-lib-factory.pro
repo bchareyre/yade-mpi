@@ -15,5 +15,4 @@ HEADERS += ClassFactory.hpp \
            FactoryExceptions.hpp 
 SOURCES += ClassFactory.cpp \
            DynLibManager.cpp \
-           Factorable.cpp \
            FactoryExceptions.cpp 

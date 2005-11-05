@@ -133,36 +133,20 @@ bool DynLibManager::load (const string& fullLibName, const string& libName )
 	if (libName.empty() || fullLibName.empty())
 		return false;
 
-	#ifdef WIN32
-		unsigned short * file2 = new unsigned short[libName.length()+1];
-		int i=0;
-		while (fullLibName[i]!='\0')
-		{
-			file2[i] = fullLibName[i];
-			i++;
-		}
-		file2[i] = '\0';
+#ifdef WIN32
+	if (isLoaded(libName))
+		return true;
 
-		HINSTANCE hinstLib = LoadLibrary(file2);
+	HINSTANCE handle = LoadLibraryA(fullLibName.c_str());
+#else
+	void * handle = dlopen(fullLibName.data(), RTLD_NOW);
+#endif
 
-		if (hinstLib == NULL)
-			return !error();
-		else
-		{
-			handles[libName] = hinstLib;
-			return true;
-		}
-	#else
-		void * handle = dlopen(fullLibName.data(), RTLD_NOW);
+	if (!handle)
+		return !error();
 
-		if (!handle)
-			return !error();
-		else
-		{
-			handles[libName] = handle;
-			return true;
-		}
-	#endif
+	handles[libName] = handle;
+	return true;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -171,7 +155,11 @@ bool DynLibManager::load (const string& fullLibName, const string& libName )
 bool DynLibManager::unload (const string libName)
 {
 	if (isLoaded(libName))
+	#ifdef WIN32
+		return FreeLibrary(handles[libName]);
+	#else
 		return closeLib(libName);
+	#endif		
 	else
 		return false;
 }
@@ -191,7 +179,7 @@ bool DynLibManager::unloadAll ()
 
 	for( ; ith!=ithEnd ; ++ith)
 		if ((*ith).first.length()!=0)
-			closeLib((*ith).first);
+			unload((*ith).first);
 	return false;
 }
 
@@ -240,23 +228,27 @@ bool DynLibManager::closeLib(const string libName)
 bool DynLibManager::error() 
 {
 	#ifdef WIN32
-    		TCHAR szBuf[80];
-    		LPVOID lpMsgBuf;
-    		DWORD dw = GetLastError();
-
-    		FormatMessage( FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, NULL, GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR) &lpMsgBuf, 0, NULL );
-
-// 		ofstream f; 
-// 		f.open("log.txt");
-// 		f << "Error " << dw << " : " << lpMsgBuf << endl;
-// 		f.close();
-		
-		return (dw!=0);
+		char* lpMsgBuf;
+		const DWORD lastError = GetLastError();
+	
+		FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, NULL, lastError, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR) &lpMsgBuf, 0, NULL);
+	
+		std::string errMsg(lpMsgBuf);
+		LocalFree(lpMsgBuf); // mind the FORMAT_MESSAGE_ALLOCATE_BUFFER !
+	
+		if (lastError != ERROR_SUCCESS)
+		{
+//			cerr << errMsg << endl;
+//			Omega::printErrorLog(errMsg);
+			return true;
+		}
+	
+		return false;
 	#else
  		char * error = dlerror();
 		if (error != NULL)  
 		{
-			//cout << error << endl;
+			//cerr << error << endl;
 			//Omega::printErrorLog(error);
 		}
 		return (error!=NULL);
