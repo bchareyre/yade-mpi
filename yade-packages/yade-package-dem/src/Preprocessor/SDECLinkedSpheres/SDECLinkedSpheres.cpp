@@ -238,7 +238,7 @@ string SDECLinkedSpheres::generate()
 	
 	return "total number of permament links created: " 
 		+ lexical_cast<string>(rootBody->persistentInteractions->size()) 
-		+ "\n WARNING: link bonds are currently not working!";
+		+ "\nWARNING: link bonds are currently not working!";
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

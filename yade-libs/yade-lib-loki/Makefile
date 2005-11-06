@@ -11,7 +11,7 @@ yade_lib_subdir=yade-libs
 yade_libnames_basename=yade-lib-loki
 
 all:
-	cd projects/kdevelop ; qmake "YADE_QMAKE_PATH=${PREFIX_DIR}/${INSTALL_DIR}" && $(MAKE)
+	cd projects && cd kdevelop && qmake "YADE_QMAKE_PATH=${PREFIX_DIR}/${INSTALL_DIR}" && $(MAKE)
 
 clean:
 	-rm bin/*
