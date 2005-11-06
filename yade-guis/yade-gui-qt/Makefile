@@ -11,46 +11,46 @@ yade_gui_subdir=yade-guis
 yade_libnames_basename=QtGUI
 
 all:
-	cd projects/kdevelop ; qmake "YADE_QMAKE_PATH=${PREFIX_DIR}/${INSTALL_DIR}" && $(MAKE)
+	cd src && qmake "YADE_QMAKE_PATH=${PREFIX_DIR}/${INSTALL_DIR}" && $(MAKE)
 
 clean:
 	-rm bin/*
-	-find ./projects/kdevelop -name "Makefile" -exec rm {} \;
-	-find ./projects/kdevelop -name "*.o" -exec rm {} \;
-	-find ./projects/kdevelop -name "*.kdevses" -exec rm {} \;
-	-find ./projects/kdevelop -name "*.kdevelop.pcs" -exec rm {} \;
-	-rm ./projects/kdevelop/QtGUI/QtFileGeneratorController.cpp
-	-rm ./projects/kdevelop/QtGUI/QtGeneratedPreferencesEditor.h
-	-rm ./projects/kdevelop/QtGUI/YadeQtGeneratedMainWindow.cpp
-	-rm ./projects/kdevelop/QtGUI/moc_QtGeneratedCodeGenerator.cpp
-	-rm ./projects/kdevelop/QtGUI/QtGeneratedEngineEditor.h
-	-rm ./projects/kdevelop/QtGUI/QtGeneratedCodeGenerator.h
-	-rm ./projects/kdevelop/QtGUI/QtGeneratedSimulationController.h
-	-rm ./projects/kdevelop/QtGUI/QtGeneratedPreferencesEditor.cpp
-	-rm ./projects/kdevelop/QtGUI/moc_GLEngineEditor.cpp
-	-rm ./projects/kdevelop/QtGUI/QtGeneratedMessageDialog.h
-	-rm ./projects/kdevelop/QtGUI/moc_QtFileGeneratorController.cpp
-	-rm ./projects/kdevelop/QtGUI/QtGeneratedMetaDispatchingEngineProperties.h
-	-rm ./projects/kdevelop/QtGUI/QtGeneratedEngineEditor.cpp
-	-rm ./projects/kdevelop/QtGUI/QtFileGeneratorController.h
-	-rm ./projects/kdevelop/QtGUI/QtGeneratedCodeGenerator.cpp
-	-rm ./projects/kdevelop/QtGUI/YadeQtGeneratedMainWindow.h
-	-rm ./projects/kdevelop/QtGUI/QtGeneratedSimulationController.cpp
-	-rm ./projects/kdevelop/QtGUI/moc_GLViewer.cpp
-	-rm ./projects/kdevelop/QtGUI/QtGeneratedMessageDialog.cpp
-	-rm ./projects/kdevelop/QtGUI/QtGeneratedMetaDispatchingEngineProperties.cpp
-	-rm ./projects/kdevelop/QtGUI/moc_QtGeneratedEngineEditor.cpp
-	-rm ./projects/kdevelop/QtGUI/moc_QtGeneratedSimulationController.cpp
-	-rm ./projects/kdevelop/QtGUI/moc_QtGeneratedMessageDialog.cpp
-	-rm ./projects/kdevelop/QtGUI/moc_QtGeneratedMetaDispatchingEngineProperties.cpp
-	-rm ./projects/kdevelop/QtGUI/moc_YadeQtGeneratedMainWindow.cpp
-	-rm ./projects/kdevelop/QtGUI/moc_QtGeneratedPreferencesEditor.cpp
-	-rm ./projects/kdevelop/QtGUI/moc_QtGeneratedSphericalDEMSimulator.cpp
-	-rm ./projects/kdevelop/QtGUI/QtGeneratedSphericalDEMSimulator.h
-	-rm ./projects/kdevelop/QtGUI/QtGeneratedSphericalDEMSimulator.cpp
-	-rm ./projects/kdevelop/QtGUI/moc_QtGeneratedSimulationPlayer.cpp
-	-rm ./projects/kdevelop/QtGUI/QtGeneratedSimulationPlayer.h
-	-rm ./projects/kdevelop/QtGUI/QtGeneratedSimulationPlayer.cpp
+	-find ./src -name "Makefile" -exec rm {} \;
+	-find ./src -name "*.o" -exec rm {} \;
+	-find ./src -name "*.kdevses" -exec rm {} \;
+	-find ./src -name "*.kdevelop.pcs" -exec rm {} \;
+	-rm ./src/QtGUI/QtFileGeneratorController.cpp
+	-rm ./src/QtGUI/QtGeneratedPreferencesEditor.h
+	-rm ./src/QtGUI/YadeQtGeneratedMainWindow.cpp
+	-rm ./src/QtGUI/moc_QtGeneratedCodeGenerator.cpp
+	-rm ./src/QtGUI/QtGeneratedEngineEditor.h
+	-rm ./src/QtGUI/QtGeneratedCodeGenerator.h
+	-rm ./src/QtGUI/QtGeneratedSimulationController.h
+	-rm ./src/QtGUI/QtGeneratedPreferencesEditor.cpp
+	-rm ./src/QtGUI/moc_GLEngineEditor.cpp
+	-rm ./src/QtGUI/QtGeneratedMessageDialog.h
+	-rm ./src/QtGUI/moc_QtFileGeneratorController.cpp
+	-rm ./src/QtGUI/QtGeneratedMetaDispatchingEngineProperties.h
+	-rm ./src/QtGUI/QtGeneratedEngineEditor.cpp
+	-rm ./src/QtGUI/QtFileGeneratorController.h
+	-rm ./src/QtGUI/QtGeneratedCodeGenerator.cpp
+	-rm ./src/QtGUI/YadeQtGeneratedMainWindow.h
+	-rm ./src/QtGUI/QtGeneratedSimulationController.cpp
+	-rm ./src/QtGUI/moc_GLViewer.cpp
+	-rm ./src/QtGUI/QtGeneratedMessageDialog.cpp
+	-rm ./src/QtGUI/QtGeneratedMetaDispatchingEngineProperties.cpp
+	-rm ./src/QtGUI/moc_QtGeneratedEngineEditor.cpp
+	-rm ./src/QtGUI/moc_QtGeneratedSimulationController.cpp
+	-rm ./src/QtGUI/moc_QtGeneratedMessageDialog.cpp
+	-rm ./src/QtGUI/moc_QtGeneratedMetaDispatchingEngineProperties.cpp
+	-rm ./src/QtGUI/moc_YadeQtGeneratedMainWindow.cpp
+	-rm ./src/QtGUI/moc_QtGeneratedPreferencesEditor.cpp
+	-rm ./src/QtGUI/moc_QtGeneratedSphericalDEMSimulator.cpp
+	-rm ./src/QtGUI/QtGeneratedSphericalDEMSimulator.h
+	-rm ./src/QtGUI/QtGeneratedSphericalDEMSimulator.cpp
+	-rm ./src/QtGUI/moc_QtGeneratedSimulationPlayer.cpp
+	-rm ./src/QtGUI/QtGeneratedSimulationPlayer.h
+	-rm ./src/QtGUI/QtGeneratedSimulationPlayer.cpp
 
 install:
 	mkdir --parents ${PREFIX_DIR}/${INSTALL_DIR}/lib/yade/${yade_gui_subdir}

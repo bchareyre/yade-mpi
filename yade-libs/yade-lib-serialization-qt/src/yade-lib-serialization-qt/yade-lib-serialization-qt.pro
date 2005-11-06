@@ -7,11 +7,11 @@ LIBS += -lXMLFormatManager
 INCLUDEPATH += $${YADE_QMAKE_PATH}/include 
 QMAKE_LIBDIR = $${YADE_QMAKE_PATH}/lib/yade/yade-libs/ 
 win32 {
-TARGET = ../../../../bin/yade-lib-serialization-qt 
+TARGET = ../../../bin/yade-lib-serialization-qt 
 CONFIG += console
 }
 !win32 {
-TARGET = ../../../bin/yade-lib-serialization-qt 
+TARGET = ../../bin/yade-lib-serialization-qt 
 }
 
 CONFIG += debug \

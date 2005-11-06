@@ -10,11 +10,11 @@ LIBS += -lLatticeBeamParameters \
 INCLUDEPATH += $${YADE_QMAKE_PATH}/include/ \
                ../../../DataClass/PhysicalParameters/LatticeNodeParameters \
                ../../../DataClass/PhysicalParameters/LatticeBeamParameters 
-QMAKE_LIBDIR = ../../../../../bin \
-               ../../../../../bin \
+QMAKE_LIBDIR = ../../../../bin \
+               ../../../../bin \
                $${YADE_QMAKE_PATH}/lib/yade/yade-package-common/ \
                $${YADE_QMAKE_PATH}/lib/yade/yade-libs/ 
-DESTDIR = ../../../../../bin 
+DESTDIR = ../../../../bin 
 CONFIG += debug \
           thread \
           warn_on \

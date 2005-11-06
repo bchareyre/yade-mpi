@@ -11,13 +11,13 @@ yade_lib_subdir=yade-libs
 yade_libnames_basename=yade-lib-serialization-qt
 
 all:
-	cd projects/kdevelop ; qmake "YADE_QMAKE_PATH=${PREFIX_DIR}/${INSTALL_DIR}" && $(MAKE)
+	cd src && qmake "YADE_QMAKE_PATH=${PREFIX_DIR}/${INSTALL_DIR}" && $(MAKE)
 
 clean:
 	-rm bin/*
-	-rm ./projects/kdevelop/yade-libserialization-qt/moc_QtGUIGenerator.cpp
-	-find ./projects/kdevelop -name "Makefile" -exec rm {} \;
-	-find ./projects/kdevelop -name "*.o" -exec rm {} \;
+	-rm ./src/yade-libserialization-qt/moc_QtGUIGenerator.cpp
+	-find ./src -name "Makefile" -exec rm {} \;
+	-find ./src -name "*.o" -exec rm {} \;
 
 install:
 	mkdir --parents ${PREFIX_DIR}/${INSTALL_DIR}/lib/yade/${yade_lib_subdir}

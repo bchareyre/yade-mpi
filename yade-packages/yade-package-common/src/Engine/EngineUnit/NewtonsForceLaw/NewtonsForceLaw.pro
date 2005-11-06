@@ -12,15 +12,15 @@ INCLUDEPATH += $${YADE_QMAKE_PATH}/include/ \
                ../../../DataClass/PhysicalAction/Force \
                ../../../DataClass/PhysicalParameters/ParticleParameters \
                ../../../Engine/MetaEngine/PhysicalActionApplier 
-QMAKE_LIBDIR = ../../../../../bin \
-               ../../../../../bin \
-               ../../../../../bin \
+QMAKE_LIBDIR = ../../../../bin \
+               ../../../../bin \
+               ../../../../bin \
                $${YADE_QMAKE_PATH}/lib/yade/yade-libs/ 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 
 QMAKE_CXXFLAGS_DEBUG += -lpthread \
                         -pthread 
-DESTDIR = ../../../../../bin 
+DESTDIR = ../../../../bin 
 CONFIG += debug \
           thread \
           warn_on \

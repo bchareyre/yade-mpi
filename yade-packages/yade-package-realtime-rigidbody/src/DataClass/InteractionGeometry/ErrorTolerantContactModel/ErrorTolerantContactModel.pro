@@ -14,7 +14,7 @@ QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 
 QMAKE_CXXFLAGS_DEBUG += -lpthread \
                         -pthread 
-DESTDIR = ../../../../../bin 
+DESTDIR = ../../../../bin 
 CONFIG += debug \
           thread \
           warn_on \

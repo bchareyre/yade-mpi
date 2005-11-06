@@ -7,11 +7,11 @@ LIBS += -lyade-lib-qhull
 INCLUDEPATH += $${YADE_QMAKE_PATH}/include 
 QMAKE_LIBDIR = $${YADE_QMAKE_PATH}/lib/yade/yade-libs/ 
 win32 {
-TARGET = ../../../../bin/yade-lib-swiftpp 
+TARGET = ../../../bin/yade-lib-swiftpp 
 CONFIG += console
 }
 !win32 {
-TARGET = ../../../bin/yade-lib-swiftpp 
+TARGET = ../../bin/yade-lib-swiftpp 
 }
 
 CONFIG += debug \

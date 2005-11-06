@@ -10,13 +10,13 @@ LIBS += -lSpheresContactGeometry \
 INCLUDEPATH += $${YADE_QMAKE_PATH}/include/ \
                ../../../DataClass/InteractionGeometry/SpheresContactGeometry \
                ../../../DataClass/InteractingGeometry/PolyhedralSweptSphere 
-QMAKE_LIBDIR = ../../../../../bin \
+QMAKE_LIBDIR = ../../../../bin \
                $${YADE_QMAKE_PATH}/lib/yade/yade-libs/ 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 
 QMAKE_CXXFLAGS_DEBUG += -lpthread \
                         -pthread 
-DESTDIR = ../../../../../bin 
+DESTDIR = ../../../../bin 
 CONFIG += debug \
           thread \
           warn_on \

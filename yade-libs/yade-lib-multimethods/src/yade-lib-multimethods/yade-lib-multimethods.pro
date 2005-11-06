@@ -11,11 +11,11 @@ SOURCES += Indexable.cpp \
            MultiMethodsExceptions.cpp 
 INCLUDEPATH += $${YADE_QMAKE_PATH}/include
 win32 {
-TARGET = ../../../../bin/yade-lib-multimethods
+TARGET = ../../../bin/yade-lib-multimethods
 CONFIG += console
 }
 !win32 {
-TARGET = ../../../bin/yade-lib-multimethods
+TARGET = ../../bin/yade-lib-multimethods
 }
 
 CONFIG += debug \

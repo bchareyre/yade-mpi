@@ -47,9 +47,9 @@ INCLUDEPATH += $${YADE_QMAKE_PATH}/include/ \
                ../../DataClass/InteractionPhysics/SpringPhysics \
                ../../DataClass/InteractionGeometry/SpringGeometry \
                ../../DataClass/PhysicalParameters/ParticleSetParameters 
-QMAKE_LIBDIR = ../../../../bin \
-               ../../../../bin \
-               ../../../../bin \
+QMAKE_LIBDIR = ../../../bin \
+               ../../../bin \
+               ../../../bin \
                $${YADE_QMAKE_PATH}/lib/yade/yade-package-dem \
                $${YADE_QMAKE_PATH}/lib/yade/yade-package-common/ \
                $${YADE_QMAKE_PATH}/lib/yade/yade-libs/ 
@@ -57,7 +57,7 @@ QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 
 QMAKE_CXXFLAGS_DEBUG += -lpthread \
                         -pthread 
-DESTDIR = ../../../../bin 
+DESTDIR = ../../../bin 
 CONFIG += debug \
           thread \
           warn_on \

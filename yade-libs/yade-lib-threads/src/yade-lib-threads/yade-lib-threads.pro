@@ -10,11 +10,11 @@ HEADERS += Threadable.hpp \
 SOURCES += ThreadSafe.cpp \
            ThreadSynchronizer.cpp 
 win32 {
-TARGET = ../../../../bin/yade-lib-threads
+TARGET = ../../../bin/yade-lib-threads
 CONFIG += console
 }
 !win32 {
-TARGET = ../../../bin/yade-lib-threads
+TARGET = ../../bin/yade-lib-threads
 }
 
 CONFIG += debug \

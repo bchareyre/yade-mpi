@@ -26,11 +26,11 @@ SOURCES += Archive.cpp \
            SerializationExceptions.cpp 
 INCLUDEPATH += $${YADE_QMAKE_PATH}/include
 win32 {
-TARGET = ../../../../bin/yade-lib-serialization
+TARGET = ../../../bin/yade-lib-serialization
 CONFIG += console
 }
 !win32 {
-TARGET = ../../../bin/yade-lib-serialization
+TARGET = ../../bin/yade-lib-serialization
 }
 
 CONFIG += debug \

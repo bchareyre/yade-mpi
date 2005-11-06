@@ -21,11 +21,11 @@ QMAKE_LIBDIR = $${YADE_QMAKE_PATH}/lib/yade/yade-package-dem \
                $${YADE_QMAKE_PATH}/lib/yade/yade-package-common \
                $${YADE_QMAKE_PATH}/lib/yade/yade-libs 
 win32 {
-TARGET = ../../../../bin/SphericalDEMSimulator 
+TARGET = ../../../bin/SphericalDEMSimulator 
 CONFIG += console
 }
 !win32 {
-TARGET = ../../../bin/SphericalDEMSimulator 
+TARGET = ../../bin/SphericalDEMSimulator 
 }
 
 CONFIG += debug \

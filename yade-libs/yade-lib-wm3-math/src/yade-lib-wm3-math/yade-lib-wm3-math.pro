@@ -4,11 +4,11 @@ error( "YADE_QMAKE_PATH internal qmake variable is not set, you should run for e
 
 
 win32 {
-TARGET = ../../../../bin/yade-lib-wm3-math 
+TARGET = ../../../bin/yade-lib-wm3-math 
 CONFIG += console
 }
 !win32 {
-TARGET = ../../../bin/yade-lib-wm3-math 
+TARGET = ../../bin/yade-lib-wm3-math 
 }
 
 CONFIG += debug \

@@ -78,11 +78,11 @@ LIBS += -lyade-lib-time \
 INCLUDEPATH += $${YADE_QMAKE_PATH}/include
 QMAKE_LIBDIR = $${YADE_QMAKE_PATH}/lib/yade/yade-libs
 win32 {
-TARGET = ../../../../bin/yade
+TARGET = ../../../bin/yade
 CONFIG += console
 }
 !win32 {
-TARGET = ../../../bin/yade
+TARGET = ../../bin/yade
 }
 
 CONFIG += debug \

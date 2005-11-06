@@ -4,11 +4,11 @@ error( "YADE_QMAKE_PATH internal qmake variable is not set, you should run for e
 
 
 win32 {
-TARGET = ../../../../bin/yade-lib-qhull 
+TARGET = ../../../bin/yade-lib-qhull 
 CONFIG += console
 }
 !win32 {
-TARGET = ../../../bin/yade-lib-qhull 
+TARGET = ../../bin/yade-lib-qhull 
 }
 
 CONFIG += debug \

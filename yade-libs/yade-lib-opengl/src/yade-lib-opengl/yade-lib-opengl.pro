@@ -8,11 +8,11 @@ LIBS += -lglut \
 INCLUDEPATH += $${YADE_QMAKE_PATH}/include 
 QMAKE_LIBDIR = $${YADE_QMAKE_PATH}/lib/yade/yade-libs/ 
 win32 {
-TARGET = ../../../../bin/yade-lib-opengl 
+TARGET = ../../../bin/yade-lib-opengl 
 CONFIG += console
 }
 !win32 {
-TARGET = ../../../bin/yade-lib-opengl 
+TARGET = ../../bin/yade-lib-opengl 
 }
 
 CONFIG += debug \

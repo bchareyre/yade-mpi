@@ -5,11 +5,11 @@ error( "YADE_QMAKE_PATH internal qmake variable is not set, you should run for e
 
 INCLUDEPATH += $${YADE_QMAKE_PATH}/include 
 win32 {
-TARGET = ../../../../bin/yade-lib-factory 
+TARGET = ../../../bin/yade-lib-factory 
 CONFIG += console
 }
 !win32 {
-TARGET = ../../../bin/yade-lib-factory 
+TARGET = ../../bin/yade-lib-factory 
 }
 
 CONFIG += debug \

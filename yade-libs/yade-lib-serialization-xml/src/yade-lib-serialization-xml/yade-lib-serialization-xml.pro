@@ -5,11 +5,11 @@ error( "YADE_QMAKE_PATH internal qmake variable is not set, you should run for e
 
 INCLUDEPATH += $${YADE_QMAKE_PATH}/include 
 win32 {
-TARGET = ../../../../bin/XMLFormatManager 
+TARGET = ../../../bin/XMLFormatManager 
 CONFIG += console
 }
 !win32 {
-TARGET = ../../../bin/XMLFormatManager 
+TARGET = ../../bin/XMLFormatManager 
 }
 
 CONFIG += debug \

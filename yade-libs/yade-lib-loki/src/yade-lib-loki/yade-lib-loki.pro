@@ -3,12 +3,12 @@ error( "YADE_QMAKE_PATH internal qmake variable is not set, you should run for e
 }
 
 win32 {
-TARGET = ../../../../bin/yade-lib-loki 
+TARGET = ../../../bin/yade-lib-loki 
 CONFIG += console
 }
 
 !win32 {
-TARGET = ../../../bin/yade-lib-loki 
+TARGET = ../../bin/yade-lib-loki 
 }
 
 CONFIG += debug \

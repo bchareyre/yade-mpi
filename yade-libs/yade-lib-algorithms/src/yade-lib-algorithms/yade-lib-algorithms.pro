@@ -7,11 +7,11 @@ HEADERS += PerlinNoise.hpp
 SOURCES += PerlinNoise.cpp 
 INCLUDEPATH += $${YADE_QMAKE_PATH}/include/
 win32 {
-TARGET = ../../../../bin/yade-lib-algorithms
+TARGET = ../../../bin/yade-lib-algorithms
 CONFIG += console
 }
 !win32 {
-TARGET = ../../../bin/yade-lib-algorithms
+TARGET = ../../bin/yade-lib-algorithms
 }
 
 CONFIG += debug \

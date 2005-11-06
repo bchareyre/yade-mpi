@@ -11,14 +11,14 @@ yade_gui_subdir=yade-extra
 yade_libnames_basename=SphericalDEMSimulator
 
 all:
-	cd projects/kdevelop ; qmake "YADE_QMAKE_PATH=${PREFIX_DIR}/${INSTALL_DIR}" && $(MAKE)
+	cd src && qmake "YADE_QMAKE_PATH=${PREFIX_DIR}/${INSTALL_DIR}" && $(MAKE)
 
 clean:
 	-rm bin/*
-	-find ./projects/kdevelop -name "Makefile" -exec rm {} \;
-	-find ./projects/kdevelop -name "*.o" -exec rm {} \;
-	-find ./projects/kdevelop -name "*.kdevses" -exec rm {} \;
-	-find ./projects/kdevelop -name "*.kdevelop.pcs" -exec rm {} \;
+	-find ./src -name "Makefile" -exec rm {} \;
+	-find ./src -name "*.o" -exec rm {} \;
+	-find ./src -name "*.kdevses" -exec rm {} \;
+	-find ./src -name "*.kdevelop.pcs" -exec rm {} \;
 
 install:
 	mkdir --parents ${PREFIX_DIR}/${INSTALL_DIR}/lib/yade/${yade_gui_subdir}

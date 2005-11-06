@@ -15,11 +15,11 @@ SOURCES += Distances2D.cpp \
            MarchingCube.cpp 
 INCLUDEPATH += $${YADE_QMAKE_PATH}/include
 win32 {
-TARGET = ../../../../bin/yade-lib-computational-geometry
+TARGET = ../../../bin/yade-lib-computational-geometry
 CONFIG += console
 }
 !win32 {
-TARGET = ../../../bin/yade-lib-computational-geometry
+TARGET = ../../bin/yade-lib-computational-geometry
 }
 
 CONFIG += debug \

@@ -29,17 +29,17 @@ INCLUDEPATH += $${YADE_QMAKE_PATH}/include/ \
                ../../Engine/StandAloneEngine/ElasticContactLaw \
                ../../Engine/EngineUnit/MacroMicroElasticRelationships \
                ../../DataClass/PhysicalParameters/BodyMacroParameters 
-QMAKE_LIBDIR = ../../../../bin \
-               ../../../../bin \
-               ../../../../bin \
-               ../../../../bin \
+QMAKE_LIBDIR = ../../../bin \
+               ../../../bin \
+               ../../../bin \
+               ../../../bin \
                $${YADE_QMAKE_PATH}/lib/yade/yade-package-common/ \
                $${YADE_QMAKE_PATH}/lib/yade/yade-libs/ 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 
 QMAKE_CXXFLAGS_DEBUG += -lpthread \
                         -pthread 
-DESTDIR = ../../../../bin 
+DESTDIR = ../../../bin 
 CONFIG += debug \
           thread \
           warn_on \
