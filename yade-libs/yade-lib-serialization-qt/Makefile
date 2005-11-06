@@ -15,7 +15,7 @@ all:
 
 clean:
 	-rm bin/*
-	-rm ./src/yade-libserialization-qt/moc_QtGUIGenerator.cpp
+	-rm ./src/yade-lib-serialization-qt/moc_QtGUIGenerator.cpp
 	-find ./src -name "Makefile" -exec rm {} \;
 	-find ./src -name "*.o" -exec rm {} \;
 
