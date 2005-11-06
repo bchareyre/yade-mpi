@@ -7,6 +7,8 @@ INCLUDEPATH += $${YADE_QMAKE_PATH}/include
 win32 {
 TARGET = ../../../bin/yade-lib-factory 
 CONFIG += console
+LIBS += -llibboost_filesystem-mgw-mt-d-1_33 \
+        -llibboost_thread-mgw-mt-d-1_33
 }
 !win32 {
 TARGET = ../../bin/yade-lib-factory 

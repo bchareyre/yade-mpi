@@ -48,19 +48,20 @@ float Math<float>::fastInvSqrt (float fValue)
 template <>
 double Math<double>::fastInvSqrt (double dValue)
 {
-#if defined(WIN32) || defined(MINGW)
-    double dHalf = 0.5*dValue;
-    Integer64 i  = *(Integer64*)&dValue;
-    i = 0x5fe6ec85e7de30da - (i >> 1);
-    dValue = *(double*)&i;
-    dValue = dValue*(1.5 - dHalf*dValue*dValue);
-    return dValue;
-#else
+// FIXME - wtf with Integer64 on windows?
+//#if defined(WIN32) || defined(MINGW)
+//    double dHalf = 0.5*dValue;
+//    Integer64 i  = *(Integer64*)&dValue;
+//    i = 0x5fe6ec85e7de30da - (i >> 1);
+//    dValue = *(double*)&i;
+//    dValue = dValue*(1.5 - dHalf*dValue*dValue);
+//    return dValue;
+//#else
     // Need to determine how to access 64-bit integers, constants, and
     // use them on Macintosh and Linux.  The type int64_t defined in
     // stdint.h on those platforms still resolves to the 32-bit "long".
     return (double)Math<float>::fastInvSqrt((float)dValue);
-#endif
+//#endif
 
 }
 //----------------------------------------------------------------------------
