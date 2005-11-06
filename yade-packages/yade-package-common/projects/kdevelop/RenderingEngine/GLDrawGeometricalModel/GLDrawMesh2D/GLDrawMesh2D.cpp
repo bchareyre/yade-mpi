@@ -1,1 +1,0 @@
-../../../../../src/RenderingEngine/GLDrawGeometricalModel/GLDrawMesh2D/GLDrawMesh2D.cpp

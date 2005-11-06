@@ -1,1 +1,0 @@
-../../../src/QtPreferencesEditor.cpp

@@ -1,1 +1,0 @@
-../../../../../src/DataClass/InteractionGeometry/SpringGeometry/SpringGeometry.cpp

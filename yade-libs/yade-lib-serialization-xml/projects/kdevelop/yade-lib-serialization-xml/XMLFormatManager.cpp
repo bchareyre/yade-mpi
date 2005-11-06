@@ -1,1 +1,0 @@
-../../../src/XMLFormatManager.cpp

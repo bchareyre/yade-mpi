@@ -1,1 +1,0 @@
-../../../src/GLTextLabel.cpp
