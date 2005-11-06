@@ -22,7 +22,7 @@ install:
 	mkdir --parents ${PREFIX_DIR}/${INSTALL_DIR}/lib/yade/${yade_lib_subdir}
 	mkdir --parents ${PREFIX_DIR}/${INSTALL_DIR}/include/yade/${yade_include_subdir}
 	cp --no-dereference bin/* ${PREFIX_DIR}/${INSTALL_DIR}/lib/yade/${yade_lib_subdir}
-	cp src/*.h ${PREFIX_DIR}/${INSTALL_DIR}/include/yade/${yade_include_subdir}
+	cp src/${yade_include_subdir}/*.h ${PREFIX_DIR}/${INSTALL_DIR}/include/yade/${yade_include_subdir}
 
 uninstall:
 	rm -f ${PREFIX_DIR}/${INSTALL_DIR}/lib/yade/${yade_lib_subdir}/lib${yade_libnames_basename}*

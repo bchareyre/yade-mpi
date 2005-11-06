@@ -3,7 +3,7 @@ error( "YADE_QMAKE_PATH internal qmake variable is not set, you should run for e
 }
 
 TEMPLATE=subdirs
-SUBDIRS=yade-spherical-dem-simulator
+SUBDIRS=SphericalDEMSimulator
 CONFIG += debug \
           warn_on
 

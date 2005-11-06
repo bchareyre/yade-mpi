@@ -24,7 +24,7 @@ install:
 	mkdir  --parents ${PREFIX_DIR}/${INSTALL_DIR}/include/yade/${yade_include_subdir}
 	-mkdir --parents ${PREFIX_DIR}/${INSTALL_DIR}/bin
 	cp --no-dereference bin/* ${PREFIX_DIR}/${INSTALL_DIR}/bin
-	cp src/*.hpp ${PREFIX_DIR}/${INSTALL_DIR}/include/yade/${yade_include_subdir}
+	cp src/yade/*.hpp ${PREFIX_DIR}/${INSTALL_DIR}/include/yade/${yade_include_subdir}
 
 uninstall:
 	rm -f ${PREFIX_DIR}/${INSTALL_DIR}/bin/yade
