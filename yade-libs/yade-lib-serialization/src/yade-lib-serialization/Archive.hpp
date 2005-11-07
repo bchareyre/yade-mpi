@@ -1,31 +1,16 @@
-/***************************************************************************
- *   Copyright (C) 2004 by Olivier Galizzi                                 *
- *   olivier.galizzi@imag.fr                                               *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
+/*************************************************************************
+*  Copyright (C) 2004 by Olivier Galizzi                                 *
+*  olivier.galizzi@imag.fr                                               *
+*  Copyright (C) 2004 by Janek Kozicki                                   *
+*  cosurgi@berlios.de                                                    *
+*                                                                        *
+*  This program is free software; it is licensed under the terms of the  *
+*  GNU General Public License v2 or later. See file LICENSE for details. *
+*************************************************************************/
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#ifndef __ARCHIVECONTENT_HPP__
-#define __ARCHIVECONTENT_HPP__
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+#ifndef ARCHIVECONTENT_HPP
+#define ARCHIVECONTENT_HPP
 
 #include <boost/shared_ptr.hpp>
 #include <boost/any.hpp>
@@ -36,23 +21,15 @@
 #include <vector>
 #include <map>
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 #include "SerializationExceptions.hpp"
 #include "ArchiveTypes.hpp"
 #include "SerializableTypes.hpp"
 #include "SerializableSingleton.hpp"
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 using namespace boost;
 using namespace std;
 using namespace ArchiveTypes;
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 // FIXME - if you are doing major rewrite of Serialization, check if following macro
 // could make good use of Loki::OrderedTypeInfo
@@ -69,9 +46,6 @@ using namespace ArchiveTypes;
 								type,			\
 								isFundamental );
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 /*! \brief Abstract representation of a class attributes.
 
 	This class is designed for serialization purpose. For each attribute of a class to serialize, an Archive
@@ -85,12 +59,11 @@ using namespace ArchiveTypes;
 	All this serialization stuff needs rewriting, especially class Archive is a total mess. Rewriting should
 	make it clean, while preserving original client interface.
 */
+
 class Archive
 {
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Attributes											///
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/*! Pointer to a function that build the archive of the next element in the container. So it means
 	that the current archive represent a attribute that is a container (std::vector ....)
@@ -181,9 +154,7 @@ class Archive
 	/*! <a href="../ArchiveTypes.html">Type</a> of the attribute represented by the current archive */
 	private   : SerializableTypes::Type recordType;
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Constructor/Destructor									///
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /*! @name Constructor/Destructor function*/
 //@{
@@ -207,9 +178,7 @@ class Archive
 	 	    static inline shared_ptr<Archive> create(const string& name,Type& attribute);
 //@}
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
 /// Method											///
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /*! @name Getters and setters*/
 //@{
@@ -275,9 +244,7 @@ class Archive
 	/*! Description of a class that is stored inside the factory.*/
 	private   : class SerializableDescriptor
 		    {
-			///////////////////////////////////////////////////////////////////////////
 			/// Attributes								///
-			///////////////////////////////////////////////////////////////////////////
 
 			/*! Used by the findType method to test the type of the class and know if it is a Factorable (i.e. Factorable) or Custom class*/
 			public    : VerifyFactorableFnPtr verify;
@@ -286,9 +253,7 @@ class Archive
 			/*! fundamental is true the class type is a fundamtental type (e.g. Vector3, Quaternion) */
 			public    : bool fundamental;
 
-			///////////////////////////////////////////////////////////////////////////
 			/// Constructor/Destructor						///
-			///////////////////////////////////////////////////////////////////////////
 
 			/*! Empty constructor */
 			public    : SerializableDescriptor() {};
@@ -308,16 +273,8 @@ class Archive
 	public    : static bool registerSerializableDescriptor( string name, VerifyFactorableFnPtr verify, SerializableTypes::Type type, bool f);
 	public    : static bool findClassInfo(const type_info& tp,SerializableTypes::Type& type, string& serializableClassName,bool& fundamental);
 
-
-
 };
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "Archive.tpp"
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-#endif // __ARCHIVECONTENT_HPP__
+#endif // ARCHIVECONTENT_HPP

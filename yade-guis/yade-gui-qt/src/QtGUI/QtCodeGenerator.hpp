@@ -1,121 +1,62 @@
-/***************************************************************************
- *   Copyright (C) 2004 by Olivier Galizzi                                 *
- *   olivier.galizzi@imag.fr                                               *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
+/*************************************************************************
+*  Copyright (C) 2004 by Olivier Galizzi                                 *
+*  olivier.galizzi@imag.fr                                               *
+*                                                                        *
+*  This program is free software; it is licensed under the terms of the  *
+*  GNU General Public License v2 or later. See file LICENSE for details. *
+*************************************************************************/
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-#ifndef __QTCODEGENERATOR_HPP__
-#define __QTCODEGENERATOR_HPP__
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+#ifndef QTCODEGENERATOR_HPP
+#define QTCODEGENERATOR_HPP
 
 #include <QtGeneratedCodeGenerator.h>
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 #include <yade/yade-lib-factory/Factorable.hpp>
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 #include <string>
 #include <fstream>
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 using namespace std;
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-/*! \brief 
-
-	
-*/
 class QtCodeGenerator : public QtGeneratedCodeGenerator, public Factorable
 {
+	private :
+		string baseDataClass;
+		string baseEngineClass;
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-/// Attributes											///
-///////////////////////////////////////////////////////////////////////////////////////////////////
+		void writeHeader(ofstream& s, const string& name, const string& email);
+		void writeSperarationLines(ofstream& s);
+		void writeIfDef(ofstream& s,bool start);
+		void writeIfDef(ofstream& s, const string& name, bool start);
+		bool testDirectory(const string& dirName,const string& className);
+		void writeAttributesArea(ofstream& s);
+		void writeMethodsArea(ofstream& s);
+		void writeConstructorDestructorArea(ofstream& s);
+		void writeSerializationArea(ofstream& s);
+		void writePutYourCodeHereArea(ofstream& s, int nbTabs=0);
 
-	private : string baseDataClass;
-	private : string baseEngineClass;
+	public :
+		QtCodeGenerator (QWidget * parent = 0, const char * name = 0 );
+		virtual ~QtCodeGenerator ();
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-/// Constructor/Destructor									///
-///////////////////////////////////////////////////////////////////////////////////////////////////
-	
-	/*! Constructor */
-	public : QtCodeGenerator (QWidget * parent = 0, const char * name = 0 );
+ 	public slots :
+		virtual void bgDataTypeClicked(int);
+ 		virtual void pbDataPathClicked();
+		virtual void pbGenerateDataClassClicked();
+		virtual void pbLoadDataClassClicked();
+		virtual void pbSaveDataClassClicked();
 
-	/*! Destructor */
-	public : virtual ~QtCodeGenerator ();
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-/// Methods											///
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-	private : void writeHeader(ofstream& s, const string& name, const string& email);
-	private : void writeSperarationLines(ofstream& s);
-	private : void writeIfDef(ofstream& s,bool start);
-	private : void writeIfDef(ofstream& s, const string& name, bool start);
-	private : bool testDirectory(const string& dirName,const string& className);
-	private : void writeAttributesArea(ofstream& s);
-	private : void writeMethodsArea(ofstream& s);
-	private : void writeConstructorDestructorArea(ofstream& s);
-	private : void writeSerializationArea(ofstream& s);
-	private : void writePutYourCodeHereArea(ofstream& s, int nbTabs=0);
-	
- 	public slots : virtual void bgDataTypeClicked(int);
- 	public slots : virtual void pbDataPathClicked();
-	public slots : virtual void pbGenerateDataClassClicked();
-	public slots : virtual void pbLoadDataClassClicked();
-	public slots : virtual void pbSaveDataClassClicked();
-
-	public slots : virtual void bgEngineTypeClicked(int);
-	public slots : virtual void pbEnginePathClicked();
-	public slots : virtual void pbGenerateEngineClassClicked();
-	public slots : virtual void pbAddEngineUnitParamClicked();
-	public slots : virtual void pbAddMetaEngineParamClicked();
-	public slots : virtual void pbSaveEngineClassClicked();
-	public slots : virtual void pbLoadEngineClassClicked();
+		virtual void bgEngineTypeClicked(int);
+		virtual void pbEnginePathClicked();
+		virtual void pbGenerateEngineClassClicked();
+		virtual void pbAddEngineUnitParamClicked();
+		virtual void pbAddMetaEngineParamClicked();
+		virtual void pbSaveEngineClassClicked();
+		virtual void pbLoadEngineClassClicked();
 
 	REGISTER_CLASS_NAME(QtCodeGenerator);
 	REGISTER_BASE_CLASS_NAME(Factorable);
-
 };
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 REGISTER_FACTORABLE(QtCodeGenerator);
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-#endif // __QTCODEGENERATOR_HPP__
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+#endif // QTCODEGENERATOR_HPP
 

@@ -1,52 +1,23 @@
-/***************************************************************************
- *   Copyright (C) 2004 by Janek Kozicki                                   *
- *   cosurgi@berlios.de                                                    *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
- 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+/*************************************************************************
+*  Copyright (C) 2004 by Janek Kozicki                                   *
+*  cosurgi@berlios.de                                                    *
+*                                                                        *
+*  This program is free software; it is licensed under the terms of the  *
+*  GNU General Public License v2 or later. See file LICENSE for details. *
+*************************************************************************/
 
-#ifndef __OPENGLWRAPPER_HPP__
-#define __OPENGLWRAPPER_HPP__
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+#ifndef OPENGLWRAPPER_HPP
+#define OPENGLWRAPPER_HPP
 
 #include <yade/yade-lib-wm3-math/Vector3.hpp>
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <GL/gl.h>
 #include <GL/glut.h>
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 template <bool> struct static_assert;
 template <> struct static_assert<true> {};
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///	Primary Templates									///
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
+///	Primary Templates
 
 template< typename Type > inline GLAPI void GLAPIENTRY glRotate		( Type ,Type ,Type , Type  )	{	static_assert<false> GL_OpenGLWrapper_bad_type;(void) GL_OpenGLWrapper_bad_type; };
 template< typename Type > inline GLAPI void GLAPIENTRY glScale		( Type ,Type , Type  )		{	static_assert<false> GL_OpenGLWrapper_bad_type;(void) GL_OpenGLWrapper_bad_type; };
@@ -84,11 +55,7 @@ template< typename Type > inline GLAPI void GLAPIENTRY glMaterial	( GLenum face,
 template< typename Type > inline GLAPI void GLAPIENTRY glMaterialv	( GLenum face, GLenum pname, Type param ){	static_assert<false> GL_OpenGLWrapper_bad_type;(void) GL_OpenGLWrapper_bad_type; };
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///	Template Specializations								///
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+///	Template Specializations
 
 
 template< > inline GLAPI void GLAPIENTRY glRotate< double >			(double angle,double x,double y, double z )	{	glRotated(angle,x,y,z);	};
@@ -278,11 +245,7 @@ template< > inline GLAPI void GLAPIENTRY glMaterialv< Vector3<float> >		( GLenum
 template< > inline GLAPI void GLAPIENTRY glMaterialv< Vector3<int> >		( GLenum face, GLenum pname, const Vector3<int> params )	{	glMaterialiv(face,pname,params);	};
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///	Functions Not Coverted									///
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+///	Functions Not Coverted
 
 /*
 GLAPI void GLAPIENTRY glRectdv( const GLdouble *v1, const GLdouble *v2 );
@@ -512,10 +475,5 @@ GLAPI void GLAPIENTRY glWindowPos4fvMESA( const GLfloat *p );
 GLAPI void GLAPIENTRY glWindowPos4dvMESA( const GLdouble *p );
 */
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+#endif // OPENGLWRAPPER_HPP
 
-#endif // __OPENGLWRAPPER_HPP__
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////

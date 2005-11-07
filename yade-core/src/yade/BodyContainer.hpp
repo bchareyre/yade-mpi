@@ -1,104 +1,68 @@
-/***************************************************************************
- *   Copyright (C) 2004 by Olivier Galizzi                                 *
- *   olivier.galizzi@imag.fr                                               *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
+/*************************************************************************
+*  Copyright (C) 2004 by Olivier Galizzi                                 *
+*  olivier.galizzi@imag.fr                                               *
+*  Copyright (C) 2004 by Janek Kozicki                                   *
+*  cosurgi@berlios.de                                                    *
+*                                                                        *
+*  This program is free software; it is licensed under the terms of the  *
+*  GNU General Public License v2 or later. See file LICENSE for details. *
+*************************************************************************/
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#ifndef __BODYCONTAINER_HPP__
-#define __BODYCONTAINER_HPP__
+#ifndef BODYCONTAINER_HPP
+#define BODYCONTAINER_HPP
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <yade/yade-lib-serialization/Serializable.hpp>
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "BodyContainerIteratorPointer.hpp"
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 class Body;
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 using namespace boost;
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 class BodyContainer : public Serializable
 {
-	public    : BodyContainer();
-	public    : virtual ~BodyContainer();
+	public :
+		BodyContainer();
+		virtual ~BodyContainer();
 
-	//FIXME : use const shared_ptr<Body>&
-	public    : virtual unsigned int insert(shared_ptr<Body>&)			{throw;};
-	public    : virtual unsigned int insert(shared_ptr<Body>& , unsigned int)	{throw;};
-	public    : virtual void clear() 						{throw;};
-	public    : virtual bool erase(unsigned int) 					{throw;};
-	public    : virtual bool find(unsigned int , shared_ptr<Body>&) const		{throw;};
-	public    : virtual shared_ptr<Body>& operator[](unsigned int)			{throw;};
-	public    : virtual const shared_ptr<Body>& operator[](unsigned int) const	{throw;};
+	
+		virtual unsigned int insert(shared_ptr<Body>&)			{throw;}; //FIXME : use const shared_ptr<Body>&
+		virtual unsigned int insert(shared_ptr<Body>& , unsigned int)	{throw;};
+		virtual void clear() 						{throw;};
+		virtual bool erase(unsigned int) 				{throw;};
+		virtual bool find(unsigned int , shared_ptr<Body>&) const	{throw;};
+		virtual shared_ptr<Body>& operator[](unsigned int)		{throw;};
+		virtual const shared_ptr<Body>& operator[](unsigned int) const	{throw;};
+		
+		typedef BodyContainerIteratorPointer iterator;
+		virtual BodyContainer::iterator begin()				{throw;};
+		virtual BodyContainer::iterator end()				{throw;};
+		
+		virtual unsigned int size() 					{throw;};
 
-	public    : typedef BodyContainerIteratorPointer iterator;
-        public    : virtual BodyContainer::iterator begin()				{throw;};
-        public    : virtual BodyContainer::iterator end()				{throw;};
+	protected :
+		void setId(shared_ptr<Body>& , unsigned int);
 
-	public    : virtual unsigned int size() 					{throw;};
-
-	// looping over the data
-//	public    : virtual void gotoFirst() 						{throw;};
-//	public    : virtual bool notAtEnd() 						{throw;};
-//	public    : virtual void gotoNext() 						{throw;};
-//	public    : virtual shared_ptr<Body>& getCurrent()	 			{throw;};
-//	public    : virtual void pushIterator()			 			{throw;};
-//	public    : virtual void popIterator()			 			{throw;};
-
-
-	protected : void setId(shared_ptr<Body>& , unsigned int);
-
-	// serialization of this class...
 	REGISTER_CLASS_NAME(BodyContainer);
 	REGISTER_BASE_CLASS_NAME(Serializable);
 
 	// local storage for uniform serialization of all possible container concrete implementations.
-	private   : vector<shared_ptr<Body> > body; 
-	
-	public    : virtual void registerAttributes();
-	protected : virtual void preProcessAttributes(bool deserializing);
-	protected : virtual void postProcessAttributes(bool deserializing);
+	private :
+		vector<shared_ptr<Body> > body; 
+	public :
+		virtual void registerAttributes();
+	protected :
+		virtual void preProcessAttributes(bool deserializing);
+		virtual void postProcessAttributes(bool deserializing);
 };
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 REGISTER_SERIALIZABLE(BodyContainer,false);
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 #endif // __BODYCONTAINER_HPP__
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////

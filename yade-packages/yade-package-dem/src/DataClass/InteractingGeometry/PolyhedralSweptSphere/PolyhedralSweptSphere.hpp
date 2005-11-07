@@ -1,101 +1,53 @@
-/***************************************************************************
- *   Copyright (C) 2004 by Olivier Galizzi                                 *
- *   olivier.galizzi@imag.fr                                               *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
+/*************************************************************************
+*  Copyright (C) 2004 by Olivier Galizzi                                 *
+*  olivier.galizzi@imag.fr                                               *
+*                                                                        *
+*  This program is free software; it is licensed under the terms of the  *
+*  GNU General Public License v2 or later. See file LICENSE for details. *
+*************************************************************************/
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+#ifndef POLYHEDRALSWEPTSPHERE_HPP
+#define POLYHEDRALSWEPTSPHERE_HPP
 
-#ifndef __POLYHEDRALSWEPTSPHERE_HPP__
-#define __POLYHEDRALSWEPTSPHERE_HPP__
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <yade/yade-core/InteractingGeometry.hpp>
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 class PolyhedralSweptSphere : public InteractingGeometry
 {
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-/// Attributes											///
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 	private : 
-	
-	struct ltPair
-	{
-		bool operator()(const pair<int,int>& p1, const pair<int,int>& p2)
+		struct ltPair
 		{
-			
-			return ((p1.first<p2.first) || (p1.first==p2.first && p1.second<p2.second));
-		}
-	};
+			bool operator()(const pair<int,int>& p1, const pair<int,int>& p2)
+			{
+				
+				return ((p1.first<p2.first) || (p1.first==p2.first && p1.second<p2.second));
+			}
+		};
 
-	public : vector<Vector3r> vertices;
-	public : vector<vector<int> > faces;
-	public : vector<pair<int,int> > edges;
-	public : float radius;
-	public : Real minEdge;
+	public :
+		vector<Vector3r>	vertices;
+		vector<vector<int> >	faces;
+		vector<pair<int,int> >	edges;
+		float			radius;
+		Real			minEdge;
 	
-///////////////////////////////////////////////////////////////////////////////////////////////////
-/// Constructor/Destructor									///
-///////////////////////////////////////////////////////////////////////////////////////////////////
+		PolyhedralSweptSphere();
+		virtual ~PolyhedralSweptSphere();
+		void computeEdges();
 
-	/*! Constructor */
-	public : PolyhedralSweptSphere();
-
-	/*! Destructor */
-	public : virtual ~PolyhedralSweptSphere();
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-/// Serialization										///
-///////////////////////////////////////////////////////////////////////////////////////////////////
-	
+/// Serialization
+	protected :
+		virtual void postProcessAttributes(bool deserializing);
+		virtual void registerAttributes();
 	REGISTER_CLASS_NAME(PolyhedralSweptSphere);
 	REGISTER_BASE_CLASS_NAME(InteractingGeometry);
 
-	public : void registerAttributes();
-	protected : virtual void postProcessAttributes(bool deserializing);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-/// Methods											///
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-	public  : void computeEdges();
-
 	REGISTER_CLASS_INDEX(PolyhedralSweptSphere,InteractingGeometry);
-
 };
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 REGISTER_SERIALIZABLE(PolyhedralSweptSphere,false);
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-#endif // __POLYHEDRALSWEPTSPHERE_HPP__
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+#endif // POLYHEDRALSWEPTSPHERE_HPP
 

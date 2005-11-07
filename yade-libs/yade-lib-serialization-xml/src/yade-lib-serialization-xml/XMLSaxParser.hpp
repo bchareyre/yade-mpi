@@ -1,81 +1,53 @@
-/***************************************************************************
- *   Copyright (C) 2004 by Olivier Galizzi                                 *
- *   olivier.galizzi@imag.fr                                               *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
+/*************************************************************************
+*  Copyright (C) 2004 by Olivier Galizzi                                 *
+*  olivier.galizzi@imag.fr                                               *
+*                                                                        *
+*  This program is free software; it is licensed under the terms of the  *
+*  GNU General Public License v2 or later. See file LICENSE for details. *
+*************************************************************************/
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-#ifndef __XMLSAXPARSER_H__
-#define __XMLSAXPARSER_H__
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+#ifndef XMLSAXPARSER_HPP
+#define XMLSAXPARSER_HPP
 
 #include <map>
 #include <vector>
 #include <string>
 #include <iostream>
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 using namespace std;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 class XmlSaxParser
 {
-	private   : map< string , string > basicAttributes;
-	private   : string currentXmlLine;
-	private   : string currentLineCopy;
-	private   : string tagName;
-	private   : int lineLength;
+	private :
+		map< string , string > basicAttributes;
+		string currentXmlLine;
+		string currentLineCopy;
+		string tagName;
+		int lineLength;
 
-	private   : unsigned long int lineNumber;
-	public    : unsigned long int getLineNumber();
+		unsigned long int lineNumber;
+		int findCar(int i,char c);
+		bool isWhiteSpace(char c);
 
-	// construction
-	public    : XmlSaxParser ();
-	public    : virtual ~XmlSaxParser ();
+	public :
+		unsigned long int getLineNumber();
 
+		XmlSaxParser ();
+		virtual ~XmlSaxParser ();
 
-	public    : bool readNextXmlLine(istream& stream);
-	public    : string readNextFundamentalStringValue(istream& stream);
-	public    : void parseCurrentXmlLine();
-	public    : bool readAndParseNextXmlLine(istream& stream);
-	public    : bool isFullTag();
-	public    : bool isOpeningTag();
-	public    : bool isClosingTag();
-	public    : bool isComment();
-	public    : string getTagName();
-	public    : string getArgumentValue(const string& argName);
-	public    : const map<string,string>& getBasicAttributes();
-	public    : void deleteBasicAttribute(const string& name);
-	private   : int findCar(int i,char c);
-	private   : bool isWhiteSpace(char c);
+		bool readNextXmlLine(istream& stream);
+		string readNextFundamentalStringValue(istream& stream);
+		void parseCurrentXmlLine();
+		bool readAndParseNextXmlLine(istream& stream);
+		bool isFullTag();
+		bool isOpeningTag();
+		bool isClosingTag();
+		bool isComment();
+		string getTagName();
+		string getArgumentValue(const string& argName);
+		const map<string,string>& getBasicAttributes();
+		void deleteBasicAttribute(const string& name);
 };
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+#endif // XMLSAXPARSER_HPP
 
-#endif // __XMLSAXPARSER_H__
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -1,36 +1,17 @@
-/***************************************************************************
- *   Copyright (C) 2004 by Olivier Galizzi                                 *
- *   olivier.galizzi@imag.fr                                               *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
+/*************************************************************************
+*  Copyright (C) 2004 by Olivier Galizzi                                 *
+*  olivier.galizzi@imag.fr                                               *
+*  Copyright (C) 2004 by Janek Kozicki                                   *
+*  cosurgi@berlios.de                                                    *
+*                                                                        *
+*  This program is free software; it is licensed under the terms of the  *
+*  GNU General Public License v2 or later. See file LICENSE for details. *
+*************************************************************************/
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-#ifndef __BODY_HPP__
-#define __BODY_HPP__
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+#ifndef BODY_HPP
+#define BODY_HPP
 
 #include <iostream>
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "GeometricalModel.hpp"
 #include "InteractingGeometry.hpp"
@@ -40,35 +21,20 @@
 #include "Interaction.hpp"
 #include "PhysicalActionContainer.hpp"
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 #include <yade/yade-lib-wm3-math/Se3.hpp>
 #include <yade/yade-lib-serialization/Serializable.hpp>
 #include <yade/yade-lib-multimethods/Indexable.hpp>
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
-//class Engine;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-/*! \brief Abstract interface for bodies stored in BodyContainer
-
-	BodyContainer can store MetaBody and Body, both derived from Body
+/*! \brief Abstract interface for bodies stored in BodyContainer, Body represents the atomic element of simulation.
 */
 
 class Body : public Serializable
 {
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-/// Attributes											///
-///////////////////////////////////////////////////////////////////////////////////////////////////
+/// Attributes
 	private	: unsigned int id;
 	public	: unsigned int getId() const {return id;};
-
 
 	// group to which body belongs (maybe vector<int> , to allow multiple groups?)
 
@@ -80,61 +46,37 @@ class Body : public Serializable
 	private : int groupMask;
 	public  : int getGroupMask() {return groupMask; };
 
-	
-	
 	// only BodyContainer can set the id of a body
 	friend class BodyContainer;
 
-		
-	/*! Mechanical parameters of the body (mass, sitffness ...) */
-	public : shared_ptr<PhysicalParameters> physicalParameters;
-
-	/*! The geometrical model of this body (polyhedron, box ...) */
-	public : shared_ptr<GeometricalModel> geometricalModel;
+	public : // FIXME - should be private ...
+		shared_ptr<PhysicalParameters>	physicalParameters;	/// mass, sitffness
+		shared_ptr<GeometricalModel>	geometricalModel;	/// Polyhedron, Box
+		shared_ptr<InteractingGeometry> interactionGeometry;	/// sphere hierarchy, InteractingBox
+		shared_ptr<BoundingVolume>	boundingVolume;		/// AABB, K-Dop
 	
-	/*! The interaction model of this body (sphere hierarchy, box ...) */
-	public : shared_ptr<InteractingGeometry> interactionGeometry;
-	
-	/*! The bounding volume of this body (AABB, K-Dop ...) */
-	public : shared_ptr<BoundingVolume> boundingVolume;
-	
-
-	// FIXME : should be determined automatically or not ?? if the body has a subscription to a kinematic engine then it is not dynamic but maybe a body with no subscription can be not dynamic ??
+	// FIXME : should be determined automatically or not ?? if the body has a subscription to a
+	// kinematic engine then it is not dynamic but maybe a body with no subscription can be not dynamic ??
 	/*! isDynamic is true if the state of the body is not modified by a kinematicEngine. It is useful
 	for example for collision detection : if two colliding bodies are only kinematic then it is useless to
 	modelise their contact */
 	public : bool isDynamic;
 	
-///////////////////////////////////////////////////////////////////////////////////////////////////
-/// Constructor/Destructor									///
-///////////////////////////////////////////////////////////////////////////////////////////////////
+/// Constructor/Destructor
 
-	/*! Constructor */
 	public : Body ();
 	public : Body (unsigned int newId, int newGroup);
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-/// Serialization										///
-///////////////////////////////////////////////////////////////////////////////////////////////////
+/// Serialization
 	
 	REGISTER_CLASS_NAME(Body);
 	REGISTER_BASE_CLASS_NAME(Serializable);
 
-	/*! Tells the IOFormatManager which attributes should be serialized */
 	public : void registerAttributes();
 
 };
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 REGISTER_SERIALIZABLE(Body,false);
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-#endif // __BODY_HPP__
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+#endif // BODY_HPP
 

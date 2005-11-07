@@ -1,94 +1,59 @@
-/***************************************************************************
- *   Copyright (C) 2004 by Olivier Galizzi                                 *
- *   olivier.galizzi@imag.fr                                               *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
+/*************************************************************************
+*  Copyright (C) 2004 by Olivier Galizzi                                 *
+*  olivier.galizzi@imag.fr                                               *
+*                                                                        *
+*  This program is free software; it is licensed under the terms of the  *
+*  GNU General Public License v2 or later. See file LICENSE for details. *
+*************************************************************************/
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-#ifndef __THREADABLE_HPP__
-#define __THREADABLE_HPP__
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////
+#ifndef THREADABLE_HPP
+#define THREADABLE_HPP
 
 #include <boost/thread/thread.hpp>
 #include <boost/thread/condition.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/shared_ptr.hpp>
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
 #include "ThreadSafe.hpp"
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////
 
 using namespace boost;
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
 class ThreadSynchronizer;
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////
 
 template<class Thread>
 class Threadable
 {
-	protected : boost::mutex * mutex;
-	private  : bool  * finished;
-	private  : bool  * blocked;	
-	private  : bool  * singleLoop;	
-	protected : int * turn;
-	private     : shared_ptr<boost::thread> thread;
-	protected   : shared_ptr<ThreadSynchronizer> synchronizer;
+	protected :
+		boost::mutex * mutex;
+		int * turn;
+		shared_ptr<ThreadSynchronizer> synchronizer;
 
-	public    : Threadable(shared_ptr<ThreadSynchronizer> s);
-	public    : virtual ~Threadable();
+	private :
+		bool  * finished;
+		bool  * blocked;	
+		bool  * singleLoop;	
+		shared_ptr<boost::thread> thread;
 
-	public : void operator()();
-	public : void createThread();
-	
-	public    : virtual bool notEnd()  = 0;
-	public    : virtual void oneLoop() = 0;
+	public :
+		Threadable(shared_ptr<ThreadSynchronizer> s);
+		virtual ~Threadable();
 
-	public    : void sleep(int ms);
-	public    : void join();
-	public    : void start();
-	public    : void stop();
-	public    : bool isStopped();
-	public    : void doOneLoop();
-	public : void finish();
+		void operator()();
+		void createThread();
+		
+		virtual bool notEnd()  = 0;
+		virtual void oneLoop() = 0;
+
+		void sleep(int ms);
+		void join();
+		void start();
+		void stop();
+		bool isStopped();
+		void doOneLoop();
+		void finish();
 
 };
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
 #include "Threadable.tpp"
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////
+#endif // THREADABLE_HPP
 
-#endif // __THREADABLE_HPP__
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////

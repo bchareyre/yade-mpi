@@ -1,114 +1,55 @@
-/***************************************************************************
- *   Copyright (C) 2005 by Olivier Galizzi   *
- *   olivier.galizzi@imag.fr   *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
+/*************************************************************************
+*  Copyright (C) 2004 by Olivier Galizzi                                 *
+*  olivier.galizzi@imag.fr                                               *
+*                                                                        *
+*  This program is free software; it is licensed under the terms of the  *
+*  GNU General Public License v2 or later. See file LICENSE for details. *
+*************************************************************************/
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-#ifndef __PHYSICALACTIONCONTAINERITERATORPOINTER__
-#define __PHYSICALACTIONCONTAINERITERATORPOINTER__
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#ifndef PHYSICALACTIONCONTAINERITERATORPOINTER_HPP
+#define PHYSICALACTIONCONTAINERITERATORPOINTER_HPP
 
 #include "PhysicalActionContainerIterator.hpp"
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 class PhysicalActionContainerIteratorPointer
 {
-	private : shared_ptr<PhysicalActionContainerIterator> ptr;
-	public  : PhysicalActionContainerIterator& getRef() {return *ptr;};
-	public  : PhysicalActionContainerIterator& getRef() const {return *ptr;};
-	public  : shared_ptr<PhysicalActionContainerIterator> get() {return ptr;};
-	public  : shared_ptr<PhysicalActionContainerIterator> get() const {return ptr;};
+	private :
+		shared_ptr<PhysicalActionContainerIterator> ptr;
+		void allocate(const PhysicalActionContainerIteratorPointer& bi)
+		{
+			if (ptr==0) ptr = bi.get()->createPtr();
+		}
 
+	public :
+		PhysicalActionContainerIterator& getRef() {return *ptr;};
+		PhysicalActionContainerIterator& getRef() const {return *ptr;};
+		shared_ptr<PhysicalActionContainerIterator> get() {return ptr;};
+		shared_ptr<PhysicalActionContainerIterator> get() const {return ptr;};
 
-	public  : PhysicalActionContainerIteratorPointer(const PhysicalActionContainerIteratorPointer& bi) 
-	{
-		allocate(bi);
-		ptr->affect(bi.getRef());
-	};
+		PhysicalActionContainerIteratorPointer(const PhysicalActionContainerIteratorPointer& bi)
+		{
+			allocate(bi);
+			ptr->affect(bi.getRef());
+		};
 
-	public  : PhysicalActionContainerIteratorPointer(const shared_ptr<PhysicalActionContainerIterator>& i)
-	{
-		ptr = i;
-	};
+		PhysicalActionContainerIteratorPointer(const shared_ptr<PhysicalActionContainerIterator>& i) { ptr = i; };
+		PhysicalActionContainerIteratorPointer()  { ptr = shared_ptr<PhysicalActionContainerIterator>(); };
+		bool operator!=(const PhysicalActionContainerIteratorPointer& bi) { return ptr->isDifferent(bi.getRef()); };
 
-	public  : PhysicalActionContainerIteratorPointer() 
-	{
-		ptr = shared_ptr<PhysicalActionContainerIterator>();
-	};
+		PhysicalActionContainerIteratorPointer& operator=(const PhysicalActionContainerIteratorPointer& bi)
+		{
+			allocate(bi);
+			ptr->affect(bi.getRef());
+			return *this;
+		};
 
-	private : void allocate(const PhysicalActionContainerIteratorPointer& bi)
-	{
-		if (ptr==0)
-			ptr = bi.get()->createPtr();
-	}
-
-	public  : bool operator!=(const PhysicalActionContainerIteratorPointer& bi)
-	{
-		return ptr->isDifferent(bi.getRef());
-	};
-
-	public  : PhysicalActionContainerIteratorPointer& operator++()
-	{
-		ptr->increment();
-		return *this;
-	};
-
-//	public  : PhysicalActionContainerIteratorPointer& operator++(int)
-//	{
-		// FIXME - this is bad. because it returns incremented value.
-		//         the real solution is to copy whole class (duplicate in memory)
-		//         but it is ineffective. so it's better to disable this operator.
-//		PhysicalActionContainerIteratorPointer& tmp = *this;
-//		ptr->increment();
-//		return tmp;
-//	};
-
-	public  : PhysicalActionContainerIteratorPointer& operator=(const PhysicalActionContainerIteratorPointer& bi)
-	{
-		allocate(bi);
-			
-		ptr->affect(bi.getRef());
-		return *this;
-	};
-
-	public  : shared_ptr<PhysicalAction> operator*()
-	{
-		return ptr->getValue();
-	};
-
-	public : int getCurrentIndex()
-	{
-		return ptr->getCurrentIndex();
-	};
+		PhysicalActionContainerIteratorPointer& operator++()	{ ptr->increment(); return *this; };
+		PhysicalActionContainerIteratorPointer& operator++(int);  // disabled
+		shared_ptr<PhysicalAction> operator*()			{ return ptr->getValue(); };
+		int getCurrentIndex()					{ return ptr->getCurrentIndex(); };
 
 };
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 #endif // __PHYSICALACTIONCONTAINERITERATORPOINTER__
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

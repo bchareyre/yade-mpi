@@ -1,100 +1,63 @@
-/***************************************************************************
- *   Copyright (C) 2004 by Olivier Galizzi                                 *
- *   olivier.galizzi@imag.fr                                               *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
- 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+/*************************************************************************
+*  Copyright (C) 2004 by Olivier Galizzi                                 *
+*  olivier.galizzi@imag.fr                                               *
+*                                                                        *
+*  This program is free software; it is licensed under the terms of the  *
+*  GNU General Public License v2 or later. See file LICENSE for details. *
+*************************************************************************/
 
-#ifndef __FPSTRACKER_H__
-#define __FPSTRACKER_H__
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+#ifndef FPSTRACKER_HPP
+#define FPSTRACKER_HPP
 
 #include <list>
 #include <vector>
 #include <string>
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 #include <yade/yade-lib-time/Chrono.hpp>
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "GLWindow.hpp"
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 using namespace std;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 class FpsTracker : public GLWindow
 {	
+	private :
+		Chrono		chron;	
+	
+		std::list<std::pair<float,float> > fpss;
+		int		fpssSize;
+		
+		float		 fps
+				,moyFps
+				,minFps
+				,maxFps
+				,lastTime
+				,currentTime
+				,curveColor[3]
+				,moyColor[3]
+				,minTime
+				,maxStoredPoints;
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-/// Attributes											///
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-	private : Chrono chron;	
+		int		 nbActions
+				,minNbActions;
+		
+		
+		void glDrawInsideWindow();
+		void drawCurve();
+		void updateMoy(float lastX, float lastY, float X, float Y);
+		void drawString(string str,int x,int y,float * c);
 	
-	private : std::list<std::pair<float,float> > fpss;
-	private : int fpssSize;
+	public :
+		void setCurveColor(float r, float g, float b) { curveColor[0] = r; curveColor[1] = g; curveColor[2] = b;};	
+		void setMoyColor(float r, float g, float b) { moyColor[0] = r; moyColor[1] = g; moyColor[2] = b;};	
+		void setMinNbActions(int n) { minNbActions = n;};	
+		void setMinTime(float n) { minTime = n;};	
+		void setMaxStoredPoints(int n) { maxStoredPoints = n;};	
 	
-	private : float fps;
-	private : float moyFps;
-	private : float minFps;
-	private : float maxFps;
-	private : int nbActions;		
-	private : float lastTime;
-	private : float currentTime;
-	
-	private : float curveColor[3];
-	public  : void setCurveColor(float r, float g, float b) { curveColor[0] = r; curveColor[1] = g; curveColor[2] = b;};	
-	private : float moyColor[3];	
-	public  : void setMoyColor(float r, float g, float b) { moyColor[0] = r; moyColor[1] = g; moyColor[2] = b;};	
-	private : int minNbActions;
-	public  : void setMinNbActions(int n) { minNbActions = n;};	
-	private : float minTime;
-	public  : void setMinTime(float n) { minTime = n;};	
-	private : float maxStoredPoints;
-	public  : void setMaxStoredPoints(int n) { maxStoredPoints = n;};	
-	
-	private : void glDrawInsideWindow();
-	private : void drawCurve();
-	private : void updateMoy(float lastX, float lastY, float X, float Y);
-	private : void drawString(string str,int x,int y,float * c);
-	
-	// construction
-	public : FpsTracker (int minX=10, int minY=10, int sizeX=100, int sizeY=100);
-	public : virtual ~FpsTracker ();
-	public : inline void addOneAction() { nbActions++;};
+		FpsTracker (int minX=10, int minY=10, int sizeX=100, int sizeY=100);
+		virtual ~FpsTracker ();
+		inline void addOneAction() { nbActions++;};
 };
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+#endif // FPSTRACKER_HPP
 
-#endif // __FPSTRACKER_H__
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -1,79 +1,39 @@
-/***************************************************************************
- *   Copyright (C) 2004 by Janek Kozicki                                   *
- *   cosurgi@berlios.de                                                    *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+/*************************************************************************
+*  Copyright (C) 2004 by Janek Kozicki                                   *
+*  cosurgi@berlios.de                                                    *
+*                                                                        *
+*  This program is free software; it is licensed under the terms of the  *
+*  GNU General Public License v2 or later. See file LICENSE for details. *
+*************************************************************************/
 
 #ifndef FEM_NODE_PARAMETERS_HPP 
 #define FEM_NODE_PARAMETERS_HPP 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 #include <yade/yade-package-common/ParticleParameters.hpp>
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 class FEMNodeData : public ParticleParameters
 {
-///////////////////////////////////////////////////////////////////////////////////////////////////
-/// Attributes 											///
-///////////////////////////////////////////////////////////////////////////////////////////////////
+/// Attributes 
 	
-	public: Vector3r initialPosition; // mayber this should be stored in FEMTetrahedron? (but then this data will be stored multiple times, since each tetrahedron will copy the same coordinades for each of its nodes...)
+	public :
+		Vector3r initialPosition; // maybe this should be stored in FEMTetrahedron? (but then this data will be stored multiple times, since each tetrahedron will copy the same coordinades for each of its nodes...)
 	
-///////////////////////////////////////////////////////////////////////////////////////////////////
-/// Methods 											///
-///////////////////////////////////////////////////////////////////////////////////////////////////
+/// Methods 
+		FEMNodeData();
+		virtual ~FEMNodeData();
 
-	public : FEMNodeData();
-	public : virtual ~FEMNodeData();
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-/// Serialization										///
-///////////////////////////////////////////////////////////////////////////////////////////////////
-	
+/// Serialization
+	protected :
+		void registerAttributes();
 	REGISTER_CLASS_NAME(FEMNodeData);
 	REGISTER_BASE_CLASS_NAME(ParticleParameters);
-
-	public : void registerAttributes();
 	
-///////////////////////////////////////////////////////////////////////////////////////////////////
-/// Indexable											///
-///////////////////////////////////////////////////////////////////////////////////////////////////
-	
+/// Indexable
 	REGISTER_CLASS_INDEX(FEMNodeData,ParticleParameters);
 
 };
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 REGISTER_SERIALIZABLE(FEMNodeData,false);
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-#endif // __LATTICENODEPARAMETERS_HPP__
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+#endif // FEM_NODE_PARAMETERS_HPP
 

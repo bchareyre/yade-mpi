@@ -1,99 +1,70 @@
-/***************************************************************************
- *   Copyright (C) 2004 by Olivier Galizzi                                 *
- *   olivier.galizzi@imag.fr                                               *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
+/*************************************************************************
+*  Copyright (C) 2004 by Olivier Galizzi                                 *
+*  olivier.galizzi@imag.fr                                               *
+*                                                                        *
+*  This program is free software; it is licensed under the terms of the  *
+*  GNU General Public License v2 or later. See file LICENSE for details. *
+*************************************************************************/
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-#ifndef __SIMULATIONCONTROLLER_H__
-#define __SIMULATIONCONTROLLER_H__
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+#ifndef SIMULATIONCONTROLLER_HPP
+#define SIMULATIONCONTROLLER_HPP
 
 #include <yade/yade-lib-opengl/GLWindowsManager.hpp>
 #include <yade/yade-lib-serialization-qt/QtGUIGenerator.hpp>
 #include <yade/yade-core/RenderingEngine.hpp>
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 #include <qlayout.h>
 #include <qframe.h>
 #include <qscrollview.h>
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 #include "GLViewer.hpp"
 #include "QtGeneratedSimulationController.h"
 #include "SimulationControllerUpdater.hpp"
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 class SimulationController : public QtGeneratedSimulationController
 {
+	private :
+		boost::mutex mutex;
 
-	public :  bool changeSkipTimeStepper, skipTimeStepper, changeTimeStep,wasUsingTimeStepper;
-	private : boost::mutex mutex;
-	private : QtGUIGenerator guiGen;	
-	private : QWidget * parentWorkspace;	
-	private : shared_ptr<RenderingEngine> renderer;
-	private : map<int,GLViewer* > glViews;
-	private : int maxNbViews;
-		
-	private : shared_ptr<SimulationControllerUpdater> updater;
-
-	private : QScrollView * scrollView;
-	private : QFrame * scrollViewFrame;
-	private : QVBoxLayout* scrollViewLayout;
+		QtGUIGenerator guiGen;	
+		QWidget * parentWorkspace;	
+		shared_ptr<RenderingEngine> renderer;
+		map<int,GLViewer* > glViews;
+		int maxNbViews;
 	
-	// construction
-	public : SimulationController (QWidget * parent=0);
+		shared_ptr<SimulationControllerUpdater> updater;
 
-	public : virtual ~SimulationController (); 
+		QScrollView * scrollView;
+		QFrame * scrollViewFrame;
+		QVBoxLayout* scrollViewLayout;
+		void addNewView();
 	
-	public slots : virtual void pbApplyClicked();
-	public slots : virtual void pbLoadClicked();
-	public slots : virtual void pbNewViewClicked();
-	public slots : virtual void pbStopClicked();
-	public slots : virtual void pbStartClicked();
-	public slots : virtual void pbResetClicked();
-	public slots : virtual void pbCenterSceneClicked();
-	public slots : virtual void pbOneSimulationStepClicked();
-	public slots : virtual void bgTimeStepClicked(int i);
-	public slots : virtual void sb10PowerSecondValueChanged(int);
-	public slots : virtual void sbSecondValueChanged(int);
+	public : 
+		bool	 changeSkipTimeStepper
+			,skipTimeStepper
+			,changeTimeStep
+			,wasUsingTimeStepper;
 
-	public slots : void closeGLViewEvent(int id);
+		SimulationController (QWidget * parent=0);
 
-	private : void addNewView();
+		virtual ~SimulationController (); 
 	
-	protected : void closeEvent(QCloseEvent *evt);
+	public slots :
+		virtual void pbApplyClicked();
+		virtual void pbLoadClicked();
+		virtual void pbNewViewClicked();
+		virtual void pbStopClicked();
+		virtual void pbStartClicked();
+		virtual void pbResetClicked();
+		virtual void pbCenterSceneClicked();
+		virtual void pbOneSimulationStepClicked();
+		virtual void bgTimeStepClicked(int i);
+		virtual void sb10PowerSecondValueChanged(int);
+		virtual void sbSecondValueChanged(int);
+		void closeGLViewEvent(int id);
 
+	
+	protected :
+		void closeEvent(QCloseEvent *evt);
 };
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+#endif // SIMULATIONCONTROLLER_HPP
 
-#endif // __SIMULATIONCONTROLLER_H__
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////

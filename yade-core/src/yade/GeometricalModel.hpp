@@ -1,72 +1,39 @@
-/***************************************************************************
- *   Copyright (C) 2004 by Olivier Galizzi                                 *
- *   olivier.galizzi@imag.fr                                               *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
+/*************************************************************************
+*  Copyright (C) 2004 by Olivier Galizzi                                 *
+*  olivier.galizzi@imag.fr                                               *
+*                                                                        *
+*  This program is free software; it is licensed under the terms of the  *
+*  GNU General Public License v2 or later. See file LICENSE for details. *
+*************************************************************************/
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-#ifndef __GEOMETRICALMODEL_H__
-#define __GEOMETRICALMODEL_H__
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+#ifndef GEOMETRICALMODEL_HPP
+#define GEOMETRICALMODEL_HPP
 
 #include <yade/yade-lib-wm3-math/Se3.hpp>
 #include <yade/yade-lib-wm3-math/Vector3.hpp>
 #include <yade/yade-lib-serialization/Serializable.hpp>
 #include <yade/yade-lib-multimethods/Indexable.hpp>
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 class InteractingGeometry;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 class GeometricalModel : public Serializable, public Indexable
 {
+	public :
+		bool		 visible
+				,wire
+				,shadowCaster;
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-/// Attributes											///
-///////////////////////////////////////////////////////////////////////////////////////////////////
+		Vector3f	diffuseColor;
 
-	public : bool visible;
-	public : bool wire;
-	public : bool shadowCaster;
-	public : Vector3f diffuseColor;
+	protected : 
+		void registerAttributes();
 
-	public : void registerAttributes();
 	REGISTER_CLASS_NAME(GeometricalModel);
 	REGISTER_BASE_CLASS_NAME(Serializable Indexable);
 	REGISTER_INDEX_COUNTER(GeometricalModel);
 };
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 REGISTER_SERIALIZABLE(GeometricalModel,false);
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+#endif //  GEOMETRICALMODEL_HPP
 
-#endif // __GEOMETRICALMODEL_H__
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////

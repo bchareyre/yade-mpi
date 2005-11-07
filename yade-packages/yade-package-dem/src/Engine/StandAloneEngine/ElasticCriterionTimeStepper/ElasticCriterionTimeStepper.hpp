@@ -1,72 +1,46 @@
-/***************************************************************************
- *   Copyright (C) 2004 by Olivier Galizzi                                 *
- *   olivier.galizzi@imag.fr                                               *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
+/*************************************************************************
+*  Copyright (C) 2004 by Olivier Galizzi                                 *
+*  olivier.galizzi@imag.fr                                               *
+*                                                                        *
+*  This program is free software; it is licensed under the terms of the  *
+*  GNU General Public License v2 or later. See file LICENSE for details. *
+*************************************************************************/
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-#ifndef __SDECTIMESTEPPER_HPP__
-#define __SDECTIMESTEPPER_HPP__
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+#ifndef ELASTIC_CRITERION_TIME_STEPPER_HPP
+#define ELASTIC_CRITERION_TIME_STEPPER_HPP
 
 #include <yade/yade-core/TimeStepper.hpp>
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 class Interaction;
 class BodyContainer;
 class MacroMicroElasticRelationships;
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 class ElasticCriterionTimeStepper : public TimeStepper
 {
+	private :
+		Real		newDt;
+		bool		computedSomething;
+		shared_ptr<MacroMicroElasticRelationships> sdecContactModel;
 
-	public  : int sdecGroupMask;
-	private : shared_ptr<MacroMicroElasticRelationships> sdecContactModel;
+		void findTimeStepFromBody(const shared_ptr<Body>&);
+		void findTimeStepFromInteraction(const shared_ptr<Interaction>& , shared_ptr<BodyContainer>&);
 
-	public : ElasticCriterionTimeStepper();
-	public : virtual ~ElasticCriterionTimeStepper();
+	public :
+		int sdecGroupMask; // FIXME - we should find a way to clean groupmask stuff
+
+		ElasticCriterionTimeStepper();
+		virtual ~ElasticCriterionTimeStepper();
 	
-	public : virtual void computeTimeStep(Body* body);
-	
-	private : void findTimeStepFromBody(const shared_ptr<Body>&);
-	private : void findTimeStepFromInteraction(const shared_ptr<Interaction>& , shared_ptr<BodyContainer>&);
-	private : Real newDt;
-	private : bool computedSomething;
+		virtual void computeTimeStep(Body* body);
 
-	protected: virtual void registerAttributes();
+	protected :
+		virtual void registerAttributes();
+
 	REGISTER_CLASS_NAME(ElasticCriterionTimeStepper);
 	REGISTER_BASE_CLASS_NAME(TimeStepper);
 };
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 REGISTER_SERIALIZABLE(ElasticCriterionTimeStepper,false);
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-#endif // __SDECTIMESTEPPER_HPP__
+#endif //  ELASTIC_CRITERION_TIME_STEPPER_HPP
 

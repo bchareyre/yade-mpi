@@ -1,69 +1,40 @@
-/***************************************************************************
- *   Copyright (C) 2004 by Olivier Galizzi                                 *
- *   olivier.galizzi@imag.fr                                               *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
+/*************************************************************************
+*  Copyright (C) 2004 by Olivier Galizzi                                 *
+*  olivier.galizzi@imag.fr                                               *
+*  Copyright (C) 2004 by Janek Kozicki                                   *
+*  cosurgi@berlios.de                                                    *
+*                                                                        *
+*  This program is free software; it is licensed under the terms of the  *
+*  GNU General Public License v2 or later. See file LICENSE for details. *
+*************************************************************************/
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-#ifndef __METAENGINE_HPP__
-#define __METAENGINE_HPP__
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+#ifndef METAENGINE_HPP
+#define METAENGINE_HPP
 
 #include "Engine.hpp"
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 class MetaEngine : public Engine
 {
-	public : MetaEngine() {};
-	public : virtual ~MetaEngine() {};
+	public :
+		MetaEngine() {};
+		virtual ~MetaEngine() {};
 
-	public : virtual string getEngineUnitType() { throw; };
+		virtual string getEngineUnitType() { throw; };
 
-
-	public	  : virtual void registerAttributes()
-	{
-		Engine::registerAttributes();
-	};
-
-	protected : virtual void postProcessAttributes(bool deserializing)
-	{
-		Engine::postProcessAttributes(deserializing);
-	}
-
+	protected :
+		virtual void registerAttributes()
+		{
+			Engine::registerAttributes();
+		};
+		virtual void postProcessAttributes(bool deserializing)
+		{
+			Engine::postProcessAttributes(deserializing);
+		}
 	REGISTER_CLASS_NAME(MetaEngine);	
 	REGISTER_BASE_CLASS_NAME(Engine);
 };
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 REGISTER_SERIALIZABLE(MetaEngine,false);
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-#endif // __METAENGINE_HPP__
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+#endif // METAENGINE_HPP
 

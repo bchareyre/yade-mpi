@@ -1,70 +1,36 @@
-/***************************************************************************
- *   Copyright (C) 2004 by Olivier Galizzi                                 *
- *   olivier.galizzi@imag.fr                                               *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
+/*************************************************************************
+*  Copyright (C) 2004 by Olivier Galizzi                                 *
+*  olivier.galizzi@imag.fr                                               *
+*                                                                        *
+*  This program is free software; it is licensed under the terms of the  *
+*  GNU General Public License v2 or later. See file LICENSE for details. *
+*************************************************************************/
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-#ifndef __BOUNDINGSPHERE_H__
-#define __BOUNDINGSPHERE_H__
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+#ifndef BOUNDINGSPHERE_HPP
+#define BOUNDINGSPHERE_HPP
 
 #include <yade/yade-core/BoundingVolume.hpp>
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 class BoundingSphere : public BoundingVolume
 {
-	public : Real radius;
-	public : Vector3r center;
+	public :
+		Real		radius;
+		Vector3r	center;
 
-	public : BoundingSphere();
-	public : virtual ~BoundingSphere();
+		BoundingSphere();
+		virtual ~BoundingSphere();
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-/// Serialization										///
-///////////////////////////////////////////////////////////////////////////////////////////////////
-	
+/// Serialization
+		void registerAttributes();
+
 	REGISTER_CLASS_NAME(BoundingSphere);
 	REGISTER_BASE_CLASS_NAME(BoundingVolume);
-
-	public : void registerAttributes(); // FIXME - remove that function, dispatcher should take care of that
 	
-///////////////////////////////////////////////////////////////////////////////////////////////////
-/// Indexable											///
-///////////////////////////////////////////////////////////////////////////////////////////////////
-	
+/// Indexable
 	REGISTER_CLASS_INDEX(BoundingSphere,BoundingVolume);
 };
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 REGISTER_SERIALIZABLE(BoundingSphere,false);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #endif // __BOUNDINGSPHERE_H__
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////

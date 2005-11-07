@@ -1,33 +1,16 @@
-/***************************************************************************
- *   Copyright (C) 2004 by Olivier Galizzi                                 *
- *   olivier.galizzi@imag.fr                                               *
- *   Copyright (C) 2004 by Janek Kozicki                                   *
- *   cosurgi@berlios.de                                                    *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
+/*************************************************************************
+*  Copyright (C) 2004 by Olivier Galizzi                                 *
+*  olivier.galizzi@imag.fr                                               *
+*  Copyright (C) 2004 by Janek Kozicki                                   *
+*  cosurgi@berlios.de                                                    *
+*                                                                        *
+*  This program is free software; it is licensed under the terms of the  *
+*  GNU General Public License v2 or later. See file LICENSE for details. *
+*************************************************************************/
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+#ifndef CLASSFACTORY_HPP
+#define CLASSFACTORY_HPP
 
-#ifndef __CLASSFACTORY_HPP__
-#define __CLASSFACTORY_HPP__
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <map>
 #include <string>
@@ -35,19 +18,13 @@
 
 #include <boost/shared_ptr.hpp>
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <yade/yade-lib-loki/Singleton.hpp>
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "FactoryExceptions.hpp"
 #include "DynLibManager.hpp"
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #define REGISTER_FACTORABLE(name) 						\
 	inline boost::shared_ptr< Factorable > CreateShared##name()			\
@@ -68,24 +45,28 @@
 								CreateShared##name ,	\
 								CreatePureCustom##name);
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 class Factorable;
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /*! \brief The class factory of Yade used for serialization purpose and also as a dynamic library loader.
-	All classes that call the macro REGISTER_CLASS in their header are registered inside the factory so it is possible to ask the factory to create an instance of that class. This is automatic because the macro should be outside the class definition, so it is called automatically when the class is loaded by the program or when a dynamic library is loaded. This ClassFactory also acts as a dynamic library loader : when you ask for an instance, either the class already exists inside the factory and a new instance is created, either the class doesn't exist inside the factory and the ClassFactory will look on the hard drive to know if your class exists inside a dynamic library. If so the library is loaded and a new instance of the class can be created.
-	\note ClassFactory is a singleton so you can't create an instance of it because its constructor is private. You should instead use ClassFactory::instance().createShared("Rigidbody") for example
+	All classes that call the macro REGISTER_FACTORABLE in their header are registered inside the factory
+	so it is possible to ask the factory to create an instance of that class. This is automatic because the
+	macro should be outside the class definition, so it is called automatically when the class is loaded by
+	the program or when a dynamic library is loaded.
+	
+	This ClassFactory also acts as a dynamic library loader : when you ask for an instance, either the class
+	already exists inside the factory and a new instance is created, or the class doesn't exist inside the
+	factory and the ClassFactory will look on the hard drive to know if your class exists inside a dynamic library.
+	If so the library is loaded and a new instance of the class can be created.
+
+	\note ClassFactory is a singleton so you can't create an instance of it because its constructor is private.
+	You should instead use ClassFactory::instance().createShared("Rigidbody") for example.
 */
 class ClassFactory : public Singleton< ClassFactory >
 {
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-/// Types											///
-///////////////////////////////////////////////////////////////////////////////////////////////////
+/// Types
 
 	/*! Pointer on a function that create an instance of a serializable class an return a shared pointer on it */
 	private   : typedef boost::shared_ptr<Factorable> ( *CreateSharedFactorableFnPtr )();
@@ -97,9 +78,7 @@ class ClassFactory : public Singleton< ClassFactory >
 	/*! Description of a class that is stored inside the factory.*/
 	private   : class FactorableCreators
 		    {
-			///////////////////////////////////////////////////////////////////////////
-			/// Attributes								///
-			///////////////////////////////////////////////////////////////////////////
+			/// Attributes
 
 			/*! Used to create a C pointer on the class (if serializable) */
 			public    : CreateFactorableFnPtr create;
@@ -108,9 +87,7 @@ class ClassFactory : public Singleton< ClassFactory >
 			/*! Used to create a void C pointer on the class */
 			public    : CreatePureCustomFnPtr createPureCustom;
 	
-			///////////////////////////////////////////////////////////////////////////
-			/// Constructor/Destructor						///
-			///////////////////////////////////////////////////////////////////////////
+			/// Constructor/Destructor
 
 			/*! Empty constructor */
 			public    : FactorableCreators() {};
@@ -129,18 +106,14 @@ class ClassFactory : public Singleton< ClassFactory >
 	private   : typedef std::map< std::string , FactorableCreators > FactorableCreatorsMap;
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-/// Attributes											///
-///////////////////////////////////////////////////////////////////////////////////////////////////
+/// Attributes
 
 	/*! The internal dynamic library manager used to load dynamic libraries when an instance of a non loaded class is ask */
 	private   : DynLibManager dlm;
 	/*! Map that contains the name of the registered class and their description */
 	private   : FactorableCreatorsMap map;
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-/// Constructor/Destructor									///
-///////////////////////////////////////////////////////////////////////////////////////////////////
+/// Constructor/Destructor
 
 	/*! Constructor
 		\note  the constructor is private because ClassFactory is a Singleton
@@ -156,9 +129,7 @@ class ClassFactory : public Singleton< ClassFactory >
 	*/
 	private   : virtual ~ClassFactory() {};
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-/// Methods											///
-///////////////////////////////////////////////////////////////////////////////////////////////////
+/// Methods
 
 	/*! Assignement operator needed by the Singleton class */
 	private   : ClassFactory& operator=(const ClassFactory&);
@@ -203,10 +174,5 @@ class ClassFactory : public Singleton< ClassFactory >
 	FRIEND_SINGLETON(ClassFactory);
 };
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 #endif // __CLASSFACTORY_HPP__
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////

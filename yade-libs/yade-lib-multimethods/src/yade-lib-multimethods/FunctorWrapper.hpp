@@ -1,43 +1,22 @@
-/***************************************************************************
- *   Copyright (C) 2005 by Janek Kozicki                                   *
- *   cosurgi@berlios.de                                                    *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+/*************************************************************************
+*  Copyright (C) 2004 by Janek Kozicki                                   *
+*  cosurgi@berlios.de                                                    *
+*                                                                        *
+*  This program is free software; it is licensed under the terms of the  *
+*  GNU General Public License v2 or later. See file LICENSE for details. *
+*************************************************************************/
 
 #ifndef DYNLIB_LAUNCHER_HPP
 #define DYNLIB_LAUNCHER_HPP
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "MultiMethodsExceptions.hpp"
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <yade/yade-lib-serialization/Serializable.hpp>
 #include <yade/yade-lib-loki/Typelist.hpp>
 #include <yade/yade-lib-loki/Functor.hpp>
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <string>
 
@@ -47,7 +26,6 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// base template for classes that provide virtual functions for multiple dispatch,		///
 /// in other words for multivirtual function call						///
-///////////////////////////////////////////////////////////////////////////////////////////////////
 ///
 ///
 /// This is a base template for all classes that will provide functions for multiple dispatch.
@@ -109,7 +87,6 @@
 /// references were added where necessary, to optimize call speed.
 /// So pay attention when you overload this function.
 ///
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 template
 <	class ResultType, 		// type returned by multivirtual function
@@ -136,8 +113,8 @@ class FunctorWrapper //: public Serializable // FIXME functor shouldn't be seria
 		typedef typename Impl::Parm14 Parm14;
 		typedef typename Impl::Parm15 Parm15;
 	
-	private : ResultType error(int n)
-		 {
+		ResultType error(int n)
+		{
 			std::string err = std::string(MultiMethodsExceptions::BadVirtualCall) + "types are:\n" 
 			+ "1. " + typeid(Parm1).name() + "\n" 
 			+ "2. " + typeid(Parm2).name() + "\n"
@@ -151,65 +128,61 @@ class FunctorWrapper //: public Serializable // FIXME functor shouldn't be seria
 			+ "number of types used in the call: " + boost::lexical_cast<string>(n);
 			cerr << err.c_str();
 			throw MultiMethodsBadVirtualCall(err.c_str());
-		 }
+		}
 
-	public : FunctorWrapper () {};
-	public : virtual ~FunctorWrapper () {};
-	public : virtual string checkOrder() const { return ""; };
-
-// FIXME : we can save some memory by writing specializations for each number of parameters, like FunctorImpl, but it will not make call faster - always it's one virtual redirection. So I'll do that later.
+	public :
+		FunctorWrapper () {};
+		virtual ~FunctorWrapper () {};
+		virtual string checkOrder() const { return ""; };
 
 // in following functions a second throw was added - just to bypass compiler warnings - it will never be executed.
 
-	virtual ResultType go	(	Parm1) 							{ return error(1); };
-	virtual ResultType go	(	Parm1,Parm2) 						{ return error(2); };
-	virtual ResultType go	(	Parm1,Parm2,Parm3) 					{ return error(3); };
-	virtual ResultType go	(	Parm1,Parm2,Parm3,Parm4) 				{ return error(4); };
-	virtual ResultType go	(	Parm1,Parm2,Parm3,Parm4,Parm5) 				{ return error(5); };
-	virtual ResultType go	(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6) 			{ return error(6); };
-	virtual ResultType go	(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7) 		{ return error(7); };
-	virtual ResultType go	(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7,Parm8)	{ return error(8); };
-	virtual ResultType go	(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7,Parm8,
-					Parm9)							{ return error(9); };
-	virtual ResultType go	(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7,Parm8,
-					Parm9,Parm10)						{ return error(10); };
-	virtual ResultType go	(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7,Parm8,
-					Parm9,Parm10,Parm11)					{ return error(11); };
-	virtual ResultType go	(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7,Parm8,
-					Parm9,Parm10,Parm11,Parm12)				{ return error(12); };
-	virtual ResultType go	(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7,Parm8,
-					Parm9,Parm10,Parm11,Parm12,Parm13)			{ return error(13); };
-	virtual ResultType go	(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7,Parm8,
-					Parm9,Parm10,Parm11,Parm12,Parm13,Parm14)		{ return error(14); };
-	virtual ResultType go	(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7,Parm8,
-					Parm9,Parm10,Parm11,Parm12,Parm13,Parm14,Parm15)	{ return error(15); };
-	
-	virtual ResultType goReverse(	Parm1) 							{ return error(1); };
-	virtual ResultType goReverse(	Parm1,Parm2) 						{ return error(2); };
-	virtual ResultType goReverse(	Parm1,Parm2,Parm3) 					{ return error(3); };
-	virtual ResultType goReverse(	Parm1,Parm2,Parm3,Parm4) 				{ return error(4); };
-	virtual ResultType goReverse(	Parm1,Parm2,Parm3,Parm4,Parm5) 				{ return error(5); };
-	virtual ResultType goReverse(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6) 			{ return error(6); };
-	virtual ResultType goReverse(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7) 		{ return error(7); };
-	virtual ResultType goReverse(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7,Parm8)	{ return error(8); };
-	virtual ResultType goReverse(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7,Parm8,
-					Parm9)							{ return error(9); };
-	virtual ResultType goReverse(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7,Parm8,
-					Parm9,Parm10)						{ return error(10); };
-	virtual ResultType goReverse(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7,Parm8,
-					Parm9,Parm10,Parm11)					{ return error(11); };
-	virtual ResultType goReverse(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7,Parm8,
-					Parm9,Parm10,Parm11,Parm12)				{ return error(12); };
-	virtual ResultType goReverse(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7,Parm8,
-					Parm9,Parm10,Parm11,Parm12,Parm13)			{ return error(13); };
-	virtual ResultType goReverse(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7,Parm8,
-					Parm9,Parm10,Parm11,Parm12,Parm13,Parm14)		{ return error(14); };
-	virtual ResultType goReverse(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7,Parm8,
-					Parm9,Parm10,Parm11,Parm12,Parm13,Parm14,Parm15)	{ return error(15); };
+		virtual ResultType go	(	Parm1) 							{ return error(1); };
+		virtual ResultType go	(	Parm1,Parm2) 						{ return error(2); };
+		virtual ResultType go	(	Parm1,Parm2,Parm3) 					{ return error(3); };
+		virtual ResultType go	(	Parm1,Parm2,Parm3,Parm4) 				{ return error(4); };
+		virtual ResultType go	(	Parm1,Parm2,Parm3,Parm4,Parm5) 				{ return error(5); };
+		virtual ResultType go	(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6) 			{ return error(6); };
+		virtual ResultType go	(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7) 		{ return error(7); };
+		virtual ResultType go	(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7,Parm8)	{ return error(8); };
+		virtual ResultType go	(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7,Parm8,
+						Parm9)							{ return error(9); };
+		virtual ResultType go	(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7,Parm8,
+						Parm9,Parm10)						{ return error(10); };
+		virtual ResultType go	(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7,Parm8,
+						Parm9,Parm10,Parm11)					{ return error(11); };
+		virtual ResultType go	(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7,Parm8,
+						Parm9,Parm10,Parm11,Parm12)				{ return error(12); };
+		virtual ResultType go	(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7,Parm8,
+						Parm9,Parm10,Parm11,Parm12,Parm13)			{ return error(13); };
+		virtual ResultType go	(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7,Parm8,
+						Parm9,Parm10,Parm11,Parm12,Parm13,Parm14)		{ return error(14); };
+		virtual ResultType go	(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7,Parm8,
+						Parm9,Parm10,Parm11,Parm12,Parm13,Parm14,Parm15)	{ return error(15); };
+		
+		virtual ResultType goReverse(	Parm1) 							{ return error(1); };
+		virtual ResultType goReverse(	Parm1,Parm2) 						{ return error(2); };
+		virtual ResultType goReverse(	Parm1,Parm2,Parm3) 					{ return error(3); };
+		virtual ResultType goReverse(	Parm1,Parm2,Parm3,Parm4) 				{ return error(4); };
+		virtual ResultType goReverse(	Parm1,Parm2,Parm3,Parm4,Parm5) 				{ return error(5); };
+		virtual ResultType goReverse(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6) 			{ return error(6); };
+		virtual ResultType goReverse(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7) 		{ return error(7); };
+		virtual ResultType goReverse(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7,Parm8)	{ return error(8); };
+		virtual ResultType goReverse(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7,Parm8,
+						Parm9)							{ return error(9); };
+		virtual ResultType goReverse(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7,Parm8,
+						Parm9,Parm10)						{ return error(10); };
+		virtual ResultType goReverse(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7,Parm8,
+						Parm9,Parm10,Parm11)					{ return error(11); };
+		virtual ResultType goReverse(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7,Parm8,
+						Parm9,Parm10,Parm11,Parm12)				{ return error(12); };
+		virtual ResultType goReverse(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7,Parm8,
+						Parm9,Parm10,Parm11,Parm12,Parm13)			{ return error(13); };
+		virtual ResultType goReverse(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7,Parm8,
+						Parm9,Parm10,Parm11,Parm12,Parm13,Parm14)		{ return error(14); };
+		virtual ResultType goReverse(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7,Parm8,
+						Parm9,Parm10,Parm11,Parm12,Parm13,Parm14,Parm15)	{ return error(15); };
 };
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #define DEFINE_FUNCTOR_ORDER_2D(class1,class2)							\
 	public : virtual std::string checkOrder() const						\
@@ -223,13 +196,5 @@ class FunctorWrapper //: public Serializable // FIXME functor shouldn't be seria
 		return (string(#class1)+" "+string(#class2)+" "+string(#class3));		\
 	}											\
 
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-#endif // DYNLIB_LAUNCHER_HPP
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+#endif //  DYNLIB_LAUNCHER_HPP
 

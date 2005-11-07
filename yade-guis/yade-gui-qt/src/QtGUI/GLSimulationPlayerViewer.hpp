@@ -1,114 +1,65 @@
-/***************************************************************************
- *   Copyright (C) 2004 by Olivier Galizzi                                 *
- *   olivier.galizzi@imag.fr                                               *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
+/*************************************************************************
+*  Copyright (C) 2004 by Olivier Galizzi                                 *
+*  olivier.galizzi@imag.fr                                               *
+*                                                                        *
+*  This program is free software; it is licensed under the terms of the  *
+*  GNU General Public License v2 or later. See file LICENSE for details. *
+*************************************************************************/
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-#ifndef __SIMULATIONVIEWER_HPP__
-#define __SIMULATIONVIEWER_HPP__
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+#ifndef SIMULATIONVIEWER_HPP
+#define SIMULATIONVIEWER_HPP
 
 #include <QGLViewer/qglviewer.h>
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <yade/yade-core/RenderingEngine.hpp>
 #include <yade/yade-core/MetaBody.hpp>
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 class GLSimulationPlayerViewer : public QGLViewer
 {
+/// Attributes
+	private :
+		shared_ptr<RenderingEngine>	 renderer;
+		shared_ptr<MetaBody>		 rootBody;
+		vector<vector<float> >		 se3s;
+		
+		string				 fileName
+						,inputBaseName
+						,inputBaseDirectory
+						,outputBaseName
+						,outputBaseDirectory;
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-/// Attributes										      ///
-///////////////////////////////////////////////////////////////////////////////////////////////////
+		int				 inputPaddle;
 
-	private : shared_ptr<RenderingEngine> renderer;
-	private : shared_ptr<MetaBody> rootBody;
-	private : vector<vector<float> > se3s;
+		bool				 saveSnapShots;
+
+		int				 frameNumber;
+		
+		bool loadPositionOrientationFile();
 	
-	private : string fileName;
+	public :
+		GLSimulationPlayerViewer(QWidget * parent=0,char*name=0);
+		virtual ~GLSimulationPlayerViewer();
 
-	private : string inputBaseName;
-	private : string inputBaseDirectory;
-	private : int inputPaddle;
+		void setRootBody(shared_ptr<MetaBody> rb) { rootBody = rb;};
+		void load(const string& fileName);
 
-	private : string outputBaseName;
-	private : string outputBaseDirectory;
-	
-	private : bool saveSnapShots;
+		void setInputPaddle(int p) { inputPaddle = p;};
+		void setInputBaseName(const string& baseName) { inputBaseName = baseName;};
+		void setInputDirectory(const string& baseDirectory) { inputBaseDirectory = baseDirectory;};
+		
+		void setOutputBaseName(const string& baseName) { outputBaseName = baseName;};
+		void setOutputDirectory(const string& baseDirectory) { outputBaseDirectory = baseDirectory;};
+		void setSaveSnapShots(bool b) { saveSnapShots = b;};
+		
+		void doOneStep();
+		void reset();
 
-	private : int frameNumber;
-	
-///////////////////////////////////////////////////////////////////////////////////////////////////
-/// Constructor/Destructor								      ///
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-	/*! Constructor */
-	public : GLSimulationPlayerViewer(QWidget * parent=0,char*name=0);
-
-	/*! Destructor */
-	public : virtual ~GLSimulationPlayerViewer();
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-/// Methods										      ///
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-	public : void setRootBody(shared_ptr<MetaBody> rb) { rootBody = rb;};
-	public : void load(const string& fileName);
-
-	private : bool loadPositionOrientationFile();
-
-	protected : virtual void draw();
-	protected : virtual void fastDraw();
-	protected : virtual void animate();
-	protected : virtual void initializeGL();
-
-	public : void setInputPaddle(int p) { inputPaddle = p;};
-	public : void setInputBaseName(const string& baseName) { inputBaseName = baseName;};
-	public : void setInputDirectory(const string& baseDirectory) { inputBaseDirectory = baseDirectory;};
-	
-	public : void setOutputBaseName(const string& baseName) { outputBaseName = baseName;};
-	public : void setOutputDirectory(const string& baseDirectory) { outputBaseDirectory = baseDirectory;};
-	public : void setSaveSnapShots(bool b) { saveSnapShots = b;};
-	
-	public : void doOneStep();
-	public : void reset();
-
+	protected :
+		virtual void draw();
+		virtual void fastDraw();
+		virtual void animate();
+		virtual void initializeGL();
 };
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-// CALL REGISTER_SERIALIZABLE OR REGISTER_FACTORABLE MACRO HERE
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-#endif // __SIMULATIONVIEWER_HPP__
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+#endif // SIMULATIONVIEWER_HPP
 

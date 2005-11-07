@@ -1,84 +1,43 @@
-/***************************************************************************
- *   Copyright (C) 2004 by Olivier Galizzi                                 *
- *   olivier.galizzi@imag.fr                                               *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
+/*************************************************************************
+*  Copyright (C) 2004 by Olivier Galizzi                                 *
+*  olivier.galizzi@imag.fr                                               *
+*                                                                        *
+*  This program is free software; it is licensed under the terms of the  *
+*  GNU General Public License v2 or later. See file LICENSE for details. *
+*************************************************************************/
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-#ifndef __ELASTICCOHESIVELAW_HPP__
-#define __ELASTICCOHESIVELAW_HPP__
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+#ifndef ELASTICCOHESIVELAW_HPP
+#define ELASTICCOHESIVELAW_HPP
 
 #include <yade/yade-core/Engine.hpp>
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <set>
 #include <boost/tuple/tuple.hpp>
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 class PhysicalAction;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 class ElasticCohesiveLaw : public Engine
 {
+	private :
+		bool first; // FIXME - remove that!
+		shared_ptr<PhysicalAction> actionForce;
+		shared_ptr<PhysicalAction> actionMomentum;
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-/// Attributes											///
-///////////////////////////////////////////////////////////////////////////////////////////////////
+	public :
+		int sdecGroupMask;
+		bool momentRotationLaw;
+		
+		ElasticCohesiveLaw();
+		void action(Body* body);
 
-	private : bool first; // FIXME - remove that!
-	private : shared_ptr<PhysicalAction> actionForce;
-	private : shared_ptr<PhysicalAction> actionMomentum;
-	public  : int sdecGroupMask;
-	public  : bool momentRotationLaw;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-/// Constructor/Destructor								        ///
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-	public : ElasticCohesiveLaw();
-	public : void action(Body* body);
-
-	public : void registerAttributes();
+	protected : 
+		void registerAttributes();
 	REGISTER_CLASS_NAME(ElasticCohesiveLaw);
 	REGISTER_BASE_CLASS_NAME(Engine);
 
 };
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 REGISTER_SERIALIZABLE(ElasticCohesiveLaw,false);
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-#endif // __ELASTICCOHESIVELAW_HPP__
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+#endif // ELASTICCOHESIVELAW_HPP
 

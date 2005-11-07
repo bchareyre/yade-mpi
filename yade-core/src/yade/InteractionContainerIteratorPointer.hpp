@@ -1,108 +1,54 @@
-/***************************************************************************
- *   Copyright (C) 2005 by Olivier Galizzi   *
- *   olivier.galizzi@imag.fr   *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
+/*************************************************************************
+*  Copyright (C) 2004 by Olivier Galizzi                                 *
+*  olivier.galizzi@imag.fr                                               *
+*                                                                        *
+*  This program is free software; it is licensed under the terms of the  *
+*  GNU General Public License v2 or later. See file LICENSE for details. *
+*************************************************************************/
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-#ifndef __INTERACTIONCONTAINERITERATORPOINTER__
-#define __INTERACTIONCONTAINERITERATORPOINTER__
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#ifndef INTERACTIONCONTAINERITERATORPOINTER_HPP
+#define INTERACTIONCONTAINERITERATORPOINTER_HPP
 
 #include "InteractionContainerIterator.hpp"
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 class InteractionContainerIteratorPointer
 {
-	private : shared_ptr<InteractionContainerIterator> ptr;
-	public  : InteractionContainerIterator& getRef() {return *ptr;};
-	public  : InteractionContainerIterator& getRef() const {return *ptr;};
-	public  : shared_ptr<InteractionContainerIterator> get() {return ptr;};
-	public  : shared_ptr<InteractionContainerIterator> get() const {return ptr;};
+	private :
+		shared_ptr<InteractionContainerIterator> ptr;
+		void allocate(const InteractionContainerIteratorPointer& bi)
+		{
+			if (ptr==0)
+				ptr = bi.get()->createPtr();
+		}
 
 
-	public  : InteractionContainerIteratorPointer(const InteractionContainerIteratorPointer& bi) 
-	{
-		allocate(bi);
-		ptr->affect(bi.getRef());
-	};
+	public  :
+		InteractionContainerIterator&			getRef()	{ return *ptr; };
+		InteractionContainerIterator&			getRef() const	{ return *ptr; };
+		shared_ptr<InteractionContainerIterator>	get()		{ return  ptr; };
+		shared_ptr<InteractionContainerIterator>	get() const	{ return  ptr; };
 
-	public  : InteractionContainerIteratorPointer(const shared_ptr<InteractionContainerIterator>& i)
-	{
-		ptr = i;
-	};
+		InteractionContainerIteratorPointer(const InteractionContainerIteratorPointer& bi) 
+		{
+			allocate(bi);
+			ptr->affect(bi.getRef());
+		};
 
-	public  : InteractionContainerIteratorPointer() 
-	{
-		ptr = shared_ptr<InteractionContainerIterator>();
-	};
+		InteractionContainerIteratorPointer(const shared_ptr<InteractionContainerIterator>& i) { ptr = i; };
+		InteractionContainerIteratorPointer()  { ptr = shared_ptr<InteractionContainerIterator>(); };
 
-	private : void allocate(const InteractionContainerIteratorPointer& bi)
-	{
-		if (ptr==0)
-			ptr = bi.get()->createPtr();
-	}
+		bool operator!=(const InteractionContainerIteratorPointer& bi) { return ptr->isDifferent(bi.getRef()); };
+		shared_ptr<Interaction>			operator*() { return ptr->getValue(); };	
+		InteractionContainerIteratorPointer&	operator++() { ptr->increment(); return *this; };
+		InteractionContainerIteratorPointer&	operator++(int); // disabled
+		InteractionContainerIteratorPointer&	operator=(const InteractionContainerIteratorPointer& bi)
+		{
+			allocate(bi);
+			ptr->affect(bi.getRef());
+			return *this;
+		};
 
-	public  : bool operator!=(const InteractionContainerIteratorPointer& bi)
-	{
-		return ptr->isDifferent(bi.getRef());
-	};
-
-	public  : InteractionContainerIteratorPointer& operator++()
-	{
-		ptr->increment();
-		return *this;
-	};
-
-//	public  : InteractionContainerIteratorPointer& operator++(int)
-//	{
-		// FIXME - this is bad. because it returns incremented value.
-		//         the real solution is to copy whole class (duplicate in memory)
-		//         but it is ineffective. so it's better to disable this operator.
-//		InteractionContainerIteratorPointer& tmp = *this;
-//		ptr->increment();
-//		return tmp;
-//	};
-
-	public  : InteractionContainerIteratorPointer& operator=(const InteractionContainerIteratorPointer& bi)
-	{
-		allocate(bi);
-			
-		ptr->affect(bi.getRef());
-		return *this;
-	};
-
-	public  : shared_ptr<Interaction> operator*()
-	{
-		return ptr->getValue();
-	};	
 };
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-#endif // __INTERACTIONCONTAINERITERATORPOINTER__
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#endif // INTERACTIONCONTAINERITERATORPOINTER_HPP
 

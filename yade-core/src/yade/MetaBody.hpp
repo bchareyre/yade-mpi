@@ -1,76 +1,45 @@
-/***************************************************************************
- *   Copyright (C) 2004 by Olivier Galizzi                                 *
- *   olivier.galizzi@imag.fr                                               *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
+/*************************************************************************
+*  Copyright (C) 2004 by Olivier Galizzi                                 *
+*  olivier.galizzi@imag.fr                                               *
+*  Copyright (C) 2004 by Janek Kozicki                                   *
+*  cosurgi@berlios.de                                                    *
+*                                                                        *
+*  This program is free software; it is licensed under the terms of the  *
+*  GNU General Public License v2 or later. See file LICENSE for details. *
+*************************************************************************/
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-#ifndef __NONCONNEXBODY_H__
-#define __NONCONNEXBODY_H__
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+#ifndef METABODY_HPP
+#define METABODY_HPP
 
 #include "Body.hpp"
 #include "BodyContainer.hpp"
 #include "Engine.hpp"
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 class MetaBody : public Body
 {
-	public	: shared_ptr<BodyContainer> bodies;
-	public  : vector<shared_ptr<Engine> > actors;
-	public  : vector<shared_ptr<Engine> > initializers;
+	public : // FIXME - why public?
+		shared_ptr<BodyContainer>		bodies;
+		vector<shared_ptr<Engine> >		actors;
+		vector<shared_ptr<Engine> >		initializers;
+		shared_ptr<InteractionContainer>	persistentInteractions; // disappear, reappear according to physical (or any other non-spatial) criterion
+		shared_ptr<InteractionContainer>	volatileInteractions;	// disappear, reappear according to spatial criterion
+		shared_ptr<PhysicalActionContainer>	actionParameters;
 	
-	public	: shared_ptr<InteractionContainer> persistentInteractions;  // disappear, reappear according to physical (or any other non-spatial) criterion
-	public	: shared_ptr<InteractionContainer> volatileInteractions; // disappear, reappear according to spatial criterion
-	public	: shared_ptr<PhysicalActionContainer> actionParameters;
-	
-	// construction
-	public	: MetaBody ();
+		MetaBody ();
 
-	public	: void moveToNextTimeStep(); // FIXME - maybe rename this to loop() ?
+		void moveToNextTimeStep();
 
-	public  : void setTimeSteppersActive(bool a);
+		void setTimeSteppersActive(bool a); // FIXME - wtf ?
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-/// Serialization										///
-///////////////////////////////////////////////////////////////////////////////////////////////////
-	
+/// Serialization
+	protected :
+		virtual void postProcessAttributes(bool deserializing);
+		virtual void registerAttributes();
 	REGISTER_CLASS_NAME(MetaBody);
 	REGISTER_BASE_CLASS_NAME(Body);
-
-	protected : virtual void postProcessAttributes(bool deserializing);
-	public	: void registerAttributes();
 };
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 REGISTER_SERIALIZABLE(MetaBody,false);
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+#endif // METABODY_HPP
 
-#endif // __NONCONNEXBODY_H__
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////

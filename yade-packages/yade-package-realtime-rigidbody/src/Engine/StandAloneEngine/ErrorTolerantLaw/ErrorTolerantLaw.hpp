@@ -1,51 +1,22 @@
-/***************************************************************************
- *   Copyright (C) 2004 by Olivier Galizzi                                 *
- *   olivier.galizzi@imag.fr                                               *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+/*************************************************************************
+*  Copyright (C) 2004 by Olivier Galizzi                                 *
+*  olivier.galizzi@imag.fr                                               *
+*                                                                        *
+*  This program is free software; it is licensed under the terms of the  *
+*  GNU General Public License v2 or later. See file LICENSE for details. *
+*************************************************************************/
 
-#ifndef __ERRORTOLERANTDYNAMICENGINE_HPP__
-#define __ERRORTOLERANTDYNAMICENGINE_HPP__
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+#ifndef ERRORTOLERANTDYNAMICENGINE_HPP
+#define ERRORTOLERANTDYNAMICENGINE_HPP
 
 #include <yade/yade-core/Engine.hpp>
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/matrix_sparse.hpp>
 #include <boost/numeric/ublas/banded.hpp>
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 using namespace boost::numeric;
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-/**
-@author Olivier Galizzi
-*/
 class ErrorTolerantLaw : public Engine
 {
 	typedef enum{VANISHING,CLAMPED} ContactState;
@@ -68,6 +39,7 @@ class ErrorTolerantLaw : public Engine
 				ublas::banded_matrix<float>& invM	,
 				ublas::matrix<float>& Jt		,
 				ublas::vector<float>& v	);
+
 // I changed sparse_matrix to matrix, because of boost 1.33. why? Maybe there is another name for this matrix?
 // Or maybe sparse matrix is no longer necessery, because matrix is efficient when sparse?
 //
@@ -110,15 +82,7 @@ class ErrorTolerantLaw : public Engine
 	REGISTER_BASE_CLASS_NAME(Engine);
 };
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 REGISTER_SERIALIZABLE(ErrorTolerantLaw,false);
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+#endif // ERRORTOLERANTDYNAMICENGINE_HPP
 
-#endif // __ERRORTOLERANTDYNAMICENGINE_HPP__
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////

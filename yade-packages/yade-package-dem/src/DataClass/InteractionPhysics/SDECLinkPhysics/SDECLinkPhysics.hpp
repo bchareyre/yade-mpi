@@ -1,75 +1,55 @@
-#ifndef __SDECPERMANENTLINKPHYSICS_HPP__
-#define __SDECPERMANENTLINKPHYSICS_HPP__
+/*************************************************************************
+*  Copyright (C) 2004 by Janek Kozicki                                   *
+*  cosurgi@berlios.de                                                    *
+*                                                                        *
+*  This program is free software; it is licensed under the terms of the  *
+*  GNU General Public License v2 or later. See file LICENSE for details. *
+*************************************************************************/
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+#ifndef SDECLINKPHYSICS_HPP
+#define SDECLINKPHYSICS_HPP
 
 #include <yade/yade-core/InteractionPhysics.hpp>
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 class SDECLinkPhysics : public InteractionPhysics
 {
-	public : SDECLinkPhysics();
-	public : virtual ~SDECLinkPhysics();
-	
-///////////////////////////////////////////////////////////////////////////////////////////////////
-/// Attributes											///
-///////////////////////////////////////////////////////////////////////////////////////////////////
+	public :	
+		Real		 kn				// normal elastic constant.
+				,ks				// shear elastic constant.
 
-	public : Real kn;				// normal elastic constant.
-	public : Real ks;				// shear elastic constant.
+				,knMax
+				,ksMax
+				,heta
+				,averageRadius
+				,kr
 
-	public : Real knMax;
-	public : Real ksMax;
+				,initialKn			// initial normal elastic constant.
+				,initialKs			// initial shear elastic constant.
+				,equilibriumDistance		// equilibrium distance
+				,initialEquilibriumDistance;	// initial equilibrium distance
 
-	public : Real initialKn;			// initial normal elastic constant.
-	public : Real initialKs;			// initial shear elastic constant.
-	public : Real equilibriumDistance;		// equilibrium distance
-	public : Real initialEquilibriumDistance;	// initial equilibrium distance
-	public : Vector3r prevNormal;			// unit normal of the contact plane.
-	public : Vector3r normalForce;			// normal force applied on a DE
-	public : Vector3r shearForce;			// shear force applied on a DE
+		Vector3r	 prevNormal			// unit normal of the contact plane.
+				,normalForce			// normal force applied on a DE
+				,shearForce			// shear force applied on a DE
+				,thetar;
 
-/////////////////////////////////////////////////////// FIXME : this goes to another dynlib - MDEM
-	//public : Vector3r initRotation1;
-	//public : Vector3r initRotation2;
+		Quaternionr	 prevRotation1
+				,prevRotation2;
+		
+		
+		SDECLinkPhysics();
+		virtual ~SDECLinkPhysics();
 
-	public : Quaternionr prevRotation1;
-	//public : Quaternionr currentRotation1;
-	public : Quaternionr prevRotation2;
-	//public : Quaternionr currentRotation2;
-	
-	public : Vector3r thetar;
-	public : Real heta;
-	public : Real averageRadius;
-	public : Real kr;
-////////////////////////////////////////////////////////
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-/// Serialization										///
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-	protected : virtual void postProcessAttributes(bool deserializing);
-	public : void registerAttributes();
-
+/// Serialization
+	protected :
+		virtual void postProcessAttributes(bool deserializing);
+		void registerAttributes();
 	REGISTER_CLASS_NAME(SDECLinkPhysics);
 	REGISTER_BASE_CLASS_NAME(InteractionPhysics);
 
 };
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 REGISTER_SERIALIZABLE(SDECLinkPhysics,false);
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-#endif // __SDECPERMANENTLINKPHYSICS_HPP__
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+#endif // SDECLINKPHYSICS_HPP
 

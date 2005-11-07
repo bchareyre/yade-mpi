@@ -1,146 +1,103 @@
-/***************************************************************************
- *   Copyright (C) 2004 by Olivier Galizzi                                 *
- *   olivier.galizzi@imag.fr                                               *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
+/*************************************************************************
+*  Copyright (C) 2004 by Olivier Galizzi                                 *
+*  olivier.galizzi@imag.fr                                               *
+*                                                                        *
+*  This program is free software; it is licensed under the terms of the  *
+*  GNU General Public License v2 or later. See file LICENSE for details. *
+*************************************************************************/
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-#ifndef __IOMANAGER__
-#define __IOMANAGER__
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+#ifndef IOFORMATMANAGER_HPP
+#define IOFORMATMANAGER_HPP
 
 #include <iostream>
 #include <fstream>
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 #include <yade/yade-lib-factory/Factorable.hpp>
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 #include <vector>
 #include <string>
-
 #include <boost/shared_ptr.hpp>
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 class Serializable;
 class Archive;
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 using namespace std;
 using namespace boost;
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 class IOFormatManager : public Factorable
 {
-	public   : IOFormatManager();
-	public   : virtual ~IOFormatManager();
-
-	public  : virtual void beginSerialization(ostream& ,  Archive& );
-	public  : virtual void finalizeSerialization(ostream& ,  Archive& );
-	public  : virtual string beginDeserialization(istream& ,  Archive& );
-	public  : virtual void finalizeDeserialization(istream& , Archive& );
+	private :
+		static char cOB;	// containerOpeningBracket 
+		static char cCB;	// containerClosingBracket
+		static char cS;		// containerSeparator
+		static char cfOB;	// customFundamentalOpeningBracket
+		static char cfCB;	// customFundamentalClosingBracket
+		static char cfS; 	// customFundamentalSeparator
 	
-	private    : static char cOB;	// containerOpeningBracket 
-	private    : static char cCB;	// containerClosingBracket
-	private    : static char cS;	// containerSeparator
-	private    : static char cfOB;	// customFundamentalOpeningBracket
-	private    : static char cfCB;	// customFundamentalClosingBracket
-	private    : static char cfS; 	// customFundamentalSeparator
+	protected :
+		void setContainerOpeningBracket(char c) {cOB=c;};
+		void setContainerClosingBracket(char c) {cCB=c;};
+		void setContainerSeparator(char c)      {cS=c;};
+		
+		void setCustomFundamentalOpeningBracket(char c) {cfOB=c;};
+		void setCustomFundamentalClosingBracket(char c) {cfCB=c;};
+		void setCustomFundamentalSeparator(char c)      {cfS=c;};
+
+	public :
+		IOFormatManager();
+		virtual ~IOFormatManager();
+		
+		virtual void beginSerialization(ostream& ,  Archive& );
+		virtual void finalizeSerialization(ostream& ,  Archive& );
+		virtual string beginDeserialization(istream& ,  Archive& );
+		virtual void finalizeDeserialization(istream& , Archive& );
+		
+		static char getContainerOpeningBracket() {return cOB;};
+		static char getContainerClosingBracket() {return cCB;};
+		static char getContainerSeparator()      {return cS;};
+		
+		static char getCustomFundamentalOpeningBracket() {return cfOB;};
+		static char getCustomFundamentalClosingBracket() {return cfCB;};
+		static char getCustomFundamentalSeparator()      {return cfS;};
+
+		static void parseFundamental(const string& str, vector<string>& tokens);
+		
+		static void serializeFundamental(ostream& stream, Archive& ac, int depth);
+		static void deserializeFundamental(istream& stream, Archive& ac, const string& str);
+		
+		static void serializeCustomClass(ostream& stream, Archive& ac , int depth);
+		static void deserializeCustomClass(istream& stream, Archive& ac, const string& str="");
+		
+		static void serializeSmartPointerOfFundamental(ostream& stream, Archive& ac , int depth);
+		static void deserializeSmartPointerOfFundamental(istream& stream, Archive& ac, const string& str);
 	
-	protected  : void setContainerOpeningBracket(char c) {cOB=c;};
-	protected  : void setContainerClosingBracket(char c) {cCB=c;};
-	protected  : void setContainerSeparator(char c)      {cS=c;};
-	
-	protected  : void setCustomFundamentalOpeningBracket(char c) {cfOB=c;};
-	protected  : void setCustomFundamentalClosingBracket(char c) {cfCB=c;};
-	protected  : void setCustomFundamentalSeparator(char c)      {cfS=c;};
-	
-	public  : static char getContainerOpeningBracket() {return cOB;};
-	public  : static char getContainerClosingBracket() {return cCB;};
-	public  : static char getContainerSeparator()      {return cS;};
-	 
-	public  : static char getCustomFundamentalOpeningBracket() {return cfOB;};
-	public  : static char getCustomFundamentalClosingBracket() {return cfCB;};
-	public  : static char getCustomFundamentalSeparator()      {return cfS;};
-	
-	public : static void parseFundamental(const string& str, vector<string>& tokens);
-	
-	public : static void serializeFundamental(ostream& stream, Archive& ac, int depth);
-	public : static void deserializeFundamental(istream& stream, Archive& ac, const string& str);
+		static void serializeCustomFundamental(ostream& stream, Archive& ac, int depth);
+		static void serializeContainerOfFundamental(ostream& stream, Archive& ac, int depth);
+		static void serializeFundamentalSerializable(ostream& stream, Archive& ac, int depth);
+		
+		static void deserializeCustomFundamental(istream& stream, Archive& ac,const string& str);
+		static void deserializeContainerOfFundamental(istream& stream, Archive& ac, const string& str);
+		static void deserializeFundamentalSerializable(istream& stream, Archive& ac, const string& str);
 
-	public : static void serializeCustomClass(ostream& stream, Archive& ac , int depth);
-	public : static void deserializeCustomClass(istream& stream, Archive& ac, const string& str="");
-
-	public : static void serializeSmartPointerOfFundamental(ostream& stream, Archive& ac , int depth);
-	public : static void deserializeSmartPointerOfFundamental(istream& stream, Archive& ac, const string& str);
-	
-	public    : static void serializeCustomFundamental(ostream& stream, Archive& ac, int depth);
-	public    : static void serializeContainerOfFundamental(ostream& stream, Archive& ac, int depth);
-	public    : static void serializeFundamentalSerializable(ostream& stream, Archive& ac, int depth);
-
-	public    : static void deserializeCustomFundamental(istream& stream, Archive& ac,const string& str);
-	public    : static void deserializeContainerOfFundamental(istream& stream, Archive& ac, const string& str);
-	public    : static void deserializeFundamentalSerializable(istream& stream, Archive& ac, const string& str);
-
-	public : template<typename Type>
-		 static void loadFromFile(const string& libName, const string& fileName,const string& name, Type& t);
-
-	public : template<typename Type>
-		 static void saveToFile(const string& libName, const string& fileName,const string& name, Type& t);
-
-
-	public : template<typename Type>
-		 void loadArchive(const string& libName, istream& stream, Type& t, const string& name);
-
-	public : template<typename Type>
-		 void saveArchive(const string& libName, ostream& stream, Type& t, const string& name);
+		template<typename Type>
+		static void loadFromFile(const string& libName, const string& fileName,const string& name, Type& t);
+		
+		template<typename Type>
+		static void saveToFile(const string& libName, const string& fileName,const string& name, Type& t);
+		
+		
+		template<typename Type>
+		void loadArchive(const string& libName, istream& stream, Type& t, const string& name);
+		
+		template<typename Type>
+		void saveArchive(const string& libName, ostream& stream, Type& t, const string& name);
 
 	REGISTER_CLASS_NAME(IOFormatManager);
 	REGISTER_BASE_CLASS_NAME(Serializable);
 
 };
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "IOFormatManager.tpp"
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 REGISTER_FACTORABLE(IOFormatManager);
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+#endif //  IOFORMATMANAGER_HPP
 
-#endif // __IOMANAGER__
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////

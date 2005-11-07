@@ -1,84 +1,55 @@
-/***************************************************************************
- *   Copyright (C) 2004 by Olivier Galizzi                                 *
- *   olivier.galizzi@imag.fr                                               *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
+/*************************************************************************
+*  Copyright (C) 2004 by Olivier Galizzi                                 *
+*  olivier.galizzi@imag.fr                                               *
+*                                                                        *
+*  This program is free software; it is licensed under the terms of the  *
+*  GNU General Public License v2 or later. See file LICENSE for details. *
+*************************************************************************/
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-#ifndef __QTMETADISPATCHINGENGINEPROPERTIES_HPP__
-#define __QTMETADISPATCHINGENGINEPROPERTIES_HPP__
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+#ifndef QTMETADISPATCHINGENGINEPROPERTIES_HPP
+#define QTMETADISPATCHINGENGINEPROPERTIES_HPP
 
 #include <QtGeneratedMetaDispatchingEngineProperties.h>
 #include <qlayout.h>
 #include <qcombobox.h>
 #include <qpixmap.h>
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 #include <yade/yade-core/MetaDispatchingEngine.hpp>
 #include <yade/yade-core/Engine.hpp>
 #include <yade/yade-lib-serialization-qt/QtGUIGenerator.hpp>
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-/**
-@author Olivier Galizzi
-*/
 class QtMetaDispatchingEngineProperties : public QtGeneratedMetaDispatchingEngineProperties
 {
-	protected : vector<vector<QWidget*> > cbs;
-	protected : vector<shared_ptr<EngineUnit> > engineUnitParameters;
+	protected :
+		vector<vector<QWidget*> > cbs;
+		vector<shared_ptr<EngineUnit> > engineUnitParameters;
 
-	protected : vector<string> baseClasses;
-	protected : int dimension;
-	protected : QtGUIGenerator guiGen;
-	protected : QFrame * engineUnitFrame;
-	protected : shared_ptr<MetaDispatchingEngine> metaEngine;
+		vector<string> baseClasses;
+		int dimension;
+		QtGUIGenerator guiGen;
+		QFrame * engineUnitFrame;
+		shared_ptr<MetaDispatchingEngine> metaEngine;
 
-	protected : vector<vector<string> > inheritedClasses;
+		vector<vector<string> > inheritedClasses;
 
-	protected : void buildDynlibList();
+		void buildDynlibList();
 
-	private   : QPixmap image0;
-	private   : QPixmap image1;
+	private :
+		QPixmap image0;
+		QPixmap image1;
 
-	public    : QtMetaDispatchingEngineProperties(shared_ptr<MetaDispatchingEngine>& mde, QWidget* parent=0,  const char* name=0 );
-	public    : QtMetaDispatchingEngineProperties(QWidget* parent=0,  const char* name=0);
-	public    : ~QtMetaDispatchingEngineProperties();
+	public :
+		QtMetaDispatchingEngineProperties(shared_ptr<MetaDispatchingEngine>& mde, QWidget* parent=0,  const char* name=0 );
+		QtMetaDispatchingEngineProperties(QWidget* parent=0,  const char* name=0);
+		~QtMetaDispatchingEngineProperties();
 
-	public slots : void pbAddClicked();
-	public slots : void pbOkClicked();
-	public slots : void pbRemoveClicked();
-	public slots : void pbSerializationClicked();
+	public slots :
+		void pbAddClicked();
+		void pbOkClicked();
+		void pbRemoveClicked();
+		void pbSerializationClicked();
 
 	protected  : void showEvent( QShowEvent * );
 };
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+#endif // QTMETADISPATCHINGENGINEPROPERTIES_HPP
 
-#endif // __QTMETADISPATCHINGENGINEPROPERTIES_HPP__
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////

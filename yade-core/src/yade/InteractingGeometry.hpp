@@ -1,44 +1,20 @@
-/***************************************************************************
- *   Copyright (C) 2004 by Olivier Galizzi                                 *
- *   olivier.galizzi@imag.fr                                               *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
+/*************************************************************************
+*  Copyright (C) 2004 by Olivier Galizzi                                 *
+*  olivier.galizzi@imag.fr                                               *
+*                                                                        *
+*  This program is free software; it is licensed under the terms of the  *
+*  GNU General Public License v2 or later. See file LICENSE for details. *
+*************************************************************************/
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-#ifndef __COLLISIONMODEL_H__
-#define __COLLISIONMODEL_H__
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+#ifndef INTERACTING_GEOMETRY_HPP
+#define INTERACTING_GEOMETRY_HPP
 
 #include <yade/yade-lib-serialization/Serializable.hpp>
 #include <yade/yade-lib-multimethods/Indexable.hpp>
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 class BoundingVolume;
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-// the geometry through which the body zill interact:
+// the geometry through which the body will interact:
 // - planet emitting gravity has just radius of influence
 // - magnet has also just volume of influence
 // - for tetrahedrons we can use sphere tree or sweptshpere volume
@@ -48,39 +24,20 @@ class BoundingVolume;
 
 class InteractingGeometry : public Serializable, public Indexable
 {
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-/// Attributes											///
-///////////////////////////////////////////////////////////////////////////////////////////////////
+	public :
+		Vector3f diffuseColor;
 	
-	public : Vector3f diffuseColor;
-	
-///////////////////////////////////////////////////////////////////////////////////////////////////
-/// Serialization										///
-///////////////////////////////////////////////////////////////////////////////////////////////////
-	
+/// Serialization
+	protected :
+		void registerAttributes();
 	REGISTER_CLASS_NAME(InteractingGeometry);
 	REGISTER_BASE_CLASS_NAME(Serializable Indexable);
-
-	public : void registerAttributes();
 	
-///////////////////////////////////////////////////////////////////////////////////////////////////
-/// Indexable											///
-///////////////////////////////////////////////////////////////////////////////////////////////////
-	
+/// Indexable
 	REGISTER_INDEX_COUNTER(InteractingGeometry);
-	
 };
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 REGISTER_SERIALIZABLE(InteractingGeometry,false);
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+#endif //  INTERACTING_GEOMETRY_HPP
 
-#endif // __COLLISIONMODEL_H__
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////

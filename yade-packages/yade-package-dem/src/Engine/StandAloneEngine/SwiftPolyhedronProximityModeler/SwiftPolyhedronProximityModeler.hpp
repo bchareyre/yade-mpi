@@ -1,94 +1,44 @@
-/***************************************************************************
- *   Copyright (C) 2004 by Olivier Galizzi                                 *
- *   olivier.galizzi@imag.fr                                               *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
+/*************************************************************************
+*  Copyright (C) 2004 by Olivier Galizzi                                 *
+*  olivier.galizzi@imag.fr                                               *
+*                                                                        *
+*  This program is free software; it is licensed under the terms of the  *
+*  GNU General Public License v2 or later. See file LICENSE for details. *
+*************************************************************************/
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-#ifndef __SWIFTPOLYHEDRONPROXIMITYMODELER_HPP__
-#define __SWIFTPOLYHEDRONPROXIMITYMODELER_HPP__
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+#ifndef SWIFTPOLYHEDRONPROXIMITYMODELER_HPP
+#define SWIFTPOLYHEDRONPROXIMITYMODELER_HPP
 
 #include "PolyhedralSweptSphere.hpp"
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 #include <yade/yade-core/Engine.hpp>
 #include <yade/yade-lib-swiftpp/SWIFT.h>
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 class SwiftPolyhedronProximityModeler : public Engine
 {
+	private :
+		SWIFT_Scene*	 scene;
+		bool		 first;
+		vector<int>	 ids;
+		double *	 vs;
+		int *		 fs;
+		int *		 fv;
+		int		 vn
+				,fn;
+		double		 R[9];
+		double		 T[3];
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-/// Attributes											///
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-	private : SWIFT_Scene* scene;
-	private : bool first;
-	private : vector<int> ids;
-	private : double * vs;
-	private : int * fs;
-	private : int * fv;
-	private : int vn, fn;
-	private : double R[9];
-	private : double T[3];
+		void getSwiftInfo(const PolyhedralSweptSphere* pss, double *& v, int *& f,  int*& fv,int& nbVertices, int& nbFaces);
 	
-///////////////////////////////////////////////////////////////////////////////////////////////////
-/// Constructor/Destructor									///
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-	/*! Constructor */
-	public : SwiftPolyhedronProximityModeler();
-
-	/*! Destructor */
-	public : virtual ~SwiftPolyhedronProximityModeler();
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-/// Methods											///
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-	public    : virtual void action(Body* body);
+	public :
+		SwiftPolyhedronProximityModeler();
+		virtual ~SwiftPolyhedronProximityModeler();
+		virtual void action(Body* body);
 	
 	REGISTER_CLASS_NAME(SwiftPolyhedronProximityModeler);
 	REGISTER_BASE_CLASS_NAME(Engine);
-
-	
-	private : void getSwiftInfo(const PolyhedralSweptSphere* pss, double *& v, int *& f,  int*& fv,int& nbVertices, int& nbFaces);
-
 };
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 REGISTER_SERIALIZABLE(SwiftPolyhedronProximityModeler,false);
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-#endif // __SWIFTPOLYHEDRONPROXIMITYMODELER_HPP__
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+#endif // SWIFTPOLYHEDRONPROXIMITYMODELER_HPP
 

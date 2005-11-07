@@ -1,55 +1,35 @@
-/***************************************************************************
- *   Copyright (C) 2004 by Janek Kozicki                                   *
- *   cosurgi@berlios.de                                                    *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+/*************************************************************************
+*  Copyright (C) 2004 by Janek Kozicki                                   *
+*  cosurgi@berlios.de                                                    *
+*                                                                        *
+*  This program is free software; it is licensed under the terms of the  *
+*  GNU General Public License v2 or later. See file LICENSE for details. *
+*************************************************************************/
 
 #ifndef LATTICE_BOX_HPP
 #define LATTICE_BOX_HPP 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 #include <yade/yade-core/FileGenerator.hpp>
 #include <yade/yade-lib-wm3-math/Vector3.hpp>
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 class LatticeExample : public FileGenerator
 {
 	private :
-		Vector3r 	nbNodes;
-		Real 		disorder;
-		Real 		maxLength;
 		int 		nodeGroupMask,beamGroupMask;
-		Real 		maxDeformationSquared;
 		
-		Vector3r 	regionA_min;
-		Vector3r 	regionA_max;
-		Vector3r 	direction_A;
-		Real 		velocity_A;
-		Vector3r 	regionB_min;
-		Vector3r 	regionB_max;
-		Vector3r 	direction_B;
-		Real 		velocity_B;
+		Vector3r 	 nbNodes
+			 	,regionA_min
+			 	,regionA_max
+			 	,direction_A
+			 	,regionB_min
+			 	,regionB_max
+			 	,direction_B;
+		
+		Real 		 disorder
+		 		,maxLength
+		 		,velocity_B
+		 		,velocity_A
+		 		,maxDeformationSquared;
 
 	public : 
 		LatticeExample();
@@ -70,16 +50,7 @@ class LatticeExample : public FileGenerator
 
 };
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 REGISTER_SERIALIZABLE(LatticeExample,false);
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 #endif // LATTICE_BOX_HPP 
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 

@@ -1,108 +1,54 @@
-/***************************************************************************
- *   Copyright (C) 2005 by Olivier Galizzi   *
- *   olivier.galizzi@imag.fr   *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
+/*************************************************************************
+*  Copyright (C) 2004 by Olivier Galizzi                                 *
+*  olivier.galizzi@imag.fr                                               *
+*                                                                        *
+*  This program is free software; it is licensed under the terms of the  *
+*  GNU General Public License v2 or later. See file LICENSE for details. *
+*************************************************************************/
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-#ifndef __BODYCONTAINERITERATORPOINTER__
-#define __BODYCONTAINERITERATORPOINTER__
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#ifndef BODYCONTAINERITERATORPOINTER_HPP
+#define BODYCONTAINERITERATORPOINTER_HPP
 
 #include "BodyContainerIterator.hpp"
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 class BodyContainerIteratorPointer
 {
-	private : shared_ptr<BodyContainerIterator> ptr;
-	public  : BodyContainerIterator& getRef() {return *ptr;};
-	public  : BodyContainerIterator& getRef() const {return *ptr;};
-	public  : shared_ptr<BodyContainerIterator> get() {return ptr;};
-	public  : shared_ptr<BodyContainerIterator> get() const {return ptr;};
+	private :
+		shared_ptr<BodyContainerIterator> ptr;
+		void allocate(const BodyContainerIteratorPointer& bi)
+		{
+			if (ptr==0) ptr = bi.get()->createPtr();
+		}
 
 
-	public  : BodyContainerIteratorPointer(const BodyContainerIteratorPointer& bi) 
-	{
-		allocate(bi);
-		ptr->affect(bi.getRef());
-	};
+	public :
+		BodyContainerIterator&			getRef()	{ return *ptr; };
+		BodyContainerIterator&			getRef() const	{ return *ptr; };
+		shared_ptr<BodyContainerIterator>	get()		{ return  ptr; };
+		shared_ptr<BodyContainerIterator>	get() const	{ return  ptr; };
 
-	public  : BodyContainerIteratorPointer(const shared_ptr<BodyContainerIterator>& i)
-	{
-		ptr = i;
-	};
+		BodyContainerIteratorPointer(const shared_ptr<BodyContainerIterator>& i)	{ ptr = i; };
 
-	public  : BodyContainerIteratorPointer() 
-	{
-		ptr = shared_ptr<BodyContainerIterator>();
-	};
+		BodyContainerIteratorPointer()		{ ptr = shared_ptr<BodyContainerIterator>(); };
 
-	private : void allocate(const BodyContainerIteratorPointer& bi)
-	{
-		if (ptr==0)
-			ptr = bi.get()->createPtr();
-	}
+		BodyContainerIteratorPointer(const BodyContainerIteratorPointer& bi) 
+		{
+			allocate(bi);
+			ptr->affect(bi.getRef());
+		};
 
-	public  : bool operator!=(const BodyContainerIteratorPointer& bi)
-	{
-		return ptr->isDifferent(bi.getRef());
-	};
+		bool operator!=(const BodyContainerIteratorPointer& bi)	{ return ptr->isDifferent(bi.getRef());	};
+		shared_ptr<Body>			operator*()	{ return ptr->getValue(); };	
+		BodyContainerIteratorPointer&		operator++()	{ ptr->increment(); return *this; };
+		BodyContainerIteratorPointer&		operator++(int); // disabled 
+		BodyContainerIteratorPointer& operator=(const BodyContainerIteratorPointer& bi)
+		{
+			allocate(bi);
+			ptr->affect(bi.getRef());
+			return *this;
+		};
 
-	public  : BodyContainerIteratorPointer& operator++()
-	{
-		ptr->increment();
-		return *this;
-	};
-
-//	public  : BodyContainerIteratorPointer& operator++(int)
-//	{
-		// FIXME - this is bad. because it returns incremented value.
-		//         the real solution is to copy whole class (duplicate in memory)
-		//         but it is ineffective. so it's better to disable this operator.
-//		BodyContainerIteratorPointer& tmp = *this;
-//		ptr->increment();
-//		return tmp;
-//	};
-
-	public  : BodyContainerIteratorPointer& operator=(const BodyContainerIteratorPointer& bi)
-	{
-		allocate(bi);
-			
-		ptr->affect(bi.getRef());
-		return *this;
-	};
-
-	public  : shared_ptr<Body> operator*()
-	{
-		return ptr->getValue();
-	};	
 };
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-#endif // __BODYCONTAINERITERATORPOINTER__
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#endif // BODYCONTAINERITERATORPOINTER_HPP
 

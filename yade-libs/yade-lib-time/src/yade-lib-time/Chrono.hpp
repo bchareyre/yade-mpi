@@ -1,31 +1,13 @@
-/***************************************************************************
- *   Copyright (C) 2004 by Olivier Galizzi                                 *
- *   olivier.galizzi@imag.fr                                               *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
+/*************************************************************************
+*  Copyright (C) 2004 by Olivier Galizzi                                 *
+*  olivier.galizzi@imag.fr                                               *
+*                                                                        *
+*  This program is free software; it is licensed under the terms of the  *
+*  GNU General Public License v2 or later. See file LICENSE for details. *
+*************************************************************************/
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-#ifndef __CHRONO_H__
-#define __CHRONO_H__
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+#ifndef CHRONO_HPP
+#define CHRONO_HPP
 
 // Visual C++ : D�init _Windows
 #if defined(_MSC_VER)
@@ -43,29 +25,24 @@
 	#include <windows.h>
 #endif
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
 class Chrono
 {
+/// Attributes
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-/// Attributes											///
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-	private : double frequency;
-	private : double time;
-	private : double begin;
-	private : double end;
+	private :
+		double		 frequency
+				,time
+				,begin
+				,end;
 	
 	// Instruction RDTSC du processeur Pentium
-	private : double RDTSC();
+		double RDTSC();
 
 
 	// Lit la fr�uence du processeur
 	// Renvoie la fr�uence en Hz dans 'frequence' si le code de retour est
 	// diff�ent de 1. Renvoie 0 en cas d'erreur.
-	private : int readCpuFrequency ();
+		int readCpuFrequency ();
 	
 	#if defined(_Windows)
 		// D�init les types uint32 et uint64 sous Windows
@@ -92,19 +69,15 @@ class Chrono
 	#endif
 
 	
-	public : Chrono();
-	public : ~Chrono();
+	public :
+		Chrono();
+		~Chrono();
 	
-	public : void start();
-	public : double stop();
-	public : double getTime();
+		void start();
+		double stop();
+		double getTime();
 
 };
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 #endif // __CHRONO_H__
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -1,72 +1,45 @@
-/***************************************************************************
- *   Copyright (C) 2005 by Olivier Galizzi   *
- *   olivier.galizzi@imag.fr   *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
+/*************************************************************************
+*  Copyright (C) 2004 by Olivier Galizzi                                 *
+*  olivier.galizzi@imag.fr                                               *
+*                                                                        *
+*  This program is free software; it is licensed under the terms of the  *
+*  GNU General Public License v2 or later. See file LICENSE for details. *
+*************************************************************************/
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-#ifndef __STANDALONESIMULATOR_HPP__
-#define __STANDALONESIMULATOR_HPP__
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+#ifndef STANDALONESIMULATOR_HPP
+#define STANDALONESIMULATOR_HPP
 
 #include <yade/yade-lib-serialization/Serializable.hpp>
 #include <yade/yade-lib-wm3-math/Math.hpp>
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 class StandAloneSimulator : public Serializable
 {
+	protected :
+		bool	 record;
 
-	protected : bool record;
-	protected : int interval;
-	protected : string outputDirectory;
-	protected : string outputBaseName;
-	protected : int paddle;
+		int	 interval
+			,paddle;
 
-	public : StandAloneSimulator();
-	public : virtual ~StandAloneSimulator() {};
+		string	 outputDirectory
+			,outputBaseName;
 
-	public : virtual void setTimeStep(Real dt) {};
-	public : virtual void doOneIteration() {};
-	public : virtual void run(int nbIterations) {};
-	public : virtual void loadConfigurationFile(const string& fileName) {};
+	public : 
+		StandAloneSimulator();
+		virtual ~StandAloneSimulator() {};
 
-	public : void setRecording(bool record);
-	public : void setRecordingProperties(int interval, const string& outputDirectory,const string& outputBaseName,int paddle);
+		virtual void setTimeStep(Real dt) {};
+		virtual void doOneIteration() {};
+		virtual void run(int nbIterations) {};
+		virtual void loadConfigurationFile(const string& fileName) {};
+
+		void setRecording(bool record);
+		void setRecordingProperties(int interval, const string& outputDirectory,const string& outputBaseName,int paddle);
 
 	REGISTER_CLASS_NAME(StandAloneSimulator);
 	REGISTER_BASE_CLASS_NAME(Serializable);
-
 };
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 REGISTER_SERIALIZABLE(StandAloneSimulator,false);
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+#endif // STANDALONESIMULATOR_HPP
 
-#endif // __STANDALONESIMULATOR_HPP__
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////

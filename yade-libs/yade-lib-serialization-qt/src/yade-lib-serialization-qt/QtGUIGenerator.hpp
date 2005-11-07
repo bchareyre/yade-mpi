@@ -1,149 +1,86 @@
-/***************************************************************************
- *   Copyright (C) 2004 by Olivier Galizzi                                 *
- *   olivier.galizzi@imag.fr                                               *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
+/*************************************************************************
+*  Copyright (C) 2004 by Olivier Galizzi                                 *
+*  olivier.galizzi@imag.fr                                               *
+*                                                                        *
+*  This program is free software; it is licensed under the terms of the  *
+*  GNU General Public License v2 or later. See file LICENSE for details. *
+*************************************************************************/
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-#ifndef __QTGUIGENERATOR_HPP__
-#define __QTGUIGENERATOR_HPP__
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+#ifndef QTGUIGENERATOR_HPP
+#define QTGUIGENERATOR_HPP
 
 #include <yade/yade-lib-serialization-xml/XMLFormatManager.hpp>
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 #include <map>
 #include <vector>
-
 #include <boost/shared_ptr.hpp>
-
 #include <qobject.h>
 #include <qlabel.h>
 #include <qobject.h>
 #include <qframe.h>
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 using namespace std;
 using namespace boost;
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-/*! \brief 
-
-	
-*/
 class QtGUIGenerator : public QObject
 {
-
 	Q_OBJECT
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-/// Attributes											///
-///////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	class AttributeDescriptor
-	{
-		public : typedef enum {INTEGER,FLOATING,BOOLEAN} AttributeType;
-		
-		public : AttributeDescriptor() { strings.clear();widgets.clear();types.clear();};
-		public : virtual ~AttributeDescriptor()
+	private :
+
+		struct AttributeDescriptor
 		{
+				typedef enum {INTEGER,FLOATING,BOOLEAN} AttributeType;
+			
+				AttributeDescriptor() { strings.clear();widgets.clear();types.clear();};
+				virtual ~AttributeDescriptor()	{ }
+				string name;
+				vector<string> strings;
+				QLabel* label;
+				vector<AttributeType> types;
+				vector<QWidget*> widgets;
+			//	vector<QLineEdit*> lineEdits;
+		};
+		bool		 resizeHeight
+				,resizeWidth
+				,showButtons;
 
-			//if (label)
-			//	label->~QLabel();
-			//for(unsigned int i=0;i<widgets.size();i++)
-			//	if (widgets[i])
-			//		delete widgets[i];
-			//strings.clear();
-			//types.clear();
-			//widgets.clear();
-		}
-		public : string name;
-		public : vector<string> strings;
-		public : QLabel* label;
-		public : vector<AttributeType> types;
-		//public : vector<QLineEdit*> lineEdits;
-		public : vector<QWidget*> widgets;
-	};
-	
-	public : vector<shared_ptr<AttributeDescriptor> > descriptors;
-	public : map<string,int> lookUp;
-	public : shared_ptr<Serializable> serializable;	
-	private : QWidget * currentWidget;
+		int		 translationX
+				,translationY
+				,shiftX
+				,shiftY
+				,buttonWidth
+				,buttonHeight
+				,widgetWidth
+				,widgetHeight;
 
-	private : bool resizeHeight;
-	private : bool resizeWidth;
-	private : int translationX;
-	private : int translationY;
-	private : int shiftX;
-	private : int shiftY;
-	private : bool showButtons;
-	public : void setShowButtons(bool b) { showButtons=b;};
-	public : void setResizeHeight(bool b) { resizeHeight=b;};
-	public : void setResizeWidth(bool b) { resizeWidth=b;};
-	public : void setTranslation(int x, int y) { translationX=x; translationY=y; };
-	public : void setShift(int x, int y) {shiftX=x;shiftY=y;};
-	
-	private : string getString(shared_ptr<AttributeDescriptor> d, int widgetNum);
-	private : int buttonWidth;
-	private : int buttonHeight;
-	private : int widgetWidth;
-	private : int widgetHeight;
-	
-///////////////////////////////////////////////////////////////////////////////////////////////////
-/// Constructor/Destructor									///
-///////////////////////////////////////////////////////////////////////////////////////////////////
-	
-	/*! Constructor */
-	public : QtGUIGenerator ();
+		QWidget *	currentWidget;
 
-	/*! Destructor */
-	public : virtual ~QtGUIGenerator ();
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-/// Methods											///
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-	public : void buildGUI(shared_ptr<Serializable> s, QWidget * widget);
-	public : void deserialize(shared_ptr<Serializable> s);
+		string getString(shared_ptr<AttributeDescriptor> d, int widgetNum);
+		void reArrange(QWidget * widget);
+		void addButtons(QWidget * widget);
 	
-	private : void reArrange(QWidget * widget);
-	private : void addButtons(QWidget * widget);
-	
-	public slots : virtual void pushButtonOkClicked() ;
-	public slots : virtual void pushButtonApplyClicked() ;
-	public slots : virtual void pushButtonCancelClicked() ;
+	public :
+		vector<shared_ptr<AttributeDescriptor> > descriptors;
+		map<string,int> lookUp;
+		shared_ptr<Serializable> serializable;	
 
+		void setShowButtons(bool b) { showButtons=b;};
+		void setResizeHeight(bool b) { resizeHeight=b;};
+		void setResizeWidth(bool b) { resizeWidth=b;};
+		void setTranslation(int x, int y) { translationX=x; translationY=y; };
+		void setShift(int x, int y) {shiftX=x;shiftY=y;};
+	
+		QtGUIGenerator ();
+		virtual ~QtGUIGenerator ();
+
+		void buildGUI(shared_ptr<Serializable> s, QWidget * widget);
+		void deserialize(shared_ptr<Serializable> s);
+	
+	public slots :
+		virtual void pushButtonOkClicked() ;
+		virtual void pushButtonApplyClicked() ;
+		virtual void pushButtonCancelClicked() ;
 };
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-#endif // __QTGUIGENERATOR_HPP__
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+#endif // QTGUIGENERATOR_HPP
 

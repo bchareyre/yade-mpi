@@ -1,71 +1,35 @@
-/***************************************************************************
- *   Copyright (C) 2005 by Olivier Galizzi                                 *
- *   olivier.galizzi@imag.fr                                               *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
+/*************************************************************************
+*  Copyright (C) 2004 by Olivier Galizzi                                 *
+*  olivier.galizzi@imag.fr                                               *
+*                                                                        *
+*  This program is free software; it is licensed under the terms of the  *
+*  GNU General Public License v2 or later. See file LICENSE for details. *
+*************************************************************************/
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-#ifndef __INTERACTIONHASHMAPITERATOR__
-#define __INTERACTIONHASHMAPITERATOR__
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#ifndef INTERACTIONHASHMAPITERATOR_HPP
+#define INTERACTIONHASHMAPITERATOR_HPP
 
 #include <yade/yade-core/InteractionContainerIterator.hpp>
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 #include <vector>
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 #include "InteractionHashMap.hpp"
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 using namespace std;
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 class InteractionHashMapIterator : public InteractionContainerIterator 
 {
-	public : IHashMap::iterator hmii;
+	public :
+		IHashMap::iterator hmii;
 
-	public : InteractionHashMapIterator();
-	public : ~InteractionHashMapIterator();
+		InteractionHashMapIterator();
+		~InteractionHashMapIterator();
 
-	public : virtual bool isDifferent(const InteractionContainerIterator& i);
-	public : virtual void affect(const InteractionContainerIterator& i);
-	public : virtual void increment();
-	public : virtual shared_ptr<Interaction> getValue();
-	public : virtual shared_ptr<InteractionContainerIterator> createPtr();
+		virtual bool isDifferent(const InteractionContainerIterator& i);
+		virtual void affect(const InteractionContainerIterator& i);
+		virtual void increment();
+		virtual shared_ptr<Interaction> getValue();
+		virtual shared_ptr<InteractionContainerIterator> createPtr();
 
 };
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#endif // INTERACTIONHASHMAPITERATOR_HPP
 
-#endif // __INTERACTIONHASHMAPITERATOR__
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////

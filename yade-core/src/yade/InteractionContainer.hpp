@@ -1,110 +1,54 @@
-/***************************************************************************
- *   Copyright (C) 2004 by Olivier Galizzi                                 *
- *   olivier.galizzi@imag.fr                                               *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
+/*************************************************************************
+*  Copyright (C) 2004 by Olivier Galizzi                                 *
+*  olivier.galizzi@imag.fr                                               *
+*  Copyright (C) 2004 by Janek Kozicki                                   *
+*  cosurgi@berlios.de                                                    *
+*                                                                        *
+*  This program is free software; it is licensed under the terms of the  *
+*  GNU General Public License v2 or later. See file LICENSE for details. *
+*************************************************************************/
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-#ifndef __INTERACTIONCONTAINER_HPP__
-#define __INTERACTIONCONTAINER_HPP__
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+#ifndef INTERACTIONCONTAINER_HPP
+#define INTERACTIONCONTAINER_HPP
 
 #include <yade/yade-lib-serialization/Serializable.hpp>
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 #include "InteractionContainerIteratorPointer.hpp"
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 class Interaction;
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 using namespace boost;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 class InteractionContainer : public Serializable
 {
-	public    : InteractionContainer() { interaction.clear(); };
-	public    : virtual ~InteractionContainer() {};
+	public :
+		InteractionContainer() { interaction.clear(); };
+		virtual ~InteractionContainer() {};
 
-	public    : virtual bool insert(unsigned int /*id1*/,unsigned int /*id2*/)				{throw;};
-	public    : virtual bool insert(shared_ptr<Interaction>&)						{throw;};
-	public    : virtual void clear() 									{throw;};
-	public    : virtual bool erase(unsigned int /*id1*/,unsigned int /*id2*/) 				{throw;};
+		virtual bool insert(unsigned int /*id1*/,unsigned int /*id2*/)				{throw;};
+		virtual bool insert(shared_ptr<Interaction>&)						{throw;};
+		virtual void clear() 									{throw;};
+		virtual bool erase(unsigned int /*id1*/,unsigned int /*id2*/) 				{throw;};
 
-	public    : virtual const shared_ptr<Interaction>& find(unsigned int /*id1*/,unsigned int /*id2*/) 		{throw;};
+		virtual const shared_ptr<Interaction>& find(unsigned int /*id1*/,unsigned int /*id2*/) 	{throw;};
 
-	// looping over the data
-//	public    : virtual void gotoFirst() 									{throw;};
-//	public    : virtual bool notAtEnd() 									{throw;};
-//	public    : virtual void gotoNext() 									{throw;};
+		typedef InteractionContainerIteratorPointer iterator;
+        	virtual InteractionContainer::iterator begin()						{throw;};
+        	virtual InteractionContainer::iterator end()						{throw;};
 
-// BEGIN - delete that! we shouldn't check isReal flag inside contaier, because we will make iterators
-//	public    : virtual void gotoFirstPotential() 								{throw;};
-//	public    : virtual void gotoNextPotential() 								{throw;};
-//	public    : virtual bool notAtEndPotential() 								{throw;};
-// END
+		virtual unsigned int size() 								{throw;};
 
+	private :
+		vector<shared_ptr<Interaction> > interaction;
 
-
-	public    : typedef InteractionContainerIteratorPointer iterator;
-        public    : virtual InteractionContainer::iterator begin()			{throw;};
-        public    : virtual InteractionContainer::iterator end()			{throw;};
-
-	
- 	//public    : virtual const shared_ptr<Interaction>& getCurrent() 						{throw;};
-
-	// deletes currently pointed element, and goes to the next one.
-	//public    : virtual void eraseCurrentAndGotoNext() 							{throw;};
-	//public    : virtual void eraseCurrentAndGotoNextPotential()						{throw;};
-	public    : virtual unsigned int size() 								{throw;};
-
-
-	// serialization of this class...
+	protected :
+		virtual void registerAttributes();
+		virtual void preProcessAttributes(bool deserializing);
+		virtual void postProcessAttributes(bool deserializing);
 	REGISTER_CLASS_NAME(InteractionContainer);
 	REGISTER_BASE_CLASS_NAME(Serializable);
-
-	private   : vector<shared_ptr<Interaction> > interaction;
-	public    : virtual void registerAttributes();
-
-	protected : virtual void preProcessAttributes(bool deserializing);
-	protected : virtual void postProcessAttributes(bool deserializing);
 };
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 REGISTER_SERIALIZABLE(InteractionContainer,false);
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+#endif // INTERACTIONCONTAINER_HPP
 
-#endif // __INTERACTIONCONTAINER_HPP__
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////

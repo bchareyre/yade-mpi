@@ -1,97 +1,49 @@
-/***************************************************************************
- *   Copyright (C) 2004 by Olivier Galizzi                                 *
- *   olivier.galizzi@imag.fr                                               *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
+/*************************************************************************
+*  Copyright (C) 2004 by Olivier Galizzi                                 *
+*  olivier.galizzi@imag.fr                                               *
+*  Copyright (C) 2004 by Janek Kozicki                                   *
+*  cosurgi@berlios.de                                                    *
+*                                                                        *
+*  This program is free software; it is licensed under the terms of the  *
+*  GNU General Public License v2 or later. See file LICENSE for details. *
+*************************************************************************/
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-#ifndef __INTERACTION_H__
-#define __INTERACTION_H__
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+#ifndef INTERACTION_HPP
+#define INTERACTION_HPP
 
 #include <boost/shared_ptr.hpp>
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 #include <yade/yade-lib-serialization/Serializable.hpp>
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 #include "InteractionGeometry.hpp"
 #include "InteractionPhysics.hpp"
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 class Interaction : public Serializable
 {
+	private	:
+		unsigned int id1,id2;	// FIXME  this should be vector<unsigned int> ids;
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-/// Attributes											///
-///////////////////////////////////////////////////////////////////////////////////////////////////
-	
-	public	: bool isNew;		// FIXME : better to test if InteractionPhysics==0 and remove this flag
-
-
-
-	// we can remove this flag, if we make another container for PotetntialInteraction with only ids
-	
-	public  : bool isReal;		// maybe we can remove this, and check if InteractingGeometry, and InteractionPhysics are empty?
-	private	: unsigned int id1,id2; // this should be           vector<unsigned int> ids;
+	public :
+		bool isNew;		// FIXME : better to test if InteractionPhysics==0 and remove this flag
+					// we can remove this flag, if we make another container for PotetntialInteraction with only ids
+		bool isReal;		// maybe we can remove this, and check if InteractingGeometry, and InteractionPhysics are empty?
 
 
 	// FIXME - why public ?!
-	public	: shared_ptr<InteractionGeometry> interactionGeometry; // should return InteractionGeometry*
-	public	: shared_ptr<InteractionPhysics> interactionPhysics;
+		shared_ptr<InteractionGeometry> interactionGeometry; // FIXME should return InteractionGeometry* (faster, we know who is responsible for deletion)
+		shared_ptr<InteractionPhysics> interactionPhysics;
 
-	// construction
-	public	: Interaction ();
-	public	: Interaction(unsigned int newId1,unsigned int newId2);
+		Interaction ();
+		Interaction(unsigned int newId1,unsigned int newId2);
 
-	public	: unsigned int getId1() {return id1;}; // everything written inside class declaration is inline, therefore as fast as accessing the variable itself, every compiler guarantees this.
-	public	: unsigned int getId2() {return id2;};
+		unsigned int getId1() {return id1;};
+		unsigned int getId2() {return id2;};
 
-	public	: void registerAttributes();
-
+	protected :
+		void registerAttributes();
 	REGISTER_CLASS_NAME(Interaction);
 	REGISTER_BASE_CLASS_NAME(Serializable);
-
 };
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 REGISTER_SERIALIZABLE(Interaction,false);
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-#endif // __INTERACTION_H__
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
-
-
+#endif // INTERACTION_HPP
 

@@ -1,31 +1,14 @@
-/***************************************************************************
- *   Copyright (C) 2004 by Olivier Galizzi                                 *
- *   olivier.galizzi@imag.fr                                               *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
- 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+/*************************************************************************
+*  Copyright (C) 2004 by Olivier Galizzi                                 *
+*  olivier.galizzi@imag.fr                                               *
+*  Copyright (C) 2004 by Bronek Kozicki                                  *
+*                                                                        *
+*  This program is free software; it is licensed under the terms of the  *
+*  GNU General Public License v2 or later. See file LICENSE for details. *
+*************************************************************************/
 
-#ifndef __DYNLIBMANAGER_H__
-#define __DYNLIBMANAGER_H__
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+#ifndef DYNLIBMANAGER_HPP
+#define DYNLIBMANAGER_HPP
 
 #ifdef WIN32
 	#define OS "Windows"
@@ -41,63 +24,41 @@
 #include <map>
 #include <vector>
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 using namespace std;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 class DynLibManager 
 {
+	private :
+		#ifdef WIN32
+		std::map<const string, HINSTANCE> handles;	
+		#else	
+		std::map<const string, void *> handles;
+		#endif
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-/// Types											///
-///////////////////////////////////////////////////////////////////////////////////////////////////
+		vector<string> baseDirs;
+		bool autoUnload;
 	
-	#ifdef WIN32
-		private : std::map<const string, HINSTANCE> handles;	
-	#else	
-		private : std::map<const string, void *> handles;
-	#endif
+	public :
+		DynLibManager ();
+		~DynLibManager ();
+		void addBaseDirectory(const string& dir);
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-/// Attributes											///
-///////////////////////////////////////////////////////////////////////////////////////////////////
+		bool load (const string& libName, const string& libName);
+		bool loadFromDirectoryList (const string& fullLibName);
+		
+		bool unload (const string libName);
+		bool isLoaded (const string libName);
+		bool unloadAll ();
+		void setAutoUnload ( bool enabled );
+		
+		string libNameToSystemName(const string& name);
+		string systemNameToLibName(const string& name);
+		string findLibDir(const string& name);
 
-	private : vector<string> baseDirs;
-	public : void addBaseDirectory(const string& dir);
-	
-	private : bool autoUnload;
-	
-	// construction
-	public : DynLibManager ();
-	public : ~DynLibManager ();
-
-//	public : Factory resolve (const string libName, const string symb );
-	public : bool load (const string& libName, const string& libName);
-	public : bool loadFromDirectoryList (const string& fullLibName);
-
-
-	public : bool unload (const string libName);
-	public : bool isLoaded (const string libName);
-	public : bool unloadAll ();
-	public : void setAutoUnload ( bool enabled );
-
-	public : string libNameToSystemName(const string& name);
-	public : string systemNameToLibName(const string& name);
-	public : string findLibDir(const string& name);
-
-
-	private : bool closeLib(const string libName);
-	private : bool error();
+	private :
+		bool closeLib(const string libName);
+		bool error();
 };
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #endif // __DYNLIBMANAGER_H__
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////

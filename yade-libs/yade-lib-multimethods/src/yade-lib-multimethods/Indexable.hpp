@@ -1,69 +1,41 @@
-/***************************************************************************
- *   Copyright (C) 2004 by Olivier Galizzi                                 *
- *   olivier.galizzi@imag.fr                                               *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
+/*************************************************************************
+*  Copyright (C) 2004 by Olivier Galizzi                                 *
+*  olivier.galizzi@imag.fr                                               *
+*  Copyright (C) 2004 by Janek Kozicki                                   *
+*  cosurgi@berlios.de                                                    *
+*                                                                        *
+*  This program is free software; it is licensed under the terms of the  *
+*  GNU General Public License v2 or later. See file LICENSE for details. *
+*************************************************************************/
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-#ifndef __INDEXABLE_H__
-#define __INDEXABLE_H__
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+#ifndef INDEXABLE_HPP
+#define INDEXABLE_HPP
 
 #include <boost/scoped_ptr.hpp>
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 /*! \brief Abstract interface for all Indexable class.
-
-	An indexable class is a class that will be managed by a MultiMethodManager. The index the function getClassIndex() returns, corresponds to the index in the matrix where the class will be handled.
+	An indexable class is a class that will be managed by a MultiMethodManager.
+	The index the function getClassIndex() returns, corresponds to the index in the matrix where the class will be handled.
 */
+
 class Indexable
 {
+	protected :
+		void createIndex();
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-/// Constructor/Destructor									///
-///////////////////////////////////////////////////////////////////////////////////////////////////
+	public :
+		Indexable ();
+		virtual ~Indexable ();
 
-	/*! Constructor */
-	public : Indexable ();
-
-	/*! Destructor */
-	public : virtual ~Indexable ();
-
-	protected : void createIndex();
-	
-	/*! Returns the id of the current class. This id is set by a multimethod manager */
-	public : virtual int& getClassIndex() { throw;};
-	public : virtual const int& getClassIndex() const { throw;};
-	public : virtual int& getBaseClassIndex(int ) { throw;};
-	public : virtual const int& getBaseClassIndex(int ) const { throw;};
-	
-	public : virtual const int& getMaxCurrentlyUsedClassIndex() const { throw;};
-	public : virtual void incrementMaxCurrentlyUsedClassIndex() { throw;};
+		virtual int& getClassIndex() { throw;};  /// Returns the id of the current class. This id is set by a multimethod manager
+		virtual const int& getClassIndex() const { throw;};
+		virtual int& getBaseClassIndex(int ) { throw;};
+		virtual const int& getBaseClassIndex(int ) const { throw;};
+		
+		virtual const int& getMaxCurrentlyUsedClassIndex() const { throw;};
+		virtual void incrementMaxCurrentlyUsedClassIndex() { throw;};
 
 };
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 // this macro is used by classes that are a dimension in multimethod matrix
 
@@ -102,7 +74,6 @@ class Indexable
 		else								\
 			return baseClass->getBaseClassIndex(--depth);		\
 	}
-
 
 // this macro is used by base class for classes that are a dimension in multimethod matrix
 // to keep track of maximum number of classes of their kin. Multimethod matrix can't
@@ -154,11 +125,5 @@ class Indexable
 		max++;								\
 	}									\
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-#endif // __INDEXABLE_H__
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+#endif // INDEXABLE_HPP
 

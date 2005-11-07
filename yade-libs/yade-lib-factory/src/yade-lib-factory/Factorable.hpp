@@ -1,45 +1,25 @@
-/***************************************************************************
- *   Copyright (C) 2004 by Olivier Galizzi                                 *
- *   olivier.galizzi@imag.fr                                               *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
+/*************************************************************************
+*  Copyright (C) 2004 by Olivier Galizzi                                 *
+*  olivier.galizzi@imag.fr                                               *
+*  Copyright (C) 2004 by Janek Kozicki                                   *
+*  cosurgi@berlios.de                                                    *
+*                                                                        *
+*  This program is free software; it is licensed under the terms of the  *
+*  GNU General Public License v2 or later. See file LICENSE for details. *
+*************************************************************************/
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-#ifndef __FACTORABLE__
-#define __FACTORABLE__
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+#ifndef FACTORABLE_HPP
+#define FACTORABLE_HPP
 
 #include "ClassFactory.hpp"
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <string>
 #include <sstream>
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 #define REGISTER_CLASS_NAME(cn)								\
 	public : virtual string getClassName() const { return #cn; };
+
+// FIXME[1] - that macro below should go to another class! factorable has nothing to do with inheritance tree.
 
 #define REGISTER_BASE_CLASS_NAME(bcn)							\
 	public : virtual string getBaseClassName(unsigned int i=0) const		\
@@ -72,29 +52,23 @@
 		return tokens.size();							\
 	}
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 class Factorable
 {
-	public    : Factorable() {}
-	public    : virtual ~Factorable() {}
+	public :
+		Factorable() {}
+		virtual ~Factorable() {}
+
+		virtual string getBaseClassName(unsigned int i=0) const { return "";}	// FIXME[1]
+		virtual int getBaseClassNumber() { return 0;}				// FIXME[1]
 
 	REGISTER_CLASS_NAME(Factorable);
-	public : virtual string getBaseClassName(unsigned int i=0) const { return "";}
-	public : virtual int getBaseClassNumber() { return 0;}
 
 // FIXME - virtual function to return version, long and short description, OR
 //         maybe just a file with the same name as class with description inside
-//	public    : virtual std::string getVersion();
+//	public    : virtual std::string getVersion();					// FIXME[1] -	we can make a class Plugin for all that extra stuff: 
+											//		shortDescription(), longDescription(),  baseClassName(), baseClassNumber()
 };
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-#endif // __FACTORABLE__
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
+#endif // FACTORABLE_HPP
 

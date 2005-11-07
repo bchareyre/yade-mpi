@@ -1,89 +1,40 @@
-/***************************************************************************
- *   Copyright (C) 2004 by Olivier Galizzi                                 *
- *   olivier.galizzi@imag.fr                                               *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
+/*************************************************************************
+*  Copyright (C) 2004 by Olivier Galizzi                                 *
+*  olivier.galizzi@imag.fr                                               *
+*                                                                        *
+*  This program is free software; it is licensed under the terms of the  *
+*  GNU General Public License v2 or later. See file LICENSE for details. *
+*************************************************************************/
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-#ifndef __TIMESTEPPER_H__
-#define __TIMESTEPPER_H__
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+#ifndef TIMESTEPPER_HPP
+#define TIMESTEPPER_HPP
 
 #include <list>
 #include <vector>
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 #include "Interaction.hpp"
 #include "Engine.hpp"
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 class Body;
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-/*! \brief Abstract interface for all time stepper engine.
-
-*/
 class TimeStepper : public Engine
 {
+	public :
+		bool active;
+		unsigned int timeStepUpdateInterval;
 
-	public : bool active;
-	public : unsigned int timeStepUpdateInterval;
+		TimeStepper();
+		virtual void computeTimeStep(Body*  ) { throw; };
+		virtual bool isActivated();
+		virtual void action(Body* b) { computeTimeStep(b);} ;
+		void setActive(bool a, int nb=-1);
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-/// Methods											///
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-	public : TimeStepper();
-
-	public : virtual void computeTimeStep(Body*  ) { throw; };
-
-	public : virtual bool isActivated();
-
-	public : virtual void action(Body* b) { computeTimeStep(b);} ;
-
-	public : void setActive(bool a, int nb=-1);
-
-	public : virtual void registerAttributes();
-
+	protected :
+		virtual void registerAttributes();
 	REGISTER_CLASS_NAME(TimeStepper);
 	REGISTER_BASE_CLASS_NAME(Engine);
-
 };
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 REGISTER_SERIALIZABLE(TimeStepper,false);
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-#endif // __TIMESTEPPER_H__
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+#endif // TIMESTEPPER_HPP
 

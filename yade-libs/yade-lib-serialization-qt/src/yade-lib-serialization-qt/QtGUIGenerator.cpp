@@ -310,3 +310,4 @@ void QtGUIGenerator::pushButtonCancelClicked()
 {
 	currentWidget->close();
 }
+

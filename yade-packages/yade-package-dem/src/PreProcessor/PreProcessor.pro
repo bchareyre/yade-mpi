@@ -7,6 +7,7 @@ SUBDIRS += Funnel \
            SDECImpactTest \
            SDECLinkedSpheres \
            SDECSpheresPlane \
+           SDECMovingWall \
            SDECTriaxialTest \
            TetrahedronsTest 
 CONFIG += debug \
