@@ -182,8 +182,8 @@ void SphericalDEMSimulator::loadConfigurationFile(const string& fileName)
 		spheres.push_back(sd);
 	}
 
-	vector<shared_ptr<Engine> >::iterator ei    = rootBody->actors.begin();
-	vector<shared_ptr<Engine> >::iterator eiEnd = rootBody->actors.end();
+	vector<shared_ptr<Engine> >::iterator ei    = rootBody->engines.begin();
+	vector<shared_ptr<Engine> >::iterator eiEnd = rootBody->engines.end();
 	for( ; ei!=eiEnd ; ++ei)
 	{
 		shared_ptr<Engine> e = *ei;

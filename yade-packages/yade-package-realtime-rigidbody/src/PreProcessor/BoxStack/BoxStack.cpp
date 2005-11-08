@@ -285,19 +285,19 @@ void BoxStack::createActors(shared_ptr<MetaBody>& rootBody)
 // 	for(int i=0;i<7;i++)
 // 		kinematic->subscribedBodies.push_back(i);
 	
-	rootBody->actors.clear();
-	rootBody->actors.push_back(shared_ptr<Engine>(new PhysicalActionContainerReseter));
-	rootBody->actors.push_back(boundingVolumeDispatcher);
-	rootBody->actors.push_back(shared_ptr<Engine>(new SAPCollider));
-	rootBody->actors.push_back(interactionGeometryDispatcher);
-	rootBody->actors.push_back(shared_ptr<Engine>(new FrictionLessElasticContactLaw));
-	rootBody->actors.push_back(gravityCondition);
-	rootBody->actors.push_back(actionDampingDispatcher);
-	rootBody->actors.push_back(applyActionDispatcher);
-	rootBody->actors.push_back(positionIntegrator);
-	rootBody->actors.push_back(orientationIntegrator);
+	rootBody->engines.clear();
+	rootBody->engines.push_back(shared_ptr<Engine>(new PhysicalActionContainerReseter));
+	rootBody->engines.push_back(boundingVolumeDispatcher);
+	rootBody->engines.push_back(shared_ptr<Engine>(new SAPCollider));
+	rootBody->engines.push_back(interactionGeometryDispatcher);
+	rootBody->engines.push_back(shared_ptr<Engine>(new FrictionLessElasticContactLaw));
+	rootBody->engines.push_back(gravityCondition);
+	rootBody->engines.push_back(actionDampingDispatcher);
+	rootBody->engines.push_back(applyActionDispatcher);
+	rootBody->engines.push_back(positionIntegrator);
+	rootBody->engines.push_back(orientationIntegrator);
 //	if(isRotating)
-//		rootBody->actors.push_back(kinematic);
+//		rootBody->engines.push_back(kinematic);
 	
 	rootBody->initializers.clear();
 	rootBody->initializers.push_back(actionParameterInitializer);

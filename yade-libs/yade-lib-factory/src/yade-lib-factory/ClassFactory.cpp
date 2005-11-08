@@ -10,15 +10,12 @@
 
 #include "ClassFactory.hpp"
 
-
 class Factorable;
-
 
 void ClassFactory::addBaseDirectory(const string& dir)
 {
 	dlm.addBaseDirectory(dir);
 }
-
 
 bool ClassFactory::registerFactorable( std::string name 			   , CreateFactorableFnPtr create,
 					 CreateSharedFactorableFnPtr createShared, CreatePureCustomFnPtr createPureCustom)
@@ -35,7 +32,6 @@ bool ClassFactory::registerFactorable( std::string name 			   , CreateFactorable
 
 	return tmp;
 }
-
 
 boost::shared_ptr<Factorable> ClassFactory::createShared( std::string name )
 {
@@ -59,7 +55,6 @@ boost::shared_ptr<Factorable> ClassFactory::createShared( std::string name )
 	return ( i -> second.createShared ) ();
 }
 
-
 Factorable* ClassFactory::createPure( std::string name )
 {
 	FactorableCreatorsMap::const_iterator i = map.find( name );
@@ -82,7 +77,6 @@ Factorable* ClassFactory::createPure( std::string name )
 	return ( i -> second.create ) ();
 }
 
-
 void * ClassFactory::createPureCustom( std::string name )
 {
 	FactorableCreatorsMap::const_iterator i = map.find( name );
@@ -94,18 +88,15 @@ void * ClassFactory::createPureCustom( std::string name )
 	return ( i -> second.createPureCustom ) ();
 }
 
-
 bool ClassFactory::load(const string& name)
 {
 	return dlm.loadFromDirectoryList(name);
 }
 
-
 string ClassFactory::libNameToSystemName(const string& name)
 {
 	return dlm.libNameToSystemName(name);
 }
-
 
 string ClassFactory::systemNameToLibName(const string& name)
 {

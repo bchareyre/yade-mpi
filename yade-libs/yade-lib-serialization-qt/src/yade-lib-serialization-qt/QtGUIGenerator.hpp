@@ -33,12 +33,13 @@ class QtGUIGenerator : public QObject
 			
 				AttributeDescriptor() { strings.clear();widgets.clear();types.clear();};
 				virtual ~AttributeDescriptor()	{ }
-				string name;
-				vector<string> strings;
-				QLabel* label;
-				vector<AttributeType> types;
-				vector<QWidget*> widgets;
-			//	vector<QLineEdit*> lineEdits;
+
+				string			name;
+				vector<string>		strings;
+				QLabel*			label;
+				vector<AttributeType>	types;
+				vector<QWidget*>	widgets;
+			//	vector<QLineEdit*>	lineEdits;
 		};
 		bool		 resizeHeight
 				,resizeWidth

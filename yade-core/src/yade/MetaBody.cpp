@@ -21,7 +21,7 @@ MetaBody::MetaBody() :
 	//, volatileInteractions(new InteractionVecSet)
 	//, actionParameters(new PhysicalActionVectorVector)
 {	
-	actors.clear();
+	engines.clear();
 	initializers.clear();
 }
 
@@ -45,7 +45,7 @@ void MetaBody::postProcessAttributes(bool deserializing)
 void MetaBody::registerAttributes()
 {
 	Body::registerAttributes();
-	REGISTER_ATTRIBUTE(actors);
+	REGISTER_ATTRIBUTE(engines);
 	REGISTER_ATTRIBUTE(initializers);
 	REGISTER_ATTRIBUTE(bodies);
 	REGISTER_ATTRIBUTE(volatileInteractions);
@@ -56,8 +56,8 @@ void MetaBody::registerAttributes()
 
 void MetaBody::moveToNextTimeStep()
 {
-	vector<shared_ptr<Engine> >::iterator ai    = actors.begin();
-	vector<shared_ptr<Engine> >::iterator aiEnd = actors.end();
+	vector<shared_ptr<Engine> >::iterator ai    = engines.begin();
+	vector<shared_ptr<Engine> >::iterator aiEnd = engines.end();
 	for( ; ai!=aiEnd ; ++ai )
 	{
 		if ((*ai)->isActivated())
@@ -68,8 +68,8 @@ void MetaBody::moveToNextTimeStep()
 
 void MetaBody::setTimeSteppersActive(bool a)
 {
-	vector<shared_ptr<Engine> >::iterator ai    = actors.begin();
-	vector<shared_ptr<Engine> >::iterator aiEnd = actors.end();
+	vector<shared_ptr<Engine> >::iterator ai    = engines.begin();
+	vector<shared_ptr<Engine> >::iterator aiEnd = engines.end();
 	for( ; ai!=aiEnd ; ++ai )
 	{
 		if (Omega::instance().isInheritingFrom((*ai)->getClassName(),"TimeStepper"))

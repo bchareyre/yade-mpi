@@ -47,7 +47,7 @@ void TranslationEngine::applyCondition(Body * body)
 		if(ParticleParameters* p = dynamic_cast<ParticleParameters*>((*bodies)[*ii]->physicalParameters.get()))
 		{
 
-		// FIXME - specify intervals of activity for an actor => use isActivated method
+		// FIXME - specify intervals of activity for an engine => use isActivated method
 		//if( Omega::instance().getIter() > 1000 )
 		//	b->velocity		= Vector3r(0,0,0);
 		//else

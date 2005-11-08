@@ -216,7 +216,7 @@ class Archive
 	public    : bool isProcessed() { return processed;};
 //@}
 
-	/*! Returns true is the archive is an archive of a fundamental type or of a class that contains
+	/*! Returns true if the archive is an archive of a fundamental type or of a class that contains
 	only fundamental types.	This is useful for XML output for example that can write simple attributes in a different
 	way than write complex one.
 	\return true is the current archive is a fundamental archive or if it is an archive of a custom	or serializable class

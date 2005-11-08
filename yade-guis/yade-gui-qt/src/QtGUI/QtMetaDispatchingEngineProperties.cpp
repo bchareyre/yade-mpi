@@ -286,7 +286,7 @@ void QtMetaDispatchingEngineProperties::pbAddClicked()
 
 	// if no attributes are registered then the button to open the serialization frame is not enabled
 	shared_ptr<EngineUnit> eu = dynamic_pointer_cast<EngineUnit>(ClassFactory::instance().createShared(((QComboBox*)v[v.size()-3])->currentText()));
-	eu->registerAttributes();
+	eu->registerSerializableAttributes(false);
 	v.back()->setEnabled(eu->getArchives().size()!=0);
 
 	for(unsigned int j=0;j<v.size();j++)

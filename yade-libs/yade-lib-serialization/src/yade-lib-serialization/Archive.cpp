@@ -10,11 +10,9 @@
 
 #include "Archive.hpp"
 
-
 map<SerializableTypes::Type,pair<SerializeFnPtr,DeserializeFnPtr> > Archive::serializationMap;
 map<SerializableTypes::Type,pair<SerializeFnPtr,DeserializeFnPtr> > Archive::serializationMapOfFundamental;
 Archive::SerializableDescriptorMap Archive::map;
-
 
 Archive::Archive(const string& n)
 {
@@ -23,11 +21,9 @@ Archive::Archive(const string& n)
 	fundamental	= false;
 }
 
-
 Archive::~Archive()
 {
 }
-
 
 bool Archive::containsOnlyFundamentals()
 {
@@ -38,19 +34,17 @@ bool Archive::containsOnlyFundamentals()
 		if (recordType==SerializableTypes::SERIALIZABLE)
 		{
 			Serializable * s = any_cast<Serializable*>(getAddress());
-			s->registerSerializableAttributes(false);
+			s->registerAttributes();
 			bool result = s->containsOnlyFundamentals();
-			s->markAllAttributesProcessed();
-			s->unregisterSerializableAttributes(false); // in fact true/false here doesn't apply - we are not serializing/deserializing - just checking
+			s->archives.clear();
 			return result;
 		}
 		else if (recordType==SerializableTypes::CUSTOM_CLASS)
 		{
 			shared_ptr<Serializable> s = dynamic_pointer_cast<Serializable>(ClassFactory::instance().createShared(getSerializableClassName()));
-			s->registerSerializableAttributes(false);
+			s->registerAttributes();
 			bool result = s->containsOnlyFundamentals();
-			s->markAllAttributesProcessed();
-			s->unregisterSerializableAttributes(false); // in fact true/false here doesn't apply - we are not serializing/deserializing - just checking
+			s->archives.clear();
 			return result;
 		}
 		else if (recordType==SerializableTypes::POINTER)
@@ -72,7 +66,6 @@ bool Archive::containsOnlyFundamentals()
 	}
 }
 
-
 bool Archive::addSerializablePointer(SerializableTypes::Type rt ,bool fundamental, SerializeFnPtr sp, DeserializeFnPtr dsp)
 {
 	if (fundamental)
@@ -82,38 +75,3 @@ bool Archive::addSerializablePointer(SerializableTypes::Type rt ,bool fundamenta
 	return true;
 }
 
-
-// bool Archive::registerSerializableDescriptor( string name , VerifyFactorableFnPtr verify, SerializableTypes::Type type, bool f )
-// {
-// 	std::cout << "registering serializable : " << name << endl;
-//
-// 	bool tmp = map.insert( SerializableDescriptorMap::value_type( name , SerializableDescriptor(verify,type,f) )).second;
-//
-// 	//#ifdef DEBUG
-// 		if (tmp)
-// 			std::cout << "registering serializable : " << name << " OK\n";
-// 		else
-// 			std::cout << "registering serializable: " << name << " FAILED\n";
-// 	//#endif
-//
-// 	return tmp;
-// }
-
-
-// bool Archive::findClassInfo(const type_info& tp,SerializableTypes::Type& type, string& serializableClassName,bool& fundamental)
-// {
-// 	SerializableDescriptorMap::iterator mi    = map.begin();
-// 	SerializableDescriptorMap::iterator miEnd = map.end();
-//
-// 	for( ; mi!=miEnd ; mi++)
-// 	{
-// 		if (tp==(*mi).second.verify())
-// 		{
-// 			serializableClassName=(*mi).first;
-// 			fundamental = (*mi).second.fundamental;
-// 			type = (*mi).second.type;
-// 			return true;
-// 		}
-// 	}
-// 	return false;
-// }

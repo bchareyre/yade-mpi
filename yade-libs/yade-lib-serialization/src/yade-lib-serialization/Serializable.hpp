@@ -1,6 +1,8 @@
 /*************************************************************************
 *  Copyright (C) 2004 by Olivier Galizzi                                 *
 *  olivier.galizzi@imag.fr                                               *
+*  Copyright (C) 2004 by Janek Kozicki                                   *
+*  cosurgi@berlios.de                                                    *
 *                                                                        *
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
@@ -26,7 +28,6 @@ using namespace boost;
 using namespace std;
 using namespace ArchiveTypes;
 
-
 #define DECLARE_POINTER_TO_MY_CUSTOM_CLASS(Type,attribute,any)		\
 	Type * attribute=any_cast< Type * >(any);
 
@@ -45,28 +46,25 @@ using namespace ArchiveTypes;
 class Serializable : public Factorable
 {
 	public :
-		Serializable();
-		virtual ~Serializable();
-		
-		typedef list< shared_ptr<Archive> > Archives; // FIXME - Archive, public typedef ??
-		Archives& getArchives() { return archives;};
+		typedef list< shared_ptr<Archive> >	Archives;
+		Serializable() {};
+		virtual ~Serializable() {};
 	
 		void unregisterSerializableAttributes(bool deserializing);
 		void registerSerializableAttributes(bool deserializing);
-		void markAllAttributesProcessed();
 		bool findAttribute(const string& name,shared_ptr<Archive>& arc);
 		bool containsOnlyFundamentals();
+		Archives& getArchives() 	{ return archives; };
+		
+		virtual void serialize(any& )	{ throw SerializableError(SerializationExceptions::SetFunctionNotDeclared); };
+		virtual void deserialize(any& ) { throw SerializableError(SerializationExceptions::GetFunctionNotDeclared); };
 
-		virtual void registerAttributes() {}; // FIXME - protected
-
-		// FIXME - those two are used only by custom class and MultiTypeHandler. make it private, or something
-		virtual void serialize(any& ) { throw SerializableError(SerializationExceptions::SetFunctionNotDeclared);};
-		virtual void deserialize(any& ) { throw SerializableError(SerializationExceptions::GetFunctionNotDeclared);};
-	
 	private :
-		Archives archives;
+		Archives				archives;
+		friend class Archive;
 	
 	protected :
+		virtual void registerAttributes() {};
 		virtual void preProcessAttributes(bool /*deserializing*/) {};
 		virtual void postProcessAttributes(bool /*deserializing*/) {};
 
@@ -76,6 +74,7 @@ class Serializable : public Factorable
 			shared_ptr<Archive> ac = Archive::create(name,attribute);
 			archives.push_back(ac);
 		}
+
 	REGISTER_CLASS_NAME(Serializable);
 	REGISTER_BASE_CLASS_NAME(Factorable);
 };

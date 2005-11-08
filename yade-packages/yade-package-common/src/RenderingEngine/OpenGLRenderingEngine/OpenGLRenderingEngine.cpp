@@ -32,7 +32,6 @@ OpenGLRenderingEngine::OpenGLRenderingEngine() : RenderingEngine()
 	
 	addInteractionGeometryFunctor("InteractingSphere","GLDrawInteractingSphere");
 	addInteractionGeometryFunctor("InteractingBox","GLDrawInteractingBox");
-	
 	addInteractionGeometryFunctor("PolyhedralSweptSphere","GLDrawPolyhedralSweptSphere");
 		
 	addGeometricalModelFunctor("Box","GLDrawBox");

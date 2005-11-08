@@ -62,7 +62,7 @@ void NullGUI::help()
 }
 
 
-int NullGUI::run(int argc, char** argv)
+int NullGUI::run(int argc, char* argv[])
 {
 
 	int ch;

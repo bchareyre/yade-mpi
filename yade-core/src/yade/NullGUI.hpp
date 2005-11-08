@@ -35,7 +35,7 @@ class NullGUI : public FrontEnd
 	public :
 		NullGUI ();
 		virtual ~NullGUI ();
-		int run(int argc, char *argv[]);
+		virtual int run(int argc, char *argv[]);
 	
 	REGISTER_CLASS_NAME(NullGUI);
 	REGISTER_BASE_CLASS_NAME(FrontEnd);

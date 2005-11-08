@@ -13,7 +13,6 @@
 
 class GLDrawMetaInteractingGeometry : public GLDrawInteractingGeometryFunctor
 {
-	// FIXME : wtf with InteractionGeometrySet !?
 	public :
 		virtual void go(const shared_ptr<InteractingGeometry>&, const shared_ptr<PhysicalParameters>&);
 

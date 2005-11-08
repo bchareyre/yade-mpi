@@ -19,7 +19,7 @@ class MetaBody : public Body
 {
 	public : // FIXME - why public?
 		shared_ptr<BodyContainer>		bodies;
-		vector<shared_ptr<Engine> >		actors;
+		vector<shared_ptr<Engine> >		engines;
 		vector<shared_ptr<Engine> >		initializers;
 		shared_ptr<InteractionContainer>	persistentInteractions; // disappear, reappear according to physical (or any other non-spatial) criterion
 		shared_ptr<InteractionContainer>	volatileInteractions;	// disappear, reappear according to spatial criterion

@@ -123,7 +123,7 @@ void XMLFormatManager::serializeSerializable(ostream& stream, Archive& ac, int d
 
 	s->registerSerializableAttributes(false);
 
-	Serializable::Archives archives = s->getArchives();
+	Serializable::Archives& archives = s->getArchives();
 
 	Serializable::Archives::iterator ai    = archives.begin();
 	Serializable::Archives::iterator aiEnd = archives.end();

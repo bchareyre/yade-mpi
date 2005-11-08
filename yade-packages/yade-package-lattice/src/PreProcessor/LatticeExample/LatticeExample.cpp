@@ -286,12 +286,12 @@ void LatticeExample::createActors(shared_ptr<MetaBody>& )
 	latticeLaw->beamGroupMask = beamGroupMask;
 	latticeLaw->maxDispl = maxDeformationSquared;
 
-	rootBody->actors.clear();
-	rootBody->actors.push_back(boundingVolumeDispatcher);
-	rootBody->actors.push_back(geometricalModelDispatcher);
-	rootBody->actors.push_back(latticeLaw);
-//	rootBody->actors.push_back(applyActionDispatcher); // ????
-//	rootBody->actors.push_back(positionIntegrator);
+	rootBody->engines.clear();
+	rootBody->engines.push_back(boundingVolumeDispatcher);
+	rootBody->engines.push_back(geometricalModelDispatcher);
+	rootBody->engines.push_back(latticeLaw);
+//	rootBody->engines.push_back(applyActionDispatcher); // ????
+//	rootBody->engines.push_back(positionIntegrator);
 	
 	
 	rootBody->initializers.clear();
@@ -339,7 +339,7 @@ void LatticeExample::imposeTranslation(shared_ptr<MetaBody>& rootBody, Vector3r 
 	direction.normalize();
  	translationCondition->translationAxis = direction;
 	
-	rootBody->actors.push_back(translationCondition);
+	rootBody->engines.push_back(translationCondition);
 	translationCondition->subscribedBodies.clear();
 	
 	BodyContainer::iterator bi    = rootBody->bodies->begin();

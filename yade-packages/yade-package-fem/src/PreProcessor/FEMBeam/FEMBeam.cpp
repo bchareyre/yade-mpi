@@ -163,14 +163,14 @@ void FEMBeam::createActors(shared_ptr<MetaBody>& rootBody)
 	actionParameterInitializer->actionParameterNames.push_back("Force");
 	actionParameterInitializer->actionParameterNames.push_back("Momentum"); // FIXME - should be unnecessery, but BUG in PhysicalActionVectorVector
 	
-	rootBody->actors.clear();
-	rootBody->actors.push_back(shared_ptr<Engine>(new PhysicalActionContainerReseter));
-	rootBody->actors.push_back(boundingVolumeDispatcher);
-	rootBody->actors.push_back(geometricalModelDispatcher);
-	rootBody->actors.push_back(femLaw);
-	rootBody->actors.push_back(gravityCondition);
-	rootBody->actors.push_back(applyActionDispatcher);
-	rootBody->actors.push_back(positionIntegrator);
+	rootBody->engines.clear();
+	rootBody->engines.push_back(shared_ptr<Engine>(new PhysicalActionContainerReseter));
+	rootBody->engines.push_back(boundingVolumeDispatcher);
+	rootBody->engines.push_back(geometricalModelDispatcher);
+	rootBody->engines.push_back(femLaw);
+	rootBody->engines.push_back(gravityCondition);
+	rootBody->engines.push_back(applyActionDispatcher);
+	rootBody->engines.push_back(positionIntegrator);
 	
 	rootBody->initializers.clear();
 	rootBody->initializers.push_back(bodyPhysicalParametersDispatcher);
@@ -227,7 +227,7 @@ void FEMBeam::imposeTranslation(shared_ptr<MetaBody>& rootBody, Vector3r min, Ve
 	direction.normalize();
  	translationCondition->translationAxis = direction;
 	
-	rootBody->actors.push_back(translationCondition);
+	rootBody->engines.push_back(translationCondition);
 	translationCondition->subscribedBodies.clear();
 	BodyContainer::iterator bi    = rootBody->bodies->begin();
 	BodyContainer::iterator biEnd = rootBody->bodies->end();

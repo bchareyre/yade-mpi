@@ -10,15 +10,6 @@
 
 #include "Serializable.hpp"
 
-Serializable::Serializable() : Factorable()
-{
-	archives.clear();
-}
-
-Serializable::~Serializable()
-{
-}
-
 void Serializable::unregisterSerializableAttributes(bool deserializing)
 {
 	Archives::iterator ai    = archives.begin();
@@ -29,7 +20,7 @@ void Serializable::unregisterSerializableAttributes(bool deserializing)
 		{
 			string error = (*ai)->getName();
 			error = SerializationExceptions::AttributeIsNotDefined + error;
-			cerr << error << endl;
+			cerr << error << endl; // FIXME - FrontEnd::message()  <- can cerr, or display dialog box, or sth, else.
 			//throw SerializableUnregisterError(error.c_str());
 		}
 	}
@@ -45,16 +36,6 @@ void Serializable::registerSerializableAttributes(bool deserializing)
 	this->registerAttributes();
 }
 
-
-void Serializable::markAllAttributesProcessed()
-{
-	Archives::iterator ai    = archives.begin();
-	Archives::iterator aiEnd = archives.end();
-	for( ; ai!=aiEnd ; ++ai)
-		(*ai)->markProcessed();
-}
-
-
 bool Serializable::findAttribute(const string& name,shared_ptr<Archive>& arc)
 {
 	Archives::iterator ai = archives.begin();
@@ -67,7 +48,6 @@ bool Serializable::findAttribute(const string& name,shared_ptr<Archive>& arc)
 		}
 	return false;
 }
-
 
 bool Serializable::containsOnlyFundamentals()
 {

@@ -103,7 +103,7 @@ void QtGUIGenerator::buildGUI(shared_ptr<Serializable> s,  QWidget * widget)
 	serializable = s;
 
 	if (serializable->getArchives().empty()) // attributes are not registered
-		serializable->registerAttributes();
+		serializable->registerSerializableAttributes(false);
 
 	Serializable::Archives archives = serializable->getArchives();
 
@@ -128,22 +128,19 @@ void QtGUIGenerator::buildGUI(shared_ptr<Serializable> s,  QWidget * widget)
 			for(unsigned int i=0;i<nbStrings;i++)
 			{
 				any instance = (*ai)->getAddress();
-				try
+				if(bool ** b = any_cast<bool*>(&instance))
 				{
-					bool * b = any_cast<bool*>(instance);
 					QCheckBox * cb = new QCheckBox(widget);
-					cb->setChecked(*b);
+					cb->setChecked(**b);
 					descriptor->widgets.push_back(cb);
 					descriptor->types.push_back(AttributeDescriptor::BOOLEAN);
 				}
-				catch(...) 
-				// FIXME catch(...) is very, very bad. it can catch na operating system error. the only thing you can do after catch(...) is to rethrow it. ignoring it, may cause big instability problems!
+				else
 				{
 					QLineEdit* le = new QLineEdit(widget);
 					le->setText(descriptor->strings[i]);
 					descriptor->widgets.push_back(le);
 					descriptor->types.push_back(AttributeDescriptor::FLOATING);
-					// throw; // FIXME: rethrow exception - uncomment this line!
 				}
 			}
 		
@@ -177,13 +174,15 @@ void QtGUIGenerator::buildGUI(shared_ptr<Serializable> s,  QWidget * widget)
 	
 	QPoint p = widget->pos();
 	widget->move(p.x()+translationX,p.y()+translationY);
+	
+	s->unregisterSerializableAttributes(false);
 
 }
 
 
 void QtGUIGenerator::deserialize(shared_ptr<Serializable> s)
 {
-	s->registerAttributes();
+	s->registerSerializableAttributes(true);
 	Serializable::Archives archives = s->getArchives();
 
 	Serializable::Archives::iterator ai    = archives.begin();

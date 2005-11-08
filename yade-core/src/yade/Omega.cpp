@@ -403,8 +403,8 @@ void Omega::skipTimeStepper(bool s)
 //FIXME : make that recursive to scan all submetabodies ???
 bool Omega::containTimeStepper()
 {
-	vector<shared_ptr<Engine> >::iterator ai    = rootBody->actors.begin();
-	vector<shared_ptr<Engine> >::iterator aiEnd = rootBody->actors.end();
+	vector<shared_ptr<Engine> >::iterator ai    = rootBody->engines.begin();
+	vector<shared_ptr<Engine> >::iterator aiEnd = rootBody->engines.end();
 	for(int i=0;ai!=aiEnd;++ai,i++)
 	{
 		if (isInheritingFrom((*ai)->getClassName(),"TimeStepper"))

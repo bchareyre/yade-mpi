@@ -65,111 +65,81 @@ class Factorable;
 */
 class ClassFactory : public Singleton< ClassFactory >
 {
-
-/// Types
-
-	/*! Pointer on a function that create an instance of a serializable class an return a shared pointer on it */
-	private   : typedef boost::shared_ptr<Factorable> ( *CreateSharedFactorableFnPtr )();
-	/*! Pointer on a function that create an instance of a serializable class an return a C pointer on it */
-	private   : typedef Factorable* ( *CreateFactorableFnPtr )();
-	/*! Pointer on a function that create an instance of a custom class (i.e. not serializable) and return a void C pointer on it */
-	private   : typedef void* ( *CreatePureCustomFnPtr )();
+	private :
+		/// Pointer on a function that create an instance of a serializable class an return a shared pointer on it
+		typedef boost::shared_ptr<Factorable> ( *CreateSharedFactorableFnPtr )();
+		/// Pointer on a function that create an instance of a serializable class an return a C pointer on it
+		typedef Factorable* ( *CreateFactorableFnPtr )();
+		/// Pointer on a function that create an instance of a custom class (i.e. not serializable) and return a void C pointer on it
+		typedef void* ( *CreatePureCustomFnPtr )();
 	
-	/*! Description of a class that is stored inside the factory.*/
-	private   : class FactorableCreators
-		    {
-			/// Attributes
-
-			/*! Used to create a C pointer on the class (if serializable) */
-			public    : CreateFactorableFnPtr create;
-			/*! Used to create a shared pointer on the class (if serializable) */
-			public    : CreateSharedFactorableFnPtr createShared;
-			/*! Used to create a void C pointer on the class */
-			public    : CreatePureCustomFnPtr createPureCustom;
+		/// Description of a class that is stored inside the factory.
+		struct FactorableCreators
+		{
+			CreateFactorableFnPtr create;		/// Used to create a C pointer on the class (if serializable)
+			CreateSharedFactorableFnPtr createShared;	/// Used to create a shared pointer on the class (if serializable)
+			CreatePureCustomFnPtr createPureCustom;	/// Used to create a void C pointer on the class
 	
-			/// Constructor/Destructor
+			FactorableCreators() {};
+			FactorableCreators(	CreateFactorableFnPtr c, CreateSharedFactorableFnPtr cs,
+						CreatePureCustomFnPtr cpc)
+			{
+				create 		 = c;
+				createShared	 = cs;
+				createPureCustom = cpc;
+			};
+		};
 
-			/*! Empty constructor */
-			public    : FactorableCreators() {};
-			/*! Constructor that initialize all the attributes of the class */
-			public    : FactorableCreators(	CreateFactorableFnPtr c, CreateSharedFactorableFnPtr cs,
-							CreatePureCustomFnPtr cpc)
-				    {
-					create 		 = c;
-					createShared	 = cs;
-					createPureCustom = cpc;
-				    };
+	 	/// Type of a Stl map used to map the registered class name with their FactorableCreators
+		typedef std::map< std::string , FactorableCreators > FactorableCreatorsMap;
 
-		    };
+		/// The internal dynamic library manager used to load dynamic libraries when an instance of a non loaded class is ask
+		DynLibManager dlm;
+		/// Map that contains the name of the registered class and their description
+		FactorableCreatorsMap map;
 
- 	/*! Type of a Stl map used to map the registered class name with their FactorableCreators */
-	private   : typedef std::map< std::string , FactorableCreators > FactorableCreatorsMap;
+		ClassFactory() {	cerr << "Constructing ClassFactory  (if multiple times - check '-rdynamic' flag!)" << endl;};
+		ClassFactory(const ClassFactory&);
+		ClassFactory& operator=(const ClassFactory&);
+		virtual ~ClassFactory() {};
 
-
-/// Attributes
-
-	/*! The internal dynamic library manager used to load dynamic libraries when an instance of a non loaded class is ask */
-	private   : DynLibManager dlm;
-	/*! Map that contains the name of the registered class and their description */
-	private   : FactorableCreatorsMap map;
-
-/// Constructor/Destructor
-
-	/*! Constructor
-		\note  the constructor is private because ClassFactory is a Singleton
-	*/
-	private   : ClassFactory() {	cerr << "Constructing ClassFactory  (if multiple times - check '-rdynamic' flag!)" << endl;};
-	/*! Copy Constructor
-		\note  needed by the singleton class
-	*/
-	private   : ClassFactory(const ClassFactory&);
-	
-	/*! Destructor
-		\note  the destructor is private because ClassFactory is a Singleton
-	*/
-	private   : virtual ~ClassFactory() {};
-
-/// Methods
-
-	/*! Assignement operator needed by the Singleton class */
-	private   : ClassFactory& operator=(const ClassFactory&);
-
-	/*! This method is used to register a Factorable class into the factory. It is called only from macro REGISTER_CLASS_TO_FACTORY
-		\param name the name of the class
-		\param create a pointer to a function that is able to return a C pointer on the given class
-		\param createPureCustom a pointer to a function that is able to return a void C pointer on the given class
-		\param verify a pointer to a function that is able to return the type_info of the given class
-		\param type type of the class (SERIALIZABLE or CUSTOM)
-		\param f is true is the class is a fundamental one (Vector3, Quaternion)
-		\return true if registration is succesfull
-	*/
-	public    : bool registerFactorable( 	std::string name			  , CreateFactorableFnPtr create,
+	public :
+		/*! This method is used to register a Factorable class into the factory. It is called only from macro REGISTER_CLASS_TO_FACTORY
+			\param name the name of the class
+			\param create a pointer to a function that is able to return a C pointer on the given class
+			\param createPureCustom a pointer to a function that is able to return a void C pointer on the given class
+			\param verify a pointer to a function that is able to return the type_info of the given class
+			\param type type of the class (SERIALIZABLE or CUSTOM)
+			\param f is true is the class is a fundamental one (Vector3, Quaternion)
+			\return true if registration is succesfull
+		*/
+		bool registerFactorable( 	std::string name			  , CreateFactorableFnPtr create,
 						CreateSharedFactorableFnPtr createShared, CreatePureCustomFnPtr createPureCustom);
 
-	/*! Create a shared pointer on a serializable class of the given name */
-	public 	  : boost::shared_ptr<Factorable> createShared( std::string name );
+		/// Create a shared pointer on a serializable class of the given name
+		boost::shared_ptr<Factorable> createShared( std::string name );
 
-	/*! Create a C pointer on a serializable class of the given name */
-	public 	  : Factorable* createPure( std::string name );
+		/// Create a C pointer on a serializable class of the given name
+		Factorable* createPure( std::string name );
 
-	/*! Create a void C pointer on a class of the given name */
-	public 	  : void * createPureCustom( std::string name );
+		/// Create a void C pointer on a class of the given name
+		void * createPureCustom( std::string name );
 
-	/*! Mainly used by the method findType for serialization purpose. Tells if a given type is a serilializable class
-		\param tp type info of the type to test
-		\param fundamental is true if the given type is fundamental (Vector3,Quaternion ...)
-	*/
-	public 	  : bool isFactorable(const type_info& tp,bool& fundamental);
+		/*! Mainly used by the method findType for serialization purpose. Tells if a given type is a serilializable class
+			\param tp type info of the type to test
+			\param fundamental is true if the given type is fundamental (Vector3,Quaternion ...)
+		*/
+		bool isFactorable(const type_info& tp,bool& fundamental);
 
-	public 	  : void addBaseDirectory(const string& dir);
+		void addBaseDirectory(const string& dir);
 	
-	public    : bool load(const string& name );
+		bool load(const string& name );
 
-	public    : string libNameToSystemName(const string& name);
-	public	  : string systemNameToLibName(const string& name);
+		string libNameToSystemName(const string& name);
+		string systemNameToLibName(const string& name);
 
-	public    : virtual string getClassName() const { return "Factorable"; };
-	public    : virtual string getBaseClassName(int ) const { return "";};
+		virtual string getClassName() const { return "Factorable"; };
+		virtual string getBaseClassName(int ) const { return "";};
 
 	FRIEND_SINGLETON(ClassFactory);
 };

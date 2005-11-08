@@ -123,7 +123,7 @@ void QtEngineEditor::pbSaveClicked()
 
 	//FIXME : add combobox in GUI to select IOFormatManager
 	
-	IOFormatManager::saveToFile("XMLFormatManager",leFileName->text(),"actors",enginesVec);
+	IOFormatManager::saveToFile("XMLFormatManager",leFileName->text(),"engines",enginesVec);
 
 }
 

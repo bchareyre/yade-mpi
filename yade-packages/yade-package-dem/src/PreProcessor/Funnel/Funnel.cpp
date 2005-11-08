@@ -309,20 +309,20 @@ void Funnel::createActors(shared_ptr<MetaBody>& rootBody)
 	sdecTimeStepper->sdecGroupMask = 1;
 	sdecTimeStepper->timeStepUpdateInterval = timeStepUpdateInterval;
 
-	rootBody->actors.clear();
-	rootBody->actors.push_back(shared_ptr<Engine>(new PhysicalActionContainerReseter));
-	rootBody->actors.push_back(sdecTimeStepper);
-	rootBody->actors.push_back(boundingVolumeDispatcher);	
-	rootBody->actors.push_back(shared_ptr<Engine>(new PersistentSAPCollider));
-	rootBody->actors.push_back(interactionGeometryDispatcher);
-	rootBody->actors.push_back(interactionPhysicsDispatcher);
-	rootBody->actors.push_back(shared_ptr<Engine>(new ElasticContactLaw));
-	rootBody->actors.push_back(gravityCondition);
-	rootBody->actors.push_back(actionDampingDispatcher);
-	rootBody->actors.push_back(applyActionDispatcher);
-	rootBody->actors.push_back(positionIntegrator);
+	rootBody->engines.clear();
+	rootBody->engines.push_back(shared_ptr<Engine>(new PhysicalActionContainerReseter));
+	rootBody->engines.push_back(sdecTimeStepper);
+	rootBody->engines.push_back(boundingVolumeDispatcher);	
+	rootBody->engines.push_back(shared_ptr<Engine>(new PersistentSAPCollider));
+	rootBody->engines.push_back(interactionGeometryDispatcher);
+	rootBody->engines.push_back(interactionPhysicsDispatcher);
+	rootBody->engines.push_back(shared_ptr<Engine>(new ElasticContactLaw));
+	rootBody->engines.push_back(gravityCondition);
+	rootBody->engines.push_back(actionDampingDispatcher);
+	rootBody->engines.push_back(applyActionDispatcher);
+	rootBody->engines.push_back(positionIntegrator);
 	if(!rotationBlocked)
-		rootBody->actors.push_back(orientationIntegrator);
+		rootBody->engines.push_back(orientationIntegrator);
 	
 	rootBody->initializers.clear();
 	rootBody->initializers.push_back(actionParameterInitializer);
