@@ -1,25 +1,10 @@
-/***************************************************************************
- *   Copyright (C) 2004 by Olivier Galizzi                                 *
- *   olivier.galizzi@imag.fr                                               *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+/*************************************************************************
+*  Copyright (C) 2004 by Olivier Galizzi                                 *
+*  olivier.galizzi@imag.fr                                               *
+*                                                                        *
+*  This program is free software; it is licensed under the terms of the  *
+*  GNU General Public License v2 or later. See file LICENSE for details. *
+*************************************************************************/
 
 #include "ElasticCohesiveLaw.hpp"
 #include "BodyMacroParameters.hpp"
@@ -28,8 +13,6 @@
 #include "ElasticContactParameters.hpp"
 #include "SDECLinkPhysics.hpp"
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <yade/yade-core/Omega.hpp>
 #include <yade/yade-core/MetaBody.hpp>
@@ -37,8 +20,6 @@
 #include <yade/yade-package-common/Momentum.hpp>
 #include <yade/yade-core/PhysicalAction.hpp>
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 ElasticCohesiveLaw::ElasticCohesiveLaw() : Engine() , actionForce(new Force) , actionMomentum(new Momentum)
 {
@@ -47,8 +28,6 @@ ElasticCohesiveLaw::ElasticCohesiveLaw() : Engine() , actionForce(new Force) , a
 	momentRotationLaw = true;
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void ElasticCohesiveLaw::registerAttributes()
 {
@@ -57,8 +36,6 @@ void ElasticCohesiveLaw::registerAttributes()
 	REGISTER_ATTRIBUTE(momentRotationLaw);
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 //FIXME : remove bool first !!!!!
 void ElasticCohesiveLaw::action(Body* body)
@@ -68,9 +45,7 @@ void ElasticCohesiveLaw::action(Body* body)
 
 	Real dt = Omega::instance().getTimeStep();
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// Permanents Links													///
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	InteractionContainer::iterator ii    = ncb->persistentInteractions->begin();
 	InteractionContainer::iterator iiEnd = ncb->persistentInteractions->end();
@@ -100,9 +75,7 @@ void ElasticCohesiveLaw::action(Body* body)
 			Vector3r axis;
 			Real angle;
 	
-	////////////////////////////////////////////////////////////
 	/// Here is the code with approximated rotations 	 ///
-	////////////////////////////////////////////////////////////
 	
 			axis = currentContactPhysics->prevNormal.cross(currentContactGeometry->normal);
 			currentContactPhysics->shearForce	       -= currentContactPhysics->shearForce.cross(axis);
@@ -110,9 +83,7 @@ void ElasticCohesiveLaw::action(Body* body)
 			axis 						= angle*currentContactGeometry->normal;
 			currentContactPhysics->shearForce     	       -= currentContactPhysics->shearForce.cross(axis);
 	
-	////////////////////////////////////////////////////////////
 	/// Here is the code without approximated rotations 	 ///
-	////////////////////////////////////////////////////////////
 	
 	// 		Quaternionr q;
 	//
@@ -127,9 +98,7 @@ void ElasticCohesiveLaw::action(Body* body)
 	// 		q.fromAngleAxis(angle,axis);
 	// 		currentContactPhysics->shearForce	= q*currentContactPhysics->shearForce;
 	
-	////////////////////////////////////////////////////////////
 	/// 							 ///
-	////////////////////////////////////////////////////////////
 	
 			Vector3r x				= de1->se3.position+(currentContactGeometry->radius1-0.5*un)*currentContactGeometry->normal;
 			//Vector3r x				= (de1->se3.position+de2->se3.position)*0.5;
@@ -152,11 +121,9 @@ void ElasticCohesiveLaw::action(Body* body)
 	
 	
 	
-	////////////////////////////////////////////////////////////
 	/// Moment law					 	 ///
 		if(momentRotationLaw)
 		{
-	////////////////////////////////////////////////////////////
 	
 			if (first)
 			{
@@ -219,9 +186,7 @@ void ElasticCohesiveLaw::action(Body* body)
 			q_i_n.fromAxes(Vector3r(1,0,0),Vector3r(0,1,0),Vector3r(0,0,1)); // use identity matrix
 			q_n_i = q_i_n.inverse();
 	
-	////////////////////////////////////////////////////////////
 	/// Using Euler angle				 	 ///
-	////////////////////////////////////////////////////////////
 	
 	// 		Vector3r dBeta;
 	// 		Vector3r orientation_Nc,orientation_Nc_old;
@@ -257,13 +222,9 @@ void ElasticCohesiveLaw::action(Body* body)
 	// 		Vector3r dUr = 	( currentContactGeometry->radius1*(  dRotationA  -  dBeta)
 	// 				- currentContactGeometry->radius2*(  dRotationB  -  dBeta) ) * 0.5;
 	
-	////////////////////////////////////////////////////////////
 	/// Ending of use of eurler angle		 	 ///
-	////////////////////////////////////////////////////////////
 	
-	////////////////////////////////////////////////////////////
 	/// Using Quaternionr				 	 ///
-	////////////////////////////////////////////////////////////
 	
 			Quaternionr q,q1,q2;
 			Vector3r dRotationAMinusDBeta,dRotationBMinusDBeta;
@@ -275,9 +236,7 @@ void ElasticCohesiveLaw::action(Body* body)
 			q2.toEulerAngles(dRotationBMinusDBeta);
 			Vector3r dUr = ( currentContactGeometry->radius1*dRotationAMinusDBeta - currentContactGeometry->radius2*dRotationBMinusDBeta ) * 0.5;
 	
-	////////////////////////////////////////////////////////////
 	/// Ending of use of Quaternionr			 	 ///
-	////////////////////////////////////////////////////////////
 	
 			Vector3r dThetar = dUr/currentContactPhysics->averageRadius;
 			currentContactPhysics->thetar += dThetar;
@@ -312,10 +271,8 @@ void ElasticCohesiveLaw::action(Body* body)
 			currentContactPhysics->prevRotation1 = de1->se3.orientation;
 			currentContactPhysics->prevRotation2 = de2->se3.orientation;
 	
-	////////////////////////////////////////////////////////////
 	/// Moment law	END				 	 ///
 		}
-	////////////////////////////////////////////////////////////
 	
 			currentContactPhysics->prevNormal = currentContactGeometry->normal;
 		}	
@@ -324,6 +281,4 @@ void ElasticCohesiveLaw::action(Body* body)
 	first = false; 
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 

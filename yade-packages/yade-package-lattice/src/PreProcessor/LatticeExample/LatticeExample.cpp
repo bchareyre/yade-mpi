@@ -1,25 +1,10 @@
-/***************************************************************************
- *   Copyright (C) 2004 by Janek Kozicki                                   *
- *   cosurgi@berlios.de                                                    *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+/*************************************************************************
+*  Copyright (C) 2004 by Janek Kozicki                                   *
+*  cosurgi@berlios.de                                                    *
+*                                                                        *
+*  This program is free software; it is licensed under the terms of the  *
+*  GNU General Public License v2 or later. See file LICENSE for details. *
+*************************************************************************/
 
 #include "LatticeExample.hpp"
 
@@ -29,8 +14,6 @@
 #include "LineSegment.hpp"
 #include "LatticeLaw.hpp"
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <yade/yade-package-common/Sphere.hpp>
 
@@ -51,14 +34,10 @@
 
 #include <yade/yade-package-common/PhysicalActionContainerInitializer.hpp>
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 using namespace boost;
 using namespace std;
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 LatticeExample::LatticeExample() : FileGenerator()
 {
@@ -81,16 +60,12 @@ LatticeExample::LatticeExample() : FileGenerator()
 	maxDeformationSquared 	= 0.0004;
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 LatticeExample::~LatticeExample()
 {
 
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void LatticeExample::registerAttributes()
 {
@@ -190,8 +165,6 @@ string LatticeExample::generate()
 }
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void LatticeExample::createNode(shared_ptr<Body>& body, int i, int j, int k)
 {
@@ -227,8 +200,6 @@ void LatticeExample::createNode(shared_ptr<Body>& body, int i, int j, int k)
 	body->physicalParameters	= physics;
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void LatticeExample::createBeam(shared_ptr<Body>& body, unsigned int i, unsigned int j)
 {
@@ -258,8 +229,6 @@ void LatticeExample::createBeam(shared_ptr<Body>& body, unsigned int i, unsigned
 	body->physicalParameters	= physics;
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void LatticeExample::calcBeamsPositionOrientationLength(shared_ptr<MetaBody>& body)
 {
@@ -293,8 +262,6 @@ void LatticeExample::calcBeamsPositionOrientationLength(shared_ptr<MetaBody>& bo
 }
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void LatticeExample::createActors(shared_ptr<MetaBody>& )
 {
@@ -334,8 +301,6 @@ void LatticeExample::createActors(shared_ptr<MetaBody>& )
 }	
  
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void LatticeExample::positionRootBody(shared_ptr<MetaBody>& rootBody)
 {
@@ -366,8 +331,6 @@ void LatticeExample::positionRootBody(shared_ptr<MetaBody>& rootBody)
 	rootBody->physicalParameters 	= physics;
 }
 	
-/////////////////////////////////////////////////////////////////////////////////////////////////// 
-///////////////////////////////////////////////////////////////////////////////////////////////////
  
 void LatticeExample::imposeTranslation(shared_ptr<MetaBody>& rootBody, Vector3r min, Vector3r max, Vector3r direction, Real velocity)
 {
@@ -405,6 +368,4 @@ void LatticeExample::imposeTranslation(shared_ptr<MetaBody>& rootBody, Vector3r 
 	}
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////// 
-///////////////////////////////////////////////////////////////////////////////////////////////////
  

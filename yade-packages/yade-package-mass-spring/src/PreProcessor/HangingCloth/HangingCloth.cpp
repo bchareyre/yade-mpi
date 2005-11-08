@@ -1,25 +1,10 @@
-/***************************************************************************
- *   Copyright (C) 2004 by Olivier Galizzi                                 *
- *   olivier.galizzi@imag.fr                                               *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+/*************************************************************************
+*  Copyright (C) 2004 by Olivier Galizzi                                 *
+*  olivier.galizzi@imag.fr                                               *
+*                                                                        *
+*  This program is free software; it is licensed under the terms of the  *
+*  GNU General Public License v2 or later. See file LICENSE for details. *
+*************************************************************************/
 
 #include "HangingCloth.hpp"
 
@@ -28,8 +13,6 @@
 #include "SpringGeometry.hpp"
 #include "SpringPhysics.hpp"
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <yade/yade-core/Body.hpp>
 #include <yade/yade-package-common/Mesh2D.hpp>
@@ -78,8 +61,6 @@
 #include <yade/yade-package-common/InteractionVecSet.hpp>
 #include <yade/yade-package-common/PhysicalActionVectorVector.hpp>
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 HangingCloth::HangingCloth () : FileGenerator()
 {
@@ -113,23 +94,17 @@ HangingCloth::HangingCloth () : FileGenerator()
 	gravity 	= Vector3r(0,-9.81,0);
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 HangingCloth::~HangingCloth ()
 {
 
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void HangingCloth::postProcessAttributes(bool)
 {
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void HangingCloth::registerAttributes()
 {
@@ -164,8 +139,6 @@ void HangingCloth::registerAttributes()
 //	REGISTER_ATTRIBUTE(sphereFrictionDeg);
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 string HangingCloth::generate()
 {
@@ -274,9 +247,7 @@ string HangingCloth::generate()
 
 	rootBody->persistentInteractions->clear();
 
-//////////////////////////////////////////////////////
 // make mesh
-//////////////////////////////////////////////////////
 	
 	for(int i=0;i<width;i++)
 		for(int j=0;j<height;j++)
@@ -394,18 +365,14 @@ string HangingCloth::generate()
 	}
 
 	
-//////////////////////////////////////////////////////
 // make ground
-//////////////////////////////////////////////////////
 
 	shared_ptr<Body> groundBox;
 	createBox(groundBox, Vector3r(0,-200,0), Vector3r(500,10,500));
 	if(ground)
 		rootBody->bodies->insert(groundBox);
 
-//////////////////////////////////////////////////////
 // make spheres
-//////////////////////////////////////////////////////
 	
 // 	for(int i=0;i<nbSpheres[0];i++)
 // 		for(int j=0;j<nbSpheres[1];j++)
@@ -418,9 +385,7 @@ string HangingCloth::generate()
 
 			
 
-//////////////////////////////////////////////////////
 // make links
-//////////////////////////////////////////////////////
 
 	int linksNum=0;
 	if(linkSpheres)
@@ -474,8 +439,6 @@ string HangingCloth::generate()
 	return "total number of permament links created: " + lexical_cast<string>(linksNum);
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 shared_ptr<Interaction>& HangingCloth::createSpring(const shared_ptr<MetaBody>& rootBody,int i,int j)
 {
@@ -501,8 +464,6 @@ shared_ptr<Interaction>& HangingCloth::createSpring(const shared_ptr<MetaBody>& 
 	return spring;
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void HangingCloth::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 {
@@ -551,8 +512,6 @@ void HangingCloth::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 	body->physicalParameters	= physics;
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void HangingCloth::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents)
 {
@@ -594,5 +553,3 @@ void HangingCloth::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r
 	body->physicalParameters	= physics;
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -1,25 +1,13 @@
-/***************************************************************************
- *   Copyright (C) 2004 by Olivier Galizzi                                 *
- *   olivier.galizzi@imag.fr                                               *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
+/*************************************************************************
+*  Copyright (C) 2004 by Olivier Galizzi                                 *
+*  olivier.galizzi@imag.fr                                               *
+*  Copyright (C) 2004 by Janek Kozicki                                   *
+*  cosurgi@berlios.de                                                    *
+*                                                                        *
+*  This program is free software; it is licensed under the terms of the  *
+*  GNU General Public License v2 or later. See file LICENSE for details. *
+*************************************************************************/
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "SDECSpheresPlane.hpp"
 
@@ -30,8 +18,6 @@
 #include "ElasticCriterionTimeStepper.hpp"
 #include "PositionOrientationRecorder.hpp"
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <yade/yade-package-common/Box.hpp>
 #include <yade/yade-package-common/AABB.hpp>
@@ -66,8 +52,6 @@
 #include <yade/yade-package-common/InteractionVecSet.hpp>
 #include <yade/yade-package-common/PhysicalActionVectorVector.hpp>
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 SDECSpheresPlane::SDECSpheresPlane () : FileGenerator()
 {
@@ -90,24 +74,18 @@ SDECSpheresPlane::SDECSpheresPlane () : FileGenerator()
 	spheresHeight = 0;
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 SDECSpheresPlane::~SDECSpheresPlane ()
 {
 
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void SDECSpheresPlane::postProcessAttributes(bool)
 {
 
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void SDECSpheresPlane::registerAttributes()
 {
@@ -129,8 +107,6 @@ void SDECSpheresPlane::registerAttributes()
 	REGISTER_ATTRIBUTE(timeStepUpdateInterval);
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 string SDECSpheresPlane::generate()
 {
@@ -193,8 +169,6 @@ string SDECSpheresPlane::generate()
 	return "";
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void SDECSpheresPlane::createGroundSphere(shared_ptr<Body>& body,Real radius, Real i, Real j, Real k)
 {
@@ -237,8 +211,6 @@ void SDECSpheresPlane::createGroundSphere(shared_ptr<Body>& body,Real radius, Re
 	body->physicalParameters	= physics;
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void SDECSpheresPlane::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 {
@@ -285,8 +257,6 @@ void SDECSpheresPlane::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 	body->physicalParameters	= physics;
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void SDECSpheresPlane::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents)
 {
@@ -334,8 +304,6 @@ void SDECSpheresPlane::createBox(shared_ptr<Body>& body, Vector3r position, Vect
 	body->physicalParameters	= physics;
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void SDECSpheresPlane::createActors(shared_ptr<MetaBody>& rootBody)
 {
@@ -404,8 +372,6 @@ void SDECSpheresPlane::createActors(shared_ptr<MetaBody>& rootBody)
 	rootBody->initializers.push_back(boundingVolumeDispatcher);
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void SDECSpheresPlane::positionRootBody(shared_ptr<MetaBody>& rootBody) 
 {
@@ -431,6 +397,4 @@ void SDECSpheresPlane::positionRootBody(shared_ptr<MetaBody>& rootBody)
 	rootBody->physicalParameters 		= physics;
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 

@@ -1,32 +1,17 @@
-/***************************************************************************
- *   Copyright (C) 2004 by Olivier Galizzi                                 *
- *   olivier.galizzi@imag.fr                                               *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+/*************************************************************************
+*  Copyright (C) 2004 by Olivier Galizzi                                 *
+*  olivier.galizzi@imag.fr                                               *
+*  Copyright (C) 2004 by Janek Kozicki                                   *
+*  cosurgi@berlios.de                                                    *
+*                                                                        *
+*  This program is free software; it is licensed under the terms of the  *
+*  GNU General Public License v2 or later. See file LICENSE for details. *
+*************************************************************************/
 
 ///
 // FIXME : add CohesiveContactLaw engine to make it work
 ///
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "SDECLinkedSpheres.hpp"
 
@@ -37,8 +22,6 @@
 #include "SDECLinkPhysics.hpp"
 #include "ElasticCriterionTimeStepper.hpp"
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <yade/yade-package-common/Box.hpp>
 #include <yade/yade-package-common/AABB.hpp>
@@ -72,8 +55,6 @@
 #include <yade/yade-package-common/InteractionVecSet.hpp>
 #include <yade/yade-package-common/PhysicalActionVectorVector.hpp>
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 SDECLinkedSpheres::SDECLinkedSpheres () : FileGenerator()
 {
@@ -97,23 +78,17 @@ SDECLinkedSpheres::SDECLinkedSpheres () : FileGenerator()
 	gravity = Vector3r(0,-9.81,0);
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 SDECLinkedSpheres::~SDECLinkedSpheres ()
 {
 
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void SDECLinkedSpheres::postProcessAttributes(bool)
 {
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void SDECLinkedSpheres::registerAttributes()
 {
@@ -136,8 +111,6 @@ void SDECLinkedSpheres::registerAttributes()
 	REGISTER_ATTRIBUTE(timeStepUpdateInterval);
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 string SDECLinkedSpheres::generate()
 {
@@ -241,8 +214,6 @@ string SDECLinkedSpheres::generate()
 		+ "\nWARNING: link bonds are currently not working!";
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void SDECLinkedSpheres::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 {
@@ -291,8 +262,6 @@ void SDECLinkedSpheres::createSphere(shared_ptr<Body>& body, int i, int j, int k
 	body->physicalParameters	= physics;
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void SDECLinkedSpheres::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents)
 {
@@ -339,8 +308,6 @@ void SDECLinkedSpheres::createBox(shared_ptr<Body>& body, Vector3r position, Vec
 	body->physicalParameters	= physics;
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void SDECLinkedSpheres::createActors(shared_ptr<MetaBody>& rootBody)
 {
@@ -408,8 +375,6 @@ void SDECLinkedSpheres::createActors(shared_ptr<MetaBody>& rootBody)
 	rootBody->initializers.push_back(boundingVolumeDispatcher);
 }
 	
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void SDECLinkedSpheres::positionRootBody(shared_ptr<MetaBody>& rootBody)
 {
@@ -436,5 +401,3 @@ void SDECLinkedSpheres::positionRootBody(shared_ptr<MetaBody>& rootBody)
 	
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////

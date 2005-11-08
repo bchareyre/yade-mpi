@@ -1,42 +1,17 @@
-/***************************************************************************
- *   Copyright (C) 2004 by Olivier Galizzi                                 *
- *   olivier.galizzi@imag.fr                                               *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
- 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+/*************************************************************************
+*  Copyright (C) 2004 by Olivier Galizzi                                 *
+*  olivier.galizzi@imag.fr                                               *
+*                                                                        *
+*  This program is free software; it is licensed under the terms of the  *
+*  GNU General Public License v2 or later. See file LICENSE for details. *
+*************************************************************************/
 
 #include "GLTextLabel.hpp"
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-#ifdef WIN32
-	#include <windows.h>
-#endif
-
 #include <GL/gl.h>
 #include <GL/glut.h>
-
 #include <string.h>
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 GLTextLabel::GLTextLabel (int minX,int minY, int sizeX,int sizeY,char * text) : GLWindow(minX,minY,sizeX,sizeY)
 {
@@ -45,24 +20,18 @@ GLTextLabel::GLTextLabel (int minX,int minY, int sizeX,int sizeY,char * text) : 
 	setTextColor(1,0,0);
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 GLTextLabel::~GLTextLabel ()
 {
 
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void GLTextLabel::glDrawInsideWindow()
 {	
 	drawString(text,10,10,textColor);
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void GLTextLabel::drawString(char * str,int ,int ,Vector3r c)
 {
@@ -77,8 +46,6 @@ void GLTextLabel::drawString(char * str,int ,int ,Vector3r c)
 	}
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void GLTextLabel::setText(char * text)
 {
@@ -102,8 +69,6 @@ void GLTextLabel::setText(char * text)
 	}
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void GLTextLabel::fitTextSize()
 {
@@ -116,13 +81,9 @@ void GLTextLabel::fitTextSize()
 	sizeY = 15*3;
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void GLTextLabel::setTextColor(float r, float g,float b)
 {
 	textColor = Vector3r(r,g,b);
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////

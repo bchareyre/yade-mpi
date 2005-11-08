@@ -39,7 +39,6 @@ SOURCES += Math.cpp \
            Matrix3.cpp \
            Matrix4.cpp \
            Quaternion.cpp \
-           Se3.cpp \
            Vector2.cpp \
            Vector3.cpp \
            Vector4.cpp 

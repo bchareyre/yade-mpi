@@ -1,49 +1,23 @@
-/***************************************************************************
- *   Copyright (C) 2004 by Olivier Galizzi                                 *
- *   olivier.galizzi@imag.fr                                               *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+/*************************************************************************
+*  Copyright (C) 2004 by Olivier Galizzi                                 *
+*  olivier.galizzi@imag.fr                                               *
+*                                                                        *
+*  This program is free software; it is licensed under the terms of the  *
+*  GNU General Public License v2 or later. See file LICENSE for details. *
+*************************************************************************/
 
 #include "QtFileGenerator.hpp"
 #include "FileDialog.hpp"
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 #include <sstream>
 #include <qlabel.h>
 #include <qpushbutton.h>
 #include <qgroupbox.h>
 #include <qcombobox.h>
 #include <qlineedit.h>
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 #include <yade/yade-lib-factory/ClassFactory.hpp>
 #include <yade/yade-core/FileGenerator.hpp>
 #include <yade/yade-core/Omega.hpp>
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 QtFileGenerator::QtFileGenerator ( QWidget * parent , const char * name) : QtFileGeneratorController(parent,name)
 {
@@ -75,16 +49,12 @@ QtFileGenerator::QtFileGenerator ( QWidget * parent , const char * name) : QtFil
 	cbGeneratorNameActivated(cbGeneratorName->currentText()); // FIXME : I need to call this function 2 times to have good display of scrollView
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 QtFileGenerator::~QtFileGenerator()
 {
 
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void QtFileGenerator::pbChooseClicked()
 {
@@ -95,8 +65,6 @@ void QtFileGenerator::pbChooseClicked()
 		leOutputFileName->setText(fileName);
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void QtFileGenerator::cbGeneratorNameActivated(const QString& s)
 {
@@ -137,8 +105,6 @@ void QtFileGenerator::cbGeneratorNameActivated(const QString& s)
 	}
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
@@ -160,8 +126,6 @@ void QtFileGenerator::pbGenerateClicked()
 	md->exec();
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void QtFileGenerator::pbCloseClicked()
 {
@@ -169,16 +133,12 @@ void QtFileGenerator::pbCloseClicked()
 	destroy();
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void QtFileGenerator::pbLoadClicked()
 {
 	cerr << "pbLoadClicked\n";
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 void QtFileGenerator::pbSaveClicked()
@@ -186,8 +146,6 @@ void QtFileGenerator::pbSaveClicked()
 	cerr << "pbSaveClicked\n";
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 void QtFileGenerator::closeEvent(QCloseEvent *evt)
@@ -196,5 +154,3 @@ void QtFileGenerator::closeEvent(QCloseEvent *evt)
 	QtFileGeneratorController::closeEvent(evt);
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////

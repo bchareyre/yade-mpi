@@ -1,25 +1,10 @@
-/***************************************************************************
- *   Copyright (C) 2004 by Olivier Galizzi                                 *
- *   olivier.galizzi@imag.fr                                               *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+/*************************************************************************
+*  Copyright (C) 2004 by Olivier Galizzi                                 *
+*  olivier.galizzi@imag.fr                                               *
+*                                                                        *
+*  This program is free software; it is licensed under the terms of the  *
+*  GNU General Public License v2 or later. See file LICENSE for details. *
+*************************************************************************/
 
 #include "TetrahedronsTest.hpp"
 
@@ -30,8 +15,6 @@
 #include "ElasticCriterionTimeStepper.hpp"
 #include "SwiftPolyhedronProximityModeler.hpp"
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <yade/yade-package-common/Box.hpp>
 #include <yade/yade-package-common/AABB.hpp>
@@ -64,8 +47,6 @@
 #include <yade/yade-package-common/InteractionVecSet.hpp>
 #include <yade/yade-package-common/PhysicalActionVectorVector.hpp>
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 TetrahedronsTest::TetrahedronsTest () : FileGenerator()
 {
@@ -86,23 +67,17 @@ TetrahedronsTest::TetrahedronsTest () : FileGenerator()
 	disorder = 0.2;
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 TetrahedronsTest::~TetrahedronsTest ()
 {
 
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void TetrahedronsTest::postProcessAttributes(bool)
 {
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void TetrahedronsTest::registerAttributes()
 {
@@ -122,8 +97,6 @@ void TetrahedronsTest::registerAttributes()
 	REGISTER_ATTRIBUTE(timeStepUpdateInterval);
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 string TetrahedronsTest::generate()
 {
@@ -160,8 +133,6 @@ string TetrahedronsTest::generate()
 	return "";
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void TetrahedronsTest::createTetrahedron(shared_ptr<Body>& body, int i, int j, int k)
 {
@@ -233,8 +204,6 @@ void TetrahedronsTest::createTetrahedron(shared_ptr<Body>& body, int i, int j, i
 	body->physicalParameters	= physics;
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void TetrahedronsTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents)
 {
@@ -326,8 +295,6 @@ void TetrahedronsTest::createBox(shared_ptr<Body>& body, Vector3r position, Vect
 	body->physicalParameters	= physics;
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void TetrahedronsTest::createActors(shared_ptr<MetaBody>& rootBody)
 {
@@ -389,8 +356,6 @@ void TetrahedronsTest::createActors(shared_ptr<MetaBody>& rootBody)
 	rootBody->initializers.push_back(boundingVolumeDispatcher);
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void TetrahedronsTest::positionRootBody(shared_ptr<MetaBody>& rootBody) 
 {
@@ -416,8 +381,6 @@ void TetrahedronsTest::positionRootBody(shared_ptr<MetaBody>& rootBody)
 	rootBody->physicalParameters 		= physics;
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void TetrahedronsTest::loadTRI(shared_ptr<Tetrahedron>& tet, const string& fileName)
 {
@@ -456,8 +419,6 @@ void TetrahedronsTest::loadTRI(shared_ptr<Tetrahedron>& tet, const string& fileN
 	f.close();
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////
 // /*
 // void Viewer::polyhedron2PolyhedralSS(const shared_ptr<PointCloud>& poly, shared_ptr<PolyhedralSS>& ss)
 // {

@@ -1,39 +1,20 @@
-/***************************************************************************
- *   Copyright (C) 2004 by Olivier Galizzi                                 *
- *   olivier.galizzi@imag.fr                                               *
- *   Copyright (C) 2004 by Janek Kozicki                                   *
- *   cosurgi@berlios.de                                                    *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+/*************************************************************************
+*  Copyright (C) 2004 by Olivier Galizzi                                 *
+*  olivier.galizzi@imag.fr                                               *
+*  Copyright (C) 2004 by Janek Kozicki                                   *
+*  cosurgi@berlios.de                                                    *
+*                                                                        *
+*  This program is free software; it is licensed under the terms of the  *
+*  GNU General Public License v2 or later. See file LICENSE for details. *
+*************************************************************************/
 
 #ifndef __CONTAINERHANDLER_H__
 #define __CONTAINERHANDLER_H__
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "SerializationExceptions.hpp"
 #include "Archive.hpp"
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <vector>
 #include <list>
@@ -41,13 +22,9 @@
 #include <deque>
 #include <map>
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <yade/yade-lib-loki/AssocVector.hpp>
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 template<typename Type>
 struct ContainerHandler
@@ -63,9 +40,7 @@ struct ContainerHandler
 	}
 };
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
 /// vector											///
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 template<typename ContainedType>
 struct ContainerHandler<std::vector<ContainedType> >
@@ -108,7 +83,6 @@ struct ContainerHandler<std::vector<ContainedType> >
 	}
 };
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 template<typename ContainedType>
 SerializableTypes::Type findType( std::vector<ContainedType>& ,bool& fundamental, string& str)
@@ -138,9 +112,7 @@ SerializableTypes::Type findType( std::vector<ContainedType>& ,bool& fundamental
 };
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
 /// list											///
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 template<typename ContainedType>
 struct ContainerHandler<std::list<ContainedType> >
@@ -183,7 +155,6 @@ struct ContainerHandler<std::list<ContainedType> >
 	}
 };
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 template<typename ContainedType>
 SerializableTypes::Type findType( std::list<ContainedType>& ,bool& fundamental, string& str)
@@ -194,9 +165,7 @@ SerializableTypes::Type findType( std::list<ContainedType>& ,bool& fundamental, 
 	return SerializableTypes::CONTAINER;
 };
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
 /// set												///
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 // set is 1. a read-only structure
 //        2. does not support resize()
@@ -295,7 +264,6 @@ struct ContainerHandler<std::set<ContainedType> >
 	}
 };
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 template<typename ContainedType>
 SerializableTypes::Type findType( std::set<ContainedType>& ,bool& fundamental, string& str)
@@ -306,7 +274,6 @@ SerializableTypes::Type findType( std::set<ContainedType>& ,bool& fundamental, s
 	return SerializableTypes::CONTAINER;
 };
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
 /// version without a hack.
 
 /*
@@ -323,8 +290,6 @@ struct ContainerHandler<std::set<ContainedType> >
 	}
 };
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 template<typename ContainedType>
 SerializableTypes::Type findType( std::set<ContainedType>& ,bool& fundamental, string& str)
@@ -337,9 +302,7 @@ SerializableTypes::Type findType( std::set<ContainedType>& ,bool& fundamental, s
 }
 */
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
 /// deque											///
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 template<typename ContainedType>
 struct ContainerHandler<std::deque<ContainedType> >
@@ -382,7 +345,6 @@ struct ContainerHandler<std::deque<ContainedType> >
 	}
 };
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 template<typename ContainedType>
 SerializableTypes::Type findType( std::deque<ContainedType>& ,bool& fundamental, string& str)
@@ -393,9 +355,7 @@ SerializableTypes::Type findType( std::deque<ContainedType>& ,bool& fundamental,
 	return SerializableTypes::CONTAINER;
 };
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
 /// map												///
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 // map    1. has read-only key
 //        2. does not support resize()
@@ -493,7 +453,6 @@ struct ContainerHandler<std::map< ContainedType1 , ContainedType2> >
 	}
 };
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 template<typename ContainedType1 , typename ContainedType2 >
 SerializableTypes::Type findType( std::map< ContainedType1, ContainedType2 >& ,bool& fundamental, string& str)
@@ -504,9 +463,7 @@ SerializableTypes::Type findType( std::map< ContainedType1, ContainedType2 >& ,b
 	return SerializableTypes::CONTAINER;
 };
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
 /// AssocVector											///
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 // AssocVector    1. has read-writable key, but I'll do the same as in std::map and std::set
 //                2. does not support resize()
@@ -604,7 +561,6 @@ struct ContainerHandler<Loki::AssocVector< ContainedType1 , ContainedType2> >
 	}
 };
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 template<typename ContainedType1 , typename ContainedType2 >
 SerializableTypes::Type findType( Loki::AssocVector< ContainedType1, ContainedType2 >& ,bool& fundamental, string& str)
@@ -615,7 +571,5 @@ SerializableTypes::Type findType( Loki::AssocVector< ContainedType1, ContainedTy
 	return SerializableTypes::CONTAINER;
 };
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #endif // __CONTAINERHANDLER_H__

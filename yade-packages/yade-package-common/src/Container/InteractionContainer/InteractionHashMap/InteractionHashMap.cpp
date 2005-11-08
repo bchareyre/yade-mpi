@@ -1,46 +1,25 @@
-/***************************************************************************
- *   Copyright (C) 2005 by Olivier Galizzi                                 *
- *   olivier.galizzi@imag.fr                                               *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////
+/*************************************************************************
+*  Copyright (C) 2004 by Olivier Galizzi                                 *
+*  olivier.galizzi@imag.fr                                               *
+*                                                                        *
+*  This program is free software; it is licensed under the terms of the  *
+*  GNU General Public License v2 or later. See file LICENSE for details. *
+*************************************************************************/
 
 #include "InteractionHashMap.hpp"
 #include "InteractionHashMapIterator.hpp"
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////
 
 InteractionHashMap::InteractionHashMap()
 {
 	clear();
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////
 
 InteractionHashMap::~InteractionHashMap()
 {
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////
 
 bool InteractionHashMap::insert(shared_ptr<Interaction>& i)
 {
@@ -52,8 +31,6 @@ bool InteractionHashMap::insert(shared_ptr<Interaction>& i)
 	return interactions.insert( IHashMap::value_type( pair<unsigned int,unsigned int>(id1,id2) , i )).second;
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////
 
 bool InteractionHashMap::insert(unsigned int id1,unsigned int id2)
 {
@@ -61,16 +38,12 @@ bool InteractionHashMap::insert(unsigned int id1,unsigned int id2)
 	return insert(i);	
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void InteractionHashMap::clear()
 {
 	interactions.clear();
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////
 
 bool InteractionHashMap::erase(unsigned int id1,unsigned int id2)
 {
@@ -85,8 +58,6 @@ bool InteractionHashMap::erase(unsigned int id1,unsigned int id2)
 
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////
 
 const shared_ptr<Interaction>& InteractionHashMap::find(unsigned int id1,unsigned int id2)
 {
@@ -103,8 +74,6 @@ const shared_ptr<Interaction>& InteractionHashMap::find(unsigned int id1,unsigne
 	}
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////
 
 InteractionContainer::iterator InteractionHashMap::begin()
 {
@@ -114,8 +83,6 @@ InteractionContainer::iterator InteractionHashMap::begin()
 	return InteractionContainer::iterator(it);
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////
 
 InteractionContainer::iterator InteractionHashMap::end()
 {
@@ -125,8 +92,6 @@ InteractionContainer::iterator InteractionHashMap::end()
 	return InteractionContainer::iterator(it);
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // void InteractionHashMap::eraseCurrentAndGotoNextPotential()
 // {

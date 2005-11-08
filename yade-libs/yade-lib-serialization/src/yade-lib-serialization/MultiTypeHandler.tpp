@@ -1,46 +1,20 @@
-/***************************************************************************
- *   Copyright (C) 2004 by Janek Kozicki                                   *
- *   cosurgi@berlios.de                                                    *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
-
-// it's magic :)
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
+/*************************************************************************
+*  Copyright (C) 2004 by Janek Kozicki                                   *
+*  cosurgi@berlios.de                                                    *
+*                                                                        *
+*  This program is free software; it is licensed under the terms of the  *
+*  GNU General Public License v2 or later. See file LICENSE for details. *
+*************************************************************************/
 
 #ifndef __MULTITYPEHANDLER_H__
 #define __MULTITYPEHANDLER_H__
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "SerializationExceptions.hpp"
 #include "Archive.hpp"
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 #include <utility>
-
 #include <boost/tuple/tuple.hpp>
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 template<typename Type>
 struct MultiTypeSerializer : public Serializable
@@ -56,9 +30,7 @@ struct MultiTypeHandler
 };
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
 /// pair											///
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 template<typename ContainedType1 , typename ContainedType2 >
 class MultiTypeSerializer< std::pair< ContainedType1 , ContainedType2 > > : public Serializable
@@ -102,7 +74,6 @@ class MultiTypeSerializer< std::pair< ContainedType1 , ContainedType2 > > : publ
 	};
 };
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 template<typename ContainedType1 , typename ContainedType2 >
 struct MultiTypeHandler< std::pair< ContainedType1 , ContainedType2 > >
@@ -127,7 +98,6 @@ struct MultiTypeHandler< std::pair< ContainedType1 , ContainedType2 > >
 };
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 template<typename ContainedType1 , typename ContainedType2 >
 SerializableTypes::Type findType( std::pair< ContainedType1 , ContainedType2 >& ,bool& fundamental, string& str)
@@ -166,9 +136,7 @@ SerializableTypes::Type findType( std::pair< ContainedType1 , ContainedType2 >& 
 };
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
 /// tuple 1											///
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 template< typename ContainedType1 >
 class MultiTypeSerializer< boost::tuple< ContainedType1 > > : public Serializable
@@ -205,7 +173,6 @@ class MultiTypeSerializer< boost::tuple< ContainedType1 > > : public Serializabl
 	};
 };
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 template< typename ContainedType1 >
 struct MultiTypeHandler< boost::tuple< ContainedType1 > >
@@ -230,7 +197,6 @@ struct MultiTypeHandler< boost::tuple< ContainedType1 > >
 };
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 template< typename ContainedType1  >
 SerializableTypes::Type findType( boost::tuple< ContainedType1 >& ,bool& fundamental, string& str)
@@ -263,9 +229,7 @@ SerializableTypes::Type findType( boost::tuple< ContainedType1 >& ,bool& fundame
 };
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
 /// tuple 2											///
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 template< typename ContainedType1 , typename ContainedType2 >
 class MultiTypeSerializer< boost::tuple< ContainedType1 , ContainedType2 > > : public Serializable
@@ -306,7 +270,6 @@ class MultiTypeSerializer< boost::tuple< ContainedType1 , ContainedType2 > > : p
 	};
 };
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 template< typename ContainedType1 , typename ContainedType2 >
 struct MultiTypeHandler< boost::tuple< ContainedType1 , ContainedType2 > >
@@ -331,7 +294,6 @@ struct MultiTypeHandler< boost::tuple< ContainedType1 , ContainedType2 > >
 };
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 template< typename ContainedType1 , typename ContainedType2 >
 SerializableTypes::Type findType( boost::tuple< ContainedType1 , ContainedType2 >& ,bool& fundamental, string& str)
@@ -368,9 +330,7 @@ SerializableTypes::Type findType( boost::tuple< ContainedType1 , ContainedType2 
 };
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
 /// tuple 3											///
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 template< typename ContainedType1 , typename ContainedType2 , typename ContainedType3 >
 class MultiTypeSerializer< boost::tuple< ContainedType1 , ContainedType2 , ContainedType3 > > : public Serializable
@@ -415,7 +375,6 @@ class MultiTypeSerializer< boost::tuple< ContainedType1 , ContainedType2 , Conta
 	};
 };
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 template< typename ContainedType1 , typename ContainedType2 , typename ContainedType3 >
 struct MultiTypeHandler< boost::tuple< ContainedType1 , ContainedType2 , ContainedType3 > >
@@ -440,7 +399,6 @@ struct MultiTypeHandler< boost::tuple< ContainedType1 , ContainedType2 , Contain
 };
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 template< typename ContainedType1 , typename ContainedType2 , typename ContainedType3 >
 SerializableTypes::Type findType( boost::tuple< ContainedType1 , ContainedType2 , ContainedType3 >& ,bool& fundamental, string& str)
@@ -481,9 +439,7 @@ SerializableTypes::Type findType( boost::tuple< ContainedType1 , ContainedType2 
 };
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
 /// tuple 4											///
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 template< typename ContainedType1 , typename ContainedType2 , typename ContainedType3 , typename ContainedType4 >
 class MultiTypeSerializer< boost::tuple< ContainedType1 , ContainedType2 , ContainedType3 , ContainedType4 > > : public Serializable
@@ -531,7 +487,6 @@ class MultiTypeSerializer< boost::tuple< ContainedType1 , ContainedType2 , Conta
 	};								//
 };									//
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 template< typename ContainedType1 , typename ContainedType2 , typename ContainedType3 , typename ContainedType4 >
 struct MultiTypeHandler< boost::tuple< ContainedType1 , ContainedType2 , ContainedType3 , ContainedType4 > >
@@ -557,7 +512,6 @@ struct MultiTypeHandler< boost::tuple< ContainedType1 , ContainedType2 , Contain
 };									//
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 template< typename ContainedType1 , typename ContainedType2 , typename ContainedType3 , typename ContainedType4 >
 SerializableTypes::Type findType( boost::tuple< ContainedType1 , ContainedType2 , ContainedType3 , ContainedType4 >& ,bool& fundamental, string& str)
@@ -601,9 +555,7 @@ SerializableTypes::Type findType( boost::tuple< ContainedType1 , ContainedType2 
 	return SerializableTypes::CUSTOM_CLASS;				//
 };
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
 /// tuple 5											///
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 template< typename ContainedType1 , typename ContainedType2 , typename ContainedType3 , typename ContainedType4 , typename ContainedType5 >
 class MultiTypeSerializer< boost::tuple< ContainedType1 , ContainedType2 , ContainedType3 , ContainedType4 , ContainedType5 > > : public Serializable
@@ -655,7 +607,6 @@ class MultiTypeSerializer< boost::tuple< ContainedType1 , ContainedType2 , Conta
 	};								//
 };									//
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 template< typename ContainedType1 , typename ContainedType2 , typename ContainedType3 , typename ContainedType4 , typename ContainedType5 >
 struct MultiTypeHandler< boost::tuple< ContainedType1 , ContainedType2 , ContainedType3 , ContainedType4 , ContainedType5 > >
@@ -681,7 +632,6 @@ struct MultiTypeHandler< boost::tuple< ContainedType1 , ContainedType2 , Contain
 };									//
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 template< typename ContainedType1 , typename ContainedType2 , typename ContainedType3 , typename ContainedType4 , typename ContainedType5 >
 SerializableTypes::Type findType( boost::tuple< ContainedType1 , ContainedType2 , ContainedType3 , ContainedType4 , ContainedType5 >& ,bool& fundamental, string& str)
@@ -729,7 +679,5 @@ SerializableTypes::Type findType( boost::tuple< ContainedType1 , ContainedType2 
 	return SerializableTypes::CUSTOM_CLASS;				//
 };
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #endif // __MULTITYPEHANDLER_H__
