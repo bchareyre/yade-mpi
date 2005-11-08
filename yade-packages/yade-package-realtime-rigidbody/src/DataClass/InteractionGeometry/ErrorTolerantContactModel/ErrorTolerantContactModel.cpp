@@ -6,28 +6,28 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "ErrorTolerantContactModel.hpp"
+#include "ErrorTolerantContact.hpp"
 
 
-ErrorTolerantContactModel::ErrorTolerantContactModel() : InteractionGeometry()
+ErrorTolerantContact::ErrorTolerantContact() : InteractionGeometry()
 {
 
 }
 
 
-ErrorTolerantContactModel::~ErrorTolerantContactModel ()
+ErrorTolerantContact::~ErrorTolerantContact ()
 {
 
 }
 
 
-void ErrorTolerantContactModel::postProcessAttributes(bool)
+void ErrorTolerantContact::postProcessAttributes(bool)
 {
 
 }
 
 
-void ErrorTolerantContactModel::registerAttributes()
+void ErrorTolerantContact::registerAttributes()
 {
 
 }

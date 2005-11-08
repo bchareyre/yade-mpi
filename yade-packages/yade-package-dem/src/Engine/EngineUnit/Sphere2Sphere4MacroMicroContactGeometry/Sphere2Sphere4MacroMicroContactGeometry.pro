@@ -27,5 +27,5 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
-HEADERS += Sphere2Sphere4MacroMicroContactGeometry.hpp 
-SOURCES += Sphere2Sphere4MacroMicroContactGeometry.cpp 
+HEADERS += InteractingSphere2InteractingSphere4SpheresContactGeometry.hpp 
+SOURCES += InteractingSphere2InteractingSphere4SpheresContactGeometry.cpp 

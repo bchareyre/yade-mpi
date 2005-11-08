@@ -19,19 +19,19 @@
 
 
 /*! \brief
-	Abstract interface for all geometrical model factories.
+	Abstract interface for building GeometricalModel depending on PhysicalParameters (currently used for updating geometry if physics has changed and affects it).
 
- OLD: FIXME, what is written below is a description of BodyFactory. move it there
- 
+ 	It is used when you want to update GeometricalModel of your Body during runtime. Only Physical
+	Parameters of the Body can affect "perfect geometrical representation"(GeometricalModel) of
+	the Body. So it is given as first argument.
+
+
+DEPRECATED explanation (will move do BodyFactory perhaps?):
+
 	It is used for creating a geometrical model from a given set of parameters.
 	This is very useful when you want to load a file that contains geometrical data or when
 	you want to build an object with that depends on several parameters.
 	
- NEW: FIXME - delete comment that is above
- 
- 	It is used when you want to update GeometricalModel of your Body during runtime. Only Physical
-	Parameters of the Body can affect "perfect geometrical representation"(GeometricalModel) of
-	the Body. So it is given as first argument.
 */
 class GeometricalModelEngineUnit : 	public EngineUnit2D
 					<

@@ -12,7 +12,7 @@
 
 #include <yade/yade-package-common/InteractionGeometryEngineUnit.hpp>
 
-class Sphere2Sphere4ClosestFeatures : public InteractionGeometryEngineUnit
+class InteractingSphere2InteractingSphere4ClosestFeatures : public InteractionGeometryEngineUnit
 {
 	public :
 		virtual bool go(	const shared_ptr<InteractingGeometry>& cm1,
@@ -26,12 +26,12 @@ class Sphere2Sphere4ClosestFeatures : public InteractionGeometryEngineUnit
 					const Se3r& se32,
 					const shared_ptr<Interaction>& c);
 
-	REGISTER_CLASS_NAME(Sphere2Sphere4ClosestFeatures);
+	REGISTER_CLASS_NAME(InteractingSphere2InteractingSphere4ClosestFeatures);
 	REGISTER_BASE_CLASS_NAME(InteractionGeometryEngineUnit);
 	DEFINE_FUNCTOR_ORDER_2D(InteractingSphere,InteractingSphere);
 };
 
-REGISTER_SERIALIZABLE(Sphere2Sphere4ClosestFeatures,false);
+REGISTER_SERIALIZABLE(InteractingSphere2InteractingSphere4ClosestFeatures,false);
 
 #endif // SPHERE2SPHERE4CLOSESTFEATURES_HPP
 

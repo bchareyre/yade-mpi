@@ -11,7 +11,7 @@
 
 #include <yade/yade-package-common/InteractionGeometryEngineUnit.hpp>
 
-class Sphere2Sphere4ErrorTolerant : public InteractionGeometryEngineUnit
+class InteractingSphere2InteractingSphere4ErrorTolerantContact : public InteractionGeometryEngineUnit
 {
 	public :
 		virtual bool go(	const shared_ptr<InteractingGeometry>& cm1,
@@ -25,12 +25,12 @@ class Sphere2Sphere4ErrorTolerant : public InteractionGeometryEngineUnit
 					const Se3r& se32,
 					const shared_ptr<Interaction>& c);
 
-	REGISTER_CLASS_NAME(Sphere2Sphere4ErrorTolerant);
+	REGISTER_CLASS_NAME(InteractingSphere2InteractingSphere4ErrorTolerantContact);
 	REGISTER_BASE_CLASS_NAME(InteractionGeometryEngineUnit);
 	DEFINE_FUNCTOR_ORDER_2D(Sphere,Sphere);
 };
 
-REGISTER_SERIALIZABLE(Sphere2Sphere4ErrorTolerant,false);
+REGISTER_SERIALIZABLE(InteractingSphere2InteractingSphere4ErrorTolerantContact,false);
 
 #endif // SPHERE2SPHERE4ERRORTOLERANT_HPP
 

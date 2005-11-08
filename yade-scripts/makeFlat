@@ -27,8 +27,8 @@ find ./ -name "*.ui"  -exec ./makeSymLinkFlat {} \;
 mv .yade-sandbox yade-sandbox
 
 cd yade-flat
-symlinks -rcsd ./
-symlinks -rcsd ./
+#symlinks -rcsd ./
+#symlinks -rcsd ./
 cd ..
 
 rm ./makeSymLinkFlat

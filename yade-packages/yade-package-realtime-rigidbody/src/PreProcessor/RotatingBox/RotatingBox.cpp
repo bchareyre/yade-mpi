@@ -267,9 +267,9 @@ void RotatingBox::createActors(shared_ptr<MetaBody>& rootBody)
 	actionParameterInitializer->actionParameterNames.push_back("Momentum");
 	
 	shared_ptr<InteractionGeometryMetaEngine> interactionGeometryDispatcher(new InteractionGeometryMetaEngine);
-	interactionGeometryDispatcher->add("InteractingSphere","InteractingSphere","Sphere2Sphere4ClosestFeatures");
-	interactionGeometryDispatcher->add("InteractingSphere","InteractingBox","Box2Sphere4ClosestFeatures");
-	interactionGeometryDispatcher->add("InteractingBox","InteractingBox","Box2Box4ClosestFeatures");
+	interactionGeometryDispatcher->add("InteractingSphere","InteractingSphere","InteractingSphere2InteractingSphere4ClosestFeatures");
+	interactionGeometryDispatcher->add("InteractingSphere","InteractingBox","InteractingBox2InteractingSphere4ClosestFeatures");
+	interactionGeometryDispatcher->add("InteractingBox","InteractingBox","InteractingBox2InteractingBox4ClosestFeatures");
 
 	shared_ptr<BoundingVolumeMetaEngine> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeMetaEngine>(new BoundingVolumeMetaEngine);
 	boundingVolumeDispatcher->add("InteractingSphere","AABB","InteractingSphere2AABB");

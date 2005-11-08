@@ -6,13 +6,13 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "Box2Sphere4ErrorTolerant.hpp"
-#include "ErrorTolerantContactModel.hpp"
+#include "InteractingBox2InteractingSphere4ErrorTolerantContact.hpp"
+#include "ErrorTolerantContact.hpp"
 #include <yade/yade-package-common/Sphere.hpp>
 #include <yade/yade-package-common/Box.hpp>
 
 
-bool Box2Sphere4ErrorTolerant::go(		const shared_ptr<InteractingGeometry>& cm1,
+bool InteractingBox2InteractingSphere4ErrorTolerantContact::go(		const shared_ptr<InteractingGeometry>& cm1,
 						const shared_ptr<InteractingGeometry>& cm2,
 						const Se3r& se31,
 						const Se3r& se32,
@@ -80,7 +80,7 @@ bool Box2Sphere4ErrorTolerant::go(		const shared_ptr<InteractingGeometry>& cm1,
 		pt1 = se32.position + normal*min;
 		pt2 = se32.position - normal*s->radius;	
 	
-		shared_ptr<ErrorTolerantContactModel> cm = shared_ptr<ErrorTolerantContactModel>(new ErrorTolerantContactModel());
+		shared_ptr<ErrorTolerantContact> cm = shared_ptr<ErrorTolerantContact>(new ErrorTolerantContact());
 		cm->closestPoints.push_back(std::pair<Vector3r,Vector3r>(pt1,pt2));
 		cm->normal = pt1-pt2;
 		cm->o1p1 = pt1-se31.position;
@@ -106,7 +106,7 @@ bool Box2Sphere4ErrorTolerant::go(		const shared_ptr<InteractingGeometry>& cm1,
 
 	pt2 = se32.position - normal * s->radius;
 		
-	shared_ptr<ErrorTolerantContactModel> cm = shared_ptr<ErrorTolerantContactModel>(new ErrorTolerantContactModel());
+	shared_ptr<ErrorTolerantContact> cm = shared_ptr<ErrorTolerantContact>(new ErrorTolerantContact());
 	cm->closestPoints.push_back(std::pair<Vector3r,Vector3r>(pt1,pt2));
 	cm->normal = pt1-pt2;
 	cm->o1p1 = pt1-se31.position;
@@ -119,7 +119,7 @@ bool Box2Sphere4ErrorTolerant::go(		const shared_ptr<InteractingGeometry>& cm1,
 }
 
 
-bool Box2Sphere4ErrorTolerant::goReverse(	const shared_ptr<InteractingGeometry>& cm1,
+bool InteractingBox2InteractingSphere4ErrorTolerantContact::goReverse(	const shared_ptr<InteractingGeometry>& cm1,
 						const shared_ptr<InteractingGeometry>& cm2,
 						const Se3r& se31,
 						const Se3r& se32,
@@ -128,7 +128,7 @@ bool Box2Sphere4ErrorTolerant::goReverse(	const shared_ptr<InteractingGeometry>&
 	bool isInteracting = go(cm2,cm1,se32,se31,c);
 	if (isInteracting)
 	{
-		shared_ptr<ErrorTolerantContactModel> cm = dynamic_pointer_cast<ErrorTolerantContactModel>(c->interactionGeometry);
+		shared_ptr<ErrorTolerantContact> cm = dynamic_pointer_cast<ErrorTolerantContact>(c->interactionGeometry);
 
 		Vector3r tmp = cm->closestPoints[0].first;
 		cm->closestPoints[0].first = cm->closestPoints[0].second;

@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #include "ErrorTolerantLaw.hpp"
-#include "ErrorTolerantContactModel.hpp"
+#include "ErrorTolerantContact.hpp"
 #include <yade/yade-package-common/RigidBodyParameters.hpp>
 #include <yade/yade-core/MetaBody.hpp>
 
@@ -107,7 +107,7 @@ void ErrorTolerantLaw::action(Body* body)
 			if (contact->isReal)
 			{
 
-				shared_ptr<ErrorTolerantContactModel> cm = dynamic_pointer_cast<ErrorTolerantContactModel>(contact->interactionGeometry);
+				shared_ptr<ErrorTolerantContact> cm = dynamic_pointer_cast<ErrorTolerantContact>(contact->interactionGeometry);
 	
 				id1 		= contact->getId1();
 				id2 		= contact->getId2();

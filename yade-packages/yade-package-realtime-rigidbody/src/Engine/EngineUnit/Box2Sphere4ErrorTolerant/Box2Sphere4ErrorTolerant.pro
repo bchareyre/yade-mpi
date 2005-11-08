@@ -3,7 +3,7 @@ error( "YADE_QMAKE_PATH internal qmake variable is not set, you should run for e
 }
 
 
-LIBS += -lErrorTolerantContactModel \
+LIBS += -lErrorTolerantContact \
         -lInteractionGeometryMetaEngine \
         -lyade-lib-factory \
         -lyade-lib-wm3-math \
@@ -12,7 +12,7 @@ LIBS += -lErrorTolerantContactModel \
         -lSphere \
         -rdynamic 
 INCLUDEPATH += $${YADE_QMAKE_PATH}/include/ \
-               ../../../DataClass/InteractionGeometry/ErrorTolerantContactModel 
+               ../../../DataClass/InteractionGeometry/ErrorTolerantContact 
 QMAKE_LIBDIR = ../../../../bin \
                $${YADE_QMAKE_PATH}/lib/yade/yade-package-common/ \
                $${YADE_QMAKE_PATH}/lib/yade/yade-libs/ 
@@ -26,5 +26,5 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
-HEADERS += Box2Sphere4ErrorTolerant.hpp 
-SOURCES += Box2Sphere4ErrorTolerant.cpp 
+HEADERS += InteractingBox2InteractingSphere4ErrorTolerantContact.hpp 
+SOURCES += InteractingBox2InteractingSphere4ErrorTolerantContact.cpp 

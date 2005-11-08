@@ -6,12 +6,12 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "Sphere2Sphere4ErrorTolerant.hpp"
-#include "ErrorTolerantContactModel.hpp"
+#include "InteractingSphere2InteractingSphere4ErrorTolerantContact.hpp"
+#include "ErrorTolerantContact.hpp"
 #include <yade/yade-package-common/Sphere.hpp>
 
 
-bool Sphere2Sphere4ErrorTolerant::go(		const shared_ptr<InteractingGeometry>& cm1,
+bool InteractingSphere2InteractingSphere4ErrorTolerantContact::go(		const shared_ptr<InteractingGeometry>& cm1,
 						const shared_ptr<InteractingGeometry>& cm2,
 						const Se3r& se31,
 						const Se3r& se32,
@@ -25,7 +25,7 @@ bool Sphere2Sphere4ErrorTolerant::go(		const shared_ptr<InteractingGeometry>& cm
 
 	if (penetrationDepth>0)
 	{
-		shared_ptr<ErrorTolerantContactModel> cm = shared_ptr<ErrorTolerantContactModel>(new ErrorTolerantContactModel());
+		shared_ptr<ErrorTolerantContact> cm = shared_ptr<ErrorTolerantContact>(new ErrorTolerantContact());
 
 		Vector3r pt1 = se31.position+normal*s1->radius;
 		Vector3r pt2 = se32.position-normal*s2->radius;
@@ -42,7 +42,7 @@ bool Sphere2Sphere4ErrorTolerant::go(		const shared_ptr<InteractingGeometry>& cm
 }
 
 
-bool Sphere2Sphere4ErrorTolerant::goReverse(	const shared_ptr<InteractingGeometry>& cm1,
+bool InteractingSphere2InteractingSphere4ErrorTolerantContact::goReverse(	const shared_ptr<InteractingGeometry>& cm1,
 						const shared_ptr<InteractingGeometry>& cm2,
 						const Se3r& se31,
 						const Se3r& se32,

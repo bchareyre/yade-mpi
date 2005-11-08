@@ -231,7 +231,7 @@ void SphericalDEMSimulator::findRealCollision(const vector<SphericalDEM>& sphere
 			
 			int id2 = c->id;
 			
-			/// Sphere2Sphere4MacroMicroContactGeometry
+			/// InteractingSphere2InteractingSphere4SpheresContactGeometry
 			Vector3r normal = spheres[id2].position-spheres[id1].position;
 			Real penetrationDepth = spheres[id1].radius+spheres[id2].radius-normal.normalize();
 	

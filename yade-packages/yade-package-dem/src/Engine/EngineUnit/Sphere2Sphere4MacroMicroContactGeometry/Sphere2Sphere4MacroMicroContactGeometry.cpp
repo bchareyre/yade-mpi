@@ -8,17 +8,17 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "Sphere2Sphere4MacroMicroContactGeometry.hpp"
+#include "InteractingSphere2InteractingSphere4SpheresContactGeometry.hpp"
 #include "SpheresContactGeometry.hpp"
 #include "SDECLinkGeometry.hpp"
 #include <yade/yade-package-common/InteractingSphere.hpp>
 
 
-bool Sphere2Sphere4MacroMicroContactGeometry::go(	const shared_ptr<InteractingGeometry>& cm1,
-						const shared_ptr<InteractingGeometry>& cm2,
-						const Se3r& se31,
-						const Se3r& se32,
-						const shared_ptr<Interaction>& c)
+bool InteractingSphere2InteractingSphere4SpheresContactGeometry::go(	const shared_ptr<InteractingGeometry>& cm1,
+							const shared_ptr<InteractingGeometry>& cm2,
+							const Se3r& se31,
+							const Se3r& se32,
+							const shared_ptr<Interaction>& c)
 {
 	InteractingSphere* s1 = static_cast<InteractingSphere*>(cm1.get());
 	InteractingSphere* s2 = static_cast<InteractingSphere*>(cm2.get());
@@ -67,11 +67,11 @@ bool Sphere2Sphere4MacroMicroContactGeometry::go(	const shared_ptr<InteractingGe
 }
 
 
-bool Sphere2Sphere4MacroMicroContactGeometry::goReverse(	const shared_ptr<InteractingGeometry>& cm1,
-						const shared_ptr<InteractingGeometry>& cm2,
-						const Se3r& se31,
-						const Se3r& se32,
-						const shared_ptr<Interaction>& c)
+bool InteractingSphere2InteractingSphere4SpheresContactGeometry::goReverse(	const shared_ptr<InteractingGeometry>& cm1,
+								const shared_ptr<InteractingGeometry>& cm2,
+								const Se3r& se31,
+								const Se3r& se32,
+								const shared_ptr<Interaction>& c)
 {
 	return go(cm1,cm2,se31,se32,c);
 }

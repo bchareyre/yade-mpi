@@ -6,13 +6,13 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "Box2Sphere4ClosestFeatures.hpp"
+#include "InteractingBox2InteractingSphere4ClosestFeatures.hpp"
 #include <yade/yade-package-common/InteractingSphere.hpp>
 #include <yade/yade-package-common/InteractingBox.hpp>
 #include <yade/yade-package-common/ClosestFeatures.hpp>
 
 
-bool Box2Sphere4ClosestFeatures::go(		const shared_ptr<InteractingGeometry>& cm1,
+bool InteractingBox2InteractingSphere4ClosestFeatures::go(		const shared_ptr<InteractingGeometry>& cm1,
 						const shared_ptr<InteractingGeometry>& cm2,
 						const Se3r& se31,
 						const Se3r& se32,
@@ -111,7 +111,7 @@ bool Box2Sphere4ClosestFeatures::go(		const shared_ptr<InteractingGeometry>& cm1
 }
 
 
-bool Box2Sphere4ClosestFeatures::goReverse(	const shared_ptr<InteractingGeometry>& cm1,
+bool InteractingBox2InteractingSphere4ClosestFeatures::goReverse(	const shared_ptr<InteractingGeometry>& cm1,
 						const shared_ptr<InteractingGeometry>& cm2,
 						const Se3r& se31,
 						const Se3r& se32,

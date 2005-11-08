@@ -11,7 +11,7 @@
 
 #include <yade/yade-package-common/InteractionGeometryEngineUnit.hpp>
 
-class Box2Box4ClosestFeatures : public InteractionGeometryEngineUnit
+class InteractingBox2InteractingBox4ClosestFeatures : public InteractionGeometryEngineUnit
 {
 	private : 
 		struct BoxBoxInteractionInfo
@@ -39,12 +39,12 @@ class Box2Box4ClosestFeatures : public InteractionGeometryEngineUnit
 	private :
 		bool testSeparatingAxis(Real expr1, Real expr2, Vector3r n,int c,BoxBoxInteractionInfo* bbInfo);
 
-	REGISTER_CLASS_NAME(Box2Box4ClosestFeatures);
+	REGISTER_CLASS_NAME(InteractingBox2InteractingBox4ClosestFeatures);
 	REGISTER_BASE_CLASS_NAME(InteractionGeometryEngineUnit);
 	DEFINE_FUNCTOR_ORDER_2D(InteractingBox,InteractingBox);
 };
 
-REGISTER_SERIALIZABLE(Box2Box4ClosestFeatures,false);
+REGISTER_SERIALIZABLE(InteractingBox2InteractingBox4ClosestFeatures,false);
 
 #endif // BOX2BOX4CLOSESTFEATURES_HPP
 

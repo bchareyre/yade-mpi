@@ -7,8 +7,8 @@ SUBDIRS += PolyhedralSweptSphere2AABB \
            Box2PolyhedralSweptSphere \
            Tetrahedron2PolyhedralSweptSphere \
            MacroMicroElasticRelationships \
-           Box2Sphere4MacroMicroContactGeometry \
-           Sphere2Sphere4MacroMicroContactGeometry 
+           InteractingBox2InteractingSphere4SpheresContactGeometry \
+           InteractingSphere2InteractingSphere4SpheresContactGeometry 
 CONFIG += debug \
           thread \
 warn_on

@@ -8,13 +8,13 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "Box2Sphere4MacroMicroContactGeometry.hpp"
+#include "InteractingBox2InteractingSphere4SpheresContactGeometry.hpp"
 #include "SpheresContactGeometry.hpp"
 #include <yade/yade-package-common/InteractingSphere.hpp>
 #include <yade/yade-package-common/InteractingBox.hpp>
 
 //FIXME return type should be shared_ptr<Interaction>
-bool Box2Sphere4MacroMicroContactGeometry::go(		const shared_ptr<InteractingGeometry>& cm1,
+bool InteractingBox2InteractingSphere4SpheresContactGeometry::go(		const shared_ptr<InteractingGeometry>& cm1,
 						const shared_ptr<InteractingGeometry>& cm2,
 						const Se3r& se31,
 						const Se3r& se32,
@@ -151,7 +151,7 @@ bool Box2Sphere4MacroMicroContactGeometry::go(		const shared_ptr<InteractingGeom
 }
 
 
-bool Box2Sphere4MacroMicroContactGeometry::goReverse(	const shared_ptr<InteractingGeometry>& cm1,
+bool InteractingBox2InteractingSphere4SpheresContactGeometry::goReverse(	const shared_ptr<InteractingGeometry>& cm1,
 						const shared_ptr<InteractingGeometry>& cm2,
 						const Se3r& se31,
 						const Se3r& se32,

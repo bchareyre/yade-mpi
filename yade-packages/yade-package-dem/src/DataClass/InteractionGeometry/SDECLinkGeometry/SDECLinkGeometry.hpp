@@ -19,7 +19,7 @@ class SDECLinkGeometry : public InteractionGeometry
 	public :
 		virtual ~SDECLinkGeometry();
 
-		Real		 radius1
+		Real		 radius1 // FIXME : lots of stuff is the same as in SpheresContactGeometry, so it should inherit from it.
 				,radius2;
 
 		Vector3r	normal;			// new unit normal of the contact plane.

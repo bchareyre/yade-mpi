@@ -18,13 +18,27 @@
 #include <boost/shared_ptr.hpp>
 #include <string>
 
+/*! \brief
+	Abstract interface for all classes that build InteractingGeometry from GeometricalModel
+
+	This is useful when it's not trivial to just write the parameters of InteractingGeometry by hand.
+	Then we can use this InteractingGeometryEngineUnit to build it from GeometricalModel.
+
+	Currently it is only used to build a PolyhedralSweptSphere from Box and from Tetrahedron
+*/
 class InteractingGeometryEngineUnit : 	public EngineUnit2D
+	/*!  
+		\param const shared_ptr<GeometricalModel>&	exact geometry of Body
+		\param Se3r&					the 3D transformation to apply to the collision model before building the bounding volume
+		\param Body*					the Body inside which operation takes place
+		\return shared_ptr<InteractingGeometry>&	the InteractingGeometry built (given as second argument to the function)
+	*/
 					<
 		 				void ,
 		 				TYPELIST_4(	  const shared_ptr<GeometricalModel>&
-								, shared_ptr<InteractingGeometry>& // is not working when const, because functors are supposed to modify it!
+								, shared_ptr<InteractingGeometry>&
 								, const Se3r& // FIXME - remove Se3r, If some function needs Se3r it must find it through Body*
-								, const Body* // with that - functors have all the data they may need, but it's const, so they can't modify it !
+								, const Body* // with that - functors have all the data they may need
 			  				  )
 					>
 {	

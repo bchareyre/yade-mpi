@@ -16,7 +16,7 @@
 
 /*! \brief Provide interaction handling between a axis aligned box and a sphere in terms of ClosestFeatures */
 
-class AABox2Sphere4ClosestFeatures : public InteractionGeometryEngineUnit
+class AAInteractingBox2InteractingSphere4ClosestFeatures : public InteractionGeometryEngineUnit
 {
 	public : 
 		virtual bool go(		const shared_ptr<InteractingGeometry>& cm1,
@@ -30,14 +30,14 @@ class AABox2Sphere4ClosestFeatures : public InteractionGeometryEngineUnit
 						const Se3r& se32,
 						const shared_ptr<Interaction>& c);
 
-	REGISTER_CLASS_NAME(AABox2Sphere4ClosestFeatures);
+	REGISTER_CLASS_NAME(AAInteractingBox2InteractingSphere4ClosestFeatures);
 	REGISTER_BASE_CLASS_NAME(InteractionGeometryEngineUnit);
 
 	DEFINE_FUNCTOR_ORDER_2D(InteractingBox,InteractingSphere);
 	
 };
 
-REGISTER_SERIALIZABLE(AABox2Sphere4ClosestFeatures,false);
+REGISTER_SERIALIZABLE(AAInteractingBox2InteractingSphere4ClosestFeatures,false);
 
 #endif // AABOX2SPHERE4CLOSESTFEATURES_HPP
 

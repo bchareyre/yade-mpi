@@ -12,7 +12,7 @@
 #include <yade/yade-core/InteractionGeometry.hpp>
 #include <yade/yade-lib-wm3-math/Vector3.hpp>
 
-class ErrorTolerantContactModel : public InteractionGeometry
+class ErrorTolerantContact : public InteractionGeometry
 {
 	public :
 		vector<pair<Vector3r,Vector3r> > closestPoints;
@@ -28,19 +28,19 @@ class ErrorTolerantContactModel : public InteractionGeometry
 	//public : t_ConnexionType type;
 	
 	// construction
-		ErrorTolerantContactModel ();
-		virtual ~ErrorTolerantContactModel ();
+		ErrorTolerantContact ();
+		virtual ~ErrorTolerantContact ();
 
 	protected :
 		virtual void postProcessAttributes(bool deserializing);
 	public :
 		void registerAttributes();
 
-	REGISTER_CLASS_NAME(ErrorTolerantContactModel);
+	REGISTER_CLASS_NAME(ErrorTolerantContact);
 	REGISTER_BASE_CLASS_NAME(InteractionGeometry);
-	//REGISTER_CLASS_INDEX(ErrorTolerantContactModel);
+	//REGISTER_CLASS_INDEX(ErrorTolerantContact);
 };
 
-REGISTER_SERIALIZABLE(ErrorTolerantContactModel,false);
+REGISTER_SERIALIZABLE(ErrorTolerantContact,false);
 
 #endif // ERRORTOLERANTCONTACTMODEL_HPP

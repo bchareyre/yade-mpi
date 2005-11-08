@@ -13,7 +13,7 @@
 
 #include <yade/yade-package-common/InteractionGeometryEngineUnit.hpp>
 
-class Box2Sphere4MacroMicroContactGeometry : public InteractionGeometryEngineUnit
+class InteractingBox2InteractingSphere4SpheresContactGeometry : public InteractionGeometryEngineUnit
 {
 	public :
 		virtual bool go(	const shared_ptr<InteractingGeometry>& cm1,
@@ -28,13 +28,13 @@ class Box2Sphere4MacroMicroContactGeometry : public InteractionGeometryEngineUni
 					const Se3r& se32,
 					const shared_ptr<Interaction>& c);
 
-	REGISTER_CLASS_NAME(Box2Sphere4MacroMicroContactGeometry);
+	REGISTER_CLASS_NAME(InteractingBox2InteractingSphere4SpheresContactGeometry);
 	REGISTER_BASE_CLASS_NAME(InteractionGeometryEngineUnit);
 
 	DEFINE_FUNCTOR_ORDER_2D(InteractingBox,InteractingSphere);
 };
 
-REGISTER_SERIALIZABLE(Box2Sphere4MacroMicroContactGeometry,false);
+REGISTER_SERIALIZABLE(InteractingBox2InteractingSphere4SpheresContactGeometry,false);
 
 #endif // __BOX2SPHERE4SDECCONTACTMODEL_H__
 

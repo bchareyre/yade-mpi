@@ -3,7 +3,7 @@ error( "YADE_QMAKE_PATH internal qmake variable is not set, you should run for e
 }
 
 
-LIBS += -lErrorTolerantContactModel \
+LIBS += -lErrorTolerantContact \
         -lRigidBodyParameters \
         -lyade-lib-wm3-math \
         -lyade-lib-serialization \
@@ -11,7 +11,7 @@ LIBS += -lErrorTolerantContactModel \
         -lyade-lib-multimethods \
         -rdynamic 
 INCLUDEPATH += $${YADE_QMAKE_PATH}/include/ \
-               ../../../DataClass/InteractionGeometry/ErrorTolerantContactModel 
+               ../../../DataClass/InteractionGeometry/ErrorTolerantContact 
 QMAKE_LIBDIR = ../../../../bin \
                $${YADE_QMAKE_PATH}/lib/yade/yade-package-common/ \
                $${YADE_QMAKE_PATH}/lib/yade/yade-libs/ 

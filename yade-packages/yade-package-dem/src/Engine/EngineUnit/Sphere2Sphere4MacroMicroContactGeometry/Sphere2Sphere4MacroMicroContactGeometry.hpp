@@ -11,7 +11,7 @@
 
 #include <yade/yade-package-common/InteractionGeometryEngineUnit.hpp>
 
-class Sphere2Sphere4MacroMicroContactGeometry : public InteractionGeometryEngineUnit
+class InteractingSphere2InteractingSphere4SpheresContactGeometry : public InteractionGeometryEngineUnit
 {
 	public :
 		virtual bool go(	const shared_ptr<InteractingGeometry>& cm1,
@@ -25,13 +25,13 @@ class Sphere2Sphere4MacroMicroContactGeometry : public InteractionGeometryEngine
 					const Se3r& se32,
 					const shared_ptr<Interaction>& c);
 
-	REGISTER_CLASS_NAME(Sphere2Sphere4MacroMicroContactGeometry);
+	REGISTER_CLASS_NAME(InteractingSphere2InteractingSphere4SpheresContactGeometry);
 	REGISTER_BASE_CLASS_NAME(InteractionGeometryEngineUnit);
 
 	DEFINE_FUNCTOR_ORDER_2D(InteractingSphere,InteractingSphere);
 };
 
-REGISTER_SERIALIZABLE(Sphere2Sphere4MacroMicroContactGeometry,false);
+REGISTER_SERIALIZABLE(InteractingSphere2InteractingSphere4SpheresContactGeometry,false);
 
 #endif // SPHERE2SPHERE4MACROMICROCONTACTGEOMETRY_HPP
 

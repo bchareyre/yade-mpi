@@ -51,7 +51,7 @@ FORMS += QtFileGeneratorController.ui \
          QtGeneratedMetaDispatchingEngineProperties.ui \
          QtGeneratedPreferencesEditor.ui 
 HEADERS += AABB.hpp \
-           AABox2Sphere4ClosestFeatures.hpp \
+           AAInteractingBox2InteractingSphere4ClosestFeatures.hpp \
            Archive.hpp \
            ArchiveTypes.hpp \
            AssocVector.hpp \
@@ -71,11 +71,11 @@ HEADERS += AABB.hpp \
            BoundingVolumeMetaEngine.hpp \
            Box.hpp \
            InteractingBox2AABB.hpp \
-           Box2Box4ClosestFeatures.hpp \
+           InteractingBox2InteractingBox4ClosestFeatures.hpp \
            Box2PolyhedralSweptSphere.hpp \
-           Box2Sphere4ClosestFeatures.hpp \
-           Box2Sphere4ErrorTolerant.hpp \
-           Box2Sphere4MacroMicroContactGeometry.hpp \
+           InteractingBox2InteractingSphere4ClosestFeatures.hpp \
+           InteractingBox2InteractingSphere4ErrorTolerantContact.hpp \
+           InteractingBox2InteractingSphere4SpheresContactGeometry.hpp \
            BoxStack.hpp \
            Chrono.hpp \
            ClassFactory.hpp \
@@ -95,7 +95,7 @@ HEADERS += AABB.hpp \
            EngineUnit.hpp \
            EngineUnit1D.hpp \
            EngineUnit2D.hpp \
-           ErrorTolerantContactModel.hpp \
+           ErrorTolerantContact.hpp \
            ErrorTolerantLaw.hpp \
            Factorable.hpp \
            FactoryExceptions.hpp \
@@ -272,9 +272,9 @@ HEADERS += AABB.hpp \
            Singleton.hpp \
            Sphere.hpp \
            InteractingSphere2AABB.hpp \
-           Sphere2Sphere4ClosestFeatures.hpp \
-           Sphere2Sphere4ErrorTolerant.hpp \
-           Sphere2Sphere4MacroMicroContactGeometry.hpp \
+           InteractingSphere2InteractingSphere4ClosestFeatures.hpp \
+           InteractingSphere2InteractingSphere4ErrorTolerantContact.hpp \
+           InteractingSphere2InteractingSphere4SpheresContactGeometry.hpp \
            SpringGeometry.hpp \
            SpringPhysics.hpp \
            stat.h \
@@ -332,7 +332,7 @@ HEADERS += AABB.hpp \
            Vector4.ipp 
 SOURCES += yade.cpp \
            AABB.cpp \
-           AABox2Sphere4ClosestFeatures.cpp \
+           AAInteractingBox2InteractingSphere4ClosestFeatures.cpp \
            Archive.cpp \
            AveragePositionRecorder.cpp \
            Body.cpp \
@@ -347,11 +347,11 @@ SOURCES += yade.cpp \
            BoundingVolumeMetaEngine.cpp \
            Box.cpp \
            InteractingBox2AABB.cpp \
-           Box2Box4ClosestFeatures.cpp \
+           InteractingBox2InteractingBox4ClosestFeatures.cpp \
            Box2PolyhedralSweptSphere.cpp \
-           Box2Sphere4ClosestFeatures.cpp \
-           Box2Sphere4ErrorTolerant.cpp \
-           Box2Sphere4MacroMicroContactGeometry.cpp \
+           InteractingBox2InteractingSphere4ClosestFeatures.cpp \
+           InteractingBox2InteractingSphere4ErrorTolerantContact.cpp \
+           InteractingBox2InteractingSphere4SpheresContactGeometry.cpp \
            BoxStack.cpp \
            Chrono.cpp \
            ClassFactory.cpp \
@@ -365,7 +365,7 @@ SOURCES += yade.cpp \
            ElasticCohesiveLaw.cpp \
            ElasticContactLaw.cpp \
            ElasticContactParameters.cpp \
-           ErrorTolerantContactModel.cpp \
+           ErrorTolerantContact.cpp \
            ErrorTolerantLaw.cpp \
            Factorable.cpp \
            FactoryExceptions.cpp \
@@ -524,9 +524,9 @@ SOURCES += yade.cpp \
            SimulationLoop.cpp \
            Sphere.cpp \
            InteractingSphere2AABB.cpp \
-           Sphere2Sphere4ClosestFeatures.cpp \
-           Sphere2Sphere4ErrorTolerant.cpp \
-           Sphere2Sphere4MacroMicroContactGeometry.cpp \
+           InteractingSphere2InteractingSphere4ClosestFeatures.cpp \
+           InteractingSphere2InteractingSphere4ErrorTolerantContact.cpp \
+           InteractingSphere2InteractingSphere4SpheresContactGeometry.cpp \
            SpringGeometry.cpp \
            SpringPhysics.cpp \
            stat.c \

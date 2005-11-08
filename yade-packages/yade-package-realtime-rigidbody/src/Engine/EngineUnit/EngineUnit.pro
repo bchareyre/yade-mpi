@@ -3,12 +3,12 @@ error( "YADE_QMAKE_PATH internal qmake variable is not set, you should run for e
 }
 
 
-SUBDIRS += AABox2Sphere4ClosestFeatures \
-           Box2Box4ClosestFeatures \
-           Box2Sphere4ClosestFeatures \
-           Box2Sphere4ErrorTolerant \
-           Sphere2Sphere4ClosestFeatures \
-           Sphere2Sphere4ErrorTolerant 
+SUBDIRS += AAInteractingBox2InteractingSphere4ClosestFeatures \
+           InteractingBox2InteractingBox4ClosestFeatures \
+           InteractingBox2InteractingSphere4ClosestFeatures \
+           InteractingBox2InteractingSphere4ErrorTolerantContact \
+           InteractingSphere2InteractingSphere4ClosestFeatures \
+           InteractingSphere2InteractingSphere4ErrorTolerantContact 
 CONFIG += debug \
           thread \
 warn_on

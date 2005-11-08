@@ -3,8 +3,8 @@ error( "YADE_QMAKE_PATH internal qmake variable is not set, you should run for e
 }
 
 
-HEADERS += ErrorTolerantContactModel.hpp 
-SOURCES += ErrorTolerantContactModel.cpp 
+HEADERS += ErrorTolerantContact.hpp 
+SOURCES += ErrorTolerantContact.cpp 
 LIBS += -lyade-lib-wm3-math \
         -lyade-lib-serialization \
         -lyade-lib-factory \

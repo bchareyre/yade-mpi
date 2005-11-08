@@ -22,7 +22,7 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
-HEADERS += Sphere2Sphere4ClosestFeatures.hpp 
-SOURCES += Sphere2Sphere4ClosestFeatures.cpp 
+HEADERS += InteractingSphere2InteractingSphere4ClosestFeatures.hpp 
+SOURCES += InteractingSphere2InteractingSphere4ClosestFeatures.cpp 
 INCLUDEPATH += $${YADE_QMAKE_PATH}/include
 

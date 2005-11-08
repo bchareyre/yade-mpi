@@ -24,7 +24,7 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
-HEADERS += AABox2Sphere4ClosestFeatures.hpp 
-SOURCES += AABox2Sphere4ClosestFeatures.cpp 
+HEADERS += AAInteractingBox2InteractingSphere4ClosestFeatures.hpp 
+SOURCES += AAInteractingBox2InteractingSphere4ClosestFeatures.cpp 
 INCLUDEPATH += $${YADE_QMAKE_PATH}/include
 

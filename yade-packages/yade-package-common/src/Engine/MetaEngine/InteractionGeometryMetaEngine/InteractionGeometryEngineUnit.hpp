@@ -17,9 +17,20 @@
 #include <boost/shared_ptr.hpp>
 #include <string>
 
-/*! \brief Abstract interface for all interaction functor.
+/*! \brief
+	Abstract interface for all classes that build Interaction from two interacting InteractingGeometry 'ies
 
-	Every functions that describe interaction between two InteractionGeometries must derive from InteractionGeometryEngineUnit.
+	This is a crucial EngineUnit used during runtime, when an interaction is detected and starts to exist between two
+	Body 'ies, a class Interaction to describe it must be created.
+	 
+	Currently we can build: SpheresContactGeometry, ErrorTolerantContact, ClosestFeatures
+
+	\param const shared_ptr<InteractingGeometry>&	first interacting Body
+	\param const shared_ptr<InteractingGeometry>&	second interacting Body
+	\param Se3r&					first Body's 3d transformation (FIXME: should be removed)
+	\param Se3r&					second Body's 3d transformation (FIXME: should be removed)
+	\return shared_ptr<Interaction>&		it returns the Interaction to be built (given as last argument to the function)
+	
 */
 
 class InteractionGeometryEngineUnit : 	public EngineUnit2D
