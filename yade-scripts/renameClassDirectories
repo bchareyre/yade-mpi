@@ -1,7 +1,7 @@
 #! /bin/sh
 
-echo "finding .pro files ... "
-find ./  -name "*.pro" -exec fgrep -l "$2" {} \;				> ./proRenameClass
+#echo "finding .pro files ... "
+#find ./  -name "*.pro" -exec fgrep -l "$2" {} \;				> ./proRenameClass
 
 echo "finding .hpp files ... "
 find ./  -name "*.hpp" -exec fgrep -l "$2" {} \;				> ./hppRenameClass6
@@ -18,33 +18,33 @@ cat ./hppRenameClass6 | while read name; do
 done
 
 
-cat ./proRenameClass  | grep -e "\<$1\>"					> ./proRenameClass2
+#cat ./proRenameClass  | grep -e "\<$1\>"					> ./proRenameClass2
 cat ./hppRenameClass  | grep -e "\<$1\>"					> ./hppRenameClass2
 
-cat ./proRenameClass2 | grep -e "\<$1\>" | sed -e "s/\<$1\>/$2/"		> ./proRenameClass3
+#cat ./proRenameClass2 | grep -e "\<$1\>" | sed -e "s/\<$1\>/$2/"		> ./proRenameClass3
 cat ./hppRenameClass2 | grep -e "\<$1\>" | sed -e "s/\<$1\>/$2/"		> ./hppRenameClass3
 
-dirname `cat ./proRenameClass2`							> ./proRenameClass4
+#dirname `cat ./proRenameClass2`							> ./proRenameClass4
 dirname `cat ./hppRenameClass2`							> ./hppRenameClass4
 
-dirname `cat ./proRenameClass3`							> ./proRenameClass5
+#dirname `cat ./proRenameClass3`							> ./proRenameClass5
 dirname `cat ./hppRenameClass3`							> ./hppRenameClass5
 
-mv ./proRenameClass4 ./proRenameClass2
+#mv ./proRenameClass4 ./proRenameClass2
 mv ./hppRenameClass4 ./hppRenameClass2
 
-mv ./proRenameClass5 ./proRenameClass3
+#mv ./proRenameClass5 ./proRenameClass3
 mv ./hppRenameClass5 ./hppRenameClass3
 
-if [ -s ./proRenameClass2 ]; then
-  if [ -e `cat ./proRenameClass2` ]; then
-    if [ -d `cat ./proRenameClass2` ]; then
-      if [ -r `cat ./proRenameClass2` ]; then
-        svn mv `cat ./proRenameClass2` `cat ./proRenameClass3` $3
-      fi
-    fi
-  fi
-fi
+#if [ -s ./proRenameClass2 ]; then
+#  if [ -e `cat ./proRenameClass2` ]; then
+#    if [ -d `cat ./proRenameClass2` ]; then
+#      if [ -r `cat ./proRenameClass2` ]; then
+#        svn mv `cat ./proRenameClass2` `cat ./proRenameClass3` $3
+#      fi
+#    fi
+#  fi
+#fi
 
 if [ -s ./hppRenameClass2 ]; then
   if [ -e `cat ./hppRenameClass2` ]; then
@@ -56,7 +56,7 @@ if [ -s ./hppRenameClass2 ]; then
   fi
 fi
 
-rm ./proRenameClass*
+#rm ./proRenameClass*
 rm ./hppRenameClass*
 
 echo ""
