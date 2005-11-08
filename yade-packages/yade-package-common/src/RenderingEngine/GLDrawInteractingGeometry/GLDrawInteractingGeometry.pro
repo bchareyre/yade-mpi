@@ -3,9 +3,9 @@ error( "YADE_QMAKE_PATH internal qmake variable is not set, you should run for e
 }
 
 
-SUBDIRS += GLDrawInteractionBox \
-           GLDrawInteractionSphere \
-           GLDrawInteractionGeometrySet 
+SUBDIRS += GLDrawInteractingBox \
+           GLDrawInteractingSphere \
+           GLDrawMetaInteractingGeometry 
 CONFIG += debug \
           thread \
 warn_on

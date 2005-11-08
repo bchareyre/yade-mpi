@@ -13,6 +13,16 @@
 #include <yade/yade-core/Body.hpp>
 #include <yade/yade-core/EngineUnit1D.hpp>
 
+/*! \brief
+	Abstract interface for all classes that want to do something depending on PhysicalParameters (works like adding external virtual function)
+
+	Currently it is used for LeapFron integration and creating FEM
+
+	\param const shared_ptr<PhysicalParameters>&	PhysicalParameters' index (Indexable) is used to dispatch this call
+	\param Body*					Body's pointer
+	
+*/
+
 class PhysicalParametersEngineUnit :    public EngineUnit1D
 					<
 		 				void ,

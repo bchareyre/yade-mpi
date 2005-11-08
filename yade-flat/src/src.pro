@@ -129,10 +129,10 @@ HEADERS += AABB.hpp \
            GLDrawBox.hpp \
            GLDrawBoxShadowVolume.hpp \
            GLDrawGeometricalModelFunctor.hpp \
-           GLDrawInteractionBox.hpp \
-           GLDrawInteractionGeometryFunctor.hpp \
-           GLDrawInteractionGeometrySet.hpp \
-           GLDrawInteractionSphere.hpp \
+           GLDrawInteractingBox.hpp \
+           GLDrawInteractingGeometryFunctor.hpp \
+           GLDrawMetaInteractingGeometry.hpp \
+           GLDrawInteractingSphere.hpp \
            GLDrawLineSegment.hpp \
            GLDrawMesh2D.hpp \
            GLDrawPolyhedralSweptSphere.hpp \
@@ -396,9 +396,9 @@ SOURCES += yade.cpp \
            GLDrawBoundingSphere.cpp \
            GLDrawBox.cpp \
            GLDrawBoxShadowVolume.cpp \
-           GLDrawInteractionBox.cpp \
-           GLDrawInteractionGeometrySet.cpp \
-           GLDrawInteractionSphere.cpp \
+           GLDrawInteractingBox.cpp \
+           GLDrawMetaInteractingGeometry.cpp \
+           GLDrawInteractingSphere.cpp \
            GLDrawLineSegment.cpp \
            GLDrawMesh2D.cpp \
            GLDrawPolyhedralSweptSphere.cpp \

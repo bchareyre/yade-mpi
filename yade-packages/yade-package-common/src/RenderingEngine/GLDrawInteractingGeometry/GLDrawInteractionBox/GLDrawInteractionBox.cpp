@@ -6,11 +6,11 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "GLDrawInteractionBox.hpp"
+#include "GLDrawInteractingBox.hpp"
 #include "InteractingBox.hpp"
 #include <yade/yade-lib-opengl/OpenGLWrapper.hpp>
 
-void GLDrawInteractionBox::go(const shared_ptr<InteractingGeometry>& cg, const shared_ptr<PhysicalParameters>&)
+void GLDrawInteractingBox::go(const shared_ptr<InteractingGeometry>& cg, const shared_ptr<PhysicalParameters>&)
 {
 	// FIXME : check that : one of those 2 lines are useless
   	glMaterialv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, cg->diffuseColor);

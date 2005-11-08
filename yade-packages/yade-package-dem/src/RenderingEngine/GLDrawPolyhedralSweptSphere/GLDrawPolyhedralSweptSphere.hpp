@@ -9,15 +9,15 @@
 #ifndef GLDRAWPOLYHEDRALSWEPTSPHERE_HPP
 #define GLDRAWPOLYHEDRALSWEPTSPHERE_HPP
 
-#include <yade/yade-package-common/GLDrawInteractionGeometryFunctor.hpp>
+#include <yade/yade-package-common/GLDrawInteractingGeometryFunctor.hpp>
 
-class GLDrawPolyhedralSweptSphere : public GLDrawInteractionGeometryFunctor
+class GLDrawPolyhedralSweptSphere : public GLDrawInteractingGeometryFunctor
 {		
 	public :
 		virtual void go(const shared_ptr<InteractingGeometry>&, const shared_ptr<PhysicalParameters>&);
 
 	REGISTER_CLASS_NAME(GLDrawPolyhedralSweptSphere);
-	REGISTER_BASE_CLASS_NAME(GLDrawInteractionGeometryFunctor);
+	REGISTER_BASE_CLASS_NAME(GLDrawInteractingGeometryFunctor);
 
 };
 

@@ -14,18 +14,18 @@
 #include <yade/yade-core/InteractingGeometry.hpp>
 #include <yade/yade-core/PhysicalParameters.hpp>
 
-class GLDrawInteractionGeometryFunctor :	public EngineUnit1D
+class GLDrawInteractingGeometryFunctor :	public EngineUnit1D
 						<
 		 					void ,
 		 					TYPELIST_2(const shared_ptr<InteractingGeometry>&, const shared_ptr<PhysicalParameters>&) 
 						>
 {
-	public : virtual ~GLDrawInteractionGeometryFunctor() {};
-	REGISTER_CLASS_NAME(GLDrawInteractionGeometryFunctor);
+	public : virtual ~GLDrawInteractingGeometryFunctor() {};
+	REGISTER_CLASS_NAME(GLDrawInteractingGeometryFunctor);
 	REGISTER_BASE_CLASS_NAME(EngineUnit1D);
 };
 
-REGISTER_SERIALIZABLE(GLDrawInteractionGeometryFunctor,false);
+REGISTER_SERIALIZABLE(GLDrawInteractingGeometryFunctor,false);
 
 #endif //  GLDRAWINTERACTIONGEOMETRYFUNCTOR_HPP
 

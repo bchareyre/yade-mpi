@@ -6,19 +6,19 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "GLDrawInteractionSphere.hpp"
+#include "GLDrawInteractingSphere.hpp"
 #include "InteractingSphere.hpp"
 #include <yade/yade-lib-opengl/OpenGLWrapper.hpp>
 
 
-int GLDrawInteractionSphere::glSphereList=-1;
-int GLDrawInteractionSphere::glWiredSphereList=-1;
+int GLDrawInteractingSphere::glSphereList=-1;
+int GLDrawInteractingSphere::glWiredSphereList=-1;
 
-vector<Vector3r> GLDrawInteractionSphere::vertices;
-vector<Vector3r> GLDrawInteractionSphere::faces;
+vector<Vector3r> GLDrawInteractingSphere::vertices;
+vector<Vector3r> GLDrawInteractingSphere::faces;
 
 
-void GLDrawInteractionSphere::go(const shared_ptr<InteractingGeometry>& cm, const shared_ptr<PhysicalParameters>& )
+void GLDrawInteractingSphere::go(const shared_ptr<InteractingGeometry>& cm, const shared_ptr<PhysicalParameters>& )
 {
 	static bool first=true;
 	
@@ -92,7 +92,7 @@ void GLDrawInteractionSphere::go(const shared_ptr<InteractingGeometry>& cm, cons
 }
 
 
-void GLDrawInteractionSphere::subdivideTriangle(Vector3r& v1,Vector3r& v2,Vector3r& v3, int depth)
+void GLDrawInteractingSphere::subdivideTriangle(Vector3r& v1,Vector3r& v2,Vector3r& v3, int depth)
 {
 	Vector3r v12,v23,v31;
 
@@ -144,7 +144,7 @@ void GLDrawInteractionSphere::subdivideTriangle(Vector3r& v1,Vector3r& v2,Vector
 }
 
 
-void GLDrawInteractionSphere::drawSphere(int depth)
+void GLDrawInteractingSphere::drawSphere(int depth)
 {
 	glShadeModel(GL_SMOOTH);
 	

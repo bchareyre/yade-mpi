@@ -5,7 +5,7 @@ error( "YADE_QMAKE_PATH internal qmake variable is not set, you should run for e
 
 HEADERS += GLDrawBoundingVolumeFunctor.hpp \
            GLDrawGeometricalModelFunctor.hpp \
-           GLDrawInteractionGeometryFunctor.hpp \
+           GLDrawInteractingGeometryFunctor.hpp \
            GLDrawShadowVolumeFunctor.hpp \
            OpenGLRenderingEngine.hpp 
 SOURCES += OpenGLRenderingEngine.cpp 

@@ -9,9 +9,9 @@
 #ifndef __GLDRAWINTERACTIONSPHERE_HPP__
 #define __GLDRAWINTERACTIONSPHERE_HPP__
 
-#include "GLDrawInteractionGeometryFunctor.hpp"
+#include "GLDrawInteractingGeometryFunctor.hpp"
 
-class GLDrawInteractionSphere : public GLDrawInteractionGeometryFunctor
+class GLDrawInteractingSphere : public GLDrawInteractingGeometryFunctor
 {	
 	private :
 		static vector<Vector3r> vertices;
@@ -24,11 +24,11 @@ class GLDrawInteractionSphere : public GLDrawInteractionGeometryFunctor
 	public :
 		virtual void go(const shared_ptr<InteractingGeometry>&, const shared_ptr<PhysicalParameters>&);
 
-	REGISTER_CLASS_NAME(GLDrawInteractionSphere);
-	REGISTER_BASE_CLASS_NAME(GLDrawInteractionGeometryFunctor);
+	REGISTER_CLASS_NAME(GLDrawInteractingSphere);
+	REGISTER_BASE_CLASS_NAME(GLDrawInteractingGeometryFunctor);
 };
 
-REGISTER_SERIALIZABLE(GLDrawInteractionSphere,false);
+REGISTER_SERIALIZABLE(GLDrawInteractingSphere,false);
 
 #endif //  GLDRAWINTERACTIONSPHERE_HPP
 

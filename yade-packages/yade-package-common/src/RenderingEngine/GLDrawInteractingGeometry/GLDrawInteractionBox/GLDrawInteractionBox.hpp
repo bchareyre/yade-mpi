@@ -9,18 +9,18 @@
 #ifndef GLDRAWINTERACTIONBOX_HPP
 #define GLDRAWINTERACTIONBOX_HPP
 
-#include "GLDrawInteractionGeometryFunctor.hpp"
+#include "GLDrawInteractingGeometryFunctor.hpp"
 
-class GLDrawInteractionBox : public GLDrawInteractionGeometryFunctor
+class GLDrawInteractingBox : public GLDrawInteractingGeometryFunctor
 {
 	public :
 		virtual void go(const shared_ptr<InteractingGeometry>&, const shared_ptr<PhysicalParameters>&);
 
-	REGISTER_CLASS_NAME(GLDrawInteractionBox);
-	REGISTER_BASE_CLASS_NAME(GLDrawInteractionGeometryFunctor);
+	REGISTER_CLASS_NAME(GLDrawInteractingBox);
+	REGISTER_BASE_CLASS_NAME(GLDrawInteractingGeometryFunctor);
 };
 
-REGISTER_SERIALIZABLE(GLDrawInteractionBox,false);
+REGISTER_SERIALIZABLE(GLDrawInteractingBox,false);
 
 #endif //  GLDRAWINTERACTIONBOX_HPP
 

@@ -6,10 +6,10 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "GLDrawInteractionGeometrySet.hpp"
+#include "GLDrawMetaInteractingGeometry.hpp"
 
 
-void GLDrawInteractionGeometrySet::go(const shared_ptr<InteractingGeometry>& , const shared_ptr<PhysicalParameters>&)
+void GLDrawMetaInteractingGeometry::go(const shared_ptr<InteractingGeometry>& , const shared_ptr<PhysicalParameters>&)
 {
 
 

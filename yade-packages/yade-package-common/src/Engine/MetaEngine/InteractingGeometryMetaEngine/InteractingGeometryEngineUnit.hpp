@@ -25,14 +25,14 @@
 	Then we can use this InteractingGeometryEngineUnit to build it from GeometricalModel.
 
 	Currently it is only used to build a PolyhedralSweptSphere from Box and from Tetrahedron
+	  
+	\param const shared_ptr<GeometricalModel>&	exact geometry of Body
+	\param Se3r&					the 3D transformation to apply to the collision model before building the bounding volume
+	\param Body*					the Body inside which operation takes place
+	\return shared_ptr<InteractingGeometry>&	the InteractingGeometry built (given as second argument to the function)
+	
 */
 class InteractingGeometryEngineUnit : 	public EngineUnit2D
-	/*!  
-		\param const shared_ptr<GeometricalModel>&	exact geometry of Body
-		\param Se3r&					the 3D transformation to apply to the collision model before building the bounding volume
-		\param Body*					the Body inside which operation takes place
-		\return shared_ptr<InteractingGeometry>&	the InteractingGeometry built (given as second argument to the function)
-	*/
 					<
 		 				void ,
 		 				TYPELIST_4(	  const shared_ptr<GeometricalModel>&

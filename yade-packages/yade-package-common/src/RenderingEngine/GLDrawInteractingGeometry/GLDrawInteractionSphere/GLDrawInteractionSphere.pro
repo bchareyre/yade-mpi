@@ -21,5 +21,5 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
-HEADERS += GLDrawInteractionSphere.hpp 
-SOURCES += GLDrawInteractionSphere.cpp 
+HEADERS += GLDrawInteractingSphere.hpp 
+SOURCES += GLDrawInteractingSphere.cpp 

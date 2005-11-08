@@ -14,7 +14,7 @@
 #include <yade/yade-core/MetaDispatchingEngine1D.hpp>
 
 #include "GLDrawBoundingVolumeFunctor.hpp"
-#include "GLDrawInteractionGeometryFunctor.hpp"
+#include "GLDrawInteractingGeometryFunctor.hpp"
 #include "GLDrawGeometricalModelFunctor.hpp"
 #include "GLDrawShadowVolumeFunctor.hpp"
 
@@ -23,7 +23,7 @@ class OpenGLRenderingEngine : public RenderingEngine
 	public : // FIXME - why public ?
 		Vector3r	 lightPos;
 		bool		 drawBoundingVolume
-				,drawInteractionGeometry
+				,drawInteractingGeometry
 				,drawGeometricalModel
 				,castShadow
 				,drawShadowVolumes
@@ -35,7 +35,7 @@ class OpenGLRenderingEngine : public RenderingEngine
 	
 	private :
 		DynLibDispatcher< BoundingVolume    , GLDrawBoundingVolumeFunctor, void , TYPELIST_1(const shared_ptr<BoundingVolume>&) > boundingVolumeDispatcher;
-		DynLibDispatcher< InteractingGeometry , GLDrawInteractionGeometryFunctor, void , TYPELIST_2(const shared_ptr<InteractingGeometry>&, const shared_ptr<PhysicalParameters>&) >interactionGeometryDispatcher;
+		DynLibDispatcher< InteractingGeometry , GLDrawInteractingGeometryFunctor, void , TYPELIST_2(const shared_ptr<InteractingGeometry>&, const shared_ptr<PhysicalParameters>&) >interactionGeometryDispatcher;
 		DynLibDispatcher< GeometricalModel  , GLDrawGeometricalModelFunctor, void , TYPELIST_3(const shared_ptr<GeometricalModel>&, const shared_ptr<PhysicalParameters>&,bool) > geometricalModelDispatcher;
 		DynLibDispatcher< GeometricalModel  , GLDrawShadowVolumeFunctor, void , TYPELIST_3(const shared_ptr<GeometricalModel>&, const shared_ptr<PhysicalParameters>&, const Vector3r& ) > shadowVolumeDispatcher;
 

@@ -21,5 +21,5 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
-HEADERS += GLDrawInteractionBox.hpp 
-SOURCES += GLDrawInteractionBox.cpp 
+HEADERS += GLDrawInteractingBox.hpp 
+SOURCES += GLDrawInteractingBox.cpp 

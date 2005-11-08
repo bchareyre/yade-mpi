@@ -19,5 +19,5 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
-HEADERS += GLDrawInteractionGeometrySet.hpp 
-SOURCES += GLDrawInteractionGeometrySet.cpp 
+HEADERS += GLDrawMetaInteractingGeometry.hpp 
+SOURCES += GLDrawMetaInteractingGeometry.cpp 

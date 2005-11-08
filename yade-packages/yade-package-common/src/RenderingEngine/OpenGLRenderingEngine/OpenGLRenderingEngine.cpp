@@ -17,7 +17,7 @@ OpenGLRenderingEngine::OpenGLRenderingEngine() : RenderingEngine()
 {
 
 	drawBoundingVolume = false;
-	drawInteractionGeometry = false;
+	drawInteractingGeometry = false;
 	drawGeometricalModel = true;
 	castShadow = false;
 	drawShadowVolumes = false;
@@ -30,8 +30,8 @@ OpenGLRenderingEngine::OpenGLRenderingEngine() : RenderingEngine()
 	addBoundingVolumeFunctor("AABB","GLDrawAABB");
 	addBoundingVolumeFunctor("BoundingSphere","GLDrawBoundingSphere");
 	
-	addInteractionGeometryFunctor("InteractingSphere","GLDrawInteractionSphere");
-	addInteractionGeometryFunctor("InteractingBox","GLDrawInteractionBox");
+	addInteractionGeometryFunctor("InteractingSphere","GLDrawInteractingSphere");
+	addInteractionGeometryFunctor("InteractingBox","GLDrawInteractingBox");
 	
 	addInteractionGeometryFunctor("PolyhedralSweptSphere","GLDrawPolyhedralSweptSphere");
 		
@@ -126,7 +126,7 @@ void OpenGLRenderingEngine::render(const shared_ptr<MetaBody>& rootBody)
 	if (drawBoundingVolume)
 		renderBoundingVolume(rootBody);
 	
-	if (drawInteractionGeometry)
+	if (drawInteractingGeometry)
 	{
 		glEnable(GL_LIGHTING);
 		glEnable(GL_CULL_FACE);
@@ -362,7 +362,7 @@ void OpenGLRenderingEngine::renderBoundingVolume(const shared_ptr<MetaBody>& roo
 		shared_ptr<Body> b = *bi;
 		glPushMatrix();
 		if(b->boundingVolume)
-			(b->boundingVolume);
+			boundingVolumeDispatcher(b->boundingVolume);
 		glPopMatrix();
 	}
 	
@@ -404,7 +404,7 @@ void OpenGLRenderingEngine::registerAttributes()
 {	
 	REGISTER_ATTRIBUTE(lightPos);
 	REGISTER_ATTRIBUTE(drawBoundingVolume);
-	REGISTER_ATTRIBUTE(drawInteractionGeometry);
+	REGISTER_ATTRIBUTE(drawInteractingGeometry);
 	REGISTER_ATTRIBUTE(drawGeometricalModel);
 	REGISTER_ATTRIBUTE(castShadow);
 	REGISTER_ATTRIBUTE(drawShadowVolumes);
