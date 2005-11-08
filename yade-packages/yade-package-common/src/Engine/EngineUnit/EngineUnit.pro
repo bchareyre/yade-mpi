@@ -3,13 +3,13 @@ error( "YADE_QMAKE_PATH internal qmake variable is not set, you should run for e
 }
 
 
-SUBDIRS += Box2AABB \
+SUBDIRS += InteractingBox2AABB \
            MetaInteractingGeometry2AABB \
            LeapFrogOrientationIntegrator \
            LeapFrogPositionIntegrator \
            NewtonsForceLaw \
            NewtonsMomentumLaw \
-           Sphere2AABB \
+           InteractingSphere2AABB \
            CundallNonViscousForceDamping \
            CundallNonViscousMomentumDamping 
 CONFIG += debug \

@@ -70,7 +70,7 @@ HEADERS += AABB.hpp \
            BoundingVolumeEngineUnit.hpp \
            BoundingVolumeMetaEngine.hpp \
            Box.hpp \
-           Box2AABB.hpp \
+           InteractingBox2AABB.hpp \
            Box2Box4ClosestFeatures.hpp \
            Box2PolyhedralSweptSphere.hpp \
            Box2Sphere4ClosestFeatures.hpp \
@@ -271,7 +271,7 @@ HEADERS += AABB.hpp \
            SimulationLoop.hpp \
            Singleton.hpp \
            Sphere.hpp \
-           Sphere2AABB.hpp \
+           InteractingSphere2AABB.hpp \
            Sphere2Sphere4ClosestFeatures.hpp \
            Sphere2Sphere4ErrorTolerant.hpp \
            Sphere2Sphere4MacroMicroContactGeometry.hpp \
@@ -346,7 +346,7 @@ SOURCES += yade.cpp \
            BoundingVolume.cpp \
            BoundingVolumeMetaEngine.cpp \
            Box.cpp \
-           Box2AABB.cpp \
+           InteractingBox2AABB.cpp \
            Box2Box4ClosestFeatures.cpp \
            Box2PolyhedralSweptSphere.cpp \
            Box2Sphere4ClosestFeatures.cpp \
@@ -523,7 +523,7 @@ SOURCES += yade.cpp \
            SimulationControllerUpdater.cpp \
            SimulationLoop.cpp \
            Sphere.cpp \
-           Sphere2AABB.cpp \
+           InteractingSphere2AABB.cpp \
            Sphere2Sphere4ClosestFeatures.cpp \
            Sphere2Sphere4ErrorTolerant.cpp \
            Sphere2Sphere4MacroMicroContactGeometry.cpp \

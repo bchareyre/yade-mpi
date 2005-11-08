@@ -20,9 +20,10 @@
 #include <boost/shared_ptr.hpp>
 #include <string>
 
-/*! \brief Abstract interface for all bounding volume factories.
-	It is used for creating a bounding volume from interaction geometry during runtime.
-	This is useful when it's not trivial to build the bounding volume from the interaction model.
+/*! \brief
+	Abstract interface for all classes that build BoundingVolume from InteractingGeometry
+
+	This is useful when it's not trivial to build the bounding volume from (some complicated) interaction model.
 	 
 	For example if you want to build an AABB from a box which is not initially aligned with the world
 	axis, it is not easy to write by hand into the configuration file the center and size of this AABB.
@@ -33,7 +34,7 @@ class BoundingVolumeEngineUnit : public EngineUnit2D
 		\param const shared_ptr<InteractingGeometry>&	the collision model from wich we want to extract the bounding volume
 		\param Se3r&					the 3D transformation to apply to the collision model before building the bounding volume
 		\param Body*					the Body inside which operation takes place
-		\param shared_ptr<BoundingVolume>&		shared pointer to the bounding volume built
+		\return shared_ptr<BoundingVolume>&		shared pointer to the bounding volume built (given as second argument to the function)
 	*/
 				<
 		 			void ,

@@ -6,12 +6,12 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
  
-#include "Box2AABB.hpp"
+#include "InteractingBox2AABB.hpp"
 #include "InteractingBox.hpp"
 #include "AABB.hpp"
 
 
-void Box2AABB::go(	const shared_ptr<InteractingGeometry>& cm,
+void InteractingBox2AABB::go(	const shared_ptr<InteractingGeometry>& cm,
 				shared_ptr<BoundingVolume>& bv,
 				const Se3r& se3,
 				const Body*	)

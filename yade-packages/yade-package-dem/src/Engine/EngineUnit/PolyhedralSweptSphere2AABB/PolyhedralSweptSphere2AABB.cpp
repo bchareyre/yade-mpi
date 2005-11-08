@@ -29,7 +29,7 @@ void PolyhedralSweptSphere2AABB::go(	  const shared_ptr<InteractingGeometry>& cm
 	for( ; vi!=viEnd ; ++vi)
 	{
 		Vector3r p = (*vi);
-		p = body->physicalParameters->se3*p; // FIXME : se"*p is not compiling !!??
+		p = body->physicalParameters->se3*p;
 		max = p.maxVector(max);
 		min = p.minVector(min);
 	}
@@ -40,6 +40,5 @@ void PolyhedralSweptSphere2AABB::go(	  const shared_ptr<InteractingGeometry>& cm
 	aabb->halfSize = 0.5*(max-min);
 	aabb->min = min;
 	aabb->max = max;	
-
 }
 	

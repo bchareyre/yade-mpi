@@ -6,11 +6,11 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
  
-#include "Sphere2AABB.hpp"
+#include "InteractingSphere2AABB.hpp"
 #include "InteractingSphere.hpp"
 #include "AABB.hpp"
 
-void Sphere2AABB::go(	  const shared_ptr<InteractingGeometry>& cm
+void InteractingSphere2AABB::go(	  const shared_ptr<InteractingGeometry>& cm
 				, shared_ptr<BoundingVolume>& bv
 				, const Se3r& se3
 				, const Body*	)

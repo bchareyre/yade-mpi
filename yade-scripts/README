@@ -32,6 +32,8 @@ svndiff num1 num2 : prints svn diff between revisions num1 and num2. useful in
 makeFlat          : invoke from trunk/
                     make symlinks of all source files (.cpp, .tpp, .h, .c, .ipp)
 		    in yade-flat.
+rmFlast	          : invoke from trunk/
+                    this script cleans after makeFlat script
 		    
 renameClassFirst        name1 name2
 renameClassFilenames    name1 name2

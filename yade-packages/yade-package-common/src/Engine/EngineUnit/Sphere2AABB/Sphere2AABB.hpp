@@ -11,18 +11,18 @@
 
 #include "BoundingVolumeEngineUnit.hpp"
 
-class Sphere2AABB : public BoundingVolumeEngineUnit
+class InteractingSphere2AABB : public BoundingVolumeEngineUnit
 {
 	public :
 		void go(	  const shared_ptr<InteractingGeometry>& cm
 				, shared_ptr<BoundingVolume>& bv
 				, const Se3r& se3
 				, const Body*	);
-	REGISTER_CLASS_NAME(Sphere2AABB);
+	REGISTER_CLASS_NAME(InteractingSphere2AABB);
 	REGISTER_BASE_CLASS_NAME(BoundingVolumeEngineUnit);
 };
 
-REGISTER_SERIALIZABLE(Sphere2AABB,false);
+REGISTER_SERIALIZABLE(InteractingSphere2AABB,false);
 
 #endif // SPHERE2AABB_HPP
 

@@ -29,5 +29,5 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
-HEADERS += Box2AABB.hpp 
-SOURCES += Box2AABB.cpp 
+HEADERS += InteractingBox2AABB.hpp 
+SOURCES += InteractingBox2AABB.cpp 

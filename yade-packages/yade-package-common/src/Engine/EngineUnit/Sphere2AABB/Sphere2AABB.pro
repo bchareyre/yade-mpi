@@ -26,5 +26,5 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
-HEADERS += Sphere2AABB.hpp 
-SOURCES += Sphere2AABB.cpp 
+HEADERS += InteractingSphere2AABB.hpp 
+SOURCES += InteractingSphere2AABB.cpp 

@@ -18,7 +18,9 @@
 #include <yade/yade-core/EngineUnit2D.hpp>
 
 
-/*! \brief Abstract interface for all geometrical model factories.
+/*! \brief
+	Abstract interface for all geometrical model factories.
+
  OLD: FIXME, what is written below is a description of BodyFactory. move it there
  
 	It is used for creating a geometrical model from a given set of parameters.

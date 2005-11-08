@@ -178,8 +178,8 @@ void FEMDEMCouplingTest::createActors(shared_ptr<MetaBody>& rootBody)
 {
 	shared_ptr<BoundingVolumeMetaEngine> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeMetaEngine>(new BoundingVolumeMetaEngine);
 	boundingVolumeDispatcher->add("MetaInteractingGeometry","AABB","MetaInteractingGeometry2AABB");
-	boundingVolumeDispatcher->add("InteractingSphere","AABB","Sphere2AABB");
-	boundingVolumeDispatcher->add("InteractingBox","AABB","Box2AABB");
+	boundingVolumeDispatcher->add("InteractingSphere","AABB","InteractingSphere2AABB");
+	boundingVolumeDispatcher->add("InteractingBox","AABB","InteractingBox2AABB");
 	boundingVolumeDispatcher->add("MetaInteractingGeometry","AABB","MetaInteractingGeometry2AABB");
 
 	shared_ptr<InteractionGeometryMetaEngine> interactionGeometryDispatcher(new InteractionGeometryMetaEngine);

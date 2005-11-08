@@ -13,7 +13,7 @@
 #include "BoundingVolumeEngineUnit.hpp"
 
 
-class Box2AABB : public BoundingVolumeEngineUnit
+class InteractingBox2AABB : public BoundingVolumeEngineUnit
 {
 	public :
 		void go(	  const shared_ptr<InteractingGeometry>& cm
@@ -21,11 +21,11 @@ class Box2AABB : public BoundingVolumeEngineUnit
 				, const Se3r& se3
 				, const Body*	);
 
-	REGISTER_CLASS_NAME(Box2AABB);
+	REGISTER_CLASS_NAME(InteractingBox2AABB);
 	REGISTER_BASE_CLASS_NAME(BoundingVolumeEngineUnit);
 };
 
-REGISTER_SERIALIZABLE(Box2AABB,false);
+REGISTER_SERIALIZABLE(InteractingBox2AABB,false);
 
 #endif // INTERACTINGBOX2AABB_HPP
 
