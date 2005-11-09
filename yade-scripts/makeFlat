@@ -14,7 +14,7 @@ echo 'cd $ORGDIR'										>> makeSymLinkFlat
 
 chmod a+x ./makeSymLinkFlat
 
-mv yade-sandbox .yade-sandbox
+mv yade-sandbox ../
 
 find ./ -name "*.h"   -exec ./makeSymLinkFlat {} \;
 find ./ -name "*.c"   -exec ./makeSymLinkFlat {} \;
@@ -24,7 +24,7 @@ find ./ -name "*.ipp" -exec ./makeSymLinkFlat {} \;
 find ./ -name "*.cpp" -exec ./makeSymLinkFlat {} \;
 find ./ -name "*.ui"  -exec ./makeSymLinkFlat {} \;
 
-mv .yade-sandbox yade-sandbox
+mv ../yade-sandbox ./
 
 cd yade-flat
 #symlinks -rcsd ./

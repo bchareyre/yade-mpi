@@ -30,12 +30,10 @@ PersistentAloneSAPCollider::PersistentAloneSAPCollider()
 	maximums.clear();
 }
 
-
 PersistentAloneSAPCollider::~PersistentAloneSAPCollider()
 {
 
 }
-
 
 void PersistentAloneSAPCollider::action(const vector<SphericalDEM>& spheres, ContactVecSet& contacts)
 {

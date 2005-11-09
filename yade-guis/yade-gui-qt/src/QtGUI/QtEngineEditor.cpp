@@ -30,7 +30,7 @@ QtEngineEditor::QtEngineEditor() : QtGeneratedEngineEditor()
 			cbMetaEnginesList->insertItem((*di).first);
 		else if (Omega::instance().isInheritingFrom((*di).first,"DeusExMachina"))
 			cbDeusExMachinaList->insertItem((*di).first);
-		else if (Omega::instance().isInheritingFrom((*di).first,"Engine"))
+		else if (Omega::instance().isInheritingFrom((*di).first,"StandAloneEngine"))
 			cbEnginesList->insertItem((*di).first);
 
 	}

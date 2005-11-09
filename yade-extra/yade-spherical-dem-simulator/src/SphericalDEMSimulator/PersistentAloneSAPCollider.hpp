@@ -11,7 +11,6 @@
 
 #include "SphericalDEM.hpp"
 #include "Contact.hpp"
-
 #include <list>
 #include <set>
 #include <vector>
