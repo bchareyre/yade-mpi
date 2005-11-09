@@ -19,7 +19,7 @@
 #include <boost/lexical_cast.hpp>
 
 
-AveragePositionRecorder::AveragePositionRecorder () : Engine()
+AveragePositionRecorder::AveragePositionRecorder () : DataRecorder()
 {
 	outputFile = "";
 	interval = 50;
@@ -38,7 +38,7 @@ void AveragePositionRecorder::postProcessAttributes(bool deserializing)
 
 void AveragePositionRecorder::registerAttributes()
 {
-	Engine::registerAttributes();
+	DataRecorder::registerAttributes();
 	REGISTER_ATTRIBUTE(outputFile);
 	REGISTER_ATTRIBUTE(interval);
 	REGISTER_ATTRIBUTE(bigBallId);

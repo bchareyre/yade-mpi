@@ -9,11 +9,11 @@
 #ifndef POSITIONORIENTATIONRECORDER_HPP
 #define POSITIONORIENTATIONRECORDER_HPP
 
-#include <yade/yade-core/Engine.hpp>
+#include <yade/yade-core/DataRecorder.hpp>
 #include <string>
 #include <fstream>
 
-class PositionOrientationRecorder : public Engine
+class PositionOrientationRecorder : public DataRecorder
 {
 	public :
 		std::string outputFile;
@@ -29,7 +29,7 @@ class PositionOrientationRecorder : public Engine
 		virtual void postProcessAttributes(bool deserializing);
 		void registerAttributes();
 	REGISTER_CLASS_NAME(PositionOrientationRecorder);
-	REGISTER_BASE_CLASS_NAME(Engine);
+	REGISTER_BASE_CLASS_NAME(DataRecorder);
 };
 
 REGISTER_SERIALIZABLE(PositionOrientationRecorder,false);

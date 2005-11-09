@@ -19,7 +19,7 @@
 #include <yade/yade-core/PhysicalAction.hpp>
 
 
-ElasticContactLaw::ElasticContactLaw() : Engine() , actionForce(new Force) , actionMomentum(new Momentum)
+ElasticContactLaw::ElasticContactLaw() : InteractionSolver() , actionForce(new Force) , actionMomentum(new Momentum)
 {
 	sdecGroupMask=1;
 	momentRotationLaw = true;
@@ -28,7 +28,7 @@ ElasticContactLaw::ElasticContactLaw() : Engine() , actionForce(new Force) , act
 
 void ElasticContactLaw::registerAttributes()
 {
-	Engine::registerAttributes();
+	InteractionSolver::registerAttributes();
 	REGISTER_ATTRIBUTE(sdecGroupMask);
 	REGISTER_ATTRIBUTE(momentRotationLaw);
 }

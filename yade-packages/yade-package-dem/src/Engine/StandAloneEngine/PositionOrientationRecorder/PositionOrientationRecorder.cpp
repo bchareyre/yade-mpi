@@ -15,7 +15,7 @@
 #include <boost/lexical_cast.hpp>
 
 
-PositionOrientationRecorder::PositionOrientationRecorder () : Engine()//, ofile("")
+PositionOrientationRecorder::PositionOrientationRecorder () : DataRecorder()//, ofile("")
 {
 	outputFile = "positionorientation";
 	interval = 50;
@@ -39,7 +39,7 @@ void PositionOrientationRecorder::postProcessAttributes(bool deserializing)
 
 void PositionOrientationRecorder::registerAttributes()
 {
-	Engine::registerAttributes();
+	DataRecorder::registerAttributes();
 	REGISTER_ATTRIBUTE(outputFile);
 	REGISTER_ATTRIBUTE(interval);
 }

@@ -31,49 +31,48 @@
 
 class Body : public Serializable
 {
+	private	:
+		unsigned int id;
+		/*! group to which body belongs (maybe vector<int> , to allow multiple groups?)
+		 * we can use them to make group one yellow, and group two red, or to record data
+		 * from some selected bodies */
+		int groupMask;
+	public	:
+		unsigned int getId() const {return id;};
 
-/// Attributes
-	private	: unsigned int id;
-	public	: unsigned int getId() const {return id;};
+		// FIXME - but we SHOULDN'T use them in InteractionSolver, because it allows
+		//         to have flat simulation. We should make tree simulation and see...
+		int getGroupMask() {return groupMask; };
 
-	// group to which body belongs (maybe vector<int> , to allow multiple groups?)
+		// only BodyContainer can set the id of a body
+		friend class BodyContainer;
 
-	// we can use them to make group one yellow, and group two red, or to record data from some
-	// selected bodies
-
-	// FIXME - but we SHOULDN'T use them in InteractionSolver, because it allows
-	//         to have flat simulation. We should make tree simulation and see...
-	private : int groupMask;
-	public  : int getGroupMask() {return groupMask; };
-
-	// only BodyContainer can set the id of a body
-	friend class BodyContainer;
-
-	public : // FIXME - should be private ...
-		shared_ptr<PhysicalParameters>	physicalParameters;	/// mass, sitffness
-		shared_ptr<GeometricalModel>	geometricalModel;	/// Polyhedron, Box
-		shared_ptr<InteractingGeometry> interactionGeometry;	/// sphere hierarchy, InteractingBox
-		shared_ptr<BoundingVolume>	boundingVolume;		/// AABB, K-Dop
+		// FIXME - should be private ...
+		/// here are stored physical things that describe the Body: mass, stiffness
+		shared_ptr<PhysicalParameters>	physicalParameters;
+		/// the 'perfect' representation of body's geometry: Polyhedron, Box
+		shared_ptr<GeometricalModel>	geometricalModel;
+		/// description of how this body interacts with others, like: SphereHierarchy, InteractingBox
+		shared_ptr<InteractingGeometry> interactionGeometry;
+		/// BoundingVolume is used for quick detection of potential interactions, that can be: AABB, K-Dop
+		shared_ptr<BoundingVolume>	boundingVolume;
 	
-	// FIXME : should be determined automatically or not ?? if the body has a subscription to a
-	// kinematic engine then it is not dynamic but maybe a body with no subscription can be not dynamic ??
-	/*! isDynamic is true if the state of the body is not modified by a kinematicEngine. It is useful
-	for example for collision detection : if two colliding bodies are only kinematic then it is useless to
-	modelise their contact */
-	public : bool isDynamic;
+		/*! isDynamic is true if the state of the body is not modified by a kinematicEngine.
+		 * It is useful	for example for collision detection : if two colliding bodies are only
+		 * kinematic then it is useless to modelise their contact */
+		// FIXME : should be determined automatically or not ?? if the body has a subscription to a
+		// kinematic engine then it is not dynamic but maybe a body with no subscription can be not dynamic ??
+		bool isDynamic;
 	
-/// Constructor/Destructor
+		// Constructor/Destructor
+		Body ();
+		Body (unsigned int newId, int newGroup);
 
-	public : Body ();
-	public : Body (unsigned int newId, int newGroup);
-
-/// Serialization
-	
+		// Serialization
+	protected:
+		void registerAttributes();
 	REGISTER_CLASS_NAME(Body);
 	REGISTER_BASE_CLASS_NAME(Serializable);
-
-	public : void registerAttributes();
-
 };
 
 REGISTER_SERIALIZABLE(Body,false);

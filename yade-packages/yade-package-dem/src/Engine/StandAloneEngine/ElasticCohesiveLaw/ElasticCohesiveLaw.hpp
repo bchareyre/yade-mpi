@@ -9,14 +9,14 @@
 #ifndef ELASTICCOHESIVELAW_HPP
 #define ELASTICCOHESIVELAW_HPP
 
-#include <yade/yade-core/Engine.hpp>
+#include <yade/yade-core/InteractionSolver.hpp>
 
 #include <set>
 #include <boost/tuple/tuple.hpp>
 
 class PhysicalAction;
 
-class ElasticCohesiveLaw : public Engine
+class ElasticCohesiveLaw : public InteractionSolver
 {
 	private :
 		bool first; // FIXME - remove that!
@@ -33,7 +33,7 @@ class ElasticCohesiveLaw : public Engine
 	protected : 
 		void registerAttributes();
 	REGISTER_CLASS_NAME(ElasticCohesiveLaw);
-	REGISTER_BASE_CLASS_NAME(Engine);
+	REGISTER_BASE_CLASS_NAME(InteractionSolver);
 
 };
 

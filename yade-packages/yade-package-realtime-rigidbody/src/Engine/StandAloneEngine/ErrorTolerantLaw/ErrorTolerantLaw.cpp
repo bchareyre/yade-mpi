@@ -11,7 +11,7 @@
 #include <yade/yade-package-common/RigidBodyParameters.hpp>
 #include <yade/yade-core/MetaBody.hpp>
 
-ErrorTolerantLaw::ErrorTolerantLaw() : Engine()
+ErrorTolerantLaw::ErrorTolerantLaw() : InteractionSolver()
 {
 	maxReactivations = 100;
 	maxIterations    = 5;
@@ -27,14 +27,14 @@ ErrorTolerantLaw::~ErrorTolerantLaw()
 
 void ErrorTolerantLaw::postProcessAttributes(bool deserializing)
 {
-	Engine::postProcessAttributes(deserializing);
+	InteractionSolver::postProcessAttributes(deserializing);
 	// PROCESS DESIRED ATTRIBUTES HERE
 }
 
 
 void ErrorTolerantLaw::registerAttributes()
 {
-	Engine::registerAttributes();
+	InteractionSolver::registerAttributes();
 	// REGISTER DESIRED ATTRIBUTES HERE
 }
 

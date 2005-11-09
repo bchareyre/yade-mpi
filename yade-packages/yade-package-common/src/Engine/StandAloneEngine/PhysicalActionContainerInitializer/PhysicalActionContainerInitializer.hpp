@@ -9,14 +9,14 @@
 #ifndef ACTION_PARAMETER_INITIALIZER_HPP
 #define ACTION_PARAMETER_INITIALIZER_HPP 
 
-#include <yade/yade-core/Engine.hpp>
+#include <yade/yade-core/StandAloneEngine.hpp>
 
 #include <vector>
 #include <string>
 
 class Body;
 
-class PhysicalActionContainerInitializer : public Engine
+class PhysicalActionContainerInitializer : public StandAloneEngine
 {
 	public :
 		std::vector<std::string> actionParameterNames;
@@ -29,7 +29,7 @@ class PhysicalActionContainerInitializer : public Engine
 		virtual void registerAttributes();
 
 	REGISTER_CLASS_NAME(PhysicalActionContainerInitializer);
-	REGISTER_BASE_CLASS_NAME(Engine);
+	REGISTER_BASE_CLASS_NAME(StandAloneEngine);
 };
 
 REGISTER_SERIALIZABLE(PhysicalActionContainerInitializer,false);

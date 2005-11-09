@@ -21,7 +21,7 @@
 #include <yade/yade-core/PhysicalAction.hpp>
 
 
-ElasticCohesiveLaw::ElasticCohesiveLaw() : Engine() , actionForce(new Force) , actionMomentum(new Momentum)
+ElasticCohesiveLaw::ElasticCohesiveLaw() : InteractionSolver() , actionForce(new Force) , actionMomentum(new Momentum)
 {
 	sdecGroupMask=1;
 	first=true;
@@ -31,7 +31,7 @@ ElasticCohesiveLaw::ElasticCohesiveLaw() : Engine() , actionForce(new Force) , a
 
 void ElasticCohesiveLaw::registerAttributes()
 {
-	Engine::registerAttributes();
+	InteractionSolver::registerAttributes();
 	REGISTER_ATTRIBUTE(sdecGroupMask);
 	REGISTER_ATTRIBUTE(momentRotationLaw);
 }

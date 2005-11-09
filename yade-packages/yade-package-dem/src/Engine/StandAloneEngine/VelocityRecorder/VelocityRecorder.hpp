@@ -11,11 +11,11 @@
 #ifndef VELOCITY_RECORDER_HPP
 #define VELOCITY_RECORDER_HPP
 
-#include <yade/yade-core/Engine.hpp>
+#include <yade/yade-core/DataRecorder.hpp>
 #include <string>
 #include <fstream>
 
-class VelocityRecorder : public Engine
+class VelocityRecorder : public DataRecorder
 {
 	private :
 		std::ofstream ofile;
@@ -32,7 +32,7 @@ class VelocityRecorder : public Engine
 	protected :
 		virtual void postProcessAttributes(bool deserializing);
 	REGISTER_CLASS_NAME(VelocityRecorder);
-	REGISTER_BASE_CLASS_NAME(Engine);
+	REGISTER_BASE_CLASS_NAME(DataRecorder);
 };
 
 REGISTER_SERIALIZABLE(VelocityRecorder,false);

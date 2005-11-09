@@ -21,7 +21,7 @@
 using namespace std;
 using namespace boost;
 
-class PersistentSAPCollider
+class PersistentAloneSAPCollider
 {
 	private :
 		struct AABBBound	// represent an extrmity of an Axis ALigned bounding box
@@ -71,8 +71,8 @@ class PersistentSAPCollider
 		void findOverlappingBB(vector<shared_ptr<AABBBound> >& bounds, int nbElements, ContactVecSet& contacts);
 
 	public :
-		PersistentSAPCollider();
-		virtual ~PersistentSAPCollider();
+		PersistentAloneSAPCollider();
+		virtual ~PersistentAloneSAPCollider();
 
 		// return a list "volatileInteractions" of pairs of Body which Bounding volume are in potential interaction
 		void action(const vector<SphericalDEM>& spheres, ContactVecSet& contacts);

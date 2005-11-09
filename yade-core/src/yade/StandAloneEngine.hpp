@@ -6,39 +6,22 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef FEMLAW_HPP
-#define FEMLAW_HPP
+#ifndef STANDALONEENGINE_HPP
+#define STANDALONEENGINE_HPP
 
-#include <yade/yade-core/InteractionSolver.hpp>
+#include "Engine.hpp"
 
-class PhysicalAction;
-
-class FEMLaw : public InteractionSolver
+class StandAloneEngine : public Engine
 {
-/// Attributes
-	private :
-		shared_ptr<PhysicalAction> actionForce;
 	public :
-		int	 nodeGroupMask
-			,tetrahedronGroupMask;
+		StandAloneEngine() {};
+		virtual ~StandAloneEngine() {};
 
-		FEMLaw();
-		virtual ~FEMLaw();
-
-/// Methods
-		void action(Body* body);
-
-/// Serializtion
-	protected :
-		virtual void registerAttributes();
-	REGISTER_CLASS_NAME(FEMLaw);
-	REGISTER_BASE_CLASS_NAME(InteractionSolver);
-
-
+	REGISTER_CLASS_NAME(StandAloneEngine);	
+	REGISTER_BASE_CLASS_NAME(Engine);
 };
 
-REGISTER_SERIALIZABLE(FEMLaw,false);
+REGISTER_SERIALIZABLE(StandAloneEngine,false);
 
-#endif // FEMLAW_HPP
-
+#endif // STANDALONEENGINE_HPP
 

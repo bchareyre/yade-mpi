@@ -11,7 +11,7 @@
 #include <yade/yade-core/MetaBody.hpp>
 
 
-SwiftPolyhedronProximityModeler::SwiftPolyhedronProximityModeler() : Engine()
+SwiftPolyhedronProximityModeler::SwiftPolyhedronProximityModeler() : StandAloneEngine()
 {
 	first = true;
 }

@@ -14,7 +14,7 @@
 #include <yade/yade-core/MetaBody.hpp>
 
 
-LatticeLaw::LatticeLaw() : Engine() , actionForce(new Force)
+LatticeLaw::LatticeLaw() : InteractionSolver() , actionForce(new Force)
 {
 	nodeGroupMask = 1;
 	beamGroupMask = 2;
@@ -31,7 +31,7 @@ LatticeLaw::~LatticeLaw()
 
 void LatticeLaw::registerAttributes()
 {
-	Engine::registerAttributes();
+	InteractionSolver::registerAttributes();
 	REGISTER_ATTRIBUTE(nodeGroupMask);
 	REGISTER_ATTRIBUTE(beamGroupMask);
 	REGISTER_ATTRIBUTE(maxDispl);

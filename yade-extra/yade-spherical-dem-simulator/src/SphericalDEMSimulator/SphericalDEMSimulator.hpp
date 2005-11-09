@@ -11,7 +11,7 @@
 
 #include "SphericalDEM.hpp"
 #include "Contact.hpp"
-#include "PersistentSAPCollider.hpp"
+#include "PersistentAloneSAPCollider.hpp"
 #include <yade/yade-core/StandAloneSimulator.hpp>
 #include <yade/yade-core/MetaBody.hpp>
 
@@ -34,7 +34,7 @@ class SphericalDEMSimulator : public StandAloneSimulator
 		bool			 useTimeStepper
 					,computedSomething;
 
-		PersistentSAPCollider	sap;
+		PersistentAloneSAPCollider	sap;
 
 		void findRealCollision(const vector<SphericalDEM>& spheres, ContactVecSet& contacts);
 		void computeResponse(vector<SphericalDEM>& spheres, ContactVecSet& contacts);

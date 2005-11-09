@@ -16,7 +16,7 @@
 #include <boost/lexical_cast.hpp>
 
 
-ForceRecorder::ForceRecorder () : Engine(), actionForce(new Force)
+ForceRecorder::ForceRecorder () : DataRecorder(), actionForce(new Force)
 {
 	outputFile = "";
 	interval = 50;
@@ -37,7 +37,7 @@ void ForceRecorder::postProcessAttributes(bool deserializing)
 
 void ForceRecorder::registerAttributes()
 {
-	Engine::registerAttributes();
+	DataRecorder::registerAttributes();
 	REGISTER_ATTRIBUTE(outputFile);
 	REGISTER_ATTRIBUTE(interval);
 	REGISTER_ATTRIBUTE(startId);

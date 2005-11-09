@@ -34,8 +34,8 @@ CONFIG += debug \
           dll 
 TEMPLATE = lib 
 HEADERS += Contact.hpp \
-           PersistentSAPCollider.hpp \
+           PersistentAloneSAPCollider.hpp \
            SphericalDEMSimulator.hpp \
            SphericalDEM.hpp 
-SOURCES += PersistentSAPCollider.cpp \
+SOURCES += PersistentAloneSAPCollider.cpp \
            SphericalDEMSimulator.cpp 

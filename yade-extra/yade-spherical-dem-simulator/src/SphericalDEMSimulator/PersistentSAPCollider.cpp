@@ -6,11 +6,11 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "PersistentSAPCollider.hpp"
+#include "PersistentAloneSAPCollider.hpp"
 
-PersistentSAPCollider::PersistentSAPCollider()
+PersistentAloneSAPCollider::PersistentAloneSAPCollider()
 {
-//	cerr << "PersistentSAPCollider\n";
+//	cerr << "PersistentAloneSAPCollider\n";
 
 	//this->maxObject = 150000;
 	nbObjects=0;
@@ -31,13 +31,13 @@ PersistentSAPCollider::PersistentSAPCollider()
 }
 
 
-PersistentSAPCollider::~PersistentSAPCollider()
+PersistentAloneSAPCollider::~PersistentAloneSAPCollider()
 {
 
 }
 
 
-void PersistentSAPCollider::action(const vector<SphericalDEM>& spheres, ContactVecSet& contacts)
+void PersistentAloneSAPCollider::action(const vector<SphericalDEM>& spheres, ContactVecSet& contacts)
 {
 	if (2*spheres.size()!=xBounds.size())
 	{
@@ -103,7 +103,7 @@ void PersistentSAPCollider::action(const vector<SphericalDEM>& spheres, ContactV
 }
 
 
-void PersistentSAPCollider::updateIds(unsigned int nbElements, ContactVecSet& contacts)
+void PersistentAloneSAPCollider::updateIds(unsigned int nbElements, ContactVecSet& contacts)
 {
 
 	// the first time broadInteractionTest is called nbObject=0
@@ -154,7 +154,7 @@ void PersistentSAPCollider::updateIds(unsigned int nbElements, ContactVecSet& co
 }
 
 
-void PersistentSAPCollider::sortBounds(vector<shared_ptr<AABBBound> >& bounds, int nbElements, ContactVecSet& contacts)
+void PersistentAloneSAPCollider::sortBounds(vector<shared_ptr<AABBBound> >& bounds, int nbElements, ContactVecSet& contacts)
 {
 	int i,j;
 	shared_ptr<AABBBound> tmp;
@@ -174,7 +174,7 @@ void PersistentSAPCollider::sortBounds(vector<shared_ptr<AABBBound> >& bounds, i
 }
 
 
-void PersistentSAPCollider::updateOverlapingBBSet(int id1,int id2, ContactVecSet& contacts)
+void PersistentAloneSAPCollider::updateOverlapingBBSet(int id1,int id2, ContactVecSet& contacts)
 {
 	if (id1>id2)
 		swap(id1,id2);
@@ -205,7 +205,7 @@ void PersistentSAPCollider::updateOverlapingBBSet(int id1,int id2, ContactVecSet
 }
 
 
-void PersistentSAPCollider::updateBounds(int nbElements)
+void PersistentAloneSAPCollider::updateBounds(int nbElements)
 {
 
 	for(int i=0; i < 2*nbElements; i++)
@@ -230,7 +230,7 @@ void PersistentSAPCollider::updateBounds(int nbElements)
 
 
 
-void PersistentSAPCollider::findOverlappingBB(std::vector<shared_ptr<AABBBound> >& bounds, int nbElements, ContactVecSet& contacts)
+void PersistentAloneSAPCollider::findOverlappingBB(std::vector<shared_ptr<AABBBound> >& bounds, int nbElements, ContactVecSet& contacts)
 {
 	int i,j;
 

@@ -9,11 +9,11 @@
 #ifndef ACTION_PARAMETER_RESET_HPP
 #define ACTION_PARAMETER_RESET_HPP 
 
-#include <yade/yade-core/Engine.hpp>
+#include <yade/yade-core/StandAloneEngine.hpp>
 
 class Body;
 
-class PhysicalActionContainerReseter : public Engine
+class PhysicalActionContainerReseter : public StandAloneEngine
 {
 	public :
 		PhysicalActionContainerReseter();
@@ -21,7 +21,7 @@ class PhysicalActionContainerReseter : public Engine
 		virtual void action(Body* body);
 
 	REGISTER_CLASS_NAME(PhysicalActionContainerReseter);
-	REGISTER_BASE_CLASS_NAME(Engine);
+	REGISTER_BASE_CLASS_NAME(StandAloneEngine);
 };
 
 REGISTER_SERIALIZABLE(PhysicalActionContainerReseter,false);

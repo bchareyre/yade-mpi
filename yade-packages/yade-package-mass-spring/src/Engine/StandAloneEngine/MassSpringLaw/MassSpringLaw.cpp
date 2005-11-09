@@ -17,14 +17,14 @@
 #include <yade/yade-package-common/Momentum.hpp>
 
 
-MassSpringLaw::MassSpringLaw () : Engine(), actionForce(new Force) , actionMomentum(new Momentum)
+MassSpringLaw::MassSpringLaw () : InteractionSolver(), actionForce(new Force) , actionMomentum(new Momentum)
 {
 }
 
 
 void MassSpringLaw::registerAttributes()
 {
-	Engine::registerAttributes();
+	InteractionSolver::registerAttributes();
 	REGISTER_ATTRIBUTE(springGroupMask);
 }
 

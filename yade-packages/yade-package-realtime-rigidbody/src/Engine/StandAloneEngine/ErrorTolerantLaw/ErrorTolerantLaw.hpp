@@ -9,7 +9,7 @@
 #ifndef ERRORTOLERANTDYNAMICENGINE_HPP
 #define ERRORTOLERANTDYNAMICENGINE_HPP
 
-#include <yade/yade-core/Engine.hpp>
+#include <yade/yade-core/InteractionSolver.hpp>
 
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/matrix_sparse.hpp>
@@ -17,7 +17,7 @@
 
 using namespace boost::numeric;
 
-class ErrorTolerantLaw : public Engine
+class ErrorTolerantLaw : public InteractionSolver
 {
 	typedef enum{VANISHING,CLAMPED} ContactState;
 	vector<ContactState> contactStates;
@@ -79,7 +79,7 @@ class ErrorTolerantLaw : public Engine
 
 	
 	REGISTER_CLASS_NAME(ErrorTolerantLaw);
-	REGISTER_BASE_CLASS_NAME(Engine);
+	REGISTER_BASE_CLASS_NAME(InteractionSolver);
 };
 
 REGISTER_SERIALIZABLE(ErrorTolerantLaw,false);

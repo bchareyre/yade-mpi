@@ -15,7 +15,7 @@
 #include <boost/lexical_cast.hpp>
 
 
-VelocityRecorder::VelocityRecorder () : Engine()
+VelocityRecorder::VelocityRecorder () : DataRecorder()
 {
 	outputFile = "";
 	interval = 50;
@@ -34,7 +34,7 @@ void VelocityRecorder::postProcessAttributes(bool deserializing)
 
 void VelocityRecorder::registerAttributes()
 {
-	Engine::registerAttributes();
+	DataRecorder::registerAttributes();
 	REGISTER_ATTRIBUTE(outputFile);
 	REGISTER_ATTRIBUTE(interval);
 	REGISTER_ATTRIBUTE(bigBallId);

@@ -21,15 +21,6 @@ class MetaEngine : public Engine
 
 		virtual string getEngineUnitType() { throw; };
 
-	protected :
-		virtual void registerAttributes()
-		{
-			Engine::registerAttributes();
-		};
-		virtual void postProcessAttributes(bool deserializing)
-		{
-			Engine::postProcessAttributes(deserializing);
-		}
 	REGISTER_CLASS_NAME(MetaEngine);	
 	REGISTER_BASE_CLASS_NAME(Engine);
 };

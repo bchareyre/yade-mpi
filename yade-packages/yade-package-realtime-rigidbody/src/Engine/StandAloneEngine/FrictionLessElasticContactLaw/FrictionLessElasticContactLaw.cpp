@@ -20,14 +20,14 @@
 #include <yade/yade-package-common/Momentum.hpp>
 
 
-FrictionLessElasticContactLaw::FrictionLessElasticContactLaw () : Engine(), actionForce(new Force) , actionMomentum(new Momentum)
+FrictionLessElasticContactLaw::FrictionLessElasticContactLaw () : InteractionSolver(), actionForce(new Force) , actionMomentum(new Momentum)
 {
 }
 
 
 void FrictionLessElasticContactLaw::registerAttributes()
 {
-	Engine::registerAttributes();
+	InteractionSolver::registerAttributes();
 }
 
 

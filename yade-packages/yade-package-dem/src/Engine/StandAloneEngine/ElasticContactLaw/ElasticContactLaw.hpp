@@ -9,14 +9,14 @@
 #ifndef ELASTIC_CONTACT_LAW_HPP
 #define ELASTIC_CONTACT_LAW_HPP
 
-#include <yade/yade-core/Engine.hpp>
+#include <yade/yade-core/InteractionSolver.hpp>
 
 #include <set>
 #include <boost/tuple/tuple.hpp>
 
 class PhysicalAction;
 
-class ElasticContactLaw : public Engine
+class ElasticContactLaw : public InteractionSolver
 {
 /// Attributes
 	private :
@@ -33,7 +33,7 @@ class ElasticContactLaw : public Engine
 	protected :
 		void registerAttributes();
 	REGISTER_CLASS_NAME(ElasticContactLaw);
-	REGISTER_BASE_CLASS_NAME(Engine);
+	REGISTER_BASE_CLASS_NAME(InteractionSolver);
 };
 
 REGISTER_SERIALIZABLE(ElasticContactLaw,false);

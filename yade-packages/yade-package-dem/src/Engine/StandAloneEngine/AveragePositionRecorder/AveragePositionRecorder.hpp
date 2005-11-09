@@ -9,12 +9,12 @@
 #ifndef AVERAGE_POSISTION_RECORDER_HPP
 #define AVERAGE_POSISTION_RECORDER_HPP
 
-#include <yade/yade-core/Engine.hpp>
+#include <yade/yade-core/DataRecorder.hpp>
 
 #include <string>
 #include <fstream>
 
-class AveragePositionRecorder : public Engine
+class AveragePositionRecorder : public DataRecorder
 {
 	public :
 		AveragePositionRecorder ();
@@ -36,7 +36,7 @@ class AveragePositionRecorder : public Engine
 		std::ofstream ofile;
 	
 	REGISTER_CLASS_NAME(AveragePositionRecorder);
-	REGISTER_BASE_CLASS_NAME(Engine);
+	REGISTER_BASE_CLASS_NAME(DataRecorder);
 
 };
 

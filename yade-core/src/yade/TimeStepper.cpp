@@ -9,9 +9,9 @@
 *************************************************************************/
 
 #include "TimeStepper.hpp"
-#include "Engine.hpp"
+#include "StandAloneEngine.hpp"
 
-TimeStepper::TimeStepper() : Engine()
+TimeStepper::TimeStepper() : StandAloneEngine()
 {	
 	active = true;
 	timeStepUpdateInterval = 1;
@@ -26,7 +26,7 @@ bool TimeStepper::isActivated()
 
 void TimeStepper::registerAttributes()
 {
-	Engine::registerAttributes();
+	StandAloneEngine::registerAttributes();
 	REGISTER_ATTRIBUTE(active);
 	REGISTER_ATTRIBUTE(timeStepUpdateInterval);
 }

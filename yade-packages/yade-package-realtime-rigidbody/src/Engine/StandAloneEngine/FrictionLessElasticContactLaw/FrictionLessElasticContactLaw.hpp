@@ -9,11 +9,11 @@
 #ifndef FRICTIONLESSELASTICCONTACTLAW_HPP
 #define FRICTIONLESSELASTICCONTACTLAW_HPP
 
-#include <yade/yade-core/Engine.hpp>
+#include <yade/yade-core/InteractionSolver.hpp>
 
 class PhysicalAction;
 
-class FrictionLessElasticContactLaw : public Engine
+class FrictionLessElasticContactLaw : public InteractionSolver
 {
 	private :
 		shared_ptr<PhysicalAction> actionForce;
@@ -26,7 +26,7 @@ class FrictionLessElasticContactLaw : public Engine
 	protected :
 		 void registerAttributes();
 	REGISTER_CLASS_NAME(FrictionLessElasticContactLaw);
-	REGISTER_BASE_CLASS_NAME(Engine);
+	REGISTER_BASE_CLASS_NAME(InteractionSolver);
 
 };
 

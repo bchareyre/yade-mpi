@@ -40,6 +40,10 @@ HEADERS += BodyContainer.hpp \
            EngineUnit.hpp \
            EngineUnit1D.hpp \
            EngineUnit2D.hpp \
+	   StandAloneEngine.hpp \
+	   BroadInteractor.hpp \
+	   InteractionSolver.hpp \
+	   DataRecorder.hpp \
            StandAloneSimulator.hpp 
 SOURCES += BodyContainer.cpp \
            Body.cpp \

@@ -10,10 +10,10 @@
 #define SWIFTPOLYHEDRONPROXIMITYMODELER_HPP
 
 #include "PolyhedralSweptSphere.hpp"
-#include <yade/yade-core/Engine.hpp>
+#include <yade/yade-core/StandAloneEngine.hpp>
 #include <yade/yade-lib-swiftpp/SWIFT.h>
 
-class SwiftPolyhedronProximityModeler : public Engine
+class SwiftPolyhedronProximityModeler : public StandAloneEngine
 {
 	private :
 		SWIFT_Scene*	 scene;
@@ -35,7 +35,7 @@ class SwiftPolyhedronProximityModeler : public Engine
 		virtual void action(Body* body);
 	
 	REGISTER_CLASS_NAME(SwiftPolyhedronProximityModeler);
-	REGISTER_BASE_CLASS_NAME(Engine);
+	REGISTER_BASE_CLASS_NAME(StandAloneEngine);
 };
 
 REGISTER_SERIALIZABLE(SwiftPolyhedronProximityModeler,false);

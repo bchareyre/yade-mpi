@@ -18,7 +18,7 @@
 using namespace boost::numeric;
 
 
-FEMLaw::FEMLaw() : Engine() , actionForce(new Force)
+FEMLaw::FEMLaw() : InteractionSolver() , actionForce(new Force)
 {
 	nodeGroupMask = 1;
 	tetrahedronGroupMask = 2;
@@ -33,7 +33,7 @@ FEMLaw::~FEMLaw()
 
 void FEMLaw::registerAttributes()
 {
-	Engine::registerAttributes();
+	InteractionSolver::registerAttributes();
 	REGISTER_ATTRIBUTE(nodeGroupMask);
 	REGISTER_ATTRIBUTE(tetrahedronGroupMask);
 }

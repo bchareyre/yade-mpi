@@ -10,13 +10,13 @@
 #define LATTICELAW_HPP
 
 
-#include <yade/yade-core/Engine.hpp>
+#include <yade/yade-core/InteractionSolver.hpp>
 
 
 class PhysicalAction;
 
 
-class LatticeLaw : public Engine
+class LatticeLaw : public InteractionSolver
 {
 
 /// Attributes	
@@ -38,7 +38,7 @@ class LatticeLaw : public Engine
 	protected :
 		void registerAttributes();
 	REGISTER_CLASS_NAME(LatticeLaw);
-	REGISTER_BASE_CLASS_NAME(Engine);
+	REGISTER_BASE_CLASS_NAME(InteractionSolver);
 };
 
 

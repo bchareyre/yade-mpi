@@ -9,10 +9,10 @@
 #ifndef MASSSPRINGLAW_HPP
 #define MASSSPRINGLAW_HPP
 
-#include <yade/yade-core/Engine.hpp>
+#include <yade/yade-core/InteractionSolver.hpp>
 #include <yade/yade-core/PhysicalAction.hpp>
 
-class MassSpringLaw : public Engine
+class MassSpringLaw : public InteractionSolver
 {
 	private :
 		shared_ptr<PhysicalAction> actionForce;	
@@ -26,10 +26,10 @@ class MassSpringLaw : public Engine
 	protected :
 		void registerAttributes();
 	REGISTER_CLASS_NAME(MassSpringLaw);
-	REGISTER_BASE_CLASS_NAME(Engine);
+	REGISTER_BASE_CLASS_NAME(InteractionSolver);
 };
 
 REGISTER_SERIALIZABLE(MassSpringLaw,false);
 
-#endif // __EXPLICITMASSSPRINGDYNAMICENGINE_H__
+#endif // MASSSPRINGLAW_HPP
 

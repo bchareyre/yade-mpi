@@ -12,11 +12,11 @@
 #include <list>
 #include <vector>
 #include "Interaction.hpp"
-#include "Engine.hpp"
+#include "StandAloneEngine.hpp"
 
 class Body;
 
-class TimeStepper : public Engine
+class TimeStepper : public StandAloneEngine
 {
 	public :
 		bool active;
@@ -31,7 +31,7 @@ class TimeStepper : public Engine
 	protected :
 		virtual void registerAttributes();
 	REGISTER_CLASS_NAME(TimeStepper);
-	REGISTER_BASE_CLASS_NAME(Engine);
+	REGISTER_BASE_CLASS_NAME(StandAloneEngine);
 };
 
 REGISTER_SERIALIZABLE(TimeStepper,false);
