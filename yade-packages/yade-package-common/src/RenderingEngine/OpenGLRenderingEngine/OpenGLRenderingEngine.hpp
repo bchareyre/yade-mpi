@@ -21,7 +21,9 @@
 class OpenGLRenderingEngine : public RenderingEngine
 {	
 	public : // FIXME - why public ?
-		Vector3r	 lightPos;
+		Vector3r	 lightPos
+				,backGroundColor;
+
 		bool		 drawBoundingVolume
 				,drawInteractingGeometry
 				,drawGeometricalModel

@@ -16,16 +16,17 @@
 OpenGLRenderingEngine::OpenGLRenderingEngine() : RenderingEngine()
 {
 
-	drawBoundingVolume = false;
-	drawInteractingGeometry = false;
-	drawGeometricalModel = true;
-	castShadow = false;
-	drawShadowVolumes = false;
-	useFastShadowVolume = true;
-	drawWireFrame = false;
-	drawInside = true;
-	needInit = true;
-	lightPos = Vector3r(75.0,130.0,0.0);
+	drawBoundingVolume	= false;
+	drawInteractingGeometry	= false;
+	drawGeometricalModel	= true;
+	castShadow		= false;
+	drawShadowVolumes	= false;
+	useFastShadowVolume	= true;
+	drawWireFrame		= false;
+	drawInside		= true;
+	needInit		= true;
+	lightPos		= Vector3r(75.0,130.0,0.0);
+	backGroundColor		= Vector3r(0.2,0.2,0.2);
 	
 	addBoundingVolumeFunctor("AABB","GLDrawAABB");
 	addBoundingVolumeFunctor("BoundingSphere","GLDrawBoundingSphere");
@@ -67,7 +68,8 @@ void OpenGLRenderingEngine::render(const shared_ptr<MetaBody>& rootBody)
 {		
 	const GLfloat pos[4]	= {lightPos[0],lightPos[1],lightPos[2],1.0};
 	const GLfloat ambientColor[4]	= {0.5,0.5,0.5,1.0};	
-	
+
+	glClearColor(backGroundColor[0],backGroundColor[1],backGroundColor[2],1.0);
 	glLightfv(GL_LIGHT0, GL_POSITION, pos);
 	glLightModelfv(GL_LIGHT_MODEL_AMBIENT,ambientColor);
 	glEnable(GL_LIGHT0);
@@ -402,6 +404,7 @@ void OpenGLRenderingEngine::renderInteractionGeometry(const shared_ptr<MetaBody>
 void OpenGLRenderingEngine::registerAttributes()
 {	
 	REGISTER_ATTRIBUTE(lightPos);
+	REGISTER_ATTRIBUTE(backGroundColor);
 	REGISTER_ATTRIBUTE(drawBoundingVolume);
 	REGISTER_ATTRIBUTE(drawInteractingGeometry);
 	REGISTER_ATTRIBUTE(drawGeometricalModel);

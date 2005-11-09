@@ -50,6 +50,7 @@ class SimulationController : public QtGeneratedSimulationController
 	public slots :
 		virtual void pbApplyClicked();
 		virtual void pbLoadClicked();
+		virtual void pbSaveClicked();
 		virtual void pbNewViewClicked();
 		virtual void pbStopClicked();
 		virtual void pbStartClicked();

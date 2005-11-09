@@ -382,7 +382,15 @@
                                     <cstring>pbLoadSimulation</cstring>
                                 </property>
                                 <property name="text">
-                                    <string>Load ...</string>
+                                    <string>Load</string>
+                                </property>
+                            </widget>
+                            <widget class="QPushButton">
+                                <property name="name">
+                                    <cstring>pbSaveSimulation</cstring>
+                                </property>
+                                <property name="text">
+                                    <string>Save</string>
                                 </property>
                             </widget>
                             <widget class="QLabel">
@@ -892,7 +900,16 @@
         <receiver>QtGeneratedSimulationController</receiver>
         <slot>sb10PowerSecondValueChanged(int)</slot>
     </connection>
+    <connection>
+        <sender>pbSaveSimulation</sender>
+        <signal>clicked()</signal>
+        <receiver>QtGeneratedSimulationController</receiver>
+        <slot>pbSaveClicked()</slot>
+    </connection>
 </connections>
+<includes>
+    <include location="local" impldecl="in implementation">QtGeneratedSimulationController.ui.h</include>
+</includes>
 <signals>
     <signal>closeSignal()</signal>
 </signals>
@@ -904,11 +921,12 @@
     <slot>pbResetClicked()</slot>
     <slot>pbApplyClicked()</slot>
     <slot>pbCenterSceneClicked()</slot>
-    <slot>closeGLViewEvent(int)</slot>
+    <slot>closeGLViewEvent( int )</slot>
     <slot>pbOneSimulationStepClicked()</slot>
-    <slot>bgTimeStepClicked(int)</slot>
-    <slot>sbSecondValueChanged(int)</slot>
-    <slot>sb10PowerSecondValueChanged(int)</slot>
+    <slot>bgTimeStepClicked( int )</slot>
+    <slot>sbSecondValueChanged( int )</slot>
+    <slot>sb10PowerSecondValueChanged( int )</slot>
+    <slot>pbSaveClicked()</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

@@ -125,11 +125,8 @@ int NullGUI::loop()
 			// save snapshot
 			if( ( snapshotInterval != -1 ) && (intervals % snapshotInterval == 0) )
 			{
+				// FIXME - call Omega::instance().saveSimulation(string);
 				shared_ptr<MetaBody> rootBody = Omega::instance().getRootBody();
-				//IOFormatManager::saveToFile(	"yade-lib-serialization-xml",
-				//			"../data/" + snapshotName + "_" + lexical_cast<string>(Omega::instance().getCurrentIteration()) + ".xml",
-				//			"rootBody", 
-				//			rootBody);
 				IOFormatManager::saveToFile(	"XMLFormatManager",
 							"../data/" + snapshotName + "_" + lexical_cast<string>(Omega::instance().getCurrentIteration()) + ".xml",
 							"rootBody",

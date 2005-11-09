@@ -101,7 +101,6 @@ void SimulationController::pbApplyClicked()
 
 void SimulationController::pbLoadClicked()
 {
-	
 	string selectedFilter;
 	string fileName = FileDialog::getOpenFileName("../data", "XML Yade File (*.xml)", "Choose a file to open", parentWorkspace, selectedFilter );
 		
@@ -154,6 +153,28 @@ void SimulationController::pbLoadClicked()
 	}
 } 
 
+void SimulationController::pbSaveClicked()
+{
+	pbStopClicked();
+
+	string selectedFilter;
+	string fileName = FileDialog::getSaveFileName("../data", "XML Yade File (*.xml)", "Specify file name to save", parentWorkspace, selectedFilter );
+		
+	if (fileName.size()!=0 && selectedFilter == "XML Yade File (*.xml)" && filesystem::extension(fileName)==".xml")
+	{
+		map<int,GLViewer*>::iterator gi = glViews.begin();
+		map<int,GLViewer*>::iterator giEnd = glViews.end();
+		for(;gi!=giEnd;++gi)
+			(*gi).second->stopRendering();
+
+		Omega::instance().saveSimulation(fileName);
+		
+		gi = glViews.begin();
+		giEnd = glViews.end();
+		for(;gi!=giEnd;++gi)
+			(*gi).second->startRendering();
+	}
+}
 
 void SimulationController::pbNewViewClicked()
 {

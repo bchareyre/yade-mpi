@@ -101,6 +101,7 @@ class Omega : public Singleton<Omega>
 		void		setSimulationFileName(const string);
 		string		getSimulationFileName();
 		void		loadSimulation();
+		void		saveSimulation(const string name);
 
 		long int	getCurrentIteration();
 		void		incrementCurrentIteration();

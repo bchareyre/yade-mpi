@@ -372,6 +372,22 @@ void Omega::loadSimulation()
 	}
 }
 
+void Omega::saveSimulation(const string name)
+{
+	LOCK(Omega::instance().getRootBodyMutex());
+	
+	if( name.size() != 0 && filesystem::extension(name)==".xml" )
+	{
+		logMessage("Saving file " + name);
+		IOFormatManager::saveToFile("XMLFormatManager",name,"rootBody",rootBody);
+	}
+	else
+	{
+		std::string error = yadeExceptions::BadFile + name;
+		cerr << error.c_str() << endl;
+		throw yadeBadFile(error.c_str());
+	}
+}
 
 void Omega::freeRootBody()
 {
