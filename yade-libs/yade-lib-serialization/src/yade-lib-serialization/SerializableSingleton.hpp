@@ -32,11 +32,11 @@ class SerializableSingleton : public Singleton< SerializableSingleton >
 
 			SerializableDescriptor() {};
 			SerializableDescriptor(	VerifyFactorableFnPtr v, SerializableTypes::Type t, bool f)
-				    {
-					verify 		 = v;
-					type   		 = t;
-					fundamental 	 = f;
-				    };
+			{
+				verify 		 = v;
+				type   		 = t;
+				fundamental 	 = f;
+			};
 		};
 
 	/// Type of a Stl map used to map the registered class name with their SerializableDescriptor

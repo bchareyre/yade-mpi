@@ -1,6 +1,8 @@
 /*************************************************************************
 *  Copyright (C) 2004 by Olivier Galizzi                                 *
 *  olivier.galizzi@imag.fr                                               *
+*  Copyright (C) 2004 by Janek Kozicki                                   *
+*  cosurgi@berlios.de                                                    *
 *                                                                        *
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
@@ -23,14 +25,13 @@ char IOFormatManager::cfS	= ' ';
 
 IOFormatManager::IOFormatManager()
 {
-	Archive::addSerializablePointer(SerializableTypes::CUSTOM_CLASS, false, serializeCustomClass, deserializeCustomClass);
-	Archive::addSerializablePointer(SerializableTypes::FUNDAMENTAL, true,serializeFundamental, deserializeFundamental);
-	Archive::addSerializablePointer(SerializableTypes::POINTER, true, serializeSmartPointerOfFundamental, deserializeSmartPointerOfFundamental);
+	Archive::addSerializablePointer(SerializableTypes::CUSTOM_CLASS , false, serializeCustomClass, deserializeCustomClass);
+	Archive::addSerializablePointer(SerializableTypes::FUNDAMENTAL  , true , serializeFundamental, deserializeFundamental);
+	Archive::addSerializablePointer(SerializableTypes::POINTER      , true , serializeSmartPointerOfFundamental, deserializeSmartPointerOfFundamental);
 
-	Archive::addSerializablePointer(SerializableTypes::CONTAINER, true, serializeContainerOfFundamental, deserializeContainerOfFundamental);
-	Archive::addSerializablePointer(SerializableTypes::CUSTOM_CLASS, true, serializeCustomFundamental, deserializeCustomFundamental);
-	Archive::addSerializablePointer(SerializableTypes::SERIALIZABLE, true, serializeFundamentalSerializable, deserializeFundamentalSerializable);
-
+	Archive::addSerializablePointer(SerializableTypes::CONTAINER    , true , serializeContainerOfFundamental, deserializeContainerOfFundamental);
+	Archive::addSerializablePointer(SerializableTypes::CUSTOM_CLASS , true , serializeCustomFundamental, deserializeCustomFundamental);
+	Archive::addSerializablePointer(SerializableTypes::SERIALIZABLE , true , serializeFundamentalSerializable, deserializeFundamentalSerializable);
 }
 
 

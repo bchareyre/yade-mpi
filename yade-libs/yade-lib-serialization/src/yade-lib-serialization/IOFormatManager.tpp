@@ -8,8 +8,8 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef __IOMANAGER_TPP_
-#define __IOMANAGER_TPP_
+#ifndef IOMANAGER_TPP
+#define IOMANAGER_TPP
 
 #include "Archive.hpp"
 
@@ -57,6 +57,7 @@ void IOFormatManager::loadArchive(const string& libName, istream& stream, Type& 
 	string str = ioManager->beginDeserialization(stream,*ac);
 	ac->deserialize(stream, *ac, str);
 	ioManager->finalizeDeserialization(stream,*ac);
+	cerr << "loadFromFile 3a\n";
 }
 
 
@@ -73,4 +74,4 @@ void IOFormatManager::saveArchive(const string& libName, ostream& stream, Type& 
 }
 
 
-#endif // __IOMANAGER_TPP_
+#endif // IOMANAGER_TPP

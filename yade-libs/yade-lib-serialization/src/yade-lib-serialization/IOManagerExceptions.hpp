@@ -14,6 +14,7 @@
 
 using namespace std;
 
+/*
 struct IOManagerError : public std::runtime_error
 {
 	explicit IOManagerError(const char* msg) : std::runtime_error(msg) {};
@@ -23,6 +24,7 @@ struct CustomTypesMapperError : public std::runtime_error
 {
 	explicit CustomTypesMapperError(const char* msg) : std::runtime_error(msg) {};
 };
+*/
 
 struct IOManagerExceptions
 {

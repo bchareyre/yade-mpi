@@ -30,25 +30,29 @@ FileDialog::~FileDialog ()
 }
 
 
-string FileDialog::getOpenFileName(const string& directory,const string& filters,const string& caption,QWidget* parent,string& selectedFilter )
+string FileDialog::getOpenFileName(const string& directory,const vector<string>& filters,const string& caption,QWidget* parent,string& selectedFilter )
 {
-	const QString d(directory.c_str());
-	const QString f(filters.c_str());
+	const QString d(directory);
+	const QString f(filters[0]);
 	
 	shared_ptr<FileDialog> fd = shared_ptr<FileDialog>(new FileDialog(d,f,caption,parent));
+	for(int i = 1 ; i<filters.size() ; ++i)
+		fd->addFilter(filters[i]);
 	fd->exec();
 	selectedFilter = fd->selectedFilter().data();
 	return fd->selectedFile().data();
 }
 
 
-string FileDialog::getSaveFileName(const string& directory,const string& filters,const string& caption,QWidget* parent,string& selectedFilter )
+string FileDialog::getSaveFileName(const string& directory,const vector<string>& filters,const string& caption,QWidget* parent,string& selectedFilter )
 {
-	const QString d(directory.c_str());
-	const QString f(filters.c_str());
+	const QString d(directory);
+	const QString f(filters[0]);
 		
 	shared_ptr<FileDialog> fd = shared_ptr<FileDialog>(new FileDialog(d,f,caption,parent));
 	fd->setMode( QFileDialog::AnyFile );
+	for(int i = 1 ; i<filters.size() ; ++i)
+		fd->addFilter(filters[i]);
 	fd->exec();
 	selectedFilter = fd->selectedFilter().data();
 	return fd->selectedFile().data();

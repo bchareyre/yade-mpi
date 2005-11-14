@@ -14,10 +14,9 @@
 #include "SerializationExceptions.hpp"
 #include "Archive.hpp"
 #include <boost/lexical_cast.hpp>
-
+#include <boost/type_traits.hpp>
 
 using namespace boost; 
-
 
 template<typename Type>
 struct FundamentalHandler
@@ -32,10 +31,56 @@ struct FundamentalHandler
 	}
 };
 
+template< >
+struct FundamentalHandler< string >
+{
+	static void creator(Archive& ac, any& a)
+	{
+		if (a.type()==typeid(const string*)) // deserialization - reading from string to some Type
+		{
+			const string * tmpStr = any_cast<const string*>(a);
+			string * tmp = any_cast<string*>(ac.getAddress());
+			*tmp = lexical_cast<string>(*tmpStr);
+		}
+		else if (a.type()==typeid(const vector<unsigned char>*)) // from binary stream to Type
+		{
+			const vector<unsigned char>* tmpBin = any_cast< const vector<unsigned char>* >(a);
+			string * tmp = any_cast<string*>(ac.getAddress());
+			std::vector<unsigned char>::const_iterator ptr = (*tmpBin).begin();
+			std::vector<unsigned char>::const_iterator end = (*tmpBin).end();
+			(*tmp).resize( (*tmpBin).size() );
+			std::copy(ptr,end,(*tmp).begin());
+		}
+		else
+			throw HandlerError(SerializationExceptions::LexicalCopyError);
+	}
+	static void accessor(Archive& ac, any& a)
+	{ // FIXME - throw when trying to serialize a string that has spaces. ( if(string.find(' ') != string.end() ...)
+		if (a.type()==typeid(string*)) // serialization - writing to string from some Type
+		{
+			string * tmpStr = any_cast<string*>(a);
+			string * tmp = any_cast<string*>(ac.getAddress());
+			*tmpStr = lexical_cast<string>(*tmp);
+		}
+		else if (a.type()==typeid(vector<unsigned char>*)) // from string to binary stream
+		{
+			vector<unsigned char>* tmpBin = any_cast< vector<unsigned char>* >(a);
+			string * tmp = any_cast<string*>(ac.getAddress());
+			(*tmpBin).clear();
+			string::iterator ptr = (*tmp).begin();
+			string::iterator end = (*tmp).end();
+			(*tmpBin).resize((*tmp).size());
+			std::copy(ptr, end, (*tmpBin).begin() );
+		}
+		else
+			throw HandlerError(SerializationExceptions::LexicalCopyError);
+	}
+};
 
 template<typename Type >
 inline void lexical_copy(Archive& ac , any& a )
 {
+	// Textual serialization
 	if (a.type()==typeid(const string*)) // deserialization - reading from string to some Type
 	{
 		const string * tmpStr = any_cast<const string*>(a);
@@ -43,21 +88,37 @@ inline void lexical_copy(Archive& ac , any& a )
 		*tmp = lexical_cast<Type>(*tmpStr);
 	}
 	else if (a.type()==typeid(string*)) // serialization - writing to string from some Type
-	{ // FIXME - throw when trying to serialize a string that has spaces. ( if(string.find(' ') != string.end() ...)
+	{
 		string * tmpStr = any_cast<string*>(a);
 		Type * tmp = any_cast<Type*>(ac.getAddress());
 		*tmpStr = lexical_cast<string>(*tmp);
 	}
-	else if (a.type()==typeid(const vector<unsigned char>*))
-	{ // FIXME - throw because binary serialization is not supported yet.
-	}
-	else if (a.type()==typeid(vector<unsigned char>*))
+	// Binary serialization
+	else if (a.type()==typeid(const vector<unsigned char>*)) // from binary stream to Type
 	{
+		const vector<unsigned char>* tmpBin = any_cast< const vector<unsigned char>* >(a);
+		Type * tmp = any_cast<Type*>(ac.getAddress());
+		BOOST_STATIC_ASSERT((boost::is_POD<Type>::value));
+		std::vector<unsigned char>::const_iterator ptr = (*tmpBin).begin();
+		std::vector<unsigned char>::const_iterator end = (*tmpBin).end();
+		if(sizeof(Type) != (*tmpBin).size())
+			throw HandlerError(SerializationExceptions::LexicalCopyBinError);
+		unsigned char *ptr2 = reinterpret_cast<unsigned char *>(tmp);
+		std::copy(ptr,end,ptr2);
+	}
+	else if (a.type()==typeid(vector<unsigned char>*)) // from Type to binary stream
+	{
+		vector<unsigned char>* tmpBin = any_cast< vector<unsigned char>* >(a);
+		Type * tmp = any_cast<Type*>(ac.getAddress());
+		(*tmpBin).clear();
+		const unsigned char* ptr = reinterpret_cast<const unsigned char*>(tmp);
+		const unsigned char* end = ptr + sizeof(Type);
+		(*tmpBin).resize(sizeof(Type));
+		std::copy(ptr, end, (*tmpBin).begin() );
 	}
 	else
 		throw HandlerError(SerializationExceptions::LexicalCopyError);
 }
-
 
 template< >
 struct FundamentalHandler< int >
@@ -72,7 +133,6 @@ struct FundamentalHandler< int >
 	}
 };
 
-
 template< >
 struct FundamentalHandler< float >
 {
@@ -86,7 +146,6 @@ struct FundamentalHandler< float >
 	}
 };
 
-
 template< >
 struct FundamentalHandler< double >
 {
@@ -99,7 +158,6 @@ struct FundamentalHandler< double >
 		lexical_copy< double >( ac, a);
 	}
 };
-
 
 // bool should accept true,false and 1,0
 template< >
@@ -116,21 +174,6 @@ struct FundamentalHandler< bool >
 	}
 };
 
-
-template< >
-struct FundamentalHandler< string >
-{
-	static void creator(Archive& ac, any& a)
-	{
-		lexical_copy< string >( ac, a);
-	}
-	static void accessor(Archive& ac, any& a)
-	{
-		lexical_copy< string >( ac, a);
-	}
-};
-
-
 template< >
 struct FundamentalHandler< unsigned int >
 {
@@ -143,7 +186,6 @@ struct FundamentalHandler< unsigned int >
 		lexical_copy< unsigned int >( ac, a);
 	}
 };
-
 
 template< >
 struct FundamentalHandler< char >
@@ -158,7 +200,6 @@ struct FundamentalHandler< char >
 	}
 };
 
-
 template< >
 struct FundamentalHandler< unsigned char >
 {
@@ -171,7 +212,6 @@ struct FundamentalHandler< unsigned char >
 		lexical_copy< unsigned char >( ac, a);
 	}
 };
-
 
 template< >
 struct FundamentalHandler< short >
@@ -186,7 +226,6 @@ struct FundamentalHandler< short >
 	}
 };
 
-
 template< >
 struct FundamentalHandler< long >
 {
@@ -199,7 +238,6 @@ struct FundamentalHandler< long >
 		lexical_copy< long >( ac, a);
 	}
 };
-
 
 template< >
 struct FundamentalHandler< unsigned short >
@@ -214,7 +252,6 @@ struct FundamentalHandler< unsigned short >
 	}
 };
 
-
 template< >
 struct FundamentalHandler< unsigned long >
 {
@@ -227,7 +264,6 @@ struct FundamentalHandler< unsigned long >
 		lexical_copy< unsigned long >( ac, a);
 	}
 };
-
 
 template< >
 struct FundamentalHandler< long double >
@@ -242,7 +278,6 @@ struct FundamentalHandler< long double >
 	}
 };
 
-
 template< >
 struct FundamentalHandler< long long >
 {
@@ -255,8 +290,6 @@ struct FundamentalHandler< long long >
 		lexical_copy< long long >( ac, a);
 	}
 };
-
-
 
 #endif // __FUNDAMENTALHANDLER_H__
 

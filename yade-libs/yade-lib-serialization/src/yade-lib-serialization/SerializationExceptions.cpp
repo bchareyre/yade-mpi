@@ -17,8 +17,10 @@ const char* SerializationExceptions::SetFunctionNotDeclared   		= "Set function 
 const char* SerializationExceptions::GetFunctionNotDeclared  	 	= "Get function not declared";
 const char* SerializationExceptions::ContainerNotSupported    		= "Container not supported";
 const char* SerializationExceptions::LexicalCopyError			= "lexical_copy fails";
+const char* SerializationExceptions::ExtraCopyError			= "known fundamentals handler fails";
 const char* SerializationExceptions::FundamentalNotSupported		= "Fundamental not supported";
 const char* SerializationExceptions::SmartPointerNotSupported		= "SmartPointer not supported";
+const char* SerializationExceptions::LexicalCopyBinError 		= "binary serialization lexical_copy error (different architecture?)";
 
 // FIXME : used , but desn't throw
 const char* SerializationExceptions::AttributeIsNotDefined 		= "Attribute is not defined : ";

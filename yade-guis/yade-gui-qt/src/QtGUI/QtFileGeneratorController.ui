@@ -84,22 +84,6 @@
                         <set>AlignVCenter|AlignRight</set>
                     </property>
                 </widget>
-                <widget class="QLabel" row="2" column="0">
-                    <property name="name">
-                        <cstring>tlGeneratorName</cstring>
-                    </property>
-                    <property name="text">
-                        <string>Generator Name :</string>
-                    </property>
-                    <property name="alignment">
-                        <set>AlignVCenter|AlignRight</set>
-                    </property>
-                </widget>
-                <widget class="QComboBox" row="2" column="1" rowspan="1" colspan="2">
-                    <property name="name">
-                        <cstring>cbGeneratorName</cstring>
-                    </property>
-                </widget>
                 <widget class="QLineEdit" row="0" column="1">
                     <property name="name">
                         <cstring>leOutputFileName</cstring>
@@ -116,12 +100,25 @@
                         <pixmap>image0</pixmap>
                     </property>
                 </widget>
-                <widget class="QLineEdit" row="1" column="1" rowspan="1" colspan="2">
+                <widget class="QComboBox" row="1" column="1" rowspan="1" colspan="2">
                     <property name="name">
-                        <cstring>leSerializationName</cstring>
+                        <cstring>cbSerializationName</cstring>
+                    </property>
+                </widget>
+                <widget class="QLabel" row="2" column="0">
+                    <property name="name">
+                        <cstring>tlGeneratorName</cstring>
                     </property>
                     <property name="text">
-                        <string>XMLFormatManager</string>
+                        <string>Generator Name :</string>
+                    </property>
+                    <property name="alignment">
+                        <set>AlignVCenter|AlignRight</set>
+                    </property>
+                </widget>
+                <widget class="QComboBox" row="2" column="1" rowspan="1" colspan="2">
+                    <property name="name">
+                        <cstring>cbGeneratorName</cstring>
                     </property>
                 </widget>
             </grid>
@@ -262,15 +259,25 @@
         <receiver>QtFileGeneratorController</receiver>
         <slot>pbSaveClicked()</slot>
     </connection>
+    <connection>
+        <sender>cbSerializationName</sender>
+        <signal>activated(const QString&amp;)</signal>
+        <receiver>QtFileGeneratorController</receiver>
+        <slot>cbSerializationNameActivated(const QString&amp;)</slot>
+    </connection>
 </connections>
+<includes>
+    <include location="local" impldecl="in implementation">QtFileGeneratorController.ui.h</include>
+</includes>
 <slots>
-    <slot>cbGeneratorNameActivated(const QString&amp;)</slot>
+    <slot>cbGeneratorNameActivated( const QString &amp; )</slot>
     <slot>pbGenerateClicked()</slot>
     <slot>pbCloseClicked()</slot>
     <slot>pbChooseClicked()</slot>
     <slot>pbSave_clicked()</slot>
     <slot>pbLoadClicked()</slot>
     <slot>pbSaveClicked()</slot>
+    <slot>cbSerializationNameActivated( const QString &amp; )</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

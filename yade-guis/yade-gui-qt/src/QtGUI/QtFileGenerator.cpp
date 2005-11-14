@@ -17,6 +17,7 @@
 #include <yade/yade-lib-factory/ClassFactory.hpp>
 #include <yade/yade-core/FileGenerator.hpp>
 #include <yade/yade-core/Omega.hpp>
+#include <boost/filesystem/convenience.hpp>
 
 
 QtFileGenerator::QtFileGenerator ( QWidget * parent , const char * name) : QtFileGeneratorController(parent,name)
@@ -31,8 +32,11 @@ QtFileGenerator::QtFileGenerator ( QWidget * parent , const char * name) : QtFil
 	{
 		if (Omega::instance().isInheritingFrom((*di).first,"FileGenerator"))
 			cbGeneratorName->insertItem((*di).first);
+		if (Omega::instance().isInheritingFrom((*di).first,"IOFormatManager"))
+			cbSerializationName->insertItem((*di).first);
 	}
-
+	setSerializationName("XMLFormatManager");
+	
 	leOutputFileName->setText("../data/scene.xml");
 
 	scrollViewFrame = new QFrame();	
@@ -55,14 +59,34 @@ QtFileGenerator::~QtFileGenerator()
 
 }
 
+void QtFileGenerator::setSerializationName(string n)
+{
+	for(int i=0 ; i<cbSerializationName->count() ; ++i)
+	{
+		cbSerializationName->setCurrentItem(i);
+		if(cbSerializationName->currentText() == n)
+			return;
+	}
+}
 
 void QtFileGenerator::pbChooseClicked()
 {
 	string selectedFilter;
-	string fileName = FileDialog::getSaveFileName("../data", "XML Yade File (*.xml)", "Choose a file to save", this->parentWidget()->parentWidget(),selectedFilter );
+	std::vector<string> filters;
+	filters.push_back("Yade Binary File (*.yade)");
+	filters.push_back("XML Yade File (*.xml)");
+	string fileName = FileDialog::getSaveFileName("../data", filters , "Choose a file to save", this->parentWidget()->parentWidget(),selectedFilter );
 
-	if (fileName.size()!=0 && selectedFilter == "XML Yade File (*.xml)")
+	if (fileName.size()!=0 && selectedFilter == "XML Yade File (*.xml)" && fileName!="/" )
+	{
+		setSerializationName("XMLFormatManager");
 		leOutputFileName->setText(fileName);
+	}
+	else if (fileName.size()!=0 && selectedFilter == "Yade Binary File (*.yade)" && fileName!="/" )
+	{
+		setSerializationName("BINFormatManager");
+		leOutputFileName->setText(fileName);
+	}
 }
 
 
@@ -105,6 +129,21 @@ void QtFileGenerator::cbGeneratorNameActivated(const QString& s)
 	}
 }
 
+void QtFileGenerator::cbSerializationNameActivated(const QString& s)
+{
+	string fileName = leOutputFileName->text();
+	string ext;
+	if( s == "BINFormatManager")
+		ext = ".yade";
+	else if ( s == "XMLFormatManager")
+		ext = ".xml";
+	else ext = ".unknownFormat";
+	if( filesystem::extension(fileName) != "" )
+	{
+		filesystem::path p = filesystem::change_extension(fileName,ext);
+		leOutputFileName->setText(p.string());
+	}
+}
 
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
@@ -115,7 +154,7 @@ void QtFileGenerator::pbGenerateClicked()
 	shared_ptr<FileGenerator> fg = static_pointer_cast<FileGenerator>(ClassFactory::instance().createShared(cbGeneratorName->currentText()));
 	
 	fg->setFileName(leOutputFileName->text());
-	fg->setSerializationLibrary(leSerializationName->text());
+	fg->setSerializationLibrary(cbSerializationName->currentText());
 	
 	guiGen.deserialize(fg);
 	

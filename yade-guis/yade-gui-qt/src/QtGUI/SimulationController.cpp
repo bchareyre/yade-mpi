@@ -102,9 +102,15 @@ void SimulationController::pbApplyClicked()
 void SimulationController::pbLoadClicked()
 {
 	string selectedFilter;
-	string fileName = FileDialog::getOpenFileName("../data", "XML Yade File (*.xml)", "Choose a file to open", parentWorkspace, selectedFilter );
+	std::vector<string> filters;
+	filters.push_back("Yade Binary File (*.yade)");
+	filters.push_back("XML Yade File (*.xml)");
+	string fileName = FileDialog::getOpenFileName("../data", filters, "Choose a file to open", parentWorkspace, selectedFilter );
 		
-	if (fileName.size()!=0 && selectedFilter == "XML Yade File (*.xml)" && filesystem::exists(fileName) && filesystem::extension(fileName)==".xml")
+	if ( 	   fileName.size()!=0 
+		&& (selectedFilter == "XML Yade File (*.xml)" || selectedFilter == "Yade Binary File (*.yade)") 
+		&& filesystem::exists(fileName) 
+		&& (filesystem::extension(fileName)==".xml" || filesystem::extension(fileName)==".yade"))
 	{
 		
 		map<int,GLViewer*>::iterator gi = glViews.begin();
@@ -117,12 +123,42 @@ void SimulationController::pbLoadClicked()
 		Omega::instance().joinSimulationLoop();
 		
 		Omega::instance().setSimulationFileName(fileName);
-		Omega::instance().loadSimulation();
-		
-		string fullName = string(filesystem::basename(fileName.data()))+string(filesystem::extension(fileName.data()));
-		tlCurrentSimulation->setText(fullName);
-		
-		Omega::instance().createSimulationLoop();
+		try
+		{
+			Omega::instance().loadSimulation();
+			string fullName = string(filesystem::basename(fileName.data()))+string(filesystem::extension(fileName.data()));
+			tlCurrentSimulation->setText(fullName); 
+			Omega::instance().createSimulationLoop();
+			
+			pbStartSimulation->setEnabled(true);
+			pbStopSimulation->setEnabled(true);
+			pbResetSimulation->setEnabled(true);
+			pbOneSimulationStep->setEnabled(true);
+
+			changeSkipTimeStepper = true;
+			if (Omega::instance().containTimeStepper())
+			{
+				rbTimeStepper->setEnabled(true);
+				rbTimeStepper->setChecked(true);
+				wasUsingTimeStepper = true;
+			}
+			else
+			{
+				rbTimeStepper->setEnabled(false);
+				rbFixed->setChecked(true);
+				wasUsingTimeStepper = false;
+			}
+		} 
+		catch(SerializableError& e)
+		{
+			Omega::instance().freeRootBody();
+			shared_ptr<MessageDialog> md = shared_ptr<MessageDialog>(new MessageDialog(e.what(),this->parentWidget()->parentWidget()));
+			md->exec(); 
+			pbStartSimulation->setDisabled(true);
+			pbStopSimulation->setDisabled(true);
+			pbResetSimulation->setDisabled(true);
+			pbOneSimulationStep->setDisabled(true);
+		}
 		
 		gi = glViews.begin();
 		giEnd = glViews.end();
@@ -130,26 +166,7 @@ void SimulationController::pbLoadClicked()
 		{
 			(*gi).second->centerScene();
 			(*gi).second->startRendering();
-		}
-		
-		pbStartSimulation->setEnabled(true);
-		pbStopSimulation->setEnabled(true);
-		pbResetSimulation->setEnabled(true);
-		pbOneSimulationStep->setEnabled(true);
-
-		changeSkipTimeStepper = true;
-		if (Omega::instance().containTimeStepper())
-		{
-			rbTimeStepper->setEnabled(true);
-			rbTimeStepper->setChecked(true);
-			wasUsingTimeStepper = true;
-		}
-		else
-		{
-			rbTimeStepper->setEnabled(false);
-			rbFixed->setChecked(true);
-			wasUsingTimeStepper = false;
-		}
+		} 
 	}
 } 
 
@@ -158,9 +175,14 @@ void SimulationController::pbSaveClicked()
 	pbStopClicked();
 
 	string selectedFilter;
-	string fileName = FileDialog::getSaveFileName("../data", "XML Yade File (*.xml)", "Specify file name to save", parentWorkspace, selectedFilter );
+	std::vector<string> filters;
+	filters.push_back("Yade Binary File (*.yade)");
+	filters.push_back("XML Yade File (*.xml)");
+	string fileName = FileDialog::getSaveFileName("../data", filters, "Specify file name to save", parentWorkspace, selectedFilter );
 		
-	if (fileName.size()!=0 && selectedFilter == "XML Yade File (*.xml)" && filesystem::extension(fileName)==".xml")
+	if ( 	   fileName.size()!=0 
+		&& (selectedFilter == "XML Yade File (*.xml)" || selectedFilter == "Yade Binary File (*.yade)" ) 
+		&& (filesystem::extension(fileName)==".xml" || filesystem::extension(fileName)==".yade" ))
 	{
 		map<int,GLViewer*>::iterator gi = glViews.begin();
 		map<int,GLViewer*>::iterator giEnd = glViews.end();

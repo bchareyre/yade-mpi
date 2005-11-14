@@ -71,12 +71,12 @@
   </kdevdebugger>
   <kdevtrollproject>
     <run>
-      <mainprogram>./bin/yadeemptypackage</mainprogram>
+      <mainprogram>./bin/yadelibserializationbin</mainprogram>
       <programargs/>
       <directoryradio>executable</directoryradio>
     </run>
     <general>
-      <activedir>Engine/StandAloneEngine/LatticeLaw</activedir>
+      <activedir>yade-lib-serialization-bin</activedir>
     </general>
     <subclassing/>
   </kdevtrollproject>
@@ -91,21 +91,21 @@
   <kdevdocumentation>
     <projectdoc>
       <docsystem>Doxygen Documentation Collection</docsystem>
-      <docurl>yadeemptypackage.tag</docurl>
+      <docurl>yadelibserializationbin.tag</docurl>
     </projectdoc>
   </kdevdocumentation>
   <substmap>
-    <APPNAME>yadeemptypackage</APPNAME>
-    <APPNAMELC>yadeemptypackage</APPNAMELC>
-    <APPNAMESC>Yadeemptypackage</APPNAMESC>
-    <APPNAMEUC>YADEEMPTYPACKAGE</APPNAMEUC>
-    <AUTHOR>Your Name</AUTHOR>
-    <EMAIL>your.email@your.domain</EMAIL>
+    <APPNAME>yadelibserializationbin</APPNAME>
+    <APPNAMELC>yadelibserializationbin</APPNAMELC>
+    <APPNAMESC>Yadelibserializationbin</APPNAMESC>
+    <APPNAMEUC>YADELIBSERIALIZATIONBIN</APPNAMEUC>
+    <AUTHOR>JK</AUTHOR>
+    <EMAIL/>
     <LICENSE>GPL</LICENSE>
     <LICENSEFILE>COPYING</LICENSEFILE>
     <VERSION>0.1</VERSION>
     <YEAR>2005</YEAR>
-    <dest>/disc/devel/trunk/yade-empties/yade-empty-package/projects/yadeemptypackage</dest>
+    <dest>/disc/devel/trunk/yade-libs/yade-lib-serialization-bin/projects/yadelibserializationbin</dest>
   </substmap>
   <kdevcppsupport>
     <references/>

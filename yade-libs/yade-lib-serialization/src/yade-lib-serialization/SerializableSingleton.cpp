@@ -22,7 +22,7 @@ bool SerializableSingleton::registerSerializableDescriptor( string name , Verify
 
 	#ifdef DEBUG
 		if (tmp)
-			cout << "registering serializable : " << name << " OK\n";
+			cout << "registering serializable: " << name << " OK\n";
 		else
 			cout << "registering serializable: " << name << " FAILED\n";
 	#endif

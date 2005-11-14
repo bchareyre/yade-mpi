@@ -15,7 +15,6 @@ namespace SerializableTypes
 {
 	typedef enum
 		{
-			FACTORABLE,		/// class derived from Factorable
 			SERIALIZABLE,   	/// class derived from Serializable derived from Factorable 
 			FUNDAMENTAL,    	/// class Serializable derived from Factorable class that is
                                         	///   (de-)serialized into a single string with separator : int,float, vector<fundamental>,

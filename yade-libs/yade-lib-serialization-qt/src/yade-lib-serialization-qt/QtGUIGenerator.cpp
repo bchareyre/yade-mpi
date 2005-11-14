@@ -63,7 +63,6 @@ void QtGUIGenerator::addButtons(QWidget * widget)
 
 void QtGUIGenerator::reArrange(QWidget * widget)
 {	
-	
 	if (resizeWidth)
 		widgetWidth = 400;
 	else
@@ -77,7 +76,6 @@ void QtGUIGenerator::reArrange(QWidget * widget)
 		if (length>maxLabelLength)
 			maxLabelLength = length;
 	}
-	
 	for(unsigned int i=0;i<descriptors.size();i++)
 	{
 		descriptors[i]->label->setGeometry( QRect( shiftX, shiftY+(20+5)*i, maxLabelLength, 20 ) );
@@ -95,7 +93,7 @@ void QtGUIGenerator::buildGUI(shared_ptr<Serializable> s,  QWidget * widget)
 
 	currentWidget = widget;
 
-	XMLFormatManager xmlManager;
+	XMLFormatManager xmlManager; // FIXME - beacuse all IOFormatManagers are using pointers to static functions it is all a mess...
 
 	descriptors.clear();
 	lookUp.clear();
@@ -182,6 +180,8 @@ void QtGUIGenerator::buildGUI(shared_ptr<Serializable> s,  QWidget * widget)
 
 void QtGUIGenerator::deserialize(shared_ptr<Serializable> s)
 {
+	XMLFormatManager xmlManager; // FIXME - beacuse all IOFormatManagers are using pointers to static functions it is all a mess...
+	
 	s->registerSerializableAttributes(true);
 	Serializable::Archives archives = s->getArchives();
 

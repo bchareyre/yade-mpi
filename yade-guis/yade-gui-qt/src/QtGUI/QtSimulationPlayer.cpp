@@ -29,7 +29,9 @@ QtSimulationPlayer::~QtSimulationPlayer()
 void QtSimulationPlayer::pbInputConfigFileClicked()
 {
 	string selectedFilter;
-	string fileName = FileDialog::getOpenFileName("../data", "XML Yade File (*.xml)", "Choose a file to load", this->parentWidget()->parentWidget(),selectedFilter );
+	std::vector<string> filters;
+	filters.push_back("XML Yade File (*.xml)");
+	string fileName = FileDialog::getOpenFileName("../data", filters, "Choose a file to load", this->parentWidget()->parentWidget(),selectedFilter );
  
 	if (!fileName.empty() && selectedFilter == "XML Yade File (*.xml)")
 		leInputConfigFile->setText(fileName);

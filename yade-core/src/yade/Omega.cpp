@@ -346,7 +346,9 @@ void Omega::loadSimulation()
 {
 	LOCK(Omega::instance().getRootBodyMutex());
 	
-	if( Omega::instance().getSimulationFileName().size() != 0  &&  filesystem::exists(simulationFileName) && filesystem::extension(simulationFileName)==".xml" )
+	if( 	    (Omega::instance().getSimulationFileName().size() != 0)  
+		&&  (filesystem::exists(simulationFileName)) 
+		&&  (filesystem::extension(simulationFileName)==".xml" || filesystem::extension(simulationFileName)==".yade" ))
 	{
 		freeRootBody();
 		logMessage("Loading file " + simulationFileName);
@@ -354,7 +356,11 @@ void Omega::loadSimulation()
 		//{
 		//	LOCK(rootBodyMutex);
 		//	IOFormatManager::loadFromFile("yade-lib-serialization-xml",simulationFileName,"rootBody",rootBody);
-			IOFormatManager::loadFromFile("XMLFormatManager",simulationFileName,"rootBody",rootBody);
+			if(filesystem::extension(simulationFileName)==".xml")
+				IOFormatManager::loadFromFile("XMLFormatManager",simulationFileName,"rootBody",rootBody);
+			else if(filesystem::extension(simulationFileName)==".yade" )
+				IOFormatManager::loadFromFile("BINFormatManager",simulationFileName,"rootBody",rootBody);
+
 			sStartingSimulationTime = second_clock::local_time();
 			msStartingSimulationTime = microsec_clock::local_time();
 			simulationPauseDuration = msStartingSimulationTime-msStartingSimulationTime;
@@ -376,10 +382,14 @@ void Omega::saveSimulation(const string name)
 {
 	LOCK(Omega::instance().getRootBodyMutex());
 	
-	if( name.size() != 0 && filesystem::extension(name)==".xml" )
+	if( 	   (name.size() != 0)
+		&& (filesystem::extension(name)==".xml" || filesystem::extension(name)==".yade") )
 	{
 		logMessage("Saving file " + name);
-		IOFormatManager::saveToFile("XMLFormatManager",name,"rootBody",rootBody);
+		if(filesystem::extension(name)==".xml")
+			IOFormatManager::saveToFile("XMLFormatManager",name,"rootBody",rootBody);
+		else if(filesystem::extension(name)==".yade" )
+			IOFormatManager::saveToFile("BINFormatManager",name,"rootBody",rootBody);
 	}
 	else
 	{

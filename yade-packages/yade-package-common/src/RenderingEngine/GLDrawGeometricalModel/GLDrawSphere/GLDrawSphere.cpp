@@ -81,8 +81,10 @@ void GLDrawSphere::go(const shared_ptr<GeometricalModel>& gm, const shared_ptr<P
 	glColor3v(gm->diffuseColor);
  	if (gm->wire || wire)
  	{
- 		glScalef(radius,radius,radius);
- 		glCallList(glWiredSphereList);
+		//glScalef(radius,radius,radius);
+		//glCallList(glWiredSphereList);
+
+		glutWireSphere(radius,4,4);
  	}
  	else
  	{

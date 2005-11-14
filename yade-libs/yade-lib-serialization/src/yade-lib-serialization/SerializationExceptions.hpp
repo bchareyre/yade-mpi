@@ -46,6 +46,8 @@ struct SerializationExceptions
 	static const char* FundamentalNotSupported;
 	static const char* SmartPointerNotSupported;
 	static const char* ContainerNotSupported;
+	static const char* LexicalCopyBinError;
+	static const char* ExtraCopyError;
 };
 
 #endif //  SERIALIZATIONEXCEPTIONS_HPP

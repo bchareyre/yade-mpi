@@ -36,7 +36,9 @@ QtSphericalDEM::~QtSphericalDEM()
 void QtSphericalDEM::pbPathClicked()
 {
 	string selectedFilter;
-	string fileName = FileDialog::getOpenFileName(".", "XML Yade File (*.xml)", "Choose a file to open", parentWidget()->parentWidget(), selectedFilter );
+	std::vector<string> filters;
+	filters.push_back("XML Yade File (*.xml)");
+	string fileName = FileDialog::getOpenFileName(".", filters, "Choose a file to open", parentWidget()->parentWidget(), selectedFilter );
 		
 	if (fileName.size()!=0 && selectedFilter == "XML Yade File (*.xml)" )
 		leConfigurationFile->setText(fileName.c_str());

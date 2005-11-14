@@ -16,6 +16,7 @@ clean:
 	$(MAKE) -C yade-lib-time clean
 	$(MAKE) -C yade-lib-opengl clean
 	$(MAKE) -C yade-lib-serialization-xml clean
+	$(MAKE) -C yade-lib-serialization-bin clean
 	$(MAKE) -C yade-lib-serialization-qt clean
 	$(MAKE) -C yade-lib-qhull clean
 	$(MAKE) -C yade-lib-swiftpp clean
@@ -54,6 +55,9 @@ compile_install:
 	$(MAKE) -C yade-lib-serialization-xml
 	$(MAKE) -C yade-lib-serialization-xml install
 	
+	$(MAKE) -C yade-lib-serialization-bin
+	$(MAKE) -C yade-lib-serialization-bin install
+	
 	$(MAKE) -C yade-lib-serialization-qt
 	$(MAKE) -C yade-lib-serialization-qt install
 	
@@ -75,6 +79,7 @@ uninstall:
 	$(MAKE) -C yade-lib-time uninstall
 	$(MAKE) -C yade-lib-opengl uninstall
 	$(MAKE) -C yade-lib-serialization-xml uninstall
+	$(MAKE) -C yade-lib-serialization-bin uninstall
 	$(MAKE) -C yade-lib-serialization-qt uninstall
 	$(MAKE) -C yade-lib-qhull uninstall
 	$(MAKE) -C yade-lib-swiftpp uninstall

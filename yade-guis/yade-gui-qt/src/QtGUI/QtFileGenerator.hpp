@@ -19,10 +19,11 @@
 class QtFileGenerator : public QtFileGeneratorController, public Factorable
 {
 	private :
-		QtGUIGenerator guiGen;	
-		QScrollView * scrollView;
-		QFrame * scrollViewFrame;
-		QVBoxLayout* scrollViewLayout;
+		QtGUIGenerator	guiGen;	
+		QScrollView *	scrollView;
+		QFrame *	scrollViewFrame;
+		QVBoxLayout*	scrollViewLayout;
+		void setSerializationName(string);
 
 	public :
 		QtFileGenerator (QWidget * parent = 0, const char * name = 0 );
@@ -31,6 +32,7 @@ class QtFileGenerator : public QtFileGeneratorController, public Factorable
 	public slots :
 		virtual void pbChooseClicked(); 
 		virtual void cbGeneratorNameActivated(const QString& s);
+		virtual void cbSerializationNameActivated(const QString& s);
 		virtual void pbGenerateClicked(); 
 		virtual void pbCloseClicked();
 		virtual void pbLoadClicked();

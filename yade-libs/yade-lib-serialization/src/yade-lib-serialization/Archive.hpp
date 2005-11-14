@@ -100,7 +100,7 @@ class Archive
 	*/
 	public    : PointedNewArchiveFnPtr createNewPointedArchive;
 
-	/*! Pointer to a function that convert a fundamental type (int,float,string...) to
+	/*! Pointer to a function that converts a fundamental type (int,float,string...) to
 	a string (for text output format) or vector<unsigned char> (for binary output format)
 		\param ac the Archive representing the fundamental attribute
 		\param a  contains a pointer to the string or vector<unsigned char> that will be filled
@@ -170,9 +170,9 @@ class Archive
 	public    : virtual ~Archive();
 
 	/*! Factory used to construct an Archive object.
-	\param name Name of the attributes
-	\param attribute the attribute from which the Archive will be constructed
-	\return a pointer to the constructed archive
+	\param name 		Name of the attributes
+	\param attribute 	the attribute from which the Archive will be constructed
+	\returns 		a pointer to the constructed archive
 	*/
 	public    : template<typename Type>
 	 	    static inline shared_ptr<Archive> create(const string& name,Type& attribute);

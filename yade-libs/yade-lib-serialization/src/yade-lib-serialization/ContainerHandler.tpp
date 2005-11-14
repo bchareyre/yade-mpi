@@ -142,8 +142,8 @@ struct ContainerHandler<std::list<ContainedType> >
 		}
 
 		if(it != itEnd )
-		{// FIXME, why "[" is HERE ? it belongs to XMLManger! it is not generic. if somebody else wants to use this Serialization - he will not do that, because of this.
-			string name = ac.getName()/*+"["+lexical_cast<string>(i)+"]"*/;
+		{
+			string name = ac.getName();
 			nextAc = Archive::create(name,(*it));
 			++it;
 			++i;
