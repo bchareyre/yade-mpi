@@ -22,7 +22,7 @@ XmlSaxParser::~XmlSaxParser ()
 
 unsigned long int XmlSaxParser::getLineNumber()
 {
-	return lineNumber;
+	return (lineNumber-1);
 }
 
 
@@ -62,8 +62,6 @@ string XmlSaxParser::readNextFundamentalStringValue(istream& stream)
 
 bool XmlSaxParser::readNextXmlLine(istream& stream)
 {
-	++lineNumber;
-
 	int i;
 	string line;
 	bool comment=true;
@@ -75,12 +73,16 @@ bool XmlSaxParser::readNextXmlLine(istream& stream)
 		{
 			line[0] = stream.get();
 			while (!stream.eof() && line[0]!='<')
+			{
+				if(line[0]=='\n') ++lineNumber;
 				line[0] = stream.get();
+			}
 			i=0;
 			while (!stream.eof() && line[i]!='>')
 			{
 				i++;
 				line.push_back(stream.get());
+				if(line[line.size()-1]=='\n') ++lineNumber;
 			}
 
 			if (line.size()==1)
@@ -146,7 +148,6 @@ void XmlSaxParser::parseCurrentXmlLine()
 			argNameStop--;
 		argNameStart = argNameStop;
 	}
-
 }
 
 

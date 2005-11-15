@@ -17,16 +17,16 @@ XmlSaxParser XMLFormatManager::saxParser;
 XMLFormatManager::XMLFormatManager() : IOFormatManager()
 {
 	Archive::addSerializablePointer(SerializableTypes::SERIALIZABLE , false, serializeSerializable, deserializeSerializable);
-	Archive::addSerializablePointer(SerializableTypes::POINTER      , false, serializeSmartPointer, deserializeSmartPointer);
-	Archive::addSerializablePointer(SerializableTypes::CONTAINER    , false, serializeContainer, deserializeContainer);
-	Archive::addSerializablePointer(SerializableTypes::FUNDAMENTAL  , true , IOFormatManager::serializeFundamental, deserializeFundamental);
-
-	Archive::addSerializablePointer(SerializableTypes::CUSTOM_CLASS , false, IOFormatManager::serializeCustomClass, IOFormatManager::deserializeCustomClass);
-	Archive::addSerializablePointer(SerializableTypes::FUNDAMENTAL  , true , IOFormatManager::serializeFundamental, IOFormatManager::deserializeFundamental);
-	Archive::addSerializablePointer(SerializableTypes::POINTER      , true , IOFormatManager::serializeSmartPointerOfFundamental, IOFormatManager::deserializeSmartPointerOfFundamental);
-	Archive::addSerializablePointer(SerializableTypes::CONTAINER    , true , IOFormatManager::serializeContainerOfFundamental, IOFormatManager::deserializeContainerOfFundamental);
-	Archive::addSerializablePointer(SerializableTypes::CUSTOM_CLASS , true , IOFormatManager::serializeCustomFundamental, IOFormatManager::deserializeCustomFundamental);
 	Archive::addSerializablePointer(SerializableTypes::SERIALIZABLE , true , IOFormatManager::serializeFundamentalSerializable, IOFormatManager::deserializeFundamentalSerializable);
+	Archive::addSerializablePointer(SerializableTypes::CONTAINER    , false, serializeContainer, deserializeContainer);
+	Archive::addSerializablePointer(SerializableTypes::CONTAINER    , true , IOFormatManager::serializeContainerOfFundamental, IOFormatManager::deserializeContainerOfFundamental);
+
+	Archive::addSerializablePointer(SerializableTypes::POINTER      , true , IOFormatManager::serializeSmartPointerOfFundamental, IOFormatManager::deserializeSmartPointerOfFundamental);
+	Archive::addSerializablePointer(SerializableTypes::POINTER      , false, serializeSmartPointer, deserializeSmartPointer);
+	Archive::addSerializablePointer(SerializableTypes::CUSTOM_CLASS , true , IOFormatManager::serializeCustomFundamental, IOFormatManager::deserializeCustomFundamental);
+	Archive::addSerializablePointer(SerializableTypes::CUSTOM_CLASS , false, IOFormatManager::serializeCustomClass, IOFormatManager::deserializeCustomClass);
+	
+	Archive::addSerializablePointer(SerializableTypes::FUNDAMENTAL  , true , IOFormatManager::serializeFundamental, XMLFormatManager::deserializeFundamental);
 	
 	setContainerOpeningBracket('[');
 	setContainerClosingBracket(']');
@@ -315,7 +315,7 @@ void XMLFormatManager::deserializeFundamental(istream& stream, Archive& ac, cons
 	}
 	catch(boost::bad_lexical_cast& )
 	{
-		string error=string(IOManagerExceptions::BadAttributeValue) + " (bad lexical_cast) " + saxParser.getTagName() + " line: " + lexical_cast<string>(saxParser.getLineNumber());
+		string error=string(IOManagerExceptions::BadAttributeValue) + " (bad lexical_cast), Tag: \"" + saxParser.getTagName() + + "\", Attribute: \"" + ac.getName() + "\", Line: " + lexical_cast<string>(saxParser.getLineNumber());
 		throw SerializableError(error.c_str());
 	}
 }

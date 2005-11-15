@@ -556,7 +556,8 @@ LIBS += -lboost_thread \
 -lQGLViewer \
 -rdynamic
 INCLUDEPATH += ../src \
-/home/janek/YADE/include/
+/home/janek/YADE/include/ \
+H:\YADE\include\
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
 -pthread
 QMAKE_CXXFLAGS_DEBUG += -lpthread \

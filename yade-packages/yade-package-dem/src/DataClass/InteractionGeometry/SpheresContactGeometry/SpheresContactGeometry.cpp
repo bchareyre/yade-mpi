@@ -24,6 +24,9 @@ SpheresContactGeometry::~SpheresContactGeometry ()
 // 
 // }
 // 
-// void SpheresContactGeometry::registerAttributes()
-// {
-// }
+void SpheresContactGeometry::registerAttributes()
+{
+	REGISTER_ATTRIBUTE(radius1);
+	REGISTER_ATTRIBUTE(radius2);
+}
+

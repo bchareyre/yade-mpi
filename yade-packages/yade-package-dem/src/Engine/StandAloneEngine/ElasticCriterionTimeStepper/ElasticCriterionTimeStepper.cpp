@@ -97,8 +97,8 @@ void ElasticCriterionTimeStepper::findTimeStepFromInteraction(const shared_ptr<I
 	Real rad3 	= std::pow( std::max(interactionGeometry->radius1 , interactionGeometry->radius2 ) , 2); // radius to the power of 2, from sphere
 
 	Real dt = 0.1*min(
-			  sqrt( mass     / abs(sdecContact->kn)      )
-			, sqrt( inertia  / abs(sdecContact->ks*rad3) )
+			  sqrt( mass     / abs(sdecContact->initialKn)      )
+			, sqrt( inertia  / abs(sdecContact->initialKs*rad3) )
 		  );
 
 	newDt = std::min(dt,newDt);

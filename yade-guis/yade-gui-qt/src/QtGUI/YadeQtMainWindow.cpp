@@ -42,10 +42,21 @@ YadeQtMainWindow::YadeQtMainWindow() : YadeQtGeneratedMainWindow()
 		IOFormatManager::saveToFile("XMLFormatManager",yadeQtGUIPrefPath.string(),"preferences",preferences);
 	}
 
-	IOFormatManager::loadFromFile("XMLFormatManager",yadeQtGUIPrefPath.string(),"preferences",preferences);
+	try
+	{
+		IOFormatManager::loadFromFile("XMLFormatManager",yadeQtGUIPrefPath.string(),"preferences",preferences);
+	}
+	catch(SerializableError&)
+	{
+		preferences->mainWindowPositionX	= 50;
+		preferences->mainWindowPositionY	= 50;
+		preferences->mainWindowSizeX		= 1024;
+		preferences->mainWindowSizeY		= 768;
+		IOFormatManager::saveToFile("XMLFormatManager",yadeQtGUIPrefPath.string(),"preferences",preferences);
+	}
 
-			resize(preferences->mainWindowSizeX,preferences->mainWindowSizeY);
-		move(preferences->mainWindowPositionX,preferences->mainWindowPositionY);
+	resize(preferences->mainWindowSizeX,preferences->mainWindowSizeY);
+	move(preferences->mainWindowPositionX,preferences->mainWindowPositionY);
 	
 	addMenu("Edit");
 	addMenu("Preprocessor");

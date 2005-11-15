@@ -247,7 +247,7 @@ void BINFormatManager::serializeContainer(ostream& stream, Archive& ac , int dep
 void BINFormatManager::deserializeContainer(istream& stream, Archive& ac, const string& str)
 {
 //cerr << "+ deserializeContainer start\n"; int cccc=0;
-	unsigned short size;
+	unsigned int size;
 	stream.read(&((reinterpret_cast<char*>(&size))[0]),1);
 	stream.read(&((reinterpret_cast<char*>(&size))[1]),1);
 	stream.read(&((reinterpret_cast<char*>(&size))[2]),1);

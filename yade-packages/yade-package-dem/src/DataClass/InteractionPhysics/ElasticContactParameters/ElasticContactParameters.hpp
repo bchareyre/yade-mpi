@@ -29,6 +29,8 @@ class ElasticContactParameters : public InteractionPhysics
 				,shearForce;			// shear force applied on a DE
 		
 		virtual ~ElasticContactParameters();
+	protected :
+		virtual void registerAttributes();
 
 	REGISTER_CLASS_NAME(ElasticContactParameters);
 	REGISTER_BASE_CLASS_NAME(InteractionPhysics);

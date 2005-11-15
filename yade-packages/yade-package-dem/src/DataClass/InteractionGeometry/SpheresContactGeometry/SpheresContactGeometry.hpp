@@ -24,7 +24,9 @@ class SpheresContactGeometry : public InteractionGeometry
 				,penetrationDepth;
 
 		virtual ~SpheresContactGeometry();
-	
+
+	protected :
+		virtual void registerAttributes();
 	REGISTER_CLASS_NAME(SpheresContactGeometry);
 	REGISTER_BASE_CLASS_NAME(InteractionGeometry);
 };
