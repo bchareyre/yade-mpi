@@ -16,9 +16,6 @@
 
 class LatticeSet2LatticeBeams : public GeometricalModelEngineUnit
 {
-	private :
-		void calcBeamsPositionOrientationNewLength(shared_ptr<Body>& body, const shared_ptr<BodyContainer>& bodies);
-
 	public : 
 		void go(	  const shared_ptr<PhysicalParameters>&
 				, shared_ptr<GeometricalModel>&

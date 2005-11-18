@@ -28,7 +28,7 @@
 #include <yade/yade-package-common/InteractionVecSet.hpp>
 #include <yade/yade-package-common/PhysicalActionVectorVector.hpp>
 
-#include <yade/yade-package-common/TranslationEngine.hpp>
+#include <yade/yade-package-common/DisplacementEngine.hpp>
 #include <yade/yade-package-common/PhysicalParametersMetaEngine.hpp>
 #include <yade/yade-package-common/PhysicalActionApplier.hpp>
 
@@ -44,20 +44,39 @@ LatticeExample::LatticeExample() : FileGenerator()
 	nodeGroupMask 		= 1;
 	beamGroupMask 		= 2;
 	
-	nbNodes 		= Vector3r(4,10,4);
-	disorder 		= 0.23;
-	maxLength 		= 1.7;
+	speciemen_size_in_meters = Vector3r(0.1,0.1,0.0001);
+	cellsizeUnit_in_meters	 = 0.003;
+	minAngle_betweenBeams_deg= 20.0;
+	disorder_in_cellsizeUnit = Vector3r(0.6,0.6,0.0);
+	maxLength_in_cellsizeUnit= 1.9;
+	triangularBaseGrid 	 = true;
+				
+	crit_TensileStrain_percent = 100.0;	// E_min
+	crit_ComprStrain_percent   = 50.0;	// E_max
+			
+	longitudalStiffness_noUnit = 1.0;	// k_l
+	bendingStiffness_noUnit    = 0.0;	// k_b
 	
-	regionA_min 		= Vector3r(-1,-1,-1);
-	regionA_max 		= Vector3r(11,0.6,11);
-	direction_A 		= Vector3r(0,-1,0);
-	velocity_A 		= 0.01;
-	regionB_min 		= Vector3r(-1,8.4,-1);
-	regionB_max 		= Vector3r(11,11,11);
-	direction_B 		= Vector3r(0,1,0);
-	velocity_B 		= 0.01;
+	region_A_min 		= Vector3r(-0.006, 0.096,-1);
+	region_A_max 		= Vector3r( 0.16 , 0.16 , 1);
+	direction_A 		= Vector3r(0,1,0);
+	displacement_A_meters	= 0.0001;
 	
-	maxDeformationSquared 	= 0.0004;
+	region_B_min 		= Vector3r(-0.006,-0.006,-1);
+	region_B_max 		= Vector3r( 0.16 , 0.004, 1);
+	direction_B 		= Vector3r(0,-1,0);
+	displacement_B_meters	= 0.0001;
+
+	region_C_min 		= Vector3r(-0.006, 0.096,-1);
+	region_C_max 		= Vector3r( 0.16 , 0.16 , 1);
+	direction_C 		= Vector3r(0,1,0);
+	displacement_C_meters	= 0.0001;
+	
+	region_D_min 		= Vector3r(-0.006,-0.006,-1);
+	region_D_max 		= Vector3r( 0.16 , 0.004, 1);
+	direction_D 		= Vector3r(0,-1,0);
+	displacement_D_meters	= 0.0001;
+	
 }
 
 
@@ -69,25 +88,38 @@ LatticeExample::~LatticeExample()
 
 void LatticeExample::registerAttributes()
 {
-	REGISTER_ATTRIBUTE(nbNodes); 
-	REGISTER_ATTRIBUTE(disorder);
-	REGISTER_ATTRIBUTE(maxLength);
-//	REGISTER_ATTRIBUTE(stiffness);
-	REGISTER_ATTRIBUTE(regionA_min);
-	REGISTER_ATTRIBUTE(regionA_max);
+	REGISTER_ATTRIBUTE(speciemen_size_in_meters); 	// size
+	REGISTER_ATTRIBUTE(cellsizeUnit_in_meters);	// g [m]  	- cell size
+	REGISTER_ATTRIBUTE(minAngle_betweenBeams_deg); 	// a [deg] 	- min angle
+	REGISTER_ATTRIBUTE(disorder_in_cellsizeUnit); 	// s [-] 	- disorder 
+	REGISTER_ATTRIBUTE(maxLength_in_cellsizeUnit);	// r [-] 	- max beam length
+	
+	REGISTER_ATTRIBUTE(crit_TensileStrain_percent); // E_min [%]    - default 0.02 %
+	REGISTER_ATTRIBUTE(crit_ComprStrain_percent);   // E_max [%]    - default 0.2 %
+	REGISTER_ATTRIBUTE(longitudalStiffness_noUnit); // k_l [-]      - default 1.0
+	REGISTER_ATTRIBUTE(bendingStiffness_noUnit);    // k_b [-]      - default 0.6
+	
+	REGISTER_ATTRIBUTE(triangularBaseGrid); 	// 		- triangles
+	
+	REGISTER_ATTRIBUTE(region_A_min);
+	REGISTER_ATTRIBUTE(region_A_max);
 	REGISTER_ATTRIBUTE(direction_A);
-	REGISTER_ATTRIBUTE(velocity_A);
-	REGISTER_ATTRIBUTE(regionB_min);
-	REGISTER_ATTRIBUTE(regionB_max);
+	REGISTER_ATTRIBUTE(displacement_A_meters);
+	
+	REGISTER_ATTRIBUTE(region_B_min);
+	REGISTER_ATTRIBUTE(region_B_max);
 	REGISTER_ATTRIBUTE(direction_B);
-	REGISTER_ATTRIBUTE(velocity_B);
-//	REGISTER_ATTRIBUTE(regionC_min);
-//	REGISTER_ATTRIBUTE(regionC_max);
-//	REGISTER_ATTRIBUTE(direction_C);
-//	REGISTER_ATTRIBUTE(velocity_C);
-
-	REGISTER_ATTRIBUTE(maxDeformationSquared);
-
+	REGISTER_ATTRIBUTE(displacement_B_meters);
+	
+	REGISTER_ATTRIBUTE(region_C_min);
+	REGISTER_ATTRIBUTE(region_C_max);
+	REGISTER_ATTRIBUTE(direction_C);
+	REGISTER_ATTRIBUTE(displacement_C_meters);
+	
+	REGISTER_ATTRIBUTE(region_D_min);
+	REGISTER_ATTRIBUTE(region_D_max);
+	REGISTER_ATTRIBUTE(direction_D);
+	REGISTER_ATTRIBUTE(displacement_D_meters);
 }
 
 string LatticeExample::generate()
@@ -105,68 +137,126 @@ string LatticeExample::generate()
 	
 	shared_ptr<Body> body;
 	
-	for( int i=0 ; i<nbNodes[0] ; i++ )
-		for( int j=0 ; j<nbNodes[1] ; j++ )
-			for( int k=0 ; k<nbNodes[2] ; k++)
+	Vector3r nbNodes = speciemen_size_in_meters / cellsizeUnit_in_meters;
+	if(triangularBaseGrid)
+		nbNodes[1] *= 1.15471; // bigger by sqrt(3)/2 factor
+/* 
+ * speeding up creation of beams....
+ * 
+
+	vector<vector<vector<unsigned int> > > node_matrix; // matrix that spatially remembers nodes position.
+	node_matrix.resize(nbNodes[0]+1);
+	for( int i=0 ; i<=nbNodes[0] ; i++ )
+	{
+		node_matrix[i].resize(nbNodes[1]+1);
+		for( int j=0 ; j<=nbNodes[1] ; j++ )
+			node_matrix[i][j].resize(nbNodes[2]+1);
+	}
+*/		
+	for( int i=0 ; i<=nbNodes[0] ; i++ )
+		for( int j=0 ; j<=nbNodes[1] ; j++ )
+			for( int k=0 ; k<=nbNodes[2] ; k++)
 			{
 				shared_ptr<Body> node;
-				createNode(node,i,j,k);
-				rootBody->bodies->insert(node);
+				if(createNode(node,i,j,k))
+					rootBody->bodies->insert(node);
 			}
-			
+
 	BodyRedirectionVector bc;
 	bc.clear();
 
 	BodyContainer::iterator bi    = rootBody->bodies->begin();
 	BodyContainer::iterator bi2;
 	BodyContainer::iterator biEnd = rootBody->bodies->end();
-	for(  ; bi!=biEnd ; ++bi )  // loop over all beams
+	int beam_counter = 0;
+	float nodes_a=0;
+	float nodes_all = rootBody->bodies->size();
+	for(  ; bi!=biEnd ; ++bi )  // loop over all nodes, to create beams
 	{
-		shared_ptr<Body> bodyA = *bi;
+		Body* bodyA = (*bi).get(); // first_node
 	
-		cerr << "creating beams: " << bodyA->getId() << endl;
 		bi2 = bi;
 		++bi2;
+		nodes_a+=1.0;
 		
 		for( ; bi2!=biEnd ; ++bi2 )
 		{
-			shared_ptr<Body> bodyB = *bi2;
-			shared_ptr<LatticeNodeParameters> a = dynamic_pointer_cast<LatticeNodeParameters>(bodyA->physicalParameters);
-			shared_ptr<LatticeNodeParameters> b = dynamic_pointer_cast<LatticeNodeParameters>(bodyB->physicalParameters);
-
-			if (a && b && (a->se3.position - b->se3.position).squaredLength() < (maxLength*maxLength))  
+			Body* bodyB = (*bi2).get(); // all other nodes
+			// warning - I'm assuming that there are ONLY Nodes in the rootBody
+			LatticeNodeParameters* a = static_cast<LatticeNodeParameters*>(bodyA->physicalParameters.get());
+			LatticeNodeParameters* b = static_cast<LatticeNodeParameters*>(bodyB->physicalParameters.get());
+			
+			if ((a->se3.position - b->se3.position).squaredLength() < std::pow(maxLength_in_cellsizeUnit*cellsizeUnit_in_meters,2) )  
 			{
 				shared_ptr<Body> beam;
 				createBeam(beam,bodyA->getId(),bodyB->getId());
-				bc.insert(beam);
+				calcBeamPositionOrientationLength(beam);
+				if(checkMinimumAngle(bc,beam))
+				{
+					if( ++beam_counter % 100 == 0 )
+						cerr << "creating beam: " << beam_counter << " , " << ((nodes_a/nodes_all)*100.0)  << " %\n"; 
+					bc.insert(beam);
+				}
 			}
 		}
 	}
 
 	bi    = bc.begin();
 	biEnd = bc.end();
-	for(  ; bi!=biEnd ; ++bi )  // loop over all beams
+	for(  ; bi!=biEnd ; ++bi )  // loop over all newly created beams ...
 	{
 		shared_ptr<Body> b = *bi;
-		rootBody->bodies->insert(b);
+		rootBody->bodies->insert(b); // .. to insert then into rootBody
 	}
 	
-	cerr<< "calcBeamsPositionOrientationLength\n";
-	calcBeamsPositionOrientationLength(rootBody);
-
-	imposeTranslation(rootBody,regionA_min,regionA_max,direction_A,velocity_A);
-	imposeTranslation(rootBody,regionB_min,regionB_max,direction_B,velocity_B);
-//	imposeTranslation(rootBody,regionC_min,regionC_max,direction_C,velocity_C);
+	imposeTranslation(rootBody,region_A_min,region_A_max,direction_A,displacement_A_meters);
+	imposeTranslation(rootBody,region_B_min,region_B_max,direction_B,displacement_B_meters);
+	imposeTranslation(rootBody,region_C_min,region_C_max,direction_C,displacement_C_meters);
+	imposeTranslation(rootBody,region_D_min,region_D_max,direction_D,displacement_D_meters);
 
 	cerr << "finished.. saving\n";
 
- 	return ""; 
+ 	return "Number of nodes created:\n" + lexical_cast<string>(nbNodes[0]) + ","
+	 				    + lexical_cast<string>(nbNodes[1]) + ","
+					    + lexical_cast<string>(nbNodes[2]);
 
 }
 
+/// returns true if angle is bigger than minAngle_betweenBeams_deg
+bool LatticeExample::checkAngle( Vector3r a, Vector3r& b)
+{
+	Quaternionr al;
+	al.align(a,b);
+	Vector3r axis;
+	Real angle;
+	al.toAxisAngle(axis, angle);
+	angle *= 180.0/Mathr::PI ;
+//	cerr << " angle: " << angle << "\n";
+	return angle > minAngle_betweenBeams_deg;
+}
 
+/// returns true if angle is bigger than minAngle_betweenBeams_deg
+bool LatticeExample::checkMinimumAngle(BodyRedirectionVector& bc,shared_ptr<Body>& body)
+{
+	bool answer = true;
+	LatticeBeamParameters* newBeam = static_cast<LatticeBeamParameters*>(body->physicalParameters.get());
+	
+	BodyContainer::iterator bi    = bc.begin();
+	BodyContainer::iterator biEnd = bc.end();
+	for(  ; bi!=biEnd ; ++bi )  // loop over all beams - they MUST be beams, for static_cast<> 
+	{ 
+		LatticeBeamParameters* oldBeam = static_cast<LatticeBeamParameters*>((*bi)->physicalParameters.get());
+		if( 	   (oldBeam->id1 == newBeam->id1)
+			|| (oldBeam->id2 == newBeam->id2))
+			answer = answer && checkAngle(   oldBeam->direction ,  newBeam->direction );
+		if( 	   (oldBeam->id2 == newBeam->id1)
+			|| (oldBeam->id1 == newBeam->id2))
+			answer = answer && checkAngle( - oldBeam->direction ,  newBeam->direction );
+	} 
+	return answer;
+}
 
-void LatticeExample::createNode(shared_ptr<Body>& body, int i, int j, int k)
+bool LatticeExample::createNode(shared_ptr<Body>& body, int i, int j, int k)
 {
 	body = shared_ptr<Body>(new Body(0,nodeGroupMask));
 	shared_ptr<LatticeNodeParameters> physics(new LatticeNodeParameters);
@@ -175,29 +265,37 @@ void LatticeExample::createNode(shared_ptr<Body>& body, int i, int j, int k)
 	Quaternionr q;
 	q.fromAxisAngle( Vector3r(Mathr::unitRandom(),Mathr::unitRandom(),Mathr::unitRandom()) , Mathr::unitRandom()*Mathr::PI );
 	
-	Vector3r position		=   Vector3r(i,j,k)
-					  + Vector3r( 	  Mathr::symmetricRandom()*disorder
-					  		, Mathr::symmetricRandom()*disorder
-							, Mathr::symmetricRandom()*disorder);
+	float  triang_x = triangularBaseGrid ? (static_cast<float>(j%2))*0.5 : 0;
+	double triang_y = triangularBaseGrid ? 0.86602540378443864676        : 1; // sqrt(3)/2
+	
+	Vector3r position		= ( Vector3r(i+triang_x,j*triang_y,k)
+					  + Vector3r( 	  Mathr::symmetricRandom()*disorder_in_cellsizeUnit[0]
+					  		, Mathr::symmetricRandom()*disorder_in_cellsizeUnit[1]
+							, Mathr::symmetricRandom()*disorder_in_cellsizeUnit[2]
+						    ) * 0.5 // *0.5 because symmetricRandom is (-1,1), and disorder is whole size where nodes can appear
+					  )*cellsizeUnit_in_meters;
 
-	Real radius 			= 0.1;
+	if( 	   position[0] >= speciemen_size_in_meters[0] 
+		|| position[1] >= speciemen_size_in_meters[1]
+		|| position[2] >= speciemen_size_in_meters[2] )
+		return false;
+
+	Real radius 			= cellsizeUnit_in_meters*0.05;
 	
 	body->isDynamic			= true;
 	
-	physics->angularVelocity	= Vector3r(0,0,0);
-	physics->velocity		= Vector3r(0,0,0);
-	physics->mass			= 1;
-	physics->inertia		= Vector3r(1,1,1);
 	physics->se3			= Se3r(position,q);
 
 	gSphere->radius			= radius;
-	gSphere->diffuseColor		= Vector3f(0.5,0.5,0.5);
+	gSphere->diffuseColor		= Vector3f(0.8,0.8,0.8);
 	gSphere->wire			= false;
 	gSphere->visible		= true;
-	gSphere->shadowCaster		= true;
+	gSphere->shadowCaster		= false;
 	
 	body->geometricalModel		= gSphere;
 	body->physicalParameters	= physics;
+	
+	return true;
 }
 
 
@@ -207,61 +305,51 @@ void LatticeExample::createBeam(shared_ptr<Body>& body, unsigned int i, unsigned
 	shared_ptr<LatticeBeamParameters> physics(new LatticeBeamParameters);
 	shared_ptr<LineSegment> gBeam(new LineSegment);
 	
-	Real length 			= 0.6;
+	Real length 			= 1.0; // unspecified for now, calcBeamsPositionOrientationLength will calculate it
 	
 	body->isDynamic			= true;
 	
-	physics->angularVelocity	= Vector3r(0,0,0);
-	physics->velocity		= Vector3r(0,0,0);
-	physics->mass			= 1; // FIXME
-	physics->inertia		= Vector3r(1,1,1); // FIXME
 	physics->id1 			= i;
 	physics->id2 			= j;
 
 	gBeam->length			= length;
-//	gBeam->diffuseColor		= Vector3f(Mathf::unitRandom(),Mathf::unitRandom(),Mathf::unitRandom());
-	gBeam->diffuseColor		= Vector3f(0.8,0.8,0.8);
+	gBeam->diffuseColor		= Vector3f(0.6,0.6,0.6);
 	gBeam->wire			= false;
 	gBeam->visible			= true;
-	gBeam->shadowCaster		= true;
+	gBeam->shadowCaster		= false;
 	
 	body->geometricalModel		= gBeam;
 	body->physicalParameters	= physics;
 }
 
 
-void LatticeExample::calcBeamsPositionOrientationLength(shared_ptr<MetaBody>& body)
+void LatticeExample::calcBeamPositionOrientationLength(shared_ptr<Body>& body)
 {
-	BodyContainer::iterator bi    = body->bodies->begin();
-	BodyContainer::iterator biEnd = body->bodies->end();
-	for(  ; bi!=biEnd ; ++bi )  // loop over all beams
-	{
-		shared_ptr<Body> body = *bi;
-		if( body->getGroupMask() & beamGroupMask )
-		{
-			cerr << "calcBeamsPositionOrientationLength: " << body->getId() << endl;
-			
-			LatticeBeamParameters* beam = static_cast<LatticeBeamParameters*>(body->physicalParameters.get());
-			shared_ptr<Body>& bodyA = (*(rootBody->bodies))[beam->id1];
-			shared_ptr<Body>& bodyB = (*(rootBody->bodies))[beam->id2];
-			Se3r& se3A 		= bodyA->physicalParameters->se3;
-			Se3r& se3B 		= bodyB->physicalParameters->se3;
-			
-			Se3r se3Beam;
-			se3Beam.position 	= (se3A.position + se3B.position)*0.5;
-			Vector3r dist 		= se3A.position - se3B.position;
-			
-			Real length 		= dist.normalize();
-			beam->length 		= length;
-			beam->initialLength 	= length;
-			
-			se3Beam.orientation.align( Vector3r::UNIT_X , dist );
-			beam->se3 		= se3Beam;
-		}
-	}
+	LatticeBeamParameters* beam = static_cast<LatticeBeamParameters*>(body->physicalParameters.get());
+	shared_ptr<Body>& bodyA = (*(rootBody->bodies))[beam->id1];
+	shared_ptr<Body>& bodyB = (*(rootBody->bodies))[beam->id2];
+	Se3r& se3A 		= bodyA->physicalParameters->se3;
+	Se3r& se3B 		= bodyB->physicalParameters->se3;
+	
+	Se3r se3Beam;
+	se3Beam.position 	= (se3A.position + se3B.position)*0.5;
+	Vector3r dist 		= se3A.position - se3B.position;
+	
+	Real length 		= dist.normalize();
+	beam->direction 	= dist;
+	beam->initialDirection 	= dist;
+	beam->length 		= length;
+	beam->initialLength 	= length;
+	
+	beam->criticalTensileStrain 	= crit_TensileStrain_percent/100.0;
+	beam->criticalCompressiveStrain = crit_ComprStrain_percent/100.0;
+	beam->longitudalStiffness 	= longitudalStiffness_noUnit;
+	beam->bendingStiffness 		= bendingStiffness_noUnit;
+	
+	se3Beam.orientation.align( Vector3r::UNIT_X , dist );
+	beam->se3 		= se3Beam;
+	beam->previousSe3 	= se3Beam;
 }
-
-
 
 void LatticeExample::createActors(shared_ptr<MetaBody>& )
 {
@@ -271,31 +359,16 @@ void LatticeExample::createActors(shared_ptr<MetaBody>& )
 	shared_ptr<GeometricalModelMetaEngine> geometricalModelDispatcher	= shared_ptr<GeometricalModelMetaEngine>(new GeometricalModelMetaEngine);
 	geometricalModelDispatcher->add("LatticeSetParameters","LatticeSetGeometry","LatticeSet2LatticeBeams");
 	
-//	shared_ptr<PhysicalParametersMetaEngine> positionIntegrator(new PhysicalParametersMetaEngine);
-//	positionIntegrator->add("ParticleParameters","LeapFrogPositionIntegrator");
-	
-//	shared_ptr<PhysicalActionApplier> applyActionDispatcher(new PhysicalActionApplier);
-//	applyActionDispatcher->add("Force","ParticleParameters","NewtonsForceLaw");
-	
-//	shared_ptr<PhysicalActionContainerInitializer> actionParameterInitializer(new PhysicalActionContainerInitializer);
-//	actionParameterInitializer->actionParameterNames.push_back("Force");
-//	actionParameterInitializer->actionParameterNames.push_back("Momentum"); // FIXME - should be unnecessery, but BUG in PhysicalActionVectorVector
-	
 	shared_ptr<LatticeLaw> latticeLaw(new LatticeLaw);
 	latticeLaw->nodeGroupMask = nodeGroupMask;
 	latticeLaw->beamGroupMask = beamGroupMask;
-	latticeLaw->maxDispl = maxDeformationSquared;
 
 	rootBody->engines.clear();
 	rootBody->engines.push_back(boundingVolumeDispatcher);
-	rootBody->engines.push_back(geometricalModelDispatcher);
 	rootBody->engines.push_back(latticeLaw);
-//	rootBody->engines.push_back(applyActionDispatcher); // ????
-//	rootBody->engines.push_back(positionIntegrator);
-	
+	rootBody->engines.push_back(geometricalModelDispatcher);
 	
 	rootBody->initializers.clear();
-//	rootBody->initializers.push_back(actionParameterInitializer); // FIXME - should be automatic!
 	rootBody->initializers.push_back(boundingVolumeDispatcher);
 	rootBody->initializers.push_back(geometricalModelDispatcher);
 }	
@@ -332,14 +405,16 @@ void LatticeExample::positionRootBody(shared_ptr<MetaBody>& rootBody)
 }
 	
  
-void LatticeExample::imposeTranslation(shared_ptr<MetaBody>& rootBody, Vector3r min, Vector3r max, Vector3r direction, Real velocity)
+void LatticeExample::imposeTranslation(shared_ptr<MetaBody>& rootBody, Vector3r min, Vector3r max, Vector3r direction, Real displacement)
 {
-	shared_ptr<TranslationEngine> translationCondition = shared_ptr<TranslationEngine>(new TranslationEngine);
- 	translationCondition->velocity  = velocity;
+	shared_ptr<DisplacementEngine> translationCondition = shared_ptr<DisplacementEngine>(new DisplacementEngine);
+ 	translationCondition->displacement  = displacement;
 	direction.normalize();
  	translationCondition->translationAxis = direction;
 	
-	rootBody->engines.push_back(translationCondition);
+	rootBody->engines.push_back((rootBody->engines)[rootBody->engines.size()-1]);
+	(rootBody->engines)[rootBody->engines.size()-2]=(rootBody->engines)[rootBody->engines.size()-3];
+	(rootBody->engines)[rootBody->engines.size()-3]=translationCondition;
 	translationCondition->subscribedBodies.clear();
 	
 	BodyContainer::iterator bi    = rootBody->bodies->begin();
@@ -361,7 +436,7 @@ void LatticeExample::imposeTranslation(shared_ptr<MetaBody>& rootBody, Vector3r 
 				)
 			{
 				b->isDynamic = false;
-				b->geometricalModel->diffuseColor = Vector3f(1,0,0);
+				b->geometricalModel->diffuseColor = Vector3f(0.3,0.3,0.3);
 				translationCondition->subscribedBodies.push_back(b->getId());
 			}
 		}

@@ -21,6 +21,7 @@ NullGUI::NullGUI ()
 	snapshotInterval = -1;
 	snapshotName = "";
 	maxIteration = 0;
+	binary = 0;
 }
 
 
@@ -57,6 +58,7 @@ void NullGUI::help()
 	-m number	- specify maximum number of iterations\n\
 			  ( 0 = unlimited, tested every INTERVAL iteration).\n\
 	-t number	- set time step in seconds, default is 0.01 (FIXME - inside .xml)\n\
+	-b number	- save in binary .yade format instead of .xml\n\
 \n";
 //	-g number	- set gravity, default is 9.81 (FIXME - inside .xml)\n
 }
@@ -67,7 +69,7 @@ int NullGUI::run(int argc, char* argv[])
 
 	int ch;
 	opterr = 0;
-	while( ( ch = getopt(argc,argv,"Hf:s:S:v:pm:t:g:") ) != -1)
+	while( ( ch = getopt(argc,argv,"Hf:s:S:v:pm:t:g:b") ) != -1)
 		switch(ch)
 		{
 			case 'H'	: help(); 						return 1;
@@ -78,6 +80,7 @@ int NullGUI::run(int argc, char* argv[])
 			case 's'	: snapshotInterval = lexical_cast<int>(optarg);		break;
 			case 'S'	: snapshotName = optarg;				break;
 			case 'm'	: maxIteration = lexical_cast<long int>(optarg);	break;
+			case 'b'	: binary = true;	 				break;
 			case 't'	: Omega::instance().setTimeStep
 						(lexical_cast<Real>(optarg));			break;
 //			case 'g'	: Omega::instance().setGravity
@@ -127,11 +130,11 @@ int NullGUI::loop()
 			{
 				// FIXME - call Omega::instance().saveSimulation(string);
 				shared_ptr<MetaBody> rootBody = Omega::instance().getRootBody();
-				IOFormatManager::saveToFile(	"XMLFormatManager",
-							"../data/" + snapshotName + "_" + lexical_cast<string>(Omega::instance().getCurrentIteration()) + ".xml",
+				IOFormatManager::saveToFile(	binary?"BINFormatManager":"XMLFormatManager",
+							"../data/" + snapshotName + "_" + lexical_cast<string>(Omega::instance().getCurrentIteration()) + (binary?".yade":".xml"),
 							"rootBody",
 							rootBody);
-				cerr << "saved snapshot: " << snapshotName + "_" + lexical_cast<string>(Omega::instance().getCurrentIteration()) + ".xml\n";
+				cerr << "saved snapshot: " << snapshotName + "_" + lexical_cast<string>(Omega::instance().getCurrentIteration()) + (binary?".yade\n":".xml\n");
 			}
 		}
 

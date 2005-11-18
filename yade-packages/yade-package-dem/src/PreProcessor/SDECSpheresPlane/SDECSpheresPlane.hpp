@@ -15,6 +15,7 @@ class SDECSpheresPlane : public FileGenerator
 {
 	private :
 		Vector3r	 nbSpheres
+				,disorder
 				,groundSize
 				,gravity;
 
@@ -25,7 +26,6 @@ class SDECSpheresPlane : public FileGenerator
 				,density
 				,maxRadius
 				,dampingForce
-				,disorder
 				,dampingMomentum
 				,spheresHeight
 				,sphereYoungModulus

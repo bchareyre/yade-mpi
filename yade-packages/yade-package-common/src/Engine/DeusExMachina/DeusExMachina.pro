@@ -6,7 +6,8 @@ error( "YADE_QMAKE_PATH internal qmake variable is not set, you should run for e
 SUBDIRS += ForceEngine \
            GravityEngine \
            RotationEngine \
-           TranslationEngine 
+           TranslationEngine \
+	   DisplacementEngine
 CONFIG += debug \
           thread \
 warn_on

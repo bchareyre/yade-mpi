@@ -9,14 +9,27 @@
 #ifndef LATTICE_BEAM_PARAMETERS_HPP
 #define LATTICE_BEAM_PARAMETERS_HPP 
 
-#include <yade/yade-package-common/RigidBodyParameters.hpp>
+#include <yade/yade-core/PhysicalParameters.hpp>
 
-class LatticeBeamParameters : public RigidBodyParameters
+class LatticeBeamParameters : public PhysicalParameters 
 {
 	public :
-		unsigned int 	id1,id2;
-		Real  		initialLength,length;
-		Vector3r 	direction;
+		unsigned int 	 id1
+				,id2;
+				
+		Real  		 initialLength
+				,length;
+				
+		Vector3r 	 initialDirection
+				,direction;
+				
+		Real 		 criticalTensileStrain
+				,criticalCompressiveStrain
+				
+				,longitudalStiffness
+				,bendingStiffness;
+				
+		Se3r 		 previousSe3;
 	
 		LatticeBeamParameters();
 		virtual ~LatticeBeamParameters();
@@ -25,10 +38,10 @@ class LatticeBeamParameters : public RigidBodyParameters
 	protected :
 		void registerAttributes();
 	REGISTER_CLASS_NAME(LatticeBeamParameters);
-	REGISTER_BASE_CLASS_NAME(RigidBodyParameters);
+	REGISTER_BASE_CLASS_NAME(PhysicalParameters);
 	
 /// Indexable
-	REGISTER_CLASS_INDEX(LatticeBeamParameters,RigidBodyParameters);
+	REGISTER_CLASS_INDEX(LatticeBeamParameters,PhysicalParameters);
 
 };
 

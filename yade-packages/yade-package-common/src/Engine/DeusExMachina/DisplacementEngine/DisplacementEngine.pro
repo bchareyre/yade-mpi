@@ -3,11 +3,14 @@ error( "YADE_QMAKE_PATH internal qmake variable is not set, you should run for e
 }
 
 
-LIBS += -lyade-lib-wm3-math \
-        -lyade-lib-multimethods \
+LIBS += -lyade-lib-factory \
+        -lyade-lib-wm3-math \
         -lyade-lib-serialization \
+        -lyade-lib-multimethods \
         -rdynamic 
-QMAKE_LIBDIR = $${YADE_QMAKE_PATH}/lib/yade/yade-libs/ 
+INCLUDEPATH += $${YADE_QMAKE_PATH}/include/
+QMAKE_LIBDIR = ../../../../bin \
+               $${YADE_QMAKE_PATH}/lib/yade/yade-libs/ 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 
 QMAKE_CXXFLAGS_DEBUG += -lpthread \
@@ -18,7 +21,5 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
-HEADERS += LatticeBeamParameters.hpp 
-SOURCES += LatticeBeamParameters.cpp 
-INCLUDEPATH += $${YADE_QMAKE_PATH}/include
-
+HEADERS += DisplacementEngine.hpp 
+SOURCES += DisplacementEngine.cpp 

@@ -8,7 +8,7 @@
 
 #include "LatticeNodeParameters.hpp"
 
-LatticeNodeParameters::LatticeNodeParameters() : RigidBodyParameters()
+LatticeNodeParameters::LatticeNodeParameters() : PhysicalParameters()
 {
 	createIndex();
 	
@@ -23,7 +23,6 @@ LatticeNodeParameters::~LatticeNodeParameters()
 
 void LatticeNodeParameters::registerAttributes()
 {
-	RigidBodyParameters::registerAttributes();
-//	REGISTER_ATTRIBUTE(length);
+	PhysicalParameters::registerAttributes();
 }
 

@@ -22,6 +22,7 @@ class GLViewer : public QGLViewer
 		QGLThread		qglThread;
 		GLWindowsManager	wm;
 		int			viewId;
+		bool 			drawGrid;
 	
 	public :
 		GLViewer (int id, shared_ptr<RenderingEngine> renderer, const QGLFormat& format, QWidget * parent=0, QGLWidget * shareWidget=0);
@@ -44,6 +45,7 @@ class GLViewer : public QGLViewer
 		void mouseReleaseEvent(QMouseEvent *e);
 		void keyPressEvent(QKeyEvent *e);
 		void mouseDoubleClickEvent(QMouseEvent *e);
+		void postDraw();
 	
 	public slots :
 		void updateGL();

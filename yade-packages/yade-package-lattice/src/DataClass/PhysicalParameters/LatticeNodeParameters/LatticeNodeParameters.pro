@@ -3,13 +3,11 @@ error( "YADE_QMAKE_PATH internal qmake variable is not set, you should run for e
 }
 
 
-LIBS += -lRigidBodyParameters \
-        -lyade-lib-wm3-math \
+LIBS += -lyade-lib-wm3-math \
         -lyade-lib-multimethods \
         -lyade-lib-serialization \
         -rdynamic 
-QMAKE_LIBDIR = $${YADE_QMAKE_PATH}/lib/yade/yade-package-common/ \
-               $${YADE_QMAKE_PATH}/lib/yade/yade-libs/ 
+QMAKE_LIBDIR = $${YADE_QMAKE_PATH}/lib/yade/yade-libs/ 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 
 QMAKE_CXXFLAGS_DEBUG += -lpthread \

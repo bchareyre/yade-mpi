@@ -9,13 +9,13 @@
 #ifndef LATTICE_NODE_PARAMETERS_HPP
 #define LATTICE_NODE_PARAMETERS_HPP 
 
-#include <yade/yade-package-common/RigidBodyParameters.hpp>
+#include <yade/yade-core/PhysicalParameters.hpp>
 
-class LatticeNodeParameters : public RigidBodyParameters
+class LatticeNodeParameters : public PhysicalParameters 
 {
 	public : 
-		Real count;
-		Vector3r displacement;
+		Real 		count;
+		Vector3r 	displacement;
 	
 		LatticeNodeParameters();
 		virtual ~LatticeNodeParameters();
@@ -24,10 +24,10 @@ class LatticeNodeParameters : public RigidBodyParameters
 	protected :
 		void registerAttributes();
 	REGISTER_CLASS_NAME(LatticeNodeParameters);
-	REGISTER_BASE_CLASS_NAME(RigidBodyParameters);
+	REGISTER_BASE_CLASS_NAME(PhysicalParameters);
 	
 /// Indexable
-	REGISTER_CLASS_INDEX(LatticeNodeParameters,RigidBodyParameters);
+	REGISTER_CLASS_INDEX(LatticeNodeParameters,PhysicalParameters);
 
 };
 

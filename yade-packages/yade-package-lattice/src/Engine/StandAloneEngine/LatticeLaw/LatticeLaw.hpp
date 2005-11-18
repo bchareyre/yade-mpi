@@ -10,7 +10,9 @@
 #define LATTICELAW_HPP
 
 
+#include "LatticeBeamParameters.hpp"
 #include <yade/yade-core/InteractionSolver.hpp>
+#include <yade/yade-core/BodyContainer.hpp>
 
 
 class PhysicalAction;
@@ -23,13 +25,15 @@ class LatticeLaw : public InteractionSolver
 	
 	private :
 		shared_ptr<PhysicalAction> actionForce;
+		vector<unsigned int> futureDeletes;
+		
+		bool deleteBeam(MetaBody* lattice , LatticeBeamParameters* beam , Real stretch);
+		void calcBeamsPositionOrientationNewLength(Body* body, BodyContainer* bodies);
 
 	public :
 		int	 nodeGroupMask
 			,beamGroupMask;
-
-		Real	 maxDispl;
-
+		
 		LatticeLaw();
 		virtual ~LatticeLaw();
 		void action(Body* body);

@@ -26,6 +26,7 @@ class NullGUI : public FrontEnd
 				,snapshotInterval;
 
 		bool 		 progress;
+		bool 		 binary;
 		string		 snapshotName;
 		long int	 maxIteration;
 		

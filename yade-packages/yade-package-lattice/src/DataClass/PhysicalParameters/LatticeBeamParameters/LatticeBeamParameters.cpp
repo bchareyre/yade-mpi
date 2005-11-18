@@ -9,7 +9,7 @@
 #include "LatticeBeamParameters.hpp"
 
 
-LatticeBeamParameters::LatticeBeamParameters() : RigidBodyParameters()
+LatticeBeamParameters::LatticeBeamParameters() : PhysicalParameters()
 {
 	createIndex();
 }
@@ -23,9 +23,21 @@ LatticeBeamParameters::~LatticeBeamParameters()
 
 void LatticeBeamParameters::registerAttributes()
 {
-	RigidBodyParameters::registerAttributes();
+	PhysicalParameters::registerAttributes();
 	REGISTER_ATTRIBUTE(id1);
 	REGISTER_ATTRIBUTE(id2);
+	
 	REGISTER_ATTRIBUTE(initialLength);
 	REGISTER_ATTRIBUTE(length);
+	
+	REGISTER_ATTRIBUTE(direction);
+	REGISTER_ATTRIBUTE(initialDirection);
+	
+	REGISTER_ATTRIBUTE(criticalTensileStrain);
+	REGISTER_ATTRIBUTE(criticalCompressiveStrain);
+	
+	REGISTER_ATTRIBUTE(longitudalStiffness);
+	REGISTER_ATTRIBUTE(bendingStiffness);
+	
+	REGISTER_ATTRIBUTE(previousSe3)
 }

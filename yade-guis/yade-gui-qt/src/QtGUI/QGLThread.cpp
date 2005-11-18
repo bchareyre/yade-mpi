@@ -112,7 +112,7 @@ void QGLThread::oneLoop()
 	glViewer->postDraw();
 
 	glViewer->swapBuffers();
-	glViewer->doneCurrent ();
+	glViewer->doneCurrent();
 
 }
 

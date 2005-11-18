@@ -20,7 +20,7 @@ LIBS += -lLineSegment \
         -lParticleParameters \
         -lAABB \
         -lSphere \
-        -lTranslationEngine \
+        -lDisplacementEngine \
         -lLatticeLaw \
         -rdynamic 
 INCLUDEPATH += $${YADE_QMAKE_PATH}/include/ \

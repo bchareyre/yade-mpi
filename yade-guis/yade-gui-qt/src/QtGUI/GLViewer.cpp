@@ -17,7 +17,7 @@
 
 GLViewer::GLViewer(int id, shared_ptr<RenderingEngine> renderer, const QGLFormat& format, QWidget * parent, QGLWidget * shareWidget) : QGLViewer(format,parent,"glview",shareWidget), qglThread(this,renderer)
 {
-
+	drawGrid = false;
 	viewId = id;
 	setAutoBufferSwap(false);
 	resize(320, 240);
@@ -137,9 +137,63 @@ void GLViewer::mouseDoubleClickEvent(QMouseEvent *e)
 
 void GLViewer::keyPressEvent(QKeyEvent *e)
 {
-	if (e->key()=='F' || e->key()=='f')
-		wm.getWindow(0)->swapDisplayed();
-	else
+//	const Qt::ButtonState state = (Qt::ButtonState)(e->state() & Qt::KeyButtonMask);
+	
+	if ( e->key()==Qt::Key_F )
+		wm.getWindow(0)->swapDisplayed(); 
+	else if( e->key()==Qt::Key_G )
+//		if((state != Qt::ShiftButton)
+			drawGrid = !drawGrid;
+//		else
+//			scale = scale+1;
+	else if( e->key()!=Qt::Key_Escape )
 		QGLViewer::keyPressEvent(e);
+}
+
+void GLViewer::postDraw()
+{
+	if( drawGrid )
+	{
+//		glMatrixMode(GL_MODELVIEW);
+		glPushMatrix();
+		glPushAttrib(GL_ALL_ATTRIB_BITS);
+		qglColor(foregroundColor());
+		glDisable(GL_LIGHTING);
+		glLineWidth(0.1);
+		glBegin(GL_LINES);
+	
+		float sizef = QGLViewer::camera()->sceneRadius()*3.0f; 
+		int size = static_cast<int>(sizef);
+		qglviewer::Vec v = QGLViewer::camera()->sceneCenter();
+		int x = static_cast<int>(v[0]); int y = static_cast<int>(v[1]);
+		float xf = (static_cast<int>(v[0]*100.0))/100.0;
+		float yf = (static_cast<int>(v[1]*100.0))/100.0;
+//		float nbSubdivisions = size;
+//		for (int i=0; i<=nbSubdivisions; ++i)
+		for (int i= -size ; i<=size; ++i )
+		{
+//			const float pos = size*(2.0*i/nbSubdivisions-1.0);
+			glVertex2i( i   +x, -size+y);
+			glVertex2i( i   +x, +size+y);
+			glVertex2i(-size+x, i    +y);
+			glVertex2i( size+x, i    +y);
+		}
+		if(sizef <= 2.0)
+		{
+			glColor3f(0.9,0.9,0.9);
+			for (float i= -(static_cast<int>(sizef*100.0))/100.0 ; i<=sizef; i+=0.01 )
+			{
+				glVertex2f( i    +xf, -sizef+yf);
+				glVertex2f( i    +xf, +sizef+yf);
+				glVertex2f(-sizef+xf, i     +yf);
+				glVertex2f( sizef+xf, i     +yf);
+			}
+		}
+		
+		glEnd();
+		glPopAttrib();
+		glPopMatrix();
+	}
+	QGLViewer::postDraw();
 }
 

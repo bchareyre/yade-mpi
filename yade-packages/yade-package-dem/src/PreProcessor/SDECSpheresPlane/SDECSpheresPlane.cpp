@@ -69,7 +69,7 @@ SDECSpheresPlane::SDECSpheresPlane () : FileGenerator()
 	density = 2600;
 	rotationBlocked = false;
 	gravity = Vector3r(0,-9.81,0);
-	disorder = 0.2;
+	disorder = Vector3r(0.2,0.2,0.2);
 	useSpheresAsGround = false;
 	spheresHeight = 0;
 }
@@ -225,7 +225,9 @@ void SDECSpheresPlane::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 	
 	Vector3r position		= Vector3r(i,j+spheresHeight,k)*(2*maxRadius*1.1) // this formula is crazy !!
 					  - Vector3r( nbSpheres[0]/2*(2*maxRadius*1.1) , -7-maxRadius*2 , nbSpheres[2]/2*(2*maxRadius*1.1) )
-					  + Vector3r(Mathr::symmetricRandom(),Mathr::symmetricRandom(),Mathr::symmetricRandom())*disorder*maxRadius;
+					  + Vector3r( 	 Mathr::symmetricRandom()*disorder[0]
+					  		,Mathr::symmetricRandom()*disorder[1]
+							,Mathr::symmetricRandom()*disorder[2])*maxRadius;
 	
 	Real radius 			= (Mathr::intervalRandom(minRadius,maxRadius));
 	
