@@ -16,6 +16,7 @@ class GLDrawBoundingSphere : public GLDrawBoundingVolumeFunctor
 	public :
 		virtual void go(const shared_ptr<BoundingVolume>&);
 
+	RENDERS(BoundingSphere);
 	REGISTER_CLASS_NAME(GLDrawBoundingSphere);	
 	REGISTER_BASE_CLASS_NAME(GLDrawBoundingVolumeFunctor);
 };

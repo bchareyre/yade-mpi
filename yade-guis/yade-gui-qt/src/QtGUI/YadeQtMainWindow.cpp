@@ -31,7 +31,7 @@ YadeQtMainWindow::YadeQtMainWindow() : YadeQtGeneratedMainWindow()
 {
 
 	preferences = shared_ptr<QtGUIPreferences>(new QtGUIPreferences);
-	filesystem::path yadeQtGUIPrefPath = filesystem::path(string(getenv("HOME")) + string("/.yade/QtGUIPreferences.xml"), filesystem::native);
+	filesystem::path yadeQtGUIPrefPath = filesystem::path( Omega::instance().yadeConfigPath + "/QtGUIPreferences.xml", filesystem::native);
 
 	if ( !filesystem::exists( yadeQtGUIPrefPath ) )
 	{
@@ -44,6 +44,7 @@ YadeQtMainWindow::YadeQtMainWindow() : YadeQtGeneratedMainWindow()
 
 	try
 	{
+		cerr << "loading configuration file: " << yadeQtGUIPrefPath.string() << "\n";
 		IOFormatManager::loadFromFile("XMLFormatManager",yadeQtGUIPrefPath.string(),"preferences",preferences);
 	}
 	catch(SerializableError&)
@@ -90,7 +91,7 @@ YadeQtMainWindow::YadeQtMainWindow() : YadeQtGeneratedMainWindow()
 
 YadeQtMainWindow::~YadeQtMainWindow()
 {
-	filesystem::path yadeQtGUIPrefPath = filesystem::path(string(getenv("HOME")) + string("/.yade/QtGUIPreferences.xml"), filesystem::native);
+	filesystem::path yadeQtGUIPrefPath = filesystem::path( Omega::instance().yadeConfigPath + "/QtGUIPreferences.xml", filesystem::native);
 
 	preferences->mainWindowPositionX	= pos().x();
 	preferences->mainWindowPositionY	= pos().y();
@@ -160,6 +161,7 @@ void YadeQtMainWindow::dynamicMenuClicked()
 void YadeQtMainWindow::closeSimulationControllerEvent()
 {
 	delete simulationController;
+	simulationController = 0;
 	fileNewSimulationAction->setEnabled(true);
 }
 
@@ -173,7 +175,10 @@ void YadeQtMainWindow::fileExit()
 void YadeQtMainWindow::closeEvent(QCloseEvent *e)
 {
 	if (simulationController)
+	{
 		delete simulationController;
+		simulationController = 0;
+	}
 	YadeQtGeneratedMainWindow::closeEvent(e);
 }
 

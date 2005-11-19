@@ -214,17 +214,12 @@ bool DynLibManager::error()
 
 string DynLibManager::libNameToSystemName(const string& name)
 {
-	string systemName;
-
+	string systemName; 
 	#ifdef WIN32
-		systemName = name;
-		systemName.append(".dll");
+		systemName = name + ".dll";
 	#else
-		systemName = "lib";
-		systemName.append(name);
-		systemName.append(".so");
+		systemName = "lib" + name + ".so";
 	#endif 
-
 	return systemName;
 }
 

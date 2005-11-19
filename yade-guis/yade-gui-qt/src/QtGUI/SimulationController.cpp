@@ -52,6 +52,22 @@ SimulationController::SimulationController(QWidget * parent) : QtGeneratedSimula
 		guiGen.setShowButtons(false);
 		QSize s = scrollView->size();
 		scrollViewFrame->resize(s.width(),s.height());
+		
+		filesystem::path rendererConfig = filesystem::path( Omega::instance().yadeConfigPath + "/OpenGLRendererPref.xml", filesystem::native);
+		if ( filesystem::exists( rendererConfig ) )
+		{
+			try
+			{
+				cerr << "loading configuration file: " << rendererConfig.string() << "\n";
+				IOFormatManager::loadFromFile("XMLFormatManager",rendererConfig.string(),"renderer",renderer);
+			}
+			catch(SerializableError& e)
+			{
+				shared_ptr<MessageDialog> md = shared_ptr<MessageDialog>(new MessageDialog(rendererConfig.string() + " exists, but cannot be loaded: " + e.what(),this->parentWidget()->parentWidget()));
+				md->exec(); 
+			}
+		}
+		
 		guiGen.buildGUI(renderer, scrollViewFrame);
 		scrollView->addChild(scrollViewFrame);
 	}
@@ -90,6 +106,9 @@ SimulationController::~SimulationController()
 	glViews.clear();
 	
 	Omega::instance().freeRootBody();
+	
+	filesystem::path rendererConfig = filesystem::path( Omega::instance().yadeConfigPath + "/OpenGLRendererPref.xml", filesystem::native);
+	IOFormatManager::saveToFile("XMLFormatManager",rendererConfig.string(),"renderer",renderer);
 }
 
 
@@ -125,7 +144,7 @@ void SimulationController::pbLoadClicked()
 		Omega::instance().setSimulationFileName(fileName);
 		try
 		{
-			Omega::instance().loadSimulation();
+			Omega::instance().loadSimulation(); // expecting throw here.
 			string fullName = string(filesystem::basename(fileName.data()))+string(filesystem::extension(fileName.data()));
 			tlCurrentSimulation->setText(fullName); 
 			Omega::instance().createSimulationLoop();
@@ -149,7 +168,7 @@ void SimulationController::pbLoadClicked()
 				wasUsingTimeStepper = false;
 			}
 		} 
-		catch(SerializableError& e)
+		catch(SerializableError& e) // catching it...
 		{
 			Omega::instance().freeRootBody();
 			shared_ptr<MessageDialog> md = shared_ptr<MessageDialog>(new MessageDialog(e.what(),this->parentWidget()->parentWidget()));
@@ -179,22 +198,34 @@ void SimulationController::pbSaveClicked()
 	filters.push_back("Yade Binary File (*.yade)");
 	filters.push_back("XML Yade File (*.xml)");
 	string fileName = FileDialog::getSaveFileName("../data", filters, "Specify file name to save", parentWorkspace, selectedFilter );
-		
+
 	if ( 	   fileName.size()!=0 
 		&& (selectedFilter == "XML Yade File (*.xml)" || selectedFilter == "Yade Binary File (*.yade)" ) 
-		&& (filesystem::extension(fileName)==".xml" || filesystem::extension(fileName)==".yade" ))
+		&& (filesystem::extension(fileName)==".xml" || filesystem::extension(fileName)==".yade" || filesystem::extension(fileName)=="" )
+		&& (fileName != "")
+		&& (fileName != "/")
+		&& (fileName != "../data"))
 	{
 		map<int,GLViewer*>::iterator gi = glViews.begin();
 		map<int,GLViewer*>::iterator giEnd = glViews.end();
 		for(;gi!=giEnd;++gi)
 			(*gi).second->stopRendering();
 
+		if(filesystem::extension(fileName)=="") // user forgot to specify extension - fix it.
+			fileName += (selectedFilter == "XML Yade File (*.xml)") ? ".xml" : ".yade";
+		
+		cerr << "saving simulation: " << fileName << "\n";
 		Omega::instance().saveSimulation(fileName);
 		
 		gi = glViews.begin();
 		giEnd = glViews.end();
 		for(;gi!=giEnd;++gi)
 			(*gi).second->startRendering();
+	}
+	else
+	{
+		shared_ptr<MessageDialog> md = shared_ptr<MessageDialog>(new MessageDialog("Save failed - bad file extension.",this->parentWidget()->parentWidget()));
+		md->exec(); 
 	}
 }
 

@@ -64,10 +64,13 @@ class Omega : public Singleton<Omega>
 		long int			 currentIteration;
 		Real				 simulationTime;
 		
+		
 		void buildDynlibDatabase(const vector<string>& dynlibsList); // FIXME - maybe in ClassFactory ?
 
 	public :
 		shared_ptr<Preferences> preferences;
+		string 				 yadeConfigPath; // FIXME - must be private and more clean
+		string 				 yadeVersionName; // FIXME - public ?
 	
 		void logMessage(const string& str);
 		void logError(const string& str);

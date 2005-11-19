@@ -15,6 +15,9 @@
 #include <yade/yade-core/PhysicalParameters.hpp>
 
 
+#define RENDERS(name) 							\
+	public : virtual string renders() const { return #name; };
+
 class GLDrawGeometricalModelFunctor : 	public EngineUnit1D
 					<
 		 				void ,
@@ -22,8 +25,8 @@ class GLDrawGeometricalModelFunctor : 	public EngineUnit1D
 					>
 {
 	public : 
-		bool wire; // FIXME - right place ?
 		virtual ~GLDrawGeometricalModelFunctor() {};
+		virtual string renders() const { std::cerr << "unregistered gldraw class.\n"; throw; }; // FIXME - replace that with a nice exception
 	
 	REGISTER_CLASS_NAME(GLDrawGeometricalModelFunctor);
 	REGISTER_BASE_CLASS_NAME(EngineUnit1D);

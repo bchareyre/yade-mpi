@@ -66,7 +66,7 @@ void QtPreferencesEditor::pbDeleteIncludeFolderClicked()
 
 void QtPreferencesEditor::pbIncludePathClicked()
 {
-	leIncludeFolder->setText(FileDialog::getExistingDirectory ( "./","Choose A New Inlude Folder",this->parentWidget()->parentWidget()).c_str());
+	leIncludeFolder->setText(FileDialog::getExistingDirectory ( "./","Choose A New Include Folder",this->parentWidget()->parentWidget()).c_str());
 }
 
 
@@ -150,7 +150,7 @@ bool QtPreferencesEditor::testDirectory(const string& dirName)
 
 void QtPreferencesEditor::loadPreferences()
 {
-	filesystem::path yadeConfigPath = filesystem::path(string(getenv("HOME")) + string("/.yade"), filesystem::native);
+	filesystem::path yadeConfigPath = filesystem::path( Omega::instance().yadeConfigPath, filesystem::native);
 	IOFormatManager::loadFromFile("XMLFormatManager",yadeConfigPath.string()+"/preferences.xml","preferences",Omega::instance().preferences);
 
 	vector<string>::iterator idi    = Omega::instance().preferences->includeDirectories.begin();
@@ -167,7 +167,7 @@ void QtPreferencesEditor::loadPreferences()
 
 void QtPreferencesEditor::savePreferences()
 {
-	filesystem::path yadeConfigPath = filesystem::path(string(getenv("HOME")) + string("/.yade"), filesystem::native);
+	filesystem::path yadeConfigPath = filesystem::path( Omega::instance().yadeConfigPath, filesystem::native);
 
 	Omega::instance().preferences->dynlibDirectories.clear();
 	Omega::instance().preferences->includeDirectories.clear();

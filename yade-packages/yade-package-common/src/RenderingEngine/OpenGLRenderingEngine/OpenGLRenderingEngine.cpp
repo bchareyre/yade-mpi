@@ -28,24 +28,21 @@ OpenGLRenderingEngine::OpenGLRenderingEngine() : RenderingEngine()
 	lightPos		= Vector3r(75.0,130.0,0.0);
 	backGroundColor		= Vector3r(0.2,0.2,0.2);
 	
-	addBoundingVolumeFunctor("AABB","GLDrawAABB");
-	addBoundingVolumeFunctor("BoundingSphere","GLDrawBoundingSphere");
-	
-	addInteractionGeometryFunctor("InteractingSphere","GLDrawInteractingSphere");
-	addInteractionGeometryFunctor("InteractingBox","GLDrawInteractingBox");
-	addInteractionGeometryFunctor("PolyhedralSweptSphere","GLDrawPolyhedralSweptSphere");
-		
-	addGeometricalModelFunctor("Box","GLDrawBox");
-	addGeometricalModelFunctor("Sphere","GLDrawSphere");
-	addGeometricalModelFunctor("Mesh2D","GLDrawMesh2D");
-	addGeometricalModelFunctor("LineSegment","GLDrawLineSegment");
-	addGeometricalModelFunctor("Tetrahedron","GLDrawTetrahedron");
-	
-	addShadowVolumeFunctor("Box","GLDrawBoxShadowVolume");
-	addShadowVolumeFunctor("Sphere","GLDrawSphereShadowVolume");
-	
+	map<string,DynlibDescriptor>::const_iterator di    = Omega::instance().getDynlibsDescriptor().begin();
+	map<string,DynlibDescriptor>::const_iterator diEnd = Omega::instance().getDynlibsDescriptor().end();
+	for(;di!=diEnd;++di)
+	{
+		if (Omega::instance().isInheritingFrom((*di).first,"GLDrawBoundingVolumeFunctor"))
+			addBoundingVolumeFunctor((*di).first);
+		if (Omega::instance().isInheritingFrom((*di).first,"GLDrawInteractingGeometryFunctor"))
+			addInteractingGeometryFunctor((*di).first);
+		if (Omega::instance().isInheritingFrom((*di).first,"GLDrawGeometricalModelFunctor"))
+			addGeometricalModelFunctor((*di).first);
+		if (Omega::instance().isInheritingFrom((*di).first,"GLDrawShadowVolumeFunctor"))
+			addShadowVolumeFunctor((*di).first);
+	}
+
 	postProcessAttributes(true);
-	
 }
 
 OpenGLRenderingEngine::~OpenGLRenderingEngine()
@@ -413,11 +410,6 @@ void OpenGLRenderingEngine::registerAttributes()
 	REGISTER_ATTRIBUTE(useFastShadowVolume);	
 	REGISTER_ATTRIBUTE(drawWireFrame);
 	REGISTER_ATTRIBUTE(drawInside);
-	
-	//REGISTER_ATTRIBUTE(boundingVolumeFunctorNames);
-	//REGISTER_ATTRIBUTE(interactionGeometryFunctorNames);
-	//REGISTER_ATTRIBUTE(geometricalModelFunctorNames);
-	//REGISTER_ATTRIBUTE(shadowVolumeFunctorNames);
 }
 
 
@@ -440,8 +432,9 @@ void OpenGLRenderingEngine::postProcessAttributes(bool deserializing)
 }
 
 
-void OpenGLRenderingEngine::addBoundingVolumeFunctor(const string& str1,const string& str2)
+void OpenGLRenderingEngine::addBoundingVolumeFunctor(const string& str2)
 {
+	string str1 = (static_pointer_cast<GLDrawBoundingVolumeFunctor>(ClassFactory::instance().createShared(str2)))->renders();
 	vector<string> v;
 	v.push_back(str1);
 	v.push_back(str2);
@@ -449,8 +442,9 @@ void OpenGLRenderingEngine::addBoundingVolumeFunctor(const string& str1,const st
 }
 
 
-void OpenGLRenderingEngine::addInteractionGeometryFunctor(const string& str1,const string& str2)
+void OpenGLRenderingEngine::addInteractingGeometryFunctor(const string& str2)
 {
+	string str1 = (static_pointer_cast<GLDrawInteractingGeometryFunctor>(ClassFactory::instance().createShared(str2)))->renders();
 	vector<string> v;
 	v.push_back(str1);
 	v.push_back(str2);
@@ -458,8 +452,9 @@ void OpenGLRenderingEngine::addInteractionGeometryFunctor(const string& str1,con
 }
 
 
-void OpenGLRenderingEngine::addGeometricalModelFunctor(const string& str1,const string& str2)
+void OpenGLRenderingEngine::addGeometricalModelFunctor(const string& str2)
 {
+	string str1 = (static_pointer_cast<GLDrawGeometricalModelFunctor>(ClassFactory::instance().createShared(str2)))->renders();
 	vector<string> v;
 	v.push_back(str1);
 	v.push_back(str2);
@@ -467,8 +462,9 @@ void OpenGLRenderingEngine::addGeometricalModelFunctor(const string& str1,const 
 }
 
 
-void OpenGLRenderingEngine::addShadowVolumeFunctor(const string& str1,const string& str2)
+void OpenGLRenderingEngine::addShadowVolumeFunctor(const string& str2)
 {
+	string str1 = (static_pointer_cast<GLDrawShadowVolumeFunctor>(ClassFactory::instance().createShared(str2)))->renders();
 	vector<string> v;
 	v.push_back(str1);
 	v.push_back(str2);

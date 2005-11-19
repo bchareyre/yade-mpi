@@ -47,10 +47,10 @@ class OpenGLRenderingEngine : public RenderingEngine
 		vector<vector<string> >  shadowVolumeFunctorNames;
 
 	public :
-		void addBoundingVolumeFunctor(const string& str1,const string& str2);
-		void addInteractionGeometryFunctor(const string& str1,const string& str2);
-		void addGeometricalModelFunctor(const string& str1,const string& str2);
-		void addShadowVolumeFunctor(const string& str1,const string& str2);
+		void addBoundingVolumeFunctor(const string& str);
+		void addInteractingGeometryFunctor(const string& str);
+		void addGeometricalModelFunctor(const string& str);
+		void addShadowVolumeFunctor(const string& str);
 			
 		OpenGLRenderingEngine();
 		virtual ~OpenGLRenderingEngine();

@@ -16,6 +16,7 @@ class GLDrawInteractingBox : public GLDrawInteractingGeometryFunctor
 	public :
 		virtual void go(const shared_ptr<InteractingGeometry>&, const shared_ptr<PhysicalParameters>&);
 
+	RENDERS(InteractingBox);
 	REGISTER_CLASS_NAME(GLDrawInteractingBox);
 	REGISTER_BASE_CLASS_NAME(GLDrawInteractingGeometryFunctor);
 };

@@ -27,16 +27,21 @@ class LatticeBeamParameters : public PhysicalParameters
 				,criticalCompressiveStrain
 				
 				,longitudalStiffness
-				,bendingStiffness;
+				,bendingStiffness
+				
+				,strain;
 				
 		Se3r 		 previousSe3;
+		
+		void calcStrain();
 	
 		LatticeBeamParameters();
 		virtual ~LatticeBeamParameters();
 
 /// Serialization
 	protected :
-		void registerAttributes();
+		virtual void postProcessAttributes(bool);
+		virtual void registerAttributes();
 	REGISTER_CLASS_NAME(LatticeBeamParameters);
 	REGISTER_BASE_CLASS_NAME(PhysicalParameters);
 	

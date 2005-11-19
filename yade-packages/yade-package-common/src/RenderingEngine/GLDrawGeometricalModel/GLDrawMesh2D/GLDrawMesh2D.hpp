@@ -16,6 +16,7 @@ class GLDrawMesh2D : public GLDrawGeometricalModelFunctor
 	public :
 		virtual void go(const shared_ptr<GeometricalModel>&, const shared_ptr<PhysicalParameters>&,bool);
 
+	RENDERS(Mesh2D);
 	REGISTER_CLASS_NAME(GLDrawMesh2D);
 	REGISTER_BASE_CLASS_NAME(GLDrawGeometricalModelFunctor);
 

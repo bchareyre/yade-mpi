@@ -16,6 +16,7 @@ class GLDrawMetaInteractingGeometry : public GLDrawInteractingGeometryFunctor
 	public :
 		virtual void go(const shared_ptr<InteractingGeometry>&, const shared_ptr<PhysicalParameters>&);
 
+	RENDERS(MetaInteractingGeometry);
 	REGISTER_CLASS_NAME(GLDrawMetaInteractingGeometry);
 	REGISTER_BASE_CLASS_NAME(GLDrawInteractingGeometryFunctor);
 };

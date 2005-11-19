@@ -16,6 +16,7 @@ class GLDrawPolyhedralSweptSphere : public GLDrawInteractingGeometryFunctor
 	public :
 		virtual void go(const shared_ptr<InteractingGeometry>&, const shared_ptr<PhysicalParameters>&);
 
+	RENDERS(PolyhedralSweptSphere);
 	REGISTER_CLASS_NAME(GLDrawPolyhedralSweptSphere);
 	REGISTER_BASE_CLASS_NAME(GLDrawInteractingGeometryFunctor);
 

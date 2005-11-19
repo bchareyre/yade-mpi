@@ -36,14 +36,14 @@ void LatticeSet2LatticeBeams::go(	  const shared_ptr<PhysicalParameters>& ph
 // FIXME - this copying of length between latticeBeam geometry and physics, inside MetaBody could
 //         be done just once, if length was inside shared_ptr. This can be improved once we make
 //         indexable Parameters: Velocity, Position, Orientation, ....
-			Real strain 			= (beam->length - beam->initialLength) / beam->initialLength;
+			Real strain 			= beam->strain;
 			Real factor;
-			if( strain > 0 ) // FIXME - strain is a property of beam
+			if( strain > 0 )
 				factor 			= strain / beam->criticalTensileStrain; // positive
 			else
 				factor 			= strain / beam->criticalCompressiveStrain; // negative
 			
-			} // compute optimal red/blue colors	
+			{ // compute optimal red/blue colors	
 				maxTensileFactor		= std::max(factor,maxTensileFactor);
 				maxCompressFactor 		= std::min(factor,maxCompressFactor);
 				if(factor > 0 && maxTensileFactor > 0)

@@ -16,6 +16,8 @@
 #include <yade/yade-lib-factory/Factorable.hpp>
 #include <yade/yade-lib-serialization-qt/QtGUIGenerator.hpp>
 
+class FileGenerator;
+
 class QtFileGenerator : public QtFileGeneratorController, public Factorable
 {
 	private :
@@ -24,6 +26,8 @@ class QtFileGenerator : public QtFileGeneratorController, public Factorable
 		QFrame *	scrollViewFrame;
 		QVBoxLayout*	scrollViewLayout;
 		void setSerializationName(string);
+		void setGeneratorName(string n);
+		void displayFileGeneratorAttributes(shared_ptr<FileGenerator>&);
 
 	public :
 		QtFileGenerator (QWidget * parent = 0, const char * name = 0 );

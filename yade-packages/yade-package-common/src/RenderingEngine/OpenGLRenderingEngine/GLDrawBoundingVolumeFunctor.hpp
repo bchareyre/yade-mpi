@@ -13,6 +13,9 @@
 #include <yade/yade-core/BoundingVolume.hpp>
 #include <yade/yade-core/EngineUnit1D.hpp>
 
+#define RENDERS(name) 							\
+	public : virtual string renders() const { return #name; };
+
 class GLDrawBoundingVolumeFunctor : 	public EngineUnit1D
 					<
 		 				void ,
@@ -21,6 +24,7 @@ class GLDrawBoundingVolumeFunctor : 	public EngineUnit1D
 {
 	public :
 		virtual ~GLDrawBoundingVolumeFunctor() {};
+		virtual string renders() const { std::cerr << "unregistered gldraw class.\n"; throw; }; // FIXME - replace that with a nice exception
 
 	REGISTER_CLASS_NAME(GLDrawBoundingVolumeFunctor);
 	REGISTER_BASE_CLASS_NAME(EngineUnit1D);

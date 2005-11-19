@@ -18,7 +18,8 @@
 #include <yade/yade-core/FileGenerator.hpp>
 #include <yade/yade-core/Omega.hpp>
 #include <boost/filesystem/convenience.hpp>
-
+#include <boost/filesystem/operations.hpp>
+#include "MessageDialog.hpp"
 
 QtFileGenerator::QtFileGenerator ( QWidget * parent , const char * name) : QtFileGeneratorController(parent,name)
 {
@@ -69,6 +70,16 @@ void QtFileGenerator::setSerializationName(string n)
 	}
 }
 
+void QtFileGenerator::setGeneratorName(string n)
+{
+	for(int i=0 ; i<cbGeneratorName->count() ; ++i)
+	{
+		cbGeneratorName->setCurrentItem(i);
+		if(cbGeneratorName->currentText() == n)
+			return;
+	}
+}
+
 void QtFileGenerator::pbChooseClicked()
 {
 	string selectedFilter;
@@ -89,14 +100,10 @@ void QtFileGenerator::pbChooseClicked()
 	}
 }
 
-
-void QtFileGenerator::cbGeneratorNameActivated(const QString& s)
+void QtFileGenerator::displayFileGeneratorAttributes(shared_ptr<FileGenerator>& fg)
 {
 	try
-	{
-		//FIXME dynamic_cast is not working ???
-		shared_ptr<FileGenerator> fg = static_pointer_cast<FileGenerator>(ClassFactory::instance().createShared(s));
-
+	{ 
 		guiGen.setResizeHeight(true);
 		guiGen.setResizeWidth(false);
 		guiGen.setShift(10,10);
@@ -123,10 +130,17 @@ void QtFileGenerator::cbGeneratorNameActivated(const QString& s)
 		scrollView->addChild(scrollViewFrame);
 		scrollViewFrame->show();
 	}
-	catch (FactoryError&)
+	catch (FactoryError& e)
 	{
-	
+		shared_ptr<MessageDialog> md = shared_ptr<MessageDialog>(new MessageDialog(string("Error: ") + e.what(),this->parentWidget()->parentWidget()));
+		md->exec();
 	}
+}
+
+void QtFileGenerator::cbGeneratorNameActivated(const QString& name)
+{
+	shared_ptr<FileGenerator> fg = static_pointer_cast<FileGenerator>(ClassFactory::instance().createShared(name));
+	displayFileGeneratorAttributes(fg);
 }
 
 void QtFileGenerator::cbSerializationNameActivated(const QString& s)
@@ -145,9 +159,6 @@ void QtFileGenerator::cbSerializationNameActivated(const QString& s)
 	}
 }
 
-#include <boost/filesystem/operations.hpp>
-#include <boost/filesystem/convenience.hpp>
-#include "MessageDialog.hpp"
 void QtFileGenerator::pbGenerateClicked()
 {
 	// FIXME add some test to avoid crashing
@@ -175,14 +186,67 @@ void QtFileGenerator::pbCloseClicked()
 
 void QtFileGenerator::pbLoadClicked()
 {
-	cerr << "pbLoadClicked\n";
+	shared_ptr<FileGenerator> fg;
+
+	string selectedFilter;
+	std::vector<string> filters;
+	filters.push_back("XML Yade File (*.xml)");
+	string fileName = FileDialog::getOpenFileName("../data", filters, "Choose a FileGenerator configuration to load", this->parentWidget()->parentWidget(), selectedFilter );
+	if ( 	   fileName.size()!=0 
+		&& (selectedFilter == "XML Yade File (*.xml)") 
+		&& filesystem::exists(fileName) 
+		&& (filesystem::extension(fileName)==".xml"))
+	{
+		try
+		{
+			IOFormatManager::loadFromFile("XMLFormatManager",fileName,"fileGenerator",fg); 
+		} 
+		catch(SerializableError& e) // catching it...
+		{
+			shared_ptr<MessageDialog> md = shared_ptr<MessageDialog>(new MessageDialog(string("FileGenerator failed to load: ") + e.what(),this->parentWidget()->parentWidget()));
+			md->exec();
+			return;
+		}
+	}
+	setGeneratorName(fg->getClassName());
+	displayFileGeneratorAttributes(fg);
 }
 
 
 
 void QtFileGenerator::pbSaveClicked()
 {
-	cerr << "pbSaveClicked\n";
+	// FIXME add some test to avoid crashing
+	shared_ptr<FileGenerator> fg = static_pointer_cast<FileGenerator>(ClassFactory::instance().createShared(cbGeneratorName->currentText()));
+	
+	fg->setFileName(leOutputFileName->text());
+	fg->setSerializationLibrary(cbSerializationName->currentText());
+	guiGen.deserialize(fg);
+	
+	string selectedFilter;
+	std::vector<string> filters;
+	filters.push_back("XML Yade File (*.xml)");
+	string title = "Save FileGenerator \"" + fg->getClassName() + "\" configuration";
+	string fileName = FileDialog::getSaveFileName("../data", filters, title, this->parentWidget()->parentWidget(), selectedFilter );
+
+	if ( 	   fileName.size()!=0
+		&& (selectedFilter == "XML Yade File (*.xml)") 
+		&& (filesystem::extension(fileName)==".xml" || filesystem::extension(fileName)=="" )
+		&& (fileName != "")
+		&& (fileName != "/")
+		&& (fileName != "../data"))
+	{
+		if(filesystem::extension(fileName)=="") // user forgot to specify extension - fix it.
+			fileName += ".xml";
+		
+		cerr << "saving FileGenerator configuration: " << fileName << "\n";
+		IOFormatManager::saveToFile("XMLFormatManager",fileName,"fileGenerator",fg); 
+	}
+	else
+	{
+		shared_ptr<MessageDialog> md = shared_ptr<MessageDialog>(new MessageDialog("Save failed - bad file extension.",this->parentWidget()->parentWidget()));
+		md->exec(); 
+	}
 }
 
 

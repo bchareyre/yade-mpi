@@ -54,9 +54,10 @@ void LatticeLaw::registerAttributes()
 	REGISTER_ATTRIBUTE(beamGroupMask);
 }
 
-bool LatticeLaw::deleteBeam(MetaBody* metaBody , LatticeBeamParameters* beam , Real stretch)
+bool LatticeLaw::deleteBeam(MetaBody* metaBody , LatticeBeamParameters* beam)
 {
-	Real strain = stretch / beam->initialLength;
+	beam->calcStrain();
+	Real strain = beam->strain;
 	return 	   strain < -beam->criticalCompressiveStrain
 		|| strain >  beam->criticalTensileStrain;
 }
@@ -111,7 +112,7 @@ void LatticeLaw::action(Body* body)
 		Vector3r  displacement = beam->direction * stretch;
 		
 		{ // check E_min, E_max criterion
-			if( deleteBeam(lattice , beam , stretch) )
+			if( deleteBeam(lattice , beam) ) // calculates strain
 			{
 				futureDeletes.push_back(body->getId());
 				continue;

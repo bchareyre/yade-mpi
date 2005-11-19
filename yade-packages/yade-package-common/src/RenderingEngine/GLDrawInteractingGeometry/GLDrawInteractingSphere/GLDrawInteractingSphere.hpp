@@ -24,6 +24,7 @@ class GLDrawInteractingSphere : public GLDrawInteractingGeometryFunctor
 	public :
 		virtual void go(const shared_ptr<InteractingGeometry>&, const shared_ptr<PhysicalParameters>&);
 
+	RENDERS(InteractingSphere);
 	REGISTER_CLASS_NAME(GLDrawInteractingSphere);
 	REGISTER_BASE_CLASS_NAME(GLDrawInteractingGeometryFunctor);
 };

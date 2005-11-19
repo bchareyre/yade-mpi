@@ -34,7 +34,7 @@ NullGUI::~NullGUI()
 void NullGUI::help()
 {
 	cout <<
-"\nYet Another Dynamic Engine, pre-alpha. NullGUI frontend.\n\
+"\n" << Omega::instance().yadeVersionName << " NullGUI frontend.\n\
 \n\
 	-H		- print this help.\n\
 \n\
@@ -85,8 +85,10 @@ int NullGUI::run(int argc, char* argv[])
 						(lexical_cast<Real>(optarg));			break;
 //			case 'g'	: Omega::instance().setGravity
 //						(Vector3r(0,-lexical_cast<Real>(optarg),0));	break;
-			default		: break;
+			default		:help(); 						return 1;
 		}
+	if(Omega::instance().getSimulationFileName() == "") 
+		help(), exit(0);
 	return loop();
 }
 
@@ -128,13 +130,10 @@ int NullGUI::loop()
 			// save snapshot
 			if( ( snapshotInterval != -1 ) && (intervals % snapshotInterval == 0) )
 			{
-				// FIXME - call Omega::instance().saveSimulation(string);
-				shared_ptr<MetaBody> rootBody = Omega::instance().getRootBody();
-				IOFormatManager::saveToFile(	binary?"BINFormatManager":"XMLFormatManager",
-							"../data/" + snapshotName + "_" + lexical_cast<string>(Omega::instance().getCurrentIteration()) + (binary?".yade":".xml"),
-							"rootBody",
-							rootBody);
-				cerr << "saved snapshot: " << snapshotName + "_" + lexical_cast<string>(Omega::instance().getCurrentIteration()) + (binary?".yade\n":".xml\n");
+				string fileName = "../data/" + snapshotName + "_" + lexical_cast<string>(Omega::instance().getCurrentIteration()) + (binary?".yade":".xml");
+				cerr << "saving snapshot: " << fileName << "   ...";
+				Omega::instance().saveSimulation(fileName);
+				cerr << " done.\n";
 			}
 		}
 

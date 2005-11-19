@@ -20,6 +20,10 @@ LatticeBeamParameters::~LatticeBeamParameters()
 
 }
 
+void LatticeBeamParameters::calcStrain()
+{
+	strain = (length - initialLength) / initialLength; 
+}
 
 void LatticeBeamParameters::registerAttributes()
 {
@@ -41,3 +45,10 @@ void LatticeBeamParameters::registerAttributes()
 	
 	REGISTER_ATTRIBUTE(previousSe3)
 }
+
+void LatticeBeamParameters::postProcessAttributes(bool d)
+{
+	if(d)
+		this->calcStrain();
+}
+

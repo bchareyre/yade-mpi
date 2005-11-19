@@ -27,7 +27,7 @@ class LatticeLaw : public InteractionSolver
 		shared_ptr<PhysicalAction> actionForce;
 		vector<unsigned int> futureDeletes;
 		
-		bool deleteBeam(MetaBody* lattice , LatticeBeamParameters* beam , Real stretch);
+		bool deleteBeam(MetaBody* lattice , LatticeBeamParameters* beam);
 		void calcBeamsPositionOrientationNewLength(Body* body, BodyContainer* bodies);
 
 	public :

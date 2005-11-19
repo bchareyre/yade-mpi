@@ -83,7 +83,7 @@ string XMLFormatManager::beginDeserialization(istream& stream, Archive& ac)
 		saxParser.readAndParseNextXmlLine(stream);
 		if (ac.isFundamental())
 			return saxParser.readNextFundamentalStringValue(stream);
-		else
+		else // FIXME - rootBody loads FileGenerator !! because we should check the name of the variable!
 			return "";
 	}
 	else

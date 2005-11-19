@@ -14,13 +14,18 @@
 #include <yade/yade-core/InteractingGeometry.hpp>
 #include <yade/yade-core/PhysicalParameters.hpp>
 
+#define RENDERS(name) 							\
+	public : virtual string renders() const { return #name; };
+
 class GLDrawInteractingGeometryFunctor :	public EngineUnit1D
 						<
 		 					void ,
 		 					TYPELIST_2(const shared_ptr<InteractingGeometry>&, const shared_ptr<PhysicalParameters>&) 
 						>
 {
-	public : virtual ~GLDrawInteractingGeometryFunctor() {};
+	public :
+		virtual ~GLDrawInteractingGeometryFunctor() {};
+		virtual string renders() const { std::cerr << "unregistered gldraw class.\n"; throw; }; // FIXME - replace that with a nice exception
 	REGISTER_CLASS_NAME(GLDrawInteractingGeometryFunctor);
 	REGISTER_BASE_CLASS_NAME(EngineUnit1D);
 };
