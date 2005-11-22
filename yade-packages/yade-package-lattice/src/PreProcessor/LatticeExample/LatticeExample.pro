@@ -7,6 +7,7 @@ LIBS += -lLineSegment \
         -lLatticeSetParameters \
         -lLatticeBeamParameters \
         -lLatticeNodeParameters \
+	-lLatticeBeamAngularSpring \
         -lPhysicalActionVectorVector \
         -lInteractionVecSet \
         -lBodyRedirectionVector \
@@ -28,7 +29,8 @@ INCLUDEPATH += $${YADE_QMAKE_PATH}/include/ \
                ../../DataClass/PhysicalParameters/LatticeSetParameters \
                ../../DataClass/PhysicalParameters/LatticeNodeParameters \
                ../../DataClass/PhysicalParameters/LatticeBeamParameters \
-               ../../DataClass/GeometricalModel/LineSegment 
+               ../../DataClass/InteractionPhysics/LatticeBeamAngularSpring \
+               ../../DataClass/GeometricalModel/LineSegment
 QMAKE_LIBDIR = ../../../bin \
                ../../../bin \
                $${YADE_QMAKE_PATH}/lib/yade/yade-package-common/ \

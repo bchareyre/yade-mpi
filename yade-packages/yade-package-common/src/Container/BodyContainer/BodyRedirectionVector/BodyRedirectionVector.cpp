@@ -89,20 +89,42 @@ void BodyRedirectionVector::clear()
 
 bool BodyRedirectionVector::erase(unsigned int id)
 {
-	std::vector< shared_ptr<Body> >::iterator tmpVii    = bodies.begin();
-	std::vector< shared_ptr<Body> >::iterator tmpViiEnd = bodies.end();
-	
-	for( ; tmpVii != tmpViiEnd ; ++tmpVii )
-		if(id == (*tmpVii)->getId() )
-		{
-			bodies.erase(tmpVii);
-			indexes[id] = -1;
-			return true;
-		}
+//	std::vector< shared_ptr<Body> >::iterator tmpVii    = bodies.begin();
+//	std::vector< shared_ptr<Body> >::iterator tmpViiEnd = bodies.end();
+//	for( ; tmpVii != tmpViiEnd ; ++tmpVii )
+//		if(id == (*tmpVii)->getId() )
+//		{
+//			bodies.erase(tmpVii); // WRONG - bodies do change their indexes!
+//			indexes[id] = -1;
+//			return true;
+//		}
+//	return false;
 
-	return false;
+	long int deleted = indexes[id];
+	if( deleted != -1 )
+	{
+		std::vector< shared_ptr<Body> >::iterator tmpVii    = bodies.begin(); 
+		tmpVii += deleted;
+//		assert( (*tmpVii)->getId() == id );
+		bodies.erase(tmpVii);
+		indexes[id] = -1;
+		
+		std::vector<long int>::iterator scan = indexes.begin();
+		std::vector<long int>::iterator end  = indexes.end();
+		for( ; scan != end ; ++scan )
+			if( *scan > deleted )
+				--(*scan); 
+		return true;
+	}
+	else
+		return false;
 }
 
+
+bool BodyRedirectionVector::exists(unsigned int id) const
+{
+	return (indexes[id] != -1);
+}
 
 bool BodyRedirectionVector::find(unsigned int id , shared_ptr<Body>& b) const
 {

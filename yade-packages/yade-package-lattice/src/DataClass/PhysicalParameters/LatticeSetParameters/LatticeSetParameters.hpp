@@ -16,7 +16,9 @@
 class LatticeSetParameters : public PhysicalParameters
 {
 	public :
-		int beamGroupMask;
+		int 	 beamGroupMask
+			,nodeGroupMask;
+			
 		LatticeSetParameters();
 		virtual ~LatticeSetParameters();
 

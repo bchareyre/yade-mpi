@@ -102,44 +102,43 @@ void QtFileGenerator::pbChooseClicked()
 
 void QtFileGenerator::displayFileGeneratorAttributes(shared_ptr<FileGenerator>& fg)
 {
-	try
-	{ 
-		guiGen.setResizeHeight(true);
-		guiGen.setResizeWidth(false);
-		guiGen.setShift(10,10);
-		guiGen.setShowButtons(false);
+	guiGen.setResizeHeight(true);
+	guiGen.setResizeWidth(false);
+	guiGen.setShift(10,10);
+	guiGen.setShowButtons(false);
 		
-		QSize s = scrollView->size();
-		QPoint p = scrollView->pos();	
+	QSize s = scrollView->size();
+	QPoint p = scrollView->pos();	
 
-		delete scrollViewFrame;
-		scrollViewFrame = new QFrame();
-		scrollViewFrame->resize(s.width()-17,s.height()); // -17 because of the size of the scrollbar
+	delete scrollViewFrame;
+	scrollViewFrame = new QFrame();
+	scrollViewFrame->resize(s.width()-17,s.height()); // -17 because of the size of the scrollbar
 		
-		gbGeneratorParameters->setTitle(fg->getClassName()+" Parameters");
+	gbGeneratorParameters->setTitle(fg->getClassName()+" Parameters");
 		
-		guiGen.buildGUI(fg,scrollViewFrame);
+	guiGen.buildGUI(fg,scrollViewFrame);
 			
-			
-		if (s.height()>scrollViewFrame->size().height())
-		{
-			scrollViewFrame->setMinimumSize(s.width()-17,s.height());
-			scrollViewFrame->setMaximumSize(s.width()-17,s.height());
-		}
-			
-		scrollView->addChild(scrollViewFrame);
-		scrollViewFrame->show();
+	if (s.height()>scrollViewFrame->size().height())
+	{
+		scrollViewFrame->setMinimumSize(s.width()-17,s.height());
+		scrollViewFrame->setMaximumSize(s.width()-17,s.height());
 	}
+			
+	scrollView->addChild(scrollViewFrame);
+	scrollViewFrame->show();
+}
+
+void QtFileGenerator::cbGeneratorNameActivated(const QString& name)
+{
+//	try { // FIXME - should it be here or not?
+	shared_ptr<FileGenerator> fg = static_pointer_cast<FileGenerator>(ClassFactory::instance().createShared(name));
+/* 	}
 	catch (FactoryError& e)
 	{
 		shared_ptr<MessageDialog> md = shared_ptr<MessageDialog>(new MessageDialog(string("Error: ") + e.what(),this->parentWidget()->parentWidget()));
 		md->exec();
 	}
-}
-
-void QtFileGenerator::cbGeneratorNameActivated(const QString& name)
-{
-	shared_ptr<FileGenerator> fg = static_pointer_cast<FileGenerator>(ClassFactory::instance().createShared(name));
+*/
 	displayFileGeneratorAttributes(fg);
 }
 
@@ -176,13 +175,11 @@ void QtFileGenerator::pbGenerateClicked()
 	md->exec();
 }
 
-
 void QtFileGenerator::pbCloseClicked()
 {
 	close();
 	destroy();
 }
-
 
 void QtFileGenerator::pbLoadClicked()
 {
@@ -211,8 +208,6 @@ void QtFileGenerator::pbLoadClicked()
 	setGeneratorName(fg->getClassName());
 	displayFileGeneratorAttributes(fg);
 }
-
-
 
 void QtFileGenerator::pbSaveClicked()
 {

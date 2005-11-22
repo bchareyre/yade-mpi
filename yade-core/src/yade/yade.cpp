@@ -91,7 +91,7 @@ int main(int argc, char *argv[])
 	int ch;
 	string 	gui 		= "";
 	string 	configPath 	= string(getenv("HOME")) + string("/.yade");
-	// FIXME - we can call setenv to set LD_LIBRARY_PATH, so that yade will be able to load IOFormatManager and ClassFactory by itself
+	
 	bool 	setup 		= false;
 	if( ( ch = getopt(argc,argv,"hnN:wC:c") ) != -1)
 		switch(ch)

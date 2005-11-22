@@ -16,6 +16,7 @@
 #include "SDECLinkedSpheres.hpp"
 
 #include "ElasticContactLaw.hpp"
+#include "ElasticCohesiveLaw.hpp"
 #include "MacroMicroElasticRelationships.hpp"
 #include "BodyMacroParameters.hpp"
 #include "SDECLinkGeometry.hpp"
@@ -211,7 +212,7 @@ string SDECLinkedSpheres::generate()
 	
 	return "total number of permament links created: " 
 		+ lexical_cast<string>(rootBody->persistentInteractions->size()) 
-		+ "\nWARNING: link bonds are currently not working!";
+		+ "\nWARNING: link bonds are nearly working, but the formulas are waiting for total rewrite!";
 }
 
 
@@ -355,6 +356,10 @@ void SDECLinkedSpheres::createActors(shared_ptr<MetaBody>& rootBody)
 	shared_ptr<ElasticContactLaw> constitutiveLaw(new ElasticContactLaw);
 	constitutiveLaw->sdecGroupMask = 55;
 	constitutiveLaw->momentRotationLaw = momentRotationLaw;
+// FIXME FIXME FIXME ....	
+	shared_ptr<ElasticCohesiveLaw> constitutiveLaw2(new ElasticCohesiveLaw);
+	constitutiveLaw2->sdecGroupMask = 55;
+	constitutiveLaw2->momentRotationLaw = momentRotationLaw;
 	
 	rootBody->engines.clear();
 	rootBody->engines.push_back(sdecTimeStepper);
@@ -364,6 +369,7 @@ void SDECLinkedSpheres::createActors(shared_ptr<MetaBody>& rootBody)
 	rootBody->engines.push_back(interactionGeometryDispatcher);
 	rootBody->engines.push_back(interactionPhysicsDispatcher);
 	rootBody->engines.push_back(constitutiveLaw);
+	rootBody->engines.push_back(constitutiveLaw2);
 	rootBody->engines.push_back(gravityCondition);
 	rootBody->engines.push_back(actionDampingDispatcher);
 	rootBody->engines.push_back(applyActionDispatcher);

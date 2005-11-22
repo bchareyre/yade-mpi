@@ -12,6 +12,9 @@
 LatticeBeamParameters::LatticeBeamParameters() : PhysicalParameters()
 {
 	createIndex();
+	count = 0;
+	rotation = Vector3r(0,0,0);
+//	rotation = Quaternionr(0,0,0,0);
 }
 
 
@@ -20,7 +23,7 @@ LatticeBeamParameters::~LatticeBeamParameters()
 
 }
 
-void LatticeBeamParameters::calcStrain()
+void LatticeBeamParameters::calcStrain() // FIXME - replace that with getStrain(), or strain() (finally private variable makes sense :/ )
 {
 	strain = (length - initialLength) / initialLength; 
 }
@@ -32,10 +35,13 @@ void LatticeBeamParameters::registerAttributes()
 	REGISTER_ATTRIBUTE(id2);
 	
 	REGISTER_ATTRIBUTE(initialLength);
-	REGISTER_ATTRIBUTE(length);
+	REGISTER_ATTRIBUTE(length); // FIXME - can be calculated after deserialization
 	
-	REGISTER_ATTRIBUTE(direction);
 	REGISTER_ATTRIBUTE(initialDirection);
+	REGISTER_ATTRIBUTE(direction); // FIXME - can be calculated after deserialization
+	
+//	REGISTER_ATTRIBUTE(initialAngles);
+//	REGISTER_ATTRIBUTE(angles); // FIXME - can be calculated after deserialization
 	
 	REGISTER_ATTRIBUTE(criticalTensileStrain);
 	REGISTER_ATTRIBUTE(criticalCompressiveStrain);
@@ -43,7 +49,7 @@ void LatticeBeamParameters::registerAttributes()
 	REGISTER_ATTRIBUTE(longitudalStiffness);
 	REGISTER_ATTRIBUTE(bendingStiffness);
 	
-	REGISTER_ATTRIBUTE(previousSe3)
+	REGISTER_ATTRIBUTE(se3Displacement)
 }
 
 void LatticeBeamParameters::postProcessAttributes(bool d)

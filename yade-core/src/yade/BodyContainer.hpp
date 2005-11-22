@@ -37,6 +37,7 @@ class BodyContainer : public Serializable
 		virtual void clear() 						{throw;};
 		virtual bool erase(unsigned int) 				{throw;};
 		virtual bool find(unsigned int , shared_ptr<Body>&) const	{throw;};
+		virtual bool exists(unsigned int id) const 			{throw;};
 		virtual shared_ptr<Body>& operator[](unsigned int)		{throw;};
 		virtual const shared_ptr<Body>& operator[](unsigned int) const	{throw;};
 		

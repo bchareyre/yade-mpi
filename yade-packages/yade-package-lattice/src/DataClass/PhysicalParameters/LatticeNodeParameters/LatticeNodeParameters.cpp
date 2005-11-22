@@ -12,8 +12,10 @@ LatticeNodeParameters::LatticeNodeParameters() : PhysicalParameters()
 {
 	createIndex();
 	
-	count = 0;
-	displacement = Vector3r(0,0,0);
+	countIncremental 	= 0;
+	countStiffness 		= 0;
+	displacementIncremental = Vector3r(0.0,0.0,0.0);
+	displacementStiffness 	= Vector3r(0.0,0.0,0.0);
 }
 
 LatticeNodeParameters::~LatticeNodeParameters()

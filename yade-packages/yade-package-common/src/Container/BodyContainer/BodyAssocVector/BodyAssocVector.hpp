@@ -35,6 +35,7 @@ class BodyAssocVector : public BodyContainer
 		virtual void clear();
 		virtual bool erase(unsigned int);
 		virtual bool find(unsigned int , shared_ptr<Body>&) const;
+		virtual bool exists(unsigned int id) const;
 		virtual shared_ptr<Body>& operator[](unsigned int);
 		virtual const shared_ptr<Body>& operator[](unsigned int) const;
 

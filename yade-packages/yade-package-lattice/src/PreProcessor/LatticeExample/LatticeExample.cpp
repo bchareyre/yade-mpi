@@ -10,10 +10,10 @@
 
 #include "LatticeSetParameters.hpp"
 #include "LatticeBeamParameters.hpp"
+#include "LatticeBeamAngularSpring.hpp"
 #include "LatticeNodeParameters.hpp"
 #include "LineSegment.hpp"
 #include "LatticeLaw.hpp"
-
 
 #include <yade/yade-package-common/Sphere.hpp>
 
@@ -140,26 +140,16 @@ string LatticeExample::generate()
 	Vector3r nbNodes = speciemen_size_in_meters / cellsizeUnit_in_meters;
 	if(triangularBaseGrid)
 		nbNodes[1] *= 1.15471; // bigger by sqrt(3)/2 factor
-/* 
- * speeding up creation of beams....
- * 
 
-	vector<vector<vector<unsigned int> > > node_matrix; // matrix that spatially remembers nodes position.
-	node_matrix.resize(nbNodes[0]+1);
-	for( int i=0 ; i<=nbNodes[0] ; i++ )
-	{
-		node_matrix[i].resize(nbNodes[1]+1);
-		for( int j=0 ; j<=nbNodes[1] ; j++ )
-			node_matrix[i][j].resize(nbNodes[2]+1);
-	}
-*/		
+	unsigned int totalNodesCount = 0;
+
 	for( int i=0 ; i<=nbNodes[0] ; i++ )
 		for( int j=0 ; j<=nbNodes[1] ; j++ )
 			for( int k=0 ; k<=nbNodes[2] ; k++)
 			{
 				shared_ptr<Body> node;
 				if(createNode(node,i,j,k))
-					rootBody->bodies->insert(node);
+					rootBody->bodies->insert(node), ++totalNodesCount;
 			}
 
 	BodyRedirectionVector bc;
@@ -195,6 +185,7 @@ string LatticeExample::generate()
 				{
 					if( ++beam_counter % 100 == 0 )
 						cerr << "creating beam: " << beam_counter << " , " << ((nodes_a/nodes_all)*100.0)  << " %\n"; 
+					
 					bc.insert(beam);
 				}
 			}
@@ -207,6 +198,43 @@ string LatticeExample::generate()
 	{
 		shared_ptr<Body> b = *bi;
 		rootBody->bodies->insert(b); // .. to insert then into rootBody
+	}
+
+	{ // remember what node is in contact with what beams
+		//    node                   beams
+		connections.resize(totalNodesCount);
+		
+		bi    = rootBody->bodies->begin();
+		biEnd = rootBody->bodies->end();
+		
+		for(  ; bi!=biEnd ; ++bi )  // loop over all beams
+		{
+			Body* body = (*bi).get();
+			if( ! ( body->getGroupMask() & beamGroupMask ) )
+				continue; // skip non-beams
+			
+			LatticeBeamParameters* beam = static_cast<LatticeBeamParameters*>(body->physicalParameters.get() );
+			connections[beam->id1].push_back(body->getId());
+			connections[beam->id2].push_back(body->getId());
+		}
+	}
+	
+	{ // create angular springs between beams
+		bi    = rootBody->bodies->begin();
+		biEnd = rootBody->bodies->end();
+		float all_bodies = rootBody->bodies->size();
+		int current = 0;
+		for(  ; bi!=biEnd ; ++bi )  // loop over all beams
+		{
+			if( ++current % 100 == 0 )
+				cerr << "making angular springs: " << current << " , " << ((static_cast<float>(current)/all_bodies)*100.0) << " %\n";
+				
+			Body* body = (*bi).get();
+			if( ! ( body->getGroupMask() & beamGroupMask ) )
+				continue; // skip non-beams
+				
+			calcBeamAngles(body,rootBody->bodies.get(),rootBody->persistentInteractions.get());
+		}
 	}
 	
 	imposeTranslation(rootBody,region_A_min,region_A_max,direction_A,displacement_A_meters);
@@ -348,7 +376,51 @@ void LatticeExample::calcBeamPositionOrientationLength(shared_ptr<Body>& body)
 	
 	se3Beam.orientation.align( Vector3r::UNIT_X , dist );
 	beam->se3 		= se3Beam;
-	beam->previousSe3 	= se3Beam;
+	beam->se3Displacement.position 	= Vector3r(0.0,0.0,0.0);
+	beam->se3Displacement.orientation.align(dist,dist);
+}
+
+void LatticeExample::calcAxisAngle(LatticeBeamParameters* beam, BodyContainer* bodies, unsigned int otherId, InteractionContainer* ints, unsigned int thisId)
+{ 
+	if( ! ints->find(otherId,thisId) && otherId != thisId )
+	{
+		LatticeBeamParameters* 	otherBeam 		= dynamic_cast<LatticeBeamParameters*>( ((*(bodies))[ otherId ])->physicalParameters.get() );
+		
+		Quaternionr 		rotation;
+		Vector3r 		axis;
+		Real 			angle;
+		
+		rotation.align( beam->direction , otherBeam->direction );
+		rotation.toAxisAngle (axis, angle);
+		Vector3r result = axis*angle;
+
+		shared_ptr<Interaction> 		interaction(new Interaction( thisId , otherId ));
+		shared_ptr<LatticeBeamAngularSpring> 	angularSpring(new LatticeBeamAngularSpring);
+		
+		angularSpring->initialAngle 		= result; // rotation;
+		angularSpring->angle 			= result; // rotation;
+		
+		interaction->isReal			= true;
+		interaction->isNew 			= false;
+		interaction->interactionPhysics 	= angularSpring;
+		ints->insert(interaction);
+	}
+}
+
+void LatticeExample::calcBeamAngles(Body* body, BodyContainer* bodies, InteractionContainer* ints)
+{
+	LatticeBeamParameters* beam 	= dynamic_cast<LatticeBeamParameters*>(body->physicalParameters.get());
+
+	std::vector<unsigned int>::iterator i   = connections[beam->id1].begin();
+	std::vector<unsigned int>::iterator end = connections[beam->id1].end();
+	
+	for( ; i != end ; ++i )
+		calcAxisAngle(beam,bodies,*i,ints,body->getId());
+	
+	i   = connections[beam->id2].begin();
+	end = connections[beam->id2].end();
+	for( ; i != end ; ++i )
+		calcAxisAngle(beam,bodies,*i,ints,body->getId());
 }
 
 void LatticeExample::createActors(shared_ptr<MetaBody>& )
@@ -359,13 +431,9 @@ void LatticeExample::createActors(shared_ptr<MetaBody>& )
 	shared_ptr<GeometricalModelMetaEngine> geometricalModelDispatcher	= shared_ptr<GeometricalModelMetaEngine>(new GeometricalModelMetaEngine);
 	geometricalModelDispatcher->add("LatticeSetParameters","LatticeSetGeometry","LatticeSet2LatticeBeams");
 	
-	shared_ptr<LatticeLaw> latticeLaw(new LatticeLaw);
-	latticeLaw->nodeGroupMask = nodeGroupMask;
-	latticeLaw->beamGroupMask = beamGroupMask;
-
 	rootBody->engines.clear();
 	rootBody->engines.push_back(boundingVolumeDispatcher);
-	rootBody->engines.push_back(latticeLaw);
+	rootBody->engines.push_back(shared_ptr<LatticeLaw>(new LatticeLaw));
 	rootBody->engines.push_back(geometricalModelDispatcher);
 	
 	rootBody->initializers.clear();
@@ -384,6 +452,7 @@ void LatticeExample::positionRootBody(shared_ptr<MetaBody>& rootBody)
 	shared_ptr<LatticeSetParameters> physics(new LatticeSetParameters);
 	physics->se3			= Se3r(Vector3r(0,0,0),q);
 	physics->beamGroupMask 		= beamGroupMask;
+	physics->nodeGroupMask 		= nodeGroupMask;
 	
 	shared_ptr<MetaInteractingGeometry> set(new MetaInteractingGeometry());
 	

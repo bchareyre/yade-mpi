@@ -5,13 +5,14 @@ error( "YADE_QMAKE_PATH internal qmake variable is not set, you should run for e
 
 LIBS += -lLatticeBeamParameters \
         -lLatticeNodeParameters \
-        -lForce \
-        -lParticleParameters 
+	-lLatticeSetParameters \
+	-lLatticeBeamAngularSpring
 INCLUDEPATH += $${YADE_QMAKE_PATH}/include/ \
                ../../../DataClass/PhysicalParameters/LatticeNodeParameters \
-               ../../../DataClass/PhysicalParameters/LatticeBeamParameters 
+               ../../../DataClass/PhysicalParameters/LatticeSetParameters \
+               ../../../DataClass/PhysicalParameters/LatticeBeamParameters \
+               ../../../DataClass/InteractionPhysics/LatticeBeamAngularSpring
 QMAKE_LIBDIR = ../../../../bin \
-               ../../../../bin \
                $${YADE_QMAKE_PATH}/lib/yade/yade-package-common/ \
                $${YADE_QMAKE_PATH}/lib/yade/yade-libs/ 
 DESTDIR = ../../../../bin 

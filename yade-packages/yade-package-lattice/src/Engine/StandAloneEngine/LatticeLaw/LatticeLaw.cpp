@@ -8,50 +8,20 @@
 
 #include "LatticeLaw.hpp"
 #include "LatticeBeamParameters.hpp"
+#include "LatticeBeamAngularSpring.hpp"
 #include "LatticeNodeParameters.hpp"
-#include <yade/yade-package-common/Force.hpp>
+#include "LatticeSetParameters.hpp"
 #include <yade/yade-core/BodyContainer.hpp>
 #include <yade/yade-core/MetaBody.hpp>
 
-/*
-	LatticeBeamParameters 
-	
-		unsigned int 	 id1
-				,id2;
-				
-		Real  		 initialLength
-				,length;
-				
-		Vector3r 	 initialDirection
-				,direction;
-				
-		Real 		 criticalTensileStrain
-				,criticalCompressiveStrain
-				
-				,longitudalStiffness
-				,bendingStiffness;
-		
-		Vector3r 	 previousSe3;
-*/
-
-LatticeLaw::LatticeLaw() : InteractionSolver() , actionForce(new Force)
+LatticeLaw::LatticeLaw() : InteractionSolver()
 {
-	nodeGroupMask = 1;
-	beamGroupMask = 2;
 }
 
 
 LatticeLaw::~LatticeLaw()
 {
 
-}
-
-
-void LatticeLaw::registerAttributes()
-{
-	InteractionSolver::registerAttributes();
-	REGISTER_ATTRIBUTE(nodeGroupMask);
-	REGISTER_ATTRIBUTE(beamGroupMask);
 }
 
 bool LatticeLaw::deleteBeam(MetaBody* metaBody , LatticeBeamParameters* beam)
@@ -63,12 +33,11 @@ bool LatticeLaw::deleteBeam(MetaBody* metaBody , LatticeBeamParameters* beam)
 }
 
 
-void LatticeLaw::calcBeamsPositionOrientationNewLength(Body* body, BodyContainer* bodies)
+void LatticeLaw::calcBeamPositionOrientationNewLength(Body* body, BodyContainer* bodies)
 {
 // FIXME - verify that this updating of length, position, orientation and color is in correct place/plugin
 	LatticeBeamParameters* beam 	= static_cast<LatticeBeamParameters*>(body->physicalParameters.get());
 
-//	cerr << "beam: " << body->getId() << "id1: " << beam->id1 << " id2: " << beam->id2 << "\n";
 	Body* bodyA 			= (*(bodies))[beam->id1].get();
 	Body* bodyB 			= (*(bodies))[beam->id2].get();
 	Se3r& se3A 			= bodyA->physicalParameters->se3;
@@ -79,12 +48,16 @@ void LatticeLaw::calcBeamsPositionOrientationNewLength(Body* body, BodyContainer
 	Vector3r dist 			= se3A.position - se3B.position;
 	
 	Real length 			= dist.normalize();
+	Vector3r previousDirection 	= beam->direction;
 	beam->direction 		= dist;
 	beam->length 			= length;
 	
-	beam->previousSe3 		= beam->se3;
+	Vector3r previousPosition	= beam->se3.position;
 	se3Beam.orientation.align( Vector3r::UNIT_X , dist );
 	beam->se3 			= se3Beam;
+	
+	beam->se3Displacement.orientation.align(previousDirection,dist);
+	beam->se3Displacement.position = se3Beam.position - previousPosition;
 }
 
 void LatticeLaw::action(Body* body)
@@ -92,10 +65,43 @@ void LatticeLaw::action(Body* body)
 	futureDeletes.clear();
 
 	MetaBody * lattice = static_cast<MetaBody*>(body);
+	
+	int nodeGroupMask  = static_cast<LatticeSetParameters*>(lattice->physicalParameters.get())->nodeGroupMask;
+	int beamGroupMask  = static_cast<LatticeSetParameters*>(lattice->physicalParameters.get())->beamGroupMask;
+	
 	BodyContainer* bodies = lattice->bodies.get();
 
 	BodyContainer::iterator bi    = bodies->begin();
 	BodyContainer::iterator biEnd = bodies->end();
+	
+	InteractionContainer::iterator angles     = lattice->persistentInteractions->begin();
+	InteractionContainer::iterator angles_end = lattice->persistentInteractions->end();
+	
+	{ // 'B' calculate needed beam rotations
+		for(  ; angles != angles_end; ++angles )
+		{
+			if( 	   bodies->exists( (*angles)->getId1() ) 	// FIXME - remove this test ....
+				&& bodies->exists( (*angles)->getId2() ) ) 	//
+			{
+				LatticeBeamParameters* beam1 = static_cast<LatticeBeamParameters*>(((*(bodies))[(*angles)->getId1()])->physicalParameters.get());
+				LatticeBeamParameters* beam2 = static_cast<LatticeBeamParameters*>(((*(bodies))[(*angles)->getId2()])->physicalParameters.get());
+				
+				LatticeBeamAngularSpring* an = static_cast<LatticeBeamAngularSpring*>((*angles)->interactionPhysics.get());
+				
+				Vector3r angleDifference = an->angle - an->initialAngle;
+			//	Quaternionr angleDifference = an->angle - an->initialAngle;
+				
+				++(beam1->count);
+				++(beam2->count);
+				beam1->rotation += angleDifference;
+				beam2->rotation -= angleDifference;
+			//	beam1->rotation = beam1->rotation*angleDifference;
+			//	beam2->rotation = angleDifference*beam2->rotation;
+				
+			}
+			// else FIXME - delete unused angularSpring
+		}
+	}
 	
 	for(  ; bi!=biEnd ; ++bi )  // loop over all beams
 	{
@@ -111,7 +117,7 @@ void LatticeLaw::action(Body* body)
 		// 'D' from picture. how much beam wants to change length at each node, to bounce back through original length to mirror position.
 		Vector3r  displacement = beam->direction * stretch;
 		
-		{ // check E_min, E_max criterion
+		{ // 'E_min' 'E_max' criterion
 			if( deleteBeam(lattice , beam) ) // calculates strain
 			{
 				futureDeletes.push_back(body->getId());
@@ -122,60 +128,93 @@ void LatticeLaw::action(Body* body)
 		LatticeNodeParameters* node1 = static_cast<LatticeNodeParameters*>(((*(bodies))[beam->id1])->physicalParameters.get());
 		LatticeNodeParameters* node2 = static_cast<LatticeNodeParameters*>(((*(bodies))[beam->id2])->physicalParameters.get());
 		
-		{ // give 'D' to nodes
-			++(node1->count);
-			++(node2->count);
-			node1->displacement -= displacement;
-			node2->displacement += displacement;
-		}
-		
-		{ // 'W' from picture - previous displacement of the beam. try to do it again.
-			Vector3r previousDisplacement = beam->se3.position - beam->previousSe3.position;
-			node1->displacement += previousDisplacement;
-			node2->displacement += previousDisplacement;
-		} 
-	}
+		{ // 'W' and 'R'
+			++(node1->countIncremental);
+			++(node2->countIncremental);
+			{ // 'W' from picture - previous displacement of the beam. try to do it again.
+				node1->displacementIncremental += beam->se3Displacement.position;
+				node2->displacementIncremental += beam->se3Displacement.position;
+			}
 	
-	bi    = bodies->begin();
-	biEnd = bodies->end();
-	for(  ; bi!=biEnd ; ++bi )  // loop over all nodes
-	{
-		Body* body = (*bi).get();
-
-		if( ! ( body->getGroupMask() & nodeGroupMask ) )
-			continue; // skip non-nodes
-		
-		LatticeNodeParameters* node = static_cast<LatticeNodeParameters*>(body->physicalParameters.get() );
-		
-		{ // check nodes if they have any beams left
-			if(node->count == 0) 
-			{ // node not moving (marked for deletion)
-			//	futureDeletes.push_back(body->getId()); // FIXME - crashes ....
-				continue; 
+			{ // 'R' from picture - previous rotation of the beam. try to do it again.
+				Vector3r halfLength = beam->length * beam->direction * 0.5;
+				node1->displacementIncremental += beam->se3Displacement.orientation * ( halfLength) - halfLength;
+				node2->displacementIncremental += beam->se3Displacement.orientation * (-halfLength) + halfLength;
 			}
 		}
+
+		{ // give 'D' to nodes
+			node1->countStiffness += beam->longitudalStiffness;
+			node2->countStiffness += beam->longitudalStiffness;
+			node1->displacementStiffness -= displacement * beam->longitudalStiffness;
+			node2->displacementStiffness += displacement * beam->longitudalStiffness;
+		}
+
+		{ // 'B' from picture - rotate to align with neighbouring beams
+			node1->countStiffness += beam->bendingStiffness;
+			node2->countStiffness += beam->bendingStiffness;
+
+			Vector3r axis 		= beam->rotation / beam->count;
+			Real angle 		= axis.normalize();
+			Quaternionr rotation;
+			rotation.fromAxisAngle(axis,angle);
 		
-		Vector3r displacement 	= node->displacement / node->count;
-		node->displacement  	= Vector3r(0.0,0.0,0.0);
-		node->count 		= 0.0;
-		
-		if(body->isDynamic)
-			node->se3.position 	+= displacement;
+		//	Quaternionr rotation 	= beam->rotation;// / beam->count;
 			
-		/* FIXME FIXME FIXME FIXME FIXME FIXME FIXME
-		else // FIXME - else move only in x direction
-			node->se3.position[0] 	+= displacement[0];
-		*/
+			Vector3r length = beam->length * beam->direction;// * 0.5; // FIXME - duplicate line
+			node1->displacementStiffness += (rotation * ( length) - length) * beam->bendingStiffness;
+			node2->displacementStiffness += (rotation * (-length) + length) * beam->bendingStiffness;
+			
+			beam->rotation 		= Vector3r(0.0,0.0,0.0);
+		//	beam->rotation 		= Quaternionr(0.0,0.0,0.0,0.0);
+			beam->count 		= 0.0;
+		}
 	}
 	
-	{ // store previousSe3 in the beam, calc new beam position: X_b = ( X_n1 + X_n2 ) / 2
+	{ // move nodes
+		bi    = bodies->begin();
+		biEnd = bodies->end();
+		for(  ; bi!=biEnd ; ++bi )  // loop over all nodes -- move them according to displacements from beams
+		{
+			Body* body = (*bi).get();
+	
+			if( ! ( body->getGroupMask() & nodeGroupMask ) )
+				continue; // skip non-nodes
+			
+			LatticeNodeParameters* node = static_cast<LatticeNodeParameters*>(body->physicalParameters.get() );
+			
+			{ // check nodes if they have any beams left
+				if(node->countIncremental == 0) 
+				{ // node not moving (marked for deletion)
+					futureDeletes.push_back(body->getId());
+					continue; 
+				}
+			}
+			Vector3r displacement 		= node->displacementIncremental / node->countIncremental + node->displacementStiffness / node->countStiffness;
+			node->countIncremental 		= 0;
+			node->countStiffness 		= 0;
+			node->displacementIncremental 	= Vector3r(0.0,0.0,0.0);
+			node->displacementStiffness 	= Vector3r(0.0,0.0,0.0);
+			
+			if(body->isDynamic)
+				node->se3.position 	+= displacement;
+				
+			/* FIXME FIXME FIXME FIXME FIXME FIXME FIXME
+			else // FIXME - else move only in x direction
+				node->se3.position[0] 	+= displacement[0];
+			*/
+		}
+	}
+	
+	{ // store calc new beam position: X_b = ( X_n1 + X_n2 ) / 2 ,
+	  // store position/orientation displacement, for 'W' and 'R' in se3Displacement
 		bi    = bodies->begin();
 		biEnd = bodies->end(); 
 		for(  ; bi!=biEnd ; ++bi )  // loop over all beams
 		{
 			Body* body = (*bi).get();
 			if( body->getGroupMask() & beamGroupMask )
-				calcBeamsPositionOrientationNewLength(body,bodies);
+				calcBeamPositionOrientationNewLength(body,bodies);
 		}
 	} 
 	
@@ -185,6 +224,30 @@ void LatticeLaw::action(Body* body)
 		vector<unsigned int>::iterator vend = futureDeletes.end();
 		for( vector<unsigned int>::iterator vsta = futureDeletes.begin() ; vsta != vend ; ++vsta)
 			bodies->erase(*vsta); 
+	}
+	
+	{ // calculate new angles between beams
+		angles     = lattice->persistentInteractions->begin();
+		angles_end = lattice->persistentInteractions->end();
+		for(  ; angles != angles_end; ++angles )
+		{
+			if( 	   bodies->exists( (*angles)->getId1() )
+				&& bodies->exists( (*angles)->getId2() ) )
+			{
+				LatticeBeamParameters* beam1 = static_cast<LatticeBeamParameters*>(((*(bodies))[(*angles)->getId1()])->physicalParameters.get());
+				LatticeBeamParameters* beam2 = static_cast<LatticeBeamParameters*>(((*(bodies))[(*angles)->getId2()])->physicalParameters.get());
+			
+				Quaternionr 		rotation;
+				Vector3r		axis;
+				Real			angle;
+			
+				rotation.align( beam1->direction , beam2->direction );
+				rotation.toAxisAngle (axis, angle);
+				(static_cast<LatticeBeamAngularSpring*>((*angles)->interactionPhysics.get()))->angle = axis*angle; 
+			//	(static_cast<LatticeBeamAngularSpring*>((*angles)->interactionPhysics.get()))->angle = rotation; 
+			}
+			// else FIXME - delete unused angularSpring
+		}
 	}
 }
 

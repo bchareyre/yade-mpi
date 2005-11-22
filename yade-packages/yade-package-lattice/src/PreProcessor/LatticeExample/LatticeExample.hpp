@@ -13,6 +13,8 @@
 #include <yade/yade-lib-wm3-math/Vector3.hpp>
 #include <yade/yade-package-common/BodyRedirectionVector.hpp>
 
+class LatticeBeamParameters;
+
 class LatticeExample : public FileGenerator
 {
 	private :
@@ -57,6 +59,8 @@ class LatticeExample : public FileGenerator
 		 		,displacement_B_meters
 		 		,displacement_C_meters
 		 		,displacement_D_meters;
+				 
+		std::vector< std::vector< unsigned int > > connections; // which node is in touch with what beams.
 				
 	public : 
 		LatticeExample();
@@ -69,6 +73,8 @@ class LatticeExample : public FileGenerator
 		bool createNode(shared_ptr<Body>& body, int i, int j, int k);
 		void createBeam(shared_ptr<Body>& body, unsigned int i, unsigned int j);
 		void calcBeamPositionOrientationLength(shared_ptr<Body>& body);
+		void calcBeamAngles(Body* body, BodyContainer* bodies,InteractionContainer* ints);
+		void calcAxisAngle(LatticeBeamParameters* beam, BodyContainer* bodies, unsigned int otherId,InteractionContainer* ints,unsigned int thisId);
 		bool checkMinimumAngle(BodyRedirectionVector&,shared_ptr<Body>&);
 		bool checkAngle( Vector3r , Vector3r& );
 		void imposeTranslation(shared_ptr<MetaBody>& rootBody, Vector3r min, Vector3r max, Vector3r direction, Real velocity);

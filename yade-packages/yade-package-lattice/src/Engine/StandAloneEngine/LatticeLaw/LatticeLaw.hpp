@@ -24,23 +24,16 @@ class LatticeLaw : public InteractionSolver
 /// Attributes	
 	
 	private :
-		shared_ptr<PhysicalAction> actionForce;
 		vector<unsigned int> futureDeletes;
 		
 		bool deleteBeam(MetaBody* lattice , LatticeBeamParameters* beam);
-		void calcBeamsPositionOrientationNewLength(Body* body, BodyContainer* bodies);
-
+		void calcBeamPositionOrientationNewLength(Body* body, BodyContainer* bodies);
 	public :
-		int	 nodeGroupMask
-			,beamGroupMask;
-		
 		LatticeLaw();
 		virtual ~LatticeLaw();
 		void action(Body* body);
 
 /// Serializtion
-	protected :
-		void registerAttributes();
 	REGISTER_CLASS_NAME(LatticeLaw);
 	REGISTER_BASE_CLASS_NAME(InteractionSolver);
 };

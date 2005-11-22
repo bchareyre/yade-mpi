@@ -5,6 +5,7 @@ error( "YADE_QMAKE_PATH internal qmake variable is not set, you should run for e
 
 LIBS += -lSDECLinkGeometry \
         -lElasticContactLaw \
+        -lElasticCohesiveLaw \
         -lMacroMicroElasticRelationships \
         -lElasticCriterionTimeStepper \
         -lPhysicalActionVectorVector \
@@ -37,14 +38,12 @@ LIBS += -lSDECLinkGeometry \
 INCLUDEPATH += $${YADE_QMAKE_PATH}/include/ \
                ../../Engine/StandAloneEngine/ElasticCriterionTimeStepper \
                ../../Engine/StandAloneEngine/ElasticContactLaw \
+               ../../Engine/StandAloneEngine/ElasticCohesiveLaw \
                ../../Engine/EngineUnit/MacroMicroElasticRelationships \
                ../../DataClass/InteractionPhysics/SDECLinkPhysics \
                ../../DataClass/InteractionGeometry/SDECLinkGeometry \
                ../../DataClass/PhysicalParameters/BodyMacroParameters 
 QMAKE_LIBDIR = ../../../bin \
-               ../../../bin \
-               ../../../bin \
-               ../../../bin \
                $${YADE_QMAKE_PATH}/lib/yade/yade-package-common/ \
                $${YADE_QMAKE_PATH}/lib/yade/yade-libs/ 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \

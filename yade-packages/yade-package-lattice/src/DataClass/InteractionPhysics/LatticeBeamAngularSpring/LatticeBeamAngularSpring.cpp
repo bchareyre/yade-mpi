@@ -6,27 +6,24 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "LatticeSetParameters.hpp"
+#include "LatticeBeamAngularSpring.hpp"
 
 
-LatticeSetParameters::LatticeSetParameters() : PhysicalParameters()
+LatticeBeamAngularSpring::LatticeBeamAngularSpring() : InteractionPhysics()
 {
-	createIndex();
-	nodeGroupMask = 1;
-	beamGroupMask = 2;
+//	createIndex();
 }
 
 
-LatticeSetParameters::~LatticeSetParameters()
+LatticeBeamAngularSpring::~LatticeBeamAngularSpring()
 {
 
 }
 
-
-void LatticeSetParameters::registerAttributes()
+void LatticeBeamAngularSpring::registerAttributes()
 {
-	PhysicalParameters::registerAttributes();
-	REGISTER_ATTRIBUTE(nodeGroupMask);
-	REGISTER_ATTRIBUTE(beamGroupMask);
+	InteractionPhysics::registerAttributes();
+	REGISTER_ATTRIBUTE(initialAngle);
+	REGISTER_ATTRIBUTE(angle); // FIXME - can be calculated after deserialization
 }
- 
+

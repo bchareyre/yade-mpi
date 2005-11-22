@@ -40,7 +40,8 @@ void DisplacementEngine::applyCondition(Body * body)
 	
 	
 	for(;ii!=iiEnd;++ii)
-		((*bodies)[*ii]->physicalParameters.get())->se3.position += displacement*translationAxis;
+		if( bodies->exists(*ii) )
+			((*bodies)[*ii]->physicalParameters.get())->se3.position += displacement*translationAxis;
 		
 		
 //	}

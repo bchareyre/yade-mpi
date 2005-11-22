@@ -30,8 +30,8 @@ bool InteractingSphere2InteractingSphere4SpheresContactGeometry::go(	const share
 	if (c->interactionGeometry)
 	{
 		scm = dynamic_pointer_cast<SpheresContactGeometry>(c->interactionGeometry);
-		
-/*		if(! scm) // this is not SpheresContactGeometry, so it is SDECLinkGeometry, dispatcher should do this job.
+	// BEGIN .......  FIXME FIXME	- wrong hack, to make cohesion work.
+		if(! scm) // this is not SpheresContactGeometry, so it is SDECLinkGeometry, dispatcher should do this job.
 		{
 			shared_ptr<SDECLinkGeometry> linkGeometry = dynamic_pointer_cast<SDECLinkGeometry>(c->interactionGeometry);
 //			cerr << "it is SpringGeometry ???: " << c->interactionGeometry->getClassName() << endl;
@@ -44,7 +44,8 @@ bool InteractingSphere2InteractingSphere4SpheresContactGeometry::go(	const share
 			}
 			else
 				return false; // SpringGeometry !!!???????
-		}*/
+		}
+	// END
 	}
 	else
 		scm = shared_ptr<SpheresContactGeometry>(new SpheresContactGeometry());

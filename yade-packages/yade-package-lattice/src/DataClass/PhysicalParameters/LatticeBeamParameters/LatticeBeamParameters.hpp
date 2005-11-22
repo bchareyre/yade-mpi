@@ -10,28 +10,33 @@
 #define LATTICE_BEAM_PARAMETERS_HPP 
 
 #include <yade/yade-core/PhysicalParameters.hpp>
+#include <vector>
 
 class LatticeBeamParameters : public PhysicalParameters 
 {
 	public :
-		unsigned int 	 id1
-				,id2;
+		unsigned int 		 id1
+					,id2;
 				
-		Real  		 initialLength
-				,length;
+		Real  			 initialLength
+					,length;
 				
-		Vector3r 	 initialDirection
-				,direction;
+		Vector3r 		 initialDirection
+					,direction;
 				
-		Real 		 criticalTensileStrain
-				,criticalCompressiveStrain
+		Real 			 criticalTensileStrain
+					,criticalCompressiveStrain
 				
-				,longitudalStiffness
-				,bendingStiffness
+					,longitudalStiffness
+					,bendingStiffness
 				
-				,strain;
+					,strain;
 				
-		Se3r 		 previousSe3;
+		Se3r 			 se3Displacement;
+		
+		Real 			 count;
+	//	Quaternionr 		 rotation;
+		Vector3r 		 rotation;
 		
 		void calcStrain();
 	

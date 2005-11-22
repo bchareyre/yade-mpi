@@ -10,12 +10,15 @@
 #define LATTICE_NODE_PARAMETERS_HPP 
 
 #include <yade/yade-core/PhysicalParameters.hpp>
+#include <vector>
 
 class LatticeNodeParameters : public PhysicalParameters 
 {
 	public : 
-		Real 		count;
-		Vector3r 	displacement;
+		Real 		 countIncremental
+				,countStiffness;
+		Vector3r 	 displacementIncremental
+				,displacementStiffness;
 	
 		LatticeNodeParameters();
 		virtual ~LatticeNodeParameters();

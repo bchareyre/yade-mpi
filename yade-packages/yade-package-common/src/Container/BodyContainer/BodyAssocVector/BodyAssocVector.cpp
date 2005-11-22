@@ -85,6 +85,14 @@ bool BodyAssocVector::erase(unsigned int id)
 }
 
 
+bool BodyAssocVector::exists(unsigned int id) const
+{
+	Loki::AssocVector<unsigned int , shared_ptr<Body> >::const_iterator tmpBii;
+	tmpBii = bodies.find(id);
+
+	return (tmpBii != bodies.end());
+}
+
 bool BodyAssocVector::find(unsigned int id , shared_ptr<Body>& b) const
 {
 	// do not modify the interanl iterator
