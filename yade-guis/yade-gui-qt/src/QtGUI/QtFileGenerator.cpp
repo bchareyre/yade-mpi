@@ -197,6 +197,8 @@ void QtFileGenerator::pbLoadClicked()
 		try
 		{
 			IOFormatManager::loadFromFile("XMLFormatManager",fileName,"fileGenerator",fg); 
+			setGeneratorName(fg->getClassName());
+			displayFileGeneratorAttributes(fg);
 		} 
 		catch(SerializableError& e) // catching it...
 		{
@@ -205,8 +207,6 @@ void QtFileGenerator::pbLoadClicked()
 			return;
 		}
 	}
-	setGeneratorName(fg->getClassName());
-	displayFileGeneratorAttributes(fg);
 }
 
 void QtFileGenerator::pbSaveClicked()

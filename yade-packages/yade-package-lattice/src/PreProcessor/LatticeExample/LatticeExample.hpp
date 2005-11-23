@@ -32,9 +32,12 @@ class LatticeExample : public FileGenerator
 				,crit_ComprStrain_percent	// E_max
 				
 				,longitudalStiffness_noUnit 	// k_l
-				,bendingStiffness_noUnit;	// k_b
+				,bendingStiffness_noUnit	// k_b
 				
-		bool 		 triangularBaseGrid;
+				,nonLocalL_in_cellsizeUnit; 	// l
+				
+		bool 		 triangularBaseGrid
+				,useNonLocalModel;
 		
 		
 	// conditions
@@ -74,6 +77,7 @@ class LatticeExample : public FileGenerator
 		void createBeam(shared_ptr<Body>& body, unsigned int i, unsigned int j);
 		void calcBeamPositionOrientationLength(shared_ptr<Body>& body);
 		void calcBeamAngles(Body* body, BodyContainer* bodies,InteractionContainer* ints);
+		void calcNonLocal(Body* body1, Body* body2, BodyContainer* bodies,InteractionContainer* ints);
 		void calcAxisAngle(LatticeBeamParameters* beam, BodyContainer* bodies, unsigned int otherId,InteractionContainer* ints,unsigned int thisId);
 		bool checkMinimumAngle(BodyRedirectionVector&,shared_ptr<Body>&);
 		bool checkAngle( Vector3r , Vector3r& );

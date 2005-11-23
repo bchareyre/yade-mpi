@@ -7,6 +7,7 @@ LIBS += -lLineSegment \
         -lLatticeSetParameters \
         -lLatticeBeamParameters \
         -lLatticeNodeParameters \
+	-lNonLocalDependency \
 	-lLatticeBeamAngularSpring \
         -lPhysicalActionVectorVector \
         -lInteractionVecSet \
@@ -30,6 +31,7 @@ INCLUDEPATH += $${YADE_QMAKE_PATH}/include/ \
                ../../DataClass/PhysicalParameters/LatticeNodeParameters \
                ../../DataClass/PhysicalParameters/LatticeBeamParameters \
                ../../DataClass/InteractionPhysics/LatticeBeamAngularSpring \
+               ../../DataClass/InteractionPhysics/NonLocalDependency \
                ../../DataClass/GeometricalModel/LineSegment
 QMAKE_LIBDIR = ../../../bin \
                ../../../bin \

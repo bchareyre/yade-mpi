@@ -9,6 +9,7 @@
 #include "LatticeLaw.hpp"
 #include "LatticeBeamParameters.hpp"
 #include "LatticeBeamAngularSpring.hpp"
+#include "NonLocalDependency.hpp"
 #include "LatticeNodeParameters.hpp"
 #include "LatticeSetParameters.hpp"
 #include <yade/yade-core/BodyContainer.hpp>
@@ -164,11 +165,14 @@ void LatticeLaw::action(Body* body)
 
 			Vector3r axis 		= Vector3r( 0.0 , 0.0 , 1.0 ); // 2D - always rotation around z 
 			Real angle 		= beam->bendingRotation;
-			if( angle > 0 )
-				while(angle > Mathr::PI) angle -= Mathr::TWO_PI;
-			else
-				while(angle < -Mathr::PI) angle += Mathr::TWO_PI;
+		//	if( angle > 0 )
+		//		while(angle > Mathr::PI) angle -= Mathr::TWO_PI;
+		//	else
+		//		while(angle < -Mathr::PI) angle += Mathr::TWO_PI;
 			angle /= beam->count;
+			
+		//	if( body->getId() == 12 ) // 6, 9, 10, 11
+		//		cerr << " beam->bendingRotation: " << beam->bendingRotation << " angle: " << angle << " count: " << beam->count << "\n";
 			
 		//	Vector3r axis 		= beam->rotation / beam->count;
 		//	Real angle 		= axis.normalize();
@@ -213,7 +217,12 @@ void LatticeLaw::action(Body* body)
 					continue; 
 				}
 			}
-			Vector3r displacement 		= node->displacementIncremental / node->countIncremental + node->displacementStiffness / node->countStiffness;
+			// FIXME - correct formula
+			Vector3r displacement 	= node->displacementIncremental / node->countIncremental + node->displacementStiffness / node->countStiffness;
+			
+			// FIXME - formula from old version (better ?!?!)
+		//	Vector3r displacement 		= (node->displacementIncremental + node->displacementStiffness) / node->countStiffness;
+			
 			node->countIncremental 		= 0;
 			node->countStiffness 		= 0;
 			node->displacementIncremental 	= Vector3r(0.0,0.0,0.0);
@@ -221,11 +230,11 @@ void LatticeLaw::action(Body* body)
 			
 			if(body->isDynamic)
 				node->se3.position 	+= displacement;
-				
-			/* FIXME FIXME FIXME FIXME FIXME FIXME FIXME
-			else // FIXME - else move only in x direction
-				node->se3.position[0] 	+= displacement[0];
-			*/
+			 
+			// FIXME FIXME FIXME FIXME FIXME FIXME FIXME
+			// else // FIXME - else move only in y direction
+			//	node->se3.position[1] 	+= displacement[1];
+			//
 		}
 	}
 	

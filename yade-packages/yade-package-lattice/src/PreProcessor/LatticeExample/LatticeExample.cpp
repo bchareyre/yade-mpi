@@ -11,6 +11,7 @@
 #include "LatticeSetParameters.hpp"
 #include "LatticeBeamParameters.hpp"
 #include "LatticeBeamAngularSpring.hpp"
+#include "NonLocalDependency.hpp"
 #include "LatticeNodeParameters.hpp"
 #include "LineSegment.hpp"
 #include "LatticeLaw.hpp"
@@ -50,6 +51,8 @@ LatticeExample::LatticeExample() : FileGenerator()
 	disorder_in_cellsizeUnit = Vector3r(0.6,0.6,0.0);
 	maxLength_in_cellsizeUnit= 1.9;
 	triangularBaseGrid 	 = true;
+	useNonLocalModel 	 = true;
+	nonLocalL_in_cellsizeUnit = 3.0; 	// l
 				
 	crit_TensileStrain_percent = 100.0;	// E_min
 	crit_ComprStrain_percent   = 50.0;	// E_max
@@ -100,6 +103,8 @@ void LatticeExample::registerAttributes()
 	REGISTER_ATTRIBUTE(bendingStiffness_noUnit);    // k_b [-]      - default 0.6
 	
 	REGISTER_ATTRIBUTE(triangularBaseGrid); 	// 		- triangles
+	REGISTER_ATTRIBUTE(useNonLocalModel);
+	REGISTER_ATTRIBUTE(nonLocalL_in_cellsizeUnit); 	// l
 	
 	REGISTER_ATTRIBUTE(region_A_min);
 	REGISTER_ATTRIBUTE(region_A_max);
@@ -227,13 +232,46 @@ string LatticeExample::generate()
 		for(  ; bi!=biEnd ; ++bi )  // loop over all beams
 		{
 			if( ++current % 100 == 0 )
-				cerr << "making angular springs: " << current << " , " << ((static_cast<float>(current)/all_bodies)*100.0) << " %\n";
+				cerr << "angular springs: " << current << " , " << ((static_cast<float>(current)/all_bodies)*100.0) << " %\n";
 				
 			Body* body = (*bi).get();
 			if( ! ( body->getGroupMask() & beamGroupMask ) )
 				continue; // skip non-beams
 				
 			calcBeamAngles(body,rootBody->bodies.get(),rootBody->persistentInteractions.get());
+		}
+	}
+	
+	if(useNonLocalModel) 
+	{ // create non-local dependencies
+		bi    = rootBody->bodies->begin();
+		biEnd = rootBody->bodies->end();
+		int beam_counter = 0;
+		float nodes_a=0;
+		float nodes_all = rootBody->bodies->size();
+		for(  ; bi!=biEnd ; ++bi )  // loop over all beams to create non-local
+		{
+			Body* body1 = (*bi).get(); // first_node
+			
+			if( ! ( body1->getGroupMask() & beamGroupMask ) )
+				continue; // skip non-beams
+		
+			bi2 = bi;
+			++bi2;
+			nodes_a+=1.0;
+			
+			for( ; bi2!=biEnd ; ++bi2 )
+			{
+				Body* body2 = (*bi2).get(); // all other beams
+	
+				if( ! ( body2->getGroupMask() & beamGroupMask ) )
+					continue; // skip non-beams
+				
+				if( ++beam_counter % 1000 == 0 )
+					cerr << "non-local dependency: " << ((nodes_a/nodes_all)*100.0)  << " %\n"; 
+				
+				calcNonLocal  (body1,body2,rootBody->bodies.get(),rootBody->volatileInteractions  .get());
+			}
 		}
 	}
 	
@@ -384,7 +422,7 @@ void LatticeExample::calcAxisAngle(LatticeBeamParameters* beam, BodyContainer* b
 { 
 	if( ! ints->find(otherId,thisId) && otherId != thisId )
 	{
-		LatticeBeamParameters* 	otherBeam 		= dynamic_cast<LatticeBeamParameters*>( ((*(bodies))[ otherId ])->physicalParameters.get() );
+		LatticeBeamParameters* 	otherBeam 		= static_cast<LatticeBeamParameters*>( ((*(bodies))[ otherId ])->physicalParameters.get() );
 		
 	//	Quaternionr 		rotation;
 	//	Vector3r 		axis;
@@ -415,7 +453,7 @@ void LatticeExample::calcAxisAngle(LatticeBeamParameters* beam, BodyContainer* b
 
 void LatticeExample::calcBeamAngles(Body* body, BodyContainer* bodies, InteractionContainer* ints)
 {
-	LatticeBeamParameters* beam 	= dynamic_cast<LatticeBeamParameters*>(body->physicalParameters.get());
+	LatticeBeamParameters* beam 	= static_cast<LatticeBeamParameters*>(body->physicalParameters.get());
 
 	std::vector<unsigned int>::iterator i   = connections[beam->id1].begin();
 	std::vector<unsigned int>::iterator end = connections[beam->id1].end();
@@ -427,6 +465,30 @@ void LatticeExample::calcBeamAngles(Body* body, BodyContainer* bodies, Interacti
 	end = connections[beam->id2].end();
 	for( ; i != end ; ++i )
 		calcAxisAngle(beam,bodies,*i,ints,body->getId());
+}
+
+void LatticeExample::calcNonLocal(Body* body1, Body* body2, BodyContainer* bodies, InteractionContainer* nonl)
+{
+	LatticeBeamParameters* beam1 	= static_cast<LatticeBeamParameters*>(body1->physicalParameters.get());
+	LatticeBeamParameters* beam2 	= static_cast<LatticeBeamParameters*>(body2->physicalParameters.get());
+
+	if( ! nonl->find( body1->getId() , body2->getId() ) && body1->getId() != body2->getId() )
+	{
+		Real dist = (beam1->se3.position - beam2->se3.position).length();
+		
+		if( dist < nonLocalL_in_cellsizeUnit * cellsizeUnit_in_meters )
+		{
+			shared_ptr<Interaction> 		interaction(new Interaction( body1->getId() , body2->getId() ));
+			shared_ptr<NonLocalDependency> 		nonLocal(new NonLocalDependency);
+			
+			nonLocal->gaussValue 			= dist;
+			
+			interaction->isReal			= true;
+			interaction->isNew 			= false;
+			interaction->interactionPhysics 	= nonLocal;
+			nonl->insert(interaction);
+		}
+	} 
 }
 
 void LatticeExample::createActors(shared_ptr<MetaBody>& )
