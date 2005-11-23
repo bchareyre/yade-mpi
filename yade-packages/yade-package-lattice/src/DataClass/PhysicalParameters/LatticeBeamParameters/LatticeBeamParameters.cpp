@@ -12,9 +12,10 @@
 LatticeBeamParameters::LatticeBeamParameters() : PhysicalParameters()
 {
 	createIndex();
-	count = 0;
-	rotation = Vector3r(0,0,0);
-//	rotation = Quaternionr(0,0,0,0);
+	count = 0.0;
+//	rotation = Vector3r(0,0,0);
+//	bendingRotation = Quaternionr(1.0,0.0,0.0,0.0);
+ 	bendingRotation = 0.0;
 }
 
 
@@ -39,9 +40,6 @@ void LatticeBeamParameters::registerAttributes()
 	
 	REGISTER_ATTRIBUTE(initialDirection);
 	REGISTER_ATTRIBUTE(direction); // FIXME - can be calculated after deserialization
-	
-//	REGISTER_ATTRIBUTE(initialAngles);
-//	REGISTER_ATTRIBUTE(angles); // FIXME - can be calculated after deserialization
 	
 	REGISTER_ATTRIBUTE(criticalTensileStrain);
 	REGISTER_ATTRIBUTE(criticalCompressiveStrain);

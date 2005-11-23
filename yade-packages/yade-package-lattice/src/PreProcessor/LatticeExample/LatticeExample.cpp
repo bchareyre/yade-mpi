@@ -386,19 +386,25 @@ void LatticeExample::calcAxisAngle(LatticeBeamParameters* beam, BodyContainer* b
 	{
 		LatticeBeamParameters* 	otherBeam 		= dynamic_cast<LatticeBeamParameters*>( ((*(bodies))[ otherId ])->physicalParameters.get() );
 		
-		Quaternionr 		rotation;
-		Vector3r 		axis;
+	//	Quaternionr 		rotation;
+	//	Vector3r 		axis;
 		Real 			angle;
 		
-		rotation.align( beam->direction , otherBeam->direction );
-		rotation.toAxisAngle (axis, angle);
-		Vector3r result = axis*angle;
+	//	rotation.align( beam->direction , otherBeam->direction );
+	//	rotation.toAxisAngle (axis, angle);
+	//	Vector3r result = axis*angle;
+	
+		angle = (beam->direction.cross(otherBeam->direction)[2] > 0.0 ? 1.0 : -1.0) * Mathr::aCos( beam->direction.dot(otherBeam->direction) / ( beam->direction.length() * otherBeam->direction.length() ) );
 
 		shared_ptr<Interaction> 		interaction(new Interaction( thisId , otherId ));
 		shared_ptr<LatticeBeamAngularSpring> 	angularSpring(new LatticeBeamAngularSpring);
 		
-		angularSpring->initialAngle 		= result; // rotation;
-		angularSpring->angle 			= result; // rotation;
+	//	angularSpring->initialAngle 		= result;
+	//	angularSpring->angle 			= result;
+	//	angularSpring->initialAngle 		= rotation;
+	//	angularSpring->angle 			= rotation;
+		angularSpring->initialAngle 		= angle;
+		angularSpring->angle 			= angle;
 		
 		interaction->isReal			= true;
 		interaction->isNew 			= false;

@@ -99,8 +99,9 @@ public:
 	RealType normalize ();  // make the 4-tuple unit length
 	Quaternion inverse () const;  // apply to non-zero quaternion
 	Quaternion conjugate () const;
-	Quaternion exp () const;  // apply to quaternion with w = 0
+	Quaternion exp () const;  // apply to quaternion with w = 0, FIXED..., any quaternion works
 	Quaternion log () const;  // apply to unit-length quaternion
+	Quaternion& power(RealType q);
 
 	// orientation of a vector by a quaternion
 	Vector3<RealType> rotate (const Vector3<RealType>& rkVector) const;

@@ -564,17 +564,17 @@ Quaternion<RealType> Quaternion<RealType>::exp () const
     // If q = A*(x*i+y*j+z*k) where (x,y,z) is unit length, then
     // exp(q) = cos(A)+sin(A)*(x*i+y*j+z*k).  If sin(A) is near zero,
     // use exp(q) = cos(A)+A*(x*i+y*j+z*k) since A/sin(A) has limit 1.
-
+    
     Quaternion kResult;
-
-    RealType fAngle = Math<RealType>::Sqrt(m_afTuple[1]*m_afTuple[1] +
+    
+    RealType fAngle = Math<RealType>::sqRoot(m_afTuple[1]*m_afTuple[1] +
         m_afTuple[2]*m_afTuple[2] + m_afTuple[3]*m_afTuple[3]);
-
-    RealType fSin = Math<RealType>::Sin(fAngle);
-    kResult.m_afTuple[0] = Math<RealType>::Cos(fAngle);
-
+        
+    RealType fSin = Math<RealType>::sinus(fAngle);
+    kResult.m_afTuple[0] = Math<RealType>::cosinus(fAngle);
+    
     int i;
-
+    
     if ( Math<RealType>::fAbs(fSin) >= Math<RealType>::ZERO_TOLERANCE )
     {
         RealType fCoeff = fSin/fAngle;
@@ -586,9 +586,9 @@ Quaternion<RealType> Quaternion<RealType>::exp () const
         for (i = 1; i <= 3; i++)
             kResult.m_afTuple[i] = m_afTuple[i];
     }
-
-    return kResult;
-}
+    
+    return kResult * std::exp(m_afTuple[0]);
+} 
 //----------------------------------------------------------------------------
 template <class RealType>
 Quaternion<RealType> Quaternion<RealType>::log () const
@@ -596,16 +596,16 @@ Quaternion<RealType> Quaternion<RealType>::log () const
     // If q = cos(A)+sin(A)*(x*i+y*j+z*k) where (x,y,z) is unit length, then
     // log(q) = A*(x*i+y*j+z*k).  If sin(A) is near zero, use log(q) =
     // sin(A)*(x*i+y*j+z*k) since sin(A)/A has limit 1.
-
+    
     Quaternion kResult;
     kResult.m_afTuple[0] = (RealType)0.0;
-
+    
     int i;
-
+    
     if ( Math<RealType>::fAbs(m_afTuple[0]) < (RealType)1.0 )
     {
-        RealType fAngle = Math<RealType>::ACos(m_afTuple[0]);
-        RealType fSin = Math<RealType>::Sin(fAngle);
+        RealType fAngle = Math<RealType>::aCos(m_afTuple[0]);
+        RealType fSin = Math<RealType>::sinus(fAngle);
         if ( Math<RealType>::fAbs(fSin) >= Math<RealType>::ZERO_TOLERANCE )
         {
             RealType fCoeff = fAngle/fSin;
@@ -614,10 +614,22 @@ Quaternion<RealType> Quaternion<RealType>::log () const
             return kResult;
         }
     }
-
+    
     for (i = 1; i <= 3; i++)
         kResult.m_afTuple[i] = m_afTuple[i];
+        
     return kResult;
+}
+//-----------------------------------------------------------------------------
+template <class RealType>
+Quaternion<RealType>& Quaternion<RealType>::power (const RealType q)
+{
+	Quaternion<RealType> qt = (this->log() * q ).exp();
+	m_afTuple[0] = qt[0];
+	m_afTuple[1] = qt[1];
+	m_afTuple[2] = qt[2];
+	m_afTuple[3] = qt[3];
+	return *this;
 }
 //----------------------------------------------------------------------------
 template <class RealType>

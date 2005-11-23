@@ -36,28 +36,27 @@ bool LatticeLaw::deleteBeam(MetaBody* metaBody , LatticeBeamParameters* beam)
 void LatticeLaw::calcBeamPositionOrientationNewLength(Body* body, BodyContainer* bodies)
 {
 // FIXME - verify that this updating of length, position, orientation and color is in correct place/plugin
-	LatticeBeamParameters* beam 	= static_cast<LatticeBeamParameters*>(body->physicalParameters.get());
+	LatticeBeamParameters* beam 	  = static_cast<LatticeBeamParameters*>(body->physicalParameters.get());
 
-	Body* bodyA 			= (*(bodies))[beam->id1].get();
-	Body* bodyB 			= (*(bodies))[beam->id2].get();
-	Se3r& se3A 			= bodyA->physicalParameters->se3;
-	Se3r& se3B 			= bodyB->physicalParameters->se3;
+	Body* bodyA 			  = (*(bodies))[beam->id1].get();
+	Body* bodyB 			  = (*(bodies))[beam->id2].get();
+	Se3r& se3A 			  = bodyA->physicalParameters->se3;
+	Se3r& se3B 			  = bodyB->physicalParameters->se3;
 	
 	Se3r se3Beam;
-	se3Beam.position 		= (se3A.position + se3B.position)*0.5;
-	Vector3r dist 			= se3A.position - se3B.position;
+	se3Beam.position 		  = (se3A.position + se3B.position)*0.5;
+	Vector3r dist 			  =  se3A.position - se3B.position;
 	
-	Real length 			= dist.normalize();
-	Vector3r previousDirection 	= beam->direction;
-	beam->direction 		= dist;
-	beam->length 			= length;
+	Real length 			  = dist.normalize();
+	beam->direction 		  = dist;
+	beam->length 			  = length;
 	
-	Vector3r previousPosition	= beam->se3.position;
 	se3Beam.orientation.align( Vector3r::UNIT_X , dist );
-	beam->se3 			= se3Beam;
 	
-	beam->se3Displacement.orientation.align(previousDirection,dist);
-	beam->se3Displacement.position = se3Beam.position - previousPosition;
+	beam->se3Displacement.position    = se3Beam.position - beam->se3.position;
+	beam->se3Displacement.orientation = se3Beam.orientation * beam->se3.orientation.inverse();
+	
+	beam->se3 			  = se3Beam;
 }
 
 void LatticeLaw::action(Body* body)
@@ -88,16 +87,23 @@ void LatticeLaw::action(Body* body)
 				
 				LatticeBeamAngularSpring* an = static_cast<LatticeBeamAngularSpring*>((*angles)->interactionPhysics.get());
 				
-				Vector3r angleDifference = an->angle - an->initialAngle;
-			//	Quaternionr angleDifference = an->angle - an->initialAngle;
+			//	Vector3r angleDifference = an->angle - an->initialAngle;
+			//	Quaternionr angleDifference = an->angle * an->initialAngle.inverse();
+				Real angleDifference = an->angle - an->initialAngle;
+				
+				if( angleDifference > 0 )
+					while(angleDifference > Mathr::PI) angleDifference -= Mathr::TWO_PI;
+				else
+					while(angleDifference < -Mathr::PI) angleDifference += Mathr::TWO_PI;
 				
 				++(beam1->count);
 				++(beam2->count);
-				beam1->rotation += angleDifference;
-				beam2->rotation -= angleDifference;
-			//	beam1->rotation = beam1->rotation*angleDifference;
-			//	beam2->rotation = angleDifference*beam2->rotation;
 				
+				beam1->bendingRotation += angleDifference;
+				beam2->bendingRotation -= angleDifference;
+			
+			//	beam1->bendingRotation =  angleDifference * beam1->bendingRotation;
+			//	beam2->bendingRotation = (angleDifference * beam2->bendingRotation).inverse();
 			}
 			// else FIXME - delete unused angularSpring
 		}
@@ -150,23 +156,40 @@ void LatticeLaw::action(Body* body)
 			node2->displacementStiffness += displacement * beam->longitudalStiffness;
 		}
 
+		if( beam->count != 0 )
 		{ // 'B' from picture - rotate to align with neighbouring beams
+		
 			node1->countStiffness += beam->bendingStiffness;
 			node2->countStiffness += beam->bendingStiffness;
 
-			Vector3r axis 		= beam->rotation / beam->count;
-			Real angle 		= axis.normalize();
+			Vector3r axis 		= Vector3r( 0.0 , 0.0 , 1.0 ); // 2D - always rotation around z 
+			Real angle 		= beam->bendingRotation;
+			if( angle > 0 )
+				while(angle > Mathr::PI) angle -= Mathr::TWO_PI;
+			else
+				while(angle < -Mathr::PI) angle += Mathr::TWO_PI;
+			angle /= beam->count;
+			
+		//	Vector3r axis 		= beam->rotation / beam->count;
+		//	Real angle 		= axis.normalize();
+		
 			Quaternionr rotation;
 			rotation.fromAxisAngle(axis,angle);
-		
-		//	Quaternionr rotation 	= beam->rotation;// / beam->count;
+	//		rotation.power( 1 / beam->count );
 			
-			Vector3r length = beam->length * beam->direction;// * 0.5; // FIXME - duplicate line
+		//	Quaternionr rotation 	= beam->bendingRotation; // / beam->count;
+			
+			Vector3r length = beam->length * beam->direction; // * 0.5;// beam->bendingStiffness / beam->count;// * 0.5; // FIXME - duplicate line
+			
+		//	node1->displacementStiffness += rotation * ( length) - length;
+		//	node2->displacementStiffness += rotation * (-length) + length;
+		
 			node1->displacementStiffness += (rotation * ( length) - length) * beam->bendingStiffness;
 			node2->displacementStiffness += (rotation * (-length) + length) * beam->bendingStiffness;
 			
-			beam->rotation 		= Vector3r(0.0,0.0,0.0);
-		//	beam->rotation 		= Quaternionr(0.0,0.0,0.0,0.0);
+		//	beam->rotation 		= Vector3r(0.0,0.0,0.0);
+		//	beam->bendingRotation 	= Quaternionr(1.0,0.0,0.0,0.0);
+			beam->bendingRotation 	= 0.0;
 			beam->count 		= 0.0;
 		}
 	}
@@ -237,14 +260,18 @@ void LatticeLaw::action(Body* body)
 				LatticeBeamParameters* beam1 = static_cast<LatticeBeamParameters*>(((*(bodies))[(*angles)->getId1()])->physicalParameters.get());
 				LatticeBeamParameters* beam2 = static_cast<LatticeBeamParameters*>(((*(bodies))[(*angles)->getId2()])->physicalParameters.get());
 			
-				Quaternionr 		rotation;
-				Vector3r		axis;
+			//	Quaternionr 		rotation;
+			//	Vector3r		axis;
 				Real			angle;
 			
-				rotation.align( beam1->direction , beam2->direction );
-				rotation.toAxisAngle (axis, angle);
-				(static_cast<LatticeBeamAngularSpring*>((*angles)->interactionPhysics.get()))->angle = axis*angle; 
+			//	rotation.align( beam1->direction , beam2->direction );
+			//	rotation.toAxisAngle (axis, angle);
+			
+				angle = (beam1->direction.cross(beam2->direction)[2] > 0.0 ? 1.0 : -1.0) * Mathr::aCos( beam1->direction.dot(beam2->direction) / ( beam1->direction.length() * beam2->direction.length() ) );
+				
+			//	(static_cast<LatticeBeamAngularSpring*>((*angles)->interactionPhysics.get()))->angle = axis*angle; 
 			//	(static_cast<LatticeBeamAngularSpring*>((*angles)->interactionPhysics.get()))->angle = rotation; 
+				(static_cast<LatticeBeamAngularSpring*>((*angles)->interactionPhysics.get()))->angle = angle;       // 2D
 			}
 			// else FIXME - delete unused angularSpring
 		}

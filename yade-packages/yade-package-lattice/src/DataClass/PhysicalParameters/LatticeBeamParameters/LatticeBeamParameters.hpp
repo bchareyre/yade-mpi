@@ -35,8 +35,9 @@ class LatticeBeamParameters : public PhysicalParameters
 		Se3r 			 se3Displacement;
 		
 		Real 			 count;
-	//	Quaternionr 		 rotation;
-		Vector3r 		 rotation;
+	//	Vector3r 		 rotation;
+	//	Quaternionr 		 bendingRotation;
+		Real 			 bendingRotation;
 		
 		void calcStrain();
 	

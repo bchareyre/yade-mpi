@@ -15,10 +15,12 @@
 class LatticeBeamAngularSpring : public InteractionPhysics
 {
 	public :
-		Vector3r		 initialAngle
-			 		,angle;
+	//	Vector3r		 initialAngle
+	//		 		,angle;
 	//	Quaternionr		 initialAngle
 	//		 		,angle;
+		Real			 initialAngle  // 2D only for now
+			 		,angle;
 		
 		LatticeBeamAngularSpring();
 		virtual ~LatticeBeamAngularSpring();
