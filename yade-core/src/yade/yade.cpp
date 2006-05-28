@@ -70,6 +70,10 @@ void firstRunSetup(shared_ptr<Preferences>& pref)
 
 void printHelp()
 {
+	string flags("");
+#ifdef DOUBLE_PRECISION
+	flags+="DOUBLE_PRECISION ";
+#endif
 	cout << 
 "\n" << Omega::instance().yadeVersionName << "\n\
 \n\
@@ -81,7 +85,9 @@ void printHelp()
 	-C path : configuration directory different than default ~/.yade/\n\
 \n\
 Only one option can be passed to yade, all other options are passed to the selected GUI\n\
-\n";
+";
+	if(flags!="")
+		cout << "compilation flags: "+ flags +"\n\n";
 }
 
 int main(int argc, char *argv[])
