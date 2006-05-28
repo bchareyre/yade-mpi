@@ -31,6 +31,7 @@ GLViewer::GLViewer(int id, shared_ptr<RenderingEngine> renderer, const QGLFormat
 	wm.addWindow(shared_ptr<GLWindow>(new FpsTracker()),shared_ptr<GLWindowsManager::EventSubscription>(new GLWindowsManager::EventSubscription()));
 	
 	this->camera()->frame()->setWheelSensitivity(-1.0f); // reverse scrollwheel behaviour
+	this->setMouseBinding(Qt::MidButton, CAMERA, TRANSLATE);
 }
 
 
