@@ -89,7 +89,7 @@ void GLSimulationPlayerViewer::animate()
 	
 		if (saveSnapShots)
 		{
-			setSnapshotFilename(outputBaseDirectory+"/"+outputBaseName);
+			setSnapshotFileName(outputBaseDirectory+"/"+outputBaseName);
 			setSnapshotFormat("BMP");
 			saveSnapshot(true);
 		}

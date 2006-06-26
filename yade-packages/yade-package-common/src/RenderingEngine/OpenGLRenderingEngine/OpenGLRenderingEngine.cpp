@@ -63,6 +63,15 @@ void OpenGLRenderingEngine::init()
 
 void OpenGLRenderingEngine::render(const shared_ptr<MetaBody>& rootBody)
 {		
+	static bool initDone=false;
+	if(!initDone) // FIXME - this is a quick hack for newest version of libglut
+	{
+		int a=1;
+		char* b="./yade";
+		glutInit(&a,&b);
+		initDone=true;
+	}
+
 	const GLfloat pos[4]	= {lightPos[0],lightPos[1],lightPos[2],1.0};
 	const GLfloat ambientColor[4]	= {0.5,0.5,0.5,1.0};	
 
