@@ -6,6 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
+/*
 #ifndef THREADSAFE_HPP
 #define THREADSAFE_HPP
 
@@ -32,4 +33,6 @@ class ThreadSafe
 	boost::mutex::scoped_lock lock2(m)
 
 #endif // THREADSAFE_HPP
+
+*/
 

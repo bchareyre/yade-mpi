@@ -11,7 +11,8 @@
 
 #include <QGLViewer/qglviewer.h>
 #include <yade/yade-lib-opengl/GLWindowsManager.hpp>
-#include "QGLThread.hpp"
+#include <yade/yade-core/RenderingEngine.hpp>
+//#include "QGLThread.hpp"
 
 class GLViewer : public QGLViewer
 {	
@@ -19,36 +20,24 @@ class GLViewer : public QGLViewer
 	
 	friend class QGLThread;
 	private :
-		QGLThread		qglThread;
+//		QGLThread		qglThread;
 		GLWindowsManager	wm;
 		int			viewId;
-		bool 			drawGrid;
+		bool 			drawGrid; // FIXME - draw grid to tak naprawdê kolejny GLDrawActor
+		shared_ptr<RenderingEngine> renderer;
 	
 	public :
 		GLViewer (int id, shared_ptr<RenderingEngine> renderer, const QGLFormat& format, QWidget * parent=0, QGLWidget * shareWidget=0);
 		virtual ~GLViewer ();
-
+		virtual void draw();
 		void centerScene();
-		void finishRendering();
-		void joinRendering();
-		void stopRendering();
-		void startRendering();
-		void paintGL();	
-		void initializeGL(); 
+
 
 	protected :
-		void resizeEvent(QResizeEvent *evt);
-		void paintEvent(QPaintEvent *);
-		void closeEvent(QCloseEvent *evt);
-		void mouseMoveEvent(QMouseEvent * e);
-		void mousePressEvent(QMouseEvent *e);
-		void mouseReleaseEvent(QMouseEvent *e);
 		void keyPressEvent(QKeyEvent *e);
-		void mouseDoubleClickEvent(QMouseEvent *e);
 		void postDraw();
+		void closeEvent(QCloseEvent *e);
 	
-	public slots :
-		void updateGL();
 	signals :
 		virtual void closeSignal(int i);
 };

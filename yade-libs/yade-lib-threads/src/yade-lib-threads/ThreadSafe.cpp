@@ -5,7 +5,7 @@
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
-
+/*
 #include "ThreadSafe.hpp"
 #include <iostream>
 
@@ -23,4 +23,6 @@ void ThreadSafe::cout(const string& s)
 	LOCK(ioMutex);
 	std::cout << s << std::endl;
 }
+
+*/
 

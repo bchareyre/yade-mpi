@@ -6,6 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
+/*
 #include "QGLThread.hpp"
 #include "GLViewer.hpp"
 #include <yade/yade-lib-opengl/FpsTracker.hpp>
@@ -20,7 +21,7 @@ QGLThread::QGLThread(GLViewer * glv, shared_ptr<RenderingEngine> r) :	Threadable
 									renderer(r),
 									glViewer(glv)
 {
-	createThread();	
+//	createThread();	
 }
 
 
@@ -115,5 +116,5 @@ void QGLThread::oneLoop()
 	glViewer->doneCurrent();
 
 }
-
+*/
 

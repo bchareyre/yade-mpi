@@ -16,8 +16,8 @@
 #include <yade/yade-lib-wm3-math/Vector3.hpp>
 #include <yade/yade-lib-serialization/IOFormatManager.hpp>
 #include <yade/yade-lib-serialization/IOFormatManager.hpp>
-#include <yade/yade-lib-threads/ThreadSynchronizer.hpp>
-#include <yade/yade-lib-threads/ThreadSafe.hpp>
+//#include <yade/yade-lib-threads/ThreadSynchronizer.hpp>
+//#include <yade/yade-lib-threads/ThreadSafe.hpp>
 #include <yade/yade-lib-multimethods/FunctorWrapper.hpp>
 #include <yade/yade-lib-multimethods/Indexable.hpp>
 #include <cstdlib>
@@ -27,7 +27,7 @@
 
 Omega::Omega()
 {
-	ThreadSafe::cerr("Constructing Omega  (if multiple times - check '-rdynamic' flag!)");
+	std::cerr << "Constructing Omega  (if multiple times - check '-rdynamic' flag!)";
 }
 
 
@@ -48,7 +48,7 @@ void Omega::init()
 	dt = 0.01;
 	logFile = shared_ptr<ofstream>(new ofstream("../data/log.xml", ofstream::out | ofstream::app));
 	// build simulation loop thread
-	synchronizer = shared_ptr<ThreadSynchronizer>(new ThreadSynchronizer()); // FIXME - this should be optional
+	// synchronizer = shared_ptr<ThreadSynchronizer>(new ThreadSynchronizer()); // FIXME - this should be optional
 }
 
 
@@ -80,7 +80,11 @@ void Omega::finishSimulationLoop()
 	//LOCK(omegaMutex);
 	
 	if (simulationLoop)
-		simulationLoop->finish();
+	{
+		//simulationLoop->finish();
+		std::cerr << "finishSimulationLoop()\n";
+		simulationLoop->stop();
+	}
 }
 
 
@@ -90,7 +94,9 @@ void Omega::joinSimulationLoop()
 	
 	if (simulationLoop)
 	{
-		simulationLoop->join();
+		//simulationLoop->join();
+		std::cerr << "joinSimulationLoop()\n";
+		simulationLoop->stop();
 		simulationLoop   = shared_ptr<SimulationLoop>();
 	}
 }
@@ -344,7 +350,7 @@ string Omega::getSimulationFileName()
 
 void Omega::loadSimulation()
 {
-	LOCK(Omega::instance().getRootBodyMutex());
+	//LOCK(Omega::instance().getRootBodyMutex());
 	
 	if( 	    (Omega::instance().getSimulationFileName().size() != 0)  
 		&&  (filesystem::exists(simulationFileName)) 
@@ -380,7 +386,7 @@ void Omega::loadSimulation()
 
 void Omega::saveSimulation(const string name)
 {
-	LOCK(Omega::instance().getRootBodyMutex());
+	//LOCK(Omega::instance().getRootBodyMutex());
 	
 	if( 	   (name.size() != 0)
 		&& (filesystem::extension(name)==".xml" || filesystem::extension(name)==".yade") )
@@ -446,13 +452,13 @@ bool Omega::containTimeStepper()
 	return false;
 }
 
-
+/*
 shared_ptr<ThreadSynchronizer> Omega::getSynchronizer()
 {
 //	LOCK(omegaMutex); // we can safatly return it because it is constructed in Omega constructor
 	return synchronizer;
 }
-
+*/
 
 const shared_ptr<MetaBody>& Omega::getRootBody()
 {

@@ -9,12 +9,12 @@
 #ifndef QGLTHREAD_HPP
 #define QGLTHREAD_HPP
 
-#include <yade/yade-lib-threads/Threadable.hpp>
+//#include <yade/yade-lib-threads/Threadable.hpp>
 #include <yade/yade-core/RenderingEngine.hpp>
-
+/*
 class GLViewer;
 
-class QGLThread : public Threadable<QGLThread>
+class QGLThread// : public Threadable<QGLThread>
 {	
 	private :
 		bool * needCentering;
@@ -35,6 +35,6 @@ class QGLThread : public Threadable<QGLThread>
 		bool notEnd();
 		void oneLoop();
 };
-
+*/
 #endif //  QGLTHREAD_HPP
 

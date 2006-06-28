@@ -30,7 +30,7 @@ class SimulationController : public QtGeneratedSimulationController
 		map<int,GLViewer* > glViews;
 		int maxNbViews;
 	
-		shared_ptr<SimulationControllerUpdater> updater;
+//		shared_ptr<SimulationControllerUpdater> updater;
 
 		QScrollView * scrollView;
 		QFrame * scrollViewFrame;
@@ -44,7 +44,7 @@ class SimulationController : public QtGeneratedSimulationController
 			,wasUsingTimeStepper;
 
 		SimulationController (QWidget * parent=0);
-
+		void redrawAll();
 		virtual ~SimulationController (); 
 	
 	public slots :

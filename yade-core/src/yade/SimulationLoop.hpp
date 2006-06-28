@@ -11,14 +11,17 @@
 
 #include <yade/yade-lib-threads/Threadable.hpp>
 
-class SimulationLoop : public Threadable<SimulationLoop>
+class SimulationLoop// : public Threadable<SimulationLoop>
 {
 	public :
 		SimulationLoop();
 		~SimulationLoop();
 	
-		virtual bool notEnd();
-		virtual void oneLoop();
+	//	bool notEnd();
+		void doOneLoop();
+		void start();
+		void stop();
+		bool isStopped();
 };
 
 #endif // SIMULATIONLOOP_HPP

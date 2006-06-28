@@ -11,10 +11,11 @@
 #include <qlcdnumber.h>
 #include <qspinbox.h>
 
-SimulationControllerUpdater::SimulationControllerUpdater(SimulationController * sc) : 	Threadable<SimulationControllerUpdater>(Omega::instance().getSynchronizer()),
-											controller(sc)
+SimulationControllerUpdater::SimulationControllerUpdater(SimulationController * sc)
+	// : 	Threadable<SimulationControllerUpdater>(Omega::instance()getSynchronizer())
+	// ,	controller(sc)
 {
-	createThread();
+//	createThread();
 }
 
 
@@ -23,10 +24,9 @@ SimulationControllerUpdater::~SimulationControllerUpdater()
 
 }
 
-
 void SimulationControllerUpdater::oneLoop()
 {
-	LOCK(Omega::instance().getRootBodyMutex());
+	//LOCK(Omega::instance().getRootBodyMutex());
 			
 	controller->lcdCurrentIteration->display(lexical_cast<string>(Omega::instance().getCurrentIteration()));
 	Real simulationTime = Omega::instance().getSimulationTime();

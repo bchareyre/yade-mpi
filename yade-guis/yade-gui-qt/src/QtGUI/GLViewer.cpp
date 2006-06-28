@@ -15,11 +15,12 @@
 #include <yade/yade-core/Omega.hpp>
 
 
-GLViewer::GLViewer(int id, shared_ptr<RenderingEngine> renderer, const QGLFormat& format, QWidget * parent, QGLWidget * shareWidget) : QGLViewer(format,parent,"glview",shareWidget), qglThread(this,renderer)
+GLViewer::GLViewer(int id, shared_ptr<RenderingEngine> rendererInit, const QGLFormat& format, QWidget * parent, QGLWidget * shareWidget) : QGLViewer(format,parent,"glview",shareWidget)//, qglThread(this,rendererInit)
 {
+	renderer=rendererInit;
 	drawGrid = false;
 	viewId = id;
-	setAutoBufferSwap(false);
+	//setAutoBufferSwap(false);
 	resize(320, 240);
 
 	if (id==0)
@@ -32,108 +33,14 @@ GLViewer::GLViewer(int id, shared_ptr<RenderingEngine> renderer, const QGLFormat
 	
 	this->camera()->frame()->setWheelSensitivity(-1.0f); // reverse scrollwheel behaviour
 	this->setMouseBinding(Qt::MidButton, CAMERA, TRANSLATE);
+
+//	std::cerr << "GLViewer ctor: " << viewId << "\n";
 }
 
 
 GLViewer::~GLViewer()
 {
-	
-}
-
-
-void GLViewer::initializeGL()
-{
-	QGLViewer::initializeGL();
-	qglThread.initializeGL();
-	glClearColor(0,0,0,0);
-}
-
-
-void GLViewer::finishRendering()
-{
-	qglThread.finish();
-}
-
-
-void GLViewer::joinRendering()
-{
-	qglThread.join();
-}
-
-
-void GLViewer::stopRendering()
-{
-	qglThread.stop();
-}
-
-
-void GLViewer::startRendering()
-{	
-	qglThread.start();
-}
-
-
-void GLViewer::centerScene()
-{
-	qglThread.centerScene();
-}
-	
-
-void GLViewer::paintGL()
-{
-	// Handled by the GLThread.
-}
-
-
-void GLViewer::updateGL()
-{
-	// Handled by the GLThread.
-}
-
-
-void GLViewer::resizeEvent(QResizeEvent *evt)
-{
-	qglThread.resize(evt->size().width(),evt->size().height()); 
-}
-
-
-void GLViewer::paintEvent(QPaintEvent *)
-{
-	// Handled by the GLThread.
-}
-
-
-void GLViewer::closeEvent(QCloseEvent *)
-{
-	emit closeSignal(viewId);
-}
-
-
-void GLViewer::mouseMoveEvent(QMouseEvent * e)
-{
-	if (wm.mouseMoveEvent(e->x(),e->y())==-1)
-		QGLViewer::mouseMoveEvent(e);
-}
-
-
-void GLViewer::mousePressEvent(QMouseEvent *e)
-{
-	if (wm.mousePressEvent(e->x(),e->y())==-1)
-		QGLViewer::mousePressEvent(e);
-}
-
-
-void GLViewer::mouseReleaseEvent(QMouseEvent *e)
-{
-	if (wm.mouseReleaseEvent(e->x(),e->y())==-1)
-		QGLViewer::mouseReleaseEvent(e);
-}
-
-
-void GLViewer::mouseDoubleClickEvent(QMouseEvent *e)
-{
-	if (wm.mouseDoubleClickEvent(e->x(),e->y())==-1)
-		QGLViewer::mouseDoubleClickEvent(e);
+//	std::cerr << "GLViewer dtor:" << viewId << "\n";
 }
 
 
@@ -152,9 +59,34 @@ void GLViewer::keyPressEvent(QKeyEvent *e)
 		QGLViewer::keyPressEvent(e);
 }
 
+void GLViewer::centerScene()
+{
+	if (!Omega::instance().getRootBody())
+		return;
+
+	Vector3r min = Omega::instance().getRootBody()->boundingVolume->min;
+	Vector3r max = Omega::instance().getRootBody()->boundingVolume->max;
+	Vector3r center = (max+min)*0.5;
+	Vector3r halfSize = (max-min)*0.5;
+	float radius = std::max(halfSize[0] , std::max(halfSize[1] , halfSize[2]) );
+	setSceneCenter(qglviewer::Vec(center[0],center[1],center[2]));
+	setSceneRadius(radius*1.5);
+	showEntireScene();
+}
+
+void GLViewer::draw() // FIXME maybe rename to RendererFlowControl, or something like that?
+{
+	if (Omega::instance().getRootBody())
+	// FIXME - here we want to actually call all responsible GLDraw Actors
+		renderer->render(Omega::instance().getRootBody());
+	
+	wm.glDraw();
+	dynamic_pointer_cast<FpsTracker>(wm.getWindow(0))->addOneAction();
+}
+
 void GLViewer::postDraw()
 {
-	if( drawGrid )
+	if( drawGrid ) // FIXME drawGrid is yet another RendererFlowControl's Actor.
 	{
 //		glMatrixMode(GL_MODELVIEW);
 		glPushMatrix();
@@ -197,5 +129,10 @@ void GLViewer::postDraw()
 		glPopMatrix();
 	}
 	QGLViewer::postDraw();
+}
+
+void GLViewer::closeEvent(QCloseEvent *e)
+{
+	emit closeSignal(viewId);
 }
 

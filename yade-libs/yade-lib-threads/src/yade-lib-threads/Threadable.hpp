@@ -6,6 +6,8 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
+/*
+
 #ifndef THREADABLE_HPP
 #define THREADABLE_HPP
 
@@ -56,4 +58,6 @@ class Threadable
 #include "Threadable.tpp"
 
 #endif // THREADABLE_HPP
+
+*/
 

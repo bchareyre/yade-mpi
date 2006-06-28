@@ -6,6 +6,8 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
+/*
+
 #include "ThreadSynchronizer.hpp"
 #include "ThreadSafe.hpp"
 
@@ -70,4 +72,6 @@ void ThreadSynchronizer::signal()
 {
 	cond.notify_all();
 }
+
+*/
 

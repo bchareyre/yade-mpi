@@ -25,7 +25,7 @@
 
 class MetaBody;
 class SimulationLoop;
-class ThreadSynchronizer;
+//class ThreadSynchronizer;
 class Preferences;
 
 using namespace boost;
@@ -50,7 +50,7 @@ class Omega : public Singleton<Omega>
 						,rootBodyMutex;
 
 		shared_ptr<SimulationLoop>	 simulationLoop;
-		shared_ptr<ThreadSynchronizer>	 synchronizer;
+	//	shared_ptr<ThreadSynchronizer>	 synchronizer;
 
 		map<string,DynlibDescriptor>	 dynlibs;	// FIXME : should store that in ClassFactory ?
 		Real				 dt;		// FIXME - maybe ? move this to MetaBody.hpp OR MAYBE NOT ?
@@ -84,7 +84,7 @@ class Omega : public Singleton<Omega>
 		void		joinSimulationLoop();
 		void		doOneSimulationLoop();
 		
-		shared_ptr<ThreadSynchronizer> getSynchronizer();
+	//	shared_ptr<ThreadSynchronizer> getSynchronizer();
 
 		const		map<string,DynlibDescriptor>& getDynlibsDescriptor();
 		void		scanPlugins();

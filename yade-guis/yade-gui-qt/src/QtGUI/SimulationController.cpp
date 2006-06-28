@@ -79,7 +79,7 @@ SimulationController::SimulationController(QWidget * parent) : QtGeneratedSimula
 	maxNbViews=0;
 	addNewView();
 
-	updater = shared_ptr<SimulationControllerUpdater>(new SimulationControllerUpdater(this));
+//	updater = shared_ptr<SimulationControllerUpdater>(new SimulationControllerUpdater(this));
 }
 
 
@@ -90,17 +90,19 @@ SimulationController::~SimulationController()
 	Omega::instance().finishSimulationLoop();
 	Omega::instance().joinSimulationLoop();
 	
-	updater->finish();
-	updater->join();
+//	updater->finish();
+//	updater->join();
 	
 	map<int,GLViewer*>::reverse_iterator gi = glViews.rbegin();
 	map<int,GLViewer*>::reverse_iterator giEnd = glViews.rend();
 	for(;gi!=giEnd;++gi)
 	{
-		boost::mutex::scoped_lock lock(mutex);
-		(*gi).second->finishRendering();
-		(*gi).second->joinRendering();
-		delete (*gi).second;
+		//boost::mutex::scoped_lock lock(mutex);
+		//(*gi).second->finishRendering();
+		//(*gi).second->joinRendering();
+		//delete (*gi).second;
+		gi->second->close();
+		delete gi->second;
 	}
 
 	glViews.clear();
@@ -111,6 +113,13 @@ SimulationController::~SimulationController()
 	IOFormatManager::saveToFile("XMLFormatManager",rendererConfig.string(),"renderer",renderer);
 }
 
+void SimulationController::redrawAll()
+{
+	map<int,GLViewer*>::reverse_iterator gi = glViews.rbegin();
+	map<int,GLViewer*>::reverse_iterator giEnd = glViews.rend();
+	for(;gi!=giEnd;++gi)
+		gi->second->updateGL();
+}
 
 void SimulationController::pbApplyClicked()
 {
@@ -134,10 +143,10 @@ void SimulationController::pbLoadClicked()
 		
 		map<int,GLViewer*>::iterator gi = glViews.begin();
 		map<int,GLViewer*>::iterator giEnd = glViews.end();
-		for(;gi!=giEnd;++gi)
-			(*gi).second->stopRendering();
+	//	for(;gi!=giEnd;++gi)
+	//		(*gi).second->stopRendering();
 
-		updater->stop();
+//		updater->stop();
 		Omega::instance().finishSimulationLoop();
 		Omega::instance().joinSimulationLoop();
 		
@@ -184,8 +193,9 @@ void SimulationController::pbLoadClicked()
 		for(;gi!=giEnd;++gi)
 		{
 			(*gi).second->centerScene();
-			(*gi).second->startRendering();
-		} 
+	//		(*gi).second->startRendering();
+		}
+		redrawAll();
 	}
 } 
 
@@ -206,10 +216,10 @@ void SimulationController::pbSaveClicked()
 		&& (fileName != "/")
 		&& (fileName != "../data"))
 	{
-		map<int,GLViewer*>::iterator gi = glViews.begin();
-		map<int,GLViewer*>::iterator giEnd = glViews.end();
-		for(;gi!=giEnd;++gi)
-			(*gi).second->stopRendering();
+	//	map<int,GLViewer*>::iterator gi = glViews.begin();
+	//	map<int,GLViewer*>::iterator giEnd = glViews.end();
+	//	for(;gi!=giEnd;++gi)
+	//		(*gi).second->stopRendering();
 
 		if(filesystem::extension(fileName)=="") // user forgot to specify extension - fix it.
 			fileName += (selectedFilter == "XML Yade File (*.xml)") ? ".xml" : ".yade";
@@ -217,10 +227,11 @@ void SimulationController::pbSaveClicked()
 		cerr << "saving simulation: " << fileName << "\n";
 		Omega::instance().saveSimulation(fileName);
 		
-		gi = glViews.begin();
-		giEnd = glViews.end();
-		for(;gi!=giEnd;++gi)
-			(*gi).second->startRendering();
+	//	gi = glViews.begin();
+	//	giEnd = glViews.end();
+	//	for(;gi!=giEnd;++gi)
+	//		(*gi).second->startRendering();
+		redrawAll();
 	}
 	else
 	{
@@ -257,7 +268,7 @@ void SimulationController::addNewView()
 	
 	connect( glViews[maxNbViews], SIGNAL( closeSignal(int) ), this, SLOT( closeGLViewEvent(int) ) );
 	glViews[maxNbViews]->centerScene();
-	glViews[maxNbViews]->startRendering();
+	//glViews[maxNbViews]->startRendering();
 }
 
 
@@ -268,8 +279,9 @@ void SimulationController::closeGLViewEvent(int id)
 
 	if (id!=0)
 	{
-		glViews[id]->finishRendering();
-		glViews[id]->joinRendering();
+	//	glViews[id]->finishRendering();
+	//	glViews[id]->joinRendering();
+		glViews[id]->close();
 		delete glViews[id];
 		glViews.erase(id);
 		if (id==maxNbViews)
@@ -282,7 +294,11 @@ void SimulationController::pbStopClicked()
 {
 	//LOCK(Omega::instance().getRootBodyMutex());
 	Omega::instance().stopSimulationLoop();
-	updater->stop();
+	map<int,GLViewer*>::reverse_iterator gi = glViews.rbegin();
+	map<int,GLViewer*>::reverse_iterator giEnd = glViews.rend();
+	for(;gi!=giEnd;++gi)
+		gi->second->stopAnimation();
+//	updater->stop();
 }
 
 
@@ -290,33 +306,38 @@ void SimulationController::pbStartClicked()
 {
 	//LOCK(Omega::instance().getRootBodyMutex());
 	Omega::instance().startSimulationLoop();	
-	updater->start();
+	map<int,GLViewer*>::reverse_iterator gi = glViews.rbegin();
+	map<int,GLViewer*>::reverse_iterator giEnd = glViews.rend();
+	for(;gi!=giEnd;++gi)
+		gi->second->startAnimation();
+//	updater->start();
 }
 
 
 void SimulationController::pbResetClicked()
 {	
-	updater->stop();
-	map<int,GLViewer*>::iterator gi = glViews.begin();
-	map<int,GLViewer*>::iterator giEnd = glViews.end();
-	for(;gi!=giEnd;++gi)
-		(*gi).second->stopRendering();
+//	updater->stop();
+	//map<int,GLViewer*>::iterator gi = glViews.begin();
+	//map<int,GLViewer*>::iterator giEnd = glViews.end();
+	//for(;gi!=giEnd;++gi)
+	//	(*gi).second->stopRendering();
 	
 	Omega::instance().finishSimulationLoop();
 	Omega::instance().joinSimulationLoop();	
 	Omega::instance().loadSimulation();
 	Omega::instance().createSimulationLoop();
 
-	updater->oneLoop(); // to refresh gui
+//	updater->oneLoop(); // to refresh gui
 	
-	gi = glViews.begin();
-	for(;gi!=giEnd;++gi)
-		(*gi).second->startRendering();
+	//gi = glViews.begin();
+	//for(;gi!=giEnd;++gi)
+	//	(*gi).second->startRendering();
 
 	changeSkipTimeStepper = true;
 	skipTimeStepper = !wasUsingTimeStepper;
 
 	rbTimeStepper->setEnabled(Omega::instance().containTimeStepper());
+	redrawAll();
 
 	//pbCenterSceneClicked();
 }
@@ -327,8 +348,10 @@ void SimulationController::pbOneSimulationStepClicked()
 	//Omega::instance().stopSimulationLoop();
 	//updater->start();
 	//FIXME : fix real simulation time
+	pbStopClicked();
 	Omega::instance().doOneSimulationLoop();
-	updater->doOneLoop();
+	redrawAll();
+//	updater->doOneLoop();
 	
 }
 
@@ -340,11 +363,13 @@ void SimulationController::pbCenterSceneClicked()
 	map<int,GLViewer*>::iterator giEnd = glViews.end();
 	for(;gi!=giEnd;++gi)
 		(*gi).second->centerScene();
+//	redrawAll();
 }
 
 
 void SimulationController::closeEvent(QCloseEvent *)
 {
+	pbStopClicked();
 	emit closeSignal();
 }
 

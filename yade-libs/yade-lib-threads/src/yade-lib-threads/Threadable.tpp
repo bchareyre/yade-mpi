@@ -6,6 +6,8 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
+/*
+
 #include <boost/thread/xtime.hpp>
 
 #include "ThreadSynchronizer.hpp"
@@ -134,4 +136,6 @@ void Threadable<Thread>::sleep(int ms)
 
 	boost::thread::sleep(xt);
 }
+
+*/
 

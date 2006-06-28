@@ -6,6 +6,8 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
+/*
+
 #ifndef THREADSYNCHRONIZER_HPP
 #define THREADSYNCHRONIZER_HPP
 
@@ -42,4 +44,6 @@ class ThreadSynchronizer
 };
 
 #endif // THREADSYNCHRONIZER_HPP
+
+*/
 
