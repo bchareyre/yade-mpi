@@ -11,7 +11,7 @@
 #include "Omega.hpp"
 #include "yadeExceptions.hpp"
 #include "MetaBody.hpp"
-#include "SimulationLoop.hpp"
+#include "SimulationRunner.hpp"
 #include "Preferences.hpp"
 #include <yade/yade-lib-wm3-math/Vector3.hpp>
 #include <yade/yade-lib-serialization/IOFormatManager.hpp>
@@ -71,7 +71,7 @@ void Omega::logMessage(const string& str)
 void Omega::createSimulationLoop()
 {
 	//LOCK(omegaMutex);
-	simulationLoop   = shared_ptr<SimulationLoop>(new SimulationLoop());
+	simulationLoop   = shared_ptr<SimulationRunner>(new SimulationRunner());
 }
 
 
@@ -82,7 +82,7 @@ void Omega::finishSimulationLoop()
 	if (simulationLoop)
 	{
 		//simulationLoop->finish();
-		std::cerr << "finishSimulationLoop()\n";
+		//std::cerr << "finishSimulationLoop()\n";
 		simulationLoop->stop();
 	}
 }
@@ -95,9 +95,9 @@ void Omega::joinSimulationLoop()
 	if (simulationLoop)
 	{
 		//simulationLoop->join();
-		std::cerr << "joinSimulationLoop()\n";
+		//std::cerr << "joinSimulationLoop()\n";
 		simulationLoop->stop();
-		simulationLoop   = shared_ptr<SimulationLoop>();
+		simulationLoop   = shared_ptr<SimulationRunner>();
 	}
 }
 

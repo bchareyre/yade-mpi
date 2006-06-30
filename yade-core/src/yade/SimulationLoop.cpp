@@ -8,18 +8,18 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "SimulationLoop.hpp"
+#include "SimulationRunner.hpp"
 #include "MetaBody.hpp"
 #include "Omega.hpp"
 //#include <yade/yade-lib-threads/ThreadSynchronizer.hpp>
 
-SimulationLoop::SimulationLoop()// : Threadable<SimulationLoop>(Omega::instance().getSynchronizer())
+SimulationRunner::SimulationRunner()// : Threadable<SimulationRunner>(Omega::instance().getSynchronizer())
 {
 //	createThread();
 }
 
 
-SimulationLoop::~SimulationLoop()
+SimulationRunner::~SimulationRunner()
 {
 
 }
@@ -57,7 +57,7 @@ class Running
 Running running;
 
 
-bool SimulationLoop::isStopped()
+bool SimulationRunner::isStopped()
 {
 	boost::mutex::scoped_lock lock(mut);
 	return !running.val();
@@ -70,7 +70,7 @@ void run()
 }
 
 
-void SimulationLoop::doOneLoop()
+void SimulationRunner::doOneLoop()
 {
 //	LOCK(Omega::instance().getRootBodyMutex());
 		
@@ -84,18 +84,18 @@ void SimulationLoop::doOneLoop()
 }
 
 
-void SimulationLoop::start()
+void SimulationRunner::start()
 {
 	boost::mutex::scoped_lock lock(mut);
 	running.tru();
 	boost::thread th(&run);
-	std::cerr << "start\n";
+	//std::cerr << "start\n";
 }
 
-void SimulationLoop::stop()
+void SimulationRunner::stop()
 {
 	boost::mutex::scoped_lock lock(mut);
 	running.fal();
-	std::cerr << "stop\n";
+//	std::cerr << "stop\n";
 }
 

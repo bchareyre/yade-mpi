@@ -89,7 +89,11 @@ void GLSimulationPlayerViewer::animate()
 	
 		if (saveSnapShots)
 		{
+#ifdef QGLVIEWER20
+			setSnapshotFilename(outputBaseDirectory+"/"+outputBaseName);
+#else
 			setSnapshotFileName(outputBaseDirectory+"/"+outputBaseName);
+#endif
 			setSnapshotFormat("BMP");
 			saveSnapshot(true);
 		}

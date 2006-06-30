@@ -63,6 +63,7 @@ void OpenGLRenderingEngine::init()
 
 void OpenGLRenderingEngine::render(const shared_ptr<MetaBody>& rootBody)
 {	// FIXME - make a compile time flag for that. So yade can compile with different versions.
+#ifndef NO_GLUTINIT
 	static bool initDone=false;
 	if(!initDone) // FIXME - this is a quick hack for newest version of libglut
 	{
@@ -71,6 +72,7 @@ void OpenGLRenderingEngine::render(const shared_ptr<MetaBody>& rootBody)
 		glutInit(&a,&b);
 		initDone=true;
 	}
+#endif
 	//
 	const GLfloat pos[4]	= {lightPos[0],lightPos[1],lightPos[2],1.0};
 	const GLfloat ambientColor[4]	= {0.5,0.5,0.5,1.0};	

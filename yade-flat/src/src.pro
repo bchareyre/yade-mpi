@@ -247,7 +247,7 @@ HEADERS += AABB.hpp \
            SerializationExceptions.hpp \
            SimulationController.hpp \
            SimulationControllerUpdater.hpp \
-           SimulationLoop.hpp \
+           SimulationRunner.hpp \
            Singleton.hpp \
            Sphere.hpp \
            SpheresContactGeometry.hpp \
@@ -508,7 +508,7 @@ SOURCES += yade.cpp \
            SerializationExceptions.cpp \
            SimulationController.cpp \
            SimulationControllerUpdater.cpp \
-           SimulationLoop.cpp \
+           SimulationRunner.cpp \
            Sphere.cpp \
            SpheresContactGeometry.cpp \
            SphericalDEMSimulator.cpp \

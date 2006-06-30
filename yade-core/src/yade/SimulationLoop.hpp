@@ -11,11 +11,11 @@
 
 #include <yade/yade-lib-threads/Threadable.hpp>
 
-class SimulationLoop// : public Threadable<SimulationLoop>
+class SimulationRunner// : public Threadable<SimulationRunner>
 {
 	public :
-		SimulationLoop();
-		~SimulationLoop();
+		SimulationRunner();
+		~SimulationRunner();
 	
 	//	bool notEnd();
 		void doOneLoop();

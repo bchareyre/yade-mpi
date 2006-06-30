@@ -1,7 +1,7 @@
 #! /bin/sh
 
 echo ""
-echo "You have decided to rename class: $1 to a new name: $2, very good."
+echo "You have decided to rename class: \"$1\" to a new name: \"$2\", very good."
 echo "But first make sure that : "
 echo " - svn status in trunk/ directory displays NO CHANGES at all, well, actually changes"
 echo "   totally unrelated to those classes should work... "

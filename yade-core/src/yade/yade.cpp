@@ -74,6 +74,12 @@ void printHelp()
 #ifdef DOUBLE_PRECISION
 	flags+="DOUBLE_PRECISION ";
 #endif
+#ifdef QGLVIEWER20
+	flags+="QGLVIEWER20 ";
+#endif
+#ifdef NO_GLUTINIT
+	flags+="NO_GLUTINIT ";
+#endif
 	cout << 
 "\n" << Omega::instance().yadeVersionName << "\n\
 \n\

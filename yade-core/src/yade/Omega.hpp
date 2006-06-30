@@ -24,7 +24,7 @@
 #include <yade/yade-lib-factory/ClassFactory.hpp>
 
 class MetaBody;
-class SimulationLoop;
+class SimulationRunner;
 //class ThreadSynchronizer;
 class Preferences;
 
@@ -49,7 +49,7 @@ class Omega : public Singleton<Omega>
 		boost::mutex			 omegaMutex
 						,rootBodyMutex;
 
-		shared_ptr<SimulationLoop>	 simulationLoop;
+		shared_ptr<SimulationRunner>	 simulationLoop;
 	//	shared_ptr<ThreadSynchronizer>	 synchronizer;
 
 		map<string,DynlibDescriptor>	 dynlibs;	// FIXME : should store that in ClassFactory ?
