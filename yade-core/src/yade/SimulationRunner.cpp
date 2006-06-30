@@ -1,7 +1,5 @@
 /*************************************************************************
-*  Copyright (C) 2004 by Olivier Galizzi                                 *
-*  olivier.galizzi@imag.fr                                               *
-*  Copyright (C) 2004 by Janek Kozicki                                   *
+*  Copyright (C) 2006 by Janek Kozicki                                   *
 *  cosurgi@berlios.de                                                    *
 *                                                                        *
 *  This program is free software; it is licensed under the terms of the  *
@@ -9,93 +7,59 @@
 *************************************************************************/
 
 #include "SimulationRunner.hpp"
-#include "MetaBody.hpp"
-#include "Omega.hpp"
-//#include <yade/yade-lib-threads/ThreadSynchronizer.hpp>
-
-SimulationRunner::SimulationRunner()// : Threadable<SimulationRunner>(Omega::instance().getSynchronizer())
-{
-//	createThread();
-}
-
-
-SimulationRunner::~SimulationRunner()
-{
-
-}
+#include "SimulationFlow.hpp"
 
 #include <boost/thread/thread.hpp>
-#include <boost/thread/mutex.hpp>
+#include <boost/function.hpp>
+#include <boost/bind.hpp>
 
-//bool running=false;
-boost::mutex mut,runmutex;
-
-class Running
+void SimulationRunner::run()
 {
-	private:
-		bool	running_;
-	public:
-		Running() : running_(false) {}
-		bool val()
-		{
-			boost::mutex::scoped_lock lock(runmutex);
-			return running_;
-		};
-		void tru()
-		{
-			boost::mutex::scoped_lock lock(runmutex);
-			running_=true;
-		};
-		void fal()
-		{
-			boost::mutex::scoped_lock lock(runmutex);
-			running_=false;
-		};
-
-};
-
-Running running;
-
-
-bool SimulationRunner::isStopped()
-{
-	boost::mutex::scoped_lock lock(mut);
-	return !running.val();
+	boost::mutex::scoped_lock lock(runmutex_);
+	while(isRunning())
+		call();
 }
 
-void run()
+void SimulationRunner::call()
 {
-	while(running.val())
-		Omega::instance().doOneSimulationLoop();
+	boost::mutex::scoped_lock lock(callmutex_);
+	simulationFlow_->singleLoop();
 }
 
-
-void SimulationRunner::doOneLoop()
+void SimulationRunner::singleLoop()
 {
-//	LOCK(Omega::instance().getRootBodyMutex());
-		
-	boost::mutex::scoped_lock lock(mut);
-	if (Omega::instance().getRootBody())
-	{
-		Omega::instance().getRootBody()->moveToNextTimeStep();
-		Omega::instance().incrementCurrentIteration();
-		Omega::instance().incrementSimulationTime();
-	}
+	boost::mutex::scoped_lock boollock(boolmutex_);
+	boost::mutex::scoped_lock calllock(callmutex_);
+	if(running_) return;
+	boost::function0<void> call( boost::bind( &SimulationRunner::call , this ) );
+	boost::thread th(call);
 }
-
 
 void SimulationRunner::start()
 {
-	boost::mutex::scoped_lock lock(mut);
-	running.tru();
-	boost::thread th(&run);
-	//std::cerr << "start\n";
+	boost::mutex::scoped_lock lock(boolmutex_);
+	if(running_) return;
+	running_=true;
+	boost::function0<void> run( boost::bind( &SimulationRunner::run , this ) );
+	boost::thread th(run);
 }
 
 void SimulationRunner::stop()
 {
-	boost::mutex::scoped_lock lock(mut);
-	running.fal();
-//	std::cerr << "stop\n";
+	boost::mutex::scoped_lock lock(boolmutex_);
+	running_=false;
+}
+
+bool SimulationRunner::isRunning()
+{
+	boost::mutex::scoped_lock lock(boolmutex_);
+	return running_;
+}
+
+SimulationRunner::~SimulationRunner()
+{
+	stop();
+	boost::mutex::scoped_lock runlock(runmutex_);
+	boost::mutex::scoped_lock calllock(callmutex_);
 }
 

@@ -71,7 +71,7 @@ void Omega::logMessage(const string& str)
 void Omega::createSimulationLoop()
 {
 	//LOCK(omegaMutex);
-	simulationLoop   = shared_ptr<SimulationRunner>(new SimulationRunner());
+	simulationLoop   = shared_ptr<SimulationRunner>(new SimulationRunner(&simulationFlow_));
 }
 
 
@@ -110,7 +110,7 @@ void Omega::doOneSimulationLoop()
 		//	simulationPauseDuration += microsec_clock::local_time()-msStartingPauseTime;
 		//else
 		msStartingPauseTime = microsec_clock::local_time();	
-		simulationLoop->doOneLoop();
+		simulationLoop->singleLoop();
 	}
 }
 
@@ -119,7 +119,7 @@ void Omega::startSimulationLoop()
 {
 //	LOCK(omegaMutex);
 
-	if (simulationLoop && simulationLoop->isStopped())
+	if (simulationLoop && !simulationLoop->isRunning())
 	{
 		simulationPauseDuration += microsec_clock::local_time()-msStartingPauseTime;
 		simulationLoop->start();
@@ -130,7 +130,7 @@ void Omega::startSimulationLoop()
 void Omega::stopSimulationLoop()
 {
 //	LOCK(omegaMutex);
-	if (simulationLoop && !(simulationLoop->isStopped()))
+	if (simulationLoop && simulationLoop->isRunning())
 	{
 		msStartingPauseTime = microsec_clock::local_time();
 		simulationLoop->stop();	

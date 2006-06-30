@@ -11,7 +11,6 @@ clean:
 	$(MAKE) -C yade-lib-factory clean
 	$(MAKE) -C yade-lib-multimethods clean
 	$(MAKE) -C yade-lib-serialization clean
-	$(MAKE) -C yade-lib-threads clean
 	$(MAKE) -C yade-lib-computational-geometry clean
 	$(MAKE) -C yade-lib-time clean
 	$(MAKE) -C yade-lib-opengl clean
@@ -39,9 +38,6 @@ compile_install:
 	
 	$(MAKE) -C yade-lib-serialization
 	$(MAKE) -C yade-lib-serialization install
-	
-	$(MAKE) -C yade-lib-threads
-	$(MAKE) -C yade-lib-threads install
 	
 	$(MAKE) -C yade-lib-computational-geometry
 	$(MAKE) -C yade-lib-computational-geometry install
@@ -74,7 +70,6 @@ uninstall:
 	$(MAKE) -C yade-lib-factory uninstall
 	$(MAKE) -C yade-lib-multimethods uninstall
 	$(MAKE) -C yade-lib-serialization uninstall
-	$(MAKE) -C yade-lib-threads uninstall
 	$(MAKE) -C yade-lib-computational-geometry uninstall
 	$(MAKE) -C yade-lib-time uninstall
 	$(MAKE) -C yade-lib-opengl uninstall
