@@ -24,6 +24,7 @@ void SimulationRunner::call()
 {
 	boost::mutex::scoped_lock lock(callmutex_);
 	simulationFlow_->singleLoop();
+	// can add here a signal, that notifies the UI about single loop being completed
 }
 
 void SimulationRunner::singleLoop()

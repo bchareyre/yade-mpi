@@ -17,7 +17,7 @@
 
  */
 
-class SimulationFlow
+class SimulationFlow  // perhaps simulation steps, or stage? as it is a single stage of the simulation, that consists of several steps
 {
 	public :
 		void singleLoop();
