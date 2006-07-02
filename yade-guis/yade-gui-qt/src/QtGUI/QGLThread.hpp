@@ -9,7 +9,6 @@
 #ifndef QGLTHREAD_HPP
 #define QGLTHREAD_HPP
 
-//#include <yade/yade-lib-threads/Threadable.hpp>
 #include <yade/yade-core/RenderingEngine.hpp>
 /*
 class GLViewer;

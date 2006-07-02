@@ -27,7 +27,6 @@ LIBS += -lyade-lib-time \
         -lyade-lib-multimethods \
         -lyade-lib-factory \
         -lyade-lib-opengl \
-        -lyade-lib-threads \
         -lyade-lib-serialization \
         -lyade-lib-computational-geometry \
         -lXMLFormatManager \

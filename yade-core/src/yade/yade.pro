@@ -70,7 +70,6 @@ SOURCES += BodyContainer.cpp \
            MetaDispatchingEngine.cpp \
            StandAloneSimulator.cpp 
 LIBS += -lyade-lib-time \
--lyade-lib-threads \
 -lyade-lib-serialization \
 -lyade-lib-factory \
 -lyade-lib-wm3-math \

@@ -19,9 +19,7 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <unistd.h>
 #include <yade/yade-core/Omega.hpp>
-#include <yade/yade-lib-threads/ThreadSynchronizer.hpp>
 #include <yade/yade-lib-wm3-math/Math.hpp>
-#include <yade/yade-lib-threads/Threadable.hpp>
 
 
 using namespace boost;

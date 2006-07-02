@@ -8,7 +8,6 @@
 
 #include "GLViewer.hpp"
 #include <GL/glut.h>
-#include <yade/yade-lib-threads/ThreadSynchronizer.hpp>
 #include <yade/yade-lib-opengl/FpsTracker.hpp>
 #include <yade/yade-core/Body.hpp>
 #include <yade/yade-core/Interaction.hpp>

@@ -16,8 +16,6 @@
 #include <yade/yade-lib-wm3-math/Vector3.hpp>
 #include <yade/yade-lib-serialization/IOFormatManager.hpp>
 #include <yade/yade-lib-serialization/IOFormatManager.hpp>
-//#include <yade/yade-lib-threads/ThreadSynchronizer.hpp>
-//#include <yade/yade-lib-threads/ThreadSafe.hpp>
 #include <yade/yade-lib-multimethods/FunctorWrapper.hpp>
 #include <yade/yade-lib-multimethods/Indexable.hpp>
 #include <cstdlib>

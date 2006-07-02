@@ -67,8 +67,8 @@ YadeQtMainWindow::YadeQtMainWindow() : YadeQtGeneratedMainWindow()
 	addItem("Edit","Preferences...","QtPreferencesEditor");
 		
 	addItem("Preprocessor","File Generator...","QtFileGenerator");
-	addItem("Preprocessor","Engine Editor...","QtEngineEditor");
-	addItem("Preprocessor","Code Generator...","QtCodeGenerator");
+	//addItem("Preprocessor","Engine Editor...","QtEngineEditor");
+	//addItem("Preprocessor","Code Generator...","QtCodeGenerator");
 
 	addItem("Postprocessor","Simulation Player...","QtSimulationPlayer");
 

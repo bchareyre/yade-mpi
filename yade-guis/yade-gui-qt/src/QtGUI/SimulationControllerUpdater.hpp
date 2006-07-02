@@ -9,11 +9,10 @@
 #ifndef SIMULATIONCONTROLLERUPDATER_HPP
 #define SIMULATIONCONTROLLERUPDATER_HPP
 
-//#include <yade/yade-lib-threads/Threadable.hpp>
 
 class SimulationController;
 
-class SimulationControllerUpdater// : public Threadable<SimulationControllerUpdater>
+class SimulationControllerUpdater
 {	
 	private :
 		SimulationController * controller;
