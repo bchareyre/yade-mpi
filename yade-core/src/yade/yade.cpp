@@ -98,7 +98,7 @@ Only one option can be passed to yade, all other options are passed to the selec
 
 int main(int argc, char *argv[])
 {
-	Omega::instance().yadeVersionName = "Yet Another Dynamic Engine 0.9.1, beta.";
+	Omega::instance().yadeVersionName = "Yet Another Dynamic Engine 0.10.0, beta.";
 	
 	int ch;
 	string 	gui 		= "";

@@ -3,41 +3,73 @@
 # Subdir relative project main directory: ./src
 # Target is an application:  
 
+YadeQtGeneratedMainWindow.ui.target = YadeQtGeneratedMainWindow.ui 
+YadeQtGeneratedMainWindow.ui.commands = $$IDL_COMPILER 
+QtGeneratedSphericalDEMSimulator.ui.commands = $$IDL_COMPILER 
+QtGeneratedSimulationPlayer.ui.commands = $$IDL_COMPILER 
+QtGeneratedSimulationController.ui.target = QtGeneratedSimulationController.ui 
+QtGeneratedSimulationController.ui.commands = $$IDL_COMPILER 
+QtGeneratedPreferencesEditor.ui.target = QtGeneratedPreferencesEditor.ui 
+QtGeneratedPreferencesEditor.ui.commands = $$IDL_COMPILER 
+QtGeneratedMetaDispatchingEngineProperties.ui.target = QtGeneratedMetaDispatchingEngineProperties.ui 
+QtGeneratedMetaDispatchingEngineProperties.ui.commands = $$IDL_COMPILER 
+QtGeneratedMessageDialog.ui.target = QtGeneratedMessageDialog.ui 
+QtGeneratedMessageDialog.ui.commands = $$IDL_COMPILER 
+QtGeneratedEngineEditor.ui.target = QtGeneratedEngineEditor.ui 
+QtGeneratedEngineEditor.ui.commands = $$IDL_COMPILER 
+QtGeneratedCodeGenerator.ui.target = QtGeneratedCodeGenerator.ui 
+QtGeneratedCodeGenerator.ui.commands = $$IDL_COMPILER 
+QtFileGeneratorController.ui.target = QtFileGeneratorController.ui 
+QtFileGeneratorController.ui.commands = $$IDL_COMPILER 
+LIBS += -lboost_thread \
+        -lboost_filesystem \
+        -lboost_date_time \
+        -lglut \
+        -lQGLViewer \
+        -rdynamic 
+INCLUDEPATH += ../src \
+               /home/janek/YADE/include/ 
+QMAKE_CXXFLAGS_RELEASE += -lpthread \
+                          -pthread 
+QMAKE_CXXFLAGS_DEBUG += -lpthread \
+                        -pthread \
+                        -g \
+                        -DDOUBLE_PRECISION 
+CONFIG += debug \
+          warn_on 
+TEMPLATE = app 
 FORMS += QtFileGeneratorController.ui \
-         QtGeneratedMessageDialog.ui \
-         QtGeneratedSimulationController.ui \
-         YadeQtGeneratedMainWindow.ui \
          QtGeneratedCodeGenerator.ui \
          QtGeneratedEngineEditor.ui \
+         QtGeneratedMessageDialog.ui \
          QtGeneratedMetaDispatchingEngineProperties.ui \
          QtGeneratedPreferencesEditor.ui \
+         QtGeneratedSimulationController.ui \
          QtGeneratedSimulationPlayer.ui \
-         QtGeneratedSphericalDEMSimulator.ui 
-IDLS += QtGeneratedSimulationPlayer.ui \
-        QtGeneratedSphericalDEMSimulator.ui 
+         QtGeneratedSphericalDEMSimulator.ui \
+         YadeQtGeneratedMainWindow.ui 
 HEADERS += AABB.hpp \
-           Vector4.ipp \
            AAInteractingBox2InteractingSphere4ClosestFeatures.hpp \
            Archive.hpp \
            ArchiveTypes.hpp \
            AssocVector.hpp \
            AveragePositionRecorder.hpp \
            BINFormatManager.hpp \
-           Body.hpp \
            BodyAssocVector.hpp \
            BodyAssocVectorIterator.hpp \
            BodyContainer.hpp \
            BodyContainerIterator.hpp \
            BodyContainerIteratorPointer.hpp \
+           Body.hpp \
            BodyMacroParameters.hpp \
            BodyRedirectionVector.hpp \
            BodyRedirectionVectorIterator.hpp \
            BoundingSphere.hpp \
-           BoundingVolume.hpp \
            BoundingVolumeEngineUnit.hpp \
+           BoundingVolume.hpp \
            BoundingVolumeMetaEngine.hpp \
-           Box.hpp \
            Box2PolyhedralSweptSphere.hpp \
+           Box.hpp \
            BoxStack.hpp \
            BroadInteractor.hpp \
            Chrono.hpp \
@@ -48,6 +80,7 @@ HEADERS += AABB.hpp \
            CundallNonViscousMomentumDamping.hpp \
            DataRecorder.hpp \
            DeusExMachina.hpp \
+           DisplacementEngine.hpp \
            Distances2D.hpp \
            Distances3D.hpp \
            DynLibDispatcher.hpp \
@@ -58,9 +91,9 @@ HEADERS += AABB.hpp \
            ElasticCriterionTimeStepper.hpp \
            EmptyType.hpp \
            Engine.hpp \
-           EngineUnit.hpp \
            EngineUnit1D.hpp \
            EngineUnit2D.hpp \
+           EngineUnit.hpp \
            ErrorTolerantContact.hpp \
            ErrorTolerantLaw.hpp \
            Factorable.hpp \
@@ -76,8 +109,8 @@ HEADERS += AABB.hpp \
            FEMTetrahedronStiffness.hpp \
            FileDialog.hpp \
            FileGenerator.hpp \
-           Force.hpp \
            ForceEngine.hpp \
+           Force.hpp \
            ForceRecorder.hpp \
            FpsTracker.hpp \
            FrictionLessElasticContactLaw.hpp \
@@ -85,10 +118,10 @@ HEADERS += AABB.hpp \
            Functor.hpp \
            FunctorWrapper.hpp \
            Funnel.hpp \
-           geom.h \
-           GeometricalModel.hpp \
            GeometricalModelEngineUnit.hpp \
+           GeometricalModel.hpp \
            GeometricalModelMetaEngine.hpp \
+           geom.h \
            GLDrawAABB.hpp \
            GLDrawBoundingSphere.hpp \
            GLDrawBoundingVolumeFunctor.hpp \
@@ -115,40 +148,41 @@ HEADERS += AABB.hpp \
            GravityEngine.hpp \
            HangingCloth.hpp \
            Indexable.hpp \
-           InteractingBox.hpp \
            InteractingBox2AABB.hpp \
            InteractingBox2InteractingBox4ClosestFeatures.hpp \
            InteractingBox2InteractingSphere4ClosestFeatures.hpp \
            InteractingBox2InteractingSphere4ErrorTolerantContact.hpp \
            InteractingBox2InteractingSphere4SpheresContactGeometry.hpp \
-           InteractingGeometry.hpp \
+           InteractingBox.hpp \
            InteractingGeometryEngineUnit.hpp \
+           InteractingGeometry.hpp \
            InteractingGeometryMetaEngine.hpp \
-           InteractingSphere.hpp \
            InteractingSphere2AABB.hpp \
            InteractingSphere2InteractingSphere4ClosestFeatures.hpp \
            InteractingSphere2InteractingSphere4ErrorTolerantContact.hpp \
            InteractingSphere2InteractingSphere4SpheresContactGeometry.hpp \
-           Interaction.hpp \
+           InteractingSphere.hpp \
            InteractionContainer.hpp \
            InteractionContainerIterator.hpp \
            InteractionContainerIteratorPointer.hpp \
-           InteractionGeometry.hpp \
            InteractionGeometryEngineUnit.hpp \
+           InteractionGeometry.hpp \
            InteractionGeometryMetaEngine.hpp \
            InteractionHashMap.hpp \
            InteractionHashMapIterator.hpp \
-           InteractionPhysics.hpp \
+           Interaction.hpp \
            InteractionPhysicsEngineUnit.hpp \
+           InteractionPhysics.hpp \
            InteractionPhysicsMetaEngine.hpp \
            InteractionSolver.hpp \
            InteractionVecSet.hpp \
            InteractionVecSetIterator.hpp \
            Intersections2D.hpp \
            Intersections3D.hpp \
-           io.h \
            IOFormatManager.hpp \
+           io.h \
            IOManagerExceptions.hpp \
+           LatticeBeamAngularSpring.hpp \
            LatticeBeamParameters.hpp \
            LatticeExample.hpp \
            LatticeLaw.hpp \
@@ -171,16 +205,17 @@ HEADERS += AABB.hpp \
            Mesh2D.hpp \
            MessageDialog.hpp \
            MetaBody.hpp \
-           MetaDispatchingEngine.hpp \
            MetaDispatchingEngine1D.hpp \
            MetaDispatchingEngine2D.hpp \
+           MetaDispatchingEngine.hpp \
            MetaEngine.hpp \
-           MetaInteractingGeometry.hpp \
            MetaInteractingGeometry2AABB.hpp \
+           MetaInteractingGeometry.hpp \
            Momentum.hpp \
            MultiMethodsExceptions.hpp \
            NewtonsForceLaw.hpp \
            NewtonsMomentumLaw.hpp \
+           NonLocalDependency.hpp \
            NullGUI.hpp \
            NullType.hpp \
            Omega.hpp \
@@ -192,7 +227,6 @@ HEADERS += AABB.hpp \
            PerlinNoise.hpp \
            PersistentAloneSAPCollider.hpp \
            PersistentSAPCollider.hpp \
-           PhysicalAction.hpp \
            PhysicalActionApplier.hpp \
            PhysicalActionApplierUnit.hpp \
            PhysicalActionContainer.hpp \
@@ -202,26 +236,27 @@ HEADERS += AABB.hpp \
            PhysicalActionContainerReseter.hpp \
            PhysicalActionDamper.hpp \
            PhysicalActionDamperUnit.hpp \
+           PhysicalAction.hpp \
            PhysicalActionVectorVector.hpp \
            PhysicalActionVectorVectorIterator.hpp \
-           PhysicalParameters.hpp \
            PhysicalParametersEngineUnit.hpp \
+           PhysicalParameters.hpp \
            PhysicalParametersMetaEngine.hpp \
            poly.h \
-           PolyhedralSweptSphere.hpp \
            PolyhedralSweptSphere2AABB.hpp \
+           PolyhedralSweptSphere.hpp \
            Polyhedron.hpp \
            PositionOrientationRecorder.hpp \
            Preferences.hpp \
            QGLThread.hpp \
-           qhull.h \
            qhull_a.h \
+           qhull.h \
            qset.h \
            QtCodeGenerator.hpp \
            QtEngineEditor.hpp \
            QtFileGenerator.hpp \
-           QtGUI.hpp \
            QtGUIGenerator.hpp \
+           QtGUI.hpp \
            QtGUIPreferences.hpp \
            QtMetaDispatchingEngineProperties.hpp \
            QtPreferencesEditor.hpp \
@@ -247,6 +282,7 @@ HEADERS += AABB.hpp \
            SerializationExceptions.hpp \
            SimulationController.hpp \
            SimulationControllerUpdater.hpp \
+           SimulationFlow.hpp \
            SimulationRunner.hpp \
            Singleton.hpp \
            Sphere.hpp \
@@ -258,27 +294,24 @@ HEADERS += AABB.hpp \
            StandAloneEngine.hpp \
            StandAloneSimulator.hpp \
            stat.h \
-           SWIFT.h \
            SWIFT_array.h \
            SWIFT_boxnode.h \
            SWIFT_common.h \
            SWIFT_config.h \
            SWIFT_fileio.h \
            SWIFT_front.h \
+           SWIFT.h \
            SWIFT_linalg.h \
            SWIFT_lut.h \
            SWIFT_mesh.h \
            SWIFT_mesh_utils.h \
            SWIFT_object.h \
            SWIFT_pair.h \
-           SWIFT_pqueue.h \
            SwiftPolyhedronProximityModeler.hpp \
-           Tetrahedron.hpp \
+           SWIFT_pqueue.h \
            Tetrahedron2PolyhedralSweptSphere.hpp \
+           Tetrahedron.hpp \
            TetrahedronsTest.hpp \
-           Threadable.hpp \
-           ThreadSafe.hpp \
-           ThreadSynchronizer.hpp \
            TimeStepper.hpp \
            TranslationEngine.hpp \
            Typelist.hpp \
@@ -298,36 +331,34 @@ HEADERS += AABB.hpp \
            FundamentalHandler.tpp \
            IOFormatManager.tpp \
            KnownFundamentalsHandler.tpp \
+           MultiTypeHandler.tpp \
+           PointerHandler.tpp \
            Math.ipp \
            Matrix2.ipp \
            Matrix3.ipp \
            Matrix4.ipp \
-           MultiTypeHandler.tpp \
-           PointerHandler.tpp \
            Quaternion.ipp \
            Se3.ipp \
-           Threadable.tpp \
            Vector2.ipp \
-           Vector3.ipp 
-SOURCES += yade.cpp \
-           YadeQtMainWindow.cpp \
-           AABB.cpp \
+           Vector3.ipp \
+           Vector4.ipp 
+SOURCES += AABB.cpp \
            AAInteractingBox2InteractingSphere4ClosestFeatures.cpp \
            Archive.cpp \
            AveragePositionRecorder.cpp \
            BINFormatManager.cpp \
-           Body.cpp \
            BodyAssocVector.cpp \
            BodyAssocVectorIterator.cpp \
            BodyContainer.cpp \
+           Body.cpp \
            BodyMacroParameters.cpp \
            BodyRedirectionVector.cpp \
            BodyRedirectionVectorIterator.cpp \
            BoundingSphere.cpp \
            BoundingVolume.cpp \
            BoundingVolumeMetaEngine.cpp \
-           Box.cpp \
            Box2PolyhedralSweptSphere.cpp \
+           Box.cpp \
            BoxStack.cpp \
            Chrono.cpp \
            ClassFactory.cpp \
@@ -335,6 +366,7 @@ SOURCES += yade.cpp \
            CundallNonViscousForceDamping.cpp \
            CundallNonViscousMomentumDamping.cpp \
            DeusExMachina.cpp \
+           DisplacementEngine.cpp \
            Distances2D.cpp \
            Distances3D.cpp \
            DynLibManager.cpp \
@@ -364,8 +396,8 @@ SOURCES += yade.cpp \
            FrictionLessElasticContactLaw.cpp \
            FrontEnd.cpp \
            Funnel.cpp \
-           geom.c \
            geom2.c \
+           geom.c \
            GeometricalModel.cpp \
            GeometricalModelMetaEngine.cpp \
            GLDrawAABB.cpp \
@@ -391,21 +423,21 @@ SOURCES += yade.cpp \
            GravityEngine.cpp \
            HangingCloth.cpp \
            Indexable.cpp \
-           InteractingBox.cpp \
            InteractingBox2AABB.cpp \
            InteractingBox2InteractingBox4ClosestFeatures.cpp \
            InteractingBox2InteractingSphere4ClosestFeatures.cpp \
            InteractingBox2InteractingSphere4ErrorTolerantContact.cpp \
            InteractingBox2InteractingSphere4SpheresContactGeometry.cpp \
+           InteractingBox.cpp \
            InteractingGeometry.cpp \
            InteractingGeometryMetaEngine.cpp \
-           InteractingSphere.cpp \
            InteractingSphere2AABB.cpp \
            InteractingSphere2InteractingSphere4ClosestFeatures.cpp \
            InteractingSphere2InteractingSphere4ErrorTolerantContact.cpp \
            InteractingSphere2InteractingSphere4SpheresContactGeometry.cpp \
-           Interaction.cpp \
+           InteractingSphere.cpp \
            InteractionContainer.cpp \
+           Interaction.cpp \
            InteractionGeometryMetaEngine.cpp \
            InteractionHashMap.cpp \
            InteractionHashMapIterator.cpp \
@@ -417,6 +449,7 @@ SOURCES += yade.cpp \
            io.c \
            IOFormatManager.cpp \
            IOManagerExceptions.cpp \
+           LatticeBeamAngularSpring.cpp \
            LatticeBeamParameters.cpp \
            LatticeExample.cpp \
            LatticeLaw.cpp \
@@ -437,18 +470,19 @@ SOURCES += yade.cpp \
            Matrix4.cpp \
            mem.c \
            merge.c \
-           mesh.cpp \
            Mesh2D.cpp \
+           mesh.cpp \
            mesh_utils.cpp \
            MessageDialog.cpp \
            MetaBody.cpp \
            MetaDispatchingEngine.cpp \
-           MetaInteractingGeometry.cpp \
            MetaInteractingGeometry2AABB.cpp \
+           MetaInteractingGeometry.cpp \
            Momentum.cpp \
            MultiMethodsExceptions.cpp \
            NewtonsForceLaw.cpp \
            NewtonsMomentumLaw.cpp \
+           NonLocalDependency.cpp \
            NullGUI.cpp \
            object.cpp \
            Omega.cpp \
@@ -469,10 +503,10 @@ SOURCES += yade.cpp \
            PhysicalActionVectorVectorIterator.cpp \
            PhysicalParameters.cpp \
            PhysicalParametersMetaEngine.cpp \
-           poly.c \
            poly2.c \
-           PolyhedralSweptSphere.cpp \
+           poly.c \
            PolyhedralSweptSphere2AABB.cpp \
+           PolyhedralSweptSphere.cpp \
            Polyhedron.cpp \
            PositionOrientationRecorder.cpp \
            pqueue.cpp \
@@ -508,6 +542,7 @@ SOURCES += yade.cpp \
            SerializationExceptions.cpp \
            SimulationController.cpp \
            SimulationControllerUpdater.cpp \
+           SimulationFlow.cpp \
            SimulationRunner.cpp \
            Sphere.cpp \
            SpheresContactGeometry.cpp \
@@ -517,11 +552,9 @@ SOURCES += yade.cpp \
            StandAloneSimulator.cpp \
            stat.c \
            SwiftPolyhedronProximityModeler.cpp \
-           Tetrahedron.cpp \
            Tetrahedron2PolyhedralSweptSphere.cpp \
+           Tetrahedron.cpp \
            TetrahedronsTest.cpp \
-           ThreadSafe.cpp \
-           ThreadSynchronizer.cpp \
            TimeStepper.cpp \
            TranslationEngine.cpp \
            unix.c \
@@ -532,39 +565,11 @@ SOURCES += yade.cpp \
            VelocityRecorder.cpp \
            XMLFormatManager.cpp \
            XMLSaxParser.cpp \
-           yadeExceptions.cpp 
-YadeQtGeneratedMainWindow.ui.target = YadeQtGeneratedMainWindow.ui
-YadeQtGeneratedMainWindow.ui.commands = $$IDL_COMPILER
-QtGeneratedSimulationController.ui.target = QtGeneratedSimulationController.ui
-QtGeneratedSimulationController.ui.commands = $$IDL_COMPILER
-QtGeneratedPreferencesEditor.ui.target = QtGeneratedPreferencesEditor.ui
-QtGeneratedPreferencesEditor.ui.commands = $$IDL_COMPILER
-QtGeneratedMetaDispatchingEngineProperties.ui.target = QtGeneratedMetaDispatchingEngineProperties.ui
-QtGeneratedMetaDispatchingEngineProperties.ui.commands = $$IDL_COMPILER
-QtGeneratedMessageDialog.ui.target = QtGeneratedMessageDialog.ui
-QtGeneratedMessageDialog.ui.commands = $$IDL_COMPILER
-QtGeneratedEngineEditor.ui.target = QtGeneratedEngineEditor.ui
-QtGeneratedEngineEditor.ui.commands = $$IDL_COMPILER
-QtGeneratedCodeGenerator.ui.target = QtGeneratedCodeGenerator.ui
-QtGeneratedCodeGenerator.ui.commands = $$IDL_COMPILER
-QtFileGeneratorController.ui.target = QtFileGeneratorController.ui
-QtFileGeneratorController.ui.commands = $$IDL_COMPILER
-LIBS += -lboost_thread \
--lboost_filesystem \
--lboost_date_time \
--lglut \
--lQGLViewer \
--rdynamic
-INCLUDEPATH += ../src \
-/home/janek/YADE/include/ \
-H:\YADE\include\
-QMAKE_CXXFLAGS_RELEASE += -lpthread \
--pthread
-QMAKE_CXXFLAGS_DEBUG += -lpthread \
--pthread
-CONFIG += debug \
-warn_on
-TEMPLATE = app
+           yade.cpp \
+           yadeExceptions.cpp \
+           YadeQtMainWindow.cpp 
+QtGeneratedSphericalDEMSimulator.ui.target = QtGeneratedSphericalDEMSimulator.ui
+QtGeneratedSimulationPlayer.ui.target = QtGeneratedSimulationPlayer.ui
 win32{
   TARGET = ../../bin/yade
   CONFIG += console

@@ -13,6 +13,7 @@
     <projectdirectory>.</projectdirectory>
     <absoluteprojectpath>false</absoluteprojectpath>
     <description/>
+    <versioncontrol/>
   </general>
   <kdevfileview>
     <groups>
@@ -70,7 +71,7 @@
   <kdevdebugger>
     <general>
       <dbgshell/>
-      <programargs> -i QtGUI</programargs>
+      <programargs/>
       <gdbpath/>
       <configGdbScript/>
       <runShellScript/>
@@ -88,7 +89,7 @@
   <kdevtrollproject>
     <run>
       <mainprogram>bin/yade</mainprogram>
-      <programargs> -iQtGUI</programargs>
+      <programargs/>
       <directoryradio>executable</directoryradio>
       <customdirectory>/</customdirectory>
       <terminal>false</terminal>
@@ -105,10 +106,12 @@
       <makebin/>
       <prio>0</prio>
       <envvars/>
+      <runmultiplejobs>false</runmultiplejobs>
     </make>
     <subclassing/>
   </kdevtrollproject>
   <kdevfilecreate>
+    <filetypes/>
     <useglobaltypes>
       <type ext="ui" />
       <type ext="cpp" />
@@ -118,8 +121,9 @@
   </kdevfilecreate>
   <kdevdocumentation>
     <projectdoc>
-      <docsystem>Doxygen Documentation Collection</docsystem>
-      <docurl>${APPNAMELC}.tag</docurl>
+      <docsystem/>
+      <docurl/>
+      <usermanualurl/>
     </projectdoc>
   </kdevdocumentation>
   <substmap>
@@ -155,6 +159,11 @@
       <inlineGet>true</inlineGet>
       <inlineSet>true</inlineSet>
     </creategettersetter>
+    <qt>
+      <used>false</used>
+      <version>3</version>
+      <root/>
+    </qt>
   </kdevcppsupport>
   <cppsupportpart>
     <filetemplates>
