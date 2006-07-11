@@ -21,7 +21,6 @@ class SimulationControllerUpdater
 		SimulationControllerUpdater(SimulationController * sc);
 		virtual ~SimulationControllerUpdater();
 		void oneLoop();
-		bool notEnd();
 };
 
 #endif // SIMULATIONCONTROLLERUPDATER_HPP

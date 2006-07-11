@@ -1,6 +1,8 @@
 /*************************************************************************
 *  Copyright (C) 2004 by Olivier Galizzi                                 *
 *  olivier.galizzi@imag.fr                                               *
+*  Copyright (C) 2006 by Janek Kozicki                                   *
+*  cosurgi@berlios.de                                                    *
 *                                                                        *
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
@@ -30,7 +32,7 @@ class SimulationController : public QtGeneratedSimulationController
 		map<int,GLViewer* > glViews;
 		int maxNbViews;
 	
-//		shared_ptr<SimulationControllerUpdater> updater;
+		shared_ptr<SimulationControllerUpdater> updater;
 
 		QScrollView * scrollView;
 		QFrame * scrollViewFrame;
@@ -65,6 +67,7 @@ class SimulationController : public QtGeneratedSimulationController
 	
 	protected :
 		void closeEvent(QCloseEvent *evt);
+		virtual void timerEvent(QTimerEvent* );
 };
 
 #endif // SIMULATIONCONTROLLER_HPP

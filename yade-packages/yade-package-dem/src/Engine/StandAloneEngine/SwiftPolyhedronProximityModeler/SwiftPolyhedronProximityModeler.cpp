@@ -168,7 +168,7 @@ void SwiftPolyhedronProximityModeler::action(Body* body)
 			//cg->normal.normalize();
 
 			//cout << cg->normal << " | " << normals[3*i+0] << " " << normals[3*i+1] << " "  << normals[3*i+2] << endl;
-			
+		/*	
 			if (featuresType[2*i]==SWIFT_VERTEX && featuresType[2*i+1]==SWIFT_VERTEX)
 				cout << "vv" << endl;
 			else if (featuresType[2*i]==SWIFT_EDGE && featuresType[2*i+1]==SWIFT_VERTEX)
@@ -181,7 +181,7 @@ void SwiftPolyhedronProximityModeler::action(Body* body)
 				cout << "fv" << endl;
 			else if (featuresType[2*i]==SWIFT_EDGE && featuresType[2*i+1]==SWIFT_EDGE)
 				cout << "ee" << endl;
-
+		*/
 			p1 -= cg->normal*pss1->radius;
 			p2 += cg->normal*pss2->radius;
 			

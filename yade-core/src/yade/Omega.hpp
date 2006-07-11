@@ -27,7 +27,6 @@
 
 class MetaBody;
 class SimulationRunner;
-//class ThreadSynchronizer;
 class Preferences;
 
 using namespace boost;
@@ -53,7 +52,6 @@ class Omega : public Singleton<Omega>
 
 		shared_ptr<SimulationRunner>	 simulationLoop;
 		SimulationFlow			 simulationFlow_;
-	//	shared_ptr<ThreadSynchronizer>	 synchronizer;
 
 		map<string,DynlibDescriptor>	 dynlibs;	// FIXME : should store that in ClassFactory ?
 		Real				 dt;		// FIXME - maybe ? move this to MetaBody.hpp OR MAYBE NOT ?

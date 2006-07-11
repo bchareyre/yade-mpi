@@ -77,28 +77,19 @@ SimulationController::SimulationController(QWidget * parent) : QtGeneratedSimula
 	maxNbViews=0;
 	addNewView();
 
-//	updater = shared_ptr<SimulationControllerUpdater>(new SimulationControllerUpdater(this));
+	updater = shared_ptr<SimulationControllerUpdater>(new SimulationControllerUpdater(this));
 }
 
 
 SimulationController::~SimulationController()
 {	
-	//LOCK(Omega::instance().getRootBodyMutex());
-	
 	Omega::instance().finishSimulationLoop();
 	Omega::instance().joinSimulationLoop();
-	
-//	updater->finish();
-//	updater->join();
 	
 	map<int,GLViewer*>::reverse_iterator gi = glViews.rbegin();
 	map<int,GLViewer*>::reverse_iterator giEnd = glViews.rend();
 	for(;gi!=giEnd;++gi)
 	{
-		//boost::mutex::scoped_lock lock(mutex);
-		//(*gi).second->finishRendering();
-		//(*gi).second->joinRendering();
-		//delete (*gi).second;
 		gi->second->close();
 		delete gi->second;
 	}
@@ -122,11 +113,14 @@ void SimulationController::redrawAll()
 void SimulationController::pbApplyClicked()
 {
 	guiGen.deserialize(renderer);
+	redrawAll();
 }
 
 
 void SimulationController::pbLoadClicked()
 {
+	pbStopClicked();
+	
 	string selectedFilter;
 	std::vector<string> filters;
 	filters.push_back("Yade Binary File (*.yade)");
@@ -138,12 +132,6 @@ void SimulationController::pbLoadClicked()
 		&& filesystem::exists(fileName) 
 		&& (filesystem::extension(fileName)==".xml" || filesystem::extension(fileName)==".yade"))
 	{
-		
-		map<int,GLViewer*>::iterator gi = glViews.begin();
-		map<int,GLViewer*>::iterator giEnd = glViews.end();
-	//	for(;gi!=giEnd;++gi)
-	//		(*gi).second->stopRendering();
-
 //		updater->stop();
 		Omega::instance().finishSimulationLoop();
 		Omega::instance().joinSimulationLoop();
@@ -186,14 +174,7 @@ void SimulationController::pbLoadClicked()
 			pbOneSimulationStep->setDisabled(true);
 		}
 		
-		gi = glViews.begin();
-		giEnd = glViews.end();
-		for(;gi!=giEnd;++gi)
-		{
-			(*gi).second->centerScene();
-	//		(*gi).second->startRendering();
-		}
-		redrawAll();
+		pbCenterSceneClicked();
 	}
 } 
 
@@ -214,10 +195,6 @@ void SimulationController::pbSaveClicked()
 		&& (fileName != "/")
 		&& (fileName != "../data"))
 	{
-	//	map<int,GLViewer*>::iterator gi = glViews.begin();
-	//	map<int,GLViewer*>::iterator giEnd = glViews.end();
-	//	for(;gi!=giEnd;++gi)
-	//		(*gi).second->stopRendering();
 
 		if(filesystem::extension(fileName)=="") // user forgot to specify extension - fix it.
 			fileName += (selectedFilter == "XML Yade File (*.xml)") ? ".xml" : ".yade";
@@ -225,15 +202,11 @@ void SimulationController::pbSaveClicked()
 		cerr << "saving simulation: " << fileName << "\n";
 		Omega::instance().saveSimulation(fileName);
 		
-	//	gi = glViews.begin();
-	//	giEnd = glViews.end();
-	//	for(;gi!=giEnd;++gi)
-	//		(*gi).second->startRendering();
 		redrawAll();
 	}
 	else
 	{
-		shared_ptr<MessageDialog> md = shared_ptr<MessageDialog>(new MessageDialog("Save failed - bad file extension.",this->parentWidget()->parentWidget()));
+		shared_ptr<MessageDialog> md = shared_ptr<MessageDialog>(new MessageDialog("Save aborted (check file extension).",this->parentWidget()->parentWidget()));
 		md->exec(); 
 	}
 }
@@ -246,8 +219,6 @@ void SimulationController::pbNewViewClicked()
 
 void SimulationController::addNewView()
 {
-	//LOCK(Omega::instance().getRootBodyMutex());
-	
 	QGLFormat format;
 	QGLFormat::setDefaultFormat( format );
 	format.setStencil(TRUE);
@@ -266,19 +237,13 @@ void SimulationController::addNewView()
 	
 	connect( glViews[maxNbViews], SIGNAL( closeSignal(int) ), this, SLOT( closeGLViewEvent(int) ) );
 	glViews[maxNbViews]->centerScene();
-	//glViews[maxNbViews]->startRendering();
 }
 
 
 void SimulationController::closeGLViewEvent(int id)
 {
-	//LOCK(Omega::instance().getRootBodyMutex());
-	//boost::mutex::scoped_lock lock(mutex);
-
 	if (id!=0)
 	{
-	//	glViews[id]->finishRendering();
-	//	glViews[id]->joinRendering();
 		glViews[id]->close();
 		delete glViews[id];
 		glViews.erase(id);
@@ -290,73 +255,65 @@ void SimulationController::closeGLViewEvent(int id)
 
 void SimulationController::pbStopClicked()
 {
-	//LOCK(Omega::instance().getRootBodyMutex());
 	Omega::instance().stopSimulationLoop();
-	map<int,GLViewer*>::reverse_iterator gi = glViews.rbegin();
-	map<int,GLViewer*>::reverse_iterator giEnd = glViews.rend();
-	for(;gi!=giEnd;++gi)
-		gi->second->stopAnimation();
+//	map<int,GLViewer*>::reverse_iterator gi = glViews.rbegin();
+//	map<int,GLViewer*>::reverse_iterator giEnd = glViews.rend();
+//	for(;gi!=giEnd;++gi)
+//		gi->second->stopAnimation();
 //	updater->stop();
+	
+	killTimers();
 }
 
 
 void SimulationController::pbStartClicked()
 {
-	//LOCK(Omega::instance().getRootBodyMutex());
 	Omega::instance().startSimulationLoop();	
-	map<int,GLViewer*>::reverse_iterator gi = glViews.rbegin();
-	map<int,GLViewer*>::reverse_iterator giEnd = glViews.rend();
-	for(;gi!=giEnd;++gi)
-		gi->second->startAnimation();
+//	map<int,GLViewer*>::reverse_iterator gi = glViews.rbegin();
+//	map<int,GLViewer*>::reverse_iterator giEnd = glViews.rend();
+//	for(;gi!=giEnd;++gi)
+//		gi->second->startAnimation();
 //	updater->start();
+
+	startTimer(50);
 }
 
 
 void SimulationController::pbResetClicked()
 {	
 //	updater->stop();
-	//map<int,GLViewer*>::iterator gi = glViews.begin();
-	//map<int,GLViewer*>::iterator giEnd = glViews.end();
-	//for(;gi!=giEnd;++gi)
-	//	(*gi).second->stopRendering();
+
+	pbStopClicked();
 	
 	Omega::instance().finishSimulationLoop();
 	Omega::instance().joinSimulationLoop();	
 	Omega::instance().loadSimulation();
 	Omega::instance().createSimulationLoop();
 
-//	updater->oneLoop(); // to refresh gui
-	
-	//gi = glViews.begin();
-	//for(;gi!=giEnd;++gi)
-	//	(*gi).second->startRendering();
-
 	changeSkipTimeStepper = true;
 	skipTimeStepper = !wasUsingTimeStepper;
+	updater->oneLoop(); // to refresh gui
 
 	rbTimeStepper->setEnabled(Omega::instance().containTimeStepper());
 	redrawAll();
 
-	//pbCenterSceneClicked();
+//	pbCenterSceneClicked();  // FIXME - add autocenter option...
 }
 
 
 void SimulationController::pbOneSimulationStepClicked()
 {
-	//Omega::instance().stopSimulationLoop();
 	//updater->start();
 	//FIXME : fix real simulation time
 	pbStopClicked();
 	Omega::instance().doOneSimulationLoop();
 	redrawAll();
-//	updater->doOneLoop();
-	
+	updater->oneLoop();
 }
 
 
 void SimulationController::pbCenterSceneClicked()
 {
-	//LOCK(Omega::instance().getRootBodyMutex());
 	map<int,GLViewer*>::iterator gi = glViews.begin();
 	map<int,GLViewer*>::iterator giEnd = glViews.end();
 	for(;gi!=giEnd;++gi)
@@ -407,5 +364,11 @@ void SimulationController::sb10PowerSecondValueChanged(int)
 void SimulationController::sbSecondValueChanged(int)
 {
 	changeTimeStep = true;
+}
+
+void SimulationController::timerEvent( QTimerEvent* )
+{
+	updater->oneLoop();
+	redrawAll();
 }
 

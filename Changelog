@@ -1,3 +1,106 @@
+r.974 version 0.10.0
+  - added SimulationRunner, that can start/stop or perform singleLoop of simulation in separate thread.
+  - Maybe some signal capability will be added to SimulationRunner, so that something can be notified when singleLoop is finished during calculations.
+
+r.972
+  - GLSimulationPlayerviewer - change of function call, because qglviewer 2.2 has changed a function name: added compilation flag: QGLVIEWER20
+  - OpenGLRenderingEngine - latest version of libglut3d requires to call glutInit(): added compilation flags: NO_GLUTINIT
+
+r.970
+  - Threadable class has been removed:
+  - when yade is idle 0% of CPU is consumed by the display,
+  - when simulation is ran it is in separate thread, second processor (if present) is drawing on the screen,
+  - with two processors theoretically QtGUI should have speed equal to NullGUI,
+  - drawing on the screen is not synchronized, so some bodies are from previous iteration, some are from next iteration (later there will be an option to turn synchronization ON - it will slow down computations a bit)
+  - This implementation is stil not 100% tested, please report if there are any problems. Especially if there is a segfault on exit. Press enter in each graphical view to start/stop updating it.
+
+r.960
+  - 'cancel' when loading filegenerator is not crashing now
+  - started non-local model for lattice
+  - hopefully 2d lattice beams are now okay.
+  - middle button in 3d view is now "PAN" command, not "ZOOM" as it used to be. It's more similar to AutoCAD
+  - 'yade -h' will now display compilation flags (currently only DOUBLE_PRECISION - how about adding long double ;) ?)
+
+r.957
+  - added function Quaternion::power(RealType)
+  - lattice bending works now in 2d (X-Y plane), using angles. not vectors or quaternions. I will do 3d later.
+
+r.956
+  - fixed serious bug in bool BodyRedirectionVector::erase(unsigned int);
+  - added function bool exists() const; to BodyContainer
+  - graphical display now has reversed meaning of scrollwheel, so it is now similar to behaviour of blender and autocad
+  - SDECLinkedSpheres is working after some (surprise!) quick hack. That part is still waiting for total rewrite.
+  - big improvements in lattice model. beam bending works (but not always) with axis+angle notation. maybe with quaternions it will be better. There is a problem that shows itself when using regular triangular grid.
+
+r.955 version 0.9.8
+  - NullGUI displays help when called without arguments
+  - fixed serious problem in OpenGLRenderingEngine's constructor - there were hardoced plugin names. now the list is built dynamically
+  - configurable path to preferences, not forcing users to use ~/.yade/
+  - QtGUI is now saving the configuration of RenderingEngine, so for example background color is remembered now.
+  - 'Load' and 'Save' in FileGenerator works
+  - added yadeVersionName to Omega - so that all plugins can query it to correcly display version, which is set by main(), and general cleaning of the mess in main(), yade.cpp
+  - fixed handling of pointer to simulationController in YadeQtMainWindow.cpp
+  - lattice model based on rods works great
+  - add a FIXME in XMLFormatManager, beginDesrialization : rootBody can load FileGenerator, because is not checking names
+
+r.954 version 0.9.7
+  - NullGUI can save to binary format
+  - graphical windows GLViewer displays a grid with cell size exacly 1 meter or 1 cm (depending on the model size) previously that grid had some random size, which was totally useless
+  - added DisplacementEngine derived from DeuxExMachina - is like translation, but without velocity - purely kinematic displacement.
+  - disorder parameters in FileGenerators SDECSpheresPlane and LatticeExample are now Vector3r, so that we can specify different randomness in each direction. This is useful for flat 2D simulations
+  - major improvements to lattice model (rod model is working)
+
+r.953 version 0.9.6
+  - binary serialization for yade
+  - fixed one bug in BINFormatManager
+  - fixed saving ElasticContactParameters and SpheresContactGeometry, so that after loading the simulation is not going crazy
+  - removed GLAPI and GLAPIENTRY from OpenGLWrapper
+  - XMLSaxParser is now better at counting lines
+
+r.951 version 0.9.5
+  - can save simulation from simulation controller
+  - can change background color of the simulation displayed
+
+r.950
+  - QtEngineEditor is not working - doesn't detect correctly StandAloneEngines
+  - there was a collision between PersistentSAPCollider and PersistentSAPCollider from yade-extra, renamed second one to PersistentAloneSAPCollider
+
+r.949 version 0.9.4
+  - added: StandAloneEngine.hpp, InteractionSolver.hpp, DataRecorder.hpp, BroadInteractor.hpp - to have a nicer and easier to navigate class diagram
+  - fixed drawing of bounding volumes inside rootBody
+
+r.948 version 0.9.3
+  - MetaBody::actors -> engines
+  - GLDrawInteractionBox -> GLDrawInteractingBox
+  - GLDrawInteractionGeometryFunctor -> GLDrawInteractingGeometryFunctor
+  - GLDrawInteractionSphere -> GLDrawInteractingSphere
+  - GLDrawInteractionGeometrySet -> GLDrawMetaInteractingGeometry
+  - ErrorTolerantContactModel -> ErrorTolerantContact
+  - AABox2Sphere4ClosestFeatures -> AAInteractingBox2InteractingSphere4ClosestFeatures
+  - Box2Box4ClosestFeatures -> InteractingBox2InteractingBox4ClosestFeatures
+  - Box2Sphere4ClosestFeatures -> InteractingBox2InteractingSphere4ClosestFeatures
+  - Box2Sphere4ErrorTolerant -> InteractingBox2InteractingSphere4ErrorTolerantContact
+  - Box2Sphere4MacroMicroContactGeometry -> InteractingBox2InteractingSphere4SpheresContactGeometry
+  - Sphere2Sphere4ClosestFeatures -> InteractingSphere2InteractingSphere4ClosestFeatures
+  - Sphere2Sphere4ErrorTolerant -> InteractingSphere2InteractingSphere4ErrorTolerantContact
+  - Sphere2Sphere4MacroMicroContactGeometry -> InteractingSphere2InteractingSphere4SpheresContactGeometry
+  - Box2AABB -> InteractingBox2AABB
+  - Sphere2AABB -> InteractingSphere2AABB
+
+r.938 version 0.9.2
+  - added SDECMovingWall FileGenerator contributed by Andreas Plesch.
+  - cleaned all .cpp files. they are all now less cluttered and easier/shorter to read.
+  - So I have started compiling it on windows, and I stopped on the problem that linker cannot link serialization with factory.
+
+
+r.917 version 0.9.1
+  - SimulationPlayer - can play recorded position/orientation data
+  - QtSimulationPlayer
+  - SphericalDEMSimulator - a separate version of DEM calculations without all "yade burden" to make speed comparisons
+
+r.914
+  - new version of docs, checked by my sister.
+
 r.904 yade-core version 0.9.0
   - split of packages done. Now each package can be developed separately and has own version numbers.
   - Initial version numbers are choosen arbitrally to reflect their advancement state.

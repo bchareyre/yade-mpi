@@ -128,7 +128,7 @@ string FEMBeam::generate()
 	imposeTranslation(rootBody,regionMin1,regionMax1,translationAxis1,velocity1);
 	imposeTranslation(rootBody,regionMin2,regionMax2,translationAxis2,velocity2);
 
-	return "";
+	return "\nNOTE: if it explodes, set smaller time step.";
 }
 
 

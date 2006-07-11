@@ -12,10 +12,8 @@
 #include <qspinbox.h>
 
 SimulationControllerUpdater::SimulationControllerUpdater(SimulationController * sc)
-	// : 	Threadable<SimulationControllerUpdater>(Omega::instance()getSynchronizer())
-	// ,	controller(sc)
+	:	controller(sc)
 {
-//	createThread();
 }
 
 
@@ -26,8 +24,6 @@ SimulationControllerUpdater::~SimulationControllerUpdater()
 
 void SimulationControllerUpdater::oneLoop()
 {
-	//LOCK(Omega::instance().getRootBodyMutex());
-			
 	controller->lcdCurrentIteration->display(lexical_cast<string>(Omega::instance().getCurrentIteration()));
 	Real simulationTime = Omega::instance().getSimulationTime();
 
@@ -63,6 +59,7 @@ void SimulationControllerUpdater::oneLoop()
 	controller->lcdSecond->display(lexical_cast<string>(seconds));
 	controller->lcdMSecond->display(lexical_cast<string>(mseconds));
 
+	// FIXME - why updater is controlling the timestep ??
 	if (controller->changeSkipTimeStepper)
 			Omega::instance().skipTimeStepper(controller->skipTimeStepper);
 
@@ -95,9 +92,4 @@ void SimulationControllerUpdater::oneLoop()
 	controller->changeTimeStep = false;
 }
 
-
-bool SimulationControllerUpdater::notEnd()
-{
-	return true;
-}
 

@@ -38,9 +38,9 @@ string FileDialog::getOpenFileName(const string& directory,const vector<string>&
 	shared_ptr<FileDialog> fd = shared_ptr<FileDialog>(new FileDialog(d,f,caption,parent));
 	for(int i = 1 ; i<filters.size() ; ++i)
 		fd->addFilter(filters[i]);
-	fd->exec();
+	int res=fd->exec();
 	selectedFilter = fd->selectedFilter().data();
-	return fd->selectedFile().data();
+	return res==QDialog::Accepted?fd->selectedFile().data():std::string("");
 }
 
 
@@ -53,9 +53,9 @@ string FileDialog::getSaveFileName(const string& directory,const vector<string>&
 	fd->setMode( QFileDialog::AnyFile );
 	for(int i = 1 ; i<filters.size() ; ++i)
 		fd->addFilter(filters[i]);
-	fd->exec();
+	int res=fd->exec();
 	selectedFilter = fd->selectedFilter().data();
-	return fd->selectedFile().data();
+	return res==QDialog::Accepted?fd->selectedFile().data():std::string("");
 }
 
 
@@ -65,7 +65,7 @@ string FileDialog::getExistingDirectory ( const string& directory,const string& 
 		
 	shared_ptr<FileDialog> fd = shared_ptr<FileDialog>(new FileDialog(d,"",caption,parent));
 	fd->setMode( QFileDialog::DirectoryOnly );
-	fd->exec();
-	return fd->selectedFile().data();
+	int res=fd->exec();
+	return res==QDialog::Accepted?fd->selectedFile().data():std::string("");
 }
 

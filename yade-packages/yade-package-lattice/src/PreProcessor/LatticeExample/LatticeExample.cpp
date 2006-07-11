@@ -45,13 +45,13 @@ LatticeExample::LatticeExample() : FileGenerator()
 	nodeGroupMask 		= 1;
 	beamGroupMask 		= 2;
 	
-	speciemen_size_in_meters = Vector3r(0.1,0.1,0.0001);
-	cellsizeUnit_in_meters	 = 0.003;
+	speciemen_size_in_meters = Vector3r(0.05,0.1,0.05);
+	cellsizeUnit_in_meters	 = 0.01;
 	minAngle_betweenBeams_deg= 20.0;
-	disorder_in_cellsizeUnit = Vector3r(0.6,0.6,0.0);
+	disorder_in_cellsizeUnit = Vector3r(0.6,0.6,0.6);
 	maxLength_in_cellsizeUnit= 1.9;
 	triangularBaseGrid 	 = true;
-	useNonLocalModel 	 = true;
+	useNonLocalModel 	 = false;
 	nonLocalL_in_cellsizeUnit = 3.0; 	// l
 				
 	crit_TensileStrain_percent = 100.0;	// E_min
@@ -284,7 +284,7 @@ string LatticeExample::generate()
 
  	return "Number of nodes created:\n" + lexical_cast<string>(nbNodes[0]) + ","
 	 				    + lexical_cast<string>(nbNodes[1]) + ","
-					    + lexical_cast<string>(nbNodes[2]);
+					    + lexical_cast<string>(nbNodes[2]) + "\n\nNOTE: sometimes it can look better when 'drawWireFrame' is enabled in Display tab.";
 
 }
 
