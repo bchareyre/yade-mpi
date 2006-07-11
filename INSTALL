@@ -1,70 +1,152 @@
-from this directory level you can install whole yade at once.
-It's a good solution when installing yade for the first time. When you
-install something next time, it is better to install only from directories
-that have changed their version numbers - you will save on compilation time.
+This file is a copy/paste of information in http://yade.berlios.de/index.php?m=700
+you can check there for more up to date information.
 
-INSTALLING:
 
-to compile and install whole yade execute following commands:
+----------------------------------------------------------------------------
+COMPILING CURRENT RELEASE
 
-	make compile_install
-	make clean		# to clean afterwards
+From yade-all directory level you can install whole yade at once. It's a good
+solution when installing yade for the first time. When you install something
+next time, it is better to install only from directories that have changed
+their version numbers - you will save on compilation time.
 
-    WARNING: command 'make compile_install' is compiling and installing,
-    this is because compiling next packege requires the previous one to
-    be already installed otherwise compilation will fail. (normally we
-    should invoke 'make && make install', so here is an exception)
+To compile and install whole yade execute following commands:
 
-by default everything is installed in directory INSTALL_DIR=/usr/local,
-if for example you want to install somewhere else instead, you can do this:
+   make compile_install
+   make clean            # to clean afterwards
+
+WARNING: command 'make compile_install' is compiling and installing, this is
+because compiling next packege requires the previous one to be already
+installed otherwise compilation will fail (normally we should invoke 'make &&
+make install', so this is an exception).
+
+NOTE: By default everything is installed in directory INSTALL_DIR=/usr/local,
+it is however recommended to install yade in your home directory, read on
+below:
+
+
+----------------------------------------------------------------------------
+RECOMMENDED INSTALLATION METHOD
+
+Because yade is still in early development stage, and most likely you will edit
+the sources and recompile, then it is recommended that you install yade as a
+user without root privileages (execute this comamnd from inside
+yade-all-0.10.0/ directory):
+
+   mkdir ~/YADE
+   make compile_install INSTALL_DIR='/YADE' PREFIX_DIR='/home/joeuser'
+
+Remember to replace "joeuser" with your user name.
+
+Read section about starting yade >>.
+Remember to add plugin directories as described in first time setup >>.
+
+
+----------------------------------------------------------------------------
+OTHER COMPILATION VARIANTS
 
 As a root user:
 
-	make compile_install INSTALL_DIR='/usr'
+   make compile_install INSTALL_DIR='/usr'
 
-As a user without root privileages:
+If you are a package maintaner, you may want to install everything in different
+directory tree:
 
-        mkdir ~/YADE
-        make compile_install INSTALL_DIR='/YADE' PREFIX_DIR='/home/joeuser'
+   make compile_install PREFIX_DIR='/tmp/foo' INSTALL_DIR='/usr'
 
-If you are a package maintaner, you may want to install everything in
-different directory tree:
 
-	make compile_install PREFIX_DIR='/tmp/foo' INSTALL_DIR='/usr'
+----------------------------------------------------------------------------
+SUMMARY OF YADE COMPILATION OPTIONS
 
-NOTES:
- 1. Both INSTALL_DIR and PREFIX_DIR should start with / and shouldn't have
-    trailing slash.
+   1. INSTALL_DIR - determines the installation directory, starts with / , ends without /
 
- 2. If compilation is interrupted (eg. due to some compilation error), and
-    then resumed with *different* INSTALL_DIR or PREFIX_DIR, then all *.pro
-    files (used by qmake) will be damaged (wrong INSTALL_DIR and PREFIX_DIR
-    inside)
+   2. PREFIX_DIR - determines prefix for installation directory, starts with / , ends without /
 
- 3. If you are compiling with gcc3.3, you need to pass additional argument:
- 
-        make compile_install CXXFLAGS='-pthread -lpthread'
+   3. CXXFLAGS='-DDOUBLE_PRECISION' - yade is compiled using 'double' as a base
+   type for calculation. This gives higher precision than 'float'. On some
+   computers it is faster (like AMD64), on others it is slower - this really
+   depends on your machine.
 
- 4. flag CXXFLAGS can be used to set some compilation options, like:
+   4. CXXFLAGS='-DNO_GLUTINIT' - older versions of libglut do not have function
+   glutInit(), you should use this compilation flag then.
 
-        CXXFLAGS='-O3'                     : optimize code for speed
-	CXXFLAGS='-pthread -lpthread -O3'  : gcc3.3, and optimize for speed
-	CXXFLAGS='-g'                      : debugging symbols
-	CXXFLAGS='-DDOUBLE_PRECISION -O3'  : for calculation use double precision
-	                                     instead of float and optimize for speed
-	
-OTHER MAKE COMMANDS
+   5. CXXFLAGS='-DQGLVIEWER20' - If you are using older QGLViewer (version 2.0)
+   you should use this flag, otherwise you will get error about setFileName()
 
-	make uninstall          # to uninstall (you have to provide correct 
-	                        #               INSTALL_DIR, and PREFIX_DIR ) 
-	
 
-DOCUMENTATION:
+----------------------------------------------------------------------------
+COMPILATION NOTES
 
-we plan to have documentation in doc/ directory of each library, but for now
-nothing is there.
+   1. Both INSTALL_DIR and PREFIX_DIR should start with / and shouldn't have
+   trailing slash.
 
-RUNNING
+   2. If compilation is interrupted (eg. due to some compilation error), and
+   then resumed with different INSTALL_DIR or PREFIX_DIR, then all *.pro files
+   (used by qmake) will be damaged (wrong INSTALL_DIR and PREFIX_DIR inside)
+
+   3. If you are compiling with gcc3.3, you need to pass additional argument:
+
+         make compile_install CXXFLAGS='-pthread -lpthread'
+
+   4. flag CXXFLAGS can be used to set some compilation options, like:
+
+         CXXFLAGS='-O3'                     # optimize code for speed
+         CXXFLAGS='-pthread -lpthread -O3'  # gcc3.3, and optimize for speed
+         CXXFLAGS='-g'                      # debugging symbols - gdb's backtrace can display line numbers
+         CXXFLAGS='-DDOUBLE_PRECISION -O3'  # for calculation use double precision instead of float and optimize for speed
+
+   5. If you ever want to uninstall, you can invoke this command (with correct INSTALL_DIR, and PREFIX_DIR):
+
+         make uninstall
+
+   6. AMD64: when compiling on AMD64 an additional -fPIC option is required:
+         make compile_install CXXFLAGS='-fPIC -pthread -lpthread -O3' INSTALL_DIR='/YADE' PREFIX_DIR='/home/joeuser'
+
+   7. Fedora core 4: gcc 4 generates an error when it encounters an anonymous enum. It is no longer possible to write
+
+         enum {value = 1 }
+
+      It must be written instead:
+         enum enumname {value = 1 }
+
+      Under fedora 4 the default compiler is gcc 4 and some header files from
+      stl still contain anonymous enums. You must edit those .h files and give
+      any name to those enums. Among other files this must be corrected:
+      /usr/include/c++/4.0.?/bits/cpp_type_traits.h, and some of QT headers,
+      like qcolor.h. Remember to give different name to each enum. Inside there
+      is something like this:
+
+      template<>
+          struct __is_integer<bool>
+          {
+            enum { __value = 1 };
+            typedef __true_type __type;
+          };
+
+      Replace it with:
+
+      template<>
+          struct __is_integer<bool>
+          {
+            enum enumname1 { __value = 1 };
+            typedef __true_type __type;
+          };
+
+      In above case the compilation error was reported as:
+         .../yade/yade-lib-wm3-math/Math.ipp:53: error:
+         `std::__is _integer<double>::<anonymous enum>' is/uses anonymous type
+
+   8. If you get an error:
+         glut.so: undefined reference
+      you have to edit file yade-core/src/yade/yade.pro and add -lGL and -lGLU at the bottom.
+
+   9. Gentoo: If you get an error:
+         GL/freeglut_ext.h: No such file or directory
+      You have to replace file glut with freeglut.
+
+
+----------------------------------------------------------------------------
+STARTING YADE
 
 To start correctly, yade must be able to find its libraries. It means that you
 should set LD_LIBRARY_PATH environment variable to point to the right
@@ -76,7 +158,7 @@ directory. Depending on where yade is installed, it can be one of those:
 
 You can do this in following ways:
 
-   1. add following line to your /home/janek/.bashrc or /home/janek/.zshenv
+   1. add following line to your ~/.bashrc or ~/.zshenv
 
          export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/lib/yade/yade-libs
 
@@ -84,19 +166,19 @@ You can do this in following ways:
 
          export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/lib/yade/yade-libs
 
-note: csh uses setenv instead of export
+NOTE: csh uses setenv instead of export
 
 If you fail to do what is described above, you will get the following error:
 
-./yade: error while loading shared libraries: libyade-lib-threads.so.1: cannot open shared object file: No such file or directory
+./yade: error while loading shared libraries: libyade-lib-time.so.1: cannot open shared object file: No such file or directory
 
 
-
+----------------------------------------------------------------------------
 FIRST TIME SETUP
 
-After launching yade for the first time, you will be welcomed by "Yade first
-use wizard". You will be asked questions, and your answers will be saved in the
-directory /home/janek/.yade
+After launching yade for the first time, you will be welcomed by 'Yade first
+use wizard'. You will be asked questions, and your answers will be saved in the
+directory ~/.yade
 
 1. Specify default GUI name [QtGUI] :
 
@@ -111,21 +193,73 @@ Here you should specify path to yade-guis, it can be one of the following:
 
    /usr/local/lib/yade/yade-guis
    /home/joeuser/YADE/lib/yade/yade-guis
-   /usr/lib/yade/yade-guislibs
+   /usr/lib/yade/yade-guis
 
 Then a graphical window should appear. Next step is to add directories with all
-other plugins used by yade. To do so click "Edit-Preferences-Plugin Folders",
+other plugins used by yade. To do so click 'Edit->Preferences->Plugin Folders',
 and add all directories from lib/yade/ path. This is a daunting task, since
 there are currently 8 directories to add (will be fixed with bug #004858). But
 you should do it only once. If you are developing your own plugins, and they
 reside in some other directory, you should add this directory here.
 
-Then click Plugins on the left, and click a button Rescan. You should see
+Then click 'Plugins' on the left, and click a button 'Rescan'. You should see
 all C++ classes that are recognized by yade from those plugins.
 
-After that you can normally use yade.
 
-MORE INFORMATION
+----------------------------------------------------------------------------
+FILEGENERATORS
 
-For more (and up to date!) information about working with yade see: http://yade.berlios.de/index.php?m=700
+Filegenerators are used to generate an input file for yade to simulate
+something. Later this section will be extended with explanations on how to
+write a new filegenerator. But for now, you can try using some of the existing
+ones.
+
+In yade QtGUI click 'Preprocessor->File Generator'.
+
+By default the output file name is ../data/scene.xml. That is because currently
+yade is assuming that is is ran from somewhere/bin/ directory, and there exists
+a directory named somewhere/data/. This behaviour will change after fixing bug
+#004853. For now you can use ../data directory.
+
+Output library name is a serialization plugin used to save the file. Currently
+we have only support for XML, but soon binary format will appear.
+
+Generator name is the name of the class used to generate this file. You can
+pick anything from the list, and see what it generates. If you happen to write
+a new generator plugin, and a path to this plugin was added in preferences,
+then it will automatically appear in this drop down list.
+
+Below are parameters that the plugin uses to generate a file.
+
+Finally you can click 'Generate' button. And an output file will be saved.
+
+You can use 'Load' and 'Save' buttons to store various configurations of
+currently selected filegenerator.
+
+EXAMPLES
+
+Some of filegenerators described above need an input file which can be found in
+yade-examples >>. Currently we have:
+
+- 2 examples for FEM
+- 1 example for SDEC Impact test
+
+Other filegenerators work without need for any input file. They generate
+examples just by parameters given to them. In the future yade-examples will
+contain more.
+
+Put those examples in mentioned above somewhere/data/ directory, so that
+filegenerators will find them.
+
+FIRST SIMULATION
+
+Once you have succesfully generated an input file for the simulation (called
+../scene.xml by default), you can load and run it. Click 'File->New
+Simulation', and you will see a Simulation Controller window. Inside it click
+Load and choose scene.xml.
+
+You can manipulate the qglviewer graphical window by dragging and scrolling
+with the mouse. To run the simulation click the button play (play).  From now
+on you can start exploring yade yourself.
+
 
