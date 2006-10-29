@@ -1,10 +1,12 @@
 /*************************************************************************
-*  Copyright (C) 2004 by Olivier Galizzi                                 *
-*  olivier.galizzi@imag.fr                                               *
+*  Copyright (C) 2006 by Bruno Chareyre                                  *
+*  bruno.chareyre@hmg.inpg.fr                                            *
 *                                                                        *
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
+
+/* Please comment out unused code, so that yade-flat will work without problems
 
 #include "BodyMacroParameters.hpp"
 #include "SpheresContactGeometry.hpp"
@@ -97,5 +99,8 @@ void GlobalStiffnessCounter::action(Body* body)
 	}
 
 }
+
+*/
+
 
 

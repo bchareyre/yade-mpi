@@ -75,10 +75,6 @@
 using namespace boost;
 using namespace std;
 
-typedef pair<Vector3r, Real> BasicSphere;
-//! make a list of spheres non-overlapping sphere
-string GenerateCloud(vector<BasicSphere>& sphere_list, Vector3r lowerCorner, Vector3r upperCorner, long number, Real rad_std_dev, Real porosity);
-
 IsotropicCompressionTest::IsotropicCompressionTest () : FileGenerator()
 {
 	lowerCorner 		= Vector3r(0,0,0);
@@ -657,7 +653,7 @@ void IsotropicCompressionTest::positionRootBody(shared_ptr<MetaBody>& rootBody)
 
 
 
-string GenerateCloud(vector<BasicSphere>& sphere_list, Vector3r lowerCorner, Vector3r upperCorner, long number, Real rad_std_dev, Real porosity)
+string IsotropicCompressionTest::GenerateCloud(vector<BasicSphere>& sphere_list, Vector3r lowerCorner, Vector3r upperCorner, long number, Real rad_std_dev, Real porosity)
 {
 	typedef boost::minstd_rand StdGenerator;
 	static StdGenerator generator;

@@ -6,6 +6,8 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
+/* Please comment out unused code, so that yade-flat will work without problems
+
 #ifndef GLOBALSTIFFNESSCOUNTER_HPP
 #define GLOBALSTIFFNESSCOUNTER_HPP
 
@@ -48,4 +50,6 @@ class GlobalStiffnessCounter : public InteractionSolver
 REGISTER_SERIALIZABLE(GlobalStiffnessCounter,false);
 
 #endif // GLOBALSTIFFNESSCOUNTER_HPP
+
+*/
 

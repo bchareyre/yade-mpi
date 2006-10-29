@@ -99,6 +99,9 @@ class TriaxialTest : public FileGenerator
 		void createSphere(shared_ptr<Body>& body, Vector3r position, Real radius,bool big,bool dynamic);
 		void createActors(shared_ptr<MetaBody>& rootBody);
 		void positionRootBody(shared_ptr<MetaBody>& rootBody);
+
+		typedef pair<Vector3r, Real> BasicSphere;
+		string GenerateCloud(vector<BasicSphere>& sphere_list, Vector3r lowerCorner, Vector3r upperCorner, long number, Real rad_std_dev, Real porosity);
 	
 	public : 
 		TriaxialTest ();

@@ -64,7 +64,7 @@ void LatticeBeamParameters::postProcessAttributes(bool deserializing)
 			if(d1)
 			{
 				d1=false;
-				std::cout << "cement\n";
+				std::cout << "\nCEMENT:\n";
 				chk("\t\tk.b",bendingStiffness);                // k.b
 				chk("\tk.l",longitudalStiffness);               // k.l
 				chk("E.c",criticalCompressiveStrain);           // E.c
@@ -77,7 +77,7 @@ void LatticeBeamParameters::postProcessAttributes(bool deserializing)
 			if(d2)
 			{
 				d2=false;
-				std::cout << "aggregate\n";
+				std::cout << "\nAGGREGATE:\n";
 				chk("\t\tk.b",bendingStiffness);                // k.b
 				chk("\tk.l",longitudalStiffness);               // k.l
 				chk("E.c",criticalCompressiveStrain);           // E.c
@@ -90,7 +90,7 @@ void LatticeBeamParameters::postProcessAttributes(bool deserializing)
 			if(d3)
 			{
 				d3=false;
-				std::cout << "bond\n";
+				std::cout << "\nBOND:\n";
 				chk("\t\tk.b",bendingStiffness);                // k.b
 				chk("\tk.l",longitudalStiffness);               // k.l
 				chk("E.c",criticalCompressiveStrain);           // E.c
