@@ -17,11 +17,21 @@ int GLDrawSphere::glWiredSphereList=-1;
 vector<Vector3r> GLDrawSphere::vertices;
 vector<Vector3r> GLDrawSphere::faces;
 
+//void drawString(string str,int x,int y,float * c)
+//{
+//      glPushMatrix();
+//      glRasterPos2i(x,y);
+//      glColor3fv(c);
+//      for(unsigned int i=0;i<str.length();i++)
+//              glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, str[i]);
+//      glPopMatrix();
+//}
 
-void GLDrawSphere::go(const shared_ptr<GeometricalModel>& gm, const shared_ptr<PhysicalParameters>&,bool wire)
+
+void GLDrawSphere::go(const shared_ptr<GeometricalModel>& gm, const shared_ptr<PhysicalParameters>& ph,bool wire)
 {
-	static bool first=true;
-	
+        static bool first=true;
+        
 	if (first)
 	{
 		Real X = 0.525731112119133606;
@@ -82,17 +92,26 @@ void GLDrawSphere::go(const shared_ptr<GeometricalModel>& gm, const shared_ptr<P
  	if (gm->wire || wire)
  	{
 		//glScalef(radius,radius,radius);
-		//glCallList(glWiredSphereList);
+                //glCallList(glWiredSphereList);
 
-		glutWireSphere(radius,4,4);
- 	}
- 	else
- 	{
+                glutWireSphere(radius,4,4);
+                
+/////////////////////////// FIXME - display coordinates (stupid place!!)
+//              glPushMatrix();
+//              glRasterPos2i(0,0);
+//              std::string str=std::string("  (") + boost::lexical_cast<std::string>((float)(ph->se3.position[0])) + "," + boost::lexical_cast<std::string>((float)(ph->se3.position[1])) + ")";
+//              for(unsigned int i=0;i<str.length();i++)
+//                      glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, str[i]);
+//              glPopMatrix();
+///////////////////////////
+
+        }
+        else
+        {
 		glScalef(radius,radius,radius);
 		glCallList(glSphereList);
 	}
 }
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void GLDrawSphere::subdivideTriangle(Vector3r& v1,Vector3r& v2,Vector3r& v3, int depth)

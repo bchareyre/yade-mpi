@@ -180,6 +180,10 @@ bool DynLibManager::closeLib(const string libName)
 
 }
 
+std::string DynLibManager::lastError()
+{
+        return lastError_;
+}
 
 bool DynLibManager::error() 
 {
@@ -196,9 +200,10 @@ bool DynLibManager::error()
 		{
 //			cerr << errMsg << endl;
 //			Omega::printErrorLog(errMsg);
+			lastError_ = errMsg;
 			return true;
 		}
-	
+
 		return false;
 	#else
  		char * error = dlerror();
@@ -206,6 +211,7 @@ bool DynLibManager::error()
 		{
 			//cerr << error << endl;
 			//Omega::printErrorLog(error);
+			lastError_ = error;
 		}
 		return (error!=NULL);
 	#endif

@@ -94,7 +94,7 @@ void GLViewer::postDraw()
 		glDisable(GL_LIGHTING);
 		glLineWidth(0.1);
 		glBegin(GL_LINES);
-	
+
 		float sizef = QGLViewer::camera()->sceneRadius()*3.0f; 
 		int size = static_cast<int>(sizef);
 		qglviewer::Vec v = QGLViewer::camera()->sceneCenter();

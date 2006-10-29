@@ -96,7 +96,7 @@ void Omega::doOneSimulationLoop()
 		//if ((simulationLoop->isStopped()))
 		//	simulationPauseDuration += microsec_clock::local_time()-msStartingPauseTime;
 		//else
-		msStartingPauseTime = microsec_clock::local_time();	
+		msStartingPauseTime = microsec_clock::local_time();
 		simulationLoop->singleLoop();
 	}
 }
@@ -117,7 +117,7 @@ void Omega::stopSimulationLoop()
 	if (simulationLoop && simulationLoop->isRunning())
 	{
 		msStartingPauseTime = microsec_clock::local_time();
-		simulationLoop->stop();	
+		simulationLoop->stop();
 	}
 }
 
@@ -258,10 +258,9 @@ void Omega::scanPlugins()
 				bool thisLoaded = ClassFactory::instance().load((*dlli));
 				if (!thisLoaded && overflow == 1)
 //				if (!thisLoaded)
-					cerr << "load unsuccesfull : " << (*dlli) << endl;
+					cerr << "load unsuccesfull : " << (*dlli) << ", the error was: " << ClassFactory::instance().lastError() <<  endl;
 //				else
 //					cerr << "loaded            : " << *dlli << endl;
-
 				allLoaded &= thisLoaded;
 				if(thisLoaded)
 					dynlibsListLoaded[loaded] = true; 
@@ -273,7 +272,6 @@ void Omega::scanPlugins()
 		cerr << "Couldn't load everything, some stuff may work incorrectly.\n";
 	
 	buildDynlibDatabase(dynlibsList);
-
 }
 
 
@@ -324,7 +322,7 @@ string Omega::getSimulationFileName()
 
 void Omega::loadSimulation()
 {
-	if( 	    (Omega::instance().getSimulationFileName().size() != 0)  
+	if(	    (Omega::instance().getSimulationFileName().size() != 0)
 		&&  (filesystem::exists(simulationFileName)) 
 		&&  (filesystem::extension(simulationFileName)==".xml" || filesystem::extension(simulationFileName)==".yade" ))
 	{
@@ -358,9 +356,9 @@ void Omega::loadSimulation()
 
 void Omega::saveSimulation(const string name)
 {
-	if( 	   (name.size() != 0)
+	if(	   (name.size() != 0)
 		&& (filesystem::extension(name)==".xml" || filesystem::extension(name)==".yade") )
-	{
+        {
 		logMessage("Saving file " + name);
 		if(filesystem::extension(name)==".xml")
 			IOFormatManager::saveToFile("XMLFormatManager",name,"rootBody",rootBody);
@@ -416,7 +414,7 @@ bool Omega::containTimeStepper()
 				return true;
 		}*/
 	}
-	return false;
+        return false;
 }
 
 const shared_ptr<MetaBody>& Omega::getRootBody()

@@ -80,6 +80,9 @@ void printHelp()
 #ifdef NO_GLUTINIT
 	flags+="NO_GLUTINIT ";
 #endif
+#ifdef DEBUG
+	flags+="DEBUG (is this flag used?) ";
+#endif
 	cout << 
 "\n" << Omega::instance().yadeVersionName << "\n\
 \n\
@@ -99,9 +102,9 @@ Only one option can be passed to yade, all other options are passed to the selec
 int main(int argc, char *argv[])
 {
 	Omega::instance().yadeVersionName = "Yet Another Dynamic Engine 0.10.0, beta.";
-	
+
 	int ch;
-	string 	gui 		= "";
+	string  gui             = "";
 	string 	configPath 	= string(getenv("HOME")) + string("/.yade");
 	
 	bool 	setup 		= false;
@@ -119,7 +122,7 @@ int main(int argc, char *argv[])
 	
 	if(configPath[configPath.size()-1] == '/')
 		configPath = configPath.substr(0,configPath.size()-1); 
-	
+
 	Omega::instance().preferences    = shared_ptr<Preferences>(new Preferences);
 	Omega::instance().yadeConfigPath = configPath; 
 	filesystem::path yadeConfigPath  = filesystem::path(Omega::instance().yadeConfigPath, filesystem::native);

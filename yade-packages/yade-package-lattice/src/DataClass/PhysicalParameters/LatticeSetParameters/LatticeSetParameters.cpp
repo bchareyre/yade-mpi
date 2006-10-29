@@ -11,9 +11,14 @@
 
 LatticeSetParameters::LatticeSetParameters() : PhysicalParameters()
 {
-	createIndex();
-	nodeGroupMask = 1;
-	beamGroupMask = 2;
+        createIndex();
+        nodeGroupMask = 1;
+        beamGroupMask = 2;
+        total = 0;
+        nonl = 0;
+        range=0;
+        useBendTensileSoftening = false;
+        useStiffnessSoftening   = false;
 }
 
 
@@ -25,8 +30,10 @@ LatticeSetParameters::~LatticeSetParameters()
 
 void LatticeSetParameters::registerAttributes()
 {
-	PhysicalParameters::registerAttributes();
-	REGISTER_ATTRIBUTE(nodeGroupMask);
-	REGISTER_ATTRIBUTE(beamGroupMask);
+        PhysicalParameters::registerAttributes();
+        REGISTER_ATTRIBUTE(nodeGroupMask);
+        REGISTER_ATTRIBUTE(beamGroupMask);
+        REGISTER_ATTRIBUTE(useBendTensileSoftening);
+        REGISTER_ATTRIBUTE(useStiffnessSoftening);
 }
  

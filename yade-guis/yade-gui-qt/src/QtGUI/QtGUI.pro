@@ -66,7 +66,6 @@ HEADERS += FileDialog.hpp \
            GLEngineEditor.hpp \
            GLViewer.hpp \
            MessageDialog.hpp \
-           QGLThread.hpp \
            QtCodeGenerator.hpp \
            QtEngineEditor.hpp \
            QtFileGenerator.hpp \
@@ -84,7 +83,6 @@ SOURCES += FileDialog.cpp \
            GLEngineEditor.cpp \
            GLViewer.cpp \
            MessageDialog.cpp \
-           QGLThread.cpp \
            QtCodeGenerator.cpp \
            QtEngineEditor.cpp \
            QtFileGenerator.cpp \

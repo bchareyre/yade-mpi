@@ -10,7 +10,11 @@ SUBDIRS += ElasticCohesiveLaw \
            AveragePositionRecorder \
            ForceRecorder \
            PositionOrientationRecorder \
-           VelocityRecorder 
+           VelocityRecorder \
+	   StiffnessCounter \
+	   StiffnessMatrixTimeStepper #\
+	   #GlobalStiffnessCounter \		
+	   
 CONFIG += debug \
           thread \
 warn_on

@@ -11,6 +11,7 @@
 #include <iostream>
 #include <boost/shared_ptr.hpp>
 #include <boost/filesystem/convenience.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 using namespace std;
 
@@ -53,6 +54,8 @@ void NullGUI::help()
 			  you will have a snpashot every 500th iteration.\n\
 	-S name		- specify base filename of snapshot. Defaults to input\n\
 			  filename. Filename has appended iteration number.\n\
+        -Q name		- do not calculate, just save what is loaded and exit\n\
+			  (for doing data conversions)\n\
 \n\
     options:\n\
 	-m number	- specify maximum number of iterations\n\
@@ -60,28 +63,30 @@ void NullGUI::help()
 	-t number	- set time step in seconds, default is 0.01 (FIXME - inside .xml)\n\
 	-b number	- save in binary .yade format instead of .xml\n\
 \n";
-//	-g number	- set gravity, default is 9.81 (FIXME - inside .xml)\n
+//      -g number       - set gravity, default is 9.81 (FIXME - inside .xml)\n
 }
 
+std::string quickSave("");
 
 int NullGUI::run(int argc, char* argv[])
 {
 
 	int ch;
 	opterr = 0;
-	while( ( ch = getopt(argc,argv,"Hf:s:S:v:pm:t:g:b") ) != -1)
+	while( ( ch = getopt(argc,argv,"Hf:s:S:v:pm:t:g:bQ:") ) != -1)
 		switch(ch)
 		{
-			case 'H'	: help(); 						return 1;
+			case 'H'        : help();                                               return 1;
 			case 'v'	: interval = lexical_cast<int>(optarg);			break;
 			case 'p'	: progress = true;					break;
 			case 'f'	: Omega::instance().setSimulationFileName(optarg);
-					  if(snapshotName.size() == 0 ) snapshotName = optarg;	break;
-			case 's'	: snapshotInterval = lexical_cast<int>(optarg);		break;
-			case 'S'	: snapshotName = optarg;				break;
-			case 'm'	: maxIteration = lexical_cast<long int>(optarg);	break;
-			case 'b'	: binary = true;	 				break;
-			case 't'	: Omega::instance().setTimeStep
+                                          if(snapshotName.size() == 0 ) snapshotName = optarg;	break;
+			case 's'        : snapshotInterval = lexical_cast<int>(optarg);		break;
+			case 'S'        : snapshotName = optarg;				break;
+			case 'Q'        : quickSave = optarg;					break;
+			case 'm'        : maxIteration = lexical_cast<long int>(optarg);	break;
+			case 'b'        : binary = true;					break;
+			case 't'        : Omega::instance().setTimeStep
 						(lexical_cast<Real>(optarg));			break;
 //			case 'g'	: Omega::instance().setGravity
 //						(Vector3r(0,-lexical_cast<Real>(optarg),0));	break;
@@ -95,7 +100,10 @@ int NullGUI::run(int argc, char* argv[])
 
 int NullGUI::loop()
 {
-     	Omega::instance().loadSimulation();
+	Omega::instance().loadSimulation();
+	if(quickSave.size()!=0)
+		std::cerr << "saving "<< quickSave << "\n", Omega::instance().saveSimulation(quickSave), exit(1);
+
 	cerr << "Starting computation of file: " << Omega::instance().getSimulationFileName() << endl;
 
 	if( maxIteration == 0)
@@ -113,6 +121,7 @@ int NullGUI::loop()
 
 	long int intervals = 0;
 	chron.start();
+	boost::posix_time::ptime start = boost::posix_time::second_clock::local_time();
 	while(1)
 	{
 		Omega::instance().getRootBody()->moveToNextTimeStep();
@@ -141,11 +150,10 @@ int NullGUI::loop()
 		if( ( maxIteration !=0 ) &&  (Omega::instance().getCurrentIteration() >= maxIteration) )
 		{
 			cerr << "Calc finished at: " << Omega::instance().getCurrentIteration() << endl;
-			cerr << "Computation time: " << chron.stop() << endl;
+			cerr << "Computation time (chron): " << chron.stop() << endl;
+			cerr << "Computation time (boost::posix_time): " << boost::posix_time::to_simple_string(boost::posix_time::time_duration(boost::posix_time::second_clock::local_time() - start)) << endl;
 			exit(0);
 		}
-
 	}
-	
 }
 

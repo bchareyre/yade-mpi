@@ -12,7 +12,7 @@
 #include <qspinbox.h>
 
 SimulationControllerUpdater::SimulationControllerUpdater(SimulationController * sc)
-	:	controller(sc)
+        :       controller(sc)
 {
 }
 

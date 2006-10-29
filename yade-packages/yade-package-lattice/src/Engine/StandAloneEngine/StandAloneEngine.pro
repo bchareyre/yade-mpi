@@ -3,7 +3,10 @@ error( "YADE_QMAKE_PATH internal qmake variable is not set, you should run for e
 }
 
 
-SUBDIRS += LatticeLaw
+SUBDIRS += LatticeLaw \
+           NonLocalInitializer \
+           MeasurePoisson \
+           StrainRecorder
 CONFIG += debug \
           thread \
 warn_on

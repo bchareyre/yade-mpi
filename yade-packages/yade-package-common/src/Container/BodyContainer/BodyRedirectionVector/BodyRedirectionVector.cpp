@@ -123,7 +123,7 @@ bool BodyRedirectionVector::erase(unsigned int id)
 
 bool BodyRedirectionVector::exists(unsigned int id) const
 {
-	return (indexes[id] != -1);
+        return id<indexes.size() && (indexes[id] != -1);
 }
 
 bool BodyRedirectionVector::find(unsigned int id , shared_ptr<Body>& b) const

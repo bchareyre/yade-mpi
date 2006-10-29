@@ -37,7 +37,7 @@ class DynLibManager
 
 		vector<string> baseDirs;
 		bool autoUnload;
-	
+
 	public :
 		DynLibManager ();
 		~DynLibManager ();
@@ -45,19 +45,21 @@ class DynLibManager
 
 		bool load (const string& libName, const string& libName);
 		bool loadFromDirectoryList (const string& fullLibName);
-		
+
 		bool unload (const string libName);
 		bool isLoaded (const string libName);
 		bool unloadAll ();
 		void setAutoUnload ( bool enabled );
-		
+
 		string libNameToSystemName(const string& name);
 		string systemNameToLibName(const string& name);
 		string findLibDir(const string& name);
+		string lastError();
 
 	private :
 		bool closeLib(const string libName);
 		bool error();
+		string lastError_;
 };
 
 #endif // __DYNLIBMANAGER_H__

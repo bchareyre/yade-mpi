@@ -40,7 +40,7 @@ struct DynlibDescriptor
 	bool		 isIndexable
 			,isFactorable
 			,isSerializable;
-};	
+};
 
 class Omega : public Singleton<Omega>
 {
@@ -70,8 +70,8 @@ class Omega : public Singleton<Omega>
 
 	public :
 		shared_ptr<Preferences> preferences;
-		string 				 yadeConfigPath; // FIXME - must be private and more clean
-		string 				 yadeVersionName; // FIXME - public ?
+		string 				 yadeConfigPath;	// FIXME - must be private and more clean
+		string 				 yadeVersionName;	// FIXME - public ?
 	
 		void logMessage(const string& str);
 		void logError(const string& str);
@@ -84,8 +84,8 @@ class Omega : public Singleton<Omega>
 		void		finishSimulationLoop();
 		void		joinSimulationLoop();
 		void		doOneSimulationLoop();
-		
-	//	shared_ptr<ThreadSynchronizer> getSynchronizer();
+
+        //      shared_ptr<ThreadSynchronizer> getSynchronizer();
 
 		const		map<string,DynlibDescriptor>& getDynlibsDescriptor();
 		void		scanPlugins();
@@ -120,7 +120,7 @@ class Omega : public Singleton<Omega>
 		~Omega();
 		Omega(const Omega&);
 		Omega& operator=(const Omega&);
-	
+
 	FRIEND_SINGLETON(Omega);
 };
 

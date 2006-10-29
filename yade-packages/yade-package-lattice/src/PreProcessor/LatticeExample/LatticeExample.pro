@@ -7,8 +7,11 @@ LIBS += -lLineSegment \
         -lLatticeSetParameters \
         -lLatticeBeamParameters \
         -lLatticeNodeParameters \
-	-lNonLocalDependency \
-	-lLatticeBeamAngularSpring \
+        -lNonLocalDependency \
+        -lNonLocalInitializer \
+        -lStrainRecorder \
+        -lMeasurePoisson \
+        -lLatticeBeamAngularSpring \
         -lPhysicalActionVectorVector \
         -lInteractionVecSet \
         -lBodyRedirectionVector \
@@ -27,6 +30,9 @@ LIBS += -lLineSegment \
         -rdynamic 
 INCLUDEPATH += $${YADE_QMAKE_PATH}/include/ \
                ../../Engine/StandAloneEngine/LatticeLaw \
+               ../../Engine/StandAloneEngine/StrainRecorder \
+               ../../Engine/StandAloneEngine/MeasurePoisson \
+               ../../Engine/StandAloneEngine/NonLocalInitializer \
                ../../DataClass/PhysicalParameters/LatticeSetParameters \
                ../../DataClass/PhysicalParameters/LatticeNodeParameters \
                ../../DataClass/PhysicalParameters/LatticeBeamParameters \
@@ -34,7 +40,6 @@ INCLUDEPATH += $${YADE_QMAKE_PATH}/include/ \
                ../../DataClass/InteractionPhysics/NonLocalDependency \
                ../../DataClass/GeometricalModel/LineSegment
 QMAKE_LIBDIR = ../../../bin \
-               ../../../bin \
                $${YADE_QMAKE_PATH}/lib/yade/yade-package-common/ \
                $${YADE_QMAKE_PATH}/lib/yade/yade-libs/ 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \

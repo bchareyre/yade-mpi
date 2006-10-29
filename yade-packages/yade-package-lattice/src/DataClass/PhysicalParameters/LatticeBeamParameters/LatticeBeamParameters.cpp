@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #include "LatticeBeamParameters.hpp"
-
+#include <yade/yade-core/Omega.hpp>
 
 LatticeBeamParameters::LatticeBeamParameters() : PhysicalParameters()
 {
@@ -15,7 +15,10 @@ LatticeBeamParameters::LatticeBeamParameters() : PhysicalParameters()
 	count = 0.0;
 //	rotation = Vector3r(0,0,0);
 //	bendingRotation = Quaternionr(1.0,0.0,0.0,0.0);
- 	bendingRotation = 0.0;
+	bendingRotation = 0.0;
+	lastIter_ = -1;
+	nonLocalStrain = 0.0;
+	nonLocalDivisor = 0.0;
 }
 
 
@@ -24,9 +27,98 @@ LatticeBeamParameters::~LatticeBeamParameters()
 
 }
 
-void LatticeBeamParameters::calcStrain() // FIXME - replace that with getStrain(), or strain() (finally private variable makes sense :/ )
+void LatticeBeamParameters::postProcessAttributes(bool deserializing)
 {
-	strain = (length - initialLength) / initialLength; 
+	if(deserializing)
+	{
+/*		if(criticalTensileStrain > 0.00015) // E.l
+		{ // CEMENT MATRIX
+			bendingStiffness          = 0.7;	// k.b
+			longitudalStiffness       = 1.0;	// k.l
+			criticalCompressiveStrain = 1.0;	// E.c
+			criticalTensileStrain     = 0.0002;	// E.l
+		}
+		else if(criticalTensileStrain > 0.00006) // E.l
+		{ // AGGREGATE
+			bendingStiffness          = 2.1;	// k.b
+			longitudalStiffness       = 3.0;	// k.l
+			criticalCompressiveStrain = 1.0;	// E.c
+			criticalTensileStrain     = 0.0001333;	// E.l
+		}
+		else
+		{ // BOND / INTERFACE
+			bendingStiffness          = 0.7;	// k.b
+			longitudalStiffness       = 1.0;	// k.l
+			criticalCompressiveStrain = 1.0;	// E.c
+			criticalTensileStrain     = 0.0002;	// E.l
+		}
+*/		lastIter_ = -10;
+
+
+// checking
+
+#define chk(x,y) std::cout << #y << ",      " << x << " = " << y << "\n"
+		if(criticalTensileStrain > 0.00015) // E.l
+		{ // CEMENT MATRIX
+			static bool d1=true;
+			if(d1)
+			{
+				d1=false;
+				std::cout << "cement\n";
+				chk("\t\tk.b",bendingStiffness);                // k.b
+				chk("\tk.l",longitudalStiffness);               // k.l
+				chk("E.c",criticalCompressiveStrain);           // E.c
+				chk("\tE.l",criticalTensileStrain);             // E.l
+			}
+		}
+		else if(criticalTensileStrain > 0.00006) // E.l
+		{ // AGGREGATE
+			static bool d2=true;
+			if(d2)
+			{
+				d2=false;
+				std::cout << "aggregate\n";
+				chk("\t\tk.b",bendingStiffness);                // k.b
+				chk("\tk.l",longitudalStiffness);               // k.l
+				chk("E.c",criticalCompressiveStrain);           // E.c
+				chk("\tE.l",criticalTensileStrain);             // E.l
+			}
+		}
+		else
+		{ // BOND / INTERFACE
+			static bool d3=true;
+			if(d3)
+			{
+				d3=false;
+				std::cout << "bond\n";
+				chk("\t\tk.b",bendingStiffness);                // k.b
+				chk("\tk.l",longitudalStiffness);               // k.l
+				chk("E.c",criticalCompressiveStrain);           // E.c
+				chk("\tE.l",criticalTensileStrain);             // E.l
+			}
+		}
+#undef chk
+
+
+
+
+	//	bendingStiffness    *= 25000;
+	//	longitudalStiffness *= 25000;
+        }
+}
+
+
+Real LatticeBeamParameters::strain()
+{
+        long int it = Omega::instance().getCurrentIteration();
+        if( lastIter_ == it )
+                return strain_;
+        else
+        {
+                lastIter_ = it;
+                strain_ = (length - initialLength) / initialLength;
+                return strain_;
+        }
 }
 
 void LatticeBeamParameters::registerAttributes()
@@ -46,13 +138,7 @@ void LatticeBeamParameters::registerAttributes()
 	
 	REGISTER_ATTRIBUTE(longitudalStiffness);
 	REGISTER_ATTRIBUTE(bendingStiffness);
-	
-	REGISTER_ATTRIBUTE(se3Displacement)
-}
 
-void LatticeBeamParameters::postProcessAttributes(bool d)
-{
-	if(d)
-		this->calcStrain();
+	REGISTER_ATTRIBUTE(se3Displacement);
 }
 

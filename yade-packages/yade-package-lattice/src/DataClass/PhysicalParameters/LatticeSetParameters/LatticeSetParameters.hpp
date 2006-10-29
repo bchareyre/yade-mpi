@@ -11,16 +11,30 @@
 
 
 #include <yade/yade-core/PhysicalParameters.hpp>
-
+#include <list>
 
 class LatticeSetParameters : public PhysicalParameters
 {
 	public :
-		int 	 beamGroupMask
-			,nodeGroupMask;
-			
-		LatticeSetParameters();
-		virtual ~LatticeSetParameters();
+                int      beamGroupMask
+                        ,nodeGroupMask;
+
+                bool     useBendTensileSoftening,useStiffnessSoftening;
+                        
+                unsigned long int total;
+                
+                struct NonLocalInteraction
+                {
+                        unsigned int    id1,id2;
+                //      Real            gaussValue; // must use malloc()
+                        //float                 gaussValue; // must use malloc()
+                };
+                //std::vector<std::list<NonLocalInteraction , std::__malloc_alloc_template<sizeof(NonLocalInteraction)> > > nonl;
+                void* nonl;
+                Real range;
+                
+                LatticeSetParameters();
+                virtual ~LatticeSetParameters();
 
 /// Serializable
 	protected :

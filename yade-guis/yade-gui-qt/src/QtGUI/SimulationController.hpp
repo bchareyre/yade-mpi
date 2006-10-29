@@ -43,13 +43,13 @@ class SimulationController : public QtGeneratedSimulationController
 		bool	 changeSkipTimeStepper
 			,skipTimeStepper
 			,changeTimeStep
-			,wasUsingTimeStepper;
+                        ,wasUsingTimeStepper;
 
-		SimulationController (QWidget * parent=0);
-		void redrawAll();
-		virtual ~SimulationController (); 
-	
-	public slots :
+                SimulationController (QWidget * parent=0);
+                void redrawAll();
+                virtual ~SimulationController (); 
+        
+        public slots :
 		virtual void pbApplyClicked();
 		virtual void pbLoadClicked();
 		virtual void pbSaveClicked();
@@ -64,10 +64,10 @@ class SimulationController : public QtGeneratedSimulationController
 		virtual void sbSecondValueChanged(int);
 		void closeGLViewEvent(int id);
 
-	
-	protected :
-		void closeEvent(QCloseEvent *evt);
-		virtual void timerEvent(QTimerEvent* );
+        
+        protected :
+                void closeEvent(QCloseEvent *evt);
+                virtual void timerEvent(QTimerEvent* );
 };
 
 #endif // SIMULATIONCONTROLLER_HPP

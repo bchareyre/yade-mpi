@@ -82,10 +82,10 @@ SimulationController::SimulationController(QWidget * parent) : QtGeneratedSimula
 
 
 SimulationController::~SimulationController()
-{	
+{
 	Omega::instance().finishSimulationLoop();
 	Omega::instance().joinSimulationLoop();
-	
+
 	map<int,GLViewer*>::reverse_iterator gi = glViews.rbegin();
 	map<int,GLViewer*>::reverse_iterator giEnd = glViews.rend();
 	for(;gi!=giEnd;++gi)
@@ -120,7 +120,7 @@ void SimulationController::pbApplyClicked()
 void SimulationController::pbLoadClicked()
 {
 	pbStopClicked();
-	
+
 	string selectedFilter;
 	std::vector<string> filters;
 	filters.push_back("Yade Binary File (*.yade)");
@@ -135,7 +135,7 @@ void SimulationController::pbLoadClicked()
 //		updater->stop();
 		Omega::instance().finishSimulationLoop();
 		Omega::instance().joinSimulationLoop();
-		
+
 		Omega::instance().setSimulationFileName(fileName);
 		try
 		{
@@ -173,9 +173,9 @@ void SimulationController::pbLoadClicked()
 			pbResetSimulation->setDisabled(true);
 			pbOneSimulationStep->setDisabled(true);
 		}
-		
+
 		pbCenterSceneClicked();
-	}
+        }
 } 
 
 void SimulationController::pbSaveClicked()
@@ -198,10 +198,10 @@ void SimulationController::pbSaveClicked()
 
 		if(filesystem::extension(fileName)=="") // user forgot to specify extension - fix it.
 			fileName += (selectedFilter == "XML Yade File (*.xml)") ? ".xml" : ".yade";
-		
+
 		cerr << "saving simulation: " << fileName << "\n";
 		Omega::instance().saveSimulation(fileName);
-		
+
 		redrawAll();
 	}
 	else
@@ -234,7 +234,7 @@ void SimulationController::addNewView()
 		maxNbViews++;
 		glViews[maxNbViews] = new GLViewer(maxNbViews,renderer, format, parentWorkspace, glViews[0]);
 	}
-	
+
 	connect( glViews[maxNbViews], SIGNAL( closeSignal(int) ), this, SLOT( closeGLViewEvent(int) ) );
 	glViews[maxNbViews]->centerScene();
 }
@@ -261,14 +261,14 @@ void SimulationController::pbStopClicked()
 //	for(;gi!=giEnd;++gi)
 //		gi->second->stopAnimation();
 //	updater->stop();
-	
+
 	killTimers();
 }
 
 
 void SimulationController::pbStartClicked()
 {
-	Omega::instance().startSimulationLoop();	
+	Omega::instance().startSimulationLoop();        
 //	map<int,GLViewer*>::reverse_iterator gi = glViews.rbegin();
 //	map<int,GLViewer*>::reverse_iterator giEnd = glViews.rend();
 //	for(;gi!=giEnd;++gi)
@@ -280,13 +280,13 @@ void SimulationController::pbStartClicked()
 
 
 void SimulationController::pbResetClicked()
-{	
+{
 //	updater->stop();
 
 	pbStopClicked();
-	
+
 	Omega::instance().finishSimulationLoop();
-	Omega::instance().joinSimulationLoop();	
+	Omega::instance().joinSimulationLoop(); 
 	Omega::instance().loadSimulation();
 	Omega::instance().createSimulationLoop();
 

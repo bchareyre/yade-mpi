@@ -19,10 +19,11 @@
 
 
 /*! \brief
-	Abstract interface for building GeometricalModel depending on PhysicalParameters (currently used for updating geometry if physics has changed and affects it).
+        Abstract interface for building GeometricalModel depending on PhysicalParameters
+        (currently used for updating geometry if physics has changed and affects it).
 
- 	It is used when you want to update GeometricalModel of your Body during runtime. Only Physical
-	Parameters of the Body can affect "perfect geometrical representation"(GeometricalModel) of
+        It is used when you want to update GeometricalModel of your Body during runtime. Only Physical
+        Parameters of the Body can affect "perfect geometrical representation"(GeometricalModel) of
 	the Body. So it is given as first argument.
 
 

@@ -66,18 +66,19 @@ void ForceRecorder::action(Body * body)
 		y+=force[1];
 		z+=force[2];
 	}
-	
+	//cerr << "record force" << endl;
 	ofile << lexical_cast<string>(Omega::instance().getSimulationTime()) << " " 
 		<< lexical_cast<string>(x) << " " 
 		<< lexical_cast<string>(y) << " " 
 		<< lexical_cast<string>(z) << endl;
+		
 
 		
-	// FIXME all that lines do not belong to ForceRecorder
-	if( bigBallReleaseTime < Omega::instance().getSimulationTime() && (!changed) )
-	{
-		changed = true;
-		(*(ncb->bodies))[bigBallId]->isDynamic = true;
-	}
+// 	// FIXME all that lines do not belong to ForceRecorder
+// 	if( bigBallReleaseTime < Omega::instance().getSimulationTime() && (!changed) )
+// 	{
+// 		changed = true;
+// 		(*(ncb->bodies))[bigBallId]->isDynamic = true;
+// 	}
 }
 

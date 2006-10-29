@@ -15,6 +15,9 @@
 #include "LatticeNodeParameters.hpp"
 #include "LineSegment.hpp"
 #include "LatticeLaw.hpp"
+#include "StrainRecorder.hpp"
+#include "MeasurePoisson.hpp"
+#include "NonLocalInitializer.hpp"
 
 #include <yade/yade-package-common/Sphere.hpp>
 
@@ -42,44 +45,89 @@ using namespace std;
 
 LatticeExample::LatticeExample() : FileGenerator()
 {
-	nodeGroupMask 		= 1;
-	beamGroupMask 		= 2;
+        nodeGroupMask           = 1;
+        beamGroupMask           = 2;
+        
+        speciemen_size_in_meters = Vector3r(0.1,0.1,0.0001);
+        cellsizeUnit_in_meters   = 0.003;
+        minAngle_betweenBeams_deg= 20.0;
+        disorder_in_cellsizeUnit = Vector3r(0.6,0.6,0.0);
+        maxLength_in_cellsizeUnit= 1.9;
+        triangularBaseGrid       = true;
+        useNonLocalModel         = false;
+        useBendTensileSoftening  = false;
+        useStiffnessSoftening    = false;
+        nonLocalL_in_cellsizeUnit= 1.1;         // l
+                                
+        crit_TensileStrain       = 1.0; // E_min
+        crit_ComprStrain         = 0.5; // E_max
+                        
+        longitudalStiffness_noUnit= 1.0;        // k_l
+        bendingStiffness_noUnit   = 0.7;        // k_b
+        
+        region_A_min             = Vector3r(-0.006, 0.096,-1);
+        region_A_max             = Vector3r( 0.16 , 0.16 , 1);
+	direction_A 		 = Vector3r(0,1,0);
+	displacement_A_meters	 = 0.0001;
 	
-	speciemen_size_in_meters = Vector3r(0.05,0.1,0.05);
-	cellsizeUnit_in_meters	 = 0.01;
-	minAngle_betweenBeams_deg= 20.0;
-	disorder_in_cellsizeUnit = Vector3r(0.6,0.6,0.6);
-	maxLength_in_cellsizeUnit= 1.9;
-	triangularBaseGrid 	 = true;
-	useNonLocalModel 	 = false;
-	nonLocalL_in_cellsizeUnit = 3.0; 	// l
-				
-	crit_TensileStrain_percent = 100.0;	// E_min
-	crit_ComprStrain_percent   = 50.0;	// E_max
-			
-	longitudalStiffness_noUnit = 1.0;	// k_l
-	bendingStiffness_noUnit    = 0.0;	// k_b
-	
-	region_A_min 		= Vector3r(-0.006, 0.096,-1);
-	region_A_max 		= Vector3r( 0.16 , 0.16 , 1);
-	direction_A 		= Vector3r(0,1,0);
-	displacement_A_meters	= 0.0001;
-	
-	region_B_min 		= Vector3r(-0.006,-0.006,-1);
-	region_B_max 		= Vector3r( 0.16 , 0.004, 1);
-	direction_B 		= Vector3r(0,-1,0);
-	displacement_B_meters	= 0.0001;
+	region_B_min 		 = Vector3r(-0.006,-0.006,-1);
+	region_B_max 		 = Vector3r( 0.16 , 0.004, 1);
+	direction_B 		 = Vector3r(0,-1,0);
+	displacement_B_meters	 = 0.0001;
 
-	region_C_min 		= Vector3r(-0.006, 0.096,-1);
-	region_C_max 		= Vector3r( 0.16 , 0.16 , 1);
-	direction_C 		= Vector3r(0,1,0);
-	displacement_C_meters	= 0.0001;
+	region_C_min 		 = Vector3r(-0.006, 0.096,-1);
+	region_C_max 		 = Vector3r( 0.16 , 0.16 , 1);
+	direction_C 		 = Vector3r(0,1,0);
+	displacement_C_meters	 = 0.0001;
 	
-	region_D_min 		= Vector3r(-0.006,-0.006,-1);
-	region_D_max 		= Vector3r( 0.16 , 0.004, 1);
-	direction_D 		= Vector3r(0,-1,0);
-	displacement_D_meters	= 0.0001;
-	
+	region_D_min 		 = Vector3r(-0.006,-0.006,-1);
+	region_D_max 		 = Vector3r( 0.16 , 0.004, 1);
+        direction_D              = Vector3r(0,-1,0);
+        displacement_D_meters    = 0.0001;
+        
+        strainRecorder_xz_plane  = -1;
+        strainRecorder_node1     = Vector3r(0,0,0);
+        strainRecorder_node2     = Vector3r(0,1,0);
+        measurePoisson_node3     = Vector3r(0  ,0.1,0);
+        measurePoisson_node4     = Vector3r(0.2,0.1,0);
+        outputFile               = "../data/strains";
+        poissonFile              = "../data/poisson";
+        subscribedBodies.clear();
+                
+        regionDelete_A_min       = Vector3r(0,0,0);
+        regionDelete_A_max       = Vector3r(0,0,0);
+        regionDelete_B_min       = Vector3r(0,0,0);
+        regionDelete_B_max       = Vector3r(0,0,0);
+        regionDelete_C_min       = Vector3r(0,0,0);
+        regionDelete_C_max       = Vector3r(0,0,0);
+        regionDelete_D_min       = Vector3r(0,0,0);
+        regionDelete_D_max       = Vector3r(0,0,0);
+        regionDelete_E_min       = Vector3r(0,0,0);
+        regionDelete_E_max       = Vector3r(0,0,0);
+        regionDelete_F_min       = Vector3r(0,0,0);
+        regionDelete_F_max       = Vector3r(0,0,0);
+
+        nonDestroy_A_min         = Vector3r(0,0,0);
+        nonDestroy_A_max         = Vector3r(0,0,0);
+        nonDestroy_B_min         = Vector3r(0,0,0);
+        nonDestroy_B_max         = Vector3r(0,0,0);
+
+        useAggregates            = false;
+        aggregatePercent         = 40;
+        aggregateMeanDiameter    = cellsizeUnit_in_meters*1;
+        aggregateSigmaDiameter   = cellsizeUnit_in_meters*2;
+        aggregateMinDiameter     = cellsizeUnit_in_meters*2;
+        aggregateMaxDiameter     = cellsizeUnit_in_meters*4;
+        // MaterialParameters of aggregate
+        agg_longStiffness_noUnit = 3.0;                                 // k_l aggregate
+        agg_bendStiffness_noUnit = 2.1;                                 // k_b aggregate
+        agg_critCompressStrain   = 100.0;                               // E.c aggregate
+        agg_critTensileStrain    = 50.0;                                // E.l aggregate
+        // MaterialParameters of bond
+        bond_longStiffness_noUnit= 0.7;                                 // k_l bond
+        bond_bendStiffness_noUnit= 0.28;                                // k_b bond
+        bond_critCompressStrain  = 100.0;                               // E.c bond
+        bond_critTensileStrain   = 50.0;                                // E.l bond
 }
 
 
@@ -94,18 +142,20 @@ void LatticeExample::registerAttributes()
 	REGISTER_ATTRIBUTE(speciemen_size_in_meters); 	// size
 	REGISTER_ATTRIBUTE(cellsizeUnit_in_meters);	// g [m]  	- cell size
 	REGISTER_ATTRIBUTE(minAngle_betweenBeams_deg); 	// a [deg] 	- min angle
-	REGISTER_ATTRIBUTE(disorder_in_cellsizeUnit); 	// s [-] 	- disorder 
-	REGISTER_ATTRIBUTE(maxLength_in_cellsizeUnit);	// r [-] 	- max beam length
-	
-	REGISTER_ATTRIBUTE(crit_TensileStrain_percent); // E_min [%]    - default 0.02 %
-	REGISTER_ATTRIBUTE(crit_ComprStrain_percent);   // E_max [%]    - default 0.2 %
-	REGISTER_ATTRIBUTE(longitudalStiffness_noUnit); // k_l [-]      - default 1.0
-	REGISTER_ATTRIBUTE(bendingStiffness_noUnit);    // k_b [-]      - default 0.6
-	
-	REGISTER_ATTRIBUTE(triangularBaseGrid); 	// 		- triangles
-	REGISTER_ATTRIBUTE(useNonLocalModel);
-	REGISTER_ATTRIBUTE(nonLocalL_in_cellsizeUnit); 	// l
-	
+        REGISTER_ATTRIBUTE(disorder_in_cellsizeUnit);   // s [-]        - disorder 
+        REGISTER_ATTRIBUTE(maxLength_in_cellsizeUnit);  // r [-]        - max beam length
+        
+        REGISTER_ATTRIBUTE(crit_TensileStrain);         // E_min [%]    - default 0.02 %
+        REGISTER_ATTRIBUTE(crit_ComprStrain);           // E_max [%]    - default 0.2 %
+        REGISTER_ATTRIBUTE(longitudalStiffness_noUnit); // k_l [-]      - default 1.0
+        REGISTER_ATTRIBUTE(bendingStiffness_noUnit);    // k_b [-]      - default 0.6
+        
+        REGISTER_ATTRIBUTE(triangularBaseGrid);         //              - triangles
+        REGISTER_ATTRIBUTE(useBendTensileSoftening);
+        REGISTER_ATTRIBUTE(useStiffnessSoftening);
+        REGISTER_ATTRIBUTE(useNonLocalModel);
+        REGISTER_ATTRIBUTE(nonLocalL_in_cellsizeUnit);  // l
+        
 	REGISTER_ATTRIBUTE(region_A_min);
 	REGISTER_ATTRIBUTE(region_A_max);
 	REGISTER_ATTRIBUTE(direction_A);
@@ -122,9 +172,52 @@ void LatticeExample::registerAttributes()
 	REGISTER_ATTRIBUTE(displacement_C_meters);
 	
 	REGISTER_ATTRIBUTE(region_D_min);
-	REGISTER_ATTRIBUTE(region_D_max);
-	REGISTER_ATTRIBUTE(direction_D);
-	REGISTER_ATTRIBUTE(displacement_D_meters);
+        REGISTER_ATTRIBUTE(region_D_max);
+        REGISTER_ATTRIBUTE(direction_D);
+        REGISTER_ATTRIBUTE(displacement_D_meters);
+        
+        REGISTER_ATTRIBUTE(strainRecorder_xz_plane);
+        REGISTER_ATTRIBUTE(strainRecorder_node1);
+        REGISTER_ATTRIBUTE(strainRecorder_node2);
+        REGISTER_ATTRIBUTE(outputFile);
+        REGISTER_ATTRIBUTE(measurePoisson_node3);
+        REGISTER_ATTRIBUTE(measurePoisson_node4);
+        REGISTER_ATTRIBUTE(poissonFile);
+        
+        REGISTER_ATTRIBUTE(regionDelete_A_min);
+        REGISTER_ATTRIBUTE(regionDelete_A_max);
+        REGISTER_ATTRIBUTE(regionDelete_B_min);
+        REGISTER_ATTRIBUTE(regionDelete_B_max);
+        REGISTER_ATTRIBUTE(regionDelete_C_min);
+        REGISTER_ATTRIBUTE(regionDelete_C_max);
+        REGISTER_ATTRIBUTE(regionDelete_D_min);
+        REGISTER_ATTRIBUTE(regionDelete_D_max);
+        REGISTER_ATTRIBUTE(regionDelete_E_min);
+        REGISTER_ATTRIBUTE(regionDelete_E_max);
+        REGISTER_ATTRIBUTE(regionDelete_F_min);
+        REGISTER_ATTRIBUTE(regionDelete_F_max);
+
+        REGISTER_ATTRIBUTE(nonDestroy_A_min);
+        REGISTER_ATTRIBUTE(nonDestroy_A_max);
+        REGISTER_ATTRIBUTE(nonDestroy_B_min);
+        REGISTER_ATTRIBUTE(nonDestroy_B_max);
+
+        REGISTER_ATTRIBUTE(useAggregates);
+        REGISTER_ATTRIBUTE(aggregatePercent);
+        REGISTER_ATTRIBUTE(aggregateMeanDiameter);
+        REGISTER_ATTRIBUTE(aggregateSigmaDiameter);
+        REGISTER_ATTRIBUTE(aggregateMinDiameter);
+        REGISTER_ATTRIBUTE(aggregateMaxDiameter);
+        // MaterialParameters of aggregate
+        REGISTER_ATTRIBUTE(agg_longStiffness_noUnit);
+        REGISTER_ATTRIBUTE(agg_bendStiffness_noUnit);
+        REGISTER_ATTRIBUTE(agg_critCompressStrain);
+        REGISTER_ATTRIBUTE(agg_critTensileStrain);
+        // MaterialParameters of bond
+        REGISTER_ATTRIBUTE(bond_longStiffness_noUnit);
+        REGISTER_ATTRIBUTE(bond_bendStiffness_noUnit);
+        REGISTER_ATTRIBUTE(bond_critCompressStrain);
+        REGISTER_ATTRIBUTE(bond_critTensileStrain);
 }
 
 string LatticeExample::generate()
@@ -146,19 +239,21 @@ string LatticeExample::generate()
 	if(triangularBaseGrid)
 		nbNodes[1] *= 1.15471; // bigger by sqrt(3)/2 factor
 
-	unsigned int totalNodesCount = 0;
+        unsigned int totalNodesCount = 0;
 
-	for( int i=0 ; i<=nbNodes[0] ; i++ )
-		for( int j=0 ; j<=nbNodes[1] ; j++ )
-			for( int k=0 ; k<=nbNodes[2] ; k++)
-			{
-				shared_ptr<Body> node;
-				if(createNode(node,i,j,k))
-					rootBody->bodies->insert(node), ++totalNodesCount;
-			}
-
-	BodyRedirectionVector bc;
-	bc.clear();
+        for( int j=0 ; j<=nbNodes[1] ; j++ )
+        {
+                for( int i=0 ; i<=nbNodes[0] ; i++ )
+                        for( int k=0 ; k<=nbNodes[2] ; k++)
+                        {
+                                shared_ptr<Body> node;
+                                if(createNode(node,i,j,k))
+                                        rootBody->bodies->insert(node), ++totalNodesCount;
+                        }
+        }
+        
+        BodyRedirectionVector bc;
+        bc.clear();
 
 	BodyContainer::iterator bi    = rootBody->bodies->begin();
 	BodyContainer::iterator bi2;
@@ -194,19 +289,82 @@ string LatticeExample::generate()
 					bc.insert(beam);
 				}
 			}
-		}
-	}
+                }
+        }
 
-	bi    = bc.begin();
-	biEnd = bc.end();
-	for(  ; bi!=biEnd ; ++bi )  // loop over all newly created beams ...
-	{
-		shared_ptr<Body> b = *bi;
-		rootBody->bodies->insert(b); // .. to insert then into rootBody
-	}
+        { // subscribe two nodes, that are monitored by strain recoder to get a measure of length
+                bi    = rootBody->bodies->begin();
+                biEnd = rootBody->bodies->end();
+                int node1Id=-1; Real len1=100000; Real tmpLen;
+                int node2Id=-1; Real len2=100000;
+                for(  ; bi!=biEnd ; ++bi )  // loop over all nodes, to find those closest to strainRecorder_node1 and strainRecorder_node2
+                {
+                        Body* body = (*bi).get();
+                        LatticeNodeParameters* node = dynamic_cast<LatticeNodeParameters*>(body->physicalParameters.get());
+                        tmpLen = ( strainRecorder_node1 - node->se3.position ).squaredLength();
+                        if(tmpLen < len1) len1=tmpLen, node1Id=body->getId();
+                        tmpLen = ( strainRecorder_node2 - node->se3.position ).squaredLength();
+                        if(tmpLen < len2) len2=tmpLen, node2Id=body->getId();
+                }
+                assert(node1Id!=-1 && node2Id!=-1);
+                subscribedBodies.push_back(node1Id); // bottom
+                subscribedBodies.push_back(node2Id); // upper
+                
+                measurePoisson->bottom =node1Id; // bottom
+                measurePoisson->upper  =node2Id; // upper
+        }
+        
+        { // subscribe two nodes, that are monitored by MeasurePoisson to get a measure of poisson
+                bi    = rootBody->bodies->begin();
+                biEnd = rootBody->bodies->end();
+                int node3Id=-1; Real len1=100000; Real tmpLen;
+                int node4Id=-1; Real len2=100000;
+                for(  ; bi!=biEnd ; ++bi )  // loop over all nodes, to find those closest to measurePoisson_node3 and measurePoisson_node4
+                {
+                        Body* body = (*bi).get();
+                        LatticeNodeParameters* node = dynamic_cast<LatticeNodeParameters*>(body->physicalParameters.get());
+                        tmpLen = ( measurePoisson_node3 - node->se3.position ).squaredLength();
+                        if(tmpLen < len1) len1=tmpLen, node3Id=body->getId();
+                        tmpLen = ( measurePoisson_node4 - node->se3.position ).squaredLength();
+                        if(tmpLen < len2) len2=tmpLen, node4Id=body->getId();
+                }
+                assert(node3Id!=-1 && node4Id!=-1);
+                measurePoisson->left   =node3Id; // left
+                measurePoisson->right  =node4Id; // right
+                measurePoisson->horizontal              =   (*(rootBody->bodies))[node4Id]->physicalParameters->se3.position[0] 
+                                                          - (*(rootBody->bodies))[node3Id]->physicalParameters->se3.position[0];
+        }
 
-	{ // remember what node is in contact with what beams
-		//    node                   beams
+
+        bi    = bc.begin();
+        biEnd = bc.end();
+        for(  ; bi!=biEnd ; ++bi )  // loop over all newly created beams ...
+        {
+                shared_ptr<Body> b = *bi;
+                rootBody->bodies->insert(b); // .. to insert them into rootBody
+                
+                // attach them to strain recorder
+                
+                Real xz_plane = strainRecorder_xz_plane;
+                Real pos1 = (*(rootBody->bodies))[static_cast<LatticeBeamParameters*>( b->physicalParameters.get() )->id1]->physicalParameters->se3.position[1]; // beam first node
+                Real pos2 = (*(rootBody->bodies))[static_cast<LatticeBeamParameters*>( b->physicalParameters.get() )->id2]->physicalParameters->se3.position[1]; // beam second node
+                if( pos1 < pos2 )
+                        std::swap(pos1,pos2); // make sure that pos1 is bigger 
+                if(        pos1 > xz_plane
+                        && pos2 < xz_plane 
+                        )
+                        subscribedBodies.push_back( b->getId() ); // beam crosses the plane!
+        }
+        strainRecorder->subscribedBodies        = subscribedBodies;
+
+        strainRecorder->initialLength           =   (*(rootBody->bodies))[subscribedBodies[0]]->physicalParameters->se3.position[1] 
+                                                  - (*(rootBody->bodies))[subscribedBodies[1]]->physicalParameters->se3.position[1];
+        
+        measurePoisson->vertical                =   (*(rootBody->bodies))[subscribedBodies[1]]->physicalParameters->se3.position[1] 
+                                                  - (*(rootBody->bodies))[subscribedBodies[0]]->physicalParameters->se3.position[1];
+                
+        { // remember what node is in contact with what beams
+                //    node                   beams
 		connections.resize(totalNodesCount);
 		
 		bi    = rootBody->bodies->begin();
@@ -239,52 +397,31 @@ string LatticeExample::generate()
 				continue; // skip non-beams
 				
 			calcBeamAngles(body,rootBody->bodies.get(),rootBody->persistentInteractions.get());
-		}
-	}
-	
-	if(useNonLocalModel) 
-	{ // create non-local dependencies
-		bi    = rootBody->bodies->begin();
-		biEnd = rootBody->bodies->end();
-		int beam_counter = 0;
-		float nodes_a=0;
-		float nodes_all = rootBody->bodies->size();
-		for(  ; bi!=biEnd ; ++bi )  // loop over all beams to create non-local
-		{
-			Body* body1 = (*bi).get(); // first_node
-			
-			if( ! ( body1->getGroupMask() & beamGroupMask ) )
-				continue; // skip non-beams
-		
-			bi2 = bi;
-			++bi2;
-			nodes_a+=1.0;
-			
-			for( ; bi2!=biEnd ; ++bi2 )
-			{
-				Body* body2 = (*bi2).get(); // all other beams
-	
-				if( ! ( body2->getGroupMask() & beamGroupMask ) )
-					continue; // skip non-beams
-				
-				if( ++beam_counter % 1000 == 0 )
-					cerr << "non-local dependency: " << ((nodes_a/nodes_all)*100.0)  << " %\n"; 
-				
-				calcNonLocal  (body1,body2,rootBody->bodies.get(),rootBody->volatileInteractions  .get());
-			}
-		}
-	}
-	
-	imposeTranslation(rootBody,region_A_min,region_A_max,direction_A,displacement_A_meters);
-	imposeTranslation(rootBody,region_B_min,region_B_max,direction_B,displacement_B_meters);
-	imposeTranslation(rootBody,region_C_min,region_C_max,direction_C,displacement_C_meters);
-	imposeTranslation(rootBody,region_D_min,region_D_max,direction_D,displacement_D_meters);
+                }
+        }
+        
+        regionDelete(rootBody,regionDelete_A_min,regionDelete_A_max);
+        regionDelete(rootBody,regionDelete_B_min,regionDelete_B_max);
+        regionDelete(rootBody,regionDelete_C_min,regionDelete_C_max);
+        regionDelete(rootBody,regionDelete_D_min,regionDelete_D_max);
+        regionDelete(rootBody,regionDelete_E_min,regionDelete_E_max);
+        regionDelete(rootBody,regionDelete_F_min,regionDelete_F_max);
 
-	cerr << "finished.. saving\n";
+        imposeTranslation(rootBody,region_A_min,region_A_max,direction_A,displacement_A_meters);
+        imposeTranslation(rootBody,region_B_min,region_B_max,direction_B,displacement_B_meters);
+        imposeTranslation(rootBody,region_C_min,region_C_max,direction_C,displacement_C_meters);
+        imposeTranslation(rootBody,region_D_min,region_D_max,direction_D,displacement_D_meters);
 
- 	return "Number of nodes created:\n" + lexical_cast<string>(nbNodes[0]) + ","
-	 				    + lexical_cast<string>(nbNodes[1]) + ","
-					    + lexical_cast<string>(nbNodes[2]) + "\n\nNOTE: sometimes it can look better when 'drawWireFrame' is enabled in Display tab.";
+        if(useAggregates) addAggregates(rootBody);
+        
+        nonDestroy(rootBody,nonDestroy_A_min,nonDestroy_A_max);
+        nonDestroy(rootBody,nonDestroy_B_min,nonDestroy_B_max);
+        
+        cerr << "finished.. saving\n";
+
+        return "Number of nodes created:\n" + lexical_cast<string>(nbNodes[0]) + ","
+                                            + lexical_cast<string>(nbNodes[1]) + ","
+                                            + lexical_cast<string>(nbNodes[2]) + "\n\nNOTE: sometimes it can look better when 'drawWireFrame' is enabled in Display tab.";
 
 }
 
@@ -358,10 +495,25 @@ bool LatticeExample::createNode(shared_ptr<Body>& body, int i, int j, int k)
 	gSphere->visible		= true;
 	gSphere->shadowCaster		= false;
 	
-	body->geometricalModel		= gSphere;
-	body->physicalParameters	= physics;
-	
-	return true;
+        body->geometricalModel          = gSphere;
+        body->physicalParameters        = physics;
+
+//////////////////////
+// do tego przyk?adu ustawiam wspó?rz?dne - FIXME - przyda?oby si? ?adowanie wspó?rz?dnych wierzcho?ków sk?din?d
+//static int zzzzz=0;
+//switch(zzzzz%5)
+//{
+//      case 0  : physics->se3.position=Vector3r(0.4,1.5,0); break;
+//      case 1  : physics->se3.position=Vector3r(0.8,0.6,0); break;
+//      case 2  : physics->se3.position=Vector3r(0,0,0); break;
+//      case 3  : physics->se3.position=Vector3r(1.6,0.5,0); break;
+//      case 4  : physics->se3.position=Vector3r(2.0,0,0); break;
+//};
+//zzzzz++;
+//
+//////////////////////
+        
+        return true;
 }
 
 
@@ -404,14 +556,14 @@ void LatticeExample::calcBeamPositionOrientationLength(shared_ptr<Body>& body)
 	Real length 		= dist.normalize();
 	beam->direction 	= dist;
 	beam->initialDirection 	= dist;
-	beam->length 		= length;
-	beam->initialLength 	= length;
-	
-	beam->criticalTensileStrain 	= crit_TensileStrain_percent/100.0;
-	beam->criticalCompressiveStrain = crit_ComprStrain_percent/100.0;
-	beam->longitudalStiffness 	= longitudalStiffness_noUnit;
-	beam->bendingStiffness 		= bendingStiffness_noUnit;
-	
+        beam->length            = length;
+        beam->initialLength     = length;
+        
+        beam->criticalTensileStrain     = crit_TensileStrain;
+        beam->criticalCompressiveStrain = crit_ComprStrain;
+        beam->longitudalStiffness       = longitudalStiffness_noUnit;
+        beam->bendingStiffness          = bendingStiffness_noUnit;
+        
 	se3Beam.orientation.align( Vector3r::UNIT_X , dist );
 	beam->se3 		= se3Beam;
 	beam->se3Displacement.position 	= Vector3r(0.0,0.0,0.0);
@@ -429,13 +581,13 @@ void LatticeExample::calcAxisAngle(LatticeBeamParameters* beam, BodyContainer* b
 		Real 			angle;
 		
 	//	rotation.align( beam->direction , otherBeam->direction );
-	//	rotation.toAxisAngle (axis, angle);
-	//	Vector3r result = axis*angle;
-	
-		angle = (beam->direction.cross(otherBeam->direction)[2] > 0.0 ? 1.0 : -1.0) * Mathr::aCos( beam->direction.dot(otherBeam->direction) / ( beam->direction.length() * otherBeam->direction.length() ) );
+        //      rotation.toAxisAngle (axis, angle);
+        //      Vector3r result = axis*angle;
+        
+                angle = (beam->direction.cross(otherBeam->direction)[2] > 0.0 ? 1.0 : -1.0) * Mathr::aCos( beam->direction.dot(otherBeam->direction) );
 
-		shared_ptr<Interaction> 		interaction(new Interaction( thisId , otherId ));
-		shared_ptr<LatticeBeamAngularSpring> 	angularSpring(new LatticeBeamAngularSpring);
+                shared_ptr<Interaction>                 interaction(new Interaction( thisId , otherId ));
+                shared_ptr<LatticeBeamAngularSpring>    angularSpring(new LatticeBeamAngularSpring);
 		
 	//	angularSpring->initialAngle 		= result;
 	//	angularSpring->angle 			= result;
@@ -464,66 +616,59 @@ void LatticeExample::calcBeamAngles(Body* body, BodyContainer* bodies, Interacti
 	i   = connections[beam->id2].begin();
 	end = connections[beam->id2].end();
 	for( ; i != end ; ++i )
-		calcAxisAngle(beam,bodies,*i,ints,body->getId());
-}
-
-void LatticeExample::calcNonLocal(Body* body1, Body* body2, BodyContainer* bodies, InteractionContainer* nonl)
-{
-	LatticeBeamParameters* beam1 	= static_cast<LatticeBeamParameters*>(body1->physicalParameters.get());
-	LatticeBeamParameters* beam2 	= static_cast<LatticeBeamParameters*>(body2->physicalParameters.get());
-
-	if( ! nonl->find( body1->getId() , body2->getId() ) && body1->getId() != body2->getId() )
-	{
-		Real dist = (beam1->se3.position - beam2->se3.position).length();
-		
-		if( dist < nonLocalL_in_cellsizeUnit * cellsizeUnit_in_meters )
-		{
-			shared_ptr<Interaction> 		interaction(new Interaction( body1->getId() , body2->getId() ));
-			shared_ptr<NonLocalDependency> 		nonLocal(new NonLocalDependency);
-			
-			nonLocal->gaussValue 			= dist;
-			
-			interaction->isReal			= true;
-			interaction->isNew 			= false;
-			interaction->interactionPhysics 	= nonLocal;
-			nonl->insert(interaction);
-		}
-	} 
+                calcAxisAngle(beam,bodies,*i,ints,body->getId());
 }
 
 void LatticeExample::createActors(shared_ptr<MetaBody>& )
 {
-	shared_ptr<BoundingVolumeMetaEngine> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeMetaEngine>(new BoundingVolumeMetaEngine);
+        shared_ptr<BoundingVolumeMetaEngine> boundingVolumeDispatcher   = shared_ptr<BoundingVolumeMetaEngine>(new BoundingVolumeMetaEngine);
 	boundingVolumeDispatcher->add("MetaInteractingGeometry","AABB","MetaInteractingGeometry2AABB");
 
-	shared_ptr<GeometricalModelMetaEngine> geometricalModelDispatcher	= shared_ptr<GeometricalModelMetaEngine>(new GeometricalModelMetaEngine);
-	geometricalModelDispatcher->add("LatticeSetParameters","LatticeSetGeometry","LatticeSet2LatticeBeams");
-	
-	rootBody->engines.clear();
-	rootBody->engines.push_back(boundingVolumeDispatcher);
-	rootBody->engines.push_back(shared_ptr<LatticeLaw>(new LatticeLaw));
-	rootBody->engines.push_back(geometricalModelDispatcher);
-	
-	rootBody->initializers.clear();
-	rootBody->initializers.push_back(boundingVolumeDispatcher);
-	rootBody->initializers.push_back(geometricalModelDispatcher);
-}	
- 
+        shared_ptr<GeometricalModelMetaEngine> geometricalModelDispatcher       = shared_ptr<GeometricalModelMetaEngine>(new GeometricalModelMetaEngine);
+        geometricalModelDispatcher->add("LatticeSetParameters","LatticeSetGeometry","LatticeSet2LatticeBeams");
+        
+        strainRecorder = shared_ptr<StrainRecorder>(new StrainRecorder);
+        strainRecorder->outputFile              = outputFile;
+        strainRecorder->interval                = 10;
+        
+        measurePoisson = shared_ptr<MeasurePoisson>(new MeasurePoisson);
+        measurePoisson->outputFile              = poissonFile;
+        measurePoisson->interval                = 10;
+        
+        rootBody->engines.clear();
+        rootBody->engines.push_back(boundingVolumeDispatcher);
+        rootBody->engines.push_back(shared_ptr<LatticeLaw>(new LatticeLaw));
+        rootBody->engines.push_back(geometricalModelDispatcher);
+        rootBody->engines.push_back(strainRecorder);
+        rootBody->engines.push_back(measurePoisson);
+        
+        rootBody->initializers.clear();
+        rootBody->initializers.push_back(boundingVolumeDispatcher);
+        rootBody->initializers.push_back(geometricalModelDispatcher);
 
+        if(useNonLocalModel)
+        {
+                shared_ptr<NonLocalInitializer> nonLocalInitializer(new NonLocalInitializer);
+                nonLocalInitializer->range = nonLocalL_in_cellsizeUnit * cellsizeUnit_in_meters;
+                rootBody->initializers.push_back(nonLocalInitializer);
+        }
+}       
 
 void LatticeExample::positionRootBody(shared_ptr<MetaBody>& rootBody)
 {
-	rootBody->isDynamic		= false;
+        rootBody->isDynamic             = false;
 
 	Quaternionr q;
 	q.fromAxisAngle( Vector3r(0,0,1),0);
 	shared_ptr<LatticeSetParameters> physics(new LatticeSetParameters);
-	physics->se3			= Se3r(Vector3r(0,0,0),q);
-	physics->beamGroupMask 		= beamGroupMask;
-	physics->nodeGroupMask 		= nodeGroupMask;
-	
-	shared_ptr<MetaInteractingGeometry> set(new MetaInteractingGeometry());
-	
+        physics->se3                    = Se3r(Vector3r(0,0,0),q);
+        physics->beamGroupMask          = beamGroupMask;
+        physics->nodeGroupMask          = nodeGroupMask;
+        physics->useBendTensileSoftening= useBendTensileSoftening;
+        physics->useStiffnessSoftening  = useStiffnessSoftening;
+        
+        shared_ptr<MetaInteractingGeometry> set(new MetaInteractingGeometry());
+        
 	set->diffuseColor		= Vector3f(0,0,1);
 
 	shared_ptr<AABB> aabb(new AABB);
@@ -548,13 +693,14 @@ void LatticeExample::imposeTranslation(shared_ptr<MetaBody>& rootBody, Vector3r 
  	translationCondition->displacement  = displacement;
 	direction.normalize();
  	translationCondition->translationAxis = direction;
-	
-	rootBody->engines.push_back((rootBody->engines)[rootBody->engines.size()-1]);
-	(rootBody->engines)[rootBody->engines.size()-2]=(rootBody->engines)[rootBody->engines.size()-3];
-	(rootBody->engines)[rootBody->engines.size()-3]=translationCondition;
-	translationCondition->subscribedBodies.clear();
-	
-	BodyContainer::iterator bi    = rootBody->bodies->begin();
+        
+        rootBody->engines.push_back((rootBody->engines)[rootBody->engines.size()-1]);
+        (rootBody->engines)[rootBody->engines.size()-2]=(rootBody->engines)[rootBody->engines.size()-3];
+        (rootBody->engines)[rootBody->engines.size()-3]=(rootBody->engines)[rootBody->engines.size()-4];
+        (rootBody->engines)[rootBody->engines.size()-4]=translationCondition;
+        translationCondition->subscribedBodies.clear();
+        
+        BodyContainer::iterator bi    = rootBody->bodies->begin();
 	BodyContainer::iterator biEnd = rootBody->bodies->end();
 	for(  ; bi!=biEnd ; ++bi )
 	{
@@ -577,7 +723,215 @@ void LatticeExample::imposeTranslation(shared_ptr<MetaBody>& rootBody, Vector3r 
 				translationCondition->subscribedBodies.push_back(b->getId());
 			}
 		}
-	}
+        }
 }
 
- 
+void LatticeExample::regionDelete(shared_ptr<MetaBody>& rootBody, Vector3r min, Vector3r max)
+{
+        vector<unsigned int> futureDeletes;
+        
+        BodyContainer::iterator bi    = rootBody->bodies->begin();
+        BodyContainer::iterator biEnd = rootBody->bodies->end();
+        for(  ; bi!=biEnd ; ++bi )
+        {
+                shared_ptr<Body> b = *bi;
+        
+                if( b->getGroupMask() & beamGroupMask )
+                {
+                        Vector3r pos = b->physicalParameters->se3.position;
+                        if(        pos[0] > min[0] 
+                                && pos[1] > min[1] 
+                                && pos[2] > min[2] 
+                                && pos[0] < max[0] 
+                                && pos[1] < max[1] 
+                                && pos[2] < max[2] 
+                                )
+                                futureDeletes.push_back( b->getId() );
+                }
+        }
+        
+        vector<unsigned int>::iterator vend = futureDeletes.end();
+        for( vector<unsigned int>::iterator vsta = futureDeletes.begin() ; vsta != vend ; ++vsta)
+                rootBody->bodies->erase(*vsta); 
+}
+
+void LatticeExample::nonDestroy(shared_ptr<MetaBody>& rootBody, Vector3r min, Vector3r max)
+{
+        vector<unsigned int> marked;
+        
+        BodyContainer::iterator bi    = rootBody->bodies->begin();
+        BodyContainer::iterator biEnd = rootBody->bodies->end();
+        for(  ; bi!=biEnd ; ++bi )
+        {
+                shared_ptr<Body> b = *bi;
+        
+                if( b->getGroupMask() & beamGroupMask )
+                {
+                        Vector3r pos = b->physicalParameters->se3.position;
+                        if(        pos[0] > min[0] 
+                                && pos[1] > min[1] 
+                                && pos[2] > min[2] 
+                                && pos[0] < max[0] 
+                                && pos[1] < max[1] 
+                                && pos[2] < max[2] 
+                                )
+                                marked.push_back( b->getId() );
+                }
+        }
+        
+        vector<unsigned int>::iterator vend = marked.end();
+        for( vector<unsigned int>::iterator vsta = marked.begin() ; vsta != vend ; ++vsta)
+        {
+                LatticeBeamParameters* beam = static_cast<LatticeBeamParameters*>( ((*(rootBody->bodies))[*vsta])->physicalParameters.get());
+                beam->criticalTensileStrain     = 0.9;
+                beam->criticalCompressiveStrain = 0.9;
+                beam->longitudalStiffness       = 4.0;
+                beam->bendingStiffness          = 2.8;
+                (*(rootBody->bodies))[beam->id1]->geometricalModel->diffuseColor = Vector3f(0.2,0.5,0.7);
+                (*(rootBody->bodies))[beam->id2]->geometricalModel->diffuseColor = Vector3f(0.2,0.5,0.7);
+        }
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////
+
+struct Circle
+{
+        float x,y,d;
+};
+
+bool overlaps(Circle& cc,std::vector<Circle>& c)
+{
+        std::vector<Circle>::iterator end=c.end();
+        for(std::vector<Circle>::iterator i=c.begin();i!=end;++i)
+        {
+                float dist2 = std::pow(i->x - cc.x ,2)+std::pow(i->y - cc.y,2);
+                float r2    = std::pow( 1.1*(i->d+cc.d)/2.0 ,2); // FIXME - 1.1 is hardcoded. van Mier's min distance is 1.1*(D1+D2)/2
+                if(dist2<r2)
+                        return true;
+        }
+        return false;
+};
+
+int aggInside(Vector3r& a,Vector3r& b,std::vector<Circle>& c, Real cellsizeUnit_in_meters)
+{ // checks if nodes 'a','b' are inside any of aggregates from list 'c'
+        int res=0;
+        std::vector<Circle>::iterator end=c.end();
+        for(std::vector<Circle>::iterator i=c.begin();i!=end;++i)
+        {
+        //      if(i->r < cellsizeUnit_in_meters) // FIXME
+        //              continue;
+
+                float dist2 = std::pow(i->x - a[0],2)+std::pow(i->y - a[1],2);
+                float r2    = std::pow(i->d*0.5,2);
+                if(dist2<r2) res=1; else res=0;
+
+                dist2 = std::pow(i->x - b[0],2)+std::pow(i->y - b[1],2);
+                if(dist2<r2) ++res;
+
+                if(res!=0) return res;
+        }
+        return false;
+}
+
+float aggsAreas(std::vector<Circle>& c)
+{
+        float aggArea=0.0;
+        std::vector<Circle>::iterator end=c.end();
+        for(std::vector<Circle>::iterator i=c.begin();i!=end;++i)
+                aggArea += 3.14159265358979323846*std::pow(i->d*0.5 ,2);
+        return aggArea;
+}
+
+// random
+#include <boost/random/linear_congruential.hpp>
+#include <boost/random/uniform_real.hpp>
+#include <boost/random/variate_generator.hpp>
+#include <boost/random/normal_distribution.hpp>
+
+void LatticeExample::addAggregates(shared_ptr<MetaBody>& rootBody)
+{
+        // first make a list of circles
+        std::vector<Circle> c;
+
+        Real AGGREGATES_X=speciemen_size_in_meters[0];
+        Real AGGREGATES_Y=speciemen_size_in_meters[1];
+        Real MAX_DIAMETER  =aggregateMaxDiameter;
+        Real MIN_DIAMETER  =aggregateMinDiameter;
+        Real MEAN_DIAMETER =aggregateMeanDiameter;
+        Real SIGMA_DIAMETER=aggregateSigmaDiameter;
+
+        typedef boost::minstd_rand StdGenerator;
+        static StdGenerator generator;
+        static boost::variate_generator<StdGenerator&, boost::uniform_real<> >
+                random1(generator, boost::uniform_real<>(0,1));
+        static boost::variate_generator<StdGenerator&, boost::normal_distribution<> > 
+                randomN(generator, boost::normal_distribution<>(MEAN_DIAMETER,SIGMA_DIAMETER));
+
+        std::cerr << "generating aggregates ... ";
+        do
+        {
+                Circle cc;
+                cc.x=random1()*AGGREGATES_X, cc.y=random1()*AGGREGATES_Y;
+                do { cc.d=randomN(); } while (cc.d>=MAX_DIAMETER || cc.d<=MIN_DIAMETER);
+                for(int i=0 ; i<1000 ; ++i)
+                        if(overlaps(cc,c))
+                                cc.x=random1()*AGGREGATES_X, cc.y=random1()*AGGREGATES_Y;
+                        else
+                        {
+                                c.push_back(cc);
+                //              std::cerr << cc.x << " " << cc.y << " " << cc.d << "\n";
+                                break;
+                        }
+        }
+        while(aggregatePercent/100.0 > aggsAreas(c)/(AGGREGATES_X*AGGREGATES_Y) );
+
+        std::cerr << "done. " << c.size() << " aggregates generated, area: " << aggsAreas(c)/(AGGREGATES_X*AGGREGATES_Y) << "\n";
+
+        { // set different properties for beams that lie in an aggregate
+          // parametrize from above - takes three arguments: 
+          // - MaterialParameters of aggregate, 
+          // - MaterialParameters of bond, 
+          // - list of circles.
+                BodyContainer::iterator bi    = rootBody->bodies->begin();
+                BodyContainer::iterator biEnd = rootBody->bodies->end();
+                float all_bodies = rootBody->bodies->size();
+                int current = 0;
+                for(  ; bi!=biEnd ; ++bi )  // loop over all beams
+                {
+                //      if( ++current % 100 == 0 )
+                //              cerr << "aggregate beams: " << current << " , " << ((static_cast<float>(current)/all_bodies)*100.0) << " %\n";
+                                
+                        Body* body = (*bi).get();
+                        if( ! ( body->getGroupMask() & beamGroupMask ) )
+                                continue; // skip non-beams
+
+                        LatticeBeamParameters* beam     = static_cast<LatticeBeamParameters*>(body->physicalParameters.get());
+                        int ovv = aggInside(     (*(rootBody->bodies))[beam->id1]->physicalParameters->se3.position
+                                                ,(*(rootBody->bodies))[beam->id2]->physicalParameters->se3.position
+                                                ,c, cellsizeUnit_in_meters );
+                        if(ovv==2) // aggregate
+                        {
+                                beam->longitudalStiffness       = agg_longStiffness_noUnit;
+                                beam->bendingStiffness          = agg_bendStiffness_noUnit;
+                                beam->criticalTensileStrain     = agg_critTensileStrain;
+                                beam->criticalCompressiveStrain = agg_critCompressStrain;
+                
+                                (*(rootBody->bodies))[beam->id1]->geometricalModel->diffuseColor = Vector3f(0.6,0.2,0.0);
+                                (*(rootBody->bodies))[beam->id2]->geometricalModel->diffuseColor = Vector3f(0.6,0.2,0.0);
+                        }
+                        else if(ovv==1) // bond
+                        {
+                                beam->longitudalStiffness       = bond_longStiffness_noUnit;
+                                beam->bendingStiffness          = bond_bendStiffness_noUnit;
+                                beam->criticalTensileStrain     = bond_critTensileStrain;
+                                beam->criticalCompressiveStrain = bond_critCompressStrain;
+                
+                                (*(rootBody->bodies))[beam->id1]->geometricalModel->diffuseColor = Vector3f(0.6,0.6,0.0);
+                                (*(rootBody->bodies))[beam->id2]->geometricalModel->diffuseColor = Vector3f(0.6,0.6,0.0);
+                        }
+                }
+        }
+}
+

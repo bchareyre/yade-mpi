@@ -14,35 +14,39 @@
 
 class LatticeBeamParameters : public PhysicalParameters 
 {
-	public :
-		unsigned int 		 id1
-					,id2;
+        private:
+                long int                 lastIter_;
+                Real                     strain_;
+        public :
+                unsigned int             id1
+                                        ,id2;
 				
 		Real  			 initialLength
-					,length;
-				
-		Vector3r 		 initialDirection
-					,direction;
-				
-		Real 			 criticalTensileStrain
-					,criticalCompressiveStrain
-				
-					,longitudalStiffness
-					,bendingStiffness
-				
-					,strain;
-				
-		Se3r 			 se3Displacement;
-		
+                                        ,length;
+                                
+                Vector3r                 initialDirection
+                                        ,direction; // is a unit vector
+                                
+                Real                     criticalTensileStrain
+                                        ,criticalCompressiveStrain
+                                
+                                        ,longitudalStiffness
+                                        ,bendingStiffness;
+                                
+                                
+                Se3r                     se3Displacement;
+                
 		Real 			 count;
 	//	Vector3r 		 rotation;
-	//	Quaternionr 		 bendingRotation;
-		Real 			 bendingRotation;
-		
-		void calcStrain();
-	
-		LatticeBeamParameters();
-		virtual ~LatticeBeamParameters();
+        //      Quaternionr              bendingRotation;
+                Real                     bendingRotation;
+                
+                Real strain();
+                Real                     nonLocalStrain
+                                        ,nonLocalDivisor;
+        
+                LatticeBeamParameters();
+                virtual ~LatticeBeamParameters();
 
 /// Serialization
 	protected :

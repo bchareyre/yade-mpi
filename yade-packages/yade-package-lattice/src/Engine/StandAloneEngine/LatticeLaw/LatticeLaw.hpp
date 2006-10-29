@@ -22,14 +22,15 @@ class LatticeLaw : public InteractionSolver
 {
 
 /// Attributes	
-	
-	private :
-		vector<unsigned int> futureDeletes;
-		
-		bool deleteBeam(MetaBody* lattice , LatticeBeamParameters* beam);
-		void calcBeamPositionOrientationNewLength(Body* body, BodyContainer* bodies);
-	public :
-		LatticeLaw();
+        
+        private :
+                vector<unsigned int> futureDeletes;
+                bool nonlocal;
+                
+                bool deleteBeam(MetaBody* lattice , LatticeBeamParameters* beam, Body*);
+                void calcBeamPositionOrientationNewLength(Body* body, BodyContainer* bodies);
+        public :
+                LatticeLaw();
 		virtual ~LatticeLaw();
 		void action(Body* body);
 

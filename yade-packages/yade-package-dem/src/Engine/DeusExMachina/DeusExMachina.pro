@@ -3,9 +3,13 @@ error( "YADE_QMAKE_PATH internal qmake variable is not set, you should run for e
 }
 
 
+SUBDIRS += ResultantForceEngine \
+	TriaxialStressController \
+	TriaxialCompressionEngine
+           
 CONFIG += debug \
           thread \
-          warn_on 
-TEMPLATE = subdirs 
+warn_on
+TEMPLATE = subdirs
 INCLUDEPATH += $${YADE_QMAKE_PATH}/include
 

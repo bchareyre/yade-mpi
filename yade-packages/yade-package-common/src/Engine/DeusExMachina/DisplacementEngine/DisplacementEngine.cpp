@@ -35,10 +35,14 @@ void DisplacementEngine::applyCondition(Body * body)
 //
 // FIXME - we really need to set intervals for engines.
 //
-//	if(Omega::instance().getCurrentIteration() < 20)
-//	{
-	
-	
+
+//	if(Omega::instance().getCurrentIteration() > 2000)
+//		return;
+
+
+//      {
+
+
 	for(;ii!=iiEnd;++ii)
 		if( bodies->exists(*ii) )
 			((*bodies)[*ii]->physicalParameters.get())->se3.position += displacement*translationAxis;

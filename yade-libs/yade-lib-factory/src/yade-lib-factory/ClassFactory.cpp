@@ -90,12 +90,17 @@ void * ClassFactory::createPureCustom( std::string name )
 
 bool ClassFactory::load(const string& name)
 {
-	return dlm.loadFromDirectoryList(name);
+        return dlm.loadFromDirectoryList(name);
+}
+
+string ClassFactory::lastError()
+{
+        return dlm.lastError();
 }
 
 string ClassFactory::libNameToSystemName(const string& name)
 {
-	return dlm.libNameToSystemName(name);
+        return dlm.libNameToSystemName(name);
 }
 
 string ClassFactory::systemNameToLibName(const string& name)

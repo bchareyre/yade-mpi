@@ -23,10 +23,10 @@ class GLViewer : public QGLViewer
 //		QGLThread		qglThread;
 		GLWindowsManager	wm;
 		int			viewId;
-		bool 			drawGrid; // FIXME - draw grid to tak naprawdê kolejny GLDrawActor
+		bool			drawGrid; // FIXME - draw grid is in fact just another GLDrawActor
 		shared_ptr<RenderingEngine> renderer;
-	
-	public :
+
+        public :
 		GLViewer (int id, shared_ptr<RenderingEngine> renderer, const QGLFormat& format, QWidget * parent=0, QGLWidget * shareWidget=0);
 		virtual ~GLViewer ();
 		virtual void draw();
@@ -37,7 +37,7 @@ class GLViewer : public QGLViewer
 		void keyPressEvent(QKeyEvent *e);
 		void postDraw();
 		void closeEvent(QCloseEvent *e);
-	
+
 	signals :
 		virtual void closeSignal(int i);
 };
