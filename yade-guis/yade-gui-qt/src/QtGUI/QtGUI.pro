@@ -22,8 +22,7 @@ QtGeneratedCodeGenerator.ui.commands = $$IDL_COMPILER
 QtFileGeneratorController.ui.target = QtFileGeneratorController.ui 
 QtFileGeneratorController.ui.commands = $$IDL_COMPILER 
 QMAKE_gDIR = $${YADE_QMAKE_PATH}/lib/yade/yade-libs/ 
-LIBS += -lyade-lib-time \
-        -lyade-lib-wm3-math \
+LIBS += -lyade-lib-wm3-math \
         -lyade-lib-multimethods \
         -lyade-lib-factory \
         -lyade-lib-opengl \

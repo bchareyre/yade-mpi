@@ -379,8 +379,6 @@
     |       |-- InteractionPhysicsDispatcher.hpp
     |       `-- InteractionPhysicsFunctor.hpp			In================Engine
     `-- yade
-        |-- Chrono.cpp
-        |-- Chrono.hpp
         |-- Engine.hpp
         |-- FileGenerator.cpp
         |-- FileGenerator.hpp

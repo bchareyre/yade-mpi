@@ -12,7 +12,6 @@ clean:
 	$(MAKE) -C yade-lib-multimethods clean
 	$(MAKE) -C yade-lib-serialization clean
 	$(MAKE) -C yade-lib-computational-geometry clean
-	$(MAKE) -C yade-lib-time clean
 	$(MAKE) -C yade-lib-opengl clean
 	$(MAKE) -C yade-lib-serialization-xml clean
 	$(MAKE) -C yade-lib-serialization-bin clean
@@ -42,9 +41,6 @@ compile_install:
 	$(MAKE) -C yade-lib-computational-geometry
 	$(MAKE) -C yade-lib-computational-geometry install
 	
-	$(MAKE) -C yade-lib-time
-	$(MAKE) -C yade-lib-time install
-	
 	$(MAKE) -C yade-lib-opengl
 	$(MAKE) -C yade-lib-opengl install
 	
@@ -71,7 +67,6 @@ uninstall:
 	$(MAKE) -C yade-lib-multimethods uninstall
 	$(MAKE) -C yade-lib-serialization uninstall
 	$(MAKE) -C yade-lib-computational-geometry uninstall
-	$(MAKE) -C yade-lib-time uninstall
 	$(MAKE) -C yade-lib-opengl uninstall
 	$(MAKE) -C yade-lib-serialization-xml uninstall
 	$(MAKE) -C yade-lib-serialization-bin uninstall

@@ -14,7 +14,6 @@
 #include <qscrollview.h>
 #include <QtGeneratedSphericalDEMSimulator.h>
 #include <boost/shared_ptr.hpp>
-#include <yade/yade-lib-time/Chrono.hpp>
 #include <yade/yade-lib-factory/Factorable.hpp>
 #include <yade/yade-core/StandAloneSimulator.hpp>
 
@@ -27,7 +26,6 @@ class QtSphericalDEM : public QtGeneratedSphericalDEMSimulator, public Factorabl
 		int	currentIteration;
 		int	maxIteration;
 		bool	stop;
-		Chrono	chron;
 		bool	record;
 
 	public :

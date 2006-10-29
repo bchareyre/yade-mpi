@@ -20,7 +20,7 @@ using namespace boost;
 
 FpsTracker::FpsTracker (int minX,int minY, int sizeX,int sizeY) : GLWindow(minX,minY,sizeX,sizeY)
 {
-	chron.start();	
+//	chron.start();	
 	lastTime	= 0;
 	maxFps		= 0;
 	minFps 		= 1000000;
@@ -48,7 +48,7 @@ FpsTracker::~FpsTracker ()
 
 void FpsTracker::glDrawInsideWindow()
 {	
-	currentTime = chron.getTime();
+	currentTime = 0;//chron.getTime();
 		
 	if (nbActions>=minNbActions && currentTime>=minTime)
 	{			

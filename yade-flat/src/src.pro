@@ -27,7 +27,6 @@ HEADERS += AABB.hpp \
            Box2PolyhedralSweptSphere.hpp \
            BoxStack.hpp \
            BroadInteractor.hpp \
-           Chrono.hpp \
            ClassFactory.hpp \
            ClosestFeatures.hpp \
            Contact.hpp \
@@ -320,7 +319,6 @@ SOURCES += AABB.cpp \
            Box.cpp \
            Box2PolyhedralSweptSphere.cpp \
            BoxStack.cpp \
-           Chrono.cpp \
            ClassFactory.cpp \
            ClosestFeatures.cpp \
            CundallNonViscousForceDamping.cpp \

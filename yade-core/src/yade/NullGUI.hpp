@@ -11,7 +11,6 @@
 
 // FIXME : there is a problem because I need to link with serialization when I include Factorable because Factorable use some Type described in serialization for the findClassInfo method
 #include "FrontEnd.hpp"
-#include <yade/yade-lib-time/Chrono.hpp>
 
 /*! \brief
 	This GUI is commmand line interface for yade - just starts calculations and never ends
@@ -20,8 +19,6 @@
 class NullGUI : public FrontEnd
 {
 	private :
-		Chrono chron;
-
 		int 		 interval
 				,snapshotInterval;
 

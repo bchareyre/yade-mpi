@@ -13,8 +13,6 @@
 #include <vector>
 #include <string>
 
-#include <yade/yade-lib-time/Chrono.hpp>
-
 #include "GLWindow.hpp"
 
 using namespace std;
@@ -22,8 +20,6 @@ using namespace std;
 class FpsTracker : public GLWindow
 {	
 	private :
-		Chrono		chron;	
-	
 		std::list<std::pair<float,float> > fpss;
 		int		fpssSize;
 		

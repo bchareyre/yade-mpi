@@ -3,8 +3,7 @@ error( "YADE_QMAKE_PATH internal qmake variable is not set, you should run for e
 }
 
 
-LIBS += -lglut \
-        -lyade-lib-time 
+LIBS += -lglut
 INCLUDEPATH += $${YADE_QMAKE_PATH}/include 
 QMAKE_LIBDIR = $${YADE_QMAKE_PATH}/lib/yade/yade-libs/ 
 win32 {

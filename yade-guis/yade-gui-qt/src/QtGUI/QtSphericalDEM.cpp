@@ -18,7 +18,7 @@
 #include <yade/yade-lib-factory/ClassFactory.hpp>
 #include <yade/yade-core/FileGenerator.hpp>
 #include <yade/yade-core/Omega.hpp>
-
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 QtSphericalDEM::QtSphericalDEM ( QWidget * parent , const char * name) : QtGeneratedSphericalDEMSimulator(parent,name)
 {
@@ -58,7 +58,7 @@ void QtSphericalDEM::pbStartClicked()
 	maxIteration = sbNbIterations->value();
 	currentIteration = 0;
 	stop = false;
-	chron.start();
+	boost::posix_time::ptime start = boost::posix_time::second_clock::local_time();
 /*	while (currentIteration!=maxIteration && !stop)
 	{
 		currentIteration++;
@@ -71,7 +71,7 @@ void QtSphericalDEM::pbStartClicked()
 	simulator->setRecording(record);
 	simulator->setRecordingProperties(sbInterval->value(),leOutputDirectory->text(),leOutputBaseName->text(),sbPaddle->value());
 	simulator->run(maxIteration);
-	tlDurationValue->setText(lexical_cast<string>(chron.stop()).c_str());
+	tlDurationValue->setText(boost::posix_time::to_simple_string(boost::posix_time::time_duration(boost::posix_time::second_clock::local_time() - start)));
 	tlIteration->setText(lexical_cast<string>(maxIteration).c_str());
 }
 

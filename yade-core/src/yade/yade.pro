@@ -69,8 +69,7 @@ SOURCES += BodyContainer.cpp \
            TimeStepper.cpp \
            MetaDispatchingEngine.cpp \
            StandAloneSimulator.cpp 
-LIBS += -lyade-lib-time \
--lyade-lib-serialization \
+LIBS += -lyade-lib-serialization \
 -lyade-lib-factory \
 -lyade-lib-wm3-math \
 -lyade-lib-loki \

@@ -120,7 +120,6 @@ int NullGUI::loop()
 			<< "to filename: " << snapshotName << "_[0-9]" << endl;
 
 	long int intervals = 0;
-	chron.start();
 	boost::posix_time::ptime start = boost::posix_time::second_clock::local_time();
 	while(1)
 	{
@@ -150,8 +149,7 @@ int NullGUI::loop()
 		if( ( maxIteration !=0 ) &&  (Omega::instance().getCurrentIteration() >= maxIteration) )
 		{
 			cerr << "Calc finished at: " << Omega::instance().getCurrentIteration() << endl;
-			cerr << "Computation time (chron): " << chron.stop() << endl;
-			cerr << "Computation time (boost::posix_time): " << boost::posix_time::to_simple_string(boost::posix_time::time_duration(boost::posix_time::second_clock::local_time() - start)) << endl;
+			cerr << "Computation time: " << boost::posix_time::to_simple_string(boost::posix_time::time_duration(boost::posix_time::second_clock::local_time() - start)) << endl;
 			exit(0);
 		}
 	}
