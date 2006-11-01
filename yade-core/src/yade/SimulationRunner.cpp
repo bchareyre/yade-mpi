@@ -6,58 +6,58 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "SimulationRunner.hpp"
-#include "SimulationFlow.hpp"
+#include "ThreadRunner.hpp"
+#include "ThreadWorker.hpp"
 
 #include <boost/thread/thread.hpp>
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
 
-void SimulationRunner::run()
+void ThreadRunner::run()
 {
 	boost::mutex::scoped_lock lock(runmutex_);
 	while(isRunning())
 		call();
 }
 
-void SimulationRunner::call()
+void ThreadRunner::call()
 {
 	boost::mutex::scoped_lock lock(callmutex_);
 	simulationFlow_->singleLoop();
 	// can add here a signal, that notifies the UI about single loop being completed
 }
 
-void SimulationRunner::singleLoop()
+void ThreadRunner::singleLoop()
 {
 	boost::mutex::scoped_lock boollock(boolmutex_);
 	boost::mutex::scoped_lock calllock(callmutex_);
 	if(running_) return;
-	boost::function0<void> call( boost::bind( &SimulationRunner::call , this ) );
+	boost::function0<void> call( boost::bind( &ThreadRunner::call , this ) );
 	boost::thread th(call);
 }
 
-void SimulationRunner::start()
+void ThreadRunner::start()
 {
 	boost::mutex::scoped_lock lock(boolmutex_);
 	if(running_) return;
 	running_=true;
-	boost::function0<void> run( boost::bind( &SimulationRunner::run , this ) );
+	boost::function0<void> run( boost::bind( &ThreadRunner::run , this ) );
 	boost::thread th(run);
 }
 
-void SimulationRunner::stop()
+void ThreadRunner::stop()
 {
 	boost::mutex::scoped_lock lock(boolmutex_);
 	running_=false;
 }
 
-bool SimulationRunner::isRunning()
+bool ThreadRunner::isRunning()
 {
 	boost::mutex::scoped_lock lock(boolmutex_);
 	return running_;
 }
 
-SimulationRunner::~SimulationRunner()
+ThreadRunner::~ThreadRunner()
 {
 	stop();
 	boost::mutex::scoped_lock runlock(runmutex_);

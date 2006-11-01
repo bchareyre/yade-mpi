@@ -6,11 +6,11 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "SimulationFlow.hpp"
+#include "ThreadWorker.hpp"
 #include "Omega.hpp"
 #include "MetaBody.hpp"
 
-void SimulationFlow::singleLoop()
+void ThreadWorker::singleLoop()
 {
 	if (Omega::instance().getRootBody()) // FIXME - would it contain the loop in the private variables, this check would be unnecessary
 	{

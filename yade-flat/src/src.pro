@@ -249,8 +249,8 @@ HEADERS += AABB.hpp \
            SerializationExceptions.hpp \
            SimulationController.hpp \
            SimulationControllerUpdater.hpp \
-           SimulationFlow.hpp \
-           SimulationRunner.hpp \
+           ThreadWorker.hpp \
+           ThreadRunner.hpp \
            Singleton.hpp \
            Sphere.hpp \
            SpheresContactGeometry.hpp \
@@ -512,8 +512,8 @@ SOURCES += AABB.cpp \
            SerializationExceptions.cpp \
            SimulationController.cpp \
            SimulationControllerUpdater.cpp \
-           SimulationFlow.cpp \
-           SimulationRunner.cpp \
+           ThreadWorker.cpp \
+           ThreadRunner.cpp \
            Sphere.cpp \
            SpheresContactGeometry.cpp \
            SphericalDEMSimulator.cpp \

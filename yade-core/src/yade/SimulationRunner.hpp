@@ -12,17 +12,17 @@
 #define SIMULATION_RUNNER_HPP
 
 /*! 
-\brief	SimulationRunner takes care of starting/stopping (executing) the
+\brief	ThreadRunner takes care of starting/stopping (executing) the
 	simulation flow in the separate thread. 
 
 	Also it can execute a single loop of simulation flow in a separate
 	thread.
 
-	Lifetime of SimulationRunner is guaranteed to be longer or equal to
+	Lifetime of ThreadRunner is guaranteed to be longer or equal to
 	the lifetime of	the separate thread.
 
-	Lifetime of SimulationRunner must be ensured by the user to be shorter
-	or equal to the lifetime of SimulationFlow.
+	Lifetime of ThreadRunner must be ensured by the user to be shorter
+	or equal to the lifetime of ThreadWorker.
 
 	Do not destroy immediately after call to singleLoop(). Destructor can
 	kick in before a separate thread starts, which will lead to a crash.
@@ -37,12 +37,12 @@
 
  */
 
-class SimulationFlow;
+class ThreadWorker;
 
-class SimulationRunner
+class ThreadRunner
 {
 	private :
-		SimulationFlow* simulationFlow_;
+		ThreadWorker* simulationFlow_;
 		bool		running_;
 		boost::mutex	boolmutex_;
 		boost::mutex	callmutex_;
@@ -51,8 +51,8 @@ class SimulationRunner
 		void		call();
 
 	public :
-		SimulationRunner(SimulationFlow* c) : simulationFlow_(c), running_(false) {};
-		~SimulationRunner();
+		ThreadRunner(ThreadWorker* c) : simulationFlow_(c), running_(false) {};
+		~ThreadRunner();
 
 		void singleLoop();
 		void start();

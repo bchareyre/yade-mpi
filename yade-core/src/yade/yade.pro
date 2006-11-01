@@ -27,8 +27,8 @@ HEADERS += BodyContainer.hpp \
            PhysicalParameters.hpp \
            Preferences.hpp \
            RenderingEngine.hpp \
-           SimulationRunner.hpp \
-           SimulationFlow.hpp \
+           ThreadRunner.hpp \
+           ThreadWorker.hpp \
            yadeExceptions.hpp \
            TimeStepper.hpp \
            BodyContainerIterator.hpp \
@@ -62,8 +62,8 @@ SOURCES += BodyContainer.cpp \
            PhysicalActionContainer.cpp \
            PhysicalParameters.cpp \
            Preferences.cpp \
-           SimulationRunner.cpp \
-           SimulationFlow.cpp \
+           ThreadRunner.cpp \
+           ThreadWorker.cpp \
            yade.cpp \
            yadeExceptions.cpp \
            TimeStepper.cpp \
