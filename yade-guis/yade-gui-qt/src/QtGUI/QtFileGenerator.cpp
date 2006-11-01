@@ -14,6 +14,7 @@
 #include <qgroupbox.h>
 #include <qcombobox.h>
 #include <qlineedit.h>
+#include <qprogressbar.h>
 #include <yade/yade-lib-factory/ClassFactory.hpp>
 #include <yade/yade-core/FileGenerator.hpp>
 #include <yade/yade-core/Omega.hpp>
@@ -30,6 +31,7 @@ QtFileGenerator::QtFileGenerator ( QWidget * parent , const char * name)
 	QSize s = size();
 	setMinimumSize(s);
 	setMaximumSize(QSize(s.width(),32000));	
+	textLabel1->setText("waiting for orders");
 	
 	map<string,DynlibDescriptor>::const_iterator di    = Omega::instance().getDynlibsDescriptor().begin();
 	map<string,DynlibDescriptor>::const_iterator diEnd = Omega::instance().getDynlibsDescriptor().end();
@@ -186,25 +188,35 @@ void QtFileGenerator::pbGenerateClicked()
 //	string message = fg->generateAndSave();
 	pbClose->setEnabled(true);
 	pbGenerate->setEnabled(false);
-	startTimer(100);
+	startTimer(20);
+	progressBar1->setTotalSteps(1000);
 }
 
 void QtFileGenerator::timerEvent( QTimerEvent* )
 {
+	// generating ....
+	if(m_worker && m_runner)
+	{
+		textLabel1->setText(m_worker->message());
+		progressBar1->setProgress(m_worker->progress()*1000.0);
+	}
+
+	// generation finished
 	if(m_worker && m_runner && !m_runner->isRunning() && m_worker->done())
 	{
 		m_runner   = shared_ptr<ThreadRunner>();
 		pbClose->setEnabled(false);
 		pbGenerate->setEnabled(true);
 
-		string fileName = string(filesystem::basename(leOutputFileName->text().data()))+string(filesystem::extension(leOutputFileName->text().data()));
 		string message = boost::any_cast<std::string>(m_worker->getReturnValue());
-		shared_ptr<MessageDialog> md = shared_ptr<MessageDialog>(new MessageDialog("File "+fileName+" generated successfully.\n\n"+message,this->parentWidget()->parentWidget()));
+		shared_ptr<MessageDialog> md = shared_ptr<MessageDialog>(new MessageDialog(message,this->parentWidget()->parentWidget()));
 		md->exec();
 
 		m_worker=shared_ptr<FileGenerator>();
 
 		killTimers();
+		progressBar1->reset();
+		textLabel1->setText("waiting for orders");
 	}
 }
 

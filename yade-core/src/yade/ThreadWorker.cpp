@@ -10,46 +10,67 @@
 
 void ThreadWorker::setTerminate(bool b)
 {
-	boost::mutex::scoped_lock lock(m_boolmutex);
+	boost::mutex::scoped_lock lock(m_mutex);
 	m_should_terminate=b;
 };
 
 bool ThreadWorker::shouldTerminate()
 {
-	boost::mutex::scoped_lock lock(m_boolmutex);
+	boost::mutex::scoped_lock lock(m_mutex);
 	return m_should_terminate;
 };
 		
-signed char ThreadWorker::progress()
+void ThreadWorker::setProgress(float i)
 {
-	return 0;
+	boost::mutex::scoped_lock lock(m_mutex);
+	m_progress=i;
+};
+
+void ThreadWorker::setMessage(std::string s)
+{
+	boost::mutex::scoped_lock lock(m_mutex);
+	m_message=s;
+};
+
+float ThreadWorker::progress()
+{
+	boost::mutex::scoped_lock lock(m_mutex);
+	return m_progress;
+};
+
+std::string ThreadWorker::message()
+{
+	boost::mutex::scoped_lock lock(m_mutex);
+	return m_message;
 };
 
 void ThreadWorker::setReturnValue(boost::any a)
 {
+	boost::mutex::scoped_lock lock(m_mutex);
 	m_val = a;
 };
 
 boost::any ThreadWorker::getReturnValue()
 {
+	boost::mutex::scoped_lock lock(m_mutex);
 	return m_val;
 };
 
 bool ThreadWorker::done()
 {
-	boost::mutex::scoped_lock lock(m_boolmutex);
+	boost::mutex::scoped_lock lock(m_mutex);
 	return m_done;
 };
 
 void ThreadWorker::callSingleAction()
 {
 	{
-		boost::mutex::scoped_lock lock(m_boolmutex);
+		boost::mutex::scoped_lock lock(m_mutex);
 		m_done = false;
 	}
 	this->singleAction();
 	{
-		boost::mutex::scoped_lock lock(m_boolmutex);
+		boost::mutex::scoped_lock lock(m_mutex);
 		m_done = true;
 	}
 };

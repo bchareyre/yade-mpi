@@ -61,13 +61,15 @@ string FileGenerator::generateAndSave()
 	}
 	else
 	{
+		setMessage("saving...");
 		IOFormatManager::saveToFile(serializationDynlib, outputFileName, "rootBody", rootBody);
-		return message;
+		return std::string("File "+outputFileName+" generated successfully.\n\n")+message;
 	}
 }
 
 void FileGenerator::singleAction()
 {
+	setMessage("generating model...");
 	std::string st=generateAndSave();
 	setReturnValue(st);
 };

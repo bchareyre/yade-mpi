@@ -247,6 +247,7 @@ string LatticeExample::generate()
 
         unsigned int totalNodesCount = 0;
 
+	setMessage("creating nodes...");
         for( int j=0 ; j<=nbNodes[1] ; j++ )
         {
 		if(shouldTerminate()) return "";
@@ -269,6 +270,7 @@ string LatticeExample::generate()
 	int beam_counter = 0;
 	float nodes_a=0;
 	float nodes_all = rootBody->bodies->size();
+	setMessage("creating beams...");
 	for(  ; bi!=biEnd ; ++bi )  // loop over all nodes, to create beams
 	{
 		Body* bodyA = (*bi).get(); // first_node
@@ -294,7 +296,10 @@ string LatticeExample::generate()
 				if(checkMinimumAngle(bc,beam))
 				{
 					if( ++beam_counter % 100 == 0 )
+					{
 						cerr << "creating beam: " << beam_counter << " , " << ((nodes_a/nodes_all)*100.0)  << " %\n"; 
+						setProgress(nodes_a/nodes_all);
+					}
 					
 					bc.insert(beam);
 				}
@@ -399,7 +404,8 @@ string LatticeExample::generate()
 			connections[beam->id2].push_back(body->getId());
 		}
 	}
-	
+
+	setMessage("angular springs...");
 	{ // create angular springs between beams
 		bi    = rootBody->bodies->begin();
 		biEnd = rootBody->bodies->end();
@@ -410,7 +416,10 @@ string LatticeExample::generate()
 			if(shouldTerminate()) return "";
 
 			if( ++current % 100 == 0 )
+			{
 				cerr << "angular springs: " << current << " , " << ((static_cast<float>(current)/all_bodies)*100.0) << " %\n";
+				setProgress(((float)(current)/all_bodies));
+			}
 				
 			Body* body = (*bi).get();
 			if( ! ( body->getGroupMask() & beamGroupMask ) )

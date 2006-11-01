@@ -146,6 +146,9 @@ string SDECSpheresPlane::generate()
 		nbSpheresk = (int)(groundSize[2]/radius);
 
 		for(int i=0;i<nbSpheresi;i++)
+		{
+			if(shouldTerminate()) return "";
+
 			for(int j=0;j<nbSpheresj;j++)
 				for(int k=0;k<nbSpheresk;k++)
 				{
@@ -153,18 +156,27 @@ string SDECSpheresPlane::generate()
 					createGroundSphere(sphere,radius,radius*(i-nbSpheresi*0.5+0.5),radius*(j-nbSpheresj*0.5+0.5),radius*(k-nbSpheresk*0.5+0.5));
 					rootBody->bodies->insert(sphere);
 				}
+		}
 	}
 
 ///////// spheres
+	float all = nbSpheres[0]*nbSpheres[1]*nbSpheres[2];
+	float current = 0.0;
 
 	for(int i=0;i<nbSpheres[0];i++)
+	{
+		if(shouldTerminate()) return "";
+
 		for(int j=0;j<nbSpheres[1];j++)
 			for(int k=0;k<nbSpheres[2];k++)
 			{
 				shared_ptr<Body> sphere;
 				createSphere(sphere,i,j,k);
 				rootBody->bodies->insert(sphere);
+
+				setProgress(current++/all);
 			}
+	}
 	
 	return "";
 }

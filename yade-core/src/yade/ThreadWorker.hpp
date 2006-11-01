@@ -27,8 +27,10 @@ class ThreadWorker	//         perhaps simulation steps, or stage? as it is a sin
 		friend class ThreadRunner;
 		bool		m_should_terminate;
 		bool		m_done;
-		boost::mutex	m_boolmutex;
+		boost::mutex	m_mutex;
 		boost::any	m_val;
+		float		m_progress;
+		std::string	m_message;
 		void		setTerminate(bool);
 		void		callSingleAction();
 
@@ -36,15 +38,18 @@ class ThreadWorker	//         perhaps simulation steps, or stage? as it is a sin
 		/// singleAction() can check whether someone asked for termination, and terminate if/when possible
 		bool		shouldTerminate();
 		void		setReturnValue(boost::any);
+		void		setProgress(float);
+		void		setMessage(std::string);
 		/// derived classes must define this method
 		virtual void	singleAction() = 0;
 
 	public:
-		ThreadWorker() : m_should_terminate(false), m_done(false) {};
+		ThreadWorker() : m_should_terminate(false), m_done(false), m_progress(0) {};
 		virtual		~ThreadWorker() {};
 
-		/// Returns a value between 0 and 100 percent. Reimplement if necessary.
-		virtual signed char progress();
+		/// Returns a value between 0.0 and 1.0. Call setProgress() to set it.
+		float		progress();
+		std::string	message();
 		boost::any	getReturnValue();
 		bool		done();
 };
