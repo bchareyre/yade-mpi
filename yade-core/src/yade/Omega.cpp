@@ -97,7 +97,7 @@ void Omega::doOneSimulationLoop()
 		//	simulationPauseDuration += microsec_clock::local_time()-msStartingPauseTime;
 		//else
 		msStartingPauseTime = microsec_clock::local_time();
-		simulationLoop->singleLoop();
+		simulationLoop->spawnSingleAction();
 	}
 }
 

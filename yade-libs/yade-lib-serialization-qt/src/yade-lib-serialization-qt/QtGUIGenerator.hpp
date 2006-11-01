@@ -76,6 +76,7 @@ class QtGUIGenerator : public QObject
 
 		void buildGUI(shared_ptr<Serializable> s, QWidget * widget);
 		void deserialize(shared_ptr<Serializable> s);
+		void deserialize(Serializable* s);
 	
 	public slots :
 		virtual void pushButtonOkClicked() ;

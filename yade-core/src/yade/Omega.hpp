@@ -23,7 +23,7 @@
 #include <yade/yade-lib-loki/Singleton.hpp>
 #include <yade/yade-lib-factory/ClassFactory.hpp>
 
-#include "ThreadWorker.hpp"
+#include "SimulationFlow.hpp"
 
 class MetaBody;
 class ThreadRunner;
@@ -51,7 +51,7 @@ class Omega : public Singleton<Omega>
 						,rootBodyMutex;
 
 		shared_ptr<ThreadRunner>	 simulationLoop;
-		ThreadWorker			 simulationFlow_;
+		SimulationFlow			 simulationFlow_;
 
 		map<string,DynlibDescriptor>	 dynlibs;	// FIXME : should store that in ClassFactory ?
 		Real				 dt;		// FIXME - maybe ? move this to MetaBody.hpp OR MAYBE NOT ?

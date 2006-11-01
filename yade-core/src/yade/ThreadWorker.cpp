@@ -7,16 +7,50 @@
 *************************************************************************/
 
 #include "ThreadWorker.hpp"
-#include "Omega.hpp"
-#include "MetaBody.hpp"
 
-void ThreadWorker::singleLoop()
+void ThreadWorker::setTerminate(bool b)
 {
-	if (Omega::instance().getRootBody()) // FIXME - would it contain the loop in the private variables, this check would be unnecessary
+	boost::mutex::scoped_lock lock(m_boolmutex);
+	m_should_terminate=b;
+};
+
+bool ThreadWorker::shouldTerminate()
+{
+	boost::mutex::scoped_lock lock(m_boolmutex);
+	return m_should_terminate;
+};
+		
+signed char ThreadWorker::progress()
+{
+	return 0;
+};
+
+void ThreadWorker::setReturnValue(boost::any a)
+{
+	m_val = a;
+};
+
+boost::any ThreadWorker::getReturnValue()
+{
+	return m_val;
+};
+
+bool ThreadWorker::done()
+{
+	boost::mutex::scoped_lock lock(m_boolmutex);
+	return m_done;
+};
+
+void ThreadWorker::callSingleAction()
+{
 	{
-		Omega::instance().getRootBody()->moveToNextTimeStep();
-		Omega::instance().incrementCurrentIteration();
-		Omega::instance().incrementSimulationTime();
+		boost::mutex::scoped_lock lock(m_boolmutex);
+		m_done = false;
+	}
+	this->singleAction();
+	{
+		boost::mutex::scoped_lock lock(m_boolmutex);
+		m_done = true;
 	}
 };
 

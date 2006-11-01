@@ -48,15 +48,27 @@ void FileGenerator::registerAttributes()
 
 string FileGenerator::generate() 
 {
-	return "";
+	return "FileGenerator (base class) generates nothing.";
 }
 
 
 string FileGenerator::generateAndSave()
 {
 	string message = generate();
-	IOFormatManager::saveToFile(serializationDynlib, outputFileName, "rootBody", rootBody);
-	return message;
+	if(shouldTerminate())
+	{
+		return "Generation aborted.";
+	}
+	else
+	{
+		IOFormatManager::saveToFile(serializationDynlib, outputFileName, "rootBody", rootBody);
+		return message;
+	}
 }
 
+void FileGenerator::singleAction()
+{
+	std::string st=generateAndSave();
+	setReturnValue(st);
+};
 

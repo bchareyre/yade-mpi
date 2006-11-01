@@ -20,8 +20,12 @@
 #include <boost/filesystem/convenience.hpp>
 #include <boost/filesystem/operations.hpp>
 #include "MessageDialog.hpp"
+#include <yade/yade-core/ThreadRunner.hpp>
 
-QtFileGenerator::QtFileGenerator ( QWidget * parent , const char * name) : QtFileGeneratorController(parent,name)
+QtFileGenerator::QtFileGenerator ( QWidget * parent , const char * name)
+	: QtFileGeneratorController(parent,name)
+	, m_worker(shared_ptr<FileGenerator>())
+	, m_runner(shared_ptr<ThreadRunner>())
 {
 	QSize s = size();
 	setMinimumSize(s);
@@ -166,29 +170,53 @@ void QtFileGenerator::cbSerializationNameActivated(const QString& s)
 
 void QtFileGenerator::pbGenerateClicked()
 {
-	// FIXME add some test to avoid crashing
-	shared_ptr<FileGenerator> fg = static_pointer_cast<FileGenerator>(ClassFactory::instance().createShared(cbGeneratorName->currentText()));
-	
-	fg->setFileName(leOutputFileName->text());
-	fg->setSerializationLibrary(cbSerializationName->currentText());
-	
-	guiGen.deserialize(fg);
-	
-	string message = fg->generateAndSave();
-//	pbClose->setEnabled(true);
-//	pbGenerate->setEnabled(false);
+	if(m_worker != 0)
+		return;
 
-	string fileName = string(filesystem::basename(leOutputFileName->text().data()))+string(filesystem::extension(leOutputFileName->text().data()));
-	shared_ptr<MessageDialog> md = shared_ptr<MessageDialog>(new MessageDialog("File "+fileName+" generated successfully.\n\n"+message,this->parentWidget()->parentWidget()));
-	md->exec();
+	m_worker = static_pointer_cast<FileGenerator>(ClassFactory::instance().createShared(cbGeneratorName->currentText()));
+	
+	m_worker->setFileName(leOutputFileName->text());
+	m_worker->setSerializationLibrary(cbSerializationName->currentText());
+	
+	guiGen.deserialize(m_worker);
+	
+	m_runner   = shared_ptr<ThreadRunner>(new ThreadRunner(m_worker.get()));
+	m_runner->spawnSingleAction();
+
+//	string message = fg->generateAndSave();
+	pbClose->setEnabled(true);
+	pbGenerate->setEnabled(false);
+	startTimer(100);
+}
+
+void QtFileGenerator::timerEvent( QTimerEvent* )
+{
+	if(m_worker && m_runner && !m_runner->isRunning() && m_worker->done())
+	{
+		m_runner   = shared_ptr<ThreadRunner>();
+		pbClose->setEnabled(false);
+		pbGenerate->setEnabled(true);
+
+		string fileName = string(filesystem::basename(leOutputFileName->text().data()))+string(filesystem::extension(leOutputFileName->text().data()));
+		string message = boost::any_cast<std::string>(m_worker->getReturnValue());
+		shared_ptr<MessageDialog> md = shared_ptr<MessageDialog>(new MessageDialog("File "+fileName+" generated successfully.\n\n"+message,this->parentWidget()->parentWidget()));
+		md->exec();
+
+		m_worker=shared_ptr<FileGenerator>();
+
+		killTimers();
+	}
 }
 
 // FIXME - stupid qt3-designer. This is now "Stop" not "Close"
 void QtFileGenerator::pbCloseClicked()
 {
 
+	if(m_runner)
+		m_runner->pleaseTerminate();
+
 	// So here we want to kill the generator thread.
-	std::cerr << "Stop\n";
+//	std::cerr << "Stop\n";
 
 
 ///////////////////// FIXME - this Close was doing.
@@ -264,6 +292,8 @@ void QtFileGenerator::pbSaveClicked()
 
 void QtFileGenerator::closeEvent(QCloseEvent *evt)
 {
+	if(m_worker || m_runner)
+		return;
 	close();
 	QtFileGeneratorController::closeEvent(evt);
 }

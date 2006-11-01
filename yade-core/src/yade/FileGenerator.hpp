@@ -12,9 +12,14 @@
 #include <yade/yade-lib-serialization/Serializable.hpp>
 
 #include "MetaBody.hpp"
+#include "ThreadWorker.hpp"
 
-class FileGenerator : public Serializable
+class FileGenerator
+	: public Serializable
+	, public ThreadWorker
 {
+	private:
+		std::string generateAndSave();
 	protected :
 		shared_ptr<MetaBody>	 rootBody;
 
@@ -28,10 +33,11 @@ class FileGenerator : public Serializable
 		FileGenerator ();
 		virtual ~FileGenerator ();
 		
-		virtual string generate();
-		string generateAndSave();
+		virtual void singleAction();
 
 	protected :
+		virtual string generate();
+
 		virtual void postProcessAttributes(bool);
 		virtual void registerAttributes();
 

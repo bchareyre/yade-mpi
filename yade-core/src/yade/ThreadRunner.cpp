@@ -23,11 +23,18 @@ void ThreadRunner::run()
 void ThreadRunner::call()
 {
 	boost::mutex::scoped_lock lock(callmutex_);
-	simulationFlow_->singleLoop();
+	m_thread_worker->setTerminate(false);
+	m_thread_worker->callSingleAction();
 	// can add here a signal, that notifies the UI about single loop being completed
 }
 
-void ThreadRunner::singleLoop()
+void ThreadRunner::pleaseTerminate()
+{
+	stop();
+	m_thread_worker->setTerminate(true);
+}
+
+void ThreadRunner::spawnSingleAction()
 {
 	boost::mutex::scoped_lock boollock(boolmutex_);
 	boost::mutex::scoped_lock calllock(callmutex_);
@@ -59,7 +66,7 @@ bool ThreadRunner::isRunning()
 
 ThreadRunner::~ThreadRunner()
 {
-	stop();
+	pleaseTerminate();
 	boost::mutex::scoped_lock runlock(runmutex_);
 	boost::mutex::scoped_lock calllock(callmutex_);
 }

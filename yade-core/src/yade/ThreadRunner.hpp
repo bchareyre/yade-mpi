@@ -6,32 +6,36 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include <boost/thread/mutex.hpp>
+#ifndef THREAD_RUNNER_HPP
+#define THREAD_RUNNER_HPP
 
-#ifndef SIMULATION_RUNNER_HPP
-#define SIMULATION_RUNNER_HPP
+#include <boost/thread/mutex.hpp>
 
 /*! 
 \brief	ThreadRunner takes care of starting/stopping (executing) the
-	simulation flow in the separate thread. 
+	ThreadWorker in the separate thread. 
 
-	Also it can execute a single loop of simulation flow in a separate
-	thread.
+	It is achieved by either:
+	- one execution of { ThreadWorker::singleAction(); } in separate thread
+	- a loop { while(isRunning() ) ThreadWorker::singleAction(); } in separate thread
 
 	Lifetime of ThreadRunner is guaranteed to be longer or equal to
-	the lifetime of	the separate thread.
+	the lifetime of	the separate thread of execution.
 
-	Lifetime of ThreadRunner must be ensured by the user to be shorter
-	or equal to the lifetime of ThreadWorker.
+	The ThreadRunner owner must make sure that ThreadWorker has longer or
+	equal lifetime than instance of ThreadRunner. Otherwise ThreadRunner
+	will try to execute a dead object, which will lead to crash.
 
-	Do not destroy immediately after call to singleLoop(). Destructor can
+	Do not destroy immediately after call to singleAction(). Destructor can
 	kick in before a separate thread starts, which will lead to a crash.
 
+	User can explicitly ask the running thread to terminate execution. If
+	the thread supports it, it will terminate.
 
 \note	This code is reentrant. Simultaneous requests from other threads to
-	start/stop or perform singleLoop are expected.
+	start/stop or perform singleAction() are expected.
 	   
-	So simulations are running, while the user is interacting with the
+	So ThreadWorker(s) are running, while the user is interacting with the
 	UI frontend (doesn't matter whether the UI is graphical, ncurses or
 	any other).
 
@@ -42,7 +46,7 @@ class ThreadWorker;
 class ThreadRunner
 {
 	private :
-		ThreadWorker* simulationFlow_;
+		ThreadWorker*	m_thread_worker;
 		bool		running_;
 		boost::mutex	boolmutex_;
 		boost::mutex	callmutex_;
@@ -51,12 +55,13 @@ class ThreadRunner
 		void		call();
 
 	public :
-		ThreadRunner(ThreadWorker* c) : simulationFlow_(c), running_(false) {};
+		ThreadRunner(ThreadWorker* c) : m_thread_worker(c), running_(false) {};
 		~ThreadRunner();
 
-		void singleLoop();
+		void spawnSingleAction();
 		void start();
 		void stop();
+		void pleaseTerminate();
 		bool isRunning();
 };
 

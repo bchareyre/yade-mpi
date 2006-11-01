@@ -249,6 +249,8 @@ string LatticeExample::generate()
 
         for( int j=0 ; j<=nbNodes[1] ; j++ )
         {
+		if(shouldTerminate()) return "";
+
                 for( int i=0 ; i<=nbNodes[0] ; i++ )
                         for( int k=0 ; k<=nbNodes[2] ; k++)
                         {
@@ -277,6 +279,8 @@ string LatticeExample::generate()
 		
 		for( ; bi2!=biEnd ; ++bi2 )
 		{
+			if(shouldTerminate()) return "";
+
 			Body* bodyB = (*bi2).get(); // all other nodes
 			// warning - I'm assuming that there are ONLY Nodes in the rootBody
 			LatticeNodeParameters* a = static_cast<LatticeNodeParameters*>(bodyA->physicalParameters.get());
@@ -305,6 +309,8 @@ string LatticeExample::generate()
                 int node2Id=-1; Real len2=100000;
                 for(  ; bi!=biEnd ; ++bi )  // loop over all nodes, to find those closest to strainRecorder_node1 and strainRecorder_node2
                 {
+			if(shouldTerminate()) return "";
+
                         Body* body = (*bi).get();
                         LatticeNodeParameters* node = dynamic_cast<LatticeNodeParameters*>(body->physicalParameters.get());
                         tmpLen = ( strainRecorder_node1 - node->se3.position ).squaredLength();
@@ -327,6 +333,8 @@ string LatticeExample::generate()
                 int node4Id=-1; Real len2=100000;
                 for(  ; bi!=biEnd ; ++bi )  // loop over all nodes, to find those closest to measurePoisson_node3 and measurePoisson_node4
                 {
+			if(shouldTerminate()) return "";
+
                         Body* body = (*bi).get();
                         LatticeNodeParameters* node = dynamic_cast<LatticeNodeParameters*>(body->physicalParameters.get());
                         tmpLen = ( measurePoisson_node3 - node->se3.position ).squaredLength();
@@ -346,6 +354,8 @@ string LatticeExample::generate()
         biEnd = bc.end();
         for(  ; bi!=biEnd ; ++bi )  // loop over all newly created beams ...
         {
+		if(shouldTerminate()) return "";
+
                 shared_ptr<Body> b = *bi;
                 rootBody->bodies->insert(b); // .. to insert them into rootBody
                 
@@ -378,6 +388,8 @@ string LatticeExample::generate()
 		
 		for(  ; bi!=biEnd ; ++bi )  // loop over all beams
 		{
+			if(shouldTerminate()) return "";
+
 			Body* body = (*bi).get();
 			if( ! ( body->getGroupMask() & beamGroupMask ) )
 				continue; // skip non-beams
@@ -395,6 +407,8 @@ string LatticeExample::generate()
 		int current = 0;
 		for(  ; bi!=biEnd ; ++bi )  // loop over all beams
 		{
+			if(shouldTerminate()) return "";
+
 			if( ++current % 100 == 0 )
 				cerr << "angular springs: " << current << " , " << ((static_cast<float>(current)/all_bodies)*100.0) << " %\n";
 				

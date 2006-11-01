@@ -17,6 +17,7 @@
 #include <yade/yade-lib-serialization-qt/QtGUIGenerator.hpp>
 
 class FileGenerator;
+class ThreadRunner;
 
 class QtFileGenerator : public QtFileGeneratorController, public Factorable
 {
@@ -28,6 +29,9 @@ class QtFileGenerator : public QtFileGeneratorController, public Factorable
 		void setSerializationName(string);
 		void setGeneratorName(string n);
 		void displayFileGeneratorAttributes(shared_ptr<FileGenerator>&);
+		
+		shared_ptr<ThreadRunner>	 m_runner;
+		shared_ptr<FileGenerator>	 m_worker;
 
 	public :
 		QtFileGenerator (QWidget * parent = 0, const char * name = 0 );
@@ -43,7 +47,8 @@ class QtFileGenerator : public QtFileGeneratorController, public Factorable
 		virtual void pbSaveClicked();
 	
 	protected : 
-		void closeEvent(QCloseEvent *evt);
+		virtual void closeEvent(QCloseEvent *evt);
+                virtual void timerEvent(QTimerEvent* );
 
 	REGISTER_CLASS_NAME(QtFileGenerator);
 	REGISTER_BASE_CLASS_NAME(Factorable);

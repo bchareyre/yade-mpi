@@ -180,6 +180,11 @@ void QtGUIGenerator::buildGUI(shared_ptr<Serializable> s,  QWidget * widget)
 
 void QtGUIGenerator::deserialize(shared_ptr<Serializable> s)
 {
+	this->deserialize(s.get());
+};
+
+void QtGUIGenerator::deserialize(Serializable* s)
+{
 	XMLFormatManager xmlManager; // FIXME - beacuse all IOFormatManagers are using pointers to static functions it is all a mess...
 	
 	s->registerSerializableAttributes(true);

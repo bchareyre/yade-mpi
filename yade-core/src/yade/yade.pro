@@ -22,6 +22,7 @@ HEADERS += BodyContainer.hpp \
            MetaEngine.hpp \
            NullGUI.hpp \
            Omega.hpp \
+	   SimulationFlow.hpp \
            PhysicalActionContainer.hpp \
            PhysicalAction.hpp \
            PhysicalParameters.hpp \
@@ -59,6 +60,7 @@ SOURCES += BodyContainer.cpp \
            MetaBody.cpp \
            NullGUI.cpp \
            Omega.cpp \
+	   SimulationFlow.cpp \
            PhysicalActionContainer.cpp \
            PhysicalParameters.cpp \
            Preferences.cpp \
