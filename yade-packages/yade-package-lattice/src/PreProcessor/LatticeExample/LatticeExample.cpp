@@ -622,8 +622,8 @@ void LatticeExample::calcAxisAngle(LatticeBeamParameters* beam, BodyContainer* b
 	//	angularSpring->angle 			= result;
 	//	angularSpring->initialAngle 		= rotation;
 	//	angularSpring->angle 			= rotation;
-		angularSpring->initialAngle 		= angle;
-		angularSpring->angle 			= angle;
+		angularSpring->initialPlaneAngle 	= angle;
+		angularSpring->planeAngle 		= angle;
 		
 		interaction->isReal			= true;
 		interaction->isNew 			= false;

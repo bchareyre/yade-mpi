@@ -27,7 +27,8 @@ using namespace boost;
 
 SimulationController::SimulationController(QWidget * parent) : QtGeneratedSimulationController(parent,"SimulationController")
 {
-	refreshTime = 50;
+	sync=false;
+	refreshTime = 20;
 	parentWorkspace = parent;
 
 	scrollViewFrame = new QFrame();	
@@ -257,11 +258,6 @@ void SimulationController::closeGLViewEvent(int id)
 void SimulationController::pbStopClicked()
 {
 	Omega::instance().stopSimulationLoop();
-//	map<int,GLViewer*>::reverse_iterator gi = glViews.rbegin();
-//	map<int,GLViewer*>::reverse_iterator giEnd = glViews.rend();
-//	for(;gi!=giEnd;++gi)
-//		gi->second->stopAnimation();
-//	updater->stop();
 
 	killTimers();
 }
@@ -269,12 +265,8 @@ void SimulationController::pbStopClicked()
 
 void SimulationController::pbStartClicked()
 {
-	Omega::instance().startSimulationLoop();        
-//	map<int,GLViewer*>::reverse_iterator gi = glViews.rbegin();
-//	map<int,GLViewer*>::reverse_iterator giEnd = glViews.rend();
-//	for(;gi!=giEnd;++gi)
-//		gi->second->startAnimation();
-//	updater->start();
+	if(!sync)
+		Omega::instance().startSimulationLoop();        
 
 	startTimer(refreshTime);
 }
@@ -307,7 +299,7 @@ void SimulationController::pbOneSimulationStepClicked()
 	//updater->start();
 	//FIXME : fix real simulation time
 	pbStopClicked();
-	Omega::instance().doOneSimulationLoop();
+	Omega::instance().spawnSingleSimulationLoop();
 	redrawAll();
 	updater->oneLoop();
 }
@@ -369,12 +361,26 @@ void SimulationController::sbSecondValueChanged(int)
 
 void SimulationController::sbRefreshValueChanged(int v)
 {
+	pbStopClicked();
 	refreshTime = v;
+}
+
+void SimulationController::cbSyncToggled( bool b)
+{
+	pbStopClicked();
+	sync = b;
+}
+
+void SimulationController::pbStart2Clicked()
+{
+	pbStartClicked();
 }
 
 void SimulationController::timerEvent( QTimerEvent* )
 {
 	updater->oneLoop();
 	redrawAll();
+	if(sync)
+		Omega::instance().spawnSingleSimulationLoop();
 }
 

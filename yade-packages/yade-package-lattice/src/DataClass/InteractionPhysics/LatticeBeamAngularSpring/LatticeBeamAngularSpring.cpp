@@ -11,6 +11,11 @@
 
 LatticeBeamAngularSpring::LatticeBeamAngularSpring() : InteractionPhysics()
 {
+
+	initialPlaneAngle	= 0;
+	planeAngle		= 0;
+	initialOffPlaneAngle	= 0;
+	offPlaneAngle		= 0;
 //	createIndex();
 }
 
@@ -23,7 +28,9 @@ LatticeBeamAngularSpring::~LatticeBeamAngularSpring()
 void LatticeBeamAngularSpring::registerAttributes()
 {
 	InteractionPhysics::registerAttributes();
-	REGISTER_ATTRIBUTE(initialAngle);
-	REGISTER_ATTRIBUTE(angle); // FIXME - can be calculated after deserialization
+	REGISTER_ATTRIBUTE(initialPlaneAngle);
+	REGISTER_ATTRIBUTE(planeAngle); // FIXME - can be calculated after deserialization
+	REGISTER_ATTRIBUTE(initialOffPlaneAngle);
+	REGISTER_ATTRIBUTE(offPlaneAngle); // FIXME - can be calculated after deserialization
 }
 

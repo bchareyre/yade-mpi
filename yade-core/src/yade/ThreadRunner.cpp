@@ -15,6 +15,7 @@
 
 void ThreadRunner::run()
 {
+	// this is the body of execution of separate thread
 	boost::mutex::scoped_lock lock(runmutex_);
 	while(isRunning())
 		call();
@@ -22,10 +23,10 @@ void ThreadRunner::run()
 
 void ThreadRunner::call()
 {
+	// this is the body of execution of separate thread
 	boost::mutex::scoped_lock lock(callmutex_);
 	m_thread_worker->setTerminate(false);
 	m_thread_worker->callSingleAction();
-	// can add here a signal, that notifies the UI about single loop being completed
 }
 
 void ThreadRunner::pleaseTerminate()

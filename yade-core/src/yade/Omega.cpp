@@ -43,8 +43,6 @@ void Omega::init()
 	currentIteration = 0;
 	dt = 0.01;
 	logFile = shared_ptr<ofstream>(new ofstream("../data/log.xml", ofstream::out | ofstream::app));
-	// build simulation loop thread
-	// synchronizer = shared_ptr<ThreadSynchronizer>(new ThreadSynchronizer()); // FIXME - this should be optional
 }
 
 
@@ -69,11 +67,7 @@ void Omega::createSimulationLoop()
 void Omega::finishSimulationLoop()
 {
 	if (simulationLoop)
-	{
-		//simulationLoop->finish();
-		//std::cerr << "finishSimulationLoop()\n";
 		simulationLoop->stop();
-	}
 }
 
 
@@ -81,21 +75,16 @@ void Omega::joinSimulationLoop()
 {
 	if (simulationLoop)
 	{
-		//simulationLoop->join();
-		//std::cerr << "joinSimulationLoop()\n";
 		simulationLoop->stop();
 		simulationLoop   = shared_ptr<ThreadRunner>();
 	}
 }
 
 
-void Omega::doOneSimulationLoop()
+void Omega::spawnSingleSimulationLoop()
 {
 	if (simulationLoop)
 	{
-		//if ((simulationLoop->isStopped()))
-		//	simulationPauseDuration += microsec_clock::local_time()-msStartingPauseTime;
-		//else
 		msStartingPauseTime = microsec_clock::local_time();
 		simulationLoop->spawnSingleAction();
 	}

@@ -24,14 +24,13 @@
 class SimulationController : public QtGeneratedSimulationController
 {
 	private :
-		boost::mutex mutex;
-
 		QtGUIGenerator guiGen;	
 		QWidget * parentWorkspace;	
 		shared_ptr<RenderingEngine> renderer;
 		map<int,GLViewer* > glViews;
 		int maxNbViews;
 		int refreshTime;
+		bool sync;
 	
 		shared_ptr<SimulationControllerUpdater> updater;
 
@@ -64,6 +63,8 @@ class SimulationController : public QtGeneratedSimulationController
 		virtual void sb10PowerSecondValueChanged(int);
 		virtual void sbSecondValueChanged(int);
 		virtual void sbRefreshValueChanged(int);
+		virtual void cbSyncToggled(bool);
+		virtual void pbStart2Clicked();
 		void closeGLViewEvent(int id);
 
         

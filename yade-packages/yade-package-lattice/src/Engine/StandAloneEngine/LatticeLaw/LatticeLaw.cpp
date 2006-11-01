@@ -100,7 +100,7 @@ void LatticeLaw::action(Body* body)
 				
 			//	Vector3r angleDifference = an->angle - an->initialAngle;
 			//	Quaternionr angleDifference = an->angle * an->initialAngle.inverse();
-				Real angleDifference = an->angle - an->initialAngle;
+				Real angleDifference = an->planeAngle - an->initialPlaneAngle;
 				
 				if( angleDifference > 0 )
 					while(angleDifference > Mathr::PI) angleDifference -= Mathr::TWO_PI;
@@ -435,16 +435,19 @@ void LatticeLaw::action(Body* body)
 			
 			//	Quaternionr 		rotation;
 			//	Vector3r		axis;
-				Real			angle;
+				Real			planeAngle;
 
 			//	rotation.align( beam1->direction , beam2->direction );
 			//	rotation.toAxisAngle (axis, angle);
 
-				angle = (beam1->direction.cross(beam2->direction)[2] > 0.0 ? 1.0 : -1.0) * Mathr::aCos( beam1->direction.dot(beam2->direction));
+				planeAngle = (beam1->direction.cross(beam2->direction)[2] > 0.0 ? 1.0 : -1.0) * Mathr::aCos( beam1->direction.dot(beam2->direction));
+
+				if((*angles)->getId2()==7)
+					std::cerr << planeAngle << "\n";
 
 			//	(static_cast<LatticeBeamAngularSpring*>((*angles)->interactionPhysics.get()))->angle = axis*angle; 
 			//	(static_cast<LatticeBeamAngularSpring*>((*angles)->interactionPhysics.get()))->angle = rotation; 
-				(static_cast<LatticeBeamAngularSpring*>((*angles)->interactionPhysics.get()))->angle = angle;       // 2D
+				(static_cast<LatticeBeamAngularSpring*>((*angles)->interactionPhysics.get()))->planeAngle = planeAngle;       // 2D
 			}
 			// else FIXME - delete unused angularSpring
 		}

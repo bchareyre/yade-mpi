@@ -9,7 +9,7 @@
             <x>0</x>
             <y>0</y>
             <width>397</width>
-            <height>642</height>
+            <height>661</height>
         </rect>
     </property>
     <property name="sizePolicy">
@@ -756,36 +756,112 @@
                                     <enum>Raised</enum>
                                 </property>
                             </widget>
-                            <widget class="QLayoutWidget">
+                            <widget class="QPushButton">
                                 <property name="name">
-                                    <cstring>layout2</cstring>
+                                    <cstring>pbApply</cstring>
+                                </property>
+                                <property name="sizePolicy">
+                                    <sizepolicy>
+                                        <hsizetype>5</hsizetype>
+                                        <vsizetype>1</vsizetype>
+                                        <horstretch>0</horstretch>
+                                        <verstretch>0</verstretch>
+                                    </sizepolicy>
+                                </property>
+                                <property name="minimumSize">
+                                    <size>
+                                        <width>0</width>
+                                        <height>0</height>
+                                    </size>
+                                </property>
+                                <property name="text">
+                                    <string>Apply</string>
+                                </property>
+                            </widget>
+                        </vbox>
+                    </widget>
+                    <widget class="QGroupBox">
+                        <property name="name">
+                            <cstring>gbOthersParameters</cstring>
+                        </property>
+                        <property name="sizePolicy">
+                            <sizepolicy>
+                                <hsizetype>7</hsizetype>
+                                <vsizetype>1</vsizetype>
+                                <horstretch>0</horstretch>
+                                <verstretch>0</verstretch>
+                            </sizepolicy>
+                        </property>
+                        <property name="title">
+                            <string>Others Parameters</string>
+                        </property>
+                        <grid>
+                            <property name="name">
+                                <cstring>unnamed</cstring>
+                            </property>
+                            <widget class="QCheckBox" row="1" column="0">
+                                <property name="name">
+                                    <cstring>checkBox1</cstring>
+                                </property>
+                                <property name="text">
+                                    <string>sync.display</string>
+                                </property>
+                            </widget>
+                            <widget class="QPushButton" row="0" column="0" rowspan="1" colspan="2">
+                                <property name="name">
+                                    <cstring>pbCenterScene</cstring>
+                                </property>
+                                <property name="sizePolicy">
+                                    <sizepolicy>
+                                        <hsizetype>0</hsizetype>
+                                        <vsizetype>0</vsizetype>
+                                        <horstretch>0</horstretch>
+                                        <verstretch>0</verstretch>
+                                    </sizepolicy>
+                                </property>
+                                <property name="minimumSize">
+                                    <size>
+                                        <width>160</width>
+                                        <height>0</height>
+                                    </size>
+                                </property>
+                                <property name="text">
+                                    <string>Center Scene</string>
+                                </property>
+                            </widget>
+                            <widget class="QPushButton" row="0" column="2">
+                                <property name="name">
+                                    <cstring>pbNewView</cstring>
+                                </property>
+                                <property name="enabled">
+                                    <bool>true</bool>
+                                </property>
+                                <property name="sizePolicy">
+                                    <sizepolicy>
+                                        <hsizetype>0</hsizetype>
+                                        <vsizetype>0</vsizetype>
+                                        <horstretch>0</horstretch>
+                                        <verstretch>0</verstretch>
+                                    </sizepolicy>
+                                </property>
+                                <property name="minimumSize">
+                                    <size>
+                                        <width>160</width>
+                                        <height>0</height>
+                                    </size>
+                                </property>
+                                <property name="text">
+                                    <string>New View ...</string>
+                                </property>
+                            </widget>
+                            <widget class="QLayoutWidget" row="1" column="1" rowspan="1" colspan="2">
+                                <property name="name">
+                                    <cstring>layout3</cstring>
                                 </property>
                                 <hbox>
                                     <property name="name">
                                         <cstring>unnamed</cstring>
                                     </property>
-                                    <widget class="QPushButton">
-                                        <property name="name">
-                                            <cstring>pbApply</cstring>
-                                        </property>
-                                        <property name="sizePolicy">
-                                            <sizepolicy>
-                                                <hsizetype>0</hsizetype>
-                                                <vsizetype>1</vsizetype>
-                                                <horstretch>0</horstretch>
-                                                <verstretch>0</verstretch>
-                                            </sizepolicy>
-                                        </property>
-                                        <property name="minimumSize">
-                                            <size>
-                                                <width>160</width>
-                                                <height>0</height>
-                                            </size>
-                                        </property>
-                                        <property name="text">
-                                            <string>Apply</string>
-                                        </property>
-                                    </widget>
                                     <widget class="QLabel">
                                         <property name="name">
                                             <cstring>textLabel1</cstring>
@@ -816,52 +892,40 @@
                                             <number>3000</number>
                                         </property>
                                         <property name="value">
-                                            <number>50</number>
+                                            <number>20</number>
+                                        </property>
+                                    </widget>
+                                    <widget class="QPushButton">
+                                        <property name="name">
+                                            <cstring>pushButton10</cstring>
+                                        </property>
+                                        <property name="sizePolicy">
+                                            <sizepolicy>
+                                                <hsizetype>0</hsizetype>
+                                                <vsizetype>0</vsizetype>
+                                                <horstretch>0</horstretch>
+                                                <verstretch>0</verstretch>
+                                            </sizepolicy>
+                                        </property>
+                                        <property name="minimumSize">
+                                            <size>
+                                                <width>20</width>
+                                                <height>25</height>
+                                            </size>
+                                        </property>
+                                        <property name="maximumSize">
+                                            <size>
+                                                <width>20</width>
+                                                <height>25</height>
+                                            </size>
+                                        </property>
+                                        <property name="text">
+                                            <string>&gt;</string>
                                         </property>
                                     </widget>
                                 </hbox>
                             </widget>
-                        </vbox>
-                    </widget>
-                    <widget class="QGroupBox">
-                        <property name="name">
-                            <cstring>gbOthersParameters</cstring>
-                        </property>
-                        <property name="sizePolicy">
-                            <sizepolicy>
-                                <hsizetype>7</hsizetype>
-                                <vsizetype>1</vsizetype>
-                                <horstretch>0</horstretch>
-                                <verstretch>0</verstretch>
-                            </sizepolicy>
-                        </property>
-                        <property name="title">
-                            <string>Others Parameters</string>
-                        </property>
-                        <hbox>
-                            <property name="name">
-                                <cstring>unnamed</cstring>
-                            </property>
-                            <widget class="QPushButton">
-                                <property name="name">
-                                    <cstring>pbCenterScene</cstring>
-                                </property>
-                                <property name="text">
-                                    <string>Center Scene</string>
-                                </property>
-                            </widget>
-                            <widget class="QPushButton">
-                                <property name="name">
-                                    <cstring>pbNewView</cstring>
-                                </property>
-                                <property name="enabled">
-                                    <bool>true</bool>
-                                </property>
-                                <property name="text">
-                                    <string>New View ...</string>
-                                </property>
-                            </widget>
-                        </hbox>
+                        </grid>
                     </widget>
                 </vbox>
             </widget>
@@ -961,7 +1025,22 @@
         <receiver>QtGeneratedSimulationController</receiver>
         <slot>sbRefreshValueChanged(int)</slot>
     </connection>
+    <connection>
+        <sender>checkBox1</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>QtGeneratedSimulationController</receiver>
+        <slot>cbSyncToggled(bool)</slot>
+    </connection>
+    <connection>
+        <sender>pushButton10</sender>
+        <signal>clicked()</signal>
+        <receiver>QtGeneratedSimulationController</receiver>
+        <slot>pbStart2Clicked()</slot>
+    </connection>
 </connections>
+<includes>
+    <include location="local" impldecl="in implementation">QtGeneratedSimulationController.ui.h</include>
+</includes>
 <signals>
     <signal>closeSignal()</signal>
 </signals>
@@ -981,6 +1060,8 @@
     <slot>pbSaveClicked()</slot>
     <slot>sbRefreshvalueChanged( int )</slot>
     <slot>sbRefreshValueChanged( int )</slot>
+    <slot>cbSyncToggled( bool )</slot>
+    <slot>pbStart2Clicked()</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

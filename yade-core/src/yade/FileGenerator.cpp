@@ -62,6 +62,7 @@ string FileGenerator::generateAndSave()
 	else
 	{
 		setMessage("saving...");
+		setProgress(1.0);
 		IOFormatManager::saveToFile(serializationDynlib, outputFileName, "rootBody", rootBody);
 		return std::string("File "+outputFileName+" generated successfully.\n\n")+message;
 	}

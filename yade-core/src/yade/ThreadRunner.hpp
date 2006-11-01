@@ -58,10 +58,16 @@ class ThreadRunner
 		ThreadRunner(ThreadWorker* c) : m_thread_worker(c), running_(false) {};
 		~ThreadRunner();
 
+		/// perform ThreadWorker::singleAction() in separate thread
 		void spawnSingleAction();
+		/// start doing singleAction() in a loop in separate thread
 		void start();
+		/// stop the loop
 		void stop();
+		/// kindly ask the separate thread to terminate
 		void pleaseTerminate();
+		/// check whether the infinite loop is currently running.
+		/// Does not report correctly if the exectution was started with spwanSingleAction().
 		bool isRunning();
 };
 

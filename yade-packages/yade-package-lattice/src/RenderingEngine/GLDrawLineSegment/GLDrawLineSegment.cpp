@@ -18,7 +18,7 @@ void GLDrawLineSegment::go(const shared_ptr<GeometricalModel>& gm, const shared_
 	
 	Real len = (static_cast<LineSegment*>(gm.get()))->length;
 	
-	glScalef(len,0.0012,0.0012); // it's a box, not a line. looks better :)
+	glScalef(len,0.042,0.042); // it's a box, not a line. looks better :)
 
 	if (gm->wire || wire)
 	{
