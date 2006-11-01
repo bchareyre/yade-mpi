@@ -20,19 +20,22 @@ class PhysicalAction;
 
 class LatticeLaw : public InteractionSolver
 {
-
-/// Attributes	
-        
-        private :
-                vector<unsigned int> futureDeletes;
-                bool nonlocal;
+	private:
+		vector<unsigned int> futureDeletes;
+		bool nonlocal;
                 
                 bool deleteBeam(MetaBody* lattice , LatticeBeamParameters* beam, Body*);
                 void calcBeamPositionOrientationNewLength(Body* body, BodyContainer* bodies);
-        public :
-                LatticeLaw();
+	public :
+		bool roughEdges,ensure2D; // FIXME, FIXME, FIXME 
+		LatticeLaw();
 		virtual ~LatticeLaw();
 		void action(Body* body);
+		void registerAttributes()
+		{
+			REGISTER_ATTRIBUTE(roughEdges);
+			REGISTER_ATTRIBUTE(ensure2D);
+		};
 
 /// Serializtion
 	REGISTER_CLASS_NAME(LatticeLaw);

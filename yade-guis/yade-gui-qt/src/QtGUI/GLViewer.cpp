@@ -16,10 +16,10 @@
 
 GLViewer::GLViewer(int id, shared_ptr<RenderingEngine> rendererInit, const QGLFormat& format, QWidget * parent, QGLWidget * shareWidget) : QGLViewer(format,parent,"glview",shareWidget)//, qglThread(this,rendererInit)
 {
+	isMoving=false;
 	renderer=rendererInit;
 	drawGrid = false;
 	viewId = id;
-	//setAutoBufferSwap(false);
 	resize(320, 240);
 
 	if (id==0)
@@ -27,15 +27,29 @@ GLViewer::GLViewer(int id, shared_ptr<RenderingEngine> rendererInit, const QGLFo
 	else
 		setCaption("Secondary View number "+lexical_cast<string>(id));
 	show();
-
-	wm.addWindow(shared_ptr<GLWindow>(new FpsTracker()),shared_ptr<GLWindowsManager::EventSubscription>(new GLWindowsManager::EventSubscription()));
 	
-	this->camera()->frame()->setWheelSensitivity(-1.0f); // reverse scrollwheel behaviour
-	this->setMouseBinding(Qt::MidButton, CAMERA, TRANSLATE);
+	notMoving();
 
-//	std::cerr << "GLViewer ctor: " << viewId << "\n";
+	if(manipulatedFrame() == 0 )
+		setManipulatedFrame(new qglviewer::ManipulatedFrame());
 }
 
+void GLViewer::notMoving()
+{
+	camera()->frame()->setWheelSensitivity(-1.0f);
+	setMouseBinding(Qt::LeftButton + Qt::RightButton, CAMERA, ZOOM);
+	setMouseBinding(Qt::LeftButton, CAMERA, ROTATE);
+	setMouseBinding(Qt::MidButton, CAMERA, TRANSLATE);
+	setMouseBinding(Qt::RightButton, CAMERA, TRANSLATE);
+	setWheelBinding(Qt::NoButton, CAMERA, ZOOM);
+	setMouseBinding(Qt::SHIFT + Qt::LeftButton, SELECT);
+	//setMouseBinding(Qt::RightButton, NO_CLICK_ACTION);
+
+	setMouseBinding(Qt::SHIFT + Qt::LeftButton + Qt::RightButton, FRAME, ZOOM);
+	setMouseBinding(Qt::SHIFT + Qt::MidButton, FRAME, TRANSLATE);
+	setMouseBinding(Qt::SHIFT + Qt::RightButton, FRAME, ROTATE);
+	setWheelBinding(Qt::ShiftButton , FRAME, ZOOM);
+};
 
 GLViewer::~GLViewer()
 {
@@ -45,16 +59,24 @@ GLViewer::~GLViewer()
 
 void GLViewer::keyPressEvent(QKeyEvent *e)
 {
-//	const Qt::ButtonState state = (Qt::ButtonState)(e->state() & Qt::KeyButtonMask);
-	
-	if ( e->key()==Qt::Key_F )
-		wm.getWindow(0)->swapDisplayed(); 
+	if ( e->key()==Qt::Key_M )
+		if( !(isMoving = !isMoving ) )
+		{
+			displayMessage("moving finished");
+			notMoving();
+		}
+		else
+		{
+			displayMessage("moving selected object");
+			setMouseBinding(Qt::LeftButton + Qt::RightButton, FRAME, ZOOM);
+			setMouseBinding(Qt::LeftButton, FRAME, TRANSLATE);
+			setMouseBinding(Qt::MidButton, FRAME, TRANSLATE);
+			setMouseBinding(Qt::RightButton, FRAME, ROTATE);
+			setWheelBinding(Qt::NoButton , FRAME, ZOOM);
+		}
 	else if( e->key()==Qt::Key_G )
-//		if((state != Qt::ShiftButton)
-			drawGrid = !drawGrid;
-//		else
-//			scale = scale+1;
-	else if( e->key()!=Qt::Key_Escape )
+		drawGrid = !drawGrid;
+	else if( e->key()!=Qt::Key_Escape && e->key()!=Qt::Key_Space )
 		QGLViewer::keyPressEvent(e);
 }
 
@@ -62,6 +84,11 @@ void GLViewer::centerScene()
 {
 	if (!Omega::instance().getRootBody())
 		return;
+
+	if(Omega::instance().getRootBody()->bodies->size() < 500)
+		displayMessage("Less than 500 bodies, moving possible. Select with shift, press 'm' to move.", 6000);
+	else
+		displayMessage("More than 500 bodies. Moving not possible", 6000);
 
 	Vector3r min = Omega::instance().getRootBody()->boundingVolume->min;
 	Vector3r max = Omega::instance().getRootBody()->boundingVolume->max;
@@ -75,12 +102,68 @@ void GLViewer::centerScene()
 
 void GLViewer::draw() // FIXME maybe rename to RendererFlowControl, or something like that?
 {
-	if (Omega::instance().getRootBody())
+	if(Omega::instance().getRootBody())
+	{
+		int selection = selectedName();
+		if(selection != -1)
+		{
+			Quaternionr& q = (*(Omega::instance().getRootBody()->bodies))[selection]->physicalParameters->se3.orientation;
+			Vector3r&    v = (*(Omega::instance().getRootBody()->bodies))[selection]->physicalParameters->se3.position;
+			float v0,v1,v2;
+			manipulatedFrame()->getPosition(v0,v1,v2);
+			v[0]=v0;v[1]=v1;v[2]=v2;
+			double q0,q1,q2,q3;
+			manipulatedFrame()->getOrientation(q0,q1,q2,q3);
+			q[0]=q0;q[1]=q1;q[2]=q2;q[3]=q3;
+		}
+		
 	// FIXME - here we want to actually call all responsible GLDraw Actors
-		renderer->render(Omega::instance().getRootBody());
-	
-	wm.glDraw();
-	dynamic_pointer_cast<FpsTracker>(wm.getWindow(0))->addOneAction();
+		renderer->render(Omega::instance().getRootBody(), selectedName());
+	}
+}
+
+void GLViewer::drawWithNames() // FIXME maybe rename to RendererFlowControl, or something like that?
+{
+	if (Omega::instance().getRootBody() && Omega::instance().getRootBody()->bodies->size() < 500 )
+	// FIXME - here we want to actually call all responsible GLDraw Actors
+		renderer->renderWithNames(Omega::instance().getRootBody());
+}
+
+// new object selected.
+// set frame coordinates, and isDynamic=false;
+void GLViewer::postSelection(const QPoint& point) 
+{
+	int selection = selectedName();
+	if(selection == -1)
+	{
+		if(isMoving)
+		{
+			displayMessage("moving finished");
+			notMoving();
+			isMoving=false;
+		}
+		return;
+	}
+
+	wasDynamic = (*(Omega::instance().getRootBody()->bodies))[selection]->isDynamic;
+	(*(Omega::instance().getRootBody()->bodies))[selection]->isDynamic = false;
+
+	Quaternionr& q = (*(Omega::instance().getRootBody()->bodies))[selection]->physicalParameters->se3.orientation;
+	Vector3r&    v = (*(Omega::instance().getRootBody()->bodies))[selection]->physicalParameters->se3.position;
+	manipulatedFrame()->setPositionAndOrientation(qglviewer::Vec(v[0],v[1],v[2]),qglviewer::Quaternion(q[0],q[1],q[2],q[3]));
+
+}
+
+// maybe new object will be selected.
+// if so, then set isDynamic of previous selection, to old value
+void GLViewer::endSelection(const QPoint &point)
+{
+	int old = selectedName();
+
+	QGLViewer::endSelection(point);
+
+	if(old != -1 && old!=selectedName())
+		(*(Omega::instance().getRootBody()->bodies))[old]->isDynamic = wasDynamic;
 }
 
 void GLViewer::postDraw()

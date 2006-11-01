@@ -34,6 +34,7 @@ class OpenGLRenderingEngine : public RenderingEngine
 				,drawInside
 		
 				,needInit;
+		int		 current_selection;
 	
 	private :
 		DynLibDispatcher< BoundingVolume    , GLDrawBoundingVolumeFunctor, void , TYPELIST_1(const shared_ptr<BoundingVolume>&) > boundingVolumeDispatcher;
@@ -56,7 +57,8 @@ class OpenGLRenderingEngine : public RenderingEngine
 		virtual ~OpenGLRenderingEngine();
 	
 		void init();
-		void render(const shared_ptr<MetaBody>& body);
+		void render(const shared_ptr<MetaBody>& body, const int selection = -1);
+		virtual void renderWithNames(const shared_ptr<MetaBody>& );
 	
 	private :
 		void renderGeometricalModel(const shared_ptr<MetaBody>& rootBody);

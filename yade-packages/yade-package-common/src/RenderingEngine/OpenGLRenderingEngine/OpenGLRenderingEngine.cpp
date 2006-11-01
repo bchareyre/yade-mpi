@@ -61,7 +61,38 @@ void OpenGLRenderingEngine::init()
 	}
 }
 
-void OpenGLRenderingEngine::render(const shared_ptr<MetaBody>& rootBody)
+void OpenGLRenderingEngine::renderWithNames(const shared_ptr<MetaBody>& rootBody)
+{
+	shared_ptr<BodyContainer>& bodies = rootBody->bodies;
+	BodyContainer::iterator bi    = bodies->begin();
+	BodyContainer::iterator biEnd = bodies->end();
+	for( ; bi!=biEnd ; ++bi)
+	{
+		if((*bi)->geometricalModel)
+		{
+			glPushMatrix();
+			Se3r& se3 = (*bi)->physicalParameters->se3;
+			Real angle;
+			Vector3r axis;	
+			se3.orientation.toAxisAngle(axis,angle);	
+			glTranslatef(se3.position[0],se3.position[1],se3.position[2]);
+			glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
+			if((*bi)->geometricalModel->getClassName() != "LineSegment") // FIXME FIXME !! - so a body needs to say: I am selectable ?!?!
+			{
+				glPushName( (*bi)->getId() );
+				geometricalModelDispatcher((*bi)->geometricalModel,(*bi)->physicalParameters,/* always solid, not wireframe */false);
+				glPopName();
+			}
+			glPopMatrix();
+		}
+	}
+};
+
+void OpenGLRenderingEngine::render(
+		const shared_ptr<MetaBody>& rootBody, 
+		const int selection	// FIXME: not sure. maybe a list of selections, 
+					// or maybe bodies themselves should remember if they are selected?
+		)
 {	// FIXME - make a compile time flag for that. So yade can compile with different versions.
 #ifndef NO_GLUTINIT
 	static bool initDone=false;
@@ -73,6 +104,7 @@ void OpenGLRenderingEngine::render(const shared_ptr<MetaBody>& rootBody)
 		initDone=true;
 	}
 #endif
+	current_selection = selection;
 	//
 	const GLfloat pos[4]	= {lightPos[0],lightPos[1],lightPos[2],1.0};
 	const GLfloat ambientColor[4]	= {0.5,0.5,0.5,1.0};	
@@ -320,9 +352,8 @@ void OpenGLRenderingEngine::renderShadowVolumes(const shared_ptr<MetaBody>& root
 		BodyContainer::iterator biEnd = rootBody->bodies->end();
 		for(; bi!=biEnd ; ++bi )
 		{
-			shared_ptr<Body> b = *bi;
-			if (b->geometricalModel->shadowCaster)
-				shadowVolumeDispatcher(b->geometricalModel,b->physicalParameters,lightPos);
+			if ((*bi)->geometricalModel->shadowCaster)
+				shadowVolumeDispatcher((*bi)->geometricalModel,(*bi)->physicalParameters,lightPos);
 		}
 	}
 	else
@@ -333,6 +364,7 @@ void OpenGLRenderingEngine::renderShadowVolumes(const shared_ptr<MetaBody>& root
 void OpenGLRenderingEngine::renderGeometricalModel(const shared_ptr<MetaBody>& rootBody)
 {	
 	shared_ptr<BodyContainer>& bodies = rootBody->bodies;
+	bool done=false;
 
 	if((rootBody->geometricalModel || drawInside) && drawInside)
 	{
@@ -341,17 +373,28 @@ void OpenGLRenderingEngine::renderGeometricalModel(const shared_ptr<MetaBody>& r
 		for( ; bi!=biEnd ; ++bi)
 		{
 
-			shared_ptr<Body> b = *bi;
-			if(b->geometricalModel)
+			if((*bi)->geometricalModel)
 			{
 				glPushMatrix();
-				Se3r& se3 = b->physicalParameters->se3;
+				Se3r& se3 = (*bi)->physicalParameters->se3;
 				Real angle;
 				Vector3r axis;	
 				se3.orientation.toAxisAngle(axis,angle);	
 				glTranslatef(se3.position[0],se3.position[1],se3.position[2]);
 				glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
-				geometricalModelDispatcher(b->geometricalModel,b->physicalParameters,drawWireFrame);
+				if(current_selection == (*bi)->getId())
+				{
+					const GLfloat ambientColor[4]	= {10.0,0.0,0.0,1.0};	
+					glLightModelfv(GL_LIGHT_MODEL_AMBIENT,ambientColor);
+					
+				} else if (done) {
+					done = false;
+					const GLfloat ambientColor[4]	= {0.5,0.5,0.5,1.0};	
+					glLightModelfv(GL_LIGHT_MODEL_AMBIENT,ambientColor);
+				}
+				geometricalModelDispatcher((*bi)->geometricalModel,(*bi)->physicalParameters,drawWireFrame);
+				if(current_selection == (*bi)->getId())
+					done = true;
 				glPopMatrix();
 			}
 		}
@@ -368,10 +411,9 @@ void OpenGLRenderingEngine::renderBoundingVolume(const shared_ptr<MetaBody>& roo
 	BodyContainer::iterator biEnd = rootBody->bodies->end();
 	for( ; bi!=biEnd ; ++bi)
 	{
-		shared_ptr<Body> b = *bi;
 		glPushMatrix();
-		if(b->boundingVolume)
-			boundingVolumeDispatcher(b->boundingVolume);
+		if((*bi)->boundingVolume)
+			boundingVolumeDispatcher((*bi)->boundingVolume);
 		glPopMatrix();
 	}
 	
@@ -389,16 +431,15 @@ void OpenGLRenderingEngine::renderInteractionGeometry(const shared_ptr<MetaBody>
 	BodyContainer::iterator biEnd = rootBody->bodies->end();
 	for( ; bi!=biEnd ; ++bi)
 	{
-		shared_ptr<Body> b = *bi;
 		glPushMatrix();
-		Se3r& se3 = b->physicalParameters->se3;
+		Se3r& se3 = (*bi)->physicalParameters->se3;
 		Real angle;
 		Vector3r axis;	
 		se3.orientation.toAxisAngle(axis,angle);	
 		glTranslatef(se3.position[0],se3.position[1],se3.position[2]);
 		glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
-		if(b->interactionGeometry)
-			interactionGeometryDispatcher(b->interactionGeometry,b->physicalParameters);
+		if((*bi)->interactionGeometry)
+			interactionGeometryDispatcher((*bi)->interactionGeometry,(*bi)->physicalParameters);
 		glPopMatrix();
 	}
 	

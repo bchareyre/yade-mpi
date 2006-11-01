@@ -385,14 +385,20 @@ void LatticeLaw::action(Body* body)
 			node->displacementStiffness     = Vector3r(0.0,0.0,0.0);
 
 			if(body->isDynamic)
+			{
 				node->se3.position      += displacementTotal;
-
+			}
 			// FIXME FIXME FIXME FIXME FIXME FIXME FIXME
-			else // FIXME - else move only in x direction
-				node->se3.position[0]   += displacementTotal[0];
-
-			node->se3.position[2] = 0; // ensure 2D
-			//
+			else
+			{
+				if(!roughEdges)// FIXME - else move only in x and z directions
+				{
+					node->se3.position[0]   += displacementTotal[0];
+					node->se3.position[2]   += displacementTotal[2];
+				}
+			}
+			if(ensure2D)
+				node->se3.position[2] = 0; // ensure 2D
 		}
 	}
 	

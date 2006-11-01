@@ -52,6 +52,8 @@ QtFileGenerator::QtFileGenerator ( QWidget * parent , const char * name) : QtFil
 
 	cbGeneratorNameActivated(cbGeneratorName->currentText());
 	cbGeneratorNameActivated(cbGeneratorName->currentText()); // FIXME : I need to call this function 2 times to have good display of scrollView
+
+	pbClose->setEnabled(false);
 }
 
 
@@ -158,6 +160,10 @@ void QtFileGenerator::cbSerializationNameActivated(const QString& s)
 	}
 }
 
+#include <boost/thread/thread.hpp>
+#include <boost/function.hpp>
+#include <boost/bind.hpp>
+
 void QtFileGenerator::pbGenerateClicked()
 {
 	// FIXME add some test to avoid crashing
@@ -169,16 +175,26 @@ void QtFileGenerator::pbGenerateClicked()
 	guiGen.deserialize(fg);
 	
 	string message = fg->generateAndSave();
+//	pbClose->setEnabled(true);
+//	pbGenerate->setEnabled(false);
 
 	string fileName = string(filesystem::basename(leOutputFileName->text().data()))+string(filesystem::extension(leOutputFileName->text().data()));
 	shared_ptr<MessageDialog> md = shared_ptr<MessageDialog>(new MessageDialog("File "+fileName+" generated successfully.\n\n"+message,this->parentWidget()->parentWidget()));
 	md->exec();
 }
 
+// FIXME - stupid qt3-designer. This is now "Stop" not "Close"
 void QtFileGenerator::pbCloseClicked()
 {
-	close();
-	destroy();
+
+	// So here we want to kill the generator thread.
+	std::cerr << "Stop\n";
+
+
+///////////////////// FIXME - this Close was doing.
+//	close();
+//	destroy();
+///////////////////////////////////////////////////
 }
 
 void QtFileGenerator::pbLoadClicked()

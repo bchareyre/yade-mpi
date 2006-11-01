@@ -41,7 +41,9 @@ class LatticeExample : public FileGenerator
                 bool             triangularBaseGrid
                                 ,useNonLocalModel
                                 ,useBendTensileSoftening
-                                ,useStiffnessSoftening;
+                                ,useStiffnessSoftening
+                                ,ensure2D
+                                ,roughEdges;
         
         // aggregates
                 bool             useAggregates;

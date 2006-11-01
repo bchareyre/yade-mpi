@@ -31,6 +31,7 @@ class SimulationController : public QtGeneratedSimulationController
 		shared_ptr<RenderingEngine> renderer;
 		map<int,GLViewer* > glViews;
 		int maxNbViews;
+		int refreshTime;
 	
 		shared_ptr<SimulationControllerUpdater> updater;
 
@@ -62,6 +63,7 @@ class SimulationController : public QtGeneratedSimulationController
 		virtual void bgTimeStepClicked(int i);
 		virtual void sb10PowerSecondValueChanged(int);
 		virtual void sbSecondValueChanged(int);
+		virtual void sbRefreshValueChanged(int);
 		void closeGLViewEvent(int id);
 
         

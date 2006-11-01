@@ -76,7 +76,7 @@
       <directoryradio>executable</directoryradio>
     </run>
     <general>
-      <activedir>DataClass/InteractionPhysics/LatticeBeamAngularSpring</activedir>
+      <activedir>Engine/StandAloneEngine/LatticeLaw</activedir>
     </general>
     <subclassing/>
   </kdevtrollproject>

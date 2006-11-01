@@ -27,6 +27,7 @@ using namespace boost;
 
 SimulationController::SimulationController(QWidget * parent) : QtGeneratedSimulationController(parent,"SimulationController")
 {
+	refreshTime = 50;
 	parentWorkspace = parent;
 
 	scrollViewFrame = new QFrame();	
@@ -275,7 +276,7 @@ void SimulationController::pbStartClicked()
 //		gi->second->startAnimation();
 //	updater->start();
 
-	startTimer(50);
+	startTimer(refreshTime);
 }
 
 
@@ -364,6 +365,11 @@ void SimulationController::sb10PowerSecondValueChanged(int)
 void SimulationController::sbSecondValueChanged(int)
 {
 	changeTimeStep = true;
+}
+
+void SimulationController::sbRefreshValueChanged(int v)
+{
+	refreshTime = v;
 }
 
 void SimulationController::timerEvent( QTimerEvent* )

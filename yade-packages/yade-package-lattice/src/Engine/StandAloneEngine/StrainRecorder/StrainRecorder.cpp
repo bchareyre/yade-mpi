@@ -51,6 +51,8 @@ bool StrainRecorder::isActivated()
 
 void StrainRecorder::action(Body * body)
 {
+	return;
+	
 	MetaBody * ncb = static_cast<MetaBody*>(body);
 	Real strain_y=0,stress_y=0;//,stress_nonlocal_y=0;
 	

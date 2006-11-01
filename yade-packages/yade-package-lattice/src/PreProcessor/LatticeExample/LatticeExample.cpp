@@ -65,6 +65,9 @@ LatticeExample::LatticeExample() : FileGenerator()
         longitudalStiffness_noUnit= 1.0;        // k_l
         bendingStiffness_noUnit   = 0.7;        // k_b
         
+        ensure2D 		 = false;
+        roughEdges 		 = false;
+        
         region_A_min             = Vector3r(-0.006, 0.096,-1);
         region_A_max             = Vector3r( 0.16 , 0.16 , 1);
 	direction_A 		 = Vector3r(0,1,0);
@@ -149,6 +152,9 @@ void LatticeExample::registerAttributes()
         REGISTER_ATTRIBUTE(crit_ComprStrain);           // E_max [%]    - default 0.2 %
         REGISTER_ATTRIBUTE(longitudalStiffness_noUnit); // k_l [-]      - default 1.0
         REGISTER_ATTRIBUTE(bendingStiffness_noUnit);    // k_b [-]      - default 0.6
+        
+        REGISTER_ATTRIBUTE(ensure2D);
+        REGISTER_ATTRIBUTE(roughEdges);
         
         REGISTER_ATTRIBUTE(triangularBaseGrid);         //              - triangles
         REGISTER_ATTRIBUTE(useBendTensileSoftening);
@@ -635,9 +641,13 @@ void LatticeExample::createActors(shared_ptr<MetaBody>& )
         measurePoisson->outputFile              = poissonFile;
         measurePoisson->interval                = 10;
         
+        shared_ptr<LatticeLaw> latticeLaw(new LatticeLaw);
+        latticeLaw->ensure2D   = ensure2D;
+        latticeLaw->roughEdges = roughEdges;
+        
         rootBody->engines.clear();
         rootBody->engines.push_back(boundingVolumeDispatcher);
-        rootBody->engines.push_back(shared_ptr<LatticeLaw>(new LatticeLaw));
+        rootBody->engines.push_back(latticeLaw);
         rootBody->engines.push_back(geometricalModelDispatcher);
         rootBody->engines.push_back(strainRecorder);
         rootBody->engines.push_back(measurePoisson);

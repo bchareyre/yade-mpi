@@ -5,6 +5,8 @@ all:
 	@echo --
 
 clean:
+	$(MAKE) -C yade-lib-qhull clean
+	$(MAKE) -C yade-lib-swiftpp clean
 	$(MAKE) -C yade-lib-loki clean
 	$(MAKE) -C yade-lib-wm3-math clean
 	$(MAKE) -C yade-lib-algorithms clean
@@ -16,10 +18,14 @@ clean:
 	$(MAKE) -C yade-lib-serialization-xml clean
 	$(MAKE) -C yade-lib-serialization-bin clean
 	$(MAKE) -C yade-lib-serialization-qt clean
-	$(MAKE) -C yade-lib-qhull clean
-	$(MAKE) -C yade-lib-swiftpp clean
 
 compile_install:
+	$(MAKE) -C yade-lib-qhull
+	$(MAKE) -C yade-lib-qhull install
+	
+	$(MAKE) -C yade-lib-swiftpp
+	$(MAKE) -C yade-lib-swiftpp install
+	
 	$(MAKE) -C yade-lib-loki
 	$(MAKE) -C yade-lib-loki install
 	
@@ -52,14 +58,10 @@ compile_install:
 	
 	$(MAKE) -C yade-lib-serialization-qt
 	$(MAKE) -C yade-lib-serialization-qt install
-	
-	$(MAKE) -C yade-lib-qhull
-	$(MAKE) -C yade-lib-qhull install
-	
-	$(MAKE) -C yade-lib-swiftpp
-	$(MAKE) -C yade-lib-swiftpp install
 
 uninstall:
+	$(MAKE) -C yade-lib-qhull uninstall
+	$(MAKE) -C yade-lib-swiftpp uninstall
 	$(MAKE) -C yade-lib-loki uninstall
 	$(MAKE) -C yade-lib-wm3-math uninstall
 	$(MAKE) -C yade-lib-algorithms uninstall
@@ -71,6 +73,4 @@ uninstall:
 	$(MAKE) -C yade-lib-serialization-xml uninstall
 	$(MAKE) -C yade-lib-serialization-bin uninstall
 	$(MAKE) -C yade-lib-serialization-qt uninstall
-	$(MAKE) -C yade-lib-qhull uninstall
-	$(MAKE) -C yade-lib-swiftpp uninstall
 

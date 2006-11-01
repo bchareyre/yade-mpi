@@ -210,7 +210,7 @@
                         <cstring>pbClose</cstring>
                     </property>
                     <property name="text">
-                        <string>Close</string>
+                        <string>Stop</string>
                     </property>
                 </widget>
             </hbox>
@@ -266,9 +266,6 @@
         <slot>cbSerializationNameActivated(const QString&amp;)</slot>
     </connection>
 </connections>
-<includes>
-    <include location="local" impldecl="in implementation">QtFileGeneratorController.ui.h</include>
-</includes>
 <slots>
     <slot>cbGeneratorNameActivated( const QString &amp; )</slot>
     <slot>pbGenerateClicked()</slot>

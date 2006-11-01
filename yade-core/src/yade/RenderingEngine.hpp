@@ -18,7 +18,8 @@ class RenderingEngine :  public Serializable
 		RenderingEngine():Serializable() {};
 		virtual ~RenderingEngine() {} ;
 	
-		virtual void render(const shared_ptr<MetaBody>& ) {throw;};
+		virtual void render(const shared_ptr<MetaBody>& , const int selection = -1) {throw;};
+		virtual void renderWithNames(const shared_ptr<MetaBody>& ) {throw;};
 		virtual void init() {throw;};
 
 	REGISTER_CLASS_NAME(RenderingEngine);
