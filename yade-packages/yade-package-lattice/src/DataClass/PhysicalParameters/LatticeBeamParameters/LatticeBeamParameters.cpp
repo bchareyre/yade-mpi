@@ -130,8 +130,8 @@ void LatticeBeamParameters::registerAttributes()
 	REGISTER_ATTRIBUTE(initialLength);
 	REGISTER_ATTRIBUTE(length); // FIXME - can be calculated after deserialization
 	
-	REGISTER_ATTRIBUTE(initialDirection);
 	REGISTER_ATTRIBUTE(direction); // FIXME - can be calculated after deserialization
+	REGISTER_ATTRIBUTE(otherDirection); // this must be saved!
 	
 	REGISTER_ATTRIBUTE(criticalTensileStrain);
 	REGISTER_ATTRIBUTE(criticalCompressiveStrain);

@@ -202,7 +202,7 @@ void QtFileGenerator::timerEvent( QTimerEvent* )
 	}
 
 	// generation finished
-	if(m_worker && m_runner && !m_runner->isRunning() && m_worker->done())
+	if(m_worker && m_runner && !m_runner->looping() && m_worker->done())
 	{
 		m_runner   = shared_ptr<ThreadRunner>();
 		pbClose->setEnabled(false);

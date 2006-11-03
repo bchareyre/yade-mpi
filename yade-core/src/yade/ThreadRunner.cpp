@@ -16,15 +16,26 @@
 void ThreadRunner::run()
 {
 	// this is the body of execution of separate thread
-	boost::mutex::scoped_lock lock(runmutex_);
-	while(isRunning())
+	boost::mutex::scoped_lock lock(m_runmutex);
+	while(looping())
 		call();
 }
 
 void ThreadRunner::call()
 {
 	// this is the body of execution of separate thread
-	boost::mutex::scoped_lock lock(callmutex_);
+	//
+	// FIXME - if several threads are blocked here and waiting, and the
+	// destructor is called we get a crash. This happens if some other
+	// thread is calling spwanSingleAction in a loop (instead of calling
+	// start() and stop() as it normally should). This is currently the
+	// case of SimulationController with synchronization turned on.
+	//
+	// the solution is to use a counter (perhaps recursive_mutex?) which
+	// will count the number of threads in the queue, and only after they
+	// all finish execution the destructor will be able to finish its work
+	// 
+	boost::mutex::scoped_lock lock(m_callmutex);
 	m_thread_worker->setTerminate(false);
 	m_thread_worker->callSingleAction();
 }
@@ -37,38 +48,38 @@ void ThreadRunner::pleaseTerminate()
 
 void ThreadRunner::spawnSingleAction()
 {
-	boost::mutex::scoped_lock boollock(boolmutex_);
-	boost::mutex::scoped_lock calllock(callmutex_);
-	if(running_) return;
+	boost::mutex::scoped_lock boollock(m_boolmutex);
+	boost::mutex::scoped_lock calllock(m_callmutex);
+	if(m_looping) return;
 	boost::function0<void> call( boost::bind( &ThreadRunner::call , this ) );
 	boost::thread th(call);
 }
 
 void ThreadRunner::start()
 {
-	boost::mutex::scoped_lock lock(boolmutex_);
-	if(running_) return;
-	running_=true;
+	boost::mutex::scoped_lock lock(m_boolmutex);
+	if(m_looping) return;
+	m_looping=true;
 	boost::function0<void> run( boost::bind( &ThreadRunner::run , this ) );
 	boost::thread th(run);
 }
 
 void ThreadRunner::stop()
 {
-	boost::mutex::scoped_lock lock(boolmutex_);
-	running_=false;
+	boost::mutex::scoped_lock lock(m_boolmutex);
+	m_looping=false;
 }
 
-bool ThreadRunner::isRunning()
+bool ThreadRunner::looping()
 {
-	boost::mutex::scoped_lock lock(boolmutex_);
-	return running_;
+	boost::mutex::scoped_lock lock(m_boolmutex);
+	return m_looping;
 }
 
 ThreadRunner::~ThreadRunner()
 {
 	pleaseTerminate();
-	boost::mutex::scoped_lock runlock(runmutex_);
-	boost::mutex::scoped_lock calllock(callmutex_);
+	boost::mutex::scoped_lock runlock(m_runmutex);
+	boost::mutex::scoped_lock calllock(m_callmutex);
 }
 

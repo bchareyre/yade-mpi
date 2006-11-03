@@ -17,7 +17,7 @@
 
 	It is achieved by either:
 	- one execution of { ThreadWorker::singleAction(); } in separate thread
-	- a loop { while(isRunning() ) ThreadWorker::singleAction(); } in separate thread
+	- a loop { while(looping() ) ThreadWorker::singleAction(); } in separate thread
 
 	Lifetime of ThreadRunner is guaranteed to be longer or equal to
 	the lifetime of	the separate thread of execution.
@@ -47,28 +47,27 @@ class ThreadRunner
 {
 	private :
 		ThreadWorker*	m_thread_worker;
-		bool		running_;
-		boost::mutex	boolmutex_;
-		boost::mutex	callmutex_;
-		boost::mutex	runmutex_;
+		bool		m_looping;
+		boost::mutex	m_boolmutex;
+		boost::mutex	m_callmutex;
+		boost::mutex	m_runmutex;
 		void		run();
 		void		call();
 
 	public :
-		ThreadRunner(ThreadWorker* c) : m_thread_worker(c), running_(false) {};
+		ThreadRunner(ThreadWorker* c) : m_thread_worker(c), m_looping(false) {};
 		~ThreadRunner();
 
 		/// perform ThreadWorker::singleAction() in separate thread
 		void spawnSingleAction();
 		/// start doing singleAction() in a loop in separate thread
 		void start();
-		/// stop the loop
+		/// stop the loop (changes the flag checked by looping() )
 		void stop();
 		/// kindly ask the separate thread to terminate
 		void pleaseTerminate();
-		/// check whether the infinite loop is currently running.
-		/// Does not report correctly if the exectution was started with spwanSingleAction().
-		bool isRunning();
+		/// precondition for the loop started with start().
+		bool looping();
 };
 
 #endif // SIMULATIONLOOP_HPP

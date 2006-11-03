@@ -298,7 +298,7 @@ string LatticeExample::generate()
 					if( ++beam_counter % 100 == 0 )
 					{
 						cerr << "creating beam: " << beam_counter << " , " << ((nodes_a/nodes_all)*100.0)  << " %\n"; 
-						setProgress(nodes_a/nodes_all);
+						setProgress(std::pow(nodes_a/nodes_all,2));
 					}
 					
 					bc.insert(beam);
@@ -584,7 +584,6 @@ void LatticeExample::calcBeamPositionOrientationLength(shared_ptr<Body>& body)
 	
 	Real length 		= dist.normalize();
 	beam->direction 	= dist;
-	beam->initialDirection 	= dist;
         beam->length            = length;
         beam->initialLength     = length;
         
@@ -597,6 +596,13 @@ void LatticeExample::calcBeamPositionOrientationLength(shared_ptr<Body>& body)
 	beam->se3 		= se3Beam;
 	beam->se3Displacement.position 	= Vector3r(0.0,0.0,0.0);
 	beam->se3Displacement.orientation.align(dist,dist);
+
+	Vector3r axis;
+	Real angle;
+	beam->se3Displacement.orientation.toAxisAngle(axis, angle);
+	axis.normalize();
+
+	beam->otherDirection	= axis; // any unit vector that is orthogonal to direction.
 }
 
 void LatticeExample::calcAxisAngle(LatticeBeamParameters* beam, BodyContainer* bodies, unsigned int otherId, InteractionContainer* ints, unsigned int thisId)
@@ -604,26 +610,27 @@ void LatticeExample::calcAxisAngle(LatticeBeamParameters* beam, BodyContainer* b
 	if( ! ints->find(otherId,thisId) && otherId != thisId )
 	{
 		LatticeBeamParameters* 	otherBeam 		= static_cast<LatticeBeamParameters*>( ((*(bodies))[ otherId ])->physicalParameters.get() );
-		
-	//	Quaternionr 		rotation;
-	//	Vector3r 		axis;
 		Real 			angle;
 		
-	//	rotation.align( beam->direction , otherBeam->direction );
-        //      rotation.toAxisAngle (axis, angle);
-        //      Vector3r result = axis*angle;
-        
-                angle = (beam->direction.cross(otherBeam->direction)[2] > 0.0 ? 1.0 : -1.0) * Mathr::aCos( beam->direction.dot(otherBeam->direction) );
+	/*
+                angle = (
+				beam->direction.cross(otherBeam->direction)[2] > 0.0 ? 1.0 : -1.0
+			)
+			* 
+			beam->direction.angleBetweenUnitVectors(otherBeam->direction) ;
+	*/
+
+		angle = beam->direction.angleBetweenUnitVectors(otherBeam->direction);
 
                 shared_ptr<Interaction>                 interaction(new Interaction( thisId , otherId ));
                 shared_ptr<LatticeBeamAngularSpring>    angularSpring(new LatticeBeamAngularSpring);
 		
-	//	angularSpring->initialAngle 		= result;
-	//	angularSpring->angle 			= result;
-	//	angularSpring->initialAngle 		= rotation;
-	//	angularSpring->angle 			= rotation;
 		angularSpring->initialPlaneAngle 	= angle;
 		angularSpring->planeAngle 		= angle;
+		angularSpring->lastCrossProduct		= -1.0*(beam->direction.cross(otherBeam->direction));
+		angularSpring->planeSwap180		= false;
+		//angularSpring->initialOffPlaneAngle	= ;
+		//angularSpring->offPlaneAngle		= ;
 		
 		interaction->isReal			= true;
 		interaction->isNew 			= false;
@@ -903,6 +910,7 @@ void LatticeExample::addAggregates(shared_ptr<MetaBody>& rootBody)
                 randomN(generator, boost::normal_distribution<>(MEAN_DIAMETER,SIGMA_DIAMETER));
 
         std::cerr << "generating aggregates ... ";
+	setMessage(  "generating aggregates...");
         do
         {
                 Circle cc;
@@ -917,6 +925,7 @@ void LatticeExample::addAggregates(shared_ptr<MetaBody>& rootBody)
                 //              std::cerr << cc.x << " " << cc.y << " " << cc.d << "\n";
                                 break;
                         }
+		setProgress((aggsAreas(c)/(AGGREGATES_X*AGGREGATES_Y))/(aggregatePercent/100.0));
         }
         while(aggregatePercent/100.0 > aggsAreas(c)/(AGGREGATES_X*AGGREGATES_Y) );
 

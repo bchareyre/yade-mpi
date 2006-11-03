@@ -297,6 +297,12 @@ RealType Vector3<RealType>::dot (const Vector3& rkV) const
 }
 //----------------------------------------------------------------------------
 template <class RealType>
+RealType Vector3<RealType>::angleBetweenUnitVectors(const Vector3& rkV) const
+{
+    return Mathr::aCos( this->dot(rkV) );
+}
+//----------------------------------------------------------------------------
+template <class RealType>
 RealType Vector3<RealType>::normalize ()
 {
     RealType fLength = length();

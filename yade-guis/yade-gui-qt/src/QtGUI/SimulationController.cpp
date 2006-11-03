@@ -363,12 +363,18 @@ void SimulationController::sbRefreshValueChanged(int v)
 {
 	pbStopClicked();
 	refreshTime = v;
+	if(sync && refreshTime < 20) 
+		// FIXME - problem is that ThreadRunner cannot 'too often' call spawnSingleSimulationLoop().
+		// This is a temporary solution...
+		refreshTime = 20;
 }
 
 void SimulationController::cbSyncToggled( bool b)
 {
 	pbStopClicked();
 	sync = b;
+	if(sync && refreshTime < 20)
+		refreshTime = 20;
 }
 
 void SimulationController::pbStart2Clicked()

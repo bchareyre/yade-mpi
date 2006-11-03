@@ -74,11 +74,11 @@ public:
     RealType length () const;
     RealType squaredLength () const;
     RealType dot (const Vector3& rkV) const;
+    RealType angleBetweenUnitVectors(const Vector3& rkV) const;
     RealType normalize ();
     Vector3 maxVector (const Vector3& rkV) const;
     Vector3 minVector (const Vector3& rkV) const;
     Vector3 multDiag (const Vector3& rkV) const;
- 
 
     // The cross products are computed using the right-handed rule.  Be aware
     // that some graphics APIs use a left-handed rule.  If you have to compute

@@ -109,12 +109,18 @@ void LatticeLaw::action(Body* body)
 				
 				++(beam1->count);
 				++(beam2->count);
-				
-				beam1->bendingRotation += angleDifference;
-				beam2->bendingRotation -= angleDifference;
 			
-			//	beam1->bendingRotation =  angleDifference * beam1->bendingRotation;
-			//	beam2->bendingRotation = (angleDifference * beam2->bendingRotation).inverse();
+				if(an->lastCrossProduct.dot(Vector3r(0,0,1)) > 0.0 xor an->planeSwap180 )
+				{
+					beam1->bendingRotation -= angleDifference;
+					beam2->bendingRotation += angleDifference;
+				}
+				else
+				{
+					beam1->bendingRotation += angleDifference;
+					beam2->bendingRotation -= angleDifference;
+				}
+			
 			}
 			// else FIXME - delete unused angularSpring
 		}
@@ -317,34 +323,16 @@ void LatticeLaw::action(Body* body)
 
 			Vector3r axis           = Vector3r( 0.0 , 0.0 , 1.0 ); // 2D - always rotation around z 
 			Real angle              = beam->bendingRotation;
-		//	if( angle > 0 )
-		//		while(angle > Mathr::PI) angle -= Mathr::TWO_PI;
-		//	else
-		//		while(angle < -Mathr::PI) angle += Mathr::TWO_PI;
 			angle /= beam->count;
 			
-		//	if( body->getId() == 12 ) // 6, 9, 10, 11
-		//		cerr << " beam->bendingRotation: " << beam->bendingRotation << " angle: " << angle << " count: " << beam->count << "\n";
-			
-		//	Vector3r axis 		= beam->rotation / beam->count;
-		//	Real angle 		= axis.normalize();
-		
 			Quaternionr rotation;
 			rotation.fromAxisAngle(axis,angle);
-	//		rotation.power( 1 / beam->count );
-			
-		//	Quaternionr rotation 	= beam->bendingRotation; // / beam->count;
 			
 			Vector3r length = beam->length * beam->direction;// * 0.5;// beam->bendingStiffness / beam->count;// * 0.5; // FIXME - duplicate line
-			
-		//	node1->displacementStiffness += rotation * ( length) - length;
-		//	node2->displacementStiffness += rotation * (-length) + length;
 
 			node1->displacementStiffness += (rotation * ( length) - length) * beam->bendingStiffness  * FIXME_useStiffnessSoftening_Factor;
 			node2->displacementStiffness += (rotation * (-length) + length) * beam->bendingStiffness  * FIXME_useStiffnessSoftening_Factor;
 
-		//	beam->rotation          = Vector3r(0.0,0.0,0.0);
-		//	beam->bendingRotation   = Quaternionr(1.0,0.0,0.0,0.0);
 			beam->bendingRotation 	= 0.0;
 			beam->count 		= 0.0;
 		}
@@ -432,22 +420,33 @@ void LatticeLaw::action(Body* body)
 			{
 				LatticeBeamParameters* beam1 = static_cast<LatticeBeamParameters*>(((*(bodies))[(*angles)->getId1()])->physicalParameters.get());
 				LatticeBeamParameters* beam2 = static_cast<LatticeBeamParameters*>(((*(bodies))[(*angles)->getId2()])->physicalParameters.get());
-			
-			//	Quaternionr 		rotation;
-			//	Vector3r		axis;
-				Real			planeAngle;
-
-			//	rotation.align( beam1->direction , beam2->direction );
-			//	rotation.toAxisAngle (axis, angle);
-
-				planeAngle = (beam1->direction.cross(beam2->direction)[2] > 0.0 ? 1.0 : -1.0) * Mathr::aCos( beam1->direction.dot(beam2->direction));
+				Vector3r	newCP;
+				Vector3r&	lastCP		= (static_cast<LatticeBeamAngularSpring*>((*angles)->interactionPhysics.get()))->lastCrossProduct;
+				bool&		planeSwap180	= (static_cast<LatticeBeamAngularSpring*>((*angles)->interactionPhysics.get()))->planeSwap180;
+				bool		oldPS180	= planeSwap180;
+				Real		planeAngle;
+/*
+				planeAngle =	(
+							beam1->direction.cross(beam2->direction)[2] > 0.0 ? 1.0 : -1.0
+						)
+						*
+						beam1->direction.angleBetweenUnitVectors(beam2->direction);
+*/
+				newCP		= beam1->direction.cross(beam2->direction);
+				if(newCP.dot(lastCP)< 0.0)
+					planeSwap180=!planeSwap180;
+				
+				planeAngle	= ( planeSwap180 ? 1.0 : -1.0 ) * beam1->direction.angleBetweenUnitVectors(beam2->direction);
 
 				if((*angles)->getId2()==7)
 					std::cerr << planeAngle << "\n";
 
-			//	(static_cast<LatticeBeamAngularSpring*>((*angles)->interactionPhysics.get()))->angle = axis*angle; 
-			//	(static_cast<LatticeBeamAngularSpring*>((*angles)->interactionPhysics.get()))->angle = rotation; 
-				(static_cast<LatticeBeamAngularSpring*>((*angles)->interactionPhysics.get()))->planeAngle = planeAngle;       // 2D
+				(static_cast<LatticeBeamAngularSpring*>((*angles)->interactionPhysics.get()))->planeAngle = planeAngle;
+
+				if(newCP.squaredLength() > 0.01)
+					lastCP = newCP;
+				else
+					planeSwap180 = oldPS180;
 			}
 			// else FIXME - delete unused angularSpring
 		}

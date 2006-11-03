@@ -24,8 +24,8 @@ class LatticeBeamParameters : public PhysicalParameters
 		Real  			 initialLength
                                         ,length;
                                 
-                Vector3r                 initialDirection
-                                        ,direction; // is a unit vector
+                Vector3r                 direction		// is a unit vector
+					,otherDirection;	// is a unit vector too
                                 
                 Real                     criticalTensileStrain
                                         ,criticalCompressiveStrain
@@ -37,8 +37,6 @@ class LatticeBeamParameters : public PhysicalParameters
                 Se3r                     se3Displacement;
                 
 		Real 			 count;
-	//	Vector3r 		 rotation;
-        //      Quaternionr              bendingRotation;
                 Real                     bendingRotation;
                 
                 Real strain();

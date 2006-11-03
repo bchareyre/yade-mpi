@@ -15,6 +15,8 @@
 class LatticeBeamAngularSpring : public InteractionPhysics
 {
 	public :
+		Vector3r		 lastCrossProduct;
+		bool			 planeSwap180;
 		Real			 initialPlaneAngle  // 2D only for now
 			 		,planeAngle
 					,initialOffPlaneAngle

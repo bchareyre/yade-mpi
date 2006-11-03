@@ -806,6 +806,9 @@
                                 <property name="text">
                                     <string>sync.display</string>
                                 </property>
+                                <property name="toolTip" stdset="0">
+                                    <string>Not synchronized: one processor for calculation, another for display.</string>
+                                </property>
                             </widget>
                             <widget class="QPushButton" row="0" column="0" rowspan="1" colspan="2">
                                 <property name="name">
@@ -869,6 +872,9 @@
                                         <property name="text">
                                             <string>Refresh [ms]</string>
                                         </property>
+                                        <property name="toolTip" stdset="0">
+                                            <string>How often you wish the display to refresh.</string>
+                                        </property>
                                     </widget>
                                     <widget class="QSpinBox">
                                         <property name="name">
@@ -893,6 +899,9 @@
                                         </property>
                                         <property name="value">
                                             <number>20</number>
+                                        </property>
+                                        <property name="toolTip" stdset="0">
+                                            <string>How often you wish the display to refresh.</string>
                                         </property>
                                     </widget>
                                     <widget class="QPushButton">
