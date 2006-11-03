@@ -11,12 +11,11 @@
 
 #include "PolyhedralSweptSphere.hpp"
 #include <yade/yade-core/StandAloneEngine.hpp>
-#include <yade/yade-lib-swiftpp/SWIFT.h>
 
 class SwiftPolyhedronProximityModeler : public StandAloneEngine
 {
 	private :
-		SWIFT_Scene*	 scene;
+//		SWIFT_Scene*	 scene;
 		bool		 first;
 		vector<int>	 ids;
 		double *	 vs;

@@ -30,7 +30,7 @@ void SwiftPolyhedronProximityModeler::action(Body* body)
 
 	if (first)
 	{
-		scene = new SWIFT_Scene( false, false );
+		//scene = new SWIFT_Scene( false, false );
 			
 		ids.clear();
 		int id;
@@ -45,7 +45,7 @@ void SwiftPolyhedronProximityModeler::action(Body* body)
 			b = *bi;
 			pss = static_cast<PolyhedralSweptSphere*>(b->interactionGeometry.get());
 			getSwiftInfo(pss,vs,fs,fv,vn,fn); //FIXME : need to make a new inside getSwiftInfo ??
-			scene->Add_Convex_Object( (SWIFT_Real*)vs, fs, vn, fn, id , 
+			/*scene->Add_Convex_Object( (SWIFT_Real*)vs, fs, vn, fn, id , 
 							DEFAULT_FIXED, 
 							DEFAULT_ORIENTATION, 
 							DEFAULT_TRANSLATION,
@@ -55,7 +55,7 @@ void SwiftPolyhedronProximityModeler::action(Body* body)
 							DEFAULT_BOX_ENLARGE_ABS,
 							fv,
 							DEFAULT_CUBE_ASPECT_RATIO);
-	
+	*/
 			ids.push_back(id);
 			
 			Vector3r rotColumn[3];
@@ -68,7 +68,7 @@ void SwiftPolyhedronProximityModeler::action(Body* body)
 			Vector3r p = b->physicalParameters->se3.position;
 			T[0] = p[0]; T[1] = p[1]; T[2] = p[2];
 	
-			scene->Set_Object_Transformation( id, (SWIFT_Real*)R, (SWIFT_Real*)T );
+	//		scene->Set_Object_Transformation( id, (SWIFT_Real*)R, (SWIFT_Real*)T );
 		}	
 		first = false;
 
@@ -82,7 +82,7 @@ void SwiftPolyhedronProximityModeler::action(Body* body)
 		scene->Query_Contact_Determination(true,SWIFT_INFINITY,nbPairs,&oids,&nbContacts,&distances,&nearestPts,&normals);*/
 	}
 		
-	scene->Deactivate();
+	//scene->Deactivate();
 
 // FIXME : object trnasfor can be initilized 2 or more times		
 	
@@ -96,7 +96,7 @@ void SwiftPolyhedronProximityModeler::action(Body* body)
 		const shared_ptr<Interaction>& interaction = *ii;
 		bodiesToUpdates.insert(interaction->getId1());
 		bodiesToUpdates.insert(interaction->getId2());
-		scene->Activate(interaction->getId1(),interaction->getId2());
+		//scene->Activate(interaction->getId1(),interaction->getId2());
 	}
 	
 	set<int>::iterator b2ui = bodiesToUpdates.begin();
@@ -114,19 +114,19 @@ void SwiftPolyhedronProximityModeler::action(Body* body)
 		R[6] = rotColumn[0][2]; R[7] = rotColumn[1][2]; R[8] = rotColumn[2][2];
 		p = b->physicalParameters->se3.position;
 		T[0] = p[0]; T[1] = p[1]; T[2] = p[2];
-		scene->Set_Object_Transformation( *b2ui, (SWIFT_Real*)R, (SWIFT_Real*)T );
+		//scene->Set_Object_Transformation( *b2ui, (SWIFT_Real*)R, (SWIFT_Real*)T );
 	}
 
 		
 	int nbPairs;
 	int * oids;
 	int * nbContacts;
-	SWIFT_Real * nearestPts;
-	SWIFT_Real * distances;
-	SWIFT_Real * normals;
+//	SWIFT_Real * nearestPts;
+//	SWIFT_Real * distances;
+//	SWIFT_Real * normals;
 	int * featuresType;
 	int * featuresId;
-	scene->Query_Contact_Determination(true,SWIFT_INFINITY,nbPairs,&oids,&nbContacts,&distances,&nearestPts,&normals,&featuresType,&featuresId);
+	//scene->Query_Contact_Determination(true,SWIFT_INFINITY,nbPairs,&oids,&nbContacts,&distances,&nearestPts,&normals,&featuresType,&featuresId);
 
 	for(int i=0 ; i<nbPairs ; i++)
 	{
@@ -142,7 +142,7 @@ void SwiftPolyhedronProximityModeler::action(Body* body)
 		PolyhedralSweptSphere * pss1 = static_cast<PolyhedralSweptSphere*>(b1->interactionGeometry.get());
 		PolyhedralSweptSphere * pss2 = static_cast<PolyhedralSweptSphere*>(b2->interactionGeometry.get());
 
-		if (distances[i]<pss1->radius+pss2->radius)
+		if (false/*distances[i]<pss1->radius+pss2->radius*/)
 		{
 			shared_ptr<Interaction> collision = potentialCollisions->find(id1,id2);
 
@@ -154,15 +154,15 @@ void SwiftPolyhedronProximityModeler::action(Body* body)
 			else
 				cg = shared_ptr<SpheresContactGeometry>(new SpheresContactGeometry());
 
-			Vector3r p1(nearestPts[6*i],nearestPts[6*i+1],nearestPts[6*i+2]);
-			Vector3r p2(nearestPts[6*i+3],nearestPts[6*i+4],nearestPts[6*i+5]);
+			Vector3r p1;//(nearestPts[6*i],nearestPts[6*i+1],nearestPts[6*i+2]);
+			Vector3r p2;//(nearestPts[6*i+3],nearestPts[6*i+4],nearestPts[6*i+5]);
 
 			p1 = b1->physicalParameters->se3*p1;
 			p2 = b2->physicalParameters->se3*p2;
 
-			cg->normal[0] = normals[3*i+0];
-			cg->normal[1] = normals[3*i+1];
-			cg->normal[2] = normals[3*i+2];
+//			cg->normal[0] = normals[3*i+0];
+//			cg->normal[1] = normals[3*i+1];
+//			cg->normal[2] = normals[3*i+2];
 			
 			//cg->normal = p1-p2;
 			//cg->normal.normalize();
@@ -202,7 +202,7 @@ void SwiftPolyhedronProximityModeler::action(Body* body)
 // 			}
 			cg->contactPoint = 0.5*(p1+p2);
 
-			cg->penetrationDepth = fabs(distances[i]-pss1->radius-pss2->radius);//(p2-p1).length();
+//			cg->penetrationDepth = fabs(distances[i]-pss1->radius-pss2->radius);//(p2-p1).length();
 			
 			cg->radius1 = 0.5*(b1->boundingVolume->max-b1->boundingVolume->min).length();
 			cg->radius2 = 0.5*(b2->boundingVolume->max-b2->boundingVolume->min).length();

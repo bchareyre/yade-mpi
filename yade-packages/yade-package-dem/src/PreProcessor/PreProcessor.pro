@@ -8,7 +8,6 @@ SUBDIRS += Funnel \
            SDECLinkedSpheres \
            SDECSpheresPlane \
            SDECMovingWall \
-           SDECTriaxialTest \
            TetrahedronsTest \
 	   IsotropicCompressionTest \
 	   TriaxialTest 

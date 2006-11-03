@@ -198,7 +198,7 @@ void QtFileGenerator::timerEvent( QTimerEvent* )
 	if(m_worker && m_runner)
 	{
 		textLabel1->setText(m_worker->message());
-		progressBar1->setProgress(m_worker->progress()*1000.0);
+		progressBar1->setProgress((int)(m_worker->progress()*1000.0));
 	}
 
 	// generation finished

@@ -5,7 +5,6 @@ error( "YADE_QMAKE_PATH internal qmake variable is not set, you should run for e
 
 LIBS += -lSpheresContactGeometry \
         -lPolyhedralSweptSphere \
-        -lyade-lib-swiftpp \
         -rdynamic 
 INCLUDEPATH += $${YADE_QMAKE_PATH}/include/ \
                ../../../DataClass/InteractionGeometry/SpheresContactGeometry \

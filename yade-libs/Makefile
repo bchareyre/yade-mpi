@@ -5,8 +5,6 @@ all:
 	@echo --
 
 clean:
-	$(MAKE) -C yade-lib-qhull clean
-	$(MAKE) -C yade-lib-swiftpp clean
 	$(MAKE) -C yade-lib-loki clean
 	$(MAKE) -C yade-lib-wm3-math clean
 	$(MAKE) -C yade-lib-algorithms clean
@@ -20,12 +18,6 @@ clean:
 	$(MAKE) -C yade-lib-serialization-qt clean
 
 compile_install:
-	$(MAKE) -C yade-lib-qhull
-	$(MAKE) -C yade-lib-qhull install
-	
-	$(MAKE) -C yade-lib-swiftpp
-	$(MAKE) -C yade-lib-swiftpp install
-	
 	$(MAKE) -C yade-lib-loki
 	$(MAKE) -C yade-lib-loki install
 	
@@ -60,8 +52,6 @@ compile_install:
 	$(MAKE) -C yade-lib-serialization-qt install
 
 uninstall:
-	$(MAKE) -C yade-lib-qhull uninstall
-	$(MAKE) -C yade-lib-swiftpp uninstall
 	$(MAKE) -C yade-lib-loki uninstall
 	$(MAKE) -C yade-lib-wm3-math uninstall
 	$(MAKE) -C yade-lib-algorithms uninstall
