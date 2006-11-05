@@ -438,14 +438,14 @@ void OpenGLRenderingEngine::renderInteractionGeometry(const shared_ptr<MetaBody>
 		se3.orientation.toAxisAngle(axis,angle);	
 		glTranslatef(se3.position[0],se3.position[1],se3.position[2]);
 		glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
-		if((*bi)->interactionGeometry)
-			interactionGeometryDispatcher((*bi)->interactionGeometry,(*bi)->physicalParameters);
+		if((*bi)->interactingGeometry)
+			interactionGeometryDispatcher((*bi)->interactingGeometry,(*bi)->physicalParameters);
 		glPopMatrix();
 	}
 	
 	glPushMatrix();
-	if(rootBody->interactionGeometry)
-		interactionGeometryDispatcher(rootBody->interactionGeometry,rootBody->physicalParameters);
+	if(rootBody->interactingGeometry)
+		interactionGeometryDispatcher(rootBody->interactingGeometry,rootBody->physicalParameters);
 	glPopMatrix();
 }
 

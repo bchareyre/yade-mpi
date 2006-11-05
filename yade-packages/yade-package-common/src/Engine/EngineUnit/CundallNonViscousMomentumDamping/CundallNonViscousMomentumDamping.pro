@@ -27,3 +27,4 @@ CONFIG += debug \
 TEMPLATE = lib 
 HEADERS += CundallNonViscousMomentumDamping.hpp 
 SOURCES += CundallNonViscousMomentumDamping.cpp 
+QMAKE_RUN_CXX_IMP = $(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $(shell pwd)/$<

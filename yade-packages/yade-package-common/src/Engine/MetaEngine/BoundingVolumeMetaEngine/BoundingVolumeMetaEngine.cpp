@@ -24,11 +24,11 @@ void BoundingVolumeMetaEngine::action(Body* body)
 	for( ; bi!=biEnd ; ++bi )
 	{
 		shared_ptr<Body> b = *bi;
-		if(b->interactionGeometry && b->boundingVolume)
-			operator()(b->interactionGeometry,b->boundingVolume,b->physicalParameters->se3,b.get());
+		if(b->interactingGeometry && b->boundingVolume)
+			operator()(b->interactingGeometry,b->boundingVolume,b->physicalParameters->se3,b.get());
 	}
 		
-	operator()(body->interactionGeometry,body->boundingVolume,body->physicalParameters->se3,body);
+	operator()(body->interactingGeometry,body->boundingVolume,body->physicalParameters->se3,body);
 }
 
 

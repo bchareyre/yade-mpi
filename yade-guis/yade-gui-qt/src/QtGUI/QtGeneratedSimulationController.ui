@@ -488,6 +488,9 @@
                                 <property name="pixmap">
                                     <pixmap>image3</pixmap>
                                 </property>
+                                <property name="toolTip" stdset="0">
+                                    <string>Note: currently using synchronized display can *sometimes* lead to crash when reloading file.</string>
+                                </property>
                             </widget>
                         </hbox>
                     </widget>
@@ -807,7 +810,7 @@
                                     <string>sync.display</string>
                                 </property>
                                 <property name="toolTip" stdset="0">
-                                    <string>Not synchronized: one processor for calculation, another for display.</string>
+                                    <string>Not synchronized: one processor for calculation, another for display. Synchronized can sometimes crash - yet to be fixed.</string>
                                 </property>
                             </widget>
                             <widget class="QPushButton" row="0" column="0" rowspan="1" colspan="2">
@@ -1047,9 +1050,6 @@
         <slot>pbStart2Clicked()</slot>
     </connection>
 </connections>
-<includes>
-    <include location="local" impldecl="in implementation">QtGeneratedSimulationController.ui.h</include>
-</includes>
 <signals>
     <signal>closeSignal()</signal>
 </signals>

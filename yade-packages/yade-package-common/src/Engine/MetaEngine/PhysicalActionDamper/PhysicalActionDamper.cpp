@@ -15,8 +15,8 @@ void PhysicalActionDamper::action(Body* body)
 {
 	MetaBody * ncb = dynamic_cast<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
-	PhysicalActionContainer::iterator pai    = ncb->actionParameters->begin();
-	PhysicalActionContainer::iterator paiEnd = ncb->actionParameters->end();
+	PhysicalActionContainer::iterator pai    = ncb->physicalActions->begin();
+	PhysicalActionContainer::iterator paiEnd = ncb->physicalActions->end();
 	for( ; pai!=paiEnd ; ++pai)
 	{
 		shared_ptr<PhysicalAction> action = *pai;
@@ -26,9 +26,9 @@ void PhysicalActionDamper::action(Body* body)
 	}
 
 
-//	for( ncb->actionParameters->gotoFirst() ; ncb->actionParameters->notAtEnd() ; ncb->actionParameters->gotoNext())
+//	for( ncb->physicalActions->gotoFirst() ; ncb->physicalActions->notAtEnd() ; ncb->physicalActions->gotoNext())
 //	{
-//		shared_ptr<PhysicalAction>& action = ncb->actionParameters->getCurrent(id);
+//		shared_ptr<PhysicalAction>& action = ncb->physicalActions->getCurrent(id);
 //		// FIXME - solve the problem of Body's id
 //		operator()( action , (*bodies)[id]->physicalParameters , (*bodies)[id].get() );
 //	}

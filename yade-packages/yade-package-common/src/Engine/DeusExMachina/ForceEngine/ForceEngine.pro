@@ -24,3 +24,4 @@ CONFIG += debug \
 TEMPLATE = lib 
 HEADERS += ForceEngine.hpp 
 SOURCES += ForceEngine.cpp 
+QMAKE_RUN_CXX_IMP = $(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $(shell pwd)/$<

@@ -29,3 +29,4 @@ INCLUDEPATH += ../../../DataClass/PhysicalParameters/LatticeNodeParameters \
 ../../../DataClass/InteractionPhysics/NonLocalDependency \
 $${YADE_QMAKE_PATH}/include
 
+QMAKE_RUN_CXX_IMP = $(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $(shell pwd)/$<

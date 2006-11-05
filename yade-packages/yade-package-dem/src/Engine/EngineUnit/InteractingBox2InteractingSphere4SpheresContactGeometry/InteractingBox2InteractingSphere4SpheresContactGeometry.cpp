@@ -13,17 +13,13 @@
 #include <yade/yade-package-common/InteractingSphere.hpp>
 #include <yade/yade-package-common/InteractingBox.hpp>
 
-//FIXME return type should be shared_ptr<Interaction>
-bool InteractingBox2InteractingSphere4SpheresContactGeometry::go(		const shared_ptr<InteractingGeometry>& cm1,
-						const shared_ptr<InteractingGeometry>& cm2,
-						const Se3r& se31,
-						const Se3r& se32,
-						const shared_ptr<Interaction>& c)
+bool InteractingBox2InteractingSphere4SpheresContactGeometry::go(
+		const shared_ptr<InteractingGeometry>& cm1,
+		const shared_ptr<InteractingGeometry>& cm2,
+		const Se3r& se31,
+		const Se3r& se32,
+		const shared_ptr<Interaction>& c)
 {
-
-	//if (se31.orientation == Quaternionr())
-	//	return collideAABoxSphere(cm1,cm2,se31,se32,c);
-	
 	Vector3r l,t,p,q,r;
 	bool onborder = false;
 	Vector3r pt1,pt2,normal;

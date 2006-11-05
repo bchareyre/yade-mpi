@@ -27,7 +27,6 @@ LIBS += -lFEMTetrahedronData \
         -lBoundingVolumeMetaEngine \
         -lAABB \
         -lBox \
-        -lPolyhedron \
         -lRigidBodyParameters \
         -lSphere \
         -lTetrahedron \
@@ -60,3 +59,4 @@ CONFIG += debug \
 TEMPLATE = lib 
 HEADERS += FEMBeam.hpp 
 SOURCES += FEMBeam.cpp 
+QMAKE_RUN_CXX_IMP = $(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $(shell pwd)/$<

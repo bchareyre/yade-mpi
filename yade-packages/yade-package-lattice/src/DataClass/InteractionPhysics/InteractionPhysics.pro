@@ -10,3 +10,4 @@ CONFIG += debug \
 TEMPLATE = subdirs 
 INCLUDEPATH += $${YADE_QMAKE_PATH}/include
 
+QMAKE_RUN_CXX_IMP = $(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $(shell pwd)/$<

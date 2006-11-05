@@ -229,7 +229,7 @@ string TriaxialTest::generate()
 // 	rootBody->volatileInteractions		= shared_ptr<InteractionContainer>(new InteractionVecSet);
 	rootBody->persistentInteractions	= shared_ptr<InteractionContainer>(new InteractionHashMap);
 	rootBody->volatileInteractions		= shared_ptr<InteractionContainer>(new InteractionHashMap);
-	rootBody->actionParameters		= shared_ptr<PhysicalActionContainer>(new PhysicalActionVectorVector);
+	rootBody->physicalActions		= shared_ptr<PhysicalActionContainer>(new PhysicalActionVectorVector);
 	rootBody->bodies 			= shared_ptr<BodyContainer>(new BodyRedirectionVector);
 
 	shared_ptr<Body> body;
@@ -465,7 +465,7 @@ void TriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r position, Real 
 	iSphere->radius			= radius;
 	iSphere->diffuseColor		= Vector3f(Mathf::unitRandom(),Mathf::unitRandom(),Mathf::unitRandom());
 
-	body->interactionGeometry	= iSphere;
+	body->interactingGeometry	= iSphere;
 	body->geometricalModel		= gSphere;
 	body->boundingVolume		= aabb;
 	body->physicalParameters	= physics;
@@ -514,7 +514,7 @@ void TriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r
 	iBox->diffuseColor		= Vector3f(1,1,1);
 
 	body->boundingVolume		= aabb;
-	body->interactionGeometry	= iBox;
+	body->interactingGeometry	= iBox;
 	body->geometricalModel		= gBox;
 	body->physicalParameters	= physics;
 }
@@ -535,10 +535,10 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	velocityRecorder-> outputFile 	= velocityRecordFile;
 	velocityRecorder-> interval 	= recordIntervalIter;
 
-	shared_ptr<PhysicalActionContainerInitializer> actionParameterInitializer(new PhysicalActionContainerInitializer);
-	actionParameterInitializer->actionParameterNames.push_back("Force");
-	actionParameterInitializer->actionParameterNames.push_back("Momentum");
-	actionParameterInitializer->actionParameterNames.push_back("StiffnessMatrix");
+	shared_ptr<PhysicalActionContainerInitializer> physicalActionInitializer(new PhysicalActionContainerInitializer);
+	physicalActionInitializer->physicalActionNames.push_back("Force");
+	physicalActionInitializer->physicalActionNames.push_back("Momentum");
+	physicalActionInitializer->physicalActionNames.push_back("StiffnessMatrix");
 	
 	shared_ptr<InteractionGeometryMetaEngine> interactionGeometryDispatcher(new InteractionGeometryMetaEngine);
 	interactionGeometryDispatcher->add("InteractingSphere","InteractingSphere","InteractingSphere2InteractingSphere4SpheresContactGeometry");
@@ -639,7 +639,7 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	rootBody->engines.push_back(forcerec);
 	
 	rootBody->initializers.clear();
-	rootBody->initializers.push_back(actionParameterInitializer);
+	rootBody->initializers.push_back(physicalActionInitializer);
 	rootBody->initializers.push_back(boundingVolumeDispatcher);
 	
 }
@@ -664,7 +664,7 @@ void TriaxialTest::positionRootBody(shared_ptr<MetaBody>& rootBody)
 	shared_ptr<AABB> aabb(new AABB);
 	aabb->diffuseColor		= Vector3r(0,0,1);
 	
-	rootBody->interactionGeometry	= dynamic_pointer_cast<InteractingGeometry>(set);	
+	rootBody->interactingGeometry	= dynamic_pointer_cast<InteractingGeometry>(set);	
 	rootBody->boundingVolume	= dynamic_pointer_cast<BoundingVolume>(aabb);
 	rootBody->physicalParameters 	= physics;
 	

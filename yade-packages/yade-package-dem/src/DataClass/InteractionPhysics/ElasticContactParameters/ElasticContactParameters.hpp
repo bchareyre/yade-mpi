@@ -9,14 +9,15 @@
 #ifndef ELASTIC_CONTACT_PARAMETERS_HPP
 #define ELASTIC_CONTACT_PARAMETERS_HPP
 
-#include <yade/yade-core/InteractionPhysics.hpp>
+#include <yade/yade-package-common/SimpleElasticInteraction.hpp>
 
-class ElasticContactParameters : public InteractionPhysics
+class ElasticContactParameters : public SimpleElasticInteraction
 {
 	public :
+		ElasticContactParameters() {};
 
-		Real		 kn				// normal elastic constant.
-				,ks				// shear elastic constant.
+		Real		// kn				// normal elastic constant. (inside SimpleElasticInteraction)
+				 ks				// shear elastic constant.
 				,initialKn			// initial normal elastic constant.
 				,initialKs			// initial shear elastic constant.
 				,equilibriumDistance		// equilibrium distance
@@ -33,7 +34,7 @@ class ElasticContactParameters : public InteractionPhysics
 		virtual void registerAttributes();
 
 	REGISTER_CLASS_NAME(ElasticContactParameters);
-	REGISTER_BASE_CLASS_NAME(InteractionPhysics);
+	REGISTER_BASE_CLASS_NAME(SimpleElasticInteraction);
 
 };
 

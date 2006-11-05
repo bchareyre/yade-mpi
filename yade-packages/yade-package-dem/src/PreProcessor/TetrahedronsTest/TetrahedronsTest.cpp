@@ -1,20 +1,19 @@
 /*************************************************************************
-*  Copyright (C) 2004 by Olivier Galizzi                                 *
-*  olivier.galizzi@imag.fr                                               *
+*  Copyright (C) 2006 by Janek Kozicki                                   *
+*  cosurgi@mail.berlios.de                                               *
 *                                                                        *
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
+#include <boost/lexical_cast.hpp>
+
 #include "TetrahedronsTest.hpp"
 
-#include "BodyMacroParameters.hpp"
-#include "ElasticContactLaw.hpp"
-#include "SDECLinkGeometry.hpp"
-#include "MacroMicroElasticRelationships.hpp"
+#include <yade/yade-package-common/ElasticBodyParameters.hpp>
 #include "ElasticCriterionTimeStepper.hpp"
-#include "SwiftPolyhedronProximityModeler.hpp"
-
+#include "InteractingMyTetrahedron.hpp"
+#include "MyTetrahedronLaw.hpp"
 
 #include <yade/yade-package-common/Box.hpp>
 #include <yade/yade-package-common/AABB.hpp>
@@ -23,6 +22,7 @@
 #include <yade/yade-package-common/PersistentSAPCollider.hpp>
 #include <yade/yade-lib-serialization/IOFormatManager.hpp>
 #include <yade/yade-core/Interaction.hpp>
+
 #include <yade/yade-package-common/BoundingVolumeMetaEngine.hpp>
 #include <yade/yade-package-common/MetaInteractingGeometry2AABB.hpp>
 #include <yade/yade-package-common/MetaInteractingGeometry.hpp>
@@ -37,6 +37,8 @@
 #include <yade/yade-package-common/CundallNonViscousMomentumDamping.hpp>
 #include <yade/yade-package-common/GravityEngine.hpp>
 
+#include <yade/yade-package-common/InteractingGeometryMetaEngine.hpp>
+#include <yade/yade-package-common/InteractionGeometryMetaEngine.hpp>
 #include <yade/yade-package-common/InteractionPhysicsMetaEngine.hpp>
 #include <yade/yade-core/Body.hpp>
 #include <yade/yade-package-common/InteractingBox.hpp>
@@ -50,21 +52,42 @@
 
 TetrahedronsTest::TetrahedronsTest () : FileGenerator()
 {
-	nbTetrahedrons = Vector3r(1,1,1);
-	minRadius = 5;
-	maxRadius = 5;
-	groundSize = Vector3r(50,5,50);
-	dampingForce = 0.3;
-	dampingMomentum = 0.3;
-	timeStepUpdateInterval = 300;
-	sphereYoungModulus   = 15000000.0;
-	//sphereYoungModulus   = 10000;
-	spherePoissonRatio  = 0.2;
-	sphereFrictionDeg   = 18.0;
-	density = 2600;
-	rotationBlocked = false;
-	gravity = Vector3r(0,-9.81,0);
-	disorder = 0.2;
+	nbTetrahedrons		= Vector3r(5,6,7);
+	minSize			= 5;
+	maxSize			= 6;
+
+	groundSize		= Vector3r(100,5,100);
+
+	/*
+	 *
+	 * Vaclav,
+	 *
+	 * damping has so huge values, because this example calculation has no
+	 * shering force in the contact, therefore there cannot be fricion
+	 * simulated. To make a good simulation (with tetrahedrons too) you
+	 * should add shearing force. It is not possible to have friction
+	 * without shearing :)
+	 *
+	 * You can see into ElasticContactLaw (press here ctrl-] , then ctrl-O ;)
+	 * how shearing force is used. You may even want to use
+	 * BodyMacroParameters and sth. like ElasticContactParameters to
+	 * calculate friction, and incremental between iterations shearing
+	 * force
+	 *
+	 * Also you can check how the simulation behaves with damping equal to zero.
+	 *
+	 */
+	dampingForce		= 0.9;
+	dampingMomentum		= 0.9;
+
+	timeStepUpdateInterval	= 300;
+
+	youngModulus		= 80000000.0;
+
+	density			= 2600;
+	rotationBlocked		= false;
+	gravity			= Vector3r(0,-9.81,0);
+	disorder		= 0.2;
 }
 
 
@@ -82,11 +105,9 @@ void TetrahedronsTest::postProcessAttributes(bool)
 void TetrahedronsTest::registerAttributes()
 {
 	REGISTER_ATTRIBUTE(nbTetrahedrons);
-	REGISTER_ATTRIBUTE(minRadius);
-	REGISTER_ATTRIBUTE(maxRadius);
-	REGISTER_ATTRIBUTE(sphereYoungModulus);
-	REGISTER_ATTRIBUTE(spherePoissonRatio);
-	REGISTER_ATTRIBUTE(sphereFrictionDeg);
+	REGISTER_ATTRIBUTE(minSize);
+	REGISTER_ATTRIBUTE(maxSize);
+	REGISTER_ATTRIBUTE(youngModulus);
 	REGISTER_ATTRIBUTE(gravity);
 	REGISTER_ATTRIBUTE(density);
 	REGISTER_ATTRIBUTE(disorder);
@@ -94,7 +115,7 @@ void TetrahedronsTest::registerAttributes()
 	REGISTER_ATTRIBUTE(dampingForce);
 	REGISTER_ATTRIBUTE(dampingMomentum);
 	REGISTER_ATTRIBUTE(rotationBlocked);
-	REGISTER_ATTRIBUTE(timeStepUpdateInterval);
+	//REGISTER_ATTRIBUTE(timeStepUpdateInterval); // not used. But you may want to use it....
 }
 
 
@@ -109,7 +130,7 @@ string TetrahedronsTest::generate()
 	
 	rootBody->persistentInteractions	= shared_ptr<InteractionContainer>(new InteractionVecSet);
 	rootBody->volatileInteractions		= shared_ptr<InteractionContainer>(new InteractionVecSet);
-	rootBody->actionParameters		= shared_ptr<PhysicalActionContainer>(new PhysicalActionVectorVector);
+	rootBody->physicalActions		= shared_ptr<PhysicalActionContainer>(new PhysicalActionVectorVector);
 	rootBody->bodies 			= shared_ptr<BodyContainer>(new BodyRedirectionVector);
 		
 ////////////////////////////////////
@@ -120,99 +141,126 @@ string TetrahedronsTest::generate()
 	rootBody->bodies->insert(ground);
 
 ///////// tetrahedrons
+	float all = nbTetrahedrons[0]*nbTetrahedrons[1]*nbTetrahedrons[2];
+	float current = 0.0;
 
+	setMessage("generating tetrahedrons...");
 	for(int i=0;i<nbTetrahedrons[0];i++)
+	{
+		if(shouldTerminate()) return "";
+
 		for(int j=0;j<nbTetrahedrons[1];j++)
 			for(int k=0;k<nbTetrahedrons[2];k++)
 			{
 				shared_ptr<Body> tet;
 				createTetrahedron(tet,i,j,k);
 				rootBody->bodies->insert(tet);
+				
+				setProgress(current++/all);
 			}
+	}
 	
-	return "";
+	return "foo bar "+boost::lexical_cast<std::string>(42);
 }
 
 
 void TetrahedronsTest::createTetrahedron(shared_ptr<Body>& body, int i, int j, int k)
 {
 	body = shared_ptr<Body>(new Body(0,1));
-	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
+	shared_ptr<ElasticBodyParameters> physics(new ElasticBodyParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<Tetrahedron> tet(new Tetrahedron);
-	shared_ptr<PolyhedralSweptSphere> pss(new PolyhedralSweptSphere);
 	
-	Quaternionr q = Quaternionr::IDENTITY;
-	//q.fromAxisAngle( Vector3r(Mathr::symmetricRandom(),Mathr::symmetricRandom(),Mathr::symmetricRandom()),Mathr::symmetricRandom());
-	//q.normalize();
+	Quaternionr q;// = Quaternionr::IDENTITY;
+	// random orientation
+	q.fromAxisAngle( Vector3r(Mathr::symmetricRandom(),Mathr::symmetricRandom(),Mathr::symmetricRandom()),Mathr::symmetricRandom());
+	q.normalize();
+
+	// semi-random position in the space
+	Vector3r position		= Vector3r(i,j,k)*(2*maxSize*1.1) // this formula is crazy !!
+					  - Vector3r( nbTetrahedrons[0]/2*(2*maxSize*1.1) , -7-maxSize*2 , nbTetrahedrons[2]/2*(2*maxSize*1.1) )
+					  + Vector3r( 	 Mathr::symmetricRandom()
+					  		,Mathr::symmetricRandom()
+							,Mathr::symmetricRandom())*maxSize*disorder;
 	
-	Vector3r position		= Vector3r(i,j,k)*(5*maxRadius*1.1) // this formula is crazy !!
-					  - Vector3r( nbTetrahedrons[0]/2*(2*maxRadius*1.1) , -9-maxRadius*2 , nbTetrahedrons[2]/2*(2*maxRadius*1.1) )
-					  + Vector3r(Mathr::symmetricRandom(),Mathr::symmetricRandom(),Mathr::symmetricRandom())*disorder*maxRadius;
-	
-	Real radius 			= (Mathr::intervalRandom(minRadius,maxRadius));
+	Real radius 			= (Mathr::intervalRandom(minSize,maxSize));
 	
 	body->isDynamic			= true;
-	
+
 	physics->angularVelocity	= Vector3r(0,0,0);
 	physics->velocity		= Vector3r(0,0,0);
-	physics->mass			= 4.0/3.0*Mathr::PI*radius*radius*radius*density;
-	physics->inertia		= Vector3r(2.0/5.0*physics->mass*radius*radius,2.0/5.0*physics->mass*radius*radius,2.0/5.0*physics->mass*radius*radius); //
-	physics->se3			= Se3r(position,q);
-	physics->young			= sphereYoungModulus;
-	physics->poisson		= spherePoissonRatio;
-	physics->frictionAngle		= sphereFrictionDeg * Mathr::PI/180.0;
 
-	aabb->diffuseColor		= Vector3r(0,1,0);
-
-	loadTRI(tet,"../data/tetra1.tri");
+	makeTet(tet,radius);
 	tet->diffuseColor		= Vector3f(Mathf::unitRandom(),Mathf::unitRandom(),Mathf::unitRandom());
 	tet->wire			= false;
 	tet->visible			= true;
 	tet->shadowCaster		= false;
-	
-	pss->radius			= 3;
-	pss->diffuseColor		= Vector3f(0.8,0.3,0.3);
-	pss->vertices.clear();
-	pss->vertices.push_back(tet->v1);
-	pss->vertices.push_back(tet->v2);
-	pss->vertices.push_back(tet->v3);
-	pss->vertices.push_back(tet->v4);
-	pss->faces.clear();
-	vector<int> face;
-	face.resize(3);
-	face[0] = 2;
-	face[1] = 1;
-	face[2] = 0;
-	pss->faces.push_back(face);
-	face[0] = 3;
-	face[1] = 2;
-	face[2] = 0;
-	pss->faces.push_back(face);
-	face[0] = 1;
-	face[1] = 3;
-	face[2] = 0;
-	pss->faces.push_back(face);
-	face[0] = 1;
-	face[1] = 2;
-	face[2] = 3;
-	pss->faces.push_back(face);
-	
-	body->interactionGeometry	= pss;
+
+	// Vaclav,
+	//
+	// Here mass and inertia are totally wrong, because the formulas are for sphere, not for tetrahedron.
+	// I should put here correct formulas to get scientific results. But this is a quick example.
+	//
+	// So it's your job to write good formulas here.
+	//
+	// They are used at the end of each interation calculation, and it's important that they are correct, because:
+	//
+	// class NewtonsForceLaw               uses mass                to calculate body acceleration        from given force
+	// class NewtonsMomentumLaw            uses inertia             to calculate body angularAcceleration from given momentum
+	//
+	// class LeapFrogPositionIntegrator    uses acceleration        to calculate body translation
+	// class LeapFrogOrientationIntegrator uses angularAcceleration to calculate body rotation
+	//
+	// (those four classes cannot be modifed, they do their job just fine :)
+	// (also this exact information written above, is explicitly defined in createActors, this file, line 314)
+	//
+	// So currently these numbers are wrong, so tetrahedrons will rotate unrealistically (as you can see yourself :)
+	//
+	physics->mass			= 4.0/3.0*Mathr::PI*radius*radius*radius*density;
+	//
+	// in fact I'm curious to see how this example behaves with correct inertia and mass.
+	// Before you do anything else you can try to write a good formula here. I belive that
+	// tetrahedrons will behave much more correctly.
+	physics->inertia		= Vector3r(2.0/5.0*physics->mass*radius*radius,2.0/5.0*physics->mass*radius*radius,2.0/5.0*physics->mass*radius*radius);
+	////////////////////////////////////////////////////////////////////////////////////
+
+	physics->se3			= Se3r(position,q);
+	physics->young			= youngModulus;
+
+	aabb->diffuseColor		= Vector3r(0,1,0);
+
+	// interactingGeometry is filled with data by Tetrahedron2InteractingMyTetrahedron
+	shared_ptr<InteractingGeometry> imt(new InteractingMyTetrahedron);
+	imt->diffuseColor               = Vector3f(0.5,0.5,1.0);
+	body->interactingGeometry	= imt;
+
 	body->geometricalModel		= tet;
 	body->boundingVolume		= aabb;
+
+	// Vaclav,
+	//
+	// Here I use ElasticBodyParameters for physics, because this very simple example
+	// of four spheres in a tetrahedron needs only young modulus. (stiffness)
+	// and nothing more.
+	//
+	// if you need some other physical data about tetrahedron (not just stiffness)
+	// then you will need to make a new class.
+	//
 	body->physicalParameters	= physics;
 }
 
 
 void TetrahedronsTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents)
 {
+	// this is just the bottom surface on which all is lying
+	// we could even make a box (or even RotatingBox) by making several boxes, as
+	// in the RotatingBox example FileGenerator
+
 	body = shared_ptr<Body>(new Body(0,1));
-	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
+	shared_ptr<ElasticBodyParameters> physics(new ElasticBodyParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<Box> gBox(new Box);
-	shared_ptr<PolyhedralSweptSphere> pss(new PolyhedralSweptSphere);
-	
+	shared_ptr<InteractingBox> iBox(new InteractingBox);
 	
 	Quaternionr q;
 	q.fromAxisAngle( Vector3r(0,0,1),0);
@@ -227,12 +275,8 @@ void TetrahedronsTest::createBox(shared_ptr<Body>& body, Vector3r position, Vect
 							, physics->mass*(extents[0]*extents[0]+extents[2]*extents[2])/3
 							, physics->mass*(extents[1]*extents[1]+extents[0]*extents[0])/3
 						);
-	//physics->mass			= 0;
-	//physics->inertia		= Vector3r(0,0,0);
 	physics->se3			= Se3r(position,q);
-	physics->young			= sphereYoungModulus;
-	physics->poisson		= spherePoissonRatio;
-	physics->frictionAngle		= sphereFrictionDeg * Mathr::PI/180.0;
+	physics->young			= youngModulus;
 
 	aabb->diffuseColor		= Vector3r(1,0,0);
 
@@ -242,55 +286,11 @@ void TetrahedronsTest::createBox(shared_ptr<Body>& body, Vector3r position, Vect
 	gBox->visible			= true;
 	gBox->shadowCaster		= true;
 	
-	pss->diffuseColor		= Vector3f(1,0,0);
-	pss->vertices.clear();
-	
-	pss->vertices.push_back(Vector3r(-extents[0],-extents[1],-extents[2]));
-	pss->vertices.push_back(Vector3r(extents[0],-extents[1],-extents[2]));
-	pss->vertices.push_back(Vector3r(extents[0],extents[1],-extents[2]));
-	pss->vertices.push_back(Vector3r(-extents[0],extents[1],-extents[2]));
-	
-	pss->vertices.push_back(Vector3r(-extents[0],-extents[1],extents[2]));
-	pss->vertices.push_back(Vector3r(extents[0],-extents[1],extents[2]));
-	pss->vertices.push_back(Vector3r(extents[0],extents[1],extents[2]));
-	pss->vertices.push_back(Vector3r(-extents[0],extents[1],extents[2]));
+	iBox->extents			= extents;
+	iBox->diffuseColor		= Vector3f(1,1,1);
 
-	pss->faces.clear();
-	vector<int> face;
-	face.resize(4);
-	face[0] = 0;
-	face[1] = 4;
-	face[2] = 7;
-	face[3] = 3;			//	      7         4
-	pss->faces.push_back(face);	//	3         0
-	face[0] = 1;			//	
-	face[1] = 2;			//
-	face[2] = 6;			//
-	face[3] = 5;			//	       6         5
-	pss->faces.push_back(face);	//	2         1
-	face[0] = 2;
-	face[1] = 3;
-	face[2] = 7;
-	face[3] = 6;
-	pss->faces.push_back(face);
-	face[0] = 0;
-	face[1] = 1;
-	face[2] = 5;
-	face[3] = 4;
-	pss->faces.push_back(face);
-	face[0] = 4;
-	face[1] = 5;
-	face[2] = 6;
-	face[3] = 7;
-	pss->faces.push_back(face);
-	face[0] = 3;
-	face[1] = 2;
-	face[2] = 1;
-	face[3] = 0;
-	pss->faces.push_back(face);
-	pss->radius = 3;
 	body->boundingVolume		= aabb;
-	body->interactionGeometry	= pss;
+	body->interactingGeometry	= iBox;
 	body->geometricalModel		= gBox;
 	body->physicalParameters	= physics;
 }
@@ -298,17 +298,35 @@ void TetrahedronsTest::createBox(shared_ptr<Body>& body, Vector3r position, Vect
 
 void TetrahedronsTest::createActors(shared_ptr<MetaBody>& rootBody)
 {
-	shared_ptr<PhysicalActionContainerInitializer> actionParameterInitializer(new PhysicalActionContainerInitializer);
-	actionParameterInitializer->actionParameterNames.push_back("Force");
-	actionParameterInitializer->actionParameterNames.push_back("Momentum");
-	
-	shared_ptr<SwiftPolyhedronProximityModeler> swiftPolyhedronProximityModeler(new SwiftPolyhedronProximityModeler);
+	shared_ptr<PhysicalActionContainerInitializer> physicalActionInitializer(new PhysicalActionContainerInitializer);
 
+	// all the strings here are just class names
+	// those class names in each class are registered with REGISTER_CLASS_NAME(SomeClass);
+	//
+	physicalActionInitializer->physicalActionNames.push_back("Force");
+	physicalActionInitializer->physicalActionNames.push_back("Momentum");
+	
 	shared_ptr<InteractionPhysicsMetaEngine> interactionPhysicsDispatcher(new InteractionPhysicsMetaEngine);
-	interactionPhysicsDispatcher->add("BodyMacroParameters","BodyMacroParameters","MacroMicroElasticRelationships");
+	// so for this simple example I use  ElasticBodyParameters           : to store young modulus,
+	// and                               ElasticBodySimpleRelationship   : to calculate the stiffnes of current interaction
+	//                                                                     using the young modulus of two bodies, it creates
+	//                                                                     a class SimpleElasticInteraction
+	//
+	// Vaclav, it is very likely that you will need some other physical representation of interaction than SimpleElasticInteraction
+	//
+	interactionPhysicsDispatcher->add("ElasticBodyParameters","ElasticBodyParameters","ElasticBodySimpleRelationship");
 		
+	shared_ptr<InteractionGeometryMetaEngine> interactionGeometryDispatcher(new InteractionGeometryMetaEngine);
+	interactionGeometryDispatcher->add("InteractingMyTetrahedron","InteractingMyTetrahedron","InteractingMyTetrahedron2InteractingMyTetrahedron4InteractionOfMyTetrahedron");
+	interactionGeometryDispatcher->add("InteractingMyTetrahedron","InteractingBox","InteractingMyTetrahedron2InteractingBox4InteractionOfMyTetrahedron");
+
+	shared_ptr<InteractingGeometryMetaEngine> interactingGeometryDispatcher	= shared_ptr<InteractingGeometryMetaEngine>(new InteractingGeometryMetaEngine);
+	interactingGeometryDispatcher->add("Tetrahedron","InteractingMyTetrahedron","Tetrahedron2InteractingMyTetrahedron");
+	
 	shared_ptr<BoundingVolumeMetaEngine> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeMetaEngine>(new BoundingVolumeMetaEngine);
-	boundingVolumeDispatcher->add("PolyhedralSweptSphere","AABB","PolyhedralSweptSphere2AABB");
+	boundingVolumeDispatcher->add("InteractingSphere","AABB","InteractingSphere2AABB");
+	boundingVolumeDispatcher->add("InteractingBox","AABB","InteractingBox2AABB");
+	boundingVolumeDispatcher->add("InteractingMyTetrahedron","AABB","InteractingMyTetrahedron2AABB");
 	boundingVolumeDispatcher->add("MetaInteractingGeometry","AABB","MetaInteractingGeometry2AABB");
 	
 	shared_ptr<GravityEngine> gravityCondition(new GravityEngine);
@@ -316,8 +334,10 @@ void TetrahedronsTest::createActors(shared_ptr<MetaBody>& rootBody)
 	
 	shared_ptr<CundallNonViscousForceDamping> actionForceDamping(new CundallNonViscousForceDamping);
 	actionForceDamping->damping = dampingForce;
+
 	shared_ptr<CundallNonViscousMomentumDamping> actionMomentumDamping(new CundallNonViscousMomentumDamping);
 	actionMomentumDamping->damping = dampingMomentum;
+
 	shared_ptr<PhysicalActionDamper> actionDampingDispatcher(new PhysicalActionDamper);
 	actionDampingDispatcher->add("Force","RigidBodyParameters","CundallNonViscousForceDamping",actionForceDamping);
 	actionDampingDispatcher->add("Momentum","RigidBodyParameters","CundallNonViscousMomentumDamping",actionMomentumDamping);
@@ -325,25 +345,38 @@ void TetrahedronsTest::createActors(shared_ptr<MetaBody>& rootBody)
 	shared_ptr<PhysicalActionApplier> applyActionDispatcher(new PhysicalActionApplier);
 	applyActionDispatcher->add("Force","RigidBodyParameters","NewtonsForceLaw");
 	applyActionDispatcher->add("Momentum","RigidBodyParameters","NewtonsMomentumLaw");
-	
+
+	// 
+	// they must be separate, because for each body both of those integrators must perform the necessary work.
+	// if they were in a single MetaEngine then LeapFrogOrientationIntegrator would "win" the competition
+	// because it is closer polymorphically to RigidBodyParameters (and
+	// ElasticBodyParameters derives directly from RigidBodyParameters). 
+	//
+	// And the bodies would ONLY rotate...
 	shared_ptr<PhysicalParametersMetaEngine> positionIntegrator(new PhysicalParametersMetaEngine);
 	positionIntegrator->add("ParticleParameters","LeapFrogPositionIntegrator");
+
+	// so another separate MetaEngine
 	shared_ptr<PhysicalParametersMetaEngine> orientationIntegrator(new PhysicalParametersMetaEngine);
 	orientationIntegrator->add("RigidBodyParameters","LeapFrogOrientationIntegrator");
+	//////////////////
  	
-
+/*
+ * updating timestep is not used in this simplified example. But you may decide to use it later.
+ *
 	shared_ptr<ElasticCriterionTimeStepper> sdecTimeStepper(new ElasticCriterionTimeStepper);
 	sdecTimeStepper->sdecGroupMask = 1;
 	sdecTimeStepper->timeStepUpdateInterval = timeStepUpdateInterval;
+*/
 
 	rootBody->engines.clear();
 	rootBody->engines.push_back(shared_ptr<Engine>(new PhysicalActionContainerReseter));
-	rootBody->engines.push_back(sdecTimeStepper);
+	//rootBody->engines.push_back(sdecTimeStepper);
 	rootBody->engines.push_back(boundingVolumeDispatcher);	
 	rootBody->engines.push_back(shared_ptr<Engine>(new PersistentSAPCollider));
-	rootBody->engines.push_back(swiftPolyhedronProximityModeler);
+	rootBody->engines.push_back(interactionGeometryDispatcher);
 	rootBody->engines.push_back(interactionPhysicsDispatcher);
-	rootBody->engines.push_back(shared_ptr<Engine>(new ElasticContactLaw));
+	rootBody->engines.push_back(shared_ptr<Engine>(new MyTetrahedronLaw));
 	rootBody->engines.push_back(gravityCondition);
 	rootBody->engines.push_back(actionDampingDispatcher);
 	rootBody->engines.push_back(applyActionDispatcher);
@@ -352,7 +385,8 @@ void TetrahedronsTest::createActors(shared_ptr<MetaBody>& rootBody)
 		rootBody->engines.push_back(orientationIntegrator);
 	
 	rootBody->initializers.clear();
-	rootBody->initializers.push_back(actionParameterInitializer);
+	rootBody->initializers.push_back(physicalActionInitializer);
+	rootBody->initializers.push_back(interactingGeometryDispatcher);
 	rootBody->initializers.push_back(boundingVolumeDispatcher);
 }
 
@@ -376,102 +410,17 @@ void TetrahedronsTest::positionRootBody(shared_ptr<MetaBody>& rootBody)
 	shared_ptr<AABB> aabb(new AABB);
 	aabb->diffuseColor			= Vector3r(0,0,1);
 	
-	rootBody->interactionGeometry		= dynamic_pointer_cast<InteractingGeometry>(set);	
+	rootBody->interactingGeometry		= dynamic_pointer_cast<InteractingGeometry>(set);	
 	rootBody->boundingVolume		= dynamic_pointer_cast<BoundingVolume>(aabb);
 	rootBody->physicalParameters 		= physics;
 }
 
 
-void TetrahedronsTest::loadTRI(shared_ptr<Tetrahedron>& tet, const string& fileName)
+void TetrahedronsTest::makeTet(shared_ptr<Tetrahedron>& tet, Real size)
 {
-	ifstream f(fileName.c_str());
-	
-	string type;
-	int nbFaces;
-	int nbVertices;
-	f >> type;
-	f >> nbVertices;
-	f >> nbFaces;
-	
-	Vector3r v;
-	vector<int> face;
-	vector<vector<int> > faces;
-	
-// 	for(int i=0 ; i<nbVertices ; i++)
-// 	{
-// 		f >> tet->v[0] >> v[1] >> v[2];
-// 		tet->vertices.push_back(v);	
-// 	}
-	f >> tet->v1[0] >> tet->v1[1] >> tet->v1[2];
-	f >> tet->v2[0] >> tet->v2[1] >> tet->v2[2];
-	f >> tet->v3[0] >> tet->v3[1] >> tet->v3[2];
-	f >> tet->v4[0] >> tet->v4[1] >> tet->v4[2];
-
-	face.resize(3);
-	faces.clear();
-	for(int i=0 ; i<nbFaces ; i++)
-	{
-		
-		f >> face[0] >> face[1] >> face[2];
-		//faces.push_back(face);	
-	}	
-	
-	f.close();
+	tet->v1=size*(Mathr::unitRandom()*0.7+1.0)*Vector3r(0,0,1);
+	tet->v2=size*(Mathr::unitRandom()*0.7+1.0)*Vector3r(0.73,-0.6,-0.33);
+	tet->v3=size*(Mathr::unitRandom()*0.7+1.0)*Vector3r(-0.88,-0.33,-0.33);
+	tet->v4=size*(Mathr::unitRandom()*0.7+1.0)*Vector3r(0.16,0.93,-0.33);
 }
 
-// /*
-// void Viewer::polyhedron2PolyhedralSS(const shared_ptr<PointCloud>& poly, shared_ptr<PolyhedralSS>& ss)
-// {
-// 	ss->vertices = poly->vertices;
-// 	ss->se3	     = poly->se3;
-// 	ss->radius = 0.2;
-// 	
-// 	shared_ptr<IFSPolyhedron> ifsp = dynamic_pointer_cast<IFSPolyhedron>(poly);
-// 	if (ifsp)
-// 	{
-// 		ss->faces    = ifsp->faces;
-// 		FIXME : not working yet !
-// 		for(unsigned int i=0 ; i<ss->faces.size() ; i++)
-// 		{	
-// 			Vector3r v1 = ss->vertices[ss->faces[i][0]];
-// 			Vector3r v2 = ss->vertices[ss->faces[i][1]];
-// 			Vector3r v3 = ss->vertices[ss->faces[i][2]];
-// 			Vector3r n = (v1-v2).unitCross(v1-v3);
-// 			ss->vertices[ss->faces[i][0]] -= n*ss->radius;
-// 			ss->vertices[ss->faces[i][1]] -= n*ss->radius;
-// 			ss->vertices[ss->faces[i][2]] -= n*ss->radius;
-// 			
-// 		}
-// 	}
-// 		
-// 	shared_ptr<Tetrahedron> tet = dynamic_pointer_cast<Tetrahedron>(poly);
-// 	if (tet)
-// 	{
-// 		ss->faces.clear();
-// 		
-// 		vector<int> face;
-// 		face.resize(3);
-// 		
-// 		face[0] = 0;
-// 		face[1] = 1;
-// 		face[2] = 2;
-// 		ss->faces.push_back(face);
-// 		
-// 		face[0] = 0;
-// 		face[1] = 2;
-// 		face[2] = 3;
-// 		ss->faces.push_back(face);
-// 		
-// 		face[0] = 0;
-// 		face[1] = 3;
-// 		face[2] = 1;
-// 		ss->faces.push_back(face);
-// 		
-// 		face[0] = 3;
-// 		face[1] = 2;
-// 		face[2] = 1;
-// 		ss->faces.push_back(face);
-// 	}
-// 	
-// 	ss->computeEdges();
-// }*/

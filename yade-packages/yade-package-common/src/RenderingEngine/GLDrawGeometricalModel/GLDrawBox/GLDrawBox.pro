@@ -23,3 +23,4 @@ CONFIG += debug \
 TEMPLATE = lib 
 HEADERS += GLDrawBox.hpp 
 SOURCES += GLDrawBox.cpp 
+QMAKE_RUN_CXX_IMP = $(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $(shell pwd)/$<

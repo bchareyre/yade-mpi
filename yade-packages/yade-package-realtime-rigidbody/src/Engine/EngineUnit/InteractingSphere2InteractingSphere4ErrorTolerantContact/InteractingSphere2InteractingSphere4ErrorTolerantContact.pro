@@ -27,3 +27,4 @@ CONFIG += debug \
 TEMPLATE = lib 
 HEADERS += InteractingSphere2InteractingSphere4ErrorTolerantContact.hpp 
 SOURCES += InteractingSphere2InteractingSphere4ErrorTolerantContact.cpp 
+QMAKE_RUN_CXX_IMP = $(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $(shell pwd)/$<

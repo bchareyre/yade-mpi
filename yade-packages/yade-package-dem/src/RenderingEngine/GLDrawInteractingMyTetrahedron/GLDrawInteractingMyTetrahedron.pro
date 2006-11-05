@@ -3,24 +3,26 @@ error( "YADE_QMAKE_PATH internal qmake variable is not set, you should run for e
 }
 
 
-LIBS += -lPolyhedralSweptSphere \
-        -lInteractingGeometryMetaEngine \
-        -lTetrahedron \
+LIBS += -lInteractingMyTetrahedron \
+        -lyade-lib-opengl \
         -rdynamic 
 INCLUDEPATH += $${YADE_QMAKE_PATH}/include/ \
-               ../../../DataClass/InteractingGeometry/PolyhedralSweptSphere 
-QMAKE_LIBDIR = ../../../../bin \
-               $${YADE_QMAKE_PATH}/lib/yade/yade-package-common/ \
+               ../../DataClass/InteractingGeometry/InteractingMyTetrahedron \
+               ../../RenderingEngine/OpenGLRenderingEngine 
+QMAKE_LIBDIR = ../../../bin \
                $${YADE_QMAKE_PATH}/lib/yade/yade-libs/ 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 
 QMAKE_CXXFLAGS_DEBUG += -lpthread \
                         -pthread 
-DESTDIR = ../../../../bin 
+DESTDIR = ../../../bin 
 CONFIG += debug \
           thread \
           warn_on \
           dll 
 TEMPLATE = lib 
-HEADERS += Tetrahedron2PolyhedralSweptSphere.hpp 
-SOURCES += Tetrahedron2PolyhedralSweptSphere.cpp 
+HEADERS += GLDrawInteractingMyTetrahedron.hpp 
+SOURCES += GLDrawInteractingMyTetrahedron.cpp 
+
+QMAKE_RUN_CXX_IMP = $(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $(shell pwd)/$<
+

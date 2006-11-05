@@ -25,3 +25,4 @@ CONFIG += debug \
 TEMPLATE = lib 
 HEADERS += FEMLaw.hpp 
 SOURCES += FEMLaw.cpp 
+QMAKE_RUN_CXX_IMP = $(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $(shell pwd)/$<

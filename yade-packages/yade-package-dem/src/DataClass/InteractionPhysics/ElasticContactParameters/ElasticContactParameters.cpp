@@ -21,6 +21,7 @@ ElasticContactParameters::~ElasticContactParameters()
 
 void ElasticContactParameters::registerAttributes()
 {
+	SimpleElasticInteraction::registerAttributes();
 	REGISTER_ATTRIBUTE(prevNormal);
 	REGISTER_ATTRIBUTE(shearForce);
 	REGISTER_ATTRIBUTE(initialKn);

@@ -1,6 +1,4 @@
 /*************************************************************************
-*  Copyright (C) 2004 by Olivier Galizzi                                 *
-*  olivier.galizzi@imag.fr                                               *
 *  Copyright (C) 2006 by Bruno Chareyre                                  *
 *  bruno.chareyre@hmg.inpg.fr                                            *
 *                                                                        *

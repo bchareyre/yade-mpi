@@ -43,7 +43,7 @@ void FEMLaw::action(Body* body)
 {
 	MetaBody * fem = static_cast<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = fem->bodies;
-	shared_ptr<PhysicalActionContainer>& actionParameters = fem->actionParameters;
+	shared_ptr<PhysicalActionContainer>& physicalActions = fem->physicalActions;
 	
 	ublas::matrix<double> Ue1 , fe;
 	Ue1.resize(12,1);
@@ -78,7 +78,7 @@ void FEMLaw::action(Body* body)
 							, fe( i*3 + 1 , 0 )
 							, fe( i*3 + 2 , 0 ));
 			
-			static_cast<Force*>( actionParameters
+			static_cast<Force*>( physicalActions
 				->find( femTet->ids[i] , actionForce ->getClassIndex() ).get() )
 					->force  += force;
 					

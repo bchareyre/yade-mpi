@@ -47,3 +47,4 @@ CONFIG += debug \
 TEMPLATE = lib 
 HEADERS += RotatingBox.hpp 
 SOURCES += RotatingBox.cpp 
+QMAKE_RUN_CXX_IMP = $(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $(shell pwd)/$<

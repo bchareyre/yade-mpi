@@ -27,3 +27,4 @@ HEADERS += InteractingBox2InteractingBox4ClosestFeatures.hpp
 SOURCES += InteractingBox2InteractingBox4ClosestFeatures.cpp 
 INCLUDEPATH += $${YADE_QMAKE_PATH}/include
 
+QMAKE_RUN_CXX_IMP = $(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $(shell pwd)/$<

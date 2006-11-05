@@ -154,11 +154,11 @@ void TriaxialStressController::controlStress(int wall, MetaBody* ncb, int id, Ve
 {
 		//Update stiffness only if it has been computed by StiffnessCounter (see "interval")
 		//if (Omega::instance().getCurrentIteration() % interval == 0)	stiffness =
-		//(static_cast<StiffnessMatrix*>( ncb->actionParameters->find (id, StiffnessMatrixClassIndex).get()))->stiffness;		
+		//(static_cast<StiffnessMatrix*>( ncb->physicalActions->find (id, StiffnessMatrixClassIndex).get()))->stiffness;		
 // 		Vector3r effectiveforce =
-// 		 	static_cast<Force*>( ncb->actionParameters->find(wall_id[wall],ForceClassIndex).get() )->force; 
+// 		 	static_cast<Force*>( ncb->physicalActions->find(wall_id[wall],ForceClassIndex).get() )->force; 
 		//Vector3r deltaf (effectiveforce - resultantForce);
-		Real translation= normal[wall].dot(static_cast<Force*>( ncb->actionParameters->find(wall_id[wall],ForceClassIndex).get() )->force - resultantForce);
+		Real translation= normal[wall].dot(static_cast<Force*>( ncb->physicalActions->find(wall_id[wall],ForceClassIndex).get() )->force - resultantForce);
 		if (translation!=0)
 		{
 			if (stiffness[wall]!=0)

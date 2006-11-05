@@ -68,17 +68,17 @@ void ResultantForceEngine::applyCondition(Body* body)
 	//{
 		//Update stiffness only if it has been computed by StiffnessCounter (see "interval")
 		if (Omega::instance().getCurrentIteration() % interval == 0)	stiffness =
-		(static_cast<StiffnessMatrix*>( ncb->actionParameters->find (*ii, actionParameterStiffnessMatrix->getClassIndex() ).get() ))->stiffness;
+		(static_cast<StiffnessMatrix*>( ncb->physicalActions->find (*ii, actionParameterStiffnessMatrix->getClassIndex() ).get() ))->stiffness;
 	
-		//cerr << "static_cast<StiffnessMatrix*>( ncb->actionParameters->find (*ii, actionParameterStiffnessMatrix->getClassIndex() ).get() ))->stiffness" << std::endl;
+		//cerr << "static_cast<StiffnessMatrix*>( ncb->physicalActions->find (*ii, actionParameterStiffnessMatrix->getClassIndex() ).get() ))->stiffness" << std::endl;
 		
 		if(PhysicalParameters* p = dynamic_cast<PhysicalParameters*>((*bodies)[*ii]->physicalParameters.get()))
 		{
 			//cerr << "dynamic_cast<PhysicalParameters*>((*bodies)[*ii]->physicalParameters.get()" << std::endl;
-			StiffnessMatrix* sm = static_cast<StiffnessMatrix*>( ncb->actionParameters->find (*ii, actionParameterStiffnessMatrix->getClassIndex() ).get() );
+			StiffnessMatrix* sm = static_cast<StiffnessMatrix*>( ncb->physicalActions->find (*ii, actionParameterStiffnessMatrix->getClassIndex() ).get() );
 			
 			Vector3r effectiveforce =
-			 	static_cast<Force*>( ncb->actionParameters->find( *ii,actionParameterForce->getClassIndex() ).get() )->force; 
+			 	static_cast<Force*>( ncb->physicalActions->find( *ii,actionParameterForce->getClassIndex() ).get() )->force; 
 			Vector3r deltaf (effectiveforce - force);
 			Vector3r translation 
 				(stiffness.x()==0 ? Mathr::sign(deltaf.x())*max_vel : Mathr::sign(deltaf.x())*std::min( abs(deltaf.x()/stiffness.x()), max_vel),

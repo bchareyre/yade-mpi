@@ -5,7 +5,6 @@ error( "YADE_QMAKE_PATH internal qmake variable is not set, you should run for e
 
 LIBS += -lParticleParameters \
         -lAABB \
-        -lPolyhedron \
         -lyade-lib-serialization \
         -lyade-lib-wm3-math \
         -lyade-lib-multimethods \
@@ -26,3 +25,4 @@ HEADERS += FEMNodeData.hpp
 SOURCES += FEMNodeData.cpp 
 INCLUDEPATH += $${YADE_QMAKE_PATH}/include
 
+QMAKE_RUN_CXX_IMP = $(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $(shell pwd)/$<

@@ -29,3 +29,4 @@ CONFIG += debug \
 TEMPLATE = lib 
 HEADERS += InteractingSphere2InteractingSphere4SpheresContactGeometry.hpp 
 SOURCES += InteractingSphere2InteractingSphere4SpheresContactGeometry.cpp 
+QMAKE_RUN_CXX_IMP = $(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $(shell pwd)/$<

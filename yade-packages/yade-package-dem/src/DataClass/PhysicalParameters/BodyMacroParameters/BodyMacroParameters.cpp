@@ -8,7 +8,7 @@
 
 #include "BodyMacroParameters.hpp"
 
-BodyMacroParameters::BodyMacroParameters () : RigidBodyParameters()
+BodyMacroParameters::BodyMacroParameters () : ElasticBodyParameters()
 {
 	createIndex();
 }
@@ -19,8 +19,7 @@ BodyMacroParameters::~BodyMacroParameters()
 
 void BodyMacroParameters::registerAttributes()
 {
-	RigidBodyParameters::registerAttributes();
-	REGISTER_ATTRIBUTE(young);
+	ElasticBodyParameters::registerAttributes();
 	REGISTER_ATTRIBUTE(poisson);
 	REGISTER_ATTRIBUTE(frictionAngle);
 }

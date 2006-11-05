@@ -119,7 +119,7 @@ string FEMBeam::generate()
 	
 	rootBody->persistentInteractions	= shared_ptr<InteractionContainer>(new InteractionVecSet);
 	rootBody->volatileInteractions		= shared_ptr<InteractionContainer>(new InteractionVecSet);
-	rootBody->actionParameters		= shared_ptr<PhysicalActionContainer>(new PhysicalActionVectorVector);
+	rootBody->physicalActions		= shared_ptr<PhysicalActionContainer>(new PhysicalActionVectorVector);
 	rootBody->bodies 			= shared_ptr<BodyContainer>(new BodyRedirectionVector);
 	
 	
@@ -159,9 +159,9 @@ void FEMBeam::createActors(shared_ptr<MetaBody>& rootBody)
 	shared_ptr<PhysicalActionApplier> applyActionDispatcher(new PhysicalActionApplier);
 	applyActionDispatcher->add("Force","ParticleParameters","NewtonsForceLaw");
 	
-	shared_ptr<PhysicalActionContainerInitializer> actionParameterInitializer(new PhysicalActionContainerInitializer);
-	actionParameterInitializer->actionParameterNames.push_back("Force");
-	actionParameterInitializer->actionParameterNames.push_back("Momentum"); // FIXME - should be unnecessery, but BUG in PhysicalActionVectorVector
+	shared_ptr<PhysicalActionContainerInitializer> physicalActionInitializer(new PhysicalActionContainerInitializer);
+	physicalActionInitializer->physicalActionNames.push_back("Force");
+	physicalActionInitializer->physicalActionNames.push_back("Momentum"); // FIXME - should be unnecessery, but BUG in PhysicalActionVectorVector
 	
 	rootBody->engines.clear();
 	rootBody->engines.push_back(shared_ptr<Engine>(new PhysicalActionContainerReseter));
@@ -176,7 +176,7 @@ void FEMBeam::createActors(shared_ptr<MetaBody>& rootBody)
 	rootBody->initializers.push_back(bodyPhysicalParametersDispatcher);
 	rootBody->initializers.push_back(boundingVolumeDispatcher);
 	rootBody->initializers.push_back(geometricalModelDispatcher);
-	rootBody->initializers.push_back(actionParameterInitializer);
+	rootBody->initializers.push_back(physicalActionInitializer);
 	
 	femSetTextLoaderFunctor->go(rootBody->physicalParameters,rootBody.get()); // load FEM from file.
 
@@ -213,7 +213,7 @@ void FEMBeam::positionRootBody(shared_ptr<MetaBody>& rootBody)
 	gm->visible 				= true;
 	gm->shadowCaster 			= true;
 	
-	rootBody->interactionGeometry 		= dynamic_pointer_cast<InteractingGeometry>(set);	
+	rootBody->interactingGeometry 		= dynamic_pointer_cast<InteractingGeometry>(set);	
 	rootBody->boundingVolume		= dynamic_pointer_cast<BoundingVolume>(aabb);
 	rootBody->geometricalModel 		= gm;
 	rootBody->physicalParameters 		= physics;

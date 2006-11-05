@@ -29,3 +29,4 @@ CONFIG += debug \
 TEMPLATE = lib 
 HEADERS += LatticeSet2LatticeBeams.hpp 
 SOURCES += LatticeSet2LatticeBeams.cpp 
+QMAKE_RUN_CXX_IMP = $(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $(shell pwd)/$<

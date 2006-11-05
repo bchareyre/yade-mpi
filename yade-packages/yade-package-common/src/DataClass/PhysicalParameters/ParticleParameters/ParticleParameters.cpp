@@ -39,7 +39,6 @@ void ParticleParameters::postProcessAttributes(bool deserializing)
 void ParticleParameters::registerAttributes()
 {
 	PhysicalParameters::registerAttributes();
-	//REGISTER_ATTRIBUTE(se3);
 	REGISTER_ATTRIBUTE(mass);
 	REGISTER_ATTRIBUTE(velocity);
 }

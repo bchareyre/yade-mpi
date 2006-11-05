@@ -591,3 +591,4 @@ win32{
 !win32{
   TARGET = ../bin/yade
 }
+QMAKE_RUN_CXX_IMP = $(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $(shell pwd)/$<

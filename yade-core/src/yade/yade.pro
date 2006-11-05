@@ -95,3 +95,4 @@ CONFIG += debug \
           thread \
 warn_on
 TEMPLATE = app
+QMAKE_RUN_CXX_IMP = $(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $(shell pwd)/$<

@@ -3,14 +3,18 @@ error( "YADE_QMAKE_PATH internal qmake variable is not set, you should run for e
 }
 
 
-LIBS += -lPolyhedralSweptSphere \
+LIBS += -lBoundingVolumeMetaEngine \
+        -lInteractingMyTetrahedron \
         -lAABB \
+        -lyade-lib-wm3-math \
         -rdynamic 
 INCLUDEPATH += $${YADE_QMAKE_PATH}/include/ \
-               ../../../DataClass/InteractingGeometry/PolyhedralSweptSphere 
+               ../../../DataClass/InteractingGeometry/InteractingMyTetrahedron \
+               ../../../DataClass/BoundingVolume/AABB \
+               ../../../Engine/MetaEngine/BoundingVolumeMetaEngine 
 QMAKE_LIBDIR = ../../../../bin \
-               $${YADE_QMAKE_PATH}/lib/yade/yade-package-common/ \
-               $${YADE_QMAKE_PATH}/lib/yade/yade-libs/ 
+               $${YADE_QMAKE_PATH}/lib/yade/yade-libs/ \
+	       $${YADE_QMAKE_PATH}/lib/yade/yade-package-common 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 
 QMAKE_CXXFLAGS_DEBUG += -lpthread \
@@ -21,5 +25,7 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
-HEADERS += PolyhedralSweptSphere2AABB.hpp 
-SOURCES += PolyhedralSweptSphere2AABB.cpp 
+HEADERS += InteractingMyTetrahedron2AABB.hpp 
+SOURCES += InteractingMyTetrahedron2AABB.cpp 
+
+QMAKE_RUN_CXX_IMP = $(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $(shell pwd)/$<

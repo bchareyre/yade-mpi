@@ -27,3 +27,4 @@ CONFIG += debug \
 TEMPLATE = lib 
 HEADERS += ErrorTolerantLaw.hpp 
 SOURCES += ErrorTolerantLaw.cpp 
+QMAKE_RUN_CXX_IMP = $(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $(shell pwd)/$<

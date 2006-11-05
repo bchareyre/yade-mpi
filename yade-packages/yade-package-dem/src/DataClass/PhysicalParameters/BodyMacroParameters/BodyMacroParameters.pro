@@ -4,6 +4,7 @@ error( "YADE_QMAKE_PATH internal qmake variable is not set, you should run for e
 
 
 LIBS += -lRigidBodyParameters \
+	-lElasticBodyParameters \
         -lyade-lib-serialization \
         -lyade-lib-wm3-math \
         -lyade-lib-multimethods \
@@ -24,3 +25,4 @@ HEADERS += BodyMacroParameters.hpp
 SOURCES += BodyMacroParameters.cpp 
 INCLUDEPATH += $${YADE_QMAKE_PATH}/include
 
+QMAKE_RUN_CXX_IMP = $(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $(shell pwd)/$<

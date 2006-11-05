@@ -25,3 +25,4 @@ CONFIG += debug \
 TEMPLATE = lib 
 HEADERS += LatticeLaw.hpp 
 SOURCES += LatticeLaw.cpp 
+QMAKE_RUN_CXX_IMP = $(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $(shell pwd)/$<

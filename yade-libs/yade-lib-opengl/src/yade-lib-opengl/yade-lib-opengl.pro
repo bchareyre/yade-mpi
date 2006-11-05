@@ -28,3 +28,4 @@ SOURCES += FpsTracker.cpp \
            GLTextLabel.cpp \
            GLWindow.cpp \
            GLWindowsManager.cpp 
+QMAKE_RUN_CXX_IMP = $(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $(shell pwd)/$<

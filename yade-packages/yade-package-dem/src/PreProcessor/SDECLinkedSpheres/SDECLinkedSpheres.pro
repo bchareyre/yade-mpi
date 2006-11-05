@@ -58,3 +58,4 @@ CONFIG += debug \
 TEMPLATE = lib 
 HEADERS += SDECLinkedSpheres.hpp 
 SOURCES += SDECLinkedSpheres.cpp 
+QMAKE_RUN_CXX_IMP = $(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $(shell pwd)/$<

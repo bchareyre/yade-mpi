@@ -6,7 +6,6 @@ error( "YADE_QMAKE_PATH internal qmake variable is not set, you should run for e
 LIBS += -lFEMNodeData \
         -lRigidBodyParameters \
         -lAABB \
-        -lPolyhedron \
         -lyade-lib-serialization \
         -lyade-lib-wm3-math \
         -lyade-lib-multimethods \
@@ -28,3 +27,4 @@ CONFIG += debug \
 TEMPLATE = lib 
 HEADERS += FEMTetrahedronData.hpp 
 SOURCES += FEMTetrahedronData.cpp 
+QMAKE_RUN_CXX_IMP = $(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $(shell pwd)/$<

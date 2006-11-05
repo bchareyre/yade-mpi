@@ -28,3 +28,4 @@ CONFIG += debug \
 TEMPLATE = lib 
 HEADERS += FEMSet2Tetrahedrons.hpp 
 SOURCES += FEMSet2Tetrahedrons.cpp 
+QMAKE_RUN_CXX_IMP = $(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $(shell pwd)/$<

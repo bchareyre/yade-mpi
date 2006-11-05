@@ -124,7 +124,7 @@ Real TriaxialCompressionEngine::ComputeUnbalancedForce(Body * body, bool maxUnba
                 Real f;
                 for(  ; bi!=biEnd ; ++bi ) {
                         if ((*bi)->isDynamic) {
-                                f= (static_cast<Force*>   ( ncb->actionParameters->find( (*bi)->getId() , actionForceIndex).get() )->force).length();
+                                f= (static_cast<Force*>   ( ncb->physicalActions->find( (*bi)->getId() , actionForceIndex).get() )->force).length();
                                 MeanUnbalanced += f;
                                 if (f!=0) ++nBodies;
                         }
@@ -137,7 +137,7 @@ Real TriaxialCompressionEngine::ComputeUnbalancedForce(Body * body, bool maxUnba
                 BodyContainer::iterator biEnd = bodies->end();
                 for(  ; bi!=biEnd ; ++bi ) {
                         if ((*bi)->isDynamic) {
-                                MaxUnbalanced = std::max((static_cast<Force*>   ( ncb->actionParameters->find( (*bi)->getId() , actionForceIndex).get() )->force).length(), MaxUnbalanced);
+                                MaxUnbalanced = std::max((static_cast<Force*>   ( ncb->physicalActions->find( (*bi)->getId() , actionForceIndex).get() )->force).length(), MaxUnbalanced);
                         }
                 }
                 return MaxUnbalanced/MeanForce;

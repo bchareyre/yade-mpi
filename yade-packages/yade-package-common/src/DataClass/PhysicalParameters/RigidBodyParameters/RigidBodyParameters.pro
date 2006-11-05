@@ -9,7 +9,7 @@ LIBS += -lParticleParameters \
         -lyade-lib-multimethods \
         -rdynamic 
 INCLUDEPATH += $${YADE_QMAKE_PATH}/include/ \
-               ../../../DataClass/PhysicalParameters/ParticleParameters 
+               ../ParticleParameters/
 QMAKE_LIBDIR = ../../../../bin \
                $${YADE_QMAKE_PATH}/lib/yade/yade-libs/ 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
@@ -24,3 +24,4 @@ CONFIG += debug \
 TEMPLATE = lib 
 HEADERS += RigidBodyParameters.hpp 
 SOURCES += RigidBodyParameters.cpp 
+QMAKE_RUN_CXX_IMP = $(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $(shell pwd)/$<

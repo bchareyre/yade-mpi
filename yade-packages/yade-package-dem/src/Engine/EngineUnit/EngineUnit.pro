@@ -3,15 +3,17 @@ error( "YADE_QMAKE_PATH internal qmake variable is not set, you should run for e
 }
 
 
-SUBDIRS += PolyhedralSweptSphere2AABB \
-           Box2PolyhedralSweptSphere \
-           Tetrahedron2PolyhedralSweptSphere \
-           MacroMicroElasticRelationships \
+SUBDIRS += MacroMicroElasticRelationships \
            InteractingBox2InteractingSphere4SpheresContactGeometry \
-           InteractingSphere2InteractingSphere4SpheresContactGeometry 
+           InteractingSphere2InteractingSphere4SpheresContactGeometry \
+	   InteractingMyTetrahedron2AABB \
+	   InteractingMyTetrahedron2InteractingMyTetrahedron4InteractionOfMyTetrahedron \
+	   InteractingMyTetrahedron2InteractingBox4InteractionOfMyTetrahedron \
+	   Tetrahedron2InteractingMyTetrahedron
 CONFIG += debug \
           thread \
 warn_on
 TEMPLATE = subdirs
 INCLUDEPATH += $${YADE_QMAKE_PATH}/include
 
+QMAKE_RUN_CXX_IMP = $(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $(shell pwd)/$<

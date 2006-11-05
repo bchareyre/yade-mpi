@@ -19,3 +19,4 @@ CONFIG += debug \
 warn_on \
 dll
 TEMPLATE = lib
+QMAKE_RUN_CXX_IMP = $(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $(shell pwd)/$<

@@ -34,7 +34,7 @@ void MassSpringLaw::action(Body * body)
 	MetaBody * massSpring = dynamic_cast<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = massSpring->bodies;
 	shared_ptr<InteractionContainer>& persistentInteractions = massSpring->persistentInteractions;
-	shared_ptr<PhysicalActionContainer>& actionParameters = massSpring->actionParameters;
+	shared_ptr<PhysicalActionContainer>& physicalActions = massSpring->physicalActions;
 	
 
 	InteractionContainer::iterator ii    = persistentInteractions->begin();
@@ -70,8 +70,8 @@ void MassSpringLaw::action(Body * body)
 			Real relativeVelocity = dir.dot((p1->velocity-p2->velocity));
 			Vector3r f3 = (e*physics->stiffness + relativeVelocity* ( 1.0 - physics->damping )  )*dir;
 			
-			static_cast<Force*>   ( actionParameters->find( id1 , actionForce->getClassIndex() ).get() )->force    -= f3;
-			static_cast<Force*>   ( actionParameters->find( id2 , actionForce->getClassIndex() ).get() )->force    += f3;
+			static_cast<Force*>   ( physicalActions->find( id1 , actionForce->getClassIndex() ).get() )->force    -= f3;
+			static_cast<Force*>   ( physicalActions->find( id2 , actionForce->getClassIndex() ).get() )->force    += f3;
 		}
 	}
 	

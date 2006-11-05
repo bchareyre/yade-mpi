@@ -31,7 +31,7 @@ class PhysicalActionVectorVector : public PhysicalActionContainer
 	// in this two-dimensional table:
 	// 	- first  dimension is Body->getId() number
 	//	- second dimension is PhysicalAction->getClassIndex() number
-		vector< vector< shared_ptr<PhysicalAction> > > actionParameters;
+		vector< vector< shared_ptr<PhysicalAction> > > physicalActions;
 			vector< shared_ptr<PhysicalAction> >   actionTypesResetted;
 		vector< bool > usedIds;
 	

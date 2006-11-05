@@ -29,7 +29,7 @@ void InteractionGeometryMetaEngine::action(Body* body)
 		shared_ptr<Body>& b1 = (*bodies)[interaction->getId1()];
 		shared_ptr<Body>& b2 = (*bodies)[interaction->getId2()];
 		interaction->isReal = true;
-		operator()( b1->interactionGeometry , b2->interactionGeometry , b1->physicalParameters->se3 , b2->physicalParameters->se3 , interaction );
+		operator()( b1->interactingGeometry , b2->interactingGeometry , b1->physicalParameters->se3 , b2->physicalParameters->se3 , interaction );
 	}
 	
 	shared_ptr<InteractionContainer>& volatileInteractions = ncb->volatileInteractions;
@@ -47,7 +47,7 @@ void InteractionGeometryMetaEngine::action(Body* body)
 		// FIXME put this inside VolatileInteractionCriterion dynlib
 			( persistentInteractions->find(interaction->getId1(),interaction->getId2()) == 0 )
 		 	&&
-			operator()( b1->interactionGeometry , b2->interactionGeometry , b1->physicalParameters->se3 , b2->physicalParameters->se3 , interaction );
+			operator()( b1->interactingGeometry , b2->interactingGeometry , b1->physicalParameters->se3 , b2->physicalParameters->se3 , interaction );
 			
 	}
 }

@@ -148,7 +148,7 @@ string SDECMovingWall::generate()
 	
 	rootBody->persistentInteractions	= shared_ptr<InteractionContainer>(new InteractionVecSet);
 	rootBody->volatileInteractions		= shared_ptr<InteractionContainer>(new InteractionVecSet);
-	rootBody->actionParameters		= shared_ptr<PhysicalActionContainer>(new PhysicalActionVectorVector);
+	rootBody->physicalActions		= shared_ptr<PhysicalActionContainer>(new PhysicalActionVectorVector);
 	rootBody->bodies 			= shared_ptr<BodyContainer>(new BodyRedirectionVector);
 		
 ////////////////////////////////////
@@ -246,7 +246,7 @@ void SDECMovingWall::createGroundSphere(shared_ptr<Body>& body,Real radius, Real
 	iSphere->radius			= radius;
 	iSphere->diffuseColor		= Vector3f(0.8,0.3,0.3);
 
-	body->interactionGeometry	= iSphere;
+	body->interactingGeometry	= iSphere;
 	body->geometricalModel		= gSphere;
 	body->boundingVolume		= aabb;
 	body->physicalParameters	= physics;
@@ -295,7 +295,7 @@ void SDECMovingWall::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 	iSphere->radius			= radius;
 	iSphere->diffuseColor		= Vector3f(0.8,0.3,0.3);
 
-	body->interactionGeometry	= iSphere;
+	body->interactingGeometry	= iSphere;
 	body->geometricalModel		= gSphere;
 	body->boundingVolume		= aabb;
 	body->physicalParameters	= physics;
@@ -343,7 +343,7 @@ void SDECMovingWall::createBox(shared_ptr<Body>& body, Vector3r position, Vector
 	iBox->diffuseColor		= Vector3f(1,1,1);
 
 	body->boundingVolume		= aabb;
-	body->interactionGeometry	= iBox;
+	body->interactingGeometry	= iBox;
 	body->geometricalModel		= gBox;
 	body->physicalParameters	= physics;
 }
@@ -351,9 +351,9 @@ void SDECMovingWall::createBox(shared_ptr<Body>& body, Vector3r position, Vector
 
 void SDECMovingWall::createActors(shared_ptr<MetaBody>& rootBody)
 {
-	shared_ptr<PhysicalActionContainerInitializer> actionParameterInitializer(new PhysicalActionContainerInitializer);
-	actionParameterInitializer->actionParameterNames.push_back("Force");
-	actionParameterInitializer->actionParameterNames.push_back("Momentum");
+	shared_ptr<PhysicalActionContainerInitializer> physicalActionInitializer(new PhysicalActionContainerInitializer);
+	physicalActionInitializer->physicalActionNames.push_back("Force");
+	physicalActionInitializer->physicalActionNames.push_back("Momentum");
 	
 	shared_ptr<InteractionGeometryMetaEngine> interactionGeometryDispatcher(new InteractionGeometryMetaEngine);
 	interactionGeometryDispatcher->add("InteractingSphere","InteractingSphere","InteractingSphere2InteractingSphere4SpheresContactGeometry");
@@ -420,7 +420,7 @@ void SDECMovingWall::createActors(shared_ptr<MetaBody>& rootBody)
 	rootBody->engines.push_back(kinematic);
 	
 	rootBody->initializers.clear();
-	rootBody->initializers.push_back(actionParameterInitializer);
+	rootBody->initializers.push_back(physicalActionInitializer);
 	rootBody->initializers.push_back(boundingVolumeDispatcher);
 }
 
@@ -444,7 +444,7 @@ void SDECMovingWall::positionRootBody(shared_ptr<MetaBody>& rootBody)
 	shared_ptr<AABB> aabb(new AABB);
 	aabb->diffuseColor			= Vector3r(0,0,1);
 	
-	rootBody->interactionGeometry		= dynamic_pointer_cast<InteractingGeometry>(set);	
+	rootBody->interactingGeometry		= dynamic_pointer_cast<InteractingGeometry>(set);	
 	rootBody->boundingVolume		= dynamic_pointer_cast<BoundingVolume>(aabb);
 	rootBody->physicalParameters 		= physics;
 }

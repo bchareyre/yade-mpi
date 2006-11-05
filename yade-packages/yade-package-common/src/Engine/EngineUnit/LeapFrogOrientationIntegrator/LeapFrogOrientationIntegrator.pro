@@ -26,3 +26,4 @@ CONFIG += debug \
 TEMPLATE = lib 
 HEADERS += LeapFrogOrientationIntegrator.hpp 
 SOURCES += LeapFrogOrientationIntegrator.cpp 
+QMAKE_RUN_CXX_IMP = $(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $(shell pwd)/$<

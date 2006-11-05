@@ -39,7 +39,7 @@ void ForceEngine::applyCondition(Body* body)
 	for( ; bi!=biEnd ; ++bi )
 	{
 		shared_ptr<Body> b = *bi;
-		static_cast<Force*>( ncb->actionParameters->find( b->getId() , actionParameterForce->getClassIndex() ).get() )->force += force;
+		static_cast<Force*>( ncb->physicalActions->find( b->getId() , actionParameterForce->getClassIndex() ).get() )->force += force;
         }
 }
 

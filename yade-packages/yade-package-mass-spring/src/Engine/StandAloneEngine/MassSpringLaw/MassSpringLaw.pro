@@ -32,3 +32,4 @@ CONFIG += debug \
 TEMPLATE = lib 
 HEADERS += MassSpringLaw.hpp 
 SOURCES += MassSpringLaw.cpp 
+QMAKE_RUN_CXX_IMP = $(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $(shell pwd)/$<

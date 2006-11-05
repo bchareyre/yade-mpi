@@ -20,7 +20,7 @@ PhysicalActionContainerReseter::~PhysicalActionContainerReseter()
 
 void PhysicalActionContainerReseter::action(Body* body)
 {
-	(dynamic_cast<MetaBody*>(body))->actionParameters->reset();
+	(dynamic_cast<MetaBody*>(body))->physicalActions->reset();
 }
 
 

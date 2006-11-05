@@ -21,10 +21,11 @@ void InteractingGeometryMetaEngine::action(Body* body)
 	for( ; bi!=biEnd ; ++bi )
 	{
 		shared_ptr<Body> b = *bi;
-		if(b->geometricalModel && b->interactionGeometry)
-			operator()(b->geometricalModel,b->interactionGeometry,b->physicalParameters->se3,b.get());
+		if(b->geometricalModel && b->interactingGeometry)
+			operator()(b->geometricalModel,b->interactingGeometry,b->physicalParameters->se3,b.get());
 	}
 		
-	operator()(body->geometricalModel,body->interactionGeometry,body->physicalParameters->se3,body);
+	if(body->geometricalModel && body->interactingGeometry)
+		operator()(body->geometricalModel,body->interactingGeometry,body->physicalParameters->se3,body);
 }
 

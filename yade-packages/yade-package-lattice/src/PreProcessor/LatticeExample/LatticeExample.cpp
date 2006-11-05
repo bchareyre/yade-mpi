@@ -235,7 +235,7 @@ string LatticeExample::generate()
 	
 	rootBody->persistentInteractions	= shared_ptr<InteractionContainer>(new InteractionVecSet);
 	rootBody->volatileInteractions		= shared_ptr<InteractionContainer>(new InteractionVecSet);
-	rootBody->actionParameters		= shared_ptr<PhysicalActionContainer>(new PhysicalActionVectorVector);
+	rootBody->physicalActions		= shared_ptr<PhysicalActionContainer>(new PhysicalActionVectorVector);
 	rootBody->bodies 			= shared_ptr<BodyContainer>(new BodyRedirectionVector);
 
 	
@@ -720,7 +720,7 @@ void LatticeExample::positionRootBody(shared_ptr<MetaBody>& rootBody)
 	gm->visible 			= true;
 	gm->shadowCaster 		= true;
 	
-	rootBody->interactionGeometry	= dynamic_pointer_cast<InteractingGeometry>(set);	
+	rootBody->interactingGeometry	= dynamic_pointer_cast<InteractingGeometry>(set);	
 	rootBody->boundingVolume	= dynamic_pointer_cast<BoundingVolume>(aabb);
 	rootBody->geometricalModel 	= gm;
 	rootBody->physicalParameters 	= physics;

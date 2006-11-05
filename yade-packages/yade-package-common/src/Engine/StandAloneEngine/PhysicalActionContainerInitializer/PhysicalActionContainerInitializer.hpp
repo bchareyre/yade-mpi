@@ -19,7 +19,7 @@ class Body;
 class PhysicalActionContainerInitializer : public StandAloneEngine
 {
 	public :
-		std::vector<std::string> actionParameterNames;
+		std::vector<std::string> physicalActionNames;
 	
 		PhysicalActionContainerInitializer();
 		virtual ~PhysicalActionContainerInitializer();

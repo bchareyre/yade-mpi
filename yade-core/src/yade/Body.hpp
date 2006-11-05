@@ -53,7 +53,7 @@ class Body : public Serializable
 		/// the 'perfect' representation of body's geometry: Polyhedron, Box
 		shared_ptr<GeometricalModel>	geometricalModel;
 		/// description of how this body interacts with others, like: SphereHierarchy, InteractingBox
-		shared_ptr<InteractingGeometry> interactionGeometry;
+		shared_ptr<InteractingGeometry> interactingGeometry;
 		/// BoundingVolume is used for quick detection of potential interactions, that can be: AABB, K-Dop
 		shared_ptr<BoundingVolume>	boundingVolume;
 	

@@ -28,7 +28,7 @@ PhysicalActionVectorVector::~PhysicalActionVectorVector()
 
 void PhysicalActionVectorVector::clear()
 {
-	actionParameters.clear();
+	physicalActions.clear();
 	usedIds.clear();
 }
 
@@ -36,8 +36,8 @@ void PhysicalActionVectorVector::clear()
 // doesn't not delete all, just resets data
 void PhysicalActionVectorVector::reset()
 {
-	vector< vector< shared_ptr<PhysicalAction> > >::iterator vvi    = actionParameters.begin();
-	vector< vector< shared_ptr<PhysicalAction> > >::iterator vviEnd = actionParameters.end();
+	vector< vector< shared_ptr<PhysicalAction> > >::iterator vvi    = physicalActions.begin();
+	vector< vector< shared_ptr<PhysicalAction> > >::iterator vviEnd = physicalActions.end();
 	for( ; vvi != vviEnd ; ++vvi )
 	{
 		vector< shared_ptr<PhysicalAction> >::iterator vi    = (*vvi).begin();
@@ -51,7 +51,7 @@ void PhysicalActionVectorVector::reset()
 
 unsigned int PhysicalActionVectorVector::size()
 {
-	return actionParameters.size();
+	return physicalActions.size();
 }
 
 
@@ -76,23 +76,23 @@ void PhysicalActionVectorVector::prepare(std::vector<shared_ptr<PhysicalAction> 
 // should be always succesfull. if it is not - you forgot to call prepare()
 shared_ptr<PhysicalAction>& PhysicalActionVectorVector::find(unsigned int id , int actionIndex )
 {
-	if( actionParameters.size() <= id ) // this is very rarely executed, only at beginning.
+	if( physicalActions.size() <= id ) // this is very rarely executed, only at beginning.
 	// somebody is accesing out of bounds, make sure he will find, what he needs - a resetted PhysicalAction of his type
 	{
-		unsigned int oldSize = actionParameters.size();
+		unsigned int oldSize = physicalActions.size();
 		unsigned int newSize = id+1;
 		usedIds.resize(newSize,false);
-		actionParameters.resize(newSize);
+		physicalActions.resize(newSize);
 		for(unsigned int i = oldSize ; i < newSize ; ++i )
 		{
 			unsigned int actionTypesSize = actionTypesResetted.size();
-			actionParameters[i].resize(actionTypesSize);
+			physicalActions[i].resize(actionTypesSize);
 			for( unsigned int j = 0 ; j < actionTypesSize ; ++j )
-				actionParameters[i][j] = actionTypesResetted[j]->clone();
+				physicalActions[i][j] = actionTypesResetted[j]->clone();
 		}
 	}
 	usedIds[id] = true;
-	return actionParameters[id][actionIndex];
+	return physicalActions[id][actionIndex];
 }
 
 
@@ -101,8 +101,8 @@ PhysicalActionContainer::iterator PhysicalActionVectorVector::begin()
 	shared_ptr<PhysicalActionVectorVectorIterator> it(new PhysicalActionVectorVectorIterator());
 	it->currentIndex = 0;
 	it->usedIds	 = &usedIds;
-	it->vvi		 = actionParameters.begin();
-	it->vviEnd	 = actionParameters.end();
+	it->vvi		 = physicalActions.begin();
+	it->vviEnd	 = physicalActions.end();
 	while(it->vvi!=it->vviEnd && !usedIds[it->currentIndex])
 	{
 		++(it->currentIndex);
@@ -121,9 +121,9 @@ PhysicalActionContainer::iterator PhysicalActionVectorVector::begin()
 PhysicalActionContainer::iterator PhysicalActionVectorVector::end()
 {
 	shared_ptr<PhysicalActionVectorVectorIterator> it(new PhysicalActionVectorVectorIterator());
-	it->currentIndex = actionParameters.size();
-	it->vvi		 = actionParameters.end();
-	it->vviEnd	 = actionParameters.end();
+	it->currentIndex = physicalActions.size();
+	it->vvi		 = physicalActions.end();
+	it->vviEnd	 = physicalActions.end();
 	it->vi		 = (*it->vvi).end();
 	it->viEnd	 = (*it->vvi).end();
 

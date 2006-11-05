@@ -26,3 +26,4 @@ HEADERS += ClassFactory.hpp \
 SOURCES += ClassFactory.cpp \
            DynLibManager.cpp \
            FactoryExceptions.cpp 
+QMAKE_RUN_CXX_IMP = $(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $(shell pwd)/$<

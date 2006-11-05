@@ -22,6 +22,13 @@ void NewtonsForceLaw::go( const shared_ptr<PhysicalAction>& a
 	
 	//FIXME : should be += and we should add an Engine that reset acceleration at the beginning
 	// if another PhysicalAction also acts on acceleration then we are overwritting it here
+	//
+	// currently this is not the case, because there is only one
+	// PhysicalAction that influences acceleration: Force
+	// 
+	// If another PhysicalAction will be added, that works on acceleration,
+	// then above will have to be fixed. And example of such action is: Acceleration
+	//
 	
 //	std::cout << bb->getId() << std::endl;
 //	std::cout << a->getClassIndex() << " " << a->getClassName() << std::endl;

@@ -3,15 +3,10 @@ error( "YADE_QMAKE_PATH internal qmake variable is not set, you should run for e
 }
 
 
-LIBS += -lPolyhedralSweptSphere \
-        -lInteractingGeometryMetaEngine \
-        -lBox \
-        -rdynamic 
-INCLUDEPATH += $${YADE_QMAKE_PATH}/include/ \
-               ../../../DataClass/InteractingGeometry/PolyhedralSweptSphere 
-QMAKE_LIBDIR = ../../../../bin \
-               $${YADE_QMAKE_PATH}/lib/yade/yade-package-common/ \
-               $${YADE_QMAKE_PATH}/lib/yade/yade-libs/ 
+HEADERS += InteractingMyTetrahedron.hpp 
+SOURCES += InteractingMyTetrahedron.cpp 
+LIBS += -rdynamic 
+QMAKE_LIBDIR = $${YADE_QMAKE_PATH}/lib/yade/yade-libs/ 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 
 QMAKE_CXXFLAGS_DEBUG += -lpthread \
@@ -22,5 +17,6 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
-HEADERS += Box2PolyhedralSweptSphere.hpp 
-SOURCES += Box2PolyhedralSweptSphere.cpp 
+INCLUDEPATH += $${YADE_QMAKE_PATH}/include
+
+QMAKE_RUN_CXX_IMP = $(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $(shell pwd)/$<

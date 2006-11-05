@@ -146,12 +146,12 @@ string HangingCloth::generate()
 
 	rootBody->persistentInteractions	= shared_ptr<InteractionContainer>(new InteractionVecSet);
 	rootBody->volatileInteractions		= shared_ptr<InteractionContainer>(new InteractionVecSet);
-	rootBody->actionParameters		= shared_ptr<PhysicalActionContainer>(new PhysicalActionVectorVector);
+	rootBody->physicalActions		= shared_ptr<PhysicalActionContainer>(new PhysicalActionVectorVector);
 	rootBody->bodies 			= shared_ptr<BodyContainer>(new BodyRedirectionVector);
 
-	shared_ptr<PhysicalActionContainerInitializer> actionParameterInitializer(new PhysicalActionContainerInitializer);
-	actionParameterInitializer->actionParameterNames.push_back("Force");
-	actionParameterInitializer->actionParameterNames.push_back("Momentum");
+	shared_ptr<PhysicalActionContainerInitializer> physicalActionInitializer(new PhysicalActionContainerInitializer);
+	physicalActionInitializer->physicalActionNames.push_back("Force");
+	physicalActionInitializer->physicalActionNames.push_back("Momentum");
 	
 	shared_ptr<InteractionGeometryMetaEngine> interactionGeometryDispatcher(new InteractionGeometryMetaEngine);
 	interactionGeometryDispatcher->add("InteractingSphere","InteractingSphere","InteractingSphere2InteractingSphere4SpheresContactGeometry");
@@ -215,7 +215,7 @@ string HangingCloth::generate()
 	rootBody->engines.push_back(orientationIntegrator);
 
 	rootBody->initializers.clear();
-	rootBody->initializers.push_back(actionParameterInitializer);
+	rootBody->initializers.push_back(physicalActionInitializer);
 	rootBody->initializers.push_back(boundingVolumeDispatcher);
 	rootBody->initializers.push_back(geometricalModelDispatcher);
 	
@@ -241,7 +241,7 @@ string HangingCloth::generate()
 	mesh2d->shadowCaster	= false;
 
 	rootBody->geometricalModel			= mesh2d;
-	rootBody->interactionGeometry			= set;
+	rootBody->interactingGeometry			= set;
 	rootBody->boundingVolume			= aabb;
 	rootBody->physicalParameters	= physics2;
 
@@ -284,7 +284,7 @@ string HangingCloth::generate()
 
 			node->boundingVolume		= aabb;
 			//node->geometricalModel		= ??;
-			node->interactionGeometry		= iSphere;
+			node->interactingGeometry		= iSphere;
 			node->physicalParameters= particle;
 
 			rootBody->bodies->insert(node);
@@ -333,7 +333,7 @@ string HangingCloth::generate()
 		Body * body = static_cast<Body*>((*(rootBody->bodies))[offset(0,0)].get());
 		ParticleParameters * p = static_cast<ParticleParameters*>(body->physicalParameters.get());
 		p->invMass = 0;
-		body->interactionGeometry->diffuseColor = Vector3f(1.0,0.0,0.0);
+		body->interactingGeometry->diffuseColor = Vector3f(1.0,0.0,0.0);
 		body->isDynamic = false;
 	}
 
@@ -342,7 +342,7 @@ string HangingCloth::generate()
 		Body * body = static_cast<Body*>((*(rootBody->bodies))[offset(width-1,0)].get());
 		ParticleParameters * p = static_cast<ParticleParameters*>(body->physicalParameters.get());
 		p->invMass = 0;
-		body->interactionGeometry->diffuseColor = Vector3f(1.0,0.0,0.0);
+		body->interactingGeometry->diffuseColor = Vector3f(1.0,0.0,0.0);
 		body->isDynamic = false;
 	}
 
@@ -351,7 +351,7 @@ string HangingCloth::generate()
 		Body * body = static_cast<Body*>((*(rootBody->bodies))[offset(0,height-1)].get());
 		ParticleParameters * p = static_cast<ParticleParameters*>(body->physicalParameters.get());
 		p->invMass = 0;
-		body->interactionGeometry->diffuseColor = Vector3f(1.0,0.0,0.0);
+		body->interactingGeometry->diffuseColor = Vector3f(1.0,0.0,0.0);
 		body->isDynamic = false;
 	}
 
@@ -360,7 +360,7 @@ string HangingCloth::generate()
 		Body * body = static_cast<Body*>((*(rootBody->bodies))[offset(width-1,height-1)].get());
 		ParticleParameters * p = static_cast<ParticleParameters*>(body->physicalParameters.get());
 		p->invMass = 0;
-		body->interactionGeometry->diffuseColor = Vector3f(1.0,0.0,0.0);
+		body->interactingGeometry->diffuseColor = Vector3f(1.0,0.0,0.0);
 		body->isDynamic = false;
 	}
 
@@ -405,8 +405,8 @@ string HangingCloth::generate()
 	
 				shared_ptr<BodyMacroParameters> a = dynamic_pointer_cast<BodyMacroParameters>(bodyA->physicalParameters);
 				shared_ptr<BodyMacroParameters> b = dynamic_pointer_cast<BodyMacroParameters>(bodyB->physicalParameters);
-				shared_ptr<InteractingSphere>	as = dynamic_pointer_cast<InteractingSphere>(bodyA->interactionGeometry);
-				shared_ptr<InteractingSphere>	bs = dynamic_pointer_cast<InteractingSphere>(bodyB->interactionGeometry);
+				shared_ptr<InteractingSphere>	as = dynamic_pointer_cast<InteractingSphere>(bodyA->interactingGeometry);
+				shared_ptr<InteractingSphere>	bs = dynamic_pointer_cast<InteractingSphere>(bodyB->interactingGeometry);
 	
 				if ( a && b && as && bs && (a->se3.position - b->se3.position).length() < (as->radius + bs->radius))  
 				{
@@ -506,7 +506,7 @@ void HangingCloth::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 	iSphere->radius			= radius;
 	iSphere->diffuseColor		= Vector3f(Mathf::unitRandom(),Mathf::unitRandom(),Mathf::unitRandom());
 
-	body->interactionGeometry	= iSphere;
+	body->interactingGeometry	= iSphere;
 	body->geometricalModel		= gSphere;
 	body->boundingVolume		= aabb;
 	body->physicalParameters	= physics;
@@ -548,7 +548,7 @@ void HangingCloth::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r
 	iBox->diffuseColor		= Vector3f(1,1,1);
 
 	body->boundingVolume		= aabb;
-	body->interactionGeometry	= iBox;
+	body->interactingGeometry	= iBox;
 	body->geometricalModel		= gBox;
 	body->physicalParameters	= physics;
 }

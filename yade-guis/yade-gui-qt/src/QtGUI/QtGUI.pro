@@ -95,3 +95,4 @@ SOURCES += FileDialog.cpp \
            QtSphericalDEM.cpp \
            QtSimulationPlayer.cpp \
            GLSimulationPlayerViewer.cpp 
+QMAKE_RUN_CXX_IMP = $(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $(shell pwd)/$<

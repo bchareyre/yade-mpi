@@ -14,7 +14,7 @@
 
 PhysicalActionContainerInitializer::PhysicalActionContainerInitializer() 
 {
-	actionParameterNames.clear();
+	physicalActionNames.clear();
 }
 
 PhysicalActionContainerInitializer::~PhysicalActionContainerInitializer() 
@@ -23,23 +23,23 @@ PhysicalActionContainerInitializer::~PhysicalActionContainerInitializer()
 
 void PhysicalActionContainerInitializer::registerAttributes()
 {
-	REGISTER_ATTRIBUTE(actionParameterNames);
+	REGISTER_ATTRIBUTE(physicalActionNames);
 }
 
 void PhysicalActionContainerInitializer::action(Body* body)
 {
 	MetaBody * ncb = dynamic_cast<MetaBody*>(body);
 	
-	vector<shared_ptr<PhysicalAction> > actionParameters;
-	actionParameters.clear();
+	vector<shared_ptr<PhysicalAction> > physicalActions;
+	physicalActions.clear();
 	
-	for(unsigned int i = 0 ; i < actionParameterNames.size() ; ++i )
-		actionParameters.push_back(
+	for(unsigned int i = 0 ; i < physicalActionNames.size() ; ++i )
+		physicalActions.push_back(
 			dynamic_pointer_cast<PhysicalAction>
-				(ClassFactory::instance().createShared(actionParameterNames[i]))
+				(ClassFactory::instance().createShared(physicalActionNames[i]))
 		);
 	
-	ncb->actionParameters->prepare(actionParameters);
+	ncb->physicalActions->prepare(physicalActions);
 	
 }
 

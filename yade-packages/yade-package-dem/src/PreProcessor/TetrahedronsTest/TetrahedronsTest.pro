@@ -3,15 +3,13 @@ error( "YADE_QMAKE_PATH internal qmake variable is not set, you should run for e
 }
 
 
-LIBS += -lPolyhedralSweptSphere \
-        -lSDECLinkGeometry \
-        -lElasticContactLaw \
-        -lSwiftPolyhedronProximityModeler \
+LIBS += -lMyTetrahedronLaw \
         -lMacroMicroElasticRelationships \
         -lElasticCriterionTimeStepper \
         -lPhysicalActionVectorVector \
         -lInteractionVecSet \
         -lBodyRedirectionVector \
+	-lInteractingMyTetrahedron \
         -lInteractingSphere \
         -lInteractingBox \
         -lCundallNonViscousMomentumDamping \
@@ -21,6 +19,7 @@ LIBS += -lPolyhedralSweptSphere \
         -lPhysicalActionContainerInitializer \
         -lPhysicalActionContainerReseter \
         -lInteractionGeometryMetaEngine \
+	-lInteractingGeometryMetaEngine \
         -lInteractionPhysicsMetaEngine \
         -lPhysicalActionApplier \
         -lPhysicalParametersMetaEngine \
@@ -39,12 +38,8 @@ LIBS += -lPolyhedralSweptSphere \
         -rdynamic 
 INCLUDEPATH += $${YADE_QMAKE_PATH}/include/ \
                ../../Engine/StandAloneEngine/ElasticCriterionTimeStepper \
-               ../../Engine/StandAloneEngine/SwiftPolyhedronProximityModeler \
-               ../../Engine/StandAloneEngine/ElasticContactLaw \
-               ../../Engine/EngineUnit/MacroMicroElasticRelationships \
-               ../../DataClass/InteractionGeometry/SDECLinkGeometry \
-               ../../DataClass/PhysicalParameters/BodyMacroParameters \
-               ../../DataClass/InteractingGeometry/PolyhedralSweptSphere 
+               ../../Engine/StandAloneEngine/MyTetrahedronLaw \
+               ../../DataClass/InteractingGeometry/InteractingMyTetrahedron
 QMAKE_LIBDIR = ../../../bin \
                ../../../bin \
                ../../../bin \
@@ -65,3 +60,6 @@ CONFIG += debug \
 TEMPLATE = lib 
 HEADERS += TetrahedronsTest.hpp 
 SOURCES += TetrahedronsTest.cpp 
+
+QMAKE_RUN_CXX_IMP = $(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $(shell pwd)/$<
+

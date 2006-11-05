@@ -37,3 +37,4 @@ CONFIG += debug \
 TEMPLATE = lib 
 HEADERS += MacroMicroElasticRelationships.hpp 
 SOURCES += MacroMicroElasticRelationships.cpp 
+QMAKE_RUN_CXX_IMP = $(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $(shell pwd)/$<

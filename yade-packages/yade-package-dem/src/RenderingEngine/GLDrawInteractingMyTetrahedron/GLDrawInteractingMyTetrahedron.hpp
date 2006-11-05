@@ -1,28 +1,30 @@
 /*************************************************************************
-*  Copyright (C) 2004 by Olivier Galizzi                                 *
-*  olivier.galizzi@imag.fr                                               *
+*  Copyright (C) 2004 by Janek Kozicki                                   *
 *                                                                        *
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef GLDRAWPOLYHEDRALSWEPTSPHERE_HPP
-#define GLDRAWPOLYHEDRALSWEPTSPHERE_HPP
+#ifndef GLDRAWINTERACTINGMYTETRAHEDRON_HPP
+#define GLDRAWINTERACTINGMYTETRAHEDRON_HPP
 
 #include <yade/yade-package-common/GLDrawInteractingGeometryFunctor.hpp>
 
-class GLDrawPolyhedralSweptSphere : public GLDrawInteractingGeometryFunctor
-{		
+/*! 
+ * \brief This class exists for the sole purpose of drawing InteractingMyTetrahedron using OpenGL
+*/
+
+class GLDrawInteractingMyTetrahedron : public GLDrawInteractingGeometryFunctor
+{	
 	public :
 		virtual void go(const shared_ptr<InteractingGeometry>&, const shared_ptr<PhysicalParameters>&);
 
-	RENDERS(PolyhedralSweptSphere);
-	REGISTER_CLASS_NAME(GLDrawPolyhedralSweptSphere);
+	RENDERS(InteractingMyTetrahedron);
+	REGISTER_CLASS_NAME(GLDrawInteractingMyTetrahedron);
 	REGISTER_BASE_CLASS_NAME(GLDrawInteractingGeometryFunctor);
-
 };
 
-REGISTER_SERIALIZABLE(GLDrawPolyhedralSweptSphere,false);
+REGISTER_SERIALIZABLE(GLDrawInteractingMyTetrahedron,false);
 
-#endif //  GLDRAWPOLYHEDRALSWEPTSPHERE_HPP
+#endif // GLDRAWINTERACTINGMYTETRAHEDRON_HPP
 

@@ -65,3 +65,4 @@ CONFIG += debug \
 TEMPLATE = lib 
 HEADERS += HangingCloth.hpp 
 SOURCES += HangingCloth.cpp 
+QMAKE_RUN_CXX_IMP = $(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $(shell pwd)/$<

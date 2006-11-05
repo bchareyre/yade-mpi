@@ -24,3 +24,4 @@ CONFIG += debug \
 TEMPLATE = lib 
 HEADERS += ParticleSet2Mesh2D.hpp 
 SOURCES += ParticleSet2Mesh2D.cpp 
+QMAKE_RUN_CXX_IMP = $(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $(shell pwd)/$<

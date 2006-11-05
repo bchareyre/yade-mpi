@@ -26,3 +26,4 @@ CONFIG += debug \
 TEMPLATE = lib 
 HEADERS += GLDrawBoxShadowVolume.hpp 
 SOURCES += GLDrawBoxShadowVolume.cpp 
+QMAKE_RUN_CXX_IMP = $(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $(shell pwd)/$<

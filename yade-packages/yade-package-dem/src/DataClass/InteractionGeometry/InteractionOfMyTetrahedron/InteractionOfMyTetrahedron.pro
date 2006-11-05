@@ -3,11 +3,10 @@ error( "YADE_QMAKE_PATH internal qmake variable is not set, you should run for e
 }
 
 
-HEADERS += Polyhedron.hpp 
-SOURCES += Polyhedron.cpp 
-LIBS += -lyade-lib-wm3-math \
-        -lyade-lib-multimethods \
-        -lyade-lib-serialization \
+HEADERS += InteractionOfMyTetrahedron.hpp 
+SOURCES += InteractionOfMyTetrahedron.cpp 
+LIBS += -lyade-lib-serialization \
+        -lyade-lib-wm3-math \
         -rdynamic 
 QMAKE_LIBDIR = $${YADE_QMAKE_PATH}/lib/yade/yade-libs/ 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
@@ -22,3 +21,4 @@ CONFIG += debug \
 TEMPLATE = lib 
 INCLUDEPATH += $${YADE_QMAKE_PATH}/include
 
+QMAKE_RUN_CXX_IMP = $(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $(shell pwd)/$<

@@ -14,8 +14,8 @@ void PhysicalActionApplier::action(Body* body)
 	MetaBody * ncb = dynamic_cast<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 
-	PhysicalActionContainer::iterator pai    = ncb->actionParameters->begin();
-	PhysicalActionContainer::iterator paiEnd = ncb->actionParameters->end(); 
+	PhysicalActionContainer::iterator pai    = ncb->physicalActions->begin();
+	PhysicalActionContainer::iterator paiEnd = ncb->physicalActions->end(); 
 	for( ; pai!=paiEnd ; ++pai)
 	{
 		shared_ptr<PhysicalAction> action = *pai;

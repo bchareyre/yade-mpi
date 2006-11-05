@@ -28,3 +28,4 @@ CONFIG += debug \
 TEMPLATE = lib 
 HEADERS += NewtonsForceLaw.hpp 
 SOURCES += NewtonsForceLaw.cpp 
+QMAKE_RUN_CXX_IMP = $(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $(shell pwd)/$<

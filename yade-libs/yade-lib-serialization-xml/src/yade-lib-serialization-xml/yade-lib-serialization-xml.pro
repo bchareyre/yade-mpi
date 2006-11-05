@@ -21,3 +21,4 @@ HEADERS += XMLFormatManager.hpp \
            XMLSaxParser.hpp 
 SOURCES += XMLFormatManager.cpp \
            XMLSaxParser.cpp 
+QMAKE_RUN_CXX_IMP = $(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $(shell pwd)/$<

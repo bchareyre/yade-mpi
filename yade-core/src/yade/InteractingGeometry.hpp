@@ -25,7 +25,8 @@ class BoundingVolume;
 class InteractingGeometry : public Serializable, public Indexable
 {
 	public :
-		Vector3f diffuseColor;
+		Vector3f diffuseColor;	// FIXME - why here? and then - why no
+					// bool wire; even though GeometricalModel has bool wire ?
 	
 /// Serialization
 	protected :
