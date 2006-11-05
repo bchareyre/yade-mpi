@@ -10,7 +10,7 @@
 
 #include "MacroMicroElasticRelationships.hpp"
 #include "SpheresContactGeometry.hpp"
-#include "ElasticContactParameters.hpp"
+#include "ElasticContactInteraction.hpp"
 #include "SDECLinkGeometry.hpp" // FIXME - I can't dispatch by SDECLinkGeometry <-> SpheresContactGeometry !!?
 #include "SDECLinkPhysics.hpp" // FIXME
 #include "BodyMacroParameters.hpp"
@@ -48,12 +48,12 @@ void MacroMicroElasticRelationships::go(	  const shared_ptr<PhysicalParameters>&
 /* OLD VERSION  this is a LinearContactModel, different class, model different that MicroMacroElasticRelationships
 another would be HerzMindlinContactModel
 
-		shared_ptr<ElasticContactParameters> contactPhysics;
+		shared_ptr<ElasticContactInteraction> contactPhysics;
 		
 		if ( interaction->isNew)
 		{
-			interaction->interactionPhysics = shared_ptr<ElasticContactParameters>(new ElasticContactParameters());
-			contactPhysics = dynamic_pointer_cast<ElasticContactParameters>(interaction->interactionPhysics);
+			interaction->interactionPhysics = shared_ptr<ElasticContactInteraction>(new ElasticContactInteraction());
+			contactPhysics = dynamic_pointer_cast<ElasticContactInteraction>(interaction->interactionPhysics);
 			
 			contactPhysics->initialKn			= 2*(sdec1->kn*sdec2->kn)/(sdec1->kn+sdec2->kn);
 			contactPhysics->initialKs			= 2*(sdec1->ks*sdec2->ks)/(sdec1->ks+sdec2->ks);
@@ -61,7 +61,7 @@ another would be HerzMindlinContactModel
 			contactPhysics->initialEquilibriumDistance	= interactionGeometry->radius1+interactionGeometry->radius2;
 		}
 		else
-			contactPhysics = dynamic_pointer_cast<ElasticContactParameters>(interaction->interactionPhysics);
+			contactPhysics = dynamic_pointer_cast<ElasticContactInteraction>(interaction->interactionPhysics);
 		
 		contactPhysics->kn = contactPhysics->initialKn;
 		contactPhysics->ks = contactPhysics->initialKs;
@@ -69,8 +69,8 @@ another would be HerzMindlinContactModel
 */
 		if( interaction->isNew)
 		{
-			interaction->interactionPhysics = shared_ptr<ElasticContactParameters>(new ElasticContactParameters());
-			ElasticContactParameters* contactPhysics = dynamic_cast<ElasticContactParameters*>(interaction->interactionPhysics.get());
+			interaction->interactionPhysics = shared_ptr<ElasticContactInteraction>(new ElasticContactInteraction());
+			ElasticContactInteraction* contactPhysics = dynamic_cast<ElasticContactInteraction*>(interaction->interactionPhysics.get());
 
 			Real Ea 	= sdec1->young;
 			Real Eb 	= sdec2->young;
@@ -105,7 +105,7 @@ another would be HerzMindlinContactModel
 		}
 		else
 		{	// FIXME - are those lines necessary ???? what they are doing in fact ???
-			ElasticContactParameters* contactPhysics = dynamic_cast<ElasticContactParameters*>(interaction->interactionPhysics.get());
+			ElasticContactInteraction* contactPhysics = dynamic_cast<ElasticContactInteraction*>(interaction->interactionPhysics.get());
 
 			contactPhysics->kn = contactPhysics->initialKn;
 			contactPhysics->ks = contactPhysics->initialKs;

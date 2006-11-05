@@ -11,10 +11,10 @@
 
 #include <yade/yade-package-common/SimpleElasticInteraction.hpp>
 
-class ElasticContactParameters : public SimpleElasticInteraction
+class ElasticContactInteraction : public SimpleElasticInteraction
 {
 	public :
-		ElasticContactParameters() {};
+		ElasticContactInteraction() {};
 
 		Real		// kn				// normal elastic constant. (inside SimpleElasticInteraction)
 				 ks				// shear elastic constant.
@@ -29,16 +29,16 @@ class ElasticContactParameters : public SimpleElasticInteraction
 				,normalForce			// normal force applied on a DE
 				,shearForce;			// shear force applied on a DE
 		
-		virtual ~ElasticContactParameters();
+		virtual ~ElasticContactInteraction();
 	protected :
 		virtual void registerAttributes();
 
-	REGISTER_CLASS_NAME(ElasticContactParameters);
+	REGISTER_CLASS_NAME(ElasticContactInteraction);
 	REGISTER_BASE_CLASS_NAME(SimpleElasticInteraction);
 
 };
 
-REGISTER_SERIALIZABLE(ElasticContactParameters,false);
+REGISTER_SERIALIZABLE(ElasticContactInteraction,false);
 
 #endif // ELASTIC_CONTACT_PARAMETERS_HPP
 

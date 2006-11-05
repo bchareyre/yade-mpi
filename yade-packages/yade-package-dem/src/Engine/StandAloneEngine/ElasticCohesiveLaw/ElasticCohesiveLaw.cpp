@@ -10,7 +10,7 @@
 #include "BodyMacroParameters.hpp"
 #include "SpheresContactGeometry.hpp"
 #include "SDECLinkGeometry.hpp"
-#include "ElasticContactParameters.hpp"
+#include "ElasticContactInteraction.hpp"
 #include "SDECLinkPhysics.hpp"
 
 

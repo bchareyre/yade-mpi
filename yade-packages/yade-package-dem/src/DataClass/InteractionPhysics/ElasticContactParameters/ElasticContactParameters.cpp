@@ -6,20 +6,20 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "ElasticContactParameters.hpp"
+#include "ElasticContactInteraction.hpp"
 
 
-ElasticContactParameters::~ElasticContactParameters()
+ElasticContactInteraction::~ElasticContactInteraction()
 {
 }
 
-// void ElasticContactParameters::postProcessAttributes(bool)
+// void ElasticContactInteraction::postProcessAttributes(bool)
 // {
 // 
 // }
 
 
-void ElasticContactParameters::registerAttributes()
+void ElasticContactInteraction::registerAttributes()
 {
 	SimpleElasticInteraction::registerAttributes();
 	REGISTER_ATTRIBUTE(prevNormal);

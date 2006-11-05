@@ -4,7 +4,7 @@ error( "YADE_QMAKE_PATH internal qmake variable is not set, you should run for e
 
 
 LIBS += -lSDECLinkPhysics \
-        -lElasticContactParameters \
+        -lElasticContactInteraction \
         -lSDECLinkGeometry \
         -lSpheresContactGeometry \
         -lBodyMacroParameters \
@@ -17,7 +17,7 @@ LIBS += -lSDECLinkPhysics \
         -rdynamic 
 INCLUDEPATH += $${YADE_QMAKE_PATH}/include/ \
                ../../../DataClass/InteractionPhysics/SDECLinkPhysics \
-               ../../../DataClass/InteractionPhysics/ElasticContactParameters \
+               ../../../DataClass/InteractionPhysics/ElasticContactInteraction \
                ../../../DataClass/InteractionGeometry/SDECLinkGeometry \
                ../../../DataClass/InteractionGeometry/SpheresContactGeometry \
                ../../../DataClass/PhysicalParameters/BodyMacroParameters 

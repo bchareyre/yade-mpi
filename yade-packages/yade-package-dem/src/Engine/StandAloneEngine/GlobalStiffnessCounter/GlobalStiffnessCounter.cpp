@@ -11,7 +11,7 @@
 #include "BodyMacroParameters.hpp"
 #include "SpheresContactGeometry.hpp"
 #include "SDECLinkGeometry.hpp"
-#include "ElasticContactParameters.hpp"
+#include "ElasticContactInteraction.hpp"
 #include "SDECLinkPhysics.hpp"
 #include <yade/yade-core/Omega.hpp>
 #include <yade/yade-core/MetaBody.hpp>
@@ -68,7 +68,7 @@ void GlobalStiffnessCounter::action(Body* body)
 				//continue; // skip other groups, BTW: this is example of a good usage of 'continue' keyword
 	
 			SpheresContactGeometry* currentContactGeometry 	= static_cast<SpheresContactGeometry*>(contact->interactionGeometry.get());
-			ElasticContactParameters* currentContactPhysics = static_cast<ElasticContactParameters*> (contact->interactionPhysics.get());
+			ElasticContactInteraction* currentContactPhysics = static_cast<ElasticContactInteraction*> (contact->interactionPhysics.get());
 			
 		
 			Vector3r diag_stiffness = Vector3r( 	std::pow(currentContactGeometry->normal.x(),2),

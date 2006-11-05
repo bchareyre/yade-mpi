@@ -70,7 +70,7 @@ TetrahedronsTest::TetrahedronsTest () : FileGenerator()
 	 *
 	 * You can see into ElasticContactLaw (press here ctrl-] , then ctrl-O ;)
 	 * how shearing force is used. You may even want to use
-	 * BodyMacroParameters and sth. like ElasticContactParameters to
+	 * BodyMacroParameters and sth. like ElasticContactInteraction to
 	 * calculate friction, and incremental between iterations shearing
 	 * force
 	 *

@@ -8,7 +8,7 @@
 
 #include "TriaxialStressController.hpp"
 #include "yade/yade-package-common/ParticleParameters.hpp"
-#include "ElasticContactParameters.hpp"
+#include "ElasticContactInteraction.hpp"
 #include "yade/yade-package-common/Force.hpp"
 #include "StiffnessMatrix.hpp"
 #include <yade/yade-lib-wm3-math/Math.hpp>
@@ -139,8 +139,8 @@ void TriaxialStressController::updateStiffness (MetaBody * ncb)
 			{
 				if ( wall_id[index]==id1 || wall_id[index]==id2 )
 				{
-					ElasticContactParameters* currentContactPhysics =
-					static_cast<ElasticContactParameters*> ( contact->interactionPhysics.get() );
+					ElasticContactInteraction* currentContactPhysics =
+					static_cast<ElasticContactInteraction*> ( contact->interactionPhysics.get() );
 					stiffness[index]  += currentContactPhysics->kn;
 				
 				}			

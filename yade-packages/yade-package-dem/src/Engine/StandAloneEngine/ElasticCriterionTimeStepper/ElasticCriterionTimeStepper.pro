@@ -3,14 +3,14 @@ error( "YADE_QMAKE_PATH internal qmake variable is not set, you should run for e
 }
 
 
-LIBS += -lElasticContactParameters \
+LIBS += -lElasticContactInteraction \
         -lSpheresContactGeometry \
         -lMacroMicroElasticRelationships \
         -lSphere \
         -rdynamic 
 INCLUDEPATH += $${YADE_QMAKE_PATH}/include/ \
                ../../../Engine/EngineUnit/MacroMicroElasticRelationships \
-               ../../../DataClass/InteractionPhysics/ElasticContactParameters \
+               ../../../DataClass/InteractionPhysics/ElasticContactInteraction \
                ../../../DataClass/InteractionGeometry/SpheresContactGeometry \
                ../../../DataClass/PhysicalParameters/BodyMacroParameters 
 QMAKE_LIBDIR = ../../../../bin \

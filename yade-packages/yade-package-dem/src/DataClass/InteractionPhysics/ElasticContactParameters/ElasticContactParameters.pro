@@ -3,8 +3,8 @@ error( "YADE_QMAKE_PATH internal qmake variable is not set, you should run for e
 }
 
 
-HEADERS += ElasticContactParameters.hpp 
-SOURCES += ElasticContactParameters.cpp 
+HEADERS += ElasticContactInteraction.hpp 
+SOURCES += ElasticContactInteraction.cpp 
 LIBS += -lSimpleElasticInteraction \
 	-rdynamic 
 

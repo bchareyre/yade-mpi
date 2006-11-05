@@ -10,7 +10,7 @@
 #include <yade/yade-core/MetaBody.hpp>
 #include <yade/yade-core/Omega.hpp>
 #include <yade/yade-package-common/Force.hpp>
-#include "ElasticContactParameters.hpp"
+#include "ElasticContactInteraction.hpp"
 
 
 TriaxialCompressionEngine::TriaxialCompressionEngine() : actionForce(new Force)
@@ -107,7 +107,7 @@ Real TriaxialCompressionEngine::ComputeUnbalancedForce(Body * body, bool maxUnba
         for(  ; ii!=iiEnd ; ++ii ) {
                 if ((*ii)->isReal) {
                         const shared_ptr<Interaction>& contact = *ii;
-                        MeanForce += (static_cast<ElasticContactParameters*> (contact->interactionPhysics.get()))->normalForce.length();
+                        MeanForce += (static_cast<ElasticContactInteraction*> (contact->interactionPhysics.get()))->normalForce.length();
                         ++nForce;
                 }
         }

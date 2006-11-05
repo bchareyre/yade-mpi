@@ -33,7 +33,7 @@ struct Contact
 	Vector3r	 normal				// new unit normal of the contact plane.
 			,contactPoint;	
 
-	///ElasticContactParameters
+	///ElasticContactInteraction
 	Real		 kn				// normal elastic constant.
 			,ks				// shear elastic constant.
 			,initialKn			// initial normal elastic constant.

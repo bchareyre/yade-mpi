@@ -41,7 +41,7 @@ HEADERS += AABB.hpp \
            DynLibManager.hpp \
            ElasticCohesiveLaw.hpp \
            ElasticContactLaw.hpp \
-           ElasticContactParameters.hpp \
+           ElasticContactInteraction.hpp \
            ElasticCriterionTimeStepper.hpp \
            EmptyType.hpp \
            Engine.hpp \
@@ -330,7 +330,7 @@ SOURCES += AABB.cpp \
            DynLibManager.cpp \
            ElasticCohesiveLaw.cpp \
            ElasticContactLaw.cpp \
-           ElasticContactParameters.cpp \
+           ElasticContactInteraction.cpp \
            ElasticCriterionTimeStepper.cpp \
            ErrorTolerantContact.cpp \
            ErrorTolerantLaw.cpp \

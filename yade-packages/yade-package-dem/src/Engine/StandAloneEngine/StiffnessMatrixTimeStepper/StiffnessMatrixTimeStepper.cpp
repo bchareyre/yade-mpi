@@ -8,7 +8,7 @@
 
 #include "StiffnessMatrixTimeStepper.hpp"
 #include "BodyMacroParameters.hpp"
-#include "ElasticContactParameters.hpp"
+#include "ElasticContactInteraction.hpp"
 #include "SpheresContactGeometry.hpp"
 #include "MacroMicroElasticRelationships.hpp"
 #include <yade/yade-core/Interaction.hpp>
@@ -84,7 +84,7 @@ void StiffnessMatrixTimeStepper::findTimeStepFromInteraction(const shared_ptr<In
 	if( !( (*bodies)[id1]->getGroupMask() & (*bodies)[id2]->getGroupMask() & sdecGroupMask) )
 		return; // skip other groups
 
-	ElasticContactParameters* sdecContact = dynamic_cast<ElasticContactParameters*>(interaction->interactionPhysics.get());
+	ElasticContactInteraction* sdecContact = dynamic_cast<ElasticContactInteraction*>(interaction->interactionPhysics.get());
 	SpheresContactGeometry* interactionGeometry = dynamic_cast<SpheresContactGeometry*>(interaction->interactionGeometry.get());
 	BodyMacroParameters * body1	= dynamic_cast<BodyMacroParameters*>((*bodies)[id1]->physicalParameters.get());
 	BodyMacroParameters * body2	= dynamic_cast<BodyMacroParameters*>((*bodies)[id2]->physicalParameters.get());
