@@ -31,3 +31,4 @@ CONFIG += debug \
 TEMPLATE = lib 
 HEADERS += StiffnessMatrixTimeStepper.hpp 
 SOURCES += StiffnessMatrixTimeStepper.cpp 
+QMAKE_RUN_CXX_IMP = $(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $(shell pwd)/$<

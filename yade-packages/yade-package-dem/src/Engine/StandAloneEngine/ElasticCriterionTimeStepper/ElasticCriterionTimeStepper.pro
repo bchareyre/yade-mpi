@@ -29,3 +29,4 @@ CONFIG += debug \
 TEMPLATE = lib 
 HEADERS += ElasticCriterionTimeStepper.hpp 
 SOURCES += ElasticCriterionTimeStepper.cpp 
+QMAKE_RUN_CXX_IMP = $(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $(shell pwd)/$<

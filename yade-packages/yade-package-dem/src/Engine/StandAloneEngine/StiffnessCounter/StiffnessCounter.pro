@@ -43,3 +43,4 @@ CONFIG += debug \
 TEMPLATE = lib 
 HEADERS += StiffnessCounter.hpp 
 SOURCES += StiffnessCounter.cpp 
+QMAKE_RUN_CXX_IMP = $(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $(shell pwd)/$<

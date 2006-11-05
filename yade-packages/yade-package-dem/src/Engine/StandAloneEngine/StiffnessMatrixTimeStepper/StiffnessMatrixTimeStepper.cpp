@@ -47,7 +47,7 @@ void StiffnessMatrixTimeStepper::findTimeStepFromBody(const shared_ptr<Body>& bo
 {
 	BodyMacroParameters * sdec	= dynamic_cast<BodyMacroParameters*>(body->physicalParameters.get());
 	Sphere* sphere 		= dynamic_cast<Sphere*>(body->geometricalModel.get());
-	Vector3r& stiffness = (static_cast<StiffnessMatrix*>( ncb->actionParameters->find (body->getId(), stiffnessMatrixClassIndex).get()))->stiffness;
+	Vector3r& stiffness = (static_cast<StiffnessMatrix*>( ncb->physicalActions->find (body->getId(), stiffnessMatrixClassIndex).get()))->stiffness;
 
 	//cerr << "Vector3r& stiffness = (static_cast<StiffnessMatrix*>( ncb" << endl;
 	if(! (sphere && sdec && stiffness) )

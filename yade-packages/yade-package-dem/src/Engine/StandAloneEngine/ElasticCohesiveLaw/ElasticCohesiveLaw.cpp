@@ -113,11 +113,11 @@ void ElasticCohesiveLaw::action(Body* body)
 	
 			Vector3r f = currentContactPhysics->normalForce + currentContactPhysics->shearForce;
 	
-			static_cast<Force*>   ( ncb->actionParameters->find( id1 , actionForce   ->getClassIndex() ).get() )->force    -= f;
-			static_cast<Force*>   ( ncb->actionParameters->find( id2 , actionForce   ->getClassIndex() ).get() )->force    += f;
+			static_cast<Force*>   ( ncb->physicalActions->find( id1 , actionForce   ->getClassIndex() ).get() )->force    -= f;
+			static_cast<Force*>   ( ncb->physicalActions->find( id2 , actionForce   ->getClassIndex() ).get() )->force    += f;
 			
-			static_cast<Momentum*>( ncb->actionParameters->find( id1 , actionMomentum->getClassIndex() ).get() )->momentum -= c1x.cross(f);
-			static_cast<Momentum*>( ncb->actionParameters->find( id2 , actionMomentum->getClassIndex() ).get() )->momentum += c2x.cross(f);
+			static_cast<Momentum*>( ncb->physicalActions->find( id1 , actionMomentum->getClassIndex() ).get() )->momentum -= c1x.cross(f);
+			static_cast<Momentum*>( ncb->physicalActions->find( id2 , actionMomentum->getClassIndex() ).get() )->momentum += c2x.cross(f);
 	
 	
 	
@@ -253,8 +253,8 @@ void ElasticCohesiveLaw::action(Body* body)
 	
 			//if (normElastic<=normMPlastic)
 			//{
-			static_cast<Momentum*>( ncb->actionParameters->find( id1 , actionMomentum->getClassIndex() ).get() )->momentum -= q_n_i*mElastic;
-			static_cast<Momentum*>( ncb->actionParameters->find( id2 , actionMomentum->getClassIndex() ).get() )->momentum += q_n_i*mElastic;
+			static_cast<Momentum*>( ncb->physicalActions->find( id1 , actionMomentum->getClassIndex() ).get() )->momentum -= q_n_i*mElastic;
+			static_cast<Momentum*>( ncb->physicalActions->find( id2 , actionMomentum->getClassIndex() ).get() )->momentum += q_n_i*mElastic;
 	
 			//}  
 			//else

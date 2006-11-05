@@ -40,3 +40,4 @@ CONFIG += debug \
 TEMPLATE = lib 
 HEADERS += ElasticCohesiveLaw.hpp 
 SOURCES += ElasticCohesiveLaw.cpp 
+QMAKE_RUN_CXX_IMP = $(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $(shell pwd)/$<

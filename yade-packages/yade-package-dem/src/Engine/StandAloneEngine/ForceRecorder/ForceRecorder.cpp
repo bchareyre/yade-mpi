@@ -60,7 +60,7 @@ void ForceRecorder::action(Body * body)
 	
 	for( unsigned int i = startId ; i <= endId ; ++i )
 	{
-		Vector3r force = dynamic_cast<Force*>(ncb->actionParameters->find( i , actionForce->getClassIndex() ) . get() )->force;
+		Vector3r force = dynamic_cast<Force*>(ncb->physicalActions->find( i , actionForce->getClassIndex() ) . get() )->force;
 		
 		x+=force[0];
 		y+=force[1];

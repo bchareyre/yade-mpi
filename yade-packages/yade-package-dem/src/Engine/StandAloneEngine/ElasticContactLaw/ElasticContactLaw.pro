@@ -41,3 +41,4 @@ CONFIG += debug \
 TEMPLATE = lib 
 HEADERS += ElasticContactLaw.hpp 
 SOURCES += ElasticContactLaw.cpp 
+QMAKE_RUN_CXX_IMP = $(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $(shell pwd)/$<

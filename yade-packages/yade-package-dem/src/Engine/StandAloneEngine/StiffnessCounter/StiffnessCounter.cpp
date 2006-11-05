@@ -70,10 +70,10 @@ void StiffnessCounter::action(Body* body)
  			matrix1.makeTensorProduct(currentContactGeometry->normal,currentContactGeometry->normal);
  			matrix2.makeIdentity ();
  			matrix2 = matrix2*currentContactPhysics->ks + matrix1*(currentContactPhysics->kn-currentContactPhysics->ks);
-			PhysicalAction* st = ncb->actionParameters->find(id1,actionStiffness->getClassIndex()).get();
+			PhysicalAction* st = ncb->physicalActions->find(id1,actionStiffness->getClassIndex()).get();
 			StiffnessMatrix* s = static_cast<StiffnessMatrix*>(st);
 			s->stiffness += matrix2; 	
-			st = ncb->actionParameters->find(id2,actionStiffness->getClassIndex()).get();
+			st = ncb->physicalActions->find(id2,actionStiffness->getClassIndex()).get();
 			s = static_cast<StiffnessMatrix*>(st);
 			s->stiffness += matrix2;
 			//_____________________________	*/		
@@ -85,10 +85,10 @@ void StiffnessCounter::action(Body* body)
 			diag_stiffness *= currentContactPhysics->kn-currentContactPhysics->ks;
 			diag_stiffness = diag_stiffness + Vector3r(1,1,1)*currentContactPhysics->ks;	//diagonal terms of stiffness matrix
 			
-			PhysicalAction* st = ncb->actionParameters->find(id1,actionStiffness->getClassIndex()).get();
+			PhysicalAction* st = ncb->physicalActions->find(id1,actionStiffness->getClassIndex()).get();
 			StiffnessMatrix* s = static_cast<StiffnessMatrix*>(st);
 			s->stiffness += diag_stiffness; 	
-			st = ncb->actionParameters->find(id2,actionStiffness->getClassIndex()).get();
+			st = ncb->physicalActions->find(id2,actionStiffness->getClassIndex()).get();
 			s = static_cast<StiffnessMatrix*>(st);
 			s->stiffness += diag_stiffness;
 			//____________________________

@@ -86,10 +86,10 @@ void GlobalStiffnessCounter::action(Body* body)
 			diag_Rstiffness *= currentContactPhysics->ks;
 			
 			
-			PhysicalAction* st = ncb->actionParameters->find(id1,actionStiffness->getClassIndex()).get();
+			PhysicalAction* st = ncb->physicalActions->find(id1,actionStiffness->getClassIndex()).get();
 			StiffnessMatrix* s = static_cast<StiffnessMatrix*>(st);
 			s->stiffness += diag_stiffness; 	
-			st = ncb->actionParameters->find(id2,actionStiffness->getClassIndex()).get();
+			st = ncb->physicalActions->find(id2,actionStiffness->getClassIndex()).get();
 			s = static_cast<StiffnessMatrix*>(st);
 			s->stiffness += diag_stiffness;
 			//____________________________
