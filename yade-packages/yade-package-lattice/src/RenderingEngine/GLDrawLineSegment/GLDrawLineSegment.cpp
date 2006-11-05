@@ -29,11 +29,11 @@ void GLDrawLineSegment::go(const shared_ptr<GeometricalModel>& gm, const shared_
 		glVertex3(-0.5,0.0,0.0);
 		glVertex3( 0.5,0.0,0.0);
 
-		glVertex3( 0.0,0.0,0.0);
-		glVertex3( 0.0, 0.4*len/0.042 ,0.0);
+//		glVertex3( 0.0,0.0,0.0);
+//		glVertex3( 0.0, 0.4*len/0.042 ,0.0);
 
-		glVertex3( 0.0,0.0,0.0);
-		glVertex3( 0.0, 0.0 , 0.25*len/0.042 );
+//		glVertex3( 0.0,0.0,0.0);
+//		glVertex3( 0.0, 0.0 , 0.25*len/0.042 );
 
 		glEnd();
 	}

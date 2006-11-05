@@ -20,9 +20,6 @@ void LatticeSet2LatticeBeams::go(	  const shared_ptr<PhysicalParameters>& ph
 	const MetaBody * ncb = static_cast<const MetaBody*>(body);
 	const shared_ptr<BodyContainer>& bodies = ncb->bodies;
 
-	static Real maxTensileFactor = 0.0; // FIXME - thread unsafe
-	static Real maxCompressFactor = 0.0; // FIXME - thread unsafe
-
 	BodyContainer::iterator bi    = bodies->begin();
 	BodyContainer::iterator biEnd = bodies->end();
 	for(  ; bi!=biEnd ; ++bi )
@@ -36,35 +33,12 @@ void LatticeSet2LatticeBeams::go(	  const shared_ptr<PhysicalParameters>& ph
 // FIXME - this copying of length between latticeBeam geometry and physics, inside MetaBody could
 //         be done just once, if length was inside shared_ptr. This can be improved once we make
 //         indexable Parameters: Velocity, Position, Orientation, ....
-			Real strain                     = beam->strain();
-			Real factor;
-			if( strain > 0 )
-				factor                  = strain / beam->criticalTensileStrain; // positive
-			else
-				factor 			= strain / beam->criticalCompressiveStrain; // negative
-			
-			{ // compute optimal red/blue colors	
-				maxTensileFactor		= std::max(factor,maxTensileFactor);
-				maxCompressFactor 		= std::min(factor,maxCompressFactor);
-				if(factor > 0 && maxTensileFactor > 0)
-				{
-					factor                  /= maxTensileFactor;
-					line->diffuseColor      = Vector3f(0.9,0.9,1.0) - factor * Vector3f(0.9,0.9,0.0);
-				}
-				else if (factor < 0 && maxCompressFactor < 0)
-				{
-					factor                  /= maxCompressFactor;
-					line->diffuseColor      = Vector3f(1.0,0.9,0.9) - factor * Vector3f(0.0,0.9,0.9);
-				}
-				else
-					line->diffuseColor      = Vector3f(0.9,0.9,0.9);
-			}
 			line->length                    = beam->length;
 
 			// FIXME - display aggregates as brown, bonds as dark brown.
-			//      if(beam->criticalTensileStrain > 0.00015) line->diffuseColor = Vector3f(0.6,0.6,0.6); else // ZACZYN
-			//      if(beam->criticalTensileStrain > 0.00006) line->diffuseColor = Vector3f(0.0,0.0,0.0); else // KRUSZYWO
-			//                                                line->diffuseColor = Vector3f(0.3,0.3,0.3);      // ??CZENIE
+			      if(beam->criticalTensileStrain > 0.00015) line->diffuseColor = Vector3f(0.6,0.6,0.6); else // CEMENT
+			      if(beam->criticalTensileStrain > 0.00006) line->diffuseColor = Vector3f(0.0,0.0,0.0); else // AGGREGATE
+			                                                line->diffuseColor = Vector3f(0.3,0.3,0.3);      // BOND
 		}
 	}
 }

@@ -3,12 +3,8 @@ error( "YADE_QMAKE_PATH internal qmake variable is not set, you should run for e
 }
 
 
-SUBDIRS += GLDrawBoundingVolume \
-           GLDrawGeometricalModel \
-           GLDrawInteractingGeometry \
-           GLDrawShadowVolume \
-	   GLDrawState \
-           OpenGLRenderingEngine 
+SUBDIRS += GLDrawParticleState \
+           GLDrawRigidBodyState 
 CONFIG += debug \
           thread \
 warn_on

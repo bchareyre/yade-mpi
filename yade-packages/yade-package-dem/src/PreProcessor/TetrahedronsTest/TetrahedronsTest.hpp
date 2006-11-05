@@ -53,7 +53,7 @@
  *  - then we can apply those PhysicalActions on the Body, thus calculate new
  *    body's acceleration and angularAcceleration using NewtonsLaw. class applyActionDispatcher does just that
  *
- *  - and finally the new body's position is integrated using leap from integration
+ *  - and finally the new body's position is integrated using leapfrog integration
  *
  *
  *

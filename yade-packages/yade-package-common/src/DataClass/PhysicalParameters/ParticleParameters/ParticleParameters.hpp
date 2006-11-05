@@ -16,9 +16,11 @@
 class ParticleParameters : public PhysicalParameters
 {
 	public :
+		// parameters
 		Real		 mass
 				,invMass;
 
+		// state
 		Vector3r	 acceleration
 				,velocity;
 

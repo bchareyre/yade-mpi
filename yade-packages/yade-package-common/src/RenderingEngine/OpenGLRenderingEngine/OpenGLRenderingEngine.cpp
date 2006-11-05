@@ -16,6 +16,7 @@
 OpenGLRenderingEngine::OpenGLRenderingEngine() : RenderingEngine()
 {
 
+	drawState		= false;
 	drawBoundingVolume	= false;
 	drawInteractingGeometry	= false;
 	drawGeometricalModel	= true;
@@ -32,6 +33,8 @@ OpenGLRenderingEngine::OpenGLRenderingEngine() : RenderingEngine()
 	map<string,DynlibDescriptor>::const_iterator diEnd = Omega::instance().getDynlibsDescriptor().end();
 	for(;di!=diEnd;++di)
 	{
+		if (Omega::instance().isInheritingFrom((*di).first,"GLDrawStateFunctor"))
+			addStateFunctor((*di).first);
 		if (Omega::instance().isInheritingFrom((*di).first,"GLDrawBoundingVolumeFunctor"))
 			addBoundingVolumeFunctor((*di).first);
 		if (Omega::instance().isInheritingFrom((*di).first,"GLDrawInteractingGeometryFunctor"))
@@ -164,6 +167,9 @@ void OpenGLRenderingEngine::render(
 		}
 	}
 	
+	if (drawState)
+		renderState(rootBody);
+	
 	if (drawBoundingVolume)
 		renderBoundingVolume(rootBody);
 	
@@ -171,7 +177,7 @@ void OpenGLRenderingEngine::render(
 	{
 		glEnable(GL_LIGHTING);
 		glEnable(GL_CULL_FACE);
-		renderInteractionGeometry(rootBody);
+		renderInteractingGeometry(rootBody);
 	}
 
 
@@ -405,6 +411,25 @@ void OpenGLRenderingEngine::renderGeometricalModel(const shared_ptr<MetaBody>& r
 }
 
 
+void OpenGLRenderingEngine::renderState(const shared_ptr<MetaBody>& rootBody)
+{	
+	BodyContainer::iterator bi    = rootBody->bodies->begin();
+	BodyContainer::iterator biEnd = rootBody->bodies->end();
+	for( ; bi!=biEnd ; ++bi)
+	{
+		glPushMatrix();
+		if((*bi)->physicalParameters)
+			stateDispatcher((*bi)->physicalParameters);
+		glPopMatrix();
+	}
+	
+	glPushMatrix();
+	if(rootBody->physicalParameters)
+		stateDispatcher(rootBody->physicalParameters);
+	glPopMatrix();
+}
+
+
 void OpenGLRenderingEngine::renderBoundingVolume(const shared_ptr<MetaBody>& rootBody)
 {	
 	BodyContainer::iterator bi    = rootBody->bodies->begin();
@@ -425,7 +450,7 @@ void OpenGLRenderingEngine::renderBoundingVolume(const shared_ptr<MetaBody>& roo
 
 
 
-void OpenGLRenderingEngine::renderInteractionGeometry(const shared_ptr<MetaBody>& rootBody)
+void OpenGLRenderingEngine::renderInteractingGeometry(const shared_ptr<MetaBody>& rootBody)
 {
 	BodyContainer::iterator bi    = rootBody->bodies->begin();
 	BodyContainer::iterator biEnd = rootBody->bodies->end();
@@ -451,9 +476,10 @@ void OpenGLRenderingEngine::renderInteractionGeometry(const shared_ptr<MetaBody>
 
 
 void OpenGLRenderingEngine::registerAttributes()
-{	
+{
 	REGISTER_ATTRIBUTE(lightPos);
 	REGISTER_ATTRIBUTE(backGroundColor);
+	REGISTER_ATTRIBUTE(drawState);
 	REGISTER_ATTRIBUTE(drawBoundingVolume);
 	REGISTER_ATTRIBUTE(drawInteractingGeometry);
 	REGISTER_ATTRIBUTE(drawGeometricalModel);
@@ -469,6 +495,9 @@ void OpenGLRenderingEngine::postProcessAttributes(bool deserializing)
 {
 	if(deserializing)
 	{
+		for(unsigned int i=0;i<stateFunctorNames.size();i++)
+			stateDispatcher.add1DEntry(stateFunctorNames[i][0],stateFunctorNames[i][1]);
+			
 		for(unsigned int i=0;i<boundingVolumeFunctorNames.size();i++)
 			boundingVolumeDispatcher.add1DEntry(boundingVolumeFunctorNames[i][0],boundingVolumeFunctorNames[i][1]);
 			
@@ -481,6 +510,16 @@ void OpenGLRenderingEngine::postProcessAttributes(bool deserializing)
 		for(unsigned int i=0;i<shadowVolumeFunctorNames.size();i++)
 			shadowVolumeDispatcher.add1DEntry(shadowVolumeFunctorNames[i][0],shadowVolumeFunctorNames[i][1]);
 	}
+}
+
+
+void OpenGLRenderingEngine::addStateFunctor(const string& str2)
+{
+	string str1 = (static_pointer_cast<GLDrawStateFunctor>(ClassFactory::instance().createShared(str2)))->renders();
+	vector<string> v;
+	v.push_back(str1);
+	v.push_back(str2);
+	stateFunctorNames.push_back(v);
 }
 
 

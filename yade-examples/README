@@ -2,10 +2,9 @@ This directory contains some examples for filegenerators:
 
 2 examples for FEM
 1 example for SDEC Impact test
-2 examples for tetrahedrons
 
 Other filegenerators work without need for any input file. They generate examples
-just by parameters given to them. In the future here will appear more examples.
+just by parameters given to them.
 
 
 By default yade filegenerators are looking for those files in ../data directory.

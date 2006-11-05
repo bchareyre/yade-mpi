@@ -17,11 +17,15 @@
 template <bool> struct static_assert;
 template <> struct static_assert<true> {};
 
+struct OpenGLWrapper {}; // for ctags
+
 ///	Primary Templates
 
 template< typename Type > inline void glRotate		( Type ,Type ,Type , Type  )	{	static_assert<false> GL_OpenGLWrapper_bad_type;(void) GL_OpenGLWrapper_bad_type; };
 template< typename Type > inline void glScale		( Type ,Type , Type  )		{	static_assert<false> GL_OpenGLWrapper_bad_type;(void) GL_OpenGLWrapper_bad_type; };
+template< typename Type > inline void glScalev		( const Type  )			{	static_assert<false> GL_OpenGLWrapper_bad_type;(void) GL_OpenGLWrapper_bad_type; };
 template< typename Type > inline void glTranslate	( Type ,Type , Type  )		{	static_assert<false> GL_OpenGLWrapper_bad_type;(void) GL_OpenGLWrapper_bad_type; };
+template< typename Type > inline void glTranslatev	( const Type )			{	static_assert<false> GL_OpenGLWrapper_bad_type;(void) GL_OpenGLWrapper_bad_type; };
 template< typename Type > inline void glVertex2		( Type ,Type  )			{	static_assert<false> GL_OpenGLWrapper_bad_type;(void) GL_OpenGLWrapper_bad_type; };
 template< typename Type > inline void glVertex3		( Type ,Type , Type  )		{	static_assert<false> GL_OpenGLWrapper_bad_type;(void) GL_OpenGLWrapper_bad_type; };
 template< typename Type > inline void glVertex4		( Type ,Type ,Type , Type  )	{	static_assert<false> GL_OpenGLWrapper_bad_type;(void) GL_OpenGLWrapper_bad_type; };
@@ -63,9 +67,13 @@ template< > inline void glRotate< float >			(float angle,float x,float y, float 
 
 template< > inline void glScale< double >			( double x,double y, double z )		{	glScaled(x,y,z);	};
 template< > inline void glScale< float >			( float x,float y,float z )		{	glScalef(x,y,z);	};
+template< > inline void glScalev< Vector3<double> >		( const Vector3<double> v )		{	glScaled(v[0],v[1],v[2]);};
+template< > inline void glScalev< Vector3<float> >		( const Vector3<float> v )		{	glScalef(v[0],v[1],v[2]);};
 
 template< > inline void glTranslate< double >			( double x,double y, double z )		{	glTranslated(x,y,z);	};
 template< > inline void glTranslate< float >			( float x,float y,float z )		{	glTranslatef(x,y,z);	};
+template< > inline void glTranslatev< Vector3<double> >		( const Vector3<double> v )		{	glTranslated(v[0],v[1],v[2]);};
+template< > inline void glTranslatev< Vector3<float> >		( const Vector3<float> v )		{	glTranslatef(v[0],v[1],v[2]);};
 
 template< > inline void glVertex2< double >			( double x,double y )			{	glVertex2d(x,y);	};
 template< > inline void glVertex2< float >			( float x,float y )			{	glVertex2f(x,y);	};

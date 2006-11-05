@@ -15,8 +15,10 @@
 class RigidBodyParameters : public ParticleParameters
 {	
 	public :
+		// parameters
 		Vector3r	 invInertia
 				,inertia
+		// state
 				,angularAcceleration
 				,angularVelocity;
 	

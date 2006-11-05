@@ -3,29 +3,24 @@ error( "YADE_QMAKE_PATH internal qmake variable is not set, you should run for e
 }
 
 
-HEADERS += GLDrawBoundingVolumeFunctor.hpp \
-           GLDrawGeometricalModelFunctor.hpp \
-           GLDrawInteractingGeometryFunctor.hpp \
-           GLDrawShadowVolumeFunctor.hpp \
-	   GLDrawStateFunctor.hpp \
-           OpenGLRenderingEngine.hpp 
-
-SOURCES += OpenGLRenderingEngine.cpp 
-LIBS += -lglut \
-        -lGLU \
-        -lGL \
+LIBS += -lParticleParameters \
+        -lyade-lib-opengl \
         -rdynamic 
-QMAKE_LIBDIR = $${YADE_QMAKE_PATH}/lib/yade/yade-libs/ 
+INCLUDEPATH += $${YADE_QMAKE_PATH}/include/ \
+               ../../../DataClass/PhysicalParameters/ParticleParameters \
+               ../../../RenderingEngine/OpenGLRenderingEngine 
+QMAKE_LIBDIR = ../../../../bin \
+               $${YADE_QMAKE_PATH}/lib/yade/yade-libs/ 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 
 QMAKE_CXXFLAGS_DEBUG += -lpthread \
                         -pthread 
-DESTDIR = ../../../bin 
+DESTDIR = ../../../../bin 
 CONFIG += debug \
           thread \
           warn_on \
           dll 
 TEMPLATE = lib 
-INCLUDEPATH += $${YADE_QMAKE_PATH}/include
-
+HEADERS += GLDrawParticleState.hpp 
+SOURCES += GLDrawParticleState.cpp 
 QMAKE_RUN_CXX_IMP = $(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $(shell pwd)/$<
