@@ -8,6 +8,7 @@
 
 #include "NullGUI.hpp"
 #include "MetaBody.hpp"
+#include "FileGenerator.hpp"
 #include <iostream>
 #include <boost/shared_ptr.hpp>
 #include <boost/filesystem/convenience.hpp>
@@ -23,6 +24,8 @@ NullGUI::NullGUI ()
 	snapshotName = "";
 	maxIteration = 0;
 	binary = 0;
+	filegen = "";
+	file = "";
 }
 
 
@@ -46,7 +49,7 @@ void NullGUI::help()
 			  so you see that calculations are going on.\n\
 \n\
     input:\n\
-	-f name		- specify filename to load.\n\
+	-f name		- specify filename to load, or filegenerator configuration file\n\
 \n\
     output:\n\
 	-s number	- if specified, a snapshot is saved every 'number'\n\
@@ -54,8 +57,13 @@ void NullGUI::help()
 			  you will have a snpashot every 500th iteration.\n\
 	-S name		- specify base filename of snapshot. Defaults to input\n\
 			  filename. Filename has appended iteration number.\n\
+			  Or specify FileGenerator output file if generating a file.\n\
+			  (without extension, use -b to get binary output)\n\
         -Q name		- do not calculate, just save what is loaded and exit\n\
 			  (for doing data conversions)\n\
+	-F name		- FileGenerator name, must be specified with -f that specifies\n\
+			  the accompanying configuration file (used for file generation)\n\
+			  and with -S that specifies the output file to save\n\
 \n\
     options:\n\
 	-m number	- specify maximum number of iterations\n\
@@ -73,14 +81,14 @@ int NullGUI::run(int argc, char* argv[])
 
 	int ch;
 	opterr = 0;
-	while( ( ch = getopt(argc,argv,"Hf:s:S:v:pm:t:g:bQ:") ) != -1)
+	while( ( ch = getopt(argc,argv,"Hf:s:S:v:pm:t:g:bQ:F:") ) != -1)
 		switch(ch)
 		{
 			case 'H'        : help();                                               return 1;
 			case 'v'	: interval = lexical_cast<int>(optarg);			break;
 			case 'p'	: progress = true;					break;
-			case 'f'	: Omega::instance().setSimulationFileName(optarg);
-                                          if(snapshotName.size() == 0 ) snapshotName = optarg;	break;
+			case 'F'	: filegen = optarg;					break;
+			case 'f'	: file = optarg;					break;
 			case 's'        : snapshotInterval = lexical_cast<int>(optarg);		break;
 			case 'S'        : snapshotName = optarg;				break;
 			case 'Q'        : quickSave = optarg;					break;
@@ -92,15 +100,33 @@ int NullGUI::run(int argc, char* argv[])
 //						(Vector3r(0,-lexical_cast<Real>(optarg),0));	break;
 			default		:help(); 						return 1;
 		}
-	if(Omega::instance().getSimulationFileName() == "") 
-		help(), exit(0);
-	return loop();
+	if(filegen.empty()) // calculations
+	{
+		Omega::instance().setSimulationFileName(file);
+		if(snapshotName.empty() ) snapshotName = file;
+		if(Omega::instance().getSimulationFileName() == "") 
+			help(), exit(0);
+		return loop();
+	} 
+	else // FileGenerator
+		return gen();
+
+	assert(false); // never reach this place
 }
 
 
 int NullGUI::loop()
 {
-	Omega::instance().loadSimulation();
+	try
+	{
+		Omega::instance().loadSimulation();
+	}
+	catch(SerializableError& e)
+	{
+		std::cerr << file << " cannot be loaded: " << e.what() << "\n";
+		exit(0);
+	}
+		
 	if(quickSave.size()!=0)
 		std::cerr << "saving "<< quickSave << "\n", Omega::instance().saveSimulation(quickSave), exit(1);
 
@@ -154,4 +180,40 @@ int NullGUI::loop()
 		}
 	}
 }
+
+int NullGUI::gen()
+{
+	if(snapshotName.empty())
+		std::cerr << "please specufy output file name with -S\n", exit(0);
+	if(file.empty())
+		std::cerr << "please specufy config file name with -f\n", exit(0);
+	boost::shared_ptr<Factorable> tmpf;
+	try
+	{
+		tmpf = ClassFactory::instance().createShared(filegen);
+	}
+	catch(FactoryError& e)
+	{
+		std::cerr << filegen << " is not available: " << e.what() << "\n", exit(0);
+	}
+	boost::shared_ptr<FileGenerator> f = dynamic_pointer_cast<FileGenerator>(tmpf);
+	if( f == 0 )
+		std::cerr << filegen << " is not a FileGenerator.\n", exit(0);
+	try
+	{
+		std::cerr << "loading FileGenerator configuration file: " << file << "\n";
+		IOFormatManager::loadFromFile("XMLFormatManager",file,"fileGenerator",f);
+	}
+	catch(SerializableError& e)
+	{
+		std::cerr << file << " cannot be loaded: " << e.what() << "\n", exit(0);
+	}
+	std::cerr	<< "calling FileGenerator: " << filegen 
+			<< ",\nwith config file: " << file 
+			<< ",\nto generate file: " << snapshotName << (binary?".yade":".xml") << "\n\n";
+	f->setFileName(snapshotName + (binary?".yade":".xml"));
+	f->setSerializationLibrary((binary?"BINFormatManager":"XMLFormatManager"));
+	std::cerr << "\n" << f->generateAndSave() << "\n";
+	return 0;
+};
 

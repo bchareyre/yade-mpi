@@ -63,7 +63,14 @@ string FileGenerator::generateAndSave()
 	{
 		setMessage("saving...");
 		setProgress(1.0);
-		IOFormatManager::saveToFile(serializationDynlib, outputFileName, "rootBody", rootBody);
+		try
+		{
+			IOFormatManager::saveToFile(serializationDynlib, outputFileName, "rootBody", rootBody);
+		}
+		catch(SerializableError& e)
+		{
+			return std::string("File "+outputFileName+" cannot be saved: "+e.what());
+		}
 		return std::string("File "+outputFileName+" generated successfully.\n\n")+message;
 	}
 }

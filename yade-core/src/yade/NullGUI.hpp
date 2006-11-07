@@ -24,11 +24,12 @@ class NullGUI : public FrontEnd
 
 		bool 		 progress;
 		bool 		 binary;
-		string		 snapshotName;
+		string		 snapshotName,filegen,file;
 		long int	 maxIteration;
 		
 		void help();
 		int loop();
+		int gen();
 
 	public :
 		NullGUI ();

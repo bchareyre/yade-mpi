@@ -18,8 +18,6 @@ class FileGenerator
 	: public Serializable
 	, public ThreadWorker
 {
-	private:
-		std::string generateAndSave();
 	protected :
 		shared_ptr<MetaBody>	 rootBody;
 
@@ -27,6 +25,7 @@ class FileGenerator
 					,serializationDynlib;
 	
 	public :
+		std::string generateAndSave();
 		void setFileName(const string& fileName);
 		void setSerializationLibrary(const string& lib);
 		

@@ -32,6 +32,7 @@ struct IOManagerExceptions
 	static const char* WrongFileFooter;
 	static const char* AttributeNotFound;
 	static const char* BadAttributeValue;
+	static const char* FileNotGood;
 };
 
 #endif //  IOMANAGEREXCEPTIONS_HPP

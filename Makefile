@@ -35,3 +35,7 @@ uninstall:
 	$(MAKE) -C yade-guis uninstall
 	$(MAKE) -C yade-packages uninstall
 	$(MAKE) -C yade-extra uninstall
+
+tags:
+	ctags -R --language-force=c++ --extra=+q --exclude=.svn
+

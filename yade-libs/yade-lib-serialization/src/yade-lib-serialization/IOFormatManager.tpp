@@ -12,11 +12,15 @@
 #define IOMANAGER_TPP
 
 #include "Archive.hpp"
+#include "SerializationExceptions.hpp"
+#include "IOManagerExceptions.hpp"
 
 template<typename Type>
 void IOFormatManager::loadFromFile(const string& libName, const string& fileName,const string& name, Type& t)
 {
 	ifstream filei(fileName.c_str());
+	if(!filei.good())
+		throw SerializableError(IOManagerExceptions::FileNotGood);
 
 	shared_ptr<IOFormatManager> ioManager;
 	ioManager = dynamic_pointer_cast<IOFormatManager>(ClassFactory::instance().createShared(libName));
@@ -34,6 +38,8 @@ template<typename Type>
 void IOFormatManager::saveToFile(const string& libName, const string& fileName,const string& name, Type& t)
 {
 	ofstream fileo(fileName.c_str());
+	if(!fileo.good())
+		throw  SerializableError(IOManagerExceptions::FileNotGood);
 	
 	shared_ptr<IOFormatManager> ioManager;
 	ioManager = static_pointer_cast<IOFormatManager>(ClassFactory::instance().createShared(libName));
@@ -57,7 +63,6 @@ void IOFormatManager::loadArchive(const string& libName, istream& stream, Type& 
 	string str = ioManager->beginDeserialization(stream,*ac);
 	ac->deserialize(stream, *ac, str);
 	ioManager->finalizeDeserialization(stream,*ac);
-	cerr << "loadFromFile 3a\n";
 }
 
 
