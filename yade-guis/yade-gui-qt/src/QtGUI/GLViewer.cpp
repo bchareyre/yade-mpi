@@ -1,6 +1,8 @@
 /*************************************************************************
 *  Copyright (C) 2004 by Olivier Galizzi                                 *
 *  olivier.galizzi@imag.fr                                               *
+*  Copyright (C) 2005 by Janek Kozicki                                   *
+*  cosurgi@berlios.de                                                    *
 *                                                                        *
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
@@ -105,7 +107,7 @@ void GLViewer::draw() // FIXME maybe rename to RendererFlowControl, or something
 	if(Omega::instance().getRootBody())
 	{
 		int selection = selectedName();
-		if(selection != -1)
+		if(selection != -1 && (*(Omega::instance().getRootBody()->bodies)).exists(selection) )
 		{
 			Quaternionr& q = (*(Omega::instance().getRootBody()->bodies))[selection]->physicalParameters->se3.orientation;
 			Vector3r&    v = (*(Omega::instance().getRootBody()->bodies))[selection]->physicalParameters->se3.position;
@@ -144,13 +146,15 @@ void GLViewer::postSelection(const QPoint& point)
 		}
 		return;
 	}
+	if( (*(Omega::instance().getRootBody()->bodies)).exists(selection) )
+	{
+		wasDynamic = (*(Omega::instance().getRootBody()->bodies))[selection]->isDynamic;
+		(*(Omega::instance().getRootBody()->bodies))[selection]->isDynamic = false;
 
-	wasDynamic = (*(Omega::instance().getRootBody()->bodies))[selection]->isDynamic;
-	(*(Omega::instance().getRootBody()->bodies))[selection]->isDynamic = false;
-
-	Quaternionr& q = (*(Omega::instance().getRootBody()->bodies))[selection]->physicalParameters->se3.orientation;
-	Vector3r&    v = (*(Omega::instance().getRootBody()->bodies))[selection]->physicalParameters->se3.position;
-	manipulatedFrame()->setPositionAndOrientation(qglviewer::Vec(v[0],v[1],v[2]),qglviewer::Quaternion(q[0],q[1],q[2],q[3]));
+		Quaternionr& q = (*(Omega::instance().getRootBody()->bodies))[selection]->physicalParameters->se3.orientation;
+		Vector3r&    v = (*(Omega::instance().getRootBody()->bodies))[selection]->physicalParameters->se3.position;
+		manipulatedFrame()->setPositionAndOrientation(qglviewer::Vec(v[0],v[1],v[2]),qglviewer::Quaternion(q[0],q[1],q[2],q[3]));
+	}
 
 }
 
@@ -162,7 +166,7 @@ void GLViewer::endSelection(const QPoint &point)
 
 	QGLViewer::endSelection(point);
 
-	if(old != -1 && old!=selectedName())
+	if(old != -1 && old!=selectedName() && (*(Omega::instance().getRootBody()->bodies)).exists(old) )
 		(*(Omega::instance().getRootBody()->bodies))[old]->isDynamic = wasDynamic;
 }
 

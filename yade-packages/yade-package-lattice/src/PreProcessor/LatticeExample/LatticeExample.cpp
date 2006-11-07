@@ -234,7 +234,7 @@ string LatticeExample::generate()
 
 	
 	rootBody->persistentInteractions	= shared_ptr<InteractionContainer>(new InteractionVecSet);
-	rootBody->volatileInteractions		= shared_ptr<InteractionContainer>(new InteractionVecSet);
+	rootBody->transientInteractions		= shared_ptr<InteractionContainer>(new InteractionVecSet);
 	rootBody->physicalActions		= shared_ptr<PhysicalActionContainer>(new PhysicalActionVectorVector);
 	rootBody->bodies 			= shared_ptr<BodyContainer>(new BodyRedirectionVector);
 
@@ -597,12 +597,7 @@ void LatticeExample::calcBeamPositionOrientationLength(shared_ptr<Body>& body)
 	beam->se3Displacement.position 	= Vector3r(0.0,0.0,0.0);
 	beam->se3Displacement.orientation.align(dist,dist);
 
-	Vector3r axis;
-	Real angle;
-	beam->se3Displacement.orientation.toAxisAngle(axis, angle);
-	axis.normalize();
-
-	beam->otherDirection	= axis; // any unit vector that is orthogonal to direction.
+	beam->otherDirection	= beam->se3.orientation*Vector3r::UNIT_Y; // any unit vector that is orthogonal to direction.
 }
 
 void LatticeExample::calcAxisAngle(LatticeBeamParameters* beam, BodyContainer* bodies, unsigned int otherId, InteractionContainer* ints, unsigned int thisId)
@@ -610,27 +605,21 @@ void LatticeExample::calcAxisAngle(LatticeBeamParameters* beam, BodyContainer* b
 	if( ! ints->find(otherId,thisId) && otherId != thisId )
 	{
 		LatticeBeamParameters* 	otherBeam 		= static_cast<LatticeBeamParameters*>( ((*(bodies))[ otherId ])->physicalParameters.get() );
-		Real 			angle;
+		Real 			angle, offPlaneAngle;
 		
-	/*
-                angle = (
-				beam->direction.cross(otherBeam->direction)[2] > 0.0 ? 1.0 : -1.0
-			)
-			* 
-			beam->direction.angleBetweenUnitVectors(otherBeam->direction) ;
-	*/
-
 		angle = beam->direction.angleBetweenUnitVectors(otherBeam->direction);
 
                 shared_ptr<Interaction>                 interaction(new Interaction( thisId , otherId ));
                 shared_ptr<LatticeBeamAngularSpring>    angularSpring(new LatticeBeamAngularSpring);
 		
 		angularSpring->initialPlaneAngle 	= angle;
-		angularSpring->planeAngle 		= angle;
-		angularSpring->lastCrossProduct		= -1.0*(beam->direction.cross(otherBeam->direction));
+	//	angularSpring->planeAngle 		= angle;
 		angularSpring->planeSwap180		= false;
-		//angularSpring->initialOffPlaneAngle	= ;
-		//angularSpring->offPlaneAngle		= ;
+		angularSpring->lastCrossProduct		= -1.0*(beam->direction.cross(otherBeam->direction));
+		
+		offPlaneAngle = beam->otherDirection.angleBetweenUnitVectors(angularSpring->lastCrossProduct);
+		angularSpring->initialOffPlaneAngle	= offPlaneAngle;
+	//	angularSpring->offPlaneAngle		= offPlaneAngle;
 		
 		interaction->isReal			= true;
 		interaction->isNew 			= false;

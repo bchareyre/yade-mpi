@@ -73,7 +73,7 @@ void StrainRecorder::action(Body * body)
 	strain_y = (currentLength - initialLength) / initialLength; // odkszta³cenie ca³ej próbki
 	
 	//bool nonlocal = false;
-	//if (ncb->volatileInteractions->size() != 0) // it's non-local
+	//if (ncb->transientInteractions->size() != 0) // it's non-local
 	//	nonlocal = true;
 	
 	for( ; i != end ; ++i )

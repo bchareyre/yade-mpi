@@ -18,7 +18,7 @@ MetaBody::MetaBody() :
 	  Body()
 	//, bodies(new BodyRedirectionVector)
 	//, persistentInteractions(new InteractionVecSet)
-	//, volatileInteractions(new InteractionVecSet)
+	//, transientInteractions(new InteractionVecSet)
 	//, physicalActions(new PhysicalActionVectorVector)
 {	
 	engines.clear();
@@ -48,7 +48,7 @@ void MetaBody::registerAttributes()
 	REGISTER_ATTRIBUTE(engines);
 	REGISTER_ATTRIBUTE(initializers);
 	REGISTER_ATTRIBUTE(bodies);
-	REGISTER_ATTRIBUTE(volatileInteractions);
+	REGISTER_ATTRIBUTE(transientInteractions);
 	REGISTER_ATTRIBUTE(persistentInteractions);
 	REGISTER_ATTRIBUTE(physicalActions); // FIXME - needed or not ? - Olivier : yes it is needed if there is no default initialization into constructor
 }

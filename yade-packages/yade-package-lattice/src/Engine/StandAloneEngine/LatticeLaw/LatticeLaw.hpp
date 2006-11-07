@@ -22,7 +22,7 @@ class LatticeLaw : public InteractionSolver
 {
 	private:
 		vector<unsigned int> futureDeletes;
-		bool nonlocal;
+		//bool nonlocal;
                 
                 bool deleteBeam(MetaBody* lattice , LatticeBeamParameters* beam, Body*);
                 void calcBeamPositionOrientationNewLength(Body* body, BodyContainer* bodies);
@@ -35,6 +35,8 @@ class LatticeLaw : public InteractionSolver
 		{
 			REGISTER_ATTRIBUTE(roughEdges);
 			REGISTER_ATTRIBUTE(ensure2D);
+			// must go to derived class
+			//REGISTER_ATTRIBUTE(nonlocal);
 		};
 
 /// Serializtion

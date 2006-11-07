@@ -37,7 +37,7 @@ class SAPCollider : public BroadInteractor
 		};
 
 	protected :
-		// number of potential volatileInteractions = number of colliding AABB
+		// number of potential transientInteractions = number of colliding AABB
 		int nbPotentialInteractions;
 		// maximum number of object that that collider can handle
 		unsigned int maxObject;
@@ -62,7 +62,7 @@ class SAPCollider : public BroadInteractor
 		SAPCollider ();
 		~SAPCollider ();
 
-		// return a list "volatileInteractions" of pairs of Body which Bounding volume are in potential interaction
+		// return a list "transientInteractions" of pairs of Body which Bounding volume are in potential interaction
 		void action(Body * body);
 
 

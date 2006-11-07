@@ -79,9 +79,9 @@ void PersistentSAPCollider::action(Body* body)
 		}
 	}
 	
-	volatileInteractions = ncb->volatileInteractions;
-	InteractionContainer::iterator ii    = volatileInteractions->begin();
-	InteractionContainer::iterator iiEnd = volatileInteractions->end();
+	transientInteractions = ncb->transientInteractions;
+	InteractionContainer::iterator ii    = transientInteractions->begin();
+	InteractionContainer::iterator iiEnd = transientInteractions->end();
 	for( ; ii!=iiEnd ; ++ii)
 	{
 		shared_ptr<Interaction> interaction = *ii;
@@ -177,7 +177,7 @@ void PersistentSAPCollider::updateOverlapingBBSet(int id1,int id2)
 {
 
 // 	// look if the paiur (id1,id2) already exists in the overleppingBB collection
-	bool found = (volatileInteractions->find(id1,id2)!=0);
+	bool found = (transientInteractions->find(id1,id2)!=0);
 	
 	// test if the AABBs of the spheres number "id1" and "id2" are overlapping
 	int offset1 = 3*id1;
@@ -188,10 +188,10 @@ void PersistentSAPCollider::updateOverlapingBBSet(int id1,int id2)
 
 	// inserts the pair p=(id1,id2) if the two AABB overlapps and if p does not exists in the overlappingBB
 	if (overlapp && !found)
-		volatileInteractions->insert(id1,id2);
+		transientInteractions->insert(id1,id2);
 	// removes the pair p=(id1,id2) if the two AABB do not overlapp any more and if p already exists in the overlappingBB
 	else if (!overlapp && found)
-		volatileInteractions->erase(id1,id2);
+		transientInteractions->erase(id1,id2);
 
 }
 

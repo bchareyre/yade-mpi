@@ -143,7 +143,7 @@ void NonLocalInitializer::action(Body * body)
 	BodyContainer::iterator bi2;
 	BodyContainer::iterator biEnd = rootBody->bodies->end();
 	
-	//rootBody->volatileInteractions->clear();
+	//rootBody->transientInteractions->clear();
 	//nonl.clear();
 	//nonl.resize(1);
 	
@@ -178,7 +178,7 @@ void NonLocalInitializer::action(Body * body)
 			if( ! ( body2->getGroupMask() & beamGroupMask ) )
 				continue; // skip non-beams
 			
-			//calcNonLocal(body1,body2,rootBody->bodies.get(),rootBody->volatileInteractions.get());
+			//calcNonLocal(body1,body2,rootBody->bodies.get(),rootBody->transientInteractions.get());
 			if( calcNonLocal(body1,body2,rootBody->bodies.get(),nonl) )
 				++total; 
 		}

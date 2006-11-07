@@ -29,9 +29,9 @@ void InteractionPhysicsMetaEngine::action(Body* body)
 		operator()( b1->physicalParameters , b2->physicalParameters , interaction );
 	}
 
-	shared_ptr<InteractionContainer>& volatileInteractions = ncb->volatileInteractions;
-	ii    = volatileInteractions->begin();
-	iiEnd = volatileInteractions->end(); 
+	shared_ptr<InteractionContainer>& transientInteractions = ncb->transientInteractions;
+	ii    = transientInteractions->begin();
+	iiEnd = transientInteractions->end(); 
 	for( ; ii!=iiEnd ; ++ii)
 	{
 		const shared_ptr<Interaction> interaction = *ii;

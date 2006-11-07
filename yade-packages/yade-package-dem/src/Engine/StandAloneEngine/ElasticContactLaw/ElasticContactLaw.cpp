@@ -44,8 +44,8 @@ void ElasticContactLaw::action(Body* body)
 
 /// Non Permanents Links												///
 
-	InteractionContainer::iterator ii    = ncb->volatileInteractions->begin();
-	InteractionContainer::iterator iiEnd = ncb->volatileInteractions->end();
+	InteractionContainer::iterator ii    = ncb->transientInteractions->begin();
+	InteractionContainer::iterator iiEnd = ncb->transientInteractions->end();
 	for(  ; ii!=iiEnd ; ++ii )
 	{
 		if ((*ii)->isReal)

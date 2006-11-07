@@ -40,7 +40,7 @@ class PersistentAloneSAPCollider
 	};
 
 	protected :
-		int nbPotentialInteractions;		// number of potential volatileInteractions = number of interacting AABB
+		int nbPotentialInteractions;		// number of potential transientInteractions = number of interacting AABB
 		unsigned int			nbObjects;
 		vector<shared_ptr<AABBBound> >	xBounds;	// AABB extremity of the sphere number "id" projected onto the X axis
 		vector<shared_ptr<AABBBound> >	yBounds;	// AABB extremity of the sphere number "id" projected onto the Y axis
@@ -73,7 +73,7 @@ class PersistentAloneSAPCollider
 		PersistentAloneSAPCollider();
 		virtual ~PersistentAloneSAPCollider();
 
-		// return a list "volatileInteractions" of pairs of Body which Bounding volume are in potential interaction
+		// return a list "transientInteractions" of pairs of Body which Bounding volume are in potential interaction
 		void action(const vector<SphericalDEM>& spheres, ContactVecSet& contacts);
 
 };

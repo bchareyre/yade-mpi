@@ -32,9 +32,9 @@ void InteractionGeometryMetaEngine::action(Body* body)
 		operator()( b1->interactingGeometry , b2->interactingGeometry , b1->physicalParameters->se3 , b2->physicalParameters->se3 , interaction );
 	}
 	
-	shared_ptr<InteractionContainer>& volatileInteractions = ncb->volatileInteractions;
-	ii    = volatileInteractions->begin();
-	iiEnd = volatileInteractions->end(); 
+	shared_ptr<InteractionContainer>& transientInteractions = ncb->transientInteractions;
+	ii    = transientInteractions->begin();
+	iiEnd = transientInteractions->end(); 
 	for(  ; ii!=iiEnd ; ++ii)
 	{
 		const shared_ptr<Interaction> interaction = *ii;

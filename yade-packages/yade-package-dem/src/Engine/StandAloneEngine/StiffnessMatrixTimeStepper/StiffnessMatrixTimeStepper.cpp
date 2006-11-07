@@ -128,7 +128,7 @@ void StiffnessMatrixTimeStepper::computeTimeStep(Body* body)
 	MetaBody * ncb = dynamic_cast<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 // 	shared_ptr<InteractionContainer>& persistentInteractions = ncb->persistentInteractions;
-// 	shared_ptr<InteractionContainer>& volatileInteractions = ncb->volatileInteractions;
+// 	shared_ptr<InteractionContainer>& transientInteractions = ncb->transientInteractions;
 
 	newDt = Mathr::MAX_REAL;
 	Real defaultDt = 0.0003;
@@ -140,13 +140,13 @@ void StiffnessMatrixTimeStepper::computeTimeStep(Body* body)
 	for(  ; ii!=iiEnd ; ++ii )
 		findTimeStepFromInteraction(*ii , bodies);
 
-	ii    = volatileInteractions->begin();
-	iiEnd = volatileInteractions->end();
+	ii    = transientInteractions->begin();
+	iiEnd = transientInteractions->end();
 	for(  ; ii!=iiEnd ; ++ii )
 		findTimeStepFromInteraction(*ii , bodies);*/
 	
-// no volatileInteractions at all? so let's try to estimate timestep by investigating bodies,
-// simulating that a body in contact with itself. this happens only when there were not volatileInteractions at all.
+// no transientInteractions at all? so let's try to estimate timestep by investigating bodies,
+// simulating that a body in contact with itself. this happens only when there were not transientInteractions at all.
 	BodyContainer::iterator bi    = bodies->begin();
 	BodyContainer::iterator biEnd = bodies->end();
 	for(  ; bi!=biEnd ; ++bi )

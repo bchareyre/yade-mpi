@@ -36,8 +36,8 @@ void MyTetrahedronLaw::action(Body* body)
 
 	Real dt = Omega::instance().getTimeStep();
 
-	InteractionContainer::iterator ii    = ncb->volatileInteractions->begin();
-	InteractionContainer::iterator iiEnd = ncb->volatileInteractions->end();
+	InteractionContainer::iterator ii    = ncb->transientInteractions->begin();
+	InteractionContainer::iterator iiEnd = ncb->transientInteractions->end();
 	for(  ; ii!=iiEnd ; ++ii )
 	{
 		if ((*ii)->isReal)	// isReal means that InteractingMyTetrahedron2InteractingMyTetrahedron4InteractionOfMyTetrahedron returned true

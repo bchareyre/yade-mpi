@@ -102,8 +102,8 @@ Real TriaxialCompressionEngine::ComputeUnbalancedForce(Body * body, bool maxUnba
         MetaBody * ncb = static_cast<MetaBody*>(body);
         shared_ptr<BodyContainer>& bodies = ncb->bodies;
 
-        InteractionContainer::iterator ii    = ncb->volatileInteractions->begin();
-        InteractionContainer::iterator iiEnd = ncb->volatileInteractions->end();
+        InteractionContainer::iterator ii    = ncb->transientInteractions->begin();
+        InteractionContainer::iterator iiEnd = ncb->transientInteractions->end();
         for(  ; ii!=iiEnd ; ++ii ) {
                 if ((*ii)->isReal) {
                         const shared_ptr<Interaction>& contact = *ii;

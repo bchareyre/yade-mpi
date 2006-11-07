@@ -96,8 +96,8 @@ void SAPCollider::action(Body* body)
 	std::set<unsigned int>::iterator it;
 	std::set<unsigned int>::iterator itEnd;
 
-	/*std::list<Interaction*>::iterator ci = volatileInteractions.begin();
-	std::list<Interaction*>::iterator ciEnd = volatileInteractions.end();
+	/*std::list<Interaction*>::iterator ci = transientInteractions.begin();
+	std::list<Interaction*>::iterator ciEnd = transientInteractions.end();
 	for(;ci!=ciEnd;++ci)
 	{
 		delete (*ci)->interactionGeometry;
@@ -105,7 +105,7 @@ void SAPCollider::action(Body* body)
 	}*/
 
 // FIXME : correct that
-	ncb->volatileInteractions->clear();
+	ncb->transientInteractions->clear();
 
 	nbPotentialInteractions = 0;
 	for(i=0;i<nbObjects;i++)
@@ -120,7 +120,7 @@ void SAPCollider::action(Body* body)
 			{
 				nbPotentialInteractions++;
 				shared_ptr<Interaction> inter(new Interaction(i,*it));
-				ncb->volatileInteractions->insert(inter);
+				ncb->transientInteractions->insert(inter);
 			}
 		}
 	}

@@ -125,8 +125,8 @@ void TriaxialStressController::updateStiffness (MetaBody * ncb)
 		stiffness[i] = 0;
 	}											///
 
-	InteractionContainer::iterator ii    = ncb->volatileInteractions->begin();
-	InteractionContainer::iterator iiEnd = ncb->volatileInteractions->end();
+	InteractionContainer::iterator ii    = ncb->transientInteractions->begin();
+	InteractionContainer::iterator iiEnd = ncb->transientInteractions->end();
 	for(  ; ii!=iiEnd ; ++ii )
 	{
 		if ((*ii)->isReal)

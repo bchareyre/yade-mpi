@@ -39,8 +39,8 @@ void FrictionLessElasticContactLaw::action(Body * body)
 	Real stiffness = 10000;
 	Real viscosity = 10;
 	
-	InteractionContainer::iterator ii = ncb->volatileInteractions->begin();
-	InteractionContainer::iterator iiEnd = ncb->volatileInteractions->end();
+	InteractionContainer::iterator ii = ncb->transientInteractions->begin();
+	InteractionContainer::iterator iiEnd = ncb->transientInteractions->end();
 	for( ; ii!=iiEnd; ++ii )
 	{
 		shared_ptr<Interaction> contact = *ii;
@@ -90,9 +90,9 @@ void FrictionLessElasticContactLaw::action(Body * body)
 // 
 // 	Real dt = Omega::instance().getTimeStep();
 // 
-// 	for( ncb->volatileInteractions->gotoFirst() ; ncb->volatileInteractions->notAtEnd() ; ncb->volatileInteractions->gotoNext() )
+// 	for( ncb->transientInteractions->gotoFirst() ; ncb->transientInteractions->notAtEnd() ; ncb->transientInteractions->gotoNext() )
 // 	{
-// 		const shared_ptr<Interaction>& contact = ncb->volatileInteractions->getCurrent();
+// 		const shared_ptr<Interaction>& contact = ncb->transientInteractions->getCurrent();
 // 		int id1 = contact->getId1();
 // 		int id2 = contact->getId2();
 // 

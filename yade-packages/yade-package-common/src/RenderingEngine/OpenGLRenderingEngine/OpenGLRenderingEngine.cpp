@@ -182,7 +182,7 @@ void OpenGLRenderingEngine::render(
 
 
 /*	shared_ptr<BodyContainer> bodies = rootBody->bodies;
-	shared_ptr<InteractionContainer>& collisions = rootBody->volatileInteractions;
+	shared_ptr<InteractionContainer>& collisions = rootBody->transientInteractions;
 	for( collisions->gotoFirst() ; collisions->notAtEnd() ; collisions->gotoNext())
 	{
 		const shared_ptr<Interaction>& col = collisions->getCurrent();

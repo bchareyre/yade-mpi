@@ -14,37 +14,42 @@
 
 class LatticeBeamParameters : public PhysicalParameters 
 {
-        private:
-                long int                 lastIter_;
-                Real                     strain_;
-        public :
-                unsigned int             id1
-                                        ,id2;
-				
+	private:
+		long int                 lastIter_;
+		Real                     strain_;
+	public :
+		// element
+		unsigned int             id1
+					,id2;
+		// state		
 		Real  			 initialLength
-                                        ,length;
-                                
-                Vector3r                 direction		// is a unit vector
+					,length;
+
+		Vector3r                 direction		// is a unit vector
 					,otherDirection;	// is a unit vector too
-                                
-                Real                     criticalTensileStrain
-                                        ,criticalCompressiveStrain
-                                
-                                        ,longitudalStiffness
-                                        ,bendingStiffness;
-                                
-                                
-                Se3r                     se3Displacement;
-                
+
+		Se3r                     se3Displacement;
+
+		// parameters
+		Real                     criticalTensileStrain
+					,criticalCompressiveStrain
+	
+					,longitudalStiffness
+					,bendingStiffness;
+
+
+		// where does it belong, what is it?
+		// a PhysicalAction !
 		Real 			 count;
-                Real                     bendingRotation;
-                
-                Real strain();
-                Real                     nonLocalStrain
-                                        ,nonLocalDivisor;
-        
-                LatticeBeamParameters();
-                virtual ~LatticeBeamParameters();
+		Quaternionr		 rotation;
+
+		Real strain();
+		// must go to derived class
+		//Real                     nonLocalStrain
+		//                        ,nonLocalDivisor;
+
+		LatticeBeamParameters();
+		virtual ~LatticeBeamParameters();
 
 /// Serialization
 	protected :

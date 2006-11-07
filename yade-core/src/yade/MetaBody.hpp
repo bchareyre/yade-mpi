@@ -22,7 +22,7 @@ class MetaBody : public Body
 		vector<shared_ptr<Engine> >		engines;
 		vector<shared_ptr<Engine> >		initializers;
 		shared_ptr<InteractionContainer>	persistentInteractions; // disappear, reappear according to physical (or any other non-spatial) criterion
-		shared_ptr<InteractionContainer>	volatileInteractions;	// disappear, reappear according to spatial criterion
+		shared_ptr<InteractionContainer>	transientInteractions;	// disappear, reappear according to spatial criterion
 		shared_ptr<PhysicalActionContainer>	physicalActions;
 	
 		MetaBody ();

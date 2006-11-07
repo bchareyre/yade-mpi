@@ -13,12 +13,13 @@ LatticeBeamParameters::LatticeBeamParameters() : PhysicalParameters()
 {
 	createIndex();
 	count = 0.0;
-//	rotation = Vector3r(0,0,0);
-//	bendingRotation = Quaternionr(1.0,0.0,0.0,0.0);
-	bendingRotation = 0.0;
+	rotation = Quaternionr(1.0,0.0,0.0,0.0);
+//	rotation.fromAxisAngle( Vector3r(0,0,1),0);
+//	bendingRotation = 0.0;
+//	torsionalRotation = 0.0;
 	lastIter_ = -1;
-	nonLocalStrain = 0.0;
-	nonLocalDivisor = 0.0;
+//	nonLocalStrain = 0.0;
+//	nonLocalDivisor = 0.0;
 }
 
 

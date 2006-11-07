@@ -46,7 +46,7 @@ void ErrorTolerantLaw::action(Body* body)
 	MetaBody * ncb = dynamic_cast<MetaBody*>(body);
 	shared_ptr<BodyContainer> bodies = ncb->bodies;
 
-	if (ncb->volatileInteractions->size() > 0)
+	if (ncb->transientInteractions->size() > 0)
 	{
 		// Build inverse of masses matrix and store it into a vector
 		ublas::banded_matrix<float> invM(6*bodies->size(),6*bodies->size(),1,1);
@@ -82,8 +82,8 @@ void ErrorTolerantLaw::action(Body* body)
 		//
 		ublas::matrix<float> J;
 		ublas::matrix<float> Jt;
-		//ublas::sparse_matrix<float> J (6*bodies->size(), ncb->volatileInteractions->size(), ncb->volatileInteractions->size()*2/*6*bodies.size()*body->volatileInteractions.size()*/);
-		//ublas::sparse_matrix<float> Jt (ncb->volatileInteractions->size(), 6*bodies->size(), ncb->volatileInteractions->size()*2/*6*bodies.size()*body->volatileInteractions.size()*/);
+		//ublas::sparse_matrix<float> J (6*bodies->size(), ncb->transientInteractions->size(), ncb->transientInteractions->size()*2/*6*bodies.size()*body->transientInteractions.size()*/);
+		//ublas::sparse_matrix<float> Jt (ncb->transientInteractions->size(), 6*bodies->size(), ncb->transientInteractions->size()*2/*6*bodies.size()*body->transientInteractions.size()*/);
 
 		static ublas::vector<float> penetrationDepthes;
 		static ublas::vector<float> penetrationVelocities;
@@ -99,8 +99,8 @@ void ErrorTolerantLaw::action(Body* body)
 		shared_ptr<Interaction> contact;
 		i=0;
 
-		InteractionContainer::iterator ii = ncb->volatileInteractions->begin();
-		InteractionContainer::iterator iiEnd = ncb->volatileInteractions->end();
+		InteractionContainer::iterator ii = ncb->transientInteractions->begin();
+		InteractionContainer::iterator iiEnd = ncb->transientInteractions->end();
 		for( ; ii!=iiEnd; ++ii )
 		{
 			contact = *ii;

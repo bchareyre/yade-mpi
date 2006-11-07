@@ -18,9 +18,10 @@ class LatticeBeamAngularSpring : public InteractionPhysics
 		Vector3r		 lastCrossProduct;
 		bool			 planeSwap180;
 		Real			 initialPlaneAngle  // 2D only for now
-			 		,planeAngle
+			 		//,planeAngle
 					,initialOffPlaneAngle
-					,offPlaneAngle;
+					//,offPlaneAngle
+					;
 		
 		LatticeBeamAngularSpring();
 		virtual ~LatticeBeamAngularSpring();
