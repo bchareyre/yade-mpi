@@ -205,7 +205,7 @@ void Omega::scanPlugins()
 			filesystem::directory_iterator diEnd;
 			for ( ; di != diEnd; ++di )
 			{
-				if (!filesystem::is_directory(*di) && !filesystem::symbolic_link_exists(*di) && filesystem::extension(*di)!=".a")
+				if (!filesystem::is_directory(*di) && filesystem::symbolic_link_exists(*di) && filesystem::extension(*di)!=".a")
 				{
 					filesystem::path name(filesystem::basename((*di)));
 					int prevLength = (*di).leaf().size();
@@ -318,22 +318,20 @@ void Omega::loadSimulation()
 		freeRootBody();
 		logMessage("Loading file " + simulationFileName);
 		
-		//{
-		//	LOCK(rootBodyMutex);
-		//	IOFormatManager::loadFromFile("yade-lib-serialization-xml",simulationFileName,"rootBody",rootBody);
-			if(filesystem::extension(simulationFileName)==".xml")
-				IOFormatManager::loadFromFile("XMLFormatManager",simulationFileName,"rootBody",rootBody);
-			else if(filesystem::extension(simulationFileName)==".yade" )
-				IOFormatManager::loadFromFile("BINFormatManager",simulationFileName,"rootBody",rootBody);
+		if(filesystem::extension(simulationFileName)==".xml")
+			IOFormatManager::loadFromFile("XMLFormatManager",simulationFileName,"rootBody",rootBody);
+		else if(filesystem::extension(simulationFileName)==".yade" )
+			IOFormatManager::loadFromFile("BINFormatManager",simulationFileName,"rootBody",rootBody);
+		if( rootBody->getClassName() != "MetaBody")
+			throw yadeBadFile("bad file to load");
 
-			sStartingSimulationTime = second_clock::local_time();
-			msStartingSimulationTime = microsec_clock::local_time();
-			simulationPauseDuration = msStartingSimulationTime-msStartingSimulationTime;
-			msStartingPauseTime = msStartingSimulationTime;
-			*logFile << "<Simulation" << " Date =\"" << sStartingSimulationTime << "\">" << endl;
-			currentIteration = 0;
-			simulationTime = 0;	
-		//}
+		sStartingSimulationTime = second_clock::local_time();
+		msStartingSimulationTime = microsec_clock::local_time();
+		simulationPauseDuration = msStartingSimulationTime-msStartingSimulationTime;
+		msStartingPauseTime = msStartingSimulationTime;
+		*logFile << "<Simulation" << " Date =\"" << sStartingSimulationTime << "\">" << endl;
+		currentIteration = 0;
+		simulationTime = 0;	
 	}
 	else
 	{
