@@ -19,6 +19,7 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <unistd.h>
 #include <yade/yade-core/Omega.hpp>
+#include <yade/yade-core/yadeExceptions.hpp>
 #include <yade/yade-lib-wm3-math/Math.hpp>
 
 
@@ -166,6 +167,16 @@ void SimulationController::pbLoadClicked()
 			}
 		} 
 		catch(SerializableError& e) // catching it...
+		{
+			Omega::instance().freeRootBody();
+			shared_ptr<MessageDialog> md = shared_ptr<MessageDialog>(new MessageDialog(e.what(),this->parentWidget()->parentWidget()));
+			md->exec(); 
+			pbStartSimulation->setDisabled(true);
+			pbStopSimulation->setDisabled(true);
+			pbResetSimulation->setDisabled(true);
+			pbOneSimulationStep->setDisabled(true);
+		}
+		catch(yadeError& e)
 		{
 			Omega::instance().freeRootBody();
 			shared_ptr<MessageDialog> md = shared_ptr<MessageDialog>(new MessageDialog(e.what(),this->parentWidget()->parentWidget()));
