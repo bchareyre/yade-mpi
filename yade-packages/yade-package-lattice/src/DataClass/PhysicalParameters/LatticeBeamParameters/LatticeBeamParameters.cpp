@@ -13,13 +13,11 @@ LatticeBeamParameters::LatticeBeamParameters() : PhysicalParameters()
 {
 	createIndex();
 	count = 0.0;
-	rotation = Quaternionr(1.0,0.0,0.0,0.0);
-//	rotation.fromAxisAngle( Vector3r(0,0,1),0);
-//	bendingRotation = 0.0;
-//	torsionalRotation = 0.0;
+	bendingRotation = Quaternionr(1.0,0.0,0.0,0.0);
+	torsionalRotation = Quaternionr(1.0,0.0,0.0,0.0);
+	torsionAngle = 0;
+	torsionalStiffness = 0.6;
 	lastIter_ = -1;
-//	nonLocalStrain = 0.0;
-//	nonLocalDivisor = 0.0;
 }
 
 
@@ -34,22 +32,22 @@ void LatticeBeamParameters::postProcessAttributes(bool deserializing)
 	{
 /*		if(criticalTensileStrain > 0.00015) // E.l
 		{ // CEMENT MATRIX
-			bendingStiffness          = 0.7;	// k.b
 			longitudalStiffness       = 1.0;	// k.l
+			bendingStiffness          = 0.7;	// k.b
 			criticalCompressiveStrain = 1.0;	// E.c
 			criticalTensileStrain     = 0.0002;	// E.l
 		}
 		else if(criticalTensileStrain > 0.00006) // E.l
 		{ // AGGREGATE
-			bendingStiffness          = 2.1;	// k.b
 			longitudalStiffness       = 3.0;	// k.l
+			bendingStiffness          = 2.1;	// k.b
 			criticalCompressiveStrain = 1.0;	// E.c
 			criticalTensileStrain     = 0.0001333;	// E.l
 		}
 		else
 		{ // BOND / INTERFACE
-			bendingStiffness          = 0.7;	// k.b
 			longitudalStiffness       = 1.0;	// k.l
+			bendingStiffness          = 0.7;	// k.b
 			criticalCompressiveStrain = 1.0;	// E.c
 			criticalTensileStrain     = 0.0002;	// E.l
 		}
@@ -66,8 +64,9 @@ void LatticeBeamParameters::postProcessAttributes(bool deserializing)
 			{
 				d1=false;
 				std::cout << "\nCEMENT:\n";
-				chk("\t\tk.b",bendingStiffness);                // k.b
 				chk("\tk.l",longitudalStiffness);               // k.l
+				chk("\t\tk.b",bendingStiffness);                // k.b
+				chk("\tk.t",torsionalStiffness);              // k.t
 				chk("E.c",criticalCompressiveStrain);           // E.c
 				chk("\tE.l",criticalTensileStrain);             // E.l
 			}
@@ -79,8 +78,9 @@ void LatticeBeamParameters::postProcessAttributes(bool deserializing)
 			{
 				d2=false;
 				std::cout << "\nAGGREGATE:\n";
-				chk("\t\tk.b",bendingStiffness);                // k.b
 				chk("\tk.l",longitudalStiffness);               // k.l
+				chk("\t\tk.b",bendingStiffness);                // k.b
+				chk("\tk.t",torsionalStiffness);              // k.t
 				chk("E.c",criticalCompressiveStrain);           // E.c
 				chk("\tE.l",criticalTensileStrain);             // E.l
 			}
@@ -92,8 +92,9 @@ void LatticeBeamParameters::postProcessAttributes(bool deserializing)
 			{
 				d3=false;
 				std::cout << "\nBOND:\n";
-				chk("\t\tk.b",bendingStiffness);                // k.b
 				chk("\tk.l",longitudalStiffness);               // k.l
+				chk("\t\tk.b",bendingStiffness);                // k.b
+				chk("\tk.t",torsionalStiffness);              // k.t
 				chk("E.c",criticalCompressiveStrain);           // E.c
 				chk("\tE.l",criticalTensileStrain);             // E.l
 			}
@@ -136,9 +137,10 @@ void LatticeBeamParameters::registerAttributes()
 	
 	REGISTER_ATTRIBUTE(criticalTensileStrain);
 	REGISTER_ATTRIBUTE(criticalCompressiveStrain);
-	
+
 	REGISTER_ATTRIBUTE(longitudalStiffness);
 	REGISTER_ATTRIBUTE(bendingStiffness);
+	REGISTER_ATTRIBUTE(torsionalStiffness);
 
 	REGISTER_ATTRIBUTE(se3Displacement);
 }

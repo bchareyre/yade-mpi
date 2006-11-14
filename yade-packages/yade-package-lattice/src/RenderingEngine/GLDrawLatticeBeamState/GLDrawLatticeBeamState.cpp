@@ -47,9 +47,18 @@ void GLDrawLatticeBeamState::go(const shared_ptr<PhysicalParameters>& pp)
 	glBegin(GL_LINES);
 		glVertex3v(beam->direction*(-0.5));
 		glVertex3v(beam->direction*0.5);
-	//	glColor3(1.0,1.0,1.0);
-		glVertex3(0,0,0);
+	glEnd();
+	/*
+	glBegin(GL_TRIANGLES);
+		glColor3(1.0,1.0,1.0);
+		glVertex3v(beam->direction*(-0.1));
+		glVertex3v(beam->direction*0.1);
+		glVertex3v(beam->otherDirection*0.2);
+		
+		glVertex3v(beam->direction*0.1);
+		glVertex3v(beam->direction*(-0.1));
 		glVertex3v(beam->otherDirection*0.2);
 	glEnd();
+	*/
 }
 

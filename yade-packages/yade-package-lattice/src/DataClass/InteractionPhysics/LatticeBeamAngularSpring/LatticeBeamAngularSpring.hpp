@@ -19,9 +19,14 @@ class LatticeBeamAngularSpring : public InteractionPhysics
 		bool			 planeSwap180;
 		Real			 initialPlaneAngle  // 2D only for now
 			 		//,planeAngle
-					,initialOffPlaneAngle
+					,initialOffPlaneAngle1
+					,initialOffPlaneAngle2
+					,lastOffPlaneAngleDifference1
+					,lastOffPlaneAngleDifference2
 					//,offPlaneAngle
 					;
+		int			 swirl1
+					,swirl2;
 		
 		LatticeBeamAngularSpring();
 		virtual ~LatticeBeamAngularSpring();

@@ -76,6 +76,10 @@ void GLViewer::keyPressEvent(QKeyEvent *e)
 			setMouseBinding(Qt::RightButton, FRAME, ROTATE);
 			setWheelBinding(Qt::NoButton , FRAME, ZOOM);
 		}
+	else if( e->key()==Qt::Key_C && selectedName() != -1 && (*(Omega::instance().getRootBody()->bodies)).exists(selectedName()))
+		setSceneCenter(manipulatedFrame()->position());
+	else if( e->key()==Qt::Key_D )
+		wasDynamic = true;
 	else if( e->key()==Qt::Key_G )
 		drawGrid = !drawGrid;
 	else if( e->key()!=Qt::Key_Escape && e->key()!=Qt::Key_Space )
@@ -148,6 +152,7 @@ void GLViewer::postSelection(const QPoint& point)
 	}
 	if( (*(Omega::instance().getRootBody()->bodies)).exists(selection) )
 	{
+		std::cerr << "new selection " << selection << "\n";
 		wasDynamic = (*(Omega::instance().getRootBody()->bodies))[selection]->isDynamic;
 		(*(Omega::instance().getRootBody()->bodies))[selection]->isDynamic = false;
 

@@ -35,6 +35,7 @@ class LatticeExample : public FileGenerator
                                 
                                 ,longitudalStiffness_noUnit     // k_l
                                 ,bendingStiffness_noUnit        // k_b
+                                ,torsionalStiffness_noUnit      // k_t
                         //////////////////////////////////////                          
                                 ,nonLocalL_in_cellsizeUnit;     // l
                                 
@@ -55,11 +56,13 @@ class LatticeExample : public FileGenerator
                         // MaterialParameters of aggregate
                                 ,agg_longStiffness_noUnit       // k_l aggregate
                                 ,agg_bendStiffness_noUnit       // k_b aggregate
+                                ,agg_torsStiffness_noUnit       // k_t aggregate
                                 ,agg_critCompressStrain         // E.c aggregate
                                 ,agg_critTensileStrain          // E.l aggregate
                         // MaterialParameters of bond
                                 ,bond_longStiffness_noUnit      // k_l bond
                                 ,bond_bendStiffness_noUnit      // k_b bond
+                                ,bond_torsStiffness_noUnit      // k_t bond
                                 ,bond_critCompressStrain        // E.c bond
                                 ,bond_critTensileStrain;        // E.l bond
 

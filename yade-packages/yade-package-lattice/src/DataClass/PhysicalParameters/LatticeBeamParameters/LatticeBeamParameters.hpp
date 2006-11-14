@@ -35,13 +35,16 @@ class LatticeBeamParameters : public PhysicalParameters
 					,criticalCompressiveStrain
 	
 					,longitudalStiffness
-					,bendingStiffness;
+					,bendingStiffness
+					,torsionalStiffness;
 
 
 		// where does it belong, what is it?
 		// a PhysicalAction !
-		Real 			 count;
-		Quaternionr		 rotation;
+		Real 			 count
+					,torsionAngle;
+		Quaternionr		 bendingRotation
+					,torsionalRotation;
 
 		Real strain();
 		// must go to derived class

@@ -63,7 +63,8 @@ LatticeExample::LatticeExample() : FileGenerator()
         crit_ComprStrain         = 0.5; // E_max
                         
         longitudalStiffness_noUnit= 1.0;        // k_l
-        bendingStiffness_noUnit   = 0.7;        // k_b
+        bendingStiffness_noUnit   = 0.6;        // k_b
+        torsionalStiffness_noUnit = 0.6;        // k_t
         
         ensure2D 		 = false;
         roughEdges 		 = false;
@@ -124,11 +125,13 @@ LatticeExample::LatticeExample() : FileGenerator()
         // MaterialParameters of aggregate
         agg_longStiffness_noUnit = 3.0;                                 // k_l aggregate
         agg_bendStiffness_noUnit = 2.1;                                 // k_b aggregate
+        agg_torsStiffness_noUnit = 2.1;                                 // k_b aggregate
         agg_critCompressStrain   = 100.0;                               // E.c aggregate
         agg_critTensileStrain    = 50.0;                                // E.l aggregate
         // MaterialParameters of bond
         bond_longStiffness_noUnit= 0.7;                                 // k_l bond
         bond_bendStiffness_noUnit= 0.28;                                // k_b bond
+        bond_torsStiffness_noUnit= 0.28;                                // k_b bond
         bond_critCompressStrain  = 100.0;                               // E.c bond
         bond_critTensileStrain   = 50.0;                                // E.l bond
 }
@@ -152,6 +155,7 @@ void LatticeExample::registerAttributes()
         REGISTER_ATTRIBUTE(crit_ComprStrain);           // E_max [%]    - default 0.2 %
         REGISTER_ATTRIBUTE(longitudalStiffness_noUnit); // k_l [-]      - default 1.0
         REGISTER_ATTRIBUTE(bendingStiffness_noUnit);    // k_b [-]      - default 0.6
+        REGISTER_ATTRIBUTE(torsionalStiffness_noUnit);  // k_t [-]      - default 0.6
         
         REGISTER_ATTRIBUTE(ensure2D);
         REGISTER_ATTRIBUTE(roughEdges);
@@ -217,11 +221,13 @@ void LatticeExample::registerAttributes()
         // MaterialParameters of aggregate
         REGISTER_ATTRIBUTE(agg_longStiffness_noUnit);
         REGISTER_ATTRIBUTE(agg_bendStiffness_noUnit);
+        REGISTER_ATTRIBUTE(agg_torsStiffness_noUnit);
         REGISTER_ATTRIBUTE(agg_critCompressStrain);
         REGISTER_ATTRIBUTE(agg_critTensileStrain);
         // MaterialParameters of bond
         REGISTER_ATTRIBUTE(bond_longStiffness_noUnit);
         REGISTER_ATTRIBUTE(bond_bendStiffness_noUnit);
+        REGISTER_ATTRIBUTE(bond_torsStiffness_noUnit);
         REGISTER_ATTRIBUTE(bond_critCompressStrain);
         REGISTER_ATTRIBUTE(bond_critTensileStrain);
 }
@@ -528,15 +534,15 @@ bool LatticeExample::createNode(shared_ptr<Body>& body, int i, int j, int k)
         body->physicalParameters        = physics;
 
 //////////////////////
-// do tego przyk?adu ustawiam wspó?rz?dne - FIXME - przyda?oby si? ?adowanie wspó?rz?dnych wierzcho?ków sk?din?d
+// some custom coordinates for testing: - FIXME - it will be useful to be able to get coordinates from outside
 //static int zzzzz=0;
 //switch(zzzzz%5)
 //{
-//      case 0  : physics->se3.position=Vector3r(0.4,1.5,0); break;
-//      case 1  : physics->se3.position=Vector3r(0.8,0.6,0); break;
-//      case 2  : physics->se3.position=Vector3r(0,0,0); break;
-//      case 3  : physics->se3.position=Vector3r(1.6,0.5,0); break;
-//      case 4  : physics->se3.position=Vector3r(2.0,0,0); break;
+//      case 0  : physics->se3.position=Vector3r(0,0.4,1.5); break;
+//      case 1  : physics->se3.position=Vector3r(0,0.8,0.6); break;
+//      case 2  : physics->se3.position=Vector3r(0,0  ,0  ); break;
+//      case 3  : physics->se3.position=Vector3r(0,1.6,0.5); break;
+//      case 4  : physics->se3.position=Vector3r(0,2.0,0  ); break;
 //};
 //zzzzz++;
 //
@@ -591,6 +597,7 @@ void LatticeExample::calcBeamPositionOrientationLength(shared_ptr<Body>& body)
         beam->criticalCompressiveStrain = crit_ComprStrain;
         beam->longitudalStiffness       = longitudalStiffness_noUnit;
         beam->bendingStiffness          = bendingStiffness_noUnit;
+        beam->torsionalStiffness        = torsionalStiffness_noUnit;
         
 	se3Beam.orientation.align( Vector3r::UNIT_X , dist );
 	beam->se3 		= se3Beam;
@@ -600,27 +607,41 @@ void LatticeExample::calcBeamPositionOrientationLength(shared_ptr<Body>& body)
 	beam->otherDirection	= beam->se3.orientation*Vector3r::UNIT_Y; // any unit vector that is orthogonal to direction.
 }
 
-void LatticeExample::calcAxisAngle(LatticeBeamParameters* beam, BodyContainer* bodies, unsigned int otherId, InteractionContainer* ints, unsigned int thisId)
+void LatticeExample::calcAxisAngle(LatticeBeamParameters* beam1, BodyContainer* bodies, unsigned int otherId, InteractionContainer* ints, unsigned int thisId)
 { 
 	if( ! ints->find(otherId,thisId) && otherId != thisId )
 	{
-		LatticeBeamParameters* 	otherBeam 		= static_cast<LatticeBeamParameters*>( ((*(bodies))[ otherId ])->physicalParameters.get() );
+		LatticeBeamParameters* 	beam2 		= static_cast<LatticeBeamParameters*>( ((*(bodies))[ otherId ])->physicalParameters.get() );
 		Real 			angle, offPlaneAngle;
 		
-		angle = beam->direction.angleBetweenUnitVectors(otherBeam->direction);
+		angle = beam1->direction.angleBetweenUnitVectors(beam2->direction);
 
                 shared_ptr<Interaction>                 interaction(new Interaction( thisId , otherId ));
                 shared_ptr<LatticeBeamAngularSpring>    angularSpring(new LatticeBeamAngularSpring);
 		
 		angularSpring->initialPlaneAngle 	= angle;
-	//	angularSpring->planeAngle 		= angle;
 		angularSpring->planeSwap180		= false;
-		angularSpring->lastCrossProduct		= -1.0*(beam->direction.cross(otherBeam->direction));
+		angularSpring->lastCrossProduct		= 1.0*(beam1->direction.cross(beam2->direction));
+		angularSpring->lastCrossProduct.normalize();
 		
-		offPlaneAngle = beam->otherDirection.angleBetweenUnitVectors(angularSpring->lastCrossProduct);
-		angularSpring->initialOffPlaneAngle	= offPlaneAngle;
-	//	angularSpring->offPlaneAngle		= offPlaneAngle;
-		
+		angularSpring->initialOffPlaneAngle1	= beam1->otherDirection.angleBetweenUnitVectors(angularSpring->lastCrossProduct);
+		angularSpring->initialOffPlaneAngle2	= beam2->otherDirection.angleBetweenUnitVectors(angularSpring->lastCrossProduct);
+
+	//	std::cerr << thisId << ", " << otherId << ", (" << beam1->otherDirection << ") (" << beam2->otherDirection << ") (" << angularSpring->lastCrossProduct << ")\n";
+				
+		Quaternionr	aligner1,aligner2;
+		aligner1.fromAxisAngle(beam1->direction , angularSpring->initialOffPlaneAngle1);
+		aligner2.fromAxisAngle(beam2->direction , angularSpring->initialOffPlaneAngle2);
+				
+		Vector3r	dir1			= aligner1 * angularSpring->lastCrossProduct;
+		Vector3r	dir2			= aligner2 * angularSpring->lastCrossProduct;
+
+		// FIXME
+		if( dir1.dot(beam1->otherDirection) < 0.999999 )
+			angularSpring->initialOffPlaneAngle1   *= -1.0;//, angularSpring->offPlaneSwap1 = true;
+		if( dir2.dot(beam2->otherDirection) < 0.999999 )
+			angularSpring->initialOffPlaneAngle2   *= -1.0;//, angularSpring->offPlaneSwap2 = true;
+	
 		interaction->isReal			= true;
 		interaction->isNew 			= false;
 		interaction->interactionPhysics 	= angularSpring;
@@ -816,6 +837,7 @@ void LatticeExample::nonDestroy(shared_ptr<MetaBody>& rootBody, Vector3r min, Ve
                 beam->criticalCompressiveStrain = 0.9;
                 beam->longitudalStiffness       = 4.0;
                 beam->bendingStiffness          = 2.8;
+                beam->torsionalStiffness        = 2.8;
                 (*(rootBody->bodies))[beam->id1]->geometricalModel->diffuseColor = Vector3f(0.2,0.5,0.7);
                 (*(rootBody->bodies))[beam->id2]->geometricalModel->diffuseColor = Vector3f(0.2,0.5,0.7);
         }
@@ -946,6 +968,7 @@ void LatticeExample::addAggregates(shared_ptr<MetaBody>& rootBody)
                         {
                                 beam->longitudalStiffness       = agg_longStiffness_noUnit;
                                 beam->bendingStiffness          = agg_bendStiffness_noUnit;
+                                beam->torsionalStiffness        = agg_torsStiffness_noUnit;
                                 beam->criticalTensileStrain     = agg_critTensileStrain;
                                 beam->criticalCompressiveStrain = agg_critCompressStrain;
                 
@@ -956,6 +979,7 @@ void LatticeExample::addAggregates(shared_ptr<MetaBody>& rootBody)
                         {
                                 beam->longitudalStiffness       = bond_longStiffness_noUnit;
                                 beam->bendingStiffness          = bond_bendStiffness_noUnit;
+                                beam->torsionalStiffness	= bond_torsStiffness_noUnit;
                                 beam->criticalTensileStrain     = bond_critTensileStrain;
                                 beam->criticalCompressiveStrain = bond_critCompressStrain;
                 

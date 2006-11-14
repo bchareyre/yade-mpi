@@ -18,7 +18,7 @@ class LatticeNodeParameters : public PhysicalParameters
 		Real 		 countIncremental
 				,countStiffness;
 		Vector3r 	 displacementIncremental
-				,displacementStiffness;
+				,displacementAlignmental;
 	
 		LatticeNodeParameters();
 		virtual ~LatticeNodeParameters();

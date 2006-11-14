@@ -51,6 +51,7 @@ bool StrainRecorder::isActivated()
 
 void StrainRecorder::action(Body * body)
 {
+//	std::cerr << "StrainRecorder quits\n";
 //	return;
 	
 	MetaBody * ncb = static_cast<MetaBody*>(body);
