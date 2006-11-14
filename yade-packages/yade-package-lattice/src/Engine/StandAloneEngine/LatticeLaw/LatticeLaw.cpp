@@ -83,9 +83,9 @@ void LatticeLaw::calcBeamPositionOrientationNewLength(Body* body, BodyContainer*
 	beam->torsionAngle		= 0.0;
 	beam->count			= 0.0;
 
-	double zzzzz=beam->direction.dot(beam->otherDirection);
-	if(zzzzz < -3e-16 || zzzzz > 3e-16 )
-		std::cerr << "============== " << zzzzz << "\n";
+//	double zzzzz=beam->direction.dot(beam->otherDirection);
+//	if(zzzzz < -3e-16 || zzzzz > 3e-16 )
+//		std::cerr << "============== " << zzzzz << "\n";
 //		std::cerr << " (" << beam->otherDirection << ")";
 
 }
@@ -167,6 +167,8 @@ void LatticeLaw::action(Body* body)
 				beam2->bendingRotation = beam2->bendingRotation * rotationDifference2;
 
 		// 'T' calculate torsional rotation
+			if(calcTorsion)
+			{
 
 				bool sameFlow			= true;
 				if( (beam1->id1 == beam2->id1) || (beam1->id2 == beam2->id2) )
@@ -236,18 +238,8 @@ void LatticeLaw::action(Body* body)
 
 				Real swirlAngle1 = (offPlaneAngleDifference1 + Mathr::TWO_PI * an->swirl1)*sinAngleSquared;
 				Real swirlAngle2 = (offPlaneAngleDifference2 + Mathr::TWO_PI * an->swirl2)*sinAngleSquared;
-
 				
-//std::cerr.precision(3);
-//if(beam1->id1 == 22 && beam1->id2 == 23) std::cerr << "22,23 " << offPlaneAngleDifference1 << " \t" << offPlaneAngleDifference2 << " \t" << torsionAngle1 << " \t" << torsionAngle2 << " \tswirl: " << an->swirl1 << " " << an->swirl2 << " angle: " << swirlAngle1 << " " << swirlAngle2 << "\n";
-//if(beam1->id1 == 26 && beam1->id2 == 27) std::cerr << "26,27 " << offPlaneAngleDifference1 << " \t" << offPlaneAngleDifference2 << " \t" << torsionAngle1 << " \t" << torsionAngle2 << " \tswirl: " << an->swirl1 << " " << an->swirl2 << " angle: " << swirlAngle1 << " " << swirlAngle2 << "\n";
-//if(beam1->id1 == 24 && beam1->id2 == 25) std::cerr << "24,25 " << offPlaneAngleDifference1 << " \t" << offPlaneAngleDifference2 << " \t" << torsionAngle1 << " \t" << torsionAngle2 << " \tswirl: " << an->swirl1 << " " << an->swirl2 << " angle: " << swirlAngle1 << " " << swirlAngle2 << "\n";
-//if(beam1->id1 == 20 && beam1->id2 == 21) std::cerr << "20,21 " << offPlaneAngleDifference1 << " \t" << offPlaneAngleDifference2 << " \t" << torsionAngle1 << " \t" << torsionAngle2 << " \tswirl: " << an->swirl1 << " " << an->swirl2 << " angle: " << swirlAngle1 << " " << swirlAngle2 << "\n";
-//		if(beam1->id1 == 7  &&  beam2->id1 == 11) beam1->torsionAngle += 0.01;
-//		else
 				beam1->torsionAngle += 0.5*( swirlAngle1 + torsionAngle1)/beam1->count;
-//		if(beam2->id1 == 7  &&  beam2->id2 == 11) beam2->torsionAngle += 0.01;
-//		else
 				beam2->torsionAngle += 0.5*( swirlAngle2 + torsionAngle2)/beam2->count;
 				
 				//axis of torsional rotation is the other's beam direction, the beam tries to rotate its neighbours to fit its orientation
@@ -256,6 +248,7 @@ void LatticeLaw::action(Body* body)
 			
 				beam1->torsionalRotation = beam1->torsionalRotation * rotationDifference1;
 				beam2->torsionalRotation = beam2->torsionalRotation * rotationDifference2;
+			}
 			}
 		}
 	}
@@ -323,6 +316,7 @@ void LatticeLaw::action(Body* body)
 			node2->displacementAlignmental += (beam->bendingRotation * (-beam_vec) + beam_vec) * beam->bendingStiffness;
 		}
 		
+		if(calcTorsion)
 		{ // 'T' from picture - torsion
 
 			node1->countStiffness += beam->torsionalStiffness;

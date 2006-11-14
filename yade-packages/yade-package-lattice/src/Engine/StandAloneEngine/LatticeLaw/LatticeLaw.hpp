@@ -27,7 +27,7 @@ class LatticeLaw : public InteractionSolver
                 bool deleteBeam(MetaBody* lattice , LatticeBeamParameters* beam, Body*);
                 void calcBeamPositionOrientationNewLength(Body* body, BodyContainer* bodies);
 	public :
-		bool roughEdges,ensure2D; // FIXME, FIXME, FIXME 
+		bool roughEdges,ensure2D,calcTorsion; // FIXME, FIXME, FIXME 
 		LatticeLaw();
 		virtual ~LatticeLaw();
 		void action(Body* body);
@@ -35,6 +35,7 @@ class LatticeLaw : public InteractionSolver
 		{
 			REGISTER_ATTRIBUTE(roughEdges);
 			REGISTER_ATTRIBUTE(ensure2D);
+			REGISTER_ATTRIBUTE(calcTorsion);
 			// must go to derived class
 			//REGISTER_ATTRIBUTE(nonlocal);
 		};

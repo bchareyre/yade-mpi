@@ -40,11 +40,13 @@ class LatticeExample : public FileGenerator
                                 ,nonLocalL_in_cellsizeUnit;     // l
                                 
                 bool             triangularBaseGrid
+				,triangularBaseGrid3D
                                 ,useNonLocalModel
                                 ,useBendTensileSoftening
                                 ,useStiffnessSoftening
                                 ,ensure2D
-                                ,roughEdges;
+                                ,roughEdges
+				,calculate_Torsion;
         
         // aggregates
                 bool             useAggregates;

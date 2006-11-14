@@ -20,7 +20,8 @@ void GLDrawLineSegment::go(const shared_ptr<GeometricalModel>& gm, const shared_
 
 	// FIXME - there must be a way to tell this from outside
 //	glScalef(len,0.030,0.030); // it's a box, not a line. looks better :)
-	glScalef(len,0.010,0.010); // it's a box, not a line. looks better :)
+//	glScalef(len,0.010,0.010); // it's a box, not a line. looks better :)
+	glScalef(len,0.001,0.001); // it's a box, not a line. looks better :)
 
 	if (gm->wire || wire)
 	{

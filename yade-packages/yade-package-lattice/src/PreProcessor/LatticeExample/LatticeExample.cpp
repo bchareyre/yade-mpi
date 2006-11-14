@@ -54,6 +54,7 @@ LatticeExample::LatticeExample() : FileGenerator()
         disorder_in_cellsizeUnit = Vector3r(0.6,0.6,0.0);
         maxLength_in_cellsizeUnit= 1.9;
         triangularBaseGrid       = true;
+        triangularBaseGrid3D     = true;
         useNonLocalModel         = false;
         useBendTensileSoftening  = false;
         useStiffnessSoftening    = false;
@@ -68,6 +69,7 @@ LatticeExample::LatticeExample() : FileGenerator()
         
         ensure2D 		 = false;
         roughEdges 		 = false;
+	calculate_Torsion	 = false;
         
         region_A_min             = Vector3r(-0.006, 0.096,-1);
         region_A_max             = Vector3r( 0.16 , 0.16 , 1);
@@ -159,8 +161,10 @@ void LatticeExample::registerAttributes()
         
         REGISTER_ATTRIBUTE(ensure2D);
         REGISTER_ATTRIBUTE(roughEdges);
+        REGISTER_ATTRIBUTE(calculate_Torsion);
         
         REGISTER_ATTRIBUTE(triangularBaseGrid);         //              - triangles
+        REGISTER_ATTRIBUTE(triangularBaseGrid3D);       //              - triangles 3d
         REGISTER_ATTRIBUTE(useBendTensileSoftening);
         REGISTER_ATTRIBUTE(useStiffnessSoftening);
         REGISTER_ATTRIBUTE(useNonLocalModel);
@@ -250,6 +254,8 @@ string LatticeExample::generate()
 	Vector3r nbNodes = speciemen_size_in_meters / cellsizeUnit_in_meters;
 	if(triangularBaseGrid)
 		nbNodes[1] *= 1.15471; // bigger by sqrt(3)/2 factor
+	if(triangularBaseGrid3D)
+		nbNodes[2] *= 1.22475; // bigger by (1/3)*(sqrt(6)) factor
 
         unsigned int totalNodesCount = 0;
 
@@ -503,10 +509,22 @@ bool LatticeExample::createNode(shared_ptr<Body>& body, int i, int j, int k)
 	Quaternionr q;
 	q.fromAxisAngle( Vector3r(Mathr::unitRandom(),Mathr::unitRandom(),Mathr::unitRandom()) , Mathr::unitRandom()*Mathr::PI );
 	
-	float  triang_x = triangularBaseGrid ? (static_cast<float>(j%2))*0.5 : 0;
-	double triang_y = triangularBaseGrid ? 0.86602540378443864676        : 1; // sqrt(3)/2
+	float  triang_x = triangularBaseGrid   ? ((static_cast<float>(j%2))*0.5)+i : i+0;
+	double triang_y = triangularBaseGrid   ? 0.86602540378443864676*j          : j*1; // sqrt(3)/2
+	double triang_z = k;
+
+	if(triangularBaseGrid3D)
+	{
+		triang_z *= 0.81649658092772603273;
+		switch(k%3)
+		{
+			case 0 : triang_x += 0.5; triang_y +=     0.86602540378443864676/3.0; break;
+			case 1 :                  triang_y += 2.0*0.86602540378443864676/3.0; break;
+			case 2 : break;
+		}
+	}
 	
-	Vector3r position		= ( Vector3r(i+triang_x,j*triang_y,k)
+	Vector3r position		= ( Vector3r(triang_x,triang_y,triang_z)
 					  + Vector3r( 	  Mathr::symmetricRandom()*disorder_in_cellsizeUnit[0]
 					  		, Mathr::symmetricRandom()*disorder_in_cellsizeUnit[1]
 							, Mathr::symmetricRandom()*disorder_in_cellsizeUnit[2]
@@ -684,6 +702,7 @@ void LatticeExample::createActors(shared_ptr<MetaBody>& )
         shared_ptr<LatticeLaw> latticeLaw(new LatticeLaw);
         latticeLaw->ensure2D   = ensure2D;
         latticeLaw->roughEdges = roughEdges;
+        latticeLaw->calcTorsion= calculate_Torsion;
         
         rootBody->engines.clear();
         rootBody->engines.push_back(boundingVolumeDispatcher);
