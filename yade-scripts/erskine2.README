@@ -1,0 +1,12 @@
+erskine2.py and erskine2-apply.sh should be placed in trunk/yade-scripts directory. wscript must be in trunk/.
+
+install waf from http://freehackers.org/~tnagy/bksys.html
+
+cd trunk/yade-scripts; ./erskine2-apply.sh YADE_QMAKE_PATH
+for example            ./erskine2-apply.sh /home/joeuser/YADE
+cd trunk;
+	export CXX='ccache -g++4.0'
+	waf configure
+	waf (add '-j4' for speed and/or '-p' for prettyness)
+
+Installation doesn't work yet. Not did I verify that the build is OK. It compiles, that's it. And it will automatically reflect any changes to the .pro files.
