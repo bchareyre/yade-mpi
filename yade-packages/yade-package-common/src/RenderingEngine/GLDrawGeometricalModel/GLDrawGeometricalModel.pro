@@ -6,7 +6,8 @@ error( "YADE_QMAKE_PATH internal qmake variable is not set, you should run for e
 SUBDIRS += GLDrawTetrahedron \
            GLDrawBox \
            GLDrawMesh2D \
-           GLDrawSphere 
+           GLDrawSphere \
+	   GLDrawQuadrilateral
 CONFIG += debug \
           thread \
 warn_on

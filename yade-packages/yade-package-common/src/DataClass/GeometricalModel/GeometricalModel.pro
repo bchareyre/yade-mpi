@@ -6,7 +6,8 @@ error( "YADE_QMAKE_PATH internal qmake variable is not set, you should run for e
 SUBDIRS += Box \
            Mesh2D \
            Sphere \
-           Tetrahedron 
+           Tetrahedron \
+	   Quadrilateral
 CONFIG += debug \
           thread \
 warn_on

@@ -26,6 +26,7 @@ OpenGLRenderingEngine::OpenGLRenderingEngine() : RenderingEngine()
 	drawWireFrame		= false;
 	drawInside		= true;
 	needInit		= true;
+	drawMask		= ~0;
 	lightPos		= Vector3r(75.0,130.0,0.0);
 	backGroundColor		= Vector3r(0.2,0.2,0.2);
 	
@@ -358,7 +359,7 @@ void OpenGLRenderingEngine::renderShadowVolumes(const shared_ptr<MetaBody>& root
 		BodyContainer::iterator biEnd = rootBody->bodies->end();
 		for(; bi!=biEnd ; ++bi )
 		{
-			if ((*bi)->geometricalModel->shadowCaster)
+			if ((*bi)->geometricalModel->shadowCaster && ( (*bi)->getGroupMask() & drawMask ))
 				shadowVolumeDispatcher((*bi)->geometricalModel,(*bi)->physicalParameters,lightPos);
 		}
 	}
@@ -378,8 +379,7 @@ void OpenGLRenderingEngine::renderGeometricalModel(const shared_ptr<MetaBody>& r
 		BodyContainer::iterator biEnd = bodies->end();
 		for( ; bi!=biEnd ; ++bi)
 		{
-
-			if((*bi)->geometricalModel)
+			if((*bi)->geometricalModel && ( (*bi)->getGroupMask() & drawMask ))
 			{
 				glPushMatrix();
 				Se3r& se3 = (*bi)->physicalParameters->se3;
@@ -398,6 +398,7 @@ void OpenGLRenderingEngine::renderGeometricalModel(const shared_ptr<MetaBody>& r
 					const GLfloat ambientColor[4]	= {0.5,0.5,0.5,1.0};	
 					glLightModelfv(GL_LIGHT_MODEL_AMBIENT,ambientColor);
 				}
+				// FIXME FIXME - in fact it is a 1D dispatcher
 				geometricalModelDispatcher((*bi)->geometricalModel,(*bi)->physicalParameters,drawWireFrame);
 				if(current_selection == (*bi)->getId())
 					done = true;
@@ -418,7 +419,7 @@ void OpenGLRenderingEngine::renderState(const shared_ptr<MetaBody>& rootBody)
 	for( ; bi!=biEnd ; ++bi)
 	{
 		glPushMatrix();
-		if((*bi)->physicalParameters)
+		if((*bi)->physicalParameters && ( (*bi)->getGroupMask() & drawMask ))
 			stateDispatcher((*bi)->physicalParameters);
 		glPopMatrix();
 	}
@@ -437,7 +438,7 @@ void OpenGLRenderingEngine::renderBoundingVolume(const shared_ptr<MetaBody>& roo
 	for( ; bi!=biEnd ; ++bi)
 	{
 		glPushMatrix();
-		if((*bi)->boundingVolume)
+		if((*bi)->boundingVolume && ( (*bi)->getGroupMask() & drawMask ))
 			boundingVolumeDispatcher((*bi)->boundingVolume);
 		glPopMatrix();
 	}
@@ -463,7 +464,7 @@ void OpenGLRenderingEngine::renderInteractingGeometry(const shared_ptr<MetaBody>
 		se3.orientation.toAxisAngle(axis,angle);	
 		glTranslatef(se3.position[0],se3.position[1],se3.position[2]);
 		glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
-		if((*bi)->interactingGeometry)
+		if((*bi)->interactingGeometry && ( (*bi)->getGroupMask() & drawMask ))
 			interactionGeometryDispatcher((*bi)->interactingGeometry,(*bi)->physicalParameters);
 		glPopMatrix();
 	}
@@ -488,6 +489,7 @@ void OpenGLRenderingEngine::registerAttributes()
 	REGISTER_ATTRIBUTE(useFastShadowVolume);	
 	REGISTER_ATTRIBUTE(drawWireFrame);
 	REGISTER_ATTRIBUTE(drawInside);
+	REGISTER_ATTRIBUTE(drawMask);
 }
 
 

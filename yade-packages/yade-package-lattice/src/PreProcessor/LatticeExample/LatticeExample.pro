@@ -24,6 +24,8 @@ LIBS += -lLineSegment \
         -lPhysicalActionContainerInitializer \
         -lParticleParameters \
         -lAABB \
+	-lQuadrilateral \
+	-lParticleParameters \
         -lSphere \
         -lDisplacementEngine \
         -lLatticeLaw \

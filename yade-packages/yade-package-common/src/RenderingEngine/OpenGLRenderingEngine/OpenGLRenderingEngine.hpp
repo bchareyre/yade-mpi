@@ -36,12 +36,14 @@ class OpenGLRenderingEngine : public RenderingEngine
 				,drawInside
 		
 				,needInit;
-		int		 current_selection;
-	
+		int		 current_selection
+				,drawMask;
+
 	private :
 		DynLibDispatcher< PhysicalParameters , GLDrawStateFunctor, void , TYPELIST_1(const shared_ptr<PhysicalParameters>&) > stateDispatcher;
 		DynLibDispatcher< BoundingVolume     , GLDrawBoundingVolumeFunctor, void , TYPELIST_1(const shared_ptr<BoundingVolume>&) > boundingVolumeDispatcher;
 		DynLibDispatcher< InteractingGeometry,GLDrawInteractingGeometryFunctor, void , TYPELIST_2(const shared_ptr<InteractingGeometry>&, const shared_ptr<PhysicalParameters>&) >interactionGeometryDispatcher;
+		// FIXME - in fact it is a 1D dispatcher
 		DynLibDispatcher< GeometricalModel   , GLDrawGeometricalModelFunctor, void , TYPELIST_3(const shared_ptr<GeometricalModel>&, const shared_ptr<PhysicalParameters>&,bool) > geometricalModelDispatcher;
 		DynLibDispatcher< GeometricalModel   , GLDrawShadowVolumeFunctor, void , TYPELIST_3(const shared_ptr<GeometricalModel>&, const shared_ptr<PhysicalParameters>&, const Vector3r& ) > shadowVolumeDispatcher;
 

@@ -20,7 +20,7 @@ class MeasurePoisson;
 class LatticeExample : public FileGenerator
 {
 	private :
-		int 		nodeGroupMask,beamGroupMask;
+		int 		nodeGroupMask,beamGroupMask,quadGroupMask;
 		
 	// mesh generation	
 		Vector3r 	 speciemen_size_in_meters 	// size
@@ -46,7 +46,8 @@ class LatticeExample : public FileGenerator
                                 ,useStiffnessSoftening
                                 ,ensure2D
                                 ,roughEdges
-				,calculate_Torsion;
+				,calculate_Torsion
+				,quads;
         
         // aggregates
                 bool             useAggregates;
@@ -137,6 +138,7 @@ class LatticeExample : public FileGenerator
 		void createActors(shared_ptr<MetaBody>& rootBody);
 		void positionRootBody(shared_ptr<MetaBody>& rootBody);
 		bool createNode(shared_ptr<Body>& body, int i, int j, int k);
+		bool createQuad(shared_ptr<Body>& body, int i, int j, Vector3r);
                 void createBeam(shared_ptr<Body>& body, unsigned int i, unsigned int j);
                 void calcBeamPositionOrientationLength(shared_ptr<Body>& body);
                 void calcBeamAngles(Body* body, BodyContainer* bodies,InteractionContainer* ints);

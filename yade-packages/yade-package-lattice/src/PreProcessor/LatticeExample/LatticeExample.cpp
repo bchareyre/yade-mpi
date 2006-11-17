@@ -37,7 +37,8 @@
 #include <yade/yade-package-common/PhysicalActionApplier.hpp>
 
 #include <yade/yade-package-common/PhysicalActionContainerInitializer.hpp>
-
+#include <yade/yade-package-common/Quadrilateral.hpp>
+#include <yade/yade-package-common/ParticleParameters.hpp>
 
 using namespace boost;
 using namespace std;
@@ -47,6 +48,7 @@ LatticeExample::LatticeExample() : FileGenerator()
 {
         nodeGroupMask           = 1;
         beamGroupMask           = 2;
+	quadGroupMask		= 4;
         
         speciemen_size_in_meters = Vector3r(0.1,0.1,0.0001);
         cellsizeUnit_in_meters   = 0.003;
@@ -70,6 +72,7 @@ LatticeExample::LatticeExample() : FileGenerator()
         ensure2D 		 = false;
         roughEdges 		 = false;
 	calculate_Torsion	 = false;
+	quads			 = false;
         
         region_A_min             = Vector3r(-0.006, 0.096,-1);
         region_A_max             = Vector3r( 0.16 , 0.16 , 1);
@@ -162,6 +165,7 @@ void LatticeExample::registerAttributes()
         REGISTER_ATTRIBUTE(ensure2D);
         REGISTER_ATTRIBUTE(roughEdges);
         REGISTER_ATTRIBUTE(calculate_Torsion);
+        REGISTER_ATTRIBUTE(quads);
         
         REGISTER_ATTRIBUTE(triangularBaseGrid);         //              - triangles
         REGISTER_ATTRIBUTE(triangularBaseGrid3D);       //              - triangles 3d
@@ -268,11 +272,11 @@ string LatticeExample::generate()
                         for( int k=0 ; k<=nbNodes[2] ; k++)
                         {
                                 shared_ptr<Body> node;
-                                if(createNode(node,i,j,k))
+                                if(createNode(node,i,j,k) || quads)
                                         rootBody->bodies->insert(node), ++totalNodesCount;
                         }
         }
-        
+
         BodyRedirectionVector bc;
         bc.clear();
 
@@ -440,6 +444,26 @@ string LatticeExample::generate()
 			calcBeamAngles(body,rootBody->bodies.get(),rootBody->persistentInteractions.get());
                 }
         }
+	
+	if(quads)
+	{
+		float all = (nbNodes[0]-1)*(nbNodes[1]-1)*(nbNodes[2]-1);
+		float current = 0.0;
+		setMessage("quadrilaterals...");
+		for( int j=1 ; j<=nbNodes[1] ; j++ )
+		{
+			if(shouldTerminate()) return "";
+
+			for( int i=1 ; i<=nbNodes[0] ; i++ )
+			{
+				shared_ptr<Body> quad;
+				if(createQuad(quad,i,j,nbNodes))
+					rootBody->bodies->insert(quad);
+				setProgress(current++/all);
+			}
+		}
+	};
+        
         
         regionDelete(rootBody,regionDelete_A_min,regionDelete_A_max);
         regionDelete(rootBody,regionDelete_B_min,regionDelete_B_max);
@@ -531,11 +555,6 @@ bool LatticeExample::createNode(shared_ptr<Body>& body, int i, int j, int k)
 						    ) * 0.5 // *0.5 because symmetricRandom is (-1,1), and disorder is whole size where nodes can appear
 					  )*cellsizeUnit_in_meters;
 
-	if( 	   position[0] >= speciemen_size_in_meters[0] 
-		|| position[1] >= speciemen_size_in_meters[1]
-		|| position[2] >= speciemen_size_in_meters[2] )
-		return false;
-
 	Real radius 			= cellsizeUnit_in_meters*0.05;
 	
 	body->isDynamic			= true;
@@ -566,6 +585,37 @@ bool LatticeExample::createNode(shared_ptr<Body>& body, int i, int j, int k)
 //
 //////////////////////
         
+	if( 	   position[0] >= speciemen_size_in_meters[0] 
+		|| position[1] >= speciemen_size_in_meters[1]
+		|| position[2] >= speciemen_size_in_meters[2] )
+		return false;
+
+        return true;
+}
+
+
+bool LatticeExample::createQuad(shared_ptr<Body>& quad, int i, int j, Vector3r nbNodes)
+{
+	quad = shared_ptr<Body>(new Body(0,quadGroupMask));
+	shared_ptr<Quadrilateral> gQuad(new Quadrilateral( (j-1)*(int)std::floor(nbNodes[0]+1)+i-1 , j*(int)std::floor(nbNodes[0]+1)+i-1 , j*(int)std::floor(nbNodes[0]+1)+i , (j-1)*(int)std::floor(nbNodes[0]+1)+i, rootBody.get()));
+	// FIXME FIXME - this is an empty class. not needed at all.
+	// all this Quadrilateral stuff in fact does not fit current design at all.
+	shared_ptr<ParticleParameters> physics(new ParticleParameters);
+	
+	quad->isDynamic			= false;
+
+	physics->se3			= Se3r(Vector3r(0,0,0),Quaternionr(1,0,0,0));
+	physics->mass			= 0;
+	physics->velocity		= Vector3r(0,0,0);
+
+	gQuad->diffuseColor		= Vector3f(0.0,0.0,0.0);
+	gQuad->visible			= true;
+	gQuad->wire			= false;
+	gQuad->shadowCaster		= false;
+	
+        quad->geometricalModel          = gQuad;
+	quad->physicalParameters	= physics;
+
         return true;
 }
 
