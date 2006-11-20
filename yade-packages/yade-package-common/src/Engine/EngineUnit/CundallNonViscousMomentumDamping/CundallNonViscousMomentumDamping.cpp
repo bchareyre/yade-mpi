@@ -33,18 +33,9 @@ void CundallNonViscousMomentumDamping::go( 	  const shared_ptr<PhysicalAction>& 
 	RigidBodyParameters * rb = static_cast<RigidBodyParameters*>(b.get());
 	
 	Vector3r& m  = am->momentum;
-	register int sign;
-	for(int j=0;j<3;j++)
-	{
-		if (rb->angularVelocity[j]==0)
-			sign = 0;
-		else if (rb->angularVelocity[j]>0)
-			sign = 1;
-		else
-			sign = -1;
-			
-		m[j] -= damping * std::abs(m[j]) * sign;
-	}
+	Real sign = Mathr::sign( m.dot(rb->angularVelocity) );
+	m *= 1 - damping*sign;
+
 }
 
 
