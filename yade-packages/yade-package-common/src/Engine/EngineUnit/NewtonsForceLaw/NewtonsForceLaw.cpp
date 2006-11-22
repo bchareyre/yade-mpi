@@ -35,7 +35,7 @@ void NewtonsForceLaw::go( const shared_ptr<PhysicalAction>& a
 //	std::string ch;
 //	std::cin >> ch;
 	
-	p->acceleration = p->invMass*af->force;
+	p->acceleration = af->force/p->mass;
 }
 
 

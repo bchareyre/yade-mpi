@@ -16,8 +16,7 @@ class RigidBodyParameters : public ParticleParameters
 {	
 	public :
 		// parameters
-		Vector3r	 invInertia
-				,inertia
+		Vector3r	 inertia
 		// state
 				,angularAcceleration
 				,angularVelocity;
@@ -27,7 +26,6 @@ class RigidBodyParameters : public ParticleParameters
 
 /// Serialization										///
 	protected :
-		virtual void postProcessAttributes(bool deserializing);
 		void registerAttributes();
 	REGISTER_CLASS_NAME(RigidBodyParameters);
 	REGISTER_BASE_CLASS_NAME(ParticleParameters);

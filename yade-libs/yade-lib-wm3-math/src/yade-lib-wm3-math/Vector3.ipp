@@ -658,3 +658,11 @@ Vector3<RealType> Vector3<RealType>::multDiag (const Vector3& rkV) const
 {
 	return Vector3(x()*rkV.x(),y()*rkV.y(),z()*rkV.z());
 }
+//----------------------------------------------------------------------------
+template <class RealType>
+Vector3<RealType> Vector3<RealType>::divDiag (const Vector3& rkV) const
+{
+	return Vector3(x()/rkV.x(),y()/rkV.y(),z()/rkV.z());
+}
+
+

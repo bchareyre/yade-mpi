@@ -82,7 +82,6 @@ void FEMLaw::action(Body* body)
 				->find( femTet->ids[i] , actionForce ->getClassIndex() ).get() )
 					->force  += force;
 					
-			// FIXME - check what's up with invMass in NewtonsForceLaw ???
 		}
 	}
 }

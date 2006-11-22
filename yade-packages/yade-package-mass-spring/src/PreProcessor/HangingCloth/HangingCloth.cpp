@@ -332,7 +332,7 @@ string HangingCloth::generate()
 	{
 		Body * body = static_cast<Body*>((*(rootBody->bodies))[offset(0,0)].get());
 		ParticleParameters * p = static_cast<ParticleParameters*>(body->physicalParameters.get());
-		p->invMass = 0;
+		p->mass = 1;
 		body->interactingGeometry->diffuseColor = Vector3f(1.0,0.0,0.0);
 		body->isDynamic = false;
 	}
@@ -341,7 +341,7 @@ string HangingCloth::generate()
 	{
 		Body * body = static_cast<Body*>((*(rootBody->bodies))[offset(width-1,0)].get());
 		ParticleParameters * p = static_cast<ParticleParameters*>(body->physicalParameters.get());
-		p->invMass = 0;
+		p->mass = 1;
 		body->interactingGeometry->diffuseColor = Vector3f(1.0,0.0,0.0);
 		body->isDynamic = false;
 	}
@@ -350,7 +350,7 @@ string HangingCloth::generate()
 	{
 		Body * body = static_cast<Body*>((*(rootBody->bodies))[offset(0,height-1)].get());
 		ParticleParameters * p = static_cast<ParticleParameters*>(body->physicalParameters.get());
-		p->invMass = 0;
+		p->mass = 1;
 		body->interactingGeometry->diffuseColor = Vector3f(1.0,0.0,0.0);
 		body->isDynamic = false;
 	}
@@ -359,7 +359,7 @@ string HangingCloth::generate()
 	{
 		Body * body = static_cast<Body*>((*(rootBody->bodies))[offset(width-1,height-1)].get());
 		ParticleParameters * p = static_cast<ParticleParameters*>(body->physicalParameters.get());
-		p->invMass = 0;
+		p->mass = 1;
 		body->interactingGeometry->diffuseColor = Vector3f(1.0,0.0,0.0);
 		body->isDynamic = false;
 	}

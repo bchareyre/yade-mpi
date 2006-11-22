@@ -7,6 +7,7 @@ if [ "$1" = "" ]; then
 fi
 
 echo Installation path: $1
+echo please edit _build_/_cache_/default.cache.py to set CXXFLAGS, etc...
 
 ERSKINE=./erskine2.py
 YADE=../

@@ -65,12 +65,12 @@ void ErrorTolerantLaw::action(Body* body)
 
 			int offset = 6*i;
 			shared_ptr<RigidBodyParameters> rb = dynamic_pointer_cast<RigidBodyParameters>(b);
-			invM(offset,offset++) = rb->invMass;
-			invM(offset,offset++) = rb->invMass;
-			invM(offset,offset++) = rb->invMass;
-			invM(offset,offset++) = rb->invInertia[0];
-			invM(offset,offset++) = rb->invInertia[1];
-			invM(offset,offset)   = rb->invInertia[2];
+			invM(offset,offset++) = 1.0/rb->mass;
+			invM(offset,offset++) = 1.0/rb->mass;
+			invM(offset,offset++) = 1.0/rb->mass;
+			invM(offset,offset++) = 1.0/rb->inertia[0];
+			invM(offset,offset++) = 1.0/rb->inertia[1];
+			invM(offset,offset)   = 1.0/rb->inertia[2];
 		}
 
 		// Build the jacobian and transpose of jacobian
@@ -209,7 +209,7 @@ void ErrorTolerantLaw::action(Body* body)
 				moments[i][j] -= 0.1*m*sign;
 			}*/
 
-			rb->acceleration += force*rb->invMass;
+			rb->acceleration += force/rb->mass;
 			//rb->angularAcceleration += moments[i].multTerm(rb->invInertia);
 		}
         }

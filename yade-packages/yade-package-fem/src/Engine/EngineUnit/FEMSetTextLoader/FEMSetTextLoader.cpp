@@ -79,7 +79,6 @@ void FEMSetTextLoader::createNode( shared_ptr<Body>& body
 	physics->velocity		= Vector3r(0,0,0);
 	physics->acceleration		= Vector3r(0,0,0);
 	physics->mass			= 1;
-	physics->invMass		= 1;
 //	physics->inertia		= Vector3r(1,1,1);
 	physics->se3			= Se3r(position,q);
 	physics->initialPosition	= position;

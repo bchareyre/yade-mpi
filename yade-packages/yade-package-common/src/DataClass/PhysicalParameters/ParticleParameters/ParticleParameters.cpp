@@ -22,20 +22,6 @@ ParticleParameters::~ParticleParameters()
 }
 
 
-void ParticleParameters::postProcessAttributes(bool deserializing)
-{
-	PhysicalParameters::postProcessAttributes(deserializing);
-	
-	if(deserializing)
-	{
-		if (mass==0)
-			invMass = 0;
-		else
-			invMass = 1.0/mass;
-	}
-}
-
-
 void ParticleParameters::registerAttributes()
 {
 	PhysicalParameters::registerAttributes();

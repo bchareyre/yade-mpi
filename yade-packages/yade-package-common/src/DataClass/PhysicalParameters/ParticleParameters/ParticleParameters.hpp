@@ -17,8 +17,7 @@ class ParticleParameters : public PhysicalParameters
 {
 	public :
 		// parameters
-		Real		 mass
-				,invMass;
+		Real		 mass;
 
 		// state
 		Vector3r	 acceleration
@@ -29,7 +28,6 @@ class ParticleParameters : public PhysicalParameters
 
 /// Serializable
 	protected :
-		virtual void postProcessAttributes(bool deserializing);
 		virtual void registerAttributes();
 	REGISTER_CLASS_NAME(ParticleParameters);
 	REGISTER_BASE_CLASS_NAME(PhysicalParameters);

@@ -21,7 +21,7 @@ void NewtonsMomentumLaw::go( 	  const shared_ptr<PhysicalAction>& a
 	RigidBodyParameters * rb = static_cast<RigidBodyParameters*>(b.get());
 	
 	//FIXME : should be += and we should add an Engine that reset acceleration at the beginning
-	rb->angularAcceleration = am->momentum.multDiag(rb->invInertia);
+	rb->angularAcceleration = am->momentum.divDiag(rb->inertia);
 }
 
 

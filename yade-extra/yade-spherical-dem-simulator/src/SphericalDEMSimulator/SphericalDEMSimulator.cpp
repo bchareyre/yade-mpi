@@ -164,9 +164,7 @@ void SphericalDEMSimulator::loadConfigurationFile(const string& fileName)
 		sd.angularVelocity	= bmp->angularVelocity;
 
 		sd.mass			= bmp->mass;
-		sd.invMass		= bmp->invMass;
 		sd.inertia		= bmp->inertia;
-		sd.invInertia		= bmp->invInertia;
 
 		sd.young		= bmp->young;
 		sd.poisson		= bmp->poisson;
