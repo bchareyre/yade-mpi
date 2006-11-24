@@ -787,7 +787,7 @@ void Matrix3<RealType>::eigenDecomposition (Matrix3& rkRot, Matrix3& rkDiag) con
     // diagonal entries of D are the corresponding eigenvalues.
     RealType afDiag[3], afSubd[2];
     rkRot = *this;
-    bool bReflection = rkRot.Tridiagonalize(afDiag,afSubd);
+    bool bReflection = rkRot.tridiagonalize(afDiag,afSubd);
     bool bConverged = rkRot.QLAlgorithm(afDiag,afSubd);
     assert( bConverged );
 
@@ -1293,7 +1293,7 @@ bool Matrix3<RealType>::tridiagonalize (RealType afDiag[3], RealType afSubd[2])
     afDiag[0] = fM00;
     if ( Math<RealType>::fAbs(fM02) >= Math<RealType>::ZERO_TOLERANCE )
     {
-        afSubd[0] = Math<RealType>::Sqrt(fM01*fM01+fM02*fM02);
+        afSubd[0] = Math<RealType>::sqRoot(fM01*fM01+fM02*fM02);
         RealType fInvLength = ((RealType)1.0)/afSubd[0];
         fM01 *= fInvLength;
         fM02 *= fInvLength;
