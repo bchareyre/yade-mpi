@@ -3,10 +3,10 @@ error( "YADE_QMAKE_PATH internal qmake variable is not set, you should run for e
 }
 
 
-SUBDIRS += DeusExMachina \
-           MetaEngine \
-           EngineUnit \	   
-           StandAloneEngine
+SUBDIRS += MetaEngine \
+           EngineUnit \
+           StandAloneEngine \
+	   DeusExMachina
 CONFIG += debug \
           thread \
           warn_on 
