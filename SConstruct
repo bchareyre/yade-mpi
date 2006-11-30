@@ -39,6 +39,7 @@ def prepareIncludes():
 				try:
 					# subinc in additional directory level, ascend one more directory...
 					os.symlink(join('..','..','..',root,f),join(subinc,f));
+					print f
 				except OSError: pass
 
 import os, os.path
