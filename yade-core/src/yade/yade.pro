@@ -90,6 +90,10 @@ CONFIG += console
 !win32 {
 TARGET = ../../bin/yade
 }
+!isEmpty(LOG4CXX) {
+	LIBS += -llog4cxx
+	DEFINES += LOG4CXX
+}
 
 CONFIG += debug \
           thread \

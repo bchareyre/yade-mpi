@@ -25,7 +25,7 @@
 
 Omega::Omega()
 {
-	std::cerr << "Constructing Omega  (if multiple times - check '-rdynamic' flag!)";
+	std::cerr << "Constructing Omega  (if multiple times - check '-rdynamic' flag!)\n";
 }
 
 
@@ -119,6 +119,7 @@ void Omega::buildDynlibDatabase(const vector<string>& dynlibsList)
 	for( ; dlli!=dlliEnd ; ++dlli)
 	{
 		string name = *dlli;
+		//cerr<<"Library: "<<name<<"\n";
 		shared_ptr<Factorable> f;
 		try
 		{
@@ -196,7 +197,7 @@ void Omega::scanPlugins()
 	vector<string>::iterator siEnd = preferences->dynlibDirectories.end();
 	for( ; si != siEnd ; ++si)
 	{
-		cerr << "Loading from : " << (*si) << endl;
+		cerr << "Plugins in " <<(*si)<<": ";
 		filesystem::path directory((*si));
 
 		if ( filesystem::exists( directory ) )
@@ -205,8 +206,8 @@ void Omega::scanPlugins()
 			filesystem::directory_iterator diEnd;
 			for ( ; di != diEnd; ++di )
 			{
-				if (!filesystem::is_directory(*di) && filesystem::symbolic_link_exists(*di) && filesystem::extension(*di)!=".a")
-				{
+				// node is not a directory and is either regular file or non-dangling symlink; and extension is not ".a"
+				if (!filesystem::is_directory(*di) && filesystem::exists(*di) && filesystem::extension(*di)!=".a"){
 					filesystem::path name(filesystem::basename((*di)));
 					int prevLength = (*di).leaf().size();
 					int length = name.leaf().size();
@@ -216,19 +217,17 @@ void Omega::scanPlugins()
 						name = filesystem::path(filesystem::basename(name));
 						length = name.leaf().size();
 					}
-//					cerr << name.leaf() << endl;
-					if( 	dynlibsList.size()==0 || 
-						ClassFactory::instance().systemNameToLibName(name.leaf()) != dynlibsList.back() 
-					)
-					{
+					if(dynlibsList.size()==0 || ClassFactory::instance().systemNameToLibName(name.leaf()) != dynlibsList.back()){
+						cerr<<name.leaf()<<" ";
 						dynlibsList.push_back(ClassFactory::instance().systemNameToLibName(name.leaf()));
 						dynlibsListLoaded.push_back(false);
 					}
-				}
+					else cerr<<"[not loaded: "<<name.leaf()<<"] ";
+				} else cerr<<"[skipped: "<<filesystem::basename(*di)<<"] ";
 			}
 		}
-		else
-			cerr << "ERROR: trying to scan plugins in non existing directory : "<< directory.native_directory_string() << endl;
+		else cerr << "ERROR: trying to scan plugins in non existing directory : "<< directory.native_directory_string() << endl;
+		cerr<<"\n";
 	}
 
 	bool allLoaded = false;

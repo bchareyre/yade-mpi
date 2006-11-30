@@ -37,5 +37,6 @@ uninstall:
 	$(MAKE) -C yade-extra uninstall
 
 tags:
-	ctags -R --language-force=c++ --extra=+q --exclude=.svn
+	# prevent generated symlinked files from yade-flat and include to be parsed
+	ctags -R --language-force=c++ --extra=+q --exclude=.svn --exclude=yade-flat --exclude=include
 

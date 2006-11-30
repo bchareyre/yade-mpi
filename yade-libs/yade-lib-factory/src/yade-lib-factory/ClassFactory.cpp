@@ -35,6 +35,14 @@ bool ClassFactory::registerFactorable( std::string name 			   , CreateFactorable
 
 boost::shared_ptr<Factorable> ClassFactory::createShared( std::string name )
 {
+#if 0
+	cerr<<"Creating shared lib: "<<name<<"\n";
+	cerr<<"Available libs: ";
+		for(FactorableCreatorsMap::iterator i=map.begin(); i!=map.end(); i++){
+			cerr<<i->first<<" ";
+		}
+	cerr<<"\n";
+#endif
 
 	FactorableCreatorsMap::const_iterator i = map.find( name );
 	if( i == map.end() )

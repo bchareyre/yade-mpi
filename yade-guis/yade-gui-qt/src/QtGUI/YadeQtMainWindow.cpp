@@ -86,6 +86,9 @@ YadeQtMainWindow::YadeQtMainWindow() : YadeQtGeneratedMainWindow()
 	setCentralWidget( vbox );
 	
 	simulationController = 0;
+	
+	// HACK
+	if(Omega::instance().getSimulationFileName()!="") fileNewSimulation();
 }
 
 

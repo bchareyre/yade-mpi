@@ -18,6 +18,8 @@
 #include "FrontEnd.hpp"
 #include "Preferences.hpp"
 
+#include "logging.hpp"
+
 using namespace std;
 
 void firstRunSetup(shared_ptr<Preferences>& pref)
@@ -92,12 +94,20 @@ void printHelp()
 	-w	: launch the 'first run configuration'\n\
 	-c	: use local directory ./ as configuration directory\n\
 	-C path : configuration directory different than default ~/.yade/\n\
+	-S file : load simulation from file (works with QtGUI only)\n\
 \n\
 Only one option can be passed to yade, all other options are passed to the selected GUI\n\
 ";
 	if(flags!="")
 		cout << "compilation flags: "+ flags +"\n\n";
 }
+
+#ifdef LOG4CXX
+// provides parent logger for everybody
+log4cxx::LoggerPtr logger=log4cxx::Logger::getLogger("yade");
+#endif
+
+
 
 int main(int argc, char *argv[])
 {
@@ -106,9 +116,25 @@ int main(int argc, char *argv[])
 	int ch;
 	string  gui             = "";
 	string 	configPath 	= string(getenv("HOME")) + string("/.yade");
+	string simulationFileName="";
+
+	// This makes boost stop bitching about dot-files and other files that may not exist on MS-DOS 3.3;
+	// see http://www.boost.org/libs/filesystem/doc/portability_guide.htm#recommendations for what all they consider bad.
+	// Since it is a static variable, it infulences all boost::filesystem operations in this respect (fortunately)
+	filesystem::path::default_name_check(filesystem::native);
+
+#	ifdef LOG4CXX
+	// read logging configuration from file and watch it (creates a separate thread)
+	if(filesystem::exists(configPath+"/logging.conf")){
+		log4cxx::PropertyConfigurator::configureAndWatch(configPath+"/logging.conf");
+	} else { // otherwise use simple console-directed logging
+		log4cxx::BasicConfigurator::configure();
+	}
+#	endif
+
 	
 	bool 	setup 		= false;
-	if( ( ch = getopt(argc,argv,"hnN:wC:c") ) != -1)
+	if( ( ch = getopt(argc,argv,"hnN:wC:cS:") ) != -1)
 		switch(ch)
 		{
 			case 'h' :	printHelp();		return 1;
@@ -117,6 +143,7 @@ int main(int argc, char *argv[])
 			case 'w' :	setup = true;		break;
 			case 'C' :	configPath = optarg; 	break;
 			case 'c' :	configPath = "."; 	break;
+			case 'S' : simulationFileName=optarg; break;
 			default	 :	printHelp();		return 1;
 		}
 	
@@ -133,13 +160,17 @@ int main(int argc, char *argv[])
 		filesystem::create_directories(yadeConfigPath);
 		firstRunSetup(Omega::instance().preferences);
 	}
-	cout << "loading configuration file: " << yadeConfigFile.string() << "\n";
+	//cout << "loading configuration file: " << yadeConfigFile.string() << "\n";
+	LOG_INFO("loading configuration file: "<<yadeConfigFile.string());
+
 	IOFormatManager::loadFromFile("XMLFormatManager",yadeConfigFile.string(),"preferences",Omega::instance().preferences);
 
-	cout << "Please wait while loading plugins.\n";
+	LOG_INFO("Please wait while loading plugins.")
 	Omega::instance().scanPlugins();
-	cout << "Plugins loaded.\n";
+	LOG_INFO("Plugins loaded.");
 	Omega::instance().init();
+
+	Omega::instance().setSimulationFileName(simulationFileName); //init() resets to "";
 	
 	if( gui.size()==0)
 		gui = Omega::instance().preferences->defaultGUILibName;
@@ -147,7 +178,7 @@ int main(int argc, char *argv[])
 	shared_ptr<FrontEnd> frontEnd = dynamic_pointer_cast<FrontEnd>(ClassFactory::instance().createShared(gui));
 
  	int ok = frontEnd->run(argc,argv);
-	cerr << "Yade: normal exit." << endl;
+	LOG_INFO("Yade: normal exit.");
 	return ok;
 }
 

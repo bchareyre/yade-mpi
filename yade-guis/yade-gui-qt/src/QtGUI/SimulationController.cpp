@@ -81,6 +81,20 @@ SimulationController::SimulationController(QWidget * parent) : QtGeneratedSimula
 	addNewView();
 
 	updater = shared_ptr<SimulationControllerUpdater>(new SimulationControllerUpdater(this));
+
+	// HACK: this should be passed through the bazillion of abstract interfaces to the the most abstract idea,
+	// of which Plato speaks in the Republic and elsewhere, then descending from this perfectly one beyond being
+	// though the cascades of emanations here, where it incarnates. Unfortunately, there is no heaven in c++, because
+	// c++ itself is hell.
+	//
+	// Actually, it is quite useful, since it allows me to pass simulation to yade from command line,
+	// thus saving at least 4 mouse-clicks
+	//
+	// there is file existence assertion in lodSimulationFromFilename, so yade will abort cleanly...
+	cerr<<"Omega::instance().getSimulationFileName()="<<Omega::instance().getSimulationFileName()<<endl;
+	if (Omega::instance().getSimulationFileName()!=""){
+		loadSimulationFromFileName(Omega::instance().getSimulationFileName());
+	}
 }
 
 
@@ -135,6 +149,14 @@ void SimulationController::pbLoadClicked()
 		&& filesystem::exists(fileName) 
 		&& (filesystem::extension(fileName)==".xml" || filesystem::extension(fileName)==".yade"))
 	{
+		this->loadSimulationFromFileName(fileName);
+	}
+}
+
+
+void SimulationController::loadSimulationFromFileName(const std::string& fileName){
+	assert(filesystem::exists(fileName));
+
 //		updater->stop();
 		Omega::instance().finishSimulationLoop();
 		Omega::instance().joinSimulationLoop();
@@ -188,8 +210,7 @@ void SimulationController::pbLoadClicked()
 		}
 
 		pbCenterSceneClicked();
-        }
-} 
+}
 
 void SimulationController::pbSaveClicked()
 {
