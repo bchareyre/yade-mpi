@@ -1,6 +1,6 @@
 #!/usr/bin/scons
 # coding: UTF-8
-# syntax=python
+# vim: set syntax=python
 
 #
 # This is the master build file for scons (http://www.scons.org). It is experimental, though it build very well for me. Prequisities for running:
@@ -9,6 +9,8 @@
 # 3. go to yade-scripts and run ./erskine3-apply.sh. It should generate SConscript files for subprojects.
 #
 # To run the build, just run `scons' from the top-level (this) directory. This step will do preparatory steps (creating local include directory and symlinking all headers from there, create install directories), compile files and install them. Scons has great support for parallel builds, you can try `scons -j4'.
+#
+# To clean the build, run `scons -c'. Please note that it will also _uninstall_ yade. This is only temporary inconvenience that will disappera, though...
 #
 #
 # TODO: 1. retrieve target list and append install targets dynamically; 2. configuration and option handling.
@@ -39,7 +41,6 @@ def prepareIncludes():
 				try:
 					# subinc in additional directory level, ascend one more directory...
 					os.symlink(join('..','..','..',root,f),join(subinc,f));
-					print f
 				except OSError: pass
 
 import os, os.path
