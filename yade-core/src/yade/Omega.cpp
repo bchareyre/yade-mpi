@@ -22,10 +22,11 @@
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
 
+CREATE_LOGGER(Omega);
 
 Omega::Omega()
 {
-	std::cerr << "Constructing Omega  (if multiple times - check '-rdynamic' flag!)\n";
+	LOG_INFO("Constructing Omega  (if multiple times - check '-rdynamic' flag!).");
 }
 
 
@@ -197,7 +198,6 @@ void Omega::scanPlugins()
 	vector<string>::iterator siEnd = preferences->dynlibDirectories.end();
 	for( ; si != siEnd ; ++si)
 	{
-		cerr << "Plugins in " <<(*si)<<": ";
 		filesystem::path directory((*si));
 
 		if ( filesystem::exists( directory ) )
@@ -206,28 +206,36 @@ void Omega::scanPlugins()
 			filesystem::directory_iterator diEnd;
 			for ( ; di != diEnd; ++di )
 			{
-				// node is not a directory and is either regular file or non-dangling symlink; and extension is not ".a"
-				if (!filesystem::is_directory(*di) && filesystem::exists(*di) && filesystem::extension(*di)!=".a"){
+				// node is not a directory and is either regular file or non-dangling symlink; and extension is not ".a"; AND moreover transforming it to library name and back to filename is identity; otherwise the file wouldn't be loaded by the DynLibManager anyway
+				if (!filesystem::is_directory(*di) && filesystem::exists(*di) && filesystem::extension(*di)!=".a" &&
+					ClassFactory::instance().libNameToSystemName(ClassFactory::instance().systemNameToLibName(filesystem::basename(*di)))==(di->leaf())){
 					filesystem::path name(filesystem::basename((*di)));
 					int prevLength = (*di).leaf().size();
 					int length = name.leaf().size();
+					// warning: this can produce invalid name (too short).
+					// 0-length names are dumped directly
+					// names 0<length<4 should fail assertion in DynLibManager::systemNameToLibName
+					// the whole loading "logic" should be rewritten from scratch...
+					//
+					// my reading of what it is supposed to do: returns the part of filename before the first dot... !!??
+					// humm, perhaps it is a result of obfuscative c++ contest (obfuscative c++ = oxymoron, anyway)
 					while (length!=prevLength)
 					{
 						prevLength=length;
 						name = filesystem::path(filesystem::basename(name));
 						length = name.leaf().size();
 					}
-					if(dynlibsList.size()==0 || ClassFactory::instance().systemNameToLibName(name.leaf()) != dynlibsList.back()){
-						cerr<<name.leaf()<<" ";
+					if(name.leaf().length()<1) continue; // filter out 0-length filenames
+					if(dynlibsList.size()==0 || ClassFactory::instance().systemNameToLibName(name.leaf())!=dynlibsList.back()) {
+						LOG_DEBUG("Added plugin: "<<*si<<"/"<<di->leaf()<<".");
 						dynlibsList.push_back(ClassFactory::instance().systemNameToLibName(name.leaf()));
 						dynlibsListLoaded.push_back(false);
 					}
-					else cerr<<"[not loaded: "<<name.leaf()<<"] ";
-				} else cerr<<"[skipped: "<<filesystem::basename(*di)<<"] ";
+					else LOG_DEBUG("Possible plugin discarded: "<<*si<<"/"<<name.leaf()<<".");
+				} else LOG_DEBUG("File not considered a plugin: "<<di->leaf()<<".");
 			}
 		}
-		else cerr << "ERROR: trying to scan plugins in non existing directory : "<< directory.native_directory_string() << endl;
-		cerr<<"\n";
+		else LOG_ERROR("Nonexistent plugin directory: "<<directory.native_directory_string()<<".");
 	}
 
 	bool allLoaded = false;
@@ -244,11 +252,17 @@ void Omega::scanPlugins()
 			if( dynlibsListLoaded[loaded] == false )
 			{
 				bool thisLoaded = ClassFactory::instance().load((*dlli));
-				if (!thisLoaded && overflow == 1)
+				if (!thisLoaded && overflow == 1){
 //				if (!thisLoaded)
-					cerr << "load unsuccesfull : " << (*dlli) << ", the error was: " << ClassFactory::instance().lastError() <<  endl;
+					string err=ClassFactory::instance().lastError();
+					// HACK
+					if(err.find("cannot open shared object file: No such file or directory")!=std::string::npos){
+						LOG_INFO("Attemted to load nonexistent file; since this may be due to bad algorithm of filename construction, we pretend everything is OK (original error: `"<<err<<"').");
+						thisLoaded=true;
+					} else LOG_ERROR("Error loading Library `"<<(*dlli)<<"': "<<err<<".");
 //				else
 //					cerr << "loaded            : " << *dlli << endl;
+				}
 				allLoaded &= thisLoaded;
 				if(thisLoaded)
 					dynlibsListLoaded[loaded] = true; 

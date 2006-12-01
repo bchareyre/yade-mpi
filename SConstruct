@@ -12,41 +12,50 @@
 #
 # To clean the build, run `scons -c'. Please note that it will also _uninstall_ yade. This is only temporary inconvenience that will disappera, though...
 #
+# What it does: running the script always checks for existence of installation directories for both libs and headers (hack).
+# Prebuild target symlinks all headers to the ./include/* directories to make compilation possible without installing includes to $PREFIX.
+# The install target takes care of both compilation and installation of binary, libraries and headers.
+#
 #
 # TODO: 1. retrieve target list and append install targets dynamically; 2. configuration and option handling.
+#
+# And as usually, clean up the code, get rid of workarounds and hacks etc.
 
 
 import os.path, string
 
-def prepareIncludes():
+def prepareIncludes(prefix=None):
 	"""symlink all in-tree headers into the ./include directory so that we can build before headers are installed"""
+	#print "prepareIncludes(prefix='%s')"%prefix
+	global env
 	import os,string,re
 	from os.path import join,split,isabs,isdir,exists
-	yaderoot='.' # MUST be relative!!
-	assert(not isabs(yaderoot));
-	yadeinc=join(yaderoot,'include','yade')
-	for root, dirs, files in os.walk(yaderoot):
+	if not prefix: yadeRoot='.' # MUST be relative, otherwise relative symlinks for the local includes will break badly
+	else: yadeRoot=prefix
+	yadeInc=join(yadeRoot,'include','yade')
+	for root, dirs, files in os.walk('.'):
 		for d in ('.svn','yade-flat','include'):
 			try: dirs.remove(d)
-			except ValueError:pass
+			except ValueError: pass
 		for f in files:
 			if f.split('.')[-1] in ('hpp','inl','ipp','tpp','h'):
-				subinc=None
-				for part in root.split(os.sep):
-					if re.match('yade-((extra|core)|(gui|lib|package)-.*)',part):
-						subinc=join(yadeinc,part)
-						break
-				assert(subinc)
-				if not isdir(subinc): os.makedirs(subinc)
-				try:
-					# subinc in additional directory level, ascend one more directory...
-					os.symlink(join('..','..','..',root,f),join(subinc,f));
-				except OSError: pass
+				m=re.match('^.*?'+os.path.sep+'(yade-((extra|core)|((gui|lib|package)-.*?)))'+os.path.sep+'.*$',root)
+				subInc=join(yadeInc,m.group(1))
+				if not prefix: # local include directory
+					if not isdir(subInc): os.makedirs(subInc)
+					try:
+						os.symlink(join('..','..','..',root,f),join(subInc,f));
+					except OSError: pass # if the file already exists, symlink fails
+				else:
+					env.Install(subInc,join(root,f))
+					#assert(subInc in instIncludeDirs)
 
 import os, os.path
 
 libDirs=['yade-libs','yade-packages/yade-package-common','yade-packages/yade-package-dem','yade-packages/yade-package-fem','yade-packages/yade-package-lattice','yade-packages/yade-package-mass-spring','yade-packages/yade-package-realtime-rigidbody','yade-extra','yade-guis']
 instDirs=[os.path.join('$PREFIX','bin')]+map(lambda x: os.path.join('$PREFIX','lib','yade',string.split(x,os.path.sep)[-1]),libDirs)
+instIncludeDirs=map(lambda x: os.path.join('$PREFIX','include','yade',string.split(x,os.path.sep)[-1]),libDirs+['yade-core'])
+
 
 # this is to help the qt tool to know where it should look...
 os.environ['QTDIR']='/usr/share/qt3'
@@ -72,6 +81,7 @@ env.Append(SHLINKFLAGS='-Wl,-soname=${TARGET.file} -rdynamic')
 # if this is not present, vtables & typeinfos for classes in yade binary itself are not exported
 # this breaks plugin loading
 env.Append(LINKFLAGS='-rdynamic') 
+env.Append(CXXFLAGS='-pipe')
 
 
 env.Append(RPATH=map(lambda x: os.path.join('$PREFIX','lib','yade',string.split(x,os.path.sep)[-1]),libDirs))
@@ -94,11 +104,6 @@ opts.Update(env)
 opts.Save('env.conf', env)
 
 
-
-#Depends('compile','prebuild')
-#Default(env.Program(target='compile'))
-
-
 ## http://www.scons.org/wiki/HidingCommandLinesInOutput
 env.Replace(CXXCOMSTR='c++  $SOURCES → ${TARGET.file}')
 env.Replace(SHCXXCOMSTR='so++ $SOURCES → ${TARGET.file}')
@@ -106,35 +111,27 @@ env.Replace(SHLINKCOMSTR='so $SOURCES → ${TARGET.file}')
 env.Replace(LINKCOMSTR='a $SOURCES → ${TARGET.file}')
 
 
+## this is a workaround... env.Install method likes targets to be existing directories...
+## should reside in prepareIncludes or sth similar
+def createDirs(dirList):
+	for d in dirList:
+		dd=d.replace('$PREFIX',env['PREFIX'])
+		if not os.path.exists(dd):
+			print dd
+			os.makedirs(dd)
+		elif not os.path.isdir(dd): raise OSError("Installation directory `%s' is a file?!"%dd)
+createDirs(instDirs)
+createDirs(instIncludeDirs)
+	
 
-## this is a workaround... should reside in prepareIncludes or sth similar
-for d in instDirs:
-	dd=d.replace('$PREFIX',env['PREFIX'])
-	if not os.path.exists(dd):
-		print dd
-		os.makedirs(dd)
-	elif not os.path.isdir(dd): raise OSError("Installation directory `%s' is a file?!"%dd)
-
-prepareIncludesProxy=prepareIncludes()
-prebuildAlias=env.Alias('prebuild',prepareIncludesProxy)
-installAlias=env.Alias('install',instDirs)
+prepareLocalIncludesProxy=prepareIncludes()
+prepareIncludesProxy=prepareIncludes(prefix=env['PREFIX'])
+prebuildAlias=env.Alias('prebuild',prepareLocalIncludesProxy)
+installAlias=env.Alias('install',[instDirs,prepareIncludesProxy,os.path.join('$PREFIX','include','yade')])
 Depends(installAlias,prebuildAlias)
 Default(installAlias)
-
 
 Help(opts.GenerateHelpText(env))
 Export('env');
 SConscript(map(lambda x: os.path.join(x,'SConscript'),libDirs+['yade-core']),exports=['env'])
 
-#['yade-/SConscript',
-#	'yade-core/SConscript',
-#	'yade-guis/SConscript',
-#	'yade-extra/SConscript',
-#	'yade-packages/yade-package-common/SConscript',
-#	'yade-packages/yade-package-dem/SConscript',
-#	'yade-packages/yade-package-fem/SConscript',
-#	'yade-packages/yade-package-lattice/SConscript',
-#	'yade-packages/yade-package-mass-spring/SConscript',
-#	'yade-packages/yade-package-realtime-rigidbody/SConscript'],
-#
-#	exports=['yade','yadeQt'])

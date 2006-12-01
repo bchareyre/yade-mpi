@@ -9,9 +9,11 @@
 #include "SerializableSingleton.hpp"
 #include <iostream>
 
+CREATE_LOGGER(SerializableSingleton);
+
 SerializableSingleton::SerializableSingleton() 
 {	
-	cerr << "Constructing SerializableSingleton  (if multiple times - check '-rdynamic' flag!)" << endl;
+	LOG_INFO("Constructing SerializableSingleton  (if multiple times - check '-rdynamic' flag!).");
 }
 
 

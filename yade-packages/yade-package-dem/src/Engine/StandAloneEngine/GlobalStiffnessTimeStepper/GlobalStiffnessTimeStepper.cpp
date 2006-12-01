@@ -19,7 +19,6 @@
 
 StiffnessMatrixTimeStepper::StiffnessMatrixTimeStepper() : TimeStepper() , sdecContactModel(new MacroMicroElasticRelationships), actionParameterStiffnessMatrix(new StiffnessMatrix)
 {
-cerr << "StiffnessMatrixTimeStepper()"  << endl;
 	stiffnessMatrixClassIndex = actionParameterStiffnessMatrix->getClassIndex();
 	sdecGroupMask = 1;
 	computedOnce = false;

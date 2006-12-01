@@ -26,6 +26,7 @@
 
 using namespace std;
 
+CREATE_LOGGER(YadeQtMainWindow);
 
 YadeQtMainWindow::YadeQtMainWindow() : YadeQtGeneratedMainWindow()
 {
@@ -44,7 +45,7 @@ YadeQtMainWindow::YadeQtMainWindow() : YadeQtGeneratedMainWindow()
 
 	try
 	{
-		cerr << "loading configuration file: " << yadeQtGUIPrefPath.string() << "\n";
+		LOG_INFO("Loading configuration file: "<<yadeQtGUIPrefPath.string()<<".")
 		IOFormatManager::loadFromFile("XMLFormatManager",yadeQtGUIPrefPath.string(),"preferences",preferences);
 	}
 	catch(SerializableError&)

@@ -14,12 +14,13 @@
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
 
-
 #include "ClassFactory.hpp"
 
 
 using namespace std;
 using namespace boost;
+
+CREATE_LOGGER(DynLibManager);
 
 
 DynLibManager::DynLibManager ()
@@ -88,18 +89,22 @@ bool DynLibManager::loadFromDirectoryList (const string& libName )
 	string baseDir = findLibDir(libName);
 
 	string fullLibName;
-	if (baseDir.length()==0)
-		return load(libFileName,libName);
-	else
-		return load(baseDir+"/"+libFileName,libName);
+	if (baseDir.length()==0) return load(libFileName,libName);
+	else return load(baseDir+"/"+libFileName,libName);
 	
 }
 
 
 bool DynLibManager::load (const string& fullLibName, const string& libName )
 {
-	if (libName.empty() || fullLibName.empty())
+	if (libName.empty() || fullLibName.empty()){
+		LOG_ERROR("Empty filename for library `"<<libName<<"'.");
 		return false;
+	}
+	/*if(!filesystem::exists(fullLibName)){
+		LOG_ERROR("Trying to load library `"<<libName<<"' from nonexistent file `"<<fullLibName<<"'?! (still returning success)");
+		return true;
+	}*/
 
 #ifdef WIN32
 	if (isLoaded(libName))
@@ -110,8 +115,7 @@ bool DynLibManager::load (const string& fullLibName, const string& libName )
 	void * handle = dlopen(fullLibName.data(), RTLD_NOW);
 #endif
 
-	if (!handle)
-		return !error();
+	if (!handle) return !error();
 
 	handles[libName] = handle;
 	return true;
@@ -233,6 +237,10 @@ string DynLibManager::libNameToSystemName(const string& name)
 string DynLibManager::systemNameToLibName(const string& name)
 {
 	string libName;
+	if(name.length()<=3){ // this arbitrary value may disappear once the logic below is dumped...
+		LOG_WARN("Filename `"<<name<<"' too short, returning empty string (cross thumbs).");
+		return "";
+	}
 
 	#ifdef WIN32
 		libName = name.substr(0,name.size()-4);

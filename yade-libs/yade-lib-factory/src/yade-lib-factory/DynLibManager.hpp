@@ -24,6 +24,8 @@
 #include <map>
 #include <vector>
 
+#include<yade/yade-core/logging.hpp>
+
 using namespace std;
 
 class DynLibManager 
@@ -55,6 +57,7 @@ class DynLibManager
 		string systemNameToLibName(const string& name);
 		string findLibDir(const string& name);
 		string lastError();
+		DECLARE_LOGGER;
 
 	private :
 		bool closeLib(const string libName);

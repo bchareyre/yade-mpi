@@ -21,7 +21,6 @@
 
 ResultantForceEngine::ResultantForceEngine() : actionParameterStiffnessMatrix(new StiffnessMatrix), actionParameterForce(new Force)
 {
-cerr << "constructeur de ResultantForceEngine" << std::endl;
 	interval =1;
 	damping = 0.1;
 	force = Vector3r::ZERO;

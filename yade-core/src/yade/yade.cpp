@@ -107,28 +107,28 @@ Only one option can be passed to yade, all other options are passed to the selec
 log4cxx::LoggerPtr logger=log4cxx::Logger::getLogger("yade");
 #endif
 
-
-
 int main(int argc, char *argv[])
 {
-	Omega::instance().yadeVersionName = "Yet Another Dynamic Engine 0.10.0, beta.";
 
 	int ch;
-	string  gui             = "";
-	string 	configPath 	= string(getenv("HOME")) + string("/.yade");
+	string gui = "";
+	string configPath = string(getenv("HOME")) + string("/.yade");
 	string simulationFileName="";
 
 	// This makes boost stop bitching about dot-files and other files that may not exist on MS-DOS 3.3;
 	// see http://www.boost.org/libs/filesystem/doc/portability_guide.htm#recommendations for what all they consider bad.
-	// Since it is a static variable, it infulences all boost::filesystem operations in this respect (fortunately)
+	// Since it is a static variable, it infulences all boost::filesystem operations in this respect (fortunately).
 	filesystem::path::default_name_check(filesystem::native);
 
 #	ifdef LOG4CXX
-	// read logging configuration from file and watch it (creates a separate thread)
-	if(filesystem::exists(configPath+"/logging.conf")){
-		log4cxx::PropertyConfigurator::configureAndWatch(configPath+"/logging.conf");
+	// read logging configuration from file and watch it (creates a separate thread)a
+	std::string logConf=configPath+"/logging.conf";
+	if(filesystem::exists(logConf)){
+		log4cxx::PropertyConfigurator::configureAndWatch(logConf);
+		LOG_INFO("Logger loaded and watches configuration file: "<<logConf<<".");
 	} else { // otherwise use simple console-directed logging
 		log4cxx::BasicConfigurator::configure();
+		LOG_INFO("Logger uses basic (console) configuration ("<<logConf<<" not found). Look at the file yade-doc/logging.conf.sample in the source distribution on an example how to customize logging.");
 	}
 #	endif
 
@@ -150,6 +150,8 @@ int main(int argc, char *argv[])
 	if(configPath[configPath.size()-1] == '/')
 		configPath = configPath.substr(0,configPath.size()-1); 
 
+	Omega::instance().yadeVersionName = "Yet Another Dynamic Engine 0.10.0, beta.";
+
 	Omega::instance().preferences    = shared_ptr<Preferences>(new Preferences);
 	Omega::instance().yadeConfigPath = configPath; 
 	filesystem::path yadeConfigPath  = filesystem::path(Omega::instance().yadeConfigPath, filesystem::native);
@@ -161,11 +163,11 @@ int main(int argc, char *argv[])
 		firstRunSetup(Omega::instance().preferences);
 	}
 	//cout << "loading configuration file: " << yadeConfigFile.string() << "\n";
-	LOG_INFO("loading configuration file: "<<yadeConfigFile.string());
+	LOG_INFO("Loading configuration file: "<<yadeConfigFile.string());
 
 	IOFormatManager::loadFromFile("XMLFormatManager",yadeConfigFile.string(),"preferences",Omega::instance().preferences);
 
-	LOG_INFO("Please wait while loading plugins.")
+	LOG_INFO("Please wait while loading plugins.");
 	Omega::instance().scanPlugins();
 	LOG_INFO("Plugins loaded.");
 	Omega::instance().init();

@@ -1,0 +1,38 @@
+# This is example logging configuration file for yade.
+#
+# Place it in ~/.yade/logging.conf if you want it to be loaded and watched for changes during execution as well.
+#
+# log4cxx homepage is http://logging.apache.org/log4cxx/
+# of particular interest is instroduction (http://logging.apache.org/log4cxx/manual/Introduction.html)
+# and pattern description (http://logging.apache.org/log4cxx/manual/classlog4cxx_1_1PatternLayout.html)
+#
+
+# Set root logger level to DEBUG, one appender for console and other to a file
+log4j.rootLogger=DEBUG,console,logfile
+
+log4j.appender.console=org.apache.log4j.ConsoleAppender
+# A1 uses PatternLayout.
+log4j.appender.console.layout=org.apache.log4j.PatternLayout
+#log4j.appender.console.layout.ConversionPattern=%-4r %-5p %c %x - %m%n # this is the default
+log4j.appender.console.layout.ConversionPattern=%-5p %-10c %m%n
+
+# this appender creates logfile that is being rotated following a size criterion
+# better would be to rotate it at every execution, but I am not sure if that exists in log4cxx...
+log4j.appender.logfile=org.apache.log4j.RollingFileAppender
+log4j.appender.logfile.File=/tmp/yade.log
+log4j.appender.logfile.MaxFileSize=10MB
+log4j.appender.logfile.MaxBackupIndex=1 # Keep one backup file
+log4j.appender.logfile.layout=org.apache.log4j.PatternLayout
+log4j.appender.logfile.layout.ConversionPattern=%-5p %t %-10c %m%n
+
+
+# Minimum level of messages you want to see
+# Childs inherit from their parents, unless overridden explicitly, therefore
+# the following disables DEBUG messages by default (everywhere)
+log4j.logger.yade=INFO
+# except for the classes where requested:
+#log4j.logger.yade.Omega=DEBUG
+log4j.logger.yade.DynLibManager=DEBUG
+
+
+

@@ -14,6 +14,7 @@
 #include <string>
 #include <map>
 #include <yade/yade-lib-loki/Singleton.hpp>
+#include <yade/yade-core/logging.hpp>
 
 using namespace std;
 
@@ -46,6 +47,7 @@ class SerializableSingleton : public Singleton< SerializableSingleton >
 	public :
 		bool registerSerializableDescriptor( string name, VerifyFactorableFnPtr verify, SerializableTypes::Type type, bool f);
 		bool findClassInfo(const type_info& tp,SerializableTypes::Type& type, string& serializableClassName,bool& fundamental);
+		DECLARE_LOGGER;
 
 	private :
 		SerializableSingleton();

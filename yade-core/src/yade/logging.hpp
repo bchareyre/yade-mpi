@@ -47,9 +47,9 @@
 
 #include<iostream>
 
+#	define _POOR_MANS_LOG(level,msg) {std::cerr<<level " "<<_LOG_HEAD<<msg<<std::endl;}
 #	define _LOG_HEAD __FILE__ ":"<<__LINE__<<" "<<__FUNCTION__<<": "
-#	define _POOR_MANS_LOG(level,msg) std::cerr<<level " "<<_LOG_HEAD<<msg<<std::endl
-#	define LOG_DEBUG(msg)
+#	define LOG_DEBUG(msg) 
 #	define LOG_INFO(msg) _POOR_MANS_LOG("INFO ",msg)
 #	define LOG_WARN(msg) _POOR_MANS_LOG("WARN ",msg)
 #	define LOG_ERROR(msg) _POOR_MANS_LOG("ERROR",msg)

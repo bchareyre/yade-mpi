@@ -115,6 +115,8 @@ class Omega : public Singleton<Omega>
 		
 		void		init();
 
+		DECLARE_LOGGER;
+
 	private	:
 		Omega();
 		~Omega();

@@ -12,6 +12,7 @@
 #include <qworkspace.h>
 #include <qmainwindow.h>
 #include <qframe.h>
+#include<yade/yade-core/logging.hpp>
 #include "YadeQtGeneratedMainWindow.h"
 #include "SimulationController.hpp"
 #include "QtGUIPreferences.hpp"
@@ -40,6 +41,7 @@ class YadeQtMainWindow : public YadeQtGeneratedMainWindow
 		void addMenu(string menuName);
 		void addItem(string menuName, string itemName,string className);
 		void createMenus();
+		DECLARE_LOGGER;
 
 	public slots :
 		virtual void fileNewSimulation();

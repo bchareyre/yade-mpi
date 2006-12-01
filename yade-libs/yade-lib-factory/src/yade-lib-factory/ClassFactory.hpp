@@ -20,6 +20,7 @@
 
 
 #include <yade/yade-lib-loki/Singleton.hpp>
+#include <yade/yade-core/logging.hpp>
 
 
 #include "FactoryExceptions.hpp"
@@ -98,10 +99,11 @@ class ClassFactory : public Singleton< ClassFactory >
 		/// Map that contains the name of the registered class and their description
 		FactorableCreatorsMap map;
 
-		ClassFactory() {	cerr << "Constructing ClassFactory  (if multiple times - check '-rdynamic' flag!)" << endl;};
+		ClassFactory() { cerr<<"Constructing ClassFactory  (if multiple times - check '-rdynamic' flag!).\n";};
 		ClassFactory(const ClassFactory&);
 		ClassFactory& operator=(const ClassFactory&);
 		virtual ~ClassFactory() {};
+		DECLARE_LOGGER;
 
 	public :
 		/*! This method is used to register a Factorable class into the factory. It is called only from macro REGISTER_CLASS_TO_FACTORY
