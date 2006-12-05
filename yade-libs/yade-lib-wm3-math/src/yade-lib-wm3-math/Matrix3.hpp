@@ -90,12 +90,16 @@ public:
     Matrix3 (const Vector3<RealType>& rkU, const Vector3<RealType>& rkV);
 
     // create various matrices
-    Matrix3& makeZero ();
-    Matrix3& makeIdentity ();
-    Matrix3& makeDiagonal (RealType fM00, RealType fM11, RealType fM22);
-    Matrix3& fromAxisAngle (const Vector3<RealType>& rkAxis, RealType fAngle);
-    Matrix3& makeTensorProduct (const Vector3<RealType>& rkU,
-        const Vector3<RealType>& rkV);
+	__attribute__((deprecated)) inline     Matrix3& makeZero(){return MakeZero();}
+    Matrix3& MakeZero() ;
+	__attribute__((deprecated)) inline     Matrix3& makeIdentity(){return MakeIdentity();}
+    Matrix3& MakeIdentity() ;
+	__attribute__((deprecated)) inline     Matrix3& makeDiagonal(RealType fM00, RealType fM11, RealType fM22){return MakeDiagonal(fM00,fM11,fM22);}
+    Matrix3& MakeDiagonal(RealType fM00, RealType fM11, RealType fM22) ;
+	__attribute__((deprecated)) inline     Matrix3& fromAxisAngle(const Vector3<RealType>& rkAxis, RealType fAngle){return FromAxisAngle(rkAxis,fAngle);}
+    Matrix3& FromAxisAngle(const Vector3<RealType>& rkAxis, RealType fAngle) ;
+	__attribute__((deprecated)) inline     Matrix3& makeTensorProduct(const Vector3<RealType>& rkU,        const Vector3<RealType>& rkV){return MakeTensorProduct(rkU,rkV);}
+    Matrix3& MakeTensorProduct(const Vector3<RealType>& rkU,        const Vector3<RealType>& rkV) ;
 
     // member access
     operator const RealType* () const;
@@ -104,11 +108,16 @@ public:
     RealType* operator[] (int iRow);
     RealType operator() (int iRow, int iCol) const;
     RealType& operator() (int iRow, int iCol);
-    void setRow (int iRow, const Vector3<RealType>& rkV);
-    Vector3<RealType> getRow (int iRow) const;
-    void setColumn (int iCol, const Vector3<RealType>& rkV);
-    Vector3<RealType> getColumn (int iCol) const;
-    void getColumnMajor (RealType* afCMajor) const;
+	__attribute__((deprecated)) inline     void setRow(int iRow, const Vector3<RealType>& rkV){return SetRow(iRow,rkV);}
+    void SetRow(int iRow, const Vector3<RealType>& rkV) ;
+	__attribute__((deprecated)) inline     Vector3<RealType> getRow(int iRow) const{return GetRow(iRow);}
+    Vector3<RealType> GetRow(int iRow) const ;
+	__attribute__((deprecated)) inline     void setColumn(int iCol, const Vector3<RealType>& rkV){return SetColumn(iCol,rkV);}
+    void SetColumn(int iCol, const Vector3<RealType>& rkV) ;
+	__attribute__((deprecated)) inline     Vector3<RealType> getColumn(int iCol) const{return GetColumn(iCol);}
+    Vector3<RealType> GetColumn(int iCol) const ;
+	__attribute__((deprecated)) inline     void getColumnMajor(RealType* afCMajor) const{return GetColumnMajor(afCMajor);}
+    void GetColumnMajor(RealType* afCMajor) const ;
 
     // assignment
     Matrix3& operator= (const Matrix3& rkM);
@@ -139,66 +148,83 @@ public:
     Vector3<RealType> operator* (const Vector3<RealType>& rkV) const;  // M * v
 
     // other operations
-    Matrix3 transpose () const;  // M^T
-    Matrix3 transposeTimes (const Matrix3& rkM) const;  // this^T * M
-    Matrix3 timesTranspose (const Matrix3& rkM) const;  // this * M^T
-    Matrix3 inverse () const;
-    Matrix3 adjoint () const;
-    RealType determinant () const;
-    RealType qForm (const Vector3<RealType>& rkU,
-        const Vector3<RealType>& rkV) const;  // u^T*M*v
-    Matrix3 timesDiagonal (const Vector3<RealType>& rkDiag) const;  // M*D
-    Matrix3 diagonalTimes (const Vector3<RealType>& rkDiag) const;  // D*M
+	__attribute__((deprecated)) inline     Matrix3 transpose() const{return Transpose();}
+    Matrix3 Transpose() const ;
+	__attribute__((deprecated)) inline     Matrix3 transposeTimes(const Matrix3& rkM) const{return TransposeTimes(rkM);}
+    Matrix3 TransposeTimes(const Matrix3& rkM) const ;
+	__attribute__((deprecated)) inline     Matrix3 timesTranspose(const Matrix3& rkM) const{return TimesTranspose(rkM);}
+    Matrix3 TimesTranspose(const Matrix3& rkM) const ;
+	__attribute__((deprecated)) inline     Matrix3 inverse() const{return Inverse();}
+    Matrix3 Inverse() const ;
+	__attribute__((deprecated)) inline     Matrix3 adjoint() const{return Adjoint();}
+    Matrix3 Adjoint() const ;
+	__attribute__((deprecated)) inline     RealType determinant() const{return Determinant();}
+    RealType Determinant() const ;
+	__attribute__((deprecated)) inline     RealType qForm(const Vector3<RealType>& rkU,        const Vector3<RealType>& rkV) const{return QForm(rkU,rkV);}
+    RealType QForm(const Vector3<RealType>& rkU,        const Vector3<RealType>& rkV) const ;
+	__attribute__((deprecated)) inline     Matrix3 timesDiagonal(const Vector3<RealType>& rkDiag) const{return TimesDiagonal(rkDiag);}
+    Matrix3 TimesDiagonal(const Vector3<RealType>& rkDiag) const ;
+	__attribute__((deprecated)) inline     Matrix3 diagonalTimes(const Vector3<RealType>& rkDiag) const{return DiagonalTimes(rkDiag);}
+    Matrix3 DiagonalTimes(const Vector3<RealType>& rkDiag) const ;
 
     // The matrix must be a orientation for these functions to be valid.  The
     // last function uses Gram-Schmidt orthonormalization applied to the
     // columns of the orientation matrix.  The angle must be in radians, not
     // degrees.
-    void toAxisAngle (Vector3<RealType>& rkAxis, RealType& rfAngle) const;
-    void orthonormalize ();
+	__attribute__((deprecated)) inline     void toAxisAngle(Vector3<RealType>& rkAxis, RealType& rfAngle) const{return ToAxisAngle(rkAxis,rfAngle);}
+    void ToAxisAngle(Vector3<RealType>& rkAxis, RealType& rfAngle) const ;
+	__attribute__((deprecated)) inline     void orthonormalize(){return Orthonormalize();}
+    void Orthonormalize() ;
 
     // The matrix must be symmetric.  Factor M = R * D * R^T where
     // R = [u0|u1|u2] is a orientation matrix with columns u0, u1, and u2 and
     // D = diag(d0,d1,d2) is a diagonal matrix whose diagonal entries are d0,
     // d1, and d2.  The eigenvector u[i] corresponds to eigenvector d[i].
     // The eigenvalues are ordered as d0 <= d1 <= d2.
-    void eigenDecomposition (Matrix3& rkRot, Matrix3& rkDiag) const;
+	__attribute__((deprecated)) inline     void eigenDecomposition(Matrix3& rkRot, Matrix3& rkDiag) const{return EigenDecomposition(rkRot,rkDiag);}
+    void EigenDecomposition(Matrix3& rkRot, Matrix3& rkDiag) const ;
 
     // The matrix must be orthonormal.  The decomposition is yaw*pitch*roll
     // where yaw is orientation about the Up vector, pitch is orientation about the
     // Right axis, and roll is orientation about the Direction axis.
-    Matrix3& fromEulerAnglesXYZ (RealType fYAngle, RealType fPAngle, RealType fRAngle);
-    Matrix3& fromEulerAnglesXZY (RealType fYAngle, RealType fPAngle, RealType fRAngle);
-    Matrix3& fromEulerAnglesYXZ (RealType fYAngle, RealType fPAngle, RealType fRAngle);
-    Matrix3& fromEulerAnglesYZX (RealType fYAngle, RealType fPAngle, RealType fRAngle);
-    Matrix3& fromEulerAnglesZXY (RealType fYAngle, RealType fPAngle, RealType fRAngle);
-    Matrix3& fromEulerAnglesZYX (RealType fYAngle, RealType fPAngle, RealType fRAngle);
-    bool toEulerAnglesXYZ (RealType& rfYAngle, RealType& rfPAngle,
-        RealType& rfRAngle) const;
-    bool toEulerAnglesXZY (RealType& rfYAngle, RealType& rfPAngle,
-        RealType& rfRAngle) const;
-    bool toEulerAnglesYXZ (RealType& rfYAngle, RealType& rfPAngle,
-        RealType& rfRAngle) const;
-    bool toEulerAnglesYZX (RealType& rfYAngle, RealType& rfPAngle,
-        RealType& rfRAngle) const;
-    bool toEulerAnglesZXY (RealType& rfYAngle, RealType& rfPAngle,
-        RealType& rfRAngle) const;
-    bool toEulerAnglesZYX (RealType& rfYAngle, RealType& rfPAngle,
-        RealType& rfRAngle) const;
+	__attribute__((deprecated)) inline     Matrix3& fromEulerAnglesXYZ(RealType fYAngle, RealType fPAngle, RealType fRAngle){return FromEulerAnglesXYZ(fYAngle,fPAngle,fRAngle);}
+    Matrix3& FromEulerAnglesXYZ(RealType fYAngle, RealType fPAngle, RealType fRAngle) ;
+	__attribute__((deprecated)) inline     Matrix3& fromEulerAnglesXZY(RealType fYAngle, RealType fPAngle, RealType fRAngle){return FromEulerAnglesXZY(fYAngle,fPAngle,fRAngle);}
+    Matrix3& FromEulerAnglesXZY(RealType fYAngle, RealType fPAngle, RealType fRAngle) ;
+	__attribute__((deprecated)) inline     Matrix3& fromEulerAnglesYXZ(RealType fYAngle, RealType fPAngle, RealType fRAngle){return FromEulerAnglesYXZ(fYAngle,fPAngle,fRAngle);}
+    Matrix3& FromEulerAnglesYXZ(RealType fYAngle, RealType fPAngle, RealType fRAngle) ;
+	__attribute__((deprecated)) inline     Matrix3& fromEulerAnglesYZX(RealType fYAngle, RealType fPAngle, RealType fRAngle){return FromEulerAnglesYZX(fYAngle,fPAngle,fRAngle);}
+    Matrix3& FromEulerAnglesYZX(RealType fYAngle, RealType fPAngle, RealType fRAngle) ;
+	__attribute__((deprecated)) inline     Matrix3& fromEulerAnglesZXY(RealType fYAngle, RealType fPAngle, RealType fRAngle){return FromEulerAnglesZXY(fYAngle,fPAngle,fRAngle);}
+    Matrix3& FromEulerAnglesZXY(RealType fYAngle, RealType fPAngle, RealType fRAngle) ;
+	__attribute__((deprecated)) inline     Matrix3& fromEulerAnglesZYX(RealType fYAngle, RealType fPAngle, RealType fRAngle){return FromEulerAnglesZYX(fYAngle,fPAngle,fRAngle);}
+    Matrix3& FromEulerAnglesZYX(RealType fYAngle, RealType fPAngle, RealType fRAngle) ;
+	__attribute__((deprecated)) inline     bool toEulerAnglesXYZ(RealType& rfYAngle, RealType& rfPAngle,        RealType& rfRAngle) const{return ToEulerAnglesXYZ(rfYAngle,rfPAngle,rfRAngle);}
+    bool ToEulerAnglesXYZ(RealType& rfYAngle, RealType& rfPAngle,        RealType& rfRAngle) const ;
+	__attribute__((deprecated)) inline     bool toEulerAnglesXZY(RealType& rfYAngle, RealType& rfPAngle,        RealType& rfRAngle) const{return ToEulerAnglesXZY(rfYAngle,rfPAngle,rfRAngle);}
+    bool ToEulerAnglesXZY(RealType& rfYAngle, RealType& rfPAngle,        RealType& rfRAngle) const ;
+	__attribute__((deprecated)) inline     bool toEulerAnglesYXZ(RealType& rfYAngle, RealType& rfPAngle,        RealType& rfRAngle) const{return ToEulerAnglesYXZ(rfYAngle,rfPAngle,rfRAngle);}
+    bool ToEulerAnglesYXZ(RealType& rfYAngle, RealType& rfPAngle,        RealType& rfRAngle) const ;
+	__attribute__((deprecated)) inline     bool toEulerAnglesYZX(RealType& rfYAngle, RealType& rfPAngle,        RealType& rfRAngle) const{return ToEulerAnglesYZX(rfYAngle,rfPAngle,rfRAngle);}
+    bool ToEulerAnglesYZX(RealType& rfYAngle, RealType& rfPAngle,        RealType& rfRAngle) const ;
+	__attribute__((deprecated)) inline     bool toEulerAnglesZXY(RealType& rfYAngle, RealType& rfPAngle,        RealType& rfRAngle) const{return ToEulerAnglesZXY(rfYAngle,rfPAngle,rfRAngle);}
+    bool ToEulerAnglesZXY(RealType& rfYAngle, RealType& rfPAngle,        RealType& rfRAngle) const ;
+	__attribute__((deprecated)) inline     bool toEulerAnglesZYX(RealType& rfYAngle, RealType& rfPAngle,        RealType& rfRAngle) const{return ToEulerAnglesZYX(rfYAngle,rfPAngle,rfRAngle);}
+    bool ToEulerAnglesZYX(RealType& rfYAngle, RealType& rfPAngle,        RealType& rfRAngle) const ;
 
     // SLERP (spherical linear interpolation) without quaternions.  Computes
     // R(t) = R0*(Transpose(R0)*R1)^t.  If Q is a orientation matrix with
     // unit-length axis U and angle A, then Q^t is a orientation matrix with
     // unit-length axis U and orientation angle t*A.
-    static Matrix3 slerp (RealType fT, const Matrix3& rkR0,
-        const Matrix3& rkR1);
+	__attribute__((deprecated)) inline     static Matrix3 slerp(RealType fT, const Matrix3& rkR0,        const Matrix3& rkR1){return Slerp(fT,rkR0,rkR1);}
+    static Matrix3 Slerp(RealType fT, const Matrix3& rkR0,        const Matrix3& rkR1) ;
 
     // Singular value decomposition, M = L*S*R, where L and R are orthogonal
     // and S is a diagonal matrix whose diagonal entries are nonnegative.
-    void singularValueDecomposition (Matrix3& rkL, Matrix3& rkS,
-        Matrix3& rkR) const;
-    void singularValueComposition (const Matrix3& rkL, const Matrix3& rkS,
-        const Matrix3& rkR);
+	__attribute__((deprecated)) inline     void singularValueDecomposition(Matrix3& rkL, Matrix3& rkS,        Matrix3& rkR) const{return SingularValueDecomposition(rkL,rkS,rkR);}
+    void SingularValueDecomposition(Matrix3& rkL, Matrix3& rkS,        Matrix3& rkR) const ;
+	__attribute__((deprecated)) inline     void singularValueComposition(const Matrix3& rkL, const Matrix3& rkS,        const Matrix3& rkR){return SingularValueComposition(rkL,rkS,rkR);}
+    void SingularValueComposition(const Matrix3& rkL, const Matrix3& rkS,        const Matrix3& rkR) ;
 
     // factor M = Q*D*U with orthogonal Q, diagonal D, upper triangular U
     void QDUDecomposition (Matrix3& rkQ, Matrix3& rkD, Matrix3& rkU) const;
@@ -214,18 +240,22 @@ private:
     // value is 'false'.  Otherwise, the transformation is a reflection and
     // the return value is 'true'.  The QLAlgorithm returns 'true' iff the
     // QL iteration scheme converged.
-    bool tridiagonalize (RealType afDiag[3], RealType afSubd[2]);
+	__attribute__((deprecated)) inline     bool tridiagonalize(RealType afDiag[3], RealType afSubd[2]){return Tridiagonalize(afDiag,afSubd);}
+    bool Tridiagonalize(RealType afDiag[3], RealType afSubd[2]) ;
     bool QLAlgorithm (RealType afDiag[3], RealType afSubd[2]);
 
     // support for singular value decomposition
-    static void bidiagonalize (Matrix3& rkA, Matrix3& rkL, Matrix3& rkR);
-    static void golubKahanStep (Matrix3& rkA, Matrix3& rkL, Matrix3& rkR);
+	__attribute__((deprecated)) inline     static void bidiagonalize(Matrix3& rkA, Matrix3& rkL, Matrix3& rkR){return Bidiagonalize(rkA,rkL,rkR);}
+    static void Bidiagonalize(Matrix3& rkA, Matrix3& rkL, Matrix3& rkR) ;
+	__attribute__((deprecated)) inline     static void golubKahanStep(Matrix3& rkA, Matrix3& rkL, Matrix3& rkR){return GolubKahanStep(rkA,rkL,rkR);}
+    static void GolubKahanStep(Matrix3& rkA, Matrix3& rkL, Matrix3& rkR) ;
 
     // for indexing into the 1D array of the matrix, iCol+N*iRow
     static int I (int iRow, int iCol);
 
     // support for comparisons
-    int compareArrays (const Matrix3& rkM) const;
+	__attribute__((deprecated)) inline     int compareArrays(const Matrix3& rkM) const{return CompareArrays(rkM);}
+    int CompareArrays(const Matrix3& rkM) const ;
 
     RealType m_afEntry[9];
 };

@@ -35,8 +35,7 @@ template<> const double Math<double>::RAD_TO_DEG = 180.0/Math<double>::PI;
 
 //----------------------------------------------------------------------------
 template <>
-float Math<float>::fastInvSqrt (float fValue)
-{
+float Math<float>::FastInvSqrt(float fValue) {
     float fHalf = 0.5f*fValue;
     int i  = *(int*)&fValue;
     i = 0x5f3759df - (i >> 1);
@@ -46,8 +45,7 @@ float Math<float>::fastInvSqrt (float fValue)
 }
 //----------------------------------------------------------------------------
 template <>
-double Math<double>::fastInvSqrt (double dValue)
-{
+double Math<double>::FastInvSqrt(double dValue) {
 // FIXME - wtf with Integer64 on windows?
 //#if defined(WIN32) || defined(MINGW)
 //    double dHalf = 0.5*dValue;

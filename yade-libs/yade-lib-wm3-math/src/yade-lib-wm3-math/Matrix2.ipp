@@ -150,14 +150,12 @@ int Matrix2<RealType>::I (int iRow, int iCol)
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-void Matrix2<RealType>::makeZero ()
-{
+void Matrix2<RealType>::MakeZero() {
     memset(m_afEntry,0,4*sizeof(RealType));
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-void Matrix2<RealType>::makeIdentity ()
-{
+void Matrix2<RealType>::MakeIdentity() {
     m_afEntry[0] = (RealType)1.0;
     m_afEntry[1] = (RealType)0.0;
     m_afEntry[2] = (RealType)0.0;
@@ -165,8 +163,7 @@ void Matrix2<RealType>::makeIdentity ()
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-void Matrix2<RealType>::makeDiagonal (RealType fM00, RealType fM11)
-{
+void Matrix2<RealType>::MakeDiagonal(RealType fM00, RealType fM11) {
     m_afEntry[0] = fM00;
     m_afEntry[1] = (RealType)0.0;
     m_afEntry[2] = (RealType)0.0;
@@ -174,8 +171,7 @@ void Matrix2<RealType>::makeDiagonal (RealType fM00, RealType fM11)
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-void Matrix2<RealType>::fromAngle (RealType fAngle)
-{
+void Matrix2<RealType>::FromAngle(RealType fAngle) {
     m_afEntry[0] = Math<RealType>::Cos(fAngle);
     m_afEntry[2] = Math<RealType>::Sin(fAngle);
     m_afEntry[1] = -m_afEntry[2];
@@ -183,9 +179,7 @@ void Matrix2<RealType>::fromAngle (RealType fAngle)
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-void Matrix2<RealType>::makeTensorProduct (const Vector2<RealType>& rkU,
-    const Vector2<RealType>& rkV)
-{
+void Matrix2<RealType>::MakeTensorProduct(const Vector2<RealType>& rkU,    const Vector2<RealType>& rkV) {
     m_afEntry[0] = rkU[0]*rkV[0];
     m_afEntry[1] = rkU[0]*rkV[1];
     m_afEntry[2] = rkU[1]*rkV[0];
@@ -193,16 +187,14 @@ void Matrix2<RealType>::makeTensorProduct (const Vector2<RealType>& rkU,
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-void Matrix2<RealType>::setRow (int iRow, const Vector2<RealType>& rkV)
-{
+void Matrix2<RealType>::SetRow(int iRow, const Vector2<RealType>& rkV) {
     assert( 0 <= iRow && iRow < 2 );
     for (int iCol = 0, i = 2*iRow; iCol < 2; iCol++, i++)
         m_afEntry[i] = rkV[iCol];
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-Vector2<RealType> Matrix2<RealType>::getRow (int iRow) const
-{
+Vector2<RealType> Matrix2<RealType>::GetRow(int iRow) const {
     assert( 0 <= iRow && iRow < 2 );
     Vector2<RealType> kV;
     for (int iCol = 0, i = 2*iRow; iCol < 2; iCol++, i++)
@@ -211,16 +203,14 @@ Vector2<RealType> Matrix2<RealType>::getRow (int iRow) const
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-void Matrix2<RealType>::setColumn (int iCol, const Vector2<RealType>& rkV)
-{
+void Matrix2<RealType>::SetColumn(int iCol, const Vector2<RealType>& rkV) {
     assert( 0 <= iCol && iCol < 2 );
     for (int iRow = 0, i = iCol; iRow < 2; iRow++, i += 2)
         m_afEntry[i] = rkV[iRow];
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-Vector2<RealType> Matrix2<RealType>::getColumn (int iCol) const
-{
+Vector2<RealType> Matrix2<RealType>::GetColumn(int iCol) const {
     assert( 0 <= iCol && iCol < 2 );
     Vector2<RealType> kV;
     for (int iRow = 0, i = iCol; iRow < 2; iRow++, i += 2)
@@ -229,8 +219,7 @@ Vector2<RealType> Matrix2<RealType>::getColumn (int iCol) const
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-void Matrix2<RealType>::getColumnMajor (RealType* afCMajor) const
-{
+void Matrix2<RealType>::GetColumnMajor(RealType* afCMajor) const {
     for (int iRow = 0, i = 0; iRow < 2; iRow++)
     {
         for (int iCol = 0; iCol < 2; iCol++)
@@ -246,8 +235,7 @@ Matrix2<RealType>& Matrix2<RealType>::operator= (const Matrix2& rkM)
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-int Matrix2<RealType>::compareArrays (const Matrix2& rkM) const
-{
+int Matrix2<RealType>::CompareArrays(const Matrix2& rkM) const {
     return memcmp(m_afEntry,rkM.m_afEntry,4*sizeof(RealType));
 }
 //----------------------------------------------------------------------------
@@ -422,8 +410,7 @@ Vector2<RealType> Matrix2<RealType>::operator* (const Vector2<RealType>& rkV) co
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-Matrix2<RealType> Matrix2<RealType>::transpose () const
-{
+Matrix2<RealType> Matrix2<RealType>::Transpose() const {
     Matrix2 kTranspose;
     for (int iRow = 0; iRow < 2; iRow++)
     {
@@ -434,8 +421,7 @@ Matrix2<RealType> Matrix2<RealType>::transpose () const
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-Matrix2<RealType> Matrix2<RealType>::transposeTimes (const Matrix2& rkM) const
-{
+Matrix2<RealType> Matrix2<RealType>::TransposeTimes(const Matrix2& rkM) const {
     // P = A^T*B, P[r][c] = sum_m A[m][r]*B[m][c]
     Matrix2 kProd;
     for (int iRow = 0; iRow < 2; iRow++)
@@ -455,8 +441,7 @@ Matrix2<RealType> Matrix2<RealType>::transposeTimes (const Matrix2& rkM) const
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-Matrix2<RealType> Matrix2<RealType>::timesTranspose (const Matrix2& rkM) const
-{
+Matrix2<RealType> Matrix2<RealType>::TimesTranspose(const Matrix2& rkM) const {
     // P = A*B^T, P[r][c] = sum_m A[r][m]*B[c][m]
     Matrix2 kProd;
     for (int iRow = 0; iRow < 2; iRow++)
@@ -476,8 +461,7 @@ Matrix2<RealType> Matrix2<RealType>::timesTranspose (const Matrix2& rkM) const
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-Matrix2<RealType> Matrix2<RealType>::inverse () const
-{
+Matrix2<RealType> Matrix2<RealType>::Inverse() const {
     Matrix2 kInverse;
 
     RealType fDet = m_afEntry[0]*m_afEntry[3] - m_afEntry[1]*m_afEntry[2];
@@ -498,36 +482,30 @@ Matrix2<RealType> Matrix2<RealType>::inverse () const
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-Matrix2<RealType> Matrix2<RealType>::adjoint () const
-{
+Matrix2<RealType> Matrix2<RealType>::Adjoint() const {
     return Matrix2(
          m_afEntry[3],-m_afEntry[1],
         -m_afEntry[2], m_afEntry[0]);
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-RealType Matrix2<RealType>::determinant () const
-{
+RealType Matrix2<RealType>::Determinant() const {
     return m_afEntry[0]*m_afEntry[3] - m_afEntry[1]*m_afEntry[2];
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-RealType Matrix2<RealType>::qForm (const Vector2<RealType>& rkU,
-    const Vector2<RealType>& rkV) const
-{
+RealType Matrix2<RealType>::QForm(const Vector2<RealType>& rkU,    const Vector2<RealType>& rkV) const {
     return rkU.Dot((*this)*rkV);
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-void Matrix2<RealType>::toAngle (RealType& rfAngle) const
-{
+void Matrix2<RealType>::ToAngle(RealType& rfAngle) const {
     // assert:  matrix is a orientation
     rfAngle = Math<RealType>::ATan2(m_afEntry[2],m_afEntry[0]);
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-void Matrix2<RealType>::orthonormalize ()
-{
+void Matrix2<RealType>::Orthonormalize() {
     // Algorithm uses Gram-Schmidt orthogonalization.  If 'this' matrix is
     // M = [m0|m1], then orthonormal output matrix is Q = [q0|q1],
     //
@@ -557,8 +535,7 @@ void Matrix2<RealType>::orthonormalize ()
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-void Matrix2<RealType>::eigenDecomposition (Matrix2& rkRot, Matrix2& rkDiag) const
-{
+void Matrix2<RealType>::EigenDecomposition(Matrix2& rkRot, Matrix2& rkDiag) const {
     RealType fTrace = m_afEntry[0] + m_afEntry[3];
     RealType fDiff = m_afEntry[0] - m_afEntry[3];
     RealType fDiscr = Math<RealType>::Sqrt(fDiff*fDiff +

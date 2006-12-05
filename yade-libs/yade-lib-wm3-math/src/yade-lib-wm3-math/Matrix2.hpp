@@ -77,12 +77,16 @@ public:
     Matrix2 (const Vector2<RealType>& rkU, const Vector2<RealType>& rkV);
 
     // create various matrices
-    void makeZero ();
-    void makeIdentity ();
-    void makeDiagonal (RealType fM00, RealType fM11);
-    void fromAngle (RealType fAngle);
-    void makeTensorProduct (const Vector2<RealType>& rkU,
-        const Vector2<RealType>& rkV);
+	__attribute__((deprecated)) inline     void makeZero(){return MakeZero();}
+    void MakeZero() ;
+	__attribute__((deprecated)) inline     void makeIdentity(){return MakeIdentity();}
+    void MakeIdentity() ;
+	__attribute__((deprecated)) inline     void makeDiagonal(RealType fM00, RealType fM11){return MakeDiagonal(fM00,fM11);}
+    void MakeDiagonal(RealType fM00, RealType fM11) ;
+	__attribute__((deprecated)) inline     void fromAngle(RealType fAngle){return FromAngle(fAngle);}
+    void FromAngle(RealType fAngle) ;
+	__attribute__((deprecated)) inline     void makeTensorProduct(const Vector2<RealType>& rkU,        const Vector2<RealType>& rkV){return MakeTensorProduct(rkU,rkV);}
+    void MakeTensorProduct(const Vector2<RealType>& rkU,        const Vector2<RealType>& rkV) ;
 
     // member access
     operator const RealType* () const;
@@ -91,11 +95,16 @@ public:
     RealType* operator[] (int iRow);
     RealType operator() (int iRow, int iCol) const;
     RealType& operator() (int iRow, int iCol);
-    void setRow (int iRow, const Vector2<RealType>& rkV);
-    Vector2<RealType> getRow (int iRow) const;
-    void setColumn (int iCol, const Vector2<RealType>& rkV);
-    Vector2<RealType> getColumn (int iCol) const;
-    void getColumnMajor (RealType* afCMajor) const;
+	__attribute__((deprecated)) inline     void setRow(int iRow, const Vector2<RealType>& rkV){return SetRow(iRow,rkV);}
+    void SetRow(int iRow, const Vector2<RealType>& rkV) ;
+	__attribute__((deprecated)) inline     Vector2<RealType> getRow(int iRow) const{return GetRow(iRow);}
+    Vector2<RealType> GetRow(int iRow) const ;
+	__attribute__((deprecated)) inline     void setColumn(int iCol, const Vector2<RealType>& rkV){return SetColumn(iCol,rkV);}
+    void SetColumn(int iCol, const Vector2<RealType>& rkV) ;
+	__attribute__((deprecated)) inline     Vector2<RealType> getColumn(int iCol) const{return GetColumn(iCol);}
+    Vector2<RealType> GetColumn(int iCol) const ;
+	__attribute__((deprecated)) inline     void getColumnMajor(RealType* afCMajor) const{return GetColumnMajor(afCMajor);}
+    void GetColumnMajor(RealType* afCMajor) const ;
 
     // assignment
     Matrix2& operator= (const Matrix2& rkM);
@@ -126,28 +135,37 @@ public:
     Vector2<RealType> operator* (const Vector2<RealType>& rkV) const;  // M * v
 
     // other operations
-    Matrix2 transpose () const;  // M^T
-    Matrix2 transposeTimes (const Matrix2& rkM) const;  // this^T * M
-    Matrix2 timesTranspose (const Matrix2& rkM) const;  // this * M^T
-    Matrix2 inverse () const;
-    Matrix2 adjoint () const;
-    RealType determinant () const;
-    RealType qForm (const Vector2<RealType>& rkU,
-        const Vector2<RealType>& rkV) const;  // u^T*M*v
+	__attribute__((deprecated)) inline     Matrix2 transpose() const{return Transpose();}
+    Matrix2 Transpose() const ;
+	__attribute__((deprecated)) inline     Matrix2 transposeTimes(const Matrix2& rkM) const{return TransposeTimes(rkM);}
+    Matrix2 TransposeTimes(const Matrix2& rkM) const ;
+	__attribute__((deprecated)) inline     Matrix2 timesTranspose(const Matrix2& rkM) const{return TimesTranspose(rkM);}
+    Matrix2 TimesTranspose(const Matrix2& rkM) const ;
+	__attribute__((deprecated)) inline     Matrix2 inverse() const{return Inverse();}
+    Matrix2 Inverse() const ;
+	__attribute__((deprecated)) inline     Matrix2 adjoint() const{return Adjoint();}
+    Matrix2 Adjoint() const ;
+	__attribute__((deprecated)) inline     RealType determinant() const{return Determinant();}
+    RealType Determinant() const ;
+	__attribute__((deprecated)) inline     RealType qForm(const Vector2<RealType>& rkU,        const Vector2<RealType>& rkV) const{return QForm(rkU,rkV);}
+    RealType QForm(const Vector2<RealType>& rkU,        const Vector2<RealType>& rkV) const ;
 
     // The matrix must be a orientation for these functions to be valid.  The
     // last function uses Gram-Schmidt orthonormalization applied to the
     // columns of the orientation matrix.  The angle must be in radians, not
     // degrees.
-    void toAngle (RealType& rfAngle) const;
-    void orthonormalize ();
+	__attribute__((deprecated)) inline     void toAngle(RealType& rfAngle) const{return ToAngle(rfAngle);}
+    void ToAngle(RealType& rfAngle) const ;
+	__attribute__((deprecated)) inline     void orthonormalize(){return Orthonormalize();}
+    void Orthonormalize() ;
 
     // The matrix must be symmetric.  Factor M = R * D * R^T where
     // R = [u0|u1] is a orientation matrix with columns u0 and u1 and
     // D = diag(d0,d1) is a diagonal matrix whose diagonal entries are d0 and
     // d1.  The eigenvector u[i] corresponds to eigenvector d[i].  The
     // eigenvalues are ordered as d0 <= d1.
-    void eigenDecomposition (Matrix2& rkRot, Matrix2& rkDiag) const;
+	__attribute__((deprecated)) inline     void eigenDecomposition(Matrix2& rkRot, Matrix2& rkDiag) const{return EigenDecomposition(rkRot,rkDiag);}
+    void EigenDecomposition(Matrix2& rkRot, Matrix2& rkDiag) const ;
 
     static const Matrix2 ZERO;
     static const Matrix2 IDENTITY;
@@ -157,7 +175,8 @@ private:
     static int I (int iRow, int iCol);
 
     // support for comparisons
-    int compareArrays (const Matrix2& rkM) const;
+	__attribute__((deprecated)) inline     int compareArrays(const Matrix2& rkM) const{return CompareArrays(rkM);}
+    int CompareArrays(const Matrix2& rkM) const ;
     
     // matrix stored in row-major order
     RealType m_afEntry[4];

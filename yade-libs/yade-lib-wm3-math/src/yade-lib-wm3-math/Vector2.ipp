@@ -66,26 +66,22 @@ RealType& Vector2<RealType>::operator[] (int i)
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-RealType Vector2<RealType>::x () const
-{
+RealType Vector2<RealType>::X() const {
     return m_afTuple[0];
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-RealType& Vector2<RealType>::x ()
-{
+RealType& Vector2<RealType>::X() {
     return m_afTuple[0];
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-RealType Vector2<RealType>::y () const
-{
+RealType Vector2<RealType>::Y() const {
     return m_afTuple[1];
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-RealType& Vector2<RealType>::y ()
-{
+RealType& Vector2<RealType>::Y() {
     return m_afTuple[1];
 }
 //----------------------------------------------------------------------------
@@ -98,8 +94,7 @@ Vector2<RealType>& Vector2<RealType>::operator= (const Vector2& rkV)
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-int Vector2<RealType>::compareArrays (const Vector2& rkV) const
-{
+int Vector2<RealType>::CompareArrays(const Vector2& rkV) const {
     return memcmp(m_afTuple,rkV.m_afTuple,2*sizeof(RealType));
 }
 //----------------------------------------------------------------------------
@@ -242,32 +237,28 @@ Vector2<RealType>& Vector2<RealType>::operator/= (RealType fScalar)
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-RealType Vector2<RealType>::length () const
-{
+RealType Vector2<RealType>::Length() const {
     return Math<RealType>::sqRoot(
         m_afTuple[0]*m_afTuple[0] +
         m_afTuple[1]*m_afTuple[1]);
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-RealType Vector2<RealType>::squaredLength () const
-{
+RealType Vector2<RealType>::SquaredLength() const {
     return
         m_afTuple[0]*m_afTuple[0] +
         m_afTuple[1]*m_afTuple[1];
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-RealType Vector2<RealType>::dot (const Vector2& rkV) const
-{
+RealType Vector2<RealType>::Dot(const Vector2& rkV) const {
     return
         m_afTuple[0]*rkV.m_afTuple[0] +
         m_afTuple[1]*rkV.m_afTuple[1];
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-RealType Vector2<RealType>::normalize ()
-{
+RealType Vector2<RealType>::Normalize() {
     RealType fLength = length();
 
     if ( fLength > Math<RealType>::ZERO_TOLERANCE )
@@ -287,30 +278,24 @@ RealType Vector2<RealType>::normalize ()
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-Vector2<RealType> Vector2<RealType>::perp () const
-{
+Vector2<RealType> Vector2<RealType>::Perp() const {
     return Vector2(m_afTuple[1],-m_afTuple[0]);
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-Vector2<RealType> Vector2<RealType>::unitPerp () const
-{
+Vector2<RealType> Vector2<RealType>::UnitPerp() const {
     Vector2 kPerp(m_afTuple[1],-m_afTuple[0]);
     kPerp.Normalize();
     return kPerp;
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-RealType Vector2<RealType>::dotPerp (const Vector2& rkV) const
-{
+RealType Vector2<RealType>::DotPerp(const Vector2& rkV) const {
     return m_afTuple[0]*rkV.m_afTuple[1] - m_afTuple[1]*rkV.m_afTuple[0];
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-void Vector2<RealType>::getBarycentrics (const Vector2<RealType>& rkV0,
-    const Vector2<RealType>& rkV1, const Vector2<RealType>& rkV2, RealType afBary[3])
-    const
-{
+void Vector2<RealType>::GetBarycentrics(const Vector2<RealType>& rkV0,    const Vector2<RealType>& rkV1, const Vector2<RealType>& rkV2, RealType afBary[3])    const {
     // compute the vectors relative to V2 of the triangle
     Vector2<RealType> akDiff[3] =
     {
@@ -408,8 +393,7 @@ void Vector2<RealType>::getBarycentrics (const Vector2<RealType>& rkV0,
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-void Vector2<RealType>::orthonormalize (Vector2& rkU, Vector2& rkV)
-{
+void Vector2<RealType>::Orthonormalize(Vector2& rkU, Vector2& rkV) {
     // If the input vectors are v0 and v1, then the Gram-Schmidt
     // orthonormalization produces vectors u0 and u1 as follows,
     //
@@ -429,9 +413,7 @@ void Vector2<RealType>::orthonormalize (Vector2& rkU, Vector2& rkV)
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-void Vector2<RealType>::generateOrthonormalBasis (Vector2& rkU, Vector2& rkV,
-    bool bUnitLengthV)
-{
+void Vector2<RealType>::GenerateOrthonormalBasis(Vector2& rkU, Vector2& rkV,    bool bUnitLengthV) {
     if ( !bUnitLengthV )
         rkV.Normalize();
 

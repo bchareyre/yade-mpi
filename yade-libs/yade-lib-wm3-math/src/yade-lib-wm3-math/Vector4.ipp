@@ -70,50 +70,42 @@ RealType& Vector4<RealType>::operator[] (int i)
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-RealType Vector4<RealType>::x () const
-{
+RealType Vector4<RealType>::X() const {
     return m_afTuple[0];
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-RealType& Vector4<RealType>::x ()
-{
+RealType& Vector4<RealType>::X() {
     return m_afTuple[0];
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-RealType Vector4<RealType>::y () const
-{
+RealType Vector4<RealType>::Y() const {
     return m_afTuple[1];
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-RealType& Vector4<RealType>::y ()
-{
+RealType& Vector4<RealType>::Y() {
     return m_afTuple[1];
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-RealType Vector4<RealType>::z () const
-{
+RealType Vector4<RealType>::Z() const {
     return m_afTuple[2];
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-RealType& Vector4<RealType>::z ()
-{
+RealType& Vector4<RealType>::Z() {
     return m_afTuple[2];
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-RealType Vector4<RealType>::w () const
-{
+RealType Vector4<RealType>::W() const {
     return m_afTuple[3];
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-RealType& Vector4<RealType>::w ()
-{
+RealType& Vector4<RealType>::W() {
     return m_afTuple[3];
 }
 //----------------------------------------------------------------------------
@@ -128,8 +120,7 @@ Vector4<RealType>& Vector4<RealType>::operator= (const Vector4& rkV)
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-int Vector4<RealType>::compareArrays (const Vector4& rkV) const
-{
+int Vector4<RealType>::CompareArrays(const Vector4& rkV) const {
     return memcmp(m_afTuple,rkV.m_afTuple,4*sizeof(RealType));
 }
 //----------------------------------------------------------------------------
@@ -296,8 +287,7 @@ Vector4<RealType>& Vector4<RealType>::operator/= (RealType fScalar)
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-RealType Vector4<RealType>::length () const
-{
+RealType Vector4<RealType>::Length() const {
     return Math<RealType>::Sqrt(
         m_afTuple[0]*m_afTuple[0] +
         m_afTuple[1]*m_afTuple[1] +
@@ -306,8 +296,7 @@ RealType Vector4<RealType>::length () const
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-RealType Vector4<RealType>::squaredLength () const
-{
+RealType Vector4<RealType>::SquaredLength() const {
     return
         m_afTuple[0]*m_afTuple[0] +
         m_afTuple[1]*m_afTuple[1] +
@@ -316,8 +305,7 @@ RealType Vector4<RealType>::squaredLength () const
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-RealType Vector4<RealType>::dot (const Vector4& rkV) const
-{
+RealType Vector4<RealType>::Dot(const Vector4& rkV) const {
     return
         m_afTuple[0]*rkV.m_afTuple[0] +
         m_afTuple[1]*rkV.m_afTuple[1] +
@@ -326,8 +314,7 @@ RealType Vector4<RealType>::dot (const Vector4& rkV) const
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-RealType Vector4<RealType>::normalize ()
-{
+RealType Vector4<RealType>::Normalize() {
     RealType fLength = length();
 
     if ( fLength > Math<RealType>::ZERO_TOLERANCE )

@@ -85,50 +85,42 @@ RealType& Quaternion<RealType>::operator[] (int i)
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-RealType Quaternion<RealType>::w () const
-{
+RealType Quaternion<RealType>::W() const {
     return m_afTuple[0];
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-RealType& Quaternion<RealType>::w ()
-{
+RealType& Quaternion<RealType>::W() {
     return m_afTuple[0];
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-RealType Quaternion<RealType>::x () const
-{
+RealType Quaternion<RealType>::X() const {
     return m_afTuple[1];
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-RealType& Quaternion<RealType>::x ()
-{
+RealType& Quaternion<RealType>::X() {
     return m_afTuple[1];
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-RealType Quaternion<RealType>::y () const
-{
+RealType Quaternion<RealType>::Y() const {
     return m_afTuple[2];
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-RealType& Quaternion<RealType>::y ()
-{
+RealType& Quaternion<RealType>::Y() {
     return m_afTuple[2];
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-RealType Quaternion<RealType>::z () const
-{
+RealType Quaternion<RealType>::Z() const {
     return m_afTuple[3];
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-RealType& Quaternion<RealType>::z ()
-{
+RealType& Quaternion<RealType>::Z() {
     return m_afTuple[3];
 }
 //----------------------------------------------------------------------------
@@ -140,8 +132,7 @@ Quaternion<RealType>& Quaternion<RealType>::operator= (const Quaternion& rkQ)
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-int Quaternion<RealType>::compareArrays (const Quaternion& rkQ) const
-{
+int Quaternion<RealType>::CompareArrays(const Quaternion& rkQ) const {
     return memcmp(m_afTuple,rkQ.m_afTuple,4*sizeof(RealType));
 }
 //----------------------------------------------------------------------------
@@ -327,9 +318,7 @@ Quaternion<RealType>& Quaternion<RealType>::operator/= (RealType fScalar)
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-Quaternion<RealType>& Quaternion<RealType>::fromRotationMatrix (
-    const Matrix3<RealType>& rkRot)
-{
+Quaternion<RealType>& Quaternion<RealType>::FromRotationMatrix(const Matrix3<RealType>& rkRot) {
     // Algorithm in Ken Shoemake's article in 1987 SIGGRAPH course notes
     // article "Quaternion Calculus and Fast Animation".
 
@@ -370,8 +359,7 @@ Quaternion<RealType>& Quaternion<RealType>::fromRotationMatrix (
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-void Quaternion<RealType>::toRotationMatrix (Matrix3<RealType>& rkRot) const
-{
+void Quaternion<RealType>::ToRotationMatrix(Matrix3<RealType>& rkRot) const {
     RealType fTx  = ((RealType)2.0)*m_afTuple[1];
     RealType fTy  = ((RealType)2.0)*m_afTuple[2];
     RealType fTz  = ((RealType)2.0)*m_afTuple[3];
@@ -397,9 +385,7 @@ void Quaternion<RealType>::toRotationMatrix (Matrix3<RealType>& rkRot) const
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-Quaternion<RealType>& Quaternion<RealType>::fromRotationMatrix (
-    const Vector3<RealType> akRotColumn[3])
-{
+Quaternion<RealType>& Quaternion<RealType>::FromRotationMatrix(const Vector3<RealType> akRotColumn[3]) {
     Matrix3<RealType> kRot;
     for (int iCol = 0; iCol < 3; iCol++)
     {
@@ -411,8 +397,7 @@ Quaternion<RealType>& Quaternion<RealType>::fromRotationMatrix (
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-void Quaternion<RealType>::toRotationMatrix (Vector3<RealType> akRotColumn[3]) const
-{
+void Quaternion<RealType>::ToRotationMatrix(Vector3<RealType> akRotColumn[3]) const {
     Matrix3<RealType> kRot;
     toRotationMatrix(kRot);
     for (int iCol = 0; iCol < 3; iCol++)
@@ -424,9 +409,7 @@ void Quaternion<RealType>::toRotationMatrix (Vector3<RealType> akRotColumn[3]) c
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-Quaternion<RealType>& Quaternion<RealType>::fromAxisAngle (
-    const Vector3<RealType>& rkAxis, RealType fAngle)
-{
+Quaternion<RealType>& Quaternion<RealType>::FromAxisAngle(    const Vector3<RealType>& rkAxis, RealType fAngle) {
     // assert:  axis[] is unit length
     //
     // The quaternion representing the orientation is
@@ -443,9 +426,7 @@ Quaternion<RealType>& Quaternion<RealType>::fromAxisAngle (
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-void Quaternion<RealType>::toAxisAngle (Vector3<RealType>& rkAxis, RealType& rfAngle)
-    const
-{
+void Quaternion<RealType>::ToAxisAngle(Vector3<RealType>& rkAxis, RealType& rfAngle)    const {
     // The quaternion representing the orientation is
     //   q = cos(A/2)+sin(A/2)*(x*i+y*j+z*k)
 
@@ -470,8 +451,7 @@ void Quaternion<RealType>::toAxisAngle (Vector3<RealType>& rkAxis, RealType& rfA
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-RealType Quaternion<RealType>::length () const
-{
+RealType Quaternion<RealType>::Length() const {
     return Math<RealType>::sqRoot(
         m_afTuple[0]*m_afTuple[0] +
         m_afTuple[1]*m_afTuple[1] +
@@ -480,8 +460,7 @@ RealType Quaternion<RealType>::length () const
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-RealType Quaternion<RealType>::squaredLength () const
-{
+RealType Quaternion<RealType>::SquaredLength() const {
     return
         m_afTuple[0]*m_afTuple[0] +
         m_afTuple[1]*m_afTuple[1] +
@@ -490,8 +469,7 @@ RealType Quaternion<RealType>::squaredLength () const
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-RealType Quaternion<RealType>::dot (const Quaternion& rkQ) const
-{
+RealType Quaternion<RealType>::Dot(const Quaternion& rkQ) const {
     RealType fDot = (RealType)0.0;
     for (int i = 0; i < 4; i++)
         fDot += m_afTuple[i]*rkQ.m_afTuple[i];
@@ -499,8 +477,7 @@ RealType Quaternion<RealType>::dot (const Quaternion& rkQ) const
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-RealType Quaternion<RealType>::normalize ()
-{
+RealType Quaternion<RealType>::Normalize() {
     RealType fLength = length();
 
     if ( fLength > Math<RealType>::ZERO_TOLERANCE )
@@ -524,8 +501,7 @@ RealType Quaternion<RealType>::normalize ()
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-Quaternion<RealType> Quaternion<RealType>::inverse () const
-{
+Quaternion<RealType> Quaternion<RealType>::Inverse() const {
     Quaternion kInverse;
 
     RealType fNorm = (RealType)0.0;
@@ -552,15 +528,13 @@ Quaternion<RealType> Quaternion<RealType>::inverse () const
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-Quaternion<RealType> Quaternion<RealType>::conjugate () const
-{
+Quaternion<RealType> Quaternion<RealType>::Conjugate() const {
     return Quaternion(m_afTuple[0],-m_afTuple[1],-m_afTuple[2],
         -m_afTuple[3]);
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-Quaternion<RealType> Quaternion<RealType>::exp () const
-{
+Quaternion<RealType> Quaternion<RealType>::Exp() const {
     // If q = A*(x*i+y*j+z*k) where (x,y,z) is unit length, then
     // exp(q) = cos(A)+sin(A)*(x*i+y*j+z*k).  If sin(A) is near zero,
     // use exp(q) = cos(A)+A*(x*i+y*j+z*k) since A/sin(A) has limit 1.
@@ -591,8 +565,7 @@ Quaternion<RealType> Quaternion<RealType>::exp () const
 } 
 //----------------------------------------------------------------------------
 template <class RealType>
-Quaternion<RealType> Quaternion<RealType>::log () const
-{
+Quaternion<RealType> Quaternion<RealType>::Log() const {
     // If q = cos(A)+sin(A)*(x*i+y*j+z*k) where (x,y,z) is unit length, then
     // log(q) = A*(x*i+y*j+z*k).  If sin(A) is near zero, use log(q) =
     // sin(A)*(x*i+y*j+z*k) since sin(A)/A has limit 1.
@@ -633,9 +606,7 @@ Quaternion<RealType>& Quaternion<RealType>::power (const RealType q)
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-Vector3<RealType> Quaternion<RealType>::rotate (const Vector3<RealType>& rkVector)
-    const
-{
+Vector3<RealType> Quaternion<RealType>::Rotate(const Vector3<RealType>& rkVector)    const {
     // Given a vector u = (x0,y0,z0) and a unit length quaternion
     // q = <w,x,y,z>, the vector v = (x1,y1,z1) which represents the
     // orientation of u by q is v = q*u*q^{-1} where * indicates quaternion
@@ -660,9 +631,7 @@ Vector3<RealType> Quaternion<RealType>::rotate (const Vector3<RealType>& rkVecto
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-Quaternion<RealType>& Quaternion<RealType>::slerp (RealType fT, const Quaternion& rkP,
-    const Quaternion& rkQ)
-{
+Quaternion<RealType>& Quaternion<RealType>::Slerp(RealType fT, const Quaternion& rkP,    const Quaternion& rkQ) {
     RealType fCos = rkP.Dot(rkQ);
     RealType fAngle = Math<RealType>::ACos(fCos);
 
@@ -683,9 +652,7 @@ Quaternion<RealType>& Quaternion<RealType>::slerp (RealType fT, const Quaternion
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-Quaternion<RealType>& Quaternion<RealType>::slerpExtraSpins (RealType fT,
-    const Quaternion& rkP, const Quaternion& rkQ, int iExtraSpins)
-{
+Quaternion<RealType>& Quaternion<RealType>::SlerpExtraSpins(RealType fT,    const Quaternion& rkP, const Quaternion& rkQ, int iExtraSpins) {
     RealType fCos = rkP.Dot(rkQ);
     RealType fAngle = Math<RealType>::ACos(fCos);
 
@@ -707,9 +674,7 @@ Quaternion<RealType>& Quaternion<RealType>::slerpExtraSpins (RealType fT,
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-Quaternion<RealType>& Quaternion<RealType>::intermediate (const Quaternion& rkQ0,
-    const Quaternion& rkQ1, const Quaternion& rkQ2)
-{
+Quaternion<RealType>& Quaternion<RealType>::Intermediate(const Quaternion& rkQ0,    const Quaternion& rkQ1, const Quaternion& rkQ2) {
     // assert:  Q0, Q1, Q2 all unit-length
     Quaternion kQ1Inv = rkQ1.Conjugate();
     Quaternion kP0 = kQ1Inv*rkQ0;
@@ -722,9 +687,7 @@ Quaternion<RealType>& Quaternion<RealType>::intermediate (const Quaternion& rkQ0
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-Quaternion<RealType>& Quaternion<RealType>::squad (RealType fT, const Quaternion& rkQ0,
-    const Quaternion& rkA0, const Quaternion& rkA1, const Quaternion& rkQ1)
-{
+Quaternion<RealType>& Quaternion<RealType>::Squad(RealType fT, const Quaternion& rkQ0,    const Quaternion& rkA0, const Quaternion& rkA1, const Quaternion& rkQ1) {
     RealType fSlerpT = ((RealType)2.0)*fT*((RealType)1.0-fT);
     Quaternion kSlerpP = Slerp(fT,rkQ0,rkQ1);
     Quaternion kSlerpQ = Slerp(fT,rkA0,rkA1);
@@ -732,9 +695,7 @@ Quaternion<RealType>& Quaternion<RealType>::squad (RealType fT, const Quaternion
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-Quaternion<RealType>& Quaternion<RealType>::align (const Vector3<RealType>& rkV1,
-    const Vector3<RealType>& rkV2)
-{
+Quaternion<RealType>& Quaternion<RealType>::Align(const Vector3<RealType>& rkV1,    const Vector3<RealType>& rkV2) {
     // If V1 and V2 are not parallel, the axis of orientation is the unit-length
     // vector U = Cross(V1,V2)/Length(Cross(V1,V2)).  The angle of orientation,
     // A, is the angle between V1 and V2.  The quaternion for the orientation is
@@ -777,18 +738,14 @@ Quaternion<RealType>& Quaternion<RealType>::align (const Vector3<RealType>& rkV1
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-void Quaternion<RealType>::decomposeTwistTimesSwing (
-    const Vector3<RealType>& rkV1, Quaternion& rkTwist, Quaternion& rkSwing)
-{
+void Quaternion<RealType>::DecomposeTwistTimesSwing(    const Vector3<RealType>& rkV1, Quaternion& rkTwist, Quaternion& rkSwing) {
     Vector3<RealType> kV2 = rotate(rkV1);
     rkSwing = align(rkV1,kV2);
     rkTwist = (*this)*rkSwing.conjugate();
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-void Quaternion<RealType>::decomposeSwingTimesTwist (
-    const Vector3<RealType>& rkV1, Quaternion& rkSwing, Quaternion& rkTwist)
-{
+void Quaternion<RealType>::DecomposeSwingTimesTwist(    const Vector3<RealType>& rkV1, Quaternion& rkSwing, Quaternion& rkTwist) {
     Vector3<RealType> kV2 = rotate(rkV1);
     rkSwing = align(rkV1,kV2);
     rkTwist = rkSwing.conjugate()*(*this);

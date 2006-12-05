@@ -68,38 +68,32 @@ RealType& Vector3<RealType>::operator[] (int i)
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-RealType Vector3<RealType>::x () const
-{
+RealType Vector3<RealType>::X() const {
     return m_afTuple[0];
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-RealType& Vector3<RealType>::x ()
-{
+RealType& Vector3<RealType>::X() {
     return m_afTuple[0];
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-RealType Vector3<RealType>::y () const
-{
+RealType Vector3<RealType>::Y() const {
     return m_afTuple[1];
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-RealType& Vector3<RealType>::y ()
-{
+RealType& Vector3<RealType>::Y() {
     return m_afTuple[1];
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-RealType Vector3<RealType>::z () const
-{
+RealType Vector3<RealType>::Z() const {
     return m_afTuple[2];
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-RealType& Vector3<RealType>::z ()
-{
+RealType& Vector3<RealType>::Z() {
     return m_afTuple[2];
 }
 //----------------------------------------------------------------------------
@@ -113,8 +107,7 @@ Vector3<RealType>& Vector3<RealType>::operator= (const Vector3& rkV)
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-int Vector3<RealType>::compareArrays (const Vector3& rkV) const
-{
+int Vector3<RealType>::CompareArrays(const Vector3& rkV) const {
     return memcmp(m_afTuple,rkV.m_afTuple,3*sizeof(RealType));
 }
 //----------------------------------------------------------------------------
@@ -270,8 +263,7 @@ Vector3<RealType>& Vector3<RealType>::operator/= (RealType fScalar)
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-RealType Vector3<RealType>::length () const
-{
+RealType Vector3<RealType>::Length() const {
     return Math<RealType>::sqRoot(
         m_afTuple[0]*m_afTuple[0] +
         m_afTuple[1]*m_afTuple[1] +
@@ -279,8 +271,7 @@ RealType Vector3<RealType>::length () const
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-RealType Vector3<RealType>::squaredLength () const
-{
+RealType Vector3<RealType>::SquaredLength() const {
     return
         m_afTuple[0]*m_afTuple[0] +
         m_afTuple[1]*m_afTuple[1] +
@@ -288,8 +279,7 @@ RealType Vector3<RealType>::squaredLength () const
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-RealType Vector3<RealType>::dot (const Vector3& rkV) const
-{
+RealType Vector3<RealType>::Dot(const Vector3& rkV) const {
     return
         m_afTuple[0]*rkV.m_afTuple[0] +
         m_afTuple[1]*rkV.m_afTuple[1] +
@@ -303,8 +293,7 @@ RealType Vector3<RealType>::angleBetweenUnitVectors(const Vector3& rkV) const
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-RealType Vector3<RealType>::normalize ()
-{
+RealType Vector3<RealType>::Normalize() {
     RealType fLength = length();
 
     if ( fLength > Math<RealType>::ZERO_TOLERANCE )
@@ -340,8 +329,7 @@ Vector3<RealType> Vector3<RealType>::minVector (const Vector3& rkV) const
 
 //----------------------------------------------------------------------------
 template <class RealType>
-Vector3<RealType> Vector3<RealType>::cross (const Vector3& rkV) const
-{
+Vector3<RealType> Vector3<RealType>::Cross(const Vector3& rkV) const {
     return Vector3(
         m_afTuple[1]*rkV.m_afTuple[2] - m_afTuple[2]*rkV.m_afTuple[1],
         m_afTuple[2]*rkV.m_afTuple[0] - m_afTuple[0]*rkV.m_afTuple[2],
@@ -349,8 +337,7 @@ Vector3<RealType> Vector3<RealType>::cross (const Vector3& rkV) const
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-Vector3<RealType> Vector3<RealType>::unitCross (const Vector3& rkV) const
-{
+Vector3<RealType> Vector3<RealType>::UnitCross(const Vector3& rkV) const {
     Vector3 kCross(
         m_afTuple[1]*rkV.m_afTuple[2] - m_afTuple[2]*rkV.m_afTuple[1],
         m_afTuple[2]*rkV.m_afTuple[0] - m_afTuple[0]*rkV.m_afTuple[2],
@@ -360,10 +347,7 @@ Vector3<RealType> Vector3<RealType>::unitCross (const Vector3& rkV) const
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-void Vector3<RealType>::getBarycentrics (const Vector3<RealType>& rkV0,
-    const Vector3<RealType>& rkV1, const Vector3<RealType>& rkV2,
-    const Vector3<RealType>& rkV3, RealType afBary[4]) const
-{
+void Vector3<RealType>::GetBarycentrics(const Vector3<RealType>& rkV0,    const Vector3<RealType>& rkV1, const Vector3<RealType>& rkV2,    const Vector3<RealType>& rkV3, RealType afBary[4]) const {
     // compute the vectors relative to V3 of the tetrahedron
     Vector3<RealType> akDiff[4] =
     {
@@ -588,8 +572,7 @@ void Vector3<RealType>::getBarycentrics (const Vector3<RealType>& rkV0,
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-void Vector3<RealType>::orthonormalize (Vector3& rkU, Vector3& rkV, Vector3& rkW)
-{
+void Vector3<RealType>::Orthonormalize(Vector3& rkU, Vector3& rkV, Vector3& rkW) {
     // If the input vectors are v0, v1, and v2, then the Gram-Schmidt
     // orthonormalization produces vectors u0, u1, and u2 as follows,
     //
@@ -616,15 +599,12 @@ void Vector3<RealType>::orthonormalize (Vector3& rkU, Vector3& rkV, Vector3& rkW
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-void Vector3<RealType>::orthonormalize (Vector3* akV)
-{
+void Vector3<RealType>::Orthonormalize(Vector3* akV) {
     Orthonormalize(akV[0],akV[1],akV[2]);
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-void Vector3<RealType>::generateOrthonormalBasis (Vector3& rkU, Vector3& rkV,
-    Vector3& rkW, bool bUnitLengthW)
-{
+void Vector3<RealType>::GenerateOrthonormalBasis(Vector3& rkU, Vector3& rkV,    Vector3& rkW, bool bUnitLengthW) {
     if ( !bUnitLengthW )
         rkW.normalize();
 

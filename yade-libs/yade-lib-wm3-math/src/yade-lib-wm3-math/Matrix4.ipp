@@ -119,14 +119,12 @@ int Matrix4<RealType>::I (int iRow, int iCol)
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-void Matrix4<RealType>::makeZero ()
-{
+void Matrix4<RealType>::MakeZero() {
     memset(m_afEntry,0,16*sizeof(RealType));
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-void Matrix4<RealType>::makeIdentity ()
-{
+void Matrix4<RealType>::MakeIdentity() {
     m_afEntry[ 0] = (RealType)1.0;
     m_afEntry[ 1] = (RealType)0.0;
     m_afEntry[ 2] = (RealType)0.0;
@@ -146,16 +144,14 @@ void Matrix4<RealType>::makeIdentity ()
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-void Matrix4<RealType>::setRow (int iRow, const Vector4<RealType>& rkV)
-{
+void Matrix4<RealType>::SetRow(int iRow, const Vector4<RealType>& rkV) {
     assert( 0 <= iRow && iRow < 4 );
     for (int iCol = 0, i = 4*iRow; iCol < 4; iCol++, i++)
         m_afEntry[i] = rkV[iCol];
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-Vector4<RealType> Matrix4<RealType>::getRow (int iRow) const
-{
+Vector4<RealType> Matrix4<RealType>::GetRow(int iRow) const {
     assert( 0 <= iRow && iRow < 4 );
     Vector4<RealType> kV;
     for (int iCol = 0, i = 4*iRow; iCol < 4; iCol++, i++)
@@ -164,16 +160,14 @@ Vector4<RealType> Matrix4<RealType>::getRow (int iRow) const
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-void Matrix4<RealType>::setColumn (int iCol, const Vector4<RealType>& rkV)
-{
+void Matrix4<RealType>::SetColumn(int iCol, const Vector4<RealType>& rkV) {
     assert( 0 <= iCol && iCol < 4 );
     for (int iRow = 0, i = iCol; iRow < 4; iRow++, i += 4)
         m_afEntry[i] = rkV[iRow];
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-Vector4<RealType> Matrix4<RealType>::getColumn (int iCol) const
-{
+Vector4<RealType> Matrix4<RealType>::GetColumn(int iCol) const {
     assert( 0 <= iCol && iCol < 4 );
     Vector4<RealType> kV;
     for (int iRow = 0, i = iCol; iRow < 4; iRow++, i += 4)
@@ -182,8 +176,7 @@ Vector4<RealType> Matrix4<RealType>::getColumn (int iCol) const
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-void Matrix4<RealType>::getColumnMajor (RealType* afCMajor) const
-{
+void Matrix4<RealType>::GetColumnMajor(RealType* afCMajor) const {
     for (int iRow = 0, i = 0; iRow < 4; iRow++)
     {
         for (int iCol = 0; iCol < 4; iCol++)
@@ -199,8 +192,7 @@ Matrix4<RealType>& Matrix4<RealType>::operator= (const Matrix4& rkM)
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-int Matrix4<RealType>::compareArrays (const Matrix4& rkM) const
-{
+int Matrix4<RealType>::CompareArrays(const Matrix4& rkM) const {
     return memcmp(m_afEntry,rkM.m_afEntry,16*sizeof(RealType));
 }
 //----------------------------------------------------------------------------
@@ -376,8 +368,7 @@ Vector4<RealType> Matrix4<RealType>::operator* (const Vector4<RealType>& rkV) co
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-Matrix4<RealType> Matrix4<RealType>::transpose () const
-{
+Matrix4<RealType> Matrix4<RealType>::Transpose() const {
     Matrix4 kTranspose;
     for (int iRow = 0; iRow < 4; iRow++)
     {
@@ -388,8 +379,7 @@ Matrix4<RealType> Matrix4<RealType>::transpose () const
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-Matrix4<RealType> Matrix4<RealType>::transposeTimes (const Matrix4& rkM) const
-{
+Matrix4<RealType> Matrix4<RealType>::TransposeTimes(const Matrix4& rkM) const {
     // P = A^T*B, P[r][c] = sum_m A[m][r]*B[m][c]
     Matrix4 kProd;
     for (int iRow = 0; iRow < 4; iRow++)
@@ -409,8 +399,7 @@ Matrix4<RealType> Matrix4<RealType>::transposeTimes (const Matrix4& rkM) const
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-Matrix4<RealType> Matrix4<RealType>::timesTranspose (const Matrix4& rkM) const
-{
+Matrix4<RealType> Matrix4<RealType>::TimesTranspose(const Matrix4& rkM) const {
     // P = A*B^T, P[r][c] = sum_m A[r][m]*B[c][m]
     Matrix4 kProd;
     for (int iRow = 0; iRow < 4; iRow++)
@@ -430,8 +419,7 @@ Matrix4<RealType> Matrix4<RealType>::timesTranspose (const Matrix4& rkM) const
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-Matrix4<RealType> Matrix4<RealType>::inverse () const
-{
+Matrix4<RealType> Matrix4<RealType>::Inverse() const {
     RealType fA0 = m_afEntry[ 0]*m_afEntry[ 5] - m_afEntry[ 1]*m_afEntry[ 4];
     RealType fA1 = m_afEntry[ 0]*m_afEntry[ 6] - m_afEntry[ 2]*m_afEntry[ 4];
     RealType fA2 = m_afEntry[ 0]*m_afEntry[ 7] - m_afEntry[ 3]*m_afEntry[ 4];
@@ -478,8 +466,7 @@ Matrix4<RealType> Matrix4<RealType>::inverse () const
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-Matrix4<RealType> Matrix4<RealType>::adjoint () const
-{
+Matrix4<RealType> Matrix4<RealType>::Adjoint() const {
     RealType fA0 = m_afEntry[ 0]*m_afEntry[ 5] - m_afEntry[ 1]*m_afEntry[ 4];
     RealType fA1 = m_afEntry[ 0]*m_afEntry[ 6] - m_afEntry[ 2]*m_afEntry[ 4];
     RealType fA2 = m_afEntry[ 0]*m_afEntry[ 7] - m_afEntry[ 3]*m_afEntry[ 4];
@@ -515,8 +502,7 @@ Matrix4<RealType> Matrix4<RealType>::adjoint () const
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-RealType Matrix4<RealType>::determinant () const
-{
+RealType Matrix4<RealType>::Determinant() const {
     RealType fA0 = m_afEntry[ 0]*m_afEntry[ 5] - m_afEntry[ 1]*m_afEntry[ 4];
     RealType fA1 = m_afEntry[ 0]*m_afEntry[ 6] - m_afEntry[ 2]*m_afEntry[ 4];
     RealType fA2 = m_afEntry[ 0]*m_afEntry[ 7] - m_afEntry[ 3]*m_afEntry[ 4];
@@ -534,16 +520,12 @@ RealType Matrix4<RealType>::determinant () const
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-RealType Matrix4<RealType>::qForm (const Vector4<RealType>& rkU,
-    const Vector4<RealType>& rkV) const
-{
+RealType Matrix4<RealType>::QForm(const Vector4<RealType>& rkU,    const Vector4<RealType>& rkV) const {
     return rkU.Dot((*this)*rkV);
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-void Matrix4<RealType>::makeObliqueProjection (const Vector3<RealType>& rkNormal,
-    const Vector3<RealType>& rkPoint, const Vector3<RealType>& rkDirection)
-{
+void Matrix4<RealType>::MakeObliqueProjection(const Vector3<RealType>& rkNormal,    const Vector3<RealType>& rkPoint, const Vector3<RealType>& rkDirection) {
     // The projection plane is Dot(N,X-P) = 0 where N is a 3-by-1 unit-length
     // normal vector and P is a 3-by-1 point on the plane.  The projection
     // is oblique to the plane, in the direction of the 3-by-1 vector D.
@@ -585,9 +567,7 @@ void Matrix4<RealType>::makeObliqueProjection (const Vector3<RealType>& rkNormal
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-void Matrix4<RealType>::makePerspectiveProjection (const Vector3<RealType>& rkNormal,
-    const Vector3<RealType>& rkPoint, const Vector3<RealType>& rkEye)
-{
+void Matrix4<RealType>::MakePerspectiveProjection(const Vector3<RealType>& rkNormal,    const Vector3<RealType>& rkPoint, const Vector3<RealType>& rkEye) {
     //     +-                                                 -+
     // M = | Dot(N,E-P)*I - E*N^T    -(Dot(N,E-P)*I - E*N^T)*E |
     //     |        -N^t                      Dot(N,E)         |
@@ -620,9 +600,7 @@ void Matrix4<RealType>::makePerspectiveProjection (const Vector3<RealType>& rkNo
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-void Matrix4<RealType>::makeReflection (const Vector3<RealType>& rkNormal,
-    const Vector3<RealType>& rkPoint)
-{
+void Matrix4<RealType>::MakeReflection(const Vector3<RealType>& rkNormal,    const Vector3<RealType>& rkPoint) {
     //     +-                         -+
     // M = | I-2*N*N^T    2*Dot(N,P)*N |
     //     |     0^T            1      |

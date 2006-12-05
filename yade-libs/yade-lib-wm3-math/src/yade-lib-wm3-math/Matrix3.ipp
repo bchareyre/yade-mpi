@@ -181,15 +181,13 @@ int Matrix3<RealType>::I (int iRow, int iCol)
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-Matrix3<RealType>& Matrix3<RealType>::makeZero ()
-{
+Matrix3<RealType>& Matrix3<RealType>::MakeZero() {
     memset(m_afEntry,0,9*sizeof(RealType));
     return *this;
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-Matrix3<RealType>& Matrix3<RealType>::makeIdentity ()
-{
+Matrix3<RealType>& Matrix3<RealType>::MakeIdentity() {
     m_afEntry[0] = (RealType)1.0;
     m_afEntry[1] = (RealType)0.0;
     m_afEntry[2] = (RealType)0.0;
@@ -203,8 +201,7 @@ Matrix3<RealType>& Matrix3<RealType>::makeIdentity ()
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-Matrix3<RealType>& Matrix3<RealType>::makeDiagonal (RealType fM00, RealType fM11, RealType fM22)
-{
+Matrix3<RealType>& Matrix3<RealType>::MakeDiagonal(RealType fM00, RealType fM11, RealType fM22) {
     m_afEntry[0] = fM00;
     m_afEntry[1] = (RealType)0.0;
     m_afEntry[2] = (RealType)0.0;
@@ -218,9 +215,7 @@ Matrix3<RealType>& Matrix3<RealType>::makeDiagonal (RealType fM00, RealType fM11
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-Matrix3<RealType>& Matrix3<RealType>::fromAxisAngle (const Vector3<RealType>& rkAxis,
-    RealType fAngle)
-{
+Matrix3<RealType>& Matrix3<RealType>::FromAxisAngle(const Vector3<RealType>& rkAxis,    RealType fAngle) {
     RealType fCos = Math<RealType>::Cos(fAngle);
     RealType fSin = Math<RealType>::Sin(fAngle);
     RealType fOneMinusCos = ((RealType)1.0)-fCos;
@@ -248,9 +243,7 @@ Matrix3<RealType>& Matrix3<RealType>::fromAxisAngle (const Vector3<RealType>& rk
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-Matrix3<RealType>& Matrix3<RealType>::makeTensorProduct (const Vector3<RealType>& rkU,
-    const Vector3<RealType>& rkV)
-{
+Matrix3<RealType>& Matrix3<RealType>::MakeTensorProduct(const Vector3<RealType>& rkU,    const Vector3<RealType>& rkV) {
     m_afEntry[0] = rkU[0]*rkV[0];
     m_afEntry[1] = rkU[0]*rkV[1];
     m_afEntry[2] = rkU[0]*rkV[2];
@@ -264,16 +257,14 @@ Matrix3<RealType>& Matrix3<RealType>::makeTensorProduct (const Vector3<RealType>
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-void Matrix3<RealType>::setRow (int iRow, const Vector3<RealType>& rkV)
-{
+void Matrix3<RealType>::SetRow(int iRow, const Vector3<RealType>& rkV) {
     assert( 0 <= iRow && iRow < 3 );
     for (int iCol = 0, i = 3*iRow; iCol < 3; iCol++, i++)
         m_afEntry[i] = rkV[iCol];
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-Vector3<RealType> Matrix3<RealType>::getRow (int iRow) const
-{
+Vector3<RealType> Matrix3<RealType>::GetRow(int iRow) const {
     assert( 0 <= iRow && iRow < 3 );
     Vector3<RealType> kV;
     for (int iCol = 0, i = 3*iRow; iCol < 3; iCol++, i++)
@@ -282,16 +273,14 @@ Vector3<RealType> Matrix3<RealType>::getRow (int iRow) const
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-void Matrix3<RealType>::setColumn (int iCol, const Vector3<RealType>& rkV)
-{
+void Matrix3<RealType>::SetColumn(int iCol, const Vector3<RealType>& rkV) {
     assert( 0 <= iCol && iCol < 3 );
     for (int iRow = 0, i = iCol; iRow < 3; iRow++, i += 3)
         m_afEntry[i] = rkV[iRow];
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-Vector3<RealType> Matrix3<RealType>::getColumn (int iCol) const
-{
+Vector3<RealType> Matrix3<RealType>::GetColumn(int iCol) const {
     assert( 0 <= iCol && iCol < 3 );
     Vector3<RealType> kV;
     for (int iRow = 0, i = iCol; iRow < 3; iRow++, i += 3)
@@ -300,8 +289,7 @@ Vector3<RealType> Matrix3<RealType>::getColumn (int iCol) const
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-void Matrix3<RealType>::getColumnMajor (RealType* afCMajor) const
-{
+void Matrix3<RealType>::GetColumnMajor(RealType* afCMajor) const {
     for (int iRow = 0, i = 0; iRow < 3; iRow++)
     {
         for (int iCol = 0; iCol < 3; iCol++)
@@ -317,8 +305,7 @@ Matrix3<RealType>& Matrix3<RealType>::operator= (const Matrix3& rkM)
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-int Matrix3<RealType>::compareArrays (const Matrix3& rkM) const
-{
+int Matrix3<RealType>::CompareArrays(const Matrix3& rkM) const {
     return memcmp(m_afEntry,rkM.m_afEntry,9*sizeof(RealType));
 }
 //----------------------------------------------------------------------------
@@ -494,8 +481,7 @@ Vector3<RealType> Matrix3<RealType>::operator* (const Vector3<RealType>& rkV) co
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-Matrix3<RealType> Matrix3<RealType>::transpose () const
-{
+Matrix3<RealType> Matrix3<RealType>::Transpose() const {
     Matrix3 kTranspose;
     for (int iRow = 0; iRow < 3; iRow++)
     {
@@ -506,8 +492,7 @@ Matrix3<RealType> Matrix3<RealType>::transpose () const
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-Matrix3<RealType> Matrix3<RealType>::transposeTimes (const Matrix3& rkM) const
-{
+Matrix3<RealType> Matrix3<RealType>::TransposeTimes(const Matrix3& rkM) const {
     // P = A^T*B, P[r][c] = sum_m A[m][r]*B[m][c]
     Matrix3 kProd;
     for (int iRow = 0; iRow < 3; iRow++)
@@ -527,8 +512,7 @@ Matrix3<RealType> Matrix3<RealType>::transposeTimes (const Matrix3& rkM) const
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-Matrix3<RealType> Matrix3<RealType>::timesTranspose (const Matrix3& rkM) const
-{
+Matrix3<RealType> Matrix3<RealType>::TimesTranspose(const Matrix3& rkM) const {
     // P = A*B^T, P[r][c] = sum_m A[r][m]*B[c][m]
     Matrix3 kProd;
     for (int iRow = 0; iRow < 3; iRow++)
@@ -548,8 +532,7 @@ Matrix3<RealType> Matrix3<RealType>::timesTranspose (const Matrix3& rkM) const
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-Matrix3<RealType> Matrix3<RealType>::inverse () const
-{
+Matrix3<RealType> Matrix3<RealType>::Inverse() const {
     // Invert a 3x3 using cofactors.  This is faster than using a generic
     // Gaussian elimination because of the loop overhead of such a method.
 
@@ -576,8 +559,7 @@ Matrix3<RealType> Matrix3<RealType>::inverse () const
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-Matrix3<RealType> Matrix3<RealType>::adjoint () const
-{
+Matrix3<RealType> Matrix3<RealType>::Adjoint() const {
     Matrix3 kAdjoint;
 
     kAdjoint[0][0] = m_afEntry[4]*m_afEntry[8] - m_afEntry[5]*m_afEntry[7];
@@ -594,8 +576,7 @@ Matrix3<RealType> Matrix3<RealType>::adjoint () const
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-RealType Matrix3<RealType>::determinant () const
-{
+RealType Matrix3<RealType>::Determinant() const {
     RealType fCo00 = m_afEntry[4]*m_afEntry[8] - m_afEntry[5]*m_afEntry[7];
     RealType fCo10 = m_afEntry[5]*m_afEntry[6] - m_afEntry[3]*m_afEntry[8];
     RealType fCo20 = m_afEntry[3]*m_afEntry[7] - m_afEntry[4]*m_afEntry[6];
@@ -604,14 +585,12 @@ RealType Matrix3<RealType>::determinant () const
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-RealType Matrix3<RealType>::qForm (const Vector3<RealType>& rkU, const Vector3<RealType>& rkV) const
-{
+RealType Matrix3<RealType>::QForm(const Vector3<RealType>& rkU, const Vector3<RealType>& rkV) const {
     return rkU.Dot((*this)*rkV);
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-Matrix3<RealType> Matrix3<RealType>::timesDiagonal (const Vector3<RealType>& rkDiag) const
-{
+Matrix3<RealType> Matrix3<RealType>::TimesDiagonal(const Vector3<RealType>& rkDiag) const {
     return Matrix3(
         m_afEntry[0]*rkDiag[0],m_afEntry[1]*rkDiag[1],m_afEntry[2]*rkDiag[2],
         m_afEntry[3]*rkDiag[0],m_afEntry[4]*rkDiag[1],m_afEntry[5]*rkDiag[2],
@@ -619,8 +598,7 @@ Matrix3<RealType> Matrix3<RealType>::timesDiagonal (const Vector3<RealType>& rkD
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-Matrix3<RealType> Matrix3<RealType>::diagonalTimes (const Vector3<RealType>& rkDiag) const
-{
+Matrix3<RealType> Matrix3<RealType>::DiagonalTimes(const Vector3<RealType>& rkDiag) const {
     return Matrix3(
         rkDiag[0]*m_afEntry[0],rkDiag[0]*m_afEntry[1],rkDiag[0]*m_afEntry[2],
         rkDiag[1]*m_afEntry[3],rkDiag[1]*m_afEntry[4],rkDiag[1]*m_afEntry[5],
@@ -628,8 +606,7 @@ Matrix3<RealType> Matrix3<RealType>::diagonalTimes (const Vector3<RealType>& rkD
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-void Matrix3<RealType>::toAxisAngle (Vector3<RealType>& rkAxis, RealType& rfAngle) const
-{
+void Matrix3<RealType>::ToAxisAngle(Vector3<RealType>& rkAxis, RealType& rfAngle) const {
     // Let (x,y,z) be the unit-length axis and let A be an angle of orientation.
     // The orientation matrix is R = I + sin(A)*P + (1-cos(A))*P^2 where
     // I is the identity and
@@ -726,8 +703,7 @@ void Matrix3<RealType>::toAxisAngle (Vector3<RealType>& rkAxis, RealType& rfAngl
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-void Matrix3<RealType>::orthonormalize ()
-{
+void Matrix3<RealType>::Orthonormalize() {
     // Algorithm uses Gram-Schmidt orthogonalization.  If 'this' matrix is
     // M = [m0|m1|m2], then orthonormal output matrix is Q = [q0|q1|q2],
     //
@@ -781,8 +757,7 @@ void Matrix3<RealType>::orthonormalize ()
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-void Matrix3<RealType>::eigenDecomposition (Matrix3& rkRot, Matrix3& rkDiag) const
-{
+void Matrix3<RealType>::EigenDecomposition(Matrix3& rkRot, Matrix3& rkDiag) const {
     // Factor M = R*D*R^T.  The columns of R are the eigenvectors.  The
     // diagonal entries of D are the corresponding eigenvalues.
     RealType afDiag[3], afSubd[2];
@@ -860,9 +835,7 @@ void Matrix3<RealType>::eigenDecomposition (Matrix3& rkRot, Matrix3& rkDiag) con
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-Matrix3<RealType>& Matrix3<RealType>::fromEulerAnglesXYZ (RealType fYAngle, RealType fPAngle,
-    RealType fRAngle)
-{
+Matrix3<RealType>& Matrix3<RealType>::FromEulerAnglesXYZ(RealType fYAngle, RealType fPAngle,    RealType fRAngle) {
     RealType fCos, fSin;
 
     fCos = Math<RealType>::Cos(fYAngle);
@@ -891,9 +864,7 @@ Matrix3<RealType>& Matrix3<RealType>::fromEulerAnglesXYZ (RealType fYAngle, Real
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-Matrix3<RealType>& Matrix3<RealType>::fromEulerAnglesXZY (RealType fYAngle, RealType fPAngle,
-    RealType fRAngle)
-{
+Matrix3<RealType>& Matrix3<RealType>::FromEulerAnglesXZY(RealType fYAngle, RealType fPAngle,    RealType fRAngle) {
     RealType fCos, fSin;
 
     fCos = Math<RealType>::Cos(fYAngle);
@@ -922,9 +893,7 @@ Matrix3<RealType>& Matrix3<RealType>::fromEulerAnglesXZY (RealType fYAngle, Real
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-Matrix3<RealType>& Matrix3<RealType>::fromEulerAnglesYXZ (RealType fYAngle, RealType fPAngle,
-    RealType fRAngle)
-{
+Matrix3<RealType>& Matrix3<RealType>::FromEulerAnglesYXZ(RealType fYAngle, RealType fPAngle,    RealType fRAngle) {
     RealType fCos, fSin;
 
     fCos = Math<RealType>::Cos(fYAngle);
@@ -953,9 +922,7 @@ Matrix3<RealType>& Matrix3<RealType>::fromEulerAnglesYXZ (RealType fYAngle, Real
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-Matrix3<RealType>& Matrix3<RealType>::fromEulerAnglesYZX (RealType fYAngle, RealType fPAngle,
-    RealType fRAngle)
-{
+Matrix3<RealType>& Matrix3<RealType>::FromEulerAnglesYZX(RealType fYAngle, RealType fPAngle,    RealType fRAngle) {
     RealType fCos, fSin;
 
     fCos = Math<RealType>::Cos(fYAngle);
@@ -984,9 +951,7 @@ Matrix3<RealType>& Matrix3<RealType>::fromEulerAnglesYZX (RealType fYAngle, Real
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-Matrix3<RealType>& Matrix3<RealType>::fromEulerAnglesZXY (RealType fYAngle, RealType fPAngle,
-    RealType fRAngle)
-{
+Matrix3<RealType>& Matrix3<RealType>::FromEulerAnglesZXY(RealType fYAngle, RealType fPAngle,    RealType fRAngle) {
     RealType fCos, fSin;
 
     fCos = Math<RealType>::Cos(fYAngle);
@@ -1015,9 +980,7 @@ Matrix3<RealType>& Matrix3<RealType>::fromEulerAnglesZXY (RealType fYAngle, Real
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-Matrix3<RealType>& Matrix3<RealType>::fromEulerAnglesZYX (RealType fYAngle, RealType fPAngle,
-    RealType fRAngle)
-{
+Matrix3<RealType>& Matrix3<RealType>::FromEulerAnglesZYX(RealType fYAngle, RealType fPAngle,    RealType fRAngle) {
     RealType fCos, fSin;
 
     fCos = Math<RealType>::Cos(fYAngle);
@@ -1046,9 +1009,7 @@ Matrix3<RealType>& Matrix3<RealType>::fromEulerAnglesZYX (RealType fYAngle, Real
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-bool Matrix3<RealType>::toEulerAnglesXYZ (RealType& rfXAngle, RealType& rfYAngle,
-    RealType& rfZAngle) const
-{
+bool Matrix3<RealType>::ToEulerAnglesXYZ(RealType& rfXAngle, RealType& rfYAngle,    RealType& rfZAngle) const {
     // rot =  cy*cz          -cy*sz           sy
     //        cz*sx*sy+cx*sz  cx*cz-sx*sy*sz -cy*sx
     //       -cx*cz*sy+sx*sz  cz*sx+cx*sy*sz  cx*cy
@@ -1082,9 +1043,7 @@ bool Matrix3<RealType>::toEulerAnglesXYZ (RealType& rfXAngle, RealType& rfYAngle
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-bool Matrix3<RealType>::toEulerAnglesXZY (RealType& rfXAngle, RealType& rfZAngle,
-    RealType& rfYAngle) const
-{
+bool Matrix3<RealType>::ToEulerAnglesXZY(RealType& rfXAngle, RealType& rfZAngle,    RealType& rfYAngle) const {
     // rot =  cy*cz          -sz              cz*sy
     //        sx*sy+cx*cy*sz  cx*cz          -cy*sx+cx*sy*sz
     //       -cx*sy+cy*sx*sz  cz*sx           cx*cy+sx*sy*sz
@@ -1118,9 +1077,7 @@ bool Matrix3<RealType>::toEulerAnglesXZY (RealType& rfXAngle, RealType& rfZAngle
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-bool Matrix3<RealType>::toEulerAnglesYXZ (RealType& rfYAngle, RealType& rfXAngle,
-    RealType& rfZAngle) const
-{
+bool Matrix3<RealType>::ToEulerAnglesYXZ(RealType& rfYAngle, RealType& rfXAngle,    RealType& rfZAngle) const {
     // rot =  cy*cz+sx*sy*sz  cz*sx*sy-cy*sz  cx*sy
     //        cx*sz           cx*cz          -sx
     //       -cz*sy+cy*sx*sz  cy*cz*sx+sy*sz  cx*cy
@@ -1154,9 +1111,7 @@ bool Matrix3<RealType>::toEulerAnglesYXZ (RealType& rfYAngle, RealType& rfXAngle
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-bool Matrix3<RealType>::toEulerAnglesYZX (RealType& rfYAngle, RealType& rfZAngle,
-    RealType& rfXAngle) const
-{
+bool Matrix3<RealType>::ToEulerAnglesYZX(RealType& rfYAngle, RealType& rfZAngle,    RealType& rfXAngle) const {
     // rot =  cy*cz           sx*sy-cx*cy*sz  cx*sy+cy*sx*sz
     //        sz              cx*cz          -cz*sx
     //       -cz*sy           cy*sx+cx*sy*sz  cx*cy-sx*sy*sz
@@ -1190,9 +1145,7 @@ bool Matrix3<RealType>::toEulerAnglesYZX (RealType& rfYAngle, RealType& rfZAngle
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-bool Matrix3<RealType>::toEulerAnglesZXY (RealType& rfZAngle, RealType& rfXAngle,
-    RealType& rfYAngle) const
-{
+bool Matrix3<RealType>::ToEulerAnglesZXY(RealType& rfZAngle, RealType& rfXAngle,    RealType& rfYAngle) const {
     // rot =  cy*cz-sx*sy*sz -cx*sz           cz*sy+cy*sx*sz
     //        cz*sx*sy+cy*sz  cx*cz          -cy*cz*sx+sy*sz
     //       -cx*sy           sx              cx*cy
@@ -1226,9 +1179,7 @@ bool Matrix3<RealType>::toEulerAnglesZXY (RealType& rfZAngle, RealType& rfXAngle
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-bool Matrix3<RealType>::toEulerAnglesZYX (RealType& rfZAngle, RealType& rfYAngle,
-    RealType& rfXAngle) const
-{
+bool Matrix3<RealType>::ToEulerAnglesZYX(RealType& rfZAngle, RealType& rfYAngle,    RealType& rfXAngle) const {
     // rot =  cy*cz           cz*sx*sy-cx*sz  cx*cz*sy+sx*sz
     //        cy*sz           cx*cz+sx*sy*sz -cz*sx+cx*sy*sz
     //       -sy              cy*sx           cx*cy
@@ -1262,9 +1213,7 @@ bool Matrix3<RealType>::toEulerAnglesZYX (RealType& rfZAngle, RealType& rfYAngle
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-Matrix3<RealType> Matrix3<RealType>::slerp (RealType fT, const Matrix3& rkR0,
-    const Matrix3& rkR1)
-{
+Matrix3<RealType> Matrix3<RealType>::Slerp(RealType fT, const Matrix3& rkR0,    const Matrix3& rkR1) {
     Vector3<RealType> kAxis;
     RealType fAngle;
     Matrix3 kProd = rkR0.TransposeTimes(rkR1);
@@ -1273,8 +1222,7 @@ Matrix3<RealType> Matrix3<RealType>::slerp (RealType fT, const Matrix3& rkR0,
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-bool Matrix3<RealType>::tridiagonalize (RealType afDiag[3], RealType afSubd[2])
-{
+bool Matrix3<RealType>::Tridiagonalize(RealType afDiag[3], RealType afSubd[2]) {
     // Householder reduction T = Q^t M Q
     //   Input:   
     //     mat, symmetric 3x3 matrix M
@@ -1539,8 +1487,7 @@ bool Matrix3<RealType>::QLAlgorithm (RealType afDiag[3], RealType afSubd[2])
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-void Matrix3<RealType>::bidiagonalize (Matrix3& rkA, Matrix3& rkL, Matrix3& rkR)
-{
+void Matrix3<RealType>::Bidiagonalize(Matrix3& rkA, Matrix3& rkL, Matrix3& rkR) {
     RealType afV[3], afW[3];
     RealType fLength, fSign, fT1, fInvT1, fT2;
     bool bIdentity;
@@ -1663,8 +1610,7 @@ void Matrix3<RealType>::bidiagonalize (Matrix3& rkA, Matrix3& rkL, Matrix3& rkR)
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-void Matrix3<RealType>::golubKahanStep (Matrix3& rkA, Matrix3& rkL, Matrix3& rkR)
-{
+void Matrix3<RealType>::GolubKahanStep(Matrix3& rkA, Matrix3& rkL, Matrix3& rkR) {
     RealType fT11 = rkA[0][1]*rkA[0][1]+rkA[1][1]*rkA[1][1];
     RealType fT22 = rkA[1][2]*rkA[1][2]+rkA[2][2]*rkA[2][2];
     RealType fT12 = rkA[1][1]*rkA[1][2];
@@ -1768,9 +1714,7 @@ void Matrix3<RealType>::golubKahanStep (Matrix3& rkA, Matrix3& rkL, Matrix3& rkR
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-void Matrix3<RealType>::singularValueDecomposition (Matrix3& rkL, Matrix3& rkS,
-    Matrix3& rkR) const
-{
+void Matrix3<RealType>::SingularValueDecomposition(Matrix3& rkL, Matrix3& rkS,    Matrix3& rkR) const {
     int iRow, iCol;
 
     Matrix3 kA = *this;
@@ -1897,9 +1841,7 @@ void Matrix3<RealType>::singularValueDecomposition (Matrix3& rkL, Matrix3& rkS,
 }
 //----------------------------------------------------------------------------
 template <class RealType>
-void Matrix3<RealType>::singularValueComposition (const Matrix3& rkL,
-    const Matrix3& rkS, const Matrix3& rkR)
-{
+void Matrix3<RealType>::SingularValueComposition(const Matrix3& rkL,    const Matrix3& rkS, const Matrix3& rkR) {
     *this = rkL*(rkS*rkR);
 }
 //----------------------------------------------------------------------------

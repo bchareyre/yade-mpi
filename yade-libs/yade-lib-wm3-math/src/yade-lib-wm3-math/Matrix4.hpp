@@ -62,8 +62,10 @@ public:
     //                        m32,m03,m13,m23,m33} [col major]
     Matrix4 (const RealType afEntry[16], bool bRowMajor);
 
-    void makeZero ();
-    void makeIdentity ();
+	__attribute__((deprecated)) inline     void makeZero(){return MakeZero();}
+    void MakeZero() ;
+	__attribute__((deprecated)) inline     void makeIdentity(){return MakeIdentity();}
+    void MakeIdentity() ;
 
     // member access
     operator const RealType* () const;
@@ -72,11 +74,16 @@ public:
     RealType* operator[] (int iRow);
     RealType operator() (int iRow, int iCol) const;
     RealType& operator() (int iRow, int iCol);
-    void setRow (int iRow, const Vector4<RealType>& rkV);
-    Vector4<RealType> getRow (int iRow) const;
-    void setColumn (int iCol, const Vector4<RealType>& rkV);
-    Vector4<RealType> getColumn (int iCol) const;
-    void getColumnMajor (RealType* afCMajor) const;
+	__attribute__((deprecated)) inline     void setRow(int iRow, const Vector4<RealType>& rkV){return SetRow(iRow,rkV);}
+    void SetRow(int iRow, const Vector4<RealType>& rkV) ;
+	__attribute__((deprecated)) inline     Vector4<RealType> getRow(int iRow) const{return GetRow(iRow);}
+    Vector4<RealType> GetRow(int iRow) const ;
+	__attribute__((deprecated)) inline     void setColumn(int iCol, const Vector4<RealType>& rkV){return SetColumn(iCol,rkV);}
+    void SetColumn(int iCol, const Vector4<RealType>& rkV) ;
+	__attribute__((deprecated)) inline     Vector4<RealType> getColumn(int iCol) const{return GetColumn(iCol);}
+    Vector4<RealType> GetColumn(int iCol) const ;
+	__attribute__((deprecated)) inline     void getColumnMajor(RealType* afCMajor) const{return GetColumnMajor(afCMajor);}
+    void GetColumnMajor(RealType* afCMajor) const ;
 
     // assignment
     Matrix4& operator= (const Matrix4& rkM);
@@ -107,24 +114,30 @@ public:
     Vector4<RealType> operator* (const Vector4<RealType>& rkV) const;  // M * v
 
     // other operations
-    Matrix4 transpose () const;  // M^T
-    Matrix4 transposeTimes (const Matrix4& rkM) const;  // this^T * M
-    Matrix4 timesTranspose (const Matrix4& rkM) const;  // this * M^T
-    Matrix4 inverse () const;
-    Matrix4 adjoint () const;
-    RealType determinant () const;
-    RealType qForm (const Vector4<RealType>& rkU,
-        const Vector4<RealType>& rkV) const;  // u^T*M*v
+	__attribute__((deprecated)) inline     Matrix4 transpose() const{return Transpose();}
+    Matrix4 Transpose() const ;
+	__attribute__((deprecated)) inline     Matrix4 transposeTimes(const Matrix4& rkM) const{return TransposeTimes(rkM);}
+    Matrix4 TransposeTimes(const Matrix4& rkM) const ;
+	__attribute__((deprecated)) inline     Matrix4 timesTranspose(const Matrix4& rkM) const{return TimesTranspose(rkM);}
+    Matrix4 TimesTranspose(const Matrix4& rkM) const ;
+	__attribute__((deprecated)) inline     Matrix4 inverse() const{return Inverse();}
+    Matrix4 Inverse() const ;
+	__attribute__((deprecated)) inline     Matrix4 adjoint() const{return Adjoint();}
+    Matrix4 Adjoint() const ;
+	__attribute__((deprecated)) inline     RealType determinant() const{return Determinant();}
+    RealType Determinant() const ;
+	__attribute__((deprecated)) inline     RealType qForm(const Vector4<RealType>& rkU,        const Vector4<RealType>& rkV) const{return QForm(rkU,rkV);}
+    RealType QForm(const Vector4<RealType>& rkU,        const Vector4<RealType>& rkV) const ;
 
     // projection matrices onto a specified plane
-    void makeObliqueProjection (const Vector3<RealType>& rkNormal,
-        const Vector3<RealType>& rkPoint, const Vector3<RealType>& rkDirection);
-    void makePerspectiveProjection (const Vector3<RealType>& rkNormal,
-        const Vector3<RealType>& rkPoint, const Vector3<RealType>& rkEye);
+	__attribute__((deprecated)) inline     void makeObliqueProjection(const Vector3<RealType>& rkNormal,        const Vector3<RealType>& rkPoint, const Vector3<RealType>& rkDirection){return MakeObliqueProjection(rkNormal,rkPoint,rkDirection);}
+    void MakeObliqueProjection(const Vector3<RealType>& rkNormal,        const Vector3<RealType>& rkPoint, const Vector3<RealType>& rkDirection) ;
+	__attribute__((deprecated)) inline     void makePerspectiveProjection(const Vector3<RealType>& rkNormal,        const Vector3<RealType>& rkPoint, const Vector3<RealType>& rkEye){return MakePerspectiveProjection(rkNormal,rkPoint,rkEye);}
+    void MakePerspectiveProjection(const Vector3<RealType>& rkNormal,        const Vector3<RealType>& rkPoint, const Vector3<RealType>& rkEye) ;
 
     // reflection matrix through a specified plane
-    void makeReflection (const Vector3<RealType>& rkNormal,
-        const Vector3<RealType>& rkPoint);
+	__attribute__((deprecated)) inline     void makeReflection(const Vector3<RealType>& rkNormal,        const Vector3<RealType>& rkPoint){return MakeReflection(rkNormal,rkPoint);}
+    void MakeReflection(const Vector3<RealType>& rkNormal,        const Vector3<RealType>& rkPoint) ;
 
     // special matrices
     static const Matrix4 ZERO;
@@ -135,7 +148,8 @@ private:
     static int I (int iRow, int iCol);
 
     // support for comparisons
-    int compareArrays (const Matrix4& rkM) const;
+	__attribute__((deprecated)) inline     int compareArrays(const Matrix4& rkM) const{return CompareArrays(rkM);}
+    int CompareArrays(const Matrix4& rkM) const ;
 
     RealType m_afEntry[16];
 };

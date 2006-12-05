@@ -39,12 +39,18 @@ public:
     operator RealType* ();
     RealType operator[] (int i) const;
     RealType& operator[] (int i);
-    RealType x () const;
-    RealType& x ();
-    RealType y () const;
-    RealType& y ();
-    RealType z () const;
-    RealType& z ();
+	__attribute__((deprecated)) inline     RealType x() const{return X();}
+    RealType X() const ;
+	__attribute__((deprecated)) inline     RealType& x(){return X();}
+    RealType& X() ;
+	__attribute__((deprecated)) inline     RealType y() const{return Y();}
+    RealType Y() const ;
+	__attribute__((deprecated)) inline     RealType& y(){return Y();}
+    RealType& Y() ;
+	__attribute__((deprecated)) inline     RealType z() const{return Z();}
+    RealType Z() const ;
+	__attribute__((deprecated)) inline     RealType& z(){return Z();}
+    RealType& Z() ;
 
     // assignment
     Vector3& operator= (const Vector3& rkV);
@@ -71,11 +77,15 @@ public:
     Vector3& operator/= (RealType fScalar);
 
     // vector operations
-    RealType length () const;
-    RealType squaredLength () const;
-    RealType dot (const Vector3& rkV) const;
+	__attribute__((deprecated)) inline     RealType length() const{return Length();}
+    RealType Length() const ;
+	__attribute__((deprecated)) inline     RealType squaredLength() const{return SquaredLength();}
+    RealType SquaredLength() const ;
+	__attribute__((deprecated)) inline     RealType dot(const Vector3& rkV) const{return Dot(rkV);}
+    RealType Dot(const Vector3& rkV) const ;
     RealType angleBetweenUnitVectors(const Vector3& rkV) const;
-    RealType normalize ();
+	__attribute__((deprecated)) inline     RealType normalize(){return Normalize();}
+    RealType Normalize() ;
     Vector3 maxVector (const Vector3& rkV) const;
     Vector3 minVector (const Vector3& rkV) const;
     Vector3 multDiag (const Vector3& rkV) const;
@@ -86,27 +96,30 @@ public:
     // a cross product with these functions and send the result to the API
     // that expects left-handed, you will need to change sign on the vector
     // (replace each component value c by -c).
-    Vector3 cross (const Vector3& rkV) const;
-    Vector3 unitCross (const Vector3& rkV) const;
+	__attribute__((deprecated)) inline     Vector3 cross(const Vector3& rkV) const{return Cross(rkV);}
+    Vector3 Cross(const Vector3& rkV) const ;
+	__attribute__((deprecated)) inline     Vector3 unitCross(const Vector3& rkV) const{return UnitCross(rkV);}
+    Vector3 UnitCross(const Vector3& rkV) const ;
 
     // Compute the barycentric coordinates of the point with respect to the
     // tetrahedron <V0,V1,V2,V3>, P = b0*V0 + b1*V1 + b2*V2 + b3*V3, where
     // b0 + b1 + b2 + b3 = 1.
-    void getBarycentrics (const Vector3<RealType>& rkV0,
-        const Vector3<RealType>& rkV1, const Vector3<RealType>& rkV2,
-        const Vector3<RealType>& rkV3, RealType afBary[4]) const;
+	__attribute__((deprecated)) inline     void getBarycentrics(const Vector3<RealType>& rkV0,        const Vector3<RealType>& rkV1, const Vector3<RealType>& rkV2,        const Vector3<RealType>& rkV3, RealType afBary[4]) const{return GetBarycentrics(rkV0,rkV1,rkV2,rkV3,afBary);}
+    void GetBarycentrics(const Vector3<RealType>& rkV0,        const Vector3<RealType>& rkV1, const Vector3<RealType>& rkV2,        const Vector3<RealType>& rkV3, RealType afBary[4]) const ;
 
     // Gram-Schmidt orthonormalization.  Take linearly independent vectors
     // U, V, and W and compute an orthonormal set (unit length, mutually
     // perpendicular).
-    static void orthonormalize (Vector3& rkU, Vector3& rkV, Vector3& rkW);
-    static void orthonormalize (Vector3* akV);
+	__attribute__((deprecated)) inline     static void orthonormalize(Vector3& rkU, Vector3& rkV, Vector3& rkW){return Orthonormalize(rkU,rkV,rkW);}
+    static void Orthonormalize(Vector3& rkU, Vector3& rkV, Vector3& rkW) ;
+	__attribute__((deprecated)) inline     static void orthonormalize(Vector3* akV){return Orthonormalize(akV);}
+    static void Orthonormalize(Vector3* akV) ;
 
     // Input W must be initialized to a nonzero vector, output is {U,V,W},
     // an orthonormal basis.  A hint is provided about whether or not W
     // is already unit length.
-    static void generateOrthonormalBasis (Vector3& rkU, Vector3& rkV,
-        Vector3& rkW, bool bUnitLengthW);
+	__attribute__((deprecated)) inline     static void generateOrthonormalBasis(Vector3& rkU, Vector3& rkV,        Vector3& rkW, bool bUnitLengthW){return GenerateOrthonormalBasis(rkU,rkV,rkW,bUnitLengthW);}
+    static void GenerateOrthonormalBasis(Vector3& rkU, Vector3& rkV,        Vector3& rkW, bool bUnitLengthW) ;
 
     // special vectors
     static const Vector3 ZERO;
@@ -117,7 +130,8 @@ public:
     friend std::ostream & operator<< <> (std::ostream &os, const Vector3<RealType> &v);
 private:
     // support for comparisons
-    int compareArrays (const Vector3& rkV) const;
+	__attribute__((deprecated)) inline     int compareArrays(const Vector3& rkV) const{return CompareArrays(rkV);}
+    int CompareArrays(const Vector3& rkV) const ;
 
     RealType m_afTuple[3];
 };

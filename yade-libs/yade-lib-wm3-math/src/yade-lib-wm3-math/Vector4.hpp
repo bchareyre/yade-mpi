@@ -30,14 +30,22 @@ public:
     operator RealType* ();
     RealType operator[] (int i) const;
     RealType& operator[] (int i);
-    RealType x () const;
-    RealType& x ();
-    RealType y () const;
-    RealType& y ();
-    RealType z () const;
-    RealType& z ();
-    RealType w () const;
-    RealType& w ();
+	__attribute__((deprecated)) inline     RealType x() const{return X();}
+    RealType X() const ;
+	__attribute__((deprecated)) inline     RealType& x(){return X();}
+    RealType& X() ;
+	__attribute__((deprecated)) inline     RealType y() const{return Y();}
+    RealType Y() const ;
+	__attribute__((deprecated)) inline     RealType& y(){return Y();}
+    RealType& Y() ;
+	__attribute__((deprecated)) inline     RealType z() const{return Z();}
+    RealType Z() const ;
+	__attribute__((deprecated)) inline     RealType& z(){return Z();}
+    RealType& Z() ;
+	__attribute__((deprecated)) inline     RealType w() const{return W();}
+    RealType W() const ;
+	__attribute__((deprecated)) inline     RealType& w(){return W();}
+    RealType& W() ;
 
     // assignment
     Vector4& operator= (const Vector4& rkV);
@@ -64,10 +72,14 @@ public:
     Vector4& operator/= (RealType fScalar);
 
     // vector operations
-    RealType length () const;
-    RealType squaredLength () const;
-    RealType dot (const Vector4& rkV) const;
-    RealType normalize ();
+	__attribute__((deprecated)) inline     RealType length() const{return Length();}
+    RealType Length() const ;
+	__attribute__((deprecated)) inline     RealType squaredLength() const{return SquaredLength();}
+    RealType SquaredLength() const ;
+	__attribute__((deprecated)) inline     RealType dot(const Vector4& rkV) const{return Dot(rkV);}
+    RealType Dot(const Vector4& rkV) const ;
+	__attribute__((deprecated)) inline     RealType normalize(){return Normalize();}
+    RealType Normalize() ;
     Vector4 maxVector (const Vector4& rkV) const;
     Vector4 minVector (const Vector4& rkV) const;
     Vector4 multDiag (const Vector4& rkV) const;
@@ -81,7 +93,8 @@ public:
 
 private:
     // support for comparisons
-    int compareArrays (const Vector4& rkV) const;
+	__attribute__((deprecated)) inline     int compareArrays(const Vector4& rkV) const{return CompareArrays(rkV);}
+    int CompareArrays(const Vector4& rkV) const ;
 
     RealType m_afTuple[4];
 };
