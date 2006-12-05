@@ -66,7 +66,7 @@ void ElasticCohesiveLaw::action(Body* body)
 			SDECLinkPhysics* currentContactPhysics		= dynamic_cast<SDECLinkPhysics*>(contact2->interactionPhysics.get());
 			SDECLinkGeometry* currentContactGeometry	= dynamic_cast<SDECLinkGeometry*>(contact2->interactionGeometry.get());
 	
-			Real un 					= currentContactPhysics->equilibriumDistance-(de2->se3.position-de1->se3.position).length();
+			Real un 					= currentContactPhysics->equilibriumDistance-(de2->se3.position-de1->se3.position).Length();
 			currentContactPhysics->normalForce		= currentContactPhysics->kn*un*currentContactGeometry->normal;
 	
 			if (first)
@@ -77,11 +77,11 @@ void ElasticCohesiveLaw::action(Body* body)
 	
 	/// Here is the code with approximated rotations 	 ///
 	
-			axis = currentContactPhysics->prevNormal.cross(currentContactGeometry->normal);
-			currentContactPhysics->shearForce	       -= currentContactPhysics->shearForce.cross(axis);
-			angle	 					= dt*0.5*currentContactGeometry->normal.dot(de1->angularVelocity+de2->angularVelocity);
+			axis = currentContactPhysics->prevNormal.Cross(currentContactGeometry->normal);
+			currentContactPhysics->shearForce	       -= currentContactPhysics->shearForce.Cross(axis);
+			angle	 					= dt*0.5*currentContactGeometry->normal.Dot(de1->angularVelocity+de2->angularVelocity);
 			axis 						= angle*currentContactGeometry->normal;
-			currentContactPhysics->shearForce     	       -= currentContactPhysics->shearForce.cross(axis);
+			currentContactPhysics->shearForce     	       -= currentContactPhysics->shearForce.Cross(axis);
 	
 	/// Here is the code without approximated rotations 	 ///
 	
@@ -106,8 +106,8 @@ void ElasticCohesiveLaw::action(Body* body)
 			Vector3r c1x				= (x - de1->se3.position);
 			Vector3r c2x				= (x - de2->se3.position);
 	
-			Vector3r relativeVelocity 		= (de2->velocity+de2->angularVelocity.cross(c2x)) - (de1->velocity+de1->angularVelocity.cross(c1x));
-			Vector3r shearVelocity			= relativeVelocity-currentContactGeometry->normal.dot(relativeVelocity)*currentContactGeometry->normal;
+			Vector3r relativeVelocity 		= (de2->velocity+de2->angularVelocity.Cross(c2x)) - (de1->velocity+de1->angularVelocity.Cross(c1x));
+			Vector3r shearVelocity			= relativeVelocity-currentContactGeometry->normal.Dot(relativeVelocity)*currentContactGeometry->normal;
 			Vector3r shearDisplacement		= shearVelocity*dt;
 			currentContactPhysics->shearForce      -= currentContactPhysics->ks*shearDisplacement;
 	
@@ -116,8 +116,8 @@ void ElasticCohesiveLaw::action(Body* body)
 			static_cast<Force*>   ( ncb->physicalActions->find( id1 , actionForce   ->getClassIndex() ).get() )->force    -= f;
 			static_cast<Force*>   ( ncb->physicalActions->find( id2 , actionForce   ->getClassIndex() ).get() )->force    += f;
 			
-			static_cast<Momentum*>( ncb->physicalActions->find( id1 , actionMomentum->getClassIndex() ).get() )->momentum -= c1x.cross(f);
-			static_cast<Momentum*>( ncb->physicalActions->find( id2 , actionMomentum->getClassIndex() ).get() )->momentum += c2x.cross(f);
+			static_cast<Momentum*>( ncb->physicalActions->find( id1 , actionMomentum->getClassIndex() ).get() )->momentum -= c1x.Cross(f);
+			static_cast<Momentum*>( ncb->physicalActions->find( id2 , actionMomentum->getClassIndex() ).get() )->momentum += c2x.Cross(f);
 	
 	
 	
@@ -136,8 +136,8 @@ void ElasticCohesiveLaw::action(Body* body)
 			Vector3r n	= currentContactGeometry->normal;
 			Vector3r prevN	= currentContactPhysics->prevNormal;
 			Vector3r t1	= currentContactPhysics->shearForce;
-			t1.normalize();
-			Vector3r t2	= n.unitCross(t1);
+			t1.Normalize();
+			Vector3r t2	= n.UnitCross(t1);
 	
 	// 		if (n[0]!=0 && n[1]!=0 && n[2]!=0)
 	// 		{
@@ -184,7 +184,7 @@ void ElasticCohesiveLaw::action(Body* body)
 	
 			q_i_n.fromAxes(n,t1,t2);
 			q_i_n.fromAxes(Vector3r(1,0,0),Vector3r(0,1,0),Vector3r(0,0,1)); // use identity matrix
-			q_n_i = q_i_n.inverse();
+			q_n_i = q_i_n.Inverse();
 	
 	/// Using Euler angle				 	 ///
 	
@@ -229,9 +229,9 @@ void ElasticCohesiveLaw::action(Body* body)
 			Quaternionr q,q1,q2;
 			Vector3r dRotationAMinusDBeta,dRotationBMinusDBeta;
 	
-			q.align(n,prevN);
-			q1 = (de1->se3.orientation*currentContactPhysics->prevRotation1.inverse())*q.inverse();
-			q2 = (de2->se3.orientation*currentContactPhysics->prevRotation2.inverse())*q.inverse();
+			q.Align(n,prevN);
+			q1 = (de1->se3.orientation*currentContactPhysics->prevRotation1.Inverse())*q.Inverse();
+			q2 = (de2->se3.orientation*currentContactPhysics->prevRotation2.Inverse())*q.Inverse();
 			q1.toEulerAngles(dRotationAMinusDBeta);
 			q2.toEulerAngles(dRotationBMinusDBeta);
 			Vector3r dUr = ( currentContactGeometry->radius1*dRotationAMinusDBeta - currentContactGeometry->radius2*dRotationBMinusDBeta ) * 0.5;
@@ -241,14 +241,14 @@ void ElasticCohesiveLaw::action(Body* body)
 			Vector3r dThetar = dUr/currentContactPhysics->averageRadius;
 			currentContactPhysics->thetar += dThetar;
 	
-			Real fNormal = currentContactPhysics->normalForce.length();
+			Real fNormal = currentContactPhysics->normalForce.Length();
 			Real normMPlastic = currentContactPhysics->heta*fNormal;
 			Vector3r thetarn = q_i_n*currentContactPhysics->thetar; // rolling angle
 			Vector3r mElastic = currentContactPhysics->kr * thetarn;
 	
 			//mElastic[0] = 0;  // No moment around normal direction
 	
-			Real normElastic = mElastic.length();
+			Real normElastic = mElastic.Length();
 	
 	
 			//if (normElastic<=normMPlastic)

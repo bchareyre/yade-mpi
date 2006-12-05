@@ -430,7 +430,7 @@ void TriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r position, Real 
 	shared_ptr<InteractingSphere> iSphere(new InteractingSphere);
 	
 	Quaternionr q;
-	q.fromAxisAngle( Vector3r(0,0,1),0);
+	q.FromAxisAngle( Vector3r(0,0,1),0);
 	
 	body->isDynamic			= dynamic;
 	
@@ -463,7 +463,7 @@ void TriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r position, Real 
 	gSphere->shadowCaster		= true;
 	
 	iSphere->radius			= radius;
-	iSphere->diffuseColor		= Vector3f(Mathf::unitRandom(),Mathf::unitRandom(),Mathf::unitRandom());
+	iSphere->diffuseColor		= Vector3f(Mathf::UnitRandom(),Mathf::UnitRandom(),Mathf::UnitRandom());
 
 	body->interactingGeometry	= iSphere;
 	body->geometricalModel		= gSphere;
@@ -481,7 +481,7 @@ void TriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r
 	shared_ptr<InteractingBox> iBox(new InteractingBox);
 	
 	Quaternionr q;
-	q.fromAxisAngle( Vector3r(0,0,1),0);
+	q.FromAxisAngle( Vector3r(0,0,1),0);
 
 	body->isDynamic			= false;
 	
@@ -650,7 +650,7 @@ void TriaxialTest::positionRootBody(shared_ptr<MetaBody>& rootBody)
 	rootBody->isDynamic		= false;
 
 	Quaternionr q;
-	q.fromAxisAngle( Vector3r(0,0,1),0);
+	q.FromAxisAngle( Vector3r(0,0,1),0);
 	shared_ptr<ParticleParameters> physics(new ParticleParameters); // FIXME : fix indexable class PhysicalParameters
 	physics->se3			= Se3r(Vector3r(0,0,0),q);
 	physics->mass			= 0;
@@ -685,7 +685,7 @@ string TriaxialTest::GenerateCloud(vector<BasicSphere>& sphere_list, Vector3r lo
 	long tries = 1000; //nb of tries for positionning the next sphere
 	Vector3r dimensions = upperCorner - lowerCorner;
 		
-	Real mean_radius = std::pow(dimensions.x()*dimensions.y()*dimensions.z()*(1-porosity)/(3.1416*1.3333*number),0.333333);
+	Real mean_radius = std::pow(dimensions.X()*dimensions.Y()*dimensions.Z()*(1-porosity)/(3.1416*1.3333*number),0.333333);
         //cerr << mean_radius;
 
 	std::cerr << "generating aggregates ... ";
@@ -695,12 +695,12 @@ string TriaxialTest::GenerateCloud(vector<BasicSphere>& sphere_list, Vector3r lo
 		BasicSphere s;
 		for (t=0; t<tries; ++t) {
 			s.second = (random1()-0.5)*rad_std_dev*mean_radius+mean_radius;
-			s.first.x() = lowerCorner.x()+s.second+(dimensions.x()-2*s.second)*random1();
-			s.first.y() = lowerCorner.y()+s.second+(dimensions.y()-2*s.second)*random1();
-			s.first.z() = lowerCorner.z()+s.second+(dimensions.z()-2*s.second)*random1();
+			s.first.X() = lowerCorner.X()+s.second+(dimensions.X()-2*s.second)*random1();
+			s.first.Y() = lowerCorner.Y()+s.second+(dimensions.Y()-2*s.second)*random1();
+			s.first.Z() = lowerCorner.Z()+s.second+(dimensions.Z()-2*s.second)*random1();
 			bool overlap=false;
 			for (long j=0; (j<i && !overlap); j++)
-				if ( pow(sphere_list[j].second+s.second, 2) > (sphere_list[j].first-s.first).squaredLength()) overlap=true;
+				if ( pow(sphere_list[j].second+s.second, 2) > (sphere_list[j].first-s.first).SquaredLength()) overlap=true;
 			if (!overlap)
 			{
 				sphere_list.push_back(s);

@@ -220,7 +220,7 @@ void SDECMovingWall::createGroundSphere(shared_ptr<Body>& body,Real radius, Real
 	shared_ptr<InteractingSphere> iSphere(new InteractingSphere);
 	
 	Quaternionr q;
-	q.fromAxisAngle( Vector3r(0,0,1),0);
+	q.FromAxisAngle( Vector3r(0,0,1),0);
 	
 	Vector3r position		= Vector3r(i,j,k);
 	
@@ -262,12 +262,12 @@ void SDECMovingWall::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 	shared_ptr<InteractingSphere> iSphere(new InteractingSphere);
 	
 	Quaternionr q;
-	q.fromAxisAngle( Vector3r(0,0,1),0);
+	q.FromAxisAngle( Vector3r(0,0,1),0);
 	
 	Vector3r position		= Vector3r(i,j+spheresHeight,k)*(2*maxRadius*1.1) // this formula is crazy !!
 					  - Vector3r( nbSpheres[0]/2*(2*maxRadius*1.1) , -7-maxRadius*2 , nbSpheres[2]/2*(2*maxRadius*1.1) )
-					  + Vector3r(Mathr::symmetricRandom(),Mathr::symmetricRandom(),Mathr::symmetricRandom())*disorder*maxRadius;
-	Real radius 			= (Mathr::intervalRandom(minRadius,maxRadius));
+					  + Vector3r(Mathr::SymmetricRandom(),Mathr::SymmetricRandom(),Mathr::SymmetricRandom())*disorder*maxRadius;
+	Real radius 			= (Mathr::IntervalRandom(minRadius,maxRadius));
 	
 	body->isDynamic			= true;
 	
@@ -312,7 +312,7 @@ void SDECMovingWall::createBox(shared_ptr<Body>& body, Vector3r position, Vector
 	
 	
 	Quaternionr q;
-	q.fromAxisAngle( Vector3r(0,0,1),0);
+	q.FromAxisAngle( Vector3r(0,0,1),0);
 
 	body->isDynamic			= false;
 	
@@ -389,7 +389,7 @@ void SDECMovingWall::createActors(shared_ptr<MetaBody>& rootBody)
 // moving wall
 	shared_ptr<TranslationEngine> kinematic = shared_ptr<TranslationEngine>(new TranslationEngine);
 	kinematic->velocity  = wallVelocity;
-	wallTranslationAxis.normalize();
+	wallTranslationAxis.Normalize();
 	kinematic->translationAxis  = wallTranslationAxis;
 
 	kinematic->subscribedBodies.push_back(1); //wall should be second inserted body, id=1
@@ -430,7 +430,7 @@ void SDECMovingWall::positionRootBody(shared_ptr<MetaBody>& rootBody)
 	rootBody->isDynamic		= false;
 	
 	Quaternionr q;
-	q.fromAxisAngle( Vector3r(0,0,1),0);
+	q.FromAxisAngle( Vector3r(0,0,1),0);
 
 	shared_ptr<ParticleParameters> physics(new ParticleParameters); // FIXME : fix indexable class PhysicalParameters
 	physics->se3				= Se3r(Vector3r(0,0,0),q);

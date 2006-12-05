@@ -79,9 +79,9 @@ void StiffnessCounter::action(Body* body)
 			//_____________________________	*/		
 			
 			//optimized style____________		
-			Vector3r diag_stiffness = Vector3r( 	std::pow(currentContactGeometry->normal.x(),2),
-								std::pow(currentContactGeometry->normal.y(),2),
-								std::pow(currentContactGeometry->normal.z(),2) );
+			Vector3r diag_stiffness = Vector3r( 	std::pow(currentContactGeometry->normal.X(),2),
+								std::pow(currentContactGeometry->normal.Y(),2),
+								std::pow(currentContactGeometry->normal.Z(),2) );
 			diag_stiffness *= currentContactPhysics->kn-currentContactPhysics->ks;
 			diag_stiffness = diag_stiffness + Vector3r(1,1,1)*currentContactPhysics->ks;	//diagonal terms of stiffness matrix
 			

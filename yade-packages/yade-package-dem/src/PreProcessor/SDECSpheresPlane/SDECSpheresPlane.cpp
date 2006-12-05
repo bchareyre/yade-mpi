@@ -191,7 +191,7 @@ void SDECSpheresPlane::createGroundSphere(shared_ptr<Body>& body,Real radius, Re
 	shared_ptr<InteractingSphere> iSphere(new InteractingSphere);
 	
 	Quaternionr q;
-	q.fromAxisAngle( Vector3r(0,0,1),0);
+	q.FromAxisAngle( Vector3r(0,0,1),0);
 	
 	Vector3r position		= Vector3r(i,j,k);
 	
@@ -233,15 +233,15 @@ void SDECSpheresPlane::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 	shared_ptr<InteractingSphere> iSphere(new InteractingSphere);
 	
 	Quaternionr q;
-	q.fromAxisAngle( Vector3r(0,0,1),0);
+	q.FromAxisAngle( Vector3r(0,0,1),0);
 	
 	Vector3r position		= Vector3r(i,j+spheresHeight,k)*(2*maxRadius*1.1) // this formula is crazy !!
 					  - Vector3r( nbSpheres[0]/2*(2*maxRadius*1.1) , -7-maxRadius*2 , nbSpheres[2]/2*(2*maxRadius*1.1) )
-					  + Vector3r( 	 Mathr::symmetricRandom()*disorder[0]
-					  		,Mathr::symmetricRandom()*disorder[1]
-							,Mathr::symmetricRandom()*disorder[2])*maxRadius;
+					  + Vector3r( 	 Mathr::SymmetricRandom()*disorder[0]
+					  		,Mathr::SymmetricRandom()*disorder[1]
+							,Mathr::SymmetricRandom()*disorder[2])*maxRadius;
 	
-	Real radius 			= (Mathr::intervalRandom(minRadius,maxRadius));
+	Real radius 			= (Mathr::IntervalRandom(minRadius,maxRadius));
 	
 	body->isDynamic			= true;
 	
@@ -257,7 +257,7 @@ void SDECSpheresPlane::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 	aabb->diffuseColor		= Vector3r(0,1,0);
 
 	gSphere->radius			= radius;
-	gSphere->diffuseColor		= Vector3f(Mathf::unitRandom(),Mathf::unitRandom(),Mathf::unitRandom());
+	gSphere->diffuseColor		= Vector3f(Mathf::UnitRandom(),Mathf::UnitRandom(),Mathf::UnitRandom());
 	gSphere->wire			= false;
 	gSphere->visible		= true;
 	gSphere->shadowCaster		= true;
@@ -282,7 +282,7 @@ void SDECSpheresPlane::createBox(shared_ptr<Body>& body, Vector3r position, Vect
 	
 	
 	Quaternionr q;
-	q.fromAxisAngle( Vector3r(0,0,1),0);
+	q.FromAxisAngle( Vector3r(0,0,1),0);
 
 	body->isDynamic			= false;
 	
@@ -392,7 +392,7 @@ void SDECSpheresPlane::positionRootBody(shared_ptr<MetaBody>& rootBody)
 	rootBody->isDynamic		= false;
 	
 	Quaternionr q;
-	q.fromAxisAngle( Vector3r(0,0,1),0);
+	q.FromAxisAngle( Vector3r(0,0,1),0);
 
 	shared_ptr<ParticleParameters> physics(new ParticleParameters); // FIXME : fix indexable class PhysicalParameters
 	physics->se3				= Se3r(Vector3r(0,0,0),q);

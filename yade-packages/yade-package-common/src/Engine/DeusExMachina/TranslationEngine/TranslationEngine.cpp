@@ -13,7 +13,7 @@
 void TranslationEngine::postProcessAttributes(bool deserializing)
 {
 	if(deserializing)
-		translationAxis.normalize();
+		translationAxis.Normalize();
 }
 
 

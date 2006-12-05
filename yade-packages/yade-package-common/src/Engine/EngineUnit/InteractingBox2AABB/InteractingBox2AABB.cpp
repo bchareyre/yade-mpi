@@ -22,7 +22,7 @@ void InteractingBox2AABB::go(	const shared_ptr<InteractingGeometry>& cm,
 	aabb->center = se3.position;
 
 	Matrix3r r;
-	se3.orientation.toRotationMatrix(r);
+	se3.orientation.ToRotationMatrix(r);
 	aabb->halfSize = Vector3r(0,0,0);
 	for( int i=0; i<3; ++i )
 		for( int j=0; j<3; ++j )

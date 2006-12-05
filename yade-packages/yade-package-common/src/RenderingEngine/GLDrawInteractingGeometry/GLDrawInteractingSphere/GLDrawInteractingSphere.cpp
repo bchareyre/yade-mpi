@@ -99,7 +99,7 @@ void GLDrawInteractingSphere::subdivideTriangle(Vector3r& v1,Vector3r& v2,Vector
 	if (depth==0)
 	{
 		Vector3r v = (v1+v2+v3)/3.0;
-		Real angle = atan(v[2]/v[0])/v.length();
+		Real angle = atan(v[2]/v[0])/v.Length();
 
 		GLfloat matAmbient[4];
 
@@ -134,9 +134,9 @@ void GLDrawInteractingSphere::subdivideTriangle(Vector3r& v1,Vector3r& v2,Vector
 	v12 = v1+v2;
 	v23 = v2+v3;
 	v31 = v3+v1;
-	v12.normalize();
-	v23.normalize();
-	v31.normalize();
+	v12.Normalize();
+	v23.Normalize();
+	v31.Normalize();
 	subdivideTriangle(v1,v12,v31,depth-1);
 	subdivideTriangle(v2,v23,v12,depth-1);
 	subdivideTriangle(v3,v31,v23,depth-1);

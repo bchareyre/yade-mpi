@@ -361,7 +361,7 @@ void SDECImpactTest::createSphere(shared_ptr<Body>& body, Vector3r position, Rea
 	shared_ptr<InteractingSphere> iSphere(new InteractingSphere);
 	
 	Quaternionr q;
-	q.fromAxisAngle( Vector3r(0,0,1),0);
+	q.FromAxisAngle( Vector3r(0,0,1),0);
 	
 	body->isDynamic			= dynamic;
 	
@@ -394,7 +394,7 @@ void SDECImpactTest::createSphere(shared_ptr<Body>& body, Vector3r position, Rea
 	gSphere->shadowCaster		= true;
 	
 	iSphere->radius			= radius;
-	iSphere->diffuseColor		= Vector3f(Mathf::unitRandom(),Mathf::unitRandom(),Mathf::unitRandom());
+	iSphere->diffuseColor		= Vector3f(Mathf::UnitRandom(),Mathf::UnitRandom(),Mathf::UnitRandom());
 
 	body->interactingGeometry	= iSphere;
 	body->geometricalModel		= gSphere;
@@ -412,7 +412,7 @@ void SDECImpactTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector
 	shared_ptr<InteractingBox> iBox(new InteractingBox);
 	
 	Quaternionr q;
-	q.fromAxisAngle( Vector3r(0,0,1),0);
+	q.FromAxisAngle( Vector3r(0,0,1),0);
 
 	body->isDynamic			= false;
 	
@@ -542,7 +542,7 @@ void SDECImpactTest::positionRootBody(shared_ptr<MetaBody>& rootBody)
 	rootBody->isDynamic		= false;
 
 	Quaternionr q;
-	q.fromAxisAngle( Vector3r(0,0,1),0);
+	q.FromAxisAngle( Vector3r(0,0,1),0);
 	shared_ptr<ParticleParameters> physics(new ParticleParameters); // FIXME : fix indexable class PhysicalParameters
 	physics->se3			= Se3r(Vector3r(0,0,0),q);
 	physics->mass			= 0;

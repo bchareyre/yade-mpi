@@ -39,12 +39,12 @@ TriaxialStressController::TriaxialStressController() : actionParameterStiffnessM
 		stiffness[i] = 0;
 		normal[i] = Vector3r::ZERO;
 	}
-	normal[wall_bottom].y()=1;
-	normal[wall_top].y()=-1;
-	normal[wall_left].x()=1;
-	normal[wall_right].x()=-1;
-	normal[wall_front].z()=-1;
-	normal[wall_back].z()=1;
+	normal[wall_bottom].Y()=1;
+	normal[wall_top].Y()=-1;
+	normal[wall_left].X()=1;
+	normal[wall_right].X()=-1;
+	normal[wall_front].Z()=-1;
+	normal[wall_back].Z()=1;
 	
 // 	wall_bottom_id = wall_id[0];
 // 	wall_top_id = wall_id[1];
@@ -158,15 +158,15 @@ void TriaxialStressController::controlStress(int wall, MetaBody* ncb, int id, Ve
 // 		Vector3r effectiveforce =
 // 		 	static_cast<Force*>( ncb->physicalActions->find(wall_id[wall],ForceClassIndex).get() )->force; 
 		//Vector3r deltaf (effectiveforce - resultantForce);
-		Real translation= normal[wall].dot(static_cast<Force*>( ncb->physicalActions->find(wall_id[wall],ForceClassIndex).get() )->force - resultantForce);
+		Real translation= normal[wall].Dot(static_cast<Force*>( ncb->physicalActions->find(wall_id[wall],ForceClassIndex).get() )->force - resultantForce);
 		if (translation!=0)
 		{
 			if (stiffness[wall]!=0)
 			{
 				translation /= stiffness[wall];
-				translation = std::min( abs(translation), max_vel ) * Mathr::sign(translation);
+				translation = std::min( abs(translation), max_vel ) * Mathr::Sign(translation);
 			}
-			else  translation = wall_max_vel * Mathr::sign(translation);
+			else  translation = wall_max_vel * Mathr::Sign(translation);
 		}
 		
 		 
@@ -227,9 +227,9 @@ void TriaxialStressController::applyCondition(Body* body)
 	PhysicalParameters* p_back 	= static_cast<PhysicalParameters*>((*bodies)[wall_back_id]->physicalParameters.get());
 	
 	{
-		height = p_top->se3.position.y() - p_bottom->se3.position.y() - thickness;
-		width = p_right->se3.position.x() - p_left->se3.position.x() - thickness;
-		depth = p_front->se3.position.z() - p_back->se3.position.z() - thickness;
+		height = p_top->se3.position.Y() - p_bottom->se3.position.Y() - thickness;
+		width = p_right->se3.position.X() - p_left->se3.position.X() - thickness;
+		depth = p_front->se3.position.Z() - p_back->se3.position.Z() - thickness;
 				
 		
 		Vector3r wallForce (0, sigma_iso*width*depth, 0);

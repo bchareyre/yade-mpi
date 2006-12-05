@@ -231,7 +231,7 @@ void SphericalDEMSimulator::findRealCollision(const vector<SphericalDEM>& sphere
 			
 			/// InteractingSphere2InteractingSphere4SpheresContactGeometry
 			Vector3r normal = spheres[id2].position-spheres[id1].position;
-			Real penetrationDepth = spheres[id1].radius+spheres[id2].radius-normal.normalize();
+			Real penetrationDepth = spheres[id1].radius+spheres[id2].radius-normal.Normalize();
 	
 			if (penetrationDepth>0)
 			{
@@ -329,25 +329,25 @@ nbCollision++;
 				Vector3r axis;
 				Real angle;
 		
-				axis	 	= c->prevNormal.cross(c->normal);
-				shearForce	-= shearForce.cross(axis);
-				angle		= dt*0.5*c->normal.dot(spheres[id1].angularVelocity+spheres[id2].angularVelocity);
+				axis	 	= c->prevNormal.Cross(c->normal);
+				shearForce	-= shearForce.Cross(axis);
+				angle		= dt*0.5*c->normal.Dot(spheres[id1].angularVelocity+spheres[id2].angularVelocity);
 				axis		= angle*c->normal;
-				shearForce	-= shearForce.cross(axis);
+				shearForce	-= shearForce.Cross(axis);
 			
 				Vector3r x			= c->contactPoint;
 				Vector3r c1x			= (x - spheres[id1].position);
 				Vector3r c2x			= (x - spheres[id2].position);
-				Vector3r relativeVelocity	= (spheres[id2].velocity+spheres[id2].angularVelocity.cross(c2x)) - (spheres[id1].velocity+spheres[id1].angularVelocity.cross(c1x));
-				Vector3r shearVelocity		= relativeVelocity-c->normal.dot(relativeVelocity)*c->normal;
+				Vector3r relativeVelocity	= (spheres[id2].velocity+spheres[id2].angularVelocity.Cross(c2x)) - (spheres[id1].velocity+spheres[id1].angularVelocity.Cross(c1x));
+				Vector3r shearVelocity		= relativeVelocity-c->normal.Dot(relativeVelocity)*c->normal;
 				Vector3r shearDisplacement	= shearVelocity*dt;
 				shearForce 			-= c->ks*shearDisplacement;
 		
 				/// PFC3d SlipModel, is using friction angle and CoulombCriterion
-				Real maxFs = c->normalForce.squaredLength() * pow(c->tangensOfFrictionAngle,2);
-				if( shearForce.squaredLength() > maxFs )
+				Real maxFs = c->normalForce.SquaredLength() * pow(c->tangensOfFrictionAngle,2);
+				if( shearForce.SquaredLength() > maxFs )
 				{
-					maxFs = Mathr::sqRoot(maxFs) / shearForce.length();
+					maxFs = Mathr::Sqrt(maxFs) / shearForce.Length();
 					shearForce *= maxFs;
 				}
 				/// PFC3d SlipModel
@@ -357,8 +357,8 @@ nbCollision++;
 				spheres[id1].force -= f;
 				spheres[id2].force += f;
 
-				spheres[id1].momentum -= c1x.cross(f);
-				spheres[id2].momentum += c2x.cross(f);
+				spheres[id1].momentum -= c1x.Cross(f);
+				spheres[id2].momentum += c2x.Cross(f);
 				
 				c->prevNormal = c->normal;
 			}
@@ -443,11 +443,11 @@ void SphericalDEMSimulator::timeIntegration(vector<SphericalDEM>& spheres)
 			///LeapFrogOrientationIntegrator
 			(*si).prevAngularVelocity = (*si).angularVelocity+0.5*dt*(*si).angularAcceleration;
 			Vector3r axis = (*si).angularVelocity;
-			Real angle = axis.normalize();
+			Real angle = axis.Normalize();
 			Quaternionr q;
-			q.fromAxisAngle(axis,angle*dt);
+			q.FromAxisAngle(axis,angle*dt);
 			(*si).orientation = q*(*si).orientation;
-			(*si).orientation.normalize();
+			(*si).orientation.Normalize();
 		}
 	}
 

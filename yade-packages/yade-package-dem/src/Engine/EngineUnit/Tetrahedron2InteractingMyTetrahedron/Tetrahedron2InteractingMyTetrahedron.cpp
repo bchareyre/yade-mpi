@@ -26,9 +26,9 @@ void Tetrahedron2InteractingMyTetrahedron::go(	const shared_ptr<GeometricalModel
 	it->c3 = tet->v3*0.5;
 	it->c4 = tet->v4*0.5;
 
-	it->r1 = it->c1.length();
-	it->r2 = it->c2.length();
-	it->r3 = it->c3.length();
-	it->r4 = it->c4.length();
+	it->r1 = it->c1.Length();
+	it->r2 = it->c2.Length();
+	it->r3 = it->c3.Length();
+	it->r4 = it->c4.Length();
 }
 	

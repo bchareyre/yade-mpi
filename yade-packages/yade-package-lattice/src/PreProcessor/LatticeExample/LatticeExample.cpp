@@ -304,7 +304,7 @@ string LatticeExample::generate()
 			LatticeNodeParameters* a = static_cast<LatticeNodeParameters*>(bodyA->physicalParameters.get());
 			LatticeNodeParameters* b = static_cast<LatticeNodeParameters*>(bodyB->physicalParameters.get());
 			
-			if ((a->se3.position - b->se3.position).squaredLength() < std::pow(maxLength_in_cellsizeUnit*cellsizeUnit_in_meters,2) )  
+			if ((a->se3.position - b->se3.position).SquaredLength() < std::pow(maxLength_in_cellsizeUnit*cellsizeUnit_in_meters,2) )  
 			{
 				shared_ptr<Body> beam;
 				createBeam(beam,bodyA->getId(),bodyB->getId());
@@ -334,9 +334,9 @@ string LatticeExample::generate()
 
                         Body* body = (*bi).get();
                         LatticeNodeParameters* node = dynamic_cast<LatticeNodeParameters*>(body->physicalParameters.get());
-                        tmpLen = ( strainRecorder_node1 - node->se3.position ).squaredLength();
+                        tmpLen = ( strainRecorder_node1 - node->se3.position ).SquaredLength();
                         if(tmpLen < len1) len1=tmpLen, node1Id=body->getId();
-                        tmpLen = ( strainRecorder_node2 - node->se3.position ).squaredLength();
+                        tmpLen = ( strainRecorder_node2 - node->se3.position ).SquaredLength();
                         if(tmpLen < len2) len2=tmpLen, node2Id=body->getId();
                 }
                 assert(node1Id!=-1 && node2Id!=-1);
@@ -358,9 +358,9 @@ string LatticeExample::generate()
 
                         Body* body = (*bi).get();
                         LatticeNodeParameters* node = dynamic_cast<LatticeNodeParameters*>(body->physicalParameters.get());
-                        tmpLen = ( measurePoisson_node3 - node->se3.position ).squaredLength();
+                        tmpLen = ( measurePoisson_node3 - node->se3.position ).SquaredLength();
                         if(tmpLen < len1) len1=tmpLen, node3Id=body->getId();
-                        tmpLen = ( measurePoisson_node4 - node->se3.position ).squaredLength();
+                        tmpLen = ( measurePoisson_node4 - node->se3.position ).SquaredLength();
                         if(tmpLen < len2) len2=tmpLen, node4Id=body->getId();
                 }
                 assert(node3Id!=-1 && node4Id!=-1);
@@ -494,10 +494,10 @@ string LatticeExample::generate()
 bool LatticeExample::checkAngle( Vector3r a, Vector3r& b)
 {
 	Quaternionr al;
-	al.align(a,b);
+	al.Align(a,b);
 	Vector3r axis;
 	Real angle;
-	al.toAxisAngle(axis, angle);
+	al.ToAxisAngle(axis, angle);
 	angle *= 180.0/Mathr::PI ;
 //	cerr << " angle: " << angle << "\n";
 	return angle > minAngle_betweenBeams_deg;
@@ -531,7 +531,7 @@ bool LatticeExample::createNode(shared_ptr<Body>& body, int i, int j, int k)
 	shared_ptr<Sphere> gSphere(new Sphere);
 	
 	Quaternionr q;
-	q.fromAxisAngle( Vector3r(Mathr::unitRandom(),Mathr::unitRandom(),Mathr::unitRandom()) , Mathr::unitRandom()*Mathr::PI );
+	q.FromAxisAngle( Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom()) , Mathr::UnitRandom()*Mathr::PI );
 	
 	float  triang_x = triangularBaseGrid   ? ((static_cast<float>(j%2))*0.5)+i : i+0;
 	double triang_y = triangularBaseGrid   ? 0.86602540378443864676*j          : j*1; // sqrt(3)/2
@@ -549,9 +549,9 @@ bool LatticeExample::createNode(shared_ptr<Body>& body, int i, int j, int k)
 	}
 	
 	Vector3r position		= ( Vector3r(triang_x,triang_y,triang_z)
-					  + Vector3r( 	  Mathr::symmetricRandom()*disorder_in_cellsizeUnit[0]
-					  		, Mathr::symmetricRandom()*disorder_in_cellsizeUnit[1]
-							, Mathr::symmetricRandom()*disorder_in_cellsizeUnit[2]
+					  + Vector3r( 	  Mathr::SymmetricRandom()*disorder_in_cellsizeUnit[0]
+					  		, Mathr::SymmetricRandom()*disorder_in_cellsizeUnit[1]
+							, Mathr::SymmetricRandom()*disorder_in_cellsizeUnit[2]
 						    ) * 0.5 // *0.5 because symmetricRandom is (-1,1), and disorder is whole size where nodes can appear
 					  )*cellsizeUnit_in_meters;
 
@@ -656,7 +656,7 @@ void LatticeExample::calcBeamPositionOrientationLength(shared_ptr<Body>& body)
 	se3Beam.position 	= (se3A.position + se3B.position)*0.5;
 	Vector3r dist 		= se3A.position - se3B.position;
 	
-	Real length 		= dist.normalize();
+	Real length 		= dist.Normalize();
 	beam->direction 	= dist;
         beam->length            = length;
         beam->initialLength     = length;
@@ -667,10 +667,10 @@ void LatticeExample::calcBeamPositionOrientationLength(shared_ptr<Body>& body)
         beam->bendingStiffness          = bendingStiffness_noUnit;
         beam->torsionalStiffness        = torsionalStiffness_noUnit;
         
-	se3Beam.orientation.align( Vector3r::UNIT_X , dist );
+	se3Beam.orientation.Align( Vector3r::UNIT_X , dist );
 	beam->se3 		= se3Beam;
 	beam->se3Displacement.position 	= Vector3r(0.0,0.0,0.0);
-	beam->se3Displacement.orientation.align(dist,dist);
+	beam->se3Displacement.orientation.Align(dist,dist);
 
 	beam->otherDirection	= beam->se3.orientation*Vector3r::UNIT_Y; // any unit vector that is orthogonal to direction.
 }
@@ -689,8 +689,8 @@ void LatticeExample::calcAxisAngle(LatticeBeamParameters* beam1, BodyContainer* 
 		
 		angularSpring->initialPlaneAngle 	= angle;
 		angularSpring->planeSwap180		= false;
-		angularSpring->lastCrossProduct		= 1.0*(beam1->direction.cross(beam2->direction));
-		angularSpring->lastCrossProduct.normalize();
+		angularSpring->lastCrossProduct		= 1.0*(beam1->direction.Cross(beam2->direction));
+		angularSpring->lastCrossProduct.Normalize();
 		
 		angularSpring->initialOffPlaneAngle1	= beam1->otherDirection.angleBetweenUnitVectors(angularSpring->lastCrossProduct);
 		angularSpring->initialOffPlaneAngle2	= beam2->otherDirection.angleBetweenUnitVectors(angularSpring->lastCrossProduct);
@@ -698,16 +698,16 @@ void LatticeExample::calcAxisAngle(LatticeBeamParameters* beam1, BodyContainer* 
 	//	std::cerr << thisId << ", " << otherId << ", (" << beam1->otherDirection << ") (" << beam2->otherDirection << ") (" << angularSpring->lastCrossProduct << ")\n";
 				
 		Quaternionr	aligner1,aligner2;
-		aligner1.fromAxisAngle(beam1->direction , angularSpring->initialOffPlaneAngle1);
-		aligner2.fromAxisAngle(beam2->direction , angularSpring->initialOffPlaneAngle2);
+		aligner1.FromAxisAngle(beam1->direction , angularSpring->initialOffPlaneAngle1);
+		aligner2.FromAxisAngle(beam2->direction , angularSpring->initialOffPlaneAngle2);
 				
 		Vector3r	dir1			= aligner1 * angularSpring->lastCrossProduct;
 		Vector3r	dir2			= aligner2 * angularSpring->lastCrossProduct;
 
 		// FIXME
-		if( dir1.dot(beam1->otherDirection) < 0.999999 )
+		if( dir1.Dot(beam1->otherDirection) < 0.999999 )
 			angularSpring->initialOffPlaneAngle1   *= -1.0;//, angularSpring->offPlaneSwap1 = true;
-		if( dir2.dot(beam2->otherDirection) < 0.999999 )
+		if( dir2.Dot(beam2->otherDirection) < 0.999999 )
 			angularSpring->initialOffPlaneAngle2   *= -1.0;//, angularSpring->offPlaneSwap2 = true;
 	
 		interaction->isReal			= true;
@@ -778,7 +778,7 @@ void LatticeExample::positionRootBody(shared_ptr<MetaBody>& rootBody)
         rootBody->isDynamic             = false;
 
 	Quaternionr q;
-	q.fromAxisAngle( Vector3r(0,0,1),0);
+	q.FromAxisAngle( Vector3r(0,0,1),0);
 	shared_ptr<LatticeSetParameters> physics(new LatticeSetParameters);
         physics->se3                    = Se3r(Vector3r(0,0,0),q);
         physics->beamGroupMask          = beamGroupMask;
@@ -810,7 +810,7 @@ void LatticeExample::imposeTranslation(shared_ptr<MetaBody>& rootBody, Vector3r 
 {
 	shared_ptr<DisplacementEngine> translationCondition = shared_ptr<DisplacementEngine>(new DisplacementEngine);
  	translationCondition->displacement  = displacement;
-	direction.normalize();
+	direction.Normalize();
  	translationCondition->translationAxis = direction;
         
         rootBody->engines.push_back((rootBody->engines)[rootBody->engines.size()-1]);

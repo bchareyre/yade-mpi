@@ -129,7 +129,7 @@ void BoxStack::createBox(shared_ptr<Body>& body, int i, int j, int k)
 	shared_ptr<InteractingBox> iBox(new InteractingBox);
 	
 	Quaternionr q;
-	q.fromAxisAngle( Vector3r(0,0,1),0);
+	q.FromAxisAngle( Vector3r(0,0,1),0);
 		
 	Vector3r position		= Vector3r(i*boxSize[0],j*boxSize[1],k*boxSize[2])*2
 					  - Vector3r(0,-boxSize[1],nbBoxes[2]*boxSize[2]-boxSize[2])
@@ -147,13 +147,13 @@ void BoxStack::createBox(shared_ptr<Body>& body, int i, int j, int k)
 	aabb->diffuseColor		= Vector3r(0,1,0);
 	
 	gBox->extents			= size;
-	gBox->diffuseColor		= Vector3f(Mathf::unitRandom(),Mathf::unitRandom(),Mathf::unitRandom());
+	gBox->diffuseColor		= Vector3f(Mathf::UnitRandom(),Mathf::UnitRandom(),Mathf::UnitRandom());
 	gBox->wire			= false;
 	gBox->visible			= true;
 	gBox->shadowCaster		= true;
 	
 	iBox->extents			= size;
-	iBox->diffuseColor		= Vector3f(Mathf::unitRandom(),Mathf::unitRandom(),Mathf::unitRandom());
+	iBox->diffuseColor		= Vector3f(Mathf::UnitRandom(),Mathf::UnitRandom(),Mathf::UnitRandom());
 
 	body->interactingGeometry	= iBox;
 	body->geometricalModel		= gBox;
@@ -171,7 +171,7 @@ void BoxStack::createSphere(shared_ptr<Body>& body)
 	shared_ptr<InteractingSphere> iSphere(new InteractingSphere);
 	
 	Quaternionr q;
-	q.fromAxisAngle( Vector3r(0,0,1),0);
+	q.FromAxisAngle( Vector3r(0,0,1),0);
 		
 	Vector3r position 		= Vector3r(0,nbBoxes[1]*boxSize[1],0)
 					  + bulletPosition;
@@ -189,13 +189,13 @@ void BoxStack::createSphere(shared_ptr<Body>& body)
 	aabb->diffuseColor		= Vector3r(0,1,0);
 	
 	gSphere->radius			= radius;
-	gSphere->diffuseColor		= Vector3f(Mathf::unitRandom(),Mathf::unitRandom(),Mathf::unitRandom());
+	gSphere->diffuseColor		= Vector3f(Mathf::UnitRandom(),Mathf::UnitRandom(),Mathf::UnitRandom());
 	gSphere->wire			= false;
 	gSphere->visible		= true;
 	gSphere->shadowCaster		= true;
 	
 	iSphere->radius			= radius;
-	iSphere->diffuseColor		= Vector3f(Mathf::unitRandom(),Mathf::unitRandom(),Mathf::unitRandom());
+	iSphere->diffuseColor		= Vector3f(Mathf::UnitRandom(),Mathf::UnitRandom(),Mathf::UnitRandom());
 
 	body->interactingGeometry	= iSphere;
 	body->geometricalModel		= gSphere;
@@ -213,7 +213,7 @@ void BoxStack::createKinematicBox(shared_ptr<Body>& body, Vector3r position, Vec
 	shared_ptr<InteractingBox> iBox(new InteractingBox);
 	
 	Quaternionr q;
-	q.fromAxisAngle( Vector3r(0,0,1),0);
+	q.FromAxisAngle( Vector3r(0,0,1),0);
 
 	body->isDynamic			= false;
 	
@@ -309,7 +309,7 @@ void BoxStack::createActors(shared_ptr<MetaBody>& rootBody)
 void BoxStack::positionRootBody(shared_ptr<MetaBody>& rootBody)
 {
 	rootBody->isDynamic			= false;
-	Quaternionr q;	q.fromAxisAngle( Vector3r(0,0,1),0);
+	Quaternionr q;	q.FromAxisAngle( Vector3r(0,0,1),0);
 	shared_ptr<ParticleParameters> physics(new ParticleParameters); // FIXME : fix indexable class PhysicalParameters
 	physics->se3				= Se3r(Vector3r(0,0,0),q);
 	physics->mass				= 0;

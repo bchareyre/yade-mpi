@@ -135,18 +135,18 @@ string Funnel::generate()
 	Real holeSize = 20;
 	Real height = 40;
 	
-	Real translation = (funnelSize[0]+funnelSize[1])*Mathr::cosinus(angle)+holeSize/2.0;	
-	Real translationY = (funnelSize[0]+funnelSize[1]*2)*Mathr::sinus(angle)+height;
+	Real translation = (funnelSize[0]+funnelSize[1])*Mathr::Cos(angle)+holeSize/2.0;	
+	Real translationY = (funnelSize[0]+funnelSize[1]*2)*Mathr::Sin(angle)+height;
 	
 	createBox(north, Vector3r(0,translationY,translation), funnelSize);
 	createBox(south, Vector3r(0,translationY,-translation), funnelSize);
 	createBox(east, Vector3r(translation,translationY,0), funnelSize);
 	createBox(west, Vector3r(-translation,translationY,0), funnelSize);
 	
-	north->physicalParameters->se3.orientation.fromAxisAngle(Vector3r(1,0,0),-angle);
-	south->physicalParameters->se3.orientation.fromAxisAngle(Vector3r(1,0,0),angle);
-	east->physicalParameters->se3.orientation.fromAxisAngle(Vector3r(0,0,1),angle);
-	west->physicalParameters->se3.orientation.fromAxisAngle(Vector3r(0,0,1),-angle);
+	north->physicalParameters->se3.orientation.FromAxisAngle(Vector3r(1,0,0),-angle);
+	south->physicalParameters->se3.orientation.FromAxisAngle(Vector3r(1,0,0),angle);
+	east->physicalParameters->se3.orientation.FromAxisAngle(Vector3r(0,0,1),angle);
+	west->physicalParameters->se3.orientation.FromAxisAngle(Vector3r(0,0,1),-angle);
 
 	north->geometricalModel->wire = true;
 	north->geometricalModel->shadowCaster = false;
@@ -182,13 +182,13 @@ void Funnel::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 	shared_ptr<InteractingSphere> iSphere(new InteractingSphere);
 	
 	Quaternionr q;
-	q.fromAxisAngle( Vector3r(0,0,1),0);
+	q.FromAxisAngle( Vector3r(0,0,1),0);
 	
 	Vector3r position		= Vector3r(i,j,k)*(2*maxRadius*1.1) // this formula is crazy !!
 					  - Vector3r( nbSpheres[0]/2*(2*maxRadius*1.1) , -7-maxRadius*2 , nbSpheres[2]/2*(2*maxRadius*1.1) )
-					  + Vector3r(Mathr::symmetricRandom(),Mathr::symmetricRandom(),Mathr::symmetricRandom())*disorder*maxRadius;
+					  + Vector3r(Mathr::SymmetricRandom(),Mathr::SymmetricRandom(),Mathr::SymmetricRandom())*disorder*maxRadius;
 	
-	Real radius 			= (Mathr::intervalRandom(minRadius,maxRadius));
+	Real radius 			= (Mathr::IntervalRandom(minRadius,maxRadius));
 	
 	body->isDynamic			= true;
 	
@@ -204,7 +204,7 @@ void Funnel::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 	aabb->diffuseColor		= Vector3r(0,1,0);
 
 	gSphere->radius			= radius;
-	gSphere->diffuseColor		= Vector3f(Mathf::unitRandom(),Mathf::unitRandom(),Mathf::unitRandom());
+	gSphere->diffuseColor		= Vector3f(Mathf::UnitRandom(),Mathf::UnitRandom(),Mathf::UnitRandom());
 	gSphere->wire			= false;
 	gSphere->visible		= true;
 	gSphere->shadowCaster		= true;
@@ -229,7 +229,7 @@ void Funnel::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r exten
 	
 	
 	Quaternionr q;
-	q.fromAxisAngle( Vector3r(0,0,1),0);
+	q.FromAxisAngle( Vector3r(0,0,1),0);
 
 	body->isDynamic			= false;
 	
@@ -335,7 +335,7 @@ void Funnel::positionRootBody(shared_ptr<MetaBody>& rootBody)
 	rootBody->isDynamic		= false;
 	
 	Quaternionr q;
-	q.fromAxisAngle( Vector3r(0,0,1),0);
+	q.FromAxisAngle( Vector3r(0,0,1),0);
 
 	shared_ptr<ParticleParameters> physics(new ParticleParameters); // FIXME : fix indexable class PhysicalParameters
 	physics->se3				= Se3r(Vector3r(0,0,0),q);

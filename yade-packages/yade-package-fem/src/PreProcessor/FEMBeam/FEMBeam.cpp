@@ -194,7 +194,7 @@ void FEMBeam::positionRootBody(shared_ptr<MetaBody>& rootBody)
 	rootBody->isDynamic			= false;
 
 	Quaternionr q;
-	q.fromAxisAngle( Vector3r(0,0,1),0);
+	q.FromAxisAngle( Vector3r(0,0,1),0);
 	shared_ptr<FEMSetParameters> physics(new FEMSetParameters);
 	physics->se3				= Se3r(Vector3r(0,0,0),q);
 	physics->nodeGroupMask 			= nodeGroupMask;
@@ -224,7 +224,7 @@ void FEMBeam::imposeTranslation(shared_ptr<MetaBody>& rootBody, Vector3r min, Ve
 {
 	shared_ptr<TranslationEngine> translationCondition = shared_ptr<TranslationEngine>(new TranslationEngine);
  	translationCondition->velocity  = velocity;
-	direction.normalize();
+	direction.Normalize();
  	translationCondition->translationAxis = direction;
 	
 	rootBody->engines.push_back(translationCondition);

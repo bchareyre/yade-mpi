@@ -220,7 +220,7 @@ string HangingCloth::generate()
 	rootBody->initializers.push_back(geometricalModelDispatcher);
 	
 	Quaternionr q;
-	q.fromAxisAngle( Vector3r(0,0,1),0);
+	q.FromAxisAngle( Vector3r(0,0,1),0);
 
 	// use ParticleSet so that we have automatic updating for free
 	shared_ptr<ParticleSetParameters> physics2(new ParticleSetParameters);
@@ -408,7 +408,7 @@ string HangingCloth::generate()
 				shared_ptr<InteractingSphere>	as = dynamic_pointer_cast<InteractingSphere>(bodyA->interactingGeometry);
 				shared_ptr<InteractingSphere>	bs = dynamic_pointer_cast<InteractingSphere>(bodyB->interactingGeometry);
 	
-				if ( a && b && as && bs && (a->se3.position - b->se3.position).length() < (as->radius + bs->radius))  
+				if ( a && b && as && bs && (a->se3.position - b->se3.position).Length() < (as->radius + bs->radius))  
 				{
 					shared_ptr<Interaction> 		link(new Interaction( bodyA->getId() , bodyB->getId() ));
 					shared_ptr<SDECLinkGeometry>		geometry(new SDECLinkGeometry);
@@ -420,7 +420,7 @@ string HangingCloth::generate()
 					physics->initialKn			= 500000;
 					physics->initialKs			= 50000;
 					physics->heta				= 1;
-					physics->initialEquilibriumDistance	= (a->se3.position - b->se3.position).length();
+					physics->initialEquilibriumDistance	= (a->se3.position - b->se3.position).Length();
 					physics->knMax				= 75000;
 					physics->ksMax				= 7500;
 	
@@ -452,7 +452,7 @@ shared_ptr<Interaction>& HangingCloth::createSpring(const shared_ptr<MetaBody>& 
 	geometry->p1			= b1->physicalParameters->se3.position;
 	geometry->p2			= b2->physicalParameters->se3.position;
 
-	physics->initialLength		= (geometry->p1-geometry->p2).length();
+	physics->initialLength		= (geometry->p1-geometry->p2).Length();
 	physics->stiffness		= springStiffness;
 	physics->damping		= springDamping;
 
@@ -474,14 +474,14 @@ void HangingCloth::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 	shared_ptr<InteractingSphere> iSphere(new InteractingSphere);
 	
 	Quaternionr q;
-	q.fromAxisAngle( Vector3r(0,0,1),0);
+	q.FromAxisAngle( Vector3r(0,0,1),0);
 	
 		
 	Vector3r position 		=   Vector3r(i,j,k) * spacing 
 					  - Vector3r( nbSpheres[0]/2*spacing  ,  nbSpheres[1]/2*spacing-90  ,  nbSpheres[2]/2*spacing)
-					  + Vector3r( Mathr::symmetricRandom()*disorder ,  Mathr::symmetricRandom()*disorder , Mathr::symmetricRandom()*disorder );
+					  + Vector3r( Mathr::SymmetricRandom()*disorder ,  Mathr::SymmetricRandom()*disorder , Mathr::SymmetricRandom()*disorder );
 
-	Real radius 			= (Mathr::intervalRandom(minRadius,maxRadius));
+	Real radius 			= (Mathr::IntervalRandom(minRadius,maxRadius));
 	
 	body->isDynamic			= true;
 	
@@ -498,13 +498,13 @@ void HangingCloth::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 
 
 	gSphere->radius			= radius;
-	gSphere->diffuseColor		= Vector3f(Mathf::unitRandom(),Mathf::unitRandom(),Mathf::unitRandom());
+	gSphere->diffuseColor		= Vector3f(Mathf::UnitRandom(),Mathf::UnitRandom(),Mathf::UnitRandom());
 	gSphere->wire			= false;
 	gSphere->visible		= true;
 	gSphere->shadowCaster		= true;
 	
 	iSphere->radius			= radius;
-	iSphere->diffuseColor		= Vector3f(Mathf::unitRandom(),Mathf::unitRandom(),Mathf::unitRandom());
+	iSphere->diffuseColor		= Vector3f(Mathf::UnitRandom(),Mathf::UnitRandom(),Mathf::UnitRandom());
 
 	body->interactingGeometry	= iSphere;
 	body->geometricalModel		= gSphere;
@@ -523,7 +523,7 @@ void HangingCloth::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r
 	
 	
 	Quaternionr q;
-	q.fromAxisAngle( Vector3r(0,0,1),0);
+	q.FromAxisAngle( Vector3r(0,0,1),0);
 
 	body->isDynamic			= false;
 	

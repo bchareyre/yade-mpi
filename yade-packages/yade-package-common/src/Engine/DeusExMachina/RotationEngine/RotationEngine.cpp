@@ -42,7 +42,7 @@ void RotationEngine::applyCondition(Body * body)
 	time = dt;
 
 	Quaternionr q;
-	q.fromAxisAngle(rotationAxis,angularVelocity*dt);
+	q.FromAxisAngle(rotationAxis,angularVelocity*dt);
 
 	Vector3r ax;
 	Real an;
@@ -56,8 +56,8 @@ void RotationEngine::applyCondition(Body * body)
 			
 		rb->se3.orientation	= q*rb->se3.orientation;
 
-		rb->se3.orientation.normalize();
-		rb->se3.orientation.toAxisAngle(ax,an);
+		rb->se3.orientation.Normalize();
+		rb->se3.orientation.ToAxisAngle(ax,an);
 		
 		rb->angularVelocity	= rotationAxis*angularVelocity;
 		rb->velocity		= Vector3r(0,0,0);

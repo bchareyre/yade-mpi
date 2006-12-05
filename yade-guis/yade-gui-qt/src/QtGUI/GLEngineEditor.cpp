@@ -112,7 +112,7 @@ void GLEngineEditor::drawArrow(int x1,int y1, int x2, int y2)
 	glEnd();
 
 	Vector2r v = Vector2r(x1-x2,y1-y2);
-	v.normalize();
+	v.Normalize();
 	v = v*10;
 	Vector2r n = Vector2r(-v[1],v[0]);
 	

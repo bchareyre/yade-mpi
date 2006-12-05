@@ -33,7 +33,7 @@ void CundallNonViscousMomentumDamping::go( 	  const shared_ptr<PhysicalAction>& 
 	RigidBodyParameters * rb = static_cast<RigidBodyParameters*>(b.get());
 	
 	Vector3r& m  = am->momentum;
-	Real sign = Mathr::sign( m.dot(rb->angularVelocity) );
+	Real sign = Mathr::Sign( m.Dot(rb->angularVelocity) );
 	m *= 1 - damping*sign;
 
 }

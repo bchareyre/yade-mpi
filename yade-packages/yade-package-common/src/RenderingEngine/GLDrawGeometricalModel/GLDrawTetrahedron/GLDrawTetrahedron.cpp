@@ -103,36 +103,36 @@ void GLDrawTetrahedron::go(const shared_ptr<GeometricalModel>& gm, const shared_
 		Vector3r center = 0.25*(tet->v1+tet->v2+tet->v3+tet->v4);
 		
 		glBegin(GL_TRIANGLES);
-			Vector3r n = (tet->v1-tet->v4).unitCross(tet->v2-tet->v4);
+			Vector3r n = (tet->v1-tet->v4).UnitCross(tet->v2-tet->v4);
 			Vector3r faceCenter = (tet->v4+tet->v1+tet->v2)/3.0;
-			if ((faceCenter-center).dot(n)<0)
+			if ((faceCenter-center).Dot(n)<0)
 				n = -n;
 			glNormal3v (n);
 			glVertex3v(tet->v4);
 			glVertex3v(tet->v1);
 			glVertex3v(tet->v2);
 			
-			n = (tet->v2-tet->v1).unitCross(tet->v3-tet->v1);
+			n = (tet->v2-tet->v1).UnitCross(tet->v3-tet->v1);
 			faceCenter = (tet->v1+tet->v2+tet->v3)/3.0;
-			if ((faceCenter-center).dot(n)<0)
+			if ((faceCenter-center).Dot(n)<0)
 				n = -n;
 			glNormal3v (n);
 			glVertex3v(tet->v1);
 			glVertex3v(tet->v2);
 			glVertex3v(tet->v3);
 
-			n = (tet->v3-tet->v2).unitCross(tet->v4-tet->v2);
+			n = (tet->v3-tet->v2).UnitCross(tet->v4-tet->v2);
 			faceCenter = (tet->v2+tet->v3+tet->v4)/3.0;
-			if ((faceCenter-center).dot(n)<0)
+			if ((faceCenter-center).Dot(n)<0)
 				n = -n;
 			glNormal3v (n);
 			glVertex3v(tet->v2);
 			glVertex3v(tet->v3);
 			glVertex3v(tet->v4);
 			
-			n = (tet->v4-tet->v3).unitCross(tet->v1-tet->v3);
+			n = (tet->v4-tet->v3).UnitCross(tet->v1-tet->v3);
 			faceCenter = (tet->v3+tet->v4+tet->v1)/3.0;
-			if ((faceCenter-center).dot(n)<0)
+			if ((faceCenter-center).Dot(n)<0)
 				n = -n;
 			glNormal3v (n);
 			glVertex3v(tet->v3);

@@ -59,15 +59,15 @@ void MassSpringLaw::action(Body * body)
 			Vector3r v1 = p2->se3.position;
 			Vector3r v2 = p1->se3.position;
 			
-			Real l  = (v2-v1).length();
+			Real l  = (v2-v1).Length();
 			
 			Real l0 = physics->initialLength;
 			
 			Vector3r dir = (v2-v1);
-			dir.normalize();
+			dir.Normalize();
 			
 			Real e  = (l-l0)/l0;
-			Real relativeVelocity = dir.dot((p1->velocity-p2->velocity));
+			Real relativeVelocity = dir.Dot((p1->velocity-p2->velocity));
 			Vector3r f3 = (e*physics->stiffness + relativeVelocity* ( 1.0 - physics->damping )  )*dir;
 			
 			static_cast<Force*>   ( physicalActions->find( id1 , actionForce->getClassIndex() ).get() )->force    -= f3;

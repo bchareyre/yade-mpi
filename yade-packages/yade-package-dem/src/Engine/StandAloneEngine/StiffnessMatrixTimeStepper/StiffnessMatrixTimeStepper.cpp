@@ -67,8 +67,8 @@ void StiffnessMatrixTimeStepper::findTimeStepFromBody(const shared_ptr<Body>& bo
 // 	Real Kn		= abs((Eab*Sinit/Dinit)*( (1+alpha)/(beta*(1+Vab) + gamma*(1-alpha*Dab) ) ));
 // 	Real Ks		= abs(Kn*(1-alpha*Vab)/(1+Vab));
 
-	Real dt = min (sqrt( sdec->mass  /  stiffness.x()) ,sqrt( sdec->mass  /  stiffness.y() ) );
-	dt = 0.3 * min (sqrt( sdec->mass  /  stiffness.z()), dt);
+	Real dt = min (sqrt( sdec->mass  /  stiffness.X()) ,sqrt( sdec->mass  /  stiffness.Y() ) );
+	dt = 0.3 * min (sqrt( sdec->mass  /  stiffness.Z()), dt);
 	
 	newDt = std::min(dt,newDt);
 	computedSomething = true;

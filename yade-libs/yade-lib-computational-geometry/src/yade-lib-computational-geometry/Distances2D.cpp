@@ -13,9 +13,9 @@
 Real distancePointLine2D(Vector2r p, Vector2r o,Vector2r d)
 {
 	Vector2r n = Vector2r(-d[1],d[0]);
-	n.normalize();
-	Real d0 = o.dot(n);
-	Real d1 = p.dot(n)-d0;
+	n.Normalize();
+	Real d0 = o.Dot(n);
+	Real d1 = p.Dot(n)-d0;
 	return d1;
 
 }
@@ -24,13 +24,13 @@ Real distancePointSegment2D(Vector2r p, Vector2r x1,Vector2r x2)
 {
 	Real d = distancePointLine2D(p, x1, x2-x1);
 	Vector2r n = Vector2r(x1[1]-x2[1],x2[0]-x1[0]);
-	n.normalize();
+	n.Normalize();
 	Vector2r pOn = p-d*n;
 	Real c;
 	if (!pointOnSegment2D(x1, x2, pOn, c))
 	{
-		d = (p-x1).length();
-		Real d2 = (p-x2).length();
+		d = (p-x1).Length();
+		Real d2 = (p-x2).Length();
 		if (d2<d)
 			d = d2;
 	}

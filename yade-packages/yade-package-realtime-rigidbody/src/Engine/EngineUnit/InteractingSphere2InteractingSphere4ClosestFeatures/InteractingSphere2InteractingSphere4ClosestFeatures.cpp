@@ -21,7 +21,7 @@ bool InteractingSphere2InteractingSphere4ClosestFeatures::go(		const shared_ptr<
 	shared_ptr<InteractingSphere> s2 = dynamic_pointer_cast<InteractingSphere>(cm2);
 	
 	Vector3r v = se31.position-se32.position;
-	Real l = v.normalize();
+	Real l = v.Normalize();
 	
 	if (l<s1->radius+s2->radius)
 	{

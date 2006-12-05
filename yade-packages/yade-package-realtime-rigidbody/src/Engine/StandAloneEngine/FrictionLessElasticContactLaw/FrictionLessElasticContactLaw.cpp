@@ -66,21 +66,21 @@ void FrictionLessElasticContactLaw::action(Body * body)
 				Vector3r o2p = (p - rb2->se3.position);
 	
 				Vector3r dir = p2-p1;
-				Real l  = dir.normalize();
+				Real l  = dir.Normalize();
 				Real elongation  = l*l;
 	
 				//Vector3r v1 = rb1->velocity+o1p.cross(rb1->angularVelocity);
 				//Vector3r v2 = rb2->velocity+o2p.cross(rb2->angularVelocity);
-				Vector3r v1 = rb1->velocity+rb1->angularVelocity.cross(o1p);
-				Vector3r v2 = rb2->velocity+rb2->angularVelocity.cross(o2p);
-				Real relativeVelocity = dir.dot(v2-v1);
+				Vector3r v1 = rb1->velocity+rb1->angularVelocity.Cross(o1p);
+				Vector3r v2 = rb2->velocity+rb2->angularVelocity.Cross(o2p);
+				Real relativeVelocity = dir.Dot(v2-v1);
 				Vector3r f = (elongation*stiffness+relativeVelocity*viscosity)/size*dir;
 	
 				static_cast<Force*>   ( ncb->physicalActions->find( id1 , actionForce   ->getClassIndex() ).get() )->force    += f;
 				static_cast<Force*>   ( ncb->physicalActions->find( id2 , actionForce   ->getClassIndex() ).get() )->force    -= f;
 			
-				static_cast<Momentum*>( ncb->physicalActions->find( id1 , actionMomentum->getClassIndex() ).get() )->momentum += o1p.cross(f);
-				static_cast<Momentum*>( ncb->physicalActions->find( id2 , actionMomentum->getClassIndex() ).get() )->momentum -= o2p.cross(f);
+				static_cast<Momentum*>( ncb->physicalActions->find( id1 , actionMomentum->getClassIndex() ).get() )->momentum += o1p.Cross(f);
+				static_cast<Momentum*>( ncb->physicalActions->find( id2 , actionMomentum->getClassIndex() ).get() )->momentum -= o2p.Cross(f);
 			}
 		}
 	}

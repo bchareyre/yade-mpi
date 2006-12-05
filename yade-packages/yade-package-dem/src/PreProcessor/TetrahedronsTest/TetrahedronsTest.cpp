@@ -173,17 +173,17 @@ void TetrahedronsTest::createTetrahedron(shared_ptr<Body>& body, int i, int j, i
 	
 	Quaternionr q;// = Quaternionr::IDENTITY;
 	// random orientation
-	q.fromAxisAngle( Vector3r(Mathr::symmetricRandom(),Mathr::symmetricRandom(),Mathr::symmetricRandom()),Mathr::symmetricRandom());
-	q.normalize();
+	q.FromAxisAngle( Vector3r(Mathr::SymmetricRandom(),Mathr::SymmetricRandom(),Mathr::SymmetricRandom()),Mathr::SymmetricRandom());
+	q.Normalize();
 
 	// semi-random position in the space
 	Vector3r position		= Vector3r(i,j,k)*(2*maxSize*1.1) // this formula is crazy !!
 					  - Vector3r( nbTetrahedrons[0]/2*(2*maxSize*1.1) , -7-maxSize*2 , nbTetrahedrons[2]/2*(2*maxSize*1.1) )
-					  + Vector3r( 	 Mathr::symmetricRandom()
-					  		,Mathr::symmetricRandom()
-							,Mathr::symmetricRandom())*maxSize*disorder;
+					  + Vector3r( 	 Mathr::SymmetricRandom()
+					  		,Mathr::SymmetricRandom()
+							,Mathr::SymmetricRandom())*maxSize*disorder;
 	
-	Real radius 			= (Mathr::intervalRandom(minSize,maxSize));
+	Real radius 			= (Mathr::IntervalRandom(minSize,maxSize));
 	
 	body->isDynamic			= true;
 
@@ -191,7 +191,7 @@ void TetrahedronsTest::createTetrahedron(shared_ptr<Body>& body, int i, int j, i
 	physics->velocity		= Vector3r(0,0,0);
 
 	makeTet(tet,radius);
-	tet->diffuseColor		= Vector3f(Mathf::unitRandom(),Mathf::unitRandom(),Mathf::unitRandom());
+	tet->diffuseColor		= Vector3f(Mathf::UnitRandom(),Mathf::UnitRandom(),Mathf::UnitRandom());
 	tet->wire			= false;
 	tet->visible			= true;
 	tet->shadowCaster		= false;
@@ -263,7 +263,7 @@ void TetrahedronsTest::createBox(shared_ptr<Body>& body, Vector3r position, Vect
 	shared_ptr<InteractingBox> iBox(new InteractingBox);
 	
 	Quaternionr q;
-	q.fromAxisAngle( Vector3r(0,0,1),0);
+	q.FromAxisAngle( Vector3r(0,0,1),0);
 
 	body->isDynamic			= false;
 	
@@ -396,7 +396,7 @@ void TetrahedronsTest::positionRootBody(shared_ptr<MetaBody>& rootBody)
 	rootBody->isDynamic		= false;
 	
 	Quaternionr q;
-	q.fromAxisAngle( Vector3r(0,0,1),0);
+	q.FromAxisAngle( Vector3r(0,0,1),0);
 
 	shared_ptr<ParticleParameters> physics(new ParticleParameters); // FIXME : fix indexable class PhysicalParameters
 	physics->se3				= Se3r(Vector3r(0,0,0),q);
@@ -418,9 +418,9 @@ void TetrahedronsTest::positionRootBody(shared_ptr<MetaBody>& rootBody)
 
 void TetrahedronsTest::makeTet(shared_ptr<Tetrahedron>& tet, Real size)
 {
-	tet->v1=size*(Mathr::unitRandom()*0.7+1.0)*Vector3r(0,0,1);
-	tet->v2=size*(Mathr::unitRandom()*0.7+1.0)*Vector3r(0.73,-0.6,-0.33);
-	tet->v3=size*(Mathr::unitRandom()*0.7+1.0)*Vector3r(-0.88,-0.33,-0.33);
-	tet->v4=size*(Mathr::unitRandom()*0.7+1.0)*Vector3r(0.16,0.93,-0.33);
+	tet->v1=size*(Mathr::UnitRandom()*0.7+1.0)*Vector3r(0,0,1);
+	tet->v2=size*(Mathr::UnitRandom()*0.7+1.0)*Vector3r(0.73,-0.6,-0.33);
+	tet->v3=size*(Mathr::UnitRandom()*0.7+1.0)*Vector3r(-0.88,-0.33,-0.33);
+	tet->v4=size*(Mathr::UnitRandom()*0.7+1.0)*Vector3r(0.16,0.93,-0.33);
 }
 

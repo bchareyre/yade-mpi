@@ -20,9 +20,9 @@ void GLDrawSphereShadowVolume::go(const shared_ptr<GeometricalModel>& gm , const
 	
 	Vector3r dir = lightPos-center;
 	Vector3r normalDir(-dir[1],dir[0],0);
-	normalDir.normalize();
+	normalDir.Normalize();
 	normalDir *= radius;
-	Vector3r biNormalDir = normalDir.unitCross(dir)*radius;
+	Vector3r biNormalDir = normalDir.UnitCross(dir)*radius;
 	
 	int nbSegments = 15;
 	

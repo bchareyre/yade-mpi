@@ -35,11 +35,11 @@ void LeapFrogOrientationIntegrator::go(	  const shared_ptr<PhysicalParameters>& 
 		
 	prevAngularVelocities[id] = rb->angularVelocity+0.5*dt*rb->angularAcceleration;
 	Vector3r axis = rb->angularVelocity;
-	Real angle = axis.normalize();
+	Real angle = axis.Normalize();
 	Quaternionr q;
-	q.fromAxisAngle(axis,angle*dt);
+	q.FromAxisAngle(axis,angle*dt);
 	rb->se3.orientation = q*rb->se3.orientation;
-	rb->se3.orientation.normalize();
+	rb->se3.orientation.Normalize();
 
 	firsts[id] = false;
 }

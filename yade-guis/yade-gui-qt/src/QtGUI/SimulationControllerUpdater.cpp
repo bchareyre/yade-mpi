@@ -67,7 +67,7 @@ void SimulationControllerUpdater::oneLoop()
 	{
 		Real second = (Real)(controller->sbSecond->value());
 		Real powerSecond = (Real)(controller->sb10PowerSecond->value());
-		Omega::instance().setTimeStep(second*Mathr::power(10,powerSecond));
+		Omega::instance().setTimeStep(second*Mathr::Pow(10,powerSecond));
 	}
 
 // 	Real dt = Omega::instance().getTimeStep();

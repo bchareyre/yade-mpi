@@ -91,7 +91,7 @@ bool NonLocalInitializer::calcNonLocal(Body* body1, Body* body2, BodyContainer* 
 	//if( ! nonl->find( body1->getId() , body2->getId() ) )
 	//if( ! exists )
 	{
-		Real sqDist = (beam1->se3.position - beam2->se3.position).squaredLength();
+		Real sqDist = (beam1->se3.position - beam2->se3.position).SquaredLength();
 	//	Real dist = (beam1->se3.position - beam2->se3.position).length();
 		Real len  = range;
 		if( sqDist < std::pow(3 * len,2) )

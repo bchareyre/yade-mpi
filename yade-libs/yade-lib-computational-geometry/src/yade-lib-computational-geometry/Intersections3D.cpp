@@ -15,9 +15,9 @@ void lineClosestApproach (const Vector3r pa, const Vector3r ua, const Vector3r p
 	
 	p = pb - pa;
 
-	Real uaub = ua.dot(ub);
-	Real q1 =  ua.dot(p);
-	Real q2 = -ub.dot(p);
+	Real uaub = ua.Dot(ub);
+	Real q1 =  ua.Dot(p);
+	Real q2 = -ub.Dot(p);
 	Real d = 1-uaub*uaub;
 	
 	if (d <= 0) 

@@ -33,23 +33,23 @@ bool InteractingBox2InteractingSphere4ErrorTolerantContact::go(		const shared_pt
 	
 	Vector3r extents = obb->extents;
 
-	se31.orientation.toRotationMatrix(axisT);
-	axis = axisT.transpose();
+	se31.orientation.ToRotationMatrix(axisT);
+	axis = axisT.Transpose();
 	
 	p = se32.position-se31.position;
 	
 	l[0] = extents[0];
-	t[0] = axis.getRow(0).dot(p); 
+	t[0] = axis.GetRow(0).Dot(p); 
 	if (t[0] < -l[0]) { t[0] = -l[0]; onborder = true; }
 	if (t[0] >  l[0]) { t[0] =  l[0]; onborder = true; }
 
 	l[1] = extents[1];
-	t[1] = axis.getRow(1).dot(p);
+	t[1] = axis.GetRow(1).Dot(p);
 	if (t[1] < -l[1]) { t[1] = -l[1]; onborder = true; }
 	if (t[1] >  l[1]) { t[1] =  l[1]; onborder = true; }
 
 	l[2] = extents[2];
-	t[2] = axis.getRow(2).dot(p);
+	t[2] = axis.GetRow(2).Dot(p);
 	if (t[2] < -l[2]) { t[2] = -l[2]; onborder = true; }
 	if (t[2] >  l[2]) { t[2] =  l[2]; onborder = true; }
 	
@@ -75,7 +75,7 @@ bool InteractingBox2InteractingSphere4ErrorTolerantContact::go(		const shared_pt
 		
 		normal = axisT*tmp;
 		
-		normal.normalize();
+		normal.Normalize();
 		
 		pt1 = se32.position + normal*min;
 		pt2 = se32.position - normal*s->radius;	
@@ -94,7 +94,7 @@ bool InteractingBox2InteractingSphere4ErrorTolerantContact::go(		const shared_pt
 	q = axisT*t;
 	r = p - q;
 	
-	depth = s->radius-sqrt(r.dot(r));
+	depth = s->radius-sqrt(r.Dot(r));
 	
 	if (depth < 0) 
 		return false;
@@ -102,7 +102,7 @@ bool InteractingBox2InteractingSphere4ErrorTolerantContact::go(		const shared_pt
 	pt1 = q + se31.position;
 
 	normal = r;
-	normal.normalize();
+	normal.Normalize();
 
 	pt2 = se32.position - normal * s->radius;
 		

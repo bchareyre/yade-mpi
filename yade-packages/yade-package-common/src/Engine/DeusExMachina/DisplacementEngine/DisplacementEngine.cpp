@@ -12,7 +12,7 @@
 void DisplacementEngine::postProcessAttributes(bool deserializing)
 {
 	if(deserializing)
-		translationAxis.normalize();
+		translationAxis.Normalize();
 }
 
 

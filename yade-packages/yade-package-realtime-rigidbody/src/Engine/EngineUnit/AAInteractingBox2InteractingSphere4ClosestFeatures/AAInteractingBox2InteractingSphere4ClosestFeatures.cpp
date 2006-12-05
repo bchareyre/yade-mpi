@@ -66,7 +66,7 @@ bool AAInteractingBox2InteractingSphere4ClosestFeatures::go(		const shared_ptr<I
 		
 		normal = tmp;
 		
-		normal.normalize();
+		normal.Normalize();
 		
 		pt1 = se32.position + normal*min;
 		pt2 = se32.position - normal*s->radius;
@@ -82,7 +82,7 @@ bool AAInteractingBox2InteractingSphere4ClosestFeatures::go(		const shared_ptr<I
 	
 	r = p - q;
 	
-	depth = s->radius-sqrt(r.dot(r));
+	depth = s->radius-sqrt(r.Dot(r));
 	
 	if (depth < 0)
 		return false;
@@ -90,7 +90,7 @@ bool AAInteractingBox2InteractingSphere4ClosestFeatures::go(		const shared_ptr<I
 	pt1 = q + se31.position;
 
 	normal = r;
-	normal.normalize();
+	normal.Normalize();
 
 	pt2 = se32.position - normal * s->radius;
 		

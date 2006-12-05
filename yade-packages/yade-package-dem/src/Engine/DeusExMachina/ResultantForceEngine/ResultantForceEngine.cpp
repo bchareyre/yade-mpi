@@ -80,9 +80,9 @@ void ResultantForceEngine::applyCondition(Body* body)
 			 	static_cast<Force*>( ncb->physicalActions->find( *ii,actionParameterForce->getClassIndex() ).get() )->force; 
 			Vector3r deltaf (effectiveforce - force);
 			Vector3r translation 
-				(stiffness.x()==0 ? Mathr::sign(deltaf.x())*max_vel : Mathr::sign(deltaf.x())*std::min( abs(deltaf.x()/stiffness.x()), max_vel),
-				stiffness.y()==0 ? Mathr::sign(deltaf.y())*max_vel : Mathr::sign(deltaf.y())*std::min( abs(deltaf.y()/stiffness.y()), max_vel),
-				stiffness.z()==0 ? Mathr::sign(deltaf.z())*max_vel : Mathr::sign(deltaf.z())*std::min( abs(deltaf.z()/stiffness.z()), max_vel) );
+				(stiffness.X()==0 ? Mathr::Sign(deltaf.X())*max_vel : Mathr::Sign(deltaf.X())*std::min( abs(deltaf.X()/stiffness.X()), max_vel),
+				stiffness.Y()==0 ? Mathr::Sign(deltaf.Y())*max_vel : Mathr::Sign(deltaf.Y())*std::min( abs(deltaf.Y()/stiffness.Y()), max_vel),
+				stiffness.Z()==0 ? Mathr::Sign(deltaf.Z())*max_vel : Mathr::Sign(deltaf.Z())*std::min( abs(deltaf.Z()/stiffness.Z()), max_vel) );
 			previoustranslation = (1-damping)*translation + 0.9*previoustranslation;// formula for "steady-flow" evolution with fluctuations
 			p->se3.position	+= previoustranslation;
 			//p->velocity		=  previoustranslation/dt;//FIXME : useless???	

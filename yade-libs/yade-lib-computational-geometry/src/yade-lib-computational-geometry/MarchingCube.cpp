@@ -216,7 +216,7 @@ const Vector3f& MarchingCube::computeNormalX(const vector<vector<vector<float> >
 	normal[2] =	interpolateValue( xyz, xp1yz, scalarField[x][y][z+1], scalarField[x+1][y][z+1] ) - 
 			interpolateValue( xyz, xp1yz, scalarField[x][y][z-1], scalarField[x+1][y][z-1] );
 			
-	normal.normalize();
+	normal.Normalize();
 	return normal;
 }
 
@@ -234,7 +234,7 @@ const Vector3f& MarchingCube::computeNormalY(const vector<vector<vector<float> >
 	normal[2] =	interpolateValue( xyz, xyp1z, scalarField[x][y][z+1], scalarField[x][y+1][z+1] ) - 
 			interpolateValue( xyz, xyp1z, scalarField[x][y][z-1], scalarField[x][y+1][z-1] );
 	
-	normal.normalize();
+	normal.Normalize();
 	return normal;
 } 
 
@@ -253,7 +253,7 @@ const Vector3f& MarchingCube::computeNormalZ(const vector<vector<vector<float> >
 			interpolateValue( xyz, xyzp1, scalarField[x][y-1][z], scalarField[x][y-1][z+1] ); 
 	normal[2] =	interpolateValue( xyzp1, xyz, scalarField[x][y][z+2]-xyz, xyzp1-scalarField[x][y][z-1] );
 	
-	normal.normalize();
+	normal.Normalize();
 	return normal;
 } 
 

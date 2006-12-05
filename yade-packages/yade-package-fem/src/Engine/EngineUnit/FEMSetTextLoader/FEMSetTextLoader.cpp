@@ -69,7 +69,7 @@ void FEMSetTextLoader::createNode( shared_ptr<Body>& body
 	shared_ptr<Sphere> gSphere(new Sphere);
 	
 	Quaternionr q;
-	q.fromAxisAngle( Vector3r(0,0,1) , 0 );
+	q.FromAxisAngle( Vector3r(0,0,1) , 0 );
 	
 	Real radius 			= 0.5;
 	

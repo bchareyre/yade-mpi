@@ -75,11 +75,11 @@ void ElasticContactLaw::action(Body* body)
 	
 	/// Here is the code with approximated rotations 	 ///
 			
-			axis	 		= currentContactPhysics->prevNormal.cross(currentContactGeometry->normal);
-			shearForce 	       -= shearForce.cross(axis);
-			angle 			= dt*0.5*currentContactGeometry->normal.dot(de1->angularVelocity+de2->angularVelocity);
+			axis	 		= currentContactPhysics->prevNormal.Cross(currentContactGeometry->normal);
+			shearForce 	       -= shearForce.Cross(axis);
+			angle 			= dt*0.5*currentContactGeometry->normal.Dot(de1->angularVelocity+de2->angularVelocity);
 			axis 			= angle*currentContactGeometry->normal;
-			shearForce 	       -= shearForce.cross(axis);
+			shearForce 	       -= shearForce.Cross(axis);
 		
 	/// Here is the code with exact rotations 		 ///
 	
@@ -101,16 +101,16 @@ void ElasticContactLaw::action(Body* body)
 			Vector3r x				= currentContactGeometry->contactPoint;
 			Vector3r c1x				= (x - de1->se3.position);
 			Vector3r c2x				= (x - de2->se3.position);
-			Vector3r relativeVelocity		= (de2->velocity+de2->angularVelocity.cross(c2x)) - (de1->velocity+de1->angularVelocity.cross(c1x));
-			Vector3r shearVelocity			= relativeVelocity-currentContactGeometry->normal.dot(relativeVelocity)*currentContactGeometry->normal;
+			Vector3r relativeVelocity		= (de2->velocity+de2->angularVelocity.Cross(c2x)) - (de1->velocity+de1->angularVelocity.Cross(c1x));
+			Vector3r shearVelocity			= relativeVelocity-currentContactGeometry->normal.Dot(relativeVelocity)*currentContactGeometry->normal;
 			Vector3r shearDisplacement		= shearVelocity*dt;
 			shearForce 			       -= currentContactPhysics->ks*shearDisplacement;
 	
 	// PFC3d SlipModel, is using friction angle. CoulombCriterion
-			Real maxFs = currentContactPhysics->normalForce.squaredLength() * std::pow(currentContactPhysics->tangensOfFrictionAngle,2);
-			if( shearForce.squaredLength() > maxFs )
+			Real maxFs = currentContactPhysics->normalForce.SquaredLength() * std::pow(currentContactPhysics->tangensOfFrictionAngle,2);
+			if( shearForce.SquaredLength() > maxFs )
 			{
-				maxFs = Mathr::sqRoot(maxFs) / shearForce.length();
+				maxFs = Mathr::Sqrt(maxFs) / shearForce.Length();
 				shearForce *= maxFs;
 			}
 	////////// PFC3d SlipModel
@@ -121,8 +121,8 @@ void ElasticContactLaw::action(Body* body)
 			static_cast<Force*>   ( ncb->physicalActions->find( id1 , actionForce   ->getClassIndex() ).get() )->force    -= f;
 			static_cast<Force*>   ( ncb->physicalActions->find( id2 , actionForce   ->getClassIndex() ).get() )->force    += f;
 			
-			static_cast<Momentum*>( ncb->physicalActions->find( id1 , actionMomentum->getClassIndex() ).get() )->momentum -= c1x.cross(f);
-			static_cast<Momentum*>( ncb->physicalActions->find( id2 , actionMomentum->getClassIndex() ).get() )->momentum += c2x.cross(f);
+			static_cast<Momentum*>( ncb->physicalActions->find( id1 , actionMomentum->getClassIndex() ).get() )->momentum -= c1x.Cross(f);
+			static_cast<Momentum*>( ncb->physicalActions->find( id2 , actionMomentum->getClassIndex() ).get() )->momentum += c2x.Cross(f);
 			
 			currentContactPhysics->prevNormal = currentContactGeometry->normal;
 		}

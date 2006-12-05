@@ -21,7 +21,7 @@ bool InteractingSphere2InteractingSphere4ErrorTolerantContact::go(		const shared
 	shared_ptr<Sphere> s2 = dynamic_pointer_cast<Sphere>(cm2);
 
 	Vector3r normal = se32.position-se31.position;
-	float penetrationDepth = s1->radius+s2->radius-normal.normalize();
+	float penetrationDepth = s1->radius+s2->radius-normal.Normalize();
 
 	if (penetrationDepth>0)
 	{

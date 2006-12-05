@@ -54,7 +54,7 @@ void GLDrawMesh2D::go(const shared_ptr<GeometricalModel>& gm, const shared_ptr<P
 			Vector3r v1 = vertices[faces[i][0]];
 			Vector3r v2 = vertices[faces[i][1]];
 			Vector3r v3 = vertices[faces[i][2]];
-			fNormals[i] = -(v2-v1).cross(v3-v1);
+			fNormals[i] = -(v2-v1).Cross(v3-v1);
 		}
 		for(unsigned int i=0;i<vertices.size();i++)
 		{

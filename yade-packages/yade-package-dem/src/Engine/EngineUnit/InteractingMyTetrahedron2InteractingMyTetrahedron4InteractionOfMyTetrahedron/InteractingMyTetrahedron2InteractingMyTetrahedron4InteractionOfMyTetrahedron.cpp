@@ -17,7 +17,7 @@ void InteractingMyTetrahedron2InteractingMyTetrahedron4InteractionOfMyTetrahedro
 	// and extract results from it, but those three lines are much shorter :)
 	normal = c2 - c1;
 	contactPoint = (c1 + c2)*0.5;
-	Real length = normal.normalize();
+	Real length = normal.Normalize();
 	penetrationDepth = ( r2 + r1 ) - length; // positive: penetration exists
 }
 

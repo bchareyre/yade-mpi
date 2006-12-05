@@ -24,7 +24,7 @@ bool InteractingSphere2InteractingSphere4SpheresContactGeometry::go(	const share
 	InteractingSphere* s2 = static_cast<InteractingSphere*>(cm2.get());
 
 	Vector3r normal = se32.position-se31.position;
-	Real penetrationDepth = s1->radius+s2->radius-normal.normalize();
+	Real penetrationDepth = s1->radius+s2->radius-normal.Normalize();
 
 	shared_ptr<SpheresContactGeometry> scm;
 	if (c->interactionGeometry)
@@ -39,7 +39,7 @@ bool InteractingSphere2InteractingSphere4SpheresContactGeometry::go(	const share
 			if(linkGeometry)
 			{
 				linkGeometry->normal 			= se32.position-se31.position;
-				linkGeometry->normal.normalize();
+				linkGeometry->normal.Normalize();
 				return true;
 			}
 			else

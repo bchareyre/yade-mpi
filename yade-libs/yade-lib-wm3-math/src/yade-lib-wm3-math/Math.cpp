@@ -58,7 +58,7 @@ double Math<double>::FastInvSqrt(double dValue) {
     // Need to determine how to access 64-bit integers, constants, and
     // use them on Macintosh and Linux.  The type int64_t defined in
     // stdint.h on those platforms still resolves to the 32-bit "long".
-    return (double)Math<float>::fastInvSqrt((float)dValue);
+    return (double)Math<float>::FastInvSqrt((float)dValue);
 //#endif
 
 }

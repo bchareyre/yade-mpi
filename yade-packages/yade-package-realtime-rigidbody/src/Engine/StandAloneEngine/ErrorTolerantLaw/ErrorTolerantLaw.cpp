@@ -114,8 +114,8 @@ void ErrorTolerantLaw::action(Body* body)
 				o1p1 		= cm->o1p1;
 				o2p2 		= cm->o2p2;
 				n 		= cm->normal;
-				o1p1CrossN 	= o1p1.cross(n);
-				o2p2CrossN 	= o2p2.cross(n);
+				o1p1CrossN 	= o1p1.Cross(n);
+				o2p2CrossN 	= o2p2.Cross(n);
 	
 				offset1		= 6*id1;
 				offset2		= 6*id2;
@@ -149,7 +149,7 @@ void ErrorTolerantLaw::action(Body* body)
 				Jt(i,offset2++)	= -o2p2CrossN[1];
 				Jt(i,offset2)	= -o2p2CrossN[2];
 	
-				penetrationDepthes[i] = (cm->closestPoints[0].first-cm->closestPoints[0].second).length();
+				penetrationDepthes[i] = (cm->closestPoints[0].first-cm->closestPoints[0].second).Length();
 	
 				//penetrationVelocities[i] = ( ((*bodies)[id1]->velocity+o1p1.cross((*bodies)[id1]->angularVelocity)) - ((*bodies)[id2]->velocity+o2p2.cross((*bodies)[id2]->angularVelocity)) ).dot(n);
 			}
@@ -183,7 +183,7 @@ void ErrorTolerantLaw::action(Body* body)
 			//Vector3r force = Omega::instance().getGravity()*rb->mass;
 			Vector3r force = Vector3r(0,-9.81,0)*rb->mass; // FIXME - use GravityEngine
 			int sign;
-			float f = force.length();
+			float f = force.Length();
 
 			for(int j=0;j<3;j++)  // FIXME - use CundallNonViscousForceDamping
 			{

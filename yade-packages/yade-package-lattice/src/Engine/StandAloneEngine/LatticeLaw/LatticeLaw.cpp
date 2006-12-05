@@ -54,7 +54,7 @@ void LatticeLaw::calcBeamPositionOrientationNewLength(Body* body, BodyContainer*
 	se3Beam.position 		  = (se3A.position + se3B.position)*0.5;
 	Vector3r dist 			  =  se3A.position - se3B.position;
 	
-	Real length 			  = dist.normalize();
+	Real length 			  = dist.Normalize();
 
 	beam->direction 		  = dist;
 	beam->length 			  = length;
@@ -62,18 +62,18 @@ void LatticeLaw::calcBeamPositionOrientationNewLength(Body* body, BodyContainer*
 /////////////////////////////////////////
 //	// rotate otherDirection
 //	{
-		beam->otherDirection -= beam->direction.dot(beam->otherDirection)*beam->direction;
+		beam->otherDirection -= beam->direction.Dot(beam->otherDirection)*beam->direction;
 		Quaternionr tor(beam->direction,beam->torsionAngle);
 		beam->otherDirection = tor * beam->otherDirection;
-		beam->otherDirection.normalize();
+		beam->otherDirection.Normalize();
 //	}
 /////////////////////////////////////////
 	
-	Vector3r CP			  = beam->direction.cross(beam->otherDirection);
-	se3Beam.orientation.fromRotationMatrix( Matrix3r( beam->direction , beam->otherDirection , CP , true ) );
+	Vector3r CP			  = beam->direction.Cross(beam->otherDirection);
+	se3Beam.orientation.FromRotationMatrix( Matrix3r( beam->direction , beam->otherDirection , CP , true ) );
 	
 	beam->se3Displacement.position    = se3Beam.position - beam->se3.position;
-	beam->se3Displacement.orientation = se3Beam.orientation * beam->se3.orientation.conjugate();
+	beam->se3Displacement.orientation = se3Beam.orientation * beam->se3.orientation.Conjugate();
 	
 	beam->se3 			  = se3Beam;
 
@@ -135,14 +135,14 @@ void LatticeLaw::action(Body* body)
 				bool		oldPS180	= planeSwap180;
 				Real		planeAngle;
 
-				newCP		= beam1->direction.cross(beam2->direction);
-				if(newCP.dot(lastCP)< 0.0)
+				newCP		= beam1->direction.Cross(beam2->direction);
+				if(newCP.Dot(lastCP)< 0.0)
 					planeSwap180=!planeSwap180;
 				
 				// beam1->direction and beam2->direction are unit vectors
 				planeAngle	= ( planeSwap180      ? -1.0 : 1.0 ) * beam1->direction.angleBetweenUnitVectors(beam2->direction);
 
-				Real sinAngleSquared = newCP.squaredLength();
+				Real sinAngleSquared = newCP.SquaredLength();
 				if(sinAngleSquared > 0.0001)
 					lastCP = newCP;
 				else
@@ -157,11 +157,11 @@ void LatticeLaw::action(Body* body)
 					while(angleDifference < -Mathr::PI) angleDifference += Mathr::TWO_PI;
 				
 				// axis of bending rotation is orthogonal to the plane between two beams and must have unit length
-				lastCP.normalize();
+				lastCP.Normalize();
 				Quaternionr rotationDifference1,rotationDifference2;
 
-				rotationDifference1.fromAxisAngle(lastCP, ( planeSwap180 ? -1.0 : 1.0 ) * angleDifference/beam1->count);
-				rotationDifference2.fromAxisAngle(lastCP, ( planeSwap180 ? 1.0 : -1.0 ) * angleDifference/beam2->count);
+				rotationDifference1.FromAxisAngle(lastCP, ( planeSwap180 ? -1.0 : 1.0 ) * angleDifference/beam1->count);
+				rotationDifference2.FromAxisAngle(lastCP, ( planeSwap180 ? 1.0 : -1.0 ) * angleDifference/beam2->count);
 				
 				beam1->bendingRotation = beam1->bendingRotation * rotationDifference1;
 				beam2->bendingRotation = beam2->bendingRotation * rotationDifference2;
@@ -179,16 +179,16 @@ void LatticeLaw::action(Body* body)
 		
 				/////////////////////////////////////////////////////////////
 				Quaternionr	aligner1,aligner2;
-				aligner1.fromAxisAngle(beam1->direction , offPlaneAngle1);
-				aligner2.fromAxisAngle(beam2->direction , offPlaneAngle2);
+				aligner1.FromAxisAngle(beam1->direction , offPlaneAngle1);
+				aligner2.FromAxisAngle(beam2->direction , offPlaneAngle2);
 						
 				Vector3r	dir1			= aligner1 * lastCP;
 				Vector3r	dir2			= aligner2 * lastCP;
 		
 				// FIXME
-				if( dir1.dot(beam1->otherDirection) < 0.999999 )
+				if( dir1.Dot(beam1->otherDirection) < 0.999999 )
 					offPlaneAngle1   *= -1.0;
-				if( dir2.dot(beam2->otherDirection) < 0.999999 )
+				if( dir2.Dot(beam2->otherDirection) < 0.999999 )
 					offPlaneAngle2   *= -1.0;
 				/////////////////////////////////////////////////////////////
 
@@ -243,8 +243,8 @@ void LatticeLaw::action(Body* body)
 				beam2->torsionAngle += 0.5*( swirlAngle2 + torsionAngle2)/beam2->count;
 				
 				//axis of torsional rotation is the other's beam direction, the beam tries to rotate its neighbours to fit its orientation
-				rotationDifference1.fromAxisAngle(beam2->direction, ((sameFlow ? -1.0 : 1.0)*swirlAngle1-torsionAngle2)/beam1->count);
-				rotationDifference2.fromAxisAngle(beam1->direction, ((sameFlow ? -1.0 : 1.0)*swirlAngle2-torsionAngle1)/beam2->count);
+				rotationDifference1.FromAxisAngle(beam2->direction, ((sameFlow ? -1.0 : 1.0)*swirlAngle1-torsionAngle2)/beam1->count);
+				rotationDifference2.FromAxisAngle(beam1->direction, ((sameFlow ? -1.0 : 1.0)*swirlAngle2-torsionAngle1)/beam2->count);
 			
 				beam1->torsionalRotation = beam1->torsionalRotation * rotationDifference1;
 				beam2->torsionalRotation = beam2->torsionalRotation * rotationDifference2;

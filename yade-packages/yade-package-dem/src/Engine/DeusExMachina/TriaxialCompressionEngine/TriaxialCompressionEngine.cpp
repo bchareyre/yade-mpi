@@ -33,7 +33,7 @@ TriaxialCompressionEngine::~TriaxialCompressionEngine()
 void TriaxialCompressionEngine::postProcessAttributes(bool deserializing)
 {
 	if(deserializing)
-        translationAxis.normalize();
+        translationAxis.Normalize();
 }
 
 
@@ -107,7 +107,7 @@ Real TriaxialCompressionEngine::ComputeUnbalancedForce(Body * body, bool maxUnba
         for(  ; ii!=iiEnd ; ++ii ) {
                 if ((*ii)->isReal) {
                         const shared_ptr<Interaction>& contact = *ii;
-                        MeanForce += (static_cast<ElasticContactInteraction*> (contact->interactionPhysics.get()))->normalForce.length();
+                        MeanForce += (static_cast<ElasticContactInteraction*> (contact->interactionPhysics.get()))->normalForce.Length();
                         ++nForce;
                 }
         }
@@ -124,7 +124,7 @@ Real TriaxialCompressionEngine::ComputeUnbalancedForce(Body * body, bool maxUnba
                 Real f;
                 for(  ; bi!=biEnd ; ++bi ) {
                         if ((*bi)->isDynamic) {
-                                f= (static_cast<Force*>   ( ncb->physicalActions->find( (*bi)->getId() , actionForceIndex).get() )->force).length();
+                                f= (static_cast<Force*>   ( ncb->physicalActions->find( (*bi)->getId() , actionForceIndex).get() )->force).Length();
                                 MeanUnbalanced += f;
                                 if (f!=0) ++nBodies;
                         }
@@ -137,7 +137,7 @@ Real TriaxialCompressionEngine::ComputeUnbalancedForce(Body * body, bool maxUnba
                 BodyContainer::iterator biEnd = bodies->end();
                 for(  ; bi!=biEnd ; ++bi ) {
                         if ((*bi)->isDynamic) {
-                                MaxUnbalanced = std::max((static_cast<Force*>   ( ncb->physicalActions->find( (*bi)->getId() , actionForceIndex).get() )->force).length(), MaxUnbalanced);
+                                MaxUnbalanced = std::max((static_cast<Force*>   ( ncb->physicalActions->find( (*bi)->getId() , actionForceIndex).get() )->force).Length(), MaxUnbalanced);
                         }
                 }
                 return MaxUnbalanced/MeanForce;

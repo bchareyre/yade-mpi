@@ -184,7 +184,7 @@ string SDECLinkedSpheres::generate()
 			shared_ptr<InteractingSphere>	as = dynamic_pointer_cast<InteractingSphere>(bodyA->interactingGeometry);
 			shared_ptr<InteractingSphere>	bs = dynamic_pointer_cast<InteractingSphere>(bodyB->interactingGeometry);
 
-			if ((a->se3.position - b->se3.position).length() < (as->radius + bs->radius))  
+			if ((a->se3.position - b->se3.position).Length() < (as->radius + bs->radius))  
 			{
 				shared_ptr<Interaction> 		link(new Interaction( bodyA->getId() , bodyB->getId() ));
 				shared_ptr<SDECLinkGeometry>		geometry(new SDECLinkGeometry);
@@ -196,7 +196,7 @@ string SDECLinkedSpheres::generate()
 				physics->initialKn			= 50000000; // FIXME - BIG problem here.
 				physics->initialKs			= 5000000;
 				physics->heta				= 1;
-				physics->initialEquilibriumDistance	= (a->se3.position - b->se3.position).length();
+				physics->initialEquilibriumDistance	= (a->se3.position - b->se3.position).Length();
 				physics->knMax				= 5500000;
 				physics->ksMax				= 550000;
 
@@ -225,14 +225,14 @@ void SDECLinkedSpheres::createSphere(shared_ptr<Body>& body, int i, int j, int k
 	shared_ptr<InteractingSphere> iSphere(new InteractingSphere);
 	
 	Quaternionr q;
-	q.fromAxisAngle( Vector3r(0,0,1),0);
+	q.FromAxisAngle( Vector3r(0,0,1),0);
 	
 		
 	Vector3r position 		= Vector3r(i,j,k)*spacing
 					  - Vector3r(nbSpheres[0]/2*spacing,nbSpheres[1]/2*spacing-90,nbSpheres[2]/2*spacing) 
-					  + Vector3r(Mathr::symmetricRandom()*disorder,Mathr::symmetricRandom()*disorder,Mathr::symmetricRandom()*disorder);
+					  + Vector3r(Mathr::SymmetricRandom()*disorder,Mathr::SymmetricRandom()*disorder,Mathr::SymmetricRandom()*disorder);
 
-	Real radius 			= (Mathr::intervalRandom(minRadius,maxRadius));
+	Real radius 			= (Mathr::IntervalRandom(minRadius,maxRadius));
 	
 	body->isDynamic			= true;
 	
@@ -249,13 +249,13 @@ void SDECLinkedSpheres::createSphere(shared_ptr<Body>& body, int i, int j, int k
 
 
 	gSphere->radius			= radius;
-	gSphere->diffuseColor		= Vector3f(Mathf::unitRandom(),Mathf::unitRandom(),Mathf::unitRandom());
+	gSphere->diffuseColor		= Vector3f(Mathf::UnitRandom(),Mathf::UnitRandom(),Mathf::UnitRandom());
 	gSphere->wire			= false;
 	gSphere->visible		= true;
 	gSphere->shadowCaster		= true;
 	
 	iSphere->radius			= radius;
-	iSphere->diffuseColor		= Vector3f(Mathf::unitRandom(),Mathf::unitRandom(),Mathf::unitRandom());
+	iSphere->diffuseColor		= Vector3f(Mathf::UnitRandom(),Mathf::UnitRandom(),Mathf::UnitRandom());
 
 	body->interactingGeometry	= iSphere;
 	body->geometricalModel		= gSphere;
@@ -273,7 +273,7 @@ void SDECLinkedSpheres::createBox(shared_ptr<Body>& body, Vector3r position, Vec
 	shared_ptr<InteractingBox> iBox(new InteractingBox);
 	
 	Quaternionr q;
-	q.fromAxisAngle( Vector3r(0,0,1),0);
+	q.FromAxisAngle( Vector3r(0,0,1),0);
 
 	body->isDynamic			= false;
 	
@@ -387,7 +387,7 @@ void SDECLinkedSpheres::positionRootBody(shared_ptr<MetaBody>& rootBody)
 	rootBody->isDynamic		= false;
 	
 	Quaternionr q;
-	q.fromAxisAngle( Vector3r(0,0,1),0);
+	q.FromAxisAngle( Vector3r(0,0,1),0);
 	
 	shared_ptr<ParticleParameters> physics(new ParticleParameters); // FIXME : fix indexable class PhysicalParameters
 	physics->se3			= Se3r(Vector3r(0,0,0),q);

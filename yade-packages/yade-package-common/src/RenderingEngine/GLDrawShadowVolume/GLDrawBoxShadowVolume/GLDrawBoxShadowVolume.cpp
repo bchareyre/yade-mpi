@@ -264,7 +264,7 @@ void GLDrawBoxShadowVolume::go(const shared_ptr<GeometricalModel>& gm , const sh
 	
 	Real angle;
 	Vector3r axis;	
-	se3.orientation.toAxisAngle(axis,angle);	
+	se3.orientation.ToAxisAngle(axis,angle);	
 	glTranslatef(se3.position[0],se3.position[1],se3.position[2]);
 	glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);	
 
