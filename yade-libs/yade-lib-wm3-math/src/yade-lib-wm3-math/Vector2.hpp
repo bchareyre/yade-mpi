@@ -8,9 +8,16 @@
 // may not be copied or disclosed except in accordance with the terms of that
 // agreement.
 
-#ifndef WM3VECTOR2_H
-#define WM3VECTOR2_H
+#ifndef YADE_WM3VECTOR2_H
+#define YADE_WM3VECTOR2_H
 
+#warning Deprecated header, include <Wm3Vector2.h> and <yade/yade-core/yadeWm3.hpp> instead
+
+#ifndef USE_BASTARDIZED_WM3
+#include<Wm3Vector2.h>
+#include<yade/yade-core/yadeWm3.hpp>
+using namespace Wm3;
+#else
 #include "Math.hpp"
 
 //namespace Wm3
@@ -72,9 +79,12 @@ public:
     RealType Dot(const Vector2& rkV) const ;
 	__attribute__((deprecated)) inline     RealType normalize(){return Normalize();}
     RealType Normalize() ;
-    Vector2 maxVector (const Vector2& rkV) const;
-    Vector2 minVector (const Vector2& rkV) const;
-    Vector2 multDiag (const Vector2& rkV) const;
+
+	// added by the yade team
+   __attribute__((deprecated)) Vector2 maxVector (const Vector2& rkV) const;
+   __attribute__((deprecated)) Vector2 minVector (const Vector2& rkV) const;
+   __attribute__((deprecated)) Vector2 multDiag (const Vector2& rkV) const;
+	// end
     
     // returns (y,-x)
 	__attribute__((deprecated)) inline     Vector2 perp() const{return Perp();}
@@ -131,4 +141,4 @@ typedef Vector2<Real> Vector2r;
 //}
 
 #endif
-
+#endif

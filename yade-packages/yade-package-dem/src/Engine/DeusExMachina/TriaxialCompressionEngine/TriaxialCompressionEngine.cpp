@@ -11,6 +11,7 @@
 #include <yade/yade-core/Omega.hpp>
 #include <yade/yade-package-common/Force.hpp>
 #include "ElasticContactInteraction.hpp"
+#include <yade/yade-core/yadeWm3Extra.hpp>
 
 
 TriaxialCompressionEngine::TriaxialCompressionEngine() : actionForce(new Force)

@@ -12,6 +12,7 @@
 #include "RotationEngine.hpp"
 #include "RigidBodyParameters.hpp"
 #include <yade/yade-core/MetaBody.hpp>
+#include <yade/yade-core/yadeWm3Extra.hpp>
 
 
 RotationEngine::RotationEngine()

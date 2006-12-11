@@ -14,6 +14,7 @@
 #include "LatticeSetParameters.hpp"
 #include <yade/yade-core/BodyContainer.hpp>
 #include <yade/yade-core/MetaBody.hpp>
+#include <yade/yade-core/yadeWm3Extra.hpp>
 
 LatticeLaw::LatticeLaw() : InteractionSolver()
 {
@@ -140,7 +141,7 @@ void LatticeLaw::action(Body* body)
 					planeSwap180=!planeSwap180;
 				
 				// beam1->direction and beam2->direction are unit vectors
-				planeAngle	= ( planeSwap180      ? -1.0 : 1.0 ) * beam1->direction.angleBetweenUnitVectors(beam2->direction);
+				planeAngle	= ( planeSwap180      ? -1.0 : 1.0 ) * unitVectorsAngle(beam1->direction,beam2->direction);
 
 				Real sinAngleSquared = newCP.SquaredLength();
 				if(sinAngleSquared > 0.0001)
@@ -174,8 +175,8 @@ void LatticeLaw::action(Body* body)
 				if( (beam1->id1 == beam2->id1) || (beam1->id2 == beam2->id2) )
 					sameFlow		= false;
 
-				Real offPlaneAngle1		= beam1->otherDirection.angleBetweenUnitVectors(lastCP);
-				Real offPlaneAngle2		= beam2->otherDirection.angleBetweenUnitVectors(lastCP);
+				Real offPlaneAngle1		= unitVectorsAngle(beam1->otherDirection,lastCP);
+				Real offPlaneAngle2		= unitVectorsAngle(beam2->otherDirection,lastCP);
 		
 				/////////////////////////////////////////////////////////////
 				Quaternionr	aligner1,aligner2;

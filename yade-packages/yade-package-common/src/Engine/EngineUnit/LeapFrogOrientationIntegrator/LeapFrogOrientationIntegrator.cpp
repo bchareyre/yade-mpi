@@ -31,9 +31,9 @@ void LeapFrogOrientationIntegrator::go(	  const shared_ptr<PhysicalParameters>& 
 	Real dt = Omega::instance().getTimeStep();
 		
 	if (!firsts[id])
-		rb->angularVelocity = prevAngularVelocities[id]+0.5*dt*rb->angularAcceleration;
+		rb->angularVelocity = prevAngularVelocities[id]+rb->angularAcceleration*0.5*dt;
 		
-	prevAngularVelocities[id] = rb->angularVelocity+0.5*dt*rb->angularAcceleration;
+	prevAngularVelocities[id] = rb->angularVelocity+((Real)(0.5*dt))*rb->angularAcceleration;
 	Vector3r axis = rb->angularVelocity;
 	Real angle = axis.Normalize();
 	Quaternionr q;

@@ -15,6 +15,8 @@
 #include "InteractingMyTetrahedron.hpp"
 #include "MyTetrahedronLaw.hpp"
 
+#include <yade/yade-core/yadeWm3Extra.hpp>
+
 #include <yade/yade-package-common/Box.hpp>
 #include <yade/yade-package-common/AABB.hpp>
 #include <yade/yade-core/MetaBody.hpp>

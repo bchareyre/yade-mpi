@@ -8,10 +8,19 @@
 // may not be copied or disclosed except in accordance with the terms of that
 // agreement.
 
-#ifndef WM3VECTOR3_H
-#define WM3VECTOR3_H
+#ifndef YADE_WM3VECTOR3_H
+#define YADE_WM3VECTOR3_H
+
+#warning Deprecated header, include <Wm3Vector3.h> and <yade/yade-core/yadeWm3.hpp> instead
+
+#ifndef USE_BASTARDIZED_WM3
+#include<Wm3Vector3.h>
+#include<yade/yade-core/yadeWm3.hpp>
+using namespace Wm3;
+#else
 
 #include "Math.hpp"
+
 #include <algorithm>
 
 #include <iostream>
@@ -83,13 +92,16 @@ public:
     RealType SquaredLength() const ;
 	__attribute__((deprecated)) inline     RealType dot(const Vector3& rkV) const{return Dot(rkV);}
     RealType Dot(const Vector3& rkV) const ;
-    RealType angleBetweenUnitVectors(const Vector3& rkV) const;
 	__attribute__((deprecated)) inline     RealType normalize(){return Normalize();}
     RealType Normalize() ;
-    Vector3 maxVector (const Vector3& rkV) const;
-    Vector3 minVector (const Vector3& rkV) const;
-    Vector3 multDiag (const Vector3& rkV) const;
-    Vector3 divDiag (const Vector3& rkV) const;
+
+	 // added by the yade team
+    __attribute__((deprecated)) RealType angleBetweenUnitVectors(const Vector3& rkV) const;
+   __attribute__((deprecated))  Vector3 maxVector (const Vector3& rkV) const;
+  __attribute__((deprecated))   Vector3 minVector (const Vector3& rkV) const;
+  __attribute__((deprecated))   Vector3 multDiag (const Vector3& rkV) const;
+  __attribute__((deprecated))   Vector3 divDiag (const Vector3& rkV) const;
+  	 // end
 
     // The cross products are computed using the right-handed rule.  Be aware
     // that some graphics APIs use a left-handed rule.  If you have to compute
@@ -154,4 +166,4 @@ typedef Vector3<Real> Vector3r;
 //}
 
 #endif
-
+#endif

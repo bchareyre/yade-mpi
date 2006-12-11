@@ -10,6 +10,9 @@
 #include "InteractionOfMyTetrahedron.hpp"
 #include "InteractingMyTetrahedron.hpp"
 
+#include <yade/yade-core/yadeWm3Extra.hpp>
+
+
 void InteractingMyTetrahedron2InteractingMyTetrahedron4InteractionOfMyTetrahedron::calcTwoSpheres(
 		Vector3r c1, Real r1, Vector3r c2, Real r2, Real& penetrationDepth, Vector3r& normal, Vector3r& contactPoint)
 {

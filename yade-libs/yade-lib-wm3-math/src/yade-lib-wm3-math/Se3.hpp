@@ -6,13 +6,12 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef SE3_HPP
-#define SE3_HPP
+#ifndef YADE_SE3_HPP
+#define YADE_SE3_HPP
 
-
+#include "Math.hpp"
 #include "Quaternion.hpp"
 #include "Vector3.hpp"
-
 
 template <class RealType>
 class Se3

@@ -13,6 +13,8 @@
 #include "SDECLinkGeometry.hpp"
 #include <yade/yade-package-common/InteractingSphere.hpp>
 
+#include <yade/yade-core/yadeWm3Extra.hpp>
+
 
 bool InteractingSphere2InteractingSphere4SpheresContactGeometry::go(	const shared_ptr<InteractingGeometry>& cm1,
 							const shared_ptr<InteractingGeometry>& cm2,

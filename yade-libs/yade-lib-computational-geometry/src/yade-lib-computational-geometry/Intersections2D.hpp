@@ -9,6 +9,7 @@
 #ifndef INTERSECTION2D_HPP
 #define INTERSECTION2D_HPP
 
+#include <yade/yade-lib-wm3-math/Math.hpp>
 #include <yade/yade-lib-wm3-math/Vector3.hpp>
 #include <yade/yade-lib-wm3-math/Vector2.hpp>
 #include <vector>

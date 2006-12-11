@@ -12,6 +12,8 @@
 #include "yade/yade-package-common/Force.hpp"
 #include "StiffnessMatrix.hpp"
 #include <yade/yade-lib-wm3-math/Math.hpp>
+#include <yade/yade-core/yadeWm3Extra.hpp>
+
 
 
 #include <yade/yade-core/MetaBody.hpp>

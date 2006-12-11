@@ -13,6 +13,7 @@
 #include <string>
 #include <vector>
 #include <yade/yade-lib-wm3-math/Vector3.hpp>
+#include <yade/yade-core/yadeWm3Extra.hpp>
 
 using namespace std;
 
@@ -21,24 +22,24 @@ class MarchingCube
 
 /// ATTRIBUTES
 
-	private : vector<Vector3f> triangles;
-	public  : const vector<Vector3f>& getTriangles() { return triangles; }
+	private : vector<Vector3r> triangles;
+	public  : const vector<Vector3r>& getTriangles() { return triangles; }
 	
-	private : vector<Vector3f> normals;
-	public  : const vector<Vector3f>& getNormals() { return normals; }
+	private : vector<Vector3r> normals;
+	public  : const vector<Vector3r>& getNormals() { return normals; }
 
 	private : int nbTriangles;
 	public  : int getNbTriangles() { return nbTriangles; }
   
-	private : Vector3f beta;
-	private : Vector3f alpha;
+	private : Vector3r beta;
+	private : Vector3r alpha;
 	private : int sizeX,sizeY,sizeZ;
 	private : float isoValue;
   
-	private : vector<vector<vector<Vector3f> > > positions;
+	private : vector<vector<vector<Vector3r> > > positions;
 	private : static const int edgeArray[256];
 	private : static const int triTable[256][16];
-	Vector3f aNormal;	
+	Vector3r aNormal;	
 	
 /// PRIVATE METHOD
   
@@ -51,15 +52,15 @@ class MarchingCube
   	private : void computeNormal(const vector<vector<vector<float> > >& scalarField, int x, int y, int z,int offset, int triangleNum);
 	
 	/** interpolate coordinates of point vect (that is on isosurface) from coordinates of points vect1 et vect2 **/
-	private : void interpolate (const Vector3f&  vect1, const Vector3f& vect2, float val1, float val2,Vector3f& vect);
+	private : void interpolate (const Vector3r&  vect1, const Vector3r& vect2, float val1, float val2,Vector3r& vect);
 
 	/** Same as interpolate but in 1D **/
 	private : float interpolateValue(float val1, float val2, float val_cible1, float val_cible2);
 
 	/** Compute normal to vertice or triangle inside cell (x,y,z) **/
-	private : const Vector3f& computeNormalX(const vector<vector<vector<float> > >& scalarField, int x, int y, int z);
-	private : const Vector3f& computeNormalY(const vector<vector<vector<float> > >& scalarField, int x, int y, int z );
-	private : const Vector3f& computeNormalZ(const vector<vector<vector<float> > >& scalarField, int x, int y, int z); 
+	private : const Vector3r& computeNormalX(const vector<vector<vector<float> > >& scalarField, int x, int y, int z);
+	private : const Vector3r& computeNormalY(const vector<vector<vector<float> > >& scalarField, int x, int y, int z );
+	private : const Vector3r& computeNormalZ(const vector<vector<vector<float> > >& scalarField, int x, int y, int z); 
 
 /// CONSTRUCTOR/DESTRUCTOR
 
@@ -70,7 +71,7 @@ class MarchingCube
 
 	public  : void computeTriangulation(const vector<vector<vector<float> > >& scalarField, float iso);
 
-	public  : void init(int sx, int sy, int sz, const Vector3f& min, const Vector3f& max);
+	public  : void init(int sx, int sy, int sz, const Vector3r& min, const Vector3r& max);
 
 	public  : void resizeScalarField(vector<vector<vector<float> > >& scalarField, int sx, int sy, int sz);
 };

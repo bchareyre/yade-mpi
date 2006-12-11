@@ -302,7 +302,7 @@ def scriptGen(v,dir):
 		if installable.has_key((env,targetType)): installable[(env,targetType)].append(pythonicTarget(target))
 		else: installable[(env,targetType)]=[pythonicTarget(target),]
 		if len(libs)>0:
-			ret+=",%sLIBS=%s"%(fieldSep,toStr(libs))
+			ret+=",%sLIBS=%s['LIBS']+%s"%(fieldSep,env,toStr(libs))
 		if len(includePath)>0:
 			# using CPPPATH would override top-level settings (question posted on scons ML how to avoid this)
 			# for now, put all paths prefixed with -I to CPPFLAGS as workaround

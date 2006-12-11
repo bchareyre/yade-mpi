@@ -83,16 +83,18 @@ class MetaDispatchingEngine2D : public MetaDispatchingEngine,
 
 //REGISTER_SERIALIZABLE(MetaDispatchingEngine2D,false);
 
-// #define REGISTER_BASE_CLASS_TYPE_2D(name1,name2)			\
-// 	public : virtual string getBaseClassType(unsigned int i)	\
-// 	{								\
-// 		switch (i)						\
-// 		{							\
-// 			case 0  : return #name1;			\
-// 			case 1  : return #name2;			\
-// 			default : return "";				\
-// 		}							\
-// 	}	
+/*
+#define REGISTER_BASE_CLASS_TYPE_2D(name1,name2)			\
+ 	public : virtual string getBaseClassType(unsigned int i)	\
+ 	{								\
+ 		switch (i)						\
+ 		{							\
+ 			case 0  : return #name1;			\
+ 			case 1  : return #name2;			\
+ 			default : return "";				\
+ 		}							\
+ 	}	
+*/
 
 #endif // METADISPATCHINGENGINE2D_HPP
 

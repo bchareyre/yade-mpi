@@ -31,9 +31,9 @@ void LeapFrogPositionIntegrator::go(       const shared_ptr<PhysicalParameters>&
 	Real dt = Omega::instance().getTimeStep();
 
 	if (!firsts[id])
-		p->velocity = prevVelocities[id]+0.5*dt*p->acceleration;
+		p->velocity = prevVelocities[id]+((Real)0.5)*dt*p->acceleration;
 
-	prevVelocities[id] = p->velocity+0.5*dt*p->acceleration;
+	prevVelocities[id] = p->velocity+((Real)0.5)*dt*p->acceleration;
 	p->se3.position += prevVelocities[id]*dt;
 
 	firsts[id] = false;

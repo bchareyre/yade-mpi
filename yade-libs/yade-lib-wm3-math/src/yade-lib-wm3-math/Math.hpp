@@ -8,8 +8,25 @@
 // may not be copied or disclosed except in accordance with the terms of that
 // agreement.
 
-#ifndef WM3MATH_H
-#define WM3MATH_H
+#ifndef YADE_WM3MATH_H
+#define YADE_WM3MATH_H
+
+#warning Deprecated header, include <Wm3Math.h> and <yade/yade-core/yadeWm3.hpp> instead
+
+#ifndef USE_BASTARDIZED_WM3
+#include<Wm3Math.h>
+#include<yade/yade-core/yadeWm3.hpp>
+using namespace Wm3;
+#else
+
+#ifdef DOUBLE_PRECISION
+	typedef double Real;
+#else
+	typedef float Real;
+#endif
+
+// for i in *.hpp; do perl -pi -e"s@#warning.*@#warning Deprecated header, include <Wm3${i%%.hpp}.h> and <yade/yade-core/yadeWm3.hpp> instead@" $i; done
+
 
 //#include "Wm3System.h"
 
@@ -187,19 +204,13 @@ public:
     } \
 }
 
-#ifdef DOUBLE_PRECISION
-	typedef double Real;
-#else
-	typedef float Real;
-#endif
 
 typedef Math<float> Mathf;
 typedef Math<double> Mathd;
-
 typedef Math<Real> Mathr;
 
 
 //}
 
 #endif
-
+#endif

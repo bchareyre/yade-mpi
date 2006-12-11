@@ -13,6 +13,9 @@
 #include <yade/yade-package-common/InteractingSphere.hpp>
 #include <yade/yade-package-common/InteractingBox.hpp>
 
+#include <yade/yade-core/yadeWm3Extra.hpp>
+
+
 bool InteractingBox2InteractingSphere4SpheresContactGeometry::go(
 		const shared_ptr<InteractingGeometry>& cm1,
 		const shared_ptr<InteractingGeometry>& cm2,

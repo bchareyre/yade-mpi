@@ -20,14 +20,14 @@ MarchingCube::~MarchingCube()
 }
 
 
-void  MarchingCube::init(int sx, int sy, int sz, const Vector3f& min, const Vector3f& max) 
+void  MarchingCube::init(int sx, int sy, int sz, const Vector3r& min, const Vector3r& max) 
 {
 	sizeX = sx;
 	sizeY = sy;
 	sizeZ = sz;
 	
-	alpha	= (max-min).multDiag(Vector3f(1.0/(float)sx, 1.0/(float)sy, 1.0/(float)sz));
-	beta	= 0.5*(min-max).multDiag(Vector3f(1.0/(float)sx, 1.0/(float)sy, 1.0/(float)sz))+min;
+	alpha	= diagMult(max-min,Vector3r(1.0/(float)sx, 1.0/(float)sy, 1.0/(float)sz));
+	beta	= diagMult(min-max,Vector3r(1.0/(Real)sx, 1.0/(Real)sy, 1.0/(Real)sz))*.5+min;
 
 	triangles.resize(16*sx*sy*sz);
 	normals.resize(16*sx*sy*sz);
@@ -42,7 +42,7 @@ void  MarchingCube::init(int sx, int sy, int sz, const Vector3f& min, const Vect
 	for(int i=0;i<sizeX;i++)
 		for(int j=0;j<sizeY;j++)
 			for(int k=0;k<sizeZ;k++) 
-				positions[i][j][k] = alpha.multDiag(Vector3f(i,j,k))+beta;
+				positions[i][j][k] = diagMult(alpha,Vector3r(i,j,k))+beta;
 }
 
 
@@ -71,8 +71,8 @@ void MarchingCube::computeTriangulation(const vector<vector<vector<float> > >& s
 void MarchingCube::polygonize(const vector<vector<vector<float> > >& scalarField, int x,int y,int z)
 {
 	static vector<float> cellValues(8);
-	static vector<Vector3f> cellPositions(8);
-	static vector<Vector3f> vertexList(12);
+	static vector<Vector3r> cellPositions(8);
+	static vector<Vector3r> vertexList(12);
 	
 	cellValues[0] = scalarField[x][y][z];
 	cellValues[1] = scalarField[x+1][y][z];
@@ -187,7 +187,7 @@ void MarchingCube::computeNormal(const vector<vector<vector<float> > >& scalarFi
 }
 
 
-void MarchingCube::interpolate(const Vector3f& vect1, const Vector3f& vect2, float val1, float val2, Vector3f& vect) 
+void MarchingCube::interpolate(const Vector3r& vect1, const Vector3r& vect2, float val1, float val2, Vector3r& vect) 
 {
 	vect[0] =  interpolateValue(val1, val2, vect1[0], vect2[0]);
 	vect[1] =  interpolateValue(val1, val2, vect1[1], vect2[1]);
@@ -203,9 +203,9 @@ float MarchingCube::interpolateValue( float val1, float val2, float val_cible1, 
 } 
 
 				   
-const Vector3f& MarchingCube::computeNormalX(const vector<vector<vector<float> > >& scalarField, int x, int y, int z)
+const Vector3r& MarchingCube::computeNormalX(const vector<vector<vector<float> > >& scalarField, int x, int y, int z)
 {
-	static Vector3f normal;
+	static Vector3r normal;
 	
 	float xyz = scalarField[x][y][z];
 	float xp1yz = scalarField[x+1][y][z];
@@ -221,9 +221,9 @@ const Vector3f& MarchingCube::computeNormalX(const vector<vector<vector<float> >
 }
 
 
-const Vector3f& MarchingCube::computeNormalY(const vector<vector<vector<float> > >& scalarField, int x, int y, int z ) 
+const Vector3r& MarchingCube::computeNormalY(const vector<vector<vector<float> > >& scalarField, int x, int y, int z ) 
 {
-	static Vector3f normal;
+	static Vector3r normal;
 	
 	float xyz = scalarField[x][y][z];
 	float xyp1z = scalarField[x][y+1][z];
@@ -239,9 +239,9 @@ const Vector3f& MarchingCube::computeNormalY(const vector<vector<vector<float> >
 } 
 
               
-const Vector3f& MarchingCube::computeNormalZ(const vector<vector<vector<float> > >& scalarField, int x, int y, int z) 
+const Vector3r& MarchingCube::computeNormalZ(const vector<vector<vector<float> > >& scalarField, int x, int y, int z) 
 {
-	static Vector3f normal;
+	static Vector3r normal;
 
 	float xyz = scalarField[x][y][z];
 	float xyzp1 = scalarField[x][y][z+1];

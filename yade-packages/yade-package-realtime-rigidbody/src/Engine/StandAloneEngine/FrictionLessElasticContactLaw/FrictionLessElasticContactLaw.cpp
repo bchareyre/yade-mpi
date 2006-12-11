@@ -19,6 +19,9 @@
 #include <yade/yade-package-common/Force.hpp>
 #include <yade/yade-package-common/Momentum.hpp>
 
+#include <yade/yade-core/yadeWm3Extra.hpp>
+
+
 
 FrictionLessElasticContactLaw::FrictionLessElasticContactLaw () : InteractionSolver(), actionForce(new Force) , actionMomentum(new Momentum)
 {

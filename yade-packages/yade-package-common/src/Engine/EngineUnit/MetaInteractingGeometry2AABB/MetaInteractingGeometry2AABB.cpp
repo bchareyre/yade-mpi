@@ -11,6 +11,7 @@
 
 #include "MetaInteractingGeometry.hpp"
 #include "AABB.hpp"
+#include<yade/yade-core/yadeWm3Extra.hpp>
 
 
 void MetaInteractingGeometry2AABB::go(	  const shared_ptr<InteractingGeometry>&
@@ -33,13 +34,13 @@ void MetaInteractingGeometry2AABB::go(	  const shared_ptr<InteractingGeometry>&
 		shared_ptr<Body> b = *bi;
 		if(b->boundingVolume)
 		{
-	 		max = max.maxVector(b->boundingVolume->max);
- 			min = min.minVector(b->boundingVolume->min);
+	 		max = componentMaxVector(max,b->boundingVolume->max);
+ 			min = componentMinVector(min,b->boundingVolume->min);
 		} 
 		else
 		{
-	 		max = max.maxVector(b->physicalParameters->se3.position);
- 			min = min.minVector(b->physicalParameters->se3.position);
+	 		max = componentMaxVector(max,b->physicalParameters->se3.position);
+ 			min = componentMinVector(min,b->physicalParameters->se3.position);
 		}
 	}
 	

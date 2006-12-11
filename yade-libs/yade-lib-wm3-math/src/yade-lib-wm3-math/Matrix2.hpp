@@ -8,8 +8,19 @@
 // may not be copied or disclosed except in accordance with the terms of that
 // agreement.
 
-#ifndef WM3MATRIX2_H
-#define WM3MATRIX2_H
+#ifndef YADE_WM3MATRIX2_H
+#define YADE_WM3MATRIX2_H
+
+#warning Deprecated header, include <Wm3Matrix2.h> and <yade/yade-core/yadeWm3.hpp> instead
+
+#ifndef USE_BASTARDIZED_WM3
+#include<Wm3Matrix2.h>
+#include<yade/yade-core/yadeWm3.hpp>
+using namespace Wm3;
+#else
+
+#include"Math.hpp"
+
 
 // Matrix operations are applied on the left.  For example, given a matrix M
 // and a vector V, matrix-times-vector is M*V.  That is, V is treated as a
@@ -199,4 +210,4 @@ typedef Matrix2<Real> Matrix2r;
 //}
 
 #endif
-
+#endif

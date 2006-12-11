@@ -13,7 +13,7 @@
 
 Vector3f makeColor(double val,double min,double max)
 {
-	double sc01 = ((val-min)/(max-min))*2.0-1.0;
+	Real sc01 = ((val-min)/(max-min))*2.0-1.0;
 	if(sc01 < 0) return Vector3f(0.9,0.9,1.0) + sc01 * Vector3f(0.9,0.9,0.0);
 	if(sc01 > 0) return Vector3f(1.0,0.9,0.9) - sc01 * Vector3f(0.0,0.9,0.9);
 	return Vector3f(0.9,0.9,0.9);

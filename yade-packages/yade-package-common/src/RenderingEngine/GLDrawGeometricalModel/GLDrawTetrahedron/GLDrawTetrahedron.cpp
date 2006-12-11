@@ -9,6 +9,7 @@
 #include "GLDrawTetrahedron.hpp"
 #include "Tetrahedron.hpp"
 #include <yade/yade-lib-opengl/OpenGLWrapper.hpp>
+#include <yade/yade-core/yadeWm3.hpp>
 
 
 void GLDrawTetrahedron::go(const shared_ptr<GeometricalModel>& gm, const shared_ptr<PhysicalParameters>&,bool wire)
@@ -100,7 +101,7 @@ void GLDrawTetrahedron::go(const shared_ptr<GeometricalModel>& gm, const shared_
 		glDisable(GL_CULL_FACE);
 		glEnable(GL_LIGHTING);
 
-		Vector3r center = 0.25*(tet->v1+tet->v2+tet->v3+tet->v4);
+		Vector3r center = (tet->v1+tet->v2+tet->v3+tet->v4)*.25;
 		
 		glBegin(GL_TRIANGLES);
 			Vector3r n = (tet->v1-tet->v4).UnitCross(tet->v2-tet->v4);

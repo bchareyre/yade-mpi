@@ -11,6 +11,7 @@
 #include "NewtonsMomentumLaw.hpp"
 #include "RigidBodyParameters.hpp"
 #include "Momentum.hpp"
+#include <yade/yade-core/yadeWm3Extra.hpp>
 
 
 void NewtonsMomentumLaw::go( 	  const shared_ptr<PhysicalAction>& a
@@ -21,7 +22,7 @@ void NewtonsMomentumLaw::go( 	  const shared_ptr<PhysicalAction>& a
 	RigidBodyParameters * rb = static_cast<RigidBodyParameters*>(b.get());
 	
 	//FIXME : should be += and we should add an Engine that reset acceleration at the beginning
-	rb->angularAcceleration = am->momentum.divDiag(rb->inertia);
+	rb->angularAcceleration = diagDiv(am->momentum,rb->inertia);
 }
 
 

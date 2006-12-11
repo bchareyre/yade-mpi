@@ -8,8 +8,18 @@
 // may not be copied or disclosed except in accordance with the terms of that
 // agreement.
 
-#ifndef WM3QUATERNION_H
-#define WM3QUATERNION_H
+#ifndef YADE_WM3QUATERNION_H
+#define YADE_WM3QUATERNION_H
+
+#warning Deprecated header, include <Wm3Quaternion.h> and <yade/yade-core/yadeWm3.hpp> instead
+
+#ifndef USE_BASTARDIZED_WM3
+#include<Wm3Quaternion.h>
+#include<yade/yade-core/yadeWm3.hpp>
+using namespace Wm3;
+#else
+
+#include "Math.hpp"
 
 #include "Matrix3.hpp"
 #include "Vector3.hpp"
@@ -85,7 +95,7 @@ public:
 	Quaternion& operator/= (RealType fScalar);
 
 	
-	Vector3<RealType> operator* (const Vector3<RealType>& v) const;
+	__attribute__((deprecated)) Vector3<RealType> operator* (const Vector3<RealType>& v) const;
 	
 	// conversion between quaternions, matrices, and axis-angle
 	__attribute__((deprecated)) inline 	Quaternion& fromRotationMatrix(const Matrix3<RealType>& rkRot){return FromRotationMatrix(rkRot);}
@@ -100,11 +110,14 @@ public:
 	Quaternion& FromAxisAngle(const Vector3<RealType>& rkAxis, RealType fAngle) ;
 	__attribute__((deprecated)) inline 	void toAxisAngle(Vector3<RealType>& rkAxis, RealType& rfAngle) const{return ToAxisAngle(rkAxis,rfAngle);}
 	void ToAxisAngle(Vector3<RealType>& rkAxis, RealType& rfAngle) const ;
-	
-	void toAxes (Vector3<RealType>& axis1, Vector3<RealType>& axis2, Vector3<RealType>& axis3) const; 
-	void fromAxes (const Vector3<RealType>& axis1,const Vector3<RealType>& axis2,const Vector3<RealType>& axis3); 
-	void toGLMatrix(RealType m[16]) const;
-	void toEulerAngles (Vector3<RealType>& eulerAngles,RealType threshold = 1e-06f) const;
+
+
+	// added by the yade team	
+	__attribute__((deprecated)) void toAxes (Vector3<RealType>& axis1, Vector3<RealType>& axis2, Vector3<RealType>& axis3) const; 
+	__attribute__((deprecated)) void fromAxes (const Vector3<RealType>& axis1,const Vector3<RealType>& axis2,const Vector3<RealType>& axis3); 
+	__attribute__((deprecated)) void toGLMatrix(RealType m[16]) const;
+	__attribute__((deprecated)) void toEulerAngles (Vector3<RealType>& eulerAngles,RealType threshold = 1e-06f) const;
+	// end of added by yade team
 	
 	// functions of a quaternion
 	__attribute__((deprecated)) inline 	RealType length() const{return Length();}
@@ -192,4 +205,4 @@ typedef Quaternion<Real> Quaternionr;
 //}
 
 #endif
-
+#endif

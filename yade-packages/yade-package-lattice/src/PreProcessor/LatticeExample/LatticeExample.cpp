@@ -18,6 +18,8 @@
 #include "StrainRecorder.hpp"
 #include "MeasurePoisson.hpp"
 #include "NonLocalInitializer.hpp"
+#include <yade/yade-core/yadeWm3Extra.hpp>
+
 
 #include <yade/yade-package-common/Sphere.hpp>
 
@@ -682,7 +684,7 @@ void LatticeExample::calcAxisAngle(LatticeBeamParameters* beam1, BodyContainer* 
 		LatticeBeamParameters* 	beam2 		= static_cast<LatticeBeamParameters*>( ((*(bodies))[ otherId ])->physicalParameters.get() );
 		Real 			angle, offPlaneAngle;
 		
-		angle = beam1->direction.angleBetweenUnitVectors(beam2->direction);
+		angle = unitVectorsAngle(beam1->direction,beam2->direction);
 
                 shared_ptr<Interaction>                 interaction(new Interaction( thisId , otherId ));
                 shared_ptr<LatticeBeamAngularSpring>    angularSpring(new LatticeBeamAngularSpring);
@@ -692,8 +694,8 @@ void LatticeExample::calcAxisAngle(LatticeBeamParameters* beam1, BodyContainer* 
 		angularSpring->lastCrossProduct		= 1.0*(beam1->direction.Cross(beam2->direction));
 		angularSpring->lastCrossProduct.Normalize();
 		
-		angularSpring->initialOffPlaneAngle1	= beam1->otherDirection.angleBetweenUnitVectors(angularSpring->lastCrossProduct);
-		angularSpring->initialOffPlaneAngle2	= beam2->otherDirection.angleBetweenUnitVectors(angularSpring->lastCrossProduct);
+		angularSpring->initialOffPlaneAngle1	= unitVectorsAngle(beam1->otherDirection,angularSpring->lastCrossProduct);
+		angularSpring->initialOffPlaneAngle2	= unitVectorsAngle(beam2->otherDirection,angularSpring->lastCrossProduct);
 
 	//	std::cerr << thisId << ", " << otherId << ", (" << beam1->otherDirection << ") (" << beam2->otherDirection << ") (" << angularSpring->lastCrossProduct << ")\n";
 				

@@ -8,8 +8,16 @@
 // may not be copied or disclosed except in accordance with the terms of that
 // agreement.
 
-#ifndef WM3VECTOR4_H
-#define WM3VECTOR4_H
+#ifndef YADE_WM3VECTOR4_H
+#define YADE_WM3VECTOR4_H
+
+#warning Deprecated header, include <Wm3Vector4.h> and <yade/yade-core/yadeWm3.hpp> instead
+
+#ifndef USE_BASTARDIZED_WM3
+#include<Wm3Vector4.h>
+#include<yade/yade-core/yadeWm3.hpp>
+using namespace Wm3;
+#else
 
 #include "Math.hpp"
 
@@ -80,9 +88,12 @@ public:
     RealType Dot(const Vector4& rkV) const ;
 	__attribute__((deprecated)) inline     RealType normalize(){return Normalize();}
     RealType Normalize() ;
-    Vector4 maxVector (const Vector4& rkV) const;
-    Vector4 minVector (const Vector4& rkV) const;
-    Vector4 multDiag (const Vector4& rkV) const;
+
+	 // added by the yade team
+    __attribute__((deprecated)) Vector4 maxVector (const Vector4& rkV) const;
+    __attribute__((deprecated)) Vector4 minVector (const Vector4& rkV) const;
+    __attribute__((deprecated)) Vector4 multDiag (const Vector4& rkV) const;
+	 //end
         
 // special vectors
     static const Vector4 ZERO;
@@ -111,4 +122,4 @@ typedef Vector4<Real> Vector4r;
 //}
 
 #endif
-
+#endif

@@ -20,6 +20,9 @@
 #include <yade/yade-package-common/Momentum.hpp>
 #include <yade/yade-core/PhysicalAction.hpp>
 
+#include<yade/yade-core/yadeWm3Extra.hpp>
+
+
 
 ElasticCohesiveLaw::ElasticCohesiveLaw() : InteractionSolver() , actionForce(new Force) , actionMomentum(new Momentum)
 {
@@ -182,8 +185,8 @@ void ElasticCohesiveLaw::action(Body* body)
 	
 			Quaternionr q_i_n,q_n_i;
 	
-			q_i_n.fromAxes(n,t1,t2);
-			q_i_n.fromAxes(Vector3r(1,0,0),Vector3r(0,1,0),Vector3r(0,0,1)); // use identity matrix
+			q_i_n=quaternionFromAxes(n,t1,t2);
+			q_i_n=quaternionFromAxes(Vector3r(1,0,0),Vector3r(0,1,0),Vector3r(0,0,1)); // use identity matrix
 			q_n_i = q_i_n.Inverse();
 	
 	/// Using Euler angle				 	 ///
@@ -232,8 +235,8 @@ void ElasticCohesiveLaw::action(Body* body)
 			q.Align(n,prevN);
 			q1 = (de1->se3.orientation*currentContactPhysics->prevRotation1.Inverse())*q.Inverse();
 			q2 = (de2->se3.orientation*currentContactPhysics->prevRotation2.Inverse())*q.Inverse();
-			q1.toEulerAngles(dRotationAMinusDBeta);
-			q2.toEulerAngles(dRotationBMinusDBeta);
+			quaternionToEulerAngles(q1,dRotationAMinusDBeta);
+			quaternionToEulerAngles(q2,dRotationBMinusDBeta);
 			Vector3r dUr = ( currentContactGeometry->radius1*dRotationAMinusDBeta - currentContactGeometry->radius2*dRotationBMinusDBeta ) * 0.5;
 	
 	/// Ending of use of Quaternionr			 	 ///

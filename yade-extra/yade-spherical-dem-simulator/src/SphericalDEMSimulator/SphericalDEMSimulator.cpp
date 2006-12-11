@@ -25,6 +25,9 @@
 
 #include <yade/yade-lib-serialization/IOFormatManager.hpp>
 
+#include <yade/yade-core/yadeWm3Extra.hpp>
+
+
 
 #include "SphericalDEMSimulator.hpp"
 
@@ -415,7 +418,7 @@ void SphericalDEMSimulator::applyResponse(vector<SphericalDEM>& spheres)
 		(*si).acceleration = (*si).invMass*(*si).force;
 		
 		///NewtonsMomentumLaw 
-		(*si).angularAcceleration = (*si).momentum.multDiag((*si).invInertia);
+		(*si).angularAcceleration = diagMult((*si).momentum,(*si).invInertia);
 	}
 }
 
