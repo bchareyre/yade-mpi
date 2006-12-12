@@ -121,7 +121,7 @@ def createDirs(dirList):
 			print dd
 			os.makedirs(dd)
 		elif not os.path.isdir(dd): raise OSError("Installation directory `%s' is a file?!"%dd)
-#createDirs(instDirs)
+createDirs(instDirs)
 createDirs(instIncludeDirs)
 	
 
