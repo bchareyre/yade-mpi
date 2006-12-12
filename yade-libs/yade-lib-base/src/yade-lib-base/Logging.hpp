@@ -34,7 +34,7 @@
 
 #	define _LOG_HEAD __FILE__":"<<__LINE__<<" "<<__FUNCTION__<<": "
 	// logger is local for every class, but if it is missing, we will use the parent's class logger automagically.
-#	define LOG_DEBUG(msg) LOG4CXX_DEBUG(logger, _LOG_HEAD<<msg)
+#	define LOG_DEBUG(msg)
 #	define LOG_INFO(msg)  LOG4CXX_INFO(logger,  _LOG_HEAD<<msg)
 #	define LOG_WARN(msg)  LOG4CXX_WARN(logger,  _LOG_HEAD<<msg)
 #	define LOG_ERROR(msg) LOG4CXX_ERROR(logger, _LOG_HEAD<<msg)
