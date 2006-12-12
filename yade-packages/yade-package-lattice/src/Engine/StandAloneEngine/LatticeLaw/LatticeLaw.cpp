@@ -14,7 +14,7 @@
 #include "LatticeSetParameters.hpp"
 #include <yade/yade-core/BodyContainer.hpp>
 #include <yade/yade-core/MetaBody.hpp>
-#include <yade/yade-core/yadeWm3Extra.hpp>
+#include <yade/yade-lib-base/yadeWm3Extra.hpp>
 
 LatticeLaw::LatticeLaw() : InteractionSolver()
 {

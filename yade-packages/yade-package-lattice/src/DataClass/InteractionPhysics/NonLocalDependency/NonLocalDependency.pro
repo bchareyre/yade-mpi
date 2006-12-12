@@ -3,7 +3,7 @@ error( "YADE_QMAKE_PATH internal qmake variable is not set, you should run for e
 }
 
 
-LIBS += -lyade-lib-wm3-math \
+LIBS += -lyade-lib-base -lWm3Foundation \
         -lyade-lib-multimethods \
         -lyade-lib-serialization \
         -rdynamic 

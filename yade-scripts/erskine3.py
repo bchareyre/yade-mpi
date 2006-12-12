@@ -15,6 +15,8 @@ from re import *
 from copy import deepcopy
 import pprint
 
+def warning2(msg): warning(currentPro+' '+msg)
+
 bgroup=('(','{','[')
 egroup=(')','}',']')
 # variables that do not propagate to sub-builds
@@ -31,6 +33,8 @@ targetLangType={'yade-lib-serialization-qt':'qt3','QtGUI':'qt3'}
 targetEnv={'yade-lib-serialization-qt':'env','QtGUI':'env'}
 # was: yade
 defaultEnv='env'
+
+currentPro='[none]'
 
 allEnvs=[defaultEnv]
 for t in targetEnv.keys():
@@ -76,6 +80,7 @@ def parseProject(proFile,inheritedVariables={}):
 		else:
 			if l[-1]=='\\': l=l[:-1]
 			nest=beginnest
+	#pprint.pprint(qm)
 
 	# process statements sequentially, replace variables / functions
 	for stat in qm:
@@ -97,7 +102,7 @@ def parseProject(proFile,inheritedVariables={}):
 					repl=os.environ[v]
 					info("Substituting environment variable `%s` → `%s`"%(v,repl))
 				else:
-					if not v in undefOK: warning("Undefined environment variable `%s'."%(v))
+					if not v in undefOK: warning2("Undefined environment variable `%s'."%(v))
 					repl=''
 			else:
 				if v[0]=='(': v=v[1:-1]
@@ -106,9 +111,9 @@ def parseProject(proFile,inheritedVariables={}):
 					if not v in undefOK:
 						if os.environ.has_key(v):
 							repl=os.environ[v]
-							if not v in replaceOK: warning("Undefined internal variable `%s', using environment variable instead."%(v))
+							if not v in replaceOK: warning2("Undefined internal variable `%s', using environment variable instead."%(v))
 						else:
-							warning("Undefined internal variable `%s'."%(v))
+							warning2("Undefined internal variable `%s'."%(v))
 							repl=''
 					else: repl=''
 			stat=stat[:m.start()]+repl+stat[m.end():]
@@ -118,7 +123,7 @@ def parseProject(proFile,inheritedVariables={}):
 			cond,then=conditional.group(1,2)
 			if cond=='win32': continue # windows stuff is discarded completely
 			elif cond=='!win32': stat=then # otherwise we pass the whole then-clause to further treatment
-			else: warning("Unknown condition `%s'."%cond)
+			else: warning2("Unknown condition `%s'."%cond)
 		assign=match(r'^\s*([a-zA-Z0-9_.]+)\s*(=|\+=)\s*(.*)$',stat) # this line is an assignment
 		call=match(r'^\s*(!?[a-z][a-zA-Z0-9_]+)\s*(\(.*)$',stat) # this line is a "function call"
 		if assign:
@@ -129,13 +134,15 @@ def parseProject(proFile,inheritedVariables={}):
 			if action =='=' or action=='+=':	vars[param]+=val
 		elif call:
 			func,rest=call.group(1,2)
-			if not func in undefOK: warning("Function `%s' not implemented; arguments `%s'.\n"%(func,rest))
+			if not func in undefOK: warning2("Function `%s' not implemented; arguments `%s'.\n"%(func,rest))
 		else:
-			warning("Line not parsed: `%s'.\n"%(stat))
+			warning2("Line not parsed: `%s'.\n"%(stat))
 	return vars
 
 def proProcess(filename,_vars={},dir='.',nest=0):
 	info("(%s) Processing project file `%s'."%(nest,filename))
+	global currentPro
+	currentPro=filename
 	posterityVars=[]
 	vars=deepcopy(_vars)
 	for l in localVars:
@@ -163,7 +170,7 @@ def proProcess(filename,_vars={},dir='.',nest=0):
 		#if oldTarget!=newTarget: warning("Old and new target differ: `%s' vs. `%s' (using new one)."%(oldTarget,newTarget))
 		return [childVars]
 	else:
-		warning("Unknown TEMPLATE `%s'"%template)
+		warning2("%s: Unknown TEMPLATE `%s'"%(currentPro,template))
 		return None
 
 def listUnique(List):
@@ -191,6 +198,8 @@ def pythonicTarget(t):
 
 def scriptGen(v,dir):
 	project=v['PROJECT']
+	global currentPro
+	currentPro=project
 	target=v['TARGET']
 	commentOut=False # waf doesn't like targetless sources; scons is fine with that
 	template=v['TEMPLATE'][0]
@@ -224,7 +233,8 @@ def scriptGen(v,dir):
 		for l in ll:
 			if l[0:2]=='-l': ret.append(l[2:])
 			elif l=='-rdynamic': pass
-			else: warning("Unknown LIBS item `%s'."%l)
+			else:
+				warning2("Unknown LIBS item `%s'."%l)
 		return ret
 	libs=[]
 	if v.has_key('LIBS'): libs=listLibs(v['LIBS'])
@@ -246,7 +256,7 @@ def scriptGen(v,dir):
 	# filter out non-existent paths; without warning, it could be a short lambda...
 	def DelAndWarnNonexistentPath(x):
 		if not exists(normpath(join(dirAbsPath,x))):
-			warning("Include path `%s' is invalid, removed!"%(normpath(join(dirAbsPath,x))))
+			warning2("Include path `%s' is invalid, removed!"%(normpath(join(dirAbsPath,x))))
 			return False
 		return True
 	includePath=filter(DelAndWarnNonexistentPath,includePath)
@@ -265,7 +275,7 @@ def scriptGen(v,dir):
 		assert(targetType) # "TEMPLATE is neither `lib' nor `app'.
 
 		if not len(sources)==0:
-			warning("Project `%s' has empty source list, build rule will be commented out."%project)
+			warning2("Project `%s' has empty source list, build rule will be commented out."%project)
 			commentOut=True
 
 		langType='cpp'

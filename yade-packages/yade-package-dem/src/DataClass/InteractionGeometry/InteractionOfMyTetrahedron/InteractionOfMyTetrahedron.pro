@@ -6,7 +6,7 @@ error( "YADE_QMAKE_PATH internal qmake variable is not set, you should run for e
 HEADERS += InteractionOfMyTetrahedron.hpp 
 SOURCES += InteractionOfMyTetrahedron.cpp 
 LIBS += -lyade-lib-serialization \
-        -lyade-lib-wm3-math \
+        -lyade-lib-base -lWm3Foundation \
         -rdynamic 
 QMAKE_LIBDIR = $${YADE_QMAKE_PATH}/lib/yade/yade-libs/ 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \

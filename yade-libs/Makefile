@@ -6,8 +6,7 @@ all:
 
 clean:
 	$(MAKE) -C yade-lib-loki clean
-	$(MAKE) -C yade-lib-wm3-math clean
-	$(MAKE) -C yade-lib-algorithms clean
+	$(MAKE) -C yade-lib-base clean
 	$(MAKE) -C yade-lib-factory clean
 	$(MAKE) -C yade-lib-multimethods clean
 	$(MAKE) -C yade-lib-serialization clean
@@ -18,14 +17,11 @@ clean:
 	$(MAKE) -C yade-lib-serialization-qt clean
 
 compile_install:
+	$(MAKE) -C yade-lib-base
+	$(MAKE) -C yade-lib-base install
+
 	$(MAKE) -C yade-lib-loki
 	$(MAKE) -C yade-lib-loki install
-	
-	$(MAKE) -C yade-lib-wm3-math
-	$(MAKE) -C yade-lib-wm3-math install
-	
-	$(MAKE) -C yade-lib-algorithms
-	$(MAKE) -C yade-lib-algorithms install
 	
 	$(MAKE) -C yade-lib-factory
 	$(MAKE) -C yade-lib-factory install
@@ -53,8 +49,7 @@ compile_install:
 
 uninstall:
 	$(MAKE) -C yade-lib-loki uninstall
-	$(MAKE) -C yade-lib-wm3-math uninstall
-	$(MAKE) -C yade-lib-algorithms uninstall
+	$(MAKE) -C yade-lib-base uninstall
 	$(MAKE) -C yade-lib-factory uninstall
 	$(MAKE) -C yade-lib-multimethods uninstall
 	$(MAKE) -C yade-lib-serialization uninstall

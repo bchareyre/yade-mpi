@@ -18,7 +18,7 @@
 #include "StrainRecorder.hpp"
 #include "MeasurePoisson.hpp"
 #include "NonLocalInitializer.hpp"
-#include <yade/yade-core/yadeWm3Extra.hpp>
+#include <yade/yade-lib-base/yadeWm3Extra.hpp>
 
 
 #include <yade/yade-package-common/Sphere.hpp>

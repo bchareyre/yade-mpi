@@ -11,7 +11,7 @@
 #include "NewtonsMomentumLaw.hpp"
 #include "RigidBodyParameters.hpp"
 #include "Momentum.hpp"
-#include <yade/yade-core/yadeWm3Extra.hpp>
+#include <yade/yade-lib-base/yadeWm3Extra.hpp>
 
 
 void NewtonsMomentumLaw::go( 	  const shared_ptr<PhysicalAction>& a

@@ -9,9 +9,12 @@
 #ifndef INTERSECTION2D_HPP
 #define INTERSECTION2D_HPP
 
-#include <yade/yade-lib-wm3-math/Math.hpp>
-#include <yade/yade-lib-wm3-math/Vector3.hpp>
-#include <yade/yade-lib-wm3-math/Vector2.hpp>
+#include <Wm3Math.h>
+#include <yade/yade-lib-base/yadeWm3.hpp>
+#include <Wm3Vector3.h>
+#include <yade/yade-lib-base/yadeWm3.hpp>
+#include <Wm3Vector2.h>
+#include <yade/yade-lib-base/yadeWm3.hpp>
 #include <vector>
 
 using namespace std;

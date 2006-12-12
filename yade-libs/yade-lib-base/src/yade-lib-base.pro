@@ -3,11 +3,10 @@ error( "YADE_QMAKE_PATH internal qmake variable is not set, you should run for e
 }
 
 TEMPLATE=subdirs
-SUBDIRS=yade-lib-wm3-math
-CONFIG  += debug \
+SUBDIRS=yade-lib-base
+CONFIG += debug \
           thread \
-warn_on
-
+          warn_on
 INCLUDEPATH += $${YADE_QMAKE_PATH}/include
 
 QMAKE_RUN_CXX_IMP = $(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $(shell pwd)/$<

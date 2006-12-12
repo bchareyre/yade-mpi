@@ -15,7 +15,7 @@ LIBS += -lMacroMicroElasticRelationships \
         -lyade-lib-multimethods \
         -lyade-lib-factory \
         -lyade-lib-serialization \
-        -lyade-lib-wm3-math 
+        -lyade-lib-base -lWm3Foundation 
 INCLUDEPATH += $${YADE_QMAKE_PATH}/include 
 QMAKE_LIBDIR = $${YADE_QMAKE_PATH}/lib/yade/yade-package-dem \
                $${YADE_QMAKE_PATH}/lib/yade/yade-package-common \

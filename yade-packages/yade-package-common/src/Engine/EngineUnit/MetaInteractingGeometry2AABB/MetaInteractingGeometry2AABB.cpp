@@ -11,7 +11,7 @@
 
 #include "MetaInteractingGeometry.hpp"
 #include "AABB.hpp"
-#include<yade/yade-core/yadeWm3Extra.hpp>
+#include<yade/yade-lib-base/yadeWm3Extra.hpp>
 
 
 void MetaInteractingGeometry2AABB::go(	  const shared_ptr<InteractingGeometry>&

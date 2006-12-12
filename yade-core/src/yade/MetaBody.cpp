@@ -8,7 +8,8 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include <yade/yade-lib-wm3-math/Math.hpp>
+#include <Wm3Math.h>
+#include <yade/yade-lib-base/yadeWm3.hpp>
 #include "MetaBody.hpp"
 #include "Engine.hpp"
 #include "TimeStepper.hpp"

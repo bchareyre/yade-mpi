@@ -9,7 +9,8 @@
 #ifndef INTERSECTION3D_HPP
 #define INTERSECTION3D_HPP
 
-#include <yade/yade-lib-wm3-math/Vector3.hpp>
+#include <Wm3Vector3.h>
+#include <yade/yade-lib-base/yadeWm3.hpp>
 
 	void lineClosestApproach (const Vector3r pa, const Vector3r ua, const Vector3r pb, const Vector3r ub, Real &alpha, Real &beta);
 

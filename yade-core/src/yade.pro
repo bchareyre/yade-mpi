@@ -11,6 +11,7 @@ DEFINES = DEBUG
 CONFIG += debug \
           thread \
 warn_on
+LIBS += -lyade-lib-base -lWm3Foundation
 TEMPLATE = subdirs
 INCLUDEPATH += $${YADE_QMAKE_PATH}/include
 

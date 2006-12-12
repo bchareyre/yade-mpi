@@ -10,7 +10,7 @@
 #include "InteractionOfMyTetrahedron.hpp"
 #include "InteractingMyTetrahedron.hpp"
 
-#include <yade/yade-core/yadeWm3Extra.hpp>
+#include <yade/yade-lib-base/yadeWm3Extra.hpp>
 
 
 void InteractingMyTetrahedron2InteractingMyTetrahedron4InteractionOfMyTetrahedron::calcTwoSpheres(

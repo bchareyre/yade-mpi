@@ -20,7 +20,7 @@
 
 
 #include <yade/yade-lib-loki/Singleton.hpp>
-#include <yade/yade-core/logging.hpp>
+#include <yade/yade-lib-base/Logging.hpp>
 
 
 #include "FactoryExceptions.hpp"

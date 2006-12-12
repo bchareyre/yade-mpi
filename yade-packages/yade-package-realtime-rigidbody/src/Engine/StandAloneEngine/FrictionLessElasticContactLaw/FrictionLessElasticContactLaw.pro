@@ -4,7 +4,7 @@ error( "YADE_QMAKE_PATH internal qmake variable is not set, you should run for e
 
 
 LIBS += -lyade-lib-serialization \
-        -lyade-lib-wm3-math \
+        -lyade-lib-base -lWm3Foundation \
         -lyade-lib-multimethods \
         -lMomentum \
         -lForce \

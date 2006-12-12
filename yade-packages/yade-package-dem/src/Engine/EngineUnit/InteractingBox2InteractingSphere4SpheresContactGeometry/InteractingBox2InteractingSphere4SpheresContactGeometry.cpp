@@ -13,7 +13,7 @@
 #include <yade/yade-package-common/InteractingSphere.hpp>
 #include <yade/yade-package-common/InteractingBox.hpp>
 
-#include <yade/yade-core/yadeWm3Extra.hpp>
+#include <yade/yade-lib-base/yadeWm3Extra.hpp>
 
 
 bool InteractingBox2InteractingSphere4SpheresContactGeometry::go(

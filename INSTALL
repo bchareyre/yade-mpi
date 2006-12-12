@@ -66,6 +66,8 @@ SUMMARY OF YADE COMPILATION OPTIONS
    type for calculation. This gives higher precision than 'float'. On some
    computers it is faster (like AMD64), on others it is slower - this really
    depends on your machine.
+   // Now SINGLE_PRCISION must be defined for floats, since doubles are what the default is.
+   // SINGLE_PRECISION will deprecated shortly anyway
 
    4. CXXFLAGS='-DNO_GLUTINIT' - older versions of libglut do not have function
    glutInit(), you should use this compilation flag then.

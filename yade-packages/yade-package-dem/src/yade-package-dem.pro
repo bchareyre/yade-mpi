@@ -12,7 +12,7 @@ SUBDIRS += Container \
 TEMPLATE=subdirs
 CONFIG += debug \
           thread \
-warn_on
+			warn_on
 
 INCLUDEPATH += $${YADE_QMAKE_PATH}/include
 

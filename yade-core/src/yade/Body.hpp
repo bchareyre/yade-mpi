@@ -21,7 +21,7 @@
 #include "Interaction.hpp"
 #include "PhysicalActionContainer.hpp"
 
-#include <yade/yade-lib-wm3-math/Se3.hpp>
+#include <yade/yade-lib-base/yadeWm3Extra.hpp>
 #include <yade/yade-lib-serialization/Serializable.hpp>
 #include <yade/yade-lib-multimethods/Indexable.hpp>
 

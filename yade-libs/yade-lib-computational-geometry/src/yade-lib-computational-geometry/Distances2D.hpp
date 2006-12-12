@@ -9,7 +9,8 @@
 #ifndef DISTANCES2D_HPP
 #define DISTANCES2D_HPP
 
-#include <yade/yade-lib-wm3-math/Vector2.hpp>
+#include <Wm3Vector2.h>
+#include <yade/yade-lib-base/yadeWm3.hpp>
 
 #include <vector>
 

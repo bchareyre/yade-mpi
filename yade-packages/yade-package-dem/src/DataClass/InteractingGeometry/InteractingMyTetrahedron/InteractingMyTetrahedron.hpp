@@ -9,7 +9,8 @@
 #define INTERACTING_MY_TETRAHEDRON_HPP
 
 #include <yade/yade-core/InteractingGeometry.hpp>
-#include <yade/yade-lib-wm3-math/Math.hpp>
+#include <Wm3Math.h>
+#include <yade/yade-lib-base/yadeWm3.hpp>
 
 /*! 
  * \brief This class stores an information about geometry for tetrahedron which

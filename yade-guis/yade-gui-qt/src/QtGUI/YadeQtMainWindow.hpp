@@ -12,7 +12,7 @@
 #include <qworkspace.h>
 #include <qmainwindow.h>
 #include <qframe.h>
-#include<yade/yade-core/logging.hpp>
+#include<yade/yade-lib-base/Logging.hpp>
 #include "YadeQtGeneratedMainWindow.h"
 #include "SimulationController.hpp"
 #include "QtGUIPreferences.hpp"

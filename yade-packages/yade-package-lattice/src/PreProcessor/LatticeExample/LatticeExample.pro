@@ -29,7 +29,9 @@ LIBS += -lLineSegment \
         -lSphere \
         -lDisplacementEngine \
         -lLatticeLaw \
-        -rdynamic 
+        -rdynamic \
+		  -lyade-lib-base \
+		  -lWm3Foundation
 INCLUDEPATH += $${YADE_QMAKE_PATH}/include/ \
                ../../Engine/StandAloneEngine/LatticeLaw \
                ../../Engine/StandAloneEngine/StrainRecorder \

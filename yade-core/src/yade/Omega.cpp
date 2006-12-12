@@ -13,7 +13,8 @@
 #include "MetaBody.hpp"
 #include "ThreadRunner.hpp"
 #include "Preferences.hpp"
-#include <yade/yade-lib-wm3-math/Vector3.hpp>
+#include <Wm3Vector3.h>
+#include <yade/yade-lib-base/yadeWm3.hpp>
 #include <yade/yade-lib-serialization/IOFormatManager.hpp>
 #include <yade/yade-lib-serialization/IOFormatManager.hpp>
 #include <yade/yade-lib-multimethods/FunctorWrapper.hpp>
@@ -21,6 +22,8 @@
 #include <cstdlib>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
+
+#include <cxxabi.h>
 
 CREATE_LOGGER(Omega);
 
@@ -259,9 +262,17 @@ void Omega::scanPlugins()
 					if(err.find("cannot open shared object file: No such file or directory")!=std::string::npos){
 						LOG_INFO("Attemted to load nonexistent file; since this may be due to bad algorithm of filename construction, we pretend everything is OK (original error: `"<<err<<"').");
 						thisLoaded=true;
-					} else LOG_ERROR("Error loading Library `"<<(*dlli)<<"': "<<err<<".");
-//				else
-//					cerr << "loaded            : " << *dlli << endl;
+					}
+					else if(err.find(": undefined symbol: ")!=std::string::npos){
+						size_t pos=err.rfind(":");
+						assert(pos!=std::string::npos);
+						std::string sym(err,pos+2); //2 removes ": " from the beginning
+						int status=0;
+						char* demangled_sym=abi::__cxa_demangle(sym.c_str(),0,0,&status);
+						LOG_FATAL("Undefined symbol `"<<demangled_sym<<"("<<err<<").");
+
+					}
+					else LOG_ERROR("Error loading Library `"<<(*dlli)<<"': "<<err<<" ."); // leave space to not to confuse c++filt
 				}
 				allLoaded &= thisLoaded;
 				if(thisLoaded)

@@ -6,7 +6,7 @@ error( "YADE_QMAKE_PATH internal qmake variable is not set, you should run for e
 HEADERS += SAPCollider.hpp 
 SOURCES += SAPCollider.cpp 
 LIBS += -lyade-lib-serialization \
--lyade-lib-wm3-math \
+-lyade-lib-base -lWm3Foundation \
 -lyade-lib-multimethods \
 -rdynamic
 QMAKE_LIBDIR = $${YADE_QMAKE_PATH}/lib/yade/yade-libs/

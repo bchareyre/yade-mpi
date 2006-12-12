@@ -72,7 +72,7 @@ env.Append(ENV={'PATH':path,'HOME':os.environ['HOME'],'TERM':os.environ['TERM']}
 # also look at QTDIR above...
 env.Replace(QT_LIB='qt-mt')
 env.Replace(CXX='ccache g++-4.0')
-env.Append(CPPDEFINES=['LOG4CXX','DOUBLE_PRECISION']) #,'USE_BASTARDIZED_WM3']) #'USE_NATIVE_WM3','DOUBLE_PRECISION'])
+env.Append(CPPDEFINES=['LOG4CXX'])
 env.Append(LIBS=['glut','boost_date_time','boost_filesystem','boost_thread','pthread','log4cxx','Wm3Foundation'])
 # The '#' expands to build root
 env.Append(CPPPATH=['#/include','/usr/local/include/wm3'])
@@ -100,7 +100,6 @@ env.Append(LIBPATH=map(lambda x: os.path.join('#',x),libDirs))
 opts=Options('env.conf')
 opts.Add(PathOption('PREFIX', 'Install path prefix', '/usr/local'))
 opts.Add(BoolOption('DEBUG', 'Enable debugging information and disable optimizations',1))
-opts.Add(BoolOption('DOUBLE_PRECISION', 'Use double precision for real numbers',0))
 opts.Add(BoolOption('LOG4CXX','Use log4cxx logging framework',0))
 opts.Update(env)
 opts.Save('env.conf', env)
@@ -122,7 +121,7 @@ def createDirs(dirList):
 			print dd
 			os.makedirs(dd)
 		elif not os.path.isdir(dd): raise OSError("Installation directory `%s' is a file?!"%dd)
-createDirs(instDirs)
+#createDirs(instDirs)
 createDirs(instIncludeDirs)
 	
 

@@ -16,7 +16,7 @@ LIBS += -lSpringGeometry \
         -lCundallNonViscousForceDamping \
         -lMacroMicroElasticRelationships \
         -lyade-lib-serialization \
-        -lyade-lib-wm3-math \
+        -lyade-lib-base -lWm3Foundation \
         -lPhysicalActionContainerInitializer \
         -lPhysicalActionContainerReseter \
         -lGravityEngine \

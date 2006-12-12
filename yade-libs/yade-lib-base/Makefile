@@ -6,9 +6,9 @@ INSTALL_DIR=/usr/local
 
 #######################
 
-yade_include_subdir=yade-lib-algorithms
+yade_include_subdir=yade-lib-base
 yade_lib_subdir=yade-libs
-yade_libnames_basename=yade-lib-algorithms
+yade_libnames_basename=yade-lib-base
 
 all:
 	cd src && qmake "YADE_QMAKE_PATH=${PREFIX_DIR}/${INSTALL_DIR}" && $(MAKE)
@@ -32,5 +32,3 @@ uninstall:
 	rmdir --ignore-fail-on-non-empty ${PREFIX_DIR}/${INSTALL_DIR}/lib/yade/${yade_lib_subdir}
 	rmdir --ignore-fail-on-non-empty ${PREFIX_DIR}/${INSTALL_DIR}/lib/yade
 	rmdir --ignore-fail-on-non-empty ${PREFIX_DIR}/${INSTALL_DIR}/include/yade
-
-

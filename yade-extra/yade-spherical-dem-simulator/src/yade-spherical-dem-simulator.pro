@@ -6,5 +6,5 @@ TEMPLATE=subdirs
 SUBDIRS=SphericalDEMSimulator
 CONFIG += debug \
           warn_on
-
+LIBS += -lyade-lib-base -lWm3Foundation
 QMAKE_RUN_CXX_IMP = $(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $(shell pwd)/$<

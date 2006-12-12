@@ -12,8 +12,9 @@
 #include <cmath>
 #include <string>
 #include <vector>
-#include <yade/yade-lib-wm3-math/Vector3.hpp>
-#include <yade/yade-core/yadeWm3Extra.hpp>
+#include <Wm3Vector3.h>
+#include <yade/yade-lib-base/yadeWm3.hpp>
+#include <yade/yade-lib-base/yadeWm3Extra.hpp>
 
 using namespace std;
 

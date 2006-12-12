@@ -10,7 +10,7 @@
 #define INTERACTIONGEOMETRYFUNCTOR_HPP
 
 #include <yade/yade-core/InteractingGeometry.hpp>
-#include <yade/yade-lib-wm3-math/Se3.hpp>
+#include <yade/yade-lib-base/yadeWm3Extra.hpp>
 #include <yade/yade-core/Interaction.hpp>
 #include <yade/yade-core/EngineUnit2D.hpp>
 

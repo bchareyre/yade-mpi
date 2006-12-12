@@ -5,7 +5,7 @@ error( "YADE_QMAKE_PATH internal qmake variable is not set, you should run for e
 
 LIBS += -lParticleParameters \
         -lyade-lib-factory \
-        -lyade-lib-wm3-math \
+        -lyade-lib-base -lWm3Foundation \
         -lyade-lib-serialization \
         -lyade-lib-multimethods \
         -rdynamic 

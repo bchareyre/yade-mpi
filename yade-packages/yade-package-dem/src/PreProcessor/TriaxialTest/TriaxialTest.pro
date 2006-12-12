@@ -14,7 +14,7 @@ LIBS += -lSDECLinkGeometry \
         -lInteractionVecSet \
 	-lInteractionHashMap \
         -lBodyRedirectionVector \
-        -lyade-lib-wm3-math \
+        -lyade-lib-base -lWm3Foundation \
         -lInteractingSphere \
         -lInteractingBox \
         -lCundallNonViscousMomentumDamping \

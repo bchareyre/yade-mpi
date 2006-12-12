@@ -7,7 +7,7 @@ SUBDIRS=yade-lib-serialization-qt
 CONFIG  += debug \
           thread \
 warn_on
-
+LIBS += -lyade-lib-base -lWm3Foundation
 INCLUDEPATH += $${YADE_QMAKE_PATH}/include
 
 QMAKE_RUN_CXX_IMP = $(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $(shell pwd)/$<

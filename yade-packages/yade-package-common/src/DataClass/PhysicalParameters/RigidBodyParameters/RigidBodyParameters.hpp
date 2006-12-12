@@ -10,7 +10,8 @@
 #define RIGIDBODYPARAMETERS_HPP
 
 #include "ParticleParameters.hpp"
-#include <yade/yade-lib-wm3-math/Matrix3.hpp>
+#include <Wm3Matrix3.h>
+#include <yade/yade-lib-base/yadeWm3.hpp>
 
 class RigidBodyParameters : public ParticleParameters
 {	

@@ -10,7 +10,8 @@
 #define TETRAHEDRON_HPP
 
 #include <yade/yade-core/GeometricalModel.hpp>
-#include <yade/yade-lib-wm3-math/Math.hpp>
+#include <Wm3Math.h>
+#include <yade/yade-lib-base/yadeWm3.hpp>
 
 class Tetrahedron : public GeometricalModel
 {

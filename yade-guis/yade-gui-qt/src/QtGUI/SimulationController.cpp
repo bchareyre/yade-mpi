@@ -20,7 +20,8 @@
 #include <unistd.h>
 #include <yade/yade-core/Omega.hpp>
 #include <yade/yade-core/yadeExceptions.hpp>
-#include <yade/yade-lib-wm3-math/Math.hpp>
+#include <Wm3Math.h>
+#include <yade/yade-lib-base/yadeWm3.hpp>
 
 
 using namespace boost;

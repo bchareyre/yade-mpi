@@ -15,14 +15,21 @@
 #include "KnownFundamentalsHandler.tpp"
 //#include "MultiTypeHandler.tpp" // this is in Serializable.hpp, should be here, but then it doesn't compile
 
-#include <yade/yade-lib-wm3-math/Vector2.hpp>
-#include <yade/yade-lib-wm3-math/Vector3.hpp>
-#include <yade/yade-lib-wm3-math/Vector4.hpp>
-#include <yade/yade-lib-wm3-math/Matrix2.hpp>
-#include <yade/yade-lib-wm3-math/Matrix3.hpp>
-#include <yade/yade-lib-wm3-math/Matrix4.hpp>
-#include <yade/yade-lib-wm3-math/Quaternion.hpp>
-#include <yade/yade-lib-wm3-math/Se3.hpp>
+#include <Wm3Vector2.h>
+#include <yade/yade-lib-base/yadeWm3.hpp>
+#include <Wm3Vector3.h>
+#include <yade/yade-lib-base/yadeWm3.hpp>
+#include <Wm3Vector4.h>
+#include <yade/yade-lib-base/yadeWm3.hpp>
+#include <Wm3Matrix2.h>
+#include <yade/yade-lib-base/yadeWm3.hpp>
+#include <Wm3Matrix3.h>
+#include <yade/yade-lib-base/yadeWm3.hpp>
+#include <Wm3Matrix4.h>
+#include <yade/yade-lib-base/yadeWm3.hpp>
+#include <Wm3Quaternion.h>
+#include <yade/yade-lib-base/yadeWm3.hpp>
+#include <yade/yade-lib-base/yadeWm3Extra.hpp>
 
 using namespace ArchiveTypes;
 

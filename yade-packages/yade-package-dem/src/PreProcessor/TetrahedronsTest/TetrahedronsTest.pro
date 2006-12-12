@@ -33,7 +33,7 @@ LIBS += -lMyTetrahedronLaw \
         -lMetaInteractingGeometry2AABB \
         -lTetrahedron \
         -lyade-lib-serialization \
-        -lyade-lib-wm3-math \
+        -lyade-lib-base -lWm3Foundation \
         -lyade-lib-multimethods \
         -rdynamic 
 INCLUDEPATH += $${YADE_QMAKE_PATH}/include/ \

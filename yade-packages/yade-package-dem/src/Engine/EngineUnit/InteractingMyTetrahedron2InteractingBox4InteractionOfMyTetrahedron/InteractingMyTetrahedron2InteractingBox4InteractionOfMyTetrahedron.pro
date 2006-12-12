@@ -9,7 +9,7 @@ LIBS += -lInteractionOfMyTetrahedron \
 	-lInteractingBox \
 	-lInteractingSphere \
 	-lSpheresContactGeometry \
-        -lyade-lib-wm3-math \
+        -lyade-lib-base -lWm3Foundation \
         -lyade-lib-multimethods \
         -lInteractingMyTetrahedron \
         -rdynamic 

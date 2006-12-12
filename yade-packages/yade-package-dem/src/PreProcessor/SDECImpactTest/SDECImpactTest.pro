@@ -13,7 +13,7 @@ LIBS += -lSDECLinkGeometry \
         -lPhysicalActionVectorVector \
         -lInteractionVecSet \
         -lBodyRedirectionVector \
-        -lyade-lib-wm3-math \
+        -lyade-lib-base -lWm3Foundation \
         -lInteractingSphere \
         -lInteractingBox \
         -lCundallNonViscousMomentumDamping \

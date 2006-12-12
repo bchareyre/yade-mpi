@@ -9,7 +9,7 @@
 #include "GLDrawTetrahedron.hpp"
 #include "Tetrahedron.hpp"
 #include <yade/yade-lib-opengl/OpenGLWrapper.hpp>
-#include <yade/yade-core/yadeWm3.hpp>
+#include <yade/yade-lib-base/yadeWm3.hpp>
 
 
 void GLDrawTetrahedron::go(const shared_ptr<GeometricalModel>& gm, const shared_ptr<PhysicalParameters>&,bool wire)

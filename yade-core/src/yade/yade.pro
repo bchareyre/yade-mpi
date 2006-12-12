@@ -1,5 +1,4 @@
-isEmpty ( YADE_QMAKE_PATH ) {
-error( "YADE_QMAKE_PATH internal qmake variable is not set, you should run for example qmake YADE_QMAKE_PATH=/home/janek/YADE, this will not work from inside kdevelop (when they will fix it?)" )
+isEmpty ( YADE_QMAKE_PATH ) { error( "YADE_QMAKE_PATH internal qmake variable is not set, you should run for example qmake YADE_QMAKE_PATH=/home/janek/YADE, this will not work from inside kdevelop (when they will fix it?)" )
 }
 
 
@@ -46,7 +45,7 @@ HEADERS += BodyContainer.hpp \
 	   BroadInteractor.hpp \
 	   InteractionSolver.hpp \
 	   DataRecorder.hpp \
-           StandAloneSimulator.hpp 
+           StandAloneSimulator.hpp
 SOURCES += BodyContainer.cpp \
            Body.cpp \
            BoundingVolume.cpp \
@@ -70,10 +69,10 @@ SOURCES += BodyContainer.cpp \
            yadeExceptions.cpp \
            TimeStepper.cpp \
            MetaDispatchingEngine.cpp \
-           StandAloneSimulator.cpp 
+           StandAloneSimulator.cpp
 LIBS += -lyade-lib-serialization \
 -lyade-lib-factory \
--lyade-lib-wm3-math \
+-lyade-lib-base -lWm3Foundation \
 -lyade-lib-loki \
 -lyade-lib-multimethods \
 -lglut \
@@ -89,10 +88,6 @@ CONFIG += console
 }
 !win32 {
 TARGET = ../../bin/yade
-}
-!isEmpty(LOG4CXX) {
-	LIBS += -llog4cxx
-	DEFINES += LOG4CXX
 }
 
 CONFIG += debug \

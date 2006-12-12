@@ -14,11 +14,11 @@
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
 #include <yade/yade-lib-factory/ClassFactory.hpp>
+#include <yade/yade-lib-base/Logging.hpp>
 #include "Omega.hpp"
 #include "FrontEnd.hpp"
 #include "Preferences.hpp"
 
-#include "logging.hpp"
 
 using namespace std;
 

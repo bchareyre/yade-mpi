@@ -13,8 +13,9 @@
 #include "yade/yade-package-common/ParticleParameters.hpp"
 #include "yade/yade-package-common/Force.hpp"
 #include "StiffnessMatrix.hpp"
-#include <yade/yade-lib-wm3-math/Math.hpp>
-#include <yade/yade-core/yadeWm3Extra.hpp>
+#include <Wm3Math.h>
+#include <yade/yade-lib-base/yadeWm3.hpp>
+#include <yade/yade-lib-base/yadeWm3Extra.hpp>
 
 
 

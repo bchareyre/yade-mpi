@@ -7,7 +7,7 @@ LIBS += -lErrorTolerantContact \
         -lInteractionGeometryMetaEngine \
         -lyade-lib-multimethods \
         -lyade-lib-factory \
-        -lyade-lib-wm3-math \
+        -lyade-lib-base -lWm3Foundation \
         -lSphere \
         -rdynamic 
 INCLUDEPATH += $${YADE_QMAKE_PATH}/include/ \

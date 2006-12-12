@@ -9,7 +9,8 @@
 #ifndef OPENGLWRAPPER_HPP
 #define OPENGLWRAPPER_HPP
 
-#include <yade/yade-lib-wm3-math/Vector3.hpp>
+#include <Wm3Vector3.h>
+#include <yade/yade-lib-base/yadeWm3.hpp>
 
 #include <GL/gl.h>
 #include <GL/glut.h>

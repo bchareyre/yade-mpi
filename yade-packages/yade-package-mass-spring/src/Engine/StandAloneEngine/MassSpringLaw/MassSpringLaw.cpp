@@ -15,7 +15,7 @@
 #include <yade/yade-package-common/ParticleParameters.hpp>
 #include <yade/yade-package-common/Force.hpp>
 #include <yade/yade-package-common/Momentum.hpp>
-#include <yade/yade-core/yadeWm3Extra.hpp>
+#include <yade/yade-lib-base/yadeWm3Extra.hpp>
 
 
 MassSpringLaw::MassSpringLaw () : InteractionSolver(), actionForce(new Force) , actionMomentum(new Momentum)

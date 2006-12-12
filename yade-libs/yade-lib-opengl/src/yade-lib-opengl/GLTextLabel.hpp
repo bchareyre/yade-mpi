@@ -10,7 +10,8 @@
 #define GLTEXTLABEL_HPP
 
 #include "GLWindow.hpp"
-#include <yade/yade-lib-wm3-math/Vector3.hpp>
+#include <Wm3Vector3.h>
+#include <yade/yade-lib-base/yadeWm3.hpp>
 
 class GLTextLabel : public GLWindow
 {	

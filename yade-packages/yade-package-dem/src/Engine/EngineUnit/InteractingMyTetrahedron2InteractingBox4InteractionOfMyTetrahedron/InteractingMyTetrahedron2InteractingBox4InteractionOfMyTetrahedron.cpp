@@ -15,7 +15,7 @@
 #include <boost/shared_ptr.hpp>
 #include "SpheresContactGeometry.hpp"
 #include <yade/yade-core/Interaction.hpp>
-#include <yade/yade-core/yadeWm3Extra.hpp>
+#include <yade/yade-lib-base/yadeWm3Extra.hpp>
 
 void InteractingMyTetrahedron2InteractingBox4InteractionOfMyTetrahedron::calcSphereAndBox(
 		Vector3r c1,
