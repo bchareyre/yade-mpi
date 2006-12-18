@@ -358,7 +358,7 @@ for project in projects:
 	allVars.append(proProcess(project,dir=dirname(project)))
 
 # HACK: useful stuff to pass down via globals...
-pretty=False
+pretty=True
 if pretty:
 	toStr=pprint.pformat; fieldSep='\n'
 else:

@@ -117,7 +117,6 @@ Real unitVectorsAngle(const Vector3r& a, const Vector3r& rkV)  { return Mathr::A
 
 
 Real componentSum(const Vector3r& v){return v[0]+v[1]+v[2];}
-Real componentSqrSum(const Vector3r& v){return v[0]*v[0]+v[1]*v[1]+v[2]*v[2];}
 
 
 

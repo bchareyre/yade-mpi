@@ -43,6 +43,31 @@ Remember to add plugin directories as described in first time setup >>.
 
 
 ----------------------------------------------------------------------------
+COMPILING WITH SCONS
+
+Yade will eventually (hopefully) use scons instead of make. As of now, scons features
+some autodetection capabilities, robust support for parallel builds and nice output.
+Scons is probably packaged for your distribution - if not, go to http://www.scons.org
+and download it. It is written in pure python, there is no need to compile.
+
+Scons build files (SConscript) will be generated automatically from .pro files on the first run.
+Warnings can be safely ignored.
+
+There are some options that may interest you.
+
+	1. "scons -j4" will make scons compile 4 files at a time. Major speedup for multicore machines.
+
+	2. CPPPATH and LIBPATH to find headers and libraries in non-standard locations. For example,
+
+		scons CPPPATH="/usr/local/include/wm3" LIBPATH="/usr/local/lib"
+
+	3. PREFIX indicates where to install. /usr/local is the default.
+
+For other options, try "scons -h". Note that the options given by 'scons -h' are remembered accross runs
+(yade.scons.conf) and you do not need to enter them every time.
+
+
+----------------------------------------------------------------------------
 OTHER COMPILATION VARIANTS
 
 As a root user:
