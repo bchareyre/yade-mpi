@@ -97,6 +97,9 @@ Vector3r diagMult (const Vector3r& a, const Vector3r& rkV);
 Vector3r diagDiv (const Vector3r& a, const Vector3r& rkV);
 Real unitVectorsAngle(const Vector3r& a, const Vector3r& rkV);
 
+Real componentSum(const Vector3r& v);
+Real componentSqrSum(const Vector3r& v);
+
 
 
 /*Vector4r std::maxVector (const Vector4r& rkV) const;

@@ -8,7 +8,6 @@
 /**************** explicit instantiations ****************************/
 /* this template garbage will go away once we dump Real and go with double forver */
 template Vector3<float> operator*<double, float>(double, Wm3::Vector3<float> const&);
-
 /****** end of explicit instantiations *******/
 
 
@@ -115,6 +114,10 @@ Vector3r componentMinVector (const Vector3r& a, const Vector3r& rkV)  { return V
 Vector3r diagMult (const Vector3r& a, const Vector3r& rkV)  {	return Vector3r(a.X()*rkV.X(),a.Y()*rkV.Y(),a.Z()*rkV.Z()); }
 Vector3r diagDiv (const Vector3r& a, const Vector3r& rkV)  { return Vector3r(a.X()/rkV.X(),a.Y()/rkV.Y(),a.Z()/rkV.Z()); }
 Real unitVectorsAngle(const Vector3r& a, const Vector3r& rkV)  { return Mathr::ACos(a.Dot(rkV)); }
+
+
+Real componentSum(const Vector3r& v){return v[0]+v[1]+v[2];}
+Real componentSqrSum(const Vector3r& v){return v[0]*v[0]+v[1]*v[1]+v[2]*v[2];}
 
 
 

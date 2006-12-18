@@ -40,6 +40,7 @@ class FileGenerator
 		virtual void postProcessAttributes(bool);
 		virtual void registerAttributes();
 
+	DECLARE_LOGGER;
 	REGISTER_CLASS_NAME(FileGenerator);
 	REGISTER_BASE_CLASS_NAME(Serializable);
 };

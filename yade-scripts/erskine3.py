@@ -306,8 +306,10 @@ def scriptGen(v,dir):
 	elif buildEngine=='scons':
 		env=defaultEnv
 		if target in targetEnv: env=targetEnv[target]
-		ret+="%s=%s.%s('%s',%s%s"%(pythonicTarget(target),env,
-			{'program':'Program','shlib':'SharedLibrary','staticlib':'StaticLibrary'}[targetType],
+		# assign variable to each target, so that it can be passed to the Install method later	
+		# uncomment this and look for EXPLICIT_INSTALL below as well
+		# ret+="%s="%pythonicTarget(target)
+		ret+="%s.%s('%s',%s%s"%(env,{'program':'Program','shlib':'SharedLibrary','staticlib':'StaticLibrary'}[targetType],
 			target,fieldSep,toStr(prependDirFile(relPath,sources)))
 		if installable.has_key((env,targetType)): installable[(env,targetType)].append(pythonicTarget(target))
 		else: installable[(env,targetType)]=[pythonicTarget(target),]
@@ -338,10 +340,11 @@ def masterScriptGen(V,dir):
 	if buildEngine=='scons':
 		s+="Import('*')\n"
 		s+=processVars(V,dir)
-		s+='\n'
 		for env,ttype in installable.keys(): # one of shlib, staticlib, program
 			if len(installable[(env,ttype)])==0: continue
-			s+="%s.Install('%s',source=[%s])\n"%(env,installDirs[ttype],string.join(installable[(env,ttype)],','))
+			# commented temporarily
+			# if you need this back, uncomment also the other lines marked by EXPLICIT_INSTALL in comment
+			# s+="\n%s.Install('%s',source=[%s])\n"%(env,installDirs[ttype],string.join(installable[(env,ttype)],','))
 	elif buildEngine=='waf':
 		s+=processVars(V,dir)
 	return s

@@ -1,6 +1,6 @@
 #!/usr/bin/scons
 # coding: UTF-8
-# vim: set syntax=python
+# vim:syntax=python:
 
 #
 # This is the master build file for scons (http://www.scons.org). It is experimental, though it build very well for me. Prequisities for running:
@@ -17,12 +17,14 @@
 # The install target takes care of both compilation and installation of binary, libraries and headers.
 #
 #
-# TODO: 1. retrieve target list and append install targets dynamically; 2. configuration and option handling.
+# TODO:
+#  1. [DONE] retrieve target list and append install targets dynamically;
+#  2. configuration and option handling.
 #
 # And as usually, clean up the code, get rid of workarounds and hacks etc.
 
 
-import os.path, string
+import os, os.path, string, re
 
 def prepareIncludes(prefix=None):
 	"""symlink all in-tree headers into the ./include directory so that we can build before headers are installed"""
@@ -50,7 +52,6 @@ def prepareIncludes(prefix=None):
 					env.Install(subInc,join(root,f))
 					#assert(subInc in instIncludeDirs)
 
-import os, os.path
 
 libDirs=['yade-libs','yade-packages/yade-package-common','yade-packages/yade-package-dem','yade-packages/yade-package-fem','yade-packages/yade-package-lattice','yade-packages/yade-package-mass-spring','yade-packages/yade-package-realtime-rigidbody','yade-extra','yade-guis']
 instDirs=[os.path.join('$PREFIX','bin')]+map(lambda x: os.path.join('$PREFIX','lib','yade',string.split(x,os.path.sep)[-1]),libDirs)
@@ -63,7 +64,8 @@ env=Environment(tools=['default','qt'])
 # do not propagate PATH from outside, to ensure identical builds on different machines
 path=['/usr/local/bin', '/bin', '/usr/bin']
 # ccache needs $HOME to be set; colorgcc needs $TERM
-env.Append(ENV={'PATH':path,'HOME':os.environ['HOME'],'TERM':os.environ['TERM']})
+env.Append(ENV={'PATH':path,'HOME':os.environ['HOME'],'TERM':os.environ['TERM'],
+	'DISTCC_HOSTS':'localhost'}) #'192.168.0.101/1 localhost'})
 
 ################################################
 ######## these setting should be adapted...
@@ -105,11 +107,13 @@ opts.Update(env)
 opts.Save('env.conf', env)
 
 
-## http://www.scons.org/wiki/HidingCommandLinesInOutput
-env.Replace(CXXCOMSTR='c++  $SOURCES → ${TARGET.file}')
-env.Replace(SHCXXCOMSTR='so++ $SOURCES → ${TARGET.file}')
-env.Replace(SHLINKCOMSTR='so $SOURCES → ${TARGET.file}')
-env.Replace(LINKCOMSTR='a $SOURCES → ${TARGET.file}')
+if False:
+	## http://www.scons.org/wiki/HidingCommandLinesInOutput
+	env.Replace(CXXCOMSTR='c++  $SOURCES → ${TARGET.file}')
+	env.Replace(SHCXXCOMSTR='so++ $SOURCES → ${TARGET.file}')
+	env.Replace(SHLINKCOMSTR='so $SOURCES → ${TARGET.file}')
+	env.Replace(LINKCOMSTR='a $SOURCES → ${TARGET.file}')
+	env.Replace(INSTALLSTR='⇒ $SOURCE → $TARGET')
 
 
 ## this is a workaround... env.Install method likes targets to be existing directories...
@@ -135,4 +139,30 @@ Default(installAlias)
 Help(opts.GenerateHelpText(env))
 Export('env');
 SConscript(map(lambda x: os.path.join(x,'SConscript'),libDirs+['yade-core']),exports=['env'])
+
+#################################################
+########### Installation
+# (this is UNIX specific!)
+
+### cut&paste from http://www.scons.org/wiki/BuildDirGlob, then modified
+def enumerateDotSoNodes(dirnode, level=0):
+	if type(dirnode)==type(''): dirnode=Dir(dirnode) # convert string to node
+	ret=[]
+	for f in dirnode.all_children():
+		if type(f)==type(Dir('.')): # print str(f)
+			ret+=enumerateDotSoNodes(f,level)
+		if str(f)[-3:]=='.so':
+			ret.append(f) #print "%s%s (%s: %s)"%(level * ' ', str(f),type(f.get_builder()),f.get_builder())
+	return ret
+installableNodes=enumerateDotSoNodes(Dir('.'))
+
+# iterate over .so nodes we got previously and call Install for each of them
+for n in installableNodes:
+	f=str(n)
+	m=re.match(r'(^|.*/)(yade-(extra|guis|libs|package-[^/]+))/lib[^/]+\.so$',f)
+	assert(m)
+	instDir=m.group(2)
+	env.Install('$PREFIX/lib/yade/'+instDir,n)
+# for the one and only binary, we do it by hand
+env.Install('$PREFIX/bin','yade-core/yade')
 

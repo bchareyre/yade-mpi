@@ -6,8 +6,12 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "FileGenerator.hpp"
+#include<cstdlib>
+#include<yade/yade-lib-multimethods/MultiMethodsExceptions.hpp>
 
+#include"FileGenerator.hpp"
+
+CREATE_LOGGER(FileGenerator);
 
 FileGenerator::FileGenerator () : Serializable() 
 {
@@ -54,7 +58,18 @@ string FileGenerator::generate()
 
 string FileGenerator::generateAndSave()
 {
-	string message = generate();
+	string message;
+	try {
+		message = generate();
+	}
+	catch(SerializableError& e){return string("SeriazableError: ")+e.what();}
+	catch(FactoryError& e){return string("FactoryError: ")+e.what();}
+	catch(MultiMethodsError& e){return string("MultiMethodsError: ")+e.what();}
+	catch(std::exception& e){
+		LOG_FATAL("Unhandled exception: "<<typeid(e).name()<<" : "<<e.what());
+		exit(1);
+	}
+
 	if(shouldTerminate())
 	{
 		return "Generation aborted.";

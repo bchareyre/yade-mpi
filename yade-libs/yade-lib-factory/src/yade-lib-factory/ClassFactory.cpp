@@ -10,6 +10,8 @@
 
 #include "ClassFactory.hpp"
 
+CREATE_LOGGER(ClassFactory);
+
 class Factorable;
 
 void ClassFactory::addBaseDirectory(const string& dir)
@@ -52,6 +54,11 @@ boost::shared_ptr<Factorable> ClassFactory::createShared( std::string name )
 		{
 			if( map.find( name ) == map.end() )
 			{
+				// Well, exception are also a way to return value, right?
+				// This throws at startup for every .so that doesn't contain class named the same as the library.
+				// I.e. almost everything in yade-libs and some others installed locally...
+				// Don't log that, it would confuse users.
+				//LOG_FATAL("Can't create class "<<name<<" - was never registered.");
 				std::string error = FactoryExceptions::ClassNotRegistered + name;
 				throw FactoryClassNotRegistered(error.c_str());
 			}

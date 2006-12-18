@@ -103,7 +103,6 @@ class ClassFactory : public Singleton< ClassFactory >
 		ClassFactory(const ClassFactory&);
 		ClassFactory& operator=(const ClassFactory&);
 		virtual ~ClassFactory() {};
-		DECLARE_LOGGER;
 
 	public :
 		/*! This method is used to register a Factorable class into the factory. It is called only from macro REGISTER_CLASS_TO_FACTORY
@@ -143,6 +142,8 @@ class ClassFactory : public Singleton< ClassFactory >
 
 		virtual string getClassName() const { return "Factorable"; };
 		virtual string getBaseClassName(int ) const { return "";};
+
+	DECLARE_LOGGER;
 
 	FRIEND_SINGLETON(ClassFactory);
 };
