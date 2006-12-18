@@ -124,9 +124,8 @@ PhysicalActionContainer::iterator PhysicalActionVectorVector::end()
 	it->currentIndex = physicalActions.size();
 	it->vvi		 = physicalActions.end();
 	it->vviEnd	 = physicalActions.end();
-	it->vi		 = (*it->vvi).end();
-	it->viEnd	 = (*it->vvi).end();
-
+	/* Using nested iterator when the first one is end() already would be error, therefore we leave it->vi and it->viEnd alone.
+	 * (see PhysicalActionVectorVectorIterator::isDifferent for exact implementation of !=end()) */
 	return PhysicalActionContainer::iterator(it);
 
 }
