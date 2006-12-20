@@ -3,19 +3,17 @@
 # vim:syntax=python:
 
 #
-# This is the master build file for scons (http://www.scons.org). It is experimental, though it build very well for me. Prequisities for running:
-# 1. have scons installed (debian & family: package scons)
-# 2. edit the few lines below that are marked `these lines should be adapted'. In particular, remove LOG4CXX macro and log4cxx library if you don't want to use it. (Autodetection and configuration is planned for later)
-# 3. go to yade-scripts and run ./erskine3-apply.sh. It should generate SConscript files for subprojects.
+# This is the master build file for scons (http://www.scons.org). It is experimental, though it build very well for me. Prequisities for running are having scons installed (debian & family: package scons)
 #
-# To run the build, just run `scons' from the top-level (this) directory. This step will do preparatory steps (creating local include directory and symlinking all headers from there, create install directories), compile files and install them. Scons has great support for parallel builds, you can try `scons -j4'.
+# Type "scons -h" for yade-specific options and "scons -H" for scons' options. Note that yade options will be remembered (saved in scons.config) so that you need to specify them only for the first time. Like this, for example:
 #
-# To clean the build, run `scons -c'. Please note that it will also _uninstall_ yade. This is only temporary inconvenience that will disappera, though...
+#	scons -j2 pretty=1 debug=0 optimize=1 profile=1 exclude=extra,fem,lattice,realtime-rigidbody,mass-spring CPPPATH=/usr/local/include/wm3
 #
-# What it does: running the script always checks for existence of installation directories for both libs and headers (hack).
-# Prebuild target symlinks all headers to the ./include/* directories to make compilation possible without installing includes to $PREFIX.
-# The install target takes care of both compilation and installation of binary, libraries and headers.
+# Next time, you can simply run "scons" or "scons -j4" (for 4-parallel builds) to rebuild targets that need it. IF YOU NEED TO READ CODE IN THIS FILE, SOMETHING IS BROKEN AND YOU SHOULD REALLY TELL ME (the goal is to replace qmake eventually).
 #
+# Scons will do preparatory steps (generating SConscript files from .pro files, creating local include directory and symlinking all headers from there, ...), compile files and install them.
+#
+# To clean the build, run `scons -c'. Please note that it will also _uninstall_ yade from $PREFIX!
 #
 # TODO:
 #  1. [DONE] retrieve target list and append install targets dynamically;
@@ -30,10 +28,15 @@ import os,os.path,string,re,sys
 ############# OPTIONS ####################################################################
 ##########################################################################################
 
-opts=Options('yade.scons.conf')
+optsFile='scons.config'
+
+opts=Options(optsFile)
 opts.AddOptions(
 	PathOption('PREFIX', 'Install path prefix', '/usr/local'),
-	BoolOption('DEBUG', 'Enable debugging information and disable optimizations',1),
+	BoolOption('debug', 'Enable debugging information and disable optimizations',1),
+	BoolOption('profile','Enable profiling information',0),
+	BoolOption('optimize','Turn on heavy optimizations (generates SSE2 instructions)',0),
+	ListOption('exclude','Components that will not be built','none',names=['extra','common','dem','fem','lattice','mass-spring','realtime-rigidbody']),
 	('CPPPATH', 'Additional paths for the C preprocessor (whitespace separated)',None,None,Split),
 	('LIBPATH','Additional paths for the linker (whitespace separated)',None,None,Split),
 	('QTDIR','Directories where to look for qt3',['/usr/share/qt3','/usr/lib/qt'],None,Split),
@@ -49,7 +52,9 @@ env.Append(ENV={'PATH':['/usr/local/bin','/bin','/usr/bin']})
 propagatedEnvVars=['HOME','TERM','DISTCC_HOSTS']
 for v in propagatedEnvVars:
 	if os.environ.has_key(v): env.Append(ENV={v:os.environ[v]})
-opts.Save('yade.scons.conf',env)
+
+opts.Save(optsFile,env)
+
 Help(opts.GenerateHelpText(env))
 
 
@@ -92,7 +97,7 @@ env.Replace(QT_LIB='qt-mt')
 env.Append(LIBS=['glut','boost_date_time','boost_filesystem','boost_thread','pthread','Wm3Foundation'])
 
 if conf.CheckLibWithHeader('log4cxx','log4cxx/logger.h','c++','log4cxx::Logger::getLogger("foo");'):
-	env.Append(LIBS='log4cxx',CPPDEFINES='LOG4CXX')
+	env.Append(LIBS='log4cxx',CPPDEFINES=['LOG4CXX'])
 
 env=conf.Finish()
 
@@ -103,15 +108,30 @@ env=conf.Finish()
 
 ### DIRECTORIES
 libDirs=['yade-libs','yade-packages/yade-package-common','yade-packages/yade-package-dem','yade-packages/yade-package-fem','yade-packages/yade-package-lattice','yade-packages/yade-package-mass-spring','yade-packages/yade-package-realtime-rigidbody','yade-extra','yade-guis']
+# exclude stuff that should be excluded
+libDirs=[x for x in libDirs if not re.match('^.*-('+string.join(env['exclude'],'|')+')$',x)]
+
 instDirs=[os.path.join('$PREFIX','bin')]+[os.path.join('$PREFIX','lib','yade',string.split(x,os.path.sep)[-1]) for x in libDirs]
 instIncludeDirs=['yade-core']+[os.path.join('$PREFIX','include','yade',string.split(x,os.path.sep)[-1]) for x in libDirs]
-
 ### PREPROCESSOR
 env.Append(CPPPATH=['#/include'])
 
 ### COMPILER
-if env['DEBUG']: env.Append(CXXFLAGS='-ggdb3')
-else: env.Append(CXXFLAGS='-O2 -ffast-math')
+if env['debug']: env.Append(CXXFLAGS='-ggdb3',CPPDEFINES=['DEBUG'])
+else: env.Append(CXXFLAGS='-O2')
+if env['optimize']:
+	env.Append(CXXFLAGS=Split('-O3 -floop-optimize2 -ffast-math'))
+	# CRASH -ffloat-store
+	# maybe not CRASH?: -fno-math-errno
+	# CRASH?: -fmodulo-sched  
+	#   it is probably --ffast-fath that crashes !!!
+	# gcc-4.1 only: -funsafe-loop-optimizations -Wunsafe-loop-optimizations
+	# sure CRASH: -ftree-vectorize
+	# CRASH (one of them): -fivopts -fgcse-sm -fgcse-las (one of them - not sure which one exactly)
+	# ?: -ftree-loop-linear -ftree-loop-ivcanon
+	archFlags=Split('-march=pentium4 -mfpmath=sse,387') #-malign-double')
+	env.Append(CXXFLAGS=archFlags,LINKFLAGS=archFlags,SHLINKFLAGS=archFlags)
+if env['profile']: env.Append(CXXFLAGS=['-pg'],LINKFLAGS=['-pg'],SHLINKFLAGS=['-pg'])
 env.Append(CXXFLAGS=['-pipe','-Wall'])
 
 ### LINKER
