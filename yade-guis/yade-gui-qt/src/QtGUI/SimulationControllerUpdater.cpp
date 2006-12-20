@@ -11,9 +11,13 @@
 #include <qlcdnumber.h>
 #include <qspinbox.h>
 
+CREATE_LOGGER(SimulationControllerUpdater);
+
 SimulationControllerUpdater::SimulationControllerUpdater(SimulationController * sc)
-        :       controller(sc)
+        :       controller(sc), iterPerSec_TTL_ms(1000)
 {
+	iterPerSec_LastIter=Omega::instance().getCurrentIteration();
+	iterPerSec_LastLocalTime=microsec_clock::local_time();
 }
 
 
@@ -59,6 +63,15 @@ void SimulationControllerUpdater::oneLoop()
 	controller->lcdSecond->display(lexical_cast<string>(seconds));
 	controller->lcdMSecond->display(lexical_cast<string>(mseconds));
 
+	// update iterations per second - only one in a while (iterPerSec_TTL_ms)
+	// does someone need to display that with more precision than integer?
+	long iterPerSec_LastAgo_ms=(microsec_clock::local_time()-iterPerSec_LastLocalTime).total_milliseconds();
+	if(iterPerSec_LastAgo_ms>iterPerSec_TTL_ms){
+		controller->tlIterPerSec->setText(lexical_cast<string>((1000*(Omega::instance().getCurrentIteration()-iterPerSec_LastIter))/iterPerSec_LastAgo_ms));
+		iterPerSec_LastIter=Omega::instance().getCurrentIteration();
+		iterPerSec_LastLocalTime=microsec_clock::local_time();
+	}
+
 	// FIXME - why updater is controlling the timestep ??
 	if (controller->changeSkipTimeStepper)
 			Omega::instance().skipTimeStepper(controller->skipTimeStepper);
@@ -87,6 +100,7 @@ void SimulationControllerUpdater::oneLoop()
 // 	controller->lcdDt10PowerSecond->display((int)dt);
 	string strDt = lexical_cast<string>(Omega::instance().getTimeStep());
 	controller->tlTimeStep->setText(strDt);
+
 
 	controller->changeSkipTimeStepper = false;
 	controller->changeTimeStep = false;
