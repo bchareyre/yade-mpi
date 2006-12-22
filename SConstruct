@@ -33,6 +33,7 @@ optsFile='scons.config'
 opts=Options(optsFile)
 opts.AddOptions(
 	PathOption('PREFIX', 'Install path prefix', '/usr/local'),
+	('POSTFIX','Local version appended to binary, library and config directory (beware: if PREFIX is the same, headers of the older version will still be overwritten','',None,lambda x:x),
 	BoolOption('debug', 'Enable debugging information and disable optimizations',1),
 	BoolOption('profile','Enable profiling information',0),
 	BoolOption('optimize','Turn on heavy optimizations (generates SSE2 instructions)',0),
@@ -106,15 +107,18 @@ env=conf.Finish()
 ############# BUILDING ###################################################################
 ##########################################################################################
 
+env.SourceSignatures('MD5')
+
 ### DIRECTORIES
 libDirs=['yade-libs','yade-packages/yade-package-common','yade-packages/yade-package-dem','yade-packages/yade-package-fem','yade-packages/yade-package-lattice','yade-packages/yade-package-mass-spring','yade-packages/yade-package-realtime-rigidbody','yade-extra','yade-guis']
 # exclude stuff that should be excluded
 libDirs=[x for x in libDirs if not re.match('^.*-('+string.join(env['exclude'],'|')+')$',x)]
 
-instDirs=[os.path.join('$PREFIX','bin')]+[os.path.join('$PREFIX','lib','yade',string.split(x,os.path.sep)[-1]) for x in libDirs]
+instDirs=[os.path.join('$PREFIX','bin')]+[os.path.join('$PREFIX','lib','yade$POSTFIX',string.split(x,os.path.sep)[-1]) for x in libDirs]
 instIncludeDirs=['yade-core']+[os.path.join('$PREFIX','include','yade',string.split(x,os.path.sep)[-1]) for x in libDirs]
 ### PREPROCESSOR
 env.Append(CPPPATH=['#/include'])
+env.Append(CPPDEFINES=[('POSTFIX',r'\"$POSTFIX\"'),('PREFIX',r'\"$PREFIX\"')])
 
 ### COMPILER
 if env['debug']: env.Append(CXXFLAGS='-ggdb3',CPPDEFINES=['DEBUG'])
@@ -139,7 +143,7 @@ env.Append(SHLINKFLAGS='-Wl,-soname=${TARGET.file} -rdynamic')
 # if this is not present, vtables & typeinfos for classes in yade binary itself are not exported; breaks plugin loading
 env.Append(LINKFLAGS='-rdynamic') 
 # makes dynamic library loading easied (no LD_LIBRARY_PATH) and perhaps faster
-env.Append(RPATH=[os.path.join('$PREFIX','lib','yade',string.split(x,os.path.sep)[-1]) for x in libDirs])
+env.Append(RPATH=[os.path.join('$PREFIX','lib','yade$POSTFIX',string.split(x,os.path.sep)[-1]) for x in libDirs])
 # find already compiled but not yet installed libraries for linking
 env.Append(LIBPATH=[os.path.join('#',x) for x in libDirs])
 
@@ -152,7 +156,7 @@ if major=='0' and int(minor)<=96 and int(micro)<93:
 	## should reside in prepareIncludes or sth similar
 	def createDirs(dirList):
 		for d in dirList:
-			dd=d.replace('$PREFIX',env['PREFIX'])
+			dd=env.subst(d) #d.replace('$PREFIX',env['PREFIX'])
 			if not os.path.exists(dd):
 				print dd
 				os.makedirs(dd)
@@ -241,9 +245,9 @@ for n in installableNodes:
 	m=re.match(r'(^|.*/)(yade-(extra|guis|libs|package-[^/]+))/lib[^/]+\.so$',f)
 	assert(m)
 	instDir=m.group(2)
-	env.Install('$PREFIX/lib/yade/'+instDir,n)
+	env.Install('$PREFIX/lib/yade$POSTFIX/'+instDir,n)
 # for the one and only binary, we do it by hand
-env.Install('$PREFIX/bin','yade-core/yade')
+env.InstallAs('$PREFIX/bin/yade$POSTFIX','yade-core/yade')
 
 ##########################################################################################
 ############# MISCILLANEA ################################################################

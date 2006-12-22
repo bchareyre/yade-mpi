@@ -96,6 +96,9 @@ SimulationController::SimulationController(QWidget * parent) : QtGeneratedSimula
 	if (Omega::instance().getSimulationFileName()!=""){
 		loadSimulationFromFileName(Omega::instance().getSimulationFileName());
 	}
+
+	// this should prevent weird things happening during the very first run; it is not a proper fix, though.
+	pbStopClicked();
 }
 
 
@@ -291,7 +294,6 @@ void SimulationController::closeGLViewEvent(int id)
 void SimulationController::pbStopClicked()
 {
 	Omega::instance().stopSimulationLoop();
-
 	killTimers();
 }
 

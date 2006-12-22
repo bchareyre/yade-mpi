@@ -38,5 +38,5 @@ uninstall:
 
 tags:
 	# prevent generated symlinked files from yade-flat and include to be parsed
-	ctags -R --language-force=c++ --extra=+q --exclude=.svn --exclude=yade-flat --exclude=include
+	ctags -R --language-force=c++ --extra=+q --exclude='.*' --exclude=yade-flat --exclude=include
 

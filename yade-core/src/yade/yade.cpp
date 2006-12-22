@@ -22,51 +22,24 @@
 
 using namespace std;
 
+#ifdef LOG4CXX
+// provides parent logger for everybody
+log4cxx::LoggerPtr logger=log4cxx::Logger::getLogger("yade");
+#endif
+
 void firstRunSetup(shared_ptr<Preferences>& pref)
 {
-	cout <<
-"\n\n\
-##########################################\n\
-#      Yade first run configuration      #\n\
-##########################################\n\
-\n";
-	string 	 guiName
-		,guiDir
-		,defaultGUI = "QtGUI"
-		,defaultDir = "/usr/local/lib/yade/yade-guis";
-	char 	 str[500];
-
-	filesystem::path guiFullPath;
-	do 
-	{
-		cout << "1. Specify default GUI name [" << defaultGUI << "] : " ;
-		cin.getline(str,500);
-		guiName = str;
-		if(guiName=="")
-			guiName = defaultGUI;
-	
-		cout << "\n   using GUI: " << guiName << "\n";
-	
-		cout << "\n2. Specify the path to the default GUI [" << defaultDir << "] : " ;
-		cin.getline(str,500);
-		guiDir = str;
-		
-		cout << "\n   using path: " << guiDir << "\n";
-		
-		if(guiDir=="")
-			guiDir = defaultDir;
-			
-		cout << "\n";
-		if (guiDir[guiDir.size()-1]!='/')
-			guiDir.push_back('/');
-		guiFullPath = filesystem::path(guiDir + ClassFactory::instance().libNameToSystemName(guiName) , filesystem::native);
-		if ( ! filesystem::exists(guiFullPath) && guiName != "NullGUI" )
-			cout << "## Error: " << guiDir+ClassFactory::instance().libNameToSystemName(guiName) << " doesn't exist\n## Try Again\n\n";
-	} while (!filesystem::exists(guiFullPath) && guiName != "NullGUI");
-	
-	pref->dynlibDirectories.push_back(guiDir.substr(0,guiDir.size()-1));
-	pref->defaultGUILibName = guiName;
-
+	char *libDirs[]={"yade-extra","yade-guis","yade-libs","yade-package-common","yade-package-dem","yade-package-fem","yade-package-lattice","yade-package-mass-spring","yade-package-realtime-rigidbody",NULL /* sentinel */};
+	string cfgFile=Omega::instance().yadeConfigPath+"/preferences.xml";
+	LOG_INFO("Creating default configuration file: "<<cfgFile<<". Please tune by hand if needed.");
+	string expLibDir;
+	for(int i=0; libDirs[i+1]!=NULL; i++) {
+		expLibDir=string( PREFIX "/lib/yade" POSTFIX "/")+libDirs[i];
+		LOG_INFO("Adding plugin directory "<<expLibDir<<".");
+		pref->dynlibDirectories.push_back(expLibDir);
+	}
+	LOG_INFO("Setting GUI: QtGUI.");
+	pref->defaultGUILibName="QtGUI";
 	IOFormatManager::saveToFile("XMLFormatManager",Omega::instance().yadeConfigPath+"/preferences.xml","preferences",pref);
 }
 
@@ -102,17 +75,13 @@ Only one option can be passed to yade, all other options are passed to the selec
 		cout << "compilation flags: "+ flags +"\n\n";
 }
 
-#ifdef LOG4CXX
-// provides parent logger for everybody
-log4cxx::LoggerPtr logger=log4cxx::Logger::getLogger("yade");
-#endif
 
 int main(int argc, char *argv[])
 {
 
 	int ch;
 	string gui = "";
-	string configPath = string(getenv("HOME")) + string("/.yade");
+	string configPath = string(getenv("HOME")) + string("/.yade" POSTFIX);
 	string simulationFileName="";
 
 	// This makes boost stop bitching about dot-files and other files that may not exist on MS-DOS 3.3;
