@@ -31,6 +31,13 @@ import os,os.path,string,re,sys
 optsFile='scons.config'
 
 opts=Options(optsFile)
+#
+# The convention now is, that
+#  1. CAPITALIZED options are
+#   (a) notorious shell variables (they correspons most the time to SCons environment options of the same name - like CPPPATH)
+#   (b) c preprocessor macros available to the program source (like PREFIX and POSTFIX)
+#  2. lowercase options influence the building process, compiler options and the like.
+#
 opts.AddOptions(
 	PathOption('PREFIX', 'Install path prefix', '/usr/local'),
 	('POSTFIX','Local version appended to binary, library and config directory (beware: if PREFIX is the same, headers of the older version will still be overwritten','',None,lambda x:x),
