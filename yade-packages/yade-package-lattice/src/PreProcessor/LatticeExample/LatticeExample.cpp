@@ -265,19 +265,26 @@ string LatticeExample::generate()
 
         unsigned int totalNodesCount = 0;
 
-	setMessage("creating nodes...");
-        for( int j=0 ; j<=nbNodes[1] ; j++ )
-        {
-		if(shouldTerminate()) return "";
+	{
+		setMessage("creating nodes...");
+		float all = nbNodes[0]*nbNodes[1]*nbNodes[2];
+		float current = 0.0;
 
-                for( int i=0 ; i<=nbNodes[0] ; i++ )
-                        for( int k=0 ; k<=nbNodes[2] ; k++)
-                        {
-                                shared_ptr<Body> node;
-                                if(createNode(node,i,j,k) || quads)
-                                        rootBody->bodies->insert(node), ++totalNodesCount;
-                        }
-        }
+		for( int j=0 ; j<=nbNodes[1] ; j++ )
+		{
+			if(shouldTerminate()) return "";
+
+			for( int i=0 ; i<=nbNodes[0] ; i++ )
+				for( int k=0 ; k<=nbNodes[2] ; k++)
+				{
+					setProgress(current++/all);
+
+					shared_ptr<Body> node;
+					if(createNode(node,i,j,k) || quads)
+						rootBody->bodies->insert(node), ++totalNodesCount;
+				}
+		}
+	}
 
         BodyRedirectionVector bc;
         bc.clear();
@@ -289,6 +296,8 @@ string LatticeExample::generate()
 	float nodes_a=0;
 	float nodes_all = rootBody->bodies->size();
 	setMessage("creating beams...");
+	double r  = maxLength_in_cellsizeUnit*cellsizeUnit_in_meters;
+	double r2 = std::pow(r,2);
 	for(  ; bi!=biEnd ; ++bi )  // loop over all nodes, to create beams
 	{
 		Body* bodyA = (*bi).get(); // first_node
@@ -306,7 +315,12 @@ string LatticeExample::generate()
 			LatticeNodeParameters* a = static_cast<LatticeNodeParameters*>(bodyA->physicalParameters.get());
 			LatticeNodeParameters* b = static_cast<LatticeNodeParameters*>(bodyB->physicalParameters.get());
 			
-			if ((a->se3.position - b->se3.position).SquaredLength() < std::pow(maxLength_in_cellsizeUnit*cellsizeUnit_in_meters,2) )  
+			//if ((a->se3.position - b->se3.position).SquaredLength() < std::pow(maxLength_in_cellsizeUnit*cellsizeUnit_in_meters,2) )  
+
+			if (	   ( std::abs(a->se3.position[0] - b->se3.position[0])<= r )
+				&& ( std::abs(a->se3.position[1] - b->se3.position[1])<= r )
+				&& ( std::abs(a->se3.position[2] - b->se3.position[2])<= r )
+				&& ((a->se3.position - b->se3.position).SquaredLength() < r2 ) )  
 			{
 				shared_ptr<Body> beam;
 				createBeam(beam,bodyA->getId(),bodyB->getId());

@@ -58,7 +58,7 @@ opts.AddOptions(
 ### create THE environment
 env=Environment(tools=['default'],options=opts)
 # do not propagate PATH from outside, to ensure identical builds on different machines
-env.Append(ENV={'PATH':['/usr/local/bin','/bin','/usr/bin']})
+#env.Append(ENV={'PATH':['/usr/local/bin','/bin','/usr/bin']})
 # ccache needs $HOME to be set; colorgcc needs $TERM
 propagatedEnvVars=['HOME','TERM','DISTCC_HOSTS']
 for v in propagatedEnvVars:
@@ -102,6 +102,10 @@ def CheckCXX(context):
 
 conf=Configure(env,custom_tests={'CheckQt':CheckQt,'CheckCXX':CheckCXX})
 
+#I have moved it up. It is necessary, because the tests also need -pthread flag
+# -pthread is for older g++ 3.3 and 3.4
+env.Append(CXXFLAGS=['-pipe','-Wall','-pthread'])
+
 ok=True
 ok&=conf.CheckCXX()
 ok&=conf.CheckLibWithHeader('pthread','pthread.h','c','pthread_exit(NULL);')
@@ -140,7 +144,7 @@ instDirs=[os.path.join('$PREFIX','bin')]+[os.path.join('$PREFIX','lib','yade$POS
 instIncludeDirs=['yade-core']+[os.path.join('$PREFIX','include','yade',string.split(x,os.path.sep)[-1]) for x in libDirs]
 ### PREPROCESSOR
 env.Append(CPPPATH=['#/include'])
-env.Append(CPPDEFINES=[('POSTFIX',r'\"$POSTFIX\"'),('PREFIX',r'\"$PREFIX\"')])
+env.Append(CPPDEFINES=[('POSTFIX',r'$POSTFIX'),('PREFIX',r'$PREFIX')])
 
 ### COMPILER
 if env['debug']: env.Append(CXXFLAGS='-ggdb3',CPPDEFINES=['DEBUG'])
@@ -159,7 +163,8 @@ if env['optimize']:
 	archFlags=Split('-march=pentium4 -mfpmath=sse,387') #-malign-double')
 	env.Append(CXXFLAGS=archFlags,LINKFLAGS=archFlags,SHLINKFLAGS=archFlags)
 if env['profile']: env.Append(CXXFLAGS=['-pg'],LINKFLAGS=['-pg'],SHLINKFLAGS=['-pg'])
-env.Append(CXXFLAGS=['-pipe','-Wall'])
+# -pthread is for older g++ 3.3 and 3.4
+#env.Append(CXXFLAGS=['-pipe','-Wall','-pthread'])
 
 ### LINKER
 env.Append(SHLINKFLAGS='-Wl,-soname=${TARGET.file} -rdynamic')
@@ -263,7 +268,7 @@ installableNodes=enumerateDotSoNodes(Dir('.'))
 for n in installableNodes:
 	f=str(n)
 	m=re.match(r'(^|.*/)(yade-(extra|guis|libs|package-[^/]+))/lib[^/]+\.so$',f)
-	if nor m: # older scons version have e.g. qt libs in nodes, we just skip them here
+	if not m: # older scons version have e.g. qt libs in nodes, we just skip them here
 		# TODO: exclude system libs in node enumerator, that is much safer
 		if major=='0' and int(minor)<=96 and int(micro)<90: continue
 		else: assert(m)

@@ -10,6 +10,9 @@ clean:
 	$(MAKE) -C yade-guis clean
 	$(MAKE) -C yade-packages clean
 	$(MAKE) -C yade-extra clean
+	rm -rf config.log scons.config .sconf_temp include
+	find -name ".sconsign" -exec rm -rf {} \;
+	find -name "SConscript" -exec rm -rf {} \;
 
 compile_install:
 	$(MAKE) -C yade-libs compile_install

@@ -1,15 +1,13 @@
 /*************************************************************************
-*  Copyright (C) 2004 by Olivier Galizzi                                 *
-*  olivier.galizzi@imag.fr                                               *
-*                                                                        *
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include<cstdlib>
-#include<yade/yade-lib-multimethods/MultiMethodsExceptions.hpp>
+#include <cstdlib>
+#include <yade/yade-lib-multimethods/MultiMethodsExceptions.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
-#include"FileGenerator.hpp"
+#include "FileGenerator.hpp"
 
 CREATE_LOGGER(FileGenerator);
 
@@ -59,6 +57,7 @@ string FileGenerator::generate()
 string FileGenerator::generateAndSave()
 {
 	string message;
+	boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
 	try {
 		message = generate();
 	}
@@ -76,6 +75,8 @@ string FileGenerator::generateAndSave()
 	}
 	else
 	{
+		boost::posix_time::ptime now2 = boost::posix_time::second_clock::local_time();
+		boost::posix_time::time_duration generationTime = now2 - now; // generation time, without save time
 		setMessage("saving...");
 		setProgress(1.0);
 		try
@@ -86,7 +87,8 @@ string FileGenerator::generateAndSave()
 		{
 			return std::string("File "+outputFileName+" cannot be saved: "+e.what());
 		}
-		return std::string("File "+outputFileName+" generated successfully.\n\n")+message;
+		return std::string("File "+outputFileName+" generated successfully (time: "
+				+ boost::posix_time::to_simple_string(generationTime) +").\n\n")+message;
 	}
 }
 

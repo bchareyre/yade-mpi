@@ -13,6 +13,7 @@
 #include <getopt.h>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
+#include <boost/preprocessor/stringize.hpp>
 #include <yade/yade-lib-factory/ClassFactory.hpp>
 #include <yade/yade-lib-base/Logging.hpp>
 #include "Omega.hpp"
@@ -27,6 +28,27 @@ using namespace std;
 log4cxx::LoggerPtr logger=log4cxx::Logger::getLogger("yade");
 #endif
 
+// FIXME - those two function will be moved to some class responsible for configuration
+std::string getPrefix()
+{
+	// I had to use BOOST_PP_STRINGIZE because g++3.3 tried to insert the path verbatim (not as a string)
+	// and there was a compilation error
+	std::string tmp(BOOST_PP_STRINGIZE(PREFIX));
+	if(tmp=="PREFIX") // if PREFIX is undefined, BOOST_PP_STRINGIZE returns the name instead of empty value
+	{
+		LOG_FATAL("undefined PREFIX, aborting");
+		exit(1);
+	};
+	return tmp;
+};
+
+std::string getPostfix()
+{
+	std::string tmp(BOOST_PP_STRINGIZE(POSTFIX));
+	if(tmp=="POSTFIX") tmp=""; // if POSTFIX is undefined, BOOST_PP_STRINGIZE returns the name instead of empty value
+	return tmp;
+};
+
 void firstRunSetup(shared_ptr<Preferences>& pref)
 {
 	char *libDirs[]={"yade-extra","yade-guis","yade-libs","yade-package-common","yade-package-dem","yade-package-fem","yade-package-lattice","yade-package-mass-spring","yade-package-realtime-rigidbody",NULL /* sentinel */};
@@ -34,7 +56,7 @@ void firstRunSetup(shared_ptr<Preferences>& pref)
 	LOG_INFO("Creating default configuration file: "<<cfgFile<<". Please tune by hand if needed.");
 	string expLibDir;
 	for(int i=0; libDirs[i+1]!=NULL; i++) {
-		expLibDir=string( PREFIX "/lib/yade" POSTFIX "/")+libDirs[i];
+		expLibDir=getPrefix() + "/lib/yade" + getPostfix() + "/" + libDirs[i];
 		LOG_INFO("Adding plugin directory "<<expLibDir<<".");
 		pref->dynlibDirectories.push_back(expLibDir);
 	}
@@ -46,6 +68,11 @@ void firstRunSetup(shared_ptr<Preferences>& pref)
 void printHelp()
 {
 	string flags("");
+	flags=flags+"PREFIX=" +getPrefix()+ "\n";
+	flags=flags+"POSTFIX=" + getPostfix() + "\n";
+#ifdef SINGLE_PRECISION
+	flags+="DOUBLE_PRECISION ";
+#endif
 #ifdef DOUBLE_PRECISION
 	flags+="DOUBLE_PRECISION ";
 #endif
@@ -72,7 +99,7 @@ void printHelp()
 Only one option can be passed to yade, all other options are passed to the selected GUI\n\
 ";
 	if(flags!="")
-		cout << "compilation flags: "+ flags +"\n\n";
+		cout << "compilation flags:\n"+ flags +"\n\n";
 }
 
 
@@ -81,7 +108,7 @@ int main(int argc, char *argv[])
 
 	int ch;
 	string gui = "";
-	string configPath = string(getenv("HOME")) + string("/.yade" POSTFIX);
+	string configPath = string(getenv("HOME")) + "/.yade" + getPostfix();
 	string simulationFileName="";
 
 	// This makes boost stop bitching about dot-files and other files that may not exist on MS-DOS 3.3;
