@@ -23,6 +23,9 @@
 # And as usually, clean up the code, get rid of workarounds and hacks etc.
 
 import os,os.path,string,re,sys
+import SCons
+# SCons version numbers are needed a few times
+major,minor,micro=SCons.__version__.split('.')
 
 ##########################################################################################
 ############# OPTIONS ####################################################################
@@ -45,7 +48,7 @@ opts.AddOptions(
 	BoolOption('profile','Enable profiling information',0),
 	BoolOption('optimize','Turn on heavy optimizations (generates SSE2 instructions)',0),
 	ListOption('exclude','Components that will not be built','none',names=['extra','common','dem','fem','lattice','mass-spring','realtime-rigidbody']),
-	('CPPPATH', 'Additional paths for the C preprocessor (whitespace separated)',None,None,Split),
+	('CPPPATH', 'Additional paths for the C preprocessor (whitespace separated)',['/usr/include/wm3'],None,Split),
 	('LIBPATH','Additional paths for the linker (whitespace separated)',None,None,Split),
 	('QTDIR','Directories where to look for qt3',['/usr/share/qt3','/usr/lib/qt'],None,Split),
 	('CXX','The c++ compiler','ccache g++-4.0'),
@@ -62,6 +65,10 @@ for v in propagatedEnvVars:
 	if os.environ.has_key(v): env.Append(ENV={v:os.environ[v]})
 
 opts.Save(optsFile,env)
+
+def my_format(env, opt, help, default, actual):
+	return "%10s: %5s [%s] (%s)\n"%(opt,actual,default,help)
+opts.FormatOptionHelpText = my_format
 
 Help(opts.GenerateHelpText(env))
 
@@ -86,9 +93,17 @@ def CheckQt(context, qtdirs):
 			return ret
 	return False
 
-conf=Configure(env,custom_tests={'CheckQt':CheckQt})
+def CheckCXX(context):
+	context.Message('Checking whether c++ compiler "%s" works...'%env['CXX'])
+	ret=context.TryLink('#include<iostream>\nint main(int argc, char**argv){std::cerr<<std::endl;return 0;}\n','.cpp')
+	context.Result(ret)
+	return ret
+
+
+conf=Configure(env,custom_tests={'CheckQt':CheckQt,'CheckCXX':CheckCXX})
 
 ok=True
+ok&=conf.CheckCXX()
 ok&=conf.CheckLibWithHeader('pthread','pthread.h','c','pthread_exit(NULL);')
 ok&=conf.CheckLibWithHeader('glut','GL/glut.h','c','glutGetModifiers();')
 ok&=conf.CheckLibWithHeader('boost_date_time','boost/date_time/posix_time/posix_time.hpp','c++','boost::posix_time::time_duration::time_duration();')
@@ -97,7 +112,7 @@ ok&=conf.CheckLibWithHeader('boost_filesystem','boost/filesystem/path.hpp','c++'
 ok&=conf.CheckLibWithHeader('Wm3Foundation','Wm3Math.h','c++','Wm3::Math<double>::PI;')
 ok&=conf.CheckQt(env['QTDIR'])
 if not ok:
-	print "One of the essential libraries above was not found, unable to continue.\n\nCheck config.log for possible causes, note that there are options that you may need to customize:\n"+opts.GenerateHelpText(env)
+	print "\nOne of the essential libraries above was not found, unable to continue.\n\nCheck config.log for possible causes, note that there are options that you may need to customize:\n\n"+opts.GenerateHelpText(env)
 	Exit(1)
 
 env.Tool('qt')
@@ -131,7 +146,8 @@ env.Append(CPPDEFINES=[('POSTFIX',r'\"$POSTFIX\"'),('PREFIX',r'\"$PREFIX\"')])
 if env['debug']: env.Append(CXXFLAGS='-ggdb3',CPPDEFINES=['DEBUG'])
 else: env.Append(CXXFLAGS='-O2')
 if env['optimize']:
-	env.Append(CXXFLAGS=Split('-O3 -floop-optimize2 -ffast-math'))
+	env.Append(CXXFLAGS=Split('-O3 -ffast-math'))
+	# -floop-optimize2 is a gcc-4.x flag, doesn't exist on previous version
 	# CRASH -ffloat-store
 	# maybe not CRASH?: -fno-math-errno
 	# CRASH?: -fmodulo-sched  
@@ -157,8 +173,6 @@ env.Append(LIBPATH=[os.path.join('#',x) for x in libDirs])
 
 ### this workaround is only needed for scons<=0.96.92, will disappear soon
 ###  (env.Install method chokes on no-existing directories)
-import SCons
-major,minor,micro=SCons.__version__.split('.')
 if major=='0' and int(minor)<=96 and int(micro)<93:
 	## should reside in prepareIncludes or sth similar
 	def createDirs(dirList):
@@ -209,9 +223,8 @@ def prepareIncludes(prefix=None):
 from os.path import exists
 if len([1 for x in [os.path.join(x,'SConscript') for x in libDirs+['yade-core']] if not exists(x)]):
 	print "Generating SConscript files (warnings can be ignored safely)..."
-	from subprocess import Popen
-	p = Popen("cd yade-scripts && sh erskine3-apply.sh",shell=True)
-	if(os.waitpid(p.pid, 0)[1])!=0:
+	ret=os.system('cd yade-scripts && sh erskine3-apply.sh')
+	if ret!=0:
 		print "Error running yade-scripts/erskine3-apply.sh, try doing it by hand."
 		Exit(1)
 
@@ -250,6 +263,10 @@ installableNodes=enumerateDotSoNodes(Dir('.'))
 for n in installableNodes:
 	f=str(n)
 	m=re.match(r'(^|.*/)(yade-(extra|guis|libs|package-[^/]+))/lib[^/]+\.so$',f)
+	if nor m: # older scons version have e.g. qt libs in nodes, we just skip them here
+		# TODO: exclude system libs in node enumerator, that is much safer
+		if major=='0' and int(minor)<=96 and int(micro)<90: continue
+		else: assert(m)
 	assert(m)
 	instDir=m.group(2)
 	env.Install('$PREFIX/lib/yade$POSTFIX/'+instDir,n)
