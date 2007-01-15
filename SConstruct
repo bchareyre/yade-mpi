@@ -65,11 +65,7 @@ for v in propagatedEnvVars:
 	if os.environ.has_key(v): env.Append(ENV={v:os.environ[v]})
 
 opts.Save(optsFile,env)
-
-def my_format(env, opt, help, default, actual):
-	return "%10s: %5s [%s] (%s)\n"%(opt,actual,default,help)
-opts.FormatOptionHelpText = my_format
-
+opts.FormatOptionHelpText=lambda env,opt,help,default,actual: "%10s: %5s [%s] (%s)\n"%(opt,actual,default,help)
 Help(opts.GenerateHelpText(env))
 
 
@@ -100,33 +96,28 @@ def CheckCXX(context):
 	return ret
 
 
-conf=Configure(env,custom_tests={'CheckQt':CheckQt,'CheckCXX':CheckCXX})
+if not env.GetOption('clean'):
+	ok=True
+	conf=Configure(env,custom_tests={'CheckQt':CheckQt,'CheckCXX':CheckCXX})
+	ok&=conf.CheckCXX()
+	ok&=conf.CheckLibWithHeader('pthread','pthread.h','c','pthread_exit(NULL);')
+	ok&=conf.CheckLibWithHeader('glut','GL/glut.h','c','glutGetModifiers();')
+	ok&=conf.CheckLibWithHeader('boost_date_time','boost/date_time/posix_time/posix_time.hpp','c++','boost::posix_time::time_duration::time_duration();')
+	ok&=conf.CheckLibWithHeader('boost_thread','boost/thread/thread.hpp','c++','boost::thread::thread();')
+	ok&=conf.CheckLibWithHeader('boost_filesystem','boost/filesystem/path.hpp','c++','boost::filesystem::path();')
+	ok&=conf.CheckLibWithHeader('Wm3Foundation','Wm3Math.h','c++','Wm3::Math<double>::PI;')
+	ok&=conf.CheckQt(env['QTDIR'])
+	env.Tool('qt'); env.Replace(QT_LIB='qt-mt')
+	ok&=conf.CheckLibWithHeader('QGLViewer','QGLViewer/qglviewer.h','c++','QGLViewer(1);')
+	if not ok:
+		print "\nOne of the essential libraries above was not found, unable to continue.\n\nCheck config.log for possible causes, note that there are options that you may need to customize:\n\n"+opts.GenerateHelpText(env)
+		Exit(1)
 
-#I have moved it up. It is necessary, because the tests also need -pthread flag
-# -pthread is for older g++ 3.3 and 3.4
-env.Append(CXXFLAGS=['-pipe','-Wall','-pthread'])
+	env.Append(LIBS=['glut','boost_date_time','boost_filesystem','boost_thread','pthread','Wm3Foundation'])
 
-ok=True
-ok&=conf.CheckCXX()
-ok&=conf.CheckLibWithHeader('pthread','pthread.h','c','pthread_exit(NULL);')
-ok&=conf.CheckLibWithHeader('glut','GL/glut.h','c','glutGetModifiers();')
-ok&=conf.CheckLibWithHeader('boost_date_time','boost/date_time/posix_time/posix_time.hpp','c++','boost::posix_time::time_duration::time_duration();')
-ok&=conf.CheckLibWithHeader('boost_thread','boost/thread/thread.hpp','c++','boost::thread::thread();')
-ok&=conf.CheckLibWithHeader('boost_filesystem','boost/filesystem/path.hpp','c++','boost::filesystem::path();')
-ok&=conf.CheckLibWithHeader('Wm3Foundation','Wm3Math.h','c++','Wm3::Math<double>::PI;')
-ok&=conf.CheckQt(env['QTDIR'])
-if not ok:
-	print "\nOne of the essential libraries above was not found, unable to continue.\n\nCheck config.log for possible causes, note that there are options that you may need to customize:\n\n"+opts.GenerateHelpText(env)
-	Exit(1)
+	if conf.CheckLibWithHeader('log4cxx','log4cxx/logger.h','c++','log4cxx::Logger::getLogger("foo");'): env.Append(LIBS='log4cxx',CPPDEFINES=['LOG4CXX'])
 
-env.Tool('qt')
-env.Replace(QT_LIB='qt-mt')
-env.Append(LIBS=['glut','boost_date_time','boost_filesystem','boost_thread','pthread','Wm3Foundation'])
-
-if conf.CheckLibWithHeader('log4cxx','log4cxx/logger.h','c++','log4cxx::Logger::getLogger("foo");'):
-	env.Append(LIBS='log4cxx',CPPDEFINES=['LOG4CXX'])
-
-env=conf.Finish()
+	env=conf.Finish()
 
 
 ##########################################################################################
@@ -163,13 +154,13 @@ if env['optimize']:
 	archFlags=Split('-march=pentium4 -mfpmath=sse,387') #-malign-double')
 	env.Append(CXXFLAGS=archFlags,LINKFLAGS=archFlags,SHLINKFLAGS=archFlags)
 if env['profile']: env.Append(CXXFLAGS=['-pg'],LINKFLAGS=['-pg'],SHLINKFLAGS=['-pg'])
-# -pthread is for older g++ 3.3 and 3.4
-#env.Append(CXXFLAGS=['-pipe','-Wall','-pthread'])
+env.Append(CXXFLAGS=['-pipe','-Wall'])
 
 ### LINKER
-env.Append(SHLINKFLAGS='-Wl,-soname=${TARGET.file} -rdynamic')
+env.Append(LIBS=[]) # ensure existence of the flag
+env.Append(SHLINKFLAGS=['-Wl,-soname=${TARGET.file} -rdynamic'])
 # if this is not present, vtables & typeinfos for classes in yade binary itself are not exported; breaks plugin loading
-env.Append(LINKFLAGS='-rdynamic') 
+env.Append(LINKFLAGS=['-rdynamic']) 
 # makes dynamic library loading easied (no LD_LIBRARY_PATH) and perhaps faster
 env.Append(RPATH=[os.path.join('$PREFIX','lib','yade$POSTFIX',string.split(x,os.path.sep)[-1]) for x in libDirs])
 # find already compiled but not yet installed libraries for linking
@@ -224,22 +215,22 @@ def prepareIncludes(prefix=None):
 # 4. set the "install" target as default (if scons is called without any arguments)
 # Should be cleaned up.
 
-## re-run erskine if needed
-from os.path import exists
-if len([1 for x in [os.path.join(x,'SConscript') for x in libDirs+['yade-core']] if not exists(x)]):
-	print "Generating SConscript files (warnings can be ignored safely)..."
-	ret=os.system('cd yade-scripts && sh erskine3-apply.sh')
-	if ret!=0:
-		print "Error running yade-scripts/erskine3-apply.sh, try doing it by hand."
-		Exit(1)
+if not env.GetOption('clean'):
+	## re-run erskine if needed
+	from os.path import exists
+	if len([1 for x in [os.path.join(x,'SConscript') for x in libDirs+['yade-core']] if not exists(x)]):
+		print "Generating SConscript files (warnings can be ignored safely)..."
+		ret=os.system('cd yade-scripts && sh erskine3-apply.sh')
+		if ret!=0:
+			print "Error running yade-scripts/erskine3-apply.sh, try doing it by hand."
+			Exit(1)
 
-
-prepareLocalIncludesProxy=prepareIncludes()
-prepareIncludesProxy=prepareIncludes(prefix=env['PREFIX'])
-prebuildAlias=env.Alias('prebuild',[prepareLocalIncludesProxy])
-installAlias=env.Alias('install',[instDirs,prepareIncludesProxy,os.path.join('$PREFIX','include','yade')])
-Depends(installAlias,prebuildAlias)
-Default(installAlias)
+	prepareLocalIncludesProxy=prepareIncludes()
+	prepareIncludesProxy=prepareIncludes(prefix=env['PREFIX'])
+	prebuildAlias=env.Alias('prebuild',[prepareLocalIncludesProxy])
+	installAlias=env.Alias('install',[instDirs,prepareIncludesProxy,os.path.join('$PREFIX','include','yade')])
+	Depends(installAlias,prebuildAlias)
+	Default(installAlias)
 
 # read all SConscript files
 env.Export('env');
@@ -252,31 +243,33 @@ SConscript([os.path.join(x,'SConscript') for x in libDirs+['yade-core']])
 
 ##### (this is UNIX specific!) ######################
 
+##### (*.so pattern is UNIX specific!!) ######################
 def enumerateDotSoNodes(dirnode, level=0):
-	" cut&paste from http://www.scons.org/wiki/BuildDirGlob, then modified "
-	if type(dirnode)==type(''): dirnode=Dir(dirnode) # convert string to node
+	"cut&paste from http://www.scons.org/wiki/BuildDirGlob, then modified"
 	ret=[]
 	for f in dirnode.all_children():
-		if type(f)==type(Dir('.')): # print str(f)
-			ret+=enumerateDotSoNodes(f,level)
-		if str(f)[-3:]=='.so':
-			ret.append(f) #print "%s%s (%s: %s)"%(level * ' ', str(f),type(f.get_builder()),f.get_builder())
+		if f.isdir():
+			ret+=enumerateDotSoNodes(f,level+1)
+		if f.isfile() and str(f)[-3:]=='.so':
+			ret.append(f)
 	return ret
-installableNodes=enumerateDotSoNodes(Dir('.'))
 
-# iterate over .so nodes we got previously and call Install for each of them
-for n in installableNodes:
-	f=str(n)
-	m=re.match(r'(^|.*/)(yade-(extra|guis|libs|package-[^/]+))/lib[^/]+\.so$',f)
-	if not m: # older scons version have e.g. qt libs in nodes, we just skip them here
-		# TODO: exclude system libs in node enumerator, that is much safer
-		if major=='0' and int(minor)<=96 and int(micro)<90: continue
-		else: assert(m)
-	assert(m)
-	instDir=m.group(2)
-	env.Install('$PREFIX/lib/yade$POSTFIX/'+instDir,n)
-# for the one and only binary, we do it by hand
-env.InstallAs('$PREFIX/bin/yade$POSTFIX','yade-core/yade')
+# since we skip this when cleaning, it means that installed files will not be cleaned
+if not env.GetOption('clean'):
+	installableNodes=enumerateDotSoNodes(Dir('.'))
+	# iterate over .so nodes we got previously and call Install for each of them
+	for n in installableNodes:
+		f=str(n)
+		m=re.match(r'(^|.*/)(yade-(extra|guis|libs|package-[^/]+))/[^/]+$',f)
+		if not m: # older scons version have e.g. qt libs in nodes, we just skip them here
+			# TODO: exclude system libs in node enumerator, that is much safer
+			if major=='0' and int(minor)<=96 and int(micro)<90: continue
+			else: assert(m)
+		assert(m)
+		instDir=m.group(2)
+		env.Install('$PREFIX/lib/yade$POSTFIX/'+instDir,n)
+	# for the one and only binary, we do it by hand
+	env.InstallAs('$PREFIX/bin/yade$POSTFIX','yade-core/yade')
 
 ##########################################################################################
 ############# MISCILLANEA ################################################################

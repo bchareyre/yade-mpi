@@ -10,7 +10,7 @@ clean:
 	$(MAKE) -C yade-guis clean
 	$(MAKE) -C yade-packages clean
 	$(MAKE) -C yade-extra clean
-	rm -rf config.log scons.config .sconf_temp include
+	rm -rf config.log scons.config .sconf_temp include .sconsign.dblite
 	find -name ".sconsign" -exec rm -rf {} \;
 	find -name "SConscript" -exec rm -rf {} \;
 
