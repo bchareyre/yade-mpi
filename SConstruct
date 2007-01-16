@@ -250,20 +250,16 @@ if major=='0' and minor=='96' and int(micro)<91:
 		"cut&paste from http://www.scons.org/wiki/BuildDirGlob, then modified"
 		ret=[]
 		for f in dirnode.all_children():
-			if f.dir==str(f):
-				ret+=enumerateDotSoNodes(f,level+1)
-			elif str(f)[-3:]=='.so':
-				ret.append(f)
+			if f.dir==str(f): ret+=enumerateDotSoNodes(f,level+1)
+			elif str(f)[-3:]=='.so': ret.append(f)
 		return ret
 else:
 	def enumerateDotSoNodes(dirnode, level=0):
 		"cut&paste from http://www.scons.org/wiki/BuildDirGlob, then modified"
 		ret=[]
 		for f in dirnode.all_children():
-			if f.isdir():
-				ret+=enumerateDotSoNodes(f,level+1)
-			elif f.isfile() and str(f)[-3:]=='.so':
-				ret.append(f)
+			if f.isdir(): ret+=enumerateDotSoNodes(f,level+1) # isdir() is True only for existing dirs!!
+			elif str(f)[-3:]=='.so': ret.append(f)
 		return ret
 
 # since we skip this when cleaning, it means that installed files will not be cleaned
