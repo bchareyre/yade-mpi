@@ -260,7 +260,7 @@ void Omega::scanPlugins()
 					string err=ClassFactory::instance().lastError();
 					// HACK
 					if(err.find("cannot open shared object file: No such file or directory")!=std::string::npos){
-						LOG_INFO("Attemted to load nonexistent file; since this may be due to bad algorithm of filename construction, we pretend everything is OK (original error: `"<<err<<"').");
+						LOG_INFO("Attempted to load nonexistent file; since this may be due to bad algorithm of filename construction, we pretend everything is OK (original error: `"<<err<<"').");
 						thisLoaded=true;
 					}
 					else if(err.find(": undefined symbol: ")!=std::string::npos){

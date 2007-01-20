@@ -93,6 +93,7 @@ void SDECLinkedSpheres::postProcessAttributes(bool)
 
 void SDECLinkedSpheres::registerAttributes()
 {
+	FileGenerator::registerAttributes();
 	REGISTER_ATTRIBUTE(nbSpheres);
 	REGISTER_ATTRIBUTE(minRadius);
 	REGISTER_ATTRIBUTE(maxRadius);

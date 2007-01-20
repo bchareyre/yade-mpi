@@ -44,7 +44,8 @@ void FileGenerator::postProcessAttributes(bool)
 
 void FileGenerator::registerAttributes() 
 {	
-
+	REGISTER_ATTRIBUTE(outputFileName);
+	REGISTER_ATTRIBUTE(serializationDynlib);
 }
 
 
@@ -87,8 +88,12 @@ string FileGenerator::generateAndSave()
 		{
 			return std::string("File "+outputFileName+" cannot be saved: "+e.what());
 		}
-		return std::string("File "+outputFileName+" generated successfully (time: "
-				+ boost::posix_time::to_simple_string(generationTime) +").\n\n")+message;
+		boost::posix_time::ptime now3 = boost::posix_time::second_clock::local_time();
+		boost::posix_time::time_duration saveTime = now3 - now2; // save time
+		return std::string("File "+outputFileName+" generated successfully."
+				+ "\ngeneration time: " + boost::posix_time::to_simple_string(generationTime) 
+				+ "\nsave time: "       + boost::posix_time::to_simple_string(saveTime)
+				+"\n\n")+message;
 	}
 }
 

@@ -48,12 +48,16 @@ void  MarchingCube::init(int sx, int sy, int sz, const Vector3r& min, const Vect
 
 void MarchingCube::resizeScalarField(vector<vector<vector<float> > >& scalarField, int sx, int sy, int sz)
 {
+	sizeX = sx;
+	sizeY = sy;
+	sizeZ = sz;
+	
 	scalarField.resize(sx);
 	for(int i=0;i<sx;i++)
-			scalarField[i].resize(sx); 
+			scalarField[i].resize(sy); 
 	for(int i=0;i<sx;i++)
 		for(int j=0;j<sy;j++)
-				scalarField[i][j].resize(sz); 
+				scalarField[i][j].resize(sz,0); 
 }
 
 

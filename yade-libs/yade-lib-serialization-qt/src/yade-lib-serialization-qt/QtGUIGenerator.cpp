@@ -109,7 +109,13 @@ void QtGUIGenerator::buildGUI(shared_ptr<Serializable> s,  QWidget * widget)
 	Serializable::Archives::iterator aiEnd = archives.end();
 	for( ; ai!=aiEnd ; ++ai)
 	{
-		if ((*ai)->isFundamental())
+		if (       (*ai)->isFundamental()
+		        // FIXME ...
+			// oh well. It is already decided that we will use boost::serialization. And this hack only proves that
+			// current system is broken. I am so tired of NOT loading the filename from generator save files, 
+			// that I had to add this....
+		        && (*ai)->getName() != "outputFileName"
+			&& (*ai)->getName() != "serializationDynlib" )
 		{
 			shared_ptr<AttributeDescriptor> descriptor(new AttributeDescriptor);
 			
@@ -194,7 +200,13 @@ void QtGUIGenerator::deserialize(Serializable* s)
 	Serializable::Archives::iterator aiEnd = archives.end();
 	for(; ai!=aiEnd ; ++ai)
 	{
-		if ((*ai)->isFundamental())
+		if (       (*ai)->isFundamental()
+		        // FIXME ...
+			// oh well. It is already decided that we will use boost::serialization. And this hack only proves that
+			// current system is broken. I am so tired of NOT loading the filename from generator save files, 
+			// that I had to add this....
+		        && (*ai)->getName() != "outputFileName"
+			&& (*ai)->getName() != "serializationDynlib" )
 		{
 			string str;
 			int i = lookUp[(*ai)->getName()];

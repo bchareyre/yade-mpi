@@ -77,6 +77,10 @@ class Omega : public Singleton<Omega>
 		void logMessage(const string& str);
 		void logError(const string& str);
 		
+		float	isoValue;
+		float	isoThick;
+		int     isoSec;
+		
 		boost::mutex&	getRootBodyMutex();
 		
 		void		createSimulationLoop();

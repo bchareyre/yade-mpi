@@ -28,6 +28,8 @@ class FileGenerator
 		std::string generateAndSave();
 		void setFileName(const string& fileName);
 		void setSerializationLibrary(const string& lib);
+		std::string getFileName() {return outputFileName;}; // stupid? better make that variable public.. ech.
+		std::string getSerializationLibrary() {return serializationDynlib;};
 		
 		FileGenerator ();
 		virtual ~FileGenerator ();

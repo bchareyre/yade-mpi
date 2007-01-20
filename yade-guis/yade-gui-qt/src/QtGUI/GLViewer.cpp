@@ -77,11 +77,38 @@ void GLViewer::keyPressEvent(QKeyEvent *e)
 			setWheelBinding(Qt::NoButton , FRAME, ZOOM);
 		}
 	else if( e->key()==Qt::Key_C && selectedName() != -1 && (*(Omega::instance().getRootBody()->bodies)).exists(selectedName()))
-		setSceneCenter(manipulatedFrame()->position());
+		setSceneCenter(manipulatedFrame()->position()), updateGL();
 	else if( e->key()==Qt::Key_D )
 		wasDynamic = true;
 	else if( e->key()==Qt::Key_G )
-		drawGrid = !drawGrid;
+		drawGrid = !drawGrid, updateGL();
+
+// FIXME BEGIN - arguments for GLDraw*ers should be from dialog box, not through Omega !!!
+	else if( e->key()==Qt::Key_Delete )
+		Omega::instance().isoValue-=0.05, updateGL();
+	else if( e->key()==Qt::Key_Insert )
+		Omega::instance().isoValue+=0.05, updateGL();
+
+	else if( e->key()==Qt::Key_Next )
+		Omega::instance().isoThick-=0.05, updateGL();
+	else if( e->key()==Qt::Key_Prior )
+		Omega::instance().isoThick+=0.05, updateGL();
+
+	else if( e->key()==Qt::Key_End )
+		Omega::instance().isoSec=std::max(4, Omega::instance().isoSec-1), updateGL();
+	else if( e->key()==Qt::Key_Home )
+		Omega::instance().isoSec+=1, updateGL();
+// FIXME END
+
+	else if (e->key() == Qt::Key_T)
+	{ // 'T' changes the projection type : perspective or orthogonal
+		if (camera()->type() == qglviewer::Camera::ORTHOGRAPHIC)
+			camera()->setType(qglviewer::Camera::PERSPECTIVE);
+		else
+			camera()->setType(qglviewer::Camera::ORTHOGRAPHIC);
+		updateGL();
+	}
+
 	else if( e->key()!=Qt::Key_Escape && e->key()!=Qt::Key_Space )
 		QGLViewer::keyPressEvent(e);
 }

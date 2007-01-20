@@ -42,6 +42,7 @@ class LatticeExample : public FileGenerator
                                 
                 bool             triangularBaseGrid
 				,triangularBaseGrid3D
+				,use_Delaunay
                                 ,useNonLocalModel
                                 ,useBendTensileSoftening
                                 ,useStiffnessSoftening
@@ -119,7 +120,18 @@ class LatticeExample : public FileGenerator
                                 ,regionDelete_E_min
                                 ,regionDelete_E_max
                                 ,regionDelete_F_min
-                                ,regionDelete_F_max;
+                                ,regionDelete_F_max
+
+                                ,regionDelete_1_min
+                                ,regionDelete_1_max
+                                ,regionDelete_2_min
+                                ,regionDelete_2_max
+                                ,regionDelete_3_min
+                                ,regionDelete_3_max
+                                ,regionDelete_4_min
+                                ,regionDelete_4_max
+                                ,regionDelete_5_min
+                                ,regionDelete_5_max;
 
         // non destroy areas
                 Vector3r         nonDestroy_A_min
@@ -141,7 +153,9 @@ class LatticeExample : public FileGenerator
 		bool createNode(shared_ptr<Body>& body, int i, int j, int k);
 		bool createQuad(shared_ptr<Body>& body, int i, int j, Vector3r);
                 void createBeam(shared_ptr<Body>& body, unsigned int i, unsigned int j);
-                void calcBeamPositionOrientationLength(shared_ptr<Body>& body);
+                Real calcBeamPositionOrientationLength(shared_ptr<Body>& body);
+                bool notDeleted(Vector3r pos);
+		bool isDeleted(Vector3r pos, Vector3r min, Vector3r max);
                 void calcBeamAngles(Body* body, BodyContainer* bodies,InteractionContainer* ints);
                 void calcAxisAngle(LatticeBeamParameters* beam, BodyContainer* bodies, unsigned int otherId,InteractionContainer* ints,unsigned int thisId);
                 bool checkMinimumAngle(BodyRedirectionVector&,shared_ptr<Body>&);

@@ -107,6 +107,9 @@ SimulationController::~SimulationController()
 	Omega::instance().finishSimulationLoop();
 	Omega::instance().joinSimulationLoop();
 
+	// to avoid loading that file next time, when SimulationController is opened again.
+	Omega::instance().setSimulationFileName("");
+
 	map<int,GLViewer*>::reverse_iterator gi = glViews.rbegin();
 	map<int,GLViewer*>::reverse_iterator giEnd = glViews.rend();
 	for(;gi!=giEnd;++gi)

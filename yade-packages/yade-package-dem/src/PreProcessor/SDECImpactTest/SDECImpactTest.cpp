@@ -132,6 +132,7 @@ SDECImpactTest::~SDECImpactTest ()
 
 void SDECImpactTest::registerAttributes()
 {
+	FileGenerator::registerAttributes();
 //	REGISTER_ATTRIBUTE(lowerCorner);
 //	REGISTER_ATTRIBUTE(upperCorner);
 //	REGISTER_ATTRIBUTE(thickness);

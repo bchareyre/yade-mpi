@@ -106,6 +106,7 @@ void TetrahedronsTest::postProcessAttributes(bool)
 
 void TetrahedronsTest::registerAttributes()
 {
+	FileGenerator::registerAttributes();
 	REGISTER_ATTRIBUTE(nbTetrahedrons);
 	REGISTER_ATTRIBUTE(minSize);
 	REGISTER_ATTRIBUTE(maxSize);

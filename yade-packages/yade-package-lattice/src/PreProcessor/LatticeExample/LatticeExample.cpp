@@ -42,6 +42,11 @@
 #include <yade/yade-package-common/Quadrilateral.hpp>
 #include <yade/yade-package-common/ParticleParameters.hpp>
 
+// Delaunay
+#include <Wm3Delaunay3.h>
+#include <Wm3Delaunay2.h>
+#include <Wm3Query.h>
+
 using namespace boost;
 using namespace std;
 
@@ -54,6 +59,7 @@ LatticeExample::LatticeExample() : FileGenerator()
         
         speciemen_size_in_meters = Vector3r(0.1,0.1,0.0001);
         cellsizeUnit_in_meters   = 0.003;
+	use_Delaunay		 = true;
         minAngle_betweenBeams_deg= 20.0;
         disorder_in_cellsizeUnit = Vector3r(0.6,0.6,0.0);
         maxLength_in_cellsizeUnit= 1.9;
@@ -118,6 +124,17 @@ LatticeExample::LatticeExample() : FileGenerator()
         regionDelete_F_min       = Vector3r(0,0,0);
         regionDelete_F_max       = Vector3r(0,0,0);
 
+        regionDelete_1_min       = Vector3r(0,0,0);
+        regionDelete_1_max       = Vector3r(0,0,0);
+        regionDelete_2_min       = Vector3r(0,0,0);
+        regionDelete_2_max       = Vector3r(0,0,0);
+        regionDelete_3_min       = Vector3r(0,0,0);
+        regionDelete_3_max       = Vector3r(0,0,0);
+        regionDelete_4_min       = Vector3r(0,0,0);
+        regionDelete_4_max       = Vector3r(0,0,0);
+        regionDelete_5_min       = Vector3r(0,0,0);
+        regionDelete_5_max       = Vector3r(0,0,0);
+
         nonDestroy_A_min         = Vector3r(0,0,0);
         nonDestroy_A_max         = Vector3r(0,0,0);
         nonDestroy_B_min         = Vector3r(0,0,0);
@@ -152,11 +169,13 @@ LatticeExample::~LatticeExample()
 
 void LatticeExample::registerAttributes()
 {
+	FileGenerator::registerAttributes();
 	REGISTER_ATTRIBUTE(speciemen_size_in_meters); 	// size
 	REGISTER_ATTRIBUTE(cellsizeUnit_in_meters);	// g [m]  	- cell size
 	REGISTER_ATTRIBUTE(minAngle_betweenBeams_deg); 	// a [deg] 	- min angle
         REGISTER_ATTRIBUTE(disorder_in_cellsizeUnit);   // s [-]        - disorder 
         REGISTER_ATTRIBUTE(maxLength_in_cellsizeUnit);  // r [-]        - max beam length
+	REGISTER_ATTRIBUTE(use_Delaunay);
         
         REGISTER_ATTRIBUTE(crit_TensileStrain);         // E_min [%]    - default 0.02 %
         REGISTER_ATTRIBUTE(crit_ComprStrain);           // E_max [%]    - default 0.2 %
@@ -217,6 +236,17 @@ void LatticeExample::registerAttributes()
         REGISTER_ATTRIBUTE(regionDelete_F_min);
         REGISTER_ATTRIBUTE(regionDelete_F_max);
 
+        REGISTER_ATTRIBUTE(regionDelete_1_min);
+        REGISTER_ATTRIBUTE(regionDelete_1_max);
+        REGISTER_ATTRIBUTE(regionDelete_2_min);
+        REGISTER_ATTRIBUTE(regionDelete_2_max);
+        REGISTER_ATTRIBUTE(regionDelete_3_min);
+        REGISTER_ATTRIBUTE(regionDelete_3_max);
+        REGISTER_ATTRIBUTE(regionDelete_4_min);
+        REGISTER_ATTRIBUTE(regionDelete_4_max);
+        REGISTER_ATTRIBUTE(regionDelete_5_min);
+        REGISTER_ATTRIBUTE(regionDelete_5_max);
+
         REGISTER_ATTRIBUTE(nonDestroy_A_min);
         REGISTER_ATTRIBUTE(nonDestroy_A_max);
         REGISTER_ATTRIBUTE(nonDestroy_B_min);
@@ -263,8 +293,12 @@ string LatticeExample::generate()
 	if(triangularBaseGrid3D)
 		nbNodes[2] *= 1.22475; // bigger by (1/3)*(sqrt(6)) factor
 
-        unsigned int totalNodesCount = 0;
 
+	bool FLAT = speciemen_size_in_meters[2]<cellsizeUnit_in_meters;
+	std::vector<Vector2r> vert2; vert2.clear(); // Delaunay
+	std::vector<Vector3r> vert3; vert3.clear(); // Delaunay
+
+        unsigned int totalNodesCount = 0;
 	{
 		setMessage("creating nodes...");
 		float all = nbNodes[0]*nbNodes[1]*nbNodes[2];
@@ -281,7 +315,13 @@ string LatticeExample::generate()
 
 					shared_ptr<Body> node;
 					if(createNode(node,i,j,k) || quads)
+					{
 						rootBody->bodies->insert(node), ++totalNodesCount;
+						if(FLAT)
+							vert2.push_back(Vector2r(node->physicalParameters->se3.position[0],node->physicalParameters->se3.position[1])); // Delaunay
+						else
+							vert3.push_back(node->physicalParameters->se3.position); // Delaunay
+					}
 				}
 		}
 	}
@@ -292,6 +332,69 @@ string LatticeExample::generate()
 	BodyContainer::iterator bi    = rootBody->bodies->begin();
 	BodyContainer::iterator bi2;
 	BodyContainer::iterator biEnd = rootBody->bodies->end();
+
+	if(use_Delaunay) // create beams, Delaunay
+	{
+		std::set< std::pair<int,int> > pairs;
+		int I,J;
+		if(FLAT)
+		{
+			setProgress(0); setMessage("Delaunay 2d...");
+			Delaunay2<Real> del2(vert2.size(),&(vert2[0]),cellsizeUnit_in_meters/50,false, Query::QT_INTEGER); // Delaunay
+
+			int del2_i = 0;
+			int del2_ind[3];
+			while(del2.GetIndexSet(del2_i++,del2_ind))
+			{
+				if(shouldTerminate()) return "";
+				setProgress((float)del2_i/(float)del2.GetSimplexQuantity());
+				shared_ptr<Body> beam;
+
+				for(int zzz=0 ; zzz<3 ; ++zzz)
+				{
+					I=del2_ind[zzz];J=del2_ind[(zzz+1)%3];
+					if(J>I) std::swap(I,J);
+					if(pairs.insert(std::make_pair(I,J)).second)
+					{
+						createBeam(beam,I,J);
+						if(calcBeamPositionOrientationLength(beam)<maxLength_in_cellsizeUnit*cellsizeUnit_in_meters)
+							if(notDeleted(beam->physicalParameters->se3.position)) 
+								bc.insert(beam);
+					}
+				}
+			}
+		}
+		else
+		{
+			setProgress(0); setMessage("Delaunay 3d...");
+			Delaunay3<Real> del3(vert3.size(),&(vert3[0]),cellsizeUnit_in_meters/50,false, Query::QT_INTEGER); // Delaunay
+			
+			int del3_i = 0;
+			int del3_ind[4];
+			while(del3.GetIndexSet(del3_i++,del3_ind))
+			{
+				if(shouldTerminate()) return "";
+				setProgress((float)del3_i/(float)del3.GetSimplexQuantity());
+				shared_ptr<Body> beam;
+
+				for(int zzz=0 ; zzz<4 ; ++zzz)
+				{
+					I=del3_ind[zzz];J=del3_ind[(zzz+1)%4];
+					if(J>I) std::swap(I,J);
+					if(pairs.insert(std::make_pair(I,J)).second)
+					{
+						createBeam(beam,I,J);
+						if(calcBeamPositionOrientationLength(beam)<maxLength_in_cellsizeUnit*cellsizeUnit_in_meters)
+							if(notDeleted(beam->physicalParameters->se3.position)) 
+								bc.insert(beam);
+					}
+				}
+			}
+		}
+
+	}
+	else
+	{ //  create beams, old method
 	int beam_counter = 0;
 	float nodes_a=0;
 	float nodes_all = rootBody->bodies->size();
@@ -333,11 +436,14 @@ string LatticeExample::generate()
 						setProgress(std::pow(nodes_a/nodes_all,2));
 					}
 					
-					bc.insert(beam);
+					if(notDeleted(beam->physicalParameters->se3.position)) 
+						bc.insert(beam);
 				}
 			}
                 }
         }
+	} // beams are created
+
 
         { // subscribe two nodes, that are monitored by strain recoder to get a measure of length
                 bi    = rootBody->bodies->begin();
@@ -449,7 +555,7 @@ string LatticeExample::generate()
 
 			if( ++current % 100 == 0 )
 			{
-				cerr << "angular springs: " << current << " , " << ((static_cast<float>(current)/all_bodies)*100.0) << " %\n";
+				//cerr << "angular springs: " << current << " , " << ((static_cast<float>(current)/all_bodies)*100.0) << " %\n";
 				setProgress(((float)(current)/all_bodies));
 			}
 				
@@ -480,13 +586,18 @@ string LatticeExample::generate()
 		}
 	};
         
-        
-        regionDelete(rootBody,regionDelete_A_min,regionDelete_A_max);
-        regionDelete(rootBody,regionDelete_B_min,regionDelete_B_max);
-        regionDelete(rootBody,regionDelete_C_min,regionDelete_C_max);
-        regionDelete(rootBody,regionDelete_D_min,regionDelete_D_max);
-        regionDelete(rootBody,regionDelete_E_min,regionDelete_E_max);
-        regionDelete(rootBody,regionDelete_F_min,regionDelete_F_max);
+//	setMessage("Deleting A..."); regionDelete(rootBody,regionDelete_A_min,regionDelete_A_max); if(shouldTerminate()) return "";
+//	setMessage("Deleting B..."); regionDelete(rootBody,regionDelete_B_min,regionDelete_B_max); if(shouldTerminate()) return "";
+//	setMessage("Deleting C..."); regionDelete(rootBody,regionDelete_C_min,regionDelete_C_max); if(shouldTerminate()) return "";
+//	setMessage("Deleting D..."); regionDelete(rootBody,regionDelete_D_min,regionDelete_D_max); if(shouldTerminate()) return "";
+//	setMessage("Deleting E..."); regionDelete(rootBody,regionDelete_E_min,regionDelete_E_max); if(shouldTerminate()) return "";
+//	setMessage("Deleting F..."); regionDelete(rootBody,regionDelete_F_min,regionDelete_F_max); if(shouldTerminate()) return "";
+//
+//	setMessage("Deleting 1..."); regionDelete(rootBody,regionDelete_1_min,regionDelete_1_max); if(shouldTerminate()) return "";
+//	setMessage("Deleting 2..."); regionDelete(rootBody,regionDelete_2_min,regionDelete_2_max); if(shouldTerminate()) return "";
+//	setMessage("Deleting 3..."); regionDelete(rootBody,regionDelete_3_min,regionDelete_3_max); if(shouldTerminate()) return "";
+//	setMessage("Deleting 4..."); regionDelete(rootBody,regionDelete_4_min,regionDelete_4_max); if(shouldTerminate()) return "";
+//	setMessage("Deleting 5..."); regionDelete(rootBody,regionDelete_5_min,regionDelete_5_max); if(shouldTerminate()) return "";
 
         imposeTranslation(rootBody,region_A_min,region_A_max,direction_A,displacement_A_meters);
         imposeTranslation(rootBody,region_B_min,region_B_max,direction_B,displacement_B_meters);
@@ -494,6 +605,7 @@ string LatticeExample::generate()
         imposeTranslation(rootBody,region_D_min,region_D_max,direction_D,displacement_D_meters);
 
         if(useAggregates) addAggregates(rootBody);
+	if(shouldTerminate()) return "";
         
         nonDestroy(rootBody,nonDestroy_A_min,nonDestroy_A_max);
         nonDestroy(rootBody,nonDestroy_B_min,nonDestroy_B_max);
@@ -502,7 +614,9 @@ string LatticeExample::generate()
 
         return "Number of nodes created:\n" + lexical_cast<string>(nbNodes[0]) + ","
                                             + lexical_cast<string>(nbNodes[1]) + ","
-                                            + lexical_cast<string>(nbNodes[2]) + "\n\nNOTE: sometimes it can look better when 'drawWireFrame' is enabled in Display tab.";
+                                            + lexical_cast<string>(nbNodes[2]) + ","
+	     + "Number of beams: " + lexical_cast<string>(bc.size()) + "\n"
+	     + "\nNOTE: sometimes it can look better when 'drawWireFrame' is enabled in Display tab.";
 
 }
 
@@ -660,7 +774,7 @@ void LatticeExample::createBeam(shared_ptr<Body>& body, unsigned int i, unsigned
 }
 
 
-void LatticeExample::calcBeamPositionOrientationLength(shared_ptr<Body>& body)
+Real LatticeExample::calcBeamPositionOrientationLength(shared_ptr<Body>& body)
 {
 	LatticeBeamParameters* beam = static_cast<LatticeBeamParameters*>(body->physicalParameters.get());
 	shared_ptr<Body>& bodyA = (*(rootBody->bodies))[beam->id1];
@@ -689,6 +803,8 @@ void LatticeExample::calcBeamPositionOrientationLength(shared_ptr<Body>& body)
 	beam->se3Displacement.orientation.Align(dist,dist);
 
 	beam->otherDirection	= beam->se3.orientation*Vector3r::UNIT_Y; // any unit vector that is orthogonal to direction.
+
+	return length;
 }
 
 void LatticeExample::calcAxisAngle(LatticeBeamParameters* beam1, BodyContainer* bodies, unsigned int otherId, InteractionContainer* ints, unsigned int thisId)
@@ -861,6 +977,37 @@ void LatticeExample::imposeTranslation(shared_ptr<MetaBody>& rootBody, Vector3r 
         }
 }
 
+bool LatticeExample::isDeleted(Vector3r pos, Vector3r min, Vector3r max)
+{
+	return(
+		   pos[0] > min[0] 
+		&& pos[1] > min[1] 
+		&& pos[2] > min[2] 
+		&& pos[0] < max[0] 
+		&& pos[1] < max[1] 
+		&& pos[2] < max[2] 
+	      );
+}
+
+bool LatticeExample::notDeleted(Vector3r pos)
+{
+//	return true;
+	return (!(
+		   isDeleted(pos,regionDelete_A_min,regionDelete_A_max)
+        	|| isDeleted(pos,regionDelete_B_min,regionDelete_B_max)
+        	|| isDeleted(pos,regionDelete_C_min,regionDelete_C_max)
+        	|| isDeleted(pos,regionDelete_D_min,regionDelete_D_max)
+        	|| isDeleted(pos,regionDelete_E_min,regionDelete_E_max)
+        	|| isDeleted(pos,regionDelete_F_min,regionDelete_F_max)
+
+		|| isDeleted(pos,regionDelete_1_min,regionDelete_1_max)
+        	|| isDeleted(pos,regionDelete_2_min,regionDelete_2_max)
+        	|| isDeleted(pos,regionDelete_3_min,regionDelete_3_max)
+        	|| isDeleted(pos,regionDelete_4_min,regionDelete_4_max)
+        	|| isDeleted(pos,regionDelete_5_min,regionDelete_5_max)
+	));
+};
+
 void LatticeExample::regionDelete(shared_ptr<MetaBody>& rootBody, Vector3r min, Vector3r max)
 {
         vector<unsigned int> futureDeletes;
@@ -934,7 +1081,7 @@ void LatticeExample::nonDestroy(shared_ptr<MetaBody>& rootBody, Vector3r min, Ve
 
 struct Circle
 {
-        float x,y,d;
+        float x,y,z,d;
 };
 
 bool overlaps(Circle& cc,std::vector<Circle>& c)
@@ -942,7 +1089,7 @@ bool overlaps(Circle& cc,std::vector<Circle>& c)
         std::vector<Circle>::iterator end=c.end();
         for(std::vector<Circle>::iterator i=c.begin();i!=end;++i)
         {
-                float dist2 = std::pow(i->x - cc.x ,2)+std::pow(i->y - cc.y,2);
+                float dist2 = std::pow(i->x - cc.x ,2)+std::pow(i->y - cc.y,2)+std::pow(i->z - cc.z,2);
                 float r2    = std::pow( 1.1*(i->d+cc.d)/2.0 ,2); // FIXME - 1.1 is hardcoded. van Mier's min distance is 1.1*(D1+D2)/2
                 if(dist2<r2)
                         return true;
@@ -959,11 +1106,11 @@ int aggInside(Vector3r& a,Vector3r& b,std::vector<Circle>& c, Real cellsizeUnit_
         //      if(i->r < cellsizeUnit_in_meters) // FIXME
         //              continue;
 
-                float dist2 = std::pow(i->x - a[0],2)+std::pow(i->y - a[1],2);
+                float dist2 = std::pow(i->x - a[0],2)+std::pow(i->y - a[1],2)+std::pow(i->z - a[2],2);
                 float r2    = std::pow(i->d*0.5,2);
                 if(dist2<r2) res=1; else res=0;
 
-                dist2 = std::pow(i->x - b[0],2)+std::pow(i->y - b[1],2);
+                dist2 = std::pow(i->x - b[0],2)+std::pow(i->y - b[1],2)+std::pow(i->z - b[2],2);
                 if(dist2<r2) ++res;
 
                 if(res!=0) return res;
@@ -980,6 +1127,15 @@ float aggsAreas(std::vector<Circle>& c)
         return aggArea;
 }
 
+float aggsVolumes(std::vector<Circle>& c)
+{
+        float aggVolume=0.0;
+        std::vector<Circle>::iterator end=c.end();
+        for(std::vector<Circle>::iterator i=c.begin();i!=end;++i)
+                aggVolume += (4.0/3.0)*3.14159265358979323846*std::pow(i->d*0.5 ,3);
+        return aggVolume;
+}
+
 // random
 #include <boost/random/linear_congruential.hpp>
 #include <boost/random/uniform_real.hpp>
@@ -993,6 +1149,9 @@ void LatticeExample::addAggregates(shared_ptr<MetaBody>& rootBody)
 
         Real AGGREGATES_X=speciemen_size_in_meters[0];
         Real AGGREGATES_Y=speciemen_size_in_meters[1];
+        Real AGGREGATES_Z=speciemen_size_in_meters[2];
+	if(AGGREGATES_Z < cellsizeUnit_in_meters )
+		AGGREGATES_Z = 0.0;
         Real MAX_DIAMETER  =aggregateMaxDiameter;
         Real MIN_DIAMETER  =aggregateMinDiameter;
         Real MEAN_DIAMETER =aggregateMeanDiameter;
@@ -1009,23 +1168,29 @@ void LatticeExample::addAggregates(shared_ptr<MetaBody>& rootBody)
 	setMessage(  "generating aggregates...");
         do
         {
+		if(shouldTerminate()) return;
+
                 Circle cc;
-                cc.x=random1()*AGGREGATES_X, cc.y=random1()*AGGREGATES_Y;
+                cc.x=random1()*AGGREGATES_X, cc.y=random1()*AGGREGATES_Y, cc.z=AGGREGATES_Z==0?0:random1()*AGGREGATES_Z;
                 do { cc.d=randomN(); } while (cc.d>=MAX_DIAMETER || cc.d<=MIN_DIAMETER);
                 for(int i=0 ; i<1000 ; ++i)
                         if(overlaps(cc,c))
-                                cc.x=random1()*AGGREGATES_X, cc.y=random1()*AGGREGATES_Y;
+                                cc.x=random1()*AGGREGATES_X, cc.y=random1()*AGGREGATES_Y, cc.z=AGGREGATES_Z==0?0:random1()*AGGREGATES_Z;
                         else
                         {
                                 c.push_back(cc);
                 //              std::cerr << cc.x << " " << cc.y << " " << cc.d << "\n";
                                 break;
                         }
-		setProgress((aggsAreas(c)/(AGGREGATES_X*AGGREGATES_Y))/(aggregatePercent/100.0));
+		if(AGGREGATES_Z == 0)
+			setProgress((aggsAreas(c)/(AGGREGATES_X*AGGREGATES_Y))/(aggregatePercent/100.0));
+		else
+			setProgress((aggsVolumes(c)/(AGGREGATES_X*AGGREGATES_Y*AGGREGATES_Z))/(aggregatePercent/100.0));
         }
-        while(aggregatePercent/100.0 > aggsAreas(c)/(AGGREGATES_X*AGGREGATES_Y) );
+        //while(aggregatePercent/100.0 > aggsAreas(c)/(AGGREGATES_X*AGGREGATES_Y) );
+        while( progress() < 1.0 );
 
-        std::cerr << "done. " << c.size() << " aggregates generated, area: " << aggsAreas(c)/(AGGREGATES_X*AGGREGATES_Y) << "\n";
+        std::cerr << "done. " << c.size() << " area: " << aggsAreas(c)/(AGGREGATES_X*AGGREGATES_Y) << " vol: " << aggsVolumes(c)/(AGGREGATES_X*AGGREGATES_Y*AGGREGATES_Z) << "\n";
 
         { // set different properties for beams that lie in an aggregate
           // parametrize from above - takes three arguments: 

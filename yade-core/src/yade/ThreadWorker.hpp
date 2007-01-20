@@ -52,7 +52,7 @@ class ThreadWorker	//         perhaps simulation steps, or stage? as it is a sin
 		virtual		~ThreadWorker() {};
 
 		/// Returns a value between 0.0 and 1.0. Useful for updating a progress bar.
-		float		progress();
+		float		progress(); // get_progress ? (pick a naming convention, efngh)
 		/// You can display a message in GUI about what is the current work status
 		std::string	message();
 		/// Check whether execution is finished,

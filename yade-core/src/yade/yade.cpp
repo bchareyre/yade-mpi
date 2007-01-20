@@ -71,7 +71,7 @@ void printHelp()
 	flags=flags+"PREFIX=" +getPrefix()+ "\n";
 	flags=flags+"POSTFIX=" + getPostfix() + "\n";
 #ifdef SINGLE_PRECISION
-	flags+="DOUBLE_PRECISION ";
+	flags+="SINGLE_PRECISION ";
 #endif
 #ifdef DOUBLE_PRECISION
 	flags+="DOUBLE_PRECISION ";

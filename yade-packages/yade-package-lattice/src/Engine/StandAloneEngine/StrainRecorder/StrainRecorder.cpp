@@ -51,8 +51,8 @@ bool StrainRecorder::isActivated()
 
 void StrainRecorder::action(Body * body)
 {
-//	std::cerr << "StrainRecorder quits\n";
-//	return;
+	std::cerr << "StrainRecorder quits\n";
+	return;
 	
 	MetaBody * ncb = static_cast<MetaBody*>(body);
 	Real strain_y=0,stress_y=0;//,stress_nonlocal_y=0;
@@ -60,9 +60,11 @@ void StrainRecorder::action(Body * body)
 	std::vector<unsigned int>::iterator i   = subscribedBodies.begin();
 	std::vector<unsigned int>::iterator end = subscribedBodies.end();
 	
+	if(!ncb->bodies->exists(*i)) std::cerr << "StrainRecorder missing node\n", exit(1);
 	LatticeNodeParameters* node1 = dynamic_cast<LatticeNodeParameters*>( (*(ncb->bodies))[*i]->physicalParameters . get() );
 	(*(ncb->bodies))[*i]->geometricalModel->diffuseColor = Vector3f(1.0,0.0,0.0); // FIXME [1]
 	++i;
+	if(!ncb->bodies->exists(*i)) std::cerr << "StrainRecorder missing node\n", exit(1);
 	LatticeNodeParameters* node2 = dynamic_cast<LatticeNodeParameters*>( (*(ncb->bodies))[*i]->physicalParameters . get() );
 	(*(ncb->bodies))[*i]->geometricalModel->diffuseColor = Vector3f(1.0,0.0,0.0); // FIXME [1]
 	++i;

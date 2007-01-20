@@ -108,6 +108,7 @@ void HangingCloth::postProcessAttributes(bool)
 
 void HangingCloth::registerAttributes()
 {
+	FileGenerator::registerAttributes();
 	REGISTER_ATTRIBUTE(width);
 	REGISTER_ATTRIBUTE(height);
 	REGISTER_ATTRIBUTE(springStiffness);

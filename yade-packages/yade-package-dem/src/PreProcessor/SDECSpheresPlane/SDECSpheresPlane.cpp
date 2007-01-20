@@ -89,6 +89,7 @@ void SDECSpheresPlane::postProcessAttributes(bool)
 
 void SDECSpheresPlane::registerAttributes()
 {
+	FileGenerator::registerAttributes();
 	REGISTER_ATTRIBUTE(nbSpheres);
 	REGISTER_ATTRIBUTE(minRadius);
 	REGISTER_ATTRIBUTE(maxRadius);

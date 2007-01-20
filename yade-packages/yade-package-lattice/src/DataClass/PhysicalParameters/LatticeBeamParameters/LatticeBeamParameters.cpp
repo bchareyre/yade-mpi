@@ -59,6 +59,7 @@ void LatticeBeamParameters::postProcessAttributes(bool deserializing)
 #define chk(x,y) std::cout << #y << ",      " << x << " = " << y << "\n"
 		if(criticalTensileStrain > 0.00015) // E.l
 		{ // CEMENT MATRIX
+			static int cement=0;	++cement;
 			static bool d1=true;
 			if(d1)
 			{
@@ -73,6 +74,7 @@ void LatticeBeamParameters::postProcessAttributes(bool deserializing)
 		}
 		else if(criticalTensileStrain > 0.00006) // E.l
 		{ // AGGREGATE
+			static int aggregate=0; ++aggregate;
 			static bool d2=true;
 			if(d2)
 			{
@@ -87,6 +89,7 @@ void LatticeBeamParameters::postProcessAttributes(bool deserializing)
 		}
 		else
 		{ // BOND / INTERFACE
+			static int bond=0; ++bond;
 			static bool d3=true;
 			if(d3)
 			{

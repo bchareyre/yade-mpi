@@ -96,6 +96,7 @@ FEMBeam::~FEMBeam ()
 
 void FEMBeam::registerAttributes()
 {
+	FileGenerator::registerAttributes();
 	REGISTER_ATTRIBUTE(femTxtFile);
 	REGISTER_ATTRIBUTE(gravity);
 	

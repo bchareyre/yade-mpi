@@ -177,11 +177,11 @@ void QtFileGenerator::pbGenerateClicked()
 
 	m_worker = static_pointer_cast<FileGenerator>(ClassFactory::instance().createShared(cbGeneratorName->currentText()));
 	
+	guiGen.deserialize(m_worker);
+
 	m_worker->setFileName(leOutputFileName->text());
 	m_worker->setSerializationLibrary(cbSerializationName->currentText());
-	
-	guiGen.deserialize(m_worker);
-	
+		
 	m_runner   = shared_ptr<ThreadRunner>(new ThreadRunner(m_worker.get()));
 	m_runner->spawnSingleAction();
 
@@ -263,6 +263,12 @@ void QtFileGenerator::pbLoadClicked()
 			return;
 		}
 	}
+	std::string tmp=fg->getFileName();
+	if(tmp!="../data/scene.xml") // this check to avoid resetting data, when loading older file.
+	{
+		leOutputFileName->setText(tmp);
+		setSerializationName(fg->getSerializationLibrary());
+	}
 }
 
 void QtFileGenerator::pbSaveClicked()
@@ -270,9 +276,9 @@ void QtFileGenerator::pbSaveClicked()
 	// FIXME add some test to avoid crashing
 	shared_ptr<FileGenerator> fg = static_pointer_cast<FileGenerator>(ClassFactory::instance().createShared(cbGeneratorName->currentText()));
 	
+	guiGen.deserialize(fg);
 	fg->setFileName(leOutputFileName->text());
 	fg->setSerializationLibrary(cbSerializationName->currentText());
-	guiGen.deserialize(fg);
 	
 	string selectedFilter;
 	std::vector<string> filters;
