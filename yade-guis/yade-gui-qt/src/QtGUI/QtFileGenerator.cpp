@@ -255,6 +255,13 @@ void QtFileGenerator::pbLoadClicked()
 			IOFormatManager::loadFromFile("XMLFormatManager",fileName,"fileGenerator",fg); 
 			setGeneratorName(fg->getClassName());
 			displayFileGeneratorAttributes(fg);
+
+			std::string tmp=fg->getFileName();
+			if(tmp!="../data/scene.xml") // this check to avoid resetting data, when loading older file.
+			{
+				leOutputFileName->setText(tmp);
+				setSerializationName(fg->getSerializationLibrary());
+			}
 		} 
 		catch(SerializableError& e) // catching it...
 		{
@@ -262,12 +269,6 @@ void QtFileGenerator::pbLoadClicked()
 			md->exec();
 			return;
 		}
-	}
-	std::string tmp=fg->getFileName();
-	if(tmp!="../data/scene.xml") // this check to avoid resetting data, when loading older file.
-	{
-		leOutputFileName->setText(tmp);
-		setSerializationName(fg->getSerializationLibrary());
 	}
 }
 

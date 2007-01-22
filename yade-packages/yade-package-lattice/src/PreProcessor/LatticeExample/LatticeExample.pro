@@ -10,6 +10,9 @@ LIBS += -lLineSegment \
         -lNonLocalDependency \
         -lNonLocalInitializer \
         -lStrainRecorder \
+        -lNodeRecorder \
+        -lBeamRecorder \
+	-lMovingSupport \
         -lMeasurePoisson \
         -lLatticeBeamAngularSpring \
         -lPhysicalActionVectorVector \
@@ -35,6 +38,9 @@ LIBS += -lLineSegment \
 INCLUDEPATH += $${YADE_QMAKE_PATH}/include/ \
                ../../Engine/StandAloneEngine/LatticeLaw \
                ../../Engine/StandAloneEngine/StrainRecorder \
+               ../../Engine/StandAloneEngine/NodeRecorder \
+               ../../Engine/StandAloneEngine/BeamRecorder \
+	       ../../Engine/StandAloneEngine/MovingSupport \
                ../../Engine/StandAloneEngine/MeasurePoisson \
                ../../Engine/StandAloneEngine/NonLocalInitializer \
                ../../DataClass/PhysicalParameters/LatticeSetParameters \

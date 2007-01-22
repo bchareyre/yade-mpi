@@ -44,6 +44,9 @@ class BINFormatManager : public IOFormatManager
 		static void 		  serializeUnsupported(ostream&, Archive&, int);
 		static void 		deserializeUnsupported(istream&, Archive&,const string&);
 
+		static void               serializeCustomFundamental(ostream& stream, Archive& ac, int depth);
+		static void		deserializeCustomFundamental(istream& stream, Archive& ac,const string& str);
+
 	REGISTER_CLASS_NAME(BINFormatManager);
 	REGISTER_BASE_CLASS_NAME(IOFormatManager);
 };

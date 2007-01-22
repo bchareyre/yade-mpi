@@ -15,6 +15,9 @@ void GLDrawLatticeBeamState::go(const shared_ptr<PhysicalParameters>& pp)
 	static Real maxTensileFactor = 0.0; // FIXME - thread unsafe
 	static Real maxCompressFactor = 0.0; // FIXME - thread unsafe
 
+	static unsigned int cccc=0;
+	if(((++cccc)%100000) == 0) std::cerr << maxTensileFactor << " " <<maxCompressFactor << "\n";
+
 	LatticeBeamParameters* beam = static_cast<LatticeBeamParameters*>(pp.get());
 	Real strain                     = beam->strain();
 	Real factor;

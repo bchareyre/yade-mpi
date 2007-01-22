@@ -29,7 +29,8 @@ BINFormatManager::BINFormatManager() : IOFormatManager()
 	Archive::addSerializablePointer(SerializableTypes::POINTER      , true , serializeSmartPointer             , deserializeSmartPointer);
 
 	Archive::addSerializablePointer(SerializableTypes::CUSTOM_CLASS , false, serializeUnsupported              , deserializeUnsupported);
-	Archive::addSerializablePointer(SerializableTypes::CUSTOM_CLASS , true , serializeUnsupported              , deserializeUnsupported);
+	//Archive::addSerializablePointer(SerializableTypes::CUSTOM_CLASS , true , serializeUnsupported              , deserializeUnsupported);
+	Archive::addSerializablePointer(SerializableTypes::CUSTOM_CLASS , true , serializeCustomFundamental        , deserializeCustomFundamental);
 }
 
 BINFormatManager::~BINFormatManager()
@@ -334,5 +335,42 @@ void BINFormatManager::deserializeUnsupported(istream&, Archive&,const string&)
 {
 	string error=string(IOManagerExceptions::BadAttributeValue) + " - custom class is not supported in binary, I'm too lazy to write this stuff, but you can write it ;)";
 	throw SerializableError(error.c_str());
+}
+
+void BINFormatManager::deserializeCustomFundamental(istream& stream, Archive& ac,const string& str)
+{
+	shared_ptr<Serializable> s = dynamic_pointer_cast<Serializable>(ClassFactory::instance().createShared(ac.getSerializableClassName()));
+
+	s->registerSerializableAttributes(true);
+
+	Serializable::Archives archives = s->getArchives();
+	Serializable::Archives::iterator archi = archives.begin();
+	Serializable::Archives::iterator archiEnd = archives.end();
+	for( ; archi!=archiEnd ; ++archi)
+		(*archi)->deserialize(stream,**archi,str);
+
+	s->deserialize(ac.getAddress());
+	s->unregisterSerializableAttributes(true);
+	ac.markProcessed();
+}
+
+
+void BINFormatManager::serializeCustomFundamental(ostream& stream, Archive& ac,int depth)
+{
+	shared_ptr<Serializable> ss = dynamic_pointer_cast<Serializable>(ClassFactory::instance().createShared(ac.getSerializableClassName()));
+	ss->serialize(ac.getAddress());
+	ss->registerSerializableAttributes(false);
+	Serializable::Archives archives = ss->getArchives();
+	Serializable::Archives::iterator archi = archives.begin();
+	Serializable::Archives::iterator archiEnd = archives.end();
+
+	for( ; archi!=archiEnd ; ++archi)
+	{
+		(*archi)->serialize(stream,**archi,depth+1);
+		(*archi)->markProcessed();
+	}
+
+	ss->unregisterSerializableAttributes(false);
+	ac.markProcessed();
 }
 

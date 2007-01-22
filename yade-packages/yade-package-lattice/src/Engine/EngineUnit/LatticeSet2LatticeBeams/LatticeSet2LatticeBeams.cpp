@@ -40,7 +40,7 @@ void LatticeSet2LatticeBeams::go(	  const shared_ptr<PhysicalParameters>& ph
 			      if(beam->criticalTensileStrain > 0.00006) line->diffuseColor = Vector3f(0.0,0.0,0.0); else // AGGREGATE
 			                                                line->diffuseColor = Vector3f(0.3,0.3,0.3);      // BOND
 
-			      if(beam->longitudalStiffness > 3.6 ) line->diffuseColor = Vector3f(1.0,0.0,0.0); // NON-DESTROY
+			      if(beam->longitudalStiffness > 3.6 ) line->diffuseColor = Vector3f(0.4,0.4,1.0); // NON-DESTROY
 		}
 	}
 }

@@ -139,7 +139,7 @@ int main(int argc, char *argv[])
 			case 'w' :	setup = true;		break;
 			case 'C' :	configPath = optarg; 	break;
 			case 'c' :	configPath = "."; 	break;
-			case 'S' : simulationFileName=optarg; break;
+			case 'S' :	simulationFileName=optarg; break;
 			default	 :	printHelp();		return 1;
 		}
 	

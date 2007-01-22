@@ -274,6 +274,7 @@ void LatticeLaw::action(Body* body)
 		{ // 'E_min' 'E_max' criterion
 			if( deleteBeam(lattice , beam, body) ) // calculates strain
 			{
+				std::cerr << "one beam deleted\n";
 				futureDeletes.push_back(body->getId());
 				continue;
 			}
@@ -392,8 +393,8 @@ void LatticeLaw::action(Body* body)
 	{ // delete all beams and nodes marked for deletion 
 	  // - beams that exceeded critical tensile/compressive strain
 	  // - nodes that have no more beams
-		vector<unsigned int>::iterator vend = futureDeletes.end();
-		for( vector<unsigned int>::iterator vsta = futureDeletes.begin() ; vsta != vend ; ++vsta)
+		std::list<unsigned int>::iterator vend = futureDeletes.end();
+		for( std::list<unsigned int>::iterator vsta = futureDeletes.begin() ; vsta != vend ; ++vsta)
 			bodies->erase(*vsta); 
 	}
 }

@@ -77,9 +77,13 @@ class Omega : public Singleton<Omega>
 		void logMessage(const string& str);
 		void logError(const string& str);
 		
+		// FIXME this is a hack. See  GLViewer:86
+		// problem is that currently there is no way to transmit arguments between UI and GLDraw* methods.
+		// Omega will be deleted anyway, so, uh.. I am polluting it now :/
 		float	isoValue;
 		float	isoThick;
 		int     isoSec;
+		// FIXME end
 		
 		boost::mutex&	getRootBodyMutex();
 		

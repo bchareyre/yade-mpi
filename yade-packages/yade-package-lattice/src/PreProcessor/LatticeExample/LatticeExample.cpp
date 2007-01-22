@@ -16,6 +16,9 @@
 #include "LineSegment.hpp"
 #include "LatticeLaw.hpp"
 #include "StrainRecorder.hpp"
+#include "NodeRecorder.hpp"
+#include "BeamRecorder.hpp"
+#include "MovingSupport.hpp"
 #include "MeasurePoisson.hpp"
 #include "NonLocalInitializer.hpp"
 #include <yade/yade-lib-base/yadeWm3Extra.hpp>
@@ -109,6 +112,8 @@ LatticeExample::LatticeExample() : FileGenerator()
         measurePoisson_node4     = Vector3r(0.2,0.1,0);
         outputFile               = "../data/strains";
         poissonFile              = "../data/poisson";
+        nodeRecorderFile         = "../data/npos";
+        beamRecorderFile         = "../data/bstr";
         subscribedBodies.clear();
                 
         regionDelete_A_min       = Vector3r(0,0,0);
@@ -140,6 +145,12 @@ LatticeExample::LatticeExample() : FileGenerator()
         nonDestroy_B_min         = Vector3r(0,0,0);
         nonDestroy_B_max         = Vector3r(0,0,0);
 
+	CT_A_min		 = Vector3r(0,0,-1);
+	CT_A_max		 = Vector3r(0,0,-1);
+	CT_B_min		 = Vector3r(0,0,-1);
+	CT_B_max		 = Vector3r(0,0,-1);
+	CT			 = 1;
+
         useAggregates            = false;
         aggregatePercent         = 40;
         aggregateMeanDiameter    = cellsizeUnit_in_meters*1;
@@ -158,6 +169,53 @@ LatticeExample::LatticeExample() : FileGenerator()
         bond_torsStiffness_noUnit= 0.28;                                // k_b bond
         bond_critCompressStrain  = 100.0;                               // E.c bond
         bond_critTensileStrain   = 50.0;                                // E.l bond
+		
+	nodeRec_A_min=Vector3r(0,0,0);
+	nodeRec_A_max=Vector3r(0,0,0);
+	nodeRec_B_min=Vector3r(0,0,0);
+	nodeRec_B_max=Vector3r(0,0,0);
+	nodeRec_C_min=Vector3r(0,0,0);
+	nodeRec_C_max=Vector3r(0,0,0);
+	nodeRec_D_min=Vector3r(0,0,0);
+	nodeRec_D_max=Vector3r(0,0,0);
+	nodeRec_E_min=Vector3r(0,0,0);
+	nodeRec_E_max=Vector3r(0,0,0);
+	nodeRec_F_min=Vector3r(0,0,0);
+	nodeRec_F_max=Vector3r(0,0,0);
+	
+	beamRec_A_pos=Vector3r(0,0,0);
+	beamRec_B_pos=Vector3r(0,0,0);
+	beamRec_C_pos=Vector3r(0,0,0);
+	beamRec_D_pos=Vector3r(0,0,0);
+	beamRec_E_pos=Vector3r(0,0,0);
+
+	beamRec_A_range=0;
+	beamRec_B_range=0;
+	beamRec_C_range=0;
+	beamRec_D_range=0;
+	beamRec_E_range=0;
+
+	beamRec_A_dir=-1;
+	beamRec_B_dir=-1;
+	beamRec_C_dir=-1;
+	beamRec_D_dir=-1;
+	beamRec_E_dir=-1;
+		
+	movSupp_A_pos=Vector3r(0,0,0);
+	movSupp_A_range=0;
+	movSupp_A_dir=-1;
+
+	movSupp_B_pos=Vector3r(0,0,0);
+	movSupp_B_range=0;
+	movSupp_B_dir=-1;
+
+	movSupp_C_pos=Vector3r(0,0,0);
+	movSupp_C_range=0;
+	movSupp_C_dir=-1;
+
+	movSupp_D_pos=Vector3r(0,0,0);
+	movSupp_D_range=0;
+	movSupp_D_dir=-1;
 }
 
 
@@ -215,14 +273,60 @@ void LatticeExample::registerAttributes()
         REGISTER_ATTRIBUTE(direction_D);
         REGISTER_ATTRIBUTE(displacement_D_meters);
         
+	REGISTER_ATTRIBUTE(outputFile);
         REGISTER_ATTRIBUTE(strainRecorder_xz_plane);
         REGISTER_ATTRIBUTE(strainRecorder_node1);
         REGISTER_ATTRIBUTE(strainRecorder_node2);
-        REGISTER_ATTRIBUTE(outputFile);
+
+        REGISTER_ATTRIBUTE(poissonFile);
         REGISTER_ATTRIBUTE(measurePoisson_node3);
         REGISTER_ATTRIBUTE(measurePoisson_node4);
-        REGISTER_ATTRIBUTE(poissonFile);
-        
+
+
+	REGISTER_ATTRIBUTE(nodeRecorderFile);
+	REGISTER_ATTRIBUTE(nodeRec_A_min);
+	REGISTER_ATTRIBUTE(nodeRec_A_max);
+	REGISTER_ATTRIBUTE(nodeRec_B_min);
+	REGISTER_ATTRIBUTE(nodeRec_B_max);
+	REGISTER_ATTRIBUTE(nodeRec_C_min);
+	REGISTER_ATTRIBUTE(nodeRec_C_max);
+	REGISTER_ATTRIBUTE(nodeRec_D_min);
+	REGISTER_ATTRIBUTE(nodeRec_D_max);
+	REGISTER_ATTRIBUTE(nodeRec_E_min);
+	REGISTER_ATTRIBUTE(nodeRec_E_max);
+	REGISTER_ATTRIBUTE(nodeRec_F_min);
+	REGISTER_ATTRIBUTE(nodeRec_F_max);
+	
+	REGISTER_ATTRIBUTE(beamRecorderFile);
+	REGISTER_ATTRIBUTE(beamRec_A_dir);
+	REGISTER_ATTRIBUTE(beamRec_A_pos);
+	REGISTER_ATTRIBUTE(beamRec_A_range);
+	REGISTER_ATTRIBUTE(beamRec_B_dir);
+	REGISTER_ATTRIBUTE(beamRec_B_pos);
+	REGISTER_ATTRIBUTE(beamRec_B_range);
+	REGISTER_ATTRIBUTE(beamRec_C_dir);
+	REGISTER_ATTRIBUTE(beamRec_C_pos);
+	REGISTER_ATTRIBUTE(beamRec_C_range);
+	REGISTER_ATTRIBUTE(beamRec_D_dir);
+	REGISTER_ATTRIBUTE(beamRec_D_pos);
+	REGISTER_ATTRIBUTE(beamRec_D_range);
+	REGISTER_ATTRIBUTE(beamRec_E_dir);
+	REGISTER_ATTRIBUTE(beamRec_E_pos);
+	REGISTER_ATTRIBUTE(beamRec_E_range);
+
+	REGISTER_ATTRIBUTE(movSupp_A_dir);
+	REGISTER_ATTRIBUTE(movSupp_A_pos);
+	REGISTER_ATTRIBUTE(movSupp_A_range);
+	REGISTER_ATTRIBUTE(movSupp_B_dir);
+	REGISTER_ATTRIBUTE(movSupp_B_pos);
+	REGISTER_ATTRIBUTE(movSupp_B_range);
+	REGISTER_ATTRIBUTE(movSupp_C_dir);
+	REGISTER_ATTRIBUTE(movSupp_C_pos);
+	REGISTER_ATTRIBUTE(movSupp_C_range);
+	REGISTER_ATTRIBUTE(movSupp_D_dir);
+	REGISTER_ATTRIBUTE(movSupp_D_pos);
+	REGISTER_ATTRIBUTE(movSupp_D_range);
+
         REGISTER_ATTRIBUTE(regionDelete_A_min);
         REGISTER_ATTRIBUTE(regionDelete_A_max);
         REGISTER_ATTRIBUTE(regionDelete_B_min);
@@ -251,6 +355,12 @@ void LatticeExample::registerAttributes()
         REGISTER_ATTRIBUTE(nonDestroy_A_max);
         REGISTER_ATTRIBUTE(nonDestroy_B_min);
         REGISTER_ATTRIBUTE(nonDestroy_B_max);
+       
+	REGISTER_ATTRIBUTE(CT);
+	REGISTER_ATTRIBUTE(CT_A_min);
+        REGISTER_ATTRIBUTE(CT_A_max);
+        REGISTER_ATTRIBUTE(CT_B_min);
+        REGISTER_ATTRIBUTE(CT_B_max);
 
         REGISTER_ATTRIBUTE(useAggregates);
         REGISTER_ATTRIBUTE(aggregatePercent);
@@ -277,7 +387,6 @@ string LatticeExample::generate()
 	rootBody = shared_ptr<MetaBody>(new MetaBody);
 	createActors(rootBody);
 	positionRootBody(rootBody);
-
 	
 	rootBody->persistentInteractions	= shared_ptr<InteractionContainer>(new InteractionVecSet);
 	rootBody->transientInteractions		= shared_ptr<InteractionContainer>(new InteractionVecSet);
@@ -586,19 +695,6 @@ string LatticeExample::generate()
 		}
 	};
         
-//	setMessage("Deleting A..."); regionDelete(rootBody,regionDelete_A_min,regionDelete_A_max); if(shouldTerminate()) return "";
-//	setMessage("Deleting B..."); regionDelete(rootBody,regionDelete_B_min,regionDelete_B_max); if(shouldTerminate()) return "";
-//	setMessage("Deleting C..."); regionDelete(rootBody,regionDelete_C_min,regionDelete_C_max); if(shouldTerminate()) return "";
-//	setMessage("Deleting D..."); regionDelete(rootBody,regionDelete_D_min,regionDelete_D_max); if(shouldTerminate()) return "";
-//	setMessage("Deleting E..."); regionDelete(rootBody,regionDelete_E_min,regionDelete_E_max); if(shouldTerminate()) return "";
-//	setMessage("Deleting F..."); regionDelete(rootBody,regionDelete_F_min,regionDelete_F_max); if(shouldTerminate()) return "";
-//
-//	setMessage("Deleting 1..."); regionDelete(rootBody,regionDelete_1_min,regionDelete_1_max); if(shouldTerminate()) return "";
-//	setMessage("Deleting 2..."); regionDelete(rootBody,regionDelete_2_min,regionDelete_2_max); if(shouldTerminate()) return "";
-//	setMessage("Deleting 3..."); regionDelete(rootBody,regionDelete_3_min,regionDelete_3_max); if(shouldTerminate()) return "";
-//	setMessage("Deleting 4..."); regionDelete(rootBody,regionDelete_4_min,regionDelete_4_max); if(shouldTerminate()) return "";
-//	setMessage("Deleting 5..."); regionDelete(rootBody,regionDelete_5_min,regionDelete_5_max); if(shouldTerminate()) return "";
-
         imposeTranslation(rootBody,region_A_min,region_A_max,direction_A,displacement_A_meters);
         imposeTranslation(rootBody,region_B_min,region_B_max,direction_B,displacement_B_meters);
         imposeTranslation(rootBody,region_C_min,region_C_max,direction_C,displacement_C_meters);
@@ -609,6 +705,9 @@ string LatticeExample::generate()
         
         nonDestroy(rootBody,nonDestroy_A_min,nonDestroy_A_max);
         nonDestroy(rootBody,nonDestroy_B_min,nonDestroy_B_max);
+        
+	modifyCT(rootBody,CT_A_min,CT_A_max);
+        modifyCT(rootBody,CT_B_min,CT_B_max);
         
         cerr << "finished.. saving\n";
 
@@ -881,7 +980,42 @@ void LatticeExample::createActors(shared_ptr<MetaBody>& )
         measurePoisson->outputFile              = poissonFile;
         measurePoisson->interval                = 10;
         
-        shared_ptr<LatticeLaw> latticeLaw(new LatticeLaw);
+/*
+NodeRecorder nnnn;
+	std::string	 outputFile;
+	unsigned int	 interval;
+	std::list<std::pair<Vector3r,Vector3r> > regions; // a list of min/max pairs describing each region.
+BeamRecorder bbbb;
+	std::string	 outputFile;
+	unsigned int	 interval;
+	std::list<std::pair<Vector3r,std::pair< Real, int > > > sections; // a list of section planes: <a midpoint, half length, direction >
+*/
+        nodeRecorder   = shared_ptr<NodeRecorder>(new NodeRecorder);
+        nodeRecorder->outputFile                = nodeRecorderFile;
+        nodeRecorder->interval                  = 10;
+	if(nodeRec_A_min != nodeRec_A_max) nodeRecorder->regions.push_back(std::make_pair(nodeRec_A_min,nodeRec_A_max));
+	if(nodeRec_B_min != nodeRec_B_max) nodeRecorder->regions.push_back(std::make_pair(nodeRec_B_min,nodeRec_B_max));
+	if(nodeRec_C_min != nodeRec_C_max) nodeRecorder->regions.push_back(std::make_pair(nodeRec_C_min,nodeRec_C_max));
+	if(nodeRec_D_min != nodeRec_D_max) nodeRecorder->regions.push_back(std::make_pair(nodeRec_D_min,nodeRec_D_max));
+	if(nodeRec_E_min != nodeRec_E_max) nodeRecorder->regions.push_back(std::make_pair(nodeRec_E_min,nodeRec_E_max));
+	if(nodeRec_F_min != nodeRec_F_max) nodeRecorder->regions.push_back(std::make_pair(nodeRec_F_min,nodeRec_F_max));
+        
+        beamRecorder = shared_ptr<BeamRecorder>(new BeamRecorder);
+        beamRecorder->outputFile                = beamRecorderFile;
+        beamRecorder->interval                  = 10;
+	if(beamRec_A_dir != -1) beamRecorder->sections.push_back(std::make_pair(beamRec_A_pos,std::make_pair(beamRec_A_range,beamRec_A_dir)));
+	if(beamRec_B_dir != -1) beamRecorder->sections.push_back(std::make_pair(beamRec_B_pos,std::make_pair(beamRec_B_range,beamRec_B_dir)));
+	if(beamRec_C_dir != -1) beamRecorder->sections.push_back(std::make_pair(beamRec_C_pos,std::make_pair(beamRec_C_range,beamRec_C_dir)));
+	if(beamRec_D_dir != -1) beamRecorder->sections.push_back(std::make_pair(beamRec_D_pos,std::make_pair(beamRec_D_range,beamRec_D_dir)));
+	if(beamRec_E_dir != -1) beamRecorder->sections.push_back(std::make_pair(beamRec_E_pos,std::make_pair(beamRec_E_range,beamRec_E_dir)));
+        
+        movingSupport   = shared_ptr<MovingSupport>(new MovingSupport);
+	if(movSupp_A_dir != -1) movingSupport->sections.push_back(std::make_pair(movSupp_A_pos,std::make_pair(movSupp_A_dir,movSupp_A_range)));
+	if(movSupp_B_dir != -1) movingSupport->sections.push_back(std::make_pair(movSupp_B_pos,std::make_pair(movSupp_B_dir,movSupp_B_range)));
+	if(movSupp_C_dir != -1) movingSupport->sections.push_back(std::make_pair(movSupp_C_pos,std::make_pair(movSupp_C_dir,movSupp_C_range)));
+	if(movSupp_D_dir != -1) movingSupport->sections.push_back(std::make_pair(movSupp_D_pos,std::make_pair(movSupp_D_dir,movSupp_D_range)));
+ 	
+	shared_ptr<LatticeLaw> latticeLaw(new LatticeLaw);
         latticeLaw->ensure2D   = ensure2D;
         latticeLaw->roughEdges = roughEdges;
         latticeLaw->calcTorsion= calculate_Torsion;
@@ -892,6 +1026,9 @@ void LatticeExample::createActors(shared_ptr<MetaBody>& )
         rootBody->engines.push_back(geometricalModelDispatcher);
         rootBody->engines.push_back(strainRecorder);
         rootBody->engines.push_back(measurePoisson);
+        rootBody->engines.push_back(nodeRecorder);
+        rootBody->engines.push_back(beamRecorder);
+	rootBody->engines.push_back(movingSupport);
         
         rootBody->initializers.clear();
         rootBody->initializers.push_back(boundingVolumeDispatcher);
@@ -944,11 +1081,15 @@ void LatticeExample::imposeTranslation(shared_ptr<MetaBody>& rootBody, Vector3r 
  	translationCondition->displacement  = displacement;
 	direction.Normalize();
  	translationCondition->translationAxis = direction;
-        
+
+        // FIXME: WTF ???
         rootBody->engines.push_back((rootBody->engines)[rootBody->engines.size()-1]);
         (rootBody->engines)[rootBody->engines.size()-2]=(rootBody->engines)[rootBody->engines.size()-3];
         (rootBody->engines)[rootBody->engines.size()-3]=(rootBody->engines)[rootBody->engines.size()-4];
-        (rootBody->engines)[rootBody->engines.size()-4]=translationCondition;
+        (rootBody->engines)[rootBody->engines.size()-4]=(rootBody->engines)[rootBody->engines.size()-5];
+        (rootBody->engines)[rootBody->engines.size()-5]=(rootBody->engines)[rootBody->engines.size()-6];
+        (rootBody->engines)[rootBody->engines.size()-6]=(rootBody->engines)[rootBody->engines.size()-7];
+        (rootBody->engines)[rootBody->engines.size()-7]=translationCondition;
         translationCondition->subscribedBodies.clear();
         
         BodyContainer::iterator bi    = rootBody->bodies->begin();
@@ -1039,7 +1180,7 @@ void LatticeExample::regionDelete(shared_ptr<MetaBody>& rootBody, Vector3r min, 
 
 void LatticeExample::nonDestroy(shared_ptr<MetaBody>& rootBody, Vector3r min, Vector3r max)
 {
-        vector<unsigned int> marked;
+	std::list<unsigned int> marked;
         
         BodyContainer::iterator bi    = rootBody->bodies->begin();
         BodyContainer::iterator biEnd = rootBody->bodies->end();
@@ -1061,17 +1202,50 @@ void LatticeExample::nonDestroy(shared_ptr<MetaBody>& rootBody, Vector3r min, Ve
                 }
         }
         
-        vector<unsigned int>::iterator vend = marked.end();
-        for( vector<unsigned int>::iterator vsta = marked.begin() ; vsta != vend ; ++vsta)
+	std::list<unsigned int>::iterator vend = marked.end();
+        for( std::list<unsigned int>::iterator vsta = marked.begin() ; vsta != vend ; ++vsta)
         {
                 LatticeBeamParameters* beam = static_cast<LatticeBeamParameters*>( ((*(rootBody->bodies))[*vsta])->physicalParameters.get());
                 beam->criticalTensileStrain     = 0.9;
                 beam->criticalCompressiveStrain = 0.9;
-                beam->longitudalStiffness       = 4.0;
+                beam->longitudalStiffness       = 10.0;
                 beam->bendingStiffness          = 2.8;
                 beam->torsionalStiffness        = 2.8;
                 (*(rootBody->bodies))[beam->id1]->geometricalModel->diffuseColor = Vector3f(0.2,0.5,0.7);
                 (*(rootBody->bodies))[beam->id2]->geometricalModel->diffuseColor = Vector3f(0.2,0.5,0.7);
+        }
+}
+
+
+void LatticeExample::modifyCT(shared_ptr<MetaBody>& rootBody, Vector3r min, Vector3r max)
+{
+	std::list<unsigned int> marked;
+        
+        BodyContainer::iterator bi    = rootBody->bodies->begin();
+        BodyContainer::iterator biEnd = rootBody->bodies->end();
+        for(  ; bi!=biEnd ; ++bi )
+        {
+                shared_ptr<Body> b = *bi;
+        
+                if( b->getGroupMask() & beamGroupMask )
+                {
+                        Vector3r pos = b->physicalParameters->se3.position;
+                        if(        pos[0] > min[0] 
+                                && pos[1] > min[1] 
+                                && pos[2] > min[2] 
+                                && pos[0] < max[0] 
+                                && pos[1] < max[1] 
+                                && pos[2] < max[2] 
+                                )
+                                marked.push_back( b->getId() );
+                }
+        }
+        
+	std::list<unsigned int>::iterator vend = marked.end();
+        for( std::list<unsigned int>::iterator vsta = marked.begin() ; vsta != vend ; ++vsta)
+        {
+                LatticeBeamParameters* beam = static_cast<LatticeBeamParameters*>( ((*(rootBody->bodies))[*vsta])->physicalParameters.get());
+                beam->criticalTensileStrain     = CT;
         }
 }
 

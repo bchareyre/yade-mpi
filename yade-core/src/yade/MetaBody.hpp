@@ -20,7 +20,7 @@ class MetaBody : public Body
 	public : // FIXME - why public?
 		shared_ptr<BodyContainer>		bodies;
 		vector<shared_ptr<Engine> >		engines;
-		vector<shared_ptr<Engine> >		initializers;
+		vector<shared_ptr<Engine> >		initializers; // FIXME: see MovingSupport:50
 		shared_ptr<InteractionContainer>	persistentInteractions; // disappear, reappear according to physical (or any other non-spatial) criterion
 		shared_ptr<InteractionContainer>	transientInteractions;	// disappear, reappear according to spatial criterion
 		shared_ptr<PhysicalActionContainer>	physicalActions;

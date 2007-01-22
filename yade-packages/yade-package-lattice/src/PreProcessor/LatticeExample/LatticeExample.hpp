@@ -17,6 +17,9 @@
 class LatticeBeamParameters;
 class StrainRecorder;
 class MeasurePoisson;
+class NodeRecorder;
+class BeamRecorder;
+class MovingSupport;
 
 class LatticeExample : public FileGenerator
 {
@@ -106,7 +109,10 @@ class LatticeExample : public FileGenerator
                                 ,measurePoisson_node4;
                 shared_ptr<StrainRecorder> strainRecorder;
                 shared_ptr<MeasurePoisson> measurePoisson;
-                std::string      outputFile,poissonFile;
+		shared_ptr<BeamRecorder>   beamRecorder;
+		shared_ptr<NodeRecorder>   nodeRecorder;
+		shared_ptr<MovingSupport>  movingSupport;
+                std::string      outputFile,poissonFile,nodeRecorderFile,beamRecorderFile;
                 
         // delete beams regions
                 Vector3r         regionDelete_A_min
@@ -133,12 +139,71 @@ class LatticeExample : public FileGenerator
                                 ,regionDelete_5_min
                                 ,regionDelete_5_max;
 
+	// node recorder
+		Vector3r	 nodeRec_A_min
+				,nodeRec_A_max
+				,nodeRec_B_min
+				,nodeRec_B_max
+				,nodeRec_C_min
+				,nodeRec_C_max
+				,nodeRec_D_min
+				,nodeRec_D_max
+				,nodeRec_E_min
+				,nodeRec_E_max
+				,nodeRec_F_min
+				,nodeRec_F_max;
+	// beam recorder
+		
+		Vector3r	 beamRec_A_pos
+				,beamRec_B_pos
+				,beamRec_C_pos
+				,beamRec_D_pos
+				,beamRec_E_pos;
+
+		Real		 beamRec_A_range
+				,beamRec_B_range
+				,beamRec_C_range
+				,beamRec_D_range
+				,beamRec_E_range;
+
+		int		 beamRec_A_dir
+				,beamRec_B_dir
+				,beamRec_C_dir
+				,beamRec_D_dir
+				,beamRec_E_dir;
+
+	// moving support
+
+		Vector3r	 movSupp_A_pos;
+		Real		 movSupp_A_range;
+		int		 movSupp_A_dir;
+
+		Vector3r	 movSupp_B_pos;
+		Real		 movSupp_B_range;
+		int		 movSupp_B_dir;
+
+		Vector3r	 movSupp_C_pos;
+		Real		 movSupp_C_range;
+		int		 movSupp_C_dir;
+
+		Vector3r	 movSupp_D_pos;
+		Real		 movSupp_D_range;
+		int		 movSupp_D_dir;
+
         // non destroy areas
                 Vector3r         nonDestroy_A_min
                                 ,nonDestroy_A_max
                                 ,nonDestroy_B_min
                                 ,nonDestroy_B_max;
-                
+
+	// region of modified crit_TensileStrain
+	
+		Vector3r	 CT_A_min
+				,CT_A_max
+				,CT_B_min
+				,CT_B_max;
+		Real		 CT;
+
                                  
                 std::vector< std::vector< unsigned int > > connections; // which node is in touch with what beams.
                                 
@@ -163,6 +228,7 @@ class LatticeExample : public FileGenerator
                 void imposeTranslation(shared_ptr<MetaBody>& rootBody, Vector3r min, Vector3r max, Vector3r direction, Real velocity);
                 void regionDelete(shared_ptr<MetaBody>& rootBody, Vector3r min, Vector3r max);
                 void nonDestroy(shared_ptr<MetaBody>& rootBody, Vector3r min, Vector3r max);
+                void modifyCT(shared_ptr<MetaBody>& rootBody, Vector3r min, Vector3r max);
 
                 virtual void registerAttributes();
                 REGISTER_CLASS_NAME(LatticeExample);

@@ -13,7 +13,7 @@
 #include "LatticeBeamParameters.hpp"
 #include <yade/yade-core/InteractionSolver.hpp>
 #include <yade/yade-core/BodyContainer.hpp>
-
+#include <list>
 
 class PhysicalAction;
 
@@ -21,7 +21,7 @@ class PhysicalAction;
 class LatticeLaw : public InteractionSolver
 {
 	private:
-		vector<unsigned int> futureDeletes;
+		std::list<unsigned int> futureDeletes;
 		//bool nonlocal;
                 
                 bool deleteBeam(MetaBody* lattice , LatticeBeamParameters* beam, Body*);
