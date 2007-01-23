@@ -158,7 +158,7 @@ env.Append(CXXFLAGS=['-pipe','-Wall'])
 
 ### LINKER
 env.Append(LIBS=[]) # ensure existence of the flag
-env.Append(SHLINKFLAGS=['-Wl,-soname=${TARGET.file} -rdynamic'])
+env.Append(SHLINKFLAGS=['-Wl,-soname=${TARGET.file}','-rdynamic'])
 # if this is not present, vtables & typeinfos for classes in yade binary itself are not exported; breaks plugin loading
 env.Append(LINKFLAGS=['-rdynamic']) 
 # makes dynamic library loading easied (no LD_LIBRARY_PATH) and perhaps faster
