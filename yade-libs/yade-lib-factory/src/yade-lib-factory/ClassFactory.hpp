@@ -134,8 +134,9 @@ class ClassFactory : public Singleton< ClassFactory >
 
 		void addBaseDirectory(const string& dir);
 
-		bool load(const string& name );
+		bool load(const string& name);
 		std::string lastError();
+		vector<string> lastPluginClasses(){ return dlm.lastPluginClasses; }
 
 		string libNameToSystemName(const string& name);
 		string systemNameToLibName(const string& name);

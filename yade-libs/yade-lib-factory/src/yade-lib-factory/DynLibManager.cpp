@@ -97,6 +97,8 @@ bool DynLibManager::loadFromDirectoryList (const string& libName )
 
 bool DynLibManager::load (const string& fullLibName, const string& libName )
 {
+	lastPluginClasses.clear();
+
 	if (libName.empty() || fullLibName.empty()){
 		LOG_ERROR("Empty filename for library `"<<libName<<"'.");
 		return false;
@@ -107,9 +109,7 @@ bool DynLibManager::load (const string& fullLibName, const string& libName )
 	}*/
 
 #ifdef WIN32
-	if (isLoaded(libName))
-		return true;
-
+	if (isLoaded(libName)) return true;
 	HINSTANCE handle = LoadLibraryA(fullLibName.c_str());
 #else
 	void * handle = dlopen(fullLibName.data(), RTLD_NOW);
@@ -118,6 +118,12 @@ bool DynLibManager::load (const string& fullLibName, const string& libName )
 	if (!handle) return !error();
 
 	handles[libName] = handle;
+
+#ifndef WIN32
+	char**yadePluginClasses=(char**)dlsym(handle, "yadePluginClasses");
+	// errors are ignored, since definition of this sybol is optional
+	if(dlerror()==NULL){ for(int i=0; yadePluginClasses[i]; i++){ lastPluginClasses.push_back(yadePluginClasses[i]); }}
+#endif
 	return true;
 }
 

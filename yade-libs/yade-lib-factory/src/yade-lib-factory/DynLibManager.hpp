@@ -57,6 +57,7 @@ class DynLibManager
 		string systemNameToLibName(const string& name);
 		string findLibDir(const string& name);
 		string lastError();
+		vector<string> lastPluginClasses;
 		DECLARE_LOGGER;
 
 	private :
