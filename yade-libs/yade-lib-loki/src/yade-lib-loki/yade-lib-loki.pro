@@ -23,7 +23,9 @@ HEADERS += AssocVector.hpp \
            Singleton.hpp \
            Typelist.hpp \
            TypeManip.hpp \
-           TypeTraits.hpp 
+           TypeTraits.hpp
+	   
+SOURCES += _dummySourceFile.cpp
 
 INCLUDEPATH += $${YADE_QMAKE_PATH}/include
 QMAKE_RUN_CXX_IMP = $(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $(shell pwd)/$<
