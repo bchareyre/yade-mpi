@@ -8,15 +8,18 @@ LIBS += -lyade-lib-factory \
 	-lForce \
         -lParticleParameters \
 	-lElasticContactInteraction \
-	-lStiffnessMatrix \
+	-lInteractingSphere \
+        -lSpheresContactGeometry \
+	-lSphere \
 	-rdynamic
 	
 INCLUDEPATH += $${YADE_QMAKE_PATH}/include/ \
-               ../../../DataClass/PhysicalAction/StiffnessMatrix \
-	       ../../../DataClass/PhysicalParameters/ParticleParameters \
+               ../../../DataClass/PhysicalParameters/ParticleParameters \
+	       ../../../DataClass/InteractionGeometry/SpheresContactGeometry \
 	       ../../../Engine/DeusExMachina/TriaxialStressController \
-	       ../../../DataClass/InteractionPhysics/ElasticContactInteraction 
-               
+	       ../../../DataClass/InteractionPhysics/ElasticContactInteraction \
+	       
+
 QMAKE_LIBDIR = ../../../../bin \
                ../../../../bin \
 	       $${YADE_QMAKE_PATH}/lib/yade/yade-package-common/ \

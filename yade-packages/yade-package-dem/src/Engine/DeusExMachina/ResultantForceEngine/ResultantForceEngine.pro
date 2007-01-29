@@ -7,12 +7,11 @@ LIBS += -lyade-lib-factory \
 	-lyade-lib-base -lWm3Foundation \
 	-lForce \
         -lParticleParameters \
-	-lStiffnessMatrix \
-	#-lStiffnessCounter \
-        -rdynamic
+	-lGlobalStiffness \
+	-rdynamic
 	
 INCLUDEPATH += $${YADE_QMAKE_PATH}/include/ \
-               ../../../DataClass/PhysicalAction/StiffnessMatrix \
+               ../../../DataClass/PhysicalAction/GlobalStiffness \
 	       ../../../DataClass/PhysicalParameters/ParticleParameters \
 	       ../../../Engine/DeusExMachina/ResultantForceEngine
                

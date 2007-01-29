@@ -56,13 +56,14 @@ void TriaxialCompressionEngine::updateParameters(Body * body)
 {
 	
 	UnbalancedForce=ComputeUnbalancedForce(body);
-	cerr << "UnbalancedForce=" << UnbalancedForce << endl;
+	if (Omega::instance().getCurrentIteration() % 50 == 0) cerr << "UnbalancedForce=" << UnbalancedForce << endl;
 	if (autoCompressionActivation) compressionActivated = (UnbalancedForce<=StabilityCriterion);//Is the assembly compact and stable?
 	if (compressionActivated)
 	{
 		wall_bottom_activated=false;//stop stress control on top and bottom wall
 		wall_top_activated=false;
-		autoCompressionActivation = false; //avoid stopping compression if UnbalancedForce increases due to compression		
+		autoCompressionActivation = false; //don't stop compression when UnbalancedForce increases due to compression	
+		internalCompaction = false;	
 	}
 	
 	
@@ -79,7 +80,7 @@ void TriaxialCompressionEngine::applyCondition(Body * body)
 
         if (compressionActivated)
         {
-		cerr << "Compression started!!" << endl;
+		if (Omega::instance().getCurrentIteration() % 50 == 0) cerr << "Compression started!!" << endl;
         	Real dt = Omega::instance().getTimeStep();
                 MetaBody * ncb = static_cast<MetaBody*>(body);
                 shared_ptr<BodyContainer>& bodies = ncb->bodies;
@@ -108,11 +109,15 @@ Real TriaxialCompressionEngine::ComputeUnbalancedForce(Body * body, bool maxUnba
         for(  ; ii!=iiEnd ; ++ii ) {
                 if ((*ii)->isReal) {
                         const shared_ptr<Interaction>& contact = *ii;
+                        Real fn = (static_cast<ElasticContactInteraction*> (contact->interactionPhysics.get()))->normalForce.Length();
+                        if (fn!=0)
+                        {
                         MeanForce += (static_cast<ElasticContactInteraction*> (contact->interactionPhysics.get()))->normalForce.Length();
                         ++nForce;
+                        }
                 }
         }
-        MeanForce /= nForce;
+        if (MeanForce!=0) MeanForce /= nForce;
 
         int actionForceIndex = actionForce->getClassIndex();
 

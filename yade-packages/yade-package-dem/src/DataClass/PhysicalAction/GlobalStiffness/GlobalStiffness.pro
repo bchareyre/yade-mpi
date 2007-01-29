@@ -5,7 +5,7 @@ error( "YADE_QMAKE_PATH internal qmake variable is not set, you should run for e
 
 HEADERS += GlobalStiffness.hpp 
 SOURCES += GlobalStiffness.cpp 
-LIBS += -rdynamic 
+LIBS += -rdynamic -lyade-lib-base -lWm3Foundation
 QMAKE_LIBDIR = $${YADE_QMAKE_PATH}/lib/yade/yade-libs/ 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 

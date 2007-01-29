@@ -15,9 +15,11 @@
 #include "BodyMacroParameters.hpp"
 #include "SDECLinkGeometry.hpp"
 #include "SDECLinkPhysics.hpp"
-#include "ElasticCriterionTimeStepper.hpp"
-#include "StiffnessMatrixTimeStepper.hpp"
-#include "StiffnessCounter.hpp"
+//#include "ElasticCriterionTimeStepper.hpp"
+//#include "StiffnessMatrixTimeStepper.hpp"
+//#include "StiffnessCounter.hpp"
+#include "GlobalStiffnessCounter.hpp"
+#include "GlobalStiffnessTimeStepper.hpp"
 
 #include "AveragePositionRecorder.hpp"
 #include "ForceRecorder.hpp"
@@ -76,6 +78,11 @@ using namespace boost;
 using namespace std;
 
 
+typedef pair<Vector3r, Real> BasicSphere;
+//! make a list of spheres non-overlapping sphere
+string GenerateCloud(vector<BasicSphere>& sphere_list, Vector3r lowerCorner, Vector3r upperCorner, long number, Real rad_std_dev, Real porosity);
+
+
 TriaxialTest::TriaxialTest () : FileGenerator()
 {
 	lowerCorner 		= Vector3r(0,0,0);
@@ -108,6 +115,7 @@ TriaxialTest::TriaxialTest () : FileGenerator()
 	
 //	boxWalls 		= false;
 	boxWalls 		= true;
+	internalCompaction	=false;
 
 //	bigBall 		= true;
 	bigBall 		= false;
@@ -123,11 +131,16 @@ TriaxialTest::TriaxialTest () : FileGenerator()
 	
 	dampingForce = 0.5;
 	dampingMomentum = 0.5;
+	defaultDt = 0.0001;
 	
 	timeStepUpdateInterval = 50;
+	timeStepOutputInterval = 50;
 	wallStiffnessUpdateInterval = 1;
 	numberOfGrains = 400;
 	strainRate = 0.1;
+	StabilityCriterion = 0.01;
+	autoCompressionActivation = true;
+	maxMultiplier = 1.01;
 	
 	sphereYoungModulus  = 15000000.0;
 	spherePoissonRatio  = 0.2;
@@ -136,7 +149,7 @@ TriaxialTest::TriaxialTest () : FileGenerator()
 	
 	boxYoungModulus   = 15000000.0;
 	boxPoissonRatio  = 0.2;
-	boxFrictionDeg   = -18.0;
+	boxFrictionDeg   = 0.f;
 	gravity 	= Vector3r(0,-9.81,0);
 	
 	sigma_iso = 50000;
@@ -164,7 +177,9 @@ void TriaxialTest::registerAttributes()
 	REGISTER_ATTRIBUTE(thickness);
 	REGISTER_ATTRIBUTE(importFilename);
 	//REGISTER_ATTRIBUTE(nlayers);
-	REGISTER_ATTRIBUTE(boxWalls);
+	//REGISTER_ATTRIBUTE(boxWalls);
+	REGISTER_ATTRIBUTE(internalCompaction);
+	REGISTER_ATTRIBUTE(maxMultiplier);
 
 	REGISTER_ATTRIBUTE(sphereYoungModulus);
 	REGISTER_ATTRIBUTE(spherePoissonRatio);
@@ -175,13 +190,17 @@ void TriaxialTest::registerAttributes()
 	REGISTER_ATTRIBUTE(boxFrictionDeg);
 
 	REGISTER_ATTRIBUTE(density);
+	REGISTER_ATTRIBUTE(defaultDt);
 	REGISTER_ATTRIBUTE(dampingForce);
 	REGISTER_ATTRIBUTE(dampingMomentum);
 	REGISTER_ATTRIBUTE(rotationBlocked);
 	REGISTER_ATTRIBUTE(timeStepUpdateInterval);
+	REGISTER_ATTRIBUTE(timeStepOutputInterval);
 	REGISTER_ATTRIBUTE(wallStiffnessUpdateInterval);
 	REGISTER_ATTRIBUTE(numberOfGrains);
 	REGISTER_ATTRIBUTE(strainRate);
+	REGISTER_ATTRIBUTE(StabilityCriterion);
+	REGISTER_ATTRIBUTE(autoCompressionActivation);
 //	REGISTER_ATTRIBUTE(wall_top);
 //	REGISTER_ATTRIBUTE(wall_bottom);
 //	REGISTER_ATTRIBUTE(wall_1);
@@ -205,14 +224,14 @@ void TriaxialTest::registerAttributes()
 
 //	REGISTER_ATTRIBUTE(gravity);
 	
-	REGISTER_ATTRIBUTE(bigBall);
-	REGISTER_ATTRIBUTE(bigBallRadius);
-	REGISTER_ATTRIBUTE(bigBallDensity);
-	REGISTER_ATTRIBUTE(bigBallDropTimeSeconds);
-	REGISTER_ATTRIBUTE(bigBallFrictDeg);
-	REGISTER_ATTRIBUTE(bigBallYoungModulus);
-	REGISTER_ATTRIBUTE(bigBallPoissonRatio);
-	REGISTER_ATTRIBUTE(bigBallDropHeight);
+	//REGISTER_ATTRIBUTE(bigBall);
+	//REGISTER_ATTRIBUTE(bigBallRadius);
+	//REGISTER_ATTRIBUTE(bigBallDensity);
+	//REGISTER_ATTRIBUTE(bigBallDropTimeSeconds);
+	//REGISTER_ATTRIBUTE(bigBallFrictDeg);
+	//REGISTER_ATTRIBUTE(bigBallYoungModulus);
+	//REGISTER_ATTRIBUTE(bigBallPoissonRatio);
+	//REGISTER_ATTRIBUTE(bigBallDropHeight);
 	REGISTER_ATTRIBUTE(sigma_iso);
 
 }
@@ -539,7 +558,8 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	shared_ptr<PhysicalActionContainerInitializer> physicalActionInitializer(new PhysicalActionContainerInitializer);
 	physicalActionInitializer->physicalActionNames.push_back("Force");
 	physicalActionInitializer->physicalActionNames.push_back("Momentum");
-	physicalActionInitializer->physicalActionNames.push_back("StiffnessMatrix");
+	//physicalActionInitializer->physicalActionNames.push_back("StiffnessMatrix");
+	physicalActionInitializer->physicalActionNames.push_back("GlobalStiffness");
 	
 	shared_ptr<InteractionGeometryMetaEngine> interactionGeometryDispatcher(new InteractionGeometryMetaEngine);
 	interactionGeometryDispatcher->add("InteractingSphere","InteractingSphere","InteractingSphere2InteractingSphere4SpheresContactGeometry");
@@ -576,21 +596,29 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	shared_ptr<PhysicalParametersMetaEngine> orientationIntegrator(new PhysicalParametersMetaEngine);
 	orientationIntegrator->add("RigidBodyParameters","LeapFrogOrientationIntegrator");
 
-	shared_ptr<ElasticCriterionTimeStepper> sdecTimeStepper(new ElasticCriterionTimeStepper);
-	sdecTimeStepper->sdecGroupMask = 2;
-	sdecTimeStepper->timeStepUpdateInterval = timeStepUpdateInterval;
+	//shared_ptr<ElasticCriterionTimeStepper> sdecTimeStepper(new ElasticCriterionTimeStepper);
+	//sdecTimeStepper->sdecGroupMask = 2;
+	//sdecTimeStepper->timeStepUpdateInterval = timeStepUpdateInterval;
 	
-	shared_ptr<StiffnessMatrixTimeStepper> stiffnessMatrixTimeStepper(new StiffnessMatrixTimeStepper);
-	stiffnessMatrixTimeStepper->sdecGroupMask = 2;
-	stiffnessMatrixTimeStepper->timeStepUpdateInterval = timeStepUpdateInterval;
+	//shared_ptr<StiffnessMatrixTimeStepper> stiffnessMatrixTimeStepper(new StiffnessMatrixTimeStepper);
+	//stiffnessMatrixTimeStepper->sdecGroupMask = 2;
+	//stiffnessMatrixTimeStepper->timeStepUpdateInterval = timeStepUpdateInterval;
 	
+	shared_ptr<GlobalStiffnessTimeStepper> globalStiffnessTimeStepper(new GlobalStiffnessTimeStepper);
+	globalStiffnessTimeStepper->sdecGroupMask = 2;
+	globalStiffnessTimeStepper->timeStepUpdateInterval = timeStepUpdateInterval;
+	globalStiffnessTimeStepper->defaultDt = defaultDt;
 	
 	shared_ptr<ElasticContactLaw> elasticContactLaw(new ElasticContactLaw);
 	elasticContactLaw->sdecGroupMask = 2;
 	
-	shared_ptr<StiffnessCounter> stiffnesscounter(new StiffnessCounter);
-	stiffnesscounter->sdecGroupMask = 2;
-	stiffnesscounter->interval = timeStepUpdateInterval;
+	//shared_ptr<StiffnessCounter> stiffnesscounter(new StiffnessCounter);
+	//stiffnesscounter->sdecGroupMask = 2;
+	//stiffnesscounter->interval = timeStepUpdateInterval;
+	
+	shared_ptr<GlobalStiffnessCounter> globalStiffnessCounter(new GlobalStiffnessCounter);
+	globalStiffnessCounter->sdecGroupMask = 2;
+	globalStiffnessCounter->interval = timeStepUpdateInterval;
 	
 	// moving walls to regulate the stress applied + compress when the packing is dense an stable
 	cerr << "triaxialcompressionEngine = shared_ptr<TriaxialCompressionEngine> (new TriaxialCompressionEngine);" << std::endl;
@@ -600,7 +628,11 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	triaxialcompressionEngine-> max_vel = 0.0001;
 	triaxialcompressionEngine-> thickness = thickness;
 	triaxialcompressionEngine->strainRate = strainRate;
-	triaxialcompressionEngine->StabilityCriterion = 0.01;
+	triaxialcompressionEngine->StabilityCriterion = StabilityCriterion;
+	triaxialcompressionEngine->autoCompressionActivation = autoCompressionActivation;
+	triaxialcompressionEngine->internalCompaction = internalCompaction;
+	triaxialcompressionEngine->maxMultiplier = maxMultiplier;
+		
 	cerr << "fin de section triaxialcompressionEngine = shared_ptr<TriaxialCompressionEngine> (new TriaxialCompressionEngine);" << std::endl;
 	
 	
@@ -623,8 +655,10 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	rootBody->engines.push_back(interactionGeometryDispatcher);
 	rootBody->engines.push_back(interactionPhysicsDispatcher);
 	rootBody->engines.push_back(elasticContactLaw);
-	rootBody->engines.push_back(stiffnesscounter);
-	rootBody->engines.push_back(stiffnessMatrixTimeStepper);
+	//rootBody->engines.push_back(stiffnesscounter);
+	//rootBody->engines.push_back(stiffnessMatrixTimeStepper);
+	rootBody->engines.push_back(globalStiffnessCounter);
+	rootBody->engines.push_back(globalStiffnessTimeStepper);
 	//rootBody->engines.push_back(gravityCondition);
 	rootBody->engines.push_back(actionDampingDispatcher);
 	rootBody->engines.push_back(applyActionDispatcher);
@@ -673,7 +707,7 @@ void TriaxialTest::positionRootBody(shared_ptr<MetaBody>& rootBody)
 
 
 
-string TriaxialTest::GenerateCloud(vector<BasicSphere>& sphere_list, Vector3r lowerCorner, Vector3r upperCorner, long number, Real rad_std_dev, Real porosity)
+string GenerateCloud(vector<BasicSphere>& sphere_list, Vector3r lowerCorner, Vector3r upperCorner, long number, Real rad_std_dev, Real porosity)
 {
 	typedef boost::minstd_rand StdGenerator;
 	static StdGenerator generator;

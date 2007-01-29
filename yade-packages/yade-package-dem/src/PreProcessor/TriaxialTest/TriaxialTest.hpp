@@ -43,6 +43,7 @@ class TriaxialTest : public FileGenerator
 				,density
 				,dampingForce
 				,dampingMomentum
+				,defaultDt
 
 				,bigBallRadius
 				,bigBallDensity
@@ -53,7 +54,10 @@ class TriaxialTest : public FileGenerator
 				,bigBallDropHeight
 				
 				,sigma_iso
-				,strainRate;
+				,strainRate
+				,StabilityCriterion
+				,autoCompressionActivation
+				,maxMultiplier; ///max multiplier of diameters during internal compaction
 
 		bool		 wall_top
 				,wall_bottom
@@ -72,10 +76,12 @@ class TriaxialTest : public FileGenerator
 				,spheresRandomColor
 				,recordBottomForce
 				,recordAveragePositions
-				,boxWalls;
+				,boxWalls
+				,internalCompaction;
 
 		int		 recordIntervalIter
 				,timeStepUpdateInterval
+				,timeStepOutputInterval
 				,wallStiffnessUpdateInterval
 				,numberOfGrains;
 				/*,wall_top_id
@@ -100,9 +106,6 @@ class TriaxialTest : public FileGenerator
 		void createSphere(shared_ptr<Body>& body, Vector3r position, Real radius,bool big,bool dynamic);
 		void createActors(shared_ptr<MetaBody>& rootBody);
 		void positionRootBody(shared_ptr<MetaBody>& rootBody);
-
-		typedef pair<Vector3r, Real> BasicSphere;
-		string GenerateCloud(vector<BasicSphere>& sphere_list, Vector3r lowerCorner, Vector3r upperCorner, long number, Real rad_std_dev, Real porosity);
 	
 	public : 
 		TriaxialTest ();

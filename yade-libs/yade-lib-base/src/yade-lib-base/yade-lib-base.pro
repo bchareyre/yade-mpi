@@ -20,5 +20,6 @@ HEADERS += yadeWm3.hpp \
            yadeWm3Extra.hpp \
 			  Logging.hpp
 SOURCES += yadeWm3Extra.cpp
+QMAKE_LIBDIR += $${YADE_QMAKE_PATH}/lib/
 LIBS += -lWm3Foundation -rdynamic
 QMAKE_RUN_CXX_IMP = $(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $(shell pwd)/$<

@@ -76,7 +76,7 @@
       <directoryradio>executable</directoryradio>
     </run>
     <general>
-      <activedir>Engine/EngineUnit/Sphere2Sphere4MacroMicroContactGeometry</activedir>
+      <activedir>PostProcessor</activedir>
     </general>
     <subclassing/>
   </kdevtrollproject>

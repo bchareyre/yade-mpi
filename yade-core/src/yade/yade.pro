@@ -81,7 +81,8 @@ LIBS += -lyade-lib-serialization \
 -lboost_filesystem \
 -lboost_thread
 INCLUDEPATH += $${YADE_QMAKE_PATH}/include
-QMAKE_LIBDIR = $${YADE_QMAKE_PATH}/lib/yade/yade-libs
+QMAKE_LIBDIR = $${YADE_QMAKE_PATH}/lib/yade/yade-libs/ \
+		$${YADE_QMAKE_PATH}/lib/
 win32 {
 TARGET = ../../../bin/yade
 CONFIG += console

@@ -25,6 +25,9 @@
  *
  */
 
+
+#define LOG_DEBUG
+
 #ifdef LOG4CXX
 
 #	include<log4cxx/logger.h>

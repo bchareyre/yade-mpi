@@ -12,7 +12,7 @@
 #include "ResultantForceEngine.hpp"
 #include "yade/yade-package-common/ParticleParameters.hpp"
 #include "yade/yade-package-common/Force.hpp"
-#include "StiffnessMatrix.hpp"
+#include "GlobalStiffness.hpp"
 #include <Wm3Math.h>
 #include <yade/yade-lib-base/yadeWm3.hpp>
 #include <yade/yade-lib-base/yadeWm3Extra.hpp>
@@ -22,7 +22,7 @@
 #include <yade/yade-core/MetaBody.hpp>
 
 
-ResultantForceEngine::ResultantForceEngine() : actionParameterStiffnessMatrix(new StiffnessMatrix), actionParameterForce(new Force)
+ResultantForceEngine::ResultantForceEngine() : actionParameterGlobalStiffness(new GlobalStiffness), actionParameterForce(new Force)
 {
 	interval =1;
 	damping = 0.1;
@@ -70,14 +70,14 @@ void ResultantForceEngine::applyCondition(Body* body)
 	//{
 		//Update stiffness only if it has been computed by StiffnessCounter (see "interval")
 		if (Omega::instance().getCurrentIteration() % interval == 0)	stiffness =
-		(static_cast<StiffnessMatrix*>( ncb->physicalActions->find (*ii, actionParameterStiffnessMatrix->getClassIndex() ).get() ))->stiffness;
+		(static_cast<GlobalStiffness*>( ncb->physicalActions->find (*ii, actionParameterGlobalStiffness->getClassIndex() ).get() ))->stiffness;
 	
-		//cerr << "static_cast<StiffnessMatrix*>( ncb->physicalActions->find (*ii, actionParameterStiffnessMatrix->getClassIndex() ).get() ))->stiffness" << std::endl;
+		//cerr << "static_cast<GlobalStiffness*>( ncb->physicalActions->find (*ii, actionParameterGlobalStiffness->getClassIndex() ).get() ))->stiffness" << std::endl;
 		
 		if(PhysicalParameters* p = dynamic_cast<PhysicalParameters*>((*bodies)[*ii]->physicalParameters.get()))
 		{
 			//cerr << "dynamic_cast<PhysicalParameters*>((*bodies)[*ii]->physicalParameters.get()" << std::endl;
-			StiffnessMatrix* sm = static_cast<StiffnessMatrix*>( ncb->physicalActions->find (*ii, actionParameterStiffnessMatrix->getClassIndex() ).get() );
+			GlobalStiffness* sm = static_cast<GlobalStiffness*>( ncb->physicalActions->find (*ii, actionParameterGlobalStiffness->getClassIndex() ).get() );
 			
 			Vector3r effectiveforce =
 			 	static_cast<Force*>( ncb->physicalActions->find( *ii,actionParameterForce->getClassIndex() ).get() )->force; 

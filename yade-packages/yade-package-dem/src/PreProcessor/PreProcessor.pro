@@ -9,8 +9,8 @@ SUBDIRS += Funnel \
            SDECSpheresPlane \
            SDECMovingWall \
            TetrahedronsTest \
-	   IsotropicCompressionTest \
-	   TriaxialTest 
+	   TriaxialTest
+
 CONFIG += debug \
           thread \
 warn_on

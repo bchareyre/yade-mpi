@@ -2,6 +2,9 @@ isEmpty ( YADE_QMAKE_PATH ) {
 error( "YADE_QMAKE_PATH internal qmake variable is not set, you should run for example qmake YADE_QMAKE_PATH=/usr/local, this will not work from inside kdevelop (when they will fix it?)" )
 }
 
+LIBS +=  -lyade-lib-base -lWm3Foundation -rdynamic
+QMAKE_LIBDIR = $${YADE_QMAKE_PATH}/lib/yade/yade-libs/
+
 
 HEADERS += Distances2D.hpp \
            Distances3D.hpp \
@@ -24,7 +27,7 @@ TARGET = ../../bin/yade-lib-computational-geometry
 
 CONFIG += debug \
           thread \
-warn_on \
-dll
+	  warn_on \
+	  dll
 TEMPLATE = lib
 QMAKE_RUN_CXX_IMP = $(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $(shell pwd)/$<

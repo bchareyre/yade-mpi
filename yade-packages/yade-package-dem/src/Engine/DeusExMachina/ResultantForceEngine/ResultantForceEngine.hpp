@@ -25,7 +25,7 @@ class PhysicalAction;
 class ResultantForceEngine : public DeusExMachina 
 {
 	private :
-		shared_ptr<PhysicalAction> actionParameterStiffnessMatrix;
+		shared_ptr<PhysicalAction> actionParameterGlobalStiffness;
 		shared_ptr<PhysicalAction> actionParameterForce;
 		
 			

@@ -1,6 +1,6 @@
 /*************************************************************************
-*  Copyright (C) 2004 by Olivier Galizzi                                 *
-*  olivier.galizzi@imag.fr                                               *
+*  Copyright (C) 2006 by Bruno Chareyre                                  *
+*  bruno.chareyre@hmg.inpg.fr                                            *
 *                                                                        *
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
@@ -17,25 +17,26 @@ class MacroMicroElasticRelationships;
 class MetaBody;
 class PhysicalAction;
 
-class StiffnessMatrixTimeStepper : public TimeStepper
+class GlobalStiffnessTimeStepper : public TimeStepper
 {
 	private :
 		Real		newDt;
 		bool		computedSomething,
 				computedOnce;
 		shared_ptr<MacroMicroElasticRelationships> sdecContactModel;
-		shared_ptr<PhysicalAction> actionParameterStiffnessMatrix;
-		int stiffnessMatrixClassIndex;
+		shared_ptr<PhysicalAction> actionParameterGlobalStiffness;
+		int globalStiffnessClassIndex;
 
 		void findTimeStepFromBody(const shared_ptr<Body>& body, MetaBody * ncb);
 		void findTimeStepFromInteraction(const shared_ptr<Interaction>& , shared_ptr<BodyContainer>&);
 
 	public :
 		int sdecGroupMask; // FIXME - we should find a way to clean groupmask stuff
-		//Real defaultDt;
+		Real defaultDt;
+		Real timestepSafetyCoefficient;
 
-		StiffnessMatrixTimeStepper();
-		virtual ~StiffnessMatrixTimeStepper();
+		GlobalStiffnessTimeStepper();
+		virtual ~GlobalStiffnessTimeStepper();
 	
 		virtual void computeTimeStep(Body* body);
 		virtual bool isActivated();
@@ -44,11 +45,11 @@ class StiffnessMatrixTimeStepper : public TimeStepper
 	protected :
 		virtual void registerAttributes();
 
-	REGISTER_CLASS_NAME(StiffnessMatrixTimeStepper);
+	REGISTER_CLASS_NAME(GlobalStiffnessTimeStepper);
 	REGISTER_BASE_CLASS_NAME(TimeStepper);
 };
 
-REGISTER_SERIALIZABLE(StiffnessMatrixTimeStepper,false);
+REGISTER_SERIALIZABLE(GlobalStiffnessTimeStepper,false);
 
-#endif //  STIFFNESS_MATRIX_TIME_STEPPER_HPP
+#endif //  GLOBAL_STIFFNESS_TIME_STEPPER_HPP
 

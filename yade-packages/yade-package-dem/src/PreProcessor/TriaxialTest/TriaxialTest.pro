@@ -14,7 +14,6 @@ LIBS += -lSDECLinkGeometry \
         -lInteractionVecSet \
 	-lInteractionHashMap \
         -lBodyRedirectionVector \
-        -lyade-lib-base -lWm3Foundation \
         -lInteractingSphere \
         -lInteractingBox \
         -lCundallNonViscousMomentumDamping \
@@ -36,13 +35,14 @@ LIBS += -lSDECLinkGeometry \
         -lPersistentSAPCollider \
         -lSAPCollider \
         -lMetaInteractingGeometry2AABB \
-	-lStiffnessMatrix \
-	-lStiffnessCounter \
+	-lGlobalStiffness \
+	-lGlobalStiffnessCounter \
 	-lResultantForceEngine \
 	-lTriaxialStressController \
 	-lTriaxialCompressionEngine \
-	-lStiffnessMatrixTimeStepper \
-	-rdynamic 
+	-lGlobalStiffnessTimeStepper \
+	-rdynamic -lyade-lib-base -lWm3Foundation
+	
 INCLUDEPATH += $${YADE_QMAKE_PATH}/include/ \
                ../../Engine/StandAloneEngine/VelocityRecorder \
                ../../Engine/StandAloneEngine/ForceRecorder \
@@ -52,11 +52,11 @@ INCLUDEPATH += $${YADE_QMAKE_PATH}/include/ \
                ../../Engine/EngineUnit/MacroMicroElasticRelationships \
                ../../DataClass/InteractionPhysics/SDECLinkPhysics \
                ../../DataClass/InteractionGeometry/SDECLinkGeometry \
-	        ../../DataClass/PhysicalAction/StiffnessMatrix \
-	       ../../Engine/StandAloneEngine/StiffnessCounter \	      
+	        ../../DataClass/PhysicalAction/GlobalStiffness \
+	       ../../Engine/StandAloneEngine/GlobalStiffnessCounter \	      
 	       ../../Engine/DeusExMachina/TriaxialCompressionEngine \
 	       ../../Engine/DeusExMachina/TriaxialStressController \
-	        ../../Engine/StandAloneEngine/StiffnessMatrixTimeStepper \
+	        ../../Engine/StandAloneEngine/GlobalStiffnessTimeStepper \
                ../../DataClass/PhysicalParameters/BodyMacroParameters 
 	       
 QMAKE_LIBDIR = ../../../bin \

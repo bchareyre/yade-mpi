@@ -3,18 +3,20 @@ error( "YADE_QMAKE_PATH internal qmake variable is not set, you should run for e
 }
 
 
-LIBS += -lElasticContactInteraction \
+LIBS += -lyade-lib-base -lWm3Foundation \
+	-lElasticContactInteraction \
         -lSpheresContactGeometry \
         -lMacroMicroElasticRelationships \
         -lSphere \
-	-lStiffnessMatrix \
-        -rdynamic 
+	-lGlobalStiffness \
+	-rdynamic
+        
 INCLUDEPATH += $${YADE_QMAKE_PATH}/include/ \
                ../../../Engine/EngineUnit/MacroMicroElasticRelationships \
                ../../../DataClass/InteractionPhysics/ElasticContactInteraction \
                ../../../DataClass/InteractionGeometry/SpheresContactGeometry \
                ../../../DataClass/PhysicalParameters/BodyMacroParameters \
-	       ../../../DataClass/PhysicalAction/StiffnessMatrix
+	       ../../../DataClass/PhysicalAction/GlobalStiffness
 QMAKE_LIBDIR = ../../../../bin \
                ../../../../bin \
                $${YADE_QMAKE_PATH}/lib/yade/yade-package-common/ \
@@ -29,6 +31,6 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
-HEADERS += StiffnessMatrixTimeStepper.hpp 
-SOURCES += StiffnessMatrixTimeStepper.cpp 
+HEADERS += GlobalStiffnessTimeStepper.hpp 
+SOURCES += GlobalStiffnessTimeStepper.cpp 
 QMAKE_RUN_CXX_IMP = $(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $(shell pwd)/$<

@@ -1,12 +1,12 @@
 /*************************************************************************
-*  Copyright (C) 2004 by Janek Kozicki                                   *
-*  cosurgi@berlios.de                                                    *
+*  Copyright (C) 2006 by Bruno Chareyre                                  *
+*  bruno.chareyre@hmg.inpg.fr                                            *
 *                                                                        *
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "StiffnessMatrixTimeStepper.hpp"
+#include "GlobalStiffnessTimeStepper.hpp"
 #include "BodyMacroParameters.hpp"
 #include "ElasticContactInteraction.hpp"
 #include "SpheresContactGeometry.hpp"
@@ -14,39 +14,46 @@
 #include <yade/yade-core/Interaction.hpp>
 #include <yade/yade-core/MetaBody.hpp>
 #include <yade/yade-package-common/Sphere.hpp>
-#include <StiffnessMatrix.hpp>
+#include <GlobalStiffness.hpp>
 
 
-StiffnessMatrixTimeStepper::StiffnessMatrixTimeStepper() : TimeStepper() , sdecContactModel(new MacroMicroElasticRelationships), actionParameterStiffnessMatrix(new StiffnessMatrix)
+GlobalStiffnessTimeStepper::GlobalStiffnessTimeStepper() : TimeStepper() , sdecContactModel(new MacroMicroElasticRelationships), actionParameterGlobalStiffness(new GlobalStiffness)
 {
-	stiffnessMatrixClassIndex = actionParameterStiffnessMatrix->getClassIndex();
+cerr << "GlobalStiffnessTimeStepper()"  << endl;
+	globalStiffnessClassIndex = actionParameterGlobalStiffness->getClassIndex();
 	sdecGroupMask = 1;
+	timestepSafetyCoefficient = 0.8;
 	computedOnce = false;
+	defaultDt = 1;
 	
 }
 
 
-StiffnessMatrixTimeStepper::~StiffnessMatrixTimeStepper()
+GlobalStiffnessTimeStepper::~GlobalStiffnessTimeStepper()
 {
 
 }
 
 
-void StiffnessMatrixTimeStepper::registerAttributes()
+void GlobalStiffnessTimeStepper::registerAttributes()
 {
 	TimeStepper::registerAttributes();
 	REGISTER_ATTRIBUTE(sdecGroupMask);
-	//REGISTER_ATTRIBUTE(defaultDt);
+	REGISTER_ATTRIBUTE(defaultDt);
 }
 
 
-void StiffnessMatrixTimeStepper::findTimeStepFromBody(const shared_ptr<Body>& body, MetaBody * ncb)
+void GlobalStiffnessTimeStepper::findTimeStepFromBody(const shared_ptr<Body>& body, MetaBody * ncb)
 {
-	BodyMacroParameters * sdec	= dynamic_cast<BodyMacroParameters*>(body->physicalParameters.get());
-	Sphere* sphere 		= dynamic_cast<Sphere*>(body->geometricalModel.get());
-	Vector3r& stiffness = (static_cast<StiffnessMatrix*>( ncb->physicalActions->find (body->getId(), stiffnessMatrixClassIndex).get()))->stiffness;
+	RigidBodyParameters * sdec	= static_cast<RigidBodyParameters*>(body->physicalParameters.get());
+	
+	Sphere* sphere = static_cast<Sphere*>(body->geometricalModel.get());
+	
+	Vector3r& stiffness = (static_cast<GlobalStiffness*>( ncb->physicalActions->find (body->getId(), globalStiffnessClassIndex).get()))->stiffness;
+	Vector3r& Rstiffness = (static_cast<GlobalStiffness*>( ncb->physicalActions->find (body->getId(), globalStiffnessClassIndex).get()))->Rstiffness;
 
-	//cerr << "Vector3r& stiffness = (static_cast<StiffnessMatrix*>( ncb" << endl;
+
+	//cerr << "Vector3r& stiffness = (static_cast<GlobalStiffness*>( ncb" << endl;
 	if(! (sphere && sdec && stiffness) )
 		return; // not possible to compute!
 	//cerr << "return; // not possible to compute!" << endl;
@@ -65,67 +72,53 @@ void StiffnessMatrixTimeStepper::findTimeStepFromBody(const shared_ptr<Body>& bo
 // 	Real Kn		= abs((Eab*Sinit/Dinit)*( (1+alpha)/(beta*(1+Vab) + gamma*(1-alpha*Dab) ) ));
 // 	Real Ks		= abs(Kn*(1-alpha*Vab)/(1+Vab));
 
-	Real dt = min (sqrt( sdec->mass  /  stiffness.x()) ,sqrt( sdec->mass  /  stiffness.y() ) );
-	dt = 0.5 * min (sqrt( sdec->mass  /  stiffness.z()), dt);
 	
-	newDt = std::min(dt,newDt);
-	computedSomething = true;
-}
-
-
-void StiffnessMatrixTimeStepper::findTimeStepFromInteraction(const shared_ptr<Interaction>& interaction, shared_ptr<BodyContainer>& bodies)
-{
-	unsigned int id1 = interaction->getId1();
-	unsigned int id2 = interaction->getId2();
+// 	Real dt = min (sqrt( sdec->mass  /  stiffness.x()) ,sqrt( sdec->mass  /  stiffness.y() ) );
+// 	dt = 0.5 * min (sqrt( sdec->mass  /  stiffness.z()), dt);
+	
+	Real dt = max( max (stiffness.X(), stiffness.Y()), stiffness.Z() );
+	dt = (dt!=0 ? sqrt(sdec->mass/dt) : Mathr::MAX_REAL);	
 		
-	if( !( (*bodies)[id1]->getGroupMask() & (*bodies)[id2]->getGroupMask() & sdecGroupMask) )
-		return; // skip other groups
-
-	ElasticContactInteraction* sdecContact = dynamic_cast<ElasticContactInteraction*>(interaction->interactionPhysics.get());
-	SpheresContactGeometry* interactionGeometry = dynamic_cast<SpheresContactGeometry*>(interaction->interactionGeometry.get());
-	BodyMacroParameters * body1	= dynamic_cast<BodyMacroParameters*>((*bodies)[id1]->physicalParameters.get());
-	BodyMacroParameters * body2	= dynamic_cast<BodyMacroParameters*>((*bodies)[id2]->physicalParameters.get());
-
-	if(! (sdecContact && interactionGeometry && body1 && body2))
-		return;
+	Real dtx = (Rstiffness.X()!=0 ? sdec->inertia.X()/Rstiffness.X() : Mathr::MAX_REAL);
+	Real dty = (Rstiffness.Y()!=0 ? sdec->inertia.Y()/Rstiffness.Y() : Mathr::MAX_REAL);
+	Real dtz = (Rstiffness.Z()!=0 ? sdec->inertia.Z()/Rstiffness.Z() : Mathr::MAX_REAL);
+	Real Rdt = sqrt( min( min (dtx, dty), dtz ) );
 	
-	Real mass 	= std::min( body1->mass                   , body2->mass               );
-//	if(mass == 0) 			// FIXME - remove that comment: zero mass and zero inertia are too stupid to waste time checking that.
-//		mass 	= std::max( body1->mass                   , body2->mass               );
-//	if(mass == 0)
-//		return; // not possible to compute
-	Real inertia 	= std::min( body1->inertia[0]             , body2->inertia[0]         );
-//	if( inertia == 0)
-//		inertia = std::max( body1->inertia[0]             , body2->inertia[0]         );
-//	if( inertia == 0)
-//		return;
-	Real rad3 	= std::pow(std::max(interactionGeometry->radius1 , interactionGeometry->radius2 ) , 2); // radius to the power of 2, from sphere
-
-	Real dt = 0.1*min(
-			  sqrt( mass     / abs(sdecContact->initialKn)      )
-			, sqrt( inertia  / abs(sdecContact->initialKs*rad3) )
-		  );
-
+	//cerr << "Rstiffness.x()=" << Rstiffness.x() << "  " << Rstiffness.y() << "  " << Rstiffness.z() << endl;
+	//cerr << "sdec->inertia=" << sdec->inertia.x() << " " << sdec->inertia.x() << " " << sdec->inertia.x() << endl;
+	//cerr << "timesteps : dt=" << dt << " / Rdt=" << Rdt << endl;
+	
+	dt = timestepSafetyCoefficient*std::min(dt,Rdt);
+	
 	newDt = std::min(dt,newDt);
 	computedSomething = true;
+	
 }
 
-bool StiffnessMatrixTimeStepper::isActivated()
+
+void GlobalStiffnessTimeStepper::findTimeStepFromInteraction(const shared_ptr<Interaction>& interaction, shared_ptr<BodyContainer>& bodies)
+{
+
+
+}
+
+bool GlobalStiffnessTimeStepper::isActivated()
 {
 	return (active && (!computedOnce || (Omega::instance().getCurrentIteration() % timeStepUpdateInterval == 0)));
 }
 
 
-void StiffnessMatrixTimeStepper::computeTimeStep(Body* body)
+void GlobalStiffnessTimeStepper::computeTimeStep(Body* body)
 {
 //cerr << "computeTimeStep(Body* body)"  << endl;
+cerr << "phasea1 "; 
 	MetaBody * ncb = dynamic_cast<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 // 	shared_ptr<InteractionContainer>& persistentInteractions = ncb->persistentInteractions;
 // 	shared_ptr<InteractionContainer>& transientInteractions = ncb->transientInteractions;
 
 	newDt = Mathr::MAX_REAL;
-	Real defaultDt = 0.0003;
+	//Real defaultDt = 0.0003;
 	
 	computedSomething = false; // this flag is to avoid setting timestep to MAX_REAL :)
 /*
@@ -139,10 +132,8 @@ void StiffnessMatrixTimeStepper::computeTimeStep(Body* body)
 	for(  ; ii!=iiEnd ; ++ii )
 		findTimeStepFromInteraction(*ii , bodies);*/
 
-	if(! computedSomething)
+	if(!computedSomething)
 	{
-// no transientInteractions at all? so let's try to estimate timestep by investigating bodies,
-// simulating that a body in contact with itself. this happens only when there were not transientInteractions at all.
 		BodyContainer::iterator bi    = bodies->begin();
 		BodyContainer::iterator biEnd = bodies->end();
 		for(  ; bi!=biEnd ; ++bi )
@@ -156,14 +147,17 @@ void StiffnessMatrixTimeStepper::computeTimeStep(Body* body)
 				findTimeStepFromBody(b, ncb); }
 		}
 	}	
+	
+	cerr << "phasea9 "; 
+	
 	if(computedSomething)
 	{
 		Omega::instance().setTimeStep(min(newDt , defaultDt));
 		computedOnce = true;		
-		//cerr << "StiffnessMatrixTimeStepper, timestep chosen is:" << Omega::instance().getTimeStep() << endl;
+		//cerr << "GlobalStiffnessTimeStepper, timestep chosen is:" << Omega::instance().getTimeStep() << endl;
 	}
-//	cerr << "StiffnessMatrixTimeStepper, computedSomething is:" << computedSomething << endl;
-	cerr << "StiffnessMatrixTimeStepper, newDt is:" << newDt << endl;
+//	cerr << "GlobalStiffnessTimeStepper, computedSomething is:" << computedSomething << endl;
+	cerr << "GlobalGlobalStiffnessTimeStepper, newDt is:" << newDt << endl;
 	cerr << "new timestep chosen is:" << Omega::instance().getTimeStep() << endl;
 }
 

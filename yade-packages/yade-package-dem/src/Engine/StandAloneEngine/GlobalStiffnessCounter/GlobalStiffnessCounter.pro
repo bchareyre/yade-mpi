@@ -9,21 +9,23 @@ LIBS += -lSDECLinkPhysics \
         -lSpheresContactGeometry \
         -lBodyMacroParameters \
         -lyade-lib-serialization \
-        -lyade-lib-base -lWm3Foundation \
+        -lyade-lib-base \
+        -lWm3Foundation \
         -lyade-lib-multimethods \
         -lForce \
 	-lMomentum \
         -lSphere \
         -lRigidBodyParameters \
-	-lStiffnessMatrix \
-        -rdynamic 
+	-lGlobalStiffness \
+        -rdynamic
+        
 INCLUDEPATH += $${YADE_QMAKE_PATH}/include/ \
                ../../../DataClass/InteractionPhysics/SDECLinkPhysics \
                ../../../DataClass/InteractionPhysics/ElasticContactInteraction \
                ../../../DataClass/InteractionGeometry/SDECLinkGeometry \
                ../../../DataClass/InteractionGeometry/SpheresContactGeometry \
                ../../../DataClass/PhysicalParameters/BodyMacroParameters \
-	       ../../../DataClass/PhysicalAction/StiffnessMatrix
+	       ../../../DataClass/PhysicalAction/GlobalStiffness
 QMAKE_LIBDIR = ../../../../bin \
                ../../../../bin \
                ../../../../bin \
