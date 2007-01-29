@@ -42,13 +42,13 @@ opts=Options(optsFile)
 #  2. lowercase options influence the building process, compiler options and the like.
 #
 opts.AddOptions(
-	PathOption('PREFIX', 'Install path prefix', '/home/3S-LAB/bchareyre/Programmation/YADE'),
+	PathOption('PREFIX', 'Install path prefix', '/usr/local'),
 	('POSTFIX','Local version appended to binary, library and config directory (beware: if PREFIX is the same, headers of the older version will still be overwritten','',None,lambda x:x),
 	BoolOption('debug', 'Enable debugging information and disable optimizations',1),
 	BoolOption('profile','Enable profiling information',0),
 	BoolOption('optimize','Turn on heavy optimizations (generates SSE2 instructions)',0),
 	ListOption('exclude','Components that will not be built','none',names=['extra','common','dem','fem','lattice','mass-spring','realtime-rigidbody']),
-	('CPPPATH', 'Additional paths for the C preprocessor (whitespace separated)',['/home/3S-LAB/bchareyre/Programmation/YADE/include'],None,Split),
+	('CPPPATH', 'Additional paths for the C preprocessor (whitespace separated)',['/usr/include/wm3'],None,Split),
 	('LIBPATH','Additional paths for the linker (whitespace separated)',None,None,Split),
 	('QTDIR','Directories where to look for qt3',['/usr/share/qt3','/usr/lib/qt'],None,Split),
 	('CXX','The c++ compiler','ccache g++-4.0'),
