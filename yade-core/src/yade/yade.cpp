@@ -55,7 +55,7 @@ void firstRunSetup(shared_ptr<Preferences>& pref)
 	string cfgFile=Omega::instance().yadeConfigPath+"/preferences.xml";
 	LOG_INFO("Creating default configuration file: "<<cfgFile<<". Please tune by hand if needed.");
 	string expLibDir;
-	for(int i=0; libDirs[i+1]!=NULL; i++) {
+	for(int i=0; libDirs[i]!=NULL; i++) {
 		expLibDir=getPrefix() + "/lib/yade" + getPostfix() + "/" + libDirs[i];
 		LOG_INFO("Adding plugin directory "<<expLibDir<<".");
 		pref->dynlibDirectories.push_back(expLibDir);
