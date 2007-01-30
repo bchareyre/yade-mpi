@@ -186,7 +186,7 @@ bool Omega::isInheritingFrom(const string& className, const string& baseClassNam
 
 void Omega::scanPlugins()
 {
-
+#define STUPID_DLL
 //	ClassFactory::instance().unloadAll();
 
 	// TODO: remove all comments of the form /*DLL ... */, they comment the old code that whould not be needed any more
@@ -197,7 +197,9 @@ void Omega::scanPlugins()
 		ClassFactory::instance().addBaseDirectory((*dldi));
 			
 	vector<string> dynlibsList;
-	/*DLL vector< int >    dynlibsListLoaded; */
+	#ifdef STUPID_DLL
+		vector< int >    dynlibsListLoaded;
+	#endif
 
 	vector<string>::iterator si = preferences->dynlibDirectories.begin();
 	vector<string>::iterator siEnd = preferences->dynlibDirectories.end();
@@ -234,7 +236,9 @@ void Omega::scanPlugins()
 					if(dynlibsList.size()==0 || ClassFactory::instance().systemNameToLibName(name.leaf())!=dynlibsList.back()) {
 						LOG_DEBUG("Added plugin: "<<*si<<"/"<<di->leaf()<<".");
 						dynlibsList.push_back(ClassFactory::instance().systemNameToLibName(name.leaf()));
-						/*DLL dynlibsListLoaded.push_back(false); */
+						#ifdef STUPID_DLL
+							dynlibsListLoaded.push_back(false);
+						#endif
 					}
 					else LOG_DEBUG("Possible plugin discarded: "<<*si<<"/"<<name.leaf()<<".");
 				} else LOG_DEBUG("File not considered a plugin: "<<di->leaf()<<".");
@@ -245,18 +249,31 @@ void Omega::scanPlugins()
 
 	bool allLoaded = false;
 	int overflow = 30; // to prevent infinite loop
-	/*DLL assert(dynlibsList.size() == dynlibsListLoaded.size() ); */
 	vector<string> dynlibsClassList; // dynlibsList holds filenames, this holds classes defined inside (may be different if using yadePuginClasses)
-	/*DLL while (!allLoaded && --overflow > 0)	{	*/
+	#ifdef STUPID_DLL
+		assert(dynlibsList.size() == dynlibsListLoaded.size());
+		while (!allLoaded && --overflow > 0){
+		int loaded = 0;
+	#endif
 		vector< string >::iterator dlli    = dynlibsList.begin();
 		vector< string >::iterator dlliEnd = dynlibsList.end();
-		/*DLL int loaded = 0; */
 		allLoaded = true;
-		for( ; dlli!=dlliEnd ; ++dlli /*DLL , ++loaded */ )
+		for( ; dlli!=dlliEnd ; ++dlli
+		#ifdef STUPID_DLL
+		, ++loaded
+		#endif
+		)
 		{
-			/*DLL if( dynlibsListLoaded[loaded] == false ) { */
+			#ifdef STUPID_DLL
+			if( dynlibsListLoaded[loaded] == false ) {
+				LOG_DEBUG("Trying to load plugin "<<*dlli<<" (no."<<loaded<<"; overflow="<<overflow<<")");
+			#endif
 			bool thisLoaded = ClassFactory::instance().load((*dlli));
-			if (!thisLoaded && overflow == 1){
+			if (!thisLoaded
+				#ifdef STUPID_DLL
+				&& overflow == 1
+				#endif
+				){
 				string err=ClassFactory::instance().lastError();
 				// HACK
 				if(err.find("cannot open shared object file: No such file or directory")!=std::string::npos){
@@ -270,22 +287,29 @@ void Omega::scanPlugins()
 					int status=0;
 					char* demangled_sym=abi::__cxa_demangle(sym.c_str(),0,0,&status);
 					LOG_FATAL("Undefined symbol `"<<demangled_sym<<"' ("<<err<<").");
-
 				}
 				else LOG_ERROR("Error loading Library `"<<(*dlli)<<"': "<<err<<" ."); // leave space to not to confuse c++filt
 			}
+			#ifdef STUPID_DLL
+			else if (!thisLoaded) { LOG_DEBUG("Plugin "<<*dlli<<" not loaded successfully this time..."); }
+			#endif
 			else { // no error
 				if (ClassFactory::instance().lastPluginClasses().size()==0){ // regular plugin, one class per file
 					dynlibsClassList.push_back(*dlli);
+					LOG_DEBUG("Plugin "<<*dlli<<" loaded succesfully.");
 				} else {// if plugin defines yadePluginClasses (has multiple classes), insert these into dynLibsList
 					vector<string> css=ClassFactory::instance().lastPluginClasses();
 					for(size_t i=0; i<css.size();i++) { dynlibsClassList.push_back(css[i]); LOG_DEBUG("Plugin "<<*dlli<<": added class "<<css[i]<<".");  }
 				}
 			}
 			allLoaded &= thisLoaded;
-			/*DLL if(thisLoaded) dynlibsListLoaded[loaded] = true; } */
+			#ifdef STUPID_DLL
+				if(thisLoaded) dynlibsListLoaded[loaded] = true; }
+			#endif
 		}
-	/*DLL} */
+	#ifdef STUPID_DLL
+	}
+	#endif
 
 	if(!allLoaded) LOG_WARN("Couldn't load everything, some stuff may work incorrectly.");
 	
