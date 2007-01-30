@@ -163,8 +163,16 @@ void MovingSupport::action(Body * body)
 							- (*(ncb->bodies))[id2]->physicalParameters->se3.position[dir];
 				Real delta = (dist - current_dist)/2.0;
 
-				(*(ncb->bodies))[id1]->physicalParameters->se3.position[dir] += delta;
-				(*(ncb->bodies))[id2]->physicalParameters->se3.position[dir] -= delta;
+//				(*(ncb->bodies))[id1]->physicalParameters->se3.position[dir] += delta;
+//				(*(ncb->bodies))[id2]->physicalParameters->se3.position[dir] -= delta;
+
+				LatticeNodeParameters* node1 = static_cast<LatticeNodeParameters*>((*(ncb->bodies))[id1]->physicalParameters.get() );
+				LatticeNodeParameters* node2 = static_cast<LatticeNodeParameters*>((*(ncb->bodies))[id2]->physicalParameters.get() );
+//				++(node1->countIncremental);
+//				++(node2->countIncremental);
+				Vector3r DI(0,0,0);DI[dir]=delta;
+				node1->displacementIncremental += DI; 
+				node2->displacementIncremental -= DI;
 
 				(*(ncb->bodies))[id1]->geometricalModel->diffuseColor = Vector3f(0.0,0.0,((float)section)/2.0); // FIXME [1]
 				(*(ncb->bodies))[id2]->geometricalModel->diffuseColor = Vector3f(0.0,0.0,((float)section)/2.0); // FIXME [1]

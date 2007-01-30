@@ -92,13 +92,23 @@ class LatticeExample : public FileGenerator
 				 
 			 	,region_D_min
 			 	,region_D_max
-			 	,direction_D;
+			 	,direction_D
+				 
+			 	,region_E_min
+			 	,region_E_max
+			 	,direction_E
+				 
+			 	,region_F_min
+			 	,region_F_max
+			 	,direction_F;
 				 
 						
 		Real		 displacement_A_meters
 		 		,displacement_B_meters
                                 ,displacement_C_meters
-                                ,displacement_D_meters;
+                                ,displacement_D_meters
+                                ,displacement_E_meters
+                                ,displacement_F_meters;
                                 
         // strain recorder
                 std::vector< unsigned int > subscribedBodies;

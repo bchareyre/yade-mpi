@@ -359,7 +359,7 @@ void OpenGLRenderingEngine::renderShadowVolumes(const shared_ptr<MetaBody>& root
 		BodyContainer::iterator biEnd = rootBody->bodies->end();
 		for(; bi!=biEnd ; ++bi )
 		{
-			if ((*bi)->geometricalModel->shadowCaster && ( (*bi)->getGroupMask() & drawMask ))
+			if ((*bi)->geometricalModel->shadowCaster && ( ((*bi)->getGroupMask() & drawMask) || (*bi)->getGroupMask()==0 ))
 				shadowVolumeDispatcher((*bi)->geometricalModel,(*bi)->physicalParameters,lightPos);
 		}
 	}
@@ -379,7 +379,7 @@ void OpenGLRenderingEngine::renderGeometricalModel(const shared_ptr<MetaBody>& r
 		BodyContainer::iterator biEnd = bodies->end();
 		for( ; bi!=biEnd ; ++bi)
 		{
-			if((*bi)->geometricalModel && ( (*bi)->getGroupMask() & drawMask ))
+			if((*bi)->geometricalModel && ( ((*bi)->getGroupMask() & drawMask) || (*bi)->getGroupMask()==0 ))
 			{
 				glPushMatrix();
 				Se3r& se3 = (*bi)->physicalParameters->se3;
@@ -419,7 +419,7 @@ void OpenGLRenderingEngine::renderState(const shared_ptr<MetaBody>& rootBody)
 	for( ; bi!=biEnd ; ++bi)
 	{
 		glPushMatrix();
-		if((*bi)->physicalParameters && ( (*bi)->getGroupMask() & drawMask ))
+		if((*bi)->physicalParameters && ( ((*bi)->getGroupMask() & drawMask ) || (*bi)->getGroupMask()==0 ))
 			stateDispatcher((*bi)->physicalParameters);
 		glPopMatrix();
 	}
@@ -438,7 +438,7 @@ void OpenGLRenderingEngine::renderBoundingVolume(const shared_ptr<MetaBody>& roo
 	for( ; bi!=biEnd ; ++bi)
 	{
 		glPushMatrix();
-		if((*bi)->boundingVolume && ( (*bi)->getGroupMask() & drawMask ))
+		if((*bi)->boundingVolume && ( ((*bi)->getGroupMask() & drawMask) || (*bi)->getGroupMask()==0 ))
 			boundingVolumeDispatcher((*bi)->boundingVolume);
 		glPopMatrix();
 	}
@@ -464,7 +464,7 @@ void OpenGLRenderingEngine::renderInteractingGeometry(const shared_ptr<MetaBody>
 		se3.orientation.ToAxisAngle(axis,angle);	
 		glTranslatef(se3.position[0],se3.position[1],se3.position[2]);
 		glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
-		if((*bi)->interactingGeometry && ( (*bi)->getGroupMask() & drawMask ))
+		if((*bi)->interactingGeometry && ( ((*bi)->getGroupMask() & drawMask) || (*bi)->getGroupMask()==0 ))
 			interactionGeometryDispatcher((*bi)->interactingGeometry,(*bi)->physicalParameters);
 		glPopMatrix();
 	}

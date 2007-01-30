@@ -105,6 +105,16 @@ LatticeExample::LatticeExample() : FileGenerator()
         direction_D              = Vector3r(0,-1,0);
         displacement_D_meters    = 0.0001;
         
+	region_E_min 		 = Vector3r(0,0,-1);
+	region_E_max 		 = Vector3r(0,0,-1);
+        direction_E              = Vector3r(0,1,0);
+        displacement_E_meters    = 0.0;
+        
+	region_F_min 		 = Vector3r(0,0,-1);
+	region_F_max 		 = Vector3r(0,0,-1);
+        direction_F              = Vector3r(0,1,0);
+        displacement_F_meters    = 0.0;
+        
         strainRecorder_xz_plane  = -1;
         strainRecorder_node1     = Vector3r(0,0,0);
         strainRecorder_node2     = Vector3r(0,1,0);
@@ -272,6 +282,16 @@ void LatticeExample::registerAttributes()
         REGISTER_ATTRIBUTE(region_D_max);
         REGISTER_ATTRIBUTE(direction_D);
         REGISTER_ATTRIBUTE(displacement_D_meters);
+        
+	REGISTER_ATTRIBUTE(region_E_min);
+        REGISTER_ATTRIBUTE(region_E_max);
+        REGISTER_ATTRIBUTE(direction_E);
+        REGISTER_ATTRIBUTE(displacement_E_meters);
+        
+	REGISTER_ATTRIBUTE(region_F_min);
+        REGISTER_ATTRIBUTE(region_F_max);
+        REGISTER_ATTRIBUTE(direction_F);
+        REGISTER_ATTRIBUTE(displacement_F_meters);
         
 	REGISTER_ATTRIBUTE(outputFile);
         REGISTER_ATTRIBUTE(strainRecorder_xz_plane);
@@ -699,6 +719,8 @@ string LatticeExample::generate()
         imposeTranslation(rootBody,region_B_min,region_B_max,direction_B,displacement_B_meters);
         imposeTranslation(rootBody,region_C_min,region_C_max,direction_C,displacement_C_meters);
         imposeTranslation(rootBody,region_D_min,region_D_max,direction_D,displacement_D_meters);
+        imposeTranslation(rootBody,region_E_min,region_E_max,direction_E,displacement_E_meters);
+        imposeTranslation(rootBody,region_F_min,region_F_max,direction_F,displacement_F_meters);
 
         if(useAggregates) addAggregates(rootBody);
 	if(shouldTerminate()) return "";
