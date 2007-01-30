@@ -12,6 +12,7 @@
 
 void GLDrawLatticeBeamState::go(const shared_ptr<PhysicalParameters>& pp)
 {
+	// FIXME the same in  GeometricalModelForceColorizer.cpp 
 	static Real maxTensileFactor = 0.0; // FIXME - thread unsafe
 	static Real maxCompressFactor = 0.0; // FIXME - thread unsafe
 

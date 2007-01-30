@@ -12,7 +12,8 @@ SUBDIRS += ElasticCohesiveLaw \
            PositionOrientationRecorder \
            VelocityRecorder \
 	   GlobalStiffnessCounter \
-	   GlobalStiffnessTimeStepper
+	   GlobalStiffnessTimeStepper \
+	   GeometricalModelForceColorizer
 
 CONFIG += debug \
           thread \
