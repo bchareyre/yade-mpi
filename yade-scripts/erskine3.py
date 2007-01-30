@@ -260,6 +260,7 @@ def scriptGen(v,dir):
 			return False
 		return True
 	includePath=filter(DelAndWarnNonexistentPath,includePath)
+	includePath=[normpath(p) for p in includePath]
 
 
 
@@ -360,7 +361,15 @@ for project in projects:
 # HACK: useful stuff to pass down via globals...
 pretty=True
 if pretty:
-	toStr=pprint.pformat; fieldSep='\n'
+	def toStr(what):
+		ret=pprint.pformat(what); n=1
+		# replace leading spaces (nesting) by tabs...
+		while n: ret,n=subn(r'(?m)^(\t*) ',r'\1\t',ret)
+		# indent all lines by one more tab
+		ret=sub(r'(?m)^','\t',ret)
+		# de-indent the first one
+		return ret[1:]
+	fieldSep='\n\t'
 else:
 	toStr=str; fieldSep='';
 installable={} # hash indexed by (env,targetType)->pythonicTargetName
