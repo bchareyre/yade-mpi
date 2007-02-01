@@ -24,12 +24,15 @@ class SpheresContactGeometry : public InteractionGeometry
 				,radius2
 				,penetrationDepth;
 
+		SpheresContactGeometry();
 		virtual ~SpheresContactGeometry();
 
 	protected :
 		virtual void registerAttributes();
 	REGISTER_CLASS_NAME(SpheresContactGeometry);
 	REGISTER_BASE_CLASS_NAME(InteractionGeometry);
+
+	REGISTER_CLASS_INDEX(SpheresContactGeometry,InteractionGeometry);
 };
 
 REGISTER_SERIALIZABLE(SpheresContactGeometry,false);

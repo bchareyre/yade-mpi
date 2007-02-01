@@ -26,6 +26,8 @@ InteractionVecSet::~InteractionVecSet()
 
 bool InteractionVecSet::insert(shared_ptr<Interaction>& i)
 {
+	boost::mutex::scoped_lock lock(drawloopmutex);
+
 	unsigned int id1 = i->getId1();
 	unsigned int id2 = i->getId2();
 
@@ -54,6 +56,8 @@ bool InteractionVecSet::insert(unsigned int id1,unsigned int id2)
 
 void InteractionVecSet::clear()
 {
+	boost::mutex::scoped_lock lock(drawloopmutex);
+
 	interactions.clear();
 	currentSize=0;
 }
@@ -61,6 +65,8 @@ void InteractionVecSet::clear()
 
 bool InteractionVecSet::erase(unsigned int id1,unsigned int id2)
 {
+	boost::mutex::scoped_lock lock(drawloopmutex);
+
 	if (id1>id2)
 		swap(id1,id2);
 

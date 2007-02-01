@@ -47,6 +47,7 @@ class SDECLinkPhysics : public InteractionPhysics
 	REGISTER_CLASS_NAME(SDECLinkPhysics);
 	REGISTER_BASE_CLASS_NAME(InteractionPhysics);
 
+	REGISTER_CLASS_INDEX(SDECLinkPhysics,InteractionPhysics);
 };
 
 REGISTER_SERIALIZABLE(SDECLinkPhysics,false);

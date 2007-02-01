@@ -10,6 +10,7 @@
 
 InteractionOfMyTetrahedron::InteractionOfMyTetrahedron() : InteractionGeometry()
 {
+	createIndex();
 }
 
 

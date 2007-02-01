@@ -14,11 +14,11 @@
 #include <Wm3Vector3.h>
 #include <yade/yade-lib-base/yadeWm3.hpp>
 #include <Wm3Quaternion.h>
-#include <yade/yade-lib-base/yadeWm3.hpp>
 
 class SDECLinkGeometry : public InteractionGeometry
 {
 	public :
+		SDECLinkGeometry();
 		virtual ~SDECLinkGeometry();
 
 		Real		 radius1 // FIXME : lots of stuff is the same as in SpheresContactGeometry, so it should inherit from it.
@@ -28,8 +28,11 @@ class SDECLinkGeometry : public InteractionGeometry
 
 	protected :
 		void registerAttributes();
+
 	REGISTER_CLASS_NAME(SDECLinkGeometry);
 	REGISTER_BASE_CLASS_NAME(InteractionGeometry);
+
+	REGISTER_CLASS_INDEX(SDECLinkGeometry,InteractionGeometry);
 };
 
 REGISTER_SERIALIZABLE(SDECLinkGeometry,false);

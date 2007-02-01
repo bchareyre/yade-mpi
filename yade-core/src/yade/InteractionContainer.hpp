@@ -13,6 +13,7 @@
 
 #include <yade/yade-lib-serialization/Serializable.hpp>
 #include "InteractionContainerIteratorPointer.hpp"
+#include <boost/thread/mutex.hpp>
 
 class Interaction;
 
@@ -21,6 +22,8 @@ using namespace boost;
 class InteractionContainer : public Serializable
 {
 	public :
+		boost::mutex	drawloopmutex; // FIXME a hack, containers have to be rewritten lock-free.
+
 		InteractionContainer() { interaction.clear(); };
 		virtual ~InteractionContainer() {};
 

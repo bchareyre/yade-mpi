@@ -9,6 +9,11 @@
 #include "SimpleElasticInteraction.hpp"
 
 
+SimpleElasticInteraction::SimpleElasticInteraction()
+{
+	createIndex();
+}
+
 SimpleElasticInteraction::~SimpleElasticInteraction()
 {
 }

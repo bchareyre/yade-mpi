@@ -11,7 +11,7 @@
 
 NonLocalDependency::NonLocalDependency() : InteractionPhysics()
 {
-//	createIndex();
+	createIndex();
 }
 
 

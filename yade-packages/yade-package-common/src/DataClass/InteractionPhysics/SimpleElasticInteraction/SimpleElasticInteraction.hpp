@@ -17,12 +17,15 @@ class SimpleElasticInteraction : public InteractionPhysics
 	public :
 		Real		 kn;				// normal elastic constant.
 	
+		SimpleElasticInteraction();
 		virtual ~SimpleElasticInteraction();
 	protected :
 		virtual void registerAttributes();
 
 	REGISTER_CLASS_NAME(SimpleElasticInteraction);
 	REGISTER_BASE_CLASS_NAME(InteractionPhysics);
+
+	REGISTER_CLASS_INDEX(SimpleElasticInteraction,InteractionPhysics);
 
 };
 

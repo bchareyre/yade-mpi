@@ -7,6 +7,8 @@ HEADERS += GLDrawBoundingVolumeFunctor.hpp \
            GLDrawGeometricalModelFunctor.hpp \
            GLDrawInteractingGeometryFunctor.hpp \
            GLDrawShadowVolumeFunctor.hpp \
+	   GLDrawInteractionPhysicsFunctor.hpp \
+	   GLDrawInteractionGeometryFunctor.hpp \
 	   GLDrawStateFunctor.hpp \
            OpenGLRenderingEngine.hpp 
 

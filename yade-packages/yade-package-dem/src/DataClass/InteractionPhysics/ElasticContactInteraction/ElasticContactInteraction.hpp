@@ -14,8 +14,6 @@
 class ElasticContactInteraction : public SimpleElasticInteraction
 {
 	public :
-		ElasticContactInteraction() {};
-
 		Real		// kn				// normal elastic constant. (inside SimpleElasticInteraction)
 				 ks				// shear elastic constant.
 				,initialKn			// initial normal elastic constant.
@@ -28,13 +26,16 @@ class ElasticContactInteraction : public SimpleElasticInteraction
 		Vector3r	prevNormal			// unit normal of the contact plane.
 				,normalForce			// normal force applied on a DE
 				,shearForce;			// shear force applied on a DE
-		
+
+		ElasticContactInteraction();
 		virtual ~ElasticContactInteraction();
 	protected :
 		virtual void registerAttributes();
 
 	REGISTER_CLASS_NAME(ElasticContactInteraction);
 	REGISTER_BASE_CLASS_NAME(SimpleElasticInteraction);
+
+	REGISTER_CLASS_INDEX(ElasticContactInteraction,SimpleElasticInteraction);
 
 };
 

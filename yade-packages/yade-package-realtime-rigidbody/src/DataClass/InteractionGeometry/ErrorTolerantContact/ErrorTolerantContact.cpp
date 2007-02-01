@@ -11,7 +11,7 @@
 
 ErrorTolerantContact::ErrorTolerantContact() : InteractionGeometry()
 {
-
+	createIndex();
 }
 
 

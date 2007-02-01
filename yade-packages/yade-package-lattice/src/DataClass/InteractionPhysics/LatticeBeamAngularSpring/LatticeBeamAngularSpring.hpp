@@ -38,7 +38,7 @@ class LatticeBeamAngularSpring : public InteractionPhysics
 	REGISTER_BASE_CLASS_NAME(InteractionPhysics);
 	
 /// Indexable
-//	REGISTER_CLASS_INDEX(LatticeBeamAngularSpring,InteractionPhysics);
+	REGISTER_CLASS_INDEX(LatticeBeamAngularSpring,InteractionPhysics);
 
 };
 

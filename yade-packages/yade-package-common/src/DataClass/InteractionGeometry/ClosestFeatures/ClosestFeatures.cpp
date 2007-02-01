@@ -11,6 +11,7 @@
 
 ClosestFeatures::ClosestFeatures() : InteractionGeometry()
 {
+	createIndex();
 	closestsPoints.clear();
 }
 

@@ -39,7 +39,8 @@ class ErrorTolerantContact : public InteractionGeometry
 
 	REGISTER_CLASS_NAME(ErrorTolerantContact);
 	REGISTER_BASE_CLASS_NAME(InteractionGeometry);
-	//REGISTER_CLASS_INDEX(ErrorTolerantContact);
+	
+	REGISTER_CLASS_INDEX(ErrorTolerantContact,InteractionGeometry);
 };
 
 REGISTER_SERIALIZABLE(ErrorTolerantContact,false);

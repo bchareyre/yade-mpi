@@ -27,6 +27,7 @@ class ClosestFeatures : public InteractionGeometry
 	REGISTER_CLASS_NAME(ClosestFeatures);
 	REGISTER_BASE_CLASS_NAME(InteractionGeometry);
 
+	REGISTER_CLASS_INDEX(ClosestFeatures,InteractionGeometry);
 };
 
 REGISTER_SERIALIZABLE(ClosestFeatures,false);

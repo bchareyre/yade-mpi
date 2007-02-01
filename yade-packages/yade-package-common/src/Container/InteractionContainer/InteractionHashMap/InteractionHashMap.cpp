@@ -23,6 +23,8 @@ InteractionHashMap::~InteractionHashMap()
 
 bool InteractionHashMap::insert(shared_ptr<Interaction>& i)
 {
+	boost::mutex::scoped_lock lock(drawloopmutex);
+
 	unsigned int id1 = i->getId1();
 	unsigned int id2 = i->getId2();
 	if (id1>id2)
@@ -41,12 +43,16 @@ bool InteractionHashMap::insert(unsigned int id1,unsigned int id2)
 
 void InteractionHashMap::clear()
 {
+	boost::mutex::scoped_lock lock(drawloopmutex);
+
 	interactions.clear();
 }
 
 
 bool InteractionHashMap::erase(unsigned int id1,unsigned int id2)
 {
+	boost::mutex::scoped_lock lock(drawloopmutex);
+
 	if (id1>id2)
 		swap(id1,id2);
 

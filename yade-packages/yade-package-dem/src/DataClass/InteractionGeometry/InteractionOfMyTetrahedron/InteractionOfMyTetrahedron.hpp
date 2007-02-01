@@ -75,6 +75,8 @@ class InteractionOfMyTetrahedron : public InteractionGeometry
 	REGISTER_CLASS_NAME(InteractionOfMyTetrahedron);
 	REGISTER_BASE_CLASS_NAME(InteractionGeometry);
 
+	REGISTER_CLASS_INDEX(InteractionOfMyTetrahedron,InteractionGeometry);
+
 };
 
 REGISTER_SERIALIZABLE(InteractionOfMyTetrahedron,false);

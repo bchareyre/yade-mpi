@@ -10,11 +10,12 @@
 
 #include "SpheresContactGeometry.hpp"
 
-// SpheresContactGeometry::SpheresContactGeometry() : InteractionGeometry()
-// {
-// }
-// 
-// 
+SpheresContactGeometry::SpheresContactGeometry() : InteractionGeometry()
+{
+	createIndex();
+}
+ 
+ 
 SpheresContactGeometry::~SpheresContactGeometry ()
 {
 }

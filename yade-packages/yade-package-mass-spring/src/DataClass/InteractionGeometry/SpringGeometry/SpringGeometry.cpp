@@ -8,6 +8,11 @@
 
 #include "SpringGeometry.hpp"
 
+SpringGeometry::SpringGeometry()
+{
+	createIndex();
+}
+
 SpringGeometry::~SpringGeometry()
 {
 }

@@ -9,6 +9,11 @@
 #include "ElasticContactInteraction.hpp"
 
 
+ElasticContactInteraction::ElasticContactInteraction()
+{
+	createIndex();
+}
+
 ElasticContactInteraction::~ElasticContactInteraction()
 {
 }

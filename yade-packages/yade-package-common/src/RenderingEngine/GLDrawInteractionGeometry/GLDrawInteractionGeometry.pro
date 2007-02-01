@@ -3,9 +3,7 @@ error( "YADE_QMAKE_PATH internal qmake variable is not set, you should run for e
 }
 
 
-SUBDIRS += GLDrawInteractingMyTetrahedron \
-           GLDrawSpheresContactGeometry
-
+SUBDIRS += GLDrawClosestFeatures
 CONFIG += debug \
           thread \
 warn_on

@@ -10,6 +10,11 @@
 
 #include "SDECLinkGeometry.hpp"
 
+SDECLinkGeometry::SDECLinkGeometry()
+{
+	createIndex();
+}
+
 SDECLinkGeometry::~SDECLinkGeometry()
 {
 }

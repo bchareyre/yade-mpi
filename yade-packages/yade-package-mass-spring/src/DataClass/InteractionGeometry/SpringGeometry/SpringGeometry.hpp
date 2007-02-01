@@ -18,12 +18,15 @@ class SpringGeometry : public InteractionGeometry
 	public :
 		Vector3r p1;
 		Vector3r p2;
+		SpringGeometry();
 		virtual ~SpringGeometry();
 	
 	protected :
 		void registerAttributes();
 	REGISTER_CLASS_NAME(SpringGeometry);
 	REGISTER_BASE_CLASS_NAME(InteractionGeometry);
+
+	REGISTER_CLASS_INDEX(SpringGeometry,InteractionGeometry);
 };
 
 REGISTER_SERIALIZABLE(SpringGeometry,false);

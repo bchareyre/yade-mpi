@@ -12,6 +12,8 @@
 #include <yade/yade-core/MetaBody.hpp>
 #include <yade/yade-package-common/Force.hpp>
 #include <boost/lexical_cast.hpp>
+#include <yade/yade-lib-base/yadeWm3Extra.hpp>
+//#include <Wm3Vector3r.hpp>
 
 
 GeometricalModelForceColorizer::GeometricalModelForceColorizer () : StandAloneEngine(), actionForce(new Force)
@@ -60,9 +62,21 @@ void GeometricalModelForceColorizer::action(Body * body)
 			GeometricalModel* gm = body->geometricalModel.get();
 			unsigned int i = body -> getId();
 			Vector3r force = dynamic_cast<Force*>(ncb->physicalActions->find( i , actionForce->getClassIndex() ) . get() )->force;
+
 			gm->diffuseColor[0] = (force[0]-min)/(max-min);
 			gm->diffuseColor[1] = (force[1]-min)/(max-min);
 			gm->diffuseColor[2] = (force[2]-min)/(max-min);
+
+		/*
+			//Real val = std::sqrt(force[0]*force[0]+force[1]*force[1]+force[2]*force[2]);
+			Real val = force[2];
+			//Real val = force.squaredLength();
+			//min=0;
+			gm->diffuseColor[0] = (val-min)/(max-min);
+			gm->diffuseColor[1] = (val-min)/(max-min);
+			gm->diffuseColor[2] = (val-min)/(max-min);
+		*/
+
 		}
 
 	}

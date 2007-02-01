@@ -18,6 +18,8 @@
 #include "GLDrawInteractingGeometryFunctor.hpp"
 #include "GLDrawGeometricalModelFunctor.hpp"
 #include "GLDrawShadowVolumeFunctor.hpp"
+#include "GLDrawInteractionPhysicsFunctor.hpp"
+#include "GLDrawInteractionGeometryFunctor.hpp"
 
 class OpenGLRenderingEngine : public RenderingEngine
 {	
@@ -34,24 +36,31 @@ class OpenGLRenderingEngine : public RenderingEngine
 				,useFastShadowVolume
 				,drawWireFrame
 				,drawInside
+				,drawInteractionGeometry
+				,drawInteractionPhysics
 		
 				,needInit;
 		int		 current_selection
 				,drawMask;
 
 	private :
-		DynLibDispatcher< PhysicalParameters , GLDrawStateFunctor, void , TYPELIST_1(const shared_ptr<PhysicalParameters>&) > stateDispatcher;
-		DynLibDispatcher< BoundingVolume     , GLDrawBoundingVolumeFunctor, void , TYPELIST_1(const shared_ptr<BoundingVolume>&) > boundingVolumeDispatcher;
-		DynLibDispatcher< InteractingGeometry,GLDrawInteractingGeometryFunctor, void , TYPELIST_2(const shared_ptr<InteractingGeometry>&, const shared_ptr<PhysicalParameters>&) >interactionGeometryDispatcher;
+		DynLibDispatcher< InteractionGeometry , GLDrawInteractionGeometryFunctor, void , TYPELIST_5(const shared_ptr<InteractionGeometry>&, const shared_ptr<Interaction>& , const shared_ptr<Body>&, const shared_ptr<Body>&, bool) > interactionGeometryDispatcher;
+		DynLibDispatcher< InteractionPhysics  , GLDrawInteractionPhysicsFunctor,  void , TYPELIST_5(const shared_ptr<InteractionPhysics>& , const shared_ptr<Interaction>&, const shared_ptr<Body>&, const shared_ptr<Body>&, bool) > interactionPhysicsDispatcher;
+
+		DynLibDispatcher< PhysicalParameters  , GLDrawStateFunctor,               void , TYPELIST_1(const shared_ptr<PhysicalParameters>&) > stateDispatcher;
+		DynLibDispatcher< BoundingVolume      , GLDrawBoundingVolumeFunctor,      void , TYPELIST_1(const shared_ptr<BoundingVolume>&) > boundingVolumeDispatcher;
+		DynLibDispatcher< InteractingGeometry , GLDrawInteractingGeometryFunctor, void , TYPELIST_2(const shared_ptr<InteractingGeometry>&, const shared_ptr<PhysicalParameters>&) > interactingGeometryDispatcher;
 		// FIXME - in fact it is a 1D dispatcher
-		DynLibDispatcher< GeometricalModel   , GLDrawGeometricalModelFunctor, void , TYPELIST_3(const shared_ptr<GeometricalModel>&, const shared_ptr<PhysicalParameters>&,bool) > geometricalModelDispatcher;
-		DynLibDispatcher< GeometricalModel   , GLDrawShadowVolumeFunctor, void , TYPELIST_3(const shared_ptr<GeometricalModel>&, const shared_ptr<PhysicalParameters>&, const Vector3r& ) > shadowVolumeDispatcher;
+		DynLibDispatcher< GeometricalModel    , GLDrawGeometricalModelFunctor,    void , TYPELIST_3(const shared_ptr<GeometricalModel>&, const shared_ptr<PhysicalParameters>&, bool) > geometricalModelDispatcher;
+		DynLibDispatcher< GeometricalModel    , GLDrawShadowVolumeFunctor,        void , TYPELIST_3(const shared_ptr<GeometricalModel>&, const shared_ptr<PhysicalParameters>&, const Vector3r& ) > shadowVolumeDispatcher;
 
 		vector<vector<string> >  stateFunctorNames;
 		vector<vector<string> >  boundingVolumeFunctorNames;
-		vector<vector<string> >  interactionGeometryFunctorNames;
+		vector<vector<string> >  interactingGeometryFunctorNames;
 		vector<vector<string> >  geometricalModelFunctorNames;
 		vector<vector<string> >  shadowVolumeFunctorNames;
+		vector<vector<string> >  interactionGeometryFunctorNames;
+		vector<vector<string> >  interactionPhysicsFunctorNames;
 
 	public :
 		void addStateFunctor(const string& str);
@@ -59,6 +68,8 @@ class OpenGLRenderingEngine : public RenderingEngine
 		void addInteractingGeometryFunctor(const string& str);
 		void addGeometricalModelFunctor(const string& str);
 		void addShadowVolumeFunctor(const string& str);
+		void addInteractionGeometryFunctor(const string& str);
+		void addInteractionPhysicsFunctor(const string& str);
 			
 		OpenGLRenderingEngine();
 		virtual ~OpenGLRenderingEngine();
@@ -69,6 +80,8 @@ class OpenGLRenderingEngine : public RenderingEngine
 	
 	private :
 		void renderGeometricalModel(const shared_ptr<MetaBody>& rootBody);
+		void renderInteractionPhysics(const shared_ptr<MetaBody>& rootBody);
+		void renderInteractionGeometry(const shared_ptr<MetaBody>& rootBody);
 		void renderState(const shared_ptr<MetaBody>& rootBody);
 		void renderBoundingVolume(const shared_ptr<MetaBody>& rootBody);
 		void renderInteractingGeometry(const shared_ptr<MetaBody>& rootBody);

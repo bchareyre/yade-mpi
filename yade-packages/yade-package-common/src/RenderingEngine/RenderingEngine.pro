@@ -7,6 +7,8 @@ SUBDIRS += GLDrawBoundingVolume \
            GLDrawGeometricalModel \
            GLDrawInteractingGeometry \
            GLDrawShadowVolume \
+	   GLDrawInteractionGeometry \
+	   GLDrawInteractionPhysics \
 	   GLDrawState \
            OpenGLRenderingEngine 
 CONFIG += debug \

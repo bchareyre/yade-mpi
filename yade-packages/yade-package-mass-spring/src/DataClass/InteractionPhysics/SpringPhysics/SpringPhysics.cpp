@@ -8,6 +8,11 @@
 
 #include "SpringPhysics.hpp"
 
+SpringPhysics::SpringPhysics()
+{
+	createIndex();
+}
+
 SpringPhysics::~SpringPhysics()
 {
 }

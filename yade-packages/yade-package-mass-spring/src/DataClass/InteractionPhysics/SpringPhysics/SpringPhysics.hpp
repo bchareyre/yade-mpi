@@ -18,12 +18,15 @@ class SpringPhysics : public InteractionPhysics
 				,damping
 				,initialLength;
 
+		SpringPhysics();
 		virtual ~SpringPhysics();
 
 	protected :
 		virtual void registerAttributes();
 	REGISTER_CLASS_NAME(SpringPhysics);
 	REGISTER_BASE_CLASS_NAME(InteractionPhysics);
+
+	REGISTER_CLASS_INDEX(SpringPhysics,InteractionPhysics);
 };
 
 REGISTER_SERIALIZABLE(SpringPhysics,false);

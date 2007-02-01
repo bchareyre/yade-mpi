@@ -30,6 +30,9 @@ OpenGLRenderingEngine::OpenGLRenderingEngine() : RenderingEngine()
 	lightPos		= Vector3r(75.0,130.0,0.0);
 	backGroundColor		= Vector3r(0.2,0.2,0.2);
 	
+	drawInteractionGeometry	= false;
+	drawInteractionPhysics	= false;
+	
 	map<string,DynlibDescriptor>::const_iterator di    = Omega::instance().getDynlibsDescriptor().begin();
 	map<string,DynlibDescriptor>::const_iterator diEnd = Omega::instance().getDynlibsDescriptor().end();
 	for(;di!=diEnd;++di)
@@ -44,6 +47,13 @@ OpenGLRenderingEngine::OpenGLRenderingEngine() : RenderingEngine()
 			addGeometricalModelFunctor((*di).first);
 		if (Omega::instance().isInheritingFrom((*di).first,"GLDrawShadowVolumeFunctor"))
 			addShadowVolumeFunctor((*di).first);
+
+	//	InteractionGeometry
+	//	InteractionPhysics
+		if (Omega::instance().isInheritingFrom((*di).first,"GLDrawInteractionGeometryFunctor"))
+			addInteractionGeometryFunctor((*di).first);
+		if (Omega::instance().isInheritingFrom((*di).first,"GLDrawInteractionPhysicsFunctor"))
+			addInteractionPhysicsFunctor((*di).first);
 	}
 
 	postProcessAttributes(true);
@@ -181,6 +191,12 @@ void OpenGLRenderingEngine::render(
 		renderInteractingGeometry(rootBody);
 	}
 
+	if (drawInteractionGeometry)
+		renderInteractionGeometry(rootBody);
+	
+	if (drawInteractionPhysics)
+		renderInteractionPhysics(rootBody);
+	
 
 /*	shared_ptr<BodyContainer> bodies = rootBody->bodies;
 	shared_ptr<InteractionContainer>& collisions = rootBody->transientInteractions;
@@ -412,6 +428,70 @@ void OpenGLRenderingEngine::renderGeometricalModel(const shared_ptr<MetaBody>& r
 }
 
 
+void OpenGLRenderingEngine::renderInteractionGeometry(const shared_ptr<MetaBody>& rootBody)
+{	
+	{
+		boost::mutex::scoped_lock lock(rootBody->persistentInteractions->drawloopmutex);
+
+		InteractionContainer::iterator bi    = rootBody->persistentInteractions->begin();
+		InteractionContainer::iterator biEnd = rootBody->persistentInteractions->end();
+		for( ; bi!=biEnd ; ++bi)
+		{
+			glPushMatrix();
+			if((*bi)->interactionGeometry)
+				interactionGeometryDispatcher((*bi)->interactionGeometry,(*bi),(*(rootBody->bodies))[(*bi)->getId1()],(*(rootBody->bodies))[(*bi)->getId2()],drawWireFrame);
+			glPopMatrix();
+		}
+	}
+
+	{
+		boost::mutex::scoped_lock lock(rootBody->transientInteractions->drawloopmutex);
+
+		InteractionContainer::iterator bi    = rootBody->transientInteractions->begin();
+		InteractionContainer::iterator biEnd = rootBody->transientInteractions->end();
+		for( ; bi!=biEnd ; ++bi)
+		{
+			glPushMatrix();
+			if((*bi)->interactionGeometry)
+				interactionGeometryDispatcher((*bi)->interactionGeometry,(*bi),(*(rootBody->bodies))[(*bi)->getId1()],(*(rootBody->bodies))[(*bi)->getId2()],drawWireFrame);
+			glPopMatrix();
+		}
+	}
+}
+
+
+void OpenGLRenderingEngine::renderInteractionPhysics(const shared_ptr<MetaBody>& rootBody)
+{	
+	{
+		boost::mutex::scoped_lock lock(rootBody->persistentInteractions->drawloopmutex);
+
+		InteractionContainer::iterator bi    = rootBody->persistentInteractions->begin();
+		InteractionContainer::iterator biEnd = rootBody->persistentInteractions->end();
+		for( ; bi!=biEnd ; ++bi)
+		{
+			glPushMatrix();
+			if((*bi)->interactionPhysics)
+				interactionPhysicsDispatcher((*bi)->interactionPhysics,(*bi),(*(rootBody->bodies))[(*bi)->getId1()],(*(rootBody->bodies))[(*bi)->getId2()],drawWireFrame);
+			glPopMatrix();
+		}
+	}
+
+	{
+		boost::mutex::scoped_lock lock(rootBody->transientInteractions->drawloopmutex);
+
+		InteractionContainer::iterator bi    = rootBody->transientInteractions->begin();
+		InteractionContainer::iterator biEnd = rootBody->transientInteractions->end();
+		for( ; bi!=biEnd ; ++bi)
+		{
+			glPushMatrix();
+			if((*bi)->interactionPhysics)
+				interactionPhysicsDispatcher((*bi)->interactionPhysics,(*bi),(*(rootBody->bodies))[(*bi)->getId1()],(*(rootBody->bodies))[(*bi)->getId2()],drawWireFrame);
+			glPopMatrix();
+		}
+	}
+}
+
+
 void OpenGLRenderingEngine::renderState(const shared_ptr<MetaBody>& rootBody)
 {	
 	BodyContainer::iterator bi    = rootBody->bodies->begin();
@@ -465,31 +545,39 @@ void OpenGLRenderingEngine::renderInteractingGeometry(const shared_ptr<MetaBody>
 		glTranslatef(se3.position[0],se3.position[1],se3.position[2]);
 		glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
 		if((*bi)->interactingGeometry && ( ((*bi)->getGroupMask() & drawMask) || (*bi)->getGroupMask()==0 ))
-			interactionGeometryDispatcher((*bi)->interactingGeometry,(*bi)->physicalParameters);
+			interactingGeometryDispatcher((*bi)->interactingGeometry,(*bi)->physicalParameters);
 		glPopMatrix();
 	}
 	
 	glPushMatrix();
 	if(rootBody->interactingGeometry)
-		interactionGeometryDispatcher(rootBody->interactingGeometry,rootBody->physicalParameters);
+		interactingGeometryDispatcher(rootBody->interactingGeometry,rootBody->physicalParameters);
 	glPopMatrix();
 }
 
 
 void OpenGLRenderingEngine::registerAttributes()
 {
-	REGISTER_ATTRIBUTE(lightPos);
-	REGISTER_ATTRIBUTE(backGroundColor);
 	REGISTER_ATTRIBUTE(drawState);
 	REGISTER_ATTRIBUTE(drawBoundingVolume);
 	REGISTER_ATTRIBUTE(drawInteractingGeometry);
 	REGISTER_ATTRIBUTE(drawGeometricalModel);
+	
+	REGISTER_ATTRIBUTE(drawMask);
+	
+	REGISTER_ATTRIBUTE(drawWireFrame);
+
+	REGISTER_ATTRIBUTE(drawInteractionGeometry);
+	REGISTER_ATTRIBUTE(drawInteractionPhysics);
+	
+	REGISTER_ATTRIBUTE(lightPos);
+	REGISTER_ATTRIBUTE(backGroundColor);
+	
+	REGISTER_ATTRIBUTE(drawInside);
+
 	REGISTER_ATTRIBUTE(castShadow);
 	REGISTER_ATTRIBUTE(drawShadowVolumes);
 	REGISTER_ATTRIBUTE(useFastShadowVolume);	
-	REGISTER_ATTRIBUTE(drawWireFrame);
-	REGISTER_ATTRIBUTE(drawInside);
-	REGISTER_ATTRIBUTE(drawMask);
 }
 
 
@@ -503,17 +591,41 @@ void OpenGLRenderingEngine::postProcessAttributes(bool deserializing)
 		for(unsigned int i=0;i<boundingVolumeFunctorNames.size();i++)
 			boundingVolumeDispatcher.add1DEntry(boundingVolumeFunctorNames[i][0],boundingVolumeFunctorNames[i][1]);
 			
-		for(unsigned int i=0;i<interactionGeometryFunctorNames.size();i++)
-			interactionGeometryDispatcher.add1DEntry(interactionGeometryFunctorNames[i][0],interactionGeometryFunctorNames[i][1]);
+		for(unsigned int i=0;i<interactingGeometryFunctorNames.size();i++)
+			interactingGeometryDispatcher.add1DEntry(interactingGeometryFunctorNames[i][0],interactingGeometryFunctorNames[i][1]);
 			
 		for(unsigned int i=0;i<geometricalModelFunctorNames.size();i++)
 			geometricalModelDispatcher.add1DEntry(geometricalModelFunctorNames[i][0],geometricalModelFunctorNames[i][1]);
 		
 		for(unsigned int i=0;i<shadowVolumeFunctorNames.size();i++)
 			shadowVolumeDispatcher.add1DEntry(shadowVolumeFunctorNames[i][0],shadowVolumeFunctorNames[i][1]);
+		
+		for(unsigned int i=0;i<interactionGeometryFunctorNames.size();i++)
+			interactionGeometryDispatcher.add1DEntry(interactionGeometryFunctorNames[i][0],interactionGeometryFunctorNames[i][1]);
+			
+		for(unsigned int i=0;i<interactionPhysicsFunctorNames.size();i++)
+			interactionPhysicsDispatcher.add1DEntry(interactionPhysicsFunctorNames[i][0],interactionPhysicsFunctorNames[i][1]);	
 	}
 }
 
+
+void OpenGLRenderingEngine::addInteractionGeometryFunctor(const string& str2)
+{
+	string str1 = (static_pointer_cast<GLDrawInteractionGeometryFunctor>(ClassFactory::instance().createShared(str2)))->renders();
+	vector<string> v;
+	v.push_back(str1);
+	v.push_back(str2);
+	interactionGeometryFunctorNames.push_back(v);
+}
+
+void OpenGLRenderingEngine::addInteractionPhysicsFunctor(const string& str2)
+{
+	string str1 = (static_pointer_cast<GLDrawInteractionPhysicsFunctor>(ClassFactory::instance().createShared(str2)))->renders();
+	vector<string> v;
+	v.push_back(str1);
+	v.push_back(str2);
+	interactionPhysicsFunctorNames.push_back(v);
+}
 
 void OpenGLRenderingEngine::addStateFunctor(const string& str2)
 {
@@ -541,7 +653,7 @@ void OpenGLRenderingEngine::addInteractingGeometryFunctor(const string& str2)
 	vector<string> v;
 	v.push_back(str1);
 	v.push_back(str2);
-	interactionGeometryFunctorNames.push_back(v);
+	interactingGeometryFunctorNames.push_back(v);
 }
 
 

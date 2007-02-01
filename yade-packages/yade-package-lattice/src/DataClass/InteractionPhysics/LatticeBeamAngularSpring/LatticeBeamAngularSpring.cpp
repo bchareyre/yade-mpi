@@ -23,7 +23,8 @@ LatticeBeamAngularSpring::LatticeBeamAngularSpring() : InteractionPhysics()
 	swirl2			= 0;
 //	offPlaneAngle		= 0;
 	planeSwap180		= false;
-//	createIndex();
+
+	createIndex();
 }
 
 

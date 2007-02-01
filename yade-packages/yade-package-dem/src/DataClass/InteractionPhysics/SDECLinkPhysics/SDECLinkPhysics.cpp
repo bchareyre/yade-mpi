@@ -13,6 +13,7 @@
 
 SDECLinkPhysics::SDECLinkPhysics()
 {
+	createIndex();
 }
 
 SDECLinkPhysics::~SDECLinkPhysics()

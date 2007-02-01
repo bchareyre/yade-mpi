@@ -27,7 +27,7 @@ class NonLocalDependency : public InteractionPhysics
 	REGISTER_BASE_CLASS_NAME(InteractionPhysics);
 	
 /// Indexable
-//	REGISTER_CLASS_INDEX(NonLocalDependency,InteractionPhysics);
+	REGISTER_CLASS_INDEX(NonLocalDependency,InteractionPhysics);
 
 };
 

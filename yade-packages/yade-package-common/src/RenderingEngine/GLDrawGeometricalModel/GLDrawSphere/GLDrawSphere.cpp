@@ -123,6 +123,7 @@ void GLDrawSphere::subdivideTriangle(Vector3r& v1,Vector3r& v2,Vector3r& v3, int
 		Vector3r v = (v1+v2+v3)/3.0;
 		Real angle = atan(v[2]/v[0])/v.Length();
 
+		// FIXME - another parameter to GLDraw* to allow to disable that stripe on the sphere
 		GLfloat matAmbient[4];
 
 		if (angle>-Mathr::PI/6.0 && angle<=Mathr::PI/6.0)

@@ -3,16 +3,13 @@ error( "YADE_QMAKE_PATH internal qmake variable is not set, you should run for e
 }
 
 
-LIBS += -lRigidBodyParameters \
-        -lForce \
+LIBS += -lClosestFeatures \
+        -lyade-lib-opengl \
         -rdynamic 
 INCLUDEPATH += $${YADE_QMAKE_PATH}/include/ \
-               ../../../DataClass/PhysicalParameters/LatticeNodeParameters \
-               ../../../DataClass/PhysicalParameters/LatticeSetParameters \
-               ../../../DataClass/PhysicalParameters/LatticeBeamParameters \
-               ../../../DataClass/InteractionPhysics/LatticeBeamAngularSpring \
-               ../../../DataClass/InteractionPhysics/NonLocalDependency
-QMAKE_LIBDIR = $${YADE_QMAKE_PATH}/lib/yade/yade-package-common/ \
+               ../../../DataClass/InteractionGeometry/ClosestFeatures \
+               ../../../RenderingEngine/OpenGLRenderingEngine 
+QMAKE_LIBDIR = ../../../../bin \
                $${YADE_QMAKE_PATH}/lib/yade/yade-libs/ 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \
                           -pthread 
@@ -24,8 +21,6 @@ CONFIG += debug \
           warn_on \
           dll 
 TEMPLATE = lib 
-HEADERS += GeometricalModelForceColorizer.hpp 
-SOURCES += GeometricalModelForceColorizer.cpp 
-INCLUDEPATH += $${YADE_QMAKE_PATH}/include
-
+HEADERS += GLDrawClosestFeatures.hpp 
+SOURCES += GLDrawClosestFeatures.cpp 
 QMAKE_RUN_CXX_IMP = $(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $(shell pwd)/$<
