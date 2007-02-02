@@ -14,14 +14,16 @@
 class GLDrawSphere : public GLDrawGeometricalModelFunctor
 {
 	private :
-		static vector<Vector3r> vertices;
-		static vector<Vector3r> faces;
-		static int glWiredSphereList;
-		static int glSphereList;
+		bool first;
+		vector<Vector3r> vertices;
+		vector<Vector3r> faces;
+		int glWiredSphereList;
+		int glSphereList;
 		void subdivideTriangle(Vector3r& v1,Vector3r& v2,Vector3r& v3, int depth);
 		void drawSphere(int depth);
 	
 	public :
+		GLDrawSphere();
 		virtual void go(const shared_ptr<GeometricalModel>&, const shared_ptr<PhysicalParameters>&,bool);
 		
 	RENDERS(Sphere);

@@ -161,7 +161,8 @@ void SimulationController::pbLoadClicked()
 }
 
 
-void SimulationController::loadSimulationFromFileName(const std::string& fileName){
+void SimulationController::loadSimulationFromFileName(const std::string& fileName)
+{
 	assert(filesystem::exists(fileName));
 
 //		updater->stop();

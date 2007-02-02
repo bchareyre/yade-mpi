@@ -16,22 +16,23 @@
 OpenGLRenderingEngine::OpenGLRenderingEngine() : RenderingEngine()
 {
 
-	drawState		= false;
-	drawBoundingVolume	= false;
-	drawInteractingGeometry	= false;
-	drawGeometricalModel	= true;
-	castShadow		= false;
-	drawShadowVolumes	= false;
-	useFastShadowVolume	= true;
-	drawWireFrame		= false;
-	drawInside		= true;
+	Body_state		= false;
+	Body_bounding_volume	= false;
+	Body_interacting_geom	= false;
+	Body_geometrical_model	= true;
+	Cast_shadows		= false;
+	Shadow_volumes	= false;
+	Fast_shadow_volume	= true;
+	Body_wire		= false;
+	Interaction_wire	= false;
+	Draw_inside		= true;
 	needInit		= true;
-	drawMask		= ~0;
-	lightPos		= Vector3r(75.0,130.0,0.0);
-	backGroundColor		= Vector3r(0.2,0.2,0.2);
+	Draw_mask		= ~0;
+	Light_position		= Vector3r(75.0,130.0,0.0);
+	Background_color		= Vector3r(0.2,0.2,0.2);
 	
-	drawInteractionGeometry	= false;
-	drawInteractionPhysics	= false;
+	Interaction_geometry	= false;
+	Interaction_physics	= false;
 	
 	map<string,DynlibDescriptor>::const_iterator di    = Omega::instance().getDynlibsDescriptor().begin();
 	map<string,DynlibDescriptor>::const_iterator diEnd = Omega::instance().getDynlibsDescriptor().end();
@@ -120,10 +121,10 @@ void OpenGLRenderingEngine::render(
 #endif
 	current_selection = selection;
 	//
-	const GLfloat pos[4]	= {lightPos[0],lightPos[1],lightPos[2],1.0};
+	const GLfloat pos[4]	= {Light_position[0],Light_position[1],Light_position[2],1.0};
 	const GLfloat ambientColor[4]	= {0.5,0.5,0.5,1.0};	
 
-	glClearColor(backGroundColor[0],backGroundColor[1],backGroundColor[2],1.0);
+	glClearColor(Background_color[0],Background_color[1],Background_color[2],1.0);
 	glLightfv(GL_LIGHT0, GL_POSITION, pos);
 	glLightModelfv(GL_LIGHT_MODEL_AMBIENT,ambientColor);
 	glEnable(GL_LIGHT0);
@@ -131,23 +132,23 @@ void OpenGLRenderingEngine::render(
 	glDisable(GL_LIGHTING);
 	
 	glPushMatrix();
-	glTranslatef(lightPos[0],lightPos[1],lightPos[2]);
+	glTranslatef(Light_position[0],Light_position[1],Light_position[2]);
 	glColor3f(1.0,1.0,1.0);
 	glutSolidSphere(3,10,10);
 	glPopMatrix();	
 	
-	if (drawGeometricalModel)
+	if (Body_geometrical_model)
 	{
-		if (castShadow)
+		if (Cast_shadows)
 		{	
 			
-			if (useFastShadowVolume)
-				renderSceneUsingFastShadowVolumes(rootBody,lightPos);
+			if (Fast_shadow_volume)
+				renderSceneUsingFastShadowVolumes(rootBody,Light_position);
 			else
-				renderSceneUsingShadowVolumes(rootBody,lightPos);
+				renderSceneUsingShadowVolumes(rootBody,Light_position);
 				
 			// draw transparent shadow volume
-			if (drawShadowVolumes)
+			if (Shadow_volumes)
 			{
 				glAlphaFunc(GL_GREATER, 1.0f/255.0f);
 				glEnable(GL_ALPHA_TEST);
@@ -160,10 +161,10 @@ void OpenGLRenderingEngine::render(
 				glEnable(GL_CULL_FACE);
 			
 				glCullFace(GL_FRONT);
-				renderShadowVolumes(rootBody,lightPos);
+				renderShadowVolumes(rootBody,Light_position);
 				
 				glCullFace(GL_BACK);
-				renderShadowVolumes(rootBody,lightPos);
+				renderShadowVolumes(rootBody,Light_position);
 				
 				glEnable(GL_DEPTH_TEST);
 				glDisable(GL_BLEND);
@@ -178,23 +179,23 @@ void OpenGLRenderingEngine::render(
 		}
 	}
 	
-	if (drawState)
+	if (Body_state)
 		renderState(rootBody);
 	
-	if (drawBoundingVolume)
+	if (Body_bounding_volume)
 		renderBoundingVolume(rootBody);
 	
-	if (drawInteractingGeometry)
+	if (Body_interacting_geom)
 	{
 		glEnable(GL_LIGHTING);
 		glEnable(GL_CULL_FACE);
 		renderInteractingGeometry(rootBody);
 	}
 
-	if (drawInteractionGeometry)
+	if (Interaction_geometry)
 		renderInteractionGeometry(rootBody);
 	
-	if (drawInteractionPhysics)
+	if (Interaction_physics)
 		renderInteractionPhysics(rootBody);
 	
 
@@ -229,7 +230,7 @@ void OpenGLRenderingEngine::render(
 }
 
 
-void OpenGLRenderingEngine::renderSceneUsingShadowVolumes(const shared_ptr<MetaBody>& rootBody,Vector3r lightPos)
+void OpenGLRenderingEngine::renderSceneUsingShadowVolumes(const shared_ptr<MetaBody>& rootBody,Vector3r Light_position)
 {
 	glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
 	glEnable(GL_CULL_FACE);
@@ -244,11 +245,11 @@ void OpenGLRenderingEngine::renderSceneUsingShadowVolumes(const shared_ptr<MetaB
 
 	glStencilOp(GL_KEEP, GL_KEEP, GL_INCR);
 	glCullFace(GL_BACK);  /* increment using front face of shadow volume */
-	renderShadowVolumes(rootBody,lightPos);
+	renderShadowVolumes(rootBody,Light_position);
 	
 	glStencilOp(GL_KEEP, GL_KEEP, GL_DECR);
 	glCullFace(GL_FRONT);  /* increment using front face of shadow volume */
-	renderShadowVolumes(rootBody,lightPos);	
+	renderShadowVolumes(rootBody,Light_position);	
 			
 	glDepthMask(GL_TRUE);
 	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
@@ -274,7 +275,7 @@ void OpenGLRenderingEngine::renderSceneUsingShadowVolumes(const shared_ptr<MetaB
 }
 
 
-void OpenGLRenderingEngine::renderSceneUsingFastShadowVolumes(const shared_ptr<MetaBody>& rootBody,Vector3r lightPos)
+void OpenGLRenderingEngine::renderSceneUsingFastShadowVolumes(const shared_ptr<MetaBody>& rootBody,Vector3r Light_position)
 {
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_NORMALIZE);
@@ -289,11 +290,11 @@ void OpenGLRenderingEngine::renderSceneUsingFastShadowVolumes(const shared_ptr<M
 
 	glStencilOp(GL_KEEP, GL_KEEP, GL_INCR);
 	glCullFace(GL_BACK);  /* increment using front face of shadow volume */
-	renderShadowVolumes(rootBody,lightPos);
+	renderShadowVolumes(rootBody,Light_position);
 	
 	glStencilOp(GL_KEEP, GL_KEEP, GL_DECR);
 	glCullFace(GL_FRONT);  /* increment using front face of shadow volume */
-	renderShadowVolumes(rootBody,lightPos);	
+	renderShadowVolumes(rootBody,Light_position);	
 	
 	// Need to do that to remove shadow that are not on object but if glClear is 0
 /*	glStencilOp(GL_KEEP, GL_KEEP, GL_INCR);	
@@ -367,7 +368,7 @@ void OpenGLRenderingEngine::renderSceneUsingFastShadowVolumes(const shared_ptr<M
 }	
 
 
-void OpenGLRenderingEngine::renderShadowVolumes(const shared_ptr<MetaBody>& rootBody,Vector3r lightPos)
+void OpenGLRenderingEngine::renderShadowVolumes(const shared_ptr<MetaBody>& rootBody,Vector3r Light_position)
 {	
 	if (!rootBody->geometricalModel)
 	{
@@ -375,12 +376,12 @@ void OpenGLRenderingEngine::renderShadowVolumes(const shared_ptr<MetaBody>& root
 		BodyContainer::iterator biEnd = rootBody->bodies->end();
 		for(; bi!=biEnd ; ++bi )
 		{
-			if ((*bi)->geometricalModel->shadowCaster && ( ((*bi)->getGroupMask() & drawMask) || (*bi)->getGroupMask()==0 ))
-				shadowVolumeDispatcher((*bi)->geometricalModel,(*bi)->physicalParameters,lightPos);
+			if ((*bi)->geometricalModel->shadowCaster && ( ((*bi)->getGroupMask() & Draw_mask) || (*bi)->getGroupMask()==0 ))
+				shadowVolumeDispatcher((*bi)->geometricalModel,(*bi)->physicalParameters,Light_position);
 		}
 	}
 	else
-		shadowVolumeDispatcher(rootBody->geometricalModel,rootBody->physicalParameters,lightPos);
+		shadowVolumeDispatcher(rootBody->geometricalModel,rootBody->physicalParameters,Light_position);
 }
 
 
@@ -389,13 +390,13 @@ void OpenGLRenderingEngine::renderGeometricalModel(const shared_ptr<MetaBody>& r
 	shared_ptr<BodyContainer>& bodies = rootBody->bodies;
 	bool done=false;
 
-	if((rootBody->geometricalModel || drawInside) && drawInside)
+	if((rootBody->geometricalModel || Draw_inside) && Draw_inside)
 	{
 		BodyContainer::iterator bi    = bodies->begin();
 		BodyContainer::iterator biEnd = bodies->end();
 		for( ; bi!=biEnd ; ++bi)
 		{
-			if((*bi)->geometricalModel && ( ((*bi)->getGroupMask() & drawMask) || (*bi)->getGroupMask()==0 ))
+			if((*bi)->geometricalModel && ( ((*bi)->getGroupMask() & Draw_mask) || (*bi)->getGroupMask()==0 ))
 			{
 				glPushMatrix();
 				Se3r& se3 = (*bi)->physicalParameters->se3;
@@ -415,7 +416,7 @@ void OpenGLRenderingEngine::renderGeometricalModel(const shared_ptr<MetaBody>& r
 					glLightModelfv(GL_LIGHT_MODEL_AMBIENT,ambientColor);
 				}
 				// FIXME FIXME - in fact it is a 1D dispatcher
-				geometricalModelDispatcher((*bi)->geometricalModel,(*bi)->physicalParameters,drawWireFrame);
+				geometricalModelDispatcher((*bi)->geometricalModel,(*bi)->physicalParameters,Body_wire);
 				if(current_selection == (*bi)->getId())
 					done = true;
 				glPopMatrix();
@@ -424,7 +425,7 @@ void OpenGLRenderingEngine::renderGeometricalModel(const shared_ptr<MetaBody>& r
 	}
 	
 	if(rootBody->geometricalModel)
-		geometricalModelDispatcher(rootBody->geometricalModel,rootBody->physicalParameters,drawWireFrame);
+		geometricalModelDispatcher(rootBody->geometricalModel,rootBody->physicalParameters,Body_wire);
 }
 
 
@@ -439,7 +440,7 @@ void OpenGLRenderingEngine::renderInteractionGeometry(const shared_ptr<MetaBody>
 		{
 			glPushMatrix();
 			if((*bi)->interactionGeometry)
-				interactionGeometryDispatcher((*bi)->interactionGeometry,(*bi),(*(rootBody->bodies))[(*bi)->getId1()],(*(rootBody->bodies))[(*bi)->getId2()],drawWireFrame);
+				interactionGeometryDispatcher((*bi)->interactionGeometry,(*bi),(*(rootBody->bodies))[(*bi)->getId1()],(*(rootBody->bodies))[(*bi)->getId2()],Interaction_wire);
 			glPopMatrix();
 		}
 	}
@@ -453,7 +454,7 @@ void OpenGLRenderingEngine::renderInteractionGeometry(const shared_ptr<MetaBody>
 		{
 			glPushMatrix();
 			if((*bi)->interactionGeometry)
-				interactionGeometryDispatcher((*bi)->interactionGeometry,(*bi),(*(rootBody->bodies))[(*bi)->getId1()],(*(rootBody->bodies))[(*bi)->getId2()],drawWireFrame);
+				interactionGeometryDispatcher((*bi)->interactionGeometry,(*bi),(*(rootBody->bodies))[(*bi)->getId1()],(*(rootBody->bodies))[(*bi)->getId2()],Interaction_wire);
 			glPopMatrix();
 		}
 	}
@@ -471,7 +472,7 @@ void OpenGLRenderingEngine::renderInteractionPhysics(const shared_ptr<MetaBody>&
 		{
 			glPushMatrix();
 			if((*bi)->interactionPhysics)
-				interactionPhysicsDispatcher((*bi)->interactionPhysics,(*bi),(*(rootBody->bodies))[(*bi)->getId1()],(*(rootBody->bodies))[(*bi)->getId2()],drawWireFrame);
+				interactionPhysicsDispatcher((*bi)->interactionPhysics,(*bi),(*(rootBody->bodies))[(*bi)->getId1()],(*(rootBody->bodies))[(*bi)->getId2()],Interaction_wire);
 			glPopMatrix();
 		}
 	}
@@ -485,7 +486,7 @@ void OpenGLRenderingEngine::renderInteractionPhysics(const shared_ptr<MetaBody>&
 		{
 			glPushMatrix();
 			if((*bi)->interactionPhysics)
-				interactionPhysicsDispatcher((*bi)->interactionPhysics,(*bi),(*(rootBody->bodies))[(*bi)->getId1()],(*(rootBody->bodies))[(*bi)->getId2()],drawWireFrame);
+				interactionPhysicsDispatcher((*bi)->interactionPhysics,(*bi),(*(rootBody->bodies))[(*bi)->getId1()],(*(rootBody->bodies))[(*bi)->getId2()],Interaction_wire);
 			glPopMatrix();
 		}
 	}
@@ -499,7 +500,7 @@ void OpenGLRenderingEngine::renderState(const shared_ptr<MetaBody>& rootBody)
 	for( ; bi!=biEnd ; ++bi)
 	{
 		glPushMatrix();
-		if((*bi)->physicalParameters && ( ((*bi)->getGroupMask() & drawMask ) || (*bi)->getGroupMask()==0 ))
+		if((*bi)->physicalParameters && ( ((*bi)->getGroupMask() & Draw_mask ) || (*bi)->getGroupMask()==0 ))
 			stateDispatcher((*bi)->physicalParameters);
 		glPopMatrix();
 	}
@@ -518,7 +519,7 @@ void OpenGLRenderingEngine::renderBoundingVolume(const shared_ptr<MetaBody>& roo
 	for( ; bi!=biEnd ; ++bi)
 	{
 		glPushMatrix();
-		if((*bi)->boundingVolume && ( ((*bi)->getGroupMask() & drawMask) || (*bi)->getGroupMask()==0 ))
+		if((*bi)->boundingVolume && ( ((*bi)->getGroupMask() & Draw_mask) || (*bi)->getGroupMask()==0 ))
 			boundingVolumeDispatcher((*bi)->boundingVolume);
 		glPopMatrix();
 	}
@@ -544,7 +545,7 @@ void OpenGLRenderingEngine::renderInteractingGeometry(const shared_ptr<MetaBody>
 		se3.orientation.ToAxisAngle(axis,angle);	
 		glTranslatef(se3.position[0],se3.position[1],se3.position[2]);
 		glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
-		if((*bi)->interactingGeometry && ( ((*bi)->getGroupMask() & drawMask) || (*bi)->getGroupMask()==0 ))
+		if((*bi)->interactingGeometry && ( ((*bi)->getGroupMask() & Draw_mask) || (*bi)->getGroupMask()==0 ))
 			interactingGeometryDispatcher((*bi)->interactingGeometry,(*bi)->physicalParameters);
 		glPopMatrix();
 	}
@@ -558,26 +559,26 @@ void OpenGLRenderingEngine::renderInteractingGeometry(const shared_ptr<MetaBody>
 
 void OpenGLRenderingEngine::registerAttributes()
 {
-	REGISTER_ATTRIBUTE(drawState);
-	REGISTER_ATTRIBUTE(drawBoundingVolume);
-	REGISTER_ATTRIBUTE(drawInteractingGeometry);
-	REGISTER_ATTRIBUTE(drawGeometricalModel);
+	REGISTER_ATTRIBUTE(Light_position);
+	REGISTER_ATTRIBUTE(Background_color);
 	
-	REGISTER_ATTRIBUTE(drawMask);
-	
-	REGISTER_ATTRIBUTE(drawWireFrame);
+	REGISTER_ATTRIBUTE(Body_wire);
 
-	REGISTER_ATTRIBUTE(drawInteractionGeometry);
-	REGISTER_ATTRIBUTE(drawInteractionPhysics);
+	REGISTER_ATTRIBUTE(Body_state);
+	REGISTER_ATTRIBUTE(Body_bounding_volume);
+	REGISTER_ATTRIBUTE(Body_interacting_geom);
+	REGISTER_ATTRIBUTE(Body_geometrical_model);
 	
-	REGISTER_ATTRIBUTE(lightPos);
-	REGISTER_ATTRIBUTE(backGroundColor);
+	REGISTER_ATTRIBUTE(Interaction_wire);
+	REGISTER_ATTRIBUTE(Interaction_geometry);
+	REGISTER_ATTRIBUTE(Interaction_physics);
 	
-	REGISTER_ATTRIBUTE(drawInside);
+	REGISTER_ATTRIBUTE(Draw_mask);
+	REGISTER_ATTRIBUTE(Draw_inside);
 
-	REGISTER_ATTRIBUTE(castShadow);
-	REGISTER_ATTRIBUTE(drawShadowVolumes);
-	REGISTER_ATTRIBUTE(useFastShadowVolume);	
+	REGISTER_ATTRIBUTE(Cast_shadows);
+	REGISTER_ATTRIBUTE(Shadow_volumes);
+	REGISTER_ATTRIBUTE(Fast_shadow_volume);	
 }
 
 

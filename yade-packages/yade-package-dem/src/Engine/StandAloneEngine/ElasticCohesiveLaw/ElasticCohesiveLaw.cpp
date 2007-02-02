@@ -64,8 +64,8 @@ void ElasticCohesiveLaw::action(Body* body)
 			if( !( (*bodies)[id1]->getGroupMask() & (*bodies)[id2]->getGroupMask() & sdecGroupMask) )
 				continue; // skip other groups, BTW: this is example of a good usage of 'continue' keyword
 	
-			BodyMacroParameters* de1				= dynamic_cast<BodyMacroParameters*>((*bodies)[id1]->physicalParameters.get());
-			BodyMacroParameters* de2				= dynamic_cast<BodyMacroParameters*>((*bodies)[id2]->physicalParameters.get());
+			BodyMacroParameters* de1			= dynamic_cast<BodyMacroParameters*>((*bodies)[id1]->physicalParameters.get());
+			BodyMacroParameters* de2			= dynamic_cast<BodyMacroParameters*>((*bodies)[id2]->physicalParameters.get());
 			SDECLinkPhysics* currentContactPhysics		= dynamic_cast<SDECLinkPhysics*>(contact2->interactionPhysics.get());
 			SDECLinkGeometry* currentContactGeometry	= dynamic_cast<SDECLinkGeometry*>(contact2->interactionGeometry.get());
 	

@@ -63,8 +63,8 @@ void GeometricalModelForceColorizer::action(Body * body)
 			unsigned int i = body -> getId();
 			Vector3r force = dynamic_cast<Force*>(ncb->physicalActions->find( i , actionForce->getClassIndex() ) . get() )->force;
 
-			gm->diffuseColor[0] = (force[0]-min)/(max-min);
-			gm->diffuseColor[1] = (force[1]-min)/(max-min);
+			gm->diffuseColor[0] = (force[2]-min)/(max-min);
+			gm->diffuseColor[1] = (force[2]-min)/(max-min);
 			gm->diffuseColor[2] = (force[2]-min)/(max-min);
 
 		/*

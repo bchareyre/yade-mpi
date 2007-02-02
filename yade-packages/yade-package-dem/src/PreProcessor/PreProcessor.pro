@@ -9,7 +9,8 @@ SUBDIRS += Funnel \
            SDECSpheresPlane \
            SDECMovingWall \
            TetrahedronsTest \
-	   TriaxialTest
+	   TriaxialTest \
+	   ThreePointBending
 	   
 
 CONFIG += debug \

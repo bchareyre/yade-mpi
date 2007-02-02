@@ -108,6 +108,10 @@ void GLViewer::keyPressEvent(QKeyEvent *e)
 			camera()->setType(qglviewer::Camera::ORTHOGRAPHIC);
 		updateGL();
 	}
+	else if( e->key()==Qt::Key_O )
+		camera()->setFieldOfView(camera()->fieldOfView()*0.9), updateGL();
+	else if( e->key()==Qt::Key_P )
+		camera()->setFieldOfView(camera()->fieldOfView()*1.1), updateGL();
 
 	else if( e->key()!=Qt::Key_Escape && e->key()!=Qt::Key_Space )
 		QGLViewer::keyPressEvent(e);

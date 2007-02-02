@@ -24,24 +24,25 @@
 class OpenGLRenderingEngine : public RenderingEngine
 {	
 	public : // FIXME - why public ?
-		Vector3r	 lightPos
-				,backGroundColor;
+		Vector3r	 Light_position
+				,Background_color;
 
-		bool		 drawState
-				,drawBoundingVolume
-				,drawInteractingGeometry
-				,drawGeometricalModel
-				,castShadow
-				,drawShadowVolumes
-				,useFastShadowVolume
-				,drawWireFrame
-				,drawInside
-				,drawInteractionGeometry
-				,drawInteractionPhysics
+		bool		 Body_state
+				,Body_bounding_volume
+				,Body_interacting_geom
+				,Body_geometrical_model
+				,Cast_shadows
+				,Shadow_volumes
+				,Fast_shadow_volume
+				,Body_wire
+				,Interaction_wire
+				,Draw_inside
+				,Interaction_geometry
+				,Interaction_physics
 		
 				,needInit;
 		int		 current_selection
-				,drawMask;
+				,Draw_mask;
 
 	private :
 		DynLibDispatcher< InteractionGeometry , GLDrawInteractionGeometryFunctor, void , TYPELIST_5(const shared_ptr<InteractionGeometry>&, const shared_ptr<Interaction>& , const shared_ptr<Body>&, const shared_ptr<Body>&, bool) > interactionGeometryDispatcher;
@@ -85,9 +86,9 @@ class OpenGLRenderingEngine : public RenderingEngine
 		void renderState(const shared_ptr<MetaBody>& rootBody);
 		void renderBoundingVolume(const shared_ptr<MetaBody>& rootBody);
 		void renderInteractingGeometry(const shared_ptr<MetaBody>& rootBody);
-		void renderShadowVolumes(const shared_ptr<MetaBody>& rootBody,Vector3r lightPos);
-		void renderSceneUsingShadowVolumes(const shared_ptr<MetaBody>& rootBody,Vector3r lightPos);
-		void renderSceneUsingFastShadowVolumes(const shared_ptr<MetaBody>& rootBody,Vector3r lightPos);
+		void renderShadowVolumes(const shared_ptr<MetaBody>& rootBody,Vector3r Light_position);
+		void renderSceneUsingShadowVolumes(const shared_ptr<MetaBody>& rootBody,Vector3r Light_position);
+		void renderSceneUsingFastShadowVolumes(const shared_ptr<MetaBody>& rootBody,Vector3r Light_position);
 	
 	protected :
 		void postProcessAttributes(bool deserializing);

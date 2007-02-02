@@ -6,36 +6,37 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "GLDrawSpheresContactGeometry.hpp"
-#include "SpheresContactGeometry.hpp"
+#include "GLDrawSDECLinkGeometry.hpp"
+#include "SDECLinkGeometry.hpp"
 #include "SimpleElasticInteraction.hpp"
-#include "ElasticContactInteraction.hpp"
+#include "SDECLinkPhysics.hpp"
 
 #include <yade/yade-lib-opengl/OpenGLWrapper.hpp>
 
-GLDrawSpheresContactGeometry::GLDrawSpheresContactGeometry() : midMax(0), forceMax(0)
+GLDrawSDECLinkGeometry::GLDrawSDECLinkGeometry() : midMax(0), forceMax(0)
 {
 }
 
-void GLDrawSpheresContactGeometry::go(
+void GLDrawSDECLinkGeometry::go(
 		const shared_ptr<InteractionGeometry>& ig,
 		const shared_ptr<Interaction>& ip,
 		const shared_ptr<Body>& b1,
 		const shared_ptr<Body>& b2,
 		bool wireFrame)
 {
-	SpheresContactGeometry*    sc = static_cast<SpheresContactGeometry*>(ig.get());
-	ElasticContactInteraction* el = static_cast<ElasticContactInteraction*>(ip->interactionPhysics.get());
-	
+	SDECLinkGeometry*	sc = static_cast<SDECLinkGeometry*>(ig.get());
+	SDECLinkPhysics*	el = static_cast<SDECLinkPhysics*>(ip->interactionPhysics.get());
+
+	Vector3r contactPoint = (b1->physicalParameters->se3.position + b2->physicalParameters->se3.position)*0.5 ;
 
 	if(wireFrame)
 	{
 		midMax=0;
 		forceMax=0;
 
-		glTranslatev(sc->contactPoint);
+		glTranslatev( contactPoint );
 		glBegin(GL_LINES);
-			glColor3(0.0,1.0,0.0);
+			glColor3(0.2,0.2,0.9);
 			glVertex3(0.0,0.0,0.0);
 			glVertex3v(-1.0*(sc->normal*sc->radius1));
 			glVertex3(0.0,0.0,0.0);
@@ -54,7 +55,7 @@ void GLDrawSpheresContactGeometry::go(
 		Real dif = (sc->radius1 - sc->radius2)*0.5;
 		midMax = std::max(mid,midMax);
 
-		glTranslatev(sc->contactPoint-(sc->normal*dif));
+		glTranslatev( contactPoint-(sc->normal*dif) );
 		glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
 		
 	// FIXME - we need a way to give parameters from outside, again.... so curerntly this scale is hardcoded here
@@ -68,7 +69,7 @@ void GLDrawSpheresContactGeometry::go(
 		}
 		else
 			glScalef(mid,mid*0.05,mid*0.05);
-		glColor3(0.5,0.5,0.5);
+		glColor3(0.2,0.2,0.7);
 	// ///////////
 
 		glEnable(GL_LIGHTING);

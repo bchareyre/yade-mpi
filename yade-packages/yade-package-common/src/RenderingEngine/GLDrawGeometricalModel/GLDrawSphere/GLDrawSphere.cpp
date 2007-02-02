@@ -11,11 +11,11 @@
 #include <yade/yade-lib-opengl/OpenGLWrapper.hpp>
 
 
-int GLDrawSphere::glSphereList=-1;
-int GLDrawSphere::glWiredSphereList=-1;
+//int GLDrawSphere::glSphereList=-1;
+//int GLDrawSphere::glWiredSphereList=-1;
 
-vector<Vector3r> GLDrawSphere::vertices;
-vector<Vector3r> GLDrawSphere::faces;
+//vector<Vector3r> GLDrawSphere::vertices;
+//vector<Vector3r> GLDrawSphere::faces;
 
 //void drawString(string str,int x,int y,float * c)
 //{
@@ -27,11 +27,12 @@ vector<Vector3r> GLDrawSphere::faces;
 //      glPopMatrix();
 //}
 
+GLDrawSphere::GLDrawSphere() : first(true), glSphereList(-1), glWiredSphereList(-1)
+{
+};
 
 void GLDrawSphere::go(const shared_ptr<GeometricalModel>& gm, const shared_ptr<PhysicalParameters>& ph,bool wire)
 {
-        static bool first=true;
-        
 	if (first)
 	{
 		Real X = 0.525731112119133606;
@@ -94,8 +95,51 @@ void GLDrawSphere::go(const shared_ptr<GeometricalModel>& gm, const shared_ptr<P
 		//glScalef(radius,radius,radius);
                 //glCallList(glWiredSphereList);
 
-                glutWireSphere(radius,4,4);
-                
+//                glutWireSphere(radius,4,4);
+
+		///////////////////////
+		// draw a circle from a bunch of short lines
+		//
+		// FACING the camera !!
+		///////////////////////
+		//
+			glPushMatrix();
+
+			float modelview[16];
+			int i,j;
+			glGetFloatv(GL_MODELVIEW_MATRIX , modelview);
+			// undo all rotations
+			// beware all scaling is lost as well 
+			for( i=0; i<3; i++ ) 
+				for( j=0; j<3; j++ ) {
+					if ( i==j )
+						modelview[i*4+j] = 1.0;
+					else
+						modelview[i*4+j] = 0.0;
+				}
+			glLoadMatrixf(modelview);
+
+
+		
+		glDisable(GL_LIGHTING);
+		float vectorY1=radius,startY=vectorY1;
+		float vectorX1=0,startX=vectorX1;
+		glBegin(GL_LINE_STRIP);			
+		for(float angle=0.0f ; angle <= (2.0f*3.14159) ; angle+=0.31f)
+		{		
+			float vectorX=(radius*(float)sin((double)angle));
+			float vectorY=(radius*(float)cos((double)angle));		
+			glVertex2d(vectorX1,vectorY1);
+			vectorY1=vectorY;
+			vectorX1=vectorX;			
+		}
+		glVertex2d(startX,startY);
+		glEnd();
+
+			glPopMatrix();
+
+		/////////////////////
+		
 /////////////////////////// FIXME - display coordinates (stupid place!!)
 //              glPushMatrix();
 //              glRasterPos2i(0,0);
@@ -123,7 +167,11 @@ void GLDrawSphere::subdivideTriangle(Vector3r& v1,Vector3r& v2,Vector3r& v3, int
 		Vector3r v = (v1+v2+v3)/3.0;
 		Real angle = atan(v[2]/v[0])/v.Length();
 
-		// FIXME - another parameter to GLDraw* to allow to disable that stripe on the sphere
+	////////////////////////////
+	//
+	// FIXME - another parameter to GLDraw* to allow to disable that stripe on the sphere
+	//
+	// BEGIN mark
 		GLfloat matAmbient[4];
 
 		if (angle>-Mathr::PI/6.0 && angle<=Mathr::PI/6.0)
@@ -140,9 +188,12 @@ void GLDrawSphere::subdivideTriangle(Vector3r& v1,Vector3r& v2,Vector3r& v3, int
 			matAmbient[2] = 0.0;
 			matAmbient[3] = 0.0;
 		}
-
+	
 		glMaterialfv(GL_FRONT_AND_BACK,GL_SPECULAR,matAmbient);
-		
+	// END mark
+	////////////////////////////
+	
+	
 		glBegin(GL_TRIANGLES);
 			glNormal3v(v3);
 			glVertex3v(v3);
