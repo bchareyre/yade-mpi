@@ -15,18 +15,20 @@
 #include <qcombobox.h>
 #include <qlineedit.h>
 #include <qprogressbar.h>
+#include <qcheckbox.h>
 #include <yade/yade-lib-factory/ClassFactory.hpp>
 #include <yade/yade-core/FileGenerator.hpp>
 #include <yade/yade-core/Omega.hpp>
 #include <boost/filesystem/convenience.hpp>
 #include <boost/filesystem/operations.hpp>
 #include "MessageDialog.hpp"
+#include "YadeQtMainWindow.hpp"
 #include <yade/yade-core/ThreadRunner.hpp>
 
 QtFileGenerator::QtFileGenerator ( QWidget * parent , const char * name)
 	: QtFileGeneratorController(parent,name)
-	, m_worker(shared_ptr<FileGenerator>())
 	, m_runner(shared_ptr<ThreadRunner>())
+	, m_worker(shared_ptr<FileGenerator>())
 {
 	QSize s = size();
 	setMinimumSize(s);
@@ -217,6 +219,16 @@ void QtFileGenerator::timerEvent( QTimerEvent* )
 		killTimers();
 		progressBar1->reset();
 		textLabel1->setText("waiting for orders");
+
+		/* now, launch the generated simulation if
+		 * 1. it is desired,
+		 * 2. generation was successful (unreliable check: generator returns string; we just have a look if the filename specified exists or not),
+		 * 3. no simulation is open already (by checking Omega's simulationFileName) */
+		if(cbOpenAutomatically->isChecked() && filesystem::exists(filesystem::path((const char*)(leOutputFileName->text()))) && Omega::instance().getSimulationFileName()==""){
+			QWidget* qw=this; while (qw->parentWidget()) qw=qw->parentWidget(); // find toplevel widget - which should be yade's main window
+			Omega::instance().setSimulationFileName((const char*)(leOutputFileName->text()));
+			(dynamic_cast<YadeQtMainWindow*>(qw))->fileNewSimulation();
+		}
 	}
 }
 

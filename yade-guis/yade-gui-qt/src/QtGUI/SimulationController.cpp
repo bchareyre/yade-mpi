@@ -199,6 +199,7 @@ void SimulationController::loadSimulationFromFileName(const std::string& fileNam
 		catch(SerializableError& e) // catching it...
 		{
 			Omega::instance().freeRootBody();
+			Omega::instance().setSimulationFileName("");
 			shared_ptr<MessageDialog> md = shared_ptr<MessageDialog>(new MessageDialog(e.what(),this->parentWidget()->parentWidget()));
 			md->exec(); 
 			pbStartSimulation->setDisabled(true);
@@ -209,6 +210,7 @@ void SimulationController::loadSimulationFromFileName(const std::string& fileNam
 		catch(yadeError& e)
 		{
 			Omega::instance().freeRootBody();
+			Omega::instance().setSimulationFileName("");
 			shared_ptr<MessageDialog> md = shared_ptr<MessageDialog>(new MessageDialog(e.what(),this->parentWidget()->parentWidget()));
 			md->exec(); 
 			pbStartSimulation->setDisabled(true);

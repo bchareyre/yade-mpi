@@ -49,7 +49,7 @@ class QtFileGenerator : public QtFileGeneratorController, public Factorable
 	protected : 
 		virtual void closeEvent(QCloseEvent *evt);
                 virtual void timerEvent(QTimerEvent* );
-
+	
 	REGISTER_CLASS_NAME(QtFileGenerator);
 	REGISTER_BASE_CLASS_NAME(Factorable);
 

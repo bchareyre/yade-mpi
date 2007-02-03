@@ -167,6 +167,7 @@ void YadeQtMainWindow::closeSimulationControllerEvent()
 	delete simulationController;
 	simulationController = 0;
 	fileNewSimulationAction->setEnabled(true);
+	Omega::instance().setSimulationFileName("");
 }
 
 
