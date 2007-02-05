@@ -17,7 +17,7 @@
 class GLDrawInteractingMyTetrahedron : public GLDrawInteractingGeometryFunctor
 {	
 	public :
-		virtual void go(const shared_ptr<InteractingGeometry>&, const shared_ptr<PhysicalParameters>&);
+		virtual void go(const shared_ptr<InteractingGeometry>&, const shared_ptr<PhysicalParameters>&,bool);
 
 	RENDERS(InteractingMyTetrahedron);
 	REGISTER_CLASS_NAME(GLDrawInteractingMyTetrahedron);

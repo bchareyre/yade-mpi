@@ -69,7 +69,10 @@ void GLDrawSDECLinkGeometry::go(
 		}
 		else
 			glScalef(mid,mid*0.05,mid*0.05);
-		glColor3(0.2,0.2,0.7);
+		if( sc->normal.Dot(el->normalForce) < 0 )
+			glColor3(0.5,0.5,0.9);
+		else
+			glColor3(0.9,0.5,0.5);
 	// ///////////
 
 		glEnable(GL_LIGHTING);

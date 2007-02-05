@@ -5,7 +5,8 @@ error( "YADE_QMAKE_PATH internal qmake variable is not set, you should run for e
 
 SUBDIRS += GLDrawLineSegment \
            GLDrawLatticeBeamState \
-	   GLDrawLatticeSetGeometry
+	   GLDrawLatticeSetGeometry \
+	   GLDrawLatticeInteractingGeometry
 CONFIG += debug \
           thread \
 warn_on

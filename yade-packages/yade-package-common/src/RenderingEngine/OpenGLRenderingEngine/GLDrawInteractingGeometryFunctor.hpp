@@ -20,7 +20,7 @@
 class GLDrawInteractingGeometryFunctor :	public EngineUnit1D
 						<
 		 					void ,
-		 					TYPELIST_2(const shared_ptr<InteractingGeometry>&, const shared_ptr<PhysicalParameters>&) 
+		 					TYPELIST_3(const shared_ptr<InteractingGeometry>&, const shared_ptr<PhysicalParameters>&,bool) 
 						>
 {
 	public :

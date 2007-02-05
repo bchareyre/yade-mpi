@@ -95,7 +95,7 @@ void GLViewer::keyPressEvent(QKeyEvent *e)
 		Omega::instance().isoThick+=0.05, updateGL();
 
 	else if( e->key()==Qt::Key_End )
-		Omega::instance().isoSec=std::max(4, Omega::instance().isoSec-1), updateGL();
+		Omega::instance().isoSec=std::max(1, Omega::instance().isoSec-1), updateGL();
 	else if( e->key()==Qt::Key_Home )
 		Omega::instance().isoSec+=1, updateGL();
 // FIXME END

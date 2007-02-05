@@ -19,6 +19,7 @@ LIBS += -lLineSegment \
         -lInteractionVecSet \
         -lBodyRedirectionVector \
         -lMetaInteractingGeometry \
+        -lLatticeInteractingGeometry \
         -lGeometricalModelMetaEngine \
         -lInteractionPhysicsMetaEngine \
         -lBoundingVolumeMetaEngine \
@@ -44,6 +45,7 @@ INCLUDEPATH += $${YADE_QMAKE_PATH}/include/ \
                ../../Engine/StandAloneEngine/MeasurePoisson \
                ../../Engine/StandAloneEngine/NonLocalInitializer \
                ../../DataClass/PhysicalParameters/LatticeSetParameters \
+               ../../DataClass/InteractingGeometry/LatticeInteractingGeometry \
                ../../DataClass/PhysicalParameters/LatticeNodeParameters \
                ../../DataClass/PhysicalParameters/LatticeBeamParameters \
                ../../DataClass/InteractionPhysics/LatticeBeamAngularSpring \

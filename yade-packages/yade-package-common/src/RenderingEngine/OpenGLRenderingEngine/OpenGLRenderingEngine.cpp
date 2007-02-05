@@ -546,13 +546,13 @@ void OpenGLRenderingEngine::renderInteractingGeometry(const shared_ptr<MetaBody>
 		glTranslatef(se3.position[0],se3.position[1],se3.position[2]);
 		glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
 		if((*bi)->interactingGeometry && ( ((*bi)->getGroupMask() & Draw_mask) || (*bi)->getGroupMask()==0 ))
-			interactingGeometryDispatcher((*bi)->interactingGeometry,(*bi)->physicalParameters);
+			interactingGeometryDispatcher((*bi)->interactingGeometry,(*bi)->physicalParameters,Body_wire);
 		glPopMatrix();
 	}
 	
 	glPushMatrix();
 	if(rootBody->interactingGeometry)
-		interactingGeometryDispatcher(rootBody->interactingGeometry,rootBody->physicalParameters);
+		interactingGeometryDispatcher(rootBody->interactingGeometry,rootBody->physicalParameters,Body_wire);
 	glPopMatrix();
 }
 

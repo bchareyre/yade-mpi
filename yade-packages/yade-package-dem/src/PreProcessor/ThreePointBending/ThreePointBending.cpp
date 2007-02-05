@@ -188,6 +188,7 @@ string ThreePointBending::generate()
 				bm->young		= sphereYoungModulus;
 				bm->poisson		= spherePoissonRatio;
 				bm->frictionAngle	= sphereFrictionDeg * Mathr::PI/180.0;
+				bm->mass		/= 1000.0; // FIXME !!!
 			}
 		}
 	}

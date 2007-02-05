@@ -125,7 +125,7 @@ class FunctorWrapper //: public Serializable // FIXME functor shouldn't be seria
 			+ "8. " + typeid(Parm4).name() + "\n"
 			+ "9. " + typeid(Parm4).name() + "\n"
 			+ "10. " + typeid(Parm4).name() + "\n"
-			+ "number of types used in the call: " + boost::lexical_cast<string>(n);
+			+ "number of types used in the call: " + boost::lexical_cast<string>(n) + "\n\n";
 			cerr << err.c_str();
 			throw MultiMethodsBadVirtualCall(err.c_str());
 		}

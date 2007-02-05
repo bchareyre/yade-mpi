@@ -10,6 +10,10 @@
 #include "LineSegment.hpp"
 #include <yade/yade-lib-opengl/OpenGLWrapper.hpp>
 
+GLDrawLineSegment::GLDrawLineSegment() : maxLen(0)
+{
+};
+
 void GLDrawLineSegment::go(const shared_ptr<GeometricalModel>& gm, const shared_ptr<PhysicalParameters>&,bool wire)
 {
 	// FIXME : check that : one of those 2 lines are useless
@@ -17,15 +21,19 @@ void GLDrawLineSegment::go(const shared_ptr<GeometricalModel>& gm, const shared_
 	glColor3v(gm->diffuseColor);
 	
 	Real len = (static_cast<LineSegment*>(gm.get()))->length;
+	maxLen = std::max(len,maxLen);
 
 	// FIXME - there must be a way to tell this from outside
 //	glScalef(len,0.030,0.030); // it's a box, not a line. looks better :)
 //	glScalef(len,0.010,0.010); // it's a box, not a line. looks better :)
 //	glScalef(len,0.001,0.001); // it's a box, not a line. looks better :)
-	glScalef(len,0.00007,0.00007); // it's a box, not a line. looks better :)
+//	glScalef(len,0.00007,0.00007); // it's a box, not a line. looks better :)
+	glScalef(len,maxLen*0.07,maxLen*0.07); // it's a box, not a line. looks better :)
 
 	if (gm->wire || wire)
 	{
+		maxLen = 0;
+
 		glBegin(GL_LINES);
 		glDisable(GL_LIGHTING);
 

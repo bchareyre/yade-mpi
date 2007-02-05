@@ -9,7 +9,7 @@
 #include "InteractingMyTetrahedron.hpp"
 #include <yade/yade-lib-opengl/OpenGLWrapper.hpp>
 
-void GLDrawInteractingMyTetrahedron::go(const shared_ptr<InteractingGeometry>& cm, const shared_ptr<PhysicalParameters>& )
+void GLDrawInteractingMyTetrahedron::go(const shared_ptr<InteractingGeometry>& cm, const shared_ptr<PhysicalParameters>& ,bool)
 {
 	glMaterialv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, cm->diffuseColor);
 	glColor3v(cm->diffuseColor);

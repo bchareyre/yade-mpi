@@ -18,7 +18,7 @@ vector<Vector3r> GLDrawInteractingSphere::vertices;
 vector<Vector3r> GLDrawInteractingSphere::faces;
 
 
-void GLDrawInteractingSphere::go(const shared_ptr<InteractingGeometry>& cm, const shared_ptr<PhysicalParameters>& )
+void GLDrawInteractingSphere::go(const shared_ptr<InteractingGeometry>& cm, const shared_ptr<PhysicalParameters>& ,bool)
 {
 	static bool first=true;
 	

@@ -13,7 +13,10 @@
 
 class GLDrawLineSegment : public GLDrawGeometricalModelFunctor
 {
+	private :
+		Real maxLen;
 	public :
+		GLDrawLineSegment();
 		virtual void go(const shared_ptr<GeometricalModel>&, const shared_ptr<PhysicalParameters>&,bool);
 
 	RENDERS(LineSegment);

@@ -101,6 +101,7 @@ void GLDrawSphere::go(const shared_ptr<GeometricalModel>& gm, const shared_ptr<P
 		// draw a circle from a bunch of short lines
 		//
 		// FACING the camera !!
+		// FIXME: this can be done faster, by storing the circle in the buffer (similarly as the sphere)
 		///////////////////////
 		//
 			glPushMatrix();

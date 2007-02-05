@@ -23,6 +23,7 @@
 #include "NonLocalInitializer.hpp"
 #include <yade/yade-lib-base/yadeWm3Extra.hpp>
 
+#include "LatticeInteractingGeometry.hpp"
 
 #include <yade/yade-package-common/Sphere.hpp>
 
@@ -826,11 +827,11 @@ bool LatticeExample::createNode(shared_ptr<Body>& body, int i, int j, int k)
 //static int zzzzz=0;
 //switch(zzzzz%5)
 //{
-//      case 0  : physics->se3.position=Vector3r(0,0.4,1.5); break;
-//      case 1  : physics->se3.position=Vector3r(0,0.8,0.6); break;
-//      case 2  : physics->se3.position=Vector3r(0,0  ,0  ); break;
-//      case 3  : physics->se3.position=Vector3r(0,1.6,0.5); break;
-//      case 4  : physics->se3.position=Vector3r(0,2.0,0  ); break;
+//      case 0  : physics->se3.position=Vector3r(0.4,1.5,0); break;
+//      case 1  : physics->se3.position=Vector3r(0.8,0.6,0); break;
+//      case 2  : physics->se3.position=Vector3r(0  ,0  ,0); break;
+//      case 3  : physics->se3.position=Vector3r(1.6,0.5,0); break;
+//      case 4  : physics->se3.position=Vector3r(2.0,0  ,0); break;
 //};
 //zzzzz++;
 //
@@ -1077,8 +1078,9 @@ void LatticeExample::positionRootBody(shared_ptr<MetaBody>& rootBody)
         physics->useBendTensileSoftening= useBendTensileSoftening;
         physics->useStiffnessSoftening  = useStiffnessSoftening;
         
-        shared_ptr<MetaInteractingGeometry> set(new MetaInteractingGeometry());
-        
+        shared_ptr<LatticeInteractingGeometry> set(new LatticeInteractingGeometry());
+       
+
 	set->diffuseColor		= Vector3f(0,0,1);
 
 	shared_ptr<AABB> aabb(new AABB);
