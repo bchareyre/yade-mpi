@@ -13,7 +13,7 @@ CREATE_LOGGER(SerializableSingleton);
 
 SerializableSingleton::SerializableSingleton() 
 {	
-	LOG_INFO("Constructing SerializableSingleton  (if multiple times - check '-rdynamic' flag!).");
+	cerr<<"Constructing SerializableSingleton  (if multiple times - check '-rdynamic' flag!)."<<endl;
 }
 
 

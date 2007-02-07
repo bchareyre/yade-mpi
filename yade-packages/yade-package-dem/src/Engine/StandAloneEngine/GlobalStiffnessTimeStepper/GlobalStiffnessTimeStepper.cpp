@@ -19,7 +19,6 @@
 
 GlobalStiffnessTimeStepper::GlobalStiffnessTimeStepper() : TimeStepper() , sdecContactModel(new MacroMicroElasticRelationships), actionParameterGlobalStiffness(new GlobalStiffness)
 {
-cerr << "GlobalStiffnessTimeStepper()"  << endl;
 	globalStiffnessClassIndex = actionParameterGlobalStiffness->getClassIndex();
 	sdecGroupMask = 1;
 	timestepSafetyCoefficient = 0.8;

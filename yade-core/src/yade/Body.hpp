@@ -38,6 +38,9 @@ class Body : public Serializable
 		 * from some selected bodies */
 		int groupMask;
 	public	:
+		#ifdef HIGHLEVEL_CLUMPS
+		int clumpId;
+		#endif
 		unsigned int getId() const {return id;};
 
 		// FIXME - but we SHOULDN'T use them in InteractionSolver, because it allows

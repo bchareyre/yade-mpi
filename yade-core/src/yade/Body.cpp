@@ -16,6 +16,9 @@ Body::Body () :
 	  Serializable()
 	, id(0)
 	, groupMask(1)
+	#ifdef HIGHLEVEL_CLUMPS
+	,clumpId(-1)
+	#endif
 {
 }
 

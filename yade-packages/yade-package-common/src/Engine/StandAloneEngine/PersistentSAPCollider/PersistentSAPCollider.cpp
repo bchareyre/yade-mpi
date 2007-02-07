@@ -182,9 +182,17 @@ void PersistentSAPCollider::updateOverlapingBBSet(int id1,int id2)
 	// test if the AABBs of the spheres number "id1" and "id2" are overlapping
 	int offset1 = 3*id1;
 	int offset2 = 3*id2;
-	bool overlapp = !(maximums[offset1]<minimums[offset2] || maximums[offset2]<minimums[offset1] || 
-			  maximums[offset1+1]<minimums[offset2+1] || maximums[offset2+1]<minimums[offset1+1] || 
-			  maximums[offset1+2]<minimums[offset2+2] || maximums[offset2+2]<minimums[offset1+2]);
+	#ifdef HIGHLEVEL_CLUMPS
+		unsigned int clumpId1=(*(Omega::instance().rootBody()->bodies))[id1]->clumpId;
+		unsigned int clumpId2=(*(Omega::instance().rootBody()->bodies))[id2]->clumpId;
+	#endif
+	bool overlapp =
+	#ifdef HIGHLEVEL_CLUMPS
+		(clumpId1<0 || clumpId2<0 || clumpId1!=clumpId2) && // only collide if at least one particle is non-clump or belong to different clumps
+	#endif
+		!(maximums[offset1]<minimums[offset2] || maximums[offset2]<minimums[offset1] || 
+		maximums[offset1+1]<minimums[offset2+1] || maximums[offset2+1]<minimums[offset1+1] || 
+		maximums[offset1+2]<minimums[offset2+2] || maximums[offset2+2]<minimums[offset1+2]);
 
 	// inserts the pair p=(id1,id2) if the two AABB overlapps and if p does not exists in the overlappingBB
 	if (overlapp && !found)
