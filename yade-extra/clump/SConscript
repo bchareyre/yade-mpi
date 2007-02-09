@@ -1,0 +1,12 @@
+Import('*')
+env.SharedLibrary('Clump',
+	['Clump.cpp'],
+	LIBS=env['LIBS']+['PhysicalParametersEngineUnit',
+		'Body',
+		'yade-lib-multimethods',
+		'yade-lib-factory',
+		'yade-lib-serialization',
+		'yade-lib-base',
+		'Wm3Foundation'],
+	CPPPATH=env['CPPPATH']+['$PREFIX/include'])
+

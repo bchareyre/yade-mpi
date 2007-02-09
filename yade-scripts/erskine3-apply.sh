@@ -4,7 +4,8 @@
 
 ERSKINE=./erskine3.py
 YADE=../
-export YADE_QMAKE_PATH=/usr/local YADECOMPILATIONPATH=$YADE
+# erskine3 accepts scons variables smuggled as @VARIABLE and resulting in $VARIABLE in generated scripts; do that for $PREFIX (ac scons var)
+export YADE_QMAKE_PATH=@PREFIX YADECOMPILATIONPATH=$YADE
 ENGINE=--scons; SCRIPT=SConscript
 #ENGINE=--waf; SCRIPT=wscript_build
 

@@ -15,11 +15,7 @@
 void LeapFrogPositionIntegrator::go(       const shared_ptr<PhysicalParameters>& b
 						, Body* body)
 {
-	#ifdef HIGHLEVEL_CLUMPS
-		if(!body->isDynamic || body->clumpId>=0) return; // if clump member, integration will be done in clump's integrator and position of this body modified directly
-	#else
 	if(!body->isDynamic) return;
-	#endif
 
 	unsigned int id = body->getId();
 	

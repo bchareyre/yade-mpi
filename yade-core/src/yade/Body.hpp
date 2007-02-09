@@ -21,6 +21,7 @@
 #include "Interaction.hpp"
 #include "PhysicalActionContainer.hpp"
 
+
 #include <yade/yade-lib-base/yadeWm3Extra.hpp>
 #include <yade/yade-lib-serialization/Serializable.hpp>
 #include <yade/yade-lib-multimethods/Indexable.hpp>
@@ -39,7 +40,15 @@ class Body : public Serializable
 		int groupMask;
 	public	:
 		#ifdef HIGHLEVEL_CLUMPS
-		int clumpId;
+			/*! \brief Numerical type for ::Body::id.
+			 * \bug  Current code mixes singed and unsigned int, this might be a way to enforce consistence. */
+			typedef unsigned int id_t;
+			//! Clump of which this body makes part. If it is not part of a clump, set to Body::ID_NONE.
+			id_t clumpId;
+			//! symbolic constant for body that doesn't exist.
+			static const id_t ID_NONE;
+			//! get Body pointer given its id. 
+			static shared_ptr<Body> byId(id_t _id);
 		#endif
 		unsigned int getId() const {return id;};
 

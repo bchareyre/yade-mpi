@@ -22,14 +22,13 @@ void NewtonsMomentumLaw::go( 	  const shared_ptr<PhysicalAction>& a
 	RigidBodyParameters * rb = static_cast<RigidBodyParameters*>(b.get());
 	
 	//FIXME : should be += and we should add an Engine that reset acceleration at the beginning
-	#ifdef HIGHLEVE_CLUMPS
-	if(bb->clumpId<0) rb->angularAcceleration = diagDiv(am->momentum,rb->inertia);
+	#ifdef HIGHLEVEL_CLUMPS
+	if(bb->clumpId==Body::ID_NONE) rb->angularAcceleration = diagDiv(am->momentum,rb->inertia);
 	else{
-		/* TODO: get respective clump RigidBodyParameters, then something like
-		 * clumpRBP->angularAcceleration+=diagDiv(am->momentum,clumpRBP->inertia);
-		 * The FIXME above is critical for this to work!
-		 * */
-
+		shared_ptr<Body> clump=Body::byId(bb->clumpId);
+		RigidBodyParameters* clumpRBP=dynamic_cast<RigidBodyParameters*>(clump->physicalParameters.get());
+		/* TODO: the FIXME above still applies!!! */
+		clumpRBP->angularAcceleration+=diagDiv(am->momentum,clumpRBP->inertia);
 	}
 	#else
 	rb->angularAcceleration = diagDiv(am->momentum,rb->inertia);

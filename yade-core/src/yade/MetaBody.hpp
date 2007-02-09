@@ -24,11 +24,6 @@ class MetaBody : public Body
 		shared_ptr<InteractionContainer>	persistentInteractions; // disappear, reappear according to physical (or any other non-spatial) criterion
 		shared_ptr<InteractionContainer>	transientInteractions;	// disappear, reappear according to spatial criterion
 		shared_ptr<PhysicalActionContainer>	physicalActions;
-		#ifdef HIGHLEVEL_CLUMPS
-			// body Id's are unsigned ints (shouldn't be typedef'ed somewhere?)
-			vector<vector<unsigned int> > clumpMembers; // clumpMembers[i] contains bodyId's of all members of clump #i (i>=0); they need not to be sorted (this may change, though)
-			vector<unsigned int> clumpParameterBodies; // clumpParameterBodies[i] is ID of body in this->bodies that has physical information for clump #i; the body has isDynamic==false, it serves only as convenient parameter storage
-		#endif
 	
 		MetaBody ();
 

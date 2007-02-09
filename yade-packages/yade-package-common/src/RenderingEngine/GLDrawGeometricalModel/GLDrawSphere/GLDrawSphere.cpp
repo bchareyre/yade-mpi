@@ -27,7 +27,7 @@
 //      glPopMatrix();
 //}
 
-GLDrawSphere::GLDrawSphere() : first(true), glSphereList(-1), glWiredSphereList(-1)
+GLDrawSphere::GLDrawSphere() : first(true), glWiredSphereList(-1), glSphereList(-1)
 {
 };
 

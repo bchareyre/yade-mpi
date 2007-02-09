@@ -118,7 +118,7 @@ void SAPCollider::action(Body* body)
 //			if (!(bodies->find(i)->isDynamic==false && bodies->find(*it)->isDynamic==false))
 			#ifdef HIGHLEVEL_CLUMPS
 				if( (*bodies)[i]->isDynamic && (*bodies)[*it]->isDynamic && // old stuff: both bodies must be dynamic
-					( (*bodies)[i]->clumpId<0 || (*bodies)[*it]->clumpId<0 || ( (*bodies)[i]->clumpId != (*bodies)[*it]->clumpId )) // either (at least) one of them is not within a clump or they are not part of the same clump
+					( (*bodies)[i]->clumpId==Body::ID_NONE || (*bodies)[*it]->clumpId==Body::ID_NONE || ( (*bodies)[i]->clumpId != (*bodies)[*it]->clumpId )) // either (at least) one of them is not within a clump or they are not part of the same clump
 					)
 			#else
 			if (!((*bodies)[i]->isDynamic==false && (*bodies)[*it]->isDynamic==false))

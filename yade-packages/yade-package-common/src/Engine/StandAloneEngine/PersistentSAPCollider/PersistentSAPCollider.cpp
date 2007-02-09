@@ -183,12 +183,11 @@ void PersistentSAPCollider::updateOverlapingBBSet(int id1,int id2)
 	int offset1 = 3*id1;
 	int offset2 = 3*id2;
 	#ifdef HIGHLEVEL_CLUMPS
-		unsigned int clumpId1=(*(Omega::instance().rootBody()->bodies))[id1]->clumpId;
-		unsigned int clumpId2=(*(Omega::instance().rootBody()->bodies))[id2]->clumpId;
+		Body::id_t clumpId1=Body::byId(id1)->clumpId, clumpId2=Body::byId(id2)->clumpId;
 	#endif
 	bool overlapp =
 	#ifdef HIGHLEVEL_CLUMPS
-		(clumpId1<0 || clumpId2<0 || clumpId1!=clumpId2) && // only collide if at least one particle is non-clump or belong to different clumps
+		(clumpId1==Body::ID_NONE || clumpId2<Body::ID_NONE || clumpId1!=clumpId2) && // only collide if at least one particle is non-clump or belong to different clumps
 	#endif
 		!(maximums[offset1]<minimums[offset2] || maximums[offset2]<minimums[offset1] || 
 		maximums[offset1+1]<minimums[offset2+1] || maximums[offset2+1]<minimums[offset1+1] || 

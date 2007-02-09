@@ -11,7 +11,7 @@
 #include "Force.hpp"
 #include <yade/yade-core/MetaBody.hpp>
 
-GravityEngine::GravityEngine() : gravity(Vector3r::ZERO) , actionParameterForce(new Force)
+GravityEngine::GravityEngine() : actionParameterForce(new Force), gravity(Vector3r::ZERO)
 {
 }
 

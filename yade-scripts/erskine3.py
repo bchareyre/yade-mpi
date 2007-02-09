@@ -2,13 +2,13 @@
 # -*- Encoding: utf-8 -*-
 
 """
-This program should really be run by the erskine2-apply.sh script
+This program should really be run by the erskine3-apply.sh script
 
 Erskine is Watt's colleague in the house of Mr. Nutting.
 
 """
 
-import sys,pprint,string,os#,os.path
+import sys,pprint,string,os
 from logging import *
 from os.path import *
 from re import *
@@ -22,7 +22,7 @@ egroup=(')','}',']')
 # variables that do not propagate to sub-builds
 localVars=['TEMPLATE','SUBDIRS','HEADERS','SOURCES','FORMS','LEXSOURCES','YACCSOURCES','TARGET','DESTDIR','PROJECT']
 # variables / function that are ignored if undefined (replaced by ''); for all other, a warning is printed (and are ignored anyway)
-undefOK=['CXXPATH','CXX','CXXFLAGS','YADE_QQMAKE_PATH','INCPATH','IDL_COMPILER']
+undefOK=['CXXPATH','CXX','CXXFLAGS','INCPATH','IDL_COMPILER']
 # internal qmake variables that may be replace with the environment ones without warning
 replaceOK=['YADECOMPILATIONPATH'] 
 discardedStatements=['^isEmpty\s*\(\s*YADE_QMAKE_PATH\s*\).*$']
@@ -117,6 +117,9 @@ def parseProject(proFile,inheritedVariables={}):
 							repl=''
 					else: repl=''
 			stat=stat[:m.start()]+repl+stat[m.end():]
+
+		# scons variables (namely, $PREFIX, were smuggled unexpanded by using @PREFIX instead. Change it to what it should be now.
+		stat=stat.replace('@','$')
 
 		conditional=match(r'^\s*(!?[a-zA-Z0-9_]+)\s*{(.*)}$',stat) # this is a (possibly negated) conditional; nothing complicated, please; specifically, nested conditionals do not work
 		if conditional:
@@ -249,18 +252,20 @@ def scriptGen(v,dir):
 	#print "relPath=%s,INCLUDEPATH=%s"%(relPath,includePath)
 	def prependDirFileIfRelative(d,f):
 		def prepIf(ff):
-			if not isabs(ff): return join(d,ff)
+			if not isabs(ff) and ff[0]!='$': return join(d,ff)
 			return ff
 		return map(prepIf,f)
 	includePath=prependDirFileIfRelative(relPath,includePath)
 	# filter out non-existent paths; without warning, it could be a short lambda...
 	def DelAndWarnNonexistentPath(x):
-		if not exists(normpath(join(dirAbsPath,x))):
+		if not exists(normpath(join(dirAbsPath,x))) and x[0]!='$':
 			warning2("Include path `%s' is invalid, removed!"%(normpath(join(dirAbsPath,x))))
 			return False
 		return True
 	includePath=filter(DelAndWarnNonexistentPath,includePath)
 	includePath=[normpath(p) for p in includePath]
+	# remove duplicates... http://stinkpot.afraid.org:8080/tricks/index.php/2006/05/find-all-the-unique-elements-in-a-python-list/
+	includePath=dict([(i,1) for i in includePath]).keys()
 
 
 

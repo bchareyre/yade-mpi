@@ -14,7 +14,7 @@
 #include <yade/yade-core/MetaBody.hpp>
 
 
-ForceEngine::ForceEngine() : force(Vector3r::ZERO) , actionParameterForce(new Force)
+ForceEngine::ForceEngine() : actionParameterForce(new Force), force(Vector3r::ZERO)
 {
 }
 

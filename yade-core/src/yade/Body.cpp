@@ -10,6 +10,15 @@
 
 #include "Body.hpp"
 
+#include <limits>
+#include "MetaBody.hpp"
+#include "Omega.hpp"
+
+#ifdef HIGHLEVEL_CLUMPS
+	const id_t Body::ID_NONE=UINT_MAX;
+	/*! the definition will change once Omega disappears, but the interface should be the same. */
+	shared_ptr<Body> Body::byId(Body::id_t _id){return (*(Omega::instance().getRootBody()->bodies))[_id];}
+#endif
 
 // we must initialize id = 0, otherwise BodyContainer will crash.
 Body::Body () : 
@@ -17,7 +26,7 @@ Body::Body () :
 	, id(0)
 	, groupMask(1)
 	#ifdef HIGHLEVEL_CLUMPS
-	,clumpId(-1)
+	,clumpId(ID_NONE)
 	#endif
 {
 }
@@ -26,6 +35,9 @@ Body::Body (unsigned int newId, int newGroup) :
 	  Serializable()
 	, id(newId)
 	, groupMask(newGroup)
+	#ifdef HIGHLEVEL_CLUMPS
+	,clumpId(ID_NONE)
+	#endif
 	, physicalParameters(shared_ptr<PhysicalParameters>())
 	, geometricalModel(shared_ptr<GeometricalModel>())
 	, interactingGeometry(shared_ptr<InteractingGeometry>())
@@ -45,5 +57,8 @@ void Body::registerAttributes()
 	REGISTER_ATTRIBUTE(geometricalModel);
 	REGISTER_ATTRIBUTE(interactingGeometry);
 	REGISTER_ATTRIBUTE(boundingVolume);
+	#ifdef HIGHLEVEL_CLUMPS
+	REGISTER_ATTRIBUTE(clumpId);
+	#endif
 }
 

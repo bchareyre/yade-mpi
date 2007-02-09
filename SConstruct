@@ -48,6 +48,7 @@ opts.AddOptions(
 	BoolOption('profile','Enable profiling information',0),
 	BoolOption('optimize','Turn on heavy optimizations (generates SSE2 instructions)',0),
 	ListOption('exclude','Components that will not be built','none',names=['extra','common','dem','fem','lattice','mass-spring','realtime-rigidbody']),
+	('extraModules', 'Extra directories with their own SConscript files (must be in-tree) (whitespace separated)',None,None,Split),
 	('CPPPATH', 'Additional paths for the C preprocessor (whitespace separated)',['/usr/include/wm3'],None,Split),
 	('LIBPATH','Additional paths for the linker (whitespace separated)',None,None,Split),
 	('QTDIR','Directories where to look for qt3',['/usr/share/qt3','/usr/lib/qt'],None,Split),
@@ -136,6 +137,7 @@ instIncludeDirs=['yade-core']+[os.path.join('$PREFIX','include','yade',string.sp
 ### PREPROCESSOR
 env.Append(CPPPATH=['#/include'])
 env.Append(CPPDEFINES=[('POSTFIX',r'$POSTFIX'),('PREFIX',r'$PREFIX')])
+env.Append(CPPDEFINES=['HIGHLEVEL_CLUMPS'])
 
 ### COMPILER
 if env['debug']: env.Append(CXXFLAGS='-ggdb3',CPPDEFINES=['DEBUG'])
@@ -155,6 +157,7 @@ if env['optimize']:
 	env.Append(CXXFLAGS=archFlags,LINKFLAGS=archFlags,SHLINKFLAGS=archFlags)
 if env['profile']: env.Append(CXXFLAGS=['-pg'],LINKFLAGS=['-pg'],SHLINKFLAGS=['-pg'])
 env.Append(CXXFLAGS=['-pipe','-Wall'])
+#env.Append(CXXFLAGS=['-save-temps'])
 
 ### LINKER
 env.Append(LIBS=[]) # ensure existence of the flag
@@ -234,7 +237,8 @@ if not env.GetOption('clean'):
 
 # read all SConscript files
 env.Export('env');
-SConscript([os.path.join(x,'SConscript') for x in libDirs+['yade-core']])
+SConscript(dirs=libDirs+['yade-core'])
+if env.has_key('extraModules'): SConscript(dirs=env['extraModules'])
 
 
 ##########################################################################################
@@ -268,13 +272,16 @@ if not env.GetOption('clean'):
 	# iterate over .so nodes we got previously and call Install for each of them
 	for n in installableNodes:
 		f=str(n)
-		m=re.match(r'(^|.*/)(yade-(extra|guis|libs|package-[^/]+))/[^/]+$',f)
-		if not m: # older scons version have e.g. qt libs in nodes, we just skip them here
+		# the last (/.*) is meant got extraModules, again...
+		m=re.match(r'(^|.*/)(yade-(extra|guis|libs|package-[^/]+))(/.*)?/[^/]+$',f)
+		if m: instDir=m.group(2)
+		else: # older scons version have e.g. qt libs in nodes, we just skip them here
 			# TODO: exclude system libs in node enumerator, that is much safer
 			if major=='0' and int(minor)<=96 and int(micro)<90: continue
-			else: assert(m)
-		assert(m)
-		instDir=m.group(2)
+			# nodes not found will be installed in yade-extra; this is meant specifically for extraModules
+			# FIXME: should be done in a clean way.
+			instDir='yade-extra'
+		if f.find('Clump')>=0: print f,instDir
 		env.Install('$PREFIX/lib/yade$POSTFIX/'+instDir,n)
 	# for the one and only binary, we do it by hand
 	env.InstallAs('$PREFIX/bin/yade$POSTFIX','yade-core/yade')
