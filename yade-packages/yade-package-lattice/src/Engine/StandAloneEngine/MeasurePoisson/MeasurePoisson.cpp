@@ -21,6 +21,7 @@ MeasurePoisson::MeasurePoisson () : DataRecorder()
 	interval = 50;
 	horizontal = vertical -1.0;
 	bottom = upper = left = right = -1;
+	idx=0;
 }
 
 
@@ -28,9 +29,11 @@ void MeasurePoisson::postProcessAttributes(bool deserializing)
 {
 	if(deserializing)
 	{
-//		outputFile="../data/strain-C8";
-//		outputFile[15]='B';
+	//	outputFile += "_"+boost::lexical_cast<std::string>(Omega::instance().getTimeStep());
+	//	std::cerr << "using dt for poisson output file: " << outputFile << "\n";
+
 		ofile.open(outputFile.c_str());
+
 	}
 }
 
@@ -57,14 +60,17 @@ bool MeasurePoisson::isActivated()
 
 void MeasurePoisson::action(Body * body)
 {
+
+
 	return;
+
 	if(bottom==-1 || upper==-1 || left==-1 || right==-1)
 	{
 		std::cerr << "bad nodes!\n";
 		return;
 	}
 	MetaBody * ncb = static_cast<MetaBody*>(body);
-	
+
 	LatticeNodeParameters* node_left   = dynamic_cast<LatticeNodeParameters*>( (*(ncb->bodies))[left  ]->physicalParameters . get() );
 	(*(ncb->bodies))[left  ]->geometricalModel->diffuseColor = Vector3f(1.0,1.0,0.0); // FIXME [1]
 	LatticeNodeParameters* node_right  = dynamic_cast<LatticeNodeParameters*>( (*(ncb->bodies))[right ]->physicalParameters . get() );
@@ -88,11 +94,18 @@ void MeasurePoisson::action(Body * body)
 	Real 	poisson2 = -1.0* ( (dd/d)
 			          / (dL/L));
 
+	last20[(idx++)%20] = poisson2;
+	Real avg=0;
+	if(idx>22)
+		for(int i=0;i<20;i++)
+			avg+=last20[i]*0.05;
+
 	Real	poisson3 = std::log(d/(dd-d))/std::log(dL/L+1.0);
 	
 	ofile	<< lexical_cast<string>(poisson1) << " " 
 		<< lexical_cast<string>(poisson2) << " " 
 		<< lexical_cast<string>(poisson3) << " " 
+		<< " avg: " << lexical_cast<string>(avg) << " " 
 		<< endl; 
 		
 	// [1]

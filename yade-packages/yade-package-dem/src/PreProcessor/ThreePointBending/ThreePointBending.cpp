@@ -168,6 +168,8 @@ string ThreePointBending::generate()
 			return "Error: cannot load the file that should contain spheres";
 		}
 	}
+	else
+		return "Error: cannot load the file that should contain spheres";
 /////////////////////////////////////
 	Vector3r min(10000,10000,10000),max(-10000,-10000,-10000);
 	{// calc min/max

@@ -45,9 +45,11 @@ void BeamRecorder::postProcessAttributes(bool deserializing)
 {
 	if(deserializing)
 	{
+	//	outputFile += "_"+boost::lexical_cast<std::string>(Omega::instance().getTimeStep());
+	//	std::cerr << "using dt for BeamRecorder output file: " << outputFile << "\n";
+
 		ofile.open(outputFile.c_str());
-//		first = true;
-//		subscribedBodies.clear();
+
 	}
 }
 

@@ -311,11 +311,41 @@ void LatticeLaw::action(Body* body)
 		Vector3r beam_vec = beam->length * beam->direction;
 		{ // 'B' from picture - rotate to align with neighbouring beams
 
+/*   
+ *   Bending stiffness different for compression and tension.
+ *
+			Real kb = beam->bendingStiffness;
+			Real Em = beam->criticalTensileStrain/2.0;
+			Real x  = beam->strain();
+			const Real howmuch = 0.5;
+
+		//	if(beam->strain() < 0) // compression
+		//	//if(beam->strain() > 0) // tension
+		//		kb *= howmuch;	// FIXME - it's a material paramater. k.b in compression is 0.2 of k.b in tension.
+		//				// it should be a function in LatticeBeamParameters that returs correct value depending
+		//				// on tension/compression
+		
+		//	x<-E ? kb*0.2 : ((kb*0.2+kb)/2+(kb*0.2-kb)/(-2*E)*x)
+
+			if( x < -Em )
+				kb *= howmuch;
+			else if( x < Em )
+				kb = (kb*howmuch+kb)/2.0+x*(kb*howmuch-kb)/(-2.0*Em);
+			// if strain > criticalTensileStrain/2.0 then kb is not changed
+
+			node1->countStiffness += kb;
+			node2->countStiffness += kb;
+
+			node1->displacementAlignmental += (beam->bendingRotation * ( beam_vec) - beam_vec) * kb;
+			node2->displacementAlignmental += (beam->bendingRotation * (-beam_vec) + beam_vec) * kb;
+
+*/
 			node1->countStiffness += beam->bendingStiffness;
 			node2->countStiffness += beam->bendingStiffness;
 
 			node1->displacementAlignmental += (beam->bendingRotation * ( beam_vec) - beam_vec) * beam->bendingStiffness;
 			node2->displacementAlignmental += (beam->bendingRotation * (-beam_vec) + beam_vec) * beam->bendingStiffness;
+
 		}
 		
 		if(calcTorsion)

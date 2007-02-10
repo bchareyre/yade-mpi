@@ -26,9 +26,11 @@ void StrainRecorder::postProcessAttributes(bool deserializing)
 {
 	if(deserializing)
 	{
-//		outputFile="../data/strain-C8";
-//		outputFile[15]='B';
+	//	outputFile += "_"+boost::lexical_cast<std::string>(Omega::instance().getTimeStep());
+	//	std::cerr << "using dt for StrainRecorder output file: " << outputFile << "\n";
+
 		ofile.open(outputFile.c_str());
+
 	}
 }
 

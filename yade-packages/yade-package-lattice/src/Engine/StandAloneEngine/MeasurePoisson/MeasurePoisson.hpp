@@ -18,6 +18,9 @@ class MeasurePoisson : public DataRecorder
 {
 	private :
 		std::ofstream ofile; 
+		Real	last20[20];
+		int	idx;
+	
 
 	public :
 		std::string	 outputFile;

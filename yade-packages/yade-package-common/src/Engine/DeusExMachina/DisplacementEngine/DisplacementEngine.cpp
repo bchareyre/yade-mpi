@@ -14,12 +14,15 @@ void DisplacementEngine::postProcessAttributes(bool deserializing)
 	if(deserializing)
 	{
 		translationAxis.Normalize();
+
 		/*
 		if(displacement==0)
 			displacement=2e-10;
 		else
 			displacement=0;
 		*/
+	//	displacement *= 10.0;
+
 		std::cerr << "displacement: " << displacement << "\n";
 	}
 }

@@ -30,6 +30,19 @@ void LatticeBeamParameters::postProcessAttributes(bool deserializing)
 {
 	if(deserializing)
 	{
+
+	//	torsionalStiffness /= 10.0;
+
+	//	static bool first=true;
+	//	if(first)
+	//		std::cerr << "using dt for k.b\n", first=false;
+	//	bendingStiffness    = Omega::instance().getTimeStep();
+
+//		bendingStiffness		/= 10.0;
+//		longitudalStiffness		/= 10.0;
+//		criticalTensileStrain		*= 10.0;
+
+
 /*		if(criticalTensileStrain > 0.00015) // E.l
 		{ // CEMENT MATRIX
 			longitudalStiffness       = 1.0;	// k.l
@@ -104,11 +117,6 @@ void LatticeBeamParameters::postProcessAttributes(bool deserializing)
 		}
 #undef chk
 
-
-
-
-	//	bendingStiffness    *= 25000;
-	//	longitudalStiffness *= 25000;
         }
 }
 

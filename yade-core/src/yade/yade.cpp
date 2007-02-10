@@ -36,7 +36,7 @@ std::string getPrefix()
 	std::string tmp(BOOST_PP_STRINGIZE(PREFIX));
 	if(tmp=="PREFIX") // if PREFIX is undefined, BOOST_PP_STRINGIZE returns the name instead of empty value
 	{
-		LOG_FATAL("undefined PREFIX, aborting");
+		LOG_FATAL("\n\nundefined PREFIX, aborting!! You should compile with CXXFLAGS eg. -DPREFIX=/home/user/YADE\n\n");
 		exit(1);
 	};
 	return tmp;
@@ -68,8 +68,8 @@ void firstRunSetup(shared_ptr<Preferences>& pref)
 void printHelp()
 {
 	string flags("");
-	flags=flags+"PREFIX=" +getPrefix()+ "\n";
-	flags=flags+"POSTFIX=" + getPostfix() + "\n";
+	flags=flags+"   PREFIX=" +getPrefix()+ "\n";
+	flags=flags+"   POSTFIX=" + getPostfix() + "\n";
 #ifdef SINGLE_PRECISION
 	flags+="SINGLE_PRECISION ";
 #endif

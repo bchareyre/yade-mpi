@@ -97,12 +97,12 @@ LatticeExample::LatticeExample() : FileGenerator()
 	displacement_B_meters	 = 0.0001;
 
 	region_C_min 		 = Vector3r(-0.006, 0.096,-1);
-	region_C_max 		 = Vector3r( 0.16 , 0.16 , 1);
+	region_C_max 		 = Vector3r( 0.16 , 0.16 ,-1);
 	direction_C 		 = Vector3r(0,1,0);
 	displacement_C_meters	 = 0.0001;
 	
 	region_D_min 		 = Vector3r(-0.006,-0.006,-1);
-	region_D_max 		 = Vector3r( 0.16 , 0.004, 1);
+	region_D_max 		 = Vector3r( 0.16 , 0.004,-1);
         direction_D              = Vector3r(0,-1,0);
         displacement_D_meters    = 0.0001;
         
