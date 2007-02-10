@@ -237,8 +237,8 @@ if not env.GetOption('clean'):
 
 # read all SConscript files
 env.Export('env');
-SConscript(dirs=libDirs+['yade-core'])
-if env.has_key('extraModules'): SConscript(dirs=env['extraModules'])
+env.SConscript(dirs=libDirs+['yade-core'])
+if env.has_key('extraModules'): env.SConscript(dirs=env['extraModules'])
 
 
 ##########################################################################################

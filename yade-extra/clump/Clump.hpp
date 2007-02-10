@@ -12,8 +12,9 @@
 #include<vector>
 #include<yade/yade-core/Body.hpp>
 #include<yade/yade-lib-factory/Factorable.hpp>
-#include <boost/shared_ptr.hpp>
+#include<boost/shared_ptr.hpp>
 #include<yade/yade-package-common/PhysicalParametersEngineUnit.hpp>
+#include<yade/yade-package-common/RigidBodyParameters.hpp>
 #include<yade/yade-lib-base/Logging.hpp>
 #include<yade/yade-lib-base/yadeWm3Extra.hpp>
 
@@ -59,14 +60,23 @@ class Clump: public Body {
 		//! se3 of respective subBodies in local coordinates
 		std::vector<Se3r> subSe3s;
 	public:
-		Clump(): Body() { /*createIndex();*/ isDynamic=false; };
+		Clump();
 		virtual ~Clump(){};
 		//! \brief add Body to the Clump
 		void add(Body::id_t);
 		//! \brief remove Body from the Clump
 		void del(Body::id_t);
-		//! Recalculate physical properties of clump.
-		void update(bool intersecting);
+		//! Recalculate physical properties of Clump.
+		void updateProperties(bool intersecting);
+		//! Calculate positions and orientations of subBodies based on my own Se3.
+		void moveSubBodies();
+	private: // may be made public, but once properly tested...
+		//! Recalculates inertia tensor of a body after translation away from (default) or towards its centroid.
+		static Matrix3r inertiaTensorTranslate(const Matrix3r& I,const Real m, const Vector3r& off);
+		//! Recalculate body's inertia tensor in rotated coordinates.
+		static Matrix3r inertiaTensorRotate(const Matrix3r& I, const Matrix3r& T);
+		//! Recalculate body's inertia tensor in rotated coordinates.
+		static Matrix3r inertiaTensorRotate(const Matrix3r& I, const Quaternionr& rot);
 
 	void registerAttributes(){Body::registerAttributes(); REGISTER_ATTRIBUTE(subBodies); REGISTER_ATTRIBUTE(subSe3s);}
 	REGISTER_CLASS_NAME(Clump);
@@ -77,25 +87,22 @@ class Clump: public Body {
 
 REGISTER_SERIALIZABLE(Clump,false);
 
-/*! \brief  Engine that calculate position and orientation of the clump in next timestep.
-
-This engine is responsible for updating ::Clump::subBodies positions as well so that the clump behaves as a rigid body.
+/*! \brief  Update ::Clump::subBodies positions so that the Clump behaves as a rigid body.
 */
-
-class ClumpLeapFrogPositionAndOrientationIntegrator: public PhysicalParametersEngineUnit {
+class ClumpSubBodyMover: public PhysicalParametersEngineUnit {
 	public:
-		/*! \todo Needs to be implemented */
-		virtual void go(const shared_ptr<PhysicalParameters>&, Body*);
-		ClumpLeapFrogPositionAndOrientationIntegrator(): PhysicalParametersEngineUnit() {/*createIndex();*/ }
-		virtual ~ClumpLeapFrogPositionAndOrientationIntegrator(){};
+		//! This is the engine's working part
+		virtual void go(const shared_ptr<PhysicalParameters>& pp, Body* clump);
+		ClumpSubBodyMover();
+		virtual ~ClumpSubBodyMover(){};
 
-	REGISTER_CLASS_NAME(ClumpLeapFrogPositionAndOrientationIntegrator);
+	REGISTER_CLASS_NAME(ClumpSubBodyMover);
 	REGISTER_BASE_CLASS_NAME(PhysicalParametersEngineUnit);
-	// REGISTER_CLASS_INDEX(ClumpLeapFrogPositionAndOrientationIntegrator,PhysicalParametersEngineUnit);
+	// REGISTER_CLASS_INDEX(ClumpSubBodyMover,PhysicalParametersEngineUnit);
 	DECLARE_LOGGER;
 };
 
-REGISTER_SERIALIZABLE(ClumpLeapFrogPositionAndOrientationIntegrator,false);
+REGISTER_SERIALIZABLE(ClumpSubBodyMover,false);
 
 
 #endif /* CLUMP_HPP */

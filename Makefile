@@ -43,3 +43,5 @@ tags:
 	# prevent generated symlinked files from yade-flat and include to be parsed
 	ctags -R --extra=+q --fields=+n --exclude='.*' --exclude=yade-flat --exclude=include --exclude='*.so'
 
+doc:
+	cd yade-doc; doxygen Doxyfile

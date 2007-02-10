@@ -80,6 +80,7 @@
 // show Matrix3 from the wm3 library 
 #define TRWM3MAT(_M)	LOG_TRACE(#_M "=(("<<_M(0,0)<<" "<<_M(0,1)<<" "<<_M(0,2)<<")("<<_M(1,0)<<" "<<_M(1,1)<<" "<<_M(1,2)<<")("<<_M(2,0)<<" "<<_M(2,1)<<" "<<_M(2,2)<<"))");
 #define TRWM3VEC(_V) LOG_TRACE(#_V "=("<<_V[0]<<" "<<_V[1]<<" "<<_V[2]<<")")
+#define TRWM3QUAT(_Q) LOG_TRACE(#_Q "=("<<_Q[0]<<" "<<_Q[1]<<" "<<_Q[2]<<" "<<_Q[3]<<")")
 
 #endif /* LOGGING_HPP */
 
