@@ -24,11 +24,19 @@ class InteractingSphere2InteractingSphere4SpheresContactGeometry : public Intera
 					const Se3r& se31,
 					const Se3r& se32,
 					const shared_ptr<Interaction>& c);
+					
+		InteractingSphere2InteractingSphere4SpheresContactGeometry();		
+					
+		double InteractionDetectionFactor;// InteractionGeometry will be computed when InteractionDetectionFactor*(rad1+rad2) > distance 		
+	
 
 	REGISTER_CLASS_NAME(InteractingSphere2InteractingSphere4SpheresContactGeometry);
 	REGISTER_BASE_CLASS_NAME(InteractionGeometryEngineUnit);
 
 	DEFINE_FUNCTOR_ORDER_2D(InteractingSphere,InteractingSphere);
+	
+	protected :
+		virtual void registerAttributes();
 };
 
 REGISTER_SERIALIZABLE(InteractingSphere2InteractingSphere4SpheresContactGeometry,false);

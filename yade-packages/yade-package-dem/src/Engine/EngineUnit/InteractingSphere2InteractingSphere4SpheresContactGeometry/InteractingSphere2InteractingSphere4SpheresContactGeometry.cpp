@@ -16,6 +16,16 @@
 #include <yade/yade-lib-base/yadeWm3Extra.hpp>
 
 
+InteractingSphere2InteractingSphere4SpheresContactGeometry::InteractingSphere2InteractingSphere4SpheresContactGeometry()
+{
+	InteractionDetectionFactor = 1;
+}
+
+void InteractingSphere2InteractingSphere4SpheresContactGeometry::registerAttributes()
+{	
+	REGISTER_ATTRIBUTE(InteractionDetectionFactor);
+}
+
 bool InteractingSphere2InteractingSphere4SpheresContactGeometry::go(	const shared_ptr<InteractingGeometry>& cm1,
 							const shared_ptr<InteractingGeometry>& cm2,
 							const Se3r& se31,
@@ -26,12 +36,14 @@ bool InteractingSphere2InteractingSphere4SpheresContactGeometry::go(	const share
 	InteractingSphere* s2 = static_cast<InteractingSphere*>(cm2.get());
 
 	Vector3r normal = se32.position-se31.position;
-	Real penetrationDepth = s1->radius+s2->radius-normal.Normalize();
+	Real penetrationDepth = pow(InteractionDetectionFactor*(s1->radius+s2->radius), 2) - normal.SquaredLength();// Compute a wrong value just to check sign - faster than computing distances
+	//Real penetrationDepth = s1->radius+s2->radius-normal.Normalize();
 
 	shared_ptr<SpheresContactGeometry> scm;
 	if (c->interactionGeometry)
 	{
-		scm = dynamic_pointer_cast<SpheresContactGeometry>(c->interactionGeometry);
+		//scm = dynamic_pointer_cast<SpheresContactGeometry>(c->interactionGeometry);
+		scm = static_pointer_cast<SpheresContactGeometry>(c->interactionGeometry);
 	// BEGIN .......  FIXME FIXME	- wrong hack, to make cohesion work.
 		if(! scm) // this is not SpheresContactGeometry, so it is SDECLinkGeometry, dispatcher should do this job.
 		{
@@ -54,6 +66,7 @@ bool InteractingSphere2InteractingSphere4SpheresContactGeometry::go(	const share
 		
 	if (penetrationDepth>0)
 	{
+		penetrationDepth = s1->radius+s2->radius-normal.Normalize();
 		scm->contactPoint = se31.position+(s1->radius-0.5*penetrationDepth)*normal;//0.5*(pt1+pt2);
 		scm->normal = normal;
 		scm->penetrationDepth = penetrationDepth;
@@ -65,8 +78,7 @@ bool InteractingSphere2InteractingSphere4SpheresContactGeometry::go(	const share
 	
 		return true;
 	}
-	else
-		return false;
+	else return false;
 }
 
 
