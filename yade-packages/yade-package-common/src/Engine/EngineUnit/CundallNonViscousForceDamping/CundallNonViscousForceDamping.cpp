@@ -32,9 +32,12 @@ void CundallNonViscousForceDamping::go(    const shared_ptr<PhysicalAction>& a
 	Force * af = static_cast<Force*>(a.get());
 	ParticleParameters * p = static_cast<ParticleParameters*>(b.get());
 		
-	Real sign = Mathr::Sign( (af->force).Dot(p->velocity) );
-	af->force *= 1 - damping*sign;
-
+	
+	for (int i=0; i<3; ++i)
+	{
+		af->force[i] *= 1 - damping*Mathr::Sign(af->force[i]*p->velocity[i]);	
+	}
+	
 }
 
 
