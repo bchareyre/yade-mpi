@@ -7,6 +7,7 @@ LIBS += -lPhysicalActionApplier \
         -lForce \
         -lParticleParameters \
         -lPhysicalActionApplier \
+		  -lRigidBodyParameters \
         -rdynamic 
 INCLUDEPATH += $${YADE_QMAKE_PATH}/include/ \
                ../../../DataClass/PhysicalAction/Force \

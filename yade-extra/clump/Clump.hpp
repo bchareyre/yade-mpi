@@ -10,11 +10,15 @@
 #define CLUMP_HPP
 
 #include<vector>
+#include<map>
 #include<yade/yade-core/Body.hpp>
+#include<yade/yade-core/MetaBody.hpp>
+#include<yade/yade-core/FileGenerator.hpp>
 #include<yade/yade-lib-factory/Factorable.hpp>
 #include<boost/shared_ptr.hpp>
 #include<yade/yade-package-common/PhysicalParametersEngineUnit.hpp>
 #include<yade/yade-package-common/RigidBodyParameters.hpp>
+#include<yade/yade-package-common/AABB.hpp>
 #include<yade/yade-lib-base/Logging.hpp>
 #include<yade/yade-lib-base/yadeWm3Extra.hpp>
 
@@ -39,8 +43,8 @@
 	-# given the root body, tell
 		- what clumps it contains (enumerate all bodies and filter clumps, see above)
 	-#	given a clump, tell
-		- what bodies it contains (::Clump::subBodies)
-		- what are se3 of these bodies (::Clump::subSe3s)
+		- what bodies it contains (keys of ::Clump::subBodies)
+		- what are se3 of these bodies (values of ::Clump::subBodies)
 	-# add/delete bodies from/to clump (::Clump::add, ::Clump::del)
 		- This includes saving se3 of the subBody: it \em must be in clump's local coordinates so that it is constant. The transformation from global to local is given by clump's se3 at the moment of addition. Clump's se3 is initially (origin,identity)
 	-# Update clump's physical properties (Clump::update: will be copied from the Slum code)
@@ -55,10 +59,14 @@
  */
 
 class Clump: public Body {
+		/*
 		//! ID's of bodies that make part of this clump.
 		std::vector<Body::id_t> subBodies;
 		//! se3 of respective subBodies in local coordinates
-		std::vector<Se3r> subSe3s;
+		std::vector<Se3r> subSe3s; */
+		//! mapping of body IDs to their relative positions; replaces subBodies and subSe3s;
+		typedef std::map<Body::id_t,Se3r> clumpMap;
+		clumpMap subBodies;
 	public:
 		Clump();
 		virtual ~Clump(){};
@@ -78,7 +86,7 @@ class Clump: public Body {
 		//! Recalculate body's inertia tensor in rotated coordinates.
 		static Matrix3r inertiaTensorRotate(const Matrix3r& I, const Quaternionr& rot);
 
-	void registerAttributes(){Body::registerAttributes(); REGISTER_ATTRIBUTE(subBodies); REGISTER_ATTRIBUTE(subSe3s);}
+	void registerAttributes(){Body::registerAttributes(); REGISTER_ATTRIBUTE(subBodies);}
 	REGISTER_CLASS_NAME(Clump);
 	REGISTER_BASE_CLASS_NAME(Body);
 	// REGISTER_CLASS_INDEX(Clump,Body);
@@ -103,6 +111,36 @@ class ClumpSubBodyMover: public PhysicalParametersEngineUnit {
 };
 
 REGISTER_SERIALIZABLE(ClumpSubBodyMover,false);
+
+/*! \brief Test some basic clump functionality; show how to use clumps as well. */
+class ClumpTestGen : public FileGenerator {
+	DECLARE_LOGGER;
+	private :
+		//Vector3r	nbTetrahedrons,groundSize,gravity;
+		//Real	minSize,density,maxSize,dampingForce,disorder,dampingMomentum,youngModulus;
+		//int		 timeStepUpdateInterval;
+		//bool		 rotationBlocked;
+		//void createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents);
+		void createOneClump(shared_ptr<MetaBody>& rootBody, int i, int j, int k);
+		void createActors(shared_ptr<MetaBody>& rootBody);
+		//void positionRootBody(shared_ptr<MetaBody>& rootBody);
+		//void calculatePropertiesAndReposition(const shared_ptr<SlumShape>& slum, shared_ptr<ElasticBodyParameters>& rbp, Real density);
+		//void makeTet(shared_ptr<Tetrahedron>& tet, Real radius);
+	public :
+		ClumpTestGen (){};
+		~ClumpTestGen (){};
+		string generate();
+	protected :
+		virtual void postProcessAttributes(bool deserializing){};
+		void registerAttributes(){};
+	REGISTER_CLASS_NAME(ClumpTestGen);
+	REGISTER_BASE_CLASS_NAME(FileGenerator);
+};
+
+REGISTER_SERIALIZABLE(ClumpTestGen,false);
+
+
+
 
 
 #endif /* CLUMP_HPP */

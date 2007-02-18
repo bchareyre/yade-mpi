@@ -31,7 +31,7 @@ Vector4<RealType2> operator* (RealType1 fScalar, const Vector4<RealType2>& rkV){
 
 Matrix2r operator*(Real fScalar, const Matrix2r& rkM){return rkM*fScalar;}
 // v^T * M
-Vector2r operator* (const Vector2r& rkV, const Matrix2r& rkM){
+Vector2r operator*(const Vector2r& rkV, const Matrix2r& rkM){
 	 return Vector2r(rkV[0]*rkM[0][0] + rkV[1]*rkM[1][0],rkV[0]*rkM[0][1] + rkV[1]*rkM[1][1]);
 }
 

@@ -462,6 +462,8 @@ const shared_ptr<MetaBody>& Omega::getRootBody()
 	return rootBody;
 }
 
+void Omega::setRootBody(shared_ptr<MetaBody>& rb){ rootBody=rb;}
+
 
 ptime Omega::getMsStartingSimulationTime()
 {

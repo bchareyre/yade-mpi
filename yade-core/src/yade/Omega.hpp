@@ -109,6 +109,7 @@ class Omega : public Singleton<Omega>
 		bool		containTimeStepper();
 
 		const		shared_ptr<MetaBody>& getRootBody();
+		void		setRootBody(shared_ptr<MetaBody>&);
 		void		freeRootBody();
 		
 		ptime		getMsStartingSimulationTime();
