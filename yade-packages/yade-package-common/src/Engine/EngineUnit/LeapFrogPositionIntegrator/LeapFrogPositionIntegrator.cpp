@@ -35,6 +35,8 @@ void LeapFrogPositionIntegrator::go(       const shared_ptr<PhysicalParameters>&
 	prevVelocities[id] = p->velocity+((Real)0.5)*dt*p->acceleration;
 	p->se3.position += prevVelocities[id]*dt;
 
+	//cerr<<"#"<<body->getId()<<"dx="<<prevVelocities[id]*dt<<endl;
+
 	firsts[id] = false;
 }
 

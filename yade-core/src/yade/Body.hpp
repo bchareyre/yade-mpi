@@ -49,6 +49,7 @@ class Body : public Serializable
 			static const id_t ID_NONE;
 			//! get Body pointer given its id. 
 			static shared_ptr<Body> byId(id_t _id);
+			//bool isClump(){return id==clumpId;}
 		#endif
 		unsigned int getId() const {return id;};
 

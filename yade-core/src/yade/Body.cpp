@@ -16,7 +16,18 @@
 
 #ifdef HIGHLEVEL_CLUMPS
 	const id_t Body::ID_NONE=UINT_MAX;
-	/*! the definition will change once Omega disappears, but the interface should be the same. */
+	/*! The definition will change once Omega disappears, but the interface should be the same.
+	 * \warning This relies on Omega::instance().getRootBody() returning the respective rootBody.
+	 * Therefore, if you use this from a FileGenerator, you will need to call something like \code
+		shared_ptr<MetaBody> oldRootBody=Omega::instance().getRootBody();
+		Omega::instance().setRootBody(rootBody);
+		// ...
+		// do your stuff here
+		// ...
+		Omega::instance().setRootBody(oldRootBody);
+		\endcode
+		\warning Make sure that a simulation is not running during generation, otherwise it will most likely crash. It seems that Omega::getRootBodyMutex that could be used for this purpose is just a dummy function.
+	 * */
 	shared_ptr<Body> Body::byId(Body::id_t _id){return (*(Omega::instance().getRootBody()->bodies))[_id];}
 #endif
 

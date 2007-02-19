@@ -43,11 +43,16 @@ void InteractionGeometryMetaEngine::action(Body* body)
 		shared_ptr<Body>& b2 = (*bodies)[interaction->getId2()];
 		
 		interaction->isReal =
-
-		// FIXME put this inside VolatileInteractionCriterion dynlib
+			b1->interactingGeometry && b2->interactingGeometry && // some bodies do not have interactingGeometry
+			// FIXME put this inside VolatileInteractionCriterion dynlib
 			( persistentInteractions->find(interaction->getId1(),interaction->getId2()) == 0 )
 		 	&&
 			operator()( b1->interactingGeometry , b2->interactingGeometry , b1->physicalParameters->se3 , b2->physicalParameters->se3 , interaction );
+
+		//tmp
+		if(!(b1->interactingGeometry&&b2->interactingGeometry)){
+			cerr<<__FILE__<<":"<<__LINE__<<": no interacting geometry "<< (b1->interactingGeometry?b1->getId():-1)<<" "<<(b2->interactingGeometry?b2->getId():-1)<<endl;
+		}
 			
 	}
 }

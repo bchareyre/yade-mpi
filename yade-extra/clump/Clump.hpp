@@ -14,6 +14,7 @@
 #include<yade/yade-core/Body.hpp>
 #include<yade/yade-core/MetaBody.hpp>
 #include<yade/yade-core/FileGenerator.hpp>
+#include<yade/yade-core/DeusExMachina.hpp>
 #include<yade/yade-lib-factory/Factorable.hpp>
 #include<boost/shared_ptr.hpp>
 #include<yade/yade-package-common/PhysicalParametersEngineUnit.hpp>
@@ -27,19 +28,20 @@
 	#error HIGHLEVEL_CLUMPS must be defined if clumps are to work!
 #endif
 
-/*! \brief Body representing clump (aggregate) composed by other existing bodies.
+/*! Body representing clump (rigid aggregate) composed by other existing bodies.
 
+	Clump is one of bodies that reside in rootBody->bodies.
 	When an existing body is added to ::Clump, it's ::Body::isDynamic flag is set to false
 	(it is still subscribed to all its engines, to make it possible to remove it from the clump again).
-	All forces acting on |subBodies| are made to act on the clump itself, which will ensure that they
-	 influence all |subBodies| as if the clump were a rigid particle.
+	All forces acting on Clump::subBodies are made to act on the clump itself, which will ensure that they
+	influence all Clump::subBodies as if the clump were a rigid particle.
  
 	What are clump requirements so that they function?
 	-# Given any body, tell
 		- if it is a clump member \code Body::clumpId!=Body::ID_NONE \endcode
 		- what is it's clump id (Body::clumpId)
-	 	- if it is a clump (is instance of ::Clump)
-		- could be `Body::clumpId==Body::id`, but we can't guarantee consistency here; `id`s are assigned automatically by `BodyContainer` and it would have to be conscient of the body being clump... or not? This will probably be used not very often (engines use templates, not RTTI (?))
+	 	- if it is a clump \code Body::clumpId==Body::id \endcode This is assured at each call to Clump::add.
+		 - we could use RTTI instead? Would that be more reliable?
 	-# given the root body, tell
 		- what clumps it contains (enumerate all bodies and filter clumps, see above)
 	-#	given a clump, tell
@@ -55,6 +57,9 @@
 	-# Recalculate ::subBodies position and orientation (same class as previously will handle that automatically)
 
 	Some more information can be found http://beta.arcig.cz/~eudoxos/phd/index.cgi/YaDe/HighLevelClumps
+
+	\note PersistentSAPCollider and SAPCollider bypass Clump by virtue of no boundingVolume being defined. Different logic would have to be implemented if Clump were to have its own boundingVolume.
+	\note Clump relies on its id being assigned (as well as id of its components); therefore, only bodies that have already been inserted to the container may be added to Clump which has been itself already added to the container.
  
  */
 
@@ -95,17 +100,19 @@ class Clump: public Body {
 
 REGISTER_SERIALIZABLE(Clump,false);
 
-/*! \brief  Update ::Clump::subBodies positions so that the Clump behaves as a rigid body.
+/*! Update ::Clump::subBodies positions so that the Clump behaves as a rigid body.
+ *
+ *
 */
-class ClumpSubBodyMover: public PhysicalParametersEngineUnit {
+class ClumpSubBodyMover: public DeusExMachina {
 	public:
-		//! This is the engine's working part
-		virtual void go(const shared_ptr<PhysicalParameters>& pp, Body* clump);
+		//! Interates over rootBody->bodies and calls Clump::moveSubBodies() for clumps.
+		virtual void applyCondition(Body* rootBody);
 		ClumpSubBodyMover();
 		virtual ~ClumpSubBodyMover(){};
 
 	REGISTER_CLASS_NAME(ClumpSubBodyMover);
-	REGISTER_BASE_CLASS_NAME(PhysicalParametersEngineUnit);
+	REGISTER_BASE_CLASS_NAME(DeusExMachina);
 	// REGISTER_CLASS_INDEX(ClumpSubBodyMover,PhysicalParametersEngineUnit);
 	DECLARE_LOGGER;
 };
@@ -122,10 +129,12 @@ class ClumpTestGen : public FileGenerator {
 		//bool		 rotationBlocked;
 		//void createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents);
 		void createOneClump(shared_ptr<MetaBody>& rootBody, int i, int j, int k);
+		shared_ptr<Body> createOneSphere(Vector3r position, Real radius);
 		void createActors(shared_ptr<MetaBody>& rootBody);
 		//void positionRootBody(shared_ptr<MetaBody>& rootBody);
 		//void calculatePropertiesAndReposition(const shared_ptr<SlumShape>& slum, shared_ptr<ElasticBodyParameters>& rbp, Real density);
 		//void makeTet(shared_ptr<Tetrahedron>& tet, Real radius);
+		shared_ptr<ClumpSubBodyMover> clumpMover;
 	public :
 		ClumpTestGen (){};
 		~ClumpTestGen (){};

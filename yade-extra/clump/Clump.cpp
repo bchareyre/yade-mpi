@@ -18,25 +18,44 @@ CREATE_LOGGER(Clump);
 CREATE_LOGGER(ClumpSubBodyMover);
 CREATE_LOGGER(ClumpTestGen);
 
-//! Constructor must be in the .cpp file (?)
-ClumpSubBodyMover::ClumpSubBodyMover(): PhysicalParametersEngineUnit() {/*createIndex();*/ }
+/**************************************************************************************
+ ************************************* ClumpSubBodyMover ******************************
+ **************************************************************************************/
+
+// Constructor must be in the .cpp file (?)
+ClumpSubBodyMover::ClumpSubBodyMover(){/*createIndex();*/ LOG_TRACE("constructor"); }
 
 /*! We only call clump's method, since it belongs there logically. It makes encapsulation of private members nicer, too.
  * @param pp passed by the dispatcher
  * @param clump passed by the dispatcher
  */
-void ClumpSubBodyMover::go(const shared_ptr<PhysicalParameters>& pp, Body* clump){
-	if(!clump->isDynamic) return; // perhaps clump that has been desactivated?!
-	dynamic_cast<Clump*>(clump)->moveSubBodies();
+void ClumpSubBodyMover::applyCondition(Body* _rootBody){
+	MetaBody* rootBody = dynamic_cast<MetaBody*>(_rootBody);
+	for(BodyContainer::iterator I=rootBody->bodies->begin(); I!=rootBody->bodies->end(); ++I){
+		shared_ptr<Body> b = *I;
+		// is this a clump?
+		if(b->getId()==b->clumpId){
+			//LOG_TRACE("Applying movement to clump #"<<b->getId());
+			dynamic_pointer_cast<Clump>(b)->moveSubBodies();
+		}
+	}
+	//if(!clump->isDynamic) return; // perhaps clump that has been desactivated?!
 }
 
+/**************************************************************************************
+ ******************************************** Clump ***********************************
+ **************************************************************************************/
 
 /*! Create zero'ed RigidBodyParameters; they should not be manipulated directly, since they are all calculated in Clump::update.
  * @todo do we need to do the same for GeomtricalModel, InteractingGeometry and BoundingVolume? They will never be used. Sort that out for sure.
+ * @bug setting Clump::isDynamic in constructor is not enough (as if it were modified somewhere), must be set explicitly by the user after construction (why?)
  */
 Clump::Clump(): Body(){
-	isDynamic=false;
+	isDynamic=true;
 	physicalParameters=shared_ptr<RigidBodyParameters>(new RigidBodyParameters);
+
+	// these will not be defined for the moment...
+#if 0
 	boundingVolume=shared_ptr<AABB>(new AABB);
 	boundingVolume->diffuseColor=Vector3r(1,0,0);
 
@@ -45,6 +64,7 @@ Clump::Clump(): Body(){
 
 	geometricalModel=shared_ptr<GeometricalModel>(new GeometricalModel);
 	geometricalModel->diffuseColor=Vector3f(0,0,0); geometricalModel->wire=false; geometricalModel->visible=false; geometricalModel->shadowCaster=false;
+#endif
 
 }
 
@@ -66,6 +86,9 @@ void Clump::add(Body::id_t subId){
 	subBody->isDynamic=false;
 	// for now, push just unitialized se3; will be updated by updateProperties
 	subBodies[subId]=Se3r();
+
+	clumpId=getId(); // identifies a clump
+
 	LOG_DEBUG("Added body #"<<subId<<" to clump #"<<getId());
 }
 
@@ -89,11 +112,14 @@ void Clump::del(Body::id_t subId){
 void Clump::moveSubBodies(){
 	const Se3r& mySe3(physicalParameters->se3);
 	for(clumpMap::iterator I=subBodies.begin(); I!=subBodies.end(); I++){
-		// now, I->first is Body::id_t, I->second is Se3r of that body
+		// now, I->first is Body::id_t, I->second is Se3r of that body in the clump
 		shared_ptr<Body> subBody=Body::byId(I->first);
 		shared_ptr<RigidBodyParameters> subRBP=dynamic_pointer_cast<RigidBodyParameters>(subBody->physicalParameters);
+		//LOG_TRACE("Old #"<<I->first<<"position: "<<subRBP->se3.position);
 		subRBP->se3.position=mySe3.position+mySe3.orientation*I->second.position;
 		subRBP->se3.orientation=mySe3.orientation*I->second.orientation;
+		//LOG_TRACE("New #"<<I->first<<"position: "<<subRBP->se3.position);
+		//LOG_TRACE("Clump #"<<getId()<<" moved #"<<I->first<<".");
 	}
 }
 
@@ -121,7 +147,7 @@ void Clump::moveSubBodies(){
 
 	@note User is responsible for calling this function when appropriate (after adding/removing bodies and before any subsequent simulation). This function can be rather slow by virtue of numerical integration.
 	@note subBodie's velocities are not taken into account. This means that clump will be at still after being created, even if its composing particles did have some velocities. If this is concern for someone, it needs to be completed in the code below. See Clump::moveSubBodies for complementary issue.
-	@todo Needs to be implemented and tested.
+	@todo Needs to be tested for physical correctness
 	@param intersecting if true, evaluate mass and inertia numerically; otherwise, use analytical methods (parallel axes theorem) which disregard any intersections, but are much faster. */
 void Clump::updateProperties(bool intersecting){
 	LOG_DEBUG("Updating clump #"<<getId()<<" parameters");
@@ -151,18 +177,43 @@ void Clump::updateProperties(bool intersecting){
 			// transform from local to global coords
 			// FIXME: verify this!
 			Quaternionr subRBP_orientation_conjugate=subRBP->se3.orientation.Conjugate();
-			Ig+=Clump::inertiaTensorTranslate(Clump::inertiaTensorRotate(Matrix3r(subRBP->inertia),subRBP_orientation_conjugate),-subRBP->mass,-1.*subRBP->se3.position);
+			Matrix3r Imatrix(subRBP->inertia[0],subRBP->inertia[1],subRBP->inertia[2]); TRWM3MAT(Imatrix);
+			TRWM3QUAT(subRBP_orientation_conjugate);
+			Ig+=Clump::inertiaTensorTranslate(Clump::inertiaTensorRotate(Imatrix,subRBP_orientation_conjugate),-subRBP->mass,-1.*subRBP->se3.position);
+
+			//TRWM3MAT(Clump::inertiaTensorRotate(Matrix3r(subRBP->inertia),subRBP_orientation_conjugate));
 		}
 	}else{LOG_ERROR("Self-intersecting clumps not implemented.");}
+	TRVAR1(M);
+	TRWM3MAT(Ig);
+	TRWM3VEC(Sg);
+
+	/*! @bug incorrect results; these are vars traced for one and only sphere:
+	 *
+DEBUG yade.Clump yade-extra/clump/Clump.cpp:153 updateProperties: Updating clump #1 parameters
+DEBUG yade.Clump yade-extra/clump/Clump.cpp:182 updateProperties: subRBP->inertia=(104.72 104.72 104.72)
+DEBUG yade.Clump yade-extra/clump/Clump.cpp:183 updateProperties: Clump::inertiaTensorRotate(Matrix3r(subRBP->inertia),subRBP_orientation_conjugate)=((0 0 0)(0 0 0)(0 0 0))
+DEBUG yade.Clump yade-extra/clump/Clump.cpp:186 updateProperties: M=1047.2; 
+DEBUG yade.Clump yade-extra/clump/Clump.cpp:187 updateProperties: Ig=((0 0 0)(0 0 0)(0 0 0))
+DEBUG yade.Clump yade-extra/clump/Clump.cpp:188 updateProperties: Sg=(0 0 0)
+DEBUG yade.Clump yade-extra/clump/Clump.cpp:200 updateProperties: Ic=((0 0 0)(0 0 0)(0 0 0))
+DEBUG yade.Clump yade-extra/clump/Clump.cpp:201 updateProperties: Clump::inertiaTensorRotate(Ic_orientG,R_g2c)=((0 nan nan)(nan nan nan)(nan nan nan))
+
+*/
 
 
 	mySe3.position=Sg/M; // clump's centroid
 	// this will calculate translation only, since rotation is zero
 	Matrix3r Ic_orientG=Clump::inertiaTensorTranslate(Ig, -M /* negative mass means towards centroid */, mySe3.position); // inertia at clump's centroid but with world orientation
 
-	Matrix3r R_g2c; //rotation matrix
+	Matrix3r R_g2c(true); //rotation matrix
 	Ic_orientG(1,0)=Ic_orientG(0,1); Ic_orientG(2,0)=Ic_orientG(0,2); Ic_orientG(2,1)=Ic_orientG(1,2); // symmetrize
+	Ic_orientG(0,0)+=.1;
+	TRWM3MAT(Ic_orientG);
 	Ic_orientG.EigenDecomposition(R_g2c,Ic);
+	/*! @bug: eigendecomposition is wrong. see http://article.gmane.org/gmane.science.physics.yade.devel/99 for message. */
+	// has NaNs for identity matrix!
+	TRWM3MAT(R_g2c);
 
 	// these two should give the same result!
 	TRWM3MAT(Ic);
@@ -188,7 +239,7 @@ void Clump::updateProperties(bool intersecting){
 		I->second.orientation=mySe3.orientation.Conjugate()*subRBP->se3.orientation;
 		I->second.position=mySe3.orientation.Conjugate()*(subRBP->se3.position-mySe3.position);
 	}
-
+#if 0
 	// update bounding box; we could have done this in previous loops, but this is cleaner
 	Vector3r min(0,0,0),max(0,0,0);
 	for(clumpMap::iterator I=subBodies.begin(); I!=subBodies.end(); I++){
@@ -199,6 +250,7 @@ void Clump::updateProperties(bool intersecting){
 	}
 	shared_ptr<AABB> aabb=dynamic_pointer_cast<AABB>(boundingVolume);
 	aabb->center=(min+max)*.5; aabb->halfSize=(max-min)*.5;
+#endif
 }
 
 /*! @brief Recalculates inertia tensor of a body after translation away from (default) or towards its centroid.
@@ -211,12 +263,14 @@ void Clump::updateProperties(bool intersecting){
 Matrix3r Clump::inertiaTensorTranslate(const Matrix3r& I,const Real m, const Vector3r& off){
 	Real ooff=off.Dot(off);
 	Matrix3r I2=I;
+	//TRWM3VEC(off); TRVAR2(ooff,m); TRWM3MAT(I);
 	// translation away from centroid
 	/* I^c_jk=I'_jk-M*(delta_jk R.R - R_j*R_k) [http://en.wikipedia.org/wiki/Moments_of_inertia#Parallel_axes_theorem] */
 	I2+=m*Matrix3r(/* dIxx */ ooff-off[0]*off[0], /* dIxy */ -off[0]*off[1], /* dIxz */ -off[0]*off[2],
 		/* sym */ 0, /* dIyy */ ooff-off[1]*off[1], /* dIyz */ -off[1]*off[2],
 		/* sym */ 0, /* sym */ 0, /* dIzz */ ooff-off[2]*off[2]);
 	I2(1,0)=I2(0,1); I2(2,0)=I2(0,2); I2(2,1)=I2(1,2);
+	//TRWM3MAT(I2);
 	return I2;
 }
 
@@ -228,6 +282,7 @@ Matrix3r Clump::inertiaTensorTranslate(const Matrix3r& I,const Real m, const Vec
  */
 Matrix3r Clump::inertiaTensorRotate(const Matrix3r& I,const Matrix3r& T){
 	/* [http://www.kwon3d.com/theory/moi/triten.html] */
+	//TRWM3MAT(I); TRWM3MAT(T);
 	return T.Transpose()*I*T;
 }
 
@@ -326,7 +381,8 @@ void ClumpLeapFrogPositionAndOrientationIntegrator::go(const shared_ptr<Physical
 //#include "BodyMacroParameters.hpp"
 
 
-
+// generate either random spheres, or (if not defined) just one sphere and one one-sphere clump
+//#define CLUMP_COMPLICATED
 
 
 string ClumpTestGen::generate()
@@ -369,18 +425,21 @@ string ClumpTestGen::generate()
 
 	// some clumps
 	setMessage("Elements...");
-	for(int i=0;i<2;i++)
-	{
-		if(shouldTerminate()) return "";
-		for(int j=0;j<2;j++)
-			for(int k=0;k<2;k++)
-			{
-				//shared_ptr<Body> clump;
-				createOneClump(rootBody,i,j,k);
-				//rootBody->bodies->insert(clump);
-				setProgress(i*j*k/(2*2*2));
-			}
+	#ifdef CLUMP_COMPLICATED
+		for(int i=0;i<2;i++) for(int j=0;j<2;j++) for(int k=0;k<2;k++){
+	#else
+		{ int i=0,j=0,k=0;
+	#endif
+			if(shouldTerminate()) return "";
+			createOneClump(rootBody,i,j,k);
+			setProgress(i*j*k/(2*2*2));
 	}
+
+	#ifndef CLUMP_COMPLICATED
+	// for the simple case, create a standalone sphere as well
+		shared_ptr<Body> sphere=createOneSphere(Vector3r(1,0,0),.5);
+		rootBody->bodies->insert(sphere);
+	#endif
 
 	// restore Omega
 	Omega::instance().setRootBody(oldRootBody);
@@ -396,67 +455,157 @@ string ClumpTestGen::generate()
 
 void ClumpTestGen::createOneClump(shared_ptr<MetaBody>& rootBody, int i, int j, int k)
 {
-	Vector3r clumpPos=Vector3r(i,j,k)+Vector3r(.2*Mathr::SymmetricRandom(),.2*Mathr::SymmetricRandom(),.2*Mathr::SymmetricRandom());
-	Real density=2000;
+	// empty clump	
+	shared_ptr<Clump> clump=shared_ptr<Clump>(new Clump());
+	shared_ptr<Body> clumpAsBody=dynamic_pointer_cast<Body>(clump);
+	rootBody->bodies->insert(clumpAsBody);
 
-	int nSpheres=(int)(Mathr::UnitRandom()*4+1);
+	clump->isDynamic=true;
+	// if subscribedBodies work some day: clumpMover->subscribedBodies.push_back(clump->getId());
+	
+	#ifdef CLUMP_COMPLICATED	
+		Vector3r clumpPos=Vector3r(i,j,k)+Vector3r(.2*Mathr::SymmetricRandom(),.2*Mathr::SymmetricRandom(),.2*Mathr::SymmetricRandom());	int nSpheres=(int)(Mathr::UnitRandom()*4+1);
+	#else
+		Vector3r clumpPos=Vector3r(i,j,k); int nSpheres=1;
+	#endif
+
 	LOG_TRACE("Will generate "<<nSpheres<<" shperes around the point "<<clumpPos);
+
 	vector<Body::id_t> subBodyIDs;
 	// create a few spheres that will be part of the clump afterwards
 	for(int i=0; i<nSpheres; i++){
-		//body
-		shared_ptr<Body> body=shared_ptr<Body>(new Body(0,55));
-		body->isDynamic=true;
+		shared_ptr<Body> sphere=
+			#ifdef CLUMP_COMPLICATED
+			// positined around future clump's position
+				createOneSphere(clumpPos+.3*Vector3r(Mathr::SymmetricRandom(),Mathr::SymmetricRandom(),Mathr::SymmetricRandom()),Mathr::IntervalRandom(.1,.3));
+			#else
+				createOneSphere(clumpPos,.5);
+			#endif
+		Body::id_t lastId=(Body::id_t)rootBody->bodies->insert(sphere);
+		clump->add(lastId);
 
-		// physics
-		shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
-		// positined around future clump's position
-		Vector3r position=clumpPos+.3*Vector3r(Mathr::SymmetricRandom(),Mathr::SymmetricRandom(),Mathr::SymmetricRandom());
-		Quaternionr q; q.FromAxisAngle(Vector3r(0,0,1),0);
-		Real radius=Mathr::IntervalRandom(.2,.5);
-		physics->angularVelocity=Vector3r(0,0,0);
-		physics->velocity=Vector3r(0,0,0);
-		physics->mass=4.0/3.0*Mathr::PI*radius*radius*radius*density;
-		physics->inertia=Vector3r(2.0/5.0*physics->mass*radius*radius,2.0/5.0*physics->mass*radius*radius,2.0/5.0*physics->mass*radius*radius);
-		physics->se3=Se3r(position,q);
-		physics->young=2e7;
-		physics->poisson=.3;
-		physics->frictionAngle=40*Mathr::PI/180.0;
-		body->physicalParameters=physics;
-
-		// aabb
-		shared_ptr<AABB> aabb(new AABB);
-		aabb->diffuseColor=Vector3r(0,1,0);
-		body->boundingVolume=aabb;
-
-		// mold
-		shared_ptr<Sphere> gSphere(new Sphere);
-		shared_ptr<InteractingSphere> iSphere(new InteractingSphere);
-		iSphere->radius=radius;
-		iSphere->diffuseColor=Vector3f(Mathf::UnitRandom(),Mathf::UnitRandom(),Mathf::UnitRandom());
-		body->interactingGeometry=iSphere;
-
-		//shape
-		gSphere->radius=radius;
-		gSphere->diffuseColor=Vector3f(Mathf::UnitRandom(),Mathf::UnitRandom(),Mathf::UnitRandom());
-		gSphere->wire=false;
-		gSphere->visible=true;
-		gSphere->shadowCaster=true;
-		body->geometricalModel=gSphere;
-
-		Body::id_t lastId=(Body::id_t)rootBody->bodies->insert(body);
-		subBodyIDs.push_back(lastId);
-		LOG_TRACE("Generated sphere #"<<lastId);
+		LOG_TRACE("Generated clumped sphere #"<<lastId);
 	}
 
-	shared_ptr<Clump> clump=shared_ptr<Clump>(new Clump());
-	shared_ptr<Body> clumpAsBody=dynamic_pointer_cast<Body>(clump);
-#if 0
-	//FIXME
-	rootBody->bodies->insert(clumpAsBody);
-	for(size_t i=0; i<subBodyIDs.size(); i++){clump->add(subBodyIDs[i]);}
 	clump->updateProperties(false);
-#endif
+}
+
+shared_ptr<Body> ClumpTestGen::createOneSphere(Vector3r position, Real radius){
+	Real density=2000;
+
+	// body itself
+	shared_ptr<Body> body=shared_ptr<Body>(new Body(0,55));
+	body->isDynamic=true;
+
+	// physics
+	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
+	Quaternionr q; q.FromAxisAngle(Vector3r(0,0,1),0);
+	physics->angularVelocity=Vector3r(0,0,0);
+	physics->velocity=Vector3r(0,0,0);
+	physics->mass=4.0/3.0*Mathr::PI*radius*radius*radius*density;
+	physics->inertia=Vector3r(2.0/5.0*physics->mass*radius*radius,2.0/5.0*physics->mass*radius*radius,2.0/5.0*physics->mass*radius*radius);
+	physics->se3=Se3r(position,q);
+	physics->young=2e7;
+	physics->poisson=.3;
+	physics->frictionAngle=40*Mathr::PI/180.0;
+	body->physicalParameters=physics;
+
+	// aabb
+	shared_ptr<AABB> aabb(new AABB);
+	aabb->diffuseColor=Vector3r(0,1,0);
+	body->boundingVolume=aabb;
+
+	// mold
+	shared_ptr<Sphere> gSphere(new Sphere);
+	shared_ptr<InteractingSphere> iSphere(new InteractingSphere);
+	iSphere->radius=radius;
+	iSphere->diffuseColor=Vector3f(Mathf::UnitRandom(),Mathf::UnitRandom(),Mathf::UnitRandom());
+	body->interactingGeometry=iSphere;
+
+	//shape
+	gSphere->radius=radius;
+	gSphere->diffuseColor=Vector3f(Mathf::UnitRandom(),Mathf::UnitRandom(),Mathf::UnitRandom());
+	gSphere->wire=false;
+	gSphere->visible=true;
+	gSphere->shadowCaster=true;
+	body->geometricalModel=gSphere;
+
+	return body;
+}
+
+void ClumpTestGen::createActors(shared_ptr<MetaBody>& rootBody)
+{
+	shared_ptr<PhysicalActionContainerInitializer> physicalActionInitializer(new PhysicalActionContainerInitializer);
+	physicalActionInitializer->physicalActionNames.push_back("Force");
+	physicalActionInitializer->physicalActionNames.push_back("Momentum");
+	
+	shared_ptr<InteractionGeometryMetaEngine> interactionGeometryDispatcher(new InteractionGeometryMetaEngine);
+	interactionGeometryDispatcher->add("InteractingSphere","InteractingSphere","InteractingSphere2InteractingSphere4SpheresContactGeometry");
+	interactionGeometryDispatcher->add("InteractingSphere","InteractingBox","InteractingBox2InteractingSphere4SpheresContactGeometry");
+
+	shared_ptr<InteractionPhysicsMetaEngine> interactionPhysicsDispatcher(new InteractionPhysicsMetaEngine);
+	interactionPhysicsDispatcher->add("BodyMacroParameters","BodyMacroParameters","MacroMicroElasticRelationships");
+		
+	shared_ptr<BoundingVolumeMetaEngine> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeMetaEngine>(new BoundingVolumeMetaEngine);
+	boundingVolumeDispatcher->add("InteractingSphere","AABB","InteractingSphere2AABB");
+	boundingVolumeDispatcher->add("InteractingBox","AABB","InteractingBox2AABB");
+	boundingVolumeDispatcher->add("MetaInteractingGeometry","AABB","MetaInteractingGeometry2AABB");
+		
+	shared_ptr<GravityEngine> gravityCondition(new GravityEngine);
+	gravityCondition->gravity=Vector3r(0,0,-1);
+	
+	shared_ptr<CundallNonViscousForceDamping> actionForceDamping(new CundallNonViscousForceDamping);
+	actionForceDamping->damping = .2;
+	shared_ptr<CundallNonViscousMomentumDamping> actionMomentumDamping(new CundallNonViscousMomentumDamping);
+	actionMomentumDamping->damping = .2;
+	shared_ptr<PhysicalActionDamper> actionDampingDispatcher(new PhysicalActionDamper);
+	actionDampingDispatcher->add("Force","ParticleParameters","CundallNonViscousForceDamping",actionForceDamping);
+	actionDampingDispatcher->add("Momentum","RigidBodyParameters","CundallNonViscousMomentumDamping",actionMomentumDamping);
+	
+	shared_ptr<PhysicalActionApplier> applyActionDispatcher(new PhysicalActionApplier);
+	applyActionDispatcher->add("Force","ParticleParameters","NewtonsForceLaw");
+	applyActionDispatcher->add("Momentum","RigidBodyParameters","NewtonsMomentumLaw");
+	
+	shared_ptr<PhysicalParametersMetaEngine> positionIntegrator(new PhysicalParametersMetaEngine);
+	positionIntegrator->add("ParticleParameters","LeapFrogPositionIntegrator");
+	shared_ptr<PhysicalParametersMetaEngine> orientationIntegrator(new PhysicalParametersMetaEngine);
+	orientationIntegrator->add("RigidBodyParameters","LeapFrogOrientationIntegrator");
+ 	
+	shared_ptr<ElasticCriterionTimeStepper> sdecTimeStepper(new ElasticCriterionTimeStepper);
+	sdecTimeStepper->sdecGroupMask = 55;
+	sdecTimeStepper->timeStepUpdateInterval = 300;
+	
+	shared_ptr<ElasticContactLaw> constitutiveLaw(new ElasticContactLaw);
+	constitutiveLaw->sdecGroupMask = 55;
+	constitutiveLaw->momentRotationLaw = true;
+/*// FIXME FIXME FIXME ....	
+	shared_ptr<ElasticCohesiveLaw> constitutiveLaw2(new ElasticCohesiveLaw);
+	constitutiveLaw2->sdecGroupMask = 55;
+	constitutiveLaw2->momentRotationLaw = momentRotationLaw;*/
+
+	// clumps will be subscribed later, as they are generated
+	clumpMover=shared_ptr<ClumpSubBodyMover>(new ClumpSubBodyMover);
+	
+	rootBody->engines.clear();
+	rootBody->engines.push_back(sdecTimeStepper);
+	rootBody->engines.push_back(shared_ptr<Engine>(new PhysicalActionContainerReseter));
+	rootBody->engines.push_back(boundingVolumeDispatcher);
+	rootBody->engines.push_back(shared_ptr<Engine>(new PersistentSAPCollider));
+	rootBody->engines.push_back(interactionGeometryDispatcher);
+	rootBody->engines.push_back(interactionPhysicsDispatcher);
+	rootBody->engines.push_back(constitutiveLaw);
+	//rootBody->engines.push_back(constitutiveLaw2);
+	rootBody->engines.push_back(gravityCondition);
+	rootBody->engines.push_back(actionDampingDispatcher);
+	rootBody->engines.push_back(applyActionDispatcher);
+	rootBody->engines.push_back(positionIntegrator);
+	rootBody->engines.push_back(orientationIntegrator);
+	rootBody->engines.push_back(clumpMover);
+
+	rootBody->initializers.clear();
+	rootBody->initializers.push_back(physicalActionInitializer);
+	rootBody->initializers.push_back(boundingVolumeDispatcher);
+}
 
 /*
 	body = shared_ptr<Body>(new Body(0,1));
@@ -511,75 +660,3 @@ eeds only young modulus. (stiffness)
 	// then you will need to make a new class.
 	//
 	body->physicalParameters=physics;*/
-}
-
-void ClumpTestGen::createActors(shared_ptr<MetaBody>& rootBody)
-{
-	shared_ptr<PhysicalActionContainerInitializer> physicalActionInitializer(new PhysicalActionContainerInitializer);
-	physicalActionInitializer->physicalActionNames.push_back("Force");
-	physicalActionInitializer->physicalActionNames.push_back("Momentum");
-	
-	shared_ptr<InteractionGeometryMetaEngine> interactionGeometryDispatcher(new InteractionGeometryMetaEngine);
-	interactionGeometryDispatcher->add("InteractingSphere","InteractingSphere","InteractingSphere2InteractingSphere4SpheresContactGeometry");
-	interactionGeometryDispatcher->add("InteractingSphere","InteractingBox","InteractingBox2InteractingSphere4SpheresContactGeometry");
-
-	shared_ptr<InteractionPhysicsMetaEngine> interactionPhysicsDispatcher(new InteractionPhysicsMetaEngine);
-	interactionPhysicsDispatcher->add("BodyMacroParameters","BodyMacroParameters","MacroMicroElasticRelationships");
-		
-	shared_ptr<BoundingVolumeMetaEngine> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeMetaEngine>(new BoundingVolumeMetaEngine);
-	boundingVolumeDispatcher->add("InteractingSphere","AABB","InteractingSphere2AABB");
-	boundingVolumeDispatcher->add("InteractingBox","AABB","InteractingBox2AABB");
-	boundingVolumeDispatcher->add("MetaInteractingGeometry","AABB","MetaInteractingGeometry2AABB");
-		
-	shared_ptr<GravityEngine> gravityCondition(new GravityEngine);
-	gravityCondition->gravity=Vector3r(0,0,-1);
-	
-	shared_ptr<CundallNonViscousForceDamping> actionForceDamping(new CundallNonViscousForceDamping);
-	actionForceDamping->damping = .2;
-	shared_ptr<CundallNonViscousMomentumDamping> actionMomentumDamping(new CundallNonViscousMomentumDamping);
-	actionMomentumDamping->damping = .2;
-	shared_ptr<PhysicalActionDamper> actionDampingDispatcher(new PhysicalActionDamper);
-	actionDampingDispatcher->add("Force","ParticleParameters","CundallNonViscousForceDamping",actionForceDamping);
-	actionDampingDispatcher->add("Momentum","RigidBodyParameters","CundallNonViscousMomentumDamping",actionMomentumDamping);
-	
-	shared_ptr<PhysicalActionApplier> applyActionDispatcher(new PhysicalActionApplier);
-	applyActionDispatcher->add("Force","ParticleParameters","NewtonsForceLaw");
-	applyActionDispatcher->add("Momentum","RigidBodyParameters","NewtonsMomentumLaw");
-	
-	shared_ptr<PhysicalParametersMetaEngine> positionIntegrator(new PhysicalParametersMetaEngine);
-	positionIntegrator->add("ParticleParameters","LeapFrogPositionIntegrator");
-	shared_ptr<PhysicalParametersMetaEngine> orientationIntegrator(new PhysicalParametersMetaEngine);
-	orientationIntegrator->add("RigidBodyParameters","LeapFrogOrientationIntegrator");
- 	
-	shared_ptr<ElasticCriterionTimeStepper> sdecTimeStepper(new ElasticCriterionTimeStepper);
-	sdecTimeStepper->sdecGroupMask = 55;
-	sdecTimeStepper->timeStepUpdateInterval = 300;
-	
-	shared_ptr<ElasticContactLaw> constitutiveLaw(new ElasticContactLaw);
-	constitutiveLaw->sdecGroupMask = 55;
-	constitutiveLaw->momentRotationLaw = true;
-/*// FIXME FIXME FIXME ....	
-	shared_ptr<ElasticCohesiveLaw> constitutiveLaw2(new ElasticCohesiveLaw);
-	constitutiveLaw2->sdecGroupMask = 55;
-	constitutiveLaw2->momentRotationLaw = momentRotationLaw;*/
-	
-	rootBody->engines.clear();
-	rootBody->engines.push_back(sdecTimeStepper);
-	rootBody->engines.push_back(shared_ptr<Engine>(new PhysicalActionContainerReseter));
-	rootBody->engines.push_back(boundingVolumeDispatcher);
-	rootBody->engines.push_back(shared_ptr<Engine>(new PersistentSAPCollider));
-	rootBody->engines.push_back(interactionGeometryDispatcher);
-	rootBody->engines.push_back(interactionPhysicsDispatcher);
-	rootBody->engines.push_back(constitutiveLaw);
-	//rootBody->engines.push_back(constitutiveLaw2);
-	rootBody->engines.push_back(gravityCondition);
-	rootBody->engines.push_back(actionDampingDispatcher);
-	rootBody->engines.push_back(applyActionDispatcher);
-	rootBody->engines.push_back(positionIntegrator);
-	rootBody->engines.push_back(orientationIntegrator);
-
-	rootBody->initializers.clear();
-	rootBody->initializers.push_back(physicalActionInitializer);
-	rootBody->initializers.push_back(boundingVolumeDispatcher);
-}
-

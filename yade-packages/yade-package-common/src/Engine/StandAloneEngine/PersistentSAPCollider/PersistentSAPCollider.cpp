@@ -66,6 +66,7 @@ void PersistentSAPCollider::action(Body* body)
 		b = *bi;
 		
 		offset = 3*i;
+		//FIXME: this is broken: bodies without boundingVolume are just skipped, which means that some garbage values are used later!
 		if(b->boundingVolume) // can't assume that everybody has BoundingVolume
 		{
 			min = b->boundingVolume->min;
@@ -176,7 +177,7 @@ void PersistentSAPCollider::sortBounds(vector<shared_ptr<AABBBound> >& bounds, i
 void PersistentSAPCollider::updateOverlapingBBSet(int id1,int id2)
 {
 
-// 	// look if the paiur (id1,id2) already exists in the overleppingBB collection
+// 	// look if the pair (id1,id2) already exists in the overleppingBB collection
 	bool found = (transientInteractions->find(id1,id2)!=0);
 	
 	// test if the AABBs of the spheres number "id1" and "id2" are overlapping
@@ -185,19 +186,20 @@ void PersistentSAPCollider::updateOverlapingBBSet(int id1,int id2)
 	#ifdef HIGHLEVEL_CLUMPS
 		Body::id_t clumpId1=Body::byId(id1)->clumpId, clumpId2=Body::byId(id2)->clumpId;
 	#endif
-	bool overlapp =
+	bool overlap =
 	#ifdef HIGHLEVEL_CLUMPS
-		(clumpId1==Body::ID_NONE || clumpId2<Body::ID_NONE || clumpId1!=clumpId2) && // only collide if at least one particle is non-clump or belong to different clumps
+		(clumpId1==Body::ID_NONE || clumpId2==Body::ID_NONE || clumpId1!=clumpId2) && // only collide if at least one particle is standalone or belongs to different clumps
+		clumpId1!=(Body::id_t)id1 && clumpId2!=(Body::id_t)id2 && // do not collide clumps, since they are just containers, they never interact
 	#endif
 		!(maximums[offset1]<minimums[offset2] || maximums[offset2]<minimums[offset1] || 
 		maximums[offset1+1]<minimums[offset2+1] || maximums[offset2+1]<minimums[offset1+1] || 
 		maximums[offset1+2]<minimums[offset2+2] || maximums[offset2+2]<minimums[offset1+2]);
 
-	// inserts the pair p=(id1,id2) if the two AABB overlapps and if p does not exists in the overlappingBB
-	if (overlapp && !found)
+	// inserts the pair p=(id1,id2) if the two AABB overlaps and if p does not exists in the overlappingBB
+	if (overlap && !found)
 		transientInteractions->insert(id1,id2);
 	// removes the pair p=(id1,id2) if the two AABB do not overlapp any more and if p already exists in the overlappingBB
-	else if (!overlapp && found)
+	else if (!overlap && found)
 		transientInteractions->erase(id1,id2);
 
 }
