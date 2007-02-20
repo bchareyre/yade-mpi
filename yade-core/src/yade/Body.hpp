@@ -49,7 +49,13 @@ class Body : public Serializable
 			static const id_t ID_NONE;
 			//! get Body pointer given its id. 
 			static shared_ptr<Body> byId(id_t _id);
-			//bool isClump(){return id==clumpId;}
+			//! Whether this Body is a Clump.
+			//! @note The following is always true: \code (Body::isClump() XOR Body::isClumpMember() XOR Body::isStandalone()) \endcode
+			bool isClump() const {return clumpId!=ID_NONE && id==clumpId;}
+			//! Whether this Body is member of a Clump.
+			bool isClumpMember() const {return clumpId!=ID_NONE && id!=clumpId;}
+			//! Whether this body is standalone (neither Clump, nor member of a Clump)
+			bool isStandalone() const {return clumpId==ID_NONE;}
 		#endif
 		unsigned int getId() const {return id;};
 
@@ -71,7 +77,7 @@ class Body : public Serializable
 		shared_ptr<BoundingVolume>	boundingVolume;
 	
 		/*! isDynamic is true if the state of the body is not modified by a kinematicEngine.
-		 * It is useful	for example for collision detection : if two colliding bodies are only
+		 * It is useful for example for collision detection : if two colliding bodies are only
 		 * kinematic then it is useless to modelise their contact */
 		// FIXME : should be determined automatically or not ?? if the body has a subscription to a
 		// kinematic engine then it is not dynamic but maybe a body with no subscription can be not dynamic ??

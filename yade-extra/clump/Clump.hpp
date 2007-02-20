@@ -128,7 +128,7 @@ class ClumpTestGen : public FileGenerator {
 		//int		 timeStepUpdateInterval;
 		//bool		 rotationBlocked;
 		//void createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents);
-		void createOneClump(shared_ptr<MetaBody>& rootBody, int i, int j, int k);
+		void createOneClump(shared_ptr<MetaBody>& rootBody, Vector3r clumpPos, vector<Vector3r> relPos, vector<Real> radii);
 		shared_ptr<Body> createOneSphere(Vector3r position, Real radius);
 		void createActors(shared_ptr<MetaBody>& rootBody);
 		//void positionRootBody(shared_ptr<MetaBody>& rootBody);

@@ -67,6 +67,7 @@ void SAPCollider::action(Body* body)
 	shared_ptr<Body> b;
 	i=0;
 
+	// FIXME: this will crash if body has no bounding volume
 	BodyContainer::iterator bi    = bodies->begin();
 	BodyContainer::iterator biEnd = bodies->end();
 	for(; bi!=biEnd ; ++bi,i++ )
