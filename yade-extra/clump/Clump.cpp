@@ -4,9 +4,6 @@
 
 #include<algorithm>
 
-
-
-
 char* yadePluginClasses[]={
 	"Clump",
 	"ClumpSubBodyMover",
@@ -276,7 +273,7 @@ DEBUG yade.Clump yade-extra/clump/Clump.cpp:201 updateProperties: Clump::inertia
 		I->second.position=mySe3.orientation.Conjugate()*(subRBP->se3.position-mySe3.position);
 	}
 
-	// clump as such has no bounding box, since it is probably never needed. The following may be safely removed unless someone need it.
+	// clump as such has no bounding box, since it is probably never needed. The following may be safely removed unless someone needs it.
 	#if 0
 		// update bounding box; we could have done this in previous loops, but this is cleaner
 		Vector3r min(0,0,0),max(0,0,0);
@@ -294,7 +291,7 @@ DEBUG yade.Clump yade-extra/clump/Clump.cpp:201 updateProperties: Clump::inertia
 /*! @brief Recalculates inertia tensor of a body after translation away from (default) or towards its centroid.
  *
  * @oaram I inertia tensor in the original coordinates; it is assumed to be upper-triangular (elements below the diagonal are ignored).
- * @param m mass of the body; if positive, translation is away from the centroid;
+ * @param m mass of the body; if positive, translation is away from the centroid; if negative, towards centroid.
  * @param off offset of the new origin from the original origin
  * @return inertia tensor in the new coordinate system; the matrix is symmetric.
  */
@@ -376,12 +373,14 @@ Matrix3r Clump::inertiaTensorRotate(const Matrix3r& I, const Quaternionr& rot){
 #include <yade/yade-package-dem/BodyMacroParameters.hpp>
 #include <yade/yade-package-dem/ElasticCriterionTimeStepper.hpp>
 #include <yade/yade-package-dem/ElasticContactLaw.hpp>
+
+#include<yade/yade-extra/PythonRecorder.hpp>
 //#include "ElasticCohesiveLaw.hpp"
 //#include "MacroMicroElasticRelationships.hpp"
 //#include "BodyMacroParameters.hpp"
 
 
-// generate either random spheres, or (if not defined) just one sphere and one one-sphere clump
+// generate either random spheres, or (if not defined) regular one sphere and {1,2,3,4}-clumps
 //#define CLUMP_COMPLICATED
 
 
@@ -396,12 +395,12 @@ string ClumpTestGen::generate()
 		shared_ptr<AABB> aabb(new AABB); aabb->diffuseColor=Vector3r(0,0,1);
 		rootBody->boundingVolume=dynamic_pointer_cast<BoundingVolume>(aabb);
 		createActors(rootBody);
-	}
-	// Containers
+		// Containers
 		rootBody->persistentInteractions=shared_ptr<InteractionContainer>(new InteractionVecSet);
 		rootBody->transientInteractions=shared_ptr<InteractionContainer>(new InteractionVecSet);
 		rootBody->physicalActions=shared_ptr<PhysicalActionContainer>(new PhysicalActionVectorVector);
 		rootBody->bodies=shared_ptr<BodyContainer>(new BodyRedirectionVector);
+	}
 
 	// FIXME: this is to make Body::byId work; otherwise crash will occur. Save rootBody, restore after generation is completed
 	// FIXME: will not be restored if generation crashes.
@@ -485,10 +484,19 @@ string ClumpTestGen::generate()
 }
 
 
-/*! \brief Generate clump with random spheres, at given position. 
+/*! \brief Generate clump of spheres, the result will be inserted into rootBody.
  *
- * For now, only generate a few spheres around the clump's "center". Later, these spheres will build the actual clump. */
-
+ * To create a clump, first the clump itself needs to be instantiated \em and inserted into rootBody (this will assign an Body::id).
+ * In order for this to work, Omega::roootBody must have been assigned; within generators, use Omega::setRootBody for this.
+ *
+ * The body to add to clump must have been also created and added to the rootBody (so that it has id, again).
+ *
+ * Finally, call Clump::updateProperties to get physical properties physically right (inertia, position, orientation, mass, ...).
+ *
+ * @param clumpPos Center of the clump (not necessarily centroid); serves merely as reference for sphere positions.
+ * @param relPos Relative positions of individual spheres' centers.
+ * @param radii Radii of composing spheres. Must have the same length as relPos.
+ */
 void ClumpTestGen::createOneClump(shared_ptr<MetaBody>& rootBody, Vector3r clumpPos, vector<Vector3r> relPos, vector<Real> radii)
 {
 	assert(relPos.size()==radii.size());
@@ -510,6 +518,10 @@ void ClumpTestGen::createOneClump(shared_ptr<MetaBody>& rootBody, Vector3r clump
 	clump->updateProperties(false);
 }
 
+/* Create single Sphere with some sane default parameters.
+ *
+ * @return Sphere (as Body) that can be readily used.
+ */
 shared_ptr<Body> ClumpTestGen::createOneSphere(Vector3r position, Real radius){
 	Real density=2000;
 
@@ -552,7 +564,11 @@ shared_ptr<Body> ClumpTestGen::createOneSphere(Vector3r position, Real radius){
 
 	return body;
 }
-
+/*! Instantiate engines acting on bodies during simulation.
+ *
+ * For simplicity, physical constants are not parametrized but hardcoded.
+ * Damping is not used so that energy conservation may be asserted.
+ */
 void ClumpTestGen::createActors(shared_ptr<MetaBody>& rootBody)
 {
 	shared_ptr<PhysicalActionContainerInitializer> physicalActionInitializer(new PhysicalActionContainerInitializer);
@@ -572,7 +588,7 @@ void ClumpTestGen::createActors(shared_ptr<MetaBody>& rootBody)
 	boundingVolumeDispatcher->add("MetaInteractingGeometry","AABB","MetaInteractingGeometry2AABB");
 		
 	shared_ptr<GravityEngine> gravityCondition(new GravityEngine);
-	gravityCondition->gravity=Vector3r(0,0,-1);
+	gravityCondition->gravity=Vector3r(0,0,-10);
 	
 	shared_ptr<CundallNonViscousForceDamping> actionForceDamping(new CundallNonViscousForceDamping);
 	actionForceDamping->damping = .2;
@@ -605,6 +621,7 @@ void ClumpTestGen::createActors(shared_ptr<MetaBody>& rootBody)
 
 	// clumps will be subscribed later, as they are generated
 	clumpMover=shared_ptr<ClumpSubBodyMover>(new ClumpSubBodyMover);
+
 	
 	rootBody->engines.clear();
 	rootBody->engines.push_back(sdecTimeStepper);
@@ -621,6 +638,13 @@ void ClumpTestGen::createActors(shared_ptr<MetaBody>& rootBody)
 	rootBody->engines.push_back(positionIntegrator);
 	rootBody->engines.push_back(orientationIntegrator);
 	rootBody->engines.push_back(clumpMover);
+	#ifdef EMBED_PYTHON
+		shared_ptr<PythonRecorder> pythonRecorder=shared_ptr<PythonRecorder>(new PythonRecorder);
+		//pythonRecorder->expression="print 'x2=',B[2].x,'v4=',B[4].I";
+		//pythonRecorder->expression="print 'x=',B[2].x,'v=',B[2].v,'m=',B[2].m,'energy=',B[2].Etrans+B[2].Erot+B[2].Epot,'(trans=',B[2].Etrans,'rot=',B[2].Erot,'pot=',B[2].Epot,')'";
+		pythonRecorder->expression="if (S.i%50==0): print 'file=',S.file,'iteration =',S.i,'t= ',S.t,'x2 =',B[2].x";
+		rootBody->engines.push_back(pythonRecorder);
+	#endif
 
 	rootBody->initializers.clear();
 	rootBody->initializers.push_back(physicalActionInitializer);

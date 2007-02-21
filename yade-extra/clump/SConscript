@@ -32,7 +32,21 @@ env.SharedLibrary('Clump',
 		'ParticleParameters',
 		'SAPCollider',
 		'MetaInteractingGeometry2AABB',
-		'yade-lib-multimethods'],
-	CPPPATH=env['CPPPATH']+['$PREFIX/include'])
+		'PythonRecorder',
+		'yade-lib-multimethods'])
 #env.Program('tryI',['tryI.cpp'],LIBS=env['LIBS']+['yade-lib-base','Wm3Foundation'])
+#	LIBS=env['LIBS']+[
+#		'yade-lib-serialization',
+#		'yade-lib-base',
+#		'Wm3Foundation',])
+#env.Program('pyrec',['pyrec.cpp'])
+#env.SharedLibrary('emb',['emb.cc'],SHLIBPREFIX='')
+
+
+## PythonRecorder
+env.SharedLibrary('PythonRecorder',['PythonRecorder.cpp'])
+env.SharedLibrary('_pyade',['pyade.cpp'],SHLIBPREFIX='',
+	LIBS=env['LIBS']+['yade-lib-base','Wm3Foundation','ParticleParameters','RigidBodyParameters'],
+)
+env.Install('$PREFIX/lib/yade/yade-extra','pyade.py')
 

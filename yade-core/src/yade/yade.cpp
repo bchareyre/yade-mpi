@@ -8,6 +8,10 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
+#ifdef EMBED_PYTHON
+	#include<Python.h>
+#endif
+
 #include <iostream>
 #include <string>
 #include <getopt.h>
@@ -128,6 +132,11 @@ int main(int argc, char *argv[])
 	}
 #	endif
 
+	#ifdef EMBED_PYTHON
+		Py_Initialize();
+		LOG_DEBUG("Python interpreter initialized.");
+	#endif
+
 	
 	bool 	setup 		= false;
 	if( ( ch = getopt(argc,argv,"hnN:wC:cS:") ) != -1)
@@ -176,6 +185,12 @@ int main(int argc, char *argv[])
 	shared_ptr<FrontEnd> frontEnd = dynamic_pointer_cast<FrontEnd>(ClassFactory::instance().createShared(gui));
 
  	int ok = frontEnd->run(argc,argv);
+
+	#ifdef EMBED_PYTHON
+		Py_Finalize();
+		LOG_DEBUG("Python interpreter finalized.");
+	#endif
+
 	LOG_INFO("Yade: normal exit.");
 	return ok;
 }

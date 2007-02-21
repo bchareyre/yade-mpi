@@ -74,9 +74,10 @@ Help(opts.GenerateHelpText(env))
 ############# CONFIGURATION ##############################################################
 ##########################################################################################
 
+env.Append(CPPPATH='',LIBPATH='',LIBS='')
+
 def CheckQt(context, qtdirs):
 	# make sure they exist and save them for restoring if a test fails
-	context.env.Append(CPPPATH='',LIBPATH='',LIBS='')
 	origs={'LIBS':context.env['LIBS'],'LIBPATH':context.env['LIBPATH'],'CPPPATH':context.env['CPPPATH']}
 	for qtdir in qtdirs:
 		context.Message( 'Checking for qt-mt in '+qtdir+'... ' )
@@ -90,6 +91,24 @@ def CheckQt(context, qtdirs):
 			return ret
 	return False
 
+def CheckPython(context):
+	origs={'LIBS':context.env['LIBS'],'LIBPATH':context.env['LIBPATH'],'CPPPATH':context.env['CPPPATH'],'LINKFLAGS':context.env['LINKFLAGS']}
+	context.Message('Checking for Python development files... ')
+	try:
+		#FIXME: once caught, exception disappears along with the actual message of what happened...
+		import distutils.sysconfig as ds
+		context.env.Append(CPPPATH=ds.get_python_inc(),LIBS=ds.get_config_var('LIBS').split())
+		context.env.Append(LINKFLAGS=ds.get_config_var('LINKFORSHARED').split()+ds.get_config_var('BLDLIBRARY').split())
+		ret=context.TryLink('#include<Python.h>\nint main(int argc, char **argv){Py_Initialize(); Py_Finalize();}\n','.cpp')
+		if not ret: raise RuntimeError
+	except (ImportError,RuntimeError):
+		for k in origs.keys(): context.env[k]=origs[k]
+		context.Result(False)
+		return False
+	context.Result(True)
+	return True
+		
+
 def CheckCXX(context):
 	context.Message('Checking whether c++ compiler "%s" works...'%env['CXX'])
 	ret=context.TryLink('#include<iostream>\nint main(int argc, char**argv){std::cerr<<std::endl;return 0;}\n','.cpp')
@@ -98,8 +117,9 @@ def CheckCXX(context):
 
 
 if not env.GetOption('clean'):
+	#essential libraries first
 	ok=True
-	conf=Configure(env,custom_tests={'CheckQt':CheckQt,'CheckCXX':CheckCXX})
+	conf=Configure(env,custom_tests={'CheckQt':CheckQt,'CheckCXX':CheckCXX,'CheckPython':CheckPython})
 	ok&=conf.CheckCXX()
 	ok&=conf.CheckLibWithHeader('pthread','pthread.h','c','pthread_exit(NULL);')
 	ok&=conf.CheckLibWithHeader('glut','GL/glut.h','c','glutGetModifiers();')
@@ -113,10 +133,12 @@ if not env.GetOption('clean'):
 	if not ok:
 		print "\nOne of the essential libraries above was not found, unable to continue.\n\nCheck config.log for possible causes, note that there are options that you may need to customize:\n\n"+opts.GenerateHelpText(env)
 		Exit(1)
-
 	env.Append(LIBS=['glut','boost_date_time','boost_filesystem','boost_thread','pthread','Wm3Foundation'])
 
-	if conf.CheckLibWithHeader('log4cxx','log4cxx/logger.h','c++','log4cxx::Logger::getLogger("foo");'): env.Append(LIBS='log4cxx',CPPDEFINES=['LOG4CXX'])
+	#optional libraries
+	if conf.CheckLibWithHeader('log4cxx','log4cxx/logger.h','c++','log4cxx::Logger::getLogger("foo");'):
+		env.Append(LIBS='log4cxx',CPPDEFINES=['LOG4CXX'])
+	if conf.CheckPython(): env.Append(CPPDEFINES=['EMBED_PYTHON'])
 
 	env=conf.Finish()
 
@@ -238,7 +260,11 @@ if not env.GetOption('clean'):
 # read all SConscript files
 env.Export('env');
 env.SConscript(dirs=libDirs+['yade-core'])
-if env.has_key('extraModules'): env.SConscript(dirs=env['extraModules'])
+if env.has_key('extraModules'):
+	env.SConscript(dirs=env['extraModules'])
+	#make sure extra modules find their own components for linking
+	env.Append(LIBPATH=[os.path.join('#',x) for x in env['extraModules']])
+
 
 
 ##########################################################################################

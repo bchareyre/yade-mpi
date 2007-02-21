@@ -34,9 +34,6 @@ using namespace boost;
 using namespace boost::posix_time;
 using namespace std;
 
-//! "return" Body* given the body id. After Omega disappears, only change the definition
-#define BODY_BY_ID(id) ((*(Omega::instance().rootBody()->bodies))[id].get())
-
 struct DynlibDescriptor
 {
 	set<string>	 baseClasses;
