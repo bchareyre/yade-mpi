@@ -15,7 +15,6 @@ CREATE_LOGGER(PythonRecorder);
  *
  * @todo Import path prepended to sys.path hardcoded now. Should depend on install dir (PREFIX and POSTFIX);
  * @todo Maybe change PythonRecorder::expression to vector<string> so that multiple expressions may be run at a time. This is equivalent to multiline expressions, but more easily manageable from c++.
- * @todo Design an intelligent way of doing output, now just prints to stdout...
  *
  */
 
@@ -34,6 +33,12 @@ PythonRecorder::PythonRecorder():DataRecorder(){
 	int status=PyRun_SimpleString("from pyade import *"); // pyade will import _pyade by itself
 	if(status){ LOG_ERROR("pyade import failed."); }
 	else LOG_DEBUG("pyade imported.");
+}
+
+void PythonRecorder::postProcessAttributes(bool deserializing){
+	if(outputFile.length()==0) return;
+	PyRun_SimpleString(string("import os; import sys; ofile=file('"+outputFile+"','w+'); sys.stdout=ofile").c_str());
+	LOG_DEBUG("Python stdout redirected to "<<outputFile);
 }
 
 void PythonRecorder::action(Body *_rootBody)

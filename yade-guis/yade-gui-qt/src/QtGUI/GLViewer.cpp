@@ -183,6 +183,9 @@ void GLViewer::postSelection(const QPoint& point)
 	}
 	if( (*(Omega::instance().getRootBody()->bodies)).exists(selection) )
 	{
+		#ifdef HIGHLEVEL_CLUMPS
+			Omega::instance().selectedBodies.push_front(Body::byId(selection)->isClumpMember()?Body::byId(selection)->clumpId:selection);
+		#endif
 		std::cerr << "new selection " << selection << "\n";
 		wasDynamic = (*(Omega::instance().getRootBody()->bodies))[selection]->isDynamic;
 		(*(Omega::instance().getRootBody()->bodies))[selection]->isDynamic = false;

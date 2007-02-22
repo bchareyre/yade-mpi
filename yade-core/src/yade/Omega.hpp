@@ -14,6 +14,7 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <fstream>
 #include <set>
+#include <list>
 #include <time.h>
 #include <boost/thread/thread.hpp>
 #include <iostream>
@@ -25,6 +26,7 @@
 #include <yade/yade-lib-factory/ClassFactory.hpp>
 
 #include "SimulationFlow.hpp"
+#include "Body.hpp"
 
 class MetaBody;
 class ThreadRunner;
@@ -73,6 +75,8 @@ class Omega : public Singleton<Omega>
 		shared_ptr<Preferences> preferences;
 		string 				 yadeConfigPath;	// FIXME - must be private and more clean
 		string 				 yadeVersionName;	// FIXME - public ?
+
+		list<Body::id_t> selectedBodies;
 	
 		void logMessage(const string& str);
 		void logError(const string& str);

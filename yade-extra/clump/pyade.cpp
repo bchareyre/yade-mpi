@@ -1,6 +1,7 @@
 // (c) 2007 Vaclav Smilauer <eudoxos@arcig.cz> 
 
 #include<Python.h>
+#include<list>
 
 #include<boost/shared_ptr.hpp>
 #include<yade/yade-core/Body.hpp>
@@ -11,6 +12,19 @@
 #include<yade/yade-lib-base/yadeWm3Extra.hpp>
 #include<yade/yade-core/Omega.hpp>
 
+
+/******************* basic type conversions *********/
+static PyObject* __main__; // assigned in initializer
+PyObject* toPython(int arg){return Py_BuildValue("i",arg);}
+PyObject* toPython(Body::id_t arg){return toPython((int)arg);}
+PyObject* toPython(long arg){return Py_BuildValue("l",arg);}
+PyObject* toPython(bool arg){return toPython((int)arg);}
+PyObject* toPython(double arg){return Py_BuildValue("d",arg);}
+PyObject* toPython(std::string arg){return Py_BuildValue("s",arg.c_str());}
+PyObject* toPython(Wm3::Vector3r arg){	return PyObject_Call(PyObject_GetAttrString(__main__,"Vector"),Py_BuildValue("(ddd)",arg[0],arg[1],arg[2]),NULL);}
+PyObject* toPython(Wm3::Quaternionr arg){ return PyObject_Call(PyObject_GetAttrString(__main__,"Quaternion"),Py_BuildValue("(dddd)",arg[0],arg[1],arg[2],arg[3]),NULL);}
+PyObject* toPython(list<Body::id_t> arg){	PyObject* ret=PyList_New(0); for(list<Body::id_t>::iterator I=arg.begin(); I!=arg.end(); I++) PyList_Append(ret,toPython(*I)); return ret;}
+ 
 /******************* body properties ****************/
 
 /*! Body parameters that can be accessed through this code.
@@ -46,17 +60,17 @@ bodyProp(PyObject *self, PyObject *args){
 	shared_ptr<RigidBodyParameters> rbp=dynamic_pointer_cast<RigidBodyParameters>(pp);
 	switch(prop){
 		/* warning: no implicit conversions in additional arguments (not even int->double), attention!! */
-		case bp_id: return Py_BuildValue("i",(int)(B->getId()));
-		case bp_clumpId: return Py_BuildValue("i",(int)(B->clumpId));
-		case bp_x: return Py_BuildValue("(ddd)",pp->se3.position[0],pp->se3.position[1],pp->se3.position[2]);
-		case bp_r: return Py_BuildValue("(dddd)",pp->se3.orientation[0],pp->se3.orientation[1],pp->se3.orientation[2],pp->se3.orientation[3]);
-		case bp_v: return Py_BuildValue("(ddd)",pap->velocity[0],pap->velocity[1],pap->velocity[2]);
-		case bp_w: return Py_BuildValue("(ddd)",rbp->angularVelocity[0],rbp->angularVelocity[1],rbp->angularVelocity[2]);
-		case bp_m: return Py_BuildValue("d",pap->mass);
-		case bp_I: return Py_BuildValue("(ddd)",rbp->inertia[0],rbp->inertia[1],rbp->inertia[2]);
-		case bp_isClump: return Py_BuildValue("i",(int)B->isClump());
-		case bp_isClumpMember: return Py_BuildValue("i",(int)B->isClumpMember());
-		case bp_isStandalone: return Py_BuildValue("i",(int)B->isStandalone());
+		case bp_id: return toPython(B->getId());
+		case bp_clumpId: return toPython(B->clumpId);
+		case bp_x: return toPython(pp->se3.position);
+		case bp_r: return toPython(pp->se3.orientation);
+		case bp_v: return toPython(pap->velocity[0]);
+		case bp_w: return toPython(rbp->angularVelocity[0]);
+		case bp_m: return toPython(pap->mass);
+		case bp_I: return toPython(rbp->inertia);
+		case bp_isClump: return toPython(B->isClump());
+		case bp_isClumpMember: return toPython(B->isClumpMember());
+		case bp_isStandalone: return toPython(B->isStandalone());
 	}
 	return Py_BuildValue("");
 }
@@ -77,7 +91,9 @@ bodyPropDict(PyObject *self, PyObject *args){
 enum simulPropCodes {/*! simulation time [double] */ sm_t,
 	/*! iteration number [float] */ sm_i,
 	/*! timestep [float] */ sm_dt,
-	/*! simulation filename [float] */ sm_file};
+	/*! simulation filename [float] */ sm_file,
+	/*! number of bodies in rootBody */ sm_nBodies,
+	/*! list of selected bodies (newest first) */ sm_sel };
 
 /* Retrieves simulation's property.
  *
@@ -92,10 +108,12 @@ simulProp(PyObject *self, PyObject *args){
 	if(!PyArg_ParseTuple(args, "l", &prop)) return NULL;
 	//shared_ptr<MetaBody> rootBody=Omega::instance()->getRootBody();
 	switch(prop){
-		case sm_t: return Py_BuildValue("d",Omega::instance().getSimulationTime());
-		case sm_dt: return Py_BuildValue("d",Omega::instance().getTimeStep());
-		case sm_i: return Py_BuildValue("l",Omega::instance().getCurrentIteration());
-		case sm_file: return Py_BuildValue("s",Omega::instance().getSimulationFileName().c_str());
+		case sm_t: return toPython(Omega::instance().getSimulationTime());
+		case sm_dt: return toPython(Omega::instance().getTimeStep());
+		case sm_i: return toPython(Omega::instance().getCurrentIteration());
+		case sm_file: return toPython(Omega::instance().getSimulationFileName());
+		case sm_nBodies: return toPython(Omega::instance().getRootBody()->bodies->size());
+		case sm_sel: return toPython(Omega::instance().selectedBodies);
 	}
 	return Py_BuildValue("");
 }
@@ -103,7 +121,7 @@ simulProp(PyObject *self, PyObject *args){
 static PyObject*
 simulPropDict(PyObject *self, PyObject *args){
 	#define SM(name) #name,sm_##name
-		return Py_BuildValue("{sisisisi}",SM(t),SM(dt),SM(i),SM(file));
+		return Py_BuildValue("{sisisisisisi}",SM(t),SM(dt),SM(i),SM(file),SM(nBodies),SM(sel));
 	#undef SM
 }
 
@@ -117,4 +135,9 @@ static PyMethodDef _pyadeMethods[] = {
     {NULL, NULL, 0, NULL} /* sentinel */
 };
 
-PyMODINIT_FUNC init_pyade(void){ (void) Py_InitModule("_pyade", _pyadeMethods);}
+
+PyMODINIT_FUNC init_pyade(void){
+	(void) Py_InitModule("_pyade", _pyadeMethods);
+	__main__=PyImport_Import(PyString_FromString("__main__"));
+	assert(__main__);
+}
