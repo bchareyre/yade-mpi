@@ -19,9 +19,10 @@
 
 GlobalStiffnessTimeStepper::GlobalStiffnessTimeStepper() : TimeStepper() , sdecContactModel(new MacroMicroElasticRelationships), actionParameterGlobalStiffness(new GlobalStiffness)
 {
+//cerr << "GlobalStiffnessTimeStepper()"  << endl;
 	globalStiffnessClassIndex = actionParameterGlobalStiffness->getClassIndex();
 	sdecGroupMask = 1;
-	timestepSafetyCoefficient = 0.8;
+	timestepSafetyCoefficient = 0.4;
 	computedOnce = false;
 	defaultDt = 1;
 	
@@ -87,7 +88,7 @@ void GlobalStiffnessTimeStepper::findTimeStepFromBody(const shared_ptr<Body>& bo
 	//cerr << "sdec->inertia=" << sdec->inertia.x() << " " << sdec->inertia.x() << " " << sdec->inertia.x() << endl;
 	//cerr << "timesteps : dt=" << dt << " / Rdt=" << Rdt << endl;
 	
-	dt = timestepSafetyCoefficient*std::min(dt,Rdt);
+	dt = 0.709*timestepSafetyCoefficient*std::min(dt,Rdt);//0.709 = 1/sqrt(2)
 	
 	newDt = std::min(dt,newDt);
 	computedSomething = true;
@@ -109,8 +110,7 @@ bool GlobalStiffnessTimeStepper::isActivated()
 
 void GlobalStiffnessTimeStepper::computeTimeStep(Body* body)
 {
-//cerr << "computeTimeStep(Body* body)"  << endl;
-cerr << "phasea1 "; 
+
 	MetaBody * ncb = dynamic_cast<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 // 	shared_ptr<InteractionContainer>& persistentInteractions = ncb->persistentInteractions;
@@ -146,17 +146,13 @@ cerr << "phasea1 ";
 				findTimeStepFromBody(b, ncb); }
 		}
 	}	
-	
-	cerr << "phasea9 "; 
-	
+		
 	if(computedSomething)
 	{
 		Omega::instance().setTimeStep(min(newDt , defaultDt));
 		computedOnce = true;		
 		//cerr << "GlobalStiffnessTimeStepper, timestep chosen is:" << Omega::instance().getTimeStep() << endl;
 	}
-//	cerr << "GlobalStiffnessTimeStepper, computedSomething is:" << computedSomething << endl;
-	cerr << "GlobalGlobalStiffnessTimeStepper, newDt is:" << newDt << endl;
-	cerr << "new timestep chosen is:" << Omega::instance().getTimeStep() << endl;
+	cerr << "new timestep is:" << Omega::instance().getTimeStep() << endl;
 }
 

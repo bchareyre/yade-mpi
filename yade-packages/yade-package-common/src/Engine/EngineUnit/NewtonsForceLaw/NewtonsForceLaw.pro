@@ -7,11 +7,11 @@ LIBS += -lPhysicalActionApplier \
         -lForce \
         -lParticleParameters \
         -lPhysicalActionApplier \
-		  -lRigidBodyParameters \
+	-lRigidBodyParameters \
         -rdynamic 
 INCLUDEPATH += $${YADE_QMAKE_PATH}/include/ \
                ../../../DataClass/PhysicalAction/Force \
-               ../../../DataClass/PhysicalParameters/RigidBodyParameters \					
+               ../../../DataClass/PhysicalParameters/RigidBodyParameters \
                ../../../DataClass/PhysicalParameters/ParticleParameters \
                ../../../Engine/MetaEngine/PhysicalActionApplier 
 QMAKE_LIBDIR = ../../../../bin \
