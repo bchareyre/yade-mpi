@@ -8,7 +8,7 @@ LIBS += -lSDECLinkGeometry \
         -lAveragePositionRecorder \
         -lVelocityRecorder \
         -lForceRecorder \
-        -lMacroMicroElasticRelationships \
+        -lSimpleElasticRelationships \
         -lElasticCriterionTimeStepper \
         -lPhysicalActionVectorVector \
         -lInteractionVecSet \
@@ -49,7 +49,7 @@ INCLUDEPATH += $${YADE_QMAKE_PATH}/include/ \
                ../../Engine/StandAloneEngine/AveragePositionRecorder \
                ../../Engine/StandAloneEngine/ElasticCriterionTimeStepper \
                ../../Engine/StandAloneEngine/ElasticContactLaw \
-               ../../Engine/EngineUnit/MacroMicroElasticRelationships \
+               ../../Engine/EngineUnit/SimpleElasticRelationships \
                ../../DataClass/InteractionPhysics/SDECLinkPhysics \
                ../../DataClass/InteractionGeometry/SDECLinkGeometry \
 	        ../../DataClass/PhysicalAction/GlobalStiffness \

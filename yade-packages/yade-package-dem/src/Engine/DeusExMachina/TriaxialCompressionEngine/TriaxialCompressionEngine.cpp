@@ -12,13 +12,19 @@
 #include <yade/yade-package-common/Force.hpp>
 #include "ElasticContactInteraction.hpp"
 #include <yade/yade-lib-base/yadeWm3Extra.hpp>
+#include <boost/lexical_cast.hpp>
 
 
 TriaxialCompressionEngine::TriaxialCompressionEngine() : actionForce(new Force)
 {
 	translationAxis=TriaxialStressController::normal[wall_bottom_id];
 	strainRate=0;
+	currentStrainRate=0;
 	StabilityCriterion=0.001;
+	Phase1=false;
+	Phase1End = "Phase1End";
+	FinalIterationPhase1 = 0;
+// 	Phase2End = "Phase2End";
 	compressionActivated=false;
 	autoCompressionActivation=true;
 	for (int i=0; i<3; ++i) strain[i]=0;
@@ -42,6 +48,7 @@ void TriaxialCompressionEngine::registerAttributes()
 {
 	TriaxialStressController::registerAttributes();
 	REGISTER_ATTRIBUTE(strainRate);
+	REGISTER_ATTRIBUTE(currentStrainRate);
 	REGISTER_ATTRIBUTE(strain);
 	REGISTER_ATTRIBUTE(UnbalancedForce);
 	REGISTER_ATTRIBUTE(StabilityCriterion);
@@ -56,17 +63,50 @@ void TriaxialCompressionEngine::updateParameters(Body * body)
 {
 	
 	UnbalancedForce=ComputeUnbalancedForce(body);
-	if (Omega::instance().getCurrentIteration() % 50 == 0) cerr << "UnbalancedForce=" << UnbalancedForce << endl;
-	if (autoCompressionActivation) compressionActivated = (UnbalancedForce<=StabilityCriterion);//Is the assembly compact and stable?
-	if (compressionActivated)
-	{
-		wall_bottom_activated=false;//stop stress control on top and bottom wall
-		wall_top_activated=false;
-		autoCompressionActivation = false; //don't stop compression when UnbalancedForce increases due to compression	
-		internalCompaction = false;	
+	if (Omega::instance().getCurrentIteration() % 100 == 0) cerr << "UnbalancedForce=" << UnbalancedForce << endl;
+	
+	// new test
+	//cerr << "1" << endl;
+	if (!Phase1 && autoCompressionActivation &&
+	UnbalancedForce<=StabilityCriterion)		//Start 
+	{	
+// 		// saving snapshot.xml
+// 	string fileName = "../data/" + Phase1End + "_" + 
+// 	lexical_cast<string>(Omega::instance().getCurrentIteration()) + ".xml";
+// 	cerr << "saving snapshot: " << fileName << " ...";
+// 	Omega::instance().saveSimulation(fileName);
+		
+		internalCompaction = false;
+		Phase1 = true;
+		FinalIterationPhase1 =
+		Omega::instance().getCurrentIteration();
 	}
 	
+	if (autoCompressionActivation && Phase1
+	&& ((Omega::instance().getCurrentIteration()) >=
+	(FinalIterationPhase1+1000)))
 	
+	{
+		if (UnbalancedForce<=StabilityCriterion)
+		{
+		// saving snapshot.xml
+	string fileName = "../data/" + Phase1End + "_" + 
+	lexical_cast<string>(Omega::instance().getCurrentIteration()) + ".xml";
+	cerr << "saving snapshot: " << fileName << " ...";
+	Omega::instance().saveSimulation(fileName);
+	
+	compressionActivated = true;
+		}
+	
+	}
+
+	if (compressionActivated)
+	{
+		wall_bottom_activated=false;
+		wall_top_activated=false;
+		autoCompressionActivation = false;
+	}
+		
 }
 
 
@@ -77,17 +117,36 @@ void TriaxialCompressionEngine::applyCondition(Body * body)
                 updateParameters(body);
 
         TriaxialStressController::applyCondition(body);
+        MetaBody * ncb2 = static_cast<MetaBody*>(body);
+        //cerr << computeStress(ncb2)  << endl;
 
         if (compressionActivated)
         {
-		if (Omega::instance().getCurrentIteration() % 50 == 0) cerr << "Compression started!!" << endl;
+		if (Omega::instance().getCurrentIteration() % 50 == 0) 
+ 		cerr << "Compression started!!" << endl;
         	Real dt = Omega::instance().getTimeStep();
-                MetaBody * ncb = static_cast<MetaBody*>(body);
-                shared_ptr<BodyContainer>& bodies = ncb->bodies;
-                PhysicalParameters* p = static_cast<PhysicalParameters*>((*bodies)[wall_bottom_id]->physicalParameters.get());
-                p->se3.position += 0.5*strainRate*height*translationAxis*dt;
-                p = static_cast<PhysicalParameters*>((*bodies)[wall_top_id]->physicalParameters.get());
-                p->se3.position -= 0.5*strainRate*height*translationAxis*dt;
+                  MetaBody * ncb = static_cast<MetaBody*>(body);
+                  shared_ptr<BodyContainer>& bodies = ncb->bodies;
+                  
+                  if (currentStrainRate < strainRate) currentStrainRate
+			+= strainRate*0.0003;	// !!! si décharge
+                
+                  PhysicalParameters* p =
+		static_cast<PhysicalParameters*>((*bodies)[wall_bottom_id]->
+		physicalParameters. get());
+                  p->se3.position += 0.5*strainRate*height*translationAxis*dt;
+//                 cerr << "deplacmt = " <<
+// 		0.5*strainRate*height*translationAxis*dt << endl;
+//                 cerr << "wall_bottom : p->se3.position = " << p->se3.position
+// 		<< endl;
+		
+		  p =
+		static_cast<PhysicalParameters*>((*bodies)[wall_top_id]->	
+		physicalParameters.get( ));
+                  p->se3.position -= 0.5*strainRate*height*translationAxis*dt;
+//                 cerr << "wall_top : p->se3.position = " << p->se3.position
+// 		<< endl;
+
         }
 }
 

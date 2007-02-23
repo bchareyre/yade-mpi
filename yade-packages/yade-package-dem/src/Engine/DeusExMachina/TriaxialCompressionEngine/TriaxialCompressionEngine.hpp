@@ -13,6 +13,7 @@
 #include <Wm3Vector3.h>
 #include <yade/yade-lib-base/yadeWm3.hpp>
 #include "TriaxialStressController.hpp"
+#include <string>
 
 /*! \brief Isotropic compression + uniaxial compression test
 
@@ -32,12 +33,17 @@ class TriaxialCompressionEngine : public TriaxialStressController
 		
 		//! Strain velocity (./s)
 		Real strainRate;
+		Real currentStrainRate;
 		//! Max ratio of resultant forces on mean contact force
 		Real UnbalancedForce;
 		//! Value of UnbalancedForce for which the system is considered stable
 		Real StabilityCriterion;
 		Vector3r strain;
 		Vector3r translationAxis;
+		//! is isotropicInternalCompactionFinished?
+		bool Phase1;
+		int FinalIterationPhase1;
+		std::string Phase1End; //,Phase2End;
 		//! Is uniaxial compression currently activated?
 		bool compressionActivated;
 		//! Auto-switch between isotropic and uniaxial compression?

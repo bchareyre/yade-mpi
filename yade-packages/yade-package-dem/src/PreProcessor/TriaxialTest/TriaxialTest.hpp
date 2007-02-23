@@ -57,7 +57,8 @@ class TriaxialTest : public FileGenerator
 				,strainRate
 				,StabilityCriterion
 				,autoCompressionActivation
-				,maxMultiplier; ///max multiplier of diameters during internal compaction
+				,maxMultiplier ///max multiplier of diameters during internal compaction
+				,finalMaxMultiplier;
 
 		bool		 wall_top
 				,wall_bottom
@@ -83,6 +84,7 @@ class TriaxialTest : public FileGenerator
 				,timeStepUpdateInterval
 				,timeStepOutputInterval
 				,wallStiffnessUpdateInterval
+				,radiusControlInterval
 				,numberOfGrains;
 				/*,wall_top_id
 				,wall_bottom_id

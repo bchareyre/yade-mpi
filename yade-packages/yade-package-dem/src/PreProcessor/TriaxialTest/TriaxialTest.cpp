@@ -3,6 +3,8 @@
 *  olivier.galizzi@imag.fr                                               *
 *  Copyright (C) 2004 by Janek Kozicki                                   *
 *  cosurgi@berlios.de                                                    *
+*  Copyright (C) 2007 by Bruno Chareyre		                         *
+*  bruno.chareyre@hmg.inpg.fr                                            *
 *                                                                        *
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
@@ -11,7 +13,7 @@
 #include "TriaxialTest.hpp"
 
 #include "ElasticContactLaw.hpp"
-#include "MacroMicroElasticRelationships.hpp"
+#include "SimpleElasticRelationships.hpp"
 #include "BodyMacroParameters.hpp"
 #include "SDECLinkGeometry.hpp"
 #include "SDECLinkPhysics.hpp"
@@ -135,15 +137,17 @@ TriaxialTest::TriaxialTest () : FileGenerator()
 	
 	timeStepUpdateInterval = 50;
 	timeStepOutputInterval = 50;
-	wallStiffnessUpdateInterval = 1;
+	wallStiffnessUpdateInterval = 10;
+	radiusControlInterval = 10;
 	numberOfGrains = 400;
 	strainRate = 0.1;
 	StabilityCriterion = 0.01;
-	autoCompressionActivation = true;
+	autoCompressionActivation = false;
 	maxMultiplier = 1.01;
+	finalMaxMultiplier = 1.001;
 	
 	sphereYoungModulus  = 15000000.0;
-	spherePoissonRatio  = 0.2;
+	spherePoissonRatio  = 0.5;
 	sphereFrictionDeg   = 18.0;
 	density			= 2600;
 	
@@ -180,6 +184,7 @@ void TriaxialTest::registerAttributes()
 	//REGISTER_ATTRIBUTE(boxWalls);
 	REGISTER_ATTRIBUTE(internalCompaction);
 	REGISTER_ATTRIBUTE(maxMultiplier);
+	REGISTER_ATTRIBUTE(finalMaxMultiplier);
 
 	REGISTER_ATTRIBUTE(sphereYoungModulus);
 	REGISTER_ATTRIBUTE(spherePoissonRatio);
@@ -197,6 +202,7 @@ void TriaxialTest::registerAttributes()
 	REGISTER_ATTRIBUTE(timeStepUpdateInterval);
 	REGISTER_ATTRIBUTE(timeStepOutputInterval);
 	REGISTER_ATTRIBUTE(wallStiffnessUpdateInterval);
+	REGISTER_ATTRIBUTE(radiusControlInterval);
 	REGISTER_ATTRIBUTE(numberOfGrains);
 	REGISTER_ATTRIBUTE(strainRate);
 	REGISTER_ATTRIBUTE(StabilityCriterion);
@@ -566,7 +572,7 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	interactionGeometryDispatcher->add("InteractingSphere","InteractingBox","InteractingBox2InteractingSphere4SpheresContactGeometry");
 
 	shared_ptr<InteractionPhysicsMetaEngine> interactionPhysicsDispatcher(new InteractionPhysicsMetaEngine);
-	interactionPhysicsDispatcher->add("BodyMacroParameters","BodyMacroParameters","MacroMicroElasticRelationships");
+	interactionPhysicsDispatcher->add("BodyMacroParameters","BodyMacroParameters","SimpleElasticRelationships");
 		
 	shared_ptr<BoundingVolumeMetaEngine> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeMetaEngine>(new BoundingVolumeMetaEngine);
 	boundingVolumeDispatcher->add("InteractingSphere","AABB","InteractingSphere2AABB");
@@ -624,6 +630,7 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	cerr << "triaxialcompressionEngine = shared_ptr<TriaxialCompressionEngine> (new TriaxialCompressionEngine);" << std::endl;
 	triaxialcompressionEngine = shared_ptr<TriaxialCompressionEngine> (new TriaxialCompressionEngine);
 	triaxialcompressionEngine-> interval = wallStiffnessUpdateInterval;// = stiffness update interval
+	triaxialcompressionEngine-> radiusControlInterval = radiusControlInterval;// = stiffness update interval
 	triaxialcompressionEngine-> sigma_iso = sigma_iso;
 	triaxialcompressionEngine-> max_vel = 0.0001;
 	triaxialcompressionEngine-> thickness = thickness;
@@ -655,6 +662,7 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	rootBody->engines.push_back(interactionGeometryDispatcher);
 	rootBody->engines.push_back(interactionPhysicsDispatcher);
 	rootBody->engines.push_back(elasticContactLaw);
+	rootBody->engines.push_back(triaxialcompressionEngine);
 	//rootBody->engines.push_back(stiffnesscounter);
 	//rootBody->engines.push_back(stiffnessMatrixTimeStepper);
 	rootBody->engines.push_back(globalStiffnessCounter);
@@ -667,7 +675,7 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 		rootBody->engines.push_back(orientationIntegrator);
 	//rootBody->engines.push_back(resultantforceEngine);
 	//rootBody->engines.push_back(triaxialstressController);
-	rootBody->engines.push_back(triaxialcompressionEngine);
+	
 		
 	rootBody->engines.push_back(averagePositionRecorder);
 	rootBody->engines.push_back(velocityRecorder);

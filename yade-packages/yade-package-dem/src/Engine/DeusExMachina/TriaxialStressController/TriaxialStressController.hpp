@@ -10,10 +10,9 @@
 #define TRIAXIAL_STRESS_CONTROLLER_HPP
 
 #include <yade/yade-core/DeusExMachina.hpp>
-#include <Wm3Math.h>
-#include <yade/yade-lib-base/yadeWm3.hpp>
 #include <Wm3Vector3.h>
 #include <yade/yade-lib-base/yadeWm3.hpp>
+
 
 class PhysicalAction;
 class MetaBody;
@@ -34,7 +33,7 @@ class TriaxialStressController : public DeusExMachina
 		
 			
 	public :
-		unsigned int interval;
+		unsigned int interval, radiusControlInterval;
 		//! index values for retrieving walls
 		int wall_bottom, wall_top, wall_left, wall_right, wall_front, wall_back;
 		//! Defines the prescibed resultant force 
@@ -47,12 +46,14 @@ class TriaxialStressController : public DeusExMachina
 		Vector3r	stress [6];
 		int 		wall_id [6];
 		
+		//Real UnbalancedForce;		
 				
 		//! wallDamping coefficient - wallDamping=0 implies a "perfect" control of the resultant force, wallDamping=1 means no movement
 		Real			wallDamping;
 		//! maximum displacement/cycle (usefull to prevent explosions when stiffness is very low...) 
-		Real			max_vel;
+
 		Real			maxMultiplier;
+		Real			finalMaxMultiplier;
 		//! switch between "external" (walls) and "internal" (growth of particles) compaction 
 		bool internalCompaction; 
 		
@@ -62,7 +63,7 @@ class TriaxialStressController : public DeusExMachina
 		Real height, width, depth;
 		Real thickness; // FIXME should retrieve "extents" of a InteractingBox
 		Real sigma_iso;
-				
+		Real max_vel;
 
 		TriaxialStressController();
 		virtual ~TriaxialStressController();
