@@ -101,7 +101,7 @@ def CheckPython(context):
 		context.env.Append(LINKFLAGS=ds.get_config_var('LINKFORSHARED').split()+ds.get_config_var('BLDLIBRARY').split())
 		ret=context.TryLink('#include<Python.h>\nint main(int argc, char **argv){Py_Initialize(); Py_Finalize();}\n','.cpp')
 		if not ret: raise RuntimeError
-	except (ImportError,RuntimeError):
+	except (ImportError,RuntimeError,ds.DistutilsPlatformError):
 		for k in origs.keys(): context.env[k]=origs[k]
 		context.Result(False)
 		return False
@@ -297,7 +297,6 @@ if not env.GetOption('clean'):
 	installableNodes=enumerateDotSoNodes(Dir('.'))
 	# iterate over .so nodes we got previously and call Install for each of them
 	for n in installableNodes:
-		f=str(n)
 		# the last (/.*) is meant got extraModules, again...
 		m=re.match(r'(^|.*/)(yade-(extra|guis|libs|package-[^/]+))(/.*)?/[^/]+$',f)
 		if m: instDir=m.group(2)
