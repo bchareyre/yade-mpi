@@ -4,12 +4,9 @@ error( "YADE_QMAKE_PATH internal qmake variable is not set, you should run for e
 
 
 SUBDIRS += MacroMicroElasticRelationships \
-	   MacroMicroElasticRelationshipsWater \
 	   SimpleElasticRelationships \
            InteractingBox2InteractingSphere4SpheresContactGeometry \
-	   InteractingBox2InteractingSphere4SpheresContactGeometryWater \
-           InteractingSphere2InteractingSphere4SpheresContactGeometry \
-	   InteractingSphere2InteractingSphere4SpheresContactGeometryWater \
+	   InteractingSphere2InteractingSphere4SpheresContactGeometry \
 	   InteractingMyTetrahedron2AABB \
 	   InteractingMyTetrahedron2InteractingMyTetrahedron4InteractionOfMyTetrahedron \
 	   InteractingMyTetrahedron2InteractingBox4InteractionOfMyTetrahedron \
