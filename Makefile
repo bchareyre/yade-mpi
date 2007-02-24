@@ -45,3 +45,12 @@ tags:
 
 doc:
 	cd yade-doc; doxygen Doxyfile
+
+#### convenience and individual targets; saves typing.
+# helper target for parallel compilation which is broken generally and needs to be tried repeatedly until it succeeds (or not)
+ci:
+	$(MAKE) compile_install || $(MAKE) compile_install || $(MAKE) compile_install || $(MAKE) compile_install || $(MAKE) compile_install || $(MAKE) compile_install || $(MAKE) compile_install || $(MAKE) compile_install || $(MAKE) compile_install || $(MAKE) compile_install || $(MAKE) compile_install || $(MAKE) compile_install || $(MAKE) compile_install || $(MAKE) compile_install
+
+eudoxos:
+	$(MAKE) ci -j4 INSTALL_DIR='/YADE' PREFIX_DIR=/tmp CXX="g++-4.0" LINK="g++-4.0" CXXFLAGS="-I/usr/local/include/wm3"
+

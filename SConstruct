@@ -16,7 +16,7 @@
 # To clean the build, run `scons -c'. Please note that it will also _uninstall_ yade from $PREFIX!
 #
 # TODO:
-#  1. [DONE] retrieve target list and append install targets dynamically;
+#  1. [REMOVED] [DONE] retrieve target list and append install targets dynamically;
 #  2. [DONE] configuration and option handling.
 #  3. Have build.log with commands and all output...
 #
@@ -25,7 +25,7 @@
 import os,os.path,string,re,sys
 import SCons
 # SCons version numbers are needed a few times
-major,minor,micro=SCons.__version__.split('.')
+sconsVersion=sum([int(SCons.__version__.split('.')[ord[0]])*ord[1] for ord in [(0,10000),(1,100),(2,1)]])
 
 ##########################################################################################
 ############# OPTIONS ####################################################################
@@ -189,12 +189,14 @@ env.Append(LINKFLAGS=['-rdynamic'])
 # makes dynamic library loading easied (no LD_LIBRARY_PATH) and perhaps faster
 env.Append(RPATH=[os.path.join('$PREFIX','lib','yade$POSTFIX',string.split(x,os.path.sep)[-1]) for x in libDirs])
 # find already compiled but not yet installed libraries for linking
-env.Append(LIBPATH=[os.path.join('#',x) for x in libDirs])
+#env.Append(LIBPATH=[os.path.join('#',x) for x in libDirs])
+env.Append(LIBPATH=env['RPATH'])
+
 
 
 ### this workaround is only needed for scons<=0.96.92, will disappear soon
 ###  (env.Install method chokes on no-existing directories)
-if major=='0' and int(minor)<=96 and int(micro)<93:
+if sconsVersion<=9692:
 	## should reside in prepareIncludes or sth similar
 	def createDirs(dirList):
 		for d in dirList:
@@ -266,54 +268,11 @@ if env.has_key('extraModules'):
 	env.Append(LIBPATH=[os.path.join('#',x) for x in env['extraModules']])
 
 
-
+#env.NoClean('$PREFIX/bin/yade$POSTFIX','$PREFIX/lib/yade$POSTFIX','$PREFIX/include/yade')
 ##########################################################################################
 ############# INSTALLATION ###############################################################
 ##########################################################################################
 
-##### (this is UNIX specific!) ######################
-
-##### (*.so pattern is UNIX specific!!) ######################
-# the first variant will disappear once etch is out, since the other solution is cleaner
-if major=='0' and minor=='96' and int(micro)<91:
-	def enumerateDotSoNodes(dirnode, level=0):
-		"cut&paste from http://www.scons.org/wiki/BuildDirGlob, then modified"
-		ret=[]
-		for f in dirnode.all_children():
-			if f.dir==str(f): ret+=enumerateDotSoNodes(f,level+1)
-			elif str(f)[-3:]=='.so': ret.append(f)
-		return ret
-else:
-	def enumerateDotSoNodes(dirnode, level=0):
-		"cut&paste from http://www.scons.org/wiki/BuildDirGlob, then modified"
-		ret=[]
-		for f in dirnode.all_children():
-			if f.isdir(): ret+=enumerateDotSoNodes(f,level+1) # isdir() is True only for existing dirs!!
-			elif str(f)[-3:]=='.so': ret.append(f)
-		return ret
-
-# since we skip this when cleaning, it means that installed files will not be cleaned
-if not env.GetOption('clean'):
-	installableNodes=enumerateDotSoNodes(Dir('.'))
-	# iterate over .so nodes we got previously and call Install for each of them
-	for n in installableNodes:
-		# the last (/.*) is meant got extraModules, again...
-		m=re.match(r'(^|.*/)(yade-(extra|guis|libs|package-[^/]+))(/.*)?/[^/]+$',f)
-		if m: instDir=m.group(2)
-		else: # older scons version have e.g. qt libs in nodes, we just skip them here
-			# TODO: exclude system libs in node enumerator, that is much safer
-			if major=='0' and int(minor)<=96 and int(micro)<90: continue
-			# nodes not found will be installed in yade-extra; this is meant specifically for extraModules
-			# FIXME: should be done in a clean way.
-			instDir='yade-extra'
-		if f.find('Clump')>=0: print f,instDir
-		env.Install('$PREFIX/lib/yade$POSTFIX/'+instDir,n)
-	# for the one and only binary, we do it by hand
-	env.InstallAs('$PREFIX/bin/yade$POSTFIX','yade-core/yade')
-
-##########################################################################################
-############# MISCILLANEA ################################################################
-##########################################################################################
 
 if env['pretty']:
 	## http://www.scons.org/wiki/HidingCommandLinesInOutput

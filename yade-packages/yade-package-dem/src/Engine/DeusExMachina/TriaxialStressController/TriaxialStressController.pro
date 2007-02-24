@@ -14,7 +14,6 @@ LIBS += -lyade-lib-factory \
 	-rdynamic
 	
 INCLUDEPATH += $${YADE_QMAKE_PATH}/include/ \
-               ../../../DataClass/PhysicalParameters/ParticleParameters \
 	       ../../../DataClass/InteractionGeometry/SpheresContactGeometry \
 	       ../../../Engine/DeusExMachina/TriaxialStressController \
 	       ../../../DataClass/InteractionPhysics/ElasticContactInteraction \

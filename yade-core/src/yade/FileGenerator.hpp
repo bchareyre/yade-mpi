@@ -10,6 +10,7 @@
 #define FILEGENERATOR_HPP
 
 #include <yade/yade-lib-serialization/Serializable.hpp>
+#include<yade/yade-lib-base/Logging.hpp>
 
 #include "MetaBody.hpp"
 #include "ThreadWorker.hpp"

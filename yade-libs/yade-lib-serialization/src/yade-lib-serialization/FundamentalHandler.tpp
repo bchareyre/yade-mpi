@@ -41,6 +41,13 @@ struct FundamentalHandler< string >
 			const string * tmpStr = any_cast<const string*>(a);
 			string * tmp = any_cast<string*>(ac.getAddress());
 			*tmp = lexical_cast<string>(*tmpStr);
+			/*
+			*tmp=*tmpStr; // why not like this?
+			#define _RESTORE_SPECIAL(escape,special)pos=0; while((pos=tmp->find(escape,pos))!=string::npos){tmp->replace(pos,2,special); cerr<<escape<<" "<<pos<<endl;}
+			unsigned int pos;
+			_RESTORE_SPECIAL("\\\\","\\"); _RESTORE_SPECIAL("\\n","\n"); _RESTORE_SPECIAL("\\t","\t"); _RESTORE_SPECIAL("\\'","\""); // order matters!
+			#undef _RESTORE_SPECIAL
+			*/
 		}
 		else if (a.type()==typeid(const vector<unsigned char>*)) // from binary stream to Type
 		{
@@ -61,6 +68,13 @@ struct FundamentalHandler< string >
 			string * tmpStr = any_cast<string*>(a);
 			string * tmp = any_cast<string*>(ac.getAddress());
 			*tmpStr = lexical_cast<string>(*tmp);
+			/*
+			*tmpStr=*tmp; // why not this?
+			#define _ESCAPE_SPECIAL(special,escape) pos=0; while((pos=tmpStr->find(special,pos))!=string::npos){tmpStr->replace(pos,1,escape); pos+=2;}
+			unsigned int pos;
+			_ESCAPE_SPECIAL("\\","\\\\"); _ESCAPE_SPECIAL('\n',"\\n"); _ESCAPE_SPECIAL('\t',"\\t"); _ESCAPE_SPECIAL('\"',"\\'"); // order matters!
+			#undef _ESCAPE_SPECIAL
+			*/
 		}
 		else if (a.type()==typeid(vector<unsigned char>*)) // from string to binary stream
 		{

@@ -50,7 +50,7 @@ class Bodies:
 	class Body:
 		"""Dummy class that returns a few body parameters as if they were its attributes.
 		C++ code in pyade.cpp is called to get the actual values.
-		Properties calculable from those already existing may be defined here - see Etrans, Erot, Epot for examples."""
+		Properties calculable from those already existing may be defined here - see Etrans, Erot, Epot, E for examples."""
 		def __init__(self,id):
 			self._id=id
 		def __getattr__(self,name):
@@ -58,6 +58,7 @@ class Bodies:
 			elif name=='Erot': return sum([.5*self.I[i]*self.w[i]**2 for i in range(3)])
 			#FIXME: gravity hardcoded...
 			elif name=='Epot': return -sum([self.x[i]*(0,0,-10)[i] for i in range(3)])*self.m
+			elif name=='E': return self.Etrans+self.Erot+self.Epot
 			else: return _pyade.bodyProp(self._id,_pyade.bodyPropDict()[name])
 
 class Simul:

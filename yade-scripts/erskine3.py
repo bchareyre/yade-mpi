@@ -312,9 +312,6 @@ def scriptGen(v,dir):
 	elif buildEngine=='scons':
 		env=defaultEnv
 		if target in targetEnv: env=targetEnv[target]
-		# assign variable to each target, so that it can be passed to the Install method later	
-		# uncomment this and look for EXPLICIT_INSTALL below as well
-		# ret+="%s="%pythonicTarget(target)
 		ret+="%s.%s('%s',%s%s"%(env,{'program':'Program','shlib':'SharedLibrary','staticlib':'StaticLibrary'}[targetType],
 			target,fieldSep,toStr(prependDirFile(relPath,sources)))
 		if installable.has_key((env,targetType)): installable[(env,targetType)].append(pythonicTarget(target))
@@ -329,6 +326,9 @@ def scriptGen(v,dir):
 			### try the inverse:
 			ret+=",%sCPPPATH=%s['CPPPATH']+%s"%(fieldSep,env,toStr(includePath))
 		ret+=')'
+		instDir=installDirs[targetType]
+		if instDirTargets.has_key((env,instDir)): instDirTargets[(env,instDir)].append((ret,target))
+		else: instDirTargets[(env,instDir)]=[(ret,target)]
 		
 	else: raise ValueError('buildEngine must be waf or scons (--waf or --scons)');
 
@@ -345,12 +345,19 @@ def masterScriptGen(V,dir):
 	s=''
 	if buildEngine=='scons':
 		s+="Import('*')\n"
-		s+=processVars(V,dir)
-		for env,ttype in installable.keys(): # one of shlib, staticlib, program
-			if len(installable[(env,ttype)])==0: continue
-			# commented temporarily
-			# if you need this back, uncomment also the other lines marked by EXPLICIT_INSTALL in comment
-			# s+="\n%s.Install('%s',source=[%s])\n"%(env,installDirs[ttype],string.join(installable[(env,ttype)],','))
+		processVars(V,dir) # return value of processVars discarded, results passed in instDirTarget instead
+		for env,dir in instDirTargets.keys():
+			idt=instDirTargets[(env,dir)]
+			#binary targets are handles specially: they install under _filename_ postfixed
+			if match('.*/bin$',dir): ## warhing: this is OS-specific to tell binary target!
+				s+="%s.InstallAs(["%env+','.join(["'%s$POSTFIX'"%(join(dir,tgSpec[1])) for tgSpec in idt])+"],[\n"
+				s+=',\n'.join([sub(r'(?m)^','\t',tgSpec[0]) for tgSpec in idt])
+				s+='\n])'
+			#whereas other targets install under _filename_ into a dir that has been postfixed already
+			else:
+				s+="%s.Install('%s',[\n"%(env,dir)
+				s+=',\n'.join([sub(r'(?m)^','\t',tgSpec[0]) for tgSpec in idt])+'\n])\n'
+				#for tgSpec in idt: print tgSpec[0]
 	elif buildEngine=='waf':
 		s+=processVars(V,dir)
 	return s
@@ -378,7 +385,8 @@ if pretty:
 else:
 	toStr=str; fieldSep='';
 installable={} # hash indexed by (env,targetType)->pythonicTargetName
-installDirs={'shlib':join('$PREFIX','lib','yade',string.split(scriptDir,os.sep)[-1]),'staticlib':join('$PREFIX','lib','yade'),'program':join('$PREFIX','bin')}
+instDirTargets={} # hash indexed by (env,targetDir)->str_target_spec
+installDirs={'shlib':join('$PREFIX','lib','yade$POSTFIX',string.split(scriptDir,os.sep)[-1]),'staticlib':join('$PREFIX','lib','yade$POSTFIX'),'program':join('$PREFIX','bin')}
 
 print masterScriptGen(allVars,scriptDir)
 

@@ -12,7 +12,6 @@ LIBS += -lyade-lib-factory \
 	
 INCLUDEPATH += $${YADE_QMAKE_PATH}/include/ \
                ../../../DataClass/PhysicalAction/GlobalStiffness \
-	       ../../../DataClass/PhysicalParameters/ParticleParameters \
 	       ../../../Engine/DeusExMachina/ResultantForceEngine
                
 QMAKE_LIBDIR = ../../../../bin \

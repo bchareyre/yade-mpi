@@ -11,8 +11,7 @@ LIBS += -lSDECLinkGeometry \
 INCLUDEPATH += $${YADE_QMAKE_PATH}/include/ \
                ../../DataClass/InteractionGeometry/SDECLinkGeometry \
 	       ../../DataClass/InteractionPhysics/SDECLinkPhysics \
-	       ../../../../yade-package-common/src/DataClass/InteractionPhysics/SimpleElasticInteraction \
-               ../../RenderingEngine/OpenGLRenderingEngine 
+	       ../../../../yade-package-common/src/DataClass/InteractionPhysics/SimpleElasticInteraction
 QMAKE_LIBDIR = ../../../bin \
                ../../../../yade-package-common/bin \
                $${YADE_QMAKE_PATH}/lib/yade/yade-libs/ 

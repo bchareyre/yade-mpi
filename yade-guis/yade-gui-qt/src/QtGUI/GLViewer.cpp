@@ -14,6 +14,9 @@
 #include <yade/yade-core/Body.hpp>
 #include <yade/yade-core/Interaction.hpp>
 #include <yade/yade-core/Omega.hpp>
+#ifdef HIGHLEVEL_CLUMPS
+#include<yade/yade-extra/Clump.hpp>
+#endif
 
 
 GLViewer::GLViewer(int id, shared_ptr<RenderingEngine> rendererInit, const QGLFormat& format, QWidget * parent, QGLWidget * shareWidget) : QGLViewer(format,parent,"glview",shareWidget)//, qglThread(this,rendererInit)
@@ -152,6 +155,15 @@ void GLViewer::draw() // FIXME maybe rename to RendererFlowControl, or something
 			double q0,q1,q2,q3;
 			manipulatedFrame()->getOrientation(q0,q1,q2,q3);
 			q[0]=q0;q[1]=q1;q[2]=q2;q[3]=q3;
+
+			#ifdef HIGHLEVEL_CLUMPS
+				shared_ptr<Body> b=Body::byId(selection);
+				if(b->isClump()){
+					Clump* c=dynamic_cast<Clump*>(Body::byId(b->clumpId).get());
+					c->moveSubBodies();
+					//for(Clump::clumpMap::iterator I=c->subBodies.begin(); I!=c->subBodies.end(); I++)renderer->render(Omega::instance().getRootBody(), I->first);
+				}
+			#endif
 		}
 		
 	// FIXME - here we want to actually call all responsible GLDraw Actors
@@ -184,7 +196,11 @@ void GLViewer::postSelection(const QPoint& point)
 	if( (*(Omega::instance().getRootBody()->bodies)).exists(selection) )
 	{
 		#ifdef HIGHLEVEL_CLUMPS
-			Omega::instance().selectedBodies.push_front(Body::byId(selection)->isClumpMember()?Body::byId(selection)->clumpId:selection);
+			if(Body::byId(selection)->isClumpMember()){ // select clump (invisible) instead of its member
+				cerr<<"Clump member #"<<selection<<" selected, selecting clump instead."<<endl;
+				selection=Body::byId(selection)->clumpId;
+				setSelectedName(selection);
+			}
 		#endif
 		std::cerr << "new selection " << selection << "\n";
 		wasDynamic = (*(Omega::instance().getRootBody()->bodies))[selection]->isDynamic;

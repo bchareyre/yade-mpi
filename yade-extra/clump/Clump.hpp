@@ -71,9 +71,10 @@
 
 class Clump: public Body {
 		//! mapping of body IDs to their relative positions; replaces subBodies and subSe3s;
+	public:
 		typedef std::map<Body::id_t,Se3r> clumpMap;
 		clumpMap subBodies;
-	public:
+
 		Clump();
 		virtual ~Clump(){};
 		//! \brief add Body to the Clump

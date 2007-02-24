@@ -9,9 +9,7 @@ LIBS += -lBoundingVolumeMetaEngine \
         -lyade-lib-base -lWm3Foundation \
         -rdynamic 
 INCLUDEPATH += $${YADE_QMAKE_PATH}/include/ \
-               ../../../DataClass/InteractingGeometry/InteractingMyTetrahedron \
-               ../../../DataClass/BoundingVolume/AABB \
-               ../../../Engine/MetaEngine/BoundingVolumeMetaEngine 
+               ../../../DataClass/InteractingGeometry/InteractingMyTetrahedron
 QMAKE_LIBDIR = ../../../../bin \
                $${YADE_QMAKE_PATH}/lib/yade/yade-libs/ \
 	       $${YADE_QMAKE_PATH}/lib/yade/yade-package-common 

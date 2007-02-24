@@ -642,7 +642,8 @@ void ClumpTestGen::createActors(shared_ptr<MetaBody>& rootBody)
 		shared_ptr<PythonRecorder> pythonRecorder=shared_ptr<PythonRecorder>(new PythonRecorder);
 		//pythonRecorder->expression="print 'x2=',B[2].x,'v4=',B[4].I";
 		//pythonRecorder->expression="print 'x=',B[2].x,'v=',B[2].v,'m=',B[2].m,'energy=',B[2].Etrans+B[2].Erot+B[2].Epot,'(trans=',B[2].Etrans,'rot=',B[2].Erot,'pot=',B[2].Epot,')'";
-		pythonRecorder->expression="if (S.i%50==0): print 'file=',S.file,'iteration =',S.i,'t= ',S.t,'x2 =',B[2].x";
+		//pythonRecorder->expression="if (S.i%50==0): print 'file=',S.file,'iteration =',S.i,'t= ',S.t,'x2 =',B[2].x";
+		pythonRecorder->expression="if (S.i%50==0) and len(S.sel)>=2:\n\tprint B[S.sel[0]].E\n\tprint '=========END OF OUTPUT==============='";
 		rootBody->engines.push_back(pythonRecorder);
 	#endif
 

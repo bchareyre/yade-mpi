@@ -7,8 +7,7 @@ LIBS += -lInteractingMyTetrahedron \
         -lyade-lib-opengl \
         -rdynamic 
 INCLUDEPATH += $${YADE_QMAKE_PATH}/include/ \
-               ../../DataClass/InteractingGeometry/InteractingMyTetrahedron \
-               ../../RenderingEngine/OpenGLRenderingEngine 
+               ../../DataClass/InteractingGeometry/InteractingMyTetrahedron
 QMAKE_LIBDIR = ../../../bin \
                $${YADE_QMAKE_PATH}/lib/yade/yade-libs/ 
 QMAKE_CXXFLAGS_RELEASE += -lpthread \

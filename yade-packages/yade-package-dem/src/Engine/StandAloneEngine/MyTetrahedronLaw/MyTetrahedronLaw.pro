@@ -17,8 +17,7 @@ LIBS += -lElasticContactInteraction \
         -rdynamic 
 INCLUDEPATH += $${YADE_QMAKE_PATH}/include/ \
                ../../../DataClass/InteractionPhysics/ElasticContactInteraction \
-               ../../../DataClass/InteractionGeometry/InteractionOfMyTetrahedron \
-               ../../../DataClass/PhysicalParameters/ElasticBodyParameters 
+               ../../../DataClass/InteractionGeometry/InteractionOfMyTetrahedron
 QMAKE_LIBDIR = ../../../../bin \
                $${YADE_QMAKE_PATH}/lib/yade/yade-package-common/ \
                $${YADE_QMAKE_PATH}/lib/yade/yade-libs/ 
