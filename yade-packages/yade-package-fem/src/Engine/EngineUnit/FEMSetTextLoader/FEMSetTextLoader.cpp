@@ -84,7 +84,7 @@ void FEMSetTextLoader::createNode( shared_ptr<Body>& body
 	physics->initialPosition	= position;
 
 	gSphere->radius			= radius;
-	gSphere->diffuseColor		= Vector3f(0.9,0.9,0.3);
+	gSphere->diffuseColor		= Vector3r(0.9,0.9,0.3);
 	gSphere->wire			= false;
 	gSphere->visible		= true;
 	gSphere->shadowCaster		= true;
@@ -121,7 +121,7 @@ void FEMSetTextLoader::createTetrahedron(  const MetaBody* rootBody
 	// FIXME - remove Se3 - FEMTetrahedron DOES NOT need Se3 !
 	physics->se3 			= Se3r( Vector3r(0,0,0) , Quaternionr(0,0,0,0) );
 
-	gTet->diffuseColor		= Vector3f(1,1,1);
+	gTet->diffuseColor		= Vector3r(1,1,1);
 	gTet->wire			= false;
 	gTet->visible			= true;
 	gTet->shadowCaster		= true;

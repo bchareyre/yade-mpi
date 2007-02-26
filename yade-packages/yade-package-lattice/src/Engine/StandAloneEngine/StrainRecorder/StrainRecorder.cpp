@@ -64,11 +64,11 @@ void StrainRecorder::action(Body * body)
 	
 	if(!ncb->bodies->exists(*i)) std::cerr << "StrainRecorder missing node\n", exit(1);
 	LatticeNodeParameters* node1 = dynamic_cast<LatticeNodeParameters*>( (*(ncb->bodies))[*i]->physicalParameters . get() );
-	(*(ncb->bodies))[*i]->geometricalModel->diffuseColor = Vector3f(1.0,0.0,0.0); // FIXME [1]
+	(*(ncb->bodies))[*i]->geometricalModel->diffuseColor = Vector3r(1.0,0.0,0.0); // FIXME [1]
 	++i;
 	if(!ncb->bodies->exists(*i)) std::cerr << "StrainRecorder missing node\n", exit(1);
 	LatticeNodeParameters* node2 = dynamic_cast<LatticeNodeParameters*>( (*(ncb->bodies))[*i]->physicalParameters . get() );
-	(*(ncb->bodies))[*i]->geometricalModel->diffuseColor = Vector3f(1.0,0.0,0.0); // FIXME [1]
+	(*(ncb->bodies))[*i]->geometricalModel->diffuseColor = Vector3r(1.0,0.0,0.0); // FIXME [1]
 	++i;
 	// FIXME - zamiast ¶ledziæ tylko dwa punkty (jeden na dole i jeden u góry), to lepiej zaznaczyæ dwa obszary punktów i liczyæ ¶redni± ich po³o¿enia,
 	// bo teraz, je¶li który¶ punkt zostanie wykasowany, to nie jest mo¿liwe kontynuowanie pomiarów.
@@ -90,7 +90,7 @@ void StrainRecorder::action(Body * body)
 			//Real s_nonl_y =0;
 			//if(nonlocal)
 			//	s_nonl_y 		= (beam->nonLocalStrain / beam->nonLocalDivisor) * std::abs(beam->direction[1]);
-			(*(ncb->bodies))[*i]->geometricalModel->diffuseColor = Vector3f(0.0,1.0,1.0); // FIXME [1]
+			(*(ncb->bodies))[*i]->geometricalModel->diffuseColor = Vector3r(0.0,1.0,1.0); // FIXME [1]
 			stress_y += s_y;
 			//stress_nonlocal_y += s_nonl_y;
 		}

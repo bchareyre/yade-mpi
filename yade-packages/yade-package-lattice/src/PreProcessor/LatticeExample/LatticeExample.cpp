@@ -814,7 +814,7 @@ bool LatticeExample::createNode(shared_ptr<Body>& body, int i, int j, int k)
 	physics->se3			= Se3r(position,q);
 
 	gSphere->radius			= radius;
-	gSphere->diffuseColor		= Vector3f(0.8,0.8,0.8);
+	gSphere->diffuseColor		= Vector3r(0.8,0.8,0.8);
 	gSphere->wire			= false;
 	gSphere->visible		= true;
 	gSphere->shadowCaster		= false;
@@ -860,7 +860,7 @@ bool LatticeExample::createQuad(shared_ptr<Body>& quad, int i, int j, Vector3r n
 	physics->mass			= 0;
 	physics->velocity		= Vector3r(0,0,0);
 
-	gQuad->diffuseColor		= Vector3f(0.0,0.0,0.0);
+	gQuad->diffuseColor		= Vector3r(0.0,0.0,0.0);
 	gQuad->visible			= true;
 	gQuad->wire			= false;
 	gQuad->shadowCaster		= false;
@@ -886,7 +886,7 @@ void LatticeExample::createBeam(shared_ptr<Body>& body, unsigned int i, unsigned
 	physics->id2 			= j;
 
 	gBeam->length			= length;
-	gBeam->diffuseColor		= Vector3f(0.6,0.6,0.6);
+	gBeam->diffuseColor		= Vector3r(0.6,0.6,0.6);
 	gBeam->wire			= false;
 	gBeam->visible			= true;
 	gBeam->shadowCaster		= false;
@@ -1081,13 +1081,13 @@ void LatticeExample::positionRootBody(shared_ptr<MetaBody>& rootBody)
         shared_ptr<LatticeInteractingGeometry> set(new LatticeInteractingGeometry());
        
 
-	set->diffuseColor		= Vector3f(0,0,1);
+	set->diffuseColor		= Vector3r(0,0,1);
 
 	shared_ptr<AABB> aabb(new AABB);
 	aabb->diffuseColor		= Vector3r(0,0,1);
 
 	shared_ptr<GeometricalModel> gm = dynamic_pointer_cast<GeometricalModel>(ClassFactory::instance().createShared("LatticeSetGeometry"));
-	gm->diffuseColor 		= Vector3f(1,1,1);
+	gm->diffuseColor 		= Vector3r(1,1,1);
 	gm->wire 			= false;
 	gm->visible 			= true;
 	gm->shadowCaster 		= true;
@@ -1135,7 +1135,7 @@ void LatticeExample::imposeTranslation(shared_ptr<MetaBody>& rootBody, Vector3r 
 				)
 			{
 				b->isDynamic = false;
-				b->geometricalModel->diffuseColor = Vector3f(0.3,0.3,0.3);
+				b->geometricalModel->diffuseColor = Vector3r(0.3,0.3,0.3);
 				translationCondition->subscribedBodies.push_back(b->getId());
 			}
 		}
@@ -1235,8 +1235,8 @@ void LatticeExample::nonDestroy(shared_ptr<MetaBody>& rootBody, Vector3r min, Ve
                 beam->longitudalStiffness       = 10.0;
                 beam->bendingStiffness          = 2.8;
                 beam->torsionalStiffness        = 2.8;
-                (*(rootBody->bodies))[beam->id1]->geometricalModel->diffuseColor = Vector3f(0.2,0.5,0.7);
-                (*(rootBody->bodies))[beam->id2]->geometricalModel->diffuseColor = Vector3f(0.2,0.5,0.7);
+                (*(rootBody->bodies))[beam->id1]->geometricalModel->diffuseColor = Vector3r(0.2,0.5,0.7);
+                (*(rootBody->bodies))[beam->id2]->geometricalModel->diffuseColor = Vector3r(0.2,0.5,0.7);
         }
 }
 
@@ -1420,8 +1420,8 @@ void LatticeExample::addAggregates(shared_ptr<MetaBody>& rootBody)
                                 beam->criticalTensileStrain     = agg_critTensileStrain;
                                 beam->criticalCompressiveStrain = agg_critCompressStrain;
                 
-                                (*(rootBody->bodies))[beam->id1]->geometricalModel->diffuseColor = Vector3f(0.6,0.2,0.0);
-                                (*(rootBody->bodies))[beam->id2]->geometricalModel->diffuseColor = Vector3f(0.6,0.2,0.0);
+                                (*(rootBody->bodies))[beam->id1]->geometricalModel->diffuseColor = Vector3r(0.6,0.2,0.0);
+                                (*(rootBody->bodies))[beam->id2]->geometricalModel->diffuseColor = Vector3r(0.6,0.2,0.0);
                         }
                         else if(ovv==1) // bond
                         {
@@ -1431,8 +1431,8 @@ void LatticeExample::addAggregates(shared_ptr<MetaBody>& rootBody)
                                 beam->criticalTensileStrain     = bond_critTensileStrain;
                                 beam->criticalCompressiveStrain = bond_critCompressStrain;
                 
-                                (*(rootBody->bodies))[beam->id1]->geometricalModel->diffuseColor = Vector3f(0.6,0.6,0.0);
-                                (*(rootBody->bodies))[beam->id2]->geometricalModel->diffuseColor = Vector3f(0.6,0.6,0.0);
+                                (*(rootBody->bodies))[beam->id1]->geometricalModel->diffuseColor = Vector3r(0.6,0.6,0.0);
+                                (*(rootBody->bodies))[beam->id2]->geometricalModel->diffuseColor = Vector3r(0.6,0.6,0.0);
                         }
                 }
         }

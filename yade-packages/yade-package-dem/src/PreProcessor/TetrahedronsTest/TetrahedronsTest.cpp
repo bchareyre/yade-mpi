@@ -194,7 +194,7 @@ void TetrahedronsTest::createTetrahedron(shared_ptr<Body>& body, int i, int j, i
 	physics->velocity		= Vector3r(0,0,0);
 
 	makeTet(tet,radius);
-	tet->diffuseColor		= Vector3f(Mathf::UnitRandom(),Mathf::UnitRandom(),Mathf::UnitRandom());
+	tet->diffuseColor		= Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom());
 	tet->wire			= false;
 	tet->visible			= true;
 	tet->shadowCaster		= false;
@@ -234,7 +234,7 @@ void TetrahedronsTest::createTetrahedron(shared_ptr<Body>& body, int i, int j, i
 
 	// interactingGeometry is filled with data by Tetrahedron2InteractingMyTetrahedron
 	shared_ptr<InteractingGeometry> imt(new InteractingMyTetrahedron);
-	imt->diffuseColor               = Vector3f(0.5,0.5,1.0);
+	imt->diffuseColor               = Vector3r(0.5,0.5,1.0);
 	body->interactingGeometry	= imt;
 
 	body->geometricalModel		= tet;
@@ -284,13 +284,13 @@ void TetrahedronsTest::createBox(shared_ptr<Body>& body, Vector3r position, Vect
 	aabb->diffuseColor		= Vector3r(1,0,0);
 
 	gBox->extents			= extents;
-	gBox->diffuseColor		= Vector3f(1,1,1);
+	gBox->diffuseColor		= Vector3r(1,1,1);
 	gBox->wire			= false;
 	gBox->visible			= true;
 	gBox->shadowCaster		= true;
 	
 	iBox->extents			= extents;
-	iBox->diffuseColor		= Vector3f(1,1,1);
+	iBox->diffuseColor		= Vector3r(1,1,1);
 
 	body->boundingVolume		= aabb;
 	body->interactingGeometry	= iBox;
@@ -408,7 +408,7 @@ void TetrahedronsTest::positionRootBody(shared_ptr<MetaBody>& rootBody)
 	physics->acceleration			= Vector3r::ZERO;
 		
 	shared_ptr<MetaInteractingGeometry> set(new MetaInteractingGeometry());
-	set->diffuseColor			= Vector3f(0,0,1);
+	set->diffuseColor			= Vector3r(0,0,1);
 	
 	shared_ptr<AABB> aabb(new AABB);
 	aabb->diffuseColor			= Vector3r(0,0,1);

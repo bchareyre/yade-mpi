@@ -77,7 +77,7 @@ void GLDrawInteractingSphere::go(const shared_ptr<InteractingGeometry>& cm, cons
 	
 	Real radius = (static_cast<InteractingSphere*>(cm.get()))->radius;
 	
-	glMaterialv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, cm->diffuseColor);
+	glMaterialv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, Vector3f(cm->diffuseColor[0],cm->diffuseColor[1],cm->diffuseColor[2]));
 	glColor3v(cm->diffuseColor);
 // 	if (cm->wire)
 // 	{

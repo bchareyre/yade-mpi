@@ -203,13 +203,13 @@ void FEMBeam::positionRootBody(shared_ptr<MetaBody>& rootBody)
 	
 	shared_ptr<MetaInteractingGeometry> set(new MetaInteractingGeometry());
 	
-	set->diffuseColor			= Vector3f(0,0,1);
+	set->diffuseColor			= Vector3r(0,0,1);
 
 	shared_ptr<AABB> aabb(new AABB);
 	aabb->diffuseColor			= Vector3r(0,0,1);
 
 	shared_ptr<GeometricalModel> gm 	= dynamic_pointer_cast<GeometricalModel>(ClassFactory::instance().createShared("FEMSetGeometry"));
-	gm->diffuseColor 			= Vector3f(1,1,1);
+	gm->diffuseColor 			= Vector3r(1,1,1);
 	gm->wire 				= false;
 	gm->visible 				= true;
 	gm->shadowCaster 			= true;
@@ -246,7 +246,7 @@ void FEMBeam::imposeTranslation(shared_ptr<MetaBody>& rootBody, Vector3r min, Ve
 				&& pos[2] < max[2] )
 			{
 				b->isDynamic = false;
-				b->geometricalModel->diffuseColor = Vector3f(1,0,0);
+				b->geometricalModel->diffuseColor = Vector3r(1,0,0);
 				translationCondition->subscribedBodies.push_back(b->getId());
 			}
 		}

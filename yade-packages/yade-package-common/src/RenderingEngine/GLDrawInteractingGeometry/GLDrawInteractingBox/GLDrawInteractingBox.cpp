@@ -13,7 +13,7 @@
 void GLDrawInteractingBox::go(const shared_ptr<InteractingGeometry>& cg, const shared_ptr<PhysicalParameters>&,bool)
 {
 	// FIXME : check that : one of those 2 lines are useless
-  	glMaterialv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, cg->diffuseColor);
+  	glMaterialv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, Vector3f(cg->diffuseColor[0],cg->diffuseColor[1],cg->diffuseColor[2]));
 	glColor3v(cg->diffuseColor);
 	
 	Vector3r &extents = (static_cast<InteractingBox*>(cg.get()))->extents;

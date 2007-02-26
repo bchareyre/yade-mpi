@@ -65,6 +65,7 @@ class GLWindow
 		
 		void setBackgroundColor(float r, float g, float b) { color[0] = r; color[1] = g; color[2] = b;};	
 		void getBackgroundColor(float& r, float& g, float& b) { r=color[0]; g=color[1]; b=color[2];};	
+		void getBackgroundColor(double& r, double& g, double& b) { r=color[0]; g=color[1]; b=color[2];};	
 		
 		void setSelectionColor(float r, float g, float b) { selectionColor[0] = r; selectionColor[1] = g; selectionColor[2] = b;};		
 		void setBorderColor(float r, float g, float b) { borderColor[0] = r; borderColor[1] = g; borderColor[2] = b;};			

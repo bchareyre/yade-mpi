@@ -83,7 +83,7 @@ SDECImpactTest::SDECImpactTest () : FileGenerator()
 	wall_2_wire		= true;
 	wall_3_wire		= true;
 	wall_4_wire		= true;
-	spheresColor		= Vector3f(0.8,0.3,0.3);
+	spheresColor		= Vector3r(0.8,0.3,0.3);
 	spheresRandomColor	= false;
 	recordBottomForce	= true;
 	forceRecordFile		= "../data/force";
@@ -395,7 +395,7 @@ void SDECImpactTest::createSphere(shared_ptr<Body>& body, Vector3r position, Rea
 	gSphere->shadowCaster		= true;
 	
 	iSphere->radius			= radius;
-	iSphere->diffuseColor		= Vector3f(Mathf::UnitRandom(),Mathf::UnitRandom(),Mathf::UnitRandom());
+	iSphere->diffuseColor		= Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom());
 
 	body->interactingGeometry	= iSphere;
 	body->geometricalModel		= gSphere;
@@ -436,13 +436,13 @@ void SDECImpactTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector
 	aabb->diffuseColor		= Vector3r(1,0,0);
 
 	gBox->extents			= extents;
-	gBox->diffuseColor		= Vector3f(1,1,1);
+	gBox->diffuseColor		= Vector3r(1,1,1);
 	gBox->wire			= wire;
 	gBox->visible			= true;
 	gBox->shadowCaster		= false;
 	
 	iBox->extents			= extents;
-	iBox->diffuseColor		= Vector3f(1,1,1);
+	iBox->diffuseColor		= Vector3r(1,1,1);
 
 	body->boundingVolume		= aabb;
 	body->interactingGeometry	= iBox;
@@ -552,7 +552,7 @@ void SDECImpactTest::positionRootBody(shared_ptr<MetaBody>& rootBody)
 	
 	shared_ptr<MetaInteractingGeometry> set(new MetaInteractingGeometry());
 	
-	set->diffuseColor		= Vector3f(0,0,1);
+	set->diffuseColor		= Vector3r(0,0,1);
 
 	shared_ptr<AABB> aabb(new AABB);
 	aabb->diffuseColor		= Vector3r(0,0,1);

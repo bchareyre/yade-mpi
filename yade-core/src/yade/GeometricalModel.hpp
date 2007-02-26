@@ -24,7 +24,7 @@ class GeometricalModel : public Serializable, public Indexable
 				,wire
 				,shadowCaster;
 
-		Vector3f	diffuseColor;
+		Vector3r	diffuseColor;
 
 	protected : 
 		void registerAttributes();

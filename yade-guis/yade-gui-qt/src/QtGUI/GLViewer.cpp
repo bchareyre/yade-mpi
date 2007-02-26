@@ -159,9 +159,8 @@ void GLViewer::draw() // FIXME maybe rename to RendererFlowControl, or something
 			#ifdef HIGHLEVEL_CLUMPS
 				shared_ptr<Body> b=Body::byId(selection);
 				if(b->isClump()){
-					Clump* c=dynamic_cast<Clump*>(Body::byId(b->clumpId).get());
-					c->moveSubBodies();
-					//for(Clump::clumpMap::iterator I=c->subBodies.begin(); I!=c->subBodies.end(); I++)renderer->render(Omega::instance().getRootBody(), I->first);
+					Clump* clump=dynamic_cast<Clump*>(Body::byId(b->clumpId).get());
+					clump->moveMembers();
 				}
 			#endif
 		}

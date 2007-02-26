@@ -171,7 +171,7 @@ void GLDrawLatticeSetGeometry::go(const shared_ptr<GeometricalModel>& gm, const 
 	}
 
 	// FIXME : check that : one of those 2 lines are useless
-  	glMaterialv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, gm->diffuseColor);
+  	glMaterialv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, Vector3f(gm->diffuseColor[0],gm->diffuseColor[1],gm->diffuseColor[2]));
 	glColor3v(gm->diffuseColor);
 	
 	//Real len = (static_cast<LatticeSetGeometry*>(gm.get()))->length;

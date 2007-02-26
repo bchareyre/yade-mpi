@@ -72,13 +72,13 @@ void MeasurePoisson::action(Body * body)
 	MetaBody * ncb = static_cast<MetaBody*>(body);
 
 	LatticeNodeParameters* node_left   = dynamic_cast<LatticeNodeParameters*>( (*(ncb->bodies))[left  ]->physicalParameters . get() );
-	(*(ncb->bodies))[left  ]->geometricalModel->diffuseColor = Vector3f(1.0,1.0,0.0); // FIXME [1]
+	(*(ncb->bodies))[left  ]->geometricalModel->diffuseColor = Vector3r(1.0,1.0,0.0); // FIXME [1]
 	LatticeNodeParameters* node_right  = dynamic_cast<LatticeNodeParameters*>( (*(ncb->bodies))[right ]->physicalParameters . get() );
-	(*(ncb->bodies))[right ]->geometricalModel->diffuseColor = Vector3f(1.0,1.0,0.0); // FIXME [1]
+	(*(ncb->bodies))[right ]->geometricalModel->diffuseColor = Vector3r(1.0,1.0,0.0); // FIXME [1]
 	LatticeNodeParameters* node_bottom = dynamic_cast<LatticeNodeParameters*>( (*(ncb->bodies))[bottom]->physicalParameters . get() );
-	(*(ncb->bodies))[bottom]->geometricalModel->diffuseColor = Vector3f(1.0,1.0,0.0); // FIXME [1]
+	(*(ncb->bodies))[bottom]->geometricalModel->diffuseColor = Vector3r(1.0,1.0,0.0); // FIXME [1]
 	LatticeNodeParameters* node_upper  = dynamic_cast<LatticeNodeParameters*>( (*(ncb->bodies))[upper ]->physicalParameters . get() );
-	(*(ncb->bodies))[upper ]->geometricalModel->diffuseColor = Vector3f(1.0,1.0,0.0); // FIXME [1]
+	(*(ncb->bodies))[upper ]->geometricalModel->diffuseColor = Vector3r(1.0,1.0,0.0); // FIXME [1]
 	
 	// FIXME - zamiast ¶ledziæ tylko dwa punkty (jeden na dole i jeden u góry), to lepiej zaznaczyæ dwa obszary punktów i liczyæ ¶redni± ich po³o¿enia,
 	// bo teraz, je¶li który¶ punkt zostanie wykasowany, to nie jest mo¿liwe kontynuowanie pomiarów.

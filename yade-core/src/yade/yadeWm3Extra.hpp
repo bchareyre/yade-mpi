@@ -37,9 +37,9 @@
 	template<class RealType1, class RealType2>
 	Vector3<RealType2> operator* (RealType1 fScalar, const Vector3<RealType2>& rkV){ return Vector3<RealType2>(fScalar*rkV[0],fScalar*rkV[1],fScalar*rkV[2]);}
 
-	/*__attribute__((deprecated)) Vector3f operator*(const double s, const Vector3f& v){return Vector3f(s*v[0],s*v[1],s*v[2]);}
+	/*__attribute__((deprecated)) Vector3r operator*(const double s, const Vector3r& v){return Vector3r(s*v[0],s*v[1],s*v[2]);}
 	__attribute__((deprecated)) Vector3d operator*(const float s, const Vector3d& v){return Vector3d(s*v[0],s*v[1],s*v[2]);}
-	__attribute__((deprecated)) Vector3f operator*(const Vector3f& v, const double s){return Vector3f(s*v[0],s*v[1],s*v[2]);}
+	__attribute__((deprecated)) Vector3r operator*(const Vector3r& v, const double s){return Vector3r(s*v[0],s*v[1],s*v[2]);}
 	__attribute__((deprecated)) Vector3d operator*(const Vector3d& v, const float s){return Vector3d(s*v[0],s*v[1],s*v[2]);}*/
 
 	std::ostream & operator<< (std::ostream &os, const Vector3r &v){ return os << v[0] << " " << v[1] << " " << v[2];}

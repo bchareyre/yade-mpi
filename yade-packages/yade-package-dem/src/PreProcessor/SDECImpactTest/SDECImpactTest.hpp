@@ -24,7 +24,7 @@ class SDECImpactTest : public FileGenerator
 				,lowerCorner
 				,upperCorner;
 
-		Vector3f	 spheresColor;
+		Vector3r	 spheresColor;
 
 		Real		 thickness
 				,sphereYoungModulus

@@ -44,7 +44,7 @@ class GLEngineEditor : public QGLViewer
 		int endX;
 		int endY;
 		int selectedEngine;
-		Vector3f savedColor;
+		Vector3r savedColor;
 		int firstEngine;
 
 		void drawGrid();

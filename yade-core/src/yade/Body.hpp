@@ -28,8 +28,7 @@
 
 
 /*! \brief Abstract interface for bodies stored in BodyContainer, Body represents the atomic element of simulation.
-*/
-
+ */
 class Body : public Serializable
 {
 	private	:

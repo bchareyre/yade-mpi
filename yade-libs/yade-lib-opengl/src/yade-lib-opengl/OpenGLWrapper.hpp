@@ -249,6 +249,7 @@ template< > inline void glRect< int >				(int	x1,int	  y1,int x2, int y2 )		{	gl
 template< > inline void glRect< short >			(short	x1,short  y1,short x2,short y2 )	{	glRects(x1,y1,x2,y2);	};
 
 template< > inline void glMaterial< float >			( GLenum face, GLenum pname, float param )			{	glMaterialf(face,pname,param);		};
+template< > inline void glMaterial< double >			( GLenum face, GLenum pname, double param )			{	glMaterialf(face,pname,param);		};
 template< > inline void glMaterial< int >			( GLenum face, GLenum pname, int param )			{	glMateriali(face,pname,param);		};
 template< > inline void glMaterialv< Vector3<float> >		( GLenum face, GLenum pname, const Vector3<float> params )	{	glMaterialfv(face,pname,params);	};
 template< > inline void glMaterialv< Vector3<int> >		( GLenum face, GLenum pname, const Vector3<int> params )	{	glMaterialiv(face,pname,params);	};

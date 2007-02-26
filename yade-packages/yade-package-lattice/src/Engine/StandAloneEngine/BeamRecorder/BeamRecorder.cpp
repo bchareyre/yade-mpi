@@ -155,7 +155,7 @@ void BeamRecorder::action(Body * body)
 				stress_x += s_x;
 				stress_y += s_y;
 
-				(*(ncb->bodies))[*i]->geometricalModel->diffuseColor = Vector3f(1.0,0.0,((float)section)/3.0); // FIXME [1]
+				(*(ncb->bodies))[*i]->geometricalModel->diffuseColor = Vector3r(1.0,0.0,((float)section)/3.0); // FIXME [1]
 			}
 		}
 

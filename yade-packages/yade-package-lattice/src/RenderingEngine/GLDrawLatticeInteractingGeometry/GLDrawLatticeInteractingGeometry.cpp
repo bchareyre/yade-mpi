@@ -78,7 +78,7 @@ void GLDrawLatticeInteractingGeometry::damagedNeighbor(unsigned int a)
 	if(damaged.size()<=a) damaged.resize(a+1,0);
 	++damaged[a];
 
-	//(*(bodies))[A]->geometricalModel->diffuseColor = Vector3f(0.0,0.0,((float)section)/2.0);
+	//(*(bodies))[A]->geometricalModel->diffuseColor = Vector3r(0.0,0.0,((float)section)/2.0);
 };
 
 void GLDrawLatticeInteractingGeometry::go(const shared_ptr<InteractingGeometry>& gm, const shared_ptr<PhysicalParameters>&,bool wire)
@@ -110,8 +110,8 @@ void GLDrawLatticeInteractingGeometry::go(const shared_ptr<InteractingGeometry>&
 				LatticeBeamParameters* b2 = static_cast<LatticeBeamParameters*>(((*(bodies))[(*angles)->getId2()])->physicalParameters.get());
 				unsigned int A = b2->id1,
 					     B = b2->id2;
-				Vector3f c1 = (*(bodies))[A]->geometricalModel->diffuseColor;
-				Vector3f c2 = (*(bodies))[B]->geometricalModel->diffuseColor;
+				Vector3r c1 = (*(bodies))[A]->geometricalModel->diffuseColor;
+				Vector3r c2 = (*(bodies))[B]->geometricalModel->diffuseColor;
 				// beams that have nodes with red=0 and green=0 in geometrical model are used by MovingSupport, so I want to exclude them...
 				if( !((c1[0]==0 && c1[1]==0) || (c2[0]==0 && c2[1]==0)) )
 					damagedNeighbor((*angles)->getId2());
@@ -123,8 +123,8 @@ void GLDrawLatticeInteractingGeometry::go(const shared_ptr<InteractingGeometry>&
 				LatticeBeamParameters* b1 = static_cast<LatticeBeamParameters*>(((*(bodies))[(*angles)->getId1()])->physicalParameters.get());
 				unsigned int A = b1->id1,
 					     B = b1->id2;
-				Vector3f c1 = (*(bodies))[A]->geometricalModel->diffuseColor;
-				Vector3f c2 = (*(bodies))[B]->geometricalModel->diffuseColor;
+				Vector3r c1 = (*(bodies))[A]->geometricalModel->diffuseColor;
+				Vector3r c2 = (*(bodies))[B]->geometricalModel->diffuseColor;
 				if( !((c1[0]==0 && c1[1]==0) || (c2[0]==0 && c2[1]==0)) )
 					damagedNeighbor((*angles)->getId1());
 			}
@@ -133,7 +133,7 @@ void GLDrawLatticeInteractingGeometry::go(const shared_ptr<InteractingGeometry>&
 		angles_end = interactions->end();
 	}
 
-  	glMaterialv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, gm->diffuseColor);
+  	glMaterialv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, Vector3f(gm->diffuseColor[0],gm->diffuseColor[1],gm->diffuseColor[2]));
 	glColor3(0.5,0.5,0.9);
 	glDisable(GL_CULL_FACE);
 	glEnable(GL_LIGHTING);

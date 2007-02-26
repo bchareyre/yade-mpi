@@ -34,12 +34,12 @@ void GLDrawLatticeBeamState::go(const shared_ptr<PhysicalParameters>& pp)
 	if(factor > 0 && maxTensileFactor > 0)
 	{
 		factor                  /= maxTensileFactor;
-		glColor3v(Vector3f(0.9,0.9,1.0) - factor * Vector3f(0.9,0.9,0.0));
+		glColor3v(Vector3r(0.9,0.9,1.0) - factor * Vector3r(0.9,0.9,0.0));
 	}
 	else if (factor < 0 && maxCompressFactor < 0)
 	{
 		factor                  /= maxCompressFactor; // both are negative, so result is positive
-		glColor3v(Vector3f(1.0,0.9,0.9) - factor * Vector3f(0.0,0.9,0.9));
+		glColor3v(Vector3r(1.0,0.9,0.9) - factor * Vector3r(0.0,0.9,0.9));
 	}
 	else
 		glColor3(0.9,0.9,0.9);

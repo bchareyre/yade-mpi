@@ -70,8 +70,8 @@ void GLDrawSpheresContactGeometry::go(
 			glScalef(mid,mid*0.05,mid*0.05);
 		glColor3(0.5,0.5,0.5);
 	// ///////////
-
-//		glMaterialv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, gm->diffuseColor);
+ 
+ 	 	//glMaterialv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, Vector3f(gm->diffuseColor[0],gm->diffuseColor[1],gm->diffuseColor[2]));
 		glEnable(GL_LIGHTING);
 		glutSolidCube(1.0);
 

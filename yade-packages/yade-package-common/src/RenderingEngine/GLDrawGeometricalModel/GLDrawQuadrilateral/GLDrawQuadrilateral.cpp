@@ -11,12 +11,12 @@
 #include <yade/yade-core/MetaBody.hpp>
 #include <yade/yade-lib-opengl/OpenGLWrapper.hpp>
 
-Vector3f makeColor(double val,double min,double max)
+Vector3r makeColor(double val,double min,double max)
 {
 	Real sc01 = ((val-min)/(max-min))*2.0-1.0;
-	if(sc01 < 0) return Vector3f(0.9,0.9,1.0) + sc01 * Vector3f(0.9,0.9,0.0);
-	if(sc01 > 0) return Vector3f(1.0,0.9,0.9) - sc01 * Vector3f(0.0,0.9,0.9);
-	return Vector3f(0.9,0.9,0.9);
+	if(sc01 < 0) return Vector3r(0.9,0.9,1.0) + sc01 * Vector3r(0.9,0.9,0.0);
+	if(sc01 > 0) return Vector3r(1.0,0.9,0.9) - sc01 * Vector3r(0.0,0.9,0.9);
+	return Vector3r(0.9,0.9,0.9);
 }
 
 void GLDrawQuadrilateral::go(const shared_ptr<GeometricalModel>& gm, const shared_ptr<PhysicalParameters>&,bool wire)

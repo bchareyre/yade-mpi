@@ -250,13 +250,13 @@ void SDECLinkedSpheres::createSphere(shared_ptr<Body>& body, int i, int j, int k
 
 
 	gSphere->radius			= radius;
-	gSphere->diffuseColor		= Vector3f(Mathf::UnitRandom(),Mathf::UnitRandom(),Mathf::UnitRandom());
+	gSphere->diffuseColor		= Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom());
 	gSphere->wire			= false;
 	gSphere->visible		= true;
 	gSphere->shadowCaster		= true;
 	
 	iSphere->radius			= radius;
-	iSphere->diffuseColor		= Vector3f(Mathf::UnitRandom(),Mathf::UnitRandom(),Mathf::UnitRandom());
+	iSphere->diffuseColor		= Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom());
 
 	body->interactingGeometry	= iSphere;
 	body->geometricalModel		= gSphere;
@@ -296,13 +296,13 @@ void SDECLinkedSpheres::createBox(shared_ptr<Body>& body, Vector3r position, Vec
 	aabb->diffuseColor		= Vector3r(1,0,0);
 
 	gBox->extents			= extents;
-	gBox->diffuseColor		= Vector3f(1,1,1);
+	gBox->diffuseColor		= Vector3r(1,1,1);
 	gBox->wire			= false;
 	gBox->visible			= true;
 	gBox->shadowCaster		= true;
 	
 	iBox->extents			= extents;
-	iBox->diffuseColor		= Vector3f(1,1,1);
+	iBox->diffuseColor		= Vector3r(1,1,1);
 
 	body->boundingVolume		= aabb;
 	body->interactingGeometry	= iBox;
@@ -397,7 +397,7 @@ void SDECLinkedSpheres::positionRootBody(shared_ptr<MetaBody>& rootBody)
 	physics->acceleration		= Vector3r::ZERO;
 	
 	shared_ptr<MetaInteractingGeometry> set(new MetaInteractingGeometry());
-	set->diffuseColor		= Vector3f(0,0,1);
+	set->diffuseColor		= Vector3r(0,0,1);
 
 	shared_ptr<AABB> aabb(new AABB);
 	aabb->diffuseColor		= Vector3r(0,0,1);

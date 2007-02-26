@@ -121,7 +121,7 @@ void NodeRecorder::action(Body * body)
 				sum+=(*(ncb->bodies))[*i]->physicalParameters->se3.position;
 				++count;
 				
-				(*(ncb->bodies))[*i]->geometricalModel->diffuseColor = Vector3f(0.0,1.0,((float)region)/1.5); // FIXME [1]
+				(*(ncb->bodies))[*i]->geometricalModel->diffuseColor = Vector3r(0.0,1.0,((float)region)/1.5); // FIXME [1]
 			}
 		}
 

@@ -88,7 +88,7 @@ void GLDrawSphere::go(const shared_ptr<GeometricalModel>& gm, const shared_ptr<P
 	
 	Real radius = (static_cast<Sphere*>(gm.get()))->radius;
 	
-	glMaterialv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, gm->diffuseColor);
+	glMaterialv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, Vector3f(gm->diffuseColor[0],gm->diffuseColor[1],gm->diffuseColor[2]));
 	glColor3v(gm->diffuseColor);
  	if (gm->wire || wire)
  	{

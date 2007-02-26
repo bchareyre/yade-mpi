@@ -239,13 +239,13 @@ void SDECMovingWall::createGroundSphere(shared_ptr<Body>& body,Real radius, Real
 	aabb->diffuseColor		= Vector3r(0,1,0);
 
 	gSphere->radius			= radius;
-	gSphere->diffuseColor		= Vector3f(0.7,0.7,0.7);
+	gSphere->diffuseColor		= Vector3r(0.7,0.7,0.7);
 	gSphere->wire			= false;
 	gSphere->visible		= true;
 	gSphere->shadowCaster		= true;
 	
 	iSphere->radius			= radius;
-	iSphere->diffuseColor		= Vector3f(0.8,0.3,0.3);
+	iSphere->diffuseColor		= Vector3r(0.8,0.3,0.3);
 
 	body->interactingGeometry	= iSphere;
 	body->geometricalModel		= gSphere;
@@ -288,13 +288,13 @@ void SDECMovingWall::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 //	position.normalize();
 //	gSphere->diffuseColor		= position;
 // a simple way to have alternating colors per layer
-	gSphere->diffuseColor		= Vector3f(std::sin((float)j),std::cos((float)j),j/nbSpheres[1]);
+	gSphere->diffuseColor		= Vector3r(std::sin((float)j),std::cos((float)j),j/nbSpheres[1]);
 	gSphere->wire			= false;
 	gSphere->visible		= true;
 	gSphere->shadowCaster		= true;
 	
 	iSphere->radius			= radius;
-	iSphere->diffuseColor		= Vector3f(0.8,0.3,0.3);
+	iSphere->diffuseColor		= Vector3r(0.8,0.3,0.3);
 
 	body->interactingGeometry	= iSphere;
 	body->geometricalModel		= gSphere;
@@ -335,13 +335,13 @@ void SDECMovingWall::createBox(shared_ptr<Body>& body, Vector3r position, Vector
 	aabb->diffuseColor		= Vector3r(1,0,0);
 
 	gBox->extents			= extents;
-	gBox->diffuseColor		= Vector3f(1,1,1);
+	gBox->diffuseColor		= Vector3r(1,1,1);
 	gBox->wire			= wire;
 	gBox->visible			= true;
 	gBox->shadowCaster		= true;
 	
 	iBox->extents			= extents;
-	iBox->diffuseColor		= Vector3f(1,1,1);
+	iBox->diffuseColor		= Vector3r(1,1,1);
 
 	body->boundingVolume		= aabb;
 	body->interactingGeometry	= iBox;
@@ -440,7 +440,7 @@ void SDECMovingWall::positionRootBody(shared_ptr<MetaBody>& rootBody)
 	physics->acceleration			= Vector3r::ZERO;
 		
 	shared_ptr<MetaInteractingGeometry> set(new MetaInteractingGeometry());
-	set->diffuseColor			= Vector3f(0,0,1);
+	set->diffuseColor			= Vector3r(0,0,1);
 	
 	shared_ptr<AABB> aabb(new AABB);
 	aabb->diffuseColor			= Vector3r(0,0,1);
