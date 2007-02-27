@@ -75,9 +75,7 @@ class Omega : public Singleton<Omega>
 		shared_ptr<Preferences> preferences;
 		string 				 yadeConfigPath;	// FIXME - must be private and more clean
 		string 				 yadeVersionName;	// FIXME - public ?
-		#ifdef HIGHLEVEL_CLUMPS
-			list<Body::id_t> selectedBodies;
-		#endif
+		list<Body::id_t> selectedBodies;
 	
 		void logMessage(const string& str);
 		void logError(const string& str);

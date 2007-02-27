@@ -24,10 +24,6 @@
 #include<yade/yade-lib-base/yadeWm3Extra.hpp>
 
 
-#ifndef HIGHLEVEL_CLUMPS
-	#error HIGHLEVEL_CLUMPS must be defined if clumps are to work!
-#endif
-
 /*! Body representing clump (rigid aggregate) composed by other existing bodies.
 
 	Clump is one of bodies that reside in rootBody->bodies.
@@ -85,6 +81,8 @@ class Clump: public Body {
 		void updateProperties(bool intersecting);
 		//! Calculate positions and orientations of members based on my own Se3.
 		void moveMembers();
+		//! update member positions after clump being moved by mouse (in case simulation is paused and engines will not do that).
+		void userForcedDisplacementRedrawHook(){moveMembers();}
 	private: // may be made public, but once properly tested...
 		//! Recalculates inertia tensor of a body after translation away from (default) or towards its centroid.
 		static Matrix3r inertiaTensorTranslate(const Matrix3r& I,const Real m, const Vector3r& off);

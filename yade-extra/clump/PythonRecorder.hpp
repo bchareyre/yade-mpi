@@ -24,7 +24,7 @@ class PythonRecorder : public DataRecorder
 		PythonRecorder();
 		virtual void action(Body* b);
 		virtual bool isActivated(){return true;}
-		virtual void registerAttributes(){DataRecorder::registerAttributes(); REGISTER_ATTRIBUTE(expression); REGISTER_ATTRIBUTE(outputFile);}
+		virtual void registerAttributes(){DataRecorder::registerAttributes(); REGISTER_ATTRIBUTE(expression); REGISTER_ATTRIBUTE(initExpression); REGISTER_ATTRIBUTE(outputFile);}
 		//! This expression will be interpreted when the engine is called.
 		std::string expression;
 		//! Piece of python code run on intialization

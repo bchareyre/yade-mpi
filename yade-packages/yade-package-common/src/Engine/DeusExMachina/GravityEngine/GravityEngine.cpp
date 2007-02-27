@@ -37,15 +37,14 @@ void GravityEngine::applyCondition(Body* body)
 	for( ; bi!=biEnd ; ++bi )
 	{
 		shared_ptr<Body> b = *bi;
-		#ifdef HIGHLEVEL_CLUMPS
-			/* skip bodies that are within a clump;
-			 * even if they are marked isDynamic==false, forces applied to them are passed to the clump, which is dynamic;
-			 * and since clump is a body with mass equal to the sum of masses of its components, it would have gravity applied twice.
-			 *
-			 * The choice is to skip (b->isClumpMember()) or (b->isClump()). We rather skip members,
-			 * since that will apply smaller number of forces and (theoretically) improve numerical stability ;-) */
-			if(b->isClumpMember()) continue;
-		#endif
+		/* skip bodies that are within a clump;
+		 * even if they are marked isDynamic==false, forces applied to them are passed to the clump, which is dynamic;
+		 * and since clump is a body with mass equal to the sum of masses of its components, it would have gravity applied twice.
+		 *
+		 * The choice is to skip (b->isClumpMember()) or (b->isClump()). We rather skip members,
+		 * since that will apply smaller number of forces and (theoretically) improve numerical stability ;-) */
+		if(b->isClumpMember()) continue;
+
 		ParticleParameters* p = dynamic_cast<ParticleParameters*>(b->physicalParameters.get());
 		if (p)
 			static_cast<Force*>( ncb->physicalActions->find( b->getId() , actionParameterForce->getClassIndex() ).get() )->force += gravity * p->mass;

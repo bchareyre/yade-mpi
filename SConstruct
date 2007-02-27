@@ -147,7 +147,12 @@ if not env.GetOption('clean'):
 ############# BUILDING ###################################################################
 ##########################################################################################
 
-env.SourceSignatures('MD5')
+if 1:
+	env.SourceSignatures('MD5')
+	env.SetOption('max_drift',5) # cache md5sums of files older than 5 seconds
+	SetOption('implicit_cache',1) # cahe #include files etc.
+	env.SourceCode(".",None) # skip dotted directories
+	SetOption('num_jobs',6)
 
 ### DIRECTORIES
 libDirs=['yade-libs','yade-packages/yade-package-common','yade-packages/yade-package-dem','yade-packages/yade-package-fem','yade-packages/yade-package-lattice','yade-packages/yade-package-mass-spring','yade-packages/yade-package-realtime-rigidbody','yade-extra','yade-guis']
@@ -159,7 +164,6 @@ instIncludeDirs=['yade-core']+[os.path.join('$PREFIX','include','yade',string.sp
 ### PREPROCESSOR
 env.Append(CPPPATH=['#/include'])
 env.Append(CPPDEFINES=[('POSTFIX',r'$POSTFIX'),('PREFIX',r'$PREFIX')])
-env.Append(CPPDEFINES=['HIGHLEVEL_CLUMPS'])
 
 ### COMPILER
 if env['debug']: env.Append(CXXFLAGS='-ggdb3',CPPDEFINES=['DEBUG'])
@@ -215,10 +219,31 @@ def prepareIncludes(prefix=None):
 	#print "prepareIncludes(prefix='%s')"%prefix
 	global env
 	import os,string,re
-	from os.path import join,split,isabs,isdir,exists
+	from os.path import join,split,isabs,isdir,exists,islink,isfile
 	if not prefix: yadeRoot='.' # MUST be relative, otherwise relative symlinks for the local includes will break badly
 	else: yadeRoot=prefix
 	yadeInc=join(yadeRoot,'include','yade')
+	#### POSTFIX_INCLUDES
+	# make the headure install directory symlink to postfixed version
+	# e.g. ./include/yade -> ./include/yade-debug
+	# 	./include/yade will be deleted at this point
+	# 	./include/yade-debug will be created if it doesn't exist
+	# 	symlink yade -> yade->debug will be created
+	# This makes all headers installed to ./include/yade go actually to ./include/yade-debug
+	#
+	# I hope this doesn't break scons' algorithm for dependency detection
+	if len(env['POSTFIX'])>0:
+		import shutil
+		yadeIncPostfix=yadeInc+env.subst("$POSTFIX")
+		
+		if not exists(yadeInc): pass
+		elif islink(yadeInc) or isfile(yadeInc): os.remove(yadeInc) # simply remove the link/file
+		else: shutil.rmtree(yadeInc)
+		assert(not isfile(yadeInc))
+
+		if not exists(yadeIncPostfix): os.makedirs(yadeIncPostfix)
+		os.symlink(env.subst("yade$POSTFIX"),yadeInc)
+
 	for root, dirs, files in os.walk('.'):
 		for d in ('.svn','yade-flat','include'):
 			try: dirs.remove(d)

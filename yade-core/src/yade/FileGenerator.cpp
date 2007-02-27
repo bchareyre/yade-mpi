@@ -67,7 +67,7 @@ string FileGenerator::generateAndSave()
 	catch(MultiMethodsError& e){return string("MultiMethodsError: ")+e.what();}
 	catch(std::exception& e){
 		LOG_FATAL("Unhandled exception: "<<typeid(e).name()<<" : "<<e.what());
-		exit(1);
+		abort(); // use abort, since we may want to inspect core
 	}
 
 	if(shouldTerminate())

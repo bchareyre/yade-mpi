@@ -183,14 +183,13 @@ void PersistentSAPCollider::updateOverlapingBBSet(int id1,int id2)
 	// test if the AABBs of the spheres number "id1" and "id2" are overlapping
 	int offset1 = 3*id1;
 	int offset2 = 3*id2;
-	#ifdef HIGHLEVEL_CLUMPS
-		shared_ptr<Body> b1=Body::byId(id1), b2=Body::byId(id2);
-	#endif
+	// FIXME: this is perhaps an expensive operation?!
+	const shared_ptr<Body>& b1(Body::byId(id1)), b2(Body::byId(id2));
 	bool overlap =
-	#ifdef HIGHLEVEL_CLUMPS
+
 		(b1->isStandalone() || b2->isStandalone() || b1->clumpId!=b2->clumpId ) && // only collide if at least one particle is standalone or they belong to different clumps
 		!b1->isClump() && !b2->isClump() && // do not collide clumps, since they are just containers, never interact
-	#endif
+
 		!(maximums[offset1]<minimums[offset2] || maximums[offset2]<minimums[offset1] || 
 		maximums[offset1+1]<minimums[offset2+1] || maximums[offset2+1]<minimums[offset1+1] || 
 		maximums[offset1+2]<minimums[offset2+2] || maximums[offset2+2]<minimums[offset1+2]);

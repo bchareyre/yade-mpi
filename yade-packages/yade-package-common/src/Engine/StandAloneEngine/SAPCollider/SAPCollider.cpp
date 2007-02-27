@@ -117,13 +117,12 @@ void SAPCollider::action(Body* body)
 		{
 			// FIXME - this assumes that bodies are numbered from zero with one number increments, BAD!!!
 //			if (!(bodies->find(i)->isDynamic==false && bodies->find(*it)->isDynamic==false))
-			#ifdef HIGHLEVEL_CLUMPS
+//			FIXME: this is broken for clumps!!!
+//			!!!!!!!!!!!!!!!!!!!!!!!!!! BROKEN !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 				if( (*bodies)[i]->isDynamic && (*bodies)[*it]->isDynamic && // old stuff: both bodies must be dynamic
 					( (*bodies)[i]->clumpId==Body::ID_NONE || (*bodies)[*it]->clumpId==Body::ID_NONE || ( (*bodies)[i]->clumpId != (*bodies)[*it]->clumpId )) // either (at least) one of them is not within a clump or they are not part of the same clump
 					)
-			#else
-			if (!((*bodies)[i]->isDynamic==false && (*bodies)[*it]->isDynamic==false))
-			#endif
+			// pre-clump code: if (!((*bodies)[i]->isDynamic==false && (*bodies)[*it]->isDynamic==false))
 			{
 				nbPotentialInteractions++;
 				shared_ptr<Interaction> inter(new Interaction(i,*it));

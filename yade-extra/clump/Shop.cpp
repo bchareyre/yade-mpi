@@ -45,17 +45,32 @@
 #define _SPEC_CAST(orig,cast) template<> void Shop::setDefault<orig>(string key, orig val){setDefault(key,cast(val));}
 _SPEC_CAST(const char*,string);
 _SPEC_CAST(char*,string);
-_SPEC_CAST(int,long);
-_SPEC_CAST(unsigned int,long);
-_SPEC_CAST(unsigned long,long);
 #undef _SPEC_CAST
 
 map<string,boost::any> Shop::defaults;
 
+CREATE_LOGGER(Shop);
+
+template <typename valType> valType Shop::getDefault(const string& key) {
+	ensureInit();
+	try{return boost::any_cast<valType>(defaults[key]);}
+	catch(boost::bad_any_cast& e){
+		LOG_FATAL("Cast error while getting key `"<<key<<"' of type `"<<typeid(valType).name()<<"' ("<<e.what()<<").");
+		if(!hasDefault(key) || (defaults[key].type()==typeid(void))){LOG_FATAL("Key `"<<key<<"' not defined in the map.");}
+		else{LOG_INFO("(key `"<<key<<"' exists and if of type `"<<defaults[key].type().name()<<"').");}
+		throw;
+	}
+}
+
 void Shop::init(){
+	//LOG_INFO("Container length is "<<defaults.size()<<endl);
+	/*for(map<string,boost::any>::iterator I=defaults.begin(); I!=defaults.end(); I++){
+		LOG_INFO("Key `"<<I->first<<", type `"<<I->second.type().name()<<"'.");
+	}*/
+
 	defaults["container_is_not_empty"]=boost::any(0); // prevent loops from ensureInit();
 
-	setDefault("body_sdecGroupMask",55);
+	setDefault<int>("body_sdecGroupMask",55);
 	
 	setDefault("phys_density",2e3);
 	setDefault("phys_young",4e7);
@@ -78,10 +93,11 @@ void Shop::init(){
 
 	setDefault("param_damping",.2);
 	setDefault("param_gravity",Vector3r(0,0,-10));
-	setDefault("param_timeStepUpdateInterval",300);
+	setDefault<int>("param_timeStepUpdateInterval",300);
 	setDefault("param_momentRotationLaw",true);
 
-	setDefault("param_python",false);
+	setDefault("param_pythonInitExpr",string("print 'Hello world!'"));
+	setDefault("param_pythonExpr",string(""));
 
 }
 
@@ -132,10 +148,16 @@ void Shop::rootBodyActors(shared_ptr<MetaBody> rootBody){
 	//engines
 	rootBody->engines.clear();
 
-	if(getDefault<long>("param_timeStepUpdateInterval")>0){
+	/* big fat FIXME:
+	 * for some */
+	#define GO(type) try{cerr<<"Cast to" #type<<" gives: "<<getDefault<type>("body_sdecGroupMask")<<endl;} catch(boost::bad_any_cast){}
+	/*	GO(unsigned short); GO(short); GO(char);GO(int);GO(unsigned int);GO(long);GO(unsigned long);GO(long long);GO(unsigned long long); */
+	
+	if(getDefault<int>("param_timeStepUpdateInterval")>0){
 		shared_ptr<ElasticCriterionTimeStepper> sdecTimeStepper(new ElasticCriterionTimeStepper);
-		sdecTimeStepper->sdecGroupMask=getDefault<long>("body_sdecGroupMask");
-		sdecTimeStepper->timeStepUpdateInterval=getDefault<long>("param_timeStepUpdateInterval");
+		sdecTimeStepper->sdecGroupMask=getDefault<int>("body_sdecGroupMask");
+		sdecTimeStepper->timeStepUpdateInterval=getDefault<int>("param_timeStepUpdateInterval");
+		sdecTimeStepper->timeStepUpdateInterval=300;
 		rootBody->engines.push_back(sdecTimeStepper);
 	}
 
@@ -155,12 +177,12 @@ void Shop::rootBodyActors(shared_ptr<MetaBody> rootBody){
 	rootBody->engines.push_back(interactionPhysicsDispatcher);
 		
 	shared_ptr<ElasticContactLaw> constitutiveLaw(new ElasticContactLaw);
-	constitutiveLaw->sdecGroupMask = getDefault<long>("body_sdecGroupMask");
+	constitutiveLaw->sdecGroupMask = getDefault<int>("body_sdecGroupMask");
 	constitutiveLaw->momentRotationLaw = getDefault<bool>("param_momentRotationLaw");
 	rootBody->engines.push_back(constitutiveLaw);
 
 	shared_ptr<ElasticCohesiveLaw> constitutiveLaw2(new ElasticCohesiveLaw);
-	constitutiveLaw2->sdecGroupMask = getDefault<long>("body_sdecGroupMask");
+	constitutiveLaw2->sdecGroupMask = getDefault<int>("body_sdecGroupMask");
 	constitutiveLaw2->momentRotationLaw = getDefault<bool>("param_momentRotationLaw");
 	rootBody->engines.push_back(constitutiveLaw2);
 	
@@ -198,8 +220,9 @@ void Shop::rootBodyActors(shared_ptr<MetaBody> rootBody){
 	rootBody->engines.push_back(shared_ptr<ClumpMemberMover>(new ClumpMemberMover));
 
 	#ifdef EMBED_PYTHON
-		if(getDefault<string>("param_pythonExpr").size()>0){
+		if(getDefault<string>("param_pythonExpr").length()>0 || getDefault<string>("param_pythonInitExpr").length()>0){
 			shared_ptr<PythonRecorder> pythonRecorder=shared_ptr<PythonRecorder>(new PythonRecorder);
+			pythonRecorder->initExpression=getDefault<string>("param_pythonInitExpr");
 			pythonRecorder->expression=getDefault<string>("param_pythonExpr");
 			rootBody->engines.push_back(pythonRecorder);
 		}
@@ -210,7 +233,7 @@ void Shop::rootBodyActors(shared_ptr<MetaBody> rootBody){
 /*! Create body - sphere. */
 shared_ptr<Body> Shop::sphere(Vector3r center, Real radius){
 	// body itself
-	shared_ptr<Body> body=shared_ptr<Body>(new Body(0,getDefault<long>("body_sdecGroupMask")));
+	shared_ptr<Body> body=shared_ptr<Body>(new Body(0,getDefault<int>("body_sdecGroupMask")));
 	body->isDynamic=true;
 
 	// physics
@@ -251,7 +274,7 @@ shared_ptr<Body> Shop::sphere(Vector3r center, Real radius){
 
 /*! Create body - box. */
 shared_ptr<Body> Shop::box(Vector3r center, Vector3r extents){
-		shared_ptr<Body> body=shared_ptr<Body>(new Body(0,getDefault<long>("body_sdecGroupMask")));
+		shared_ptr<Body> body=shared_ptr<Body>(new Body(0,getDefault<int>("body_sdecGroupMask")));
 		body->isDynamic=true;
 
 		shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);

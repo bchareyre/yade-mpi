@@ -10,6 +10,7 @@
 
 #ifdef EMBED_PYTHON
 	#include<Python.h>
+	#include<signal.h>
 #endif
 
 #include <iostream>
@@ -30,6 +31,16 @@ using namespace std;
 #ifdef LOG4CXX
 // provides parent logger for everybody
 log4cxx::LoggerPtr logger=log4cxx::Logger::getLogger("yade");
+#endif
+
+#ifdef EMBED_PYTHON
+void sigintHandler(int sig){
+	LOG_DEBUG("Finalizing Python...");
+	Py_Finalize();
+	// http://www.cons.org/cracauer/sigint.html
+	signal(SIGINT,SIG_DFL); // reset to default
+	kill(getpid(),SIGINT); // kill ourselves, this time without Python
+}
 #endif
 
 // FIXME - those two function will be moved to some class responsible for configuration
@@ -135,6 +146,7 @@ int main(int argc, char *argv[])
 	#ifdef EMBED_PYTHON
 		Py_Initialize();
 		LOG_DEBUG("Python interpreter initialized.");
+		signal(SIGINT,sigintHandler);
 	#endif
 
 	

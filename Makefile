@@ -10,7 +10,7 @@ clean:
 	$(MAKE) -C yade-guis clean
 	$(MAKE) -C yade-packages clean
 	$(MAKE) -C yade-extra clean
-	rm -rf config.log scons.config .sconf_temp include .sconsign.dblite
+	rm -rf config.log .sconf_temp include .sconsign.dblite # scons.config should be kept alone
 	find -name ".sconsign" -exec rm -rf {} \;
 	find -name "SConscript" -exec rm -rf {} \;
 
@@ -52,5 +52,5 @@ ci:
 	$(MAKE) compile_install || $(MAKE) compile_install || $(MAKE) compile_install || $(MAKE) compile_install || $(MAKE) compile_install || $(MAKE) compile_install || $(MAKE) compile_install || $(MAKE) compile_install || $(MAKE) compile_install || $(MAKE) compile_install || $(MAKE) compile_install || $(MAKE) compile_install || $(MAKE) compile_install || $(MAKE) compile_install
 
 eudoxos:
-	$(MAKE) ci -j4 INSTALL_DIR='/YADE' PREFIX_DIR=/tmp CXX="g++-4.0" LINK="g++-4.0" CXXFLAGS="-I/usr/local/include/wm3"
+	$(MAKE) ci -j4 INSTALL_DIR='/YADE' PREFIX_DIR=/tmp CXX="distcc g++-4.0" LINK="g++-4.0" CXXFLAGS="-I/usr/local/include/wm3"
 

@@ -36,9 +36,13 @@ PythonRecorder::PythonRecorder():DataRecorder(){
 }
 
 void PythonRecorder::postProcessAttributes(bool deserializing){
-	if(outputFile.length()==0) return;
-	PyRun_SimpleString(string("import os; import sys; ofile=file('"+outputFile+"','w+'); sys.stdout=ofile").c_str());
-	LOG_DEBUG("Python stdout redirected to "<<outputFile);
+	if(outputFile.length()>0){
+		LOG_DEBUG("Redirecting python stdout to `"<<outputFile<<"'.");
+		PyRun_SimpleString(string("import os; import sys; ofile=file('"+outputFile+"','w+'); sys.stdout=ofile").c_str());
+	}
+	if(initExpression.length()>0){
+		PyRun_SimpleString(initExpression.c_str());
+	}
 }
 
 void PythonRecorder::action(Body *_rootBody)

@@ -38,24 +38,27 @@ class Body : public Serializable
 		 * from some selected bodies */
 		int groupMask;
 	public	:
-		#ifdef HIGHLEVEL_CLUMPS
-			/*! \brief Numerical type for ::Body::id.
-			 * \bug  Current code mixes singed and unsigned int, this might be a way to enforce consistence. */
-			typedef unsigned int id_t;
-			//! Clump of which this body makes part. If it is not part of a clump, set to Body::ID_NONE.
-			id_t clumpId;
-			//! symbolic constant for body that doesn't exist.
-			static const id_t ID_NONE;
-			//! get Body pointer given its id. 
-			static shared_ptr<Body> byId(id_t _id);
-			//! Whether this Body is a Clump.
-			//! @note The following is always true: \code (Body::isClump() XOR Body::isClumpMember() XOR Body::isStandalone()) \endcode
-			bool isClump() const {return clumpId!=ID_NONE && id==clumpId;}
-			//! Whether this Body is member of a Clump.
-			bool isClumpMember() const {return clumpId!=ID_NONE && id!=clumpId;}
-			//! Whether this body is standalone (neither Clump, nor member of a Clump)
-			bool isStandalone() const {return clumpId==ID_NONE;}
-		#endif
+		/*! \brief Numerical type for ::Body::id.
+		 * \bug  Current code mixes signed and unsigned int, this might be a way to enforce consistence. */
+		typedef unsigned int id_t;
+		//! Clump of which this body makes part. If it is not part of a clump, set to Body::ID_NONE.
+		id_t clumpId;
+		//! symbolic constant for body that doesn't exist.
+		static const id_t ID_NONE;
+		//! get Body pointer given its id. 
+		static shared_ptr<Body> byId(id_t _id);
+		//! Whether this Body is a Clump.
+		//! @note The following is always true: \code (Body::isClump() XOR Body::isClumpMember() XOR Body::isStandalone()) \endcode
+		bool isClump() const {return clumpId!=ID_NONE && id==clumpId;}
+		//! Whether this Body is member of a Clump.
+		bool isClumpMember() const {return clumpId!=ID_NONE && id!=clumpId;}
+		//! Whether this body is standalone (neither Clump, nor member of a Clump)
+		bool isStandalone() const {return clumpId==ID_NONE;}
+		/*! Hook for clump to update position of members when user-forced reposition and redraw (through GUI) occurs.
+		 * This is useful only in cases when engines that do that in every iteration are not active - i.e. when the simulation is paused.
+		 * (otherwise, GLViewer would depend on Clump and therefore Clump would have to go to yade-core...) */
+		virtual void userForcedDisplacementRedrawHook(){return;}
+
 		unsigned int getId() const {return id;};
 
 		// FIXME - but we SHOULDN'T use them in InteractionSolver, because it allows
