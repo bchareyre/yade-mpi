@@ -108,6 +108,7 @@ void Clump::del(Body::id_t subId){
  */
 void Clump::moveMembers(){
 	const Se3r& mySe3(physicalParameters->se3);
+	const shared_ptr<RigidBodyParameters>& myRBP(dynamic_pointer_cast<RigidBodyParameters>(physicalParameters));
 	for(Clump::memberMap::iterator I=members.begin(); I!=members.end(); I++){
 		// now, I->first is Body::id_t, I->second is Se3r of that body in the clump
 		shared_ptr<Body> subBody=Body::byId(I->first);
@@ -118,7 +119,9 @@ void Clump::moveMembers(){
 		//LOG_TRACE("New #"<<I->first<<"position: "<<subRBP->se3.position);
 		//LOG_TRACE("Clump #"<<getId()<<" moved #"<<I->first<<".");
 
-		//! FIXME: need to set velocity as well, because of damping?!
+		//! FIXME: we set velocity because of damping here; but since positions are integrated after all forces applied, these velocities will be used in the NEXT step for CundallNonViscousDamping. Does that matter?!
+		subRBP->velocity=myRBP->velocity+myRBP->angularVelocity.Cross(I->second.position);
+		subRBP->angularVelocity=myRBP->angularVelocity;
 	}
 	/* @bug Temporarily we reset acceleration and angularAcceleration of the clump here;
 	 * should be a new negine that will take care of that?
@@ -340,6 +343,9 @@ string ClumpTestGen::generate()
 
 	rootBody=Shop::rootBody();
 	Shop::rootBodyActors(rootBody);
+	// clumps do not need to subscribe currently (that will most likely change, though)
+	rootBody->engines.push_back(shared_ptr<ClumpMemberMover>(new ClumpMemberMover));
+	
 
 	shared_ptr<MetaBody> oldRootBody=Omega::instance().getRootBody();
 	Omega::instance().setRootBody(rootBody);

@@ -2,55 +2,13 @@ Import('*')
 env.Install('$PREFIX/lib/yade$POSTFIX/yade-extra',[
 	env.SharedLibrary('Clump',
 		['Clump.cpp'],
-		LIBS=env['LIBS']+[
-			#'ElasticContactLaw',
-			#'ElasticCohesiveLaw',
-			#'MacroMicroElasticRelationships',
-			#'ElasticCriterionTimeStepper',
-			#'PhysicalActionVectorVector',
-			#'InteractionVecSet',
-			#'BodyRedirectionVector',
-			#'InteractingSphere',
-			#'InteractingBox',
-			#'CundallNonViscousMomentumDamping',
-			#'CundallNonViscousForceDamping',
-			#'MetaInteractingGeometry',
-			#'GravityEngine',
-			#'yade-lib-serialization',
-			#'yade-lib-base',
-			#'Wm3Foundation',
-			#'PhysicalActionContainerInitializer',
-			#'PhysicalActionContainerReseter',
-			#'InteractionGeometryMetaEngine',
-			#'InteractionPhysicsMetaEngine',
-			#'PhysicalActionApplier',
-			#'PhysicalParametersMetaEngine',
-			#'BoundingVolumeMetaEngine',
-			#'Box',
-			#'Sphere',
-			#'AABB',
-			#'PersistentSAPCollider',
-			#'ParticleParameters',
-			#'SAPCollider',
-			#'MetaInteractingGeometry2AABB',
-			#'PythonRecorder',
-			#'yade-lib-multimethods',
-			'Shop'],
+		LIBS=env['LIBS']+['Shop'],
 		LIBPATH=env['LIBPATH']),
-	#env.Program('tryI',['tryI.cpp'],LIBS=env['LIBS']+['yade-lib-base','Wm3Foundation'])
-	#	LIBS=env['LIBS']+[
-	#		'yade-lib-serialization',
-	#		'yade-lib-base',
-	#		'Wm3Foundation',])
-	#env.Program('pyrec',['pyrec.cpp'])
-	#env.SharedLibrary('emb',['emb.cc'],SHLIBPREFIX='')
-	## PythonRecorder
 	env.SharedLibrary('PythonRecorder',['PythonRecorder.cpp']),
 	env.SharedLibrary('_pyade',['pyade.cpp'],SHLIBPREFIX='',
 		LIBS=env['LIBS']+['yade-lib-base','Wm3Foundation','ParticleParameters','RigidBodyParameters'],
 	),
 	env.File('pyade.py'),
-
 	env.SharedLibrary('Shop',
 		['Shop.cpp'],
 		LIBS=env['LIBS']+[
@@ -85,5 +43,6 @@ env.Install('$PREFIX/lib/yade$POSTFIX/yade-extra',[
 			'SAPCollider',
 			'MetaInteractingGeometry2AABB',
 			'PythonRecorder',
+			#'Clump',
 			'yade-lib-multimethods']),
 ])

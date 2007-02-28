@@ -27,9 +27,9 @@ void CundallNonViscousMomentumDamping::registerAttributes()
 
 void CundallNonViscousMomentumDamping::go( 	  const shared_ptr<PhysicalAction>& a
 						, const shared_ptr<PhysicalParameters>& b
-						, const Body*)
+						, const Body* body)
 {
-
+	if(body->isClump()) return;
 	Momentum * am = static_cast<Momentum*>(a.get());
 	RigidBodyParameters * rb = static_cast<RigidBodyParameters*>(b.get());
 	

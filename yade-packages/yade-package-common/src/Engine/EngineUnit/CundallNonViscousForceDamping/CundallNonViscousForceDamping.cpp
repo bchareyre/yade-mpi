@@ -27,8 +27,9 @@ void CundallNonViscousForceDamping::registerAttributes()
 
 void CundallNonViscousForceDamping::go(    const shared_ptr<PhysicalAction>& a
 						, const shared_ptr<PhysicalParameters>& b
-						, const Body*)
+						, const Body* body)
 {
+	if(body->isClump()) return;
 	Force * af = static_cast<Force*>(a.get());
 	ParticleParameters * p = static_cast<ParticleParameters*>(b.get());
 		

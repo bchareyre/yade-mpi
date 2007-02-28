@@ -38,7 +38,7 @@
 #include<yade/yade-package-dem/ElasticCohesiveLaw.hpp>
 
 #include<yade/yade-extra/PythonRecorder.hpp>
-#include<yade/yade-extra/Clump.hpp>
+//#include<yade/yade-extra/Clump.hpp>
 //#include "BodyMacroParameters.hpp"
 
 
@@ -215,9 +215,6 @@ void Shop::rootBodyActors(shared_ptr<MetaBody> rootBody){
 	shared_ptr<PhysicalParametersMetaEngine> orientationIntegrator(new PhysicalParametersMetaEngine);
 	orientationIntegrator->add("RigidBodyParameters","LeapFrogOrientationIntegrator");
 	rootBody->engines.push_back(orientationIntegrator);
-
-	// clumps do not need to subscribe currently (that will most likely change, though)
-	rootBody->engines.push_back(shared_ptr<ClumpMemberMover>(new ClumpMemberMover));
 
 	#ifdef EMBED_PYTHON
 		if(getDefault<string>("param_pythonExpr").length()>0 || getDefault<string>("param_pythonInitExpr").length()>0){

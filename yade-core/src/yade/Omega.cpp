@@ -291,7 +291,7 @@ void Omega::scanPlugins()
 				else LOG_ERROR("Error loading Library `"<<(*dlli)<<"': "<<err<<" ."); // leave space to not to confuse c++filt
 			}
 			#ifdef STUPID_DLL
-			else if (!thisLoaded) { LOG_DEBUG("Plugin "<<*dlli<<" not loaded successfully this time..."); }
+			else if (!thisLoaded) { LOG_DEBUG("Plugin "<<*dlli<<" not loaded successfully this time: "<<ClassFactory::instance().lastError()<<" (will retry)."); }
 			#endif
 			else { // no error
 				if (ClassFactory::instance().lastPluginClasses().size()==0){ // regular plugin, one class per file
