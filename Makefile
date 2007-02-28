@@ -46,6 +46,9 @@ tags:
 doc:
 	cd yade-doc; doxygen Doxyfile
 
+ChangeLog:
+	svn log --xml --verbose | xsltproc yade-scripts/svn2cl.xsl - > ChangeLog
+
 #### convenience and individual targets; saves typing.
 # helper target for parallel compilation which is broken generally and needs to be tried repeatedly until it succeeds (or not)
 ci:

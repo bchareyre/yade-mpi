@@ -52,7 +52,7 @@ opts.AddOptions(
 	('CPPPATH', 'Additional paths for the C preprocessor (whitespace separated)',['/usr/include/wm3'],None,Split),
 	('LIBPATH','Additional paths for the linker (whitespace separated)',None,None,Split),
 	('QTDIR','Directories where to look for qt3',['/usr/share/qt3','/usr/lib/qt'],None,Split),
-	('CXX','The c++ compiler','ccache g++-4.0'),
+	('CXX','The c++ compiler','distcc g++-4.0'),
 	BoolOption('pretty',"Don't show compiler command line (like the Linux kernel)",1)
 )
 
@@ -107,7 +107,21 @@ def CheckPython(context):
 		return False
 	context.Result(True)
 	return True
-		
+
+def CheckYadeVersion(context):
+	context.Message('Getting Yade version... ')
+	svnRevision=None
+	for l in os.popen("svn info").readlines():
+		m=re.match(r'Revision: ([0-9]+)',l)
+		if m:
+			svnRevision=m.group(1)
+			break
+	if svnRevision:
+		env['VERSION']='svn'+svnRevision
+		context.Result(env['VERSION'])
+	else:
+		env['VERSION']=''
+		context.Result('Svn revision not found, leaving empty')
 
 def CheckCXX(context):
 	context.Message('Checking whether c++ compiler "%s" works...'%env['CXX'])
@@ -119,7 +133,9 @@ def CheckCXX(context):
 if not env.GetOption('clean'):
 	#essential libraries first
 	ok=True
-	conf=Configure(env,custom_tests={'CheckQt':CheckQt,'CheckCXX':CheckCXX,'CheckPython':CheckPython})
+	conf=Configure(env,custom_tests={'CheckQt':CheckQt,'CheckCXX':CheckCXX,'CheckPython':CheckPython,'CheckYadeVersion':CheckYadeVersion})
+	conf.CheckYadeVersion()
+	env['POSTFIX']='-'+env['VERSION']+env['POSTFIX']
 	ok&=conf.CheckCXX()
 	ok&=conf.CheckLibWithHeader('pthread','pthread.h','c','pthread_exit(NULL);')
 	ok&=conf.CheckLibWithHeader('glut','GL/glut.h','c','glutGetModifiers();')
@@ -150,14 +166,16 @@ if not env.GetOption('clean'):
 if 1:
 	env.SourceSignatures('MD5')
 	env.SetOption('max_drift',5) # cache md5sums of files older than 5 seconds
-	SetOption('implicit_cache',1) # cahe #include files etc.
+	SetOption('implicit_cache',1) # cache #include files etc.
 	env.SourceCode(".",None) # skip dotted directories
 	SetOption('num_jobs',6)
 
 ### DIRECTORIES
 libDirs=['yade-libs','yade-packages/yade-package-common','yade-packages/yade-package-dem','yade-packages/yade-package-fem','yade-packages/yade-package-lattice','yade-packages/yade-package-mass-spring','yade-packages/yade-package-realtime-rigidbody','yade-extra','yade-guis']
 # exclude stuff that should be excluded
-libDirs=[x for x in libDirs if not re.match('^.*-('+string.join(env['exclude'],'|')+')$',x)]
+libDirs=[x for x in libDirs if not re.match('^.*-('+'|'.join(env['exclude'])+')$',x)]
+# all things will be built here...
+buildDir=env.subst('build$POSTFIX')
 
 instDirs=[os.path.join('$PREFIX','bin')]+[os.path.join('$PREFIX','lib','yade$POSTFIX',string.split(x,os.path.sep)[-1]) for x in libDirs]
 instIncludeDirs=['yade-core']+[os.path.join('$PREFIX','include','yade',string.split(x,os.path.sep)[-1]) for x in libDirs]
@@ -193,7 +211,15 @@ env.Append(LINKFLAGS=['-rdynamic'])
 # makes dynamic library loading easied (no LD_LIBRARY_PATH) and perhaps faster
 env.Append(RPATH=[os.path.join('$PREFIX','lib','yade$POSTFIX',string.split(x,os.path.sep)[-1]) for x in libDirs])
 # find already compiled but not yet installed libraries for linking
-#env.Append(LIBPATH=[os.path.join('#',x) for x in libDirs])
+#env.Append(LIBPATH=[os.path.join('#',x) for x in libDirs]	# -floop-optimize2 is a gcc-4.x flag, doesn't exist on previous version
+	# CRASH -ffloat-store
+	# maybe not CRASH?: -fno-math-errno
+	# CRASH?: -fmodulo-sched  
+	#   it is probably --ffast-fath that crashes !!!
+	# gcc-4.1 only: -funsafe-loop-optimizations -Wunsafe-loop-optimizations
+	# sure CRASH: -ftree-vectorize
+	# CRASH (one of them): -fivopts -fgcse-sm -fgcse-las (one of them - not sure which one exactly)
+	# ?: -ftree-loop-linear -ftree-loop-ivcanon)
 env.Append(LIBPATH=env['RPATH'])
 
 
@@ -220,7 +246,7 @@ def prepareIncludes(prefix=None):
 	global env
 	import os,string,re
 	from os.path import join,split,isabs,isdir,exists,islink,isfile
-	if not prefix: yadeRoot='.' # MUST be relative, otherwise relative symlinks for the local includes will break badly
+	if not prefix: yadeRoot=env.subst('build$POSTFIX') # MUST be relative, otherwise relative symlinks for the local includes will break badly
 	else: yadeRoot=prefix
 	yadeInc=join(yadeRoot,'include','yade')
 	#### POSTFIX_INCLUDES
@@ -232,7 +258,7 @@ def prepareIncludes(prefix=None):
 	# This makes all headers installed to ./include/yade go actually to ./include/yade-debug
 	#
 	# I hope this doesn't break scons' algorithm for dependency detection
-	if len(env['POSTFIX'])>0:
+	if 0 and len(env['POSTFIX'])>0:
 		import shutil
 		yadeIncPostfix=yadeInc+env.subst("$POSTFIX")
 		
@@ -254,11 +280,11 @@ def prepareIncludes(prefix=None):
 				subInc=join(yadeInc,m.group(1))
 				if not prefix: # local include directory
 					if not isdir(subInc): os.makedirs(subInc)
-					try: os.symlink(join('..','..','..',root,f),join(subInc,f));
+					upLevels=len(subInc.split(os.path.sep))
+					linkTarget=os.path.sep.join(['..' for x in range(0,upLevels)]+[root]+[f])
+					try: os.symlink(linkTarget,join(subInc,f));
 					except OSError: pass # if the file already exists, symlink fails
 				else: env.Install(subInc,join(root,f))
-
-
 
 # 1. re-generate SConscript files if some of them do not exist. This must be done in-place for
 #		scons postpones all actions after having processed SConscruct and SConscript files.
@@ -278,19 +304,22 @@ if not env.GetOption('clean'):
 			Exit(1)
 
 	prepareLocalIncludesProxy=prepareIncludes()
-	prepareIncludesProxy=prepareIncludes(prefix=env['PREFIX'])
+	#prepareIncludesProxy=prepareIncludes(prefix=env['PREFIX'])
 	prebuildAlias=env.Alias('prebuild',[prepareLocalIncludesProxy])
-	installAlias=env.Alias('install',[instDirs,prepareIncludesProxy,os.path.join('$PREFIX','include','yade')])
+	installAlias=env.Alias('install',[instDirs]) #,os.path.join('$PREFIX','include','yade')]) #prepareIncludesProxy,
 	Depends(installAlias,prebuildAlias)
 	Default(installAlias)
 
 # read all SConscript files
 env.Export('env');
-env.SConscript(dirs=libDirs+['yade-core'])
-if env.has_key('extraModules'):
-	env.SConscript(dirs=env['extraModules'])
-	#make sure extra modules find their own components for linking
-	env.Append(LIBPATH=[os.path.join('#',x) for x in env['extraModules']])
+
+if env.has_key('extraModules'): extraModules=env['extraModules']
+else: extraModules=[]
+
+for libDir in extraModules+libDirs+['yade-core']:
+	#print libDir
+	env.SConscript(dirs=libDir,build_dir=os.path.join(buildDir,libDir),duplicate=0)
+env.Append(LIBPATH=[os.path.join('#',x) for x in extraModules])
 
 
 #env.NoClean('$PREFIX/bin/yade$POSTFIX','$PREFIX/lib/yade$POSTFIX','$PREFIX/include/yade')

@@ -27,4 +27,4 @@ $ERSKINE $ENGINE $YADE/yade-packages/yade-package-mass-spring/src/yade-package-m
 $ERSKINE $ENGINE $YADE/yade-packages/yade-package-realtime-rigidbody/src/yade-package-realtime-rigidbody.pro $YADE/yade-packages/yade-package-realtime-rigidbody > $YADE/yade-packages/yade-package-realtime-rigidbody/$SCRIPT
 
 echo Creating entry for yade-extra/Clump in $YADE/yade-extra/$SCRIPT
-echo "env.SConscript(dirs=['Clump'])" >> $YADE/yade-extra/$SCRIPT
+echo "env.SConscript(dirs=['clump'])" >> $YADE/yade-extra/$SCRIPT
