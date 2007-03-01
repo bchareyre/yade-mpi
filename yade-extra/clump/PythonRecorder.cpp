@@ -8,6 +8,8 @@
 //#include <yade/yade-core/Omega.hpp>
 #include <yade/yade-core/MetaBody.hpp>
 //#include <boost/lexical_cast.hpp>
+#include <boost/preprocessor/stringize.hpp>
+
 
 CREATE_LOGGER(PythonRecorder);
 
@@ -20,7 +22,7 @@ CREATE_LOGGER(PythonRecorder);
 
 PythonRecorder::PythonRecorder():DataRecorder(){
 	// FIXME: this will have to be set somehow, hardcode for now...
-	PyRun_SimpleString("import sys; sys.path.insert(0,'/usr/local/lib/yade/yade-extra');");
+	PyRun_SimpleString((string("import sys; sys.path.insert(0,'")+BOOST_PP_STRINGIZE(PREFIX)+"/lib/yade"+BOOST_PP_STRINGIZE(POSTFIX)+"/yade-extra');").c_str());
 
 	#if 0
 	PyObject* pyModuleName=PyString_FromString("pyade");

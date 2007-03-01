@@ -64,8 +64,8 @@ bodyProp(PyObject *self, PyObject *args){
 		case bp_clumpId: return toPython(B->clumpId);
 		case bp_x: return toPython(pp->se3.position);
 		case bp_r: return toPython(pp->se3.orientation);
-		case bp_v: return toPython(pap->velocity[0]);
-		case bp_w: return toPython(rbp->angularVelocity[0]);
+		case bp_v: return toPython(pap->velocity);
+		case bp_w: return toPython(rbp->angularVelocity);
 		case bp_m: return toPython(pap->mass);
 		case bp_I: return toPython(rbp->inertia);
 		case bp_isClump: return toPython(B->isClump());
