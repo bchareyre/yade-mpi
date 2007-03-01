@@ -10,9 +10,10 @@
 
 #ifdef EMBED_PYTHON
 	#include<Python.h>
-	#include<signal.h>
 #endif
 
+#include<signal.h>
+#include<cstdlib>
 #include <iostream>
 #include <string>
 #include <getopt.h>
@@ -29,19 +30,32 @@
 using namespace std;
 
 #ifdef LOG4CXX
-// provides parent logger for everybody
-log4cxx::LoggerPtr logger=log4cxx::Logger::getLogger("yade");
+	// provides parent logger for everybody
+	log4cxx::LoggerPtr logger=log4cxx::Logger::getLogger("yade");
 #endif
 
-#ifdef EMBED_PYTHON
-void sigintHandler(int sig){
-	LOG_DEBUG("Finalizing Python...");
-	Py_Finalize();
-	// http://www.cons.org/cracauer/sigint.html
-	signal(SIGINT,SIG_DFL); // reset to default
-	kill(getpid(),SIGINT); // kill ourselves, this time without Python
+string gdbCrashBatch;
+
+void
+sigHandler(int sig){
+	#ifdef EMBED_PYTHON
+		if(sig==SIGINT){
+			LOG_DEBUG("Finalizing Python...");
+			Py_Finalize();
+			// http://www.cons.org/cracauer/sigint.html
+			signal(SIGINT,SIG_DFL); // reset to default
+			kill(getpid(),SIGINT); // kill ourselves, this time without Python
+		}
+	#endif
+	#ifdef YADE_DEBUG
+		else if(sig==SIGABRT || sig==SIGSEGV){
+			signal(SIGSEGV,SIG_DFL); signal(SIGABRT,SIG_DFL); // prevent loops - default handlers
+			cerr<<"SIGSEGV/SIGABRT handler";
+			system((string("gdb -x ")+gdbCrashBatch).c_str());
+			kill(getpid(),sig); // reemit signal after exiting gdb
+		}
+	#endif
 }
-#endif
 
 // FIXME - those two function will be moved to some class responsible for configuration
 std::string getPrefix()
@@ -85,21 +99,9 @@ void printHelp()
 	string flags("");
 	flags=flags+"   PREFIX=" +getPrefix()+ "\n";
 	flags=flags+"   POSTFIX=" + getPostfix() + "\n";
-#ifdef SINGLE_PRECISION
-	flags+="SINGLE_PRECISION ";
-#endif
-#ifdef DOUBLE_PRECISION
-	flags+="DOUBLE_PRECISION ";
-#endif
-#ifdef QGLVIEWER20
-	flags+="QGLVIEWER20 ";
-#endif
-#ifdef NO_GLUTINIT
-	flags+="NO_GLUTINIT ";
-#endif
-#ifdef DEBUG
-	flags+="DEBUG (is this flag used?) ";
-#endif
+	#ifdef YADE_DEBUG
+		flags+="   DEBUG";
+	#endif
 	cout << 
 "\n" << Omega::instance().yadeVersionName << "\n\
 \n\
@@ -120,7 +122,6 @@ Only one option can be passed to yade, all other options are passed to the selec
 
 int main(int argc, char *argv[])
 {
-
 	int ch;
 	string gui = "";
 	string configPath = string(getenv("HOME")) + "/.yade" + getPostfix();
@@ -131,23 +132,18 @@ int main(int argc, char *argv[])
 	// Since it is a static variable, it infulences all boost::filesystem operations in this respect (fortunately).
 	filesystem::path::default_name_check(filesystem::native);
 
-#	ifdef LOG4CXX
-	// read logging configuration from file and watch it (creates a separate thread)a
-	std::string logConf=configPath+"/logging.conf";
-	if(filesystem::exists(logConf)){
-		log4cxx::PropertyConfigurator::configureAndWatch(logConf);
-		LOG_INFO("Logger loaded and watches configuration file: "<<logConf<<".");
-	} else { // otherwise use simple console-directed logging
-		log4cxx::BasicConfigurator::configure();
-		LOG_INFO("Logger uses basic (console) configuration ("<<logConf<<" not found). Look at the file yade-doc/logging.conf.sample in the source distribution on an example how to customize logging.");
-	}
-#	endif
-
-	#ifdef EMBED_PYTHON
-		Py_Initialize();
-		LOG_DEBUG("Python interpreter initialized.");
-		signal(SIGINT,sigintHandler);
+	#ifdef LOG4CXX
+		// read logging configuration from file and watch it (creates a separate thread)a
+		std::string logConf=configPath+"/logging.conf";
+		if(filesystem::exists(logConf)){
+			log4cxx::PropertyConfigurator::configureAndWatch(logConf);
+			LOG_INFO("Logger loaded and watches configuration file: "<<logConf<<".");
+		} else { // otherwise use simple console-directed logging
+			log4cxx::BasicConfigurator::configure();
+			LOG_INFO("Logger uses basic (console) configuration ("<<logConf<<" not found). Look at the file yade-doc/logging.conf.sample in the source distribution on an example how to customize logging.");
+		}
 	#endif
+
 
 	
 	bool 	setup 		= false;
@@ -174,6 +170,20 @@ int main(int argc, char *argv[])
 	filesystem::path yadeConfigPath  = filesystem::path(Omega::instance().yadeConfigPath, filesystem::native);
 	filesystem::path yadeConfigFile  = filesystem::path(Omega::instance().yadeConfigPath + "/preferences.xml", filesystem::native);
 
+	#ifdef YADE_DEBUG
+		ofstream gdbBatch;
+		gdbCrashBatch=(yadeConfigPath/"gdb_crash_batch").string();
+		gdbBatch.open(gdbCrashBatch.c_str()); gdbBatch<<"attach "<<lexical_cast<string>(getpid())<<"\nthread info\nthread apply all backtrace\n"; gdbBatch.close();
+		signal(SIGABRT,sigHandler);
+		signal(SIGSEGV,sigHandler);
+	#endif
+
+	#ifdef EMBED_PYTHON
+		LOG_DEBUG("Initializing Python...");
+		Py_Initialize();
+		signal(SIGINT,sigHandler);
+	#endif
+
 	if ( !filesystem::exists( yadeConfigPath ) || setup || !filesystem::exists(yadeConfigFile) )
 	{
 		filesystem::create_directories(yadeConfigPath);
@@ -199,8 +209,8 @@ int main(int argc, char *argv[])
  	int ok = frontEnd->run(argc,argv);
 
 	#ifdef EMBED_PYTHON
+		LOG_DEBUG("Finalizing Python...");
 		Py_Finalize();
-		LOG_DEBUG("Python interpreter finalized.");
 	#endif
 
 	LOG_INFO("Yade: normal exit.");

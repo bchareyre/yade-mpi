@@ -308,7 +308,7 @@ class DynLibDispatcher
 			shared_ptr<Executor> executor = ex ? ex : makeExecutor(libName);	// create the requested functor
 			callBacks[index] = executor;
 						
-			#ifdef DEBUG
+			#if 0
 				cerr <<" New class added to DynLibDispatcher 1D: " << libName << endl;
 			#endif
 		  };
@@ -431,7 +431,7 @@ class DynLibDispatcher
 				callBacksInfo	[index1][index2] = 0;
 			}
 
-			#ifdef DEBUG
+			#if 0
 				cerr <<" New class added to MultiMethodsManager 2D: " << libName << endl;
 			#endif
 		  }

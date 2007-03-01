@@ -22,7 +22,7 @@ bool SerializableSingleton::registerSerializableDescriptor( string name , Verify
 
 	bool tmp = map.insert( SerializableDescriptorMap::value_type( name , SerializableDescriptor(verify,type,f) )).second;
 
-	#ifdef DEBUG
+	#if 0
 		if (tmp)
 			cout << "registering serializable: " << name << " OK\n";
 		else

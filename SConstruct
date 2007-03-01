@@ -184,7 +184,7 @@ env.Append(CPPPATH=['#/include'])
 env.Append(CPPDEFINES=[('POSTFIX',r'$POSTFIX'),('PREFIX',r'$PREFIX')])
 
 ### COMPILER
-if env['debug']: env.Append(CXXFLAGS='-ggdb3',CPPDEFINES=['DEBUG'])
+if env['debug']: env.Append(CXXFLAGS='-ggdb3',CPPDEFINES=['DEBUG','YADE_DEBUG'])
 else: env.Append(CXXFLAGS='-O2')
 if env['optimize']:
 	env.Append(CXXFLAGS=Split('-O3 -ffast-math'))

@@ -25,7 +25,7 @@ bool ClassFactory::registerFactorable( std::string name 			   , CreateFactorable
 
 	bool tmp = map.insert( FactorableCreatorsMap::value_type( name , FactorableCreators(create,createShared, createPureCustom) )).second;
 
-	#ifdef DEBUG
+	#if 0
 		if (tmp)
 			std::cout << "registering factorable: " << name << " OK\n";
 		else
