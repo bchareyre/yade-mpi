@@ -66,58 +66,37 @@ class Simul:
 	def __getattr__(self,name):
 		return _pyade.simulProp(_pyade.simulPropDict()[name])
 
-#class History:
-#	"""
-#		example:
-#			hash="B5I" for B[5].I
-#			lambda to get value at current time: lambda: B[5].I
-#		relWanted={hash:(delta_t>0,delta_i>0,lambda to get value),...}; highest delta_t/delta_i gets precedence
-#		absWanted={hash:([t0,t1,t2,...],[i0,i1,...]),...}
-#		data={hash:[(iter,time,value),...],hash2:[(,,),...]}
-#	"""
-#	def __init__:
-#		relWanted={}; absWanted={};
-#		# time and iteration when called for the last time - used to determine if we know how to calculate an abs value
-#		prev=(0,0)
-#		self.ITER,self.TIME=0,1
-#	def addWanted(hash,coord,what,getFunc=None):
-#		if coord<0: #relative
-#			if relWanted.has_key(hash):
-#				rec=list(relWanted[hash]) # to be mutable
-#				if rec[what]>-coord: rec[what]=-coord
-#					relWanted[hash]=tuple(rec)
-#			else:
-#				assert(getFunc)
-#				rec=[0,0,getFunc]
-#				rec[what]=-coord
-#				relWanted[hash]=tuple(rec)
-#		else: # absolute
-#			if absWanted.has_key[hash]:
-#				if not coord in absWanted[hash][what]: absWanted[hash][what].append(coord)
-#			else:
-#				rec=[][]
-#				rec[what].append(coord)
-#				absWanted[hash]=rec
-#			
-#	def get(hash,t=None,i=None):
-#		assert((t or i) and not (t and i)); #args mutually exclusive
-#		# self.what says whether we need time or iterations
-#		if t:
-#			d=t; what=ITER;
-#		else
-#			d=i; what=TIME
-#		dd=d; wanted=absWanted #absolute, from origin
-#		if d<0: # relative, towards past
-#			dd=[S.i+d,S.t+d][what];
-#		if data.has_key[hash]:
-#			res=[ddh for ddh in data[hash] if ddh[what]==dd];
-#			assert(len(res) in [0,1]);
-#			addWanted(hash,dd,what)
-#			if not d in absWanted[hash][what]: absWanted[hash][what].append(d)
-#			if len(res)==1: return ret[0][2]
-#		else: 
-#			addWanted[hash][what].append(d)
-#			return None
+class Interactions:
+	"Class accessing individual interactions, either persistent or transient (based on constructor parameter)."
+	def __len__(self): return [S.nPersistent,S.nTransient][isTransient]
+	def __init__(self, _isTransient):
+		self.isTransient=_isTransient
+	class _iterator:
+		def __init__(self,_isTransient): self.index=0
+		def next(self):
+			if self.index>=[S.nPersistent,S.nTransient][_isTransient]: raise StopIteration
+			self.index+=1
+			return self.interNo(self.index)
+			# tricky; need to call that with parameters; like self.interactionNo(n)->(id1,id2)
+			#return B[self.index].
+	def interNo(n): return self[_pyade.interNo(n,self.isTransient)]
+	def __getitem__(self,id):
+		if type(id)==tuple:
+			#if len(id)==2: return Interactions.Interaction(id[0],id[1],self.isTransient)
+			if len(id)==2: return self.Interaction(id[0],id[1],self.isTransient)
+			else: raise ValueError("Interaction must be determined by 2 ids")
+		if type(id)==int:
+			inter=[Ip,It][self.isTransient]
+			return [x for x in inter if x.id1==id or x.id2==id] # th
+	class Interaction:
+		def __init__(self, id1, id2): self._id1,self._id2,self._isTransient=id1,id2,self.isTransient
+		def __getattr__(self,name):
+			if name=='foo': return Vector(1,2,3)
+			#elif ...
+			else: return _pyade.interProp(self._id1,self._id2,_pyade.interPropDict()[name])
+
+
+
 
 
 

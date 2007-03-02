@@ -125,6 +125,50 @@ simulPropDict(PyObject *self, PyObject *args){
 	#undef SM
 }
 
+#if 0
+/************************ interaction properties *****************************/
+/*! Interaction parameters that can be accessed through this code.
+ *
+ * @note Other attributes may still be defined in the python interface - see pyade.py for those.
+ */
+enum interPropCodes { /*! id of the first body [long] */ it_id1,
+	/*! id of the second body [long] */ it_id2,
+	/*! contact point [Vector] */ it_cp,
+	/*! normal [Vector] */ it_normal,
+	/*! radius1 [float] */ it_r1,
+	/*! radius2 [float] */ it_r2,
+	/*! peneration depth [float] */ it_penetration }
+
+/* Retrieves interaction property
+ *
+ * @return Python object of which type depends on the property requested; interPropCodes has details.
+ */
+static PyObject*
+interProp(PyObject *self, PyObject *args){
+	long id1,id2,prop; int isTransient;
+	if(!PyArg_ParseTuple(args, "llli", &id1, &id2, &prop, &isTransient)) return NULL;
+	shared_ptr<InteractionContainer> inters=isTransient?Omega::instance()->getRootBody()->transientInteractions:Omega::instance()->getRootBody()->persistentInteractions;
+	switch(prop){
+		case it_id1: return toPython(id1); // hmmm, these two are not needed?!
+		case it_id2: return toPython(id2);
+		case it_cp:{
+			const shared_ptr<SpheresContactGeometry>& scg=dynamic_cast<SpheresContactGeometry>(inters->find(id1,id2));
+			return return toPython(scg->contactPoint);
+		}
+		case sm_file: return toPython(Omega::instance().getSimulationFileName());
+		case sm_nBodies: return toPython(Omega::instance().getRootBody()->bodies->size());
+		case sm_sel: return toPython(Omega::instance().selectedBodies);
+	}
+	return Py_BuildValue("");
+}
+
+static PyObject*
+interPropDict(PyObject *self, PyObject *args){
+	#define IT(name) #name,it_##name
+		return Py_BuildValue("{sisisisisisisi}",IT(id1),IT(id2),IT(cp),IT(normal),IT(r1),IT(r2),IT(penetration));
+	#undef IT
+}
+#endif
 /************************ module setup *************************/
 
 static PyMethodDef _pyadeMethods[] = {
