@@ -8,28 +8,18 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "ArchiveTypes.hpp"
-#include "FundamentalHandler.tpp"
-#include "ContainerHandler.tpp"
-#include "PointerHandler.tpp"
-#include "KnownFundamentalsHandler.tpp"
-//#include "MultiTypeHandler.tpp" // this is in Serializable.hpp, should be here, but then it doesn't compile
 
 #include <Wm3Vector2.h>
-#include <yade/yade-lib-base/yadeWm3.hpp>
 #include <Wm3Vector3.h>
-#include <yade/yade-lib-base/yadeWm3.hpp>
 #include <Wm3Vector4.h>
-#include <yade/yade-lib-base/yadeWm3.hpp>
 #include <Wm3Matrix2.h>
-#include <yade/yade-lib-base/yadeWm3.hpp>
 #include <Wm3Matrix3.h>
-#include <yade/yade-lib-base/yadeWm3.hpp>
 #include <Wm3Matrix4.h>
-#include <yade/yade-lib-base/yadeWm3.hpp>
 #include <Wm3Quaternion.h>
 #include <yade/yade-lib-base/yadeWm3.hpp>
 #include <yade/yade-lib-base/yadeWm3Extra.hpp>
+
+#include<boost/type_traits.hpp>
 
 using namespace ArchiveTypes;
 
@@ -161,3 +151,9 @@ inline shared_ptr<Archive> Archive::create(const string& name,Type& attribute)
 };
 
 
+#include "ArchiveTypes.hpp"
+#include "FundamentalHandler.tpp"
+#include "ContainerHandler.tpp"
+#include "PointerHandler.tpp"
+#include "KnownFundamentalsHandler.tpp"
+//#include "MultiTypeHandler.tpp" // this is in Serializable.hpp, should be here, but then it doesn't compile

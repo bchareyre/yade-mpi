@@ -48,6 +48,7 @@ opts.AddOptions(
 	BoolOption('profile','Enable profiling information',0),
 	BoolOption('optimize','Turn on heavy optimizations (generates SSE2 instructions)',0),
 	ListOption('exclude','Components that will not be built','none',names=['extra','common','dem','fem','lattice','mass-spring','realtime-rigidbody']),
+	('jobs','Number of jobs to run at the same time (same as -j, but saved)',4,None,int),
 	('extraModules', 'Extra directories with their own SConscript files (must be in-tree) (whitespace separated)',None,None,Split),
 	('CPPPATH', 'Additional paths for the C preprocessor (whitespace separated)',['/usr/include/wm3'],None,Split),
 	('LIBPATH','Additional paths for the linker (whitespace separated)',None,None,Split),
@@ -108,6 +109,14 @@ def CheckPython(context):
 	context.Result(True)
 	return True
 
+def CheckScientificPython(context):
+	context.Message('Checkgin for scientific python module (debian: package python-scientific)... ')
+	try:
+		import Scientific
+		context.Result(True); return True
+	except ImportError:
+		context.Result(False); return False
+
 def CheckYadeVersion(context):
 	context.Message('Getting Yade version... ')
 	svnRevision=None
@@ -133,10 +142,18 @@ def CheckCXX(context):
 if not env.GetOption('clean'):
 	#essential libraries first
 	ok=True
-	conf=Configure(env,custom_tests={'CheckQt':CheckQt,'CheckCXX':CheckCXX,'CheckPython':CheckPython,'CheckYadeVersion':CheckYadeVersion})
+	conf=Configure(env,custom_tests={'CheckQt':CheckQt,'CheckCXX':CheckCXX,'CheckPython':CheckPython,'CheckScientificPython':CheckScientificPython,'CheckYadeVersion':CheckYadeVersion})
 	conf.CheckYadeVersion()
+	# set some variables
 	env['POSTFIX']='-'+env['VERSION']+env['POSTFIX']
+	buildDir=env.subst('build$POSTFIX')
+	# these MUST be first so that builddir's headers are read before any locally installed ones
+	env.Append(CPPPATH=[os.path.join('#',buildDir,'include')])
+
 	ok&=conf.CheckCXX()
+	if not ok:
+			print "\nYour compiler is broken, no point in continuing. See `config.log' for what went wrong and use the CXX parameter to change your compiler."
+			Exit(1)
 	ok&=conf.CheckLibWithHeader('pthread','pthread.h','c','pthread_exit(NULL);')
 	ok&=conf.CheckLibWithHeader('glut','GL/glut.h','c','glutGetModifiers();')
 	ok&=conf.CheckLibWithHeader('boost_date_time','boost/date_time/posix_time/posix_time.hpp','c++','boost::posix_time::time_duration::time_duration();')
@@ -154,7 +171,7 @@ if not env.GetOption('clean'):
 	#optional libraries
 	if conf.CheckLibWithHeader('log4cxx','log4cxx/logger.h','c++','log4cxx::Logger::getLogger("foo");'):
 		env.Append(LIBS='log4cxx',CPPDEFINES=['LOG4CXX'])
-	if conf.CheckPython(): env.Append(CPPDEFINES=['EMBED_PYTHON'])
+	if conf.CheckPython() and conf.CheckScientificPython(): env.Append(CPPDEFINES=['EMBED_PYTHON'])
 
 	env=conf.Finish()
 
@@ -168,19 +185,17 @@ if 1:
 	env.SetOption('max_drift',5) # cache md5sums of files older than 5 seconds
 	SetOption('implicit_cache',1) # cache #include files etc.
 	env.SourceCode(".",None) # skip dotted directories
-	SetOption('num_jobs',6)
+	SetOption('num_jobs',env['jobs'])
 
 ### DIRECTORIES
 libDirs=['yade-libs','yade-packages/yade-package-common','yade-packages/yade-package-dem','yade-packages/yade-package-fem','yade-packages/yade-package-lattice','yade-packages/yade-package-mass-spring','yade-packages/yade-package-realtime-rigidbody','yade-extra','yade-guis']
 # exclude stuff that should be excluded
 libDirs=[x for x in libDirs if not re.match('^.*-('+'|'.join(env['exclude'])+')$',x)]
 # all things will be built here...
-buildDir=env.subst('build$POSTFIX')
 
 instDirs=[os.path.join('$PREFIX','bin')]+[os.path.join('$PREFIX','lib','yade$POSTFIX',string.split(x,os.path.sep)[-1]) for x in libDirs]
 instIncludeDirs=['yade-core']+[os.path.join('$PREFIX','include','yade',string.split(x,os.path.sep)[-1]) for x in libDirs]
 ### PREPROCESSOR
-env.Append(CPPPATH=['#/include'])
 env.Append(CPPDEFINES=[('POSTFIX',r'$POSTFIX'),('PREFIX',r'$PREFIX')])
 
 ### COMPILER

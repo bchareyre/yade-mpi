@@ -1,7 +1,6 @@
 // (c) 2007 Vaclav Smilauer <eudoxos@arcig.cz> 
 
 #include"Clump.hpp"
-#include<yade/yade-extra/Shop.hpp>
 #include<algorithm>
 
 char* yadePluginClasses[]={
@@ -335,7 +334,8 @@ Matrix3r Clump::inertiaTensorRotate(const Matrix3r& I, const Quaternionr& rot){
  ********************* ClumpTestGen ***************************************************
  **************************************************************************************/
 
-#include <yade/yade-core/MetaBody.hpp>
+#include<yade/yade-core/MetaBody.hpp>
+#include<yade/yade-extra/Shop.hpp>
 
 string ClumpTestGen::generate()
 {

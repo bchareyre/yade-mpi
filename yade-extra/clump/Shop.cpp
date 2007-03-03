@@ -37,7 +37,10 @@
 #include<yade/yade-package-dem/ElasticContactLaw.hpp>
 #include<yade/yade-package-dem/ElasticCohesiveLaw.hpp>
 
-#include<yade/yade-extra/PythonRecorder.hpp>
+#ifdef EMBED_PYTHON
+	#include<yade/yade-extra/PythonRecorder.hpp>
+#endif
+
 //#include<yade/yade-extra/Clump.hpp>
 //#include "BodyMacroParameters.hpp"
 
