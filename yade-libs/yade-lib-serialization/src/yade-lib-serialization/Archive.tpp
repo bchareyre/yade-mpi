@@ -21,6 +21,9 @@
 
 #include<boost/type_traits.hpp>
 
+template<typename Type> SerializableTypes::Type findType(Type& instance,bool& fundamental, string& str);
+#include "ContainerHandler.tpp"
+
 using namespace ArchiveTypes;
 
 
@@ -84,6 +87,7 @@ SerializableTypes::Type findType(Type& instance,bool& fundamental, string& str)
 		return type;
 	}
 	else
+		cerr<<"Type of instance is: "<<typeid(instance).name()<<endl;
 		throw SerializableError(SerializationExceptions::SerializableUnknown2);
 };
 
@@ -153,7 +157,6 @@ inline shared_ptr<Archive> Archive::create(const string& name,Type& attribute)
 
 #include "ArchiveTypes.hpp"
 #include "FundamentalHandler.tpp"
-#include "ContainerHandler.tpp"
 #include "PointerHandler.tpp"
 #include "KnownFundamentalsHandler.tpp"
 //#include "MultiTypeHandler.tpp" // this is in Serializable.hpp, should be here, but then it doesn't compile
