@@ -49,7 +49,7 @@ bool VelocityRecorder::isActivated()
 
 void VelocityRecorder::action(Body * body)
 {
-	MetaBody * ncb = dynamic_cast<MetaBody*>(body);
+	MetaBody * ncb = Dynamic_cast<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	
 	Real x=0, y=0, z=0, size=0;//, totalMass=0; FIXME- how many recorders/Actors to make simple stuff?
@@ -62,7 +62,7 @@ void VelocityRecorder::action(Body * body)
 		if( body->isDynamic && body->getId() != bigBallId )
 		{ 
 			size+=1.0;
-			ParticleParameters* pp = dynamic_cast<ParticleParameters*>(body->physicalParameters.get());
+			ParticleParameters* pp = Dynamic_cast<ParticleParameters*>(body->physicalParameters.get());
 			x+=pp->velocity[0];
 			y+=pp->velocity[1];
 			z+=pp->velocity[2];
@@ -75,7 +75,7 @@ void VelocityRecorder::action(Body * body)
 	y /= size;
 	z /= size;
 //	cerr << totalMass << endl;
-	ParticleParameters* bigBall = dynamic_cast<ParticleParameters*>((*bodies)[bigBallId]->physicalParameters.get());
+	ParticleParameters* bigBall = Dynamic_cast<ParticleParameters*>((*bodies)[bigBallId]->physicalParameters.get());
 	
 	ofile << lexical_cast<string>(Omega::instance().getSimulationTime()) << " " 
 		<< lexical_cast<string>(x) << " " 

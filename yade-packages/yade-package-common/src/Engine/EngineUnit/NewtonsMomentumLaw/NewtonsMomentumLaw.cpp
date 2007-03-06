@@ -26,7 +26,7 @@ void NewtonsMomentumLaw::go( 	  const shared_ptr<PhysicalAction>& a
 	else if(bb->isClump()) rb->angularAcceleration+=diagDiv(am->momentum,rb->inertia);
 	else { // isClumpMember()
 		const shared_ptr<Body>& clump(Body::byId(bb->clumpId));
-		RigidBodyParameters* clumpRBP=dynamic_cast<RigidBodyParameters*>(clump->physicalParameters.get());
+		RigidBodyParameters* clumpRBP=Dynamic_cast<RigidBodyParameters*>(clump->physicalParameters.get());
 		/* angularAcceleration is reset by ClumpMemberMover engine */
 		clumpRBP->angularAcceleration+=diagDiv(am->momentum,clumpRBP->inertia);
 	}

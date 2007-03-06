@@ -24,7 +24,7 @@ void FEMSetTextLoader::go(	  const shared_ptr<PhysicalParameters>& par
 					, Body* body)
 
 {
-	MetaBody* rootBody = dynamic_cast<MetaBody*>(body);
+	MetaBody* rootBody = Dynamic_cast<MetaBody*>(body);
 	shared_ptr<FEMSetParameters> physics = dynamic_pointer_cast<FEMSetParameters>(par);
 	nodeGroupMask = physics->nodeGroupMask;
 	tetrahedronGroupMask = physics->tetrahedronGroupMask;

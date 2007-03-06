@@ -133,11 +133,11 @@ void NonLocalInitializer::action(Body * body)
 	return; // YADEview
 
 	MetaBody * rootBody = static_cast<MetaBody*>(body);
-	int beamGroupMask = dynamic_cast<LatticeSetParameters*>(rootBody->physicalParameters.get())->beamGroupMask;
+	int beamGroupMask = Dynamic_cast<LatticeSetParameters*>(rootBody->physicalParameters.get())->beamGroupMask;
 	//std::list<std::list<LatticeSetParameters::NonLocalInteraction> >
 	//std::vector<std::list<LatticeSetParameters::NonLocalInteraction , std::__malloc_alloc_template<sizeof(LatticeSetParameters::NonLocalInteraction)> > >& nonl = dynamic_cast<LatticeSetParameters*>(rootBody->physicalParameters.get())->nonl;
-	void* nonl = dynamic_cast<LatticeSetParameters*>(rootBody->physicalParameters.get())->nonl;
-	dynamic_cast<LatticeSetParameters*>(rootBody->physicalParameters.get())->range=range;
+	void* nonl = Dynamic_cast<LatticeSetParameters*>(rootBody->physicalParameters.get())->nonl;
+	Dynamic_cast<LatticeSetParameters*>(rootBody->physicalParameters.get())->range=range;
 
 	BodyContainer::iterator bi    = rootBody->bodies->begin();
 	BodyContainer::iterator bi2;
@@ -150,9 +150,9 @@ void NonLocalInitializer::action(Body * body)
 	nonl = calloc(121637044ul,sizeof(LatticeSetParameters::NonLocalInteraction));
 	if( nonl == 0 )
 		cerr << "cannot allocate memory\n",exit(0);
-	dynamic_cast<LatticeSetParameters*>(rootBody->physicalParameters.get())->nonl = nonl;
+	Dynamic_cast<LatticeSetParameters*>(rootBody->physicalParameters.get())->nonl = nonl;
 	
-	unsigned long int& total = dynamic_cast<LatticeSetParameters*>(rootBody->physicalParameters.get())->total;
+	unsigned long int& total = Dynamic_cast<LatticeSetParameters*>(rootBody->physicalParameters.get())->total;
 	total=0;
 
 	int beam_counter = 0;

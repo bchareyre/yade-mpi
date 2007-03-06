@@ -43,7 +43,7 @@ void ElasticCohesiveLaw::registerAttributes()
 //FIXME : remove bool first !!!!!
 void ElasticCohesiveLaw::action(Body* body)
 {
-	MetaBody * ncb = dynamic_cast<MetaBody*>(body);
+	MetaBody * ncb = Dynamic_cast<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 
 	Real dt = Omega::instance().getTimeStep();
@@ -64,10 +64,10 @@ void ElasticCohesiveLaw::action(Body* body)
 			if( !( (*bodies)[id1]->getGroupMask() & (*bodies)[id2]->getGroupMask() & sdecGroupMask) )
 				continue; // skip other groups, BTW: this is example of a good usage of 'continue' keyword
 	
-			BodyMacroParameters* de1			= dynamic_cast<BodyMacroParameters*>((*bodies)[id1]->physicalParameters.get());
-			BodyMacroParameters* de2			= dynamic_cast<BodyMacroParameters*>((*bodies)[id2]->physicalParameters.get());
-			SDECLinkPhysics* currentContactPhysics		= dynamic_cast<SDECLinkPhysics*>(contact2->interactionPhysics.get());
-			SDECLinkGeometry* currentContactGeometry	= dynamic_cast<SDECLinkGeometry*>(contact2->interactionGeometry.get());
+			BodyMacroParameters* de1			= Dynamic_cast<BodyMacroParameters*>((*bodies)[id1]->physicalParameters.get());
+			BodyMacroParameters* de2			= Dynamic_cast<BodyMacroParameters*>((*bodies)[id2]->physicalParameters.get());
+			SDECLinkPhysics* currentContactPhysics		= Dynamic_cast<SDECLinkPhysics*>(contact2->interactionPhysics.get());
+			SDECLinkGeometry* currentContactGeometry	= Dynamic_cast<SDECLinkGeometry*>(contact2->interactionGeometry.get());
 	
 			Real un 					= currentContactPhysics->equilibriumDistance-(de2->se3.position-de1->se3.position).Length();
 			currentContactPhysics->normalForce		= currentContactPhysics->kn*un*currentContactGeometry->normal;

@@ -24,7 +24,7 @@ void MetaInteractingGeometry2AABB::go(	  const shared_ptr<InteractingGeometry>&
 	Vector3r max(-Mathr::MAX_REAL,-Mathr::MAX_REAL,-Mathr::MAX_REAL);
 	Vector3r min( Mathr::MAX_REAL, Mathr::MAX_REAL, Mathr::MAX_REAL);
 	
-	const MetaBody * ncb = dynamic_cast<const MetaBody*>(body);
+	const MetaBody * ncb = Dynamic_cast<const MetaBody*>(body);
 	const shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	
 	BodyContainer::iterator bi    = bodies->begin();

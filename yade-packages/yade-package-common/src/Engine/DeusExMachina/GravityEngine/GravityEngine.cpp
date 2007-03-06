@@ -29,7 +29,7 @@ void GravityEngine::registerAttributes()
 
 void GravityEngine::applyCondition(Body* body)
 {
-	MetaBody * ncb = dynamic_cast<MetaBody*>(body);
+	MetaBody * ncb = Dynamic_cast<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	
 	BodyContainer::iterator bi    = bodies->begin();

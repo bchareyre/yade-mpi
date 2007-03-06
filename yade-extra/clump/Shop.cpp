@@ -18,6 +18,23 @@
 #include<yade/yade-package-common/InteractingBox.hpp>
 #include<yade/yade-package-common/InteractingSphere.hpp>
 
+#include<yade/yade-package-common/InteractingSphere2AABB.hpp>
+#include<yade/yade-package-common/InteractingBox2AABB.hpp>
+#include<yade/yade-package-common/MetaInteractingGeometry.hpp>
+#include<yade/yade-package-common/MetaInteractingGeometry2AABB.hpp>
+#include<yade/yade-package-common/Momentum.hpp>
+#include<yade/yade-package-common/Force.hpp>
+#include<yade/yade-package-common/NewtonsForceLaw.hpp>
+#include<yade/yade-package-common/NewtonsMomentumLaw.hpp>
+#include<yade/yade-package-common/LeapFrogPositionIntegrator.hpp>
+#include<yade/yade-package-common/LeapFrogOrientationIntegrator.hpp>
+#include<yade/yade-package-dem/InteractingSphere2InteractingSphere4SpheresContactGeometry.hpp>
+#include<yade/yade-package-dem/InteractingBox2InteractingSphere4SpheresContactGeometry.hpp>
+/*class InteractingSphere2AABB;
+class InteractingBox2AABB;
+class MetaInteractingGeometry;
+class MetaInteractingGeometry2AABB; */
+
 
 #include<yade/yade-package-common/PhysicalActionContainerReseter.hpp>
 #include<yade/yade-package-common/PhysicalActionContainerInitializer.hpp>
@@ -143,9 +160,9 @@ void Shop::rootBodyActors(shared_ptr<MetaBody> rootBody){
 	rootBody->initializers.push_back(physicalActionInitializer);
 	
 	shared_ptr<BoundingVolumeMetaEngine> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeMetaEngine>(new BoundingVolumeMetaEngine);
-	boundingVolumeDispatcher->add("InteractingSphere","AABB","InteractingSphere2AABB");
-	boundingVolumeDispatcher->add("InteractingBox","AABB","InteractingBox2AABB");
-	boundingVolumeDispatcher->add("MetaInteractingGeometry","AABB","MetaInteractingGeometry2AABB");
+	boundingVolumeDispatcher->DISPATCHER_ADD3(InteractingSphere,AABB,InteractingSphere2AABB);
+	boundingVolumeDispatcher->DISPATCHER_ADD3(InteractingBox,AABB,InteractingBox2AABB);
+	boundingVolumeDispatcher->DISPATCHER_ADD3(MetaInteractingGeometry,AABB,MetaInteractingGeometry2AABB);
 	rootBody->initializers.push_back(boundingVolumeDispatcher);
 
 	//engines
@@ -171,12 +188,12 @@ void Shop::rootBodyActors(shared_ptr<MetaBody> rootBody){
 	rootBody->engines.push_back(shared_ptr<Engine>(new PersistentSAPCollider));
 
 	shared_ptr<InteractionGeometryMetaEngine> interactionGeometryDispatcher(new InteractionGeometryMetaEngine);
-	interactionGeometryDispatcher->add("InteractingSphere","InteractingSphere","InteractingSphere2InteractingSphere4SpheresContactGeometry");
-	interactionGeometryDispatcher->add("InteractingSphere","InteractingBox","InteractingBox2InteractingSphere4SpheresContactGeometry");
+	interactionGeometryDispatcher->DISPATCHER_ADD3(InteractingSphere,InteractingSphere,InteractingSphere2InteractingSphere4SpheresContactGeometry);
+	interactionGeometryDispatcher->DISPATCHER_ADD3(InteractingSphere,InteractingBox,InteractingBox2InteractingSphere4SpheresContactGeometry);
 	rootBody->engines.push_back(interactionGeometryDispatcher);
 
 	shared_ptr<InteractionPhysicsMetaEngine> interactionPhysicsDispatcher(new InteractionPhysicsMetaEngine);
-	interactionPhysicsDispatcher->add("BodyMacroParameters","BodyMacroParameters","MacroMicroElasticRelationships");
+	interactionPhysicsDispatcher->DISPATCHER_ADD3(BodyMacroParameters,BodyMacroParameters,MacroMicroElasticRelationships);
 	rootBody->engines.push_back(interactionPhysicsDispatcher);
 		
 	shared_ptr<ElasticContactLaw> constitutiveLaw(new ElasticContactLaw);
@@ -201,22 +218,22 @@ void Shop::rootBodyActors(shared_ptr<MetaBody> rootBody){
 		shared_ptr<CundallNonViscousMomentumDamping> actionMomentumDamping(new CundallNonViscousMomentumDamping);
 		actionMomentumDamping->damping = getDefault<double>("param_damping");
 		shared_ptr<PhysicalActionDamper> actionDampingDispatcher(new PhysicalActionDamper);
-		actionDampingDispatcher->add("Force","ParticleParameters","CundallNonViscousForceDamping",actionForceDamping);
-		actionDampingDispatcher->add("Momentum","RigidBodyParameters","CundallNonViscousMomentumDamping",actionMomentumDamping);
+		actionDampingDispatcher->DISPATCHER_ADD3_1(Force,ParticleParameters,CundallNonViscousForceDamping,actionForceDamping);
+		actionDampingDispatcher->DISPATCHER_ADD3_1(Momentum,RigidBodyParameters,CundallNonViscousMomentumDamping,actionMomentumDamping);
 		rootBody->engines.push_back(actionDampingDispatcher);
 	}
 	
 	shared_ptr<PhysicalActionApplier> applyActionDispatcher(new PhysicalActionApplier);
-	applyActionDispatcher->add("Force","ParticleParameters","NewtonsForceLaw");
-	applyActionDispatcher->add("Momentum","RigidBodyParameters","NewtonsMomentumLaw");
+	applyActionDispatcher->DISPATCHER_ADD3(Force,ParticleParameters,NewtonsForceLaw);
+	applyActionDispatcher->DISPATCHER_ADD3(Momentum,RigidBodyParameters,NewtonsMomentumLaw);
 	rootBody->engines.push_back(applyActionDispatcher);
 	
 	shared_ptr<PhysicalParametersMetaEngine> positionIntegrator(new PhysicalParametersMetaEngine);
-	positionIntegrator->add("ParticleParameters","LeapFrogPositionIntegrator");
+	positionIntegrator->DISPATCHER_ADD2(ParticleParameters,LeapFrogPositionIntegrator);
 	rootBody->engines.push_back(positionIntegrator);
 
 	shared_ptr<PhysicalParametersMetaEngine> orientationIntegrator(new PhysicalParametersMetaEngine);
-	orientationIntegrator->add("RigidBodyParameters","LeapFrogOrientationIntegrator");
+	orientationIntegrator->DISPATCHER_ADD2(RigidBodyParameters,LeapFrogOrientationIntegrator);
 	rootBody->engines.push_back(orientationIntegrator);
 
 	#ifdef EMBED_PYTHON

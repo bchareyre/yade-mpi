@@ -55,12 +55,12 @@ bool ForceRecorder::isActivated()
 
 void ForceRecorder::action(Body * body)
 {
-	MetaBody * ncb = dynamic_cast<MetaBody*>(body);
+	MetaBody * ncb = Dynamic_cast<MetaBody*>(body);
 	Real x=0, y=0, z=0;
 	
 	for( unsigned int i = startId ; i <= endId ; ++i )
 	{
-		Vector3r force = dynamic_cast<Force*>(ncb->physicalActions->find( i , actionForce->getClassIndex() ) . get() )->force;
+		Vector3r force = Dynamic_cast<Force*>(ncb->physicalActions->find( i , actionForce->getClassIndex() ) . get() )->force;
 		
 		x+=force[0];
 		y+=force[1];

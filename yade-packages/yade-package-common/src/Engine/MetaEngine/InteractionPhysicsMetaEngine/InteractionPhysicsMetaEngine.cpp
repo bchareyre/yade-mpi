@@ -14,7 +14,7 @@
 
 void InteractionPhysicsMetaEngine::action(Body* body)
 {
-	MetaBody * ncb = dynamic_cast<MetaBody*>(body);
+	MetaBody * ncb = Dynamic_cast<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	
 	shared_ptr<InteractionContainer>& persistentInteractions = ncb->persistentInteractions;

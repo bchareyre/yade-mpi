@@ -63,11 +63,11 @@ void StrainRecorder::action(Body * body)
 	std::vector<unsigned int>::iterator end = subscribedBodies.end();
 	
 	if(!ncb->bodies->exists(*i)) std::cerr << "StrainRecorder missing node\n", exit(1);
-	LatticeNodeParameters* node1 = dynamic_cast<LatticeNodeParameters*>( (*(ncb->bodies))[*i]->physicalParameters . get() );
+	LatticeNodeParameters* node1 = Dynamic_cast<LatticeNodeParameters*>( (*(ncb->bodies))[*i]->physicalParameters . get() );
 	(*(ncb->bodies))[*i]->geometricalModel->diffuseColor = Vector3r(1.0,0.0,0.0); // FIXME [1]
 	++i;
 	if(!ncb->bodies->exists(*i)) std::cerr << "StrainRecorder missing node\n", exit(1);
-	LatticeNodeParameters* node2 = dynamic_cast<LatticeNodeParameters*>( (*(ncb->bodies))[*i]->physicalParameters . get() );
+	LatticeNodeParameters* node2 = Dynamic_cast<LatticeNodeParameters*>( (*(ncb->bodies))[*i]->physicalParameters . get() );
 	(*(ncb->bodies))[*i]->geometricalModel->diffuseColor = Vector3r(1.0,0.0,0.0); // FIXME [1]
 	++i;
 	// FIXME - zamiast ¶ledziæ tylko dwa punkty (jeden na dole i jeden u góry), to lepiej zaznaczyæ dwa obszary punktów i liczyæ ¶redni± ich po³o¿enia,

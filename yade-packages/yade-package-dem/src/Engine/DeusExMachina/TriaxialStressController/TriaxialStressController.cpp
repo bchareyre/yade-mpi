@@ -246,7 +246,7 @@ void TriaxialStressController::controlExternalStress(int wall, MetaBody* ncb, in
 void TriaxialStressController::applyCondition(Body* body)
 {
 	//cerr << "TriaxialStressController::applyCondition" << endl;
-        MetaBody * ncb = dynamic_cast<MetaBody*>(body);
+        MetaBody * ncb = Dynamic_cast<MetaBody*>(body);
 
         //Update stiffness only if it has been computed by StiffnessCounter (see "interval")
         if (Omega::instance().getCurrentIteration() % interval == 0 || Omega::instance().getCurrentIteration()<1000)

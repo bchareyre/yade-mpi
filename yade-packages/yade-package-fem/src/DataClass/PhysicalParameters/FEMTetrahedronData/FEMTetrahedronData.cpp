@@ -35,21 +35,21 @@ void FEMTetrahedronData::calcKeMatrix(MetaBody* femBody)
 	nodesCoordinates.resize(3,4);
 	nodesCoordinates.clear();
 	
-	nodesCoordinates(0,0) = dynamic_cast<FEMNodeData*>((*(femBody->bodies))[ids[0]]->physicalParameters.get())->initialPosition[0];
-	nodesCoordinates(1,0) = dynamic_cast<FEMNodeData*>((*(femBody->bodies))[ids[0]]->physicalParameters.get())->initialPosition[1];
-	nodesCoordinates(2,0) = dynamic_cast<FEMNodeData*>((*(femBody->bodies))[ids[0]]->physicalParameters.get())->initialPosition[2];
+	nodesCoordinates(0,0) = Dynamic_cast<FEMNodeData*>((*(femBody->bodies))[ids[0]]->physicalParameters.get())->initialPosition[0];
+	nodesCoordinates(1,0) = Dynamic_cast<FEMNodeData*>((*(femBody->bodies))[ids[0]]->physicalParameters.get())->initialPosition[1];
+	nodesCoordinates(2,0) = Dynamic_cast<FEMNodeData*>((*(femBody->bodies))[ids[0]]->physicalParameters.get())->initialPosition[2];
 
-	nodesCoordinates(0,1) = dynamic_cast<FEMNodeData*>((*(femBody->bodies))[ids[1]]->physicalParameters.get())->initialPosition[0];
-	nodesCoordinates(1,1) = dynamic_cast<FEMNodeData*>((*(femBody->bodies))[ids[1]]->physicalParameters.get())->initialPosition[1];
-	nodesCoordinates(2,1) = dynamic_cast<FEMNodeData*>((*(femBody->bodies))[ids[1]]->physicalParameters.get())->initialPosition[2];
+	nodesCoordinates(0,1) = Dynamic_cast<FEMNodeData*>((*(femBody->bodies))[ids[1]]->physicalParameters.get())->initialPosition[0];
+	nodesCoordinates(1,1) = Dynamic_cast<FEMNodeData*>((*(femBody->bodies))[ids[1]]->physicalParameters.get())->initialPosition[1];
+	nodesCoordinates(2,1) = Dynamic_cast<FEMNodeData*>((*(femBody->bodies))[ids[1]]->physicalParameters.get())->initialPosition[2];
 
-	nodesCoordinates(0,2) = dynamic_cast<FEMNodeData*>((*(femBody->bodies))[ids[2]]->physicalParameters.get())->initialPosition[0];
-	nodesCoordinates(1,2) = dynamic_cast<FEMNodeData*>((*(femBody->bodies))[ids[2]]->physicalParameters.get())->initialPosition[1];
-	nodesCoordinates(2,2) = dynamic_cast<FEMNodeData*>((*(femBody->bodies))[ids[2]]->physicalParameters.get())->initialPosition[2];
+	nodesCoordinates(0,2) = Dynamic_cast<FEMNodeData*>((*(femBody->bodies))[ids[2]]->physicalParameters.get())->initialPosition[0];
+	nodesCoordinates(1,2) = Dynamic_cast<FEMNodeData*>((*(femBody->bodies))[ids[2]]->physicalParameters.get())->initialPosition[1];
+	nodesCoordinates(2,2) = Dynamic_cast<FEMNodeData*>((*(femBody->bodies))[ids[2]]->physicalParameters.get())->initialPosition[2];
 
-	nodesCoordinates(0,3) = dynamic_cast<FEMNodeData*>((*(femBody->bodies))[ids[3]]->physicalParameters.get())->initialPosition[0];
-	nodesCoordinates(1,3) = dynamic_cast<FEMNodeData*>((*(femBody->bodies))[ids[3]]->physicalParameters.get())->initialPosition[1];
-	nodesCoordinates(2,3) = dynamic_cast<FEMNodeData*>((*(femBody->bodies))[ids[3]]->physicalParameters.get())->initialPosition[2]; 
+	nodesCoordinates(0,3) = Dynamic_cast<FEMNodeData*>((*(femBody->bodies))[ids[3]]->physicalParameters.get())->initialPosition[0];
+	nodesCoordinates(1,3) = Dynamic_cast<FEMNodeData*>((*(femBody->bodies))[ids[3]]->physicalParameters.get())->initialPosition[1];
+	nodesCoordinates(2,3) = Dynamic_cast<FEMNodeData*>((*(femBody->bodies))[ids[3]]->physicalParameters.get())->initialPosition[2]; 
 	
 	localCalcKeMatrix(nodesCoordinates);
 	

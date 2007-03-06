@@ -18,7 +18,7 @@ void FEMTetrahedronStiffness::go(	  const shared_ptr<PhysicalParameters>& par
 					, Body* body)
 
 {
-	MetaBody* rootBody = dynamic_cast<MetaBody*>(body);
+	MetaBody* rootBody = Dynamic_cast<MetaBody*>(body);
 	shared_ptr<FEMSetParameters> physics = dynamic_pointer_cast<FEMSetParameters>(par);
 	nodeGroupMask = physics->nodeGroupMask;
 	tetrahedronGroupMask = physics->tetrahedronGroupMask;
@@ -30,7 +30,7 @@ void FEMTetrahedronStiffness::go(	  const shared_ptr<PhysicalParameters>& par
 	// FIXME - this loop should be somewhere in InteractionPhysicsMetaEngine
 		shared_ptr<Body> b = *bi;
 		if(b->getGroupMask() & tetrahedronGroupMask)
-			dynamic_cast<FEMTetrahedronData*>( b->physicalParameters.get() )->calcKeMatrix(rootBody);
+			Dynamic_cast<FEMTetrahedronData*>( b->physicalParameters.get() )->calcKeMatrix(rootBody);
 		// FIXME - that should be done inside InteractionPhysicsEngineUnit
 	}
 	

@@ -53,7 +53,7 @@ bool AveragePositionRecorder::isActivated()
 
 void AveragePositionRecorder::action(Body * body)
 {
-	MetaBody * ncb = dynamic_cast<MetaBody*>(body);
+	MetaBody * ncb = Dynamic_cast<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	
 	Real x=0, y=0, z=0, size=0;

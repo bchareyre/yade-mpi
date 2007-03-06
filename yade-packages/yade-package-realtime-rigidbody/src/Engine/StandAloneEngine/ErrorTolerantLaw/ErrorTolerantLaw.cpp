@@ -43,7 +43,7 @@ void ErrorTolerantLaw::registerAttributes()
 void ErrorTolerantLaw::action(Body* body)
 {
 
-	MetaBody * ncb = dynamic_cast<MetaBody*>(body);
+	MetaBody * ncb = Dynamic_cast<MetaBody*>(body);
 	shared_ptr<BodyContainer> bodies = ncb->bodies;
 
 	if (ncb->transientInteractions->size() > 0)

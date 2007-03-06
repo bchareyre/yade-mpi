@@ -12,6 +12,11 @@
 #include "MetaDispatchingEngine.hpp"
 #include <yade/yade-lib-multimethods/DynLibDispatcher.hpp>
 
+/*! Type-safe variant of the MetaDispatchingEngine2D::add function. Arguments are not strings, but regular typenames and will give compile-time error if not defined. They are passed to MetaDispatchingEngine2D::add in the same order as given. */
+#define DISPATCHER_ADD3(e1,e2,e3) add(#e1,#e2,#e3); {/* compile-time check for class existence */ typedef e1 p1; typedef e2 p2; typedef e3 p3;}
+/*! Same as DISPATCHER_ADD3 macro, but passes the additional 4th argument to MetaDispatchingEngine2D::add as its 4th, optional argument */
+#define DISPATCHER_ADD3_1(e1,e2,e3,e4) add(#e1,#e2,#e3,e4); {/* compile-time check for class existence */ typedef e1 p1; typedef e2 p2; typedef e3 p3;}
+
 template
 <
 	class baseClass1, 

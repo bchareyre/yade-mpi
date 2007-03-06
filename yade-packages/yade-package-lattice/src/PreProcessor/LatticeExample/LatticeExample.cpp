@@ -585,7 +585,7 @@ string LatticeExample::generate()
 			if(shouldTerminate()) return "";
 
                         Body* body = (*bi).get();
-                        LatticeNodeParameters* node = dynamic_cast<LatticeNodeParameters*>(body->physicalParameters.get());
+                        LatticeNodeParameters* node = Dynamic_cast<LatticeNodeParameters*>(body->physicalParameters.get());
                         tmpLen = ( strainRecorder_node1 - node->se3.position ).SquaredLength();
                         if(tmpLen < len1) len1=tmpLen, node1Id=body->getId();
                         tmpLen = ( strainRecorder_node2 - node->se3.position ).SquaredLength();
@@ -609,7 +609,7 @@ string LatticeExample::generate()
 			if(shouldTerminate()) return "";
 
                         Body* body = (*bi).get();
-                        LatticeNodeParameters* node = dynamic_cast<LatticeNodeParameters*>(body->physicalParameters.get());
+                        LatticeNodeParameters* node = Dynamic_cast<LatticeNodeParameters*>(body->physicalParameters.get());
                         tmpLen = ( measurePoisson_node3 - node->se3.position ).SquaredLength();
                         if(tmpLen < len1) len1=tmpLen, node3Id=body->getId();
                         tmpLen = ( measurePoisson_node4 - node->se3.position ).SquaredLength();

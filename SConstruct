@@ -113,7 +113,7 @@ def CheckPython(context):
 	return True
 
 def CheckScientificPython(context):
-	context.Message('Checkgin for scientific python module (debian: package python-scientific)... ')
+	context.Message('Checking for scientific python module (debian: python-scientific)... ')
 	try:
 		import Scientific
 		context.Result(True); return True
@@ -189,7 +189,7 @@ if not env.GetOption('clean'):
 
 ### SCONS OPTIMIZATIONS
 env.SourceSignatures('MD5') #can be 'timestamp', but is less reliable and not so much faster
-env.SetOption('max_drift',30) # cache md5sums of files older than 30 seconds
+env.SetOption('max_drift',5) # cache md5sums of files older than 30 seconds
 SetOption('implicit_cache',1) # cache #include files etc.
 env.SourceCode(".",None) # skip dotted directories
 SetOption('num_jobs',env['jobs'])

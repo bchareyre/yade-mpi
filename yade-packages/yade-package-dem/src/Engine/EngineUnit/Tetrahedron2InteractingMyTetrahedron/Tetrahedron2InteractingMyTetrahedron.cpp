@@ -19,7 +19,7 @@ void Tetrahedron2InteractingMyTetrahedron::go(	const shared_ptr<GeometricalModel
 	if(ig == 0)
 		ig = boost::shared_ptr<InteractingGeometry>(new InteractingMyTetrahedron);
 
-	InteractingMyTetrahedron* it = dynamic_cast<InteractingMyTetrahedron*>(ig.get());
+	InteractingMyTetrahedron* it = Dynamic_cast<InteractingMyTetrahedron*>(ig.get());
 	
 	it->c1 = tet->v1*0.5;
 	it->c2 = tet->v2*0.5;

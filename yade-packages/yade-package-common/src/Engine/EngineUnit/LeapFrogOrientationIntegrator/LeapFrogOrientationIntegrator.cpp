@@ -25,7 +25,7 @@ void LeapFrogOrientationIntegrator::go(	  const shared_ptr<PhysicalParameters>& 
 		firsts.resize(id+1,true);
 	}
 
-	RigidBodyParameters * rb = dynamic_cast<RigidBodyParameters*>(b.get());
+	RigidBodyParameters * rb = Dynamic_cast<RigidBodyParameters*>(b.get());
 	
 	Real dt = Omega::instance().getTimeStep();
 		

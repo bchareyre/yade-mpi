@@ -32,7 +32,7 @@ void MassSpringLaw::registerAttributes()
 
 void MassSpringLaw::action(Body * body)
 {
-	MetaBody * massSpring = dynamic_cast<MetaBody*>(body);
+	MetaBody * massSpring = Dynamic_cast<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = massSpring->bodies;
 	shared_ptr<InteractionContainer>& persistentInteractions = massSpring->persistentInteractions;
 	shared_ptr<PhysicalActionContainer>& physicalActions = massSpring->physicalActions;

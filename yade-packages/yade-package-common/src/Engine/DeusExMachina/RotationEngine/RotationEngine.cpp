@@ -33,7 +33,7 @@ void RotationEngine::registerAttributes()
 void RotationEngine::applyCondition(Body * body)
 {
 
-	MetaBody * ncb = dynamic_cast<MetaBody*>(body);
+	MetaBody * ncb = Dynamic_cast<MetaBody*>(body);
 	shared_ptr<BodyContainer> bodies = ncb->bodies;
 
 	std::vector<int>::const_iterator ii = subscribedBodies.begin();

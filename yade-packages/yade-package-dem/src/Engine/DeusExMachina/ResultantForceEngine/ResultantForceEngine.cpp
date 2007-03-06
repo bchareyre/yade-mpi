@@ -53,7 +53,7 @@ void ResultantForceEngine::registerAttributes()
 void ResultantForceEngine::applyCondition(Body* body)
 {
 	//cerr << "void ResultantForceEngine::applyCondition(Body* body)" << std::endl;
-	MetaBody * ncb = dynamic_cast<MetaBody*>(body);
+	MetaBody * ncb = Dynamic_cast<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	
 	std::vector<int>::const_iterator ii = subscribedBodies.begin();

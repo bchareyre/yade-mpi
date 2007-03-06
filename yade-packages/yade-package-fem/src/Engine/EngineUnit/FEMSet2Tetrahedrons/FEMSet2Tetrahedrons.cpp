@@ -20,8 +20,8 @@ void FEMSet2Tetrahedrons::go(	  const shared_ptr<PhysicalParameters>& ph
 				, shared_ptr<GeometricalModel>& 
 				, const Body* body)
 {
-	int tetrahedronGroupMask = dynamic_cast<const FEMSetParameters*>(ph.get())->tetrahedronGroupMask;
-	const MetaBody * cb = dynamic_cast<const MetaBody*>(body);
+	int tetrahedronGroupMask = Dynamic_cast<const FEMSetParameters*>(ph.get())->tetrahedronGroupMask;
+	const MetaBody * cb = Dynamic_cast<const MetaBody*>(body);
 	const shared_ptr<BodyContainer>& bodies = cb->bodies;
 	
 // FIXME - this copying of data! 
@@ -32,8 +32,8 @@ void FEMSet2Tetrahedrons::go(	  const shared_ptr<PhysicalParameters>& ph
 		shared_ptr<Body> b = *bi;
 		if(b->getGroupMask() & tetrahedronGroupMask )
 		{
-			Tetrahedron* tet 		= dynamic_cast<Tetrahedron*>        (b->geometricalModel.get());
-			FEMTetrahedronData* tetData	= dynamic_cast<FEMTetrahedronData*> (b->physicalParameters.get());
+			Tetrahedron* tet 		= Dynamic_cast<Tetrahedron*>        (b->geometricalModel.get());
+			FEMTetrahedronData* tetData	= Dynamic_cast<FEMTetrahedronData*> (b->physicalParameters.get());
 			
 			tet->v1 			= (*(cb->bodies))[tetData->ids[0]]->physicalParameters->se3.position;
 			tet->v2 			= (*(cb->bodies))[tetData->ids[1]]->physicalParameters->se3.position;

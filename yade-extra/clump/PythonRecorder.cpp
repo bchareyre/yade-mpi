@@ -49,7 +49,7 @@ void PythonRecorder::postProcessAttributes(bool deserializing){
 
 void PythonRecorder::action(Body *_rootBody)
 {
-	//MetaBody* rootBody=dynamic_cast<MetaBody*>(_rootBody);
+	//MetaBody* rootBody=Dynamic_cast<MetaBody*>(_rootBody);
 	PyRun_SimpleString(expression.c_str());
 }
 
