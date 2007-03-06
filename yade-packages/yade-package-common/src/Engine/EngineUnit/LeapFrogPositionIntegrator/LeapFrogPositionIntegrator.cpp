@@ -25,7 +25,7 @@ void LeapFrogPositionIntegrator::go(       const shared_ptr<PhysicalParameters>&
 		firsts.resize(id+1,true);
 	}
 
-	ParticleParameters * p = Dynamic_cast<ParticleParameters*>(b.get());
+	ParticleParameters * p = YADE_CAST<ParticleParameters*>(b.get());
 
 	Real dt = Omega::instance().getTimeStep();
 

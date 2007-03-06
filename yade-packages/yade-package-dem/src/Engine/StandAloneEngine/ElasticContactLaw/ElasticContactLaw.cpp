@@ -37,7 +37,7 @@ void ElasticContactLaw::registerAttributes()
 //FIXME : remove bool first !!!!!
 void ElasticContactLaw::action(Body* body)
 {
-	MetaBody * ncb = Dynamic_cast<MetaBody*>(body);
+	MetaBody * ncb = YADE_CAST<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 
 	Real dt = Omega::instance().getTimeStep();
@@ -57,10 +57,10 @@ void ElasticContactLaw::action(Body* body)
 			if( !( (*bodies)[id1]->getGroupMask() & (*bodies)[id2]->getGroupMask() & sdecGroupMask)  )
 				continue; // skip other groups, BTW: this is example of a good usage of 'continue' keyword
 	
-			BodyMacroParameters* de1 				= Dynamic_cast<BodyMacroParameters*>((*bodies)[id1]->physicalParameters.get());
-			BodyMacroParameters* de2 				= Dynamic_cast<BodyMacroParameters*>((*bodies)[id2]->physicalParameters.get());
-			SpheresContactGeometry* currentContactGeometry 	= Dynamic_cast<SpheresContactGeometry*>(contact->interactionGeometry.get());
-			ElasticContactInteraction* currentContactPhysics   	= Dynamic_cast<ElasticContactInteraction*> (contact->interactionPhysics.get());
+			BodyMacroParameters* de1 				= YADE_CAST<BodyMacroParameters*>((*bodies)[id1]->physicalParameters.get());
+			BodyMacroParameters* de2 				= YADE_CAST<BodyMacroParameters*>((*bodies)[id2]->physicalParameters.get());
+			SpheresContactGeometry* currentContactGeometry 	= YADE_CAST<SpheresContactGeometry*>(contact->interactionGeometry.get());
+			ElasticContactInteraction* currentContactPhysics   	= YADE_CAST<ElasticContactInteraction*> (contact->interactionPhysics.get());
 			
 			Vector3r& shearForce 			= currentContactPhysics->shearForce;
 	

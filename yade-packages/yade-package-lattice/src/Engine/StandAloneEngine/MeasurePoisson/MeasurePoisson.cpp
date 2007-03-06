@@ -71,13 +71,13 @@ void MeasurePoisson::action(Body * body)
 	}
 	MetaBody * ncb = static_cast<MetaBody*>(body);
 
-	LatticeNodeParameters* node_left   = Dynamic_cast<LatticeNodeParameters*>( (*(ncb->bodies))[left  ]->physicalParameters . get() );
+	LatticeNodeParameters* node_left   = YADE_CAST<LatticeNodeParameters*>( (*(ncb->bodies))[left  ]->physicalParameters . get() );
 	(*(ncb->bodies))[left  ]->geometricalModel->diffuseColor = Vector3r(1.0,1.0,0.0); // FIXME [1]
-	LatticeNodeParameters* node_right  = Dynamic_cast<LatticeNodeParameters*>( (*(ncb->bodies))[right ]->physicalParameters . get() );
+	LatticeNodeParameters* node_right  = YADE_CAST<LatticeNodeParameters*>( (*(ncb->bodies))[right ]->physicalParameters . get() );
 	(*(ncb->bodies))[right ]->geometricalModel->diffuseColor = Vector3r(1.0,1.0,0.0); // FIXME [1]
-	LatticeNodeParameters* node_bottom = Dynamic_cast<LatticeNodeParameters*>( (*(ncb->bodies))[bottom]->physicalParameters . get() );
+	LatticeNodeParameters* node_bottom = YADE_CAST<LatticeNodeParameters*>( (*(ncb->bodies))[bottom]->physicalParameters . get() );
 	(*(ncb->bodies))[bottom]->geometricalModel->diffuseColor = Vector3r(1.0,1.0,0.0); // FIXME [1]
-	LatticeNodeParameters* node_upper  = Dynamic_cast<LatticeNodeParameters*>( (*(ncb->bodies))[upper ]->physicalParameters . get() );
+	LatticeNodeParameters* node_upper  = YADE_CAST<LatticeNodeParameters*>( (*(ncb->bodies))[upper ]->physicalParameters . get() );
 	(*(ncb->bodies))[upper ]->geometricalModel->diffuseColor = Vector3r(1.0,1.0,0.0); // FIXME [1]
 	
 	// FIXME - zamiast ¶ledziæ tylko dwa punkty (jeden na dole i jeden u góry), to lepiej zaznaczyæ dwa obszary punktów i liczyæ ¶redni± ich po³o¿enia,

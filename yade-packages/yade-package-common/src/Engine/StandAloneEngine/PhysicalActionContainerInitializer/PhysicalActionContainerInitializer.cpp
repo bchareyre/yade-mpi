@@ -28,7 +28,7 @@ void PhysicalActionContainerInitializer::registerAttributes()
 
 void PhysicalActionContainerInitializer::action(Body* body)
 {
-	MetaBody * ncb = Dynamic_cast<MetaBody*>(body);
+	MetaBody * ncb = YADE_CAST<MetaBody*>(body);
 	
 	vector<shared_ptr<PhysicalAction> > physicalActions;
 	physicalActions.clear();

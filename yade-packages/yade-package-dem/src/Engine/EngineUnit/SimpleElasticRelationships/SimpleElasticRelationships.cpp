@@ -41,7 +41,7 @@ void SimpleElasticRelationships::go(	  const shared_ptr<PhysicalParameters>& b1 
 		if( interaction->isNew)
 		{
 			interaction->interactionPhysics = shared_ptr<ElasticContactInteraction>(new ElasticContactInteraction());
-			ElasticContactInteraction* contactPhysics = Dynamic_cast<ElasticContactInteraction*>(interaction->interactionPhysics.get());
+			ElasticContactInteraction* contactPhysics = YADE_CAST<ElasticContactInteraction*>(interaction->interactionPhysics.get());
 
 			Real Ea 	= sdec1->young;
 			Real Eb 	= sdec2->young;
@@ -77,7 +77,7 @@ void SimpleElasticRelationships::go(	  const shared_ptr<PhysicalParameters>& b1 
 		}
 		else
 		{	// FIXME - are those lines necessary ???? what they are doing in fact ???
-			ElasticContactInteraction* contactPhysics = Dynamic_cast<ElasticContactInteraction*>(interaction->interactionPhysics.get());
+			ElasticContactInteraction* contactPhysics = YADE_CAST<ElasticContactInteraction*>(interaction->interactionPhysics.get());
 
 			contactPhysics->kn = contactPhysics->initialKn;
 			contactPhysics->ks = contactPhysics->initialKs;

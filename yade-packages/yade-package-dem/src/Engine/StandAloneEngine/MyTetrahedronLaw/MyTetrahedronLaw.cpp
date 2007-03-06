@@ -31,7 +31,7 @@ void MyTetrahedronLaw::registerAttributes()
 
 void MyTetrahedronLaw::action(Body* body)
 {
-	MetaBody * ncb = Dynamic_cast<MetaBody*>(body);
+	MetaBody * ncb = YADE_CAST<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 
 	Real dt = Omega::instance().getTimeStep();
@@ -58,10 +58,10 @@ void MyTetrahedronLaw::action(Body* body)
 //			if( !( (*bodies)[id1]->getGroupMask() & (*bodies)[id2]->getGroupMask() & sdecGroupMask)  )
 //				continue;
 	
-			ElasticBodyParameters* de1 				= Dynamic_cast<ElasticBodyParameters*>((*bodies)[id1]->physicalParameters.get());
-			ElasticBodyParameters* de2 				= Dynamic_cast<ElasticBodyParameters*>((*bodies)[id2]->physicalParameters.get());
-			InteractionOfMyTetrahedron* currentContactGeometry	= Dynamic_cast<InteractionOfMyTetrahedron*>(contact->interactionGeometry.get());
-			SimpleElasticInteraction* currentContactPhysics		= Dynamic_cast<SimpleElasticInteraction*>(contact->interactionPhysics.get());
+			ElasticBodyParameters* de1 				= YADE_CAST<ElasticBodyParameters*>((*bodies)[id1]->physicalParameters.get());
+			ElasticBodyParameters* de2 				= YADE_CAST<ElasticBodyParameters*>((*bodies)[id2]->physicalParameters.get());
+			InteractionOfMyTetrahedron* currentContactGeometry	= YADE_CAST<InteractionOfMyTetrahedron*>(contact->interactionGeometry.get());
+			SimpleElasticInteraction* currentContactPhysics		= YADE_CAST<SimpleElasticInteraction*>(contact->interactionPhysics.get());
 
 			for(int i=0 ; i<4 ; ++i )
 				for(int j=0 ; j<4 ; ++j)

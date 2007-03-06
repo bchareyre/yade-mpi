@@ -47,7 +47,7 @@ void PositionOrientationRecorder::registerAttributes()
 
 void PositionOrientationRecorder::action(Body * body)
 {
-	MetaBody * ncb = Dynamic_cast<MetaBody*>(body);
+	MetaBody * ncb = YADE_CAST<MetaBody*>(body);
 	
 	if( Omega::instance().getCurrentIteration() % interval == 0 /*&& ofile*/ )
 	{

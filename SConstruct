@@ -226,6 +226,7 @@ if env['debug']: env.Append(CXXFLAGS='-ggdb3',CPPDEFINES=['DEBUG','YADE_DEBUG'])
 else: env.Append(CXXFLAGS='-O2')
 if env['optimize']:
 	env.Append(CXXFLAGS=Split('-O3 -ffast-math'))
+	env.Append(CPPDEFINES=[('YADE_CAST','static_cast')])
 	# -floop-optimize2 is a gcc-4.x flag, doesn't exist on previous version
 	# CRASH -ffloat-store
 	# maybe not CRASH?: -fno-math-errno
@@ -237,6 +238,9 @@ if env['optimize']:
 	# ?: -ftree-loop-linear -ftree-loop-ivcanon
 	archFlags=Split('-march=pentium4 -mfpmath=sse,387') #-malign-double')
 	env.Append(CXXFLAGS=archFlags,LINKFLAGS=archFlags,SHLINKFLAGS=archFlags)
+else:
+	env.Append(CPPDEFINES=[('YADE_CAST','dynamic_cast')])
+
 if env['profile']: env.Append(CXXFLAGS=['-pg'],LINKFLAGS=['-pg'],SHLINKFLAGS=['-pg'])
 env.Append(CXXFLAGS=['-pipe','-Wall'])
 

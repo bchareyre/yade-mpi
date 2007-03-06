@@ -17,7 +17,7 @@ void ParticleSet2Mesh2D::go(	  const shared_ptr<PhysicalParameters>&
 {
 	Mesh2D* mesh2d = static_cast<Mesh2D*>(gm.get());
 	
-	const MetaBody * ncb = Dynamic_cast<const MetaBody*>(body);
+	const MetaBody * ncb = YADE_CAST<const MetaBody*>(body);
 	const shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	
 // FIXME - this copying of Se3 between Mesh2D, and Particles inside MetaBody could be done just once, if Se3 was inside shared_ptr. This can be improved once we make indexable Parameters: Velocity, Position, Orientation, ....

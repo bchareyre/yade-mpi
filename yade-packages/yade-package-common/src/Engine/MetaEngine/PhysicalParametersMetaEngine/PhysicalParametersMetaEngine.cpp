@@ -14,7 +14,7 @@
 
 void PhysicalParametersMetaEngine::action(Body* body)
 {
-	MetaBody * ncb = Dynamic_cast<MetaBody*>(body);
+	MetaBody * ncb = YADE_CAST<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	
 	BodyContainer::iterator bi    = bodies->begin();

@@ -26,7 +26,7 @@ ClumpMemberMover::ClumpMemberMover(){/*createIndex();*/ }
  * @param clump passed by the dispatcher
  */
 void ClumpMemberMover::applyCondition(Body* _rootBody){
-	MetaBody* rootBody = Dynamic_cast<MetaBody*>(_rootBody);
+	MetaBody* rootBody = YADE_CAST<MetaBody*>(_rootBody);
 	for(BodyContainer::iterator I=rootBody->bodies->begin(); I!=rootBody->bodies->end(); ++I){
 		shared_ptr<Body> b = *I;
 		// is this a clump?
