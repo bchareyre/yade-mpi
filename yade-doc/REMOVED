@@ -1,0 +1,4 @@
+This file records what elements were removed from yade's repositories and at which point. The reason is that even if the component is in SVN history, it is useless if someone doesn't know that is there.
+
+ * PerlinNoise
+
