@@ -153,7 +153,7 @@ void IOFormatManager::serializeFundamental(ostream& stream, Archive& ac,int )
 
 void IOFormatManager::deserializeCustomClass(istream& stream, Archive& ac, const string& str)
 {
-	shared_ptr<Serializable> s = dynamic_pointer_cast<Serializable>(ClassFactory::instance().createShared(ac.getSerializableClassName()));
+	shared_ptr<Serializable> s = YADE_PTR_CAST<Serializable>(ClassFactory::instance().createShared(ac.getSerializableClassName()));
 
 	shared_ptr<Archive> tmpAc = Archive::create(ac.getName(),*s);
 	tmpAc->deserialize(stream, *tmpAc, str);
@@ -164,7 +164,7 @@ void IOFormatManager::deserializeCustomClass(istream& stream, Archive& ac, const
 
 void IOFormatManager::serializeCustomClass(ostream& stream, Archive& ac,int depth)
 {
-	shared_ptr<Serializable> s = dynamic_pointer_cast<Serializable>(ClassFactory::instance().createShared(ac.getSerializableClassName()));
+	shared_ptr<Serializable> s = YADE_PTR_CAST<Serializable>(ClassFactory::instance().createShared(ac.getSerializableClassName()));
 	s->serialize(ac.getAddress());
 	shared_ptr<Archive> tmpAc = Archive::create(ac.getName(),*s);
 	tmpAc->serialize(stream,*tmpAc,depth);
@@ -204,7 +204,7 @@ void IOFormatManager::serializeSmartPointerOfFundamental(ostream& stream, Archiv
 // or better provide a regexp
 void IOFormatManager::deserializeCustomFundamental(istream& stream, Archive& ac,const string& str)
 {
-	shared_ptr<Serializable> s = dynamic_pointer_cast<Serializable>(ClassFactory::instance().createShared(ac.getSerializableClassName()));
+	shared_ptr<Serializable> s = YADE_PTR_CAST<Serializable>(ClassFactory::instance().createShared(ac.getSerializableClassName()));
 
 	s->registerSerializableAttributes(true);
 
@@ -226,7 +226,7 @@ void IOFormatManager::deserializeCustomFundamental(istream& stream, Archive& ac,
 
 void IOFormatManager::serializeCustomFundamental(ostream& stream, Archive& ac,int depth)
 {
-	shared_ptr<Serializable> ss = dynamic_pointer_cast<Serializable>(ClassFactory::instance().createShared(ac.getSerializableClassName()));
+	shared_ptr<Serializable> ss = YADE_PTR_CAST<Serializable>(ClassFactory::instance().createShared(ac.getSerializableClassName()));
 	ss->serialize(ac.getAddress());
 	ss->registerSerializableAttributes(false);
 	Serializable::Archives archives = ss->getArchives();

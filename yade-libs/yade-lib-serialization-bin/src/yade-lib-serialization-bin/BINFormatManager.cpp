@@ -339,7 +339,7 @@ void BINFormatManager::deserializeUnsupported(istream&, Archive&,const string&)
 
 void BINFormatManager::deserializeCustomFundamental(istream& stream, Archive& ac,const string& str)
 {
-	shared_ptr<Serializable> s = dynamic_pointer_cast<Serializable>(ClassFactory::instance().createShared(ac.getSerializableClassName()));
+	shared_ptr<Serializable> s = YADE_PTR_CAST<Serializable>(ClassFactory::instance().createShared(ac.getSerializableClassName()));
 
 	s->registerSerializableAttributes(true);
 
@@ -357,7 +357,7 @@ void BINFormatManager::deserializeCustomFundamental(istream& stream, Archive& ac
 
 void BINFormatManager::serializeCustomFundamental(ostream& stream, Archive& ac,int depth)
 {
-	shared_ptr<Serializable> ss = dynamic_pointer_cast<Serializable>(ClassFactory::instance().createShared(ac.getSerializableClassName()));
+	shared_ptr<Serializable> ss = YADE_PTR_CAST<Serializable>(ClassFactory::instance().createShared(ac.getSerializableClassName()));
 	ss->serialize(ac.getAddress());
 	ss->registerSerializableAttributes(false);
 	Serializable::Archives archives = ss->getArchives();

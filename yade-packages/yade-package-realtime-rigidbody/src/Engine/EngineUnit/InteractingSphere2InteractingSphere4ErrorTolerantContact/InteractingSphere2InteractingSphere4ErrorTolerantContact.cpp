@@ -17,8 +17,8 @@ bool InteractingSphere2InteractingSphere4ErrorTolerantContact::go(		const shared
 						const Se3r& se32,
 						const shared_ptr<Interaction>& c)
 {
-	shared_ptr<Sphere> s1 = dynamic_pointer_cast<Sphere>(cm1);
-	shared_ptr<Sphere> s2 = dynamic_pointer_cast<Sphere>(cm2);
+	shared_ptr<Sphere> s1 = YADE_PTR_CAST<Sphere>(cm1);
+	shared_ptr<Sphere> s2 = YADE_PTR_CAST<Sphere>(cm2);
 
 	Vector3r normal = se32.position-se31.position;
 	float penetrationDepth = s1->radius+s2->radius-normal.Normalize();

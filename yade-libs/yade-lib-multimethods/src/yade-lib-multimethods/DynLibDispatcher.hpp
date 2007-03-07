@@ -188,14 +188,14 @@ class DynLibDispatcher
  	public  : shared_ptr<Executor> getExecutor(const string& baseClassName1,const string& baseClassName2)
 		  {
 
-			shared_ptr<BaseClass1> baseClass1 = dynamic_pointer_cast<BaseClass1>(ClassFactory::instance().createShared(baseClassName1));
-			shared_ptr<Indexable> base1	  = dynamic_pointer_cast<Indexable>(baseClass1);
+			shared_ptr<BaseClass1> baseClass1 = YADE_PTR_CAST<BaseClass1>(ClassFactory::instance().createShared(baseClassName1));
+			shared_ptr<Indexable> base1	  = YADE_PTR_CAST<Indexable>(baseClass1);
 			assert(base1);
 			int& index1 = base1->getClassIndex();
  			assert (index1 != -1);
 
-			shared_ptr<BaseClass2> baseClass2 = dynamic_pointer_cast<BaseClass2>(ClassFactory::instance().createShared(baseClassName2));
-			shared_ptr<Indexable> base2	  = dynamic_pointer_cast<Indexable>(baseClass2);
+			shared_ptr<BaseClass2> baseClass2 = YADE_PTR_CAST<BaseClass2>(ClassFactory::instance().createShared(baseClassName2));
+			shared_ptr<Indexable> base2	  = YADE_PTR_CAST<Indexable>(baseClass2);
 			assert(base2);
 			int& index2 = base2->getClassIndex();
  			assert (index2 != -1);
@@ -209,8 +209,8 @@ class DynLibDispatcher
  	public  : shared_ptr<Executor> getExecutor(const string& baseClassName)
 		  {
 
-			shared_ptr<BaseClass1> baseClass = dynamic_pointer_cast<BaseClass1>(ClassFactory::instance().createShared(baseClassName));
-			shared_ptr<Indexable> base	  = dynamic_pointer_cast<Indexable>(baseClass);
+			shared_ptr<BaseClass1> baseClass = YADE_PTR_CAST<BaseClass1>(ClassFactory::instance().createShared(baseClassName));
+			shared_ptr<Indexable> base	  = YADE_PTR_CAST<Indexable>(baseClass);
 			assert(base);
 			int& index = base->getClassIndex();
  			assert (index != -1);
@@ -294,9 +294,9 @@ class DynLibDispatcher
 			// the class might not exist in memory at all, and we have to load dynamic library,
 			// so that a static variable is created and accessible)
 			shared_ptr<BaseClass1> baseClass = 
-				dynamic_pointer_cast<BaseClass1>(ClassFactory::instance().createShared(baseClassName));
+				YADE_PTR_CAST<BaseClass1>(ClassFactory::instance().createShared(baseClassName));
 			// this is a strange tweak without which it won't work.
-			shared_ptr<Indexable> base = dynamic_pointer_cast<Indexable>(baseClass);
+			shared_ptr<Indexable> base = YADE_PTR_CAST<Indexable>(baseClass);
 		
 			assert(base);
 			int& index = base->getClassIndex();
@@ -373,10 +373,10 @@ class DynLibDispatcher
 		
 	public  : void add2DEntry( string baseClassName1, string baseClassName2, string libName, shared_ptr<Executor> ex = shared_ptr<Executor>())
 		  {
-			shared_ptr<BaseClass1> baseClass1 = dynamic_pointer_cast<BaseClass1>(ClassFactory::instance().createShared(baseClassName1));
-			shared_ptr<BaseClass2> baseClass2 = dynamic_pointer_cast<BaseClass2>(ClassFactory::instance().createShared(baseClassName2));
-			shared_ptr<Indexable> base1 = dynamic_pointer_cast<Indexable>(baseClass1);
-			shared_ptr<Indexable> base2 = dynamic_pointer_cast<Indexable>(baseClass2);
+			shared_ptr<BaseClass1> baseClass1 = YADE_PTR_CAST<BaseClass1>(ClassFactory::instance().createShared(baseClassName1));
+			shared_ptr<BaseClass2> baseClass2 = YADE_PTR_CAST<BaseClass2>(ClassFactory::instance().createShared(baseClassName2));
+			shared_ptr<Indexable> base1 = YADE_PTR_CAST<Indexable>(baseClass1);
+			shared_ptr<Indexable> base2 = YADE_PTR_CAST<Indexable>(baseClass2);
 			
 			assert(base1);
 			assert(base2);

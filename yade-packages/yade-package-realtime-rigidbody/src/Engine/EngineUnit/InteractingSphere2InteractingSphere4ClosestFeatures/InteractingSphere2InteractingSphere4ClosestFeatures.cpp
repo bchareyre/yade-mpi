@@ -17,8 +17,8 @@ bool InteractingSphere2InteractingSphere4ClosestFeatures::go(		const shared_ptr<
 						const Se3r& se32,
 						const shared_ptr<Interaction>& c)
 {
-	shared_ptr<InteractingSphere> s1 = dynamic_pointer_cast<InteractingSphere>(cm1);
-	shared_ptr<InteractingSphere> s2 = dynamic_pointer_cast<InteractingSphere>(cm2);
+	shared_ptr<InteractingSphere> s1 = YADE_PTR_CAST<InteractingSphere>(cm1);
+	shared_ptr<InteractingSphere> s2 = YADE_PTR_CAST<InteractingSphere>(cm2);
 	
 	Vector3r v = se31.position-se32.position;
 	Real l = v.Normalize();

@@ -52,12 +52,12 @@ void FrictionLessElasticContactLaw::action(Body * body)
 			int id1 = contact->getId1();
 			int id2 = contact->getId2();
 	
-			shared_ptr<RigidBodyParameters> rb1 = dynamic_pointer_cast<RigidBodyParameters>((*bodies)[id1]->physicalParameters);
-			shared_ptr<RigidBodyParameters> rb2 = dynamic_pointer_cast<RigidBodyParameters>((*bodies)[id2]->physicalParameters);
+			shared_ptr<RigidBodyParameters> rb1 = YADE_PTR_CAST<RigidBodyParameters>((*bodies)[id1]->physicalParameters);
+			shared_ptr<RigidBodyParameters> rb2 = YADE_PTR_CAST<RigidBodyParameters>((*bodies)[id2]->physicalParameters);
 	
-			std::vector<std::pair<Vector3r,Vector3r> >::iterator cpi = (dynamic_pointer_cast<ClosestFeatures>(contact->interactionGeometry))->closestsPoints.begin();
-			std::vector<std::pair<Vector3r,Vector3r> >::iterator cpiEnd = (dynamic_pointer_cast<ClosestFeatures>(contact->interactionGeometry))->closestsPoints.end();
-			Real size = (dynamic_pointer_cast<ClosestFeatures>(contact->interactionGeometry))->closestsPoints.size();
+			std::vector<std::pair<Vector3r,Vector3r> >::iterator cpi = (YADE_PTR_CAST<ClosestFeatures>(contact->interactionGeometry))->closestsPoints.begin();
+			std::vector<std::pair<Vector3r,Vector3r> >::iterator cpiEnd = (YADE_PTR_CAST<ClosestFeatures>(contact->interactionGeometry))->closestsPoints.end();
+			Real size = (YADE_PTR_CAST<ClosestFeatures>(contact->interactionGeometry))->closestsPoints.size();
 			for( ; cpi!=cpiEnd ; ++cpi)
 			{
 				Vector3r p1 = (*cpi).first;

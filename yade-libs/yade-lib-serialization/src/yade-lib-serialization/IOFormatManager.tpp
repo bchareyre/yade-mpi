@@ -23,7 +23,7 @@ void IOFormatManager::loadFromFile(const string& libName, const string& fileName
 		throw SerializableError(IOManagerExceptions::FileNotGood);
 
 	shared_ptr<IOFormatManager> ioManager;
-	ioManager = dynamic_pointer_cast<IOFormatManager>(ClassFactory::instance().createShared(libName));
+	ioManager = YADE_PTR_CAST<IOFormatManager>(ClassFactory::instance().createShared(libName));
 
 	shared_ptr<Archive> ac = Archive::create(name,t);
 	string str = ioManager->beginDeserialization(filei,*ac);
@@ -57,7 +57,7 @@ template<typename Type>
 void IOFormatManager::loadArchive(const string& libName, istream& stream, Type& t, const string& name)
 {
 	shared_ptr<IOFormatManager> ioManager;
-	ioManager = dynamic_pointer_cast<IOFormatManager>(ClassFactory::instance().createShared(libName));
+	ioManager = YADE_PTR_CAST<IOFormatManager>(ClassFactory::instance().createShared(libName));
 
 	shared_ptr<Archive> ac = Archive::create(name,t);
 	string str = ioManager->beginDeserialization(stream,*ac);
@@ -70,7 +70,7 @@ template<typename Type>
 void IOFormatManager::saveArchive(const string& libName, ostream& stream, Type& t, const string& name)
 {
 	shared_ptr<IOFormatManager> ioManager;
-	ioManager = dynamic_pointer_cast<IOFormatManager>(ClassFactory::instance().createShared(libName));
+	ioManager = YADE_PTR_CAST<IOFormatManager>(ClassFactory::instance().createShared(libName));
 
 	shared_ptr<Archive> ac = Archive::create(name,t);
 	ioManager->beginSerialization(stream, *ac);

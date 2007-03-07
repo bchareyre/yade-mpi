@@ -28,8 +28,8 @@ bool InteractingBox2InteractingSphere4ClosestFeatures::go(		const shared_ptr<Int
 	Matrix3r axisT,axis;
 	Real depth;
 
-	shared_ptr<InteractingSphere> s = dynamic_pointer_cast<InteractingSphere>(cm2);
-	shared_ptr<InteractingBox> obb = dynamic_pointer_cast<InteractingBox>(cm1);
+	shared_ptr<InteractingSphere> s = YADE_PTR_CAST<InteractingSphere>(cm2);
+	shared_ptr<InteractingBox> obb = YADE_PTR_CAST<InteractingBox>(cm1);
 	
 	Vector3r extents = obb->extents;
 
@@ -120,7 +120,7 @@ bool InteractingBox2InteractingSphere4ClosestFeatures::goReverse(	const shared_p
 	bool isInteracting = go(cm2,cm1,se32,se31,interaction);
 	if (isInteracting)
 	{
-		shared_ptr<ClosestFeatures> cf = dynamic_pointer_cast<ClosestFeatures>(interaction->interactionGeometry);
+		shared_ptr<ClosestFeatures> cf = YADE_PTR_CAST<ClosestFeatures>(interaction->interactionGeometry);
 		Vector3r tmp = cf->closestsPoints[0].first;
 		cf->closestsPoints[0].first = cf->closestsPoints[0].second;		
 		cf->closestsPoints[0].second = tmp;

@@ -279,7 +279,7 @@ void XMLFormatManager::serializeSmartPointer(ostream& stream, Archive& ac , int 
 		}
 		else if (type==SerializableTypes::CUSTOM_CLASS)
 		{
-			shared_ptr<Serializable> s = dynamic_pointer_cast<Serializable>(ClassFactory::instance().createShared(tmpAc->getSerializableClassName()));
+			shared_ptr<Serializable> s = YADE_PTR_CAST<Serializable>(ClassFactory::instance().createShared(tmpAc->getSerializableClassName()));
 			stream << " _className_=\"" << s->getClassName() << "\" ";//>" << endl;
 			tmpAc->serialize(stream, *tmpAc, depth+1);
 		}

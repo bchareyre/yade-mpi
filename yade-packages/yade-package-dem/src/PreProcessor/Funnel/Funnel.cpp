@@ -350,8 +350,8 @@ void Funnel::positionRootBody(shared_ptr<MetaBody>& rootBody)
 	shared_ptr<AABB> aabb(new AABB);
 	aabb->diffuseColor			= Vector3r(0,0,1);
 	
-	rootBody->interactingGeometry		= dynamic_pointer_cast<InteractingGeometry>(set);	
-	rootBody->boundingVolume		= dynamic_pointer_cast<BoundingVolume>(aabb);
+	rootBody->interactingGeometry		= YADE_PTR_CAST<InteractingGeometry>(set);	
+	rootBody->boundingVolume		= YADE_PTR_CAST<BoundingVolume>(aabb);
 	rootBody->physicalParameters 		= physics;
 }
 

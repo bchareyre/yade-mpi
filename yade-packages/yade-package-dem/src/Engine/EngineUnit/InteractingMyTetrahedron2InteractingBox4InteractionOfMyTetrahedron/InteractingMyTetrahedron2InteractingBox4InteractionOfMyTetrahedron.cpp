@@ -78,7 +78,7 @@ bool InteractingMyTetrahedron2InteractingBox4InteractionOfMyTetrahedron::go(
 	if (c->isNew)
 		imt = shared_ptr<InteractionOfMyTetrahedron>(new InteractionOfMyTetrahedron());
 	else
-		imt = dynamic_pointer_cast<InteractionOfMyTetrahedron>(c->interactionGeometry);	
+		imt = YADE_PTR_CAST<InteractionOfMyTetrahedron>(c->interactionGeometry);	
 
 
 

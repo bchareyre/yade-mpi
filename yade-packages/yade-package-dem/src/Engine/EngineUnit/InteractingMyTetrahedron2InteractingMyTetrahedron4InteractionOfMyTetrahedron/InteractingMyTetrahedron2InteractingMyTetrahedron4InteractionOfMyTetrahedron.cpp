@@ -39,7 +39,7 @@ bool InteractingMyTetrahedron2InteractingMyTetrahedron4InteractionOfMyTetrahedro
 	if (c->isNew)
 		imt = shared_ptr<InteractionOfMyTetrahedron>(new InteractionOfMyTetrahedron());
 	else
-		imt = dynamic_pointer_cast<InteractionOfMyTetrahedron>(c->interactionGeometry);	
+		imt = YADE_PTR_CAST<InteractionOfMyTetrahedron>(c->interactionGeometry);	
 
 	bool isInteracting = false;
 	for(int i=0 ; i<4 ; ++i )

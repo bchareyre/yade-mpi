@@ -41,7 +41,7 @@ bool Archive::containsOnlyFundamentals()
 		}
 		else if (recordType==SerializableTypes::CUSTOM_CLASS)
 		{
-			shared_ptr<Serializable> s = dynamic_pointer_cast<Serializable>(ClassFactory::instance().createShared(getSerializableClassName()));
+			shared_ptr<Serializable> s = YADE_PTR_CAST<Serializable>(ClassFactory::instance().createShared(getSerializableClassName()));
 			s->registerAttributes();
 			bool result = s->containsOnlyFundamentals();
 			s->archives.clear();

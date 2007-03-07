@@ -247,10 +247,10 @@ string ThreePointBending::generate()
 		{
 			shared_ptr<Body> bodyB = *bi2;
 
-			shared_ptr<BodyMacroParameters> a = dynamic_pointer_cast<BodyMacroParameters>(bodyA->physicalParameters);
-			shared_ptr<BodyMacroParameters> b = dynamic_pointer_cast<BodyMacroParameters>(bodyB->physicalParameters);
-			shared_ptr<InteractingSphere>	as = dynamic_pointer_cast<InteractingSphere>(bodyA->interactingGeometry);
-			shared_ptr<InteractingSphere>	bs = dynamic_pointer_cast<InteractingSphere>(bodyB->interactingGeometry);
+			shared_ptr<BodyMacroParameters> a = YADE_PTR_CAST<BodyMacroParameters>(bodyA->physicalParameters);
+			shared_ptr<BodyMacroParameters> b = YADE_PTR_CAST<BodyMacroParameters>(bodyB->physicalParameters);
+			shared_ptr<InteractingSphere>	as = YADE_PTR_CAST<InteractingSphere>(bodyA->interactingGeometry);
+			shared_ptr<InteractingSphere>	bs = YADE_PTR_CAST<InteractingSphere>(bodyB->interactingGeometry);
 
 			if ((a->se3.position - b->se3.position).Length() < (as->radius + bs->radius))  
 			{
@@ -427,8 +427,8 @@ void ThreePointBending::positionRootBody(shared_ptr<MetaBody>& rootBody)
 	shared_ptr<AABB> aabb(new AABB);
 	aabb->diffuseColor		= Vector3r(0,0,1);
 	
-	rootBody->interactingGeometry	= dynamic_pointer_cast<InteractingGeometry>(set);	
-	rootBody->boundingVolume	= dynamic_pointer_cast<BoundingVolume>(aabb);
+	rootBody->interactingGeometry	= YADE_PTR_CAST<InteractingGeometry>(set);	
+	rootBody->boundingVolume	= YADE_PTR_CAST<BoundingVolume>(aabb);
 	rootBody->physicalParameters 	= physics;
 	
 }

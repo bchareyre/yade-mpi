@@ -86,7 +86,7 @@ bool InteractingBox2InteractingSphere4SpheresContactGeometry::go(
 		if (c->isNew)
 			scm = shared_ptr<SpheresContactGeometry>(new SpheresContactGeometry());
 		else
-			scm = dynamic_pointer_cast<SpheresContactGeometry>(c->interactionGeometry);
+			scm = YADE_PTR_CAST<SpheresContactGeometry>(c->interactionGeometry);
 			
 		scm->contactPoint = 0.5*(pt1+pt2);
 		scm->normal = pt1-pt2;
@@ -129,7 +129,7 @@ bool InteractingBox2InteractingSphere4SpheresContactGeometry::go(
 	if (c->isNew)
 		scm = shared_ptr<SpheresContactGeometry>(new SpheresContactGeometry());
 	else
-		scm = dynamic_pointer_cast<SpheresContactGeometry>(c->interactionGeometry);	
+		scm = YADE_PTR_CAST<SpheresContactGeometry>(c->interactionGeometry);	
 	scm->contactPoint = 0.5*(pt1+pt2);
 	scm->normal = pt1-pt2;
 	scm->penetrationDepth = scm->normal.Normalize();

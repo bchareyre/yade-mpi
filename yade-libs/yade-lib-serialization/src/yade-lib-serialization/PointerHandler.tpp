@@ -56,9 +56,9 @@ struct PointerHandler<shared_ptr<PointedType> >
 				// proper solution is to write template specialization for PointerHandler< int >
 				// if you need it - then write it.
 
-//				shared_ptr<Serializable> newInstance = dynamic_pointer_cast<Serializable>(ClassFactory::instance().createShared(typeStr));
+//				shared_ptr<Serializable> newInstance = YADE_PTR_CAST<Serializable>(ClassFactory::instance().createShared(typeStr));
 //				tmpPtr		= any_cast< shared_ptr<PointedType>* >(ac.getAddress());	
-//				*tmpPtr 	= dynamic_pointer_cast<PointedType>(newInstance);
+//				*tmpPtr 	= YADE_PTR_CAST<PointedType>(newInstance);
 //				newAc 		= Archive::create(name,**tmpPtr);
 
 // original h4x00r lines .....

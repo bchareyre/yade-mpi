@@ -42,7 +42,7 @@ bool InteractingSphere2InteractingSphere4SpheresContactGeometry::go(	const share
 	shared_ptr<SpheresContactGeometry> scm;
 	if (c->interactionGeometry)
 	{
-		//scm = dynamic_pointer_cast<SpheresContactGeometry>(c->interactionGeometry);
+		//scm = YADE_PTR_CAST<SpheresContactGeometry>(c->interactionGeometry);
 		scm = static_pointer_cast<SpheresContactGeometry>(c->interactionGeometry);
 	// BEGIN .......  FIXME FIXME	- wrong hack, to make cohesion work.
 		if(! scm) // this is not SpheresContactGeometry, so it is SDECLinkGeometry, dispatcher should do this job.

@@ -134,10 +134,10 @@ shared_ptr<MetaBody> Shop::rootBody(){
 	rootBody->physicalParameters=physics;
 
 	shared_ptr<MetaInteractingGeometry> set(new MetaInteractingGeometry());	set->diffuseColor=Vector3r(0,0,1);
-	rootBody->interactingGeometry=dynamic_pointer_cast<InteractingGeometry>(set);	
+	rootBody->interactingGeometry=YADE_PTR_CAST<InteractingGeometry>(set);	
 	
 	shared_ptr<AABB> aabb(new AABB); aabb->diffuseColor=Vector3r(0,0,1);
-	rootBody->boundingVolume=dynamic_pointer_cast<BoundingVolume>(aabb);
+	rootBody->boundingVolume=YADE_PTR_CAST<BoundingVolume>(aabb);
 	
 	rootBody->persistentInteractions=shared_ptr<InteractionContainer>(new InteractionVecSet);
 	rootBody->transientInteractions=shared_ptr<InteractionContainer>(new InteractionVecSet);

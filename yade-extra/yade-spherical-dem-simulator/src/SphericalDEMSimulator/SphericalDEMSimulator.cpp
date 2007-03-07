@@ -196,7 +196,7 @@ void SphericalDEMSimulator::loadConfigurationFile(const string& fileName)
 		shared_ptr<InteractionPhysicsMetaEngine> ipme = dynamic_pointer_cast<InteractionPhysicsMetaEngine>(e);
 		if (ipme)
 		{
-			shared_ptr<MacroMicroElasticRelationships> mmer = dynamic_pointer_cast<MacroMicroElasticRelationships>(ipme->getExecutor("BodyMacroParameters","BodyMacroParameters"));
+			shared_ptr<MacroMicroElasticRelationships> mmer = YADE_PTR_CAST<MacroMicroElasticRelationships>(ipme->getExecutor("BodyMacroParameters","BodyMacroParameters"));
 			assert(e);
 			alpha	= mmer->alpha;
 			beta	= mmer->beta;
@@ -206,8 +206,8 @@ void SphericalDEMSimulator::loadConfigurationFile(const string& fileName)
 		shared_ptr<PhysicalActionDamper> pade = dynamic_pointer_cast<PhysicalActionDamper>(e);
 		if (pade)
 		{	
-			shared_ptr<CundallNonViscousForceDamping> cnvfd = dynamic_pointer_cast<CundallNonViscousForceDamping>(pade->getExecutor("Force","RigidBodyParameters"));
-			shared_ptr<CundallNonViscousMomentumDamping> cnvmd = dynamic_pointer_cast<CundallNonViscousMomentumDamping>(pade->getExecutor("Momentum","RigidBodyParameters"));
+			shared_ptr<CundallNonViscousForceDamping> cnvfd = YADE_PTR_CAST<CundallNonViscousForceDamping>(pade->getExecutor("Force","RigidBodyParameters"));
+			shared_ptr<CundallNonViscousMomentumDamping> cnvmd = YADE_PTR_CAST<CundallNonViscousMomentumDamping>(pade->getExecutor("Momentum","RigidBodyParameters"));
 			assert(cnvfd);
 			assert(cnvmd);
 			forceDamping 	= cnvfd->damping;

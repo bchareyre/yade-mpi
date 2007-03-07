@@ -53,7 +53,7 @@ another would be HerzMindlinContactModel
 		if ( interaction->isNew)
 		{
 			interaction->interactionPhysics = shared_ptr<ElasticContactInteraction>(new ElasticContactInteraction());
-			contactPhysics = dynamic_pointer_cast<ElasticContactInteraction>(interaction->interactionPhysics);
+			contactPhysics = YADE_PTR_CAST<ElasticContactInteraction>(interaction->interactionPhysics);
 			
 			contactPhysics->initialKn			= 2*(sdec1->kn*sdec2->kn)/(sdec1->kn+sdec2->kn);
 			contactPhysics->initialKs			= 2*(sdec1->ks*sdec2->ks)/(sdec1->ks+sdec2->ks);
@@ -61,7 +61,7 @@ another would be HerzMindlinContactModel
 			contactPhysics->initialEquilibriumDistance	= interactionGeometry->radius1+interactionGeometry->radius2;
 		}
 		else
-			contactPhysics = dynamic_pointer_cast<ElasticContactInteraction>(interaction->interactionPhysics);
+			contactPhysics = YADE_PTR_CAST<ElasticContactInteraction>(interaction->interactionPhysics);
 		
 		contactPhysics->kn = contactPhysics->initialKn;
 		contactPhysics->ks = contactPhysics->initialKs;

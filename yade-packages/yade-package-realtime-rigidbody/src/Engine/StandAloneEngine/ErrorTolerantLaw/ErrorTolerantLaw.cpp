@@ -64,7 +64,7 @@ void ErrorTolerantLaw::action(Body* body)
 			b = *bi;
 
 			int offset = 6*i;
-			shared_ptr<RigidBodyParameters> rb = dynamic_pointer_cast<RigidBodyParameters>(b);
+			shared_ptr<RigidBodyParameters> rb = YADE_PTR_CAST<RigidBodyParameters>(b);
 			invM(offset,offset++) = 1.0/rb->mass;
 			invM(offset,offset++) = 1.0/rb->mass;
 			invM(offset,offset++) = 1.0/rb->mass;
@@ -107,7 +107,7 @@ void ErrorTolerantLaw::action(Body* body)
 			if (contact->isReal)
 			{
 
-				shared_ptr<ErrorTolerantContact> cm = dynamic_pointer_cast<ErrorTolerantContact>(contact->interactionGeometry);
+				shared_ptr<ErrorTolerantContact> cm = YADE_PTR_CAST<ErrorTolerantContact>(contact->interactionGeometry);
 	
 				id1 		= contact->getId1();
 				id2 		= contact->getId2();

@@ -35,7 +35,7 @@ void PhysicalActionContainerInitializer::action(Body* body)
 	
 	for(unsigned int i = 0 ; i < physicalActionNames.size() ; ++i )
 		physicalActions.push_back(
-			dynamic_pointer_cast<PhysicalAction>
+			YADE_PTR_CAST<PhysicalAction>
 				(ClassFactory::instance().createShared(physicalActionNames[i]))
 		);
 	

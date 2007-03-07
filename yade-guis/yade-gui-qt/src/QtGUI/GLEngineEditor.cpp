@@ -291,7 +291,7 @@ void GLEngineEditor::resizeEvent(QResizeEvent * e)
 
 void GLEngineEditor::updateLabel(int i)
 {
-	shared_ptr<GLTextLabel> tl = dynamic_pointer_cast<GLTextLabel>(wm.getWindow(i));
+	shared_ptr<GLTextLabel> tl = YADE_PTR_CAST<GLTextLabel>(wm.getWindow(i));
 	//tl->setText(data->fracProperties[i]->name);
 	//tl->setBorderColor(data->fractures[i]->color[0],data->fractures[i]->color[1],data->fractures[i]->color[2]);
 	tl->fitTextSize();

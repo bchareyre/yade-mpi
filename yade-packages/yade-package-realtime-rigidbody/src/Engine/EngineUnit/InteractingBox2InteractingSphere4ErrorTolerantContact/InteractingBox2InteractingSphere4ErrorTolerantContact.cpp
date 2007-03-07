@@ -28,8 +28,8 @@ bool InteractingBox2InteractingSphere4ErrorTolerantContact::go(		const shared_pt
 	Matrix3r axisT,axis;
 	float depth;
 
-	shared_ptr<Sphere> s = dynamic_pointer_cast<Sphere>(cm2);
-	shared_ptr<Box> obb = dynamic_pointer_cast<Box>(cm1);
+	shared_ptr<Sphere> s = YADE_PTR_CAST<Sphere>(cm2);
+	shared_ptr<Box> obb = YADE_PTR_CAST<Box>(cm1);
 	
 	Vector3r extents = obb->extents;
 
@@ -128,7 +128,7 @@ bool InteractingBox2InteractingSphere4ErrorTolerantContact::goReverse(	const sha
 	bool isInteracting = go(cm2,cm1,se32,se31,c);
 	if (isInteracting)
 	{
-		shared_ptr<ErrorTolerantContact> cm = dynamic_pointer_cast<ErrorTolerantContact>(c->interactionGeometry);
+		shared_ptr<ErrorTolerantContact> cm = YADE_PTR_CAST<ErrorTolerantContact>(c->interactionGeometry);
 
 		Vector3r tmp = cm->closestPoints[0].first;
 		cm->closestPoints[0].first = cm->closestPoints[0].second;

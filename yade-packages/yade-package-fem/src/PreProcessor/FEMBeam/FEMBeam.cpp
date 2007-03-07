@@ -208,14 +208,14 @@ void FEMBeam::positionRootBody(shared_ptr<MetaBody>& rootBody)
 	shared_ptr<AABB> aabb(new AABB);
 	aabb->diffuseColor			= Vector3r(0,0,1);
 
-	shared_ptr<GeometricalModel> gm 	= dynamic_pointer_cast<GeometricalModel>(ClassFactory::instance().createShared("FEMSetGeometry"));
+	shared_ptr<GeometricalModel> gm 	= YADE_PTR_CAST<GeometricalModel>(ClassFactory::instance().createShared("FEMSetGeometry"));
 	gm->diffuseColor 			= Vector3r(1,1,1);
 	gm->wire 				= false;
 	gm->visible 				= true;
 	gm->shadowCaster 			= true;
 	
-	rootBody->interactingGeometry 		= dynamic_pointer_cast<InteractingGeometry>(set);	
-	rootBody->boundingVolume		= dynamic_pointer_cast<BoundingVolume>(aabb);
+	rootBody->interactingGeometry 		= YADE_PTR_CAST<InteractingGeometry>(set);	
+	rootBody->boundingVolume		= YADE_PTR_CAST<BoundingVolume>(aabb);
 	rootBody->geometricalModel 		= gm;
 	rootBody->physicalParameters 		= physics;
 }

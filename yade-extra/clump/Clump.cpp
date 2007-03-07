@@ -29,10 +29,9 @@ void ClumpMemberMover::applyCondition(Body* _rootBody){
 	MetaBody* rootBody = YADE_CAST<MetaBody*>(_rootBody);
 	for(BodyContainer::iterator I=rootBody->bodies->begin(); I!=rootBody->bodies->end(); ++I){
 		shared_ptr<Body> b = *I;
-		// is this a clump?
-		if(b->getId()==b->clumpId){
+		if(b->isClump()){
 			//LOG_TRACE("Applying movement to clump #"<<b->getId());
-			dynamic_pointer_cast<Clump>(b)->moveMembers();
+			static_cast<Clump*>(b.get())->moveMembers();
 		}
 	}
 	//if(!clump->isDynamic) return; // perhaps clump that has been desactivated?!
@@ -107,11 +106,11 @@ void Clump::del(Body::id_t subId){
  */
 void Clump::moveMembers(){
 	const Se3r& mySe3(physicalParameters->se3);
-	const shared_ptr<RigidBodyParameters>& myRBP(dynamic_pointer_cast<RigidBodyParameters>(physicalParameters));
+	const shared_ptr<RigidBodyParameters>& myRBP=static_pointer_cast<RigidBodyParameters>(physicalParameters);
 	for(Clump::memberMap::iterator I=members.begin(); I!=members.end(); I++){
 		// now, I->first is Body::id_t, I->second is Se3r of that body in the clump
-		shared_ptr<Body> subBody=Body::byId(I->first);
-		shared_ptr<RigidBodyParameters> subRBP=dynamic_pointer_cast<RigidBodyParameters>(subBody->physicalParameters);
+		shared_ptr<Body> member=Body::byId(I->first);
+		const shared_ptr<RigidBodyParameters>& subRBP(YADE_PTR_CAST<RigidBodyParameters>(member->physicalParameters));
 		//LOG_TRACE("Old #"<<I->first<<"position: "<<subRBP->se3.position);
 		subRBP->se3.position=mySe3.position+mySe3.orientation*I->second.position;
 		subRBP->se3.orientation=mySe3.orientation*I->second.orientation;
@@ -125,7 +124,7 @@ void Clump::moveMembers(){
 	/* @bug Temporarily we reset acceleration and angularAcceleration of the clump here;
 	 * should be a new negine that will take care of that?
 	 */
-	shared_ptr<RigidBodyParameters> clumpRBP=dynamic_pointer_cast<RigidBodyParameters>(physicalParameters);
+	const shared_ptr<RigidBodyParameters>& clumpRBP(YADE_PTR_CAST<RigidBodyParameters>(physicalParameters));
 	#if 0
 		if(Omega::instance().getCurrentIteration()%50==0){
 			Real Erot=.5*clumpRBP->inertia[0]*pow(clumpRBP->angularVelocity[0],2)+.5*clumpRBP->inertia[1]*pow(clumpRBP->angularVelocity[1],2)+.5*clumpRBP->inertia[2]*pow(clumpRBP->angularVelocity[2],2);
@@ -185,13 +184,13 @@ void Clump::updateProperties(bool intersecting){
 	Vector3r Sg(0,0,0); // static moment
 	Matrix3r Ig(true /* fill with zeros */ ), Ic(true); // tensors of inertia; is upper triangular, zeros instead of symmetric elements
 	Se3r& mySe3(physicalParameters->se3);
-	const shared_ptr<RigidBodyParameters>& clumpRBP(dynamic_pointer_cast<RigidBodyParameters>(physicalParameters));
+	const shared_ptr<RigidBodyParameters>& clumpRBP(YADE_PTR_CAST<RigidBodyParameters>(physicalParameters));
 
 	if(members.size()==1){
 		LOG_DEBUG("Clump of size one will be treated specially.")
 		memberMap::iterator I=members.begin();
 		shared_ptr<Body> subBody=Body::byId(I->first);
-		shared_ptr<RigidBodyParameters> subRBP=dynamic_pointer_cast<RigidBodyParameters>(subBody->physicalParameters);
+		const shared_ptr<RigidBodyParameters>& subRBP(YADE_PTR_CAST<RigidBodyParameters>(subBody->physicalParameters));
 		mySe3.position=subRBP->se3.position;
 		mySe3.orientation=subRBP->se3.orientation;
 		clumpRBP->inertia=subRBP->inertia;
@@ -210,7 +209,7 @@ void Clump::updateProperties(bool intersecting){
 		for(memberMap::iterator I=members.begin(); I!=members.end(); I++){
 			// now, I->first is Body::id_t, I->second is Se3r of that body
 			shared_ptr<Body> subBody=Body::byId(I->first);
-			shared_ptr<RigidBodyParameters> subRBP=dynamic_pointer_cast<RigidBodyParameters>(subBody->physicalParameters);
+			const shared_ptr<RigidBodyParameters>& subRBP(YADE_PTR_CAST<RigidBodyParameters>(subBody->physicalParameters));
 			M+=subRBP->mass;
 			Sg+=subRBP->mass*subRBP->se3.position;
 			// transform from local to global coords
@@ -259,7 +258,7 @@ void Clump::updateProperties(bool intersecting){
 			//!!!!! note that this is HIGHLY incorrect for all non-single clumps !!!!!
 			memberMap::iterator I=members.begin();
 			shared_ptr<Body> subBody=Body::byId(I->first);
-			shared_ptr<RigidBodyParameters> subRBP=dynamic_pointer_cast<RigidBodyParameters>(subBody->physicalParameters);
+			const shared_ptr<RigidBodyParameters>& subRBP(YADE_PTR_CAST<RigidBodyParameters>(subBody->physicalParameters));
 			clumpRBP->inertia=subRBP->inertia*10.; // 10 is arbitrary; just to have inertia of clump bigger
 			// orientation of the clump is broken as well, since is result of EigenDecomposition as well (rotation matrix)
 			mySe3.orientation.FromRotationMatrix(Matrix3r(1,0,0,0,1,0,0,0,1));
@@ -276,7 +275,7 @@ void Clump::updateProperties(bool intersecting){
 	for(memberMap::iterator I=members.begin(); I!=members.end(); I++){
 		// now, I->first is Body::id_t, I->second is Se3r of that body
 		shared_ptr<Body> subBody=Body::byId(I->first);
-		shared_ptr<RigidBodyParameters> subRBP=dynamic_pointer_cast<RigidBodyParameters>(subBody->physicalParameters);
+		const shared_ptr<RigidBodyParameters>& subRBP(YADE_PTR_CAST<RigidBodyParameters>(subBody->physicalParameters));
 		I->second.orientation=mySe3.orientation.Conjugate()*subRBP->se3.orientation;
 		I->second.position=mySe3.orientation.Conjugate()*(subRBP->se3.position-mySe3.position);
 	}
@@ -414,7 +413,7 @@ void ClumpTestGen::createOneClump(shared_ptr<MetaBody>& rootBody, Vector3r clump
 	
 	// empty clump	
 	shared_ptr<Clump> clump=shared_ptr<Clump>(new Clump());
-	shared_ptr<Body> clumpAsBody=dynamic_pointer_cast<Body>(clump);
+	shared_ptr<Body> clumpAsBody(static_pointer_cast<Body>(clump));
 	rootBody->bodies->insert(clumpAsBody);
 
 	clump->isDynamic=true;
