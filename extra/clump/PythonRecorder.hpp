@@ -7,6 +7,7 @@
 	#error EMBED_PYTHON must be defined for this module to work!
 #endif
 
+#include<Python.h>
 #include<string>
 #include<yade/core/DataRecorder.hpp>
 #include<yade/lib-base/Logging.hpp>
@@ -16,22 +17,27 @@
  * The expressions to access yade's internals are described in documentation for pyade.py and pyade.cpp.
  *
  * */
-class PythonRecorder : public DataRecorder
+class PythonRecorder: public DataRecorder
 {
 	private:
+		//! simple call to 
+		PyObject *compiledRunExprCall;
+		//! dictionary of globals, for passing to PyEval_EvalCode
+		PyObject *mainDict;
+		//! runExpr, but string-transformed to python function definition
+		std::string runExprAsDef;
 	public :
 		//! Constructor that imports pyade module (warns if there is an error).
 		PythonRecorder();
 		virtual void action(Body* b);
 		virtual bool isActivated(){return true;}
-		virtual void registerAttributes(){DataRecorder::registerAttributes(); REGISTER_ATTRIBUTE(expression); REGISTER_ATTRIBUTE(initExpression); REGISTER_ATTRIBUTE(outputFile);}
-		//! This expression will be interpreted when the engine is called.
-		std::string expression;
-		//! Piece of python code run on intialization
-		std::string initExpression;
+		virtual void registerAttributes(){DataRecorder::registerAttributes(); REGISTER_ATTRIBUTE(runExpr); REGISTER_ATTRIBUTE(initExpr); REGISTER_ATTRIBUTE(outputFile);}
+		//! This expression will be interpreted when the engine is called (every iteration)
+		std::string runExpr;
+		//! Piece of python code run on intialization (deserialization)
+		std::string initExpr;
 		//! If not empty, python sys.stdout will be redirected to this file (overwritten every time!)
 		std::string outputFile;
-		//std::string initExpression;
 	protected :
 		virtual void postProcessAttributes(bool deserializing);
 	DECLARE_LOGGER;

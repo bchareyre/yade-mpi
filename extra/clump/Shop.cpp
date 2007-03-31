@@ -117,7 +117,7 @@ void Shop::init(){
 	setDefault("param_momentRotationLaw",true);
 
 	setDefault("param_pythonInitExpr",string("print 'Hello world!'"));
-	setDefault("param_pythonExpr",string(""));
+	setDefault("param_pythonRunExpr",string(""));
 
 }
 
@@ -237,10 +237,10 @@ void Shop::rootBodyActors(shared_ptr<MetaBody> rootBody){
 	rootBody->engines.push_back(orientationIntegrator);
 
 	#ifdef EMBED_PYTHON
-		if(getDefault<string>("param_pythonExpr").length()>0 || getDefault<string>("param_pythonInitExpr").length()>0){
+		if(getDefault<string>("param_pythonRunExpr").length()>0 || getDefault<string>("param_pythonInitExpr").length()>0){
 			shared_ptr<PythonRecorder> pythonRecorder=shared_ptr<PythonRecorder>(new PythonRecorder);
-			pythonRecorder->initExpression=getDefault<string>("param_pythonInitExpr");
-			pythonRecorder->expression=getDefault<string>("param_pythonExpr");
+			pythonRecorder->initExpr=getDefault<string>("param_pythonInitExpr");
+			pythonRecorder->runExpr=getDefault<string>("param_pythonRunExpr");
 			rootBody->engines.push_back(pythonRecorder);
 		}
 	#endif

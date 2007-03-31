@@ -10,6 +10,7 @@
 
 #ifdef EMBED_PYTHON
 	#include<Python.h>
+	extern int Py_OptimizeFlag;
 #endif
 
 #include<signal.h>
@@ -151,6 +152,7 @@ int main(int argc, char *argv[])
 
 	#ifdef EMBED_PYTHON
 		LOG_DEBUG("Initializing Python...");
+		Py_OptimizeFlag=1;
 		Py_Initialize();
 		signal(SIGINT,sigHandler);
 	#endif
