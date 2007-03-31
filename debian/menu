@@ -1,0 +1,1 @@
+?package(yade):needs="X11" section="Apps/Science" title="yade" command="/usr/bin/yade"

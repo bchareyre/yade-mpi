@@ -1,0 +1,72 @@
+Import('*')
+env.Install('$PREFIX/lib/yade$SUFFIX/lib',[
+
+	env.SharedLibrary('yade-base',
+		['base/yadeWm3Extra.cpp'],
+		LIBS=env['LIBS']),
+
+	env.SharedLibrary('miniWm3',
+		['miniWm3/Wm3Math.cpp',
+			'miniWm3/Wm3Matrix3.cpp',
+			'miniWm3/Wm3Quaternion.cpp',
+			'miniWm3/Wm3Vector3.cpp',
+			'miniWm3/Wm3Matrix2.cpp',
+			'miniWm3/Wm3Matrix4.cpp',
+			'miniWm3/Wm3Vector2.cpp',
+			'miniWm3/Wm3Vector4.cpp',
+			'miniWm3/Wm3Memory.cpp',
+			'miniWm3/Wm3String.cpp',
+			'miniWm3/Wm3System.cpp'],
+		# miniWm3 cannot link with itself, filter it out.
+		LIBS=filter(lambda l: l!='miniWm3',env['LIBS']),
+		# miniWm3 will be always optimized and without debugging info, even in debug builds.
+		CXXFLAGS=env['CXXFLAGS']+['-O3','-g0']),
+
+	env.SharedLibrary('yade-computational-geometry',
+		['computational-geometry/Distances2D.cpp',
+			'computational-geometry/Distances3D.cpp',
+			'computational-geometry/Intersections2D.cpp',
+			'computational-geometry/Intersections3D.cpp',
+			'computational-geometry/MarchingCube.cpp'],
+		LIBS=env['LIBS']+['yade-base']),
+
+	env.SharedLibrary('yade-factory',
+		['factory/ClassFactory.cpp',
+			'factory/DynLibManager.cpp',
+			'factory/FactoryExceptions.cpp']),
+
+	env.SharedLibrary('yade-loki',
+		['loki/_dummySourceFile.cpp']),
+
+	env.SharedLibrary('yade-multimethods',
+		['multimethods/Indexable.cpp',
+			'multimethods/MultiMethodsExceptions.cpp']),
+
+	env.SharedLibrary('yade-opengl',
+		['opengl/FpsTracker.cpp',
+			'opengl/GLTextLabel.cpp',
+			'opengl/GLWindow.cpp',
+			'opengl/GLWindowsManager.cpp'],
+		LIBS=env['LIBS']+['glut']),
+
+	env.SharedLibrary('BINFormatManager',
+		['serialization-bin/BINFormatManager.cpp']),
+
+	env.SharedLibrary('yade-serialization-qt',
+		['serialization-qt/QtGUIGenerator.cpp'],
+		LIBS=env['LIBS']+['yade-base','XMLFormatManager']),
+
+	env.SharedLibrary('XMLFormatManager',
+		['serialization-xml/XMLFormatManager.cpp',
+			'serialization-xml/XMLSaxParser.cpp'],
+		LIBS=env['LIBS']+['yade-base']),
+
+	env.SharedLibrary('yade-serialization',
+		['serialization/Archive.cpp',
+			'serialization/IOFormatManager.cpp',
+			'serialization/IOManagerExceptions.cpp',
+			'serialization/Serializable.cpp',
+			'serialization/SerializableSingleton.cpp',
+			'serialization/SerializationExceptions.cpp'])
+])
+

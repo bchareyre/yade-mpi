@@ -1,0 +1,16 @@
+#!/bin/sh
+SVNVERSION="svn$( svn info | egrep '^Revision:' | cut -f2 -d' ')"
+_SVNVERSION="-$SVNVERSION"
+echo $SVNVERSION > SVNVERSION
+cp debian/control-svn-template debian/control
+perl -pi -e"s/\@SVNVERSION\@/$SVNVERSION/g" debian/control
+perl -pi -e"s/\@_SVNVERSION\@/$_SVNVERSION/g" debian/control
+
+cat <<EOF > debian/changelog
+yade$_SVNVERSION (1) unstable; urgency=low
+
+  * Building of svn snapshots as separate debian packages.
+
+ -- Vaclav Smilauer <eudoxos@arcig.cz>  Thu,  12 Mar 2007 12:44:19 +0100
+EOF
+

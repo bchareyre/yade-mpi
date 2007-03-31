@@ -1,9 +1,0 @@
-yade-flat directory is solely for debugging purposes. Shouldn't be packaged or
-used by non-developers.
-
-before using it, please run yade-scripts/makeFlat from trunk/ directory, and
-make sure that src/src.pro is up to date.
-
-yade-flat is scanning for plugins, this can be considered a bug.
-But it's yade-flat specific, so probably will never be fixed.
-

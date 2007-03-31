@@ -1,0 +1,36 @@
+Source: yade@_SVNVERSION@
+Section: x11
+Priority: optional
+Maintainer: Vaclav Smilauer <eudoxos@arcig.cz>
+Build-Depends: debhelper (>= 5), scons, lib3dviewer-dev, wildmagic-dev, libqt3-mt-dev, qt3-dev-tools, python-dev, freeglut3-dev, libboost-date-time-dev, libboost-filesystem-dev, libboost-thread-dev, liblog4cxx9-dev, docbook-to-man, python-scientific
+Standards-Version: 3.7.2
+
+Package: yade@_SVNVERSION@
+Architecture: any
+Provides: yade-svn
+Depends: ${shlibs:Depends}, ${misc:Depends}, python-scientific
+Description: Platform for dynamical modeling.
+ Yet Another Dynamic Engine. etc.
+ .
+ This package contains speed-optimized build of yade.
+
+Package: yade@_SVNVERSION@-dbg
+Architecture: any
+Provides: yade-svn-dbg
+Depends: ${shlibs:Depends}, ${misc:Depends}, python-scientific, gdb
+Description: Platform for dynamical modeling.
+ Yet Another Dynamic Engine. etc.
+ .
+ This package contains debug build of yade.
+
+
+Package: yade@_SVNVERSION@-dev
+Architecture: all
+Provides: yade-svn-dev
+Recommends: yade@_SVNVERSION@ | yade@_SVNVERSION@-dbg
+Depends: pkg-config
+Description: Platform for dynamical modeling.
+ Yet Another Dynamic Engine. etc.
+ .
+ This package contains headers for yade.
+

@@ -38,24 +38,29 @@ opts=Options(optsFile)
 # The convention now is, that
 #  1. CAPITALIZED options are
 #   (a) notorious shell variables (they correspons most the time to SCons environment options of the same name - like CPPPATH)
-#   (b) c preprocessor macros available to the program source (like PREFIX and POSTFIX)
+#   (b) c preprocessor macros available to the program source (like PREFIX and SUFFIX)
 #  2. lowercase options influence the building process, compiler options and the like.
 #
 opts.AddOptions(
-	PathOption('PREFIX', 'Install path prefix', '/usr/local'),
-	('POSTFIX','Local version appended to binary, library and config directory (beware: if PREFIX is the same, headers of the older version will still be overwritten','',None,lambda x:x),
+	### OLD: use PathOption with PathOption.PathIsDirCreate, but that doesn't exist in 0.96.1!
+	('PREFIX','Install path prefix','/usr/local'),
+	PathOption('runtimePREFIX','Runtime path prefix; DO NOT USE, inteded for packaging only.','$PREFIX'),
+	('variant','Build variant, will be suffixed to all files, along with version (beware: if PREFIX is the same, headers of the older version will still be overwritten','',None,lambda x:x),
 	BoolOption('debug', 'Enable debugging information and disable optimizations',1),
 	BoolOption('profile','Enable profiling information',0),
 	BoolOption('optimize','Turn on heavy optimizations (generates SSE2 instructions)',0),
 	ListOption('exclude','Components that will not be built','none',names=['extra','common','dem','fem','lattice','mass-spring','realtime-rigidbody']),
 	('jobs','Number of jobs to run at the same time (same as -j, but saved)',4,None,int),
 	('extraModules', 'Extra directories with their own SConscript files (must be in-tree) (whitespace separated)',None,None,Split),
-	('buildPrefix','Where to create build-[version][POSTFIX] directory for intermediary files','..'),
-	('CPPPATH', 'Additional paths for the C preprocessor (whitespace separated)',['/usr/include/wm3'],None,Split),
+	('buildPrefix','Where to create build-[version][variant] directory for intermediary files','..'),
+	('version','Yade version (if not specified, guess will be attempted)',None),
+	('CPPPATH', 'Additional paths for the C preprocessor (whitespace separated)',None,None,Split),
 	('LIBPATH','Additional paths for the linker (whitespace separated)',None,None,Split),
 	('QTDIR','Directories where to look for qt3',['/usr/share/qt3','/usr/lib/qt'],None,Split),
-	('CXX','The c++ compiler','distcc g++-4.0'),
-	BoolOption('pretty',"Don't show compiler command line (like the Linux kernel)",1)
+	('CXX','The c++ compiler','g++'),
+	('CXXFLAGS','Additional compiler flags; you can use them for tuning like -march=pentium4.',None,None,Split), # not tested if really propagates
+	BoolOption('pretty',"Don't show compiler command line (like the Linux kernel)",1),
+	BoolOption('useMiniWm3','use local miniWm3 library instead of Wm3Foundation',0),
 )
 
 ### create THE environment
@@ -63,7 +68,8 @@ env=Environment(tools=['default'],options=opts)
 # do not propagate PATH from outside, to ensure identical builds on different machines
 #env.Append(ENV={'PATH':['/usr/local/bin','/bin','/usr/bin']})
 # ccache needs $HOME to be set; colorgcc needs $TERM; distcc wants DISTCC_HOSTS
-propagatedEnvVars=['HOME','TERM','DISTCC_HOSTS']
+# fakeroot needs FAKEROOTKEY and LD_PRELOAD
+propagatedEnvVars=['HOME','TERM','DISTCC_HOSTS','LD_PRELOAD','FAKEROOTKEY','LD_LIBRARY_PATH']
 for v in propagatedEnvVars:
 	if os.environ.has_key(v): env.Append(ENV={v:os.environ[v]})
 
@@ -71,12 +77,46 @@ opts.Save(optsFile,env)
 opts.FormatOptionHelpText=lambda env,opt,help,default,actual: "%10s: %5s [%s] (%s)\n"%(opt,actual,default,help)
 Help(opts.GenerateHelpText(env))
 
+###########################################
+################# BUILD DIRECTORY #########
+###########################################
+
+##ALL generated stuff should go here - therefore we must determine it very early!!
+
+if not env.has_key('version'):
+	"Attempts to get yade version from local svn tree; should be extended so that it works for releases as well (not yet applicable)."
+	svnRevision=None
+	for l in os.popen("svn info").readlines():
+		m=re.match(r'Revision: ([0-9]+)',l)
+		if m: env['version']='svn'+m.group(1)
+	if not env.has_key('version'): env['version']='unknown'
+env['SUFFIX']='-'+env['version']+env['variant']
+print "Yade version is `%s', installed files will be suffixed with `%s'."%(env['version'],env['SUFFIX'])
+# make buildDir absolute, saves hassles later
+buildDir=os.path.abspath(env.subst('$buildPrefix/build$SUFFIX'))
+print "All intermediary files will be in `%s'."%env.subst(buildDir)
+env['buildDir']=buildDir
+# these MUST be first so that builddir's headers are read before any locally installed ones
+buildInc='$buildDir/include/yade-$version'
+env.Append(CPPPATH=[buildInc])
+
+if env['useMiniWm3']:
+	env.Append(CPPPATH=[buildInc+'/yade/lib-miniWm3'])
+	if not 'lattice' in env['exclude']:
+		print "!!! Using miniWm3, lattice will be excluded !!!"
+		env.Append(exclude=['lattice'])
+
+### OLD: older scons only
+if not os.path.exists(buildDir): os.makedirs(buildDir)
+
+env.SConsignFile(buildDir+'/scons-signatures')
 
 ##########################################################################################
 ############# CONFIGURATION ##############################################################
 ##########################################################################################
 
-env.Append(CPPPATH='',LIBPATH='',LIBS='')
+# ensure non-None
+env.Append(CPPPATH='',LIBPATH='',LIBS='',CXXFLAGS='')
 
 def CheckQt(context, qtdirs):
 	"Attempts to localize qt3 installation in given qtdirs. Sets necessary variables if found and returns True; otherwise returns False."
@@ -120,21 +160,6 @@ def CheckScientificPython(context):
 	except ImportError:
 		context.Result(False); return False
 
-def CheckYadeVersion(context):
-	"Attempts to get yade version from local svn tree; should be extended so that it works for releases as well (not yet applicable)."
-	context.Message('Getting Yade version... ')
-	svnRevision=None
-	for l in os.popen("svn info").readlines():
-		m=re.match(r'Revision: ([0-9]+)',l)
-		if m:
-			svnRevision=m.group(1)
-			break
-	if svnRevision:
-		env['VERSION']='svn'+svnRevision
-		context.Result(env['VERSION'])
-	else:
-		env['VERSION']=''
-		context.Result('Svn revision not found, leaving empty')
 
 def CheckCXX(context):
 	context.Message('Checking whether c++ compiler "%s" works...'%env['CXX'])
@@ -144,41 +169,39 @@ def CheckCXX(context):
 
 
 if not env.GetOption('clean'):
-	conf=Configure(env,custom_tests={'CheckQt':CheckQt,'CheckCXX':CheckCXX,'CheckPython':CheckPython,'CheckScientificPython':CheckScientificPython,'CheckYadeVersion':CheckYadeVersion})
-
-	## buildDir stuff - derived from yade version
-	conf.CheckYadeVersion()
-	# set some variables
-	env['POSTFIX']='-'+env['VERSION']+env['POSTFIX']
-	buildDir=os.path.join(env['buildPrefix'],env.subst('build$POSTFIX'))
-	# these MUST be first so that builddir's headers are read before any locally installed ones
-	if os.path.isabs(buildDir): env.Append(CPPPATH=[os.path.join(buildDir,'include')])
-	else: env.Append(CPPPATH=[os.path.join('#',buildDir,'include')])
+	conf=env.Configure(custom_tests={'CheckQt':CheckQt,'CheckCXX':CheckCXX,'CheckPython':CheckPython,'CheckScientificPython':CheckScientificPython},
+		conf_dir='$buildDir/.sconf_temp',log_file='$buildDir/config.log')
 
 	ok=True
 	ok&=conf.CheckCXX()
 	if not ok:
-			print "\nYour compiler is broken, no point in continuing. See `config.log' for what went wrong and use the CXX parameter to change your compiler."
+			print "\nYour compiler is broken, no point in continuing. See `%s' for what went wrong and use the CXX/CXXFLAGS parameters to change your compiler."%(buildDir+'/config.log')
 			Exit(1)
-	# essential libs
+	# check essential libs
 	ok&=conf.CheckLibWithHeader('pthread','pthread.h','c','pthread_exit(NULL);')
 	ok&=conf.CheckLibWithHeader('glut','GL/glut.h','c','glutGetModifiers();')
 	ok&=conf.CheckLibWithHeader('boost_date_time','boost/date_time/posix_time/posix_time.hpp','c++','boost::posix_time::time_duration::time_duration();')
 	ok&=conf.CheckLibWithHeader('boost_thread','boost/thread/thread.hpp','c++','boost::thread::thread();')
 	ok&=conf.CheckLibWithHeader('boost_filesystem','boost/filesystem/path.hpp','c++','boost::filesystem::path();')
-	ok&=conf.CheckLibWithHeader('Wm3Foundation','Wm3Math.h','c++','Wm3::Math<double>::PI;')
+	if not env['useMiniWm3']: ok&=conf.CheckLibWithHeader('Wm3Foundation','Wm3Math.h','c++','Wm3::Math<double>::PI;')
 	ok&=conf.CheckQt(env['QTDIR'])
 	env.Tool('qt'); env.Replace(QT_LIB='qt-mt')
-	ok&=conf.CheckLibWithHeader('QGLViewer','QGLViewer/qglviewer.h','c++','QGLViewer(1);')
+	ok&=conf.CheckLibWithHeader('3dviewer','QGLViewer/qglviewer.h','c++','QGLViewer(1);')
 	if not ok:
-		print "\nOne of the essential libraries above was not found, unable to continue.\n\nCheck config.log for possible causes, note that there are options that you may need to customize:\n\n"+opts.GenerateHelpText(env)
+		print "\nOne of the essential libraries above was not found, unable to continue.\n\nCheck `%s' for possible causes, note that there are options that you may need to customize:\n\n"%(buildDir+'/config.log')+opts.GenerateHelpText(env)
 		Exit(1)
-	env.Append(LIBS=['glut','boost_date_time','boost_filesystem','boost_thread','pthread','Wm3Foundation'])
 
-	#optional libs
+	# check optional libs
 	if conf.CheckLibWithHeader('log4cxx','log4cxx/logger.h','c++','log4cxx::Logger::getLogger("foo");'):
 		env.Append(LIBS='log4cxx',CPPDEFINES=['LOG4CXX'])
 	if conf.CheckPython() and conf.CheckScientificPython(): env.Append(CPPDEFINES=['EMBED_PYTHON'])
+
+	# append essential libs		
+	env.Append(LIBS=['glut','boost_date_time','boost_filesystem','boost_thread','pthread'])
+
+	if env['useMiniWm3']: env.Append(LIBS='miniWm3')
+	else: env.Append(LIBS='Wm3Foundation')
+	#'Wm3Foundation'
 
 	env=conf.Finish()
 
@@ -206,20 +229,28 @@ if env['pretty']:
 	env.Replace(QT_MOCCOMSTR='M ${SOURCES}')
 
 ### DIRECTORIES
+## PREFIX must be absolute path. Why?!
+env['PREFIX']=os.path.abspath(env['PREFIX'])
 
 # paths to in-tree SConscript files
-libDirs=['yade-libs','yade-packages/yade-package-common','yade-packages/yade-package-dem','yade-packages/yade-package-fem','yade-packages/yade-package-lattice','yade-packages/yade-package-mass-spring','yade-packages/yade-package-realtime-rigidbody','yade-extra','yade-guis']
+libDirs=['lib','pkg/common','pkg/dem','pkg/fem','pkg/lattice','pkg/mass-spring','pkg/realtime-rigidbody','extra','gui']
 # BUT: exclude stuff that should be excluded
-libDirs=[x for x in libDirs if not re.match('^.*-('+'|'.join(env['exclude'])+')$',x)]
+libDirs=[x for x in libDirs if not re.match('^.*/('+'|'.join(env['exclude'])+')$',x)]
+# where are we going to be installed... pkg/dem becomes pkg-dem
+instLibDirs=[os.path.join('$PREFIX','lib','yade$SUFFIX',x.replace('/','-')) for x in libDirs]
+# directory for yade-$version.pc
+pcDir=os.path.join('$PREFIX','lib','pkgconfig')
 # will install in the following dirs (needed?)
-instDirs=[os.path.join('$PREFIX','bin')]+[os.path.join('$PREFIX','lib','yade$POSTFIX',string.split(x,os.path.sep)[-1]) for x in libDirs]
+instDirs=[os.path.join('$PREFIX','bin')]+instLibDirs+[pcDir]
+# where are we going to be run - may be different (packaging)
+runtimeLibDirs=[os.path.join('$runtimePREFIX','lib','yade$SUFFIX',x.replace('/','-')) for x in libDirs]
 
 ## not used for now...
 #instIncludeDirs=['yade-core']+[os.path.join('$PREFIX','include','yade',string.split(x,os.path.sep)[-1]) for x in libDirs]
 
 
 ### PREPROCESSOR FLAGS
-env.Append(CPPDEFINES=[('POSTFIX',r'$POSTFIX'),('PREFIX',r'$PREFIX')])
+env.Append(CPPDEFINES=[('SUFFIX',r'\"$SUFFIX\"'),('PREFIX',r'\"$runtimePREFIX\"')])
 
 ### COMPILER
 if env['debug']: env.Append(CXXFLAGS='-ggdb3',CPPDEFINES=['DEBUG','YADE_DEBUG'])
@@ -236,8 +267,9 @@ if env['optimize']:
 	# sure CRASH: -ftree-vectorize
 	# CRASH (one of them): -fivopts -fgcse-sm -fgcse-las (one of them - not sure which one exactly)
 	# ?: -ftree-loop-linear -ftree-loop-ivcanon
-	archFlags=Split('-march=pentium4 -mfpmath=sse,387') #-malign-double')
-	env.Append(CXXFLAGS=archFlags,LINKFLAGS=archFlags,SHLINKFLAGS=archFlags)
+	## this will fail on non-i386 archs (includeing AMD64)
+	#archFlags=Split('-march=pentium4 -mfpmath=sse,387') #-malign-double')
+	#env.Append(CXXFLAGS=archFlags,LINKFLAGS=archFlags,SHLINKFLAGS=archFlags)
 else:
 	env.Append(CPPDEFINES=[('YADE_CAST','dynamic_cast'),('YADE_PTR_CAST','dynamic_pointer_cast')])
 
@@ -246,14 +278,14 @@ env.Append(CXXFLAGS=['-pipe','-Wall'])
 
 ### LINKER
 env.Append(LIBS=[]) # ensure existence of the flag
-env.Append(SHLINKFLAGS=['-Wl,-soname=${TARGET.file}','-rdynamic'])
+env.Append(SHLINKFLAGS=['-Wl,-soname=\"${TARGET.file}\"','-rdynamic']) #,'-Wl,-z,defs'])
 # if this is not present, vtables & typeinfos for classes in yade binary itself are not exported; breaks plugin loading
 env.Append(LINKFLAGS=['-rdynamic']) 
 # makes dynamic library loading easied (no LD_LIBRARY_PATH) and perhaps faster
-env.Append(RPATH=[os.path.join('$PREFIX','lib','yade$POSTFIX',string.split(x,os.path.sep)[-1]) for x in libDirs])
+env.Append(RPATH=runtimeLibDirs)
 # find already compiled but not yet installed libraries for linking
 #env.Append(LIBPATH=[os.path.join('#',x) for x in libDirs]	# -floop-optimize2 is a gcc-4.x flag, doesn't exist on previous version
-env.Append(LIBPATH=env['RPATH']) # this is if we link to libs that are installed, which is the case now
+env.Append(LIBPATH=instLibDirs) # this is if we link to libs that are installed, which is the case now
 
 
 ### this workaround is only needed for scons<=0.96.92, will disappear soon
@@ -270,7 +302,7 @@ if sconsVersion<=9692:
 	createDirs(instDirs)
 	#createDirs(instIncludeDirs)
 	
-def prepareIncludes(prefix=None):
+def installHeaders(prefix=None):
 	"""symlink all in-tree headers into  some include directory so that we can build before headers are installed.
 	If prefix is given, headers will be copied there.
 	If not, include tree will be created and syumlinked in buildDir, using relative symlinks."""
@@ -279,16 +311,22 @@ def prepareIncludes(prefix=None):
 	from os.path import join,split,isabs,isdir,exists,islink,isfile,sep
 	if not prefix: yadeRoot=buildDir
 	else: yadeRoot=prefix
-	yadeInc=join(yadeRoot,'include','yade')
+	yadeInc=join(yadeRoot,'include','yade-%s'%env['version'],'yade')
+	#print "CALLED, prefix=%s, yadeInc=%s"%(prefix,yadeInc)
 
-	for root, dirs, files in os.walk('.'):
-		for d in ('.svn','yade-flat','include'):
+	for root, dirs, files in os.walk('.',topdown=True):
+		for d in ('.svn'): ## skip all files that are not part of sources in the proper sense!
 			try: dirs.remove(d)
 			except ValueError: pass
+		# exclude non-lib directories (like doc, scripts, ...)
+		if not re.match(r'\.[/\\](core|lib|pkg|gui|extra)[/\\]?.*',root): continue
+		# exclude headers from excluded stuff
+		if re.match(r'^.*/('+'|'.join(env['exclude'])+')/',root): continue
 		for f in files:
-			if f.split('.')[-1] in ('hpp','inl','ipp','tpp','h'):
-				m=re.match('^.*?'+os.path.sep+'(yade-((extra|core)|((gui|lib|package)-.*?)))'+os.path.sep+'.*$',root)
-				subInc=join(yadeInc,m.group(1))
+			if f.split('.')[-1] in ('hpp','inl','ipp','tpp','h','mcr'):
+				#m=re.match('^\./([^/]*)/.*$',root)
+				m=re.match('^.*?'+sep+'((extra|core)|((gui|lib|pkg)'+sep+'.*?))(|'+sep+'.*)$',root)
+				subInc=join(yadeInc,m.group(1).replace(sep,'-')) # replace pkg/lattice by pkg-lattice
 				if not prefix: # local include directory: do symlinks
 					if not isdir(subInc): os.makedirs(subInc)
 					def relpath(pf,pt):
@@ -303,37 +341,55 @@ def prepareIncludes(prefix=None):
 				else: # install directory: use scons' Install facility
 					env.Install(subInc,join(root,f))
 
-# 1. re-generate SConscript files if some of them do not exist. This must be done in-place for
-#		scons postpones all actions after having processed SConscruct and SConscript files.
-# 2. symlink all headers to buildDir/include before the actual build
-# 3. (unused now) instruct scons to install (not symlink) all headers to the right place as well
-# 4. set the "install" target as default (if scons is called without any arguments), which triggers build in turn
+def makePkgConfig(fileName):
+	cflags,libs='Cflags: ','Libs: '
+	cflags+=' '+' '.join(env['CXXFLAGS'])
+	for df in env['CPPDEFINES']:
+		if type(df)==tuple: cflags+=' -D%s=%s'%(df[0],df[1])
+		else: cflags+=' -D%s'%df
+	for p in env['CPPPATH']:
+		if p[0]=='#': cflags+=' -I$PREFIX/include/yade$SUFFIX'
+		else: cflags+=' -I%s'%p
+	for l in env['SHLINKFLAGS']:
+		if not l.find('soname')>=0: libs+=' '+l # skip -Wl,soname=...
+	for p in env['RPATH']: libs+=' -Wl,-rpath=%s'%p
+	for p in env['LIBPATH']: libs+=' -L%s'%p
+	pc='Name: Yade\nDescription: Platform for dynamic mechanics\nVersion: %s\n%s\n%s\n'%(env['version'],cflags,libs)
+	pc+='yadeLibDir: $PREFIX/lib/yade$SUFFIX\n'
+	pc=re.sub(r'\bPREFIX\b','runtimePREFIX',pc) # fix prefix paths
+	pc=re.sub(r'\bbuildDir\b','runtimePREFIX',pc) # fix include paths: divert to the installed location
+	pc=env.subst(pc)+'\n'
+	f=file(env.subst(fileName),'w'); f.write(pc); f.close()
+	return None
+
+# 1. symlink all headers to buildDir/include before the actual build
+# 2. (unused now) instruct scons to install (not symlink) all headers to the right place as well
+# 3. set the "install" target as default (if scons is called without any arguments), which triggers build in turn
 # Should be cleaned up.
 
 if not env.GetOption('clean'):
-	## re-run erskine if needed
-	from os.path import exists
-	if len([1 for x in [os.path.join(x,'SConscript') for x in libDirs+['yade-core']] if not exists(x)]):
-		print "Generating SConscript files (warnings can be ignored safely)..."
-		ret=os.system('cd yade-scripts && sh erskine3-apply.sh')
-		if ret!=0:
-			print "Error running yade-scripts/erskine3-apply.sh, try doing it by hand."
-			Exit(1)
-
-	prepareLocalIncludesProxy=prepareIncludes()
-	#prepareIncludesProxy=prepareIncludes(prefix=env['PREFIX'])
-	prebuildAlias=env.Alias('prebuild',[prepareLocalIncludesProxy])
-	installAlias=env.Alias('install',[instDirs]) #,os.path.join('$PREFIX','include','yade')]) #prepareIncludesProxy,
-	Depends(installAlias,prebuildAlias)
-	Default(installAlias)
+	# how to make that executed automatically??! For now, run always.
+	#env.AddPreAction(installAlias,installHeaders)
+	installHeaders() # install to buildDir always
+	installHeaders(env.subst('$PREFIX')) # install to $PREFIX if specifically requested: like "scons /usr/local/include"
+	makePkgConfig('$buildDir/yade${SUFFIX}.pc')
+	env.Install(pcDir,'$buildDir/yade${SUFFIX}.pc')
+	installAlias=env.Alias('install',instDirs) # build and install everything that should go to instDirs, which are $PREFIX/{bin,lib} (uses scons' Install); include pkgconfig stuff
+	env.Default(installAlias)
 
 env.Export('env');
 
 if env.has_key('extraModules'):
-	env['yadeModules']=env['extraModules']+libDirs+['yade-core']
+	env['yadeModules']=env['extraModules']+libDirs+['core']
 	env.Append(LIBPATH=[os.path.join('#',x) for x in env['extraModules']])
-else: env['yadeModules']=libDirs+['yade-core']
+else: env['yadeModules']=libDirs+['core']
 
 # read top-level SConscript file. It is used only so that build_dir is set. This file reads all SConscripts from in yadeModules
 env.SConscript(dirs=['.'],build_dir=buildDir,duplicate=0)
+
+############# OTHER TARGETS #####################
+env.Command('tags',libDirs,"ctags -R --extra=+q --fields=+n --exclude='.*' --exclude=yade-flat --exclude=include --exclude='*.so'")
+env.Alias('doc',env.Command('doc/doxygen/html/index.html',libDirs,"cd doc; doxygen Doxyfile"))
+
+
 

@@ -1,0 +1,5 @@
+This directory contains direct copy of a part of WildMagick3p11 (http://www.geometrictools.com). The only file that altered is Wm3FoundationPCH.h, which is just empty here.
+
+Due to building issues, its non-availability as debian packages and considerable size of the original library, of which yade uses only a fraction, we decided to ship and build a local copy.
+
+Upstream source licence is LGPL.
