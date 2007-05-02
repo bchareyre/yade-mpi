@@ -5,7 +5,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/extra',[
 		['spherical-dem-simulator/PersistentAloneSAPCollider.cpp',
 			'spherical-dem-simulator/SphericalDEMSimulator.cpp'],
 		LIBS=env['LIBS']+['yade-base',
-			
 			'MacroMicroElasticRelationships',
 			'BodyMacroParameters',
 			'CundallNonViscousMomentumDamping',
@@ -23,6 +22,14 @@ env.Install('$PREFIX/lib/yade$SUFFIX/extra',[
 	env.SharedLibrary('Clump',
 		['clump/Clump.cpp'],
 		LIBS=env['LIBS']+['Shop']),
+		
+	env.SharedLibrary('Tetra',['tetra/Tetra.cpp'],LIBS=env['LIBS']+['Tetrahedron',
+         'ParticleParameters',
+         'RigidBodyParameters',
+         'SimpleElasticInteraction',
+         'AABB']),
+	
+	env.SharedLibrary('TetraTestGen',['tetra/TetraTestGen.cpp'],LIBS=env['LIBS']+['Shop']),
 
 	env.SharedLibrary('PythonRecorder',['clump/PythonRecorder.cpp']),
 
@@ -58,6 +65,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/extra',[
 			'BoundingVolumeMetaEngine',
 			'Box',
 			'Sphere',
+			'Tetra',
 			'AABB',
 			'PersistentSAPCollider',
 			'ParticleParameters',

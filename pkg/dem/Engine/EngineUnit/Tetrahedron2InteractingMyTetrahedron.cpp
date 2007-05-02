@@ -21,10 +21,10 @@ void Tetrahedron2InteractingMyTetrahedron::go(	const shared_ptr<GeometricalModel
 
 	InteractingMyTetrahedron* it = YADE_CAST<InteractingMyTetrahedron*>(ig.get());
 	
-	it->c1 = tet->v1*0.5;
-	it->c2 = tet->v2*0.5;
-	it->c3 = tet->v3*0.5;
-	it->c4 = tet->v4*0.5;
+	it->c1 = tet->v[0]*0.5;
+	it->c2 = tet->v[1]*0.5;
+	it->c3 = tet->v[2]*0.5;
+	it->c4 = tet->v[3]*0.5;
 
 	it->r1 = it->c1.Length();
 	it->r2 = it->c2.Length();

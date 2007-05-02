@@ -9,17 +9,18 @@
 #ifndef TETRAHEDRON_HPP
 #define TETRAHEDRON_HPP
 
+#include<vector>
 #include<yade/core/GeometricalModel.hpp>
-#include <Wm3Math.h>
+#include<Wm3Math.h>
 #include<yade/lib-base/yadeWm3.hpp>
 
 class Tetrahedron : public GeometricalModel
 {
 	public :
-		Vector3r	v1,v2,v3,v4; // vertices of tetrahedron
+		std::vector<Vector3r> v; // vertices of tetrahedron
 
 		Tetrahedron();
-		Tetrahedron(Vector3r& p1,Vector3r& p2,Vector3r& p3,Vector3r& p4);
+		Tetrahedron(Vector3r& v1,Vector3r& v2,Vector3r& v3,Vector3r& v4);
 		virtual ~Tetrahedron();
 
 	protected :

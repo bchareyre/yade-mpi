@@ -3,7 +3,7 @@
 *  cosurgi@berlios.de                                                    *
 *                                                                        *
 *  This program is free software; it is licensed under the terms of the  *
-*  GNU General Public License v2 or later. See file LICENSE for details. *
+*  GNU General Public License v[1] or later. See file LICENSE for details. *
 *************************************************************************/
 
 #include "GLDrawTetrahedron.hpp"
@@ -26,23 +26,23 @@ void GLDrawTetrahedron::go(const shared_ptr<GeometricalModel>& gm, const shared_
 			glDisable(GL_LIGHTING);
 			
 			// FIXME - stupid method to draw lines of tetrahedron
-			glVertex3v(tet->v1);
-			glVertex3v(tet->v2);
+			glVertex3v(tet->v[0]);
+			glVertex3v(tet->v[1]);
 			
-			glVertex3v(tet->v1);
-			glVertex3v(tet->v3);
+			glVertex3v(tet->v[0]);
+			glVertex3v(tet->v[2]);
 			
-			glVertex3v(tet->v1);
-			glVertex3v(tet->v4);
+			glVertex3v(tet->v[0]);
+			glVertex3v(tet->v[3]);
 			
-			glVertex3v(tet->v3);
-			glVertex3v(tet->v4);
+			glVertex3v(tet->v[2]);
+			glVertex3v(tet->v[3]);
 			
-			glVertex3v(tet->v2);
-			glVertex3v(tet->v4);
+			glVertex3v(tet->v[1]);
+			glVertex3v(tet->v[3]);
 			
-			glVertex3v(tet->v2);
-			glVertex3v(tet->v3);
+			glVertex3v(tet->v[1]);
+			glVertex3v(tet->v[2]);
 			
 		glEnd();
 	}
@@ -51,24 +51,24 @@ void GLDrawTetrahedron::go(const shared_ptr<GeometricalModel>& gm, const shared_
 // 		glBegin(GL_TRIANGLE_STRIP);
 // 			glEnable(GL_LIGHTING); 
 // 			
-// 			glNormal3v (tet->v4);
-// 			glVertex3fv(tet->v4);
+// 			glNormal3v (tet->v[3]);
+// 			glVertex3fv(tet->v[3]);
 // 			
-// 			glNormal3v (tet->v1);
-// 			glVertex3fv(tet->v1);
+// 			glNormal3v (tet->v[0]);
+// 			glVertex3fv(tet->v[0]);
 // 			
-// 			glNormal3v (tet->v2);
-// 			glVertex3fv(tet->v2);
+// 			glNormal3v (tet->v[1]);
+// 			glVertex3fv(tet->v[1]);
 // 			
 // 			
-// 			glNormal3v (tet->v3);
-// 			glVertex3fv(tet->v3);
+// 			glNormal3v (tet->v[2]);
+// 			glVertex3fv(tet->v[2]);
 // 			
-// 			glNormal3v (tet->v4);
-// 			glVertex3fv(tet->v4);
+// 			glNormal3v (tet->v[3]);
+// 			glVertex3fv(tet->v[3]);
 // 			
-// 			glNormal3v (tet->v1);
-// 			glVertex3fv(tet->v1);
+// 			glNormal3v (tet->v[0]);
+// 			glVertex3fv(tet->v[0]);
 // 		glEnd();
 
 /*		glDisable(GL_CULL_FACE);
@@ -76,69 +76,69 @@ void GLDrawTetrahedron::go(const shared_ptr<GeometricalModel>& gm, const shared_
 			glEnable(GL_LIGHTING); 
 		
 
-				glVertex3fv(tet->v4);
+				glVertex3fv(tet->v[3]);
 			
 			
-				glVertex3fv(tet->v1);			
+				glVertex3fv(tet->v[0]);			
 
 			
-			Vector3r n = (tet->v1-tet->v4).unitCross(tet->v2-tet->v4);
+			Vector3r n = (tet->v[0]-tet->v[3]).unitCross(tet->v[1]-tet->v[3]);
 			glNormal3v (n);
-				glVertex3fv(tet->v2);
+				glVertex3fv(tet->v[1]);
 			
-			n = (tet->v2-tet->v1).unitCross(tet->v3-tet->v1);
-			glNormal3v (n);
-			
-				glVertex3fv(tet->v3);
-			n = (tet->v3-tet->v2).unitCross(tet->v4-tet->v2);
+			n = (tet->v[1]-tet->v[0]).unitCross(tet->v[2]-tet->v[0]);
 			glNormal3v (n);
 			
-				glVertex3fv(tet->v4);
-			n = (tet->v4-tet->v3).unitCross(tet->v1-tet->v3);
+				glVertex3fv(tet->v[2]);
+			n = (tet->v[2]-tet->v[1]).unitCross(tet->v[3]-tet->v[1]);
 			glNormal3v (n);
-				glVertex3fv(tet->v1);
+			
+				glVertex3fv(tet->v[3]);
+			n = (tet->v[3]-tet->v[2]).unitCross(tet->v[0]-tet->v[2]);
+			glNormal3v (n);
+				glVertex3fv(tet->v[0]);
 		glEnd();*/
 		glDisable(GL_CULL_FACE);
 		glEnable(GL_LIGHTING);
 
-		Vector3r center = (tet->v1+tet->v2+tet->v3+tet->v4)*.25;
+		Vector3r center = (tet->v[0]+tet->v[1]+tet->v[2]+tet->v[3])*.25;
 		
 		glBegin(GL_TRIANGLES);
-			Vector3r n = (tet->v1-tet->v4).UnitCross(tet->v2-tet->v4);
-			Vector3r faceCenter = (tet->v4+tet->v1+tet->v2)/3.0;
+			Vector3r n = (tet->v[0]-tet->v[3]).UnitCross(tet->v[1]-tet->v[3]);
+			Vector3r faceCenter = (tet->v[3]+tet->v[0]+tet->v[1])/3.0;
 			if ((faceCenter-center).Dot(n)<0)
 				n = -n;
 			glNormal3v (n);
-			glVertex3v(tet->v4);
-			glVertex3v(tet->v1);
-			glVertex3v(tet->v2);
+			glVertex3v(tet->v[3]);
+			glVertex3v(tet->v[0]);
+			glVertex3v(tet->v[1]);
 			
-			n = (tet->v2-tet->v1).UnitCross(tet->v3-tet->v1);
-			faceCenter = (tet->v1+tet->v2+tet->v3)/3.0;
+			n = (tet->v[1]-tet->v[0]).UnitCross(tet->v[2]-tet->v[0]);
+			faceCenter = (tet->v[0]+tet->v[1]+tet->v[2])/3.0;
 			if ((faceCenter-center).Dot(n)<0)
 				n = -n;
 			glNormal3v (n);
-			glVertex3v(tet->v1);
-			glVertex3v(tet->v2);
-			glVertex3v(tet->v3);
+			glVertex3v(tet->v[0]);
+			glVertex3v(tet->v[1]);
+			glVertex3v(tet->v[2]);
 
-			n = (tet->v3-tet->v2).UnitCross(tet->v4-tet->v2);
-			faceCenter = (tet->v2+tet->v3+tet->v4)/3.0;
+			n = (tet->v[2]-tet->v[1]).UnitCross(tet->v[3]-tet->v[1]);
+			faceCenter = (tet->v[1]+tet->v[2]+tet->v[3])/3.0;
 			if ((faceCenter-center).Dot(n)<0)
 				n = -n;
 			glNormal3v (n);
-			glVertex3v(tet->v2);
-			glVertex3v(tet->v3);
-			glVertex3v(tet->v4);
+			glVertex3v(tet->v[1]);
+			glVertex3v(tet->v[2]);
+			glVertex3v(tet->v[3]);
 			
-			n = (tet->v4-tet->v3).UnitCross(tet->v1-tet->v3);
-			faceCenter = (tet->v3+tet->v4+tet->v1)/3.0;
+			n = (tet->v[3]-tet->v[2]).UnitCross(tet->v[0]-tet->v[2]);
+			faceCenter = (tet->v[2]+tet->v[3]+tet->v[0])/3.0;
 			if ((faceCenter-center).Dot(n)<0)
 				n = -n;
 			glNormal3v (n);
-			glVertex3v(tet->v3);
-			glVertex3v(tet->v4);
-			glVertex3v(tet->v1);
+			glVertex3v(tet->v[2]);
+			glVertex3v(tet->v[3]);
+			glVertex3v(tet->v[0]);
 		glEnd();
 	}
 }

@@ -58,6 +58,8 @@ class MetaInteractingGeometry2AABB; */
 	#include<yade/extra/PythonRecorder.hpp>
 #endif
 
+#include<yade/extra/Tetra.hpp>
+
 //#include<yade/extra/Clump.hpp>
 //#include "BodyMacroParameters.hpp"
 
@@ -322,6 +324,44 @@ shared_ptr<Body> Shop::box(Vector3r center, Vector3r extents){
 		// mold
 		shared_ptr<InteractingBox> mold(new InteractingBox);
 		mold->extents=extents;
+		mold->diffuseColor=getDefault<bool>("mold_randomColor")?Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom()):getDefault<Vector3r>("mold_color");
+		body->interactingGeometry=mold;
+
+		return body;
+}
+
+/*! Create body - tetrahedron. */
+shared_ptr<Body> Shop::tetra(vector<Vector3r>& v){
+		shared_ptr<Body> body=shared_ptr<Body>(new Body(0,getDefault<int>("body_sdecGroupMask")));
+		body->isDynamic=true;
+
+		shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
+		physics->angularVelocity=Vector3r(0,0,0);
+		physics->velocity=Vector3r(0,0,0);
+		physics->mass=1*getDefault<double>("phys_density"); // FIXME: mass, inertia not correct
+		physics->inertia=Vector3r(physics->mass/12.,physics->mass/12.,physics->mass/12.);
+		physics->se3=Se3r((v[0]+v[1]+v[2]+v[3])*.25,Quaternionr(Vector3r(0,0,1),0));
+		physics->young=getDefault<double>("phys_young");
+		physics->poisson=getDefault<double>("phys_poisson");
+		physics->frictionAngle=getDefault<double>("phys_frictionAngle");
+		body->physicalParameters=physics;
+
+		// aabb
+		shared_ptr<AABB> aabb(new AABB);
+		aabb->diffuseColor=getDefault<bool>("aabb_randomColor")?Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom()):getDefault<Vector3r>("aabb_color");
+		body->boundingVolume=aabb;
+
+		//shape
+		shared_ptr<Tetrahedron> shape(new Tetrahedron);
+		shape->v[0]=v[0]; shape->v[1]=v[1]; shape->v[2]=v[2]; shape->v[3]=v[3];
+		shape->diffuseColor=getDefault<bool>("shape_randomColor")?Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom()):getDefault<Vector3r>("shape_color");
+		shape->wire=getDefault<bool>("shape_wire");
+		shape->visible=getDefault<bool>("shape_visible");
+		shape->shadowCaster=getDefault<bool>("shape_shadowCaster");
+		body->geometricalModel=shape;
+
+		// mold
+		shared_ptr<TetraMold> mold(new TetraMold(v[0],v[1],v[2],v[3]));
 		mold->diffuseColor=getDefault<bool>("mold_randomColor")?Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom()):getDefault<Vector3r>("mold_color");
 		body->interactingGeometry=mold;
 

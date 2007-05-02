@@ -186,7 +186,7 @@ bool Omega::isInheritingFrom(const string& className, const string& baseClassNam
 
 void Omega::scanPlugins()
 {
-#define STUPID_DLL
+// #define STUPID_DLL
 //	ClassFactory::instance().unloadAll();
 
 	// TODO: remove all comments of the form /*DLL ... */, they comment the old code that whould not be needed any more

@@ -421,9 +421,9 @@ void TetrahedronsTest::positionRootBody(shared_ptr<MetaBody>& rootBody)
 
 void TetrahedronsTest::makeTet(shared_ptr<Tetrahedron>& tet, Real size)
 {
-	tet->v1=size*(Mathr::UnitRandom()*0.7+1.0)*Vector3r(0,0,1);
-	tet->v2=size*(Mathr::UnitRandom()*0.7+1.0)*Vector3r(0.73,-0.6,-0.33);
-	tet->v3=size*(Mathr::UnitRandom()*0.7+1.0)*Vector3r(-0.88,-0.33,-0.33);
-	tet->v4=size*(Mathr::UnitRandom()*0.7+1.0)*Vector3r(0.16,0.93,-0.33);
+	tet->v[0]=size*(Mathr::UnitRandom()*0.7+1.0)*Vector3r(0,0,1);
+	tet->v[1]=size*(Mathr::UnitRandom()*0.7+1.0)*Vector3r(0.73,-0.6,-0.33);
+	tet->v[2]=size*(Mathr::UnitRandom()*0.7+1.0)*Vector3r(-0.88,-0.33,-0.33);
+	tet->v[3]=size*(Mathr::UnitRandom()*0.7+1.0)*Vector3r(0.16,0.93,-0.33);
 }
 

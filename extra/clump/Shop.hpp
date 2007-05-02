@@ -46,5 +46,6 @@ class Shop{
 		static void rootBodyActors(shared_ptr<MetaBody>);
 		static shared_ptr<Body> sphere(Vector3r center, Real radius);
 		static shared_ptr<Body> box(Vector3r center, Vector3r extents);
+		static shared_ptr<Body> tetra(vector<Vector3r>& v);
 };
 
