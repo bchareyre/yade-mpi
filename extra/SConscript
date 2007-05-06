@@ -27,9 +27,12 @@ env.Install('$PREFIX/lib/yade$SUFFIX/extra',[
          'ParticleParameters',
          'RigidBodyParameters',
          'SimpleElasticInteraction',
+			'ElasticBodyParameters',
+			'Momentum',
+			'Force',
          'AABB']),
 	
-	env.SharedLibrary('TetraTestGen',['tetra/TetraTestGen.cpp'],LIBS=env['LIBS']+['Shop']),
+	env.SharedLibrary('TetraTestGen',['tetra/TetraTestGen.cpp'],LIBS=env['LIBS']+['Shop','Tetra']),
 
 	env.SharedLibrary('PythonRecorder',['clump/PythonRecorder.cpp']),
 

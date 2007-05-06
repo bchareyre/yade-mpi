@@ -164,6 +164,7 @@ void Shop::rootBodyActors(shared_ptr<MetaBody> rootBody){
 	shared_ptr<BoundingVolumeMetaEngine> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeMetaEngine>(new BoundingVolumeMetaEngine);
 	boundingVolumeDispatcher->DISPATCHER_ADD3(InteractingSphere,AABB,InteractingSphere2AABB);
 	boundingVolumeDispatcher->DISPATCHER_ADD3(InteractingBox,AABB,InteractingBox2AABB);
+	boundingVolumeDispatcher->DISPATCHER_ADD3(TetraMold,AABB,TetraAABB);
 	boundingVolumeDispatcher->DISPATCHER_ADD3(MetaInteractingGeometry,AABB,MetaInteractingGeometry2AABB);
 	rootBody->initializers.push_back(boundingVolumeDispatcher);
 
@@ -192,6 +193,7 @@ void Shop::rootBodyActors(shared_ptr<MetaBody> rootBody){
 	shared_ptr<InteractionGeometryMetaEngine> interactionGeometryDispatcher(new InteractionGeometryMetaEngine);
 	interactionGeometryDispatcher->DISPATCHER_ADD3(InteractingSphere,InteractingSphere,InteractingSphere2InteractingSphere4SpheresContactGeometry);
 	interactionGeometryDispatcher->DISPATCHER_ADD3(InteractingSphere,InteractingBox,InteractingBox2InteractingSphere4SpheresContactGeometry);
+	interactionGeometryDispatcher->DISPATCHER_ADD3(TetraMold,TetraMold,Tetra2TetraBang);
 	rootBody->engines.push_back(interactionGeometryDispatcher);
 
 	shared_ptr<InteractionPhysicsMetaEngine> interactionPhysicsDispatcher(new InteractionPhysicsMetaEngine);

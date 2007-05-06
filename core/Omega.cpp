@@ -248,9 +248,9 @@ void Omega::scanPlugins()
 	}
 
 	bool allLoaded = false;
-	int overflow = 30; // to prevent infinite loop
 	vector<string> dynlibsClassList; // dynlibsList holds filenames, this holds classes defined inside (may be different if using yadePuginClasses)
 	#ifdef STUPID_DLL
+		int overflow = 30; // to prevent infinite loop
 		assert(dynlibsList.size() == dynlibsListLoaded.size());
 		while (!allLoaded && --overflow > 0){
 		int loaded = 0;

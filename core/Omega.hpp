@@ -86,6 +86,9 @@ class Omega : public Singleton<Omega>
 		float	isoValue;
 		float	isoThick;
 		int     isoSec;
+		// dtto for gdb
+		string gdbCrashBatch;
+
 		// FIXME end
 		
 		boost::mutex&	getRootBodyMutex();

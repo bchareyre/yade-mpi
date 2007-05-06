@@ -8,7 +8,7 @@ char* yadePluginClasses[]={
 	"TetraBang", 
 	"Tetrahedron2TetraMold",
 	"TetraAABB", 
-	// some code in cpp (here):
+	// some code in cpp (this file):
 	"TetraLaw",	 
 	"Tetra2TetraBang",
 	"TetraDraw",
@@ -26,8 +26,6 @@ char* yadePluginClasses[]={
 
 #include <yade/pkg-common/AABB.hpp>
 #include <yade/pkg-common/Tetrahedron.hpp>
-//#include <yade/pkg-common/InteractingBox.hpp>
-//#include <yade/pkg-common/InteractingSphere.hpp>
 #include <yade/pkg-common/ElasticBodyParameters.hpp>
 #include <yade/pkg-common/SimpleElasticInteraction.hpp>
 
@@ -151,7 +149,7 @@ void TetraLaw::action(Body* body)
 }
 
 
-void TetraDraw::go(const shared_ptr<InteractingGeometry>& cm, const shared_ptr<PhysicalParameters>& )
+void TetraDraw::go(const shared_ptr<InteractingGeometry>& cm, const shared_ptr<PhysicalParameters>&,bool)
 {
   	glMaterialv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,Vector3f(cm->diffuseColor[0],cm->diffuseColor[1],cm->diffuseColor[2]));
 	glColor3v(cm->diffuseColor);
@@ -159,7 +157,7 @@ void TetraDraw::go(const shared_ptr<InteractingGeometry>& cm, const shared_ptr<P
 	if (0) { // wireframe, as for Tetrahedron
 		glDisable(GL_LIGHTING);
 		glBegin(GL_LINES);
-			#define __ONEWIRE(a,b) glVertex3v(t->v[a]);glVertex3v(t->v[b])
+			#define __ONEWIRE(a,b) glVertex3dv(t->v[a]);glVertex3dv(t->v[b])
 				__ONEWIRE(0,1);__ONEWIRE(0,2);__ONEWIRE(0,3);__ONEWIRE(1,2);__ONEWIRE(1,3);__ONEWIRE(2,3);
 			#undef __ONEWIRE
 		glEnd();
@@ -169,7 +167,7 @@ void TetraDraw::go(const shared_ptr<InteractingGeometry>& cm, const shared_ptr<P
 		Vector3r center = (t->v[0]+t->v[1]+t->v[2]+t->v[3])*.25, faceCenter, n;
 		glDisable(GL_CULL_FACE); glEnable(GL_LIGHTING);
 		glBegin(GL_TRIANGLES);
-			#define __ONEFACE(a,b,c) n=(t->v[b]-t->v[a]).UnitCross(t->v[c]-t->v[a]); faceCenter=(t->v[a]+t->v[b]+t->v[c])/3.; if((faceCenter-center).Dot(n)<0)n=-n; glNormal3v(n); glVertex3v(t->v[a]); glVertex3v(t->v[b]); glVertex3v(t->v[c]);
+			#define __ONEFACE(a,b,c) n=(t->v[b]-t->v[a]).UnitCross(t->v[c]-t->v[a]); faceCenter=(t->v[a]+t->v[b]+t->v[c])/3.; if((faceCenter-center).Dot(n)<0)n=-n; glNormal3dv(n); glVertex3dv(t->v[a]); glVertex3dv(t->v[b]); glVertex3dv(t->v[c]);
 				__ONEFACE(3,0,1);
 				__ONEFACE(0,1,2);
 				__ONEFACE(1,2,3);
@@ -178,5 +176,97 @@ void TetraDraw::go(const shared_ptr<InteractingGeometry>& cm, const shared_ptr<P
 		glEnd();
 	}
 	
+}
+
+
+
+/*! calculates tetrahedron inertia relative to the origin (0,0,0), with unit density (scales linearly)
+See article F. Tonon, "Explicit Exact Formulas for the 3-D Tetrahedron Inertia Tensor in Terms of its Vertex Coordinates", http://www.scipub.org/fulltext/jms2/jms2118-11.pdf
+
+Numerical example to check:
+
+vertices:
+	(8.33220, 11.86875, 0.93355)
+	(0.75523 ,5.00000, 16.37072)
+	(52.61236, 5.00000, 5.38580)
+	(2.00000, 5.00000, 3.00000)
+centroid:
+	(15.92492, 0.78281, 3.72962)
+intertia/density WRT centroid:
+	a/μ = 43520.33257 m⁵
+	b/μ = 194711.28938 m⁵
+	c/μ = 191168.76173 m⁵
+	a’/μ= 4417.66150 m⁵
+	b’/μ=-46343.16662 m⁵
+	c’/μ= 11996.20119 m⁵
+
+@fixme: failing numerical testcase (in TetraTestGen::generate) ?! centroid is correct, for inertia we get:
+
+63509.2
+193465
+191169
+4417.66
+-52950.8
+-11971.3
+
+I checked "a" charcter by character and it is correct; it the author wrong (doubtful)?
+
+*/
+Matrix3r TetrahedronInertiaTensor(vector<Vector3r> v){
+	#define x1 v[0][0]
+	#define y1 v[0][1]
+	#define z1 v[0][2]
+	#define x2 v[1][0]
+	#define y2 v[1][1]
+	#define z2 v[1][2]
+	#define x3 v[2][0]
+	#define y3 v[2][1]
+	#define z3 v[2][2]
+	#define x4 v[3][0]
+	#define y4 v[3][1]
+	#define z4 v[3][2]
+
+	// Jacobian of transformation to the reference 4hedron
+	double detJ=(x2-x1)*(y3-y1)*(z4-z1)+(x3-x1)*(y4-y1)*(z2-z1)+(x4-x1)*(y2-y1)*(z3-z1)
+		-(x2-x1)*(y4-y1)*(z3-z1)-(x3-x1)*(y2-y1)*(z4-z1)-(x4-x1)*(y3-y1)*(z2-z1);
+	detJ=fabs(detJ);
+	double a=detJ*(y1*y1-y1*y2+y2*y2+y1*y3+y2*y3+
+		y3*y3+y1*y4+y2*y4+y3*y4+y4*y4+z1*z1+z1*z2+
+		z2*z2+z1*z3+z2*z3+z3*z3+z1*z4+z2*z4+z3*z4+z4*z4)/60.;
+	double b=detJ*(x1*x1+x1*x2+x2*x2+x1*x3+x2*x3+x3*x3+
+		x1*x4+x2*x4+x3*x4+x4*x4+z1*z1+z1*z2+z2*z2+z1*z3+
+		z2*z3+z3*z3+z1*z4+z2*z4+z4*z4)/60.;
+	double c=detJ*(x1*x1+x1*x2+x2*x2+x1*x3+x2*x3+x3*x3+x1*x4+
+		x2*x4+x3*x4+x4*x4+y1*y1+y1*y2+y2*y2+y1*y3+
+		y2*y3+y3*y3+y1*y4+y2*y4+y3*y4+y4*y4)/60.;
+	// a' in the article etc.
+	double a__=detJ*(2*y1*z1+y2*z1+y3*z1+y4*z1+y1*z2+
+		2*y2*z2+y3*z2+y4*z2+y1*z3+y2*z3+2*y3*z3+
+		y4*z3+y1*z4+y2*z4+y3*z4+2*y4*z4)/120.;
+	double b__=detJ*(2*z1*z1+x2*z1+x3*z1+x4*z1+x1*z2+
+		2*x2*z2+x3*z2+x4*z2+z1*z3+x2*z3+2*x3*z3+
+		x4*z3+x1*z4+x2*z4+x3*z4+2*x4*z4)/120.;
+	double c__=detJ*(2*x1*y1+x2*y2+x3*y1+x4*y1+x1*y2+
+		2*x2*y2+x3*y2+x4*y2+x1*y3+x2*y3+2*x3*y3+
+		x4*y3+x1*y4+x2*y4+x3*y4+2*x4*y4)/120.;
+
+	return Matrix3r(
+		a   , -b__, -c__,
+		-b__, b   , -a__,
+		-c__, -a__, c    );
+
+	#undef x1
+	#undef y1
+	#undef z1
+	#undef x2
+	#undef y2
+	#undef z2
+	#undef x3
+	#undef y3
+	#undef z3
+	#undef x4
+	#undef y4
+	#undef z4
+
 }
 

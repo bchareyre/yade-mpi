@@ -65,6 +65,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-realtime-rigidbody',[
 		LIBS=env['LIBS']+['yade-base',
 			'ErrorTolerantContact',
 			'InteractionGeometryMetaEngine',
+			'InteractingSphere',
 			'yade-multimethods',
 			'yade-factory',
 			'Sphere'],

@@ -49,7 +49,7 @@ opts.AddOptions(
 	BoolOption('debug', 'Enable debugging information and disable optimizations',1),
 	BoolOption('profile','Enable profiling information',0),
 	BoolOption('optimize','Turn on heavy optimizations (generates SSE2 instructions)',0),
-	ListOption('exclude','Components that will not be built','none',names=['extra','common','dem','fem','lattice','mass-spring','realtime-rigidbody']),
+	ListOption('exclude','Components that will not be built','none',names=['gui','extra','common','dem','fem','lattice','mass-spring','realtime-rigidbody']),
 	('jobs','Number of jobs to run at the same time (same as -j, but saved)',4,None,int),
 	('extraModules', 'Extra directories with their own SConscript files (must be in-tree) (whitespace separated)',None,None,Split),
 	('buildPrefix','Where to create build-[version][variant] directory for intermediary files','..'),
@@ -277,8 +277,13 @@ if env['profile']: env.Append(CXXFLAGS=['-pg'],LINKFLAGS=['-pg'],SHLINKFLAGS=['-
 env.Append(CXXFLAGS=['-pipe','-Wall'])
 
 ### LINKER
-env.Append(LIBS=[]) # ensure existence of the flag
-env.Append(SHLINKFLAGS=['-Wl,-soname=\"${TARGET.file}\"','-rdynamic']) #,'-Wl,-z,defs'])
+#env['NONPLUGIN_LIBS']=env['LIBS']
+## libs for all plugins
+env.Append(LIBS=[])
+env.Append(SHLINKFLAGS=['-Wl,-soname=\"${TARGET.file}\"','-rdynamic'])
+
+#env.Append(LIBS=['yade-core']); env.Append(SHLINKFLAGS=['-Wl,--no-undefined']);
+
 # if this is not present, vtables & typeinfos for classes in yade binary itself are not exported; breaks plugin loading
 env.Append(LINKFLAGS=['-rdynamic']) 
 # makes dynamic library loading easied (no LD_LIBRARY_PATH) and perhaps faster
@@ -383,6 +388,8 @@ if env.has_key('extraModules'):
 	env['yadeModules']=env['extraModules']+libDirs+['core']
 	env.Append(LIBPATH=[os.path.join('#',x) for x in env['extraModules']])
 else: env['yadeModules']=libDirs+['core']
+
+#env['yadeModules']=['lib','core','extra']
 
 # read top-level SConscript file. It is used only so that build_dir is set. This file reads all SConscripts from in yadeModules
 env.SConscript(dirs=['.'],build_dir=buildDir,duplicate=0)

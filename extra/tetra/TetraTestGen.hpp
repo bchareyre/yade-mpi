@@ -10,7 +10,7 @@ class TetraTestGen: public FileGenerator {
 	DECLARE_LOGGER;
 	public:
 		vector<size_t> gridSize;
-		TetraTestGen(){ gridSize.push_back(2); gridSize.push_back(2); gridSize.push_back(2);};
+		TetraTestGen(){ gridSize.push_back(3); gridSize.push_back(3); gridSize.push_back(3);};
 		~TetraTestGen (){};
 		string generate();
 	protected :

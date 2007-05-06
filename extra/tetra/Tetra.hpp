@@ -1,3 +1,5 @@
+// © 2007 Václav Šmilauer <eudoxos@arcig.cz>
+
 #ifndef TETRA_HPP
 #define TETRA_HPP
 
@@ -15,8 +17,8 @@
 #include<yade/pkg-common/GLDrawInteractingGeometryFunctor.hpp>
 #include<yade/pkg-common/InteractionGeometryEngineUnit.hpp>
 
-#include <yade/pkg-common/Force.hpp>
-#include <yade/pkg-common/Momentum.hpp>
+#include<yade/pkg-common/Force.hpp>
+#include<yade/pkg-common/Momentum.hpp>
 
 #include<Wm3Math.h>
 #include<Wm3Vector3.h>
@@ -27,12 +29,12 @@
  * Self-contained. */
 class TetraMold: public InteractingGeometry{
 	public:
-		//! vertices of the tetrahedron
+		//! vertices of the tetrahedron. All constructors _must_ create exactly 4 elements of the vector.
 		vector<Vector3r> v;
 		TetraMold(){createIndex(); for(size_t i=0; i<4; i++) v.push_back(Vector3r(0,0,0)); }
 		TetraMold(Vector3r v1, Vector3r v2, Vector3r v3, Vector3r v4){createIndex(); v.clear(); v.push_back(v1); v.push_back(v2); v.push_back(v3); v.push_back(v4);}
 		virtual ~TetraMold (){};
-	protected :
+	protected:
 		void registerAttributes(){InteractingGeometry::registerAttributes(); REGISTER_ATTRIBUTE(v);}
 		REGISTER_CLASS_NAME(TetraMold);
 		REGISTER_BASE_CLASS_NAME(InteractingGeometry);
@@ -64,9 +66,9 @@ REGISTER_SERIALIZABLE(TetraBang,false);
  *
  * Self-contained. */
 
-class Tetrahedron2TetraMold : public InteractingGeometryEngineUnit
+class Tetrahedron2TetraMold: public InteractingGeometryEngineUnit
 {
-	public :
+	public:
 		void go(const shared_ptr<GeometricalModel>& gm,shared_ptr<InteractingGeometry>& ig,const Se3r& se3,const Body*){
 			Tetrahedron* tet=static_cast<Tetrahedron*>(gm.get());
 			//! @fixme this seems superfluous?!: if(!ig)
@@ -82,15 +84,15 @@ REGISTER_SERIALIZABLE(Tetrahedron2TetraMold,false);
  *
  * Self-contained. */
 
-class TetraAABB : public BoundingVolumeEngineUnit
+class TetraAABB: public BoundingVolumeEngineUnit
 {
-	public :
+	public:
 		void go(const shared_ptr<InteractingGeometry>& ig, shared_ptr<BoundingVolume>& bv, const Se3r& se3, const Body*){
 			TetraMold* t=static_cast<TetraMold*>(ig.get());
 			AABB* aabb=static_cast<AABB*>(bv.get());
 			#define __VOP(op,ix) op(t->v[0][ix],op(t->v[1][ix],op(t->v[2][ix],t->v[3][ix])))
-				aabb->min=Vector3r(__VOP(std::min,0),__VOP(std::min,1),__VOP(std::min,2));
-				aabb->max=Vector3r(__VOP(std::max,0),__VOP(std::max,1),__VOP(std::max,2));
+				aabb->min=se3.position+Vector3r(__VOP(std::min,0),__VOP(std::min,1),__VOP(std::min,2));
+				aabb->max=se3.position+Vector3r(__VOP(std::max,0),__VOP(std::max,1),__VOP(std::max,2));
 			#undef __VOP
 			aabb->center=(aabb->min+aabb->max)*0.5;
 			aabb->halfSize=(aabb->max-aabb->min)*0.5;
@@ -103,10 +105,10 @@ REGISTER_SERIALIZABLE(TetraAABB,false);
 
 /*! Draw TetraMold using OpenGL */
 
-class TetraDraw : public GLDrawInteractingGeometryFunctor
+class TetraDraw: public GLDrawInteractingGeometryFunctor
 {	
-	public :
-		virtual void go(const shared_ptr<InteractingGeometry>&, const shared_ptr<PhysicalParameters>&);
+	public:
+		virtual void go(const shared_ptr<InteractingGeometry>&, const shared_ptr<PhysicalParameters>&,bool);
 
 		RENDERS(TetraMold);
 		REGISTER_CLASS_NAME(TetraDraw);
@@ -129,7 +131,7 @@ class TetraLaw: public InteractionSolver {
 		TetraLaw():InteractionSolver(),actionForce(new Force),actionMomentum(new Momentum){};
 
 		void action(Body* body);
-	protected :
+	protected:
 		void registerAttributes(){InteractionSolver::registerAttributes(); /* … */ }
 		REGISTER_CLASS_NAME(TetraLaw);
 		REGISTER_BASE_CLASS_NAME(InteractionSolver);
@@ -141,9 +143,9 @@ REGISTER_SERIALIZABLE(TetraLaw,false);
 /*! @fixme implement Tetra2BoxBang by representing box as 6 tetrahedra. */
 
 /*! Create TetraBang (collision geometry) from colliding TetraMolds. */
-class Tetra2TetraBang : public InteractionGeometryEngineUnit
+class Tetra2TetraBang: public InteractionGeometryEngineUnit
 {
-	public :
+	public:
 		virtual bool go(const shared_ptr<InteractingGeometry>& cm1, const shared_ptr<InteractingGeometry>& cm2, const Se3r& se31, const Se3r& se32, const shared_ptr<Interaction>& c);
 		virtual bool goReverse(	const shared_ptr<InteractingGeometry>& cm1, const shared_ptr<InteractingGeometry>& cm2, const Se3r& se31, const Se3r& se32, const shared_ptr<Interaction>& c);
 
@@ -154,6 +156,9 @@ class Tetra2TetraBang : public InteractionGeometryEngineUnit
 
 REGISTER_SERIALIZABLE(Tetra2TetraBang,false);
 
+
+// Miscillaneous functions
+Matrix3r TetrahedronInertiaTensor(vector<Vector3r> v);
 
 
 #endif

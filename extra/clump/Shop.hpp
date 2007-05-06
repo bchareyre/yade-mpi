@@ -41,7 +41,8 @@ class Shop{
 		/*! Set the default value. Overrides existing value or creates new entry. Integer types are always cast to long (be careful when retrieving them). */
 		template <typename valType> static void setDefault(string key, const valType value){
 			ensureInit(); //cerr<<"Shop: Setting `"<<key<<"'="<<value<<" (type `"<<typeid(valType).name()<<"')."<<endl;
-			defaults[key]=boost::any(value);}		
+			defaults[key]=boost::any(value);}
+
 		static shared_ptr<MetaBody> rootBody();
 		static void rootBodyActors(shared_ptr<MetaBody>);
 		static shared_ptr<Body> sphere(Vector3r center, Real radius);

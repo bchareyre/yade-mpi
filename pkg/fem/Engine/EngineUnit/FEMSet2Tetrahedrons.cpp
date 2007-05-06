@@ -35,10 +35,10 @@ void FEMSet2Tetrahedrons::go(	  const shared_ptr<PhysicalParameters>& ph
 			Tetrahedron* tet 		= YADE_CAST<Tetrahedron*>        (b->geometricalModel.get());
 			FEMTetrahedronData* tetData	= YADE_CAST<FEMTetrahedronData*> (b->physicalParameters.get());
 			
-			tet->v1 			= (*(cb->bodies))[tetData->ids[0]]->physicalParameters->se3.position;
-			tet->v2 			= (*(cb->bodies))[tetData->ids[1]]->physicalParameters->se3.position;
-			tet->v3 			= (*(cb->bodies))[tetData->ids[2]]->physicalParameters->se3.position;
-			tet->v4 			= (*(cb->bodies))[tetData->ids[3]]->physicalParameters->se3.position;
+			tet->v[0] 			= (*(cb->bodies))[tetData->ids[0]]->physicalParameters->se3.position;
+			tet->v[1] 			= (*(cb->bodies))[tetData->ids[1]]->physicalParameters->se3.position;
+			tet->v[2] 			= (*(cb->bodies))[tetData->ids[2]]->physicalParameters->se3.position;
+			tet->v[3] 			= (*(cb->bodies))[tetData->ids[3]]->physicalParameters->se3.position;
 		}
 	}
 }

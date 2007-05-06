@@ -34,8 +34,6 @@ using namespace std;
 	log4cxx::LoggerPtr logger=log4cxx::Logger::getLogger("yade");
 #endif
 
-string gdbCrashBatch;
-
 void
 sigHandler(int sig){
 	#ifdef EMBED_PYTHON
@@ -50,8 +48,9 @@ sigHandler(int sig){
 	#ifdef YADE_DEBUG
 		if(sig==SIGABRT || sig==SIGSEGV){
 			signal(SIGSEGV,SIG_DFL); signal(SIGABRT,SIG_DFL); // prevent loops - default handlers
-			cerr<<"SIGSEGV/SIGABRT handler";
-			system((string("gdb -x ")+gdbCrashBatch).c_str());
+			cerr<<"SIGSEGV/SIGABRT handler called; gdb batch file is `"<<Omega::instance().gdbCrashBatch<<"'"<<endl;
+			system((string("gdb -x ")+Omega::instance().gdbCrashBatch).c_str());
+			unlink(Omega::instance().gdbCrashBatch.c_str()); // delete the crash batch file
 			kill(getpid(),sig); // reemit signal after exiting gdb
 		}
 	#endif
@@ -119,7 +118,9 @@ int main(int argc, char *argv[])
 			LOG_INFO("Logger loaded and watches configuration file: "<<logConf<<".");
 		} else { // otherwise use simple console-directed logging
 			log4cxx::BasicConfigurator::configure();
-			LOG_INFO("Logger uses basic (console) configuration ("<<logConf<<" not found). Look at the file yade-doc/logging.conf.sample in the source distribution on an example how to customize logging.");
+			logger->setLevel(log4cxx::Level::INFO);
+			LOG_INFO("Logger uses basic (console) configuration since `"<<logConf<<"' was not found. DEBUG messages will be ommited.");
+			LOG_INFO("Look at the file doc/logging.conf.sample in the source distribution as an example on how to customize logging.");
 		}
 	#endif
 
@@ -163,12 +164,13 @@ int main(int argc, char *argv[])
 	}
 
 	#ifdef YADE_DEBUG
-		// postponed until the config dir have been created
+		// postponed until the config dir has been created
 		ofstream gdbBatch;
-		gdbCrashBatch=(yadeConfigPath/"gdb_crash_batch-pid").string()+lexical_cast<string>(getpid());
-		gdbBatch.open(gdbCrashBatch.c_str()); gdbBatch<<"attach "<<lexical_cast<string>(getpid())<<"\nthread info\nthread apply all backtrace\n"; gdbBatch.close();
+		Omega::instance().gdbCrashBatch=(yadeConfigPath/"gdb_crash_batch-pid").string()+lexical_cast<string>(getpid());
+		gdbBatch.open(Omega::instance().gdbCrashBatch.c_str()); gdbBatch<<"attach "<<lexical_cast<string>(getpid())<<"\nthread info\nthread apply all backtrace\n"; gdbBatch.close();
 		signal(SIGABRT,sigHandler);
 		signal(SIGSEGV,sigHandler);
+		LOG_DEBUG("ABRT/SEGV signal handlers set, crash batch created as "<<Omega::instance().gdbCrashBatch);
 	#endif
 
 
@@ -176,7 +178,7 @@ int main(int argc, char *argv[])
 
 	IOFormatManager::loadFromFile("XMLFormatManager",yadeConfigFile.string(),"preferences",Omega::instance().preferences);
 
-	LOG_INFO("Please wait while loading plugins.");
+	LOG_INFO("Loading plugins...");
 	Omega::instance().scanPlugins();
 	LOG_INFO("Plugins loaded.");
 	Omega::instance().init();
@@ -195,7 +197,7 @@ int main(int argc, char *argv[])
 		Py_Finalize();
 	#endif
 	#ifdef YADE_DEBUG
-		unlink(gdbCrashBatch.c_str());
+		unlink(Omega::instance().gdbCrashBatch.c_str());
 	#endif
 
 	LOG_INFO("Yade: normal exit.");
