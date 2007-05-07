@@ -106,7 +106,7 @@ void NodeRecorder::action(Body * body)
 		}
 	}
 
-	for( int region=0 ; region<regions.size() ; ++region )
+	for(size_t region=0 ; region<regions.size() ; ++region )
 	{
 		std::list<unsigned int>::iterator i   = subscribedBodies[region].begin();
 		std::list<unsigned int>::iterator end = subscribedBodies[region].end();

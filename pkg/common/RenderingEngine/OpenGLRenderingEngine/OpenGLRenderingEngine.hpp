@@ -12,6 +12,7 @@
 #include<yade/core/RenderingEngine.hpp>
 #include<yade/lib-multimethods/DynLibDispatcher.hpp>
 #include<yade/core/MetaDispatchingEngine1D.hpp>
+#include<yade/core/Body.hpp>
 
 #include "GLDrawStateFunctor.hpp"
 #include "GLDrawBoundingVolumeFunctor.hpp"
@@ -41,8 +42,8 @@ class OpenGLRenderingEngine : public RenderingEngine
 				,Interaction_physics
 		
 				,needInit;
-		int		 current_selection
-				,Draw_mask;
+		int 	current_selection,
+				Draw_mask;
 
 	private :
 		DynLibDispatcher< InteractionGeometry , GLDrawInteractionGeometryFunctor, void , TYPELIST_5(const shared_ptr<InteractionGeometry>&, const shared_ptr<Interaction>& , const shared_ptr<Body>&, const shared_ptr<Body>&, bool) > interactionGeometryDispatcher;
@@ -76,7 +77,7 @@ class OpenGLRenderingEngine : public RenderingEngine
 		virtual ~OpenGLRenderingEngine();
 	
 		void init();
-		void render(const shared_ptr<MetaBody>& body, const int selection = -1);
+		void render(const shared_ptr<MetaBody>& body, int selection = -1);
 		virtual void renderWithNames(const shared_ptr<MetaBody>& );
 	
 	private :

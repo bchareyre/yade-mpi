@@ -191,10 +191,10 @@ QtMetaDispatchingEngineProperties::QtMetaDispatchingEngineProperties(shared_ptr<
 
 	vector<vector<string> > functorNames = mde->getFunctorNames();
 
-	for(int i=0;i<functorNames.size() ;i++)
+	for(size_t i=0;i<functorNames.size() ;i++)
 	{
 		pbAddClicked();
-		for(int j=0;j<functorNames[i].size();j++)
+		for(size_t j=0;j<functorNames[i].size();j++)
 			((QComboBox*)cbs[i][j])->setCurrentText(functorNames[i][j]);
 		engineUnitParameters.back() = mde->findFunctorArguments(functorNames[i].back());
 	}

@@ -270,7 +270,7 @@ void Clump::updateProperties(bool intersecting){
 	clumpRBP->velocity=Vector3r(0,0,0);
 	clumpRBP->angularVelocity=Vector3r(0,0,0);
 
-	// update subBodySe3s; subtract clump orientation (apply its inverse first) to subBody's orientation
+	// update subBodySe3s; subtract clump orientation (=apply its inverse first) to subBody's orientation
 	// Conjugate is equivalent to Inverse for normalized quaternions
 	for(memberMap::iterator I=members.begin(); I!=members.end(); I++){
 		// now, I->first is Body::id_t, I->second is Se3r of that body

@@ -36,7 +36,7 @@ string FileDialog::getOpenFileName(const string& directory,const vector<string>&
 	const QString f(filters[0]);
 	
 	shared_ptr<FileDialog> fd = shared_ptr<FileDialog>(new FileDialog(d,f,caption,parent));
-	for(int i = 1 ; i<filters.size() ; ++i)
+	for(size_t i = 1 ; i<filters.size() ; ++i)
 		fd->addFilter(filters[i]);
 	int res=fd->exec();
 	selectedFilter = fd->selectedFilter().data();
@@ -51,7 +51,7 @@ string FileDialog::getSaveFileName(const string& directory,const vector<string>&
 		
 	shared_ptr<FileDialog> fd = shared_ptr<FileDialog>(new FileDialog(d,f,caption,parent));
 	fd->setMode( QFileDialog::AnyFile );
-	for(int i = 1 ; i<filters.size() ; ++i)
+	for(size_t i = 1 ; i<filters.size() ; ++i)
 		fd->addFilter(filters[i]);
 	int res=fd->exec();
 	selectedFilter = fd->selectedFilter().data();

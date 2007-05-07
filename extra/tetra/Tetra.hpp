@@ -50,13 +50,21 @@ REGISTER_SERIALIZABLE(TetraMold,false);
 
 class TetraBang: public InteractionGeometry{
 	public:
-		Real volume;
-		Se3r overlapSe3;
-		Vector3r inertia;
-		
+		Real penetrationVolume;
+		Real equivalentCrossSection;
+		Real maxPenetrationDepthA, maxPenetrationDepthB, equivalentPenetrationDepth;
+		Vector3r contactPoint;
+		Vector3r normal;
+
 		TetraBang(): InteractionGeometry(){};
 		virtual ~TetraBang(){};
 	protected:
+		void registerAttributes(){ InteractionGeometry::registerAttributes();
+			REGISTER_ATTRIBUTE(penetrationVolume); REGISTER_ATTRIBUTE(equivalentCrossSection);
+			REGISTER_ATTRIBUTE(contactPoint); REGISTER_ATTRIBUTE(normal);
+			REGISTER_ATTRIBUTE(equivalentPenetrationDepth);
+			REGISTER_ATTRIBUTE(maxPenetrationDepthA); REGISTER_ATTRIBUTE(maxPenetrationDepthB);
+		}
 		REGISTER_CLASS_NAME(TetraBang);
 		REGISTER_BASE_CLASS_NAME(InteractionGeometry);
 };
@@ -158,7 +166,10 @@ REGISTER_SERIALIZABLE(Tetra2TetraBang,false);
 
 
 // Miscillaneous functions
-Matrix3r TetrahedronInertiaTensor(vector<Vector3r> v);
+Real TetrahedronVolume(const vector<Vector3r>& v);
+Matrix3r TetrahedronInertiaTensor(const vector<Vector3r>& v);
+Matrix3r TetrahedronCentralInertiaTensor(const vector<Vector3r>& v);
+Quaternionr TetrahedronWithLocalAxesPrincipal(shared_ptr<Body>& tetraBody);
 
 
 #endif

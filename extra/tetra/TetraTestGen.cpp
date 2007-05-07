@@ -54,10 +54,10 @@ string TetraTestGen::generate()
 		v[1]=Vector3r(0.75523 ,5.00000, 16.37072);
 		v[2]=Vector3r(52.61236, 5.00000, -5.38580);
 		v[3]=Vector3r(2.00000, 5.00000, 3.00000);
-		Vector3r cg=(v[0]+v[1]+v[2]+v[3])*.25;
+		/* Vector3r cg=(v[0]+v[1]+v[2]+v[3])*.25;
 		cerr<<"Centroid: "<<cg<<endl;
-		v[0]-=cg; v[1]-=cg; v[2]-=cg; v[3]-=cg;
-		Matrix3r I=TetrahedronInertiaTensor(v);
+		v[0]-=cg; v[1]-=cg; v[2]-=cg; v[3]-=cg; */
+		Matrix3r I=TetrahedronCentralInertiaTensor(v);
 		cerr<<v[0][0]<<" "<<v[0][1]<<" "<<v[0][2]<<endl;
 		cerr<<I(0,0)<<endl<<I(1,1)<<endl<<I(2,2)<<endl<<-I(1,2)<<endl<<-I(0,1)<<endl<<-I(0,2)<<endl;
 	#endif 

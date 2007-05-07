@@ -115,7 +115,7 @@ void QtEngineEditor::pbSaveClicked()
 	
 	enginesVec.push_back(engines[next].engine);
 	
-	for(int i=0;i<engines.size()-1;i++)
+	for(size_t i=0;i<engines.size()-1;i++)
 	{
 		next = glEngineEditor->findRelationStartingWith(next);
 		enginesVec.push_back(engines[next].engine);

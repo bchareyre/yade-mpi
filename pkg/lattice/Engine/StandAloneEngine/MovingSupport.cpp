@@ -142,7 +142,7 @@ void MovingSupport::action(Body * body)
 	}
 
 
-	for( int section=0 ; section<sections.size() ; ++section )
+	for(size_t section=0 ; section<sections.size() ; ++section )
 	{
 	//	std::list<unsigned int>::iterator i   = subscribedBodies[section].first.begin();
 	//	std::list<unsigned int>::iterator end = subscribedBodies[section].first.end();

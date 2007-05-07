@@ -9,15 +9,13 @@
 #ifndef CONTACT_HPP
 #define CONTACT_HPP
 
-#include <Wm3Math.h>
-#include<yade/lib-base/yadeWm3.hpp>
-#include <Wm3Vector3.h>
-#include<yade/lib-base/yadeWm3.hpp>
-#include <Wm3Quaternion.h>
+#include<Wm3Math.h>
+#include<Wm3Vector3.h>
+#include<Wm3Quaternion.h>
 #include<yade/lib-base/yadeWm3.hpp>
 
-#include <vector>
-#include <set>
+#include<vector>
+#include<set>
 
 using namespace std;
 

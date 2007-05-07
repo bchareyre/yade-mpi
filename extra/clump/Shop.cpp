@@ -340,8 +340,8 @@ shared_ptr<Body> Shop::tetra(vector<Vector3r>& v){
 		shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
 		physics->angularVelocity=Vector3r(0,0,0);
 		physics->velocity=Vector3r(0,0,0);
-		physics->mass=1*getDefault<double>("phys_density"); // FIXME: mass, inertia not correct
-		physics->inertia=Vector3r(physics->mass/12.,physics->mass/12.,physics->mass/12.);
+		physics->mass=getDefault<double>("phys_density")*TetrahedronVolume(v);
+		// inertia will be calculated below, by TetrahedronWithLocalAxesPrincipal
 		physics->se3=Se3r((v[0]+v[1]+v[2]+v[3])*.25,Quaternionr(Vector3r(0,0,1),0));
 		physics->young=getDefault<double>("phys_young");
 		physics->poisson=getDefault<double>("phys_poisson");
@@ -366,6 +366,9 @@ shared_ptr<Body> Shop::tetra(vector<Vector3r>& v){
 		shared_ptr<TetraMold> mold(new TetraMold(v[0],v[1],v[2],v[3]));
 		mold->diffuseColor=getDefault<bool>("mold_randomColor")?Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom()):getDefault<Vector3r>("mold_color");
 		body->interactingGeometry=mold;
+
+		// make local axes coincident with principal axes
+		TetrahedronWithLocalAxesPrincipal(body);
 
 		return body;
 }

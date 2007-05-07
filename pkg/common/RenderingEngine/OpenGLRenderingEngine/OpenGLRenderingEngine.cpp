@@ -105,7 +105,7 @@ void OpenGLRenderingEngine::renderWithNames(const shared_ptr<MetaBody>& rootBody
 
 void OpenGLRenderingEngine::render(
 		const shared_ptr<MetaBody>& rootBody, 
-		const int selection	// FIXME: not sure. maybe a list of selections, 
+		int selection	// FIXME: not sure. maybe a list of selections, 
 					// or maybe bodies themselves should remember if they are selected?
 		)
 {	// FIXME - make a compile time flag for that. So yade can compile with different versions.

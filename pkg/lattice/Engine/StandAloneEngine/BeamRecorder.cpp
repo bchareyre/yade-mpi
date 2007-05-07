@@ -90,7 +90,7 @@ void BeamRecorder::action(Body * body)
 		std::list<std::pair<Vector3r,std::pair<Real,int> > >::iterator i  =sections.begin();
 		std::list<std::pair<Vector3r,std::pair<Real,int> > >::iterator end=sections.end();
 
-		for( int section=0 ; i != end ; ++i, ++section )
+		for(size_t section=0 ; i != end ; ++i, ++section )
 		{
 			Vector3r midpoint = i->first;
 			Real     half     = i->second.first;
@@ -133,7 +133,7 @@ void BeamRecorder::action(Body * body)
 	}
 
 
-	for( int section=0 ; section<sections.size() ; ++section )
+	for(size_t section=0 ; section<sections.size() ; ++section )
 	{
 		std::list<unsigned int>::iterator i   = subscribedBodies[section].first.begin();
 		std::list<unsigned int>::iterator end = subscribedBodies[section].first.end();
