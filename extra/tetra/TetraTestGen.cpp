@@ -23,12 +23,12 @@ string TetraTestGen::generate()
 	Omega::instance().setRootBody(rootBody);
 	#endif
 
-	vector<Vector3r> v;
+	Vector3r v[4];
 
-	v.push_back(Vector3r(1,1,0));
-	v.push_back(Vector3r(0,-2,0));
-	v.push_back(Vector3r(-1,1,0));
-	v.push_back(Vector3r(0,0,-2));
+	v[0]=Vector3r(1,1,0);
+	v[1]=Vector3r(0,-2,0);
+	v[2]=Vector3r(-1,1,0);
+	v[3]=Vector3r(0,0,-2);
 	shared_ptr<Body> ground=Shop::tetra(v);
 	ground->isDynamic=false;
 	rootBody->bodies->insert(ground);

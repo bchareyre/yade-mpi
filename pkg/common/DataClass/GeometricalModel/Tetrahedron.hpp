@@ -17,10 +17,10 @@
 class Tetrahedron : public GeometricalModel
 {
 	public :
-		std::vector<Vector3r> v; // vertices of tetrahedron
+		Vector3r v[4]; // vertices of tetrahedron
 
 		Tetrahedron();
-		Tetrahedron(Vector3r& v1,Vector3r& v2,Vector3r& v3,Vector3r& v4);
+		Tetrahedron(const Vector3r& v0, const Vector3r& v1, const Vector3r& v2, const Vector3r& v3);
 		virtual ~Tetrahedron();
 
 	protected :

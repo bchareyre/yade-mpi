@@ -29,10 +29,10 @@
  * Self-contained. */
 class TetraMold: public InteractingGeometry{
 	public:
-		//! vertices of the tetrahedron. All constructors _must_ create exactly 4 elements of the vector.
-		vector<Vector3r> v;
-		TetraMold(){createIndex(); for(size_t i=0; i<4; i++) v.push_back(Vector3r(0,0,0)); }
-		TetraMold(Vector3r v1, Vector3r v2, Vector3r v3, Vector3r v4){createIndex(); v.clear(); v.push_back(v1); v.push_back(v2); v.push_back(v3); v.push_back(v4);}
+		//! vertices of the tetrahedron.
+		Vector3r v[4];
+		TetraMold(){createIndex();}
+		TetraMold(Vector3r v0, Vector3r v1, Vector3r v2, Vector3r v3){createIndex(); v[0]=v0; v[1]=v1; v[2]=v2; v[3]=v3; }
 		virtual ~TetraMold (){};
 	protected:
 		void registerAttributes(){InteractingGeometry::registerAttributes(); REGISTER_ATTRIBUTE(v);}
@@ -138,6 +138,8 @@ class TetraLaw: public InteractionSolver {
 
 		TetraLaw():InteractionSolver(),actionForce(new Force),actionMomentum(new Momentum){};
 
+		int sdecGroupMask; // probably unused?!
+
 		void action(Body* body);
 	protected:
 		void registerAttributes(){InteractionSolver::registerAttributes(); /* … */ }
@@ -160,15 +162,21 @@ class Tetra2TetraBang: public InteractionGeometryEngineUnit
 		REGISTER_CLASS_NAME(Tetra2TetraBang);
 		REGISTER_BASE_CLASS_NAME(InteractionGeometryEngineUnit);
 		DEFINE_FUNCTOR_ORDER_2D(TetraMold,TetraMold);
+	private:
+		list<Tetrahedron> Tetra2TetraIntersection(const Tetrahedron& A, const Tetrahedron& B);
+		list<Tetrahedron> TetraClipByPlane(const Tetrahedron& T, const Vector3r& P, const Vector3r& n);
+		//! Intersection of line given by points A, B and plane given by P and its normal.
+		Vector3r PtPtPlaneIntr(const Vector3r& A, const Vector3r& B, const Vector3r& P, const Vector3r& normal){const double t=(P-A).Dot(normal) / (B-A).Dot(normal); return A+t*(B-A); }
 };
 
 REGISTER_SERIALIZABLE(Tetra2TetraBang,false);
 
 
 // Miscillaneous functions
-Real TetrahedronVolume(const vector<Vector3r>& v);
-Matrix3r TetrahedronInertiaTensor(const vector<Vector3r>& v);
-Matrix3r TetrahedronCentralInertiaTensor(const vector<Vector3r>& v);
+//! Tetrahedron's volume.
+Real TetrahedronVolume(const Vector3r v[4]){ return fabs(Vector3r(v[1]-v[0]).Dot(Vector3r(v[2]-v[0]).Cross(v[3]-v[0])))/6.; }
+Matrix3r TetrahedronInertiaTensor(const Vector3r v[4]);
+Matrix3r TetrahedronCentralInertiaTensor(const Vector3r v[4]);
 Quaternionr TetrahedronWithLocalAxesPrincipal(shared_ptr<Body>& tetraBody);
 
 

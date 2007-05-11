@@ -333,7 +333,7 @@ shared_ptr<Body> Shop::box(Vector3r center, Vector3r extents){
 }
 
 /*! Create body - tetrahedron. */
-shared_ptr<Body> Shop::tetra(vector<Vector3r>& v){
+shared_ptr<Body> Shop::tetra(Vector3r v[4]){
 		shared_ptr<Body> body=shared_ptr<Body>(new Body(0,getDefault<int>("body_sdecGroupMask")));
 		body->isDynamic=true;
 
