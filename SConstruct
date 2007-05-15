@@ -194,7 +194,8 @@ if not env.GetOption('clean'):
 	# check optional libs
 	if conf.CheckLibWithHeader('log4cxx','log4cxx/logger.h','c++','log4cxx::Logger::getLogger("foo");'):
 		env.Append(LIBS='log4cxx',CPPDEFINES=['LOG4CXX'])
-	if conf.CheckPython() and conf.CheckScientificPython(): env.Append(CPPDEFINES=['EMBED_PYTHON'])
+	if conf.CheckPython() and conf.CheckScientificPython():
+		env.Append(CPPDEFINES=['EMBED_PYTHON'])
 
 	# append essential libs		
 	env.Append(LIBS=['glut','boost_date_time','boost_filesystem','boost_thread','pthread'])

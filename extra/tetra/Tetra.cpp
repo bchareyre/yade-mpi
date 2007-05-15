@@ -35,7 +35,6 @@ char* yadePluginClasses[]={
 //#include"Intersection/Wm3IntrTetrahedron3Tetrahedron3.cpp"
 //#include"Intersection/Wm3Intersector.cpp"
 
-
 /*! Calculate configuration of TetraMold - TetraMold intersection.
  *
  * Wildmagick's functions are used here: intersection is returned as a set of tetrahedra (may be empty, inwhich case there is no real intersection).
