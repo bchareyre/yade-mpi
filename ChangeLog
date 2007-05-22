@@ -1,3 +1,372 @@
+r.1165
+  - updated Icon
+  - updated ChangeLog
+  - moved some obsolete scripts to doc/removed
+  - preparing for release 
+
+r.1162 (Vaclav)
+  - Make compilation proper when python is not found (no errors, just disable what should be disabled).
+
+r.1161 (Vaclav)
+  1. remove vector<Vector3r> from tetrahedra code, replace simply by Vector3r[4]
+  2. implement 4h-4h intersection peroperly, without relying on wm3. Compiles, not tested for correctness at all.
+
+r.1160 (Vaclav)
+  1. Some type fixes (signed vs. unsigned). The Body ID mess needs to be cleaned up!!!
+  2. More tetrahedron stuff; will not compile for now, though.
+  3. Icon update ;-)
+
+r.1159 (Vaclav)
+  1. gdbCrashBatch moved to Omega (was emptry when a different thread thatn the main one crashed?!)
+  2. Shop generates tetrahedra properly now, including dispatchers
+  3. Tetrahedra rendering and linking fixed
+  4. Added an icon to the main window (not serious ;-) )
+  5. commented out STUPID_DLL overflowing loader 
+  6. log4cxx has level set to INFO by default (was DEBUG, lot of garbage on screen)
+
+r.1158 (Vaclav)
+  1. Remove cyclic plugin loading forever (undefined STUPID_DLL)
+  2. Tetrahedron has vector<Vector3r> v instead of Vector3r v1,v2,v3,v4; (fem will probably not compile because of this for now - will be fixed)
+  3. Added experimental tetra class & friends.
+
+r.1155 (Vaclav)  
+  1. PythonRecorder runs optimized byte-compiled expression, optionally translated to machine-code by psyco
+  2. Serialization lib now properly escapes and unescapes XML-unfriendly charcters (\n,\t,<,>,",\\)->(\\n,\\t,\[,\],\',\\\\)
+
+r.1154 (Vaclav)  
+  - Merged the scons-layout branch to trunk.
+  - tree is flattened, scons is the only compilation method,
+  - qmake stuff removed completely
+  - added debian/rules for packaging
+  - added miniWm3 (does not need to depend on Wm3Foundation, just recommended). We plan to stop using wm3 anyway....
+
+r.1087 (Vaclav)
+  - Doxygen settings from yade-flat imported. New file tracking removed elements.
+  - dynamic_pointer_cast replaced by YADE_PTR_CAST as appropriate. It must be defined on compiler command-line (-DYADE_PTR_CAST=dynamic_pointer_cast or -DYADE_PTR_CAST=static_pointer_cast). Scons builds get this automatically.  
+  - dynamic_cast replaced by YADE_CAST where appropriate: i.e. the result of the cast is not checked to verify whether the conversion was successful as condition for further flow branching. The consequence is that you have to #define YADE_CAST in CXXFLAGS by hand as either dynamic_cast (original version) or static_cast (for optimized builds) when using make.
+  - Scons will do that automatically for you. It is the highest time you switch to scons ;-).
+  - SCons cleanup. Now supports buildPrefix (defaults to '..') so that build is completely separate from sources.
+
+r.1082 (Vaclav)
+  1. Cleanup of clump includes
+  2. Scons now puts buildDir include directory first so that it shadows eventually installed versions
+  3. jobs=x added to scons, like -j3, but is saved accross runs
+  4. Archive modifications (shuffling includes around) so that compiling with recent g++ (4.1) works - was preprocessor problem.
+  - Attempt to access interactions from Python, commeted out for the moment. May disappear later. Not used anywhere. Do not use.
+
+r.1079 (Vaclav)
+  Python fixes:
+  1. load pyade.py from path given by PREFIX and POSTFIX (we really need to define that somewhere in a unified manner: not by using BOOST_PP_STRINGIZE everywhere! - config.hpp...?)
+  2. velocity and angularVelocity are vectors now (returned only the x component by mistake)
+
+r.1078 (Vaclav)
+  1. Debugging mode now #defines YADE_DEBUG in addition to DEBUG, which seems to be #undef'ed by some header. Lazy to trace down.
+  2. Removed #ifdef DEBUG messages from dynlib &co (now under #if 0); use LOG_TRACE if you need those messages
+  3. Signal handler now handles SIGSEGV (segmentation fault) and SIGABRT (failed assertions, among other) in debugging mode: gdb is run, attached to the current process and backtrace of all threads is printed. 
+
+r.1077 (Vaclav)
+  1. Clump member velocities are calculated in ClumpMemberMover. This may create problems since velocity will always be lagged by one iteration. 
+  2. removed cyclic dependency of Clump and Shop.
+
+r.1076 (Vaclav)
+  1. renamed Chagelog to ChangeLog, will be generated autmatically from svn chamgelog
+  2. removed waf script (wscript), not used
+  3. scons now installs everything with '-version-postfix' appended, like yade-svn1072-debug
+  4. scons builds different variants (version and postfix) in separate directories
+
+r.1075 (Vaclav)
+  Many extensive changes:
+  1. HIGHLEVEL_CLUMPS removed, as if it were defined always. Minor things to do with clumps are calculating member velocities at every iteration and figuring out if CundallNonViscousDamping works differently than for standalone bodies.
+  2. signal handles if linked with python so that ^C works as expected.
+  3. Fixes in the Shop code.
+  4. scons builds should support even separate headers for different postfixes.
+
+r.1074 (Vaclav)
+  1. OK, the floats floating around for colors drove me nuts, so I replace all of that garbage by doubles. Since for one particular case (glMaterialv) the corresponding function taking double (glMaterialdv) is not defined in mesa (and perhaps not in most other gl libs), for that one the argument was converted explicitly.
+  2. New Shop class, that defines static methods for easy things, along with a dictionary of default parameters for some useful stuff: like getting a rootbody with reasonable set of actors, sphere body, box body. That's all for the moment. Add your own stuff. Filegenerators may shrink considerably this way.
+  3. Clump::subBodies renamed to Clump::members, Clump::moveSubBodies to Clump::moveMembers, ClumpSubBodyMover to ClumpMemberMover - to be consistent with Body::isClumpMember. Clump still not moved to DEM, that will wait till later - at the moment, QGLViewer depends on Clump (for moving clump when selected and moved with mouse).
+  - There may be some borken things here, do not use this revision for anything.
+
+r.1073 (Vaclav)
+  1. Scons changes, node enumeration gotten rid of, now uses proper Install in SConscript's. Should eliminate scons version problems we've had.
+  2. Some new make targets: for repetitive compilation (with -j2) and first personalizaed target: eudoxos.
+  3. Selecting clump member in GLViewer now selects the whole clump; it is moved and redrawn as well (only with HIGHLEVEL_CLUMPS).
+  4. An attempts at escaping special characters beforce XML serialization (\",\n,\t,\\), doesn't work - commented out.
+  5. Project files cleaned from nonexistent include directories.
+
+r.1072 (Bruno)
+  - Minor changes in the computation of the critical timestep.
+
+r.1070 (Bruno)
+  A lot of small changes in triaxial classes, impossible to comment all of them; but note that :
+  - TriaxialCompressionEngine can compress a sample to a dense isotropic state (either by moving walls or increasing the size of the spheres),
+  - then change the confining pressure if needed (for running tests with different confining pressure on the same sample),
+  - then start a triaxial compression test at constant zz strain rate and constant xx and yy stress (when the sample is considered stable based on StabilityCriterion).
+  - The transitions between the different phases are (in principle) very smooth.
+  note also that the contact laws are now defined using SimpleElasticLaw.
+
+r.1069 (Bruno)
+  - A simple definition of contact stiffness based on E and nu :
+     kn = E*size of sphere (so that apparent stiffness will be independent of size)
+     ks = nu*kn
+
+r.1067 (Vaclav)
+  1. selection in the renderer are now saved in Omega::selectedBodies (GUI to that list is in the future yet)
+  2. PythonRecorder now supports retrieving selected bodies; it redirects stdout to file if specified.
+  3. pyade now required scientific python to be installed - this permits to do vector and quaternion arithmetics in python. General cleanup.
+  4. pyadeDummy.py module added - for testing pyade without yade
+
+r.1066 (Vaclav)
+  1. Clump code cleanup
+  2. Python may now be embedded in yade: (i) SConscruct checks for it and #defines EMBED_PYTHON if present. (ii) main sets up the interpreter. One disadvantage is that Python runs in its own thread, so pressing ^C during simulation doesn't quit yade (^\ still works).
+  3. New class PythonRecorder that evaluates arbitrary expression when activated.
+  4. Pyade interface that makes it possible to retrieve some values from yade in Python. For example, you can now record body #5 z-velocity and z-angularVelocity every 10 iterations by setting PythonRecorder::expression="if (S.i%10==0): print B[5].v[2],B[5].w[2]". Retrievable attributes are documented in the source (or the Doxygen documentation).
+  - The python stuff is not very logically still in yade-extra/clump, which has become my playground. Once it matures and someone want it, it may move. Let me know it you find it useful.
+
+
+r.1065 (Vaclav)
+  1. Clump code is not (hopefully) correct physically - translational, rotational and potential energies give constant sum over time (more or less)
+  2. ClumpTestGen generates a useful scenario of standalone sphere, {1,2,3,4}-sphere clump.
+  3. Inertia calculation fallback for cases with NaNs from EigenDecomposition.
+  4. acceleration and angularAcceleration reset after every position update for clump.
+  5. Body::{isClump,isClumpMember,isStandalone} added.
+  6. Gravity engine skips clump members (applied to the whole clump only).
+  - Perhaps in the next commit, I will remove the #ifdef HIGHLEVEL_CLUMPS. Someone protesting?
+
+r.1064 (Vaclav)
+  1. Fixes in the clump code
+  2. InteractionGeometryMetaEngine doesn't crash if a body doesn't have interactingGeometry (like Clump)
+  3. Fixes in the collider, related to the clump code
+  4. ClumpSubBodyMover is now a DeuxExMachina
+  5. discovered bug in Wm3::Matrix3::EigenDecomposition
+  6. ClumpTestGen generates a usable testcase (either a random one, or with one-sphere clump and an equivalent sphere) for testing purposes. Parameters etc. are physically wrong, but at least there are no crashes.
+  7. ClumpTestGen temporarily sets rootBody in Omega so that Body::byId is usable
+
+r.1063 (Vaclav)
+  1. Clump::subBodies are now a std::map<Body::id_t,Se3r>, subSe3s removed.
+  2. Sample clump generator ClumpTestGen written; works, but yade crashes because of dispatchers being setup incorrectly.
+  3. Omega::setRootBody added so that rootBody can be temporarily set during filegeneration, which is necessary for Body::byId.
+
+r.1062  (Bruno)
+  - Squared distances are now compared instead of simple distances (faster) to decide if two grains are in contact.
+  - In addition, InteractionDetectionFactor is added as member data. The default value is 1, a value greater than one will allow the geometry of contacts to be created as soon as the distance is less than Factor*SumOfRadii. Usefull for interactions at longer distances (like capillary effects).
+
+r.1061  (Bruno)
+  - The damping equations are reverted to their original expressions, with independant damping of each DOF. It looks like the convergence to equilibrium is faster with these equation
+
+r.1060  (Vaclav)
+  1. Clump code completed, but totally untested so far.
+  2. Added target 'doc' to Makefile that runs doxygen
+  3. New tracing macro TRWM3QUAT for quaternions
+
+r.1059  
+  - a more prominent warning when PREFIX was not defined during compilation
+  - ThreePointBending does not crash when there is not file to load
+  - some fiddling with lattice
+
+r.1058  (Vaclav)
+  1. provide Doxyfile, running "cd yade-doc; doxygen" will produce html reference documentation
+  2. initial (non-functional) implementation of high-level clumps, along with some cleanup of the changes done elsewhere
+  3. erskine now can be given scons variables (namely, $PREFIX) that will be unexpanded in generated SConscript's
+  4. SConscruct #defines HIGHLEVEL_CLUMPS, since other people probably don't use scons (yet)
+  5. New method Body::byId, new typedef Body::id_t, new constant Body::ID_NONE (jailed in HIGHLEVEL_CLUMPS for now, that will be removed sooner or later)
+
+r.1057
+  - Prepare framework for "high-level clumps". Everything is withing #ifdef HIGHLEVEL_CLUMPS, hence shouldn't change anything unless compiled with that option (don't try at the moment, it doesn't work). More information at http://beta.arcig.cz/~eudoxos/phd/index.cgi/YaDe/HighLevelClumps .
+
+r.1056
+  IMPORTANT: In this commit I have added a third parameter to GLDrawInteractingGeometryFunctor, which means that all GLDrawInteracting* classes had to be changed. If you have your own classes that draw interacting geometry you must modify them as well. The extra paramater added is 'bool wireFrame'. I think it will be useful :)
+  - also I made two separate 'bool' flags in the display settings to set wireframe for body and for interactions.
+  - the interaction for linked spheres is drawn in two colors: red for compression, blue for tension.
+  - some lattice improvements, like drawing of fracture surface in 3D.
+
+r.1055 (Vaclav)
+  - Simulation may be (which is the default) loaded after generation automatically now.
+
+r.1054
+  - in GLViewer new keys: 'o' and 'p' to change the field of view. Useful for changing the perspective.
+  - GLDrawSphere now plots a wireframe sphere very nicely: a circle facing the camera. Look very neat when combined with drawn interactions
+  - I have changed the flag names in OpenGLRenderingEngine. Maybe this look better, what do you think?
+  - I added a ThreePointBending. It can load spheres from some other simulation, put two supports and a moving piston. So we get a beam bending. It works in such a way, that first we generate an assembly of compacted spheres using Bruno's triaxial compression, with the dimensions of desired beam. Then load them into ThreePointBending, and we can bend a beam. It uses a linked spheres with unfinished formulas from Jean Patrick Plassiard, so it is rather unfinished... just like SDECLinkedSpheres example...  
+
+r.1053
+  - In this commit I made Interactions drawable by GLDraw*, and I added three example GLDraws for Interactions:
+  - GLDrawClosestFeatures - it is a very simple GLDraw - just plots the vector of two overlapping bodies, the closest feature. A body displaced by it, will stop overlapping with the other body.
+  - GLDrawSimpleElasticInteraction - it prints a "kn" of the interaction. It may be useful if someone wants to PRINT data on the screen about interactions.
+  - GLDrawSpheresContactGeometry - this is most interesting, it draws a box between two interacting spheres, and it's size corresponds to the force between them. With it it is simple to see how the force paths.  It uses only a normal force, not shear force
+    IMPORTANT: this is a fairly big change: *EVERY* class that inherits from
+    InteractionPhysics or InteractionGeometry had to be modified:
+    1. write constructor in .hpp file
+    2. write REGISTER_CLASS_INDEX(this class,its base class); macro in .hpp file
+    3. write createIndex(); call inside constructor in .cpp file
+  For example look into AABB.hpp AABB.cpp to see how it must look like.
+  - If you want to import some of your classess, you must make those modifications to your interaction classes.
+
+r.1052
+  - added GeometricalModelForceColorizer. It is another hacky Engine that I have added (along with Quadrilaterals). I did it, because I wanted to see spheres colored according to force acting on them. This is a hack because the GLDraw mechanism is currently very limited, and has to be extended to allow things like this. So currently it works, but not in a way it should be done.  GLDraw* changes are coming ... soon :) 
+  - BTW: it could be done better, currently looking at those colors can give you apoplexy
+
+r.1051 (Bruno)
+  - IsotropicCompressionEngine removed from SVN.
+  - TriaxialTest do the same thing (i.e. isot. compression) better, and do more.
+
+r.1050  
+  - OpenGLRenderingEngine didn't draw Body when it's groupMask was 0
+  - some changes in lattice.
+
+r.1048  (Vaclav)
+  1. Fixed Omega::scanPlugins so that it loads plugins that were linked without -rpath for their dependencies. Everything is in #ifdef STUPID_DLL
+  2. Removed again IsotropicCompressionTest since needed headers are missing. Bruno, please add them back (they were removed in the 1045 commit.) and then enable IsotropicCompressionTest in yade-packages/yade-package-dem/src/PreProcessor/PreProcessor.pro again.  
+
+r.1047  (Vaclav)
+  1. Include IsotropicCompressionTest in dem's preprocessors project so that it gets compiled
+  2. Improve erskine to indent SConscripts in a nice way
+
+r.1044  (Vaclav)
+  - Fix build process for older versions of scons that break if there is a target that has no sources. Added a dummy empty file to the loki library to do that, modified project file. Do not forget to delete yade-libs/yade-lib-loki before running scons again to regenerate SConscript files.
+  - Plugin loader now handles multi-class plugins, provided that they define "char* yadePluginClasses[]" symbol containing list of class names (sentinel=NULL) that the plugin contains. Regular one-class-per-file plugins work normally.
+  - Something like yadePluginClasses should be (in the future) extended to hold more module information (classes, module version, author, perhaps license, URL, required yade version, pointers to documentation etc.).
+  - Microchanges: fix rpath quoting, fix ctags indexing non-c++ files (local bug? --language=c++ would make all files (including .o, for example), being indexed.
+
+r.1041  
+  - QtFileGenerator remembers save file name (so it is not always ../data/scene.xml), this was done in previous commit. A small bugfix here
+  - maximum delay between display updates is now 10 minutes (600000 miliseconds)
+  - BIN format did not support std::pair, I had to fix it, because I needed that. But we are switching to boost::serialization in near future, anyway. 
+  - added NodeRecorder (records average position of selected nodes), BeamRecorder (records stress in x and y direction in a selected section) and MovingSupport (a sliding support - transfers only one DOF acorss it) to lattice.
+  - replaced std::vector with std::list in few places in lattice. There where add/remove was more often, and random access was not needed.
+
+r.1040
+  - FileGenerator shows generation time, and saving time
+  - FileGenerator saves output file name (it was always fixed at
+    "../data/scene.xml") and serialization dynlib (BIN / XML) so currently ../data/scene.xml is just a default value. But saving a filegenerator remembers target output file.
+  - To make it work I had to add a line FileGenerator::registerAttributes(); in all FileGenerator-s (so it is a call to the base class, so it can register file name and serialization dynlib.
+  - also, to make it work I had to make a dirty HACK in  yade-lib-serialization-qt. I don't feel much guilt, because it is already decided that we will scrap yade's serialization and switch to boost::serialization. Then this hack will disappear.
+  - SimulationController will not reopen a file, when closed and opened. That was a bit annoying when last file loaded was big.
+  - some fixes in MarchingCube
+  - Lattice can display its own aggregates using marching cubes. Like with Quadrilaterals, I had to make a hasck to get it to work. And it again proves that GLDraw* mechanisms need improvement. I had to add a global variable in Omega, to transmit parameters between user input and the GLDrawer. The parameters are changed inside GLViewer, which is a hack too. I had to do this now, because there is no way to parametrise GLDrawers from user interface.  ( GLDrawLatticeSetGeometry ) 
+  - MeasurePoisson improvement, LatticeExample can now generate using Delaunay, 
+
+r.1036
+  - FileGenerator reports how long the generation took
+  - yade.cpp takes PREFIX and POSTFIX as #define /some/path , without "
+  - small change to lattice generation method
+  - Makefile cleans after scons
+  - small SConstruct changes
+
+r.1033  (Vaclav)
+  - Scons accepts additional POSTFIX parameter, which will alter installation so that PREFIX/{bin,lib}/yade becomes PREFIX/{bin,lib}/yadePOSTFIX (similar to EXTRAVERSION of Linux). Further, configuration files will be searched for in ~/.yadePOSTFIX instead of ~/.yade. Unfortunately, headers installed in PREFIX will still be overwritten by newer version, even with different POSTFIX, since most files do something like #include<yade/...>. This is meant to ease simultaneous installations of different variants of yade. To achieve full independence, PREFIX and POSTFIX should be different. Note that you don't need to set LD_LIBRARY_PATH, since scons uses linker's -rpath option (hint: man ld). If someone has better solution, please let me know.  
+  - Along the same line, I replace the annoying first run configuration (and annoying way of adding plugin directories) by simply writing config file with sane default values if none is present. The user is noticed of that.
+  - Finally, when SimulationController is launched, the stop button callback is called - Bruno, can you confirm, that the first simulation is now OK?
+
+r.1032  (Vaclav)
+  - Iterations/sec display added to simulation controller (someone more sensible may redesign the layout in the future). Line ending changed from CRLF to CR. 
+  - SCons update, please use it and report any problems to yade-dev or yade-users. Thanks.
+  - Quick fix for recently discovered segfault. Wondering why it didn't surface before. Valgrind still complains about PhysicalActionVectorVectorIterator::increment using an unitialized value, but that may be unrelated (probably is) to this one.
+  - Massive update of scons, which I now recommend for building. It has some autodetection support as well.
+  - Please report any bugs (?) / RFEs to me. Brief instruction are given in INSTALL.
+  - Exceptions from the FileGenerator thread are now properly caught; it means for example that if you pass an invalid classname in createActors, yade will tell you what class it wasn't able to construct instead of hanging infinitely.
+
+r.1025  (Vaclav)
+  - Bastardized wm3 library ejected from the tree. From now on, you need to install wm3 separately. Will update README shortly on how to proceed. Basically, add  "-I/usr/local/include/wm3" to CXXFLAGS if you use qmake. Includes and linking was adjusted in c++ and .pro files.
+  - DOUBLE_PRECISION removed in favor of SINGLE_PRECISION. Therefore, the default is to define Reals as doubles now. SINGLE_PRECISION will be removed very soon anyway.
+  - Removed yade-lib-algorithms, since it is not used. Once someone needs it, it can be found in svn history.
+  - Created yade-lib-base, that for now contains
+   1. Logging.hpp: moved from yade-core to avoid circular dependency),
+   2. yadeWm3.hpp: typedefs for Vector3r Vecrtor3<Real>, definition of Real. This header will be removed soon, since it will not be needed.
+   3. yadeWm3Extra.hpp: things that were added to the bastardized wm3, like a few operators and functions. You almost certainly want to include it in your code if you get undefined references (and link with yade-lib-base).
+  - Omega now reports undefined symbols demangled.
+
+r.1020  (Vaclav)
+  1. Two sets of files were named StiffnessMatrixTimeStepper, of which the other one was in directory Global StiffnessTimestepper. Since it was not used (not compiled by default), I renamed the second set to match the directory name. If it breaks something, let me know.
+  2. Updated the scons script, scons now compiles yade completely, including header installation. It is yet to be tuned to be lot more fast, but works fine already.
+  3. Cleaning up messages at startup, (almost) everything is piped through the LOG_* stuff.
+  4. Included sample logging.conf.sample file, log4cxx is amazingly flexible and easy to use. Give it a try!
+  5. Lot of debugging since after the last change of allowing regular files to be plugin-loaded, yade would try to load garbage (like the file foobar.baz transformed to libbar.so and the like) giving spurious errors. Everything should work properly now, you can have whatever you like in the plugins directories. It will not even crash on short files (amazing fragility...).
+  6. Removed the message from ResultantForceEngine constructor, to not to pollute the console every time. Dtto for StiffnessMatrixTimeStepper.
+  7. Added one ; in yade.cpp that broke compilation without LOG4CXX. The non-log4cxx macros are now enclosed within {} just as their log4cxx counter parts. This should eliminate the need for separately building both configurations.
+
+r.1018  (Vaclav)
+  1. Allow running simulation from commandline by using the -S switch (in QtGUI only for the moment).
+  2. Embryonal form of some logging framework (logging.hpp), that is perfectly usable as of now. it is disabled by default, see logging.hpp for more information on how to use it.
+  3. Scripts to build yade with scons (works here), which should make repetitive and parallel building faster/more reliable. Note that scons build uses the log4cxx framework by default.
+  4. Some random and mostly commented-out changes in the library loader I needed for debugging my installation. Most importantly however, yade will also load files that are _not_ symlinks (which was not the case until now).
+  5. Changing boost path corectness checker to "native", so that we don't crash on non-ms-dos filenames.
+
+r.1016  (Bruno)
+  - Engines are now compiled in a different order, with DeusExMachinas compiled last. The full DEM package has been compiled successfully after thuis change.
+  - same thing to be done probably for the MyTetrahedron stuff as some headers can't be found when you "make clean" + "make" from yade-package-dem directory
+  - Matrix3 patch from Vaclav
+
+r.1014
+  - removed invMass and invInertia. Removed special handling for division by zero. mass shouldn't be zero anyway.
+  - I checked simulation results, by comparing positionoritntation_* files, before and after the change. There was a difference in the two or three last digits. 1.234567890123xxx  <- x are different numbers oh well. Perhaps this version is more precise, because in fact there is one multiplication less during the calculations.
+
+r.1013  (Bruno)
+  - Modifications in the equations of "non-viscous" damping. The equations are now as defined by Cundall.
+
+r.1011 (*)
+  - Added drawMask to OpenGLRenderingEngine, it is now possible to see only bodies that have a certain groupMask
+  - Added Quadrilateral, but it is in fact a hack, that makes it possible to see the evolution of strain field. It is much simpler to add something as a component of OpenGLRenderingEngine (the drawing loop) than as a component of engines (the calculation loop). This fact is a string indication that design of OpenGLRenderingEngine is much better than design of Metabody->engines. And so engines must be eliminated to simplify their use. Whole process will get automated.
+  - So currently we have a Quadrilateral that is not really a Quadrilateral, but just a quick hack to see evolution of strain field. The real solution will be to change the data structure. And this solution is coming ;) (ut don't know when) 
+  - Anyway, adding it, gave me a lot of thoughts about the current design of data.  I won't leave this unfixed, this would be too bad :>
+
+r.1010
+  - 'C' key centers scene on selected body
+  - 'D' sets the 'isDynamic' flag of selected body. (select it twice to unset this flag).
+  - Finally 3D lattice works with torsion and bending. There is bending stiffness, and torsion stiffness.
+  - flag that allows to enable/disable calculating of torsion in lattice
+  - LatticeExample FileGenerator can now generate a 3D tetrahedral regular grid. (before there was only orthogonal grid)
+
+r.1008
+  - Omega throws when loading bad simulation file
+  - NullGUI allows to call a FileGenerator
+  - Lattice 3D is working with bending stiffness. Now I must add torsional stiffness.
+  - also renamed: ./yade-scripts/renameClassFirst volatileInteractions transientInteractions
+  - added GLDrawStateFunctor. So now it is possible to see bodies' velocity, acceleration, angularVelocity, angularAcceleration. And other State attributes of a body.
+  - renaming: ElasticContactParameters ElasticContactInteraction
+
+r.1000
+  - Some cleaning, involving changing variable names, like Body::interactingGeometry. Which caused almost all the files to be modified.
+  - And most imporatntly added a primitive example of doing calculations with tetrahedrons. It is for educational purposes about how to add new stuff to yade. Later I will have to come back to this commit, and extract from it a useful example for the manual.
+  - This example is for Václav ©milauer, because he wants to write a complete simulation with tetrahedrons. So this is a starting point.
+
+r.995
+  - Finally deleted swiftpp and qhull. Now we have less license problems. There is still license problem with math library, though.
+  - Tetrahedrons are currently not working, just crashing (because swiftpp was removed).
+  - SDECTriaxialTest is deleted, because it was never done, in fact.
+
+r.995
+  - more improvements in ThreadRunner, ThreadWorker::~ThreadWorker and SimulationController
+  - fiddling with lattice: angle between beams is now calculated in 3D not 2D, with tracking of positive/negative angle. So the angle is between -180 and 180 deg, while arcus cosinus can only give a result between 0 and 180 degrees.
+
+r.994
+  - Graphics display can be now synchronized with the calculation without problems, and without blocking GUI 
+  - FileGenerator now does not block whole GUI when generating. And can be stopped if function generate() calls somewhere in the loops:
+        if(shouldTerminate()) return "";
+  - an example how to use the progrss bar, and messages is inside SDECSpheresPlane generator, and LatticeExample. Other generators cannot be stopped with "Stop" button.
+  - ranaming SimulationRunner -> ThreadRunner ; SimulationFlow -> ThreadWorker
+
+r.989
+  - it is possible to select (shift click) and 'm'ove bodies in the simulation view window a dirty implementation. Needs major refactoring.
+  - the "display" tab now offers the ability to set 'display refresh rate' in [ms] so it's like the priority of draw.
+  - deleted yade-lib-time, and using boost::posix_time instead
+
+r.983
+  - better DynLib error reporting
+  - new Lattice, only 2D
+  - triaxial test from Bruno
+  - deleted unused QGLThread
+
+r.979
+  - updated INSTALL file (before release).
+  - also updated Changelog in previous commit.
+
+
+r.978
+  - SimulationController is now updating iterations/time and sets time step correctly.
+  - some small changes in filegenerators, so they by default will generate something interesting.
+  - FileDialog now reports "Cancel" button correctly.
+
 r.974 version 0.10.0
   - added SimulationRunner, that can start/stop or perform singleLoop of simulation in separate thread.
   - Maybe some signal capability will be added to SimulationRunner, so that something can be notified when singleLoop is finished during calculations.
