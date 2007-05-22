@@ -100,11 +100,10 @@ env['buildDir']=buildDir
 buildInc='$buildDir/include/yade-$version'
 env.Append(CPPPATH=[buildInc])
 
-if env['useMiniWm3']:
-	env.Append(CPPPATH=[buildInc+'/yade/lib-miniWm3'])
-	if not 'lattice' in env['exclude']:
-		print "!!! Using miniWm3, lattice will be excluded !!!"
-		env.Append(exclude=['lattice'])
+if env['useMiniWm3']: env.Append(CPPPATH=[buildInc+'/yade/lib-miniWm3'])
+	#if not 'lattice' in env['exclude']:
+	#	print "!!! Using miniWm3, lattice will be excluded !!!"
+	#	env.Append(exclude=['lattice'])
 
 ### OLD: older scons only
 if not os.path.exists(buildDir): os.makedirs(buildDir)
@@ -200,9 +199,8 @@ if not env.GetOption('clean'):
 	# append essential libs		
 	env.Append(LIBS=['glut','boost_date_time','boost_filesystem','boost_thread','pthread'])
 
-	if env['useMiniWm3']: env.Append(LIBS='miniWm3')
-	else: env.Append(LIBS='Wm3Foundation')
-	#'Wm3Foundation'
+	if env['useMiniWm3']: env.Append(LIBS='miniWm3',CPPDEFINES=['MINIWM3'])
+	else:	env.Append(LIBS='Wm3Foundation')
 
 	env=conf.Finish()
 
