@@ -117,7 +117,7 @@ void TriaxialCompressionEngine::applyCondition(Body * body)
                 updateParameters(body);
 
         TriaxialStressController::applyCondition(body);
-        MetaBody * ncb2 = static_cast<MetaBody*>(body);
+//        MetaBody * ncb2 = static_cast<MetaBody*>(body);
         //cerr << computeStress(ncb2)  << endl;
 
         if (compressionActivated)

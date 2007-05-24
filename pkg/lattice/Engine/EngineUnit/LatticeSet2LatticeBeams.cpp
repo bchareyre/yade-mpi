@@ -36,11 +36,11 @@ void LatticeSet2LatticeBeams::go(	  const shared_ptr<PhysicalParameters>& ph
 			line->length                    = beam->length;
 
 			// FIXME - display aggregates as brown, bonds as dark brown.
-			      if(beam->criticalTensileStrain > 0.00015) line->diffuseColor = Vector3r(0.6,0.6,0.6); else // CEMENT
-			      if(beam->criticalTensileStrain > 0.00006) line->diffuseColor = Vector3r(0.0,0.0,0.0); else // AGGREGATE
-			                                                line->diffuseColor = Vector3r(0.3,0.3,0.3);      // BOND
+			      if(beam->longitudalStiffness   < 0.09  ) line->diffuseColor = Vector3r(0.8,0.8,0.8); else // BOND  
+			      if(beam->longitudalStiffness   < 0.12  ) line->diffuseColor = Vector3r(0.4,0.4,0.4); else // CEMENT   
+			                                               line->diffuseColor = Vector3r(0.0,0.0,0.0);      // AGGREGATE
 
-			      if(beam->longitudalStiffness > 3.6 ) line->diffuseColor = Vector3r(0.4,0.4,1.0); // NON-DESTROY
+			      if(beam->longitudalStiffness > 1.2  ) line->diffuseColor = Vector3r(0.4,0.4,1.0); // NON-DESTROY
 		}
 	}
 }

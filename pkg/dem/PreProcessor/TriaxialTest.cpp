@@ -245,7 +245,7 @@ void TriaxialTest::registerAttributes()
 
 string TriaxialTest::generate()
 {
-	unsigned int startId=boost::numeric::bounds<unsigned int>::highest(), endId=0; // record forces from group 2
+//	unsigned int startId=boost::numeric::bounds<unsigned int>::highest(), endId=0; // record forces from group 2
 	
 	rootBody = shared_ptr<MetaBody>(new MetaBody);
 	createActors(rootBody);

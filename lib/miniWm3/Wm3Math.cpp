@@ -37,13 +37,21 @@ template<> const double Math<double>::DEG_TO_RAD = Math<double>::PI/180.0;
 template<> const double Math<double>::RAD_TO_DEG = 180.0/Math<double>::PI;
 
 //----------------------------------------------------------------------------
+/*
+ * Those are nice, but they are not used anywhere in yade !
+ * and they give a compile-time warning.
+ * Also I know that they are not too precise, but are fast. So in fact I don't
+ * think we need them in our (precise ;) physical calculations.
+ *
 template <>
 float Math<float>::FastInvSqrt (float fValue)
 {
     float fHalf = 0.5f*fValue;
     int i  = *(int*)&fValue;
+//    int i  = *reinterpret_cast<int*>(&fValue);
     i = 0x5f3759df - (i >> 1);
     fValue = *(float*)&i;
+//    fValue = *reinterpret_cast<float*>(&i);
     fValue = fValue*(1.5f - fHalf*fValue*fValue);
     return fValue;
 }
@@ -53,15 +61,18 @@ double Math<double>::FastInvSqrt (double dValue)
 {
     double dHalf = 0.5*dValue;
     Integer64 i  = *(Integer64*)&dValue;
+//    Integer64 i  = *reinterpret_cast<Integer64*>(&dValue);
 #if defined(WM3_USING_VC70) || defined(WM3_USING_VC6)
     i = 0x5fe6ec85e7de30da - (i >> 1);
 #else
     i = 0x5fe6ec85e7de30daLL - (i >> 1);
 #endif
     dValue = *(double*)&i;
+//    dValue = *reinterpret_cast<double*>(&i);
     dValue = dValue*(1.5 - dHalf*dValue*dValue);
     return dValue;
 }
+*/
 //----------------------------------------------------------------------------
 
 }

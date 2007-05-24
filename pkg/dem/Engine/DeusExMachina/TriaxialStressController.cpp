@@ -360,7 +360,6 @@ void TriaxialStressController::controlInternalStress(MetaBody* ncb, Real multipl
 {
 	BodyContainer::iterator bi    = ncb->bodies->begin();
         BodyContainer::iterator biEnd = ncb->bodies->end();
-        Real f;
         //cerr << "meanstress = "radius = " << endl;
         //cerr << "bouclesurBodies" << endl;
         for(  ; bi!=biEnd ; ++bi ) {

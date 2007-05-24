@@ -36,7 +36,7 @@ bool NonLocalInitializer::calcNonLocal(Body* body1, Body* body2, BodyContainer* 
 	LatticeBeamParameters* beam1 	= static_cast<LatticeBeamParameters*>(body1->physicalParameters.get());
 	LatticeBeamParameters* beam2 	= static_cast<LatticeBeamParameters*>(body2->physicalParameters.get());
 	
-	static Real sqPi = std::sqrt(Mathr::PI);
+//	static Real sqPi = std::sqrt(Mathr::PI);
 	
 	//bool exists = false;
 	/*

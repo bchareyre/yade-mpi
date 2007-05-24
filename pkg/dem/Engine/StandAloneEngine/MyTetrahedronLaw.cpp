@@ -34,7 +34,7 @@ void MyTetrahedronLaw::action(Body* body)
 	MetaBody * ncb = YADE_CAST<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 
-	Real dt = Omega::instance().getTimeStep();
+//	Real dt = Omega::instance().getTimeStep();
 
 	InteractionContainer::iterator ii    = ncb->transientInteractions->begin();
 	InteractionContainer::iterator iiEnd = ncb->transientInteractions->end();

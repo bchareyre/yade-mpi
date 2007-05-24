@@ -144,18 +144,22 @@ void LatticeLaw::action(Body* body)
 				planeAngle	= ( planeSwap180      ? -1.0 : 1.0 ) * unitVectorsAngle(beam1->direction,beam2->direction);
 
 				Real sinAngleSquared = newCP.SquaredLength();
+				//Real cosAngleSquared = std::pow(beam1->direction.Dot(beam2->direction),2);
 				if(sinAngleSquared > 0.0001)
 					lastCP = newCP;
 				else
 					planeSwap180 = oldPS180;	
+				//sinAngleSquared = newCP.Length();
 				
 		 // 'B' calculate needed beam rotations 
 				Real angleDifference = planeAngle - an->initialPlaneAngle;
-				
+			
+				// FIXME - is it really necessary?
 				if( angleDifference > 0 )
 					while(angleDifference > Mathr::PI) angleDifference -= Mathr::TWO_PI;
 				else
 					while(angleDifference < -Mathr::PI) angleDifference += Mathr::TWO_PI;
+				// FIXME END
 				
 				// axis of bending rotation is orthogonal to the plane between two beams and must have unit length
 				lastCP.Normalize();
@@ -179,6 +183,7 @@ void LatticeLaw::action(Body* body)
 				Real offPlaneAngle2		= unitVectorsAngle(beam2->otherDirection,lastCP);
 		
 				/////////////////////////////////////////////////////////////
+		// FIXME [1] look below
 				Quaternionr	aligner1,aligner2;
 				aligner1.FromAxisAngle(beam1->direction , offPlaneAngle1);
 				aligner2.FromAxisAngle(beam2->direction , offPlaneAngle2);
@@ -191,6 +196,11 @@ void LatticeLaw::action(Body* body)
 					offPlaneAngle1   *= -1.0;
 				if( dir2.Dot(beam2->otherDirection) < 0.999999 )
 					offPlaneAngle2   *= -1.0;
+	//			if( (lastCP.Cross(beam1->direction)).Dot(beam1->otherDirection) > 0.0 )
+	//				offPlaneAngle1   *= -1.0;
+	//			if( (lastCP.Cross(beam2->direction)).Dot(beam2->otherDirection) > 0.0 )
+	//				offPlaneAngle2   *= -1.0;
+	//	// FIXME [1] END
 				/////////////////////////////////////////////////////////////
 
 				Real offPlaneAngleDifference1	= an->initialOffPlaneAngle1 - offPlaneAngle1;
@@ -207,16 +217,20 @@ void LatticeLaw::action(Body* body)
 					while(offPlaneAngleDifference2 < -Mathr::PI) offPlaneAngleDifference2 += Mathr::TWO_PI;
 
 				Real torsionAngle1, torsionAngle2;
-				if(sameFlow)
-				{
-					torsionAngle1 = offPlaneAngleDifference1 - offPlaneAngleDifference2;
-					torsionAngle2 = -torsionAngle1;
-				}
-				else
-				{
-					torsionAngle1 = offPlaneAngleDifference1 + offPlaneAngleDifference2;
-					torsionAngle2 = torsionAngle1;
-				}
+//				if(sameFlow)
+//				{
+//					torsionAngle1 = offPlaneAngleDifference1 - offPlaneAngleDifference2;
+//					torsionAngle2 = -torsionAngle1;
+//				}
+//				else
+//				{
+//					torsionAngle1 = offPlaneAngleDifference1 + offPlaneAngleDifference2;
+//					torsionAngle2 = torsionAngle1;
+//				}
+				torsionAngle1 = offPlaneAngleDifference1 + (sameFlow?-1:1)*offPlaneAngleDifference2;
+		//		torsionAngle1 *= cosAngleSquared;
+				torsionAngle2 = (sameFlow?-1:1)*torsionAngle1;
+
 				
 				if( torsionAngle1 > 0 )
 					while(torsionAngle1 > Mathr::PI) torsionAngle1 -= Mathr::TWO_PI;
@@ -229,6 +243,7 @@ void LatticeLaw::action(Body* body)
 					while(torsionAngle2 < -Mathr::PI) torsionAngle2 += Mathr::TWO_PI;
 
 				// calculate beam swirl
+		// FIXME [1] - this can solve this double checking of angle +/-180
 				if( an->lastOffPlaneAngleDifference1 >  3.0 && offPlaneAngleDifference1 < -3.0 ) ++(an->swirl1);
 				if( an->lastOffPlaneAngleDifference1 < -3.0 && offPlaneAngleDifference1 >  3.0 ) --(an->swirl1);
 				if( an->lastOffPlaneAngleDifference2 >  3.0 && offPlaneAngleDifference2 < -3.0 ) ++(an->swirl2);
@@ -293,17 +308,20 @@ void LatticeLaw::action(Body* body)
 
 		{ // 'R' from picture - previous rotation of the beam. try to do it again.
 			Vector3r halfLength = beam->length * beam->direction * 0.5;
-			node1->displacementIncremental += beam->se3Displacement.orientation * ( halfLength) - halfLength;
-			node2->displacementIncremental += beam->se3Displacement.orientation * (-halfLength) + halfLength;
+			Vector3r R = beam->se3Displacement.orientation * ( halfLength) - halfLength;
+			node1->displacementIncremental += R;
+			node2->displacementIncremental -= R;
+			//node1->displacementIncremental += beam->se3Displacement.orientation * ( halfLength) - halfLength;
+			//node2->displacementIncremental += beam->se3Displacement.orientation * (-halfLength) + halfLength;
 
 		//	beam->otherDirection		= beam->se3Displacement.orientation * beam->otherDirection;
 		}
 
 		{ // 'D' to nodes
-			node1->countStiffness += beam->longitudalStiffness;
-			node2->countStiffness += beam->longitudalStiffness;
-			node1->displacementAlignmental -= displacementLongitudal * beam->longitudalStiffness;
-			node2->displacementAlignmental += displacementLongitudal * beam->longitudalStiffness;
+			node1->countStiffness += (beam->longitudalStiffness)/(beam->initialLength);
+			node2->countStiffness += (beam->longitudalStiffness)/(beam->initialLength);
+			node1->displacementAlignmental -= (displacementLongitudal * beam->longitudalStiffness)/(beam->initialLength);
+			node2->displacementAlignmental += (displacementLongitudal * beam->longitudalStiffness)/(beam->initialLength);
 		}
 
 		if( beam->count != 0 )
@@ -313,17 +331,20 @@ void LatticeLaw::action(Body* body)
 
 /*   
  *   Bending stiffness different for compression and tension.
- *
+ */
+			static bool first=true;
+			if(first)
+			{
+				//std::cerr << "\nusing k.b tension=0.6, k.b compression=0.2 !\n/beam->initialLength !\n";
+				std::cerr << "\nNOT! using k.b tension=0.6, k.b compression=0.2 ! (just a classical formula)\n\n";
+				first=false;
+			}
+/*
 			Real kb = beam->bendingStiffness;
-			Real Em = beam->criticalTensileStrain/2.0;
+			Real Em = beam->criticalTensileStrain/3.0;
 			Real x  = beam->strain();
-			const Real howmuch = 0.5;
-
-		//	if(beam->strain() < 0) // compression
-		//	//if(beam->strain() > 0) // tension
-		//		kb *= howmuch;	// FIXME - it's a material paramater. k.b in compression is 0.2 of k.b in tension.
-		//				// it should be a function in LatticeBeamParameters that returs correct value depending
-		//				// on tension/compression
+			//const Real howmuch = 0.5;
+			const Real howmuch = 0.3333333333333333333333333333;
 		
 		//	x<-E ? kb*0.2 : ((kb*0.2+kb)/2+(kb*0.2-kb)/(-2*E)*x)
 
@@ -333,29 +354,31 @@ void LatticeLaw::action(Body* body)
 				kb = (kb*howmuch+kb)/2.0+x*(kb*howmuch-kb)/(-2.0*Em);
 			// if strain > criticalTensileStrain/2.0 then kb is not changed
 
-			node1->countStiffness += kb;
-			node2->countStiffness += kb;
+			node1->countStiffness += kb/beam->initialLength;
+			node2->countStiffness += kb/beam->initialLength;
 
-			node1->displacementAlignmental += (beam->bendingRotation * ( beam_vec) - beam_vec) * kb;
-			node2->displacementAlignmental += (beam->bendingRotation * (-beam_vec) + beam_vec) * kb;
+			node1->displacementAlignmental += ((beam->bendingRotation * ( beam_vec) - beam_vec) * kb)/(beam->initialLength);
+			node2->displacementAlignmental += ((beam->bendingRotation * (-beam_vec) + beam_vec) * kb)/(beam->initialLength);
 
 */
-			node1->countStiffness += beam->bendingStiffness;
-			node2->countStiffness += beam->bendingStiffness;
+			node1->countStiffness += (beam->bendingStiffness)/(beam->initialLength);
+			node2->countStiffness += (beam->bendingStiffness)/(beam->initialLength);
 
-			node1->displacementAlignmental += (beam->bendingRotation * ( beam_vec) - beam_vec) * beam->bendingStiffness;
-			node2->displacementAlignmental += (beam->bendingRotation * (-beam_vec) + beam_vec) * beam->bendingStiffness;
+			node1->displacementAlignmental += ((beam->bendingRotation * ( beam_vec) - beam_vec) * beam->bendingStiffness)/(beam->initialLength);
+			node2->displacementAlignmental += ((beam->bendingRotation * (-beam_vec) + beam_vec) * beam->bendingStiffness)/(beam->initialLength);
+
+			beam->shearing_strain = ((beam->bendingRotation * (-beam_vec) + beam_vec) * beam->bendingStiffness)/(beam->initialLength);
 
 		}
 		
 		if(calcTorsion)
 		{ // 'T' from picture - torsion
 
-			node1->countStiffness += beam->torsionalStiffness;
-			node2->countStiffness += beam->torsionalStiffness;
+			node1->countStiffness += (beam->torsionalStiffness)/(beam->initialLength);
+			node2->countStiffness += (beam->torsionalStiffness)/(beam->initialLength);
 
-			node1->displacementAlignmental += (beam->torsionalRotation * ( beam_vec) - beam_vec) * beam->torsionalStiffness;
-			node2->displacementAlignmental += (beam->torsionalRotation * (-beam_vec) + beam_vec) * beam->torsionalStiffness;
+			node1->displacementAlignmental += ((beam->torsionalRotation * ( beam_vec) - beam_vec) * beam->torsionalStiffness)/(beam->initialLength);
+			node2->displacementAlignmental += ((beam->torsionalRotation * (-beam_vec) + beam_vec) * beam->torsionalStiffness)/(beam->initialLength);
 		}
 		}
 	}

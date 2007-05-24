@@ -113,7 +113,7 @@ void GLDrawLatticeSetGeometry::generateScalarField()
 
 	MetaBody * lattice = static_cast<MetaBody*>(Omega::instance().getRootBody().get());
 
-	int nodeGroupMask  = static_cast<LatticeSetParameters*>(lattice->physicalParameters.get())->nodeGroupMask;
+//	int nodeGroupMask  = static_cast<LatticeSetParameters*>(lattice->physicalParameters.get())->nodeGroupMask;
 	int beamGroupMask  = static_cast<LatticeSetParameters*>(lattice->physicalParameters.get())->beamGroupMask;
 
 	BodyContainer* bodies = lattice->bodies.get();

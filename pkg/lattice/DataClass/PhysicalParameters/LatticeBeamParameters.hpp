@@ -27,6 +27,7 @@ class LatticeBeamParameters : public PhysicalParameters
 
 		Vector3r                 direction		// is a unit vector
 					,otherDirection;	// is a unit vector too
+		Vector3r		 shearing_strain;
 
 		Se3r                     se3Displacement;
 

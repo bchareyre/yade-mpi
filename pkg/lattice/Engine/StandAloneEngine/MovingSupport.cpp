@@ -150,7 +150,7 @@ void MovingSupport::action(Body * body)
 		std::list<std::pair<std::pair<unsigned int,unsigned int>,Real> >::iterator end = subscribedBodies[section].first.end();
 		int dir                               = subscribedBodies[section].second;
 		
-		Real stress=0; // in direction 'dir'
+//		Real stress=0; // in direction 'dir'
 
 		for( ; i != end ; ++i )
 		{

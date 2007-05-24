@@ -47,9 +47,11 @@
 #include<yade/pkg-common/ParticleParameters.hpp>
 
 // Delaunay
-#include <Wm3Delaunay3.h>
-#include <Wm3Delaunay2.h>
-#include <Wm3Query.h>
+#ifndef MINIWM3
+	#include <Wm3Delaunay3.h>
+	#include <Wm3Delaunay2.h>
+	#include <Wm3Query.h>
+#endif
 
 using namespace boost;
 using namespace std;
@@ -63,7 +65,11 @@ LatticeExample::LatticeExample() : FileGenerator()
         
         speciemen_size_in_meters = Vector3r(0.1,0.1,0.0001);
         cellsizeUnit_in_meters   = 0.003;
+#ifndef MINIWM3
 	use_Delaunay		 = true;
+#else
+	use_Delaunay		 = false;
+#endif
         minAngle_betweenBeams_deg= 20.0;
         disorder_in_cellsizeUnit = Vector3r(0.6,0.6,0.0);
         maxLength_in_cellsizeUnit= 1.9;
@@ -463,6 +469,7 @@ string LatticeExample::generate()
 	BodyContainer::iterator bi2;
 	BodyContainer::iterator biEnd = rootBody->bodies->end();
 
+#ifndef MINIWM3
 	if(use_Delaunay) // create beams, Delaunay
 	{
 		std::set< std::pair<int,int> > pairs;
@@ -523,6 +530,12 @@ string LatticeExample::generate()
 		}
 
 	}
+#else
+	if(use_Delaunay) // create beams, Delaunay not avauilable
+	{
+		return "Yade was compiled without full installation of wildmagic-dev (Wm3 foundation library), can't use Delaunay. Please disable option use_Delaunay or compile yade with full wm3 library installed. Don't forget CPPPATH=/usr/include/wm3 scons parameter.";
+	}
+#endif
 	else
 	{ //  create beams, old method
 	int beam_counter = 0;
@@ -827,15 +840,21 @@ bool LatticeExample::createNode(shared_ptr<Body>& body, int i, int j, int k)
 //static int zzzzz=0;
 //switch(zzzzz%5)
 //{
-//      case 0  : physics->se3.position=Vector3r(0.4,1.5,0); break;
-//      case 1  : physics->se3.position=Vector3r(0.8,0.6,0); break;
-//      case 2  : physics->se3.position=Vector3r(0  ,0  ,0); break;
-//      case 3  : physics->se3.position=Vector3r(1.6,0.5,0); break;
-//      case 4  : physics->se3.position=Vector3r(2.0,0  ,0); break;
+//      case 0  : physics->se3.position=Vector3r(0,0,0); break;
+//      case 1  : physics->se3.position=Vector3r(3,0,0); break;
+//      case 2  : physics->se3.position=Vector3r(8,0,0); break;
+//      case 3  : physics->se3.position=Vector3r(0,4,0); break;
+//      case 4  : physics->se3.position=Vector3r(3,4,0); break;
 //};
 //zzzzz++;
 //
-//////////////////////
+////      case 0  : physics->se3.position=Vector3r(0.4,1.5,0); break;
+////      case 1  : physics->se3.position=Vector3r(0.8,0.6,0); break;
+////      case 2  : physics->se3.position=Vector3r(0  ,0  ,0); break;
+////      case 3  : physics->se3.position=Vector3r(1.6,0.5,0); break;
+////      case 4  : physics->se3.position=Vector3r(2.0,0  ,0); break;
+////
+////////////////////////
         
 	if( 	   position[0] >= speciemen_size_in_meters[0] 
 		|| position[1] >= speciemen_size_in_meters[1]
@@ -934,7 +953,7 @@ void LatticeExample::calcAxisAngle(LatticeBeamParameters* beam1, BodyContainer* 
 	if( ! ints->find(otherId,thisId) && otherId != thisId )
 	{
 		LatticeBeamParameters* 	beam2 		= static_cast<LatticeBeamParameters*>( ((*(bodies))[ otherId ])->physicalParameters.get() );
-		Real 			angle, offPlaneAngle;
+		Real 			angle;
 		
 		angle = unitVectorsAngle(beam1->direction,beam2->direction);
 
@@ -1049,9 +1068,10 @@ BeamRecorder bbbb;
         rootBody->engines.push_back(geometricalModelDispatcher);
         rootBody->engines.push_back(strainRecorder);
         rootBody->engines.push_back(measurePoisson);
-        rootBody->engines.push_back(nodeRecorder);
-        rootBody->engines.push_back(beamRecorder);
-	rootBody->engines.push_back(movingSupport);
+	// FIXME - Serialization of nodeRecorder, beamRecorder and movingSupport is not wirking....
+        //rootBody->engines.push_back(nodeRecorder);
+        //rootBody->engines.push_back(beamRecorder);
+	//rootBody->engines.push_back(movingSupport);
         
         rootBody->initializers.clear();
         rootBody->initializers.push_back(boundingVolumeDispatcher);
@@ -1110,10 +1130,10 @@ void LatticeExample::imposeTranslation(shared_ptr<MetaBody>& rootBody, Vector3r 
         rootBody->engines.push_back((rootBody->engines)[rootBody->engines.size()-1]);
         (rootBody->engines)[rootBody->engines.size()-2]=(rootBody->engines)[rootBody->engines.size()-3];
         (rootBody->engines)[rootBody->engines.size()-3]=(rootBody->engines)[rootBody->engines.size()-4];
-        (rootBody->engines)[rootBody->engines.size()-4]=(rootBody->engines)[rootBody->engines.size()-5];
+        (rootBody->engines)[rootBody->engines.size()-4]=/*(rootBody->engines)[rootBody->engines.size()-5];
         (rootBody->engines)[rootBody->engines.size()-5]=(rootBody->engines)[rootBody->engines.size()-6];
         (rootBody->engines)[rootBody->engines.size()-6]=(rootBody->engines)[rootBody->engines.size()-7];
-        (rootBody->engines)[rootBody->engines.size()-7]=translationCondition;
+        (rootBody->engines)[rootBody->engines.size()-7]=*/translationCondition;
         translationCondition->subscribedBodies.clear();
         
         BodyContainer::iterator bi    = rootBody->bodies->begin();
@@ -1397,8 +1417,8 @@ void LatticeExample::addAggregates(shared_ptr<MetaBody>& rootBody)
           // - list of circles.
                 BodyContainer::iterator bi    = rootBody->bodies->begin();
                 BodyContainer::iterator biEnd = rootBody->bodies->end();
-                float all_bodies = rootBody->bodies->size();
-                int current = 0;
+                //float all_bodies = rootBody->bodies->size();
+                //int current = 0;
                 for(  ; bi!=biEnd ; ++bi )  // loop over all beams
                 {
                 //      if( ++current % 100 == 0 )

@@ -55,7 +55,7 @@ void MassSpringLaw::action(Body * body)
 			ParticleParameters * p2 = static_cast<ParticleParameters*>((*bodies)[id2]->physicalParameters.get());
 			
 			SpringPhysics* physics		= static_cast<SpringPhysics*>(spring->interactionPhysics.get());
-			SpringGeometry* geometry	= static_cast<SpringGeometry*>(spring->interactionGeometry.get());
+//			SpringGeometry* geometry	= static_cast<SpringGeometry*>(spring->interactionGeometry.get());
 			
 			Vector3r v1 = p2->se3.position;
 			Vector3r v2 = p1->se3.position;

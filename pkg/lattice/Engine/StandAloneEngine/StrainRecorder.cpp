@@ -57,25 +57,33 @@ void StrainRecorder::action(Body * body)
 //	return;
 	
 	MetaBody * ncb = static_cast<MetaBody*>(body);
-	Real strain_y=0,stress_y=0;//,stress_nonlocal_y=0;
+	Real strain_y=0,stress_y=0,stress_s=0;//,stress_nonlocal_y=0;
 	
 	std::vector<unsigned int>::iterator i   = subscribedBodies.begin();
 	std::vector<unsigned int>::iterator end = subscribedBodies.end();
 	
-	if(!ncb->bodies->exists(*i)) std::cerr << "StrainRecorder missing node\n", exit(1);
-	LatticeNodeParameters* node1 = YADE_CAST<LatticeNodeParameters*>( (*(ncb->bodies))[*i]->physicalParameters . get() );
+	if(!ncb->bodies->exists(*i))
+	{
+		std::cerr << "StrainRecorder missing node\n";
+		return;
+	}
+	LatticeNodeParameters* node1 = dynamic_cast<LatticeNodeParameters*>( (*(ncb->bodies))[*i]->physicalParameters . get() );
 	(*(ncb->bodies))[*i]->geometricalModel->diffuseColor = Vector3r(1.0,0.0,0.0); // FIXME [1]
 	++i;
-	if(!ncb->bodies->exists(*i)) std::cerr << "StrainRecorder missing node\n", exit(1);
-	LatticeNodeParameters* node2 = YADE_CAST<LatticeNodeParameters*>( (*(ncb->bodies))[*i]->physicalParameters . get() );
+	if(!ncb->bodies->exists(*i)) 
+	{
+		std::cerr << "StrainRecorder missing node\n";
+		return;
+	}
+	LatticeNodeParameters* node2 = dynamic_cast<LatticeNodeParameters*>( (*(ncb->bodies))[*i]->physicalParameters . get() );
 	(*(ncb->bodies))[*i]->geometricalModel->diffuseColor = Vector3r(1.0,0.0,0.0); // FIXME [1]
 	++i;
-	// FIXME - zamiast ¶ledziæ tylko dwa punkty (jeden na dole i jeden u góry), to lepiej zaznaczyæ dwa obszary punktów i liczyæ ¶redni± ich po³o¿enia,
-	// bo teraz, je¶li który¶ punkt zostanie wykasowany, to nie jest mo¿liwe kontynuowanie pomiarów.
+	// FIXME - zamiast ?ledzi? tylko dwa punkty (jeden na dole i jeden u góry), to lepiej zaznaczy? dwa obszary punktów i liczy? ?redni? ich po?o?enia,
+	// bo teraz, je?li który? punkt zostanie wykasowany, to nie jest mo?liwe kontynuowanie pomiarów.
 	
 	Real 		currentLength = node1->se3.position[1] - node2->se3.position[1];
 	
-	strain_y = (currentLength - initialLength) / initialLength; // odkszta³cenie ca³ej próbki
+	strain_y = (currentLength - initialLength) / initialLength; // odkszta?cenie ca?ej próbki
 	
 	//bool nonlocal = false;
 	//if (ncb->transientInteractions->size() != 0) // it's non-local
@@ -86,19 +94,22 @@ void StrainRecorder::action(Body * body)
 		if( (*(ncb->bodies)).exists(*i) )
 		{
 			LatticeBeamParameters* beam 	= static_cast<LatticeBeamParameters*>( (*(ncb->bodies))[*i]->physicalParameters . get() );
-			Real s_y 			= beam->strain() * std::abs(beam->direction[1]) * beam->longitudalStiffness; // direction is a unit vector, so direction[1] is cos(angle_to_y)
+			Real s_y 			= beam->strain()        * std::abs(beam->direction[1]) * beam->longitudalStiffness; // direction is a unit vector, so direction[1] is cos(angle_to_y)
+			Real s_s			= beam->shearing_strain[1];// * beam->bendingStiffness;
 			//Real s_nonl_y =0;
 			//if(nonlocal)
 			//	s_nonl_y 		= (beam->nonLocalStrain / beam->nonLocalDivisor) * std::abs(beam->direction[1]);
 			(*(ncb->bodies))[*i]->geometricalModel->diffuseColor = Vector3r(0.0,1.0,1.0); // FIXME [1]
 			stress_y += s_y;
+			stress_s += s_s;
 			//stress_nonlocal_y += s_nonl_y;
 		}
 	}
 	
 	//ofile << lexical_cast<string>(Omega::instance().getSimulationTime()) << " " 
 	ofile	<< lexical_cast<string>(strain_y) << " " 
-		<< lexical_cast<string>(stress_y)// << " " 
+		<< lexical_cast<string>(stress_y) << " " 
+		<< lexical_cast<string>(stress_s)// << " " 
 		//<< lexical_cast<string>(stress_nonlocal_y)
 		<< endl; 
 		

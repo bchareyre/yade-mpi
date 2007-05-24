@@ -244,14 +244,14 @@ void ElasticCohesiveLaw::action(Body* body)
 			Vector3r dThetar = dUr/currentContactPhysics->averageRadius;
 			currentContactPhysics->thetar += dThetar;
 	
-			Real fNormal = currentContactPhysics->normalForce.Length();
-			Real normMPlastic = currentContactPhysics->heta*fNormal;
+		//	Real fNormal = currentContactPhysics->normalForce.Length();
+		//	Real normMPlastic = currentContactPhysics->heta*fNormal;
 			Vector3r thetarn = q_i_n*currentContactPhysics->thetar; // rolling angle
 			Vector3r mElastic = currentContactPhysics->kr * thetarn;
 	
 			//mElastic[0] = 0;  // No moment around normal direction
 	
-			Real normElastic = mElastic.Length();
+		//	Real normElastic = mElastic.Length();
 	
 	
 			//if (normElastic<=normMPlastic)

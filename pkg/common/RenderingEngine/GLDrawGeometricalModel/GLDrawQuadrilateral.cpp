@@ -14,6 +14,7 @@
 Vector3r makeColor(double val,double min,double max)
 {
 	Real sc01 = ((val-min)/(max-min))*2.0-1.0;
+	sc01*=-1.0;
 	if(sc01 < 0) return Vector3r(0.9,0.9,1.0) + sc01 * Vector3r(0.9,0.9,0.0);
 	if(sc01 > 0) return Vector3r(1.0,0.9,0.9) - sc01 * Vector3r(0.0,0.9,0.9);
 	return Vector3r(0.9,0.9,0.9);
@@ -21,6 +22,17 @@ Vector3r makeColor(double val,double min,double max)
 
 void GLDrawQuadrilateral::go(const shared_ptr<GeometricalModel>& gm, const shared_ptr<PhysicalParameters>&,bool wire)
 {	
+
+// FIXME - that's a hack also. We must give more power to the GUI
+//
+	static bool initialized=false;
+	if(!initialized)
+	{
+		Omega::instance().isoSec=0;
+		initialized=true;
+	}
+	int WTT = Omega::instance().isoSec%3; 
+
 	Quadrilateral* q = static_cast<Quadrilateral*>(gm.get());
 	MetaBody* mb = Omega::instance().getRootBody().get();
 	
@@ -58,14 +70,31 @@ void GLDrawQuadrilateral::go(const shared_ptr<GeometricalModel>& gm, const share
 
 	calculateStrainQuadrilateral(ox1,oy1,ox2,oy2,ox3,oy3,ox4,oy4,nx1,ny1,nx2,ny2,nx3,ny3,nx4,ny4,0,0,e11,e22,e12,e21,x,y);
 
-	//std::cerr << "e11: " << e11 << " e22: " << e22 << " e12: " << e12 << " e21: " << e21 << " x: " << x << " y: " << y << "\n";
-	double m=-0.00005,M = 0.0001;
+//	static Real lastx = 0;
+//	//std::cout << " x: " << x << " y: " << y << "e11: " << e11 << " e22: " << e22 << " e12: " << e12 << " e21: " << e21  << "\n";
+//	if( x>=0.20 && x <=0.40 && y>0.037 && y <0.10 )
+//	//if( x>=0.01 && x <=0.31 && y>0.023 && y <0.097 )
+//		std::cout << x << " " << y << " " << e11 << " " << e22 << " " << e12 << " " << e21 << "\n";
+//	if(x<lastx)
+//		std::cout << "\n";
+//	lastx=x;
+
+	//double m=-0.00005,M = 0.0001;
+	double m=-0.005,M = 0.005; // dodatni to rozciaganie, niebieski
+	//double m=-1,M = 1;//GLDrawLatticeSetGeometry
 	//M = std::max(e22,M);
 	//m = std::min(e22,m);
 	//static int zzz=0;
 	//if((++zzz%1000)==0)
 	//	std::cerr << m << " " << M << "\n";
-	glColor3v(makeColor(e22,m,M));
+	static int ZZZ=0;
+	switch(WTT)
+	{
+		case 0: glColor3v(makeColor(e11,m,M));if(ZZZ++%10000==0)std::cerr << "e11 ";break;
+		case 1: glColor3v(makeColor(e22,m,M));if(ZZZ++%10000==0)std::cerr << "e22 ";break;
+		case 2: glColor3v(makeColor(e12,m,M));if(ZZZ++%10000==0)std::cerr << "e12 ";break;
+		default: std::cerr << "WTF?\n";
+	}
 	//if(std::abs(e22) > 0.0003 /*|| std::abs(e11) > r*/) return;
 
 	if (gm->wire || wire)

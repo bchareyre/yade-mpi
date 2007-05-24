@@ -18,6 +18,7 @@ LatticeBeamParameters::LatticeBeamParameters() : PhysicalParameters()
 	torsionAngle = 0;
 	torsionalStiffness = 0.6;
 	lastIter_ = -1;
+	shearing_strain = Vector3r(0,0,0);
 }
 
 
@@ -33,11 +34,20 @@ void LatticeBeamParameters::postProcessAttributes(bool deserializing)
 
 	//	torsionalStiffness /= 10.0;
 
-	//	static bool first=true;
-	//	if(first)
-	//		std::cerr << "using dt for k.b\n", first=false;
-	//	bendingStiffness    = Omega::instance().getTimeStep();
-
+//		static bool first=true;
+//		if(first)
+//		{
+//			std::cerr << "using 0.2 for k.b. So k.l=" << longitudalStiffness 
+////				<< " dt="<< Omega::instance().getTimeStep() 
+////				<< " k.b=" << longitudalStiffness * Omega::instance().getTimeStep() 
+//				<< " k.b=" << longitudalStiffness * 0.2 
+//				<<"\n";
+////				//<<"\nAnd criticalTensileStrain*10 and bendingStiffness/10 and longitudalStiffness/10\n\n", first=false;
+//			 first=false;
+//		}
+//
+//		bendingStiffness    = longitudalStiffness * 0.2;
+//
 //		bendingStiffness		/= 10.0;
 //		longitudalStiffness		/= 10.0;
 //		criticalTensileStrain		*= 10.0;
@@ -70,7 +80,7 @@ void LatticeBeamParameters::postProcessAttributes(bool deserializing)
 // checking
 
 #define chk(x,y) std::cout << #y << ",      " << x << " = " << y << "\n"
-		if(criticalTensileStrain > 0.00015) // E.l
+		if(criticalTensileStrain > 0.0015) // E.l
 		{ // CEMENT MATRIX
 			static int cement=0;	++cement;
 			static bool d1=true;
@@ -85,7 +95,7 @@ void LatticeBeamParameters::postProcessAttributes(bool deserializing)
 				chk("\tE.l",criticalTensileStrain);             // E.l
 			}
 		}
-		else if(criticalTensileStrain > 0.00006) // E.l
+		else if(criticalTensileStrain > 0.0006) // E.l
 		{ // AGGREGATE
 			static int aggregate=0; ++aggregate;
 			static bool d2=true;

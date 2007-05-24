@@ -77,7 +77,7 @@ void ResultantForceEngine::applyCondition(Body* body)
 		if(PhysicalParameters* p = dynamic_cast<PhysicalParameters*>((*bodies)[*ii]->physicalParameters.get()))
 		{
 			//cerr << "dynamic_cast<PhysicalParameters*>((*bodies)[*ii]->physicalParameters.get()" << std::endl;
-			GlobalStiffness* sm = static_cast<GlobalStiffness*>( ncb->physicalActions->find (*ii, actionParameterGlobalStiffness->getClassIndex() ).get() );
+//			GlobalStiffness* sm = static_cast<GlobalStiffness*>( ncb->physicalActions->find (*ii, actionParameterGlobalStiffness->getClassIndex() ).get() );
 			
 			Vector3r effectiveforce =
 			 	static_cast<Force*>( ncb->physicalActions->find( *ii,actionParameterForce->getClassIndex() ).get() )->force; 

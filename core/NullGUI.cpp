@@ -164,7 +164,12 @@ int NullGUI::loop()
 			// save snapshot
 			if( ( snapshotInterval != -1 ) && (intervals % snapshotInterval == 0) )
 			{
-				string fileName = "../data/" + snapshotName + "_" + lexical_cast<string>(Omega::instance().getCurrentIteration()) + (binary?".yade":".xml");
+				string fileName = "../data/" 
+					+ snapshotName 
+			//		+ "__dt_" + lexical_cast<string>(Omega::instance().getTimeStep())
+			//		+ "__it_" + lexical_cast<string>(Omega::instance().getCurrentIteration()) 
+					+ "_" + lexical_cast<string>(Omega::instance().getCurrentIteration()) 
+					+ (binary?".yade":".xml");
 				cerr << "saving snapshot: " << fileName << "   ...";
 				Omega::instance().saveSimulation(fileName);
 				cerr << " done.\n";

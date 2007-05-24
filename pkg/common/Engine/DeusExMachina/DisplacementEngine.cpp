@@ -15,14 +15,16 @@ void DisplacementEngine::postProcessAttributes(bool deserializing)
 	{
 		translationAxis.Normalize();
 
-		/*
+	/*	
 		if(displacement==0)
-			displacement=2e-10;
+			displacement=6e-9;
 		else
 			displacement=0;
-		*/
-	//	displacement *= 10.0;
-
+			//displacement=3e-8;
+		
+		//displacement *= 20.0;
+	*/
+	//	std::cerr << "displacement 0.00000000375*2: " << displacement << "\n";
 		std::cerr << "displacement: " << displacement << "\n";
 	}
 }
@@ -38,6 +40,29 @@ void DisplacementEngine::registerAttributes()
 
 void DisplacementEngine::applyCondition(Body * body)
 {
+
+/// FIXME - that's a hack! more control needed from the GUI !
+//
+	static int oldSec;
+	static int count=0;
+	static bool initialized=false;
+	if(!initialized)
+	{
+		Omega::instance().isoSec=0;
+		oldSec=Omega::instance().isoSec=0;
+		initialized=true;
+	}
+	if(oldSec!=Omega::instance().isoSec)
+	{
+		std::cerr << "multiplication by dt, before: " << displacement;
+		displacement*=Omega::instance().getTimeStep();
+		std::cerr << "after: " << displacement << "\n";
+		if((count++)%6==0) oldSec=Omega::instance().isoSec;
+	}
+
+
+
+
 	MetaBody * ncb = static_cast<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 
