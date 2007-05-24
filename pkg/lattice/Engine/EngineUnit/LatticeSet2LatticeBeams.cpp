@@ -40,6 +40,7 @@ void LatticeSet2LatticeBeams::go(	  const shared_ptr<PhysicalParameters>& ph
 			      if(beam->longitudalStiffness   < 0.12  ) line->diffuseColor = Vector3r(0.4,0.4,0.4); else // CEMENT   
 			                                               line->diffuseColor = Vector3r(0.0,0.0,0.0);      // AGGREGATE
 
+			      if(beam->longitudalStiffness > 0.99 ) line->diffuseColor = Vector3r(0.6,0.6,0.6); // DEFAULT generation
 			      if(beam->longitudalStiffness > 1.2  ) line->diffuseColor = Vector3r(0.4,0.4,1.0); // NON-DESTROY
 		}
 	}

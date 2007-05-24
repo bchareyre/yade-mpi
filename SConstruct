@@ -210,7 +210,7 @@ if not env.GetOption('clean'):
 ##########################################################################################
 
 ### SCONS OPTIMIZATIONS
-env.SourceSignatures('timestamp') #can be  'MD5' or 'timestamp'; 'timestamp' but is less reliable and not so much faster
+env.SourceSignatures('MD5') #can be  'MD5' or 'timestamp'; 'timestamp' but is less reliable and not so much faster
 env.SetOption('max_drift',5) # cache md5sums of files older than 30 seconds
 SetOption('implicit_cache',1) # cache #include files etc.
 env.SourceCode(".",None) # skip dotted directories

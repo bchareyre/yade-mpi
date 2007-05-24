@@ -533,7 +533,7 @@ string LatticeExample::generate()
 #else
 	if(use_Delaunay) // create beams, Delaunay not avauilable
 	{
-		return "Yade was compiled without full installation of wildmagic-dev (Wm3 foundation library), can't use Delaunay. Please disable option use_Delaunay or compile yade with full wm3 library installed. Don't forget CPPPATH=/usr/include/wm3 scons parameter.";
+		return "ERROR:\n\nYade was compiled without full installation of wildmagic-dev (Wm3 foundation library), can't use Delaunay. Please disable option use_Delaunay or compile yade with full wm3 library installed. Don't forget CPPPATH=/usr/include/wm3 scons parameter.";
 	}
 #endif
 	else
