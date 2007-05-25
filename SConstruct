@@ -60,7 +60,7 @@ opts.AddOptions(
 	('CXX','The c++ compiler','g++'),
 	('CXXFLAGS','Additional compiler flags; you can use them for tuning like -march=pentium4.',None,None,Split), # not tested if really propagates
 	BoolOption('pretty',"Don't show compiler command line (like the Linux kernel)",1),
-	BoolOption('useMiniWm3','use local miniWm3 library instead of Wm3Foundation',0),
+	BoolOption('useMiniWm3','use local miniWm3 library instead of Wm3Foundation',1),
 )
 
 ### create THE environment
@@ -179,14 +179,21 @@ if not env.GetOption('clean'):
 	# check essential libs
 	ok&=conf.CheckLibWithHeader('pthread','pthread.h','c','pthread_exit(NULL);')
 	ok&=conf.CheckLibWithHeader('glut','GL/glut.h','c','glutGetModifiers();')
-	ok&=conf.CheckLibWithHeader('boost_date_time','boost/date_time/posix_time/posix_time.hpp','c++','boost::posix_time::time_duration::time_duration();')
-	ok&=conf.CheckLibWithHeader('boost_thread','boost/thread/thread.hpp','c++','boost::thread::thread();')
-	ok&=conf.CheckLibWithHeader('boost_filesystem','boost/filesystem/path.hpp','c++','boost::filesystem::path();')
+
+	# gentoo has threaded flavour named differently and it must have precedence over the non-threaded one
+	ok&=(conf.CheckLibWithHeader('boost_date_time-mt','boost/date_time/posix_time/posix_time.hpp','c++','boost::posix_time::time_duration::time_duration();',autoadd=1)
+		or conf.CheckLibWithHeader('boost_date_time','boost/date_time/posix_time/posix_time.hpp','c++','boost::posix_time::time_duration::time_duration();',autoadd=1))
+	ok&=(conf.CheckLibWithHeader('boost_thread-mt','boost/thread/thread.hpp','c++','boost::thread::thread();')
+		or conf.CheckLibWithHeader('boost_thread','boost/thread/thread.hpp','c++','boost::thread::thread();'))
+	ok&=(conf.CheckLibWithHeader('boost_filesystem-mt','boost/filesystem/path.hpp','c++','boost::filesystem::path();',autoadd=1)
+		or conf.CheckLibWithHeader('boost_filesystem','boost/filesystem/path.hpp','c++','boost::filesystem::path();',autoadd=1))
+
 	if not env['useMiniWm3']: ok&=conf.CheckLibWithHeader('Wm3Foundation','Wm3Math.h','c++','Wm3::Math<double>::PI;')
+
 	ok&=conf.CheckQt(env['QTDIR'])
 	env.Tool('qt'); env.Replace(QT_LIB='qt-mt')
 
-	# one or another
+	# one or another (QGLViewer is upstream name, 3dviewer is (teomporary) workaround for clashing name with obsolete package once in debian)
 	if conf.CheckLibWithHeader('QGLViewer','QGLViewer/qglviewer.h','c++','QGLViewer(1);'): env['QGLVIEWER_LIB']='QGLViewer'
 	elif conf.CheckLibWithHeader('3dviewer','QGLViewer/qglviewer.h','c++','QGLViewer(1);'): env['QGLVIEWER_LIB']='3dviewer'
 	else: ok=False
