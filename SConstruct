@@ -25,7 +25,7 @@
 import os,os.path,string,re,sys
 import SCons
 # SCons version numbers are needed a few times
-sconsVersion=sum([int(SCons.__version__.split('.')[ord[0]])*ord[1] for ord in [(0,10000),(1,100),(2,1)]])
+sconsVersion=sum([int(SCons.__version__.split('.')[ord[0]])*ord[1] for ord in [(0,10000),(1,100),(2,1)][:len(SCons.__version__.split('.'))] ])
 
 ##########################################################################################
 ############# OPTIONS ####################################################################
@@ -56,7 +56,7 @@ opts.AddOptions(
 	('version','Yade version (if not specified, guess will be attempted)',None),
 	('CPPPATH', 'Additional paths for the C preprocessor (whitespace separated)',None,None,Split),
 	('LIBPATH','Additional paths for the linker (whitespace separated)',None,None,Split),
-	('QTDIR','Directories where to look for qt3',['/usr/share/qt3','/usr/lib/qt','/usr/qt/3'],None,Split),
+	('QTDIR','Directories where to look for qt3',['/usr/share/qt3','/usr/lib/qt','/usr/qt/3','/usr/lib/qt-3.3'],None,Split),
 	('CXX','The c++ compiler','g++'),
 	('CXXFLAGS','Additional compiler flags; you can use them for tuning like -march=pentium4.',None,None,Split), # not tested if really propagates
 	BoolOption('pretty',"Don't show compiler command line (like the Linux kernel)",1),
@@ -101,9 +101,6 @@ buildInc='$buildDir/include/yade-$version'
 env.Append(CPPPATH=[buildInc])
 
 if env['useMiniWm3']: env.Append(CPPPATH=[buildInc+'/yade/lib-miniWm3'])
-	#if not 'lattice' in env['exclude']:
-	#	print "!!! Using miniWm3, lattice will be excluded !!!"
-	#	env.Append(exclude=['lattice'])
 
 ### OLD: older scons only
 if not os.path.exists(buildDir): os.makedirs(buildDir)
@@ -231,13 +228,13 @@ SetOption('num_jobs',env['jobs'])
 ### SHOWING OUTPUT
 if env['pretty']:
 	## http://www.scons.org/wiki/HidingCommandLinesInOutput
-	env.Replace(CXXCOMSTR='C ${SOURCES}') # → ${TARGET.file}')
-	env.Replace(SHCXXCOMSTR='C ${SOURCES}')  #→ ${TARGET.file}')
-	env.Replace(SHLINKCOMSTR='L ${SOURCES}') # → ${TARGET.file}')
-	env.Replace(LINKCOMSTR='L ${SOURCES}') # → ${TARGET.file}')
-	env.Replace(INSTALLSTR='⇒ $TARGET')
-	env.Replace(QT_UICCOMSTR='U ${SOURCES}')
-	env.Replace(QT_MOCCOMSTR='M ${SOURCES}')
+	env.Replace(CXXCOMSTR='C ${SOURCES}', # → ${TARGET.file}')
+		SHCXXCOMSTR='C ${SOURCES}',  #→ ${TARGET.file}')
+		SHLINKCOMSTR='L ${SOURCES}', # → ${TARGET.file}')
+		LINKCOMSTR='L ${SOURCES}', # → ${TARGET.file}')
+		INSTALLSTR='⇒ $TARGET',
+		QT_UICCOMSTR='U ${SOURCES}',
+		QT_MOCCOMSTR='M ${SOURCES}')
 
 ### DIRECTORIES
 ## PREFIX must be absolute path. Why?!
@@ -267,8 +264,8 @@ env.Append(CPPDEFINES=[('SUFFIX',r'\"$SUFFIX\"'),('PREFIX',r'\"$runtimePREFIX\"'
 if env['debug']: env.Append(CXXFLAGS='-ggdb3',CPPDEFINES=['DEBUG','YADE_DEBUG'])
 else: env.Append(CXXFLAGS='-O2')
 if env['optimize']:
-	env.Append(CXXFLAGS=Split('-O3 -ffast-math'))
-	env.Append(CPPDEFINES=[('YADE_CAST','static_cast'),('YADE_PTR_CAST','static_pointer_cast')])
+	env.Append(CXXFLAGS=Split('-O3 -ffast-math'),
+		CPPDEFINES=[('YADE_CAST','static_cast'),('YADE_PTR_CAST','static_pointer_cast')])
 	# -floop-optimize2 is a gcc-4.x flag, doesn't exist on previous version
 	# CRASH -ffloat-store
 	# maybe not CRASH?: -fno-math-errno
@@ -290,8 +287,7 @@ env.Append(CXXFLAGS=['-pipe','-Wall'])
 ### LINKER
 #env['NONPLUGIN_LIBS']=env['LIBS']
 ## libs for all plugins
-env.Append(LIBS=[])
-env.Append(SHLINKFLAGS=['-Wl,-soname=\"${TARGET.file}\"','-rdynamic'])
+env.Append(LIBS=[],SHLINKFLAGS=['-Wl,-soname=\"${TARGET.file}\"','-rdynamic'])
 
 #env.Append(LIBS=['yade-core']); env.Append(SHLINKFLAGS=['-Wl,--no-undefined']);
 

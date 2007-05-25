@@ -710,7 +710,4 @@
     <slot>deleteEngine(int)</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
-<includehints>
-    <includehint>glengineeditor.h</includehint>
-</includehints>
 </UI>

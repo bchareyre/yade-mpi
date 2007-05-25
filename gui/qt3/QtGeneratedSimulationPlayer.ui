@@ -509,7 +509,4 @@
     <slot>cbSaveSnapShotsToggled(bool)</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
-<includehints>
-    <includehint>glsimulationplayerviewer.h</includehint>
-</includehints>
 </UI>
