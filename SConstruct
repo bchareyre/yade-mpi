@@ -56,7 +56,7 @@ opts.AddOptions(
 	('version','Yade version (if not specified, guess will be attempted)',None),
 	('CPPPATH', 'Additional paths for the C preprocessor (whitespace separated)',None,None,Split),
 	('LIBPATH','Additional paths for the linker (whitespace separated)',None,None,Split),
-	('QTDIR','Directories where to look for qt3',['/usr/share/qt3','/usr/lib/qt'],None,Split),
+	('QTDIR','Directories where to look for qt3',['/usr/share/qt3','/usr/lib/qt','/usr/qt/3'],None,Split),
 	('CXX','The c++ compiler','g++'),
 	('CXXFLAGS','Additional compiler flags; you can use them for tuning like -march=pentium4.',None,None,Split), # not tested if really propagates
 	BoolOption('pretty',"Don't show compiler command line (like the Linux kernel)",1),
@@ -185,7 +185,12 @@ if not env.GetOption('clean'):
 	if not env['useMiniWm3']: ok&=conf.CheckLibWithHeader('Wm3Foundation','Wm3Math.h','c++','Wm3::Math<double>::PI;')
 	ok&=conf.CheckQt(env['QTDIR'])
 	env.Tool('qt'); env.Replace(QT_LIB='qt-mt')
-	ok&=conf.CheckLibWithHeader('3dviewer','QGLViewer/qglviewer.h','c++','QGLViewer(1);')
+
+	# one or another
+	if conf.CheckLibWithHeader('QGLViewer','QGLViewer/qglviewer.h','c++','QGLViewer(1);'): env['QGLVIEWER_LIB']='QGLViewer'
+	elif conf.CheckLibWithHeader('3dviewer','QGLViewer/qglviewer.h','c++','QGLViewer(1);'): env['QGLVIEWER_LIB']='3dviewer'
+	else: ok=False
+
 	if not ok:
 		print "\nOne of the essential libraries above was not found, unable to continue.\n\nCheck `%s' for possible causes, note that there are options that you may need to customize:\n\n"%(buildDir+'/config.log')+opts.GenerateHelpText(env)
 		Exit(1)
