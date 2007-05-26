@@ -428,7 +428,8 @@ intertia/density WRT centroid:
 I checked "a" charcter by character and it is correct; it the author wrong (doubtful)?
 
 */
-Matrix3r TetrahedronInertiaTensor(const Vector3r v[4]){
+//Matrix3r TetrahedronInertiaTensor(const Vector3r v[4]){
+Matrix3r TetrahedronInertiaTensor(const vector<Vector3r>& v){
 	#define x1 v[0][0]
 	#define y1 v[0][1]
 	#define z1 v[0][2]
@@ -441,6 +442,9 @@ Matrix3r TetrahedronInertiaTensor(const Vector3r v[4]){
 	#define x4 v[3][0]
 	#define y4 v[3][1]
 	#define z4 v[3][2]
+
+// FIXME - C array
+	assert(v.size()==4);
 
 	// Jacobian of transformation to the reference 4hedron
 	double detJ=(x2-x1)*(y3-y1)*(z4-z1)+(x3-x1)*(y4-y1)*(z2-z1)+(x4-x1)*(y2-y1)*(z3-z1)
@@ -486,13 +490,22 @@ Matrix3r TetrahedronInertiaTensor(const Vector3r v[4]){
 }
 
 /*! Caluclate tetrahedron's central inertia tensor */
-Matrix3r TetrahedronCentralInertiaTensor(const Vector3r v[4]){
-	Vector3r vv[4];
+//Matrix3r TetrahedronCentralInertiaTensor(const Vector3r v[4]){
+Matrix3r TetrahedronCentralInertiaTensor(const vector<Vector3r>& v){
+	assert(v.size()==4);
+	vector<Vector3r> vv;
+
+//	Vector3r vv[4];
 	Vector3r cg=(v[0]+v[1]+v[2]+v[3])*.25;
-	vv[0]=v[0]-cg;
-	vv[1]=v[1]-cg;
-	vv[2]=v[2]-cg;
-	vv[3]=v[3]-cg;
+//	vv[0]=v[0]-cg;
+//	vv[1]=v[1]-cg;
+//	vv[2]=v[2]-cg;
+//	vv[3]=v[3]-cg;
+	vv.push_back(v[0]-cg);
+	vv.push_back(v[1]-cg);
+	vv.push_back(v[2]-cg);
+	vv.push_back(v[3]-cg);
+
 	return TetrahedronInertiaTensor(vv);
 }
 

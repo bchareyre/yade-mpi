@@ -13,12 +13,17 @@
 Tetrahedron::Tetrahedron(): GeometricalModel()
 {
 	createIndex();
+ 	// FIXME: something like v(4,Vector3r(0,0,0)) should work...
+	// FIXME - remove that line when we can move to C array[4]
+	for(size_t i=0; i<4; i++) v.push_back(Vector3r(0,0,0));
 }
 
 Tetrahedron::Tetrahedron(const Vector3r& v0,const Vector3r& v1,const Vector3r& v2,const Vector3r& v3) : GeometricalModel()
 {
 	createIndex();
-	v[0]=v0; v[1]=v1; v[2]=v2; v[3]=v3;
+	// FIXME - we can move to C array[4] ...
+	v.push_back(v0); v.push_back(v1); v.push_back(v2); v.push_back(v3);
+//	v[0]=v0; v[1]=v1; v[2]=v2; v[3]=v3;
 }
 
 Tetrahedron::~Tetrahedron()

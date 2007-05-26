@@ -17,7 +17,9 @@
 class Tetrahedron : public GeometricalModel
 {
 	public :
-		Vector3r v[4]; // vertices of tetrahedron
+	// FIXME - we can go back to C array when we migrate to boost::serialization. yade::serialization does not support C arrays
+		std::vector<Vector3r> v; // vertices of tetrahedron
+//		Vector3r v[4]; // vertices of tetrahedron
 
 		Tetrahedron();
 		Tetrahedron(const Vector3r& v0, const Vector3r& v1, const Vector3r& v2, const Vector3r& v3);
