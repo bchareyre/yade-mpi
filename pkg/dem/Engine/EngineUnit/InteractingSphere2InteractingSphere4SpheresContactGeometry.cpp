@@ -43,7 +43,15 @@ bool InteractingSphere2InteractingSphere4SpheresContactGeometry::go(	const share
 	if (c->interactionGeometry)
 	{
 		//scm = YADE_PTR_CAST<SpheresContactGeometry>(c->interactionGeometry);
-		scm = static_pointer_cast<SpheresContactGeometry>(c->interactionGeometry);
+	//
+	// WARNING! 
+	//
+	// FIXME - this must be dynamic cast until the contaners are rewritten to support multiple interactions types
+	//         the problem is that scm can be either SDECLinkGeometry or SpheresContactGeometry and the only way CURRENTLY
+	//         to check this is by dynamic cast. This has to be fixed.
+	//
+		scm = dynamic_pointer_cast<SpheresContactGeometry>(c->interactionGeometry);
+		//scm = dynamic_cast<SpheresContactGeometry*>(c->interactionGeometry.get());
 	// BEGIN .......  FIXME FIXME	- wrong hack, to make cohesion work.
 		if(! scm) // this is not SpheresContactGeometry, so it is SDECLinkGeometry, dispatcher should do this job.
 		{

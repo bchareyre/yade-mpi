@@ -115,6 +115,8 @@ void SAPCollider::action(Body* body)
 		itEnd = overlappingBB[i].end();
 		for(;it!=itEnd;++it)
 		{
+		/* FIXME - clump stuff doesn't work, and SAPCollider itself is crazy and gotta be replaced with a working one.
+		 *
 			// FIXME - this assumes that bodies are numbered from zero with one number increments, BAD!!!
 //			if (!(bodies->find(i)->isDynamic==false && bodies->find(*it)->isDynamic==false))
 //			FIXME: this is broken for clumps!!!
@@ -123,6 +125,9 @@ void SAPCollider::action(Body* body)
 					( (*bodies)[i]->clumpId==Body::ID_NONE || (*bodies)[*it]->clumpId==Body::ID_NONE || ( (*bodies)[i]->clumpId != (*bodies)[*it]->clumpId )) // either (at least) one of them is not within a clump or they are not part of the same clump
 					)
 			// pre-clump code: if (!((*bodies)[i]->isDynamic==false && (*bodies)[*it]->isDynamic==false))
+		*/
+			
+			if (!((*bodies)[i]->isDynamic==false && (*bodies)[*it]->isDynamic==false))
 			{
 				nbPotentialInteractions++;
 				shared_ptr<Interaction> inter(new Interaction(i,*it));
