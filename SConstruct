@@ -49,7 +49,8 @@ opts.AddOptions(
 	BoolOption('debug', 'Enable debugging information and disable optimizations',1),
 	BoolOption('profile','Enable profiling information',0),
 	BoolOption('optimize','Turn on heavy optimizations (generates SSE2 instructions)',0),
-	ListOption('exclude','Components that will not be built','none',names=['gui','extra','common','dem','fem','lattice','mass-spring','realtime-rigidbody']),
+	ListOption('exclude','Yade components that will not be built','none',names=['gui','extra','common','dem','fem','lattice','mass-spring','realtime-rigidbody']),
+	ListOption('features','Optional features that are turned on','all',names=['python','log4cxx']),
 	('jobs','Number of jobs to run at the same time (same as -j, but saved)',4,None,int),
 	('extraModules', 'Extra directories with their own SConscript files (must be in-tree) (whitespace separated)',None,None,Split),
 	('buildPrefix','Where to create build-[version][variant] directory for intermediary files','..'),
@@ -86,7 +87,7 @@ Help(opts.GenerateHelpText(env))
 if not env.has_key('version'):
 	"Attempts to get yade version from local svn tree; should be extended so that it works for releases as well (not yet applicable)."
 	svnRevision=None
-	for l in os.popen("svn info").readlines():
+	for l in os.popen("LC_ALL=c svn info").readlines():
 		m=re.match(r'Revision: ([0-9]+)',l)
 		if m: env['version']='svn'+m.group(1)
 	if not env.has_key('version'): env['version']='unknown'
@@ -200,9 +201,9 @@ if not env.GetOption('clean'):
 		Exit(1)
 
 	# check optional libs
-	if conf.CheckLibWithHeader('log4cxx','log4cxx/logger.h','c++','log4cxx::Logger::getLogger("foo");'):
+	if 'log4cxx' in env['features'] and conf.CheckLibWithHeader('log4cxx','log4cxx/logger.h','c++','log4cxx::Logger::getLogger("foo");'):
 		env.Append(LIBS='log4cxx',CPPDEFINES=['LOG4CXX'])
-	if conf.CheckPython() and conf.CheckScientificPython():
+	if 'python' in env['features'] and conf.CheckPython() and conf.CheckScientificPython():
 		env.Append(CPPDEFINES=['EMBED_PYTHON'])
 
 	# append essential libs		
@@ -287,7 +288,8 @@ env.Append(CXXFLAGS=['-pipe','-Wall'])
 ### LINKER
 #env['NONPLUGIN_LIBS']=env['LIBS']
 ## libs for all plugins
-env.Append(LIBS=[],SHLINKFLAGS=['-Wl,-soname=\"${TARGET.file}\"','-rdynamic'])
+# Investigate whether soname is useful for something. Probably not: SHLINKFLAGS=['-Wl,-soname=${TARGET.file},'-rdynamic']
+env.Append(LIBS=[],SHLINKFLAGS=['-rdynamic'])
 
 #env.Append(LIBS=['yade-core']); env.Append(SHLINKFLAGS=['-Wl,--no-undefined']);
 
