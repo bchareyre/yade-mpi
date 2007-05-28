@@ -224,7 +224,10 @@ void QtFileGenerator::timerEvent( QTimerEvent* )
 		 * 1. it is desired,
 		 * 2. generation was successful (unreliable check: generator returns string; we just have a look if the filename specified exists or not),
 		 * 3. no simulation is open already (by checking Omega's simulationFileName) */
-		if(cbOpenAutomatically->isChecked() && filesystem::exists(filesystem::path((const char*)(leOutputFileName->text()))) && Omega::instance().getSimulationFileName()==""){
+		if(	   cbOpenAutomatically->isChecked() 
+			&& filesystem::exists(filesystem::path((const char*)(leOutputFileName->text()))) 
+			&& Omega::instance().getSimulationFileName()=="")
+		{
 			QWidget* qw=this; while (qw->parentWidget()) qw=qw->parentWidget(); // find toplevel widget - which should be yade's main window
 			Omega::instance().setSimulationFileName((const char*)(leOutputFileName->text()));
 			(dynamic_cast<YadeQtMainWindow*>(qw))->fileNewSimulation();

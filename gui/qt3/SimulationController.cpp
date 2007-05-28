@@ -161,7 +161,7 @@ void SimulationController::pbLoadClicked()
 }
 
 
-void SimulationController::loadSimulationFromFileName(const std::string& fileName)
+void SimulationController::loadSimulationFromFileName(const std::string& fileName,bool center)
 {
 	assert(filesystem::exists(fileName));
 
@@ -219,7 +219,10 @@ void SimulationController::loadSimulationFromFileName(const std::string& fileNam
 			pbOneSimulationStep->setDisabled(true);
 		}
 
-		pbCenterSceneClicked();
+		if(center)
+			pbCenterSceneClicked();
+		
+		rbTimeStepper->setEnabled(Omega::instance().containTimeStepper());
 }
 
 void SimulationController::pbSaveClicked()
@@ -319,17 +322,29 @@ void SimulationController::pbResetClicked()
 
 	pbStopClicked();
 
+/*
 	Omega::instance().finishSimulationLoop();
 	Omega::instance().joinSimulationLoop(); 
 	Omega::instance().loadSimulation();
 	Omega::instance().createSimulationLoop();
+*/
+	std::string name=Omega::instance().getSimulationFileName(); 
+	loadSimulationFromFileName(name,false);
 
-	changeSkipTimeStepper = true;
-	skipTimeStepper = !wasUsingTimeStepper;
-	updater->oneLoop(); // to refresh gui
+	if(Omega::instance().getRootBody())
+	{
+		changeSkipTimeStepper = true;
+		skipTimeStepper = !wasUsingTimeStepper;
+		updater->oneLoop(); // to refresh gui
 
-	rbTimeStepper->setEnabled(Omega::instance().containTimeStepper());
-	redrawAll();
+		rbTimeStepper->setEnabled(Omega::instance().containTimeStepper());
+		redrawAll();
+	} 
+	else
+	{
+		Omega::instance().setSimulationFileName(name);
+		pbResetSimulation->setEnabled(true);
+	}
 
 //	pbCenterSceneClicked();  // FIXME - add autocenter option...
 }
@@ -365,7 +380,7 @@ void SimulationController::closeEvent(QCloseEvent *)
 
 void SimulationController::bgTimeStepClicked(int i)
 {
-	switch (i)
+	switch (i) // FIXME wtf ? (code written by Olivier)
 	{
 		case 0 : //Use timeStepper
 			changeSkipTimeStepper = true;

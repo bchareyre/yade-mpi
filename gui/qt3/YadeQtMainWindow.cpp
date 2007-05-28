@@ -140,7 +140,8 @@ void YadeQtMainWindow::createMenus()
 
 void YadeQtMainWindow::fileNewSimulation()
 {
-	simulationController = new SimulationController(workspace);
+	if(!simulationController)
+		simulationController = new SimulationController(workspace);
 	simulationController->show();
 	connect( simulationController, SIGNAL( closeSignal() ), this, SLOT( closeSimulationControllerEvent() ) );
 	fileNewSimulationAction->setEnabled(false);

@@ -38,7 +38,7 @@ class SimulationController : public QtGeneratedSimulationController
 		QFrame * scrollViewFrame;
 		QVBoxLayout* scrollViewLayout;
 		void addNewView();
-		void loadSimulationFromFileName(const std::string& fileName);
+		void loadSimulationFromFileName(const std::string& fileName,bool center=true);
 	
 	public : 
 		bool	 changeSkipTimeStepper
