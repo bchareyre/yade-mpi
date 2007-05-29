@@ -128,7 +128,7 @@ def CheckQt(context, qtdirs):
 		context.Message( 'Checking for qt-mt in '+qtdir+'... ' )
 		context.env['QTDIR']=qtdir
 		context.env.Append(LIBS='qt-mt',LIBPATH=qtdir+'/lib',CPPPATH=qtdir+'/include' )
-		ret=context.TryLink('#include<qapp.h>\nint main(int argc, char **argv){QApplication qapp(argc, argv);return 0;}\n','.cpp')
+		ret=context.TryLink('#include<qapplication.h>\nint main(int argc, char **argv){QApplication qapp(argc, argv);return 0;}\n','.cpp')
 		context.Result(ret)
 		if not ret:
 			for k in origs.keys(): context.env[k]=origs[k]
