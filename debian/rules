@@ -71,7 +71,7 @@ install: build
 	### WARNING: !!!!!!!!!!!!! if this hangs later on, use fakeroot-tcp instead of fakeroot !!!!!!!!
 	## scons remembers settings, specify only those that have changed on subsequent invocations
 	#install headers
-	scons buildPrefix=debian runtimePREFIX=/usr PREFIX=debian/yade${_SVNVERSION}-dev/usr variant='' version=${SVNVERSION} useMiniWm3=0 exclude=realtime-rigidbody CPPPATH=/usr/include/wm3 debian/yade${_SVNVERSION}-dev/usr/include
+	scons buildPrefix=debian runtimePREFIX=/usr PREFIX=debian/yade${_SVNVERSION}-dev/usr variant='' version=${SVNVERSION} useMiniWm3=1 exclude=realtime-rigidbody CPPPATH=/usr/include/wm3 debian/yade${_SVNVERSION}-dev/usr/include
 	#debug build
 	scons PREFIX=debian/yade${_SVNVERSION}-dbg/usr variant=-dbg optimize=0 debug=1
 	#optimized build
