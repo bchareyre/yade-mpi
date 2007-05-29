@@ -50,7 +50,8 @@ opts.AddOptions(
 	BoolOption('profile','Enable profiling information',0),
 	BoolOption('optimize','Turn on heavy optimizations (generates SSE2 instructions)',0),
 	ListOption('exclude','Yade components that will not be built','none',names=['gui','extra','common','dem','fem','lattice','mass-spring','realtime-rigidbody']),
-	ListOption('features','Optional features that are turned on','all',names=['python','log4cxx']),
+	# OK, dummy prevents bug in scons: if one selects all, it says all in scons.config, but without quotes, which generates error.
+	ListOption('features','Optional features that are turned on','python,log4cxx',names=['python','log4cxx','dummy']),
 	('jobs','Number of jobs to run at the same time (same as -j, but saved)',4,None,int),
 	('extraModules', 'Extra directories with their own SConscript files (must be in-tree) (whitespace separated)',None,None,Split),
 	('buildPrefix','Where to create build-[version][variant] directory for intermediary files','..'),
@@ -87,7 +88,7 @@ Help(opts.GenerateHelpText(env))
 if not env.has_key('version'):
 	"Attempts to get yade version from local svn tree; should be extended so that it works for releases as well (not yet applicable)."
 	svnRevision=None
-	for l in os.popen("LC_ALL=c svn info").readlines():
+	for l in os.popen("LC_ALL=C svn info").readlines():
 		m=re.match(r'Revision: ([0-9]+)',l)
 		if m: env['version']='svn'+m.group(1)
 	if not env.has_key('version'): env['version']='unknown'
@@ -192,9 +193,8 @@ if not env.GetOption('clean'):
 	env.Tool('qt'); env.Replace(QT_LIB='qt-mt')
 
 	# one or another (QGLViewer is upstream name, 3dviewer is (teomporary) workaround for clashing name with obsolete package once in debian)
-	if conf.CheckLibWithHeader('QGLViewer','QGLViewer/qglviewer.h','c++','QGLViewer(1);'): env['QGLVIEWER_LIB']='QGLViewer'
-	elif conf.CheckLibWithHeader('3dviewer','QGLViewer/qglviewer.h','c++','QGLViewer(1);'): env['QGLVIEWER_LIB']='3dviewer'
-	else: ok=False
+	ok&=(conf.CheckLibWithHeader('QGLViewer','QGLViewer/qglviewer.h','c++','QGLViewer(1);'): env['QGLVIEWER_LIB']='QGLViewer'
+		or conf.CheckLibWithHeader('3dviewer','QGLViewer/qglviewer.h','c++','QGLViewer(1);'): env['QGLVIEWER_LIB']='3dviewer')
 
 	if not ok:
 		print "\nOne of the essential libraries above was not found, unable to continue.\n\nCheck `%s' for possible causes, note that there are options that you may need to customize:\n\n"%(buildDir+'/config.log')+opts.GenerateHelpText(env)

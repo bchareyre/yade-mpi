@@ -141,7 +141,7 @@ bool GLSimulationPlayerViewer::loadPositionOrientationFile()
 	fileName = inputBaseDirectory+"/"+inputBaseName;
 
 	string num = lexical_cast<string>(frameNumber);
-	while (num.size()<inputPaddle)
+	while (num.size()<(size_t)inputPaddle)
 		num.insert(num.begin(),'0');
 
 	fileName += num;

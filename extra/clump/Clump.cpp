@@ -192,6 +192,7 @@ void Clump::updateProperties(bool intersecting){
 		shared_ptr<Body> subBody=Body::byId(I->first);
 		const shared_ptr<RigidBodyParameters>& subRBP(YADE_PTR_CAST<RigidBodyParameters>(subBody->physicalParameters));
 		mySe3.position=subRBP->se3.position;
+		TRWM3VEC(subRBP->se3.position);
 		mySe3.orientation=subRBP->se3.orientation;
 		clumpRBP->inertia=subRBP->inertia;
 		clumpRBP->mass=subRBP->mass;

@@ -105,7 +105,7 @@ void SphericalDEMSimulator::run(int nbIterations)
 			string fileName = outputDirectory+"/"+outputBaseName;
 		
 			string num = lexical_cast<string>(recordedIter);
-			while (num.size()<paddle)
+			while (num.size()<(size_t)paddle)
 				num.insert(num.begin(),'0');
 		
 			fileName += num;
