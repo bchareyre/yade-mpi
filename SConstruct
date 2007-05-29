@@ -86,12 +86,16 @@ Help(opts.GenerateHelpText(env))
 ##ALL generated stuff should go here - therefore we must determine it very early!!
 
 if not env.has_key('version'):
-	"Attempts to get yade version from local svn tree; should be extended so that it works for releases as well (not yet applicable)."
-	svnRevision=None
-	for l in os.popen("LC_ALL=C svn info").readlines():
-		m=re.match(r'Revision: ([0-9]+)',l)
-		if m: env['version']='svn'+m.group(1)
-	if not env.has_key('version'): env['version']='unknown'
+	"Attempts to get yade version from RELEASE file if it exists or from svn."
+	if os.path.exists('RELEASE'):
+		env['version']=file('RELEASE').readline().strip()
+	if not env.has_key('version'):
+		for l in os.popen("LC_ALL=C svn info").readlines():
+			m=re.match(r'Revision: ([0-9]+)',l)
+			if m: env['version']='svn'+m.group(1)
+	if not env.has_key('version'):
+		env['version']='unknown'
+
 env['SUFFIX']='-'+env['version']+env['variant']
 print "Yade version is `%s', installed files will be suffixed with `%s'."%(env['version'],env['SUFFIX'])
 # make buildDir absolute, saves hassles later
