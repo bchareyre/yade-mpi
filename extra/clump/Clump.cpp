@@ -191,13 +191,15 @@ void Clump::updateProperties(bool intersecting){
 		memberMap::iterator I=members.begin();
 		shared_ptr<Body> subBody=Body::byId(I->first);
 		const shared_ptr<RigidBodyParameters>& subRBP(YADE_PTR_CAST<RigidBodyParameters>(subBody->physicalParameters));
+		// se3 of the clump as whole is the same as the member's se3
 		mySe3.position=subRBP->se3.position;
-		TRWM3VEC(subRBP->se3.position);
 		mySe3.orientation=subRBP->se3.orientation;
+		// relative member's se3 is identity
+		I->second.position=Vector3r::ZERO; I->second.orientation=Quaternionr::IDENTITY;
 		clumpRBP->inertia=subRBP->inertia;
 		clumpRBP->mass=subRBP->mass;
-		clumpRBP->velocity=Vector3r(0,0,0);
-		clumpRBP->angularVelocity=Vector3r(0,0,0);
+		clumpRBP->velocity=Vector3r::ZERO;
+		clumpRBP->angularVelocity=Vector3r::ZERO;
 		return;
 	}
 

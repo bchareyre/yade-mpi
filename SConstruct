@@ -193,8 +193,10 @@ if not env.GetOption('clean'):
 	env.Tool('qt'); env.Replace(QT_LIB='qt-mt')
 
 	# one or another (QGLViewer is upstream name, 3dviewer is (teomporary) workaround for clashing name with obsolete package once in debian)
-	ok&=(conf.CheckLibWithHeader('QGLViewer','QGLViewer/qglviewer.h','c++','QGLViewer(1);'): env['QGLVIEWER_LIB']='QGLViewer'
-		or conf.CheckLibWithHeader('3dviewer','QGLViewer/qglviewer.h','c++','QGLViewer(1);'): env['QGLVIEWER_LIB']='3dviewer')
+	if conf.CheckLibWithHeader('QGLViewer','QGLViewer/qglviewer.h','c++','QGLViewer(1);'): env['QGLVIEWER_LIB']='QGLViewer'
+	elif conf.CheckLibWithHeader('3dviewer','QGLViewer/qglviewer.h','c++','QGLViewer(1);'): env['QGLVIEWER_LIB']='3dviewer'
+	else: ok=False
+	
 
 	if not ok:
 		print "\nOne of the essential libraries above was not found, unable to continue.\n\nCheck `%s' for possible causes, note that there are options that you may need to customize:\n\n"%(buildDir+'/config.log')+opts.GenerateHelpText(env)
