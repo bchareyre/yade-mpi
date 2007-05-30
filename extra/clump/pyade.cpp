@@ -16,14 +16,15 @@
 /******************* basic type conversions *********/
 static PyObject* __main__; // assigned in initializer
 PyObject* toPython(int arg){return Py_BuildValue("i",arg);}
-PyObject* toPython(Body::id_t arg){return toPython((int)arg);}
+//PyObject* toPython(body_id_t arg){return toPython((int)arg);}
+PyObject* toPython(unsigned int arg){return toPython((int)arg);}
 PyObject* toPython(long arg){return Py_BuildValue("l",arg);}
 PyObject* toPython(bool arg){return toPython((int)arg);}
 PyObject* toPython(double arg){return Py_BuildValue("d",arg);}
 PyObject* toPython(std::string arg){return Py_BuildValue("s",arg.c_str());}
 PyObject* toPython(Wm3::Vector3r arg){	return PyObject_Call(PyObject_GetAttrString(__main__,"Vector"),Py_BuildValue("(ddd)",arg[0],arg[1],arg[2]),NULL);}
 PyObject* toPython(Wm3::Quaternionr arg){ return PyObject_Call(PyObject_GetAttrString(__main__,"Quaternion"),Py_BuildValue("(dddd)",arg[0],arg[1],arg[2],arg[3]),NULL);}
-PyObject* toPython(list<Body::id_t> arg){	PyObject* ret=PyList_New(0); for(list<Body::id_t>::iterator I=arg.begin(); I!=arg.end(); I++) PyList_Append(ret,toPython(*I)); return ret;}
+PyObject* toPython(list<body_id_t> arg){	PyObject* ret=PyList_New(0); for(list<body_id_t>::iterator I=arg.begin(); I!=arg.end(); I++) PyList_Append(ret,toPython(*I)); return ret;}
  
 /******************* body properties ****************/
 
@@ -52,7 +53,7 @@ static PyObject*
 bodyProp(PyObject *self, PyObject *args){
 	long id, prop;
 	if(!PyArg_ParseTuple(args, "ll", &id, &prop)) return NULL;
-	shared_ptr<Body> B=Body::byId((Body::id_t)id);
+	shared_ptr<Body> B=Body::byId((body_id_t)id);
 	shared_ptr<PhysicalParameters> pp=B->physicalParameters;
 	// FIXME: we will crash if user requests rbp for a body that doesn't have it!
 	// later, do assert(rbp), raise exception (in a pythonic way - need to see docs on that) and return None

@@ -15,7 +15,7 @@
 #include "Omega.hpp"
 
 //! This could be -1 if id_t is re-typedef'ed as `int'
-const id_t Body::ID_NONE=UINT_MAX;
+const body_id_t Body::ID_NONE=body_id_t(-1);
 /*! The definition will change once Omega disappears, but the interface should be the same.
  * \warning This relies on Omega::instance().getRootBody() returning the respective rootBody.
  * Therefore, if you use this from a FileGenerator, you will need to call something like \code
@@ -28,7 +28,7 @@ const id_t Body::ID_NONE=UINT_MAX;
 	\endcode
 	\warning Make sure that a simulation is not running during generation, otherwise it will most likely crash. It seems that Omega::getRootBodyMutex that could be used for this purpose is just a dummy function.
  * */
-shared_ptr<Body> Body::byId(Body::id_t _id){return (*(Omega::instance().getRootBody()->bodies))[_id];}
+shared_ptr<Body> Body::byId(body_id_t _id){return (*(Omega::instance().getRootBody()->bodies))[_id];}
 
 // we must initialize id = 0, otherwise BodyContainer will crash.
 Body::Body () : 
@@ -39,7 +39,7 @@ Body::Body () :
 {
 }
 
-Body::Body (unsigned int newId, int newGroup) :
+Body::Body (body_id_t newId, int newGroup) :
 	  Serializable()
 	, id(newId)
 	, groupMask(newGroup)

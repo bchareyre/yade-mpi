@@ -66,5 +66,5 @@ string TetraTestGen::generate()
 	Omega::instance().setRootBody(oldRootBody);
 	#endif
 	
-	return "OK";
+	return "ATTN: this example is not working yet!";
 }

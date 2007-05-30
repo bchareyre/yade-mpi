@@ -17,7 +17,7 @@ using namespace std;
 
 struct lessThanPair
 {
-	bool operator()(const pair<unsigned int,shared_ptr<Interaction> >& p1, const pair<unsigned int,shared_ptr<Interaction> >& p2) const
+	bool operator()(const pair<body_id_t,shared_ptr<Interaction> >& p1, const pair<body_id_t,shared_ptr<Interaction> >& p2) const
 	{
 		return (p1.first<p2.first);
 	}
@@ -26,10 +26,10 @@ struct lessThanPair
 class InteractionVecSetIterator : public InteractionContainerIterator 
 {
 	public :
-		vector<set<pair<unsigned int,shared_ptr<Interaction> >,lessThanPair > >::iterator vii;
-		vector<set<pair<unsigned int,shared_ptr<Interaction> >,lessThanPair > >::iterator viiEnd;
-		set<pair<unsigned int,shared_ptr<Interaction> >,lessThanPair >::iterator sii;
-		set<pair<unsigned int,shared_ptr<Interaction> >,lessThanPair >::iterator siiEnd;
+		vector<set<pair<body_id_t,shared_ptr<Interaction> >,lessThanPair > >::iterator vii;
+		vector<set<pair<body_id_t,shared_ptr<Interaction> >,lessThanPair > >::iterator viiEnd;
+		set<pair<body_id_t,shared_ptr<Interaction> >,lessThanPair >::iterator sii;
+		set<pair<body_id_t,shared_ptr<Interaction> >,lessThanPair >::iterator siiEnd;
 
 		InteractionVecSetIterator();
 		~InteractionVecSetIterator();

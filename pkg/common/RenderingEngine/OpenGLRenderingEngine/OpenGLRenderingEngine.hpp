@@ -42,8 +42,8 @@ class OpenGLRenderingEngine : public RenderingEngine
 				,Interaction_physics
 		
 				,needInit;
-		int 	current_selection,
-				Draw_mask;
+		body_id_t 	current_selection;
+		int		Draw_mask;
 
 	private :
 		DynLibDispatcher< InteractionGeometry , GLDrawInteractionGeometryFunctor, void , TYPELIST_5(const shared_ptr<InteractionGeometry>&, const shared_ptr<Interaction>& , const shared_ptr<Body>&, const shared_ptr<Body>&, bool) > interactionGeometryDispatcher;
@@ -77,7 +77,7 @@ class OpenGLRenderingEngine : public RenderingEngine
 		virtual ~OpenGLRenderingEngine();
 	
 		void init();
-		void render(const shared_ptr<MetaBody>& body, int selection = -1);
+		void render(const shared_ptr<MetaBody>& body, body_id_t selection = body_id_t(-1));
 		virtual void renderWithNames(const shared_ptr<MetaBody>& );
 	
 	private :

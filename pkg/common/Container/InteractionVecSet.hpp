@@ -24,7 +24,7 @@ using namespace __gnu_cxx;
 class InteractionVecSet : public InteractionContainer
 {
 	private :
-		vector<set<pair<unsigned int,shared_ptr<Interaction> >,lessThanPair > > interactions;
+		vector<set<pair<body_id_t,shared_ptr<Interaction> >,lessThanPair > > interactions;
 		unsigned int currentSize;
 		shared_ptr<Interaction> empty;
 
@@ -33,11 +33,11 @@ class InteractionVecSet : public InteractionContainer
 		InteractionVecSet();
 		virtual ~InteractionVecSet();
 
-		virtual bool insert(unsigned int id1,unsigned int id2);
+		virtual bool insert(body_id_t id1,body_id_t id2);
 		virtual bool insert(shared_ptr<Interaction>& i);
 		virtual void clear();
-		virtual bool erase(unsigned int id1,unsigned int id2);
-		virtual const shared_ptr<Interaction>& find(unsigned int id1,unsigned int id2);
+		virtual bool erase(body_id_t id1,body_id_t id2);
+		virtual const shared_ptr<Interaction>& find(body_id_t id1,body_id_t id2);
 
 		virtual InteractionContainer::iterator begin();
         	virtual InteractionContainer::iterator end();

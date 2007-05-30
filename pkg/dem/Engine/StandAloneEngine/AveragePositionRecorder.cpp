@@ -23,7 +23,6 @@ AveragePositionRecorder::AveragePositionRecorder () : DataRecorder()
 {
 	outputFile = "";
 	interval = 50;
-	bigBallId = 0;
 }
 
 
@@ -41,7 +40,6 @@ void AveragePositionRecorder::registerAttributes()
 	DataRecorder::registerAttributes();
 	REGISTER_ATTRIBUTE(outputFile);
 	REGISTER_ATTRIBUTE(interval);
-	REGISTER_ATTRIBUTE(bigBallId);
 }
 
 
@@ -63,7 +61,7 @@ void AveragePositionRecorder::action(Body * body)
 	for(  ; bi!=biEnd ; ++bi )
 	{
 		shared_ptr<Body> body = *bi;
-		if( body->isDynamic && body->getId() != bigBallId )
+		if( body->isDynamic )
 		{ 
 			size+=1.0;
 			x+=body->physicalParameters->se3.position[0];
@@ -79,11 +77,7 @@ void AveragePositionRecorder::action(Body * body)
 	ofile << lexical_cast<string>(Omega::instance().getSimulationTime()) << " " 
 		<< lexical_cast<string>(x) << " " 
 		<< lexical_cast<string>(y) << " " 
-		<< lexical_cast<string>(z) << " "
-
-		<< lexical_cast<string>((*bodies)[bigBallId]->physicalParameters->se3.position[0]) << " " // big ball
-		<< lexical_cast<string>((*bodies)[bigBallId]->physicalParameters->se3.position[1]) << " " 
-		<< lexical_cast<string>((*bodies)[bigBallId]->physicalParameters->se3.position[2]) << endl;
+		<< lexical_cast<string>(z) << endl;
 }
 
 

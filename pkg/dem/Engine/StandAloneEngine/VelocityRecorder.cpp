@@ -19,7 +19,6 @@ VelocityRecorder::VelocityRecorder () : DataRecorder()
 {
 	outputFile = "";
 	interval = 50;
-	bigBallId = 0;
 }
 
 
@@ -37,7 +36,6 @@ void VelocityRecorder::registerAttributes()
 	DataRecorder::registerAttributes();
 	REGISTER_ATTRIBUTE(outputFile);
 	REGISTER_ATTRIBUTE(interval);
-	REGISTER_ATTRIBUTE(bigBallId);
 }
 
 
@@ -59,7 +57,7 @@ void VelocityRecorder::action(Body * body)
 	for(  ; bi!=biEnd ; ++bi )
 	{
 		shared_ptr<Body> body = *bi;
-		if( body->isDynamic && body->getId() != bigBallId )
+		if( body->isDynamic )
 		{ 
 			size+=1.0;
 			ParticleParameters* pp = YADE_CAST<ParticleParameters*>(body->physicalParameters.get());
@@ -75,16 +73,11 @@ void VelocityRecorder::action(Body * body)
 	y /= size;
 	z /= size;
 //	cerr << totalMass << endl;
-	ParticleParameters* bigBall = YADE_CAST<ParticleParameters*>((*bodies)[bigBallId]->physicalParameters.get());
 	
 	ofile << lexical_cast<string>(Omega::instance().getSimulationTime()) << " " 
 		<< lexical_cast<string>(x) << " " 
 		<< lexical_cast<string>(y) << " " 
-		<< lexical_cast<string>(z) << " "
-
-		<< lexical_cast<string>(bigBall->velocity[0]) << " " // big ball
-		<< lexical_cast<string>(bigBall->velocity[1]) << " " 
-		<< lexical_cast<string>(bigBall->velocity[2]) << endl;
+		<< lexical_cast<string>(z) << endl;
 }
 
 

@@ -20,7 +20,7 @@ Interaction::Interaction ()
 }
 
 
-Interaction::Interaction(unsigned int newId1,unsigned int newId2) : id1(newId1) , id2(newId2)
+Interaction::Interaction(body_id_t newId1,body_id_t newId2) : id1(newId1) , id2(newId2)
 {	
 	isNew = true;
 	isReal = false;

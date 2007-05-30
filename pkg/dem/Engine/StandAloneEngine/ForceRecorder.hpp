@@ -26,12 +26,9 @@ class ForceRecorder : public DataRecorder
 	
 	public :
 		std::string	 outputFile;
-		unsigned int	 interval
+		int		 interval
 				,startId
 				,endId;
-
-		int		bigBallId; // FIXME !!!!!!!!!!
-		Real		bigBallReleaseTime; // FIXME !!!!!!!!!!
 
 		ForceRecorder ();
 

@@ -163,7 +163,7 @@ void GLDrawLatticeInteractingGeometry::go(const shared_ptr<InteractingGeometry>&
 					else if(A==C)	A=D;
 					else if(B==C)	B=D;
 
-				if(wire && (damaged.size()>std::max((*angles)->getId1(),(*angles)->getId2())) && (damaged[(*angles)->getId1()]>=limit && damaged[(*angles)->getId2()]>=limit))
+				if(wire && (damaged.size()>static_cast<unsigned int>(std::max((*angles)->getId1(),(*angles)->getId2()))) && (damaged[(*angles)->getId1()]>=limit && damaged[(*angles)->getId2()]>=limit))
 				{
 					glColor3(0.9,0.2,0.2);
 					red=true;

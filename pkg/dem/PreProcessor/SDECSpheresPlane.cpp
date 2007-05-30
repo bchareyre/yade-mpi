@@ -185,7 +185,7 @@ string SDECSpheresPlane::generate()
 
 void SDECSpheresPlane::createGroundSphere(shared_ptr<Body>& body,Real radius, Real i, Real j, Real k)
 {
-	body = shared_ptr<Body>(new Body(0,1));
+	body = shared_ptr<Body>(new Body(body_id_t(0),1));
 	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<Sphere> gSphere(new Sphere);
@@ -227,7 +227,7 @@ void SDECSpheresPlane::createGroundSphere(shared_ptr<Body>& body,Real radius, Re
 
 void SDECSpheresPlane::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 {
-	body = shared_ptr<Body>(new Body(0,1));
+	body = shared_ptr<Body>(new Body(body_id_t(0),1));
 	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<Sphere> gSphere(new Sphere);
@@ -275,7 +275,7 @@ void SDECSpheresPlane::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 
 void SDECSpheresPlane::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents)
 {
-	body = shared_ptr<Body>(new Body(0,1));
+	body = shared_ptr<Body>(new Body(body_id_t(0),1));
 	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<Box> gBox(new Box);
@@ -380,7 +380,7 @@ void SDECSpheresPlane::createActors(shared_ptr<MetaBody>& rootBody)
 		rootBody->engines.push_back(orientationIntegrator);
 
 	shared_ptr<PositionOrientationRecorder> positionOrientationRecorder(new PositionOrientationRecorder);
-	rootBody->engines.push_back(positionOrientationRecorder);
+	//rootBody->engines.push_back(positionOrientationRecorder);
 
 	rootBody->initializers.clear();
 	rootBody->initializers.push_back(physicalActionInitializer);

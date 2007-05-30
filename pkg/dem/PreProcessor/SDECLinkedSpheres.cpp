@@ -219,7 +219,7 @@ string SDECLinkedSpheres::generate()
 
 void SDECLinkedSpheres::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 {
-	body = shared_ptr<Body>(new Body(0,55));
+	body = shared_ptr<Body>(new Body(body_id_t(0),55));
 	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<Sphere> gSphere(new Sphere);
@@ -267,7 +267,7 @@ void SDECLinkedSpheres::createSphere(shared_ptr<Body>& body, int i, int j, int k
 
 void SDECLinkedSpheres::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents)
 {
-	body = shared_ptr<Body>(new Body(0,55));
+	body = shared_ptr<Body>(new Body(body_id_t(0),55));
 	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<Box> gBox(new Box);

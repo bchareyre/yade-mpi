@@ -31,7 +31,6 @@ class AveragePositionRecorder : public DataRecorder
 	public : 
 		std::string outputFile;
 		unsigned int interval;
-		unsigned int bigBallId;
 	private : 
 		std::ofstream ofile;
 	

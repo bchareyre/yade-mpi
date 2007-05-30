@@ -23,7 +23,6 @@ class VelocityRecorder : public DataRecorder
 	public :
 		std::string outputFile;
 		unsigned int interval;
-		unsigned int bigBallId;
 		VelocityRecorder ();
 		virtual void registerAttributes();
 		virtual void action(Body* b);

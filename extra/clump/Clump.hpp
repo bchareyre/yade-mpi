@@ -68,15 +68,15 @@
 class Clump: public Body {
 		//! mapping of body IDs to their relative positions; replaces members and subSe3s;
 	public:
-		typedef std::map<Body::id_t,Se3r> memberMap;
+		typedef std::map<body_id_t,Se3r> memberMap;
 		memberMap members;
 
 		Clump();
 		virtual ~Clump(){};
 		//! \brief add Body to the Clump
-		void add(Body::id_t);
+		void add(body_id_t);
 		//! \brief remove Body from the Clump
-		void del(Body::id_t);
+		void del(body_id_t);
 		//! Recalculate physical properties of Clump.
 		void updateProperties(bool intersecting);
 		//! Calculate positions and orientations of members based on my own Se3.

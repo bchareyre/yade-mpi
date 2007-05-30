@@ -18,7 +18,7 @@ using namespace __gnu_cxx;
 
 struct eqPair
 {
-	bool operator()(const pair<unsigned int,unsigned int>& p1, const pair<unsigned int,unsigned int>& p2) const
+	bool operator()(const pair<body_id_t,body_id_t>& p1, const pair<body_id_t,body_id_t>& p2) const
 	{
 		return (p1.first==p2.first && p1.second==p2.second);
 	}
@@ -26,13 +26,13 @@ struct eqPair
 
 struct hashPair
 {
-	unsigned int operator()(const pair<unsigned int,unsigned int>& p) const
+	unsigned int operator()(const pair<body_id_t,body_id_t>& p) const
 	{
-		return (p.first+p.second)%182501621;
+		return ((unsigned int)p.first+(unsigned int)p.second)%182501621;
 	}
 };
 
-typedef hash_map<pair<unsigned int,unsigned int>, shared_ptr<Interaction>, hashPair, eqPair > IHashMap;
+typedef hash_map<pair<body_id_t,body_id_t>, shared_ptr<Interaction>, hashPair, eqPair > IHashMap;
 
 class InteractionHashMap : public InteractionContainer
 {
@@ -44,11 +44,11 @@ class InteractionHashMap : public InteractionContainer
 		InteractionHashMap();
 		virtual ~InteractionHashMap();
 
-		virtual bool insert(unsigned int id1,unsigned int id2);
+		virtual bool insert(body_id_t id1,body_id_t id2);
 		virtual bool insert(shared_ptr<Interaction>& i);
 		virtual void clear();
-		virtual bool erase(unsigned int id1,unsigned int id2);
-		virtual const shared_ptr<Interaction>& find(unsigned int id1,unsigned int id2);
+		virtual bool erase(body_id_t id1,body_id_t id2);
+		virtual const shared_ptr<Interaction>& find(body_id_t id1,body_id_t id2);
 	
 		virtual InteractionContainer::iterator begin();
 	        virtual InteractionContainer::iterator end();

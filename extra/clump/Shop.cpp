@@ -254,7 +254,7 @@ void Shop::rootBodyActors(shared_ptr<MetaBody> rootBody){
 /*! Create body - sphere. */
 shared_ptr<Body> Shop::sphere(Vector3r center, Real radius){
 	// body itself
-	shared_ptr<Body> body=shared_ptr<Body>(new Body(0,getDefault<int>("body_sdecGroupMask")));
+	shared_ptr<Body> body=shared_ptr<Body>(new Body(body_id_t(0),getDefault<int>("body_sdecGroupMask")));
 	body->isDynamic=true;
 
 	// physics
@@ -295,7 +295,7 @@ shared_ptr<Body> Shop::sphere(Vector3r center, Real radius){
 
 /*! Create body - box. */
 shared_ptr<Body> Shop::box(Vector3r center, Vector3r extents){
-		shared_ptr<Body> body=shared_ptr<Body>(new Body(0,getDefault<int>("body_sdecGroupMask")));
+		shared_ptr<Body> body=shared_ptr<Body>(new Body(body_id_t(0),getDefault<int>("body_sdecGroupMask")));
 		body->isDynamic=true;
 
 		shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
@@ -334,7 +334,7 @@ shared_ptr<Body> Shop::box(Vector3r center, Vector3r extents){
 
 /*! Create body - tetrahedron. */
 shared_ptr<Body> Shop::tetra(Vector3r v[4]){
-		shared_ptr<Body> body=shared_ptr<Body>(new Body(0,getDefault<int>("body_sdecGroupMask")));
+		shared_ptr<Body> body=shared_ptr<Body>(new Body(body_id_t(0),getDefault<int>("body_sdecGroupMask")));
 		body->isDynamic=true;
 
 		shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);

@@ -329,8 +329,6 @@ string TriaxialTest::generate()
 // 	if(bigBall)
 // 		rootBody->bodies->insert(body);
 // 	bigId = body->getId();
-// 	forcerec->bigBallId = bigId;
-	forcerec->bigBallReleaseTime = 0;
 	//forcerec->startId = startId;
 	//forcerec->endId   = endId;
 	//averagePositionRecorder->bigBallId = bigId;
@@ -449,7 +447,7 @@ string TriaxialTest::generate()
 
 void TriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r position, Real radius, bool big, bool dynamic )
 {
-	body = shared_ptr<Body>(new Body(0,2));
+	body = shared_ptr<Body>(new Body(body_id_t(0),2));
 	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<Sphere> gSphere(new Sphere);
@@ -500,7 +498,7 @@ void TriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r position, Real 
 
 void TriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents, bool wire)
 {
-	body = shared_ptr<Body>(new Body(0,2));
+	body = shared_ptr<Body>(new Body(body_id_t(0),2));
 	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<Box> gBox(new Box);

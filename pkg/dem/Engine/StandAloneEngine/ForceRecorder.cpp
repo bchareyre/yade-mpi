@@ -42,8 +42,6 @@ void ForceRecorder::registerAttributes()
 	REGISTER_ATTRIBUTE(interval);
 	REGISTER_ATTRIBUTE(startId);
 	REGISTER_ATTRIBUTE(endId);
-	REGISTER_ATTRIBUTE(bigBallId);
-	REGISTER_ATTRIBUTE(bigBallReleaseTime);
 }
 
 
@@ -58,7 +56,7 @@ void ForceRecorder::action(Body * body)
 	MetaBody * ncb = YADE_CAST<MetaBody*>(body);
 	Real x=0, y=0, z=0;
 	
-	for( unsigned int i = startId ; i <= endId ; ++i )
+	for( int i = startId ; i <= endId ; ++i )
 	{
 		Vector3r force = YADE_CAST<Force*>(ncb->physicalActions->find( i , actionForce->getClassIndex() ) . get() )->force;
 		
@@ -74,11 +72,5 @@ void ForceRecorder::action(Body * body)
 		
 
 		
-// 	// FIXME all that lines do not belong to ForceRecorder
-// 	if( bigBallReleaseTime < Omega::instance().getSimulationTime() && (!changed) )
-// 	{
-// 		changed = true;
-// 		(*(ncb->bodies))[bigBallId]->isDynamic = true;
-// 	}
 }
 

@@ -184,7 +184,7 @@ void PersistentSAPCollider::updateOverlapingBBSet(int id1,int id2)
 	int offset1 = 3*id1;
 	int offset2 = 3*id2;
 	// FIXME: this is perhaps an expensive operation?!
-	const shared_ptr<Body>& b1(Body::byId(id1)), b2(Body::byId(id2));
+	const shared_ptr<Body>& b1(Body::byId(body_id_t(id1))), b2(Body::byId(body_id_t(id2)));
 	bool overlap =
 
 		(b1->isStandalone() || b2->isStandalone() || b1->clumpId!=b2->clumpId ) && // only collide if at least one particle is standalone or they belong to different clumps

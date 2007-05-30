@@ -65,7 +65,7 @@ void QtEngineEditor::pbAddEngineClicked()
 
 void QtEngineEditor::pbAddMetaEngineClicked()
 {
-	int id;
+	int id=0;
 	EngineDescriptor ed;
 
 	string engineName = cbMetaEnginesList->currentText();

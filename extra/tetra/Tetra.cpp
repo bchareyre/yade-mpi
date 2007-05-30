@@ -335,7 +335,7 @@ void TetraLaw::action(Body* body)
 	for(InteractionContainer::iterator contactI=rootBody->transientInteractions->begin(); contactI!=rootBody->transientInteractions->end(); ++contactI){
 		if (!(*contactI)->isReal) continue; // Tetra2TetraBang::go returned false for this interaction, skip it
 
-		const Body::id_t idA=(*contactI)->getId1(), idB=(*contactI)->getId2();
+		const body_id_t idA=(*contactI)->getId1(), idB=(*contactI)->getId2();
 		const shared_ptr<Body>& A=Body::byId(idA), B=Body::byId(idB);
 			
 		if(!(A->getGroupMask()&B->getGroupMask()&sdecGroupMask)) continue; // no bits overlap in masks, skip this one

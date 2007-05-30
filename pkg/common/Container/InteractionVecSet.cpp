@@ -28,16 +28,16 @@ bool InteractionVecSet::insert(shared_ptr<Interaction>& i)
 {
 	boost::mutex::scoped_lock lock(drawloopmutex);
 
-	unsigned int id1 = i->getId1();
-	unsigned int id2 = i->getId2();
+	body_id_t id1 = i->getId1();
+	body_id_t id2 = i->getId2();
 
 	if (id1>id2)
 		swap(id1,id2);
 
-	if ( id1 >=interactions.size())
+	if ( static_cast<unsigned int>(id1) >=interactions.size())
 		interactions.resize(id1+1);
 
-	if (interactions[id1].insert(pair<unsigned int,shared_ptr<Interaction> >(id2,i)).second)
+	if (interactions[id1].insert(pair<body_id_t,shared_ptr<Interaction> >(id2,i)).second)
 	{
 		currentSize++;
 		return true;
@@ -47,7 +47,7 @@ bool InteractionVecSet::insert(shared_ptr<Interaction>& i)
 }
 
 
-bool InteractionVecSet::insert(unsigned int id1,unsigned int id2)
+bool InteractionVecSet::insert(body_id_t id1,body_id_t id2)
 {
 	shared_ptr<Interaction> i(new Interaction(id1,id2) );
 	return insert(i);	
@@ -63,17 +63,17 @@ void InteractionVecSet::clear()
 }
 
 
-bool InteractionVecSet::erase(unsigned int id1,unsigned int id2)
+bool InteractionVecSet::erase(body_id_t id1,body_id_t id2)
 {
 	boost::mutex::scoped_lock lock(drawloopmutex);
 
 	if (id1>id2)
 		swap(id1,id2);
 
-	if ( id1 < interactions.size())
+	if ( static_cast<unsigned int>(id1) < interactions.size())
 	{
 		shared_ptr<Interaction> tmpI;
-		if (interactions[id1].erase(pair<unsigned int,shared_ptr<Interaction> >(id2,tmpI)))
+		if (interactions[id1].erase(pair<body_id_t,shared_ptr<Interaction> >(id2,tmpI)))
 		{
 			currentSize--;
 			return true;
@@ -87,16 +87,16 @@ bool InteractionVecSet::erase(unsigned int id1,unsigned int id2)
 }
 
 
-const shared_ptr<Interaction>& InteractionVecSet::find(unsigned int id1,unsigned int id2)
+const shared_ptr<Interaction>& InteractionVecSet::find(body_id_t id1,body_id_t id2)
 {
 	if (id1>id2)
 		swap(id1,id2);
 
 	if (static_cast<unsigned int>(id1)<interactions.size())
 	{
-		set<pair<unsigned int,shared_ptr<Interaction> >,lessThanPair >::iterator sii;
+		set<pair<body_id_t,shared_ptr<Interaction> >,lessThanPair >::iterator sii;
 		shared_ptr<Interaction> tmpI;
-		sii = interactions[id1].find(pair<unsigned int,shared_ptr<Interaction> >(id2,tmpI));
+		sii = interactions[id1].find(pair<body_id_t,shared_ptr<Interaction> >(id2,tmpI));
 		if (sii!=interactions[id1].end())
 			return (*sii).second;
 		else

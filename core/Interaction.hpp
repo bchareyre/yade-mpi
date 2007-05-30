@@ -16,10 +16,18 @@
 #include "InteractionGeometry.hpp"
 #include "InteractionPhysics.hpp"
 
+/////////////////////////////////
+// FIXME - this is in wrong file!
+//#include<boost/strong_typedef.hpp>
+//BOOST_STRONG_TYPEDEF(int, body_id_t)
+typedef int body_id_t;
+// later we will have primitive_id_type and composite_id_type
+/////////////////////////////////
+
 class Interaction : public Serializable
 {
 	private	:
-		unsigned int id1,id2;	// FIXME  this should be vector<unsigned int> ids;
+		body_id_t id1,id2;	// FIXME  this should be vector<unsigned int> ids;
 
 	public :
 		bool isNew;		// FIXME : better to test if InteractionPhysics==0 and remove this flag
@@ -32,10 +40,10 @@ class Interaction : public Serializable
 		shared_ptr<InteractionPhysics> interactionPhysics;
 
 		Interaction ();
-		Interaction(unsigned int newId1,unsigned int newId2);
+		Interaction(body_id_t newId1,body_id_t newId2);
 
-		unsigned int getId1() {return id1;};
-		unsigned int getId2() {return id2;};
+		body_id_t getId1() {return id1;};
+		body_id_t getId2() {return id2;};
 
 	protected :
 		void registerAttributes();

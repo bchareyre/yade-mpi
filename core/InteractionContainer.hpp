@@ -27,12 +27,12 @@ class InteractionContainer : public Serializable
 		InteractionContainer() { interaction.clear(); };
 		virtual ~InteractionContainer() {};
 
-		virtual bool insert(unsigned int /*id1*/,unsigned int /*id2*/)				{throw;};
+		virtual bool insert(body_id_t /*id1*/,body_id_t /*id2*/)				{throw;};
 		virtual bool insert(shared_ptr<Interaction>&)						{throw;};
 		virtual void clear() 									{throw;};
-		virtual bool erase(unsigned int /*id1*/,unsigned int /*id2*/) 				{throw;};
+		virtual bool erase(body_id_t /*id1*/,body_id_t /*id2*/) 				{throw;};
 
-		virtual const shared_ptr<Interaction>& find(unsigned int /*id1*/,unsigned int /*id2*/) 	{throw;};
+		virtual const shared_ptr<Interaction>& find(body_id_t /*id1*/,body_id_t /*id2*/) 	{throw;};
 
 		typedef InteractionContainerIteratorPointer iterator;
         	virtual InteractionContainer::iterator begin()						{throw;};

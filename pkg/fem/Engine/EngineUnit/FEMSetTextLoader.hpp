@@ -28,15 +28,15 @@ class FEMSetTextLoader : public PhysicalParametersEngineUnit
 	
 		void createNode(	  shared_ptr<Body>& body
 					, Vector3r position
-					, unsigned int id);
+					, int id);
 					
 		void createTetrahedron(   const MetaBody* rootBody
 					, shared_ptr<Body>& body
-					, unsigned int id
-					, unsigned int id1
-					, unsigned int id2
-					, unsigned int id3
-					, unsigned int id4);
+					, int id
+					, int id1
+					, int id2
+					, int id3
+					, int id4);
 
 	protected :
 		virtual void registerAttributes();	

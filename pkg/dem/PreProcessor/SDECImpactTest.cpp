@@ -189,7 +189,7 @@ void SDECImpactTest::registerAttributes()
 
 string SDECImpactTest::generate()
 {
-	unsigned int startId=boost::numeric::bounds<unsigned int>::highest(), endId=0; // record forces from group 2
+	int startId=boost::numeric::bounds<unsigned int>::highest(), endId=0; // record forces from group 2
 	
 	rootBody = shared_ptr<MetaBody>(new MetaBody);
 	createActors(rootBody);
@@ -237,8 +237,8 @@ string SDECImpactTest::generate()
 			rootBody->bodies->insert(body);
 			if(f == 2)
 			{
-				startId = std::min(body->getId() , startId);
-				endId   = std::max(body->getId() , endId);
+				startId = std::min((int)body->getId() , startId);
+				endId   = std::max((int)body->getId() , endId);
 			}
 				
 		}
@@ -251,12 +251,8 @@ string SDECImpactTest::generate()
 	if(bigBall)
 		rootBody->bodies->insert(body);
 	bigId = body->getId();
-	forcerec->bigBallId = bigId;
-	forcerec->bigBallReleaseTime = bigBallDropTimeSeconds;
 	forcerec->startId = startId;
 	forcerec->endId   = endId;
-	averagePositionRecorder->bigBallId = bigId;
-	velocityRecorder->bigBallId = bigId;
 
 	if(boxWalls)
 	{
@@ -355,7 +351,7 @@ string SDECImpactTest::generate()
 
 void SDECImpactTest::createSphere(shared_ptr<Body>& body, Vector3r position, Real radius, bool big, bool dynamic )
 {
-	body = shared_ptr<Body>(new Body(0,2));
+	body = shared_ptr<Body>(new Body(body_id_t(0),2));
 	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<Sphere> gSphere(new Sphere);
@@ -406,7 +402,7 @@ void SDECImpactTest::createSphere(shared_ptr<Body>& body, Vector3r position, Rea
 
 void SDECImpactTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents, bool wire)
 {
-	body = shared_ptr<Body>(new Body(0,2));
+	body = shared_ptr<Body>(new Body(body_id_t(0),2));
 	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<Box> gBox(new Box);

@@ -130,7 +130,7 @@ void SAPCollider::action(Body* body)
 			if (!((*bodies)[i]->isDynamic==false && (*bodies)[*it]->isDynamic==false))
 			{
 				nbPotentialInteractions++;
-				shared_ptr<Interaction> inter(new Interaction(i,*it));
+				shared_ptr<Interaction> inter(new Interaction(body_id_t(i),body_id_t(*it)));
 				ncb->transientInteractions->insert(inter);
 			}
 		}

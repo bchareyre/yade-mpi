@@ -881,90 +881,60 @@
                             </sizepolicy>
                         </property>
                         <property name="title">
-                            <string>Simulation Duration</string>
+                            <string>Other parameters</string>
                         </property>
-                        <grid>
+                        <hbox>
                             <property name="name">
                                 <cstring>unnamed</cstring>
                             </property>
-                            <widget class="QRadioButton" row="0" column="0">
+                            <widget class="QPushButton">
                                 <property name="name">
-                                    <cstring>rbUnlimited</cstring>
+                                    <cstring>pbCenterScene_2</cstring>
                                 </property>
-                                <property name="enabled">
-                                    <bool>false</bool>
+                                <property name="sizePolicy">
+                                    <sizepolicy>
+                                        <hsizetype>0</hsizetype>
+                                        <vsizetype>0</vsizetype>
+                                        <horstretch>0</horstretch>
+                                        <verstretch>0</verstretch>
+                                    </sizepolicy>
+                                </property>
+                                <property name="minimumSize">
+                                    <size>
+                                        <width>160</width>
+                                        <height>0</height>
+                                    </size>
                                 </property>
                                 <property name="text">
-                                    <string>Unlimited</string>
+                                    <string>Center Scene</string>
                                 </property>
                             </widget>
-                            <widget class="QRadioButton" row="1" column="0">
+                            <widget class="QPushButton">
                                 <property name="name">
-                                    <cstring>rbFixedIteration</cstring>
+                                    <cstring>pbNewView_2</cstring>
                                 </property>
                                 <property name="enabled">
-                                    <bool>false</bool>
+                                    <bool>true</bool>
+                                </property>
+                                <property name="sizePolicy">
+                                    <sizepolicy>
+                                        <hsizetype>0</hsizetype>
+                                        <vsizetype>0</vsizetype>
+                                        <horstretch>0</horstretch>
+                                        <verstretch>0</verstretch>
+                                    </sizepolicy>
+                                </property>
+                                <property name="minimumSize">
+                                    <size>
+                                        <width>160</width>
+                                        <height>0</height>
+                                    </size>
                                 </property>
                                 <property name="text">
-                                    <string>Fixed Iterations</string>
+                                    <string>New View ...</string>
                                 </property>
                             </widget>
-                            <widget class="QRadioButton" row="2" column="0">
-                                <property name="name">
-                                    <cstring>rbFixedTime</cstring>
-                                </property>
-                                <property name="enabled">
-                                    <bool>false</bool>
-                                </property>
-                                <property name="text">
-                                    <string>Fixed Time</string>
-                                </property>
-                            </widget>
-                            <widget class="QSpinBox" row="1" column="1" rowspan="1" colspan="3">
-                                <property name="name">
-                                    <cstring>sbFixedIteration</cstring>
-                                </property>
-                                <property name="enabled">
-                                    <bool>false</bool>
-                                </property>
-                                <property name="maxValue">
-                                    <number>1000000000</number>
-                                </property>
-                                <property name="value">
-                                    <number>1000000000</number>
-                                </property>
-                            </widget>
-                            <widget class="QSpinBox" row="2" column="1">
-                                <property name="name">
-                                    <cstring>spinBox1_3</cstring>
-                                </property>
-                                <property name="enabled">
-                                    <bool>false</bool>
-                                </property>
-                            </widget>
-                            <widget class="QLabel" row="2" column="2">
-                                <property name="name">
-                                    <cstring>tl10Power_2</cstring>
-                                </property>
-                                <property name="enabled">
-                                    <bool>false</bool>
-                                </property>
-                                <property name="text">
-                                    <string>x10</string>
-                                </property>
-                                <property name="alignment">
-                                    <set>AlignCenter</set>
-                                </property>
-                            </widget>
-                            <widget class="QSpinBox" row="2" column="3">
-                                <property name="name">
-                                    <cstring>spinBox1_2_2</cstring>
-                                </property>
-                                <property name="enabled">
-                                    <bool>false</bool>
-                                </property>
-                            </widget>
-                        </grid>
+                        </hbox>
                     </widget>
                 </vbox>
             </widget>
@@ -1204,16 +1174,16 @@
 </widget>
 <images>
     <image name="image0">
-        <data format="PNG" length="160">89504e470d0a1a0a0000000d4948445200000015000000150806000000a917a5960000006749444154388dadccd10d80300c03d1947118a1fbcb23b00e2c4013dbc9fd9ef4168098eecae6def73b8eba70893a3085aa308d2ab084b2b08c32b08556b08d66700b3dc16d1478d628fa07b6d01368a31968a11528a30c28a12c48a30a48a12a58a20e1811f101d3512a7c38fee1ac0000000049454e44ae426082</data>
+        <data format="PNG" length="252">89504e470d0a1a0a0000000d4948445200000015000000150806000000a917a596000000c349444154388dadd4310e82401046e1b78462e8f61cda6187e7974ebabdc7764e870d2460609d59a5217f80f0e58510d2944001015545447ede4dd60c02593322c276df867e2e5d3fdb214de9f48dd7fe32033cc72978c44d5100c0cb2d0ea5a6ab743dace262d355ea15375122aa4a94080abb0d40b73bdf87613ebd7fd9a6a65e71537ae391d4227635b58add4d2de2aaa6dbf3631cc3e7f36d6d53e896eff68f4d8f84eb6e6b9a9e09ab9b9684554dbf09dd4d2d425753abd0dcd42334fd4f6bf71b0403e127c7dd51090000000049454e44ae426082</data>
     </image>
     <image name="image1">
-        <data format="PNG" length="181">89504e470d0a1a0a0000000d4948445200000015000000150806000000a917a5960000007c49444154388db5d5c10dc0200805d0da749a8ee0fe6104d7694f4d0851f91f28270de479e2db44e4a8aeeb3bf47e3fba21329aeee9bb57273a681f2d411998425198461138847a7018ddc1297405a7d1195c825ab80cd51b5782da154ea3b34c48a1ab9009a3bbd40aa15e0cd22892ab148a06358c32c9dffef8a35ea81230cf566a45c40000000049454e44ae426082</data>
+        <data format="PNG" length="273">89504e470d0a1a0a0000000d4948445200000015000000150806000000a917a596000000d849444154388db595310e83300c451f88c16c5c81b56c744bcf5fc66ef41cd9ea2d1d2088221a42d266b1be1dc54f6f49313e46504040551191ec5c5ab520d0f5adbb9ade757deb3a7371562d228255cb362310ca65230daa0ad44c67aa8d34a073056ec6389f55f563becda5df00aff9d1a9ae097c3f96b8f41bf6481782553f867871ba47ba10f0393f228e76ba9d87884f398d253eed348638c9e91171b2d3107196d375bd0f43e1ef57b94ea1661c9e05bf74ba26f4f7ab1ca75bc26ca77b84594ebf11263b0d1126393d223ced3486d0e7e21f7fd41b9f5d95b4bfffbba60000000049454e44ae426082</data>
     </image>
     <image name="image2">
-        <data format="PNG" length="113">89504e470d0a1a0a0000000d4948445200000015000000150806000000a917a5960000003849444154388d633c76ec1803b50113d54da495a12cd804adacb4fe23f38f1dbbc6488c1c0c0c1def8f1a3a6ae8a8a123d350c6915df203007bf20ccfb0566fcb0000000049454e44ae426082</data>
+        <data format="PNG" length="232">89504e470d0a1a0a0000000d4948445200000015000000150806000000a917a596000000af49444154388ded95a10ec33010435fa2810bbb5f181e1becbe7f8565c1fd85b01eeb401b2d8dc29ab2869c6ccb8ae5931217a7080608981922721afb640904922544841ed8c529764b98f12359424529e76718565880002cc46976597fbd9f6be621f01d4757fbbd8a82818a6266a828db09ff59e8079e8daffded4e614fb2cf423ff0d0ecd41f12ee37d6494bbd95b4f6fbd616eba4a5de4a5afbef4eef4eef4e7b767ac97bdaecf42c7657fc513f8f2ab9c097ced54c0000000049454e44ae426082</data>
     </image>
     <image name="image3">
-        <data format="PNG" length="119">89504e470d0a1a0a0000000d4948445200000015000000150806000000a917a5960000003e49444154388d633c76ec1803b50113d54d1c5286b2a00b585969fd27d59063c7ae3122f3878ef7470d1d3574d4506a028c0205bd7020070c1defd3c45000a13508e31a4d23f00000000049454e44ae426082</data>
+        <data format="PNG" length="210">89504e470d0a1a0a0000000d4948445200000015000000150806000000a917a5960000009949444154388ded94bd0a0231108427e18ab1db67d1cef737e575f139b6733aaff0222182dc4f0a854b330cec928fafd890c70c0800014920b9bb479703045c0e92e8d1431e7337c2d2634fc2d243ebf4723d3fb1f2e5740f5f9d028f79744536c4d1689004a3bd88719a879767bd6fb44fa75b485ba7b1fe41d226d27aff4d7a383d9cfeb8d3c1e5301a4ade520a755f9268fa1fdfd31ec413524e89890537f1ed0000000049454e44ae426082</data>
     </image>
 </images>
 <connections>
@@ -1306,6 +1276,18 @@
         <signal>clicked()</signal>
         <receiver>QtGeneratedSimulationController</receiver>
         <slot>pbStart2Clicked()</slot>
+    </connection>
+    <connection>
+        <sender>pbCenterScene_2</sender>
+        <signal>clicked()</signal>
+        <receiver>QtGeneratedSimulationController</receiver>
+        <slot>pbCenterSceneClicked()</slot>
+    </connection>
+    <connection>
+        <sender>pbNewView_2</sender>
+        <signal>clicked()</signal>
+        <receiver>QtGeneratedSimulationController</receiver>
+        <slot>pbNewViewClicked()</slot>
     </connection>
 </connections>
 <signals>

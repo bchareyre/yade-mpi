@@ -791,7 +791,7 @@ bool LatticeExample::checkMinimumAngle(BodyRedirectionVector& bc,shared_ptr<Body
 
 bool LatticeExample::createNode(shared_ptr<Body>& body, int i, int j, int k)
 {
-	body = shared_ptr<Body>(new Body(0,nodeGroupMask));
+	body = shared_ptr<Body>(new Body(body_id_t(0),nodeGroupMask));
 	shared_ptr<LatticeNodeParameters> physics(new LatticeNodeParameters);
 	shared_ptr<Sphere> gSphere(new Sphere);
 	
@@ -867,7 +867,7 @@ bool LatticeExample::createNode(shared_ptr<Body>& body, int i, int j, int k)
 
 bool LatticeExample::createQuad(shared_ptr<Body>& quad, int i, int j, Vector3r nbNodes)
 {
-	quad = shared_ptr<Body>(new Body(0,quadGroupMask));
+	quad = shared_ptr<Body>(new Body(body_id_t(0),quadGroupMask));
 	shared_ptr<Quadrilateral> gQuad(new Quadrilateral( (j-1)*(int)std::floor(nbNodes[0]+1)+i-1 , j*(int)std::floor(nbNodes[0]+1)+i-1 , j*(int)std::floor(nbNodes[0]+1)+i , (j-1)*(int)std::floor(nbNodes[0]+1)+i, rootBody.get()));
 	// FIXME FIXME - this is an empty class. not needed at all.
 	// all this Quadrilateral stuff in fact does not fit current design at all.
@@ -891,9 +891,9 @@ bool LatticeExample::createQuad(shared_ptr<Body>& quad, int i, int j, Vector3r n
 }
 
 
-void LatticeExample::createBeam(shared_ptr<Body>& body, unsigned int i, unsigned int j)
+void LatticeExample::createBeam(shared_ptr<Body>& body, int i, int j)
 {
-	body = shared_ptr<Body>(new Body(0,beamGroupMask));
+	body = shared_ptr<Body>(new Body(body_id_t(0),beamGroupMask));
 	shared_ptr<LatticeBeamParameters> physics(new LatticeBeamParameters);
 	shared_ptr<LineSegment> gBeam(new LineSegment);
 	
@@ -948,7 +948,7 @@ Real LatticeExample::calcBeamPositionOrientationLength(shared_ptr<Body>& body)
 	return length;
 }
 
-void LatticeExample::calcAxisAngle(LatticeBeamParameters* beam1, BodyContainer* bodies, unsigned int otherId, InteractionContainer* ints, unsigned int thisId)
+void LatticeExample::calcAxisAngle(LatticeBeamParameters* beam1, BodyContainer* bodies, int otherId, InteractionContainer* ints, int thisId)
 { 
 	if( ! ints->find(otherId,thisId) && otherId != thisId )
 	{
@@ -957,7 +957,7 @@ void LatticeExample::calcAxisAngle(LatticeBeamParameters* beam1, BodyContainer* 
 		
 		angle = unitVectorsAngle(beam1->direction,beam2->direction);
 
-                shared_ptr<Interaction>                 interaction(new Interaction( thisId , otherId ));
+                shared_ptr<Interaction>                 interaction(new Interaction( body_id_t(thisId) , body_id_t(otherId) ));
                 shared_ptr<LatticeBeamAngularSpring>    angularSpring(new LatticeBeamAngularSpring);
 		
 		angularSpring->initialPlaneAngle 	= angle;

@@ -169,7 +169,7 @@ string TetrahedronsTest::generate()
 
 void TetrahedronsTest::createTetrahedron(shared_ptr<Body>& body, int i, int j, int k)
 {
-	body = shared_ptr<Body>(new Body(0,1));
+	body = shared_ptr<Body>(new Body(body_id_t(0),1));
 	shared_ptr<ElasticBodyParameters> physics(new ElasticBodyParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<Tetrahedron> tet(new Tetrahedron);
@@ -259,7 +259,7 @@ void TetrahedronsTest::createBox(shared_ptr<Body>& body, Vector3r position, Vect
 	// we could even make a box (or even RotatingBox) by making several boxes, as
 	// in the RotatingBox example FileGenerator
 
-	body = shared_ptr<Body>(new Body(0,1));
+	body = shared_ptr<Body>(new Body(body_id_t(0),1));
 	shared_ptr<ElasticBodyParameters> physics(new ElasticBodyParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<Box> gBox(new Box);

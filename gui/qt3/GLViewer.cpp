@@ -185,9 +185,9 @@ void GLViewer::postSelection(const QPoint& point)
 	}
 	if( (*(Omega::instance().getRootBody()->bodies)).exists(selection) )
 	{
-		if(Body::byId(selection)->isClumpMember()){ // select clump (invisible) instead of its member
+		if(Body::byId(body_id_t(selection))->isClumpMember()){ // select clump (invisible) instead of its member
 			cerr<<"Clump member #"<<selection<<" selected, selecting clump instead."<<endl;
-			selection=Body::byId(selection)->clumpId;
+			selection=Body::byId(body_id_t(selection))->clumpId;
 			setSelectedName(selection);
 		}
 

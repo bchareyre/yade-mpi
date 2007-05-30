@@ -227,12 +227,12 @@ class LatticeExample : public FileGenerator
 		void positionRootBody(shared_ptr<MetaBody>& rootBody);
 		bool createNode(shared_ptr<Body>& body, int i, int j, int k);
 		bool createQuad(shared_ptr<Body>& body, int i, int j, Vector3r);
-                void createBeam(shared_ptr<Body>& body, unsigned int i, unsigned int j);
+                void createBeam(shared_ptr<Body>& body, int i, int j);
                 Real calcBeamPositionOrientationLength(shared_ptr<Body>& body);
                 bool notDeleted(Vector3r pos);
 		bool isDeleted(Vector3r pos, Vector3r min, Vector3r max);
                 void calcBeamAngles(Body* body, BodyContainer* bodies,InteractionContainer* ints);
-                void calcAxisAngle(LatticeBeamParameters* beam, BodyContainer* bodies, unsigned int otherId,InteractionContainer* ints,unsigned int thisId);
+                void calcAxisAngle(LatticeBeamParameters* beam, BodyContainer* bodies, int otherId,InteractionContainer* ints, int thisId);
                 bool checkMinimumAngle(BodyRedirectionVector&,shared_ptr<Body>&);
                 bool checkAngle( Vector3r , Vector3r& );
                 void imposeTranslation(shared_ptr<MetaBody>& rootBody, Vector3r min, Vector3r max, Vector3r direction, Real velocity);

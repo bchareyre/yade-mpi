@@ -214,7 +214,7 @@ string SDECMovingWall::generate()
 
 void SDECMovingWall::createGroundSphere(shared_ptr<Body>& body,Real radius, Real i, Real j, Real k)
 {
-	body = shared_ptr<Body>(new Body(0,1));
+	body = shared_ptr<Body>(new Body(body_id_t(0),1));
 	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<Sphere> gSphere(new Sphere);
@@ -256,7 +256,7 @@ void SDECMovingWall::createGroundSphere(shared_ptr<Body>& body,Real radius, Real
 
 void SDECMovingWall::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 {
-	body = shared_ptr<Body>(new Body(0,1));
+	body = shared_ptr<Body>(new Body(body_id_t(0),1));
 	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<Sphere> gSphere(new Sphere);
@@ -305,7 +305,7 @@ void SDECMovingWall::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 
 void SDECMovingWall::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents, bool wire)
 {
-	body = shared_ptr<Body>(new Body(0,1));
+	body = shared_ptr<Body>(new Body(body_id_t(0),1));
 	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<Box> gBox(new Box);
