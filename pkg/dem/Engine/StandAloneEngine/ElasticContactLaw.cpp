@@ -6,7 +6,8 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "ElasticContactLaw.hpp"
+#include <yade/pkg-dem/ElasticContactLaw.hpp>
+
 #include<yade/pkg-dem/BodyMacroParameters.hpp>
 #include<yade/pkg-dem/SpheresContactGeometry.hpp>
 #include<yade/pkg-dem/SDECLinkGeometry.hpp>
@@ -68,7 +69,7 @@ void ElasticContactLaw::action(Body* body)
 				shearForce			= Vector3r(0,0,0);
 					
 			Real un 				= currentContactGeometry->penetrationDepth;
-			currentContactPhysics->normalForce	= currentContactPhysics->kn*un*currentContactGeometry->normal;
+			currentContactPhysics->normalForce	= currentContactPhysics->kn*std::max(un,(Real) 0)*currentContactGeometry->normal;
 	
 			Vector3r axis;
 			Real angle;

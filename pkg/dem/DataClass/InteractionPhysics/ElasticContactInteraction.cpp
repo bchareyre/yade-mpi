@@ -6,7 +6,8 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "ElasticContactInteraction.hpp"
+#include <yade/pkg-dem/ElasticContactInteraction.hpp>
+
 
 
 ElasticContactInteraction::ElasticContactInteraction()

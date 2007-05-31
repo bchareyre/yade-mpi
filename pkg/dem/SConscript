@@ -536,5 +536,139 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'yade-multimethods',
 			'boost_filesystem',
 			'TranslationEngine']),
-])
 
+env.SharedLibrary('WallStressRecorder',
+		['Engine/DeusExMachina/WallStressRecorder.cpp'],
+		LIBS=env['LIBS']+['ParticleParameters',
+			'ElasticContactInteraction',
+			'SpheresContactGeometry',
+			'BodyMacroParameters',
+			'Force',
+			'TriaxialStressController',
+			'TriaxialCompressionEngine',
+			'Sphere',
+			'ElasticContactLaw']),
+
+env.SharedLibrary('CapillaryPressureEngine',
+		['Engine/DeusExMachina/CapillaryPressureEngine.cpp'],
+		LIBS=env['LIBS']+['CapillaryCohesiveLaw']),
+
+
+env.SharedLibrary('CapillaryStressRecorder',
+		['Engine/DeusExMachina/CapillaryStressRecorder.cpp'],
+		LIBS=env['LIBS']+['ParticleParameters',
+			'ElasticContactInteraction',
+			'CapillaryParameters',
+			'Force',
+			'CapillaryCohesiveLaw']),
+
+env.SharedLibrary('TriaxialTestWater',
+		['PreProcessor/TriaxialTestWater.cpp'],
+		LIBS=env['LIBS']+Split('''SDECLinkGeometry
+        ElasticContactLaw
+        CapillaryCohesiveLaw
+        AveragePositionRecorder
+        VelocityRecorder
+        ForceRecorder
+        WallStressRecorder
+        CapillaryStressRecorder
+        ContactStressRecorder
+        MacroMicroElasticRelationships
+        ElasticCriterionTimeStepper
+        PhysicalActionVectorVector
+        InteractionVecSet
+	InteractionHashMap
+        BodyRedirectionVector
+        InteractingSphere
+        InteractingBox
+        CundallNonViscousMomentumDamping
+        CundallNonViscousForceDamping
+        MetaInteractingGeometry
+        GravityEngine
+        yade-serialization
+        PhysicalActionContainerInitializer
+        PhysicalActionContainerReseter
+        InteractionGeometryMetaEngine
+        InteractionPhysicsMetaEngine
+        PhysicalActionApplier
+        PhysicalParametersMetaEngine
+        BoundingVolumeMetaEngine
+        yade-multimethods
+        Box
+        Sphere
+        AABB
+        PersistentSAPCollider
+        SAPCollider
+        MetaInteractingGeometry2AABB
+	GlobalStiffness
+	GlobalStiffnessCounter
+	ResultantForceEngine
+	TriaxialStressController
+	TriaxialCompressionEngine
+	GlobalStiffnessTimeStepper''')),
+
+
+
+
+env.SharedLibrary('ContactStressRecorder',
+		['Engine/DeusExMachina/ContactStressRecorder.cpp'],
+		LIBS=env['LIBS']+['ParticleParameters',
+			'ElasticContactInteraction',
+			'SpheresContactGeometry',
+			'BodyMacroParameters',
+			'Force',
+			'TriaxialStressController',
+			'TriaxialCompressionEngine',
+			'Sphere',
+			'ElasticContactLaw',
+			'CapillaryCohesiveLaw']),
+
+env.SharedLibrary('CapillaryCohesiveLaw',
+		['Engine/StandAloneEngine/CapillaryCohesiveLaw.cpp'],
+		LIBS=env['LIBS']+['CapillaryParameters',
+			'ElasticContactInteraction',
+			'SpheresContactGeometry',
+			'BodyMacroParameters',
+			'Force',
+			'Momentum',
+			'RigidBodyParameters',
+			'Sphere',
+			'ElasticContactLaw']),
+
+env.SharedLibrary('CapillaryParameters',
+		['DataClass/InteractionPhysics/CapillaryParameters.cpp'],
+		LIBS=env['LIBS']+['ElasticContactInteraction']),
+
+env.SharedLibrary('InteractingSphere2InteractingSphere4SpheresContactGeometryWater',
+		['Engine/EngineUnit/InteractingSphere2InteractingSphere4SpheresContactGeometryWater.cpp'],
+		LIBS=env['LIBS']+['SpheresContactGeometry',
+			'InteractionGeometryMetaEngine',
+			'InteractingSphere' ]),
+
+env.SharedLibrary('InteractingBox2InteractingSphere4SpheresContactGeometryWater',
+		['Engine/EngineUnit/InteractingBox2InteractingSphere4SpheresContactGeometryWater.cpp'],
+		LIBS=env['LIBS']+['SpheresContactGeometry',
+			'InteractionGeometryMetaEngine',
+			'InteractingSphere',
+			'InteractingBox' ]),
+
+env.SharedLibrary('MacroMicroElasticRelationshipsWater',
+		['Engine/EngineUnit/MacroMicroElasticRelationshipsWater.cpp'],
+		LIBS=env['LIBS']+['SDECLinkPhysics',
+			'SDECLinkGeometry',
+			'ElasticContactInteraction',
+			'SpheresContactGeometry',
+			'BodyMacroParameters',
+			'RigidBodyParameters',
+			'ParticleParameters',
+			'InteractionPhysicsMetaEngine',
+			'CapillaryParameters']),
+
+env.SharedLibrary('InteractingSphere2AABBwater',
+		['Engine/EngineUnit/InteractingSphere2AABBwater.cpp'],
+		LIBS=env['LIBS']+['InteractingSphere', 'AABB', 'BoundingVolumeMetaEngine']),
+
+
+
+
+])

@@ -56,7 +56,7 @@ class Body : public Serializable
 		bool isStandalone() const {return clumpId==ID_NONE;}
 		/*! Hook for clump to update position of members when user-forced reposition and redraw (through GUI) occurs.
 		 * This is useful only in cases when engines that do that in every iteration are not active - i.e. when the simulation is paused.
-		 * (otherwise, GLViewer would depend on Clump and therefore Clump would have to go to yade-core...) */
+		 * (otherwise, GLViewer would depend on Clump and therefore Clump would have to go to core...) */
 		virtual void userForcedDisplacementRedrawHook(){return;}
 
 		body_id_t getId() const {return id;};

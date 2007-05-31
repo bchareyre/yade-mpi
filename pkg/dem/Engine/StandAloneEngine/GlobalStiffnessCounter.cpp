@@ -63,6 +63,9 @@ void GlobalStiffnessCounter::action(Body* body)
                         int id1 = contact->getId1();
                         int id2 = contact->getId2();
 
+			//if body_getId1.isClumpMember() Id1 = ball from clump Idc
+			// Id1 = Body::clumpId
+
                         //if( !( (*bodies)[id1]->getGroupMask() & (*bodies)[id2]->getGroupMask() & sdecGroupMask)  )
                         //continue; // skip other groups, BTW: this is example of a good usage of 'continue' keyword
 
