@@ -26,7 +26,8 @@ void InteractionPhysicsMetaEngine::action(Body* body)
 
 		shared_ptr<Body>& b1 = (*bodies)[interaction->getId1()];
 		shared_ptr<Body>& b2 = (*bodies)[interaction->getId2()];
-		operator()( b1->physicalParameters , b2->physicalParameters , interaction );
+		if( b1->physicalParameters && b2->physicalParameters )
+			operator()( b1->physicalParameters , b2->physicalParameters , interaction );
 	}
 
 	shared_ptr<InteractionContainer>& transientInteractions = ncb->transientInteractions;

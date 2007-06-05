@@ -178,7 +178,7 @@ void PersistentSAPCollider::updateOverlapingBBSet(int id1,int id2)
 {
 
 // 	// look if the pair (id1,id2) already exists in the overleppingBB collection
-	bool found = (transientInteractions->find(id1,id2)!=0);
+	bool found = (transientInteractions->find(body_id_t(id1),body_id_t(id2))!=0);
 	
 	// test if the AABBs of the spheres number "id1" and "id2" are overlapping
 	int offset1 = 3*id1;
@@ -196,10 +196,10 @@ void PersistentSAPCollider::updateOverlapingBBSet(int id1,int id2)
 
 	// inserts the pair p=(id1,id2) if the two AABB overlaps and if p does not exists in the overlappingBB
 	if (overlap && !found)
-		transientInteractions->insert(id1,id2);
+		transientInteractions->insert(body_id_t(id1),body_id_t(id2));
 	// removes the pair p=(id1,id2) if the two AABB do not overlapp any more and if p already exists in the overlappingBB
 	else if (!overlap && found)
-		transientInteractions->erase(id1,id2);
+		transientInteractions->erase(body_id_t(id1),body_id_t(id2));
 
 }
 

@@ -105,11 +105,13 @@ another would be HerzMindlinContactModel
 		}
 		else
 		{	// FIXME - are those lines necessary ???? what they are doing in fact ???
-			ElasticContactInteraction* contactPhysics = YADE_CAST<ElasticContactInteraction*>(interaction->interactionPhysics.get());
-
-			contactPhysics->kn = contactPhysics->initialKn;
-			contactPhysics->ks = contactPhysics->initialKs;
-			contactPhysics->equilibriumDistance = contactPhysics->initialEquilibriumDistance;
+			ElasticContactInteraction* contactPhysics = dynamic_cast<ElasticContactInteraction*>(interaction->interactionPhysics.get());
+			if(contactPhysics)
+			{
+				contactPhysics->kn = contactPhysics->initialKn;
+				contactPhysics->ks = contactPhysics->initialKs;
+				contactPhysics->equilibriumDistance = contactPhysics->initialEquilibriumDistance;
+			}
 		}	
 		
 	}

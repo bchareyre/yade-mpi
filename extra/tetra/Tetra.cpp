@@ -254,6 +254,11 @@ list<Tetrahedron> Tetra2TetraBang::Tetra2TetraIntersection(const Tetrahedron& A,
  * http://members.tripod.com/~Paul_Kirby/vector/Vplanelineint.html
  */
 list<Tetrahedron> Tetra2TetraBang::TetraClipByPlane(const Tetrahedron& T, const Vector3r& P, const Vector3r& normal){
+	
+	list<Tetrahedron> ret;
+	// FIXME I've put return here, to avoid crashing in the release / Janek
+	return ret;
+
 	vector<size_t> pos, neg, zer; Real dist[4];
 	for(size_t i=0; i<4; i++){
 		dist[i]=(T.v[i]-P).Dot(normal);
@@ -266,8 +271,6 @@ list<Tetrahedron> Tetra2TetraBang::TetraClipByPlane(const Tetrahedron& T, const 
 	#define ZER zer.size()
 	#define PTPT(i,j) PtPtPlaneIntr(v[i],v[j],P,normal)
 	assert(NEG+POS+ZER==4);
-
-	list<Tetrahedron> ret;
 
 	// HOMOGENEOUS CASES
 		// ++++, +++0, ++00, +000, 0000 (degenerate (planar) tetrahedron)

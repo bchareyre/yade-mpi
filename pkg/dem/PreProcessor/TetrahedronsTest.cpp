@@ -124,6 +124,7 @@ void TetrahedronsTest::registerAttributes()
 
 string TetrahedronsTest::generate()
 {
+	Omega::instance().setTimeStep(0.04);
 	rootBody = shared_ptr<MetaBody>(new MetaBody);
 	createActors(rootBody);
 	positionRootBody(rootBody);

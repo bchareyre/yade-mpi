@@ -85,6 +85,7 @@ void BoxStack::registerAttributes()
 
 string BoxStack::generate()
 {
+	Omega::instance().setTimeStep(0.04);
 	rootBody = shared_ptr<MetaBody>(new MetaBody);
 
 	createActors(rootBody);

@@ -189,7 +189,7 @@ void SDECImpactTest::registerAttributes()
 
 string SDECImpactTest::generate()
 {
-	int startId=boost::numeric::bounds<unsigned int>::highest(), endId=0; // record forces from group 2
+	int startId=boost::numeric::bounds<int>::highest(), endId=0; // record forces from group 2
 	
 	rootBody = shared_ptr<MetaBody>(new MetaBody);
 	createActors(rootBody);

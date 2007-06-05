@@ -95,8 +95,8 @@ void WallStressRecorder::action(Body * body)
 			if (currentContactGeometry->penetrationDepth >= 0)
 
 			{
-			unsigned int id1 = interaction -> getId1();
-			unsigned int id2 = interaction -> getId2();
+			int id1 = interaction -> getId1();
+			int id2 = interaction -> getId2();
 
 			ElasticContactInteraction* currentContactPhysics   
 			= static_cast<ElasticContactInteraction*>

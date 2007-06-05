@@ -75,18 +75,18 @@ another would be HerzMindlinContactModel
 
 			Real Ea 	= sdec1->young;
 			Real Eb 	= sdec2->young;
-			Real Va 	= sdec1->poisson;
-			Real Vb 	= sdec2->poisson;
+//			Real Va 	= sdec1->poisson;
+//			Real Vb 	= sdec2->poisson;
 			Real Da 	= interactionGeometry->radius1; // FIXME - multiply by factor of sphere interaction distance (so sphere intaracts at bigger range that its geometrical size)
 			Real Db 	= interactionGeometry->radius2; // FIXME - as above
 			Real fa 	= sdec1->frictionAngle;
 			Real fb 	= sdec2->frictionAngle;
 
-			Real Eab	= 2*Ea*Eb/(Ea+Eb);
-			Real Vab	= 2*Va*Vb/(Va+Vb);
+//			Real Eab	= 2*Ea*Eb/(Ea+Eb);
+//			Real Vab	= 2*Va*Vb/(Va+Vb);
 
 			Real Dinit 	= Da+Db; 			// FIXME - is it just a sum?
-			Real Sinit 	= Mathr::PI * std::pow( std::min(Da,Db) , 2);
+//			Real Sinit 	= Mathr::PI * std::pow( std::min(Da,Db) , 2);
 
 			//Real Kn						= (Eab*Sinit/Dinit)*( (1+alpha)/(beta*(1+Vab) + gamma*(1-alpha*Vab) ) );
 			Real ksOnkn = 0.5;

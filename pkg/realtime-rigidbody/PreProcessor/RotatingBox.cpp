@@ -87,6 +87,7 @@ void RotatingBox::registerAttributes()
 
 string RotatingBox::generate()
 {
+	Omega::instance().setTimeStep(0.01);
 	rootBody = shared_ptr<MetaBody>(new MetaBody);
 
 	createActors(rootBody);

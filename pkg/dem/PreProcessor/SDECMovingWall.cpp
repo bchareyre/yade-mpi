@@ -416,7 +416,7 @@ void SDECMovingWall::createActors(shared_ptr<MetaBody>& rootBody)
 		rootBody->engines.push_back(orientationIntegrator);
 
 	shared_ptr<PositionOrientationRecorder> positionOrientationRecorder(new PositionOrientationRecorder);
-	rootBody->engines.push_back(positionOrientationRecorder);
+	//rootBody->engines.push_back(positionOrientationRecorder);
 
 	rootBody->engines.push_back(kinematic);
 	

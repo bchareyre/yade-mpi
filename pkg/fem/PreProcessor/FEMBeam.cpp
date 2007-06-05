@@ -114,6 +114,7 @@ void FEMBeam::registerAttributes()
 
 string FEMBeam::generate()
 {
+	Omega::instance().setTimeStep(0.004);
 	rootBody = shared_ptr<MetaBody>(new MetaBody);
 	positionRootBody(rootBody);
 	

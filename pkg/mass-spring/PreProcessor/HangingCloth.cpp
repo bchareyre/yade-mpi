@@ -143,6 +143,7 @@ void HangingCloth::registerAttributes()
 
 string HangingCloth::generate()
 {
+	Omega::instance().setTimeStep(0.004);
 	rootBody = shared_ptr<MetaBody>(new MetaBody);
 
 	rootBody->persistentInteractions	= shared_ptr<InteractionContainer>(new InteractionVecSet);
@@ -447,17 +448,18 @@ shared_ptr<Interaction>& HangingCloth::createSpring(const shared_ptr<MetaBody>& 
 	Body * b2 = static_cast<Body*>((*(rootBody->bodies))[j].get());
 
 	spring = shared_ptr<Interaction>(new Interaction( b1->getId() , b2->getId() ));
-	shared_ptr<SpringGeometry>	geometry(new SpringGeometry);
+//	shared_ptr<SpringGeometry>	geometry(new SpringGeometry);
 	shared_ptr<SpringPhysics>	physics(new SpringPhysics);
 
-	geometry->p1			= b1->physicalParameters->se3.position;
-	geometry->p2			= b2->physicalParameters->se3.position;
+//	geometry->p1			= b1->physicalParameters->se3.position;
+//	geometry->p2			= b2->physicalParameters->se3.position;
 
-	physics->initialLength		= (geometry->p1-geometry->p2).Length();
+//	physics->initialLength		= (geometry->p1-geometry->p2).Length();
+	physics->initialLength		= ( b1->physicalParameters->se3.position - b2->physicalParameters->se3.position ).Length();
 	physics->stiffness		= springStiffness;
 	physics->damping		= springDamping;
 
-	spring->interactionGeometry = geometry;
+//	spring->interactionGeometry = geometry;
 	spring->interactionPhysics = physics;
 	spring->isReal = true;
 	spring->isNew = false;

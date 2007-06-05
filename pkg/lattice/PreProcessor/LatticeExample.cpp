@@ -950,7 +950,7 @@ Real LatticeExample::calcBeamPositionOrientationLength(shared_ptr<Body>& body)
 
 void LatticeExample::calcAxisAngle(LatticeBeamParameters* beam1, BodyContainer* bodies, int otherId, InteractionContainer* ints, int thisId)
 { 
-	if( ! ints->find(otherId,thisId) && otherId != thisId )
+	if( ! ints->find(body_id_t(otherId),body_id_t(thisId)) && otherId != thisId )
 	{
 		LatticeBeamParameters* 	beam2 		= static_cast<LatticeBeamParameters*>( ((*(bodies))[ otherId ])->physicalParameters.get() );
 		Real 			angle;
