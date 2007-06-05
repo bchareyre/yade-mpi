@@ -1,0 +1,30 @@
+#!/bin/sh
+# this script must be run from yade's top-level directory!
+#
+# svn used to be used:
+# REVISION="svn$( svn info | egrep '^Revision:' | cut -f2 -d' ')"
+#
+# if there is file RELEASE, it will be the version number ($REVISION) and SNAPSHOT will be empty.
+#
+if [ -f RELEASE ]; then
+	REVISION=`cat RELEASE`
+	SNAPSHOT=""
+else
+	REVISION="bzr$( bzr version-info | egrep '^revno:' | cut -f2 -d' ')"
+	SNAPSHOT="-snapshot"
+fi
+_REVISION="-$REVISION"
+echo $REVISION > REVISION
+cp debian/control-template debian/control
+perl -pi -e"s/\@REVISION\@/$REVISION/g" debian/control
+perl -pi -e"s/\@_REVISION\@/$_REVISION/g" debian/control
+perl -pi -e"s/\@SNAPSHOT\@/$SNAPSHOT/g" debian/control
+
+cat <<EOF > debian/changelog
+yade$_REVISION (1) unstable; urgency=low
+
+  * Building snapshots as separate debian packages.
+
+ -- Vaclav Smilauer <eudoxos@arcig.cz>  Thu,  1 Jun 2007 12:44:19 +0100
+EOF
+
