@@ -127,7 +127,7 @@ string RotatingBox::generate()
 				rootBody->bodies->insert(box);
  			}
 
-	return "\nATTN: please set smaller timestep or it will bounce like crazy.";
+	return "ATTN: please set smaller timestep or it will bounce like crazy.";
 }
 
 

@@ -404,11 +404,12 @@ string HangingCloth::generate()
 			for( ; bi2!=biEnd ; ++bi2 )
 			{
 				shared_ptr<Body> bodyB = *bi2;
-	
-				shared_ptr<BodyMacroParameters> a = YADE_PTR_CAST<BodyMacroParameters>(bodyA->physicalParameters);
-				shared_ptr<BodyMacroParameters> b = YADE_PTR_CAST<BodyMacroParameters>(bodyB->physicalParameters);
-				shared_ptr<InteractingSphere>	as = YADE_PTR_CAST<InteractingSphere>(bodyA->interactingGeometry);
-				shared_ptr<InteractingSphere>	bs = YADE_PTR_CAST<InteractingSphere>(bodyB->interactingGeometry);
+
+			// FIXME - this must be a dynamic cast. it is checked afterwards..
+				shared_ptr<BodyMacroParameters> a =  dynamic_pointer_cast<BodyMacroParameters>(bodyA->physicalParameters);
+				shared_ptr<BodyMacroParameters> b =  dynamic_pointer_cast<BodyMacroParameters>(bodyB->physicalParameters);
+				shared_ptr<InteractingSphere>	as = dynamic_pointer_cast<InteractingSphere>(bodyA->interactingGeometry);
+				shared_ptr<InteractingSphere>	bs = dynamic_pointer_cast<InteractingSphere>(bodyB->interactingGeometry);
 	
 				if ( a && b && as && bs && (a->se3.position - b->se3.position).Length() < (as->radius + bs->radius))  
 				{
@@ -438,7 +439,7 @@ string HangingCloth::generate()
 		}
 	}
 			
-	return "ATTN: This test can sometimes crash in optimized builds, fix is pending for next release\n\ntotal number of permament links created: " + lexical_cast<string>(linksNum);
+	return "total number of permament links created: " + lexical_cast<string>(linksNum);
 }
 
 

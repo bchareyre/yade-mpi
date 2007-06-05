@@ -59,7 +59,7 @@ void ElasticContactLaw::action(Body* body)
 	
 			BodyMacroParameters* de1 				= YADE_CAST<BodyMacroParameters*>((*bodies)[id1]->physicalParameters.get());
 			BodyMacroParameters* de2 				= YADE_CAST<BodyMacroParameters*>((*bodies)[id2]->physicalParameters.get());
-			SpheresContactGeometry* currentContactGeometry 	= YADE_CAST<SpheresContactGeometry*>(contact->interactionGeometry.get());
+			SpheresContactGeometry* currentContactGeometry		= YADE_CAST<SpheresContactGeometry*>(contact->interactionGeometry.get());
 			ElasticContactInteraction* currentContactPhysics   	= YADE_CAST<ElasticContactInteraction*> (contact->interactionPhysics.get());
 			
 			Vector3r& shearForce 			= currentContactPhysics->shearForce;
