@@ -223,7 +223,7 @@ void TriaxialTestWater::registerAttributes()
 
 string TriaxialTestWater::generate()
 {
-	unsigned int startId=boost::numeric::bounds<unsigned int>::highest(), endId=0; // record forces from group 2
+	//unsigned int startId=boost::numeric::bounds<unsigned int>::highest(), endId=0; // record forces from group 2
 	
 	rootBody = shared_ptr<MetaBody>(new MetaBody);
 	createActors(rootBody);
@@ -371,7 +371,7 @@ string TriaxialTestWater::generate()
 			 
 	}
 	
-	return output;
+	return std::string("ATTN: this test will not work without data file for capillary law\n\n")+output;
 //  	return "Generated a sample inside box of dimensions: (" 
 //  		+ lexical_cast<string>(lowerCorner[0]) + "," 
 //  		+ lexical_cast<string>(lowerCorner[1]) + "," 

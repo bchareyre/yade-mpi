@@ -78,7 +78,7 @@ void TriaxialCompressionEngine::updateParameters(Body * body)
 	if (autoCompressionActivation && Phase1 && UnbalancedForce<=StabilityCriterion)
 	
 	{
-		Metabody * ncb = static_cast<Metabody*>(body);
+		MetaBody * ncb = static_cast<MetaBody*>(body);
 
 		Real S = computeStress(ncb);
 

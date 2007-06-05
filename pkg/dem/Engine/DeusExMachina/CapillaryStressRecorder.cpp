@@ -205,7 +205,7 @@ thickness;
 	
 	Real Vv = Vech - Vs;
 	
-	Real n = Vv/Vech;
+	//Real n = Vv/Vech;
 	Real Sr = 100*Vwater/Vv;
 	if (Sr>100) Sr=100;
 	Real w = 100*Vwater/Vech;

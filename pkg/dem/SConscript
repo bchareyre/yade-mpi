@@ -604,6 +604,7 @@ env.SharedLibrary('TriaxialTestWater',
 	GlobalStiffnessCounter
 	ResultantForceEngine
 	TriaxialStressController
+	MacroMicroElasticRelationshipsWater
 	TriaxialCompressionEngine
 	GlobalStiffnessTimeStepper''')),
 

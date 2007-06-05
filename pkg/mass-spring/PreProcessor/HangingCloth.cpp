@@ -438,7 +438,7 @@ string HangingCloth::generate()
 		}
 	}
 			
-	return "total number of permament links created: " + lexical_cast<string>(linksNum);
+	return "ATTN: This test can sometimes crash in optimized builds, fix is pending for next release\n\ntotal number of permament links created: " + lexical_cast<string>(linksNum);
 }
 
 

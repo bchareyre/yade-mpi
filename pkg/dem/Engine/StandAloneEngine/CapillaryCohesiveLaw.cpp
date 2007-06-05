@@ -166,8 +166,7 @@ void CapillaryCohesiveLaw::action(Body* body)
 
                         /// intergranular distance
 
-                        Real intergranularDistance =
-                                currentContactGeometry->penetrationDepth;
+                        //Real intergranularDistance = currentContactGeometry->penetrationDepth;
 
                         Real D =
                                 alpha*(de2->se3.position-de1->se3.position).Length()-alpha*(
@@ -192,7 +191,7 @@ void CapillaryCohesiveLaw::action(Body* body)
                         Real Pinterpol =CapillaryPressure*(R2/liquidTension);
                         currentContactPhysics->CapillaryPressure = CapillaryPressure;
 
-                        Real r = R2/R1;
+                        //Real r = R2/R1;
 
                         /// Capillary solution finder:
 
@@ -271,7 +270,7 @@ Parameters capillarylaw::Interpolate(Real R1, Real R2, Real D, Real P, int* inde
         Parameters result;
         int i = 0;
 
-        for ( i; i < (NB_R_VALUES); i++)
+        for ( ; i < (NB_R_VALUES); i++)
         {
                 Real data_R = data_complete[i].R;
                 //cerr << "i = " << i << endl;
@@ -320,7 +319,15 @@ Tableau::Tableau(const char* filename)
         file >> n_D;
 
         if (!file.is_open())
-                cout << "problem opening file for capillary law" << endl;
+	{
+		static bool first=true;
+		if(first)
+		{
+	                cout << "WARNING: cannot open file used for capillary law, in TriaxalTestWater" << endl;
+			first=false;
+		}
+		return;
+	}
         for (int i=0; i<n_D; i++)
                 full_data.push_back(TableauD(file));
         file.close();
@@ -337,7 +344,7 @@ Parameters Tableau::Interpolate2(Real D, Real P, int& index1, int& index2)
         Parameters result_inf;
         Parameters result_sup;
 
-        for ( int i=0; i < full_data.size(); ++i)
+        for ( unsigned int i=0; i < full_data.size(); ++i)
         {
                 if (full_data[i].D > D )	// ok si D rang�s ds l'ordre croissant
 
@@ -380,7 +387,7 @@ TableauD::TableauD(ifstream& file)
         file.ignore(200, '\n'); // saute les caract�res (200 au maximum) jusque au caract�re \n (fin de ligne)*_
 
         if (n_lines!=0)
-                for (i; i<n_lines; ++i) {
+                for (; i<n_lines; ++i) {
                         data.push_back(vector<Real> ());
                         for (int j=0; j < 6; ++j)	// [D,P,V,F,delta1,delta2]
                         {
@@ -471,10 +478,10 @@ TableauD::~TableauD()
 std::ostream& operator<<(std::ostream& os, Tableau& T)
 {
         os << "Tableau : R=" << T.R << endl;
-        for (int i=0; i<T.full_data.size(); i++) {
+        for (unsigned int i=0; i<T.full_data.size(); i++) {
                 os << "TableauD : D=" << T.full_data[i].D << endl;
-                for (int j=0; j<T.full_data[i].data.size();j++) {
-                        for (int k=0; k<T.full_data[i].data[j].size(); k++)
+                for (unsigned int j=0; j<T.full_data[i].data.size();j++) {
+                        for (unsigned int k=0; k<T.full_data[i].data[j].size(); k++)
                                 os << T.full_data[i].data[j][k] << " ";
                         os << endl;
                 }

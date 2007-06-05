@@ -91,7 +91,9 @@ void ContactStressRecorder::action(Body * body)
 	Real f1_el_x=0, f1_el_y=0, f1_el_z=0, x1=0, y1=0, z1=0, x2=0, y2=0, z2=0;
 	
 	Real sig11_el=0, sig22_el=0, sig33_el=0, sig12_el=0, sig13_el=0,
-	sig23_el=0, Vwater = 0, kinematicE = 0;
+	sig23_el=0;
+	//, Vwater = 0,
+	Real kinematicE = 0;
 	
 	InteractionContainer::iterator ii    = ncb->transientInteractions->begin();
         InteractionContainer::iterator iiEnd = ncb->transientInteractions->end();
@@ -202,7 +204,7 @@ static_cast<BodyMacroParameters*>((*bodies)[id2]->physicalParameters.get());
 
 	/// FabricTensor
 	
-	Real traceFT = (FT[0][0]+FT[1][1]+FT[2][2])/j;
+	//Real traceFT = (FT[0][0]+FT[1][1]+FT[2][2])/j;
 	
 	/// calcul de l'energie cinetique:
 
