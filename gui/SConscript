@@ -38,9 +38,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/gui',[
 			'yade-computational-geometry',
 			'XMLFormatManager',
 			'yade-serialization-qt',
-			'$QGLVIEWER_LIB',
-			'boost_date_time',
-			'boost_filesystem'],
+			'$QGLVIEWER_LIB'],
 		CPPPATH=env['CPPPATH']+['qt3']),
 ])
 

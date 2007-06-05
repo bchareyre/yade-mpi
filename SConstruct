@@ -90,6 +90,10 @@ if not env.has_key('version'):
 	if os.path.exists('RELEASE'):
 		env['version']=file('RELEASE').readline().strip()
 	if not env.has_key('version'):
+		for l in os.popen("LC_ALL=C bzr version-info").readlines():
+			m=re.match(r'revno: ([0-9]+)',l)
+			if m: env['version']='bzr'+m.group(1)
+	if not env.has_key('version'):
 		for l in os.popen("LC_ALL=C svn info").readlines():
 			m=re.match(r'Revision: ([0-9]+)',l)
 			if m: env['version']='svn'+m.group(1)
@@ -180,23 +184,24 @@ if not env.GetOption('clean'):
 			print "\nYour compiler is broken, no point in continuing. See `%s' for what went wrong and use the CXX/CXXFLAGS parameters to change your compiler."%(buildDir+'/config.log')
 			Exit(1)
 	# check essential libs
-	ok&=conf.CheckLibWithHeader('pthread','pthread.h','c','pthread_exit(NULL);')
-	ok&=conf.CheckLibWithHeader('glut','GL/glut.h','c','glutGetModifiers();')
+	ok&=conf.CheckLibWithHeader('pthread','pthread.h','c','pthread_exit(NULL);',autoadd=1)
+	ok&=conf.CheckLibWithHeader('glut','GL/glut.h','c','glutGetModifiers();',autoadd=1)
 
 	# gentoo has threaded flavour named differently and it must have precedence over the non-threaded one
 	ok&=(conf.CheckLibWithHeader('boost_date_time-mt','boost/date_time/posix_time/posix_time.hpp','c++','boost::posix_time::time_duration::time_duration();',autoadd=1)
 		or conf.CheckLibWithHeader('boost_date_time','boost/date_time/posix_time/posix_time.hpp','c++','boost::posix_time::time_duration::time_duration();',autoadd=1))
-	ok&=(conf.CheckLibWithHeader('boost_thread-mt','boost/thread/thread.hpp','c++','boost::thread::thread();')
-		or conf.CheckLibWithHeader('boost_thread','boost/thread/thread.hpp','c++','boost::thread::thread();'))
+	ok&=(conf.CheckLibWithHeader('boost_thread-mt','boost/thread/thread.hpp','c++','boost::thread::thread();',autoadd=1)
+		or conf.CheckLibWithHeader('boost_thread','boost/thread/thread.hpp','c++','boost::thread::thread();',autoadd=1))
 	ok&=(conf.CheckLibWithHeader('boost_filesystem-mt','boost/filesystem/path.hpp','c++','boost::filesystem::path();',autoadd=1)
 		or conf.CheckLibWithHeader('boost_filesystem','boost/filesystem/path.hpp','c++','boost::filesystem::path();',autoadd=1))
 
-	if not env['useMiniWm3']: ok&=conf.CheckLibWithHeader('Wm3Foundation','Wm3Math.h','c++','Wm3::Math<double>::PI;')
+	if not env['useMiniWm3']: ok&=conf.CheckLibWithHeader('Wm3Foundation','Wm3Math.h','c++','Wm3::Math<double>::PI;',autoadd=1)
 
 	ok&=conf.CheckQt(env['QTDIR'])
 	env.Tool('qt'); env.Replace(QT_LIB='qt-mt')
 
 	# one or another (QGLViewer is upstream name, 3dviewer is (teomporary) workaround for clashing name with obsolete package once in debian)
+	# (this one has to be explicitly mentioned for each plugin that uses it, no autoadd)
 	if conf.CheckLibWithHeader('QGLViewer','QGLViewer/qglviewer.h','c++','QGLViewer(1);'): env['QGLVIEWER_LIB']='QGLViewer'
 	elif conf.CheckLibWithHeader('3dviewer','QGLViewer/qglviewer.h','c++','QGLViewer(1);'): env['QGLVIEWER_LIB']='3dviewer'
 	else: ok=False
@@ -207,16 +212,12 @@ if not env.GetOption('clean'):
 		Exit(1)
 
 	# check optional libs
-	if 'log4cxx' in env['features'] and conf.CheckLibWithHeader('log4cxx','log4cxx/logger.h','c++','log4cxx::Logger::getLogger("foo");'):
-		env.Append(LIBS='log4cxx',CPPDEFINES=['LOG4CXX'])
+	if 'log4cxx' in env['features'] and conf.CheckLibWithHeader('log4cxx','log4cxx/logger.h','c++','log4cxx::Logger::getLogger("foo");',autoadd=1):
+		env.Append(CPPDEFINES=['LOG4CXX'])
 	if 'python' in env['features'] and conf.CheckPython() and conf.CheckScientificPython():
 		env.Append(CPPDEFINES=['EMBED_PYTHON'])
 
-	# append essential libs		
-	env.Append(LIBS=['glut','boost_date_time','boost_filesystem','boost_thread','pthread'])
-
 	if env['useMiniWm3']: env.Append(LIBS='miniWm3',CPPDEFINES=['MINIWM3'])
-	else:	env.Append(LIBS='Wm3Foundation')
 
 	env=conf.Finish()
 

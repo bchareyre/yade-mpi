@@ -31,9 +31,6 @@ env.InstallAs(['$PREFIX/bin/yade$SUFFIX'],[
 			'yade-base',
 			'yade-loki',
 			'yade-multimethods',
-			'glut',
-			'boost_date_time',
-			'boost_filesystem',
-			'boost_thread'],
+			'glut'],
 		)
 ])

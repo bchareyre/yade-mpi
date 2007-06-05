@@ -534,7 +534,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'SAPCollider',
 			'MetaInteractingGeometry2AABB',
 			'yade-multimethods',
-			'boost_filesystem',
 			'TranslationEngine']),
 
 env.SharedLibrary('WallStressRecorder',
