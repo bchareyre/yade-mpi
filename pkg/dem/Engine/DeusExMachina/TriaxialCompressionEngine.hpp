@@ -1,10 +1,11 @@
 /*************************************************************************
-*  Copyright (C) 2004 by Janek Kozicki                                   *
-*  cosurgi@berlios.de                                                    *
+*  Copyright (C) 2006 by Bruno Chareyre                                  *
+*  bruno.chareyre@hmg.inpg.fr                                            *
 *                                                                        *
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
+
 
 #ifndef TRIAXIALCOMPRESSIONENGINE_HPP
 #define TRIAXIALCOMPRESSIONENGINE_HPP
@@ -42,7 +43,7 @@ class TriaxialCompressionEngine : public TriaxialStressController
 		Vector3r translationAxis;
 		//! is isotropicInternalCompactionFinished?
 		bool Phase1;
-		int FinalIterationPhase1;
+		int FinalIterationPhase1, Iteration;
 		std::string Phase1End; //,Phase2End;
 		//! Is uniaxial compression currently activated?
 		bool compressionActivated;

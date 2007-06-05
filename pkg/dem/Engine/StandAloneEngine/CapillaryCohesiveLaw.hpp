@@ -1,8 +1,8 @@
 //
 // C++ Interface: CapillaryCohesiveLaw
 /*************************************************************************
-*  Copyright (C) 2004 by Olivier Galizzi                                 *
-*  olivier.galizzi@imag.fr                                               *
+*  Copyright (C) 2006 by luc Scholtes                                    *
+*  luc.scholtes@hmg.inpg.fr                                              *
 *                                                                        *
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
@@ -36,7 +36,7 @@ class Parameters
   int index2;
 
   Parameters();
-  Parameters(const Parameters &source); // construction par recopie
+  Parameters(const Parameters &source);
   ~Parameters();
 } ;
 
@@ -44,7 +44,7 @@ class Parameters
 const int NB_R_VALUES = 10;
 
 class PhysicalAction;
-class capillarylaw; // fait appel � la classe def plus bas
+class capillarylaw; // fait appel a la classe def plus bas
 
 class CapillaryCohesiveLaw : public InteractionSolver
 {
@@ -79,7 +79,7 @@ class TableauD
   		~TableauD();
 };
 
-// Fonction d'�criture de tableau, utilis�e dans le constructeur pour test 
+// Fonction d'ecriture de tableau, utilisee dans le constructeur pour test 
 class Tableau;
 std::ostream& operator<<(std::ostream& os, Tableau& T);
 

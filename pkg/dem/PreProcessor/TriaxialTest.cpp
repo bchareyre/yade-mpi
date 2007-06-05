@@ -17,9 +17,6 @@
 #include<yade/pkg-dem/BodyMacroParameters.hpp>
 #include<yade/pkg-dem/SDECLinkGeometry.hpp>
 #include<yade/pkg-dem/SDECLinkPhysics.hpp>
-//#include<yade/pkg-dem/ElasticCriterionTimeStepper.hpp>
-//#include<yade/pkg-dem/StiffnessMatrixTimeStepper.hpp>
-//#include<yade/pkg-dem/StiffnessCounter.hpp>
 #include<yade/pkg-dem/GlobalStiffnessCounter.hpp>
 #include<yade/pkg-dem/GlobalStiffnessTimeStepper.hpp>
 

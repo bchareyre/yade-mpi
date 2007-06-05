@@ -9,7 +9,7 @@
 #ifndef SDECLINEARCONTACTMODEL_HPP
 #define SDECLINEARCONTACTMODEL_HPP
 
-#include<yade/pkg-common/InteractionPhysicsEngineUnit.hpp>
+#include <yade/yade-package-common/InteractionPhysicsEngineUnit.hpp>
 
 class MacroMicroElasticRelationships : public InteractionPhysicsEngineUnit
 {

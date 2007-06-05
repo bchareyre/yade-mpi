@@ -1,6 +1,6 @@
 /*************************************************************************
-*  Copyright (C) 2004 by Janek Kozicki                                   *
-*  cosurgi@berlios.de                                                    *
+*  Copyright (C) 2006 by Bruno Chareyre                                  *
+*  bruno.chareyre@hmg.inpg.fr                                            *
 *                                                                        *
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
@@ -12,8 +12,7 @@
 #include<yade/pkg-dem/SpheresContactGeometry.hpp>
 #include<yade/pkg-dem/ElasticContactInteraction.hpp>
 #include<yade/pkg-common/Force.hpp>
-//#include<yade/pkg-dem/StiffnessMatrix.hpp>
-//#include<yade/lib-wm3-math/Math.hpp>
+
 
 #include<yade/core/MetaBody.hpp>
 #include<yade/pkg-common/Sphere.hpp>
@@ -187,15 +186,7 @@ void TriaxialStressController::updateStiffness (MetaBody * ncb)
 
 void TriaxialStressController::controlExternalStress(int wall, MetaBody* ncb, int id, Vector3r resultantForce, PhysicalParameters* p, Real wall_max_vel) //FIXME remove parameter "id"
 {
-	//cerr << "controlExternalStress" << endl;
-    //Update stiffness only if it has been computed by StiffnessCounter (see "interval")
-    //if (Omega::instance().getCurrentIteration() % interval == 0)	stiffness =
-    //(static_cast<StiffnessMatrix*>( ncb->physicalActions->find (id, StiffnessMatrixClassIndex).get()))->stiffness;
-    // 		Vector3r effectiveforce =
-    // 		 	static_cast<Force*>( ncb->physicalActions->find(wall_id[wall],ForceClassIndex).get() )->force;
-    //Vector3r deltaf (effectiveforce - resultantForce);
-    
-        Real translation= normal[wall].Dot(static_cast<Force*>( ncb->physicalActions->find(wall_id[wall],ForceClassIndex).get() )->force - resultantForce);
+	Real translation= normal[wall].Dot(static_cast<Force*>( ncb->physicalActions->find(wall_id[wall],ForceClassIndex).get() )->force - resultantForce);
         if (translation!=0)
         {
         //cerr << "translation!=0" << endl;
@@ -203,7 +194,7 @@ void TriaxialStressController::controlExternalStress(int wall, MetaBody* ncb, in
             {
             //cerr << "stiffness[wall]!=0" << endl;
                 translation /= stiffness[wall];
-                translation = std::min( abs(translation), max_vel ) * Mathr::Sign(translation);
+                translation = std::min( abs(translation), wall_max_vel ) * Mathr::Sign(translation);
             	//cerr << "translation=" << translation << endl;
             }
             else
@@ -211,33 +202,8 @@ void TriaxialStressController::controlExternalStress(int wall, MetaBody* ncb, in
                 
         }
 
-
-        // 		cerr << "dint wall = " <<  wall ;
-        // 		cerr << " deltaf.X() = " <<  deltaf.X() ;
-        // 		if  (deltaf.X()!=0) translation.X() =
-        // 		Mathr::Sign(deltaf.X())*(stiffness.X()==0 ? wall_max_vel : std::min( abs(deltaf.X()/stiffness.X()), wall_max_vel));
-        // 		else translation.X() = 0;
-        // 		cerr << " deltaf.Y() = " <<  deltaf.Y() ;
-        // 		cerr << " deltaf.Z() = " <<  deltaf.Z() << endl;
-        //
-        // 		if  (deltaf.Y()!=0) translation.Y() =
-        // 		Mathr::Sign(deltaf.Y())*(stiffness.Y()==0 ? wall_max_vel : std::min( abs(deltaf.Y()/stiffness.Y()), wall_max_vel));
-        // 		else translation.Y() = 0;
-        // 		if  (deltaf.Z()!=0) translation.Z() =
-        // 		Mathr::Sign(deltaf.Z())*(stiffness.Z()==0 ? wall_max_vel : std::min( abs(deltaf.Z()/stiffness.Z()), wall_max_vel));
-        // 		else translation.Z() = 0;
-
-        // 			(stiffness.X()==0 ? Mathr::Sign(deltaf.X())*wall_max_vel : Mathr::Sign(deltaf.X())*std::min( abs(deltaf.X()/stiffness.X()), wall_max_vel),
-        // 			stiffness.Y()==0 ? Mathr::Sign(deltaf.Y())*wall_max_vel : Mathr::Sign(deltaf.Y())*std::min( abs(deltaf.Y()/stiffness.Y()), wall_max_vel),
-        // 			stiffness.Z()==0 ? Mathr::Sign(deltaf.Z())*wall_max_vel : Mathr::Sign(deltaf.Z())*std::min( abs(deltaf.Z()/stiffness.Z()), wall_max_vel) );
-
         previousTranslation[wall] = (1-wallDamping)*translation*normal[wall];// + 0.7*previousTranslation[wall];// formula for "steady-flow" evolution with fluctuations
         p->se3.position	+= previousTranslation[wall];
-    
-    //if (wall==1) cerr << "Force=" << normal[wall].Dot(static_cast<Force*>( ncb->physicalActions->find(wall_id[wall],ForceClassIndex).get() )->force) << " -> " << resultantForce << "Translation[wall]=" << previousTranslation[wall] << endl;
-    //p->velocity		=  previousTranslation/dt;//FIXME : useless???
-    //}
-
 }
 
 
@@ -256,17 +222,6 @@ void TriaxialStressController::applyCondition(Body* body)
 
 
         shared_ptr<BodyContainer>& bodies = ncb->bodies;
-
-        //if(PhysicalParameters* p = dynamic_cast<PhysicalParameters*>((*bodies)[*ii]->physicalParameters.get()))
-
-        // 	if(PhysicalParameters* p_bottom = static_cast<PhysicalParameters*>((*bodies)[wall_bottom_id]->physicalParameters.get()) &&
-        // 	PhysicalParameters* p_top   =	 static_cast<PhysicalParameters*>((*bodies)[wall_top_id]->physicalParameters.get()) &&
-        // 	PhysicalParameters* p_left 	= static_cast<PhysicalParameters*>((*bodies)[wall_left_id]->physicalParameters.get()) &&
-        // 	PhysicalParameters* p_right = static_cast<PhysicalParameters*>((*bodies)[wall_right_id]->physicalParameters.get()) &&
-        // 	PhysicalParameters* p_front = static_cast<PhysicalParameters*>((*bodies)[wall_front_id]->physicalParameters.get()) &&
-        // 	PhysicalParameters* p_back 	= static_cast<PhysicalParameters*>((*bodies)[wall_back_id]->physicalParameters.get()))
-
-
 
         PhysicalParameters* p_bottom = static_cast<PhysicalParameters*>((*bodies)[wall_bottom_id]->physicalParameters.get());
         PhysicalParameters* p_top   =	 static_cast<PhysicalParameters*>((*bodies)[wall_top_id]->physicalParameters.get());

@@ -8,14 +8,14 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include"MacroMicroElasticRelationships.hpp"
-#include<yade/pkg-dem/SpheresContactGeometry.hpp>
-#include<yade/pkg-dem/ElasticContactInteraction.hpp>
-#include<yade/pkg-dem/SDECLinkGeometry.hpp> // FIXME - I can't dispatch by SDECLinkGeometry <-> SpheresContactGeometry !!?
-#include<yade/pkg-dem/SDECLinkPhysics.hpp> // FIXME
-#include<yade/pkg-dem/BodyMacroParameters.hpp>
-#include<yade/core/Omega.hpp>
-#include<yade/core/MetaBody.hpp>
+#include "MacroMicroElasticRelationships.hpp"
+#include "SpheresContactGeometry.hpp"
+#include "ElasticContactInteraction.hpp"
+#include "SDECLinkGeometry.hpp" // FIXME - I can't dispatch by SDECLinkGeometry <-> SpheresContactGeometry !!?
+#include "SDECLinkPhysics.hpp" // FIXME
+#include "BodyMacroParameters.hpp"
+#include <yade/yade-core/Omega.hpp>
+#include <yade/yade-core/MetaBody.hpp>
 
 
 MacroMicroElasticRelationships::MacroMicroElasticRelationships()
@@ -40,7 +40,7 @@ void MacroMicroElasticRelationships::go(	  const shared_ptr<PhysicalParameters>&
 {
 	BodyMacroParameters* sdec1 = static_cast<BodyMacroParameters*>(b1.get());
 	BodyMacroParameters* sdec2 = static_cast<BodyMacroParameters*>(b2.get());
-	SpheresContactGeometry* interactionGeometry = dynamic_cast<SpheresContactGeometry*>(interaction->interactionGeometry.get());
+	SpheresContactGeometry* interactionGeometry = static_cast<SpheresContactGeometry*>(interaction->interactionGeometry.get());
 	
 	if(interactionGeometry) // so it is SpheresContactGeometry  - NON PERMANENT LINK
 	{
@@ -53,7 +53,7 @@ another would be HerzMindlinContactModel
 		if ( interaction->isNew)
 		{
 			interaction->interactionPhysics = shared_ptr<ElasticContactInteraction>(new ElasticContactInteraction());
-			contactPhysics = YADE_PTR_CAST<ElasticContactInteraction>(interaction->interactionPhysics);
+			contactPhysics = dynamic_pointer_cast<ElasticContactInteraction>(interaction->interactionPhysics);
 			
 			contactPhysics->initialKn			= 2*(sdec1->kn*sdec2->kn)/(sdec1->kn+sdec2->kn);
 			contactPhysics->initialKs			= 2*(sdec1->ks*sdec2->ks)/(sdec1->ks+sdec2->ks);
@@ -61,7 +61,7 @@ another would be HerzMindlinContactModel
 			contactPhysics->initialEquilibriumDistance	= interactionGeometry->radius1+interactionGeometry->radius2;
 		}
 		else
-			contactPhysics = YADE_PTR_CAST<ElasticContactInteraction>(interaction->interactionPhysics);
+			contactPhysics = dynamic_pointer_cast<ElasticContactInteraction>(interaction->interactionPhysics);
 		
 		contactPhysics->kn = contactPhysics->initialKn;
 		contactPhysics->ks = contactPhysics->initialKs;
@@ -70,7 +70,7 @@ another would be HerzMindlinContactModel
 		if( interaction->isNew)
 		{
 			interaction->interactionPhysics = shared_ptr<ElasticContactInteraction>(new ElasticContactInteraction());
-			ElasticContactInteraction* contactPhysics = YADE_CAST<ElasticContactInteraction*>(interaction->interactionPhysics.get());
+			ElasticContactInteraction* contactPhysics = static_cast<ElasticContactInteraction*>(interaction->interactionPhysics.get());
 
 			Real Ea 	= sdec1->young;
 			Real Eb 	= sdec2->young;
@@ -105,19 +105,17 @@ another would be HerzMindlinContactModel
 		}
 		else
 		{	// FIXME - are those lines necessary ???? what they are doing in fact ???
-			ElasticContactInteraction* contactPhysics = dynamic_cast<ElasticContactInteraction*>(interaction->interactionPhysics.get());
-			if(contactPhysics)
-			{
-				contactPhysics->kn = contactPhysics->initialKn;
-				contactPhysics->ks = contactPhysics->initialKs;
-				contactPhysics->equilibriumDistance = contactPhysics->initialEquilibriumDistance;
-			}
+			ElasticContactInteraction* contactPhysics = static_cast<ElasticContactInteraction*>(interaction->interactionPhysics.get());
+
+			contactPhysics->kn = contactPhysics->initialKn;
+			contactPhysics->ks = contactPhysics->initialKs;
+			contactPhysics->equilibriumDistance = contactPhysics->initialEquilibriumDistance;
 		}	
 		
 	}
-	else   // this is PERMANENT LINK because previous dynamic_cast failed, dispatcher should do this job
+	else   // this is PERMANENT LINK because previous static_cast failed, dispatcher should do this job
 	{
-		SDECLinkGeometry* sdecLinkGeometry =  dynamic_cast<SDECLinkGeometry*>(interaction->interactionGeometry.get());
+		SDECLinkGeometry* sdecLinkGeometry =  static_cast<SDECLinkGeometry*>(interaction->interactionGeometry.get());
 		if (sdecLinkGeometry)
 		{		
 			SDECLinkPhysics* linkPhysics = static_cast<SDECLinkPhysics*>(interaction->interactionPhysics.get());

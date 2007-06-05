@@ -1,6 +1,6 @@
 /*************************************************************************
-*  Copyright (C) 2004 by Olivier Galizzi                                 *
-*  olivier.galizzi@imag.fr                                               *
+*  Copyright (C) 2006 by luc Scholtes                                    *
+*  luc.scholtes@hmg.inpg.fr                                              *
 *                                                                        *
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
@@ -147,14 +147,14 @@ void CapillaryCohesiveLaw::action(Body* body)
 
                         /// Capillary components definition:
 
-                        Real liquidTension = 0.073; 	// superficial
-                        //tension of water N/m (20ï¿½C)
+                        Real liquidTension = 0.073; 	// superficial water tension N/m (20°C)
 
                         //Real teta = 0;		// mouillage parfait (eau pure/billes de verre)
 
                         /// Interacting Grains:
-                        // dï¿½finition du rapport tailleRï¿½elle/TailleYADE
-                        Real alpha=1; // OK si pas de gravitï¿½!!!
+                        // definition du rapport tailleReelle/TailleYADE
+
+                        Real alpha=1; // OK si pas de gravite!!!
 
                         Real R1 = 0;
                         R1=alpha*std::min(currentContactGeometry->radius2,currentContactGeometry->
@@ -166,7 +166,8 @@ void CapillaryCohesiveLaw::action(Body* body)
 
                         /// intergranular distance
 
-//                        Real intergranularDistance = currentContactGeometry->penetrationDepth;
+                        Real intergranularDistance =
+                                currentContactGeometry->penetrationDepth;
 
                         Real D =
                                 alpha*(de2->se3.position-de1->se3.position).Length()-alpha*(
@@ -175,40 +176,29 @@ void CapillaryCohesiveLaw::action(Body* body)
 
                         if
                         ((currentContactGeometry->penetrationDepth>=0)||(D<=0)||CapillaryPressure<=300||
-                                        (Omega::instance().getCurrentIteration() < 2) ) {
-                                //                         			cerr << "if (currentContactGeometry->penetrationDepth >= 0)" << endl ;
-                                D = 0;	// defin Fcap when spheres interpenetrate
+                                        (Omega::instance().getCurrentIteration() < 2) ) 
+			{ 
+                                D = 0;	// def Fcap when spheres interpenetrate
                                 currentContactPhysics->meniscus=true;
                                 //meniscusParameters->meniscus=true;
-                                //                         				cerr << "END ## if (currentContactGeometry->penetrationDepth >= 0)" << endl ;
+
                         }
-                        //                         cerr << "D = " << D << " | Depth = " <<
-                        // currentContactGeometry->penetrationDepth << endl;
-                        //
-                        //                       	cerr << "meniscus = " <<
-                        // 			currentContactPhysics->meniscus << endl;
+
 
                         Real Dinterpol = D/R2;
 
                         /// Suction (Capillary pressure):
 
                         Real Pinterpol =CapillaryPressure*(R2/liquidTension);
-                        //cerr << "CapillaryPressure LAW = "<<
-                        //CapillaryPressure<< endl;
-                        //meniscusParameters->CapillaryPressure = CapillaryPressure;
                         currentContactPhysics->CapillaryPressure = CapillaryPressure;
 
-//                        Real r = R2/R1;
-
-                        //cerr << "r = "<< R2/R1 << endl ;
-                        //cerr << "Dinterpol = " << Dinterpol << endl;
+                        Real r = R2/R1;
 
                         /// Capillary solution finder:
 
                         //cerr << "solution finder " << endl;
 
                         if ((Pinterpol>=0) && (currentContactPhysics->meniscus==true))
-                                //if (Pinterpol>=0)
 
                         {	//cerr << "Pinterpol = "<< Pinterpol << endl;
 
@@ -225,34 +215,13 @@ void CapillaryCohesiveLaw::action(Body* body)
 
                                 currentContactPhysics->Fcap = Fcap;
 
-                                // 				cerr << "CapillaryPressure = "<< CapillaryPressure << endl;
-
-                                //cerr << "Finterpol = " << Finterpol << endl ;
-
                                 /// meniscus volume
 
                                 Real Vinterpol = solution.V;
                                 currentContactPhysics->Vmeniscus =
                                         Vinterpol*(R2*R2*R2)/(alpha*alpha*alpha);
-                                //meniscusParameters->Vmeniscus = Vinterpol*(R2*R2*R2);
-
-                                //Vtotal = (Vtotal+meniscusParameters->Vmeniscus);
-
-                                //                                 if (meniscusParameters->Vmeniscus != 0) {
-                                //                                         meniscusParameters->meniscus = true;
-                                //                                 } else {
-                                //                                         meniscusParameters->meniscus = false;
-                                //                                 }
-                                //
-                                //                                 cerr << " | meniscus = "<< meniscusParameters->meniscus << " | V = " << meniscusParameters->Vmeniscus << endl ;
-                                //
-                                //                                 /// wetting angles
-                                //                                 meniscusParameters->Delta1 = max(solution.delta1,solution.delta2);
-                                //                                 meniscusParameters->Delta2 = min(solution.delta1,solution.delta2);
-                                //
-                                //                                 cerr << "delta1 = " << meniscusParameters->Delta1 << "| delta2 = " << meniscusParameters->Delta2 << endl;
-
-                                if (currentContactPhysics->Vmeniscus != 0)
+                                
+				if (currentContactPhysics->Vmeniscus != 0)
                                 {
                                         currentContactPhysics->meniscus = true;
                                 } else
@@ -260,15 +229,9 @@ void CapillaryCohesiveLaw::action(Body* body)
                                         currentContactPhysics->meniscus = false;
                                 }
 
-                                //                                 cerr << " | meniscus = "<<
-                                // 				currentContactPhysics->meniscus << " | V = " <<
-                                // 				currentContactPhysics->Vmeniscus << endl ;
-
                                 /// wetting angles
                                 currentContactPhysics->Delta1 = max(solution.delta1,solution.delta2);
                                 currentContactPhysics->Delta2 = min(solution.delta1,solution.delta2);
-
-                                //cerr << "delta1 = " << currentContactPhysics->Delta1 << "| delta2 = " << currentContactPhysics->Delta2 << endl;
 
                                 static_cast<Force*>   (ncb->physicalActions->find( id1 , actionForce  ->getClassIndex()).get())->force    += Fcap;
                                 static_cast<Force*>   (ncb->physicalActions->find( id2 , actionForce  ->getClassIndex()).get())->force    -= Fcap;
@@ -306,8 +269,9 @@ Parameters capillarylaw::Interpolate(Real R1, Real R2, Real D, Real P, int* inde
         Parameters result_inf;
         Parameters result_sup;
         Parameters result;
+        int i = 0;
 
-        for ( int i=0; i < (NB_R_VALUES); i++)
+        for ( i; i < (NB_R_VALUES); i++)
         {
                 Real data_R = data_complete[i].R;
                 //cerr << "i = " << i << endl;
@@ -356,10 +320,7 @@ Tableau::Tableau(const char* filename)
         file >> n_D;
 
         if (!file.is_open())
-	{
-                cout << "ERROR: problem opening file for capillary law" << endl;
-		return;
-	}
+                cout << "problem opening file for capillary law" << endl;
         for (int i=0; i<n_D; i++)
                 full_data.push_back(TableauD(file));
         file.close();
@@ -376,7 +337,7 @@ Parameters Tableau::Interpolate2(Real D, Real P, int& index1, int& index2)
         Parameters result_inf;
         Parameters result_sup;
 
-        for ( unsigned int i=0; i < full_data.size(); ++i)
+        for ( int i=0; i < full_data.size(); ++i)
         {
                 if (full_data[i].D > D )	// ok si D rangï¿½s ds l'ordre croissant
 
@@ -419,7 +380,7 @@ TableauD::TableauD(ifstream& file)
         file.ignore(200, '\n'); // saute les caractï¿½res (200 au maximum) jusque au caractï¿½re \n (fin de ligne)*_
 
         if (n_lines!=0)
-                for (; i<n_lines; ++i) {
+                for (i; i<n_lines; ++i) {
                         data.push_back(vector<Real> ());
                         for (int j=0; j < 6; ++j)	// [D,P,V,F,delta1,delta2]
                         {
@@ -510,10 +471,10 @@ TableauD::~TableauD()
 std::ostream& operator<<(std::ostream& os, Tableau& T)
 {
         os << "Tableau : R=" << T.R << endl;
-        for (unsigned int i=0; i<T.full_data.size(); i++) {
+        for (int i=0; i<T.full_data.size(); i++) {
                 os << "TableauD : D=" << T.full_data[i].D << endl;
-                for (unsigned int j=0; j<T.full_data[i].data.size();j++) {
-                        for (unsigned int k=0; k<T.full_data[i].data[j].size(); k++)
+                for (int j=0; j<T.full_data[i].data.size();j++) {
+                        for (int k=0; k<T.full_data[i].data[j].size(); k++)
                                 os << T.full_data[i].data[j][k] << " ";
                         os << endl;
                 }

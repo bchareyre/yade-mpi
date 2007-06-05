@@ -1,6 +1,6 @@
 /*************************************************************************
-*  Copyright (C) 2004 by Olivier Galizzi                                 *
-*  olivier.galizzi@imag.fr                                               *
+*  Copyright (C) 2006 by luc Scholtes                                    *
+*  luc.scholtes@hmg.inpg.fr                                              *
 *  Copyright (C) 2004 by Janek Kozicki                                   *
 *  cosurgi@berlios.de                                                    *
 *                                                                        *
@@ -24,7 +24,7 @@ bool InteractingSphere2InteractingSphere4SpheresContactGeometryWater::go(	const 
 	InteractingSphere* s1 = static_cast<InteractingSphere*>(cm1.get());
 	InteractingSphere* s2 = static_cast<InteractingSphere*>(cm2.get());
 
-	/// c'est ce calcul qui semble poser pb !!!
+	/// pb ???
 	Vector3r normal = se32.position-se31.position;
 	Real penetrationDepth = s1->radius+s2->radius-normal.Normalize();
 	

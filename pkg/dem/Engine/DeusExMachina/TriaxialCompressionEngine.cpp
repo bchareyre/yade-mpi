@@ -1,6 +1,6 @@
 /*************************************************************************
-*  Copyright (C) 2004 by Janek Kozicki                                   *
-*  cosurgi@berlios.de                                                    *
+*  Copyright (C) 2006 by Bruno Chareyre                                  *
+*  bruno.chareyre@hmg.inpg.fr                                            *
 *                                                                        *
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
@@ -24,7 +24,7 @@ TriaxialCompressionEngine::TriaxialCompressionEngine() : actionForce(new Force)
 	Phase1=false;
 	Phase1End = "Phase1End";
 	FinalIterationPhase1 = 0;
-// 	Phase2End = "Phase2End";
+	Iteration = 0;
 	compressionActivated=false;
 	autoCompressionActivation=true;
 	for (int i=0; i<3; ++i) strain[i]=0;
@@ -65,37 +65,36 @@ void TriaxialCompressionEngine::updateParameters(Body * body)
 	UnbalancedForce=ComputeUnbalancedForce(body);
 	if (Omega::instance().getCurrentIteration() % 100 == 0) cerr << "UnbalancedForce=" << UnbalancedForce << endl;
 	
-	// new test
-	//cerr << "1" << endl;
 	if (!Phase1 && autoCompressionActivation &&
-	UnbalancedForce<=StabilityCriterion)		//Start 
+	UnbalancedForce<=StabilityCriterion)
+
 	{	
-// 		// saving snapshot.xml
-// 	string fileName = "../data/" + Phase1End + "_" + 
-// 	lexical_cast<string>(Omega::instance().getCurrentIteration()) + ".xml";
-// 	cerr << "saving snapshot: " << fileName << " ...";
-// 	Omega::instance().saveSimulation(fileName);
-		
 		internalCompaction = false;
 		Phase1 = true;
-		FinalIterationPhase1 =
-		Omega::instance().getCurrentIteration();
+// 		FinalIterationPhase1 =
+// 		Omega::instance().getCurrentIteration();
 	}
 	
-	if (autoCompressionActivation && Phase1
-	&& ((Omega::instance().getCurrentIteration()) >=
-	(FinalIterationPhase1+1000)))
+	if (autoCompressionActivation && Phase1 && UnbalancedForce<=StabilityCriterion)
 	
 	{
-		if (UnbalancedForce<=StabilityCriterion)
+		Metabody * ncb = static_cast<Metabody*>(body);
+
+		Real S = computeStress(ncb);
+
+		if (S >= sigma_iso)
 		{
-		// saving snapshot.xml
-	string fileName = "../data/" + Phase1End + "_" + 
-	lexical_cast<string>(Omega::instance().getCurrentIteration()) + ".xml";
-	cerr << "saving snapshot: " << fileName << " ...";
-	Omega::instance().saveSimulation(fileName);
+			Iteration = Omega::instance().getCurrentIteration();
+			
+			//if ((Omega::instance().getCurrentIteration()) >= (Iteration + 1000));
+		
+			// saving snapshot.xml
+			string fileName = "../data/" + Phase1End + "_" + 
+			lexical_cast<string>(Omega::instance().getCurrentIteration()) + ".xml";
+			cerr << "saving snapshot: " << fileName << " ...";
+			Omega::instance().saveSimulation(fileName);
 	
-	compressionActivated = true;
+			compressionActivated = true;
 		}
 	
 	}
@@ -122,14 +121,15 @@ void TriaxialCompressionEngine::applyCondition(Body * body)
 
         if (compressionActivated)
         {
-		if (Omega::instance().getCurrentIteration() % 50 == 0) 
+		if (Omega::instance().getCurrentIteration() % 100 == 0) 
  		cerr << "Compression started!!" << endl;
         	Real dt = Omega::instance().getTimeStep();
                   MetaBody * ncb = static_cast<MetaBody*>(body);
                   shared_ptr<BodyContainer>& bodies = ncb->bodies;
                   
-                  if (currentStrainRate < strainRate) currentStrainRate
-			+= strainRate*0.0003;	// !!! si décharge
+                if (currentStrainRate < strainRate) currentStrainRate
+			+= strainRate*0.0003;	// !!! si decharge
+		else currentStrainRate = strainRate;
                 
                   PhysicalParameters* p =
 		static_cast<PhysicalParameters*>((*bodies)[wall_bottom_id]->

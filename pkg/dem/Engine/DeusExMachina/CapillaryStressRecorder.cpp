@@ -1,5 +1,5 @@
 /*************************************************************************
-*  Copyright (C) 2006 by luc scholt�                                    *
+*  Copyright (C) 2006 by luc scholtes                                    *
 *  luc.scholtes@hmg.inpg.fr                                              *
 *                                                                        *
 *  This program is free software; it is licensed under the terms of the  *
@@ -72,7 +72,7 @@ void CapillaryStressRecorder::registerAttributes()
 
 bool CapillaryStressRecorder::isActivated()
 {
-	return ((Omega::instance().getCurrentIteration() % interval == 0) && (ofile)); // active le truc tout les "interval" !??
+	return ((Omega::instance().getCurrentIteration() % interval == 0) && (ofile));
 }
 
 
@@ -203,15 +203,9 @@ thickness;
 		}
 	}
 	
-// 	Real Rmoy = SR/N;
-// 	Real V = (height-2*Rmoy) * (width-2*Rmoy) * (depth-2*Rmoy);
-	
 	Real Vv = Vech - Vs;
 	
-// 	cerr << "Vw = " << Vwater << "Vv = " << Vv << endl;
-// 	cerr << "V = " << V << "Vs = " << Vs << endl;
-	
-//	Real n = Vv/Vech;
+	Real n = Vv/Vech;
 	Real Sr = 100*Vwater/Vv;
 	if (Sr>100) Sr=100;
 	Real w = 100*Vwater/Vech;
@@ -229,25 +223,6 @@ thickness;
 	SIG_13_cap = sig13_cap/Vech;
 	SIG_23_cap = sig23_cap/Vech;
 	
-// 	// calcul des d�ormations
-// 	
-// 	Real EPS_11=0, EPS_22=0, EPS_33=0;
-// 	
-// 	Real width_0 = upperCorner[0]-lowerCorner[0], height_0 =
-// 	upperCorner[1]-lowerCorner[1],
-// 	depth_0 = upperCorner[2]-lowerCorner[2];
-// 	
-// 	//cerr << "width_0 = " << width_0 << " width = " << width << endl;
-// 	
-// 	EPS_11 = (width_0 - width)/width_0;
-// 	EPS_22 = (height_0 - height)/height_0;
-// 	EPS_33 = (depth_0 - depth)/depth_0;
-	
-// 	if (Omega::instance().getCurrentIteration() % 100 == 0) 
-// 	{cerr << "Vwater = " << Vwater;
-// 	cerr << " | CapillaryPressure= " << CapillaryPressure << " | Sr= " << Sr
-// 	<<endl;}
-
 	ofile << lexical_cast<string>(Omega::instance().getSimulationTime()) << " " 
 		<< lexical_cast<string>(SIG_11_cap) << " " 
 		<< lexical_cast<string>(SIG_22_cap) << " " 
@@ -255,9 +230,6 @@ thickness;
 		<< lexical_cast<string>(SIG_12_cap) << " "
 		<< lexical_cast<string>(SIG_13_cap)<< " "
 		<< lexical_cast<string>(SIG_23_cap)<< "   "
-// 		<< lexical_cast<string>(EPS_11) << " "
-// 		<< lexical_cast<string>(EPS_22) << " "
-// 		<< lexical_cast<string>(EPS_33) << "   "
 		<< lexical_cast<string>(CapillaryPressure) << " "
 		<< lexical_cast<string>(Sr)<< " " 
 		<< lexical_cast<string>(w)<< " "

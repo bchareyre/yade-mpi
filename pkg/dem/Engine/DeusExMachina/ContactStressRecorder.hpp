@@ -1,6 +1,6 @@
 /*************************************************************************
-*  Copyright (C) 2004 by Olivier Galizzi                                 *
-*  olivier.galizzi@imag.fr                                               *
+*  Copyright (C) 2006 by luc Scholtes                                    *
+*  luc.scholtes@hmg.inpg.fr                                              *
 *                                                                        *
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
@@ -18,7 +18,7 @@ class PhysicalAction;
 class GeometricalModel;
 class TriaxialCompressionEngine;
 // class SampleCapillaryPressureEngine;
-//class TriaxialStressController;
+
 
 class ContactStressRecorder : public DataRecorder
 {
@@ -41,7 +41,6 @@ class ContactStressRecorder : public DataRecorder
 		Vector3r upperCorner, lowerCorner;
 		
 		TriaxialCompressionEngine* triaxCompEng;
-		//TriaxialStressController* triaxStressCont;
 		//SampleCapillaryPressureEngine* sampleCapPressEng; 
 		
 		int wall_bottom_id, wall_top_id, wall_left_id, wall_right_id, wall_front_id, wall_back_id;

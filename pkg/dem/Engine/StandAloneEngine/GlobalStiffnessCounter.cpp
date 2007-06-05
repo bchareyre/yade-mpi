@@ -95,14 +95,14 @@ void GlobalStiffnessCounter::action(Body* body)
                                 //cerr << "diag_Rstifness=" << diag_Rstiffness << endl;
 
 
-                                PhysicalAction* st = ncb->physicalActions->find(id1,actionStiffness->getClassIndex()).get();
-                                GlobalStiffness* s = static_cast<GlobalStiffness*>(st);
-                                s->stiffness += diag_stiffness;
-                                s->Rstiffness += diag_Rstiffness;
-                                st = ncb->physicalActions->find(id2,actionStiffness->getClassIndex()).get();
-                                s = static_cast<GlobalStiffness*>(st);
-                                s->stiffness += diag_stiffness;
-                                s->Rstiffness += diag_Rstiffness;
+                               PhysicalAction* st = ncb->physicalActions->find(id1,actionStiffness->getClassIndex()).get();
+				GlobalStiffness* s = static_cast<GlobalStiffness*>(st);
+				s->stiffness += diag_stiffness;
+				s->Rstiffness += diag_Rstiffness*pow(currentContactGeometry->radius1,2);	
+				st = ncb->physicalActions->find(id2,actionStiffness->getClassIndex()).get();
+				s = static_cast<GlobalStiffness*>(st);
+				s->stiffness += diag_stiffness;
+				s->Rstiffness += diag_Rstiffness*pow(currentContactGeometry->radius2,2);
                                 //____________________________
                         }
                 }

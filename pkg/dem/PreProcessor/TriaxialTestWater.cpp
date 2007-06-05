@@ -13,7 +13,7 @@
 #include <yade/pkg-dem/ElasticContactLaw.hpp>
 #include <yade/pkg-dem/CapillaryCohesiveLaw.hpp>
 
-#include <yade/pkg-dem/MacroMicroElasticRelationships.hpp>
+#include <yade/pkg-dem/MacroMicroElasticRelationshipsWater.hpp>
 #include <yade/pkg-dem/BodyMacroParameters.hpp>
 
 #include <yade/pkg-dem/GlobalStiffnessCounter.hpp>
@@ -223,7 +223,7 @@ void TriaxialTestWater::registerAttributes()
 
 string TriaxialTestWater::generate()
 {
-//	unsigned int startId=boost::numeric::bounds<unsigned int>::highest(), endId=0; // record forces from group 2
+	unsigned int startId=boost::numeric::bounds<unsigned int>::highest(), endId=0; // record forces from group 2
 	
 	rootBody = shared_ptr<MetaBody>(new MetaBody);
 	createActors(rootBody);
@@ -385,7 +385,7 @@ string TriaxialTestWater::generate()
 
 void TriaxialTestWater::createSphere(shared_ptr<Body>& body, Vector3r position, Real radius, bool big, bool dynamic )
 {
-	body = shared_ptr<Body>(new Body(body_id_t(0),2));
+	body = shared_ptr<Body>(new Body(0,2));
 	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<Sphere> gSphere(new Sphere);
@@ -436,7 +436,7 @@ void TriaxialTestWater::createSphere(shared_ptr<Body>& body, Vector3r position, 
 
 void TriaxialTestWater::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents, bool wire)
 {
-	body = shared_ptr<Body>(new Body(body_id_t(0),2));
+	body = shared_ptr<Body>(new Body(0,2));
 	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<Box> gBox(new Box);

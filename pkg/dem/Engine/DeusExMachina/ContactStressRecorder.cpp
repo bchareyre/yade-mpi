@@ -1,5 +1,5 @@
 /*************************************************************************
-*  Copyright (C) 2006 by luc scholt�                                    *
+*  Copyright (C) 2006 by luc scholtes                                    *
 *  luc.scholtes@hmg.inpg.fr                                              *
 *                                                                        *
 *  This program is free software; it is licensed under the terms of the  *
@@ -22,8 +22,6 @@
 #include <yade/core/Omega.hpp>
 #include <yade/core/MetaBody.hpp>
 #include <boost/lexical_cast.hpp>
-
-//#include <yade/core/GeometricalModel.hpp>
 
 ContactStressRecorder::ContactStressRecorder () : DataRecorder(), actionForce(new Force)
 
@@ -81,7 +79,7 @@ void ContactStressRecorder::registerAttributes()
 
 bool ContactStressRecorder::isActivated()
 {
-	return ((Omega::instance().getCurrentIteration() % interval == 0) && (ofile)); // active le truc tout les "interval" !??
+	return ((Omega::instance().getCurrentIteration() % interval == 0) && (ofile));
 }
 
 
@@ -93,16 +91,13 @@ void ContactStressRecorder::action(Body * body)
 	Real f1_el_x=0, f1_el_y=0, f1_el_z=0, x1=0, y1=0, z1=0, x2=0, y2=0, z2=0;
 	
 	Real sig11_el=0, sig22_el=0, sig33_el=0, sig12_el=0, sig13_el=0,
-	sig23_el=0, /*Vwater = 0,*/ kinematicE = 0;
+	sig23_el=0, Vwater = 0, kinematicE = 0;
 	
 	InteractionContainer::iterator ii    = ncb->transientInteractions->begin();
         InteractionContainer::iterator iiEnd = ncb->transientInteractions->end();
         
         Real j = 0;
-        //Real fabricTensor[3][3] = {{0,0,0},{0,0,0},{0,0,0}};
         Real FT[3][3] = {{0,0,0},{0,0,0},{0,0,0}};
-//         cerr << "FabricTensorInit= " << FabricTensor[0][0] << endl;
-			;
         
         for(  ; ii!=iiEnd ; ++ii ) 
         {
@@ -157,7 +152,7 @@ static_cast<BodyMacroParameters*>((*bodies)[id2]->physicalParameters.get());
 			y2 = de2->se3.position[1];
 			z2 = de2->se3.position[2];
 			
-			///Calcul des contraintes �astiques spheres/spheres
+			///Calcul des contraintes elastiques spheres/spheres
 			
 			sig11_el = sig11_el + f1_el_x*(x2 - x1);
 			sig22_el = sig22_el + f1_el_y*(y2 - y1);
@@ -176,7 +171,7 @@ static_cast<BodyMacroParameters*>((*bodies)[id2]->physicalParameters.get());
 		currentContactGeometry->radius1)	
 			*currentContactGeometry->normal;
 			
-			/// Calcul des contraintes �astiques spheres/parois
+			/// Calcul des contraintes elastiques spheres/parois
 			
 			sig11_el = sig11_el + f1_el_x*l[0];
 			sig22_el = sig22_el + f1_el_y*l[1];
@@ -188,25 +183,16 @@ static_cast<BodyMacroParameters*>((*bodies)[id2]->physicalParameters.get());
 			}
 
 			/// fabric tensor
-//  			if (Omega::instance().getCurrentIteration() % 100 == 0)
-// 			{cerr << "normal = "<< currentContactGeometry->normal <<
-// 			endl;}
+
 			Vector3r normal = currentContactGeometry->normal;
 			
 			for (int i=0; i<3; ++i)
-			{	/*cerr << "boucle i" << endl;*/
+			{	
 				for (int n=0; n<3; ++n)
 				{	
 					//fabricTensor[i][n]
 					FT[i][n]
 					+= normal[i]*normal[n];
-					
-// 					cerr << "n = " << n << endl;
-// 					cerr << "normal[i]=" << normal[i]
-// 					<< " normal[n]=" << normal[n] << 
-// 					" FabricTensor[i][n]=" <<
-// 					FabricTensor[i][n] << endl;
-					
 				}
 			}
 			
@@ -216,14 +202,10 @@ static_cast<BodyMacroParameters*>((*bodies)[id2]->physicalParameters.get());
 
 	/// FabricTensor
 	
-	//FT = (fabricTensor/j);
-//	Real traceFT = (FT[0][0]+FT[1][1]+FT[2][2])/j;
+	Real traceFT = (FT[0][0]+FT[1][1]+FT[2][2])/j;
 	
-// 	if (Omega::instance().getCurrentIteration() % 100 == 0) 
-// 	{cerr << "interactions de contact = " << j << endl;}
-// 	 cerr << "TracefabricTensor =" << traceFT << endl;}
+	/// calcul de l'energie cinetique:
 
-	/// calcul de l'�ergie cin�ique:
 	Real nbElt = 0, SR = 0, Vs=0, Rbody=0, Rmin=1, Rmax=0;
 	
 	BodyContainer::iterator bi = bodies->begin();
@@ -235,8 +217,7 @@ static_cast<BodyMacroParameters*>((*bodies)[id2]->physicalParameters.get());
 		shared_ptr<Body> b = *bi;
 		
 		int geometryIndex = b->geometricalModel->getClassIndex();
-		//cerr << "model = " << geometryIndex << endl;
-		
+	
 		if (geometryIndex == SpheresClassIndex)
 		{
 			nbElt +=1;
@@ -258,23 +239,16 @@ static_cast<BodyMacroParameters*>((*bodies)[id2]->physicalParameters.get());
 		}
 	}
 
-// 	if (Omega::instance().getCurrentIteration() % 100 == 0)
-// 	{cerr << "Ek = " << kinematicE ;}
-	
 	/// coordination number
 	
 	Real coordN = 0;
 	coordN = 2*(j/nbElt);	// ????????????????????????????????????????????
 	
-// 	if (Omega::instance().getCurrentIteration() % 100 == 0)
-// 	{cerr /*<< " j =" << j << " nbElt =" << nbElt */<< " coordN = " <<
-// 	coordN << endl;}
-
 	/// Calcul des contraintes "globales"
 	
 	Real SIG_11_el=0, SIG_22_el=0, SIG_33_el=0, SIG_12_el=0, SIG_13_el=0, SIG_23_el=0;
 	
-	// volume de l'�hantillon
+	// volume de l'echantillon
 	
 	PhysicalParameters* p_bottom = static_cast<PhysicalParameters*>((*bodies)[wall_bottom_id]->physicalParameters.get());
 	PhysicalParameters* p_top   =	 static_cast<PhysicalParameters*>((*bodies)[wall_top_id]->physicalParameters.get());
@@ -296,9 +270,6 @@ static_cast<BodyMacroParameters*>((*bodies)[id2]->physicalParameters.get());
 // 	Real V = (height-2*Rmoy) * (width-2*Rmoy) * (depth-2*Rmoy);
 	Real V = (height) * (width) * (depth);
 	
-// 	if (Omega::instance().getCurrentIteration() % 100 == 0) 
-// 	{cerr << "Vsample = " << V << endl;}
-	
 	SIG_11_el = sig11_el/V;
 	SIG_22_el = sig22_el/V;
 	SIG_33_el = sig33_el/V;
@@ -306,7 +277,7 @@ static_cast<BodyMacroParameters*>((*bodies)[id2]->physicalParameters.get());
 	SIG_13_el = sig13_el/V;
 	SIG_23_el = sig23_el/V;
 	
-	// calcul des d�ormations
+	/// calcul des deformations
 	
 	Real EPS_11=0, EPS_22=0, EPS_33=0;
 	
@@ -328,23 +299,13 @@ static_cast<BodyMacroParameters*>((*bodies)[id2]->physicalParameters.get());
 	Real n = Vv/V;
 // 	Real e = Vv/Vs;
 
-// 	cerr << "Vw1 = " << Vwater << "Vv1 = " << Vv << endl;
-// 	cerr << "V1 = " << V << "Vs1 = " << Vs << endl;
-
-
-// 	if (Omega::instance().getCurrentIteration() % 100 == 0)
-// 	{cerr << "n = " << n << "e =" << e << endl;}
-	
-// 	// mise �zero des deformations qd comp triaxiale commence
+// 	mise a zero des deformations qd comp triaxiale commence
 // 	if (triaxCompEng->compressionActivated) {  }
 	
-	/// r�up�ation de UnbalancedForce
+	/// UnbalancedForce
 	
 	Real equilibriumForce = triaxCompEng->ComputeUnbalancedForce(body);
 // 	Real equilibriumForce = sampleCapPressEng->ComputeUnbalancedForce(body);
-
-// 	if (Omega::instance().getCurrentIteration() % 100 == 0)
-// 	{cerr << "r�upUnbalancedForce = " << equilibriumForce << endl;}
 
 	if (Omega::instance().getCurrentIteration() % 100 == 0)
 	{cerr << "current Iteration " << Omega::instance().getCurrentIteration()
