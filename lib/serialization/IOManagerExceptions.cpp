@@ -16,5 +16,5 @@ const char* IOManagerExceptions::WrongFileHeader   		= "Wrong File Header";
 const char* IOManagerExceptions::AttributeNotFound 		= "Attribute not found";
 const char* IOManagerExceptions::BadAttributeValue 		= "Bad Attribute value";
 const char* IOManagerExceptions::WrongFileFooter   		= "Wrong File Footer";
-const char* IOManagerExceptions::FileNotGood       		= "This file cannot be opened";
+const char* IOManagerExceptions::FileNotGood       		= "This file cannot be opened. Please create directory ../data or change destination file";
 
