@@ -536,6 +536,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'yade-multimethods',
 			'TranslationEngine']),
 
+
 env.SharedLibrary('WallStressRecorder',
 		['Engine/DeusExMachina/WallStressRecorder.cpp'],
 		LIBS=env['LIBS']+['ParticleParameters',
@@ -670,4 +671,7 @@ env.SharedLibrary('InteractingSphere2AABBwater',
 
 
 
+
+
 ])
+

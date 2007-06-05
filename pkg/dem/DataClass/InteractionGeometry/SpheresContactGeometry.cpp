@@ -8,7 +8,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include <yade/pkg-dem/SpheresContactGeometry.hpp>
+#include "SpheresContactGeometry.hpp"
 
 SpheresContactGeometry::SpheresContactGeometry() : InteractionGeometry()
 {

@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include <yade/pkg-dem/ElasticContactLaw.hpp>
-
+#include "ElasticContactLaw.hpp"
 #include<yade/pkg-dem/BodyMacroParameters.hpp>
 #include<yade/pkg-dem/SpheresContactGeometry.hpp>
 #include<yade/pkg-dem/SDECLinkGeometry.hpp>

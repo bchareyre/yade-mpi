@@ -12,7 +12,7 @@
  *
  * All of user macros should come in 2 flavors, depending on whether we use log4cxx or not (backward compatibility).
  * The default is not to use it, unless the preprocessor macro LOG4CXX is defined. In that case, you want to #include
- * core/logging.h and link with log4cxx.
+ * yade-core/logging.h and link with log4cxx.
  *
  * TODO:
  * 1. for optimized builds, at least debugging macros should become no-ops
