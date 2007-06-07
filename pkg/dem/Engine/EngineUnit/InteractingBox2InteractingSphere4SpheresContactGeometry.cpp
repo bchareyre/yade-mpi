@@ -16,6 +16,7 @@
 #include<yade/lib-base/yadeWm3Extra.hpp>
 
 
+
 bool InteractingBox2InteractingSphere4SpheresContactGeometry::go(
 		const shared_ptr<InteractingGeometry>& cm1,
 		const shared_ptr<InteractingGeometry>& cm2,
@@ -97,43 +98,44 @@ bool InteractingBox2InteractingSphere4SpheresContactGeometry::go(
 		c->interactionGeometry = scm;
 	} else { // outside
 		Vector3r cOnBox_box = boxAxisT*cOnBox_boxLocal; // projection of sphere's center on closest box surface - relative to box's origin, but GLOBAL orientation!
-		Vector3r cOnBox_sphere = relPos21-cOnBox_box; // same, but origin in sphere's center
+		Vector3r cOnBox_sphere = cOnBox_box-relPos21; // same, but origin in sphere's center
 		depth=s->radius-cOnBox_sphere.Length();
 		if (depth<0) return false;
 
 		/*
 		 *  +-----------------------------------+
 		 *  |                                   |
-		 *  |          se32->position           |
-		 *  |               ×                   |
-		 *  |              / cOnBox_box         |
+		 *  |          se31->position           |
+		 *  |         pt2   ×                   |
+		 *  |            × / cOnBox_box         |
 		 *  |         pt1 /                     |
 		 *  +------~-----×-----~----------------+
-		 *       /       ^      \
+		 *       /       ^       \
 		 *      /        | cOnBox_sphere
 		 *      |        ×        |
-		 *      \        |  c ≡ se32->position
-		 *       \       |       /              
-		 *         ~     |     /
-		 *           ^~~ × ~~^
-		 *                 pt2
+		 *      \           c ≡ se32->position
+		 *       \               /              
+		 *         ~           /
+		 *           ^~~ ~ ~~^
+		 *                 
 		 */
 
 		pt1=cOnBox_box+se31.position;
 
 		cOnBox_sphere.Normalize(); // we want only direction in the following
 
-		// FIXME: is this CORRECT? Shouldn't it be rather se32->position+...???
-		// otherwise, we have pt1 on the box boundary, but pt2 is on the other side,
-		// therefore the contact point in OUTSIDE the box?!!
 		pt2=se32.position-cOnBox_sphere*s->radius;
 		
 		shared_ptr<SpheresContactGeometry> scm;
 		if (c->isNew) scm = shared_ptr<SpheresContactGeometry>(new SpheresContactGeometry());
 		else scm = YADE_PTR_CAST<SpheresContactGeometry>(c->interactionGeometry);	
 		scm->contactPoint = 0.5*(pt1+pt2);
-		scm->normal = pt1-pt2; scm->normal.Normalize();
-		scm->penetrationDepth = (pt1-pt2).Length();
+		//scm->normal = pt1-pt2; scm->normal.Normalize();
+		//scm->penetrationDepth = (pt1-pt2).Length();
+		scm->normal = -cOnBox_sphere;
+		scm->penetrationDepth = depth;
+		
+		
 		scm->radius1 = s->radius*2;
 		scm->radius2 = s->radius;
 		c->interactionGeometry = scm;
