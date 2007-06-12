@@ -124,7 +124,7 @@ bool InteractingBox2InteractingSphere4SpheresContactGeometry::go(
 
 		cOnBox_sphere.Normalize(); // we want only direction in the following
 
-		pt2=se32.position-cOnBox_sphere*s->radius;
+		pt2=se32.position+cOnBox_sphere*s->radius;
 		
 		shared_ptr<SpheresContactGeometry> scm;
 		if (c->isNew) scm = shared_ptr<SpheresContactGeometry>(new SpheresContactGeometry());
