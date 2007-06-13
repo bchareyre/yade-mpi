@@ -19,6 +19,7 @@
 #include<yade/pkg-dem/SDECLinkPhysics.hpp>
 #include<yade/pkg-dem/GlobalStiffnessCounter.hpp>
 #include<yade/pkg-dem/GlobalStiffnessTimeStepper.hpp>
+#include<yade/pkg-dem/PositionOrientationRecorder.hpp>
 
 #include<yade/pkg-dem/AveragePositionRecorder.hpp>
 #include<yade/pkg-dem/ForceRecorder.hpp>
@@ -107,12 +108,14 @@ TriaxialTest::TriaxialTest () : FileGenerator()
 	recordBottomForce	= true;
 	forceRecordFile		= "../data/force";
 	recordAveragePositions	= true;
-	positionRecordFile	= "../data/position";
+	positionRecordFile	= "../data/positions";
 	recordIntervalIter	= 20;
 	velocityRecordFile 	= "../data/velocities";
+	saveAnimationSnapshots = false;
+	AnimationSnapshotsBaseName = "../data/snapshots/snap";
+
 	rotationBlocked = false;
-	
-//	boxWalls 		= false;
+	//	boxWalls 		= false;
 	boxWalls 		= true;
 	internalCompaction	=false;
 
@@ -128,9 +131,9 @@ TriaxialTest::TriaxialTest () : FileGenerator()
 	bigBallDropTimeSeconds	= 30;
 	bigBallDropHeight 	= 3.04776;
 	
-	dampingForce = 0.5;
-	dampingMomentum = 0.5;
-	defaultDt = 0.0001;
+	dampingForce = 0.2;
+	dampingMomentum = 0.2;
+	defaultDt = 1;
 	
 	timeStepUpdateInterval = 50;
 	timeStepOutputInterval = 50;
@@ -222,8 +225,10 @@ void TriaxialTest::registerAttributes()
 	REGISTER_ATTRIBUTE(forceRecordFile);
 //	REGISTER_ATTRIBUTE(recordAveragePositions);
 	REGISTER_ATTRIBUTE(positionRecordFile);
-	REGISTER_ATTRIBUTE(velocityRecordFile)
+	REGISTER_ATTRIBUTE(velocityRecordFile);
 	REGISTER_ATTRIBUTE(recordIntervalIter);
+	REGISTER_ATTRIBUTE(saveAnimationSnapshots);
+	REGISTER_ATTRIBUTE(AnimationSnapshotsBaseName);
 
 //	REGISTER_ATTRIBUTE(gravity);
 	
@@ -675,6 +680,11 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	rootBody->engines.push_back(averagePositionRecorder);
 	rootBody->engines.push_back(velocityRecorder);
 	rootBody->engines.push_back(forcerec);
+	
+	if (saveAnimationSnapshots) {
+	shared_ptr<PositionOrientationRecorder> positionOrientationRecorder(new PositionOrientationRecorder);
+	positionOrientationRecorder->outputFile = AnimationSnapshotsBaseName;
+	rootBody->engines.push_back(positionOrientationRecorder);}
 	
 	rootBody->initializers.clear();
 	rootBody->initializers.push_back(physicalActionInitializer);

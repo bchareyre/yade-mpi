@@ -82,7 +82,8 @@ class TriaxialTest : public FileGenerator
 				,recordBottomForce
 				,recordAveragePositions
 				,boxWalls
-				,internalCompaction;
+				,internalCompaction
+				,saveAnimationSnapshots;
 
 		int		 recordIntervalIter
 				,timeStepUpdateInterval
@@ -100,7 +101,8 @@ class TriaxialTest : public FileGenerator
 		string		 forceRecordFile
 				,positionRecordFile
 				,velocityRecordFile
-				,importFilename;
+				,importFilename
+				,AnimationSnapshotsBaseName;
 	
 		shared_ptr<ForceRecorder> forcerec;
 		shared_ptr<VelocityRecorder> velocityRecorder;
