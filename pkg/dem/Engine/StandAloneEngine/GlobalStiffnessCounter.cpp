@@ -42,7 +42,7 @@ void GlobalStiffnessCounter::registerAttributes()
 
 bool GlobalStiffnessCounter::isActivated()
 {
-	return ((Omega::instance().getCurrentIteration() % interval == 0) );
+	return ((Omega::instance().getCurrentIteration() % interval == 0) || (Omega::instance().getCurrentIteration() < 100));
 }
 
 void GlobalStiffnessCounter::action(Body* body)
