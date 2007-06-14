@@ -24,7 +24,7 @@ GLSimulationPlayerViewer::GLSimulationPlayerViewer(QWidget * parent,char* name) 
 	shared_ptr<Factorable> tmpRenderer = ClassFactory::instance().createShared("OpenGLRenderingEngine");
 	renderer = static_pointer_cast<RenderingEngine>(tmpRenderer);
 
-	setSceneRadius(2000);
+	setSceneRadius(2);
 	showEntireScene();
 	resize(720, 576);
 	setAnimationPeriod(1);
