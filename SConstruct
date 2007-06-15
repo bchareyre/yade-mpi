@@ -44,7 +44,7 @@ opts=Options(optsFile)
 opts.AddOptions(
 	### OLD: use PathOption with PathOption.PathIsDirCreate, but that doesn't exist in 0.96.1!
 	('PREFIX','Install path prefix','/usr/local'),
-	PathOption('runtimePREFIX','Runtime path prefix; DO NOT USE, inteded for packaging only.','$PREFIX'),
+	('runtimePREFIX','Runtime path prefix; DO NOT USE, inteded for packaging only.','$PREFIX'),
 	('variant','Build variant, will be suffixed to all files, along with version (beware: if PREFIX is the same, headers of the older version will still be overwritten','',None,lambda x:x),
 	BoolOption('debug', 'Enable debugging information and disable optimizations',1),
 	BoolOption('profile','Enable profiling information',0),
