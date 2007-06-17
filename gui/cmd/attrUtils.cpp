@@ -18,8 +18,8 @@ class AttrAccess{
 		DescriptorMap descriptors; // maps attribute name to its archive and vector of its types (given as ints, from the following enum)
 		enum {BOOL,STRING,NUMBER}; // allowed types
 		
-		AttrAccess(Serializable* _ser){ser=shared_ptr<Serializable>(_ser); init();}
-		AttrAccess(shared_ptr<Serializable> _ser){ser=_ser; init();}
+		AttrAccess(Serializable* _ser): ser(shared_ptr<Serializable>(_ser)){init();}
+		AttrAccess(shared_ptr<Serializable> _ser):ser(_ser){init();}
 
 		//! create archives and descriptors
 		void init(){
