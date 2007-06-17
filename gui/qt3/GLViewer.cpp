@@ -8,8 +8,8 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "GLViewer.hpp"
-#include <GL/glut.h>
+#include"GLViewer.hpp"
+#include<GL/glut.h>
 #include<yade/lib-opengl/FpsTracker.hpp>
 #include<yade/core/Body.hpp>
 #include<yade/core/Interaction.hpp>

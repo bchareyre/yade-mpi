@@ -80,7 +80,6 @@ int NullGUI::run(int argc, char* argv[])
 {
 
 	int ch;
-	opterr = 0;
 	while( ( ch = getopt(argc,argv,"Hf:s:S:v:pm:t:g:bQ:F:") ) != -1)
 		switch(ch)
 		{

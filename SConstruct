@@ -144,17 +144,21 @@ def CheckPython(context):
 	"Checks for functional python/c API. Sets variables if OK and returns true; otherwise returns false."
 	origs={'LIBS':context.env['LIBS'],'LIBPATH':context.env['LIBPATH'],'CPPPATH':context.env['CPPPATH'],'LINKFLAGS':context.env['LINKFLAGS']}
 	context.Message('Checking for Python development files... ')
-	try:
-		#FIXME: once caught, exception disappears along with the actual message of what happened...
-		import distutils.sysconfig as ds
-		context.env.Append(CPPPATH=ds.get_python_inc(),LIBS=ds.get_config_var('LIBS').split())
-		context.env.Append(LINKFLAGS=ds.get_config_var('LINKFORSHARED').split()+ds.get_config_var('BLDLIBRARY').split())
-		ret=context.TryLink('#include<Python.h>\nint main(int argc, char **argv){Py_Initialize(); Py_Finalize();}\n','.cpp')
-		if not ret: raise RuntimeError
-	except (ImportError,RuntimeError,ds.DistutilsPlatformError):
-		for k in origs.keys(): context.env[k]=origs[k]
-		context.Result(False)
-		return False
+	if 1:
+		try:
+			#FIXME: once caught, exception disappears along with the actual message of what happened...
+			import distutils.sysconfig as ds
+			context.env.Append(CPPPATH=ds.get_python_inc(),LIBS=ds.get_config_var('LIBS').split())
+			context.env.Append(LINKFLAGS=ds.get_config_var('LINKFORSHARED').split()+ds.get_config_var('BLDLIBRARY').split())
+			ret=context.TryLink('#include<Python.h>\nint main(int argc, char **argv){Py_Initialize(); Py_Finalize();}\n','.cpp')
+			if not ret: raise RuntimeError
+		except (ImportError,RuntimeError,ds.DistutilsPlatformError):
+			for k in origs.keys(): context.env[k]=origs[k]
+			context.Result(False)
+			return False
+	else:
+		env.ParseConfig("python2.5-dbg-config --cflags")
+		env.ParseConfig("python2.5-dbg-config --ldflags")
 	context.Result(True)
 	return True
 
@@ -214,7 +218,9 @@ if not env.GetOption('clean'):
 	# check optional libs
 	if 'log4cxx' in env['features'] and conf.CheckLibWithHeader('log4cxx','log4cxx/logger.h','c++','log4cxx::Logger::getLogger("foo");',autoadd=1):
 		env.Append(CPPDEFINES=['LOG4CXX'])
-	if 'python' in env['features'] and conf.CheckPython() and conf.CheckScientificPython():
+	if 'python' in env['features'] and conf.CheckPython() and conf.CheckScientificPython() and (
+		conf.CheckLibWithHeader('boost_python-mt','boost/python.hpp','c++','boost::python::scope();',autoadd=1)
+		or conf.CheckLibWithHeader('boost_python','boost/python.hpp','c++','boost::python::scope();',autoadd=1)):
 		env.Append(CPPDEFINES=['EMBED_PYTHON'])
 
 	if env['useMiniWm3']: env.Append(LIBS='miniWm3',CPPDEFINES=['MINIWM3'])
@@ -396,7 +402,7 @@ if not env.GetOption('clean'):
 	makePkgConfig('$buildDir/yade${SUFFIX}.pc')
 	env.Install(pcDir,'$buildDir/yade${SUFFIX}.pc')
 	installAlias=env.Alias('install',instDirs) # build and install everything that should go to instDirs, which are $PREFIX/{bin,lib} (uses scons' Install); include pkgconfig stuff
-	env.Default(installAlias)
+	env.Default([installAlias,'$PREFIX'])
 
 env.Export('env');
 

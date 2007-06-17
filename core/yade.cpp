@@ -80,18 +80,19 @@ void printHelp()
 	#ifdef YADE_DEBUG
 		flags+="   DEBUG";
 	#endif
-	cout << 
+	cerr << 
 "\n" << Omega::instance().yadeVersionName << "\n\
 \n\
-	-h	: print this help.\n\
-	-n	: use NullGUI (command line interface) instead of default GUI.\n\
+	-h      : print this help.\n\
+	-n      : use NullGUI (command line interface) instead of default GUI.\n\
 	-N name : use some other custom GUI (none available yet ;)\n\
-	-w	: launch the 'first run configuration'\n\
-	-c	: use local directory ./ as configuration directory\n\
+	-w      : launch the 'first run configuration'\n\
+	-c      : use local directory ./ as configuration directory\n\
 	-C path : configuration directory different than default ~/.yade/\n\
 	-S file : load simulation from file (works with QtGUI only)\n\
+	-v      : be verbose (may be repeated)\n\
 \n\
-Only one option can be passed to yade, all other options are passed to the selected GUI\n\
+	--      : pass all remaining options to the selected GUI\n\
 ";
 	if(flags!="")
 		cout << "compilation flags:\n"+ flags +"\n\n";
@@ -100,15 +101,13 @@ Only one option can be passed to yade, all other options are passed to the selec
 
 int main(int argc, char *argv[])
 {
-	int ch;
-	string gui = "";
-	string configPath = string(getenv("HOME")) + "/.yade" SUFFIX;
-	string simulationFileName="";
 
 	// This makes boost stop bitching about dot-files and other files that may not exist on MS-DOS 3.3;
 	// see http://www.boost.org/libs/filesystem/doc/portability_guide.htm#recommendations for what all they consider bad.
 	// Since it is a static variable, it infulences all boost::filesystem operations in this respect (fortunately).
 	filesystem::path::default_name_check(filesystem::native);
+
+	string configPath=string(getenv("HOME")) + "/.yade" SUFFIX;
 
 	#ifdef LOG4CXX
 		// read logging configuration from file and watch it (creates a separate thread)a
@@ -118,27 +117,35 @@ int main(int argc, char *argv[])
 			LOG_INFO("Logger loaded and watches configuration file: "<<logConf<<".");
 		} else { // otherwise use simple console-directed logging
 			log4cxx::BasicConfigurator::configure();
-			logger->setLevel(log4cxx::Level::INFO);
-			LOG_INFO("Logger uses basic (console) configuration since `"<<logConf<<"' was not found. DEBUG messages will be ommited.");
+			logger->setLevel(log4cxx::Level::WARN);
+			LOG_INFO("Logger uses basic (console) configuration since `"<<logConf<<"' was not found. INFO and DEBUG messages will be ommited.");
 			LOG_INFO("Look at the file doc/logging.conf.sample in the source distribution as an example on how to customize logging.");
 		}
 	#endif
-
-
 	
-	bool 	setup 		= false;
-	if( ( ch = getopt(argc,argv,"hnN:wC:cS:") ) != -1)
-		switch(ch)
-		{
-			case 'h' :	printHelp();		return 1;
-			case 'n' :	gui = "NullGUI";	break;
-			case 'N' :	gui = optarg; 		break;
-			case 'w' :	setup = true;		break;
-			case 'C' :	configPath = optarg; 	break;
-			case 'c' :	configPath = "."; 	break;
-			case 'S' :	simulationFileName=optarg; break;
-			default	 :	printHelp();		return 1;
+	int ch;
+	string gui="";
+	string simulationFileName="";
+	bool setup=false;
+	int verbose=0;
+	bool coreOptions=true;
+	while(coreOptions && (ch=getopt(argc,argv,"hnN:wC:cvS:"))!=-1)
+		switch(ch){
+			case 'h': printHelp(); return 1;
+			case 'n': gui="NullGUI"; break;
+			case 'N': gui=optarg; break;
+			case 'w': setup=true; break;
+			case 'C': configPath=optarg; break;
+			case 'c': configPath="."; break;
+			case 'v': verbose+=1; break;
+			case 'S': simulationFileName=optarg; break;
+			case '-': coreOptions=false; break;
+			default: printHelp(); return 1;
 		}
+	// kill processed options, keep one more which will is in faact non-option (normally the binary)
+	argv=&(argv[optind-1]); argc-=optind-1;
+	// reset getopt globals for next processing
+	optind=0; opterr=0;
 	
 	if(configPath[configPath.size()-1] == '/')
 		configPath = configPath.substr(0,configPath.size()-1); 
@@ -150,11 +157,19 @@ int main(int argc, char *argv[])
 	filesystem::path yadeConfigPath  = filesystem::path(Omega::instance().yadeConfigPath, filesystem::native);
 	filesystem::path yadeConfigFile  = filesystem::path(Omega::instance().yadeConfigPath + "/preferences.xml", filesystem::native);
 
+	#ifdef LOG4CXX
+		if(verbose==1) logger->setLevel(log4cxx::Level::INFO);
+		else if (verbose>=2) logger->setLevel(log4cxx::Level::DEBUG);
+	#endif
+
 
 	#ifdef EMBED_PYTHON
+		/* see http://www.python.org/dev/peps/pep-0311 for threading with Python embedded */
 		LOG_DEBUG("Initializing Python...");
 		Py_OptimizeFlag=1;
 		Py_Initialize();
+		PyEval_InitThreads(); // this locks the GIL as side-effect
+		//PyGILState_STATE pyState=PyGILState_Ensure(); PyGILState_Release(pyState);
 		signal(SIGINT,sigHandler);
 	#endif
 
@@ -173,9 +188,7 @@ int main(int argc, char *argv[])
 		LOG_DEBUG("ABRT/SEGV signal handlers set, crash batch created as "<<Omega::instance().gdbCrashBatch);
 	#endif
 
-
 	LOG_INFO("Loading configuration file: "<<yadeConfigFile.string());
-
 	IOFormatManager::loadFromFile("XMLFormatManager",yadeConfigFile.string(),"preferences",Omega::instance().preferences);
 
 	LOG_INFO("Loading plugins...");
@@ -185,12 +198,12 @@ int main(int argc, char *argv[])
 
 	Omega::instance().setSimulationFileName(simulationFileName); //init() resets to "";
 	
-	if( gui.size()==0)
-		gui = Omega::instance().preferences->defaultGUILibName;
+	if(gui.size()==0) gui=Omega::instance().preferences->defaultGUILibName;
 		
 	shared_ptr<FrontEnd> frontEnd = dynamic_pointer_cast<FrontEnd>(ClassFactory::instance().createShared(gui));
-
- 	int ok = frontEnd->run(argc,argv);
+	
+ 	for(int i=0;i<argc; i++)cerr<<"Argument "<<i<<": "<<argv[i]<<endl;
+	int ok = frontEnd->run(argc,argv);
 
 	#ifdef EMBED_PYTHON
 		LOG_DEBUG("Finalizing Python...");

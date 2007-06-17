@@ -42,3 +42,9 @@ env.Install('$PREFIX/lib/yade$SUFFIX/gui',[
 		CPPPATH=env['CPPPATH']+['qt3']),
 ])
 
+if 'EMBED_PYTHON' in env['CPPDEFINES']:
+	env.Install('$PREFIX/lib/yade$SUFFIX/gui',[
+		env.SharedLibrary('cmdGui',['cmd/cmdGui.cpp']),
+		env.SharedLibrary('yadeControl',['cmd/yadeControl.cpp'],SHLIBPREFIX='',LIBS=env['LIBS']+['yade-base','libboost_python','QtGUI']),
+])
+

@@ -20,7 +20,11 @@
 #include <iostream>
 #include <boost/shared_ptr.hpp>
 
-#include <Wm3Vector3.h>
+#ifdef EMBED_PYTHON
+	#include<Python.h>
+#endif
+
+#include<Wm3Vector3.h>
 #include<yade/lib-base/yadeWm3.hpp>
 #include<yade/lib-loki/Singleton.hpp>
 #include<yade/lib-factory/ClassFactory.hpp>

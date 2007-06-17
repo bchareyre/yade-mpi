@@ -534,6 +534,13 @@ void OpenGLRenderingEngine::renderBoundingVolume(const shared_ptr<MetaBody>& roo
 
 void OpenGLRenderingEngine::renderInteractingGeometry(const shared_ptr<MetaBody>& rootBody)
 {
+	// Additional clipping planes: http://fly.srk.fer.hr/~unreal/theredbook/chapter03.html
+	#if 0
+		GLdouble clip0[4]={.0,1.,0.,0.}; // y<0
+		glClipPlane(GL_CLIP_PLANE0,clip0);
+		glEnable(GL_CLIP_PLANE0);
+	#endif
+
 	BodyContainer::iterator bi    = rootBody->bodies->begin();
 	BodyContainer::iterator biEnd = rootBody->bodies->end();
 	for( ; bi!=biEnd ; ++bi)
