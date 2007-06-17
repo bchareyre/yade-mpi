@@ -12,6 +12,8 @@
 
 #include<unistd.h>
 
+#include"attrUtils.cpp"
+
 class RenderingEngine;
 
 class pyOmega{
@@ -81,6 +83,16 @@ public:
 		QGLFormat format;	QGLFormat::setDefaultFormat(format); format.setStencil(TRUE); format.setAlpha(TRUE);
 		viewer=new GLViewer(viewId,renderer,format,0,viewId==0?0:instances[0]->viewer);
 		viewer->notMoving();
+		showAttrs(renderer);
+
+		AttrAccess acc(renderer);
+		cerr<<acc.dumpAttrs();
+		cerr<<"=========== will change these values: ========="<<endl;
+		cerr<<acc.dumpAttr("Background_color")<<endl<<acc.dumpAttr("Draw_inside")<<endl;
+		acc.setAttrStr("Background_color","{ .8 .8 .8 }");
+		acc.setAttr("Draw_inside",false);
+		cerr<<"=========== new values are: ========="<<endl;
+		cerr<<acc.dumpAttr("Background_color")<<endl<<acc.dumpAttr("Draw_inside")<<endl;
 
 		if(viewId==0){
 			app->setMainWidget(viewer);
