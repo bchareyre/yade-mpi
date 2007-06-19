@@ -150,7 +150,7 @@ int main(int argc, char *argv[])
 	if(configPath[configPath.size()-1] == '/')
 		configPath = configPath.substr(0,configPath.size()-1); 
 
-	Omega::instance().yadeVersionName = "Yet Another Dynamic Engine 0.10.0, beta.";
+	Omega::instance().yadeVersionName = "Yet Another Dynamic Engine 0.11.x, beta, SVN snapshot.";
 
 	Omega::instance().preferences    = shared_ptr<Preferences>(new Preferences);
 	Omega::instance().yadeConfigPath = configPath; 
