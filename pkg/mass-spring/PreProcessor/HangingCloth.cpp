@@ -141,7 +141,7 @@ void HangingCloth::registerAttributes()
 }
 
 
-string HangingCloth::generate()
+bool HangingCloth::generate()
 {
 	Omega::instance().setTimeStep(0.004);
 	rootBody = shared_ptr<MetaBody>(new MetaBody);
@@ -439,7 +439,8 @@ string HangingCloth::generate()
 		}
 	}
 			
-	return "total number of permament links created: " + lexical_cast<string>(linksNum);
+	message="total number of permament links created: " + lexical_cast<string>(linksNum);
+	return true;
 }
 
 

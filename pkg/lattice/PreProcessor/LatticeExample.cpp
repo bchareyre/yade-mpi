@@ -409,7 +409,7 @@ void LatticeExample::registerAttributes()
         REGISTER_ATTRIBUTE(bond_critTensileStrain);
 }
 
-string LatticeExample::generate()
+bool LatticeExample::generate()
 {
 	rootBody = shared_ptr<MetaBody>(new MetaBody);
 	createActors(rootBody);
@@ -436,13 +436,13 @@ string LatticeExample::generate()
 
         unsigned int totalNodesCount = 0;
 	{
-		setMessage("creating nodes...");
+		setStatus("creating nodes...");
 		float all = nbNodes[0]*nbNodes[1]*nbNodes[2];
 		float current = 0.0;
 
 		for( int j=0 ; j<=nbNodes[1] ; j++ )
 		{
-			if(shouldTerminate()) return "";
+			if(shouldTerminate()) return false;
 
 			for( int i=0 ; i<=nbNodes[0] ; i++ )
 				for( int k=0 ; k<=nbNodes[2] ; k++)
@@ -476,14 +476,14 @@ string LatticeExample::generate()
 		int I,J;
 		if(FLAT)
 		{
-			setProgress(0); setMessage("Delaunay 2d...");
+			setProgress(0); setStatus("Delaunay 2d...");
 			Delaunay2<Real> del2(vert2.size(),&(vert2[0]),cellsizeUnit_in_meters/50,false, Query::QT_INTEGER); // Delaunay
 
 			int del2_i = 0;
 			int del2_ind[3];
 			while(del2.GetIndexSet(del2_i++,del2_ind))
 			{
-				if(shouldTerminate()) return "";
+				if(shouldTerminate()) return false;
 				setProgress((float)del2_i/(float)del2.GetSimplexQuantity());
 				shared_ptr<Body> beam;
 
@@ -503,7 +503,7 @@ string LatticeExample::generate()
 		}
 		else
 		{
-			setProgress(0); setMessage("Delaunay 3d...");
+			setProgress(0); setStatus("Delaunay 3d...");
 			Delaunay3<Real> del3(vert3.size(),&(vert3[0]),cellsizeUnit_in_meters/50,false, Query::QT_INTEGER); // Delaunay
 			
 			int del3_i = 0;
@@ -541,7 +541,7 @@ string LatticeExample::generate()
 	int beam_counter = 0;
 	float nodes_a=0;
 	float nodes_all = rootBody->bodies->size();
-	setMessage("creating beams...");
+	setStatus("creating beams...");
 	double r  = maxLength_in_cellsizeUnit*cellsizeUnit_in_meters;
 	double r2 = std::pow(r,2);
 	for(  ; bi!=biEnd ; ++bi )  // loop over all nodes, to create beams
@@ -686,7 +686,7 @@ string LatticeExample::generate()
 		}
 	}
 
-	setMessage("angular springs...");
+	setStatus("angular springs...");
 	{ // create angular springs between beams
 		bi    = rootBody->bodies->begin();
 		biEnd = rootBody->bodies->end();
@@ -714,10 +714,10 @@ string LatticeExample::generate()
 	{
 		float all = (nbNodes[0]-1)*(nbNodes[1]-1)*(nbNodes[2]-1);
 		float current = 0.0;
-		setMessage("quadrilaterals...");
+		setStatus("quadrilaterals...");
 		for( int j=1 ; j<=nbNodes[1] ; j++ )
 		{
-			if(shouldTerminate()) return "";
+			if(shouldTerminate()) return false;
 
 			for( int i=1 ; i<=nbNodes[0] ; i++ )
 			{
@@ -737,7 +737,7 @@ string LatticeExample::generate()
         imposeTranslation(rootBody,region_F_min,region_F_max,direction_F,displacement_F_meters);
 
         if(useAggregates) addAggregates(rootBody);
-	if(shouldTerminate()) return "";
+	if(shouldTerminate()) return false;
         
         nonDestroy(rootBody,nonDestroy_A_min,nonDestroy_A_max);
         nonDestroy(rootBody,nonDestroy_B_min,nonDestroy_B_max);
@@ -747,11 +747,12 @@ string LatticeExample::generate()
         
         cerr << "finished.. saving\n";
 
-        return "Number of nodes created:\n" + lexical_cast<string>(nbNodes[0]) + ","
+        message="Number of nodes created:\n" + lexical_cast<string>(nbNodes[0]) + ","
                                             + lexical_cast<string>(nbNodes[1]) + ","
                                             + lexical_cast<string>(nbNodes[2]) + ","
 	     + "Number of beams: " + lexical_cast<string>(bc.size()) + "\n"
 	     + "\nNOTE: sometimes it can look better when 'drawWireFrame' is enabled in Display tab.";
+		  return true;
 
 }
 
@@ -1383,7 +1384,7 @@ void LatticeExample::addAggregates(shared_ptr<MetaBody>& rootBody)
                 randomN(generator, boost::normal_distribution<>(MEAN_DIAMETER,SIGMA_DIAMETER));
 
         std::cerr << "generating aggregates ... ";
-	setMessage(  "generating aggregates...");
+	setStatus(  "generating aggregates...");
         do
         {
 		if(shouldTerminate()) return;

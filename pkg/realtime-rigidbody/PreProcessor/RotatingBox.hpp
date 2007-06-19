@@ -40,7 +40,7 @@ class RotatingBox : public FileGenerator
 	public :
 		RotatingBox ();
 		~RotatingBox ();
-		virtual string generate();
+		virtual bool generate();
 	
 	protected :
 		virtual void registerAttributes();

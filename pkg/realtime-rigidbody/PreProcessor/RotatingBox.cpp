@@ -85,7 +85,7 @@ void RotatingBox::registerAttributes()
 }
 
 
-string RotatingBox::generate()
+bool RotatingBox::generate()
 {
 	Omega::instance().setTimeStep(0.01);
 	rootBody = shared_ptr<MetaBody>(new MetaBody);
@@ -127,7 +127,8 @@ string RotatingBox::generate()
 				rootBody->bodies->insert(box);
  			}
 
-	return "ATTN: please set smaller timestep or it will bounce like crazy.";
+	message="ATTN: please set smaller timestep or it will bounce like crazy.";
+	return true;
 }
 
 

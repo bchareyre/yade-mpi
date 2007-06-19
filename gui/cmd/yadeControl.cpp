@@ -1,6 +1,8 @@
 #include<yade/core/Omega.hpp>
+#include<yade/core/FileGenerator.hpp>
 
 #include<boost/python.hpp>
+#include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 #include<boost/bind.hpp>
 #include<boost/thread/thread.hpp>
 #include<boost/filesystem/operations.hpp>
@@ -11,6 +13,7 @@
 #include<qapplication.h>
 
 #include<unistd.h>
+#include<list>
 
 #include"attrUtils.cpp"
 
@@ -42,6 +45,40 @@ class pyOmega{
 		cerr<<"LOAD!"<<endl;
 	}
 };
+
+class pyPreprocessor{
+	public:
+		pyPreprocessor(){serializer="XMLFormatManager"; output="../data/scene.xml";}
+		std::string generator;
+		std::string serializer;
+		std::string output;
+		//! return list of available generators
+		boost::python::list listGenerators(){
+			boost::python::list ret;
+			for(map<string,DynlibDescriptor>::const_iterator di=Omega::instance().getDynlibsDescriptor().begin();di!=Omega::instance().getDynlibsDescriptor().end();++di) if (Omega::instance().isInheritingFrom((*di).first,"FileGenerator")) ret.append(di->first);
+			return ret;
+		}
+		//! return list of available serializers
+		boost::python::list listSerializers(){
+			//vector<string> ret;
+			boost::python::list ret;
+			for(map<string,DynlibDescriptor>::const_iterator di=Omega::instance().getDynlibsDescriptor().begin();di!=Omega::instance().getDynlibsDescriptor().end();++di) if (Omega::instance().isInheritingFrom((*di).first,"IOFormatManager")) ret.append(di->first);
+			return ret;
+		}
+		//! run generator
+		bool generate(){
+			#define _CHECK_NONEMPTY(s) if(s.empty()) throw std::runtime_error("`" #s "' is empty.")
+				_CHECK_NONEMPTY(generator); _CHECK_NONEMPTY(serializer);	_CHECK_NONEMPTY(output);
+			#undef _CHECK_NONEMPTY
+			shared_ptr<FileGenerator> gen=static_pointer_cast<FileGenerator>(ClassFactory::instance().createShared(generator));
+			gen->setFileName(output);
+			gen->setSerializationLibrary(serializer);
+			bool ret=gen->generateAndSave();
+			cerr<<(ret?"SUCCESS:\n":"FAILURE:\n")<<gen->message<<endl;
+			return ret;
+		}
+};
+		
 
 
 
@@ -112,7 +149,12 @@ vector<pyGLViewer*> pyGLViewer::instances;
 
 BOOST_PYTHON_MODULE(yadeControl)
 {
-	boost::python::class_<pyOmega>("Omega")
+	/* http://mail.python.org/pipermail/c++-sig/2004-March/007025.html
+	http://mail.python.org/pipermail/c++-sig/2004-March/007029.html */
+	python::class_<std::vector<std::string> >("_vectSs")
+		.def(python::vector_indexing_suite<std::vector<std::string>,true>());  
+
+	boost::python::class_<pyOmega>("Omega_base")
 		.add_property("iter",&pyOmega::iter)
 		.add_property("time",&pyOmega::simulationTime)
 		// TODO: return computation time
@@ -122,6 +164,14 @@ BOOST_PYTHON_MODULE(yadeControl)
 		.def("run",&pyOmega::run)
 		.def("pause",&pyOmega::pause)
 		.def("step",&pyOmega::step);
+
+	boost::python::class_<pyPreprocessor>("Preprocessor")
+		.add_property("generator",&pyPreprocessor::generator,&pyPreprocessor::generator)
+		.add_property("serializer",&pyPreprocessor::serializer,&pyPreprocessor::serializer)
+		.add_property("output",&pyPreprocessor::output,&pyPreprocessor::output)
+		.def("generate",&pyPreprocessor::generate)
+		.def("listSerializers",&pyPreprocessor::listSerializers)
+		.def("listGenerators",&pyPreprocessor::listGenerators);
 
 	boost::python::class_<pyGLViewer>("View");
 

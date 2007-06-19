@@ -221,7 +221,7 @@ class LatticeExample : public FileGenerator
 		LatticeExample();
 		virtual ~LatticeExample();
 
-		string generate();
+		bool generate();
 	
 		void createActors(shared_ptr<MetaBody>& rootBody);
 		void positionRootBody(shared_ptr<MetaBody>& rootBody);

@@ -83,7 +83,7 @@ void BoxStack::registerAttributes()
 }
 
 
-string BoxStack::generate()
+bool BoxStack::generate()
 {
 	Omega::instance().setTimeStep(0.04);
 	rootBody = shared_ptr<MetaBody>(new MetaBody);
@@ -115,7 +115,7 @@ string BoxStack::generate()
 	createSphere(body);
 	rootBody->bodies->insert(body);
  			
-	return "";
+	message=""; return true;
 }
 
 

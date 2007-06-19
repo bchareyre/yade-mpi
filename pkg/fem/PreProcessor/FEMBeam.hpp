@@ -40,7 +40,7 @@ class FEMBeam : public FileGenerator
 	public :
 		FEMBeam ();
 		~FEMBeam ();
-		string generate();
+		bool generate();
 
 	private :
 		void createActors(shared_ptr<MetaBody>& rootBody);

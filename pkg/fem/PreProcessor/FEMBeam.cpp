@@ -112,7 +112,7 @@ void FEMBeam::registerAttributes()
 }
 
 
-string FEMBeam::generate()
+bool FEMBeam::generate()
 {
 	Omega::instance().setTimeStep(0.004);
 	rootBody = shared_ptr<MetaBody>(new MetaBody);
@@ -130,7 +130,7 @@ string FEMBeam::generate()
 	imposeTranslation(rootBody,regionMin1,regionMax1,translationAxis1,velocity1);
 	imposeTranslation(rootBody,regionMin2,regionMax2,translationAxis2,velocity2);
 
-	return "\nNOTE: if it explodes, set smaller time step.";
+	message="\nNOTE: if it explodes, set smaller time step."; return true;
 }
 
 

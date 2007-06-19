@@ -34,7 +34,7 @@ class BoxStack : public FileGenerator
 
 		virtual void registerAttributes();
 		
-		virtual string generate();
+		virtual bool generate();
 
 	private :
 		void createKinematicBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents,bool);

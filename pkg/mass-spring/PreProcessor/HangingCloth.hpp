@@ -50,7 +50,7 @@ class HangingCloth : public FileGenerator
 	public :
 		HangingCloth ();
 		~HangingCloth ();
-		string generate();
+		bool generate();
 
 	
 	private :
