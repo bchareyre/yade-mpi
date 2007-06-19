@@ -18,7 +18,7 @@ CREATE_LOGGER(PythonRecorder);
  */
 
 PythonRecorder::PythonRecorder():DataRecorder(){
-	LOG_FATAL("what use of releasing unknown lock??!! Otherwise deadlock here.");
+	LOG_FATAL("what use of releasing unknown lock?! Otherwise deadlock here.");
 	PyEval_ReleaseLock();
 	PyGILState_STATE pyState = PyGILState_Ensure();
 		PyRun_SimpleString("import sys; sys.path.insert(0,'" PREFIX "/lib/yade" SUFFIX "/extra');");

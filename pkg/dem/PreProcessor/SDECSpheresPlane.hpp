@@ -44,7 +44,7 @@ class SDECSpheresPlane : public FileGenerator
 	public :
 		SDECSpheresPlane ();
 		~SDECSpheresPlane ();
-		string generate();
+		bool generate();
 
 	protected :
 		virtual void postProcessAttributes(bool deserializing);

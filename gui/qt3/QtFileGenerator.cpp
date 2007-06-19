@@ -199,7 +199,7 @@ void QtFileGenerator::timerEvent( QTimerEvent* )
 	// generating ....
 	if(m_worker && m_runner)
 	{
-		textLabel1->setText(m_worker->message());
+		textLabel1->setText(m_worker->getStatus());
 		progressBar1->setProgress((int)(m_worker->progress()*1000.0));
 	}
 
@@ -210,8 +210,10 @@ void QtFileGenerator::timerEvent( QTimerEvent* )
 		pbClose->setEnabled(false);
 		pbGenerate->setEnabled(true);
 
-		string message = boost::any_cast<std::string>(m_worker->getReturnValue());
-		shared_ptr<MessageDialog> md = shared_ptr<MessageDialog>(new MessageDialog(message,this->parentWidget()->parentWidget()));
+		bool successfullyGenerated=boost::any_cast<bool>(m_worker->getReturnValue());
+		string message=m_worker->message;
+
+		shared_ptr<MessageDialog> md = shared_ptr<MessageDialog>(new MessageDialog(string(successfullyGenerated?"SUCCESS:\n\n":"FAILURE!\n\n")+message,this->parentWidget()->parentWidget()));
 		md->exec();
 
 		m_worker=shared_ptr<FileGenerator>();
@@ -222,10 +224,10 @@ void QtFileGenerator::timerEvent( QTimerEvent* )
 
 		/* now, launch the generated simulation if
 		 * 1. it is desired,
-		 * 2. generation was successful (unreliable check: generator returns string; we just have a look if the filename specified exists or not),
+		 * 2. generation was successful
 		 * 3. no simulation is open already (by checking Omega's simulationFileName) */
-		if(	   cbOpenAutomatically->isChecked() 
-			&& filesystem::exists(filesystem::path((const char*)(leOutputFileName->text()))) 
+		if(cbOpenAutomatically->isChecked() 
+			&& successfullyGenerated //filesystem::exists(filesystem::path((const char*)(leOutputFileName->text()))) 
 			&& Omega::instance().getSimulationFileName()=="")
 		{
 			QWidget* qw=this; while (qw->parentWidget()) qw=qw->parentWidget(); // find toplevel widget - which should be yade's main window

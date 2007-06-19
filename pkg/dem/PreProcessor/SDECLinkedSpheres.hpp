@@ -48,7 +48,7 @@ class SDECLinkedSpheres : public FileGenerator
 	public :
 		SDECLinkedSpheres ();
 		~SDECLinkedSpheres ();
-		string generate();
+		bool generate();
 	
 	protected :
 		virtual void postProcessAttributes(bool deserializing);

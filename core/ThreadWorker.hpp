@@ -31,7 +31,7 @@ class ThreadWorker	//         perhaps simulation steps, or stage? as it is a sin
 		boost::mutex	m_mutex;
 		boost::any	m_val;
 		float		m_progress;
-		std::string	m_message;
+		std::string	m_status;
 		void		setTerminate(bool);
 		void		callSingleAction();
 
@@ -43,7 +43,7 @@ class ThreadWorker	//         perhaps simulation steps, or stage? as it is a sin
 		/// if you feel monitored for progress, you can set it here: a value between 0.0 and 1.0
 		void		setProgress(float);
 		/// if you feel being monitored for what currently is done, set the message here
-		void		setMessage(std::string);
+		void		setStatus(std::string);
 		/// derived classes must define this method, that's what is executed in separate thread
 		virtual void	singleAction() = 0;
 
@@ -54,7 +54,7 @@ class ThreadWorker	//         perhaps simulation steps, or stage? as it is a sin
 		/// Returns a value between 0.0 and 1.0. Useful for updating a progress bar.
 		float		progress(); // get_progress ? (pick a naming convention, efngh)
 		/// You can display a message in GUI about what is the current work status
-		std::string	message();
+		std::string	getStatus();
 		/// Check whether execution is finished,
 		bool		done();
 		/// then get the result.

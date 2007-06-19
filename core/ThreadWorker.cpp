@@ -26,10 +26,10 @@ void ThreadWorker::setProgress(float i)
 	m_progress=i;
 };
 
-void ThreadWorker::setMessage(std::string s)
+void ThreadWorker::setStatus(std::string s)
 {
 	boost::mutex::scoped_lock lock(m_mutex);
-	m_message=s;
+	m_status=s;
 };
 
 float ThreadWorker::progress()
@@ -38,10 +38,10 @@ float ThreadWorker::progress()
 	return m_progress;
 };
 
-std::string ThreadWorker::message()
+std::string ThreadWorker::getStatus()
 {
 	boost::mutex::scoped_lock lock(m_mutex);
-	return m_message;
+	return m_status;
 };
 
 void ThreadWorker::setReturnValue(boost::any a)

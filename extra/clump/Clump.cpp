@@ -339,7 +339,7 @@ Matrix3r Clump::inertiaTensorRotate(const Matrix3r& I, const Quaternionr& rot){
 #include<yade/core/MetaBody.hpp>
 #include<yade/extra/Shop.hpp>
 
-string ClumpTestGen::generate()
+bool ClumpTestGen::generate()
 {
 	Shop::setDefault("param_pythonRunExpr",string("if S.i%50==0 and S.i<1000 and S.i>500:\n\tprint S.i,len(S.sel),B[1].x, B[1].E"));
 
@@ -394,7 +394,8 @@ string ClumpTestGen::generate()
 	// restore Omega
 	Omega::instance().setRootBody(oldRootBody);
 	
-	return "OK";
+	message="OK";
+	return true;
 }
 
 /*! \brief Generate clump of spheres, the result will be inserted into rootBody.

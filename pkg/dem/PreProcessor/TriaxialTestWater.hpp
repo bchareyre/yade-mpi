@@ -124,7 +124,7 @@ class TriaxialTestWater : public FileGenerator
 	public : 
 		TriaxialTestWater ();
 		~TriaxialTestWater ();
-		string generate();
+		bool generate();
 	
 	protected :
 		void registerAttributes();

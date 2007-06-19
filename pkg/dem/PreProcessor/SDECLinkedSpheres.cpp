@@ -114,7 +114,7 @@ void SDECLinkedSpheres::registerAttributes()
 }
 
 
-string SDECLinkedSpheres::generate()
+bool SDECLinkedSpheres::generate()
 {
 	rootBody = shared_ptr<MetaBody>(new MetaBody);
 	createActors(rootBody);
@@ -211,9 +211,10 @@ string SDECLinkedSpheres::generate()
 		}
 	}
 	
-	return "total number of permament links created: " 
+	message="total number of permament links created: " 
 		+ lexical_cast<string>(rootBody->persistentInteractions->size()) 
 		+ "\nWARNING: link bonds are nearly working, but the formulas are waiting for total rewrite!";
+	return true;
 }
 
 

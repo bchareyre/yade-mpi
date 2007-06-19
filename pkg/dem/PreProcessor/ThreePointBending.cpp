@@ -125,7 +125,7 @@ void ThreePointBending::registerAttributes()
 }
 
 
-string ThreePointBending::generate()
+bool ThreePointBending::generate()
 {
 	rootBody = shared_ptr<MetaBody>(new MetaBody);
 	createActors(rootBody);
@@ -156,16 +156,15 @@ string ThreePointBending::generate()
 			else if(filesystem::extension(yadeFileWithSpheres)==".yade" )
 				IOFormatManager::loadFromFile("BINFormatManager",yadeFileWithSpheres,"rootBody",metaBodyWithSpheres);
 
-			if( metaBodyWithSpheres->getClassName() != "MetaBody")
-				return "Error: cannot load the file that should contain spheres";
+			if( metaBodyWithSpheres->getClassName() != "MetaBody"){ message="Error: cannot load the file that should contain spheres"; return false; }
 		} 
 		catch(SerializableError& e)
 		{
-			return "Error: cannot load the file that should contain spheres";
+			message="Error: cannot load the file that should contain spheres"; return false;
 		}
 		catch(yadeError& e)
 		{
-			return "Error: cannot load the file that should contain spheres";
+			message="Error: cannot load the file that should contain spheres"; return false;
 		}
 	}
 	else
@@ -184,8 +183,7 @@ string ThreePointBending::generate()
 				max = componentMaxVector(max,b->physicalParameters->se3.position + static_cast<Sphere*>(b->geometricalModel.get())->radius * Vector3r(1,1,1));
 
 				BodyMacroParameters* bm = dynamic_cast<BodyMacroParameters*>(b->physicalParameters.get());
-				if(!bm)
-					return "Error: spheres don't use BodyMacroParameters for physical parameters";
+				if(!bm) {message="Error: spheres don't use BodyMacroParameters for physical parameters"; return false;}
 
 				bm->young		= sphereYoungModulus;
 				bm->poisson		= spherePoissonRatio;
@@ -278,9 +276,10 @@ string ThreePointBending::generate()
 		}
 	}
 	
-	return "total number of permament links created: " 
+	message="total number of permament links created: " 
 		+ lexical_cast<string>(rootBody->persistentInteractions->size()) 
 		+ "\nWARNING: link bonds are nearly working, but the formulas are waiting for total rewrite!";
+	return true;
 }
 
 

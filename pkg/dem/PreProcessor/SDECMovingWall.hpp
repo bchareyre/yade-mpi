@@ -59,7 +59,7 @@ class SDECMovingWall : public FileGenerator
 	public :
 		SDECMovingWall ();
 		~SDECMovingWall ();
-		string generate();
+		bool generate();
 
 	protected :
 		virtual void postProcessAttributes(bool deserializing);

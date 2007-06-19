@@ -118,7 +118,7 @@ class TriaxialTest : public FileGenerator
 	public : 
 		TriaxialTest ();
 		~TriaxialTest ();
-		string generate();
+		bool generate();
 	
 	protected :
 		void registerAttributes();

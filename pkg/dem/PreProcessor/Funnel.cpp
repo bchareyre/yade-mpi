@@ -100,7 +100,7 @@ void Funnel::registerAttributes()
 }
 
 
-string Funnel::generate()
+bool Funnel::generate()
 {
 	rootBody = shared_ptr<MetaBody>(new MetaBody);
 	createActors(rootBody);
@@ -170,7 +170,7 @@ string Funnel::generate()
 				rootBody->bodies->insert(sphere);
 			}
 	
-	return "";
+	message=""; return true;
 }
 
 

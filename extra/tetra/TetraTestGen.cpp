@@ -11,7 +11,7 @@ char* yadePluginClasses[]={
         NULL /*sentinel*/
 };
 
-string TetraTestGen::generate()
+bool TetraTestGen::generate()
 {
 	//Shop::setDefault("param_pythonRunExpr",string("if S.i%50==0 and S.i<1000 and S.i>500:\n\tprint S.i,len(S.sel),B[1].x, B[1].E"));
 
@@ -66,5 +66,6 @@ string TetraTestGen::generate()
 	Omega::instance().setRootBody(oldRootBody);
 	#endif
 	
-	return "ATTN: this example is not working yet!";
+	message="ATTN: this example is not working yet!";
+	return true;
 }

@@ -221,7 +221,7 @@ void TriaxialTestWater::registerAttributes()
 }
 
 
-string TriaxialTestWater::generate()
+bool TriaxialTestWater::generate()
 {
 	//unsigned int startId=boost::numeric::bounds<unsigned int>::highest(), endId=0; // record forces from group 2
 	
@@ -239,7 +239,7 @@ string TriaxialTestWater::generate()
 	shared_ptr<Body> body;
 	
 	vector<BasicSphere> sphere_list;
-	string output = GenerateCloud(sphere_list, lowerCorner, upperCorner,
+	message = GenerateCloud(sphere_list, lowerCorner, upperCorner,
 	numberOfGrains, Rdispersion, 0.75);
 	
 	vector<BasicSphere>::iterator it = sphere_list.begin();
@@ -371,7 +371,8 @@ string TriaxialTestWater::generate()
 			 
 	}
 	
-	return std::string("ATTN: this test will not work without data file for capillary law\n\n")+output;
+	message=std::string("ATTN: this test will not work without data file for capillary law\n\n")+message;
+	return true;
 //  	return "Generated a sample inside box of dimensions: (" 
 //  		+ lexical_cast<string>(lowerCorner[0]) + "," 
 //  		+ lexical_cast<string>(lowerCorner[1]) + "," 

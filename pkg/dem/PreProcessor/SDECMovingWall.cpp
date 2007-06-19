@@ -138,7 +138,7 @@ void SDECMovingWall::registerAttributes()
 }
 
 
-string SDECMovingWall::generate()
+bool SDECMovingWall::generate()
 {
 	rootBody = shared_ptr<MetaBody>(new MetaBody);
 	createActors(rootBody);
@@ -208,7 +208,7 @@ string SDECMovingWall::generate()
 				rootBody->bodies->insert(sphere);
 			}
 	
-	return "";
+	message=""; return true;
 }
 
 

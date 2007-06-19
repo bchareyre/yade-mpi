@@ -12,7 +12,7 @@ class TetraTestGen: public FileGenerator {
 		vector<size_t> gridSize;
 		TetraTestGen(){ gridSize.push_back(3); gridSize.push_back(3); gridSize.push_back(3);};
 		~TetraTestGen (){};
-		string generate();
+		bool generate();
 	protected :
 		virtual void postProcessAttributes(bool deserializing){};
 		void registerAttributes(){FileGenerator::registerAttributes(); REGISTER_ATTRIBUTE(gridSize);}

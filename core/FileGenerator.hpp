@@ -26,11 +26,13 @@ class FileGenerator
 					,serializationDynlib;
 	
 	public :
-		std::string generateAndSave();
+		bool generateAndSave();
 		void setFileName(const string& fileName);
 		void setSerializationLibrary(const string& lib);
 		std::string getFileName() {return outputFileName;}; // stupid? better make that variable public.. ech.
 		std::string getSerializationLibrary() {return serializationDynlib;};
+		//! Describes the result in a user-readable form.
+		std::string message;
 		
 		FileGenerator ();
 		virtual ~FileGenerator ();
@@ -38,7 +40,8 @@ class FileGenerator
 		virtual void singleAction();
 
 	protected :
-		virtual string generate();
+		//! Returns whether the generation was successful; message for user is in FileGenerator::message
+		virtual bool generate();
 
 		virtual void postProcessAttributes(bool);
 		virtual void registerAttributes();

@@ -109,7 +109,7 @@ void SDECSpheresPlane::registerAttributes()
 }
 
 
-string SDECSpheresPlane::generate()
+bool SDECSpheresPlane::generate()
 {
 	rootBody = shared_ptr<MetaBody>(new MetaBody);
 	createActors(rootBody);
@@ -179,7 +179,7 @@ string SDECSpheresPlane::generate()
 			}
 	}
 	
-	return "";
+	message=""; return true;
 }
 
 

@@ -84,7 +84,7 @@ class SDECImpactTest : public FileGenerator
 	public : 
 		SDECImpactTest ();
 		~SDECImpactTest ();
-		string generate();
+		bool generate();
 	
 	protected :
 		void registerAttributes();

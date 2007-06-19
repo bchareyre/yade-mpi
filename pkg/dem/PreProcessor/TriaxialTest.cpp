@@ -245,7 +245,7 @@ void TriaxialTest::registerAttributes()
 }
 
 
-string TriaxialTest::generate()
+bool TriaxialTest::generate()
 {
 //	unsigned int startId=boost::numeric::bounds<unsigned int>::highest(), endId=0; // record forces from group 2
 	
@@ -263,7 +263,7 @@ string TriaxialTest::generate()
 	shared_ptr<Body> body;
 	
 	vector<BasicSphere> sphere_list;
-	string output = GenerateCloud(sphere_list, lowerCorner, upperCorner, numberOfGrains, 0.3, 0.75);
+	message=GenerateCloud(sphere_list, lowerCorner, upperCorner, numberOfGrains, 0.3, 0.75);
 	
 	vector<BasicSphere>::iterator it = sphere_list.begin();
 	vector<BasicSphere>::iterator it_end = sphere_list.end();
@@ -435,7 +435,7 @@ string TriaxialTest::generate()
 			 
 	}
 	
-	return output;
+	return true;
 //  	return "Generated a sample inside box of dimensions: (" 
 //  		+ lexical_cast<string>(lowerCorner[0]) + "," 
 //  		+ lexical_cast<string>(lowerCorner[1]) + "," 

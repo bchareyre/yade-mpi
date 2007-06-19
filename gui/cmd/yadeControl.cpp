@@ -83,7 +83,7 @@ public:
 		QGLFormat format;	QGLFormat::setDefaultFormat(format); format.setStencil(TRUE); format.setAlpha(TRUE);
 		viewer=new GLViewer(viewId,renderer,format,0,viewId==0?0:instances[0]->viewer);
 		viewer->notMoving();
-		showAttrs(renderer);
+		// showAttrs(renderer); // deprecated
 
 		AttrAccess acc(renderer);
 		cerr<<acc.dumpAttrs();

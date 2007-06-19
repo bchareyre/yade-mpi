@@ -74,35 +74,3 @@ class AttrAccess{
 		}
 };
 
-void showAttrs(shared_ptr<Serializable> ser){
-	if (ser->getArchives().empty()) ser->registerSerializableAttributes(false);
-	Serializable::Archives archives=ser->getArchives();
-
-	for(Serializable::Archives::iterator ai=archives.begin();ai!=archives.end();++ai){
-		if ((*ai)->isFundamental() && (*ai)->getName() != "outputFileName" && (*ai)->getName() != "serializationDynlib" ){
-			//shared_ptr<AttributeDescriptor> descriptor(new AttributeDescriptor);
-			//descriptor->name=(*ai)->getName();
-			cerr<<"NAME: "<<(*ai)->getName()<<endl;
-
-			vector<string> strings; stringstream stream;
-			(*ai)->serialize(stream,*(*ai),0);
-			IOFormatManager::parseFundamental(stream.str(),strings);
-
-			for(unsigned int i=0;i<strings.size();i++){
-				any instance=(*ai)->getAddress();
-				if(bool** b=any_cast<bool*>(&instance)){
-					cerr<<"\tBOOL: "<<(**b?"true":"false")<<endl;
-					//descriptor->types.push_back(AttributeDescriptor::BOOLEAN);
-				} else {
-					cerr<<"\tNUM : "<<strings[i]<<endl;
-					//descriptor->types.push_back(AttributeDescriptor::FLOATING);
-				}
-			}
-			// not possible to store descriptor into a map or set ?????!!! I don't know why but it is crashing, so I use a vector and lookup table
-			//descriptors.push_back(descriptor);
-			//lookUp[descriptor->name] = descriptors.size()-1;
-		}
-	}
-	ser->unregisterSerializableAttributes(false);
-}
-

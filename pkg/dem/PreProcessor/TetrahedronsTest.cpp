@@ -122,7 +122,7 @@ void TetrahedronsTest::registerAttributes()
 }
 
 
-string TetrahedronsTest::generate()
+bool TetrahedronsTest::generate()
 {
 	Omega::instance().setTimeStep(0.04);
 	rootBody = shared_ptr<MetaBody>(new MetaBody);
@@ -148,7 +148,7 @@ string TetrahedronsTest::generate()
 	float all = nbTetrahedrons[0]*nbTetrahedrons[1]*nbTetrahedrons[2];
 	float current = 0.0;
 
-	setMessage("generating tetrahedrons...");
+	setStatus("generating tetrahedrons...");
 	for(int i=0;i<nbTetrahedrons[0];i++)
 	{
 		if(shouldTerminate()) return "";
@@ -164,7 +164,8 @@ string TetrahedronsTest::generate()
 			}
 	}
 	
-	return "foo bar "+boost::lexical_cast<std::string>(42);
+	message="foo bar "+boost::lexical_cast<std::string>(42);
+	return true;
 }
 
 

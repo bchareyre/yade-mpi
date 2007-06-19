@@ -187,7 +187,7 @@ void SDECImpactTest::registerAttributes()
 }
 
 
-string SDECImpactTest::generate()
+bool SDECImpactTest::generate()
 {
 	int startId=boost::numeric::bounds<int>::highest(), endId=0; // record forces from group 2
 	
@@ -338,13 +338,14 @@ string SDECImpactTest::generate()
 			 
 	}
 
- 	return "Generated a sample inside box of dimensions: (" 
+ 	message="Generated a sample inside box of dimensions: (" 
  		+ lexical_cast<string>(lowerCorner[0]) + "," 
  		+ lexical_cast<string>(lowerCorner[1]) + "," 
  		+ lexical_cast<string>(lowerCorner[2]) + ") and (" 
  		+ lexical_cast<string>(upperCorner[0]) + "," 
  		+ lexical_cast<string>(upperCorner[1]) + "," 
  		+ lexical_cast<string>(upperCorner[2]) + ").";
+	return true;
 
 }
 

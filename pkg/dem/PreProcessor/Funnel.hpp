@@ -39,7 +39,7 @@ class Funnel : public FileGenerator
 	public :
 		Funnel ();
 		~Funnel ();
-		string generate();
+		bool generate();
 
 	protected :
 		void registerAttributes();

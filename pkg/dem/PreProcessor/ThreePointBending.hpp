@@ -45,7 +45,7 @@ class ThreePointBending : public FileGenerator
 	public :
 		ThreePointBending ();
 		~ThreePointBending ();
-		string generate();
+		bool generate();
 	
 	protected :
 		virtual void postProcessAttributes(bool deserializing);

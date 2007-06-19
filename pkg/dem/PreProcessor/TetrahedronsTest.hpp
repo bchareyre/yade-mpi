@@ -97,7 +97,7 @@ class TetrahedronsTest : public FileGenerator
 	public :
 		TetrahedronsTest ();
 		~TetrahedronsTest ();
-		string generate();
+		bool generate();
 
 	protected :
 		virtual void postProcessAttributes(bool deserializing);

@@ -138,7 +138,7 @@ class ClumpTestGen : public FileGenerator {
 	public :
 		ClumpTestGen (){};
 		~ClumpTestGen (){};
-		string generate();
+		bool generate();
 	protected :
 		virtual void postProcessAttributes(bool deserializing){};
 		void registerAttributes(){};
