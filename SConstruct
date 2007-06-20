@@ -33,18 +33,18 @@ sconsVersion=sum([int(SCons.__version__.split('.')[ord[0]])*ord[1] for ord in [(
 
 if sconsVersion<9693:
 	newUrl="http://dfn.dl.sourceforge.net/sourceforge/scons/scons-local-0.97.tar.gz"
-	newDir="./scons-local/scons-local-0.97"
+	newPrefix="./scons-local";
+	newDir=newPrefix+"/scons-local-0.97"
 	if not os.path.exists(newDir):
 		print "Scons version too old, downloading new version. All subsequent calls will be proxied to the new version transparently."
 		import urllib,tarfile
 		(filename,headers)=urllib.urlretrieve(newUrl)
-		print filename
-		print headers
+		print filename,"\n",headers
 		tar=tarfile.open(filename, "r:gz")
-		for tarinfo in tar: tar.extract(tarinfo,'./scons-local/')
+		for tarinfo in tar: tar.extract(tarinfo,newPrefix)
 		print "Done extracting scons to",newDir
 	if os.path.exists(newDir):
-		Exit(os.execv("./scons-local/scons.py",sys.argv[1:]))
+		Exit(os.execv(newPrefix+"/scons.py",[newPrefix+'/scons.py']+sys.argv[1:]))
 
 
 ##########################################################################################
