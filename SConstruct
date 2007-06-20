@@ -28,6 +28,26 @@ import SCons
 sconsVersion=sum([int(SCons.__version__.split('.')[ord[0]])*ord[1] for ord in [(0,10000),(1,100),(2,1)][:len(SCons.__version__.split('.'))] ])
 
 ##########################################################################################
+########## PROXY TO NEWER SCONS (DOWNLOADED IF NEEDED) ###################################
+##########################################################################################
+
+if sconsVersion<9693:
+	newUrl="http://dfn.dl.sourceforge.net/sourceforge/scons/scons-local-0.97.tar.gz"
+	newDir="./scons-local/scons-local-0.97"
+	if not os.path.exists(newDir):
+		print "Scons version too old, downloading new version. All subsequent calls will be proxied to the new version transparently."
+		import urllib,tarfile
+		(filename,headers)=urllib.urlretrieve(newUrl)
+		print filename
+		print headers
+		tar=tarfile.open(filename, "r:gz")
+		for tarinfo in tar: tar.extract(tarinfo,'./scons-local/')
+		print "Done extracting scons to",newDir
+	if os.path.exists(newDir):
+		Exit(os.execv("./scons-local/scons.py",sys.argv[1:]))
+
+
+##########################################################################################
 ############# OPTIONS ####################################################################
 ##########################################################################################
 
@@ -275,7 +295,7 @@ runtimeLibDirs=[os.path.join('$runtimePREFIX','lib','yade$SUFFIX',x.replace('/',
 env.Append(CPPDEFINES=[('SUFFIX',r'\"$SUFFIX\"'),('PREFIX',r'\"$runtimePREFIX\"')])
 
 ### COMPILER
-if env['debug']: env.Append(CXXFLAGS='-ggdb3',CPPDEFINES=['DEBUG','YADE_DEBUG'])
+if env['debug']: env.Append(CXXFLAGS='-ggdb3',CPPDEFINES=['YADE_DEBUG'])
 else: env.Append(CXXFLAGS='-O2')
 if env['optimize']:
 	env.Append(CXXFLAGS=Split('-O3 -ffast-math'),

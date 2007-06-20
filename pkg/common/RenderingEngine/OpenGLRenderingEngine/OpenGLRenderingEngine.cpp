@@ -136,7 +136,7 @@ void OpenGLRenderingEngine::render(
 	glColor3f(1.0,1.0,1.0);
 	glutSolidSphere(3,10,10);
 	glPopMatrix();	
-	
+
 	if (Body_geometrical_model)
 	{
 		if (Cast_shadows)

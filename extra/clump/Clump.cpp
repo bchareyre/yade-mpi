@@ -341,7 +341,7 @@ Matrix3r Clump::inertiaTensorRotate(const Matrix3r& I, const Quaternionr& rot){
 
 bool ClumpTestGen::generate()
 {
-	Shop::setDefault("param_pythonRunExpr",string("if S.i%50==0 and S.i<1000 and S.i>500:\n\tprint S.i,len(S.sel),B[1].x, B[1].E"));
+	//Shop::setDefault("param_pythonRunExpr",string("if S.i%50==0 and S.i<1000 and S.i>500:\n\tprint S.i,len(S.sel),B[1].x, B[1].E"));
 
 	rootBody=Shop::rootBody();
 	Shop::rootBodyActors(rootBody);

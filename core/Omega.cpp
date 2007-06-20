@@ -8,22 +8,22 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "Omega.hpp"
-#include "yadeExceptions.hpp"
-#include "MetaBody.hpp"
-#include "ThreadRunner.hpp"
-#include "Preferences.hpp"
-#include <Wm3Vector3.h>
+#include"Omega.hpp"
+#include"yadeExceptions.hpp"
+#include"MetaBody.hpp"
+#include"ThreadRunner.hpp"
+#include"Preferences.hpp"
+#include<Wm3Vector3.h>
 #include<yade/lib-base/yadeWm3.hpp>
 #include<yade/lib-serialization/IOFormatManager.hpp>
 #include<yade/lib-serialization/IOFormatManager.hpp>
 #include<yade/lib-multimethods/FunctorWrapper.hpp>
 #include<yade/lib-multimethods/Indexable.hpp>
-#include <cstdlib>
-#include <boost/filesystem/operations.hpp>
-#include <boost/filesystem/convenience.hpp>
+#include<cstdlib>
+#include<boost/filesystem/operations.hpp>
+#include<boost/filesystem/convenience.hpp>
 
-#include <cxxabi.h>
+#include<cxxabi.h>
 
 CREATE_LOGGER(Omega);
 

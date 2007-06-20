@@ -10,6 +10,7 @@ class RenderingEngine;
 class cmdGui: public FrontEnd
 {
 	private:
+		void help();
 	public:
 		cmdGui(){};
 		virtual ~cmdGui(){};

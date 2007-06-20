@@ -202,12 +202,12 @@ int main(int argc, char *argv[])
 		
 	shared_ptr<FrontEnd> frontEnd = dynamic_pointer_cast<FrontEnd>(ClassFactory::instance().createShared(gui));
 	
- 	for(int i=0;i<argc; i++)cerr<<"Argument "<<i<<": "<<argv[i]<<endl;
+ 	// for(int i=0;i<argc; i++)cerr<<"Argument "<<i<<": "<<argv[i]<<endl;
 	int ok = frontEnd->run(argc,argv);
 
 	#ifdef EMBED_PYTHON
 		LOG_DEBUG("Finalizing Python...");
-		Py_Finalize();
+		Py_Finalize(); // FIXME: http://www.boost.org/libs/python/todo.html#pyfinalize-safety says this is unsafe with boost::python
 	#endif
 	#ifdef YADE_DEBUG
 		unlink(Omega::instance().gdbCrashBatch.c_str());
