@@ -1,4 +1,75 @@
-r.1165
+r.1209 (Vaclav)
+  1. SCons will download new version of itself if older thatn 0.96.93 and will proxy all calls to it transparently (hopefully)
+  1a. Fix argv[0] for scons proxy.
+  2. Revamped python wrappers, now all attributes are settable as dicionary entries in respective instances from python
+  3. added example of python script that generates and runs BoxStack
+  4. Do not #define DEBUG, since it is used in log4cxx (as log4cxx::Levels::DEBUG). YADE_DEBUG is used everywhere. If you ever get weird errors about that, #undef DEBUG after including qt3 headers.
+  5. Some code cleanups.
+
+r.1206 (Vaclav)
+  1. rename ThreadWorker::message() to ThreadWorker::getStatus, ThreadWorker::setMessage() to ThreadWorker::setStatus (and private ThreadWorker::m_message to m_status)
+  2. add public: std::string FileGenerator::message that holds exit value description
+  3. FileGenerator::generate returns now bool (if the generation was successful); description in ::message
+  4. Adapted all generators and UIs for the above changes (except NullGUI - is that needed?)
+  5. Adjust other components for FileGenerator changes. Add wrapper for preprocessor in python.
+
+r.1204 (Vaclav)
+  - frontend cleanups, eperimental python console ui.
+  - Convenience functions for serialization - experimental.
+  - fix qualifiers in constructor of AttrAccess
+
+r.1200 (Janek)
+  - update yade icon, by Vaclav's suggestion (the red spheres are not so vividly red, so looks a bit better)
+  - scons will create the installation directory if it doesn't exist
+  - incorporated Bruno's fixes into 0.11 release
+
+r.1199 (Bruno)
+  - Modified definition of the interpenetration for box-spheres interractions. The previous definition was inconsistent.
+  - Some changes in the computation of critical timestep so that the triaxial samples do not explode when dt is set to the automatic value. The change mostly affects the first steps of a simulation. Now, dt is computed at each timestep during the first steps, whatever the value of the user-defined variable "timeStepUpdateInterval", until a relevant value is found.
+  - Cosmetic changes in TriaxialTest.
+  - Initial zoom in the simulation player is set to 2. 
+
+r.1192 (Janek)
+  - FileGenerators try to set the timestep when TimeStepper is not used. But it
+    is still not working when simulation is running during the generation. This
+    means, that 'dt' should not be in Omega, but inside a simulation itself. At
+    last there is a clear answer for this dilemma.
+  - fixed some crashing of HangingCloth
+  - fixed warnings in capillary law.
+
+r.1186 (Vaclav)
+  - Fix scons to handle boost.*-mt well, some other cleanups.
+  - remove hardcoded linkage with boost libs from SConscript files
+  - Modify debian builds so that making source packages for release versions work as well.
+
+r.1182 (Bruno)
+  - Add files related to capillary law.
+
+r.1181 (Janek)
+  - introduced body_id_t(ype) so that bodies are not numbered as an int, but as a body_id_t
+  - added center 'scene button' on first tab of simulation controller
+
+r.1180 (Vaclav)
+  - Correct 'all' value for features
+  - Clump improvements
+  - If RELEASE file exists, get yade version from there, instead of from svn.
+  - Remove wildmagic-dev from debian deps.
+  - fixed qt3 detection (used deprecated qapp.h header instead of qapplication.h).
+
+r.1174 (Janek)
+  - timestepper is set correctly when loading file in GUI (I hope!) - no need to reload second time
+  - FileGenerator does not open SimulationController if it already exists
+
+r.1174 (mixed)
+  - don't exclude lattice with miniWm3 
+  - merge lattice from Janek's PhD
+  - SConscript uses md5sum instead of timestamp.
+  - fixed crash in SDECLinkedSpheres example
+  - fixed RotatingBox and BoxStack examples - and accidental mistake in SAPCollider
+  - Add 'features' option to scons, which can enable/disable python and log4cxx at compile-time (extensible)
+
+
+r.1165 (Janek)
   - updated Icon
   - updated ChangeLog
   - moved some obsolete scripts to doc/removed
