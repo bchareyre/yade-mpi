@@ -27,6 +27,7 @@ TriaxialCompressionEngine::TriaxialCompressionEngine() : actionForce(new Force)
 	Iteration = 0;
 	compressionActivated=false;
 	autoCompressionActivation=true;
+	UnbalancedForce = 1;
 	for (int i=0; i<3; ++i) strain[i]=0;
 	
 	
