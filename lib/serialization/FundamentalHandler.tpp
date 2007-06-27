@@ -42,7 +42,7 @@ struct FundamentalHandler< string >
 			string * tmp = any_cast<string*>(ac.getAddress());
 			*tmp=*tmpStr;
 			#define _RESTORE_SPECIAL(escape,special)pos=0; while((pos=tmp->find(escape,pos))!=string::npos){tmp->replace(pos,2,special);}
-			unsigned int pos;
+			unsigned long pos;
 			_RESTORE_SPECIAL("\\n","\n"); _RESTORE_SPECIAL("\\t","\t"); _RESTORE_SPECIAL("\\'","\"");
 			_RESTORE_SPECIAL("\\[","<"); _RESTORE_SPECIAL("\\]",">"); _RESTORE_SPECIAL("\\\\","\\"); // order matters!
 			#undef _RESTORE_SPECIAL
@@ -68,7 +68,7 @@ struct FundamentalHandler< string >
 			string * tmp = any_cast<string*>(ac.getAddress());
 			*tmpStr=*tmp;
 			#define _ESCAPE_SPECIAL(special,escape) pos=0; while((pos=tmpStr->find(special,pos))!=string::npos){tmpStr->replace(pos,1,escape); pos+=2;}
-			unsigned int pos;
+			unsigned long pos;
 			_ESCAPE_SPECIAL("\\","\\\\"); _ESCAPE_SPECIAL('\n',"\\n"); _ESCAPE_SPECIAL('\t',"\\t"); _ESCAPE_SPECIAL('\"',"\\'");
 			_ESCAPE_SPECIAL('<',"\\["); _ESCAPE_SPECIAL('>',"\\]");  // order matters!
 			#undef _ESCAPE_SPECIAL
