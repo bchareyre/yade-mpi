@@ -499,6 +499,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'TriaxialCompressionEngine',
 			'GlobalStiffnessTimeStepper',
 			'yade-base',
+			'WallStressRecorder',
 			'PositionOrientationRecorder']),
 
 	env.SharedLibrary('ThreePointBending',
