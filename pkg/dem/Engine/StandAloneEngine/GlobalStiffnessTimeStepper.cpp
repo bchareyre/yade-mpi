@@ -22,7 +22,7 @@ GlobalStiffnessTimeStepper::GlobalStiffnessTimeStepper() : TimeStepper() , sdecC
 //cerr << "GlobalStiffnessTimeStepper()"  << endl;
 	globalStiffnessClassIndex = actionParameterGlobalStiffness->getClassIndex();
 	sdecGroupMask = 1;
-	timestepSafetyCoefficient = 0.6;
+	timestepSafetyCoefficient = 0.25;
 	computedOnce = false;
 	defaultDt = 1;
 	
@@ -40,6 +40,7 @@ void GlobalStiffnessTimeStepper::registerAttributes()
 	TimeStepper::registerAttributes();
 	REGISTER_ATTRIBUTE(sdecGroupMask);
 	REGISTER_ATTRIBUTE(defaultDt);
+	REGISTER_ATTRIBUTE(timestepSafetyCoefficient);
 }
 
 
@@ -172,7 +173,7 @@ void GlobalStiffnessTimeStepper::computeTimeStep(Body* body)
 		//cerr << "computedOnce=" << computedOnce << endl;	
 		//cerr << "GlobalStiffnessTimeStepper, timestep chosen is:" << Omega::instance().getTimeStep() << endl;
 	}
-	else Omega::instance().setTimeStep(defaultDt);
+	else if (!computedOnce) Omega::instance().setTimeStep(defaultDt);
 	cerr << "computed timestep = " << newDt << "; new timestep is:" << Omega::instance().getTimeStep() << endl;
 }
 

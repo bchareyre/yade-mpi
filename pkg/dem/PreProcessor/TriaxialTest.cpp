@@ -26,6 +26,7 @@
 #include<yade/pkg-dem/VelocityRecorder.hpp>
 #include<yade/pkg-dem/TriaxialStressController.hpp>
 #include<yade/pkg-dem/TriaxialCompressionEngine.hpp>
+#include <yade/pkg-dem/WallStressRecorder.hpp>
 
 #include<yade/pkg-common/Box.hpp>
 #include<yade/pkg-common/AABB.hpp>
@@ -113,6 +114,7 @@ TriaxialTest::TriaxialTest () : FileGenerator()
 	velocityRecordFile 	= "../data/velocities";
 	saveAnimationSnapshots = false;
 	AnimationSnapshotsBaseName = "../data/snapshots/snap";
+	WallStressRecordFile = "../data/WallStresses";
 
 	rotationBlocked = false;
 	//	boxWalls 		= false;
@@ -229,6 +231,7 @@ void TriaxialTest::registerAttributes()
 	REGISTER_ATTRIBUTE(recordIntervalIter);
 	REGISTER_ATTRIBUTE(saveAnimationSnapshots);
 	REGISTER_ATTRIBUTE(AnimationSnapshotsBaseName);
+	REGISTER_ATTRIBUTE(WallStressRecordFile);
 
 //	REGISTER_ATTRIBUTE(gravity);
 	
@@ -353,6 +356,7 @@ bool TriaxialTest::generate()
 			rootBody->bodies->insert(body);
 			//(resultantforceEngine->subscribedBodies).push_back(body->getId());
 			triaxialcompressionEngine->wall_bottom_id = body->getId();
+			wallStressRecorder->wall_bottom_id = body->getId();
 			forcerec->startId = body->getId();
 			forcerec->endId   = body->getId();
 			}
@@ -372,6 +376,7 @@ bool TriaxialTest::generate()
 	 	if(wall_top) {
 			rootBody->bodies->insert(body);
 			triaxialcompressionEngine->wall_top_id = body->getId();
+			wallStressRecorder->wall_top_id = body->getId();
 			}
 	// box 1
 	
@@ -387,6 +392,7 @@ bool TriaxialTest::generate()
 	 	if(wall_1) {
 			rootBody->bodies->insert(body);
 			triaxialcompressionEngine->wall_left_id = body->getId();
+			wallStressRecorder->wall_left_id = body->getId();
 			}
 	// box 2
 	 	center			= Vector3r(
@@ -402,6 +408,7 @@ bool TriaxialTest::generate()
 	 	if(wall_2) {
 			rootBody->bodies->insert(body);
 			triaxialcompressionEngine->wall_right_id = body->getId();
+			wallStressRecorder->wall_right_id = body->getId();
 			}
 	// box 3
 	 	center			= Vector3r(
@@ -416,6 +423,7 @@ bool TriaxialTest::generate()
 	 	if(wall_3) {
 			rootBody->bodies->insert(body);
 			triaxialcompressionEngine->wall_back_id = body->getId();
+			wallStressRecorder->wall_back_id = body->getId();
 			}
 	
 	// box 4
@@ -431,6 +439,7 @@ bool TriaxialTest::generate()
 	 	if(wall_4) {
 			rootBody->bodies->insert(body);
 			triaxialcompressionEngine->wall_front_id = body->getId();
+			wallStressRecorder->wall_front_id = body->getId();
 			}
 			 
 	}
@@ -627,7 +636,7 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	globalStiffnessCounter->interval = timeStepUpdateInterval;
 	
 	// moving walls to regulate the stress applied + compress when the packing is dense an stable
-	cerr << "triaxialcompressionEngine = shared_ptr<TriaxialCompressionEngine> (new TriaxialCompressionEngine);" << std::endl;
+	//cerr << "triaxialcompressionEngine = shared_ptr<TriaxialCompressionEngine> (new TriaxialCompressionEngine);" << std::endl;
 	triaxialcompressionEngine = shared_ptr<TriaxialCompressionEngine> (new TriaxialCompressionEngine);
 	triaxialcompressionEngine-> interval = wallStiffnessUpdateInterval;// = stiffness update interval
 	triaxialcompressionEngine-> radiusControlInterval = radiusControlInterval;// = stiffness update interval
@@ -640,11 +649,18 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	triaxialcompressionEngine->internalCompaction = internalCompaction;
 	triaxialcompressionEngine->maxMultiplier = maxMultiplier;
 		
-	cerr << "fin de section triaxialcompressionEngine = shared_ptr<TriaxialCompressionEngine> (new TriaxialCompressionEngine);" << std::endl;
+	//cerr << "fin de section triaxialcompressionEngine = shared_ptr<TriaxialCompressionEngine> (new TriaxialCompressionEngine);" << std::endl;
+	
+// recording global stress
+	wallStressRecorder = shared_ptr<WallStressRecorder>(new
+	WallStressRecorder);
+	wallStressRecorder-> outputFile 	= WallStressRecordFile;
+	wallStressRecorder-> interval 		= recordIntervalIter;
+	wallStressRecorder-> thickness 		= thickness;
 	
 	
 	// moving walls to regulate the stress applied
-	cerr << "triaxialstressController = shared_ptr<TriaxialStressController> (new TriaxialStressController);" << std::endl;
+	//cerr << "triaxialstressController = shared_ptr<TriaxialStressController> (new TriaxialStressController);" << std::endl;
 	triaxialstressController = shared_ptr<TriaxialStressController> (new TriaxialStressController);
 	triaxialstressController-> interval = 1;// = recordIntervalIter
 	triaxialstressController-> sigma_iso = sigma_iso;
@@ -652,7 +668,7 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	triaxialstressController-> thickness = thickness;
 	triaxialstressController->wall_bottom_activated = false;
 	triaxialstressController->wall_top_activated = false;	
-		cerr << "fin de sezction triaxialstressController = shared_ptr<TriaxialStressController> (new TriaxialStressController);" << std::endl;
+		//cerr << "fin de sezction triaxialstressController = shared_ptr<TriaxialStressController> (new TriaxialStressController);" << std::endl;
 	
 	rootBody->engines.clear();
 	rootBody->engines.push_back(shared_ptr<Engine>(new PhysicalActionContainerReseter));
@@ -667,6 +683,7 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	//rootBody->engines.push_back(stiffnessMatrixTimeStepper);
 	rootBody->engines.push_back(globalStiffnessCounter);
 	rootBody->engines.push_back(globalStiffnessTimeStepper);
+	rootBody->engines.push_back(wallStressRecorder);
 	//rootBody->engines.push_back(gravityCondition);
 	rootBody->engines.push_back(actionDampingDispatcher);
 	rootBody->engines.push_back(applyActionDispatcher);

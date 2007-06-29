@@ -22,6 +22,7 @@ TriaxialCompressionEngine::TriaxialCompressionEngine() : actionForce(new Force)
 	currentStrainRate=0;
 	StabilityCriterion=0.001;
 	Phase1=false;
+	UnbalancedForce = 1;
 	Phase1End = "Phase1End";
 	FinalIterationPhase1 = 0;
 	Iteration = 0;

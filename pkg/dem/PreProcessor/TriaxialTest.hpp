@@ -22,6 +22,7 @@ class AveragePositionRecorder;
 class VelocityRecorder;
 class TriaxialStressController;
 class TriaxialCompressionEngine;
+class WallStressRecorder;
 
 /*! \brief Isotropic compression + uniaxial compression test
 
@@ -60,7 +61,6 @@ class TriaxialTest : public FileGenerator
 				,sigma_iso
 				,strainRate
 				,StabilityCriterion
-				,autoCompressionActivation
 				,maxMultiplier ///max multiplier of diameters during internal compaction
 				,finalMaxMultiplier;
 
@@ -76,6 +76,7 @@ class TriaxialTest : public FileGenerator
 				,wall_2_wire
 				,wall_3_wire
 				,wall_4_wire
+				,autoCompressionActivation
 				,bigBall
 				,rotationBlocked
 				,spheresRandomColor
@@ -102,13 +103,15 @@ class TriaxialTest : public FileGenerator
 				,positionRecordFile
 				,velocityRecordFile
 				,importFilename
-				,AnimationSnapshotsBaseName;
+				,AnimationSnapshotsBaseName
+				,WallStressRecordFile;
 	
 		shared_ptr<ForceRecorder> forcerec;
 		shared_ptr<VelocityRecorder> velocityRecorder;
 		shared_ptr<AveragePositionRecorder> averagePositionRecorder;
 		shared_ptr<TriaxialCompressionEngine> triaxialcompressionEngine;
 		shared_ptr<TriaxialStressController> triaxialstressController;
+		shared_ptr<WallStressRecorder> wallStressRecorder;
 			
 		void createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents,bool wire);
 		void createSphere(shared_ptr<Body>& body, Vector3r position, Real radius,bool big,bool dynamic);
