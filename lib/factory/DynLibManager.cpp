@@ -81,6 +81,8 @@ void DynLibManager::addBaseDirectory(const string& dir)
 
 bool DynLibManager::loadFromDirectoryList (const string& libName )
 {
+	lastPluginClasses.clear();
+
 	if (libName.empty())
 		return false;
 

@@ -333,16 +333,19 @@ shared_ptr<Body> Shop::box(Vector3r center, Vector3r extents){
 }
 
 /*! Create body - tetrahedron. */
-shared_ptr<Body> Shop::tetra(Vector3r v[4]){
+shared_ptr<Body> Shop::tetra(Vector3r v_global[4]){
 		shared_ptr<Body> body=shared_ptr<Body>(new Body(body_id_t(0),getDefault<int>("body_sdecGroupMask")));
 		body->isDynamic=true;
+
+		Vector3r centroid=(v_global[0]+v_global[1]+v_global[2]+v_global[3])*.25;
+		Vector3r v[4]; for(int i=0; i<4; i++) v[i]=v_global[i]-centroid;
 
 		shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
 		physics->angularVelocity=Vector3r(0,0,0);
 		physics->velocity=Vector3r(0,0,0);
 		physics->mass=getDefault<double>("phys_density")*TetrahedronVolume(v);
 		// inertia will be calculated below, by TetrahedronWithLocalAxesPrincipal
-		physics->se3=Se3r((v[0]+v[1]+v[2]+v[3])*.25,Quaternionr(Vector3r(0,0,1),0));
+		physics->se3=Se3r(centroid,Quaternionr(Vector3r(0,0,1),0));
 		physics->young=getDefault<double>("phys_young");
 		physics->poisson=getDefault<double>("phys_poisson");
 		physics->frictionAngle=getDefault<double>("phys_frictionAngle");

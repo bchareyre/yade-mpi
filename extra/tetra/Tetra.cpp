@@ -395,7 +395,7 @@ void TetraDraw::go(const shared_ptr<InteractingGeometry>& cm, const shared_ptr<P
 			#undef __ONEFACE
 		glEnd();
 	}
-	
+
 }
 
 /*! Calculates tetrahedron inertia relative to the origin (0,0,0), with unit density (scales linearly).

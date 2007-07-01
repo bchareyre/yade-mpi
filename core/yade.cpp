@@ -206,8 +206,8 @@ int main(int argc, char *argv[])
 	int ok = frontEnd->run(argc,argv);
 
 	#ifdef EMBED_PYTHON
-		LOG_DEBUG("Finalizing Python...");
-		Py_Finalize(); // FIXME: http://www.boost.org/libs/python/todo.html#pyfinalize-safety says this is unsafe with boost::python
+		// LOG_DEBUG("Finalizing Python...");
+		// Py_Finalize(); // FIXME: http://www.boost.org/libs/python/todo.html#pyfinalize-safety says this is unsafe with boost::python
 	#endif
 	#ifdef YADE_DEBUG
 		unlink(Omega::instance().gdbCrashBatch.c_str());
