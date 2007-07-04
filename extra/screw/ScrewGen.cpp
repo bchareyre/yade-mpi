@@ -2,7 +2,7 @@
 #include<yade/extra/Clump.hpp>
 #include<yade/extra/Shop.hpp>
 
-char* yadePluginClasses[]={
+const char* yadePluginClasses[]={
 	"ScrewGen",
 	NULL /*sentinel*/
 };

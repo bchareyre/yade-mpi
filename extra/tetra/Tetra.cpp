@@ -2,7 +2,7 @@
 
 #include"Tetra.hpp"
 
-char* yadePluginClasses[]={
+const char* yadePluginClasses[]={
 	// self-contained in hpp:
 	"TetraMold",
 	"TetraBang", 

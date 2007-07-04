@@ -6,7 +6,7 @@
 
 #include"Tetra.hpp"
 
-char* yadePluginClasses[]={
+const char* yadePluginClasses[]={
         "TetraTestGen",
         NULL /*sentinel*/
 };

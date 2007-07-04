@@ -3,7 +3,7 @@
 #include"Clump.hpp"
 #include<algorithm>
 
-char* yadePluginClasses[]={
+const char* yadePluginClasses[]={
 	"Clump",
 	"ClumpMemberMover",
 	"ClumpTestGen",
