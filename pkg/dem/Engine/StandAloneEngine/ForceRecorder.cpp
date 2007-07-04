@@ -58,11 +58,14 @@ void ForceRecorder::action(Body * body)
 	
 	for( int i = startId ; i <= endId ; ++i )
 	{
-		Vector3r force = YADE_CAST<Force*>(ncb->physicalActions->find( i , actionForce->getClassIndex() ) . get() )->force;
+		if(ncb->bodies->exists(i))
+		{
+			Vector3r force = YADE_CAST<Force*>(ncb->physicalActions->find( i , actionForce->getClassIndex() ) . get() )->force;
 		
-		x+=force[0];
-		y+=force[1];
-		z+=force[2];
+			x+=force[0];
+			y+=force[1];
+			z+=force[2];
+		}
 	}
 	//cerr << "record force" << endl;
 	ofile << lexical_cast<string>(Omega::instance().getSimulationTime()) << " " 

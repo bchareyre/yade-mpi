@@ -1,41 +1,317 @@
-COMPILATION
-===========
+This is a copy of pages "Installation" and "Installation details" from http://yade.wikia.com/
+For more complete documentation please visit that website, especially
+instructions about installation for specific linux distribution, like:
 
-This version of yade relies uniquely on the scons build system. You can download if from http://www.scons.org, but chances are, that scons exists for your distribution (package scons, most likely). Its usage is very simple. Type "scons -h" to see available options for yade. Type "scons -H" to see options for scons proper. You need to set yade options only once, they will be remembered (in the scons.conf file). The ones you may need are:
+http://yade.wikia.com/wiki/Installation_of_yade_on_debian_or_kubuntu
+http://yade.wikia.com/wiki/Installation_of_yade_on_fedora
+http://yade.wikia.com/wiki/Installation_of_yade_on_gentoo
 
- 1. CPPPATH: to add some search paths for preprocessor
- 2. CXX: to change compiler
- 3. LIBPATH: extra directories for linker
- 4. PREFIX: where to install: default is /usr/local
- 5. POSTFIX: distinguishes different installations of yade; it will really be version-POSTFIX; if you don't specify anything, svn version (like r1088) will be used
- 6. buildPrefix: where to create build directory; default is '..'
+==============================================================
+==                                                          ==
+==         Table of Contents                                ==
+==                                                          ==
+==============================================================
+== 1 Prerequistes                                           ==
+==       1.1 Required packages                              ==
+==       1.2 Optional packages                              ==
+== 2 Recommended installation method                        ==
+== 3 Installation details                                   ==
+==       3.1 Systemwide installation as root                ==
+==       3.2 Installing from debian source packages         ==
+==       3.3 Scons options                                  ==
+==       3.4 Automatic library detection                    ==
+==       3.5 Installing the wildmagic 3 library on debian   ==
+==       3.6 Backward compatibility options                 ==
+==       3.7 Cleaning and uninstalling                      ==
+==       3.8 Install paths                                  ==
+==============================================================
 
-Scons will autodetect libraries as needed, if anything fails, see config.log.
 
-After compilation and installation (which are really not separate), you will be able to run yade - look in $PREFIX/bin directory for the executable.
 
-DEBIAN PACKAGE COMPILATION AND INSTALLATION
-===========================================
+= Prerequistes =
+================
 
-Make sure you have all packages needed for building:
+All libraries listed below must be installed with development headers. It's
+better to install them using your linux's distribution package management
+system, instead of downloading directly from the website. With the exception of
+QGLViewer ( http://artis.imag.fr/Software/QGLViewer/ ) and
+wildmagic 3.11 ( http://www.geometrictools.com/Downloads/Downloads.html ), which
+may not have a packege in your linux distribution.
 
-	$ sudo apt-get install debhelper scons lib3dviewer-dev libqt3-mt-dev qt3-dev-tools python-dev freeglut3-dev libboost-date-time-dev libboost-filesystem-dev libboost-thread-dev wildmagic-dev liblog4cxx9-dev docbook-to-man
+== Required packages ==
+=======================
 
-Note that lib3dviewer-dev and wildmagic-dev are not in official archives - see http://yade.berlios.de or http://beta.arcig.cz/~eudoxos/phd/index.cgi/YaDe/DebianSnapshotInstallHowto on how to get them.
+* ( http://www.boost.org ) 
+  boost library 1.33 or later with components: ''date-time'', ''filesystem'' and ''thread''
 
-Then go ahead:
+* ( http://trolltech.com/products/qt/qt3 ) 
+  qt3 library, including ''multithreading'' (<tt>-mt</tt>) component
 
-	$ svn checkout svn://svn.berlios.de/yade/branches/scons-layout yade-xxx # (change xxx to revision number as appropriate)
-	$ cd yade-0.0.svn1112
-	$ scripts/svn-debian-prep # creates files SVNVERSION, _SVNVERSION and appropriate debian/control
-	$ dpkg-buildpackage -rfakeroot-tcp # compiles and creates source and binary packages in ../
-	$ sudo dpkg -i ../yade-svn*-0.1.1-1_i386.dpkg
-    
-There are some limitations at this moment: version hardcoded in the control file, plain fakeroot will not work with scons (most likely because not all environment variables are propagated by scons - to be investigated).
+* freeglut3 / libglut3 development files
 
-RUNNING
-=======
+* ( http://artis.imag.fr/Software/QGLViewer/ )
+  QGLViewer
 
-Yade must be able to find its plugins if it is to function correctly - that should happen automatically. ~/.yade-??? will hold file named preferences.xml, which will be created on the first run.
+* make, g++
 
-For the rest, head over to http://yade.berlios.de and read documentation.
+* ( http://www.scons.org/ )
+  scons build system
+
+
+== Optional packages ==
+=======================
+
+* ( http://www.geometrictools.com/Downloads/Downloads.html )
+  wildmagic 3.11 - only if you want Delaunay triangulation support in lattice model
+
+* ( http://logging.apache.org/log4cxx/ )
+  log4cxx - only if you want extensive logging support in debugging
+
+* python-dev, python-scientific - only if you want python scripting interface</small>
+
+= Recommended installation method =
+===================================
+
+Run this command from inside yade-0.11.1 directory to install yade as a local
+user without root privileages (recommended):
+
+ scons PREFIX=/home/''username''/YADE optimize=1
+
+Replace 'username' with your user name. Also check out =Scons options= below to
+quickly compile not optimized version or systemwide install from debian package
+(as a root user), etc.
+
+
+========================
+=                      =
+= Installation details =
+=                      =
+========================
+
+= Systemwide installation as root =
+===================================
+
+By default yade installs in directory /usr/local, but to install there you need
+a root access. So running just scons some options should be enough. However,
+since you want to install yade systemwide as root, it might be better if you
+built a debian package instead.
+
+
+== Installing from debian source packages ==
+============================================
+
+This_repository ( http://geo.hmg.inpg.fr/~smilauer/yade ) contains weekly
+snapshots from svn in the form of debian source packages. To compile and
+install these (assuming that you already have required packages installed), you
+need to add repository source do your '/etc/apt/ sources.list':
+
+  deb-src http://geo.hmg.inpg.fr/~smilauer/yade ./
+
+Pick a revision number you want (eg. 1234), based on the repository contents -
+see http://geo.hmg.inpg.fr/~smilauer/yade, then run:
+
+  apt-get source yade-svn1234
+  sudo apt-get build-dep yade-svn1234
+  cd yade-svn1234-1
+  fakeroot-tcp debian/rules binary
+
+Once compiled, you will have optimized (yade-svn1234), debug (yade-svn1234-dbg)
+and development (yade-svn1234-dev) packages in ../, which you can install by:
+
+  sudo dpkg -i ../yade-svn1234*.deb
+
+
+
+== Scons options ==
+===================
+
+Scons is the tool used to build and install yade. Always run it from the top
+directory of yade.
+ ________________________________Scons_options________________________________
+|parameter  |default  value|description                                       |
+|-----------|--------------|--------------------------------------------------|
+|           |              |The directory where yade will be installed.       |
+|           |              |Different yade versions will not overwrite each   |
+|PREFIX     |/usr/local    |other in PREFIX directory. See version and variant|
+|           |              |below. This parameter is passed to the            |
+|           |              |preprocessor as PREFIX macro (expands to quoted   |
+|           |              |string).                                          |
+|-----------|--------------|--------------------------------------------------|
+|           |              |Scons autodetects svn revision or release number, |
+|version    |auto          |so it will be "svn1144" or "0.11.0", for example. |
+|           |              |If this fails, it will be "unknown". It is used to|
+|           |              |build `SUFFIX` (see `variant`).                   |
+|-----------|--------------|--------------------------------------------------|
+|           |              |Free-form name that describes variant of this     |
+|           |              |version (usually something like "-debug", "-      |
+|           |              |optimized" etc. May be empty. SUFFIX is a macro   |
+|variant    |empty         |defined by the preprocessor (as quoted string)    |
+|           |              |that has the form "$version$variant", i.e.        |
+|           |              |svn1144-debug if version=svn1144 and              |
+|           |              |variant=debug.                                    |
+|-----------|--------------|--------------------------------------------------|
+|           |              |Pass debugging flags to the compiler (generates   |
+|debug      |1             |debugging symbols in binaries), defines YADE_DEBUG|
+|           |              |symbols. Defaults to true.                        |
+|-----------|--------------|--------------------------------------------------|
+|           |              |Defines YADE_CAST (YADE_PTR_CAST) as static_cast  |
+|           |              |(static_pointer_cast) and pass optimization flags |
+|optimize   |0             |to the compiler. Use together with debug to get   |
+|           |              |fast code with debug symbols included. Defaults to|
+|           |              |false.                                            |
+|-----------|--------------|--------------------------------------------------|
+|           |              |Specify where to put the build-0.11.0 directory,  |
+|           |              |which will hold all files created during          |
+|buildPrefix|..            |compilation. This ensures that the source tree    |
+|           |              |remains clean and that different builds (like     |
+|           |              |optimized and debugging) are strictly separated,  |
+|           |              |like build-0.11.0 and build-0.11.0-debug          |
+|-----------|--------------|--------------------------------------------------|
+|           |              |How many compilations should run in parallel.     |
+|jobs       |4             |Defaults to four, if your computer is weak you may|
+|           |              |want a lower number. Equivalent to make -j4       |
+|-----------|--------------|--------------------------------------------------|
+|           |              |C++ compiler you want to use. You can say         |
+|CXX        |g++           |CXX="distcc g++" to have distributed build, if    |
+|           |              |that is configured.                               |
+|-----------|--------------|--------------------------------------------------|
+|           |              |Additional paths for the c proprocessor           |
+|CPPPATH    |empty         |(whitespace separated). Use it for locally-       |
+|           |              |installed libraries, eg.: CPPPATH="/usr/local/    |
+|           |              |include /home/fred/build/log4cxx/include"         |
+|-----------|--------------|--------------------------------------------------|
+|LIBPATH    |empty         |Additional paths for linker (whitespace           |
+|           |              |separated).                                       |
+|-----------|--------------|--------------------------------------------------|
+
+To see all the options, along with their default and current values, say `scons -h`.
+As an example, to compile yade I use following command
+
+  scons jobs=10 pretty=0 debug=1 optimize=0 profile=0 CXX="distcc g++" \
+        PREFIX=/home/janek/YADE useMiniWm3=0 CPPPATH=/usr/include/wm3
+
+The last two options are related to the_wildmagic_3_library. All options are
+stored inside scons.config file, so the next time you compile yade, you can
+really just issue scons command, unless you want to change something.
+
+
+== Automatic library detection ==
+=================================
+
+Scons will attempt detection of necessary libraries on your system at every
+run. If it fails, you can look at the $buildDir/config.log (eg.: ../build-
+0.11.0/config.log) file to see what went wrong. If you have some of the
+dependencies (like lib3dviewer) installed locally in /usr/local, you will have
+to use:
+
+  scons CPPPATH=/usr/local/include/wm3 LIBPATH=/usr/local/lib
+
+so that scons will find it.
+
+
+== Installing the wildmagic 3 library on debian ==
+==================================================
+
+The wildmagic_3.11_library ( http://www.geometrictools.com/Downloads/Downloads.html )
+is used by Lattice Geometrical Model when it's available. It's only to have
+dalaunay triangulation in 2D and 3D during specimen generation.
+Add the following line at the end of your /etc/apt/sources.list:
+
+  deb-src http://geo.hmg.inpg.fr/~smilauer/yade ./
+
+Then donwload, compile and install wildmagic library:
+
+  sudo apt-get update
+  apt-get source wildmagic
+  sudo apt-get build-dep wildmagic
+  cd wildmagic-3p11/
+  fakeroot debian/rules binary
+  sudo dpkg -i ../wildmagic-dev*.deb
+
+To tell scons that wildmagic is installed you need to add those parameters to
+scons: useMiniWm3=0 CPPPATH=/usr/include/wm3.
+
+
+== Backward compatibility options ==
+====================================
+
+If you have older software installed, you can use:
+
+____________________________Compatibility_options____________________________
+|parameter                     |description                                   |
+|------------------------------|----------------------------------------------|
+|                              |Older versions of libglut do not have function|
+|CXXFLAGS='-DNO_GLUTINIT'      |glutInit(), you should use this compilation   |
+|                              |flag then.                                    |
+|------------------------------|----------------------------------------------|
+|                              |If you are using older QGLViewer (version 2.0)|
+|CXXFLAGS='-DQGLVIEWER20'      |you should use this flag, otherwise you will  |
+|                              |get error about setFileName().                |
+|------------------------------|----------------------------------------------|
+|CXXFLAGS='-pthreadÂ -lpthread'|If you are compiling with gcc3.3 (an older    |
+|                              |compiler).                                    |
+|------------------------------|----------------------------------------------|
+|CXXFLAGS='-fPIC'              |When compiling on AMD64.                      |
+|------------------------------|----------------------------------------------|
+
+You can connect several CXXFLAGS by spaces: CXXFLAGS='-DNO_GLUTINIT -
+DQGLVIEWER20'
+
+
+== Cleaning and uninstalling ==
+===============================
+
+To clean the compilation invoke from yade-0.11.1/:
+
+  scons -c
+
+You can remove the compilation directory of yade, usually located in upper
+directory and starting with name build, like this one:
+
+  rm -rf ../build-0.11.1
+
+If yade was installed manually, the you can delete files from
+
+  /usr/local/lib/yade/
+  /usr/local/include/yade/
+  /usr/local/bin/yade
+
+or from (depending where yade was installed):
+
+  /home/username/YADE/lib/
+  /home/username/YADE/include/
+  /home/username/YADE/bin/yade
+
+If yade was installed from debian package, you can simply remove the package,
+and that's all.
+
+
+==  Install paths ==
+====================
+
+All files installed are versioned so that different versions and variants don't
+clash with each other - you can have as many version as you want installed at
+the same time. Supposing that we have variant=-dbg and version=svn1234 (note
+that $SUFFIX=-$version$variant) and PREFIX=/usr/local, we have
+
+ ____________________________________Paths____________________________________
+|what kind                |path used                |example                  |
+|-------------------------|-------------------------|-------------------------|
+|executable               |$PREFIX/bin/yade$SUFFIX  |/usr/local/bin/yade-     |
+|                         |                         |svn1144-debug            |
+|-------------------------|-------------------------|-------------------------|
+|default plugins          |$PREFIX/lib/yade$SUFFIX/ |/usr/local/lib/yade-     |
+|                         |lib/*/lib*.so            |svn1144-debug/*/lib*.so  |
+|-------------------------|-------------------------|-------------------------|
+|pkg-config script        |$PREFIX/lib/pkgconfig/   |/usr/local/lib/pkgconfig/|
+|                         |yade$SUFFIX              |yade-svn1144-debug.pc    |
+|-------------------------|-------------------------|-------------------------|
+|user configuration       |$HOME/.yade$SUFFIX       |/home/fred/.yade-svn1144-|
+|directory                |                         |debug                    |
+|-------------------------|-------------------------|-------------------------|
+|headers (note: common for|$PREFIX/include/         |/usr/local/include/yade- |
+|a particular version,    |yade$version/yade/*/*.hpp|svn1144/yade/*/*.hpp     |
+|regardless of variant)   |                         |                         |
+|-------------------------|-------------------------|-------------------------|
+
+
