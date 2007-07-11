@@ -356,6 +356,11 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-common',[
 		['Engine/StandAloneEngine/PersistentSAPCollider.cpp'],
 		LIBS=env['LIBS']+['yade-base'],
 		CPPPATH=env['CPPPATH']+['Engine/StandAloneEngine', '$PREFIX/include']),
+		
+	env.SharedLibrary('DistantPersistentSAPCollider',
+		['Engine/StandAloneEngine/DistantPersistentSAPCollider.cpp'],
+		LIBS=env['LIBS']+['yade-base'],
+		CPPPATH=env['CPPPATH']+['Engine/StandAloneEngine', '$PREFIX/include']),
 
 	env.SharedLibrary('SAPCollider',
 		['Engine/StandAloneEngine/SAPCollider.cpp'],

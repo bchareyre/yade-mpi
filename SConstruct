@@ -438,7 +438,7 @@ env.SConscript(dirs=['.'],build_dir=buildDir,duplicate=0)
 
 ############# OTHER TARGETS #####################
 env.Command('tags',libDirs,"ctags -R --extra=+q --fields=+n --exclude='.*' --exclude=yade-flat --exclude=include --exclude='*.so'")
-env.Alias('doc',env.Command('doc/doxygen/html/index.html',libDirs,"cd doc; doxygen Doxyfile"))
+#env.Alias('doc',env.Command('doc/doxygen/html/index.html',libDirs,"cd doc; doxygen Doxyfile"))
 
 
 
