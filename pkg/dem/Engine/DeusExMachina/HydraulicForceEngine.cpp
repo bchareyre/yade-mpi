@@ -24,6 +24,7 @@ HydraulicForceEngine::~HydraulicForceEngine()
 void HydraulicForceEngine::registerAttributes()
 {
 	REGISTER_ATTRIBUTE(gravity);
+	REGISTER_ATTRIBUTE(isActivated);
 }
 
 
