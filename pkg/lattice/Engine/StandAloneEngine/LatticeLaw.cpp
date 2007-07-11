@@ -335,11 +335,11 @@ void LatticeLaw::action(Body* body)
 			static bool first=true;
 			if(first)
 			{
-				//std::cerr << "\nusing k.b tension=0.6, k.b compression=0.2 !\n/beam->initialLength !\n";
-				std::cerr << "\nNOT! using k.b tension=0.6, k.b compression=0.2 ! (just a classical formula)\n\n";
+				std::cerr << "\nusing k.b tension=0.6, k.b compression=0.2 !\n/beam->initialLength !\n";
+				//std::cerr << "\nNOT! using k.b tension=0.6, k.b compression=0.2 ! (just a classical formula)\n\n";
 				first=false;
 			}
-/*
+
 			Real kb = beam->bendingStiffness;
 			Real Em = beam->criticalTensileStrain/3.0;
 			Real x  = beam->strain();
@@ -360,13 +360,13 @@ void LatticeLaw::action(Body* body)
 			node1->displacementAlignmental += ((beam->bendingRotation * ( beam_vec) - beam_vec) * kb)/(beam->initialLength);
 			node2->displacementAlignmental += ((beam->bendingRotation * (-beam_vec) + beam_vec) * kb)/(beam->initialLength);
 
-*/
-			node1->countStiffness += (beam->bendingStiffness)/(beam->initialLength);
+
+/*			node1->countStiffness += (beam->bendingStiffness)/(beam->initialLength);
 			node2->countStiffness += (beam->bendingStiffness)/(beam->initialLength);
 
 			node1->displacementAlignmental += ((beam->bendingRotation * ( beam_vec) - beam_vec) * beam->bendingStiffness)/(beam->initialLength);
 			node2->displacementAlignmental += ((beam->bendingRotation * (-beam_vec) + beam_vec) * beam->bendingStiffness)/(beam->initialLength);
-
+*/
 			beam->shearing_strain = ((beam->bendingRotation * (-beam_vec) + beam_vec) * beam->bendingStiffness)/(beam->initialLength);
 
 		}
@@ -382,6 +382,8 @@ void LatticeLaw::action(Body* body)
 		}
 		}
 	}
+
+	std::cout << "iter:" << Omega::instance().getCurrentIteration() << " beams_deleted: " << futureDeletes.size() << std::endl;
 	
 	{ // move nodes
 		bi    = bodies->begin();

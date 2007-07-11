@@ -23,12 +23,45 @@ MovingSupport::MovingSupport () : DataRecorder()
 }
 
 
+void MovingSupport::preProcessAttributes(bool deserializing)
+{
+	if(deserializing)
+	{
+	}
+	else
+	{
+		sections_midpoints.clear();
+		sections_halflength.clear();
+		sections_directions.clear();
+		
+		std::list<std::pair<Vector3r,std::pair< int, Real > > >::iterator i=sections.begin();
+		std::list<std::pair<Vector3r,std::pair< int, Real > > >::iterator e=sections.end();
+		for( ; i!=e ; ++i)
+		{
+			sections_midpoints.push_back(i->first);
+			sections_halflength.push_back(i->second.second);
+			sections_directions.push_back(i->second.first);
+		}
+	}
+}
+
 void MovingSupport::postProcessAttributes(bool deserializing)
 {
 	if(deserializing)
 	{
-//		first = true;
-//		subscribedBodies.clear();
+		sections.clear();
+		std::vector<Vector3r>::iterator i1=sections_midpoints.begin();
+		std::vector<Vector3r>::iterator e1=sections_midpoints.end();
+		std::vector<Real>::iterator     i2=sections_halflength.begin();
+		std::vector<int>::iterator      i3=sections_directions.begin();
+		//std::vector<Vector3r>::iterator ea region_max.end();
+		for( ; i1!=e1 ; ++i1 , ++i2 , ++i3 )
+		{
+			sections.push_back(std::make_pair(*i1,std::make_pair(*i3,*i2)));
+		}
+
+		first = true;
+		subscribedBodies.clear();
 	}
 }
 
@@ -36,10 +69,13 @@ void MovingSupport::postProcessAttributes(bool deserializing)
 void MovingSupport::registerAttributes()
 {
 	DataRecorder::registerAttributes();
-	REGISTER_ATTRIBUTE(sections);
+//	REGISTER_ATTRIBUTE(sections);
+	REGISTER_ATTRIBUTE(sections_midpoints);
+	REGISTER_ATTRIBUTE(sections_halflength);
+	REGISTER_ATTRIBUTE(sections_directions);
 
-	REGISTER_ATTRIBUTE(first);
-	REGISTER_ATTRIBUTE(subscribedBodies);
+//	REGISTER_ATTRIBUTE(first);
+//	REGISTER_ATTRIBUTE(subscribedBodies);
 }
 
 

@@ -1070,9 +1070,9 @@ BeamRecorder bbbb;
         rootBody->engines.push_back(strainRecorder);
         rootBody->engines.push_back(measurePoisson);
 	// FIXME - Serialization of nodeRecorder, beamRecorder and movingSupport is not wirking....
-        //rootBody->engines.push_back(nodeRecorder);
-        //rootBody->engines.push_back(beamRecorder);
-	//rootBody->engines.push_back(movingSupport);
+        rootBody->engines.push_back(nodeRecorder);
+        rootBody->engines.push_back(beamRecorder);
+	rootBody->engines.push_back(movingSupport);
         
         rootBody->initializers.clear();
         rootBody->initializers.push_back(boundingVolumeDispatcher);
@@ -1131,10 +1131,10 @@ void LatticeExample::imposeTranslation(shared_ptr<MetaBody>& rootBody, Vector3r 
         rootBody->engines.push_back((rootBody->engines)[rootBody->engines.size()-1]);
         (rootBody->engines)[rootBody->engines.size()-2]=(rootBody->engines)[rootBody->engines.size()-3];
         (rootBody->engines)[rootBody->engines.size()-3]=(rootBody->engines)[rootBody->engines.size()-4];
-        (rootBody->engines)[rootBody->engines.size()-4]=/*(rootBody->engines)[rootBody->engines.size()-5];
+        (rootBody->engines)[rootBody->engines.size()-4]=(rootBody->engines)[rootBody->engines.size()-5];
         (rootBody->engines)[rootBody->engines.size()-5]=(rootBody->engines)[rootBody->engines.size()-6];
         (rootBody->engines)[rootBody->engines.size()-6]=(rootBody->engines)[rootBody->engines.size()-7];
-        (rootBody->engines)[rootBody->engines.size()-7]=*/translationCondition;
+        (rootBody->engines)[rootBody->engines.size()-7]=translationCondition;
         translationCondition->subscribedBodies.clear();
         
         BodyContainer::iterator bi    = rootBody->bodies->begin();

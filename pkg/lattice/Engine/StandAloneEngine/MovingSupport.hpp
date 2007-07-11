@@ -33,6 +33,9 @@ class MovingSupport : public DataRecorder
 	public :
 		std::list<std::pair<Vector3r,std::pair< int , Real > > > sections; // a list of section planes: <a midpoint, direction , half length >
 		// int direction refers to: which coordinate to take from the Beam's.direction: x, y or z (0, 1 or 2)
+		std::vector<Vector3r> sections_midpoints;
+		std::vector<int> sections_directions;
+		std::vector<Real> sections_halflength;
 
 		MovingSupport ();
 
@@ -41,6 +44,7 @@ class MovingSupport : public DataRecorder
 		virtual bool isActivated();
 
 	protected :
+		virtual void preProcessAttributes(bool deserializing);
 		virtual void postProcessAttributes(bool deserializing);
 	REGISTER_CLASS_NAME(MovingSupport);
 	REGISTER_BASE_CLASS_NAME(DataRecorder);

@@ -31,6 +31,8 @@ class NodeRecorder : public DataRecorder
 		std::string	 outputFile;
 		unsigned int	 interval;
 		std::list<std::pair<Vector3r,Vector3r> > regions; // a list of min/max pairs describing each region.
+		std::vector<Vector3r> regions_min;
+		std::vector<Vector3r> regions_max;
 
 		NodeRecorder ();
 
@@ -39,6 +41,7 @@ class NodeRecorder : public DataRecorder
 		virtual bool isActivated();
 
 	protected :
+		virtual void preProcessAttributes(bool deserializing);
 		virtual void postProcessAttributes(bool deserializing);
 	REGISTER_CLASS_NAME(NodeRecorder);
 	REGISTER_BASE_CLASS_NAME(DataRecorder);

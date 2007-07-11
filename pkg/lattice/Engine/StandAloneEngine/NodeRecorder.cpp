@@ -26,15 +26,46 @@ NodeRecorder::NodeRecorder () : DataRecorder()
 }
 
 
+void NodeRecorder::preProcessAttributes(bool deserializing)
+{
+	if(deserializing)
+	{
+	}
+	else
+	{
+		regions_min.clear();
+		regions_max.clear();
+		std::list<std::pair<Vector3r,Vector3r> >::iterator i=regions.begin();
+		std::list<std::pair<Vector3r,Vector3r> >::iterator e=regions.end();
+		for( ; i!=e ; ++i)
+		{
+			regions_min.push_back(i->first);
+			regions_max.push_back(i->second);
+		}
+	}
+}
+
 void NodeRecorder::postProcessAttributes(bool deserializing)
 {
 	if(deserializing)
 	{
+		regions.clear();
+		std::vector<Vector3r>::iterator ii=regions_min.begin();
+		std::vector<Vector3r>::iterator ei=regions_min.end();
+		std::vector<Vector3r>::iterator ia=regions_max.begin();
+		//std::vector<Vector3r>::iterator ea region_max.end();
+		for( ; ii!=ei ; ++ii , ++ia )
+		{
+			regions.push_back(std::make_pair(*ii,*ia));
+		}
+
 	//	outputFile += "_"+boost::lexical_cast<std::string>(Omega::instance().getTimeStep());
 	//	std::cerr << "using dt for NodeRecorder output file: " << outputFile << "\n";
 
 		ofile.open(outputFile.c_str());
 
+		first = true;
+		subscribedBodies.clear();
 	}
 }
 
@@ -44,10 +75,12 @@ void NodeRecorder::registerAttributes()
 	DataRecorder::registerAttributes();
 	REGISTER_ATTRIBUTE(outputFile);
 	REGISTER_ATTRIBUTE(interval);
-	REGISTER_ATTRIBUTE(regions);
+	//REGISTER_ATTRIBUTE(regions);
+	REGISTER_ATTRIBUTE(regions_min);
+	REGISTER_ATTRIBUTE(regions_max);
 
-	REGISTER_ATTRIBUTE(first);
-	REGISTER_ATTRIBUTE(subscribedBodies);
+//	REGISTER_ATTRIBUTE(first);
+//	REGISTER_ATTRIBUTE(subscribedBodies);
 }
 
 

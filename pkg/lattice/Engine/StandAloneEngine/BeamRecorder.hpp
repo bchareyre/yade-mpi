@@ -32,6 +32,9 @@ class BeamRecorder : public DataRecorder
 		unsigned int	 interval;
 		std::list<std::pair<Vector3r,std::pair< Real, int > > > sections; // a list of section planes: <a midpoint, half length, direction >
 		// int direction refers to: which coordinate to take from the Beam's.direction: x, y or z (0, 1 or 2)
+		std::vector<Vector3r> sections_midpoints;
+		std::vector<Real> sections_halflength;
+		std::vector<int> sections_directions;
 
 		BeamRecorder ();
 
@@ -40,6 +43,7 @@ class BeamRecorder : public DataRecorder
 		virtual bool isActivated();
 
 	protected :
+		virtual void preProcessAttributes(bool deserializing);
 		virtual void postProcessAttributes(bool deserializing);
 	REGISTER_CLASS_NAME(BeamRecorder);
 	REGISTER_BASE_CLASS_NAME(DataRecorder);
