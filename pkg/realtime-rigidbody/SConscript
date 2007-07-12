@@ -1,17 +1,6 @@
 Import('*')
 env.Install('$PREFIX/lib/yade$SUFFIX/pkg-realtime-rigidbody',[
 
-	env.SharedLibrary('AAInteractingBox2InteractingSphere4ClosestFeatures',
-		['Engine/EngineUnit/AAInteractingBox2InteractingSphere4ClosestFeatures.cpp'],
-		LIBS=env['LIBS']+['yade-base',
-			'InteractionGeometryMetaEngine',
-			'yade-multimethods',
-			'InteractingSphere',
-			'InteractingBox',
-			'Box',
-			'Sphere',
-			'ClosestFeatures']),
-
 	env.SharedLibrary('InteractingBox2InteractingBox4ClosestFeatures',
 		['Engine/EngineUnit/InteractingBox2InteractingBox4ClosestFeatures.cpp'],
 		LIBS=env['LIBS']+['yade-base',

@@ -18,10 +18,6 @@ bool InteractingBox2InteractingSphere4ClosestFeatures::go(		const shared_ptr<Int
 						const Se3r& se32,
 						const shared_ptr<Interaction>& interaction)
 {
-
-	//if (se31.orientation == Quaternionr())
-	//	return collideAABoxSphere(cm1,cm2,se31,se32,interaction);
-	
 	Vector3r l,t,p,q,r;
 	bool onborder = false;
 	Vector3r pt1,pt2,normal;
