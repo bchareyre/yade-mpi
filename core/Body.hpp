@@ -31,7 +31,7 @@
  */
 class Body : public Serializable
 {
-	private	:
+	public	:
 		body_id_t id;
 		/*! group to which body belongs (maybe vector<int> , to allow multiple groups?)
 		 * we can use them to make group one yellow, and group two red, or to record data

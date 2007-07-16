@@ -89,7 +89,7 @@ void DistantPersistentSAPCollider::action(Body* body)
 		// FIXME : remove this isNew flag and test if interactionPhysic ?
 		if (interaction->isReal) // if a interaction was only potential then no geometry was created for it and so this time it is still a new one
 			interaction->isNew = false;
-		interaction->isReal = false;
+		//interaction->isReal = false;
 	}
 	
 	updateIds(bodies->size());

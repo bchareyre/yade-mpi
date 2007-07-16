@@ -22,6 +22,7 @@ CohesiveFrictionalRelationships::CohesiveFrictionalRelationships()
 		shearCohesion = 10000000;
 		setCohesionNow = false;
 		setCohesionOnNewContacts = false;
+		cohesionDefinitionIteration = -1;
 }
 
 
@@ -40,8 +41,15 @@ void CohesiveFrictionalRelationships::go(	  const shared_ptr<PhysicalParameters>
 {
 	BodyMacroParameters* sdec1 = static_cast<BodyMacroParameters*>(b1.get());
 	BodyMacroParameters* sdec2 = static_cast<BodyMacroParameters*>(b2.get());
-	SpheresContactGeometry* interactionGeometry = dynamic_cast<SpheresContactGeometry*>(interaction->interactionGeometry.get());
+	SpheresContactGeometry* interactionGeometry = dynamic_cast<SpheresContactGeometry*>(interaction->interactionGeometry.get());	
 	
+	//Create cohesive interractions only once
+	if (setCohesionNow && cohesionDefinitionIteration==-1) {
+		cohesionDefinitionIteration=Omega::instance().getCurrentIteration();}
+	if (setCohesionNow && cohesionDefinitionIteration!=-1 && cohesionDefinitionIteration!=Omega::instance().getCurrentIteration()) {
+		cohesionDefinitionIteration = -1;
+		setCohesionNow = 0;}
+		
 	if(interactionGeometry) // so it is SpheresContactGeometry  - NON PERMANENT LINK
 	{
 		if(interaction->isNew)

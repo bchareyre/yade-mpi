@@ -107,6 +107,17 @@ void TriaxialCompressionEngine::updateParameters(Body * body)
 		wall_top_activated=false;
 		autoCompressionActivation = false;
 	}
+	
+	if(!autoCompressionActivation && UnbalancedForce<=StabilityCriterion && Omega::instance().getCurrentIteration() > 1000)
+	{
+		internalCompaction = false;
+		Phase1 = true;
+		string fileName = "../data/" + Phase1End + "_" + 
+		lexical_cast<string>(Omega::instance().getCurrentIteration()) + ".xml";
+		cerr << "saving snapshot: " << fileName << " ...";
+		Omega::instance().saveSimulation(fileName);
+		Omega::instance().stopSimulationLoop();
+	}
 		
 }
 

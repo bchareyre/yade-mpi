@@ -71,7 +71,7 @@ void CohesiveFrictionalContactLaw::action(Body* body)
                         if (un < 0 && (currentContactPhysics->normalForce.SquaredLength() > pow(currentContactPhysics->normalAdhesion,2) || currentContactPhysics->normalAdhesion==0)) {
                                 //currentContactPhysics->SetBreakingState();
                                 //if (currentContactPhysics->cohesionBroken) {
-                                cerr << "broken" << endl;
+                                //cerr << "broken" << endl;
                                 contact->isReal= false;
                                 currentContactPhysics->cohesionBroken = true;
                                 currentContactPhysics->normalForce = Vector3r::ZERO;
@@ -110,8 +110,11 @@ void CohesiveFrictionalContactLaw::action(Body* body)
                                 /// 							 ///
 
                                 Vector3r x				= currentContactGeometry->contactPoint;
-                                Vector3r c1x				= (x - de1->se3.position);
-                                Vector3r c2x				= (x - de2->se3.position);
+                                //Vector3r c1x				= (x - de1->se3.position);
+                                //Vector3r c2x				= (x - de2->se3.position);
+                                ///The following definition of c1x and c2x is to avoid "granular ratcheting" (see F. ALONSO-MARROQUIN, R. GARCIA-ROJO, H.J. HERRMANN, Micro-mechanical investigation of granular ratcheting, in Cyclic Behaviour of Soils and Liquefaction Phenomena, ed. T. Triantafyllidis (Balklema, London, 2004), p. 3-10 - and a lot more papers from the same authors)
+           			 Vector3r c1x	= -currentContactGeometry->radius1*currentContactGeometry->normal;
+           			 Vector3r c2x	= currentContactGeometry->radius2*currentContactGeometry->normal;
                                 Vector3r relativeVelocity		= (de2->velocity+de2->angularVelocity.Cross(c2x)) - (de1->velocity+de1->angularVelocity.Cross(c1x));
                                 Vector3r shearVelocity			= relativeVelocity-currentContactGeometry->normal.Dot(relativeVelocity)*currentContactGeometry->normal;
                                 Vector3r shearDisplacement		= shearVelocity*dt;

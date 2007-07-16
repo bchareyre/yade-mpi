@@ -10,10 +10,10 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "CohesiveTriaxialTest.hpp"
+#include "ModifiedTriaxialTest.hpp"
 
-#include<yade/pkg-dem/CohesiveFrictionalContactLaw.hpp>
-#include<yade/pkg-dem/CohesiveFrictionalRelationships.hpp>
+#include<yade/pkg-dem/ElasticContactLaw.hpp>
+#include<yade/pkg-dem/SimpleElasticRelationships.hpp>
 #include<yade/pkg-dem/BodyMacroParameters.hpp>
 #include<yade/pkg-dem/SDECLinkGeometry.hpp>
 #include<yade/pkg-dem/SDECLinkPhysics.hpp>
@@ -33,7 +33,7 @@
 #include<yade/pkg-common/Sphere.hpp>
 #include<yade/core/MetaBody.hpp>
 #include<yade/pkg-common/SAPCollider.hpp>
-#include<yade/pkg-common/DistantPersistentSAPCollider.hpp>
+#include<yade/pkg-common/PersistentSAPCollider.hpp>
 #include<yade/lib-serialization/IOFormatManager.hpp>
 #include<yade/core/Interaction.hpp>
 #include<yade/pkg-common/BoundingVolumeMetaEngine.hpp>
@@ -41,7 +41,8 @@
 #include<yade/pkg-common/MetaInteractingGeometry.hpp>
 
 #include<yade/pkg-common/GravityEngine.hpp>
-#include<yade/pkg-dem/HydraulicForceEngine.hpp>
+#include<yade/pkg-common/HydraulicForceEngine.hpp>
+#include<yade/pkg-common/MakeItFlat.hpp>
 #include<yade/pkg-common/PhysicalActionApplier.hpp>
 #include<yade/pkg-common/PhysicalActionDamper.hpp>
 #include<yade/pkg-common/CundallNonViscousForceDamping.hpp>
@@ -85,14 +86,15 @@ typedef pair<Vector3r, Real> BasicSphere;
 string GenerateCloud(vector<BasicSphere>& sphere_list, Vector3r lowerCorner, Vector3r upperCorner, long number, Real rad_std_dev, Real porosity);
 
 
-CohesiveTriaxialTest::CohesiveTriaxialTest () : FileGenerator()
+ModifiedTriaxialTest::ModifiedTriaxialTest () : FileGenerator()
 {
-	lowerCorner 		= Vector3r(0,0,0);
-	upperCorner 		= Vector3r(1,1,1);
+	lowerCorner 		= Vector3r(-1,-0.1,-1);
+	upperCorner 		= Vector3r(1,0.1,1);
 	thickness 		= 0.001;
-	importFilename 		= "../data/small.sdec.xyz";
-	outputFileName 		= "../data/CohesiveTriaxialTest.xml";
+	importFilename 		= "../data/inp.dat";
+// 	outputFileName 		= "../data/out.xml";
 	//nlayers = 1;
+	want_2d=true;
 	wall_top 		= true;
 	wall_bottom 		= true;
 	wall_1			= true;
@@ -122,6 +124,18 @@ CohesiveTriaxialTest::CohesiveTriaxialTest () : FileGenerator()
 	boxWalls 		= true;
 	internalCompaction	=false;
 
+//	bigBall 		= true;
+	bigBall 		= false;
+	bigBallRadius		= 0.075;
+	bigBallPoissonRatio 	= 0.3;
+	bigBallYoungModulus 	= 10000000.0;
+	bigBallFrictDeg 	= 60;
+//	bigBallCohesion 	= 10000000000;
+//	bigBallTensionStr 	= 10000000000;
+	bigBallDensity		= 7800;
+	bigBallDropTimeSeconds	= 30;
+	bigBallDropHeight 	= 3.04776;
+	
 	dampingForce = 0.2;
 	dampingMomentum = 0.2;
 	defaultDt = 1;
@@ -140,15 +154,14 @@ CohesiveTriaxialTest::CohesiveTriaxialTest () : FileGenerator()
 	sphereYoungModulus  = 15000000.0;
 	spherePoissonRatio  = 0.5;
 	sphereFrictionDeg   = 18.0;
-	normalCohesion = 0;
-	shearCohesion = 0;
-	setCohesionOnNewContacts = false;
 	density			= 2600;
 	
 	boxYoungModulus   = 15000000.0;
 	boxPoissonRatio  = 0.2;
 	boxFrictionDeg   = 0.f;
 	gravity 	= Vector3r(0,-9.81,0);
+//        hydraulicForce 	= Vector3r(0.0,0,0);
+
 	
 	sigma_iso = 50000;
 	
@@ -161,15 +174,16 @@ CohesiveTriaxialTest::CohesiveTriaxialTest () : FileGenerator()
 }
 
 
-CohesiveTriaxialTest::~CohesiveTriaxialTest ()
+ModifiedTriaxialTest::~ModifiedTriaxialTest ()
 {
 
 }
 
 
-void CohesiveTriaxialTest::registerAttributes()
+void ModifiedTriaxialTest::registerAttributes()
 {
 	FileGenerator::registerAttributes();
+	REGISTER_ATTRIBUTE(want_2d);
 	REGISTER_ATTRIBUTE(lowerCorner);
 	REGISTER_ATTRIBUTE(upperCorner);
 	REGISTER_ATTRIBUTE(thickness);
@@ -183,9 +197,6 @@ void CohesiveTriaxialTest::registerAttributes()
 	REGISTER_ATTRIBUTE(sphereYoungModulus);
 	REGISTER_ATTRIBUTE(spherePoissonRatio);
 	REGISTER_ATTRIBUTE(sphereFrictionDeg);
-	REGISTER_ATTRIBUTE(normalCohesion);
-	REGISTER_ATTRIBUTE(shearCohesion);
-	REGISTER_ATTRIBUTE(setCohesionOnNewContacts);
 
 	REGISTER_ATTRIBUTE(boxYoungModulus);
 	REGISTER_ATTRIBUTE(boxPoissonRatio);
@@ -228,7 +239,8 @@ void CohesiveTriaxialTest::registerAttributes()
 	REGISTER_ATTRIBUTE(AnimationSnapshotsBaseName);
 	REGISTER_ATTRIBUTE(WallStressRecordFile);
 
-//	REGISTER_ATTRIBUTE(gravity);
+	REGISTER_ATTRIBUTE(gravity);
+//	REGISTER_ATTRIBUTE(hydraulicForce);
 	
 	//REGISTER_ATTRIBUTE(bigBall);
 	//REGISTER_ATTRIBUTE(bigBallRadius);
@@ -243,16 +255,13 @@ void CohesiveTriaxialTest::registerAttributes()
 }
 
 
-bool CohesiveTriaxialTest::generate()
+bool ModifiedTriaxialTest::generate()
 {
 //	unsigned int startId=boost::numeric::bounds<unsigned int>::highest(), endId=0; // record forces from group 2
 	
 	rootBody = shared_ptr<MetaBody>(new MetaBody);
 	createActors(rootBody);
 	positionRootBody(rootBody);
-
-// 	rootBody->persistentInteractions	= shared_ptr<InteractionContainer>(new InteractionVecSet);
-// 	rootBody->transientInteractions		= shared_ptr<InteractionContainer>(new InteractionVecSet);
 	rootBody->persistentInteractions	= shared_ptr<InteractionContainer>(new InteractionHashMap);
 	rootBody->transientInteractions		= shared_ptr<InteractionContainer>(new InteractionHashMap);
 	rootBody->physicalActions		= shared_ptr<PhysicalActionContainer>(new PhysicalActionVectorVector);
@@ -260,6 +269,80 @@ bool CohesiveTriaxialTest::generate()
 
 	shared_ptr<Body> body;
 	
+	vector<BasicSphere> sphere_list;
+	message=GenerateCloud(sphere_list, lowerCorner, upperCorner, numberOfGrains, 0.3, 0.75);
+	
+	vector<BasicSphere>::iterator it = sphere_list.begin();
+	vector<BasicSphere>::iterator it_end = sphere_list.end();
+			
+	for (;it!=it_end; ++it)
+	{
+		cerr << "sphere (" << it->first << " " << it->second << endl;
+		createSphere(body,it->first,it->second,false,true);
+		rootBody->bodies->insert(body);
+	}
+	
+// 	if(importFilename.size() != 0 && filesystem::exists(importFilename) )
+// 	{
+// 		
+// 		Vector3r layersDistance (Vector3r::ZERO); 
+// 		for (int layer=1; layer <= nlayers; ++layer)
+// 		{			
+// 			ifstream loadFile(importFilename.c_str());
+// 			long int i=0;
+// 			Real f,g,x,y,z,radius;
+// 			while( ! loadFile.eof() )
+// 			{
+// 				++i;
+// 				loadFile >> x;
+// 				loadFile >> y;
+// 				loadFile >> z;
+// 				Vector3r position = (Vector3r(x,z,y) + layersDistance);
+// 				loadFile >> radius;
+// 			
+// 				loadFile >> f;
+// 				loadFile >> g;
+// 				if( boxWalls ? f>1 : false ) // skip loading of SDEC walls
+// 					continue;
+// 				if(f==8)
+// 					continue;
+// 	
+// 		//		if( i % 100 == 0 ) // FIXME - should display a progress BAR !!
+// 		//			cout << "loaded: " << i << endl;
+// 				if(f==1)
+// 				{
+// 					lowerCorner[0] = min(position[0]-radius , lowerCorner[0]);
+// 					lowerCorner[1] = min(position[1]-radius , lowerCorner[1]);
+// 					lowerCorner[2] = min(position[2]-radius , lowerCorner[2]);
+// 					upperCorner[0] = max(position[0]+radius , upperCorner[0]);
+// 					upperCorner[1] = max(position[1]+radius , upperCorner[1]);
+// 					upperCorner[2] = max(position[2]+radius , upperCorner[2]);
+// 				}
+// 				createSphere(body,position,radius,false,f==1);
+// 				rootBody->bodies->insert(body);
+// 				if(f == 2)
+// 				{
+// 					startId = std::min(body->getId() , startId);
+// 					endId   = std::max(body->getId() , endId);
+// 				}
+// 					
+// 			}
+// 			layersDistance.y() = upperCorner.y();
+// 		}
+// 	}
+
+// create bigBall
+	//Vector3r position = (upperCorner+lowerCorner)*0.5 + Vector3r(0,bigBallDropHeight,0);
+	//createSphere(body,position,bigBallRadius,true,false);	
+	//int bigId = 0;
+// 	if(bigBall)
+// 		rootBody->bodies->insert(body);
+// 	bigId = body->getId();
+	//forcerec->startId = startId;
+	//forcerec->endId   = endId;
+	//averagePositionRecorder->bigBallId = bigId;
+	//velocityRecorder->bigBallId = bigId;
+
 	if(boxWalls)
 	{
 	// bottom box
@@ -365,82 +448,6 @@ bool CohesiveTriaxialTest::generate()
 			 
 	}
 	
-	vector<BasicSphere> sphere_list;
-	message=GenerateCloud(sphere_list, lowerCorner, upperCorner, numberOfGrains, 0.3, 0.75);
-	
-	vector<BasicSphere>::iterator it = sphere_list.begin();
-	vector<BasicSphere>::iterator it_end = sphere_list.end();
-			
-	for (;it!=it_end; ++it)
-	{
-		cerr << "sphere (" << it->first << " " << it->second << endl;
-		createSphere(body,it->first,it->second,true);
-		rootBody->bodies->insert(body);
-	}
-	
-// 	if(importFilename.size() != 0 && filesystem::exists(importFilename) )
-// 	{
-// 		
-// 		Vector3r layersDistance (Vector3r::ZERO); 
-// 		for (int layer=1; layer <= nlayers; ++layer)
-// 		{			
-// 			ifstream loadFile(importFilename.c_str());
-// 			long int i=0;
-// 			Real f,g,x,y,z,radius;
-// 			while( ! loadFile.eof() )
-// 			{
-// 				++i;
-// 				loadFile >> x;
-// 				loadFile >> y;
-// 				loadFile >> z;
-// 				Vector3r position = (Vector3r(x,z,y) + layersDistance);
-// 				loadFile >> radius;
-// 			
-// 				loadFile >> f;
-// 				loadFile >> g;
-// 				if( boxWalls ? f>1 : false ) // skip loading of SDEC walls
-// 					continue;
-// 				if(f==8)
-// 					continue;
-// 	
-// 		//		if( i % 100 == 0 ) // FIXME - should display a progress BAR !!
-// 		//			cout << "loaded: " << i << endl;
-// 				if(f==1)
-// 				{
-// 					lowerCorner[0] = min(position[0]-radius , lowerCorner[0]);
-// 					lowerCorner[1] = min(position[1]-radius , lowerCorner[1]);
-// 					lowerCorner[2] = min(position[2]-radius , lowerCorner[2]);
-// 					upperCorner[0] = max(position[0]+radius , upperCorner[0]);
-// 					upperCorner[1] = max(position[1]+radius , upperCorner[1]);
-// 					upperCorner[2] = max(position[2]+radius , upperCorner[2]);
-// 				}
-// 				createSphere(body,position,radius,false,f==1);
-// 				rootBody->bodies->insert(body);
-// 				if(f == 2)
-// 				{
-// 					startId = std::min(body->getId() , startId);
-// 					endId   = std::max(body->getId() , endId);
-// 				}
-// 					
-// 			}
-// 			layersDistance.y() = upperCorner.y();
-// 		}
-// 	}
-
-// create bigBall
-	//Vector3r position = (upperCorner+lowerCorner)*0.5 + Vector3r(0,bigBallDropHeight,0);
-	//createSphere(body,position,bigBallRadius,true,false);	
-	//int bigId = 0;
-// 	if(bigBall)
-// 		rootBody->bodies->insert(body);
-// 	bigId = body->getId();
-	//forcerec->startId = startId;
-	//forcerec->endId   = endId;
-	//averagePositionRecorder->bigBallId = bigId;
-	//velocityRecorder->bigBallId = bigId;
-
-	
-	
 	return true;
 //  	return "Generated a sample inside box of dimensions: (" 
 //  		+ lexical_cast<string>(lowerCorner[0]) + "," 
@@ -453,7 +460,7 @@ bool CohesiveTriaxialTest::generate()
 }
 
 
-void CohesiveTriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r position, Real radius, bool dynamic )
+void ModifiedTriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r position, Real radius, bool big, bool dynamic )
 {
 	body = shared_ptr<Body>(new Body(body_id_t(0),2));
 	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
@@ -468,17 +475,17 @@ void CohesiveTriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r positio
 	
 	physics->angularVelocity	= Vector3r(0,0,0);
 	physics->velocity		= Vector3r(0,0,0);
-	physics->mass			= 4.0/3.0*Mathr::PI*radius*radius*radius*density;
+	physics->mass			= 4.0/3.0*Mathr::PI*radius*radius*radius*(big ? bigBallDensity : density);
 	
 	physics->inertia		= Vector3r( 	2.0/5.0*physics->mass*radius*radius,
 							2.0/5.0*physics->mass*radius*radius,
 							2.0/5.0*physics->mass*radius*radius);
 	physics->se3			= Se3r(position,q);
-	physics->young			= sphereYoungModulus;
-	physics->poisson		= spherePoissonRatio;
-	physics->frictionAngle		= sphereFrictionDeg * Mathr::PI/180.0;
+	physics->young			= big ? bigBallYoungModulus : sphereYoungModulus;
+	physics->poisson		= big ? bigBallPoissonRatio : spherePoissonRatio;
+	physics->frictionAngle		= (big ? bigBallFrictDeg : sphereFrictionDeg ) * Mathr::PI/180.0;
 
-	if((!dynamic) && (!boxWalls))
+	if((!big) && (!dynamic) && (!boxWalls))
 	{
 		physics->young			= boxYoungModulus;
 		physics->poisson		= boxPoissonRatio;
@@ -504,7 +511,7 @@ void CohesiveTriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r positio
 }
 
 
-void CohesiveTriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents, bool wire)
+void ModifiedTriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents, bool wire)
 {
 	body = shared_ptr<Body>(new Body(body_id_t(0),2));
 	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
@@ -552,7 +559,7 @@ void CohesiveTriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, 
 }
 
 
-void CohesiveTriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
+void ModifiedTriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 {
 // recording average positions
 	averagePositionRecorder = shared_ptr<AveragePositionRecorder>(new AveragePositionRecorder);
@@ -574,27 +581,24 @@ void CohesiveTriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	physicalActionInitializer->physicalActionNames.push_back("GlobalStiffness");
 	
 	shared_ptr<InteractionGeometryMetaEngine> interactionGeometryDispatcher(new InteractionGeometryMetaEngine);
-	interactionGeometryDispatcher->add("InteractingSphere","InteractingSphere","InteractingSphere2InteractingSphere4DistantSpheresContactGeometry");
+	interactionGeometryDispatcher->add("InteractingSphere","InteractingSphere","InteractingSphere2InteractingSphere4SpheresContactGeometry");
 	interactionGeometryDispatcher->add("InteractingSphere","InteractingBox","InteractingBox2InteractingSphere4SpheresContactGeometry");
 
-	shared_ptr<CohesiveFrictionalRelationships> cohesiveFrictionalRelationships = shared_ptr<CohesiveFrictionalRelationships> (new CohesiveFrictionalRelationships);
-	cohesiveFrictionalRelationships->shearCohesion = shearCohesion;
-	cohesiveFrictionalRelationships->normalCohesion = normalCohesion;
-	cohesiveFrictionalRelationships->setCohesionOnNewContacts = setCohesionOnNewContacts;
 	shared_ptr<InteractionPhysicsMetaEngine> interactionPhysicsDispatcher(new InteractionPhysicsMetaEngine);
-	interactionPhysicsDispatcher->add("BodyMacroParameters","BodyMacroParameters","CohesiveFrictionalRelationships", cohesiveFrictionalRelationships);
+	interactionPhysicsDispatcher->add("BodyMacroParameters","BodyMacroParameters","SimpleElasticRelationships");
 		
 	shared_ptr<BoundingVolumeMetaEngine> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeMetaEngine>(new BoundingVolumeMetaEngine);
 	boundingVolumeDispatcher->add("InteractingSphere","AABB","InteractingSphere2AABB");
 	boundingVolumeDispatcher->add("InteractingBox","AABB","InteractingBox2AABB");
 	boundingVolumeDispatcher->add("MetaInteractingGeometry","AABB","MetaInteractingGeometry2AABB");
-
 	
-
-		
 	shared_ptr<GravityEngine> gravityCondition(new GravityEngine);
 	gravityCondition->gravity = gravity;
-	
+//	shared_ptr<HydraulicForceEngine> hydraulicForceCondition(new HydraulicForceEngine);
+//	hydraulicForceCondition->hydraulicForce = hydraulicForce;
+  	shared_ptr<MakeItFlat> makeItFlat(new MakeItFlat);
+//	makeItFlatCondition->makeItFlat= makeItFlat;
+
 	shared_ptr<CundallNonViscousForceDamping> actionForceDamping(new CundallNonViscousForceDamping);
 	actionForceDamping->damping = dampingForce;
 	shared_ptr<CundallNonViscousMomentumDamping> actionMomentumDamping(new CundallNonViscousMomentumDamping);
@@ -624,12 +628,9 @@ void CohesiveTriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	globalStiffnessTimeStepper->sdecGroupMask = 2;
 	globalStiffnessTimeStepper->timeStepUpdateInterval = timeStepUpdateInterval;
 	globalStiffnessTimeStepper->defaultDt = defaultDt;
-	globalStiffnessTimeStepper->timestepSafetyCoefficient = 0.2;
 	
-	shared_ptr<HydraulicForceEngine> hydraulicForceEngine (new HydraulicForceEngine);
-	
-	shared_ptr<CohesiveFrictionalContactLaw> cohesiveFrictionalContactLaw(new CohesiveFrictionalContactLaw);
-	cohesiveFrictionalContactLaw->sdecGroupMask = 2;
+	shared_ptr<ElasticContactLaw> elasticContactLaw(new ElasticContactLaw);
+	elasticContactLaw->sdecGroupMask = 2;
 	
 	//shared_ptr<StiffnessCounter> stiffnesscounter(new StiffnessCounter);
 	//stiffnesscounter->sdecGroupMask = 2;
@@ -678,17 +679,19 @@ void CohesiveTriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	rootBody->engines.push_back(shared_ptr<Engine>(new PhysicalActionContainerReseter));
 //	rootBody->engines.push_back(sdecTimeStepper);	
 	rootBody->engines.push_back(boundingVolumeDispatcher);
-	rootBody->engines.push_back(shared_ptr<Engine>(new DistantPersistentSAPCollider));
+	rootBody->engines.push_back(shared_ptr<Engine>(new PersistentSAPCollider));
 	rootBody->engines.push_back(interactionGeometryDispatcher);
 	rootBody->engines.push_back(interactionPhysicsDispatcher);
-	rootBody->engines.push_back(cohesiveFrictionalContactLaw);
+	rootBody->engines.push_back(elasticContactLaw);
 	rootBody->engines.push_back(triaxialcompressionEngine);
 	//rootBody->engines.push_back(stiffnesscounter);
 	//rootBody->engines.push_back(stiffnessMatrixTimeStepper);
 	rootBody->engines.push_back(globalStiffnessCounter);
 	rootBody->engines.push_back(globalStiffnessTimeStepper);
 	rootBody->engines.push_back(wallStressRecorder);
-	//rootBody->engines.push_back(hydraulicForceEngine);//<-------------HYDRAULIC ENGINE HERE
+	rootBody->engines.push_back(gravityCondition);
+	if(want_2d)
+		rootBody->engines.push_back(makeItFlat);
 	rootBody->engines.push_back(actionDampingDispatcher);
 	rootBody->engines.push_back(applyActionDispatcher);
 	rootBody->engines.push_back(positionIntegrator);
@@ -698,9 +701,9 @@ void CohesiveTriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	//rootBody->engines.push_back(triaxialstressController);
 	
 		
-	//rootBody->engines.push_back(averagePositionRecorder);
-	//rootBody->engines.push_back(velocityRecorder);
-	//rootBody->engines.push_back(forcerec);
+	rootBody->engines.push_back(averagePositionRecorder);
+	rootBody->engines.push_back(velocityRecorder);
+	rootBody->engines.push_back(forcerec);
 	
 	if (saveAnimationSnapshots) {
 	shared_ptr<PositionOrientationRecorder> positionOrientationRecorder(new PositionOrientationRecorder);
@@ -714,7 +717,7 @@ void CohesiveTriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 }
 
 
-void CohesiveTriaxialTest::positionRootBody(shared_ptr<MetaBody>& rootBody)
+void ModifiedTriaxialTest::positionRootBody(shared_ptr<MetaBody>& rootBody)
 {
 	rootBody->isDynamic		= false;
 
