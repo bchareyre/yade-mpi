@@ -25,7 +25,8 @@ class CohesiveFrictionalContactLaw : public InteractionSolver
 
 	public :
 		int sdecGroupMask;
-		bool momentRotationLaw;
+		bool momentRotationLaw, erosionActivated, detectBrokenBodies;
+		long iter;/// used for checking if new iteration
 	
 		CohesiveFrictionalContactLaw();
 		void action(Body* body);

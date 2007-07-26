@@ -27,6 +27,7 @@ class CohesiveFrictionalRelationships : public InteractionPhysicsEngineUnit
 				setCohesionOnNewContacts;
 				
 		int cohesionDefinitionIteration;
+		long iter;//REMOVE THIS
 
 	protected :
 		virtual void registerAttributes();

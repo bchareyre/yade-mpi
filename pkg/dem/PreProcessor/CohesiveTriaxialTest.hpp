@@ -22,7 +22,7 @@ class AveragePositionRecorder;
 class VelocityRecorder;
 class TriaxialStressController;
 class TriaxialCompressionEngine;
-class WallStressRecorder;
+class TriaxialStateRecorder;
 
 /*! \brief Isotropic compression + uniaxial compression test
 
@@ -114,7 +114,7 @@ class CohesiveTriaxialTest : public FileGenerator
 		shared_ptr<AveragePositionRecorder> averagePositionRecorder;
 		shared_ptr<TriaxialCompressionEngine> triaxialcompressionEngine;
 		shared_ptr<TriaxialStressController> triaxialstressController;
-		shared_ptr<WallStressRecorder> wallStressRecorder;
+		shared_ptr<TriaxialStateRecorder> triaxialStateRecorder;
 			
 		void createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents,bool wire);
 		void createSphere(shared_ptr<Body>& body, Vector3r position, Real radius,bool dynamic);

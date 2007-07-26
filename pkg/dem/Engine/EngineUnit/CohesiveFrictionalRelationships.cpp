@@ -11,7 +11,7 @@
 #include<yade/pkg-dem/CohesiveFrictionalContactInteraction.hpp>
 #include<yade/pkg-dem/SDECLinkGeometry.hpp> // FIXME - I can't dispatch by SDECLinkGeometry <-> SpheresContactGeometry !!?
 #include<yade/pkg-dem/SDECLinkPhysics.hpp> // FIXME
-#include<yade/pkg-dem/BodyMacroParameters.hpp>
+#include<yade/pkg-dem/CohesiveFrictionalBodyParameters.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/core/MetaBody.hpp>
 
@@ -22,7 +22,7 @@ CohesiveFrictionalRelationships::CohesiveFrictionalRelationships()
 		shearCohesion = 10000000;
 		setCohesionNow = false;
 		setCohesionOnNewContacts = false;
-		cohesionDefinitionIteration = -1;
+		cohesionDefinitionIteration = -1; 
 }
 
 
@@ -35,13 +35,13 @@ void CohesiveFrictionalRelationships::registerAttributes()
 }
 
 
-void CohesiveFrictionalRelationships::go(	  const shared_ptr<PhysicalParameters>& b1 // BodyMacroParameters
-					, const shared_ptr<PhysicalParameters>& b2 // BodyMacroParameters
+void CohesiveFrictionalRelationships::go(	  const shared_ptr<PhysicalParameters>& b1 // CohesiveFrictionalBodyParameters
+					, const shared_ptr<PhysicalParameters>& b2 // CohesiveFrictionalBodyParameters
 					, const shared_ptr<Interaction>& interaction)
 {
-	BodyMacroParameters* sdec1 = static_cast<BodyMacroParameters*>(b1.get());
-	BodyMacroParameters* sdec2 = static_cast<BodyMacroParameters*>(b2.get());
-	SpheresContactGeometry* interactionGeometry = dynamic_cast<SpheresContactGeometry*>(interaction->interactionGeometry.get());	
+	CohesiveFrictionalBodyParameters* sdec1 = static_cast<CohesiveFrictionalBodyParameters*>(b1.get());
+	CohesiveFrictionalBodyParameters* sdec2 = static_cast<CohesiveFrictionalBodyParameters*>(b2.get());
+	SpheresContactGeometry* interactionGeometry = dynamic_cast<SpheresContactGeometry*>(interaction->interactionGeometry.get());
 	
 	//Create cohesive interractions only once
 	if (setCohesionNow && cohesionDefinitionIteration==-1) {
@@ -49,7 +49,8 @@ void CohesiveFrictionalRelationships::go(	  const shared_ptr<PhysicalParameters>
 	if (setCohesionNow && cohesionDefinitionIteration!=-1 && cohesionDefinitionIteration!=Omega::instance().getCurrentIteration()) {
 		cohesionDefinitionIteration = -1;
 		setCohesionNow = 0;}
-		
+	
+	
 	if(interactionGeometry) // so it is SpheresContactGeometry  - NON PERMANENT LINK
 	{
 		if(interaction->isNew)
@@ -81,7 +82,8 @@ void CohesiveFrictionalRelationships::go(	  const shared_ptr<PhysicalParameters>
 			contactPhysics->frictionAngle			= std::min(fa,fb); // FIXME - this is actually a waste of memory space, just like initialKs and initialKn
 			contactPhysics->tangensOfFrictionAngle		= std::tan(contactPhysics->frictionAngle);
 
-			if (setCohesionOnNewContacts || setCohesionNow) { 
+			if ((setCohesionOnNewContacts || setCohesionNow) && sdec1->isCohesive && sdec2->isCohesive) { 
+			contactPhysics->cohesionBroken = false;
 			contactPhysics->normalAdhesion			= normalCohesion*pow(std::min(interactionGeometry->radius2, interactionGeometry->radius1),2);
 			contactPhysics->shearAdhesion			= shearCohesion*pow(std::min(interactionGeometry->radius2, interactionGeometry->radius1),2);;
 			}
@@ -101,7 +103,8 @@ void CohesiveFrictionalRelationships::go(	  const shared_ptr<PhysicalParameters>
 			contactPhysics->kn = contactPhysics->initialKn;
 			contactPhysics->ks = contactPhysics->initialKs;
 			contactPhysics->equilibriumDistance = contactPhysics->initialEquilibriumDistance;
-			if (setCohesionNow) { 
+			if (setCohesionNow && sdec1->isCohesive && sdec2->isCohesive) { 
+			contactPhysics->cohesionBroken = false;
 			contactPhysics->normalAdhesion			= normalCohesion*pow(std::min(interactionGeometry->radius2, interactionGeometry->radius1),2);
 			contactPhysics->shearAdhesion			= shearCohesion*pow(std::min(interactionGeometry->radius2, interactionGeometry->radius1),2);
 			//setCohesionNow = false;

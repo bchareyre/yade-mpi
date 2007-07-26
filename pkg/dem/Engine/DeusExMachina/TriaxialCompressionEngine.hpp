@@ -27,7 +27,7 @@ class TriaxialCompressionEngine : public TriaxialStressController
 {
 	private :
 		shared_ptr<PhysicalAction> actionForce;
-		
+				
 	public :
 		TriaxialCompressionEngine();
 		virtual ~TriaxialCompressionEngine();
@@ -39,11 +39,13 @@ class TriaxialCompressionEngine : public TriaxialStressController
 		Real UnbalancedForce;
 		//! Value of UnbalancedForce for which the system is considered stable
 		Real StabilityCriterion;
-		Vector3r strain;
+		//! Previous value of inherited sigma_iso (used to detect changes of the confining pressure)
+		Real previousSigmaIso;
+		//Vector3r strain;
 		Vector3r translationAxis;
 		//! is isotropicInternalCompactionFinished?
-		bool Phase1;
-		int FinalIterationPhase1, Iteration;
+		bool Phase1, saveSimulation;
+		int FinalIterationPhase1, Iteration, testEquilibriumInterval;
 		std::string Phase1End; //,Phase2End;
 		//! Is uniaxial compression currently activated?
 		bool compressionActivated;
@@ -52,8 +54,7 @@ class TriaxialCompressionEngine : public TriaxialStressController
 				
 		virtual void applyCondition(Body * body);
 		void updateParameters(Body * body);
-		//! Compute the mean/max unbalanced force in the assembly (normalized by mean contact force)
-    		Real ComputeUnbalancedForce(Body * body, bool maxUnbalanced=false);
+		
 
 	protected :
 		virtual void postProcessAttributes(bool);

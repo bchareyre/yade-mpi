@@ -11,6 +11,14 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'yade-serialization',
 			'yade-base',
 			'yade-multimethods']),
+	
+	env.SharedLibrary('CohesiveFrictionalBodyParameters',
+		['DataClass/PhysicalParameters/CohesiveFrictionalBodyParameters.cpp'],
+		LIBS=env['LIBS']+['RigidBodyParameters',
+			'BodyMacroParameters',
+			'yade-serialization',
+			'yade-base',
+			'yade-multimethods']),
 
 	env.SharedLibrary('SpheresContactGeometry',
 		['DataClass/InteractionGeometry/SpheresContactGeometry.cpp'],
@@ -140,7 +148,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'SDECLinkGeometry',
 			'CohesiveFrictionalContactInteraction',
 			'SpheresContactGeometry',
-			'BodyMacroParameters',
+			'CohesiveFrictionalBodyParameters',
 			'RigidBodyParameters',
 			'ParticleParameters',
 			'InteractionPhysicsMetaEngine']),
@@ -167,7 +175,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'CohesiveFrictionalContactInteraction',
 			'SDECLinkGeometry',
 			'SpheresContactGeometry',
-			'BodyMacroParameters',
+			'CohesiveFrictionalBodyParameters',
 			'yade-serialization',
 			'yade-base',
 			
@@ -539,7 +547,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'TriaxialCompressionEngine',
 			'GlobalStiffnessTimeStepper',
 			'yade-base',
-			'WallStressRecorder',
+			'TriaxialStateRecorder',
 			'PositionOrientationRecorder']),
 			
 	env.SharedLibrary('CohesiveTriaxialTest',
@@ -583,7 +591,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'TriaxialCompressionEngine',
 			'GlobalStiffnessTimeStepper',
 			'yade-base',
-			'WallStressRecorder',
+			'TriaxialStateRecorder',
 			'PositionOrientationRecorder',
 			'HydraulicForceEngine']),
 
@@ -635,6 +643,10 @@ env.SharedLibrary('WallStressRecorder',
 			'TriaxialCompressionEngine',
 			'Sphere',
 			'ElasticContactLaw']),
+			
+env.SharedLibrary('TriaxialStateRecorder',
+		['Engine/DeusExMachina/TriaxialStateRecorder.cpp'],
+		LIBS=env['LIBS']+['TriaxialCompressionEngine']),
 
 env.SharedLibrary('CapillaryPressureEngine',
 		['Engine/DeusExMachina/CapillaryPressureEngine.cpp'],
@@ -657,7 +669,7 @@ env.SharedLibrary('TriaxialTestWater',
         AveragePositionRecorder
         VelocityRecorder
         ForceRecorder
-        WallStressRecorder
+        TriaxialStateRecorder
         CapillaryStressRecorder
         ContactStressRecorder
         MacroMicroElasticRelationships
@@ -758,7 +770,7 @@ env.SharedLibrary('InteractingSphere2AABBwater',
 		
 env.SharedLibrary('HydraulicForceEngine',
 		['Engine/DeusExMachina/HydraulicForceEngine.cpp'],
-		LIBS=env['LIBS']+['yade-base',  'Force', 'ParticleParameters'],
+		LIBS=env['LIBS']+['yade-base',  'Force', 'Momentum', 'ParticleParameters', 'CohesiveFrictionalBodyParameters'],
 		CPPPATH=env['CPPPATH']+['Engine/DeusExMachina',
 			'DataClass/PhysicalAction',
 			'$PREFIX/include',
@@ -813,11 +825,11 @@ env.SharedLibrary('HydraulicTest',
 			'TriaxialCompressionEngine',
 			'GlobalStiffnessTimeStepper',
 			'yade-base',
-			'WallStressRecorder',
+			'TriaxialStateRecorder',
 			'PositionOrientationRecorder',
 			'HydraulicForceEngine',
 			'MakeItFlat',
-			'TranslationEngine']),
+			'TranslationEngine',]),
 
 
 

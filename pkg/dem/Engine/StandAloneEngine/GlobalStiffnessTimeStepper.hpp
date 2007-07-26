@@ -20,7 +20,7 @@ class PhysicalAction;
 class GlobalStiffnessTimeStepper : public TimeStepper
 {
 	private :
-		Real		newDt;
+		Real		newDt, previousDt;
 		bool		computedSomething,
 				computedOnce;
 		shared_ptr<MacroMicroElasticRelationships> sdecContactModel;

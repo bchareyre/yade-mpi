@@ -25,6 +25,7 @@ GlobalStiffnessTimeStepper::GlobalStiffnessTimeStepper() : TimeStepper() , sdecC
 	timestepSafetyCoefficient = 0.25;
 	computedOnce = false;
 	defaultDt = 1;
+	previousDt = defaultDt;
 	
 }
 
@@ -40,6 +41,7 @@ void GlobalStiffnessTimeStepper::registerAttributes()
 	TimeStepper::registerAttributes();
 	REGISTER_ATTRIBUTE(sdecGroupMask);
 	REGISTER_ATTRIBUTE(defaultDt);
+	REGISTER_ATTRIBUTE(previousDt);
 	REGISTER_ATTRIBUTE(timestepSafetyCoefficient);
 }
 
@@ -122,7 +124,7 @@ void GlobalStiffnessTimeStepper::findTimeStepFromInteraction(const shared_ptr<In
 
 bool GlobalStiffnessTimeStepper::isActivated()
 {
-	return (active && (!computedOnce || (Omega::instance().getCurrentIteration() % timeStepUpdateInterval == 0)));
+	return (active && ((!computedOnce) || (Omega::instance().getCurrentIteration() % timeStepUpdateInterval == 0) || (Omega::instance().getCurrentIteration() < (long int) 2) ));
 }
 
 
@@ -168,12 +170,14 @@ void GlobalStiffnessTimeStepper::computeTimeStep(Body* body)
 	if(computedSomething)
 	{
 		Omega::instance().setTimeStep(min(newDt , defaultDt));
+		previousDt = newDt;
 		//Omega::instance().setTimeStep(newDt);
 		computedOnce = true;	
 		//cerr << "computedOnce=" << computedOnce << endl;	
 		//cerr << "GlobalStiffnessTimeStepper, timestep chosen is:" << Omega::instance().getTimeStep() << endl;
 	}
-	else if (!computedOnce) Omega::instance().setTimeStep(defaultDt);
+	else if (!computedOnce) Omega::instance().setTimeStep(previousDt);
+	if (Omega::instance().getCurrentIteration() % 100 == 0)
 	cerr << "computed timestep = " << newDt << "; new timestep is:" << Omega::instance().getTimeStep() << endl;
 }
 

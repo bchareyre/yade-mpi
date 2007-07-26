@@ -12,15 +12,18 @@
 #include<yade/core/DeusExMachina.hpp>
 
 class Force;
+class Momentum;
 
 class HydraulicForceEngine : public DeusExMachina 
 {
 	private	:
 		shared_ptr<Force> actionParameterForce;
+		shared_ptr<Momentum> actionParameterMomentum;
 
 	public :
 		Vector3r gravity;
 		bool isActivated;
+		bool dummyParameter;
 		HydraulicForceEngine();
 		virtual ~HydraulicForceEngine();
 	

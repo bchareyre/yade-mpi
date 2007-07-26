@@ -22,7 +22,7 @@
 #include <yade/pkg-dem/AveragePositionRecorder.hpp>
 #include <yade/pkg-dem/ForceRecorder.hpp>
 #include <yade/pkg-dem/VelocityRecorder.hpp>
-#include <yade/pkg-dem/WallStressRecorder.hpp>
+#include <yade/pkg-dem/TriaxialStateRecorder.hpp>
 #include <yade/pkg-dem/CapillaryStressRecorder.hpp>
 #include <yade/pkg-dem/ContactStressRecorder.hpp>
 #include <yade/pkg-dem/TriaxialStressController.hpp>
@@ -139,7 +139,7 @@ TriaxialTestWater::TriaxialTestWater () : FileGenerator()
 	timeStepOutputInterval = 50;
 	wallStiffnessUpdateInterval = 1;
 	numberOfGrains = 1000;
-	max_vel = 0.00001;
+	max_vel = 1;
 	strainRate = 0.1;
 	StabilityCriterion = 0.01;
 	autoCompressionActivation = true;
@@ -274,7 +274,7 @@ bool TriaxialTestWater::generate()
 			= body->getId();
 			forcerec->startId = body->getId();
 			forcerec->endId   = body->getId();
-			wallStressRecorder->wall_bottom_id = body->getId();
+			//triaxialStateRecorder->wall_bottom_id = body->getId();
 			capillaryStressRecorder->wall_bottom_id = body->getId();
 			contactStressRecorder->wall_bottom_id = body->getId();
 			}
@@ -293,7 +293,7 @@ bool TriaxialTestWater::generate()
 	 	if(wall_top) {
 			rootBody->bodies->insert(body);
 			triaxialcompressionEngine->wall_top_id = body->getId();
-			wallStressRecorder->wall_top_id = body->getId();
+			//triaxialStateRecorder->wall_top_id = body->getId();
 			capillaryStressRecorder->wall_top_id = body->getId();
 			contactStressRecorder->wall_top_id = body->getId();
 			}
@@ -311,7 +311,7 @@ bool TriaxialTestWater::generate()
 	 	if(wall_1) {
 			rootBody->bodies->insert(body);
 			triaxialcompressionEngine->wall_left_id = body->getId();
-			wallStressRecorder->wall_left_id = body->getId();
+			//triaxialStateRecorder->wall_left_id = body->getId();
 			capillaryStressRecorder->wall_left_id = body->getId();
 			contactStressRecorder->wall_left_id = body->getId();
 			}
@@ -329,7 +329,7 @@ bool TriaxialTestWater::generate()
 	 	if(wall_2) {
 			rootBody->bodies->insert(body);
 			triaxialcompressionEngine->wall_right_id = body->getId();
-			wallStressRecorder->wall_right_id = body->getId();
+			//triaxialStateRecorder->wall_right_id = body->getId();
 			capillaryStressRecorder->wall_right_id = body->getId();
 			contactStressRecorder->wall_right_id = body->getId();
 			}
@@ -346,7 +346,7 @@ bool TriaxialTestWater::generate()
 	 	if(wall_3) {
 			rootBody->bodies->insert(body);
 			triaxialcompressionEngine->wall_back_id = body->getId();
-			wallStressRecorder->wall_back_id = body->getId();
+			//triaxialStateRecorder->wall_back_id = body->getId();
 			capillaryStressRecorder->wall_back_id = body->getId();
 			contactStressRecorder->wall_back_id = body->getId();
 			}
@@ -364,7 +364,7 @@ bool TriaxialTestWater::generate()
 	 	if(wall_4) {
 			rootBody->bodies->insert(body);
 			triaxialcompressionEngine->wall_front_id = body->getId();
-			wallStressRecorder->wall_front_id = body->getId();
+			//triaxialStateRecorder->wall_front_id = body->getId();
 			capillaryStressRecorder->wall_front_id = body->getId();
 			contactStressRecorder->wall_front_id = body->getId();
 			}
@@ -498,11 +498,11 @@ void TriaxialTestWater::createActors(shared_ptr<MetaBody>& rootBody)
 	velocityRecorder-> interval 	= recordIntervalIter;
 
 // recording global stress
-	wallStressRecorder = shared_ptr<WallStressRecorder>(new
-	WallStressRecorder);
-	wallStressRecorder-> outputFile 	= wallStressRecordFile;
-	wallStressRecorder-> interval 		= recordIntervalIter;
-	wallStressRecorder-> thickness 		= thickness;
+	triaxialStateRecorder = shared_ptr<TriaxialStateRecorder>(new
+	TriaxialStateRecorder);
+	triaxialStateRecorder-> outputFile 	= wallStressRecordFile;
+	triaxialStateRecorder-> interval 		= recordIntervalIter;
+	//triaxialStateRecorder-> thickness 		= thickness;
 	
 // recording capillary stress
 	capillaryStressRecorder = shared_ptr<CapillaryStressRecorder>(new
@@ -592,7 +592,7 @@ void TriaxialTestWater::createActors(shared_ptr<MetaBody>& rootBody)
 	cerr << "triaxialstressController = shared_ptr" << std::endl;
 	triaxialstressController = shared_ptr<TriaxialStressController> (new
 	TriaxialStressController);
-	triaxialstressController->interval = 1;// = recordIntervalIter
+	triaxialstressController->stiffnessUpdateInterval = 10;// = recordIntervalIter
 	triaxialstressController->sigma_iso = sigma_iso;
 	triaxialstressController->maxMultiplier = maxMultiplier;
 	triaxialstressController->finalMaxMultiplier = finalMaxMultiplier;
@@ -606,7 +606,7 @@ void TriaxialTestWater::createActors(shared_ptr<MetaBody>& rootBody)
 	//packing is dense an stable
 	cerr << "triaxialcompressionEngine = shared_ptr<TriaxialCompressionEngine> (new TriaxialCompressionEngine);" << std::endl;
 	triaxialcompressionEngine = shared_ptr<TriaxialCompressionEngine> (new TriaxialCompressionEngine);
-	triaxialcompressionEngine-> interval = wallStiffnessUpdateInterval;// = stiffness update interval
+	triaxialcompressionEngine-> stiffnessUpdateInterval = wallStiffnessUpdateInterval;// = stiffness update interval
 	triaxialcompressionEngine->sigma_iso = sigma_iso;
 	triaxialcompressionEngine->max_vel = max_vel;
 	triaxialcompressionEngine->thickness = thickness;
@@ -641,7 +641,7 @@ void TriaxialTestWater::createActors(shared_ptr<MetaBody>& rootBody)
 	//rootBody->engines.push_back(triaxialstressController);
 	rootBody->engines.push_back(triaxialcompressionEngine);
 	rootBody->engines.push_back(forcerec);	
-	rootBody->engines.push_back(wallStressRecorder);
+	rootBody->engines.push_back(triaxialStateRecorder);
 	rootBody->engines.push_back(contactStressRecorder);
 	rootBody->engines.push_back(actionDampingDispatcher);
 	rootBody->engines.push_back(applyActionDispatcher);
@@ -655,7 +655,7 @@ void TriaxialTestWater::createActors(shared_ptr<MetaBody>& rootBody)
 	rootBody->engines.push_back(velocityRecorder);
 	//rootBody->engines.push_back(forcerec);
 	
-	//rootBody->engines.push_back(wallStressRecorder);
+	//rootBody->engines.push_back(triaxialStateRecorder);
 	//rootBody->engines.push_back(contactStressRecorder);
 	
 	rootBody->initializers.clear();

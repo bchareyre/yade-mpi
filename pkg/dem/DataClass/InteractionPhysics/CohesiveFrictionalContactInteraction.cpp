@@ -13,7 +13,7 @@ CohesiveFrictionalContactInteraction::CohesiveFrictionalContactInteraction()
 {
 	createIndex();
 	cohesionDisablesFriction = false;
-	cohesionBroken = false;
+	cohesionBroken = true;
 	fragile = true;
 	normalAdhesion = 0;
 	shearAdhesion = 0;
@@ -23,10 +23,10 @@ CohesiveFrictionalContactInteraction::CohesiveFrictionalContactInteraction()
 void CohesiveFrictionalContactInteraction::SetBreakingState()
 {
 	
-	if (fragile) {
+	//if (fragile) {
 		cohesionBroken = true;
 		normalAdhesion = 0;
-		shearAdhesion = 0;}
+		shearAdhesion = 0;//}
 	
 }
 

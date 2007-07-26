@@ -18,7 +18,7 @@ class AveragePositionRecorder;
 class VelocityRecorder;
 class TriaxialStressController;
 class TriaxialCompressionEngine;
-class WallStressRecorder;
+class TriaxialStateRecorder;
 class CapillaryStressRecorder;
 class ContactStressRecorder;
 
@@ -110,7 +110,7 @@ class TriaxialTestWater : public FileGenerator
 		shared_ptr<ForceRecorder> forcerec;
 		shared_ptr<VelocityRecorder> velocityRecorder;
 		shared_ptr<AveragePositionRecorder> averagePositionRecorder;
-		shared_ptr<WallStressRecorder> wallStressRecorder;
+		shared_ptr<TriaxialStateRecorder> triaxialStateRecorder;
 		shared_ptr<CapillaryStressRecorder> capillaryStressRecorder;
 		shared_ptr<ContactStressRecorder> contactStressRecorder;
 		shared_ptr<TriaxialCompressionEngine> triaxialcompressionEngine;

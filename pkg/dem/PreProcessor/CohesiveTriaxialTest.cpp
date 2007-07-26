@@ -14,7 +14,7 @@
 
 #include<yade/pkg-dem/CohesiveFrictionalContactLaw.hpp>
 #include<yade/pkg-dem/CohesiveFrictionalRelationships.hpp>
-#include<yade/pkg-dem/BodyMacroParameters.hpp>
+#include<yade/pkg-dem/CohesiveFrictionalBodyParameters.hpp>
 #include<yade/pkg-dem/SDECLinkGeometry.hpp>
 #include<yade/pkg-dem/SDECLinkPhysics.hpp>
 #include<yade/pkg-dem/GlobalStiffnessCounter.hpp>
@@ -26,7 +26,7 @@
 #include<yade/pkg-dem/VelocityRecorder.hpp>
 #include<yade/pkg-dem/TriaxialStressController.hpp>
 #include<yade/pkg-dem/TriaxialCompressionEngine.hpp>
-#include <yade/pkg-dem/WallStressRecorder.hpp>
+#include <yade/pkg-dem/TriaxialStateRecorder.hpp>
 
 #include<yade/pkg-common/Box.hpp>
 #include<yade/pkg-common/AABB.hpp>
@@ -135,7 +135,7 @@ CohesiveTriaxialTest::CohesiveTriaxialTest () : FileGenerator()
 	StabilityCriterion = 0.01;
 	autoCompressionActivation = false;
 	maxMultiplier = 1.01;
-	finalMaxMultiplier = 1.001;
+	finalMaxMultiplier = 1.0001;
 	
 	sphereYoungModulus  = 15000000.0;
 	spherePoissonRatio  = 0.5;
@@ -268,16 +268,16 @@ bool CohesiveTriaxialTest::generate()
 	 						lowerCorner[1]-thickness/2.0,
 	 						(lowerCorner[2]+upperCorner[2])/2);
 	 	Vector3r halfSize	= Vector3r(
-	 						fabs(lowerCorner[0]-upperCorner[0])/2+thickness,
+	 						1.5*fabs(lowerCorner[0]-upperCorner[0])/2+thickness,
 							thickness/2.0,
-	 						fabs(lowerCorner[2]-upperCorner[2])/2+thickness);
+	 						1.5*fabs(lowerCorner[2]-upperCorner[2])/2+thickness);
 	
 		createBox(body,center,halfSize,wall_bottom_wire);
 	 	if(wall_bottom) {
 			rootBody->bodies->insert(body);
 			//(resultantforceEngine->subscribedBodies).push_back(body->getId());
 			triaxialcompressionEngine->wall_bottom_id = body->getId();
-			wallStressRecorder->wall_bottom_id = body->getId();
+			//triaxialStateRecorder->wall_bottom_id = body->getId();
 			forcerec->startId = body->getId();
 			forcerec->endId   = body->getId();
 			}
@@ -289,15 +289,15 @@ bool CohesiveTriaxialTest::generate()
 	 						upperCorner[1]+thickness/2.0,
 	 						(lowerCorner[2]+upperCorner[2])/2);
 	 	halfSize		= Vector3r(
-	 						fabs(lowerCorner[0]-upperCorner[0])/2+thickness,
+	 						1.5*fabs(lowerCorner[0]-upperCorner[0])/2+thickness,
 	 						thickness/2.0,
-	 						fabs(lowerCorner[2]-upperCorner[2])/2+thickness);
+	 						1.5*fabs(lowerCorner[2]-upperCorner[2])/2+thickness);
 	
 		createBox(body,center,halfSize,wall_top_wire);
 	 	if(wall_top) {
 			rootBody->bodies->insert(body);
 			triaxialcompressionEngine->wall_top_id = body->getId();
-			wallStressRecorder->wall_top_id = body->getId();
+			//triaxialStateRecorder->wall_top_id = body->getId();
 			}
 	// box 1
 	
@@ -307,13 +307,13 @@ bool CohesiveTriaxialTest::generate()
 	 						(lowerCorner[2]+upperCorner[2])/2);
 		halfSize		= Vector3r(
 							thickness/2.0,
-	 						fabs(lowerCorner[1]-upperCorner[1])/2+thickness,
-	 						fabs(lowerCorner[2]-upperCorner[2])/2+thickness);
+	 						1.5*fabs(lowerCorner[1]-upperCorner[1])/2+thickness,
+	 						1.5*fabs(lowerCorner[2]-upperCorner[2])/2+thickness);
 		createBox(body,center,halfSize,wall_1_wire);
 	 	if(wall_1) {
 			rootBody->bodies->insert(body);
 			triaxialcompressionEngine->wall_left_id = body->getId();
-			wallStressRecorder->wall_left_id = body->getId();
+			//triaxialStateRecorder->wall_left_id = body->getId();
 			}
 	// box 2
 	 	center			= Vector3r(
@@ -322,14 +322,14 @@ bool CohesiveTriaxialTest::generate()
 							(lowerCorner[2]+upperCorner[2])/2);
 	 	halfSize		= Vector3r(
 	 						thickness/2.0,
-	 						fabs(lowerCorner[1]-upperCorner[1])/2+thickness,
-	 						fabs(lowerCorner[2]-upperCorner[2])/2+thickness);
+	 						1.5*fabs(lowerCorner[1]-upperCorner[1])/2+thickness,
+	 						1.5*fabs(lowerCorner[2]-upperCorner[2])/2+thickness);
 	 	
 		createBox(body,center,halfSize,wall_2_wire);
 	 	if(wall_2) {
 			rootBody->bodies->insert(body);
 			triaxialcompressionEngine->wall_right_id = body->getId();
-			wallStressRecorder->wall_right_id = body->getId();
+			//triaxialStateRecorder->wall_right_id = body->getId();
 			}
 	// box 3
 	 	center			= Vector3r(
@@ -337,14 +337,14 @@ bool CohesiveTriaxialTest::generate()
 	 						(lowerCorner[1]+upperCorner[1])/2,
 	 						lowerCorner[2]-thickness/2.0);
 	 	halfSize		= Vector3r(
-	 						fabs(lowerCorner[0]-upperCorner[0])/2+thickness,
-	 						fabs(lowerCorner[1]-upperCorner[1])/2+thickness,
+	 						1.5*fabs(lowerCorner[0]-upperCorner[0])/2+thickness,
+	 						1.5*fabs(lowerCorner[1]-upperCorner[1])/2+thickness,
 	 						thickness/2.0);
 		createBox(body,center,halfSize,wall_3_wire);
 	 	if(wall_3) {
 			rootBody->bodies->insert(body);
 			triaxialcompressionEngine->wall_back_id = body->getId();
-			wallStressRecorder->wall_back_id = body->getId();
+			//triaxialStateRecorder->wall_back_id = body->getId();
 			}
 	
 	// box 4
@@ -353,14 +353,14 @@ bool CohesiveTriaxialTest::generate()
 	 						(lowerCorner[1]+upperCorner[1])/2,
 	 						upperCorner[2]+thickness/2.0);
 	 	halfSize		= Vector3r(
-	 						fabs(lowerCorner[0]-upperCorner[0])/2+thickness,
-	 						fabs(lowerCorner[1]-upperCorner[1])/2+thickness,
+	 						1.5*fabs(lowerCorner[0]-upperCorner[0])/2+thickness,
+	 						1.5*fabs(lowerCorner[1]-upperCorner[1])/2+thickness,
 	 						thickness/2.0);
 		createBox(body,center,halfSize,wall_3_wire);
 	 	if(wall_4) {
 			rootBody->bodies->insert(body);
 			triaxialcompressionEngine->wall_front_id = body->getId();
-			wallStressRecorder->wall_front_id = body->getId();
+			//triaxialStateRecorder->wall_front_id = body->getId();
 			}
 			 
 	}
@@ -456,7 +456,7 @@ bool CohesiveTriaxialTest::generate()
 void CohesiveTriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r position, Real radius, bool dynamic )
 {
 	body = shared_ptr<Body>(new Body(body_id_t(0),2));
-	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
+	shared_ptr<CohesiveFrictionalBodyParameters> physics(new CohesiveFrictionalBodyParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<Sphere> gSphere(new Sphere);
 	shared_ptr<InteractingSphere> iSphere(new InteractingSphere);
@@ -507,7 +507,7 @@ void CohesiveTriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r positio
 void CohesiveTriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents, bool wire)
 {
 	body = shared_ptr<Body>(new Body(body_id_t(0),2));
-	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
+	shared_ptr<CohesiveFrictionalBodyParameters> physics(new CohesiveFrictionalBodyParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<Box> gBox(new Box);
 	shared_ptr<InteractingBox> iBox(new InteractingBox);
@@ -533,6 +533,7 @@ void CohesiveTriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, 
 	physics->young			= boxYoungModulus;
 	physics->poisson		= boxPoissonRatio;
 	physics->frictionAngle		= boxFrictionDeg * Mathr::PI/180.0;
+	physics->isCohesive		= false;
 
 	aabb->diffuseColor		= Vector3r(1,0,0);
 
@@ -582,7 +583,7 @@ void CohesiveTriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	cohesiveFrictionalRelationships->normalCohesion = normalCohesion;
 	cohesiveFrictionalRelationships->setCohesionOnNewContacts = setCohesionOnNewContacts;
 	shared_ptr<InteractionPhysicsMetaEngine> interactionPhysicsDispatcher(new InteractionPhysicsMetaEngine);
-	interactionPhysicsDispatcher->add("BodyMacroParameters","BodyMacroParameters","CohesiveFrictionalRelationships", cohesiveFrictionalRelationships);
+	interactionPhysicsDispatcher->add("CohesiveFrictionalBodyParameters","CohesiveFrictionalBodyParameters","CohesiveFrictionalRelationships", cohesiveFrictionalRelationships);
 		
 	shared_ptr<BoundingVolumeMetaEngine> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeMetaEngine>(new BoundingVolumeMetaEngine);
 	boundingVolumeDispatcher->add("InteractingSphere","AABB","InteractingSphere2AABB");
@@ -626,8 +627,6 @@ void CohesiveTriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	globalStiffnessTimeStepper->defaultDt = defaultDt;
 	globalStiffnessTimeStepper->timestepSafetyCoefficient = 0.2;
 	
-	shared_ptr<HydraulicForceEngine> hydraulicForceEngine (new HydraulicForceEngine);
-	
 	shared_ptr<CohesiveFrictionalContactLaw> cohesiveFrictionalContactLaw(new CohesiveFrictionalContactLaw);
 	cohesiveFrictionalContactLaw->sdecGroupMask = 2;
 	
@@ -642,31 +641,34 @@ void CohesiveTriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	// moving walls to regulate the stress applied + compress when the packing is dense an stable
 	//cerr << "triaxialcompressionEngine = shared_ptr<TriaxialCompressionEngine> (new TriaxialCompressionEngine);" << std::endl;
 	triaxialcompressionEngine = shared_ptr<TriaxialCompressionEngine> (new TriaxialCompressionEngine);
-	triaxialcompressionEngine-> interval = wallStiffnessUpdateInterval;// = stiffness update interval
+	triaxialcompressionEngine-> stiffnessUpdateInterval = wallStiffnessUpdateInterval;// = stiffness update interval
 	triaxialcompressionEngine-> radiusControlInterval = radiusControlInterval;// = stiffness update interval
 	triaxialcompressionEngine-> sigma_iso = sigma_iso;
-	triaxialcompressionEngine-> max_vel = 0.0001;
+	triaxialcompressionEngine-> max_vel = 1;
 	triaxialcompressionEngine-> thickness = thickness;
 	triaxialcompressionEngine->strainRate = strainRate;
 	triaxialcompressionEngine->StabilityCriterion = StabilityCriterion;
 	triaxialcompressionEngine->autoCompressionActivation = autoCompressionActivation;
 	triaxialcompressionEngine->internalCompaction = internalCompaction;
 	triaxialcompressionEngine->maxMultiplier = maxMultiplier;
+	
+	shared_ptr<HydraulicForceEngine> hydraulicForceEngine = shared_ptr<HydraulicForceEngine> (new HydraulicForceEngine);
+	hydraulicForceEngine->dummyParameter = true;
 		
 	//cerr << "fin de section triaxialcompressionEngine = shared_ptr<TriaxialCompressionEngine> (new TriaxialCompressionEngine);" << std::endl;
 	
 // recording global stress
-	wallStressRecorder = shared_ptr<WallStressRecorder>(new
-	WallStressRecorder);
-	wallStressRecorder-> outputFile 	= WallStressRecordFile;
-	wallStressRecorder-> interval 		= recordIntervalIter;
-	wallStressRecorder-> thickness 		= thickness;
+	triaxialStateRecorder = shared_ptr<TriaxialStateRecorder>(new
+	TriaxialStateRecorder);
+	triaxialStateRecorder-> outputFile 	= WallStressRecordFile;
+	triaxialStateRecorder-> interval 		= recordIntervalIter;
+	//triaxialStateRecorder-> thickness 		= thickness;
 	
 	
 	// moving walls to regulate the stress applied
 	//cerr << "triaxialstressController = shared_ptr<TriaxialStressController> (new TriaxialStressController);" << std::endl;
 	triaxialstressController = shared_ptr<TriaxialStressController> (new TriaxialStressController);
-	triaxialstressController-> interval = 1;// = recordIntervalIter
+	triaxialstressController-> stiffnessUpdateInterval = 20;// = recordIntervalIter
 	triaxialstressController-> sigma_iso = sigma_iso;
 	triaxialstressController-> max_vel = 0.0001;
 	triaxialstressController-> thickness = thickness;
@@ -687,8 +689,8 @@ void CohesiveTriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	//rootBody->engines.push_back(stiffnessMatrixTimeStepper);
 	rootBody->engines.push_back(globalStiffnessCounter);
 	rootBody->engines.push_back(globalStiffnessTimeStepper);
-	rootBody->engines.push_back(wallStressRecorder);
-	//rootBody->engines.push_back(hydraulicForceEngine);//<-------------HYDRAULIC ENGINE HERE
+	rootBody->engines.push_back(triaxialStateRecorder);
+	rootBody->engines.push_back(hydraulicForceEngine);//<-------------HYDRAULIC ENGINE HERE
 	rootBody->engines.push_back(actionDampingDispatcher);
 	rootBody->engines.push_back(applyActionDispatcher);
 	rootBody->engines.push_back(positionIntegrator);
