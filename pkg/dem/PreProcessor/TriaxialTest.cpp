@@ -641,7 +641,7 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	triaxialcompressionEngine-> stiffnessUpdateInterval = wallStiffnessUpdateInterval;// = stiffness update interval
 	triaxialcompressionEngine-> radiusControlInterval = radiusControlInterval;// = stiffness update interval
 	triaxialcompressionEngine-> sigma_iso = sigma_iso;
-	triaxialcompressionEngine-> max_vel = 1;
+	triaxialcompressionEngine-> max_vel = 0.01;
 	triaxialcompressionEngine-> thickness = thickness;
 	triaxialcompressionEngine->strainRate = strainRate;
 	triaxialcompressionEngine->StabilityCriterion = StabilityCriterion;

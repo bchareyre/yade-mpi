@@ -139,7 +139,7 @@ TriaxialTestWater::TriaxialTestWater () : FileGenerator()
 	timeStepOutputInterval = 50;
 	wallStiffnessUpdateInterval = 1;
 	numberOfGrains = 1000;
-	max_vel = 1;
+	max_vel = 0.001;
 	strainRate = 0.1;
 	StabilityCriterion = 0.01;
 	autoCompressionActivation = true;

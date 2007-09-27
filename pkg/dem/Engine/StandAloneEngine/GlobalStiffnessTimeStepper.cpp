@@ -25,7 +25,7 @@ GlobalStiffnessTimeStepper::GlobalStiffnessTimeStepper() : TimeStepper() , sdecC
 	timestepSafetyCoefficient = 0.25;
 	computedOnce = false;
 	defaultDt = 1;
-	previousDt = defaultDt;
+	//previousDt = defaultDt;
 	
 }
 
@@ -41,7 +41,7 @@ void GlobalStiffnessTimeStepper::registerAttributes()
 	TimeStepper::registerAttributes();
 	REGISTER_ATTRIBUTE(sdecGroupMask);
 	REGISTER_ATTRIBUTE(defaultDt);
-	REGISTER_ATTRIBUTE(previousDt);
+	//REGISTER_ATTRIBUTE(previousDt);
 	REGISTER_ATTRIBUTE(timestepSafetyCoefficient);
 }
 
@@ -139,7 +139,7 @@ void GlobalStiffnessTimeStepper::computeTimeStep(Body* body)
 	newDt = Mathr::MAX_REAL;
 	//Real defaultDt = 0.0003;
 	
-	computedSomething = false; // this flag is to avoid setting timestep to MAX_REAL :)
+	//computedSomething = false; // this flag is to avoid setting timestep to MAX_REAL :)
 /*
 	InteractionContainer::iterator ii    = persistentInteractions->begin();
 	InteractionContainer::iterator iiEnd = persistentInteractions->end();
@@ -151,8 +151,8 @@ void GlobalStiffnessTimeStepper::computeTimeStep(Body* body)
 	for(  ; ii!=iiEnd ; ++ii )
 		findTimeStepFromInteraction(*ii , bodies);*/
 
-	if(!computedSomething)
-	{
+	//if(!computedSomething)
+	//{
 		BodyContainer::iterator bi    = bodies->begin();
 		BodyContainer::iterator biEnd = bodies->end();
 		for(  ; bi!=biEnd ; ++bi )
@@ -165,18 +165,18 @@ void GlobalStiffnessTimeStepper::computeTimeStep(Body* body)
 			//cerr << "if( b->getGroupMask() & sdecGroupMask)" << computedSomething << endl;
 				findTimeStepFromBody(b, ncb); }
 		}
-	}	
+	//}	
 		
 	if(computedSomething)
 	{
 		Omega::instance().setTimeStep(min(newDt , defaultDt));
-		previousDt = newDt;
+		//previousDt = Omega::instance().getTimeStep();
 		//Omega::instance().setTimeStep(newDt);
 		computedOnce = true;	
 		//cerr << "computedOnce=" << computedOnce << endl;	
 		//cerr << "GlobalStiffnessTimeStepper, timestep chosen is:" << Omega::instance().getTimeStep() << endl;
 	}
-	else if (!computedOnce) Omega::instance().setTimeStep(previousDt);
+	else if (!computedOnce) Omega::instance().setTimeStep(defaultDt);
 	if (Omega::instance().getCurrentIteration() % 100 == 0)
 	cerr << "computed timestep = " << newDt << "; new timestep is:" << Omega::instance().getTimeStep() << endl;
 }
