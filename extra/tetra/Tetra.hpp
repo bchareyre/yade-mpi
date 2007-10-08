@@ -100,7 +100,9 @@ class TetraAABB: public BoundingVolumeEngineUnit
 		void go(const shared_ptr<InteractingGeometry>& ig, shared_ptr<BoundingVolume>& bv, const Se3r& se3, const Body*){
 			TetraMold* t=static_cast<TetraMold*>(ig.get());
 			AABB* aabb=static_cast<AABB*>(bv.get());
-			#define __VOP(op,ix) op(t->v[0][ix],op(t->v[1][ix],op(t->v[2][ix],t->v[3][ix])))
+			Quaternionr invRot=se3.orientation.Conjugate();
+			Vector3r v_g[4]; for(int i=0; i<4; i++) v_g[i]=se3.orientation*t->v[i]; // vertices in global coordinates
+			#define __VOP(op,ix) op(v_g[0][ix],op(v_g[1][ix],op(v_g[2][ix],v_g[3][ix])))
 				aabb->min=se3.position+Vector3r(__VOP(std::min,0),__VOP(std::min,1),__VOP(std::min,2));
 				aabb->max=se3.position+Vector3r(__VOP(std::max,0),__VOP(std::max,1),__VOP(std::max,2));
 			#undef __VOP
@@ -164,11 +166,12 @@ class Tetra2TetraBang: public InteractionGeometryEngineUnit
 		REGISTER_CLASS_NAME(Tetra2TetraBang);
 		REGISTER_BASE_CLASS_NAME(InteractionGeometryEngineUnit);
 		DEFINE_FUNCTOR_ORDER_2D(TetraMold,TetraMold);
+		DECLARE_LOGGER;
 	private:
 		list<Tetrahedron> Tetra2TetraIntersection(const Tetrahedron& A, const Tetrahedron& B);
 		list<Tetrahedron> TetraClipByPlane(const Tetrahedron& T, const Vector3r& P, const Vector3r& n);
 		//! Intersection of line given by points A, B and plane given by P and its normal.
-		Vector3r PtPtPlaneIntr(const Vector3r& A, const Vector3r& B, const Vector3r& P, const Vector3r& normal){const double t=(P-A).Dot(normal) / (B-A).Dot(normal); return A+t*(B-A); }
+		Vector3r PtPtPlaneIntr(const Vector3r& A, const Vector3r& B, const Vector3r& P, const Vector3r& normal){const double t=(P-A).Dot(normal) / (B-A).Dot(normal); /* TRWM3VEC(A); TRWM3VEC(B); TRWM3VEC(P); TRWM3VEC(normal); LOG_TRACE("t="<<t); TRWM3VEC((A+t*(B-A))); */ return A+t*(B-A); }
 };
 
 REGISTER_SERIALIZABLE(Tetra2TetraBang,false);

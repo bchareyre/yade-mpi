@@ -35,6 +35,8 @@ const char* yadePluginClasses[]={
 //#include"Intersection/Wm3IntrTetrahedron3Tetrahedron3.cpp"
 //#include"Intersection/Wm3Intersector.cpp"
 
+CREATE_LOGGER(Tetra2TetraBang);
+
 /*! Calculate configuration of TetraMold - TetraMold intersection.
  *
  * Wildmagick's functions are used here: intersection is returned as a set of tetrahedra (may be empty, inwhich case there is no real intersection).
@@ -102,8 +104,12 @@ bool Tetra2TetraBang::go(const shared_ptr<InteractingGeometry>& cm1,const shared
 	Tetrahedron tA(se31.orientation*A->v[0]+se31.position,se31.orientation*A->v[1]+se31.position,se31.orientation*A->v[2]+se31.position,se31.orientation*A->v[3]+se31.position);
 	Tetrahedron tB(se32.orientation*B->v[0]+se32.position,se32.orientation*B->v[1]+se32.position,se32.orientation*B->v[2]+se32.position,se32.orientation*B->v[3]+se32.position);
 	// calculate intersection
+	#if 0
+		tB=Tetrahedron(Vector3r(0,0,0),Vector3r(1.5,1,1),Vector3r(0.5,1,1),Vector3r(1,1,.5));
+		tA=Tetrahedron(Vector3r(0,0,0),Vector3r(1,0,0),Vector3r(0,1,0),Vector3r(0,0,1));
+	#endif
 	list<Tetrahedron> tAB=Tetra2TetraIntersection(tA,tB);
-	if(tAB.size()==0) return false; //no intersecting volume
+	if(tAB.size()==0) { LOG_DEBUG("No intersection.");  return false;} //no intersecting volume
 
 	Real V(0); // volume of intersection (cummulative)
 	Vector3r Sg(0,0,0); // static moment of intersection
@@ -126,7 +132,7 @@ bool Tetra2TetraBang::go(const shared_ptr<InteractingGeometry>& cm1,const shared
 	 *  1. normal, the direction of the lest inertia; this is the gradient of penetration energy
 	 *  	it may have either direction mathematically, but since 4hedra are convex, 
 	 *  	normal will be always the direction pointing more towards the centroid of the other 4hedron
-	 *  2. tangent?! hopefully not neede at all. */
+	 *  2. tangent?! hopefully not needed at all. */
 
 	Matrix3r Ip, R; // principal moments of inertia, rotation matrix
 	I.EigenDecomposition(R,Ip);
@@ -155,6 +161,7 @@ bool Tetra2TetraBang::go(const shared_ptr<InteractingGeometry>& cm1,const shared
 	 * In our case, the least inertia is along ix, the other coordinates are (ix+1)%3 and (ix+2)%3. equivalentPenetrationDepth means what was z.
 	 */
 	Real equivalentPenetrationDepth=sqrt(6*(-Ip(ix,ix)+Ip(ixx,ixx)+Ip(ixxx,ixxx))/V);
+	TRVAR1(equivalentPenetrationDepth);
 	Real equivalentCrossSection=V/equivalentPenetrationDepth;
 
 	/* Now rotate the whole inertia tensors of A and B and estimate maxPenetrationDepth -- the length of the body in the direction of the contact normal.
@@ -210,18 +217,26 @@ list<Tetrahedron> Tetra2TetraBang::Tetra2TetraIntersection(const Tetrahedron& A,
 	 * clipping face is [i i1 i2], normal points away from i3 */
 	int i,i1,i2,i3;
 	Vector3r normal;
+	/* LOG_TRACE("===========================================================================================")
+	LOG_TRACE("===========================================================================================")
+	LOG_TRACE(ret.size());
+	LOG_TRACE("DUMP A and B:"); A.dump(); B.dump(); */
 	for(i=0; i<4; i++){
 		i1=(i+1)%4; i2=(i+2)%4; i3=(i+3)%4;
 		const Vector3r& P(B.v[i]); // reference point on the plane
 		normal=(B.v[i1]-P).Cross(B.v[i2]-P); normal.Normalize(); // normal
-		if((P-B.v[i3]).Dot(normal)>0) normal*=-1; // outer normal
-		for(list<Tetrahedron>::iterator I=ret.begin(); I!=ret.end(); I++){
+		if((B.v[i3]-P).Dot(normal)>0) normal*=-1; // outer normal
+		/* TRWM3VEC(P); TRWM3VEC(normal); LOG_TRACE("DUMP initial tetrahedron list:"); for(list<Tetrahedron>::iterator I=ret.begin(); I!=ret.end(); I++) (*I).dump(); */
+		for(list<Tetrahedron>::iterator I=ret.begin(); I!=ret.end(); /* I++ */ ){
 			list<Tetrahedron> splitDecomposition=TetraClipByPlane(*I,P,normal);
 			// replace current list element by the result of decomposition;
 			// I points after the erased one, so decomposed 4hedra will not be touched in this iteration, just as we want.
-			I=ret.erase(I); ret.insert(I,splitDecomposition.begin(),splitDecomposition.end());
+			// Since it will be incremented by I++ at the end of the cycle, compensate for that by I--;
+			I=ret.erase(I); ret.insert(I,splitDecomposition.begin(),splitDecomposition.end()); /* I--; */
+			/* LOG_TRACE("DUMP current tetrahedron list:"); for(list<Tetrahedron>::iterator I=ret.begin(); I!=ret.end(); I++) (*I).dump();*/ 
 		}
 	}
+	//exit(0);
 	return ret;
 }
 
@@ -256,16 +271,19 @@ list<Tetrahedron> Tetra2TetraBang::Tetra2TetraIntersection(const Tetrahedron& A,
 list<Tetrahedron> Tetra2TetraBang::TetraClipByPlane(const Tetrahedron& T, const Vector3r& P, const Vector3r& normal){
 	
 	list<Tetrahedron> ret;
-	// FIXME I've put return here, to avoid crashing in the release / Janek
-	return ret;
+	// scaling factor for Mathr::EPSILON: average edge length
+	Real scaledEPSILON=Mathr::EPSILON*(1/6.)*((T.v[1]-T.v[0])+(T.v[2]-T.v[0])+(T.v[3]-T.v[0])+(T.v[2]-T.v[1])+(T.v[3]-T.v[1])+(T.v[3]-T.v[2])).Length();
+
+	/* TRWM3VEC(P); TRWM3VEC(normal); T.dump(); */
 
 	vector<size_t> pos, neg, zer; Real dist[4];
 	for(size_t i=0; i<4; i++){
 		dist[i]=(T.v[i]-P).Dot(normal);
-		if(dist[i]>Mathr::EPSILON) pos.push_back(i);
-		else if(dist[i]<Mathr::EPSILON) neg.push_back(i);
+		if(dist[i]>scaledEPSILON) pos.push_back(i);
+		else if(dist[i]<-scaledEPSILON) neg.push_back(i);
 		else zer.push_back(i);
 	}
+	/* LOG_TRACE("dist[i]=["<<dist[0]<<","<<dist[1]<<","<<dist[2]<<","<<dist[3]<<"]"); */
 	#define NEG neg.size()
 	#define POS pos.size()
 	#define ZER zer.size()
@@ -280,43 +298,65 @@ list<Tetrahedron> Tetra2TetraBang::TetraClipByPlane(const Tetrahedron& T, const 
 	// HETEROGENEOUS CASES
 		// points are ordered -+0
 		Vector3r v[4];
-		for(size_t i=0; i<neg.size(); i++) v[i+  0]=T.v[pos[i]];
-		for(size_t i=0; i<pos.size(); i++) v[i+NEG]=T.v[neg[i]];
-		for(size_t i=0; i<zer.size(); i++) v[i+POS]=T.v[zer[i]];
+		for(size_t i=0; i<NEG; i++) v[i+  0+  0]=T.v[neg[i]];
+		for(size_t i=0; i<POS; i++) v[i+  0+NEG]=T.v[pos[i]];
+		for(size_t i=0; i<ZER; i++) v[i+POS+NEG]=T.v[zer[i]];
+		/* LOG_TRACE("NEG(in)="<<NEG<<", POS(out)="<<POS<<", ZER(boundary)="<<ZER); TRWM3VEC(v[0]); TRWM3VEC(v[1]); TRWM3VEC(v[2]); TRWM3VEC(v[3]); */
+		#define _A v[0]
+		#define _B v[1]
+		#define _C v[2]
+		#define _D v[3]
+		#define _AB PTPT(0,1)
+		#define _AC PTPT(0,2)
+		#define _AD PTPT(0,3)
+		#define _BC PTPT(1,2)
+		#define _BD PTPT(1,3)
+		#define _CD PTPT(2,3)
 		// -+++ → 1Δ [A AB AC AD]
-		if(NEG==1 && POS==3){ret.push_back(Tetrahedron(v[0],PTPT(0,1),PTPT(0,2),PTPT(0,3))); return ret;}
+		if(NEG==1 && POS==3){ret.push_back(Tetrahedron(_A,_AB,_AC,_AD)); return ret;}
 		// -++0 → 1Δ [A AB AC D]
-		if(NEG==1 && POS==2 && ZER==1){ret.push_back(Tetrahedron(v[0],PTPT(0,1),PTPT(0,2),v[3])); return ret;}
+		if(NEG==1 && POS==2 && ZER==1){ret.push_back(Tetrahedron(_A,_AB,_AC,_D)); return ret;}
 		//	-+00 → 1Δ [A AB C D]
-		if(NEG==1 && POS==1 && ZER==2){ret.push_back(Tetrahedron(v[0],PTPT(0,1),v[2],v[3])); return ret;}
+		if(NEG==1 && POS==1 && ZER==2){ret.push_back(Tetrahedron(_A,_AB,_C,_D)); return ret;}
 		// --++ → 3Δ [A AC AD B BC BD] ⇒ (e.g.) [A AC AD B] [B BC BD AD] [B AD AC BC]
 		if(NEG==2 && POS ==2){
 			// [A AC AD B]
-			ret.push_back(Tetrahedron(v[0],PTPT(0,2),PTPT(0,3),v[1]));
+			ret.push_back(Tetrahedron(_A,_AC,_AD,_B));
 			// [B BC BD AD]
-			ret.push_back(Tetrahedron(v[1],PTPT(1,2),PTPT(1,3),PTPT(0,3)));
+			ret.push_back(Tetrahedron(_B,_BC,_BD,_AD));
 			// [B AD AC BC]
-			ret.push_back(Tetrahedron(v[1],PTPT(0,3),PTPT(0,2),PTPT(1,2)));
+			ret.push_back(Tetrahedron(_B,_AD,_AC,_BC));
 			return ret;
 		}
 		// --+0 → 2Δ [A B AC BC D] ⇒ (e.g.) [A AC BC D] [B BC A D] 
 		if(NEG==2 && POS==1 && ZER==1){
 			// [A AC BC D]
-			ret.push_back(Tetrahedron(v[0],PTPT(0,2),PTPT(1,2),v[3]));
+			ret.push_back(Tetrahedron(_A,_AC,_BC,_D));
 			// [B BC A D]
-			ret.push_back(Tetrahedron(v[1],PTPT(1,2),v[0],v[3]));
+			ret.push_back(Tetrahedron(_B,_BC,_A,_D));
 			return ret;
 		}
 		// ---+ → 3Δ [A B C AD BD CD] ⇒ (e.g.) [A B C AD] [AD BD CD B] [AD C B BD]
 		if(NEG==3 && POS==1){
 			//[A B C AD]
-			ret.push_back(Tetrahedron(v[0],v[1],v[2],PTPT(0,3)));
+			ret.push_back(Tetrahedron(_A,_B,_C,_AD));
 			//[AD BD CD B]
-			ret.push_back(Tetrahedron(PTPT(0,3),PTPT(1,3),PTPT(2,3),v[1]));
+			ret.push_back(Tetrahedron(_AD,_BD,_CD,_B));
 			//[AD C B BD]
-			ret.push_back(Tetrahedron(PTPT(0,3),v[2],v[1],PTPT(1,3)));
+			ret.push_back(Tetrahedron(_AD,_C,_B,_BD));
 			return ret;
 		}
+		#undef _A
+		#undef _B
+		#undef _C
+		#undef _D
+		#undef _AB
+		#undef _AC
+		#undef _AD
+		#undef _BC
+		#undef _BD
+		#undef _CD
+
 	#undef PTPT
 	#undef NEG
 	#undef POS

@@ -23,6 +23,7 @@ class Tetrahedron : public GeometricalModel
 
 		Tetrahedron();
 		Tetrahedron(const Vector3r& v0, const Vector3r& v1, const Vector3r& v2, const Vector3r& v3);
+		void dump(void) const{std::cerr<<"["; for(int i=0; i<4; i++){ std::cerr<<"("; for(int j=0; j<3; j++) std::cerr<<v[i][j]<<","; std::cerr<<")";} std::cerr<<"]"<<std::endl;}
 		virtual ~Tetrahedron();
 
 	protected :

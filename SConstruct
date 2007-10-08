@@ -25,16 +25,21 @@
 import os,os.path,string,re,sys
 import SCons
 # SCons version numbers are needed a few times
-sconsVersion=sum([int(SCons.__version__.split('.')[ord[0]])*ord[1] for ord in [(0,10000),(1,100),(2,1)][:len(SCons.__version__.split('.'))] ])
+ver=[str(x) for x in SCons.__version__.split('.')]
+for i in range(0,len(ver)):
+	ver[i]="".join([x if x in ('0123456789') else '0' for x in ver[i]])
+	if len(ver[i])>2: ver[i]=ver[i][0:2]+"."+ver[i][2:]
+sconsVersion=10000*float(ver[0])+(100*float(ver[1]) if len(ver)>1 else 0)+(float(ver[2]) if len(ver)>2 else 0)
+#sconsVersion=sum([int(SCons.__version__.split('.')[ord[0]])*ord[1] for ord in [(0,10000),(1,100),(2,1)][:len(SCons.__version__.split('.'))] ])
 
 ##########################################################################################
 ########## PROXY TO NEWER SCONS (DOWNLOADED IF NEEDED) ###################################
 ##########################################################################################
-
 if sconsVersion<9693:
-	newUrl="http://dfn.dl.sourceforge.net/sourceforge/scons/scons-local-0.97.tar.gz"
+	#tgzParams=("http://ovh.dl.sourceforge.net/sourceforge/scons/scons-local-0.97.0d20070918.tar.gz","/scons-local-0.97.0d20070918") ## sconsVersion<=9700
+	tgzParams=("http://dfn.dl.sourceforge.net/sourceforge/scons/scons-local-0.97.tar.gz","scons-local-0.97")
 	newPrefix="./scons-local";
-	newDir=newPrefix+"/scons-local-0.97"
+	newUrl,newDir=tgzParams[0],newPrefix+"/"+tgzParams[1]
 	if not os.path.exists(newDir):
 		print "Scons version too old, downloading new version. All subsequent calls will be proxied to the new version transparently."
 		import urllib,tarfile
@@ -96,7 +101,8 @@ for v in propagatedEnvVars:
 	if os.environ.has_key(v): env.Append(ENV={v:os.environ[v]})
 
 opts.Save(optsFile,env)
-opts.FormatOptionHelpText=lambda env,opt,help,default,actual: "%10s: %5s [%s] (%s)\n"%(opt,actual,default,help)
+if sconsVersion>9700: opts.FormatOptionHelpText=lambda env,opt,help,default,actual,alias: "%10s: %5s [%s] (%s)\n"%(opt,actual,default,help)
+else: opts.FormatOptionHelpText=lambda env,opt,help,default,actual: "%10s: %5s [%s] (%s)\n"%(opt,actual,default,help)
 Help(opts.GenerateHelpText(env))
 
 ###########################################
