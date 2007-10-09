@@ -161,8 +161,9 @@ bool Tetra2TetraBang::go(const shared_ptr<InteractingGeometry>& cm1,const shared
 	 * In our case, the least inertia is along ix, the other coordinates are (ix+1)%3 and (ix+2)%3. equivalentPenetrationDepth means what was z.
 	 */
 	Real equivalentPenetrationDepth=sqrt(6*(-Ip(ix,ix)+Ip(ixx,ixx)+Ip(ixxx,ixxx))/V);
-	TRVAR1(equivalentPenetrationDepth);
 	Real equivalentCrossSection=V/equivalentPenetrationDepth;
+	TRVAR1(equivalentPenetrationDepth);
+	TRVAR1(equivalentCrossSection);
 
 	/* Now rotate the whole inertia tensors of A and B and estimate maxPenetrationDepth -- the length of the body in the direction of the contact normal.
 	 * This will be used to calculate relative deformation, which is needed for elastic response. */
@@ -365,7 +366,7 @@ list<Tetrahedron> Tetra2TetraBang::TetraClipByPlane(const Tetrahedron& T, const 
 	assert(false);
 }
 
-
+CREATE_LOGGER(TetraLaw);
 
 /*! Apply forces on tetrahedra in collision based on geometric configuration provided by Tetra2TetraBang.
  *
@@ -387,6 +388,7 @@ void TetraLaw::action(Body* body)
 		const shared_ptr<ElasticBodyParameters>& physB(dynamic_pointer_cast<ElasticBodyParameters>(B->physicalParameters));
 		
 		const shared_ptr<TetraBang>& contactGeom(dynamic_pointer_cast<TetraBang>((*contactI)->interactionGeometry));
+		if(!contactGeom) {LOG_TRACE("interactionGeoemtry is not a TetraBang"); continue;}
 		//const shared_ptr<SimpleElasticInteraction>& contactPhys(dynamic_pointer_cast<SimpleElasticInteraction*>((*contactI)->interactionPhysics));
 
 
@@ -401,6 +403,8 @@ void TetraLaw::action(Body* body)
 		// F=σA=εEA
 		// this is unused; should it?: contactPhys->kn
 		Vector3r F=contactGeom->normal*averageStrain*young*contactGeom->equivalentCrossSection;
+		TRWM3VEC(F);
+		TRWM3VEC((physB->se3.position-contactGeom->contactPoint).Cross(F));
 		static_pointer_cast<Force>(rootBody->physicalActions->find(idA,actionForce->getClassIndex()))->force-=F;
 		static_pointer_cast<Force>(rootBody->physicalActions->find(idB,actionForce->getClassIndex()))->force+=F;
 		static_pointer_cast<Momentum>(rootBody->physicalActions->find(idA,actionMomentum->getClassIndex()))->momentum-=(physA->se3.position-contactGeom->contactPoint).Cross(F);

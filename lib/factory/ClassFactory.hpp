@@ -40,7 +40,7 @@
 	{										\
 		return new name;							\
 	}										\
-	const bool registered##name =							\
+	const bool registered##name __attribute__ ((unused)) =							\
 		ClassFactory::instance().registerFactorable( 	#name ,			\
 								Create##name ,		\
 								CreateShared##name ,	\

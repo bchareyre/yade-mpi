@@ -54,32 +54,32 @@ void ElasticContactLaw::action(Body* body)
 			int id1 = contact->getId1();
 			int id2 = contact->getId2();
 			
-			if( !( (*bodies)[id1]->getGroupMask() & (*bodies)[id2]->getGroupMask() & sdecGroupMask)  )
-				continue; // skip other groups, BTW: this is example of a good usage of 'continue' keyword
+			if( !( (*bodies)[id1]->getGroupMask() & (*bodies)[id2]->getGroupMask() & sdecGroupMask) ) continue;
+
+			SpheresContactGeometry*    currentContactGeometry= dynamic_cast<SpheresContactGeometry*>(contact->interactionGeometry.get());
+			ElasticContactInteraction* currentContactPhysics = dynamic_cast<ElasticContactInteraction*> (contact->interactionPhysics.get());
+			if((!currentContactGeometry)||(!currentContactPhysics)) continue;
 	
 			BodyMacroParameters* de1 				= YADE_CAST<BodyMacroParameters*>((*bodies)[id1]->physicalParameters.get());
 			BodyMacroParameters* de2 				= YADE_CAST<BodyMacroParameters*>((*bodies)[id2]->physicalParameters.get());
-			SpheresContactGeometry* currentContactGeometry		= YADE_CAST<SpheresContactGeometry*>(contact->interactionGeometry.get());
-			ElasticContactInteraction* currentContactPhysics   	= YADE_CAST<ElasticContactInteraction*> (contact->interactionPhysics.get());
 			
 			Vector3r& shearForce 			= currentContactPhysics->shearForce;
 	
-			if ( contact->isNew)
-				shearForce			= Vector3r(0,0,0);
+			if (contact->isNew) shearForce=Vector3r(0,0,0);
 					
-			Real un 				= currentContactGeometry->penetrationDepth;
-			currentContactPhysics->normalForce	= currentContactPhysics->kn*std::max(un,(Real) 0)*currentContactGeometry->normal;
+			Real un=currentContactGeometry->penetrationDepth;
+			currentContactPhysics->normalForce=currentContactPhysics->kn*std::max(un,(Real) 0)*currentContactGeometry->normal;
 	
 			Vector3r axis;
 			Real angle;
 	
 	/// Here is the code with approximated rotations 	 ///
 			
-			axis	 		= currentContactPhysics->prevNormal.Cross(currentContactGeometry->normal);
-			shearForce 	       -= shearForce.Cross(axis);
-			angle 			= dt*0.5*currentContactGeometry->normal.Dot(de1->angularVelocity+de2->angularVelocity);
-			axis 			= angle*currentContactGeometry->normal;
-			shearForce 	       -= shearForce.Cross(axis);
+			axis = currentContactPhysics->prevNormal.Cross(currentContactGeometry->normal);
+			shearForce -= shearForce.Cross(axis);
+			angle = dt*0.5*currentContactGeometry->normal.Dot(de1->angularVelocity+de2->angularVelocity);
+			axis = angle*currentContactGeometry->normal;
+			shearForce -= shearForce.Cross(axis);
 		
 	/// Here is the code with exact rotations 		 ///
 	

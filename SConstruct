@@ -35,9 +35,9 @@ sconsVersion=10000*float(ver[0])+(100*float(ver[1]) if len(ver)>1 else 0)+(float
 ##########################################################################################
 ########## PROXY TO NEWER SCONS (DOWNLOADED IF NEEDED) ###################################
 ##########################################################################################
-if sconsVersion<9693:
-	#tgzParams=("http://ovh.dl.sourceforge.net/sourceforge/scons/scons-local-0.97.0d20070918.tar.gz","/scons-local-0.97.0d20070918") ## sconsVersion<=9700
-	tgzParams=("http://dfn.dl.sourceforge.net/sourceforge/scons/scons-local-0.97.tar.gz","scons-local-0.97")
+if sconsVersion<9700:  ##<9693: 
+	tgzParams=("http://ovh.dl.sourceforge.net/sourceforge/scons/scons-local-0.97.0d20070918.tar.gz","/scons-local-0.97.0d20070918") ## sconsVersion<=9700
+	#tgzParams=("http://dfn.dl.sourceforge.net/sourceforge/scons/scons-local-0.97.tar.gz","scons-local-0.97")
 	newPrefix="./scons-local";
 	newUrl,newDir=tgzParams[0],newPrefix+"/"+tgzParams[1]
 	if not os.path.exists(newDir):
@@ -445,7 +445,7 @@ env.SConscript(dirs=['.'],build_dir=buildDir,duplicate=0)
 
 ############# OTHER TARGETS #####################
 env.Command('tags',libDirs,"ctags -R --extra=+q --fields=+n --exclude='.*' --exclude=yade-flat --exclude=include --exclude='*.so'")
-#env.Alias('doc',env.Command('doc/doxygen/html/index.html',libDirs,"cd doc; doxygen Doxyfile"))
+env.Alias('doc',env.Command('doc/doxygen/html/index.html',libDirs,"cd doc; doxygen Doxyfile"))
 
 
 

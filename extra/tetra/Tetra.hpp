@@ -145,6 +145,8 @@ class TetraLaw: public InteractionSolver {
 		int sdecGroupMask; // probably unused?!
 
 		void action(Body* body);
+
+		DECLARE_LOGGER;
 	protected:
 		void registerAttributes(){InteractionSolver::registerAttributes(); /* … */ }
 		REGISTER_CLASS_NAME(TetraLaw);

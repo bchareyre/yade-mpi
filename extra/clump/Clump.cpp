@@ -287,7 +287,7 @@ void Clump::updateProperties(bool intersecting){
 
 /*! @brief Recalculates inertia tensor of a body after translation away from (default) or towards its centroid.
  *
- * @oaram I inertia tensor in the original coordinates; it is assumed to be upper-triangular (elements below the diagonal are ignored).
+ * @param I inertia tensor in the original coordinates; it is assumed to be upper-triangular (elements below the diagonal are ignored).
  * @param m mass of the body; if positive, translation is away from the centroid; if negative, towards centroid.
  * @param off offset of the new origin from the original origin
  * @return inertia tensor in the new coordinate system; the matrix is symmetric.

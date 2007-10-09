@@ -39,7 +39,7 @@ using namespace ArchiveTypes;
 	{										\
 		return typeid(name);							\
 	}										\
-	const bool registered##name##sname =						\
+	const bool registered##name##sname __attribute__((unused)) =						\
 		SerializableSingleton::instance().registerSerializableDescriptor(	\
 								#sname ,		\
 								Verify##name ,		\

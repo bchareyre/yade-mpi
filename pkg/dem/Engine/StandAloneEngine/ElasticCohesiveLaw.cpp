@@ -61,13 +61,13 @@ void ElasticCohesiveLaw::action(Body* body)
 			unsigned int id1 = contact2->getId1();
 			unsigned int id2 = contact2->getId2();
 			
-			if( !( (*bodies)[id1]->getGroupMask() & (*bodies)[id2]->getGroupMask() & sdecGroupMask) )
-				continue; // skip other groups, BTW: this is example of a good usage of 'continue' keyword
+			if( !( (*bodies)[id1]->getGroupMask() & (*bodies)[id2]->getGroupMask() & sdecGroupMask) ) continue;
 	
 			BodyMacroParameters* de1			= YADE_CAST<BodyMacroParameters*>((*bodies)[id1]->physicalParameters.get());
 			BodyMacroParameters* de2			= YADE_CAST<BodyMacroParameters*>((*bodies)[id2]->physicalParameters.get());
-			SDECLinkPhysics* currentContactPhysics		= YADE_CAST<SDECLinkPhysics*>(contact2->interactionPhysics.get());
-			SDECLinkGeometry* currentContactGeometry	= YADE_CAST<SDECLinkGeometry*>(contact2->interactionGeometry.get());
+			SDECLinkPhysics* currentContactPhysics		= dynamic_cast<SDECLinkPhysics*>(contact2->interactionPhysics.get());
+			SDECLinkGeometry* currentContactGeometry	= dynamic_cast<SDECLinkGeometry*>(contact2->interactionGeometry.get());
+			if((!currentContactPhysics)||(!currentContactGeometry)) continue;
 	
 			Real un 					= currentContactPhysics->equilibriumDistance-(de2->se3.position-de1->se3.position).Length();
 			currentContactPhysics->normalForce		= currentContactPhysics->kn*un*currentContactGeometry->normal;

@@ -209,6 +209,10 @@ void Shop::rootBodyActors(shared_ptr<MetaBody> rootBody){
 	constitutiveLaw2->sdecGroupMask = getDefault<int>("body_sdecGroupMask");
 	constitutiveLaw2->momentRotationLaw = getDefault<bool>("param_momentRotationLaw");
 	rootBody->engines.push_back(constitutiveLaw2);
+
+	shared_ptr<TetraLaw> constitutiveLaw3(new TetraLaw);
+	constitutiveLaw3->sdecGroupMask = getDefault<int>("body_sdecGroupMask");
+	rootBody->engines.push_back(constitutiveLaw3);
 	
 	if(getDefault<Vector3r>("param_gravity")!=Vector3r(0,0,0)){
 		shared_ptr<GravityEngine> gravityCondition(new GravityEngine);
