@@ -406,12 +406,14 @@ void SimulationController::bgTimeStepClicked(int i)
 
 void SimulationController::sb10PowerSecondValueChanged(int)
 {
+	if(!rbFixed->isOn()){ rbFixed->toggle(); bgTimeStepClicked(2); } // this should do the callback as if user clicked fixed timestepper button
 	changeTimeStep = true;
 }
 
 
 void SimulationController::sbSecondValueChanged(int)
-{
+{ 
+	if(!rbFixed->isOn()){ rbFixed->toggle(); bgTimeStepClicked(2); } // dtto
 	changeTimeStep = true;
 }
 

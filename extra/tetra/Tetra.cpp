@@ -109,22 +109,30 @@ bool Tetra2TetraBang::go(const shared_ptr<InteractingGeometry>& cm1,const shared
 		tA=Tetrahedron(Vector3r(0,0,0),Vector3r(1,0,0),Vector3r(0,1,0),Vector3r(0,0,1));
 	#endif
 	list<Tetrahedron> tAB=Tetra2TetraIntersection(tA,tB);
-	if(tAB.size()==0) { LOG_DEBUG("No intersection.");  return false;} //no intersecting volume
+	if(tAB.size()==0) { /* LOG_DEBUG("No intersection."); */ return false;} //no intersecting volume
 
 	Real V(0); // volume of intersection (cummulative)
 	Vector3r Sg(0,0,0); // static moment of intersection
 
+	Vector3r tt[4]; for(int i=0; i<4; i++) tt[i]=tA.v[i];
+	//DEBUG TRWM3VEC(tt[0]); TRWM3VEC(tt[1]); TRWM3VEC(tt[2]); TRWM3VEC(tt[3]); TRVAR1(TetrahedronVolume(tA.v)); TRVAR1(TetrahedronVolume(tt)); TRWM3MAT(TetrahedronInertiaTensor(tA.v));
+
 	for(list<Tetrahedron>::iterator II=tAB.begin(); II!=tAB.end(); II++){
 		Real dV=TetrahedronVolume(II->v);
 		V+=dV;
+		//DEBUG TRVAR1(dV); TRWM3VEC(II->v[0]); TRWM3VEC(II->v[1]); TRWM3VEC(II->v[2]); TRWM3VEC(II->v[3]); LOG_TRACE("====")
 		Sg+=dV*(II->v[0]+II->v[1]+II->v[2]+II->v[3])*.25;
 	}
 	Vector3r centroid=Sg/V;
 	Matrix3r I(true); // inertia tensor for the composition; zero matrix initially
+		// I is purely geometrical (as if with unit density)
+	
 	// get total 
-	for(list<Tetrahedron>::iterator II=tAB.begin(); II!=tAB.end(); II++){
+	Vector3r dist;	for(list<Tetrahedron>::iterator II=tAB.begin(); II!=tAB.end(); II++){
 		II->v[0]-=centroid; II->v[1]-=centroid; II->v[2]-=centroid; II->v[3]-=centroid;
-		I+=TetrahedronInertiaTensor(II->v);
+		dist=(II->v[0]+II->v[1]+II->v[2]+II->v[3])*.25-centroid;
+		/* use parallel axis theorem */ 
+		I+=TetrahedronInertiaTensor(II->v)  + TetrahedronVolume(II->v)*Matrix3r(dist[0]*dist[0],dist[1]*dist[1],dist[2]*dist[2]);
 	}
 	
 	/* Now, we have the collision volumetrically described by intersection volume (V), its inertia tensor (I) and centroid (centroid; contact point).
@@ -152,28 +160,32 @@ bool Tetra2TetraBang::go(const shared_ptr<InteractingGeometry>& cm1,const shared
 	if((Bcent-centroid).Dot(normal)<0) normal*=-1;
 
 	/* now estimate the area of the solid that is perpendicular to the normal. This will be needed to estimate elastic force based on Young's modulus.
-	 * Suppose we have cuboid, with edgesof lengths x,y,z in the direction of respective axes.
-	 * It's inertia are Ix=(V/12)*(y^2+z^2), Iy=(V/12)*(x^2+z^2), Iz=(V/12)*(x^2+y^2) and suppose Iz is minimal; Ix, Iy and Iz are known (from decomposition above).
+	 * Suppose we have cuboid, with edges of lengths x,y,z in the direction of respective axes.
+	 * It's inertia are Ix=(V/12)*(y^2+z^2), Iy=(V/12)*(x^2+z^2), Iz=(V/12)*(x^2+y^2) and suppose Iz is maximal; Ix, Iy and Iz are known (from decomposition above).
 	 * Then the area perpendicular to z (normal direction) is given by x*y=V/z, where V is known.
 	 * Ix+Iy-Iz=(V/12)*(y^2+z^2+x^2+z^2-x^2-y^2)=(V*z^2)/6, z=√(6*(Ix+Iy-Iz)/V)
-	 * Az=V/z=√(V^3/(6*(Ix+Iy+Iz))).
+	 * Az=V/z=√(V^3/(6*(Ix+Iy-Iz))).
 	 *
-	 * In our case, the least inertia is along ix, the other coordinates are (ix+1)%3 and (ix+2)%3. equivalentPenetrationDepth means what was z.
+	 * In our case, the greatest inertia is along ixxx, the other coordinates are ixx and ix. equivalentPenetrationDepth means what was z.
 	 */
-	Real equivalentPenetrationDepth=sqrt(6*(-Ip(ix,ix)+Ip(ixx,ixx)+Ip(ixxx,ixxx))/V);
+	//DEBUG
+	TRWM3MAT(Ip); TRWM3MAT(I);
+	Real equivalentPenetrationDepth=sqrt(6.*(Ip(ix,ix)+Ip(ixx,ixx)-Ip(ixxx,ixxx))/V);
 	Real equivalentCrossSection=V/equivalentPenetrationDepth;
-	TRVAR1(equivalentPenetrationDepth);
-	TRVAR1(equivalentCrossSection);
+	TRVAR3(V,equivalentPenetrationDepth,equivalentCrossSection);
 
 	/* Now rotate the whole inertia tensors of A and B and estimate maxPenetrationDepth -- the length of the body in the direction of the contact normal.
 	 * This will be used to calculate relative deformation, which is needed for elastic response. */
 	const shared_ptr<BodyMacroParameters>& physA=YADE_PTR_CAST<BodyMacroParameters>(Body::byId(interaction->getId1())->physicalParameters);
 	const shared_ptr<BodyMacroParameters>& physB=YADE_PTR_CAST<BodyMacroParameters>(Body::byId(interaction->getId2())->physicalParameters);
-	Matrix3r IA(physA->inertia); Matrix3r IB(physB->inertia);
+	// WARNING: Matrix3r(Vector3r(...)) is compiled, but gives zero matrix??!! Use explicitly constructor from diagonal entries
+	Matrix3r IA(physA->inertia[0],physA->inertia[1],physA->inertia[2]); Matrix3r IB(physB->inertia[0],physB->inertia[1],physB->inertia[2]);
 	// see Clump::inertiaTensorRotate for references
 	IA=R.Transpose()*IA*R; IB=R.Transpose()*IB*R;
-	Real maxPenetrationDepthA=sqrt(6*(-IA(ix,ix)+IA(ixx,ixx)+IA(ixxx,ixxx))/V);
-	Real maxPenetrationDepthB=sqrt(6*(-IB(ix,ix)+IB(ixx,ixx)+IB(ixxx,ixxx))/V);
+
+	Real maxPenetrationDepthA=sqrt(6*(IA(ix,ix)+IA(ixx,ixx)-IA(ixxx,ixxx))/V);
+	Real maxPenetrationDepthB=sqrt(6*(IB(ix,ix)+IB(ixx,ixx)-IB(ixxx,ixxx))/V);
+	TRVAR2(maxPenetrationDepthA,maxPenetrationDepthB);
 
 	/* store calculated stuff in bang; some is redundant */
 	bang->normal=normal;
@@ -400,11 +412,14 @@ void TetraLaw::action(Body* body)
 		 * a new InteractionPhysicsEngineUnit will be needed that will just pass the average Young's modulus here?
 		 * For now, just go back to Young's moduli directly here. */
 		Real young=.5*(physA->young+physB->young);
+		TRVAR3(young,averageStrain,contactGeom->equivalentCrossSection);
 		// F=σA=εEA
 		// this is unused; should it?: contactPhys->kn
 		Vector3r F=contactGeom->normal*averageStrain*young*contactGeom->equivalentCrossSection;
+		TRWM3VEC(contactGeom->normal);
 		TRWM3VEC(F);
 		TRWM3VEC((physB->se3.position-contactGeom->contactPoint).Cross(F));
+
 		static_pointer_cast<Force>(rootBody->physicalActions->find(idA,actionForce->getClassIndex()))->force-=F;
 		static_pointer_cast<Force>(rootBody->physicalActions->find(idB,actionForce->getClassIndex()))->force+=F;
 		static_pointer_cast<Momentum>(rootBody->physicalActions->find(idA,actionMomentum->getClassIndex()))->momentum-=(physA->se3.position-contactGeom->contactPoint).Cross(F);
@@ -463,16 +478,14 @@ intertia/density WRT centroid:
 	b’/μ=-46343.16662 m⁵
 	c’/μ= 11996.20119 m⁵
 
-@fixme: failing numerical testcase (in TetraTestGen::generate) ?! centroid is correct, for inertia we get:
+The numerical testcase (in TetraTestGen::generate) is exact as in the article for inertia (as well as centroid):
 
-63509.2
-193465
+43520.3
+194711
 191169
 4417.66
--52950.8
--11971.3
-
-I checked "a" charcter by character and it is correct; it the author wrong (doubtful)?
+-46343.2
+11996.2
 
 */
 //Matrix3r TetrahedronInertiaTensor(const Vector3r v[4]){
@@ -497,12 +510,12 @@ Matrix3r TetrahedronInertiaTensor(const vector<Vector3r>& v){
 	double detJ=(x2-x1)*(y3-y1)*(z4-z1)+(x3-x1)*(y4-y1)*(z2-z1)+(x4-x1)*(y2-y1)*(z3-z1)
 		-(x2-x1)*(y4-y1)*(z3-z1)-(x3-x1)*(y2-y1)*(z4-z1)-(x4-x1)*(y3-y1)*(z2-z1);
 	detJ=fabs(detJ);
-	double a=detJ*(y1*y1-y1*y2+y2*y2+y1*y3+y2*y3+
+	double a=detJ*(y1*y1+y1*y2+y2*y2+y1*y3+y2*y3+
 		y3*y3+y1*y4+y2*y4+y3*y4+y4*y4+z1*z1+z1*z2+
 		z2*z2+z1*z3+z2*z3+z3*z3+z1*z4+z2*z4+z3*z4+z4*z4)/60.;
 	double b=detJ*(x1*x1+x1*x2+x2*x2+x1*x3+x2*x3+x3*x3+
 		x1*x4+x2*x4+x3*x4+x4*x4+z1*z1+z1*z2+z2*z2+z1*z3+
-		z2*z3+z3*z3+z1*z4+z2*z4+z4*z4)/60.;
+		z2*z3+z3*z3+z1*z4+z2*z4+z3*z4+z4*z4)/60.;
 	double c=detJ*(x1*x1+x1*x2+x2*x2+x1*x3+x2*x3+x3*x3+x1*x4+
 		x2*x4+x3*x4+x4*x4+y1*y1+y1*y2+y2*y2+y1*y3+
 		y2*y3+y3*y3+y1*y4+y2*y4+y3*y4+y4*y4)/60.;
@@ -510,10 +523,10 @@ Matrix3r TetrahedronInertiaTensor(const vector<Vector3r>& v){
 	double a__=detJ*(2*y1*z1+y2*z1+y3*z1+y4*z1+y1*z2+
 		2*y2*z2+y3*z2+y4*z2+y1*z3+y2*z3+2*y3*z3+
 		y4*z3+y1*z4+y2*z4+y3*z4+2*y4*z4)/120.;
-	double b__=detJ*(2*z1*z1+x2*z1+x3*z1+x4*z1+x1*z2+
-		2*x2*z2+x3*z2+x4*z2+z1*z3+x2*z3+2*x3*z3+
+	double b__=detJ*(2*x1*z1+x2*z1+x3*z1+x4*z1+x1*z2+
+		2*x2*z2+x3*z2+x4*z2+x1*z3+x2*z3+2*x3*z3+
 		x4*z3+x1*z4+x2*z4+x3*z4+2*x4*z4)/120.;
-	double c__=detJ*(2*x1*y1+x2*y2+x3*y1+x4*y1+x1*y2+
+	double c__=detJ*(2*x1*y1+x2*y1+x3*y1+x4*y1+x1*y2+
 		2*x2*y2+x3*y2+x4*y2+x1*y3+x2*y3+2*x3*y3+
 		x4*y3+x1*y4+x2*y4+x3*y4+2*x4*y4)/120.;
 
