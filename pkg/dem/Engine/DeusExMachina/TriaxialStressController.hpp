@@ -19,7 +19,7 @@ class MetaBody;
 class PhysicalParameters;
 
 
-/*! \brief Controls the stress on the boundaries of a box
+/*! \brief Controls the stress on the boundaries of a box and compute strain-like and stress-like quantities for the packing
 
 	detailed description...
 */
@@ -36,17 +36,20 @@ class TriaxialStressController : public DeusExMachina
 		unsigned int stiffnessUpdateInterval, computeStressStrainInterval, radiusControlInterval;
 		//! internal index values for retrieving walls
 		int wall_bottom, wall_top, wall_left, wall_right, wall_front, wall_back;
+		//! real index values of walls in the MetaBody
+		int wall_id [6];
 		//! Defines the prescibed resultant force 
-		Vector3r		force;	
+		//Vector3r		force;	
 		//! Stores the value of the translation at the previous time step, stiffness, and normal
 		Vector3r	previousTranslation [6];
 		//! The value of stiffness (updated according to stiffnessUpdateInterval) 
 		Real		stiffness [6];
 		Real 		strain [3];
 		Vector3r	normal [6];
+		//! The values of stresses 
 		Vector3r	stress [6];
-		int 		wall_id [6];
 		Real		meanStress;
+				
 		
 		//Real UnbalancedForce;		
 				
@@ -71,6 +74,7 @@ class TriaxialStressController : public DeusExMachina
 		virtual ~TriaxialStressController();
 	
 		virtual void applyCondition(Body*);
+		//! Regulate the stress applied on walls with flag wall_XXX_activated = true
 		void controlExternalStress(int wall, MetaBody* ncb, int id, Vector3r resultantForce, PhysicalParameters* p, Real wall_max_vel);
 		void controlInternalStress(MetaBody* ncb, Real multiplier);
 		void updateStiffness(MetaBody* ncb);

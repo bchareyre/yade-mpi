@@ -26,7 +26,21 @@ class TriaxialStateRecorder;
 
 /*! \brief Isotropic compression + uniaxial compression test
 
-	detailed description...
+	This preprocessor is designed to :
+	1/ generate random loose packings and compress them under isotropic confining stress, either squeezing the packing between moving rigid boxes or expanding the particles while boxes are fixed (depending on flag "InternalCompaction").
+	2/ simulate all sorts triaxial loading path (there is however a default loading path corresponding to constant lateral stress in 2 directions and constant strain rate on the third direction - this loading path is used when the flag AutoCompressionActivation = true, otherwise the simulation stops after isotropic compression)
+	
+	
+	Essential engines :
+	
+	1/ The TrixialCompressionEngine is used for controlling the state of the sample and simulating loading paths. TrixialCompressionEngine inherits from TriaxialStressController, which can compute stress- strain-like quantities in the packing and maintain a constant level of stress at each boundary. TriaxialCompressionEngine has few more members in order to impose constant strain rate and control the transition between isotropic compression and triaxial test.
+		
+	2/ The class TriaxialStateRecorder is used to write to a file the history of stresses and strains.
+	
+	3/ TriaxialTest is currently using a group of classes including GlobalStiffness (data), GlobalStiffnessCounter (updater) and GlobalStiffnessTimeStepper to compute an appropriate dt for the numerical scheme. The TriaxialTest is the only preprocessor using these classes in Yade because they have been developped AFTER most of preprocessor examples, BUT they can be used in principle in any situation and they have nothing specifically related to the triaxial test.
+	
+	@note TriaxialStressController::ComputeUnbalancedForce(...) returns a value that can be usefull for evaluating the stability of the packing. It is defined as (mean force on particles)/(mean contact force), so that it tends to 0 in a stable packing. This parameter is checked by TriaxialCompressionEngine to switch from one stage of the simulation to the next one (e.g. stop isotropic confinment and start axial loading)
+	
  */
 
 class TriaxialTest : public FileGenerator
@@ -76,6 +90,7 @@ class TriaxialTest : public FileGenerator
 				,wall_2_wire
 				,wall_3_wire
 				,wall_4_wire
+				//! do we just want to generate a stable packing under isotropic pressure (false) or do we want the triaxial loading to start automatically right after compaction stage (true)?
 				,autoCompressionActivation
 				,bigBall
 				,rotationBlocked
@@ -83,6 +98,7 @@ class TriaxialTest : public FileGenerator
 				,recordBottomForce
 				,recordAveragePositions
 				,boxWalls
+				//! flag for choosing between moving boundaries or increasing particles sizes during the compaction stage.
 				,internalCompaction
 				,saveAnimationSnapshots;
 

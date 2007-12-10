@@ -38,7 +38,7 @@ TriaxialStressController::TriaxialStressController() : actionParameterForce(new 
 	radiusControlInterval =10;
 	computeStressStrainInterval = 10;
 	wallDamping = 0.25;
-	force = Vector3r::ZERO;
+	//force = Vector3r::ZERO;
 	for (int i=0; i<6; ++i)
 	{
 		wall_id[i] = 0;
@@ -104,7 +104,7 @@ void TriaxialStressController::registerAttributes()
 	REGISTER_ATTRIBUTE(radiusControlInterval);
 	REGISTER_ATTRIBUTE(computeStressStrainInterval);
 	REGISTER_ATTRIBUTE(wallDamping);
-	REGISTER_ATTRIBUTE(force);
+//	REGISTER_ATTRIBUTE(force);
 	
 	//REGISTER_ATTRIBUTE(UnbalancedForce);
 	

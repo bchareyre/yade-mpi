@@ -14,6 +14,14 @@
 #include <string>
 #include <fstream>
 
+/*! \brief Record the stress-strain state of a sample in simulations using TriaxialCompressionEngine
+
+	The output is a text file where each line is a record, with the format 
+	IterationNumber sigma11 sigma22 sigma33 epsilon11 epsilon22 epsilon33
+	
+ */
+
+
 class PhysicalAction;
 class TriaxialCompressionEngine;
 
