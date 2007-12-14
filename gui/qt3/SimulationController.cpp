@@ -96,9 +96,6 @@ SimulationController::SimulationController(QWidget * parent) : QtGeneratedSimula
 	if (Omega::instance().getSimulationFileName()!=""){
 		loadSimulationFromFileName(Omega::instance().getSimulationFileName());
 	}
-
-	// this should prevent weird things happening during the very first run; it is not a proper fix, though.
-	pbStopClicked();
 }
 
 
@@ -161,7 +158,7 @@ void SimulationController::pbLoadClicked()
 }
 
 
-void SimulationController::loadSimulationFromFileName(const std::string& fileName,bool center)
+void SimulationController::loadSimulationFromFileName(const std::string& fileName,bool center, bool useTimeStepperIfPresent)
 {
 	assert(filesystem::exists(fileName));
 
@@ -186,8 +183,8 @@ void SimulationController::loadSimulationFromFileName(const std::string& fileNam
 			if (Omega::instance().containTimeStepper())
 			{
 				rbTimeStepper->setEnabled(true);
-				rbTimeStepper->setChecked(true);
-				wasUsingTimeStepper = true;
+				rbTimeStepper->setChecked(useTimeStepperIfPresent);
+				wasUsingTimeStepper = useTimeStepperIfPresent;
 			}
 			else
 			{
@@ -195,6 +192,7 @@ void SimulationController::loadSimulationFromFileName(const std::string& fileNam
 				rbFixed->setChecked(true);
 				wasUsingTimeStepper = false;
 			}
+			skipTimeStepper=!wasUsingTimeStepper;
 		} 
 		catch(SerializableError& e) // catching it...
 		{
@@ -219,10 +217,7 @@ void SimulationController::loadSimulationFromFileName(const std::string& fileNam
 			pbOneSimulationStep->setDisabled(true);
 		}
 
-		if(center)
-			pbCenterSceneClicked();
-		
-		rbTimeStepper->setEnabled(Omega::instance().containTimeStepper());
+		if(center) pbCenterSceneClicked();
 }
 
 void SimulationController::pbSaveClicked()
@@ -318,26 +313,16 @@ void SimulationController::pbStartClicked()
 
 void SimulationController::pbResetClicked()
 {
-//	updater->stop();
 
 	pbStopClicked();
 
-/*
-	Omega::instance().finishSimulationLoop();
-	Omega::instance().joinSimulationLoop(); 
-	Omega::instance().loadSimulation();
-	Omega::instance().createSimulationLoop();
-*/
 	std::string name=Omega::instance().getSimulationFileName(); 
-	loadSimulationFromFileName(name,false);
+	loadSimulationFromFileName(name,false /* don't re-center scene */,wasUsingTimeStepper /* respect timeStepper setting from the prvious run*/);
 
 	if(Omega::instance().getRootBody())
 	{
-		changeSkipTimeStepper = true;
-		skipTimeStepper = !wasUsingTimeStepper;
+		// timeStepper setup done in loadSimulationFromFileName
 		updater->oneLoop(); // to refresh gui
-
-		rbTimeStepper->setEnabled(Omega::instance().containTimeStepper());
 		redrawAll();
 	} 
 	else

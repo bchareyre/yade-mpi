@@ -40,6 +40,7 @@ class GlobalStiffnessTimeStepper : public TimeStepper
 	
 		virtual void computeTimeStep(Body* body);
 		virtual bool isActivated();
+		DECLARE_LOGGER;
 
 
 	protected :

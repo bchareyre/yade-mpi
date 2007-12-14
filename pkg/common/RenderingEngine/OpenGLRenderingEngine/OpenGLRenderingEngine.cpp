@@ -114,7 +114,7 @@ void OpenGLRenderingEngine::render(
 	if(!initDone) // FIXME - this is a quick hack for newest version of libglut
 	{
 		int a=1;
-		char* b="./yade";
+		char* b=(char*)"./yade";
 		glutInit(&a,&b);
 		initDone=true;
 	}

@@ -45,7 +45,7 @@ void Omega::init()
 {
 	simulationFileName="";
 	currentIteration = 0;
-	dt = 0.01;
+	dt = 1e-8;
 	logFile = shared_ptr<ofstream>(new ofstream("../data/log.xml", ofstream::out | ofstream::app));
 }
 

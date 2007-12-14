@@ -17,7 +17,7 @@
 #include<yade/core/MetaBody.hpp>
 #include<yade/pkg-common/Sphere.hpp>
 
-
+CREATE_LOGGER(TriaxialStressController);
 
 TriaxialStressController::TriaxialStressController() : actionParameterForce(new Force), wall_bottom_id(wall_id[0]), wall_top_id(wall_id[1]), wall_left_id(wall_id[2]), wall_right_id(wall_id[3]), wall_front_id(wall_id[4]), wall_back_id(wall_id[5])
 {
@@ -194,9 +194,9 @@ void TriaxialStressController::updateStiffness (MetaBody * ncb)
 	
 }
 
-void TriaxialStressController::controlExternalStress(int wall, MetaBody* ncb, int id, Vector3r resultantForce, PhysicalParameters* p, Real wall_max_vel) //FIXME remove parameter "id"
+void TriaxialStressController::controlExternalStress(int wall, MetaBody* ncb, Vector3r resultantForce, PhysicalParameters* p, Real wall_max_vel)
 {
-	Real translation= normal[wall].Dot(static_cast<Force*>( ncb->physicalActions->find(wall_id[wall],ForceClassIndex).get() )->force - resultantForce);
+	Real translation=normal[wall].Dot(static_cast<Force*>( ncb->physicalActions->find(wall_id[wall],ForceClassIndex).get() )->force - resultantForce);
 	//cerr << "current force= " << static_cast<Force*>(ncb->physicalActions->find(wall_id[wall],ForceClassIndex).get() )->force << " imposed force = " << resultantForce << endl;
         if (translation!=0)
         {
@@ -210,9 +210,7 @@ void TriaxialStressController::controlExternalStress(int wall, MetaBody* ncb, in
             }
             else
                 translation = wall_max_vel * Mathr::Sign(translation);
-                
         }
-
         previousTranslation[wall] = (1-wallDamping)*translation*normal[wall];// + 0.7*previousTranslation[wall];// formula for "steady-flow" evolution with fluctuations
         p->se3.position	+= previousTranslation[wall];
 }
@@ -221,7 +219,7 @@ void TriaxialStressController::controlExternalStress(int wall, MetaBody* ncb, in
 
 
 void TriaxialStressController::applyCondition(Body* body)
-{
+{ TR;
 	//cerr << "TriaxialStressController::applyCondition" << endl;
         MetaBody * ncb = YADE_CAST<MetaBody*>(body);
 
@@ -246,41 +244,17 @@ void TriaxialStressController::applyCondition(Body* body)
         if (Omega::instance().getCurrentIteration() % computeStressStrainInterval == 0 ||
         	(internalCompaction && isARadiusControlIteration) )
         		computeStressStrain(ncb);
-//                cerr << "Sm = " << computeStressStrain(ncb);
-
-
-        
-
-
-       
-        
-        //cerr << "height " << height << " width " << width << " depth " << depth << endl;
 
         if (!internalCompaction) {
                 Vector3r wallForce (0, sigma_iso*width*depth, 0);
-                if (wall_bottom_activated)
-                        controlExternalStress(wall_bottom, ncb, wall_bottom_id, -wallForce, p_bottom, max_vel);
-                if (wall_top_activated)
-                        controlExternalStress(wall_top, ncb, wall_top_id, wallForce, p_top, max_vel);
-
+                if (wall_bottom_activated) controlExternalStress(wall_bottom, ncb, -wallForce, p_bottom, max_vel);
+                if (wall_top_activated) controlExternalStress(wall_top, ncb, wallForce, p_top, max_vel);
                 wallForce = Vector3r(sigma_iso*height*depth, 0, 0);
-                if (wall_left_activated)
-                        controlExternalStress(wall_left, ncb, wall_left_id,
-                                              -wallForce, p_left, max_vel*width/height);
-
-                if (wall_right_activated)
-                        controlExternalStress(wall_right, ncb, wall_right_id,
-                                              wallForce, p_right, max_vel*width/height);
-
+                if (wall_left_activated) controlExternalStress(wall_left, ncb, -wallForce, p_left, max_vel*width/height);
+                if (wall_right_activated) controlExternalStress(wall_right, ncb, wallForce, p_right, max_vel*width/height);
                 wallForce = Vector3r(0, 0, sigma_iso*height*width);
-                if (wall_back_activated)
-                        controlExternalStress(wall_back, ncb, wall_back_id,
-                                              -wallForce, p_back, max_vel*depth/height);
-
-                if (wall_front_activated)
-                        controlExternalStress(wall_front, ncb, wall_front_id,
-                                              wallForce, p_front, max_vel*depth/height);
-
+					 if (wall_back_activated) controlExternalStress(wall_back, ncb, -wallForce, p_back, max_vel*depth/height);
+					 if (wall_front_activated) controlExternalStress(wall_front, ncb, wallForce, p_front, max_vel*depth/height);
         }
         else //if internal compaction
         {
@@ -302,6 +276,12 @@ void TriaxialStressController::applyCondition(Body* body)
         }
 }
 
+void TriaxialStressController::deactivateLateralWalls()
+{
+	LOG_WARN("NOT IMPLEMENTED: would deactivate lateral walls now.");
+	cerr<<"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"<<endl;
+}
+
 
 Real TriaxialStressController::computeStressStrain(MetaBody* ncb)
 {
@@ -312,11 +292,11 @@ Real TriaxialStressController::computeStressStrain(MetaBody* ncb)
 	
 	meanStress = 0;
 	if (height0 == 0) height0 = height;
-        if (width0 == 0) width0 = width;
-        if (depth0 == 0) depth0 = depth;
+	if (width0 == 0) width0 = width;
+	if (depth0 == 0) depth0 = depth;
 	strain[0] = Mathr::Log(width0/width);
-        strain[1] = Mathr::Log(height0/height);
-        strain[2] = Mathr::Log(depth0/depth);
+	strain[1] = Mathr::Log(height0/height);
+	strain[2] = Mathr::Log(depth0/depth);
 	
 	Real invXSurface = 1.f/(height*depth);
 	Real invYSurface = 1.f/(width*depth);
@@ -334,7 +314,7 @@ Real TriaxialStressController::computeStressStrain(MetaBody* ncb)
  //<< stress[wall_front] << " " << stress[wall_back] << endl;
 
 	for (int i=0; i<6; i++) meanStress-= stress[i].Dot(normal[i]);
-	return meanStress*=0.16666666666;
+	return meanStress/6.;
 	
 }
 

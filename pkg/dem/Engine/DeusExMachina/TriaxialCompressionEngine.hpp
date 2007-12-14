@@ -23,6 +23,11 @@
 
 class PhysicalAction;
 
+/** \brief Class for controlling optional initial isotropic compaction and subsequent triaxial stress test with hydrostatic confinement.
+ *
+ *
+ * 
+ */
 class TriaxialCompressionEngine : public TriaxialStressController
 {
 	private :
@@ -51,9 +56,13 @@ class TriaxialCompressionEngine : public TriaxialStressController
 		bool compressionActivated;
 		//! Auto-switch between isotropic and uniaxial compression?
 		bool autoCompressionActivation;
+		//! Do not apply lateral confinement during uniaxial compression? (default off, i.e. lateral confinement activated)
+		bool noLateralConfinement;
 				
 		virtual void applyCondition(Body * body);
 		void updateParameters(Body * body);
+
+		DECLARE_LOGGER;
 		
 
 	protected :

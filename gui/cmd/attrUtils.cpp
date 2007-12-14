@@ -103,6 +103,8 @@ class AttrAccess{
 		//! return attribute value as python object
 		boost::python::object pyGet(std::string key){
 			vector<string> raw=getAttrStr(key);
+			DescriptorMap::iterator I=descriptors.find(key);
+			if(I==descriptors.end()) throw std::invalid_argument(string("Invalid key: `")+key+"'.");
 			if(raw.size()==1){
 				if(descriptors[key].types[0]==BOOL) return boost::python::object(lexical_cast<bool>(raw[0]));
 				if(descriptors[key].types[0]==STRING) return boost::python::object(raw[0]);
@@ -119,6 +121,8 @@ class AttrAccess{
 		}
 		//! set attribute value from python object
 		void pySet(std::string key, python::object val){
+			DescriptorMap::iterator I=descriptors.find(key);
+			if(I==descriptors.end()) throw std::invalid_argument(string("Invalid key: `")+key+"'.");
 			if(descriptors[key].types.size()==1){
 				if(descriptors[key].types[0]==BOOL) { setAttr(key,python::extract<bool>(val)); return;}
 				if(descriptors[key].types[0]==STRING){setAttr(key,python::extract<string>(val)); return;}

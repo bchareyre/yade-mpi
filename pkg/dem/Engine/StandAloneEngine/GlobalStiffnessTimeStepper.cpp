@@ -16,6 +16,7 @@
 #include<yade/pkg-common/Sphere.hpp>
 #include<yade/pkg-dem/GlobalStiffness.hpp>
 
+CREATE_LOGGER(GlobalStiffnessTimeStepper);
 
 GlobalStiffnessTimeStepper::GlobalStiffnessTimeStepper() : TimeStepper() , sdecContactModel(new MacroMicroElasticRelationships), actionParameterGlobalStiffness(new GlobalStiffness)
 {
@@ -177,7 +178,8 @@ void GlobalStiffnessTimeStepper::computeTimeStep(Body* body)
 		//cerr << "GlobalStiffnessTimeStepper, timestep chosen is:" << Omega::instance().getTimeStep() << endl;
 	}
 	else if (!computedOnce) Omega::instance().setTimeStep(defaultDt);
-	if (Omega::instance().getCurrentIteration() % 100 == 0)
-	cerr << "computed timestep = " << newDt << "; new timestep is:" << Omega::instance().getTimeStep() << endl;
+	if (Omega::instance().getCurrentIteration() % 100 == 0) LOG_INFO("computed timestep " << newDt <<
+		(Omega::instance().getTimeStep()==newDt ? string(", appplied") :
+		string(", BUT timestep is ")+lexical_cast<string>(Omega::instance().getTimeStep()))<<".");
 }
 

@@ -58,12 +58,13 @@ sigHandler(int sig){
 
 void firstRunSetup(shared_ptr<Preferences>& pref)
 {
-	char *libDirs[]={"extra","gui","lib","pkg-common","pkg-dem","pkg-fem","pkg-lattice","pkg-mass-spring","pkg-realtime-rigidbody",NULL /* sentinel */};
+	const char* libDirs[]={"extra","gui","lib","pkg-common","pkg-dem","pkg-fem","pkg-lattice","pkg-mass-spring","pkg-realtime-rigidbody",NULL /* sentinel */};
 	string cfgFile=Omega::instance().yadeConfigPath+"/preferences.xml";
 	LOG_INFO("Creating default configuration file: "<<cfgFile<<". Please tune by hand if needed.");
 	string expLibDir;
 	for(int i=0; libDirs[i]!=NULL; i++) {
 		expLibDir=string(PREFIX "/lib/yade" SUFFIX "/") + libDirs[i];
+		// FIXME: only add if really exists (module may not be built)
 		LOG_INFO("Adding plugin directory "<<expLibDir<<".");
 		pref->dynlibDirectories.push_back(expLibDir);
 	}
