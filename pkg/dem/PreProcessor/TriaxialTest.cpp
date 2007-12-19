@@ -148,7 +148,6 @@ TriaxialTest::TriaxialTest () : FileGenerator()
 	strainRate = 0.1;
 	StabilityCriterion = 0.01;
 	autoCompressionActivation = false;
-	noLateralConfinement=false;
 	maxMultiplier = 1.01;
 	finalMaxMultiplier = 1.001;
 	
@@ -213,7 +212,6 @@ void TriaxialTest::registerAttributes()
 	REGISTER_ATTRIBUTE(strainRate);
 	REGISTER_ATTRIBUTE(StabilityCriterion);
 	REGISTER_ATTRIBUTE(autoCompressionActivation);
-	REGISTER_ATTRIBUTE(noLateralConfinement);
 //	REGISTER_ATTRIBUTE(wall_top);
 //	REGISTER_ATTRIBUTE(wall_bottom);
 //	REGISTER_ATTRIBUTE(wall_1);
@@ -651,7 +649,6 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	triaxialcompressionEngine->strainRate = strainRate;
 	triaxialcompressionEngine->StabilityCriterion = StabilityCriterion;
 	triaxialcompressionEngine->autoCompressionActivation = autoCompressionActivation;
-	triaxialcompressionEngine->noLateralConfinement = noLateralConfinement;
 	triaxialcompressionEngine->internalCompaction = internalCompaction;
 	triaxialcompressionEngine->maxMultiplier = maxMultiplier;
 		

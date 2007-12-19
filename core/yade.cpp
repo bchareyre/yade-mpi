@@ -64,7 +64,7 @@ void firstRunSetup(shared_ptr<Preferences>& pref)
 	string expLibDir;
 	for(int i=0; libDirs[i]!=NULL; i++) {
 		expLibDir=string(PREFIX "/lib/yade" SUFFIX "/") + libDirs[i];
-		// FIXME: only add if really exists (module may not be built)
+		if(!filesystem::exists(expLibDir)) continue; // skip modules that were not built/installed
 		LOG_INFO("Adding plugin directory "<<expLibDir<<".");
 		pref->dynlibDirectories.push_back(expLibDir);
 	}

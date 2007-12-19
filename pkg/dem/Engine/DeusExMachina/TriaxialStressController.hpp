@@ -81,7 +81,6 @@ class TriaxialStressController : public DeusExMachina
 		Real computeStressStrain(MetaBody* ncb); //Compute stresses on walls and store the values in "Vector3r stress[6]", return mean stress
 		//! Compute the mean/max unbalanced force in the assembly (normalized by mean contact force)
     		Real ComputeUnbalancedForce(Body * body, bool maxUnbalanced=false);
-		void deactivateLateralWalls();
 
 		DECLARE_LOGGER;
 		

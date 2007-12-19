@@ -16,6 +16,9 @@
 #include "TriaxialStressController.hpp"
 #include <string>
 
+// FIXME: current serializer doesn't handle named enum types, this is workaround.
+#define stateNum int
+
 /*! \brief Isotropic compression + uniaxial compression test
 
 	detailed description...
@@ -36,6 +39,11 @@ class TriaxialCompressionEngine : public TriaxialStressController
 	public :
 		TriaxialCompressionEngine();
 		virtual ~TriaxialCompressionEngine();
+
+		enum {STATE_ISO_COMPACTION, STATE_ISO_UNLOADING, STATE_TRIAX_LOADING, STATE_LIMBO}; 
+		stateNum currentState;
+		//const char* stateNames[]={"istropic_compression","isotropic_unloading","triaxial_loading"};
+		void doStateTransition(stateNum nextState);
 		
 		//! Strain velocity (./s)
 		Real strainRate;
@@ -44,23 +52,26 @@ class TriaxialCompressionEngine : public TriaxialStressController
 		Real UnbalancedForce;
 		//! Value of UnbalancedForce for which the system is considered stable
 		Real StabilityCriterion;
-		//! Previous value of inherited sigma_iso (used to detect changes of the confining pressure)
+		//! Previous value of inherited sigma_iso (used to detect manual changes of the confining pressure)
 		Real previousSigmaIso;
+		//! Previous state (used to detect manual changes of the state in .xml)
+		stateNum previousState;
 		//Vector3r strain;
 		Vector3r translationAxis;
 		//! is isotropicInternalCompactionFinished?
 		bool Phase1, saveSimulation;
+		//! is this the beginning of the simulation, after reading the scene?
+		bool firstRun;
 		int FinalIterationPhase1, Iteration, testEquilibriumInterval;
 		std::string Phase1End; //,Phase2End;
-		//! Is uniaxial compression currently activated?
-		bool compressionActivated;
+		// //! Is uniaxial compression currently activated?
+		// bool compressionActivated;
 		//! Auto-switch between isotropic and uniaxial compression?
 		bool autoCompressionActivation;
-		//! Do not apply lateral confinement during uniaxial compression? (default off, i.e. lateral confinement activated)
-		bool noLateralConfinement;
 				
 		virtual void applyCondition(Body * body);
 		void updateParameters(Body * body);
+
 
 		DECLARE_LOGGER;
 		

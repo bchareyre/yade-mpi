@@ -219,7 +219,7 @@ void TriaxialStressController::controlExternalStress(int wall, MetaBody* ncb, Ve
 
 
 void TriaxialStressController::applyCondition(Body* body)
-{ TR;
+{
 	//cerr << "TriaxialStressController::applyCondition" << endl;
         MetaBody * ncb = YADE_CAST<MetaBody*>(body);
 
@@ -276,13 +276,6 @@ void TriaxialStressController::applyCondition(Body* body)
         }
 }
 
-void TriaxialStressController::deactivateLateralWalls()
-{
-	LOG_WARN("NOT IMPLEMENTED: would deactivate lateral walls now.");
-	cerr<<"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"<<endl;
-}
-
-
 Real TriaxialStressController::computeStressStrain(MetaBody* ncb)
 {
 	
@@ -314,8 +307,9 @@ Real TriaxialStressController::computeStressStrain(MetaBody* ncb)
  //<< stress[wall_front] << " " << stress[wall_back] << endl;
 
 	for (int i=0; i<6; i++) meanStress-= stress[i].Dot(normal[i]);
-	return meanStress/6.;
-	
+	meanStress/=6.;
+	// FIXME: meanStress is both returned as function value and stored in meanStress member. Confusing, change prototype to void, since return value isn't used anywhere.
+	return meanStress;
 }
 
 void TriaxialStressController::controlInternalStress(MetaBody* ncb, Real multiplier)

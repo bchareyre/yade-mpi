@@ -35,9 +35,11 @@ sconsVersion=10000*float(ver[0])+(100*float(ver[1]) if len(ver)>1 else 0)+(float
 ##########################################################################################
 ########## PROXY TO NEWER SCONS (DOWNLOADED IF NEEDED) ###################################
 ##########################################################################################
-if sconsVersion<9700:  ##<9693: 
-	tgzParams=("http://ovh.dl.sourceforge.net/sourceforge/scons/scons-local-0.97.0d20070918.tar.gz","/scons-local-0.97.0d20070918") ## sconsVersion<=9700
+#print sconsVersion
+if sconsVersion<9700.20071212:  ##<9700 ##<9693: 
 	#tgzParams=("http://dfn.dl.sourceforge.net/sourceforge/scons/scons-local-0.97.tar.gz","scons-local-0.97")
+	#tgzParams=("http://ovh.dl.sourceforge.net/sourceforge/scons/scons-local-0.97.0d20070918.tar.gz","/scons-local-0.97.0d20070918") ## sconsVersion<=9700
+	tgzParams=("http://switch.dl.sourceforge.net/sourceforge/scons/scons-local-0.97.0d20071212.tar.gz","/scons-local-0.97.0d20071212")
 	newPrefix="./scons-local";
 	newUrl,newDir=tgzParams[0],newPrefix+"/"+tgzParams[1]
 	if not os.path.exists(newDir):
@@ -48,6 +50,7 @@ if sconsVersion<9700:  ##<9693:
 		tar=tarfile.open(filename, "r:gz")
 		for tarinfo in tar: tar.extract(tarinfo,newPrefix)
 		print "Done extracting scons to",newDir
+		assert(os.path.exists(newDir))
 	if os.path.exists(newDir):
 		Exit(os.execv(newPrefix+"/scons.py",[newPrefix+'/scons.py']+sys.argv[1:]))
 
