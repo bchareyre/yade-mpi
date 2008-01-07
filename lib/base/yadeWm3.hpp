@@ -1,12 +1,5 @@
+#pragma once
 
-#ifdef USE_BASTARDIZED_WM3
-#error Bastardized wm3 no longer supported. Install the wm3 library.
-#endif
-
-#ifndef YADE_WM3_HPP
-#define YADE_WM3_HPP
-
-using namespace Wm3;
 
 #ifndef SINGLE_PRECISION
 	typedef double Real;
@@ -291,4 +284,4 @@ namespace Wm3 {
 	template<class T> class Vector3; typedef Vector3<Real> Vector3r;
 	template<class T> class Vector4; typedef Vector4<Real> Vector4r;
 }
-#endif
+using namespace Wm3;

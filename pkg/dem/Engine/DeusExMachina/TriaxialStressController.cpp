@@ -1,7 +1,7 @@
 /*************************************************************************
-*  Copyright (C) 2006 by Bruno Chareyre                                  *
-*  bruno.chareyre@hmg.inpg.fr                                            *
-*                                                                        *
+*  Copyright (C) 2006 by Bruno Chareyre				  *
+*  bruno.chareyre@hmg.inpg.fr					    *
+*									*
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
@@ -14,6 +14,7 @@
 #include<yade/pkg-common/Force.hpp>
 
 
+
 #include<yade/core/MetaBody.hpp>
 #include<yade/pkg-common/Sphere.hpp>
 
@@ -21,18 +22,10 @@ CREATE_LOGGER(TriaxialStressController);
 
 TriaxialStressController::TriaxialStressController() : actionParameterForce(new Force), wall_bottom_id(wall_id[0]), wall_top_id(wall_id[1]), wall_left_id(wall_id[2]), wall_right_id(wall_id[3]), wall_front_id(wall_id[4]), wall_back_id(wall_id[5])
 {
-	//cerr << "constructor of TriaxialStressController" << std::endl;
 	//StiffnessMatrixClassIndex = actionParameterStiffnessMatrix->getClassIndex();
 	ForceClassIndex = actionParameterForce->getClassIndex();
 	previousStress = 0;
 	previousMultiplier = 1;
-	wall_bottom = 0;
-	wall_top = 1;
-	wall_left = 2;
-	wall_right = 3;
-	wall_front = 4;
-	wall_back = 5;
-	
 	
 	stiffnessUpdateInterval =10;
 	radiusControlInterval =10;
@@ -54,13 +47,6 @@ TriaxialStressController::TriaxialStressController() : actionParameterForce(new 
 	normal[wall_right].X()=-1;
 	normal[wall_front].Z()=-1;
 	normal[wall_back].Z()=1;
-	
-// 	wall_bottom_id = wall_id[0];
-// 	wall_top_id = wall_id[1];
-// 	wall_left_id = wall_id[2];
-// 	wall_right_id = wall_id[3];
-// 	wall_front_id = wall_id[4];
-// 	wall_back_id = wall_id[5];
 	
 	//stiffness = Vector3r::ZERO;
 	max_vel = 0.001;
@@ -89,7 +75,6 @@ TriaxialStressController::TriaxialStressController() : actionParameterForce(new 
 	//UnbalancedForce = 0;
 	
 	sigma_iso = 0;
-	//cerr << "end of TriaxialStressController constructor" << std::endl;
 }
 
 TriaxialStressController::~TriaxialStressController()
@@ -98,7 +83,6 @@ TriaxialStressController::~TriaxialStressController()
 
 void TriaxialStressController::registerAttributes()
 {
-	//cerr << "TriaxialStressController::registerAttributes()" << std::endl;
 	DeusExMachina::registerAttributes();
 	REGISTER_ATTRIBUTE(stiffnessUpdateInterval);
 	REGISTER_ATTRIBUTE(radiusControlInterval);
@@ -140,22 +124,11 @@ void TriaxialStressController::registerAttributes()
 	REGISTER_ATTRIBUTE(previousStress);
 	REGISTER_ATTRIBUTE(previousMultiplier);
 	REGISTER_ATTRIBUTE(internalCompaction);
-	//cerr << "fin de TriaxialStressController::registerAttributes()" << std::endl;
 }
 
 void TriaxialStressController::updateStiffness (MetaBody * ncb)
 {
-	//cerr << "updateStiffness" << endl;
-	
-	//shared_ptr<BodyContainer>& bodies = ncb->bodies;
-
-	//Real dt = Omega::instance().getTimeStep();
-
-	for (int i=0; i<6; ++i)
-	{		
-		stiffness[i] = 0;
-	}									
-
+	for (int i=0; i<6; ++i) stiffness[i] = 0;
 
 	InteractionContainer::iterator ii    = ncb->transientInteractions->begin();
 	InteractionContainer::iterator iiEnd = ncb->transientInteractions->end();
@@ -165,54 +138,42 @@ void TriaxialStressController::updateStiffness (MetaBody * ncb)
 		{
 			const shared_ptr<Interaction>& contact = *ii;
 			
-			Real fn = (static_cast<ElasticContactInteraction*>	
-	(contact->interactionPhysics.get()))->normalForce.Length();
+			Real fn = (static_cast<ElasticContactInteraction*>	(contact->interactionPhysics.get()))->normalForce.Length();
 
 			if (fn!=0)
 			{
-				int id1 = contact->getId1();
-				int id2 = contact->getId2();
+				int id1 = contact->getId1(), id2 = contact->getId2();
 				
 				for (int index=0; index<6; ++index)
 				{
-				if ( wall_id[index]==id1 || wall_id[index]==id2 )
-				{
-					ElasticContactInteraction* currentContactPhysics =
-					static_cast<ElasticContactInteraction*> ( contact->interactionPhysics.get() );
-					stiffness[index]  += currentContactPhysics->kn;
-				}
+					if ( wall_id[index]==id1 || wall_id[index]==id2 )
+					{
+						ElasticContactInteraction* currentContactPhysics =
+						static_cast<ElasticContactInteraction*> ( contact->interactionPhysics.get() );
+						stiffness[index]  += currentContactPhysics->kn;
+					}
 				}
 			}
 		}
 	}
-	
-	{		
-		//cerr << "stiffness 1 = " << stiffness[1] << endl;
-	}
-	
-	//cerr << "fin updateStiffness" << endl;
-	
 }
 
 void TriaxialStressController::controlExternalStress(int wall, MetaBody* ncb, Vector3r resultantForce, PhysicalParameters* p, Real wall_max_vel)
 {
 	Real translation=normal[wall].Dot(static_cast<Force*>( ncb->physicalActions->find(wall_id[wall],ForceClassIndex).get() )->force - resultantForce);
 	//cerr << "current force= " << static_cast<Force*>(ncb->physicalActions->find(wall_id[wall],ForceClassIndex).get() )->force << " imposed force = " << resultantForce << endl;
-        if (translation!=0)
-        {
-        //cerr << "translation!=0" << endl;
-            if (stiffness[wall]!=0)
-            {
-           // cerr << "stiffness[wall]=" << stiffness[wall] << endl;
-                translation /= stiffness[wall];
-                translation = std::min( abs(translation), wall_max_vel*Omega::instance().getTimeStep() ) * Mathr::Sign(translation);
-            	//cerr << "translation=" << translation << endl;
-            }
-            else
-                translation = wall_max_vel * Mathr::Sign(translation);
-        }
-        previousTranslation[wall] = (1-wallDamping)*translation*normal[wall];// + 0.7*previousTranslation[wall];// formula for "steady-flow" evolution with fluctuations
-        p->se3.position	+= previousTranslation[wall];
+	if (translation!=0)
+	{
+	   if (stiffness[wall]!=0)
+	   {
+			translation /= stiffness[wall];
+			translation = std::min( abs(translation), wall_max_vel*Omega::instance().getTimeStep() ) * Mathr::Sign(translation);
+	   }
+	   else
+		translation = wall_max_vel * Mathr::Sign(translation);
+	}
+	previousTranslation[wall] = (1-wallDamping)*translation*normal[wall];// + 0.7*previousTranslation[wall];// formula for "steady-flow" evolution with fluctuations
+	p->se3.position	+= previousTranslation[wall];
 }
 
 
@@ -221,59 +182,59 @@ void TriaxialStressController::controlExternalStress(int wall, MetaBody* ncb, Ve
 void TriaxialStressController::applyCondition(Body* body)
 {
 	//cerr << "TriaxialStressController::applyCondition" << endl;
-        MetaBody * ncb = YADE_CAST<MetaBody*>(body);
+	MetaBody * ncb = YADE_CAST<MetaBody*>(body);
 
-        //Update stiffness only if it has been computed by StiffnessCounter (see "stiffnessUpdateInterval")
-        if (Omega::instance().getCurrentIteration() % stiffnessUpdateInterval == 0 || Omega::instance().getCurrentIteration()<1000)
-                updateStiffness(ncb);
-                
-        shared_ptr<BodyContainer>& bodies = ncb->bodies;
+	//Update stiffness only if it has been computed by StiffnessCounter (see "stiffnessUpdateInterval")
+	if (Omega::instance().getCurrentIteration() % stiffnessUpdateInterval == 0 || Omega::instance().getCurrentIteration()<1000)
+		updateStiffness(ncb);
+		
+	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 
-        PhysicalParameters* p_bottom = static_cast<PhysicalParameters*>((*bodies)[wall_bottom_id]->physicalParameters.get());
-        PhysicalParameters* p_top   =	 static_cast<PhysicalParameters*>((*bodies)[wall_top_id]->physicalParameters.get());
-        PhysicalParameters* p_left 	= static_cast<PhysicalParameters*>((*bodies)[wall_left_id]->physicalParameters.get());
-        PhysicalParameters* p_right = static_cast<PhysicalParameters*>((*bodies)[wall_right_id]->physicalParameters.get());
-        PhysicalParameters* p_front = static_cast<PhysicalParameters*>((*bodies)[wall_front_id]->physicalParameters.get());
-        PhysicalParameters* p_back 	= static_cast<PhysicalParameters*>((*bodies)[wall_back_id]->physicalParameters.get());
-                
-        height = p_top->se3.position.Y() - p_bottom->se3.position.Y() - thickness;
-        width = p_right->se3.position.X() - p_left->se3.position.X() - thickness;
-        depth = p_front->se3.position.Z() - p_back->se3.position.Z() - thickness;
+	PhysicalParameters* p_bottom = static_cast<PhysicalParameters*>((*bodies)[wall_bottom_id]->physicalParameters.get());
+	PhysicalParameters* p_top   =	 static_cast<PhysicalParameters*>((*bodies)[wall_top_id]->physicalParameters.get());
+	PhysicalParameters* p_left  = static_cast<PhysicalParameters*>((*bodies)[wall_left_id]->physicalParameters.get());
+	PhysicalParameters* p_right = static_cast<PhysicalParameters*>((*bodies)[wall_right_id]->physicalParameters.get());
+	PhysicalParameters* p_front = static_cast<PhysicalParameters*>((*bodies)[wall_front_id]->physicalParameters.get());
+	PhysicalParameters* p_back  = static_cast<PhysicalParameters*>((*bodies)[wall_back_id]->physicalParameters.get());
+		
+	height = p_top->se3.position.Y() - p_bottom->se3.position.Y() - thickness;
+	width = p_right->se3.position.X() - p_left->se3.position.X() - thickness;
+	depth = p_front->se3.position.Z() - p_back->se3.position.Z() - thickness;
  
-        bool isARadiusControlIteration = (Omega::instance().getCurrentIteration() % radiusControlInterval == 0);
-        if (Omega::instance().getCurrentIteration() % computeStressStrainInterval == 0 ||
-        	(internalCompaction && isARadiusControlIteration) )
-        		computeStressStrain(ncb);
+	bool isARadiusControlIteration = (Omega::instance().getCurrentIteration() % radiusControlInterval == 0);
+	if (Omega::instance().getCurrentIteration() % computeStressStrainInterval == 0 ||
+		 (internalCompaction && isARadiusControlIteration) )
+		computeStressStrain(ncb);
 
-        if (!internalCompaction) {
-                Vector3r wallForce (0, sigma_iso*width*depth, 0);
-                if (wall_bottom_activated) controlExternalStress(wall_bottom, ncb, -wallForce, p_bottom, max_vel);
-                if (wall_top_activated) controlExternalStress(wall_top, ncb, wallForce, p_top, max_vel);
-                wallForce = Vector3r(sigma_iso*height*depth, 0, 0);
-                if (wall_left_activated) controlExternalStress(wall_left, ncb, -wallForce, p_left, max_vel*width/height);
-                if (wall_right_activated) controlExternalStress(wall_right, ncb, wallForce, p_right, max_vel*width/height);
-                wallForce = Vector3r(0, 0, sigma_iso*height*width);
-					 if (wall_back_activated) controlExternalStress(wall_back, ncb, -wallForce, p_back, max_vel*depth/height);
-					 if (wall_front_activated) controlExternalStress(wall_front, ncb, wallForce, p_front, max_vel*depth/height);
-        }
-        else //if internal compaction
-        {
-                if (isARadiusControlIteration) {
-                        //Real s = computeStressStrain(ncb);
-                        if (sigma_iso<=meanStress) maxMultiplier = finalMaxMultiplier;
-                        if (meanStress==0)
-                                previousMultiplier = maxMultiplier;
-                        else {
-                                //     		previousMultiplier = 1+0.7*(sigma_iso-s)*(previousMultiplier-1.f)/(s-previousStress); // = (Dsigma/apparentModulus)*0.7
-                                //     		previousMultiplier = std::max(2-maxMultiplier, std::min(previousMultiplier, maxMultiplier));
-                                previousMultiplier = 1.f+(sigma_iso-meanStress)/sigma_iso*(maxMultiplier-1.f); // = (Dsigma/apparentModulus)*0.7
-                        }
-                        previousStress = meanStress;
-                        //cerr << "maxMultiplier" << maxMultiplier << endl;
-                        //Real apparentModulus = (s-previousStress)/(previousMultiplier-1.f);
-                        controlInternalStress(ncb, previousMultiplier);
-                }
-        }
+	if (!internalCompaction) {
+		Vector3r wallForce (0, sigma_iso*width*depth, 0);
+		if (wall_bottom_activated) controlExternalStress(wall_bottom, ncb, -wallForce, p_bottom, max_vel);
+		if (wall_top_activated) controlExternalStress(wall_top, ncb, wallForce, p_top, max_vel);
+		wallForce = Vector3r(sigma_iso*height*depth, 0, 0);
+		if (wall_left_activated) controlExternalStress(wall_left, ncb, -wallForce, p_left, max_vel*width/height);
+		if (wall_right_activated) controlExternalStress(wall_right, ncb, wallForce, p_right, max_vel*width/height);
+		wallForce = Vector3r(0, 0, sigma_iso*height*width);
+		if (wall_back_activated) controlExternalStress(wall_back, ncb, -wallForce, p_back, max_vel*depth/height);
+		if (wall_front_activated) controlExternalStress(wall_front, ncb, wallForce, p_front, max_vel*depth/height);
+	}
+	else //if internal compaction
+	{
+		if (isARadiusControlIteration) {
+			//Real s = computeStressStrain(ncb);
+			if (sigma_iso<=meanStress) maxMultiplier = finalMaxMultiplier;
+			if (meanStress==0)
+				previousMultiplier = maxMultiplier;
+			else {
+				//     		previousMultiplier = 1+0.7*(sigma_iso-s)*(previousMultiplier-1.f)/(s-previousStress); // = (Dsigma/apparentModulus)*0.7
+				//     		previousMultiplier = std::max(2-maxMultiplier, std::min(previousMultiplier, maxMultiplier));
+				previousMultiplier = 1.+(sigma_iso-meanStress)/sigma_iso*(maxMultiplier-1.); // = (Dsigma/apparentModulus)*0.7
+			}
+			previousStress = meanStress;
+			//cerr << "maxMultiplier" << maxMultiplier << endl;
+			//Real apparentModulus = (s-previousStress)/(previousMultiplier-1.f);
+			controlInternalStress(ncb, previousMultiplier);
+		}
+	}
 }
 
 Real TriaxialStressController::computeStressStrain(MetaBody* ncb)
@@ -314,38 +275,36 @@ Real TriaxialStressController::computeStressStrain(MetaBody* ncb)
 
 void TriaxialStressController::controlInternalStress(MetaBody* ncb, Real multiplier)
 {
-    BodyContainer::iterator bi    = ncb->bodies->begin();
-    BodyContainer::iterator biEnd = ncb->bodies->end();
-    //cerr << "meanstress = "radius = " << endl;
-    //cerr << "bouclesurBodies" << endl;
-    for (  ; bi!=biEnd ; ++bi )
-    {
-        if ((*bi)->isDynamic)
-        {
-            (static_cast<InteractingSphere*> ((*bi)->interactingGeometry.get()))->radius *= multiplier;
-            (static_cast<Sphere*>((*bi)->geometricalModel.get()))->radius *= multiplier;
-        }
-    }
-    // << "bouclesurInteraction" << endl;
-    InteractionContainer::iterator ii    = ncb->transientInteractions->begin();
-    InteractionContainer::iterator iiEnd = ncb->transientInteractions->end();
-    for (  ; ii!=iiEnd ; ++ii )
-    {
-        if ((*ii)->isReal)
-
-        {
-            SpheresContactGeometry* contact = static_cast<SpheresContactGeometry*> ((*ii)->interactionGeometry.get());
-//             if ((*(ncb->bodies))[(*ii)->getId1()]->isDynamic)
-//                 contact->radius1 *= multiplier;
-//             if ((*(ncb->bodies))[(*ii)->getId2()]->isDynamic)
-//                 contact->radius2 *= multiplier;
-            if ((*(ncb->bodies))[(*ii)->getId1()]->isDynamic)
-                contact->radius1 = static_cast<InteractingSphere*> ((*(ncb->bodies))[(*ii)->getId1()]->interactingGeometry.get())->radius;
-            if ((*(ncb->bodies))[(*ii)->getId2()]->isDynamic)
-                contact->radius2 = static_cast<InteractingSphere*> ((*(ncb->bodies))[(*ii)->getId2()]->interactingGeometry.get())->radius;
-
-        }
-    }
+   BodyContainer::iterator bi    = ncb->bodies->begin();
+   BodyContainer::iterator biEnd = ncb->bodies->end();
+   //cerr << "meanstress = "radius = " << endl;
+   //cerr << "bouclesurBodies" << endl;
+   for (  ; bi!=biEnd ; ++bi )
+   {
+		if ((*bi)->isDynamic)
+		{
+			(static_cast<InteractingSphere*> ((*bi)->interactingGeometry.get()))->radius *= multiplier;
+			(static_cast<Sphere*>((*bi)->geometricalModel.get()))->radius *= multiplier;
+		}
+	}
+	// << "bouclesurInteraction" << endl;
+	InteractionContainer::iterator ii    = ncb->transientInteractions->begin();
+	InteractionContainer::iterator iiEnd = ncb->transientInteractions->end();
+	for (  ; ii!=iiEnd ; ++ii )
+	{
+		if ((*ii)->isReal)
+		{
+			SpheresContactGeometry* contact = static_cast<SpheresContactGeometry*> ((*ii)->interactionGeometry.get());
+			//	     if ((*(ncb->bodies))[(*ii)->getId1()]->isDynamic)
+			//		 contact->radius1 *= multiplier;
+			//	     if ((*(ncb->bodies))[(*ii)->getId2()]->isDynamic)
+			//		 contact->radius2 *= multiplier;
+			if ((*(ncb->bodies))[(*ii)->getId1()]->isDynamic)
+				contact->radius1 = static_cast<InteractingSphere*> ((*(ncb->bodies))[(*ii)->getId1()]->interactingGeometry.get())->radius;
+			if ((*(ncb->bodies))[(*ii)->getId2()]->isDynamic)
+				contact->radius2 = static_cast<InteractingSphere*> ((*(ncb->bodies))[(*ii)->getId2()]->interactingGeometry.get())->radius;
+		}
+	}
 }
 
 /*!
@@ -353,58 +312,58 @@ void TriaxialStressController::controlInternalStress(MetaBody* ncb, Real multipl
  */
 Real TriaxialStressController::ComputeUnbalancedForce(Body * body, bool maxUnbalanced)
 {
-        //compute the mean contact force
-        Real MeanForce=0;
-        long nForce = 0;
+	//compute the mean contact force
+	Real MeanForce=0;
+	long nForce = 0;
 
-        MetaBody * ncb = static_cast<MetaBody*>(body);
-        shared_ptr<BodyContainer>& bodies = ncb->bodies;
+	MetaBody * ncb = static_cast<MetaBody*>(body);
+	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 
-        InteractionContainer::iterator ii    = ncb->transientInteractions->begin();
-        InteractionContainer::iterator iiEnd = ncb->transientInteractions->end();
-        for(  ; ii!=iiEnd ; ++ii ) {
-                if ((*ii)->isReal) {
-                        const shared_ptr<Interaction>& contact = *ii;
-                        Real fn = (static_cast<ElasticContactInteraction*> (contact->interactionPhysics.get()))->normalForce.Length();
-                        if (fn!=0)
-                        {
-                        MeanForce += (static_cast<ElasticContactInteraction*> (contact->interactionPhysics.get()))->normalForce.Length();
-                        ++nForce;
-                        }
-                }
-        }
-        if (nForce!=0) MeanForce /= nForce;
+	InteractionContainer::iterator ii    = ncb->transientInteractions->begin();
+	InteractionContainer::iterator iiEnd = ncb->transientInteractions->end();
+	for(  ; ii!=iiEnd ; ++ii ) {
+		if ((*ii)->isReal) {
+			const shared_ptr<Interaction>& contact = *ii;
+			Real fn = (static_cast<ElasticContactInteraction*> (contact->interactionPhysics.get()))->normalForce.Length();
+			if (fn!=0)
+			{
+			MeanForce += (static_cast<ElasticContactInteraction*> (contact->interactionPhysics.get()))->normalForce.Length();
+			++nForce;
+			}
+		}
+	}
+	if (nForce!=0) MeanForce /= nForce;
 
-//        int actionForceIndex = actionForce->getClassIndex();
+//	int actionForceIndex = actionForce->getClassIndex();
 
-        if (!maxUnbalanced) {
-                //compute mean Unbalanced Force
-                Real MeanUnbalanced=0;
-                long nBodies = 0;
-                BodyContainer::iterator bi    = bodies->begin();
-                BodyContainer::iterator biEnd = bodies->end();
-                Real f;
-                for(  ; bi!=biEnd ; ++bi ) {
-                        if ((*bi)->isDynamic) {
-                                f= (static_cast<Force*>   ( ncb->physicalActions->find( (*bi)->getId() , ForceClassIndex).get() )->force).Length();
-                                MeanUnbalanced += f;
-                                if (f!=0) ++nBodies;
-                        }
-                }
-                if (nBodies != 0 && MeanForce != 0) MeanUnbalanced = MeanUnbalanced/nBodies/MeanForce;
-                return  MeanUnbalanced;
-        } else {
-                //compute max Unbalanced Force
-                Real MaxUnbalanced=0;
-                BodyContainer::iterator bi    = bodies->begin();
-                BodyContainer::iterator biEnd = bodies->end();
-                for(  ; bi!=biEnd ; ++bi ) {
-                        if ((*bi)->isDynamic) {
-                                MaxUnbalanced = std::max((static_cast<Force*>   ( ncb->physicalActions->find( (*bi)->getId() , ForceClassIndex).get() )->force).Length(), MaxUnbalanced);
-                        }
-                }
-                if (MeanForce != 0) MaxUnbalanced = MaxUnbalanced/MeanForce;
-                return MaxUnbalanced/MeanForce;
-        }
+	if (!maxUnbalanced) {
+		//compute mean Unbalanced Force
+		Real MeanUnbalanced=0;
+		long nBodies = 0;
+		BodyContainer::iterator bi    = bodies->begin();
+		BodyContainer::iterator biEnd = bodies->end();
+		Real f;
+		for(  ; bi!=biEnd ; ++bi ) {
+			if ((*bi)->isDynamic) {
+				f= (static_cast<Force*>   ( ncb->physicalActions->find( (*bi)->getId() , ForceClassIndex).get() )->force).Length();
+				MeanUnbalanced += f;
+				if (f!=0) ++nBodies;
+			}
+		}
+		if (nBodies != 0 && MeanForce != 0) MeanUnbalanced = MeanUnbalanced/nBodies/MeanForce;
+		return  MeanUnbalanced;
+	} else {
+		//compute max Unbalanced Force
+		Real MaxUnbalanced=0;
+		BodyContainer::iterator bi    = bodies->begin();
+		BodyContainer::iterator biEnd = bodies->end();
+		for(  ; bi!=biEnd ; ++bi ) {
+			if ((*bi)->isDynamic) {
+				MaxUnbalanced = std::max((static_cast<Force*>   ( ncb->physicalActions->find( (*bi)->getId() , ForceClassIndex).get() )->force).Length(), MaxUnbalanced);
+			}
+		}
+		if (MeanForce != 0) MaxUnbalanced = MaxUnbalanced/MeanForce;
+		return MaxUnbalanced/MeanForce;
+	}
 }
 

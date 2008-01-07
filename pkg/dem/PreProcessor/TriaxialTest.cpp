@@ -161,7 +161,8 @@ TriaxialTest::TriaxialTest () : FileGenerator()
 	boxFrictionDeg   = 0.f;
 	gravity 	= Vector3r(0,-9.81,0);
 	
-	sigma_iso = 50000;
+	sigmaIsoCompaction = 50000;
+	sigmaLateralConfinement=sigmaIsoCompaction;
 	
 //	wall_top_id =0;
 // 	wall_bottom_id =0;
@@ -246,7 +247,9 @@ void TriaxialTest::registerAttributes()
 	//REGISTER_ATTRIBUTE(bigBallYoungModulus);
 	//REGISTER_ATTRIBUTE(bigBallPoissonRatio);
 	//REGISTER_ATTRIBUTE(bigBallDropHeight);
-	REGISTER_ATTRIBUTE(sigma_iso);
+	//REGISTER_ATTRIBUTE(sigma_iso);
+	REGISTER_ATTRIBUTE(sigmaIsoCompaction);
+	REGISTER_ATTRIBUTE(sigmaLateralConfinement);
 
 }
 
@@ -643,7 +646,9 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	triaxialcompressionEngine = shared_ptr<TriaxialCompressionEngine> (new TriaxialCompressionEngine);
 	triaxialcompressionEngine-> stiffnessUpdateInterval = wallStiffnessUpdateInterval;// = stiffness update interval
 	triaxialcompressionEngine-> radiusControlInterval = radiusControlInterval;// = stiffness update interval
-	triaxialcompressionEngine-> sigma_iso = sigma_iso;
+	//triaxialcompressionEngine-> sigma_iso = sigma_iso;
+	triaxialcompressionEngine-> sigmaIsoCompaction = sigmaIsoCompaction;
+	triaxialcompressionEngine-> sigmaLateralConfinement = sigmaLateralConfinement;
 	triaxialcompressionEngine-> max_vel = 0.01;
 	triaxialcompressionEngine-> thickness = thickness;
 	triaxialcompressionEngine->strainRate = strainRate;
@@ -661,7 +666,7 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	triaxialStateRecorder-> interval 		= recordIntervalIter;
 	//triaxialStateRecorderer-> thickness 		= thickness;
 	
-	
+	#if 0	
 	// moving walls to regulate the stress applied
 	//cerr << "triaxialstressController = shared_ptr<TriaxialStressController> (new TriaxialStressController);" << std::endl;
 	triaxialstressController = shared_ptr<TriaxialStressController> (new TriaxialStressController);
@@ -672,6 +677,7 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	triaxialstressController->wall_bottom_activated = false;
 	triaxialstressController->wall_top_activated = false;	
 		//cerr << "fin de sezction triaxialstressController = shared_ptr<TriaxialStressController> (new TriaxialStressController);" << std::endl;
+	#endif
 	
 	rootBody->engines.clear();
 	rootBody->engines.push_back(shared_ptr<Engine>(new PhysicalActionContainerReseter));

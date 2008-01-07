@@ -54,8 +54,10 @@ class MetaInteractingGeometry2AABB; */
 #include<yade/pkg-dem/ElasticContactLaw.hpp>
 #include<yade/pkg-dem/ElasticCohesiveLaw.hpp>
 
+#if 0
 #ifdef EMBED_PYTHON
 	#include<yade/extra/PythonRecorder.hpp>
+#endif
 #endif
 
 #include<yade/extra/Tetra.hpp>
@@ -243,7 +245,7 @@ void Shop::rootBodyActors(shared_ptr<MetaBody> rootBody){
 	shared_ptr<PhysicalParametersMetaEngine> orientationIntegrator(new PhysicalParametersMetaEngine);
 	orientationIntegrator->DISPATCHER_ADD2(RigidBodyParameters,LeapFrogOrientationIntegrator);
 	rootBody->engines.push_back(orientationIntegrator);
-
+#if 0
 	#ifdef EMBED_PYTHON
 		if(getDefault<string>("param_pythonRunExpr").length()>0 || getDefault<string>("param_pythonInitExpr").length()>0){
 			shared_ptr<PythonRecorder> pythonRecorder=shared_ptr<PythonRecorder>(new PythonRecorder);
@@ -252,6 +254,7 @@ void Shop::rootBodyActors(shared_ptr<MetaBody> rootBody){
 			rootBody->engines.push_back(pythonRecorder);
 		}
 	#endif
+#endif
 }
 
 

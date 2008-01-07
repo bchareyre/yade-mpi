@@ -35,7 +35,7 @@ class TriaxialStressController : public DeusExMachina
 	public :
 		unsigned int stiffnessUpdateInterval, computeStressStrainInterval, radiusControlInterval;
 		//! internal index values for retrieving walls
-		int wall_bottom, wall_top, wall_left, wall_right, wall_front, wall_back;
+		enum { wall_bottom=0, wall_top, wall_left, wall_right, wall_front, wall_back };
 		//! real index values of walls in the MetaBody
 		int wall_id [6];
 		//! Defines the prescibed resultant force 

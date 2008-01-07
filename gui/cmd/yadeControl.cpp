@@ -61,6 +61,7 @@ class pyOmega{
 		OMEGA.createSimulationLoop();
 		cerr<<"LOAD!"<<endl;
 	}
+	//void join(){cerr<<"JOIN!"<<endl; OMEGA.joinSimulationLoop();}
 	#undef OMEGA
 };
 
@@ -120,7 +121,12 @@ class pyGLViewer{
 	shared_ptr<boost::thread> redrawThread,appThread;
 	QApplication* app;
 	void redrawAlarm(void){
-		while(true){viewer->updateGL(); usleep(50000);}
+		while(true){
+			Omega::instance().stopSimulationLoop();
+			viewer->updateGL();
+			Omega::instance().startSimulationLoop();
+			usleep(10000000);
+		}
 	}
 	shared_ptr<AttrAccess> accessor;
 	void ensureAcc(){if(!accessor)accessor=shared_ptr<AttrAccess>(new AttrAccess(renderer));}
@@ -128,6 +134,8 @@ public:
 	DECLARE_LOGGER;
 	ATTR_ACCESS_CXX(accessor,ensureAcc);	
 	pyGLViewer(){
+		throw std::runtime_error("Programming error: Threading in pyGLViewer is broken and crashes; ignored.");
+		// LOG_WARN("Thread locking not correctly implemented, will pause Omega for redraw every 10s instead!");
 		shared_ptr<Factorable> _renderer=ClassFactory::instance().createShared("OpenGLRenderingEngine");
 		renderer=static_pointer_cast<RenderingEngine>(_renderer);
 
@@ -135,6 +143,7 @@ public:
 			Type of instance is: 15RenderingEngine
 			RuntimeError: Cannot determine type with findType()
 		*/
+		#if 0
 		if(renderer){// TODO: handle exceptions
 			filesystem::path rendererConfig=filesystem::path(Omega::instance().yadeConfigPath+"/OpenGLRendererPref.xml");
 			if(filesystem::exists(rendererConfig)){
@@ -142,11 +151,13 @@ public:
 				catch(SerializableError& e){LOG_WARN("Unable to load renderer preferences from `"<<rendererConfig.string()<<"': "<<e.what());}
 			}
 		} else throw runtime_error("Unable to create renderer!");
+		#endif
+		if(!renderer) throw runtime_error("Unable to create renderer!");
 
 		int viewId=0;
-		if(viewId==0){	int _argc=0; char* _argv[]={"foo"}; app=new QApplication(_argc,_argv);}
+		if(viewId==0){	int _argc=0; char _argvv[]="foo"; app=new QApplication(_argc,(char**) &_argvv);}
 
-		QGLFormat format;	QGLFormat::setDefaultFormat(format); format.setStencil(TRUE); format.setAlpha(TRUE);
+		QGLFormat format;	QGLFormat::setDefaultFormat(format); // format.setStencil(TRUE); format.setAlpha(TRUE);
 		viewer=shared_ptr<GLViewer>(new GLViewer(viewId,renderer,format,0,0));
 		viewer->centerScene();
 		viewer->notMoving();
@@ -184,6 +195,7 @@ BOOST_PYTHON_MODULE(yadeControl)
 		//.add_property("timeStepper",&timeStepper_get,&timeStepper_set)
 		.def("load",&pyOmega::load)
 		.def("run",&pyOmega::run)
+		// .def("join",&pyOmega::join)
 		.def("pause",&pyOmega::pause)
 		.def("step",&pyOmega::step);
 

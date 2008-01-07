@@ -53,7 +53,6 @@ class Omega : public Singleton<Omega>
 {
 
 	private	:
-		shared_ptr<ofstream>		 logFile;
 		boost::mutex			 omegaMutex
 						,rootBodyMutex;
 
@@ -81,9 +80,6 @@ class Omega : public Singleton<Omega>
 		string 				 yadeVersionName;	// FIXME - public ?
 		list<body_id_t> selectedBodies;
 	
-		void logMessage(const string& str);
-		void logError(const string& str);
-		
 		// FIXME this is a hack. See  GLViewer:86
 		// problem is that currently there is no way to transmit arguments between UI and GLDraw* methods.
 		// Omega will be deleted anyway, so, uh.. I am polluting it now :/
@@ -103,7 +99,7 @@ class Omega : public Singleton<Omega>
 		void		finishSimulationLoop();
 		void		joinSimulationLoop();
 		void		spawnSingleSimulationLoop();
-
+		bool		isRunning();
         //      shared_ptr<ThreadSynchronizer> getSynchronizer();
 
 		const		map<string,DynlibDescriptor>& getDynlibsDescriptor();

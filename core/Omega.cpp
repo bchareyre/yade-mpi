@@ -35,9 +35,7 @@ Omega::Omega()
 
 Omega::~Omega()
 {
-	*logFile << "\t" << "<Summary Duration=\"" << sStartingSimulationTime-second_clock::local_time() << "\">" <<endl;
-	*logFile << "</Simulation>" << endl << endl;
-	logFile->close();
+	LOG_INFO("Shuting down; duration "<<sStartingSimulationTime-second_clock::local_time());
 }
 
 
@@ -46,19 +44,6 @@ void Omega::init()
 	simulationFileName="";
 	currentIteration = 0;
 	dt = 1e-8;
-	logFile = shared_ptr<ofstream>(new ofstream("../data/log.xml", ofstream::out | ofstream::app));
-}
-
-
-void Omega::logError(const string& str)
-{
-	*logFile << "\t" << "<Error Date=\"" << sStartingSimulationTime-second_clock::local_time() << "\" " << "Message =\""<< str << "\"" << endl;
-}
-
-
-void Omega::logMessage(const string& str)
-{
-	*logFile << "\t" << "<Message Date=\"" << sStartingSimulationTime-second_clock::local_time() << "\" " << "Message =\""<< str << "\"" << endl;
 }
 
 
@@ -95,6 +80,7 @@ void Omega::spawnSingleSimulationLoop()
 }
 
 
+
 void Omega::startSimulationLoop()
 {
 	if (simulationLoop && !simulationLoop->looping())
@@ -114,6 +100,7 @@ void Omega::stopSimulationLoop()
 	}
 }
 
+	bool Omega::isRunning(){ return simulationLoop->looping(); }
 
 void Omega::buildDynlibDatabase(const vector<string>& dynlibsList)
 {	
@@ -369,20 +356,20 @@ void Omega::loadSimulation()
 		&&  (filesystem::extension(simulationFileName)==".xml" || filesystem::extension(simulationFileName)==".yade" ))
 	{
 		freeRootBody();
-		logMessage("Loading file " + simulationFileName);
+		LOG_INFO("Loading file " + simulationFileName);
 		
 		if(filesystem::extension(simulationFileName)==".xml")
 			IOFormatManager::loadFromFile("XMLFormatManager",simulationFileName,"rootBody",rootBody);
 		else if(filesystem::extension(simulationFileName)==".yade" )
 			IOFormatManager::loadFromFile("BINFormatManager",simulationFileName,"rootBody",rootBody);
 		if( rootBody->getClassName() != "MetaBody")
-			throw yadeBadFile("bad file to load");
+			throw yadeBadFile(string("Unrecognized extension `"+filesystem::extension(simulationFileName)+"': should be .xml|.yade").c_str());
 
 		sStartingSimulationTime = second_clock::local_time();
 		msStartingSimulationTime = microsec_clock::local_time();
 		simulationPauseDuration = msStartingSimulationTime-msStartingSimulationTime;
 		msStartingPauseTime = msStartingSimulationTime;
-		*logFile << "<Simulation" << " Date =\"" << sStartingSimulationTime << "\">" << endl;
+		LOG_DEBUG("Simulation loaded");
 		currentIteration = 0;
 		simulationTime = 0;	
 	}
@@ -399,7 +386,7 @@ void Omega::saveSimulation(const string name)
 	if(	   (name.size() != 0)
 		&& (filesystem::extension(name)==".xml" || filesystem::extension(name)==".yade") )
         {
-		logMessage("Saving file " + name);
+		LOG_INFO("Saving file " << name);
 		if(filesystem::extension(name)==".xml")
 			IOFormatManager::saveToFile("XMLFormatManager",name,"rootBody",rootBody);
 		else if(filesystem::extension(name)==".yade" )

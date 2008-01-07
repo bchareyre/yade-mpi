@@ -25,7 +25,8 @@ TriaxialCompressionEngine::TriaxialCompressionEngine() : actionForce(new Force)
 	currentStrainRate=0;
 	StabilityCriterion=0.001;
 	//Phase1=false;
-	currentState=STATE_ISO_COMPACTION;
+	currentState=STATE_UNINITIALIZED;
+	previousState=currentState;
 	UnbalancedForce = 1;
 	Phase1End = "Compacted";
 	FinalIterationPhase1 = 0;
@@ -63,51 +64,66 @@ void TriaxialCompressionEngine::registerAttributes()
 	REGISTER_ATTRIBUTE(testEquilibriumInterval);
 	REGISTER_ATTRIBUTE(currentState);
 	REGISTER_ATTRIBUTE(previousState);
+	REGISTER_ATTRIBUTE(sigmaIsoCompaction);
+	REGISTER_ATTRIBUTE(sigmaLateralConfinement);
 }
 
 void TriaxialCompressionEngine::doStateTransition(stateNum nextState){
-	if (nextState==STATE_ISO_COMPACTION){
-		currentState=nextState;
-		LOG_INFO("State transition to STATE_ISO_COMPACTION done.");
+	if ( currentState==STATE_UNINITIALIZED && nextState==STATE_ISO_COMPACTION){
+		sigma_iso=sigmaIsoCompaction;
 	}
-	if(nextState==STATE_TRIAX_LOADING){
-		assert(currentState==STATE_ISO_COMPACTION || currentState==STATE_LIMBO);
+	else if((currentState==STATE_ISO_COMPACTION || currentState==STATE_ISO_UNLOADING || currentState==STATE_LIMBO) && nextState==STATE_TRIAX_LOADING){
+		sigma_iso=sigmaLateralConfinement;
 		internalCompaction = false;
 		height0 = height; depth0 = depth; width0 = width;
 		//compressionActivated = true;
 		wall_bottom_activated=false;
 		wall_top_activated=false;
-		autoCompressionActivation = false; // FIXME: this can be removed, since it will not be used anymore
 		if(!firstRun) saveSimulation=true; // saving snapshot .xml will actually be done in ::applyCondition
-		currentState=nextState;
-		LOG_INFO("State transition from STATE_ISO_COMPACTION to STATE_TRIAX_LOADING done.");
 	}
-	if(nextState==STATE_LIMBO){
-		assert(currentState==STATE_ISO_COMPACTION);
+	else if(currentState==STATE_ISO_COMPACTION && nextState==STATE_ISO_UNLOADING){
+		sigma_iso=sigmaLateralConfinement;
+		internalCompaction=false; // unloading will not change grain sizes
+	}
+	else if(currentState==STATE_ISO_COMPACTION && nextState==STATE_LIMBO){
 		internalCompaction = false;
 		height0 = height; depth0 = depth; width0 = width;
 		saveSimulation=true; // saving snapshot .xml will actually be done in ::applyCondition
-		currentState=nextState;
-		LOG_INFO("State transition from STATE_ISO_COMPACTION to STATE_LIMBO done.");
 		// stop simulation here, since nothing will happen from now on
-		// Omega::instance().stopSimulationLoop();
+		Omega::instance().stopSimulationLoop();
 	}
+	else goto undefinedTransition;
+
+	LOG_INFO("State transition from "<<stateName(currentState)<<" to "<<stateName(nextState)<<" done.");
+	currentState=nextState;
 	previousState=currentState; // should be always kept in sync, used to track manual changes to the .xml
+	return;
+
+	undefinedTransition:
+		LOG_ERROR("Undefined transition from "<<stateName(currentState)<<" to "<<stateName(nextState)<<"! (ignored)");
 }
 
 void TriaxialCompressionEngine::updateParameters(Body * body)
 {
 
-	UnbalancedForce=ComputeUnbalancedForce(body);
+	UnbalancedForce=ComputeUnbalancedForce(body); // calculated at every iteration
 	MetaBody * ncb = static_cast<MetaBody*>(body);
-	if (Omega::instance().getCurrentIteration() % 100 == 0) LOG_DEBUG("UnbalancedForce="<<UnbalancedForce);
+	if (Omega::instance().getCurrentIteration() % 100 == 0) {
+		LOG_DEBUG(stateName(currentState));}
 
-	if(currentState==STATE_ISO_COMPACTION){ // FIXME: do we need this?? it makes sense to activate compression only during compaction!: || autoCompressionActivation){
-		if ((Omega::instance().getCurrentIteration() % computeStressStrainInterval) == 0) computeStressStrain(ncb);
-		TRVAR5(UnbalancedForce,StabilityCriterion,meanStress,sigma_iso,abs((meanStress-sigma_iso)/sigma_iso));
-
+	if(currentState==STATE_ISO_COMPACTION || currentState==STATE_ISO_UNLOADING){
+		// FIXME: do we need this?? it makes sense to activate compression only during compaction!: || autoCompressionActivation)
+		if ((Omega::instance().getCurrentIteration() % computeStressStrainInterval) == 0){
+			computeStressStrain(ncb);
+			//TRVAR5(UnbalancedForce,StabilityCriterion,meanStress,sigma_iso,abs((meanStress-sigma_iso)/sigma_iso));
+		}
 		if ( UnbalancedForce<=StabilityCriterion && abs((meanStress-sigma_iso)/sigma_iso)<0.02 ) {
-			if(autoCompressionActivation) doStateTransition(STATE_TRIAX_LOADING);
+			if(currentState==STATE_ISO_COMPACTION && autoCompressionActivation){
+				doStateTransition(STATE_ISO_UNLOADING); /*update stress and strain here*/ computeStressStrain(ncb);
+			}
+			else if(currentState==STATE_ISO_UNLOADING && autoCompressionActivation) {
+				doStateTransition(STATE_TRIAX_LOADING); computeStressStrain(ncb);
+			}
 			else doStateTransition(STATE_LIMBO);
 		}
 #if 0
@@ -137,6 +153,7 @@ void TriaxialCompressionEngine::applyCondition(Body * body)
 {
 	// here, we make sure to get consistent parameters, in case someone fiddled with the scene .xml manually
 	if(firstRun){
+		LOG_FATAL("First run!");
 		//sigma_iso was changed, we need to rerun compaction
 		if(sigma_iso!=previousSigmaIso) doStateTransition(STATE_ISO_COMPACTION);
 		if(previousState==STATE_LIMBO && currentState==STATE_TRIAX_LOADING) doStateTransition(STATE_TRIAX_LOADING);

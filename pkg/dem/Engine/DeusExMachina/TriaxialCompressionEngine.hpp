@@ -16,8 +16,6 @@
 #include "TriaxialStressController.hpp"
 #include <string>
 
-// FIXME: current serializer doesn't handle named enum types, this is workaround.
-#define stateNum int
 
 /*! \brief Isotropic compression + uniaxial compression test
 
@@ -39,11 +37,16 @@ class TriaxialCompressionEngine : public TriaxialStressController
 	public :
 		TriaxialCompressionEngine();
 		virtual ~TriaxialCompressionEngine();
-
-		enum {STATE_ISO_COMPACTION, STATE_ISO_UNLOADING, STATE_TRIAX_LOADING, STATE_LIMBO}; 
+		
+		// FIXME: current serializer doesn't handle named enum types, this is workaround.
+		#define stateNum int
+		// should be "enum stateNum {...}" once this is fixed
+		enum {STATE_UNINITIALIZED, STATE_ISO_COMPACTION, STATE_ISO_UNLOADING, STATE_TRIAX_LOADING, STATE_LIMBO};
 		stateNum currentState;
-		//const char* stateNames[]={"istropic_compression","isotropic_unloading","triaxial_loading"};
 		void doStateTransition(stateNum nextState);
+		#define _STATE_CASE(ST) case ST: return #ST
+		string stateName(stateNum st){switch(st){ _STATE_CASE(STATE_UNINITIALIZED);_STATE_CASE(STATE_ISO_COMPACTION);_STATE_CASE(STATE_ISO_UNLOADING);_STATE_CASE(STATE_TRIAX_LOADING);_STATE_CASE(STATE_LIMBO); default: return "<unknown state>"; } }
+		#undef _STATE_CASE
 		
 		//! Strain velocity (./s)
 		Real strainRate;
@@ -54,6 +57,10 @@ class TriaxialCompressionEngine : public TriaxialStressController
 		Real StabilityCriterion;
 		//! Previous value of inherited sigma_iso (used to detect manual changes of the confining pressure)
 		Real previousSigmaIso;
+		//! Desired isotropic pressure during the compaction phase
+		Real sigmaIsoCompaction;
+		//! Desired isotropic pressure during the confined uniaxial test; may be different from sigmaIsoCompaction
+		Real sigmaLateralConfinement;
 		//! Previous state (used to detect manual changes of the state in .xml)
 		stateNum previousState;
 		//Vector3r strain;

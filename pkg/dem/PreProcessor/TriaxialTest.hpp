@@ -70,10 +70,11 @@ class TriaxialTest : public FileGenerator
 				,bigBallPoissonRatio
 				,bigBallYoungModulus
 				,bigBallFrictDeg
-				,bigBallDropHeight
+				,bigBallDropHeight,
 				
-				,sigma_iso
-				,strainRate
+				sigmaIsoCompaction,
+				sigmaLateralConfinement,
+				strainRate
 				,StabilityCriterion
 				,maxMultiplier ///max multiplier of diameters during internal compaction
 				,finalMaxMultiplier;
