@@ -72,10 +72,41 @@ class LatticeExample : public FileGenerator
                                 ,bond_bendStiffness_noUnit      // k_b bond
                                 ,bond_torsStiffness_noUnit      // k_t bond
                                 ,bond_critCompressStrain        // E.c bond
-                                ,bond_critTensileStrain;        // E.l bond
+                                ,bond_critTensileStrain         // E.l bond
+                        // MaterialParameters of steel fibres
+                                ,fibre_longStiffness_noUnit      // k_l fibre
+                                ,fibre_bendStiffness_noUnit      // k_b fibre
+                                ,fibre_torsStiffness_noUnit      // k_t fibre
+                                ,fibre_critCompressStrain        // E.c fibre
+                                ,fibre_critTensileStrain         // E.l fibre
+				,fibre_count
+				,beams_per_fibre
+				,fibre_allows
+				,fibre_irregularity_noUnit
+				,fibre_balancing_iterations
+				
+				,fibres_total
+				,matrix_total
+				,beam_total;
+
+		std::vector<std::pair<Vector3r,Vector3r> > fibres; // start, direction
 
                 void addAggregates(shared_ptr<MetaBody>& rootBody);
+                void makeFibreBeams(shared_ptr<MetaBody>& rootBody);
+		bool isFibre(Vector3r,Vector3r);
+		bool fibreAllows(Vector3r);
+
+////////////////////////////////////////////////////
+struct Circle
+{
+        float x,y,z,d;
+};
+		bool overlaps(Circle& cc,std::vector<Circle>& c);
+		int aggInside(Vector3r& a,Vector3r& b,std::vector<Circle>& c, Real cellsizeUnit_in_meters);
+		float aggsAreas(std::vector<Circle>& c);
+		float aggsVolumes(std::vector<Circle>& c);
                 
+////////////////////////////////////////////
                 
         // conditions
 		Vector3r 	 region_A_min
@@ -206,6 +237,8 @@ class LatticeExample : public FileGenerator
                                 ,nonDestroy_B_min
                                 ,nonDestroy_B_max;
 
+		Real		 nonDestroy_stiffness;
+
 	// region of modified crit_TensileStrain
 	
 		Vector3r	 CT_A_min
@@ -226,6 +259,7 @@ class LatticeExample : public FileGenerator
 		void createActors(shared_ptr<MetaBody>& rootBody);
 		void positionRootBody(shared_ptr<MetaBody>& rootBody);
 		bool createNode(shared_ptr<Body>& body, int i, int j, int k);
+		bool createNodeXYZ(shared_ptr<Body>& body, Real i, Real j, Real k);
 		bool createQuad(shared_ptr<Body>& body, int i, int j, Vector3r);
                 void createBeam(shared_ptr<Body>& body, int i, int j);
                 Real calcBeamPositionOrientationLength(shared_ptr<Body>& body);
@@ -239,6 +273,7 @@ class LatticeExample : public FileGenerator
                 void regionDelete(shared_ptr<MetaBody>& rootBody, Vector3r min, Vector3r max);
                 void nonDestroy(shared_ptr<MetaBody>& rootBody, Vector3r min, Vector3r max);
                 void modifyCT(shared_ptr<MetaBody>& rootBody, Vector3r min, Vector3r max);
+		void makeFibres();
 
                 virtual void registerAttributes();
                 REGISTER_CLASS_NAME(LatticeExample);

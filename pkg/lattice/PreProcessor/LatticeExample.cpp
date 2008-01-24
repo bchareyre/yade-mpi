@@ -161,6 +161,7 @@ LatticeExample::LatticeExample() : FileGenerator()
         nonDestroy_A_max         = Vector3r(0,0,0);
         nonDestroy_B_min         = Vector3r(0,0,0);
         nonDestroy_B_max         = Vector3r(0,0,0);
+	nonDestroy_stiffness	 = 10.0;
 
 	CT_A_min		 = Vector3r(0,0,-1);
 	CT_A_max		 = Vector3r(0,0,-1);
@@ -186,6 +187,17 @@ LatticeExample::LatticeExample() : FileGenerator()
         bond_torsStiffness_noUnit= 0.28;                                // k_b bond
         bond_critCompressStrain  = 100.0;                               // E.c bond
         bond_critTensileStrain   = 50.0;                                // E.l bond
+	// MaterialParameters of steel fibres
+        fibre_longStiffness_noUnit=8.0;      // k_l fibre
+        fibre_bendStiffness_noUnit=5.6;      // k_b fibre
+        fibre_torsStiffness_noUnit=5.6;      // k_t fibre
+        fibre_critCompressStrain = 1;        // E.c fibre
+        fibre_critTensileStrain  = 0.0055;   // E.l fibre
+	fibre_count		 = 0;
+	beams_per_fibre		 = 10;
+	fibre_allows		 = 0.5;
+	fibre_irregularity_noUnit= 5;
+	fibre_balancing_iterations= 300;
 		
 	nodeRec_A_min=Vector3r(0,0,0);
 	nodeRec_A_max=Vector3r(0,0,0);
@@ -382,6 +394,7 @@ void LatticeExample::registerAttributes()
         REGISTER_ATTRIBUTE(nonDestroy_A_max);
         REGISTER_ATTRIBUTE(nonDestroy_B_min);
         REGISTER_ATTRIBUTE(nonDestroy_B_max);
+        REGISTER_ATTRIBUTE(nonDestroy_stiffness);
        
 	REGISTER_ATTRIBUTE(CT);
 	REGISTER_ATTRIBUTE(CT_A_min);
@@ -407,10 +420,24 @@ void LatticeExample::registerAttributes()
         REGISTER_ATTRIBUTE(bond_torsStiffness_noUnit);
         REGISTER_ATTRIBUTE(bond_critCompressStrain);
         REGISTER_ATTRIBUTE(bond_critTensileStrain);
+        // MaterialParameters of steel fibres
+        REGISTER_ATTRIBUTE(fibre_longStiffness_noUnit);      // k_l fibre
+        REGISTER_ATTRIBUTE(fibre_bendStiffness_noUnit);      // k_b fibre
+        REGISTER_ATTRIBUTE(fibre_torsStiffness_noUnit);      // k_t fibre
+        REGISTER_ATTRIBUTE(fibre_critCompressStrain);        // E.c fibre
+        REGISTER_ATTRIBUTE(fibre_critTensileStrain);         // E.l fibre
+	REGISTER_ATTRIBUTE(fibre_count);
+	REGISTER_ATTRIBUTE(beams_per_fibre);
+	REGISTER_ATTRIBUTE(fibre_allows);
+	REGISTER_ATTRIBUTE(fibre_irregularity_noUnit);
+	REGISTER_ATTRIBUTE(fibre_balancing_iterations);
 }
 
 bool LatticeExample::generate()
 {
+	fibres_total=0;
+	matrix_total=0;
+	beam_total=0;
 	rootBody = shared_ptr<MetaBody>(new MetaBody);
 	createActors(rootBody);
 	positionRootBody(rootBody);
@@ -436,6 +463,9 @@ bool LatticeExample::generate()
 
         unsigned int totalNodesCount = 0;
 	{
+		if(fibre_count > 0.0)
+			makeFibres();
+
 		setStatus("creating nodes...");
 		float all = nbNodes[0]*nbNodes[1]*nbNodes[2];
 		float current = 0.0;
@@ -452,6 +482,33 @@ bool LatticeExample::generate()
 					shared_ptr<Body> node;
 					if(createNode(node,i,j,k) || quads)
 					{
+						if( fibre_count < 0.5 || fibreAllows(node->physicalParameters->se3.position))
+						{
+						rootBody->bodies->insert(node), ++totalNodesCount;
+						if(FLAT)
+							vert2.push_back(Vector2r(node->physicalParameters->se3.position[0],node->physicalParameters->se3.position[1])); // Delaunay
+						else
+							vert3.push_back(node->physicalParameters->se3.position); // Delaunay
+						}
+					}
+				}
+		}
+		if(fibre_count > 0.0)
+		{
+			setStatus("creating fibre nodes...");
+			for(int i = 0 ; i < fibre_count ; ++i)
+		        {
+				Vector3r pos = fibres[i].first;
+				Vector3r del = fibres[i].second;
+				for(int j = 0 ; j < beams_per_fibre ; ++j)
+				{
+					shared_ptr<Body> node;
+					if(createNodeXYZ(
+						node,
+						pos[0] + 1.0*j*del[0],
+						pos[1] + 1.0*j*del[1],
+						pos[2] + 1.0*j*del[2] ))
+					{
 						rootBody->bodies->insert(node), ++totalNodesCount;
 						if(FLAT)
 							vert2.push_back(Vector2r(node->physicalParameters->se3.position[0],node->physicalParameters->se3.position[1])); // Delaunay
@@ -459,7 +516,9 @@ bool LatticeExample::generate()
 							vert3.push_back(node->physicalParameters->se3.position); // Delaunay
 					}
 				}
+			}
 		}
+
 	}
 
         BodyRedirectionVector bc;
@@ -736,7 +795,10 @@ bool LatticeExample::generate()
         imposeTranslation(rootBody,region_E_min,region_E_max,direction_E,displacement_E_meters);
         imposeTranslation(rootBody,region_F_min,region_F_max,direction_F,displacement_F_meters);
 
+	beam_total=bc.size();
         if(useAggregates) addAggregates(rootBody);
+	setStatus("making fibres...");
+	if(fibre_count > 0.0) makeFibreBeams(rootBody);
 	if(shouldTerminate()) return false;
         
         nonDestroy(rootBody,nonDestroy_A_min,nonDestroy_A_max);
@@ -744,16 +806,20 @@ bool LatticeExample::generate()
         
 	modifyCT(rootBody,CT_A_min,CT_A_max);
         modifyCT(rootBody,CT_B_min,CT_B_max);
-        
-        cerr << "finished.. saving\n";
 
         message="Number of nodes created:\n" + lexical_cast<string>(nbNodes[0]) + ","
                                             + lexical_cast<string>(nbNodes[1]) + ","
-                                            + lexical_cast<string>(nbNodes[2]) + ","
+                                            + lexical_cast<string>(nbNodes[2]) + ",\n"
 	     + "Number of beams: " + lexical_cast<string>(bc.size()) + "\n"
+	     + "Fibres total: " + lexical_cast<string>(fibres_total) + "\n"
+	     + "Matrix beams total: " + lexical_cast<string>(matrix_total) + "\n"
+	     + "Fibres/matrix %: " + lexical_cast<string>(100.0*fibres_total/matrix_total) + "\n"
+	     + "Fibres/all beams %: " + lexical_cast<string>(100.0*fibres_total/beam_total) + "\n"
 	     + "\nNOTE: sometimes it can look better when 'drawWireFrame' is enabled in Display tab.";
-		  return true;
 
+        cerr << "finished.. saving\n" << message << "\n";
+	
+	return true;
 }
 
 /// returns true if angle is bigger than minAngle_betweenBeams_deg
@@ -788,6 +854,44 @@ bool LatticeExample::checkMinimumAngle(BodyRedirectionVector& bc,shared_ptr<Body
 			answer = answer && checkAngle( - oldBeam->direction ,  newBeam->direction );
 	} 
 	return answer;
+}
+
+bool LatticeExample::createNodeXYZ(shared_ptr<Body>& body, Real x, Real y, Real z)
+{
+	body = shared_ptr<Body>(new Body(body_id_t(0),nodeGroupMask));
+	shared_ptr<LatticeNodeParameters> physics(new LatticeNodeParameters);
+	shared_ptr<Sphere> gSphere(new Sphere);
+	
+	Quaternionr q;
+	q.FromAxisAngle( Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom()) , Mathr::UnitRandom()*Mathr::PI );
+	
+	Vector3r position(x,y,z);
+
+	Real radius 			= cellsizeUnit_in_meters*0.05;
+	
+	body->isDynamic			= true;
+	
+	physics->se3			= Se3r(position,q);
+
+	gSphere->radius			= radius;
+	gSphere->diffuseColor		= Vector3r(1.8,1.8,0.0);
+	gSphere->wire			= false;
+	gSphere->visible		= true;
+	gSphere->shadowCaster		= false;
+	
+        body->geometricalModel          = gSphere;
+        body->physicalParameters        = physics;
+ 
+	if( 	   position[0] >= speciemen_size_in_meters[0] 
+		|| position[1] >= speciemen_size_in_meters[1]
+		|| position[2] >= speciemen_size_in_meters[2] )
+		return false;
+	if( 	   position[0] < 0 
+		|| position[1] < 0
+		|| position[2] < 0 )
+		return false;
+
+        return true;
 }
 
 bool LatticeExample::createNode(shared_ptr<Body>& body, int i, int j, int k)
@@ -1156,7 +1260,7 @@ void LatticeExample::imposeTranslation(shared_ptr<MetaBody>& rootBody, Vector3r 
 				)
 			{
 				b->isDynamic = false;
-				b->geometricalModel->diffuseColor = Vector3r(0.3,0.3,0.3);
+				b->geometricalModel->diffuseColor = Vector3r(2.0,2.0,0.0);
 				translationCondition->subscribedBodies.push_back(b->getId());
 			}
 		}
@@ -1253,11 +1357,11 @@ void LatticeExample::nonDestroy(shared_ptr<MetaBody>& rootBody, Vector3r min, Ve
                 LatticeBeamParameters* beam = static_cast<LatticeBeamParameters*>( ((*(rootBody->bodies))[*vsta])->physicalParameters.get());
                 beam->criticalTensileStrain     = 0.9;
                 beam->criticalCompressiveStrain = 0.9;
-                beam->longitudalStiffness       = 10.0;
-                beam->bendingStiffness          = 2.8;
-                beam->torsionalStiffness        = 2.8;
-                (*(rootBody->bodies))[beam->id1]->geometricalModel->diffuseColor = Vector3r(0.2,0.5,0.7);
-                (*(rootBody->bodies))[beam->id2]->geometricalModel->diffuseColor = Vector3r(0.2,0.5,0.7);
+                beam->longitudalStiffness       = nonDestroy_stiffness;
+                beam->bendingStiffness          = nonDestroy_stiffness*0.1;
+                beam->torsionalStiffness        = nonDestroy_stiffness*0.1;
+//                (*(rootBody->bodies))[beam->id1]->geometricalModel->diffuseColor = Vector3r(0.2,0.5,0.7);
+//                (*(rootBody->bodies))[beam->id2]->geometricalModel->diffuseColor = Vector3r(0.2,0.5,0.7);
         }
 }
 
@@ -1298,12 +1402,7 @@ void LatticeExample::modifyCT(shared_ptr<MetaBody>& rootBody, Vector3r min, Vect
 /////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////
 
-struct Circle
-{
-        float x,y,z,d;
-};
-
-bool overlaps(Circle& cc,std::vector<Circle>& c)
+bool LatticeExample::overlaps(Circle& cc,std::vector<Circle>& c)
 {
         std::vector<Circle>::iterator end=c.end();
         for(std::vector<Circle>::iterator i=c.begin();i!=end;++i)
@@ -1313,10 +1412,33 @@ bool overlaps(Circle& cc,std::vector<Circle>& c)
                 if(dist2<r2)
                         return true;
         }
+
+	if(fibre_count > 0)
+	{
+		for(int i = 0 ; i < fibre_count ; ++i)
+		{
+			Vector3r pos = fibres[i].first;
+			Vector3r del = fibres[i].second;
+			for(int j = 0 ; j < beams_per_fibre ; ++j)
+			{
+				Vector3r p(
+					pos[0] + 1.0*j*del[0],
+					pos[1] + 1.0*j*del[1],
+					pos[2] + 1.0*j*del[2] );
+				Vector3r dist;
+				Vector3r a(cc.x,cc.y,cc.z);
+				dist = p-a;
+				if(dist.Length() < cc.d*0.5 )
+					return true;
+			}
+		}
+	}
+
+
         return false;
 };
 
-int aggInside(Vector3r& a,Vector3r& b,std::vector<Circle>& c, Real cellsizeUnit_in_meters)
+int LatticeExample::aggInside(Vector3r& a,Vector3r& b,std::vector<Circle>& c, Real cellsizeUnit_in_meters)
 { // checks if nodes 'a','b' are inside any of aggregates from list 'c'
         int res=0;
         std::vector<Circle>::iterator end=c.end();
@@ -1337,7 +1459,7 @@ int aggInside(Vector3r& a,Vector3r& b,std::vector<Circle>& c, Real cellsizeUnit_
         return false;
 }
 
-float aggsAreas(std::vector<Circle>& c)
+float LatticeExample::aggsAreas(std::vector<Circle>& c)
 {
         float aggArea=0.0;
         std::vector<Circle>::iterator end=c.end();
@@ -1346,7 +1468,7 @@ float aggsAreas(std::vector<Circle>& c)
         return aggArea;
 }
 
-float aggsVolumes(std::vector<Circle>& c)
+float LatticeExample::aggsVolumes(std::vector<Circle>& c)
 {
         float aggVolume=0.0;
         std::vector<Circle>::iterator end=c.end();
@@ -1441,8 +1563,8 @@ void LatticeExample::addAggregates(shared_ptr<MetaBody>& rootBody)
                                 beam->criticalTensileStrain     = agg_critTensileStrain;
                                 beam->criticalCompressiveStrain = agg_critCompressStrain;
                 
-                                (*(rootBody->bodies))[beam->id1]->geometricalModel->diffuseColor = Vector3r(0.6,0.2,0.0);
-                                (*(rootBody->bodies))[beam->id2]->geometricalModel->diffuseColor = Vector3r(0.6,0.2,0.0);
+//                                (*(rootBody->bodies))[beam->id1]->geometricalModel->diffuseColor = Vector3r(0.6,0.2,0.0);
+//                                (*(rootBody->bodies))[beam->id2]->geometricalModel->diffuseColor = Vector3r(0.6,0.2,0.0);
                         }
                         else if(ovv==1) // bond
                         {
@@ -1452,10 +1574,219 @@ void LatticeExample::addAggregates(shared_ptr<MetaBody>& rootBody)
                                 beam->criticalTensileStrain     = bond_critTensileStrain;
                                 beam->criticalCompressiveStrain = bond_critCompressStrain;
                 
-                                (*(rootBody->bodies))[beam->id1]->geometricalModel->diffuseColor = Vector3r(0.6,0.6,0.0);
-                                (*(rootBody->bodies))[beam->id2]->geometricalModel->diffuseColor = Vector3r(0.6,0.6,0.0);
+//                                (*(rootBody->bodies))[beam->id1]->geometricalModel->diffuseColor = Vector3r(0.6,0.6,0.0);
+//                                (*(rootBody->bodies))[beam->id2]->geometricalModel->diffuseColor = Vector3r(0.6,0.6,0.0);
                         }
+			else // matrix
+				matrix_total+=1.0;
                 }
         }
 }
+
+//
+// old method - just put randomly
+//
+//void LatticeExample::makeFibres()
+//{
+//	fibres.clear();
+//
+//        Real AGGREGATES_X=speciemen_size_in_meters[0];
+//        Real AGGREGATES_Y=speciemen_size_in_meters[1];
+//        Real AGGREGATES_Z=speciemen_size_in_meters[2];
+//	if(AGGREGATES_Z < cellsizeUnit_in_meters )
+//		AGGREGATES_Z = 0.0;
+//
+//        typedef boost::minstd_rand StdGenerator;
+//        static StdGenerator generator;
+//        static boost::variate_generator<StdGenerator&, boost::uniform_real<> >
+//                random1(generator, boost::uniform_real<>(0,1));
+//
+//	for(int i = 0 ; i < fibre_count ; ++i)
+//        {
+//                Vector3r cc;
+//		Vector3r del;
+//                cc[0]=random1()*AGGREGATES_X, cc[1]=random1()*AGGREGATES_Y, cc[2]=AGGREGATES_Z==0?0:random1()*AGGREGATES_Z;
+//                del[0]=random1()-0.5, del[1]=random1()-0.5, del[2]=((AGGREGATES_Z==0)?(0):(random1()-0.5));
+//		del.Normalize();
+//		del=cellsizeUnit_in_meters * del;
+//		fibres.push_back(std::make_pair(cc,del));
+//        }
+//}
+
+
+// new method - equally balance fibres over volume using repulsion
+void LatticeExample::makeFibres()
+{
+	fibres.clear();
+
+        Real AGGREGATES_X=speciemen_size_in_meters[0];
+        Real AGGREGATES_Y=speciemen_size_in_meters[1];
+        Real AGGREGATES_Z=speciemen_size_in_meters[2];
+	if(AGGREGATES_Z < cellsizeUnit_in_meters )
+		AGGREGATES_Z = 0.0;
+
+        typedef boost::minstd_rand StdGenerator;
+        static StdGenerator generator;
+        static boost::variate_generator<StdGenerator&, boost::uniform_real<> >
+                random1(generator, boost::uniform_real<>(0,1));
+
+	for(int i = 0 ; i < fibre_count ; ++i)
+        {
+                Vector3r cc;
+		Vector3r del;
+                cc[0]=random1()*AGGREGATES_X, cc[1]=random1()*AGGREGATES_Y, cc[2]=((AGGREGATES_Z==0)?(0):(random1()*AGGREGATES_Z));
+                del[0]=random1()-0.5, del[1]=random1()-0.5, del[2]=((AGGREGATES_Z==0)?(0):(random1()-0.5));
+		del.Normalize();
+		del=cellsizeUnit_in_meters * del;
+		fibres.push_back(std::make_pair(cc,del));
+        }
+
+// repulsion !!
+	for(int frame=0; frame < fibre_balancing_iterations ; ++frame)
+	{
+		std::vector<Vector3r > moves;
+		moves.clear();
+		for(unsigned int i = 0 ; i < fibres.size() ; ++i )
+		{
+			Vector3r d(0,0,0);
+			Vector3r c1 = fibres[i].first + fibres[i].second*beams_per_fibre*0.5;
+			//emulate periodic boundary
+			for(int px = -1 ; px < 2 ; ++px )
+			for(int py = -1 ; py < 2 ; ++py )
+			for(int pz = ((AGGREGATES_Z==0)?0:-1) ; pz < ((AGGREGATES_Z==0)?1:2) ; ++pz )
+			{
+				Vector3r PERIODIC_DELTA(px*AGGREGATES_X,py*AGGREGATES_Y,pz*AGGREGATES_Z);
+				for(unsigned int j = 0 ; j < fibres.size() ; ++j )
+					if(i != j)
+					{
+						Vector3r c2 = fibres[j].first + fibres[j].second*beams_per_fibre*0.5 + PERIODIC_DELTA;
+						Vector3r dir=c1-c2;
+						Real r = dir.Normalize(); // dir is unit vector, r is a distance
+						if(r < cellsizeUnit_in_meters)
+						{
+							r=cellsizeUnit_in_meters;
+							dir[0]=random1()-0.5, dir[1]=random1()-0.5, dir[2]=((AGGREGATES_Z==0)?(0):(random1()-0.5));
+							dir.Normalize();
+						}
+						d += dir * 1/(r*r);
+					}
+			}
+			// repulsion from walls.
+			Vector3r MAX(AGGREGATES_X, AGGREGATES_Y, AGGREGATES_Z);
+			for(int I=0 ; I<((AGGREGATES_Z==0)?2:3) ; ++I)
+			{
+				if(c1[I] > 0 && c1[I] < MAX[I])
+					d[I] += (1/(c1[I]*c1[I]) - 1/((MAX[I]-c1[I])*(MAX[I]-c1[I])))*0.5;
+				else
+					std::cerr << "fibre " << i << " is escaping\n";
+			}
+			moves.push_back(d);
+		}
+		assert(moves.size() == fibres.size() );
+		Real maxl=0;
+		for(unsigned int i = 0 ; i < moves.size() ; ++i )
+			maxl = std::max(moves[i].Length(),maxl);
+	//	std::cerr << "maxl= " << maxl << "\n";
+		for(unsigned int i = 0 ; i < moves.size() ; ++i )
+			moves[i] = cellsizeUnit_in_meters*moves[i]/maxl;
+	
+		for(unsigned int i = 0 ; i < fibres.size() ; ++i )
+			fibres[i].first+=moves[i];
+	
+		for(unsigned int i = 0 ; i < fibres.size() ; ++i )
+		{
+			Vector3r c1 = fibres[i].first + fibres[i].second*beams_per_fibre*0.5;
+			if(   c1[0] < 0 
+			   || c1[1] < 0 
+			   || c1[2] < 0
+			   || c1[0] > AGGREGATES_X
+			   || c1[1] > AGGREGATES_Y
+			   || c1[2] > AGGREGATES_Z)
+				std::cerr << "putting again randomly\n", fibres[i].first = Vector3r(random1()*AGGREGATES_X, random1()*AGGREGATES_Y, ((AGGREGATES_Z==0)?(0):(random1()*AGGREGATES_Z)));
+		}
+		
+	//std::cerr << "frame= " << frame++ << "\n";
+		setStatus("balancing fibres...");
+		setProgress(1.0*frame/(1.0*fibre_balancing_iterations));
+	}
+
+	for(unsigned int i = 0 ; i < fibres.size() ; ++i )
+		fibres[i].first+=Vector3r(random1()-0.5, random1()-0.5, ((AGGREGATES_Z==0)?(0):(random1()-0.5)) )*fibre_irregularity_noUnit*cellsizeUnit_in_meters;
+}
+
+
+bool LatticeExample::isFibre(Vector3r a,Vector3r b)
+{
+	bool A=false;
+	bool B=false;
+	for(int i = 0 ; i < fibre_count ; ++i)
+        {
+		Vector3r pos = fibres[i].first;
+		Vector3r del = fibres[i].second;
+		for(int j = 0 ; j < beams_per_fibre ; ++j)
+		{
+			Vector3r p(
+				pos[0] + 1.0*j*del[0],
+				pos[1] + 1.0*j*del[1],
+				pos[2] + 1.0*j*del[2] );
+			if(p == a) A=true;
+			if(p == b) B=true;
+		}
+	}
+	return A && B;
+}
+
+bool LatticeExample::fibreAllows(Vector3r a)
+{
+	for(int i = 0 ; i < fibre_count ; ++i)
+        {
+		Vector3r pos = fibres[i].first;
+		Vector3r del = fibres[i].second;
+		for(int j = 0 ; j < beams_per_fibre ; ++j)
+		{
+			Vector3r p(
+				pos[0] + 1.0*j*del[0],
+				pos[1] + 1.0*j*del[1],
+				pos[2] + 1.0*j*del[2] );
+			Vector3r dist;
+			dist = p-a;
+			if(dist.Length() < cellsizeUnit_in_meters*fibre_allows )
+				return false;
+		}
+	}
+	return true;
+}
+
+
+
+void LatticeExample::makeFibreBeams(shared_ptr<MetaBody>& rootBody)
+{
+        { // set different properties for beams that are fibre
+                BodyContainer::iterator bi    = rootBody->bodies->begin();
+                BodyContainer::iterator biEnd = rootBody->bodies->end();
+                for(  ; bi!=biEnd ; ++bi )  // loop over all beams
+                {
+                        Body* body = (*bi).get();
+                        if( ! ( body->getGroupMask() & beamGroupMask ) )
+                                continue; // skip non-beams
+
+                        LatticeBeamParameters* beam     = static_cast<LatticeBeamParameters*>(body->physicalParameters.get());
+                        if(isFibre(       (*(rootBody->bodies))[beam->id1]->physicalParameters->se3.position
+                                         ,(*(rootBody->bodies))[beam->id2]->physicalParameters->se3.position))
+			{
+				beam->longitudalStiffness       = fibre_longStiffness_noUnit;
+                        	beam->bendingStiffness          = fibre_bendStiffness_noUnit;
+                        	beam->torsionalStiffness	= fibre_torsStiffness_noUnit;
+                        	beam->criticalTensileStrain     = fibre_critTensileStrain;
+                        	beam->criticalCompressiveStrain = fibre_critCompressStrain;
+                
+//                        	(*(rootBody->bodies))[beam->id1]->geometricalModel->diffuseColor = Vector3r(2.0,2.0,0.0);
+//                        	(*(rootBody->bodies))[beam->id2]->geometricalModel->diffuseColor = Vector3r(2.0,2.0,0.0);
+				
+				fibres_total+=1.0;
+			}
+                }
+        }
+}
+
 
