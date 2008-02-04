@@ -24,3 +24,4 @@ void InteractingBox::registerAttributes()
 	REGISTER_ATTRIBUTE(extents);
 }
 
+YADE_PLUGIN();

@@ -161,19 +161,23 @@ void TriaxialStressController::updateStiffness (MetaBody * ncb)
 void TriaxialStressController::controlExternalStress(int wall, MetaBody* ncb, Vector3r resultantForce, PhysicalParameters* p, Real wall_max_vel)
 {
 	Real translation=normal[wall].Dot(static_cast<Force*>( ncb->physicalActions->find(wall_id[wall],ForceClassIndex).get() )->force - resultantForce);
-	//cerr << "current force= " << static_cast<Force*>(ncb->physicalActions->find(wall_id[wall],ForceClassIndex).get() )->force << " imposed force = " << resultantForce << endl;
+	//bool log=((wall==3) && (Omega::instance().getCurrentIteration()%200==0));
+	const bool log=false;
+	if(log) LOG_DEBUG("wall="<<wall<<" actualForce="<<static_cast<Force*>(ncb->physicalActions->find(wall_id[wall],ForceClassIndex).get() )->force<<", resultantForce="<<resultantForce<<", translation="<<translation);
 	if (translation!=0)
 	{
 	   if (stiffness[wall]!=0)
 	   {
 			translation /= stiffness[wall];
+			if(log) TRVAR2(translation,wall_max_vel*Omega::instance().getTimeStep())
 			translation = std::min( abs(translation), wall_max_vel*Omega::instance().getTimeStep() ) * Mathr::Sign(translation);
 	   }
 	   else
 		translation = wall_max_vel * Mathr::Sign(translation);
 	}
 	previousTranslation[wall] = (1-wallDamping)*translation*normal[wall];// + 0.7*previousTranslation[wall];// formula for "steady-flow" evolution with fluctuations
-	p->se3.position	+= previousTranslation[wall];
+	p->se3.position += previousTranslation[wall];
+	if(log)TRVAR2(previousTranslation,p->se3.position);
 }
 
 
@@ -201,7 +205,7 @@ void TriaxialStressController::applyCondition(Body* body)
 	width = p_right->se3.position.X() - p_left->se3.position.X() - thickness;
 	depth = p_front->se3.position.Z() - p_back->se3.position.Z() - thickness;
  
-	bool isARadiusControlIteration = (Omega::instance().getCurrentIteration() % radiusControlInterval == 0);
+		bool isARadiusControlIteration = (Omega::instance().getCurrentIteration() % radiusControlInterval == 0);
 	if (Omega::instance().getCurrentIteration() % computeStressStrainInterval == 0 ||
 		 (internalCompaction && isARadiusControlIteration) )
 		computeStressStrain(ncb);
@@ -222,15 +226,13 @@ void TriaxialStressController::applyCondition(Body* body)
 		if (isARadiusControlIteration) {
 			//Real s = computeStressStrain(ncb);
 			if (sigma_iso<=meanStress) maxMultiplier = finalMaxMultiplier;
-			if (meanStress==0)
-				previousMultiplier = maxMultiplier;
+			if (meanStress==0) previousMultiplier = maxMultiplier;
 			else {
 				//     		previousMultiplier = 1+0.7*(sigma_iso-s)*(previousMultiplier-1.f)/(s-previousStress); // = (Dsigma/apparentModulus)*0.7
 				//     		previousMultiplier = std::max(2-maxMultiplier, std::min(previousMultiplier, maxMultiplier));
 				previousMultiplier = 1.+(sigma_iso-meanStress)/sigma_iso*(maxMultiplier-1.); // = (Dsigma/apparentModulus)*0.7
 			}
 			previousStress = meanStress;
-			//cerr << "maxMultiplier" << maxMultiplier << endl;
 			//Real apparentModulus = (s-previousStress)/(previousMultiplier-1.f);
 			controlInternalStress(ncb, previousMultiplier);
 		}
@@ -262,12 +264,12 @@ Real TriaxialStressController::computeStressStrain(MetaBody* ncb)
 	stress[wall_right] = ( static_cast<Force*>( ncb->physicalActions->find(wall_id[wall_right],ForceClassIndex).get() )->force ) * invXSurface;
 	stress[wall_front] = ( static_cast<Force*>( ncb->physicalActions->find(wall_id[wall_front],ForceClassIndex).get() )->force ) * invZSurface;
 	stress[wall_back] = ( static_cast<Force*>( ncb->physicalActions->find(wall_id[wall_back],ForceClassIndex).get() )->force ) * invZSurface;	
-		
+
  	//cerr << "stresses : " <<  stress[wall_bottom] << " " <<
  //stress[wall_top]<< " " << stress[wall_left]<< " " << stress[wall_right]<< " "
  //<< stress[wall_front] << " " << stress[wall_back] << endl;
 
-	for (int i=0; i<6; i++) meanStress-= stress[i].Dot(normal[i]);
+	for (int i=0; i<6; i++) meanStress-=stress[i].Dot(normal[i]);
 	meanStress/=6.;
 	// FIXME: meanStress is both returned as function value and stored in meanStress member. Confusing, change prototype to void, since return value isn't used anywhere.
 	return meanStress;
@@ -367,3 +369,4 @@ Real TriaxialStressController::ComputeUnbalancedForce(Body * body, bool maxUnbal
 	}
 }
 
+YADE_PLUGIN();

@@ -2,18 +2,8 @@
 
 #include"Tetra.hpp"
 
-const char* yadePluginClasses[]={
-	// self-contained in hpp:
-	"TetraMold",
-	"TetraBang", 
-	"Tetrahedron2TetraMold",
-	"TetraAABB", 
-	// some code in cpp (this file):
-	"TetraLaw",	 
-	"Tetra2TetraBang",
-	"TetraDraw",
-	NULL /*sentinel*/
-};
+YADE_PLUGIN(/* self-contained in hpp: */ "TetraMold", "TetraBang", "Tetrahedron2TetraMold","TetraAABB", 
+	/* some code in cpp (this file): */ "TetraLaw",	 "Tetra2TetraBang","TetraDraw");
 
 #include<boost/shared_ptr.hpp>
 
@@ -390,6 +380,8 @@ void TetraLaw::action(Body* body)
 
 	for(InteractionContainer::iterator contactI=rootBody->transientInteractions->begin(); contactI!=rootBody->transientInteractions->end(); ++contactI){
 		if (!(*contactI)->isReal) continue; // Tetra2TetraBang::go returned false for this interaction, skip it
+		const shared_ptr<TetraBang>& contactGeom(dynamic_pointer_cast<TetraBang>((*contactI)->interactionGeometry));
+		if(!contactGeom) continue;
 
 		const body_id_t idA=(*contactI)->getId1(), idB=(*contactI)->getId2();
 		const shared_ptr<Body>& A=Body::byId(idA), B=Body::byId(idB);
@@ -399,8 +391,6 @@ void TetraLaw::action(Body* body)
 		const shared_ptr<ElasticBodyParameters>& physA(dynamic_pointer_cast<ElasticBodyParameters>(A->physicalParameters));
 		const shared_ptr<ElasticBodyParameters>& physB(dynamic_pointer_cast<ElasticBodyParameters>(B->physicalParameters));
 		
-		const shared_ptr<TetraBang>& contactGeom(dynamic_pointer_cast<TetraBang>((*contactI)->interactionGeometry));
-		if(!contactGeom) {LOG_TRACE("interactionGeoemtry is not a TetraBang"); continue;}
 		//const shared_ptr<SimpleElasticInteraction>& contactPhys(dynamic_pointer_cast<SimpleElasticInteraction*>((*contactI)->interactionPhysics));
 
 

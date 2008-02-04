@@ -109,6 +109,7 @@ class Omega : public Singleton<Omega>
 		void		setTimeStep(const Real);
 		Real		getTimeStep();
 		void		skipTimeStepper(bool s);
+		bool 		timeStepperActive();
 		bool		containTimeStepper();
 
 		const		shared_ptr<MetaBody>& getRootBody();

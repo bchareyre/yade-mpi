@@ -45,3 +45,4 @@ void InteractionPhysicsMetaEngine::action(Body* body)
 	}
 }
 
+YADE_PLUGIN();

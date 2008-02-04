@@ -21,6 +21,8 @@
 #include<yade/pkg-dem/GlobalStiffness.hpp>
 #include "GlobalStiffnessCounter.hpp"
 
+#include<yade/extra/Brefcom.hpp>
+
 GlobalStiffnessCounter::GlobalStiffnessCounter() : InteractionSolver() , actionForce(new Force) , actionMomentum(new Momentum), actionStiffness(new GlobalStiffness)
 {
 	interval=1;//FIXME very high frequency - not required 
@@ -45,15 +47,119 @@ bool GlobalStiffnessCounter::isActivated()
 	return ((Omega::instance().getCurrentIteration() % interval == 0) || (Omega::instance().getCurrentIteration() < 100));
 }
 
+
+bool GlobalStiffnessCounter::getSphericalElasticInteractionParameters(const shared_ptr<Interaction>& contact, Vector3r& normal, Real& kn, Real& ks, Real& radius1, Real& radius2){
+	shared_ptr<SpheresContactGeometry> currentContactGeometry=static_pointer_cast<SpheresContactGeometry>(contact->interactionGeometry);
+	shared_ptr<ElasticContactInteraction> currentContactPhysics=static_pointer_cast<ElasticContactInteraction>(contact->interactionPhysics);
+
+	Real fn=currentContactPhysics->normalForce.Length();
+	if(fn<Mathr::EPSILON) return false; // FIXME: sharp comparison of floats will be false on machine-zeros (like 2.3333e-18 etc.): should be Mathr::EPSILON*someScaleFactor
+	normal=currentContactGeometry->normal;
+	radius1=currentContactGeometry->radius1; radius2=currentContactGeometry->radius2;
+	kn=currentContactPhysics->kn; ks=currentContactPhysics->ks;
+	return true;
+}
+
+bool GlobalStiffnessCounter::getInteractionParameters(const shared_ptr<Interaction>& contact, Vector3r& normal, Real& kn, Real& ks, Real& radius1, Real& radius2){
+
+	shared_ptr<SpheresContactGeometry> geom1=dynamic_pointer_cast<SpheresContactGeometry>(contact->interactionGeometry);
+	shared_ptr<ElasticContactInteraction> phys1=dynamic_pointer_cast<ElasticContactInteraction>(contact->interactionPhysics);
+	if(geom1 && phys1){
+		Real fn=phys1->normalForce.Length();
+		if(fn<Mathr::EPSILON) return false; // FIXME: sharp comparison of floats will be false on machine-zeros (like 2.3333e-18 etc.): should be Mathr::EPSILON*someScaleFactor
+		normal=geom1->normal;
+		radius1=geom1->radius1; radius2=geom1->radius2;
+		kn=phys1->kn; ks=phys1->ks;
+		return true;
+	}
+
+	shared_ptr<SpheresContactGeometry> geom2=dynamic_pointer_cast<SpheresContactGeometry>(contact->interactionGeometry);
+	shared_ptr<BrefcomContact> phys2=dynamic_pointer_cast<BrefcomContact>(contact->interactionPhysics);
+	if(geom2 && phys2){
+		Real fn=phys2->Fn.Length();
+		if(fn<Mathr::EPSILON) return false; // FIXME: sharp comparison of floats will be false on machine-zeros (like 2.3333e-18 etc.): should be Mathr::EPSILON*someScaleFactor
+		normal=geom2->normal;
+		radius1=geom2->radius1; radius2=geom2->radius2;
+		kn=phys2->Kn; ks=phys2->Ks;
+		return true;
+	}
+
+	shared_ptr<SDECLinkGeometry> geom3=dynamic_pointer_cast<SDECLinkGeometry>(contact->interactionGeometry);
+	shared_ptr<SDECLinkPhysics> phys3=dynamic_pointer_cast<SDECLinkPhysics>(contact->interactionPhysics);
+	if(geom3 && phys3){
+		Real fn=phys3->normalForce.Length();
+		if(fn<Mathr::EPSILON) return false; // FIXME: sharp comparison of floats will be false on machine-zeros (like 2.3333e-18 etc.): should be Mathr::EPSILON*someScaleFactor
+		normal=geom3->normal;
+		radius1=geom3->radius1; radius2=geom3->radius2;
+		kn=phys3->kn; ks=phys3->ks;
+		return true;
+	}
+
+	return false;
+}
+
+void GlobalStiffnessCounter::traverseInteractions(MetaBody* ncb, const shared_ptr<InteractionContainer>& interactions, bool spheresOnly){
+	for(InteractionContainer::iterator I=interactions->begin(); I!=interactions->end(); ++I){
+		const shared_ptr<Interaction>& contact = *I;
+		if(!contact->isReal) continue;
+
+		body_id_t id1=contact->getId1(), id2=contact->getId2();
+
+		// all we need for getting stiffness
+		Vector3r normal; Real kn, ks, radius1, radius2;
+
+		/* This is to overcome class scatter:
+		 * 	SpheresContactGeometry & ElasticContactInteraction
+		 * 	or
+		 * 	SDECLinkGeometry & SDECLinkPhysics
+		 * 	or
+		 * 	SpheresContactGeometry & BrefcomContact
+		 */
+		if(spheresOnly){ // go fast, may CRASH for non-spherical stuff however (!)
+			if(!getSphericalElasticInteractionParameters(contact, normal, kn, ks, radius1, radius2)) continue;
+		} else {
+			if(!getInteractionParameters(contact,normal,kn,ks,radius1,radius2)) continue;
+		}
+
+			
+		//Diagonal terms of the translational stiffness matrix
+		Vector3r diag_stiffness = Vector3r(std::pow(normal.X(),2),std::pow(normal.Y(),2),std::pow(normal.Z(),2));
+		diag_stiffness *= kn-ks;
+		diag_stiffness = diag_stiffness + Vector3r(1,1,1)*ks;
+
+		//diagonal terms of the rotational stiffness matrix
+		// Vector3r branch1 = currentContactGeometry->normal*currentContactGeometry->radius1;
+		// Vector3r branch2 = currentContactGeometry->normal*currentContactGeometry->radius2;
+		Vector3r diag_Rstiffness =
+			Vector3r(std::pow(normal.Y(),2)+std::pow(normal.Z(),2),
+				std::pow(normal.X(),2)+std::pow(normal.Z(),2),
+				std::pow(normal.X(),2)+std::pow(normal.Y(),2));
+		diag_Rstiffness *= ks;
+		//cerr << "diag_Rstifness=" << diag_Rstiffness << endl;
+
+		PhysicalAction* st = ncb->physicalActions->find(id1,actionStiffness->getClassIndex()).get();
+		GlobalStiffness* s = static_cast<GlobalStiffness*>(st);
+		s->stiffness += diag_stiffness;
+		s->Rstiffness += diag_Rstiffness*pow(radius1,2);	
+		st = ncb->physicalActions->find(id2,actionStiffness->getClassIndex()).get();
+		s = static_cast<GlobalStiffness*>(st);
+		s->stiffness += diag_stiffness;
+		s->Rstiffness += diag_Rstiffness*pow(radius2,2);
+	}
+}
+
 void GlobalStiffnessCounter::action(Body* body)
 {
-        MetaBody * ncb = YADE_CAST<MetaBody*>(body);
-//        shared_ptr<BodyContainer>& bodies = ncb->bodies;
+	MetaBody * ncb = YADE_CAST<MetaBody*>(body);
+	// shared_ptr<BodyContainer>& bodies = ncb->bodies;
+	//	Real dt = Omega::instance().getTimeStep();
 
-//        Real dt = Omega::instance().getTimeStep();
+	/// transient Links
+	traverseInteractions(ncb,ncb->transientInteractions, /*spheresOnly? */ false);
 
-        /// Non Permanents Links												///
-
+	/* ignore pesistent links, unused */
+	// traverseInteractions(ncb,ncb->persistentInteractions);
+#if 0
         InteractionContainer::iterator ii    = ncb->transientInteractions->begin();
         InteractionContainer::iterator iiEnd = ncb->transientInteractions->end();
         //cerr << "#############################################################################################" << endl;
@@ -107,7 +213,9 @@ void GlobalStiffnessCounter::action(Body* body)
                         }
                 }
         }
+#endif
 }
 
 
 
+YADE_PLUGIN();

@@ -26,3 +26,4 @@ void CohesiveFrictionalBodyParameters::registerAttributes()
 	REGISTER_ATTRIBUTE(isBroken);
 }
 
+YADE_PLUGIN();

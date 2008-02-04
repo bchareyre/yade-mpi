@@ -82,3 +82,4 @@ void PythonRecorder::action(Body *_rootBody)
 
 
 
+YADE_PLUGIN();

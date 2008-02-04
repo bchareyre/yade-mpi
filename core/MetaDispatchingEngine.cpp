@@ -39,7 +39,6 @@ vector<vector<string> >& MetaDispatchingEngine::getFunctorNames()
 	return functorNames;
 }
 
-
 void MetaDispatchingEngine::clear()
 {
 	functorNames.clear();

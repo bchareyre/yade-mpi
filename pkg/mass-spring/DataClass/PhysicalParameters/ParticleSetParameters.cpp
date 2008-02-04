@@ -20,3 +20,4 @@ ParticleSetParameters::~ParticleSetParameters()
 }
 
 
+YADE_PLUGIN();

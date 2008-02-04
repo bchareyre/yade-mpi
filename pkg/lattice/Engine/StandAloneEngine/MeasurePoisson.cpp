@@ -114,3 +114,4 @@ void MeasurePoisson::action(Body * body)
 	 
 }
 
+YADE_PLUGIN();

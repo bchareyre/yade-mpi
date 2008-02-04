@@ -162,7 +162,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'BodyMacroParameters',
 			'yade-serialization',
 			'yade-base',
-			
+			'GLDrawInteractingSphere',
 			'yade-multimethods',
 			'Force',
 			'Momentum',
@@ -236,7 +236,8 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'Momentum',
 			'Sphere',
 			'RigidBodyParameters',
-			'GlobalStiffness']),
+			'GlobalStiffness',
+			'Brefcom']),
 
 	env.SharedLibrary('GlobalStiffnessTimeStepper',
 		['Engine/StandAloneEngine/GlobalStiffnessTimeStepper.cpp'],
@@ -254,7 +255,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 
 	env.SharedLibrary('ResultantForceEngine',
 		['Engine/DeusExMachina/ResultantForceEngine.cpp'],
-		LIBS=env['LIBS']+['yade-factory',
+		LIBS=env['LIBS']+[
 			'yade-base',		
 			'Force',
 			'ParticleParameters',
@@ -262,7 +263,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 
 	env.SharedLibrary('TriaxialStressController',
 		['Engine/DeusExMachina/TriaxialStressController.cpp'],
-		LIBS=env['LIBS']+['yade-factory',
+		LIBS=env['LIBS']+[
 			'yade-base',
 			'Force',
 			'ParticleParameters',
@@ -273,12 +274,13 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 
 	env.SharedLibrary('TriaxialCompressionEngine',
 		['Engine/DeusExMachina/TriaxialCompressionEngine.cpp'],
-		LIBS=env['LIBS']+['yade-factory',
+		LIBS=env['LIBS']+[
 			'yade-base',
 			'Force',
 			'ParticleParameters',
 			'ElasticContactInteraction',
-			'TriaxialStressController']),
+			'TriaxialStressController',
+			'Shop']),
 
 	env.SharedLibrary('GLDrawInteractingMyTetrahedron',
 		['RenderingEngine/GLDrawInteractingMyTetrahedron/GLDrawInteractingMyTetrahedron.cpp'],
@@ -548,7 +550,8 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'GlobalStiffnessTimeStepper',
 			'yade-base',
 			'TriaxialStateRecorder',
-			'PositionOrientationRecorder']),
+			'PositionOrientationRecorder',
+			'Shop']),
 			
 	env.SharedLibrary('CohesiveTriaxialTest',
 		['PreProcessor/CohesiveTriaxialTest.cpp'],

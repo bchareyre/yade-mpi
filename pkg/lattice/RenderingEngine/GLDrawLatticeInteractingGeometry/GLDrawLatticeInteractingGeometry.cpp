@@ -199,3 +199,4 @@ void GLDrawLatticeInteractingGeometry::go(const shared_ptr<InteractingGeometry>&
 
 }
 
+YADE_PLUGIN();

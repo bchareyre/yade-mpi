@@ -119,3 +119,4 @@ void StrainRecorder::action(Body * body)
 	 
 }
 
+YADE_PLUGIN();

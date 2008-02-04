@@ -27,3 +27,4 @@ void InteractingSphere2AABBwater::go(	  const shared_ptr<InteractingGeometry>& c
 
 }
 	
+YADE_PLUGIN();

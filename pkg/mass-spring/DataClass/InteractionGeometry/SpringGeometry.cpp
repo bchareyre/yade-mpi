@@ -23,3 +23,4 @@ void SpringGeometry::registerAttributes()
 	REGISTER_ATTRIBUTE(p2);
 }
 
+YADE_PLUGIN();

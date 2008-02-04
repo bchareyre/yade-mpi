@@ -172,3 +172,4 @@ unsigned int BodyAssocVector::size()
 }
 
 
+YADE_PLUGIN();

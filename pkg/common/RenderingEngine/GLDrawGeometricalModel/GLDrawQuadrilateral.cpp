@@ -214,3 +214,4 @@ void GLDrawQuadrilateral::calculateStrainQuadrilateral(
 	y = X[1];
 };
 
+YADE_PLUGIN();

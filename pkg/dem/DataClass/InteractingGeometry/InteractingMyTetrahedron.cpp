@@ -32,3 +32,4 @@ void InteractingMyTetrahedron::registerAttributes()
 }
 
 
+YADE_PLUGIN();

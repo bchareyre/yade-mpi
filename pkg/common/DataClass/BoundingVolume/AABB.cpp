@@ -17,3 +17,4 @@ AABB::~AABB ()
 {
 }
 
+YADE_PLUGIN();

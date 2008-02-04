@@ -251,3 +251,4 @@ void CohesiveFrictionalContactLaw::action(Body* body)
 
 }
 
+YADE_PLUGIN();

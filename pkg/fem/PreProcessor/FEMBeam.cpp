@@ -255,3 +255,4 @@ void FEMBeam::imposeTranslation(shared_ptr<MetaBody>& rootBody, Vector3r min, Ve
 }
 
  
+YADE_PLUGIN();

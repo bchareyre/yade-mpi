@@ -40,3 +40,4 @@ void GLDrawSimpleElasticInteraction::go(
 	glPopMatrix();
 }
 
+YADE_PLUGIN();

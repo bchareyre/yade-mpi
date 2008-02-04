@@ -57,11 +57,12 @@ class PersistentSAPCollider : public BroadInteractor
 		// collection of AABB that are in interaction
 		//protected : vector< set<unsigned int> > overlappingBB;
 		shared_ptr<InteractionContainer> transientInteractions;
+		shared_ptr<InteractionContainer> persistentInteractions;
 		/// upper right corner of the AABB of the objects =>  for spheres = center[i]-radius
-		vector<Real> maximums;
+		vector<Real> maxima;
 
 		/// lower left corner of the AABB of the objects =>  for spheres = center[i]+radius
-		vector<Real> minimums;
+		vector<Real> minima;
 
 		/// Used the first time broadInteractionTest is called, to initialize and sort the xBounds, yBounds,
 		/// and zBounds arrays and to initialize the overlappingBB collection
@@ -91,6 +92,17 @@ class PersistentSAPCollider : public BroadInteractor
 
 		/// return a list "transientInteractions" of pairs of Body which Bounding volume are in potential interaction
 		void action(Body * body);
+
+		//! When creating transient interaction, look first if a persistent link between the pair in question exists; in that case, skip it.
+		bool noTransientIfPersistentExists;
+		//! Don't break transient interaction once bodies don't overlap anymore; material law will be responsible for breaking it.
+		bool haveDistantTransient;
+
+		void registerAttributes(){
+			BroadInteractor::registerAttributes();
+			REGISTER_ATTRIBUTE(noTransientIfPersistentExists);
+			REGISTER_ATTRIBUTE(haveDistantTransient);
+		}
 
 
 	REGISTER_CLASS_NAME(PersistentSAPCollider);

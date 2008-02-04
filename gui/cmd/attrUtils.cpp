@@ -23,6 +23,7 @@ using namespace boost;
  * They define python special functions that support dictionary operations on this object and calls proxies for them. */
 #define ATTR_ACCESS_PY(cxxClass) \
 	def("__getitem__",&cxxClass::wrappedPyGet).def("__setitem__",&cxxClass::wrappedPySet).def("keys",&cxxClass::wrappedPyKeys)
+	//.def("__getattr__",&cxxClass::wrappedPyGet).def("__setattr__",&cxxClass::wrappedPySet)
 
 
 /*! Helper class for accessing registered attributes through the serialization interface.
@@ -102,9 +103,9 @@ class AttrAccess{
 
 		//! return attribute value as python object
 		boost::python::object pyGet(std::string key){
-			vector<string> raw=getAttrStr(key);
 			DescriptorMap::iterator I=descriptors.find(key);
 			if(I==descriptors.end()) throw std::invalid_argument(string("Invalid key: `")+key+"'.");
+			vector<string> raw=getAttrStr(key);
 			if(raw.size()==1){
 				if(descriptors[key].types[0]==BOOL) return boost::python::object(lexical_cast<bool>(raw[0]));
 				if(descriptors[key].types[0]==STRING) return boost::python::object(raw[0]);

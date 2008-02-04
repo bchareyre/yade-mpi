@@ -328,3 +328,4 @@ void BoxStack::positionRootBody(shared_ptr<MetaBody>& rootBody)
 	rootBody->physicalParameters 		= physics;
 }
 
+YADE_PLUGIN();

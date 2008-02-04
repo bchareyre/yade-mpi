@@ -49,3 +49,4 @@ void LatticeBeamAngularSpring::registerAttributes()
 //	REGISTER_ATTRIBUTE(offPlaneAngle); // FIXME - can be calculated after deserialization
 }
 
+YADE_PLUGIN();

@@ -192,3 +192,4 @@ unsigned int InteractionVecSet::size()
 	return currentSize;
 }
 
+YADE_PLUGIN();

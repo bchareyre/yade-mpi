@@ -29,3 +29,4 @@ void InteractingGeometryMetaEngine::action(Body* body)
 		operator()(body->geometricalModel,body->interactingGeometry,body->physicalParameters->se3,body);
 }
 
+YADE_PLUGIN();

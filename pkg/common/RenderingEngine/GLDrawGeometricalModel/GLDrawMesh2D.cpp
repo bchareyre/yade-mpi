@@ -82,3 +82,4 @@ void GLDrawMesh2D::go(const shared_ptr<GeometricalModel>& gm, const shared_ptr<P
 	}
 }
 
+YADE_PLUGIN();

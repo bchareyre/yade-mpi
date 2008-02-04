@@ -295,3 +295,4 @@ void SAPCollider::findOverlappingBB(std::vector<AABBBound*>& bounds, int nbEleme
 	}
 }
 
+YADE_PLUGIN();

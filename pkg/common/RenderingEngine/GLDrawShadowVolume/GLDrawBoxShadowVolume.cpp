@@ -288,3 +288,4 @@ void GLDrawBoxShadowVolume::go(const shared_ptr<GeometricalModel>& gm , const sh
 
 
 
+YADE_PLUGIN();

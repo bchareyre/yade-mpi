@@ -6,7 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "ElasticContactLaw.hpp"
+#include"ElasticContactLaw.hpp"
 #include<yade/pkg-dem/BodyMacroParameters.hpp>
 #include<yade/pkg-dem/SpheresContactGeometry.hpp>
 #include<yade/pkg-dem/SDECLinkGeometry.hpp>
@@ -34,7 +34,6 @@ void ElasticContactLaw::registerAttributes()
 }
 
 
-//FIXME : remove bool first !!!!!
 void ElasticContactLaw::action(Body* body)
 {
 	MetaBody * ncb = YADE_CAST<MetaBody*>(body);
@@ -131,3 +130,4 @@ void ElasticContactLaw::action(Body* body)
 }
 
 
+YADE_PLUGIN();

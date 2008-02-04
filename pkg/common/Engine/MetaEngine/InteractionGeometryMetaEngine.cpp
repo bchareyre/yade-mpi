@@ -57,3 +57,4 @@ void InteractionGeometryMetaEngine::action(Body* body)
 	}
 }
 
+YADE_PLUGIN();

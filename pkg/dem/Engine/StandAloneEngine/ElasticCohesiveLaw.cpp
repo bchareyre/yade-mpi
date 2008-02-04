@@ -40,7 +40,6 @@ void ElasticCohesiveLaw::registerAttributes()
 }
 
 
-//FIXME : remove bool first !!!!!
 void ElasticCohesiveLaw::action(Body* body)
 {
 	MetaBody * ncb = YADE_CAST<MetaBody*>(body);
@@ -142,46 +141,6 @@ void ElasticCohesiveLaw::action(Body* body)
 			t1.Normalize();
 			Vector3r t2	= n.UnitCross(t1);
 	
-	// 		if (n[0]!=0 && n[1]!=0 && n[2]!=0)
-	// 		{
-	// 			t1 = Vector3r(0,0,sqrt(1.0/(1+(n[2]*n[2]/(n[1]*n[1])))));
-	// 			t1[1] = -n[2]/n[1]*t1[2];
-	// 			t1.normalize();
-	// 			t2 = n.unitCross(t1);
-	// 		}
-	// 		else
-	// 		{
-	// 			if (n[0]==0 && n[1]!=0 && n[2]!=0)
-	// 			{
-	// 				t1 = Vector3r(1,0,0);
-	// 				t2 = n.unitCross(t1);
-	// 			}
-	// 			else if (n[0]!=0 && n[1]==0 && n[2]!=0)
-	// 			{
-	// 				t1 = Vector3r(0,1,0);
-	// 				t2 = n.unitCross(t1);
-	// 			}
-	// 			else if (n[0]!=0 && n[1]!=0 && n[2]==0)
-	// 			{
-	// 				t1 = Vector3r(0,0,1);
-	// 				t2 = n.unitCross(t1);
-	// 			}
-	// 			else if (n[0]==0 && n[1]==0 && n[2]!=0)
-	// 			{
-	// 				t1 = Vector3r(1,0,0);
-	// 				t2 = Vector3r(0,1,0);
-	// 			}
-	// 			else if (n[0]==0 && n[1]!=0 && n[2]==0)
-	// 			{
-	// 				t1 = Vector3r(0,0,1);
-	// 				t2 = Vector3r(1,0,0);
-	// 			}
-	// 			else if (n[0]!=0 && n[1]==0 && n[2]==0)
-	// 			{
-	// 				t1 = Vector3r(0,1,0);
-	// 				t2 = Vector3r(0,0,1);
-	// 			}
-	// 		}
 	
 			Quaternionr q_i_n,q_n_i;
 	
@@ -285,3 +244,4 @@ void ElasticCohesiveLaw::action(Body* body)
 }
 
 
+YADE_PLUGIN();

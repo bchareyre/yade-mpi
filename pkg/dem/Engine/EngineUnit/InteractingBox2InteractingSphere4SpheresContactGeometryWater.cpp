@@ -187,3 +187,4 @@ bool InteractingBox2InteractingSphere4SpheresContactGeometryWater::goReverse(	co
 	return isInteracting;
 }
 
+YADE_PLUGIN();

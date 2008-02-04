@@ -684,3 +684,4 @@ void OpenGLRenderingEngine::addShadowVolumeFunctor(const string& str2)
 	shadowVolumeFunctorNames.push_back(v);
 }
 
+YADE_PLUGIN();

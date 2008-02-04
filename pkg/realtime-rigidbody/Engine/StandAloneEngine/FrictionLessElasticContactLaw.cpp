@@ -149,3 +149,4 @@ void FrictionLessElasticContactLaw::action(Body * body)
 // 	}
 }
 
+YADE_PLUGIN();

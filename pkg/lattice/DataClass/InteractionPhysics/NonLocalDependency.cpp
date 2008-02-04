@@ -26,3 +26,4 @@ void NonLocalDependency::registerAttributes()
 	REGISTER_ATTRIBUTE(gaussValue);
 }
 
+YADE_PLUGIN();

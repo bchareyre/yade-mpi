@@ -451,3 +451,4 @@ void SDECMovingWall::positionRootBody(shared_ptr<MetaBody>& rootBody)
 }
 
 
+YADE_PLUGIN();

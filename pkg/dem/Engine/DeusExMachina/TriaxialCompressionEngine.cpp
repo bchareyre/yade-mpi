@@ -12,7 +12,10 @@
 #include<yade/pkg-common/Force.hpp>
 #include<yade/pkg-dem/ElasticContactInteraction.hpp>
 #include<yade/lib-base/yadeWm3Extra.hpp>
-#include <boost/lexical_cast.hpp>
+#include<boost/lexical_cast.hpp>
+#include<boost/lambda/lambda.hpp>
+#include<yade/extra/Shop.hpp>
+
 
 class CohesiveFrictionalRelationships;
 
@@ -69,7 +72,7 @@ void TriaxialCompressionEngine::registerAttributes()
 }
 
 void TriaxialCompressionEngine::doStateTransition(stateNum nextState){
-	if ( currentState==STATE_UNINITIALIZED && nextState==STATE_ISO_COMPACTION){
+	if ( /* currentState==STATE_UNINITIALIZED && */ nextState==STATE_ISO_COMPACTION){
 		sigma_iso=sigmaIsoCompaction;
 	}
 	else if((currentState==STATE_ISO_COMPACTION || currentState==STATE_ISO_UNLOADING || currentState==STATE_LIMBO) && nextState==STATE_TRIAX_LOADING){
@@ -79,6 +82,19 @@ void TriaxialCompressionEngine::doStateTransition(stateNum nextState){
 		//compressionActivated = true;
 		wall_bottom_activated=false;
 		wall_top_activated=false;
+		if(currentState==STATE_ISO_UNLOADING){ LOG_INFO("Speres -> /tmp/unloaded.spheres"); Shop::saveSpheresToFile("/tmp/unloaded.spheres"); }
+		if(1){
+			max_vel*=20;
+			Shop::createCohesion(1e-4,1e-4,0); // (boost::lambda::_1 %2==0) && (boost::lambda::_2%2==0));
+			/*shared_ptr<MetaBody> rootBody=Omega::instance().getRootBody();
+			for(vector<shared_ptr<Engine> >::iterator I=rootBody->engines.begin(); I!=rootBody->engines.end(); ++I){
+				if((*I)->getClassName()=="PersistentSAPCollider") {
+					rootBody->engines.erase(I);
+					LOG_DEBUG("Removed PersistentSAPCollider engine.");
+					break;
+				}
+			}*/
+		}
 		if(!firstRun) saveSimulation=true; // saving snapshot .xml will actually be done in ::applyCondition
 	}
 	else if(currentState==STATE_ISO_COMPACTION && nextState==STATE_ISO_UNLOADING){
@@ -108,8 +124,7 @@ void TriaxialCompressionEngine::updateParameters(Body * body)
 
 	UnbalancedForce=ComputeUnbalancedForce(body); // calculated at every iteration
 	MetaBody * ncb = static_cast<MetaBody*>(body);
-	if (Omega::instance().getCurrentIteration() % 100 == 0) {
-		LOG_DEBUG(stateName(currentState));}
+	if (Omega::instance().getCurrentIteration() % 100 == 0) { /* TRVAR1(meanStress);*/ /* TRVAR2(stateName(currentState),sigma_iso); */ }
 
 	if(currentState==STATE_ISO_COMPACTION || currentState==STATE_ISO_UNLOADING){
 		// FIXME: do we need this?? it makes sense to activate compression only during compaction!: || autoCompressionActivation)
@@ -153,9 +168,9 @@ void TriaxialCompressionEngine::applyCondition(Body * body)
 {
 	// here, we make sure to get consistent parameters, in case someone fiddled with the scene .xml manually
 	if(firstRun){
-		LOG_FATAL("First run!");
+		LOG_INFO("First run, will initialize!");
 		//sigma_iso was changed, we need to rerun compaction
-		if(sigma_iso!=previousSigmaIso) doStateTransition(STATE_ISO_COMPACTION);
+		if(sigma_iso!=previousSigmaIso || currentState==STATE_UNINITIALIZED) doStateTransition(STATE_ISO_COMPACTION);
 		if(previousState==STATE_LIMBO && currentState==STATE_TRIAX_LOADING) doStateTransition(STATE_TRIAX_LOADING);
 		previousState=currentState;
 		previousSigmaIso=sigma_iso;
@@ -163,32 +178,34 @@ void TriaxialCompressionEngine::applyCondition(Body * body)
 	}
 	if(currentState==STATE_LIMBO) return;
 
-    TriaxialStressController::applyCondition(body);
-    if (Omega::instance().getCurrentIteration() % testEquilibriumInterval == 0) {
+   TriaxialStressController::applyCondition(body);
+   if (Omega::instance().getCurrentIteration() % testEquilibriumInterval == 0) {
         updateParameters(body);
         if (saveSimulation) {
             string fileName = "../data/" + Phase1End + "_" +
                               lexical_cast<string>(Omega::instance().getCurrentIteration()) + ".xml";
             LOG_INFO("saving snapshot: "<<fileName);
             Omega::instance().saveSimulation(fileName);
+				fileName="../data/"+Phase1End+"_"+lexical_cast<string>(Omega::instance().getCurrentIteration())+".spheres";
+				LOG_INFO("saving spheres: "<<fileName);
+				Shop::saveSpheresToFile(fileName);
             saveSimulation = false;
         }
     }
 	 if (currentState==STATE_TRIAX_LOADING) {
-        if (Omega::instance().getCurrentIteration() % 100 == 0) LOG_DEBUG("Compression active.");
+        // if (Omega::instance().getCurrentIteration() % 100 == 0) LOG_DEBUG("Compression active.");
         Real dt = Omega::instance().getTimeStep();
-        MetaBody * ncb = static_cast<MetaBody*>(body);
-        shared_ptr<BodyContainer>& bodies = ncb->bodies;
 
         if (currentStrainRate < strainRate) currentStrainRate += strainRate*0.0003;	// !!! if unloading (?)
         else currentStrainRate = strainRate;
 
 		  /* Move top and bottom wall according to strain rate */
-        PhysicalParameters* p = static_cast<PhysicalParameters*>((*bodies)[wall_bottom_id]->physicalParameters. get());
+        PhysicalParameters* p=static_cast<PhysicalParameters*>(Body::byId(wall_bottom_id)->physicalParameters.get());
         p->se3.position += 0.5*strainRate*height*translationAxis*dt;
-        p = static_cast<PhysicalParameters*>((*bodies)[wall_top_id]->physicalParameters.get( ));
+        p = static_cast<PhysicalParameters*>(Body::byId(wall_top_id)->physicalParameters.get());
         p->se3.position -= 0.5*strainRate*height*translationAxis*dt;
     }
 }
 
 
+YADE_PLUGIN();

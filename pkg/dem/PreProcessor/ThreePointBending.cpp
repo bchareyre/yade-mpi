@@ -432,3 +432,4 @@ void ThreePointBending::positionRootBody(shared_ptr<MetaBody>& rootBody)
 	
 }
 
+YADE_PLUGIN();

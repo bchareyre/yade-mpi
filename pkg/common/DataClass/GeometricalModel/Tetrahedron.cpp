@@ -36,3 +36,4 @@ void Tetrahedron::registerAttributes()
 	// FIXME
 	REGISTER_ATTRIBUTE(v);
 }
+YADE_PLUGIN();

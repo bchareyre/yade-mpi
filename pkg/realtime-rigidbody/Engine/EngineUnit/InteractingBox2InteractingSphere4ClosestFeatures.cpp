@@ -124,3 +124,4 @@ bool InteractingBox2InteractingSphere4ClosestFeatures::goReverse(	const shared_p
 	return isInteracting;
 }
 
+YADE_PLUGIN();

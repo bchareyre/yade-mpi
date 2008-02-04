@@ -165,3 +165,4 @@ bool InteractingBox2InteractingSphere4SpheresContactGeometry::goReverse(	const s
 	return isInteracting;
 }
 
+YADE_PLUGIN();

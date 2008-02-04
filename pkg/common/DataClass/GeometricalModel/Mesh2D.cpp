@@ -59,3 +59,4 @@ void Mesh2D::registerAttributes()
 
 
 
+YADE_PLUGIN();

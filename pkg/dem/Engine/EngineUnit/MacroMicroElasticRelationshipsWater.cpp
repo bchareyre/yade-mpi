@@ -131,3 +131,4 @@ another would be HerzMindlinContactModel
 		}
 	}
 };
+YADE_PLUGIN();

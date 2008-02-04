@@ -210,3 +210,4 @@ unsigned int BodyRedirectionVector::size()
 
 
 
+YADE_PLUGIN();

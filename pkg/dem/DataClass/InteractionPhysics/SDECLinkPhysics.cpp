@@ -41,3 +41,4 @@ void SDECLinkPhysics::registerAttributes()
 	REGISTER_ATTRIBUTE(heta);
 }
 
+YADE_PLUGIN();

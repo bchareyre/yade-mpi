@@ -47,3 +47,4 @@ shared_ptr<PhysicalAction> Force::clone()
 	return shared_ptr<Force>(new Force(*this));
 }
 
+YADE_PLUGIN();

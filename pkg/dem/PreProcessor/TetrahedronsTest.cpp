@@ -429,3 +429,4 @@ void TetrahedronsTest::makeTet(shared_ptr<Tetrahedron>& tet, Real size)
 	tet->v[3]=size*(Mathr::UnitRandom()*0.7+1.0)*Vector3r(0.16,0.93,-0.33);
 }
 
+YADE_PLUGIN();

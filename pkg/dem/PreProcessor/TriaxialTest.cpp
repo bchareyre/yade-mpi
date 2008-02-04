@@ -16,6 +16,7 @@
 #include "TriaxialTest.hpp"
 
 #include<yade/pkg-dem/ElasticContactLaw.hpp>
+#include<yade/pkg-dem/ElasticCohesiveLaw.hpp>
 #include<yade/pkg-dem/SimpleElasticRelationships.hpp>
 #include<yade/pkg-dem/BodyMacroParameters.hpp>
 #include<yade/pkg-dem/SDECLinkGeometry.hpp>
@@ -65,6 +66,8 @@
 #include<yade/pkg-common/InteractionHashMap.hpp>
 #include<yade/pkg-common/PhysicalActionVectorVector.hpp>
 
+#include<yade/extra/Shop.hpp>
+
 #include <boost/filesystem/convenience.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/numeric/conversion/bounds.hpp>
@@ -92,7 +95,7 @@ TriaxialTest::TriaxialTest () : FileGenerator()
 	lowerCorner 		= Vector3r(0,0,0);
 	upperCorner 		= Vector3r(1,1,1);
 	thickness 		= 0.001;
-	importFilename 		= "../data/small.sdec.xyz";
+	importFilename 		= ""; // "../data/small.sdec.xyz";
 	outputFileName 		= "../data/TriaxialTest.xml";
 	//nlayers = 1;
 	wall_top 		= true;
@@ -146,6 +149,7 @@ TriaxialTest::TriaxialTest () : FileGenerator()
 	radiusControlInterval = 10;
 	numberOfGrains = 400;
 	strainRate = 0.1;
+	maxWallVelocity=0.01;
 	StabilityCriterion = 0.01;
 	autoCompressionActivation = false;
 	maxMultiplier = 1.01;
@@ -163,6 +167,8 @@ TriaxialTest::TriaxialTest () : FileGenerator()
 	
 	sigmaIsoCompaction = 50000;
 	sigmaLateralConfinement=sigmaIsoCompaction;
+
+	wallOversizeFactor=1.;
 	
 //	wall_top_id =0;
 // 	wall_bottom_id =0;
@@ -211,6 +217,7 @@ void TriaxialTest::registerAttributes()
 	REGISTER_ATTRIBUTE(radiusControlInterval);
 	REGISTER_ATTRIBUTE(numberOfGrains);
 	REGISTER_ATTRIBUTE(strainRate);
+	REGISTER_ATTRIBUTE(maxWallVelocity);
 	REGISTER_ATTRIBUTE(StabilityCriterion);
 	REGISTER_ATTRIBUTE(autoCompressionActivation);
 //	REGISTER_ATTRIBUTE(wall_top);
@@ -237,6 +244,8 @@ void TriaxialTest::registerAttributes()
 	REGISTER_ATTRIBUTE(AnimationSnapshotsBaseName);
 	REGISTER_ATTRIBUTE(WallStressRecordFile);
 
+	REGISTER_ATTRIBUTE(wallOversizeFactor);
+
 //	REGISTER_ATTRIBUTE(gravity);
 	
 	//REGISTER_ATTRIBUTE(bigBall);
@@ -257,6 +266,7 @@ void TriaxialTest::registerAttributes()
 bool TriaxialTest::generate()
 {
 //	unsigned int startId=boost::numeric::bounds<unsigned int>::highest(), endId=0; // record forces from group 2
+	message="";
 	
 	rootBody = shared_ptr<MetaBody>(new MetaBody);
 	createActors(rootBody);
@@ -272,66 +282,19 @@ bool TriaxialTest::generate()
 	shared_ptr<Body> body;
 	
 	vector<BasicSphere> sphere_list;
-	message=GenerateCloud(sphere_list, lowerCorner, upperCorner, numberOfGrains, 0.3, 0.75);
+	if(importFilename!="") sphere_list=Shop::loadSpheresFromFile(importFilename,lowerCorner,upperCorner);
+	else message+=GenerateCloud(sphere_list, lowerCorner, upperCorner, numberOfGrains, 0.3, 0.75);
 	
 	vector<BasicSphere>::iterator it = sphere_list.begin();
 	vector<BasicSphere>::iterator it_end = sphere_list.end();
 			
 	for (;it!=it_end; ++it)
 	{
-		cerr << "sphere (" << it->first << " " << it->second << endl;
+		cerr << "sphere (" << it->first << " " << it->second << ")"<<endl;
 		createSphere(body,it->first,it->second,false,true);
 		rootBody->bodies->insert(body);
 	}
 	
-// 	if(importFilename.size() != 0 && filesystem::exists(importFilename) )
-// 	{
-// 		
-// 		Vector3r layersDistance (Vector3r::ZERO); 
-// 		for (int layer=1; layer <= nlayers; ++layer)
-// 		{			
-// 			ifstream loadFile(importFilename.c_str());
-// 			long int i=0;
-// 			Real f,g,x,y,z,radius;
-// 			while( ! loadFile.eof() )
-// 			{
-// 				++i;
-// 				loadFile >> x;
-// 				loadFile >> y;
-// 				loadFile >> z;
-// 				Vector3r position = (Vector3r(x,z,y) + layersDistance);
-// 				loadFile >> radius;
-// 			
-// 				loadFile >> f;
-// 				loadFile >> g;
-// 				if( boxWalls ? f>1 : false ) // skip loading of SDEC walls
-// 					continue;
-// 				if(f==8)
-// 					continue;
-// 	
-// 		//		if( i % 100 == 0 ) // FIXME - should display a progress BAR !!
-// 		//			cout << "loaded: " << i << endl;
-// 				if(f==1)
-// 				{
-// 					lowerCorner[0] = min(position[0]-radius , lowerCorner[0]);
-// 					lowerCorner[1] = min(position[1]-radius , lowerCorner[1]);
-// 					lowerCorner[2] = min(position[2]-radius , lowerCorner[2]);
-// 					upperCorner[0] = max(position[0]+radius , upperCorner[0]);
-// 					upperCorner[1] = max(position[1]+radius , upperCorner[1]);
-// 					upperCorner[2] = max(position[2]+radius , upperCorner[2]);
-// 				}
-// 				createSphere(body,position,radius,false,f==1);
-// 				rootBody->bodies->insert(body);
-// 				if(f == 2)
-// 				{
-// 					startId = std::min(body->getId() , startId);
-// 					endId   = std::max(body->getId() , endId);
-// 				}
-// 					
-// 			}
-// 			layersDistance.y() = upperCorner.y();
-// 		}
-// 	}
 
 // create bigBall
 	//Vector3r position = (upperCorner+lowerCorner)*0.5 + Vector3r(0,bigBallDropHeight,0);
@@ -353,9 +316,9 @@ bool TriaxialTest::generate()
 	 						lowerCorner[1]-thickness/2.0,
 	 						(lowerCorner[2]+upperCorner[2])/2);
 	 	Vector3r halfSize	= Vector3r(
-	 						fabs(lowerCorner[0]-upperCorner[0])/2+thickness,
+	 						wallOversizeFactor*fabs(lowerCorner[0]-upperCorner[0])/2+thickness,
 							thickness/2.0,
-	 						fabs(lowerCorner[2]-upperCorner[2])/2+thickness);
+	 						wallOversizeFactor*fabs(lowerCorner[2]-upperCorner[2])/2+thickness);
 	
 		createBox(body,center,halfSize,wall_bottom_wire);
 	 	if(wall_bottom) {
@@ -374,9 +337,9 @@ bool TriaxialTest::generate()
 	 						upperCorner[1]+thickness/2.0,
 	 						(lowerCorner[2]+upperCorner[2])/2);
 	 	halfSize		= Vector3r(
-	 						fabs(lowerCorner[0]-upperCorner[0])/2+thickness,
+	 						wallOversizeFactor*fabs(lowerCorner[0]-upperCorner[0])/2+thickness,
 	 						thickness/2.0,
-	 						fabs(lowerCorner[2]-upperCorner[2])/2+thickness);
+	 						wallOversizeFactor*fabs(lowerCorner[2]-upperCorner[2])/2+thickness);
 	
 		createBox(body,center,halfSize,wall_top_wire);
 	 	if(wall_top) {
@@ -392,8 +355,8 @@ bool TriaxialTest::generate()
 	 						(lowerCorner[2]+upperCorner[2])/2);
 		halfSize		= Vector3r(
 							thickness/2.0,
-	 						fabs(lowerCorner[1]-upperCorner[1])/2+thickness,
-	 						fabs(lowerCorner[2]-upperCorner[2])/2+thickness);
+	 						wallOversizeFactor*fabs(lowerCorner[1]-upperCorner[1])/2+thickness,
+	 						wallOversizeFactor*fabs(lowerCorner[2]-upperCorner[2])/2+thickness);
 		createBox(body,center,halfSize,wall_1_wire);
 	 	if(wall_1) {
 			rootBody->bodies->insert(body);
@@ -407,8 +370,8 @@ bool TriaxialTest::generate()
 							(lowerCorner[2]+upperCorner[2])/2);
 	 	halfSize		= Vector3r(
 	 						thickness/2.0,
-	 						fabs(lowerCorner[1]-upperCorner[1])/2+thickness,
-	 						fabs(lowerCorner[2]-upperCorner[2])/2+thickness);
+	 						wallOversizeFactor*fabs(lowerCorner[1]-upperCorner[1])/2+thickness,
+	 						wallOversizeFactor*fabs(lowerCorner[2]-upperCorner[2])/2+thickness);
 	 	
 		createBox(body,center,halfSize,wall_2_wire);
 	 	if(wall_2) {
@@ -422,8 +385,8 @@ bool TriaxialTest::generate()
 	 						(lowerCorner[1]+upperCorner[1])/2,
 	 						lowerCorner[2]-thickness/2.0);
 	 	halfSize		= Vector3r(
-	 						fabs(lowerCorner[0]-upperCorner[0])/2+thickness,
-	 						fabs(lowerCorner[1]-upperCorner[1])/2+thickness,
+	 						wallOversizeFactor*fabs(lowerCorner[0]-upperCorner[0])/2+thickness,
+	 						wallOversizeFactor*fabs(lowerCorner[1]-upperCorner[1])/2+thickness,
 	 						thickness/2.0);
 		createBox(body,center,halfSize,wall_3_wire);
 	 	if(wall_3) {
@@ -438,8 +401,8 @@ bool TriaxialTest::generate()
 	 						(lowerCorner[1]+upperCorner[1])/2,
 	 						upperCorner[2]+thickness/2.0);
 	 	halfSize		= Vector3r(
-	 						fabs(lowerCorner[0]-upperCorner[0])/2+thickness,
-	 						fabs(lowerCorner[1]-upperCorner[1])/2+thickness,
+	 						wallOversizeFactor*fabs(lowerCorner[0]-upperCorner[0])/2+thickness,
+	 						wallOversizeFactor*fabs(lowerCorner[1]-upperCorner[1])/2+thickness,
 	 						thickness/2.0);
 		createBox(body,center,halfSize,wall_3_wire);
 	 	if(wall_4) {
@@ -632,6 +595,11 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	
 	shared_ptr<ElasticContactLaw> elasticContactLaw(new ElasticContactLaw);
 	elasticContactLaw->sdecGroupMask = 2;
+
+	shared_ptr<ElasticCohesiveLaw> elasticCohesiveLaw(new ElasticCohesiveLaw);
+	elasticCohesiveLaw->sdecGroupMask = 2;
+	elasticCohesiveLaw->momentRotationLaw = true;
+
 	
 	//shared_ptr<StiffnessCounter> stiffnesscounter(new StiffnessCounter);
 	//stiffnesscounter->sdecGroupMask = 2;
@@ -649,7 +617,7 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	//triaxialcompressionEngine-> sigma_iso = sigma_iso;
 	triaxialcompressionEngine-> sigmaIsoCompaction = sigmaIsoCompaction;
 	triaxialcompressionEngine-> sigmaLateralConfinement = sigmaLateralConfinement;
-	triaxialcompressionEngine-> max_vel = 0.01;
+	triaxialcompressionEngine->max_vel = maxWallVelocity;
 	triaxialcompressionEngine-> thickness = thickness;
 	triaxialcompressionEngine->strainRate = strainRate;
 	triaxialcompressionEngine->StabilityCriterion = StabilityCriterion;
@@ -687,6 +655,7 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	rootBody->engines.push_back(interactionGeometryDispatcher);
 	rootBody->engines.push_back(interactionPhysicsDispatcher);
 	rootBody->engines.push_back(elasticContactLaw);
+	rootBody->engines.push_back(elasticCohesiveLaw);
 	rootBody->engines.push_back(triaxialcompressionEngine);
 	//rootBody->engines.push_back(stiffnesscounter);
 	//rootBody->engines.push_back(stiffnessMatrixTimeStepper);
@@ -745,7 +714,6 @@ void TriaxialTest::positionRootBody(shared_ptr<MetaBody>& rootBody)
 }
 
 
-
 string GenerateCloud(vector<BasicSphere>& sphere_list, Vector3r lowerCorner, Vector3r upperCorner, long number, Real rad_std_dev, Real porosity)
 {
 	typedef boost::minstd_rand StdGenerator;
@@ -793,3 +761,4 @@ string GenerateCloud(vector<BasicSphere>& sphere_list, Vector3r lowerCorner, Vec
 
 
 
+YADE_PLUGIN();

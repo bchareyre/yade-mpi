@@ -1,16 +1,22 @@
 // 2007 © Václav Šmilauer <eudoxos@arcig.cz>
 
+#pragma once
+
 #include<string>
 #include<map>
 #include<iostream>
 #include<typeinfo>
 #include<boost/any.hpp>
 #include<boost/shared_ptr.hpp>
+#include<boost/lambda/lambda.hpp>
 
 #include<Wm3Vector3.h>
 #include<Wm3Quaternion.h>
 #include<yade/lib-base/yadeWm3.hpp>
 #include<yade/lib-base/Logging.hpp>
+#include<yade/core/Body.hpp>
+
+#include<boost/function.hpp>
 
 /*
 #include<yade/core/MetaBody.hpp>
@@ -48,5 +54,12 @@ class Shop{
 		static shared_ptr<Body> sphere(Vector3r center, Real radius);
 		static shared_ptr<Body> box(Vector3r center, Vector3r extents);
 		static shared_ptr<Body> tetra(Vector3r v[4]);
+
+		static vector<pair<Vector3r,Real> > loadSpheresFromFile(string fname,Vector3r& minXYZ, Vector3r& maxXYZ);
+		static void saveSpheresToFile(string fileName);
+
+		// (true || boost::lambda::_1) means that true is the default
+		static int createCohesion(Real limitNormalForce, Real limitShearForce, int groupMask=0,
+			boost::function<bool(body_id_t,body_id_t)> linkOK = (true || boost::lambda::_1) );
 };
 

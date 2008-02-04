@@ -51,14 +51,14 @@ void GlobalStiffnessTimeStepper::findTimeStepFromBody(const shared_ptr<Body>& bo
 {
 	RigidBodyParameters * sdec	= static_cast<RigidBodyParameters*>(body->physicalParameters.get());
 	
-	Sphere* sphere = static_cast<Sphere*>(body->geometricalModel.get());
+	// Sphere* sphere = static_cast<Sphere*>(body->geometricalModel.get());
 	
 	Vector3r& stiffness = (static_cast<GlobalStiffness*>( ncb->physicalActions->find (body->getId(), globalStiffnessClassIndex).get()))->stiffness;
 	Vector3r& Rstiffness = (static_cast<GlobalStiffness*>( ncb->physicalActions->find (body->getId(), globalStiffnessClassIndex).get()))->Rstiffness;
 
 
 	//cerr << "Vector3r& stiffness = (static_cast<GlobalStiffness*>( ncb" << endl;
-	if(! (sphere && sdec && stiffness) )
+	if(! ( /* sphere && */ sdec && stiffness) )
 		return; // not possible to compute!
 	//cerr << "return; // not possible to compute!" << endl;
 // 	Real Dab  	= sphere->radius;
@@ -183,3 +183,4 @@ void GlobalStiffnessTimeStepper::computeTimeStep(Body* body)
 		string(", BUT timestep is ")+lexical_cast<string>(Omega::instance().getTimeStep()))<<".");
 }
 
+YADE_PLUGIN();

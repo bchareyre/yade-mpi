@@ -27,3 +27,4 @@ void InteractingSphere2AABB::go(	  const shared_ptr<InteractingGeometry>& cm
 
 }
 	
+YADE_PLUGIN();

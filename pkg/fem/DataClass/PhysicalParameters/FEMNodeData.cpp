@@ -27,3 +27,4 @@ void FEMNodeData::registerAttributes()
 	REGISTER_ATTRIBUTE(initialPosition);
 }
 
+YADE_PLUGIN();

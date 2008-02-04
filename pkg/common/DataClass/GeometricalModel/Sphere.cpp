@@ -26,3 +26,4 @@ void Sphere::registerAttributes()
 	REGISTER_ATTRIBUTE(radius);
 }
 
+YADE_PLUGIN();

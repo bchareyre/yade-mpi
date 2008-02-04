@@ -29,3 +29,4 @@ void ParticleParameters::registerAttributes()
 	REGISTER_ATTRIBUTE(velocity);
 }
 
+YADE_PLUGIN();

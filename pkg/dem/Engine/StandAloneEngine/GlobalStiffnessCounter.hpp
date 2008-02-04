@@ -29,8 +29,10 @@ class GlobalStiffnessCounter : public InteractionSolver
 		int actionForceIndex;
 		int actionMomentumIndex;
 		int actionStiffnessIndex;
-		
-		
+
+		bool getInteractionParameters(const shared_ptr<Interaction>& contact, Vector3r& normal, Real& kn, Real& ks, Real& radius1, Real& radius2);
+		bool getSphericalElasticInteractionParameters(const shared_ptr<Interaction>& contact, Vector3r& normal, Real& kn, Real& ks, Real& radius1, Real& radius2);
+		void traverseInteractions(MetaBody* ncb, const shared_ptr<InteractionContainer>& interactions, bool spheresOnly=false);
 
 	public :
 		unsigned int interval;

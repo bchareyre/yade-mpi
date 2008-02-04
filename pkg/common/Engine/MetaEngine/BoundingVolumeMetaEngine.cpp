@@ -33,3 +33,4 @@ void BoundingVolumeMetaEngine::action(Body* body)
 
 
 
+YADE_PLUGIN();

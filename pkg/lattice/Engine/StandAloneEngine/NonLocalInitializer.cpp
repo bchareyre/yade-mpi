@@ -188,3 +188,4 @@ void NonLocalInitializer::action(Body * body)
 //	cerr << "number of beams: " << total << "\n";
 }
 
+YADE_PLUGIN();

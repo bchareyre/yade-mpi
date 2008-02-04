@@ -28,3 +28,4 @@ void PhysicalParametersMetaEngine::action(Body* body)
  	operator()(body->physicalParameters,body);
 }
 
+YADE_PLUGIN();

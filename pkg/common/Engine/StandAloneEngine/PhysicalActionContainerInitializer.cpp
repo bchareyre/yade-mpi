@@ -44,3 +44,4 @@ void PhysicalActionContainerInitializer::action(Body* body)
 }
 
 
+YADE_PLUGIN();

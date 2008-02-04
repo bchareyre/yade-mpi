@@ -21,3 +21,4 @@ LatticeSetGeometry::~LatticeSetGeometry()
 }
 
 
+YADE_PLUGIN();

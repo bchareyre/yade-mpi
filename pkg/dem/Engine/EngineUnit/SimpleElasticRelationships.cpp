@@ -98,3 +98,4 @@ void SimpleElasticRelationships::go(	  const shared_ptr<PhysicalParameters>& b1 
 		}
 	}
 };
+YADE_PLUGIN();

@@ -207,3 +207,4 @@ void BeamRecorder::action(Body * body)
 	 
 }
 
+YADE_PLUGIN();

@@ -69,3 +69,4 @@ void TranslationEngine::applyCondition(Body * body)
 
 }
 
+YADE_PLUGIN();

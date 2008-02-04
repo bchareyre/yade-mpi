@@ -25,3 +25,4 @@ void SDECLinkGeometry::registerAttributes()
 	REGISTER_ATTRIBUTE(radius1);
 	REGISTER_ATTRIBUTE(radius2);
 }
+YADE_PLUGIN();

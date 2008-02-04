@@ -35,3 +35,4 @@ void BoundingSphere::registerAttributes() // FIXME - remove that function, dispa
 // 	min = center-v;
 // 	max = center+v;	
 // }
+YADE_PLUGIN();

@@ -222,3 +222,4 @@ void MovingSupport::action(Body * body)
 	 
 }
 
+YADE_PLUGIN();

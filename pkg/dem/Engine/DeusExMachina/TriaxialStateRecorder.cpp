@@ -148,3 +148,4 @@ void TriaxialStateRecorder::action(Body * body)
 
 }
 
+YADE_PLUGIN();

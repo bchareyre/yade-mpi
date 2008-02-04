@@ -152,3 +152,4 @@ void GLDrawInteractingSphere::drawSphere(int depth)
 		subdivideTriangle(vertices[(unsigned int)faces[i][0]],vertices[(unsigned int)faces[i][1]],vertices[(unsigned int)faces[i][2]],depth);
 }
 
+YADE_PLUGIN();

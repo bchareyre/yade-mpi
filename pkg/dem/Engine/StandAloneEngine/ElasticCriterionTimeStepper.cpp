@@ -77,6 +77,7 @@ void ElasticCriterionTimeStepper::findTimeStepFromInteraction(const shared_ptr<I
 		return; // skip other groups
 
 	ElasticContactInteraction* sdecContact = dynamic_cast<ElasticContactInteraction*>(interaction->interactionPhysics.get());
+	// if(!sdecContact) sdecContact=dynamic_cast<SDECLinkPhysics*>(interaction->interactionPhysics.get());
 	SpheresContactGeometry* interactionGeometry = dynamic_cast<SpheresContactGeometry*>(interaction->interactionGeometry.get());
 	BodyMacroParameters * body1	= dynamic_cast<BodyMacroParameters*>((*bodies)[id1]->physicalParameters.get());
 	BodyMacroParameters * body2	= dynamic_cast<BodyMacroParameters*>((*bodies)[id2]->physicalParameters.get());
@@ -146,3 +147,4 @@ void ElasticCriterionTimeStepper::computeTimeStep(Body* body)
 	}
 }
 
+YADE_PLUGIN();

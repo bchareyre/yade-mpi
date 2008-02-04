@@ -21,3 +21,4 @@ FEMSetGeometry::~FEMSetGeometry()
 }
 
 
+YADE_PLUGIN();

@@ -30,3 +30,4 @@ void FEMSetParameters::registerAttributes()
 	REGISTER_ATTRIBUTE(tetrahedronGroupMask);
 }
 
+YADE_PLUGIN();

@@ -67,3 +67,4 @@ void RotationEngine::applyCondition(Body * body)
 
 }
 
+YADE_PLUGIN();

@@ -413,3 +413,4 @@ void SDECSpheresPlane::positionRootBody(shared_ptr<MetaBody>& rootBody)
 }
 
 
+YADE_PLUGIN();

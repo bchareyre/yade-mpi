@@ -342,3 +342,4 @@ static_cast<BodyMacroParameters*>((*bodies)[id2]->physicalParameters.get());
 	
 }
 
+YADE_PLUGIN();

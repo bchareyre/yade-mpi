@@ -43,3 +43,4 @@ void ForceEngine::applyCondition(Body* body)
         }
 }
 
+YADE_PLUGIN();

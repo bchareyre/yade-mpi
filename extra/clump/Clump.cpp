@@ -3,12 +3,7 @@
 #include"Clump.hpp"
 #include<algorithm>
 
-const char* yadePluginClasses[]={
-	"Clump",
-	"ClumpMemberMover",
-	"ClumpTestGen",
-	NULL /*sentinel*/
-};
+YADE_PLUGIN("Clump","ClumpMemberMover","ClumpTestGen");
 
 CREATE_LOGGER(Clump);
 CREATE_LOGGER(ClumpMemberMover);

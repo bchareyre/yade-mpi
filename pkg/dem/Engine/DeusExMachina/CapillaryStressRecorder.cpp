@@ -237,3 +237,4 @@ thickness;
 	
 }
 
+YADE_PLUGIN();

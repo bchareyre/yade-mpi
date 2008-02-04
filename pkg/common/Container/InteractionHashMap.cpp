@@ -121,3 +121,4 @@ unsigned int InteractionHashMap::size()
 {
 	return interactions.size();
 }
+YADE_PLUGIN();

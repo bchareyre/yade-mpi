@@ -11,6 +11,7 @@
 #include"Omega.hpp"
 #include"yadeExceptions.hpp"
 #include"MetaBody.hpp"
+#include"TimeStepper.hpp"
 #include"ThreadRunner.hpp"
 #include"Preferences.hpp"
 #include<Wm3Vector3.h>
@@ -173,10 +174,8 @@ bool Omega::isInheritingFrom(const string& className, const string& baseClassNam
 
 void Omega::scanPlugins()
 {
-// #define STUPID_DLL
 //	ClassFactory::instance().unloadAll();
 
-	// TODO: remove all comments of the form /*DLL ... */, they comment the old code that whould not be needed any more
 
 	vector<string>::iterator dldi    = preferences->dynlibDirectories.begin();
 	vector<string>::iterator dldiEnd = preferences->dynlibDirectories.end();
@@ -184,9 +183,6 @@ void Omega::scanPlugins()
 		ClassFactory::instance().addBaseDirectory((*dldi));
 			
 	vector<string> dynlibsList;
-	#ifdef STUPID_DLL
-		vector< int >    dynlibsListLoaded;
-	#endif
 
 	vector<string>::iterator si = preferences->dynlibDirectories.begin();
 	vector<string>::iterator siEnd = preferences->dynlibDirectories.end();
@@ -223,9 +219,6 @@ void Omega::scanPlugins()
 					if(dynlibsList.size()==0 || ClassFactory::instance().systemNameToLibName(name.leaf())!=dynlibsList.back()) {
 						LOG_DEBUG("Added plugin: "<<*si<<"/"<<di->leaf()<<".");
 						dynlibsList.push_back(ClassFactory::instance().systemNameToLibName(name.leaf()));
-						#ifdef STUPID_DLL
-							dynlibsListLoaded.push_back(false);
-						#endif
 					}
 					else LOG_DEBUG("Possible plugin discarded: "<<*si<<"/"<<name.leaf()<<".");
 				} else LOG_DEBUG("File not considered a plugin: "<<di->leaf()<<".");
@@ -236,31 +229,12 @@ void Omega::scanPlugins()
 
 	bool allLoaded = false;
 	vector<string> dynlibsClassList; // dynlibsList holds filenames, this holds classes defined inside (may be different if using yadePuginClasses)
-	#ifdef STUPID_DLL
-		int overflow = 30; // to prevent infinite loop
-		assert(dynlibsList.size() == dynlibsListLoaded.size());
-		while (!allLoaded && --overflow > 0){
-		int loaded = 0;
-	#endif
 		vector< string >::iterator dlli    = dynlibsList.begin();
 		vector< string >::iterator dlliEnd = dynlibsList.end();
 		allLoaded = true;
-		for( ; dlli!=dlliEnd ; ++dlli
-		#ifdef STUPID_DLL
-		, ++loaded
-		#endif
-		)
-		{
-			#ifdef STUPID_DLL
-			if( dynlibsListLoaded[loaded] == false ) {
-				LOG_DEBUG("Trying to load plugin "<<*dlli<<" (no."<<loaded<<"; overflow="<<overflow<<")");
-			#endif
+		for( ; dlli!=dlliEnd ; ++dlli ) {
 			bool thisLoaded = ClassFactory::instance().load((*dlli));
-			if (!thisLoaded
-				#ifdef STUPID_DLL
-				&& overflow == 1
-				#endif
-				){
+			if (!thisLoaded){
 				string err=ClassFactory::instance().lastError();
 				// HACK
 				if(err.find("cannot open shared object file: No such file or directory")!=std::string::npos){
@@ -277,27 +251,17 @@ void Omega::scanPlugins()
 				}
 				else LOG_ERROR("Error loading Library `"<<(*dlli)<<"': "<<err<<" ."); // leave space to not to confuse c++filt
 			}
-			#ifdef STUPID_DLL
-			else if (!thisLoaded) { LOG_DEBUG("Plugin "<<*dlli<<" not loaded successfully this time: "<<ClassFactory::instance().lastError()<<" (will retry)."); }
-			#endif
 			else { // no error
 				if (ClassFactory::instance().lastPluginClasses().size()==0){ // regular plugin, one class per file
 					dynlibsClassList.push_back(*dlli);
-					LOG_DEBUG("Plugin "<<*dlli<<" loaded succesfully.");
+					LOG_DEBUG("Plugin "<<*dlli<<": loaded default class "<<*dlli<<".");
 				} else {// if plugin defines yadePluginClasses (has multiple classes), insert these into dynLibsList
 					vector<string> css=ClassFactory::instance().lastPluginClasses();
-					for(size_t i=0; i<css.size();i++) { dynlibsClassList.push_back(css[i]); LOG_DEBUG("Plugin "<<*dlli<<": added class "<<css[i]<<".");  }
+					for(size_t i=0; i<css.size();i++) { dynlibsClassList.push_back(css[i]); LOG_DEBUG("Plugin "<<*dlli<<": loaded explicit class "<<css[i]<<".");  }
 				}
 			}
 			allLoaded &= thisLoaded;
-			#ifdef STUPID_DLL
-				if(thisLoaded) dynlibsListLoaded[loaded] = true; }
-			#endif
 		}
-	#ifdef STUPID_DLL
-	}
-	#endif
-
 	if(!allLoaded) LOG_WARN("Couldn't load everything, some stuff may work incorrectly.");
 	
 	buildDynlibDatabase(dynlibsClassList);
@@ -422,6 +386,17 @@ Real Omega::getTimeStep()
 void Omega::skipTimeStepper(bool s)
 {
 	rootBody->setTimeSteppersActive(!s);
+}
+
+
+bool Omega::timeStepperActive(){
+	if(!rootBody) return false;
+	for(vector<shared_ptr<Engine> >::iterator I=rootBody->engines.begin(); I!=rootBody->engines.end(); ++I){
+		if (isInheritingFrom((*I)->getClassName(),"TimeStepper")){
+			return static_pointer_cast<TimeStepper>(*I)->active;
+		}
+	}
+	return false;
 }
 
 //FIXME : make that recursive to scan all submetabodies ???

@@ -145,11 +145,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-common',[
 	env.SharedLibrary('TranslationEngine',
 		['Engine/DeusExMachina/TranslationEngine.cpp'],
 		LIBS=env['LIBS']+['yade-base',
-			
 			'ParticleParameters',
-			'yade-factory',
-			'yade-base',
-			
 			'yade-serialization',
 			'yade-multimethods'],
 		CPPPATH=env['CPPPATH']+['DataClass/PhysicalParameters',
@@ -159,10 +155,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-common',[
 	env.SharedLibrary('DisplacementEngine',
 		['Engine/DeusExMachina/DisplacementEngine.cpp'],
 		LIBS=env['LIBS']+['yade-base',
-			
-			'yade-factory',
-			'yade-base',
-			
 			'yade-serialization',
 			'yade-multimethods'],
 		CPPPATH=env['CPPPATH']+['$PREFIX/include', 'Engine/DeusExMachina']),
@@ -210,14 +202,11 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-common',[
 	env.SharedLibrary('InteractingBox2AABB',
 		['Engine/EngineUnit/InteractingBox2AABB.cpp'],
 		LIBS=env['LIBS']+['yade-base',
-			
 			'BoundingVolumeMetaEngine',
 			'InteractingBox',
 			'AABB',
 			'Box',
-			'yade-base',
-			
-			'yade-multimethods'],
+			'yade-base'],
 		CPPPATH=env['CPPPATH']+['DataClass/BoundingVolume',
 			'DataClass/InteractingGeometry',
 			'$PREFIX/include',

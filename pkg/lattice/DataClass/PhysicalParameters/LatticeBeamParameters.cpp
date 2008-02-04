@@ -166,3 +166,4 @@ void LatticeBeamParameters::registerAttributes()
 	REGISTER_ATTRIBUTE(se3Displacement);
 }
 
+YADE_PLUGIN();

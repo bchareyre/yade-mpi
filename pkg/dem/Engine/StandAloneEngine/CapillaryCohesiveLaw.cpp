@@ -489,3 +489,4 @@ std::ostream& operator<<(std::ostream& os, Tableau& T)
         os << endl;
         return os;
 }
+YADE_PLUGIN();

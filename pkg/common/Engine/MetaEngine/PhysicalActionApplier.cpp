@@ -26,3 +26,4 @@ void PhysicalActionApplier::action(Body* body)
 }
 
 
+YADE_PLUGIN();

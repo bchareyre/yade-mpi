@@ -83,8 +83,7 @@ bool DynLibManager::loadFromDirectoryList (const string& libName )
 {
 	lastPluginClasses.clear();
 
-	if (libName.empty())
-		return false;
+	if (libName.empty()) return false;
 
 	string libFileName = libNameToSystemName(libName);
 
@@ -124,7 +123,9 @@ bool DynLibManager::load (const string& fullLibName, const string& libName )
 #ifndef WIN32
 	char**yadePluginClasses=(char**)dlsym(handle, "yadePluginClasses");
 	// errors are ignored, since definition of this sybol is optional
-	if(dlerror()==NULL){ for(int i=0; yadePluginClasses[i]; i++){ lastPluginClasses.push_back(yadePluginClasses[i]); }}
+	if(dlerror()==NULL){ for(int i=0; yadePluginClasses[i]!=NULL && strlen(yadePluginClasses[i])>0; i++){
+		lastPluginClasses.push_back(yadePluginClasses[i]); LOG_DEBUG("Pushed back `"<<yadePluginClasses[i]<<"'."); }
+	}
 #endif
 	return true;
 }

@@ -95,3 +95,4 @@ void ResultantForceEngine::applyCondition(Body* body)
 }
 
 
+YADE_PLUGIN();

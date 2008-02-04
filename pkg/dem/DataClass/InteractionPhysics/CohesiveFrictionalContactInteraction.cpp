@@ -66,3 +66,4 @@ void CohesiveFrictionalContactInteraction::registerAttributes()
 //				,normalForce			// normal force applied on a DE
 //				,shearForce;			// shear force applied on a DE
 }
+YADE_PLUGIN();

@@ -81,3 +81,4 @@ void AveragePositionRecorder::action(Body * body)
 }
 
 
+YADE_PLUGIN();

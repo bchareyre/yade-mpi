@@ -82,3 +82,4 @@ void PositionOrientationRecorder::action(Body * body)
 }
 
 
+YADE_PLUGIN();

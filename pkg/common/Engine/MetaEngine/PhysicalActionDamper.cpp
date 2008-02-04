@@ -36,3 +36,4 @@ void PhysicalActionDamper::action(Body* body)
 }
 
 
+YADE_PLUGIN();

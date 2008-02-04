@@ -27,3 +27,4 @@ void Box::registerAttributes()
 	REGISTER_ATTRIBUTE(extents);
 }
 
+YADE_PLUGIN();

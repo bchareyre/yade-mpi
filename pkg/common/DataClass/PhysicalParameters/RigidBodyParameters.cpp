@@ -28,3 +28,4 @@ void RigidBodyParameters::registerAttributes()
 	REGISTER_ATTRIBUTE(angularVelocity);
 }
 
+YADE_PLUGIN();

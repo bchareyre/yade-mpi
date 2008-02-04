@@ -46,3 +46,4 @@ shared_ptr<PhysicalAction> Momentum::clone()
 	return shared_ptr<Momentum>(new Momentum(*this));
 }
 
+YADE_PLUGIN();

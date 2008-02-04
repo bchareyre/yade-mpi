@@ -596,3 +596,4 @@ void LatticeLaw::action(Body* body)
 
 */
 
+YADE_PLUGIN();

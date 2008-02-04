@@ -33,3 +33,4 @@ void ElasticBodySimpleRelationship::registerAttributes()
 {
 };
 
+YADE_PLUGIN();

@@ -2,10 +2,7 @@
 #include<yade/extra/Clump.hpp>
 #include<yade/extra/Shop.hpp>
 
-const char* yadePluginClasses[]={
-	"ScrewGen",
-	NULL /*sentinel*/
-};
+YADE_PLUGIN("ScrewGen");
 
 CREATE_LOGGER(ScrewGen);
 

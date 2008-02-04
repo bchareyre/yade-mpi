@@ -74,10 +74,12 @@ class TriaxialTest : public FileGenerator
 				
 				sigmaIsoCompaction,
 				sigmaLateralConfinement,
-				strainRate
-				,StabilityCriterion
-				,maxMultiplier ///max multiplier of diameters during internal compaction
-				,finalMaxMultiplier;
+				strainRate,
+				maxWallVelocity,
+				StabilityCriterion,
+				maxMultiplier, ///max multiplier of diameters during internal compaction
+				finalMaxMultiplier,
+				wallOversizeFactor; // make walls bigger (/smaller) than necessary by this factor
 
 		bool		 wall_top
 				,wall_bottom

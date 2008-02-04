@@ -47,3 +47,4 @@ void Quadrilateral::registerAttributes()
 	REGISTER_ATTRIBUTE(i4);
 }
 
+YADE_PLUGIN();

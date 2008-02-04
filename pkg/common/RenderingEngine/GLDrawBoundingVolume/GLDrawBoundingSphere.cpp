@@ -18,3 +18,4 @@ void GLDrawBoundingSphere::go(const shared_ptr<BoundingVolume>& bv)
 	glutWireSphere(s->radius,10,10);
 }
 
+YADE_PLUGIN();

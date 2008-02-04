@@ -55,6 +55,8 @@ int cmdGui::run(int argc, char *argv[]) {
 		//if(status){ LOG_ERROR("pyade import failed."); } else LOG_DEBUG("pyade imported.");
 		PyRun_SimpleString("from yadeControl import *");
 
+		PyRun_SimpleString("sys.excepthook=sys.__excepthook__"); // apport on ubuntu overrides this, not needed
+
 		if(!runScript.empty()){
 			LOG_DEBUG("Will now run file `"<<runScript<<"'");
 			FILE* runScriptFILE=fopen(runScript.c_str(),"r");

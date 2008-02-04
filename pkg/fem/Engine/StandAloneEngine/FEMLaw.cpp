@@ -88,3 +88,4 @@ void FEMLaw::action(Body* body)
 
 
 
+YADE_PLUGIN();

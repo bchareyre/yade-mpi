@@ -57,3 +57,4 @@ void MakeItFlat::applyCondition(Body* body)
         }
 }
 
+YADE_PLUGIN();

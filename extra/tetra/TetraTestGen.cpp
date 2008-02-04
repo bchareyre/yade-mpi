@@ -6,10 +6,7 @@
 
 #include"Tetra.hpp"
 
-const char* yadePluginClasses[]={
-        "TetraTestGen",
-        NULL /*sentinel*/
-};
+YADE_PLUGIN("TetraTestGen");
 
 bool TetraTestGen::generate()
 {

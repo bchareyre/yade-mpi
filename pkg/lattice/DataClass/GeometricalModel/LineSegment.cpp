@@ -23,3 +23,4 @@ void LineSegment::registerAttributes()
 //	REGISTER_ATTRIBUTE(length); // no need to save it
 }
 
+YADE_PLUGIN();

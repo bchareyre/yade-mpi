@@ -46,3 +46,4 @@ void CundallNonViscousMomentumDamping::go( 	  const shared_ptr<PhysicalAction>& 
 }
 
 
+YADE_PLUGIN();

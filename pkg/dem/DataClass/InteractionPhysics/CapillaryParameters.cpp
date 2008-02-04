@@ -43,3 +43,4 @@ void CapillaryParameters::registerAttributes()
 	REGISTER_ATTRIBUTE(Delta2);
 	REGISTER_ATTRIBUTE(meniscus);
 }
+YADE_PLUGIN();

@@ -48,3 +48,4 @@ shared_ptr<PhysicalAction> GlobalStiffness::clone()
 	return shared_ptr<GlobalStiffness>(new GlobalStiffness(*this));
 }
 
+YADE_PLUGIN();

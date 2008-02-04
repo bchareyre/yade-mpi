@@ -1,36 +1,35 @@
 /*************************************************************************
-*  Copyright (C) 2004 by Olivier Galizzi                                 *
-*  olivier.galizzi@imag.fr                                               *
-*                                                                        *
+*  Copyright (C) 2004,2007 by
+*  	Olivier Galizzi <olivier.galizzi@imag.fr>
+*  	Bruno Chareyre <bruno.chareyre@hmg.inpg.fr>
+*  	Václav Šmilauer <eudoxos@arcig.cz>
+*
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "PersistentSAPCollider.hpp"
+#include"PersistentSAPCollider.hpp"
 #include<yade/core/Body.hpp>
 #include<yade/core/MetaBody.hpp>
 #include<yade/core/BodyContainer.hpp>
+#include<limits>
 
 PersistentSAPCollider::PersistentSAPCollider() : BroadInteractor()
 {
-//	cerr << "PersistentSAPCollider\n";
+	noTransientIfPersistentExists=false;
+	haveDistantTransient=false;
 
-	//this->maxObject = 150000;
 	nbObjects=0;
-
 	//xBounds.resize(2*maxObject);
 	//yBounds.resize(2*maxObject);
 	//zBounds.resize(2*maxObject);
-
-	//minimums = new Real[3*maxObject];
-	//maximums = new Real[3*maxObject];
-	
+	//minima = new Real[3*maxObject];
+	//maxima = new Real[3*maxObject];
 	xBounds.clear();
 	yBounds.clear();
 	zBounds.clear();
-
-	minimums.clear();
-	maximums.clear();
+	minima.clear();
+	maxima.clear();
 }
 
 PersistentSAPCollider::~PersistentSAPCollider()
@@ -41,65 +40,52 @@ PersistentSAPCollider::~PersistentSAPCollider()
 void PersistentSAPCollider::action(Body* body)
 {
 
-	MetaBody * ncb = YADE_CAST<MetaBody*>(body);
-	shared_ptr<BodyContainer> bodies = ncb->bodies;
+	MetaBody *ncb=YADE_CAST<MetaBody*>(body);
+	shared_ptr<BodyContainer> bodies=ncb->bodies;
 	
-	if (2*bodies->size()!=xBounds.size())
-	{
+	if (2*bodies->size()!=xBounds.size()){
 		xBounds.resize(2*bodies->size());
 		yBounds.resize(2*bodies->size());
 		zBounds.resize(2*bodies->size());
-
-		minimums.resize(3*bodies->size());
-		maximums.resize(3*bodies->size());
+		minima.resize(3*bodies->size());
+		maxima.resize(3*bodies->size());
 	}
 
-	// Updates the minimums and maximums arrays according to the new center and radius of the spheres
+	// Updates the minima and maxima arrays according to the new center and radius of the spheres
 	int offset;
 	Vector3r min,max;
-	shared_ptr<Body> b;
 
-	BodyContainer::iterator bi    = bodies->begin();
-	BodyContainer::iterator biEnd = bodies->end();
-	for(unsigned int i=0 ; bi!=biEnd ; ++bi,i++ )
-	{
-		b = *bi;
-		
+	BodyContainer::iterator bi=bodies->begin();
+	for(unsigned int i=0 ; bi!=bodies->end(); ++bi,i++) {
+		const shared_ptr<Body>& b=*bi;
 		offset = 3*i;
 		//FIXME: this is broken: bodies without boundingVolume are just skipped, which means that some garbage values are used later!
-		if(b->boundingVolume) // can't assume that everybody has BoundingVolume
-		{
-			min = b->boundingVolume->min;
-			max = b->boundingVolume->max;
-			minimums[offset+0] = min[0];
-			minimums[offset+1] = min[1];
-			minimums[offset+2] = min[2];
-			maximums[offset+0] = max[0];
-			maximums[offset+1] = max[1];
-			maximums[offset+2] = max[2];
+		if(b->boundingVolume){ // can't assume that everybody has BoundingVolume
+			min=b->boundingVolume->min; max=b->boundingVolume->max;
+			minima[offset+0]=min[0]; minima[offset+1]=min[1]; minima[offset+2]=min[2];
+			maxima[offset+0]=max[0]; maxima[offset+1]=max[1]; maxima[offset+2]=max[2];
+		}
+		else {
+			double nan=std::numeric_limits<Real>::quiet_NaN();
+			minima[offset+0]=nan; minima[offset+1]=nan; minima[offset+2]=nan;
+			maxima[offset+0]=nan; maxima[offset+1]=nan; maxima[offset+2]=nan;
+			cerr<<"Assigning nan's, not tested! (hangs during sort?)"<<endl;	
 		}
 	}
-	
-	transientInteractions = ncb->transientInteractions;
-	InteractionContainer::iterator ii    = transientInteractions->begin();
-	InteractionContainer::iterator iiEnd = transientInteractions->end();
-	for( ; ii!=iiEnd ; ++ii)
-	{
-		shared_ptr<Interaction> interaction = *ii;
-		// FIXME : remove this isNew flag and test if interactionPhysic ?
-		if (interaction->isReal) // if a interaction was only potential then no geometry was created for it and so this time it is still a new one
-			interaction->isNew = false;
-		interaction->isReal = false;
+
+	transientInteractions = ncb->transientInteractions;	
+	for(InteractionContainer::iterator I=transientInteractions->begin(); I!=transientInteractions->end(); ++I) {
+		if ((*I)->isReal) (*I)->isNew=false; // FIXME : remove this isNew flag and test if interactionPhysic ?
+		if(!haveDistantTransient) (*I)->isReal=false; // reset this flag, is used later... (??)
 	}
 	
 	updateIds(bodies->size());
-	nbObjects = bodies->size();
+	nbObjects=bodies->size();
 
 	// permutation sort of the AABBBounds along the 3 axis performed in a independant manner
 	sortBounds(xBounds, nbObjects);
 	sortBounds(yBounds, nbObjects);
 	sortBounds(zBounds, nbObjects);
-
 }
 
 
@@ -107,25 +93,16 @@ void PersistentSAPCollider::updateIds(unsigned int nbElements)
 {
 
 	// the first time broadInteractionTest is called nbObject=0
-	if (nbElements!=nbObjects)
-	{
-		int begin,end;
-
-		end = nbElements;
-		begin = 0;
-
-		if (nbElements>nbObjects)
-			begin = nbObjects;
+	if (nbElements!=nbObjects){
+		int begin=0, end=nbElements;
+		if (nbElements>nbObjects) begin=nbObjects;
 
 		// initialization if the xBounds, yBounds, zBounds
-		for(int i=begin;i<end;i++)
-		{
+		for(int i=begin;i<end;i++){
 			xBounds[2*i]	= shared_ptr<AABBBound>(new AABBBound(i,1));
 			xBounds[2*i+1]	= shared_ptr<AABBBound>(new AABBBound(i,0));
-			
 			yBounds[2*i]	= shared_ptr<AABBBound>(new AABBBound(i,1));
 			yBounds[2*i+1]	= shared_ptr<AABBBound>(new AABBBound(i,0));
-			
 			zBounds[2*i]	= shared_ptr<AABBBound>(new AABBBound(i,1));
 			zBounds[2*i+1]	= shared_ptr<AABBBound>(new AABBBound(i,0));
 		}
@@ -147,10 +124,8 @@ void PersistentSAPCollider::updateIds(unsigned int nbElements)
 		findOverlappingBB(xBounds, nbElements);
 		findOverlappingBB(yBounds, nbElements);
 		findOverlappingBB(zBounds, nbElements);
-
 	}
-	else
-		updateBounds(nbElements);
+	else updateBounds(nbElements);
 }
 
 
@@ -176,9 +151,11 @@ void PersistentSAPCollider::sortBounds(vector<shared_ptr<AABBBound> >& bounds, i
 
 void PersistentSAPCollider::updateOverlapingBBSet(int id1,int id2)
 {
-
 // 	// look if the pair (id1,id2) already exists in the overleppingBB collection
-	bool found = (transientInteractions->find(body_id_t(id1),body_id_t(id2))!=0);
+	const shared_ptr<Interaction>& interaction=transientInteractions->find(body_id_t(id1),body_id_t(id2));
+	bool found=(interaction!=0);//Bruno's Hack
+	// if there is persistent interaction, we will not create transient one!
+	bool foundPersistent = noTransientIfPersistentExists ? (persistentInteractions->find(body_id_t(id1),body_id_t(id2))!=0) : false;
 	
 	// test if the AABBs of the spheres number "id1" and "id2" are overlapping
 	int offset1 = 3*id1;
@@ -186,67 +163,48 @@ void PersistentSAPCollider::updateOverlapingBBSet(int id1,int id2)
 	// FIXME: this is perhaps an expensive operation?!
 	const shared_ptr<Body>& b1(Body::byId(body_id_t(id1))), b2(Body::byId(body_id_t(id2)));
 	bool overlap =
-
 		(b1->isStandalone() || b2->isStandalone() || b1->clumpId!=b2->clumpId ) && // only collide if at least one particle is standalone or they belong to different clumps
 		!b1->isClump() && !b2->isClump() && // do not collide clumps, since they are just containers, never interact
 
-		!(maximums[offset1]<minimums[offset2] || maximums[offset2]<minimums[offset1] || 
-		maximums[offset1+1]<minimums[offset2+1] || maximums[offset2+1]<minimums[offset1+1] || 
-		maximums[offset1+2]<minimums[offset2+2] || maximums[offset2+2]<minimums[offset1+2]);
+		!(maxima[offset1]<minima[offset2] || maxima[offset2]<minima[offset1] || 
+		maxima[offset1+1]<minima[offset2+1] || maxima[offset2+1]<minima[offset1+1] || 
+		maxima[offset1+2]<minima[offset2+2] || maxima[offset2+2]<minima[offset1+2]);
 
 	// inserts the pair p=(id1,id2) if the two AABB overlaps and if p does not exists in the overlappingBB
-	if (overlap && !found)
-		transientInteractions->insert(body_id_t(id1),body_id_t(id2));
+	if(overlap && !found && !foundPersistent) transientInteractions->insert(body_id_t(id1),body_id_t(id2));
 	// removes the pair p=(id1,id2) if the two AABB do not overlapp any more and if p already exists in the overlappingBB
-	else if (!overlap && found)
-		transientInteractions->erase(body_id_t(id1),body_id_t(id2));
-
+	else if(!overlap && found && (haveDistantTransient ? !interaction->isReal : true) ) transientInteractions->erase(body_id_t(id1),body_id_t(id2));
 }
 
 
 void PersistentSAPCollider::updateBounds(int nbElements)
 {
+	for(int i=0; i < 2*nbElements; i++){
+		if (xBounds[i]->lower) xBounds[i]->value = minima[3*xBounds[i]->id+0];
+		else xBounds[i]->value = maxima[3*xBounds[i]->id+0];
 
-	for(int i=0; i < 2*nbElements; i++)
-	{
-		if (xBounds[i]->lower)
-			xBounds[i]->value = minimums[3*xBounds[i]->id+0];
-		else
-			xBounds[i]->value = maximums[3*xBounds[i]->id+0];
+		if (yBounds[i]->lower) yBounds[i]->value = minima[3*yBounds[i]->id+1];
+		else yBounds[i]->value = maxima[3*yBounds[i]->id+1];
 
-		if (yBounds[i]->lower)
-			yBounds[i]->value = minimums[3*yBounds[i]->id+1];
-		else
-			yBounds[i]->value = maximums[3*yBounds[i]->id+1];
-
-		if (zBounds[i]->lower)
-			zBounds[i]->value = minimums[3*zBounds[i]->id+2];
-		else
-			zBounds[i]->value = maximums[3*zBounds[i]->id+2];
+		if (zBounds[i]->lower) zBounds[i]->value = minima[3*zBounds[i]->id+2];
+		else zBounds[i]->value = maxima[3*zBounds[i]->id+2];
 	}
 }
 
 
 
 
-void PersistentSAPCollider::findOverlappingBB(std::vector<shared_ptr<AABBBound> >& bounds, int nbElements)
-{
-
-	int i,j;
-
-	i = j = 0;
-	while (i<2*nbElements)
-	{
-		while (i<2*nbElements && !bounds[i]->lower)
-			i++;
+void PersistentSAPCollider::findOverlappingBB(std::vector<shared_ptr<AABBBound> >& bounds, int nbElements){
+	int i=0,j=0;
+	while (i<2*nbElements) {
+		while (i<2*nbElements && !bounds[i]->lower) i++;
 		j=i+1;
-		while (j<2*nbElements && bounds[j]->id!=bounds[i]->id)
-		{
-			if (bounds[j]->lower)
-				updateOverlapingBBSet(bounds[i]->id,bounds[j]->id);
+		while (j<2*nbElements && bounds[j]->id!=bounds[i]->id){
+			if (bounds[j]->lower) updateOverlapingBBSet(bounds[i]->id,bounds[j]->id);
 			j++;
 		}
 		i++;
 	}
 }
 
+YADE_PLUGIN();

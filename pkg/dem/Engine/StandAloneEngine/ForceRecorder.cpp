@@ -77,3 +77,4 @@ void ForceRecorder::action(Body * body)
 		
 }
 
+YADE_PLUGIN();

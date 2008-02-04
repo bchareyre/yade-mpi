@@ -56,3 +56,4 @@ void GLDrawSphereShadowVolume::go(const shared_ptr<GeometricalModel>& gm , const
 }
 
 
+YADE_PLUGIN();

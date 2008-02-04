@@ -138,3 +138,4 @@ void HydraulicForceEngine::applyCondition(Body* body)
     }
 }
 
+YADE_PLUGIN();

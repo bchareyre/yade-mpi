@@ -22,3 +22,4 @@ void SimpleElasticInteraction::registerAttributes()
 {
 	REGISTER_ATTRIBUTE(kn);
 }
+YADE_PLUGIN();

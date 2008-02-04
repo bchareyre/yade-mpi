@@ -43,3 +43,4 @@ void GLDrawClosestFeatures::go(
 	glEnd();
 }
 
+YADE_PLUGIN();

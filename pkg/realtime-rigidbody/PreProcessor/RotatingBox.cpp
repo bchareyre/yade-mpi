@@ -350,3 +350,4 @@ void RotatingBox::positionRootBody(shared_ptr<MetaBody>& rootBody)
 }
 
 
+YADE_PLUGIN();

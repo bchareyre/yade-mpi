@@ -30,7 +30,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/gui',[
 			'qt3/YadeQtGeneratedMainWindow.ui',
 			'qt3/YadeQtMainWindow.cpp'],
 		LIBS=env['LIBS']+['yade-base',
-			'yade-base',
 			'yade-multimethods',
 			'yade-factory',
 			'yade-opengl',

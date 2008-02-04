@@ -171,3 +171,4 @@ void NodeRecorder::action(Body * body)
 	// GLDrawSomething can just put a getClassName()
 }
 
+YADE_PLUGIN();

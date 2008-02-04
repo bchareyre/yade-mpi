@@ -46,6 +46,11 @@ env.Install('$PREFIX/lib/yade$SUFFIX/extra',[
 	
 	env.SharedLibrary('TetraTestGen',['tetra/TetraTestGen.cpp'],LIBS=env['LIBS']+['Shop','Tetra']),
 
+	env.SharedLibrary('UniaxialStrainControlledTest',['usct/UniaxialStrainControlledTest.cpp'],LIBS=env['LIBS']+['Shop','GlobalStiffnessTimeStepper','GlobalStiffnessCounter']),
+
+	env.SharedLibrary('Brefcom',['Brefcom.cpp'],LIBS=env['LIBS']+['Shop','InteractingSphere2InteractingSphere4DistantSpheresContactGeometry']),
+
+	env.SharedLibrary('BrefcomTestGen',['BrefcomTestGen.cpp'],LIBS=env['LIBS']+['Shop','UniaxialStrainControlledTest']),
 
 	env.SharedLibrary('Shop',
 		['clump/Shop.cpp'],
@@ -93,7 +98,12 @@ env.Install('$PREFIX/lib/yade$SUFFIX/extra',[
 			'Force',
 			'InteractingSphere2InteractingSphere4SpheresContactGeometry',
 			#'Clump',
-			'yade-multimethods']),
+			'yade-multimethods',
+			'SpheresContactGeometry',
+			'ElasticContactInteraction',
+			'SDECLinkGeometry',
+			'SDECLinkPhysics',
+			]),
 
 ])
 

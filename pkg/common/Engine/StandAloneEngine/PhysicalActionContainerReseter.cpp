@@ -24,3 +24,4 @@ void PhysicalActionContainerReseter::action(Body* body)
 }
 
 
+YADE_PLUGIN();

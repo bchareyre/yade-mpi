@@ -1790,3 +1790,4 @@ void LatticeExample::makeFibreBeams(shared_ptr<MetaBody>& rootBody)
 }
 
 
+YADE_PLUGIN();

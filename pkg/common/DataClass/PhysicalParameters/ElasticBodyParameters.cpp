@@ -23,3 +23,4 @@ void ElasticBodyParameters::registerAttributes()
 	REGISTER_ATTRIBUTE(young);
 }
 
+YADE_PLUGIN();

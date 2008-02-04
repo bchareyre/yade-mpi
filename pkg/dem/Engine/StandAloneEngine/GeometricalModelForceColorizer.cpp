@@ -83,3 +83,4 @@ void GeometricalModelForceColorizer::action(Body * body)
 		
 }
 
+YADE_PLUGIN();

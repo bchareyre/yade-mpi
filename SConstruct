@@ -21,18 +21,21 @@
 #  3. Have build.log with commands and all output...
 #
 # And as usually, clean up the code, get rid of workarounds and hacks etc.
-
 import os,os.path,string,re,sys
 import SCons
 # SCons version numbers are needed a few times
-#ver=[str(x) for x in SCons.__version__.split('.')]
-#for i in range(0,len(ver)):
-#	ver[i]="".join([x if x in ('0123456789') else '0' for x in ver[i]])
-#	if len(ver[i])>2: ver[i]=ver[i][0:2]+"."+ver[i][2:]
-#sconsVersion=10000*float(ver[0])+(100*float(ver[1]) if len(ver)>1 else 0)+(float(ver[2]) if len(ver)>2 else 0)
-#
-# should work with python 2.4
-sconsVersion=sum([int(SCons.__version__.split('.')[ord[0]])*ord[1] for ord in [(0,10000),(1,100),(2,1)][:len(SCons.__version__.split('.'))] ])
+# rewritten for python2.4
+ver=[str(x) for x in SCons.__version__.split('.')]
+for i in range(0,len(ver)):
+	def any2num(x):
+		if x in ('0123456789'): return x
+		else: return '0'
+	ver[i]="".join([any2num(x) for x in ver[i]])
+	if len(ver[i])>2: ver[i]=ver[i][0:2]+"."+ver[i][2:]
+sconsVersion=10000*float(ver[0])
+if len(ver)>1: sconsVersion+=100*float(ver[1])
+if len(ver)>2: sconsVersion+=float(ver[2])
+# print sconsVersion
 
 ##########################################################################################
 ########## PROXY TO NEWER SCONS (DOWNLOADED IF NEEDED) ###################################

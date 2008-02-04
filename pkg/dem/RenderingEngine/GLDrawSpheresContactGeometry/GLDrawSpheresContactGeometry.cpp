@@ -78,3 +78,4 @@ void GLDrawSpheresContactGeometry::go(
 	}
 }
 
+YADE_PLUGIN();

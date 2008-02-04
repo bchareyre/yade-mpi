@@ -32,3 +32,4 @@ ClosestFeatures::~ClosestFeatures ()
 // 
 // }
 
+YADE_PLUGIN();

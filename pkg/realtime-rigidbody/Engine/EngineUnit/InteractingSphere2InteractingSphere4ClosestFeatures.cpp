@@ -45,3 +45,4 @@ bool InteractingSphere2InteractingSphere4ClosestFeatures::goReverse(	const share
 	return go(cm1,cm2,se31,se32,c);
 }
 
+YADE_PLUGIN();

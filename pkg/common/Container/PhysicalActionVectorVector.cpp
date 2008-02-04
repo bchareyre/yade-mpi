@@ -131,3 +131,4 @@ PhysicalActionContainer::iterator PhysicalActionVectorVector::end()
 }
 
 
+YADE_PLUGIN();

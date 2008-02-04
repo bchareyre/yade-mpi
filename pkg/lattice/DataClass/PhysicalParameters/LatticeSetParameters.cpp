@@ -37,3 +37,4 @@ void LatticeSetParameters::registerAttributes()
         REGISTER_ATTRIBUTE(useStiffnessSoftening);
 }
  
+YADE_PLUGIN();

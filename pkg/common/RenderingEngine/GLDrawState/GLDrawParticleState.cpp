@@ -39,3 +39,4 @@ void GLDrawParticleState::go(const shared_ptr<PhysicalParameters>& pp)
 	glEnd();
 }
 
+YADE_PLUGIN();

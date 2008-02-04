@@ -24,3 +24,4 @@ void InteractingSphere::registerAttributes()
 }
 
 
+YADE_PLUGIN();

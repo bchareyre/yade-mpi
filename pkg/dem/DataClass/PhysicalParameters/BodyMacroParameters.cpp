@@ -24,3 +24,4 @@ void BodyMacroParameters::registerAttributes()
 	REGISTER_ATTRIBUTE(frictionAngle);
 }
 
+YADE_PLUGIN();

@@ -55,3 +55,4 @@ void CapillaryPressureEngine::applyCondition(Body * body)
 	
 }
 
+YADE_PLUGIN();

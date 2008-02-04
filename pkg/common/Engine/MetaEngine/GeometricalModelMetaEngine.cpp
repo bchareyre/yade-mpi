@@ -27,3 +27,4 @@ void GeometricalModelMetaEngine::action(Body* body)
 	 	operator()(body->physicalParameters,body->geometricalModel,body);
 }
 
+YADE_PLUGIN();

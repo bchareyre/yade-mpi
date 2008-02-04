@@ -81,3 +81,4 @@ void GLDrawSDECLinkGeometry::go(
 	}
 }
 
+YADE_PLUGIN();

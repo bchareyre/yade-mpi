@@ -16,3 +16,4 @@ void GLDrawMetaInteractingGeometry::go(const shared_ptr<InteractingGeometry>& , 
 }
 
 
+YADE_PLUGIN();

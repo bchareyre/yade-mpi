@@ -94,3 +94,4 @@ void DisplacementEngine::applyCondition(Body * body)
 
 }
 
+YADE_PLUGIN();

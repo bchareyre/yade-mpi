@@ -32,3 +32,4 @@ void GLDrawInteractingBox::go(const shared_ptr<InteractingGeometry>& cg, const s
 //	}
 }
 
+YADE_PLUGIN();

@@ -78,3 +78,4 @@ void MassSpringLaw::action(Body * body)
 	
 }
 
+YADE_PLUGIN();

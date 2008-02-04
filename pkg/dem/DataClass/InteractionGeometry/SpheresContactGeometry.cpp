@@ -31,3 +31,4 @@ void SpheresContactGeometry::registerAttributes()
 	REGISTER_ATTRIBUTE(radius2);
 }
 
+YADE_PLUGIN();

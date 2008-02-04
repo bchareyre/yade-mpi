@@ -89,3 +89,4 @@ void MyTetrahedronLaw::action(Body* body)
 }
 
 
+YADE_PLUGIN();

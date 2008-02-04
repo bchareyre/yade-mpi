@@ -24,3 +24,4 @@ void SpringPhysics::registerAttributes()
 	REGISTER_ATTRIBUTE(initialLength);
 }
 
+YADE_PLUGIN();

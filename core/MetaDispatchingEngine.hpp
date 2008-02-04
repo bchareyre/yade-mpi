@@ -14,11 +14,10 @@
 
 class MetaDispatchingEngine : public MetaEngine
 {
-
-	protected :
-		vector<vector<string> >		functorNames;
+	public:
+		vector<vector<string> >		functorNames; // public for python interface; since there is getFunctorArguments returning RW(!) reference to this, why have it private anyway?!
 		list<shared_ptr<EngineUnit> >	functorArguments;
-
+	protected:
 		void storeFunctorArguments(shared_ptr<EngineUnit> eu);
 
 	public :

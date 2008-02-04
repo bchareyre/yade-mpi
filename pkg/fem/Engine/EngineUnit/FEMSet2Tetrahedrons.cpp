@@ -43,3 +43,4 @@ void FEMSet2Tetrahedrons::go(	  const shared_ptr<PhysicalParameters>& ph
 	}
 }
 
+YADE_PLUGIN();

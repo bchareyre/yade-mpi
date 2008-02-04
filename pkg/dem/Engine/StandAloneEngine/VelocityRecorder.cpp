@@ -81,3 +81,4 @@ void VelocityRecorder::action(Body * body)
 }
 
 
+YADE_PLUGIN();

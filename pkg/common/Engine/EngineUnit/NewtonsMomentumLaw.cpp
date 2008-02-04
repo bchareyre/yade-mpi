@@ -33,3 +33,4 @@ void NewtonsMomentumLaw::go( 	  const shared_ptr<PhysicalAction>& a
 }
 
 
+YADE_PLUGIN();
