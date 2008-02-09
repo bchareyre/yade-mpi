@@ -18,6 +18,7 @@ class NewtonsMomentumLaw : public PhysicalActionApplierUnit
 					, const shared_ptr<PhysicalParameters>&
 					, const Body*);
 
+	FUNCTOR2D(Momentum,RigidBodyParameters);
 	REGISTER_CLASS_NAME(NewtonsMomentumLaw);
 	REGISTER_BASE_CLASS_NAME(PhysicalActionApplierUnit);
 };

@@ -118,7 +118,6 @@ bool BrefcomTestGen::generate(){
 	message="";
 	rootBody=Shop::rootBody();
 
-	/* We don't use collider and orientation integrator for now! */
 	createEngines();
 
 	shared_ptr<UniaxialStrainer> strainer(new UniaxialStrainer);
@@ -129,9 +128,12 @@ bool BrefcomTestGen::generate(){
 	
 	// control normal/shear ratio
 	//Real zCoord=.1; Real yCoord=sqrt(1-zCoord*zCoord); // distance is always 2, with contact at origin
-	Real zCoord=1, yCoord=.2;
-	shared_ptr<Body> s1=Shop::sphere(Vector3r(0,-yCoord,-zCoord),1), s2=Shop::sphere(Vector3r(0,yCoord,zCoord),1);
-	body_id_t id1=rootBody->bodies->insert(s1), id2=rootBody->bodies->insert(s2);
+	Real zCoord=1, yCoord=0;
+	shared_ptr<Body>
+		s1=Shop::sphere(Vector3r(0,-yCoord,-zCoord),1),
+		s2=Shop::sphere(Vector3r(0,yCoord,zCoord),1),
+		sMid=Shop::sphere(Vector3r(0,0,0.01),1);
+	body_id_t id1=rootBody->bodies->insert(s1), id2=rootBody->bodies->insert(s2), id3=rootBody->bodies->insert(sMid);
 	
 	//  engines should take care of the rest of interaction; this is what collider would do normally
 	/*

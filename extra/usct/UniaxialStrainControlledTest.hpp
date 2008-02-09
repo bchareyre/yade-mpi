@@ -13,7 +13,7 @@ class USCTGen: public FileGenerator {
 		~USCTGen (){};
 		bool generate();
 		string spheresFile;
-		Real strainRate, limitStrain;
+		Real strainRate, limitStrain, damping;
 		int axis;
 	protected :
 		void registerAttributes(){
@@ -22,6 +22,7 @@ class USCTGen: public FileGenerator {
 			REGISTER_ATTRIBUTE(axis);
 			REGISTER_ATTRIBUTE(strainRate);
 			REGISTER_ATTRIBUTE(limitStrain);
+			REGISTER_ATTRIBUTE(damping);
 		}
 	REGISTER_CLASS_NAME(USCTGen);
 	REGISTER_BASE_CLASS_NAME(FileGenerator);

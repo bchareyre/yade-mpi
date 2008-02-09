@@ -18,7 +18,7 @@ class MetaInteractingGeometry2AABB : public BoundingVolumeEngineUnit
 				, shared_ptr<BoundingVolume>& bv
 				, const Se3r& se3
 				, const Body* );
-
+	FUNCTOR2D(MetaInteractingGeometry,AABB);
 	REGISTER_CLASS_NAME(MetaInteractingGeometry2AABB);
 	REGISTER_BASE_CLASS_NAME(BoundingVolumeEngineUnit);
 };

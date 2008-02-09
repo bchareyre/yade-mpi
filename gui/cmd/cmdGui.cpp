@@ -45,8 +45,11 @@ int cmdGui::run(int argc, char *argv[]) {
 	}
 
 	XInitThreads();
+	PyEval_InitThreads();
 
 	PyGILState_STATE pyState = PyGILState_Ensure();
+
+
 		// wrap those in python::handle<> ??
 		PyRun_SimpleString("import sys, readline");
 		PyRun_SimpleString("sys.path.insert(0,'" PREFIX "/lib/yade" SUFFIX "/extra');");

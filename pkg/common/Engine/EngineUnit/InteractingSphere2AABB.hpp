@@ -18,6 +18,7 @@ class InteractingSphere2AABB : public BoundingVolumeEngineUnit
 				, shared_ptr<BoundingVolume>& bv
 				, const Se3r& se3
 				, const Body*	);
+	FUNCTOR2D(InteractingSphere,AABB);
 	REGISTER_CLASS_NAME(InteractingSphere2AABB);
 	REGISTER_BASE_CLASS_NAME(BoundingVolumeEngineUnit);
 };

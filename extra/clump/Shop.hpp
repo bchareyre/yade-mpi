@@ -30,6 +30,11 @@ using namespace std;
 using boost::shared_ptr;
 
 class Shop{
+	/* the only non-static thing to make class factory happy */
+	//public: Shop(){};
+	//REGISTER_CLASS_NAME(Shop);
+	//REGISTER_BASE_CLASS_NAME();
+		
 	private:
 		DECLARE_LOGGER;
 	public:
@@ -61,5 +66,5 @@ class Shop{
 		// (true || boost::lambda::_1) means that true is the default
 		static int createCohesion(Real limitNormalForce, Real limitShearForce, int groupMask=0,
 			boost::function<bool(body_id_t,body_id_t)> linkOK = (true || boost::lambda::_1) );
-};
 
+};

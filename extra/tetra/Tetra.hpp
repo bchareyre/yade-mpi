@@ -67,6 +67,7 @@ class TetraBang: public InteractionGeometry{
 			REGISTER_ATTRIBUTE(equivalentPenetrationDepth);
 			REGISTER_ATTRIBUTE(maxPenetrationDepthA); REGISTER_ATTRIBUTE(maxPenetrationDepthB);
 		}
+		FUNCTOR2D(TetraMold,TetraMold);
 		REGISTER_CLASS_NAME(TetraBang);
 		REGISTER_BASE_CLASS_NAME(InteractionGeometry);
 };
@@ -109,6 +110,7 @@ class TetraAABB: public BoundingVolumeEngineUnit
 			aabb->center=(aabb->min+aabb->max)*0.5;
 			aabb->halfSize=(aabb->max-aabb->min)*0.5;
 		}
+		FUNCTOR2D(TetraMold,AABB);
 		REGISTER_CLASS_NAME(TetraAABB);
 		REGISTER_BASE_CLASS_NAME(BoundingVolumeEngineUnit);
 };

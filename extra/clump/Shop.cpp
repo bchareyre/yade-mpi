@@ -32,6 +32,7 @@
 #include<yade/pkg-common/LeapFrogOrientationIntegrator.hpp>
 #include<yade/pkg-dem/InteractingSphere2InteractingSphere4SpheresContactGeometry.hpp>
 #include<yade/pkg-dem/InteractingBox2InteractingSphere4SpheresContactGeometry.hpp>
+#include<yade/pkg-dem/MacroMicroElasticRelationships.hpp>
 /*class InteractingSphere2AABB;
 class InteractingBox2AABB;
 class MetaInteractingGeometry;
@@ -172,10 +173,10 @@ void Shop::rootBodyActors(shared_ptr<MetaBody> rootBody){
 	rootBody->initializers.push_back(physicalActionInitializer);
 	
 	shared_ptr<BoundingVolumeMetaEngine> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeMetaEngine>(new BoundingVolumeMetaEngine);
-	boundingVolumeDispatcher->DISPATCHER_ADD3(InteractingSphere,AABB,InteractingSphere2AABB);
-	boundingVolumeDispatcher->DISPATCHER_ADD3(InteractingBox,AABB,InteractingBox2AABB);
-	boundingVolumeDispatcher->DISPATCHER_ADD3(TetraMold,AABB,TetraAABB);
-	boundingVolumeDispatcher->DISPATCHER_ADD3(MetaInteractingGeometry,AABB,MetaInteractingGeometry2AABB);
+	boundingVolumeDispatcher->add(new InteractingSphere2AABB);
+	boundingVolumeDispatcher->add(new InteractingBox2AABB);
+	boundingVolumeDispatcher->add(new TetraAABB);
+	boundingVolumeDispatcher->add(new MetaInteractingGeometry2AABB);
 	rootBody->initializers.push_back(boundingVolumeDispatcher);
 
 	//engines
@@ -201,13 +202,13 @@ void Shop::rootBodyActors(shared_ptr<MetaBody> rootBody){
 	rootBody->engines.push_back(shared_ptr<Engine>(new PersistentSAPCollider));
 
 	shared_ptr<InteractionGeometryMetaEngine> interactionGeometryDispatcher(new InteractionGeometryMetaEngine);
-	interactionGeometryDispatcher->DISPATCHER_ADD3(InteractingSphere,InteractingSphere,InteractingSphere2InteractingSphere4SpheresContactGeometry);
-	interactionGeometryDispatcher->DISPATCHER_ADD3(InteractingSphere,InteractingBox,InteractingBox2InteractingSphere4SpheresContactGeometry);
-	interactionGeometryDispatcher->DISPATCHER_ADD3(TetraMold,TetraMold,Tetra2TetraBang);
+	interactionGeometryDispatcher->add(new InteractingSphere2InteractingSphere4SpheresContactGeometry);
+	interactionGeometryDispatcher->add(new InteractingBox2InteractingSphere4SpheresContactGeometry);
+	interactionGeometryDispatcher->add(new Tetra2TetraBang);
 	rootBody->engines.push_back(interactionGeometryDispatcher);
 
 	shared_ptr<InteractionPhysicsMetaEngine> interactionPhysicsDispatcher(new InteractionPhysicsMetaEngine);
-	interactionPhysicsDispatcher->DISPATCHER_ADD3(BodyMacroParameters,BodyMacroParameters,MacroMicroElasticRelationships);
+	interactionPhysicsDispatcher->add(new MacroMicroElasticRelationships);
 	rootBody->engines.push_back(interactionPhysicsDispatcher);
 		
 	shared_ptr<ElasticContactLaw> constitutiveLaw(new ElasticContactLaw);
@@ -236,22 +237,22 @@ void Shop::rootBodyActors(shared_ptr<MetaBody> rootBody){
 		shared_ptr<CundallNonViscousMomentumDamping> actionMomentumDamping(new CundallNonViscousMomentumDamping);
 		actionMomentumDamping->damping = getDefault<double>("param_damping");
 		shared_ptr<PhysicalActionDamper> actionDampingDispatcher(new PhysicalActionDamper);
-		actionDampingDispatcher->DISPATCHER_ADD3_1(Force,ParticleParameters,CundallNonViscousForceDamping,actionForceDamping);
-		actionDampingDispatcher->DISPATCHER_ADD3_1(Momentum,RigidBodyParameters,CundallNonViscousMomentumDamping,actionMomentumDamping);
+		actionDampingDispatcher->add(actionForceDamping);
+		actionDampingDispatcher->add(actionMomentumDamping);
 		rootBody->engines.push_back(actionDampingDispatcher);
 	}
 	
 	shared_ptr<PhysicalActionApplier> applyActionDispatcher(new PhysicalActionApplier);
-	applyActionDispatcher->DISPATCHER_ADD3(Force,ParticleParameters,NewtonsForceLaw);
-	applyActionDispatcher->DISPATCHER_ADD3(Momentum,RigidBodyParameters,NewtonsMomentumLaw);
+	applyActionDispatcher->add(new NewtonsForceLaw);
+	applyActionDispatcher->add(new NewtonsMomentumLaw);
 	rootBody->engines.push_back(applyActionDispatcher);
 	
 	shared_ptr<PhysicalParametersMetaEngine> positionIntegrator(new PhysicalParametersMetaEngine);
-	positionIntegrator->DISPATCHER_ADD2(ParticleParameters,LeapFrogPositionIntegrator);
+	positionIntegrator->add(new LeapFrogPositionIntegrator);
 	rootBody->engines.push_back(positionIntegrator);
 
 	shared_ptr<PhysicalParametersMetaEngine> orientationIntegrator(new PhysicalParametersMetaEngine);
-	orientationIntegrator->DISPATCHER_ADD2(RigidBodyParameters,LeapFrogOrientationIntegrator);
+	orientationIntegrator->add(new LeapFrogOrientationIntegrator);
 	rootBody->engines.push_back(orientationIntegrator);
 #if 0
 	#ifdef EMBED_PYTHON

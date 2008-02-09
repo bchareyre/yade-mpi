@@ -9,6 +9,8 @@
 #include<yade/pkg-common/Momentum.hpp>
 #include<yade/pkg-common/InteractionPhysicsEngineUnit.hpp>
 #include<yade/pkg-dem/SpheresContactGeometry.hpp>
+#include<yade/pkg-common/GLDrawInteractionPhysicsFunctor.hpp>
+
 
 /*! @brief Convert macroscopic properties to BrefcomContact with corresponding parameters.
  *
@@ -41,6 +43,8 @@ class BrefcomMakeContact: public InteractionPhysicsEngineUnit{
 			REGISTER_ATTRIBUTE(Gf);
 			REGISTER_ATTRIBUTE(zeta);
 		}
+
+		FUNCTOR2D(BodyMacroParameters,BodyMacroParameters);
 		REGISTER_CLASS_NAME(BrefcomMakeContact);
 		REGISTER_BASE_CLASS_NAME(InteractionPhysicsEngineUnit);
 		DECLARE_LOGGER;
@@ -64,22 +68,25 @@ class BrefcomContact: public InteractionPhysics {
 		Real d0, Kn, Ks, zeta, frictionAngle, FnMax, cohesion;
 		/*! Fundamental state variables */
 		Real omegaPl;
+		/* prevNormal is oriented A→B (as in SpheresContactGeometry); OTOH, Fs is as it applies to B */
 		Vector3r prevNormal, Fs; // shear force is cummulative, this must be remembered
-		Vector3r Fn; // remembers last normal force, used by stiffness counter
+		Vector3r Fn; // normal force, as applied to A
 		bool isStructural; // whether this is "neighbour" or just "meeting" contact
 		/* calculated by deduceOtherParams (called at every iteration); first two are constants as well, other two depend on damage. */
 		Real dPeak, dBreak, d0_curr, dPeak_curr, cohesion_curr, FnMax_curr;
 		void deduceOtherParams(void){
 			dBreak=d0+(FnMax/Kn)*(1+zeta);
 			dPeak=d0+(FnMax/Kn);
-			d0_curr=d0+omegaPl*(dBreak-d0);
+			d0_curr=d0+omegaPl*(dBreak-d0); //FIXME!!!! this may be negative?!!!!
 			dPeak_curr=dPeak+omegaPl*(dBreak-dPeak);
 			FnMax_curr=FnMax*(1-omegaPl);
 			cohesion_curr=cohesion*(1-omegaPl);
 			// if(Omega::instance().getCurrentIteration()%100==0 && omegaPl>=1){ TRVAR4(d0,omegaPl,d0_curr,FnMax_curr); }
 		} 
+		/* debugging */
+		Real prevFn;
 
-		BrefcomContact(): InteractionPhysics(){ /* just in case someone forgets */ Fs=Vector3r::ZERO; Fn=Vector3r::ZERO; omegaPl=0; isStructural=false; }
+		BrefcomContact(): InteractionPhysics(){ createIndex(); /* just in case someone forgets */ Fs=Vector3r::ZERO; Fn=Vector3r::ZERO; omegaPl=0; isStructural=false; }
 
 		void registerAttributes(){
 			InteractionPhysics::registerAttributes();
@@ -121,8 +128,12 @@ class BrefcomLaw: public InteractionSolver{
 		void envelopeAndDamage();
 		//! plly calculated force on particles
 		void applyForces();
-		/* storage variables, to avoid passing them around on the stack */
-		Vector3r Fs, Fn;
+		/* storage variables, to avoid passing them around on the stack.
+		 *
+		 * The orientation is conventionally as forces should be applied on the SECOND element in the interaction.
+		 * That is, attractive force will be oriented as applied to the first element.
+		 * This is CONTRARY to ElasticCohesiveLaw !!! */
+		Vector3r Fs; Real Fn;
 		/* temporaries initialized in the loop over interactions; above methods use these. */
 		body_id_t id1, id2;
 		shared_ptr<Body> body1, body2;
@@ -139,7 +150,7 @@ class BrefcomLaw: public InteractionSolver{
 			/* cache indices for Force and Momentum */
 			ForceClassIndex=shared_ptr<PhysicalAction>(new Force())->getClassIndex();
 			MomentumClassIndex=shared_ptr<PhysicalAction>(new Momentum())->getClassIndex();
-			TRVAR2(ForceClassIndex,MomentumClassIndex);
+			//TRVAR2(ForceClassIndex,MomentumClassIndex);
 		};
 		void action(Body* body);
 	protected: 
@@ -150,8 +161,16 @@ class BrefcomLaw: public InteractionSolver{
 	REGISTER_BASE_CLASS_NAME(InteractionSolver);
 	DECLARE_LOGGER;
 };
-
 REGISTER_SERIALIZABLE(BrefcomLaw,false);
+
+class GLDrawBrefcomContact: public GLDrawInteractionPhysicsFunctor {
+	public: virtual void go(const shared_ptr<InteractionPhysics>&,const shared_ptr<Interaction>&,const shared_ptr<Body>&,const shared_ptr<Body>&,bool wireFrame);
+	RENDERS(BrefcomContact);
+	REGISTER_CLASS_NAME(GLDrawBrefcomContact);
+	REGISTER_BASE_CLASS_NAME(GLDrawInteractionPhysicsFunctor);
+};
+REGISTER_SERIALIZABLE(GLDrawBrefcomContact,false);
+
 
  
 

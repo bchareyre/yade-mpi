@@ -31,6 +31,8 @@ class InteractingBox2InteractingSphere4SpheresContactGeometry : public Interacti
 	REGISTER_CLASS_NAME(InteractingBox2InteractingSphere4SpheresContactGeometry);
 	REGISTER_BASE_CLASS_NAME(InteractionGeometryEngineUnit);
 
+	FUNCTOR2D(InteractingBox,InteractingSphere);
+
 	DEFINE_FUNCTOR_ORDER_2D(InteractingBox,InteractingSphere);
 };
 

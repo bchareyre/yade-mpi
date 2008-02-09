@@ -2,9 +2,10 @@
 #include"Brefcom.hpp"
 #include<yade/core/MetaBody.hpp>
 #include<yade/pkg-dem/BodyMacroParameters.hpp>
+#include<yade/pkg-common/Sphere.hpp>
 
 
-YADE_PLUGIN("BrefcomMakeContact","BrefcomContact","BrefcomLaw");
+YADE_PLUGIN("BrefcomMakeContact","BrefcomContact","BrefcomLaw","GLDrawBrefcomContact");
 
 /********************** BrefcomMakeContact ****************************/
 CREATE_LOGGER(BrefcomMakeContact);
@@ -37,8 +38,8 @@ void BrefcomMakeContact::go(const shared_ptr<PhysicalParameters>& pp1, const sha
 
 		contPhys->omegaPl=0;
 		/* let's try initial distance for d0; that should prevent packings with inner stresses from exploding */
-		//contPhys->d0=contGeom->radius1 + contGeom->radius2; // equilibrium distace is "just touching"
-		contPhys->d0=(elast1->se3.position-elast2->se3.position).Length(); // equilibrium distance is now
+		contPhys->d0=contGeom->radius1 + contGeom->radius2; // equilibrium distace is "just touching"
+		//contPhys->d0=(elast1->se3.position-elast2->se3.position).Length(); // equilibrium distance is now
 		contPhys->Kn=(E12*S12/contPhys->d0)*( (1+alpha)/(beta*(1+nu12) + gamma*(1-alpha*nu12)));
 		contPhys->Ks=contPhys->Kn*(1-alpha*nu12)/(1+nu12);
 		contPhys->zeta=zeta; // TODO: calculate zeta from Gf
@@ -48,8 +49,9 @@ void BrefcomMakeContact::go(const shared_ptr<PhysicalParameters>& pp1, const sha
 		contPhys->prevNormal=contGeom->normal;
 		contPhys->Fs=Vector3r::ZERO;
 
+		// NEVER!!!
 		// HACK: after beginning all links will be without cohesion (omegaPl=1) !!!
-		if(Omega::instance().getCurrentIteration()>50) contPhys->omegaPl=1;
+		if(false && Omega::instance().getCurrentIteration()>50) contPhys->omegaPl=1;
 		// OTOH, structural contacts will have this flag
 		else contPhys->isStructural=true;
 	}
@@ -67,16 +69,18 @@ CREATE_LOGGER(BrefcomContact);
 CREATE_LOGGER(BrefcomLaw);
 
 void BrefcomLaw::calculateNormalForce(){
-	Real d=(rbp1->se3.position - rbp2->se3.position).Length();
+	Real d=(rbp1->se3.position-rbp2->se3.position).Length();
 	//TRVAR2(d,BC->dBreak);
 	if(d > BC->dBreak){
 		BC->omegaPl=1; /* LOG_DEBUG("Complete damage for #"<<id1<<"+#"<<id2); */
-		Fn=Vector3r::ZERO; return; }
-	Fn = (d - BC->d0_curr) * BC->Kn * contGeom->normal;
-	//TRVAR4(d,BC->d0_curr,Fn.Length(),BC->FnMax_curr);
+		Fn=0; return; }
+	Fn = /* normal is A→B, but Fn is by convention as applied to A */ (d - BC->d0_curr) * BC->Kn;
 
+	BREFREC(Fn)
 	BREFREC(d);
-	BREFREC(BC->d0_curr);
+	BREFREC(BC->dBreak);
+	BREFREC(BC->dPeak);
+	BREFREC(BC->dPeak_curr)
 
 	#if 0
 		if(d>BC->dPeak_curr){ /* on the softening branch of the diagram */
@@ -94,18 +98,18 @@ void BrefcomLaw::calculateShearForce(){
 	Fs = BC->Fs;
 	Real dt=Omega::instance().getTimeStep();
 	// rotation of the contact normal
-	Fs -= BC->Fs.Cross( BC->prevNormal.Cross(contGeom->normal) );
+	Fs += BC->Fs.Cross( BC->prevNormal.Cross(contGeom->normal) );
 	//TRVAR1(BC->Fs.Cross( BC->prevNormal.Cross(contGeom->normal)));
 	// mutual rotation of elements
 	Real angle=dt*.5*contGeom->normal.Dot(rbp1->angularVelocity+rbp2->angularVelocity);
-	Fs -= BC->Fs.Cross(angle*contGeom->normal);
+	Fs += BC->Fs.Cross(angle*contGeom->normal);
 	//TRVAR1(BC->Fs.Cross(angle*contGeom->normal));
 	// element slip
 	Vector3r relVelocity=
 		rbp2->velocity+rbp2->angularVelocity.Cross(contGeom->contactPoint-rbp2->se3.position)-
 		rbp1->velocity+rbp1->angularVelocity.Cross(contGeom->contactPoint-rbp1->se3.position);
 	Vector3r shearDisplacement=dt*(relVelocity-contGeom->normal.Dot(relVelocity)*contGeom->normal);
-	Fs -= BC->Ks*shearDisplacement;
+	Fs += BC->Ks*shearDisplacement;
 	//TRVAR1(BC->Ks*shearDisplacement);
 	if(isnan(Fs[0]) || isnan(Fs[1]) || isnan(Fs[2])){
 		TRVAR4(BC->Fs, BC->prevNormal, contGeom->normal, BC->Fs.Cross(BC->prevNormal.Cross(contGeom->normal)));
@@ -130,21 +134,26 @@ void BrefcomLaw::envelopeAndDamage(void){
 
 		If any of these conditions is violated, decrement forces keeping their ratio and incement damage.
 	*/
-	Real fn=Fn.Dot(contGeom->normal) /* sign does matter here */, fs=Fs.Length() /* sign irrelevant */;
-	if(fn>Mathr::EPSILON && fn > BC->FnMax_curr){
+	Real fs=Fs.Length() /* sign irrelevant */;
+	if(Fn > Mathr::EPSILON && Fn > BC->FnMax_curr){
 		/* return force on the softening branch */
-		Real dmgFactor=max(1.,(BC->FnMax_curr - (fn - BC->FnMax_curr)/BC->zeta) / fn);
-		//if(isnan(dmgFactor)){TRVAR3(fn,Fn,contGeom->normal); exit(0);}
-		//TRVAR4(fn,BC->FnMax_curr,dmgFactor,BC->omegaPl);
-		Fn*=dmgFactor; fn*=dmgFactor;
-		BC->omegaPl=1-fn/BC->FnMax; // FnMax_curr will be updated from omegaPl at the next iteration
+		Real envRetFactor=max(1e-3 /*guard numerical stability*/,min(1. /*guard sane solution*/,
+			(BC->FnMax_curr - (Fn - BC->FnMax_curr)/BC->zeta) / Fn ));
+		//if(isnan(envRetFactor)){TRVAR3(fn,Fn,contGeom->normal); exit(0);}
+		Real d=(rbp1->se3.position - rbp2->se3.position).Length();
+		//TRVAR6(BC->d0,BC->dPeak,BC->dPeak_curr,BC->dBreak,BC->d0_curr,d);
+		//TRVAR5(Fn,BC->FnMax_curr,envRetFactor,BC->omegaPl,(BC->FnMax_curr - (Fn - BC->FnMax_curr)/BC->zeta) / Fn );
+		// if((d<BC->d0_curr && Fn<0) || (d>BC->d0_curr && Fn>0)) exit(1);
+		Fn*=envRetFactor;
+		BC->omegaPl=1-Fn/BC->FnMax; // FnMax_curr will be updated from omegaPl at the next iteration
+		if(BC->omegaPl<0 || BC->omegaPl>1){TRVAR5(Fn,BC->FnMax_curr,BC->zeta,envRetFactor,BC->omegaPl); exit(1);}
 		// LOG_DEBUG("Increasing damage to "<<BC->omegaPl);
-		if(Omega::instance().getCurrentIteration()%100 && BC->omegaPl>=1) { Real d=(rbp1->se3.position - rbp2->se3.position).Length(); TRVAR4(rbp1->se3.position,rbp2->se3.position,d,fn);  }
-		if(isnan(Fn[0]) || isnan(Fn[1]) || isnan(Fn[2])){ TRVAR4(Fn,fn,dmgFactor,BC->omegaPl);	exit(0); }
+		//if(Omega::instance().getCurrentIteration()%100 && BC->omegaPl>=1) { Real d=(rbp1->se3.position - rbp2->se3.position).Length(); TRVAR4(rbp1->se3.position,rbp2->se3.position,d,Fn);  }
+		if(isnan(Fn)){ TRVAR3(Fn,envRetFactor,BC->omegaPl);	exit(0); }
 	}
 	//TRVAR2(fs,BC->cohesion_curr - fn*tan(BC->frictionAngle));
-	if(fs > BC->cohesion_curr - fn*tan(BC->frictionAngle)){
-		Real FsMax_curr=BC->cohesion_curr - fn*tan(BC->frictionAngle);
+	if(fs > BC->cohesion_curr - Fn*tan(BC->frictionAngle)){
+		Real FsMax_curr=BC->cohesion_curr - Fn*tan(BC->frictionAngle);
 		Fs.Normalize();
 		Fs*=FsMax_curr;
 		#if 0
@@ -165,27 +174,25 @@ void BrefcomLaw::envelopeAndDamage(void){
 		#endif
 	}
 	BREFREC(BC->omegaPl);
-	BREFREC(Fn.Length());
+	BREFREC(Fn);
 	BREFREC(Fs.Length());
 }
 
 void BrefcomLaw::applyForces(){
-	BC->Fs=Fs; BC->Fn=Fn; // remember forces
-	Vector3r force=Fn+Fs;
+	BC->Fs=Fs; BC->Fn=Fn*contGeom->normal; // remember forces
+	Vector3r force=BC->Fn+Fs;
 
-	static_pointer_cast<Force>(rootBody->physicalActions->find(id1,ForceClassIndex))->force-=force;
-	static_pointer_cast<Force>(rootBody->physicalActions->find(id2,ForceClassIndex))->force+=force;
-	static_pointer_cast<Momentum>(rootBody->physicalActions->find(id1,MomentumClassIndex))->momentum-=
-		(contGeom->contactPoint - rbp1->se3.position).Cross(force);
-	static_pointer_cast<Momentum>(rootBody->physicalActions->find(id2,MomentumClassIndex))->momentum+=
-		(contGeom->contactPoint - rbp2->se3.position).Cross(force);
+	static_pointer_cast<Force>(rootBody->physicalActions->find(id1,ForceClassIndex))->force+=force;
+	static_pointer_cast<Force>(rootBody->physicalActions->find(id2,ForceClassIndex))->force-=force;
+	static_pointer_cast<Momentum>(rootBody->physicalActions->find(id1,MomentumClassIndex))->momentum+=(contGeom->contactPoint-rbp1->se3.position).Cross(force);
+	static_pointer_cast<Momentum>(rootBody->physicalActions->find(id2,MomentumClassIndex))->momentum-=(contGeom->contactPoint-rbp2->se3.position).Cross(force);
 }
 
 void BrefcomLaw::action(Body* body){
 	rootBody=YADE_CAST<MetaBody*>(body);
 	for(InteractionContainer::iterator I=rootBody->transientInteractions->begin(); I!=rootBody->transientInteractions->end(); ++I){
 		if(!(*I)->isReal) continue;
-		//TRACE;
+		// TRACE;
 		// initialize temporaries
 		id1=(*I)->getId1(); id2=(*I)->getId2();
 		body1=Body::byId(id1); body2=Body::byId(id2);
@@ -200,6 +207,7 @@ void BrefcomLaw::action(Body* body){
 		// if(BC->omegaPl >= 1) continue; // we want to keep broken links formally alive, for statistics of material damage
 		
 		recValues.clear(); recLabels.clear();
+		BREFREC2(Omega::instance().getCurrentIteration(),"iter");
 		BREFREC(id1);
 		BREFREC(id2);
 		BREFREC2(rbp1->se3.position[0],"x1");
@@ -208,13 +216,14 @@ void BrefcomLaw::action(Body* body){
 		BREFREC2(rbp2->se3.position[0],"x2");
 		BREFREC2(rbp2->se3.position[1],"y2");
 		BREFREC2(rbp2->se3.position[2],"z2");
+		BREFREC2(BC->omegaPl,"ω");
 
 		BC->deduceOtherParams(); // initialize non-fundamental params/variables
 		//TRVAR5(BC->d0,BC->Kn,BC->Ks,BC->zeta,BC->FnMax);
 		//TRVAR5(BC->omegaPl,BC->dBreak,BC->dPeak,BC->d0_curr,BC->dPeak_curr);
 
 		calculateNormalForce();
-		calculateShearForce();
+		//calculateShearForce();
 		// rotationEffects();
 
 		envelopeAndDamage();
@@ -223,10 +232,44 @@ void BrefcomLaw::action(Body* body){
 		//if(BC->omegaPl>=1) { (*I)->isReal=false; return; } // if total damage, cancel interaction; collider will delete it properly
 
 		applyForces();
+		//if(abs(Fn.Length())>50 && (Fn.Length()/BC->prevFn<.5 || Fn.Length()/BC->prevFn>2)){TRVAR2(BC->prevFn,Fn.Length());}
+		// BC->prevFn=Fn;
 
 		for(size_t i=0; i<recValues.size(); i++) recStream<<recLabels[i]<<": "<<recValues[i]<<" ";
 		recStream<<endl;
 	}
 }
 
+
+/********************** GLDrawBrefcomContact ****************************/
+
+#include<yade/lib-opengl/OpenGLWrapper.hpp>
+
+void GLDrawBrefcomContact::go(const shared_ptr<InteractionPhysics>& ip, const shared_ptr<Interaction>&, const shared_ptr<Body>& b1, const shared_ptr<Body>& b2, bool wireFrame){
+	const shared_ptr<BrefcomContact>& BC=static_pointer_cast<BrefcomContact>(ip);
+
+	/* shared_ptr<Sphere> s1(dynamic_pointer_cast<Sphere>(b1->geometricalModel)), s2(dynamic_pointer_cast<Sphere>(b2->geometricalModel));
+	if(s1 && s2){
+		Real radius=min(s1->radius,s2->radius), len=(b1->physicalParameters->se3.position-b2->physicalParameters->se3.position).Length();
+		glScale(len,radius,radius);
+		glutSolidCube(1);
+	} */
+
+	glColor3(BC->omegaPl,1-BC->omegaPl,0.0); /* damaged links red, undamaged green */
+
+	glBegin(GL_LINES);
+		glVertex3v(b1->physicalParameters->se3.position);
+		glVertex3v(b2->physicalParameters->se3.position);
+	glEnd();
+
+
+	Vector3r mid=0.5*(b1->physicalParameters->se3.position+b2->physicalParameters->se3.position);
+	glTranslatev(mid);
+	glPushMatrix();
+		glRasterPos2i(0,0);
+		std::string str=std::string("omegaPl=")+boost::lexical_cast<std::string>((float)(BC->omegaPl));
+		for(unsigned int i=0;i<str.length();i++) glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12,str[i]);
+	glPopMatrix();
+
+}
 

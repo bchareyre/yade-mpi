@@ -37,10 +37,21 @@ class MetaDispatchingEngine1D : public MetaDispatchingEngine,
 {
 
 	public :
-		virtual void add( string baseClassName1, string libName, shared_ptr<EngineUnit> eu = shared_ptr<EngineUnitType>())
-		{
+		virtual void __attribute__((deprecated)) add(string baseClassName1, string libName, shared_ptr<EngineUnit> eu = shared_ptr<EngineUnitType>()) {
 			storeFunctorName(baseClassName1,libName,static_pointer_cast<EngineUnitType>(eu));
 			add1DEntry(baseClassName1,libName,static_pointer_cast<EngineUnitType>(eu));
+		}
+
+		virtual void add(EngineUnitType* eu){ add(shared_ptr<EngineUnitType>(eu)); }
+		virtual void add(shared_ptr<EngineUnitType> eu){
+			storeFunctorName(eu->get1DFunctorType1(),eu->getClassName(),eu);
+			add1DEntry(eu->get1DFunctorType1(),eu->getClassName(),static_pointer_cast<EngineUnitType>(eu));
+		}
+
+		virtual void add(string euType){
+			shared_ptr<EngineUnitType> eu=dynamic_pointer_cast<EngineUnitType>(ClassFactory::instance().createShared(euType));
+			if(!eu) throw runtime_error("Class `"+euType+"' could not be cast to required 1D EngineUnit");
+			add(eu);
 		}
 
 		int getDimension() { return 1; }

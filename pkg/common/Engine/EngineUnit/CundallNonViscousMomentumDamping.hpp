@@ -24,6 +24,8 @@ class CundallNonViscousMomentumDamping : public PhysicalActionDamperUnit
 	
 	protected :
 		 virtual void registerAttributes();
+
+	FUNCTOR2D(Force,RigidBodyParameters);
 	REGISTER_CLASS_NAME(CundallNonViscousMomentumDamping);
 	REGISTER_BASE_CLASS_NAME(PhysicalActionDamperUnit);
 };

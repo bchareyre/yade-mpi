@@ -13,6 +13,7 @@
 #include<boost/any.hpp>
 #include<boost/shared_ptr.hpp>
 #include<boost/python.hpp>
+#include<boost/python/stl_iterator.hpp>
 
 #include<yade/lib-base/Logging.hpp>
 #include<yade/lib-serialization-xml/XMLFormatManager.hpp>
@@ -46,12 +47,15 @@ class pyEngineUnit{
 		void ensureEng(void){ if(!eng) throw runtime_error("No proxied EngineUnit."); if(!accessor) accessor=shared_ptr<AttrAccess>(new AttrAccess(eng));  }
 		shared_ptr<EngineUnit> eng;
 		vector<string> bases; // names of classes for which we dispatch
+		void bases_set(python::object o){ python::stl_input_iterator<string> oBeg(o), oEnd; bases.assign(oBeg,oEnd); }
+		python::list bases_get(void){ python::list ret; for(size_t i=0; i<bases.size();i++) ret.append(bases[i]); return ret; }
 		pyEngineUnit(const shared_ptr<EngineUnit>& _eng, const vector<string>& _bases): eng(_eng), bases(_bases) {}
 		pyEngineUnit(string clss, string base1="", string base2=""){
 			eng=dynamic_pointer_cast<EngineUnit>(ClassFactory::instance().createShared(clss)); if(!eng) throw runtime_error("Invalid engine class `"+clss+"': either nonexistent, or not unable to cast to `EngineUnit'");
 			if(!base1.empty()){ bases.push_back(base1); if(!base2.empty()) bases.push_back(base2); }
 		}
 		std::string pyStr(void){ ensureEng(); string ret("<"+eng->getClassName()+" EngineUnit {"); for(size_t i=0; i<bases.size(); i++) ret+=bases[i]+(i<bases.size()-1?",":""); return ret+"}>"; }
+		string className(void){ ensureEng(); return eng->getClassName(); }
 		ATTR_ACCESS_CXX(accessor,ensureEng);
 };
 
@@ -64,7 +68,8 @@ class pyEngine{
 		//pyEngine(void){throw;}
 		pyEngine(const shared_ptr<Engine>& _eng): eng(_eng) {}
 		pyEngine(string clss){ eng=dynamic_pointer_cast<Engine>(ClassFactory::instance().createShared(clss)); if(!eng) throw runtime_error("Invalid engine class `"+clss+"': either nonexistent, or not unable to cast to `Engine'"); }
-		virtual std::string pyStr(void){ throw; } 
+		virtual std::string pyStr(void){ throw; }
+		string className(void){ ensureEng(); return eng->getClassName(); }
 		ATTR_ACCESS_CXX(accessor,ensureEng);
 };
 
@@ -242,9 +247,9 @@ class pyGLViewer{
 	QApplication* app;
 	void redrawAlarm(void){
 		while(true){
-			Omega::instance().stopSimulationLoop();
+			//Omega::instance().stopSimulationLoop();
 			viewer->updateGL();
-			Omega::instance().startSimulationLoop();
+			//Omega::instance().startSimulationLoop();
 			usleep(10000000);
 		}
 	}
@@ -254,7 +259,7 @@ public:
 	DECLARE_LOGGER;
 	ATTR_ACCESS_CXX(accessor,ensureAcc);	
 	pyGLViewer(){
-		throw std::runtime_error("Programming error: Threading in pyGLViewer is broken and crashes; ignored.");
+		//throw std::runtime_error("Programming error: Threading in pyGLViewer is broken and crashes; ignored.");
 		// LOG_WARN("Thread locking not correctly implemented, will pause Omega for redraw every 10s instead!");
 		shared_ptr<Factorable> _renderer=ClassFactory::instance().createShared("OpenGLRenderingEngine");
 		renderer=static_pointer_cast<RenderingEngine>(_renderer);
@@ -347,27 +352,27 @@ BOOST_PYTHON_MODULE(yadeControl)
 	python::class_<pyStandAloneEngine>("StandAloneEngine",python::init<string>())
 	.ATTR_ACCESS_PY(pyStandAloneEngine)
 	.def("__str__",&pyStandAloneEngine::pyStr).def("__repr__",&pyStandAloneEngine::pyStr)
-	//.def("clss",&pyStandAloneEngine::pyInit);
+	.add_property("name",&pyEngine::className)
 	;
 
 	python::class_<pyMetaEngine>("MetaEngine",python::init<string>())
 	.ATTR_ACCESS_PY(pyMetaEngine)
 	.def("__str__",&pyMetaEngine::pyStr).def("__repr__",&pyMetaEngine::pyStr)
-	//.def("clss",&pyMetaEngine::pyInit)
+	.add_property("name",&pyEngine::className)
 	.add_property("functors",&pyMetaEngine::functors_get,&pyMetaEngine::functors_set)
 	;
 
 	boost::python::class_<pyDeusExMachina>("DeusExMachina",python::init<string>())
 	.ATTR_ACCESS_PY(pyDeusExMachina)
 	.def("__str__",&pyDeusExMachina::pyStr).def("__repr__",&pyDeusExMachina::pyStr)
-	//.def("clss",&pyStandAloneEngine::pyInit);
+	.add_property("name",&pyEngine::className)
 	;
 
 	boost::python::class_<pyEngineUnit>("EngineUnit",python::init<string, python::optional<string,string> >())
 	.ATTR_ACCESS_PY(pyEngineUnit)
 	.def("__str__",&pyEngineUnit::pyStr).def("__repr__",&pyEngineUnit::pyStr)
-	// .def("clss",&pyEngineUnit::pyInit)
-	.add_property("bases",&pyEngineUnit::bases,&pyEngineUnit::bases) // not yet functional
+	.add_property("name",&pyEngineUnit::className)
+	.add_property("bases",&pyEngineUnit::bases_get,&pyEngineUnit::bases_set)
 	;
 	
 

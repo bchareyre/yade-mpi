@@ -44,9 +44,10 @@ void UniaxialStrainer::applyCondition(Body* _rootBody){
 	// reverse if we're over the limit strain
 	// if(notYetReversed && limitStrain!=0 && ((currentStrainRate>0 && strain>limitStrain) || (currentStrainRate<0 && strain<limitStrain))) { currentStrainRate*=-1; notYetReversed=false; LOG_INFO("Reversed strain rate to "<<currentStrainRate); }
 	MetaBody* rootBody=static_cast<MetaBody*>(_rootBody);
-	if(Omega::instance().getCurrentIteration()%40==0 && recStream.good()) {
+	if(Omega::instance().getCurrentIteration()%50==0 && recStream.good()) {
 		computeAxialForce(rootBody);
-		recStream<<Omega::instance().getCurrentIteration()<<" "<<strain<<" "<<sumPosForces<<" "<<sumNegForces<<" "<<negCoords[0]<<" "<<posCoords[0]<<endl;
+		Real midPos=Body::byId(1)->physicalParameters->se3.position[axis];
+		recStream<<Omega::instance().getCurrentIteration()<<" "<<strain<<" "<<sumPosForces<<" "<<sumNegForces<<" "<<posCoords[0]<<" "<<negCoords[0]<<" "<<midPos<<endl;
 	}
 }
 
@@ -81,10 +82,10 @@ void UniaxialStrainer::computeAxialForce(MetaBody* rootBody){
 	#else
 		shared_ptr<Force> f(new Force);
 		for(size_t i=0; i<negIds.size(); i++){
-			sumNegForces-=static_pointer_cast<Force>(rootBody->physicalActions->find(negIds[i],f->getClassIndex()))->force[axis];
+			sumNegForces+=static_pointer_cast<Force>(rootBody->physicalActions->find(negIds[i],f->getClassIndex()))->force[axis];
 		}
 		for(size_t i=0; i<posIds.size(); i++){
-			sumPosForces+=static_pointer_cast<Force>(rootBody->physicalActions->find(posIds[i],f->getClassIndex()))->force[axis];
+			sumPosForces-=static_pointer_cast<Force>(rootBody->physicalActions->find(posIds[i],f->getClassIndex()))->force[axis];
 		}
 	#endif
 	//TRVAR2(sumPosForces,sumNegForces);
@@ -212,9 +213,9 @@ void USCTGen::createEngines(){
 	rootBody->initializers.push_back(physicalActionInitializer);
 	
 	shared_ptr<BoundingVolumeMetaEngine> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeMetaEngine>(new BoundingVolumeMetaEngine);
-	boundingVolumeDispatcher->DISPATCHER_ADD3(InteractingSphere,AABB,InteractingSphere2AABB);
-	boundingVolumeDispatcher->DISPATCHER_ADD3(MetaInteractingGeometry,AABB,MetaInteractingGeometry2AABB);
-	rootBody->initializers.push_back(boundingVolumeDispatcher);
+		boundingVolumeDispatcher->add(new InteractingSphere2AABB);
+		boundingVolumeDispatcher->add(new MetaInteractingGeometry2AABB);
+		rootBody->initializers.push_back(boundingVolumeDispatcher);
 
 	rootBody->engines.clear();
 
@@ -222,43 +223,44 @@ void USCTGen::createEngines(){
 	rootBody->engines.push_back(boundingVolumeDispatcher);
 
 	shared_ptr<PersistentSAPCollider> collider(new PersistentSAPCollider);
-	collider->haveDistantTransient=true;
-	rootBody->engines.push_back(collider);
+		collider->haveDistantTransient=true;
+		rootBody->engines.push_back(collider);
 
 	shared_ptr<InteractionGeometryMetaEngine> igeomDispatcher(new InteractionGeometryMetaEngine);
-	igeomDispatcher->DISPATCHER_ADD3(InteractingSphere,InteractingSphere,InteractingSphere2InteractingSphere4DistantSpheresContactGeometry);
-	rootBody->engines.push_back(igeomDispatcher);
+		igeomDispatcher->add(new InteractingSphere2InteractingSphere4DistantSpheresContactGeometry);
+		rootBody->engines.push_back(igeomDispatcher);
 
 	shared_ptr<InteractionPhysicsMetaEngine> iphysDispatcher(new InteractionPhysicsMetaEngine);
-	iphysDispatcher->DISPATCHER_ADD3(BodyMacroParameters,BodyMacroParameters,BrefcomMakeContact);
-	rootBody->engines.push_back(iphysDispatcher);
+		iphysDispatcher->add(new BrefcomMakeContact);
+		rootBody->engines.push_back(iphysDispatcher);
 
 	shared_ptr<BrefcomLaw> bLaw(new BrefcomLaw);
 	rootBody->engines.push_back(bLaw);
 
-	shared_ptr<CundallNonViscousForceDamping> actionForceDamping(new CundallNonViscousForceDamping);
-	actionForceDamping->damping = .5;
-	shared_ptr<CundallNonViscousMomentumDamping> actionMomentumDamping(new CundallNonViscousMomentumDamping);
-	actionMomentumDamping->damping = .5;
-	shared_ptr<PhysicalActionDamper> actionDampingDispatcher(new PhysicalActionDamper);
-	actionDampingDispatcher->add("Force","ParticleParameters","CundallNonViscousForceDamping",actionForceDamping);
-	actionDampingDispatcher->add("Momentum","RigidBodyParameters","CundallNonViscousMomentumDamping",actionMomentumDamping);
-	rootBody->engines.push_back(actionDampingDispatcher);
+	shared_ptr<PhysicalActionDamper> dampingDispatcher(new PhysicalActionDamper);
+		shared_ptr<CundallNonViscousForceDamping> forceDamper(new CundallNonViscousForceDamping);
+		forceDamper->damping = damping;
+		dampingDispatcher->add(forceDamper); //"Force","ParticleParameters","CundallNonViscousForceDamping",actionForceDamping);
+		shared_ptr<CundallNonViscousMomentumDamping> momentumDamper(new CundallNonViscousMomentumDamping);
+		momentumDamper->damping = damping;
+		dampingDispatcher->add(momentumDamper); // "Momentum","RigidBodyParameters","CundallNonViscousMomentumDamping",actionMomentumDamping);
+		rootBody->engines.push_back(dampingDispatcher);
 
 
 
 	shared_ptr<PhysicalActionApplier> applyActionDispatcher(new PhysicalActionApplier);
-	applyActionDispatcher->DISPATCHER_ADD3(Force,ParticleParameters,NewtonsForceLaw);
-	applyActionDispatcher->DISPATCHER_ADD3(Momentum,RigidBodyParameters,NewtonsMomentumLaw);
-	rootBody->engines.push_back(applyActionDispatcher);
+		//applyActionDispatcher->add(new NewtonsForceLaw); //DISPATCHER_ADD3(Force,ParticleParameters,NewtonsForceLaw);
+		applyActionDispatcher->add("Force","ParticleParameters","NewtonsForceLaw");
+		applyActionDispatcher->add(new NewtonsMomentumLaw); //DISPATCHER_ADD3(Momentum,RigidBodyParameters,NewtonsMomentumLaw);
+		rootBody->engines.push_back(applyActionDispatcher);
 	
 	shared_ptr<PhysicalParametersMetaEngine> positionIntegrator(new PhysicalParametersMetaEngine);
-	positionIntegrator->DISPATCHER_ADD2(ParticleParameters,LeapFrogPositionIntegrator);
-	rootBody->engines.push_back(positionIntegrator);
+		positionIntegrator->add(new LeapFrogPositionIntegrator); //DISPATCHER_ADD2(ParticleParameters,LeapFrogPositionIntegrator);
+		rootBody->engines.push_back(positionIntegrator);
 
 	shared_ptr<PhysicalParametersMetaEngine> orientationIntegrator(new PhysicalParametersMetaEngine);
-	orientationIntegrator->DISPATCHER_ADD2(RigidBodyParameters,LeapFrogOrientationIntegrator);
-	rootBody->engines.push_back(orientationIntegrator);
+		orientationIntegrator->add(new LeapFrogOrientationIntegrator);
+		rootBody->engines.push_back(orientationIntegrator);
 
 	shared_ptr<GlobalStiffnessTimeStepper> globalStiffnessTimeStepper(new GlobalStiffnessTimeStepper);
 	globalStiffnessTimeStepper->sdecGroupMask=1023; // BIN 111111111, should always match

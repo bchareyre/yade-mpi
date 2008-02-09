@@ -17,6 +17,8 @@
 /*! Same as DISPATCHER_ADD3 macro, but passes the additional 4th argument to MetaDispatchingEngine2D::add as its 4th, optional argument */
 #define DISPATCHER_ADD3_1(e1,e2,e3,e4) add(#e1,#e2,#e3,e4); {/* compile-time check for class existence */ typedef e1 p1; typedef e2 p2; typedef e3 p3;}
 
+
+
 template
 <
 	class baseClass1, 
@@ -36,11 +38,27 @@ class MetaDispatchingEngine2D : public MetaDispatchingEngine,
 				>
 {
 	public :
-		virtual void add( string baseClassName1, string baseClassName2, string libName, shared_ptr<EngineUnit> eu = shared_ptr<EngineUnitType>())
+		__attribute__((deprecated))
+		virtual void add ( string baseClassName1, string baseClassName2, string libName, shared_ptr<EngineUnit> eu = shared_ptr<EngineUnitType>())  
 		{
 			storeFunctorName(baseClassName1,baseClassName2,libName,static_pointer_cast<EngineUnitType>(eu));
 			add2DEntry(baseClassName1,baseClassName2,libName,static_pointer_cast<EngineUnitType>(eu));
 		}
+
+		/* add functor by pointer: this is convenience for calls like foo->add(new SomeFunctor); */
+		virtual void add(EngineUnitType* eu){ add(shared_ptr<EngineUnitType>(eu)); }
+		/* add functor by shared pointer */
+		virtual void add(shared_ptr<EngineUnitType> eu){
+			storeFunctorName(eu->get2DFunctorType1(),eu->get2DFunctorType2(),eu->getClassName(),eu);
+			add2DEntry(eu->get2DFunctorType1(),eu->get2DFunctorType2(),eu->getClassName(),static_pointer_cast<EngineUnitType>(eu));
+		}
+		/* add functor by its literal name */
+		virtual void add(string euType){
+			shared_ptr<EngineUnitType> eu=dynamic_pointer_cast<EngineUnitType>(ClassFactory::instance().createShared(euType));
+			if(!eu) throw runtime_error("Class `"+euType+"' could not be cast to required 2D EngineUnit");
+			add(eu);
+		}
+
 
 		virtual int getDimension() { return 2; }
 

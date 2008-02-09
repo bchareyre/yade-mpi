@@ -33,6 +33,9 @@ class InteractingSphere2InteractingSphere4SpheresContactGeometry : public Intera
 	REGISTER_CLASS_NAME(InteractingSphere2InteractingSphere4SpheresContactGeometry);
 	REGISTER_BASE_CLASS_NAME(InteractionGeometryEngineUnit);
 
+	FUNCTOR2D(InteractingSphere,InteractingSphere);
+	
+	//FIXME: what is this good for?!
 	DEFINE_FUNCTOR_ORDER_2D(InteractingSphere,InteractingSphere);
 	
 	protected :

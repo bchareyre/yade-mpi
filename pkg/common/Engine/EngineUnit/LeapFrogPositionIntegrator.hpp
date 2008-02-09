@@ -20,7 +20,8 @@ class LeapFrogPositionIntegrator : public PhysicalParametersEngineUnit
 	public :
 		virtual void go(	  const shared_ptr<PhysicalParameters>&
 					, Body*);
-	
+
+	FUNCTOR1D(ParticleParameters);	
 	REGISTER_CLASS_NAME(LeapFrogPositionIntegrator);
 	REGISTER_BASE_CLASS_NAME(PhysicalParametersEngineUnit);
 };

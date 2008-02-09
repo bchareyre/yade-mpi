@@ -20,7 +20,7 @@ class InteractingBox2AABB : public BoundingVolumeEngineUnit
 				, shared_ptr<BoundingVolume>& bv
 				, const Se3r& se3
 				, const Body*	);
-
+	FUNCTOR2D(InteractingBox,AABB);
 	REGISTER_CLASS_NAME(InteractingBox2AABB);
 	REGISTER_BASE_CLASS_NAME(BoundingVolumeEngineUnit);
 };

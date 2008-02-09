@@ -124,7 +124,11 @@ void TriaxialCompressionEngine::updateParameters(Body * body)
 
 	UnbalancedForce=ComputeUnbalancedForce(body); // calculated at every iteration
 	MetaBody * ncb = static_cast<MetaBody*>(body);
-	if (Omega::instance().getCurrentIteration() % 100 == 0) { /* TRVAR1(meanStress);*/ /* TRVAR2(stateName(currentState),sigma_iso); */ }
+
+	if (Omega::instance().getCurrentIteration() % 100 == 0) {
+		LOG_INFO("UnbalancedForce="<<UnbalancedForce);
+		/* TRVAR1(meanStress);*/ /* TRVAR2(stateName(currentState),sigma_iso); */
+	}
 
 	if(currentState==STATE_ISO_COMPACTION || currentState==STATE_ISO_UNLOADING){
 		// FIXME: do we need this?? it makes sense to activate compression only during compaction!: || autoCompressionActivation)

@@ -9,10 +9,10 @@
 #ifndef METADISPATCHINGENGINE_HPP
 #define METADISPATCHINGENGINE_HPP
 
-#include "MetaEngine.hpp"
+#include "Engine.hpp"
 #include "EngineUnit.hpp"
 
-class MetaDispatchingEngine : public MetaEngine
+class MetaDispatchingEngine : public Engine
 {
 	public:
 		vector<vector<string> >		functorNames; // public for python interface; since there is getFunctorArguments returning RW(!) reference to this, why have it private anyway?!
@@ -45,7 +45,7 @@ class MetaDispatchingEngine : public MetaEngine
 		virtual void registerAttributes();
 		virtual void postProcessAttributes(bool deserializing);
 	REGISTER_CLASS_NAME(MetaDispatchingEngine);
-	REGISTER_BASE_CLASS_NAME(MetaEngine);
+	REGISTER_BASE_CLASS_NAME(Engine);
 };
 
 REGISTER_SERIALIZABLE(MetaDispatchingEngine,false);

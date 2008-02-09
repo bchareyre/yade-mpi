@@ -122,8 +122,9 @@ void Omega::buildDynlibDatabase(const vector<string>& dynlibsList)
 			for(int i=0;i<f->getBaseClassNumber();i++)
 				dynlibs[name].baseClasses.insert(f->getBaseClassName(i));
 		}
-		catch (FactoryError&)
-		{
+		catch (FactoryError& e){
+			/* FIXME: this catches all errors! Some of them are not harmful, however:
+			 * when a class is not factorable, it is OK to skip it; */	
 		}
 	}
 
@@ -137,7 +138,7 @@ void Omega::buildDynlibDatabase(const vector<string>& dynlibsList)
 		{
 			string name = *bci;
 			if (name=="MetaDispatchingEngine1D" || name=="MetaDispatchingEngine2D")
-				(*dli).second.baseClasses.insert("MetaEngine");
+				(*dli).second.baseClasses.insert("MetaDispatchingEngine");
 			else if (name=="EngineUnit1D" || name=="EngineUnit2D")
 				(*dli).second.baseClasses.insert("EngineUnit");
 			else if (name=="Serializable")

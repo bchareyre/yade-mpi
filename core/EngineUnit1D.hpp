@@ -13,6 +13,8 @@
 
 #include<yade/lib-multimethods/FunctorWrapper.hpp>
 
+#define FUNCTOR1D(type1) public: std::string get1DFunctorType1(void){return string(#type1);}
+
 template
 <
 	class ReturnType,
@@ -21,6 +23,7 @@ template
 class EngineUnit1D : 	public EngineUnit,
 			public FunctorWrapper<ReturnType, AttributesType>
 {
+	public: virtual std::string get1DFunctorType1(void){throw runtime_error("Class "+this->getClassName()+" did not use FUNCTOR1D to declare its argument type?"); }
 	REGISTER_CLASS_NAME(EngineUnit1D);
 	REGISTER_BASE_CLASS_NAME(EngineUnit FunctorWrapper);
 };

@@ -41,7 +41,7 @@ if len(ver)>2: sconsVersion+=float(ver[2])
 ########## PROXY TO NEWER SCONS (DOWNLOADED IF NEEDED) ###################################
 ##########################################################################################
 #print sconsVersion
-if sconsVersion<9693: ##9700.20071212:  ##<9700 ##<9693: 
+if sconsVersion<9700.20071212: ##9700.20071212:  ##<9700 ##<9693: 
 	#tgzParams=("http://dfn.dl.sourceforge.net/sourceforge/scons/scons-local-0.97.tar.gz","scons-local-0.97")
 	#tgzParams=("http://ovh.dl.sourceforge.net/sourceforge/scons/scons-local-0.97.0d20070918.tar.gz","/scons-local-0.97.0d20070918") ## sconsVersion<=9700
 	tgzParams=("http://switch.dl.sourceforge.net/sourceforge/scons/scons-local-0.97.0d20071212.tar.gz","/scons-local-0.97.0d20071212")

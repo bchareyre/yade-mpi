@@ -22,13 +22,13 @@ MetaDispatchingEngine::~MetaDispatchingEngine()
 
 void MetaDispatchingEngine::postProcessAttributes(bool deserializing)
 {
-	MetaEngine::postProcessAttributes(deserializing);
+	Engine::postProcessAttributes(deserializing);
 }
 
 
 void MetaDispatchingEngine::registerAttributes()
 {
-	MetaEngine::registerAttributes();
+	Engine::registerAttributes();
 	REGISTER_ATTRIBUTE(functorNames);
 	REGISTER_ATTRIBUTE(functorArguments);
 }
