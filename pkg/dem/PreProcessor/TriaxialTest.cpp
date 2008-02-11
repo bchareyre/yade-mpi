@@ -546,16 +546,16 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	physicalActionInitializer->physicalActionNames.push_back("GlobalStiffness");
 	
 	shared_ptr<InteractionGeometryMetaEngine> interactionGeometryDispatcher(new InteractionGeometryMetaEngine);
-	interactionGeometryDispatcher->add("InteractingSphere","InteractingSphere","InteractingSphere2InteractingSphere4SpheresContactGeometry");
-	interactionGeometryDispatcher->add("InteractingSphere","InteractingBox","InteractingBox2InteractingSphere4SpheresContactGeometry");
+	interactionGeometryDispatcher->add("InteractingSphere2InteractingSphere4SpheresContactGeometry");
+	interactionGeometryDispatcher->add("InteractingBox2InteractingSphere4SpheresContactGeometry");
 
 	shared_ptr<InteractionPhysicsMetaEngine> interactionPhysicsDispatcher(new InteractionPhysicsMetaEngine);
-	interactionPhysicsDispatcher->add("BodyMacroParameters","BodyMacroParameters","SimpleElasticRelationships");
+	interactionPhysicsDispatcher->add("SimpleElasticRelationships");
 		
 	shared_ptr<BoundingVolumeMetaEngine> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeMetaEngine>(new BoundingVolumeMetaEngine);
-	boundingVolumeDispatcher->add("InteractingSphere","AABB","InteractingSphere2AABB");
-	boundingVolumeDispatcher->add("InteractingBox","AABB","InteractingBox2AABB");
-	boundingVolumeDispatcher->add("MetaInteractingGeometry","AABB","MetaInteractingGeometry2AABB");
+	boundingVolumeDispatcher->add("InteractingSphere2AABB");
+	boundingVolumeDispatcher->add("InteractingBox2AABB");
+	boundingVolumeDispatcher->add("MetaInteractingGeometry2AABB");
 
 	
 
@@ -568,17 +568,17 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	shared_ptr<CundallNonViscousMomentumDamping> actionMomentumDamping(new CundallNonViscousMomentumDamping);
 	actionMomentumDamping->damping = dampingMomentum;
 	shared_ptr<PhysicalActionDamper> actionDampingDispatcher(new PhysicalActionDamper);
-	actionDampingDispatcher->add("Force","ParticleParameters","CundallNonViscousForceDamping",actionForceDamping);
-	actionDampingDispatcher->add("Momentum","RigidBodyParameters","CundallNonViscousMomentumDamping",actionMomentumDamping);
+	actionDampingDispatcher->add(actionForceDamping);
+	actionDampingDispatcher->add(actionMomentumDamping);
 	
 	shared_ptr<PhysicalActionApplier> applyActionDispatcher(new PhysicalActionApplier);
-	applyActionDispatcher->add("Force","ParticleParameters","NewtonsForceLaw");
-	applyActionDispatcher->add("Momentum","RigidBodyParameters","NewtonsMomentumLaw");
+	applyActionDispatcher->add("NewtonsForceLaw");
+	applyActionDispatcher->add("NewtonsMomentumLaw");
 		
 	shared_ptr<PhysicalParametersMetaEngine> positionIntegrator(new PhysicalParametersMetaEngine);
-	positionIntegrator->add("ParticleParameters","LeapFrogPositionIntegrator");
+	positionIntegrator->add("LeapFrogPositionIntegrator");
 	shared_ptr<PhysicalParametersMetaEngine> orientationIntegrator(new PhysicalParametersMetaEngine);
-	orientationIntegrator->add("RigidBodyParameters","LeapFrogOrientationIntegrator");
+	orientationIntegrator->add("LeapFrogOrientationIntegrator");
 
 	//shared_ptr<ElasticCriterionTimeStepper> sdecTimeStepper(new ElasticCriterionTimeStepper);
 	//sdecTimeStepper->sdecGroupMask = 2;

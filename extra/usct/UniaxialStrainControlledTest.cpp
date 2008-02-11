@@ -2,6 +2,7 @@
 #include"UniaxialStrainControlledTest.hpp"
 #include<yade/pkg-common/Force.hpp>
 #include<yade/pkg-common/InteractingSphere.hpp>
+#include<yade/pkg-common/AABB.hpp>
 #include<yade/pkg-dem/SDECLinkGeometry.hpp>
 #include<yade/pkg-dem/SDECLinkPhysics.hpp>
 #include<yade/extra/Brefcom.hpp>
@@ -21,6 +22,18 @@ void UniaxialStrainer::applyCondition(Body* _rootBody){
 			"; negative #"<<negIds[0]<<" at "<<USCT_AXIS_COORD(negIds[0]));
 		LOG_INFO("Setting initial length to "<<originalLength);
 	}
+	
+	shared_ptr<AABB> rbAABB;
+	if(crossSectionArea<=0){
+		if (_rootBody->boundingVolume && (rbAABB=dynamic_pointer_cast<AABB>(_rootBody->boundingVolume))){
+			int axis2=(axis+1)%3, axis3=(axis+2)%3; // perpendicular axes indices
+			crossSectionArea=4*rbAABB->halfSize[axis2]*rbAABB->halfSize[axis3];
+			LOG_INFO("Setting crossSectionArea="<<crossSectionArea<<", using axes #"<<axis2<<" and #"<<axis3<<".");
+		} else {
+			LOG_WARN("No Axis Aligned Bounding Box for rootBody, using garbage value ("<<crossSectionArea<<") for crossSectionArea!");
+		}
+	}
+
 	// linearly increase strain to the desired value
 	if(abs(currentStrainRate)<abs(strainRate))currentStrainRate+=strainRate*.01; else currentStrainRate=strainRate;
 
@@ -47,7 +60,8 @@ void UniaxialStrainer::applyCondition(Body* _rootBody){
 	if(Omega::instance().getCurrentIteration()%50==0 && recStream.good()) {
 		computeAxialForce(rootBody);
 		Real midPos=Body::byId(1)->physicalParameters->se3.position[axis];
-		recStream<<Omega::instance().getCurrentIteration()<<" "<<strain<<" "<<sumPosForces<<" "<<sumNegForces<<" "<<posCoords[0]<<" "<<negCoords[0]<<" "<<midPos<<endl;
+		Real avgStress=(sumPosForces+sumNegForces)/(2*crossSectionArea); // average nominal stress
+		recStream<<Omega::instance().getCurrentIteration()<<" "<<strain<<" "<<avgStress<<" "<<sumPosForces<<" "<<sumNegForces<<" "<<posCoords[0]<<" "<<negCoords[0]<<" "<<midPos<<endl;
 	}
 }
 
@@ -249,9 +263,8 @@ void USCTGen::createEngines(){
 
 
 	shared_ptr<PhysicalActionApplier> applyActionDispatcher(new PhysicalActionApplier);
-		//applyActionDispatcher->add(new NewtonsForceLaw); //DISPATCHER_ADD3(Force,ParticleParameters,NewtonsForceLaw);
-		applyActionDispatcher->add("Force","ParticleParameters","NewtonsForceLaw");
-		applyActionDispatcher->add(new NewtonsMomentumLaw); //DISPATCHER_ADD3(Momentum,RigidBodyParameters,NewtonsMomentumLaw);
+		applyActionDispatcher->add(new NewtonsForceLaw);
+		applyActionDispatcher->add(new NewtonsMomentumLaw);
 		rootBody->engines.push_back(applyActionDispatcher);
 	
 	shared_ptr<PhysicalParametersMetaEngine> positionIntegrator(new PhysicalParametersMetaEngine);

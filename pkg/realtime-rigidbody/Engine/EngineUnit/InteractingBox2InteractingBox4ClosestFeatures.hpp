@@ -39,6 +39,8 @@ class InteractingBox2InteractingBox4ClosestFeatures : public InteractionGeometry
 	private :
 		bool testSeparatingAxis(Real expr1, Real expr2, Vector3r n,int c,BoxBoxInteractionInfo* bbInfo);
 
+	FUNCTOR2D(InteractingBox,InteractingBox);
+
 	REGISTER_CLASS_NAME(InteractingBox2InteractingBox4ClosestFeatures);
 	REGISTER_BASE_CLASS_NAME(InteractionGeometryEngineUnit);
 	DEFINE_FUNCTOR_ORDER_2D(InteractingBox,InteractingBox);

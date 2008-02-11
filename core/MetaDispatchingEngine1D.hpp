@@ -37,10 +37,12 @@ class MetaDispatchingEngine1D : public MetaDispatchingEngine,
 {
 
 	public :
+		#if 0
 		virtual void __attribute__((deprecated)) add(string baseClassName1, string libName, shared_ptr<EngineUnit> eu = shared_ptr<EngineUnitType>()) {
 			storeFunctorName(baseClassName1,libName,static_pointer_cast<EngineUnitType>(eu));
 			add1DEntry(baseClassName1,libName,static_pointer_cast<EngineUnitType>(eu));
 		}
+		#endif
 
 		virtual void add(EngineUnitType* eu){ add(shared_ptr<EngineUnitType>(eu)); }
 		virtual void add(shared_ptr<EngineUnitType> eu){

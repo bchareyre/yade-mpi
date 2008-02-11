@@ -21,6 +21,8 @@ class ElasticBodySimpleRelationship : public InteractionPhysicsEngineUnit
 	protected :
 		virtual void registerAttributes();
 
+	FUNCTOR2D(ElasticBodyParameters,ElasticBodyParameters);
+
 	REGISTER_CLASS_NAME(ElasticBodySimpleRelationship);
 	REGISTER_BASE_CLASS_NAME(InteractionPhysicsEngineUnit);
 

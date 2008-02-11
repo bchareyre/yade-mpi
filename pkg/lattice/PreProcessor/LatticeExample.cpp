@@ -1114,10 +1114,10 @@ void LatticeExample::calcBeamAngles(Body* body, BodyContainer* bodies, Interacti
 void LatticeExample::createActors(shared_ptr<MetaBody>& )
 {
         shared_ptr<BoundingVolumeMetaEngine> boundingVolumeDispatcher   = shared_ptr<BoundingVolumeMetaEngine>(new BoundingVolumeMetaEngine);
-	boundingVolumeDispatcher->add("MetaInteractingGeometry","AABB","MetaInteractingGeometry2AABB");
+	boundingVolumeDispatcher->add("MetaInteractingGeometry2AABB");
 
         shared_ptr<GeometricalModelMetaEngine> geometricalModelDispatcher       = shared_ptr<GeometricalModelMetaEngine>(new GeometricalModelMetaEngine);
-        geometricalModelDispatcher->add("LatticeSetParameters","LatticeSetGeometry","LatticeSet2LatticeBeams");
+        geometricalModelDispatcher->add("LatticeSet2LatticeBeams");
         
         strainRecorder = shared_ptr<StrainRecorder>(new StrainRecorder);
         strainRecorder->outputFile              = outputFile;

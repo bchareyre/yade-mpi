@@ -37,6 +37,8 @@ class InteractingMyTetrahedron2InteractingBox4InteractionOfMyTetrahedron : publi
 		
 		void calcSphereAndBox(	Vector3r c1, Real r1, Vector3r& extents, const Se3r& se3Box, Real& penetrationDepth, Vector3r& normal, Vector3r& cp);
 
+	FUNCTOR2D(InteractingMyTetrahedron,InteractingBox);
+
 	REGISTER_CLASS_NAME(InteractingMyTetrahedron2InteractingBox4InteractionOfMyTetrahedron);
 	REGISTER_BASE_CLASS_NAME(InteractionGeometryEngineUnit);
 

@@ -137,19 +137,19 @@ bool FEMBeam::generate()
 void FEMBeam::createActors(shared_ptr<MetaBody>& rootBody)
 {
 	shared_ptr<BoundingVolumeMetaEngine> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeMetaEngine>(new BoundingVolumeMetaEngine);
-	boundingVolumeDispatcher->add("MetaInteractingGeometry","AABB","MetaInteractingGeometry2AABB");
+	boundingVolumeDispatcher->add("MetaInteractingGeometry2AABB");
 
 	shared_ptr<FEMSetTextLoader> femSetTextLoaderFunctor	= shared_ptr<FEMSetTextLoader>(new FEMSetTextLoader);
 	femSetTextLoaderFunctor->fileName = femTxtFile;
 
 	shared_ptr<PhysicalParametersMetaEngine> bodyPhysicalParametersDispatcher(new PhysicalParametersMetaEngine);
-	bodyPhysicalParametersDispatcher->add("FEMSetParameters","FEMTetrahedronStiffness");
+	bodyPhysicalParametersDispatcher->add("FEMTetrahedronStiffness");
 	
 	shared_ptr<GeometricalModelMetaEngine> geometricalModelDispatcher	= shared_ptr<GeometricalModelMetaEngine>(new GeometricalModelMetaEngine);
-	geometricalModelDispatcher->add("FEMSetParameters","FEMSetGeometry","FEMSet2Tetrahedrons");
+	geometricalModelDispatcher->add("FEMSet2Tetrahedrons");
 	
 	shared_ptr<PhysicalParametersMetaEngine> positionIntegrator(new PhysicalParametersMetaEngine);
-	positionIntegrator->add("ParticleParameters","LeapFrogPositionIntegrator");
+	positionIntegrator->add("LeapFrogPositionIntegrator");
 	
 	shared_ptr<FEMLaw> femLaw(new FEMLaw);
 	femLaw->nodeGroupMask = nodeGroupMask;
@@ -159,7 +159,7 @@ void FEMBeam::createActors(shared_ptr<MetaBody>& rootBody)
 	gravityCondition->gravity = gravity;
 	
 	shared_ptr<PhysicalActionApplier> applyActionDispatcher(new PhysicalActionApplier);
-	applyActionDispatcher->add("Force","ParticleParameters","NewtonsForceLaw");
+	applyActionDispatcher->add("NewtonsForceLaw");
 	
 	shared_ptr<PhysicalActionContainerInitializer> physicalActionInitializer(new PhysicalActionContainerInitializer);
 	physicalActionInitializer->physicalActionNames.push_back("Force");

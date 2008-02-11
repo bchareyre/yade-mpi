@@ -140,7 +140,7 @@ void BrefcomLaw::envelopeAndDamage(void){
 		Real envRetFactor=max(1e-3 /*guard numerical stability*/,min(1. /*guard sane solution*/,
 			(BC->FnMax_curr - (Fn - BC->FnMax_curr)/BC->zeta) / Fn ));
 		//if(isnan(envRetFactor)){TRVAR3(fn,Fn,contGeom->normal); exit(0);}
-		Real d=(rbp1->se3.position - rbp2->se3.position).Length();
+		// Real d=(rbp1->se3.position - rbp2->se3.position).Length();
 		//TRVAR6(BC->d0,BC->dPeak,BC->dPeak_curr,BC->dBreak,BC->d0_curr,d);
 		//TRVAR5(Fn,BC->FnMax_curr,envRetFactor,BC->omegaPl,(BC->FnMax_curr - (Fn - BC->FnMax_curr)/BC->zeta) / Fn );
 		// if((d<BC->d0_curr && Fn<0) || (d>BC->d0_curr && Fn>0)) exit(1);
@@ -267,8 +267,9 @@ void GLDrawBrefcomContact::go(const shared_ptr<InteractionPhysics>& ip, const sh
 	glTranslatev(mid);
 	glPushMatrix();
 		glRasterPos2i(0,0);
-		std::string str=std::string("omegaPl=")+boost::lexical_cast<std::string>((float)(BC->omegaPl));
-		for(unsigned int i=0;i<str.length();i++) glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12,str[i]);
+		ostringstream oss; oss<<setw(2)<< /* "w="<< */ BC->omegaPl;
+		//std::string str=std::string("omegaPl=")+boost::lexical_cast<std::string>((float)(BC->omegaPl));
+		for(unsigned int i=0;i<oss.str().length();i++) glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12,oss.str()[i]);
 	glPopMatrix();
 
 }

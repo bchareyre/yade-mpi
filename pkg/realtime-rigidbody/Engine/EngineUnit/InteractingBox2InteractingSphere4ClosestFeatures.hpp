@@ -25,7 +25,8 @@ class InteractingBox2InteractingSphere4ClosestFeatures : public InteractionGeome
 					const Se3r& se31,
 					const Se3r& se32,
 					const shared_ptr<Interaction>& c);
-
+	
+	FUNCTOR2D(InteractingBox,InteractingSphere);
 	REGISTER_CLASS_NAME(InteractingBox2InteractingSphere4ClosestFeatures);
 	REGISTER_BASE_CLASS_NAME(InteractionGeometryEngineUnit);
 	DEFINE_FUNCTOR_ORDER_2D(InteractingBox,InteractingSphere);

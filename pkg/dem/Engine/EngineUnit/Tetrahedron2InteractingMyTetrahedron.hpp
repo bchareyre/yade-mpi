@@ -35,6 +35,8 @@ class Tetrahedron2InteractingMyTetrahedron : public InteractingGeometryEngineUni
 				, shared_ptr<InteractingGeometry>& ig
 				, const Se3r& se3
 				, const Body*	);
+
+	FUNCTOR2D(Tetrahedron,InteractingMyTetrahedron);
 	REGISTER_CLASS_NAME(Tetrahedron2InteractingMyTetrahedron);
 	REGISTER_BASE_CLASS_NAME(InteractingGeometryEngineUnit);
 	

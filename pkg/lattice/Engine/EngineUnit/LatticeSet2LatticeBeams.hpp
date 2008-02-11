@@ -20,7 +20,8 @@ class LatticeSet2LatticeBeams : public GeometricalModelEngineUnit
 		void go(	  const shared_ptr<PhysicalParameters>&
 				, shared_ptr<GeometricalModel>&
 				, const Body*);
-
+	
+	FUNCTOR2D(LatticeSetParameters,LatticeSetGeometry);
 	REGISTER_CLASS_NAME(LatticeSet2LatticeBeams);
 	REGISTER_BASE_CLASS_NAME(GeometricalModelEngineUnit);
 

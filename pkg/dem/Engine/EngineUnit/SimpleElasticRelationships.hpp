@@ -22,6 +22,8 @@ class SimpleElasticRelationships : public InteractionPhysicsEngineUnit
 
 	protected :
 		virtual void registerAttributes();
+
+	FUNCTOR2D(BodyMacroParameters,BodyMacroParameters);
 	REGISTER_CLASS_NAME(SimpleElasticRelationships);
 	REGISTER_BASE_CLASS_NAME(InteractionPhysicsEngineUnit);
 

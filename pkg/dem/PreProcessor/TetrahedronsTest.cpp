@@ -319,20 +319,20 @@ void TetrahedronsTest::createActors(shared_ptr<MetaBody>& rootBody)
 	//
 	// Vaclav, it is very likely that you will need some other physical representation of interaction than SimpleElasticInteraction
 	//
-	interactionPhysicsDispatcher->add("ElasticBodyParameters","ElasticBodyParameters","ElasticBodySimpleRelationship");
+	interactionPhysicsDispatcher->add("ElasticBodySimpleRelationship");
 		
 	shared_ptr<InteractionGeometryMetaEngine> interactionGeometryDispatcher(new InteractionGeometryMetaEngine);
-	interactionGeometryDispatcher->add("InteractingMyTetrahedron","InteractingMyTetrahedron","InteractingMyTetrahedron2InteractingMyTetrahedron4InteractionOfMyTetrahedron");
-	interactionGeometryDispatcher->add("InteractingMyTetrahedron","InteractingBox","InteractingMyTetrahedron2InteractingBox4InteractionOfMyTetrahedron");
+	interactionGeometryDispatcher->add("InteractingMyTetrahedron2InteractingMyTetrahedron4InteractionOfMyTetrahedron");
+	interactionGeometryDispatcher->add("InteractingMyTetrahedron2InteractingBox4InteractionOfMyTetrahedron");
 
 	shared_ptr<InteractingGeometryMetaEngine> interactingGeometryDispatcher	= shared_ptr<InteractingGeometryMetaEngine>(new InteractingGeometryMetaEngine);
-	interactingGeometryDispatcher->add("Tetrahedron","InteractingMyTetrahedron","Tetrahedron2InteractingMyTetrahedron");
+	interactingGeometryDispatcher->add("Tetrahedron2InteractingMyTetrahedron");
 	
 	shared_ptr<BoundingVolumeMetaEngine> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeMetaEngine>(new BoundingVolumeMetaEngine);
-	boundingVolumeDispatcher->add("InteractingSphere","AABB","InteractingSphere2AABB");
-	boundingVolumeDispatcher->add("InteractingBox","AABB","InteractingBox2AABB");
-	boundingVolumeDispatcher->add("InteractingMyTetrahedron","AABB","InteractingMyTetrahedron2AABB");
-	boundingVolumeDispatcher->add("MetaInteractingGeometry","AABB","MetaInteractingGeometry2AABB");
+	boundingVolumeDispatcher->add("InteractingSphere2AABB");
+	boundingVolumeDispatcher->add("InteractingBox2AABB");
+	boundingVolumeDispatcher->add("InteractingMyTetrahedron2AABB");
+	boundingVolumeDispatcher->add("MetaInteractingGeometry2AABB");
 	
 	shared_ptr<GravityEngine> gravityCondition(new GravityEngine);
 	gravityCondition->gravity = gravity;
@@ -344,12 +344,12 @@ void TetrahedronsTest::createActors(shared_ptr<MetaBody>& rootBody)
 	actionMomentumDamping->damping = dampingMomentum;
 
 	shared_ptr<PhysicalActionDamper> actionDampingDispatcher(new PhysicalActionDamper);
-	actionDampingDispatcher->add("Force","RigidBodyParameters","CundallNonViscousForceDamping",actionForceDamping);
-	actionDampingDispatcher->add("Momentum","RigidBodyParameters","CundallNonViscousMomentumDamping",actionMomentumDamping);
+	actionDampingDispatcher->add(actionForceDamping);
+	actionDampingDispatcher->add(actionMomentumDamping);
 	
 	shared_ptr<PhysicalActionApplier> applyActionDispatcher(new PhysicalActionApplier);
-	applyActionDispatcher->add("Force","RigidBodyParameters","NewtonsForceLaw");
-	applyActionDispatcher->add("Momentum","RigidBodyParameters","NewtonsMomentumLaw");
+	applyActionDispatcher->add("NewtonsForceLaw");
+	applyActionDispatcher->add("NewtonsMomentumLaw");
 
 	// 
 	// they must be separate, because for each body both of those integrators must perform the necessary work.
@@ -359,11 +359,11 @@ void TetrahedronsTest::createActors(shared_ptr<MetaBody>& rootBody)
 	//
 	// And the bodies would ONLY rotate...
 	shared_ptr<PhysicalParametersMetaEngine> positionIntegrator(new PhysicalParametersMetaEngine);
-	positionIntegrator->add("ParticleParameters","LeapFrogPositionIntegrator");
+	positionIntegrator->add("LeapFrogPositionIntegrator");
 
 	// so another separate MetaEngine
 	shared_ptr<PhysicalParametersMetaEngine> orientationIntegrator(new PhysicalParametersMetaEngine);
-	orientationIntegrator->add("RigidBodyParameters","LeapFrogOrientationIntegrator");
+	orientationIntegrator->add("LeapFrogOrientationIntegrator");
 	//////////////////
  	
 /*

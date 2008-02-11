@@ -31,6 +31,8 @@ class CohesiveFrictionalRelationships : public InteractionPhysicsEngineUnit
 
 	protected :
 		virtual void registerAttributes();
+
+	FUNCTOR2D(CohesiveFrictionalBodyParameters,CohesiveFrictionalBodyParameters);
 	REGISTER_CLASS_NAME(CohesiveFrictionalRelationships);
 	REGISTER_BASE_CLASS_NAME(InteractionPhysicsEngineUnit);
 

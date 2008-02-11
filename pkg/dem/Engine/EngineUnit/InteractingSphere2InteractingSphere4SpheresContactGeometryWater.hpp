@@ -25,6 +25,8 @@ class InteractingSphere2InteractingSphere4SpheresContactGeometryWater : public I
 					const Se3r& se32,
 					const shared_ptr<Interaction>& c);
 
+	FUNCTOR2D(InteractingSphere,InteractingSphere);
+
 	REGISTER_CLASS_NAME(InteractingSphere2InteractingSphere4SpheresContactGeometryWater);
 	REGISTER_BASE_CLASS_NAME(InteractionGeometryEngineUnit);
 

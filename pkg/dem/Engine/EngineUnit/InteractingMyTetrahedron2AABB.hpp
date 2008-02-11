@@ -29,6 +29,7 @@ class InteractingMyTetrahedron2AABB : public BoundingVolumeEngineUnit
 				, shared_ptr<BoundingVolume>& bv
 				, const Se3r& se3
 				, const Body*	);
+	FUNCTOR2D(InteractingMyTetrahedron,AABB);
 	REGISTER_CLASS_NAME(InteractingMyTetrahedron2AABB);
 	REGISTER_BASE_CLASS_NAME(BoundingVolumeEngineUnit);
 };

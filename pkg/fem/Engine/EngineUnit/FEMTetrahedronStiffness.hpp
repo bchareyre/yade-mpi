@@ -23,7 +23,8 @@ class FEMTetrahedronStiffness : public PhysicalParametersEngineUnit
 	public :
 		virtual void go(	  const shared_ptr<PhysicalParameters>&
 					, Body*);
-	
+
+	FUNCTOR1D(FEMSetParameters);	
 	REGISTER_CLASS_NAME(FEMTetrahedronStiffness);
 	REGISTER_BASE_CLASS_NAME(PhysicalParametersEngineUnit);
 

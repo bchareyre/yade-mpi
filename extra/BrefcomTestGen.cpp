@@ -76,8 +76,8 @@ void BrefcomTestGen::createEngines(){
 	rootBody->initializers.push_back(physicalActionInitializer);
 	
 	shared_ptr<BoundingVolumeMetaEngine> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeMetaEngine>(new BoundingVolumeMetaEngine);
-	boundingVolumeDispatcher->DISPATCHER_ADD3(InteractingSphere,AABB,InteractingSphere2AABB);
-	boundingVolumeDispatcher->DISPATCHER_ADD3(MetaInteractingGeometry,AABB,MetaInteractingGeometry2AABB);
+	boundingVolumeDispatcher->add(new InteractingSphere2AABB);
+	boundingVolumeDispatcher->add(new MetaInteractingGeometry2AABB);
 	rootBody->initializers.push_back(boundingVolumeDispatcher);
 
 	rootBody->engines.clear();
@@ -90,27 +90,27 @@ void BrefcomTestGen::createEngines(){
 	rootBody->engines.push_back(collider);
 
 	shared_ptr<InteractionGeometryMetaEngine> igeomDispatcher(new InteractionGeometryMetaEngine);
-	igeomDispatcher->DISPATCHER_ADD3(InteractingSphere,InteractingSphere,InteractingSphere2InteractingSphere4DistantSpheresContactGeometry);
+	igeomDispatcher->add(new InteractingSphere2InteractingSphere4DistantSpheresContactGeometry);
 	rootBody->engines.push_back(igeomDispatcher);
 
 	shared_ptr<InteractionPhysicsMetaEngine> iphysDispatcher(new InteractionPhysicsMetaEngine);
-	iphysDispatcher->DISPATCHER_ADD3(BodyMacroParameters,BodyMacroParameters,BrefcomMakeContact);
+	iphysDispatcher->add(new BrefcomMakeContact);
 	rootBody->engines.push_back(iphysDispatcher);
 
 	shared_ptr<BrefcomLaw> bLaw(new BrefcomLaw);
 	rootBody->engines.push_back(bLaw);
 
 	shared_ptr<PhysicalActionApplier> applyActionDispatcher(new PhysicalActionApplier);
-	applyActionDispatcher->DISPATCHER_ADD3(Force,ParticleParameters,NewtonsForceLaw);
-	applyActionDispatcher->DISPATCHER_ADD3(Momentum,RigidBodyParameters,NewtonsMomentumLaw);
+	applyActionDispatcher->add(new NewtonsForceLaw);
+	applyActionDispatcher->add(new NewtonsMomentumLaw);
 	rootBody->engines.push_back(applyActionDispatcher);
 	
 	shared_ptr<PhysicalParametersMetaEngine> positionIntegrator(new PhysicalParametersMetaEngine);
-	positionIntegrator->DISPATCHER_ADD2(ParticleParameters,LeapFrogPositionIntegrator);
+	positionIntegrator->add(new LeapFrogPositionIntegrator);
 	rootBody->engines.push_back(positionIntegrator);
 
 	shared_ptr<PhysicalParametersMetaEngine> orientationIntegrator(new PhysicalParametersMetaEngine);
-	orientationIntegrator->DISPATCHER_ADD2(RigidBodyParameters,LeapFrogOrientationIntegrator);
+	orientationIntegrator->add(new LeapFrogOrientationIntegrator);
 	rootBody->engines.push_back(orientationIntegrator);
 }
 

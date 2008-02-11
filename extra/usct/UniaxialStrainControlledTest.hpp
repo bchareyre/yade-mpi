@@ -1,6 +1,7 @@
 // 2008 © Václav Šmilauer <eudoxos@arcig.cz> 
 #pragma once
 #include<fstream>
+#include<limits>
 #include<yade/extra/Shop.hpp>
 #include<yade/core/FileGenerator.hpp>
 #include<yade/core/DeusExMachina.hpp>
@@ -39,13 +40,14 @@ class UniaxialStrainer: public DeusExMachina {
 	public:
 		Real strainRate,currentStrainRate,originalLength,limitStrain;
 		Real sumPosForces,sumNegForces;
+		Real crossSectionArea;
 		int axis;
 		bool notYetReversed;
 		vector<body_id_t> posIds, negIds;
 		vector<Real> posCoords,negCoords;
 
 		virtual void applyCondition(Body* _rootBody);
-		UniaxialStrainer(){axis=2; currentStrainRate=0; originalLength=-1; limitStrain=-1; notYetReversed=true; };
+		UniaxialStrainer(){axis=2; currentStrainRate=0; originalLength=-1; limitStrain=-1; notYetReversed=true; crossSectionArea=-1; };
 		virtual ~UniaxialStrainer(){};
 		void registerAttributes(){
 			DeusExMachina::registerAttributes();
@@ -59,6 +61,7 @@ class UniaxialStrainer: public DeusExMachina {
 			REGISTER_ATTRIBUTE(originalLength);
 			REGISTER_ATTRIBUTE(limitStrain);
 			REGISTER_ATTRIBUTE(notYetReversed);
+			REGISTER_ATTRIBUTE(crossSectionArea);
 		}
 		void postProcessAttributes(bool deserializing){if(deserializing) recStream.open("/tmp/usct.data"); };
 	REGISTER_CLASS_NAME(UniaxialStrainer);

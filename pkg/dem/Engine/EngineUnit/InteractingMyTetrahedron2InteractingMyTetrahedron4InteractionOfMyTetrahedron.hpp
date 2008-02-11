@@ -40,6 +40,8 @@ class InteractingMyTetrahedron2InteractingMyTetrahedron4InteractionOfMyTetrahedr
 		
 		void calcTwoSpheres(	Vector3r c1, Real r1, Vector3r c2, Real r2, Real& penetrationDepth, Vector3r& normal, Vector3r& cp);
 
+	FUNCTOR2D(InteractingMyTetrahedron,InteractingMyTetrahedron);
+
 	REGISTER_CLASS_NAME(InteractingMyTetrahedron2InteractingMyTetrahedron4InteractionOfMyTetrahedron);
 	REGISTER_BASE_CLASS_NAME(InteractionGeometryEngineUnit);
 

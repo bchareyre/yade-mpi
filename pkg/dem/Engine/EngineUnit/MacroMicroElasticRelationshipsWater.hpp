@@ -26,6 +26,9 @@ class MacroMicroElasticRelationshipsWater : public InteractionPhysicsEngineUnit
 
 	protected :
 		virtual void registerAttributes();
+
+	FUNCTOR2D(BodyMacroParameters,BodyMacroParameters);
+	
 	REGISTER_CLASS_NAME(MacroMicroElasticRelationshipsWater);
 	REGISTER_BASE_CLASS_NAME(InteractionPhysicsEngineUnit);
 

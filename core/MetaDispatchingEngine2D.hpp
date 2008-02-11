@@ -38,12 +38,14 @@ class MetaDispatchingEngine2D : public MetaDispatchingEngine,
 				>
 {
 	public :
+		#if 0
 		__attribute__((deprecated))
 		virtual void add ( string baseClassName1, string baseClassName2, string libName, shared_ptr<EngineUnit> eu = shared_ptr<EngineUnitType>())  
 		{
 			storeFunctorName(baseClassName1,baseClassName2,libName,static_pointer_cast<EngineUnitType>(eu));
 			add2DEntry(baseClassName1,baseClassName2,libName,static_pointer_cast<EngineUnitType>(eu));
 		}
+		#endif
 
 		/* add functor by pointer: this is convenience for calls like foo->add(new SomeFunctor); */
 		virtual void add(EngineUnitType* eu){ add(shared_ptr<EngineUnitType>(eu)); }

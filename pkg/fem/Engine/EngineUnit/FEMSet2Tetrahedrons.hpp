@@ -17,6 +17,7 @@ class FEMSet2Tetrahedrons : public GeometricalModelEngineUnit
 		void go(	  const shared_ptr<PhysicalParameters>&
 				, shared_ptr<GeometricalModel>&
 				, const Body*);
+	FUNCTOR2D(FEMSetParameters,FEMSetGeometry);
 	REGISTER_CLASS_NAME(FEMSet2Tetrahedrons);
 	REGISTER_BASE_CLASS_NAME(GeometricalModelEngineUnit);
 

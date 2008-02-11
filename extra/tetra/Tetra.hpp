@@ -85,6 +85,7 @@ class Tetrahedron2TetraMold: public InteractingGeometryEngineUnit
 			//! @fixme this seems superfluous?!: if(!ig)
 			ig=boost::shared_ptr<InteractingGeometry>(new TetraMold(tet->v[0],tet->v[1],tet->v[2],tet->v[3]));
 		}
+	FUNCTOR2D(Tetrahedron,TetraMold);
 	REGISTER_CLASS_NAME(Tetrahedron2TetraMold);
 	REGISTER_BASE_CLASS_NAME(InteractingGeometryEngineUnit);
 	DEFINE_FUNCTOR_ORDER_2D(Tetrahedron,TetraMold);
