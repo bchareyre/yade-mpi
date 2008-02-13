@@ -9,7 +9,6 @@
 #include "QtSimulationPlayer.hpp"
 #include "FileDialog.hpp"
 #include "GLSimulationPlayerViewer.hpp"
-#include<yade/core/Omega.hpp>
 #include<yade/core/FileGenerator.hpp>
 #include <qlineedit.h>
 #include <qpushbutton.h>

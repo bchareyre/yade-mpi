@@ -6,13 +6,13 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef SIMULATIONVIEWER_HPP
-#define SIMULATIONVIEWER_HPP
+#ifndef SIMULATIONPLAYERVIEWER_HPP
+#define SIMULATIONPLAYERVIEWER_HPP
 
-#include <QGLViewer/qglviewer.h>
-
+#include<yade/core/Omega.hpp>
 #include<yade/core/RenderingEngine.hpp>
 #include<yade/core/MetaBody.hpp>
+#include <QGLViewer/qglviewer.h>
 
 class GLSimulationPlayerViewer : public QGLViewer
 {

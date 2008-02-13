@@ -13,7 +13,6 @@
 #include<yade/lib-opengl/FpsTracker.hpp>
 #include<yade/core/Body.hpp>
 #include<yade/core/Interaction.hpp>
-#include<yade/core/Omega.hpp>
 
 
 GLViewer::GLViewer(int id, shared_ptr<RenderingEngine> rendererInit, const QGLFormat& format, QWidget * parent, QGLWidget * shareWidget) : QGLViewer(format,parent,"glview",shareWidget)//, qglThread(this,rendererInit)

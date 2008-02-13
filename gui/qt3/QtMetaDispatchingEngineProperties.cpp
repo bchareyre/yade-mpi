@@ -8,7 +8,6 @@
 
 #include "QtMetaDispatchingEngineProperties.hpp"
 #include<yade/core/EngineUnit.hpp>
-#include<yade/core/Omega.hpp>
 #include<yade/lib-multimethods/Indexable.hpp>
 #include <qgroupbox.h>
 #include <qpushbutton.h>

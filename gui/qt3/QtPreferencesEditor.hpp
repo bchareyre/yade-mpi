@@ -9,6 +9,7 @@
 #ifndef QTPREFERENCESEDITOR_HPP
 #define QTPREFERENCESEDITOR_HPP
 
+#include<yade/core/Omega.hpp>
 #include <QtGeneratedPreferencesEditor.h>
 #include<yade/lib-factory/Factorable.hpp>
 

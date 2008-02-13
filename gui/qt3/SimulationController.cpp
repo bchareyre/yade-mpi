@@ -18,7 +18,6 @@
 #include <boost/filesystem/convenience.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <unistd.h>
-#include<yade/core/Omega.hpp>
 #include<yade/core/yadeExceptions.hpp>
 #include <Wm3Math.h>
 #include<yade/lib-base/yadeWm3.hpp>

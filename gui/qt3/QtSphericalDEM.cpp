@@ -17,7 +17,6 @@
 #include <qspinbox.h>
 #include<yade/lib-factory/ClassFactory.hpp>
 #include<yade/core/FileGenerator.hpp>
-#include<yade/core/Omega.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
 QtSphericalDEM::QtSphericalDEM ( QWidget * parent , const char * name) : QtGeneratedSphericalDEMSimulator(parent,name)

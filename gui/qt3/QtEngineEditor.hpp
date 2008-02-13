@@ -9,13 +9,14 @@
 #ifndef QTENGINEEDITOR_HPP
 #define QTENGINEEDITOR_HPP
 
+#include<yade/core/Omega.hpp>
+#include<yade/lib-factory/Factorable.hpp>
+#include<yade/lib-serialization-qt/QtGUIGenerator.hpp>
+#include<yade/core/Engine.hpp>
 #include <QtGeneratedEngineEditor.h>
 #include <qlayout.h>
 #include <qframe.h>
 #include <qscrollview.h>
-#include<yade/lib-factory/Factorable.hpp>
-#include<yade/lib-serialization-qt/QtGUIGenerator.hpp>
-#include<yade/core/Engine.hpp>
 #include "QtMetaDispatchingEngineProperties.hpp"
 
 class QtEngineEditor : public QtGeneratedEngineEditor, public Factorable

@@ -8,7 +8,6 @@
 
 #include "QtCodeGenerator.hpp"
 #include "FileDialog.hpp"
-#include<yade/core/Omega.hpp>
 #include <qcombobox.h>
 #include <qlineedit.h>
 #include <qcheckbox.h>

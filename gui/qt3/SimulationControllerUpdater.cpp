@@ -6,6 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
+#include<yade/core/Omega.hpp>
 #include "SimulationControllerUpdater.hpp"
 #include "SimulationController.hpp"
 #include <qlcdnumber.h>

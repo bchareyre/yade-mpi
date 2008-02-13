@@ -9,13 +9,14 @@
 #ifndef QTSPHERICALDEM_HPP
 #define QTSPHERICALDEM_HPP
 
+#include<yade/core/Omega.hpp>
+#include<yade/lib-factory/Factorable.hpp>
+#include<yade/core/StandAloneSimulator.hpp>
+#include <boost/shared_ptr.hpp>
 #include <qlayout.h>
 #include <qframe.h>
 #include <qscrollview.h>
 #include <QtGeneratedSphericalDEMSimulator.h>
-#include <boost/shared_ptr.hpp>
-#include<yade/lib-factory/Factorable.hpp>
-#include<yade/core/StandAloneSimulator.hpp>
 
 using namespace boost;
 

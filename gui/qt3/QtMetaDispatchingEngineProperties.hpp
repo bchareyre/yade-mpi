@@ -9,6 +9,7 @@
 #ifndef QTMETADISPATCHINGENGINEPROPERTIES_HPP
 #define QTMETADISPATCHINGENGINEPROPERTIES_HPP
 
+#include<yade/core/Omega.hpp>
 #include <QtGeneratedMetaDispatchingEngineProperties.h>
 #include <qlayout.h>
 #include <qcombobox.h>

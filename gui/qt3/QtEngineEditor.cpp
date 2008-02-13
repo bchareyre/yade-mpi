@@ -9,7 +9,6 @@
 #include "QtEngineEditor.hpp"
 #include "GLEngineEditor.hpp"
 #include "FileDialog.hpp"
-#include<yade/core/Omega.hpp>
 #include<yade/core/FileGenerator.hpp>
 #include<yade/core/MetaDispatchingEngine.hpp>
 #include <qcombobox.h>

@@ -9,8 +9,9 @@
 #ifndef QTSIMULATIONPLAYER_HPP
 #define QTSIMULATIONPLAYER_HPP
 
-#include <QtGeneratedSimulationPlayer.h>
+#include<yade/core/Omega.hpp>
 #include<yade/lib-factory/Factorable.hpp>
+#include <QtGeneratedSimulationPlayer.h>
 
 class QtSimulationPlayer : public QtGeneratedSimulationPlayer, public Factorable
 {

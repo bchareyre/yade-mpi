@@ -9,12 +9,13 @@
 #ifndef QTFILEGENERATOR_HPP
 #define QTFILEGENERATOR_HPP
 
+#include<yade/core/Omega.hpp>
+#include<yade/lib-factory/Factorable.hpp>
+#include<yade/lib-serialization-qt/QtGUIGenerator.hpp>
 #include <qlayout.h>
 #include <qframe.h>
 #include <qscrollview.h>
 #include <QtFileGeneratorController.h>
-#include<yade/lib-factory/Factorable.hpp>
-#include<yade/lib-serialization-qt/QtGUIGenerator.hpp>
 
 class FileGenerator;
 class ThreadRunner;

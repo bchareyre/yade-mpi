@@ -8,7 +8,6 @@
 
 #include "QtPreferencesEditor.hpp"
 #include "FileDialog.hpp"
-#include<yade/core/Omega.hpp>
 #include<yade/core/Preferences.hpp>
 #include <qlineedit.h>
 #include <qlistview.h>

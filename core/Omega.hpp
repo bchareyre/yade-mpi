@@ -11,6 +11,23 @@
 #ifndef OMEGA_HPP
 #define OMEGA_HPP
 
+// qt3 sucks
+#ifdef EMBED_PYTHON
+	#ifdef QT_MOC_CPP
+		#undef slots
+		#include<Python.h>
+		#define slots slots
+	#else
+		#ifdef slots
+			#undef slots
+			#include<Python.h>
+			#define slots
+		#else
+			#include<Python.h>
+		#endif
+	#endif
+#endif
+
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <fstream>
 #include <set>
@@ -19,10 +36,6 @@
 #include <boost/thread/thread.hpp>
 #include <iostream>
 #include <boost/shared_ptr.hpp>
-
-#ifdef EMBED_PYTHON
-	#include<Python.h>
-#endif
 
 #include<Wm3Vector3.h>
 #include<yade/lib-base/yadeWm3.hpp>

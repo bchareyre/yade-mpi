@@ -6,6 +6,9 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
+#include<yade/lib-factory/ClassFactory.hpp>
+#include<yade/core/FileGenerator.hpp>
+#include<yade/core/ThreadRunner.hpp>
 #include "QtFileGenerator.hpp"
 #include "FileDialog.hpp"
 #include <sstream>
@@ -16,14 +19,10 @@
 #include <qlineedit.h>
 #include <qprogressbar.h>
 #include <qcheckbox.h>
-#include<yade/lib-factory/ClassFactory.hpp>
-#include<yade/core/FileGenerator.hpp>
-#include<yade/core/Omega.hpp>
 #include <boost/filesystem/convenience.hpp>
 #include <boost/filesystem/operations.hpp>
 #include "MessageDialog.hpp"
 #include "YadeQtMainWindow.hpp"
-#include<yade/core/ThreadRunner.hpp>
 
 QtFileGenerator::QtFileGenerator ( QWidget * parent , const char * name)
 	: QtFileGeneratorController(parent,name)

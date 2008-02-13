@@ -9,10 +9,11 @@
 #ifndef QTCODEGENERATOR_HPP
 #define QTCODEGENERATOR_HPP
 
-#include <QtGeneratedCodeGenerator.h>
+#include<yade/core/Omega.hpp>
 #include<yade/lib-factory/Factorable.hpp>
 #include <string>
 #include <fstream>
+#include <QtGeneratedCodeGenerator.h>
 
 using namespace std;
 
