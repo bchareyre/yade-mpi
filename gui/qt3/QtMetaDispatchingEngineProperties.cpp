@@ -380,18 +380,18 @@ void QtMetaDispatchingEngineProperties::pbOkClicked()
 		{			
 			string baseFunctor = ((QComboBox*)(*cbsi)[1])->currentText();
 			if (*eui!=shared_ptr<EngineUnit>())
-				metaEngine->add(baseClass1, baseFunctor,*eui);
+				metaEngine->add(*eui);
 			else
-				metaEngine->add(baseClass1, baseFunctor);
+				metaEngine->add(baseFunctor);
 		}
 		else if (metaEngine->getDimension()==2)
 		{
 			string baseClass2 = ((QComboBox*)(*cbsi)[1])->currentText();
 			string baseFunctor = ((QComboBox*)(*cbsi)[2])->currentText();
 			if (*eui!=shared_ptr<EngineUnit>())
-				metaEngine->add(baseClass1, baseClass2, baseFunctor,*eui);
+				metaEngine->add(*eui);
 			else
-				metaEngine->add(baseClass1, baseClass2, baseFunctor);
+				metaEngine->add(baseFunctor);
 		}
 	}
 

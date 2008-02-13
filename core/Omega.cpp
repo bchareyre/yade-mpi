@@ -44,6 +44,7 @@ void Omega::init()
 {
 	simulationFileName="";
 	currentIteration = 0;
+	stopAtIteration = 0;
 	dt = 1e-8;
 }
 
@@ -316,7 +317,7 @@ string Omega::getSimulationFileName()
 
 void Omega::loadSimulation()
 {
-	if(	    (Omega::instance().getSimulationFileName().size() != 0)
+	if((Omega::instance().getSimulationFileName().size() != 0)
 		&&  (filesystem::exists(simulationFileName)) 
 		&&  (filesystem::extension(simulationFileName)==".xml" || filesystem::extension(simulationFileName)==".yade" ))
 	{
@@ -336,7 +337,17 @@ void Omega::loadSimulation()
 		msStartingPauseTime = msStartingSimulationTime;
 		LOG_DEBUG("Simulation loaded");
 		currentIteration = 0;
-		simulationTime = 0;	
+		simulationTime = 0;
+
+		if(rootBody->recover){
+			LOG_INFO("Simulation recovery effective.");
+			dt=rootBody->recoverDt;
+			currentIteration=rootBody->recoverCurrentIteration;
+			stopAtIteration=rootBody->recoverStopAtIteration;
+			simulationTime=rootBody->recoverSimulationTime;	
+			rootBody->recover=false;
+		}
+		
 	}
 	else
 	{
@@ -346,16 +357,26 @@ void Omega::loadSimulation()
 	}
 }
 
-void Omega::saveSimulation(const string name)
+void Omega::saveSimulation(const string name, bool recover)
 {
-	if(	   (name.size() != 0)
-		&& (filesystem::extension(name)==".xml" || filesystem::extension(name)==".yade") )
-        {
+	if((name.size()!= 0) && (filesystem::extension(name)==".xml" || filesystem::extension(name)==".yade")){
 		LOG_INFO("Saving file " << name);
+
+		if(recover){
+			LOG_INFO("Simulation recovery enabled.");
+			rootBody->recover=true;
+			rootBody->recoverDt=dt;
+			rootBody->recoverCurrentIteration=currentIteration;
+			rootBody->recoverStopAtIteration=stopAtIteration;
+			rootBody->recoverSimulationTime=simulationTime;
+		}
+
 		if(filesystem::extension(name)==".xml")
 			IOFormatManager::saveToFile("XMLFormatManager",name,"rootBody",rootBody);
 		else if(filesystem::extension(name)==".yade" )
 			IOFormatManager::saveToFile("BINFormatManager",name,"rootBody",rootBody);
+
+		if(recover) rootBody->recover=false;
 	}
 	else
 	{

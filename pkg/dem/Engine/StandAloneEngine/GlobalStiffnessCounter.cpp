@@ -121,7 +121,6 @@ void GlobalStiffnessCounter::traverseInteractions(MetaBody* ncb, const shared_pt
 			if(!getInteractionParameters(contact,normal,kn,ks,radius1,radius2)) continue;
 		}
 
-			
 		//Diagonal terms of the translational stiffness matrix
 		Vector3r diag_stiffness = Vector3r(std::pow(normal.X(),2),std::pow(normal.Y(),2),std::pow(normal.Z(),2));
 		diag_stiffness *= kn-ks;

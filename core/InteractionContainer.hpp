@@ -35,8 +35,8 @@ class InteractionContainer : public Serializable
 		virtual const shared_ptr<Interaction>& find(body_id_t /*id1*/,body_id_t /*id2*/) 	{throw;};
 
 		typedef InteractionContainerIteratorPointer iterator;
-        	virtual InteractionContainer::iterator begin()						{throw;};
-        	virtual InteractionContainer::iterator end()						{throw;};
+      virtual InteractionContainer::iterator begin()						{throw;};
+      virtual InteractionContainer::iterator end()						{throw;};
 
 		virtual unsigned int size() 								{throw;};
 

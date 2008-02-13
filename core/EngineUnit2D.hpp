@@ -24,8 +24,10 @@ template
 class EngineUnit2D :	public EngineUnit,
 			public FunctorWrapper<ReturnType, AttributesType>
 {
-	public: virtual std::string get2DFunctorType1(void){throw runtime_error("Class "+this->getClassName()+" did not use FUNCTOR2D to declare its argument types?");}
-	public: virtual std::string get2DFunctorType2(void){throw runtime_error("Class "+this->getClassName()+" did not use FUNCTOR2D to declare its argument types?");}
+	public:
+		virtual std::string get2DFunctorType1(void){throw runtime_error("Class "+this->getClassName()+" did not use FUNCTOR2D to declare its argument types?");}
+		virtual std::string get2DFunctorType2(void){throw runtime_error("Class "+this->getClassName()+" did not use FUNCTOR2D to declare its argument types?");}
+		virtual vector<string> getFunctorTypes(){vector<string> ret; ret.push_back(get2DFunctorType1()); ret.push_back(get2DFunctorType2()); return ret;};
 	REGISTER_CLASS_NAME(EngineUnit2D);
 	REGISTER_BASE_CLASS_NAME(EngineUnit FunctorWrapper);
 };

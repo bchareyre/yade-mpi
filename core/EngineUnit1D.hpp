@@ -23,7 +23,9 @@ template
 class EngineUnit1D : 	public EngineUnit,
 			public FunctorWrapper<ReturnType, AttributesType>
 {
-	public: virtual std::string get1DFunctorType1(void){throw runtime_error("Class "+this->getClassName()+" did not use FUNCTOR1D to declare its argument type?"); }
+	public:
+		virtual std::string get1DFunctorType1(void){throw runtime_error("Class "+this->getClassName()+" did not use FUNCTOR1D to declare its argument type?"); }
+		virtual vector<string> getFunctorTypes(void){vector<string> ret; ret.push_back(get1DFunctorType1()); return ret;};
 	REGISTER_CLASS_NAME(EngineUnit1D);
 	REGISTER_BASE_CLASS_NAME(EngineUnit FunctorWrapper);
 };

@@ -15,17 +15,18 @@
 
 #include<signal.h>
 #include<cstdlib>
-#include <iostream>
-#include <string>
-#include <getopt.h>
-#include <boost/filesystem/operations.hpp>
-#include <boost/filesystem/convenience.hpp>
-#include <boost/preprocessor/stringize.hpp>
+#include<iostream>
+#include<string>
+#include<getopt.h>
+#include<boost/filesystem/operations.hpp>
+#include<boost/filesystem/convenience.hpp>
+#include<boost/preprocessor/stringize.hpp>
+#include<boost/regex.hpp>
 #include<yade/lib-factory/ClassFactory.hpp>
 #include<yade/lib-base/Logging.hpp>
-#include "Omega.hpp"
-#include "FrontEnd.hpp"
-#include "Preferences.hpp"
+#include"Omega.hpp"
+#include"FrontEnd.hpp"
+#include"Preferences.hpp"
 
 using namespace std;
 
@@ -54,7 +55,20 @@ sigHandler(int sig){
 			kill(getpid(),sig); // reemit signal after exiting gdb
 		}
 	#endif
+	if(sig==SIGHUP){
+		signal(SIGHUP,SIG_DFL);
+		LOG_INFO("Received SIGHUP.");
+		if(Omega::instance().getRootBody()){
+			LOG_INFO("Attempting emergency save to "<<Omega::instance().recoveryFilename);
+			Omega::instance().stopSimulationLoop();
+			Omega::instance().joinSimulationLoop();
+			Omega::instance().saveSimulation(Omega::instance().recoveryFilename);
+		} else LOG_INFO("Nothing to save.");
+		LOG_INFO("Emergency exit.");
+		exit(1);
+	}
 }
+
 
 void firstRunSetup(shared_ptr<Preferences>& pref)
 {
@@ -71,6 +85,17 @@ void firstRunSetup(shared_ptr<Preferences>& pref)
 	LOG_INFO("Setting GUI: QtGUI.");
 	pref->defaultGUILibName="QtGUI";
 	IOFormatManager::saveToFile("XMLFormatManager",Omega::instance().yadeConfigPath+"/preferences.xml","preferences",pref);
+}
+
+string findRecoveryCandidate(filesystem::path dir, string start){
+	if(!filesystem::exists(dir)) return false;
+	filesystem::directory_iterator end;
+	for(filesystem::directory_iterator I(dir); I!=end; ++I){
+		if(filesystem::is_regular(I->status()) && I->path().leaf().find(start)==0 ){
+			return (I->path()).string();
+		}
+	}
+	return "";
 }
 
 void printHelp()
@@ -143,7 +168,7 @@ int main(int argc, char *argv[])
 			case '-': coreOptions=false; break;
 			default: printHelp(); return 1;
 		}
-	// kill processed options, keep one more which will is in faact non-option (normally the binary)
+	// kill processed options, keep one more which will is in fact non-option (normally the binary)
 	argv=&(argv[optind-1]); argc-=optind-1;
 	// reset getopt globals for next processing
 	optind=0; opterr=0;
@@ -189,16 +214,26 @@ int main(int argc, char *argv[])
 		LOG_DEBUG("ABRT/SEGV signal handlers set, crash batch created as "<<Omega::instance().gdbCrashBatch);
 	#endif
 
-	LOG_INFO("Loading configuration file: "<<yadeConfigFile.string());
-	IOFormatManager::loadFromFile("XMLFormatManager",yadeConfigFile.string(),"preferences",Omega::instance().preferences);
+	LOG_INFO("Loading configuration file: "<<yadeConfigFile.string()); IOFormatManager::loadFromFile("XMLFormatManager",yadeConfigFile.string(),"preferences",Omega::instance().preferences);
 
-	LOG_INFO("Loading plugins...");
-	Omega::instance().scanPlugins();
-	LOG_INFO("Plugins loaded.");
+	LOG_INFO("Loading plugins..."); Omega::instance().scanPlugins(); LOG_INFO("Plugins loaded.");
 	Omega::instance().init();
 
 	Omega::instance().setSimulationFileName(simulationFileName); //init() resets to "";
-	
+
+	// recovery file pattern
+	Omega::instance().recoveryFilename=(yadeConfigPath/"recovery-pid").string()+lexical_cast<string>(getpid())+".xml";
+	signal(SIGHUP,sigHandler);
+
+	string recoveryCandidate=findRecoveryCandidate(/* directory */ yadeConfigPath, /* beginning of the filename */ "recovery-pid");
+	if(!recoveryCandidate.empty()){
+		if(!simulationFileName.empty()) LOG_WARN("Skipping recovery of `"<<recoveryCandidate<<"', since the file `"<<simulationFileName<<"' was given on the command-line.")
+		else {
+			LOG_INFO("Will recover simulation from `"<<recoveryCandidate<<"'.");
+			Omega::instance().setSimulationFileName(recoveryCandidate);
+		}
+	}
+
 	if(gui.size()==0) gui=Omega::instance().preferences->defaultGUILibName;
 		
 	shared_ptr<FrontEnd> frontEnd = dynamic_pointer_cast<FrontEnd>(ClassFactory::instance().createShared(gui));

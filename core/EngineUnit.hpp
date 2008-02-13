@@ -15,6 +15,7 @@
 
 class EngineUnit : public Serializable
 {
+	public: virtual vector<std::string> getFunctorTypes(){throw;}
 	REGISTER_CLASS_NAME(EngineUnit);
 	REGISTER_BASE_CLASS_NAME(Serializable);
 };

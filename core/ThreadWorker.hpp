@@ -32,10 +32,10 @@ class ThreadWorker	//         perhaps simulation steps, or stage? as it is a sin
 		boost::any	m_val;
 		float		m_progress;
 		std::string	m_status;
-		void		setTerminate(bool);
 		void		callSingleAction();
 
 	protected:
+		void		setTerminate(bool);
 		/// singleAction() can check whether someone asked for termination, and terminate if/when possible
 		bool		shouldTerminate();
 		/// if something must be returned, set the result using this method

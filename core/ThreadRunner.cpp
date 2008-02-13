@@ -17,8 +17,10 @@ void ThreadRunner::run()
 {
 	// this is the body of execution of separate thread
 	boost::mutex::scoped_lock lock(m_runmutex);
-	while(looping())
+	while(looping()) {
 		call();
+		if(m_thread_worker->shouldTerminate()){ stop(); return; }
+	}
 }
 
 void ThreadRunner::call()

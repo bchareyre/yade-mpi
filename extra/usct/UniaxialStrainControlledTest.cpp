@@ -122,6 +122,8 @@ bool USCTGen::generate(){
 	// load spheres
 	Vector3r minXYZ,maxXYZ;
 	typedef vector<pair<Vector3r,Real> > vecVecReal;
+	Shop::setDefault("phys_young",30e7);
+
 	vecVecReal spheres=Shop::loadSpheresFromFile(spheresFile,minXYZ,maxXYZ);
 	TRVAR2(minXYZ,maxXYZ);
 	// get spheres that are "close enough" to the strained ends
@@ -275,18 +277,18 @@ void USCTGen::createEngines(){
 		orientationIntegrator->add(new LeapFrogOrientationIntegrator);
 		rootBody->engines.push_back(orientationIntegrator);
 
+	shared_ptr<GlobalStiffnessCounter> globalStiffnessCounter(new GlobalStiffnessCounter);
+	globalStiffnessCounter->sdecGroupMask=1023;
+	globalStiffnessCounter->interval=100;
+
 	shared_ptr<GlobalStiffnessTimeStepper> globalStiffnessTimeStepper(new GlobalStiffnessTimeStepper);
 	globalStiffnessTimeStepper->sdecGroupMask=1023; // BIN 111111111, should always match
 	globalStiffnessTimeStepper->timeStepUpdateInterval=100;
 	globalStiffnessTimeStepper->defaultDt=1e-6;
 	rootBody->engines.push_back(globalStiffnessTimeStepper);
 
-	shared_ptr<GlobalStiffnessCounter> globalStiffnessCounter(new GlobalStiffnessCounter);
-	globalStiffnessCounter->sdecGroupMask=1023;
-	globalStiffnessCounter->interval=100;
 
 	rootBody->engines.push_back(globalStiffnessCounter);
-
 }
 
 

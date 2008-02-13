@@ -138,7 +138,6 @@ InteractionContainer::iterator InteractionVecSet::begin()
 	}
 
 	return InteractionContainer::iterator(it);
-
 }
 
 

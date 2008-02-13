@@ -168,6 +168,7 @@ class Tetra2TetraBang: public InteractionGeometryEngineUnit
 		virtual bool go(const shared_ptr<InteractingGeometry>& cm1, const shared_ptr<InteractingGeometry>& cm2, const Se3r& se31, const Se3r& se32, const shared_ptr<Interaction>& c);
 		virtual bool goReverse(	const shared_ptr<InteractingGeometry>& cm1, const shared_ptr<InteractingGeometry>& cm2, const Se3r& se31, const Se3r& se32, const shared_ptr<Interaction>& c);
 
+		FUNCTOR2D(TetraMold,TetraMold);
 		REGISTER_CLASS_NAME(Tetra2TetraBang);
 		REGISTER_BASE_CLASS_NAME(InteractionGeometryEngineUnit);
 		DEFINE_FUNCTOR_ORDER_2D(TetraMold,TetraMold);

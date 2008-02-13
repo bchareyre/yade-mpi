@@ -35,12 +35,12 @@
 #	define _LOG_HEAD __FILE__":"<<__LINE__<<" "<<__FUNCTION__<<": "
 	// logger is local for every class, but if it is missing, we will use the parent's class logger automagically.
 // TRACE doesn't really exist ATM, will output through DEBUG
-#	define LOG_TRACE(msg) LOG4CXX_DEBUG(logger, _LOG_HEAD<<msg)
-#	define LOG_DEBUG(msg) LOG4CXX_DEBUG(logger, _LOG_HEAD<<msg)
-#	define LOG_INFO(msg)  LOG4CXX_INFO(logger,  _LOG_HEAD<<msg)
-#	define LOG_WARN(msg)  LOG4CXX_WARN(logger,  _LOG_HEAD<<msg)
-#	define LOG_ERROR(msg) LOG4CXX_ERROR(logger, _LOG_HEAD<<msg)
-#	define LOG_FATAL(msg) LOG4CXX_FATAL(logger, _LOG_HEAD<<msg)
+#	define LOG_TRACE(msg) {LOG4CXX_DEBUG(logger, _LOG_HEAD<<msg);}
+#	define LOG_DEBUG(msg) {LOG4CXX_DEBUG(logger, _LOG_HEAD<<msg);}
+#	define LOG_INFO(msg)  {LOG4CXX_INFO(logger,  _LOG_HEAD<<msg);}
+#	define LOG_WARN(msg)  {LOG4CXX_WARN(logger,  _LOG_HEAD<<msg);}
+#	define LOG_ERROR(msg) {LOG4CXX_ERROR(logger, _LOG_HEAD<<msg);}
+#	define LOG_FATAL(msg) {LOG4CXX_FATAL(logger, _LOG_HEAD<<msg);}
 
 #	define DECLARE_LOGGER public: static log4cxx::LoggerPtr logger
 #	define CREATE_LOGGER(classname) log4cxx::LoggerPtr classname::logger = log4cxx::Logger::getLogger("yade." #classname)

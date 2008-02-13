@@ -60,6 +60,12 @@ int cmdGui::run(int argc, char *argv[]) {
 
 		PyRun_SimpleString("sys.excepthook=sys.__excepthook__"); // apport on ubuntu overrides this, not needed
 
+		if(!Omega::instance().getSimulationFileName().empty()){
+			string cmd="o=Omega(); o.load('"+Omega::instance().getSimulationFileName()+"'); o.run(); ";
+			LOG_INFO("Running command: `"<<cmd<<"'");
+			PyRun_SimpleString(cmd.c_str());
+		}
+
 		if(!runScript.empty()){
 			LOG_DEBUG("Will now run file `"<<runScript<<"'");
 			FILE* runScriptFILE=fopen(runScript.c_str(),"r");

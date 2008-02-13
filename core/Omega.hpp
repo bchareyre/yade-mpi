@@ -81,11 +81,11 @@ class Omega : public Singleton<Omega>
 		ptime				 msStartingPauseTime;
 		time_duration			 simulationPauseDuration;
 		string				 simulationFileName;
-		long int			 currentIteration;
-		Real				 simulationTime;
-		
-		
+		long int			currentIteration;
+		Real				simulationTime;
 		void buildDynlibDatabase(const vector<string>& dynlibsList); // FIXME - maybe in ClassFactory ?
+
+		public: long int stopAtIteration;
 
 	public :
 		shared_ptr<Preferences> preferences;
@@ -101,6 +101,7 @@ class Omega : public Singleton<Omega>
 		int     isoSec;
 		// dtto for gdb
 		string gdbCrashBatch;
+		string recoveryFilename;
 
 		// FIXME end
 		
@@ -133,9 +134,9 @@ class Omega : public Singleton<Omega>
 		time_duration	getSimulationPauseDuration();
 		
 		void		setSimulationFileName(const string);
-		string		getSimulationFileName();
+		string	getSimulationFileName();
 		void		loadSimulation();
-		void		saveSimulation(const string name);
+		void		saveSimulation(const string name, bool recover=false);
 
 		long int	getCurrentIteration();
 		void		incrementCurrentIteration();

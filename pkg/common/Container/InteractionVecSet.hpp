@@ -40,8 +40,8 @@ class InteractionVecSet : public InteractionContainer
 		virtual const shared_ptr<Interaction>& find(body_id_t id1,body_id_t id2);
 
 		virtual InteractionContainer::iterator begin();
-        	virtual InteractionContainer::iterator end();
-	
+     	virtual InteractionContainer::iterator end();
+
 		virtual unsigned int size();
 
 	REGISTER_CLASS_NAME(InteractionVecSet);

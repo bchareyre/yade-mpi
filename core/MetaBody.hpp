@@ -24,12 +24,22 @@ class MetaBody : public Body
 		shared_ptr<InteractionContainer>	persistentInteractions; // disappear, reappear according to physical (or any other non-spatial) criterion
 		shared_ptr<InteractionContainer>	transientInteractions;	// disappear, reappear according to spatial criterion
 		shared_ptr<PhysicalActionContainer>	physicalActions;
-	
+
 		MetaBody ();
 
 		void moveToNextTimeStep();
 
 		void setTimeSteppersActive(bool a); // FIXME - wtf ?
+
+		/* Recovery stuff: copy of state variables from Omega that should be copied back over. 	
+		 *	Copying is being done ine Omega::loadSimulation and Omega::saveSimulation -- keep vars in sync.
+		 * */
+		bool recover;
+		Real recoverDt;
+		long recoverCurrentIteration;
+		long recoverStopAtIteration;
+		Real recoverSimulationTime;
+
 
 /// Serialization
 	protected :

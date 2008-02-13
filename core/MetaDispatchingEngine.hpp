@@ -25,8 +25,11 @@ class MetaDispatchingEngine : public Engine
 
 		typedef list<shared_ptr<EngineUnit> >::iterator EngineUnitListIterator;
 		
-		virtual void add( string , string , shared_ptr<EngineUnit> eu = shared_ptr<EngineUnit>()) {throw;}
-		virtual void add( string , string , string , shared_ptr<EngineUnit> eu = shared_ptr<EngineUnit>()) {throw;}
+		//virtual void add( string , string , shared_ptr<EngineUnit> eu = shared_ptr<EngineUnit>()) {throw;}
+		//virtual void add( string , string , string , shared_ptr<EngineUnit> eu = shared_ptr<EngineUnit>()) {throw;}
+		virtual void add(shared_ptr<EngineUnit> eu=shared_ptr<EngineUnit>()) {throw;}
+		virtual void add(EngineUnit*) {throw;}
+		virtual void add(string) {throw;}
 		
 		void storeFunctorName(const string& baseClassName1, const string& libName, shared_ptr<EngineUnit> eu);
 		void storeFunctorName(const string& baseClassName1, const string& baseClassName2, const string& libName, shared_ptr<EngineUnit> eu);

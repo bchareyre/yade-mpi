@@ -24,6 +24,7 @@ MetaBody::MetaBody() :
 {	
 	engines.clear();
 	initializers.clear();
+	recover=false;
 }
 
 
@@ -52,6 +53,12 @@ void MetaBody::registerAttributes()
 	REGISTER_ATTRIBUTE(transientInteractions);
 	REGISTER_ATTRIBUTE(persistentInteractions);
 	REGISTER_ATTRIBUTE(physicalActions); // FIXME - needed or not ? - Olivier : yes it is needed if there is no default initialization into constructor
+
+	REGISTER_ATTRIBUTE(recover);
+	REGISTER_ATTRIBUTE(recoverDt);
+	REGISTER_ATTRIBUTE(recoverCurrentIteration);
+	REGISTER_ATTRIBUTE(recoverStopAtIteration);
+	REGISTER_ATTRIBUTE(recoverSimulationTime);
 }
 
 

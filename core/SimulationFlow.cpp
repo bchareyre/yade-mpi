@@ -17,6 +17,11 @@ void SimulationFlow::singleAction()
 		Omega::instance().getRootBody()->moveToNextTimeStep();
 		Omega::instance().incrementCurrentIteration();
 		Omega::instance().incrementSimulationTime();
+		if(Omega::instance().stopAtIteration>0 && Omega::instance().getCurrentIteration()==Omega::instance().stopAtIteration){
+			cerr<<"PAUSE at iteration #"<<Omega::instance().getCurrentIteration()<<" as requested."<<endl;
+			setTerminate(true);
+			return;
+		}
 	}
 };
 

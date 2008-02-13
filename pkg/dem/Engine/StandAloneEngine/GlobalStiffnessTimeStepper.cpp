@@ -178,9 +178,11 @@ void GlobalStiffnessTimeStepper::computeTimeStep(Body* body)
 		//cerr << "GlobalStiffnessTimeStepper, timestep chosen is:" << Omega::instance().getTimeStep() << endl;
 	}
 	else if (!computedOnce) Omega::instance().setTimeStep(defaultDt);
-	if (Omega::instance().getCurrentIteration() % 100 == 0) LOG_INFO("computed timestep " << newDt <<
-		(Omega::instance().getTimeStep()==newDt ? string(", appplied") :
-		string(", BUT timestep is ")+lexical_cast<string>(Omega::instance().getTimeStep()))<<".");
+
+	//if (Omega::instance().getCurrentIteration() % 100 == 0)
+		LOG_INFO("computed timestep " << newDt <<
+			(Omega::instance().getTimeStep()==newDt ? string(", appplied") :
+			string(", BUT timestep is ")+lexical_cast<string>(Omega::instance().getTimeStep()))<<".");
 }
 
 YADE_PLUGIN();
