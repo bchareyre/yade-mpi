@@ -86,7 +86,7 @@ using namespace std;
 
 
 typedef pair<Vector3r, Real> BasicSphere;
-//! make a list of spheres non-overlapping sphere
+//! generate a list of non-overlapping spheres
 string GenerateCloud(vector<BasicSphere>& sphere_list, Vector3r lowerCorner, Vector3r upperCorner, long number, Real rad_std_dev, Real porosity);
 
 
@@ -550,7 +550,11 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	interactionGeometryDispatcher->add("InteractingBox2InteractingSphere4SpheresContactGeometry");
 
 	shared_ptr<InteractionPhysicsMetaEngine> interactionPhysicsDispatcher(new InteractionPhysicsMetaEngine);
-	interactionPhysicsDispatcher->add("SimpleElasticRelationships");
+//	interactionPhysicsDispatcher->add("SimpleElasticRelationships");
+// Unhandled exception: St13runtime_error : Class `SimpleElasticRelationships' could not be cast to required 2D EngineUnit	
+	shared_ptr<InteractionPhysicsEngineUnit> ss(new SimpleElasticRelationships);
+	interactionPhysicsDispatcher->add(ss);
+	
 		
 	shared_ptr<BoundingVolumeMetaEngine> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeMetaEngine>(new BoundingVolumeMetaEngine);
 	boundingVolumeDispatcher->add("InteractingSphere2AABB");

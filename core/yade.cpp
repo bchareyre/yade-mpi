@@ -88,6 +88,7 @@ void firstRunSetup(shared_ptr<Preferences>& pref)
 }
 
 string findRecoveryCandidate(filesystem::path dir, string start){
+#if BOOST_VERSION > 103400
 	if(!filesystem::exists(dir)) return false;
 	filesystem::directory_iterator end;
 	for(filesystem::directory_iterator I(dir); I!=end; ++I){
@@ -95,6 +96,7 @@ string findRecoveryCandidate(filesystem::path dir, string start){
 			return (I->path()).string();
 		}
 	}
+#endif
 	return "";
 }
 
