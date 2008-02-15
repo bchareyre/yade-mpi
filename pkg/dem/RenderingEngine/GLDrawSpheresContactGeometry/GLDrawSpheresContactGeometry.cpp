@@ -58,7 +58,7 @@ void GLDrawSpheresContactGeometry::go(
 		glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
 		
 	// FIXME - we need a way to give parameters from outside, again.... so curerntly this scale is hardcoded here
-		if( (!ip->isNew) && /*ip->isReal &&*/ ip->interactionPhysics)
+		if( (!ip->isNew) && ip->isReal && ip->interactionPhysics)
 		{
 			Real force = el->normalForce.Length()/600;
 			forceMax = std::max(force,forceMax);
