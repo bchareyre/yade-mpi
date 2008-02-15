@@ -164,18 +164,21 @@ void TriaxialStressController::controlExternalStress(int wall, MetaBody* ncb, Ve
 	//bool log=((wall==3) && (Omega::instance().getCurrentIteration()%200==0));
 	const bool log=false;
 	if(log) LOG_DEBUG("wall="<<wall<<" actualForce="<<static_cast<Force*>(ncb->physicalActions->find(wall_id[wall],ForceClassIndex).get() )->force<<", resultantForce="<<resultantForce<<", translation="<<translation);
+	//cerr << "wall="<<wall<<" actualForce="<<static_cast<Force*>(ncb->physicalActions->find(wall_id[wall],ForceClassIndex).get() )->force<<", resultantForce="<<resultantForce<<", deltaF="<<translation << endl;
 	if (translation!=0)
 	{
+	//cerr << "stiffness = " << stiffness[wall];
 	   if (stiffness[wall]!=0)
 	   {
 			translation /= stiffness[wall];
 			if(log) TRVAR2(translation,wall_max_vel*Omega::instance().getTimeStep())
-			translation = std::min( abs(translation), wall_max_vel*Omega::instance().getTimeStep() ) * Mathr::Sign(translation);
+			translation = std::min( std::abs(translation), wall_max_vel*Omega::instance().getTimeStep() ) * Mathr::Sign(translation);
 	   }
 	   else
-		translation = wall_max_vel * Mathr::Sign(translation);
+		translation = wall_max_vel * Mathr::Sign(translation)*Omega::instance().getTimeStep();
 	}
 	previousTranslation[wall] = (1-wallDamping)*translation*normal[wall];// + 0.7*previousTranslation[wall];// formula for "steady-flow" evolution with fluctuations
+	//cerr << "translation = " << previousTranslation[wall] << endl;
 	p->se3.position += previousTranslation[wall];
 	if(log)TRVAR2(previousTranslation,p->se3.position);
 }
@@ -315,7 +318,7 @@ void TriaxialStressController::controlInternalStress(MetaBody* ncb, Real multipl
 Real TriaxialStressController::ComputeUnbalancedForce(Body * body, bool maxUnbalanced)
 {
 	//compute the mean contact force
-	Real MeanForce=0;
+	Real MeanForce = 0.f;
 	long nForce = 0;
 
 	MetaBody * ncb = static_cast<MetaBody*>(body);
@@ -326,10 +329,10 @@ Real TriaxialStressController::ComputeUnbalancedForce(Body * body, bool maxUnbal
 	for(  ; ii!=iiEnd ; ++ii ) {
 		if ((*ii)->isReal) {
 			const shared_ptr<Interaction>& contact = *ii;
-			Real fn = (static_cast<ElasticContactInteraction*> (contact->interactionPhysics.get()))->normalForce.Length();
+			Real fn = (static_cast<ElasticContactInteraction*> ((contact->interactionPhysics.get()))->normalForce+static_cast<ElasticContactInteraction*>(contact->interactionPhysics.get())->shearForce).SquaredLength();
 			if (fn!=0)
 			{
-			MeanForce += (static_cast<ElasticContactInteraction*> (contact->interactionPhysics.get()))->normalForce.Length();
+			MeanForce += Mathr::Sqrt(fn);
 			++nForce;
 			}
 		}
@@ -352,7 +355,7 @@ Real TriaxialStressController::ComputeUnbalancedForce(Body * body, bool maxUnbal
 				if (f!=0) ++nBodies;
 			}
 		}
-		if (nBodies != 0 && MeanForce != 0) MeanUnbalanced = MeanUnbalanced/nBodies/MeanForce;
+		if (nBodies != 0 && MeanForce != 0) MeanUnbalanced = 0.5*MeanUnbalanced/nBodies/MeanForce;
 		return  MeanUnbalanced;
 	} else {
 		//compute max Unbalanced Force

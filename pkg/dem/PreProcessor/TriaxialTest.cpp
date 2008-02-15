@@ -141,7 +141,7 @@ TriaxialTest::TriaxialTest () : FileGenerator()
 	
 	dampingForce = 0.2;
 	dampingMomentum = 0.2;
-	defaultDt = 1;
+	defaultDt = 0.001;
 	
 	timeStepUpdateInterval = 50;
 	timeStepOutputInterval = 50;
@@ -149,7 +149,7 @@ TriaxialTest::TriaxialTest () : FileGenerator()
 	radiusControlInterval = 10;
 	numberOfGrains = 400;
 	strainRate = 0.1;
-	maxWallVelocity=0.01;
+	maxWallVelocity=10;
 	StabilityCriterion = 0.01;
 	autoCompressionActivation = false;
 	maxMultiplier = 1.01;
@@ -677,8 +677,8 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	
 		
 	rootBody->engines.push_back(averagePositionRecorder);
-	rootBody->engines.push_back(velocityRecorder);
-	rootBody->engines.push_back(forcerec);
+	//rootBody->engines.push_back(velocityRecorder);
+	//rootBody->engines.push_back(forcerec);
 	
 	if (saveAnimationSnapshots) {
 	shared_ptr<PositionOrientationRecorder> positionOrientationRecorder(new PositionOrientationRecorder);

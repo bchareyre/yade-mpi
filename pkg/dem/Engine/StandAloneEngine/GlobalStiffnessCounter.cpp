@@ -44,7 +44,7 @@ void GlobalStiffnessCounter::registerAttributes()
 
 bool GlobalStiffnessCounter::isActivated()
 {
-	return ((Omega::instance().getCurrentIteration() % interval == 0) || (Omega::instance().getCurrentIteration() < 100));
+	return ((Omega::instance().getCurrentIteration() % interval == 0) || (Omega::instance().getCurrentIteration() < (long int) 2));
 }
 
 
@@ -52,8 +52,8 @@ bool GlobalStiffnessCounter::getSphericalElasticInteractionParameters(const shar
 	shared_ptr<SpheresContactGeometry> currentContactGeometry=static_pointer_cast<SpheresContactGeometry>(contact->interactionGeometry);
 	shared_ptr<ElasticContactInteraction> currentContactPhysics=static_pointer_cast<ElasticContactInteraction>(contact->interactionPhysics);
 
-	Real fn=currentContactPhysics->normalForce.Length();
-	if(fn<Mathr::EPSILON) return false; // FIXME: sharp comparison of floats will be false on machine-zeros (like 2.3333e-18 etc.): should be Mathr::EPSILON*someScaleFactor
+	Real fn=currentContactPhysics->normalForce.SquaredLength();
+	if(fn==0) return false;//This test means : is something happening at this contact : no question about numerical error
 	normal=currentContactGeometry->normal;
 	radius1=currentContactGeometry->radius1; radius2=currentContactGeometry->radius2;
 	kn=currentContactPhysics->kn; ks=currentContactPhysics->ks;

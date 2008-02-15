@@ -175,9 +175,10 @@ void GlobalStiffnessTimeStepper::computeTimeStep(Body* body)
 		//Omega::instance().setTimeStep(newDt);
 		computedOnce = true;	
 		//cerr << "computedOnce=" << computedOnce << endl;	
-		//cerr << "GlobalStiffnessTimeStepper, timestep chosen is:" << Omega::instance().getTimeStep() << endl;
+		cerr << "computed timestep is:" << min(newDt , defaultDt);
 	}
 	else if (!computedOnce) Omega::instance().setTimeStep(defaultDt);
+	cerr << " new timestep is:" << Omega::instance().getTimeStep() << endl;
 
 	//if (Omega::instance().getCurrentIteration() % 100 == 0)
 		LOG_INFO("computed timestep " << newDt <<

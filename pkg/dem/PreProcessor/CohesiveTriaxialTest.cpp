@@ -126,14 +126,14 @@ CohesiveTriaxialTest::CohesiveTriaxialTest () : FileGenerator()
 
 	dampingForce = 0.2;
 	dampingMomentum = 0.2;
-	defaultDt = 1;
+	defaultDt = 0.001;
 	
 	timeStepUpdateInterval = 50;
 	timeStepOutputInterval = 50;
 	wallStiffnessUpdateInterval = 10;
 	radiusControlInterval = 10;
 	numberOfGrains = 400;
-	strainRate = 0.1;
+	strainRate = 10;
 	StabilityCriterion = 0.01;
 	autoCompressionActivation = false;
 	maxMultiplier = 1.01;
