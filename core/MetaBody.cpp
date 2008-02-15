@@ -25,6 +25,12 @@ MetaBody::MetaBody() :
 	engines.clear();
 	initializers.clear();
 	recover=false;
+
+	// I must assign something to avoid "nan" when loading. When recover=false, those can be "nan" and lead to crash.
+	recoverDt=1;
+	recoverCurrentIteration=1;
+	recoverStopAtIteration=1;
+	recoverSimulationTime=1;
 }
 
 
