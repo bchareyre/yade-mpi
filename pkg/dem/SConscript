@@ -568,6 +568,8 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'BodyRedirectionVector',
 			'InteractingSphere',
 			'InteractingBox',
+			'InteractingSphere2InteractingSphere4DistantSpheresContactGeometry',
+			'InteractingBox2InteractingSphere4SpheresContactGeometry',
 			'CundallNonViscousMomentumDamping',
 			'CundallNonViscousForceDamping',
 			'MetaInteractingGeometry',

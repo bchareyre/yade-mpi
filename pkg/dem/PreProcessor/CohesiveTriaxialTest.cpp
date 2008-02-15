@@ -42,6 +42,8 @@
 
 #include<yade/pkg-common/GravityEngine.hpp>
 #include<yade/pkg-dem/HydraulicForceEngine.hpp>
+#include<yade/pkg-dem/InteractingSphere2InteractingSphere4DistantSpheresContactGeometry.hpp>
+#include<yade/pkg-dem/InteractingBox2InteractingSphere4SpheresContactGeometry.hpp>
 #include<yade/pkg-common/PhysicalActionApplier.hpp>
 #include<yade/pkg-common/PhysicalActionDamper.hpp>
 #include<yade/pkg-common/CundallNonViscousForceDamping.hpp>
@@ -575,8 +577,10 @@ void CohesiveTriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	physicalActionInitializer->physicalActionNames.push_back("GlobalStiffness");
 	
 	shared_ptr<InteractionGeometryMetaEngine> interactionGeometryDispatcher(new InteractionGeometryMetaEngine);
-	interactionGeometryDispatcher->add("InteractingSphere2InteractingSphere4DistantSpheresContactGeometry");
-	interactionGeometryDispatcher->add("InteractingBox2InteractingSphere4SpheresContactGeometry");
+	shared_ptr<InteractionGeometryEngineUnit> s1(new InteractingSphere2InteractingSphere4DistantSpheresContactGeometry);
+	interactionGeometryDispatcher->add(s1);
+	shared_ptr<InteractionGeometryEngineUnit> s2(new InteractingBox2InteractingSphere4SpheresContactGeometry);
+	interactionGeometryDispatcher->add(s2);
 
 	shared_ptr<CohesiveFrictionalRelationships> cohesiveFrictionalRelationships = shared_ptr<CohesiveFrictionalRelationships> (new CohesiveFrictionalRelationships);
 	cohesiveFrictionalRelationships->shearCohesion = shearCohesion;
@@ -644,7 +648,7 @@ void CohesiveTriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	triaxialcompressionEngine-> stiffnessUpdateInterval = wallStiffnessUpdateInterval;// = stiffness update interval
 	triaxialcompressionEngine-> radiusControlInterval = radiusControlInterval;// = stiffness update interval
 	triaxialcompressionEngine-> sigma_iso = sigma_iso;
-	triaxialcompressionEngine-> max_vel = 1;
+	triaxialcompressionEngine-> max_vel = 0.01;
 	triaxialcompressionEngine-> thickness = thickness;
 	triaxialcompressionEngine->strainRate = strainRate;
 	triaxialcompressionEngine->StabilityCriterion = StabilityCriterion;
