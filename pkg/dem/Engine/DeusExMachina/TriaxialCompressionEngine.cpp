@@ -126,7 +126,8 @@ void TriaxialCompressionEngine::updateParameters(Body * body)
 	MetaBody * ncb = static_cast<MetaBody*>(body);
 
 	if (Omega::instance().getCurrentIteration() % 100 == 0) {
-		LOG_INFO("UnbalancedForce="<<UnbalancedForce);
+		LOG_INFO("UnbalancedForce="<< UnbalancedForce);
+		cerr << "UnbalancedForce=" << UnbalancedForce << endl;
 		/* TRVAR1(meanStress);*/ /* TRVAR2(stateName(currentState),sigma_iso); */
 	}
 
@@ -197,6 +198,9 @@ void TriaxialCompressionEngine::applyCondition(Body * body)
         }
     }
 	 if (currentState==STATE_TRIAX_LOADING) {
+	 if (Omega::instance().getCurrentIteration() % 100 == 0) {
+            cerr << "Compression started" << endl;
+            }
         // if (Omega::instance().getCurrentIteration() % 100 == 0) LOG_DEBUG("Compression active.");
         Real dt = Omega::instance().getTimeStep();
 
