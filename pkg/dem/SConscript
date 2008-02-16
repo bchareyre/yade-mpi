@@ -789,6 +789,13 @@ env.SharedLibrary('MakeItFlat',
 			'$PREFIX/include',
 			'DataClass/PhysicalParameters']),
 			
+env.SharedLibrary('StaticSpheresAttractionEngine',
+		['Engine/DeusExMachina/StaticSpheresAttractionEngine.cpp'],
+		LIBS=env['LIBS']+['yade-base',  'Sphere', 'StaticAttractionEngine', 'ElasticContactInteraction'],
+		CPPPATH=env['CPPPATH']+['Engine/DeusExMachina',
+			'DataClass/GeometricalModel',
+			'$PREFIX/include']),
+			
 env.SharedLibrary('HydraulicTest',
 		['PreProcessor/HydraulicTest.cpp'],
 		LIBS=env['LIBS']+['SDECLinkGeometry',
