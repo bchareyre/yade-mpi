@@ -83,18 +83,6 @@ void TriaxialCompressionEngine::doStateTransition(stateNum nextState){
 		wall_bottom_activated=false;
 		wall_top_activated=false;
 		if(currentState==STATE_ISO_UNLOADING){ LOG_INFO("Speres -> /tmp/unloaded.spheres"); Shop::saveSpheresToFile("/tmp/unloaded.spheres"); }
-		if(1){
-			max_vel*=20;
-			Shop::createCohesion(1e-4,1e-4,0); // (boost::lambda::_1 %2==0) && (boost::lambda::_2%2==0));
-			/*shared_ptr<MetaBody> rootBody=Omega::instance().getRootBody();
-			for(vector<shared_ptr<Engine> >::iterator I=rootBody->engines.begin(); I!=rootBody->engines.end(); ++I){
-				if((*I)->getClassName()=="PersistentSAPCollider") {
-					rootBody->engines.erase(I);
-					LOG_DEBUG("Removed PersistentSAPCollider engine.");
-					break;
-				}
-			}*/
-		}
 		if(!firstRun) saveSimulation=true; // saving snapshot .xml will actually be done in ::applyCondition
 	}
 	else if(currentState==STATE_ISO_COMPACTION && nextState==STATE_ISO_UNLOADING){

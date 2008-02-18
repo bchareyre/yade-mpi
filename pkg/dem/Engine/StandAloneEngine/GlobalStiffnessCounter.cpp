@@ -66,21 +66,10 @@ bool GlobalStiffnessCounter::getInteractionParameters(const shared_ptr<Interacti
 	shared_ptr<ElasticContactInteraction> phys1=dynamic_pointer_cast<ElasticContactInteraction>(contact->interactionPhysics);
 	if(geom1 && phys1){
 		Real fn=phys1->normalForce.Length();
-		if(fn<Mathr::EPSILON) return false; // FIXME: sharp comparison of floats will be false on machine-zeros (like 2.3333e-18 etc.): should be Mathr::EPSILON*someScaleFactor
+		if(fn==0) return false;
 		normal=geom1->normal;
 		radius1=geom1->radius1; radius2=geom1->radius2;
 		kn=phys1->kn; ks=phys1->ks;
-		return true;
-	}
-
-	shared_ptr<SpheresContactGeometry> geom2=dynamic_pointer_cast<SpheresContactGeometry>(contact->interactionGeometry);
-	shared_ptr<BrefcomContact> phys2=dynamic_pointer_cast<BrefcomContact>(contact->interactionPhysics);
-	if(geom2 && phys2){
-		Real fn=phys2->Fn.Length();
-		if(fn<Mathr::EPSILON) return false; // FIXME: sharp comparison of floats will be false on machine-zeros (like 2.3333e-18 etc.): should be Mathr::EPSILON*someScaleFactor
-		normal=geom2->normal;
-		radius1=geom2->radius1; radius2=geom2->radius2;
-		kn=phys2->Kn; ks=phys2->Ks;
 		return true;
 	}
 
@@ -88,11 +77,17 @@ bool GlobalStiffnessCounter::getInteractionParameters(const shared_ptr<Interacti
 	shared_ptr<SDECLinkPhysics> phys3=dynamic_pointer_cast<SDECLinkPhysics>(contact->interactionPhysics);
 	if(geom3 && phys3){
 		Real fn=phys3->normalForce.Length();
-		if(fn<Mathr::EPSILON) return false; // FIXME: sharp comparison of floats will be false on machine-zeros (like 2.3333e-18 etc.): should be Mathr::EPSILON*someScaleFactor
+		if(fn==0) return false;
 		normal=geom3->normal;
 		radius1=geom3->radius1; radius2=geom3->radius2;
 		kn=phys3->kn; ks=phys3->ks;
 		return true;
+	}
+
+	shared_ptr<SpheresContactGeometry> geom2=dynamic_pointer_cast<SpheresContactGeometry>(contact->interactionGeometry);
+	shared_ptr<BrefcomContact> phys2=dynamic_pointer_cast<BrefcomContact>(contact->interactionPhysics);
+	if(geom2 && phys2){
+		return false; // FIXME, adapt to refactored Brefcom
 	}
 
 	return false;
