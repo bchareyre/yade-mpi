@@ -106,7 +106,7 @@ void Shop::init(){
 	setDefault<int>("body_sdecGroupMask",55);
 	
 	setDefault("phys_density",2e3);
-	setDefault("phys_young",30e7); // 30e10
+	setDefault("phys_young",30e10);
 	setDefault("phys_poisson",.3);
 	setDefault("phys_frictionAngle",0.5236); //30˚
 	setDefault("phys_se3_orientation",Quaternionr(Vector3r(0,0,1),0));

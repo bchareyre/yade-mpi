@@ -268,7 +268,7 @@ void USCTGen::createEngines(){
 		applyActionDispatcher->add(new NewtonsForceLaw);
 		applyActionDispatcher->add(new NewtonsMomentumLaw);
 		rootBody->engines.push_back(applyActionDispatcher);
-	
+
 	shared_ptr<PhysicalParametersMetaEngine> positionIntegrator(new PhysicalParametersMetaEngine);
 		positionIntegrator->add(new LeapFrogPositionIntegrator); //DISPATCHER_ADD2(ParticleParameters,LeapFrogPositionIntegrator);
 		rootBody->engines.push_back(positionIntegrator);
@@ -286,7 +286,6 @@ void USCTGen::createEngines(){
 	globalStiffnessTimeStepper->timeStepUpdateInterval=100;
 	globalStiffnessTimeStepper->defaultDt=1e-6;
 	rootBody->engines.push_back(globalStiffnessTimeStepper);
-
 
 	rootBody->engines.push_back(globalStiffnessCounter);
 }

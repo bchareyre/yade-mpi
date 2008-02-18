@@ -31,17 +31,17 @@ class BrefcomMakeContact: public InteractionPhysicsEngineUnit{
 		/* uniaxial traction resistance, uniaxial compression resistance, fracture energy, elastic/softening modulus ratio */
 		Real sigmaT, sigmaC, Gf, zeta;
 
-		BrefcomMakeContact(){ alpha=2.5; beta=2.0; gamma=2.65; sigmaT=3e6, sigmaC=30e6; Gf=1e5; zeta=10; }
+		BrefcomMakeContact(){ alpha=3.7; beta=2.198; gamma=3.79; sigmaT=3e6; sigmaC=30e6; }
 		virtual void go(const shared_ptr<PhysicalParameters>& pp1, const shared_ptr<PhysicalParameters>& pp2, const shared_ptr<Interaction>& interaction);
 		virtual void registerAttributes(){
 			InteractionPhysicsEngineUnit::registerAttributes();
 			REGISTER_ATTRIBUTE(alpha);
 			REGISTER_ATTRIBUTE(beta);
 			REGISTER_ATTRIBUTE(gamma);
-			REGISTER_ATTRIBUTE(sigmaT);
+			/* REGISTER_ATTRIBUTE(sigmaT);
 			REGISTER_ATTRIBUTE(sigmaC);
 			REGISTER_ATTRIBUTE(Gf);
-			REGISTER_ATTRIBUTE(zeta);
+			REGISTER_ATTRIBUTE(zeta); */
 		}
 
 		FUNCTOR2D(BodyMacroParameters,BodyMacroParameters);
@@ -65,45 +65,40 @@ class BrefcomContact: public InteractionPhysics {
 	private:
 	public:
 		/*! Fundamental parameters (constants) */
-		Real d0, Kn, Ks, zeta, frictionAngle, FnMax, cohesion;
-		/*! Fundamental state variables */
-		Real omegaPl;
-		/* prevNormal is oriented A→B (as in SpheresContactGeometry); OTOH, Fs is as it applies to B */
-		Vector3r prevNormal, Fs; // shear force is cummulative, this must be remembered
-		Vector3r Fn; // normal force, as applied to A
-		bool isStructural; // whether this is "neighbour" or just "meeting" contact
-		/* calculated by deduceOtherParams (called at every iteration); first two are constants as well, other two depend on damage. */
-		Real dPeak, dBreak, d0_curr, dPeak_curr, cohesion_curr, FnMax_curr;
-		void deduceOtherParams(void){
-			dBreak=d0+(FnMax/Kn)*(1+zeta);
-			dPeak=d0+(FnMax/Kn);
-			d0_curr=d0+omegaPl*(dBreak-d0); //FIXME!!!! this may be negative?!!!!
-			dPeak_curr=dPeak+omegaPl*(dBreak-dPeak);
-			FnMax_curr=FnMax*(1-omegaPl);
-			cohesion_curr=cohesion*(1-omegaPl);
-			// if(Omega::instance().getCurrentIteration()%100==0 && omegaPl>=1){ TRVAR4(d0,omegaPl,d0_curr,FnMax_curr); }
-		} 
-		/* debugging */
-		Real prevFn;
+		Real Kn, Kt, frictionAngle, undamagedCohesion, equilibriumDist, crossSection, epsCracking, epsFracture, xiShear;
+		/*! Up to now maximum normal strain */
+		Real kappaD;
+		/* prevNormal is oriented A→B (as in SpheresContactGeometry); */
+		Vector3r prevNormal;
+		/* previous tangential (shear) strain */
+		Vector3r epsT;
+		/* if not cohesive, equivalent to damage being always 1 */
+		bool isCohesive; // FIXME: not yet implemented
 
-		BrefcomContact(): InteractionPhysics(){ createIndex(); /* just in case someone forgets */ Fs=Vector3r::ZERO; Fn=Vector3r::ZERO; omegaPl=0; isStructural=false; }
+		/* auxiliary variable for visualization, always recalculated by BrefcomLaw */
+		Real omega;
+
+		BrefcomContact(): InteractionPhysics(),Kn(0), Kt(0), frictionAngle(0), undamagedCohesion(0), equilibriumDist(0), crossSection(0), xiShear(0) { createIndex(); epsT=Vector3r::ZERO; kappaD=0; isCohesive=false; }
+		BrefcomContact(Real _Kn, Real _Ks, Real _frictionAngle, Real _undamagedCohesion, Real _equilibriumDist, Real _crossSection, Real _epsCracking, Real _epsFracture, Real _xiShear=.3): InteractionPhysics(), Kn(_Kn), Kt(_Ks), frictionAngle(_frictionAngle), undamagedCohesion(_undamagedCohesion), equilibriumDist(_equilibriumDist), crossSection(_crossSection), epsCracking(_epsCracking), epsFracture(_epsFracture), xiShear(_xiShear) { epsT=Vector3r::ZERO; kappaD=0; isCohesive=false; }
+
 
 		void registerAttributes(){
 			InteractionPhysics::registerAttributes();
-			REGISTER_ATTRIBUTE(d0);
 			REGISTER_ATTRIBUTE(Kn);
-			REGISTER_ATTRIBUTE(Ks);
-			REGISTER_ATTRIBUTE(zeta);
+			REGISTER_ATTRIBUTE(Kt);
 			REGISTER_ATTRIBUTE(frictionAngle);
-			REGISTER_ATTRIBUTE(FnMax);
-			REGISTER_ATTRIBUTE(omegaPl);
+			REGISTER_ATTRIBUTE(undamagedCohesion);
+			REGISTER_ATTRIBUTE(equilibriumDist);
+			REGISTER_ATTRIBUTE(crossSection);
+			REGISTER_ATTRIBUTE(epsCracking);
+			REGISTER_ATTRIBUTE(epsFracture);
+			REGISTER_ATTRIBUTE(xiShear);
+
+			REGISTER_ATTRIBUTE(kappaD);
 			REGISTER_ATTRIBUTE(prevNormal);
-			REGISTER_ATTRIBUTE(Fs);
-			REGISTER_ATTRIBUTE(isStructural);
-			/*REGISTER_ATTRIBUTE(dPeak);
-			REGISTER_ATTRIBUTE(dBreak);
-			REGISTER_ATTRIBUTE(d0_curr);
-			REGISTER_ATTRIBUTE(dPeak_curr);*/
+			REGISTER_ATTRIBUTE(epsT);
+
+			REGISTER_ATTRIBUTE(isCohesive);
 		};
 
 	REGISTER_CLASS_NAME(BrefcomContact);
@@ -145,6 +140,9 @@ class BrefcomLaw: public InteractionSolver{
 		ofstream recStream;
 		vector<Real> recValues;
 		vector<string> recLabels;
+		void applyForce(const Vector3r);
+		Real funcH(Real);
+		Real funcG(Real);
 	public:
 		BrefcomLaw() {
 			/* cache indices for Force and Momentum */
