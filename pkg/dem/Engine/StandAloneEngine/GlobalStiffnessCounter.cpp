@@ -21,7 +21,7 @@
 #include<yade/pkg-dem/GlobalStiffness.hpp>
 #include "GlobalStiffnessCounter.hpp"
 
-#include<yade/extra/Brefcom.hpp>
+//#include<yade/extra/Brefcom.hpp>
 
 GlobalStiffnessCounter::GlobalStiffnessCounter() : InteractionSolver() , actionForce(new Force) , actionMomentum(new Momentum), actionStiffness(new GlobalStiffness)
 {
@@ -73,22 +73,22 @@ bool GlobalStiffnessCounter::getInteractionParameters(const shared_ptr<Interacti
 		return true;
 	}
 
-	shared_ptr<SDECLinkGeometry> geom3=dynamic_pointer_cast<SDECLinkGeometry>(contact->interactionGeometry);
-	shared_ptr<SDECLinkPhysics> phys3=dynamic_pointer_cast<SDECLinkPhysics>(contact->interactionPhysics);
-	if(geom3 && phys3){
-		Real fn=phys3->normalForce.Length();
-		if(fn==0) return false;
-		normal=geom3->normal;
-		radius1=geom3->radius1; radius2=geom3->radius2;
-		kn=phys3->kn; ks=phys3->ks;
-		return true;
-	}
-
-	shared_ptr<SpheresContactGeometry> geom2=dynamic_pointer_cast<SpheresContactGeometry>(contact->interactionGeometry);
-	shared_ptr<BrefcomContact> phys2=dynamic_pointer_cast<BrefcomContact>(contact->interactionPhysics);
-	if(geom2 && phys2){
-		return false; // FIXME, adapt to refactored Brefcom
-	}
+// 	shared_ptr<SDECLinkGeometry> geom3=dynamic_pointer_cast<SDECLinkGeometry>(contact->interactionGeometry);
+// 	shared_ptr<SDECLinkPhysics> phys3=dynamic_pointer_cast<SDECLinkPhysics>(contact->interactionPhysics);
+// 	if(geom3 && phys3){
+// 		Real fn=phys3->normalForce.Length();
+// 		if(fn==0) return false;
+// 		normal=geom3->normal;
+// 		radius1=geom3->radius1; radius2=geom3->radius2;
+// 		kn=phys3->kn; ks=phys3->ks;
+// 		return true;
+// 	}
+// 
+// 	shared_ptr<SpheresContactGeometry> geom2=dynamic_pointer_cast<SpheresContactGeometry>(contact->interactionGeometry);
+// 	shared_ptr<BrefcomContact> phys2=dynamic_pointer_cast<BrefcomContact>(contact->interactionPhysics);
+// 	if(geom2 && phys2){
+// 		return false; // FIXME, adapt to refactored Brefcom
+// 	}
 
 	return false;
 }
@@ -149,7 +149,7 @@ void GlobalStiffnessCounter::action(Body* body)
 	//	Real dt = Omega::instance().getTimeStep();
 
 	/// transient Links
-	traverseInteractions(ncb,ncb->transientInteractions, /*spheresOnly? */ false);
+	traverseInteractions(ncb,ncb->transientInteractions, /*spheresOnly? */ true);
 
 	/* ignore pesistent links, unused */
 	// traverseInteractions(ncb,ncb->persistentInteractions);
