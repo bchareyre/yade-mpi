@@ -1,27 +1,12 @@
 Import('*')
 
-#if 'EMBED_PYTHON' in env['CPPDEFINES']:
-#	env.Install('$PREFIX/lib/yade$SUFFIX/extra',[
-#		env.SharedLibrary('PythonRecorder',['clump/PythonRecorder.cpp']),
-#		env.SharedLibrary('_pyade',['clump/pyade.cpp'],SHLIBPREFIX='',LIBS=env['LIBS']+['yade-base','ParticleParameters','RigidBodyParameters']),
-#		env.File('clump/pyade.py')])
-
-#import os.path, os
-#brefcomMaterialModel=os.environ['HOME']+'/yade/brefcom-mm.hh'
-#if os.path.exists(brefcomMaterialModel):
-#	print "Will include local file "+brefcomMaterialModel
-#	brefcomInclude='-include '+brefcomMaterialModel
-#else:
-#	brefcomInclude=''
-
-
-#import os.path, os
-#brefcomMaterialModel='../brefcom-mm.hh'
-#if os.path.exists('../'+brefcomMaterialModel):
-#	print "Will include local file "+brefcomMaterialModel
-#	brefcomInclude=['-include',brefcomMaterialModel]
-#else:
-#	brefcominclude=''
+import os.path, os
+brefcomMaterialModel='../brefcom-mm.hh'
+if os.path.exists('../'+brefcomMaterialModel):
+	print "Will include local file "+brefcomMaterialModel
+	brefcomInclude=['-include',brefcomMaterialModel]
+else:
+	brefcomInclude=['']
 
 env.Install('$PREFIX/lib/yade$SUFFIX/extra',[
 	env.SharedLibrary('SphericalDEMSimulator',
@@ -64,7 +49,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/extra',[
 
 	env.SharedLibrary('UniaxialStrainControlledTest',['usct/UniaxialStrainControlledTest.cpp'],LIBS=env['LIBS']+['Shop','GlobalStiffnessTimeStepper','GlobalStiffnessCounter']),
 
-#	env.SharedLibrary('Brefcom',['Brefcom.cpp'],CXXFLAGS=env['CXXFLAGS']+brefcomInclude,LIBS=env['LIBS']+['Shop','InteractingSphere2InteractingSphere4DistantSpheresContactGeometry']),
+	env.SharedLibrary('Brefcom',['Brefcom.cpp'],CXXFLAGS=env['CXXFLAGS']+brefcomInclude,LIBS=env['LIBS']+['Shop','InteractingSphere2InteractingSphere4DistantSpheresContactGeometry']),
 
 	env.SharedLibrary('BrefcomTestGen',['BrefcomTestGen.cpp'],LIBS=env['LIBS']+['Shop','UniaxialStrainControlledTest']),
 

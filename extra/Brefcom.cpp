@@ -35,6 +35,9 @@ void BrefcomMakeContact::go(const shared_ptr<PhysicalParameters>& pp1, const sha
 		//Real d0=(elast1->se3.position-elast2->se3.position).Length();
 		Real Kn=(E12*S12/d0)*((1+alpha)/(beta*(1+nu12)+gamma*(1-alpha*nu12)));
 
+		/* recommend default values for parameters
+		 * propose ways to determine them exactly
+		 * */
 		shared_ptr<BrefcomContact> contPhys(new BrefcomContact(
 			/* Kn */ Kn,
 			/* Kt */ Kn*(1-alpha*nu12)/(1+nu12),
