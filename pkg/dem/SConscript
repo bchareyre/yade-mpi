@@ -236,8 +236,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'Momentum',
 			'Sphere',
 			'RigidBodyParameters',
-			'GlobalStiffness',
-			'Brefcom']),
+			'GlobalStiffness' ]),
 
 	env.SharedLibrary('GlobalStiffnessTimeStepper',
 		['Engine/StandAloneEngine/GlobalStiffnessTimeStepper.cpp'],
