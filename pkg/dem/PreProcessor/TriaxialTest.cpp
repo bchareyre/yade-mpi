@@ -151,7 +151,7 @@ TriaxialTest::TriaxialTest () : FileGenerator()
 	strainRate = 0.1;
 	maxWallVelocity=10;
 	StabilityCriterion = 0.01;
-	autoCompressionActivation = false;
+	autoCompressionActivation = true;
 	maxMultiplier = 1.01;
 	finalMaxMultiplier = 1.001;
 	
@@ -659,12 +659,13 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	rootBody->engines.push_back(interactionGeometryDispatcher);
 	rootBody->engines.push_back(interactionPhysicsDispatcher);
 	rootBody->engines.push_back(elasticContactLaw);
-	rootBody->engines.push_back(elasticCohesiveLaw);
-	rootBody->engines.push_back(triaxialcompressionEngine);
+	//rootBody->engines.push_back(elasticCohesiveLaw);
+	
 	//rootBody->engines.push_back(stiffnesscounter);
 	//rootBody->engines.push_back(stiffnessMatrixTimeStepper);
 	rootBody->engines.push_back(globalStiffnessCounter);
 	rootBody->engines.push_back(globalStiffnessTimeStepper);
+	rootBody->engines.push_back(triaxialcompressionEngine);
 	rootBody->engines.push_back(triaxialStateRecorder);
 	//rootBody->engines.push_back(gravityCondition);
 	rootBody->engines.push_back(actionDampingDispatcher);

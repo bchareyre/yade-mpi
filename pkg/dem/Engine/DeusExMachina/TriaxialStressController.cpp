@@ -355,7 +355,7 @@ Real TriaxialStressController::ComputeUnbalancedForce(Body * body, bool maxUnbal
 				if (f!=0) ++nBodies;
 			}
 		}
-		if (nBodies != 0 && MeanForce != 0) MeanUnbalanced = 0.5*MeanUnbalanced/nBodies/MeanForce;
+		if (nBodies != 0 && MeanForce != 0) MeanUnbalanced = MeanUnbalanced/nBodies/MeanForce;
 		return  MeanUnbalanced;
 	} else {
 		//compute max Unbalanced Force

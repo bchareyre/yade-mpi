@@ -26,7 +26,7 @@ GlobalStiffnessTimeStepper::GlobalStiffnessTimeStepper() : TimeStepper() , sdecC
 	timestepSafetyCoefficient = 0.25;
 	computedOnce = false;
 	defaultDt = 1;
-	//previousDt = defaultDt;
+	previousDt = defaultDt;
 	
 }
 
@@ -42,8 +42,9 @@ void GlobalStiffnessTimeStepper::registerAttributes()
 	TimeStepper::registerAttributes();
 	REGISTER_ATTRIBUTE(sdecGroupMask);
 	REGISTER_ATTRIBUTE(defaultDt);
-	//REGISTER_ATTRIBUTE(previousDt);
+	REGISTER_ATTRIBUTE(previousDt);
 	REGISTER_ATTRIBUTE(timestepSafetyCoefficient);
+	REGISTER_ATTRIBUTE(computedOnce);
 }
 
 
@@ -83,11 +84,11 @@ void GlobalStiffnessTimeStepper::findTimeStepFromBody(const shared_ptr<Body>& bo
 
 	Real dt = max( max (stiffness.X(), stiffness.Y()), stiffness.Z() );
 	if (dt!=0) {
-		dt = sqrt(sdec->mass/dt);  computedSomething = true;}
+		dt = sdec->mass/dt;  computedSomething = true;}//dt = squared eigenperiod of translational motion 
 	else dt = Mathr::MAX_REAL;
 	
 	if (Rstiffness.X()!=0) {
-		dtx = sdec->inertia.X()/Rstiffness.X();  computedSomething = true;}
+		dtx = sdec->inertia.X()/Rstiffness.X();  computedSomething = true;}//dtx = squared eigenperiod of rotational motion around x
 	else dtx = Mathr::MAX_REAL;
 
 	if (Rstiffness.Y()!=0) {
@@ -103,13 +104,13 @@ void GlobalStiffnessTimeStepper::findTimeStepFromBody(const shared_ptr<Body>& bo
 	//Real dtx = (Rstiffness.X()!=0 ? sdec->inertia.X()/Rstiffness.X() : Mathr::MAX_REAL);
 	//Real dty = (Rstiffness.Y()!=0 ? sdec->inertia.Y()/Rstiffness.Y() : Mathr::MAX_REAL);
 	//Real dtz = (Rstiffness.Z()!=0 ? sdec->inertia.Z()/Rstiffness.Z() : Mathr::MAX_REAL);
-	Real Rdt = sqrt( min( min (dtx, dty), dtz ) );
+	Real Rdt =  std::min( std::min (dtx, dty), dtz );//Rdt = smallest squared eigenperiod for rotational motions
 	
 	//cerr << "Rstiffness.x()=" << Rstiffness.x() << "  " << Rstiffness.y() << "  " << Rstiffness.z() << endl;
 	//cerr << "sdec->inertia=" << sdec->inertia.x() << " " << sdec->inertia.x() << " " << sdec->inertia.x() << endl;
 	//cerr << "timesteps : dt=" << dt << " / Rdt=" << Rdt << endl;
 	
-	dt = 0.709*timestepSafetyCoefficient*std::min(dt,Rdt);//0.709 = 1/sqrt(2)
+	dt = 0.709*timestepSafetyCoefficient*std::sqrt(std::min(dt,Rdt));//0.709 = 1/sqrt(2)
 	
 	newDt = std::min(dt,newDt);
 	//computedSomething = true;
@@ -170,12 +171,13 @@ void GlobalStiffnessTimeStepper::computeTimeStep(Body* body)
 		
 	if(computedSomething)
 	{
-		Omega::instance().setTimeStep(min(newDt , defaultDt));
+		previousDt = min ( min(newDt , defaultDt), 1.5*previousDt );// at maximum, dt will be multiplied by 1.5 in one iterration, this is to prevent brutal switches from 0.000... to 1 in some computations 
+		Omega::instance().setTimeStep(previousDt);
 		//previousDt = Omega::instance().getTimeStep();
 		//Omega::instance().setTimeStep(newDt);
 		computedOnce = true;	
 		//cerr << "computedOnce=" << computedOnce << endl;	
-		cerr << "computed timestep is:" << min(newDt , defaultDt);
+		cerr << "computed timestep is:" << newDt;
 	}
 	else if (!computedOnce) Omega::instance().setTimeStep(defaultDt);
 	cerr << " new timestep is:" << Omega::instance().getTimeStep() << endl;

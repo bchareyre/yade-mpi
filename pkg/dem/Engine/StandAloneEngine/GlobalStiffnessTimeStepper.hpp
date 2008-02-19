@@ -32,7 +32,9 @@ class GlobalStiffnessTimeStepper : public TimeStepper
 
 	public :
 		int sdecGroupMask; // FIXME - we should find a way to clean groupmask stuff
+		//! defaultDt is used as default AND as max value of the timestep
 		Real defaultDt;
+		//! used as a multiplier on the theoretical critical timestep (compensate some approximations in the computation)
 		Real timestepSafetyCoefficient;
 
 		GlobalStiffnessTimeStepper();

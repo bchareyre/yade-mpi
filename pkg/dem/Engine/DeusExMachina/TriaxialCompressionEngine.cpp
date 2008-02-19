@@ -125,7 +125,7 @@ void TriaxialCompressionEngine::updateParameters(Body * body)
 			computeStressStrain(ncb);
 			//TRVAR5(UnbalancedForce,StabilityCriterion,meanStress,sigma_iso,abs((meanStress-sigma_iso)/sigma_iso));
 		}
-		if ( UnbalancedForce<=StabilityCriterion && abs((meanStress-sigma_iso)/sigma_iso)<0.02 ) {
+		if ( UnbalancedForce<=StabilityCriterion && abs((meanStress-sigma_iso)/sigma_iso)<0.005 ) {
 			if(currentState==STATE_ISO_COMPACTION && autoCompressionActivation){
 				doStateTransition(STATE_ISO_UNLOADING); /*update stress and strain here*/ computeStressStrain(ncb);
 			}
