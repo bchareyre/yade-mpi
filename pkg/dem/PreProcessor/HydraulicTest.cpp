@@ -61,8 +61,8 @@
 
 HydraulicTest::HydraulicTest () : FileGenerator()
 {
-	yadeFileWithSpheres	="../data/compression1.xml";
-	file 			="../data/spheres_position.dat";
+	yadeFileWithSpheres	="./compression1.xml";
+	file 			="./spheres_position.dat";
 	radius 			=0.7;
 }
 

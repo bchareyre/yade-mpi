@@ -91,8 +91,8 @@ ModifiedTriaxialTest::ModifiedTriaxialTest () : FileGenerator()
 	lowerCorner 		= Vector3r(-1,-0.1,-1);
 	upperCorner 		= Vector3r(1,0.1,1);
 	thickness 		= 0.001;
-	importFilename 		= "../data/inp.dat";
-// 	outputFileName 		= "../data/out.xml";
+	importFilename 		= "./inp.dat";
+// 	outputFileName 		= "./out.xml";
 	//nlayers = 1;
 	want_2d=true;
 	wall_top 		= true;
@@ -110,14 +110,14 @@ ModifiedTriaxialTest::ModifiedTriaxialTest () : FileGenerator()
 	spheresColor		= Vector3r(0.8,0.3,0.3);
 	spheresRandomColor	= false;
 	recordBottomForce	= true;
-	forceRecordFile		= "../data/force";
+	forceRecordFile		= "./force";
 	recordAveragePositions	= true;
-	positionRecordFile	= "../data/positions";
+	positionRecordFile	= "./positions";
 	recordIntervalIter	= 20;
-	velocityRecordFile 	= "../data/velocities";
+	velocityRecordFile 	= "./velocities";
 	saveAnimationSnapshots = false;
-	AnimationSnapshotsBaseName = "../data/snapshots/snap";
-	WallStressRecordFile = "../data/WallStresses";
+	AnimationSnapshotsBaseName = "./snapshots/snap";
+	WallStressRecordFile = "./WallStresses";
 
 	rotationBlocked = false;
 	//	boxWalls 		= false;

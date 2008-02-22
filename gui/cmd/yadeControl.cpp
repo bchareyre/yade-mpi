@@ -213,6 +213,7 @@ class pyOmega{
 	}
 
 	//void join(){cerr<<"JOIN!"<<endl; OMEGA.joinSimulationLoop();}
+	void wait(){ if(OMEGA.isRunning()){cerr<<"WAIT!"<<endl;} while(OMEGA.isRunning()) usleep(20000 /*20 ms*/); }
 	#undef OMEGA
 };
 
@@ -227,7 +228,7 @@ class pyPreprocessor{
 		}
 	}
 	public:
-		pyPreprocessor(){serializer="XMLFormatManager"; output="../data/scene.xml";}
+		pyPreprocessor(){serializer="XMLFormatManager"; output="./scene.xml";}
 		std::string generator;
 		std::string serializer;
 		std::string output;
@@ -352,6 +353,7 @@ BOOST_PYTHON_MODULE(yadeControl)
 		// .def("join",&pyOmega::join)
 		.def("pause",&pyOmega::pause)
 		.def("step",&pyOmega::step)
+		.def("wait",&pyOmega::wait)
 		.add_property("engines",&pyOmega::engines_get,&pyOmega::engines_set)
 		;
 

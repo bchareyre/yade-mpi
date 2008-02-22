@@ -13,7 +13,7 @@ CREATE_LOGGER(FileGenerator);
 
 FileGenerator::FileGenerator () : Serializable() 
 {
-	outputFileName = "../data/scene.xml";
+	outputFileName = "./scene.xml";
 	serializationDynlib = "XMLFormatManager";
 }
 

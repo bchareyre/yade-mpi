@@ -37,7 +37,6 @@ class InteractionContainer : public Serializable
 		typedef InteractionContainerIteratorPointer iterator;
       virtual InteractionContainer::iterator begin()						{throw;};
       virtual InteractionContainer::iterator end()						{throw;};
-
 		virtual unsigned int size() 								{throw;};
 
 	private :

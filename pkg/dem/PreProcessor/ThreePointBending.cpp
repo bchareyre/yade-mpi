@@ -63,7 +63,7 @@
 
 ThreePointBending::ThreePointBending () : FileGenerator()
 {
-	yadeFileWithSpheres	="../data/someFileFromTriaxial.yade";
+	yadeFileWithSpheres	="./someFileFromTriaxial.yade";
 	gravity			= Vector3r(0,-9.81,0);
 
 	supportDepth		= 10;

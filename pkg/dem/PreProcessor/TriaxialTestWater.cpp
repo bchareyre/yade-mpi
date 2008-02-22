@@ -89,8 +89,8 @@ TriaxialTestWater::TriaxialTestWater () : FileGenerator()
 	lowerCorner 		= Vector3r(0,0,0);
 	upperCorner 		= Vector3r(0.0065,0.0065,0.0065);
 	thickness 		= 0.00001;
-	importFilename 		= "../data/small.sdec.xyz";
-	outputFileName 		= "../data/TriaxialTestWater.xml";
+	importFilename 		= "./small.sdec.xyz";
+	outputFileName 		= "./TriaxialTestWater.xml";
 	//nlayers = 1;
 	wall_top 		= true;
 	wall_bottom 		= true;
@@ -107,14 +107,14 @@ TriaxialTestWater::TriaxialTestWater () : FileGenerator()
 	spheresColor		= Vector3r(0.8,0.3,0.3);
 	spheresRandomColor	= false;
 	recordBottomForce	= true;
-	forceRecordFile		= "../data/force";
+	forceRecordFile		= "./force";
 	recordAveragePositions	= true;
-	positionRecordFile	= "../data/position";
+	positionRecordFile	= "./position";
 	recordIntervalIter	= 100;
-	velocityRecordFile 	= "../data/velocities";
-	wallStressRecordFile	= "../data/wallStress";
-	capillaryStressRecordFile	= "../data/capillaryStress";
-	contactStressRecordFile	= "../data/contactStress";
+	velocityRecordFile 	= "./velocities";
+	wallStressRecordFile	= "./wallStress";
+	capillaryStressRecordFile	= "./capillaryStress";
+	contactStressRecordFile	= "./contactStress";
 	rotationBlocked = false;
 	
 //	boxWalls 		= false;

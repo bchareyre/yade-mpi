@@ -138,7 +138,7 @@ void QtEngineEditor::pbPathClicked()
 	string selectedFilter;
 	std::vector<string> filters;
 	filters.push_back("XML Yade File (*.xml)");
-	string fileName = FileDialog::getSaveFileName("../data", filters, "Choose a file to save", this->parentWidget()->parentWidget(),selectedFilter );
+	string fileName = FileDialog::getSaveFileName(".", filters, "Choose a file to save", this->parentWidget()->parentWidget(),selectedFilter );
 
 	if (fileName.size()!=0 && selectedFilter == "XML Yade File (*.xml)")
 		leFileName->setText(fileName);

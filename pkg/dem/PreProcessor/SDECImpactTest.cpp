@@ -70,7 +70,7 @@ SDECImpactTest::SDECImpactTest () : FileGenerator()
 	lowerCorner 		= Vector3r(1000,1000,1000);
 	upperCorner 		= Vector3r(-1000,-1000,-1000);
 	thickness 		= 0.01;
-	importFilename 		= "../data/small.sdec.xyz";
+	importFilename 		= "./small.sdec.xyz";
 	wall_top 		= true;
 	wall_bottom 		= true;
 	wall_1			= true;
@@ -86,11 +86,11 @@ SDECImpactTest::SDECImpactTest () : FileGenerator()
 	spheresColor		= Vector3r(0.8,0.3,0.3);
 	spheresRandomColor	= false;
 	recordBottomForce	= true;
-	forceRecordFile		= "../data/force";
+	forceRecordFile		= "./force";
 	recordAveragePositions	= true;
-	positionRecordFile	= "../data/position";
+	positionRecordFile	= "./position";
 	recordIntervalIter	= 100;
-	velocityRecordFile 	= "../data/velocities";
+	velocityRecordFile 	= "./velocities";
 	rotationBlocked = true;
 	
 //	boxWalls 		= false;

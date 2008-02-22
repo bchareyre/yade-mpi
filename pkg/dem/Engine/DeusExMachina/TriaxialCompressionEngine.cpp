@@ -146,7 +146,7 @@ void TriaxialCompressionEngine::updateParameters(Body * body)
 				// 		}
             internalCompaction = false;
             Phase1 = true;
-            string fileName = "../data/" + Phase1End + "_" +
+            string fileName = "./" + Phase1End + "_" +
                               lexical_cast<string>(Omega::instance().getCurrentIteration()) + ".xml";
             cerr << "saving snapshot: " << fileName << " ...";
             Omega::instance().saveSimulation(fileName);
@@ -175,11 +175,11 @@ void TriaxialCompressionEngine::applyCondition(Body * body)
    if (Omega::instance().getCurrentIteration() % testEquilibriumInterval == 0) {
         updateParameters(body);
         if (saveSimulation) {
-            string fileName = "../data/" + Phase1End + "_" +
+            string fileName = "./" + Phase1End + "_" +
                               lexical_cast<string>(Omega::instance().getCurrentIteration()) + ".xml";
             LOG_INFO("saving snapshot: "<<fileName);
             Omega::instance().saveSimulation(fileName);
-				fileName="../data/"+Phase1End+"_"+lexical_cast<string>(Omega::instance().getCurrentIteration())+".spheres";
+				fileName="./"+Phase1End+"_"+lexical_cast<string>(Omega::instance().getCurrentIteration())+".spheres";
 				LOG_INFO("saving spheres: "<<fileName);
 				Shop::saveSpheresToFile(fileName);
             saveSimulation = false;

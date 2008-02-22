@@ -61,7 +61,7 @@ using namespace std;
 FEMBeam::FEMBeam () : FileGenerator()
 {
 	gravity 		= Vector3r(0,-9.81,0);
-	femTxtFile 		= "../data/fem.beam";
+	femTxtFile 		= "./fem.beam";
 	nodeGroupMask 		= 1;
 	tetrahedronGroupMask 	= 2;
 

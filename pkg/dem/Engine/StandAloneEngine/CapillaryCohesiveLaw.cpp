@@ -36,7 +36,7 @@ CapillaryCohesiveLaw::CapillaryCohesiveLaw() : InteractionSolver() , actionForce
 
         capillary = shared_ptr<capillarylaw>(new capillarylaw); // ????????
 
-        //importFilename 		= "../data"; // chemin vers M(r=...)
+        //importFilename 		= "."; // chemin vers M(r=...)
 
         capillary->fill("M(r=1)");
         capillary->fill("M(r=1.1)");

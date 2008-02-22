@@ -163,7 +163,7 @@ int NullGUI::loop()
 			// save snapshot
 			if( ( snapshotInterval != -1 ) && (intervals % snapshotInterval == 0) )
 			{
-				string fileName = "../data/" 
+				string fileName = "./" 
 					+ snapshotName 
 			//		+ "__dt_" + lexical_cast<string>(Omega::instance().getTimeStep())
 			//		+ "__it_" + lexical_cast<string>(Omega::instance().getCurrentIteration()) 

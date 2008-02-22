@@ -163,6 +163,7 @@ REGISTER_SERIALIZABLE(BrefcomLaw,false);
 
 class GLDrawBrefcomContact: public GLDrawInteractionPhysicsFunctor {
 	public: virtual void go(const shared_ptr<InteractionPhysics>&,const shared_ptr<Interaction>&,const shared_ptr<Body>&,const shared_ptr<Body>&,bool wireFrame);
+	virtual ~GLDrawBrefcomContact() {};
 	RENDERS(BrefcomContact);
 	REGISTER_CLASS_NAME(GLDrawBrefcomContact);
 	REGISTER_BASE_CLASS_NAME(GLDrawInteractionPhysicsFunctor);

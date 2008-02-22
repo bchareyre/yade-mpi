@@ -145,7 +145,7 @@ void SimulationController::pbLoadClicked()
 	std::vector<string> filters;
 	filters.push_back("Yade Binary File (*.yade)");
 	filters.push_back("XML Yade File (*.xml)");
-	string fileName = FileDialog::getOpenFileName("../data", filters, "Choose a file to open", parentWorkspace, selectedFilter );
+	string fileName = FileDialog::getOpenFileName(".", filters, "Choose a file to open", parentWorkspace, selectedFilter );
 		
 	if ( 	   fileName.size()!=0 
 		&& (selectedFilter == "XML Yade File (*.xml)" || selectedFilter == "Yade Binary File (*.yade)") 
@@ -227,14 +227,14 @@ void SimulationController::pbSaveClicked()
 	std::vector<string> filters;
 	filters.push_back("Yade Binary File (*.yade)");
 	filters.push_back("XML Yade File (*.xml)");
-	string fileName = FileDialog::getSaveFileName("../data", filters, "Specify file name to save", parentWorkspace, selectedFilter );
+	string fileName = FileDialog::getSaveFileName(".", filters, "Specify file name to save", parentWorkspace, selectedFilter );
 
 	if ( 	   fileName.size()!=0 
 		&& (selectedFilter == "XML Yade File (*.xml)" || selectedFilter == "Yade Binary File (*.yade)" ) 
 		&& (filesystem::extension(fileName)==".xml" || filesystem::extension(fileName)==".yade" || filesystem::extension(fileName)=="" )
 		&& (fileName != "")
 		&& (fileName != "/")
-		&& (fileName != "../data"))
+		&& (fileName != "."))
 	{
 
 		if(filesystem::extension(fileName)=="") // user forgot to specify extension - fix it.

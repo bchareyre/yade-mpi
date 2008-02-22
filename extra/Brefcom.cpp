@@ -3,6 +3,20 @@
 #include<yade/core/MetaBody.hpp>
 #include<yade/pkg-dem/BodyMacroParameters.hpp>
 #include<yade/pkg-common/Sphere.hpp>
+/*
+#include<boost/foreach.hpp>
+#include<boost/range.hpp>
+namespace boost {
+	template<> struct range_iterator<InteractionContainer>{typedef shared_ptr<Interaction> type;};
+	template<> struct range_const_iterator<InteractionContainer>{typedef shared_ptr<Interaction> type;};
+	template<> struct range_size<InteractionContainer>{typedef unsigned int type;};
+}
+inline shared_ptr<Interaction> boost_range_begin(InteractionContainer& c){return *(c.begin());}
+//inline shared_ptr<Interaction> boost_range_begin(const InteractionContainer& c){return *(c.begin());}
+inline shared_ptr<Interaction> boost_range_end(InteractionContainer& c){return *(c.end());}
+//inline shared_ptr<Interaction> boost_range_end(const InteractionContainer& c){return *(c.end());}
+inline boost::range_size<InteractionContainer>::type boost_range_size(InteractionContainer& c){return c.size();}
+*/
 
 
 YADE_PLUGIN("BrefcomMakeContact","BrefcomContact","BrefcomLaw","GLDrawBrefcomContact");
@@ -121,6 +135,9 @@ Real BrefcomLaw::funcH(Real kappaD){
 
 void BrefcomLaw::action(Body* body){
 	rootBody=YADE_CAST<MetaBody*>(body);
+	
+	//BOOST_FOREACH(shared_ptr<Interaction> II,*(rootBody->transientInteractions)){}
+
 	for(InteractionContainer::iterator I=rootBody->transientInteractions->begin(); I!=rootBody->transientInteractions->end(); ++I){
 		if(!(*I)->isReal) continue;
 		// TRACE;

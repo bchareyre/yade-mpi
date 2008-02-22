@@ -45,7 +45,7 @@ QtFileGenerator::QtFileGenerator ( QWidget * parent , const char * name)
 	}
 	setSerializationName("XMLFormatManager");
 	
-	leOutputFileName->setText("../data/scene.xml");
+	leOutputFileName->setText("./scene.xml");
 
 	scrollViewFrame = new QFrame();	
 	
@@ -95,7 +95,7 @@ void QtFileGenerator::pbChooseClicked()
 	std::vector<string> filters;
 	filters.push_back("Yade Binary File (*.yade)");
 	filters.push_back("XML Yade File (*.xml)");
-	string fileName = FileDialog::getSaveFileName("../data", filters , "Choose a file to save", this->parentWidget()->parentWidget(),selectedFilter );
+	string fileName = FileDialog::getSaveFileName(".", filters , "Choose a file to save", this->parentWidget()->parentWidget(),selectedFilter );
 
 	if (fileName.size()!=0 && selectedFilter == "XML Yade File (*.xml)" && fileName!="/" )
 	{
@@ -260,7 +260,7 @@ void QtFileGenerator::pbLoadClicked()
 	string selectedFilter;
 	std::vector<string> filters;
 	filters.push_back("XML Yade File (*.xml)");
-	string fileName = FileDialog::getOpenFileName("../data", filters, "Choose a FileGenerator configuration to load", this->parentWidget()->parentWidget(), selectedFilter );
+	string fileName = FileDialog::getOpenFileName(".", filters, "Choose a FileGenerator configuration to load", this->parentWidget()->parentWidget(), selectedFilter );
 	if ( 	   fileName.size()!=0 
 		&& (selectedFilter == "XML Yade File (*.xml)") 
 		&& filesystem::exists(fileName) 
@@ -273,7 +273,7 @@ void QtFileGenerator::pbLoadClicked()
 			displayFileGeneratorAttributes(fg);
 
 			std::string tmp=fg->getFileName();
-			if(tmp!="../data/scene.xml") // this check to avoid resetting data, when loading older file.
+			if(tmp!="./scene.xml") // this check to avoid resetting data, when loading older file.
 			{
 				leOutputFileName->setText(tmp);
 				setSerializationName(fg->getSerializationLibrary());
@@ -301,14 +301,14 @@ void QtFileGenerator::pbSaveClicked()
 	std::vector<string> filters;
 	filters.push_back("XML Yade File (*.xml)");
 	string title = "Save FileGenerator \"" + fg->getClassName() + "\" configuration";
-	string fileName = FileDialog::getSaveFileName("../data", filters, title, this->parentWidget()->parentWidget(), selectedFilter );
+	string fileName = FileDialog::getSaveFileName(".", filters, title, this->parentWidget()->parentWidget(), selectedFilter );
 
 	if ( 	   fileName.size()!=0
 		&& (selectedFilter == "XML Yade File (*.xml)") 
 		&& (filesystem::extension(fileName)==".xml" || filesystem::extension(fileName)=="" )
 		&& (fileName != "")
 		&& (fileName != "/")
-		&& (fileName != "../data"))
+		&& (fileName != "."))
 	{
 		if(filesystem::extension(fileName)=="") // user forgot to specify extension - fix it.
 			fileName += ".xml";

@@ -127,10 +127,10 @@ LatticeExample::LatticeExample() : FileGenerator()
         strainRecorder_node2     = Vector3r(0,1,0);
         measurePoisson_node3     = Vector3r(0  ,0.1,0);
         measurePoisson_node4     = Vector3r(0.2,0.1,0);
-        outputFile               = "../data/strains";
-        poissonFile              = "../data/poisson";
-        nodeRecorderFile         = "../data/npos";
-        beamRecorderFile         = "../data/bstr";
+        outputFile               = "./strains";
+        poissonFile              = "./poisson";
+        nodeRecorderFile         = "./npos";
+        beamRecorderFile         = "./bstr";
         subscribedBodies.clear();
                 
         regionDelete_A_min       = Vector3r(0,0,0);

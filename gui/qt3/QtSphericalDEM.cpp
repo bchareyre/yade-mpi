@@ -77,7 +77,7 @@ void QtSphericalDEM::pbStartClicked()
 
 void QtSphericalDEM::pbOutputDirectoryClicked()
 {
-	string directory = FileDialog::getExistingDirectory ( "../data","Choose the directory where to save the data", this->parentWidget()->parentWidget());
+	string directory = FileDialog::getExistingDirectory ( ".","Choose the directory where to save the data", this->parentWidget()->parentWidget());
 	if (!directory.empty())
 		leOutputDirectory->setText(directory.c_str());
 }
