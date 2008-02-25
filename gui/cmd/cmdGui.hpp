@@ -4,13 +4,11 @@
 #include<yade/core/FrontEnd.hpp>
 #include<boost/shared_ptr.hpp>
 
-class RenderingEngine;
-
-
 class cmdGui: public FrontEnd
 {
 	private:
 		void help();
+		void execScript(string);
 	public:
 		cmdGui(){};
 		virtual ~cmdGui(){};

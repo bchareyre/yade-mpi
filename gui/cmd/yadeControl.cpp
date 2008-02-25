@@ -40,24 +40,19 @@ using namespace std;
 class RenderingEngine;
 
 /*
-class pyBody{
-		shared_ptr<AttrAccess> accessor;
-	public:
-		shared_ptr<Body> body;
-		void ensureAcc(void){ if(!body) throw runtime_error("No proxied Body."); if(!accessor) accessor=shared_ptr<AttrAccess>(new AttrAccess(body));}
-		pyBody(){ body=shared_ptr<Body>(new Body); }
-		pyBody(const shared_ptr<Body>& _body): body(_body) {}
-		ATTR_ACCESS_CXX(accessor,ensureEng);
-}
+TODO:
+	1. InteractionContainer with iteration
+	2. PhysicalActionContainer (constructor with actionName) with iteration
+	3. from yadeControl import Omega as _Omega, inherit from that and add other convenience functions
 */
 
 #define BASIC_PY_PROXY_HEAD(pyClass,yadeClass) \
 class pyClass{shared_ptr<AttrAccess> accessor; \
 	public: shared_ptr<yadeClass> proxee; \
 		void ensureAcc(void){ if(!proxee) throw runtime_error(string("No proxied `")+#yadeClass+"'."); if(!accessor) accessor=shared_ptr<AttrAccess>(new AttrAccess(proxee));} \
-		pyClass(string clss){proxee=dynamic_pointer_cast<yadeClass>(ClassFactory::instance().createShared(clss)); if(!proxee) throw runtime_error("Invalid class `"+clss+"': either nonexistent, or unable to cast to `"+#yadeClass+"'"); } \
+		pyClass(string clss=""){proxee=dynamic_pointer_cast<yadeClass>(ClassFactory::instance().createShared(clss.empty()? #yadeClass : clss)); if(!proxee) throw runtime_error("Invalid class `"+clss+"': either nonexistent, or unable to cast to `"+#yadeClass+"'"); } \
 		pyClass(const shared_ptr<yadeClass>& _proxee): proxee(_proxee) {} \
-		std::string pyStr(void){ ensureAcc(); return string("<"+proxee->getClassName()+" "+ #yadeClass +">"); } \
+		std::string pyStr(void){ ensureAcc(); return string(proxee->getClassName()==#yadeClass ? "<"+proxee->getClassName()+">" : "<"+proxee->getClassName()+" "+ #yadeClass +">"); } \
 		string className(void){ ensureAcc(); return proxee->getClassName(); } \
 		ATTR_ACCESS_CXX(accessor,ensureAcc);
 
@@ -65,62 +60,26 @@ class pyClass{shared_ptr<AttrAccess> accessor; \
 
 #define BASIC_PY_PROXY(pyClass,yadeClass) BASIC_PY_PROXY_HEAD(pyClass,yadeClass) BASIC_PY_PROXY_TAIL
 
-BASIC_PY_PROXY(pyShape,GeometricalModel);
-BASIC_PY_PROXY(pyPhys,PhysicalParameters);
-BASIC_PY_PROXY(pyBound,BoundingVolume);
-BASIC_PY_PROXY(pyMold,InteractingGeometry);
 
-class pyEngineUnit{
-		shared_ptr<AttrAccess> accessor;
-	public:	
-		void ensureEng(void){ if(!eng) throw runtime_error("No proxied EngineUnit."); if(!accessor) accessor=shared_ptr<AttrAccess>(new AttrAccess(eng));  }
-		shared_ptr<EngineUnit> eng;
-		python::list bases_get(void){ python::list ret; vector<string> t=eng->getFunctorTypes(); for(size_t i=0; i<t.size(); i++) ret.append(t[i]); return ret; }
-		pyEngineUnit(const shared_ptr<EngineUnit>& _eng): eng(_eng) {}
-		pyEngineUnit(string clss){ eng=dynamic_pointer_cast<EngineUnit>(ClassFactory::instance().createShared(clss)); if(!eng) throw runtime_error("Invalid engine class `"+clss+"': either nonexistent, or not unable to cast to `EngineUnit'"); }
-		std::string pyStr(void){ ensureEng(); string ret("<"+eng->getClassName()+" EngineUnit {"); vector<string> t=eng->getFunctorTypes(); for(size_t i=0; i<t.size(); i++) ret+=t[i]+(i==t.size()-1?"":","); return ret+"}>"; }
-		string className(void){ ensureEng(); return eng->getClassName(); }
-		ATTR_ACCESS_CXX(accessor,ensureEng);
-};
+BASIC_PY_PROXY(pyInteractionGeometry,InteractionGeometry);
+BASIC_PY_PROXY(pyInteractionPhysics,InteractionPhysics);
 
-class pyEngine{
-	private:
-		shared_ptr<AttrAccess> accessor;
-	public:	
-		void ensureEng(void){ if(!eng) throw runtime_error("No proxied Engine."); if(!accessor) accessor=shared_ptr<AttrAccess>(new AttrAccess(eng)); }
-		shared_ptr<Engine> eng;
-		//pyEngine(void){throw;}
-		pyEngine(const shared_ptr<Engine>& _eng): eng(_eng) {}
-		pyEngine(string clss){ eng=dynamic_pointer_cast<Engine>(ClassFactory::instance().createShared(clss)); if(!eng) throw runtime_error("Invalid engine class `"+clss+"': either nonexistent, or not unable to cast to `Engine'"); }
-		virtual std::string pyStr(void){ throw; }
-		string className(void){ ensureEng(); return eng->getClassName(); }
-		ATTR_ACCESS_CXX(accessor,ensureEng);
-};
+BASIC_PY_PROXY(pyGeometricalModel,GeometricalModel);
+BASIC_PY_PROXY(pyPhysicalParameters,PhysicalParameters);
+BASIC_PY_PROXY(pyBoundingVolume,BoundingVolume);
+BASIC_PY_PROXY(pyInteractingGeometry,InteractingGeometry);
 
-#define CHECK_ENGINE_PTR_TYPE(e,T) if(!dynamic_pointer_cast<T>(e)) throw std::invalid_argument(string("Object of type ")+e->getClassName()+" could not be cast to "+#T);
+BASIC_PY_PROXY(pyStandAloneEngine,StandAloneEngine);
+BASIC_PY_PROXY(pyDeusExMachina,DeusExMachina);
 
-class pyStandAloneEngine: public pyEngine{
-	public:
-		pyStandAloneEngine(const shared_ptr<StandAloneEngine>& _eng): pyEngine(_eng) {}
-		pyStandAloneEngine(string clss): pyEngine(clss) { CHECK_ENGINE_PTR_TYPE(eng,StandAloneEngine); };
-		std::string pyStr(void){ ensureEng(); return string("<")+eng->getClassName()+" StandAloneEngine>"; }
-};
+BASIC_PY_PROXY_HEAD(pyEngineUnit,EngineUnit)
+	python::list bases_get(void){ python::list ret; vector<string> t=proxee->getFunctorTypes(); for(size_t i=0; i<t.size(); i++) ret.append(t[i]); return ret; }
+BASIC_PY_PROXY_TAIL;
 
-class pyDeusExMachina: public pyEngine{
-	public:
-		pyDeusExMachina(const shared_ptr<DeusExMachina>& _eng): pyEngine(_eng) {}
-		pyDeusExMachina(string clss): pyEngine(clss) { CHECK_ENGINE_PTR_TYPE(eng,DeusExMachina); }
-		std::string pyStr(void){ ensureEng(); return string("<")+eng->getClassName()+" DeusExMachina>"; }
-};
 
-class pyMetaEngine: public pyEngine{
-	public:
-		pyMetaEngine(const shared_ptr<MetaDispatchingEngine>& _eng): pyEngine(_eng) {}
-		pyMetaEngine(string clss): pyEngine(clss) { CHECK_ENGINE_PTR_TYPE(eng,MetaDispatchingEngine);} ;
-		//pyMetaEngine(string clss){ eng=dynamic_pointer_cast<MetaDispatchingEngine>(ClassFactory::instance().createShared(clss)); if(!eng) throw runtime_error("Invalid engine class `"+clss+"': either nonexistent, or not unable to cast to `MetaDispatchingEngine'"); };
-		std::string pyStr(void){ ensureEng(); return string("<")+eng->getClassName()+" MetaEngine>"; }
+BASIC_PY_PROXY_HEAD(pyMetaEngine,MetaDispatchingEngine)
 		python::list functors_get(void){
-			ensureEng(); shared_ptr<MetaDispatchingEngine> me=dynamic_pointer_cast<MetaDispatchingEngine>(eng); if(!me) throw runtime_error("Proxied class not a MetaDispatchingEngine (WTF?)"); python::list ret;
+			ensureAcc(); shared_ptr<MetaDispatchingEngine> me=dynamic_pointer_cast<MetaDispatchingEngine>(proxee); if(!me) throw runtime_error("Proxied class not a MetaDispatchingEngine (WTF?)"); python::list ret;
 			/* garbage design: functorArguments are instances of EngineUnits, but they may not be present; therefore, only use them if they exist; our pyMetaEngine, however, will always have both names and EnguneUnit objects in the same count */
 			for(size_t i=0; i<me->functorNames.size(); i++){
 				shared_ptr<EngineUnit> eu;
@@ -130,22 +89,49 @@ class pyMetaEngine: public pyEngine{
 				}
 				if(!eu) /* either list was shorter or empty pointer in the functorArguments list */ { eu=dynamic_pointer_cast<EngineUnit>(ClassFactory::instance().createShared(functorName)); if(!eu) throw runtime_error("Unable to construct `"+string(*(me->functorNames[i].rbegin()))+"' EngineUnit"); }
 				assert(eu);
-				//vector<string> fn; for(size_t j=0; j<me->functorNames[i].size()-1; j++) fn.push_back(me->functorNames[i][j]); // all names but the last one, which is the functor class name; TODO: use std::algo for the copy
 				ret.append(pyEngineUnit(eu));
 			}
 			return ret;
 		}
 		void functors_set(python::object ftrs){
-			ensureEng(); shared_ptr<MetaDispatchingEngine> me=dynamic_pointer_cast<MetaDispatchingEngine>(eng); if(!me) throw runtime_error("Proxied class not a MetaDispatchingEngine. (WTF?)");
+			ensureAcc(); shared_ptr<MetaDispatchingEngine> me=dynamic_pointer_cast<MetaDispatchingEngine>(proxee); if(!me) throw runtime_error("Proxied class not a MetaDispatchingEngine. (WTF?)");
 			me->clear(); int len=python::len(ftrs);
-			for(int i=0; i<len; i++){
-				const pyEngineUnit& eu=python::extract<pyEngineUnit>(PySequence_GetItem(ftrs.ptr(),i));
-				me->add(eu.eng);
-			}
+			for(int i=0; i<len; i++){ const pyEngineUnit& eu=python::extract<pyEngineUnit>(PySequence_GetItem(ftrs.ptr(),i)); me->add(eu.proxee); }
 		}
+BASIC_PY_PROXY_TAIL;
+
+#define NONPOD_ATTRIBUTE_ACCESS(pyName,pyClass,yadeName) \
+	python::object pyName##_get(void){ensureAcc(); return proxee->yadeName ? python::object(pyClass(proxee->yadeName)) : python::object(); } \
+	void pyName##_set(pyClass proxy){ensureAcc(); proxee->yadeName=proxy.proxee; }
+
+BASIC_PY_PROXY_HEAD(pyInteraction,Interaction)
+	NONPOD_ATTRIBUTE_ACCESS(geom,pyInteractionGeometry,interactionGeometry);
+	NONPOD_ATTRIBUTE_ACCESS(phys,pyInteractionPhysics,interactionPhysics);
+	/* shorthands */ unsigned id1_get(void){ensureAcc(); return proxee->getId1();} unsigned id2_get(void){ensureAcc(); return proxee->getId2();}
+BASIC_PY_PROXY_TAIL;
+
+BASIC_PY_PROXY_HEAD(pyBody,Body)
+	NONPOD_ATTRIBUTE_ACCESS(shape,pyGeometricalModel,geometricalModel);
+	NONPOD_ATTRIBUTE_ACCESS(mold,pyInteractingGeometry,interactingGeometry);
+	NONPOD_ATTRIBUTE_ACCESS(bound,pyBoundingVolume,boundingVolume);
+	NONPOD_ATTRIBUTE_ACCESS(phys,pyPhysicalParameters,physicalParameters);
+	unsigned id_get(){ensureAcc(); return proxee->getId();}
+	bool isStandalone(){ensureAcc(); return proxee->isStandalone();} bool isClumpMember(){ensureAcc(); return proxee->isClumpMember();} bool isClump(){ensureAcc(); return proxee->isClump();}
+BASIC_PY_PROXY_TAIL;
+
+class pyBodyContainer{
+	public:
+	const shared_ptr<BodyContainer> proxee;
+	pyBodyContainer(const shared_ptr<BodyContainer>& _proxee): proxee(_proxee){}
+	pyBody pyGetitem(unsigned id){
+		if(id>=proxee->size()){ PyErr_SetString(PyExc_IndexError, "Body id out of range."); python::throw_error_already_set(); /* make compiler happy; never reached */ return pyBody(); }
+		else return pyBody(proxee->operator[](id));
+	}
 };
 
-
+BASIC_PY_PROXY_HEAD(pyFileGenerator,FileGenerator)
+	bool generate(string outFile){ensureAcc(); proxee->setFileName(outFile); proxee->setSerializationLibrary("XMLFormatManager"); bool ret=proxee->generateAndSave(); cerr<<(ret?"SUCCESS:\n":"FAILURE:\n")<<proxee->message<<endl; return ret; };
+BASIC_PY_PROXY_TAIL;
 
 
 class pyOmega{
@@ -206,7 +192,7 @@ class pyOmega{
 	void engines_set(python::object egs){
 		assertRootBody(); int len=python::len(egs); const shared_ptr<MetaBody>& rootBody=OMEGA.getRootBody(); rootBody->engines.clear();
 		for(int i=0; i<len; i++){
-			#define PUSH_BACK_ENGINE_IF_POSSIBLE(pyEngineType) if(python::extract<pyEngineType>(PySequence_GetItem(egs.ptr(),i)).check()){ pyEngineType e=python::extract<pyEngineType>(PySequence_GetItem(egs.ptr(),i)); rootBody->engines.push_back(e.eng); /* cerr<<"added "<<e.pyStr()<<", a "<<#pyEngineType<<endl; */ continue; }
+			#define PUSH_BACK_ENGINE_IF_POSSIBLE(pyEngineType) if(python::extract<pyEngineType>(PySequence_GetItem(egs.ptr(),i)).check()){ pyEngineType e=python::extract<pyEngineType>(PySequence_GetItem(egs.ptr(),i)); rootBody->engines.push_back(e.proxee); /* cerr<<"added "<<e.pyStr()<<", a "<<#pyEngineType<<endl; */ continue; }
 			PUSH_BACK_ENGINE_IF_POSSIBLE(pyStandAloneEngine); PUSH_BACK_ENGINE_IF_POSSIBLE(pyMetaEngine); PUSH_BACK_ENGINE_IF_POSSIBLE(pyDeusExMachina);
 			throw std::runtime_error("Encountered unknown engine type (unable to extract from python object)");
 		}
@@ -214,52 +200,16 @@ class pyOmega{
 
 	//void join(){cerr<<"JOIN!"<<endl; OMEGA.joinSimulationLoop();}
 	void wait(){ if(OMEGA.isRunning()){cerr<<"WAIT!"<<endl;} while(OMEGA.isRunning()) usleep(20000 /*20 ms*/); }
+	
+	pyBodyContainer bodies_get(void){assertRootBody(); return pyBodyContainer(OMEGA.getRootBody()->bodies); }
+
+	boost::python::list listChildClasses(const string& base){
+		boost::python::list ret;
+		for(map<string,DynlibDescriptor>::const_iterator di=Omega::instance().getDynlibsDescriptor().begin();di!=Omega::instance().getDynlibsDescriptor().end();++di) if (Omega::instance().isInheritingFrom((*di).first,base)) ret.append(di->first);
+		return ret;
+	}
 	#undef OMEGA
 };
-
-/*! Generic preprocessor (FileGenerator) wrapper, with complete attribute access. */
-class pyPreprocessor{
-	shared_ptr<FileGenerator> gen;
-	shared_ptr<AttrAccess> accessor;
-	void ensureGen(void){
-		if(!gen || gen->getClassName()!=generator){ // first time or changed generator; shared_ptr should delete the old object if not referenced anymore
-			gen=static_pointer_cast<FileGenerator>(ClassFactory::instance().createShared(generator));
-			accessor=shared_ptr<AttrAccess>(new AttrAccess(gen));
-		}
-	}
-	public:
-		pyPreprocessor(){serializer="XMLFormatManager"; output="./scene.xml";}
-		std::string generator;
-		std::string serializer;
-		std::string output;
-		//! return list of available generators
-		boost::python::list listGenerators(){
-			boost::python::list ret;
-			for(map<string,DynlibDescriptor>::const_iterator di=Omega::instance().getDynlibsDescriptor().begin();di!=Omega::instance().getDynlibsDescriptor().end();++di) if (Omega::instance().isInheritingFrom((*di).first,"FileGenerator")) ret.append(di->first);
-			return ret;
-		}
-		//! return list of available serializers
-		boost::python::list listSerializers(){
-			//vector<string> ret;
-			boost::python::list ret;
-			for(map<string,DynlibDescriptor>::const_iterator di=Omega::instance().getDynlibsDescriptor().begin();di!=Omega::instance().getDynlibsDescriptor().end();++di) if (Omega::instance().isInheritingFrom((*di).first,"IOFormatManager")) ret.append(di->first);
-			return ret;
-		}
-		//! run generator
-		bool generate(){
-			#define _CHECK_NONEMPTY(s) if(s.empty()) throw std::runtime_error("`" #s "' is empty.")
-				_CHECK_NONEMPTY(generator); _CHECK_NONEMPTY(serializer);	_CHECK_NONEMPTY(output);
-			#undef _CHECK_NONEMPTY
-			ensureGen();
-			gen->setFileName(output);
-			gen->setSerializationLibrary(serializer);
-			bool ret=gen->generateAndSave();
-			cerr<<(ret?"SUCCESS:\n":"FAILURE:\n")<<gen->message<<endl;
-			return ret;
-		}
-		ATTR_ACCESS_CXX(accessor,ensureGen);
-};
-		
 
 /*! GL viewer wrapper, with full attribute access.
  *
@@ -350,12 +300,16 @@ BOOST_PYTHON_MODULE(yadeControl)
 		.def("load",&pyOmega::load)
 		.def("save",&pyOmega::save)
 		.def("run",&pyOmega::run)
-		// .def("join",&pyOmega::join)
 		.def("pause",&pyOmega::pause)
 		.def("step",&pyOmega::step)
 		.def("wait",&pyOmega::wait)
 		.add_property("engines",&pyOmega::engines_get,&pyOmega::engines_set)
+		.add_property("bodies",&pyOmega::bodies_get)
+		.def("childClasses",&pyOmega::listChildClasses)
 		;
+	
+	boost::python::class_<pyBodyContainer>("BodyContainer",python::init<pyBodyContainer&>())
+		.def("__getitem__",&pyBodyContainer::pyGetitem);
 
 		#if 0
 			.def("oneStep",&oneStep)
@@ -363,63 +317,45 @@ BOOST_PYTHON_MODULE(yadeControl)
 			.def("centerScene", &centerScene)
 		#endif
 
-	boost::python::class_<pyPreprocessor>("Preprocessor")
-		.add_property("generator",&pyPreprocessor::generator,&pyPreprocessor::generator)
-		.add_property("serializer",&pyPreprocessor::serializer,&pyPreprocessor::serializer)
-		.add_property("output",&pyPreprocessor::output,&pyPreprocessor::output)
-		.def("generate",&pyPreprocessor::generate)
-		.def("listSerializers",&pyPreprocessor::listSerializers)
-		.def("listGenerators",&pyPreprocessor::listGenerators)
-		.ATTR_ACCESS_PY(pyPreprocessor);
-
 	boost::python::class_<pyGLViewer>("View")
 		.ATTR_ACCESS_PY(pyGLViewer);
 
-	
-	/* FIXME: __str__, __repr__ etc should be inherited from one parent class in python; how to do that? */
-	/* clss currently doesn't check whether StandAloneEngine is not MetaDispatchingEngine, for example. Fix this later. */
-	python::class_<pyStandAloneEngine>("StandAloneEngine",python::init<string>())
-	.ATTR_ACCESS_PY(pyStandAloneEngine)
-	.def("__str__",&pyStandAloneEngine::pyStr).def("__repr__",&pyStandAloneEngine::pyStr)
-	.add_property("name",&pyStandAloneEngine::className)
-	;
-
-	python::class_<pyMetaEngine>("MetaEngine",python::init<string>())
-	.ATTR_ACCESS_PY(pyMetaEngine)
-	.def("__str__",&pyMetaEngine::pyStr).def("__repr__",&pyMetaEngine::pyStr)
-	.add_property("name",&pyEngine::className)
-	.add_property("functors",&pyMetaEngine::functors_get,&pyMetaEngine::functors_set)
-	;
-
-	boost::python::class_<pyDeusExMachina>("DeusExMachina",python::init<string>())
-	.ATTR_ACCESS_PY(pyDeusExMachina)
-	.def("__str__",&pyDeusExMachina::pyStr).def("__repr__",&pyDeusExMachina::pyStr)
-	.add_property("name",&pyDeusExMachina::className)
-	;
-
-	boost::python::class_<pyEngineUnit>("EngineUnit",python::init<string>())
-	.ATTR_ACCESS_PY(pyEngineUnit)
-	.def("__str__",&pyEngineUnit::pyStr).def("__repr__",&pyEngineUnit::pyStr)
-	.add_property("name",&pyEngineUnit::className)
-	.add_property("bases",&pyEngineUnit::bases_get)
-	;
-
 #define BASIC_PY_PROXY_WRAPPER(pyClass,pyName)  \
-	boost::python::class_<pyClass>(pyName,python::init<string>()) \
+	boost::python::class_<pyClass>(pyName,python::init<python::optional<string> >()) \
 	.ATTR_ACCESS_PY(pyClass) \
 	.def("__str__",&pyClass::pyStr).def("__repr__",&pyClass::pyStr) \
 	.add_property("name",&pyClass::className)
 
-	BASIC_PY_PROXY_WRAPPER(pyShape,"Shape");
-	BASIC_PY_PROXY_WRAPPER(pyMold,"Mold");
-	BASIC_PY_PROXY_WRAPPER(pyPhys,"Phys");
-	BASIC_PY_PROXY_WRAPPER(pyBound,"Bound");
+	BASIC_PY_PROXY_WRAPPER(pyStandAloneEngine,"StandAloneEngine");
+	BASIC_PY_PROXY_WRAPPER(pyMetaEngine,"MetaEngine")
+		.add_property("functors",&pyMetaEngine::functors_get,&pyMetaEngine::functors_set);
+	BASIC_PY_PROXY_WRAPPER(pyDeusExMachina,"DeusExMachina");
+	BASIC_PY_PROXY_WRAPPER(pyEngineUnit,"EngineUnit")
+		.add_property("bases",&pyEngineUnit::bases_get);
 
+	BASIC_PY_PROXY_WRAPPER(pyGeometricalModel,"Shape");
+	BASIC_PY_PROXY_WRAPPER(pyInteractingGeometry,"Mold");
+	BASIC_PY_PROXY_WRAPPER(pyPhysicalParameters,"Phys");
+	BASIC_PY_PROXY_WRAPPER(pyBoundingVolume,"Bound");
+	BASIC_PY_PROXY_WRAPPER(pyInteractionGeometry,"InterGeom");
+	BASIC_PY_PROXY_WRAPPER(pyInteractionPhysics,"InterPhys");
 
-	//scope().attr("iter")=OMEGA(getCurrentIteration());
-	//scope().attr("time")=realTime(getSimulationTime());
-	//scope().attr("verbose")=;
-	//scope().attr("verbose") = verbose;
+	BASIC_PY_PROXY_WRAPPER(pyBody,"Body")
+		.add_property("shape",&pyBody::shape_get,&pyBody::shape_set)
+		.add_property("mold",&pyBody::mold_get,&pyBody::mold_set)
+		.add_property("bound",&pyBody::bound_get,&pyBody::bound_set)
+		.add_property("phys",&pyBody::phys_get,&pyBody::phys_set)
+		.add_property("id",&pyBody::id_get)
+		.add_property("isStandalone",&pyBody::isStandalone)
+		.add_property("isClumpMember",&pyBody::isClumpMember)
+		.add_property("isClump",&pyBody::isClump);
+
+	BASIC_PY_PROXY_WRAPPER(pyInteraction,"Interaction")
+		.add_property("phys",&pyInteraction::phys_get,&pyInteraction::phys_set)
+		.add_property("geom",&pyInteraction::geom_get,&pyInteraction::geom_set);
+
+	BASIC_PY_PROXY_WRAPPER(pyFileGenerator,"Preprocessor")
+		.def("generate",&pyFileGenerator::generate);
 
 }
 

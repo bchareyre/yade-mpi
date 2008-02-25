@@ -285,6 +285,8 @@ if env['pretty']:
 		INSTALLSTR='⇒ $TARGET',
 		QT_UICCOMSTR='U ${SOURCES}',
 		QT_MOCCOMSTR='M ${SOURCES}')
+else:
+	env.Replace(INSTALLSTR='cp -f ${SOURCE} ${TARGET}')
 
 ### DIRECTORIES
 ## PREFIX must be absolute path. Why?!

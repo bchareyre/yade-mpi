@@ -33,6 +33,18 @@ void cmdGui::help(){
 ";
 }
 
+void cmdGui::execScript(string script){
+	LOG_DEBUG("Python will now run file `"<<script<<"'.");
+	FILE* scriptFILE=fopen(script.c_str(),"r");
+	if(scriptFILE){
+		PyRun_SimpleFile(scriptFILE,script.c_str());
+	}
+	else{
+		string strerr(strerror(errno));
+		LOG_ERROR("Unable to open file `"<<script<<"': "<<strerr<<".");
+	}
+}
+
 int cmdGui::run(int argc, char *argv[]) {
 	string runScript;
 	
@@ -49,40 +61,21 @@ int cmdGui::run(int argc, char *argv[]) {
 
 	PyGILState_STATE pyState = PyGILState_Ensure();
 
-
+		#define PYTHON_DEFINE_STRING(pyName,cxxName) PyRun_SimpleString((string(pyName)+"='"+string(cxxName)+"'").c_str())
 		// wrap those in python::handle<> ??
-		PyRun_SimpleString("import sys, readline");
-		PyRun_SimpleString("sys.path.insert(0,'" PREFIX "/lib/yade" SUFFIX "/extra');");
-		PyRun_SimpleString("sys.path.insert(0,'" PREFIX "/lib/yade" SUFFIX "/gui');");
-		//int status=PyRun_SimpleString("from pyade import *"); // pyade will import _pyade by itself
-		//if(status){ LOG_ERROR("pyade import failed."); } else LOG_DEBUG("pyade imported.");
-		PyRun_SimpleString("from yadeControl import *");
-
-		PyRun_SimpleString("sys.excepthook=sys.__excepthook__"); // apport on ubuntu overrides this, not needed
-
-		if(!Omega::instance().getSimulationFileName().empty()){
-			string cmd="o=Omega(); o.load('"+Omega::instance().getSimulationFileName()+"'); o.run(); ";
-			LOG_INFO("Running command: `"<<cmd<<"'");
-			PyRun_SimpleString(cmd.c_str());
-		}
-
-		if(!runScript.empty()){
-			LOG_DEBUG("Will now run file `"<<runScript<<"'");
-			FILE* runScriptFILE=fopen(runScript.c_str(),"r");
-			if(runScriptFILE){
-				PyRun_SimpleFile(runScriptFILE,runScript.c_str());
-			}
-			else{
-				string strerr(strerror(errno));
-				LOG_ERROR("Unable to open file `"<<runScript<<"':"<<strerr<<".");
-			}
-		}
+		PYTHON_DEFINE_STRING("yadePrefix",PREFIX);
+		PYTHON_DEFINE_STRING("yadeSuffix",SUFFIX);
+		PYTHON_DEFINE_STRING("yadeRunSimulation",Omega::instance().getSimulationFileName());
+		PYTHON_DEFINE_STRING("yadeRunScript",runScript);
+		#undef PYTHON_DEFINE_STRING
+		execScript(PREFIX "/lib/yade" SUFFIX "/gui/cmdGuiInit.py");
+		
+		//PyRun_InteractiveLoop(stdin,"<console>");
 
 	PyGILState_Release(pyState);
 
 	//boost::thread cmdlineThread(&cmdlineThreadStart);
 	//cmdlineThread.join();
-	PyRun_InteractiveLoop(stdin,"<console>");
 
 	return 0;
 }
