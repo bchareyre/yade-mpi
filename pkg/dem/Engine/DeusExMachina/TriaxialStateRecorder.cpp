@@ -82,7 +82,7 @@ void TriaxialStateRecorder::action(Body * body)
             if ((*itFirst)->getClassName() == "TriaxialCompressionEngine" ) //|| (*itFirst)->getBaseClassName() == "TriaxialCompressionEngine")
             {
                 cerr << "stress controller engine found" << endl;
-                triaxialCompressionEngine =  dynamic_pointer_cast<TriaxialCompressionEngine> (*itFirst);
+                triaxialCompressionEngine =  YADE_PTR_CAST<TriaxialCompressionEngine> (*itFirst);
                 //triaxialCompressionEngine = shared_ptr<TriaxialCompressionEngine> (static_cast<TriaxialCompressionEngine*> ( (*itFirst).get()));
             }
         }

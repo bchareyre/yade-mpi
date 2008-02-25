@@ -41,7 +41,7 @@ void CohesiveFrictionalRelationships::go(	  const shared_ptr<PhysicalParameters>
 {
 	CohesiveFrictionalBodyParameters* sdec1 = static_cast<CohesiveFrictionalBodyParameters*>(b1.get());
 	CohesiveFrictionalBodyParameters* sdec2 = static_cast<CohesiveFrictionalBodyParameters*>(b2.get());
-	SpheresContactGeometry* interactionGeometry = dynamic_cast<SpheresContactGeometry*>(interaction->interactionGeometry.get());
+	SpheresContactGeometry* interactionGeometry = YADE_CAST<SpheresContactGeometry*>(interaction->interactionGeometry.get());
 	
 	//Create cohesive interractions only once
 	if (setCohesionNow && cohesionDefinitionIteration==-1) {

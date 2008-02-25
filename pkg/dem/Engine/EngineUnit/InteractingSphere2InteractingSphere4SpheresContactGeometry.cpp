@@ -50,23 +50,23 @@ bool InteractingSphere2InteractingSphere4SpheresContactGeometry::go(	const share
 	//         the problem is that scm can be either SDECLinkGeometry or SpheresContactGeometry and the only way CURRENTLY
 	//         to check this is by dynamic cast. This has to be fixed.
 	//
-		scm = dynamic_pointer_cast<SpheresContactGeometry>(c->interactionGeometry);
+		scm = YADE_PTR_CAST<SpheresContactGeometry>(c->interactionGeometry);
 		//scm = dynamic_cast<SpheresContactGeometry*>(c->interactionGeometry.get());
 	// BEGIN .......  FIXME FIXME	- wrong hack, to make cohesion work.
-		if(! scm) // this is not SpheresContactGeometry, so it is SDECLinkGeometry, dispatcher should do this job.
-		{
-			shared_ptr<SDECLinkGeometry> linkGeometry = dynamic_pointer_cast<SDECLinkGeometry>(c->interactionGeometry);
-//			cerr << "it is SpringGeometry ???: " << c->interactionGeometry->getClassName() << endl;
-//			assert(linkGeometry);
-			if(linkGeometry)
-			{
-				linkGeometry->normal 			= se32.position-se31.position;
-				linkGeometry->normal.Normalize();
-				return true;
-			}
-			else
-				return false; // SpringGeometry !!!???????
-		}
+// 		if(! scm) // this is not SpheresContactGeometry, so it is SDECLinkGeometry, dispatcher should do this job.
+// 		{
+// 			shared_ptr<SDECLinkGeometry> linkGeometry = dynamic_pointer_cast<SDECLinkGeometry>(c->interactionGeometry);
+// //			cerr << "it is SpringGeometry ???: " << c->interactionGeometry->getClassName() << endl;
+// //			assert(linkGeometry);
+// 			if(linkGeometry)
+// 			{
+// 				linkGeometry->normal 			= se32.position-se31.position;
+// 				linkGeometry->normal.Normalize();
+// 				return true;
+// 			}
+// 			else
+// 				return false; // SpringGeometry !!!???????
+// 		}
 	// END
 	}
 	else

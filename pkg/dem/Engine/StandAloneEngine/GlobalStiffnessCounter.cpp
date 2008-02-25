@@ -49,8 +49,8 @@ bool GlobalStiffnessCounter::isActivated()
 
 
 bool GlobalStiffnessCounter::getSphericalElasticInteractionParameters(const shared_ptr<Interaction>& contact, Vector3r& normal, Real& kn, Real& ks, Real& radius1, Real& radius2){
-	shared_ptr<SpheresContactGeometry> currentContactGeometry=static_pointer_cast<SpheresContactGeometry>(contact->interactionGeometry);
-	shared_ptr<ElasticContactInteraction> currentContactPhysics=static_pointer_cast<ElasticContactInteraction>(contact->interactionPhysics);
+	shared_ptr<SpheresContactGeometry> currentContactGeometry=YADE_PTR_CAST<SpheresContactGeometry>(contact->interactionGeometry);
+	shared_ptr<ElasticContactInteraction> currentContactPhysics=YADE_PTR_CAST<ElasticContactInteraction>(contact->interactionPhysics);
 
 	Real fn=currentContactPhysics->normalForce.SquaredLength();
 	if(fn==0) return false;//This test means : is something happening at this contact : no question about numerical error
@@ -62,8 +62,8 @@ bool GlobalStiffnessCounter::getSphericalElasticInteractionParameters(const shar
 
 bool GlobalStiffnessCounter::getInteractionParameters(const shared_ptr<Interaction>& contact, Vector3r& normal, Real& kn, Real& ks, Real& radius1, Real& radius2){
 
-	shared_ptr<SpheresContactGeometry> geom1=dynamic_pointer_cast<SpheresContactGeometry>(contact->interactionGeometry);
-	shared_ptr<ElasticContactInteraction> phys1=dynamic_pointer_cast<ElasticContactInteraction>(contact->interactionPhysics);
+	shared_ptr<SpheresContactGeometry> geom1=YADE_PTR_CAST<SpheresContactGeometry>(contact->interactionGeometry);
+	shared_ptr<ElasticContactInteraction> phys1=YADE_PTR_CAST<ElasticContactInteraction>(contact->interactionPhysics);
 	if(geom1 && phys1){
 		Real fn=phys1->normalForce.Length();
 		if(fn==0) return false;

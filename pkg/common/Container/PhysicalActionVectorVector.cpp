@@ -18,6 +18,7 @@ PhysicalActionVectorVector::PhysicalActionVectorVector()
 {
 	clear();
 //	currentIndex = -1;
+	current_size = 0;
 }
 
 
@@ -30,6 +31,7 @@ void PhysicalActionVectorVector::clear()
 {
 	physicalActions.clear();
 	usedIds.clear();
+	current_size = physicalActions.size();
 }
 
 
@@ -51,7 +53,7 @@ void PhysicalActionVectorVector::reset()
 
 unsigned int PhysicalActionVectorVector::size()
 {
-	return physicalActions.size();
+	return current_size;
 }
 
 
@@ -76,11 +78,12 @@ void PhysicalActionVectorVector::prepare(std::vector<shared_ptr<PhysicalAction> 
 // should be always succesfull. if it is not - you forgot to call prepare()
 shared_ptr<PhysicalAction>& PhysicalActionVectorVector::find(unsigned int id , int actionIndex )
 {
-	if( physicalActions.size() <= id ) // this is very rarely executed, only at beginning.
+	if( current_size <= id ) // this is very rarely executed, only at beginning.
 	// somebody is accesing out of bounds, make sure he will find, what he needs - a resetted PhysicalAction of his type
 	{
 		unsigned int oldSize = physicalActions.size();
 		unsigned int newSize = id+1;
+		current_size = newSize;
 		usedIds.resize(newSize,false);
 		physicalActions.resize(newSize);
 		for(unsigned int i = oldSize ; i < newSize ; ++i )

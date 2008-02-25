@@ -40,7 +40,7 @@ void MacroMicroElasticRelationships::go(	  const shared_ptr<PhysicalParameters>&
 {
 	BodyMacroParameters* sdec1 = static_cast<BodyMacroParameters*>(b1.get());
 	BodyMacroParameters* sdec2 = static_cast<BodyMacroParameters*>(b2.get());
-	SpheresContactGeometry* interactionGeometry = dynamic_cast<SpheresContactGeometry*>(interaction->interactionGeometry.get());
+	SpheresContactGeometry* interactionGeometry = YADE_CAST<SpheresContactGeometry*>(interaction->interactionGeometry.get());
 	
 	if(interactionGeometry) // so it is SpheresContactGeometry  - NON PERMANENT LINK
 	{
@@ -105,7 +105,7 @@ another would be HerzMindlinContactModel
 		}
 		else
 		{	// FIXME - are those lines necessary ???? what they are doing in fact ???
-			ElasticContactInteraction* contactPhysics = dynamic_cast<ElasticContactInteraction*>(interaction->interactionPhysics.get());
+			ElasticContactInteraction* contactPhysics = YADE_CAST<ElasticContactInteraction*>(interaction->interactionPhysics.get());
 			if(contactPhysics)
 			{
 				contactPhysics->kn = contactPhysics->initialKn;

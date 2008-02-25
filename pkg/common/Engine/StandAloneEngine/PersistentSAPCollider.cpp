@@ -56,7 +56,8 @@ void PersistentSAPCollider::action(Body* body)
 	Vector3r min,max;
 
 	BodyContainer::iterator bi=bodies->begin();
-	for(unsigned int i=0 ; bi!=bodies->end(); ++bi,i++) {
+	BodyContainer::iterator bi_end = bodies->end();
+	for(unsigned int i=0 ; bi!=bi_end; ++bi,i++) {
 		const shared_ptr<Body>& b=*bi;
 		offset = 3*i;
 		//FIXME: this is broken: bodies without boundingVolume are just skipped, which means that some garbage values are used later!
@@ -74,7 +75,8 @@ void PersistentSAPCollider::action(Body* body)
 	}
 
 	transientInteractions = ncb->transientInteractions;	
-	for(InteractionContainer::iterator I=transientInteractions->begin(); I!=transientInteractions->end(); ++I) {
+	InteractionContainer::iterator I_end = transientInteractions->end();
+	for(InteractionContainer::iterator I=transientInteractions->begin(); I!=I_end; ++I) {
 		if ((*I)->isReal) (*I)->isNew=false; // FIXME : remove this isNew flag and test if interactionPhysic ?
 		if(!haveDistantTransient) (*I)->isReal=false; // reset this flag, is used later... (??)
 	}

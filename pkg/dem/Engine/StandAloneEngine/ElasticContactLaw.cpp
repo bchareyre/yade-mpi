@@ -23,6 +23,8 @@ ElasticContactLaw::ElasticContactLaw() : InteractionSolver() , actionForce(new F
 {
 	sdecGroupMask=1;
 	momentRotationLaw = true;
+	actionForceIndex = actionForce->getClassIndex();
+	actionMomentumIndex = actionMomentum->getClassIndex();
 }
 
 
@@ -55,8 +57,8 @@ void ElasticContactLaw::action(Body* body)
 			
 			if( !( (*bodies)[id1]->getGroupMask() & (*bodies)[id2]->getGroupMask() & sdecGroupMask) ) continue;
 
-			SpheresContactGeometry*    currentContactGeometry= dynamic_cast<SpheresContactGeometry*>(contact->interactionGeometry.get());
-			ElasticContactInteraction* currentContactPhysics = dynamic_cast<ElasticContactInteraction*> (contact->interactionPhysics.get());
+			SpheresContactGeometry*    currentContactGeometry= YADE_CAST<SpheresContactGeometry*>(contact->interactionGeometry.get());
+			ElasticContactInteraction* currentContactPhysics = YADE_CAST<ElasticContactInteraction*> (contact->interactionPhysics.get());
 			if((!currentContactGeometry)||(!currentContactPhysics)) continue;
 	
 			BodyMacroParameters* de1 				= YADE_CAST<BodyMacroParameters*>((*bodies)[id1]->physicalParameters.get());
@@ -117,11 +119,11 @@ void ElasticContactLaw::action(Body* body)
 			Vector3r f				= currentContactPhysics->normalForce + shearForce;
 			
 	// it will be some macro(	body->physicalActions,	ActionType , bodyId )
-			static_cast<Force*>   ( ncb->physicalActions->find( id1 , actionForce   ->getClassIndex() ).get() )->force    -= f;
-			static_cast<Force*>   ( ncb->physicalActions->find( id2 , actionForce   ->getClassIndex() ).get() )->force    += f;
+			static_cast<Force*>   ( ncb->physicalActions->find( id1 , actionForceIndex).get() )->force    -= f;
+			static_cast<Force*>   ( ncb->physicalActions->find( id2 , actionForceIndex ).get() )->force    += f;
 			
-			static_cast<Momentum*>( ncb->physicalActions->find( id1 , actionMomentum->getClassIndex() ).get() )->momentum -= c1x.Cross(f);
-			static_cast<Momentum*>( ncb->physicalActions->find( id2 , actionMomentum->getClassIndex() ).get() )->momentum += c2x.Cross(f);
+			static_cast<Momentum*>( ncb->physicalActions->find( id1 , actionMomentumIndex ).get() )->momentum -= c1x.Cross(f);
+			static_cast<Momentum*>( ncb->physicalActions->find( id2 , actionMomentumIndex ).get() )->momentum += c2x.Cross(f);
 			
 			currentContactPhysics->prevNormal = currentContactGeometry->normal;
 		}

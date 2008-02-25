@@ -34,7 +34,7 @@ void SimpleElasticRelationships::go(	  const shared_ptr<PhysicalParameters>& b1 
 {
 	BodyMacroParameters* sdec1 = static_cast<BodyMacroParameters*>(b1.get());
 	BodyMacroParameters* sdec2 = static_cast<BodyMacroParameters*>(b2.get());
-	SpheresContactGeometry* interactionGeometry = dynamic_cast<SpheresContactGeometry*>(interaction->interactionGeometry.get());
+	SpheresContactGeometry* interactionGeometry = YADE_CAST<SpheresContactGeometry*>(interaction->interactionGeometry.get());
 	
 	if(interactionGeometry) // so it is SpheresContactGeometry  - NON PERMANENT LINK
 	{

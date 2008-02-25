@@ -22,7 +22,9 @@ class ElasticContactLaw : public InteractionSolver
 	private :
 		shared_ptr<PhysicalAction> actionForce;
 		shared_ptr<PhysicalAction> actionMomentum;
-
+		int actionForceIndex;
+		int actionMomentumIndex;
+		
 	public :
 		int sdecGroupMask;
 		bool momentRotationLaw;

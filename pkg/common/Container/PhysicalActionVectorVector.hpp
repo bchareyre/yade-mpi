@@ -34,6 +34,7 @@ class PhysicalActionVectorVector : public PhysicalActionContainer
 		vector< vector< shared_ptr<PhysicalAction> > > physicalActions;
 			vector< shared_ptr<PhysicalAction> >   actionTypesResetted;
 		vector< bool > usedIds;
+		unsigned int current_size;
 	
 	public :
 		PhysicalActionVectorVector();
