@@ -113,7 +113,7 @@ void printHelp()
 \n\
 	-h      : print this help.\n\
 	-n      : use NullGUI (command line interface) instead of default GUI.\n\
-	-N name : use some other custom GUI (none available yet ;)\n\
+	-N name : specify the user interface (available: NullGUI, cmdGui, QtGUI)\n\
 	-w      : launch the 'first run configuration'\n\
 	-c      : use local directory ./ as configuration directory\n\
 	-C path : configuration directory different than default ~/.yade/\n\
