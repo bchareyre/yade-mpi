@@ -13,7 +13,7 @@
 #include<boost/any.hpp>
 #include<boost/shared_ptr.hpp>
 #include<boost/python.hpp>
-#include<boost/python/stl_iterator.hpp>
+// [boost1.34] #include<boost/python/stl_iterator.hpp>
 
 #include<yade/lib-base/Logging.hpp>
 #include<yade/lib-serialization-xml/XMLFormatManager.hpp>
@@ -98,7 +98,7 @@ BASIC_PY_PROXY_HEAD(pyMetaEngine,MetaDispatchingEngine)
 		}
 		void functors_set(python::object ftrs){
 			ensureAcc(); shared_ptr<MetaDispatchingEngine> me=dynamic_pointer_cast<MetaDispatchingEngine>(proxee); if(!me) throw runtime_error("Proxied class not a MetaDispatchingEngine. (WTF?)");
-			me->clear(); int len=python::len(ftrs);
+			me->clear(); int len=PySequence_Size(ftrs.ptr()) /*[boost1.34] python::len(ftrs)*/;
 			for(int i=0; i<len; i++){ const pyEngineUnit& eu=python::extract<pyEngineUnit>(PySequence_GetItem(ftrs.ptr(),i)); me->add(eu.proxee); }
 		}
 BASIC_PY_PROXY_TAIL;
@@ -199,7 +199,7 @@ class pyOmega{
 	}
 
 	void engines_set(python::object egs){
-		assertRootBody(); int len=python::len(egs); const shared_ptr<MetaBody>& rootBody=OMEGA.getRootBody(); rootBody->engines.clear();
+		assertRootBody(); int len=PySequence_Size(egs.ptr()) /*[boost1.34] python::len(egs)*/; const shared_ptr<MetaBody>& rootBody=OMEGA.getRootBody(); rootBody->engines.clear();
 		for(int i=0; i<len; i++){
 			#define PUSH_BACK_ENGINE_IF_POSSIBLE(pyEngineType) if(python::extract<pyEngineType>(PySequence_GetItem(egs.ptr(),i)).check()){ pyEngineType e=python::extract<pyEngineType>(PySequence_GetItem(egs.ptr(),i)); rootBody->engines.push_back(e.proxee); /* cerr<<"added "<<e.pyStr()<<", a "<<#pyEngineType<<endl; */ continue; }
 			PUSH_BACK_ENGINE_IF_POSSIBLE(pyStandAloneEngine); PUSH_BACK_ENGINE_IF_POSSIBLE(pyMetaEngine); PUSH_BACK_ENGINE_IF_POSSIBLE(pyDeusExMachina);
