@@ -82,7 +82,7 @@ opts.AddOptions(
 	BoolOption('debug', 'Enable debugging information and disable optimizations',1),
 	BoolOption('profile','Enable profiling information',0),
 	BoolOption('optimize','Turn on heavy optimizations (generates SSE2 instructions)',0),
-	ListOption('exclude','Yade components that will not be built','none',names=['gui','extra','common','dem','fem','lattice','mass-spring','realtime-rigidbody']),
+	ListOption('exclude','Yade components that will not be built','none',names=['qt3','gui','extra','common','dem','fem','lattice','mass-spring','realtime-rigidbody']),
 	# OK, dummy prevents bug in scons: if one selects all, it says all in scons.config, but without quotes, which generates error.
 	ListOption('features','Optional features that are turned on','python,log4cxx',names=['python','log4cxx','dummy']),
 	('jobs','Number of jobs to run at the same time (same as -j, but saved)',4,None,int),
@@ -235,15 +235,15 @@ if not env.GetOption('clean'):
 
 	if not env['useMiniWm3']: ok&=conf.CheckLibWithHeader('Wm3Foundation','Wm3Math.h','c++','Wm3::Math<double>::PI;',autoadd=1)
 
-	ok&=conf.CheckQt(env['QTDIR'])
-	env.Tool('qt'); env.Replace(QT_LIB='qt-mt')
-
-	# one or another (QGLViewer is upstream name, 3dviewer is (teomporary) workaround for clashing name with obsolete package once in debian)
-	# (this one has to be explicitly mentioned for each plugin that uses it, no autoadd)
-	if conf.CheckLibWithHeader('QGLViewer','QGLViewer/qglviewer.h','c++','QGLViewer(1);'): env['QGLVIEWER_LIB']='QGLViewer'
-	if conf.CheckLibWithHeader('qglviewer','QGLViewer/qglviewer.h','c++','QGLViewer(1);'): env['QGLVIEWER_LIB']='qglviewer'
-	elif conf.CheckLibWithHeader('3dviewer','QGLViewer/qglviewer.h','c++','QGLViewer(1);'): env['QGLVIEWER_LIB']='3dviewer'
-	else: ok=False
+	if 'qt3' not in env['exclude']:
+		ok&=conf.CheckQt(env['QTDIR'])
+		env.Tool('qt'); env.Replace(QT_LIB='qt-mt')
+		# one or another (QGLViewer is upstream name, 3dviewer is (teomporary) workaround for clashing name with obsolete package once in debian)
+		# (this one has to be explicitly mentioned for each plugin that uses it, no autoadd)
+		if conf.CheckLibWithHeader('QGLViewer','QGLViewer/qglviewer.h','c++','QGLViewer(1);'): env['QGLVIEWER_LIB']='QGLViewer'
+		if conf.CheckLibWithHeader('qglviewer','QGLViewer/qglviewer.h','c++','QGLViewer(1);'): env['QGLVIEWER_LIB']='qglviewer'
+		elif conf.CheckLibWithHeader('3dviewer','QGLViewer/qglviewer.h','c++','QGLViewer(1);'): env['QGLVIEWER_LIB']='3dviewer'
+		else: ok=False
 	
 
 	if not ok:
@@ -317,7 +317,9 @@ if env['debug']: env.Append(CXXFLAGS='-ggdb3',CPPDEFINES=['YADE_DEBUG'])
 else: env.Append(CXXFLAGS='-O2')
 if env['optimize']:
 	env.Append(CXXFLAGS=Split('-O3 -ffast-math'),
-		CPPDEFINES=[('YADE_CAST','static_cast'),('YADE_PTR_CAST','static_pointer_cast')])
+		CPPDEFINES=[('YADE_CAST','static_cast'),('YADE_PTR_CAST','static_pointer_cast'),'NDEBUG'])
+	# NDEBUG is used in /usr/include/assert.h: when defined, asserts() are no-ops
+
 	# -floop-optimize2 is a gcc-4.x flag, doesn't exist on previous version
 	# CRASH -ffloat-store
 	# maybe not CRASH?: -fno-math-errno

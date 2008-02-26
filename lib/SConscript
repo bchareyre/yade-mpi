@@ -1,4 +1,12 @@
 Import('*')
+
+if 'qt3' not in env['exclude']:
+	env.Install('$PREFIX/lib/yade$SUFFIX/lib',[
+		env.SharedLibrary('yade-serialization-qt',
+			['serialization-qt/QtGUIGenerator.cpp'],
+			LIBS=env['LIBS']+['yade-base','XMLFormatManager']),
+		])
+
 env.Install('$PREFIX/lib/yade$SUFFIX/lib',[
 
 	env.SharedLibrary('yade-base',
@@ -52,9 +60,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/lib',[
 	env.SharedLibrary('BINFormatManager',
 		['serialization-bin/BINFormatManager.cpp']),
 
-	env.SharedLibrary('yade-serialization-qt',
-		['serialization-qt/QtGUIGenerator.cpp'],
-		LIBS=env['LIBS']+['yade-base','XMLFormatManager']),
 
 	env.SharedLibrary('XMLFormatManager',
 		['serialization-xml/XMLFormatManager.cpp',

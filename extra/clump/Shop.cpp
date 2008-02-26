@@ -411,7 +411,7 @@ void Shop::saveSpheresToFile(string fname){
 
 vector<pair<Vector3r,Real> > Shop::loadSpheresFromFile(string fname, Vector3r& minXYZ, Vector3r& maxXYZ){
 	if(!boost::filesystem::exists(fname)) {
-		throw std::runtime_error(string("File with spheres `")+fname+"' doesn't exist.");
+		throw std::invalid_argument(string("File with spheres `")+fname+"' doesn't exist.");
 	}
 	vector<pair<Vector3r,Real> > spheres;
 	ifstream sphereFile(fname.c_str());

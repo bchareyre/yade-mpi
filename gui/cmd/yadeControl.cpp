@@ -19,7 +19,7 @@
 #include<yade/lib-serialization-xml/XMLFormatManager.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/core/FileGenerator.hpp>
-#include<yade/gui-qt3/GLViewer.hpp>
+
 
 #include<yade/core/MetaDispatchingEngine.hpp>
 #include<yade/core/StandAloneEngine.hpp>
@@ -28,9 +28,12 @@
 #include<yade/core/EngineUnit1D.hpp>
 #include<yade/core/EngineUnit2D.hpp>
 
-#include<qapplication.h>
-// qt3 sucks
-#undef DEBUG
+#ifndef NO_PYGLVIEWER
+	#include<yade/gui-qt3/GLViewer.hpp>
+	#include<qapplication.h>
+	// qt3 sucks
+	#undef DEBUG
+#endif
 
 using namespace boost;
 using namespace std;
@@ -158,7 +161,13 @@ class pyOmega{
 	bool usesTimeStepper_get(){return OMEGA.timeStepperActive();}
 	void usesTimeStepper_set(bool use){OMEGA.skipTimeStepper(!use);}
 
-	void run(){OMEGA.startSimulationLoop(); cerr<<"RUN!"<<endl;}
+	void run(long int numIter=-1){
+		if(numIter>0) OMEGA.stopAtIteration=OMEGA.getCurrentIteration()+numIter;
+		//else OMEGA.stopAtIteration=-1;
+		OMEGA.startSimulationLoop();
+		long toGo=OMEGA.stopAtIteration-OMEGA.getCurrentIteration();
+		cerr<<"RUN"<<(toGo>0?string(" ("+lexical_cast<string>(toGo)+" to go)"):string(""))<<"!"<<endl;
+	}
 	// must stop, then reload
 	//void _stop(){OMEGA(resetSimulationLoop());}
 	void pause(){OMEGA.stopSimulationLoop(); cerr<<"PAUSE!"<<endl;}
@@ -211,6 +220,9 @@ class pyOmega{
 	#undef OMEGA
 };
 
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(omega_overloads,run,0,1);
+
+#ifndef NO_PYGLVIEWER
 /*! GL viewer wrapper, with full attribute access.
  *
  * Creates the 3D view on instantiation. Currently displays nothing (why???), although it redraws just fine.
@@ -275,9 +287,8 @@ public:
 		//app->quit();
 	}
 };
-
 CREATE_LOGGER(pyGLViewer);
-
+#endif
 
 
 BOOST_PYTHON_MODULE(yadeControl)
@@ -299,7 +310,7 @@ BOOST_PYTHON_MODULE(yadeControl)
 		.add_property("usesTimeStepper",&pyOmega::usesTimeStepper_get,&pyOmega::usesTimeStepper_set)
 		.def("load",&pyOmega::load)
 		.def("save",&pyOmega::save)
-		.def("run",&pyOmega::run)
+		.def("run",&pyOmega::run,omega_overloads())
 		.def("pause",&pyOmega::pause)
 		.def("step",&pyOmega::step)
 		.def("wait",&pyOmega::wait)
@@ -316,9 +327,10 @@ BOOST_PYTHON_MODULE(yadeControl)
 			.def("newView", &newView)
 			.def("centerScene", &centerScene)
 		#endif
-
+#ifndef NO_PYGLVIEWER
 	boost::python::class_<pyGLViewer>("View")
 		.ATTR_ACCESS_PY(pyGLViewer);
+#endif
 
 #define BASIC_PY_PROXY_WRAPPER(pyClass,pyName)  \
 	boost::python::class_<pyClass>(pyName,python::init<python::optional<string> >()) \
