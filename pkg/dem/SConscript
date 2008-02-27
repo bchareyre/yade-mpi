@@ -843,6 +843,16 @@ env.SharedLibrary('HydraulicTest',
 			'TranslationEngine',]),
 
 
+env.SharedLibrary('NewtonsDampedLaw',
+		['Engine/DeusExMachina/NewtonsDampedLaw.cpp'],
+		LIBS=env['LIBS']+['yade-serialization',
+			'yade-base',		
+			'yade-multimethods',
+			'Force',
+			'Momentum',
+			'RigidBodyParameters'
+			 ]),
+
 
 
 
