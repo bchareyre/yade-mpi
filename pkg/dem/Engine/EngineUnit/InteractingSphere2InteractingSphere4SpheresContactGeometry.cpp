@@ -38,6 +38,8 @@ bool InteractingSphere2InteractingSphere4SpheresContactGeometry::go(	const share
 	Vector3r normal = se32.position-se31.position;
 	Real penetrationDepth = pow(InteractionDetectionFactor*(s1->radius+s2->radius), 2) - normal.SquaredLength();// Compute a wrong value just to check sign - faster than computing distances
 	//Real penetrationDepth = s1->radius+s2->radius-normal.Normalize();
+	if (penetrationDepth>0 || c->isReal)
+	{
 
 	shared_ptr<SpheresContactGeometry> scm;
 	if (c->interactionGeometry)
@@ -72,8 +74,7 @@ bool InteractingSphere2InteractingSphere4SpheresContactGeometry::go(	const share
 	else
 		scm = shared_ptr<SpheresContactGeometry>(new SpheresContactGeometry());
 		
-	if (penetrationDepth>0)
-	{
+	
 		penetrationDepth = s1->radius+s2->radius-normal.Normalize();
 		scm->contactPoint = se31.position+(s1->radius-0.5*penetrationDepth)*normal;//0.5*(pt1+pt2);
 		scm->normal = normal;
