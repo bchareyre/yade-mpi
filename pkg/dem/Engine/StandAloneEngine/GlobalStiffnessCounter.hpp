@@ -38,6 +38,7 @@ class GlobalStiffnessCounter : public InteractionSolver
 		unsigned int interval;
 		int sdecGroupMask;
 		bool momentRotationLaw;
+		bool assumeElasticSpheres;
 	
 		GlobalStiffnessCounter();
 		void action(Body* body);

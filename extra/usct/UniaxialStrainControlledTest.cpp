@@ -280,6 +280,7 @@ void USCTGen::createEngines(){
 	shared_ptr<GlobalStiffnessCounter> globalStiffnessCounter(new GlobalStiffnessCounter);
 	globalStiffnessCounter->sdecGroupMask=1023;
 	globalStiffnessCounter->interval=100;
+	globalStiffnessCounter->assumeElasticSpheres=false;
 
 	shared_ptr<GlobalStiffnessTimeStepper> globalStiffnessTimeStepper(new GlobalStiffnessTimeStepper);
 	globalStiffnessTimeStepper->sdecGroupMask=1023; // BIN 111111111, should always match

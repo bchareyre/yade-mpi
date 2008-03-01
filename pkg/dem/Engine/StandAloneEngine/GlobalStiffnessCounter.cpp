@@ -28,6 +28,7 @@ GlobalStiffnessCounter::GlobalStiffnessCounter() : InteractionSolver() , actionF
 	interval=1;//FIXME very high frequency - not required 
 	sdecGroupMask=1;
 	momentRotationLaw = true;
+	assumeElasticSpheres = true;
 	actionForceIndex = actionForce->getClassIndex();
 	actionMomentumIndex = actionMomentum->getClassIndex();
 	actionStiffnessIndex = actionStiffness->getClassIndex();
@@ -40,6 +41,7 @@ void GlobalStiffnessCounter::registerAttributes()
 	REGISTER_ATTRIBUTE(interval);
 	REGISTER_ATTRIBUTE(sdecGroupMask);
 	REGISTER_ATTRIBUTE(momentRotationLaw);
+	REGISTER_ATTRIBUTE(assumeElasticSpheres);
 }
 
 bool GlobalStiffnessCounter::isActivated()
@@ -149,7 +151,7 @@ void GlobalStiffnessCounter::action(Body* body)
 	//	Real dt = Omega::instance().getTimeStep();
 
 	/// transient Links
-	traverseInteractions(ncb,ncb->transientInteractions, /*spheresOnly? */ true);
+	traverseInteractions(ncb,ncb->transientInteractions, /*spheresOnly? */ assumeElasticSpheres?true:false );
 
 	/* ignore pesistent links, unused */
 	// traverseInteractions(ncb,ncb->persistentInteractions);

@@ -210,7 +210,7 @@ int main(int argc, char *argv[])
 		// postponed until the config dir has been created
 		ofstream gdbBatch;
 		Omega::instance().gdbCrashBatch=(yadeConfigPath/"gdb_crash_batch-pid").string()+lexical_cast<string>(getpid());
-		gdbBatch.open(Omega::instance().gdbCrashBatch.c_str()); gdbBatch<<"attach "<<lexical_cast<string>(getpid())<<"\nthread info\nthread apply all backtrace\n"; gdbBatch.close();
+		gdbBatch.open(Omega::instance().gdbCrashBatch.c_str()); gdbBatch<<"attach "<<lexical_cast<string>(getpid())<<"\nset pagination off\nthread info\nthread apply all backtrace\ndetach\nquit\n"; gdbBatch.close();
 		signal(SIGABRT,sigHandler);
 		signal(SIGSEGV,sigHandler);
 		LOG_DEBUG("ABRT/SEGV signal handlers set, crash batch created as "<<Omega::instance().gdbCrashBatch);
