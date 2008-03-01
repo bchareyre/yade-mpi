@@ -91,7 +91,7 @@ opts.AddOptions(
 	('version','Yade version (if not specified, guess will be attempted)',None),
 	('CPPPATH', 'Additional paths for the C preprocessor (whitespace separated)',None,None,Split),
 	('LIBPATH','Additional paths for the linker (whitespace separated)',None,None,Split),
-	('QTDIR','Directories where to look for qt3',['/usr/share/qt3','/usr/lib/qt','/usr/qt/3','/usr/lib/qt-3.3'],None,Split),
+	('QTDIR','Directories where to look for qt3',['/usr/share/qt3','/usr/lib/qt','/usr/lib/qt3','/usr/qt/3','/usr/lib/qt-3.3'],None,Split),
 	('CXX','The c++ compiler','g++'),
 	('CXXFLAGS','Additional compiler flags; you can use them for tuning like -march=pentium4.',None,None,Split), # not tested if really propagates
 	BoolOption('pretty',"Don't show compiler command line (like the Linux kernel)",1),
@@ -241,7 +241,7 @@ if not env.GetOption('clean'):
 		# one or another (QGLViewer is upstream name, 3dviewer is (teomporary) workaround for clashing name with obsolete package once in debian)
 		# (this one has to be explicitly mentioned for each plugin that uses it, no autoadd)
 		if conf.CheckLibWithHeader('QGLViewer','QGLViewer/qglviewer.h','c++','QGLViewer(1);'): env['QGLVIEWER_LIB']='QGLViewer'
-		if conf.CheckLibWithHeader('qglviewer','QGLViewer/qglviewer.h','c++','QGLViewer(1);'): env['QGLVIEWER_LIB']='qglviewer'
+		elif conf.CheckLibWithHeader('qglviewer','QGLViewer/qglviewer.h','c++','QGLViewer(1);'): env['QGLVIEWER_LIB']='qglviewer'
 		elif conf.CheckLibWithHeader('3dviewer','QGLViewer/qglviewer.h','c++','QGLViewer(1);'): env['QGLVIEWER_LIB']='3dviewer'
 		else: ok=False
 	
