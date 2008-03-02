@@ -35,6 +35,10 @@ using namespace std;
 	log4cxx::LoggerPtr logger=log4cxx::Logger::getLogger("yade");
 #endif
 
+void nullHandler(int sig){
+	cerr<<"nullHandler called"<<endl;
+}
+
 void
 sigHandler(int sig){
 	#ifdef EMBED_PYTHON
@@ -52,7 +56,7 @@ sigHandler(int sig){
 			cerr<<"SIGSEGV/SIGABRT handler called; gdb batch file is `"<<Omega::instance().gdbCrashBatch<<"'"<<endl;
 			system((string("gdb -x ")+Omega::instance().gdbCrashBatch).c_str());
 			unlink(Omega::instance().gdbCrashBatch.c_str()); // delete the crash batch file
-			kill(getpid(),sig); // reemit signal after exiting gdb
+			raise(sig); // reemit signal after exiting gdb
 		}
 	#endif
 	if(sig==SIGHUP){
@@ -170,6 +174,8 @@ int main(int argc, char *argv[])
 			case '-': coreOptions=false; break;
 			default: printHelp(); return 1;
 		}
+	// save original options
+	Omega::instance().origArgv=argv; Omega::instance().origArgc=argc;
 	// kill processed options, keep one more which will is in fact non-option (normally the binary)
 	argv=&(argv[optind-1]); argc-=optind-1;
 	// reset getopt globals for next processing

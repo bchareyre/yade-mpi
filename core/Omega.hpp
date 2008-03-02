@@ -102,6 +102,7 @@ class Omega : public Singleton<Omega>
 		// dtto for gdb
 		string gdbCrashBatch;
 		string recoveryFilename;
+		char** origArgv; int origArgc;
 
 		// FIXME end
 		

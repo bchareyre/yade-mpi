@@ -207,7 +207,7 @@ class pyOmega{
 		}
 	}
 
-	//void join(){cerr<<"JOIN!"<<endl; OMEGA.joinSimulationLoop();}
+	//void join(){cerr<<"JOIN!"<<endl; OMEGA.joinSimulationLoop(); /* FIXME: this is OK, but must create simulation loop again! */ }
 	void wait(){ if(OMEGA.isRunning()){cerr<<"WAIT!"<<endl;} while(OMEGA.isRunning()) usleep(20000 /*20 ms*/); }
 	
 	pyBodyContainer bodies_get(void){assertRootBody(); return pyBodyContainer(OMEGA.getRootBody()->bodies); }

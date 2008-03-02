@@ -321,6 +321,7 @@ void Omega::loadSimulation()
 		&&  (filesystem::exists(simulationFileName)) 
 		&&  (filesystem::extension(simulationFileName)==".xml" || filesystem::extension(simulationFileName)==".yade" ))
 	{
+		// FIXME: should stop running simulation!!
 		freeRootBody();
 		LOG_INFO("Loading file " + simulationFileName);
 		

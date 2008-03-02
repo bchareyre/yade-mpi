@@ -19,6 +19,7 @@ void cmdGui::help(){
 \n\
 	-h       print this help\n\
 	-s file  run this python script before entering interactive prompt\n\
+	/* -c cmd   run python command (may be specified multiple times, newline is appended every time) */ \n\ 
 \n\
 	Sample session:\n\
 \n\
@@ -47,12 +48,14 @@ void cmdGui::execScript(string script){
 
 int cmdGui::run(int argc, char *argv[]) {
 	string runScript;
+	string runCommands;
 	
 	int ch;
 	while((ch=getopt(argc,argv,"hs:"))!=-1)
 	switch(ch){
 		case 'h': help(); return 1;
 		case 's': runScript=string(optarg); break;
+		//case 'c': runCommands+=string(optarg)+"\n"; break;
 		default: break;
 	}
 
@@ -65,8 +68,10 @@ int cmdGui::run(int argc, char *argv[]) {
 		// wrap those in python::handle<> ??
 		PYTHON_DEFINE_STRING("yadePrefix",PREFIX);
 		PYTHON_DEFINE_STRING("yadeSuffix",SUFFIX);
+		PYTHON_DEFINE_STRING("yadeExecutable",Omega::instance().origArgv[0]);
 		PYTHON_DEFINE_STRING("yadeRunSimulation",Omega::instance().getSimulationFileName());
 		PYTHON_DEFINE_STRING("yadeRunScript",runScript);
+		PYTHON_DEFINE_STRING("yadeRunCommands",runCommands);
 		#undef PYTHON_DEFINE_STRING
 		execScript(PREFIX "/lib/yade" SUFFIX "/gui/cmdGuiInit.py");
 		

@@ -19,6 +19,11 @@ if yadeRunScript:
 	print "Running script "+yadeRunScript
 	execfile(yadeRunScript)
 
+# run commands if requested from the command line
+#if yadeRunCommands:
+#	print "Running commands from commandline: "+yadeRunCommands
+#	exec(yadeRunCommands)
+
 try:
 	# prefer ipython, since it is colorful and cool
 	from IPython.Shell import IPShellEmbed
