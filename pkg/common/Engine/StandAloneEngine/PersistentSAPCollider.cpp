@@ -67,10 +67,14 @@ void PersistentSAPCollider::action(Body* body)
 			maxima[offset+0]=max[0]; maxima[offset+1]=max[1]; maxima[offset+2]=max[2];
 		}
 		else {
-			double nan=std::numeric_limits<Real>::quiet_NaN();
-			minima[offset+0]=nan; minima[offset+1]=nan; minima[offset+2]=nan;
-			maxima[offset+0]=nan; maxima[offset+1]=nan; maxima[offset+2]=nan;
-			cerr<<"Assigning nan's, not tested! (hangs during sort?)"<<endl;	
+			// double nan=std::numeric_limits<Real>::quiet_NaN();
+			// cerr<<"Assigning nan's, not tested! (hangs during sort?)"<<endl;
+			/* assign the center of gravity as zero-volume bounding box;
+			 * it should not create spurious interactions and
+			 * is a better solution that putting nan's into minima and maxima which crashes on _some_ machines */
+			const Vector3r& pos=b->physicalParameters->se3.position;
+			minima[offset+0]=pos[0]; minima[offset+1]=pos[1]; minima[offset+2]=pos[2];
+			maxima[offset+0]=pos[0]; maxima[offset+1]=pos[1]; maxima[offset+2]=pos[2];
 		}
 	}
 

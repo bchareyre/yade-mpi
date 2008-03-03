@@ -21,7 +21,7 @@
 #  3. Have build.log with commands and all output...
 #
 # And as usually, clean up the code, get rid of workarounds and hacks etc.
-import os,os.path,string,re,sys
+import os,os.path,string,re,sys,shutil
 import SCons
 # SCons version numbers are needed a few times
 # rewritten for python2.4
@@ -143,11 +143,13 @@ env['buildDir']=buildDir
 # these MUST be first so that builddir's headers are read before any locally installed ones
 buildInc='$buildDir/include/yade-$version'
 env.Append(CPPPATH=[buildInc])
-
 if env['useMiniWm3']: env.Append(CPPPATH=[buildInc+'/yade/lib-miniWm3'])
 
-### OLD: older scons only
-if not os.path.exists(buildDir): os.makedirs(buildDir)
+if env.GetOption('clean'):
+	print "Removing build directory `%s'"%buildDir
+	shutil.rmtree(buildDir)
+	Exit()
+
 
 env.SConsignFile(buildDir+'/scons-signatures')
 
@@ -253,7 +255,7 @@ if not env.GetOption('clean'):
 	# check optional libs
 	if 'log4cxx' in env['features'] and conf.CheckLibWithHeader('log4cxx','log4cxx/logger.h','c++','log4cxx::Logger::getLogger("foo");',autoadd=1):
 		env.Append(CPPDEFINES=['LOG4CXX'])
-	if 'python' in env['features'] and conf.CheckPython() and conf.CheckScientificPython() and (
+	if 'python' in env['features'] and conf.CheckPython() and ( ### not needed now: and conf.CheckScientificPython() and (
 		conf.CheckLibWithHeader('boost_python-mt','boost/python.hpp','c++','boost::python::scope();',autoadd=1)
 		or conf.CheckLibWithHeader('boost_python','boost/python.hpp','c++','boost::python::scope();',autoadd=1)):
 		env.Append(CPPDEFINES=['EMBED_PYTHON'])
