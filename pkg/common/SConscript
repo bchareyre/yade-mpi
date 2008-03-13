@@ -109,7 +109,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-common',[
 	env.SharedLibrary('Quadrilateral',
 		['DataClass/GeometricalModel/Quadrilateral.cpp'],
 		LIBS=env['LIBS']+['yade-base','yade-multimethods'],
-		CPPPATH=env['CPPPATH']+['$PREFIX/include', 'DataClass/GeometricalModel']),
+		CPPPATH=env['CPPPATH']+['$PREFIX/include','DataClass/GeometricalModel']),
 
 	env.SharedLibrary('ForceEngine',
 		['Engine/DeusExMachina/ForceEngine.cpp'],
@@ -121,11 +121,16 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-common',[
 
 	env.SharedLibrary('GravityEngine',
 		['Engine/DeusExMachina/GravityEngine.cpp'],
-		LIBS=env['LIBS']+['yade-base',  'Force', 'ParticleParameters'],
+		LIBS=env['LIBS']+['yade-base','Force','ParticleParameters'],
 		CPPPATH=env['CPPPATH']+['Engine/DeusExMachina',
 			'DataClass/PhysicalAction',
 			'$PREFIX/include',
 			'DataClass/PhysicalParameters']),
+	
+	env.SharedLibrary('CentralGravityEngine',
+		['Engine/DeusExMachina/CentralGravityEngine.cpp'],
+		LIBS=env['LIBS']+['yade-base','Force','ParticleParameters'],
+		),
 
 	env.SharedLibrary('RotationEngine',
 		['Engine/DeusExMachina/RotationEngine.cpp'],

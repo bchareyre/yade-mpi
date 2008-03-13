@@ -4,28 +4,14 @@ if 'qt3' not in env['exclude']:
 	env.Install('$PREFIX/lib/yade$SUFFIX/gui',[
 		env.SharedLibrary('QtGUI',
 			['qt3/FileDialog.cpp',
-				'qt3/GLEngineEditor.cpp',
-				'qt3/GLSimulationPlayerViewer.cpp',
 				'qt3/GLViewer.cpp',
 				'qt3/MessageDialog.cpp',
-				'qt3/QtCodeGenerator.cpp',
-				'qt3/QtEngineEditor.cpp',
 				'qt3/QtFileGenerator.cpp',
 				'qt3/QtFileGeneratorController.ui',
 				'qt3/QtGUI.cpp',
 				'qt3/QtGUIPreferences.cpp',
-				'qt3/QtGeneratedCodeGenerator.ui',
-				'qt3/QtGeneratedEngineEditor.ui',
 				'qt3/QtGeneratedMessageDialog.ui',
-				'qt3/QtGeneratedMetaDispatchingEngineProperties.ui',
-				'qt3/QtGeneratedPreferencesEditor.ui',
 				'qt3/QtGeneratedSimulationController.ui',
-				'qt3/QtGeneratedSimulationPlayer.ui',
-				'qt3/QtGeneratedSphericalDEMSimulator.ui',
-				'qt3/QtMetaDispatchingEngineProperties.cpp',
-				'qt3/QtPreferencesEditor.cpp',
-				'qt3/QtSimulationPlayer.cpp',
-				'qt3/QtSphericalDEM.cpp',
 				'qt3/SimulationController.cpp',
 				'qt3/SimulationControllerUpdater.cpp',
 				'qt3/YadeQtGeneratedMainWindow.ui',
@@ -45,7 +31,12 @@ if 'qt3' not in env['exclude']:
 if 'EMBED_PYTHON' in env['CPPDEFINES']:
 	env.Install('$PREFIX/lib/yade$SUFFIX/gui',[
 		env.SharedLibrary('cmdGui',['cmd/cmdGui.cpp']),
-		env.SharedLibrary('yadeControl',['cmd/yadeControl.cpp'],SHLIBPREFIX='',CPPDEFINES=env['CPPDEFINES']+['NO_PYGLVIEWER'],LIBS=env['LIBS']+['yade-base','libboost_python','XMLFormatManager','yade-factory','yade-serialization']), # link with 'QtGUI' in you enable pyGLViewer
+		env.SharedLibrary('yadeControl',['cmd/yadeControl.cpp','cmd/GLViewer4.cpp'],SHLIBPREFIX='',
+			LIBS=env['LIBS']+['yade-base','libboost_python','XMLFormatManager','yade-factory','yade-serialization',],
+			# '$QGLVIEWER_LIB'
+			#CPPPATH=env['CPPPATH']+['/usr/include/qt4','/usr/include/qt4/Qt','/usr/include/qt4/QtXml','/usr/include/qt4/QtOpenGL','/usr/include/qt4/QtCore','/usr/include/qt4/QtGui'],
+			CPPDEFINES=env['CPPDEFINES']+['NO_PYGLVIEWER'],
+			),
 		env.File('cmdGuiInit.py','cmd')
 ])
 

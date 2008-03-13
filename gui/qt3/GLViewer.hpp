@@ -11,7 +11,7 @@
 #include<yade/core/Omega.hpp>
 //#include<yade/lib-opengl/GLWindowsManager.hpp> // remove that...
 #include<yade/core/RenderingEngine.hpp>
-#include <QGLViewer/qglviewer.h>
+#include<yade/lib-QGLViewer/qglviewer.h>
 
 class GLViewer : public QGLViewer
 {	

@@ -96,6 +96,7 @@ opts.AddOptions(
 	('CXXFLAGS','Additional compiler flags; you can use them for tuning like -march=pentium4.',None,None,Split), # not tested if really propagates
 	BoolOption('pretty',"Don't show compiler command line (like the Linux kernel)",1),
 	BoolOption('useMiniWm3','use local miniWm3 library instead of Wm3Foundation',1),
+	#BoolOption('useLocalQGLViewer','use in-tree QGLViewer library instead of the one installed in system',1),
 )
 
 ### create THE environment
@@ -144,6 +145,7 @@ env['buildDir']=buildDir
 buildInc='$buildDir/include/yade-$version'
 env.Append(CPPPATH=[buildInc])
 if env['useMiniWm3']: env.Append(CPPPATH=[buildInc+'/yade/lib-miniWm3'])
+#if env['useLocalQGLViewer']: env.Append(CPPPATH=[buildInc+'/yade/lib-QGLViewer'])
 
 if env.GetOption('clean'):
 	print "Removing build directory `%s'"%buildDir
@@ -240,13 +242,17 @@ if not env.GetOption('clean'):
 	if 'qt3' not in env['exclude']:
 		ok&=conf.CheckQt(env['QTDIR'])
 		env.Tool('qt'); env.Replace(QT_LIB='qt-mt')
+		env['QGLVIEWER_LIB']='yade-QGLViewer';
 		# one or another (QGLViewer is upstream name, 3dviewer is (teomporary) workaround for clashing name with obsolete package once in debian)
 		# (this one has to be explicitly mentioned for each plugin that uses it, no autoadd)
-		if conf.CheckLibWithHeader('QGLViewer','QGLViewer/qglviewer.h','c++','QGLViewer(1);'): env['QGLVIEWER_LIB']='QGLViewer'
-		elif conf.CheckLibWithHeader('qglviewer','QGLViewer/qglviewer.h','c++','QGLViewer(1);'): env['QGLVIEWER_LIB']='qglviewer'
-		elif conf.CheckLibWithHeader('3dviewer','QGLViewer/qglviewer.h','c++','QGLViewer(1);'): env['QGLVIEWER_LIB']='3dviewer'
-		else: ok=False
-	
+		#if env['useLocalQGLViewer']:
+		#	env['QGLVIEWER_LIB']='yade-QGLViewer';
+		#else:
+		#	if conf.CheckLibWithHeader('QGLViewer','QGLViewer/qglviewer.h','c++','QGLViewer(1);'): env['QGLVIEWER_LIB']='QGLViewer'
+		#	elif conf.CheckLibWithHeader('qglviewer','QGLViewer/qglviewer.h','c++','QGLViewer(1);'): env['QGLVIEWER_LIB']='qglviewer'
+		#	elif conf.CheckLibWithHeader('3dviewer','QGLViewer/qglviewer.h','c++','QGLViewer(1);'): env['QGLVIEWER_LIB']='3dviewer'
+		#	else: ok=False
+		#	if ok: print "!!! WARNING\n!!! Using system QGLViewer is not very well tested \n!!! and if there is version mismatch, wrong headers may be included.\n!!! If you get mysterious crashes, look here for cause. "
 
 	if not ok:
 		print "\nOne of the essential libraries above was not found, unable to continue.\n\nCheck `%s' for possible causes, note that there are options that you may need to customize:\n\n"%(buildDir+'/config.log')+opts.GenerateHelpText(env)

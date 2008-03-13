@@ -4,7 +4,46 @@ if 'qt3' not in env['exclude']:
 	env.Install('$PREFIX/lib/yade$SUFFIX/lib',[
 		env.SharedLibrary('yade-serialization-qt',
 			['serialization-qt/QtGUIGenerator.cpp'],
-			LIBS=env['LIBS']+['yade-base','XMLFormatManager']),
+			LIBS=env['LIBS']+['yade-base','XMLFormatManager'])])
+	#if env['useLocalQGLViewer']:
+	env.Install('$PREFIX/lib/yade$SUFFIX/lib',[
+			#env.Uic(['QGLViewer/VRenderInterface.Qt3.ui','QGLViewer/ImageInterface.Qt3.ui']),
+			env.SharedLibrary('yade-QGLViewer',Split('''
+				QGLViewer/VRenderInterface.Qt3.cpp
+				QGLViewer/ImageInterface.Qt3.cpp
+				QGLViewer/qglviewer.cpp 
+				QGLViewer/camera.cpp 
+				QGLViewer/manipulatedFrame.cpp 
+				QGLViewer/manipulatedCameraFrame.cpp 
+				QGLViewer/frame.cpp 
+				QGLViewer/saveSnapshot.cpp 
+				QGLViewer/constraint.cpp 
+				QGLViewer/keyFrameInterpolator.cpp 
+				QGLViewer/mouseGrabber.cpp 
+				QGLViewer/quaternion.cpp 
+				QGLViewer/vec.cpp
+				QGLViewer/VRender/BackFaceCullingOptimizer.cpp 
+				QGLViewer/VRender/BSPSortMethod.cpp 
+				QGLViewer/VRender/EPSExporter.cpp 
+				QGLViewer/VRender/Exporter.cpp 
+				QGLViewer/VRender/FIGExporter.cpp 
+				QGLViewer/VRender/gpc.cpp 
+				QGLViewer/VRender/ParserGL.cpp 
+				QGLViewer/VRender/Primitive.cpp 
+				QGLViewer/VRender/PrimitivePositioning.cpp 
+				QGLViewer/VRender/TopologicalSortMethod.cpp 
+				QGLViewer/VRender/VisibilityOptimizer.cpp 
+				QGLViewer/VRender/Vector2.cpp 
+				QGLViewer/VRender/Vector3.cpp 
+				QGLViewer/VRender/NVector3.cpp 
+				QGLViewer/VRender/VRender.cpp
+				'''),
+				# we want to REALLY optimize this, even in debug builds of yade
+				CXXFLAGS=[x for x in env['CXXFLAGS'] if x not in ['-ggdb3','-g','-pg'] ]+['-O3','-g0'],
+				# HACK: uic generates files in the buildDir, but gcc is invoked on files in the original dir;
+				# since the generated header is #include'd "...", it looks for it in the original dir
+				# no idea why this _does_ work with gui/qt3. Go figure.
+				CPPPATH=env['CPPPATH']+['${TARGET.dir}']),
 		])
 
 env.Install('$PREFIX/lib/yade$SUFFIX/lib',[

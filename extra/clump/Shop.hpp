@@ -61,6 +61,11 @@ class Shop{
 		static shared_ptr<Body> tetra(Vector3r v[4]);
 
 		static vector<pair<Vector3r,Real> > loadSpheresFromFile(string fname,Vector3r& minXYZ, Vector3r& maxXYZ);
+		
+		struct sphereGeomStruct{ double C0, C1, C2, r; };
+		static sphereGeomStruct smallSdecXyzData[];
+		static vector<pair<Vector3r,Real> > loadSpheresSmallSdecXyz(Vector3r& minXYZ, Vector3r& maxXYZ);
+		
 		static void saveSpheresToFile(string fileName);
 
 		// (true || boost::lambda::_1) means that true is the default

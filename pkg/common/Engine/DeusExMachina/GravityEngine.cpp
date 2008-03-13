@@ -6,9 +6,9 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "GravityEngine.hpp"
-#include "ParticleParameters.hpp"
-#include "Force.hpp"
+#include"GravityEngine.hpp"
+#include<yade/pkg-common/ParticleParameters.hpp>
+#include<yade/pkg-common/Force.hpp>
 #include<yade/core/MetaBody.hpp>
 
 GravityEngine::GravityEngine() : actionParameterForce(new Force), gravity(Vector3r::ZERO)

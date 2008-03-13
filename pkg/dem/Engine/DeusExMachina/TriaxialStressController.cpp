@@ -20,10 +20,12 @@
 
 CREATE_LOGGER(TriaxialStressController);
 
-TriaxialStressController::TriaxialStressController() : actionParameterForce(new Force), wall_bottom_id(wall_id[0]), wall_top_id(wall_id[1]), wall_left_id(wall_id[2]), wall_right_id(wall_id[3]), wall_front_id(wall_id[4]), wall_back_id(wall_id[5])
+TriaxialStressController::TriaxialStressController(): wall_bottom_id(wall_id[0]), wall_top_id(wall_id[1]), wall_left_id(wall_id[2]), wall_right_id(wall_id[3]), wall_front_id(wall_id[4]), wall_back_id(wall_id[5])
 {
 	//StiffnessMatrixClassIndex = actionParameterStiffnessMatrix->getClassIndex();
-	ForceClassIndex = actionParameterForce->getClassIndex();
+	shared_ptr<Force> tmpF(new Force);
+	ForceClassIndex=tmpF->getClassIndex();
+
 	previousStress = 0;
 	previousMultiplier = 1;
 	
@@ -54,9 +56,6 @@ TriaxialStressController::TriaxialStressController() : actionParameterForce(new 
 	finalMaxMultiplier = 1.00001;
 	internalCompaction = true;
 	
-	//StiffnessMatrixClassIndex = actionParameterStiffnessMatrix->getClassIndex();
-	ForceClassIndex = actionParameterForce->getClassIndex();
-			
 	wall_bottom_activated = true;
 	wall_top_activated = true;
 	wall_left_activated = true;

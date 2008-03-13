@@ -27,7 +27,8 @@ class PhysicalParameters;
 class TriaxialStressController : public DeusExMachina 
 {
 	private :
-		shared_ptr<PhysicalAction> actionParameterForce;
+		//shared_ptr<PhysicalAction> actionParameterForce;
+		//int cachedForceClassIndex;
 		int ForceClassIndex;
 		Real previousStress, previousMultiplier; //previous mean stress and size multiplier		
 		

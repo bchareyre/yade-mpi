@@ -124,7 +124,13 @@ bool USCTGen::generate(){
 	typedef vector<pair<Vector3r,Real> > vecVecReal;
 	Shop::setDefault("phys_young",30e7);
 
-	vecVecReal spheres=Shop::loadSpheresFromFile(spheresFile,minXYZ,maxXYZ);
+	vecVecReal spheres;
+	if(spheresFile.empty()){ 
+		LOG_INFO("spheresFile empty, loading hardwired Shop::smallSdecXyzData (examples/small.sdec.xyz).");
+		spheres=Shop::loadSpheresSmallSdecXyz(minXYZ,maxXYZ);
+	}
+	else spheres=Shop::loadSpheresFromFile(spheresFile,minXYZ,maxXYZ);
+
 	TRVAR2(minXYZ,maxXYZ);
 	// get spheres that are "close enough" to the strained ends
 	for(vecVecReal::iterator I=spheres.begin(); I!=spheres.end(); I++){

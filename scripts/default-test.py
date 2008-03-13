@@ -36,6 +36,8 @@ def crashProofRun():
 	if retval==0: return 'passed (%s iter/sec)'%(open(speedFile,'r').readline()[:-1])
 	else: return 'CRASHED (backtrace above)'
 
+generators=o.childClasses('FileGenerator')
+
 for pp in o.childClasses('FileGenerator'):
 	if pp in broken:
 		print "============= (skipping broken "+pp+")=============="

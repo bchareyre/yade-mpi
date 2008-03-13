@@ -28,11 +28,10 @@
 #include<yade/core/EngineUnit1D.hpp>
 #include<yade/core/EngineUnit2D.hpp>
 
-#ifndef NO_PYGLVIEWER
-	#include<yade/gui-qt3/GLViewer.hpp>
-	#include<qapplication.h>
-	// qt3 sucks
-	#undef DEBUG
+#ifdef USE_PYGLVIEWER
+	#include"GLViewer4.hpp"
+	#include<Qt/qapplication.h>
+	#include<Qt/qthread.h>
 #endif
 
 using namespace boost;
@@ -222,7 +221,7 @@ class pyOmega{
 
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(omega_overloads,run,0,1);
 
-#ifndef NO_PYGLVIEWER
+#ifdef USE_PYGLVIEWER 
 /*! GL viewer wrapper, with full attribute access.
  *
  * Creates the 3D view on instantiation. Currently displays nothing (why???), although it redraws just fine.
@@ -231,7 +230,8 @@ BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(omega_overloads,run,0,1);
 class pyGLViewer{
 	//DECLARE_LOGGER;
 	shared_ptr<RenderingEngine> renderer;
-	shared_ptr<GLViewer> viewer;
+	shared_ptr<GLViewer4> viewer;
+#if 0
 	shared_ptr<boost::thread> redrawThread,appThread;
 	QApplication* app;
 	void redrawAlarm(void){
@@ -242,8 +242,27 @@ class pyGLViewer{
 			usleep(10000000);
 		}
 	}
+#endif 
+	class DrawThread: public QThread{
+		//Q_OBJECT;
+		const shared_ptr<GLViewer4> vw;
+		shared_ptr<QTimer> timer;
+		public:
+			DrawThread(shared_ptr<GLViewer4> _viewer): vw(_viewer){}
+			virtual void run(){
+				LOG_WARN("drawThread::run() with viewer "<<vw);
+				timer=shared_ptr<QTimer>(new QTimer());
+				connect(timer.get(),SIGNAL(timeout()),vw.get(),SLOT(callUpdateGL()));
+				timer->start(100);
+				//while(true){ cerr<<"@"; vw->updateGL(); usleep(50000);}
+				exec();
+			};
+		//public slots:
+		//	void updateGL(){cerr<<"@";}
+	};
 	shared_ptr<AttrAccess> accessor;
 	void ensureAcc(){if(!accessor)accessor=shared_ptr<AttrAccess>(new AttrAccess(renderer));}
+	shared_ptr<DrawThread> drawThread;
 public:
 	DECLARE_LOGGER;
 	ATTR_ACCESS_CXX(accessor,ensureAcc);	
@@ -269,18 +288,24 @@ public:
 		if(!renderer) throw runtime_error("Unable to create renderer!");
 
 		int viewId=0;
-		if(viewId==0){	int _argc=0; char _argvv[]="foo"; app=new QApplication(_argc,(char**) &_argvv);}
+		//if(viewId==0){	int _argc=0; char _argvv[]="foo"; app=new QApplication(_argc,(char**) &_argvv);}
+		//app->setMainWidget(viewer.get());
+		int _argc=0; char _argvv[]="foo"; //QApplication* app=new 
+		QApplication* app=new QApplication(_argc,(char**) &_argvv);
 
-		QGLFormat format;	QGLFormat::setDefaultFormat(format); // format.setStencil(TRUE); format.setAlpha(TRUE);
-		viewer=shared_ptr<GLViewer>(new GLViewer(viewId,renderer,format,0,0));
+		QGLFormat format;	QGLFormat::setDefaultFormat(format); format.setStencil(TRUE); format.setAlpha(TRUE);
+		viewer=shared_ptr<GLViewer4>(new GLViewer4(viewId,renderer,format,/*parent*/0,0/* non-primary views will have to share widgets, though */)); //
+		viewer->setWindowTitle("GL Viewer");
 		viewer->centerScene();
-		viewer->notMoving();
+		viewer->show();
+		drawThread=shared_ptr<DrawThread>(new DrawThread(viewer));
+		drawThread->start(); // is the same as DrawThread->run() except for check that it isn't running already?!
 
-		if(viewId==0){
+		/*if(viewId==0){
 			app->setMainWidget(viewer.get());
 			redrawThread=shared_ptr<boost::thread>(new boost::thread(boost::bind(&pyGLViewer::redrawAlarm,this)));
 		}
-		appThread=shared_ptr<boost::thread>(new boost::thread(boost::bind(&QApplication::exec,app)));
+		appThread=shared_ptr<boost::thread>(new boost::thread(boost::bind(&QApplication::exec,app))); */
 	}
 	~pyGLViewer(){// redrawThread and appThread deleted by the descructor
 		//viewer->close();
@@ -288,7 +313,7 @@ public:
 	}
 };
 CREATE_LOGGER(pyGLViewer);
-#endif
+#endif /* USE_PYGLVIEWER */
 
 
 BOOST_PYTHON_MODULE(yadeControl)
@@ -327,7 +352,7 @@ BOOST_PYTHON_MODULE(yadeControl)
 			.def("newView", &newView)
 			.def("centerScene", &centerScene)
 		#endif
-#ifndef NO_PYGLVIEWER
+#ifdef USE_PYGLVIEWER
 	boost::python::class_<pyGLViewer>("View")
 		.ATTR_ACCESS_PY(pyGLViewer);
 #endif
