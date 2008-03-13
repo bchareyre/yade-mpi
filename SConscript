@@ -1,2 +1,2 @@
 Import('*')
-SConscript(dirs=env['yadeModules'],duplicate=1)
+SConscript(dirs=env['yadeModules'],duplicate=0)

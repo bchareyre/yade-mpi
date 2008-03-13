@@ -7,7 +7,8 @@ if 'qt3' not in env['exclude']:
 			LIBS=env['LIBS']+['yade-base','XMLFormatManager'])])
 	#if env['useLocalQGLViewer']:
 	env.Install('$PREFIX/lib/yade$SUFFIX/lib',[
-			#env.Uic(['QGLViewer/VRenderInterface.Qt3.ui','QGLViewer/ImageInterface.Qt3.ui']),
+			env.Uic(target=['QGLViewer/VRenderInterface.Qt3.h','QGLViewer/VRenderInterface.Qt3.cpp','QGLViewer/moc_VRenderInterface.Qt3.cpp'],source='QGLViewer/VRenderInterface.Qt3.ui'),
+			env.Uic(target=['QGLViewer/ImageInterface.Qt3.h','QGLViewer/ImageInterface.Qt3.cpp','QGLViewer/moc_ImageInterface.Qt3.cpp'],source='QGLViewer/ImageInterface.Qt3.ui'),
 			env.SharedLibrary('yade-QGLViewer',Split('''
 				QGLViewer/VRenderInterface.Qt3.cpp
 				QGLViewer/ImageInterface.Qt3.cpp
