@@ -1,21 +1,14 @@
 Import('*')
 
 if 'qt3' not in env['exclude']:
-	# QGLVIewer uses non-standatd suffix of the generated .cpp file: standard is moc_VRenderInterface.Qt3.cpp, for example. This overrides that.	
-	env.Uic(target=['QGLViewer/VRenderInterface.Qt3.h','QGLViewer/VRenderInterface.Qt3.cpp'],source='QGLViewer/VRenderInterface.Qt3.ui'),
-	env.Uic(target=['QGLViewer/ImageInterface.Qt3.h','QGLViewer/ImageInterface.Qt3.cpp'],source='QGLViewer/ImageInterface.Qt3.ui'),
-	env.Moc(source='QGLViewer/ImageInterface.Qt3.h',target=['QGLViewer/moc_ImageInterface.Qt3.cpp'])
-	env.Moc(source='QGLViewer/VRenderInterface.Qt3.h',target=['QGLViewer/moc_VRenderInterface.Qt3.cpp'])
 	env.Install('$PREFIX/lib/yade$SUFFIX/lib',[
 		env.SharedLibrary('yade-serialization-qt',
 			['serialization-qt/QtGUIGenerator.cpp'],
 			LIBS=env['LIBS']+['yade-base','XMLFormatManager']),
 		env.SharedLibrary('yade-QGLViewer',Split('''
-				QGLViewer/moc_VRenderInterface.Qt3.cpp
-				QGLViewer/moc_ImageInterface.Qt3.cpp
+				QGLViewer/VRenderInterface_Qt3.ui
+				QGLViewer/ImageInterface_Qt3.ui
 
-				QGLViewer/VRenderInterface.Qt3.cpp
-				QGLViewer/ImageInterface.Qt3.cpp
 				QGLViewer/qglviewer.cpp 
 				QGLViewer/camera.cpp 
 				QGLViewer/manipulatedFrame.cpp 
@@ -48,7 +41,7 @@ if 'qt3' not in env['exclude']:
 				# HACK: uic generates files in the buildDir, but gcc is invoked on files in the original dir;
 				# since the generated header is #include'd "...", it looks for it in the original dir
 				# no idea why this _does_ work with gui/qt3. Go figure.
-				CPPPATH=env['CPPPATH']+['${TARGET.dir}']
+				CPPPATH=env['CPPPATH']+['${TARGET.dir}'],
 			),
 		])
 

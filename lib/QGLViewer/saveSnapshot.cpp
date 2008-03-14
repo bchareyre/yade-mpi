@@ -32,7 +32,7 @@
 #  include <qcheckbox.h>
 #  include <qcombobox.h>
 #  if QT_VERSION >= 0x030000
-#   include "VRenderInterface.Qt3.h"
+#   include "VRenderInterface_Qt3.h"
 #  else
 #   include "VRenderInterface.Qt2.h"
 #  endif
@@ -46,7 +46,7 @@
 # include <qspinbox.h>
 # include <qcheckbox.h>
 # if QT_VERSION >= 0x030000
-#  include "ImageInterface.Qt3.h"
+#  include "ImageInterface_Qt3.h"
 # else
 #  include "ImageInterface.Qt2.h"
 # endif

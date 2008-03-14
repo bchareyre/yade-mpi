@@ -19,7 +19,7 @@ void cmdGui::help(){
 \n\
 	-h       print this help\n\
 	-s file  run this python script before entering interactive prompt\n\
-	/* -c cmd   run python command (may be specified multiple times, newline is appended every time) */ \n\ 
+	/* -c cmd   run python command (may be specified multiple times, newline is appended every time) */ \n\
 \n\
 	Sample session:\n\
 \n\
