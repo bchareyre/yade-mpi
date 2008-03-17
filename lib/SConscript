@@ -8,7 +8,6 @@ if 'qt3' not in env['exclude']:
 		env.SharedLibrary('yade-QGLViewer',Split('''
 				QGLViewer/VRenderInterface_Qt3.ui
 				QGLViewer/ImageInterface_Qt3.ui
-
 				QGLViewer/qglviewer.cpp 
 				QGLViewer/camera.cpp 
 				QGLViewer/manipulatedFrame.cpp 

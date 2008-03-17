@@ -36,6 +36,7 @@ sconsVersion=10000*float(ver[0])
 if len(ver)>1: sconsVersion+=100*float(ver[1])
 if len(ver)>2: sconsVersion+=float(ver[2])
 # print sconsVersion
+#
 
 ##########################################################################################
 ########## PROXY TO NEWER SCONS (DOWNLOADED IF NEEDED) ###################################
@@ -147,13 +148,31 @@ env.Append(CPPPATH=[buildInc])
 if env['useMiniWm3']: env.Append(CPPPATH=[buildInc+'/yade/lib-miniWm3'])
 #if env['useLocalQGLViewer']: env.Append(CPPPATH=[buildInc+'/yade/lib-QGLViewer'])
 
-if env.GetOption('clean'):
-	print "Removing build directory `%s'"%buildDir
-	shutil.rmtree(buildDir)
-	Exit()
-
-
 env.SConsignFile(buildDir+'/scons-signatures')
+
+##########################################################################################
+############# SHORTCUT TARGETS ###########################################################
+##########################################################################################
+
+if len(sys.argv)>1:
+	if 'clean' in sys.argv:
+		if os.path.exists(buildDir):
+			print "Cleaning: %s."%buildDir; shutil.rmtree(buildDir)
+		else: print "Nothing to clean: %s."%buildDir
+		sys.argv.remove('clean')
+	if 'tags' in sys.argv:
+		cmd="ctags -R --extra=+q --fields=+n --exclude='.*' --exclude=scons-local --exclude=include --exclude='*.so' --langmap=c++:+.inl"
+		print cmd; os.system(cmd)
+		sys.argv.remove('tags')
+	if 'doc' in sys.argv:
+		cmd="cd doc; doxygen Doxyfile"
+		print cmd; os.system(cmd)
+		sys.argv.remove('doc')
+	# still something on the command line? Ignore, but warn about that
+	if len(sys.argv)>1: print "!!! WARNING: Shortcuts (clean,tags,doc) cannot be mixed with regular targets or options; ignoring:\n"+''.join(["!!!\t"+a+"\n" for a in sys.argv[1:]])
+	# bail out
+	Exit(0)
+
 
 ##########################################################################################
 ############# CONFIGURATION ##############################################################
@@ -464,9 +483,7 @@ else: env['yadeModules']=libDirs+['core']
 # read top-level SConscript file. It is used only so that build_dir is set. This file reads all SConscripts from in yadeModules
 env.SConscript(dirs=['.'],build_dir=buildDir,duplicate=0)
 
-############# OTHER TARGETS #####################
-env.Command('tags',libDirs,"ctags -R --extra=+q --fields=+n --exclude='.*' --exclude=yade-flat --exclude=include --exclude='*.so'")
-env.Alias('doc',env.Command('doc/doxygen/html/index.html',libDirs,"cd doc; doxygen Doxyfile"))
+
 
 
 
