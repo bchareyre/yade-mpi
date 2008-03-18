@@ -65,6 +65,8 @@
 #include<yade/pkg-common/InteractionHashMap.hpp>
 #include<yade/pkg-common/PhysicalActionVectorVector.hpp>
 
+#include<yade/extra/Shop.hpp>
+
 #include <boost/filesystem/convenience.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/numeric/conversion/bounds.hpp>
@@ -92,7 +94,7 @@ CohesiveTriaxialTest::CohesiveTriaxialTest () : FileGenerator()
 	lowerCorner 		= Vector3r(0,0,0);
 	upperCorner 		= Vector3r(1,1,1);
 	thickness 		= 0.001;
-	importFilename 		= "./small.sdec.xyz";
+	importFilename 		= "";
 	outputFileName 		= "./CohesiveTriaxialTest.xml";
 	//nlayers = 1;
 	wall_top 		= true;
@@ -133,6 +135,7 @@ CohesiveTriaxialTest::CohesiveTriaxialTest () : FileGenerator()
 	wallStiffnessUpdateInterval = 10;
 	radiusControlInterval = 10;
 	numberOfGrains = 400;
+	radiusDeviation = 0.3;
 	strainRate = 10;
 	StabilityCriterion = 0.01;
 	autoCompressionActivation = false;
@@ -203,6 +206,7 @@ void CohesiveTriaxialTest::registerAttributes()
 	REGISTER_ATTRIBUTE(wallStiffnessUpdateInterval);
 	REGISTER_ATTRIBUTE(radiusControlInterval);
 	REGISTER_ATTRIBUTE(numberOfGrains);
+	REGISTER_ATTRIBUTE(radiusDeviation);
 	REGISTER_ATTRIBUTE(strainRate);
 	REGISTER_ATTRIBUTE(StabilityCriterion);
 	REGISTER_ATTRIBUTE(autoCompressionActivation);
@@ -368,7 +372,8 @@ bool CohesiveTriaxialTest::generate()
 	}
 	
 	vector<BasicSphere> sphere_list;
-	message=GenerateCloud(sphere_list, lowerCorner, upperCorner, numberOfGrains, 0.3, 0.75);
+	if(importFilename!="") sphere_list=Shop::loadSpheresFromFile(importFilename,lowerCorner,upperCorner);
+	else message=GenerateCloud(sphere_list, lowerCorner, upperCorner, numberOfGrains, radiusDeviation, 0.75);
 	
 	vector<BasicSphere>::iterator it = sphere_list.begin();
 	vector<BasicSphere>::iterator it_end = sphere_list.end();
@@ -463,8 +468,9 @@ void CohesiveTriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r positio
 	shared_ptr<Sphere> gSphere(new Sphere);
 	shared_ptr<InteractingSphere> iSphere(new InteractingSphere);
 	
-	Quaternionr q;
-	q.FromAxisAngle( Vector3r(0,0,1),0);
+	Quaternionr q(Mathr::SymmetricRandom(),Mathr::SymmetricRandom(),Mathr::SymmetricRandom(),Mathr::SymmetricRandom());
+	q.Normalize();
+//	q.FromAxisAngle( Vector3r(0,0,1),0);
 	
 	body->isDynamic			= dynamic;
 	
@@ -491,6 +497,7 @@ void CohesiveTriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r positio
 
 
 	gSphere->radius			= radius;
+//	gSphere->diffuseColor		= ((int)(position[0]*400.0))%2?Vector3r(0.7,0.7,0.7):Vector3r(0.45,0.45,0.45);
 	gSphere->diffuseColor		= spheresColor;
 	gSphere->wire			= false;
 	gSphere->visible		= true;
@@ -650,7 +657,7 @@ void CohesiveTriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	triaxialcompressionEngine-> sigma_iso = sigma_iso;
 	triaxialcompressionEngine-> sigmaLateralConfinement = sigma_iso;
 	triaxialcompressionEngine-> sigmaIsoCompaction = sigma_iso;
-	triaxialcompressionEngine-> max_vel = 0.01;
+	triaxialcompressionEngine-> max_vel = 1;
 	triaxialcompressionEngine-> thickness = thickness;
 	triaxialcompressionEngine->strainRate = strainRate;
 	triaxialcompressionEngine->StabilityCriterion = StabilityCriterion;

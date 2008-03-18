@@ -116,6 +116,10 @@ void OpenGLRenderingEngine::render(
 		int a=1;
 		char* b=(char*)"./yade";
 		glutInit(&a,&b);
+// transparent spheres (still not working)
+//glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH | GLUT_MULTISAMPLE | GLUT_ALPHA);
+//glEnable(GL_BLEND);
+//glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 		initDone=true;
 	}
 #endif

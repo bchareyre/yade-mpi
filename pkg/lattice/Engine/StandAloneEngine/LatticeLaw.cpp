@@ -289,7 +289,7 @@ void LatticeLaw::action(Body* body)
 		{ // 'E_min' 'E_max' criterion
 			if( deleteBeam(lattice , beam, body) ) // calculates strain
 			{
-				std::cerr << "one beam deleted\n";
+				//std::cerr << "one beam deleted\n";
 				futureDeletes.push_back(body->getId());
 				continue;
 			}
@@ -383,7 +383,7 @@ void LatticeLaw::action(Body* body)
 		}
 	}
 
-	std::cout << "iter:" << Omega::instance().getCurrentIteration() << " beams_deleted: " << futureDeletes.size() << std::endl;
+	//std::cout << "iter:" << Omega::instance().getCurrentIteration() << " beams_deleted: " << futureDeletes.size() << std::endl;
 	
 	{ // move nodes
 		bi    = bodies->begin();

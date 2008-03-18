@@ -109,8 +109,8 @@ struct FundamentalHandler< Vector2<RealType> >
 			vector<string> tokens;
 			IOFormatManager::parseFundamental(*tmpStr, tokens);
 		
-			tmp->x() = lexical_cast<RealType>(tokens[0]);
-			tmp->y() = lexical_cast<RealType>(tokens[1]);
+			tmp->X() = lexical_cast<RealType>(tokens[0]);
+			tmp->Y() = lexical_cast<RealType>(tokens[1]);
 		}
 		else if (a.type()==typeid(const vector<unsigned char>*)) // from binary stream to Type
 		{
@@ -119,8 +119,8 @@ struct FundamentalHandler< Vector2<RealType> >
 			static vector<RealType> content;
 			content.clear();
 			binary_to_data(*tmpBin,content);
-			tmp->x() = content[0];
-			tmp->y() = content[1];
+			tmp->X() = content[0];
+			tmp->Y() = content[1];
 		}
 		else
 			throw HandlerError(SerializationExceptions::ExtraCopyError);
@@ -132,9 +132,9 @@ struct FundamentalHandler< Vector2<RealType> >
 			string * tmpStr = any_cast<string*>(a);
 			Vector2<RealType> * tmp = any_cast<Vector2<RealType>*>(ac.getAddress());
 			*tmpStr =	IOFormatManager::getCustomFundamentalOpeningBracket()	+
-					lexical_cast<string>(tmp->x())			+
+					lexical_cast<string>(tmp->X())			+
 					IOFormatManager::getCustomFundamentalSeparator()	+
-					lexical_cast<string>(tmp->y())			+
+					lexical_cast<string>(tmp->Y())			+
 					IOFormatManager::getCustomFundamentalClosingBracket();
 		}
 		else if (a.type()==typeid(vector<unsigned char>*)) // from Vector2<RealType> to binary stream
@@ -144,8 +144,8 @@ struct FundamentalHandler< Vector2<RealType> >
 			(*tmpBin).clear();
 			static vector<RealType> content;
 			content.clear();
-			content.push_back(tmp->x());
-			content.push_back(tmp->y());
+			content.push_back(tmp->X());
+			content.push_back(tmp->Y());
 			data_to_binary(content,*tmpBin);
 		}
 		else
@@ -230,10 +230,10 @@ struct FundamentalHandler< Vector4<RealType> >
 			vector<string> tokens;
 			IOFormatManager::parseFundamental(*tmpStr, tokens);
 		
-			tmp->x() = lexical_cast<RealType>(tokens[0]);
-			tmp->y() = lexical_cast<RealType>(tokens[1]);
-			tmp->z() = lexical_cast<RealType>(tokens[2]);
-			tmp->w() = lexical_cast<RealType>(tokens[3]);
+			tmp->X() = lexical_cast<RealType>(tokens[0]);
+			tmp->Y() = lexical_cast<RealType>(tokens[1]);
+			tmp->Z() = lexical_cast<RealType>(tokens[2]);
+			tmp->W() = lexical_cast<RealType>(tokens[3]);
 		}
 		else if (a.type()==typeid(const vector<unsigned char>*)) // from binary stream to Type
 		{
@@ -242,10 +242,10 @@ struct FundamentalHandler< Vector4<RealType> >
 			static vector<RealType> content;
 			content.clear();
 			binary_to_data(*tmpBin,content);
-			tmp->w() = content[0];
-			tmp->x() = content[1];
-			tmp->y() = content[2];
-			tmp->z() = content[3];
+			tmp->W() = content[0];
+			tmp->X() = content[1];
+			tmp->Y() = content[2];
+			tmp->Z() = content[3];
 		}
 		else
 			throw HandlerError(SerializationExceptions::ExtraCopyError);
@@ -257,13 +257,13 @@ struct FundamentalHandler< Vector4<RealType> >
 			string * tmpStr = any_cast<string*>(a);
 			Vector4<RealType> * tmp = any_cast<Vector4<RealType>*>(ac.getAddress());
 			*tmpStr =	IOFormatManager::getCustomFundamentalOpeningBracket()	+
-					lexical_cast<string>(tmp->x())			+
+					lexical_cast<string>(tmp->X())			+
 					IOFormatManager::getCustomFundamentalSeparator()	+
-					lexical_cast<string>(tmp->y())			+
+					lexical_cast<string>(tmp->Y())			+
 					IOFormatManager::getCustomFundamentalSeparator()	+
-					lexical_cast<string>(tmp->z())			+
+					lexical_cast<string>(tmp->Z())			+
 					IOFormatManager::getCustomFundamentalSeparator()	+
-					lexical_cast<string>(tmp->w())			+
+					lexical_cast<string>(tmp->W())			+
 					IOFormatManager::getCustomFundamentalClosingBracket();
 		}
 		else if (a.type()==typeid(vector<unsigned char>*)) // from Vector2<RealType> to binary stream
@@ -273,10 +273,10 @@ struct FundamentalHandler< Vector4<RealType> >
 			(*tmpBin).clear();
 			static vector<RealType> content;
 			content.clear();
-			content.push_back(tmp->w());
-			content.push_back(tmp->x());
-			content.push_back(tmp->y());
-			content.push_back(tmp->z());
+			content.push_back(tmp->W());
+			content.push_back(tmp->X());
+			content.push_back(tmp->Y());
+			content.push_back(tmp->Z());
 			data_to_binary(content,*tmpBin);
 		}
 		else
@@ -596,7 +596,7 @@ struct FundamentalHandler< Quaternion<RealType> >
 				axis[0] = lexical_cast<RealType>(tokens[0]);
 				axis[1] = lexical_cast<RealType>(tokens[1]);
 				axis[2] = lexical_cast<RealType>(tokens[2]);
-				angle = axis.normalize();
+				angle = axis.Normalize();
 			}
 			else // tokens.size()==4 Quaternion is written as axis angle
 			{
@@ -605,7 +605,7 @@ struct FundamentalHandler< Quaternion<RealType> >
 				axis[2] = lexical_cast<RealType>(tokens[2]);
 				angle   = lexical_cast<RealType>(tokens[3]);
 			}
-			tmp->fromAxisAngle(axis,angle);
+			tmp->FromAxisAngle(axis,angle);
 		}
 		else if (a.type()==typeid(const vector<unsigned char>*)) // from binary stream to Type
 		{
@@ -614,10 +614,10 @@ struct FundamentalHandler< Quaternion<RealType> >
 			static vector<RealType> content;
 			content.clear();
 			binary_to_data(*tmpBin,content);
-			tmp->w() = content[0];
-			tmp->x() = content[1];
-			tmp->y() = content[2];
-			tmp->z() = content[3];
+			tmp->W() = content[0];
+			tmp->X() = content[1];
+			tmp->Y() = content[2];
+			tmp->Z() = content[3];
 		}
 		else
 			throw HandlerError(SerializationExceptions::ExtraCopyError);
@@ -632,8 +632,8 @@ struct FundamentalHandler< Quaternion<RealType> >
 		
 			RealType angle;
 			Vector3<RealType> axis;
-			tmp->toAxisAngle(axis,angle);
-			axis.normalize();
+			tmp->ToAxisAngle(axis,angle);
+			axis.Normalize();
 
 			*tmpStr =	IOFormatManager::getCustomFundamentalOpeningBracket()	+
 					lexical_cast<string>(axis[0])			+
@@ -652,10 +652,10 @@ struct FundamentalHandler< Quaternion<RealType> >
 			(*tmpBin).clear();
 			static vector<RealType> content;
 			content.clear();
-			content.push_back(tmp->w());
-			content.push_back(tmp->x());
-			content.push_back(tmp->y());
-			content.push_back(tmp->z());
+			content.push_back(tmp->W());
+			content.push_back(tmp->X());
+			content.push_back(tmp->Y());
+			content.push_back(tmp->Z());
 			data_to_binary(content,*tmpBin);
 		}
 		else

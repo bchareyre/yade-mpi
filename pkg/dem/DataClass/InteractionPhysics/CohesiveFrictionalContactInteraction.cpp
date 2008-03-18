@@ -17,7 +17,16 @@ CohesiveFrictionalContactInteraction::CohesiveFrictionalContactInteraction()
 	fragile = true;
 	normalAdhesion = 0;
 	shearAdhesion = 0;
-	
+
+// assign neutral value	
+	orientationToContact1 = Quaternionr(1.0,0.0,0.0,0.0);
+	orientationToContact2 = Quaternionr(1.0,0.0,0.0,0.0);
+	initialOrientation1 = Quaternionr(1.0,0.0,0.0,0.0);
+	initialOrientation2 = Quaternionr(1.0,0.0,0.0,0.0);
+	kr = 0;
+	currentContactOrientation = Quaternionr(1.0,0.0,0.0,0.0);
+	initialContactOrientation = Quaternionr(1.0,0.0,0.0,0.0);
+	initialPosition1=initialPosition2=Vector3r(1,0,0);
 }
 
 void CohesiveFrictionalContactInteraction::SetBreakingState()
@@ -53,6 +62,21 @@ void CohesiveFrictionalContactInteraction::registerAttributes()
 	REGISTER_ATTRIBUTE(cohesionBroken);
 	REGISTER_ATTRIBUTE(normalAdhesion);
 	REGISTER_ATTRIBUTE(shearAdhesion);
+
+// FIXME where this?
+	REGISTER_ATTRIBUTE(orientationToContact1);
+	REGISTER_ATTRIBUTE(orientationToContact2);
+	REGISTER_ATTRIBUTE(initialOrientation1);
+	REGISTER_ATTRIBUTE(initialOrientation2);
+	REGISTER_ATTRIBUTE(kr);
+	REGISTER_ATTRIBUTE(currentContactOrientation);
+	REGISTER_ATTRIBUTE(initialContactOrientation);
+	REGISTER_ATTRIBUTE(initialPosition1);
+	REGISTER_ATTRIBUTE(initialPosition2);
+//	REGISTER_ATTRIBUTE(prevX1);
+//	REGISTER_ATTRIBUTE(prevX2);
+//	REGISTER_ATTRIBUTE(initX1);
+//	REGISTER_ATTRIBUTE(initX2);
 //		Real		 kn				// normal elastic constant.
 //				,ks				// shear elastic constant.
 //				,initialKn			// initial normal elastic constant.

@@ -90,6 +90,10 @@ void GLDrawSphere::go(const shared_ptr<GeometricalModel>& gm, const shared_ptr<P
 	
 	glMaterialv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, Vector3f(gm->diffuseColor[0],gm->diffuseColor[1],gm->diffuseColor[2]));
 	glColor3v(gm->diffuseColor);
+
+// transparent spheres
+//glColor4(gm->diffuseColor[0],gm->diffuseColor[1],gm->diffuseColor[2],0.4);
+
  	if (gm->wire || wire)
  	{
 		//glScalef(radius,radius,radius);
@@ -125,7 +129,10 @@ void GLDrawSphere::go(const shared_ptr<GeometricalModel>& gm, const shared_ptr<P
 		glDisable(GL_LIGHTING);
 		float vectorY1=radius,startY=vectorY1;
 		float vectorX1=0,startX=vectorX1;
-		glBegin(GL_LINE_STRIP);			
+	glBegin(GL_LINE_STRIP);
+//filled circle (why it doesn't work? in separate small test program - 20 lines - it works)
+//glBegin(GL_TRIANGLE_FAN);
+//glVertex2d(0.0,0.0);
 		for(float angle=0.0f ; angle <= (2.0f*3.14159) ; angle+=0.31f)
 		{		
 			float vectorX=(radius*(float)sin((double)angle));

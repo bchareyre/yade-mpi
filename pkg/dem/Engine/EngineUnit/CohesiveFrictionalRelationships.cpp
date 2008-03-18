@@ -23,6 +23,8 @@ CohesiveFrictionalRelationships::CohesiveFrictionalRelationships()
 		setCohesionNow = false;
 		setCohesionOnNewContacts = false;
 		cohesionDefinitionIteration = -1; 
+
+//		elasticRollingLimit = ;
 }
 
 
@@ -34,6 +36,15 @@ void CohesiveFrictionalRelationships::registerAttributes()
 	REGISTER_ATTRIBUTE(setCohesionOnNewContacts);	
 }
 
+
+//
+//
+//
+/// Big WHAT THE FUCK? this code below is duplicated THREE times due to some weird IFs !
+/// need to FIXME that.
+/// but from all my testing it works currently. / janek
+//
+//
 
 void CohesiveFrictionalRelationships::go(	  const shared_ptr<PhysicalParameters>& b1 // CohesiveFrictionalBodyParameters
 					, const shared_ptr<PhysicalParameters>& b2 // CohesiveFrictionalBodyParameters
@@ -55,6 +66,7 @@ void CohesiveFrictionalRelationships::go(	  const shared_ptr<PhysicalParameters>
 	{
 		if(interaction->isNew)
 		{
+//std::cerr << " isNew, id1: " << interaction->getId1() << " id2: " << interaction->getId2()  << "\n";
 			interaction->interactionPhysics = shared_ptr<CohesiveFrictionalContactInteraction>(new CohesiveFrictionalContactInteraction());
 			CohesiveFrictionalContactInteraction* contactPhysics = YADE_CAST<CohesiveFrictionalContactInteraction*>(interaction->interactionPhysics.get());
 
@@ -73,8 +85,13 @@ void CohesiveFrictionalRelationships::go(	  const shared_ptr<PhysicalParameters>
 			Real Dinit 	= Da+Db; 			// FIXME - is it just a sum?
 			//Real Sinit 	= Mathr::PI * std::pow( std::min(Da,Db) , 2);
 
-			Real Kn = 2*Ea*Da*Eb*Db/(Ea*Da+Eb*Db);//harmonic average of two stiffnesses
-			Real Ks = 2*Ea*Da*Va*Eb*Db*Vb/(Ea*Da*Va+Eb*Db*Va);//harmonic average of two stiffnesses with ks=V*kn for each sphere
+			Real Kn = 2.0*Ea*Da*Eb*Db/(Ea*Da+Eb*Db);//harmonic average of two stiffnesses
+			Real Ks = 2.0*Ea*Da*Va*Eb*Db*Vb/(Ea*Da*Va+Eb*Db*Va);//harmonic average of two stiffnesses with ks=V*kn for each sphere
+
+			// Jean-Patrick Plassiard, Noura Belhaine, Frederic
+			// Victor Donze, "Calibration procedure for spherical
+			// discrete elements using a local moemnt law".
+			Real Kr = Da*Db*Ks*2.0; // just like "2.0" above - it's an arbitrary parameter
 
 			contactPhysics->initialKn			= Kn;
 			contactPhysics->initialKs			= Ks;
@@ -82,10 +99,33 @@ void CohesiveFrictionalRelationships::go(	  const shared_ptr<PhysicalParameters>
 			contactPhysics->frictionAngle			= std::min(fa,fb); // FIXME - this is actually a waste of memory space, just like initialKs and initialKn
 			contactPhysics->tangensOfFrictionAngle		= std::tan(contactPhysics->frictionAngle);
 
-			if ((setCohesionOnNewContacts || setCohesionNow) && sdec1->isCohesive && sdec2->isCohesive) { 
-			contactPhysics->cohesionBroken = false;
-			contactPhysics->normalAdhesion			= normalCohesion*pow(std::min(interactionGeometry->radius2, interactionGeometry->radius1),2);
-			contactPhysics->shearAdhesion			= shearCohesion*pow(std::min(interactionGeometry->radius2, interactionGeometry->radius1),2);;
+			if ((setCohesionOnNewContacts || setCohesionNow) && sdec1->isCohesive && sdec2->isCohesive) 
+			{
+				contactPhysics->cohesionBroken = false;
+				contactPhysics->normalAdhesion			= normalCohesion*pow(std::min(Db, Da),2);
+				contactPhysics->shearAdhesion			= shearCohesion*pow(std::min(Db, Da),2);;
+			
+				// FIXME - not sure: do I need to repeat it here [1] ?
+				contactPhysics->initialOrientation1	= sdec1->se3.orientation;
+				contactPhysics->initialOrientation2	= sdec2->se3.orientation;
+				contactPhysics->initialPosition1    = sdec1->se3.position;
+				contactPhysics->initialPosition2    = sdec2->se3.position;
+				contactPhysics->kr = Kr;
+				contactPhysics->initialContactOrientation.Align(Vector3r(1.0,0.0,0.0),interactionGeometry->normal);
+				contactPhysics->currentContactOrientation = contactPhysics->initialContactOrientation;
+				contactPhysics->orientationToContact1   = contactPhysics->initialOrientation1.Conjugate() * contactPhysics->initialContactOrientation;
+				contactPhysics->orientationToContact2	= contactPhysics->initialOrientation2.Conjugate() * contactPhysics->initialContactOrientation;
+
+
+//if((interaction->getId1()==7 && interaction->getId2()==12)||(interaction->getId1()==12 && interaction->getId2()==7)){
+//Vector3r axis0;
+//Real angle0;
+//contactPhysics->initialRelativeOrientation.ToAxisAngle(axis0,angle0);
+//std::cout << "-----------------------\n"
+//                                               << " ax0: " <<  axis0[0] << " " << axis0[1] << " " << axis0[2] << " an0: " << angle0 << "\n";
+//}
+
+				//contactPhysics->elasticRollingLimit = elasticRollingLimit;
 			}
 
 			contactPhysics->prevNormal 			= interactionGeometry->normal;
@@ -95,19 +135,54 @@ void CohesiveFrictionalRelationships::go(	  const shared_ptr<PhysicalParameters>
 			contactPhysics->ks = contactPhysics->initialKs;
 			contactPhysics->equilibriumDistance = contactPhysics->initialEquilibriumDistance;
 
+			// FIXME - or here [1] ?
+			contactPhysics->initialOrientation1	= sdec1->se3.orientation;
+			contactPhysics->initialOrientation2	= sdec2->se3.orientation;
+			contactPhysics->initialPosition1    = sdec1->se3.position;
+			contactPhysics->initialPosition2    = sdec2->se3.position;
+			contactPhysics->kr = Kr;
+			contactPhysics->initialContactOrientation.Align(Vector3r(1.0,0.0,0.0),interactionGeometry->normal);
+			contactPhysics->currentContactOrientation = contactPhysics->initialContactOrientation;
+			contactPhysics->orientationToContact1   = contactPhysics->initialOrientation1.Conjugate() * contactPhysics->initialContactOrientation;
+			contactPhysics->orientationToContact2	= contactPhysics->initialOrientation2.Conjugate() * contactPhysics->initialContactOrientation;
+			//contactPhysics->elasticRollingLimit = elasticRollingLimit;
+			//
 		}
-		else
-		{	// FIXME - are those lines necessary ???? what they are doing in fact ???
+		else // !isNew
+		{	
+			// FIXME - are those lines necessary ???? what they are doing in fact ???
+			// ANSWER - they are used when you setCohesionNow (contact isNew not)
 			CohesiveFrictionalContactInteraction* contactPhysics = YADE_CAST<CohesiveFrictionalContactInteraction*>(interaction->interactionPhysics.get());
 
 			contactPhysics->kn = contactPhysics->initialKn;
 			contactPhysics->ks = contactPhysics->initialKs;
 			contactPhysics->equilibriumDistance = contactPhysics->initialEquilibriumDistance;
-			if (setCohesionNow && sdec1->isCohesive && sdec2->isCohesive) { 
-			contactPhysics->cohesionBroken = false;
-			contactPhysics->normalAdhesion			= normalCohesion*pow(std::min(interactionGeometry->radius2, interactionGeometry->radius1),2);
-			contactPhysics->shearAdhesion			= shearCohesion*pow(std::min(interactionGeometry->radius2, interactionGeometry->radius1),2);
-			//setCohesionNow = false;
+
+			if (setCohesionNow && sdec1->isCohesive && sdec2->isCohesive) 
+			{ 
+				contactPhysics->cohesionBroken = false;
+				contactPhysics->normalAdhesion			= normalCohesion*pow(std::min(interactionGeometry->radius2, interactionGeometry->radius1),2);
+				contactPhysics->shearAdhesion			= shearCohesion*pow(std::min(interactionGeometry->radius2, interactionGeometry->radius1),2);
+				//setCohesionNow = false;
+
+			contactPhysics->initialOrientation1 = sdec1->se3.orientation;
+			contactPhysics->initialOrientation2 = sdec2->se3.orientation;
+			contactPhysics->initialPosition1    = sdec1->se3.position;
+			contactPhysics->initialPosition2    = sdec2->se3.position;
+			Real Da 	= interactionGeometry->radius1; // FIXME - multiply by factor of sphere interaction distance (so sphere interacts at bigger range that its geometrical size)
+			Real Db 	= interactionGeometry->radius2; // FIXME - as above
+			Real Kr = Da*Db*contactPhysics->ks*2.0; // just like "2.0" above - it's an arbitrary parameter
+			contactPhysics->kr = Kr;
+			contactPhysics->initialContactOrientation.Align(Vector3r(1.0,0.0,0.0),interactionGeometry->normal);
+			contactPhysics->currentContactOrientation = contactPhysics->initialContactOrientation;
+			contactPhysics->orientationToContact1   = contactPhysics->initialOrientation1.Conjugate() * contactPhysics->initialContactOrientation;
+			contactPhysics->orientationToContact2	= contactPhysics->initialOrientation2.Conjugate() * contactPhysics->initialContactOrientation;
+//Vector3r axis0;
+//Real angle0;
+//contactPhysics->initialRelativeOrientation.ToAxisAngle(axis0,angle0);
+//std::cout << "id1: " << interaction->getId1() << " id2: " << interaction->getId2() << " | "
+//                                               << " ax0: " <<  axis0[0] << " " << axis0[1] << " " << axis0[2] << ", an0: " << angle0 << "\n";
+				//contactPhysics->elasticRollingLimit = elasticRollingLimit;
 			}
 		}	
 		

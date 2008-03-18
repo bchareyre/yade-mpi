@@ -1,36 +1,36 @@
 /*************************************************************************
-*  Copyright (C) 2004 by Janek Kozicki                                   *
+*  Copyright (C) 2008 by Janek Kozicki                                   *
 *  cosurgi@berlios.de                                                    *
 *                                                                        *
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "ForceEngine.hpp"
+#include "MomentEngine.hpp"
 #include "ParticleParameters.hpp"
-#include "Force.hpp"
+#include "Momentum.hpp"
 
 
 #include<yade/core/MetaBody.hpp>
 
 
-ForceEngine::ForceEngine() : actionParameterForce(new Force), force(Vector3r::ZERO)
+MomentEngine::MomentEngine() : actionParameterMoment(new Momentum), moment(Vector3r::ZERO)
 {
 }
 
-ForceEngine::~ForceEngine()
+MomentEngine::~MomentEngine()
 {
 }
 
 
-void ForceEngine::registerAttributes()
+void MomentEngine::registerAttributes()
 {
 	DeusExMachina::registerAttributes();
-	REGISTER_ATTRIBUTE(force);
+	REGISTER_ATTRIBUTE(moment);
 }
 
 
-void ForceEngine::applyCondition(Body* body)
+void MomentEngine::applyCondition(Body* body)
 {
 	MetaBody * ncb = YADE_CAST<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
@@ -42,9 +42,9 @@ void ForceEngine::applyCondition(Body* body)
 	{
 		if(ncb->bodies->exists( *ii ))
 		{
-			static_cast<Force*>( ncb->physicalActions->find( *ii        , actionParameterForce->getClassIndex() ).get() )->force += force;
+			static_cast<Momentum*>( ncb->physicalActions->find( *ii        , actionParameterMoment->getClassIndex() ).get() )->momentum += moment;
 		} else {
-			std::cerr << "ForceEngine: body " << *ii << "doesn't exist, cannot apply force.";
+			std::cerr << "MomentEngine: body " << *ii << "doesn't exist, cannot apply moment.";
 		}
         }
 }

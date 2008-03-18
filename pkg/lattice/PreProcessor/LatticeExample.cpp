@@ -64,7 +64,7 @@ LatticeExample::LatticeExample() : FileGenerator()
 	quadGroupMask		= 4;
         
         speciemen_size_in_meters = Vector3r(0.1,0.1,0.0001);
-        cellsizeUnit_in_meters   = 0.003;
+        cellsizeUnit_in_meters   = 0.01;//0.003;
 #ifndef MINIWM3
 	use_Delaunay		 = true;
 #else

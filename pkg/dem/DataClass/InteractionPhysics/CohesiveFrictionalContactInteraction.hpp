@@ -21,6 +21,12 @@ class CohesiveFrictionalContactInteraction : public ElasticContactInteraction
 
 		Real		normalAdhesion			// max tensile force
 				,shearAdhesion;			// max shear force (actual max force can include friction too depending on cohesionDisablesFriction)
+
+		Quaternionr	initialOrientation1,initialOrientation2,
+				orientationToContact1,orientationToContact2,
+				currentContactOrientation,initialContactOrientation;
+		Vector3r	initialPosition1,initialPosition2;
+		Real		kr; // rolling stiffness
 	
 		CohesiveFrictionalContactInteraction();
 		virtual ~CohesiveFrictionalContactInteraction();

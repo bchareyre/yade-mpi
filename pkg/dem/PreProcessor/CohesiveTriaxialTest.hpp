@@ -51,6 +51,7 @@ class CohesiveTriaxialTest : public FileGenerator
 				,dampingForce
 				,dampingMomentum
 				,defaultDt
+				,radiusDeviation
 
 // 				,bigBallRadius
 // 				,bigBallDensity
