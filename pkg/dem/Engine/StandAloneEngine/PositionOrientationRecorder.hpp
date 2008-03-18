@@ -12,11 +12,18 @@
 #include<yade/core/DataRecorder.hpp>
 #include <string>
 #include <fstream>
-
+/*!
+ * Engine recording positions and orientation to plain ASCII files, primarily intended for use with the Simulation Player.
+ *
+ * See http://yade.wikia.com/wiki/New:Making_videos for details .
+ *
+ */
 class PositionOrientationRecorder : public DataRecorder
 {
 	public :
+		//! basename of the output files; for example, /tmp/xyz will produce /tmp/xyz_000010, /tmp/xyz_000020 and so on (with interval==10)
 		std::string outputFile;
+		//! modulo of iteration number when the se3's will be be written out
 		unsigned int interval;
 	
 		std::ofstream ofile;

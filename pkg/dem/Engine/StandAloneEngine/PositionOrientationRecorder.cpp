@@ -51,7 +51,11 @@ void PositionOrientationRecorder::action(Body * body)
 	
 	if( Omega::instance().getCurrentIteration() % interval == 0 /*&& ofile*/ )
 	{
-		ofile.open( string(outputFile+"_"+lexical_cast<string>( Omega::instance().getCurrentIteration() )).c_str() );
+		ostringstream oss;
+		oss<<setfill('0')<<outputFile<<"_"<<setw(6)<<Omega::instance().getCurrentIteration();
+		cerr<<"Snapshot "<<oss.str()<<endl;
+		ofile.open(oss.str().c_str());
+		if(!ofile.good()){ cerr<<"Snapshot "<<oss.str()<<" could not be opened for writing (skipping)!?"<<endl; return; }
 	
 		Real tx=0, ty=0, tz=0, rw=0, rx=0, ry=0, rz=0;
 			

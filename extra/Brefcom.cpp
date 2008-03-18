@@ -231,7 +231,7 @@ void GLDrawBrefcomContact::go(const shared_ptr<InteractionPhysics>& ip, const sh
 	glTranslatev(mid);
 	glPushMatrix();
 		glRasterPos2i(0,0);
-		ostringstream oss; oss<<setw(3)<< /* "w="<< */ (float)BC->omega;
+		ostringstream oss; oss<<setprecision(3)<< /* "w="<< */ (float)BC->omega;
 		//std::string str=std::string("omegaPl=")+boost::lexical_cast<std::string>((float)(BC->omegaPl));
 		for(unsigned int i=0;i<oss.str().length();i++) glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12,oss.str()[i]);
 	glPopMatrix();

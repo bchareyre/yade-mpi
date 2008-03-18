@@ -60,7 +60,7 @@ for pp in o.childClasses('FileGenerator'):
 		speed=nIter/(finish-start) # rough estimate
 		summary.append('%30s passed (%g iter/sec)'%(pp,speed))
 
-print "\n\n========================================= SUMMARY ======================================\n"
+print "\n\n========================================= SUMMARY ======================================\n"
 for l in summary: print l
-print "\n====================================== END OF SUMMARY =================================="
+print "\n====================================== END OF SUMMARY =================================="
 quit()

@@ -154,7 +154,7 @@ env.SConsignFile(buildDir+'/scons-signatures')
 ############# SHORTCUT TARGETS ###########################################################
 ##########################################################################################
 
-if len(sys.argv)>1:
+if len(sys.argv)>1 and ('clean' in sys.argv) or ('tags' in sys.argv) or ('doc' in sys.argv):
 	if 'clean' in sys.argv:
 		if os.path.exists(buildDir):
 			print "Cleaning: %s."%buildDir; shutil.rmtree(buildDir)
