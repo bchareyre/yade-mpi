@@ -60,7 +60,8 @@ void BrefcomMakeContact::go(const shared_ptr<PhysicalParameters>& pp1, const sha
 			/* equilibriumDist */ d0,
 			/* crossSection */ S12,
 			/* epsCracking */ sigmaT/E12,
-			/* epsFracture */ 5*sigmaT/E12
+			/* epsFracture */ calibratedEpsFracture,
+			/* expBending */ expBending
 			));
 		contPhys->prevNormal=contGeom->normal;
 		contPhys->isCohesive=(Omega::instance().getCurrentIteration()>5 ? false : true);
@@ -79,35 +80,6 @@ CREATE_LOGGER(BrefcomContact);
 
 /********************** BrefcomLaw ****************************/
 CREATE_LOGGER(BrefcomLaw);
-#if 0
-void BrefcomLaw::calculateShearForce(){
-	Fs=Vector3r::ZERO; return;
-	
-	Fs = BC->Fs;
-	Real dt=Omega::instance().getTimeStep();
-	// rotation of the contact normal
-	Fs += BC->Fs.Cross( BC->prevNormal.Cross(contGeom->normal) );
-	//TRVAR1(BC->Fs.Cross( BC->prevNormal.Cross(contGeom->normal)));
-	// mutual rotation of elements
-	Real angle=dt*.5*contGeom->normal.Dot(rbp1->angularVelocity+rbp2->angularVelocity);
-	Fs += BC->Fs.Cross(angle*contGeom->normal);
-	//TRVAR1(BC->Fs.Cross(angle*contGeom->normal));
-	// element slip
-	Vector3r relVelocity=
-		rbp2->velocity+rbp2->angularVelocity.Cross(contGeom->contactPoint-rbp2->se3.position)-
-		rbp1->velocity+rbp1->angularVelocity.Cross(contGeom->contactPoint-rbp1->se3.position);
-	Vector3r shearDisplacement=dt*(relVelocity-contGeom->normal.Dot(relVelocity)*contGeom->normal);
-	Fs += BC->Ks*shearDisplacement;
-	//TRVAR1(BC->Ks*shearDisplacement);
-	if(isnan(Fs[0]) || isnan(Fs[1]) || isnan(Fs[2])){
-		TRVAR4(BC->Fs, BC->prevNormal, contGeom->normal, BC->Fs.Cross(BC->prevNormal.Cross(contGeom->normal)));
-		TRVAR4(angle, rbp1->angularVelocity, rbp2->angularVelocity,BC->Fs.Cross(angle*contGeom->normal));
-		TRVAR4(rbp1->se3.position, rbp2->se3.position,rbp1->velocity,rbp2->velocity);
-		TRVAR4(relVelocity,shearDisplacement,BC->Ks,BC->Ks*shearDisplacement);
-		exit(0);
-	}
-}
-#endif
 
 void BrefcomLaw::applyForce(const Vector3r force){
 
@@ -117,28 +89,85 @@ void BrefcomLaw::applyForce(const Vector3r force){
 	static_pointer_cast<Momentum>(rootBody->physicalActions->find(id2,MomentumClassIndex))->momentum-=(contGeom->contactPoint-rbp2->se3.position).Cross(force);
 }
 
-Real BrefcomLaw::funcG(Real kappaD){
-#ifdef BREFCOM_FUNC_G
-	BREFCOM_FUNC_G
-#else
-	return 0;
-#endif
+/*! Damage evolution law (static version: all parameters are explicitly passed).
+ *
+ * This function is zero for any eps<=epsCrackOnset (no damage before the material starts cracking),
+ * therefore it will be linear-elastic. Between epsCrackOnset and espFracture (complete damage), it
+ * is a non-decreasing function (an exp curve in this case, controlled by a single parameter expBending).
+ * For any exp>=expFracture, return 1 (complete damage).
+ *
+ * @param kappaD maximum positive strain so far
+ * @param expBending determines whether the function is bent up or down (and how much)
+ * @param epsCrackOnsert strain at which material begins to behave non-linearly
+ * @param epsFracture strain at which material is fully damaged
+ */
+Real BrefcomLaw::damageEvolutionLaw_static(Real kappaD, Real expBending, Real epsCrackOnset, Real epsFracture){
+	//double g(double x, double c, double eps0, double eps1){
+	if(kappaD<epsCrackOnset)return 0;
+	if(kappaD>epsFracture)return 1;
+	return (1/(1-exp(-expBending)))*(1-exp(-expBending*(kappaD-epsCrackOnset)/(epsFracture-epsCrackOnset)));
 }
 
-Real BrefcomLaw::funcH(Real kappaD){
-#ifdef BREFCOM_FUNC_H
-	BREFCOM_FUNC_H
-#else
-	return 1;
-#endif	
-}	
+/*! Compute fracture energy by numerically integrating damageEvolutionLaw_static, using unitary stiffness.
+ *
+ * The value returned must be multiplied by E to obtain real fracture energy: Fracture energy
+ *    Gf=integral(E*(1-damage(eps))*eps)=E*integral(...) and we compute just the integral(...) part.
+ * The integration uses trapezoidal rule. All parameters except steps have the same
+ * meaning as for damageEvolutionLaw_static.
+ *
+ * @param steps Number of subdivision intervals for integration.
+ */
+
+Real BrefcomLaw::unitFractureEnergy(double expBending, double epsCrackOnset, double epsFracture, int steps /*=50*/){
+	assert(steps>=10);
+	const double lo=0, hi=epsFracture;
+	double sum=0,stepSize=(hi-lo)/steps,x1,x2;
+	for(int i=0; i<steps; i++){
+		x1=lo+i*stepSize; x2=x1+stepSize;
+		sum+=((1-damageEvolutionLaw_static(x1,expBending,epsCrackOnset,epsFracture))*x1+(1-damageEvolutionLaw_static(x2,expBending,epsCrackOnset,epsFracture))*x2)*.5*stepSize; /* trapezoid rule */
+	}
+	return sum;
+}
+
+/*! Calibrate epsFracture so that the desired fracture energy is obtained, while other parameters are keps constant.
+ *
+ * The iteration relies on the fact that fractureEnergy is increasing for increasing epsFracture;
+ * first we find some strain value eps at which fractureEnergy(eps,...)<Gf<fractureEnergy(2*eps,...),
+ * then the interval is bisected until fractureEnergy matches Gf with desired precision.
+ *
+ * @param Gf the desired fracture energy.
+ * @param relEpsilon relative (with regards to Gf) result precision.
+ * @param maxIter number of iterations after which we throw exception, since for a reason we don't converge or converge too slowly.
+ *
+ * Other params have the same meaning as for damageEvolutionLaw_static.
+ */
+Real BrefcomLaw::calibrateEpsFracture(double Gf, double E, double expBending, double epsCrackOnset, double epsFractureInit /*=1e-3*/, double relEpsilon /*=1e-3*/, int maxIter /*=1000*/){
+	double E1,E2,Emid,epsLo=epsFractureInit,epsHi=epsFractureInit*2,epsMid,iter=0,Gf_div_E=Gf/E;
+	bool goUp=unitFractureEnergy(expBending,epsCrackOnset,epsHi)<Gf_div_E; // do we double up or down when finding margins?
+	do { epsLo*=goUp?2:.5; epsHi=2*epsLo;
+		E1=unitFractureEnergy(expBending,epsCrackOnset,epsLo); E2=unitFractureEnergy(expBending,epsCrackOnset,epsHi);
+		if((iter++)>maxIter) throw runtime_error("Convergence problem when finding margin values for bisection.");
+	} while(!(E1<Gf_div_E && E2>=Gf_div_E));
+	// now E(epsLo)<Gf_div_E<=E(epsHi); go ahead using interval bisection
+	do {
+		epsMid=.5*(epsLo+epsHi); Emid=unitFractureEnergy(expBending,epsCrackOnset,epsMid);
+		if(Emid<Gf_div_E)epsLo=.5*(epsLo+epsHi);
+		else if(Emid>Gf_div_E)epsHi=.5*(epsLo+epsHi);
+		if((iter++)>maxIter) throw runtime_error("Convergence problem during bisection (relEpsilon too low?).");
+	} while (abs(Emid-Gf_div_E)>relEpsilon*Gf_div_E);
+	return epsMid;
+}
+
 
 void BrefcomLaw::action(Body* body){
 	rootBody=YADE_CAST<MetaBody*>(body);
 	
 	//BOOST_FOREACH(shared_ptr<Interaction> II,*(rootBody->transientInteractions)){}
-
-	for(InteractionContainer::iterator I=rootBody->transientInteractions->begin(); I!=rootBody->transientInteractions->end(); ++I){
+	
+	list<shared_ptr<Interaction> > interactionsToBeDeleted;
+	
+	InteractionContainer::iterator transientEnd=rootBody->transientInteractions->end();
+	for(InteractionContainer::iterator I=rootBody->transientInteractions->begin(); I!=transientEnd; ++I){
 		if(!(*I)->isReal) continue;
 		// TRACE;
 		// initialize temporaries
@@ -169,6 +198,11 @@ void BrefcomLaw::action(Body* body){
 		// shorthands
 		Vector3r& epsT(BC->epsT); Real& kappaD(BC->kappaD); const Real& equilibriumDist(BC->equilibriumDist); const Real& xiShear(BC->xiShear); const Real& Kn(BC->Kn); const Real& undamagedCohesion(BC->undamagedCohesion); const Real& frictionAngle(BC->frictionAngle); const Real& Kt(BC->Kt); const Real& crossSection(BC->crossSection); Real& omega(BC->omega);
 
+		Real dist=(rbp1->se3.position-rbp2->se3.position).Length();
+
+		/* deleting interaction here would (maybe) break the iterator; do it once this loop is done */
+		if(!BC->isCohesive && dist>0){ /* delete this interaction later */ interactionsToBeDeleted.push_back(*I); continue; }
+
 		/* rotate epsT to the new contact plane */
 			Real dt=Omega::instance().getTimeStep();
 			// rotation of the contact normal
@@ -182,7 +216,6 @@ void BrefcomLaw::action(Body* body){
 			rbp2->velocity+rbp2->angularVelocity.Cross(contGeom->contactPoint-rbp2->se3.position)
 			-rbp1->velocity+rbp1->angularVelocity.Cross(contGeom->contactPoint-rbp1->se3.position);
 		Vector3r tangentialDisplacement=dt*(relVelocity-contGeom->normal.Dot(relVelocity)*contGeom->normal);
-		Real dist=(rbp1->se3.position-rbp2->se3.position).Length(); 
 		epsT+=tangentialDisplacement/dist;
 		
 		/* normal strain */
@@ -203,6 +236,8 @@ void BrefcomLaw::action(Body* body){
 		for(size_t i=0; i<recValues.size(); i++) recStream<<recLabels[i]<<": "<<recValues[i]<<" ";
 		recStream<<endl;
 	}
+	// delete interactions that were requested to be deleted.
+	for(list<shared_ptr<Interaction> >::iterator I=interactionsToBeDeleted.begin(); I!=interactionsToBeDeleted.end(); I++){ rootBody->transientInteractions->erase((*I)->getId1(),(*I)->getId2()); }
 }
 
 
@@ -237,3 +272,22 @@ void GLDrawBrefcomContact::go(const shared_ptr<InteractionPhysics>& ip, const sh
 	glPopMatrix();
 }
 
+/********************** BrefcomDamageColorizer ****************************/
+void BrefcomDamageColorizer::action(Body* b){
+	MetaBody* rootBody=static_cast<MetaBody*>(b);
+	vector<pair<short,Real> > bodyDamage; /* number of cohesive interactions per body; cummulative damage of interactions */
+	bodyDamage.resize(rootBody->bodies->size(),pair<short,Real>(0,0));
+	InteractionContainer::iterator transientEnd=rootBody->transientInteractions->end();
+	for(InteractionContainer::iterator I=rootBody->transientInteractions->begin(); I!=transientEnd; ++I){
+		shared_ptr<BrefcomContact> BC=YADE_PTR_CAST<BrefcomContact>((*I)->interactionPhysics);
+		if(!BC->isCohesive) continue;
+		const body_id_t id1=(*I)->getId1(), id2=(*I)->getId2();
+		bodyDamage[id1].first++; bodyDamage[id2].first++;
+		bodyDamage[id1].second+=BC->omega; bodyDamage[id2].second+=BC->omega;
+	}
+	BodyContainer::iterator bodiesEnd=rootBody->bodies->end();
+	for(BodyContainer::iterator I=rootBody->bodies->begin(); I!=bodiesEnd; ++I){
+		Real normDmg=bodyDamage[(*I)->getId()].second/bodyDamage[(*I)->getId()].first;
+		(*I)->geometricalModel->diffuseColor=Vector3r(normDmg,1-normDmg,.5);	
+	}
+}
