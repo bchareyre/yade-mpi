@@ -38,7 +38,14 @@ if 'EMBED_PYTHON' in env['CPPDEFINES']:
 	env.Install('$PREFIX/lib/yade$SUFFIX/gui',[
 		env.SharedLibrary('cmdGui',['cmd/cmdGui.cpp']),
 		env.SharedLibrary('yadeControl',['cmd/yadeControl.cpp','cmd/GLViewer4.cpp'],SHLIBPREFIX='',
-			LIBS=env['LIBS']+['yade-base','libboost_python','XMLFormatManager','yade-factory','yade-serialization',],
+			LIBS=env['LIBS']+['yade-base','libboost_python','XMLFormatManager','yade-factory','yade-serialization','Shop',
+				'BoundingVolumeMetaEngine',
+				'GeometricalModelMetaEngine',
+				'InteractingGeometryMetaEngine',
+				'InteractionGeometryMetaEngine',
+				'InteractionPhysicsMetaEngine',
+				'PhysicalParametersMetaEngine',
+			],
 			# '$QGLVIEWER_LIB'
 			#CPPPATH=env['CPPPATH']+['/usr/include/qt4','/usr/include/qt4/Qt','/usr/include/qt4/QtXml','/usr/include/qt4/QtOpenGL','/usr/include/qt4/QtCore','/usr/include/qt4/QtGui'],
 			CPPDEFINES=env['CPPDEFINES']+['NO_PYGLVIEWER'],

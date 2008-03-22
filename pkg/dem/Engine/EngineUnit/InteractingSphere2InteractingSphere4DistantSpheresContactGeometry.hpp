@@ -31,7 +31,7 @@ class InteractingSphere2InteractingSphere4DistantSpheresContactGeometry : public
 					
 		InteractingSphere2InteractingSphere4DistantSpheresContactGeometry();		
 					
-		double InteractionDetectionFactor;// InteractionGeometry will be computed when InteractionDetectionFactor*(rad1+rad2) > distance 		
+		double interactionDetectionFactor;// InteractionGeometry will be computed when interactionDetectionFactor*(rad1+rad2) > distance 		
 	
 	FUNCTOR2D(InteractingSphere,InteractingSphere);
 

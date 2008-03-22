@@ -159,8 +159,8 @@ class BrefcomMakeContact: public InteractionPhysicsEngineUnit{
 			Real E=Shop::getDefault<double>("phys_young");
 			Real epsCrackOnset=sigmaC/E;
 			calibratedEpsFracture=BrefcomLaw::calibrateEpsFracture(Gf,E,expBending,epsCrackOnset);
-			assert(calibratedEpsFracture>epsCrackOnset);
-			LOG_DEBUG("calibratedEpsFracture="<<calibratedEpsFracture<<" for Gf="<<Gf<<", expCrackOnset="<<epsCrackOnset<<", E="<<E<<" and expBending="<<expBending);
+			LOG_DEBUG("calibratedEpsFracture="<<calibratedEpsFracture);
+			if(calibratedEpsFracture>epsCrackOnset) LOG_WARN("calibratedEpsFracture="<<calibratedEpsFracture<<" < epsCrackOnset="<<epsCrackOnset<<", Gf="<<Gf<<", E="<<E<<", expBending="<<expBending);
 		}
 
 		virtual void go(const shared_ptr<PhysicalParameters>& pp1, const shared_ptr<PhysicalParameters>& pp2, const shared_ptr<Interaction>& interaction);

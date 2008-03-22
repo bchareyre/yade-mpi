@@ -15,6 +15,8 @@ ParticleParameters::ParticleParameters() : PhysicalParameters()
 {
 	createIndex();
 	acceleration = Vector3r(0,0,0);
+	velocity = Vector3r(0,0,0);
+	mass=0;
 }
 
 ParticleParameters::~ParticleParameters()

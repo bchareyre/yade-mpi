@@ -26,6 +26,8 @@ class GeometricalModel : public Serializable, public Indexable
 
 		Vector3r	diffuseColor;
 
+		GeometricalModel(): visible(true),wire(false),shadowCaster(false),diffuseColor(Vector3r(1,1,1)){}
+
 	protected : 
 		void registerAttributes();
 

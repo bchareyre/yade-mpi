@@ -20,11 +20,6 @@ PersistentSAPCollider::PersistentSAPCollider() : BroadInteractor()
 	haveDistantTransient=false;
 
 	nbObjects=0;
-	//xBounds.resize(2*maxObject);
-	//yBounds.resize(2*maxObject);
-	//zBounds.resize(2*maxObject);
-	//minima = new Real[3*maxObject];
-	//maxima = new Real[3*maxObject];
 	xBounds.clear();
 	yBounds.clear();
 	zBounds.clear();
@@ -67,8 +62,6 @@ void PersistentSAPCollider::action(Body* body)
 			maxima[offset+0]=max[0]; maxima[offset+1]=max[1]; maxima[offset+2]=max[2];
 		}
 		else {
-			// double nan=std::numeric_limits<Real>::quiet_NaN();
-			// cerr<<"Assigning nan's, not tested! (hangs during sort?)"<<endl;
 			/* assign the center of gravity as zero-volume bounding box;
 			 * it should not create spurious interactions and
 			 * is a better solution that putting nan's into minima and maxima which crashes on _some_ machines */

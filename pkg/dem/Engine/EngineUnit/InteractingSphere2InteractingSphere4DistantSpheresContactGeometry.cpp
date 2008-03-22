@@ -18,12 +18,12 @@
 
 InteractingSphere2InteractingSphere4DistantSpheresContactGeometry::InteractingSphere2InteractingSphere4DistantSpheresContactGeometry()
 {
-	InteractionDetectionFactor = 1;
+	interactionDetectionFactor = 1;
 }
 
 void InteractingSphere2InteractingSphere4DistantSpheresContactGeometry::registerAttributes()
 {	
-	REGISTER_ATTRIBUTE(InteractionDetectionFactor);
+	REGISTER_ATTRIBUTE(interactionDetectionFactor);
 }
 
 bool InteractingSphere2InteractingSphere4DistantSpheresContactGeometry::go(	const shared_ptr<InteractingGeometry>& cm1,
@@ -36,7 +36,7 @@ bool InteractingSphere2InteractingSphere4DistantSpheresContactGeometry::go(	cons
 	InteractingSphere* s2 = static_cast<InteractingSphere*>(cm2.get());
 
 	Vector3r normal = se32.position-se31.position;
-	Real penetrationDepth = pow(InteractionDetectionFactor*(s1->radius+s2->radius), 2) - normal.SquaredLength();// Compute a wrong value just to check sign - faster than computing distances
+	Real penetrationDepth = pow(interactionDetectionFactor*(s1->radius+s2->radius), 2) - normal.SquaredLength();// Compute a wrong value just to check sign - faster than computing distances
 	//Real penetrationDepth = s1->radius+s2->radius-normal.Normalize();
 
 	shared_ptr<SpheresContactGeometry> scm;

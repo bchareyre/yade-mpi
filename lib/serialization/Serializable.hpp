@@ -12,6 +12,7 @@
 #define SERIALIZABLE_HPP
 
 #include <boost/any.hpp>
+#include <boost/foreach.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/type_traits.hpp>
 #include <boost/lexical_cast.hpp>
@@ -71,6 +72,7 @@ class Serializable : public Factorable
 		template <typename Type>
 		void registerAttribute(const string& name, Type& attribute)
 		{
+			BOOST_FOREACH(shared_ptr<Archive> a,archives){if(a->getName()==name){ /* cerr<<"Attribute "<<name<<" already registered."<<endl; */ return;}};
 			shared_ptr<Archive> ac = Archive::create(name,attribute);
 			archives.push_back(ac);
 		}

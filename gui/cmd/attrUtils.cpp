@@ -32,7 +32,7 @@ using namespace boost;
  * This class exposes pySet, pyGet and pyKeys methods to python so that associated object supports python syntax for dictionary member access.
  */
 class AttrAccess{
-	struct AttrDesc{vector<int> types; shared_ptr<Archive> archive;};
+	struct AttrDesc{int type; shared_ptr<Archive> archive;};
 	private:
 		const shared_ptr<Serializable> ser;
 		Serializable::Archives archives;
@@ -42,7 +42,7 @@ class AttrAccess{
 		//! maps attribute name to its archive and vector of its types (given as ints, from the following enum)
 		DescriptorMap descriptors;
 		//! allowed types
-		enum {BOOL,STRING,NUMBER}; // allowed types
+		enum {BOOL,STRING,NUMBER, SEQ_NUMBER, SEQ_STRING }; // allowed types
 		
 		AttrAccess(Serializable* _ser): ser(shared_ptr<Serializable>(_ser)){init();}
 		AttrAccess(shared_ptr<Serializable> _ser):ser(_ser){init();}
@@ -55,14 +55,14 @@ class AttrAccess{
 				if((*ai)->isFundamental() && (*ai)->getName()!="serializationDynlib"){
 					AttrDesc desc; 
 					desc.archive=*ai;
-					// serialize to get size
-					stringstream stream; vector<string> values;
-					(*ai)->serialize(stream,**ai,0); IOFormatManager::parseFundamental(stream.str(),values);
 					any instance=(*ai)->getAddress(); // gets pointer to the stored value
 					// 3 possibilities: one BOOL, one STRING, one or more NUMBERs
-					if     (values.size()==1 && any_cast<bool*>(&instance))   desc.types.push_back(AttrAccess::BOOL);
-					else if(values.size()==1 && any_cast<string*>(&instance)) desc.types.push_back(AttrAccess::STRING);
-					else {for(size_t i=0; i<values.size(); i++)               desc.types.push_back(AttrAccess::NUMBER);};
+					if      (any_cast<string*>(&instance)) desc.type=AttrAccess::STRING;
+					else if (any_cast<bool*>(&instance))   desc.type=AttrAccess::BOOL;
+					else if (any_cast<Real*>(&instance) || any_cast<int*>(&instance) || any_cast<unsigned int*>(&instance) || any_cast<long*>(&instance) || any_cast<unsigned long*>(&instance)) desc.type=AttrAccess::NUMBER;
+					else if (any_cast<vector<string>*>(&instance)) desc.type=AttrAccess::SEQ_STRING;
+					//else if (any_cast<vector<Real>*>(&instance)) desc.type=AttrAccess::SEQ_NUMBER;
+					else desc.type=AttrAccess::SEQ_NUMBER;
 					descriptors[(*ai)->getName()]=desc;
 				}
 			}
@@ -81,8 +81,8 @@ class AttrAccess{
 		string dumpAttr(string name){
 			string vals,types; AttrDesc desc=descriptors[name]; vector<string> values=getAttrStr(name);
 			for(size_t i=0; i<values.size(); i++) vals+=(i>0?" ":"")+values[i];
-			for(size_t i=0; i<desc.types.size(); i++) types+=string(i>0?" ":"")+(desc.types[i]==BOOL?"BOOL":(desc.types[i]==STRING?"STRING":"NUMBER"));
-			return name+" =\t"+vals+"\t ("+types+")";
+			string typeDesc(desc.type==BOOL?"BOOL":(desc.type==STRING?"STRING":(desc.type==NUMBER?"NUMBER":(desc.type==SEQ_NUMBER?"SEQ_NUMBER":(desc.type==SEQ_STRING?"SEQ_STRING":"<unknown>")))));
+			return name+" =\t"+vals+"\t ("+typeDesc+")";
 		}
 		//! call dumpAttr for all attributes (used for debugging)
 		string dumpAttrs(){ string ret; for(DescriptorMap::iterator I=descriptors.begin();I!=descriptors.end();I++) ret+=dumpAttr(I->first)+"\n"; return ret;}
@@ -92,12 +92,6 @@ class AttrAccess{
 			stringstream voidStream;
 			descriptors[name].archive->deserialize(voidStream,*(descriptors[name].archive),value);
 		}
-		//! set attribute from its (non-serialized) value, for all possible types
-		void setAttr(string name, bool value){setAttrStr(name,value?"1":"0");}
-		void setAttr(string name, string value){setAttrStr(name,value);}
-		void setAttr(string name, double value){setAttrStr(name,lexical_cast<string>(value));}
-		void setAttr(string name, vector<double> values){string val("{"); for(size_t i=0; i<values.size();i++) val+=(lexical_cast<string>(values[i]))+" "; setAttrStr(name,val+"}"); }
-
 		//! return python list of keys (attribute names)
 		boost::python::list pyKeys(){boost::python::list ret; for(DescriptorMap::iterator I=descriptors.begin();I!=descriptors.end();I++)ret.append(I->first); return ret;}
 
@@ -106,34 +100,39 @@ class AttrAccess{
 			DescriptorMap::iterator I=descriptors.find(key);
 			if(I==descriptors.end()) throw std::invalid_argument(string("Invalid key: `")+key+"'.");
 			vector<string> raw=getAttrStr(key);
-			if(raw.size()==1){
-				if(descriptors[key].types[0]==BOOL) return boost::python::object(lexical_cast<bool>(raw[0]));
-				if(descriptors[key].types[0]==STRING) return boost::python::object(raw[0]);
-				if(descriptors[key].types[0]==NUMBER) return boost::python::object(lexical_cast<double>(raw[0]));
-			} else { // list of numbers
-				/*list<double> ret;
-				for(vector<string>::iterator I=raw.begin();I!=raw.end();I++)ret.push_back(lexical_cast<double>(*I));
-				return boost::python::object<list<double> >(ret);*/
-				boost::python::list ret;
-				for(vector<string>::iterator I=raw.begin();I!=raw.end();I++)ret.append(lexical_cast<double>(*I));
-				return ret;
+			switch(descriptors[key].type){
+				case BOOL: return python::object(lexical_cast<bool>(raw[0]));
+				case NUMBER: return python::object(lexical_cast<double>(raw[0]));
+				case STRING: return python::object(raw[0]);
+				case SEQ_STRING: {python::list ret; for(size_t i=0; i<raw.size(); i++) ret.append(python::object(raw[i])); return ret;}
+				case SEQ_NUMBER: {python::list ret; for(size_t i=0; i<raw.size(); i++) ret.append(python::object(lexical_cast<double>(raw[i]))); return ret; }
+				default: throw runtime_error("Unhandled attribute type!");
 			}
-			return boost::python::object();
 		}
 		//! set attribute value from python object
 		void pySet(std::string key, python::object val){
 			DescriptorMap::iterator I=descriptors.find(key);
 			if(I==descriptors.end()) throw std::invalid_argument(string("Invalid key: `")+key+"'.");
-			if(descriptors[key].types.size()==1){
-				if(descriptors[key].types[0]==BOOL) { setAttr(key,python::extract<bool>(val)); return;}
-				if(descriptors[key].types[0]==STRING){setAttr(key,python::extract<string>(val)); return;}
-				if(descriptors[key].types[0]==NUMBER){setAttr(key,python::extract<double>(val)); return;}
-			} else {
-				if(PySequence_Check(val.ptr()) && PySequence_Size(val.ptr())==(int)descriptors[key].types.size()){
-					vector<double> cval;
-					for(int i=0; i<PySequence_Size(val.ptr()); i++) cval.push_back(python::extract<double>(PySequence_GetItem(val.ptr(),i)));
-					setAttr(key,cval);
-				} else {	throw std::invalid_argument(string("Value for `")+key+"' not sequence or not of the expected length ("+lexical_cast<string>(descriptors[key].types.size())+")"); }
+			#define SAFE_EXTRACT(from,to,type) python::extract<type> to(from); if(!to.check()) throw invalid_argument(string("Could not extract type ")+#type);
+			switch(descriptors[key].type){
+				case BOOL: {SAFE_EXTRACT(val.ptr(),extr,bool); setAttrStr(key,extr()?"1":"0"); break;}
+				case NUMBER: {SAFE_EXTRACT(val.ptr(),extr,double); setAttrStr(key,lexical_cast<string>(extr())); break; }
+				case STRING: {SAFE_EXTRACT(val.ptr(),extr,string); setAttrStr(key,extr()); break;}
+				case SEQ_STRING:{
+					if(!PySequence_Check(val.ptr())) throw invalid_argument("String sequence argument required.");
+					string strVal("[");
+					for(int i=0; i<PySequence_Size(val.ptr()); i++){SAFE_EXTRACT(PySequence_GetItem(val.ptr(),i),extr,string); strVal+=extr()+" ";}
+					setAttrStr(key,strVal+"]");
+				} 
+				break;
+				case SEQ_NUMBER:{
+					if(!PySequence_Check(val.ptr())) throw invalid_argument("Number sequence argument required.");
+					string strVal("{");
+					for(int i=0; i<PySequence_Size(val.ptr()); i++){SAFE_EXTRACT(PySequence_GetItem(val.ptr(),i),extr,double); strVal+=lexical_cast<string>(extr())+" ";}
+					setAttrStr(key,strVal+"}");
+				}
+				break;
+				default: throw runtime_error("Invalid argument types!!");
 			}
 		}
 };
