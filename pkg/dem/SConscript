@@ -1,3 +1,4 @@
+# vim: set filetype=python :
 Import('*')
 env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 
@@ -869,6 +870,70 @@ env.SharedLibrary('NewtonsDampedLaw',
 			'RigidBodyParameters'
 			 ]),
 
+	env.SharedLibrary('SimpleViscoelasticBodyParameters'
+		,['DataClass/PhysicalParameters/SimpleViscoelasticBodyParameters.cpp']
+		,LIBS=env['LIBS']+['RigidBodyParameters'])
+
+	,env.SharedLibrary('SimpleViscoelasticInteraction'
+		,['DataClass/InteractionPhysics/SimpleViscoelasticInteraction.cpp'])
+    
+	,env.SharedLibrary('GLDrawSimpleViscoelasticInteraction'
+	    ,['RenderingEngine/GLDrawSimpleViscoelasticInteraction/GLDrawSimpleViscoelasticInteraction.cpp']
+	    ,LIBS=env['LIBS']+['yade-opengl','SimpleViscoelasticInteraction'])
+
+	,env.SharedLibrary('SimpleViscoelasticRelationships'
+		,['Engine/EngineUnit/SimpleViscoelasticRelationships.cpp']
+		,LIBS=env['LIBS']+['SimpleViscoelasticBodyParameters'
+		    ,'SimpleViscoelasticInteraction'
+		    ,'SpheresContactGeometry'
+		    ])
+
+	,env.SharedLibrary('SimpleViscoelasticContactLaw'
+		,['Engine/StandAloneEngine/SimpleViscoelasticContactLaw.cpp']
+		,LIBS=env['LIBS']+['SimpleViscoelasticInteraction'
+		    ,'SimpleViscoelasticBodyParameters'
+		    ,'SpheresContactGeometry'
+		    ,'Force'
+		    ,'Momentum'
+		    ])
+	
+	,env.SharedLibrary('SimpleViscoelasticSpheresInteractionRecorder'
+	    ,['Engine/StandAloneEngine/SimpleViscoelasticSpheresInteractionRecorder.cpp']
+	    ,LIBS=env['LIBS']+['SpheresContactGeometry','SimpleViscoelasticInteraction'])
+
+	,env.SharedLibrary('RigidBodyRecorder'
+	,['Engine/StandAloneEngine/RigidBodyRecorder.cpp']
+	,LIBS=env['LIBS']+['RigidBodyParameters'])
+
+	,env.SharedLibrary('TestSimpleViscoelastic'
+		,['PreProcessor/TestSimpleViscoelastic.cpp']
+		,LIBS=env['LIBS']+['AABB'
+			    ,'Box'
+			    ,'InteractingBox'
+			    ,'SimpleViscoelasticRelationships'
+			    ,'SimpleViscoelasticContactLaw'
+			    ,'SimpleViscoelasticBodyParameters'
+			    ,'SimpleViscoelasticInteraction'
+			    ,'SimpleViscoelasticSpheresInteractionRecorder'
+			    ,'GravityEngine'
+			    ,'BodyRedirectionVector'
+			    ,'BoundingVolumeMetaEngine'
+			    ,'InteractingSphere'
+			    ,'InteractionGeometryMetaEngine'
+			    ,'InteractionPhysicsMetaEngine'
+			    ,'InteractionVecSet'
+			    ,'MetaInteractingGeometry'
+			    ,'MetaInteractingGeometry2AABB'
+			    ,'ParticleParameters'
+			    ,'RigidBodyRecorder'
+			    ,'PhysicalActionApplier'
+			    ,'PhysicalActionContainerInitializer'
+			    ,'PhysicalActionContainerReseter'
+			    ,'PhysicalActionVectorVector'
+			    ,'PhysicalParametersMetaEngine'
+			    ,'PersistentSAPCollider'
+			    ,'Sphere'
+			    ])
 
 
 
