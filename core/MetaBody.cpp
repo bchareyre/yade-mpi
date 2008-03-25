@@ -13,6 +13,7 @@
 #include "MetaBody.hpp"
 #include "Engine.hpp"
 #include "TimeStepper.hpp"
+#include<boost/foreach.hpp>
 
 // FIXME - who is to decide which class to use by default? -- Olivier : I think nobody ! It will be done automatically while deserializing
 MetaBody::MetaBody() :
@@ -34,19 +35,17 @@ MetaBody::MetaBody() :
 }
 
 
+void MetaBody::runInitializers(){
+	BOOST_FOREACH(shared_ptr<Engine> e, initializers){
+		if(e->isActivated()) e->action(this);
+	}
+}
+
 void MetaBody::postProcessAttributes(bool deserializing)
 {
-	if (deserializing)
-	{
-		vector<shared_ptr<Engine> >::iterator i    = initializers.begin();
-		vector<shared_ptr<Engine> >::iterator iEnd = initializers.end();
-		for( ; i != iEnd ; ++i)
-			if ((*i)->isActivated())
-				(*i)->action(this);
-				
+	runInitializers();	
 	//	initializers.clear(); // FIXME - we want to delate ONLY some of them!
 	//                                       because when you save and load file, you still want some initializers, but not all of them. Eg - you don't want VRML loader, or FEM loader, but you want BoundingVolumeMetaEngine. Maybe we need two list of initilizers? One that 'survive' between load and save, and others that are deleted on first time?
-	}
 }
 
 

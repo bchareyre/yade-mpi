@@ -23,7 +23,7 @@ using namespace boost;
  * They define python special functions that support dictionary operations on this object and calls proxies for them. */
 #define ATTR_ACCESS_PY(cxxClass) \
 	def("__getitem__",&cxxClass::wrappedPyGet).def("__setitem__",&cxxClass::wrappedPySet).def("keys",&cxxClass::wrappedPyKeys)
-	//.def("__getattr__",&cxxClass::wrappedPyGet).def("__setattr__",&cxxClass::wrappedPySet)
+	//def("__getattr__",&cxxClass::wrappedPyGet).def("__setattr__",&cxxClass::wrappedPySet).def("attrs",&cxxClass::wrappedPyKeys)
 
 
 /*! Helper class for accessing registered attributes through the serialization interface.
@@ -100,12 +100,13 @@ class AttrAccess{
 			DescriptorMap::iterator I=descriptors.find(key);
 			if(I==descriptors.end()) throw std::invalid_argument(string("Invalid key: `")+key+"'.");
 			vector<string> raw=getAttrStr(key);
+			LOG_DEBUG("Got raw attribute `"<<key<<"'");
 			switch(descriptors[key].type){
 				case BOOL: return python::object(lexical_cast<bool>(raw[0]));
 				case NUMBER: return python::object(lexical_cast<double>(raw[0]));
 				case STRING: return python::object(raw[0]);
 				case SEQ_STRING: {python::list ret; for(size_t i=0; i<raw.size(); i++) ret.append(python::object(raw[i])); return ret;}
-				case SEQ_NUMBER: {python::list ret; for(size_t i=0; i<raw.size(); i++) ret.append(python::object(lexical_cast<double>(raw[i]))); return ret; }
+				case SEQ_NUMBER: {python::list ret; for(size_t i=0; i<raw.size(); i++){ ret.append(python::object(lexical_cast<double>(raw[i]))); LOG_TRACE("Appended "<<raw[i]);} return ret; }
 				default: throw runtime_error("Unhandled attribute type!");
 			}
 		}

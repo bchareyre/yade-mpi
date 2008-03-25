@@ -64,12 +64,64 @@ using namespace std;
 
 class RenderingEngine;
 
+/*!
+	
+	A regular class (not Omega) is instantiated like this:
+
+		RootClass('optional class name as quoted string',{optional dictionary of attributes})
+		
+	if class name is not given, the RootClass itself is instantiated
+
+		p=PhysicalParameters() # p is now instance of PhysicalParameters
+		p=PhysicalParameters('RigidBodyParameters') # p is now instance of RigidBodyParameters, which has PhysicalParameters as the "root" class
+		p=PhysicalParameters('RigidBodyParameters',{'mass':100,'se3':[1,1,2,1,0,0,0]}) # convenience constructor
+
+	The last statement is equivalent to:
+
+		p=PhysicalParameters('RigidBodyParameters')
+		p['mass']=100; 
+		p['se3']=[1,1,2,1,0,0,0]
+
+	Class attributes are those that are registered as serializable, are accessed using the [] operator and are always read-write (be careful)
+
+		p['se3'] # this will show you the se3 attribute inside p
+		p['se3']=[1,2,3,1,0,0,0] # this sets se3 of p
+
+	Those attributes that are not fundamental types (strings, numbers, booleans, se3, vectors, quaternions, arrays of numbers, arrays of strings) can be accessed only through explicit python data members, for example:
+		
+		b=Body()
+		b.mold=InteractingGeometry("InteractingSphere",{'radius':1})
+		b.shape=GeometricalModel("Sphere",{'radius':1})
+		b.mold # will give you the interactingGeometry of body
+	
+	Instances can be queried about attributes and data members they have:
+
+		b.keys() # serializable attributes, accessible via b['attribute']
+		dir(b) # python data members, accessible via b.attribute; the __something__ attributes are python internal attributes/metods -- methods are just callable members
+
+	MetaEngine class has special constructor (for convenience):
+
+		m=MetaEngine('class name as string',[list of engine units])
+
+	and it is equivalent to
+
+		m=MetaEntine('class name as string')
+		m.functors=[list of engine units]
+
+	It is your responsibility to pass the right engineUnits, otherwise crash will results. There is currently no way I know of to prevent that. 
+
+*/
+
 /*
 TODO:
-	1. [DONE] InteractionContainer with iteration
-	2. PhysicalActionContainer (constructor with actionName) with iteration
-	3. from yadeControl import Omega as _Omega, inherit from that and add other convenience functions
+	1. PhysicalActionContainer (constructor with actionName) with iteration
+	2. from yadeControl import Omega as _Omega, inherit from that and add other convenience functions
 */
+
+#ifdef LOG4CXX
+	log4cxx::LoggerPtr logger=log4cxx::Logger::getLogger("yade.python");
+#endif
+
 
 #define BASIC_PY_PROXY_HEAD(pyClass,yadeClass) \
 class pyClass{shared_ptr<AttrAccess> accessor; \
@@ -201,8 +253,30 @@ class pyInteractionContainer{
 		}
 };
 
+
+BASIC_PY_PROXY(pyPhysicalAction,PhysicalAction);
+
+class pyPhysicalActionContainer{
+	public:
+		const shared_ptr<PhysicalActionContainer> proxee;
+		pyPhysicalActionContainer(const shared_ptr<PhysicalActionContainer>& _proxee): proxee(_proxee){}
+		pyPhysicalAction pyGetitem(python::object action_and_id){
+			if(!PySequence_Check(action_and_id.ptr())) throw invalid_argument("Key must be a tuple");
+			if(PySequence_Size(action_and_id.ptr())!=2) throw invalid_argument("Key must be a 2-tuple: [action-name , body id].");
+			python::extract<string> actionName_(PySequence_GetItem(action_and_id.ptr(),0));
+			python::extract<body_id_t> id_(PySequence_GetItem(action_and_id.ptr(),1));
+			if(!actionName_.check()) throw invalid_argument("Could not extract action-name.");
+			if(!id_.check()) throw invalid_argument("Could not extract body id.");
+			// FIXME: this may be rather slow (at every lookup!)
+			int actionClassIndex=YADE_PTR_CAST<Indexable>(ClassFactory::instance().createShared(actionName_()))->getClassIndex();
+			LOG_DEBUG("Got class index "<<actionClassIndex<<" for "<<actionName_());
+			return pyPhysicalAction(proxee->find(id_(),actionClassIndex));
+		}
+};
+
+
 BASIC_PY_PROXY_HEAD(pyFileGenerator,FileGenerator)
-	bool generate(string outFile){ensureAcc(); proxee->setFileName(outFile); proxee->setSerializationLibrary("XMLFormatManager"); bool ret=proxee->generateAndSave(); cerr<<(ret?"SUCCESS:\n":"FAILURE:\n")<<proxee->message<<endl; return ret; };
+	bool generate(string outFile){ensureAcc(); proxee->setFileName(outFile); proxee->setSerializationLibrary("XMLFormatManager"); bool ret=proxee->generateAndSave(); LOG_INFO((ret?"SUCCESS:\n":"FAILURE:\n")<<proxee->message); return ret; };
 BASIC_PY_PROXY_TAIL;
 
 
@@ -211,8 +285,13 @@ class pyOmega{
 	private:
 		// can be safely removed now, since pyOmega makes an empty rootBody in the constructor, if there is none
 		void assertRootBody(){if(!OMEGA.getRootBody()) throw std::runtime_error("No root body."); }
+		void maybeRunInitializers(){if(needsInitializers){OMEGA.getRootBody()->runInitializers(); needsInitializers=false;}}
+		/*! do we need initializers before running?
+		 * This is set to true in constructor (if we create simulation from scratch) and when we load a simulation.
+		 * Initializers are run ad this flag set to false by maybeRunInitializers when running (step or run) */
+		bool needsInitializers;
 	public:
-	pyOmega(){ if(!OMEGA.getRootBody()){shared_ptr<MetaBody> mb=Shop::rootBody(); OMEGA.setRootBody(mb);} };
+	pyOmega(){ if(!OMEGA.getRootBody()){shared_ptr<MetaBody> mb=Shop::rootBody(); OMEGA.setRootBody(mb);} OMEGA.createSimulationLoop(); /* this is not true if another instance of Omega is created; flag should be stored inside the Omega singleton for clean solution. */ needsInitializers=true; };
 
 	long iter(){ return OMEGA.getCurrentIteration();}
 	double simulationTime(){return OMEGA.getSimulationTime();}
@@ -233,15 +312,14 @@ class pyOmega{
 
 	void run(long int numIter=-1){
 		if(numIter>0) OMEGA.stopAtIteration=OMEGA.getCurrentIteration()+numIter;
+		maybeRunInitializers();
 		//else OMEGA.stopAtIteration=-1;
 		OMEGA.startSimulationLoop();
 		long toGo=OMEGA.stopAtIteration-OMEGA.getCurrentIteration();
-		cerr<<"RUN"<<(toGo>0?string(" ("+lexical_cast<string>(toGo)+" to go)"):string(""))<<"!"<<endl;
+		LOG_DEBUG("RUN"<<(toGo>0?string(" ("+lexical_cast<string>(toGo)+" to go)"):string(""))<<"!");
 	}
-	// must stop, then reload
-	//void _stop(){OMEGA(resetSimulationLoop());}
-	void pause(){OMEGA.stopSimulationLoop(); cerr<<"PAUSE!"<<endl;}
-	void step() {OMEGA.spawnSingleSimulationLoop(); cerr<<"STEP!"<<endl;}
+	void pause(){OMEGA.stopSimulationLoop(); LOG_DEBUG("PAUSE!");}
+	void step() {OMEGA.spawnSingleSimulationLoop(); maybeRunInitializers(); LOG_DEBUG("STEP!");}
 
 	void load(std::string fileName) {
 		OMEGA.finishSimulationLoop();
@@ -249,18 +327,18 @@ class pyOmega{
 		OMEGA.setSimulationFileName(fileName);
 		OMEGA.loadSimulation();
 		OMEGA.createSimulationLoop();
-		cerr<<"LOAD!"<<endl;
+		LOG_DEBUG("LOAD!");
+		needsInitializers=true;
 	}
 
 	void save(std::string fileName){
 		assertRootBody();
 		OMEGA.saveSimulation(fileName);
-		cerr<<"SAVE!"<<endl;
+		LOG_DEBUG("SAVE!");
 	}
 
 	python::list anyEngines_get(vector<shared_ptr<Engine> >& engContainer){
 		python::list ret; 
-		//for(vector<shared_ptr<Engine> >::iterator I=engContainer.begin(); I!=engContainer.end(); ++I){
 		BOOST_FOREACH(shared_ptr<Engine>& eng, engContainer){
 			#define APPEND_ENGINE_IF_POSSIBLE(engineType,pyEngineType) { shared_ptr<engineType> e=dynamic_pointer_cast<engineType>(eng); if(e) { ret.append(pyEngineType(e)); continue; } }
 			APPEND_ENGINE_IF_POSSIBLE(MetaDispatchingEngine,pyMetaEngine); APPEND_ENGINE_IF_POSSIBLE(StandAloneEngine,pyStandAloneEngine); APPEND_ENGINE_IF_POSSIBLE(DeusExMachina,pyDeusExMachina);
@@ -285,11 +363,12 @@ class pyOmega{
 	void initializers_set(python::object egs){assertRootBody(); anyEngines_set(OMEGA.getRootBody()->initializers,egs);}
 
 
-	//void join(){cerr<<"JOIN!"<<endl; OMEGA.joinSimulationLoop(); /* FIXME: this is OK, but must create simulation loop again! */ }
-	void wait(){ if(OMEGA.isRunning()){cerr<<"WAIT!"<<endl;} while(OMEGA.isRunning()) usleep(20000 /*20 ms*/); }
+	void wait(){ if(OMEGA.isRunning()){LOG_DEBUG("WAIT!");} while(OMEGA.isRunning()) usleep(50000 /*20 ms*/); }
 	
 	pyBodyContainer bodies_get(void){assertRootBody(); return pyBodyContainer(OMEGA.getRootBody()->bodies); }
 	pyInteractionContainer interactions_get(void){assertRootBody(); return pyInteractionContainer(OMEGA.getRootBody()->transientInteractions); }
+
+	pyPhysicalActionContainer actions_get(void){return pyPhysicalActionContainer(OMEGA.getRootBody()->physicalActions); }
 
 	boost::python::list listChildClasses(const string& base){
 		boost::python::list ret;
@@ -302,7 +381,7 @@ class pyOmega{
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(omega_overloads,run,0,1);
 
 #ifdef USE_PYGLVIEWER 
-/*! GL viewer wrapper, with full attribute access.
+/*! GL viewer wrapper, with full attribute access. CURRENTLY DOESN'T EVEN COMPILE!!!
  *
  * Creates the 3D view on instantiation. Currently displays nothing (why???), although it redraws just fine.
  * Has many bugs: multiple views will lead to crash, explicit delete crashes (somewhere in qt) as well.
@@ -423,6 +502,7 @@ BOOST_PYTHON_MODULE(yadeControl)
 		.add_property("initializers",&pyOmega::initializers_get,&pyOmega::initializers_set)
 		.add_property("bodies",&pyOmega::bodies_get)
 		.add_property("interactions",&pyOmega::interactions_get)
+		.add_property("actions",&pyOmega::actions_get)
 		.def("childClasses",&pyOmega::listChildClasses)
 		;
 	
@@ -436,6 +516,9 @@ BOOST_PYTHON_MODULE(yadeControl)
 	boost::python::class_<pyInteractionIterator>("InteractionIterator",python::init<pyInteractionIterator&>())
 		.def("__iter__",&pyInteractionIterator::pyIter)
 		.def("next",&pyInteractionIterator::pyNext);
+
+	boost::python::class_<pyPhysicalActionContainer>("ActionContainer",python::init<pyPhysicalActionContainer&>())
+		.def("__getitem__",&pyPhysicalActionContainer::pyGetitem);
 	
 
 //	boost::python::class_<pyBodyContainer>("BodyContainer",python::init<pyBodyContainer&>())
@@ -487,6 +570,8 @@ BOOST_PYTHON_MODULE(yadeControl)
 		.add_property("geom",&pyInteraction::geom_get,&pyInteraction::geom_set)
 		.add_property("id1",&pyInteraction::id1_get)
 		.add_property("id2",&pyInteraction::id2_get);
+
+	BASIC_PY_PROXY_WRAPPER(pyPhysicalAction,"Action");
 
 	BASIC_PY_PROXY_WRAPPER(pyFileGenerator,"Preprocessor")
 		.def("generate",&pyFileGenerator::generate);

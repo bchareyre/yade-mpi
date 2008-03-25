@@ -31,3 +31,27 @@ class CentralGravityEngine: public DeusExMachina {
 };
 REGISTER_SERIALIZABLE(CentralGravityEngine,false);
 
+/*! Apply acceleration (independent of distance) directed towards an axis.
+ *
+ */
+class AxialGravityEngine: public DeusExMachina {
+	private:
+		int cachedForceClassIndex;
+	public:
+		//! point through which the axis is passing
+		Vector3r axisPoint;
+		//! direction of the gravity axis (may not be normalized)
+		Vector3r axisDirection;
+		//! magnitude of acceleration that will be applied
+		Real acceleration;
+		AxialGravityEngine(){ shared_ptr<Force> f(new Force); cachedForceClassIndex=f->getClassIndex(); }
+		virtual ~AxialGravityEngine(){};
+		virtual void applyCondition(Body*);
+	protected:
+		virtual void registerAttributes(){REGISTER_ATTRIBUTE(axisPoint); REGISTER_ATTRIBUTE(axisDirection); REGISTER_ATTRIBUTE(acceleration); }
+		REGISTER_CLASS_NAME(AxialGravityEngine);
+		REGISTER_BASE_CLASS_NAME(DeusExMachina);
+		DECLARE_LOGGER;
+};
+REGISTER_SERIALIZABLE(AxialGravityEngine,false);
+

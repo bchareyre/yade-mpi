@@ -3,6 +3,8 @@
 #include<yade/core/MetaBody.hpp>
 #include<yade/pkg-common/ParticleParameters.hpp>
 
+YADE_PLUGIN("CentralGravityEngine","AxialGravityEngine");
+
 void CentralGravityEngine::applyCondition(Body* _rootBody){
 	/* get "rootBody", which is the whole simulation */
 	MetaBody* rootBody=YADE_CAST<MetaBody*>(_rootBody);
@@ -26,7 +28,23 @@ void CentralGravityEngine::applyCondition(Body* _rootBody){
 		// static_cast<Force*>(rootBody->physicalActions->find(centralBody,cachedForceClassIndex).get())->force-=F*toCenter;
 	}
 }
-
-YADE_PLUGIN("CentralGravityEngine");
+CREATE_LOGGER(AxialGravityEngine);
+void AxialGravityEngine::applyCondition(Body* _rootBody){
+	MetaBody* rootBody=YADE_CAST<MetaBody*>(_rootBody);
+	BodyContainer::iterator Iend=rootBody->bodies->end();
+	for(BodyContainer::iterator I=rootBody->bodies->begin(); I!=Iend; ++I){
+		const shared_ptr<Body>& b(*I);
+		if(b->isClumpMember()) continue;
+		Real myMass=YADE_PTR_CAST<ParticleParameters>(b->physicalParameters)->mass;
+		/* http://mathworld.wolfram.com/Point-LineDistance3-Dimensional.html */
+		const Vector3r& x0=b->physicalParameters->se3.position;
+		const Vector3r& x1=axisPoint;
+		const Vector3r x2=axisPoint+axisDirection;
+		Vector3r closestAxisPoint=(x2-x1) * /* t */ (-(x1-x0).Dot(x2-x1))/((x2-x1).SquaredLength());
+		Vector3r toAxis=closestAxisPoint-x0; toAxis.Normalize();
+		static_pointer_cast<Force>(rootBody->physicalActions->find(b->getId(),cachedForceClassIndex))->force+=acceleration*myMass*toAxis;
+		//if(b->getId()==20){ TRVAR3(toAxis,acceleration*myMass*toAxis,static_pointer_cast<Force>(rootBody->physicalActions->find(b->getId(),cachedForceClassIndex))->force); }
+	}
+}
 
 

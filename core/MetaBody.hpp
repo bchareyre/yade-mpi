@@ -41,6 +41,7 @@ class MetaBody : public Body
 		Real recoverSimulationTime;
 
 
+		void runInitializers();
 /// Serialization
 	protected :
 		virtual void postProcessAttributes(bool deserializing);
