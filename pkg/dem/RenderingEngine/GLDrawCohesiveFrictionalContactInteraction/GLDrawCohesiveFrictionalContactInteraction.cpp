@@ -133,9 +133,9 @@ void GLDrawCohesiveFrictionalContactInteraction::go(
 
 // draw middle
 // middle initial orientation
-	drawAxis(middle,ph->initialContactOrientation,size,1);
+//	drawAxis(middle,ph->initialContactOrientation,size,1);
 // middle current orientation
-	drawAxis(middle,ph->currentContactOrientation,size);
+//	drawAxis(middle,ph->currentContactOrientation,size);
 
 
 

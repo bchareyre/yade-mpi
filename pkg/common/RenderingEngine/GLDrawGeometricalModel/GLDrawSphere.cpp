@@ -11,12 +11,6 @@
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
 
 
-//int GLDrawSphere::glSphereList=-1;
-//int GLDrawSphere::glWiredSphereList=-1;
-
-//vector<Vector3r> GLDrawSphere::vertices;
-//vector<Vector3r> GLDrawSphere::faces;
-
 //void drawString(string str,int x,int y,float * c)
 //{
 //      glPushMatrix();
@@ -74,7 +68,7 @@ void GLDrawSphere::go(const shared_ptr<GeometricalModel>& gm, const shared_ptr<P
 		glWiredSphereList = glGenLists(1);
 		glNewList(glWiredSphereList,GL_COMPILE);
 			glDisable(GL_LIGHTING);
-			drawSphere(1);
+			drawWiredSphere();
 		glEndList();
 		glSphereList = glGenLists(1);
 		glNewList(glSphereList,GL_COMPILE);
@@ -95,58 +89,12 @@ void GLDrawSphere::go(const shared_ptr<GeometricalModel>& gm, const shared_ptr<P
 //glColor4(gm->diffuseColor[0],gm->diffuseColor[1],gm->diffuseColor[2],0.4);
 
  	if (gm->wire || wire)
- 	{
-		//glScalef(radius,radius,radius);
-                //glCallList(glWiredSphereList);
-
-//                glutWireSphere(radius,4,4);
-
-		///////////////////////
-		// draw a circle from a bunch of short lines
-		//
-		// FACING the camera !!
-		// FIXME: this can be done faster, by storing the circle in the buffer (similarly as the sphere)
-		///////////////////////
-		//
-			glPushMatrix();
-
-			float modelview[16];
-			int i,j;
-			glGetFloatv(GL_MODELVIEW_MATRIX , modelview);
-			// undo all rotations
-			// beware all scaling is lost as well 
-			for( i=0; i<3; i++ ) 
-				for( j=0; j<3; j++ ) {
-					if ( i==j )
-						modelview[i*4+j] = 1.0;
-					else
-						modelview[i*4+j] = 0.0;
-				}
-			glLoadMatrixf(modelview);
-
-
-		
-		glDisable(GL_LIGHTING);
-		float vectorY1=radius,startY=vectorY1;
-		float vectorX1=0,startX=vectorX1;
-	glBegin(GL_LINE_STRIP);
-//filled circle (why it doesn't work? in separate small test program - 20 lines - it works)
-//glBegin(GL_TRIANGLE_FAN);
-//glVertex2d(0.0,0.0);
-		for(float angle=0.0f ; angle <= (2.0f*3.14159) ; angle+=0.31f)
-		{		
-			float vectorX=(radius*(float)sin((double)angle));
-			float vectorY=(radius*(float)cos((double)angle));		
-			glVertex2d(vectorX1,vectorY1);
-			vectorY1=vectorY;
-			vectorX1=vectorX;			
-		}
-		glVertex2d(startX,startY);
-		glEnd();
-
-			glPopMatrix();
-
-		/////////////////////
+ 	{// circle facing the camera
+		glPushMatrix();
+		clearGlMatrix();
+		glScalef(radius,radius,radius);
+                glCallList(glWiredSphereList);
+		glPopMatrix();
 		
 /////////////////////////// FIXME - display coordinates (stupid place!!)
 //              glPushMatrix();
@@ -156,7 +104,6 @@ void GLDrawSphere::go(const shared_ptr<GeometricalModel>& gm, const shared_ptr<P
 //                      glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, str[i]);
 //              glPopMatrix();
 ///////////////////////////
-
         }
         else
         {
@@ -235,5 +182,43 @@ void GLDrawSphere::drawSphere(int depth)
 		subdivideTriangle(vertices[(unsigned int)faces[i][0]],vertices[(unsigned int)faces[i][1]],vertices[(unsigned int)faces[i][2]],depth);
 }
 
+void GLDrawSphere::drawWiredSphere()
+{
+		float vectorY1=1.0,startY=vectorY1;
+		float vectorX1=0,startX=vectorX1;
+
+	//not filled circle
+	//glBegin(GL_LINE_STRIP);
+//filled circle
+glBegin(GL_POLYGON);
+		for(float angle=0.0f ; angle >= (-2.0f*3.14159) ; angle-=0.155f)
+		{		
+			float vectorX=((float)sin((double)angle));
+			float vectorY=((float)cos((double)angle));		
+			glVertex2d(vectorX1,vectorY1);
+			vectorY1=vectorY;
+			vectorX1=vectorX;			
+		}
+	//not filled circle
+	//glVertex2d(startX,startY);
+		glEnd();
+}
+
+void GLDrawSphere::clearGlMatrix()
+{
+	float modelview[16];
+	int i,j;
+	glGetFloatv(GL_MODELVIEW_MATRIX , modelview);
+	// undo all rotations
+	// beware all scaling is lost as well 
+	for( i=0; i<3; i++ ) 
+		for( j=0; j<3; j++ ) {
+			if ( i==j )
+				modelview[i*4+j] = 1.0;
+			else
+				modelview[i*4+j] = 0.0;
+		}
+	glLoadMatrixf(modelview);
+}
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 YADE_PLUGIN();

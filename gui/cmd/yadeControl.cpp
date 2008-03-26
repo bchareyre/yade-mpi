@@ -268,7 +268,7 @@ class pyPhysicalActionContainer{
 			if(!actionName_.check()) throw invalid_argument("Could not extract action-name.");
 			if(!id_.check()) throw invalid_argument("Could not extract body id.");
 			// FIXME: this may be rather slow (at every lookup!)
-			int actionClassIndex=YADE_PTR_CAST<Indexable>(ClassFactory::instance().createShared(actionName_()))->getClassIndex();
+			int actionClassIndex=dynamic_pointer_cast<Indexable>(ClassFactory::instance().createShared(actionName_()))->getClassIndex();
 			LOG_DEBUG("Got class index "<<actionClassIndex<<" for "<<actionName_());
 			return pyPhysicalAction(proxee->find(id_(),actionClassIndex));
 		}
