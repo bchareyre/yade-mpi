@@ -21,7 +21,7 @@ class GLDrawSphere : public GLDrawGeometricalModelFunctor
 		int glSphereList;
 		void subdivideTriangle(Vector3r& v1,Vector3r& v2,Vector3r& v3, int depth);
 		void drawSphere(int depth);
-		void drawWiredSphere();
+		void drawCircle(bool filled);
 		void clearGlMatrix();
 	
 	public :

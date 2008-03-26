@@ -68,7 +68,7 @@ void GLDrawSphere::go(const shared_ptr<GeometricalModel>& gm, const shared_ptr<P
 		glWiredSphereList = glGenLists(1);
 		glNewList(glWiredSphereList,GL_COMPILE);
 			glDisable(GL_LIGHTING);
-			drawWiredSphere();
+			drawCircle(false);
 		glEndList();
 		glSphereList = glGenLists(1);
 		glNewList(glSphereList,GL_COMPILE);
@@ -182,26 +182,26 @@ void GLDrawSphere::drawSphere(int depth)
 		subdivideTriangle(vertices[(unsigned int)faces[i][0]],vertices[(unsigned int)faces[i][1]],vertices[(unsigned int)faces[i][2]],depth);
 }
 
-void GLDrawSphere::drawWiredSphere()
+void GLDrawSphere::drawCircle(bool filled)
 {
-		float vectorY1=1.0,startY=vectorY1;
-		float vectorX1=0,startX=vectorX1;
+	float vectorY1=1.0,startY=vectorY1;
+	float vectorX1=0,startX=vectorX1;
 
-	//not filled circle
-	//glBegin(GL_LINE_STRIP);
-//filled circle
-glBegin(GL_POLYGON);
-		for(float angle=0.0f ; angle >= (-2.0f*3.14159) ; angle-=0.155f)
-		{		
-			float vectorX=((float)sin((double)angle));
-			float vectorY=((float)cos((double)angle));		
-			glVertex2d(vectorX1,vectorY1);
-			vectorY1=vectorY;
-			vectorX1=vectorX;			
-		}
-	//not filled circle
-	//glVertex2d(startX,startY);
-		glEnd();
+	if(filled)
+		glBegin(GL_POLYGON);
+	else
+		glBegin(GL_LINE_STRIP);
+	for(float angle=0.0f ; angle >= (-2.0f*3.14159) ; angle-=0.155f)
+	{		
+		float vectorX=((float)sin((double)angle));
+		float vectorY=((float)cos((double)angle));		
+		glVertex2d(vectorX1,vectorY1);
+		vectorY1=vectorY;
+		vectorX1=vectorX;			
+	}
+	if(!filled)
+		glVertex2d(startX,startY);
+	glEnd();
 }
 
 void GLDrawSphere::clearGlMatrix()
