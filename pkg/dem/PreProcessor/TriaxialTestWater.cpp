@@ -137,14 +137,14 @@ TriaxialTestWater::TriaxialTestWater () : FileGenerator()
 	defaultDt = 0.000001;
 	timeStepUpdateInterval = 50;
 	timeStepOutputInterval = 50;
-	wallStiffnessUpdateInterval = 1;
+	wallStiffnessUpdateInterval = 10;
 	numberOfGrains = 1000;
-	max_vel = 0.001;
+	max_vel = 1;
 	strainRate = 0.1;
 	StabilityCriterion = 0.01;
 	autoCompressionActivation = true;
-	maxMultiplier = 1.001;
-	finalMaxMultiplier = 1.00001;
+	maxMultiplier = 1.01;
+	finalMaxMultiplier = 1.001;
 	
 	sphereYoungModulus  = 150000000.0;
 	spherePoissonRatio  = 0.2;
@@ -247,7 +247,7 @@ bool TriaxialTestWater::generate()
 			
 	for (;it!=it_end; ++it)
 	{
-		cerr << "sphere (" << it->first << " " << it->second << endl;
+		//cerr << "sphere (" << it->first << " " << it->second << endl;
 		createSphere(body,it->first,it->second,false,true);
 		rootBody->bodies->insert(body);
 	}
@@ -584,26 +584,15 @@ void TriaxialTestWater::createActors(shared_ptr<MetaBody>& rootBody)
 	globalStiffnessCounter->sdecGroupMask = 2;
 	globalStiffnessCounter->interval = timeStepUpdateInterval;
 	
-	// moving walls to regulate the stress applied
-	cerr << "triaxialstressController = shared_ptr" << std::endl;
-	triaxialstressController = shared_ptr<TriaxialStressController> (new
-	TriaxialStressController);
-	triaxialstressController->stiffnessUpdateInterval = 10;// = recordIntervalIter
-	triaxialstressController->sigma_iso = sigma_iso;
-	triaxialstressController->maxMultiplier = maxMultiplier;
-	triaxialstressController->finalMaxMultiplier = finalMaxMultiplier;
-	triaxialstressController->max_vel = max_vel;
-	triaxialstressController->thickness = thickness;
-// 	triaxialstressController->wall_bottom_activated = false;
-// 	triaxialstressController->wall_top_activated = false;	
-	cerr <<"fin section triaxialstressController = shared_ptr"<< std::endl;
 	
 	// moving walls to regulate the stress applied + compress when the
 	//packing is dense an stable
-	cerr << "triaxialcompressionEngine = shared_ptr<TriaxialCompressionEngine> (new TriaxialCompressionEngine);" << std::endl;
+	//cerr << "triaxialcompressionEngine = shared_ptr<TriaxialCompressionEngine> (new TriaxialCompressionEngine);" << std::endl;
 	triaxialcompressionEngine = shared_ptr<TriaxialCompressionEngine> (new TriaxialCompressionEngine);
 	triaxialcompressionEngine-> stiffnessUpdateInterval = wallStiffnessUpdateInterval;// = stiffness update interval
-	triaxialcompressionEngine->sigma_iso = sigma_iso;
+	//triaxialcompressionEngine->sigma_iso = sigma_iso;
+	triaxialcompressionEngine-> sigmaIsoCompaction = sigma_iso;
+	triaxialcompressionEngine-> sigmaLateralConfinement = sigma_iso;
 	triaxialcompressionEngine->max_vel = max_vel;
 	triaxialcompressionEngine->thickness = thickness;
 	triaxialcompressionEngine->strainRate = strainRate;
@@ -612,7 +601,7 @@ void TriaxialTestWater::createActors(shared_ptr<MetaBody>& rootBody)
 	triaxialcompressionEngine->internalCompaction = internalCompaction;
 	triaxialcompressionEngine->maxMultiplier = maxMultiplier;
 	triaxialcompressionEngine->finalMaxMultiplier = finalMaxMultiplier;
-	cerr <<"fin section triaxialcompressionEngine = shared_ptr"<< std::endl;
+	//cerr <<"fin section triaxialcompressionEngine = shared_ptr"<< std::endl;
 	
 	
 	rootBody->engines.clear();
