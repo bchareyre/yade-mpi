@@ -25,7 +25,7 @@
 
 GlobalStiffnessCounter::GlobalStiffnessCounter() : InteractionSolver() , actionForce(new Force) , actionMomentum(new Momentum), actionStiffness(new GlobalStiffness)
 {
-	interval=1;//FIXME very high frequency - not required 
+	interval=100;
 	sdecGroupMask=1;
 	momentRotationLaw = true;
 	assumeElasticSpheres = true;
@@ -75,6 +75,7 @@ bool GlobalStiffnessCounter::getInteractionParameters(const shared_ptr<Interacti
 		return true;
 	}
 
+
 // 	shared_ptr<SDECLinkGeometry> geom3=dynamic_pointer_cast<SDECLinkGeometry>(contact->interactionGeometry);
 // 	shared_ptr<SDECLinkPhysics> phys3=dynamic_pointer_cast<SDECLinkPhysics>(contact->interactionPhysics);
 // 	if(geom3 && phys3){
@@ -96,7 +97,8 @@ bool GlobalStiffnessCounter::getInteractionParameters(const shared_ptr<Interacti
 }
 
 void GlobalStiffnessCounter::traverseInteractions(MetaBody* ncb, const shared_ptr<InteractionContainer>& interactions, bool spheresOnly){
-	for(InteractionContainer::iterator I=interactions->begin(); I!=interactions->end(); ++I){
+	InteractionContainer::iterator Iend=interactions->end();
+	for(InteractionContainer::iterator I=interactions->begin(); I!=Iend; ++I){
 		const shared_ptr<Interaction>& contact = *I;
 		if(!contact->isReal) continue;
 

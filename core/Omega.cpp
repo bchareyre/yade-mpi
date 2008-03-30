@@ -45,7 +45,6 @@ void Omega::init()
 	simulationFileName="";
 	currentIteration = 0;
 	stopAtIteration = 0;
-	dt = 1e-8;
 }
 
 
@@ -342,7 +341,6 @@ void Omega::loadSimulation()
 
 		if(rootBody->recover){
 			LOG_INFO("Simulation recovery effective.");
-			dt=rootBody->recoverDt;
 			currentIteration=rootBody->recoverCurrentIteration;
 			stopAtIteration=rootBody->recoverStopAtIteration;
 			simulationTime=rootBody->recoverSimulationTime;	
@@ -366,7 +364,6 @@ void Omega::saveSimulation(const string name, bool recover)
 		if(recover){
 			LOG_INFO("Simulation recovery enabled.");
 			rootBody->recover=true;
-			rootBody->recoverDt=dt;
 			rootBody->recoverCurrentIteration=currentIteration;
 			rootBody->recoverStopAtIteration=stopAtIteration;
 			rootBody->recoverSimulationTime=simulationTime;
@@ -396,13 +393,14 @@ void Omega::freeRootBody()
 // FIXME - remove that
 void Omega::setTimeStep(const Real t)
 {
-	dt = t;
+	if(rootBody) rootBody->dt=t;
 }
 
 
 Real Omega::getTimeStep()
 {
-	return dt;
+	if(rootBody) return rootBody->dt;
+	else return -1;
 }
 
 

@@ -94,6 +94,7 @@ void TriaxialCompressionEngine::doStateTransition(stateNum nextState){
 		height0 = height; depth0 = depth; width0 = width;
 		saveSimulation=true; // saving snapshot .xml will actually be done in ::applyCondition
 		// stop simulation here, since nothing will happen from now on
+		Shop::saveSpheresToFile("/tmp/limbo.spheres");
 		Omega::instance().stopSimulationLoop();
 	}
 	else goto undefinedTransition;
@@ -115,7 +116,7 @@ void TriaxialCompressionEngine::updateParameters(Body * body)
 
 	if (Omega::instance().getCurrentIteration() % 100 == 0) {
 		LOG_INFO("UnbalancedForce="<< UnbalancedForce);
-		cerr << "UnbalancedForce=" << UnbalancedForce << endl;
+		//cerr << "UnbalancedForce=" << UnbalancedForce << endl;
 		/* TRVAR1(meanStress);*/ /* TRVAR2(stateName(currentState),sigma_iso); */
 	}
 

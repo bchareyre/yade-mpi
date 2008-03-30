@@ -22,6 +22,7 @@
 #include <yade/core/MetaBody.hpp>
 #include <boost/lexical_cast.hpp>
 
+CREATE_LOGGER(TriaxialStateRecorder);
 
 TriaxialStateRecorder::TriaxialStateRecorder () : DataRecorder()
 
@@ -81,7 +82,7 @@ void TriaxialStateRecorder::action(Body * body)
         {
             if ((*itFirst)->getClassName() == "TriaxialCompressionEngine" ) //|| (*itFirst)->getBaseClassName() == "TriaxialCompressionEngine")
             {
-                cerr << "stress controller engine found" << endl;
+                LOG_DEBUG("stress controller engine found");
                 triaxialCompressionEngine =  YADE_PTR_CAST<TriaxialCompressionEngine> (*itFirst);
                 //triaxialCompressionEngine = shared_ptr<TriaxialCompressionEngine> (static_cast<TriaxialCompressionEngine*> ( (*itFirst).get()));
             }

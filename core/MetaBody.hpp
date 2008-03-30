@@ -35,10 +35,11 @@ class MetaBody : public Body
 		 *	Copying is being done ine Omega::loadSimulation and Omega::saveSimulation -- keep vars in sync.
 		 * */
 		bool recover;
-		Real recoverDt;
 		long recoverCurrentIteration;
 		long recoverStopAtIteration;
 		Real recoverSimulationTime;
+
+		Real dt;
 
 
 		void runInitializers();

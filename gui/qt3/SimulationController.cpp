@@ -178,6 +178,11 @@ void SimulationController::loadSimulationFromFileName(const std::string& fileNam
 			pbResetSimulation->setEnabled(true);
 			pbOneSimulationStep->setEnabled(true);
 
+			Real dt=Omega::instance().getTimeStep();
+			int exp10=floor(log10(dt));
+			sbSecond->setValue((int)(dt/(pow(10.,exp10)))); // we may lose quite some precision here :-(
+			sb10PowerSecond->setValue(exp10);
+
 			changeSkipTimeStepper = true;
 			if (Omega::instance().containTimeStepper())
 			{

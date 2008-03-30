@@ -108,7 +108,7 @@ void GLSimulationPlayerViewer::load(const string& fileName)
 	filesystem::directory_iterator dEnd;
 	xyzFiles.clear();
 	for(filesystem::directory_iterator dIter(inputBaseDirectory); dIter!=dEnd; dIter++){
-		if(dIter->leaf().find(inputBaseName)!=0 || filesystem::is_directory(*dIter) || !filesystem::exists(*dIter)) continue;
+		if(dIter->leaf().find(inputBaseName)!=0 || filesystem::extension(*dIter)==".rgb" || filesystem::is_directory(*dIter) || !filesystem::exists(*dIter)) continue;
 		xyzFiles.push_back(dIter->string());
 		//LOG_TRACE("Added "<<dIter->string());
 	}
@@ -146,6 +146,8 @@ bool GLSimulationPlayerViewer::loadPositionOrientationFile()
 	if(xyzFilesIter==xyzFiles.end()) return false;
 	fileName=*(xyzFilesIter++);
 	ifstream f(fileName.c_str());
+	ifstream rgb((fileName+".rgb").c_str());
+	bool doRgb=rgb.good();
 	if(!f.good()){LOG_FATAL("Snapshot file "<<fileName<<" could not be opened for reading (fatal, ending sequence)?!"); return false;}
 	LOG_TRACE(fileName);
 	for(unsigned long id=0; !f.eof() && !f.fail() && id<=(rootBody->bodies->size()-1); id++){
@@ -153,9 +155,13 @@ bool GLSimulationPlayerViewer::loadPositionOrientationFile()
 		if(!b){ LOG_ERROR("Body #"<<id<<" doesn't exist (skipped)!"); continue; }
 		if(!b->physicalParameters) {LOG_ERROR("Body #"<<id<<" has no physical parameters?! (skipping)"); continue; }
 		Se3r& mySe3=b->physicalParameters->se3;
+		Vector3r& myColor=b->geometricalModel->diffuseColor;
 		f>>mySe3.position[0]>>mySe3.position[1]>>mySe3.position[2]>>mySe3.orientation[0]>>mySe3.orientation[1]>>mySe3.orientation[2]>>mySe3.orientation[3];
+		/* try loading color as well */
+		if(doRgb && !rgb.eof() && !rgb.fail()) rgb>>myColor[0]>>myColor[1]>>myColor[2];
 	}
 	f.close();
+	rgb.close();
 	return true;
 }
 

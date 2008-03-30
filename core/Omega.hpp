@@ -73,7 +73,6 @@ class Omega : public Singleton<Omega>
 		SimulationFlow			 simulationFlow_;
 
 		map<string,DynlibDescriptor>	 dynlibs;	// FIXME : should store that in ClassFactory ?
-		Real				 dt;		// FIXME - maybe ? move this to MetaBody.hpp OR MAYBE NOT ?
 		
 		shared_ptr<MetaBody>		 rootBody;
 		ptime				 sStartingSimulationTime;
@@ -143,7 +142,7 @@ class Omega : public Singleton<Omega>
 		void		incrementCurrentIteration();
 		
 		Real		getSimulationTime() { return simulationTime;};
-		void		incrementSimulationTime() { simulationTime+=dt;};
+		void		incrementSimulationTime() { simulationTime+=getTimeStep();};
 		
 		void		init();
 

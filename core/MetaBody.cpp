@@ -28,10 +28,11 @@ MetaBody::MetaBody() :
 	recover=false;
 
 	// I must assign something to avoid "nan" when loading. When recover=false, those can be "nan" and lead to crash.
-	recoverDt=1;
 	recoverCurrentIteration=1;
 	recoverStopAtIteration=1;
 	recoverSimulationTime=1;
+
+	dt=1e-8;
 }
 
 
@@ -58,9 +59,9 @@ void MetaBody::registerAttributes()
 	REGISTER_ATTRIBUTE(transientInteractions);
 	REGISTER_ATTRIBUTE(persistentInteractions);
 	REGISTER_ATTRIBUTE(physicalActions); // FIXME - needed or not ? - Olivier : yes it is needed if there is no default initialization into constructor
+	REGISTER_ATTRIBUTE(dt);
 
 	REGISTER_ATTRIBUTE(recover);
-	REGISTER_ATTRIBUTE(recoverDt);
 	REGISTER_ATTRIBUTE(recoverCurrentIteration);
 	REGISTER_ATTRIBUTE(recoverStopAtIteration);
 	REGISTER_ATTRIBUTE(recoverSimulationTime);

@@ -14,10 +14,10 @@ void InteractingSphere2AABB::go(const shared_ptr<InteractingGeometry>& cm, share
 	InteractingSphere* sphere = static_cast<InteractingSphere*>(cm.get());
 	AABB* aabb = static_cast<AABB*>(bv.get());
 	aabb->center = se3.position;
-	aabb->halfSize = Vector3r(sphere->radius,sphere->radius,sphere->radius);
+	aabb->halfSize = aabbEnlargeFactor*Vector3r(sphere->radius,sphere->radius,sphere->radius);
 	
-	aabb->min = aabb->center-aabb->halfSize*aabbEnlargeFactor;
-	aabb->max = aabb->center+aabb->halfSize*aabbEnlargeFactor;	
+	aabb->min = aabb->center-aabb->halfSize;
+	aabb->max = aabb->center+aabb->halfSize;	
 }
 	
 YADE_PLUGIN();

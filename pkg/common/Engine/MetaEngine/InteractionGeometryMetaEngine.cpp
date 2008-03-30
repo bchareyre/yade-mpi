@@ -50,8 +50,10 @@ void InteractionGeometryMetaEngine::action(Body* body)
 		 	&&
 			operator()( b1->interactingGeometry , b2->interactingGeometry , b1->physicalParameters->se3 , b2->physicalParameters->se3 , interaction );
 
+
 		if(wasReal==false && interaction->isReal)
 			interaction->isNew=true;
+		//cerr<<"isReal="<<interaction->isReal<<", wasReal="<<wasReal<<", isNew="<<interaction->isNew<<endl;
 
 		//tmp
 		if(!(b1->interactingGeometry&&b2->interactingGeometry)){

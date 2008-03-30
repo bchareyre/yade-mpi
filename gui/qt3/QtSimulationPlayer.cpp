@@ -56,7 +56,7 @@ void QtSimulationPlayer::pbLoadClicked()
 
 void QtSimulationPlayer::pbOutputDirectoryClicked()
 {
-	string directory = FileDialog::getExistingDirectory ( ".","Choose the directory where to save the sna shots", this->parentWidget()->parentWidget());
+	string directory = FileDialog::getExistingDirectory ( ".","Choose the directory where to save the snapshots", this->parentWidget()->parentWidget());
 	if (!directory.empty())
 		leOutputDirectory->setText(directory.c_str());
 

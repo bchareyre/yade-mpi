@@ -177,13 +177,12 @@ void GlobalStiffnessTimeStepper::computeTimeStep(Body* body)
 		//Omega::instance().setTimeStep(newDt);
 		computedOnce = true;	
 		//cerr << "computedOnce=" << computedOnce << endl;	
-		cerr << "computed timestep is:" << newDt;
+		//cerr << "computed timestep is:" << newDt;
 	}
 	else if (!computedOnce) Omega::instance().setTimeStep(defaultDt);
-	cerr << " new timestep is:" << Omega::instance().getTimeStep() << endl;
+	//cerr << " new timestep is:" << Omega::instance().getTimeStep() << endl;
 
-	//if (Omega::instance().getCurrentIteration() % 100 == 0)
-		LOG_INFO("computed timestep " << newDt <<
+	LOG_INFO("computed timestep " << newDt <<
 			(Omega::instance().getTimeStep()==newDt ? string(", appplied") :
 			string(", BUT timestep is ")+lexical_cast<string>(Omega::instance().getTimeStep()))<<".");
 }

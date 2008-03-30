@@ -44,6 +44,8 @@ YADE_PLUGIN("BrefcomTestGen");
 #include<yade/pkg-common/LeapFrogPositionIntegrator.hpp>
 #include<yade/pkg-common/LeapFrogOrientationIntegrator.hpp>
 #include<yade/pkg-common/PersistentSAPCollider.hpp>
+#include<yade/pkg-dem/PositionOrientationRecorder.hpp>
+#include<yade/pkg-dem/GlobalStiffnessTimeStepper.hpp>
 #include<yade/extra/UniaxialStrainControlledTest.hpp>
 
 /*
@@ -73,6 +75,7 @@ void BrefcomTestGen::createEngines(){
 	shared_ptr<PhysicalActionContainerInitializer> physicalActionInitializer(new PhysicalActionContainerInitializer);
 	physicalActionInitializer->physicalActionNames.push_back("Force");
 	physicalActionInitializer->physicalActionNames.push_back("Momentum");
+	physicalActionInitializer->physicalActionNames.push_back("GlobalStiffness");
 	rootBody->initializers.push_back(physicalActionInitializer);
 	
 	shared_ptr<BoundingVolumeMetaEngine> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeMetaEngine>(new BoundingVolumeMetaEngine);
@@ -94,7 +97,10 @@ void BrefcomTestGen::createEngines(){
 	rootBody->engines.push_back(igeomDispatcher);
 
 	shared_ptr<InteractionPhysicsMetaEngine> iphysDispatcher(new InteractionPhysicsMetaEngine);
-	iphysDispatcher->add(new BrefcomMakeContact);
+		shared_ptr<BrefcomMakeContact> bmc(new BrefcomMakeContact);
+		bmc->cohesiveThresholdIter=-1;
+		bmc->calibratedEpsFracture=.5; /* arbitrary, but large enough */
+		iphysDispatcher->add(bmc);
 	rootBody->engines.push_back(iphysDispatcher);
 
 	shared_ptr<BrefcomLaw> bLaw(new BrefcomLaw);
@@ -112,6 +118,26 @@ void BrefcomTestGen::createEngines(){
 	shared_ptr<PhysicalParametersMetaEngine> orientationIntegrator(new PhysicalParametersMetaEngine);
 	orientationIntegrator->add(new LeapFrogOrientationIntegrator);
 	rootBody->engines.push_back(orientationIntegrator);
+
+	shared_ptr<BrefcomDamageColorizer> dmg(new BrefcomDamageColorizer);
+	rootBody->engines.push_back(dmg);
+
+	shared_ptr<PositionOrientationRecorder> rec(new PositionOrientationRecorder);
+	rec->outputFile="/tmp/brefcom-test";
+	rec->interval=500;
+	rec->saveRgb=true;
+	rootBody->engines.push_back(rec);
+#if 0
+	shared_ptr<BrefcomStiffnessCounter> bsc(new BrefcomStiffnessCounter);
+	bsc->interval=100;
+	rootBody->engines.push_back(bsc);
+
+	shared_ptr<GlobalStiffnessTimeStepper> gsts(new GlobalStiffnessTimeStepper);
+	gsts->sdecGroupMask=1023;
+	gsts->timeStepUpdateInterval=100;
+	gsts->defaultDt=1e-4;
+	rootBody->engines.push_back(gsts);
+#endif
 }
 
 bool BrefcomTestGen::generate(){
@@ -128,11 +154,11 @@ bool BrefcomTestGen::generate(){
 	
 	// control normal/shear ratio
 	//Real zCoord=.1; Real yCoord=sqrt(1-zCoord*zCoord); // distance is always 2, with contact at origin
-	Real zCoord=1, yCoord=0;
+	Real zCoord=.9, yCoord=0;
 	shared_ptr<Body>
-		s1=Shop::sphere(Vector3r(0,-yCoord,-zCoord),1),
-		s2=Shop::sphere(Vector3r(0,yCoord,zCoord),1),
-		sMid=Shop::sphere(Vector3r(0,0,0.01),1);
+		s1=Shop::sphere(Vector3r(0,-yCoord,-zCoord),.5),
+		s2=Shop::sphere(Vector3r(0,yCoord,zCoord),.5),
+		sMid=Shop::sphere(Vector3r(0,0,0.01),.5);
 	body_id_t id1=rootBody->bodies->insert(s1), id2=rootBody->bodies->insert(s2), id3=rootBody->bodies->insert(sMid);
 	
 	//  engines should take care of the rest of interaction; this is what collider would do normally
@@ -142,8 +168,8 @@ bool BrefcomTestGen::generate(){
 	rootBody->transientInteractions->find(id1,id2)->isNew=1;
 	*/
 
-	strainer->negIds.push_back(id1); strainer->negCoords.push_back(-1);
-	strainer->posIds.push_back(id2); strainer->posCoords.push_back(1);
+	strainer->negIds.push_back(id1); strainer->negCoords.push_back(-zCoord);
+	strainer->posIds.push_back(id2); strainer->posCoords.push_back(zCoord);
 
 	return true;
 }

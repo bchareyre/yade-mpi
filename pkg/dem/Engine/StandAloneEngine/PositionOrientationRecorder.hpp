@@ -25,9 +25,8 @@ class PositionOrientationRecorder : public DataRecorder
 		std::string outputFile;
 		//! modulo of iteration number when the se3's will be be written out
 		unsigned int interval;
+		bool saveRgb;
 	
-		std::ofstream ofile;
-
 		PositionOrientationRecorder ();
 		~PositionOrientationRecorder ();
 		virtual void action(Body* b);

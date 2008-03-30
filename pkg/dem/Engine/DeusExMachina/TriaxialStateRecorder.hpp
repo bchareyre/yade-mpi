@@ -49,6 +49,7 @@ class TriaxialStateRecorder : public DataRecorder
 		virtual void registerAttributes();
 		virtual void action(Body* b);
 		virtual bool isActivated();
+		DECLARE_LOGGER;
 
 	protected :
 		virtual void postProcessAttributes(bool deserializing);

@@ -337,6 +337,8 @@ class pyOmega{
 		LOG_DEBUG("SAVE!");
 	}
 
+	void saveSpheres(std::string fileName){ Shop::saveSpheresToFile(fileName); }
+
 	python::list anyEngines_get(vector<shared_ptr<Engine> >& engContainer){
 		python::list ret; 
 		BOOST_FOREACH(shared_ptr<Engine>& eng, engContainer){
@@ -494,6 +496,7 @@ BOOST_PYTHON_MODULE(yadeControl)
 		.add_property("usesTimeStepper",&pyOmega::usesTimeStepper_get,&pyOmega::usesTimeStepper_set)
 		.def("load",&pyOmega::load)
 		.def("save",&pyOmega::save)
+		.def("saveSpheres",&pyOmega::saveSpheres)
 		.def("run",&pyOmega::run,omega_overloads())
 		.def("pause",&pyOmega::pause)
 		.def("step",&pyOmega::step)

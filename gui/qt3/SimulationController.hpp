@@ -15,12 +15,13 @@
 #include<yade/lib-opengl/GLWindowsManager.hpp>
 #include<yade/lib-serialization-qt/QtGUIGenerator.hpp>
 #include<yade/core/RenderingEngine.hpp>
-#include <qlayout.h>
-#include <qframe.h>
-#include <qscrollview.h>
-#include "GLViewer.hpp"
-#include "QtGeneratedSimulationController.h"
-#include "SimulationControllerUpdater.hpp"
+#include<qlayout.h>
+#include<qframe.h>
+#include<qscrollview.h>
+#include<qspinbox.h>
+#include"GLViewer.hpp"
+#include"QtGeneratedSimulationController.h"
+#include"SimulationControllerUpdater.hpp"
 
 class SimulationController : public QtGeneratedSimulationController
 {

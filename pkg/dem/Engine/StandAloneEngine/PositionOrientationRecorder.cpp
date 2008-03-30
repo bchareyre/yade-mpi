@@ -15,10 +15,11 @@
 #include <boost/lexical_cast.hpp>
 
 
-PositionOrientationRecorder::PositionOrientationRecorder () : DataRecorder()//, ofile("")
+PositionOrientationRecorder::PositionOrientationRecorder () : DataRecorder()
 {
 	outputFile = "positionorientation";
 	interval = 50;
+	saveRgb=false;
 }
 
 
@@ -30,10 +31,7 @@ PositionOrientationRecorder::~PositionOrientationRecorder ()
 
 void PositionOrientationRecorder::postProcessAttributes(bool deserializing)
 {
-	if(deserializing)
-	{
-	//	ofile.open(outputFile.c_str());
-	}
+	if(deserializing) {}
 }
 
 
@@ -42,46 +40,32 @@ void PositionOrientationRecorder::registerAttributes()
 	DataRecorder::registerAttributes();
 	REGISTER_ATTRIBUTE(outputFile);
 	REGISTER_ATTRIBUTE(interval);
+	REGISTER_ATTRIBUTE(saveRgb);
 }
 
 
 void PositionOrientationRecorder::action(Body * body)
 {
-	MetaBody * ncb = YADE_CAST<MetaBody*>(body);
-	
-	if( Omega::instance().getCurrentIteration() % interval == 0 /*&& ofile*/ )
-	{
+	MetaBody* ncb = YADE_CAST<MetaBody*>(body);
+	if( Omega::instance().getCurrentIteration() % interval == 0 ){
 		ostringstream oss;
 		oss<<setfill('0')<<outputFile<<"_"<<setw(6)<<Omega::instance().getCurrentIteration();
 		cerr<<"Snapshot "<<oss.str()<<endl;
+		std::ofstream ofile,rgbFile;
 		ofile.open(oss.str().c_str());
-		if(!ofile.good()){ cerr<<"Snapshot "<<oss.str()<<" could not be opened for writing (skipping)!?"<<endl; return; }
+		if(saveRgb) rgbFile.open((oss.str()+".rgb").c_str());
+		if(!ofile.good()){ cerr<<"Snapshot "<<oss.str()<<" could not be opened for writing (skipping)!"<<endl; return; }
+		if(saveRgb && !rgbFile.good()){ cerr<<"Snapshot "<<oss.str()<<" could not be opened for writing (skipping)!"<<endl; return; }
 	
-		Real tx=0, ty=0, tz=0, rw=0, rx=0, ry=0, rz=0;
-			
-		BodyContainer::iterator bi    = ncb->bodies->begin();
 		BodyContainer::iterator biEnd = ncb->bodies->end();
-		for(  ; bi!=biEnd ; ++bi )
-		{
-			shared_ptr<Body> b = *bi;
-			tx = b->physicalParameters->se3.position[0];
-			ty = b->physicalParameters->se3.position[1];
-			tz = b->physicalParameters->se3.position[2];
-		
-			rw = b->physicalParameters->se3.orientation[0];
-			rx = b->physicalParameters->se3.orientation[1];
-			ry = b->physicalParameters->se3.orientation[2];
-			rz = b->physicalParameters->se3.orientation[3];
-			
-			ofile <<	lexical_cast<string>(tx) << " " 
-					<< lexical_cast<string>(ty) << " " 
-					<< lexical_cast<string>(tz) << " "
-					<< lexical_cast<string>(rw) << " "
-					<< lexical_cast<string>(rx) << " "
-					<< lexical_cast<string>(ry) << " "
-					<< lexical_cast<string>(rz) << endl;
+		for(BodyContainer::iterator bi    = ncb->bodies->begin(); bi!=biEnd; ++bi){
+			const Se3r& se3=(*bi)->physicalParameters->se3;
+			const Vector3r& color=(*bi)->geometricalModel->diffuseColor;
+			ofile<<se3.position[0]<<" "<<se3.position[1]<<" "<<se3.position[2]<<" "<<se3.orientation[0]<<" "<<se3.orientation[1]<<" "<<se3.orientation[2]<<" "<<se3.orientation[3]<<endl;
+			if(saveRgb) rgbFile<<color[0]<<" "<<color[1]<<" "<<color[2]<<endl;
 		}
 		ofile.close();
+		if(saveRgb) rgbFile.close();
 	}
 }
 
