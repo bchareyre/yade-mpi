@@ -9,7 +9,7 @@ just by parameters given to them.
 
 By default yade filegenerators are looking for those files in ../data directory.
 You can specify another directory in filegenerator, but for now you would have to
-change it everytime (bug #004853). To avoid the hassle you can just copy content
+change it every time (bug #004853). To avoid the hassle you can just copy content
 of this directory to ../data relative to path from where you are starting yade
 ( most probably bin/ ).
 

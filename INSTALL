@@ -1,6 +1,6 @@
 This is a copy of pages "Installation" and "Installation details" from http://yade.wikia.com/
 For more complete documentation please visit that website, especially
-instructions about installation for specific linux distribution, like:
+instructions about installation for specific Linux distribution, like:
 
 http://yade.wikia.com/wiki/Installation_of_yade_on_debian_or_kubuntu
 http://yade.wikia.com/wiki/Installation_of_yade_on_fedora
@@ -11,7 +11,7 @@ http://yade.wikia.com/wiki/Installation_of_yade_on_gentoo
 ==         Table of Contents                                ==
 ==                                                          ==
 ==============================================================
-== 1 Prerequistes                                           ==
+== 1 Prerequisites                                           ==
 ==       1.1 Required packages                              ==
 ==       1.2 Optional packages                              ==
 == 2 Recommended installation method                        ==
@@ -20,7 +20,7 @@ http://yade.wikia.com/wiki/Installation_of_yade_on_gentoo
 ==       3.2 Installing from debian source packages         ==
 ==       3.3 Scons options                                  ==
 ==       3.4 Automatic library detection                    ==
-==       3.5 Installing the wildmagic 3 library on debian   ==
+==       3.5 Installing the wildmagic 3 library on Debian   ==
 ==       3.6 Backward compatibility options                 ==
 ==       3.7 Cleaning and uninstalling                      ==
 ==       3.8 Install paths                                  ==
@@ -28,7 +28,7 @@ http://yade.wikia.com/wiki/Installation_of_yade_on_gentoo
 
 
 
-= Prerequistes =
+= Prerequisites =
 ================
 
 All libraries listed below must be installed with development headers. It's
@@ -36,7 +36,7 @@ better to install them using your linux's distribution package management
 system, instead of downloading directly from the website. With the exception of
 QGLViewer ( http://artis.imag.fr/Software/QGLViewer/ ) and
 wildmagic 3.11 ( http://www.geometrictools.com/Downloads/Downloads.html ), which
-may not have a packege in your linux distribution.
+may not have a package in your Linux distribution.
 
 == Required packages ==
 =======================
@@ -73,12 +73,12 @@ may not have a packege in your linux distribution.
 ===================================
 
 Run this command from inside yade-0.11.1 directory to install yade as a local
-user without root privileages (recommended):
+user without root privileges (recommended):
 
  scons PREFIX=/home/''username''/YADE optimize=1
 
 Replace 'username' with your user name. Also check out =Scons options= below to
-quickly compile not optimized version or systemwide install from debian package
+quickly compile not optimized version or systemwide install from Debian package
 (as a root user), etc.
 
 
@@ -94,14 +94,14 @@ quickly compile not optimized version or systemwide install from debian package
 By default yade installs in directory /usr/local, but to install there you need
 a root access. So running just scons some options should be enough. However,
 since you want to install yade systemwide as root, it might be better if you
-built a debian package instead.
+built a Debian package instead.
 
 
 == Installing from debian source packages ==
 ============================================
 
 This_repository ( http://geo.hmg.inpg.fr/~smilauer/yade ) contains weekly
-snapshots from svn in the form of debian source packages. To compile and
+snapshots from svn in the form of Debian source packages. To compile and
 install these (assuming that you already have required packages installed), you
 need to add repository source do your '/etc/apt/ sources.list':
 
@@ -175,7 +175,7 @@ directory of yade.
 |CXX        |g++           |CXX="distcc g++" to have distributed build, if    |
 |           |              |that is configured.                               |
 |-----------|--------------|--------------------------------------------------|
-|           |              |Additional paths for the c proprocessor           |
+|           |              |Additional paths for the c preprocessor           |
 |CPPPATH    |empty         |(whitespace separated). Use it for locally-       |
 |           |              |installed libraries, eg.: CPPPATH="/usr/local/    |
 |           |              |include /home/fred/build/log4cxx/include"         |
@@ -209,12 +209,12 @@ to use:
 so that scons will find it.
 
 
-== Installing the wildmagic 3 library on debian ==
+== Installing the wildmagic 3 library on Debian ==
 ==================================================
 
 The wildmagic_3.11_library ( http://www.geometrictools.com/Downloads/Downloads.html )
 is used by Lattice Geometrical Model when it's available. It's only to have
-dalaunay triangulation in 2D and 3D during specimen generation.
+Delaunay triangulation in 2D and 3D during specimen generation.
 Add the following line at the end of your /etc/apt/sources.list:
 
   deb-src http://geo.hmg.inpg.fr/~smilauer/yade ./
