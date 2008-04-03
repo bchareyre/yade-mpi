@@ -9,6 +9,7 @@
 *************************************************************************/
 
 #include"GLViewer.hpp"
+#include"YadeCamera.hpp"
 #include<GL/glut.h>
 #include<yade/lib-opengl/FpsTracker.hpp>
 #include<yade/core/Body.hpp>
@@ -21,6 +22,8 @@ GLViewer::GLViewer(int id, shared_ptr<RenderingEngine> rendererInit, const QGLFo
 	renderer=rendererInit;
 	drawGrid = false;
 	viewId = id;
+	cut_plane = 0;
+	cut_plane_delta = -2;
 	resize(320, 240);
 
 	if (id==0)
@@ -112,6 +115,31 @@ void GLViewer::keyPressEvent(QKeyEvent *e)
 	else if( e->key()==Qt::Key_P )
 		camera()->setFieldOfView(camera()->fieldOfView()*1.1), updateGL();
 
+//////////////////////////////////////////////
+// FIXME that all should be in some nice GUI
+// 
+// Cutting plane
+	else if( e->key()==Qt::Key_Plus ){
+			cut_plane = std::min(1.0, cut_plane + std::pow(10.0,(double)cut_plane_delta));
+			static_cast<YadeCamera*>(camera())->setCuttingDistance(cut_plane);
+			displayMessage("Cut plane: "+lexical_cast<std::string>(cut_plane));
+	}else if( e->key()==Qt::Key_Minus ){
+			cut_plane = std::max(0.0, cut_plane - std::pow(10.0,(double)cut_plane_delta));
+			static_cast<YadeCamera*>(camera())->setCuttingDistance(cut_plane);
+			displayMessage("Cut plane: "+lexical_cast<std::string>(cut_plane));
+	}else if( e->key()==Qt::Key_Slash ){
+			cut_plane_delta -= 1;
+			displayMessage("Cut plane increment: 1e"+(cut_plane_delta>0?std::string("+"):std::string(""))+lexical_cast<std::string>(cut_plane_delta));
+	}else if( e->key()==Qt::Key_Asterisk ){
+			cut_plane_delta = std::min(1+cut_plane_delta,-1);
+			displayMessage("Cut plane increment: 1e"+(cut_plane_delta>0?std::string("+"):std::string(""))+lexical_cast<std::string>(cut_plane_delta));
+	}
+
+// FIXME END
+//////////////////////////////////////////////
+
+
+
 	else if( e->key()!=Qt::Key_Escape && e->key()!=Qt::Key_Space )
 		QGLViewer::keyPressEvent(e);
 }
@@ -122,9 +150,9 @@ void GLViewer::centerScene()
 		return;
 
 	if(Omega::instance().getRootBody()->bodies->size() < 500)
-		displayMessage("Less than 500 bodies, moving possible. Select with shift, press 'm' to move.", 6000);
+		displayMessage("Less than 500 bodies, moving possible. Select with shift, press 'm' to move. Use / * - + for cutting plane.", 6000);
 	else
-		displayMessage("More than 500 bodies. Moving not possible", 6000);
+		displayMessage("More than 500 bodies. Moving not possible. Use / * - + for cutting plane.", 6000);
 
 	Vector3r min = Omega::instance().getRootBody()->boundingVolume->min;
 	Vector3r max = Omega::instance().getRootBody()->boundingVolume->max;

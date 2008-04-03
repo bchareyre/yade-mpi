@@ -16,6 +16,7 @@ if 'qt3' not in env['exclude']:
 				'qt3/SimulationControllerUpdater.cpp',
 				'qt3/YadeQtGeneratedMainWindow.ui',
 				'qt3/YadeQtMainWindow.cpp',
+				'qt3/YadeCamera.cpp',
 
 				'qt3/GLSimulationPlayerViewer.cpp',
 				'qt3/QtGeneratedSimulationPlayer.ui',

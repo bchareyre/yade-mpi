@@ -9,6 +9,7 @@
 #include "SimulationController.hpp"
 #include "MessageDialog.hpp"
 #include "FileDialog.hpp"
+#include "YadeCamera.hpp"
 #include <qlabel.h>
 #include <qpushbutton.h>
 #include <qgroupbox.h>
@@ -179,7 +180,7 @@ void SimulationController::loadSimulationFromFileName(const std::string& fileNam
 			pbOneSimulationStep->setEnabled(true);
 
 			Real dt=Omega::instance().getTimeStep();
-			int exp10=floor(log10(dt));
+			int exp10=(int)floor(log10(dt));
 			sbSecond->setValue((int)(dt/(pow(10.,exp10)))); // we may lose quite some precision here :-(
 			sb10PowerSecond->setValue(exp10);
 
@@ -273,12 +274,16 @@ void SimulationController::addNewView()
 	if (glViews.size()==0)
 	{
 		glViews[0] = new GLViewer(0,renderer,format,parentWorkspace);
+		glViews[0]->setCamera(new YadeCamera);
+		glViews[0]->camera()->frame()->setWheelSensitivity(-1.0f);
 		maxNbViews = 0;
 	}
 	else
 	{
 		maxNbViews++;
 		glViews[maxNbViews] = new GLViewer(maxNbViews,renderer, format, parentWorkspace, glViews[0]);
+		glViews[maxNbViews]->setCamera(new YadeCamera);
+		glViews[maxNbViews]->camera()->frame()->setWheelSensitivity(-1.0f);
 	}
 
 	connect( glViews[maxNbViews], SIGNAL( closeSignal(int) ), this, SLOT( closeGLViewEvent(int) ) );

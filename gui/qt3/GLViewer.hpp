@@ -24,6 +24,8 @@ class GLViewer : public QGLViewer
 		bool			drawGrid; // FIXME - draw grid is in fact just another GLDrawActor
 		bool			isMoving;
 		bool			wasDynamic;
+		float			cut_plane;
+		int			cut_plane_delta;
 		shared_ptr<RenderingEngine> renderer;
 
         public :
