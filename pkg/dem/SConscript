@@ -211,6 +211,10 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 		['Engine/StandAloneEngine/AveragePositionRecorder.cpp'],
 		LIBS=env['LIBS']+['RigidBodyParameters']),
 
+	env.SharedLibrary('PositionRecorder',
+		['Engine/StandAloneEngine/PositionRecorder.cpp'],
+		LIBS=env['LIBS']+['RigidBodyParameters']),
+
 	env.SharedLibrary('ForceRecorder',
 		['Engine/StandAloneEngine/ForceRecorder.cpp'],
 		LIBS=env['LIBS']+['RigidBodyParameters', 'Force']),
@@ -218,6 +222,19 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 	env.SharedLibrary('PositionOrientationRecorder',
 		['Engine/StandAloneEngine/PositionOrientationRecorder.cpp'],
 		LIBS=env['LIBS']+['RigidBodyParameters']),
+
+	env.SharedLibrary('PositionSnapshot',
+		['Engine/StandAloneEngine/PositionSnapshot.cpp'],
+		LIBS=env['LIBS']+[
+			'RigidBodyParameters'
+			,'Sphere']),
+
+	env.SharedLibrary('ForceSnapshot',
+		['Engine/StandAloneEngine/ForceSnapshot.cpp'],
+		LIBS=env['LIBS']+[
+			'RigidBodyParameters'
+			,'ElasticContactInteraction'
+			,'Sphere']),
 
 	env.SharedLibrary('VelocityRecorder',
 		['Engine/StandAloneEngine/VelocityRecorder.cpp'],
@@ -383,6 +400,48 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'PersistentSAPCollider',
 			'SAPCollider',
 			'MetaInteractingGeometry2AABB']),
+
+	env.SharedLibrary('DirectShearCis',
+		['PreProcessor/DirectShearCis.cpp'],
+		LIBS=env['LIBS']+['SDECLinkGeometry',
+			'BodyMacroParameters',
+			'ElasticContactLaw',
+			'MacroMicroElasticRelationships',
+			'SimpleElasticRelationships',
+			'ElasticCriterionTimeStepper',
+			'PositionOrientationRecorder',
+			'PositionRecorder',
+			'PositionSnapshot',
+			'ForceSnapshot',
+			'ForceRecorder',
+			'PhysicalActionVectorVector',
+			'InteractionVecSet',
+			'BodyRedirectionVector',
+			'InteractingSphere',
+			'InteractingBox',
+			'CundallNonViscousMomentumDamping',
+			'CundallNonViscousForceDamping',
+			'MetaInteractingGeometry',
+			'GravityEngine',
+			'CinemCisEngine',
+			'yade-serialization',
+			'yade-base',
+			'PhysicalActionContainerInitializer',
+			'PhysicalActionContainerReseter',
+			'InteractionGeometryMetaEngine',
+			'InteractionPhysicsMetaEngine',
+			'PhysicalActionApplier',
+			'PhysicalParametersMetaEngine',
+			'BoundingVolumeMetaEngine',
+			'Box',
+			'Sphere',
+			'AABB',
+			'PersistentSAPCollider',
+			'ParticleParameters',
+			'SAPCollider',
+			'MetaInteractingGeometry2AABB',
+			'yade-multimethods']),
+
 
 	env.SharedLibrary('SDECLinkedSpheres',
 		['PreProcessor/SDECLinkedSpheres.cpp'],
