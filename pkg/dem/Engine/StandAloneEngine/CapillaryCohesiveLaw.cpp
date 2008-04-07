@@ -89,7 +89,7 @@ void CapillaryCohesiveLaw::action(Body* body)
 //compteur1 = 0;
 //compteur2 = 0;
         // 	cerr << "CapillaryCohesiveLaw::action" << endl;
-
+	//if (CapillaryPressure!=0) {
         MetaBody * ncb = static_cast<MetaBody*>(body);
         shared_ptr<BodyContainer>& bodies = ncb->bodies;
 
@@ -147,7 +147,7 @@ void CapillaryCohesiveLaw::action(Body* body)
 
                         /// Capillary components definition:
 
-                        Real liquidTension = 0.073; 	// superficial water tension N/m (20°C)
+                        Real liquidTension = 0.073; 	// superficial water tension N/m (20ï¿½C)
 
                         //Real teta = 0;		// mouillage parfait (eau pure/billes de verre)
 
@@ -240,6 +240,7 @@ void CapillaryCohesiveLaw::action(Body* body)
                         }
                 }
         }
+        //}
 //cerr << "compteur1=" << compteur1 << "; compteur2=" << compteur2 << endl;
 }
 
@@ -406,7 +407,7 @@ Parameters TableauD::Interpolate3(Real P, int& index)
         
         if (index < dataSize && index>0)
         {
-        	if (data[index][1] >= P && data[index-1][1] < P)
+        	if (data[index][1] >= P && data[index-1][1] <= P)
         	{
         		//compteur1+=1;	
         		Real Pinf=data[index-1][1];
