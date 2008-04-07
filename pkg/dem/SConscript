@@ -850,7 +850,7 @@ env.SharedLibrary('InteractingSphere2AABBwater',
 		
 env.SharedLibrary('HydraulicForceEngine',
 		['Engine/DeusExMachina/HydraulicForceEngine.cpp'],
-		LIBS=env['LIBS']+['yade-base',  'Force', 'Momentum', 'ParticleParameters', 'CohesiveFrictionalBodyParameters'],
+		LIBS=env['LIBS']+['yade-base',  'Force', 'Momentum', 'ParticleParameters', 'CohesiveFrictionalBodyParameters', 'TriaxialCompressionEngine', 'GravityEngine'],
 		CPPPATH=env['CPPPATH']+['Engine/DeusExMachina',
 			'DataClass/PhysicalAction',
 			'$PREFIX/include',

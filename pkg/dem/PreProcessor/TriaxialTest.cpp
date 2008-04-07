@@ -281,19 +281,7 @@ bool TriaxialTest::generate()
 
 	shared_ptr<Body> body;
 	
-	vector<BasicSphere> sphere_list;
-	if(importFilename!="") sphere_list=Shop::loadSpheresFromFile(importFilename,lowerCorner,upperCorner);
-	else message+=GenerateCloud(sphere_list, lowerCorner, upperCorner, numberOfGrains, 0.3, 0.75);
 	
-	vector<BasicSphere>::iterator it = sphere_list.begin();
-	vector<BasicSphere>::iterator it_end = sphere_list.end();
-			
-	for (;it!=it_end; ++it)
-	{
-		cerr << "sphere (" << it->first << " " << it->second << ")"<<endl;
-		createSphere(body,it->first,it->second,false,true);
-		rootBody->bodies->insert(body);
-	}
 	
 
 // create bigBall
@@ -411,6 +399,20 @@ bool TriaxialTest::generate()
 			//triaxialStateRecorder->wall_front_id = body->getId();
 			}
 			 
+	}
+	
+	vector<BasicSphere> sphere_list;
+	if(importFilename!="") sphere_list=Shop::loadSpheresFromFile(importFilename,lowerCorner,upperCorner);
+	else message+=GenerateCloud(sphere_list, lowerCorner, upperCorner, numberOfGrains, 0.3, 0.75);
+	
+	vector<BasicSphere>::iterator it = sphere_list.begin();
+	vector<BasicSphere>::iterator it_end = sphere_list.end();
+			
+	for (;it!=it_end; ++it)
+	{
+		cerr << "sphere (" << it->first << " " << it->second << ")"<<endl;
+		createSphere(body,it->first,it->second,false,true);
+		rootBody->bodies->insert(body);
 	}
 	
 	return true;

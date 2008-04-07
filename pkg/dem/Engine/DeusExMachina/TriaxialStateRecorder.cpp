@@ -98,6 +98,7 @@ void TriaxialStateRecorder::action(Body * body)
     << lexical_cast<string>(triaxialCompressionEngine->strain[0]) << " "
     << lexical_cast<string>(triaxialCompressionEngine->strain[1]) << " "
     << lexical_cast<string>(triaxialCompressionEngine->strain[2]) << " "
+    << lexical_cast<string>(triaxialCompressionEngine->ComputeUnbalancedForce(body)) << " "
     << endl;
 
 /*
