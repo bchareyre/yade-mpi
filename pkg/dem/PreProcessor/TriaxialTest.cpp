@@ -49,6 +49,7 @@
 #include<yade/pkg-common/PhysicalActionDamper.hpp>
 #include<yade/pkg-common/CundallNonViscousForceDamping.hpp>
 #include<yade/pkg-common/CundallNonViscousMomentumDamping.hpp>
+#include<yade/pkg-dem/NewtonsDampedLaw.hpp>
 
 #include<yade/pkg-common/InteractionGeometryMetaEngine.hpp>
 #include<yade/pkg-common/InteractionPhysicsMetaEngine.hpp>
@@ -78,6 +79,7 @@
 #include <boost/random/uniform_real.hpp>
 #include <boost/random/variate_generator.hpp>
 #include <boost/random/normal_distribution.hpp>
+
 
 
 
@@ -112,12 +114,7 @@ TriaxialTest::TriaxialTest () : FileGenerator()
 	wall_4_wire		= true;
 	spheresColor		= Vector3r(0.8,0.3,0.3);
 	spheresRandomColor	= false;
-	recordBottomForce	= true;
-	forceRecordFile		= "./force";
-	recordAveragePositions	= true;
-	positionRecordFile	= "./positions";
 	recordIntervalIter	= 20;
-	velocityRecordFile 	= "./velocities";
 	saveAnimationSnapshots = false;
 	AnimationSnapshotsBaseName = "./snapshots/snap";
 	WallStressRecordFile = "./WallStresses";
@@ -126,18 +123,6 @@ TriaxialTest::TriaxialTest () : FileGenerator()
 	//	boxWalls 		= false;
 	boxWalls 		= true;
 	internalCompaction	=false;
-
-//	bigBall 		= true;
-	bigBall 		= false;
-	bigBallRadius		= 0.075;
-	bigBallPoissonRatio 	= 0.3;
-	bigBallYoungModulus 	= 10000000.0;
-	bigBallFrictDeg 	= 60;
-//	bigBallCohesion 	= 10000000000;
-//	bigBallTensionStr 	= 10000000000;
-	bigBallDensity		= 7800;
-	bigBallDropTimeSeconds	= 30;
-	bigBallDropHeight 	= 3.04776;
 	
 	dampingForce = 0.2;
 	dampingMomentum = 0.2;
@@ -234,11 +219,6 @@ void TriaxialTest::registerAttributes()
 //	REGISTER_ATTRIBUTE(wall_4_wire);
 //	REGISTER_ATTRIBUTE(spheresColor);
 //	REGISTER_ATTRIBUTE(spheresRandomColor);
-	REGISTER_ATTRIBUTE(recordBottomForce);
-	REGISTER_ATTRIBUTE(forceRecordFile);
-//	REGISTER_ATTRIBUTE(recordAveragePositions);
-	REGISTER_ATTRIBUTE(positionRecordFile);
-	REGISTER_ATTRIBUTE(velocityRecordFile);
 	REGISTER_ATTRIBUTE(recordIntervalIter);
 	REGISTER_ATTRIBUTE(saveAnimationSnapshots);
 	REGISTER_ATTRIBUTE(AnimationSnapshotsBaseName);
@@ -283,19 +263,6 @@ bool TriaxialTest::generate()
 	
 	
 	
-
-// create bigBall
-	//Vector3r position = (upperCorner+lowerCorner)*0.5 + Vector3r(0,bigBallDropHeight,0);
-	//createSphere(body,position,bigBallRadius,true,false);	
-	//int bigId = 0;
-// 	if(bigBall)
-// 		rootBody->bodies->insert(body);
-// 	bigId = body->getId();
-	//forcerec->startId = startId;
-	//forcerec->endId   = endId;
-	//averagePositionRecorder->bigBallId = bigId;
-	//velocityRecorder->bigBallId = bigId;
-
 	if(boxWalls)
 	{
 	// bottom box
@@ -314,8 +281,6 @@ bool TriaxialTest::generate()
 			//(resultantforceEngine->subscribedBodies).push_back(body->getId());
 			triaxialcompressionEngine->wall_bottom_id = body->getId();
 			//triaxialStateRecorder->wall_bottom_id = body->getId();
-			forcerec->startId = body->getId();
-			forcerec->endId   = body->getId();
 			}
 		//forcerec->id = body->getId();
 	
@@ -401,6 +366,7 @@ bool TriaxialTest::generate()
 			 
 	}
 	
+	
 	vector<BasicSphere> sphere_list;
 	if(importFilename!="") sphere_list=Shop::loadSpheresFromFile(importFilename,lowerCorner,upperCorner);
 	else message+=GenerateCloud(sphere_list, lowerCorner, upperCorner, numberOfGrains, 0.3, 0.75);
@@ -413,7 +379,8 @@ bool TriaxialTest::generate()
 		cerr << "sphere (" << it->first << " " << it->second << ")"<<endl;
 		createSphere(body,it->first,it->second,false,true);
 		rootBody->bodies->insert(body);
-	}
+	}	
+	
 	
 	return true;
 //  	return "Generated a sample inside box of dimensions: (" 
@@ -442,15 +409,15 @@ void TriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r position, Real 
 	
 	physics->angularVelocity	= Vector3r(0,0,0);
 	physics->velocity		= Vector3r(0,0,0);
-	physics->mass			= 4.0/3.0*Mathr::PI*radius*radius*radius*(big ? bigBallDensity : density);
+	physics->mass			= 4.0/3.0*Mathr::PI*radius*radius*radius*density;
 	
 	physics->inertia		= Vector3r( 	2.0/5.0*physics->mass*radius*radius,
 							2.0/5.0*physics->mass*radius*radius,
 							2.0/5.0*physics->mass*radius*radius);
 	physics->se3			= Se3r(position,q);
-	physics->young			= big ? bigBallYoungModulus : sphereYoungModulus;
-	physics->poisson		= big ? bigBallPoissonRatio : spherePoissonRatio;
-	physics->frictionAngle		= (big ? bigBallFrictDeg : sphereFrictionDeg ) * Mathr::PI/180.0;
+	physics->young			= sphereYoungModulus;
+	physics->poisson		= spherePoissonRatio;
+	physics->frictionAngle		= sphereFrictionDeg * Mathr::PI/180.0;
 
 	if((!big) && (!dynamic) && (!boxWalls))
 	{
@@ -528,19 +495,6 @@ void TriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r
 
 void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 {
-// recording average positions
-	averagePositionRecorder = shared_ptr<AveragePositionRecorder>(new AveragePositionRecorder);
-	averagePositionRecorder -> outputFile 		= positionRecordFile;
-	averagePositionRecorder -> interval 		= recordIntervalIter;
-// recording forces
-	forcerec = shared_ptr<ForceRecorder>(new ForceRecorder);
-	forcerec -> outputFile 	= forceRecordFile;
-	forcerec -> interval 	= recordIntervalIter;
-// recording velocities
-	velocityRecorder = shared_ptr<VelocityRecorder>(new VelocityRecorder);
-	velocityRecorder-> outputFile 	= velocityRecordFile;
-	velocityRecorder-> interval 	= recordIntervalIter;
-
 	shared_ptr<PhysicalActionContainerInitializer> physicalActionInitializer(new PhysicalActionContainerInitializer);
 	physicalActionInitializer->physicalActionNames.push_back("Force");
 	physicalActionInitializer->physicalActionNames.push_back("Momentum");
@@ -654,6 +608,7 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 		//cerr << "fin de sezction triaxialstressController = shared_ptr<TriaxialStressController> (new TriaxialStressController);" << std::endl;
 	#endif
 	
+	
 	rootBody->engines.clear();
 	rootBody->engines.push_back(shared_ptr<Engine>(new PhysicalActionContainerReseter));
 //	rootBody->engines.push_back(sdecTimeStepper);	
@@ -671,19 +626,15 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	rootBody->engines.push_back(triaxialcompressionEngine);
 	rootBody->engines.push_back(triaxialStateRecorder);
 	//rootBody->engines.push_back(gravityCondition);
-	rootBody->engines.push_back(actionDampingDispatcher);
-	rootBody->engines.push_back(applyActionDispatcher);
-	rootBody->engines.push_back(positionIntegrator);
-	if(!rotationBlocked)
-		rootBody->engines.push_back(orientationIntegrator);
+	
+	rootBody->engines.push_back(shared_ptr<Engine> (new NewtonsDampedLaw));
+	
+	//if(!rotationBlocked)
+	//	rootBody->engines.push_back(orientationIntegrator);
 	//rootBody->engines.push_back(resultantforceEngine);
 	//rootBody->engines.push_back(triaxialstressController);
 	
 		
-	rootBody->engines.push_back(averagePositionRecorder);
-	//rootBody->engines.push_back(velocityRecorder);
-	//rootBody->engines.push_back(forcerec);
-	
 	if (saveAnimationSnapshots) {
 	shared_ptr<PositionOrientationRecorder> positionOrientationRecorder(new PositionOrientationRecorder);
 	positionOrientationRecorder->outputFile = AnimationSnapshotsBaseName;

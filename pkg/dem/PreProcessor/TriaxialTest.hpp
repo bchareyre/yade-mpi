@@ -63,16 +63,8 @@ class TriaxialTest : public FileGenerator
 				,dampingForce
 				,dampingMomentum
 				,defaultDt
-
-				,bigBallRadius
-				,bigBallDensity
-				,bigBallDropTimeSeconds
-				,bigBallPoissonRatio
-				,bigBallYoungModulus
-				,bigBallFrictDeg
-				,bigBallDropHeight,
 				
-				sigmaIsoCompaction,
+				,sigmaIsoCompaction,
 				sigmaLateralConfinement,
 				strainRate,
 				maxWallVelocity,
@@ -95,11 +87,9 @@ class TriaxialTest : public FileGenerator
 				,wall_4_wire
 				//! do we just want to generate a stable packing under isotropic pressure (false) or do we want the triaxial loading to start automatically right after compaction stage (true)?
 				,autoCompressionActivation
-				,bigBall
+			
 				,rotationBlocked
 				,spheresRandomColor
-				,recordBottomForce
-				,recordAveragePositions
 				,boxWalls
 				//! flag for choosing between moving boundaries or increasing particles sizes during the compaction stage.
 				,internalCompaction
@@ -118,16 +108,10 @@ class TriaxialTest : public FileGenerator
 				,wall_front_id
 				,wall_back_id;*/
 		
-		string		 forceRecordFile
-				,positionRecordFile
-				,velocityRecordFile
-				,importFilename
+		string		importFilename
 				,AnimationSnapshotsBaseName
 				,WallStressRecordFile;
 	
-		shared_ptr<ForceRecorder> forcerec;
-		shared_ptr<VelocityRecorder> velocityRecorder;
-		shared_ptr<AveragePositionRecorder> averagePositionRecorder;
 		shared_ptr<TriaxialCompressionEngine> triaxialcompressionEngine;
 		shared_ptr<TriaxialStressController> triaxialstressController;
 		shared_ptr<TriaxialStateRecorder> triaxialStateRecorder;
