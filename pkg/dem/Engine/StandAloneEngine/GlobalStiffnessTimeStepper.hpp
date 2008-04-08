@@ -11,6 +11,13 @@
 
 #include<yade/core/TimeStepper.hpp>
 
+
+/*! \brief Compute the critical timestep of the leap-frog scheme based on global stiffness of bodies
+
+		
+	See usage details in TriaxialTest documentation (TriaxialTest is also a good example of how to use this class)		
+ */
+
 class Interaction;
 class BodyContainer;
 class MacroMicroElasticRelationships;
