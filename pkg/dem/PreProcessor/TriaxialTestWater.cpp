@@ -8,6 +8,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
+
 #include "TriaxialTestWater.hpp"
 
 #include <yade/pkg-dem/ElasticContactLaw.hpp>
@@ -106,12 +107,12 @@ TriaxialTestWater::TriaxialTestWater () : FileGenerator()
 	wall_4_wire		= true;
 	spheresColor		= Vector3r(0.8,0.3,0.3);
 	spheresRandomColor	= false;
-	recordBottomForce	= true;
-	forceRecordFile		= "./force";
-	recordAveragePositions	= true;
-	positionRecordFile	= "./position";
+	//recordBottomForce	= true;
+	//forceRecordFile		= "./force";
+	//recordAveragePositions	= true;
+	//positionRecordFile	= "./position";
 	recordIntervalIter	= 100;
-	velocityRecordFile 	= "./velocities";
+	//velocityRecordFile 	= "./velocities";
 	wallStressRecordFile	= "./wallStress";
 	capillaryStressRecordFile	= "./capillaryStress";
 	contactStressRecordFile	= "./contactStress";
@@ -122,7 +123,7 @@ TriaxialTestWater::TriaxialTestWater () : FileGenerator()
 	internalCompaction	=false;
 
 //	bigBall 		= true;
-	bigBall 		= false;
+//	bigBall 		= false;
 	bigBallRadius		= 0.075;
 	bigBallPoissonRatio 	= 0.3;
 	bigBallYoungModulus 	= 10000000.0;
@@ -150,7 +151,7 @@ TriaxialTestWater::TriaxialTestWater () : FileGenerator()
 	spherePoissonRatio  = 0.2;
 	sphereFrictionDeg   = 18.0;
 	density		    = 2600;
-	Rdispersion 	    = 1.4;
+	Rdispersion 	    = 0.4;
 	
 	boxYoungModulus   = 150000000.0;
 	boxPoissonRatio  = 0.2;
@@ -204,11 +205,11 @@ void TriaxialTestWater::registerAttributes()
 	REGISTER_ATTRIBUTE(StabilityCriterion);
 	REGISTER_ATTRIBUTE(autoCompressionActivation);
 
-	REGISTER_ATTRIBUTE(recordBottomForce);
-	REGISTER_ATTRIBUTE(forceRecordFile);
+	//REGISTER_ATTRIBUTE(recordBottomForce);
+	//REGISTER_ATTRIBUTE(forceRecordFile);
 // 	REGISTER_ATTRIBUTE(recordAveragePositions);
-	REGISTER_ATTRIBUTE(positionRecordFile);
-	REGISTER_ATTRIBUTE(velocityRecordFile)
+	//REGISTER_ATTRIBUTE(positionRecordFile);
+	//REGISTER_ATTRIBUTE(velocityRecordFile)
 	REGISTER_ATTRIBUTE(recordIntervalIter);
 	REGISTER_ATTRIBUTE(wallStressRecordFile);
 	REGISTER_ATTRIBUTE(capillaryStressRecordFile);
@@ -272,8 +273,8 @@ bool TriaxialTestWater::generate()
 			rootBody->bodies->insert(body);
 			triaxialcompressionEngine->wall_bottom_id
 			= body->getId();
-			forcerec->startId = body->getId();
-			forcerec->endId   = body->getId();
+//			forcerec->startId = body->getId();
+//			forcerec->endId   = body->getId();
 			//triaxialStateRecorder->wall_bottom_id = body->getId();
 			capillaryStressRecorder->wall_bottom_id = body->getId();
 			contactStressRecorder->wall_bottom_id = body->getId();
@@ -484,18 +485,7 @@ void TriaxialTestWater::createBox(shared_ptr<Body>& body, Vector3r position, Vec
 
 void TriaxialTestWater::createActors(shared_ptr<MetaBody>& rootBody)
 {
-// recording average positions
-	averagePositionRecorder = shared_ptr<AveragePositionRecorder>(new AveragePositionRecorder);
-	averagePositionRecorder -> outputFile 		= positionRecordFile;
-	averagePositionRecorder -> interval 		= recordIntervalIter;
-// recording forces
-	forcerec = shared_ptr<ForceRecorder>(new ForceRecorder);
-	forcerec -> outputFile 	= forceRecordFile;
-	forcerec -> interval 	= recordIntervalIter;
-// recording velocities
-	velocityRecorder = shared_ptr<VelocityRecorder>(new VelocityRecorder);
-	velocityRecorder-> outputFile 	= velocityRecordFile;
-	velocityRecorder-> interval 	= recordIntervalIter;
+
 
 // recording global stress
 	triaxialStateRecorder = shared_ptr<TriaxialStateRecorder>(new
@@ -625,19 +615,19 @@ void TriaxialTestWater::createActors(shared_ptr<MetaBody>& rootBody)
 	rootBody->engines.push_back(globalStiffnessTimeStepper);
 	//rootBody->engines.push_back(triaxialstressController);
 	rootBody->engines.push_back(triaxialcompressionEngine);
-	rootBody->engines.push_back(forcerec);	
+	//rootBody->engines.push_back(forcerec);	
 	rootBody->engines.push_back(triaxialStateRecorder);
 	rootBody->engines.push_back(contactStressRecorder);
 	rootBody->engines.push_back(actionDampingDispatcher);
 	rootBody->engines.push_back(applyActionDispatcher);
 	rootBody->engines.push_back(positionIntegrator);
-	if(!rotationBlocked)
-		rootBody->engines.push_back(orientationIntegrator);
+	//if(!rotationBlocked)
+	//	rootBody->engines.push_back(orientationIntegrator);
 		
 	//rootBody->engines.push_back(triaxialcompressionEngine);
 		
-	rootBody->engines.push_back(averagePositionRecorder);
-	rootBody->engines.push_back(velocityRecorder);
+	//rootBody->engines.push_back(averagePositionRecorder);
+	//rootBody->engines.push_back(velocityRecorder);
 	//rootBody->engines.push_back(forcerec);
 	
 	//rootBody->engines.push_back(triaxialStateRecorder);

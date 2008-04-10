@@ -79,11 +79,11 @@ class TriaxialTestWater : public FileGenerator
 				,wall_2_wire
 				,wall_3_wire
 				,wall_4_wire
-				,bigBall
+			//	,bigBall
 				,rotationBlocked
 				,spheresRandomColor
-				,recordBottomForce
-				,recordAveragePositions
+			//	,recordBottomForce
+			//	,recordAveragePositions
 				,boxWalls
 				,internalCompaction;
 
@@ -99,17 +99,14 @@ class TriaxialTestWater : public FileGenerator
 				,wall_front_id
 				,wall_back_id;*/
 		
-		string		 forceRecordFile
-				,positionRecordFile
-				,velocityRecordFile
-				,wallStressRecordFile
+		string		wallStressRecordFile
 				,capillaryStressRecordFile
 				,contactStressRecordFile
 				,importFilename;
 	
-		shared_ptr<ForceRecorder> forcerec;
-		shared_ptr<VelocityRecorder> velocityRecorder;
-		shared_ptr<AveragePositionRecorder> averagePositionRecorder;
+		//shared_ptr<ForceRecorder> forcerec;
+		//shared_ptr<VelocityRecorder> velocityRecorder;
+		//shared_ptr<AveragePositionRecorder> averagePositionRecorder;
 		shared_ptr<TriaxialStateRecorder> triaxialStateRecorder;
 		shared_ptr<CapillaryStressRecorder> capillaryStressRecorder;
 		shared_ptr<ContactStressRecorder> contactStressRecorder;
