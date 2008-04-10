@@ -38,7 +38,7 @@ void TriaxialStateRecorder::postProcessAttributes(bool deserializing)
 {
 	if(deserializing)
 	{
-		ofile.open(outputFile.c_str());
+		ofile.open(outputFile.c_str(), std::ios::app);
 	}
 }
 

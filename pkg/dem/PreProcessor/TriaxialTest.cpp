@@ -153,7 +153,7 @@ TriaxialTest::TriaxialTest () : FileGenerator()
 	sigmaIsoCompaction = 50000;
 	sigmaLateralConfinement=sigmaIsoCompaction;
 
-	wallOversizeFactor=1.;
+	wallOversizeFactor=1.3;
 	
 //	wall_top_id =0;
 // 	wall_bottom_id =0;

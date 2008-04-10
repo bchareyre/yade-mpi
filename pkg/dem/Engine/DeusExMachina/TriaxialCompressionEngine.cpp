@@ -68,6 +68,7 @@ void TriaxialCompressionEngine::registerAttributes()
 	REGISTER_ATTRIBUTE(currentState);
 	REGISTER_ATTRIBUTE(previousState);
 	REGISTER_ATTRIBUTE(sigmaIsoCompaction);
+	REGISTER_ATTRIBUTE(previousSigmaIso);
 	REGISTER_ATTRIBUTE(sigmaLateralConfinement);
 }
 
@@ -170,12 +171,7 @@ void TriaxialCompressionEngine::applyCondition(Body * body)
 		previousSigmaIso=sigma_iso;
 		firstRun=false; // change this only _after_ state transitions
 	}
-	if(currentState==STATE_LIMBO) return;
-
-   TriaxialStressController::applyCondition(body);
-   if (Omega::instance().getCurrentIteration() % testEquilibriumInterval == 0) {
-        updateParameters(body);
-        if (saveSimulation) {
+	if (saveSimulation) {
             string fileName = "./" + Phase1End + "_" +
                               lexical_cast<string>(Omega::instance().getCurrentIteration()) + ".xml";
             LOG_INFO("saving snapshot: "<<fileName);
@@ -185,6 +181,12 @@ void TriaxialCompressionEngine::applyCondition(Body * body)
 				Shop::saveSpheresToFile(fileName);
             saveSimulation = false;
         }
+	if(currentState==STATE_LIMBO) return;
+
+   TriaxialStressController::applyCondition(body);
+   
+   if (Omega::instance().getCurrentIteration() % testEquilibriumInterval == 0) {
+        updateParameters(body);        
     }
 	 if (currentState==STATE_TRIAX_LOADING) {
 	 if (Omega::instance().getCurrentIteration() % 100 == 0) {
