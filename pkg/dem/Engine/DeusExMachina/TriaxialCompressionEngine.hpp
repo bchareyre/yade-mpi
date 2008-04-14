@@ -33,6 +33,7 @@ class TriaxialCompressionEngine : public TriaxialStressController
 {
 	private :
 		shared_ptr<PhysicalAction> actionForce;
+		std::string Phase1End;//used to name output files based on current state
 				
 	public :
 		TriaxialCompressionEngine();
@@ -70,7 +71,8 @@ class TriaxialCompressionEngine : public TriaxialStressController
 		//! is this the beginning of the simulation, after reading the scene?
 		bool firstRun;
 		int FinalIterationPhase1, Iteration, testEquilibriumInterval;
-		std::string Phase1End; //,Phase2End;
+		
+		std::string Key;//A code that is appended to file names to help distinguish between different simulations
 		// //! Is uniaxial compression currently activated?
 		// bool compressionActivated;
 		//! Auto-switch between isotropic and uniaxial compression?

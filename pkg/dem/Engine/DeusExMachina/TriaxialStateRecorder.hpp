@@ -37,6 +37,7 @@ class TriaxialStateRecorder : public DataRecorder
 	public :
 		std::string	 outputFile;
 		unsigned int	 interval;
+		Real 		porosity;
 		
 		//Real height, width, depth;
 		//Real thickness; // FIXME should retrieve "extents" of a InteractingBox

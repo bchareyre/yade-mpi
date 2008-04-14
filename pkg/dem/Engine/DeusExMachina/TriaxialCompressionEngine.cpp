@@ -31,6 +31,7 @@ TriaxialCompressionEngine::TriaxialCompressionEngine() : actionForce(new Force)
 	currentState=STATE_UNINITIALIZED;
 	previousState=currentState;
 	UnbalancedForce = 1;
+	Key = "";
 	Phase1End = "Compacted";
 	FinalIterationPhase1 = 0;
 	Iteration = 0;
@@ -71,6 +72,7 @@ void TriaxialCompressionEngine::registerAttributes()
 	REGISTER_ATTRIBUTE(sigmaIsoCompaction);
 	REGISTER_ATTRIBUTE(previousSigmaIso);
 	REGISTER_ATTRIBUTE(sigmaLateralConfinement);
+	REGISTER_ATTRIBUTE(Key);
 }
 
 void TriaxialCompressionEngine::doStateTransition(stateNum nextState){
@@ -88,18 +90,22 @@ void TriaxialCompressionEngine::doStateTransition(stateNum nextState){
 		wall_top_activated=false;
 		if(currentState==STATE_ISO_UNLOADING){ LOG_INFO("Speres -> /tmp/unloaded.spheres"); Shop::saveSpheresToFile("/tmp/unloaded.spheres"); }
 		if(!firstRun) saveSimulation=true; // saving snapshot .xml will actually be done in ::applyCondition
+		Phase1End = "Unloaded";
 	}
 	else if(currentState==STATE_ISO_COMPACTION && nextState==STATE_ISO_UNLOADING){
 		sigma_iso=sigmaLateralConfinement;
 		sigmaIsoCompaction = sigmaLateralConfinement;
 		previousSigmaIso=sigma_iso;
 		internalCompaction=false; // unloading will not change grain sizes
-	}
-	else if(currentState==STATE_ISO_COMPACTION && nextState==STATE_LIMBO){
+		if(!firstRun) saveSimulation=true;
+		Phase1End = "Compacted";
+	}	
+	else if ((currentState==STATE_ISO_COMPACTION || currentState==STATE_ISO_UNLOADING) && nextState==STATE_LIMBO) {
 		internalCompaction = false;
 		height0 = height; depth0 = depth; width0 = width;
 		saveSimulation=true; // saving snapshot .xml will actually be done in ::applyCondition
 		// stop simulation here, since nothing will happen from now on
+		Phase1End = (currentState==STATE_ISO_COMPACTION ? "compacted" : "unloaded");
 		Shop::saveSpheresToFile("/tmp/limbo.spheres");
 		
 	}	
@@ -182,12 +188,12 @@ void TriaxialCompressionEngine::applyCondition ( Body * body )
 	}
 	if ( saveSimulation )
 	{
-		string fileName = "./" + Phase1End + "_" +
+		string fileName = "./"+ Key + "_" + Phase1End + "_" +
 						  lexical_cast<string> ( Omega::instance().getCurrentIteration() ) + "_" +
 						  lexical_cast<string> ( currentState ) + ".xml";
 		LOG_INFO ( "saving snapshot: "<<fileName );
 		Omega::instance().saveSimulation ( fileName );
-		fileName="./"+Phase1End+"_"+lexical_cast<string> ( Omega::instance().getCurrentIteration() ) + "_" +
+		fileName="./"+ Key + "_"+Phase1End+"_"+lexical_cast<string> ( Omega::instance().getCurrentIteration() ) + "_" +
 				 lexical_cast<string> ( currentState ) +".spheres";
 		LOG_INFO ( "saving spheres: "<<fileName );
 		Shop::saveSpheresToFile ( fileName );
