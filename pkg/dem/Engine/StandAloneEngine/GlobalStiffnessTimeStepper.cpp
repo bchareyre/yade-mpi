@@ -23,7 +23,7 @@ GlobalStiffnessTimeStepper::GlobalStiffnessTimeStepper() : TimeStepper() , sdecC
 //cerr << "GlobalStiffnessTimeStepper()"  << endl;
 	globalStiffnessClassIndex = actionParameterGlobalStiffness->getClassIndex();
 	sdecGroupMask = 1;
-	timestepSafetyCoefficient = 1;
+	timestepSafetyCoefficient = 0.25;
 	computedOnce = false;
 	defaultDt = 1;
 	previousDt = defaultDt;
