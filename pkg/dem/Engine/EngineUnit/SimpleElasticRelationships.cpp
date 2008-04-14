@@ -32,16 +32,19 @@ void SimpleElasticRelationships::go(	  const shared_ptr<PhysicalParameters>& b1 
 					, const shared_ptr<PhysicalParameters>& b2 // BodyMacroParameters
 					, const shared_ptr<Interaction>& interaction)
 {
-	BodyMacroParameters* sdec1 = static_cast<BodyMacroParameters*>(b1.get());
-	BodyMacroParameters* sdec2 = static_cast<BodyMacroParameters*>(b2.get());
+	
 	SpheresContactGeometry* interactionGeometry = YADE_CAST<SpheresContactGeometry*>(interaction->interactionGeometry.get());
 	
 	if(interactionGeometry) // so it is SpheresContactGeometry  - NON PERMANENT LINK
 	{
 		if( interaction->isNew)
 		{
-			interaction->interactionPhysics = shared_ptr<ElasticContactInteraction>(new ElasticContactInteraction());
-			ElasticContactInteraction* contactPhysics = YADE_CAST<ElasticContactInteraction*>(interaction->interactionPhysics.get());
+			const shared_ptr<BodyMacroParameters>& sdec1 = YADE_PTR_CAST<BodyMacroParameters>(b1);
+			const shared_ptr<BodyMacroParameters>& sdec2 = YADE_PTR_CAST<BodyMacroParameters>(b2);
+			
+			if (!interaction->interactionPhysics) interaction->interactionPhysics = shared_ptr<ElasticContactInteraction>(new ElasticContactInteraction());
+			
+			const shared_ptr<ElasticContactInteraction>& contactPhysics = YADE_CAST<ElasticContactInteraction*>(interaction->interactionPhysics);
 
 			Real Ea 	= sdec1->young;
 			Real Eb 	= sdec2->young;
@@ -75,27 +78,27 @@ void SimpleElasticRelationships::go(	  const shared_ptr<PhysicalParameters>& b1 
 			contactPhysics->equilibriumDistance = contactPhysics->initialEquilibriumDistance;
 
 		}
-		else
-		{	// FIXME - are those lines necessary ???? what they are doing in fact ???
-			ElasticContactInteraction* contactPhysics = YADE_CAST<ElasticContactInteraction*>(interaction->interactionPhysics.get());
-
-			contactPhysics->kn = contactPhysics->initialKn;
-			contactPhysics->ks = contactPhysics->initialKs;
-			contactPhysics->equilibriumDistance = contactPhysics->initialEquilibriumDistance;
-		}	
+// 		else
+// 		{	// FIXME - are those lines necessary ???? what they are doing in fact ???
+// 			ElasticContactInteraction* contactPhysics = YADE_CAST<ElasticContactInteraction*>(interaction->interactionPhysics.get());
+// 
+// 			contactPhysics->kn = contactPhysics->initialKn;
+// 			contactPhysics->ks = contactPhysics->initialKs;
+// 			contactPhysics->equilibriumDistance = contactPhysics->initialEquilibriumDistance;
+// 		}	
 		
 	}
-	else   // this is PERMANENT LINK because previous dynamic_cast failed, dispatcher should do this job
-	{
-		SDECLinkGeometry* sdecLinkGeometry =  dynamic_cast<SDECLinkGeometry*>(interaction->interactionGeometry.get());
-		if (sdecLinkGeometry)
-		{		
-			SDECLinkPhysics* linkPhysics = static_cast<SDECLinkPhysics*>(interaction->interactionPhysics.get());
-	//		linkPhysics->frictionAngle 		= ?? //FIXME - uninitialized 
-			linkPhysics->kn 			= linkPhysics->initialKn;
-			linkPhysics->ks 			= linkPhysics->initialKs;
-			linkPhysics->equilibriumDistance 	= linkPhysics->initialEquilibriumDistance;
-		}
-	}
+// 	else   // this is PERMANENT LINK because previous dynamic_cast failed, dispatcher should do this job
+// 	{
+// 		SDECLinkGeometry* sdecLinkGeometry =  dynamic_cast<SDECLinkGeometry*>(interaction->interactionGeometry.get());
+// 		if (sdecLinkGeometry)
+// 		{		
+// 			SDECLinkPhysics* linkPhysics = static_cast<SDECLinkPhysics*>(interaction->interactionPhysics.get());
+// 	//		linkPhysics->frictionAngle 		= ?? //FIXME - uninitialized 
+// 			linkPhysics->kn 			= linkPhysics->initialKn;
+// 			linkPhysics->ks 			= linkPhysics->initialKs;
+// 			linkPhysics->equilibriumDistance 	= linkPhysics->initialEquilibriumDistance;
+// 		}
+// 	}
 };
 YADE_PLUGIN();
