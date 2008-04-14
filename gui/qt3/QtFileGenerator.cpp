@@ -135,6 +135,7 @@ void QtFileGenerator::displayFileGeneratorAttributes(shared_ptr<FileGenerator>& 
 			
 	scrollView->addChild(scrollViewFrame);
 	scrollViewFrame->show();
+	leOutputFileName->setText(fg->getFileName());
 }
 
 void QtFileGenerator::cbGeneratorNameActivated(const QString& name)
