@@ -8,12 +8,13 @@
 
 #include "TriaxialStateRecorder.hpp"
 //#include <yade/pkg-common/RigidBodyParameters.hpp>
-//#include <yade/pkg-common/ParticleParameters.hpp>
+#include <yade/pkg-common/ParticleParameters.hpp>
 //#include <yade/pkg-dem/BodyMacroParameters.hpp>
 //#include <yade/pkg-common/Force.hpp>
 //#include <yade/pkg-dem/ElasticContactLaw.hpp>
 //#include <yade/pkg-dem/TriaxialStressController.hpp>
 #include <yade/pkg-dem/TriaxialCompressionEngine.hpp>
+#include <yade/pkg-common/Sphere.hpp>
 
 //#include <yade/pkg-dem/SpheresContactGeometry.hpp>
 //#include <yade/pkg-dem/ElasticContactInteraction.hpp>
@@ -29,6 +30,7 @@ TriaxialStateRecorder::TriaxialStateRecorder () : DataRecorder()
 {
 	outputFile = "TriaxialStateRecord";
 	interval = 1;
+	porosity = 1.;
 		
 	//triaxialStressController = NULL;
 }
@@ -38,7 +40,9 @@ void TriaxialStateRecorder::postProcessAttributes(bool deserializing)
 {
 	if(deserializing)
 	{
+		bool file_exists = std::ifstream (outputFile.c_str()); //if file does not exist, we will write colums titles
 		ofile.open(outputFile.c_str(), std::ios::app);
+		if (!file_exists) ofile<<"iteration s11 s22 s33 e11 e22 e33 unb_f porosity" << endl;
 	}
 }
 
@@ -48,19 +52,7 @@ void TriaxialStateRecorder::registerAttributes()
 	DataRecorder::registerAttributes();
 	REGISTER_ATTRIBUTE(outputFile);
 	REGISTER_ATTRIBUTE(interval);
-	
-	//REGISTER_ATTRIBUTE(wall_bottom_id);
- 	//REGISTER_ATTRIBUTE(wall_top_id);
-//  	REGISTER_ATTRIBUTE(wall_left_id);
-//  	REGISTER_ATTRIBUTE(wall_right_id);
-//  	REGISTER_ATTRIBUTE(wall_front_id);
-//  	REGISTER_ATTRIBUTE(wall_back_id);
-//  	
-//  	REGISTER_ATTRIBUTE(height);
-// 	REGISTER_ATTRIBUTE(width);
-// 	REGISTER_ATTRIBUTE(depth);
-// 	REGISTER_ATTRIBUTE(thickness);
-
+	REGISTER_ATTRIBUTE(porosity);
 }
 
 
@@ -70,84 +62,70 @@ bool TriaxialStateRecorder::isActivated()
 }
 
 
-void TriaxialStateRecorder::action(Body * body)
+void TriaxialStateRecorder::action ( Body * body )
 {
-    MetaBody * ncb = static_cast<MetaBody*>(body);
+	MetaBody * ncb = static_cast<MetaBody*> ( body );
 
-    if (!triaxialCompressionEngine)
-    {
-        vector<shared_ptr<Engine> >::iterator itFirst = ncb->engines.begin();
-        vector<shared_ptr<Engine> >::iterator itLast = ncb->engines.end();
-        for (;itFirst!=itLast; ++itFirst)
-        {
-            if ((*itFirst)->getClassName() == "TriaxialCompressionEngine" ) //|| (*itFirst)->getBaseClassName() == "TriaxialCompressionEngine")
-            {
-                LOG_DEBUG("stress controller engine found");
-                triaxialCompressionEngine =  YADE_PTR_CAST<TriaxialCompressionEngine> (*itFirst);
-                //triaxialCompressionEngine = shared_ptr<TriaxialCompressionEngine> (static_cast<TriaxialCompressionEngine*> ( (*itFirst).get()));
-            }
-        }
-    }
-    if ( !(Omega::instance().getCurrentIteration() % triaxialCompressionEngine->computeStressStrainInterval == 0) )
-    	triaxialCompressionEngine->computeStressStrain(ncb);
-    
-    ofile << lexical_cast<string>(Omega::instance().getCurrentIteration()) << " "
-    << lexical_cast<string>(triaxialCompressionEngine->stress[triaxialCompressionEngine->wall_right][0]) << " "
-    << lexical_cast<string>(triaxialCompressionEngine->stress[triaxialCompressionEngine->wall_top][1]) << " "
-    << lexical_cast<string>(triaxialCompressionEngine->stress[triaxialCompressionEngine->wall_front][2]) << " "
-    << lexical_cast<string>(triaxialCompressionEngine->strain[0]) << " "
-    << lexical_cast<string>(triaxialCompressionEngine->strain[1]) << " "
-    << lexical_cast<string>(triaxialCompressionEngine->strain[2]) << " "
-    << lexical_cast<string>(triaxialCompressionEngine->ComputeUnbalancedForce(body)) << " "
-    << endl;
-
-/*
-
-    shared_ptr<BodyContainer>& bodies = ncb->bodies;
-
-    /// dimensions de l'echantillon
-
-    PhysicalParameters* p_bottom = static_cast<PhysicalParameters*>((*bodies)[wall_bottom_id]->physicalParameters.get());
-    PhysicalParameters* p_top   =  static_cast<PhysicalParameters*>((*bodies)[wall_top_id]->physicalParameters.get());
-    PhysicalParameters* p_left 	= static_cast<PhysicalParameters*>((*bodies)[wall_left_id]->physicalParameters.get());
-    PhysicalParameters* p_right = static_cast<PhysicalParameters*>((*bodies)[wall_right_id]->physicalParameters.get());
-    PhysicalParameters* p_front = static_cast<PhysicalParameters*>((*bodies)[wall_front_id]->physicalParameters.get());
-    PhysicalParameters* p_back 	= static_cast<PhysicalParameters*>((*bodies)[wall_back_id]->physicalParameters.get());
+	if ( !triaxialCompressionEngine )
+	{
+		vector<shared_ptr<Engine> >::iterator itFirst = ncb->engines.begin();
+		vector<shared_ptr<Engine> >::iterator itLast = ncb->engines.end();
+		for ( ;itFirst!=itLast; ++itFirst )
+		{
+			if ( ( *itFirst )->getClassName() == "TriaxialCompressionEngine" ) //|| (*itFirst)->getBaseClassName() == "TriaxialCompressionEngine")
+			{
+				LOG_DEBUG ( "stress controller engine found" );
+				triaxialCompressionEngine =  YADE_PTR_CAST<TriaxialCompressionEngine> ( *itFirst );
+				//triaxialCompressionEngine = shared_ptr<TriaxialCompressionEngine> (static_cast<TriaxialCompressionEngine*> ( (*itFirst).get()));
+			}
+		}
+	}
+	if ( ! ( Omega::instance().getCurrentIteration() % triaxialCompressionEngine->computeStressStrainInterval == 0 ) )
+		triaxialCompressionEngine->computeStressStrain ( ncb );
 
 
-    height = p_top->se3.position.Y() - p_bottom->se3.position.Y() - thickness;
-    width = p_right->se3.position.X() - p_left->se3.position.X() - thickness;
-    depth = p_front->se3.position.Z() - p_back->se3.position.Z() - thickness;
 
-    //cerr << "height " << height << " width " << width << " depth " << depth << endl;
+	/// Compute kinetic energy and porosity :
 
-    /// calcul des contraintes via forces resultantes sur murs
+	Real Vs=0, kinematicE = 0;
+	Real V = ( triaxialCompressionEngine->height ) * ( triaxialCompressionEngine->width ) * ( triaxialCompressionEngine->depth );
 
-    Real SIG_wall_11 = 0, SIG_wall_22 = 0, SIG_wall_33 = 0;
+	BodyContainer::iterator bi = ncb->bodies->begin();
+	BodyContainer::iterator biEnd = ncb->bodies->end();
 
-    Vector3r F_wall_11 = static_cast<Force*>( ncb->physicalActions->find(wall_left_id, actionForce->getClassIndex() ). get() )->force;
-    //cerr << "F_wall_11 " << F_wall_11;
+	for ( ; bi!=biEnd; ++bi )
 
-    SIG_wall_11 = F_wall_11[0]/(depth*height);
+	{
+		const shared_ptr<Body>& b = *bi;
 
-    Vector3r F_wall_22 = static_cast<Force*>( ncb->physicalActions->find(wall_top_id, actionForce->getClassIndex() ). get() )->force;
-    //cerr << " F_wall_22 " << F_wall_22;
+		//int geometryIndex = b->geometricalModel->getClassIndex();
 
-    SIG_wall_22 = F_wall_22[1]/(depth*width);
+		if ( b->isDynamic )
+		{
+			const shared_ptr<ParticleParameters>& pp =
+				YADE_PTR_CAST<ParticleParameters> ( b->physicalParameters );
+			const Vector3r& v = pp->velocity;
+			kinematicE +=
+				0.5* ( pp->mass ) * ( v[0]*v[0]+v[1]*v[1]+v[2]*v[2] );
 
-    Vector3r F_wall_33 = static_cast<Force*>( ncb->physicalActions->find(wall_front_id, actionForce->getClassIndex() ). get() )->force;
-    //cerr << " F_wall_33 " << F_wall_33 << endl;
-    SIG_wall_33 = F_wall_33[2]/(width*height);
+			const shared_ptr<Sphere>& sphere =
+				YADE_PTR_CAST<Sphere> ( b->geometricalModel );
+			Vs += 1.3333333*Mathr::PI*pow ( sphere->radius, 3 );
 
-    ofile << lexical_cast<string>(Omega::instance().getSimulationTime()) << " "
-    << lexical_cast<string>(SIG_wall_11) << " "
-    << lexical_cast<string>(p_left->se3.position.X()) << " "
-    << lexical_cast<string>(SIG_wall_22) << " "
-    << lexical_cast<string>(p_top->se3.position.Y()) << " "
-    << lexical_cast<string>(SIG_wall_33) << " "
-    << lexical_cast<string>(p_front->se3.position.Z()) << " "
-    << endl;*/
+		}
+	}
+	porosity = ( V - Vs ) /V;
 
+	ofile << lexical_cast<string> ( Omega::instance().getCurrentIteration() ) << " "
+	<< lexical_cast<string> ( triaxialCompressionEngine->stress[triaxialCompressionEngine->wall_right][0] ) << " "
+	<< lexical_cast<string> ( triaxialCompressionEngine->stress[triaxialCompressionEngine->wall_top][1] ) << " "
+	<< lexical_cast<string> ( triaxialCompressionEngine->stress[triaxialCompressionEngine->wall_front][2] ) << " "
+	<< lexical_cast<string> ( triaxialCompressionEngine->strain[0] ) << " "
+	<< lexical_cast<string> ( triaxialCompressionEngine->strain[1] ) << " "
+	<< lexical_cast<string> ( triaxialCompressionEngine->strain[2] ) << " "
+	<< lexical_cast<string> ( triaxialCompressionEngine->ComputeUnbalancedForce ( body ) ) << " "
+	<< lexical_cast<string> ( porosity )
+	<< endl;
 }
 
 YADE_PLUGIN();
