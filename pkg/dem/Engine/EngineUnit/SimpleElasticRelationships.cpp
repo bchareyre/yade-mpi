@@ -44,7 +44,7 @@ void SimpleElasticRelationships::go(	  const shared_ptr<PhysicalParameters>& b1 
 			
 			if (!interaction->interactionPhysics) interaction->interactionPhysics = shared_ptr<ElasticContactInteraction>(new ElasticContactInteraction());
 			
-			const shared_ptr<ElasticContactInteraction>& contactPhysics = YADE_CAST<ElasticContactInteraction*>(interaction->interactionPhysics);
+			const shared_ptr<ElasticContactInteraction>& contactPhysics = YADE_PTR_CAST<ElasticContactInteraction>(interaction->interactionPhysics);
 
 			Real Ea 	= sdec1->young;
 			Real Eb 	= sdec2->young;
