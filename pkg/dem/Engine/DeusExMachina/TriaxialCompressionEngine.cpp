@@ -40,6 +40,7 @@ TriaxialCompressionEngine::TriaxialCompressionEngine() : actionForce(new Force)
 	UnbalancedForce = 1;
 	saveSimulation = false;
 	firstRun=true;
+	previousSigmaIso=sigma_iso;
 }
 
 TriaxialCompressionEngine::~TriaxialCompressionEngine()
@@ -75,9 +76,11 @@ void TriaxialCompressionEngine::registerAttributes()
 void TriaxialCompressionEngine::doStateTransition(stateNum nextState){
 	if ( /* currentState==STATE_UNINITIALIZED && */ nextState==STATE_ISO_COMPACTION){
 		sigma_iso=sigmaIsoCompaction;
+		previousSigmaIso=sigma_iso;
 	}
 	else if((currentState==STATE_ISO_COMPACTION || currentState==STATE_ISO_UNLOADING || currentState==STATE_LIMBO) && nextState==STATE_TRIAX_LOADING){
-		sigma_iso=sigmaLateralConfinement;		
+		sigma_iso=sigmaLateralConfinement;
+		previousSigmaIso=sigma_iso;		
 		internalCompaction = false;
 		height0 = height; depth0 = depth; width0 = width;
 		//compressionActivated = true;
@@ -89,6 +92,7 @@ void TriaxialCompressionEngine::doStateTransition(stateNum nextState){
 	else if(currentState==STATE_ISO_COMPACTION && nextState==STATE_ISO_UNLOADING){
 		sigma_iso=sigmaLateralConfinement;
 		sigmaIsoCompaction = sigmaLateralConfinement;
+		previousSigmaIso=sigma_iso;
 		internalCompaction=false; // unloading will not change grain sizes
 	}
 	else if(currentState==STATE_ISO_COMPACTION && nextState==STATE_LIMBO){
@@ -170,7 +174,7 @@ void TriaxialCompressionEngine::applyCondition ( Body * body )
 	{
 		LOG_INFO ( "First run, will initialize!" );
 		//sigma_iso was changed, we need to rerun compaction
-		if ( sigmaIsoCompaction!=previousSigmaIso || currentState==STATE_UNINITIALIZED || currentState== STATE_LIMBO ) doStateTransition ( STATE_ISO_COMPACTION );
+		if ( (sigmaIsoCompaction!=previousSigmaIso || currentState==STATE_UNINITIALIZED || currentState== STATE_LIMBO) && currentState!=STATE_TRIAX_LOADING ) doStateTransition ( STATE_ISO_COMPACTION );
 		if ( previousState==STATE_LIMBO && currentState==STATE_TRIAX_LOADING ) doStateTransition ( STATE_TRIAX_LOADING );
 		previousState=currentState;
 		previousSigmaIso=sigma_iso;
@@ -190,8 +194,7 @@ void TriaxialCompressionEngine::applyCondition ( Body * body )
 		saveSimulation = false;
 	}
 	if ( currentState==STATE_LIMBO )
-	{
-		Omega::instance().stopSimulationLoop();
+	{		
 		return;
 	}
 
@@ -217,9 +220,9 @@ void TriaxialCompressionEngine::applyCondition ( Body * body )
 
 		/* Move top and bottom wall according to strain rate */
 		PhysicalParameters* p=static_cast<PhysicalParameters*> ( Body::byId ( wall_bottom_id )->physicalParameters.get() );
-		p->se3.position += 0.5*strainRate*height*translationAxis*dt;
+		p->se3.position += 0.5*currentStrainRate*height*translationAxis*dt;
 		p = static_cast<PhysicalParameters*> ( Body::byId ( wall_top_id )->physicalParameters.get() );
-		p->se3.position -= 0.5*strainRate*height*translationAxis*dt;
+		p->se3.position -= 0.5*currentStrainRate*height*translationAxis*dt;
 	}
 }
 
