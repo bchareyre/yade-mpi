@@ -42,7 +42,7 @@ void InteractionGeometryMetaEngine::action(Body* body)
 		shared_ptr<Body>& b1 = (*bodies)[interaction->getId1()];
 		shared_ptr<Body>& b2 = (*bodies)[interaction->getId2()];
 		
-		bool wasReal = interaction->isReal;
+		//bool wasReal = interaction->isReal;
 		interaction->isReal =
 			b1->interactingGeometry && b2->interactingGeometry && // some bodies do not have interactingGeometry
 			// FIXME put this inside VolatileInteractionCriterion dynlib
@@ -51,8 +51,8 @@ void InteractionGeometryMetaEngine::action(Body* body)
 			operator()( b1->interactingGeometry , b2->interactingGeometry , b1->physicalParameters->se3 , b2->physicalParameters->se3 , interaction );
 
 
-		if(wasReal==false && interaction->isReal)
-			interaction->isNew=true;
+		//if(wasReal==false && interaction->isReal)
+		//	interaction->isNew=true;
 		//cerr<<"isReal="<<interaction->isReal<<", wasReal="<<wasReal<<", isNew="<<interaction->isNew<<endl;
 
 		//tmp

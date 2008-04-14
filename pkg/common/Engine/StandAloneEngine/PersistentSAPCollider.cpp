@@ -74,7 +74,8 @@ void PersistentSAPCollider::action(Body* body)
 	transientInteractions = ncb->transientInteractions;	
 	InteractionContainer::iterator I_end = transientInteractions->end();
 	for(InteractionContainer::iterator I=transientInteractions->begin(); I!=I_end; ++I) {
-		if ((*I)->isReal) (*I)->isNew=false; // FIXME : remove this isNew flag and test if interactionPhysic ?
+		if ((*I)->isReal) (*I)->isNew=false; // 
+		else (*I)->isNew=true;
 		if(!haveDistantTransient) (*I)->isReal=false; // reset this flag, is used later... (??)
 	}
 	
