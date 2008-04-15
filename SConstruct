@@ -420,6 +420,9 @@ def installHeaders(prefix=None):
 			if f.split('.')[-1] in ('hpp','inl','ipp','tpp','h','mcr'):
 				#m=re.match('^\./([^/]*)/.*$',root)
 				m=re.match('^.*?'+sep+'((extra|core)|((gui|lib|pkg)'+sep+'.*?))(|'+sep+'.*)$',root)
+				if not m:
+					print "WARNING: file %s skipped while scanning for headers (no module)"
+					continue
 				subInc=join(yadeInc,m.group(1).replace(sep,'-')) # replace pkg/lattice by pkg-lattice
 				if not prefix: # local include directory: do symlinks
 					if not isdir(subInc): os.makedirs(subInc)
