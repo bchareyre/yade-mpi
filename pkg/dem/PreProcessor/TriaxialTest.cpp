@@ -98,7 +98,8 @@ TriaxialTest::TriaxialTest () : FileGenerator()
 	upperCorner 		= Vector3r(1,1,1);
 	thickness 		= 0.001;
 	importFilename 		= ""; // "./small.sdec.xyz";
-	outputFileName 		= "./TriaxialTest.xml";
+	Key			="";
+	outputFileName 		= "./TriaxialTest"+Key+".xml";
 	//nlayers = 1;
 	wall_top 		= true;
 	wall_bottom 		= true;
@@ -116,8 +117,8 @@ TriaxialTest::TriaxialTest () : FileGenerator()
 	spheresRandomColor	= false;
 	recordIntervalIter	= 20;
 	saveAnimationSnapshots = false;
-	AnimationSnapshotsBaseName = "./snapshots/snap";
-	WallStressRecordFile = "./WallStresses";
+	AnimationSnapshotsBaseName = "./snapshots_"+Key+"/snap";
+	WallStressRecordFile = "./WallStresses"+Key;
 
 	rotationBlocked = false;
 	//	boxWalls 		= false;
@@ -141,8 +142,9 @@ TriaxialTest::TriaxialTest () : FileGenerator()
 	finalMaxMultiplier = 1.001;
 	
 	sphereYoungModulus  = 15000000.0;
-	spherePoissonRatio  = 0.5;
-	sphereFrictionDeg   = 18.0;
+	spherePoissonRatio  = 0.5;	
+	sphereFrictionDeg = 18.0;
+	compactionFrictionDeg   = sphereFrictionDeg;
 	density			= 2600;
 	
 	boxYoungModulus   = 15000000.0;
@@ -177,6 +179,7 @@ void TriaxialTest::registerAttributes()
 	REGISTER_ATTRIBUTE(upperCorner);
 	REGISTER_ATTRIBUTE(thickness);
 	REGISTER_ATTRIBUTE(importFilename);
+	REGISTER_ATTRIBUTE(outputFileName);
 	//REGISTER_ATTRIBUTE(nlayers);
 	//REGISTER_ATTRIBUTE(boxWalls);
 	REGISTER_ATTRIBUTE(internalCompaction);
@@ -186,7 +189,7 @@ void TriaxialTest::registerAttributes()
 	REGISTER_ATTRIBUTE(sphereYoungModulus);
 	REGISTER_ATTRIBUTE(spherePoissonRatio);
 	REGISTER_ATTRIBUTE(sphereFrictionDeg);
-
+	REGISTER_ATTRIBUTE(compactionFrictionDeg);
 	REGISTER_ATTRIBUTE(boxYoungModulus);
 	REGISTER_ATTRIBUTE(boxPoissonRatio);
 	REGISTER_ATTRIBUTE(boxFrictionDeg);
@@ -239,6 +242,7 @@ void TriaxialTest::registerAttributes()
 	//REGISTER_ATTRIBUTE(sigma_iso);
 	REGISTER_ATTRIBUTE(sigmaIsoCompaction);
 	REGISTER_ATTRIBUTE(sigmaLateralConfinement);
+	REGISTER_ATTRIBUTE(Key);
 
 }
 
@@ -417,14 +421,14 @@ void TriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r position, Real 
 	physics->se3			= Se3r(position,q);
 	physics->young			= sphereYoungModulus;
 	physics->poisson		= spherePoissonRatio;
-	physics->frictionAngle		= sphereFrictionDeg * Mathr::PI/180.0;
+	physics->frictionAngle		= compactionFrictionDeg * Mathr::PI/180.0;
 
-	if((!big) && (!dynamic) && (!boxWalls))
-	{
-		physics->young			= boxYoungModulus;
-		physics->poisson		= boxPoissonRatio;
-		physics->frictionAngle		= boxFrictionDeg * Mathr::PI/180.0;
-	}
+// 	if((!big) && (!dynamic) && (!boxWalls))
+// 	{
+// 		physics->young			= boxYoungModulus;
+// 		physics->poisson		= boxPoissonRatio;
+// 		physics->frictionAngle		= boxFrictionDeg * Mathr::PI/180.0;
+// 	}
 	
 	aabb->diffuseColor		= Vector3r(0,1,0);
 
@@ -585,13 +589,15 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	triaxialcompressionEngine->internalCompaction = internalCompaction;
 	triaxialcompressionEngine->maxMultiplier = maxMultiplier;
 	triaxialcompressionEngine->finalMaxMultiplier = finalMaxMultiplier;
+	triaxialcompressionEngine->Key = Key;
+	triaxialcompressionEngine->frictionAngleDegree = sphereFrictionDeg;
 		
 	//cerr << "fin de section triaxialcompressionEngine = shared_ptr<TriaxialCompressionEngine> (new TriaxialCompressionEngine);" << std::endl;
 	
 // recording global stress
 	triaxialStateRecorder = shared_ptr<TriaxialStateRecorder>(new
 	TriaxialStateRecorder);
-	triaxialStateRecorder-> outputFile 	= WallStressRecordFile;
+	triaxialStateRecorder-> outputFile 		= WallStressRecordFile + Key;
 	triaxialStateRecorder-> interval 		= recordIntervalIter;
 	//triaxialStateRecorderer-> thickness 		= thickness;
 	

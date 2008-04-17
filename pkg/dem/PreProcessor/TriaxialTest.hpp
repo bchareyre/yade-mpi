@@ -56,6 +56,8 @@ class TriaxialTest : public FileGenerator
 				,sphereYoungModulus
 				,spherePoissonRatio
 				,sphereFrictionDeg
+				//! If a different value of friction is to be used during the compaction phase
+				,compactionFrictionDeg
 				,boxYoungModulus
 				,boxPoissonRatio
 				,boxFrictionDeg
@@ -110,7 +112,8 @@ class TriaxialTest : public FileGenerator
 		
 		string		importFilename
 				,AnimationSnapshotsBaseName
-				,WallStressRecordFile;
+				,WallStressRecordFile
+				,Key;//A code that is added to output filenames
 	
 		shared_ptr<TriaxialCompressionEngine> triaxialcompressionEngine;
 		shared_ptr<TriaxialStressController> triaxialstressController;
