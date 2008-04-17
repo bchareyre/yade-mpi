@@ -22,7 +22,7 @@
 
 #include "VolumicContactLaw.hpp"
 
-#include "/home/bruno/micromacro/KdevMicroMacro/src/TesselationWrapper.h"
+#include "TesselationWrapper.h"
 
 
 
