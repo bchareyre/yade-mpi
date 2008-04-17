@@ -44,7 +44,7 @@ class TriaxialCompressionEngine : public TriaxialStressController
 		// should be "enum stateNum {...}" once this is fixed
 		enum {STATE_UNINITIALIZED, STATE_ISO_COMPACTION, STATE_ISO_UNLOADING, STATE_TRIAX_LOADING, STATE_LIMBO};
 		stateNum currentState;
-		void doStateTransition(stateNum nextState);
+		void doStateTransition(Body *body, stateNum nextState);
 		#define _STATE_CASE(ST) case ST: return #ST
 		string stateName(stateNum st){switch(st){ _STATE_CASE(STATE_UNINITIALIZED);_STATE_CASE(STATE_ISO_COMPACTION);_STATE_CASE(STATE_ISO_UNLOADING);_STATE_CASE(STATE_TRIAX_LOADING);_STATE_CASE(STATE_LIMBO); default: return "<unknown state>"; } }
 		#undef _STATE_CASE
@@ -62,6 +62,8 @@ class TriaxialCompressionEngine : public TriaxialStressController
 		Real sigmaIsoCompaction;
 		//! Desired isotropic pressure during the confined uniaxial test; may be different from sigmaIsoCompaction
 		Real sigmaLateralConfinement;
+		//! Value of friction to use for the compression test
+		Real frictionAngleDegree;
 		//! Previous state (used to detect manual changes of the state in .xml)
 		stateNum previousState;
 		//Vector3r strain;
@@ -80,6 +82,9 @@ class TriaxialCompressionEngine : public TriaxialStressController
 				
 		virtual void applyCondition(Body * body);
 		void updateParameters(Body * body);
+		
+		///Change physical properties of interactions and/or bodies in the middle of a simulation (change only friction for the moment, complete this function to set cohesion and others before compression test)
+		void setContactProperties(Body * body, Real frictionAngle);
 
 
 		DECLARE_LOGGER;

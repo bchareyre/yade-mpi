@@ -11,10 +11,12 @@
 #include<yade/core/Omega.hpp>
 #include<yade/pkg-common/Force.hpp>
 #include<yade/pkg-dem/ElasticContactInteraction.hpp>
+#include<yade/pkg-dem/BodyMacroParameters.hpp>
 #include<yade/lib-base/yadeWm3Extra.hpp>
 #include<boost/lexical_cast.hpp>
 #include<boost/lambda/lambda.hpp>
 #include<yade/extra/Shop.hpp>
+#include<yade/core/Interaction.hpp>
 
 
 class CohesiveFrictionalRelationships;
@@ -42,6 +44,7 @@ TriaxialCompressionEngine::TriaxialCompressionEngine() : actionForce(new Force)
 	saveSimulation = false;
 	firstRun=true;
 	previousSigmaIso=sigma_iso;
+	frictionAngleDegree = -1;
 }
 
 TriaxialCompressionEngine::~TriaxialCompressionEngine()
@@ -73,9 +76,10 @@ void TriaxialCompressionEngine::registerAttributes()
 	REGISTER_ATTRIBUTE(previousSigmaIso);
 	REGISTER_ATTRIBUTE(sigmaLateralConfinement);
 	REGISTER_ATTRIBUTE(Key);
+	REGISTER_ATTRIBUTE(frictionAngleDegree);
 }
 
-void TriaxialCompressionEngine::doStateTransition(stateNum nextState){
+void TriaxialCompressionEngine::doStateTransition(Body * body, stateNum nextState){
 	if ( /* currentState==STATE_UNINITIALIZED && */ nextState==STATE_ISO_COMPACTION){
 		sigma_iso=sigmaIsoCompaction;
 		previousSigmaIso=sigma_iso;
@@ -84,6 +88,7 @@ void TriaxialCompressionEngine::doStateTransition(stateNum nextState){
 		sigma_iso=sigmaLateralConfinement;
 		previousSigmaIso=sigma_iso;		
 		internalCompaction = false;
+		if (frictionAngleDegree>0) setContactProperties(body, frictionAngleDegree);
 		height0 = height; depth0 = depth; width0 = width;
 		//compressionActivated = true;
 		wall_bottom_activated=false;
@@ -97,6 +102,7 @@ void TriaxialCompressionEngine::doStateTransition(stateNum nextState){
 		sigmaIsoCompaction = sigmaLateralConfinement;
 		previousSigmaIso=sigma_iso;
 		internalCompaction=false; // unloading will not change grain sizes
+		if (frictionAngleDegree>0) setContactProperties(body, frictionAngleDegree);
 		if(!firstRun) saveSimulation=true;
 		Phase1End = "Compacted";
 	}	
@@ -142,13 +148,13 @@ void TriaxialCompressionEngine::updateParameters ( Body * body )
 		{
 			if ( currentState==STATE_ISO_COMPACTION && autoCompressionActivation )
 			{
-				doStateTransition ( STATE_ISO_UNLOADING ); /*update stress and strain here*/ computeStressStrain ( ncb );
+				doStateTransition (body, STATE_ISO_UNLOADING ); /*update stress and strain here*/ computeStressStrain ( ncb );
 			}
 			else if ( currentState==STATE_ISO_UNLOADING && autoCompressionActivation )
 			{
-				doStateTransition ( STATE_TRIAX_LOADING ); computeStressStrain ( ncb );
+				doStateTransition (body, STATE_TRIAX_LOADING ); computeStressStrain ( ncb );
 			}
-			else doStateTransition ( STATE_LIMBO );
+			else doStateTransition (body, STATE_LIMBO );
 		}
 #if 0
 		//This is a hack in order to allow subsequent run without activating compression - like for the YADE-COMSOL coupling
@@ -180,8 +186,8 @@ void TriaxialCompressionEngine::applyCondition ( Body * body )
 	{
 		LOG_INFO ( "First run, will initialize!" );
 		//sigma_iso was changed, we need to rerun compaction
-		if ( (sigmaIsoCompaction!=previousSigmaIso || currentState==STATE_UNINITIALIZED || currentState== STATE_LIMBO) && currentState!=STATE_TRIAX_LOADING ) doStateTransition ( STATE_ISO_COMPACTION );
-		if ( previousState==STATE_LIMBO && currentState==STATE_TRIAX_LOADING ) doStateTransition ( STATE_TRIAX_LOADING );
+		if ( (sigmaIsoCompaction!=previousSigmaIso || currentState==STATE_UNINITIALIZED || currentState== STATE_LIMBO) && currentState!=STATE_TRIAX_LOADING ) doStateTransition (body, STATE_ISO_COMPACTION );
+		if ( previousState==STATE_LIMBO && currentState==STATE_TRIAX_LOADING ) doStateTransition (body, STATE_TRIAX_LOADING );
 		previousState=currentState;
 		previousSigmaIso=sigma_iso;
 		firstRun=false; // change this only _after_ state transitions
@@ -232,5 +238,44 @@ void TriaxialCompressionEngine::applyCondition ( Body * body )
 	}
 }
 
+void TriaxialCompressionEngine::setContactProperties(Body * body, Real frictionDegree)
+{
+	MetaBody * ncb = static_cast<MetaBody*> ( body );
+	shared_ptr<BodyContainer>& bodies = ncb->bodies;
+			
+	BodyContainer::iterator bi = bodies->begin();
+	BodyContainer::iterator biEnd = bodies->end();
+	
+	for ( ; bi!=biEnd; ++bi)	
+	{	
+		shared_ptr<Body> b = *bi;
+		if (b->isDynamic)
+		YADE_PTR_CAST<BodyMacroParameters> (b->physicalParameters)->frictionAngle = frictionAngleDegree * Mathr::PI/180.0;
+	}
+		
+	InteractionContainer::iterator ii    = ncb->transientInteractions->begin();
+        InteractionContainer::iterator iiEnd = ncb->transientInteractions->end();
+        
+        for(  ; ii!=iiEnd ; ++ii ) 
+        {
+        	if ((*ii)->isReal)
+                {	
+                       	const shared_ptr<BodyMacroParameters>& sdec1 = YADE_PTR_CAST<BodyMacroParameters>((*bodies)[(body_id_t) ((*ii)->getId1())]->physicalParameters);
+			const shared_ptr<BodyMacroParameters>& sdec2 = YADE_PTR_CAST<BodyMacroParameters>((*bodies)[(body_id_t) ((*ii)->getId2())]->physicalParameters);
+						
+			const shared_ptr<ElasticContactInteraction>& contactPhysics = YADE_PTR_CAST<ElasticContactInteraction>((*ii)->interactionPhysics);
+			
+			Real fa 	= sdec1->frictionAngle;
+			Real fb 	= sdec2->frictionAngle;
+
+			contactPhysics->frictionAngle			= std::min(fa,fb);
+			contactPhysics->tangensOfFrictionAngle		= std::tan(contactPhysics->frictionAngle); 
+		}
+	}
+
+}
+
+
 
 YADE_PLUGIN();
+
