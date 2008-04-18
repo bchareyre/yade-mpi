@@ -35,8 +35,13 @@ void DisplacementEngine::registerAttributes()
 	DeusExMachina::registerAttributes();
 	REGISTER_ATTRIBUTE(displacement);
 	REGISTER_ATTRIBUTE(translationAxis);
+	REGISTER_ATTRIBUTE(active);
 }
 
+bool DisplacementEngine::isActivated()
+{
+   return active;
+}
 
 void DisplacementEngine::applyCondition(Body * body)
 {

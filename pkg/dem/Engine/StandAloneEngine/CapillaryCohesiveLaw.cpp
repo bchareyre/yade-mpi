@@ -324,7 +324,7 @@ Tableau::Tableau(const char* filename)
 		static bool first=true;
 		if(first)
 		{
-	                cout << "WARNING: cannot open file used for capillary law, in TriaxalTestWater" << endl;
+	                std::cerr << "WARNING: cannot open file used for capillary law, in TriaxalTestWater" << endl;
 			first=false;
 		}
 		return;

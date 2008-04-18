@@ -27,7 +27,8 @@ CohesiveFrictionalContactLaw::CohesiveFrictionalContactLaw() : InteractionSolver
 	sdecGroupMask=1;
 	momentRotationLaw = true;
 	erosionActivated = false;
-	detectBrokenBodies = true;
+	detectBrokenBodies = false;
+	always_use_moment_law = false;
 }
 
 
@@ -38,6 +39,7 @@ void CohesiveFrictionalContactLaw::registerAttributes()
 	REGISTER_ATTRIBUTE(momentRotationLaw);
 	REGISTER_ATTRIBUTE(erosionActivated);
 	REGISTER_ATTRIBUTE(detectBrokenBodies);
+	REGISTER_ATTRIBUTE(always_use_moment_law);
 }
 
 void out(Quaternionr q)
@@ -296,7 +298,7 @@ shearForce 			       -= currentContactPhysics->ks*shearDisplacement;
 /////	/// Moment law	END				 	 ///
 
 	/// Moment law					 	 ///
-		if(momentRotationLaw && currentContactPhysics->cohesionBroken == false )
+		if(momentRotationLaw && (currentContactPhysics->cohesionBroken == false || always_use_moment_law) )
 		{
 			{// updates only orientation of contact (local coordinate system)
 				Vector3r axis = currentContactPhysics->prevNormal.UnitCross(currentContactGeometry->normal);

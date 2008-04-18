@@ -64,6 +64,13 @@ void SimpleElasticRelationships::go(	  const shared_ptr<PhysicalParameters>& b1 
 			Real Kn = 2*Ea*Da*Eb*Db/(Ea*Da+Eb*Db);//harmonic average of two stiffnesses
 			Real Ks = 2*Ea*Da*Va*Eb*Db*Vb/(Ea*Da*Va+Eb*Db*Va);//harmonic average of two stiffnesses with ks=V*kn for each sphere
 
+
+	//This is the formula used in PFC-3D
+	//
+	//Real Kn = 4 * ((Ea+Eb)*0.5) * ((Da+Db)*0.5);
+	//Real Ks = Kn/2.0;
+
+
 			contactPhysics->initialKn			= Kn;
 			contactPhysics->initialKs			= Ks;
 //cerr << "Ks: " <<       contactPhysics->initialKs			<< endl;

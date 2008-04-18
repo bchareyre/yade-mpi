@@ -19,6 +19,9 @@ class DisplacementEngine : public DeusExMachina
 		Real displacement;
 		Vector3r translationAxis;
 		void applyCondition(Body * body);
+		bool active;
+		DisplacementEngine():active(true){};
+		bool isActivated();
 
 	protected :
 		virtual void postProcessAttributes(bool);
