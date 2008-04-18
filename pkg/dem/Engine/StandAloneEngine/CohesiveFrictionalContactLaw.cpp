@@ -29,6 +29,11 @@ CohesiveFrictionalContactLaw::CohesiveFrictionalContactLaw() : InteractionSolver
 	erosionActivated = false;
 	detectBrokenBodies = false;
 	always_use_moment_law = false;
+
+//CREEP
+	shear_creep=false;
+	twist_creep=false;
+	creep_viscosity = 1.0;
 }
 
 
@@ -40,6 +45,10 @@ void CohesiveFrictionalContactLaw::registerAttributes()
 	REGISTER_ATTRIBUTE(erosionActivated);
 	REGISTER_ATTRIBUTE(detectBrokenBodies);
 	REGISTER_ATTRIBUTE(always_use_moment_law);
+	
+	REGISTER_ATTRIBUTE(shear_creep);
+	REGISTER_ATTRIBUTE(twist_creep);
+	REGISTER_ATTRIBUTE(creep_viscosity);
 }
 
 void out(Quaternionr q)
@@ -187,10 +196,11 @@ void CohesiveFrictionalContactLaw::action(Body* body)
 
 
 ///////////////////////// CREEP START (commented out) ///////////
-//	Real    viscosity = 300000.0;
-//	shearForce                            -= currentContactPhysics->ks*(shearDisplacement + shearForce*dt/viscosity);
-
+if(shear_creep){
+	shearForce                            -= currentContactPhysics->ks*(shearDisplacement + shearForce*dt/creep_viscosity);
+} else {
 shearForce 			       -= currentContactPhysics->ks*shearDisplacement;
+}
 ///////////////////////// CREEP END /////////////////////////////
 
                 //  cerr << "shearForce = " << shearForce << endl;
@@ -300,15 +310,19 @@ shearForce 			       -= currentContactPhysics->ks*shearDisplacement;
 	/// Moment law					 	 ///
 		if(momentRotationLaw && (currentContactPhysics->cohesionBroken == false || always_use_moment_law) )
 		{
-			{// updates only orientation of contact (local coordinate system)
-				Vector3r axis = currentContactPhysics->prevNormal.UnitCross(currentContactGeometry->normal);
-				Real angle =  unitVectorsAngle(currentContactPhysics->prevNormal,currentContactGeometry->normal);
-				Quaternionr align(axis,angle);
-				currentContactPhysics->currentContactOrientation =  align * currentContactPhysics->currentContactOrientation;
-			}
+			// Not necessary. OK.
+			//{// updates only orientation of contact (local coordinate system)
+			//	Vector3r axis = currentContactPhysics->prevNormal.UnitCross(currentContactGeometry->normal);
+			//	Real angle =  unitVectorsAngle(currentContactPhysics->prevNormal,currentContactGeometry->normal);
+			//	Quaternionr align(axis,angle);
+			//	currentContactPhysics->currentContactOrientation =  align * currentContactPhysics->currentContactOrientation;
+			//}
 
 			Quaternionr delta( de1->se3.orientation * currentContactPhysics->initialOrientation1.Conjugate() *
 		                           currentContactPhysics->initialOrientation2 * de2->se3.orientation.Conjugate());
+			if(twist_creep){
+				delta = delta * currentContactPhysics->twistCreep;
+			}
 
 			Vector3r axis;	// axis of rotation - this is the Moment direction UNIT vector.
 			Real angle;	// angle represents the power of resistant ELASTIC moment
@@ -320,6 +334,22 @@ shearForce 			       -= currentContactPhysics->ks*shearDisplacement;
 
 	Real angle_twist(angle * axis.Dot(currentContactGeometry->normal) );
 	Vector3r axis_twist(angle_twist * currentContactGeometry->normal);
+
+			if(twist_creep){
+				Real viscosity_twist = creep_viscosity * std::pow((2 * std::min(currentContactGeometry->radius1,currentContactGeometry->radius2)),2) / 16.0;
+				Real angle_twist_creeped = angle_twist * (1 - dt/viscosity_twist);
+				Quaternionr q_twist(currentContactGeometry->normal , angle_twist);
+				//Quaternionr q_twist_creeped(currentContactGeometry->normal , angle_twist*0.996);
+				Quaternionr q_twist_creeped(currentContactGeometry->normal , angle_twist_creeped);
+				Quaternionr q_twist_delta(q_twist_creeped * q_twist.Conjugate() );
+		currentContactPhysics->twistCreep = currentContactPhysics->twistCreep * q_twist_delta;
+				// modify the initialRelativeOrientation to substract some twisting
+			//	currentContactPhysics->initialRelativeOrientation = currentContactPhysics->initialRelativeOrientation * q_twist_delta;
+			//currentContactPhysics->initialOrientation1 = currentContactPhysics->initialOrientation1 * q_twist_delta;
+			//currentContactPhysics->initialOrientation2 = currentContactPhysics->initialOrientation2 * q_twist_delta.Conjugate();
+			}
+
+
 	Vector3r moment_twist(axis_twist * currentContactPhysics->kr);
 
 	Vector3r axis_bending(angle*axis - axis_twist);

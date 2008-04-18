@@ -24,7 +24,8 @@ class CohesiveFrictionalContactInteraction : public ElasticContactInteraction
 
 		Quaternionr	initialOrientation1,initialOrientation2,
 				orientationToContact1,orientationToContact2,
-				currentContactOrientation,initialContactOrientation;
+				currentContactOrientation,initialContactOrientation,
+				twistCreep;
 		Vector3r	initialPosition1,initialPosition2;
 		Real		kr; // rolling stiffness
 	

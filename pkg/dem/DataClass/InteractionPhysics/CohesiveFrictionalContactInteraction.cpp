@@ -23,6 +23,7 @@ CohesiveFrictionalContactInteraction::CohesiveFrictionalContactInteraction()
 	orientationToContact2 = Quaternionr(1.0,0.0,0.0,0.0);
 	initialOrientation1 = Quaternionr(1.0,0.0,0.0,0.0);
 	initialOrientation2 = Quaternionr(1.0,0.0,0.0,0.0);
+	twistCreep          = Quaternionr(1.0,0.0,0.0,0.0);
 	kr = 0;
 	currentContactOrientation = Quaternionr(1.0,0.0,0.0,0.0);
 	initialContactOrientation = Quaternionr(1.0,0.0,0.0,0.0);
@@ -73,6 +74,7 @@ void CohesiveFrictionalContactInteraction::registerAttributes()
 	REGISTER_ATTRIBUTE(initialContactOrientation);
 	REGISTER_ATTRIBUTE(initialPosition1);
 	REGISTER_ATTRIBUTE(initialPosition2);
+	REGISTER_ATTRIBUTE(twistCreep);
 //	REGISTER_ATTRIBUTE(prevX1);
 //	REGISTER_ATTRIBUTE(prevX2);
 //	REGISTER_ATTRIBUTE(initX1);
