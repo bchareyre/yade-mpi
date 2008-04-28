@@ -37,7 +37,7 @@ class NodeRecorder : public DataRecorder
 		NodeRecorder ();
 
 		virtual void registerAttributes();
-		virtual void action(Body* b);
+		virtual void action(MetaBody*);
 		virtual bool isActivated();
 
 	protected :

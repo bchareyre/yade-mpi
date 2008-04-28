@@ -36,9 +36,8 @@ void ElasticContactLaw::registerAttributes()
 }
 
 
-void ElasticContactLaw::action(Body* body)
+void ElasticContactLaw::action(MetaBody* ncb)
 {
-	MetaBody * ncb = YADE_CAST<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 
 	Real dt = Omega::instance().getTimeStep();

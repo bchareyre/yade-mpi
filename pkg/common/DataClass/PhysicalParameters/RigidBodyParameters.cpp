@@ -15,6 +15,7 @@ RigidBodyParameters::RigidBodyParameters() : ParticleParameters()
 	createIndex();
 	acceleration = Vector3r(0,0,0);
 	angularAcceleration = Vector3r(0,0,0);
+	angularVelocity=Vector3r(0,0,0);
 }
 
 RigidBodyParameters::~RigidBodyParameters()

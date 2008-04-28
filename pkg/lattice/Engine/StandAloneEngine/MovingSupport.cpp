@@ -85,14 +85,13 @@ bool MovingSupport::isActivated()
 }
 
 
-void MovingSupport::action(Body * body)
+void MovingSupport::action(MetaBody * ncb)
 	// FIXME: about "bool first":
 	// FIXME: maybe it could be added to initialiers, and called with a bool argument saying that the initialisation is performed. 
 {
 //	std::cerr << "MovingSupport quits\n";
 //	return;
 	
-	MetaBody * ncb = static_cast<MetaBody*>(body);
 
 	if(first)
 	{

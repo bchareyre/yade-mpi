@@ -38,10 +38,9 @@ DistantPersistentSAPCollider::~DistantPersistentSAPCollider()
 
 }
 
-void DistantPersistentSAPCollider::action(Body* body)
+void DistantPersistentSAPCollider::action(MetaBody* ncb)
 {
 
-	MetaBody * ncb = YADE_CAST<MetaBody*>(body);
 	shared_ptr<BodyContainer> bodies = ncb->bodies;
 	
 	if (2*bodies->size()!=xBounds.size())

@@ -74,14 +74,14 @@ class TriaxialStressController : public DeusExMachina
 		TriaxialStressController();
 		virtual ~TriaxialStressController();
 	
-		virtual void applyCondition(Body*);
+		virtual void applyCondition(MetaBody*);
 		//! Regulate the stress applied on walls with flag wall_XXX_activated = true
 		void controlExternalStress(int wall, MetaBody* ncb, Vector3r resultantForce, PhysicalParameters* p, Real wall_max_vel);
 		void controlInternalStress(MetaBody* ncb, Real multiplier);
 		void updateStiffness(MetaBody* ncb);
 		Real computeStressStrain(MetaBody* ncb); //Compute stresses on walls and store the values in "Vector3r stress[6]", return mean stress
 		//! Compute the mean/max unbalanced force in the assembly (normalized by mean contact force)
-    		Real ComputeUnbalancedForce(Body * body, bool maxUnbalanced=false);
+    		Real ComputeUnbalancedForce(MetaBody * ncb, bool maxUnbalanced=false);
 
 		DECLARE_LOGGER;
 		

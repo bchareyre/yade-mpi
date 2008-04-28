@@ -39,9 +39,8 @@ void FEMLaw::registerAttributes()
 }
 
 
-void FEMLaw::action(Body* body)
+void FEMLaw::action(MetaBody* fem)
 {
-	MetaBody * fem = static_cast<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = fem->bodies;
 	shared_ptr<PhysicalActionContainer>& physicalActions = fem->physicalActions;
 	

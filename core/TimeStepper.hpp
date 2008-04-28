@@ -23,9 +23,9 @@ class TimeStepper : public StandAloneEngine
 		unsigned int timeStepUpdateInterval;
 
 		TimeStepper();
-		virtual void computeTimeStep(Body*  ) { throw; };
+		virtual void computeTimeStep(MetaBody* ) { throw; };
 		virtual bool isActivated();
-		virtual void action(Body* b) { computeTimeStep(b);} ;
+		virtual void action(MetaBody* b) { computeTimeStep(b);} ;
 		void setActive(bool a, int nb=-1);
 
 	protected :

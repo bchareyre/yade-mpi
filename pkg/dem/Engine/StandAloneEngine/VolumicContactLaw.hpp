@@ -30,7 +30,7 @@ class VolumicContactLaw : public InteractionSolver
 		bool momentRotationLaw;
 	
 		VolumicContactLaw();
-		void action(Body* body);
+		void action(MetaBody*);
 
 	protected :
 		void registerAttributes();

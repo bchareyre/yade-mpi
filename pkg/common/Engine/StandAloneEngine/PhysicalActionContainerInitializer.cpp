@@ -26,9 +26,8 @@ void PhysicalActionContainerInitializer::registerAttributes()
 	REGISTER_ATTRIBUTE(physicalActionNames);
 }
 
-void PhysicalActionContainerInitializer::action(Body* body)
+void PhysicalActionContainerInitializer::action(MetaBody* ncb)
 {
-	MetaBody * ncb = YADE_CAST<MetaBody*>(body);
 	
 	vector<shared_ptr<PhysicalAction> > physicalActions;
 	physicalActions.clear();

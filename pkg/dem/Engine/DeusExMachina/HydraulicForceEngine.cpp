@@ -37,12 +37,11 @@ void HydraulicForceEngine::registerAttributes()
 }
 
 
-void HydraulicForceEngine::applyCondition(Body* body)
+void HydraulicForceEngine::applyCondition(MetaBody* ncb)
 {
 
     if (isActivated)
     {
-        MetaBody * ncb = YADE_CAST<MetaBody*>(body);
         shared_ptr<BodyContainer>& bodies = ncb->bodies;
         
 //cerr << "HFinverted " << HFinverted << " Omega::instance().getTimeStep() " << Omega::instance().getCurrentIteration() << endl;

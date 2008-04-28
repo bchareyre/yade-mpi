@@ -35,7 +35,7 @@ void CinemCisEngine::registerAttributes()
 }
 
 
-void CinemCisEngine::applyCondition(Body * body)
+void CinemCisEngine::applyCondition(MetaBody * body)
 {
 	if(theta<=thetalim)
 	{
@@ -47,9 +47,8 @@ void CinemCisEngine::applyCondition(Body * body)
 
 
 
-void CinemCisEngine::applyRotTranslation(Body * body)
+void CinemCisEngine::applyRotTranslation(MetaBody * ncb)
 {
-	MetaBody * ncb = YADE_CAST<MetaBody*>(body);
 	shared_ptr<BodyContainer> bodies = ncb->bodies;
 
 	Yplaqsup=((*bodies)[id_boxhaut]->physicalParameters.get())->se3.position.Y();	// the height of the sample, which may be different from the initial "height" defined in the Preprocessor
@@ -85,9 +84,8 @@ void CinemCisEngine::applyRotTranslation(Body * body)
 }
 
 
-void CinemCisEngine::applyTranslation(Body * body)
+void CinemCisEngine::applyTranslation(MetaBody * ncb)
 {
-	MetaBody * ncb = YADE_CAST<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 
 	int id_boxhaut=3;

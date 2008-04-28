@@ -50,10 +50,9 @@ void ResultantForceEngine::registerAttributes()
 
 
 
-void ResultantForceEngine::applyCondition(Body* body)
+void ResultantForceEngine::applyCondition(MetaBody* ncb)
 {
 	//cerr << "void ResultantForceEngine::applyCondition(Body* body)" << std::endl;
-	MetaBody * ncb = YADE_CAST<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	
 	std::vector<int>::const_iterator ii = subscribedBodies.begin();

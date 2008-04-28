@@ -9,9 +9,8 @@
 #include "PhysicalActionApplier.hpp"
 #include<yade/core/MetaBody.hpp>
 
-void PhysicalActionApplier::action(Body* body)
+void PhysicalActionApplier::action(MetaBody* ncb)
 {
-	MetaBody * ncb = YADE_CAST<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 
 	PhysicalActionContainer::iterator pai    = ncb->physicalActions->begin();

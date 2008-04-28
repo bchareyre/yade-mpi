@@ -31,7 +31,7 @@ public :
     SimpleViscoelasticSpheresInteractionRecorder();
     ~SimpleViscoelasticSpheresInteractionRecorder();
 
-    virtual void action(Body* body);
+    virtual void action(MetaBody*);
     bool isActivated();
 
 protected :

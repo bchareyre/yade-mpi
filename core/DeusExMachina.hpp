@@ -11,11 +11,10 @@
 
 #include <vector>
 
-#include "Engine.hpp"
+#include<yade/core/Engine.hpp>
+#include<yade/core/Body.hpp>
 
-class Body;
-
-/*! \brief Abstract interface for all deux ex machinas.
+/*! \brief Abstract interface for all dii ex machina.
 
 	All kinematic engines must derived from this class. A kinematic engine is used to modify the state of an object
 	(position,veloity ...) according to a predefined law (mathematical function, stored data ...) and not according
@@ -25,26 +24,14 @@ class Body;
 
 class DeusExMachina : public Engine
 {
-/// Attributes
-	protected :
-		Real time;
-	//	Real startTime;
-	//	Real stopTime;
-
 	public :
 		std::vector<int> subscribedBodies; /// Lists of bodies whose state will be modified by deux ex machina
-
 		DeusExMachina ();
-
-		virtual void action(Body* b);
-		virtual void applyCondition(Body* ) { throw; };
-
+		virtual void action(MetaBody*);
+		virtual void applyCondition(MetaBody*) { throw; };
 	//	virtual bool isActivated();
-
 	protected :
 		void registerAttributes();
-	
-
 	REGISTER_CLASS_NAME(DeusExMachina);
 	REGISTER_BASE_CLASS_NAME(Engine);
 };

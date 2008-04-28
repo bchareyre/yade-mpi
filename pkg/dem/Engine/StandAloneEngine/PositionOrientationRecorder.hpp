@@ -29,7 +29,7 @@ class PositionOrientationRecorder : public DataRecorder
 	
 		PositionOrientationRecorder ();
 		~PositionOrientationRecorder ();
-		virtual void action(Body* b);
+		virtual void action(MetaBody*);
 
 	protected :
 		virtual void postProcessAttributes(bool deserializing);

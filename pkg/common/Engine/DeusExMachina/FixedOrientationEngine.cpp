@@ -31,9 +31,8 @@ void FixedOrientationEngine::registerAttributes()
 }
 
 
-void FixedOrientationEngine::applyCondition(Body * body)
+void FixedOrientationEngine::applyCondition(MetaBody * ncb)
 {
-	MetaBody * ncb = static_cast<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 
 	std::vector<int>::const_iterator ii = subscribedBodies.begin();

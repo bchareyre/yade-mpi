@@ -28,7 +28,7 @@ class DisplacementToForceEngine : public DeusExMachina
 		DisplacementToForceEngine();
 		virtual ~DisplacementToForceEngine();
 
-		virtual void applyCondition(Body * body);
+		virtual void applyCondition(MetaBody *);
 
 	protected :
 		virtual void postProcessAttributes(bool);

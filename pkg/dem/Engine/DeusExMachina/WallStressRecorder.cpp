@@ -70,9 +70,8 @@ bool WallStressRecorder::isActivated()
 }
 
 
-void WallStressRecorder::action(Body * body)
+void WallStressRecorder::action(MetaBody * ncb)
 {
-	MetaBody * ncb = static_cast<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 		
 	/// dimensions de l'echantillon

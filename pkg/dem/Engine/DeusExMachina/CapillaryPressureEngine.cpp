@@ -36,7 +36,7 @@ void CapillaryPressureEngine::registerAttributes()
 }
 
 
-void CapillaryPressureEngine::applyCondition(Body * body)
+void CapillaryPressureEngine::applyCondition(MetaBody * rootBody)
 {		
 	//cerr << " CapillaryPressure = " << capillaryCohesiveLaw->CapillaryPressure << endl;
 	
@@ -48,7 +48,7 @@ void CapillaryPressureEngine::applyCondition(Body * body)
 // 	cerr << " CapillaryPressure = " << capillaryCohesiveLaw->CapillaryPressure << endl;
 // 	cerr << " PressureVariation = " << PressureVariation << endl;
 	
-	capillaryCohesiveLaw->action(body);
+	capillaryCohesiveLaw->action(rootBody);
 		
 	
 	

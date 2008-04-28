@@ -31,7 +31,7 @@ class PositionSnapshot : public DataRecorder
 		
 		PositionSnapshot ();
 		~PositionSnapshot ();
-		virtual void action(Body* b);
+		virtual void action(MetaBody*);
 		virtual bool isActivated();
 
 	protected :

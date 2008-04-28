@@ -1228,4 +1228,8 @@ private:
   bool updateGLOK_;
 };
 
+#undef DEBUG
+
 #endif // QGLVIEWER_QGLVIEWER_H
+
+

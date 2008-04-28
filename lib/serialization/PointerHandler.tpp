@@ -47,8 +47,13 @@ struct PointerHandler<shared_ptr<PointedType> >
 		if(typeStr.size() != 0)
 		{
 			// FIXME : isn't it the same code code Serializable and custom ???
-			if(boost::is_base_and_derived<Serializable,PointedType>::value)
-			{				
+
+			if(boost::is_base_of<Serializable,PointedType>::value){
+				/*
+				the condition means: is_base_and_derived(A,B)||is_same(A,B).
+				This makes it possible to deserialize shared_ptr<Serializable>.
+				*/
+
 				// WARNING: this will not compile if you have 'int' or 'float' inside shared_ptr
 				// but I'm not going to change this into reinterpret_cast just because of that.
 				// nobody will have 'int' inside shared_ptr, and reinterpret_cast is here too risky hack.

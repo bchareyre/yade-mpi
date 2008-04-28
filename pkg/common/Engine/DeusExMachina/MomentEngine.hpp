@@ -23,7 +23,7 @@ class MomentEngine : public DeusExMachina
 		MomentEngine();
 		virtual ~MomentEngine();
 	
-		virtual void applyCondition(Body*);
+		virtual void applyCondition(MetaBody*);
 	
 	protected :
 		virtual void registerAttributes();

@@ -23,7 +23,7 @@ class ForceEngine : public DeusExMachina
 		ForceEngine();
 		virtual ~ForceEngine();
 	
-		virtual void applyCondition(Body*);
+		virtual void applyCondition(MetaBody*);
 	
 	protected :
 		virtual void registerAttributes();

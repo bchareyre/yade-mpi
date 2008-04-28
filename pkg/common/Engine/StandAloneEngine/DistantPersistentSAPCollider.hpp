@@ -90,7 +90,7 @@ class DistantPersistentSAPCollider : public BroadInteractor
 		virtual ~DistantPersistentSAPCollider();
 
 		/// return a list "transientInteractions" of pairs of Body which Bounding volume are in potential interaction
-		void action(Body * body);
+		void action(MetaBody *);
 
 
 	REGISTER_CLASS_NAME(DistantPersistentSAPCollider);

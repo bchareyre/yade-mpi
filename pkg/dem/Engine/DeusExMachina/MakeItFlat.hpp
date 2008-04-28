@@ -22,7 +22,7 @@ class MakeItFlat : public DeusExMachina
 		MakeItFlat();
 		virtual ~MakeItFlat();
 	
-		virtual void applyCondition(Body*);
+		virtual void applyCondition(MetaBody*);
 	
 	protected :
 		virtual void registerAttributes();

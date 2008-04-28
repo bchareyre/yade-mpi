@@ -31,7 +31,7 @@ class ElasticCriterionTimeStepper : public TimeStepper
 		ElasticCriterionTimeStepper();
 		virtual ~ElasticCriterionTimeStepper();
 	
-		virtual void computeTimeStep(Body* body);
+		virtual void computeTimeStep(MetaBody* body);
 
 	protected :
 		virtual void registerAttributes();

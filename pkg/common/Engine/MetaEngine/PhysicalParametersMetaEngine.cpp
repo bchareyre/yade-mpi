@@ -12,9 +12,8 @@
 #include<yade/core/MetaBody.hpp>
 
 
-void PhysicalParametersMetaEngine::action(Body* body)
+void PhysicalParametersMetaEngine::action(MetaBody* ncb)
 {
-	MetaBody * ncb = YADE_CAST<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	
 	BodyContainer::iterator bi    = bodies->begin();
@@ -25,7 +24,7 @@ void PhysicalParametersMetaEngine::action(Body* body)
 		operator()(b->physicalParameters,b.get());
 	}
 	
- 	operator()(body->physicalParameters,body);
+ 	operator()(ncb->physicalParameters,ncb);
 }
 
 YADE_PLUGIN();

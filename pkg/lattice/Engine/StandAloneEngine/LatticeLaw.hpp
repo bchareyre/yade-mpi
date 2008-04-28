@@ -30,7 +30,7 @@ class LatticeLaw : public InteractionSolver
 		bool roughEdges,ensure2D,calcTorsion; // FIXME, FIXME, FIXME 
 		LatticeLaw();
 		virtual ~LatticeLaw();
-		void action(Body* body);
+		void action(MetaBody*);
 		void registerAttributes()
 		{
 			REGISTER_ATTRIBUTE(roughEdges);

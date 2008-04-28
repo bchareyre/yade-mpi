@@ -39,10 +39,9 @@ void StaticAttractionEngine::registerAttributes()
  *   After the compression stage is over, engine should be disabled by 
  *   setting active=false;
  */
-void StaticAttractionEngine::applyCondition(Body * body)
+void StaticAttractionEngine::applyCondition(MetaBody * ncb)
 {
 
-	MetaBody * ncb = static_cast<MetaBody*>(body);
 	BodyContainer::iterator bi    = ncb->bodies->begin();
 	BodyContainer::iterator biEnd = ncb->bodies->end();
 	BodyContainer::iterator bi2;

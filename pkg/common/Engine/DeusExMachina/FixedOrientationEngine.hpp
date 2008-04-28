@@ -17,7 +17,7 @@ class FixedOrientationEngine : public DeusExMachina
 {
 	public :
 		Quaternionr fixedOrientation;
-		void applyCondition(Body * body);
+		void applyCondition(MetaBody *);
 
 		FixedOrientationEngine();
 

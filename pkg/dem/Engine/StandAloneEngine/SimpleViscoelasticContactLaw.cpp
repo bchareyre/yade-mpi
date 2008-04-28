@@ -37,9 +37,8 @@ void SimpleViscoelasticContactLaw::registerAttributes()
 }
 
 
-void SimpleViscoelasticContactLaw::action(Body* body)
+void SimpleViscoelasticContactLaw::action(MetaBody* ncb)
 {
-	MetaBody * ncb = YADE_CAST<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 
 	Real dt = Omega::instance().getTimeStep();

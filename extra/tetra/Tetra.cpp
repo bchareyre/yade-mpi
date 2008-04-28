@@ -373,10 +373,8 @@ CREATE_LOGGER(TetraLaw);
 /*! Apply forces on tetrahedra in collision based on geometric configuration provided by Tetra2TetraBang.
  *
  * Comments on functionality limitations are in the code. It has not been tested at all!!! */
-void TetraLaw::action(Body* body)
+void TetraLaw::action(MetaBody* rootBody)
 {
- 	MetaBody* rootBody = dynamic_cast<MetaBody*>(body);
-	//shared_ptr<BodyContainer>& bodies = rootBody->bodies;
 
 	for(InteractionContainer::iterator contactI=rootBody->transientInteractions->begin(); contactI!=rootBody->transientInteractions->end(); ++contactI){
 		if (!(*contactI)->isReal) continue; // Tetra2TetraBang::go returned false for this interaction, skip it

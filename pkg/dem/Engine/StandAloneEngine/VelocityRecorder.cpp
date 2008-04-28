@@ -45,9 +45,8 @@ bool VelocityRecorder::isActivated()
 }
 
 
-void VelocityRecorder::action(Body * body)
+void VelocityRecorder::action(MetaBody * ncb)
 {
-	MetaBody * ncb = YADE_CAST<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	
 	Real x=0, y=0, z=0, size=0;//, totalMass=0; FIXME- how many recorders/Actors to make simple stuff?

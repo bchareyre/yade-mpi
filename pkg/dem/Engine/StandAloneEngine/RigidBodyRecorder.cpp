@@ -44,9 +44,8 @@ bool RigidBodyRecorder::isActivated()
    return ((Omega::instance().getCurrentIteration() % interval == 0));
 }
 
-void RigidBodyRecorder::action(Body * body)
+void RigidBodyRecorder::action(MetaBody * ncb)
 {
-    MetaBody * ncb = YADE_CAST<MetaBody*>(body);
     shared_ptr<BodyContainer>& bodies = ncb->bodies;
 
     BodyContainer::iterator bi	    = bodies->begin();

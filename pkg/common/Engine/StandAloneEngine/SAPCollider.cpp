@@ -51,10 +51,8 @@ SAPCollider::~SAPCollider ()
 }
 
 
-void SAPCollider::action(Body* body)
+void SAPCollider::action(MetaBody* ncb)
 {
-
-	MetaBody * ncb = YADE_CAST<MetaBody*>(body);
 	shared_ptr<BodyContainer> bodies = ncb->bodies;
 
 	unsigned int i;

@@ -23,7 +23,7 @@ class PhysicalActionContainerInitializer : public StandAloneEngine
 	
 		PhysicalActionContainerInitializer();
 		virtual ~PhysicalActionContainerInitializer();
-		virtual void action(Body* body);
+		virtual void action(MetaBody*);
 	
 	protected : 
 		virtual void registerAttributes();

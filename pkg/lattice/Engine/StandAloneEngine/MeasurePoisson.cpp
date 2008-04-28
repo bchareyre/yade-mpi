@@ -58,7 +58,7 @@ bool MeasurePoisson::isActivated()
 }
 
 
-void MeasurePoisson::action(Body * body)
+void MeasurePoisson::action(MetaBody * ncb)
 {
 
 
@@ -69,7 +69,6 @@ void MeasurePoisson::action(Body * body)
 		std::cerr << "bad nodes!\n";
 		return;
 	}
-	MetaBody * ncb = static_cast<MetaBody*>(body);
 
 	LatticeNodeParameters* node_left   = YADE_CAST<LatticeNodeParameters*>( (*(ncb->bodies))[left  ]->physicalParameters . get() );
 	(*(ncb->bodies))[left  ]->geometricalModel->diffuseColor = Vector3r(1.0,1.0,0.0); // FIXME [1]

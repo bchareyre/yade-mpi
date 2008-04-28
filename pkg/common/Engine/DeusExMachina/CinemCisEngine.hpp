@@ -28,7 +28,7 @@ class CinemCisEngine : public DeusExMachina
 
 	public :
 		CinemCisEngine();
-		void applyCondition(Body * body);
+		void applyCondition(MetaBody * body);
 
 		Real	 shearSpeed	// to be defined in the PreProcessor
 			,thetalim 	// the maximum value of theta, at wich the displacement is stopped
@@ -39,8 +39,8 @@ class CinemCisEngine : public DeusExMachina
 
 	protected :
 		void registerAttributes();
-		void applyRotTranslation(Body *body);	// to let move (rotation combined with translation) the lateral walls
-		void applyTranslation(Body *body);	// to let move (translation) the upper wall
+		void applyRotTranslation(MetaBody *);	// to let move (rotation combined with translation) the lateral walls
+		void applyTranslation(MetaBody *);	// to let move (translation) the upper wall
 	REGISTER_CLASS_NAME(CinemCisEngine);
 	REGISTER_BASE_CLASS_NAME(DeusExMachina);
 };

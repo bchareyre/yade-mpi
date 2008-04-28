@@ -49,9 +49,8 @@ void DisplacementToForceEngine::registerAttributes()
 }
 
 
-void DisplacementToForceEngine::applyCondition(Body * body)
+void DisplacementToForceEngine::applyCondition(MetaBody * ncb)
 {
-	MetaBody * ncb = static_cast<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 
 	std::vector<int>::const_iterator ii = subscribedBodies.begin();

@@ -26,7 +26,7 @@ class FEMLaw : public InteractionSolver
 		virtual ~FEMLaw();
 
 /// Methods
-		void action(Body* body);
+		void action(MetaBody*);
 
 /// Serializtion
 	protected :

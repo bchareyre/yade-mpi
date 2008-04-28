@@ -44,9 +44,8 @@ void PositionOrientationRecorder::registerAttributes()
 }
 
 
-void PositionOrientationRecorder::action(Body * body)
+void PositionOrientationRecorder::action(MetaBody * ncb)
 {
-	MetaBody* ncb = YADE_CAST<MetaBody*>(body);
 	if( Omega::instance().getCurrentIteration() % interval == 0 ){
 		ostringstream oss;
 		oss<<setfill('0')<<outputFile<<"_"<<setw(6)<<Omega::instance().getCurrentIteration();

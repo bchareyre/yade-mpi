@@ -33,7 +33,7 @@ class CapillaryRecorder : public DataRecorder
 		CapillaryRecorder ();
 
 		virtual void registerAttributes();
-		virtual void action(Body* b);
+		virtual void action(MetaBody*);
 		virtual bool isActivated();
 
 	protected :

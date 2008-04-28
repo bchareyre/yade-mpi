@@ -83,14 +83,13 @@ Parameters::~Parameters()
 ;
 
 //FIXME : remove bool first !!!!!
-void CapillaryCohesiveLaw::action(Body* body)
+void CapillaryCohesiveLaw::action(MetaBody* ncb)
 {
 
 //compteur1 = 0;
 //compteur2 = 0;
         // 	cerr << "CapillaryCohesiveLaw::action" << endl;
 	//if (CapillaryPressure!=0) {
-        MetaBody * ncb = static_cast<MetaBody*>(body);
         shared_ptr<BodyContainer>& bodies = ncb->bodies;
 
 

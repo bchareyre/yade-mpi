@@ -49,10 +49,8 @@ bool CapillaryRecorder::isActivated()
 }
 
 
-void CapillaryRecorder::action(Body * body)
+void CapillaryRecorder::action(MetaBody * ncb)
 {
-	MetaBody * ncb = static_cast<MetaBody*>(body);
-		
 	Real fx=0, fy=0, fz=0;
 	
 	

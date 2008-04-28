@@ -47,21 +47,26 @@ class UniaxialStrainer: public DeusExMachina {
 		Real strainRate,currentStrainRate,originalLength,limitStrain;
 		Real sumPosForces,sumNegForces;
 		Real crossSectionArea;
+		//! Apply strain along x (0), y (1) or z(2) axis
 		int axis;
+		//! If 0, straining is symmetric for negIds and posIds; for 1 (or -1), only posIds are strained and negIds don't move (or vice versa)
+		int asymmetry;
+
 		bool notYetReversed;
 		bool clumped;
 		vector<body_id_t> posIds, negIds;
 		vector<Real> posCoords,negCoords;
 
-		virtual void applyCondition(Body* _rootBody);
+		virtual void applyCondition(MetaBody* rootBody);
 		void init();
-		UniaxialStrainer(){axis=2; currentStrainRate=0; originalLength=-1; limitStrain=-1; notYetReversed=true; crossSectionArea=-1; needsInit=true; clumped=false; };
+		UniaxialStrainer(){axis=2; asymmetry=0; currentStrainRate=0; originalLength=-1; limitStrain=0; notYetReversed=true; crossSectionArea=-1; needsInit=true; clumped=false; };
 		virtual ~UniaxialStrainer(){};
 		void registerAttributes(){
 			DeusExMachina::registerAttributes();
 			REGISTER_ATTRIBUTE(strainRate);
 			REGISTER_ATTRIBUTE(currentStrainRate);
 			REGISTER_ATTRIBUTE(axis);
+			REGISTER_ATTRIBUTE(asymmetry);
 			REGISTER_ATTRIBUTE(posIds);
 			REGISTER_ATTRIBUTE(negIds);
 			REGISTER_ATTRIBUTE(originalLength);

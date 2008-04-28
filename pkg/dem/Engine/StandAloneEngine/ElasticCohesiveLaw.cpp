@@ -40,9 +40,8 @@ void ElasticCohesiveLaw::registerAttributes()
 }
 
 
-void ElasticCohesiveLaw::action(Body* body)
+void ElasticCohesiveLaw::action(MetaBody* ncb)
 {
-	MetaBody * ncb = YADE_CAST<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 
 	Real dt = Omega::instance().getTimeStep();

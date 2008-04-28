@@ -1,6 +1,8 @@
 // 2007 © Václav Šmilauer <eudoxos@arcig.cz>
 #include"Shop.hpp"
 
+#include<limits>
+
 #include<boost/filesystem/convenience.hpp>
 
 #include<yade/core/MetaBody.hpp>
@@ -61,6 +63,10 @@ class MetaInteractingGeometry2AABB; */
 #include<yade/pkg-dem/ElasticContactInteraction.hpp>
 #include<yade/pkg-dem/SDECLinkGeometry.hpp>
 #include<yade/pkg-dem/SDECLinkPhysics.hpp>
+
+#include<yade/lib-opengl/OpenGLWrapper.hpp>
+#include<yade/lib-QGLViewer/qglviewer.h>
+
 
 
 #if 0
@@ -1123,5 +1129,45 @@ int Shop::createCohesion(Real limitNormalForce, Real limitShearForce, int cohesi
 	// TODO: warn user if CohesiveElasticLaw is not active
 
 	return numNewLinks;
+}
+
+Real Shop::ElasticWaveTimestepEstimate(shared_ptr<MetaBody> rootBody){
+	Real minDt=std::numeric_limits<Real>::infinity();
+	BodyContainer::iterator Iend=rootBody->bodies->end();
+	for(BodyContainer::iterator I=rootBody->bodies->begin(); I!=Iend; ++I){
+		const shared_ptr<Body>& b=*I;
+		shared_ptr<Sphere> sphere=dynamic_pointer_cast<Sphere>(b->geometricalModel);
+		shared_ptr<ElasticBodyParameters> elast=dynamic_pointer_cast<ElasticBodyParameters>(b->physicalParameters);
+		if(!sphere || !elast) continue;
+		Real density=elast->mass/((4./3.)*pow(Mathr::PI*sphere->radius,3));
+		Real thisDt=2*sphere->radius/sqrt(elast->young/density);
+		minDt=std::min(minDt,thisDt);
+	}
+	return minDt;
+}
+
+void Shop::GLDrawLine(Vector3r from, Vector3r to, Vector3r color){
+	glEnable(GL_LIGHTING); glColor3v(color);
+	glBegin(GL_LINES); glVertex3v(from); glVertex3v(to); glEnd();
+}
+
+void Shop::GLDrawArrow(Vector3r from, Vector3r to, Vector3r color){
+	glEnable(GL_LIGHTING); glColor3v(color); qglviewer::Vec a(from[0],from[1],from[2]),b(to[0],to[1],to[2]); QGLViewer::drawArrow(a,b);	
+}
+
+void Shop::GLDrawNum(Real n, Vector3r pos, Vector3r color, unsigned precision){
+	ostringstream oss; oss<<setprecision(precision)<< /* "w="<< */ (double)n;
+	Shop::GLDrawText(oss.str(),pos,color);
+}
+
+void Shop::GLDrawText(std::string txt, Vector3r pos, Vector3r color){
+	glPushMatrix();
+	glTranslatev(pos);
+	glColor3(color[0],color[1],color[2]);
+	glRasterPos2i(0,0);
+	for(unsigned int i=0;i<txt.length();i++)
+		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, txt[i]);
+	glPopMatrix();
+
 }
 

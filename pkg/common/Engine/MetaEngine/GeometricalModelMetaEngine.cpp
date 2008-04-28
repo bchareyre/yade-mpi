@@ -9,9 +9,8 @@
 #include "GeometricalModelMetaEngine.hpp"
 #include<yade/core/MetaBody.hpp>
 
-void GeometricalModelMetaEngine::action(Body* body)
+void GeometricalModelMetaEngine::action(MetaBody* ncb)
 {
-	MetaBody * ncb = YADE_CAST<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	
 	BodyContainer::iterator bi    = bodies->begin();
@@ -23,8 +22,8 @@ void GeometricalModelMetaEngine::action(Body* body)
 			operator()(b->physicalParameters,b->geometricalModel,b.get());
 	}
 	
-	if(body->geometricalModel)
-	 	operator()(body->physicalParameters,body->geometricalModel,body);
+	if(ncb->geometricalModel)
+	 	operator()(ncb->physicalParameters,ncb->geometricalModel,ncb);
 }
 
 YADE_PLUGIN();

@@ -64,9 +64,8 @@ void outv(Vector3r axis)
 	std::cout << " axis: " <<  axis[0] << " " << axis[1] << " " << axis[2] << ", length: " << axis.Length() << " | ";
 }
 
-void CohesiveFrictionalContactLaw::action(Body* body)
+void CohesiveFrictionalContactLaw::action(MetaBody* ncb)
 {
-    MetaBody * ncb = YADE_CAST<MetaBody*>(body);
     shared_ptr<BodyContainer>& bodies = ncb->bodies;
 
     Real dt = Omega::instance().getTimeStep();

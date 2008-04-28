@@ -30,7 +30,7 @@ class ElasticContactLaw : public InteractionSolver
 		bool momentRotationLaw;
 	
 		ElasticContactLaw();
-		void action(Body* body);
+		void action(MetaBody*);
 
 	protected :
 		void registerAttributes();

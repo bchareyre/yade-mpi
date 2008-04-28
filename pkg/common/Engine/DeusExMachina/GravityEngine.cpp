@@ -27,9 +27,8 @@ void GravityEngine::registerAttributes()
 }
 
 
-void GravityEngine::applyCondition(Body* body)
+void GravityEngine::applyCondition(MetaBody* ncb)
 {
-	MetaBody * ncb = YADE_CAST<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	
 	BodyContainer::iterator bi    = bodies->begin();

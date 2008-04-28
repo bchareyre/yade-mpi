@@ -79,7 +79,7 @@ void TriaxialCompressionEngine::registerAttributes()
 	REGISTER_ATTRIBUTE(frictionAngleDegree);
 }
 
-void TriaxialCompressionEngine::doStateTransition(Body * body, stateNum nextState){
+void TriaxialCompressionEngine::doStateTransition(MetaBody * body, stateNum nextState){
 	if ( /* currentState==STATE_UNINITIALIZED && */ nextState==STATE_ISO_COMPACTION){
 		sigma_iso=sigmaIsoCompaction;
 		previousSigmaIso=sigma_iso;
@@ -126,11 +126,10 @@ void TriaxialCompressionEngine::doStateTransition(Body * body, stateNum nextStat
 		LOG_ERROR("Undefined transition from "<<stateName(currentState)<<" to "<<stateName(nextState)<<"! (ignored)");
 }
 
-void TriaxialCompressionEngine::updateParameters ( Body * body )
+void TriaxialCompressionEngine::updateParameters ( MetaBody * ncb )
 {
 
-	UnbalancedForce=ComputeUnbalancedForce ( body ); // calculated at every iteration
-	MetaBody * ncb = static_cast<MetaBody*> ( body );
+	UnbalancedForce=ComputeUnbalancedForce ( ncb ); // calculated at every iteration
 
 
 	if ( currentState==STATE_ISO_COMPACTION || currentState==STATE_ISO_UNLOADING )
@@ -148,13 +147,13 @@ void TriaxialCompressionEngine::updateParameters ( Body * body )
 		{
 			if ( currentState==STATE_ISO_COMPACTION && autoCompressionActivation )
 			{
-				doStateTransition (body, STATE_ISO_UNLOADING ); /*update stress and strain here*/ computeStressStrain ( ncb );
+				doStateTransition (ncb, STATE_ISO_UNLOADING ); /*update stress and strain here*/ computeStressStrain ( ncb );
 			}
 			else if ( currentState==STATE_ISO_UNLOADING && autoCompressionActivation )
 			{
-				doStateTransition (body, STATE_TRIAX_LOADING ); computeStressStrain ( ncb );
+				doStateTransition (ncb, STATE_TRIAX_LOADING ); computeStressStrain ( ncb );
 			}
-			else doStateTransition (body, STATE_LIMBO );
+			else doStateTransition (ncb, STATE_LIMBO );
 		}
 #if 0
 		//This is a hack in order to allow subsequent run without activating compression - like for the YADE-COMSOL coupling
@@ -179,15 +178,15 @@ void TriaxialCompressionEngine::updateParameters ( Body * body )
 }
 
 
-void TriaxialCompressionEngine::applyCondition ( Body * body )
+void TriaxialCompressionEngine::applyCondition ( MetaBody * ncb )
 {
 	// here, we make sure to get consistent parameters, in case someone fiddled with the scene .xml manually
 	if ( firstRun )
 	{
 		LOG_INFO ( "First run, will initialize!" );
 		//sigma_iso was changed, we need to rerun compaction
-		if ( (sigmaIsoCompaction!=previousSigmaIso || currentState==STATE_UNINITIALIZED || currentState== STATE_LIMBO) && currentState!=STATE_TRIAX_LOADING ) doStateTransition (body, STATE_ISO_COMPACTION );
-		if ( previousState==STATE_LIMBO && currentState==STATE_TRIAX_LOADING ) doStateTransition (body, STATE_TRIAX_LOADING );
+		if ( (sigmaIsoCompaction!=previousSigmaIso || currentState==STATE_UNINITIALIZED || currentState== STATE_LIMBO) && currentState!=STATE_TRIAX_LOADING ) doStateTransition (ncb, STATE_ISO_COMPACTION );
+		if ( previousState==STATE_LIMBO && currentState==STATE_TRIAX_LOADING ) doStateTransition (ncb, STATE_TRIAX_LOADING );
 		previousState=currentState;
 		previousSigmaIso=sigma_iso;
 		firstRun=false; // change this only _after_ state transitions
@@ -210,11 +209,11 @@ void TriaxialCompressionEngine::applyCondition ( Body * body )
 		return;
 	}
 
-	TriaxialStressController::applyCondition ( body );
+	TriaxialStressController::applyCondition ( ncb );
 
 	if ( Omega::instance().getCurrentIteration() % testEquilibriumInterval == 0 )
 	{
-		updateParameters ( body );
+		updateParameters ( ncb );
 		LOG_INFO("UnbalancedForce="<< UnbalancedForce);
 	}
 	
@@ -238,9 +237,8 @@ void TriaxialCompressionEngine::applyCondition ( Body * body )
 	}
 }
 
-void TriaxialCompressionEngine::setContactProperties(Body * body, Real frictionDegree)
+void TriaxialCompressionEngine::setContactProperties(MetaBody * ncb, Real frictionDegree)
 {
-	MetaBody * ncb = static_cast<MetaBody*> ( body );
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 			
 	BodyContainer::iterator bi = bodies->begin();

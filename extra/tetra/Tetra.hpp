@@ -147,7 +147,7 @@ class TetraLaw: public InteractionSolver {
 
 		int sdecGroupMask; // probably unused?!
 
-		void action(Body* body);
+		void action(MetaBody*);
 
 		DECLARE_LOGGER;
 	protected:

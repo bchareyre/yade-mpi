@@ -50,7 +50,7 @@ class NewtonsDampedLaw : public DeusExMachina
 		
 		
 	public :
-		virtual	void applyCondition(Body * body);		
+		virtual	void applyCondition(MetaBody *);		
 		NewtonsDampedLaw();
 	
 	protected :

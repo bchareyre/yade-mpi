@@ -90,12 +90,11 @@ bool NodeRecorder::isActivated()
 }
 
 
-void NodeRecorder::action(Body * body)
+void NodeRecorder::action(MetaBody * ncb)
 {
 //	std::cerr << "NodeRecorder quits\n";
 //	return;
 	
-	MetaBody * ncb = static_cast<MetaBody*>(body);
 
 	if(first)
 	{

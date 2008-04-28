@@ -29,7 +29,7 @@ class PythonRecorder: public DataRecorder
 	public :
 		//! Constructor that imports pyade module (warns if there is an error).
 		PythonRecorder();
-		virtual void action(Body* b);
+		virtual void action(MetaBody*);
 		virtual bool isActivated(){return true;}
 		virtual void registerAttributes(){DataRecorder::registerAttributes(); REGISTER_ATTRIBUTE(runExpr); REGISTER_ATTRIBUTE(initExpr); REGISTER_ATTRIBUTE(outputFile);}
 		//! This expression will be interpreted when the engine is called (every iteration)

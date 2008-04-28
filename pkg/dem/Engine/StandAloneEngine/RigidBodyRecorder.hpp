@@ -27,7 +27,7 @@ public :
     RigidBodyRecorder ();
     ~RigidBodyRecorder ();
 
-    virtual void action(Body* body);
+    virtual void action(MetaBody*);
       bool isActivated();
 
 protected :

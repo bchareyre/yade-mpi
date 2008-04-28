@@ -58,7 +58,7 @@ class CapillaryCohesiveLaw : public InteractionSolver
 		shared_ptr<capillarylaw> capillary;
 						
 		CapillaryCohesiveLaw();
-		void action(Body* body);
+		void action(MetaBody* ncb);
 
 	protected : 
 		void registerAttributes();

@@ -28,7 +28,7 @@ class CapillaryPressureEngine : public DeusExMachina
 		//shared_ptr<CapillaryCohesiveLaw>  capillaryCohesiveLaw;
 		CapillaryCohesiveLaw* capillaryCohesiveLaw;
 				
-		void applyCondition(Body * body);
+		void applyCondition(MetaBody * body);
 
 	protected :
 		virtual void registerAttributes();

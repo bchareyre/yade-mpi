@@ -146,9 +146,8 @@ void GlobalStiffnessCounter::traverseInteractions(MetaBody* ncb, const shared_pt
 	}
 }
 
-void GlobalStiffnessCounter::action(Body* body)
+void GlobalStiffnessCounter::action(MetaBody* ncb)
 {
-	MetaBody * ncb = YADE_CAST<MetaBody*>(body);
 	// shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	//	Real dt = Omega::instance().getTimeStep();
 

@@ -51,12 +51,11 @@ bool StrainRecorder::isActivated()
 }
 
 
-void StrainRecorder::action(Body * body)
+void StrainRecorder::action(MetaBody * ncb)
 {
 //	std::cerr << "StrainRecorder quits\n";
 //	return;
 	
-	MetaBody * ncb = static_cast<MetaBody*>(body);
 	Real strain_y=0,stress_y=0,stress_s=0;//,stress_nonlocal_y=0;
 	
 	std::vector<unsigned int>::iterator i   = subscribedBodies.begin();

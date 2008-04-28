@@ -51,9 +51,8 @@ bool ForceRecorder::isActivated()
 }
 
 
-void ForceRecorder::action(Body * body)
+void ForceRecorder::action(MetaBody * ncb)
 {
-	MetaBody * ncb = YADE_CAST<MetaBody*>(body);
 	Real x=0, y=0, z=0;
 	
 	for( int i = startId ; i <= endId ; ++i )

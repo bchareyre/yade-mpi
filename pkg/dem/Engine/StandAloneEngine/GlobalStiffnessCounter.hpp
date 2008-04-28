@@ -41,7 +41,7 @@ class GlobalStiffnessCounter : public InteractionSolver
 		bool assumeElasticSpheres;
 	
 		GlobalStiffnessCounter();
-		void action(Body* body);
+		void action(MetaBody*);
 		virtual bool isActivated();
 
 	protected :

@@ -29,11 +29,8 @@ NewtonsDampedLaw::NewtonsDampedLaw()
 	
 }
 
-void NewtonsDampedLaw::applyCondition ( Body * body )
+void NewtonsDampedLaw::applyCondition ( MetaBody * ncb )
 {
-
-
-	MetaBody * ncb = static_cast<MetaBody*> ( body );
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	BodyContainer::iterator bi    = bodies->begin();
 	BodyContainer::iterator biEnd = bodies->end();

@@ -22,7 +22,7 @@ class RotationEngine : public DeusExMachina
 		Vector3r rotationAxis;
 		bool rotateAroundZero;
 
-		void applyCondition(Body * body);
+		void applyCondition(MetaBody * );
 
 	protected :
 		void registerAttributes();

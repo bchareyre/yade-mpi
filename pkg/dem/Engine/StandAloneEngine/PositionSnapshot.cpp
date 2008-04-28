@@ -60,7 +60,7 @@ bool PositionSnapshot::isActivated()
 
 
 
-void PositionSnapshot::action(Body * body)
+void PositionSnapshot::action(MetaBody * ncb)
 {
 // 	copie de outputFile dans ce qui sera utilise pour le nom des fichiers resultats
 	nom_int=outputFile;
@@ -72,7 +72,6 @@ void PositionSnapshot::action(Body * body)
 	// first line of output file
 	myfile << "Id Rayon Xc Yc Zc   a l'it " << Omega::instance().getCurrentIteration() << endl;
 
-	MetaBody * ncb = static_cast<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	Vector3r pos(Vector3r::ZERO);	// which will be the position (of the center) of the considered body
 	body_id_t Id;			// its identity

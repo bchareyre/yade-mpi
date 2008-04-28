@@ -5,9 +5,7 @@
 
 YADE_PLUGIN("CentralGravityEngine","AxialGravityEngine");
 
-void CentralGravityEngine::applyCondition(Body* _rootBody){
-	/* get "rootBody", which is the whole simulation */
-	MetaBody* rootBody=YADE_CAST<MetaBody*>(_rootBody);
+void CentralGravityEngine::applyCondition(MetaBody* rootBody){
 	/* get the central body, by its id; cast its Body::physicalParameters to ParticleParameters, since we need the mass */
 	Real centralMass=YADE_PTR_CAST<ParticleParameters>(Body::byId(centralBody)->physicalParameters)->mass;
 	/* position of the central body */
@@ -29,8 +27,7 @@ void CentralGravityEngine::applyCondition(Body* _rootBody){
 	}
 }
 CREATE_LOGGER(AxialGravityEngine);
-void AxialGravityEngine::applyCondition(Body* _rootBody){
-	MetaBody* rootBody=YADE_CAST<MetaBody*>(_rootBody);
+void AxialGravityEngine::applyCondition(MetaBody* rootBody){
 	BodyContainer::iterator Iend=rootBody->bodies->end();
 	for(BodyContainer::iterator I=rootBody->bodies->begin(); I!=Iend; ++I){
 		const shared_ptr<Body>& b(*I);

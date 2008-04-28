@@ -139,6 +139,8 @@ class pyClass{shared_ptr<AttrAccess> accessor; \
 #define BASIC_PY_PROXY(pyClass,yadeClass) BASIC_PY_PROXY_HEAD(pyClass,yadeClass) BASIC_PY_PROXY_TAIL
 
 
+BASIC_PY_PROXY(pyGeneric,Serializable);
+
 BASIC_PY_PROXY(pyInteractionGeometry,InteractionGeometry);
 BASIC_PY_PROXY(pyInteractionPhysics,InteractionPhysics);
 
@@ -339,6 +341,24 @@ class pyOmega{
 
 	void saveSpheres(std::string fileName){ Shop::saveSpheresToFile(fileName); }
 
+	python::list miscParams_get(){
+		python::list ret;
+		BOOST_FOREACH(shared_ptr<Serializable>& s, OMEGA.getRootBody()->miscParams){
+			ret.append(pyGeneric(s));
+		}
+		return ret;
+	}
+
+	void miscParams_set(python::list l){
+		int len=PySequence_Size(l.ptr());
+		vector<shared_ptr<Serializable> >& miscParams=OMEGA.getRootBody()->miscParams;
+		miscParams.clear();
+		for(int i=0; i<len; i++){
+			if(python::extract<pyGeneric>(PySequence_GetItem(l.ptr(),i)).check()){ pyGeneric g=python::extract<pyGeneric>(PySequence_GetItem(l.ptr(),i)); miscParams.push_back(g.proxee); }
+			else throw std::invalid_argument("Unable to extract `Generic' from item #"+lexical_cast<string>(i)+".");
+		}
+	}
+
 	python::list anyEngines_get(vector<shared_ptr<Engine> >& engContainer){
 		python::list ret; 
 		BOOST_FOREACH(shared_ptr<Engine>& eng, engContainer){
@@ -502,6 +522,7 @@ BOOST_PYTHON_MODULE(yadeControl)
 		.def("step",&pyOmega::step)
 		.def("wait",&pyOmega::wait)
 		.add_property("engines",&pyOmega::engines_get,&pyOmega::engines_set)
+		.add_property("miscParams",&pyOmega::miscParams_get,&pyOmega::miscParams_set)
 		.add_property("initializers",&pyOmega::initializers_get,&pyOmega::initializers_set)
 		.add_property("bodies",&pyOmega::bodies_get)
 		.add_property("interactions",&pyOmega::interactions_get)
@@ -557,6 +578,8 @@ BOOST_PYTHON_MODULE(yadeControl)
 	BASIC_PY_PROXY_WRAPPER(pyBoundingVolume,"BoundingVolume");
 	BASIC_PY_PROXY_WRAPPER(pyInteractionGeometry,"InteractionGeometry");
 	BASIC_PY_PROXY_WRAPPER(pyInteractionPhysics,"InteractionPhysics");
+
+	BASIC_PY_PROXY_WRAPPER(pyGeneric,"Generic");
 
 	BASIC_PY_PROXY_WRAPPER(pyBody,"Body")
 		.add_property("shape",&pyBody::shape_get,&pyBody::shape_set)

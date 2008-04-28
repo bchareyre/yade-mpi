@@ -59,6 +59,7 @@ void MetaBody::registerAttributes()
 	REGISTER_ATTRIBUTE(transientInteractions);
 	REGISTER_ATTRIBUTE(persistentInteractions);
 	REGISTER_ATTRIBUTE(physicalActions); // FIXME - needed or not ? - Olivier : yes it is needed if there is no default initialization into constructor
+	REGISTER_ATTRIBUTE(miscParams);
 	REGISTER_ATTRIBUTE(dt);
 
 	REGISTER_ATTRIBUTE(recover);

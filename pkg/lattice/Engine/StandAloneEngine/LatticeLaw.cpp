@@ -91,11 +91,10 @@ void LatticeLaw::calcBeamPositionOrientationNewLength(Body* body, BodyContainer*
 
 }
 
-void LatticeLaw::action(Body* body)
+void LatticeLaw::action(MetaBody* lattice)
 {
 	futureDeletes.clear();
 
-	MetaBody * lattice = static_cast<MetaBody*>(body);
 
 	int nodeGroupMask  = static_cast<LatticeSetParameters*>(lattice->physicalParameters.get())->nodeGroupMask;
 	int beamGroupMask  = static_cast<LatticeSetParameters*>(lattice->physicalParameters.get())->beamGroupMask;

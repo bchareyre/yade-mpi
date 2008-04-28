@@ -48,7 +48,7 @@ class ContactStressRecorder : public DataRecorder
 		ContactStressRecorder ();
 
 		virtual void registerAttributes();
-		virtual void action(Body* b);
+		virtual void action(MetaBody*);
 		virtual bool isActivated();
 
 	protected :

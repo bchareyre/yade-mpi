@@ -63,7 +63,7 @@ class SAPCollider : public BroadInteractor
 		~SAPCollider ();
 
 		// return a list "transientInteractions" of pairs of Body which Bounding volume are in potential interaction
-		void action(Body * body);
+		void action(MetaBody *);
 
 
 		// Used the first time broadInteractionTest is called, to initialize and sort the xBounds, yBounds,

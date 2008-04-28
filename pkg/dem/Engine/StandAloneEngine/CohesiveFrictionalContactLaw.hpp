@@ -31,7 +31,7 @@ class CohesiveFrictionalContactLaw : public InteractionSolver
 		long iter;/// used for checking if new iteration
 	
 		CohesiveFrictionalContactLaw();
-		void action(Body* body);
+		void action(MetaBody*);
 
 	protected :
 		void registerAttributes();

@@ -107,9 +107,8 @@ void ElasticCriterionTimeStepper::findTimeStepFromInteraction(const shared_ptr<I
 }
 
 
-void ElasticCriterionTimeStepper::computeTimeStep(Body* body)
+void ElasticCriterionTimeStepper::computeTimeStep(MetaBody* ncb)
 {
-	MetaBody * ncb = YADE_CAST<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	shared_ptr<InteractionContainer>& persistentInteractions = ncb->persistentInteractions;
 	shared_ptr<InteractionContainer>& transientInteractions = ncb->transientInteractions;

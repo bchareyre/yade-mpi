@@ -11,9 +11,8 @@
 #include "InteractingGeometryMetaEngine.hpp"
 #include<yade/core/MetaBody.hpp>
 
-void InteractingGeometryMetaEngine::action(Body* body)
+void InteractingGeometryMetaEngine::action(MetaBody* ncb)
 {
-	MetaBody * ncb = YADE_CAST<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	
 	BodyContainer::iterator bi    = bodies->begin();
@@ -25,8 +24,8 @@ void InteractingGeometryMetaEngine::action(Body* body)
 			operator()(b->geometricalModel,b->interactingGeometry,b->physicalParameters->se3,b.get());
 	}
 		
-	if(body->geometricalModel && body->interactingGeometry)
-		operator()(body->geometricalModel,body->interactingGeometry,body->physicalParameters->se3,body);
+	if(ncb->geometricalModel && ncb->interactingGeometry)
+		operator()(ncb->geometricalModel,ncb->interactingGeometry,ncb->physicalParameters->se3,ncb);
 }
 
 YADE_PLUGIN();

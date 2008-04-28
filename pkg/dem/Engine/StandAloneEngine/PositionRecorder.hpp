@@ -25,7 +25,7 @@ class PositionRecorder : public DataRecorder
 	
 		PositionRecorder ();
 		~PositionRecorder ();
-		virtual void action(Body* b);
+		virtual void action(MetaBody*);
 		virtual bool isActivated();
 
 	protected :

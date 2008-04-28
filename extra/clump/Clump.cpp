@@ -20,8 +20,7 @@ ClumpMemberMover::ClumpMemberMover(){/*createIndex();*/ }
  * @param pp passed by the dispatcher
  * @param clump passed by the dispatcher
  */
-void ClumpMemberMover::applyCondition(Body* _rootBody){
-	MetaBody* rootBody = YADE_CAST<MetaBody*>(_rootBody);
+void ClumpMemberMover::applyCondition(MetaBody* rootBody){
 	for(BodyContainer::iterator I=rootBody->bodies->begin(); I!=rootBody->bodies->end(); ++I){
 		shared_ptr<Body> b = *I;
 		if(b->isClump()){

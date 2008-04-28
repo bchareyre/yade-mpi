@@ -18,7 +18,7 @@ class PhysicalActionContainerReseter : public StandAloneEngine
 	public :
 		PhysicalActionContainerReseter();
 		virtual ~PhysicalActionContainerReseter();
-		virtual void action(Body* body);
+		virtual void action(MetaBody*);
 
 	REGISTER_CLASS_NAME(PhysicalActionContainerReseter);
 	REGISTER_BASE_CLASS_NAME(StandAloneEngine);

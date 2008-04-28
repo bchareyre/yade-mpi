@@ -30,11 +30,6 @@ using namespace std;
 using boost::shared_ptr;
 
 class Shop{
-	/* the only non-static thing to make class factory happy */
-	//public: Shop(){};
-	//REGISTER_CLASS_NAME(Shop);
-	//REGISTER_BASE_CLASS_NAME();
-		
 	private:
 		DECLARE_LOGGER;
 	public:
@@ -71,5 +66,12 @@ class Shop{
 		// (true || boost::lambda::_1) means that true is the default
 		static int createCohesion(Real limitNormalForce, Real limitShearForce, int groupMask=0,
 			boost::function<bool(body_id_t,body_id_t)> linkOK = (true || boost::lambda::_1) );
+
+		static Real ElasticWaveTimestepEstimate(shared_ptr<MetaBody>);
+
+		static void GLDrawLine(Vector3r from, Vector3r to, Vector3r color=Vector3r(1,1,1));
+		static void GLDrawArrow(Vector3r from, Vector3r to, Vector3r color=Vector3r(1,1,1));
+		static void GLDrawText(std::string text, Vector3r pos, Vector3r color=Vector3r(1,1,1));
+		static void GLDrawNum(Real n, Vector3r pos, Vector3r color=Vector3r(1,1,1), unsigned precision=3);
 
 };

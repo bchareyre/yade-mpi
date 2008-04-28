@@ -41,10 +41,8 @@ PersistentTriangulationCollider::~PersistentTriangulationCollider()
 	delete Tes;
 }
 
-void PersistentTriangulationCollider::action ( Body* body )
+void PersistentTriangulationCollider::action ( MetaBody* ncb )
 {
-
-	MetaBody *ncb=YADE_CAST<MetaBody*> ( body );
 	shared_ptr<BodyContainer> bodies=ncb->bodies;
 	bool triangulationIteration = false;
 

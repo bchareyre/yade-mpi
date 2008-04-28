@@ -110,12 +110,11 @@ bool BeamRecorder::isActivated()
 }
 
 
-void BeamRecorder::action(Body * body)
+void BeamRecorder::action(MetaBody * ncb)
 {
 //	std::cerr << "BeamRecorder quits\n";
 //	return;
 	
-	MetaBody * ncb = static_cast<MetaBody*>(body);
 
 	if(first)
 	{

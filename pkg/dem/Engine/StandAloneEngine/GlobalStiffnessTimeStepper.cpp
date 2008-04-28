@@ -130,10 +130,9 @@ bool GlobalStiffnessTimeStepper::isActivated()
 }
 
 
-void GlobalStiffnessTimeStepper::computeTimeStep(Body* body)
+void GlobalStiffnessTimeStepper::computeTimeStep(MetaBody* ncb)
 {
 
-	MetaBody * ncb = YADE_CAST<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 // 	shared_ptr<InteractionContainer>& persistentInteractions = ncb->persistentInteractions;
 // 	shared_ptr<InteractionContainer>& transientInteractions = ncb->transientInteractions;

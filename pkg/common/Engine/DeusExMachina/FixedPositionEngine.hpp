@@ -13,15 +13,15 @@
 #include <Wm3Vector3.h>
 #include<yade/lib-base/yadeWm3.hpp>
 
-class FixedPositionEngine : public DeusExMachina
-{
-	public :
-		Vector3r fixedPosition,mask;
-		void applyCondition(Body * body);
-
+/* Resets spatial position for all subscribed bodies to the desired value. */
+class FixedPositionEngine : public DeusExMachina {
+	public:
+		Vector3r fixedPosition;
+		//! Non-zero components determine which components of fixedPosition will be used 
+		Vector3r mask;
+		void applyCondition(MetaBody*);
 		FixedPositionEngine();
-
-	protected :
+	protected:
 		virtual void postProcessAttributes(bool);
 		virtual void registerAttributes();
 	REGISTER_CLASS_NAME(FixedPositionEngine);

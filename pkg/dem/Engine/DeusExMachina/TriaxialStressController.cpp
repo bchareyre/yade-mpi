@@ -185,10 +185,9 @@ void TriaxialStressController::controlExternalStress(int wall, MetaBody* ncb, Ve
 
 
 
-void TriaxialStressController::applyCondition(Body* body)
+void TriaxialStressController::applyCondition(MetaBody* ncb)
 {
 	//cerr << "TriaxialStressController::applyCondition" << endl;
-	MetaBody * ncb = YADE_CAST<MetaBody*>(body);
 
 	//Update stiffness only if it has been computed by StiffnessCounter (see "stiffnessUpdateInterval")
 	if (Omega::instance().getCurrentIteration() % stiffnessUpdateInterval == 0 || Omega::instance().getCurrentIteration()<1000)
@@ -314,13 +313,12 @@ void TriaxialStressController::controlInternalStress(MetaBody* ncb, Real multipl
 /*!
     \fn TriaxialStressController::ComputeUnbalancedForce()
  */
-Real TriaxialStressController::ComputeUnbalancedForce(Body * body, bool maxUnbalanced)
+Real TriaxialStressController::ComputeUnbalancedForce(MetaBody * ncb, bool maxUnbalanced)
 {
 	//compute the mean contact force
 	Real MeanForce = 0.f;
 	long nForce = 0;
 
-	MetaBody * ncb = static_cast<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 
 	InteractionContainer::iterator ii    = ncb->transientInteractions->begin();

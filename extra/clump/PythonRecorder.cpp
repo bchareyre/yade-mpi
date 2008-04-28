@@ -69,7 +69,7 @@ void PythonRecorder::postProcessAttributes(bool deserializing){
 	PyGILState_Release(pyState);
 }
 
-void PythonRecorder::action(Body *_rootBody)
+void PythonRecorder::action(MetaBody *rootBody)
 {
 	if(compiledRunExprCall){
 		PyGILState_STATE pyState = PyGILState_Ensure();

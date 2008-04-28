@@ -53,9 +53,8 @@ bool PositionRecorder::isActivated()
 
 
 
-void PositionRecorder::action(Body * body)
+void PositionRecorder::action(MetaBody * ncb)
 {
-	MetaBody * ncb = static_cast<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	Vector3r pos(Vector3r::ZERO);
 

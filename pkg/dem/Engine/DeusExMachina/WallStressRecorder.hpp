@@ -37,7 +37,7 @@ class WallStressRecorder : public DataRecorder
 		WallStressRecorder ();
 
 		virtual void registerAttributes();
-		virtual void action(Body* b);
+		virtual void action(MetaBody*);
 		virtual bool isActivated();
 
 	protected :

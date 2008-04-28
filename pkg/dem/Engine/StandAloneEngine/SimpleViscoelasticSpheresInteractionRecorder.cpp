@@ -44,9 +44,8 @@ bool SimpleViscoelasticSpheresInteractionRecorder::isActivated()
    return ((Omega::instance().getCurrentIteration() % interval == 0));
 }
 
-void SimpleViscoelasticSpheresInteractionRecorder::action(Body * body)
+void SimpleViscoelasticSpheresInteractionRecorder::action(MetaBody * ncb)
 {
-    MetaBody * ncb = YADE_CAST<MetaBody*>(body);
     shared_ptr<InteractionContainer>& interactions = ncb->transientInteractions;
   
     InteractionContainer::iterator ii    = interactions->begin();

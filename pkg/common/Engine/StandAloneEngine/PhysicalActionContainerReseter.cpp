@@ -18,9 +18,9 @@ PhysicalActionContainerReseter::~PhysicalActionContainerReseter()
 {
 }
 
-void PhysicalActionContainerReseter::action(Body* body)
+void PhysicalActionContainerReseter::action(MetaBody* ncb)
 {
-	(YADE_CAST<MetaBody*>(body))->physicalActions->reset();
+	ncb->physicalActions->reset();
 }
 
 

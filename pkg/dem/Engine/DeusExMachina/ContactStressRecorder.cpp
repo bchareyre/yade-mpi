@@ -83,9 +83,8 @@ bool ContactStressRecorder::isActivated()
 }
 
 
-void ContactStressRecorder::action(Body * body)
+void ContactStressRecorder::action(MetaBody * ncb)
 {
-	MetaBody * ncb = static_cast<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 		
 	Real f1_el_x=0, f1_el_y=0, f1_el_z=0, x1=0, y1=0, z1=0, x2=0, y2=0, z2=0;
@@ -306,7 +305,7 @@ static_cast<BodyMacroParameters*>((*bodies)[id2]->physicalParameters.get());
 	
 	/// UnbalancedForce
 	
-	Real equilibriumForce = triaxCompEng->ComputeUnbalancedForce(body);
+	Real equilibriumForce = triaxCompEng->ComputeUnbalancedForce(ncb);
 // 	Real equilibriumForce = sampleCapPressEng->ComputeUnbalancedForce(body);
 
 	if (Omega::instance().getCurrentIteration() % 100 == 0)

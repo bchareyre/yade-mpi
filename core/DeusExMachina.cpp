@@ -8,21 +8,14 @@
 
 #include "DeusExMachina.hpp"
 
-DeusExMachina::DeusExMachina() : Engine()
-{
-	//startTime = -1;
-	//stopTime = -1;
-	time = 0;
+DeusExMachina::DeusExMachina() : Engine() {
 	subscribedBodies.resize(0);
 }
 
-void DeusExMachina::registerAttributes()
-{
+void DeusExMachina::registerAttributes() {
 	REGISTER_ATTRIBUTE(subscribedBodies);
 }
 
-
-void DeusExMachina::action(Body* b)
-{
+void DeusExMachina::action(MetaBody* b) {
 	this->applyCondition(b);
 }

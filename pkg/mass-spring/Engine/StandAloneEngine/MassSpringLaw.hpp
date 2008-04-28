@@ -21,7 +21,7 @@ class MassSpringLaw : public InteractionSolver
 	public :
 		int springGroupMask;
 		MassSpringLaw ();
-		void action(Body* body);
+		void action(MetaBody*);
 
 	protected :
 		void registerAttributes();

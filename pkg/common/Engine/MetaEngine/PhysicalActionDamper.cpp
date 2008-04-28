@@ -11,9 +11,8 @@
 #include "PhysicalActionDamper.hpp"
 #include<yade/core/MetaBody.hpp>
 
-void PhysicalActionDamper::action(Body* body)
+void PhysicalActionDamper::action(MetaBody* ncb)
 {
-	MetaBody * ncb = YADE_CAST<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	PhysicalActionContainer::iterator pai    = ncb->physicalActions->begin();
 	PhysicalActionContainer::iterator paiEnd = ncb->physicalActions->end();

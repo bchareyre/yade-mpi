@@ -14,9 +14,8 @@
 #include<yade/core/MetaBody.hpp>
 
 
-void BoundingVolumeMetaEngine::action(Body* body)
+void BoundingVolumeMetaEngine::action(MetaBody* ncb)
 {
-	MetaBody * ncb = YADE_CAST<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	
 	BodyContainer::iterator bi    = bodies->begin();
@@ -28,7 +27,7 @@ void BoundingVolumeMetaEngine::action(Body* body)
 			operator()(b->interactingGeometry,b->boundingVolume,b->physicalParameters->se3,b.get());
 	}
 		
-	operator()(body->interactingGeometry,body->boundingVolume,body->physicalParameters->se3,body);
+	operator()(ncb->interactingGeometry,ncb->boundingVolume,ncb->physicalParameters->se3,ncb);
 }
 
 

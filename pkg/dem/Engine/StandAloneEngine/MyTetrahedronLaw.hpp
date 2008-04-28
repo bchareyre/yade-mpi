@@ -45,7 +45,7 @@ class MyTetrahedronLaw : public InteractionSolver
 
 	public :
 		MyTetrahedronLaw();
-		void action(Body* body);
+		void action(MetaBody*);
 
 	protected :
 		void registerAttributes();

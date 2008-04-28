@@ -21,7 +21,7 @@ class FrictionLessElasticContactLaw : public InteractionSolver
 
 	public :
 		FrictionLessElasticContactLaw ();
-		void action(Body* body);
+		void action(MetaBody*);
 
 	protected :
 		 void registerAttributes();

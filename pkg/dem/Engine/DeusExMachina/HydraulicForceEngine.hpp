@@ -27,7 +27,7 @@ class HydraulicForceEngine : public DeusExMachina
 		HydraulicForceEngine();
 		virtual ~HydraulicForceEngine();
 	
-		virtual void applyCondition(Body*);
+		virtual void applyCondition(MetaBody*);
 	
 	protected :
 		virtual void registerAttributes();

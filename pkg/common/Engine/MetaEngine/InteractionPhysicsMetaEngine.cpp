@@ -12,9 +12,8 @@
 #include<yade/core/MetaBody.hpp>
 
 
-void InteractionPhysicsMetaEngine::action(Body* body)
+void InteractionPhysicsMetaEngine::action(MetaBody* ncb)
 {
-	MetaBody * ncb = YADE_CAST<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	
 	shared_ptr<InteractionContainer>& persistentInteractions = ncb->persistentInteractions;

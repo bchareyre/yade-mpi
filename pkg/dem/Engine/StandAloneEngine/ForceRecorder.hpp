@@ -33,7 +33,7 @@ class ForceRecorder : public DataRecorder
 		ForceRecorder ();
 
 		virtual void registerAttributes();
-		virtual void action(Body* b);
+		virtual void action(MetaBody*);
 		virtual bool isActivated();
 
 	protected :

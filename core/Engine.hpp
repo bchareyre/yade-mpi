@@ -23,7 +23,7 @@ class Engine : public Serializable
 		virtual ~Engine() {};
 	
 		virtual bool isActivated() { return true; };
-		virtual void action(Body*) { throw; };
+		virtual void action(MetaBody*) { throw; };
 
 	REGISTER_CLASS_NAME(Engine);
 	REGISTER_BASE_CLASS_NAME(Serializable);

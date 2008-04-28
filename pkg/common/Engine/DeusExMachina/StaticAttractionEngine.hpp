@@ -16,7 +16,7 @@
 class StaticAttractionEngine : public DeusExMachina
 {
 	public :
-		void applyCondition(Body * body);
+		void applyCondition(MetaBody *);
 		bool active;
 		StaticAttractionEngine() : active(true) {};
 		virtual bool isActivated() { return active; };

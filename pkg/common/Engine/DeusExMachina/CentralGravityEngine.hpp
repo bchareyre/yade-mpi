@@ -23,7 +23,7 @@ class CentralGravityEngine: public DeusExMachina {
 		Real kappa;
 		CentralGravityEngine(){ shared_ptr<Force> f(new Force); cachedForceClassIndex=f->getClassIndex(); }
 		virtual ~CentralGravityEngine(){};
-		virtual void applyCondition(Body*);
+		virtual void applyCondition(MetaBody*);
 	protected:
 		virtual void registerAttributes(){REGISTER_ATTRIBUTE(centralBody); REGISTER_ATTRIBUTE(kappa);}
 		REGISTER_CLASS_NAME(CentralGravityEngine);
@@ -46,7 +46,7 @@ class AxialGravityEngine: public DeusExMachina {
 		Real acceleration;
 		AxialGravityEngine(){ shared_ptr<Force> f(new Force); cachedForceClassIndex=f->getClassIndex(); }
 		virtual ~AxialGravityEngine(){};
-		virtual void applyCondition(Body*);
+		virtual void applyCondition(MetaBody*);
 	protected:
 		virtual void registerAttributes(){REGISTER_ATTRIBUTE(axisPoint); REGISTER_ATTRIBUTE(axisDirection); REGISTER_ATTRIBUTE(acceleration); }
 		REGISTER_CLASS_NAME(AxialGravityEngine);

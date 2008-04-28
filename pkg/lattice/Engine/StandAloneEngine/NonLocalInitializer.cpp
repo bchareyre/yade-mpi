@@ -128,11 +128,10 @@ bool NonLocalInitializer::calcNonLocal(Body* body1, Body* body2, BodyContainer* 
 	} 
 }
 
-void NonLocalInitializer::action(Body * body)
+void NonLocalInitializer::action(MetaBody * rootBody)
 {
 	return; // YADEview
 
-	MetaBody * rootBody = static_cast<MetaBody*>(body);
 	int beamGroupMask = YADE_CAST<LatticeSetParameters*>(rootBody->physicalParameters.get())->beamGroupMask;
 	//std::list<std::list<LatticeSetParameters::NonLocalInteraction> >
 	//std::vector<std::list<LatticeSetParameters::NonLocalInteraction , std::__malloc_alloc_template<sizeof(LatticeSetParameters::NonLocalInteraction)> > >& nonl = dynamic_cast<LatticeSetParameters*>(rootBody->physicalParameters.get())->nonl;

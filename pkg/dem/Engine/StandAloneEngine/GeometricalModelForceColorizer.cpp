@@ -28,11 +28,10 @@ bool GeometricalModelForceColorizer::isActivated()
 }
 
 
-void GeometricalModelForceColorizer::action(Body * body)
+void GeometricalModelForceColorizer::action(MetaBody * ncb)
 {
 	// FIXME the same in GLDrawLatticeBeamState.cpp
 
-	MetaBody * ncb = YADE_CAST<MetaBody*>(body);
 	BodyContainer* bodies = ncb->bodies.get();
 	
 	Real min=10000,max=-10000;

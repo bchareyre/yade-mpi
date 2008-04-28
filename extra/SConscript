@@ -104,6 +104,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/extra',[
 			'ElasticContactInteraction',
 			'SDECLinkGeometry',
 			'SDECLinkPhysics',
+			'$QGLVIEWER_LIB'
 			]),
 ])
 

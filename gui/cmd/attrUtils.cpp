@@ -16,13 +16,14 @@ using namespace boost;
 #define ATTR_ACCESS_CXX(accessor,ensureFunc) \
 	boost::python::object wrappedPyGet(std::string key){ensureFunc();return accessor->pyGet(key);} \
 	void wrappedPySet(std::string key,python::object val){ensureFunc(); accessor->pySet(key,val);} \
-	boost::python::list wrappedPyKeys(){ensureFunc(); return accessor->pyKeys();} 
+	boost::python::list wrappedPyKeys(){ensureFunc(); return accessor->pyKeys();} \
+	bool wrappedPyHasKey(std::string key){ensureFunc(); return accessor->descriptors.find(key)!=accessor->descriptors.end();}
 	
 /*! Python special functions complementing proxies defined by ATTR_ACCESS_CXX, to be used with boost::python::class_<>.
  *
  * They define python special functions that support dictionary operations on this object and calls proxies for them. */
 #define ATTR_ACCESS_PY(cxxClass) \
-	def("__getitem__",&cxxClass::wrappedPyGet).def("__setitem__",&cxxClass::wrappedPySet).def("keys",&cxxClass::wrappedPyKeys)
+	def("__getitem__",&cxxClass::wrappedPyGet).def("__setitem__",&cxxClass::wrappedPySet).def("keys",&cxxClass::wrappedPyKeys).def("has_key",&cxxClass::wrappedPyHasKey)
 	//def("__getattr__",&cxxClass::wrappedPyGet).def("__setattr__",&cxxClass::wrappedPySet).def("attrs",&cxxClass::wrappedPyKeys)
 
 

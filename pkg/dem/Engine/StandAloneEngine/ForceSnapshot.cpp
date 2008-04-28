@@ -64,7 +64,7 @@ bool ForceSnapshot::isActivated()
 
 
 
-void ForceSnapshot::action(Body * body)
+void ForceSnapshot::action(MetaBody * ncb)
 {
 // 	copie de outputFile dans ce qui sera utilise pour le nom des fichiers resultats
 	nom_int=outputFile;
@@ -77,7 +77,6 @@ void ForceSnapshot::action(Body * body)
 	myfile << "Id(body1) Id(body2) Fn R1 x1 y1 z1 R2 x2 y2 z2  a l'it " << Omega::instance().getCurrentIteration() << endl;
 // 	that is to say : the ids of the two interacting bodies, the norm of the normal force, and the radii and the position of the centers of the two spheres, and finally the number of the corresponding iteration
 
-	MetaBody * ncb = static_cast<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	Vector3r pos(Vector3r::ZERO);	// which will be the position (of the center) of the considered body
 

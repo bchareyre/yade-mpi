@@ -48,7 +48,7 @@ class TriaxialStateRecorder : public DataRecorder
 		TriaxialStateRecorder ();
 
 		virtual void registerAttributes();
-		virtual void action(Body* b);
+		virtual void action(MetaBody*);
 		virtual bool isActivated();
 		DECLARE_LOGGER;
 

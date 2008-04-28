@@ -11,6 +11,8 @@
 BodyMacroParameters::BodyMacroParameters () : ElasticBodyParameters()
 {
 	createIndex();
+	poisson=.3;
+	frictionAngle=0.5236; /* 30˚ */
 }
 
 BodyMacroParameters::~BodyMacroParameters()

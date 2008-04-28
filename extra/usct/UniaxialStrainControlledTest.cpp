@@ -23,6 +23,7 @@ void UniaxialStrainer::init(){
 	originalLength=USCT_AXIS_COORD(posIds[0])-USCT_AXIS_COORD(negIds[0]);
 	LOG_DEBUG("Reference particles: positive #"<<posIds[0]<<" at "<<USCT_AXIS_COORD(posIds[0])<<"; negative #"<<negIds[0]<<" at "<<USCT_AXIS_COORD(negIds[0]));
 	LOG_INFO("Setting initial length to "<<originalLength);
+	if(originalLength<=0) LOG_FATAL("Initial length is negative or zero (swapped reference particles?)! "<<originalLength);
 	assert(originalLength>0);
 	
 	shared_ptr<AABB> rbAABB;
@@ -39,7 +40,7 @@ void UniaxialStrainer::init(){
 	recStream.open("/tmp/usct.data");
 }
 
-void UniaxialStrainer::applyCondition(Body* _rootBody){
+void UniaxialStrainer::applyCondition(MetaBody* rootBody){
 	if(needsInit) init();
 	// postconditions for initParams
 	assert(posIds.size()==posCoords.size() && negIds.size()==negCoords.size() && originalLength>0 && crossSectionArea>1);
@@ -47,16 +48,14 @@ void UniaxialStrainer::applyCondition(Body* _rootBody){
 	if(posIds.size()==0 || negIds.size()==0) return;
 	// linearly increase strain to the desired value
 	if(abs(currentStrainRate)<abs(strainRate))currentStrainRate+=strainRate*.01; else currentStrainRate=strainRate;
-	// how much do we move
-	Real dAX=.5*currentStrainRate*originalLength*Omega::instance().getTimeStep();
+	// how much do we move; in the symmetric case, half of the strain is applied at each end;
+	Real dAX=(asymmetry==0?.5:1)*currentStrainRate*originalLength*Omega::instance().getTimeStep();
 	for(size_t i=0; i<negIds.size(); i++){
-		//TRVAR1(USCT_AXIS_COORD(negIds[i]));
-		negCoords[i]-=dAX;
+		if(asymmetry==0 || asymmetry==-1 /* for +1, don't move*/) negCoords[i]-=dAX;
 		USCT_AXIS_COORD(negIds[i])=negCoords[i]; // update current position
-		negCoords[i]-=dAX; // store current position
 	}
 	for(size_t i=0; i<posIds.size(); i++){
-		posCoords[i]+=dAX;
+		if(asymmetry==0 || asymmetry==1 /* for -1, don't move */) posCoords[i]+=dAX;
 		USCT_AXIS_COORD(posIds[i])=posCoords[i];
 	}
 
@@ -68,7 +67,7 @@ void UniaxialStrainer::applyCondition(Body* _rootBody){
 	if(notYetReversed && limitStrain!=0 && ((currentStrainRate>0 && strain>limitStrain) || (currentStrainRate<0 && strain<limitStrain))) { currentStrainRate*=-1; notYetReversed=false; LOG_INFO("Reversed strain rate to "<<currentStrainRate); }
 
 	if(Omega::instance().getCurrentIteration()%50==0 && recStream.good()) {
-		computeAxialForce(static_cast<MetaBody*>(_rootBody));
+		computeAxialForce(rootBody);
 		Real midPos=Body::byId(1)->physicalParameters->se3.position[axis];
 		Real avgStress=(sumPosForces+sumNegForces)/(2*crossSectionArea); // average nominal stress
 		recStream<<Omega::instance().getCurrentIteration()<<" "<<strain<<" "<<avgStress<<" "<<sumPosForces<<" "<<sumNegForces<<" "<<posCoords[0]<<" "<<negCoords[0]<<" "<<midPos<<endl;
@@ -208,7 +207,7 @@ void USCTGen::createEngines(){
 		shared_ptr<BrefcomMakeContact> bmc(new BrefcomMakeContact);
 		bmc->cohesiveThresholdIter=cohesiveThresholdIter;
 		bmc->expBending=20;
-		bmc->calibratedEpsFracture=3e-4;
+		//bmc->calibratedEpsFracture=3e-4;
 		iphysDispatcher->add(bmc);
 	rootBody->engines.push_back(iphysDispatcher);
 

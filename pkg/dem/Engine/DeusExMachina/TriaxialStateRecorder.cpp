@@ -62,10 +62,8 @@ bool TriaxialStateRecorder::isActivated()
 }
 
 
-void TriaxialStateRecorder::action ( Body * body )
+void TriaxialStateRecorder::action (MetaBody * ncb )
 {
-	MetaBody * ncb = static_cast<MetaBody*> ( body );
-
 	if ( !triaxialCompressionEngine )
 	{
 		vector<shared_ptr<Engine> >::iterator itFirst = ncb->engines.begin();
@@ -123,7 +121,7 @@ void TriaxialStateRecorder::action ( Body * body )
 	<< lexical_cast<string> ( triaxialCompressionEngine->strain[0] ) << " "
 	<< lexical_cast<string> ( triaxialCompressionEngine->strain[1] ) << " "
 	<< lexical_cast<string> ( triaxialCompressionEngine->strain[2] ) << " "
-	<< lexical_cast<string> ( triaxialCompressionEngine->ComputeUnbalancedForce ( body ) ) << " "
+	<< lexical_cast<string> ( triaxialCompressionEngine->ComputeUnbalancedForce ( ncb ) ) << " "
 	<< lexical_cast<string> ( porosity )
 	<< endl;
 }

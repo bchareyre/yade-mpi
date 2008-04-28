@@ -43,7 +43,7 @@ bool DisplacementEngine::isActivated()
    return active;
 }
 
-void DisplacementEngine::applyCondition(Body * body)
+void DisplacementEngine::applyCondition(MetaBody * ncb)
 {
 
 /// FIXME - that's a hack! more control needed from the GUI !
@@ -65,10 +65,6 @@ void DisplacementEngine::applyCondition(Body * body)
 		if((count++)%6==0) oldSec=Omega::instance().isoSec;
 	}
 
-
-
-
-	MetaBody * ncb = static_cast<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 
 	std::vector<int>::const_iterator ii = subscribedBodies.begin();

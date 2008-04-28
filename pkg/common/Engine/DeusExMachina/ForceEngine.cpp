@@ -30,11 +30,8 @@ void ForceEngine::registerAttributes()
 }
 
 
-void ForceEngine::applyCondition(Body* body)
+void ForceEngine::applyCondition(MetaBody* ncb)
 {
-	MetaBody * ncb = YADE_CAST<MetaBody*>(body);
-	shared_ptr<BodyContainer>& bodies = ncb->bodies;
-	
 	std::vector<int>::const_iterator ii = subscribedBodies.begin();
 	std::vector<int>::const_iterator iiEnd = subscribedBodies.end();
 	

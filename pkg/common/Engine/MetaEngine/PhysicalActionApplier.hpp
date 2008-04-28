@@ -33,7 +33,7 @@ class PhysicalActionApplier :	public MetaDispatchingEngine2D
 				>
 {
 	public :
-		virtual void action(Body* body);
+		virtual void action(MetaBody*);
 
 	REGISTER_CLASS_NAME(PhysicalActionApplier);
 	REGISTER_BASE_CLASS_NAME(MetaDispatchingEngine2D);

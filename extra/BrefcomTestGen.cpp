@@ -99,7 +99,7 @@ void BrefcomTestGen::createEngines(){
 	shared_ptr<InteractionPhysicsMetaEngine> iphysDispatcher(new InteractionPhysicsMetaEngine);
 		shared_ptr<BrefcomMakeContact> bmc(new BrefcomMakeContact);
 		bmc->cohesiveThresholdIter=-1;
-		bmc->calibratedEpsFracture=.5; /* arbitrary, but large enough */
+		//bmc->calibratedEpsFracture=.5; /* arbitrary, but large enough */
 		iphysDispatcher->add(bmc);
 	rootBody->engines.push_back(iphysDispatcher);
 
@@ -159,7 +159,7 @@ bool BrefcomTestGen::generate(){
 		s1=Shop::sphere(Vector3r(0,-yCoord,-zCoord),.5),
 		s2=Shop::sphere(Vector3r(0,yCoord,zCoord),.5),
 		sMid=Shop::sphere(Vector3r(0,0,0.01),.5);
-	body_id_t id1=rootBody->bodies->insert(s1), id2=rootBody->bodies->insert(s2), id3=rootBody->bodies->insert(sMid);
+	body_id_t id1=rootBody->bodies->insert(s1), id2=rootBody->bodies->insert(s2); //, id3=rootBody->bodies->insert(sMid);
 	
 	//  engines should take care of the rest of interaction; this is what collider would do normally
 	/*

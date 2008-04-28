@@ -30,9 +30,8 @@ void MassSpringLaw::registerAttributes()
 }
 
 
-void MassSpringLaw::action(Body * body)
+void MassSpringLaw::action(MetaBody * massSpring)
 {
-	MetaBody * massSpring = YADE_CAST<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = massSpring->bodies;
 	shared_ptr<InteractionContainer>& persistentInteractions = massSpring->persistentInteractions;
 	shared_ptr<PhysicalActionContainer>& physicalActions = massSpring->physicalActions;

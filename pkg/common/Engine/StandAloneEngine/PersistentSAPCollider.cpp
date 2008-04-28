@@ -32,10 +32,8 @@ PersistentSAPCollider::~PersistentSAPCollider()
 
 }
 
-void PersistentSAPCollider::action(Body* body)
+void PersistentSAPCollider::action(MetaBody* ncb)
 {
-
-	MetaBody *ncb=YADE_CAST<MetaBody*>(body);
 	shared_ptr<BodyContainer> bodies=ncb->bodies;
 	
 	if (2*bodies->size()!=xBounds.size()){

@@ -34,9 +34,8 @@ void FrictionLessElasticContactLaw::registerAttributes()
 }
 
 
-void FrictionLessElasticContactLaw::action(Body * body)
+void FrictionLessElasticContactLaw::action(MetaBody * ncb)
 {
-	MetaBody * ncb = YADE_CAST<MetaBody*>(body);
 	shared_ptr<BodyContainer> bodies = ncb->bodies;
 
 	Real stiffness = 10000;

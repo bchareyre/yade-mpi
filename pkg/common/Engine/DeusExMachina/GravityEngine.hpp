@@ -23,7 +23,7 @@ class GravityEngine : public DeusExMachina
 		GravityEngine();
 		virtual ~GravityEngine();
 	
-		virtual void applyCondition(Body*);
+		virtual void applyCondition(MetaBody*);
 	
 	protected :
 		virtual void registerAttributes();

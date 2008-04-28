@@ -107,7 +107,7 @@ REGISTER_SERIALIZABLE(Clump,false);
 class ClumpMemberMover: public DeusExMachina {
 	public:
 		//! Interates over rootBody->bodies and calls Clump::moveSubBodies() for clumps.
-		virtual void applyCondition(Body* rootBody);
+		virtual void applyCondition(MetaBody* rootBody);
 		ClumpMemberMover();
 		virtual ~ClumpMemberMover(){};
 

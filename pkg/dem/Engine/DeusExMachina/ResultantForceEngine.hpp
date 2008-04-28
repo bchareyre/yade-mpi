@@ -46,7 +46,7 @@ class ResultantForceEngine : public DeusExMachina
 		ResultantForceEngine();
 		virtual ~ResultantForceEngine();
 	
-		virtual void applyCondition(Body*);
+		virtual void applyCondition(MetaBody*);
 		
 	
 	protected :

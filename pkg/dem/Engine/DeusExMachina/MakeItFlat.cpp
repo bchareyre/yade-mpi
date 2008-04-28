@@ -27,9 +27,8 @@ void MakeItFlat::registerAttributes()
 }
 
 
-void MakeItFlat::applyCondition(Body* body)
+void MakeItFlat::applyCondition(MetaBody* ncb)
 {
-	MetaBody * ncb = YADE_CAST<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	
 	BodyContainer::iterator bi    = bodies->begin();

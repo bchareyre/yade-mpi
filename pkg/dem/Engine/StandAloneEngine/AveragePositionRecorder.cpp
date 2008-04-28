@@ -49,9 +49,8 @@ bool AveragePositionRecorder::isActivated()
 }
 
 
-void AveragePositionRecorder::action(Body * body)
+void AveragePositionRecorder::action(MetaBody * ncb)
 {
-	MetaBody * ncb = YADE_CAST<MetaBody*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	
 	Real x=0, y=0, z=0, size=0;

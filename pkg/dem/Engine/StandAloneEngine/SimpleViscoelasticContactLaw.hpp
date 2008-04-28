@@ -31,7 +31,7 @@ class SimpleViscoelasticContactLaw : public InteractionSolver
 		bool momentRotationLaw;
 	
 		SimpleViscoelasticContactLaw();
-		void action(Body* body);
+		void action(MetaBody*);
 
 	protected :
 		void registerAttributes();

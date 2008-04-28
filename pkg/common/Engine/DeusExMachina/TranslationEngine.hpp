@@ -18,7 +18,7 @@ class TranslationEngine : public DeusExMachina
 	public :
 		Real velocity;
 		Vector3r translationAxis;
-		void applyCondition(Body * body);
+		void applyCondition(MetaBody *);
 
 	protected :
 		virtual void postProcessAttributes(bool deserializing);
