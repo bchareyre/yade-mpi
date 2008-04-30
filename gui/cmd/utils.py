@@ -78,7 +78,7 @@ def runInQtGui(background=True):
 	[fileobj,filename]=tempfile.mkstemp('.xml','yade')
 	Omega().save(filename)
 	if background: bg=' &'
-	else bg=''
+	else: bg=''
 	os.system(yade.runtime.executable+' -N QtGUI -S "'+filename+'"'+bg)
 	if not background: os.remove(filename)
 
