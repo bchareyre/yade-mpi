@@ -1,5 +1,6 @@
-# this must be run inside yade
+#!/usr/local/bin/yade-trunk
 # coding=UTF-8
+# this must be run inside yade
 
 import os,time,sys
 simulFile='/tmp/yade-test-%d.xml'%(os.getpid()) # generated simulations here
@@ -17,6 +18,7 @@ o.run(10); o.wait() # run first 10 iterations
 start=time.time(); o.run(nIter); o.wait(); finish=time.time() # run nIter iterations, wait to finish, measure elapsed time
 speed=nIter/(finish-start) # rough estimate
 open(speedFile,'w').write('%%g'%%speed)
+print quit
 quit()
 """%(simulFile,speedFile,100)
 
@@ -24,7 +26,7 @@ f=open(pyCmdFile,'w'); f.write(runSimul); f.close()
 
 #broken=['SDECLinkedSpheres','SDECMovingWall','SDECSpheresPlane','ThreePointBending']
 genParams={
-	'USCTGen':{'spheresFile':'examples/small.sdec.xyz'}
+	#'USCTGen':{'spheresFile':'examples/small.sdec.xyz'}
 	}
 #nIter=100
 summary=[]

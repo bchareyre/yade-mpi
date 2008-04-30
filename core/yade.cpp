@@ -18,6 +18,7 @@
 #include<iostream>
 #include<string>
 #include<getopt.h>
+#include<boost/algorithm/string.hpp>
 #include<boost/filesystem/operations.hpp>
 #include<boost/filesystem/convenience.hpp>
 #include<boost/preprocessor/stringize.hpp>
@@ -174,12 +175,15 @@ int main(int argc, char *argv[])
 			case '-': coreOptions=false; break;
 			default: printHelp(); return 1;
 		}
+	// peek to see the first non-option arg that will be passed to the gui; may affect the gui we will use
+	if(optind<argc && boost::algorithm::ends_with(string(argv[optind]),string(".py"))){ gui="cmdGui"; LOG_DEBUG("Selecting cmdGui for .py"); }
 	// save original options
 	Omega::instance().origArgv=argv; Omega::instance().origArgc=argc;
-	// kill processed options, keep one more which will is in fact non-option (normally the binary)
+	// kill processed options, keep one more which is in fact non-option (normally the binary)
 	argv=&(argv[optind-1]); argc-=optind-1;
 	// reset getopt globals for next processing
 	optind=0; opterr=0;
+
 	
 	if(configPath[configPath.size()-1] == '/')
 		configPath = configPath.substr(0,configPath.size()-1); 

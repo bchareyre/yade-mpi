@@ -497,7 +497,7 @@ CREATE_LOGGER(pyGLViewer);
 #endif /* USE_PYGLVIEWER */
 
 
-BOOST_PYTHON_MODULE(yadeControl)
+BOOST_PYTHON_MODULE(wrapper)
 {
 	/* http://mail.python.org/pipermail/c++-sig/2004-March/007025.html
 	http://mail.python.org/pipermail/c++-sig/2004-March/007029.html

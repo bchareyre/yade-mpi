@@ -6,10 +6,12 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "BINFormatManager.hpp"
+#include"BINFormatManager.hpp"
 #include<yade/lib-serialization/IOManagerExceptions.hpp>
-#include <string>
-#include <vector>
+#include<yade/lib-serialization/FormatChecker.hpp>
+#include<yade/lib-serialization-xml/XMLFormatManager.hpp>
+#include<string>
+#include<vector>
 
 using namespace std;
 
@@ -19,27 +21,26 @@ BINFormatManager::BINFormatManager() : IOFormatManager()
 {
 	names.clear();
 	names.push_back("");
+
+	Archive::clearSerializablePointers();
 	
-	Archive::addSerializablePointer(SerializableTypes::SERIALIZABLE , false, serializeSerializable             , deserializeSerializable);
-	Archive::addSerializablePointer(SerializableTypes::SERIALIZABLE , true , serializeSerializable             , deserializeSerializable);
-	Archive::addSerializablePointer(SerializableTypes::FUNDAMENTAL  , true , serializeFundamental              , deserializeFundamental);
-	Archive::addSerializablePointer(SerializableTypes::CONTAINER    , false, serializeContainer                , deserializeContainer);
-	Archive::addSerializablePointer(SerializableTypes::CONTAINER    , true , serializeContainer                , deserializeContainer);
-	Archive::addSerializablePointer(SerializableTypes::POINTER      , false, serializeSmartPointer             , deserializeSmartPointer);
-	Archive::addSerializablePointer(SerializableTypes::POINTER      , true , serializeSmartPointer             , deserializeSmartPointer);
+	Archive::addSerializablePointer(SerializableTypes::SERIALIZABLE , false, BINFormatManager::serializeSerializable             , BINFormatManager::deserializeSerializable);
+	Archive::addSerializablePointer(SerializableTypes::SERIALIZABLE , true , BINFormatManager::serializeSerializable             , BINFormatManager::deserializeSerializable);
+	Archive::addSerializablePointer(SerializableTypes::FUNDAMENTAL  , true , BINFormatManager::serializeFundamental              , BINFormatManager::deserializeFundamental);
+	Archive::addSerializablePointer(SerializableTypes::CONTAINER    , false, BINFormatManager::serializeContainer                , BINFormatManager::deserializeContainer);
+	Archive::addSerializablePointer(SerializableTypes::CONTAINER    , true , BINFormatManager::serializeContainer                , BINFormatManager::deserializeContainer);
+	Archive::addSerializablePointer(SerializableTypes::POINTER      , false, BINFormatManager::serializeSmartPointer             , BINFormatManager::deserializeSmartPointer);
+	Archive::addSerializablePointer(SerializableTypes::POINTER      , true , BINFormatManager::serializeSmartPointer             , BINFormatManager::deserializeSmartPointer);
 
-	Archive::addSerializablePointer(SerializableTypes::CUSTOM_CLASS , false, serializeUnsupported              , deserializeUnsupported);
+	Archive::addSerializablePointer(SerializableTypes::CUSTOM_CLASS , false, BINFormatManager::serializeUnsupported              , BINFormatManager::deserializeUnsupported);
 	//Archive::addSerializablePointer(SerializableTypes::CUSTOM_CLASS , true , serializeUnsupported              , deserializeUnsupported);
-	Archive::addSerializablePointer(SerializableTypes::CUSTOM_CLASS , true , serializeCustomFundamental        , deserializeCustomFundamental);
-}
-
-BINFormatManager::~BINFormatManager()
-{
 
 }
+
+BINFormatManager::~BINFormatManager(){}
 
 void BINFormatManager::serializeNameMarker(ostream& stream, std::string name)
-{
+{ CHK_BIN();
 	
 	unsigned short i , namesSize = names.size();
 	for(i = 0 ; i < namesSize ; ++i)
@@ -79,7 +80,7 @@ void BINFormatManager::serializeNameMarker(ostream& stream, std::string name)
 }
 
 std::string BINFormatManager::deserializeNameMarker(istream& stream)
-{
+{ CHK_BIN();
 	static std::string result;
 	result.clear();
 
@@ -110,7 +111,7 @@ std::string BINFormatManager::deserializeNameMarker(istream& stream)
 }
 
 string BINFormatManager::beginDeserialization(istream& stream, Archive& ac)
-{
+{ CHK_BIN();
 	unsigned char ch[5];
 	stream.read(reinterpret_cast<char*>(&ch[0]),5);
 	unsigned char version = ch[4];
@@ -123,24 +124,24 @@ string BINFormatManager::beginDeserialization(istream& stream, Archive& ac)
 }
 
 void BINFormatManager::finalizeDeserialization(istream& , Archive&)
-{
+{ CHK_BIN();
 //	cerr << "finalizeDeserialization\n";
 }
 
 void BINFormatManager::beginSerialization(ostream& stream, Archive& ac)
-{
+{ CHK_BIN();
 	unsigned char version = 1;
 	stream << "YADE" << version;
 }
 
 void BINFormatManager::finalizeSerialization(ostream& stream, Archive& ac)
-{
+{ CHK_BIN();
 }
 
 /// Serialization and Deserialization of Serializable
 
 void BINFormatManager::serializeSerializable(ostream& stream, Archive& ac, int depth)
-{
+{ CHK_BIN();
 	Serializable * s;
 	s = any_cast<Serializable*>(ac.getAddress());
 	s->registerSerializableAttributes(false);
@@ -162,7 +163,7 @@ void BINFormatManager::serializeSerializable(ostream& stream, Archive& ac, int d
 
 
 void BINFormatManager::deserializeSerializable(istream& stream, Archive& ac, const string& )
-{
+{ CHK_BIN();
 //cerr << "+ deserializeSerializable start\n";
 	shared_ptr<Archive> tmpAc;
 	Serializable * s = any_cast<Serializable*>(ac.getAddress());
@@ -192,7 +193,7 @@ void BINFormatManager::deserializeSerializable(istream& stream, Archive& ac, con
 }
 
 void BINFormatManager::serializeFundamental(ostream& stream, Archive& ac, int depth)
-{
+{ CHK_BIN();
 	static std::vector<unsigned char> bin;
 	boost::any v = &bin;
 	ac.serializeFundamental(ac,v);
@@ -206,7 +207,7 @@ void BINFormatManager::serializeFundamental(ostream& stream, Archive& ac, int de
 }
 
 void BINFormatManager::deserializeFundamental(istream& stream, Archive& ac, const string&)
-{
+{ CHK_BIN();
 	static std::vector<unsigned char> bin;
 	unsigned short size;
 	stream.read(&((reinterpret_cast<char*>(&size))[0]),1);
@@ -229,6 +230,8 @@ void BINFormatManager::deserializeFundamental(istream& stream, Archive& ac, cons
 
 void BINFormatManager::serializeContainer(ostream& stream, Archive& ac , int depth)
 {
+	if(FormatChecker::format!=FormatChecker::BIN) { cerr<<__FILE__<<":"<<__LINE__<<" "<<__FUNCTION__<<": diverting to XMLFormatManager"<<endl; return XMLFormatManager::serializeContainer(stream,ac,depth); }
+
 	shared_ptr<Archive> tmpAc;
 	unsigned int size = ac.createNextArchive(ac,tmpAc,true);
 	assert(sizeof(size) == 4);
@@ -246,7 +249,7 @@ void BINFormatManager::serializeContainer(ostream& stream, Archive& ac , int dep
 
 
 void BINFormatManager::deserializeContainer(istream& stream, Archive& ac, const string& str)
-{
+{ CHK_BIN();
 //cerr << "+ deserializeContainer start\n"; int cccc=0;
 	unsigned int size;
 	stream.read(&((reinterpret_cast<char*>(&size))[0]),1);
@@ -272,7 +275,7 @@ void BINFormatManager::deserializeContainer(istream& stream, Archive& ac, const 
 /// Serialization and Deserialization of Smart Pointer
 
 void BINFormatManager::serializeSmartPointer(ostream& stream, Archive& ac , int depth)
-{
+{ CHK_BIN();
 	shared_ptr<Archive> tmpAc;
 	unsigned char ch;
 	if(ac.createPointedArchive(ac,tmpAc))
@@ -302,7 +305,7 @@ void BINFormatManager::serializeSmartPointer(ostream& stream, Archive& ac , int 
 
 
 void BINFormatManager::deserializeSmartPointer(istream& stream, Archive& ac, const string& )
-{
+{ CHK_BIN();
 //cerr << "+ deserializeSmartPointer start\n";
 	unsigned char ch;
 	stream.read(reinterpret_cast<char*>(&ch),1);
@@ -326,19 +329,19 @@ void BINFormatManager::deserializeSmartPointer(istream& stream, Archive& ac, con
 }
 
 void BINFormatManager::serializeUnsupported(ostream&, Archive&, int)
-{
+{ CHK_BIN();
 	string error=string(IOManagerExceptions::BadAttributeValue) + " - custom class is not supported in binary, I'm too lazy to write this stuff, but you can write it ;)";
 	throw SerializableError(error.c_str());
 }
 
 void BINFormatManager::deserializeUnsupported(istream&, Archive&,const string&)
-{
+{ CHK_BIN();
 	string error=string(IOManagerExceptions::BadAttributeValue) + " - custom class is not supported in binary, I'm too lazy to write this stuff, but you can write it ;)";
 	throw SerializableError(error.c_str());
 }
 
 void BINFormatManager::deserializeCustomFundamental(istream& stream, Archive& ac,const string& str)
-{
+{ CHK_BIN();
 	shared_ptr<Serializable> s = YADE_PTR_CAST<Serializable>(ClassFactory::instance().createShared(ac.getSerializableClassName()));
 
 	s->registerSerializableAttributes(true);
@@ -356,7 +359,7 @@ void BINFormatManager::deserializeCustomFundamental(istream& stream, Archive& ac
 
 
 void BINFormatManager::serializeCustomFundamental(ostream& stream, Archive& ac,int depth)
-{
+{ CHK_BIN();
 	shared_ptr<Serializable> ss = YADE_PTR_CAST<Serializable>(ClassFactory::instance().createShared(ac.getSerializableClassName()));
 	ss->serialize(ac.getAddress());
 	ss->registerSerializableAttributes(false);

@@ -44,6 +44,12 @@ if 'qt3' not in env['exclude']:
 			),
 		])
 
+	if 'binfmt' in env['features']:
+		env.Install('$PREFIX/lib/yade$SUFFIX/lib',[
+			env.SharedLibrary('BINFormatManager',['serialization-bin/BINFormatManager.cpp']),
+		])
+
+
 env.Install('$PREFIX/lib/yade$SUFFIX/lib',[
 
 	env.SharedLibrary('yade-base',
@@ -94,19 +100,17 @@ env.Install('$PREFIX/lib/yade$SUFFIX/lib',[
 			'opengl/GLWindowsManager.cpp'],
 		LIBS=env['LIBS']+['glut']),
 
-	env.SharedLibrary('BINFormatManager',
-		['serialization-bin/BINFormatManager.cpp']),
-
 
 	env.SharedLibrary('XMLFormatManager',
 		['serialization-xml/XMLFormatManager.cpp',
 			'serialization-xml/XMLSaxParser.cpp'],
-		LIBS=env['LIBS']+['yade-base']),
+		LIBS=env['LIBS']+['yade-base']), #,'BINFormatManager']),
 
 	env.SharedLibrary('yade-serialization',
 		['serialization/Archive.cpp',
 			'serialization/IOFormatManager.cpp',
 			'serialization/IOManagerExceptions.cpp',
+			'serialization/FormatChecker.cpp',
 			'serialization/Serializable.cpp',
 			'serialization/SerializableSingleton.cpp',
 			'serialization/SerializationExceptions.cpp'])

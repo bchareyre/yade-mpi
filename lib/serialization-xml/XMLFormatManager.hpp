@@ -12,7 +12,7 @@
 #define XMLFORMATMANAGER_HPP
 
 #include<yade/lib-serialization/IOFormatManager.hpp>
-#include "XMLSaxParser.hpp"
+#include"XMLSaxParser.hpp"
 
 class XMLFormatManager : public IOFormatManager
 {

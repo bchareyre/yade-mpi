@@ -8,6 +8,7 @@
 
 #include "QtGUI.hpp"
 #include "YadeQtMainWindow.hpp"
+#include<boost/algorithm/string.hpp>
 //#ifdef HAVE_CONFIG_H
 //	#include <config.h>
 //#endif
@@ -18,6 +19,8 @@
 
 QtGUI::QtGUI(){}
 QtGUI::~QtGUI(){}
+
+CREATE_LOGGER(QtGUI);
 
 int QtGUI::run(int argc, char *argv[])
 {
@@ -32,10 +35,15 @@ int QtGUI::run(int argc, char *argv[])
 		switch(ch){
 //			case 'H'	: help(); 						return 1;
 			case 't'	: Omega::instance().setTimeStep(lexical_cast<Real>(optarg)); break;
-//			case 'g'	: Omega::instance().setGravity
-//						(Vector3r(0,-lexical_cast<Real>(optarg),0));	break;
 			default: break;	
 		}
+	if(optind<argc){ // process non-option arguments
+		if(boost::algorithm::ends_with(string(argv[optind]),string(".xml"))) Omega::instance().setSimulationFileName(string(argv[optind]));
+		else optind--;
+	}
+	for (int index=optind+1; index<argc; index++) LOG_ERROR("Unprocessed non-option argument: `"<<argv[index]<<"'");
+	
+	
 
 	
    QApplication app(argc,argv);

@@ -1,3 +1,4 @@
+// vim:syntax=cpp
 /*************************************************************************
 *  Copyright (C) 2004 by Olivier Galizzi                                 *
 *  olivier.galizzi@imag.fr                                               *
@@ -72,7 +73,7 @@ inline void binary_to_data(const vector<unsigned char>& bin, vector<Type>& data)
 
 template<typename Type >
 inline void data_to_binary(vector<Type>& data, vector<unsigned char>& bin)
-{ 
+{ CHK_BIN(); 
 	unsigned char size3,size = data.size() - 1; 	// 8 bits
 	assert(size < 16);
 	size3 = size << 4; 				// max size is 16, so 4 bits is enough to store a number = 16-1 = 15

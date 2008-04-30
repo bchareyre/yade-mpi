@@ -15,6 +15,8 @@
 using namespace boost::spirit;
 
 
+int IOFormatManager::format;
+
 char IOFormatManager::cOB	= ' ';
 char IOFormatManager::cCB	= ' ';
 char IOFormatManager::cS	= ' ';

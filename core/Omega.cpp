@@ -17,7 +17,7 @@
 #include<Wm3Vector3.h>
 #include<yade/lib-base/yadeWm3.hpp>
 #include<yade/lib-serialization/IOFormatManager.hpp>
-#include<yade/lib-serialization/IOFormatManager.hpp>
+#include<yade/lib-serialization/FormatChecker.hpp>
 #include<yade/lib-multimethods/FunctorWrapper.hpp>
 #include<yade/lib-multimethods/Indexable.hpp>
 #include<cstdlib>
@@ -369,10 +369,15 @@ void Omega::saveSimulation(const string name, bool recover)
 			rootBody->recoverSimulationTime=simulationTime;
 		}
 
-		if(filesystem::extension(name)==".xml")
+		if(filesystem::extension(name)==".xml") {
+			FormatChecker::format=FormatChecker::XML;
 			IOFormatManager::saveToFile("XMLFormatManager",name,"rootBody",rootBody);
-		else if(filesystem::extension(name)==".yade" )
+		}
+
+		else if(filesystem::extension(name)==".yade" ) {
+			FormatChecker::format=FormatChecker::BIN;
 			IOFormatManager::saveToFile("BINFormatManager",name,"rootBody",rootBody);
+		}
 
 		if(recover) rootBody->recover=false;
 	}

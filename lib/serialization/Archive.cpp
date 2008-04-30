@@ -14,6 +14,8 @@ map<SerializableTypes::Type,pair<SerializeFnPtr,DeserializeFnPtr> > Archive::ser
 map<SerializableTypes::Type,pair<SerializeFnPtr,DeserializeFnPtr> > Archive::serializationMapOfFundamental;
 Archive::SerializableDescriptorMap Archive::map;
 
+void Archive::clearSerializablePointers() { serializationMap.clear(); serializationMapOfFundamental.clear(); }
+
 Archive::Archive(const string& n)
 {
 	processed	= false;

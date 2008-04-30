@@ -63,7 +63,7 @@ struct FundamentalHandler< string >
 	static void accessor(Archive& ac, any& a)
 	{ // FIXME - throw when trying to serialize a string that has spaces. ( if(string.find(' ') != string.end() ...) : (eudoxos: WHY?!!!!!)
 		if (a.type()==typeid(string*)) // serialization - writing to string from some Type
-		{
+		{ CHK_XML();
 			string * tmpStr = any_cast<string*>(a);
 			string * tmp = any_cast<string*>(ac.getAddress());
 			*tmpStr=*tmp;
@@ -74,7 +74,7 @@ struct FundamentalHandler< string >
 			#undef _ESCAPE_SPECIAL
 		}
 		else if (a.type()==typeid(vector<unsigned char>*)) // from string to binary stream
-		{
+		{ CHK_BIN();
 			vector<unsigned char>* tmpBin = any_cast< vector<unsigned char>* >(a);
 			string * tmp = any_cast<string*>(ac.getAddress());
 			(*tmpBin).clear();
@@ -91,6 +91,7 @@ struct FundamentalHandler< string >
 template<typename Type >
 inline void lexical_copy(Archive& ac , any& a )
 {
+	if(FormatChecker::format==FormatChecker::XML){
 	// Textual serialization
 	if (a.type()==typeid(const string*)) // deserialization - reading from string to some Type
 	{
@@ -99,13 +100,17 @@ inline void lexical_copy(Archive& ac , any& a )
 		*tmp = lexical_cast<Type>(*tmpStr);
 	}
 	else if (a.type()==typeid(string*)) // serialization - writing to string from some Type
-	{
+	{ CHK_XML();
 		string * tmpStr = any_cast<string*>(a);
 		Type * tmp = any_cast<Type*>(ac.getAddress());
 		*tmpStr = lexical_cast<string>(*tmp);
 	}
+	else
+		cerr<<"lexical_cast(XML): (de)serialization format mismatch"<<endl;
+	}
+	else if(FormatChecker::format==FormatChecker::BIN){
 	// Binary serialization
-	else if (a.type()==typeid(const vector<unsigned char>*)) // from binary stream to Type
+	if (a.type()==typeid(const vector<unsigned char>*)) // from binary stream to Type
 	{
 		const vector<unsigned char>* tmpBin = any_cast< const vector<unsigned char>* >(a);
 		Type * tmp = any_cast<Type*>(ac.getAddress());
@@ -118,7 +123,7 @@ inline void lexical_copy(Archive& ac , any& a )
 		std::copy(ptr,end,ptr2);
 	}
 	else if (a.type()==typeid(vector<unsigned char>*)) // from Type to binary stream
-	{
+	{ CHK_BIN();
 		vector<unsigned char>* tmpBin = any_cast< vector<unsigned char>* >(a);
 		Type * tmp = any_cast<Type*>(ac.getAddress());
 		(*tmpBin).clear();
@@ -128,6 +133,9 @@ inline void lexical_copy(Archive& ac , any& a )
 		std::copy(ptr, end, (*tmpBin).begin() );
 	}
 	else
+		cerr<<"lexical_cast(BIN): (de)serialization format mismatch"<<endl;
+	}
+	else // never reached
 		throw HandlerError(SerializationExceptions::LexicalCopyError);
 }
 

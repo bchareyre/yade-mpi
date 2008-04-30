@@ -22,6 +22,7 @@ class QtGUI : public FrontEnd
 		QtGUI ();
 		virtual ~QtGUI ();
 		virtual int run(int argc, char *argv[]);
+		DECLARE_LOGGER;
 	
 	REGISTER_CLASS_NAME(QtGUI);
 	REGISTER_BASE_CLASS_NAME(FrontEnd);

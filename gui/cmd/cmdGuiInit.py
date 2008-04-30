@@ -3,21 +3,25 @@
 #
 
 ## initialization
+
+from yade import runtime
 import sys
-sys.path.insert(0,yadePrefix+'/lib/yade'+yadeSuffix+'/extra')
-sys.path.insert(0,yadePrefix+'/lib/yade'+yadeSuffix+'/gui')
-from yadeControl import *
 sys.excepthook=sys.__excepthook__ # apport on ubuntu override this, we don't need it
+sys.path.insert(0,runtime.prefix+'/lib/yade'+runtime.suffix+'/extra')
+sys.path.insert(0,runtime.prefix+'/lib/yade'+runtime.suffix+'/gui')
+
+from yade.wrapper import *
 
 ## run simulation if requested from the command line
-if yadeRunSimulation:
-	print "Running simulation "+yadeRunSimulation
-	o=Omega(); o.load(yadeRunSimulation); o.run();
+if runtime.simulation:
+	print "Running simulation "+runtime.simulation
+	o=Omega(); o.load(runtime.simulation); o.run();
 
 ## run script if requested from the command line
-if yadeRunScript:
-	print "Running script "+yadeRunScript
-	execfile(yadeRunScript)
+if runtime.script:
+	print "Running script "+runtime.script
+	execfile(runtime.script)
+	if runtime.stopAfter: sys.exit(0)
 
 # run commands if requested from the command line
 #if yadeRunCommands:

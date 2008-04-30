@@ -123,7 +123,7 @@ bool DynLibManager::load (const string& fullLibName, const string& libName )
 #ifndef WIN32
 	char**yadePluginClasses=(char**)dlsym(handle, "yadePluginClasses");
 	// errors are ignored, since definition of this sybol is optional
-	if(dlerror()==NULL){ for(int i=0; yadePluginClasses[i]!=NULL && strlen(yadePluginClasses[i])>0; i++){
+	if(!dlerror()){ for(int i=0; yadePluginClasses[i]!=NULL && strlen(yadePluginClasses[i])>0; i++){
 		lastPluginClasses.push_back(yadePluginClasses[i]); LOG_DEBUG("Pushed back `"<<yadePluginClasses[i]<<"'."); }
 	}
 #endif

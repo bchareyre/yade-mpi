@@ -25,6 +25,7 @@
 #include "ArchiveTypes.hpp"
 #include "SerializableTypes.hpp"
 #include "SerializableSingleton.hpp"
+#include "FormatChecker.hpp"
 
 using namespace boost;
 using namespace std;
@@ -150,6 +151,8 @@ class Archive
 	/*! Stl map that contains a pointer to the serialization and deserialization function for each non
 	fundamental type */
 	private   : static map<SerializableTypes::Type,pair<SerializeFnPtr,DeserializeFnPtr> > serializationMapOfFundamental;
+
+	public: static void clearSerializablePointers(); 
 
 	/*! <a href="../ArchiveTypes.html">Type</a> of the attribute represented by the current archive */
 	private   : SerializableTypes::Type recordType;

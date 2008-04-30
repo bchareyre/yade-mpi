@@ -85,7 +85,7 @@ opts.AddOptions(
 	BoolOption('optimize','Turn on heavy optimizations (generates SSE2 instructions)',0),
 	ListOption('exclude','Yade components that will not be built','none',names=['qt3','gui','extra','common','dem','fem','lattice','mass-spring','realtime-rigidbody']),
 	# OK, dummy prevents bug in scons: if one selects all, it says all in scons.config, but without quotes, which generates error.
-	ListOption('features','Optional features that are turned on','python,log4cxx',names=['python','log4cxx','dummy']),
+	ListOption('features','Optional features that are turned on','python,log4cxx',names=['python','log4cxx','binfmt','dummy']),
 	('jobs','Number of jobs to run at the same time (same as -j, but saved)',4,None,int),
 	('extraModules', 'Extra directories with their own SConscript files (must be in-tree) (whitespace separated)',None,None,Split),
 	('buildPrefix','Where to create build-[version][variant] directory for intermediary files','..'),

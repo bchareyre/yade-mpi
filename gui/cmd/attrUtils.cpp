@@ -57,7 +57,7 @@ class AttrAccess{
 					AttrDesc desc; 
 					desc.archive=*ai;
 					any instance=(*ai)->getAddress(); // gets pointer to the stored value
-					// 3 possibilities: one BOOL, one STRING, one or more NUMBERs
+					// 3 possibilities: one BOOL, one or more STRINGS, one or more NUMBERs (fallback if none matches)
 					if      (any_cast<string*>(&instance)) desc.type=AttrAccess::STRING;
 					else if (any_cast<bool*>(&instance))   desc.type=AttrAccess::BOOL;
 					else if (any_cast<Real*>(&instance) || any_cast<int*>(&instance) || any_cast<unsigned int*>(&instance) || any_cast<long*>(&instance) || any_cast<unsigned long*>(&instance)) desc.type=AttrAccess::NUMBER;

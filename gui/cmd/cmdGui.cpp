@@ -1,6 +1,7 @@
 //#include<Python.h>
 #include<boost/thread/thread.hpp>
 #include<boost/python.hpp>
+#include<boost/algorithm/string.hpp>
 #include<errno.h>
 
 #include"cmdGui.hpp"
@@ -49,30 +50,48 @@ void cmdGui::execScript(string script){
 int cmdGui::run(int argc, char *argv[]) {
 	string runScript;
 	string runCommands;
+	bool stopAfter=false;
 	
 	int ch;
 	while((ch=getopt(argc,argv,"hs:"))!=-1)
 	switch(ch){
 		case 'h': help(); return 1;
 		case 's': runScript=string(optarg); break;
+		case 'x': stopAfter=true; break;
 		//case 'c': runCommands+=string(optarg)+"\n"; break;
-		default: break;
+		default:
+			LOG_ERROR("Unhandled option string: `"<<string(optarg)<<"' (try -h for help on options)");
+			break;
 	}
+	if(optind<argc){ // process non-option arguments
+		if(boost::algorithm::ends_with(string(argv[optind]),string(".py"))) runScript=string(argv[optind]);
+		else if(boost::algorithm::ends_with(string(argv[optind]),string(".xml"))) Omega::instance().setSimulationFileName(string(argv[optind]));
+		else optind--;
+	}
+	for (int index = optind+1; index<argc; index++) LOG_ERROR("Unprocessed non-option argument: `"<<argv[index]<<"'");
+
 
 	XInitThreads();
 	PyEval_InitThreads();
 
 	PyGILState_STATE pyState = PyGILState_Ensure();
 
-		#define PYTHON_DEFINE_STRING(pyName,cxxName) PyRun_SimpleString((string(pyName)+"='"+string(cxxName)+"'").c_str())
+		// this is needed to create the yade.runtime namespace
+		PyRun_SimpleString("import sys; sys.path.insert(0,'" PREFIX "/lib/yade" SUFFIX "/gui')");
+		PyRun_SimpleString("import yade.runtime");
+
+		#define PYTHON_DEFINE_STRING(pyName,cxxName) PyRun_SimpleString((string("yade.runtime." pyName "='")+cxxName+"'").c_str())
+		#define PYTHON_DEFINE_BOOL(pyName,cxxName) PyRun_SimpleString((string("yade.runtime." pyName "=")+(cxxName?"True":"False")).c_str())
 		// wrap those in python::handle<> ??
-		PYTHON_DEFINE_STRING("yadePrefix",PREFIX);
-		PYTHON_DEFINE_STRING("yadeSuffix",SUFFIX);
-		PYTHON_DEFINE_STRING("yadeExecutable",Omega::instance().origArgv[0]);
-		PYTHON_DEFINE_STRING("yadeRunSimulation",Omega::instance().getSimulationFileName());
-		PYTHON_DEFINE_STRING("yadeRunScript",runScript);
-		PYTHON_DEFINE_STRING("yadeRunCommands",runCommands);
+		PYTHON_DEFINE_STRING("prefix",PREFIX);
+		PYTHON_DEFINE_STRING("suffix",SUFFIX);
+		PYTHON_DEFINE_STRING("executable",Omega::instance().origArgv[0]);
+		PYTHON_DEFINE_STRING("simulation",Omega::instance().getSimulationFileName());
+		PYTHON_DEFINE_STRING("script",runScript);
+		PYTHON_DEFINE_STRING("commands",runCommands);
+		PYTHON_DEFINE_BOOL("stopAfter",stopAfter);
 		#undef PYTHON_DEFINE_STRING
+		#undef PYTHON_DEFINE_BOOL
 		execScript(PREFIX "/lib/yade" SUFFIX "/gui/cmdGuiInit.py");
 		
 		//PyRun_InteractiveLoop(stdin,"<console>");

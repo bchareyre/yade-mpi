@@ -24,6 +24,9 @@ using namespace boost;
 
 class IOFormatManager : public Factorable
 {
+	public:
+		enum {FORMAT_BIN,FORMAT_XML};
+		static int format;
 	private :
 		static char cOB;	// containerOpeningBracket 
 		static char cCB;	// containerClosingBracket

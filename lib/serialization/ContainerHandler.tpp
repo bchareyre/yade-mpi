@@ -1,3 +1,4 @@
+// vim:syn=cpp
 /*************************************************************************
 *  Copyright (C) 2004 by Olivier Galizzi                                 *
 *  olivier.galizzi@imag.fr                                               *

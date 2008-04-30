@@ -1,4 +1,6 @@
+#!/usr/local/bin/yade-trunk -x
 # -*- encoding=utf-8 -*-
+
 o=Omega() # this creates default rootBody as well
 
 # is used in both initializers and engines, assign to a temporary
@@ -19,7 +21,7 @@ o.engines=[
 	MetaEngine('InteractionPhysicsMetaEngine',[EngineUnit('SimpleElasticRelationships')]),
 	StandAloneEngine('ElasticContactLaw'),
 	StandAloneEngine('GlobalStiffnessCounter',{'interval':50}),
-	StandAloneEngine('GlobalStiffnessTimeStepper',{'defaultDt':1e-4,'active':True,'timeStepUpdateInterval':50}),
+	StandAloneEngine('GlobalStiffnessTimeStepper',{'defaultDt':1e-5,'active':True,'timeStepUpdateInterval':50}),
 	DeusExMachina('GravityEngine',{'gravity':[0,0,-9.81]}),
 	MetaEngine('PhysicalActionDamper',[
 		EngineUnit('CundallNonViscousForceDamping',{'damping':0.2}),
@@ -33,26 +35,25 @@ o.engines=[
 	MetaEngine('PhysicalParametersMetaEngine',[EngineUnit('LeapFrogOrientationIntegrator')]),
 ]
 
-s=Body()
-s.shape=GeometricalModel('Sphere',{'radius':1,'diffuseColor':[0,1,0]})
-s.mold=InteractingGeometry('InteractingSphere',{'radius':1,'diffuseColor':[1,0,0]})
-s.phys=PhysicalParameters('BodyMacroParameters',{'se3':[0,0,2,1,0,0,0],'mass':1000,'inertia':[7e4,7e4,7e4],'young':3e9,'poisson':0.3})
-s.bound=BoundingVolume('AABB',{'diffuseColor':[0,0,1]})
-s['isDynamic']=True
 
-b=Body()
-b.shape=GeometricalModel('Box',{'extents':[.5,.5,.5],'diffuseColor':[1,0,0]})
-b.mold=InteractingGeometry('InteractingBox',{'extents':[.5,.5,.5],'diffuseColor':[0,1,0]})
-b.phys=PhysicalParameters('BodyMacroParameters',{'se3':[0,0,0,1,0,0,0],'mass':2000,'inertia':[1e5,1e5,1e5],'young':3e9,'poisson':0.3})
-b.bound=BoundingVolume('AABB',{'diffuseColor':[0,0,1]})
-b['isDynamic']=False
-
-o.bodies.append(b)
-o.bodies.append(s)
+from yade import utils
+o.bodies.append(utils.box(extents=[.5,.5,.5],center=[0,0,0],dynamic=False,color=[1,0,0]))
+o.bodies.append(utils.sphere(1,[0,0,2],color=[0,1,0]))
+# o.dt=.2*utils.PWaveTimeStep()
 
 o.save('/tmp/a.xml')
+print "===================== SAVING FINISHED ====================="
+o.load('/tmp/a.xml')
+import sys
+sys.exit(0)
 
-# load that with the QtGUI
-import os
-os.system(yadeExecutable+' -N QtGUI -S /tmp/a.xml')
+if True: # shorter, but doesn't test the (de)serializer, since binary format is used
+	# will run in background
+	utils.runInQtGui()
+else:
+	## we could save it to a file just as well
+	o.save('/tmp/a.xml')
+	# load that with the QtGUI
+	import os,yade.runtime
+	os.system(yade.runtime.executable+' -N QtGUI -S /tmp/a.xml &')
 

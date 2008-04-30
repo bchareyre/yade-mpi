@@ -6,9 +6,11 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "XMLFormatManager.hpp"
+#include"XMLFormatManager.hpp"
 #include<yade/lib-serialization/IOManagerExceptions.hpp>
-#include <string>
+#include<yade/lib-serialization/FormatChecker.hpp>
+// #include<yade/lib-serialization-bin/BINFormatManager.hpp>
+#include<string>
 
 using namespace std;
 
@@ -16,13 +18,15 @@ XmlSaxParser XMLFormatManager::saxParser;
 
 XMLFormatManager::XMLFormatManager() : IOFormatManager()
 {
-	Archive::addSerializablePointer(SerializableTypes::SERIALIZABLE , false, serializeSerializable, deserializeSerializable);
+	Archive::clearSerializablePointers();
+
+	Archive::addSerializablePointer(SerializableTypes::SERIALIZABLE , false, XMLFormatManager::serializeSerializable, XMLFormatManager::deserializeSerializable);
 	Archive::addSerializablePointer(SerializableTypes::SERIALIZABLE , true , IOFormatManager::serializeFundamentalSerializable, IOFormatManager::deserializeFundamentalSerializable);
-	Archive::addSerializablePointer(SerializableTypes::CONTAINER    , false, serializeContainer, deserializeContainer);
+	Archive::addSerializablePointer(SerializableTypes::CONTAINER    , false, XMLFormatManager::serializeContainer, XMLFormatManager::deserializeContainer);
 	Archive::addSerializablePointer(SerializableTypes::CONTAINER    , true , IOFormatManager::serializeContainerOfFundamental, IOFormatManager::deserializeContainerOfFundamental);
 
 	Archive::addSerializablePointer(SerializableTypes::POINTER      , true , IOFormatManager::serializeSmartPointerOfFundamental, IOFormatManager::deserializeSmartPointerOfFundamental);
-	Archive::addSerializablePointer(SerializableTypes::POINTER      , false, serializeSmartPointer, deserializeSmartPointer);
+	Archive::addSerializablePointer(SerializableTypes::POINTER      , false, XMLFormatManager::serializeSmartPointer, XMLFormatManager::deserializeSmartPointer);
 	Archive::addSerializablePointer(SerializableTypes::CUSTOM_CLASS , true , IOFormatManager::serializeCustomFundamental, IOFormatManager::deserializeCustomFundamental);
 	Archive::addSerializablePointer(SerializableTypes::CUSTOM_CLASS , false, IOFormatManager::serializeCustomClass, IOFormatManager::deserializeCustomClass);
 	
@@ -45,14 +49,14 @@ XMLFormatManager::~XMLFormatManager()
 
 
 void XMLFormatManager::writeTabs(ostream& stream, int depth)
-{
+{ CHK_XML();
 	for(int i=0;i<depth+1;i++)
 		stream << '\t';
 }
 
 
 void XMLFormatManager::writeOpeningTag(ostream& stream, Archive& ac, int depth)
-{
+{ CHK_XML();
 	writeTabs(stream, depth);
 	stream << "<" << ac.getName();
 
@@ -62,7 +66,7 @@ void XMLFormatManager::writeOpeningTag(ostream& stream, Archive& ac, int depth)
 
 
 void XMLFormatManager::writeClosingTag(ostream& stream, Archive& ac, int depth)
-{
+{ CHK_XML();
 	if (ac.isFundamental())
 		stream << "</" << ac.getName() << ">" << endl;
 	else if (ac.containsOnlyFundamentals())
@@ -76,7 +80,7 @@ void XMLFormatManager::writeClosingTag(ostream& stream, Archive& ac, int depth)
 
 
 string XMLFormatManager::beginDeserialization(istream& stream, Archive& ac)
-{
+{ CHK_XML();
 	saxParser.readAndParseNextXmlLine(stream);
 	if (saxParser.getTagName()=="Yade")
 	{
@@ -97,7 +101,7 @@ string XMLFormatManager::beginDeserialization(istream& stream, Archive& ac)
 
 
 void XMLFormatManager::finalizeDeserialization(istream& , Archive&)
-{
+{ CHK_XML();
 	//saxParser.readAndParseNextXmlLine(stream);
 
 	//if (saxParser.getTagName()!="Yade")
@@ -106,14 +110,14 @@ void XMLFormatManager::finalizeDeserialization(istream& , Archive&)
 
 
 void XMLFormatManager::beginSerialization(ostream& stream, Archive& ac)
-{
+{ CHK_XML();
 	stream << "<Yade>" << endl;
 	writeOpeningTag(stream,ac,0);
 }
 
 
 void XMLFormatManager::finalizeSerialization(ostream& stream, Archive& ac)
-{
+{ CHK_XML();
 	writeClosingTag(stream,ac,0);
 	stream << "</Yade>" << endl;
 }
@@ -123,7 +127,7 @@ void XMLFormatManager::finalizeSerialization(ostream& stream, Archive& ac)
 /// Serialization and Deserialization of Serializable						///
 
 void XMLFormatManager::serializeSerializable(ostream& stream, Archive& ac, int depth)
-{
+{ CHK_XML();
 	Serializable * s;
 
 	s = any_cast<Serializable*>(ac.getAddress());
@@ -166,7 +170,7 @@ void XMLFormatManager::serializeSerializable(ostream& stream, Archive& ac, int d
 
 
 void XMLFormatManager::deserializeSerializable(istream& stream, Archive& ac, const string& )
-{
+{ CHK_XML();
 	shared_ptr<Archive> tmpAc;
 
 	Serializable * s = any_cast<Serializable*>(ac.getAddress());
@@ -215,9 +219,10 @@ void XMLFormatManager::deserializeSerializable(istream& stream, Archive& ac, con
 
 
 /// Serialization and Deserialization of Container						///
-
 void XMLFormatManager::serializeContainer(ostream& stream, Archive& ac , int depth)
-{
+{ CHK_XML();
+	//if(FormatChecker::format!=FormatChecker::XML) { cerr<<__FILE__<<":"<<__LINE__<<" "<<__FUNCTION__<<": diverting to BINFormatManager"<<endl; return BINFormatManager::serializeContainer(stream,ac,depth); }
+
 	shared_ptr<Archive> tmpAc;
 
 	int size = ac.createNextArchive(ac,tmpAc,true);
@@ -240,7 +245,7 @@ void XMLFormatManager::serializeContainer(ostream& stream, Archive& ac , int dep
 
 
 void XMLFormatManager::deserializeContainer(istream& stream, Archive& ac, const string& str)
-{
+{ CHK_XML();
 	map<string,string> basicAttributes = saxParser.getBasicAttributes();
 	unsigned int size = lexical_cast<unsigned int>(basicAttributes["size"]);
 	if (size>0)
@@ -266,6 +271,7 @@ void XMLFormatManager::deserializeContainer(istream& stream, Archive& ac, const 
 
 void XMLFormatManager::serializeSmartPointer(ostream& stream, Archive& ac , int depth)
 {
+//	if(FormatChecker::format!=FormatChecker::XML) { cerr<<__FILE__<<":"<<__LINE__<<" "<<__FUNCTION__<<": diverting to BINFormatManager"<<endl; return BINFormatManager::serializeSmartPointer(stream,ac,depth); }
 	shared_ptr<Archive> tmpAc;
 
 	if(ac.createPointedArchive(ac,tmpAc))
@@ -292,7 +298,7 @@ void XMLFormatManager::serializeSmartPointer(ostream& stream, Archive& ac , int 
 
 
 void XMLFormatManager::deserializeSmartPointer(istream& stream, Archive& ac, const string& )
-{
+{ CHK_XML();
 	map<string,string> basicAttributes = saxParser.getBasicAttributes();
 
 	if (basicAttributes.size()!=0)
@@ -308,7 +314,7 @@ void XMLFormatManager::deserializeSmartPointer(istream& stream, Archive& ac, con
 
 
 void XMLFormatManager::deserializeFundamental(istream& stream, Archive& ac, const string& str)
-{
+{ CHK_XML();
 	try
 	{
 		IOFormatManager::deserializeFundamental(stream,ac,str);
