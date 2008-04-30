@@ -77,7 +77,9 @@ def runInQtGui(background=True):
 	import os,tempfile,yade.runtime
 	[fileobj,filename]=tempfile.mkstemp('.xml','yade')
 	Omega().save(filename)
-	os.system(yade.runtime.executable+' -N QtGUI -S "'+filename+'"'+(' &' if background else ''))
+	if background: bg=' &'
+	else bg=''
+	os.system(yade.runtime.executable+' -N QtGUI -S "'+filename+'"'+bg)
 	if not background: os.remove(filename)
 
 def PWaveTimeStep():
