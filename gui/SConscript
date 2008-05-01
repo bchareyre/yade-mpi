@@ -38,13 +38,13 @@ if 'qt3' not in env['exclude']:
 
 if 'EMBED_PYTHON' in env['CPPDEFINES']:
 	env.Install('$PREFIX/lib/yade$SUFFIX/gui',[
-		env.SharedLibrary('cmdGui',['cmd/cmdGui.cpp']),
-		env.File('cmdGuiInit.py','cmd'),
+		env.SharedLibrary('PythonUI',['py/PythonUI.cpp']),
+		# env.File('PythonUIInit.py','py'),
 	])
 	# one level deeper so that you can say: from yade.wrapper import *
 	# (more submodules to come)
 	env.Install('$PREFIX/lib/yade$SUFFIX/gui/yade',[
-		env.SharedLibrary('wrapper',['cmd/yadeControl.cpp','cmd/GLViewer4.cpp'],SHLIBPREFIX='',
+		env.SharedLibrary('wrapper',['py/yadeControl.cpp','py/GLViewer4.cpp'],SHLIBPREFIX='',
 			LIBS=env['LIBS']+['yade-base','libboost_python','XMLFormatManager','yade-factory','yade-serialization','Shop',
 				'BoundingVolumeMetaEngine',
 				'GeometricalModelMetaEngine',
@@ -57,8 +57,8 @@ if 'EMBED_PYTHON' in env['CPPDEFINES']:
 			#CPPPATH=env['CPPPATH']+['/usr/include/qt4','/usr/include/qt4/Qt','/usr/include/qt4/QtXml','/usr/include/qt4/QtOpenGL','/usr/include/qt4/QtCore','/usr/include/qt4/QtGui'],
 			CPPDEFINES=env['CPPDEFINES']+['NO_PYGLVIEWER'],
 			),
-		env.File('__init__.py','cmd'),
-		env.File('utils.py','cmd'),
-		env.File('runtime.py','cmd'),
+		env.File('__init__.py','py'),
+		env.File('utils.py','py'),
+		env.File('runtime.py','py'),
 	])
 
