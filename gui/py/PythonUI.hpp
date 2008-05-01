@@ -1,24 +1,22 @@
 // © 2007 Václav Šmilauer <eudoxos@arcig.cz>
-#ifndef CMDGUI_HPP
-#define CMDGUI_HPP
+#pragma once
 #include<yade/core/FrontEnd.hpp>
 #include<boost/shared_ptr.hpp>
 
-class cmdGui: public FrontEnd
+class PythonUI: public FrontEnd
 {
 	private:
 		void help();
 		void execScript(string);
 	public:
-		cmdGui(){};
-		virtual ~cmdGui(){};
+		PythonUI(){};
+		virtual ~PythonUI(){};
 		virtual int run(int argc, char *argv[]);
 	
-	REGISTER_CLASS_NAME(cmdGui);
+	REGISTER_CLASS_NAME(PythonUI);
 	REGISTER_BASE_CLASS_NAME(FrontEnd);
 	DECLARE_LOGGER;
 };
 
-REGISTER_FACTORABLE(cmdGui);
+REGISTER_FACTORABLE(PythonUI);
 
-#endif

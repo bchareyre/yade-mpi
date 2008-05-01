@@ -4,7 +4,7 @@
 #include<boost/algorithm/string.hpp>
 #include<errno.h>
 
-#include"cmdGui.hpp"
+#include"PythonUI.hpp"
 
 #include <X11/Xlib.h>
 
@@ -13,10 +13,10 @@ using namespace boost;
 //void cmdlineThreadStart(){
 //}
 
-CREATE_LOGGER(cmdGui);
+CREATE_LOGGER(PythonUI);
 
-void cmdGui::help(){
-	cerr<<" cmdGui (python console) frontend.\n\
+void PythonUI::help(){
+	cerr<<" PythonUI (python console) frontend.\n\
 \n\
 	-h       print this help\n\
 	-s file  run this python script before entering interactive prompt\n\
@@ -35,7 +35,7 @@ void cmdGui::help(){
 ";
 }
 
-void cmdGui::execScript(string script){
+void PythonUI::execScript(string script){
 	LOG_DEBUG("Python will now run file `"<<script<<"'.");
 	FILE* scriptFILE=fopen(script.c_str(),"r");
 	if(scriptFILE){
@@ -47,7 +47,7 @@ void cmdGui::execScript(string script){
 	}
 }
 
-int cmdGui::run(int argc, char *argv[]) {
+int PythonUI::run(int argc, char *argv[]) {
 	string runScript;
 	string runCommands;
 	bool stopAfter=false;
@@ -76,25 +76,23 @@ int cmdGui::run(int argc, char *argv[]) {
 
 	PyGILState_STATE pyState = PyGILState_Ensure();
 
-		// this is needed to create the yade.runtime namespace
+		/* import yade (for startUI()) and yade.runtime (initially empty) namespaces */
 		PyRun_SimpleString("import sys; sys.path.insert(0,'" PREFIX "/lib/yade" SUFFIX "/gui')");
-		PyRun_SimpleString("import yade.runtime");
+		PyRun_SimpleString("import yade");
 
 		#define PYTHON_DEFINE_STRING(pyName,cxxName) PyRun_SimpleString((string("yade.runtime." pyName "='")+cxxName+"'").c_str())
 		#define PYTHON_DEFINE_BOOL(pyName,cxxName) PyRun_SimpleString((string("yade.runtime." pyName "=")+(cxxName?"True":"False")).c_str())
-		// wrap those in python::handle<> ??
-		PYTHON_DEFINE_STRING("prefix",PREFIX);
-		PYTHON_DEFINE_STRING("suffix",SUFFIX);
-		PYTHON_DEFINE_STRING("executable",Omega::instance().origArgv[0]);
-		PYTHON_DEFINE_STRING("simulation",Omega::instance().getSimulationFileName());
-		PYTHON_DEFINE_STRING("script",runScript);
-		PYTHON_DEFINE_STRING("commands",runCommands);
-		PYTHON_DEFINE_BOOL("stopAfter",stopAfter);
+			// wrap those in python::handle<> ??
+			PYTHON_DEFINE_STRING("prefix",PREFIX);
+			PYTHON_DEFINE_STRING("suffix",SUFFIX);
+			PYTHON_DEFINE_STRING("executable",Omega::instance().origArgv[0]);
+			PYTHON_DEFINE_STRING("simulation",Omega::instance().getSimulationFileName());
+			PYTHON_DEFINE_STRING("script",runScript);
+			PYTHON_DEFINE_STRING("commands",runCommands);
+			PYTHON_DEFINE_BOOL("stopAfter",stopAfter);
 		#undef PYTHON_DEFINE_STRING
 		#undef PYTHON_DEFINE_BOOL
-		execScript(PREFIX "/lib/yade" SUFFIX "/gui/cmdGuiInit.py");
-		
-		//PyRun_InteractiveLoop(stdin,"<console>");
+		execScript(PREFIX "/lib/yade" SUFFIX "/gui/PythonUI_rc.py");
 
 	PyGILState_Release(pyState);
 

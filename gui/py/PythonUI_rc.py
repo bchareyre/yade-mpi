@@ -1,14 +1,12 @@
-# os.path contains $PREFIX/lib/yade$SUFFIX/{extra,gui}
-# YADE_CONFIG_DIR=~/.yade$SUFFIX is defined
-#
+# encoding: utf-8
+"""Run everything that is needed at the beginning of PythonUI session. 
 
-## initialization
+yade.runtime must have already been populated from within c++."""
 
 from yade import runtime
 import sys
 sys.excepthook=sys.__excepthook__ # apport on ubuntu override this, we don't need it
-sys.path.insert(0,runtime.prefix+'/lib/yade'+runtime.suffix+'/extra')
-sys.path.insert(0,runtime.prefix+'/lib/yade'+runtime.suffix+'/gui')
+# sys.path.insert(0,runtime.prefix+'/lib/yade'+runtime.suffix+'/extra')
 
 from yade.wrapper import *
 
@@ -28,6 +26,8 @@ if runtime.script:
 #	print "Running commands from commandline: "+yadeRunCommands
 #	exec(yadeRunCommands)
 
+# this cannot be run directly, since importing * is allowed only at module level
+
 try:
 	# prefer ipython, since it is colorful and cool
 	from IPython.Shell import IPShellEmbed
@@ -40,9 +40,9 @@ except ImportError:
 	import os, readline, rlcompleter, atexit
 	history_file = os.path.join(os.environ['HOME']+'/.yade_python_history')
 	try:
-	    readline.read_history_file(history_file)
+		 readline.read_history_file(history_file)
 	except IOError:
-	    pass
+		 pass
 	readline.parse_and_bind("tab: complete")
 	readline.set_history_length(1000)
 	atexit.register(readline.write_history_file, history_file) # FIXME: this will probably not work!
@@ -51,4 +51,4 @@ except ImportError:
 	# run interactive loop
 	import code
 	code.InteractiveConsole(globals()).interact()
-	
+

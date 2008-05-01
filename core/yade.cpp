@@ -118,7 +118,7 @@ void printHelp()
 \n\
 	-h      : print this help.\n\
 	-n      : use NullGUI (command line interface) instead of default GUI.\n\
-	-N name : specify the user interface (available: NullGUI, cmdGui, QtGUI)\n\
+	-N name : specify the user interface (available: NullGUI, PythonUI, QtGUI)\n\
 	-w      : launch the 'first run configuration'\n\
 	-c      : use local directory ./ as configuration directory\n\
 	-C path : configuration directory different than default ~/.yade/\n\
@@ -176,7 +176,7 @@ int main(int argc, char *argv[])
 			default: printHelp(); return 1;
 		}
 	// peek to see the first non-option arg that will be passed to the gui; may affect the gui we will use
-	if(optind<argc && boost::algorithm::ends_with(string(argv[optind]),string(".py"))){ gui="cmdGui"; LOG_DEBUG("Selecting cmdGui for .py"); }
+	if(optind<argc && boost::algorithm::ends_with(string(argv[optind]),string(".py"))){ gui="PythonUI"; LOG_DEBUG("Selecting cmdGui for .py"); }
 	// save original options
 	Omega::instance().origArgv=argv; Omega::instance().origArgc=argc;
 	// kill processed options, keep one more which is in fact non-option (normally the binary)

@@ -34,7 +34,9 @@ o=Omega()
 broken=[]
 
 def crashProofRun():
-	retval=os.system("%s -N cmdGui -- -s '%s'"%(yadeExecutable,pyCmdFile))
+	import os
+	import yade.runtime
+	retval=os.system("%s -N PythonUI -- -s '%s'"%(yade.runtime.executable,pyCmdFile))
 	if retval==0: return 'passed (%s iter/sec)'%(open(speedFile,'r').readline()[:-1])
 	else: return 'CRASHED (backtrace above)'
 
@@ -65,4 +67,5 @@ for pp in o.childClasses('FileGenerator'):
 print "\n\n========================================= SUMMARY ======================================\n"
 for l in summary: print l
 print "\n====================================== END OF SUMMARY =================================="
-quit()
+import sys
+sys.exit(0) # quit() is not in python2.4
