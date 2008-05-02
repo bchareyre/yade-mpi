@@ -6,27 +6,42 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "MetaDispatchingEngine.hpp"
+#include "MetaEngine.hpp"
 
-MetaDispatchingEngine::MetaDispatchingEngine()
+#include<algorithm>
+#include<vector>
+
+list<string> MetaEngine::getNeededBex(){
+	list<string> ret;
+	BOOST_FOREACH(shared_ptr<EngineUnit> e, functorArguments){
+		list<string> eBex=e->getNeededBex();
+		ret.insert(ret.end(),eBex.begin(),eBex.end());
+	}
+	ret.sort();
+	ret.unique();
+	return ret;
+}
+
+
+MetaEngine::MetaEngine()
 {
 	functorNames.clear();
 	functorArguments.clear();
 }
 
 
-MetaDispatchingEngine::~MetaDispatchingEngine()
+MetaEngine::~MetaEngine()
 {
 }
 
 
-void MetaDispatchingEngine::postProcessAttributes(bool deserializing)
+void MetaEngine::postProcessAttributes(bool deserializing)
 {
 	Engine::postProcessAttributes(deserializing);
 }
 
 
-void MetaDispatchingEngine::registerAttributes()
+void MetaEngine::registerAttributes()
 {
 	Engine::registerAttributes();
 	REGISTER_ATTRIBUTE(functorNames);
@@ -34,12 +49,12 @@ void MetaDispatchingEngine::registerAttributes()
 }
 
 
-vector<vector<string> >& MetaDispatchingEngine::getFunctorNames()
+vector<vector<string> >& MetaEngine::getFunctorNames()
 {
 	return functorNames;
 }
 
-void MetaDispatchingEngine::clear()
+void MetaEngine::clear()
 {
 	functorNames.clear();
 	functorArguments.clear();
@@ -47,7 +62,7 @@ void MetaDispatchingEngine::clear()
 
 
 
-void MetaDispatchingEngine::storeFunctorName(const string& baseClassName1, const string& libName, shared_ptr<EngineUnit> eu)
+void MetaEngine::storeFunctorName(const string& baseClassName1, const string& libName, shared_ptr<EngineUnit> eu)
 {
 	vector<string> v;
 
@@ -60,7 +75,7 @@ void MetaDispatchingEngine::storeFunctorName(const string& baseClassName1, const
 }
 
 
-void MetaDispatchingEngine::storeFunctorName( const string& baseClassName1, const string& baseClassName2, const string& libName, shared_ptr<EngineUnit> eu)
+void MetaEngine::storeFunctorName( const string& baseClassName1, const string& baseClassName2, const string& libName, shared_ptr<EngineUnit> eu)
 {
 	vector<string> v;
 
@@ -74,7 +89,7 @@ void MetaDispatchingEngine::storeFunctorName( const string& baseClassName1, cons
 }
 
 
-void MetaDispatchingEngine::storeFunctorName( const string& baseClassName1, const string& baseClassName2, const string& baseClassName3, const string& libName, shared_ptr<EngineUnit> eu)
+void MetaEngine::storeFunctorName( const string& baseClassName1, const string& baseClassName2, const string& baseClassName3, const string& libName, shared_ptr<EngineUnit> eu)
 {
 	vector<string> v;
 
@@ -90,7 +105,7 @@ void MetaDispatchingEngine::storeFunctorName( const string& baseClassName1, cons
 }
 
 
-void MetaDispatchingEngine::storeFunctorArguments(shared_ptr<EngineUnit> eu)
+void MetaEngine::storeFunctorArguments(shared_ptr<EngineUnit> eu)
 {
 	if (!eu) 
 		return;
@@ -108,7 +123,7 @@ void MetaDispatchingEngine::storeFunctorArguments(shared_ptr<EngineUnit> eu)
 }
 
 
-shared_ptr<EngineUnit> MetaDispatchingEngine::findFunctorArguments(const string& libName)
+shared_ptr<EngineUnit> MetaEngine::findFunctorArguments(const string& libName)
 {
 
 	EngineUnitListIterator it    = functorArguments.begin();

@@ -9,12 +9,12 @@
 #ifndef METADISPATCHINGENGINE2D_HPP
 #define METADISPATCHINGENGINE2D_HPP
 
-#include "MetaDispatchingEngine.hpp"
+#include "MetaEngine.hpp"
 #include<yade/lib-multimethods/DynLibDispatcher.hpp>
 
-/*! Type-safe variant of the MetaDispatchingEngine2D::add function. Arguments are not strings, but regular typenames and will give compile-time error if not defined. They are passed to MetaDispatchingEngine2D::add in the same order as given. */
+/*! Type-safe variant of the MetaEngine2D::add function. Arguments are not strings, but regular typenames and will give compile-time error if not defined. They are passed to MetaEngine2D::add in the same order as given. */
 #define DISPATCHER_ADD3(e1,e2,e3) add(#e1,#e2,#e3); {/* compile-time check for class existence */ typedef e1 p1; typedef e2 p2; typedef e3 p3;}
-/*! Same as DISPATCHER_ADD3 macro, but passes the additional 4th argument to MetaDispatchingEngine2D::add as its 4th, optional argument */
+/*! Same as DISPATCHER_ADD3 macro, but passes the additional 4th argument to MetaEngine2D::add as its 4th, optional argument */
 #define DISPATCHER_ADD3_1(e1,e2,e3,e4) add(#e1,#e2,#e3,e4); {/* compile-time check for class existence */ typedef e1 p1; typedef e2 p2; typedef e3 p3;}
 
 
@@ -28,7 +28,7 @@ template
 	class EngineUnitArguments,
 	bool autoSymmetry=true
 >
-class MetaDispatchingEngine2D : public MetaDispatchingEngine,
+class MetaEngine2D : public MetaEngine,
 				public DynLibDispatcher
 				<	  TYPELIST_2(baseClass1,baseClass2)	// base classes for dispatch
 					, EngineUnitType			// class that provides multivirtual call
@@ -92,7 +92,7 @@ class MetaDispatchingEngine2D : public MetaDispatchingEngine,
 	protected :
 		void postProcessAttributes(bool deserializing)
 		{
-			MetaDispatchingEngine::postProcessAttributes(deserializing);
+			MetaEngine::postProcessAttributes(deserializing);
 			if(deserializing)
 			{
 				for(unsigned int i=0;i<functorNames.size();i++)
@@ -102,14 +102,14 @@ class MetaDispatchingEngine2D : public MetaDispatchingEngine,
 
 		void registerAttributes()
 		{
-			MetaDispatchingEngine::registerAttributes();
+			MetaEngine::registerAttributes();
 		}
-	REGISTER_CLASS_NAME(MetaDispatchingEngine2D);
-	REGISTER_BASE_CLASS_NAME(MetaDispatchingEngine DynLibDispatcher);
+	REGISTER_CLASS_NAME(MetaEngine2D);
+	REGISTER_BASE_CLASS_NAME(MetaEngine DynLibDispatcher);
 
 };
 
-//REGISTER_SERIALIZABLE(MetaDispatchingEngine2D,false);
+//REGISTER_SERIALIZABLE(MetaEngine2D,false);
 
 /*
 #define REGISTER_BASE_CLASS_TYPE_2D(name1,name2)			\

@@ -12,7 +12,7 @@
 #include "Engine.hpp"
 #include "EngineUnit.hpp"
 
-class MetaDispatchingEngine : public Engine
+class MetaEngine : public Engine
 {
 	public:
 		vector<vector<string> >		functorNames; // public for python interface; since there is getFunctorArguments returning RW(!) reference to this, why have it private anyway?!
@@ -30,6 +30,8 @@ class MetaDispatchingEngine : public Engine
 		virtual void add(shared_ptr<EngineUnit> eu=shared_ptr<EngineUnit>()) {throw;}
 		virtual void add(EngineUnit*) {throw;}
 		virtual void add(string) {throw;}
+
+		virtual list<string> getNeededBex();
 		
 		void storeFunctorName(const string& baseClassName1, const string& libName, shared_ptr<EngineUnit> eu);
 		void storeFunctorName(const string& baseClassName1, const string& baseClassName2, const string& libName, shared_ptr<EngineUnit> eu);
@@ -37,8 +39,8 @@ class MetaDispatchingEngine : public Engine
 		shared_ptr<EngineUnit> findFunctorArguments(const string& libName);
 		void clear();
 		
-		MetaDispatchingEngine();
-		virtual ~MetaDispatchingEngine();
+		MetaEngine();
+		virtual ~MetaEngine();
 		
 		virtual string getEngineUnitType() { throw; };
 		virtual int getDimension() { throw; };
@@ -47,11 +49,11 @@ class MetaDispatchingEngine : public Engine
 	protected :
 		virtual void registerAttributes();
 		virtual void postProcessAttributes(bool deserializing);
-	REGISTER_CLASS_NAME(MetaDispatchingEngine);
+	REGISTER_CLASS_NAME(MetaEngine);
 	REGISTER_BASE_CLASS_NAME(Engine);
 };
 
-REGISTER_SERIALIZABLE(MetaDispatchingEngine,false);
+REGISTER_SERIALIZABLE(MetaEngine,false);
 
 #endif // METADISPATCHINGENGINE_HPP
 
