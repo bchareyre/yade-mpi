@@ -79,7 +79,9 @@ def runInQtGui(background=True):
 	Omega().save(filename)
 	if background: bg=' &'
 	else: bg=''
-	os.system(yade.runtime.executable+' -N QtGUI -S "'+filename+'"'+bg)
+	cmd=yade.runtime.executable+' -N QtGUI -S "'+filename+'"'+bg
+	print "Running command: `"+cmd+"'"
+	os.system(cmd)
 	if not background: os.remove(filename)
 
 def PWaveTimeStep():
