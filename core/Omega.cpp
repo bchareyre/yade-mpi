@@ -23,6 +23,7 @@
 #include<cstdlib>
 #include<boost/filesystem/operations.hpp>
 #include<boost/filesystem/convenience.hpp>
+#include<boost/algorithm/string.hpp>
 
 #include<cxxabi.h>
 
@@ -316,77 +317,66 @@ string Omega::getSimulationFileName()
 
 void Omega::loadSimulation()
 {
-	if((Omega::instance().getSimulationFileName().size() != 0)
-		&&  (filesystem::exists(simulationFileName)) 
-		&&  (filesystem::extension(simulationFileName)==".xml" || filesystem::extension(simulationFileName)==".yade" ))
-	{
-		// FIXME: should stop running simulation!!
+	if(Omega::instance().getSimulationFileName().size()==0) throw yadeBadFile("Simulation filename to load has zero length");
+	if(filesystem::exists(simulationFileName)) throw yadeBadFile("Simulation file to load doesn't exist");
+	
+	// FIXME: should stop running simulation!!
+	LOG_INFO("Loading file " + simulationFileName);
+		
+	if(algorithm::ends_with(simulationFileName,".xml") || algorithm::ends_with(simulationFileName,".xml.gz") || algorithm::ends_with(simulationFileName,".xml.bz2")){
 		freeRootBody();
-		LOG_INFO("Loading file " + simulationFileName);
-		
-		if(filesystem::extension(simulationFileName)==".xml")
-			IOFormatManager::loadFromFile("XMLFormatManager",simulationFileName,"rootBody",rootBody);
-		else if(filesystem::extension(simulationFileName)==".yade" )
-			IOFormatManager::loadFromFile("BINFormatManager",simulationFileName,"rootBody",rootBody);
-		if( rootBody->getClassName() != "MetaBody")
-			throw yadeBadFile(string("Unrecognized extension `"+filesystem::extension(simulationFileName)+"': should be .xml|.yade").c_str());
-
-		sStartingSimulationTime = second_clock::local_time();
-		msStartingSimulationTime = microsec_clock::local_time();
-		simulationPauseDuration = msStartingSimulationTime-msStartingSimulationTime;
-		msStartingPauseTime = msStartingSimulationTime;
-		LOG_DEBUG("Simulation loaded");
-		currentIteration = 0;
-		simulationTime = 0;
-
-		if(rootBody->recover){
-			LOG_INFO("Simulation recovery effective.");
-			currentIteration=rootBody->recoverCurrentIteration;
-			stopAtIteration=rootBody->recoverStopAtIteration;
-			simulationTime=rootBody->recoverSimulationTime;	
-			rootBody->recover=false;
-		}
-		
+		IOFormatManager::loadFromFile("XMLFormatManager",simulationFileName,"rootBody",rootBody);
 	}
-	else
-	{
-		std::string error = yadeExceptions::BadFile + simulationFileName;
-		cerr << error.c_str() << endl;
-		throw yadeBadFile(error.c_str());
+	else if(algorithm::ends_with(simulationFileName,".yade")){
+		freeRootBody();
+		IOFormatManager::loadFromFile("BINFormatManager",simulationFileName,"rootBody",rootBody);
+	}
+	else throw (yadeBadFile("Extension of file not recognized."));
+
+	if( rootBody->getClassName() != "MetaBody") throw yadeBadFile("Wrong file format (rootBody is not a MetaBody!) ??");
+
+	sStartingSimulationTime = second_clock::local_time();
+	msStartingSimulationTime = microsec_clock::local_time();
+	simulationPauseDuration = msStartingSimulationTime-msStartingSimulationTime;
+	msStartingPauseTime = msStartingSimulationTime;
+	LOG_DEBUG("Simulation loaded");
+	currentIteration = 0;
+	simulationTime = 0;
+
+	if(rootBody->recover){
+		LOG_INFO("Simulation recovery effective.");
+		currentIteration=rootBody->recoverCurrentIteration;
+		stopAtIteration=rootBody->recoverStopAtIteration;
+		simulationTime=rootBody->recoverSimulationTime;	
+		rootBody->recover=false;
 	}
 }
 
 void Omega::saveSimulation(const string name, bool recover)
 {
-	if((name.size()!= 0) && (filesystem::extension(name)==".xml" || filesystem::extension(name)==".yade")){
-		LOG_INFO("Saving file " << name);
-
-		if(recover){
-			LOG_INFO("Simulation recovery enabled.");
-			rootBody->recover=true;
-			rootBody->recoverCurrentIteration=currentIteration;
-			rootBody->recoverStopAtIteration=stopAtIteration;
-			rootBody->recoverSimulationTime=simulationTime;
-		}
-
-		if(filesystem::extension(name)==".xml") {
-			FormatChecker::format=FormatChecker::XML;
-			IOFormatManager::saveToFile("XMLFormatManager",name,"rootBody",rootBody);
-		}
-
-		else if(filesystem::extension(name)==".yade" ) {
-			FormatChecker::format=FormatChecker::BIN;
-			IOFormatManager::saveToFile("BINFormatManager",name,"rootBody",rootBody);
-		}
-
-		if(recover) rootBody->recover=false;
+	if(name.size()==0) throw yadeBadFile("Filename with zero length.");
+	LOG_INFO("Saving file " << name);
+	if(recover){
+		LOG_INFO("Simulation recovery enabled.");
+		rootBody->recover=true;
+		rootBody->recoverCurrentIteration=currentIteration;
+		rootBody->recoverStopAtIteration=stopAtIteration;
+		rootBody->recoverSimulationTime=simulationTime;
 	}
-	else
-	{
-		std::string error = yadeExceptions::BadFile + name;
-		cerr << error.c_str() << endl;
-		throw yadeBadFile(error.c_str());
+
+	if(algorithm::ends_with(name,".xml") || algorithm::ends_with(name,".xml.gz") || algorithm::ends_with(name,".xml.bz2")){
+		FormatChecker::format=FormatChecker::XML;
+		IOFormatManager::saveToFile("XMLFormatManager",name,"rootBody",rootBody);
 	}
+	else if(algorithm::ends_with(name,".yade")){
+		FormatChecker::format=FormatChecker::BIN;
+		IOFormatManager::saveToFile("BINFormatManager",name,"rootBody",rootBody);
+	}
+	else {
+		rootBody->recover=false;
+		throw(yadeBadFile(("Filename extension not recognized in `"+name+"'").c_str()));
+	}
+	rootBody->recover=false;
 }
 
 void Omega::freeRootBody()

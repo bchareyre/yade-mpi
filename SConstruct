@@ -255,6 +255,8 @@ if not env.GetOption('clean'):
 		or conf.CheckLibWithHeader('boost_thread','boost/thread/thread.hpp','c++','boost::thread::thread();',autoadd=1))
 	ok&=(conf.CheckLibWithHeader('boost_filesystem-mt','boost/filesystem/path.hpp','c++','boost::filesystem::path();',autoadd=1)
 		or conf.CheckLibWithHeader('boost_filesystem','boost/filesystem/path.hpp','c++','boost::filesystem::path();',autoadd=1))
+	ok&=(conf.CheckLibWithHeader('boost_iostreams-mt','boost/iostreams/device/file.hpp','c++','boost::iostreams::file_sink("");',autoadd=1)
+		or conf.CheckLibWithHeader('boost_iostreams','boost/iostreams/device/file.hpp','c++','boost::iostreams::file_sink("");',autoadd=1))
 
 	if not env['useMiniWm3']: ok&=conf.CheckLibWithHeader('Wm3Foundation','Wm3Math.h','c++','Wm3::Math<double>::PI;',autoadd=1)
 

@@ -3,17 +3,18 @@
 
 o=Omega() # this creates default rootBody as well
 
-# is used in both initializers and engines, assign to a temporary
-aabbDisp=MetaEngine('BoundingVolumeMetaEngine',[EngineUnit('InteractingSphere2AABB'),EngineUnit('InteractingBox2AABB'),EngineUnit('MetaInteractingGeometry2AABB')])
-
 o.initializers=[
 	StandAloneEngine('PhysicalActionContainerInitializer'),
-	aabbDisp
+	MetaEngine('BoundingVolumeMetaEngine',[EngineUnit('InteractingSphere2AABB'),EngineUnit('InteractingBox2AABB'),EngineUnit('MetaInteractingGeometry2AABB')])
 	]
 
 o.engines=[
 	StandAloneEngine('PhysicalActionContainerReseter'),
-	aabbDisp,
+	MetaEngine('BoundingVolumeMetaEngine',[
+		EngineUnit('InteractingSphere2AABB'),
+		EngineUnit('InteractingBox2AABB'),
+		EngineUnit('MetaInteractingGeometry2AABB')
+	]),
 	StandAloneEngine('PersistentSAPCollider'),
 	MetaEngine('InteractionGeometryMetaEngine',[
 		EngineUnit('InteractingSphere2InteractingSphere4SpheresContactGeometry'),
@@ -21,8 +22,6 @@ o.engines=[
 	]),
 	MetaEngine('InteractionPhysicsMetaEngine',[EngineUnit('SimpleElasticRelationships')]),
 	StandAloneEngine('ElasticContactLaw'),
-	StandAloneEngine('GlobalStiffnessCounter',{'interval':50}),
-	StandAloneEngine('GlobalStiffnessTimeStepper',{'defaultDt':1e-5,'active':True,'timeStepUpdateInterval':50}),
 	DeusExMachina('GravityEngine',{'gravity':[0,0,-9.81]}),
 	MetaEngine('PhysicalActionDamper',[
 		EngineUnit('CundallNonViscousForceDamping',{'damping':0.2}),
@@ -34,6 +33,8 @@ o.engines=[
 	]),
 	MetaEngine('PhysicalParametersMetaEngine',[EngineUnit('LeapFrogPositionIntegrator')]),
 	MetaEngine('PhysicalParametersMetaEngine',[EngineUnit('LeapFrogOrientationIntegrator')]),
+	StandAloneEngine('GlobalStiffnessCounter',{'interval':50}),
+	StandAloneEngine('GlobalStiffnessTimeStepper',{'defaultDt':1e-5,'active':True,'timeStepUpdateInterval':50}),
 ]
 
 
@@ -42,13 +43,9 @@ o.bodies.append(utils.box(extents=[.5,.5,.5],center=[0,0,0],dynamic=False,color=
 o.bodies.append(utils.sphere(1,[0,0,2],color=[0,1,0]))
 # o.dt=.2*utils.PWaveTimeStep()
 
-#o.save('/tmp/a.xml')
-#print "===================== SAVING FINISHED ====================="
-#o.load('/tmp/a.xml')
-#import sys
-#sys.exit(0)
+o.save('/tmp/a.xml.bz2')
 
-if True: # shorter, but doesn't test the (de)serializer, since binary format is used
+if True:
 	# will run in background
 	utils.runInQtGui()
 else:

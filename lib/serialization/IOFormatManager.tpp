@@ -1,3 +1,4 @@
+// vim:syn=cpp
 /*************************************************************************
 *  Copyright (C) 2004 by Olivier Galizzi                                 *
 *  olivier.galizzi@imag.fr                                               *
@@ -14,42 +15,77 @@
 #include "Archive.hpp"
 #include "SerializationExceptions.hpp"
 #include "IOManagerExceptions.hpp"
+#include<boost/scoped_ptr.hpp>
+#include<boost/iostreams/filtering_stream.hpp>
+#include<boost/iostreams/filter/gzip.hpp>
+#include<boost/iostreams/filter/bzip2.hpp>
+#include<boost/iostreams/device/file.hpp>
+#include<boost/algorithm/string.hpp>
 
 template<typename Type>
 void IOFormatManager::loadFromFile(const string& libName, const string& fileName,const string& name, Type& t)
 {
-	ifstream filei(fileName.c_str());
-	if(!filei.good())
-		throw SerializableError(IOManagerExceptions::FileNotGood);
+	std::istream* anyIn;
+
+	if(boost::algorithm::ends_with(fileName,".xml")){
+		anyIn=new ifstream(fileName.c_str());
+	}
+	else if(boost::algorithm::ends_with(fileName,".xml.gz")){
+		iostreams::filtering_istream* in=new iostreams::filtering_istream();
+		in->push(iostreams::gzip_decompressor());
+		in->push(iostreams::file_source(fileName));
+	}
+	else if(boost::algorithm::ends_with(fileName,".xml.bz2")){
+		iostreams::filtering_istream* in=new iostreams::filtering_istream();
+		in->push(iostreams::bzip2_decompressor());
+		in->push(iostreams::file_source(fileName));
+	}
+	
+	if(!anyIn->good()) throw SerializableError(IOManagerExceptions::FileNotGood);
 
 	shared_ptr<IOFormatManager> ioManager;
 	ioManager = YADE_PTR_CAST<IOFormatManager>(ClassFactory::instance().createShared(libName));
 
 	shared_ptr<Archive> ac = Archive::create(name,t);
-	string str = ioManager->beginDeserialization(filei,*ac);
-	ac->deserialize(filei, *ac, str);
-	ioManager->finalizeDeserialization(filei,*ac);
+	string str = ioManager->beginDeserialization(*anyIn,*ac);
+	ac->deserialize(*anyIn, *ac, str);
+	ioManager->finalizeDeserialization(*anyIn,*ac);
 
-	filei.close();
+	delete anyIn;
 }
 
 
 template<typename Type>
 void IOFormatManager::saveToFile(const string& libName, const string& fileName,const string& name, Type& t)
 {
-	ofstream fileo(fileName.c_str());
-	if(!fileo.good())
-		throw  SerializableError(IOManagerExceptions::FileNotGood);
+	std::ostream* anyOut;
+
+	if(boost::algorithm::ends_with(fileName,".xml")){
+		anyOut=new ofstream(fileName.c_str());
+	}
+	else if(boost::algorithm::ends_with(fileName,".xml.gz")){
+		iostreams::filtering_ostream* out=new iostreams::filtering_ostream();
+		out->push(iostreams::gzip_compressor());
+		out->push(iostreams::file_sink(fileName));
+		anyOut=out;
+	}
+	else if(boost::algorithm::ends_with(fileName,".xml.bz2")){
+		iostreams::filtering_ostream* out=new iostreams::filtering_ostream();
+		out->push(iostreams::bzip2_compressor());
+		out->push(iostreams::file_sink(fileName));
+		anyOut=out;
+	}
+	if(!anyOut->good()) throw SerializableError(IOManagerExceptions::FileNotGood);
 	
 	shared_ptr<IOFormatManager> ioManager;
 	ioManager = static_pointer_cast<IOFormatManager>(ClassFactory::instance().createShared(libName));
 
 	shared_ptr<Archive> ac = Archive::create(name,t);
-	ioManager->beginSerialization(fileo, *ac);
-	ac->serialize(fileo, *ac, 1);
-	ioManager->finalizeSerialization(fileo, *ac);
+	ioManager->beginSerialization(*anyOut, *ac);
+	ac->serialize(*anyOut, *ac, 1);
+	ioManager->finalizeSerialization(*anyOut, *ac);
 
-	fileo.close();
+	delete anyOut;
 }
 
 
