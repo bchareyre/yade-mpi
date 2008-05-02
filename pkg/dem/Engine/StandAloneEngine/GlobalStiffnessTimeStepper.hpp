@@ -55,6 +55,7 @@ class GlobalStiffnessTimeStepper : public TimeStepper
 	protected :
 		virtual void registerAttributes();
 
+	NEEDS_BEX("GlobalStiffness");
 	REGISTER_CLASS_NAME(GlobalStiffnessTimeStepper);
 	REGISTER_BASE_CLASS_NAME(TimeStepper);
 };

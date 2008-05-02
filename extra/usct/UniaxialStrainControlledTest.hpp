@@ -5,6 +5,7 @@
 #include<yade/extra/Shop.hpp>
 #include<yade/core/FileGenerator.hpp>
 #include<yade/core/DeusExMachina.hpp>
+#include<yade/core/PhysicalAction.hpp>
 
 class USCTGen: public FileGenerator {
 	private:
@@ -27,6 +28,7 @@ class USCTGen: public FileGenerator {
 			REGISTER_ATTRIBUTE(damping);
 			REGISTER_ATTRIBUTE(cohesiveThresholdIter);
 		}
+	NEEDS_BEX("Force","Momentum","GlobalStiffness");
 	REGISTER_CLASS_NAME(USCTGen);
 	REGISTER_BASE_CLASS_NAME(FileGenerator);
 	DECLARE_LOGGER;
@@ -42,7 +44,7 @@ class UniaxialStrainer: public DeusExMachina {
 		void computeAxialForce(MetaBody* rootBody);
 		ofstream recStream;
 		bool needsInit;
-		#define USCT_AXIS_COORD(id) (Body::byId(id)->physicalParameters->se3.position[axis])
+		Real& axisCoord(body_id_t id){ return Body::byId(id)->physicalParameters->se3.position[axis]; };
 	public:
 		Real strainRate,currentStrainRate,originalLength,limitStrain;
 		Real sumPosForces,sumNegForces;

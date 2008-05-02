@@ -38,6 +38,7 @@ class ForceRecorder : public DataRecorder
 
 	protected :
 		virtual void postProcessAttributes(bool deserializing);
+	NEEDS_BEX("Force");
 	REGISTER_CLASS_NAME(ForceRecorder);
 	REGISTER_BASE_CLASS_NAME(DataRecorder);
 };

@@ -28,6 +28,8 @@ class PhysicalActionContainerInitializer : public StandAloneEngine
 	protected : 
 		virtual void registerAttributes();
 
+	DECLARE_LOGGER;
+
 	REGISTER_CLASS_NAME(PhysicalActionContainerInitializer);
 	REGISTER_BASE_CLASS_NAME(StandAloneEngine);
 };

@@ -27,6 +27,7 @@ class GravityEngine : public DeusExMachina
 	
 	protected :
 		virtual void registerAttributes();
+	NEEDS_BEX("Force");
 	REGISTER_CLASS_NAME(GravityEngine);
 	REGISTER_BASE_CLASS_NAME(DeusExMachina);
 };

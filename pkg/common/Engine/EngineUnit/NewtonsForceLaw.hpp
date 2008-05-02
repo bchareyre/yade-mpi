@@ -17,7 +17,7 @@ class NewtonsForceLaw : public PhysicalActionApplierUnit
 		virtual void go( 	  const shared_ptr<PhysicalAction>&
 					, const shared_ptr<PhysicalParameters>&
 					, const Body*);
-
+	NEEDS_BEX("Force");
 	FUNCTOR2D(Force,ParticleParameters);
 	REGISTER_CLASS_NAME(NewtonsForceLaw);
 	REGISTER_BASE_CLASS_NAME(PhysicalActionApplierUnit);

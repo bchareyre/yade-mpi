@@ -442,12 +442,13 @@ vector<pair<Vector3r,Real> > Shop::loadSpheresFromFile(string fname, Vector3r& m
 
 
 vector<pair<Vector3r,Real> > Shop::loadSpheresSmallSdecXyz(Vector3r& minXYZ, Vector3r& maxXYZ){
-	int i=0;
+	int i=-1;
 	vector<pair<Vector3r,Real> > spheres;
-	while(Shop::smallSdecXyzData[i].r<0){
+	while(Shop::smallSdecXyzData[++i].r>0){
 		Vector3r C(smallSdecXyzData[i].C0,smallSdecXyzData[i].C1,smallSdecXyzData[i].C2); Real r(smallSdecXyzData[i].r);
 		for(int j=0; j<3; j++) { minXYZ[j]=(spheres.size()>0?min(C[j]-r,minXYZ[j]):C[j]-r); maxXYZ[j]=(spheres.size()>0?max(C[j]+r,maxXYZ[j]):C[j]+r);}
 		spheres.push_back(pair<Vector3r,Real>(C,r));
+		//LOG_DEBUG("Loaded sphere with radius "<<r<<" at "<<C);
 	}
 	return spheres;
 }
@@ -1065,7 +1066,7 @@ Shop::sphereGeomStruct Shop::smallSdecXyzData[]={
 	{0.362861,0.429363,0.031830,0.012967},
 	{0.340153,0.437578,0.060896,0.007843},
 	{0.370512,0.415453,0.055970,0.010546},
-	{0,0,0,0}
+	{-1.,-1.,-1.,-1. } /* sentinel: non-positive radius */
 };
 
 /* Create permanent link between partcles that have transient link now, return number of created permalinks.

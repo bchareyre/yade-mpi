@@ -122,7 +122,7 @@ class BrefcomLaw: public InteractionSolver{
 			recStream.open("/tmp/breflaw.data")
 		#endif
 		; }
-
+	NEEDS_BEX("Force","Momentum");
 	REGISTER_CLASS_NAME(BrefcomLaw);
 	REGISTER_BASE_CLASS_NAME(InteractionSolver);
 	DECLARE_LOGGER;
@@ -230,6 +230,7 @@ class BrefcomStiffnessCounter : public InteractionSolver{
 		virtual bool isActivated(){return (Omega::instance().getCurrentIteration()%interval)==0;}
 	protected :
 		void registerAttributes(){REGISTER_ATTRIBUTE(interval);}
+	NEEDS_BEX("Force","Momentum","GlobalStiffness");
 	REGISTER_CLASS_NAME(BrefcomStiffnessCounter);
 	REGISTER_BASE_CLASS_NAME(InteractionSolver);
 };

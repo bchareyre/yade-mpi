@@ -16,6 +16,7 @@
 class EngineUnit : public Serializable
 {
 	public: virtual vector<std::string> getFunctorTypes(){throw;}
+		virtual list<string> getNeededBex(){return list<string>();}
 	REGISTER_CLASS_NAME(EngineUnit);
 	REGISTER_BASE_CLASS_NAME(Serializable);
 };

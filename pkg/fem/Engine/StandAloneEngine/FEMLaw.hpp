@@ -31,6 +31,7 @@ class FEMLaw : public InteractionSolver
 /// Serializtion
 	protected :
 		virtual void registerAttributes();
+	NEEDS_BEX("Force");
 	REGISTER_CLASS_NAME(FEMLaw);
 	REGISTER_BASE_CLASS_NAME(InteractionSolver);
 

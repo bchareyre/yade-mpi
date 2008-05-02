@@ -26,6 +26,7 @@ class CentralGravityEngine: public DeusExMachina {
 		virtual void applyCondition(MetaBody*);
 	protected:
 		virtual void registerAttributes(){REGISTER_ATTRIBUTE(centralBody); REGISTER_ATTRIBUTE(kappa);}
+		NEEDS_BEX("Force");
 		REGISTER_CLASS_NAME(CentralGravityEngine);
 		REGISTER_BASE_CLASS_NAME(DeusExMachina);
 };
@@ -49,6 +50,7 @@ class AxialGravityEngine: public DeusExMachina {
 		virtual void applyCondition(MetaBody*);
 	protected:
 		virtual void registerAttributes(){REGISTER_ATTRIBUTE(axisPoint); REGISTER_ATTRIBUTE(axisDirection); REGISTER_ATTRIBUTE(acceleration); }
+		NEEDS_BEX("Force");
 		REGISTER_CLASS_NAME(AxialGravityEngine);
 		REGISTER_BASE_CLASS_NAME(DeusExMachina);
 		DECLARE_LOGGER;

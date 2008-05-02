@@ -10,13 +10,13 @@
 #define INTERACTIONPHYSICSMETAENGINE_HPP 
 
 
-#include<yade/core/MetaDispatchingEngine2D.hpp>
+#include<yade/core/MetaEngine2D.hpp>
 #include<yade/lib-multimethods/DynLibDispatcher.hpp>
 #include<yade/core/PhysicalParameters.hpp>
 #include<yade/core/Interaction.hpp>
 #include "InteractionPhysicsEngineUnit.hpp"
 
-class InteractionPhysicsMetaEngine : 	public MetaDispatchingEngine2D
+class InteractionPhysicsMetaEngine : 	public MetaEngine2D
 					<	
 						PhysicalParameters,					// base classe for dispatch
 						PhysicalParameters,					// base classe for dispatch
@@ -32,7 +32,7 @@ class InteractionPhysicsMetaEngine : 	public MetaDispatchingEngine2D
 		virtual void action(MetaBody*);
 
 	REGISTER_CLASS_NAME(InteractionPhysicsMetaEngine);
-	REGISTER_BASE_CLASS_NAME(MetaDispatchingEngine2D);
+	REGISTER_BASE_CLASS_NAME(MetaEngine2D);
 };
 
 REGISTER_SERIALIZABLE(InteractionPhysicsMetaEngine,false);

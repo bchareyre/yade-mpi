@@ -34,6 +34,7 @@ class VolumicContactLaw : public InteractionSolver
 
 	protected :
 		void registerAttributes();
+	NEEDS_BEX("Force","Momentum");
 	REGISTER_CLASS_NAME(VolumicContactLaw);
 	REGISTER_BASE_CLASS_NAME(InteractionSolver);
 };

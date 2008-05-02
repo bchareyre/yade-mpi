@@ -10,6 +10,11 @@ sys.excepthook=sys.__excepthook__ # apport on ubuntu override this, we don't nee
 
 from yade.wrapper import *
 
+# python2.4 workaround (so that quit() works as it does in 2.5)
+if not callable(__builtins__.quit):
+	def _quit(): import sys; sys.exit(0)
+	__builtins__.quit=_quit
+
 ## run simulation if requested from the command line
 if runtime.simulation:
 	print "Running simulation "+runtime.simulation

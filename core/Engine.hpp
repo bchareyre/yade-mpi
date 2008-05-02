@@ -24,6 +24,8 @@ class Engine : public Serializable
 	
 		virtual bool isActivated() { return true; };
 		virtual void action(MetaBody*) { throw; };
+		/* returns all BodyExternalVariable's (Bex; formerly PhysicalActions) that this engine needs */
+		virtual list<string> getNeededBex(){return list<string>();}
 
 	REGISTER_CLASS_NAME(Engine);
 	REGISTER_BASE_CLASS_NAME(Serializable);

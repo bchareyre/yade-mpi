@@ -18,7 +18,6 @@ o.run(10); o.wait() # run first 10 iterations
 start=time.time(); o.run(nIter); o.wait(); finish=time.time() # run nIter iterations, wait to finish, measure elapsed time
 speed=nIter/(finish-start) # rough estimate
 open(speedFile,'w').write('%%g'%%speed)
-print quit
 quit()
 """%(simulFile,speedFile,100)
 

@@ -15,6 +15,8 @@
 #include<yade/lib-serialization/Serializable.hpp>
 #include<yade/lib-multimethods/Indexable.hpp>
 
+/* Helper macro for Engines and Engine units to declare what PhysicalParameters (Bex, BodyExternalVariables) they want to use */
+#define NEEDS_BEX(...) public: virtual std::list<std::string> getNeededBex(){ const char* bex[]={ __VA_ARGS__ "", NULL}; std::list<std::string> ret; for(int i=0; bex[i]!=NULL;i++){ret.push_back(std::string(bex[i]));} return ret; }
 
 class PhysicalAction : public Serializable, public Indexable
 {

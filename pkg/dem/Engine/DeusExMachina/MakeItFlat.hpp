@@ -26,6 +26,7 @@ class MakeItFlat : public DeusExMachina
 	
 	protected :
 		virtual void registerAttributes();
+	NEEDS_BEX("Force");
 	REGISTER_CLASS_NAME(MakeItFlat);
 	REGISTER_BASE_CLASS_NAME(DeusExMachina);
 };

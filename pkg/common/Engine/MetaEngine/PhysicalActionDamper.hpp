@@ -9,14 +9,14 @@
 #ifndef PHYSICALACTIONDAMPER_HPP
 #define PHYSICALACTIONDAMPER_HPP
 
-#include<yade/core/MetaDispatchingEngine2D.hpp>
+#include<yade/core/MetaEngine2D.hpp>
 #include<yade/lib-multimethods/DynLibDispatcher.hpp>
 #include<yade/core/PhysicalAction.hpp>
 #include "PhysicalActionDamperUnit.hpp"
 
 class Body;
 
-class PhysicalActionDamper : public MetaDispatchingEngine2D
+class PhysicalActionDamper : public MetaEngine2D
 				<	PhysicalAction,						// base classe for dispatch
 					PhysicalParameters,					// base classe for dispatch
 					PhysicalActionDamperUnit,				// class that provides multivirtual call
@@ -31,7 +31,7 @@ class PhysicalActionDamper : public MetaDispatchingEngine2D
 		virtual void action(MetaBody*);
 
 	REGISTER_CLASS_NAME(PhysicalActionDamper);
-	REGISTER_BASE_CLASS_NAME(MetaDispatchingEngine2D);
+	REGISTER_BASE_CLASS_NAME(MetaEngine2D);
 };
 
 REGISTER_SERIALIZABLE(PhysicalActionDamper,false);

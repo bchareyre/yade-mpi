@@ -23,7 +23,8 @@ class GeometricalModelForceColorizer : public StandAloneEngine
 
 		virtual void action(MetaBody*);
 		virtual bool isActivated();
-
+	
+	NEEDS_BEX("Force");	
 	REGISTER_CLASS_NAME(GeometricalModelForceColorizer);
 	REGISTER_BASE_CLASS_NAME(StandAloneEngine);
 };

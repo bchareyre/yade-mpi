@@ -15,13 +15,15 @@ CREATE_LOGGER(UniaxialStrainer);
 void UniaxialStrainer::init(){
 	needsInit=false;
 
+	assert(posIds.size()>0);
+	assert(negIds.size()>0);
 	posCoords.clear(); negCoords.clear();
 	BOOST_FOREACH(body_id_t id,posIds){ const shared_ptr<Body>& b=Body::byId(id); posCoords.push_back(b->physicalParameters->se3.position[axis]); b->isDynamic=false;}
 	BOOST_FOREACH(body_id_t id,negIds){ const shared_ptr<Body>& b=Body::byId(id); negCoords.push_back(b->physicalParameters->se3.position[axis]); b->isDynamic=false;}
 	assert(posIds.size()==posCoords.size() && negIds.size()==negCoords.size());
 
-	originalLength=USCT_AXIS_COORD(posIds[0])-USCT_AXIS_COORD(negIds[0]);
-	LOG_DEBUG("Reference particles: positive #"<<posIds[0]<<" at "<<USCT_AXIS_COORD(posIds[0])<<"; negative #"<<negIds[0]<<" at "<<USCT_AXIS_COORD(negIds[0]));
+	originalLength=axisCoord(posIds[0])-axisCoord(negIds[0]);
+	LOG_DEBUG("Reference particles: positive #"<<posIds[0]<<" at "<<axisCoord(posIds[0])<<"; negative #"<<negIds[0]<<" at "<<axisCoord(negIds[0]));
 	LOG_INFO("Setting initial length to "<<originalLength);
 	if(originalLength<=0) LOG_FATAL("Initial length is negative or zero (swapped reference particles?)! "<<originalLength);
 	assert(originalLength>0);
@@ -35,7 +37,7 @@ void UniaxialStrainer::init(){
 		crossSectionArea=1.;
 		LOG_WARN("No Axis Aligned Bounding Box for rootBody, using garbage value ("<<crossSectionArea<<") for crossSectionArea!");
 	}
-	assert(crossSectionArea>1);
+	assert(crossSectionArea>0);
 
 	recStream.open("/tmp/usct.data");
 }
@@ -43,7 +45,7 @@ void UniaxialStrainer::init(){
 void UniaxialStrainer::applyCondition(MetaBody* rootBody){
 	if(needsInit) init();
 	// postconditions for initParams
-	assert(posIds.size()==posCoords.size() && negIds.size()==negCoords.size() && originalLength>0 && crossSectionArea>1);
+	assert(posIds.size()==posCoords.size() && negIds.size()==negCoords.size() && originalLength>0 && crossSectionArea>0);
 	//nothing to do
 	if(posIds.size()==0 || negIds.size()==0) return;
 	// linearly increase strain to the desired value
@@ -52,14 +54,14 @@ void UniaxialStrainer::applyCondition(MetaBody* rootBody){
 	Real dAX=(asymmetry==0?.5:1)*currentStrainRate*originalLength*Omega::instance().getTimeStep();
 	for(size_t i=0; i<negIds.size(); i++){
 		if(asymmetry==0 || asymmetry==-1 /* for +1, don't move*/) negCoords[i]-=dAX;
-		USCT_AXIS_COORD(negIds[i])=negCoords[i]; // update current position
+		axisCoord(negIds[i])=negCoords[i]; // update current position
 	}
 	for(size_t i=0; i<posIds.size(); i++){
 		if(asymmetry==0 || asymmetry==1 /* for -1, don't move */) posCoords[i]+=dAX;
-		USCT_AXIS_COORD(posIds[i])=posCoords[i];
+		axisCoord(posIds[i])=posCoords[i];
 	}
 
-	Real axialLength=USCT_AXIS_COORD(posIds[0])-USCT_AXIS_COORD(negIds[0]);
+	Real axialLength=axisCoord(posIds[0])-axisCoord(negIds[0]);
 	Real strain=axialLength/originalLength-1;
 	if(Omega::instance().getCurrentIteration()%400==0) TRVAR5(dAX,axialLength,originalLength,currentStrainRate,strain);
 

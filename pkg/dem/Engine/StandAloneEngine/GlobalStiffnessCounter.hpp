@@ -46,6 +46,7 @@ class GlobalStiffnessCounter : public InteractionSolver
 
 	protected :
 		void registerAttributes();
+	NEEDS_BEX("Force","Momentum","GlobalStiffness");
 	REGISTER_CLASS_NAME(GlobalStiffnessCounter);
 	REGISTER_BASE_CLASS_NAME(InteractionSolver);
 };

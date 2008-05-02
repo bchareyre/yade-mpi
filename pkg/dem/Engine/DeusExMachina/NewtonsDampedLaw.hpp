@@ -55,7 +55,8 @@ class NewtonsDampedLaw : public DeusExMachina
 	
 	protected :
 		virtual void registerAttributes();
-	
+
+	NEEDS_BEX("Force","Momentum");	
 	REGISTER_CLASS_NAME(NewtonsDampedLaw);
 	REGISTER_BASE_CLASS_NAME(DeusExMachina);
 };

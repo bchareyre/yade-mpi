@@ -7,8 +7,9 @@ o=Omega() # this creates default rootBody as well
 aabbDisp=MetaEngine('BoundingVolumeMetaEngine',[EngineUnit('InteractingSphere2AABB'),EngineUnit('InteractingBox2AABB'),EngineUnit('MetaInteractingGeometry2AABB')])
 
 o.initializers=[
-	StandAloneEngine('PhysicalActionContainerInitializer',{'physicalActionNames':['Force','Momentum','GlobalStiffness']}),
-	aabbDisp]
+	StandAloneEngine('PhysicalActionContainerInitializer'),
+	aabbDisp
+	]
 
 o.engines=[
 	StandAloneEngine('PhysicalActionContainerReseter'),
@@ -41,11 +42,11 @@ o.bodies.append(utils.box(extents=[.5,.5,.5],center=[0,0,0],dynamic=False,color=
 o.bodies.append(utils.sphere(1,[0,0,2],color=[0,1,0]))
 # o.dt=.2*utils.PWaveTimeStep()
 
-o.save('/tmp/a.xml')
-print "===================== SAVING FINISHED ====================="
-o.load('/tmp/a.xml')
-import sys
-sys.exit(0)
+#o.save('/tmp/a.xml')
+#print "===================== SAVING FINISHED ====================="
+#o.load('/tmp/a.xml')
+#import sys
+#sys.exit(0)
 
 if True: # shorter, but doesn't test the (de)serializer, since binary format is used
 	# will run in background

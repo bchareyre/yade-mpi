@@ -10,12 +10,12 @@
 #define BODY_PHYSICAL_PARAMETERS_DISPATCHER_HPP 
 
 #include "PhysicalParametersEngineUnit.hpp"
-#include<yade/core/MetaDispatchingEngine1D.hpp>
+#include<yade/core/MetaEngine1D.hpp>
 #include<yade/lib-multimethods/DynLibDispatcher.hpp>
 #include<yade/core/PhysicalParameters.hpp>
 #include<yade/core/Body.hpp>
 
-class PhysicalParametersMetaEngine :	public MetaDispatchingEngine1D
+class PhysicalParametersMetaEngine :	public MetaEngine1D
 					<	
 						PhysicalParameters ,
 						PhysicalParametersEngineUnit,
@@ -29,7 +29,7 @@ class PhysicalParametersMetaEngine :	public MetaDispatchingEngine1D
 		virtual void action(MetaBody*);
 
 	REGISTER_CLASS_NAME(PhysicalParametersMetaEngine);
-	REGISTER_BASE_CLASS_NAME(MetaDispatchingEngine1D);
+	REGISTER_BASE_CLASS_NAME(MetaEngine1D);
 
 };
 

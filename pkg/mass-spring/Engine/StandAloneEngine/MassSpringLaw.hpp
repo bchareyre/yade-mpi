@@ -25,6 +25,7 @@ class MassSpringLaw : public InteractionSolver
 
 	protected :
 		void registerAttributes();
+	NEEDS_BEX("Force","Momentum");
 	REGISTER_CLASS_NAME(MassSpringLaw);
 	REGISTER_BASE_CLASS_NAME(InteractionSolver);
 };

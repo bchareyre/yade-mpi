@@ -35,6 +35,7 @@ class CohesiveFrictionalContactLaw : public InteractionSolver
 
 	protected :
 		void registerAttributes();
+	NEEDS_BEX("Force","Momentum");
 	REGISTER_CLASS_NAME(CohesiveFrictionalContactLaw);
 	REGISTER_BASE_CLASS_NAME(InteractionSolver);
 };

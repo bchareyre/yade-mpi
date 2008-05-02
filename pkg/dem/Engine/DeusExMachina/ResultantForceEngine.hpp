@@ -51,6 +51,7 @@ class ResultantForceEngine : public DeusExMachina
 	
 	protected :
 		virtual void registerAttributes();
+	NEEDS_BEX("Force","GlobalStiffness");
 	REGISTER_CLASS_NAME(ResultantForceEngine);
 	REGISTER_BASE_CLASS_NAME(DeusExMachina);
 };

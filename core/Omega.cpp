@@ -137,8 +137,8 @@ void Omega::buildDynlibDatabase(const vector<string>& dynlibsList)
 		for( ; bci!=bciEnd ; ++bci)
 		{
 			string name = *bci;
-			if (name=="MetaDispatchingEngine1D" || name=="MetaDispatchingEngine2D")
-				(*dli).second.baseClasses.insert("MetaDispatchingEngine");
+			if (name=="MetaEngine1D" || name=="MetaEngine2D")
+				(*dli).second.baseClasses.insert("MetaEngine");
 			else if (name=="EngineUnit1D" || name=="EngineUnit2D")
 				(*dli).second.baseClasses.insert("EngineUnit");
 			else if (name=="Serializable")

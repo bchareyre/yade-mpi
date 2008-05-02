@@ -27,6 +27,7 @@ class MomentEngine : public DeusExMachina
 	
 	protected :
 		virtual void registerAttributes();
+	NEEDS_BEX("Momentum");
 	REGISTER_CLASS_NAME(MomentEngine);
 	REGISTER_BASE_CLASS_NAME(DeusExMachina);
 };

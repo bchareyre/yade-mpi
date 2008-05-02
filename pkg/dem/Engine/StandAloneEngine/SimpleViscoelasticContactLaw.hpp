@@ -35,6 +35,7 @@ class SimpleViscoelasticContactLaw : public InteractionSolver
 
 	protected :
 		void registerAttributes();
+	NEEDS_BEX("Force","Momentum");
 	REGISTER_CLASS_NAME(SimpleViscoelasticContactLaw);
 	REGISTER_BASE_CLASS_NAME(InteractionSolver);
 };

@@ -22,9 +22,9 @@
 #include<yade/core/FileGenerator.hpp>
 
 
-#include<yade/core/MetaDispatchingEngine.hpp>
-#include<yade/core/MetaDispatchingEngine1D.hpp>
-#include<yade/core/MetaDispatchingEngine2D.hpp>
+#include<yade/core/MetaEngine.hpp>
+#include<yade/core/MetaEngine1D.hpp>
+#include<yade/core/MetaEngine2D.hpp>
 #include<yade/core/StandAloneEngine.hpp>
 #include<yade/core/DeusExMachina.hpp>
 #include<yade/core/EngineUnit.hpp>
@@ -157,11 +157,11 @@ BASIC_PY_PROXY_HEAD(pyEngineUnit,EngineUnit)
 BASIC_PY_PROXY_TAIL;
 
 
-BASIC_PY_PROXY_HEAD(pyMetaEngine,MetaDispatchingEngine)
+BASIC_PY_PROXY_HEAD(pyMetaEngine,MetaEngine)
 		// additional constructor
 		pyMetaEngine(string clss, python::list functors){init(clss); functors_set(functors);}
 		python::list functors_get(void){
-			ensureAcc(); shared_ptr<MetaDispatchingEngine> me=dynamic_pointer_cast<MetaDispatchingEngine>(proxee); if(!me) throw runtime_error("Proxied class not a MetaDispatchingEngine (WTF?)"); python::list ret;
+			ensureAcc(); shared_ptr<MetaEngine> me=dynamic_pointer_cast<MetaEngine>(proxee); if(!me) throw runtime_error("Proxied class not a MetaEngine (WTF?)"); python::list ret;
 			/* garbage design: functorArguments are instances of EngineUnits, but they may not be present; therefore, only use them if they exist; our pyMetaEngine, however, will always have both names and EnguneUnit objects in the same count */
 			for(size_t i=0; i<me->functorNames.size(); i++){
 				shared_ptr<EngineUnit> eu;
@@ -176,7 +176,7 @@ BASIC_PY_PROXY_HEAD(pyMetaEngine,MetaDispatchingEngine)
 			return ret;
 		}
 		void functors_set(python::list ftrs){
-			ensureAcc(); shared_ptr<MetaDispatchingEngine> me=dynamic_pointer_cast<MetaDispatchingEngine>(proxee); if(!me) throw runtime_error("Proxied class not a MetaDispatchingEngine. (WTF?)");
+			ensureAcc(); shared_ptr<MetaEngine> me=dynamic_pointer_cast<MetaEngine>(proxee); if(!me) throw runtime_error("Proxied class not a MetaEngine. (WTF?)");
 			me->clear(); int len=PySequence_Size(ftrs.ptr()) /*[boost1.34] python::len(ftrs)*/;
 			for(int i=0; i<len; i++){
 				python::extract<pyEngineUnit> euEx(ftrs[i]); if(!euEx.check()) throw invalid_argument("Unable to extract type EngineUnit from sequence.");
@@ -363,8 +363,8 @@ class pyOmega{
 		python::list ret; 
 		BOOST_FOREACH(shared_ptr<Engine>& eng, engContainer){
 			#define APPEND_ENGINE_IF_POSSIBLE(engineType,pyEngineType) { shared_ptr<engineType> e=dynamic_pointer_cast<engineType>(eng); if(e) { ret.append(pyEngineType(e)); continue; } }
-			APPEND_ENGINE_IF_POSSIBLE(MetaDispatchingEngine,pyMetaEngine); APPEND_ENGINE_IF_POSSIBLE(StandAloneEngine,pyStandAloneEngine); APPEND_ENGINE_IF_POSSIBLE(DeusExMachina,pyDeusExMachina);
-			throw std::runtime_error("Unknown engine type: `"+eng->getClassName()+"' (only MetaDispatchingEngine, StandAloneEngine and DeusExMachina are supported)");
+			APPEND_ENGINE_IF_POSSIBLE(MetaEngine,pyMetaEngine); APPEND_ENGINE_IF_POSSIBLE(StandAloneEngine,pyStandAloneEngine); APPEND_ENGINE_IF_POSSIBLE(DeusExMachina,pyDeusExMachina);
+			throw std::runtime_error("Unknown engine type: `"+eng->getClassName()+"' (only MetaEngine, StandAloneEngine and DeusExMachina are supported)");
 		}
 		return ret;
 	}

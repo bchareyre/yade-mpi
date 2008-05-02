@@ -12,7 +12,7 @@
 #define PHYSICALACTIONAPPLIER_HPP
 
 
-#include<yade/core/MetaDispatchingEngine2D.hpp>
+#include<yade/core/MetaEngine2D.hpp>
 #include<yade/lib-multimethods/DynLibDispatcher.hpp>
 #include<yade/core/PhysicalAction.hpp>
 
@@ -20,7 +20,7 @@
 
 class Body;
 
-class PhysicalActionApplier :	public MetaDispatchingEngine2D
+class PhysicalActionApplier :	public MetaEngine2D
 				<
 					PhysicalAction ,					// base classe for dispatch
 					PhysicalParameters,					// base classe for dispatch
@@ -36,7 +36,7 @@ class PhysicalActionApplier :	public MetaDispatchingEngine2D
 		virtual void action(MetaBody*);
 
 	REGISTER_CLASS_NAME(PhysicalActionApplier);
-	REGISTER_BASE_CLASS_NAME(MetaDispatchingEngine2D);
+	REGISTER_BASE_CLASS_NAME(MetaEngine2D);
 };
 
 REGISTER_SERIALIZABLE(PhysicalActionApplier,false);

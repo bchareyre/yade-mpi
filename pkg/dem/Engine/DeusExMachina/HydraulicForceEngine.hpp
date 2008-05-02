@@ -31,6 +31,7 @@ class HydraulicForceEngine : public DeusExMachina
 	
 	protected :
 		virtual void registerAttributes();
+	NEEDS_BEX("Force","Momentum");
 	REGISTER_CLASS_NAME(HydraulicForceEngine);
 	REGISTER_BASE_CLASS_NAME(DeusExMachina);
 };

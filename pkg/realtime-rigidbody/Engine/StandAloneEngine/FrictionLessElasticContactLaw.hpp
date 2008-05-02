@@ -25,6 +25,7 @@ class FrictionLessElasticContactLaw : public InteractionSolver
 
 	protected :
 		 void registerAttributes();
+	NEEDS_BEX("Force","Momentum");
 	REGISTER_CLASS_NAME(FrictionLessElasticContactLaw);
 	REGISTER_BASE_CLASS_NAME(InteractionSolver);
 

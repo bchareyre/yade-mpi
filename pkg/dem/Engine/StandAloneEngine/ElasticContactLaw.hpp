@@ -10,6 +10,7 @@
 #define ELASTIC_CONTACT_LAW_HPP
 
 #include<yade/core/InteractionSolver.hpp>
+#include<yade/core/PhysicalAction.hpp>
 
 #include <set>
 #include <boost/tuple/tuple.hpp>
@@ -34,6 +35,8 @@ class ElasticContactLaw : public InteractionSolver
 
 	protected :
 		void registerAttributes();
+
+	NEEDS_BEX("Force","Momentum");
 	REGISTER_CLASS_NAME(ElasticContactLaw);
 	REGISTER_BASE_CLASS_NAME(InteractionSolver);
 };

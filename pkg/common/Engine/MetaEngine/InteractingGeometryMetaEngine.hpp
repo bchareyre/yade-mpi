@@ -11,13 +11,13 @@
 
 #include "InteractingGeometryEngineUnit.hpp"
 
-#include<yade/core/MetaDispatchingEngine2D.hpp>
+#include<yade/core/MetaEngine2D.hpp>
 #include<yade/lib-multimethods/DynLibDispatcher.hpp>
 #include<yade/core/GeometricalModel.hpp>
 #include<yade/core/InteractingGeometry.hpp>
 #include<yade/core/Body.hpp>
 
-class InteractingGeometryMetaEngine : 	public MetaDispatchingEngine2D
+class InteractingGeometryMetaEngine : 	public MetaEngine2D
 					<	
 						GeometricalModel,						// base classe for dispatch
 						InteractingGeometry,						// base classe for dispatch
@@ -34,7 +34,7 @@ class InteractingGeometryMetaEngine : 	public MetaDispatchingEngine2D
 		virtual void action(MetaBody*);
 
 	REGISTER_CLASS_NAME(InteractingGeometryMetaEngine);
-	REGISTER_BASE_CLASS_NAME(MetaDispatchingEngine2D);
+	REGISTER_BASE_CLASS_NAME(MetaEngine2D);
 };
 
 REGISTER_SERIALIZABLE(InteractingGeometryMetaEngine,false);

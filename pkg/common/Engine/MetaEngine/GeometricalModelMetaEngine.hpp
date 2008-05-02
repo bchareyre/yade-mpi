@@ -10,13 +10,13 @@
 #define GEOMETRICAL_MODEL_DISPATCHER_HPP
 
 #include "GeometricalModelEngineUnit.hpp"
-#include<yade/core/MetaDispatchingEngine2D.hpp>
+#include<yade/core/MetaEngine2D.hpp>
 #include<yade/lib-multimethods/DynLibDispatcher.hpp>
 #include<yade/core/PhysicalParameters.hpp>
 #include<yade/core/GeometricalModel.hpp>
 #include<yade/core/Body.hpp>
 
-class GeometricalModelMetaEngine :	public MetaDispatchingEngine2D
+class GeometricalModelMetaEngine :	public MetaEngine2D
 					<	
 						PhysicalParameters,
 						GeometricalModel,
@@ -32,7 +32,7 @@ class GeometricalModelMetaEngine :	public MetaDispatchingEngine2D
 		virtual void action(MetaBody*);
 
 	REGISTER_CLASS_NAME(GeometricalModelMetaEngine);
-	REGISTER_BASE_CLASS_NAME(MetaDispatchingEngine2D);
+	REGISTER_BASE_CLASS_NAME(MetaEngine2D);
 };
 
 REGISTER_SERIALIZABLE(GeometricalModelMetaEngine,false);

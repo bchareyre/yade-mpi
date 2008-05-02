@@ -152,6 +152,7 @@ class TetraLaw: public InteractionSolver {
 		DECLARE_LOGGER;
 	protected:
 		void registerAttributes(){InteractionSolver::registerAttributes(); /* … */ }
+		NEEDS_BEX("Force","Momentum");
 		REGISTER_CLASS_NAME(TetraLaw);
 		REGISTER_BASE_CLASS_NAME(InteractionSolver);
 };
