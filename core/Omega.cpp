@@ -318,7 +318,7 @@ string Omega::getSimulationFileName()
 void Omega::loadSimulation()
 {
 	if(Omega::instance().getSimulationFileName().size()==0) throw yadeBadFile("Simulation filename to load has zero length");
-	if(filesystem::exists(simulationFileName)) throw yadeBadFile("Simulation file to load doesn't exist");
+	if(!filesystem::exists(simulationFileName)) throw yadeBadFile("Simulation file to load doesn't exist");
 	
 	// FIXME: should stop running simulation!!
 	LOG_INFO("Loading file " + simulationFileName);
