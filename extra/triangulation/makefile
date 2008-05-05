@@ -76,7 +76,7 @@ test$(EXE_EXT): test$(OBJ_EXT)\
 libTesselationWrapper.a : 	TesselationWrapper$(OBJ_EXT) \
 				Tesselation$(OBJ_EXT) \
 				RegularTriangulation$(OBJ_EXT)
-	$(CGAL_LIB_CREATE) 	libTesselationWrapper.a \
+	 		ar cr	libTesselationWrapper.a \
 				TesselationWrapper$(OBJ_EXT) \
 				Tesselation$(OBJ_EXT) \
 				RegularTriangulation$(OBJ_EXT)
