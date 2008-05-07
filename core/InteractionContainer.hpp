@@ -8,12 +8,12 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef INTERACTIONCONTAINER_HPP
-#define INTERACTIONCONTAINER_HPP
+#pragma once
 
+#include"InteractionContainerIteratorPointer.hpp"
 #include<yade/lib-serialization/Serializable.hpp>
-#include "InteractionContainerIteratorPointer.hpp"
-#include <boost/thread/mutex.hpp>
+#include<boost/thread/mutex.hpp>
+#include<boost/range.hpp>
 
 class Interaction;
 
@@ -52,5 +52,21 @@ class InteractionContainer : public Serializable
 
 REGISTER_SERIALIZABLE(InteractionContainer,false);
 
-#endif // INTERACTIONCONTAINER_HPP
+// BOOST_FOREACH compatibility
+#ifndef foreach
+#  define foreach BOOST_FOREACH
+#endif
+
+namespace boost{
+   template<> struct range_iterator<InteractionContainer>{ typedef InteractionContainer::iterator type; };
+   template<> struct range_const_iterator<InteractionContainer>{ typedef InteractionContainer::iterator type; };
+}
+inline InteractionContainer::iterator boost_range_begin(InteractionContainer& ic){ return ic.begin(); }
+inline InteractionContainer::iterator boost_range_end(InteractionContainer& ic){ return ic.end(); }
+namespace std{
+   template<> struct iterator_traits<InteractionContainer::iterator>{
+      typedef forward_iterator_tag iterator_category;
+      typedef shared_ptr<Interaction> reference;
+   };
+}
 

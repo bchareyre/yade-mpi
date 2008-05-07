@@ -366,6 +366,7 @@ list<Tetrahedron> Tetra2TetraBang::TetraClipByPlane(const Tetrahedron& T, const 
 	#undef ZER
 	// unreachable
 	assert(false);
+	return(ret); // prevent warning
 }
 
 CREATE_LOGGER(TetraLaw);

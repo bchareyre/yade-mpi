@@ -38,6 +38,7 @@ class BodyContainerIteratorPointer
 		};
 
 		bool operator!=(const BodyContainerIteratorPointer& bi)	{ return ptr->isDifferent(bi.getRef());	};
+		bool operator==(const BodyContainerIteratorPointer& bi)	{ return !ptr->isDifferent(bi.getRef());	};
 		shared_ptr<Body>			operator*()	{ return ptr->getValue(); };	
 		BodyContainerIteratorPointer&		operator++()	{ ptr->increment(); return *this; };
 		BodyContainerIteratorPointer&		operator++(int); // disabled 

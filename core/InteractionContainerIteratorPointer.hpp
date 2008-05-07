@@ -38,6 +38,7 @@ class InteractionContainerIteratorPointer
 		InteractionContainerIteratorPointer()  { ptr = shared_ptr<InteractionContainerIterator>(); };
 
 		bool operator!=(const InteractionContainerIteratorPointer& bi) { return ptr->isDifferent(bi.getRef()); };
+		bool operator==(const InteractionContainerIteratorPointer& bi) { return !ptr->isDifferent(bi.getRef()); };
 		shared_ptr<Interaction>			operator*() { return ptr->getValue(); };	
 		InteractionContainerIteratorPointer&	operator++() { ptr->increment(); return *this; };
 		InteractionContainerIteratorPointer&	operator++(int); // disabled

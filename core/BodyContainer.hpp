@@ -9,21 +9,15 @@
 *************************************************************************/
 
 
-#ifndef BODYCONTAINER_HPP
-#define BODYCONTAINER_HPP
-
+#pragma once
 
 #include<yade/lib-serialization/Serializable.hpp>
-
-
-#include "BodyContainerIteratorPointer.hpp"
-
+#include"BodyContainerIteratorPointer.hpp"
+#include<boost/range.hpp>
 
 class Body;
 
-
 using namespace boost;
-
 
 class BodyContainer : public Serializable
 {
@@ -65,5 +59,26 @@ class BodyContainer : public Serializable
 
 REGISTER_SERIALIZABLE(BodyContainer,false);
 
-#endif // __BODYCONTAINER_HPP__
+/* for BOOST_FOREACH compatibility */
+#ifndef foreach
+#	define foreach BOOST_FOREACH
+#endif
+
+namespace boost{
+	template<> struct range_iterator<BodyContainer>{ typedef BodyContainer::iterator type; };  
+	template<> struct range_const_iterator<BodyContainer>{ typedef BodyContainer::iterator type; }; 
+}
+
+inline BodyContainer::iterator boost_range_begin(BodyContainer& bc){ return bc.begin(); }
+inline BodyContainer::iterator boost_range_end(BodyContainer& bc){ return bc.end(); }
+/* //not needed (and const iterator is not supported by BodyContainer either)
+inline BodyContainer::iterator boost_range_begin(BodyContainer const & bc){ return bc.begin(); }
+inline BodyContainer::iterator boost_range_end(BodyContainer const & bc){ return bc.end(); }
+*/
+namespace std{
+	template<> struct iterator_traits<BodyContainer::iterator>{
+		typedef forward_iterator_tag iterator_category;
+		typedef shared_ptr<Body> reference;
+	};
+}
 

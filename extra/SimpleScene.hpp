@@ -7,8 +7,8 @@
 
 class SimpleScene: public FileGenerator {
 	public:
-		USCTGen(){};
-		~USCTGen (){};
+		SimpleScene(){};
+		~SimpleScene (){};
 		virtual bool generate();
 	protected :
 		void registerAttributes(){ FileGenerator::registerAttributes(); }

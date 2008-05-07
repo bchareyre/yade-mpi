@@ -6,6 +6,10 @@
 #include<yade/pkg-dem/SDECLinkGeometry.hpp>
 #include<yade/pkg-dem/SDECLinkPhysics.hpp>
 #include<yade/extra/Brefcom.hpp>
+#include<boost/foreach.hpp>
+
+#include<yade/core/InteractionContainer.hpp>
+
 YADE_PLUGIN("USCTGen","UniaxialStrainer");
 
 
@@ -77,6 +81,11 @@ void UniaxialStrainer::applyCondition(MetaBody* rootBody){
 }
 
 void UniaxialStrainer::computeAxialForce(MetaBody* rootBody){
+	#if 0
+		// for testing only
+		foreach(shared_ptr<Interaction> i, *rootBody->transientInteractions){ cerr<<"Testing foreach for interactions: "<<i->getId1()<<" "<<i->getId2()<<endl; }
+		foreach(shared_ptr<Body> b, *rootBody->bodies){ cerr<<"Testing foreach for bodies: "<<b->getId()<<endl; }
+	#endif
 	sumPosForces=0; sumNegForces=0;
 		shared_ptr<Force> f(new Force);
 		for(size_t i=0; i<negIds.size(); i++){
@@ -90,6 +99,7 @@ void UniaxialStrainer::computeAxialForce(MetaBody* rootBody){
 
 /***************************************** USCTGen **************************/
 CREATE_LOGGER(USCTGen);
+
 
 bool USCTGen::generate(){
 	message="";
@@ -132,6 +142,7 @@ bool USCTGen::generate(){
 			LOG_DEBUG("POS inserted #"<<sId<<" with C[axis]="<<C[axis]);
 		}
 	}
+
 #if 0
 	/* clump spheres together if requested */
 	if(clumped){
