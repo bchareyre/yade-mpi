@@ -601,6 +601,5 @@ BOOST_PYTHON_MODULE(wrapper)
 
 	BASIC_PY_PROXY_WRAPPER(pyFileGenerator,"Preprocessor")
 		.def("generate",&pyFileGenerator::generate);
-
 }
 

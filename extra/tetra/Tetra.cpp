@@ -133,7 +133,7 @@ bool Tetra2TetraBang::go(const shared_ptr<InteractingGeometry>& cm1,const shared
 	 *  2. tangent?! hopefully not needed at all. */
 
 	Matrix3r Ip, R; // principal moments of inertia, rotation matrix
-	I.EigenDecomposition(R,Ip);
+	(void) /* should check convergence*/ I.EigenDecomposition(R,Ip);
 	// according to the documentation in Wm3 header, diagonal entries are in ascending order: d0<=d1<=d2;
 	// but keep it algorithmic for now and just assert that.
 	int ix=(Ip(0,0)<Ip(1,1) && Ip(0,0)<Ip(2,2))?0:( (Ip(1,1)<Ip(0,0) && Ip(1,1)<Ip(2,2))?1:2); // index of the minimum moment of inertia

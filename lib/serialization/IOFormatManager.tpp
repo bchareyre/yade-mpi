@@ -25,67 +25,39 @@
 template<typename Type>
 void IOFormatManager::loadFromFile(const string& libName, const string& fileName,const string& name, Type& t)
 {
-	std::istream* anyIn;
-
-	if(boost::algorithm::ends_with(fileName,".xml")){
-		anyIn=new ifstream(fileName.c_str());
-	}
-	else if(boost::algorithm::ends_with(fileName,".xml.gz")){
-		iostreams::filtering_istream* in=new iostreams::filtering_istream();
-		in->push(iostreams::gzip_decompressor());
-		in->push(iostreams::file_source(fileName));
-	}
-	else if(boost::algorithm::ends_with(fileName,".xml.bz2")){
-		iostreams::filtering_istream* in=new iostreams::filtering_istream();
-		in->push(iostreams::bzip2_decompressor());
-		in->push(iostreams::file_source(fileName));
-	}
+	iostreams::filtering_istream in;
+	if(boost::algorithm::ends_with(fileName,".xml.gz")) in.push(iostreams::gzip_decompressor());
+	else if(boost::algorithm::ends_with(fileName,".xml.bz2")) in.push(iostreams::bzip2_decompressor());
+	in.push(iostreams::file_source(fileName));
 	
-	if(!anyIn->good()) throw SerializableError(IOManagerExceptions::FileNotGood);
+	if(!in.good()) throw SerializableError(IOManagerExceptions::FileNotGood);
 
 	shared_ptr<IOFormatManager> ioManager;
 	ioManager = YADE_PTR_CAST<IOFormatManager>(ClassFactory::instance().createShared(libName));
 
 	shared_ptr<Archive> ac = Archive::create(name,t);
-	string str = ioManager->beginDeserialization(*anyIn,*ac);
-	ac->deserialize(*anyIn, *ac, str);
-	ioManager->finalizeDeserialization(*anyIn,*ac);
-
-	delete anyIn;
+	string str = ioManager->beginDeserialization(in,*ac);
+	ac->deserialize(in, *ac, str);
+	ioManager->finalizeDeserialization(in,*ac);
 }
 
 
 template<typename Type>
 void IOFormatManager::saveToFile(const string& libName, const string& fileName,const string& name, Type& t)
 {
-	std::ostream* anyOut;
-
-	if(boost::algorithm::ends_with(fileName,".xml")){
-		anyOut=new ofstream(fileName.c_str());
-	}
-	else if(boost::algorithm::ends_with(fileName,".xml.gz")){
-		iostreams::filtering_ostream* out=new iostreams::filtering_ostream();
-		out->push(iostreams::gzip_compressor());
-		out->push(iostreams::file_sink(fileName));
-		anyOut=out;
-	}
-	else if(boost::algorithm::ends_with(fileName,".xml.bz2")){
-		iostreams::filtering_ostream* out=new iostreams::filtering_ostream();
-		out->push(iostreams::bzip2_compressor());
-		out->push(iostreams::file_sink(fileName));
-		anyOut=out;
-	}
-	if(!anyOut->good()) throw SerializableError(IOManagerExceptions::FileNotGood);
+	iostreams::filtering_ostream out;
+	if(boost::algorithm::ends_with(fileName,".xml.gz")) out.push(iostreams::gzip_compressor());
+	else if(boost::algorithm::ends_with(fileName,".xml.bz2")) out.push(iostreams::bzip2_compressor());
+	out.push(iostreams::file_sink(fileName));
+	if(!out.good()) throw SerializableError(IOManagerExceptions::FileNotGood);
 	
 	shared_ptr<IOFormatManager> ioManager;
 	ioManager = static_pointer_cast<IOFormatManager>(ClassFactory::instance().createShared(libName));
 
 	shared_ptr<Archive> ac = Archive::create(name,t);
-	ioManager->beginSerialization(*anyOut, *ac);
-	ac->serialize(*anyOut, *ac, 1);
-	ioManager->finalizeSerialization(*anyOut, *ac);
-
-	delete anyOut;
+	ioManager->beginSerialization(out, *ac);
+	ac->serialize(out, *ac, 1);
+	ioManager->finalizeSerialization(out, *ac);
 }
 
 

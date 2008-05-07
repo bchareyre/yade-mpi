@@ -164,10 +164,10 @@ void BrefcomLaw::applyForce(const Vector3r force){
 	Shop::Bex::momentum(id1)+=(contGeom->contactPoint-rbp1->se3.position).Cross(force);
 	Shop::Bex::momentum(id1)-=(contGeom->contactPoint-rbp2->se3.position).Cross(force);
 */
-	static_cast<Force*>(rootBody->physicalActions->find(id1,ForceClassIndex))->force+=force;
-	static_cast<Force*>(rootBody->physicalActions->find(id2,ForceClassIndex))->force-=force;
-	static_cast<Momentum*>(rootBody->physicalActions->find(id1,MomentumClassIndex))->momentum+=(contGeom->contactPoint-rbp1->se3.position).Cross(force);
-	static_cast<Momentum*>(rootBody->physicalActions->find(id2,MomentumClassIndex))->momentum-=(contGeom->contactPoint-rbp2->se3.position).Cross(force);
+	static_pointer_cast<Force>(rootBody->physicalActions->find(id1,ForceClassIndex))->force+=force;
+	static_pointer_cast<Force>(rootBody->physicalActions->find(id2,ForceClassIndex))->force-=force;
+	static_pointer_cast<Momentum>(rootBody->physicalActions->find(id1,MomentumClassIndex))->momentum+=(contGeom->contactPoint-rbp1->se3.position).Cross(force);
+	static_pointer_cast<Momentum>(rootBody->physicalActions->find(id2,MomentumClassIndex))->momentum-=(contGeom->contactPoint-rbp2->se3.position).Cross(force);
 }
 
 void BrefcomLaw::action(MetaBody* _rootBody){
