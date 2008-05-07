@@ -24,7 +24,7 @@ GLViewer::GLViewer(int id, shared_ptr<RenderingEngine> rendererInit, const QGLFo
 	viewId = id;
 	cut_plane = 0;
 	cut_plane_delta = -2;
-	resize(320, 240);
+	resize(550,550);
 
 	if (id==0)
 		setCaption("Primary View (not closable)");

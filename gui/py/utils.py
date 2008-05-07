@@ -104,6 +104,7 @@ def spheresFromFile(filename,**kw):
 	All remaining arguments are passed the the yade.utils.sphere function that creates the bodies.
 	
 	Returns list of body ids that were inserted."""
+	o=Omega()
 	ret=[]
 	for l in open(filename):
 		ss=[float(i) for i in l.split()]

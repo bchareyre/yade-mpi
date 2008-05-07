@@ -1,13 +1,16 @@
 // © 2007 Václav Šmilauer <eudoxos@arcig.cz>
 #pragma once
 #include<yade/core/FrontEnd.hpp>
-#include<boost/shared_ptr.hpp>
+#include<boost/shared_ptr.hpp>a
+#include<termios.h>
 
 class PythonUI: public FrontEnd
 {
 	private:
 		void help();
 		void execScript(string);
+		static struct termios tios,tios_orig;
+		static void termRestore();
 	public:
 		PythonUI(){};
 		virtual ~PythonUI(){};

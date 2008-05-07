@@ -74,4 +74,14 @@ class Shop{
 		static void GLDrawText(std::string text, Vector3r pos, Vector3r color=Vector3r(1,1,1));
 		static void GLDrawNum(Real n, Vector3r pos, Vector3r color=Vector3r(1,1,1), unsigned precision=3);
 
+		class Bex{
+			public:
+			static int forceIdx,momentumIdx,globalStiffnessIdx;
+			static void init();
+			static Vector3r& force(body_id_t);
+			static Vector3r& momentum(body_id_t);
+			static Vector3r& globalStiffness(body_id_t);
+			static Vector3r& globalRStiffness(body_id_t);
+		};
+
 };

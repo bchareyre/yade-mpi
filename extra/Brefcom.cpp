@@ -34,9 +34,12 @@ void BrefcomMakeContact::go(const shared_ptr<PhysicalParameters>& pp1, const sha
 	assert(contGeom); // for now, don't handle anything other than SpheresContactGeometry
 
 	if(!interaction->isNew && interaction->interactionPhysics){
-		const shared_ptr<BrefcomContact> contPhys=dynamic_pointer_cast<BrefcomContact>(interaction->interactionPhysics);
-		assert(contPhys);
-		contPhys->prevNormal=contGeom->normal;
+		/* BrefcomContact->prevNormal is assigned in BrefcomLaw::action */
+		#if 0
+			const shared_ptr<BrefcomContact> contPhys=dynamic_pointer_cast<BrefcomContact>(interaction->interactionPhysics);
+			assert(contPhys);
+			contPhys->prevNormal=contGeom->normal;
+		#endif
 	} else {
 		interaction->isNew; // just in case
 		//TRACE;
@@ -56,7 +59,7 @@ void BrefcomMakeContact::go(const shared_ptr<PhysicalParameters>& pp1, const sha
 		 * */
 		shared_ptr<BrefcomContact> contPhys(new BrefcomContact(
 			/* E */ E,
-			/* G */ E*(1-alpha*nu12)/(1+nu12),
+			/* G */ E/2*(1+nu12), //FIXME: apply apha, beta, gamma coefficients here as well?! // !!!*(1-alpha*nu12)/(1+nu12),
 			/* tanFrictionAngle */ tan(.5*(elast1->frictionAngle+elast2->frictionAngle)),
 			/* undamagedCohesion */ S12*sigmaT,
 			/* equilibriumDist */ d0,
@@ -64,7 +67,7 @@ void BrefcomMakeContact::go(const shared_ptr<PhysicalParameters>& pp1, const sha
 			/* epsCracking */ sigmaT/E12,
 			/* epsFracture */ 5*sigmaT/E12,
 			/* expBending */ expBending,
-			/* xiShear*/ 0
+			/* xiShear*/ 0.
 			));
 		contPhys->prevNormal=contGeom->normal;
 		if(cohesiveThresholdIter<0 || Omega::instance().getCurrentIteration()<cohesiveThresholdIter) contPhys->isCohesive=true;
@@ -156,10 +159,15 @@ Real BrefcomLaw::calibrateEpsFracture(double Gf, double E, double expBending, do
 }
 
 void BrefcomLaw::applyForce(const Vector3r force){
-	static_pointer_cast<Force>(rootBody->physicalActions->find(id1,ForceClassIndex))->force+=force;
-	static_pointer_cast<Force>(rootBody->physicalActions->find(id2,ForceClassIndex))->force-=force;
-	static_pointer_cast<Momentum>(rootBody->physicalActions->find(id1,MomentumClassIndex))->momentum+=(contGeom->contactPoint-rbp1->se3.position).Cross(force);
-	static_pointer_cast<Momentum>(rootBody->physicalActions->find(id2,MomentumClassIndex))->momentum-=(contGeom->contactPoint-rbp2->se3.position).Cross(force);
+/*	Shop::Bex::force(id1)+=force;
+	Shop::Bex::force(id2)-=force;
+	Shop::Bex::momentum(id1)+=(contGeom->contactPoint-rbp1->se3.position).Cross(force);
+	Shop::Bex::momentum(id1)-=(contGeom->contactPoint-rbp2->se3.position).Cross(force);
+*/
+	static_cast<Force*>(rootBody->physicalActions->find(id1,ForceClassIndex))->force+=force;
+	static_cast<Force*>(rootBody->physicalActions->find(id2,ForceClassIndex))->force-=force;
+	static_cast<Momentum*>(rootBody->physicalActions->find(id1,MomentumClassIndex))->momentum+=(contGeom->contactPoint-rbp1->se3.position).Cross(force);
+	static_cast<Momentum*>(rootBody->physicalActions->find(id2,MomentumClassIndex))->momentum-=(contGeom->contactPoint-rbp2->se3.position).Cross(force);
 }
 
 void BrefcomLaw::action(MetaBody* _rootBody){
@@ -202,26 +210,51 @@ void BrefcomLaw::action(MetaBody* _rootBody){
 
 		Real dist=(rbp1->se3.position-rbp2->se3.position).Length();
 
+		/*LOG_DEBUG(" ============= ITERATION "<<Omega::instance().getCurrentIteration()<<" ================");
+		TRVAR4(epsN,epsT,kappaD,equilibriumDist);
+		TRVAR2(rbp1->se3.position,rbp2->se3.position);
+		TRVAR2(rbp1->velocity,rbp2->velocity);
+		TRVAR2(rbp1->angularVelocity,rbp2->angularVelocity);
+		TRVAR3(BC->prevNormal,contGeom->normal,contGeom->contactPoint);
+		TRVAR1(Omega::instance().getTimeStep());*/
+
+
 		/* FIXME dist>0 doesn't take into account interaction radius!!! */
 		// /* TODO: recover non-cohesive contact deletion: */
 		if(!BC->isCohesive && dist>0){ /* delete this interaction later */ /* (*I)->isReal=false; */ continue; }
 
-		/* rotate epsT to the new contact plane */
-			const Real& dt=Omega::instance().getTimeStep();
-			// rotation of the contact normal
-			epsT+=BC->epsT.Cross(BC->prevNormal.Cross(contGeom->normal));
-			// mutual rotation
-			Real angle=dt*.5*contGeom->normal.Dot(rbp1->angularVelocity+rbp2->angularVelocity); /* broken, assumes equal radii */
-			epsT+=epsT.Cross(angle*contGeom->normal);
+		if(dist>=0) { epsT=Vector3r::ZERO; }
+		else {
+			/* rotate epsT to the new contact plane */
+				const Real& dt=Omega::instance().getTimeStep();
+#if 1
+				// rotation of the contact normal
+				//TRVAR2(epsT,BC->prevNormal.Cross(contGeom->normal));
+				//TRVAR1((BC->prevNormal.Cross(contGeom->normal)).Cross(epsT));
+				epsT+=(BC->prevNormal.Cross(contGeom->normal)).Cross(epsT);
+				
+				// mutual rotation
+				Real angle=dt*.5*contGeom->normal.Dot(rbp1->angularVelocity+rbp2->angularVelocity); /*assumes equal radii */
+				//TRVAR1(dt*.5*contGeom->normal.Dot(rbp1->angularVelocity+rbp2->angularVelocity));
+				//TRVAR1(epsT.Cross(angle*contGeom->normal));
+				epsT+=(angle*contGeom->normal).Cross(epsT);
 
-		/* calculate tangential strain increment */
-			Vector3r relVelocity /* at the contact point */ = 
-				rbp1->velocity-rbp2->velocity
-				+rbp1->angularVelocity.Cross(contGeom->contactPoint-rbp1->se3.position)
-				-rbp2->angularVelocity.Cross(contGeom->contactPoint-rbp2->se3.position);
-			Vector3r tangentialDisplacement=dt*(relVelocity-contGeom->normal.Dot(relVelocity)*contGeom->normal);
-		epsT+=tangentialDisplacement/dist;
-		
+#endif 
+			/* calculate tangential strain increment */
+				Vector3r AtoC(contGeom->contactPoint-rbp1->se3.position), BtoC(contGeom->contactPoint-rbp2->se3.position);
+				Vector3r relVelocity /* at the contact point */ = 
+					//rbp2->velocity-rbp1->velocity +
+					rbp2->angularVelocity.Cross(BtoC)
+					-rbp1->angularVelocity.Cross(AtoC);
+				Vector3r tangentialDisplacement=dt*(relVelocity- /* subtract non-shear component */ contGeom->normal.Dot(relVelocity)*contGeom->normal);
+				//TRVAR2(AtoC,BtoC);
+				//TRVAR3(relVelocity,tangentialDisplacement,tangentialDisplacement/dist);
+			epsT+=tangentialDisplacement/dist;
+			/* artificially remove residuum in the normal direction */
+			//epsT-=contGeom->normal*epsT.Dot(contGeom->normal);
+			//TRVAR1(epsT.Dot(contGeom->normal));
+		}
+			
 		/* normal strain */
 		epsN=(dist-equilibriumDist)/equilibriumDist;
 
@@ -239,6 +272,7 @@ void BrefcomLaw::action(MetaBody* _rootBody){
 
 		// store Fn (and Fs?), for use with BrefcomStiffnessCounter
 		Fn=sigmaN*crossSection;
+		//TRVAR5(epsN,epsT,sigmaN,sigmaT,crossSection*(contGeom->normal*sigmaN + sigmaT));
 		applyForce(crossSection*(contGeom->normal*sigmaN + sigmaT)); /* this is the force applied on the _first_ body */
 
 		#ifdef BREFCOM_REC
@@ -248,6 +282,9 @@ void BrefcomLaw::action(MetaBody* _rootBody){
 			for(size_t i=0; i<recValues.size(); i++) recStream<<recLabels[i]<<": "<<recValues[i]<<" ";
 			recStream<<endl;
 		#endif
+
+		/* store this normal for next timestep */
+		BC->prevNormal=contGeom->normal;
 	}
 	// delete interactions that were requested to be deleted.
 	//for(list<shared_ptr<Interaction> >::iterator I=interactionsToBeDeleted.begin(); I!=interactionsToBeDeleted.end(); I++){ rootBody->transientInteractions->erase((*I)->getId1(),(*I)->getId2()); }

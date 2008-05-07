@@ -257,6 +257,9 @@ if not env.GetOption('clean'):
 		or conf.CheckLibWithHeader('boost_filesystem','boost/filesystem/path.hpp','c++','boost::filesystem::path();',autoadd=1))
 	ok&=(conf.CheckLibWithHeader('boost_iostreams-mt','boost/iostreams/device/file.hpp','c++','boost::iostreams::file_sink("");',autoadd=1)
 		or conf.CheckLibWithHeader('boost_iostreams','boost/iostreams/device/file.hpp','c++','boost::iostreams::file_sink("");',autoadd=1))
+	foreach=conf.CheckCXXHeader('boost/foreach.hpp','<>')
+	if not foreach: print "(You can get the foreach.hpp header from http://article.gmane.org/gmane.science.physics.yade.devel/367 and save it in /usr/include/boost. It will coexist with boost 1.33 without problems.)"
+	ok&=foreach
 
 	if not env['useMiniWm3']: ok&=conf.CheckLibWithHeader('Wm3Foundation','Wm3Math.h','c++','Wm3::Math<double>::PI;',autoadd=1)
 
@@ -264,23 +267,13 @@ if not env.GetOption('clean'):
 		ok&=conf.CheckQt(env['QTDIR'])
 		env.Tool('qt'); env.Replace(QT_LIB='qt-mt')
 		env['QGLVIEWER_LIB']='yade-QGLViewer';
-		# one or another (QGLViewer is upstream name, 3dviewer is (teomporary) workaround for clashing name with obsolete package once in debian)
-		# (this one has to be explicitly mentioned for each plugin that uses it, no autoadd)
-		#if env['useLocalQGLViewer']:
-		#	env['QGLVIEWER_LIB']='yade-QGLViewer';
-		#else:
-		#	if conf.CheckLibWithHeader('QGLViewer','QGLViewer/qglviewer.h','c++','QGLViewer(1);'): env['QGLVIEWER_LIB']='QGLViewer'
-		#	elif conf.CheckLibWithHeader('qglviewer','QGLViewer/qglviewer.h','c++','QGLViewer(1);'): env['QGLVIEWER_LIB']='qglviewer'
-		#	elif conf.CheckLibWithHeader('3dviewer','QGLViewer/qglviewer.h','c++','QGLViewer(1);'): env['QGLVIEWER_LIB']='3dviewer'
-		#	else: ok=False
-		#	if ok: print "!!! WARNING\n!!! Using system QGLViewer is not very well tested \n!!! and if there is version mismatch, wrong headers may be included.\n!!! If you get mysterious crashes, look here for cause. "
 
 	if not ok:
 		print "\nOne of the essential libraries above was not found, unable to continue.\n\nCheck `%s' for possible causes, note that there are options that you may need to customize:\n\n"%(buildDir+'/config.log')+opts.GenerateHelpText(env)
 		Exit(1)
 
 	# check optional libs
-	if 'log4cxx' in env['features'] and conf.CheckLibWithHeader('log4cxx','log4cxx/logger.h','c++','log4cxx::Logger::getLogger("foo");',autoadd=1):
+	if 'log4cxx' in env['features'] and conf.CheckLibWithHeader('log4cxx','log4cxx/logger.h','c++','log4cxx::Logger::getLogger("");',autoadd=1):
 		env.Append(CPPDEFINES=['LOG4CXX'])
 	if 'python' in env['features'] and conf.CheckPython() and ( ### not needed now: and conf.CheckScientificPython() and (
 		conf.CheckLibWithHeader('boost_python-mt','boost/python.hpp','c++','boost::python::scope();',autoadd=1)

@@ -4,14 +4,15 @@
 #include<boost/algorithm/string.hpp>
 #include<errno.h>
 
+#include<stdlib.h>
+
 #include"PythonUI.hpp"
 
 #include <X11/Xlib.h>
 
 using namespace boost;
 
-//void cmdlineThreadStart(){
-//}
+struct termios PythonUI::tios, PythonUI::tios_orig;
 
 CREATE_LOGGER(PythonUI);
 
@@ -47,6 +48,11 @@ void PythonUI::execScript(string script){
 	}
 }
 
+void PythonUI::termRestore(void){
+	LOG_DEBUG("Restoring terminal discipline.");
+	tcsetattr(STDIN_FILENO,TCSANOW,&PythonUI::tios_orig);
+}
+
 int PythonUI::run(int argc, char *argv[]) {
 	string runScript;
 	string runCommands;
@@ -69,6 +75,14 @@ int PythonUI::run(int argc, char *argv[]) {
 		else optind--;
 	}
 	for (int index = optind+1; index<argc; index++) LOG_ERROR("Unprocessed non-option argument: `"<<argv[index]<<"'");
+
+   LOG_DEBUG("Setting terminal discipline (disabling ^C)");
+	tcgetattr(STDIN_FILENO,&PythonUI::tios);
+   memcpy(&PythonUI::tios_orig,&PythonUI::tios,sizeof(struct termios));
+   atexit(PythonUI::termRestore);
+	tios.c_cc[VINTR] = 0; // disable ^C
+	tcsetattr(STDIN_FILENO,TCSANOW,&PythonUI::tios);
+   tcflush(STDIN_FILENO,TCIFLUSH);
 
 
 	XInitThreads();
@@ -95,6 +109,8 @@ int PythonUI::run(int argc, char *argv[]) {
 		execScript(PREFIX "/lib/yade" SUFFIX "/gui/PythonUI_rc.py");
 
 	PyGILState_Release(pyState);
+
+	tcsetattr(STDIN_FILENO,TCSANOW,&tios_orig);
 
 	//boost::thread cmdlineThread(&cmdlineThreadStart);
 	//cmdlineThread.join();

@@ -37,7 +37,14 @@ try:
 	# prefer ipython, since it is colorful and cool
 	from IPython.Shell import IPShellEmbed
 	sys.argv=['<embedded python interpreter>']
-	ipshell = IPShellEmbed()
+	ipshell = IPShellEmbed(banner=r"""__   __    ____          ____                      _      
+\ \ / /_ _|  _ \  ___   / ___|___  _ __  ___  ___ | | ___ 
+ \ V / _` | | | |/ _ \ | |   / _ \| '_ \/ __|/ _ \| |/ _ \ 
+  | | (_| | |_| |  __/ | |__| (_) | | | \__ \ (_) | |  __/
+  |_|\__,_|____/ \___|  \____\___/|_| |_|___/\___/|_|\___|
+""",exit_msg='Bye.'
+	,rc_override={'execfile':[runtime.prefix+'/lib/yade'+runtime.suffix+'/gui/yade/ipython.py']})
+
 	ipshell()
 except ImportError:
 	## no ipython :-(, let's emulate it

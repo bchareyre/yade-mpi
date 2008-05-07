@@ -60,12 +60,12 @@ YadeQtMainWindow::YadeQtMainWindow() : YadeQtGeneratedMainWindow()
 	resize(preferences->mainWindowSizeX,preferences->mainWindowSizeY);
 	move(preferences->mainWindowPositionX,preferences->mainWindowPositionY);
 	
-	addMenu("Edit");
+	//addMenu("Edit");
 	addMenu("Preprocessor");
 	addMenu("Postprocessor");
-	addMenu("Extra");
+	//addMenu("Extra");
 
-	addItem("Edit","Preferences...","QtPreferencesEditor");
+	//addItem("Edit","Preferences...","QtPreferencesEditor");
 		
 	addItem("Preprocessor","File Generator...","QtFileGenerator");
 	//addItem("Preprocessor","Engine Editor...","QtEngineEditor");
@@ -73,7 +73,7 @@ YadeQtMainWindow::YadeQtMainWindow() : YadeQtGeneratedMainWindow()
 
 	addItem("Postprocessor","Simulation Player...","QtSimulationPlayer");
 
-	addItem("Extra","Spherical DEM Simulator...","QtSphericalDEM");
+	//addItem("Extra","Spherical DEM Simulator...","QtSphericalDEM");
 
 	createMenus();
 

@@ -35,6 +35,10 @@
 #include<yade/pkg-dem/InteractingSphere2InteractingSphere4SpheresContactGeometry.hpp>
 #include<yade/pkg-dem/InteractingBox2InteractingSphere4SpheresContactGeometry.hpp>
 #include<yade/pkg-dem/MacroMicroElasticRelationships.hpp>
+
+#include<yade/pkg-common/Force.hpp>
+#include<yade/pkg-common/Momentum.hpp>
+#include<yade/pkg-dem/GlobalStiffness.hpp>
 /*class InteractingSphere2AABB;
 class InteractingBox2AABB;
 class MetaInteractingGeometry;
@@ -68,13 +72,6 @@ class MetaInteractingGeometry2AABB; */
 #include<yade/lib-QGLViewer/qglviewer.h>
 
 
-
-#if 0
-#ifdef EMBED_PYTHON
-	#include<yade/extra/PythonRecorder.hpp>
-#endif
-#endif
-
 #include<yade/extra/Tetra.hpp>
 
 //#include<yade/extra/Clump.hpp>
@@ -86,9 +83,25 @@ _SPEC_CAST(const char*,string);
 _SPEC_CAST(char*,string);
 #undef _SPEC_CAST
 
+CREATE_LOGGER(Shop);
+
 map<string,boost::any> Shop::defaults;
 
-CREATE_LOGGER(Shop);
+int Shop::Bex::forceIdx=-1;
+int Shop::Bex::momentumIdx=-1;
+int Shop::Bex::globalStiffnessIdx=-1;
+
+void Shop::Bex::init(){
+	Shop::Bex::forceIdx=shared_ptr<PhysicalAction>(new Force())->getClassIndex();
+	Shop::Bex::momentumIdx=shared_ptr<PhysicalAction>(new Momentum())->getClassIndex();
+	Shop::Bex::globalStiffnessIdx=shared_ptr<PhysicalAction>(new GlobalStiffness())->getClassIndex();
+}
+
+Vector3r& Shop::Bex::force(body_id_t id){ assert(forceIdx>=0); return static_pointer_cast<Force>(Omega::instance().getRootBody()->physicalActions->find(id,forceIdx))->force; }
+Vector3r& Shop::Bex::momentum(body_id_t id){ assert(momentumIdx>=0); return static_pointer_cast<Momentum>(Omega::instance().getRootBody()->physicalActions->find(id,forceIdx))->momentum;}
+Vector3r& Shop::Bex::globalStiffness(body_id_t id){ assert(globalStiffnessIdx>=0); return static_pointer_cast<GlobalStiffness>(Omega::instance().getRootBody()->physicalActions->find(id,globalStiffnessIdx))->stiffness; }
+Vector3r& Shop::Bex::globalRStiffness(body_id_t id){ assert(globalStiffnessIdx>=0); return static_pointer_cast<GlobalStiffness>(Omega::instance().getRootBody()->physicalActions->find(id,globalStiffnessIdx))->Rstiffness; }
+
 
 template <typename valType> valType Shop::getDefault(const string& key) {
 	ensureInit();
