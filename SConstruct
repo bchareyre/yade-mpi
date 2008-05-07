@@ -42,10 +42,8 @@ if len(ver)>2: sconsVersion+=float(ver[2])
 ########## PROXY TO NEWER SCONS (DOWNLOADED IF NEEDED) ###################################
 ##########################################################################################
 #print sconsVersion
-if sconsVersion<9700.20071212: ##9700.20071212:  ##<9700 ##<9693: 
-	#tgzParams=("http://dfn.dl.sourceforge.net/sourceforge/scons/scons-local-0.97.tar.gz","scons-local-0.97")
-	#tgzParams=("http://ovh.dl.sourceforge.net/sourceforge/scons/scons-local-0.97.0d20070918.tar.gz","/scons-local-0.97.0d20070918") ## sconsVersion<=9700
-	tgzParams=("http://switch.dl.sourceforge.net/sourceforge/scons/scons-local-0.97.0d20071212.tar.gz","/scons-local-0.97.0d20071212")
+if sconsVersion<9803.0:
+	tgzParams=("http://kent.dl.sourceforge.net/sourceforge/scons/scons-local-0.98.3.tar.gz","/scons-local-0.98.3")
 	newPrefix="./scons-local";
 	newUrl,newDir=tgzParams[0],newPrefix+"/"+tgzParams[1]
 	if not os.path.exists(newDir):
@@ -65,7 +63,25 @@ if sconsVersion<9700.20071212: ##9700.20071212:  ##<9700 ##<9693:
 ############# OPTIONS ####################################################################
 ##########################################################################################
 
-optsFile='scons.config'
+env=Environment(tools=['default'])
+
+
+profileFile='scons.current-profile'
+profOpts=Options(profileFile)
+profOpts.AddOptions(('profile','Config profile to use (predefined: default or "", opt)','default'))
+profOpts.Update(env)
+profOpts.Save(profileFile,env)
+
+if env['profile']=='': env['profile']='default'
+optsFile='scons.profile-'+env['profile']
+profile=env['profile']
+print '@@@ Using profile',profile,'('+optsFile+') @@@'
+
+# defaults for various profiles
+if profile=='default': defOptions={'debug':1,'variant':'','optimize':0}
+elif profile=='opt': defOptions={'debug':0,'variant':'-opt','optimize':1}
+else: defOptions={'debug':0,'optimize':0,'variant':profile}
+
 
 opts=Options(optsFile)
 #
@@ -79,10 +95,10 @@ opts.AddOptions(
 	### OLD: use PathOption with PathOption.PathIsDirCreate, but that doesn't exist in 0.96.1!
 	('PREFIX','Install path prefix','/usr/local'),
 	('runtimePREFIX','Runtime path prefix; DO NOT USE, inteded for packaging only.','$PREFIX'),
-	('variant','Build variant, will be suffixed to all files, along with version (beware: if PREFIX is the same, headers of the older version will still be overwritten','',None,lambda x:x),
-	BoolOption('debug', 'Enable debugging information and disable optimizations',1),
-	BoolOption('profile','Enable profiling information',0),
-	BoolOption('optimize','Turn on heavy optimizations (generates SSE2 instructions)',0),
+	('variant','Build variant, will be suffixed to all files, along with version (beware: if PREFIX is the same, headers of the older version will still be overwritten',defOptions['variant'],None,lambda x:x),
+	BoolOption('debug', 'Enable debugging information and disable optimizations',defOptions['debug']),
+	BoolOption('gprof','Enable profiling information for gprof',0),
+	BoolOption('optimize','Turn on heavy optimizations (generates SSE2 instructions)',defOptions['optimize']),
 	ListOption('exclude','Yade components that will not be built','none',names=['qt3','gui','extra','common','dem','fem','lattice','mass-spring','realtime-rigidbody']),
 	# OK, dummy prevents bug in scons: if one selects all, it says all in scons.config, but without quotes, which generates error.
 	ListOption('features','Optional features that are turned on','python,log4cxx',names=['python','log4cxx','binfmt','dummy']),
@@ -99,9 +115,10 @@ opts.AddOptions(
 	BoolOption('useMiniWm3','use local miniWm3 library instead of Wm3Foundation',1),
 	#BoolOption('useLocalQGLViewer','use in-tree QGLViewer library instead of the one installed in system',1),
 )
+opts.Update(env)
+opts.Save(optsFile,env)
 
-### create THE environment
-env=Environment(tools=['default'],options=opts)
+
 # do not propagate PATH from outside, to ensure identical builds on different machines
 #env.Append(ENV={'PATH':['/usr/local/bin','/bin','/usr/bin']})
 # ccache needs $HOME to be set; colorgcc needs $TERM; distcc wants DISTCC_HOSTS
@@ -110,7 +127,6 @@ propagatedEnvVars=['HOME','TERM','DISTCC_HOSTS','LD_PRELOAD','FAKEROOTKEY','LD_L
 for v in propagatedEnvVars:
 	if os.environ.has_key(v): env.Append(ENV={v:os.environ[v]})
 
-opts.Save(optsFile,env)
 if sconsVersion>9700: opts.FormatOptionHelpText=lambda env,opt,help,default,actual,alias: "%10s: %5s [%s] (%s)\n"%(opt,actual,default,help)
 else: opts.FormatOptionHelpText=lambda env,opt,help,default,actual: "%10s: %5s [%s] (%s)\n"%(opt,actual,default,help)
 Help(opts.GenerateHelpText(env))
@@ -126,7 +142,7 @@ if not env.has_key('version'):
 	if os.path.exists('RELEASE'):
 		env['version']=file('RELEASE').readline().strip()
 	if not env.has_key('version'):
-		for l in os.popen("LC_ALL=C bzr version-info").readlines():
+		for l in os.popen("LC_ALL=C bzr version-info 2>/dev/null").readlines():
 			m=re.match(r'revno: ([0-9]+)',l)
 			if m: env['version']='bzr'+m.group(1)
 	if not env.has_key('version'):
@@ -291,7 +307,7 @@ if not env.GetOption('clean'):
 
 ### SCONS OPTIMIZATIONS
 SCons.Defaults.DefaultEnvironment(tools = [])
-env.SourceSignatures('MD5') #can be  'MD5' or 'timestamp'; 'timestamp' but is less reliable and not so much faster
+env.Decider('MD5-timestamp')
 env.SetOption('max_drift',5) # cache md5sums of files older than 5 seconds
 SetOption('implicit_cache',1) # cache #include files etc.
 env.SourceCode(".",None) # skip dotted directories
@@ -302,8 +318,8 @@ if env['pretty']:
 	## http://www.scons.org/wiki/HidingCommandLinesInOutput
 	env.Replace(CXXCOMSTR='C ${SOURCES}', # → ${TARGET.file}')
 		SHCXXCOMSTR='C ${SOURCES}',  #→ ${TARGET.file}')
-		SHLINKCOMSTR='L ${SOURCES}', # → ${TARGET.file}')
-		LINKCOMSTR='L ${SOURCES}', # → ${TARGET.file}')
+		SHLINKCOMSTR='L ${TARGET.file}', # → ${TARGET.file}')
+		LINKCOMSTR='L ${TARGET.file}', # → ${TARGET.file}')
 		INSTALLSTR='⇒ $TARGET',
 		QT_UICCOMSTR='U ${SOURCES}',
 		QT_MOCCOMSTR='M ${SOURCES}')
