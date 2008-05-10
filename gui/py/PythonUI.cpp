@@ -76,13 +76,18 @@ int PythonUI::run(int argc, char *argv[]) {
 	}
 	for (int index = optind+1; index<argc; index++) LOG_ERROR("Unprocessed non-option argument: `"<<argv[index]<<"'");
 
-   LOG_DEBUG("Setting terminal discipline (disabling ^C)");
+	/* In threaded ipython, receiving SIGINT from ^C leads to segfault (for reasons I don't know).
+	 * Hence we remap ^C (keycode in c_cc[VINTR]) to killing the line (c_cc[VKILL]) and disable VINTR afterwards.
+	 * The behavior is restored back by the PythonUI::termRestore registered with atexit.
+	 * */
+	LOG_DEBUG("Setting terminal discipline (^C kills line, ^U does nothing)");
 	tcgetattr(STDIN_FILENO,&PythonUI::tios);
-   memcpy(&PythonUI::tios_orig,&PythonUI::tios,sizeof(struct termios));
-   atexit(PythonUI::termRestore);
-	tios.c_cc[VINTR] = 0; // disable ^C
+	memcpy(&PythonUI::tios_orig,&PythonUI::tios,sizeof(struct termios));
+	atexit(PythonUI::termRestore);
+	tios.c_cc[VKILL]=tios.c_cc[VINTR]; // assign ^C what ^U normally does (delete line)
+	tios.c_cc[VINTR] = 0; // disable sending SIGINT at ^C
 	tcsetattr(STDIN_FILENO,TCSANOW,&PythonUI::tios);
-   tcflush(STDIN_FILENO,TCIFLUSH);
+	tcflush(STDIN_FILENO,TCIFLUSH);
 
 
 	XInitThreads();

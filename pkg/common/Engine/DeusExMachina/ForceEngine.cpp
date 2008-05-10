@@ -9,9 +9,9 @@
 #include "ForceEngine.hpp"
 #include "ParticleParameters.hpp"
 #include "Force.hpp"
-
-
 #include<yade/core/MetaBody.hpp>
+
+#include<boost/foreach.hpp>
 
 
 ForceEngine::ForceEngine() : actionParameterForce(new Force), force(Vector3r::ZERO)
@@ -30,20 +30,11 @@ void ForceEngine::registerAttributes()
 }
 
 
-void ForceEngine::applyCondition(MetaBody* ncb)
-{
-	std::vector<int>::const_iterator ii = subscribedBodies.begin();
-	std::vector<int>::const_iterator iiEnd = subscribedBodies.end();
-	
-	for( ; ii!=iiEnd ; ++ii )
-	{
-		if(ncb->bodies->exists( *ii ))
-		{
-			static_cast<Force*>( ncb->physicalActions->find( *ii        , actionParameterForce->getClassIndex() ).get() )->force += force;
-		} else {
-			std::cerr << "ForceEngine: body " << *ii << "doesn't exist, cannot apply force.";
-		}
-        }
+void ForceEngine::applyCondition(MetaBody* ncb){
+	BOOST_FOREACH(body_id_t id, subscribedBodies){
+		assert(ncb->bodies->exists(id));
+		static_pointer_cast<Force>(ncb->physicalActions->find(id,actionParameterForce->getClassIndex()))->force+=force;
+	}
 }
 
 YADE_PLUGIN();

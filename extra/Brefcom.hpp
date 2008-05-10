@@ -112,7 +112,7 @@ class BrefcomLaw: public InteractionSolver{
 			/* cache indices for Force and Momentum */
 			ForceClassIndex=shared_ptr<PhysicalAction>(new Force())->getClassIndex();
 			MomentumClassIndex=shared_ptr<PhysicalAction>(new Momentum())->getClassIndex();
-			//TRVAR2(ForceClassIndex,MomentumClassIndex);
+			Shop::Bex::initCache();
 		};
 		void action(MetaBody*);
 	protected: 

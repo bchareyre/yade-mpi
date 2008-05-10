@@ -67,7 +67,7 @@ void BrefcomMakeContact::go(const shared_ptr<PhysicalParameters>& pp1, const sha
 			/* epsCracking */ sigmaT/E12,
 			/* epsFracture */ 5*sigmaT/E12,
 			/* expBending */ expBending,
-			/* xiShear*/ 0.
+			/* xiShear*/ 0.6
 			));
 		contPhys->prevNormal=contGeom->normal;
 		if(cohesiveThresholdIter<0 || Omega::instance().getCurrentIteration()<cohesiveThresholdIter) contPhys->isCohesive=true;
@@ -173,20 +173,15 @@ void BrefcomLaw::applyForce(const Vector3r force){
 void BrefcomLaw::action(MetaBody* _rootBody){
 	rootBody=_rootBody;
 	
-	//BOOST_FOREACH(shared_ptr<Interaction> II,*(rootBody->transientInteractions)){}
-	
-	list<shared_ptr<Interaction> > interactionsToBeDeleted;
-	
-	InteractionContainer::iterator transientEnd=rootBody->transientInteractions->end();
-	for(InteractionContainer::iterator I=rootBody->transientInteractions->begin(); I!=transientEnd; ++I){
-		if(!(*I)->isReal) { /*LOG_DEBUG("Skipped unreal interaction of "<<(*I)->getId1()<<"+"<<(*I)->getId2());*/ continue; }
+	foreach(shared_ptr<Interaction> I, *rootBody->transientInteractions){
+		if(!I->isReal) continue;
 		//TRACE;
 		// initialize temporaries
-		id1=(*I)->getId1(); id2=(*I)->getId2();
+		id1=I->getId1(); id2=I->getId2();
 		body1=Body::byId(id1); body2=Body::byId(id2);
 		assert(body1); assert(body2);
-		BC=YADE_PTR_CAST<BrefcomContact>((*I)->interactionPhysics);
-		contGeom=YADE_PTR_CAST<SpheresContactGeometry>((*I)->interactionGeometry);
+		BC=YADE_PTR_CAST<BrefcomContact>(I->interactionPhysics);
+		contGeom=YADE_PTR_CAST<SpheresContactGeometry>(I->interactionGeometry);
 		rbp1=YADE_PTR_CAST<RigidBodyParameters>(body1->physicalParameters);
 		rbp2=YADE_PTR_CAST<RigidBodyParameters>(body2->physicalParameters);
 		assert(BC); assert(contGeom); assert(rbp1); assert(rbp2);
@@ -286,8 +281,6 @@ void BrefcomLaw::action(MetaBody* _rootBody){
 		/* store this normal for next timestep */
 		BC->prevNormal=contGeom->normal;
 	}
-	// delete interactions that were requested to be deleted.
-	//for(list<shared_ptr<Interaction> >::iterator I=interactionsToBeDeleted.begin(); I!=interactionsToBeDeleted.end(); I++){ rootBody->transientInteractions->erase((*I)->getId1(),(*I)->getId2()); }
 }
 
 
@@ -339,19 +332,17 @@ void GLDrawBrefcomContact::go(const shared_ptr<InteractionPhysics>& ip, const sh
 void BrefcomDamageColorizer::action(MetaBody* rootBody){
 	vector<pair<short,Real> > bodyDamage; /* number of cohesive interactions per body; cummulative damage of interactions */
 	bodyDamage.resize(rootBody->bodies->size(),pair<short,Real>(0,0));
-	InteractionContainer::iterator transientEnd=rootBody->transientInteractions->end();
-	for(InteractionContainer::iterator I=rootBody->transientInteractions->begin(); I!=transientEnd; ++I){
-		shared_ptr<BrefcomContact> BC=dynamic_pointer_cast<BrefcomContact>((*I)->interactionPhysics);
+	foreach(shared_ptr<Interaction> I, *rootBody->transientInteractions){
+		shared_ptr<BrefcomContact> BC=dynamic_pointer_cast<BrefcomContact>(I->interactionPhysics);
 		if(!BC || !BC->isCohesive) continue;
-		const body_id_t id1=(*I)->getId1(), id2=(*I)->getId2();
+		const body_id_t id1=I->getId1(), id2=I->getId2();
 		bodyDamage[id1].first++; bodyDamage[id2].first++;
 		bodyDamage[id1].second+=BC->omega; bodyDamage[id2].second+=BC->omega;
 	}
-	BodyContainer::iterator bodiesEnd=rootBody->bodies->end();
-	for(BodyContainer::iterator I=rootBody->bodies->begin(); I!=bodiesEnd; ++I){
-		if(bodyDamage[(*I)->getId()].first==0) continue;
-		Real normDmg=bodyDamage[(*I)->getId()].second/bodyDamage[(*I)->getId()].first;
-		(*I)->geometricalModel->diffuseColor=Vector3r(normDmg,1-normDmg,(*I)->isDynamic?0:1);
+	foreach(shared_ptr<Body> B, *rootBody->bodies){
+		if(bodyDamage[B->getId()].first==0) continue;
+		Real normDmg=bodyDamage[B->getId()].second/bodyDamage[B->getId()].first;
+		B->geometricalModel->diffuseColor=Vector3r(normDmg,1-normDmg,B->isDynamic?0:1);
 	}
 }
 

@@ -31,6 +31,7 @@ class MetaBody : public Body
 		void moveToNextTimeStep();
 
 		void setTimeSteppersActive(bool a); // FIXME - wtf ?
+		shared_ptr<Engine> engineByName(string s);
 
 		/* Recovery stuff: copy of state variables from Omega that should be copied back over. 	
 		 *	Copying is being done ine Omega::loadSimulation and Omega::saveSimulation -- keep vars in sync.

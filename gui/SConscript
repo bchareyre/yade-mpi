@@ -61,5 +61,6 @@ if 'EMBED_PYTHON' in env['CPPDEFINES']:
 		env.File('__init__.py','py'),
 		env.File('utils.py','py'),
 		env.File('runtime.py','py'),
+		env.File('ipython.py','py'),
 	])
 

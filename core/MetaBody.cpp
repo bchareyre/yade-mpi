@@ -80,22 +80,19 @@ void MetaBody::moveToNextTimeStep()
 	}
 }
 
+shared_ptr<Engine> MetaBody::engineByName(string s){
+	BOOST_FOREACH(shared_ptr<Engine> e, engines){
+		if(e->getClassName()==s) return e;
+	}
+	return shared_ptr<Engine>();
+}
+
 
 void MetaBody::setTimeSteppersActive(bool a)
 {
-	vector<shared_ptr<Engine> >::iterator ai    = engines.begin();
-	vector<shared_ptr<Engine> >::iterator aiEnd = engines.end();
-	for( ; ai!=aiEnd ; ++ai )
-	{
-		if (Omega::instance().isInheritingFrom((*ai)->getClassName(),"TimeStepper"))
-			(dynamic_pointer_cast<TimeStepper>(*ai))->setActive(a);
-		
-/*		map<string,DynlibType>::const_iterator dli = Omega::instance().getDynlibsType().find((*ai)->getClassName());
-		if (dli!=Omega::instance().getDynlibsType().end())
-		{
-			if ((*dli).second.baseClass=="TimeStepper")
-				(dynamic_pointer_cast<TimeStepper>(*ai))->setActive(a);
-		}*/
+	BOOST_FOREACH(shared_ptr<Engine> e, engines){
+		if (Omega::instance().isInheritingFrom(e->getClassName(),"TimeStepper"))
+			(dynamic_pointer_cast<TimeStepper>(e))->setActive(a);
 	}
 }
 

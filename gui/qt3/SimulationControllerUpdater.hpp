@@ -21,6 +21,7 @@ class SimulationControllerUpdater
 		SimulationController * controller;
 		const int iterPerSec_TTL_ms;
 		long  iterPerSec_LastIter;
+		double iterPerSec;
 		boost::posix_time::ptime iterPerSec_LastLocalTime;
 
 	public :

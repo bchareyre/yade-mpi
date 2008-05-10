@@ -91,17 +91,26 @@ int Shop::Bex::forceIdx=-1;
 int Shop::Bex::momentumIdx=-1;
 int Shop::Bex::globalStiffnessIdx=-1;
 
-void Shop::Bex::init(){
-	Shop::Bex::forceIdx=shared_ptr<PhysicalAction>(new Force())->getClassIndex();
-	Shop::Bex::momentumIdx=shared_ptr<PhysicalAction>(new Momentum())->getClassIndex();
-	Shop::Bex::globalStiffnessIdx=shared_ptr<PhysicalAction>(new GlobalStiffness())->getClassIndex();
+void Shop::Bex::initCache(){
+	if(Shop::Bex::forceIdx<0){
+		Shop::Bex::forceIdx=shared_ptr<PhysicalAction>(new Force())->getClassIndex();
+		Shop::Bex::momentumIdx=shared_ptr<PhysicalAction>(new Momentum())->getClassIndex();
+		Shop::Bex::globalStiffnessIdx=shared_ptr<PhysicalAction>(new GlobalStiffness())->getClassIndex();
+	}
 }
 
+#define __BEX_ACCESS(retType,shopBexMember,bexClass,bexIdx,bexAttribute) retType& Shop::Bex::shopBexMember(body_id_t id,MetaBody* mb){ assert(bexIdx>=0); return static_pointer_cast<bexClass>((mb?mb:Omega::instance().getRootBody().get())->physicalActions->find(id,bexIdx))->bexAttribute; }
+__BEX_ACCESS(Vector3r,force,Force,forceIdx,force);
+__BEX_ACCESS(Vector3r,momentum,Momentum,momentumIdx,momentum);
+__BEX_ACCESS(Vector3r,globalStiffness,GlobalStiffness,globalStiffnessIdx,stiffness);
+__BEX_ACCESS(Vector3r,globalRStiffness,GlobalStiffness,globalStiffnessIdx,Rstiffness);
+#undef __BEX_ACCESS
+/*
 Vector3r& Shop::Bex::force(body_id_t id){ assert(forceIdx>=0); return static_pointer_cast<Force>(Omega::instance().getRootBody()->physicalActions->find(id,forceIdx))->force; }
 Vector3r& Shop::Bex::momentum(body_id_t id){ assert(momentumIdx>=0); return static_pointer_cast<Momentum>(Omega::instance().getRootBody()->physicalActions->find(id,forceIdx))->momentum;}
 Vector3r& Shop::Bex::globalStiffness(body_id_t id){ assert(globalStiffnessIdx>=0); return static_pointer_cast<GlobalStiffness>(Omega::instance().getRootBody()->physicalActions->find(id,globalStiffnessIdx))->stiffness; }
 Vector3r& Shop::Bex::globalRStiffness(body_id_t id){ assert(globalStiffnessIdx>=0); return static_pointer_cast<GlobalStiffness>(Omega::instance().getRootBody()->physicalActions->find(id,globalStiffnessIdx))->Rstiffness; }
-
+*/
 
 template <typename valType> valType Shop::getDefault(const string& key) {
 	ensureInit();
@@ -273,16 +282,6 @@ void Shop::rootBodyActors(shared_ptr<MetaBody> rootBody){
 	shared_ptr<PhysicalParametersMetaEngine> orientationIntegrator(new PhysicalParametersMetaEngine);
 	orientationIntegrator->add(new LeapFrogOrientationIntegrator);
 	rootBody->engines.push_back(orientationIntegrator);
-#if 0
-	#ifdef EMBED_PYTHON
-		if(getDefault<string>("param_pythonRunExpr").length()>0 || getDefault<string>("param_pythonInitExpr").length()>0){
-			shared_ptr<PythonRecorder> pythonRecorder=shared_ptr<PythonRecorder>(new PythonRecorder);
-			pythonRecorder->initExpr=getDefault<string>("param_pythonInitExpr");
-			pythonRecorder->runExpr=getDefault<string>("param_pythonRunExpr");
-			rootBody->engines.push_back(pythonRecorder);
-		}
-	#endif
-#endif
 }
 
 
@@ -417,8 +416,7 @@ void Shop::saveSpheresToFile(string fname){
 	ofstream f(fname.c_str());
 	if(!f.good()) throw runtime_error("Unable to open file `"+fname+"'");
 
-	for(BodyContainer::iterator I=rootBody->bodies->begin(); I!=rootBody->bodies->end(); ++I){
-		const shared_ptr<Body>& b=*I;
+	foreach(shared_ptr<Body> b, *rootBody->bodies){
 		if (!b->isDynamic) continue;
 		shared_ptr<InteractingSphere>	intSph=dynamic_pointer_cast<InteractingSphere>(b->interactingGeometry);
 		if(!intSph) continue;
@@ -1082,74 +1080,9 @@ Shop::sphereGeomStruct Shop::smallSdecXyzData[]={
 	{-1.,-1.,-1.,-1. } /* sentinel: non-positive radius */
 };
 
-/* Create permanent link between partcles that have transient link now, return number of created permalinks.
- *
- * Needs valid Omega instance. Stiffness parameters are copied from the transientInteraction. Order of forceId1 and forceId2 is irrelevant.
- *
- * @param cohesionMask mask that must hold for _both_ Bodies in interaction, unless it is zero and is ignored.
- * @param linkOk is function expression: bool linkOK(body_id_t,body_id_t) will tell us, whether link between two particular bodies should be created. Defaults to true (always create).
- **/
-int Shop::createCohesion(Real limitNormalForce, Real limitShearForce, int cohesionMask, boost::function<bool(body_id_t,body_id_t)> linkOK){
-	int numNewLinks=0;
-	shared_ptr<MetaBody> rb=YADE_PTR_CAST<MetaBody>(Omega::instance().getRootBody());
-	vector<pair<body_id_t,body_id_t> > toBeDeleted;
-
-	// loop over transient interactions
-	for(InteractionContainer::iterator I=rb->transientInteractions->begin(); I!=rb->transientInteractions->end(); ++I){
-		const shared_ptr<Interaction>& contact=*I;
-		if (!contact->isReal) continue; // only overlapping AABBs, not body contact
-		int id1=contact->getId1(), id2=contact->getId2();
-		LOG_DEBUG("Considering linking #"<<id1<<" + #"<<id2<<"...");
-
-		if (!linkOK(id1,id2)) {LOG_DEBUG("Disallowed by linkOK."); continue; }// user didn't want to link these
-
-		const shared_ptr<Body>& b1=Body::byId(id1), b2=Body::byId(id2);
-		if (!(cohesionMask==0 || (b1->getGroupMask() & cohesionMask) && (b2->getGroupMask() & cohesionMask))) {LOG_DEBUG("Mask mismatch."); continue; }// if mask is valid for both bodies or is zero, go ahead
-		// if we have sphere without interacting sphere, it is (most likely) a bug anyway -- no need to dynamic-cast in non-debug builds
-		shared_ptr<SpheresContactGeometry> contGeom=dynamic_pointer_cast<SpheresContactGeometry>(contact->interactionGeometry);
-		shared_ptr<ElasticContactInteraction> contPhys=dynamic_pointer_cast<ElasticContactInteraction>(contact->interactionPhysics);
-		shared_ptr<InteractingSphere>	intSph1=dynamic_pointer_cast<InteractingSphere>(b1->interactingGeometry);
-		shared_ptr<InteractingSphere>	intSph2=dynamic_pointer_cast<InteractingSphere>(b2->interactingGeometry);
-
-		if(!(contGeom && contPhys && intSph1 && intSph2)) { LOG_DEBUG("Non-spherical elemnt(s) or inelastic contact."); continue;}
-
-		// replace this transient contact by permanent contact
-		// we don't need to delete the transient one since collider will (should) do it in the next loop.
-		toBeDeleted.push_back(pair<body_id_t,body_id_t>(id1,id2));
-
-		shared_ptr<Interaction> link(new Interaction(id1,id2));
-		shared_ptr<SDECLinkGeometry> linkGeom(new SDECLinkGeometry);
-		shared_ptr<SDECLinkPhysics> linkPhys(new SDECLinkPhysics);
-
-		linkGeom->radius1=intSph1->radius-.5*abs(intSph1->radius-intSph2->radius);
-		linkGeom->radius2=intSph2->radius-.5*abs(intSph1->radius-intSph2->radius);
-		linkGeom->normal=contGeom->normal;
-		link->interactionGeometry=linkGeom;
-
-		linkPhys->initialKn=contPhys->kn; linkPhys->initialKs=contPhys->ks;
-		linkPhys->initialEquilibriumDistance=intSph1->radius+intSph2->radius;
-		linkPhys->kn=linkPhys->initialKn; linkPhys->ks=linkPhys->initialKs; linkPhys->equilibriumDistance=linkPhys->initialEquilibriumDistance;
-		linkPhys->heta=1;
-		linkPhys->knMax=contPhys->normalForce.Length()*10000; // limitNormalForce;
-		linkPhys->ksMax=contPhys->normalForce.Length()*10000; // limitShearForce;
-		link->interactionPhysics=linkPhys;
-
-		link->isReal=true;
-		link->isNew=true; // only true if linkPhys doesn't exist; but we've just created it ourselves
-		rb->persistentInteractions->insert(link);
-		numNewLinks++;
-		LOG_DEBUG("LINKED #"<<id1<<" + #"<<id2<<"! (knMax="<<linkPhys->knMax<<", ksMax="<<linkPhys->ksMax<<")");
-	}
-	// TODO: warn user if CohesiveElasticLaw is not active
-
-	return numNewLinks;
-}
-
 Real Shop::ElasticWaveTimestepEstimate(shared_ptr<MetaBody> rootBody){
 	Real minDt=std::numeric_limits<Real>::infinity();
-	BodyContainer::iterator Iend=rootBody->bodies->end();
-	for(BodyContainer::iterator I=rootBody->bodies->begin(); I!=Iend; ++I){
-		const shared_ptr<Body>& b=*I;
+	foreach(shared_ptr<Body> b, *rootBody->bodies){
 		shared_ptr<Sphere> sphere=dynamic_pointer_cast<Sphere>(b->geometricalModel);
 		shared_ptr<ElasticBodyParameters> elast=dynamic_pointer_cast<ElasticBodyParameters>(b->physicalParameters);
 		if(!sphere || !elast) continue;
