@@ -332,6 +332,7 @@ env['PREFIX']=os.path.abspath(env['PREFIX'])
 
 # paths to in-tree SConscript files
 libDirs=['lib','pkg/common','pkg/dem','pkg/fem','pkg/lattice','pkg/mass-spring','pkg/realtime-rigidbody','extra','gui']
+#libDirs = libDirs + ['pkg/gram'] 
 # BUT: exclude stuff that should be excluded
 libDirs=[x for x in libDirs if not re.match('^.*/('+'|'.join(env['exclude'])+')$',x)]
 # where are we going to be installed... pkg/dem becomes pkg-dem
@@ -419,7 +420,13 @@ def installHeaders(prefix=None):
 	yadeInc=join(yadeRoot,'include','yade-%s'%env['version'],'yade')
 	#print "CALLED, prefix=%s, yadeInc=%s"%(prefix,yadeInc)
 
-	for root, dirs, files in os.walk('.',topdown=True):
+	__paths = ['.']
+	for root, dirs, files in os.walk('.'):
+	    for dir in dirs:
+		if os.path.islink(os.path.join(root,dir)):
+		    __paths = __paths + [os.path.join(root,dir)]
+	for __path in __paths:
+	    for root, dirs, files in os.walk(__path,topdown=True):
 		for d in ('.svn'): ## skip all files that are not part of sources in the proper sense!
 			try: dirs.remove(d)
 			except ValueError: pass

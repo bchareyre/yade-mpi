@@ -1,3 +1,4 @@
+# vim: set filetype=python :
 Import('*')
 
 if 'qt3' not in env['exclude']:
@@ -113,6 +114,16 @@ env.Install('$PREFIX/lib/yade$SUFFIX/lib',[
 			'serialization/FormatChecker.cpp',
 			'serialization/Serializable.cpp',
 			'serialization/SerializableSingleton.cpp',
-			'serialization/SerializationExceptions.cpp'])
+			'serialization/SerializationExceptions.cpp']),
+
+	env.SharedLibrary('STLImporter',
+		['import/STLReader.cpp',
+		    'import/STLImporter.cpp'],
+		LIBS=env['LIBS']+['Vertex'
+		    ,'InteractingVertex'
+		    ,'GeometricalEdge'
+		    ,'InteractingEdge'
+		    ,'Facet'
+		    ,'InteractingFacet'])
 ])
 

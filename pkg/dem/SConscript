@@ -88,6 +88,27 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'yade-multimethods',
 			'InteractingSphere']),
 			
+	env.SharedLibrary('InteractingVertex2InteractingSphere4SpheresContactGeometry'
+	    ,['Engine/EngineUnit/InteractingVertex2InteractingSphere4SpheresContactGeometry.cpp']
+	    ,LIBS=env['LIBS']+['InteractingVertex'
+				,'InteractingSphere'
+				,'InteractionGeometryMetaEngine'
+				,'SpheresContactGeometry']),
+	
+	env.SharedLibrary('InteractingEdge2InteractingSphere4SpheresContactGeometry'
+	    ,['Engine/EngineUnit/InteractingEdge2InteractingSphere4SpheresContactGeometry.cpp']
+	    ,LIBS=env['LIBS']+['InteractingEdge'
+				,'InteractingSphere'
+				,'InteractionGeometryMetaEngine'
+				,'SpheresContactGeometry']),
+    
+	env.SharedLibrary('InteractingFacet2InteractingSphere4SpheresContactGeometry'
+	    ,['Engine/EngineUnit/InteractingFacet2InteractingSphere4SpheresContactGeometry.cpp']
+	    ,LIBS=env['LIBS']+['InteractingFacet'
+				,'InteractingSphere'
+				,'InteractionGeometryMetaEngine'
+				,'SpheresContactGeometry']),
+
 	env.SharedLibrary('InteractingSphere2InteractingSphere4DistantSpheresContactGeometry',
 		['Engine/EngineUnit/InteractingSphere2InteractingSphere4DistantSpheresContactGeometry.cpp'],
 		LIBS=env['LIBS']+['SDECLinkGeometry',
@@ -834,9 +855,6 @@ env.SharedLibrary('TriaxialTestWater',
 	TriaxialCompressionEngine
 	GlobalStiffnessTimeStepper''')),
 
-
-
-
 env.SharedLibrary('ContactStressRecorder',
 		['Engine/DeusExMachina/ContactStressRecorder.cpp'],
 		LIBS=env['LIBS']+['ParticleParameters',
@@ -1041,8 +1059,38 @@ env.SharedLibrary('NewtonsDampedLaw',
 			    ,'Sphere'
 			    ])
 
-
-
-
+	,env.SharedLibrary('STLImporterTest'
+	    ,['PreProcessor/STLImporterTest.cpp']
+	    ,LIBS=env['LIBS']+['AABB'
+				,'STLImporter'
+				,'BodyRedirectionVector'
+				,'BoundingVolumeMetaEngine'
+				,'CundallNonViscousForceDamping'
+				,'CundallNonViscousMomentumDamping'
+				,'ElasticContactLaw'
+				,'ElasticCriterionTimeStepper'
+				,'Facet'
+				,'GeometricalEdge'
+				,'GravityEngine'
+				,'InteractingEdge'
+				,'InteractingFacet'
+				,'InteractingSphere'
+				,'InteractingVertex'
+				,'InteractionGeometryMetaEngine'
+				,'InteractionPhysicsMetaEngine'
+				,'InteractionVecSet'
+				,'MacroMicroElasticRelationships'
+				,'MetaInteractingGeometry'
+				,'MetaInteractingGeometry2AABB'
+				,'ParticleParameters'
+				,'PhysicalActionApplier'
+				,'PhysicalActionContainerInitializer'
+				,'PhysicalActionContainerReseter'
+				,'PhysicalActionVectorVector'
+				,'PhysicalParametersMetaEngine'
+				,'SpatialQuickSortCollider'
+				,'Sphere'
+				,'Vertex'
+				])
 ])
 

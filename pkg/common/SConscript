@@ -1,3 +1,4 @@
+# vim: set filetype=python :
 Import('*')
 env.Install('$PREFIX/lib/yade$SUFFIX/pkg-common',[
 
@@ -48,6 +49,15 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-common',[
 	env.SharedLibrary('MetaInteractingGeometry',
 		['DataClass/InteractingGeometry/MetaInteractingGeometry.cpp'],
 		LIBS=env['LIBS']+['yade-base']),
+    
+	env.SharedLibrary('InteractingVertex'
+	    ,['DataClass/InteractingGeometry/InteractingVertex.cpp']),
+	
+	env.SharedLibrary('InteractingEdge'
+	    ,['DataClass/InteractingGeometry/InteractingEdge.cpp']),
+
+	env.SharedLibrary('InteractingFacet'
+	    ,['DataClass/InteractingGeometry/InteractingFacet.cpp']),
 
 	env.SharedLibrary('ParticleParameters',
 		['DataClass/PhysicalParameters/ParticleParameters.cpp'],
@@ -111,6 +121,15 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-common',[
 		LIBS=env['LIBS']+['yade-base','yade-multimethods'],
 		CPPPATH=env['CPPPATH']+['$PREFIX/include','DataClass/GeometricalModel']),
 
+	env.SharedLibrary('Vertex'
+	    ,['DataClass/GeometricalModel/Vertex.cpp']),
+	
+	env.SharedLibrary('GeometricalEdge'
+	    ,['DataClass/GeometricalModel/GeometricalEdge.cpp']),
+    
+	env.SharedLibrary('Facet'
+	    ,['DataClass/GeometricalModel/Facet.cpp']),
+	
 	env.SharedLibrary('MomentEngine',
 		['Engine/DeusExMachina/MomentEngine.cpp'],
 		LIBS=env['LIBS']+['yade-base',  'Momentum', 'ParticleParameters'],
@@ -299,6 +318,14 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-common',[
 			'Engine/MetaEngine',
 			'Engine/EngineUnit']),
 
+	env.SharedLibrary('InteractingEdge2AABB'
+	    ,['Engine/EngineUnit/InteractingEdge2AABB.cpp']
+	    ,LIBS=env['LIBS']+['AABB','InteractingEdge']),
+    
+	env.SharedLibrary('InteractingFacet2AABB'
+	    ,['Engine/EngineUnit/InteractingFacet2AABB.cpp']
+	    ,LIBS=env['LIBS']+['AABB','InteractingFacet']),
+
 	env.SharedLibrary('LeapFrogOrientationIntegrator',
 		['Engine/EngineUnit/LeapFrogOrientationIntegrator.cpp'],
 		LIBS=env['LIBS']+['yade-base',
@@ -419,6 +446,9 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-common',[
 #		LIBPATH=env['LIBPATH']+['/home/bruno/micromacro/KdevMicroMacro/src'],
 #		LIBS=env['LIBS']+['yade-base', 'TesselationWrapper', 'CGAL',  'InteractingSphere', 'RigidBodyParameters'],
 #		CPPPATH=env['CPPPATH']+['Engine/StandAloneEngine', '$PREFIX/include', '/home/bruno/micromacro/KdevMicroMacro/src']),
+    
+	env.SharedLibrary('SpatialQuickSortCollider' 
+	    ,['Engine/StandAloneEngine/SpatialQuickSortCollider.cpp']),
 		
 	env.SharedLibrary('PersistentSAPCollider',
 		['Engine/StandAloneEngine/PersistentSAPCollider.cpp'],
@@ -507,6 +537,18 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-common',[
 			'$PREFIX/include',
 			'DataClass/GeometricalModel',
 			'RenderingEngine/OpenGLRenderingEngine']),
+    
+	env.SharedLibrary('GLDrawVertex'
+	    ,['RenderingEngine/GLDrawGeometricalModel/GLDrawVertex.cpp']
+	    ,LIBS=env['LIBS']+['yade-opengl','Vertex']),
+	
+	env.SharedLibrary('GLDrawGeometricalEdge'
+	    ,['RenderingEngine/GLDrawGeometricalModel/GLDrawGeometricalEdge.cpp']
+	    ,LIBS=env['LIBS']+['yade-opengl','GeometricalEdge']),
+	
+	env.SharedLibrary('GLDrawFacet'
+	    ,['RenderingEngine/GLDrawGeometricalModel/GLDrawFacet.cpp']
+	    ,LIBS=env['LIBS']+['yade-opengl','Facet']),
 
 	env.SharedLibrary('GLDrawInteractingBox',
 		['RenderingEngine/GLDrawInteractingGeometry/GLDrawInteractingBox.cpp'],
@@ -532,6 +574,18 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-common',[
 			'RenderingEngine/OpenGLRenderingEngine',
 			'RenderingEngine/GLDrawInteractingGeometry']),
 
+	env.SharedLibrary('GLDrawInteractingVertex'
+	    ,['RenderingEngine/GLDrawInteractingGeometry/GLDrawInteractingVertex.cpp']
+	    ,LIBS=env['LIBS']+['yade-opengl','InteractingVertex']),
+	
+	env.SharedLibrary('GLDrawInteractingEdge'
+	    ,['RenderingEngine/GLDrawInteractingGeometry/GLDrawInteractingEdge.cpp']
+	    ,LIBS=env['LIBS']+['yade-opengl','InteractingEdge']),
+
+	env.SharedLibrary('GLDrawInteractingFacet'
+	    ,['RenderingEngine/GLDrawInteractingGeometry/GLDrawInteractingFacet.cpp']
+	    ,LIBS=env['LIBS']+['yade-opengl','InteractingFacet']),
+	
 	env.SharedLibrary('GLDrawBoxShadowVolume',
 		['RenderingEngine/GLDrawShadowVolume/GLDrawBoxShadowVolume.cpp'],
 		LIBS=env['LIBS']+['yade-base',
