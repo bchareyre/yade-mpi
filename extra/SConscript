@@ -53,6 +53,8 @@ env.Install('$PREFIX/lib/yade$SUFFIX/extra',[
 
 	env.SharedLibrary('BrefcomTestGen',['BrefcomTestGen.cpp'],LIBS=env['LIBS']+['Shop','UniaxialStrainControlledTest','PositionOrientationRecorder']),
 
+	env.SharedLibrary('SimpleScene',['SimpleScene.cpp'],LIBS=env['LIBS']+['Shop','SimpleElasticRelationships']),
+
 	env.SharedLibrary('Shop',
 		['clump/Shop.cpp'],
 		LIBS=env['LIBS']+[

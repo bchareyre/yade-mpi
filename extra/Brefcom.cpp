@@ -159,15 +159,15 @@ Real BrefcomLaw::calibrateEpsFracture(double Gf, double E, double expBending, do
 }
 
 void BrefcomLaw::applyForce(const Vector3r force){
-/*	Shop::Bex::force(id1)+=force;
-	Shop::Bex::force(id2)-=force;
-	Shop::Bex::momentum(id1)+=(contGeom->contactPoint-rbp1->se3.position).Cross(force);
-	Shop::Bex::momentum(id1)-=(contGeom->contactPoint-rbp2->se3.position).Cross(force);
-*/
-	static_pointer_cast<Force>(rootBody->physicalActions->find(id1,ForceClassIndex))->force+=force;
+	Shop::Bex::force(id1,rootBody)+=force;
+	Shop::Bex::force(id2,rootBody)-=force;
+	Shop::Bex::momentum(id1,rootBody)+=(contGeom->contactPoint-rbp1->se3.position).Cross(force);
+	Shop::Bex::momentum(id1,rootBody)-=(contGeom->contactPoint-rbp2->se3.position).Cross(force);
+/*	static_pointer_cast<Force>(rootBody->physicalActions->find(id1,ForceClassIndex))->force+=force;
 	static_pointer_cast<Force>(rootBody->physicalActions->find(id2,ForceClassIndex))->force-=force;
 	static_pointer_cast<Momentum>(rootBody->physicalActions->find(id1,MomentumClassIndex))->momentum+=(contGeom->contactPoint-rbp1->se3.position).Cross(force);
 	static_pointer_cast<Momentum>(rootBody->physicalActions->find(id2,MomentumClassIndex))->momentum-=(contGeom->contactPoint-rbp2->se3.position).Cross(force);
+*/
 }
 
 void BrefcomLaw::action(MetaBody* _rootBody){
@@ -178,7 +178,7 @@ void BrefcomLaw::action(MetaBody* _rootBody){
 		//TRACE;
 		// initialize temporaries
 		id1=I->getId1(); id2=I->getId2();
-		body1=Body::byId(id1); body2=Body::byId(id2);
+		body1=Body::byId(id1,_rootBody); body2=Body::byId(id2,_rootBody);
 		assert(body1); assert(body2);
 		BC=YADE_PTR_CAST<BrefcomContact>(I->interactionPhysics);
 		contGeom=YADE_PTR_CAST<SpheresContactGeometry>(I->interactionGeometry);

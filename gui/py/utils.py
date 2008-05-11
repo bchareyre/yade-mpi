@@ -13,7 +13,7 @@ try: # use psyco if available
 	psyco.full()
 except ImportError: pass
 
-def sphere(radius,center,density=1,young=3e9,poisson=.3,dynamic=True,color=[1,1,1]):
+def sphere(center,radius,density=1,young=3e9,poisson=.3,dynamic=True,color=[1,1,1]):
 	"""Create default sphere, with given parameters. Physical properties such as mass and inertia are calculated automatically."""
 	s=Body()
 	s.shape=GeometricalModel('Sphere',{'radius':radius,'diffuseColor':color})
@@ -25,7 +25,7 @@ def sphere(radius,center,density=1,young=3e9,poisson=.3,dynamic=True,color=[1,1,
 	s['isDynamic']=dynamic
 	return s
 
-def box(extents,center,orientation=[1,0,0,0],density=1,young=3e9,poisson=.3,dynamic=True,color=[1,1,1]):
+def box(center,extents,orientation=[1,0,0,0],density=1,young=3e9,poisson=.3,dynamic=True,color=[1,1,1]):
 	"""Create default box (cuboid), with given parameters. Physical properties such as mass and inertia are calculated automatically."""
 	b=Body()
 	b.shape=GeometricalModel('Box',{'extents':extents,'diffuseColor':color})
@@ -108,7 +108,7 @@ def spheresFromFile(filename,**kw):
 	ret=[]
 	for l in open(filename):
 		ss=[float(i) for i in l.split()]
-		id=o.bodies.append(sphere(ss[3],[ss[0],ss[2],ss[1]],**kw))
+		id=o.bodies.append(sphere([ss[0],ss[2],ss[1]],ss[3],**kw))
 		ret.append(id)
 	return ret
 

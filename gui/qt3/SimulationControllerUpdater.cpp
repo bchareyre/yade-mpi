@@ -7,10 +7,10 @@
 *************************************************************************/
 
 #include<yade/core/Omega.hpp>
-#include "SimulationControllerUpdater.hpp"
-#include "SimulationController.hpp"
+#include"SimulationControllerUpdater.hpp"
+#include"SimulationController.hpp"
 #include<qlabel.h>
-#include <qspinbox.h>
+#include<qspinbox.h>
 #include<cstdio>
 
 CREATE_LOGGER(SimulationControllerUpdater);
@@ -66,7 +66,6 @@ void SimulationControllerUpdater::oneLoop()
 	long iterPerSec_LastAgo_ms=(microsec_clock::local_time()-iterPerSec_LastLocalTime).total_milliseconds();
 	if(iterPerSec_LastAgo_ms>iterPerSec_TTL_ms){
 		iterPerSec=(1000*(Omega::instance().getCurrentIteration()-iterPerSec_LastIter))/iterPerSec_LastAgo_ms;
-		//controller->tlIterPerSec->setText(lexical_cast<string>(iterPerSec));
 		iterPerSec_LastIter=Omega::instance().getCurrentIteration();
 		iterPerSec_LastLocalTime=microsec_clock::local_time();
 	}
@@ -85,9 +84,6 @@ void SimulationControllerUpdater::oneLoop()
 		Real powerSecond = (Real)(controller->sb10PowerSecond->value());
 		Omega::instance().setTimeStep(second*Mathr::Pow(10,powerSecond));
 	}
-
-	//string strDt = lexical_cast<string>(Omega::instance().getTimeStep());
-	//controller->tlTimeStep->setText(strDt);
 
 	char strStep[64];
 	snprintf(strStep,64,"step %g",Omega::instance().getTimeStep());

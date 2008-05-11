@@ -1,4 +1,3 @@
-
 #pragma once
 #include<yade/core/FileGenerator.hpp>
 #include<yade/core/PhysicalAction.hpp>
@@ -12,7 +11,6 @@ class SimpleScene: public FileGenerator {
 		virtual bool generate();
 	protected :
 		void registerAttributes(){ FileGenerator::registerAttributes(); }
-	NEEDS_BEX("Force","Momentum");
 	REGISTER_CLASS_NAME(SimpleScene);
 	REGISTER_BASE_CLASS_NAME(FileGenerator);
 	DECLARE_LOGGER;

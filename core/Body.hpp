@@ -26,6 +26,7 @@
 #include<yade/lib-serialization/Serializable.hpp>
 #include<yade/lib-multimethods/Indexable.hpp>
 
+class MetaBody;
 
 /*! \brief Abstract interface for bodies stored in BodyContainer, Body represents the atomic element of simulation.
  */
@@ -46,7 +47,7 @@ class Body : public Serializable
 		//! symbolic constant for body that doesn't exist.
 		static const body_id_t ID_NONE;
 		//! get Body pointer given its id. 
-		static shared_ptr<Body> byId(body_id_t _id);
+		static const shared_ptr<Body>& byId(body_id_t _id,MetaBody* rb=NULL);
 		//! Whether this Body is a Clump.
 		//! @note The following is always true: \code (Body::isClump() XOR Body::isClumpMember() XOR Body::isStandalone()) \endcode
 		bool isClump() const {return clumpId!=ID_NONE && id==clumpId;}
