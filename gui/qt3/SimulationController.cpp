@@ -146,12 +146,15 @@ void SimulationController::pbLoadClicked()
 	std::vector<string> filters;
 	filters.push_back("Yade Binary File (*.yade)");
 	filters.push_back("XML Yade File (*.xml)");
+	filters.push_back("XML Yade File (*.xml.gz)");
+	filters.push_back("XML Yade File (*.xml.bz2)");
 	string fileName = FileDialog::getOpenFileName(".", filters, "Choose a file to open", parentWorkspace, selectedFilter );
 		
 	if ( 	   fileName.size()!=0 
-		&& (selectedFilter == "XML Yade File (*.xml)" || selectedFilter == "Yade Binary File (*.yade)") 
-		&& filesystem::exists(fileName) 
-		&& (filesystem::extension(fileName)==".xml" || filesystem::extension(fileName)==".yade"))
+		//&& (selectedFilter == "XML Yade File (*.xml)" || selectedFilter == "Yade Binary File (*.yade)") 
+		//&& filesystem::exists(fileName) 
+		//&& (filesystem::extension(fileName)==".xml" || filesystem::extension(fileName)==".yade"))
+		)
 	{
 		this->loadSimulationFromFileName(fileName);
 	}
@@ -233,18 +236,15 @@ void SimulationController::pbSaveClicked()
 	std::vector<string> filters;
 	filters.push_back("Yade Binary File (*.yade)");
 	filters.push_back("XML Yade File (*.xml)");
+	filters.push_back("XML Yade File (*.xml.gz)");
+	filters.push_back("XML Yade File (*.xml.bz2)");
 	string fileName = FileDialog::getSaveFileName(".", filters, "Specify file name to save", parentWorkspace, selectedFilter );
 
-	if ( 	   fileName.size()!=0 
-		&& (selectedFilter == "XML Yade File (*.xml)" || selectedFilter == "Yade Binary File (*.yade)" ) 
-		&& (filesystem::extension(fileName)==".xml" || filesystem::extension(fileName)==".yade" || filesystem::extension(fileName)=="" )
-		&& (fileName != "")
-		&& (fileName != "/")
-		&& (fileName != "."))
+	if(fileName.size()!=0  && (fileName != "/")&& (fileName != "."))
 	{
 
 		if(filesystem::extension(fileName)=="") // user forgot to specify extension - fix it.
-			fileName += (selectedFilter == "XML Yade File (*.xml)") ? ".xml" : ".yade";
+			fileName+=".xml";
 
 		cerr << "saving simulation: " << fileName << "\n";
 		Omega::instance().saveSimulation(fileName);
