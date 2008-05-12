@@ -420,41 +420,41 @@ def installHeaders(prefix=None):
 	yadeInc=join(yadeRoot,'include','yade-%s'%env['version'],'yade')
 	#print "CALLED, prefix=%s, yadeInc=%s"%(prefix,yadeInc)
 
-	__paths = ['.']
+	paths = ['.']
 	for root, dirs, files in os.walk('.'):
-	    for dir in dirs:
-		if os.path.islink(os.path.join(root,dir)):
-		    __paths = __paths + [os.path.join(root,dir)]
-	for __path in __paths:
-	    for root, dirs, files in os.walk(__path,topdown=True):
-		for d in ('.svn'): ## skip all files that are not part of sources in the proper sense!
-			try: dirs.remove(d)
-			except ValueError: pass
-		# exclude non-lib directories (like doc, scripts, ...)
-		if not re.match(r'\.[/\\](core|lib|pkg|gui|extra)[/\\]?.*',root): continue
-		# exclude headers from excluded stuff
-		if re.match(r'^.*/('+'|'.join(env['exclude'])+')/',root): continue
-		for f in files:
-			if f.split('.')[-1] in ('hpp','inl','ipp','tpp','h','mcr'):
-				#m=re.match('^\./([^/]*)/.*$',root)
-				m=re.match('^.*?'+sep+'((extra|core)|((gui|lib|pkg)'+sep+'.*?))(|'+sep+'.*)$',root)
-				if not m:
-					print "WARNING: file %s skipped while scanning for headers (no module)"
-					continue
-				subInc=join(yadeInc,m.group(1).replace(sep,'-')) # replace pkg/lattice by pkg-lattice
-				if not prefix: # local include directory: do symlinks
-					if not isdir(subInc): os.makedirs(subInc)
-					def relpath(pf,pt):
-						"""Returns relative path from pf (path from) to pt (path to) as string.
-						Last component of pf MUST be filename, not directory name. It can be empty, though. Legal pf's: 'dir1/dir2/something.cc', 'dir1/dir2/'. Illegal: 'dir1/dir2'."""
-						from os.path import sep,join,abspath,split
-						apfl=abspath(split(pf)[0]).split(sep); aptl=abspath(pt).split(sep); i=0
-						while apfl[i]==aptl[i] and i<min(len(apfl),len(aptl))-1: i+=1
-						return sep.join(['..' for j in range(0,len(apfl)-i)]+aptl[i:])
-					linkName=join(subInc,f); linkTarget=relpath(linkName,join(root,f))
-					if not exists(linkName): os.symlink(linkTarget,linkName)
-				else: # install directory: use scons' Install facility
-					env.Install(subInc,join(root,f))
+		for dir in dirs:
+			if os.path.islink(os.path.join(root,dir)):
+				paths.append(os.path.join(root,dir))
+	for path in paths:
+		for root, dirs, files in os.walk(path,topdown=True):
+			for d in ('.svn'): ## skip all files that are not part of sources in the proper sense!
+				try: dirs.remove(d)
+				except ValueError: pass
+			# exclude non-lib directories (like doc, scripts, ...)
+			if not re.match(r'\.[/\\](core|lib|pkg|gui|extra)[/\\]?.*',root): continue
+			# exclude headers from excluded stuff
+			if re.match(r'^.*/('+'|'.join(env['exclude'])+')/',root): continue
+			for f in files:
+				if f.split('.')[-1] in ('hpp','inl','ipp','tpp','h','mcr'):
+					#m=re.match('^\./([^/]*)/.*$',root)
+					m=re.match('^.*?'+sep+'((extra|core)|((gui|lib|pkg)'+sep+'.*?))(|'+sep+'.*)$',root)
+					if not m:
+						print "WARNING: file %s skipped while scanning for headers (no module)"
+						continue
+					subInc=join(yadeInc,m.group(1).replace(sep,'-')) # replace pkg/lattice by pkg-lattice
+					if not prefix: # local include directory: do symlinks
+						if not isdir(subInc): os.makedirs(subInc)
+						def relpath(pf,pt):
+							"""Returns relative path from pf (path from) to pt (path to) as string.
+							Last component of pf MUST be filename, not directory name. It can be empty, though. Legal pf's: 'dir1/dir2/something.cc', 'dir1/dir2/'. Illegal: 'dir1/dir2'."""
+							from os.path import sep,join,abspath,split
+							apfl=abspath(split(pf)[0]).split(sep); aptl=abspath(pt).split(sep); i=0
+							while apfl[i]==aptl[i] and i<min(len(apfl),len(aptl))-1: i+=1
+							return sep.join(['..' for j in range(0,len(apfl)-i)]+aptl[i:])
+						linkName=join(subInc,f); linkTarget=relpath(linkName,join(root,f))
+						if not exists(linkName): os.symlink(linkTarget,linkName)
+					else: # install directory: use scons' Install facility
+						env.Install(subInc,join(root,f))
 
 def makePkgConfig(fileName):
 	cflags,libs='Cflags: ','Libs: '
