@@ -145,7 +145,7 @@ void STLImporter::processVertex(int id)
 
     for(int i=0,ei=egs.size(); i<ei; ++i)
     {
-//	if (egs[i].flat) continue; //FIXME: плоские просто пропускаем
+//	if (egs[i].flat) continue; //FIXME: skip flat edges 
 
 	Vector3r v0(vts[egs[i].first].point)
 		,v1(vts[egs[i].second].point)
@@ -154,43 +154,43 @@ void STLImporter::processVertex(int id)
 	else if (p0 == v1) normal = v1-v0; 
 	else continue;
 	normal.Normalize();
-	if ( vrtx.normals.size() < 2 ) // первые две нормали
+	if ( vrtx.normals.size() < 2 ) // the first two normal
 	{
 	    vrtx.normals.push_back(normal);
 	    if ( vrtx.normals.size()==2 && (vrtx.normals[0].UnitCross(vrtx.normals[1])).Length() == 0)
-	    { // вершина лежит на ребре
+	    { // vertex lies on the edge
 		vrtx.flat = true;
 		break;
 	    }
 	    continue;
 	}
-	// третья нормаль и далее
+	// third normal, etc.
 	bool add_normal_flag=true;
 	for (int ii=0,eii=vrtx.normals.size()-1; ii<eii; ++ii)
 	{
 	    for (int jj=ii+1, ejj=vrtx.normals.size(); jj<ejj; ++jj)
 	    {
-		Vector3r n1n2 = vrtx.normals[ii].UnitCross(vrtx.normals[jj]); // поворот от ni к nj
+		Vector3r n1n2 = vrtx.normals[ii].UnitCross(vrtx.normals[jj]); // turn from ni to nj
 		if ( Math<Real>::FAbs(n1n2.Dot(normal)) < Math<Real>::ZERO_TOLERANCE )
 		{ // нормаль n лежит в плоскости ni, nj
 		    add_normal_flag = false;
 
-		    Vector3r n1normal = vrtx.normals[ii].UnitCross(normal); // поворот от ni к n
+		    Vector3r n1normal = vrtx.normals[ii].UnitCross(normal); // turn from ni to n
 
 		    if ( n1n2.Dot(n1normal) < Math<Real>::ZERO_TOLERANCE) 
-		    { // повороты ni->nj и ni->n разнонаправленные 
-			Vector3r normaln1 = normal.UnitCross(vrtx.normals[ii]); // поворот от n к ni
-			Vector3r normaln2 = normal.UnitCross(vrtx.normals[jj]); // поворот от n к nj
+		    { // turns ni->nj and ni->n directed to different sides
+			Vector3r normaln1 = normal.UnitCross(vrtx.normals[ii]); // turn from n to ni
+			Vector3r normaln2 = normal.UnitCross(vrtx.normals[jj]); // turn form n to nj
 			if ( normaln1.Dot(normaln2) < Math<Real>::ZERO_TOLERANCE) 
-			    // повороты n->ni и n->nj разнонаправленные =>
-			    vrtx.flat = true; // вершина лежит во внутреннем углу
+			    // turns n->ni and n->nj directed to different sides =>
+			    vrtx.flat = true; // vertex lies in the inner corner
 			else
-			    // повороты n->ni и n->nj сонаправлены =>
+			    // turns n->ni and n->nj directed to one side =>
 			    vrtx.normals[ii] = normal; // ni <- n
 		    }
-		    else // повороты ni->nj и ni->n сонаправлены
+		    else // turns ni->nj and ni->n directed to one side
 		       	if (vrtx.normals[ii].Dot(normal) < vrtx.normals[ii].Dot(vrtx.normals[jj]))
-			    // угол между ni и n больше чем между ni и nj =>
+			    // the angle between ni and n are greater than between ni and nj =>
 			    vrtx.normals[jj]=normal; // nj <- n
 		}
 	    }
@@ -214,11 +214,11 @@ void STLImporter::processEdge(int id)
     pair<Vector3r,Vector3r> edge( minmax(p0, p1) );
     for(int i=0,ei=fcs.size(); i<ei; ++i)
     {
-	Vector3r v0(vts[fcs[i][0]].point)  // грань треугольная 
+	Vector3r v0(vts[fcs[i][0]].point)  // triangular facet
 		,v1(vts[fcs[i][1]].point)
 	        ,v2(vts[fcs[i][2]].point);
 	Vector3r N(0,0,0);
-	if ( edge == minmax(v0,v1) ) // определяем нормаль к ребру	     
+	if ( edge == minmax(v0,v1) ) // find normal to edge
 	{
 	    v1 -= v0;
 	    v2 -= v0;
@@ -242,23 +242,23 @@ void STLImporter::processEdge(int id)
 
 	if (N.Normalize() > 0)
 	{
-	    if (edg.normal1 == Vector3r::ZERO) // устанавливаем первую нормаль
+	    if (edg.normal1 == Vector3r::ZERO) // setup first normal
 	    {
 		edg.normal1 = N;
 		continue;
 	    }
-	    if (edg.normal2 == Vector3r::ZERO) // устанавливаем вторую нормаль
+	    if (edg.normal2 == Vector3r::ZERO) // setup second normal
 	    {
 		edg.normal2 = N;
 		edg.both=true;
 		continue;
 	    }
-	    // с ребром связано более 2 граней?!
+	    // the edge involves more than two faces
 	    cerr << "WARNING: Edge have over two facets" << endl;
 	}
     }
     if ( Math<Real>::FAbs(edg.normal1.Dot(edg.normal2) + 1) <= Math<Real>::ZERO_TOLERANCE)
-    { // скалярное произведение нормалей равно -1 => грани лежат в одной плоскости, ребро плоское
+    { // scalar product normals is -1 => facets lies in the same plane, edge is flat 
 	edg.flat=true;
 	nbFlatEdges++;
     }
@@ -269,27 +269,27 @@ void STLImporter::facetsConsolidation()
     int nbFlatEdgesOld = nbFlatEdges;
 
     vector<Edg>::iterator edge_it = egs.begin(), edge_end = egs.end();
-    while( edge_it != edge_end ) // обходим все ребра
+    while( edge_it != edge_end ) // loop on all edges
     {
-	if (!edge_it->flat) // ищем плоское ребро
+	if (!edge_it->flat) // find the flat edge
 	{
 	    ++edge_it;
 	    continue;
 	}
-	// плоское ребро
+	// flat edge
 	pair<int,int> edge = minmax(edge_it->first, edge_it->second); 
 
-	// ищем грани, которые разделяет edge
+	// looking for a faces, which shares this edge
 	int facet1=-1, facet2=-1;
 	int edge_in_facet1, edge_in_facet2;
-	for (int facet_it=0, facet_end=fcs.size(); facet_it<facet_end && facet2<0; ++facet_it) // цикл по граням
+	for (int facet_it=0, facet_end=fcs.size(); facet_it<facet_end && facet2<0; ++facet_it) // loop on the facets
 	{
-	    for (int edge_in_facet_it=0, edge_in_facet_end=fcs[facet_it].size(); // цикл по ребрам грани
+	    for (int edge_in_facet_it=0, edge_in_facet_end=fcs[facet_it].size(); // loop on the facet edges
 		    edge_in_facet_it < edge_in_facet_end; ++edge_in_facet_it)
 	    {
 		pair<int,int> edge_in_facet = fcs[facet_it].edge(edge_in_facet_it);
 		if ( edge == minmax(edge_in_facet.first, edge_in_facet.second) )
-		{ // edge совпадает с одним из ребер грани
+		{ // edge coincides with one of the facet
 		    if (facet1<0)
 		    { 
 		      facet1 = facet_it;
@@ -305,7 +305,7 @@ void STLImporter::facetsConsolidation()
 	    } 
 	} //for
 
-	// объединяем найденные грани
+	// join the facets 
 	Fct f1 = fcs[facet1], f2 = fcs[facet2];
 	if (f1.vertex.size()<max_vertices_in_facet && f2.vertex.size()<max_vertices_in_facet)
 	{
@@ -313,7 +313,7 @@ void STLImporter::facetsConsolidation()
 	    f1.vertex.insert(f1.vertex.begin()+edge_in_facet1+1, f2.vertex.begin(), f2.vertex.end() );
 	    reduce_facet_vertices(f1);
 	    
-	    // если получившийся многоугольник выпуклый, принимаем объединение 
+	    // if we get a convex shape, accept join
 	    if (convex_test(f1))
 	    {
 		fcs[facet1]=f1;
@@ -326,11 +326,10 @@ void STLImporter::facetsConsolidation()
 	++edge_it;
     } // while
 
-    // если были объединения граней, повторяем процедуру
+    // repeat if the joins occurred
     if (nbFlatEdgesOld != nbFlatEdges) 
 	facetsConsolidation();
 
-    // объединили все, что можно => выход
     return;
 }
 
@@ -346,7 +345,7 @@ bool STLImporter::convex_test(const Fct& f) const
 	else
 	    R = (vts[v[i]].point-vts[v[i-1]].point).UnitCross(vts[v[i+1]].point-vts[v[i]].point);
 
-	if ( T.Dot(R) < Math<Real>::ZERO_TOLERANCE ) // T направлено противоположно R
+	if ( T.Dot(R) < Math<Real>::ZERO_TOLERANCE ) // T oppositely directed R
 	    return false;
     }
     return true;
@@ -374,7 +373,7 @@ void STLImporter::reduce_facet_vertices(Fct& f)
 
 	Real L = ((vts[v[k]].point-vts[v[l]].point).UnitCross(vts[v[m]].point-vts[v[k]].point)).Length();
 	if (L == 0)
-	{ // три вершины лежат на одной прямой => удаляем среднюю
+	{ // three vertices lies on a line => remove middle vertex
 	    v.erase(v.begin()+i);
 	    N--;
 	}

@@ -9,19 +9,3 @@
 
 float STLReader::tolerance =0;
 
-//void STLReader::open(const char* filename)
-//{
-//    is.open(filename);
-//}
-//
-//void STLReader::close()
-//{
-//    is.close();
-//}
-//
-//bool STLReader::operator!() const
-//{
-//    return !is;
-//}
-
-
