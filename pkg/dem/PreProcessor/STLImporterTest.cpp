@@ -36,6 +36,7 @@
 #include<yade/pkg-dem/ElasticContactLaw.hpp>
 #include<yade/pkg-dem/ElasticCriterionTimeStepper.hpp>
 #include<yade/pkg-dem/MacroMicroElasticRelationships.hpp>
+#include<yade/pkg-common/RotationEngine.hpp>
 
 STLImporterTest::STLImporterTest() : FileGenerator()
 {
@@ -49,7 +50,6 @@ STLImporterTest::STLImporterTest() : FileGenerator()
 	spherePoissonRatio  = 0.2;
 	sphereFrictionDeg   = 18.0;
 	density = 2600;
-	rotationBlocked = false;
 	gravity = Vector3r(0,-9.81,0);
 	disorder = Vector3r(0.002,0.002,0.002);
 	verticesImport=true;
@@ -57,6 +57,8 @@ STLImporterTest::STLImporterTest() : FileGenerator()
        	facetsWire=true;
        	edgesImport=true;
 	stlFileName = "hourglass.stl";
+	angularVelocity = 0.5;
+	rotationAxis = Vector3r(0,0,1);
 	spheresHeight = 0;
 }
 
@@ -91,9 +93,10 @@ void STLImporterTest::registerAttributes()
 	REGISTER_ATTRIBUTE(edgesImport);
 	REGISTER_ATTRIBUTE(facetsImport);
 	REGISTER_ATTRIBUTE(facetsWire);
+	REGISTER_ATTRIBUTE(angularVelocity);
+	REGISTER_ATTRIBUTE(rotationAxis);
 	REGISTER_ATTRIBUTE(dampingForce);
 	REGISTER_ATTRIBUTE(dampingMomentum);
-	REGISTER_ATTRIBUTE(rotationBlocked);
 	REGISTER_ATTRIBUTE(timeStepUpdateInterval);
 }
 
@@ -101,7 +104,6 @@ void STLImporterTest::registerAttributes()
 bool STLImporterTest::generate()
 {
 	rootBody = shared_ptr<MetaBody>(new MetaBody);
-	createActors(rootBody);
 	positionRootBody(rootBody);
 
 	rootBody->dt = 0.001; //default time step
@@ -186,6 +188,10 @@ bool STLImporterTest::generate()
 			}
 	}
 	
+
+///////// engines
+	createActors(rootBody);
+
 	return true;
 }
 
@@ -279,6 +285,22 @@ void STLImporterTest::createActors(shared_ptr<MetaBody>& rootBody)
 	shared_ptr<PhysicalParametersMetaEngine> orientationIntegrator(new PhysicalParametersMetaEngine);
 	orientationIntegrator->add("LeapFrogOrientationIntegrator");
 
+	shared_ptr<RotationEngine> kinematic = shared_ptr<RotationEngine>(new RotationEngine);
+ 	kinematic->angularVelocity  = angularVelocity;
+	rotationAxis.Normalize();
+ 	kinematic->rotationAxis  = rotationAxis;
+ 	kinematic->rotateAroundZero = true;
+	
+	
+	shared_ptr<InteractingGeometry> vertex(new InteractingVertex);
+	shared_ptr<InteractingGeometry> edge(new InteractingEdge);
+	shared_ptr<InteractingGeometry> facet(new InteractingFacet);
+	for(BodyContainer::iterator bi = rootBody->bodies->begin(), biEnd=rootBody->bodies->end(); bi!=biEnd; ++bi)
+	    if ( (*bi)->interactingGeometry->getClassIndex() == vertex->getClassIndex() ||
+		    (*bi)->interactingGeometry->getClassIndex() == edge->getClassIndex() ||
+		    (*bi)->interactingGeometry->getClassIndex() == facet->getClassIndex() )
+		kinematic->subscribedBodies.push_back((*bi)->getId());
+
 	shared_ptr<ElasticCriterionTimeStepper> sdecTimeStepper(new ElasticCriterionTimeStepper);
 	sdecTimeStepper->sdecGroupMask = 1;
 	sdecTimeStepper->timeStepUpdateInterval = timeStepUpdateInterval;
@@ -295,10 +317,9 @@ void STLImporterTest::createActors(shared_ptr<MetaBody>& rootBody)
 	rootBody->engines.push_back(actionDampingDispatcher);
 	rootBody->engines.push_back(applyActionDispatcher);
 	rootBody->engines.push_back(positionIntegrator);
-
-	if(!rotationBlocked)
-		rootBody->engines.push_back(orientationIntegrator);
-
+	rootBody->engines.push_back(orientationIntegrator);
+	rootBody->engines.push_back(kinematic);
+ 	
 	rootBody->initializers.clear();
 	rootBody->initializers.push_back(physicalActionInitializer);
 	rootBody->initializers.push_back(boundingVolumeDispatcher);

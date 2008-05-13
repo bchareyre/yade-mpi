@@ -29,8 +29,13 @@ bool InteractingFacet2InteractingSphere4SpheresContactGeometry::go(	const shared
 							const shared_ptr<Interaction>& c)
 {
 	InteractingFacet*   facet = static_cast<InteractingFacet*>(cm1.get());
-	Vector3r fp = se31.position;
-	Vector3r sp = se32.position - fp;// TODO: orientation!!! //se31.orientation.Inverse()*(se32.position - fp);
+	
+	Matrix3r facetAxisT; se31.orientation.ToRotationMatrix(facetAxisT); 
+	Matrix3r facetAxis = facetAxisT.Transpose();
+	
+	// local orientation
+	Vector3r sp = facetAxis*(se32.position - se31.position); 
+	
 	Vector3r normal = facet->normal;
 	Real L = normal.Dot(sp);
 	if (L<0) { normal=-normal; L=-L; }
@@ -55,8 +60,11 @@ bool InteractingFacet2InteractingSphere4SpheresContactGeometry::go(	const shared
   
 	    Real penetrationDepth = sphereRadius - L;
 
-  	    scm->contactPoint = sp + fp - 0.5*penetrationDepth*normal; // TODO: orientation!!!
-  	    scm->normal = normal; // TODO: orientation!!!
+	    // global orientation
+	    normal = facetAxisT*normal; normal.Normalize();
+
+  	    scm->contactPoint = se32.position - 0.5*penetrationDepth*normal; 
+  	    scm->normal = normal; 
   	    scm->penetrationDepth = penetrationDepth;
   	    scm->radius1 = 2*sphereRadius;
   	    scm->radius2 = sphereRadius;

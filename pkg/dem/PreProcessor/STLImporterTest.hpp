@@ -23,8 +23,8 @@ class STLImporterTest : public FileGenerator
 				,edgesImport
 			        ,facetsImport
 			        ,facetsWire;
-
-		bool		rotationBlocked;
+		Real		angularVelocity;
+		Vector3r	rotationAxis;
 
 		Real		 minRadius
 				,maxRadius

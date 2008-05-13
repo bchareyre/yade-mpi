@@ -31,15 +31,19 @@ bool InteractingVertex2InteractingSphere4SpheresContactGeometry::go(	const share
 
     InteractingSphere* s2 = static_cast<InteractingSphere*>(cm2.get());
 
-    Vector3r normal = se32.position-se31.position; // TODO: Orientation!!!
+    Matrix3r vertexAxisT; se31.orientation.ToRotationMatrix(vertexAxisT); 
+    Matrix3r vertexAxis = vertexAxisT.Transpose();
+
+    Vector3r normal = se32.position-se31.position; // global orientation
 
     InteractingVertex* v = static_cast<InteractingVertex*>(cm1.get());
 
     // ignore vertices of a flat
     if (v->flat) return false; 
 
+    Vector3r normal_l = vertexAxis*normal; //local orientation
     for(int i=0,ei=v->normals.size(); i<ei; ++i)
-	if ( normal.Dot(v->normals[i]) < 0 ) return false;
+	if ( normal_l.Dot(v->normals[i]) < 0 ) return false;
 
     Real penetrationDepth = s2->radius - normal.Normalize();
 	    

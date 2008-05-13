@@ -30,7 +30,7 @@ class STLImporter {
 	/// number of imported edges (all|corner)
 	int number_of_imported_edges() const {if (import_edges) return (import_flat_edges_flag) ? number_of_edges() : number_of_corner_edges(); else return 0;}
 	/// number of imported facets (all|corner)
-	int number_of_imported_facets() const {return number_of_facets();}
+	int number_of_imported_facets() const {return (import_facets) ? number_of_facets() : 0;}
 	
 	/// number of all vertices
 	int number_of_vertices() const { return vts.size(); }

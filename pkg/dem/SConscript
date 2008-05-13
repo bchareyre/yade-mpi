@@ -1090,6 +1090,7 @@ env.SharedLibrary('NewtonsDampedLaw',
 				,'PhysicalParametersMetaEngine'
 				,'SpatialQuickSortCollider'
 				,'Sphere'
+				,'RotationEngine'
 				,'Vertex'
 				])
 ])

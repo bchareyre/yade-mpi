@@ -36,24 +36,25 @@ bool InteractingEdge2InteractingSphere4SpheresContactGeometry::go(	const shared_
 	Real squaredLength = e->squaredLength;
 	Real sphereRadius = static_cast<InteractingSphere*>(cm2.get())->radius;
 
-	Vector3r ep = se31.position;
-	Vector3r sp = se32.position;
-	Vector3r rp = sp - ep;
+	Matrix3r edgeAxisT; se31.orientation.ToRotationMatrix(edgeAxisT); 
+	Matrix3r edgeAxis = edgeAxisT.Transpose();
 	
-	// TODO: orientation normal1 & normal2!!!
-
+	// local orientation
+	Vector3r rp = edgeAxis*(se32.position - se31.position);
+	
 	if (e->both) {
 	    if ( e->normal1.Dot(rp) < 0 || e->normal2.Dot(rp) < 0 ) return false;
 	} else if ( e->normal1.Dot(rp) < 0 ) return false;
 
-	Vector3r edge = e->edge; // TODO: orientation edge!!! se31.orientation.Rotate(e->edge); 
+	Vector3r edge = e->edge; 
 
 	Real c1 = rp.Dot(edge);
 	if ( c1<=0 || squaredLength<=c1 ) return false;
 
-	Vector3r Pb = ep + c1/squaredLength*edge;
+	// global orientation
+	Vector3r Pb = se31.position + edgeAxisT * c1/squaredLength*edge;
 
-	Vector3r normal = sp - Pb;
+	Vector3r normal = se32.position - Pb;
 	Real penetrationDepth = sphereRadius - normal.Normalize();
 
 	if (penetrationDepth > 0)
