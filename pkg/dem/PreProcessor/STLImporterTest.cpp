@@ -133,13 +133,12 @@ bool STLImporterTest::generate()
 	    << ", Edges (corner, flat): " << imp.number_of_edges() 
 	    << " (" << imp.number_of_corner_edges() << ", " << imp.number_of_flat_edges() << ")"
 	    << ", Facets: " << imp.number_of_facets() << endl;
-	vector<shared_ptr<Body> > bds(imp.number_of_all_imported());
 	// create bodies
-	for(int i=0,e=bds.size();i<e;++i)
+	for(int i=0,e=imp.number_of_all_imported();i<e;++i)
 	{
-	    bds[i] = shared_ptr<Body>(new Body(body_id_t(0),1));
+	    shared_ptr<Body> b(new Body(body_id_t(0),1));
     
-	    bds[i]->isDynamic		= false;
+	    b->isDynamic		= false;
 	    
 	    // physical parameters
 	    shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
@@ -150,20 +149,20 @@ bool STLImporterTest::generate()
 	    physics->young			= sphereYoungModulus;
 	    physics->poisson		= spherePoissonRatio;
 	    physics->frictionAngle		= sphereFrictionDeg * Mathr::PI/180.0;
-	    bds[i]->physicalParameters	= physics;
+	    b->physicalParameters	= physics;
 
 	    // bounding box only for edges and facets (not for vertices)
 	    if(i>=imp.number_of_imported_vertices())
 	    {
 		shared_ptr<AABB> aabb(new AABB);
 		aabb->diffuseColor		= Vector3r(0,1,0);
-		bds[i]->boundingVolume	= aabb;
+		b->boundingVolume	= aabb;
 	    }
 	    
-	    rootBody->bodies->insert(bds[i]);
+	    rootBody->bodies->insert(b);
 	}
 	// import bodies (create geometry)
-	imp.import(bds);
+	imp.import(rootBody->bodies);
 	cerr << "Imported: " 
 	    << imp.number_of_imported_vertices() << " vertices, " 
 	    << imp.number_of_imported_edges() << " edges, " 
@@ -250,7 +249,6 @@ void STLImporterTest::createActors(shared_ptr<MetaBody>& rootBody)
 	
 	shared_ptr<InteractionGeometryMetaEngine> interactionGeometryDispatcher(new InteractionGeometryMetaEngine);
 	interactionGeometryDispatcher->add("InteractingSphere2InteractingSphere4SpheresContactGeometry");
-	interactionGeometryDispatcher->add("InteractingBox2InteractingSphere4SpheresContactGeometry");
 	interactionGeometryDispatcher->add("InteractingVertex2InteractingSphere4SpheresContactGeometry");
 	interactionGeometryDispatcher->add("InteractingEdge2InteractingSphere4SpheresContactGeometry");
 	interactionGeometryDispatcher->add("InteractingFacet2InteractingSphere4SpheresContactGeometry");
@@ -262,7 +260,6 @@ void STLImporterTest::createActors(shared_ptr<MetaBody>& rootBody)
 	boundingVolumeDispatcher->add("InteractingSphere2AABB");
 	boundingVolumeDispatcher->add("InteractingEdge2AABB");
 	boundingVolumeDispatcher->add("InteractingFacet2AABB");
-	boundingVolumeDispatcher->add("InteractingBox2AABB");
 	boundingVolumeDispatcher->add("MetaInteractingGeometry2AABB");
 	
 	shared_ptr<GravityEngine> gravityCondition(new GravityEngine);

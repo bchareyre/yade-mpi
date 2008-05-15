@@ -15,6 +15,7 @@
 #include <yade/pkg-common/InteractingFacet.hpp>
 #include "STLReader.hpp"
 #include<yade/core/Body.hpp>
+#include<yade/core/BodyContainer.hpp>
 
 class STLImporter {
     public:
@@ -66,8 +67,8 @@ class STLImporter {
 	/// import vertices on a flats (by default false)
 	bool import_flat_vertices_flag; 
 
-	/// import stuffs (sequence vertices, edges, facets)
-	void import(vector<shared_ptr<Body> >&);
+	/// import geometry (sequence vertices, edges, facets)
+	void import(shared_ptr<BodyContainer> bodies);
 
     protected:
 	/// Vertex

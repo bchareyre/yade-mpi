@@ -52,6 +52,7 @@ if 'EMBED_PYTHON' in env['CPPDEFINES']:
 				'InteractionGeometryMetaEngine',
 				'InteractionPhysicsMetaEngine',
 				'PhysicalParametersMetaEngine',
+				'STLImporter'
 			],
 			# ,'py/GLViewer4.cpp'
 			# '$QGLVIEWER_LIB'

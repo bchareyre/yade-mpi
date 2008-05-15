@@ -21,6 +21,7 @@
 #include<yade/core/Omega.hpp>
 #include<yade/core/FileGenerator.hpp>
 
+#include<yade/lib-import/STLImporter.hpp>
 
 #include<yade/core/MetaEngine.hpp>
 #include<yade/core/MetaEngine1D.hpp>
@@ -400,6 +401,11 @@ class pyOmega{
 	#undef OMEGA
 };
 
+class pySTLImporter : public STLImporter {
+    public:
+	void py_import(pyBodyContainer bc) { import(bc.proxee); }
+};
+	
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(omega_overloads,run,0,1);
 
 #ifdef USE_PYGLVIEWER 
@@ -601,5 +607,28 @@ BOOST_PYTHON_MODULE(wrapper)
 
 	BASIC_PY_PROXY_WRAPPER(pyFileGenerator,"Preprocessor")
 		.def("generate",&pyFileGenerator::generate);
+
+	boost::python::class_<pySTLImporter>("STLImporter")
+	    .def("open",&pySTLImporter::open)
+	    .add_property("number_of_all_imported",&pySTLImporter::number_of_all_imported)
+	    .add_property("number_of_imported_vertices",&pySTLImporter::number_of_imported_vertices)
+	    .add_property("number_of_imported_edges",&pySTLImporter::number_of_imported_edges)
+	    .add_property("number_of_imported_facets",&pySTLImporter::number_of_imported_facets)
+	    .add_property("number_of_vertices",&pySTLImporter::number_of_vertices)
+	    .add_property("number_of_corner_vertices",&pySTLImporter::number_of_corner_vertices)
+	    .add_property("number_of_flat_vertices",&pySTLImporter::number_of_flat_vertices)
+	    .add_property("number_of_facets",&pySTLImporter::number_of_facets)
+	    .add_property("number_of_edges",&pySTLImporter::number_of_edges)
+	    .add_property("number_of_corner_edges",&pySTLImporter::number_of_corner_edges)
+	    .add_property("number_of_flat_edges",&pySTLImporter::number_of_flat_edges)
+	    .def_readwrite("max_vertices_in_facet",&pySTLImporter::max_vertices_in_facet)
+	    .def("set_imported_stuff",&pySTLImporter::set_imported_stuff)
+	    .def_readwrite("import_vertices",&pySTLImporter::import_vertices)
+	    .def_readwrite("import_edges",&pySTLImporter::import_edges)
+	    .def_readwrite("import_facets",&pySTLImporter::import_facets)
+	    .def_readwrite("facets_wire",&pySTLImporter::facets_wire)
+	    .def_readwrite("import_flat_edges_flag",&pySTLImporter::import_flat_edges_flag)
+	    .def_readwrite("import_flat_vertices_flag",&pySTLImporter::import_flat_vertices_flag)
+	    .def("import_geometry",&pySTLImporter::py_import);
 }
 

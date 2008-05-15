@@ -4,7 +4,7 @@
 #
 # 2008 © Václav Šmilauer <eudoxos@arcig.cz>
 
-import math
+import math,random
 
 from yade.wrapper import *
 
