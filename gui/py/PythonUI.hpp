@@ -10,6 +10,7 @@ class PythonUI: public FrontEnd
 		void help();
 		void execScript(string);
 		static struct termios tios,tios_orig;
+		static void termSetup();
 		static void termRestore();
 	public:
 		PythonUI(){};

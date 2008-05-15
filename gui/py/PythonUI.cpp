@@ -48,6 +48,17 @@ void PythonUI::execScript(string script){
 	}
 }
 
+void PythonUI::termSetup(void){
+	LOG_DEBUG("Setting terminal discipline (^C kills line, ^U does nothing)");
+	tcgetattr(STDIN_FILENO,&PythonUI::tios);
+	memcpy(&PythonUI::tios_orig,&PythonUI::tios,sizeof(struct termios));
+	atexit(PythonUI::termRestore);
+	tios.c_cc[VKILL]=tios.c_cc[VINTR]; // assign ^C what ^U normally does (delete line)
+	tios.c_cc[VINTR] = 0; // disable sending SIGINT at ^C
+	tcsetattr(STDIN_FILENO,TCSANOW,&PythonUI::tios);
+	tcflush(STDIN_FILENO,TCIFLUSH);
+}
+
 void PythonUI::termRestore(void){
 	LOG_DEBUG("Restoring terminal discipline.");
 	tcsetattr(STDIN_FILENO,TCSANOW,&PythonUI::tios_orig);
@@ -80,14 +91,8 @@ int PythonUI::run(int argc, char *argv[]) {
 	 * Hence we remap ^C (keycode in c_cc[VINTR]) to killing the line (c_cc[VKILL]) and disable VINTR afterwards.
 	 * The behavior is restored back by the PythonUI::termRestore registered with atexit.
 	 * */
-	LOG_DEBUG("Setting terminal discipline (^C kills line, ^U does nothing)");
-	tcgetattr(STDIN_FILENO,&PythonUI::tios);
-	memcpy(&PythonUI::tios_orig,&PythonUI::tios,sizeof(struct termios));
+	termSetup();
 	atexit(PythonUI::termRestore);
-	tios.c_cc[VKILL]=tios.c_cc[VINTR]; // assign ^C what ^U normally does (delete line)
-	tios.c_cc[VINTR] = 0; // disable sending SIGINT at ^C
-	tcsetattr(STDIN_FILENO,TCSANOW,&PythonUI::tios);
-	tcflush(STDIN_FILENO,TCIFLUSH);
 
 
 	XInitThreads();
