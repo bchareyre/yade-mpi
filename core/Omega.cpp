@@ -102,7 +102,7 @@ void Omega::stopSimulationLoop()
 	}
 }
 
-	bool Omega::isRunning(){ return simulationLoop->looping(); }
+bool Omega::isRunning(){ if(simulationLoop) return simulationLoop->looping(); else return false; }
 
 void Omega::buildDynlibDatabase(const vector<string>& dynlibsList)
 {	
@@ -401,7 +401,7 @@ Real Omega::getTimeStep()
 
 void Omega::skipTimeStepper(bool s)
 {
-	rootBody->setTimeSteppersActive(!s);
+	if(rootBody) rootBody->setTimeSteppersActive(!s);
 }
 
 

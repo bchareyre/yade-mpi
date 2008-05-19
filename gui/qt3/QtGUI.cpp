@@ -17,6 +17,11 @@
 //#endif
 #include <qapplication.h>
 
+#ifdef EMBED_PYTHON
+	#include<yade/gui-py/PythonUI.hpp>
+	#include<boost/thread.hpp>
+#endif
+
 QtGUI::QtGUI(){}
 QtGUI::~QtGUI(){}
 
@@ -50,6 +55,12 @@ int QtGUI::run(int argc, char *argv[])
 	mainWindow=new YadeQtMainWindow();
 	mainWindow->show();
 	app.setMainWidget(mainWindow);
+
+	#ifdef EMBED_PYTHON
+		LOG_INFO("Launching Python thread now...");
+		//PyEval_InitThreads();
+		boost::thread pyThread(boost::function0<void>(&PythonUI::pythonSession));
+	#endif
 
 	int res =  app.exec();
 

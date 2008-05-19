@@ -206,7 +206,7 @@ int main(int argc, char *argv[])
 		LOG_DEBUG("Initializing Python...");
 		Py_OptimizeFlag=1;
 		Py_Initialize();
-		PyEval_InitThreads(); // this locks the GIL as side-effect
+		//PyEval_InitThreads(); // this locks the GIL as side-effect
 		//PyGILState_STATE pyState=PyGILState_Ensure(); PyGILState_Release(pyState);
 		signal(SIGINT,sigHandler);
 	#endif

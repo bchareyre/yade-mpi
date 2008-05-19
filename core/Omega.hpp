@@ -108,6 +108,7 @@ class Omega : public Singleton<Omega>
 		boost::mutex&	getRootBodyMutex();
 		
 		void		createSimulationLoop();
+		bool 		hasSimulationLoop(){return (bool)(simulationLoop);}
 		void		startSimulationLoop();
 		void		stopSimulationLoop();
 		void		finishSimulationLoop();

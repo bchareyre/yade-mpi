@@ -10,9 +10,18 @@
 
 #include <X11/Xlib.h>
 
+
+// #define PYTHON_USE_QT3
+
+#ifdef PYTHON_USE_QT3
+	#include<qapplication.h>
+#endif
+
 using namespace boost;
 
 struct termios PythonUI::tios, PythonUI::tios_orig;
+string PythonUI::runScript, PythonUI::runCommands;
+bool PythonUI::stopAfter;
 
 CREATE_LOGGER(PythonUI);
 
@@ -21,18 +30,6 @@ void PythonUI::help(){
 \n\
 	-h       print this help\n\
 	-s file  run this python script before entering interactive prompt\n\
-	/* -c cmd   run python command (may be specified multiple times, newline is appended every time) */ \n\
-\n\
-	Sample session:\n\
-\n\
-	>>> p=Preprocessor\n\
-	>>> p.generator='Funnel'\n\
-	>>> p['density']=2000\n\
-	>>> p.output='/tmp/funnel.xml'\n\
-	>>> p.generate()\n\
-	>>> o=Omega()\n\
-	>>> o.run()\n\
-	>>> # ^D to exit\n\
 ";
 }
 
@@ -62,6 +59,30 @@ void PythonUI::termSetup(void){
 void PythonUI::termRestore(void){
 	LOG_DEBUG("Restoring terminal discipline.");
 	tcsetattr(STDIN_FILENO,TCSANOW,&PythonUI::tios_orig);
+}
+
+void PythonUI::pythonSession(){
+	LOG_DEBUG("PythonUI::pythonSession");
+	PyGILState_STATE pyState = PyGILState_Ensure();
+		LOG_DEBUG("Got Global Interpreter Lock, good.");
+		/* import yade (for startUI()) and yade.runtime (initially empty) namespaces */
+		PyRun_SimpleString("import sys; sys.path.insert(0,'" PREFIX "/lib/yade" SUFFIX "/gui')");
+		PyRun_SimpleString("import yade");
+
+		#define PYTHON_DEFINE_STRING(pyName,cxxName) PyRun_SimpleString((string("yade.runtime." pyName "='")+cxxName+"'").c_str())
+		#define PYTHON_DEFINE_BOOL(pyName,cxxName) PyRun_SimpleString((string("yade.runtime." pyName "=")+(cxxName?"True":"False")).c_str())
+			// wrap those in python::handle<> ??
+			PYTHON_DEFINE_STRING("prefix",PREFIX);
+			PYTHON_DEFINE_STRING("suffix",SUFFIX);
+			PYTHON_DEFINE_STRING("executable",Omega::instance().origArgv[0]);
+			PYTHON_DEFINE_STRING("simulation",Omega::instance().getSimulationFileName());
+			PYTHON_DEFINE_STRING("script",runScript);
+			PYTHON_DEFINE_STRING("commands",runCommands);
+			PYTHON_DEFINE_BOOL("stopAfter",stopAfter);
+		#undef PYTHON_DEFINE_STRING
+		#undef PYTHON_DEFINE_BOOL
+		execScript(PREFIX "/lib/yade" SUFFIX "/gui/PythonUI_rc.py");
+	PyGILState_Release(pyState);
 }
 
 int PythonUI::run(int argc, char *argv[]) {
@@ -94,36 +115,14 @@ int PythonUI::run(int argc, char *argv[]) {
 	termSetup();
 	atexit(PythonUI::termRestore);
 
-
 	XInitThreads();
 	PyEval_InitThreads();
 
-	PyGILState_STATE pyState = PyGILState_Ensure();
-
-		/* import yade (for startUI()) and yade.runtime (initially empty) namespaces */
-		PyRun_SimpleString("import sys; sys.path.insert(0,'" PREFIX "/lib/yade" SUFFIX "/gui')");
-		PyRun_SimpleString("import yade");
-
-		#define PYTHON_DEFINE_STRING(pyName,cxxName) PyRun_SimpleString((string("yade.runtime." pyName "='")+cxxName+"'").c_str())
-		#define PYTHON_DEFINE_BOOL(pyName,cxxName) PyRun_SimpleString((string("yade.runtime." pyName "=")+(cxxName?"True":"False")).c_str())
-			// wrap those in python::handle<> ??
-			PYTHON_DEFINE_STRING("prefix",PREFIX);
-			PYTHON_DEFINE_STRING("suffix",SUFFIX);
-			PYTHON_DEFINE_STRING("executable",Omega::instance().origArgv[0]);
-			PYTHON_DEFINE_STRING("simulation",Omega::instance().getSimulationFileName());
-			PYTHON_DEFINE_STRING("script",runScript);
-			PYTHON_DEFINE_STRING("commands",runCommands);
-			PYTHON_DEFINE_BOOL("stopAfter",stopAfter);
-		#undef PYTHON_DEFINE_STRING
-		#undef PYTHON_DEFINE_BOOL
-		execScript(PREFIX "/lib/yade" SUFFIX "/gui/PythonUI_rc.py");
-
-	PyGILState_Release(pyState);
-
-	tcsetattr(STDIN_FILENO,TCSANOW,&tios_orig);
-
-	//boost::thread cmdlineThread(&cmdlineThreadStart);
-	//cmdlineThread.join();
+	#ifdef PYTHON_USE_QT3
+		QApplication app(0,NULL);	
+	#endif
+	
+	pythonSession();
 
 	return 0;
 }

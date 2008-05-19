@@ -32,6 +32,7 @@ if 'qt3' not in env['exclude']:
 				'XMLFormatManager',
 				'yade-serialization-qt',
 				'PositionOrientationRecorder',
+				'PythonUI',
 				'$QGLVIEWER_LIB'],
 			CPPPATH=env['CPPPATH']+['qt3']),
 	])

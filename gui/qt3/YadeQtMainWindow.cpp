@@ -5,7 +5,6 @@
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
-
 #include "YadeQtMainWindow.hpp"
 #include<yade/lib-serialization/IOFormatManager.hpp>
 #include<yade/lib-factory/ClassFactory.hpp>
@@ -28,8 +27,11 @@ using namespace std;
 
 CREATE_LOGGER(YadeQtMainWindow);
 
+YadeQtMainWindow* YadeQtMainWindow::self=NULL;
+
 YadeQtMainWindow::YadeQtMainWindow() : YadeQtGeneratedMainWindow()
 {
+	self=this;
 
 	preferences = shared_ptr<QtGUIPreferences>(new QtGUIPreferences);
 	filesystem::path yadeQtGUIPrefPath = filesystem::path( Omega::instance().yadeConfigPath + "/QtGUIPreferences.xml", filesystem::native);
@@ -38,8 +40,11 @@ YadeQtMainWindow::YadeQtMainWindow() : YadeQtGeneratedMainWindow()
 	{
 		preferences->mainWindowPositionX	= 50;
 		preferences->mainWindowPositionY	= 50;
-		preferences->mainWindowSizeX		= 1024;
-		preferences->mainWindowSizeY		= 768;
+		#ifdef USE_WORKSPACE
+			preferences->mainWindowSizeX		= 1024; preferences->mainWindowSizeY		= 768;
+		#else
+			preferences->mainWindowSizeX		= 150; preferences->mainWindowSizeY		= 150;
+		#endif	
 		IOFormatManager::saveToFile("XMLFormatManager",yadeQtGUIPrefPath.string(),"preferences",preferences);
 	}
 
@@ -52,8 +57,11 @@ YadeQtMainWindow::YadeQtMainWindow() : YadeQtGeneratedMainWindow()
 	{
 		preferences->mainWindowPositionX	= 50;
 		preferences->mainWindowPositionY	= 50;
-		preferences->mainWindowSizeX		= 1024;
-		preferences->mainWindowSizeY		= 768;
+		#ifdef USE_WORKSPACE
+			preferences->mainWindowSizeX		= 1024; preferences->mainWindowSizeY		= 768;
+		#else
+			preferences->mainWindowSizeX		= 150; preferences->mainWindowSizeY		= 150;
+		#endif	
 		IOFormatManager::saveToFile("XMLFormatManager",yadeQtGUIPrefPath.string(),"preferences",preferences);
 	}
 
@@ -61,19 +69,12 @@ YadeQtMainWindow::YadeQtMainWindow() : YadeQtGeneratedMainWindow()
 	move(preferences->mainWindowPositionX,preferences->mainWindowPositionY);
 	
 	//addMenu("Edit");
-	addMenu("Preprocessor");
-	addMenu("Postprocessor");
-	//addMenu("Extra");
-
-	//addItem("Edit","Preferences...","QtPreferencesEditor");
+	//addMenu("Preprocessor");
+	//addMenu("Postprocessor");
+	addMenu("Actions");
 		
-	addItem("Preprocessor","File Generator...","QtFileGenerator");
-	//addItem("Preprocessor","Engine Editor...","QtEngineEditor");
-	//addItem("Preprocessor","Code Generator...","QtCodeGenerator");
-
-	addItem("Postprocessor","Simulation Player...","QtSimulationPlayer");
-
-	//addItem("Extra","Spherical DEM Simulator...","QtSphericalDEM");
+	addItem("Actions","File Generator","QtFileGenerator");
+	addItem("Actions","Simulation Player","QtSimulationPlayer");
 
 	createMenus();
 
@@ -81,11 +82,12 @@ YadeQtMainWindow::YadeQtMainWindow() : YadeQtGeneratedMainWindow()
 	vbox->setFrameStyle( QFrame::StyledPanel | QFrame::Sunken );
 	vbox->setMargin( 2 );
 	vbox->setLineWidth( 2 );
+	#ifdef USE_WORKSPACE
+		workspace = new QWorkspace( vbox );
+		workspace->setBackgroundMode( PaletteMid );
+		setCentralWidget( vbox );
+	#endif
 
-	workspace = new QWorkspace( vbox );
-	workspace->setBackgroundMode( PaletteMid );
-	setCentralWidget( vbox );
-	
 	simulationController = 0;
 	
 	// HACK
@@ -121,7 +123,7 @@ void YadeQtMainWindow::addItem(string menuName, string itemName,string className
 		items.push_back(new QAction(this, itemName.c_str()));
 		items.back()->setText( itemName.c_str() );
 		items.back()->setMenuText( itemName.c_str() );
-		items.back()->setToolTip( ("Load library "+ClassFactory::instance().libNameToSystemName(className)).c_str() );
+		items.back()->setToolTip( ("Load plugin "+ClassFactory::instance().libNameToSystemName(className)).c_str() );
 		items.back()->addTo(getPopupMenu(menuName));
 		connect( items.back(), SIGNAL( activated() ), this, SLOT( dynamicMenuClicked() ) );
 	}
@@ -140,8 +142,12 @@ void YadeQtMainWindow::createMenus()
 
 void YadeQtMainWindow::fileNewSimulation()
 {
-	if(!simulationController)
-		simulationController = new SimulationController(workspace);
+	if(!simulationController) simulationController =
+	#ifdef USE_WORKSPACE
+		new SimulationController(workspace);
+	#else
+		new SimulationController(NULL);
+	#endif
 	simulationController->show();
 	connect( simulationController, SIGNAL( closeSignal() ), this, SLOT( closeSimulationControllerEvent() ) );
 	fileNewSimulationAction->setEnabled(false);
@@ -157,7 +163,11 @@ void YadeQtMainWindow::dynamicMenuClicked()
 	shared_ptr<QWidget> widget = dynamic_pointer_cast<QWidget>(qtWidgets.back());
 	if (widget) // the library is a QWidget so we set workspace as its parent
 	{
-		widget->reparent(workspace,QPoint(10,10));
+		#ifdef USE_WORKSPACE
+			widget->reparent(workspace,QPoint(10,10));
+		#else
+			//widget->reparent(this,QPoint(10,10));
+		#endif
 		widget->show();
 	}
 }

@@ -42,8 +42,8 @@ void GLViewer::notMoving()
 {
 	camera()->frame()->setWheelSensitivity(-1.0f);
 	setMouseBinding(Qt::LeftButton + Qt::RightButton, CAMERA, ZOOM);
+	setMouseBinding(Qt::MidButton, CAMERA, ZOOM);
 	setMouseBinding(Qt::LeftButton, CAMERA, ROTATE);
-	setMouseBinding(Qt::MidButton, CAMERA, TRANSLATE);
 	setMouseBinding(Qt::RightButton, CAMERA, TRANSLATE);
 	setWheelBinding(Qt::NoButton, CAMERA, ZOOM);
 	setMouseBinding(Qt::SHIFT + Qt::LeftButton, SELECT);

@@ -294,7 +294,13 @@ class pyOmega{
 		 * Initializers are run ad this flag set to false by maybeRunInitializers when running (step or run) */
 		bool needsInitializers;
 	public:
-	pyOmega(){ if(!OMEGA.getRootBody()){shared_ptr<MetaBody> mb=Shop::rootBody(); OMEGA.setRootBody(mb);} OMEGA.createSimulationLoop(); /* this is not true if another instance of Omega is created; flag should be stored inside the Omega singleton for clean solution. */ needsInitializers=true; };
+	pyOmega(){ if(!OMEGA.getRootBody()){shared_ptr<MetaBody> mb=Shop::rootBody(); OMEGA.setRootBody(mb);}
+		/* this is not true if another instance of Omega is created; flag should be stored inside the Omega singleton for clean solution. */
+		if(!OMEGA.hasSimulationLoop()){
+			OMEGA.createSimulationLoop();
+			needsInitializers=true;
+		}
+	};
 
 	long iter(){ return OMEGA.getCurrentIteration();}
 	double simulationTime(){return OMEGA.getSimulationTime();}

@@ -46,20 +46,22 @@ void SimulationControllerUpdater::oneLoop()
 	snprintf(strVirt,64,"virt %02d:%03d.%03dm%03du%03dn",min,sec,msec,misec,nsec);
 	controller->labelSimulTime->setText(string(strVirt));
 
-	time_duration duration = microsec_clock::local_time()-Omega::instance().getMsStartingSimulationTime();
-	duration -= Omega::instance().getSimulationPauseDuration();
+	if(Omega::instance().isRunning()){
+		time_duration duration = microsec_clock::local_time()-Omega::instance().getMsStartingSimulationTime();
+		duration -= Omega::instance().getSimulationPauseDuration();
 
-	unsigned int hours	= duration.hours();
-	unsigned int minutes 	= duration.minutes();
-	unsigned int seconds	= duration.seconds();
-	unsigned int mseconds	= duration.fractional_seconds()/1000;
-	unsigned int days 	= hours/24;
-	hours			= hours-24*days;
+		unsigned int hours	= duration.hours();
+		unsigned int minutes 	= duration.minutes();
+		unsigned int seconds	= duration.seconds();
+		unsigned int mseconds	= duration.fractional_seconds()/1000;
+		unsigned int days 	= hours/24;
+		hours			= hours-24*days;
 
-	char strReal[64];
-	if(days>0) snprintf(strReal,64,"real %dd %02d:%02d:%03d.%03d",days,hours,minutes,seconds,mseconds);
-	else snprintf(strReal,64,"real %02d:%02d:%03d.%03d",hours,minutes,seconds,mseconds);
-	controller->labelRealTime->setText(string(strReal));
+		char strReal[64];
+		if(days>0) snprintf(strReal,64,"real %dd %02d:%02d:%03d.%03d",days,hours,minutes,seconds,mseconds);
+		else snprintf(strReal,64,"real %02d:%02d:%03d.%03d",hours,minutes,seconds,mseconds);
+		controller->labelRealTime->setText(string(strReal));
+	}
 
 	// update iterations per second - only one in a while (iterPerSec_TTL_ms)
 	// does someone need to display that with more precision than integer?

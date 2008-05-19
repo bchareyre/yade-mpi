@@ -6,6 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
+#include "YadeQtMainWindow.hpp"
 #include "SimulationController.hpp"
 #include "MessageDialog.hpp"
 #include "FileDialog.hpp"
@@ -96,6 +97,11 @@ SimulationController::SimulationController(QWidget * parent) : QtGeneratedSimula
 	if (Omega::instance().getSimulationFileName()!=""){
 		loadSimulationFromFileName(Omega::instance().getSimulationFileName());
 	}
+	// run timer ANY TIME (simulation may be started asynchronously)
+	startTimer(refreshTime);
+	#ifndef USE_WORKSPACE
+		YadeQtMainWindow::self->hide();
+	#endif
 }
 
 
@@ -121,6 +127,10 @@ SimulationController::~SimulationController()
 	
 	filesystem::path rendererConfig = filesystem::path( Omega::instance().yadeConfigPath + "/OpenGLRendererPref.xml", filesystem::native);
 	IOFormatManager::saveToFile("XMLFormatManager",rendererConfig.string(),"renderer",renderer);
+
+	#ifndef USE_WORKSPACE
+		YadeQtMainWindow::self->show();
+	#endif
 }
 
 void SimulationController::redrawAll()
@@ -145,9 +155,7 @@ void SimulationController::pbLoadClicked()
 	string selectedFilter;
 	std::vector<string> filters;
 	filters.push_back("Yade Binary File (*.yade)");
-	filters.push_back("XML Yade File (*.xml)");
-	filters.push_back("XML Yade File (*.xml.gz)");
-	filters.push_back("XML Yade File (*.xml.bz2)");
+	filters.push_back("XML Yade File (*.xml *.xml.gz *.xml.bz2)");
 	string fileName = FileDialog::getOpenFileName(".", filters, "Choose a file to open", parentWorkspace, selectedFilter );
 		
 	if ( 	   fileName.size()!=0 
@@ -235,9 +243,7 @@ void SimulationController::pbSaveClicked()
 	string selectedFilter;
 	std::vector<string> filters;
 	filters.push_back("Yade Binary File (*.yade)");
-	filters.push_back("XML Yade File (*.xml)");
-	filters.push_back("XML Yade File (*.xml.gz)");
-	filters.push_back("XML Yade File (*.xml.bz2)");
+	filters.push_back("XML Yade File (*.xml *.xml.gz *.xml.bz2)");
 	string fileName = FileDialog::getSaveFileName(".", filters, "Specify file name to save", parentWorkspace, selectedFilter );
 
 	if(fileName.size()!=0  && (fileName != "/")&& (fileName != "."))
@@ -301,13 +307,16 @@ void SimulationController::closeGLViewEvent(int id)
 		if (id==maxNbViews)
 			maxNbViews--;
 	}
+	else{
+		/* emit close for the whole simulation? */
+	}
 }
 
 
 void SimulationController::pbStopClicked()
 {
 	Omega::instance().stopSimulationLoop();
-	killTimers();
+	//killTimers();
 }
 
 
@@ -316,7 +325,6 @@ void SimulationController::pbStartClicked()
 	if(!sync)
 		Omega::instance().startSimulationLoop();        
 
-	startTimer(refreshTime);
 }
 
 
@@ -331,7 +339,7 @@ void SimulationController::pbResetClicked()
 	if(Omega::instance().getRootBody())
 	{
 		// timeStepper setup done in loadSimulationFromFileName
-		updater->oneLoop(); // to refresh gui
+		//updater->oneLoop(); // to refresh gui
 		redrawAll();
 	} 
 	else
@@ -351,7 +359,7 @@ void SimulationController::pbOneSimulationStepClicked()
 	pbStopClicked();
 	Omega::instance().spawnSingleSimulationLoop();
 	redrawAll();
-	updater->oneLoop();
+	//updater->oneLoop();
 }
 
 

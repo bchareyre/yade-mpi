@@ -213,7 +213,13 @@ void QtFileGenerator::timerEvent( QTimerEvent* )
 		bool successfullyGenerated=boost::any_cast<bool>(m_worker->getReturnValue());
 		string message=m_worker->message;
 
-		shared_ptr<MessageDialog> md = shared_ptr<MessageDialog>(new MessageDialog(string(successfullyGenerated?"SUCCESS:\n\n":"FAILURE!\n\n")+message,this->parentWidget()->parentWidget()));
+		shared_ptr<MessageDialog> md = shared_ptr<MessageDialog>(new MessageDialog(string(successfullyGenerated?"SUCCESS:\n\n":"FAILURE!\n\n")+message,
+		#ifdef USE_WORKSPACE
+			this->parentWidget()->parentWidget()
+		#else
+			NULL
+		#endif
+		));
 		md->exec();
 
 		m_worker=shared_ptr<FileGenerator>();
@@ -230,9 +236,10 @@ void QtFileGenerator::timerEvent( QTimerEvent* )
 			&& successfullyGenerated //filesystem::exists(filesystem::path((const char*)(leOutputFileName->text()))) 
 			&& Omega::instance().getSimulationFileName()=="")
 		{
-			QWidget* qw=this; while (qw->parentWidget()) qw=qw->parentWidget(); // find toplevel widget - which should be yade's main window
+			//QWidget* qw=this; while (qw->parentWidget()) qw=qw->parentWidget(); // find toplevel widget - which should be yade's main window
 			Omega::instance().setSimulationFileName((const char*)(leOutputFileName->text()));
-			(dynamic_cast<YadeQtMainWindow*>(qw))->fileNewSimulation();
+			//(dynamic_cast<YadeQtMainWindow*>(qw))->fileNewSimulation();
+			dynamic_cast<YadeQtMainWindow*>(YadeQtMainWindow::self)->fileNewSimulation();
 		}
 	}
 }
@@ -261,7 +268,13 @@ void QtFileGenerator::pbLoadClicked()
 	string selectedFilter;
 	std::vector<string> filters;
 	filters.push_back("XML Yade File (*.xml)");
-	string fileName = FileDialog::getOpenFileName(".", filters, "Choose a FileGenerator configuration to load", this->parentWidget()->parentWidget(), selectedFilter );
+	string fileName = FileDialog::getOpenFileName(".", filters, "Choose a FileGenerator configuration to load", 
+		#ifdef USE_WORKSPACE
+			this->parentWidget()->parentWidget()
+		#else
+			NULL
+		#endif
+		, selectedFilter );
 	if ( 	   fileName.size()!=0 
 		&& (selectedFilter == "XML Yade File (*.xml)") 
 		&& filesystem::exists(fileName) 
@@ -282,7 +295,13 @@ void QtFileGenerator::pbLoadClicked()
 		} 
 		catch(SerializableError& e) // catching it...
 		{
-			shared_ptr<MessageDialog> md = shared_ptr<MessageDialog>(new MessageDialog(string("FileGenerator failed to load: ") + e.what(),this->parentWidget()->parentWidget()));
+			shared_ptr<MessageDialog> md = shared_ptr<MessageDialog>(new MessageDialog(string("FileGenerator failed to load: ") + e.what(),
+			#ifdef USE_WORKSPACE
+				this->parentWidget()->parentWidget()
+			#else
+				NULL
+			#endif	
+				));
 			md->exec();
 			return;
 		}

@@ -14,11 +14,12 @@ using namespace boost;
 FileDialog::FileDialog (const QString& directory,const QString& filters,const string& caption,QWidget* parent) : QFileDialog(directory,filters,parent,"FileDialog",false)
 {	
 	setCaption(caption);
-	
-	QSize s1 = parent->size();
-	QSize s2 = size();
-	QSize s = s1-s2;
-	reparent(parent,QPoint(s.width()/2,s.height()/2));	
+	if(parent){	
+		QSize s1 = parent->size();
+		QSize s2 = size();
+		QSize s = s1-s2;
+		reparent(parent,QPoint(s.width()/2,s.height()/2));	
+	}
 	show();
 
 }

@@ -8,13 +8,16 @@ class PythonUI: public FrontEnd
 {
 	private:
 		void help();
-		void execScript(string);
+		static void execScript(string);
 		static struct termios tios,tios_orig;
 		static void termSetup();
 		static void termRestore();
+		static string runScript, runCommands;
+		static bool stopAfter;
 	public:
 		PythonUI(){};
 		virtual ~PythonUI(){};
+		static void pythonSession();
 		virtual int run(int argc, char *argv[]);
 	
 	REGISTER_CLASS_NAME(PythonUI);

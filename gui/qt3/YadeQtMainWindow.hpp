@@ -9,6 +9,15 @@
 #ifndef YADEQTMAINWINDOW_HPP
 #define YADEQTMAINWINDOW_HPP
 
+/* #define this if you want to have workspace: one toplevel windows with subwindows inside it;
+ * that is the old behavior which is now deprecated, but still supported.
+ *
+ * If it is not defined, all dialogues etc will be standalone windows.
+ *
+ */
+
+// #define USE_WORKSPACE
+
 #include <qworkspace.h>
 #include <qmainwindow.h>
 #include <qframe.h>
@@ -22,7 +31,9 @@ class YadeQtMainWindow : public YadeQtGeneratedMainWindow
 	protected :
 		shared_ptr<QtGUIPreferences> preferences;
 		SimulationController * simulationController;
-		QWorkspace * workspace;
+		#ifdef USE_WORKSPACE
+			QWorkspace * workspace;
+		#endif
 		
 		QPopupMenu *preprocessorMenu;
 		vector<pair<string,QPopupMenu*> > menus;
@@ -37,6 +48,8 @@ class YadeQtMainWindow : public YadeQtGeneratedMainWindow
 	public :
 		YadeQtMainWindow ();
 		virtual ~YadeQtMainWindow ();
+
+		static YadeQtMainWindow* self; // HACK to retrieve this "singleton" form elsewhere
 
 		void addMenu(string menuName);
 		void addItem(string menuName, string itemName,string className);
