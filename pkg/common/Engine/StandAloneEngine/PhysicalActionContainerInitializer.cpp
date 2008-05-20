@@ -34,21 +34,21 @@ void PhysicalActionContainerInitializer::action(MetaBody* ncb)
 	list<string> allNames;
 	// copy physical action names that were passed by the user directly
 	allNames.insert(allNames.end(),physicalActionNames.begin(),physicalActionNames.end());
-	LOG_DEBUG("allNames as defined by the user: ");	BOOST_FOREACH(string an,allNames) LOG_DEBUG(an);
+	LOG_DEBUG("allNames as defined by the user: ");	FOREACH(string an,allNames) LOG_DEBUG(an);
 	// loop over all engines, get Bex from them
-	BOOST_FOREACH(shared_ptr<Engine> e, ncb->engines){
+	FOREACH(shared_ptr<Engine> e, ncb->engines){
 		list<string> bex=e->getNeededBex();
 		allNames.insert(allNames.end(),bex.begin(),bex.end());
-		LOG_DEBUG("The following engines were inserted by "<<e->getClassName()<<":"); BOOST_FOREACH(string b,bex) LOG_DEBUG(b);
+		LOG_DEBUG("The following engines were inserted by "<<e->getClassName()<<":"); FOREACH(string b,bex) LOG_DEBUG(b);
 	}
-	LOG_DEBUG("allNames after loop over engines: ");	BOOST_FOREACH(string an,allNames) LOG_DEBUG(an);
+	LOG_DEBUG("allNames after loop over engines: ");	FOREACH(string an,allNames) LOG_DEBUG(an);
 	// eliminate all duplicates
 	allNames.sort();
 	allNames.unique();
-	LOG_DEBUG("allNames after sort and unique: ");	BOOST_FOREACH(string an,allNames) LOG_DEBUG(an);
+	LOG_DEBUG("allNames after sort and unique: ");	FOREACH(string an,allNames) LOG_DEBUG(an);
 
 	vector<shared_ptr<PhysicalAction> > physicalActions;
-	BOOST_FOREACH(string physicalActionName, allNames){
+	FOREACH(string physicalActionName, allNames){
 		physicalActions.push_back(YADE_PTR_CAST<PhysicalAction>(ClassFactory::instance().createShared(physicalActionName)));
 	}
 	ncb->physicalActions->prepare(physicalActions);

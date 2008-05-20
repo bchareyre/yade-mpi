@@ -13,7 +13,7 @@
 
 list<string> MetaEngine::getNeededBex(){
 	list<string> ret;
-	BOOST_FOREACH(shared_ptr<EngineUnit> e, functorArguments){
+	FOREACH(shared_ptr<EngineUnit> e, functorArguments){
 		list<string> eBex=e->getNeededBex();
 		ret.insert(ret.end(),eBex.begin(),eBex.end());
 	}

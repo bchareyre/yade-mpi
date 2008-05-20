@@ -45,6 +45,10 @@
 #include "SimulationFlow.hpp"
 #include "Body.hpp"
 
+#ifndef FOREACH
+#	define FOREACH BOOST_FOREACH
+#endif
+
 class MetaBody;
 class ThreadRunner;
 class Preferences;

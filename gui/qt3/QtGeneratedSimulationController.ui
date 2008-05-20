@@ -8,7 +8,7 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>233</width>
+            <width>320</width>
             <height>550</height>
         </rect>
     </property>
@@ -83,94 +83,6 @@
                     <set>AlignCenter</set>
                 </property>
             </widget>
-            <widget class="QSpinBox">
-                <property name="name">
-                    <cstring>sb10PowerSecond</cstring>
-                </property>
-                <property name="enabled">
-                    <bool>true</bool>
-                </property>
-                <property name="geometry">
-                    <rect>
-                        <x>120</x>
-                        <y>260</y>
-                        <width>40</width>
-                        <height>25</height>
-                    </rect>
-                </property>
-                <property name="maxValue">
-                    <number>20</number>
-                </property>
-                <property name="minValue">
-                    <number>-20</number>
-                </property>
-                <property name="value">
-                    <number>-3</number>
-                </property>
-            </widget>
-            <widget class="QLabel">
-                <property name="name">
-                    <cstring>tl10Power</cstring>
-                </property>
-                <property name="enabled">
-                    <bool>true</bool>
-                </property>
-                <property name="geometry">
-                    <rect>
-                        <x>90</x>
-                        <y>260</y>
-                        <width>30</width>
-                        <height>25</height>
-                    </rect>
-                </property>
-                <property name="text">
-                    <string>x10</string>
-                </property>
-                <property name="alignment">
-                    <set>AlignVCenter|AlignRight</set>
-                </property>
-            </widget>
-            <widget class="QSpinBox">
-                <property name="name">
-                    <cstring>sbSecond</cstring>
-                </property>
-                <property name="enabled">
-                    <bool>true</bool>
-                </property>
-                <property name="geometry">
-                    <rect>
-                        <x>40</x>
-                        <y>260</y>
-                        <width>49</width>
-                        <height>25</height>
-                    </rect>
-                </property>
-                <property name="value">
-                    <number>40</number>
-                </property>
-            </widget>
-            <widget class="QPushButton">
-                <property name="name">
-                    <cstring>pbStopSimulation</cstring>
-                </property>
-                <property name="enabled">
-                    <bool>false</bool>
-                </property>
-                <property name="geometry">
-                    <rect>
-                        <x>90</x>
-                        <y>80</y>
-                        <width>70</width>
-                        <height>60</height>
-                    </rect>
-                </property>
-                <property name="text">
-                    <string></string>
-                </property>
-                <property name="pixmap">
-                    <pixmap>image0</pixmap>
-                </property>
-            </widget>
             <widget class="QPushButton">
                 <property name="name">
                     <cstring>pbLoadSimulation</cstring>
@@ -205,30 +117,6 @@
             </widget>
             <widget class="QPushButton">
                 <property name="name">
-                    <cstring>pbCenterScene_2</cstring>
-                </property>
-                <property name="geometry">
-                    <rect>
-                        <x>10</x>
-                        <y>300</y>
-                        <width>150</width>
-                        <height>33</height>
-                    </rect>
-                </property>
-                <property name="sizePolicy">
-                    <sizepolicy>
-                        <hsizetype>0</hsizetype>
-                        <vsizetype>0</vsizetype>
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                    </sizepolicy>
-                </property>
-                <property name="text">
-                    <string>Center Scene</string>
-                </property>
-            </widget>
-            <widget class="QPushButton">
-                <property name="name">
                     <cstring>pbNewView_2</cstring>
                 </property>
                 <property name="enabled">
@@ -254,76 +142,65 @@
                     <string>New View ...</string>
                 </property>
             </widget>
-            <widget class="QRadioButton">
+            <widget class="QPushButton">
                 <property name="name">
-                    <cstring>rbFixed</cstring>
-                </property>
-                <property name="enabled">
-                    <bool>true</bool>
+                    <cstring>pbCenterScene_2</cstring>
                 </property>
                 <property name="geometry">
                     <rect>
                         <x>10</x>
-                        <y>230</y>
-                        <width>116</width>
-                        <height>25</height>
+                        <y>300</y>
+                        <width>150</width>
+                        <height>33</height>
                     </rect>
                 </property>
-                <property name="text">
-                    <string>Fixed step</string>
-                </property>
-            </widget>
-            <widget class="QRadioButton">
-                <property name="name">
-                    <cstring>rbTimeStepper</cstring>
-                </property>
-                <property name="enabled">
-                    <bool>true</bool>
-                </property>
-                <property name="geometry">
-                    <rect>
-                        <x>10</x>
-                        <y>200</y>
-                        <width>116</width>
-                        <height>25</height>
-                    </rect>
+                <property name="sizePolicy">
+                    <sizepolicy>
+                        <hsizetype>0</hsizetype>
+                        <vsizetype>0</vsizetype>
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                    </sizepolicy>
                 </property>
                 <property name="text">
-                    <string>Time stepper</string>
-                </property>
-            </widget>
-            <widget class="QRadioButton">
-                <property name="name">
-                    <cstring>rbRealTime</cstring>
-                </property>
-                <property name="enabled">
-                    <bool>false</bool>
-                </property>
-                <property name="geometry">
-                    <rect>
-                        <x>140</x>
-                        <y>200</y>
-                        <width>16</width>
-                        <height>25</height>
-                    </rect>
-                </property>
-                <property name="text">
-                    <string>Real Time</string>
+                    <string>Center Scene</string>
                 </property>
             </widget>
             <widget class="QPushButton">
                 <property name="name">
-                    <cstring>pbResetSimulation</cstring>
+                    <cstring>pbStartSimulation</cstring>
                 </property>
                 <property name="enabled">
                     <bool>false</bool>
                 </property>
                 <property name="geometry">
                     <rect>
-                        <x>60</x>
-                        <y>150</y>
-                        <width>100</width>
-                        <height>40</height>
+                        <x>10</x>
+                        <y>70</y>
+                        <width>70</width>
+                        <height>60</height>
+                    </rect>
+                </property>
+                <property name="text">
+                    <string></string>
+                </property>
+                <property name="pixmap">
+                    <pixmap>image0</pixmap>
+                </property>
+            </widget>
+            <widget class="QPushButton">
+                <property name="name">
+                    <cstring>pbStopSimulation</cstring>
+                </property>
+                <property name="enabled">
+                    <bool>false</bool>
+                </property>
+                <property name="geometry">
+                    <rect>
+                        <x>90</x>
+                        <y>70</y>
+                        <width>70</width>
+                        <height>60</height>
                     </rect>
                 </property>
                 <property name="text">
@@ -331,9 +208,6 @@
                 </property>
                 <property name="pixmap">
                     <pixmap>image1</pixmap>
-                </property>
-                <property name="toolTip" stdset="0">
-                    <string>Note: currently using synchronized display can *sometimes* lead to crash when reloading file.</string>
                 </property>
             </widget>
             <widget class="QPushButton">
@@ -346,7 +220,7 @@
                 <property name="geometry">
                     <rect>
                         <x>10</x>
-                        <y>150</y>
+                        <y>140</y>
                         <width>40</width>
                         <height>40</height>
                     </rect>
@@ -360,17 +234,17 @@
             </widget>
             <widget class="QPushButton">
                 <property name="name">
-                    <cstring>pbStartSimulation</cstring>
+                    <cstring>pbResetSimulation</cstring>
                 </property>
                 <property name="enabled">
                     <bool>false</bool>
                 </property>
                 <property name="geometry">
                     <rect>
-                        <x>10</x>
-                        <y>80</y>
-                        <width>70</width>
-                        <height>60</height>
+                        <x>60</x>
+                        <y>140</y>
+                        <width>100</width>
+                        <height>40</height>
                     </rect>
                 </property>
                 <property name="text">
@@ -379,6 +253,148 @@
                 <property name="pixmap">
                     <pixmap>image3</pixmap>
                 </property>
+                <property name="toolTip" stdset="0">
+                    <string>Note: currently using synchronized display can *sometimes* lead to crash when reloading file.</string>
+                </property>
+            </widget>
+            <widget class="QSpinBox">
+                <property name="name">
+                    <cstring>sb10PowerSecond</cstring>
+                </property>
+                <property name="enabled">
+                    <bool>true</bool>
+                </property>
+                <property name="geometry">
+                    <rect>
+                        <x>120</x>
+                        <y>270</y>
+                        <width>40</width>
+                        <height>25</height>
+                    </rect>
+                </property>
+                <property name="maxValue">
+                    <number>20</number>
+                </property>
+                <property name="minValue">
+                    <number>-20</number>
+                </property>
+                <property name="value">
+                    <number>-3</number>
+                </property>
+            </widget>
+            <widget class="QLabel">
+                <property name="name">
+                    <cstring>tl10Power</cstring>
+                </property>
+                <property name="enabled">
+                    <bool>true</bool>
+                </property>
+                <property name="geometry">
+                    <rect>
+                        <x>80</x>
+                        <y>270</y>
+                        <width>30</width>
+                        <height>25</height>
+                    </rect>
+                </property>
+                <property name="text">
+                    <string>x10</string>
+                </property>
+                <property name="alignment">
+                    <set>AlignVCenter|AlignRight</set>
+                </property>
+            </widget>
+            <widget class="QSpinBox">
+                <property name="name">
+                    <cstring>sbSecond</cstring>
+                </property>
+                <property name="enabled">
+                    <bool>true</bool>
+                </property>
+                <property name="geometry">
+                    <rect>
+                        <x>30</x>
+                        <y>270</y>
+                        <width>49</width>
+                        <height>25</height>
+                    </rect>
+                </property>
+                <property name="value">
+                    <number>40</number>
+                </property>
+            </widget>
+            <widget class="QButtonGroup">
+                <property name="name">
+                    <cstring>timestep</cstring>
+                </property>
+                <property name="geometry">
+                    <rect>
+                        <x>10</x>
+                        <y>180</y>
+                        <width>150</width>
+                        <height>80</height>
+                    </rect>
+                </property>
+                <property name="title">
+                    <string>timestep</string>
+                </property>
+                <widget class="QRadioButton">
+                    <property name="name">
+                        <cstring>rbRealTime</cstring>
+                    </property>
+                    <property name="enabled">
+                        <bool>false</bool>
+                    </property>
+                    <property name="geometry">
+                        <rect>
+                            <x>120</x>
+                            <y>50</y>
+                            <width>16</width>
+                            <height>25</height>
+                        </rect>
+                    </property>
+                    <property name="text">
+                        <string>Real Time</string>
+                    </property>
+                </widget>
+                <widget class="QRadioButton">
+                    <property name="name">
+                        <cstring>rbFixed</cstring>
+                    </property>
+                    <property name="enabled">
+                        <bool>true</bool>
+                    </property>
+                    <property name="geometry">
+                        <rect>
+                            <x>10</x>
+                            <y>50</y>
+                            <width>116</width>
+                            <height>25</height>
+                        </rect>
+                    </property>
+                    <property name="text">
+                        <string>Fixed step</string>
+                    </property>
+                </widget>
+                <widget class="QRadioButton">
+                    <property name="name">
+                        <cstring>rbTimeStepper</cstring>
+                    </property>
+                    <property name="enabled">
+                        <bool>true</bool>
+                    </property>
+                    <property name="geometry">
+                        <rect>
+                            <x>10</x>
+                            <y>20</y>
+                            <width>116</width>
+                            <height>25</height>
+                        </rect>
+                    </property>
+                    <property name="text">
+                        <string>Time stepper</string>
+                    </property>
+                </widget>
             </widget>
         </widget>
         <widget class="QWidget">
@@ -675,16 +691,16 @@
 </widget>
 <images>
     <image name="image0">
-        <data format="PNG" length="232">89504e470d0a1a0a0000000d4948445200000015000000150806000000a917a596000000af49444154388ded95a10ec33010435fa2810bbb5f181e1becbe7f8565c1fd85b01eeb401b2d8dc29ab2869c6ccb8ae5931217a7080608981922721afb640904922544841ed8c529764b98f12359424529e76718565880002cc46976597fbd9f6be621f01d4757fbbd8a82818a6266a828db09ff59e8079e8daffded4e614fb2cf423ff0d0ecd41f12ee37d6494bbd95b4f6fbd616eba4a5de4a5afbef4eef4eef4e7b767ac97bdaecf42c7657fc513f8f2ab9c097ced54c0000000049454e44ae426082</data>
+        <data format="PNG" length="252">89504e470d0a1a0a0000000d4948445200000015000000150806000000a917a596000000c349444154388dadd4310e82401046e1b78462e8f61cda6187e7974ebabdc7764e870d2460609d59a5217f80f0e58510d2944001015545447ede4dd60c02593322c276df867e2e5d3fdb214de9f48dd7fe32033cc72978c44d5100c0cb2d0ea5a6ab743dace262d355ea15375122aa4a94080abb0d40b73bdf87613ebd7fd9a6a65e71537ae391d4227635b58add4d2de2aaa6dbf3631cc3e7f36d6d53e896eff68f4d8f84eb6e6b9a9e09ab9b9684554dbf09dd4d2d425753abd0dcd42334fd4f6bf71b0403e127c7dd51090000000049454e44ae426082</data>
     </image>
     <image name="image1">
-        <data format="PNG" length="210">89504e470d0a1a0a0000000d4948445200000015000000150806000000a917a5960000009949444154388ded94bd0a0231108427e18ab1db67d1cef737e575f139b6733aaff0222182dc4f0a854b330cec928fafd890c70c0800014920b9bb479703045c0e92e8d1431e7337c2d2634fc2d243ebf4723d3fb1f2e5740f5f9d028f79744536c4d1689004a3bd88719a879767bd6fb44fa75b485ba7b1fe41d226d27aff4d7a383d9cfeb8d3c1e5301a4ade520a755f9268fa1fdfd31ec413524e89890537f1ed0000000049454e44ae426082</data>
+        <data format="PNG" length="232">89504e470d0a1a0a0000000d4948445200000015000000150806000000a917a596000000af49444154388ded95a10ec33010435fa2810bbb5f181e1becbe7f8565c1fd85b01eeb401b2d8dc29ab2869c6ccb8ae5931217a7080608981922721afb640904922544841ed8c529764b98f12359424529e76718565880002cc46976597fbd9f6be621f01d4757fbbd8a82818a6266a828db09ff59e8079e8daffded4e614fb2cf423ff0d0ecd41f12ee37d6494bbd95b4f6fbd616eba4a5de4a5afbef4eef4eef4e7b767ac97bdaecf42c7657fc513f8f2ab9c097ced54c0000000049454e44ae426082</data>
     </image>
     <image name="image2">
         <data format="PNG" length="273">89504e470d0a1a0a0000000d4948445200000015000000150806000000a917a596000000d849444154388db595310e83300c451f88c16c5c81b56c744bcf5fc66ef41cd9ea2d1d2088221a42d266b1be1dc54f6f49313e46504040551191ec5c5ab520d0f5adbb9ade757deb3a7371562d228255cb362310ca65230daa0ad44c67aa8d34a073056ec6389f55f563becda5df00aff9d1a9ae097c3f96b8f41bf6481782553f867871ba47ba10f0393f228e76ba9d87884f398d253eed348638c9e91171b2d3107196d375bd0f43e1ef57b94ea1661c9e05bf74ba26f4f7ab1ca75bc26ca77b84594ebf11263b0d1126393d223ced3486d0e7e21f7fd41b9f5d95b4bfffbba60000000049454e44ae426082</data>
     </image>
     <image name="image3">
-        <data format="PNG" length="252">89504e470d0a1a0a0000000d4948445200000015000000150806000000a917a596000000c349444154388dadd4310e82401046e1b78462e8f61cda6187e7974ebabdc7764e870d2460609d59a5217f80f0e58510d2944001015545447ede4dd60c02593322c276df867e2e5d3fdb214de9f48dd7fe32033cc72978c44d5100c0cb2d0ea5a6ab743dace262d355ea15375122aa4a94080abb0d40b73bdf87613ebd7fd9a6a65e71537ae391d4227635b58add4d2de2aaa6dbf3631cc3e7f36d6d53e896eff68f4d8f84eb6e6b9a9e09ab9b9684554dbf09dd4d2d425753abd0dcd42334fd4f6bf71b0403e127c7dd51090000000049454e44ae426082</data>
+        <data format="PNG" length="210">89504e470d0a1a0a0000000d4948445200000015000000150806000000a917a5960000009949444154388ded94bd0a0231108427e18ab1db67d1cef737e575f139b6733aaff0222182dc4f0a854b330cec928fafd890c70c0800014920b9bb479703045c0e92e8d1431e7337c2d2634fc2d243ebf4723d3fb1f2e5740f5f9d028f79744536c4d1689004a3bd88719a879767bd6fb44fa75b485ba7b1fe41d226d27aff4d7a383d9cfeb8d3c1e5301a4ade520a755f9268fa1fdfd31ec413524e89890537f1ed0000000049454e44ae426082</data>
     </image>
 </images>
 <connections>

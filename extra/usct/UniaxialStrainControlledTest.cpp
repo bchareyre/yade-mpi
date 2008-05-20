@@ -23,8 +23,8 @@ void UniaxialStrainer::init(){
 	assert(posIds.size()>0);
 	assert(negIds.size()>0);
 	posCoords.clear(); negCoords.clear();
-	BOOST_FOREACH(body_id_t id,posIds){ const shared_ptr<Body>& b=Body::byId(id); posCoords.push_back(b->physicalParameters->se3.position[axis]); b->isDynamic=false;}
-	BOOST_FOREACH(body_id_t id,negIds){ const shared_ptr<Body>& b=Body::byId(id); negCoords.push_back(b->physicalParameters->se3.position[axis]); b->isDynamic=false;}
+	FOREACH(body_id_t id,posIds){ const shared_ptr<Body>& b=Body::byId(id); posCoords.push_back(b->physicalParameters->se3.position[axis]); b->isDynamic=false;}
+	FOREACH(body_id_t id,negIds){ const shared_ptr<Body>& b=Body::byId(id); negCoords.push_back(b->physicalParameters->se3.position[axis]); b->isDynamic=false;}
 	assert(posIds.size()==posCoords.size() && negIds.size()==negCoords.size());
 
 	originalLength=axisCoord(posIds[0])-axisCoord(negIds[0]);
@@ -55,13 +55,13 @@ void UniaxialStrainer::pushTransStrainSensors(MetaBody* rb, vector<Real>& widths
 	if(transStrainSensors.size()==0) return;
 	if(!sensorsPusher){
 		int count=0;
-		foreach(const shared_ptr<Engine>& e,rb->engines){
+		FOREACH(const shared_ptr<Engine>& e,rb->engines){
 			if(e->getClassName()=="UniaxialStrainSensorPusher"){ count++; sensorsPusher=static_pointer_cast<UniaxialStrainSensorPusher>(e); }
 		}
 		if(count>1) LOG_ERROR("Multiple UniaxialStrainSensorPusher's found, using the last one for transversal strain sensors!");
 		if(count<1) { LOG_ERROR("No UniaxialStrainSensorPusher found, transversal strain sensors will not work!"); return; }
 		sensorsPusher->subscribedBodies.clear();
-		foreach(body_id_t id, transStrainSensors) sensorsPusher->subscribedBodies.push_back(id);
+		FOREACH(body_id_t id, transStrainSensors) sensorsPusher->subscribedBodies.push_back(id);
 		sensorsPusher->forces.resize(transStrainSensors.size());
 		//TRVAR3(transStrainSensors.size(),sensorsPusher->subscribedBodies.size(),sensorsPusher->forces.size());
 	}
@@ -69,7 +69,7 @@ void UniaxialStrainer::pushTransStrainSensors(MetaBody* rb, vector<Real>& widths
 	Real forceMagnitude=.001*avgStress*transStrainSensorArea;
 	Real maxVelocity=2*strainRate*originalLength; // move at max 5 × faster than strained ends
 	/* reset orientation to identity and limit velocity */
-	foreach(body_id_t id, transStrainSensors){
+	FOREACH(body_id_t id, transStrainSensors){
 		const shared_ptr<Body>& b=Body::byId(id); const shared_ptr<ParticleParameters>& pp=YADE_PTR_CAST<ParticleParameters>(b->physicalParameters);
 		pp->se3.orientation=Quaternionr::IDENTITY;
 		if(pp->velocity.SquaredLength()>pow(maxVelocity,2)){ pp->velocity.Normalize(); pp->velocity*=maxVelocity; }
@@ -112,7 +112,7 @@ void UniaxialStrainer::setupTransStrainSensors(){
 		originalWidths.push_back(2*rbAABB->halfSize[transAxis]);
 		body_id_t sensId[]={transStrainSensors[2*(i-1)],transStrainSensors[2*(i-1)+1]};
 		// do the same on either side, only positioning will be different
-		BOOST_FOREACH(body_id_t id, sensId){
+		FOREACH(body_id_t id, sensId){
 			shared_ptr<Body> b=Body::byId(id);
 			shared_ptr<RigidBodyParameters> rbp=dynamic_pointer_cast<RigidBodyParameters>(b->physicalParameters);
 			shared_ptr<Box> box=dynamic_pointer_cast<Box>(b->geometricalModel);
@@ -178,8 +178,8 @@ void UniaxialStrainer::applyCondition(MetaBody* rootBody){
 
 void UniaxialStrainer::computeAxialForce(MetaBody* rootBody){
 	sumPosForces=sumNegForces=0;
-	foreach(body_id_t id, negIds) sumNegForces+=Shop::Bex::force(id)[axis];
-	foreach(body_id_t id, posIds) sumPosForces-=Shop::Bex::force(id)[axis];
+	FOREACH(body_id_t id, negIds) sumNegForces+=Shop::Bex::force(id)[axis];
+	FOREACH(body_id_t id, posIds) sumPosForces-=Shop::Bex::force(id)[axis];
 }
 
 /***************************************** USCTGen **************************/

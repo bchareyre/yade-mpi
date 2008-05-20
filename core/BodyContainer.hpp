@@ -60,8 +60,8 @@ class BodyContainer : public Serializable
 REGISTER_SERIALIZABLE(BodyContainer,false);
 
 /* for BOOST_FOREACH compatibility */
-#ifndef foreach
-#	define foreach BOOST_FOREACH
+#ifndef FOREACH
+#	define FOREACH BOOST_FOREACH
 #endif
 
 namespace boost{

@@ -7,8 +7,8 @@
 #include<yade/core/DeusExMachina.hpp>
 #include<yade/core/PhysicalAction.hpp>
 
-#ifndef foreach
-#define foreach BOOST_FOREACH
+#ifndef FOREACH
+#define FOREACH BOOST_FOREACH
 #endif
 
 class USCTGen: public FileGenerator {

@@ -37,7 +37,7 @@ MetaBody::MetaBody() :
 
 
 void MetaBody::runInitializers(){
-	BOOST_FOREACH(shared_ptr<Engine> e, initializers){
+	FOREACH(shared_ptr<Engine> e, initializers){
 		if(e->isActivated()) e->action(this);
 	}
 }
@@ -81,7 +81,7 @@ void MetaBody::moveToNextTimeStep()
 }
 
 shared_ptr<Engine> MetaBody::engineByName(string s){
-	BOOST_FOREACH(shared_ptr<Engine> e, engines){
+	FOREACH(shared_ptr<Engine> e, engines){
 		if(e->getClassName()==s) return e;
 	}
 	return shared_ptr<Engine>();
@@ -90,7 +90,7 @@ shared_ptr<Engine> MetaBody::engineByName(string s){
 
 void MetaBody::setTimeSteppersActive(bool a)
 {
-	BOOST_FOREACH(shared_ptr<Engine> e, engines){
+	FOREACH(shared_ptr<Engine> e, engines){
 		if (Omega::instance().isInheritingFrom(e->getClassName(),"TimeStepper"))
 			(dynamic_pointer_cast<TimeStepper>(e))->setActive(a);
 	}

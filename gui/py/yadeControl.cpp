@@ -350,7 +350,7 @@ class pyOmega{
 
 	python::list miscParams_get(){
 		python::list ret;
-		BOOST_FOREACH(shared_ptr<Serializable>& s, OMEGA.getRootBody()->miscParams){
+		FOREACH(shared_ptr<Serializable>& s, OMEGA.getRootBody()->miscParams){
 			ret.append(pyGeneric(s));
 		}
 		return ret;
@@ -368,7 +368,7 @@ class pyOmega{
 
 	python::list anyEngines_get(vector<shared_ptr<Engine> >& engContainer){
 		python::list ret; 
-		BOOST_FOREACH(shared_ptr<Engine>& eng, engContainer){
+		FOREACH(shared_ptr<Engine>& eng, engContainer){
 			#define APPEND_ENGINE_IF_POSSIBLE(engineType,pyEngineType) { shared_ptr<engineType> e=dynamic_pointer_cast<engineType>(eng); if(e) { ret.append(pyEngineType(e)); continue; } }
 			APPEND_ENGINE_IF_POSSIBLE(MetaEngine,pyMetaEngine); APPEND_ENGINE_IF_POSSIBLE(StandAloneEngine,pyStandAloneEngine); APPEND_ENGINE_IF_POSSIBLE(DeusExMachina,pyDeusExMachina);
 			throw std::runtime_error("Unknown engine type: `"+eng->getClassName()+"' (only MetaEngine, StandAloneEngine and DeusExMachina are supported)");

@@ -5,21 +5,6 @@
 #include<yade/pkg-common/Sphere.hpp>
 #include<yade/lib-QGLViewer/qglviewer.h>
 
-/*
-#include<boost/foreach.hpp>
-#include<boost/range.hpp>
-namespace boost {
-	template<> struct range_iterator<InteractionContainer>{typedef shared_ptr<Interaction> type;};
-	template<> struct range_const_iterator<InteractionContainer>{typedef shared_ptr<Interaction> type;};
-	template<> struct range_size<InteractionContainer>{typedef unsigned int type;};
-}
-inline shared_ptr<Interaction> boost_range_begin(InteractionContainer& c){return *(c.begin());}
-//inline shared_ptr<Interaction> boost_range_begin(const InteractionContainer& c){return *(c.begin());}
-inline shared_ptr<Interaction> boost_range_end(InteractionContainer& c){return *(c.end());}
-//inline shared_ptr<Interaction> boost_range_end(const InteractionContainer& c){return *(c.end());}
-inline boost::range_size<InteractionContainer>::type boost_range_size(InteractionContainer& c){return c.size();}
-*/
-
 
 YADE_PLUGIN("BrefcomMakeContact","BrefcomContact","BrefcomLaw","GLDrawBrefcomContact","BrefcomDamageColorizer" /* ,"BrefcomStiffnessCounter"*/ );
 
@@ -173,7 +158,7 @@ void BrefcomLaw::applyForce(const Vector3r force){
 void BrefcomLaw::action(MetaBody* _rootBody){
 	rootBody=_rootBody;
 	
-	foreach(shared_ptr<Interaction> I, *rootBody->transientInteractions){
+	FOREACH(shared_ptr<Interaction> I, *rootBody->transientInteractions){
 		if(!I->isReal) continue;
 		//TRACE;
 		// initialize temporaries
@@ -332,14 +317,14 @@ void GLDrawBrefcomContact::go(const shared_ptr<InteractionPhysics>& ip, const sh
 void BrefcomDamageColorizer::action(MetaBody* rootBody){
 	vector<pair<short,Real> > bodyDamage; /* number of cohesive interactions per body; cummulative damage of interactions */
 	bodyDamage.resize(rootBody->bodies->size(),pair<short,Real>(0,0));
-	foreach(shared_ptr<Interaction> I, *rootBody->transientInteractions){
+	FOREACH(shared_ptr<Interaction> I, *rootBody->transientInteractions){
 		shared_ptr<BrefcomContact> BC=dynamic_pointer_cast<BrefcomContact>(I->interactionPhysics);
 		if(!BC || !BC->isCohesive) continue;
 		const body_id_t id1=I->getId1(), id2=I->getId2();
 		bodyDamage[id1].first++; bodyDamage[id2].first++;
 		bodyDamage[id1].second+=BC->omega; bodyDamage[id2].second+=BC->omega;
 	}
-	foreach(shared_ptr<Body> B, *rootBody->bodies){
+	FOREACH(shared_ptr<Body> B, *rootBody->bodies){
 		if(bodyDamage[B->getId()].first==0) continue;
 		Real normDmg=bodyDamage[B->getId()].second/bodyDamage[B->getId()].first;
 		B->geometricalModel->diffuseColor=Vector3r(normDmg,1-normDmg,B->isDynamic?0:1);

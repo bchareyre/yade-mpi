@@ -53,8 +53,8 @@ class InteractionContainer : public Serializable
 REGISTER_SERIALIZABLE(InteractionContainer,false);
 
 // BOOST_FOREACH compatibility
-#ifndef foreach
-#  define foreach BOOST_FOREACH
+#ifndef FOREACH
+#  define FOREACH BOOST_FOREACH
 #endif
 
 namespace boost{

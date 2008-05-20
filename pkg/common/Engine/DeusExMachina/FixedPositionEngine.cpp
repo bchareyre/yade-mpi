@@ -26,7 +26,7 @@ void FixedPositionEngine::registerAttributes(){
 
 void FixedPositionEngine::applyCondition(MetaBody * ncb){
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
-	BOOST_FOREACH(int id, subscribedBodies){
+	FOREACH(int id, subscribedBodies){
 		if(!bodies->exists(id)) continue;
 		if(mask[0]!=0) (*bodies)[id]->physicalParameters->se3.position[0]=fixedPosition[0];
 		if(mask[1]!=0) (*bodies)[id]->physicalParameters->se3.position[1]=fixedPosition[1];

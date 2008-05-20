@@ -31,10 +31,13 @@ MessageDialog::MessageDialog (const string& message,QWidget* parent, const char*
 //	resize(teMessage->size().width()+20,teMessage->size().height()+30+pbOk->size().height());
 //	pbOk->move((size().width()-pbOk->size().width())/2,teMessage->size().height()+20);
 
-	QSize s1 = parent->size();
-	QSize s2 = size();
-	QSize s = s1-s2;
-	reparent(parent,QPoint(s.width()/2,s.height()/2));	
+
+	if(parent){
+		QSize s1 = parent->size();
+		QSize s2 = size();
+		QSize s = s1-s2;
+		reparent(parent,QPoint(s.width()/2,s.height()/2));	
+	}
 	
 	show();
 	startTimer(10);

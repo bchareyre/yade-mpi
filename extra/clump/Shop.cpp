@@ -416,7 +416,7 @@ void Shop::saveSpheresToFile(string fname){
 	ofstream f(fname.c_str());
 	if(!f.good()) throw runtime_error("Unable to open file `"+fname+"'");
 
-	foreach(shared_ptr<Body> b, *rootBody->bodies){
+	FOREACH(shared_ptr<Body> b, *rootBody->bodies){
 		if (!b->isDynamic) continue;
 		shared_ptr<InteractingSphere>	intSph=dynamic_pointer_cast<InteractingSphere>(b->interactingGeometry);
 		if(!intSph) continue;
@@ -1082,7 +1082,7 @@ Shop::sphereGeomStruct Shop::smallSdecXyzData[]={
 
 Real Shop::ElasticWaveTimestepEstimate(shared_ptr<MetaBody> rootBody){
 	Real minDt=std::numeric_limits<Real>::infinity();
-	foreach(shared_ptr<Body> b, *rootBody->bodies){
+	FOREACH(shared_ptr<Body> b, *rootBody->bodies){
 		shared_ptr<Sphere> sphere=dynamic_pointer_cast<Sphere>(b->geometricalModel);
 		shared_ptr<ElasticBodyParameters> elast=dynamic_pointer_cast<ElasticBodyParameters>(b->physicalParameters);
 		if(!sphere || !elast) continue;
