@@ -62,7 +62,10 @@ void ElasticContactLaw::action(MetaBody* ncb)
 	
 			BodyMacroParameters* de1 				= YADE_CAST<BodyMacroParameters*>((*bodies)[id1]->physicalParameters.get());
 			BodyMacroParameters* de2 				= YADE_CAST<BodyMacroParameters*>((*bodies)[id2]->physicalParameters.get());
-			
+
+			bool isDynamic1 = (*bodies)[id1]->isDynamic;
+			bool isDynamic2 = (*bodies)[id2]->isDynamic;
+
 			Vector3r& shearForce 			= currentContactPhysics->shearForce;
 	
 			if (contact->isNew) shearForce=Vector3r(0,0,0);
@@ -72,12 +75,19 @@ void ElasticContactLaw::action(MetaBody* ncb)
 	
 			Vector3r axis;
 			Real angle;
-	
+
 	/// Here is the code with approximated rotations 	 ///
 			
+
 			axis = currentContactPhysics->prevNormal.Cross(currentContactGeometry->normal);
 			shearForce -= shearForce.Cross(axis);
-			angle = dt*0.5*currentContactGeometry->normal.Dot(de1->angularVelocity+de2->angularVelocity);
+			//angle = dt*0.5*currentContactGeometry->normal.Dot(de1->angularVelocity+de2->angularVelocity);
+				//FIXME: if one body is kinematic then assumed its rotation centre does not lies along the normal
+				//(i.e. virtual sphere, which replaces this kinematic body on contact, does not rotate)
+			Vector3r summaryAngularVelocity(0,0,0);
+			if (isDynamic1) summaryAngularVelocity += de1->angularVelocity;
+			if (isDynamic2) summaryAngularVelocity += de2->angularVelocity;
+			angle = dt*0.5*currentContactGeometry->normal.Dot(summaryAngularVelocity);
 			axis = angle*currentContactGeometry->normal;
 			shearForce -= shearForce.Cross(axis);
 		
@@ -105,8 +115,8 @@ void ElasticContactLaw::action(MetaBody* ncb)
 			///  (see F. ALONSO-MARROQUIN, R. GARCIA-ROJO, H.J. HERRMANN, 
 			///   "Micro-mechanical investigation of granular ratcheting, in Cyclic Behaviour of Soils and Liquefaction Phenomena",
 			///   ed. T. Triantafyllidis (Balklema, London, 2004), p. 3-10 - and a lot more papers from the same authors)
-            		Vector3r _c1x_	= currentContactGeometry->radius1*currentContactGeometry->normal;
-            		Vector3r _c2x_	= -currentContactGeometry->radius2*currentContactGeometry->normal;
+            		Vector3r _c1x_	= (isDynamic1) ? currentContactGeometry->radius1*currentContactGeometry->normal : x - de1->zeroPoint;
+            		Vector3r _c2x_	= (isDynamic2) ? -currentContactGeometry->radius2*currentContactGeometry->normal : x - de2->zeroPoint;
 			Vector3r relativeVelocity		= (de2->velocity+de2->angularVelocity.Cross(_c2x_)) - (de1->velocity+de1->angularVelocity.Cross(_c1x_));
 			Vector3r shearVelocity			= relativeVelocity-currentContactGeometry->normal.Dot(relativeVelocity)*currentContactGeometry->normal;
 			Vector3r shearDisplacement		= shearVelocity*dt;
@@ -133,7 +143,6 @@ void ElasticContactLaw::action(MetaBody* ncb)
 			currentContactPhysics->prevNormal = currentContactGeometry->normal;
 		}
 	}
-
 }
 
 

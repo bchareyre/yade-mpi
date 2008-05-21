@@ -65,7 +65,7 @@ void SpatialQuickSortCollider::action(MetaBody* ncb)
 	InteractionContainer::iterator ii    = transientInteractions->begin();
 	InteractionContainer::iterator iiEnd = transientInteractions->end();
 	for( ; ii!=iiEnd ; ++ii)
-	   (*ii)->isReal = false;
+	   (*ii)->cycle = false;
 
 
 	sort(rank.begin(), rank.end(), xBoundComparator()); // sotring along X
@@ -91,11 +91,11 @@ void SpatialQuickSortCollider::action(MetaBody* ncb)
 			if ( (interaction = transientInteractions->find(body_id_t(id),body_id_t(id2))) == 0)
 			{
 			    interaction = shared_ptr<Interaction>(new Interaction(id,id2) );
-			    interaction->isReal=true;
+			    interaction->cycle=true;
 			    transientInteractions->insert(interaction);
 			}
 			else
-			    interaction->isReal = true;
+			    interaction->cycle = true;
 		    }
 		}
 		else break;
@@ -105,7 +105,7 @@ void SpatialQuickSortCollider::action(MetaBody* ncb)
 	ii    = transientInteractions->begin();
 	iiEnd = transientInteractions->end();
 	for( ; ii!=iiEnd ; ++ii)
-	   if ( ! (interaction = *ii)->isReal ) transientInteractions->erase( interaction->getId1(), interaction->getId2());
+	   if ( ! (interaction = *ii)->cycle ) transientInteractions->erase( interaction->getId1(), interaction->getId2());
 
 }
 

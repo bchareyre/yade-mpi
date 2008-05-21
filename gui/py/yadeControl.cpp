@@ -340,9 +340,9 @@ class pyOmega{
 		needsInitializers=true;
 	}
 
-	void save(std::string fileName){
+	void save(std::string fileName, bool recover=false){
 		assertRootBody();
-		OMEGA.saveSimulation(fileName);
+		OMEGA.saveSimulation(fileName,recover);
 		LOG_DEBUG("SAVE!");
 	}
 
@@ -406,13 +406,16 @@ class pyOmega{
 	}
 	#undef OMEGA
 };
+	
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(omega_run_overloads,run,0,1);
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(omega_save_overloads,save,1,2);
 
 class pySTLImporter : public STLImporter {
     public:
-	void py_import(pyBodyContainer bc) { import(bc.proxee); }
+	void py_import(pyBodyContainer bc, unsigned int begin=0) { import(bc.proxee,begin); }
 };
-	
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(omega_overloads,run,0,1);
+
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(STLImporter_import_overloads,py_import,1,2);
 
 #ifdef USE_PYGLVIEWER 
 /*! GL viewer wrapper, with full attribute access. CURRENTLY DOESN'T EVEN COMPILE!!!
@@ -527,9 +530,9 @@ BOOST_PYTHON_MODULE(wrapper)
 		.add_property("dt",&pyOmega::dt_get,&pyOmega::dt_set)
 		.add_property("usesTimeStepper",&pyOmega::usesTimeStepper_get,&pyOmega::usesTimeStepper_set)
 		.def("load",&pyOmega::load)
-		.def("save",&pyOmega::save)
+		.def("save",&pyOmega::save,omega_save_overloads())
 		.def("saveSpheres",&pyOmega::saveSpheres)
-		.def("run",&pyOmega::run,omega_overloads())
+		.def("run",&pyOmega::run,omega_run_overloads())
 		.def("pause",&pyOmega::pause)
 		.def("step",&pyOmega::step)
 		.def("wait",&pyOmega::wait)
@@ -635,6 +638,6 @@ BOOST_PYTHON_MODULE(wrapper)
 	    .def_readwrite("facets_wire",&pySTLImporter::facets_wire)
 	    .def_readwrite("import_flat_edges_flag",&pySTLImporter::import_flat_edges_flag)
 	    .def_readwrite("import_flat_vertices_flag",&pySTLImporter::import_flat_vertices_flag)
-	    .def("import_geometry",&pySTLImporter::py_import);
+	    .def("import_geometry",&pySTLImporter::py_import,STLImporter_import_overloads());
 }
 

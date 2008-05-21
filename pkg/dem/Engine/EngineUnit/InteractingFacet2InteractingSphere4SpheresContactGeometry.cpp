@@ -63,7 +63,7 @@ bool InteractingFacet2InteractingSphere4SpheresContactGeometry::go(	const shared
 	    // global orientation
 	    normal = facetAxisT*normal; normal.Normalize();
 
-  	    scm->contactPoint = se32.position - 0.5*penetrationDepth*normal; 
+  	    scm->contactPoint = se32.position - (sphereRadius-0.5*penetrationDepth)*normal; 
   	    scm->normal = normal; 
   	    scm->penetrationDepth = penetrationDepth;
   	    scm->radius1 = 2*sphereRadius;

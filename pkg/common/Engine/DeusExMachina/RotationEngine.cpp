@@ -18,6 +18,7 @@
 RotationEngine::RotationEngine()
 {
 	rotateAroundZero = false;
+	zeroPoint = Vector3r(0,0,0);
 }
 
 
@@ -27,8 +28,14 @@ void RotationEngine::registerAttributes()
 	REGISTER_ATTRIBUTE(angularVelocity);
 	REGISTER_ATTRIBUTE(rotationAxis);
 	REGISTER_ATTRIBUTE(rotateAroundZero);
+	REGISTER_ATTRIBUTE(zeroPoint);
 }
 
+void RotationEngine::postProcessAttributes(bool deserializing)
+{
+		if (!deserializing) return;
+		rotationAxis.Normalize();
+}
 
 void RotationEngine::applyCondition(MetaBody *ncb)
 {
@@ -52,7 +59,7 @@ void RotationEngine::applyCondition(MetaBody *ncb)
 		RigidBodyParameters * rb = static_cast<RigidBodyParameters*>((*bodies)[*ii]->physicalParameters.get());
 
 		if(rotateAroundZero)
-			rb->se3.position	= q*rb->se3.position; // for RotatingBox
+			rb->se3.position	= q*(rb->se3.position-zeroPoint)+zeroPoint; // for RotatingBox
 			
 		rb->se3.orientation	= q*rb->se3.orientation;
 

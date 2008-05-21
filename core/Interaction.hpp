@@ -34,6 +34,7 @@ class Interaction : public Serializable
 					// we can remove this flag, if we make another container for PotetntialInteraction with only ids
 		bool isReal;		// maybe we can remove this, and check if InteractingGeometry, and InteractionPhysics are empty?
 //		bool isNeighbor;	// Has a meaning only with triangulationCollider atm NOTE : TriangulationCollider needs that
+		bool cycle; // phase flag to mark (for example, SpatialQuickSortCollider mark by it the stale interactions) 
 
 
 	// FIXME - why public ?!

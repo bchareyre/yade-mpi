@@ -21,11 +21,13 @@ class RotationEngine : public DeusExMachina
 		Real angularVelocity;
 		Vector3r rotationAxis;
 		bool rotateAroundZero;
+		Vector3r zeroPoint;
 
 		void applyCondition(MetaBody * );
 
 	protected :
 		void registerAttributes();
+		void postProcessAttributes(bool deserializing);
 	REGISTER_CLASS_NAME(RotationEngine);
 	REGISTER_BASE_CLASS_NAME(DeusExMachina);
 };

@@ -21,6 +21,10 @@ class RigidBodyParameters : public ParticleParameters
 		// state
 				,angularAcceleration
 				,angularVelocity;
+
+		/// It is the rotation center of kinematic (non-isDymanic) body. 
+		/// It is non-serializable and must be set by kinematic Engine. 
+		Vector3r zeroPoint;
 	
 		RigidBodyParameters ();
 		virtual ~RigidBodyParameters ();

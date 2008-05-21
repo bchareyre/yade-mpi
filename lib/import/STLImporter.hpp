@@ -68,7 +68,7 @@ class STLImporter {
 	bool import_flat_vertices_flag; 
 
 	/// import geometry (sequence vertices, edges, facets)
-	void import(shared_ptr<BodyContainer> bodies);
+	void import(shared_ptr<BodyContainer> bodies, unsigned int begin=0);
 
     protected:
 	/// Vertex

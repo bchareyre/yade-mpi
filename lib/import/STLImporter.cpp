@@ -52,93 +52,94 @@ bool STLImporter::open(const char* filename)
     return true;
 }
 
-void STLImporter::import(shared_ptr<BodyContainer> bodies)
+void STLImporter::import(shared_ptr<BodyContainer> bodies, unsigned int begin)
 {
-    BodyContainer::iterator b_it = bodies->begin();
-    if (import_vertices) 
-	for(int j=0,e=vts.size(); j<e; ++j)
-	{
-	    if (!import_flat_vertices_flag && vts[j].flat) continue;
+	unsigned int b_id = begin;
 
-	    if (!import_edges && !import_facets) {
-		shared_ptr<Vertex> gVertex(new Vertex);
-		gVertex->diffuseColor		= Vector3r(0.7,0.7,0.7);
-		gVertex->wire			= false;
-		gVertex->visible		= true;
-		gVertex->shadowCaster		= true;
-		(*b_it)->geometricalModel	= gVertex;
-	    }
+	if (import_vertices) 
+			for(int j=0,e=vts.size(); j<e; ++j)
+			{
+				if (!import_flat_vertices_flag && vts[j].flat) continue;
 
-	    shared_ptr<InteractingVertex> iVertex(new InteractingVertex);
-	    iVertex->normals=vts[j].normals;
-	    iVertex->flat=vts[j].flat;
-	    iVertex->diffuseColor		= Vector3r(0.8,0.3,0.3);
+				if (!import_edges && !import_facets) {
+						shared_ptr<Vertex> gVertex(new Vertex);
+						gVertex->diffuseColor		= Vector3r(0.7,0.7,0.7);
+						gVertex->wire			= false;
+						gVertex->visible		= true;
+						gVertex->shadowCaster		= true;
+						(*bodies)[b_id]->geometricalModel	= gVertex;
+				}
 
-	    (*b_it)->physicalParameters->se3 = Se3r( vts[j].point, Quaternionr( 1,0,0,0 ) );
-	    (*b_it)->interactingGeometry= iVertex;
+				shared_ptr<InteractingVertex> iVertex(new InteractingVertex);
+				iVertex->normals=vts[j].normals;
+				iVertex->flat=vts[j].flat;
+				iVertex->diffuseColor		= Vector3r(0.8,0.3,0.3);
 
-	    ++b_it;
-	}
+				(*bodies)[b_id]->physicalParameters->se3 = Se3r( vts[j].point, Quaternionr( 1,0,0,0 ) );
+				(*bodies)[b_id]->interactingGeometry= iVertex;
+
+				++b_id;
+			}
 
     if (import_edges) 
-	for(int j=0,e=egs.size(); j<e; ++j)
-	{ 
-	    if (!import_flat_edges_flag && egs[j].flat) continue;
+			for(int j=0,e=egs.size(); j<e; ++j)
+			{ 
+				if (!import_flat_edges_flag && egs[j].flat) continue;
 
-	    Vector3r p0 = vts[egs[j].first].point
-		    ,p1 = vts[egs[j].second].point;
+				Vector3r p0 = vts[egs[j].first].point
+					,p1 = vts[egs[j].second].point;
 
-	    if (!import_facets) {
-		shared_ptr<GeometricalEdge> gEdge(new GeometricalEdge);
-		gEdge->edge			= p1-p0;
-		gEdge->diffuseColor		= Vector3r(0.8,0.8,0.8);
-		gEdge->wire			= false;
-		gEdge->visible			= true;
-		gEdge->shadowCaster		= true;
-		(*b_it)->geometricalModel	= gEdge;
-	    }
+				if (!import_facets) {
+						shared_ptr<GeometricalEdge> gEdge(new GeometricalEdge);
+						gEdge->edge			= p1-p0;
+						gEdge->diffuseColor		= Vector3r(0.8,0.8,0.8);
+						gEdge->wire			= false;
+						gEdge->visible			= true;
+						gEdge->shadowCaster		= true;
+						(*bodies)[b_id]->geometricalModel	= gEdge;
+				}
 
-	    shared_ptr<InteractingEdge> iEdge(new InteractingEdge);
-	    iEdge->edge			= p1-p0;
-	    iEdge->normal1	        = egs[j].normal1;
-	    iEdge->normal2	        = egs[j].normal2;
-	    iEdge->both			= egs[j].both;
-	    iEdge->flat			= egs[j].flat;
-	    iEdge->diffuseColor		= Vector3r(0.8,0.3,0.3);
+				shared_ptr<InteractingEdge> iEdge(new InteractingEdge);
+				iEdge->edge			= p1-p0;
+				iEdge->normal1	        = egs[j].normal1;
+				iEdge->normal2	        = egs[j].normal2;
+				iEdge->both			= egs[j].both;
+				iEdge->flat			= egs[j].flat;
+				iEdge->diffuseColor		= Vector3r(0.8,0.3,0.3);
 
-	    (*b_it)->physicalParameters->se3 = Se3r(p0 , Quaternionr( 1,0,0,0 ) );
-	    (*b_it)->interactingGeometry	= iEdge;
+				(*bodies)[b_id]->physicalParameters->se3 = Se3r(p0 , Quaternionr( 1,0,0,0 ) );
+				(*bodies)[b_id]->interactingGeometry	= iEdge;
 
-	    ++b_it;
-	}
+				++b_id;
+			}
 
     if (import_facets) 
-	for(int i=0,e=fcs.size(); i<e; ++i)
-	{
-	    const Fct &f = fcs[i];
-	    Vector3r p0 (vts[f[0]].point);
+			for(int i=0,e=fcs.size(); i<e; ++i)
+			{
+				const Fct &f = fcs[i];
+				Vector3r p0 (vts[f[0]].point);
 
-	    shared_ptr<InteractingFacet> iFacet(new InteractingFacet);
-	    iFacet->diffuseColor    = Vector3r(0.8,0.3,0.3);
+				shared_ptr<InteractingFacet> iFacet(new InteractingFacet);
+				iFacet->diffuseColor    = Vector3r(0.8,0.3,0.3);
 
-	    shared_ptr<Facet> gFacet(new Facet);
-	    gFacet->diffuseColor    = Vector3r(0.5,0.5,0.5);
-	    gFacet->wire	    = facets_wire;
-	    gFacet->visible	    = true;
-	    gFacet->shadowCaster    = true;
+				shared_ptr<Facet> gFacet(new Facet);
+				gFacet->diffuseColor    = Vector3r(0.5,0.5,0.5);
+				gFacet->wire	    = facets_wire;
+				gFacet->visible	    = true;
+				gFacet->shadowCaster    = true;
 
-	    for (int j=1,ej=f.size(); j<ej; ++j)
-	    {   
-		iFacet->vertices.push_back(vts[f[j]].point - p0);
-		gFacet->vertices.push_back(vts[f[j]].point - p0);
-	    }
+				for (int j=1,ej=f.size(); j<ej; ++j)
+				{   
+						iFacet->vertices.push_back(vts[f[j]].point - p0);
+						gFacet->vertices.push_back(vts[f[j]].point - p0);
+				}
 
-	    (*b_it)->physicalParameters->se3 = Se3r( p0, Quaternionr( 1,0,0,0 ) );
-	    (*b_it)->geometricalModel	= gFacet;
-	    (*b_it)->interactingGeometry	= iFacet;
+				(*bodies)[b_id]->physicalParameters->se3 = Se3r( p0, Quaternionr( 1,0,0,0 ) );
+				(*bodies)[b_id]->geometricalModel	= gFacet;
+				(*bodies)[b_id]->interactingGeometry	= iFacet;
 
-	    ++b_it;
-	}
+				++b_id;
+			}
 }
 
 void STLImporter::processVertex(int id)
