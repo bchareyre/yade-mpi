@@ -15,6 +15,7 @@ using namespace boost;
 struct termios PythonUI::tios, PythonUI::tios_orig;
 string PythonUI::runScript;
 bool PythonUI::stopAfter;
+vector<string> PythonUI::scriptArgs;
 
 PythonUI* PythonUI::self=NULL;
 
@@ -29,6 +30,8 @@ void PythonUI::help(){
 \nNon-option arguments (after options):\n\
 	*.py     run this script (shorthand for -s *.py)\n\
 	*.xml    open and run this simulation\n\
+\n\
+	remaining arguments are copied to yade.runtime.args (no escaping done) \n\
 ";
 }
 
@@ -83,6 +86,7 @@ void PythonUI::pythonSession(){
 			PYTHON_DEFINE_STRING("simulation",Omega::instance().getSimulationFileName());
 			PYTHON_DEFINE_STRING("script",runScript);
 			PYTHON_DEFINE_BOOL("stopAfter",stopAfter);
+			{ ostringstream oss; oss<<"yade.runtime.args=["; if(scriptArgs.size()>0){ FOREACH(string s, scriptArgs) oss<<"'"<<s<<"',"; } oss<<"]"; PyRun_SimpleString(oss.str().c_str()); }
 		#undef PYTHON_DEFINE_STRING
 		#undef PYTHON_DEFINE_BOOL
 		execScript(PREFIX "/lib/yade" SUFFIX "/gui/PythonUI_rc.py");
@@ -106,7 +110,9 @@ int PythonUI::run(int argc, char *argv[]) {
 		else if(boost::algorithm::ends_with(string(argv[optind]),string(".xml"))) Omega::instance().setSimulationFileName(string(argv[optind]));
 		else optind--;
 	}
-	for (int index = optind+1; index<argc; index++) LOG_ERROR("Unprocessed non-option argument: `"<<argv[index]<<"'");
+	for (int index = optind+1; index<argc; index++) scriptArgs.push_back(argv[index]);
+		
+		// LOG_ERROR("Unprocessed non-option argument: `"<<argv[index]<<"'");
 
 	/** thread setup **/
 	XInitThreads();

@@ -1,15 +1,21 @@
 #!/usr/local/bin/yade-trunk
 # coding=UTF-8
 # this must be run inside yade
+#
+# pass 'mail' as an argument so that the crash report is e-mailed 
+#
+#
+
 
 import os,time,sys
+import yade.runtime
 simulFile='/tmp/yade-test-%d.xml'%(os.getpid()) # generated simulations here
 pyCmdFile='/tmp/yade-test-%d.py'%(os.getpid()) # generated simulations here
-speedFile='/tmp/yade-test-%d.speed'%(os.getpid()) # write speed hiere
+msgFile='/tmp/yade-test-%d.speed'%(os.getpid()) # write speed hiere
 runSimul="""
 # generated file
 simulFile='%s'
-speedFile='%s'
+msgFile='%s'
 nIter=%d
 import time
 o=Omega()
@@ -17,13 +23,21 @@ o.load(simulFile)
 o.run(10); o.wait() # run first 10 iterations
 start=time.time(); o.run(nIter); o.wait(); finish=time.time() # run nIter iterations, wait to finish, measure elapsed time
 speed=nIter/(finish-start) # rough estimate
-open(speedFile,'w').write('%%g'%%speed)
+open(msgFile,'w').write('%%g iter/sec'%%speed)
 quit()
-"""%(simulFile,speedFile,100)
+"""%(simulFile,msgFile,100)
 
-f=open(pyCmdFile,'w'); f.write(runSimul); f.close()
+runGenerator="""
+#generated file
+p=Preprocessor('%%s'%%s)
+p.generate('%s')
+quit()
+"""%(simulFile)
 
-#broken=['SDECLinkedSpheres','SDECMovingWall','SDECSpheresPlane','ThreePointBending']
+
+#f=open(pyCmdFile,'w'); f.write(runSimul); f.close()
+
+broken=['SDECLinkedSpheres','SDECMovingWall','SDECSpheresPlane','ThreePointBending']
 genParams={
 	#'USCTGen':{'spheresFile':'examples/small.sdec.xyz'}
 	}
@@ -32,39 +46,60 @@ summary=[]
 o=Omega()
 broken=[]
 
-def crashProofRun():
-	import os
-	import yade.runtime
-	retval=os.system("%s -N PythonUI -- -s '%s'"%(yade.runtime.executable,pyCmdFile))
-	if retval==0: return 'passed (%s iter/sec)'%(open(speedFile,'r').readline()[:-1])
-	else: return 'CRASHED (backtrace above)'
+def crashProofRun(cmd,quiet=True):
+	import subprocess,os,os.path,yade.runtime
+	f=open(pyCmdFile,'w'); f.write(cmd); f.close(); 
+	if os.path.exists(msgFile): os.remove(msgFile)
+	p=subprocess.Popen([yade.runtime.executable,'-N','PythonUI','--','-s',pyCmdFile],stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+	pout=p.communicate()[0]
+	retval=p.wait()
+	if not quiet: print pout
+	msg=''
+	if os.path.exists(msgFile): msg=open(msgFile,'r').readlines()[0]
+	if retval==0: return True,msg,pout
+	else: return False,msg,pout
 
 generators=o.childClasses('FileGenerator')
 
-for pp in o.childClasses('FileGenerator'):
+reports=[]
+
+for pp in o.childClasses('FileGenerator'): #['ThreePointBending','SDECLinkedSpheres']:
 	if pp in broken:
-		print "============= (skipping broken "+pp+")=============="
-		summary.append("%30s SKIPPED (broken)"%pp)
+		reports.append(pp,'skipped (broken)','')
+	params='' if pp not in genParams else (",{"+",".join(["'%s':%s"%(k,repr(genParams[pp][k])) for k in genParams[pp]])+"}")
+	ok1,msg1,out1=crashProofRun(runGenerator%(pp,params))
+	if not ok1:
+		reports.append([pp,'generator CRASH',out1])
+		summary.append([pp,'generator CRASH'])
 		continue
-	print "============================================= "+pp+" =========================================\n"
-	p=Preprocessor(pp)
-	if pp in genParams.keys(): # set preprocessor parameters, if desired
-		for k in genParams[pp].keys():
-			p[k]=genParams[pp][k]
-	if not p.generate(simulFile): # preprocessor failed 
-		summary.append('%30s FAILED generator'%pp)
-		continue
-	if 1: # survives crash (separate process)
-		summary.append('%30s '%pp+crashProofRun())
+	ok2,msg2,out2=crashProofRun(runSimul)
+	if not ok2:
+		reports.append([pp,'simulation CRASH',out2])
+		summary.append([pp,'simulation CRASH'])
 	else:
-		o.load(simulFile)
-		o.run(10); o.wait() # run first 10 iterations
-		start=time.time(); o.run(nIter); o.wait(); finish=time.time() # run nIter iterations, wait to finish, measure elapsed time
-		speed=nIter/(finish-start) # rough estimate
-		summary.append('%30s passed (%g iter/sec)'%(pp,speed))
+		summary.append([pp,'generated, passed (%s)'%msg2])
+	print summary[-1][0]+':',summary[-1][1]
+
+reportText='\n'.join([80*'#'+'\n'+r[0]+': '+r[1]+'\n'+80*'#'+'\n'+r[2] for r in reports])
+
+if 'mail' in yade.runtime.args:
+	me,you='yade-tester.noreply@arcig.cz','yade-dev@lists.berlios.de'
+	from email.mime.text import MIMEText
+	msg=MIMEText(reportText)
+	msg['Subject']="Automated crash report for "+yade.runtime.executable+": "+",".join([r[0] for r in reports])
+	msg['From']=me
+	msg['To']=you
+	#print msg.as_string()
+	import smtplib
+	s=smtplib.SMTP()
+	s.connect()
+	s.sendmail(me,[you],msg.as_string())
+	print msg.as_string()
+	s.close()
+else:
+	print "\n\n=================================== PROBLEM DETAILS ===================================\n"
+	print reportText
 
 print "\n\n========================================= SUMMARY ======================================\n"
-for l in summary: print l
-print "\n====================================== END OF SUMMARY =================================="
-import sys
-sys.exit(0) # quit() is not in python2.4
+for l in summary: print "%30s: %s"%(l[0],l[1])
+

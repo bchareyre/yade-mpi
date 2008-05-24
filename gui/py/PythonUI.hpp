@@ -20,6 +20,7 @@ class PythonUI: public FrontEnd
 		virtual int run(int argc, char *argv[]);
 		static string runScript;
 		static bool stopAfter;
+		static vector<string> scriptArgs;
 	
 	REGISTER_CLASS_NAME(PythonUI);
 	REGISTER_BASE_CLASS_NAME(FrontEnd);
