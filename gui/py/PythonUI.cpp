@@ -90,19 +90,16 @@ void PythonUI::pythonSession(){
 }
 
 int PythonUI::run(int argc, char *argv[]) {
-	string runScript;
-	string runCommands;
-	bool stopAfter=false;
-	
 	int ch;
-	while((ch=getopt(argc,argv,"hs:x"))!=-1)
-	switch(ch){
-		case 'h': help(); return 1;
-		case 's': runScript=string(optarg); break;
-		case 'x': stopAfter=true; break;
-		default:
-			LOG_ERROR("Unhandled option string: `"<<string(optarg)<<"' (try -h for help on options)");
-			break;
+	while((ch=getopt(argc,argv,"hs:x"))!=-1){
+		switch(ch){
+			case 'h': help(); return 1; break;
+			case 's': runScript=string(optarg); break;
+			case 'x': stopAfter=true; break;
+			default:
+				LOG_WARN("Unhandled option string: `"<<string(optarg)<<"' (try -h for help on options)");
+				break;
+		}
 	}
 	if(optind<argc){ // process non-option arguments
 		if(boost::algorithm::ends_with(string(argv[optind]),string(".py"))) runScript=string(argv[optind]);

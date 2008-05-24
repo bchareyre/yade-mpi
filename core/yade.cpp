@@ -247,6 +247,7 @@ int main(int argc, char *argv[])
 	}
 
 	if(gui.size()==0) gui=Omega::instance().preferences->defaultGUILibName;
+	if(gui=="QtGUI" && !getenv("DISPLAY")){ LOG_WARN("No $DISPLAY, using PythonUI instead of QtUI"); gui="PythonUI"; }
 		
 	shared_ptr<FrontEnd> frontEnd = dynamic_pointer_cast<FrontEnd>(ClassFactory::instance().createShared(gui));
 	

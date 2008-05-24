@@ -8,8 +8,8 @@ YadeQtMainWindow* ensuredMainWindow(){if(!YadeQtMainWindow::self) throw runtime_
 STANDALONE_MAINWINDOW_FUNC(createView);
 STANDALONE_MAINWINDOW_FUNC(centerViews);
 STANDALONE_MAINWINDOW_FUNC(createSimulationController);
-STANDALONE_MAINWINDOW_FUNC(Quit);
-//void closeMainWindow(void){ exit(0); /* this is perhaps too violent? */ }
+//STANDALONE_MAINWINDOW_FUNC(Quit);
+void Quit(void){ if(YadeQtMainWindow::self) YadeQtMainWindow::self->Quit(); }
 
 
 BOOST_PYTHON_MODULE(qt){
