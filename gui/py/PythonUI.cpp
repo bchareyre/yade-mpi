@@ -10,26 +10,25 @@
 
 #include <X11/Xlib.h>
 
-
-// #define PYTHON_USE_QT3
-
-#ifdef PYTHON_USE_QT3
-	#include<qapplication.h>
-#endif
-
 using namespace boost;
 
 struct termios PythonUI::tios, PythonUI::tios_orig;
-string PythonUI::runScript, PythonUI::runCommands;
+string PythonUI::runScript;
 bool PythonUI::stopAfter;
+
+PythonUI* PythonUI::self=NULL;
 
 CREATE_LOGGER(PythonUI);
 
 void PythonUI::help(){
 	cerr<<" PythonUI (python console) frontend.\n\
 \n\
-	-h       print this help\n\
+	-h       help\n\
 	-s file  run this python script before entering interactive prompt\n\
+	-x       quit after running the script\n\
+\nNon-option arguments (after options):\n\
+	*.py     run this script (shorthand for -s *.py)\n\
+	*.xml    open and run this simulation\n\
 ";
 }
 
@@ -62,6 +61,12 @@ void PythonUI::termRestore(void){
 }
 
 void PythonUI::pythonSession(){
+	/* In threaded ipython, receiving SIGINT from ^C leads to segfault (for reasons I don't know).
+	 * Hence we remap ^C (keycode in c_cc[VINTR]) to killing the line (c_cc[VKILL]) and disable VINTR afterwards.
+	 * The behavior is restored back by the PythonUI::termRestore registered with atexit.
+	 * */
+	termSetup();
+
 	LOG_DEBUG("PythonUI::pythonSession");
 	PyGILState_STATE pyState = PyGILState_Ensure();
 		LOG_DEBUG("Got Global Interpreter Lock, good.");
@@ -77,7 +82,6 @@ void PythonUI::pythonSession(){
 			PYTHON_DEFINE_STRING("executable",Omega::instance().origArgv[0]);
 			PYTHON_DEFINE_STRING("simulation",Omega::instance().getSimulationFileName());
 			PYTHON_DEFINE_STRING("script",runScript);
-			PYTHON_DEFINE_STRING("commands",runCommands);
 			PYTHON_DEFINE_BOOL("stopAfter",stopAfter);
 		#undef PYTHON_DEFINE_STRING
 		#undef PYTHON_DEFINE_BOOL
@@ -91,12 +95,11 @@ int PythonUI::run(int argc, char *argv[]) {
 	bool stopAfter=false;
 	
 	int ch;
-	while((ch=getopt(argc,argv,"hs:"))!=-1)
+	while((ch=getopt(argc,argv,"hs:x"))!=-1)
 	switch(ch){
 		case 'h': help(); return 1;
 		case 's': runScript=string(optarg); break;
 		case 'x': stopAfter=true; break;
-		//case 'c': runCommands+=string(optarg)+"\n"; break;
 		default:
 			LOG_ERROR("Unhandled option string: `"<<string(optarg)<<"' (try -h for help on options)");
 			break;
@@ -108,20 +111,10 @@ int PythonUI::run(int argc, char *argv[]) {
 	}
 	for (int index = optind+1; index<argc; index++) LOG_ERROR("Unprocessed non-option argument: `"<<argv[index]<<"'");
 
-	/* In threaded ipython, receiving SIGINT from ^C leads to segfault (for reasons I don't know).
-	 * Hence we remap ^C (keycode in c_cc[VINTR]) to killing the line (c_cc[VKILL]) and disable VINTR afterwards.
-	 * The behavior is restored back by the PythonUI::termRestore registered with atexit.
-	 * */
-	termSetup();
-	atexit(PythonUI::termRestore);
-
+	/** thread setup **/
 	XInitThreads();
 	PyEval_InitThreads();
 
-	#ifdef PYTHON_USE_QT3
-		QApplication app(0,NULL);	
-	#endif
-	
 	pythonSession();
 
 	return 0;

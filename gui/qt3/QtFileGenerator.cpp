@@ -236,10 +236,9 @@ void QtFileGenerator::timerEvent( QTimerEvent* )
 			&& successfullyGenerated //filesystem::exists(filesystem::path((const char*)(leOutputFileName->text()))) 
 			&& Omega::instance().getSimulationFileName()=="")
 		{
-			//QWidget* qw=this; while (qw->parentWidget()) qw=qw->parentWidget(); // find toplevel widget - which should be yade's main window
-			Omega::instance().setSimulationFileName((const char*)(leOutputFileName->text()));
-			//(dynamic_cast<YadeQtMainWindow*>(qw))->fileNewSimulation();
-			dynamic_cast<YadeQtMainWindow*>(YadeQtMainWindow::self)->fileNewSimulation();
+			//Omega::instance().setSimulationFileName((const char*)(leOutputFileName->text()));
+			YadeQtMainWindow::self->loadSimulation((const char*)(leOutputFileName->text()));
+			emit close();
 		}
 	}
 }

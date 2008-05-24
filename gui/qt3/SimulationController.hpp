@@ -21,38 +21,37 @@
 #include<qspinbox.h>
 #include"GLViewer.hpp"
 #include"QtGeneratedSimulationController.h"
-#include"SimulationControllerUpdater.hpp"
 
 class SimulationController : public QtGeneratedSimulationController
 {
 	private :
 		QtGUIGenerator guiGen;	
 		QWidget * parentWorkspace;	
-		shared_ptr<RenderingEngine> renderer;
-		map<int,GLViewer* > glViews;
+		//map<int,GLViewer* > glViews;
 		int maxNbViews;
 		int refreshTime;
 		bool sync;
+
+		const int iterPerSec_TTL_ms;
+		long  iterPerSec_LastIter;
+		double iterPerSec;
+		boost::posix_time::ptime iterPerSec_LastLocalTime;
+
 	
-		shared_ptr<SimulationControllerUpdater> updater;
+		void doUpdate();
 
 		QScrollView * scrollView;
 		QFrame * scrollViewFrame;
 		QVBoxLayout* scrollViewLayout;
 		void addNewView();
-		void loadSimulationFromFileName(const std::string& fileName,bool center=true, bool useTimeStepperIfPresent=true);
 	
 	public : 
-		bool	 changeSkipTimeStepper
-			,skipTimeStepper
-			,changeTimeStep
-                        ,wasUsingTimeStepper;
-
-                SimulationController (QWidget * parent=0);
-                void redrawAll();
-                virtual ~SimulationController (); 
+		void loadSimulationFromFileName(const std::string& fileName,bool center=true, bool useTimeStepperIfPresent=true);
+		bool changeSkipTimeStepper,skipTimeStepper,changeTimeStep,wasUsingTimeStepper;
+		SimulationController (QWidget * parent=NULL);
+		virtual ~SimulationController () {}; 
         
-        public slots :
+	public slots :
 		virtual void pbApplyClicked();
 		virtual void pbLoadClicked();
 		virtual void pbSaveClicked();
@@ -68,7 +67,6 @@ class SimulationController : public QtGeneratedSimulationController
 		virtual void sbRefreshValueChanged(int);
 		virtual void cbSyncToggled(bool);
 		virtual void pbStart2Clicked();
-		void closeGLViewEvent(int id);
 
         
         protected :

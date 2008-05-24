@@ -10,14 +10,72 @@
 
 #pragma once
 
-#include"InteractionContainerIteratorPointer.hpp"
 #include<yade/lib-serialization/Serializable.hpp>
 #include<boost/thread/mutex.hpp>
+#include<boost/shared_ptr.hpp>
+#include<iostream>
 #include<boost/range.hpp>
 
-class Interaction;
+#include<yade/core/Interaction.hpp>
 
 using namespace boost;
+using namespace std;
+
+class InteractionContainerIterator 
+{
+	public :
+		InteractionContainerIterator() 		{};
+		virtual ~InteractionContainerIterator()	{};
+		
+		virtual bool isDifferent(const InteractionContainerIterator&)	{ throw;};
+		virtual void affect(const InteractionContainerIterator&)	{ throw;};
+		virtual void increment()					{ throw;};
+		virtual shared_ptr<Interaction> getValue()			{ throw;};
+		virtual shared_ptr<InteractionContainerIterator> createPtr()	{ throw;};
+};
+
+
+class InteractionContainerIteratorPointer
+{
+	private :
+		shared_ptr<InteractionContainerIterator> ptr;
+		void allocate(const InteractionContainerIteratorPointer& bi)
+		{
+			if (ptr==0)
+				ptr = bi.get()->createPtr();
+		}
+
+
+	public  :
+		InteractionContainerIterator&			getRef()	{ return *ptr; };
+		InteractionContainerIterator&			getRef() const	{ return *ptr; };
+		shared_ptr<InteractionContainerIterator>	get()		{ return  ptr; };
+		shared_ptr<InteractionContainerIterator>	get() const	{ return  ptr; };
+
+		InteractionContainerIteratorPointer(const InteractionContainerIteratorPointer& bi) 
+		{
+			allocate(bi);
+			ptr->affect(bi.getRef());
+		};
+
+		InteractionContainerIteratorPointer(const shared_ptr<InteractionContainerIterator>& i) { ptr = i; };
+		InteractionContainerIteratorPointer()  { ptr = shared_ptr<InteractionContainerIterator>(); };
+
+		bool operator!=(const InteractionContainerIteratorPointer& bi) { return ptr->isDifferent(bi.getRef()); };
+		bool operator==(const InteractionContainerIteratorPointer& bi) { return !ptr->isDifferent(bi.getRef()); };
+		shared_ptr<Interaction>			operator*() { return ptr->getValue(); };	
+		InteractionContainerIteratorPointer&	operator++() { ptr->increment(); return *this; };
+		InteractionContainerIteratorPointer&	operator++(int); // disabled
+		InteractionContainerIteratorPointer&	operator=(const InteractionContainerIteratorPointer& bi)
+		{
+			allocate(bi);
+			ptr->affect(bi.getRef());
+			return *this;
+		};
+
+};
+
+
 
 class InteractionContainer : public Serializable
 {

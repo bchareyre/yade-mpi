@@ -27,9 +27,41 @@ using namespace boost;
 	//def("__getattr__",&cxxClass::wrappedPyGet).def("__setattr__",&cxxClass::wrappedPySet).def("attrs",&cxxClass::wrappedPyKeys)
 
 
+#define BASIC_PY_PROXY_HEAD(pyClass,yadeClass) \
+class pyClass{shared_ptr<AttrAccess> accessor; \
+	private: void init(string clss){ proxee=dynamic_pointer_cast<yadeClass>(ClassFactory::instance().createShared(clss.empty()? #yadeClass : clss)); if(!proxee) throw runtime_error("Invalid class `"+clss+"': either nonexistent, or unable to cast to `"+#yadeClass+"'"); } \
+	public: shared_ptr<yadeClass> proxee; \
+		void ensureAcc(void){ if(!proxee) throw runtime_error(string("No proxied `")+#yadeClass+"'."); if(!accessor) accessor=shared_ptr<AttrAccess>(new AttrAccess(proxee));} \
+		pyClass(string clss="", python::dict attrs=python::dict()){ init(clss); python::list l=attrs.items(); int len=PySequence_Size(l.ptr()); for(int i=0; i<len; i++){ python::extract<python::tuple> t(l[i]); python::extract<string> keyEx(t()[0]); if(!keyEx.check()) throw invalid_argument("Attribute keys must be strings."); wrappedPySet(keyEx(),t()[1]); } } \
+		pyClass(const shared_ptr<yadeClass>& _proxee): proxee(_proxee) {} \
+		std::string pyStr(void){ ensureAcc(); return string(proxee->getClassName()==#yadeClass ? "<"+proxee->getClassName()+">" : "<"+proxee->getClassName()+" "+ #yadeClass +">"); } \
+		string className(void){ ensureAcc(); return proxee->getClassName(); } \
+		ATTR_ACCESS_CXX(accessor,ensureAcc);
+
+#define BASIC_PY_PROXY_TAIL };
+/*! Basic implementation of python proxy class that provides:
+ * 1. constructor with (optional) class name and (optional) dictionary of attributes
+ * 2. copy constructor from another proxy class
+ * 3. className() returning proxy class name as string 
+ * 4. ensureAcc() that makes sure we have proxy _and_ attribute access things ready
+ */
+#define BASIC_PY_PROXY(pyClass,yadeClass) BASIC_PY_PROXY_HEAD(pyClass,yadeClass) BASIC_PY_PROXY_TAIL
+
+/* Read-write access to some attribute that is not basic-serializable, i.e. must be exported as instance.attribute (not instance['attribute']. That attribute is wrapped in given python class before it is returned. */
+#define NONPOD_ATTRIBUTE_ACCESS(pyName,pyClass,yadeName) \
+	python::object pyName##_get(void){ensureAcc(); return proxee->yadeName ? python::object(pyClass(proxee->yadeName)) : python::object(); } \
+	void pyName##_set(pyClass proxy){ensureAcc(); proxee->yadeName=proxy.proxee; }
+/*! Boost.python's definition of python object corresponding to BASIC_PY_PROXY */
+#define BASIC_PY_PROXY_WRAPPER(pyClass,pyName)  \
+	boost::python::class_<pyClass>(pyName,python::init<python::optional<string,python::dict> >()) \
+	.ATTR_ACCESS_PY(pyClass) \
+	.def("__str__",&pyClass::pyStr).def("__repr__",&pyClass::pyStr) \
+	.add_property("name",&pyClass::className)
+
+
 /*! Helper class for accessing registered attributes through the serialization interface.
  *
- * 4 possible types of attributes are supported: bool, string, number, array of numbers.
+ * 4 possible types of attributes are supported: bool, string, number and arrays (homogeneous) of any of them.
  * This class exposes pySet, pyGet and pyKeys methods to python so that associated object supports python syntax for dictionary member access.
  */
 class AttrAccess{

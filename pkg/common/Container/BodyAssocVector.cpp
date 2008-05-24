@@ -7,10 +7,54 @@
 *************************************************************************/
 
 #include "BodyAssocVector.hpp"
-#include "BodyAssocVectorIterator.hpp"
-
 
 #include<yade/core/Body.hpp>
+
+BodyAssocVectorIterator::BodyAssocVectorIterator() : BodyContainerIterator()
+{
+
+}
+
+
+BodyAssocVectorIterator::~BodyAssocVectorIterator()
+{
+
+}
+
+
+bool BodyAssocVectorIterator::isDifferent(const BodyContainerIterator& i)
+{
+	return (bii != static_cast<const BodyAssocVectorIterator&>(i).bii );
+}
+
+
+void BodyAssocVectorIterator::increment()
+{
+	++bii;
+}
+
+
+void BodyAssocVectorIterator::affect(const BodyContainerIterator& i)
+{
+	bii = static_cast<const BodyAssocVectorIterator&>(i).bii;
+}
+
+
+shared_ptr<Body> BodyAssocVectorIterator::getValue()
+{
+	return (*bii).second;
+}
+
+
+shared_ptr<BodyContainerIterator> BodyAssocVectorIterator::createPtr()
+{
+	return shared_ptr<BodyContainerIterator>(new BodyAssocVectorIterator());
+}
+
+
+/************************************************************************/
+/************************************************************************/
+/************************************************************************/
 
 
 BodyAssocVector::BodyAssocVector()

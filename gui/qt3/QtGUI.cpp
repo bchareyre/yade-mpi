@@ -6,9 +6,12 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "QtGUI.hpp"
-#include "YadeQtMainWindow.hpp"
+#include"QtGUI.hpp"
+#include"YadeQtMainWindow.hpp"
+#include"GLViewer.hpp"
 #include<boost/algorithm/string.hpp>
+#include <boost/filesystem/operations.hpp>
+#include <boost/filesystem/convenience.hpp>
 //#ifdef HAVE_CONFIG_H
 //	#include <config.h>
 //#endif
@@ -22,38 +25,42 @@
 	#include<boost/thread.hpp>
 #endif
 
-QtGUI::QtGUI(){}
+QtGUI* QtGUI::self=NULL;
+
+QtGUI::QtGUI(){self=this; mainWindowHidden=false;}
 QtGUI::~QtGUI(){}
 
 CREATE_LOGGER(QtGUI);
 
+void QtGUI::help(){
+	cerr<<"Qt3 GUI\n=======\n\t-w to hide the main window (with python console only; unused now)\n\t-h to get this help\n"<<endl;
+}
+
 int QtGUI::run(int argc, char *argv[])
 {
-//	#ifdef Q_WS_X11
-		XInitThreads();
-//	#endif
-
-	// FIXME - QtGUI is consuming CPU when idle - when computations are NOT running.
-
 	int ch;
-	while( ( ch = getopt(argc,argv,"t:g:") ) != -1)
+	while( ( ch = getopt(argc,argv,"hw") ) != -1)
 		switch(ch){
-//			case 'H'	: help(); 						return 1;
-			case 't'	: Omega::instance().setTimeStep(lexical_cast<Real>(optarg)); break;
+			case 'w'	: mainWindowHidden=true; break;
+			case 'h' : help(); return 0; break;
 			default: break;	
 		}
 	if(optind<argc){ // process non-option arguments
 		if(boost::algorithm::ends_with(string(argv[optind]),string(".xml"))) Omega::instance().setSimulationFileName(string(argv[optind]));
+		#ifdef EMBED_PYTHON
+			if(boost::algorithm::ends_with(string(argv[optind]),string(".py"))) PythonUI::runScript=string(argv[optind]);
+		#endif
 		else optind--;
 	}
 	for (int index=optind+1; index<argc; index++) LOG_ERROR("Unprocessed non-option argument: `"<<argv[index]<<"'");
-	
-	
 
-	
+	XInitThreads();
    QApplication app(argc,argv);
 	mainWindow=new YadeQtMainWindow();
-	mainWindow->show();
+//	#ifdef EMBED_PYTHON
+//		if(!mainWindowHidden)
+//	#endif	
+		mainWindow->show();
 	app.setMainWidget(mainWindow);
 
 	#ifdef EMBED_PYTHON

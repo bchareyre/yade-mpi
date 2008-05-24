@@ -9,7 +9,9 @@
 *************************************************************************/
 
 #include"GLViewer.hpp"
+#include"QtGUI.hpp"
 #include"YadeCamera.hpp"
+#include"YadeQtMainWindow.hpp"
 #include<GL/glut.h>
 #include<yade/lib-opengl/FpsTracker.hpp>
 #include<yade/core/Body.hpp>
@@ -27,9 +29,9 @@ GLViewer::GLViewer(int id, shared_ptr<RenderingEngine> rendererInit, const QGLFo
 	resize(550,550);
 
 	if (id==0)
-		setCaption("Primary View (not closable)");
+		setCaption("Primary view");
 	else
-		setCaption("Secondary View number "+lexical_cast<string>(id));
+		setCaption("Secondary view number "+lexical_cast<string>(id));
 	show();
 	
 	notMoving();
@@ -146,16 +148,19 @@ void GLViewer::keyPressEvent(QKeyEvent *e)
 
 void GLViewer::centerScene()
 {
-	if (!Omega::instance().getRootBody())
-		return;
+	MetaBody* rb=Omega::instance().getRootBody().get();
+	if (!rb) return;
 
-	if(Omega::instance().getRootBody()->bodies->size() < 500)
+	if(rb->bodies->size() < 500)
 		displayMessage("Less than 500 bodies, moving possible. Select with shift, press 'm' to move. Use / * - + for cutting plane.", 6000);
 	else
 		displayMessage("More than 500 bodies. Moving not possible. Use / * - + for cutting plane.", 6000);
-
-	Vector3r min = Omega::instance().getRootBody()->boundingVolume->min;
-	Vector3r max = Omega::instance().getRootBody()->boundingVolume->max;
+	Vector3r min,max;	
+	if(rb->boundingVolume){
+		min=rb->boundingVolume->min; max=rb->boundingVolume->max;
+	} else {
+		min=Vector3r(-1,-1,-1); max=Vector3r(1,1,1);
+	}
 	Vector3r center = (max+min)*0.5;
 	Vector3r halfSize = (max-min)*0.5;
 	float radius = std::max(halfSize[0] , std::max(halfSize[1] , halfSize[2]) );
@@ -290,6 +295,7 @@ void GLViewer::postDraw()
 
 void GLViewer::closeEvent(QCloseEvent *e)
 {
-	emit closeSignal(viewId);
+	//emit closeSignal(viewId);
+	YadeQtMainWindow::self->closeView(this);
 }
 

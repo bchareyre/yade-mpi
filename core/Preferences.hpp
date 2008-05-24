@@ -20,8 +20,7 @@ class Preferences : public Serializable
 {
 	public :
 		int version;	
-		vector<string>	 dynlibDirectories
-				,includeDirectories;
+		vector<string>	 dynlibDirectories;
 
 		string		 defaultGUILibName;
 		Preferences ();

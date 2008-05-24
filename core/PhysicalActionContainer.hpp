@@ -8,13 +8,72 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef PHYSICALACTIONCONTAINER_HPP
-#define PHYSICALACTIONCONTAINER_HPP
+#pragma once
 
 #include<yade/lib-serialization/Serializable.hpp>
-#include "PhysicalActionContainerIteratorPointer.hpp"
+#include<yade/core/PhysicalAction.hpp>
+#include<boost/shared_ptr.hpp>
+#include<iostream>
 
-class PhysicalAction;
+using namespace boost;
+using namespace std;
+
+class PhysicalActionContainerIterator 
+{
+	public :
+		int currentIndex;
+
+		PhysicalActionContainerIterator() 		{};
+		virtual ~PhysicalActionContainerIterator()	{};
+	
+		virtual bool isDifferent(const PhysicalActionContainerIterator&)	{ throw;};
+		virtual void affect(const PhysicalActionContainerIterator&)		{ throw;};
+		virtual void increment()						{ throw;};
+		virtual shared_ptr<PhysicalAction> getValue()				{ throw;};
+		virtual shared_ptr<PhysicalActionContainerIterator> createPtr()		{ throw;};
+		virtual int getCurrentIndex()						{ throw;};
+};
+
+class PhysicalActionContainerIteratorPointer
+{
+	private :
+		shared_ptr<PhysicalActionContainerIterator> ptr;
+		void allocate(const PhysicalActionContainerIteratorPointer& bi)
+		{
+			if (ptr==0) ptr = bi.get()->createPtr();
+		}
+
+	public :
+		PhysicalActionContainerIterator& getRef() {return *ptr;};
+		PhysicalActionContainerIterator& getRef() const {return *ptr;};
+		shared_ptr<PhysicalActionContainerIterator> get() {return ptr;};
+		shared_ptr<PhysicalActionContainerIterator> get() const {return ptr;};
+
+		PhysicalActionContainerIteratorPointer(const PhysicalActionContainerIteratorPointer& bi)
+		{
+			allocate(bi);
+			ptr->affect(bi.getRef());
+		};
+
+		PhysicalActionContainerIteratorPointer(const shared_ptr<PhysicalActionContainerIterator>& i) { ptr = i; };
+		PhysicalActionContainerIteratorPointer()  { ptr = shared_ptr<PhysicalActionContainerIterator>(); };
+		bool operator!=(const PhysicalActionContainerIteratorPointer& bi) { return ptr->isDifferent(bi.getRef()); };
+
+		PhysicalActionContainerIteratorPointer& operator=(const PhysicalActionContainerIteratorPointer& bi)
+		{
+			allocate(bi);
+			ptr->affect(bi.getRef());
+			return *this;
+		};
+
+		PhysicalActionContainerIteratorPointer& operator++()	{ ptr->increment(); return *this; };
+		PhysicalActionContainerIteratorPointer& operator++(int);  // disabled
+		shared_ptr<PhysicalAction> operator*()			{ return ptr->getValue(); };
+		int getCurrentIndex()					{ return ptr->getCurrentIndex(); };
+
+};
+
+
 
 // this container is different: it has ALWAYS data inside, not empty pointers at all. Every field has
 // inside the right pointer type so it can be safely (and quickly) static_casted, so that the user himself
@@ -58,6 +117,4 @@ class PhysicalActionContainer : public Serializable
 };
 
 REGISTER_SERIALIZABLE(PhysicalActionContainer,false);
-
-#endif // __ACTIONCONTAINER_HPP__
 

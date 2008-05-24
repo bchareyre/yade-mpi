@@ -10,6 +10,11 @@ sys.excepthook=sys.__excepthook__ # apport on ubuntu override this, we don't nee
 
 from yade.wrapper import *
 
+#try:
+#	import yade.qt.atexit
+#	atexit.register(yade.qt.close)
+#except ImportError: pass
+
 # python2.4 workaround (so that quit() works as it does in 2.5)
 if not callable(__builtins__.quit):
 	def _quit(): import sys; sys.exit(0)
@@ -63,4 +68,8 @@ except ImportError:
 	# run interactive loop
 	import code
 	code.InteractiveConsole(globals()).interact()
+try:
+	import yade.qt
+	yade.qt.close()
+except ImportError: pass
 

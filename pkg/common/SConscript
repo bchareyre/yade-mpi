@@ -3,29 +3,27 @@ Import('*')
 env.Install('$PREFIX/lib/yade$SUFFIX/pkg-common',[
 
 	env.SharedLibrary('BodyAssocVector',
-		['Container/BodyAssocVector.cpp',
-			'Container/BodyAssocVectorIterator.cpp'],
-		LIBS=env['LIBS']+['yade-base']),
-
-	env.SharedLibrary('BodyRedirectionVector',
-		['Container/BodyRedirectionVector.cpp',
-			'Container/BodyRedirectionVectorIterator.cpp'],
+		['Container/BodyAssocVector.cpp'],
 		LIBS=env['LIBS']+['yade-base']),
 
 	env.SharedLibrary('InteractionHashMap',
-		['Container/InteractionHashMap.cpp',
-			'Container/InteractionHashMapIterator.cpp'],
+		['Container/InteractionHashMap.cpp'],
 		LIBS=env['LIBS']+['yade-base']),
-
-	env.SharedLibrary('InteractionVecSet',
-		['Container/InteractionVecSet.cpp',
-			'Container/InteractionVecSetIterator.cpp'],
-		LIBS=env['LIBS']+['yade-base']),
-
-	env.SharedLibrary('PhysicalActionVectorVector',
-		['Container/PhysicalActionVectorVector.cpp',
-			'Container/PhysicalActionVectorVectorIterator.cpp'],
-		LIBS=env['LIBS']+['yade-base']),
+	
+## moved to core/DefaultContainerImplementations
+#	env.SharedLibrary('BodyRedirectionVector',
+#		['Container/BodyRedirectionVector.cpp'],
+#		LIBS=env['LIBS']+['yade-base']),
+#	env.SharedLibrary('InteractionVecSet',
+#		['Container/InteractionVecSet.cpp'],
+#		LIBS=env['LIBS']+['yade-base']),
+#	env.SharedLibrary('PhysicalActionVectorVector',
+#		['Container/PhysicalActionVectorVector.cpp'],
+#		LIBS=env['LIBS']+['yade-base']),
+## still permit linking with that
+	env.SharedLibrary('BodyRedirectionVector',[]),
+	env.SharedLibrary('InteractionVecSet',[]),
+	env.SharedLibrary('PhysicalActionVectorVector',[]),
 
 	env.SharedLibrary('AABB',
 		['DataClass/BoundingVolume/AABB.cpp'],

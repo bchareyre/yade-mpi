@@ -8,18 +8,36 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-
-#ifndef BODYASSOCVEC_HPP
-#define BODYASSOCVEC_HPP
+#pragma once 
 
 #include<yade/core/BodyContainer.hpp>
 #include<yade/lib-loki/AssocVector.hpp>
 
-#include <list>
+#include<list>
+#include<vector>
+
+using namespace std;
+using namespace boost;
 
 class Body;
 
-using namespace boost;
+class BodyAssocVectorIterator : public BodyContainerIterator 
+{
+	public :
+		Loki::AssocVector<unsigned int , shared_ptr<Body> >::iterator bii; // FIXME - private maybe?
+
+		BodyAssocVectorIterator();
+		~BodyAssocVectorIterator();
+		
+		virtual bool isDifferent(const BodyContainerIterator& i);
+		virtual void affect(const BodyContainerIterator& i);
+		virtual void increment();
+		virtual shared_ptr<Body> getValue();
+		virtual shared_ptr<BodyContainerIterator> createPtr();
+
+};
+
+
 
 class BodyAssocVector : public BodyContainer
 {
@@ -49,6 +67,4 @@ class BodyAssocVector : public BodyContainer
 };
 
 REGISTER_SERIALIZABLE(BodyAssocVector,false);
-
-#endif // BODYASSOCVEC_HPP
 

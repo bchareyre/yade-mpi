@@ -40,12 +40,18 @@ Omega::~Omega()
 	LOG_INFO("Shuting down; duration "<<sStartingSimulationTime-second_clock::local_time());
 }
 
+void Omega::reset(){
+	finishSimulationLoop();
+	joinSimulationLoop();
+	init();
+}
 
 void Omega::init()
 {
 	simulationFileName="";
 	currentIteration = 0;
 	stopAtIteration = 0;
+	resetRootBody();
 }
 
 
@@ -324,11 +330,11 @@ void Omega::loadSimulation()
 	LOG_INFO("Loading file " + simulationFileName);
 		
 	if(algorithm::ends_with(simulationFileName,".xml") || algorithm::ends_with(simulationFileName,".xml.gz") || algorithm::ends_with(simulationFileName,".xml.bz2")){
-		freeRootBody();
+		resetRootBody();
 		IOFormatManager::loadFromFile("XMLFormatManager",simulationFileName,"rootBody",rootBody);
 	}
 	else if(algorithm::ends_with(simulationFileName,".yade")){
-		freeRootBody();
+		resetRootBody();
 		IOFormatManager::loadFromFile("BINFormatManager",simulationFileName,"rootBody",rootBody);
 	}
 	else throw (yadeBadFile("Extension of file not recognized."));
@@ -379,9 +385,9 @@ void Omega::saveSimulation(const string name, bool recover)
 	rootBody->recover=false;
 }
 
-void Omega::freeRootBody()
+void Omega::resetRootBody()
 {
-	rootBody = shared_ptr<MetaBody>();
+	rootBody = shared_ptr<MetaBody>(new MetaBody);
 }
 
 

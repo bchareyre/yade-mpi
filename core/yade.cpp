@@ -176,7 +176,7 @@ int main(int argc, char *argv[])
 			default: printHelp(); return 1;
 		}
 	// peek to see the first non-option arg that will be passed to the gui; may affect the gui we will use
-	if(optind<argc && boost::algorithm::ends_with(string(argv[optind]),string(".py"))){ gui="PythonUI"; LOG_DEBUG("Selecting cmdGui for .py"); }
+	// if(optind<argc && boost::algorithm::ends_with(string(argv[optind]),string(".py"))){ gui="PythonUI"; LOG_DEBUG("Selecting cmdGui for .py"); }
 	// save original options
 	Omega::instance().origArgv=argv; Omega::instance().origArgc=argc;
 	// kill processed options, keep one more which is in fact non-option (normally the binary)

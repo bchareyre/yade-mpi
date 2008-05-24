@@ -6,15 +6,19 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef INTERACTIONHASHMAP_HPP
-#define INTERACTIONHASHMAP_HPP
+#pragma once
 
 #include<yade/core/InteractionContainer.hpp>
 #include<yade/core/Interaction.hpp>
-#include <ext/hash_map>
+#include<ext/hash_map>
+#include<vector>
+#include"InteractionHashMap.hpp"
 
 using namespace std;
 using namespace __gnu_cxx;
+
+
+
 
 struct eqPair
 {
@@ -59,7 +63,21 @@ class InteractionHashMap : public InteractionContainer
 	REGISTER_BASE_CLASS_NAME(InteractionContainer);
 };
 
-REGISTER_SERIALIZABLE(InteractionHashMap,false);
+class InteractionHashMapIterator : public InteractionContainerIterator 
+{
+	public :
+		IHashMap::iterator hmii;
 
-#endif //  INTERACTIONHASHMAP_HPP
+		InteractionHashMapIterator();
+		~InteractionHashMapIterator();
+
+		virtual bool isDifferent(const InteractionContainerIterator& i);
+		virtual void affect(const InteractionContainerIterator& i);
+		virtual void increment();
+		virtual shared_ptr<Interaction> getValue();
+		virtual shared_ptr<InteractionContainerIterator> createPtr();
+
+};
+
+REGISTER_SERIALIZABLE(InteractionHashMap,false);
 

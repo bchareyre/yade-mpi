@@ -19,7 +19,6 @@ void Preferences::registerAttributes()
 {
 	REGISTER_ATTRIBUTE(version);
 	REGISTER_ATTRIBUTE(dynlibDirectories);
-	REGISTER_ATTRIBUTE(includeDirectories);
 	REGISTER_ATTRIBUTE(defaultGUILibName);
 }
 

@@ -8,16 +8,72 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-
 #pragma once
 
-#include<yade/lib-serialization/Serializable.hpp>
-#include"BodyContainerIteratorPointer.hpp"
+#include<iostream>
 #include<boost/range.hpp>
+#include<boost/shared_ptr.hpp>
+#include<yade/lib-serialization/Serializable.hpp>
 
 class Body;
 
 using namespace boost;
+using namespace std;
+
+class BodyContainerIterator 
+{
+	public :
+		BodyContainerIterator() 		{};
+		virtual ~BodyContainerIterator()	{};
+		
+		virtual bool isDifferent(const BodyContainerIterator&)	{ throw;};
+		virtual void affect(const BodyContainerIterator&)	{ throw;};
+		virtual void increment()				{ throw;};
+		virtual shared_ptr<Body> getValue()			{ throw;};
+		virtual shared_ptr<BodyContainerIterator> createPtr()	{ throw;};
+};
+
+class BodyContainerIteratorPointer
+{
+	private :
+		shared_ptr<BodyContainerIterator> ptr;
+		void allocate(const BodyContainerIteratorPointer& bi)
+		{
+			if (ptr==0) ptr = bi.get()->createPtr();
+		}
+
+
+	public :
+		BodyContainerIterator&			getRef()	{ return *ptr; };
+		BodyContainerIterator&			getRef() const	{ return *ptr; };
+		shared_ptr<BodyContainerIterator>	get()		{ return  ptr; };
+		shared_ptr<BodyContainerIterator>	get() const	{ return  ptr; };
+
+		BodyContainerIteratorPointer(const shared_ptr<BodyContainerIterator>& i)	{ ptr = i; };
+
+		BodyContainerIteratorPointer()		{ ptr = shared_ptr<BodyContainerIterator>(); };
+
+		BodyContainerIteratorPointer(const BodyContainerIteratorPointer& bi) 
+		{
+			allocate(bi);
+			ptr->affect(bi.getRef());
+		};
+
+		bool operator!=(const BodyContainerIteratorPointer& bi)	{ return ptr->isDifferent(bi.getRef());	};
+		bool operator==(const BodyContainerIteratorPointer& bi)	{ return !ptr->isDifferent(bi.getRef());	};
+		shared_ptr<Body>			operator*()	{ return ptr->getValue(); };	
+		BodyContainerIteratorPointer&		operator++()	{ ptr->increment(); return *this; };
+		BodyContainerIteratorPointer&		operator++(int); // disabled 
+		BodyContainerIteratorPointer& operator=(const BodyContainerIteratorPointer& bi)
+		{
+			allocate(bi);
+			ptr->affect(bi.getRef());
+			return *this;
+		};
+
+};
+
+
 
 class BodyContainer : public Serializable
 {

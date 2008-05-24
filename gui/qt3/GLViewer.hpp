@@ -20,7 +20,6 @@ class GLViewer : public QGLViewer
 	friend class QGLThread;
 	private :
 //		GLWindowsManager	wm;
-		int			viewId;
 		bool			drawGrid; // FIXME - draw grid is in fact just another GLDrawActor
 		bool			isMoving;
 		bool			wasDynamic;
@@ -35,6 +34,7 @@ class GLViewer : public QGLViewer
 		virtual void drawWithNames();
 		void centerScene();
 		void notMoving();
+		int			viewId;
 
 
 	protected :
@@ -43,9 +43,6 @@ class GLViewer : public QGLViewer
 		virtual void closeEvent(QCloseEvent *e);
 		virtual void postSelection(const QPoint& point);
 		virtual void endSelection(const QPoint &point);
-
-	signals :
-		virtual void closeSignal(int i);
 };
 
 #endif // GLVIEWER_HPP

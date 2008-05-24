@@ -12,13 +12,14 @@ class PythonUI: public FrontEnd
 		static struct termios tios,tios_orig;
 		static void termSetup();
 		static void termRestore();
-		static string runScript, runCommands;
-		static bool stopAfter;
 	public:
-		PythonUI(){};
+		PythonUI(){self=this;};
 		virtual ~PythonUI(){};
 		static void pythonSession();
+		static PythonUI *self;
 		virtual int run(int argc, char *argv[]);
+		static string runScript;
+		static bool stopAfter;
 	
 	REGISTER_CLASS_NAME(PythonUI);
 	REGISTER_BASE_CLASS_NAME(FrontEnd);

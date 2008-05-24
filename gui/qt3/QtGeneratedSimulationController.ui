@@ -340,25 +340,6 @@
                 </property>
                 <widget class="QRadioButton">
                     <property name="name">
-                        <cstring>rbRealTime</cstring>
-                    </property>
-                    <property name="enabled">
-                        <bool>false</bool>
-                    </property>
-                    <property name="geometry">
-                        <rect>
-                            <x>120</x>
-                            <y>50</y>
-                            <width>16</width>
-                            <height>25</height>
-                        </rect>
-                    </property>
-                    <property name="text">
-                        <string>Real Time</string>
-                    </property>
-                </widget>
-                <widget class="QRadioButton">
-                    <property name="name">
                         <cstring>rbFixed</cstring>
                     </property>
                     <property name="enabled">
@@ -801,6 +782,12 @@
         <slot>pbSaveClicked()</slot>
     </connection>
 </connections>
+<includes>
+    <include location="local" impldecl="in implementation">QtGeneratedSimulationController.ui.h</include>
+</includes>
+<forwards>
+    <forward>class GLViewer;</forward>
+</forwards>
 <signals>
     <signal>closeSignal()</signal>
 </signals>
@@ -812,7 +799,6 @@
     <slot>pbResetClicked()</slot>
     <slot>pbApplyClicked()</slot>
     <slot>pbCenterSceneClicked()</slot>
-    <slot>closeGLViewEvent( int )</slot>
     <slot>pbOneSimulationStepClicked()</slot>
     <slot>bgTimeStepClicked( int )</slot>
     <slot>sbSecondValueChanged( int )</slot>
@@ -822,6 +808,7 @@
     <slot>sbRefreshValueChanged( int )</slot>
     <slot>cbSyncToggled( bool )</slot>
     <slot>pbStart2Clicked()</slot>
+    <slot>closeGLViewEvent( int )</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

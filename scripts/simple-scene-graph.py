@@ -46,6 +46,7 @@ o.dt=.2*utils.PWaveTimeStep()
 ##### now the part pertaining to plots #####
 ############################################
 
+from math import *
 import yade.plot
 ## we will have 2 plots:
 ## 1. t as function of i (joke test function)

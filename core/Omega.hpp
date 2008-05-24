@@ -42,6 +42,7 @@
 #include<yade/lib-loki/Singleton.hpp>
 #include<yade/lib-factory/ClassFactory.hpp>
 
+
 #include "SimulationFlow.hpp"
 #include "Body.hpp"
 
@@ -133,7 +134,7 @@ class Omega : public Singleton<Omega>
 
 		const		shared_ptr<MetaBody>& getRootBody();
 		void		setRootBody(shared_ptr<MetaBody>&);
-		void		freeRootBody();
+		void		resetRootBody();
 		
 		ptime		getMsStartingSimulationTime();
 		time_duration	getSimulationPauseDuration();
@@ -150,6 +151,8 @@ class Omega : public Singleton<Omega>
 		void		incrementSimulationTime() { simulationTime+=getTimeStep();};
 		
 		void		init();
+
+		void reset();
 
 		DECLARE_LOGGER;
 

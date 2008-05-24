@@ -24,7 +24,11 @@ env.InstallAs(['$PREFIX/bin/yade$SUFFIX'],[
 			'ThreadWorker.cpp',
 			'TimeStepper.cpp',
 			'yade.cpp',
-			'yadeExceptions.cpp'],
+			'yadeExceptions.cpp',
+			'DefaultContainerImplementations/BodyRedirectionVector.cpp',
+			'DefaultContainerImplementations/InteractionVecSet.cpp',
+			'DefaultContainerImplementations/PhysicalActionVectorVector.cpp'
+			],
 		LIBS=env['LIBS']+['yade-base',
 			'yade-serialization',
 			'yade-factory',

@@ -61,7 +61,7 @@
 using namespace boost;
 using namespace std;
 
-#include"attrUtils.cpp"
+#include"pyAttrUtils.hpp"
 
 class RenderingEngine;
 
@@ -123,23 +123,6 @@ TODO:
 	log4cxx::LoggerPtr logger=log4cxx::Logger::getLogger("yade.python");
 #endif
 
-
-#define BASIC_PY_PROXY_HEAD(pyClass,yadeClass) \
-class pyClass{shared_ptr<AttrAccess> accessor; \
-	private: void init(string clss){ proxee=dynamic_pointer_cast<yadeClass>(ClassFactory::instance().createShared(clss.empty()? #yadeClass : clss)); if(!proxee) throw runtime_error("Invalid class `"+clss+"': either nonexistent, or unable to cast to `"+#yadeClass+"'"); } \
-	public: shared_ptr<yadeClass> proxee; \
-		void ensureAcc(void){ if(!proxee) throw runtime_error(string("No proxied `")+#yadeClass+"'."); if(!accessor) accessor=shared_ptr<AttrAccess>(new AttrAccess(proxee));} \
-		pyClass(string clss="", python::dict attrs=python::dict()){ init(clss); python::list l=attrs.items(); int len=PySequence_Size(l.ptr()); for(int i=0; i<len; i++){ python::extract<python::tuple> t(l[i]); python::extract<string> keyEx(t()[0]); if(!keyEx.check()) throw invalid_argument("Attribute keys must be strings."); wrappedPySet(keyEx(),t()[1]); } } \
-		pyClass(const shared_ptr<yadeClass>& _proxee): proxee(_proxee) {} \
-		std::string pyStr(void){ ensureAcc(); return string(proxee->getClassName()==#yadeClass ? "<"+proxee->getClassName()+">" : "<"+proxee->getClassName()+" "+ #yadeClass +">"); } \
-		string className(void){ ensureAcc(); return proxee->getClassName(); } \
-		ATTR_ACCESS_CXX(accessor,ensureAcc);
-
-#define BASIC_PY_PROXY_TAIL };
-
-#define BASIC_PY_PROXY(pyClass,yadeClass) BASIC_PY_PROXY_HEAD(pyClass,yadeClass) BASIC_PY_PROXY_TAIL
-
-
 BASIC_PY_PROXY(pyGeneric,Serializable);
 
 BASIC_PY_PROXY(pyInteractionGeometry,InteractionGeometry);
@@ -199,10 +182,6 @@ BASIC_PY_PROXY_HEAD(pyMetaEngine,MetaEngine)
 			}
 		}
 BASIC_PY_PROXY_TAIL;
-
-#define NONPOD_ATTRIBUTE_ACCESS(pyName,pyClass,yadeName) \
-	python::object pyName##_get(void){ensureAcc(); return proxee->yadeName ? python::object(pyClass(proxee->yadeName)) : python::object(); } \
-	void pyName##_set(pyClass proxy){ensureAcc(); proxee->yadeName=proxy.proxee; }
 
 BASIC_PY_PROXY_HEAD(pyInteraction,Interaction)
 	NONPOD_ATTRIBUTE_ACCESS(geom,pyInteractionGeometry,interactionGeometry);
@@ -338,6 +317,10 @@ class pyOmega{
 		OMEGA.createSimulationLoop();
 		LOG_DEBUG("LOAD!");
 		needsInitializers=true;
+	}
+
+	void reset(){
+		OMEGA.reset();
 	}
 
 	void save(std::string fileName, bool recover=false){
@@ -536,6 +519,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("pause",&pyOmega::pause)
 		.def("step",&pyOmega::step)
 		.def("wait",&pyOmega::wait)
+		.def("reset",&pyOmega::reset)
 		.add_property("engines",&pyOmega::engines_get,&pyOmega::engines_set)
 		.add_property("miscParams",&pyOmega::miscParams_get,&pyOmega::miscParams_set)
 		.add_property("initializers",&pyOmega::initializers_get,&pyOmega::initializers_set)
@@ -572,12 +556,6 @@ BOOST_PYTHON_MODULE(wrapper)
 	boost::python::class_<pyGLViewer>("View")
 		.ATTR_ACCESS_PY(pyGLViewer);
 #endif
-
-#define BASIC_PY_PROXY_WRAPPER(pyClass,pyName)  \
-	boost::python::class_<pyClass>(pyName,python::init<python::optional<string,python::dict> >()) \
-	.ATTR_ACCESS_PY(pyClass) \
-	.def("__str__",&pyClass::pyStr).def("__repr__",&pyClass::pyStr) \
-	.add_property("name",&pyClass::className)
 
 	BASIC_PY_PROXY_WRAPPER(pyStandAloneEngine,"StandAloneEngine");
 	BASIC_PY_PROXY_WRAPPER(pyMetaEngine,"MetaEngine")

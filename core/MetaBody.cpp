@@ -15,13 +15,19 @@
 #include "TimeStepper.hpp"
 #include<boost/foreach.hpp>
 
-// FIXME - who is to decide which class to use by default? -- Olivier : I think nobody ! It will be done automatically while deserializing
+
+/* this is meant to improve usability: MetaBody is ready by default (so is Omega by that token)
+ * and different type of containers can still be used instead by explicit assignment */
+#include<yade/core/BodyRedirectionVector.hpp>
+#include<yade/core/InteractionVecSet.hpp>
+#include<yade/core/PhysicalActionVectorVector.hpp>
+
 MetaBody::MetaBody() :
 	  Body()
-	//, bodies(new BodyRedirectionVector)
-	//, persistentInteractions(new InteractionVecSet)
-	//, transientInteractions(new InteractionVecSet)
-	//, physicalActions(new PhysicalActionVectorVector)
+	, bodies(new BodyRedirectionVector)
+	, persistentInteractions(new InteractionVecSet)
+	, transientInteractions(new InteractionVecSet)
+	, physicalActions(new PhysicalActionVectorVector)
 {	
 	engines.clear();
 	initializers.clear();

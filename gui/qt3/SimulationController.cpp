@@ -5,7 +5,7 @@
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
-
+#include "QtGUI.hpp"
 #include "YadeQtMainWindow.hpp"
 #include "SimulationController.hpp"
 #include "MessageDialog.hpp"
@@ -23,15 +23,23 @@
 #include<yade/core/yadeExceptions.hpp>
 #include <Wm3Math.h>
 #include<yade/lib-base/yadeWm3.hpp>
+#include<boost/foreach.hpp>
+#	ifndef FOREACH
+#		define FOREACH BOOST_FOREACH
+#	endif
 
 
 using namespace boost;
 
 
-SimulationController::SimulationController(QWidget * parent) : QtGeneratedSimulationController(parent,"SimulationController")
+SimulationController::SimulationController(QWidget * parent) : QtGeneratedSimulationController(parent,"SimulationController"), iterPerSec_TTL_ms(1000)
 {
 	sync=false;
-	refreshTime = 20;
+	refreshTime = 40;
+
+	iterPerSec_LastIter=Omega::instance().getCurrentIteration();
+	iterPerSec_LastLocalTime=microsec_clock::local_time();
+
 	parentWorkspace = parent;
 
 	scrollViewFrame = new QFrame();	
@@ -42,56 +50,22 @@ SimulationController::SimulationController(QWidget * parent) : QtGeneratedSimula
 	scrollView->setVScrollBarMode(QScrollView::Auto);
 	scrollView->setHScrollBarMode(QScrollView::Auto);
 	scrollViewLayout->addWidget( scrollView );
-	scrollView->show();	
+	scrollView->show();
 
-	shared_ptr<Factorable> tmpRenderer = ClassFactory::instance().createShared("OpenGLRenderingEngine");
-	renderer = static_pointer_cast<RenderingEngine>(tmpRenderer);
-	
-	if(renderer)
-	{
-		guiGen.setResizeHeight(true);
-		guiGen.setResizeWidth(true);
-		guiGen.setShift(10,30);
-		guiGen.setShowButtons(false);
-		QSize s = scrollView->size();
-		scrollViewFrame->resize(s.width(),s.height());
-		
-		filesystem::path rendererConfig = filesystem::path( Omega::instance().yadeConfigPath + "/OpenGLRendererPref.xml", filesystem::native);
-		if ( filesystem::exists( rendererConfig ) )
-		{
-			try
-			{
-				cerr << "loading configuration file: " << rendererConfig.string() << "\n";
-				IOFormatManager::loadFromFile("XMLFormatManager",rendererConfig.string(),"renderer",renderer);
-			}
-			catch(SerializableError& e)
-			{
-				shared_ptr<MessageDialog> md = shared_ptr<MessageDialog>(new MessageDialog(rendererConfig.string() + " exists, but cannot be loaded: " + e.what(),this->parentWidget()->parentWidget()));
-				md->exec(); 
-			}
-		}
-		
-		guiGen.buildGUI(renderer, scrollViewFrame);
-		scrollView->addChild(scrollViewFrame);
-	}
-	else
-	{
-		cerr << "renderer not created - why?!\n";
-	}
+	YadeQtMainWindow::self->ensureRenderer(); /* create renderer if none, load its config */
+
+	guiGen.setResizeHeight(true);
+	guiGen.setResizeWidth(true);
+	guiGen.setShift(10,30);
+	guiGen.setShowButtons(false);
+	QSize s = scrollView->size();
+	scrollViewFrame->resize(s.width(),s.height());
+	guiGen.buildGUI(YadeQtMainWindow::self->renderer,scrollViewFrame);
+	scrollView->addChild(scrollViewFrame);
 	
 	maxNbViews=0;
 	addNewView();
 
-	updater = shared_ptr<SimulationControllerUpdater>(new SimulationControllerUpdater(this));
-
-	// HACK: this should be passed through the bazillion of abstract interfaces to the the most abstract idea,
-	// of which Plato speaks in the Republic and elsewhere, then descending from this perfectly one beyond being
-	// though the cascades of emanations here, where it incarnates. Unfortunately, there is no heaven in c++, because
-	// c++ itself is hell.
-	//
-	// Actually, it is quite useful, since it allows me to pass simulation to yade from command line,
-	// thus saving at least 4 mouse-clicks
-	//
 	// there is file existence assertion in lodSimulationFromFilename, so yade will abort cleanly...
 	cerr<<"Omega::instance().getSimulationFileName()="<<Omega::instance().getSimulationFileName()<<endl;
 	if (Omega::instance().getSimulationFileName()!=""){
@@ -99,52 +73,12 @@ SimulationController::SimulationController(QWidget * parent) : QtGeneratedSimula
 	}
 	// run timer ANY TIME (simulation may be started asynchronously)
 	startTimer(refreshTime);
-	#ifndef USE_WORKSPACE
-		YadeQtMainWindow::self->hide();
-	#endif
 }
 
-
-SimulationController::~SimulationController()
-{
-	Omega::instance().finishSimulationLoop();
-	Omega::instance().joinSimulationLoop();
-
-	// to avoid loading that file next time, when SimulationController is opened again.
-	Omega::instance().setSimulationFileName("");
-
-	map<int,GLViewer*>::reverse_iterator gi = glViews.rbegin();
-	map<int,GLViewer*>::reverse_iterator giEnd = glViews.rend();
-	for(;gi!=giEnd;++gi)
-	{
-		gi->second->close();
-		delete gi->second;
-	}
-
-	glViews.clear();
-	
-	Omega::instance().freeRootBody();
-	
-	filesystem::path rendererConfig = filesystem::path( Omega::instance().yadeConfigPath + "/OpenGLRendererPref.xml", filesystem::native);
-	IOFormatManager::saveToFile("XMLFormatManager",rendererConfig.string(),"renderer",renderer);
-
-	#ifndef USE_WORKSPACE
-		YadeQtMainWindow::self->show();
-	#endif
-}
-
-void SimulationController::redrawAll()
-{
-	map<int,GLViewer*>::reverse_iterator gi = glViews.rbegin();
-	map<int,GLViewer*>::reverse_iterator giEnd = glViews.rend();
-	for(;gi!=giEnd;++gi)
-		gi->second->updateGL();
-}
 
 void SimulationController::pbApplyClicked()
 {
-	guiGen.deserialize(renderer);
-	redrawAll();
+	guiGen.deserialize(YadeQtMainWindow::self->renderer);
 }
 
 
@@ -158,11 +92,7 @@ void SimulationController::pbLoadClicked()
 	filters.push_back("XML Yade File (*.xml *.xml.gz *.xml.bz2)");
 	string fileName = FileDialog::getOpenFileName(".", filters, "Choose a file to open", parentWorkspace, selectedFilter );
 		
-	if ( 	   fileName.size()!=0 
-		//&& (selectedFilter == "XML Yade File (*.xml)" || selectedFilter == "Yade Binary File (*.yade)") 
-		//&& filesystem::exists(fileName) 
-		//&& (filesystem::extension(fileName)==".xml" || filesystem::extension(fileName)==".yade"))
-		)
+	if (fileName.size()!=0)
 	{
 		this->loadSimulationFromFileName(fileName);
 	}
@@ -173,7 +103,6 @@ void SimulationController::loadSimulationFromFileName(const std::string& fileNam
 {
 	assert(filesystem::exists(fileName));
 
-//		updater->stop();
 		Omega::instance().finishSimulationLoop();
 		Omega::instance().joinSimulationLoop();
 
@@ -212,7 +141,7 @@ void SimulationController::loadSimulationFromFileName(const std::string& fileNam
 		} 
 		catch(SerializableError& e) // catching it...
 		{
-			Omega::instance().freeRootBody();
+			Omega::instance().resetRootBody();
 			Omega::instance().setSimulationFileName("");
 			shared_ptr<MessageDialog> md = shared_ptr<MessageDialog>(new MessageDialog(e.what(),this->parentWidget()->parentWidget()));
 			md->exec(); 
@@ -223,7 +152,7 @@ void SimulationController::loadSimulationFromFileName(const std::string& fileNam
 		}
 		catch(yadeError& e)
 		{
-			Omega::instance().freeRootBody();
+			Omega::instance().resetRootBody();
 			Omega::instance().setSimulationFileName("");
 			shared_ptr<MessageDialog> md = shared_ptr<MessageDialog>(new MessageDialog(e.what(),this->parentWidget()->parentWidget()));
 			md->exec(); 
@@ -255,7 +184,6 @@ void SimulationController::pbSaveClicked()
 		cerr << "saving simulation: " << fileName << "\n";
 		Omega::instance().saveSimulation(fileName);
 
-		redrawAll();
 	}
 	else
 	{
@@ -272,46 +200,9 @@ void SimulationController::pbNewViewClicked()
 
 void SimulationController::addNewView()
 {
-	QGLFormat format;
-	QGLFormat::setDefaultFormat( format );
-	format.setStencil(TRUE);
-	format.setAlpha(TRUE);
-
-	if (glViews.size()==0)
-	{
-		glViews[0] = new GLViewer(0,renderer,format,parentWorkspace);
-		glViews[0]->setCamera(new YadeCamera);
-		glViews[0]->camera()->frame()->setWheelSensitivity(-1.0f);
-		maxNbViews = 0;
-	}
-	else
-	{
-		maxNbViews++;
-		glViews[maxNbViews] = new GLViewer(maxNbViews,renderer, format, parentWorkspace, glViews[0]);
-		glViews[maxNbViews]->setCamera(new YadeCamera);
-		glViews[maxNbViews]->camera()->frame()->setWheelSensitivity(-1.0f);
-	}
-
-	connect( glViews[maxNbViews], SIGNAL( closeSignal(int) ), this, SLOT( closeGLViewEvent(int) ) );
-	glViews[maxNbViews]->centerScene();
+	YadeQtMainWindow::self->createView();
+	return;
 }
-
-
-void SimulationController::closeGLViewEvent(int id)
-{
-	if (id!=0)
-	{
-		glViews[id]->close();
-		delete glViews[id];
-		glViews.erase(id);
-		if (id==maxNbViews)
-			maxNbViews--;
-	}
-	else{
-		/* emit close for the whole simulation? */
-	}
-}
-
 
 void SimulationController::pbStopClicked()
 {
@@ -339,8 +230,6 @@ void SimulationController::pbResetClicked()
 	if(Omega::instance().getRootBody())
 	{
 		// timeStepper setup done in loadSimulationFromFileName
-		//updater->oneLoop(); // to refresh gui
-		redrawAll();
 	} 
 	else
 	{
@@ -354,22 +243,15 @@ void SimulationController::pbResetClicked()
 
 void SimulationController::pbOneSimulationStepClicked()
 {
-	//updater->start();
 	//FIXME : fix real simulation time
 	pbStopClicked();
 	Omega::instance().spawnSingleSimulationLoop();
-	redrawAll();
-	//updater->oneLoop();
 }
 
 
 void SimulationController::pbCenterSceneClicked()
 {
-	map<int,GLViewer*>::iterator gi = glViews.begin();
-	map<int,GLViewer*>::iterator giEnd = glViews.end();
-	for(;gi!=giEnd;++gi)
-		(*gi).second->centerScene();
-//	redrawAll();
+	YadeQtMainWindow::self->centerViews();
 }
 
 
@@ -444,9 +326,88 @@ void SimulationController::pbStart2Clicked()
 
 void SimulationController::timerEvent( QTimerEvent* )
 {
-	updater->oneLoop();
-	redrawAll();
-	if(sync)
-		Omega::instance().spawnSingleSimulationLoop();
+	doUpdate();
+	if(sync) Omega::instance().spawnSingleSimulationLoop();
+}
+
+void SimulationController::doUpdate(){
+	SimulationController *controller=this;
+
+	Real simulationTime = Omega::instance().getSimulationTime();
+
+	unsigned int sec	= (unsigned int)(simulationTime);
+	unsigned int min	= sec/60;
+	Real time		= (simulationTime-sec)*1000;
+	unsigned int msec	= (unsigned int)(time);
+	time			= (time-msec)*1000;
+	unsigned int misec	= (unsigned int)(time);
+	time			= (time-misec)*1000;
+	unsigned int nsec	= (unsigned int)(time);
+	sec			= sec-60*min;
+
+	char strVirt[64];
+	snprintf(strVirt,64,"virt %02d:%03d.%03dm%03du%03dn",min,sec,msec,misec,nsec);
+	controller->labelSimulTime->setText(string(strVirt));
+
+	if(Omega::instance().isRunning()){
+		time_duration duration = microsec_clock::local_time()-Omega::instance().getMsStartingSimulationTime();
+		duration -= Omega::instance().getSimulationPauseDuration();
+
+		unsigned int hours	= duration.hours();
+		unsigned int minutes 	= duration.minutes();
+		unsigned int seconds	= duration.seconds();
+		unsigned int mseconds	= duration.fractional_seconds()/1000;
+		unsigned int days 	= hours/24;
+		hours			= hours-24*days;
+
+		char strReal[64];
+		if(days>0) snprintf(strReal,64,"real %dd %02d:%02d:%03d.%03d",days,hours,minutes,seconds,mseconds);
+		else snprintf(strReal,64,"real %02d:%02d:%03d.%03d",hours,minutes,seconds,mseconds);
+		controller->labelRealTime->setText(string(strReal));
+	}
+
+	// update iterations per second - only one in a while (iterPerSec_TTL_ms)
+	// does someone need to display that with more precision than integer?
+	long iterPerSec_LastAgo_ms=(microsec_clock::local_time()-iterPerSec_LastLocalTime).total_milliseconds();
+	if(iterPerSec_LastAgo_ms>iterPerSec_TTL_ms){
+		iterPerSec=(1000*(Omega::instance().getCurrentIteration()-iterPerSec_LastIter))/iterPerSec_LastAgo_ms;
+		iterPerSec_LastIter=Omega::instance().getCurrentIteration();
+		iterPerSec_LastLocalTime=microsec_clock::local_time();
+	}
+
+	char strIter[64];
+	snprintf(strIter,64,"iter #%ld, %.1f/s",Omega::instance().getCurrentIteration(),iterPerSec);
+	controller->labelIter->setText(strIter);
+
+	if (controller->changeSkipTimeStepper)
+			Omega::instance().skipTimeStepper(controller->skipTimeStepper);
+
+	if (controller->changeTimeStep)
+	{
+		Real second = (Real)(controller->sbSecond->value());
+		Real powerSecond = (Real)(controller->sb10PowerSecond->value());
+		Omega::instance().setTimeStep(second*Mathr::Pow(10,powerSecond));
+	}
+
+	char strStep[64];
+	snprintf(strStep,64,"step %g",Omega::instance().getTimeStep());
+	controller->labelStep->setText(string(strStep));
+
+	controller->changeSkipTimeStepper = false;
+	controller->changeTimeStep = false;
+
+	/* enable/disable controls here, dynamically */
+	bool hasSimulation=(Omega::instance().getRootBody() ? Omega::instance().getRootBody()->bodies->size()>0 : false ),
+		isRunning=Omega::instance().isRunning(),
+		hasTimeStepper=Omega::instance().containTimeStepper(),
+		usesTimeStepper=Omega::instance().timeStepperActive();
+
+	controller->pbStartSimulation->setEnabled(hasSimulation && !isRunning);
+	controller->pbStopSimulation->setEnabled(hasSimulation && isRunning);
+	controller->pbResetSimulation->setEnabled(hasSimulation);
+	controller->pbOneSimulationStep->setEnabled(hasSimulation&&!isRunning);
+	controller->rbTimeStepper->setEnabled(hasTimeStepper);
+	controller->rbFixed->setChecked(!usesTimeStepper);
+	controller->rbFixed->setChecked(usesTimeStepper);
 }
 
