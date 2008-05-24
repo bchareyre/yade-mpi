@@ -23,11 +23,7 @@
 #include<yade/core/PhysicalActionVectorVector.hpp>
 
 MetaBody::MetaBody() :
-	  Body()
-	, bodies(new BodyRedirectionVector)
-	, persistentInteractions(new InteractionVecSet)
-	, transientInteractions(new InteractionVecSet)
-	, physicalActions(new PhysicalActionVectorVector)
+	  Body(),bodies(new BodyRedirectionVector),persistentInteractions(new InteractionVecSet),transientInteractions(new InteractionVecSet),physicalActions(new PhysicalActionVectorVector)
 {	
 	engines.clear();
 	initializers.clear();

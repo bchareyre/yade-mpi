@@ -40,6 +40,8 @@
 #include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
 #include<yade/pkg-common/PhysicalActionDamper.hpp>
 #include<yade/pkg-common/PhysicalActionApplier.hpp>
+#include<yade/pkg-common/MetaInteractingGeometry.hpp>
+#include<yade/pkg-common/AABB.hpp>
 
 #include<yade/pkg-common/BoundingVolumeEngineUnit.hpp>
 #include<yade/pkg-common/GeometricalModelEngineUnit.hpp>
@@ -273,7 +275,13 @@ class pyOmega{
 		 * Initializers are run ad this flag set to false by maybeRunInitializers when running (step or run) */
 		bool needsInitializers;
 	public:
-	pyOmega(){ if(!OMEGA.getRootBody()){shared_ptr<MetaBody> mb=Shop::rootBody(); OMEGA.setRootBody(mb);}
+	pyOmega(){
+		shared_ptr<MetaBody> rb=OMEGA.getRootBody();
+		assert(rb);
+		if(!rb->physicalParameters){rb->physicalParameters=shared_ptr<PhysicalParameters>(new PhysicalParameters);}
+		if(!rb->boundingVolume){rb->boundingVolume=shared_ptr<AABB>(new AABB);}
+		if(!rb->interactingGeometry){rb->interactingGeometry=shared_ptr<MetaInteractingGeometry>(new MetaInteractingGeometry);}
+		//if(!OMEGA.getRootBody()){shared_ptr<MetaBody> mb=Shop::rootBody(); OMEGA.setRootBody(mb);}
 		/* this is not true if another instance of Omega is created; flag should be stored inside the Omega singleton for clean solution. */
 		if(!OMEGA.hasSimulationLoop()){
 			OMEGA.createSimulationLoop();

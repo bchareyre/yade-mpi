@@ -400,12 +400,13 @@ void SimulationController::doUpdate(){
 	bool hasSimulation=(Omega::instance().getRootBody() ? Omega::instance().getRootBody()->bodies->size()>0 : false ),
 		isRunning=Omega::instance().isRunning(),
 		hasTimeStepper=Omega::instance().containTimeStepper(),
-		usesTimeStepper=Omega::instance().timeStepperActive();
+		usesTimeStepper=Omega::instance().timeStepperActive(),
+		hasFileName=(Omega::instance().getSimulationFileName()!="");
 
 	controller->pbStartSimulation->setEnabled(hasSimulation && !isRunning);
 	controller->pbStopSimulation->setEnabled(hasSimulation && isRunning);
-	controller->pbResetSimulation->setEnabled(hasSimulation);
-	controller->pbOneSimulationStep->setEnabled(hasSimulation&&!isRunning);
+	controller->pbResetSimulation->setEnabled(hasSimulation && hasFileName);
+	controller->pbOneSimulationStep->setEnabled(hasSimulation && !isRunning);
 	controller->rbTimeStepper->setEnabled(hasTimeStepper);
 	controller->rbFixed->setChecked(!usesTimeStepper);
 	controller->rbFixed->setChecked(usesTimeStepper);

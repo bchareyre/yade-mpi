@@ -106,54 +106,6 @@ YadeQtMainWindow::~YadeQtMainWindow()
 	IOFormatManager::saveToFile("XMLFormatManager",yadeQtGUIPrefPath.string(),"preferences",preferences);
 }
 
-#if 0
-void YadeQtMainWindow::addMenu(string menuName)
-{
-	if (!menuNameExists(menuName))
-		menus.push_back(pair<string,QPopupMenu*>(menuName,new QPopupMenu(this)));
-
-}
-
-
-void YadeQtMainWindow::addItem(string menuName, string itemName,string className)
-{
-	if (menuNameExists(menuName))
-	{
-		item2ClassName[itemName] = className;
-		items.push_back(new QAction(this, itemName.c_str()));
-		items.back()->setText( itemName.c_str() );
-		items.back()->setMenuText( itemName.c_str() );
-		items.back()->setToolTip( ("Load plugin "+ClassFactory::instance().libNameToSystemName(className)).c_str() );
-		items.back()->addTo(getPopupMenu(menuName));
-		connect( items.back(), SIGNAL( activated() ), this, SLOT( dynamicMenuClicked() ) );
-	}
-}
-
-
-void YadeQtMainWindow::createMenus()
-{
-	vector<pair<string,QPopupMenu*> >::iterator mi    = menus.begin();
-	vector<pair<string,QPopupMenu*> >::iterator miEnd = menus.end();
-	for(;mi!=miEnd;++mi)
-		MenuBar->insertItem( QString((*mi).first), (*mi).second);
-
-}
-
-void YadeQtMainWindow::dynamicMenuClicked()
-{
-	QAction * action = (QAction*)(this->sender());
-	string name = action->text();
-	qtWidgets.push_back(ClassFactory::instance().createShared(item2ClassName[name]));
-
-	shared_ptr<QWidget> widget = dynamic_pointer_cast<QWidget>(qtWidgets.back());
-	if (widget) // the library is a QWidget so we set workspace as its parent
-	{
-		widget->show();
-	}
-}
-#endif
-
-
 
 void YadeQtMainWindow::closeSimulationControllerEvent() { deleteSimulationController(); }
 
