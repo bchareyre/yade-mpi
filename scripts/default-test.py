@@ -87,7 +87,7 @@ if reports:
 		s.connect()
 		s.sendmail(mailFrom,[mailTo],msg.as_string())
 		s.close()
-		print "Sent crash report to ",addr
+		print "Sent crash report to ",mailTo
 	else:
 		print "\n\n=================================== PROBLEM DETAILS ===================================\n"
 		print reportText
