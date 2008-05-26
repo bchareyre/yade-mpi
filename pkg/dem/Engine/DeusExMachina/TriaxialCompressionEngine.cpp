@@ -45,6 +45,7 @@ TriaxialCompressionEngine::TriaxialCompressionEngine() : actionForce(new Force)
 	firstRun=true;
 	previousSigmaIso=sigma_iso;
 	frictionAngleDegree = -1;
+	epsilonMax = 0.5;
 }
 
 TriaxialCompressionEngine::~TriaxialCompressionEngine()
@@ -77,6 +78,7 @@ void TriaxialCompressionEngine::registerAttributes()
 	REGISTER_ATTRIBUTE(sigmaLateralConfinement);
 	REGISTER_ATTRIBUTE(Key);
 	REGISTER_ATTRIBUTE(frictionAngleDegree);
+	REGISTER_ATTRIBUTE(epsilonMax);
 }
 
 void TriaxialCompressionEngine::doStateTransition(MetaBody * body, stateNum nextState){
@@ -225,7 +227,8 @@ void TriaxialCompressionEngine::applyCondition ( MetaBody * ncb )
 		}
 		// if (Omega::instance().getCurrentIteration() % 100 == 0) LOG_DEBUG("Compression active.");
 		Real dt = Omega::instance().getTimeStep();
-
+		
+		if (abs(epsilonMax) > abs(strain[1])) {
 		if ( currentStrainRate != strainRate ) currentStrainRate += ( strainRate-currentStrainRate ) *0.0003; // !!! if unloading (?)
 		//else currentStrainRate = strainRate;
 
@@ -234,6 +237,9 @@ void TriaxialCompressionEngine::applyCondition ( MetaBody * ncb )
 		p->se3.position += 0.5*currentStrainRate*height*translationAxis*dt;
 		p = static_cast<PhysicalParameters*> ( Body::byId ( wall_top_id )->physicalParameters.get() );
 		p->se3.position -= 0.5*currentStrainRate*height*translationAxis*dt;
+		} else {
+			Omega::instance().stopSimulationLoop();
+		}
 	}
 }
 
@@ -248,7 +254,7 @@ void TriaxialCompressionEngine::setContactProperties(MetaBody * ncb, Real fricti
 	{	
 		shared_ptr<Body> b = *bi;
 		if (b->isDynamic)
-		YADE_PTR_CAST<BodyMacroParameters> (b->physicalParameters)->frictionAngle = frictionAngleDegree * Mathr::PI/180.0;
+		YADE_PTR_CAST<BodyMacroParameters> (b->physicalParameters)->frictionAngle = frictionDegree * Mathr::PI/180.0;
 	}
 		
 	InteractionContainer::iterator ii    = ncb->transientInteractions->begin();

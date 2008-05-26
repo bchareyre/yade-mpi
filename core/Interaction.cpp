@@ -17,7 +17,9 @@ Interaction::Interaction ()
 	id2 = 0;
 	isNew = true;
 	isReal = false; // maybe we can remove this, and check if InteractingGeometry, and InteractionPhysics are empty?
-//	isNeighbor = true;NOTE : TriangulationCollider needs that
+	
+	isNeighbor = true;//NOTE : TriangulationCollider needs that
+
 }
 
 
@@ -25,7 +27,9 @@ Interaction::Interaction(body_id_t newId1,body_id_t newId2) : id1(newId1) , id2(
 {	
 	isNew = true;
 	isReal = false;
-//	isNeighbor = true;NOTE : TriangulationCollider needs that
+	isNeighbor = true;
+	isNeighbor = true;//NOTE : TriangulationCollider needs that
+
 }
 
 

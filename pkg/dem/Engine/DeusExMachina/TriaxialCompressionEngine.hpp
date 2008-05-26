@@ -62,6 +62,8 @@ class TriaxialCompressionEngine : public TriaxialStressController
 		Real sigmaIsoCompaction;
 		//! Desired isotropic pressure during the confined uniaxial test; may be different from sigmaIsoCompaction
 		Real sigmaLateralConfinement;
+		//! Value of axial deformation for which the simulation must stop
+		Real epsilonMax;
 		//! Value of friction to use for the compression test
 		Real frictionAngleDegree;
 		//! Previous state (used to detect manual changes of the state in .xml)

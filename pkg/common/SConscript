@@ -439,11 +439,11 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-common',[
 			'Engine/EngineUnit',
 			'DataClass/PhysicalParameters']),
 
-#	env.SharedLibrary('PersistentTriangulationCollider',
-#		['Engine/StandAloneEngine/PersistentTriangulationCollider.cpp'],
-#		LIBPATH=env['LIBPATH']+['/home/bruno/micromacro/KdevMicroMacro/src'],
-#		LIBS=env['LIBS']+['yade-base', 'TesselationWrapper', 'CGAL',  'InteractingSphere', 'RigidBodyParameters'],
-#		CPPPATH=env['CPPPATH']+['Engine/StandAloneEngine', '$PREFIX/include', '/home/bruno/micromacro/KdevMicroMacro/src']),
+	#env.SharedLibrary('PersistentTriangulationCollider',
+	#	['Engine/StandAloneEngine/PersistentTriangulationCollider.cpp'],
+	#	LIBPATH=env['LIBPATH']+['/home/bruno/micromacro/KdevMicroMacro/src'],
+	#	LIBS=env['LIBS']+['yade-base', 'TesselationWrapper', 'CGAL',  'InteractingSphere', 'RigidBodyParameters'],
+	#	CPPPATH=env['CPPPATH']+['Engine/StandAloneEngine', '$PREFIX/include', '/home/bruno/micromacro/KdevMicroMacro/src']),
     
 	env.SharedLibrary('SpatialQuickSortCollider' 
 	    ,['Engine/StandAloneEngine/SpatialQuickSortCollider.cpp']),

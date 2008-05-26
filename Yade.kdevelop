@@ -34,7 +34,7 @@
     </build>
     <make>
       <abortonerror>false</abortonerror>
-      <numberofjobs>2</numberofjobs>
+      <numberofjobs>10</numberofjobs>
       <prio>0</prio>
       <dontact>false</dontact>
       <makebin>scons</makebin>
@@ -42,7 +42,9 @@
       <makeoptions/>
       <selectedenvironment>default</selectedenvironment>
       <environments>
-        <default/>
+        <default>
+          <envvar value="localhost/1 192.168.27.125/2 192.168.27.91/1 192.168.23.204/2 192.168.27.201/2 192.168.27.118/2 194.254.65.169/2" name="DISTCC_HOSTS" />
+        </default>
       </environments>
     </make>
   </kdevcustomproject>
