@@ -42,7 +42,7 @@ if len(ver)>2: sconsVersion+=float(ver[2])
 ########## PROXY TO NEWER SCONS (DOWNLOADED IF NEEDED) ###################################
 ##########################################################################################
 #print sconsVersion
-if sconsVersion<9803.0:
+if sconsVersion<9803.0 and not os.environ.has_key('NO_SCONS_GET_RECENT'):
 	tgzParams=("http://kent.dl.sourceforge.net/sourceforge/scons/scons-local-0.98.3.tar.gz","/scons-local-0.98.3")
 	newPrefix="./scons-local";
 	newUrl,newDir=tgzParams[0],newPrefix+"/"+tgzParams[1]

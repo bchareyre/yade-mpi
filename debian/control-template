@@ -1,33 +1,33 @@
-Source: yade@_REVISION@
+Source: yade@_VERSION@
 Section: x11
 Priority: optional
 Maintainer: Vaclav Smilauer <eudoxos@arcig.cz>
 Build-Depends: debhelper (>= 5), scons, libqt3-mt-dev, qt3-dev-tools, freeglut3-dev, libboost-dev (>=1.34), libboost-date-time-dev (>=1.34), libboost-filesystem-dev (>=1.34), libboost-thread-dev (>=1.34), libboost-regex-dev (>=1.34), libboost-python-dev (>=1.34), libboost-iostreams-dev (>=1.34), liblog4cxx9-dev, docbook-to-man, python-scientific
 Standards-Version: 3.7.2
 
-Package: yade@_REVISION@
+Package: yade@_VERSION@
 Architecture: any
 Provides: yade@SNAPSHOT@
-Depends: ${shlibs:Depends}, ${misc:Depends}, python-scientific, ipython
+Depends: ${shlibs:Depends}, ${misc:Depends}, python-scientific, ipython, python-matplotlib
 Description: Platform for dynamical modeling.
  Yet Another Dynamic Engine. etc.
  .
  This package contains speed-optimized build of yade.
 
-Package: yade@_REVISION@-dbg
+Package: yade@_VERSION@-dbg
 Architecture: any
 Provides: yade@SNAPSHOT@-dbg
-Depends: ${shlibs:Depends}, ${misc:Depends}, python-scientific, ipython, gdb
+Depends: ${shlibs:Depends}, ${misc:Depends}, python-scientific, ipython, gdb, python-matplotlib
 Description: Platform for dynamical modeling.
  Yet Another Dynamic Engine. etc.
  .
  This package contains debug build of yade.
 
 
-Package: yade@_REVISION@-dev
+Package: yade@_VERSION@-dev
 Architecture: all
 Provides: yade@SNAPSHOT@-dev
-Recommends: yade@_REVISION@ | yade@_REVISION@-dbg
+Recommends: yade@_VERSION@ | yade@_VERSION@-dbg
 Depends: pkg-config
 Description: Platform for dynamical modeling.
  Yet Another Dynamic Engine. etc.

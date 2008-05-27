@@ -1,37 +1,31 @@
 #!/bin/sh
 # this script must be run from yade's top-level directory!
 #
-# if there is file RELEASE, it will be the version number ($REVISION) and SNAPSHOT will be empty.
+# if there is file RELEASE, it will be the version number ($VERSION) and SNAPSHOT will be empty.
+# Otherwise svn or bzr versioning information will be used. Errors out if RELEASE or .svn or .bzr don't exist.
 #
-# Othervwise svn or bzr versioning information will be used.
+# Takes one optional argument with the name of $DISTRIBUTION (default: unstable)
 #
-# Errors out if RELEASE or .svn or .bzr don't exist.
-#
-if [ -f RELEASE ]; then
-	REVISION=`cat RELEASE`
-	SNAPSHOT=""
-elif [ -d .svn ]; then
-	REVISION="svn$( svn info | egrep '^Revision:' | cut -f2 -d' ')"
-	SNAPSHOT="-snapshot"
-elif [ -d .bzr ]; then
-	REVISION="bzr$( bzr version-info | egrep '^revno:' | cut -f2 -d' ')"
-	SNAPSHOT="-snapshot"
-else
-	echo 'Revision could not be determined (RELEASE or .svn or .bzr)' >2
-	exit 1
+
+## DISTRIBUTION (first argument, otherwise the default "unstable")
+DISTRIBUTION=$1; [ -n "$DISTRIBUTION" ] || DISTRIBUTION="unstable"
+
+## VERSION (from RELEASE or svn or bzr)
+if [ -f RELEASE ]; then	VERSION=`cat RELEASE`; SNAPSHOT=""
+elif [ -d .svn ]; then VERSION="svn$( svn info | egrep '^Revision:' | cut -f2 -d' ')"; SNAPSHOT="-snapshot"
+elif [ -d .bzr ]; then VERSION="bzr$( bzr version-info | egrep '^revno:' | cut -f2 -d' ')"; SNAPSHOT="-snapshot"
+else echo 'Revision could not be determined (RELEASE or .svn or .bzr)' >2; exit 1;
 fi
-_REVISION="-$REVISION"
-echo $REVISION > REVISION
-cp debian/control-template debian/control
-perl -pi -e"s/\@REVISION\@/$REVISION/g" debian/control
-perl -pi -e"s/\@_REVISION\@/$_REVISION/g" debian/control
-perl -pi -e"s/\@SNAPSHOT\@/$SNAPSHOT/g" debian/control
+_VERSION="-$VERSION"; echo $VERSION > VERSION
+cp debian/control-template debian/control; perl -pi -e"s/\@VERSION\@/$VERSION/g" debian/control; perl -pi -e"s/\@_VERSION\@/$_VERSION/g" debian/control; perl -pi -e"s/\@SNAPSHOT\@/$SNAPSHOT/g" debian/control
 
+## debian/changelog
+DEBDATE=`date -R`
 cat <<EOF > debian/changelog
-yade$_REVISION (1) unstable; urgency=low
+yade$_VERSION (1) $DISTRIBUTION; urgency=low
 
-  * Building snapshots as separate debian packages.
+  * Mandatory debian changelog entry
 
- -- Vaclav Smilauer <eudoxos@arcig.cz>  Thu,  1 Jun 2007 12:44:19 +0100
+ -- Václav Šmilauer <eudoxos@arcig.cz>  $DEBDATE
 EOF
 

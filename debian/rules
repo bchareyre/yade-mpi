@@ -8,10 +8,8 @@
 
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
-export REVISION=`cat REVISION`
-export _REVISION=-${REVISION}
-
-
+export VERSION=`cat VERSION`
+export _VERSION=-${VERSION}
 
 
 ### eudoxos: FIXME: need to pass this to scons
@@ -37,45 +35,32 @@ build-stamp: configure-stamp
 	#$(MAKE)
 	## eudoxos: noting to be done here, will be done at the same time as installation
 	docbook-to-man debian/yade.sgml > yade.1
-
-	#echo "svn` svn info | egrep '^Revision:' | cut -f2 -d' ' `" > REVISION
-	#echo -`cat REVISION` > _REVISION ## will be used later on
-	#perl -pi~ -e"s/\byade(-svn[0-9]+)?([^-]|-dbg|-dev)\b/yade`cat _REVISION`\2/g" debian/control
-
 	touch $@
 
 clean:
 	dh_testdir
 	dh_testroot
 	rm -f build-stamp configure-stamp
-
-	# Add here commands to clean up after the build process.
-	##
-	#-$(MAKE) clean
 	## eudoxos: FIXME: scons skips config when cleaning and doesn't know where it built anything
-	#scons -c
 	dh_testdir
-	##TMP rm -rf debian/build-* debian/yade-*
-	##TMP rm -rf scons.config
-	#rm -rf REVISION _REVISION
-	##TMP dh_clean 
+	# scons clean
+	rm -rf debian/build-* debian/yade-*
+	rm -rf scons.profile* scons.current-profile
+	dh_clean 
 
 install: build
 	dh_testdir
 	dh_testroot
 	##TMP dh_clean -k 
 	dh_installdirs
-
-	## files REVISION and _REVISION contain snapshot version without/with leading '-' respectively (like svn1113 and -svn1113)
-
+	## files VERSION and _VERSION contain snapshot version without/with leading '-' respectively (like svn1113 and -svn1113)
 	### WARNING: !!!!!!!!!!!!! if this hangs later on, use fakeroot-tcp instead of fakeroot !!!!!!!!
-	## scons remembers settings, specify only those that have changed on subsequent invocations
 	#install headers
-	scons buildPrefix=debian runtimePREFIX=/usr PREFIX=debian/yade${_REVISION}-dev/usr variant='' version=${REVISION} useMiniWm3=1 exclude=realtime-rigidbody CPPPATH=/usr/include/wm3 debian/yade${_REVISION}-dev/usr/include
+	NO_SCONS_GET_RECENT= scons buildPrefix=debian runtimePREFIX=/usr PREFIX=debian/yade${_VERSION}-dev/usr variant='' version=${VERSION} exclude=realtime-rigidbody,mass-spring debian/yade${_VERSION}-dev/usr/include
 	#debug build
-	scons PREFIX=debian/yade${_REVISION}-dbg/usr variant=-dbg optimize=0 debug=1
+	NO_SCONS_GET_RECENT= scons PREFIX=debian/yade${_VERSION}-dbg/usr variant=-dbg optimize=0 debug=1
 	#optimized build
-	scons PREFIX=debian/yade${_REVISION}/usr variant='' optimize=1 debug=0
+	NO_SCONC_GET_RECENT= scons PREFIX=debian/yade${_VERSION}/usr variant="" optimize=1 debug=0
 
 
 # Build architecture-independent files here.
@@ -102,7 +87,7 @@ binary-arch: build install
 #	dh_installinfo
 	dh_installman
 	dh_link
-	## do NOT use this!!! debug builds need symbols, optimized builds don't have them already.
+	## do NOT use this!!! debug builds need symbols, optimized builds don't have them at all
 	#dh_strip
 	dh_compress
 	dh_fixperms
