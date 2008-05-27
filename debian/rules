@@ -54,13 +54,15 @@ install: build
 	##TMP dh_clean -k 
 	dh_installdirs
 	## files VERSION and _VERSION contain snapshot version without/with leading '-' respectively (like svn1113 and -svn1113)
-	### WARNING: !!!!!!!!!!!!! if this hangs later on, use fakeroot-tcp instead of fakeroot !!!!!!!!
+	### WARNING: !!!! with jobs>1, fakeroot may hang; 2 workarounds:
+	###   (a) use fakeroot-tcp instead of fakeroot
+	###   (b) say jobs=1
 	#install headers
-	NO_SCONS_GET_RECENT= scons buildPrefix=debian runtimePREFIX=/usr PREFIX=debian/yade${_VERSION}-dev/usr variant='' version=${VERSION} exclude=realtime-rigidbody,mass-spring debian/yade${_VERSION}-dev/usr/include
+	NO_SCONS_GET_RECENT= scons jobs=1 buildPrefix=debian runtimePREFIX=/usr PREFIX=debian/yade${_VERSION}-dev/usr variant='' version=${VERSION} exclude=realtime-rigidbody,mass-spring debian/yade${_VERSION}-dev/usr/include
 	#debug build
-	NO_SCONS_GET_RECENT= scons PREFIX=debian/yade${_VERSION}-dbg/usr variant=-dbg optimize=0 debug=1
+	NO_SCONS_GET_RECENT= scons jobs=1 PREFIX=debian/yade${_VERSION}-dbg/usr variant=-dbg optimize=0 debug=1
 	#optimized build
-	NO_SCONC_GET_RECENT= scons PREFIX=debian/yade${_VERSION}/usr variant="" optimize=1 debug=0
+	NO_SCONS_GET_RECENT= scons jobs=1 PREFIX=debian/yade${_VERSION}/usr variant="" optimize=1 debug=0
 
 
 # Build architecture-independent files here.

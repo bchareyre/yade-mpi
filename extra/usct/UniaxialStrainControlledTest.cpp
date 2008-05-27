@@ -67,7 +67,7 @@ void UniaxialStrainer::pushTransStrainSensors(MetaBody* rb, vector<Real>& widths
 	}
 	assert((sensorsPusher->subscribedBodies.size()==transStrainSensors.size()) && (sensorsPusher->subscribedBodies.size()==sensorsPusher->forces.size()));
 	Real forceMagnitude=.001*avgStress*transStrainSensorArea;
-	Real maxVelocity=2*strainRate*originalLength; // move at max 5 × faster than strained ends
+	Real maxVelocity=2*abs(strainRate)*originalLength; // move at max 5 × faster than strained ends
 	/* reset orientation to identity and limit velocity */
 	FOREACH(body_id_t id, transStrainSensors){
 		const shared_ptr<Body>& b=Body::byId(id); const shared_ptr<ParticleParameters>& pp=YADE_PTR_CAST<ParticleParameters>(b->physicalParameters);
