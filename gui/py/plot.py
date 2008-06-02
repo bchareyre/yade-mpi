@@ -7,7 +7,8 @@ Experimental, interface may change (even drastically).
 
 """
 import matplotlib
-# matplotlib.use('GtkCairo')
+matplotlib.use('TkAgg') #GtkCairo
+#matplotlib.use('QtAgg') #GtkCairo
 matplotlib.rc('axes',grid=True) # put grid in all figures
 import pylab
 
@@ -73,15 +74,22 @@ def fillNonSequence(o):
 #			pylab.axi
 #		fignum+=1
 
-import threading,gtk
+useGtkThread=False
+
+if useGtkThread:
+	import threading,gtk
 
 def killPlots():
+	print "Clear figures"
 	pylab.clf() # clear figures
 	needsFullReplot=True
+	return
 	for t in [t for t in threading.enumerate() if t.getName()=='Thread-plots']:
 		print "GTK quit"
 		gtk.main_quit()
 
+def plot(): fullPlot()
+def show(): fullPlot()
 def fullPlot(): makePlot(update=False)
 def updatePlot():
 	raise RuntimeError("Updating plot not supported in non-interactive mode!")
@@ -95,13 +103,25 @@ def updatePlot():
 def minMax(l): return [min(l),max(l)]
 
 def makePlot(update=False):
-	fignum=0 # figure counter
+	fignum=0 #figure counter
+	pylab.clf()
+	for p in plots:
+		#print p,fignum,plots[p]
+		pylab.figure(fignum)
+		#print "2"; pylab.ioff() # turn off interactive mode
+		plots_p=[fillNonSequence(o) for o in plots[p]]
+		pylab.plot(*sum([[data[p],data[d[0]],d[1]] for d in plots_p],[]))
+		pylab.legend([_p[0] for _p in plots_p])
+		pylab.xlabel(p)
+		fignum+=1
+	#print "4"
+	pylab.show()
+	#print "5"
+	return
+
 	if not update:
-		killPlots() # quit gkt main loop so that GUi is not blocked
-		pylab.clf() # clear figures, if any
-		global needsFullReplot
-		needsFullReplot=False
-		print "FULL plot"
+		print "KILLING plots"
+		killPlots()
 	for p in plots:
 		print p,fignum,plots[p]
 		pylab.figure(fignum)
@@ -111,6 +131,11 @@ def makePlot(update=False):
 			for i in range(len(plots_p)): plotLines[p][i].set_data(data[p],data[plots_p[i][0]])
 			pylab.axis(minMax(data[p])+minMax(sum([data[d[0]] for d in plots_p],[])))
 		else:
+			#for d in plots_p:
+			#	print d
+			#	print data[p]
+			#	print data[d[0]]
+			#	print d[1]
 			plotLines[p]=pylab.plot(*sum([[data[p],data[d[0]],d[1]] for d in plots_p],[]))
 		pylab.legend([_p[0] for _p in plots_p])
 		pylab.xlabel(p)
@@ -119,8 +144,6 @@ def makePlot(update=False):
 	if not update:
 		pylab.show()
 		#threading.Thread(target=pylab.show,name='Thread-plots').start() # works with GTK, cool! (will it work inside yade, though?!)
-def show():
-	fullPlot()
 	
 import random
 if __name__ == "__main__":

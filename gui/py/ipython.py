@@ -10,7 +10,7 @@ def yade_completers(self, event):
 	objName=event.line.split('[')[0]
 	# print objName
 	obj=eval(objName)
-	print str(type(obj))
+	# print str(type(obj))
 	if 'yade.wrapper.' in str(type(obj)):
 		return obj.keys()
 import IPython.ipapi

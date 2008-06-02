@@ -36,6 +36,7 @@ SimulationController::SimulationController(QWidget * parent) : QtGeneratedSimula
 {
 	sync=false;
 	refreshTime = 40;
+	changeTimeStep=false;
 
 	iterPerSec_LastIter=Omega::instance().getCurrentIteration();
 	iterPerSec_LastLocalTime=microsec_clock::local_time();
@@ -370,7 +371,7 @@ void SimulationController::doUpdate(){
 	// does someone need to display that with more precision than integer?
 	long iterPerSec_LastAgo_ms=(microsec_clock::local_time()-iterPerSec_LastLocalTime).total_milliseconds();
 	if(iterPerSec_LastAgo_ms>iterPerSec_TTL_ms){
-		iterPerSec=(1000*(Omega::instance().getCurrentIteration()-iterPerSec_LastIter))/iterPerSec_LastAgo_ms;
+		iterPerSec=(1000.*(Omega::instance().getCurrentIteration()-iterPerSec_LastIter))/iterPerSec_LastAgo_ms;
 		iterPerSec_LastIter=Omega::instance().getCurrentIteration();
 		iterPerSec_LastLocalTime=microsec_clock::local_time();
 	}
@@ -379,14 +380,16 @@ void SimulationController::doUpdate(){
 	snprintf(strIter,64,"iter #%ld, %.1f/s",Omega::instance().getCurrentIteration(),iterPerSec);
 	controller->labelIter->setText(strIter);
 
-	if (controller->changeSkipTimeStepper)
-			Omega::instance().skipTimeStepper(controller->skipTimeStepper);
-
-	if (controller->changeTimeStep)
-	{
+	if (controller->changeSkipTimeStepper) Omega::instance().skipTimeStepper(controller->skipTimeStepper);
+	if (controller->changeTimeStep) {
 		Real second = (Real)(controller->sbSecond->value());
 		Real powerSecond = (Real)(controller->sb10PowerSecond->value());
 		Omega::instance().setTimeStep(second*Mathr::Pow(10,powerSecond));
+	} else {
+		Real dt=Omega::instance().getTimeStep();
+		int exp10=floor(log10(dt));
+		controller->sb10PowerSecond->setValue(exp10);
+		controller->sbSecond->setValue((int)(.1+dt/(pow((float)10,exp10)))); // .1: rounding issues
 	}
 
 	char strStep[64];
@@ -395,6 +398,8 @@ void SimulationController::doUpdate(){
 
 	controller->changeSkipTimeStepper = false;
 	controller->changeTimeStep = false;
+
+	//cerr<<"dt="<<dt<<",exp10="<<exp10<<",10^exp10="<<pow((float)10,exp10)<<endl;
 
 	/* enable/disable controls here, dynamically */
 	bool hasSimulation=(Omega::instance().getRootBody() ? Omega::instance().getRootBody()->bodies->size()>0 : false ),
@@ -409,6 +414,6 @@ void SimulationController::doUpdate(){
 	controller->pbOneSimulationStep->setEnabled(hasSimulation && !isRunning);
 	controller->rbTimeStepper->setEnabled(hasTimeStepper);
 	controller->rbFixed->setChecked(!usesTimeStepper);
-	controller->rbFixed->setChecked(usesTimeStepper);
+	controller->rbTimeStepper->setChecked(usesTimeStepper);
 }
 

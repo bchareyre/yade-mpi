@@ -42,6 +42,7 @@
 #include<yade/pkg-common/PhysicalActionApplier.hpp>
 #include<yade/pkg-common/MetaInteractingGeometry.hpp>
 #include<yade/pkg-common/AABB.hpp>
+#include<yade/pkg-common/ParticleParameters.hpp>
 
 #include<yade/pkg-common/BoundingVolumeEngineUnit.hpp>
 #include<yade/pkg-common/GeometricalModelEngineUnit.hpp>
@@ -278,7 +279,7 @@ class pyOmega{
 	pyOmega(){
 		shared_ptr<MetaBody> rb=OMEGA.getRootBody();
 		assert(rb);
-		if(!rb->physicalParameters){rb->physicalParameters=shared_ptr<PhysicalParameters>(new PhysicalParameters);}
+		if(!rb->physicalParameters){rb->physicalParameters=shared_ptr<PhysicalParameters>(new ParticleParameters);} /* PhysicalParameters crashes PhysicalParametersMetaEngine... why? */
 		if(!rb->boundingVolume){rb->boundingVolume=shared_ptr<AABB>(new AABB);}
 		if(!rb->interactingGeometry){rb->interactingGeometry=shared_ptr<MetaInteractingGeometry>(new MetaInteractingGeometry);}
 		//if(!OMEGA.getRootBody()){shared_ptr<MetaBody> mb=Shop::rootBody(); OMEGA.setRootBody(mb);}

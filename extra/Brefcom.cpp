@@ -52,7 +52,7 @@ void BrefcomMakeContact::go(const shared_ptr<PhysicalParameters>& pp1, const sha
 			/* epsCracking */ sigmaT/E12,
 			/* epsFracture */ 5*sigmaT/E12,
 			/* expBending */ expBending,
-			/* xiShear*/ 0.6
+			/* xiShear*/ xiShear
 			));
 		contPhys->prevNormal=contGeom->normal;
 		if(cohesiveThresholdIter<0 || Omega::instance().getCurrentIteration()<cohesiveThresholdIter) contPhys->isCohesive=true;

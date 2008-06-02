@@ -89,7 +89,7 @@ class UniaxialStrainer: public DeusExMachina {
 		Real limitStrain;
 		//! Flag whether the sense of straining has already been reversed
 		bool notYetReversed;
-		Real sumPosForces,sumNegForces,avgStress;
+		Real sumPosForces,sumNegForces;
 		//! crossSection perpendicular to he strained axis, computed from AABB of MetaBody
 		Real crossSectionArea,transStrainSensorArea;
 		//! Apply strain along x (0), y (1) or z(2) axis
@@ -114,6 +114,9 @@ class UniaxialStrainer: public DeusExMachina {
 		 * */
 		vector<body_id_t> transStrainSensors;
 
+		//! Auxiliary vars (serializable, for recording)
+		Real strain, avgStress, avgTransStrain;
+
 		virtual void applyCondition(MetaBody* rootBody);
 		UniaxialStrainer(){axis=2; asymmetry=0; currentStrainRate=0; originalLength=-1; limitStrain=0; notYetReversed=true; crossSectionArea=-1; needsInit=true; clumped=false; sensorsPusher=shared_ptr<UniaxialStrainSensorPusher>(); recordFile="/tmp/usct.data"; };
 		virtual ~UniaxialStrainer(){};
@@ -133,8 +136,12 @@ class UniaxialStrainer: public DeusExMachina {
 			REGISTER_ATTRIBUTE(transStrainSensorArea);
 			REGISTER_ATTRIBUTE(transStrainSensors);
 			REGISTER_ATTRIBUTE(recordFile);
+			REGISTER_ATTRIBUTE(strain);
+			REGISTER_ATTRIBUTE(avgStress);
+			REGISTER_ATTRIBUTE(avgTransStrain);
 		}
-		void postProcessAttributes(bool deserializing){ if(deserializing) recStream.open(recordFile.c_str()); } 	
+		void prepareRecStream(void){ if(recordFile!="") recStream.open(recordFile.c_str()); }
+		void postProcessAttributes(bool deserializing){ if(deserializing) prepareRecStream(); } 	
 	NEEDS_BEX("Force","Momentum","GlobalStiffness");
 	REGISTER_CLASS_NAME(UniaxialStrainer);
 	REGISTER_BASE_CLASS_NAME(DeusExMachina);

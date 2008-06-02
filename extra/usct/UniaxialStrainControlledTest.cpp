@@ -45,6 +45,8 @@ void UniaxialStrainer::init(){
 	assert(crossSectionArea>0);
 
 	setupTransStrainSensors();
+
+	prepareRecStream();
 }
 
 /* Initialize UniaxialStrainSensorPusher so that subscribed bodies and forces are consistent.
@@ -66,7 +68,7 @@ void UniaxialStrainer::pushTransStrainSensors(MetaBody* rb, vector<Real>& widths
 		//TRVAR3(transStrainSensors.size(),sensorsPusher->subscribedBodies.size(),sensorsPusher->forces.size());
 	}
 	assert((sensorsPusher->subscribedBodies.size()==transStrainSensors.size()) && (sensorsPusher->subscribedBodies.size()==sensorsPusher->forces.size()));
-	Real forceMagnitude=.001*avgStress*transStrainSensorArea;
+	Real forceMagnitude=.001*abs(avgStress)*transStrainSensorArea;
 	Real maxVelocity=2*abs(strainRate)*originalLength; // move at max 5 × faster than strained ends
 	/* reset orientation to identity and limit velocity */
 	FOREACH(body_id_t id, transStrainSensors){
@@ -80,7 +82,7 @@ void UniaxialStrainer::pushTransStrainSensors(MetaBody* rb, vector<Real>& widths
 		int transAxis=(axis+i)%3, perpTransAxis=(i==1?(axis+2)%3:/* i==2 */ (axis+1)%3);
 		Vector3r F; F[axis]=0; F[perpTransAxis]=0; F[transAxis]=forceMagnitude;
 		body_id_t n1=2*(i-1), n2=2*(i-1)+1;
-		sensorsPusher->forces[n1]=-F; sensorsPusher->forces[n2]=+F;
+		sensorsPusher->forces[n1]=+F; sensorsPusher->forces[n2]=-F;
 		const shared_ptr<Body>& lo=Body::byId(transStrainSensors[n1]), hi=Body::byId(transStrainSensors[n2]);
 		Real wd=hi->physicalParameters->se3.position[transAxis]-lo->physicalParameters->se3.position[transAxis]-static_pointer_cast<Box>(hi->geometricalModel)->extents[transAxis]-static_pointer_cast<Box>(lo->geometricalModel)->extents[transAxis];
 		// negative width? Apply no more force, reset velocity to 0
@@ -159,20 +161,20 @@ void UniaxialStrainer::applyCondition(MetaBody* rootBody){
 	}
 
 	Real axialLength=axisCoord(posIds[0])-axisCoord(negIds[0]);
-	Real strain=axialLength/originalLength-1;
+	strain=axialLength/originalLength-1;
 	if(Omega::instance().getCurrentIteration()%400==0) TRVAR5(dAX,axialLength,originalLength,currentStrainRate,strain);
 
 	// reverse if we're over the limit strain
 	if(notYetReversed && limitStrain!=0 && ((currentStrainRate>0 && strain>limitStrain) || (currentStrainRate<0 && strain<limitStrain))) { currentStrainRate*=-1; notYetReversed=false; LOG_INFO("Reversed strain rate to "<<currentStrainRate); }
 
-	if(Omega::instance().getCurrentIteration()%50==0 && recStream.good()) {
+	if(Omega::instance().getCurrentIteration()%50==0 ) {
 		computeAxialForce(rootBody);
 		vector<Real> widths;
 		pushTransStrainSensors(rootBody,widths);
 		assert(widths.size()==originalWidths.size());
-		Real avgTransStrain; for(size_t i=0; i<widths.size(); i++) avgTransStrain+=(widths[i]/originalWidths[i]-1); avgTransStrain/=widths.size();
+		for(size_t i=0; i<widths.size(); i++) avgTransStrain+=(widths[i]/originalWidths[i]-1); avgTransStrain/=widths.size();
 		avgStress=(sumPosForces+sumNegForces)/(2*crossSectionArea); // average nominal stress
-		recStream<<Omega::instance().getCurrentIteration()<<" "<<strain<<" "<<avgStress<<" "<<avgTransStrain<<endl;
+		if(recStream.good()) recStream<<Omega::instance().getCurrentIteration()<<" "<<strain<<" "<<avgStress<<" "<<avgTransStrain<<endl;
 	}
 }
 

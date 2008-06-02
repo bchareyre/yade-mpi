@@ -38,7 +38,7 @@ class BrefcomContact: public InteractionPhysics {
 		Real omega, Fn, sigmaN, epsN;
 
 		BrefcomContact(): InteractionPhysics(),E(0), G(0), tanFrictionAngle(0), undamagedCohesion(0), equilibriumDist(0), crossSection(0), expBending(0), xiShear(0) { createIndex(); epsT=Vector3r::ZERO; kappaD=0; isCohesive=false; }
-		BrefcomContact(Real _E, Real _G, Real _tanFrictionAngle, Real _undamagedCohesion, Real _equilibriumDist, Real _crossSection, Real _epsCracking, Real _epsFracture, Real _expBending, Real _xiShear=.3): InteractionPhysics(), E(_E), G(_G), tanFrictionAngle(_tanFrictionAngle), undamagedCohesion(_undamagedCohesion), equilibriumDist(_equilibriumDist), crossSection(_crossSection), epsCracking(_epsCracking), epsFracture(_epsFracture), expBending(_expBending), xiShear(_xiShear) { epsT=Vector3r::ZERO; kappaD=0; isCohesive=false; omega=0; Fn=0; /*TRVAR5(epsCracking,epsFracture,Kn,crossSection,equilibriumDist); */ }
+		BrefcomContact(Real _E, Real _G, Real _tanFrictionAngle, Real _undamagedCohesion, Real _equilibriumDist, Real _crossSection, Real _epsCracking, Real _epsFracture, Real _expBending, Real _xiShear=.6): InteractionPhysics(), E(_E), G(_G), tanFrictionAngle(_tanFrictionAngle), undamagedCohesion(_undamagedCohesion), equilibriumDist(_equilibriumDist), crossSection(_crossSection), epsCracking(_epsCracking), epsFracture(_epsFracture), expBending(_expBending), xiShear(_xiShear) { epsT=Vector3r::ZERO; kappaD=0; isCohesive=false; omega=0; Fn=0; /*TRVAR5(epsCracking,epsFracture,Kn,crossSection,equilibriumDist); */ }
 
 
 		void registerAttributes(){
@@ -146,7 +146,7 @@ class BrefcomMakeContact: public InteractionPhysicsEngineUnit{
 		 * which would define just those in addition to the elastic ones.
 		 * This might be done later, for now hardcode that here. */
 		/* uniaxial traction resistance, uniaxial compression resistance, fracture energy, strain at complete fracture (calibrated in the constructor), bending parameter of the damage evolution law */
-		Real sigmaT, sigmaC, /* Griffith's fracture energy */ Gf, expBending;
+		Real sigmaT, sigmaC, /* Griffith's fracture energy */ Gf, expBending, xiShear;
 		//! Should new contacts be cohesive? They will before this iter#, they will not be afterwards. If 0, they will never be. If negative, they will always be created as cohesive.
 		long cohesiveThresholdIter;
 
@@ -181,6 +181,7 @@ class BrefcomMakeContact: public InteractionPhysicsEngineUnit{
 			REGISTER_ATTRIBUTE(cohesiveThresholdIter);
 			//REGISTER_ATTRIBUTE(calibratedEpsFracture);
 			REGISTER_ATTRIBUTE(expBending);
+			REGISTER_ATTRIBUTE(xiShear);
 			/* REGISTER_ATTRIBUTE(sigmaT);
 			REGISTER_ATTRIBUTE(sigmaC);
 			REGISTER_ATTRIBUTE(Gf); */
