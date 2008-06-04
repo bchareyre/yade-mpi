@@ -149,22 +149,6 @@
             </widget>
             <widget class="QPushButton">
                 <property name="name">
-                    <cstring>pbLoadSimulation</cstring>
-                </property>
-                <property name="geometry">
-                    <rect>
-                        <x>10</x>
-                        <y>10</y>
-                        <width>72</width>
-                        <height>33</height>
-                    </rect>
-                </property>
-                <property name="text">
-                    <string>Load</string>
-                </property>
-            </widget>
-            <widget class="QPushButton">
-                <property name="name">
                     <cstring>pbSaveSimulation</cstring>
                 </property>
                 <property name="geometry">
@@ -387,6 +371,22 @@
                     <number>40</number>
                 </property>
             </widget>
+            <widget class="QPushButton">
+                <property name="name">
+                    <cstring>pbLoadSimulation</cstring>
+                </property>
+                <property name="geometry">
+                    <rect>
+                        <x>10</x>
+                        <y>10</y>
+                        <width>72</width>
+                        <height>33</height>
+                    </rect>
+                </property>
+                <property name="text">
+                    <string>Load</string>
+                </property>
+            </widget>
             <widget class="QButtonGroup">
                 <property name="name">
                     <cstring>timestep</cstring>
@@ -420,6 +420,9 @@
                     <property name="text">
                         <string>Fixed step</string>
                     </property>
+                    <property name="buttonGroupId">
+                        <number>2</number>
+                    </property>
                 </widget>
                 <widget class="QRadioButton">
                     <property name="name">
@@ -438,6 +441,9 @@
                     </property>
                     <property name="text">
                         <string>Time stepper</string>
+                    </property>
+                    <property name="buttonGroupId">
+                        <number>0</number>
                     </property>
                 </widget>
             </widget>
@@ -780,6 +786,12 @@
         <signal>clicked()</signal>
         <receiver>QtGeneratedSimulationController</receiver>
         <slot>pbSaveClicked()</slot>
+    </connection>
+    <connection>
+        <sender>timestep</sender>
+        <signal>clicked(int)</signal>
+        <receiver>QtGeneratedSimulationController</receiver>
+        <slot>bgTimeStepClicked(int)</slot>
     </connection>
 </connections>
 <includes>

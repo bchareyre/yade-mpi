@@ -265,7 +265,9 @@ void SimulationController::closeEvent(QCloseEvent *)
 
 void SimulationController::bgTimeStepClicked(int i)
 {
-	switch (i) // FIXME wtf ? (code written by Olivier)
+	// cerr<<"CHANGING TIME STEP: i="<<i<<endl;
+	/* i: buttonGroupId, which is 0 for timeStepper, 2 for fixed step */
+	switch (i)
 	{
 		case 0 : //Use timeStepper
 			changeSkipTimeStepper = true;
@@ -413,7 +415,8 @@ void SimulationController::doUpdate(){
 	controller->pbResetSimulation->setEnabled(hasSimulation && hasFileName);
 	controller->pbOneSimulationStep->setEnabled(hasSimulation && !isRunning);
 	controller->rbTimeStepper->setEnabled(hasTimeStepper);
-	controller->rbFixed->setChecked(!usesTimeStepper);
-	controller->rbTimeStepper->setChecked(usesTimeStepper);
+	// conditionals only avoid setting the state that is already set, to avoid spurious signals
+	if(controller->rbFixed->isChecked()==usesTimeStepper) controller->rbFixed->setChecked(!usesTimeStepper);
+	if(controller->rbTimeStepper->isChecked()!=usesTimeStepper) controller->rbTimeStepper->setChecked(usesTimeStepper);
 }
 
