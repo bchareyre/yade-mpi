@@ -30,7 +30,7 @@ void QtSimulationPlayer::pbInputConfigFileClicked()
 	string selectedFilter;
 	std::vector<string> filters;
 	filters.push_back("XML Yade File (*.xml)");
-	string fileName = FileDialog::getOpenFileName(".", filters, "Choose a file to load", this->parentWidget()->parentWidget(),selectedFilter );
+	string fileName = FileDialog::getOpenFileName(".", filters, "Choose a file to load",NULL,selectedFilter );
  
 	if (!fileName.empty() && selectedFilter == "XML Yade File (*.xml)")
 		leInputConfigFile->setText(fileName);
@@ -40,7 +40,7 @@ void QtSimulationPlayer::pbInputConfigFileClicked()
 
 void QtSimulationPlayer::pbInputDirectoryClicked()
 {
-	string directory = FileDialog::getExistingDirectory ( ".","Choose the directory where the recorded file are", this->parentWidget()->parentWidget());
+	string directory = FileDialog::getExistingDirectory ( ".","Choose the directory where the recorded file are", NULL );
 	if (!directory.empty())
 		leInputDirectory->setText(directory);
 }
@@ -56,7 +56,7 @@ void QtSimulationPlayer::pbLoadClicked()
 
 void QtSimulationPlayer::pbOutputDirectoryClicked()
 {
-	string directory = FileDialog::getExistingDirectory ( ".","Choose the directory where to save the snapshots", this->parentWidget()->parentWidget());
+	string directory = FileDialog::getExistingDirectory ( ".","Choose the directory where to save the snapshots", NULL );
 	if (!directory.empty())
 		leOutputDirectory->setText(directory.c_str());
 
