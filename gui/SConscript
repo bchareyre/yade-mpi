@@ -1,6 +1,9 @@
 # vim:syntax=python
 Import('*')
 
+if 'EMBED_PYTHON' in env['CPPDEFINES']: linkPythonUI=['PythonUI']
+else: linkPythonUI=[]
+
 if 'qt3' not in env['exclude']:
 	env.Install('$PREFIX/lib/yade$SUFFIX/gui',[
 		env.SharedLibrary('QtGUI',
@@ -31,8 +34,7 @@ if 'qt3' not in env['exclude']:
 				'XMLFormatManager',
 				'yade-serialization-qt',
 				'PositionOrientationRecorder',
-				'PythonUI',
-				'$QGLVIEWER_LIB'],
+				'$QGLVIEWER_LIB']+linkPythonUI,
 			CPPPATH=env['CPPPATH']+['qt3']),
 	])
 
