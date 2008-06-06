@@ -55,12 +55,6 @@
 
 #include<yade/extra/Shop.hpp>
 
-#ifdef USE_PYGLVIEWER
-	#include"GLViewer4.hpp"
-	#include<Qt/qapplication.h>
-	#include<Qt/qthread.h>
-#endif
-
 using namespace boost;
 using namespace std;
 
@@ -383,6 +377,19 @@ class pyOmega{
 	python::list initializers_get(void){assertRootBody(); return anyEngines_get(OMEGA.getRootBody()->initializers);}
 	void initializers_set(python::object egs){assertRootBody(); anyEngines_set(OMEGA.getRootBody()->initializers,egs);}
 
+	python::object labeled_engine_get(string label){
+		FOREACH(const shared_ptr<Engine>& eng, OMEGA.getRootBody()->engines){
+			if(eng->label==label){
+				#define RETURN_ENGINE_IF_POSSIBLE(engineType,pyEngineType) { shared_ptr<engineType> e=dynamic_pointer_cast<engineType>(eng); if(e) return python::object(pyEngineType(e)); }
+				RETURN_ENGINE_IF_POSSIBLE(MetaEngine,pyMetaEngine);
+				RETURN_ENGINE_IF_POSSIBLE(StandAloneEngine,pyStandAloneEngine);
+				RETURN_ENGINE_IF_POSSIBLE(DeusExMachina,pyDeusExMachina);
+				throw std::runtime_error("Unable to cast engine to MetaEngine, StandAloneEngine or DeusExMachina? ??");
+			}
+		}
+		throw std::invalid_argument(string("No engine labeled `")+label+"'");
+	}
+
 
 	void wait(){ if(OMEGA.isRunning()){LOG_DEBUG("WAIT!");} while(OMEGA.isRunning()) usleep(50000 /*20 ms*/); }
 	
@@ -409,101 +416,6 @@ class pySTLImporter : public STLImporter {
 
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(STLImporter_import_overloads,py_import,1,2);
 
-#ifdef USE_PYGLVIEWER 
-/*! GL viewer wrapper, with full attribute access. CURRENTLY DOESN'T EVEN COMPILE!!!
- *
- * Creates the 3D view on instantiation. Currently displays nothing (why???), although it redraws just fine.
- * Has many bugs: multiple views will lead to crash, explicit delete crashes (somewhere in qt) as well.
- */
-class pyGLViewer{
-	//DECLARE_LOGGER;
-	shared_ptr<RenderingEngine> renderer;
-	shared_ptr<GLViewer4> viewer;
-#if 0
-	shared_ptr<boost::thread> redrawThread,appThread;
-	QApplication* app;
-	void redrawAlarm(void){
-		while(true){
-			//Omega::instance().stopSimulationLoop();
-			viewer->updateGL();
-			//Omega::instance().startSimulationLoop();
-			usleep(10000000);
-		}
-	}
-#endif 
-	class DrawThread: public QThread{
-		//Q_OBJECT;
-		const shared_ptr<GLViewer4> vw;
-		shared_ptr<QTimer> timer;
-		public:
-			DrawThread(shared_ptr<GLViewer4> _viewer): vw(_viewer){}
-			virtual void run(){
-				LOG_WARN("drawThread::run() with viewer "<<vw);
-				timer=shared_ptr<QTimer>(new QTimer());
-				connect(timer.get(),SIGNAL(timeout()),vw.get(),SLOT(callUpdateGL()));
-				timer->start(100);
-				//while(true){ cerr<<"@"; vw->updateGL(); usleep(50000);}
-				exec();
-			};
-		//public slots:
-		//	void updateGL(){cerr<<"@";}
-	};
-	shared_ptr<AttrAccess> accessor;
-	void ensureAcc(){if(!accessor)accessor=shared_ptr<AttrAccess>(new AttrAccess(renderer));}
-	shared_ptr<DrawThread> drawThread;
-public:
-	DECLARE_LOGGER;
-	ATTR_ACCESS_CXX(accessor,ensureAcc);	
-	pyGLViewer(){
-		//throw std::runtime_error("Programming error: Threading in pyGLViewer is broken and crashes; ignored.");
-		// LOG_WARN("Thread locking not correctly implemented, will pause Omega for redraw every 10s instead!");
-		shared_ptr<Factorable> _renderer=ClassFactory::instance().createShared("OpenGLRenderingEngine");
-		renderer=static_pointer_cast<RenderingEngine>(_renderer);
-
-		/* this is broken:
-			Type of instance is: 15RenderingEngine
-			RuntimeError: Cannot determine type with findType()
-		*/
-		#if 0
-		if(renderer){// TODO: handle exceptions
-			filesystem::path rendererConfig=filesystem::path(Omega::instance().yadeConfigPath+"/OpenGLRendererPref.xml");
-			if(filesystem::exists(rendererConfig)){
-				try{IOFormatManager::loadFromFile("XMLFormatManager",rendererConfig.string(),"renderer",renderer);}
-				catch(SerializableError& e){LOG_WARN("Unable to load renderer preferences from `"<<rendererConfig.string()<<"': "<<e.what());}
-			}
-		} else throw runtime_error("Unable to create renderer!");
-		#endif
-		if(!renderer) throw runtime_error("Unable to create renderer!");
-
-		int viewId=0;
-		//if(viewId==0){	int _argc=0; char _argvv[]="foo"; app=new QApplication(_argc,(char**) &_argvv);}
-		//app->setMainWidget(viewer.get());
-		int _argc=0; char _argvv[]="foo"; //QApplication* app=new 
-		QApplication* app=new QApplication(_argc,(char**) &_argvv);
-
-		QGLFormat format;	QGLFormat::setDefaultFormat(format); format.setStencil(TRUE); format.setAlpha(TRUE);
-		viewer=shared_ptr<GLViewer4>(new GLViewer4(viewId,renderer,format,/*parent*/0,0/* non-primary views will have to share widgets, though */)); //
-		viewer->setWindowTitle("GL Viewer");
-		viewer->centerScene();
-		viewer->show();
-		drawThread=shared_ptr<DrawThread>(new DrawThread(viewer));
-		drawThread->start(); // is the same as DrawThread->run() except for check that it isn't running already?!
-
-		/*if(viewId==0){
-			app->setMainWidget(viewer.get());
-			redrawThread=shared_ptr<boost::thread>(new boost::thread(boost::bind(&pyGLViewer::redrawAlarm,this)));
-		}
-		appThread=shared_ptr<boost::thread>(new boost::thread(boost::bind(&QApplication::exec,app))); */
-	}
-	~pyGLViewer(){// redrawThread and appThread deleted by the descructor
-		//viewer->close();
-		//app->quit();
-	}
-};
-CREATE_LOGGER(pyGLViewer);
-#endif /* USE_PYGLVIEWER */
-
-
 BOOST_PYTHON_MODULE(wrapper)
 {
 	/* http://mail.python.org/pipermail/c++-sig/2004-March/007025.html
@@ -529,6 +441,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("step",&pyOmega::step)
 		.def("wait",&pyOmega::wait)
 		.def("reset",&pyOmega::reset)
+		.def("labeledEngine",&pyOmega::labeled_engine_get)
 		.add_property("engines",&pyOmega::engines_get,&pyOmega::engines_set)
 		.add_property("miscParams",&pyOmega::miscParams_get,&pyOmega::miscParams_set)
 		.add_property("initializers",&pyOmega::initializers_get,&pyOmega::initializers_set)
@@ -552,19 +465,6 @@ BOOST_PYTHON_MODULE(wrapper)
 	boost::python::class_<pyPhysicalActionContainer>("ActionContainer",python::init<pyPhysicalActionContainer&>())
 		.def("__getitem__",&pyPhysicalActionContainer::pyGetitem);
 	
-
-//	boost::python::class_<pyBodyContainer>("BodyContainer",python::init<pyBodyContainer&>())
-//		.def("__getitem__",&pyBodyContainer::pyGetitem);
-
-		#if 0
-			.def("oneStep",&oneStep)
-			.def("newView", &newView)
-			.def("centerScene", &centerScene)
-		#endif
-#ifdef USE_PYGLVIEWER
-	boost::python::class_<pyGLViewer>("View")
-		.ATTR_ACCESS_PY(pyGLViewer);
-#endif
 
 	BASIC_PY_PROXY_WRAPPER(pyStandAloneEngine,"StandAloneEngine");
 	BASIC_PY_PROXY_WRAPPER(pyMetaEngine,"MetaEngine")

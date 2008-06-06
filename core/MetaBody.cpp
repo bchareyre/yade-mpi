@@ -34,6 +34,8 @@ MetaBody::MetaBody() :
 	recoverStopAtIteration=1;
 	recoverSimulationTime=1;
 
+	isDynamic=false;
+
 	dt=1e-8;
 }
 

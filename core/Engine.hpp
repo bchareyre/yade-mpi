@@ -19,6 +19,7 @@ class Body;
 class Engine : public Serializable
 {
 	public :
+		string label; /* user-definable label, to convenienty retrieve this particular engine instance even if multiple engines of the same type exist */
 		Engine() {};
 		virtual ~Engine() {};
 	
@@ -26,6 +27,7 @@ class Engine : public Serializable
 		virtual void action(MetaBody*) { throw; };
 		/* returns all BodyExternalVariable's (Bex; formerly PhysicalActions) that this engine needs */
 		virtual list<string> getNeededBex(){return list<string>();}
+		virtual void registerAttributes(){REGISTER_ATTRIBUTE(label);}
 
 	REGISTER_CLASS_NAME(Engine);
 	REGISTER_BASE_CLASS_NAME(Serializable);

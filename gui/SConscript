@@ -42,7 +42,7 @@ if 'EMBED_PYTHON' in env['CPPDEFINES']:
 	env.Install('$PREFIX/lib/yade$SUFFIX/gui',[
 		env.SharedLibrary('PythonUI',['py/PythonUI.cpp']),
 		env.File('PythonUI_rc.py','py'),
-		env.SharedLibrary('PlotDataGetter',['py/PlotDataGetter.cpp']),
+		# env.SharedLibrary('PlotDataGetter',['py/PlotDataGetter.cpp']),
 	])
 	# one level deeper so that you can say: from yade.wrapper import *
 	# (more submodules to come)
@@ -58,11 +58,8 @@ if 'EMBED_PYTHON' in env['CPPDEFINES']:
 				'PhysicalParametersMetaEngine',
 				'STLImporter'
 			],
-			# ,'py/GLViewer4.cpp'
-			# '$QGLVIEWER_LIB'
-			#CPPPATH=env['CPPPATH']+['/usr/include/qt4','/usr/include/qt4/Qt','/usr/include/qt4/QtXml','/usr/include/qt4/QtOpenGL','/usr/include/qt4/QtCore','/usr/include/qt4/QtGui'],
-			CPPDEFINES=env['CPPDEFINES']+['NO_PYGLVIEWER'],
 			),
+		env.SharedLibrary('PeriodicPythonRunner',['py/PeriodicPythonRunner.cpp']),
 		env.File('__init__.py','py'),
 		env.File('utils.py','py'),
 		env.File('runtime.py','py'),

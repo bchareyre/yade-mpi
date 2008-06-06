@@ -30,10 +30,10 @@ void SpatialQuickSortCollider::action(MetaBody* ncb)
 {
      shared_ptr<BodyContainer> bodies = ncb->bodies;
 
-	int nbElements=bodies->size();
+	size_t nbElements=bodies->size();
        if (nbElements!=rank.size())
        {
-	   int n = rank.size();
+	   size_t n = rank.size();
 	   rank.resize(nbElements);
 	   for (; n<nbElements; ++n)
 	       rank[n] = shared_ptr<AABBBound>(new AABBBound);
@@ -70,7 +70,7 @@ void SpatialQuickSortCollider::action(MetaBody* ncb)
 
 	sort(rank.begin(), rank.end(), xBoundComparator()); // sotring along X
 
-	int id,id2,i,j;
+	int id,id2; size_t j;
 	shared_ptr<Interaction> interaction;
 	for(int i=0,e=nbElements-1; i<e; ++i)
 	{

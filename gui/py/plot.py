@@ -7,8 +7,9 @@ Experimental, interface may change (even drastically).
 
 """
 import matplotlib
-matplotlib.use('TkAgg') #GtkCairo
-#matplotlib.use('QtAgg') #GtkCairo
+matplotlib.use('TkAgg')
+#matplotlib.use('GTKCairo')
+#matplotlib.use('QtAgg')
 matplotlib.rc('axes',grid=True) # put grid in all figures
 import pylab
 
@@ -22,7 +23,7 @@ needsFullReplot=True
 # we could have a yplot class, that would hold: (yspec,...), (Line2d,Line2d,...) ?
 
 
-plotDataGetterEngine=None
+plotDataCollector=None
 import yade.wrapper
 o=yade.wrapper.Omega()
 
@@ -32,15 +33,15 @@ def reduceData(l):
 	"""If we have too much data, take every second value and double the step for DateGetterEngine. This will keep the samples equidistant.
 	"""
 	if l>maxDataLen:
-		print "Reducing: %d>%d"%(l,maxDataLen)
-		for d in data: data[d]=data[d][::2]
-		global plotDataGetterEngine
-		if not plotDataGetterEngine:
-			plotDataGetterEngine=[e for e in o.engines if e.name=='PlotDataGetter'][0]
-		if plotDataGetterEngine:
-			plotDataGetterEngine['iterInterval']=2*plotDataGetterEngine['iterInterval']
-			plotDataGetterEngine['timeInterval']=2*plotDataGetterEngine['timeInterval']
-		else: raise RuntimeError("Interval for getting data couldn't be adjusted. (yade.plot.plotDataGetterEngine should be proxy to DataGetterEngine in yade, but is None. ")
+		global plotDataCollector
+		pdc=PlotDataCollector;
+		if not pdc: pdc=o.labeledEngine('plotDataCollector') # will raise RuntimeError if not found
+		if pdc['mayDouble']: # may we double the period without getting over limits?
+			print "Reducing data: %d > %d"%(l,maxDataLen)
+			for d in data: data[d]=data[d][::2]
+			for attr in ['virtTimeLim','realTimeLim','iterLim']:
+				val=pdc[attr]
+				pdc[attr]=[val[0],val[1]*2,val[2]]
 
 
 def addData(d):
@@ -49,7 +50,7 @@ def addData(d):
 	New data will be left-padded with nan's, unspecified data will be nan.
 	This way, equal length of all data is assured so that they can be plotted one against any other.
 
-	Nan's don't appear in graphs and are skipped. """
+	Nan's don't appear in graphs."""
 	if len(data)>0: numSamples=len(data[data.keys()[0]])
 	else: numSamples=0
 	reduceData(numSamples)
@@ -65,85 +66,18 @@ def fillNonSequence(o):
 	if o.__class__==tuple().__class__ or o.__class__==list().__class__: return o
 	else: return (o,'')
 
-#def updatePlots():
-#	fignum=0
-#	for p in plots:
-#		pylab.figure(fignum)
-#		plots_p=[fillNonSequence(o) for o in plots[p]]
-#		for d in plots_p:
-#			pylab.axi
-#		fignum+=1
-
-useGtkThread=False
-
-if useGtkThread:
-	import threading,gtk
-
-def killPlots():
-	print "Clear figures"
-	pylab.clf() # clear figures
-	needsFullReplot=True
-	return
-	for t in [t for t in threading.enumerate() if t.getName()=='Thread-plots']:
-		print "GTK quit"
-		gtk.main_quit()
-
-def plot(): fullPlot()
-def show(): fullPlot()
-def fullPlot(): makePlot(update=False)
-def updatePlot():
-	raise RuntimeError("Updating plot not supported in non-interactive mode!")
-	if needsFullReplot:
-		print "updatePlot called, doing FULL replot"
-		makePlot(update=False)
-	else:
-		print "updatePlot called, updating plot"
-		makePlot(update=True)
-
-def minMax(l): return [min(l),max(l)]
-
-def makePlot(update=False):
-	fignum=0 #figure counter
-	pylab.clf()
+def show(): plot()
+def plot():
+	pylab.ioff() # no interactive mode (hmmm, I don't know why actually...)
 	for p in plots:
-		#print p,fignum,plots[p]
-		pylab.figure(fignum)
-		#print "2"; pylab.ioff() # turn off interactive mode
+		pylab.figure()
 		plots_p=[fillNonSequence(o) for o in plots[p]]
 		pylab.plot(*sum([[data[p],data[d[0]],d[1]] for d in plots_p],[]))
 		pylab.legend([_p[0] for _p in plots_p])
 		pylab.xlabel(p)
-		fignum+=1
-	#print "4"
-	pylab.show()
-	#print "5"
+		pylab.show()
 	return
 
-	if not update:
-		print "KILLING plots"
-		killPlots()
-	for p in plots:
-		print p,fignum,plots[p]
-		pylab.figure(fignum)
-		pylab.ioff() # turn off interactive mode
-		plots_p=[fillNonSequence(o) for o in plots[p]]
-		if update:
-			for i in range(len(plots_p)): plotLines[p][i].set_data(data[p],data[plots_p[i][0]])
-			pylab.axis(minMax(data[p])+minMax(sum([data[d[0]] for d in plots_p],[])))
-		else:
-			#for d in plots_p:
-			#	print d
-			#	print data[p]
-			#	print data[d[0]]
-			#	print d[1]
-			plotLines[p]=pylab.plot(*sum([[data[p],data[d[0]],d[1]] for d in plots_p],[]))
-		pylab.legend([_p[0] for _p in plots_p])
-		pylab.xlabel(p)
-		#pylab.draw()
-		fignum+=1
-	if not update:
-		pylab.show()
-		#threading.Thread(target=pylab.show,name='Thread-plots').start() # works with GTK, cool! (will it work inside yade, though?!)
 	
 import random
 if __name__ == "__main__":
