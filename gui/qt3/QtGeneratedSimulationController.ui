@@ -8,14 +8,14 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>319</width>
-            <height>544</height>
+            <width>275</width>
+            <height>510</height>
         </rect>
     </property>
     <property name="sizePolicy">
         <sizepolicy>
-            <hsizetype>1</hsizetype>
-            <vsizetype>1</vsizetype>
+            <hsizetype>3</hsizetype>
+            <vsizetype>3</vsizetype>
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
         </sizepolicy>
@@ -29,652 +29,639 @@
     <property name="frameShadow">
         <enum>Plain</enum>
     </property>
-    <widget class="QLabel">
+    <grid>
         <property name="name">
-            <cstring>labelIter</cstring>
+            <cstring>unnamed</cstring>
         </property>
-        <property name="geometry">
-            <rect>
-                <x>10</x>
-                <y>60</y>
-                <width>190</width>
-                <height>20</height>
-            </rect>
-        </property>
-        <property name="text">
-            <string>iter #0, 0/s</string>
-        </property>
-    </widget>
-    <widget class="QLabel">
-        <property name="name">
-            <cstring>labelSimulTime</cstring>
-        </property>
-        <property name="geometry">
-            <rect>
-                <x>10</x>
-                <y>40</y>
-                <width>190</width>
-                <height>21</height>
-            </rect>
-        </property>
-        <property name="text">
-            <string>virt 00:000.000m000u000n</string>
-        </property>
-    </widget>
-    <widget class="QLabel">
-        <property name="name">
-            <cstring>labelRealTime</cstring>
-        </property>
-        <property name="geometry">
-            <rect>
-                <x>10</x>
-                <y>20</y>
-                <width>200</width>
-                <height>21</height>
-            </rect>
-        </property>
-        <property name="text">
-            <string>real 0:00:00.000</string>
-        </property>
-    </widget>
-    <widget class="QLabel">
-        <property name="name">
-            <cstring>labelStep</cstring>
-        </property>
-        <property name="geometry">
-            <rect>
-                <x>10</x>
-                <y>80</y>
-                <width>140</width>
-                <height>21</height>
-            </rect>
-        </property>
-        <property name="text">
-            <string>step 4e-3</string>
-        </property>
-    </widget>
-    <widget class="QTabWidget">
-        <property name="name">
-            <cstring>tabWidget</cstring>
-        </property>
-        <property name="geometry">
-            <rect>
-                <x>10</x>
-                <y>110</y>
-                <width>290</width>
-                <height>420</height>
-            </rect>
-        </property>
-        <property name="sizePolicy">
-            <sizepolicy>
-                <hsizetype>1</hsizetype>
-                <vsizetype>1</vsizetype>
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-            </sizepolicy>
-        </property>
-        <widget class="QWidget">
+        <widget class="QLayoutWidget" row="0" column="0">
             <property name="name">
-                <cstring>tab</cstring>
+                <cstring>layout10</cstring>
             </property>
-            <attribute name="title">
-                <string>Simulation</string>
-            </attribute>
-            <widget class="QLabel">
+            <grid>
                 <property name="name">
-                    <cstring>tlCurrentSimulation</cstring>
+                    <cstring>unnamed</cstring>
                 </property>
-                <property name="geometry">
-                    <rect>
-                        <x>10</x>
-                        <y>50</y>
-                        <width>150</width>
-                        <height>20</height>
-                    </rect>
+                <property name="spacing">
+                    <number>0</number>
                 </property>
-                <property name="sizePolicy">
-                    <sizepolicy>
-                        <hsizetype>7</hsizetype>
-                        <vsizetype>5</vsizetype>
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                    </sizepolicy>
-                </property>
-                <property name="text">
-                    <string>...</string>
-                </property>
-                <property name="alignment">
-                    <set>AlignCenter</set>
-                </property>
-            </widget>
-            <widget class="QPushButton">
-                <property name="name">
-                    <cstring>pbSaveSimulation</cstring>
-                </property>
-                <property name="geometry">
-                    <rect>
-                        <x>90</x>
-                        <y>10</y>
-                        <width>74</width>
-                        <height>33</height>
-                    </rect>
-                </property>
-                <property name="text">
-                    <string>Save</string>
-                </property>
-            </widget>
-            <widget class="QPushButton">
-                <property name="name">
-                    <cstring>pbNewView_2</cstring>
-                </property>
-                <property name="enabled">
-                    <bool>true</bool>
-                </property>
-                <property name="geometry">
-                    <rect>
-                        <x>10</x>
-                        <y>340</y>
-                        <width>150</width>
-                        <height>33</height>
-                    </rect>
-                </property>
-                <property name="sizePolicy">
-                    <sizepolicy>
-                        <hsizetype>0</hsizetype>
-                        <vsizetype>0</vsizetype>
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                    </sizepolicy>
-                </property>
-                <property name="text">
-                    <string>New View ...</string>
-                </property>
-            </widget>
-            <widget class="QPushButton">
-                <property name="name">
-                    <cstring>pbCenterScene_2</cstring>
-                </property>
-                <property name="geometry">
-                    <rect>
-                        <x>10</x>
-                        <y>300</y>
-                        <width>150</width>
-                        <height>33</height>
-                    </rect>
-                </property>
-                <property name="sizePolicy">
-                    <sizepolicy>
-                        <hsizetype>0</hsizetype>
-                        <vsizetype>0</vsizetype>
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                    </sizepolicy>
-                </property>
-                <property name="text">
-                    <string>Center Scene</string>
-                </property>
-            </widget>
-            <widget class="QPushButton">
-                <property name="name">
-                    <cstring>pbStartSimulation</cstring>
-                </property>
-                <property name="enabled">
-                    <bool>false</bool>
-                </property>
-                <property name="geometry">
-                    <rect>
-                        <x>10</x>
-                        <y>70</y>
-                        <width>70</width>
-                        <height>60</height>
-                    </rect>
-                </property>
-                <property name="text">
-                    <string></string>
-                </property>
-                <property name="pixmap">
-                    <pixmap>image0</pixmap>
-                </property>
-            </widget>
-            <widget class="QPushButton">
-                <property name="name">
-                    <cstring>pbStopSimulation</cstring>
-                </property>
-                <property name="enabled">
-                    <bool>false</bool>
-                </property>
-                <property name="geometry">
-                    <rect>
-                        <x>90</x>
-                        <y>70</y>
-                        <width>70</width>
-                        <height>60</height>
-                    </rect>
-                </property>
-                <property name="text">
-                    <string></string>
-                </property>
-                <property name="pixmap">
-                    <pixmap>image1</pixmap>
-                </property>
-            </widget>
-            <widget class="QPushButton">
-                <property name="name">
-                    <cstring>pbOneSimulationStep</cstring>
-                </property>
-                <property name="enabled">
-                    <bool>false</bool>
-                </property>
-                <property name="geometry">
-                    <rect>
-                        <x>10</x>
-                        <y>140</y>
-                        <width>40</width>
-                        <height>40</height>
-                    </rect>
-                </property>
-                <property name="text">
-                    <string></string>
-                </property>
-                <property name="pixmap">
-                    <pixmap>image2</pixmap>
-                </property>
-            </widget>
-            <widget class="QPushButton">
-                <property name="name">
-                    <cstring>pbResetSimulation</cstring>
-                </property>
-                <property name="enabled">
-                    <bool>false</bool>
-                </property>
-                <property name="geometry">
-                    <rect>
-                        <x>60</x>
-                        <y>140</y>
-                        <width>100</width>
-                        <height>40</height>
-                    </rect>
-                </property>
-                <property name="text">
-                    <string></string>
-                </property>
-                <property name="pixmap">
-                    <pixmap>image3</pixmap>
-                </property>
-                <property name="toolTip" stdset="0">
-                    <string>Note: currently using synchronized display can *sometimes* lead to crash when reloading file.</string>
-                </property>
-            </widget>
-            <widget class="QSpinBox">
-                <property name="name">
-                    <cstring>sb10PowerSecond</cstring>
-                </property>
-                <property name="enabled">
-                    <bool>true</bool>
-                </property>
-                <property name="geometry">
-                    <rect>
-                        <x>120</x>
-                        <y>270</y>
-                        <width>40</width>
-                        <height>25</height>
-                    </rect>
-                </property>
-                <property name="maxValue">
-                    <number>20</number>
-                </property>
-                <property name="minValue">
-                    <number>-20</number>
-                </property>
-                <property name="value">
-                    <number>-3</number>
-                </property>
-            </widget>
-            <widget class="QLabel">
-                <property name="name">
-                    <cstring>tl10Power</cstring>
-                </property>
-                <property name="enabled">
-                    <bool>true</bool>
-                </property>
-                <property name="geometry">
-                    <rect>
-                        <x>80</x>
-                        <y>270</y>
-                        <width>30</width>
-                        <height>25</height>
-                    </rect>
-                </property>
-                <property name="text">
-                    <string>x10</string>
-                </property>
-                <property name="alignment">
-                    <set>AlignVCenter|AlignRight</set>
-                </property>
-            </widget>
-            <widget class="QSpinBox">
-                <property name="name">
-                    <cstring>sbSecond</cstring>
-                </property>
-                <property name="enabled">
-                    <bool>true</bool>
-                </property>
-                <property name="geometry">
-                    <rect>
-                        <x>30</x>
-                        <y>270</y>
-                        <width>49</width>
-                        <height>25</height>
-                    </rect>
-                </property>
-                <property name="value">
-                    <number>40</number>
-                </property>
-            </widget>
-            <widget class="QPushButton">
-                <property name="name">
-                    <cstring>pbLoadSimulation</cstring>
-                </property>
-                <property name="geometry">
-                    <rect>
-                        <x>10</x>
-                        <y>10</y>
-                        <width>72</width>
-                        <height>33</height>
-                    </rect>
-                </property>
-                <property name="text">
-                    <string>Load</string>
-                </property>
-            </widget>
-            <widget class="QButtonGroup">
-                <property name="name">
-                    <cstring>timestep</cstring>
-                </property>
-                <property name="geometry">
-                    <rect>
-                        <x>10</x>
-                        <y>180</y>
-                        <width>150</width>
-                        <height>80</height>
-                    </rect>
-                </property>
-                <property name="title">
-                    <string>timestep</string>
-                </property>
-                <widget class="QRadioButton">
+                <widget class="QTabWidget" row="1" column="0">
                     <property name="name">
-                        <cstring>rbFixed</cstring>
+                        <cstring>tabWidget</cstring>
                     </property>
-                    <property name="enabled">
-                        <bool>true</bool>
+                    <property name="autoMask">
+                        <bool>false</bool>
                     </property>
-                    <property name="geometry">
-                        <rect>
-                            <x>10</x>
-                            <y>50</y>
-                            <width>116</width>
-                            <height>25</height>
-                        </rect>
+                    <property name="tabPosition">
+                        <enum>Top</enum>
                     </property>
-                    <property name="text">
-                        <string>Fixed step</string>
+                    <property name="tabShape">
+                        <enum>Rounded</enum>
                     </property>
-                    <property name="buttonGroupId">
-                        <number>2</number>
-                    </property>
+                    <widget class="QWidget">
+                        <property name="name">
+                            <cstring>tab</cstring>
+                        </property>
+                        <attribute name="title">
+                            <string>Simulation</string>
+                        </attribute>
+                        <grid>
+                            <property name="name">
+                                <cstring>unnamed</cstring>
+                            </property>
+                            <widget class="QPushButton" row="0" column="0">
+                                <property name="name">
+                                    <cstring>pbLoadSimulation</cstring>
+                                </property>
+                                <property name="text">
+                                    <string>Load</string>
+                                </property>
+                            </widget>
+                            <widget class="QLayoutWidget" row="4" column="0" rowspan="1" colspan="2">
+                                <property name="name">
+                                    <cstring>layout4</cstring>
+                                </property>
+                                <hbox>
+                                    <property name="name">
+                                        <cstring>unnamed</cstring>
+                                    </property>
+                                    <spacer>
+                                        <property name="name">
+                                            <cstring>spacer1</cstring>
+                                        </property>
+                                        <property name="orientation">
+                                            <enum>Horizontal</enum>
+                                        </property>
+                                        <property name="sizeType">
+                                            <enum>Expanding</enum>
+                                        </property>
+                                        <property name="sizeHint">
+                                            <size>
+                                                <width>16</width>
+                                                <height>20</height>
+                                            </size>
+                                        </property>
+                                    </spacer>
+                                    <widget class="QSpinBox">
+                                        <property name="name">
+                                            <cstring>sbSecond</cstring>
+                                        </property>
+                                        <property name="enabled">
+                                            <bool>true</bool>
+                                        </property>
+                                        <property name="value">
+                                            <number>40</number>
+                                        </property>
+                                    </widget>
+                                    <widget class="QLabel">
+                                        <property name="name">
+                                            <cstring>tl10Power</cstring>
+                                        </property>
+                                        <property name="enabled">
+                                            <bool>true</bool>
+                                        </property>
+                                        <property name="text">
+                                            <string>×10</string>
+                                        </property>
+                                        <property name="alignment">
+                                            <set>AlignVCenter|AlignRight</set>
+                                        </property>
+                                    </widget>
+                                    <widget class="QSpinBox">
+                                        <property name="name">
+                                            <cstring>sb10PowerSecond</cstring>
+                                        </property>
+                                        <property name="enabled">
+                                            <bool>true</bool>
+                                        </property>
+                                        <property name="maxValue">
+                                            <number>20</number>
+                                        </property>
+                                        <property name="minValue">
+                                            <number>-20</number>
+                                        </property>
+                                        <property name="value">
+                                            <number>-3</number>
+                                        </property>
+                                    </widget>
+                                </hbox>
+                            </widget>
+                            <widget class="QButtonGroup" row="3" column="0" rowspan="1" colspan="2">
+                                <property name="name">
+                                    <cstring>timestep</cstring>
+                                </property>
+                                <property name="sizePolicy">
+                                    <sizepolicy>
+                                        <hsizetype>3</hsizetype>
+                                        <vsizetype>3</vsizetype>
+                                        <horstretch>0</horstretch>
+                                        <verstretch>0</verstretch>
+                                    </sizepolicy>
+                                </property>
+                                <property name="frameShadow">
+                                    <enum>Sunken</enum>
+                                </property>
+                                <property name="lineWidth">
+                                    <number>1</number>
+                                </property>
+                                <property name="title">
+                                    <string>timestep</string>
+                                </property>
+                                <property name="flat">
+                                    <bool>false</bool>
+                                </property>
+                                <widget class="QRadioButton">
+                                    <property name="name">
+                                        <cstring>rbTimeStepper</cstring>
+                                    </property>
+                                    <property name="enabled">
+                                        <bool>true</bool>
+                                    </property>
+                                    <property name="geometry">
+                                        <rect>
+                                            <x>10</x>
+                                            <y>20</y>
+                                            <width>116</width>
+                                            <height>25</height>
+                                        </rect>
+                                    </property>
+                                    <property name="text">
+                                        <string>Time stepper</string>
+                                    </property>
+                                    <property name="buttonGroupId">
+                                        <number>0</number>
+                                    </property>
+                                </widget>
+                                <widget class="QRadioButton">
+                                    <property name="name">
+                                        <cstring>rbFixed</cstring>
+                                    </property>
+                                    <property name="enabled">
+                                        <bool>true</bool>
+                                    </property>
+                                    <property name="geometry">
+                                        <rect>
+                                            <x>10</x>
+                                            <y>50</y>
+                                            <width>116</width>
+                                            <height>25</height>
+                                        </rect>
+                                    </property>
+                                    <property name="text">
+                                        <string>Fixed step</string>
+                                    </property>
+                                    <property name="buttonGroupId">
+                                        <number>2</number>
+                                    </property>
+                                </widget>
+                            </widget>
+                            <widget class="QFrame" row="2" column="0" rowspan="1" colspan="2">
+                                <property name="name">
+                                    <cstring>frame5</cstring>
+                                </property>
+                                <property name="sizePolicy">
+                                    <sizepolicy>
+                                        <hsizetype>7</hsizetype>
+                                        <vsizetype>3</vsizetype>
+                                        <horstretch>0</horstretch>
+                                        <verstretch>2</verstretch>
+                                    </sizepolicy>
+                                </property>
+                                <property name="frameShape">
+                                    <enum>StyledPanel</enum>
+                                </property>
+                                <property name="frameShadow">
+                                    <enum>Raised</enum>
+                                </property>
+                                <vbox>
+                                    <property name="name">
+                                        <cstring>unnamed</cstring>
+                                    </property>
+                                    <property name="margin">
+                                        <number>0</number>
+                                    </property>
+                                    <widget class="QLayoutWidget">
+                                        <property name="name">
+                                            <cstring>layout1</cstring>
+                                        </property>
+                                        <hbox>
+                                            <property name="name">
+                                                <cstring>unnamed</cstring>
+                                            </property>
+                                            <widget class="QPushButton">
+                                                <property name="name">
+                                                    <cstring>pbStartSimulation</cstring>
+                                                </property>
+                                                <property name="enabled">
+                                                    <bool>false</bool>
+                                                </property>
+                                                <property name="sizePolicy">
+                                                    <sizepolicy>
+                                                        <hsizetype>3</hsizetype>
+                                                        <vsizetype>7</vsizetype>
+                                                        <horstretch>0</horstretch>
+                                                        <verstretch>0</verstretch>
+                                                    </sizepolicy>
+                                                </property>
+                                                <property name="minimumSize">
+                                                    <size>
+                                                        <width>0</width>
+                                                        <height>25</height>
+                                                    </size>
+                                                </property>
+                                                <property name="text">
+                                                    <string></string>
+                                                </property>
+                                                <property name="pixmap">
+                                                    <pixmap>image0</pixmap>
+                                                </property>
+                                            </widget>
+                                            <widget class="QPushButton">
+                                                <property name="name">
+                                                    <cstring>pbStopSimulation</cstring>
+                                                </property>
+                                                <property name="enabled">
+                                                    <bool>false</bool>
+                                                </property>
+                                                <property name="sizePolicy">
+                                                    <sizepolicy>
+                                                        <hsizetype>7</hsizetype>
+                                                        <vsizetype>7</vsizetype>
+                                                        <horstretch>0</horstretch>
+                                                        <verstretch>0</verstretch>
+                                                    </sizepolicy>
+                                                </property>
+                                                <property name="text">
+                                                    <string></string>
+                                                </property>
+                                                <property name="pixmap">
+                                                    <pixmap>image1</pixmap>
+                                                </property>
+                                            </widget>
+                                        </hbox>
+                                    </widget>
+                                    <widget class="QLayoutWidget">
+                                        <property name="name">
+                                            <cstring>layout2</cstring>
+                                        </property>
+                                        <hbox>
+                                            <property name="name">
+                                                <cstring>unnamed</cstring>
+                                            </property>
+                                            <widget class="QPushButton">
+                                                <property name="name">
+                                                    <cstring>pbOneSimulationStep</cstring>
+                                                </property>
+                                                <property name="enabled">
+                                                    <bool>false</bool>
+                                                </property>
+                                                <property name="sizePolicy">
+                                                    <sizepolicy>
+                                                        <hsizetype>7</hsizetype>
+                                                        <vsizetype>7</vsizetype>
+                                                        <horstretch>1</horstretch>
+                                                        <verstretch>0</verstretch>
+                                                    </sizepolicy>
+                                                </property>
+                                                <property name="minimumSize">
+                                                    <size>
+                                                        <width>0</width>
+                                                        <height>25</height>
+                                                    </size>
+                                                </property>
+                                                <property name="text">
+                                                    <string></string>
+                                                </property>
+                                                <property name="pixmap">
+                                                    <pixmap>image2</pixmap>
+                                                </property>
+                                            </widget>
+                                            <widget class="QPushButton">
+                                                <property name="name">
+                                                    <cstring>pbResetSimulation</cstring>
+                                                </property>
+                                                <property name="enabled">
+                                                    <bool>false</bool>
+                                                </property>
+                                                <property name="sizePolicy">
+                                                    <sizepolicy>
+                                                        <hsizetype>3</hsizetype>
+                                                        <vsizetype>7</vsizetype>
+                                                        <horstretch>2</horstretch>
+                                                        <verstretch>0</verstretch>
+                                                    </sizepolicy>
+                                                </property>
+                                                <property name="text">
+                                                    <string></string>
+                                                </property>
+                                                <property name="pixmap">
+                                                    <pixmap>image3</pixmap>
+                                                </property>
+                                                <property name="toolTip" stdset="0">
+                                                    <string>Note: currently using synchronized display can *sometimes* lead to crash when reloading file.</string>
+                                                </property>
+                                            </widget>
+                                        </hbox>
+                                    </widget>
+                                </vbox>
+                            </widget>
+                            <widget class="QPushButton" row="0" column="1">
+                                <property name="name">
+                                    <cstring>pbSaveSimulation</cstring>
+                                </property>
+                                <property name="sizePolicy">
+                                    <sizepolicy>
+                                        <hsizetype>3</hsizetype>
+                                        <vsizetype>0</vsizetype>
+                                        <horstretch>0</horstretch>
+                                        <verstretch>0</verstretch>
+                                    </sizepolicy>
+                                </property>
+                                <property name="text">
+                                    <string>Save</string>
+                                </property>
+                            </widget>
+                            <widget class="QLabel" row="1" column="0" rowspan="1" colspan="2">
+                                <property name="name">
+                                    <cstring>tlCurrentSimulation</cstring>
+                                </property>
+                                <property name="sizePolicy">
+                                    <sizepolicy>
+                                        <hsizetype>7</hsizetype>
+                                        <vsizetype>0</vsizetype>
+                                        <horstretch>0</horstretch>
+                                        <verstretch>0</verstretch>
+                                    </sizepolicy>
+                                </property>
+                                <property name="text">
+                                    <string>...</string>
+                                </property>
+                                <property name="alignment">
+                                    <set>AlignCenter</set>
+                                </property>
+                            </widget>
+                        </grid>
+                    </widget>
+                    <widget class="QWidget">
+                        <property name="name">
+                            <cstring>tab</cstring>
+                        </property>
+                        <attribute name="title">
+                            <string>Display</string>
+                        </attribute>
+                        <grid>
+                            <property name="name">
+                                <cstring>unnamed</cstring>
+                            </property>
+                            <widget class="QLabel" row="3" column="0">
+                                <property name="name">
+                                    <cstring>textLabel1</cstring>
+                                </property>
+                                <property name="text">
+                                    <string>Refresh [ms]</string>
+                                </property>
+                                <property name="toolTip" stdset="0">
+                                    <string>How often you wish the display to refresh.</string>
+                                </property>
+                            </widget>
+                            <widget class="QSpinBox" row="3" column="1">
+                                <property name="name">
+                                    <cstring>sbRefreshTime</cstring>
+                                </property>
+                                <property name="sizePolicy">
+                                    <sizepolicy>
+                                        <hsizetype>0</hsizetype>
+                                        <vsizetype>0</vsizetype>
+                                        <horstretch>0</horstretch>
+                                        <verstretch>0</verstretch>
+                                    </sizepolicy>
+                                </property>
+                                <property name="minimumSize">
+                                    <size>
+                                        <width>50</width>
+                                        <height>0</height>
+                                    </size>
+                                </property>
+                                <property name="maxValue">
+                                    <number>600000</number>
+                                </property>
+                                <property name="value">
+                                    <number>20</number>
+                                </property>
+                                <property name="toolTip" stdset="0">
+                                    <string>How often you wish the display to refresh.</string>
+                                </property>
+                            </widget>
+                            <widget class="QPushButton" row="1" column="0" rowspan="1" colspan="3">
+                                <property name="name">
+                                    <cstring>pbApply</cstring>
+                                </property>
+                                <property name="sizePolicy">
+                                    <sizepolicy>
+                                        <hsizetype>3</hsizetype>
+                                        <vsizetype>1</vsizetype>
+                                        <horstretch>0</horstretch>
+                                        <verstretch>0</verstretch>
+                                    </sizepolicy>
+                                </property>
+                                <property name="minimumSize">
+                                    <size>
+                                        <width>0</width>
+                                        <height>0</height>
+                                    </size>
+                                </property>
+                                <property name="text">
+                                    <string>Apply</string>
+                                </property>
+                            </widget>
+                            <widget class="QCheckBox" row="2" column="0" rowspan="1" colspan="2">
+                                <property name="name">
+                                    <cstring>checkBox1</cstring>
+                                </property>
+                                <property name="text">
+                                    <string>sync.display</string>
+                                </property>
+                                <property name="toolTip" stdset="0">
+                                    <string>Not synchronized: one processor for calculation, another for display. Synchronized can sometimes crash - yet to be fixed.</string>
+                                </property>
+                            </widget>
+                            <widget class="QPushButton" row="3" column="2">
+                                <property name="name">
+                                    <cstring>pushButton10</cstring>
+                                </property>
+                                <property name="sizePolicy">
+                                    <sizepolicy>
+                                        <hsizetype>0</hsizetype>
+                                        <vsizetype>0</vsizetype>
+                                        <horstretch>0</horstretch>
+                                        <verstretch>0</verstretch>
+                                    </sizepolicy>
+                                </property>
+                                <property name="minimumSize">
+                                    <size>
+                                        <width>20</width>
+                                        <height>25</height>
+                                    </size>
+                                </property>
+                                <property name="maximumSize">
+                                    <size>
+                                        <width>20</width>
+                                        <height>25</height>
+                                    </size>
+                                </property>
+                                <property name="text">
+                                    <string></string>
+                                </property>
+                                <property name="pixmap">
+                                    <pixmap>image4</pixmap>
+                                </property>
+                            </widget>
+                            <widget class="QFrame" row="0" column="0" rowspan="1" colspan="3">
+                                <property name="name">
+                                    <cstring>scrollViewOutsideFrame</cstring>
+                                </property>
+                                <property name="sizePolicy">
+                                    <sizepolicy>
+                                        <hsizetype>1</hsizetype>
+                                        <vsizetype>3</vsizetype>
+                                        <horstretch>0</horstretch>
+                                        <verstretch>5</verstretch>
+                                    </sizepolicy>
+                                </property>
+                                <property name="frameShape">
+                                    <enum>NoFrame</enum>
+                                </property>
+                                <property name="frameShadow">
+                                    <enum>Raised</enum>
+                                </property>
+                            </widget>
+                        </grid>
+                    </widget>
                 </widget>
-                <widget class="QRadioButton">
+                <widget class="QLayoutWidget" row="0" column="0">
                     <property name="name">
-                        <cstring>rbTimeStepper</cstring>
+                        <cstring>layout9</cstring>
                     </property>
-                    <property name="enabled">
-                        <bool>true</bool>
-                    </property>
-                    <property name="geometry">
-                        <rect>
-                            <x>10</x>
-                            <y>20</y>
-                            <width>116</width>
-                            <height>25</height>
-                        </rect>
-                    </property>
-                    <property name="text">
-                        <string>Time stepper</string>
-                    </property>
-                    <property name="buttonGroupId">
-                        <number>0</number>
-                    </property>
+                    <vbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <property name="spacing">
+                            <number>0</number>
+                        </property>
+                        <widget class="QLabel">
+                            <property name="name">
+                                <cstring>labelRealTime</cstring>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>5</hsizetype>
+                                    <vsizetype>0</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="text">
+                                <string>real 0:00:00.000</string>
+                            </property>
+                        </widget>
+                        <widget class="QLabel">
+                            <property name="name">
+                                <cstring>labelSimulTime</cstring>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>5</hsizetype>
+                                    <vsizetype>0</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="text">
+                                <string>virt 00:000.000m000u000n</string>
+                            </property>
+                        </widget>
+                        <widget class="QLabel">
+                            <property name="name">
+                                <cstring>labelIter</cstring>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>5</hsizetype>
+                                    <vsizetype>0</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="text">
+                                <string>iter #0, 0/s</string>
+                            </property>
+                        </widget>
+                        <widget class="QLabel">
+                            <property name="name">
+                                <cstring>labelStep</cstring>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>5</hsizetype>
+                                    <vsizetype>0</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="text">
+                                <string>step 4e-3</string>
+                            </property>
+                        </widget>
+                    </vbox>
                 </widget>
-            </widget>
+                <widget class="QLayoutWidget" row="2" column="0">
+                    <property name="name">
+                        <cstring>layout5</cstring>
+                    </property>
+                    <hbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <widget class="QPushButton">
+                            <property name="name">
+                                <cstring>pbNewView_2</cstring>
+                            </property>
+                            <property name="enabled">
+                                <bool>true</bool>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>0</hsizetype>
+                                    <vsizetype>0</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="text">
+                                <string>New 3D</string>
+                            </property>
+                        </widget>
+                        <widget class="QPushButton">
+                            <property name="name">
+                                <cstring>pbCenterScene_2</cstring>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>0</hsizetype>
+                                    <vsizetype>0</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="text">
+                                <string>Center all</string>
+                            </property>
+                        </widget>
+                    </hbox>
+                </widget>
+            </grid>
         </widget>
-        <widget class="QWidget">
-            <property name="name">
-                <cstring>tab</cstring>
-            </property>
-            <attribute name="title">
-                <string>Display</string>
-            </attribute>
-            <widget class="QLabel">
-                <property name="name">
-                    <cstring>textLabel1</cstring>
-                </property>
-                <property name="geometry">
-                    <rect>
-                        <x>10</x>
-                        <y>270</y>
-                        <width>103</width>
-                        <height>25</height>
-                    </rect>
-                </property>
-                <property name="text">
-                    <string>Refresh [ms]</string>
-                </property>
-                <property name="toolTip" stdset="0">
-                    <string>How often you wish the display to refresh.</string>
-                </property>
-            </widget>
-            <widget class="QSpinBox">
-                <property name="name">
-                    <cstring>spinBox6</cstring>
-                </property>
-                <property name="geometry">
-                    <rect>
-                        <x>110</x>
-                        <y>270</y>
-                        <width>50</width>
-                        <height>25</height>
-                    </rect>
-                </property>
-                <property name="sizePolicy">
-                    <sizepolicy>
-                        <hsizetype>0</hsizetype>
-                        <vsizetype>0</vsizetype>
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                    </sizepolicy>
-                </property>
-                <property name="minimumSize">
-                    <size>
-                        <width>50</width>
-                        <height>0</height>
-                    </size>
-                </property>
-                <property name="maxValue">
-                    <number>600000</number>
-                </property>
-                <property name="value">
-                    <number>20</number>
-                </property>
-                <property name="toolTip" stdset="0">
-                    <string>How often you wish the display to refresh.</string>
-                </property>
-            </widget>
-            <widget class="QCheckBox">
-                <property name="name">
-                    <cstring>checkBox1</cstring>
-                </property>
-                <property name="geometry">
-                    <rect>
-                        <x>10</x>
-                        <y>240</y>
-                        <width>110</width>
-                        <height>25</height>
-                    </rect>
-                </property>
-                <property name="text">
-                    <string>sync.display</string>
-                </property>
-                <property name="toolTip" stdset="0">
-                    <string>Not synchronized: one processor for calculation, another for display. Synchronized can sometimes crash - yet to be fixed.</string>
-                </property>
-            </widget>
-            <widget class="QPushButton">
-                <property name="name">
-                    <cstring>pbApply</cstring>
-                </property>
-                <property name="geometry">
-                    <rect>
-                        <x>10</x>
-                        <y>210</y>
-                        <width>190</width>
-                        <height>33</height>
-                    </rect>
-                </property>
-                <property name="sizePolicy">
-                    <sizepolicy>
-                        <hsizetype>5</hsizetype>
-                        <vsizetype>1</vsizetype>
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                    </sizepolicy>
-                </property>
-                <property name="minimumSize">
-                    <size>
-                        <width>0</width>
-                        <height>0</height>
-                    </size>
-                </property>
-                <property name="text">
-                    <string>Apply</string>
-                </property>
-            </widget>
-            <widget class="QPushButton">
-                <property name="name">
-                    <cstring>pbNewView</cstring>
-                </property>
-                <property name="enabled">
-                    <bool>true</bool>
-                </property>
-                <property name="geometry">
-                    <rect>
-                        <x>10</x>
-                        <y>340</y>
-                        <width>150</width>
-                        <height>33</height>
-                    </rect>
-                </property>
-                <property name="sizePolicy">
-                    <sizepolicy>
-                        <hsizetype>0</hsizetype>
-                        <vsizetype>0</vsizetype>
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                    </sizepolicy>
-                </property>
-                <property name="text">
-                    <string>New View ...</string>
-                </property>
-            </widget>
-            <widget class="QPushButton">
-                <property name="name">
-                    <cstring>pbCenterScene</cstring>
-                </property>
-                <property name="geometry">
-                    <rect>
-                        <x>10</x>
-                        <y>300</y>
-                        <width>150</width>
-                        <height>33</height>
-                    </rect>
-                </property>
-                <property name="sizePolicy">
-                    <sizepolicy>
-                        <hsizetype>0</hsizetype>
-                        <vsizetype>0</vsizetype>
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                    </sizepolicy>
-                </property>
-                <property name="text">
-                    <string>Center Scene</string>
-                </property>
-            </widget>
-            <widget class="QPushButton">
-                <property name="name">
-                    <cstring>pushButton10</cstring>
-                </property>
-                <property name="geometry">
-                    <rect>
-                        <x>170</x>
-                        <y>270</y>
-                        <width>20</width>
-                        <height>25</height>
-                    </rect>
-                </property>
-                <property name="sizePolicy">
-                    <sizepolicy>
-                        <hsizetype>0</hsizetype>
-                        <vsizetype>0</vsizetype>
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                    </sizepolicy>
-                </property>
-                <property name="minimumSize">
-                    <size>
-                        <width>20</width>
-                        <height>25</height>
-                    </size>
-                </property>
-                <property name="maximumSize">
-                    <size>
-                        <width>20</width>
-                        <height>25</height>
-                    </size>
-                </property>
-                <property name="text">
-                    <string>&gt;</string>
-                </property>
-            </widget>
-            <widget class="QFrame">
-                <property name="name">
-                    <cstring>scrollViewOutsideFrame</cstring>
-                </property>
-                <property name="geometry">
-                    <rect>
-                        <x>0</x>
-                        <y>0</y>
-                        <width>290</width>
-                        <height>200</height>
-                    </rect>
-                </property>
-                <property name="sizePolicy">
-                    <sizepolicy>
-                        <hsizetype>1</hsizetype>
-                        <vsizetype>1</vsizetype>
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                    </sizepolicy>
-                </property>
-                <property name="frameShape">
-                    <enum>NoFrame</enum>
-                </property>
-                <property name="frameShadow">
-                    <enum>Raised</enum>
-                </property>
-            </widget>
-        </widget>
-    </widget>
+    </grid>
 </widget>
 <images>
     <image name="image0">
@@ -689,14 +676,11 @@
     <image name="image3">
         <data format="PNG" length="210">89504e470d0a1a0a0000000d4948445200000015000000150806000000a917a5960000009949444154388ded94bd0a0231108427e18ab1db67d1cef737e575f139b6733aaff0222182dc4f0a854b330cec928fafd890c70c0800014920b9bb479703045c0e92e8d1431e7337c2d2634fc2d243ebf4723d3fb1f2e5740f5f9d028f79744536c4d1689004a3bd88719a879767bd6fb44fa75b485ba7b1fe41d226d27aff4d7a383d9cfeb8d3c1e5301a4ade520a755f9268fa1fdfd31ec413524e89890537f1ed0000000049454e44ae426082</data>
     </image>
+    <image name="image4">
+        <data format="PNG" length="160">89504e470d0a1a0a0000000d4948445200000015000000150806000000a917a5960000006749444154388dadccd10d80300c03d1947118a1fbcb23b00e2c4013dbc9fd9ef4168098eecae6def73b8eba70893a3085aa308d2ab084b2b08c32b08556b08d66700b3dc16d1478d628fa07b6d01368a31968a11528a30c28a12c48a30a48a12a58a20e1811f101d3512a7c38fee1ac0000000049454e44ae426082</data>
+    </image>
 </images>
 <connections>
-    <connection>
-        <sender>pbNewView</sender>
-        <signal>clicked()</signal>
-        <receiver>QtGeneratedSimulationController</receiver>
-        <slot>pbNewViewClicked()</slot>
-    </connection>
     <connection>
         <sender>pbStartSimulation</sender>
         <signal>clicked()</signal>
@@ -722,12 +706,6 @@
         <slot>pbApplyClicked()</slot>
     </connection>
     <connection>
-        <sender>pbCenterScene</sender>
-        <signal>clicked()</signal>
-        <receiver>QtGeneratedSimulationController</receiver>
-        <slot>pbCenterSceneClicked()</slot>
-    </connection>
-    <connection>
         <sender>pbOneSimulationStep</sender>
         <signal>clicked()</signal>
         <receiver>QtGeneratedSimulationController</receiver>
@@ -746,7 +724,7 @@
         <slot>sb10PowerSecondValueChanged(int)</slot>
     </connection>
     <connection>
-        <sender>spinBox6</sender>
+        <sender>sbRefreshTime</sender>
         <signal>valueChanged(int)</signal>
         <receiver>QtGeneratedSimulationController</receiver>
         <slot>sbRefreshValueChanged(int)</slot>

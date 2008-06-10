@@ -28,13 +28,20 @@
 #		define FOREACH BOOST_FOREACH
 #	endif
 
+CREATE_LOGGER(SimulationController);
 
 using namespace boost;
+/* in sync mode:
+ * 	SimulationController::timerEvent handles both redraw (by calling YadeQtMainWindow::redrawAll(force=true) and spawning one simulation loop
+ *
+ * in async mode:
+ * 	YadeQtMainWindow::timerEvent is responsible for doing redraw (will not be done if in sync mode)
+ */
 
 
 SimulationController::SimulationController(QWidget * parent) : QtGeneratedSimulationController(parent,"SimulationController"), iterPerSec_TTL_ms(1000)
 {
-	sync=false;
+	sync=false; syncRunning=false;
 	refreshTime = 40;
 	changeTimeStep=false;
 
@@ -73,8 +80,11 @@ SimulationController::SimulationController(QWidget * parent) : QtGeneratedSimula
 		loadSimulationFromFileName(Omega::instance().getSimulationFileName());
 	}
 	// run timer ANY TIME (simulation may be started asynchronously)
-	startTimer(refreshTime);
+	updateTimerId=startTimer(refreshTime);
 }
+
+/* restart timer with SimulationController::refreshTime */
+void SimulationController::restartTimer(){ killTimer(updateTimerId); updateTimerId=startTimer(refreshTime); }
 
 
 void SimulationController::pbApplyClicked()
@@ -193,36 +203,32 @@ void SimulationController::pbSaveClicked()
 	}
 }
 
-void SimulationController::pbNewViewClicked()
-{
-	addNewView();
+void SimulationController::pbNewViewClicked() {	addNewView(); }
+void SimulationController::addNewView(){ YadeQtMainWindow::self->createView(); }
+void SimulationController::pbCenterSceneClicked() { YadeQtMainWindow::self->centerViews(); }
+void SimulationController::closeEvent(QCloseEvent *){ /* switch to async run if running */ if(syncRunning) cbSyncToggled(false); emit closeSignal(); }
+void SimulationController::pbStopClicked() { Omega::instance().stopSimulationLoop(); syncRunning=false; }
+void SimulationController::pbOneSimulationStepClicked(){pbStopClicked();Omega::instance().spawnSingleSimulationLoop();}
+void SimulationController::pbStart2Clicked() { pbStartClicked(); }
+void SimulationController::pbStartClicked(){
+	restartTimer();
+	if(sync) syncRunning=true;
+	else Omega::instance().startSimulationLoop();
 }
 
-
-void SimulationController::addNewView()
-{
-	YadeQtMainWindow::self->createView();
-	return;
+void SimulationController::cbSyncToggled(bool b){	sync=b; if(sync && refreshTime<20) refreshTime=20; pbStopClicked(); pbStartClicked(); }
+void SimulationController::timerEvent( QTimerEvent* ){
+	doUpdate(); /* update the controller, like iteration number etc */
+	if(sync && syncRunning){
+		/* update GLViews */
+		//LOG_DEBUG("Sync: iter "<<Omega::instance().getCurrentIteration());
+		YadeQtMainWindow::self->redrawAll(true);
+		Omega::instance().spawnSingleSimulationLoop();
+	}
 }
-
-void SimulationController::pbStopClicked()
-{
-	Omega::instance().stopSimulationLoop();
-	//killTimers();
-}
-
-
-void SimulationController::pbStartClicked()
-{
-	if(!sync)
-		Omega::instance().startSimulationLoop();        
-
-}
-
 
 void SimulationController::pbResetClicked()
 {
-
 	pbStopClicked();
 
 	std::string name=Omega::instance().getSimulationFileName(); 
@@ -242,25 +248,8 @@ void SimulationController::pbResetClicked()
 }
 
 
-void SimulationController::pbOneSimulationStepClicked()
-{
-	//FIXME : fix real simulation time
-	pbStopClicked();
-	Omega::instance().spawnSingleSimulationLoop();
-}
 
 
-void SimulationController::pbCenterSceneClicked()
-{
-	YadeQtMainWindow::self->centerViews();
-}
-
-
-void SimulationController::closeEvent(QCloseEvent *)
-{
-	pbStopClicked();
-	emit closeSignal();
-}
 
 
 void SimulationController::bgTimeStepClicked(int i)
@@ -274,7 +263,7 @@ void SimulationController::bgTimeStepClicked(int i)
 			skipTimeStepper = false;
 			wasUsingTimeStepper=true;
 			break;
-		case 1 : // Try RealTime
+		case 1 : // Try RealTime -- deprecated
 			changeSkipTimeStepper = true;
 			skipTimeStepper = true;
 			wasUsingTimeStepper=false;
@@ -306,35 +295,17 @@ void SimulationController::sbSecondValueChanged(int)
 
 void SimulationController::sbRefreshValueChanged(int v)
 {
-	pbStopClicked();
+	//pbStopClicked();
 	refreshTime = v;
 	if(sync && refreshTime < 20) 
 		// FIXME - problem is that ThreadRunner cannot 'too often' call spawnSingleSimulationLoop().
 		// This is a temporary solution...
 		refreshTime = 20;
+	restartTimer();
 }
 
-void SimulationController::cbSyncToggled( bool b)
-{
-	pbStopClicked();
-	sync = b;
-	if(sync && refreshTime < 20)
-		refreshTime = 20;
-}
-
-void SimulationController::pbStart2Clicked()
-{
-	pbStartClicked();
-}
-
-void SimulationController::timerEvent( QTimerEvent* )
-{
-	doUpdate();
-	if(sync) Omega::instance().spawnSingleSimulationLoop();
-}
 
 void SimulationController::doUpdate(){
-	SimulationController *controller=this;
 
 	Real simulationTime = Omega::instance().getSimulationTime();
 
@@ -350,7 +321,7 @@ void SimulationController::doUpdate(){
 
 	char strVirt[64];
 	snprintf(strVirt,64,"virt %02d:%03d.%03dm%03du%03dn",min,sec,msec,misec,nsec);
-	controller->labelSimulTime->setText(string(strVirt));
+	labelSimulTime->setText(string(strVirt));
 
 	if(Omega::instance().isRunning()){
 		time_duration duration = microsec_clock::local_time()-Omega::instance().getMsStartingSimulationTime();
@@ -366,7 +337,7 @@ void SimulationController::doUpdate(){
 		char strReal[64];
 		if(days>0) snprintf(strReal,64,"real %dd %02d:%02d:%03d.%03d",days,hours,minutes,seconds,mseconds);
 		else snprintf(strReal,64,"real %02d:%02d:%03d.%03d",hours,minutes,seconds,mseconds);
-		controller->labelRealTime->setText(string(strReal));
+		labelRealTime->setText(string(strReal));
 	}
 
 	// update iterations per second - only one in a while (iterPerSec_TTL_ms)
@@ -377,46 +348,49 @@ void SimulationController::doUpdate(){
 		iterPerSec_LastIter=Omega::instance().getCurrentIteration();
 		iterPerSec_LastLocalTime=microsec_clock::local_time();
 	}
-
 	char strIter[64];
-	snprintf(strIter,64,"iter #%ld, %.1f/s",Omega::instance().getCurrentIteration(),iterPerSec);
-	controller->labelIter->setText(strIter);
+	/* print 0 instead of bogus values (at startup) */
+	snprintf(strIter,64,"iter #%ld, %.1f/s",Omega::instance().getCurrentIteration(),(iterPerSec<1e9 && iterPerSec>0)?iterPerSec:0.);
+	labelIter->setText(strIter);
 
-	if (controller->changeSkipTimeStepper) Omega::instance().skipTimeStepper(controller->skipTimeStepper);
-	if (controller->changeTimeStep) {
-		Real second = (Real)(controller->sbSecond->value());
-		Real powerSecond = (Real)(controller->sb10PowerSecond->value());
+	if (changeSkipTimeStepper) Omega::instance().skipTimeStepper(skipTimeStepper);
+	if (changeTimeStep) {
+		Real second = (Real)(sbSecond->value());
+		Real powerSecond = (Real)(sb10PowerSecond->value());
 		Omega::instance().setTimeStep(second*Mathr::Pow(10,powerSecond));
 	} else {
 		Real dt=Omega::instance().getTimeStep();
 		int exp10=floor(log10(dt));
-		controller->sb10PowerSecond->setValue(exp10);
-		controller->sbSecond->setValue((int)(.1+dt/(pow((float)10,exp10)))); // .1: rounding issues
+		sb10PowerSecond->setValue(exp10);
+		sbSecond->setValue((int)(.1+dt/(pow((float)10,exp10)))); // .1: rounding issues
 	}
+
+	if(sbRefreshTime->value()!=refreshTime) sbRefreshTime->setValue(refreshTime);
 
 	char strStep[64];
 	snprintf(strStep,64,"step %g",Omega::instance().getTimeStep());
-	controller->labelStep->setText(string(strStep));
+	labelStep->setText(string(strStep));
 
-	controller->changeSkipTimeStepper = false;
-	controller->changeTimeStep = false;
+	changeSkipTimeStepper = false;
+	changeTimeStep = false;
 
 	//cerr<<"dt="<<dt<<",exp10="<<exp10<<",10^exp10="<<pow((float)10,exp10)<<endl;
 
 	/* enable/disable controls here, dynamically */
 	bool hasSimulation=(Omega::instance().getRootBody() ? Omega::instance().getRootBody()->bodies->size()>0 : false ),
-		isRunning=Omega::instance().isRunning(),
+		isRunning=Omega::instance().isRunning() || syncRunning,
 		hasTimeStepper=Omega::instance().containTimeStepper(),
 		usesTimeStepper=Omega::instance().timeStepperActive(),
 		hasFileName=(Omega::instance().getSimulationFileName()!="");
 
-	controller->pbStartSimulation->setEnabled(hasSimulation && !isRunning);
-	controller->pbStopSimulation->setEnabled(hasSimulation && isRunning);
-	controller->pbResetSimulation->setEnabled(hasSimulation && hasFileName);
-	controller->pbOneSimulationStep->setEnabled(hasSimulation && !isRunning);
-	controller->rbTimeStepper->setEnabled(hasTimeStepper);
+	pbStartSimulation->setEnabled(hasSimulation && !isRunning);
+	pbStopSimulation->setEnabled(hasSimulation && isRunning);
+	pbResetSimulation->setEnabled(hasSimulation && hasFileName);
+	pbOneSimulationStep->setEnabled(hasSimulation && !isRunning);
+	rbTimeStepper->setEnabled(hasTimeStepper);
 	// conditionals only avoid setting the state that is already set, to avoid spurious signals
-	if(controller->rbFixed->isChecked()==usesTimeStepper) controller->rbFixed->setChecked(!usesTimeStepper);
-	if(controller->rbTimeStepper->isChecked()!=usesTimeStepper) controller->rbTimeStepper->setChecked(usesTimeStepper);
+	if(rbFixed->isChecked()==usesTimeStepper) rbFixed->setChecked(!usesTimeStepper);
+	if(rbTimeStepper->isChecked()!=usesTimeStepper) rbTimeStepper->setChecked(usesTimeStepper);
+
 }
 

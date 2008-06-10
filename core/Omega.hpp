@@ -80,7 +80,7 @@ class Omega : public Singleton<Omega>
 		map<string,DynlibDescriptor>	 dynlibs;	// FIXME : should store that in ClassFactory ?
 		
 		shared_ptr<MetaBody>		 rootBody;
-		ptime				 sStartingSimulationTime;
+		//ptime				 sStartingSimulationTime;
 		ptime				 msStartingSimulationTime;
 		ptime				 msStartingPauseTime;
 		time_duration			 simulationPauseDuration;
@@ -150,7 +150,8 @@ class Omega : public Singleton<Omega>
 		Real		getSimulationTime() { return simulationTime;};
 		void		incrementSimulationTime() { simulationTime+=getTimeStep();};
 		
-		void		init();
+		void init();
+		void timeInit();
 
 		void reset();
 

@@ -81,8 +81,12 @@ void YadeQtMainWindow::timerEvent(QTimerEvent* evt){
 		else {this->show(); }
 	#endif
 	// update GL views (if any)
-	FOREACH(const shared_ptr<GLViewer>& glv,glViews){ if(glv) glv->updateGL(); }
-	
+	redrawAll(/*force=*/false);
+}
+
+void YadeQtMainWindow::redrawAll(bool force){
+	if(force || (simulationController && !simulationController->syncRunning))
+		FOREACH(const shared_ptr<GLViewer>& glv,glViews){ if(glv) glv->updateGL(); }
 }
 
 void YadeQtMainWindow::loadSimulation(string file){

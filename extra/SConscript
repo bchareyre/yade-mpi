@@ -90,7 +90,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/extra',[
 			'MetaInteractingGeometry',
 			'MetaInteractingGeometry2AABB',
 			'GlobalStiffness',
-			# 'EMBED_PYTHON' in env['CPPDEFINES'] and 'PythonRecorder' or 'yade-base', # FIXME: handle python properly; duplicated base is harmless
 			'InteractingSphere2AABB',\
 			'InteractingBox2AABB',
 			'NewtonsMomentumLaw',

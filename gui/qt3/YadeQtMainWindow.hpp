@@ -29,6 +29,7 @@ class YadeQtMainWindow : public YadeQtGeneratedMainWindow
 		void closeView(int);
 		void centerViews();
 		void loadSimulation(string file);
+		void redrawAll(bool force=false);
 
 
 	protected :

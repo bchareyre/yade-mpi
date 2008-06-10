@@ -30,7 +30,9 @@ class SimulationController : public QtGeneratedSimulationController
 		//map<int,GLViewer* > glViews;
 		int maxNbViews;
 		int refreshTime;
+		int updateTimerId;
 		bool sync;
+		bool syncRunning;
 
 		const int iterPerSec_TTL_ms;
 		long  iterPerSec_LastIter;
@@ -39,6 +41,7 @@ class SimulationController : public QtGeneratedSimulationController
 
 	
 		void doUpdate();
+		void restartTimer();
 
 		QScrollView * scrollView;
 		QFrame * scrollViewFrame;
@@ -68,10 +71,15 @@ class SimulationController : public QtGeneratedSimulationController
 		virtual void cbSyncToggled(bool);
 		virtual void pbStart2Clicked();
 
+
+
         
         protected :
                 void closeEvent(QCloseEvent *evt);
                 virtual void timerEvent(QTimerEvent* );
+
+		friend class YadeQtMainWindow;
+	DECLARE_LOGGER;
 };
 
 #endif // SIMULATIONCONTROLLER_HPP

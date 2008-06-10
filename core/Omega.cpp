@@ -32,12 +32,14 @@ CREATE_LOGGER(Omega);
 Omega::Omega()
 {
 	LOG_INFO("Constructing Omega  (if multiple times - check '-rdynamic' flag!).");
+	init();
+	timeInit();
 }
 
 
 Omega::~Omega()
 {
-	LOG_INFO("Shuting down; duration "<<sStartingSimulationTime-second_clock::local_time());
+	LOG_INFO("Shuting down; duration "<<(msStartingSimulationTime-microsec_clock::local_time())/1000<<" s");
 }
 
 void Omega::reset(){
@@ -46,14 +48,19 @@ void Omega::reset(){
 	init();
 }
 
-void Omega::init()
-{
+void Omega::init(){
 	simulationFileName="";
 	currentIteration = 0;
 	stopAtIteration = 0;
 	resetRootBody();
 }
 
+void Omega::timeInit(){
+	//sStartingSimulationTime=second_clock::local_time();
+	msStartingSimulationTime=microsec_clock::local_time();
+	simulationPauseDuration=msStartingSimulationTime-msStartingSimulationTime;
+	msStartingPauseTime=msStartingSimulationTime;
+}
 
 void Omega::createSimulationLoop()
 {
@@ -341,10 +348,8 @@ void Omega::loadSimulation()
 
 	if( rootBody->getClassName() != "MetaBody") throw yadeBadFile("Wrong file format (rootBody is not a MetaBody!) ??");
 
-	sStartingSimulationTime = second_clock::local_time();
-	msStartingSimulationTime = microsec_clock::local_time();
-	simulationPauseDuration = msStartingSimulationTime-msStartingSimulationTime;
-	msStartingPauseTime = msStartingSimulationTime;
+	timeInit();
+
 	LOG_DEBUG("Simulation loaded");
 	currentIteration = 0;
 	simulationTime = 0;
