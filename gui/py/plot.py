@@ -34,14 +34,13 @@ def reduceData(l):
 	"""
 	if l>maxDataLen:
 		global plotDataCollector
-		pdc=PlotDataCollector;
-		if not pdc: pdc=o.labeledEngine('plotDataCollector') # will raise RuntimeError if not found
-		if pdc['mayDouble']: # may we double the period without getting over limits?
+		if not plotDataCollector: plotDataCollector=o.labeledEngine('plotDataCollector') # will raise RuntimeError if not found
+		if plotDataCollector['mayDouble']: # may we double the period without getting over limits?
 			print "Reducing data: %d > %d"%(l,maxDataLen)
 			for d in data: data[d]=data[d][::2]
 			for attr in ['virtTimeLim','realTimeLim','iterLim']:
-				val=pdc[attr]
-				pdc[attr]=[val[0],val[1]*2,val[2]]
+				val=plotDataCollector[attr]
+				plotDataCollector[attr]=[val[0],val[1]*2,val[2]]
 
 
 def addData(d):
@@ -68,15 +67,14 @@ def fillNonSequence(o):
 
 def show(): plot()
 def plot():
-	pylab.ioff() # no interactive mode (hmmm, I don't know why actually...)
+	pylab.ion() ## # no interactive mode (hmmm, I don't know why actually...)
 	for p in plots:
 		pylab.figure()
 		plots_p=[fillNonSequence(o) for o in plots[p]]
 		pylab.plot(*sum([[data[p],data[d[0]],d[1]] for d in plots_p],[]))
 		pylab.legend([_p[0] for _p in plots_p])
 		pylab.xlabel(p)
-		pylab.show()
-	return
+	pylab.show()
 
 	
 import random

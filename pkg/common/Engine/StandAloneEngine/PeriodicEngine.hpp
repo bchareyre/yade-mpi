@@ -30,14 +30,14 @@ class PeriodicEngine: public StandAloneEngine {
 		Real lastRealTime,lastVirtTime; long lastIter;
 		bool mayDouble,mayHalve;
 		bool perhapsInconsistent;
-	public :
-		PeriodicEngine(): virtTimeLim(-1,0,0),realTimeLim(-1,0,0),iterLim(-1,0,0), lastRealTime(0.),lastVirtTime(0.),lastIter(0),mayDouble(false),mayHalve(false),perhapsInconsistent(true){};
 		void ensureConsistency(Vector3r& v){
 			if(v[0]<0) return; // not active
 			if(v[2]<v[0]){Real lo=v[2]; v[2]=v[0]; v[0]=lo;} // swap limits if necessary
 			if(v[1]<v[0]) v[1]=v[0]; // put actual value below the lower limit to the lower limit
 			if(v[1]>v[2]) v[2]=v[1]; // put actual value above the upper limit to the upper limit
 		}
+	public :
+		PeriodicEngine(): virtTimeLim(-1,0,0),realTimeLim(-1,0,0),iterLim(-1,0,0), lastRealTime(0.),lastVirtTime(0.),lastIter(0),mayDouble(false),mayHalve(false),perhapsInconsistent(true){};
 		virtual void action(MetaBody* b) { throw; }
 		virtual bool isActivated(){
 			if(perhapsInconsistent){ ensureConsistency(virtTimeLim); ensureConsistency(realTimeLim); ensureConsistency(iterLim); perhapsInconsistent=false; }
@@ -48,10 +48,10 @@ class PeriodicEngine: public StandAloneEngine {
 			long nowIter=Omega::instance().getCurrentIteration();
 			Real nowVirtTime=Omega::instance().getSimulationTime();
 			timeval tp; gettimeofday(&tp,NULL); Real nowRealTime=tp.tv_sec+tp.tv_usec/1e6;
-
-			if (  (virtTimeLim[0]>=0 && lastVirtTime-nowVirtTime>virtTimeLim[1])
-			 || (realTimeLim[0]>=0 && lastRealTime-nowRealTime>realTimeLim[1])
-			 || (iterLim[0]>=0     && lastIter    -nowIter    >iterLim[1])){
+			//cerr<<"--------------------"<<endl; cerr<<"virt:"<<virtTimeLim<<";"<<lastVirtTime<<";"<<nowVirtTime<<endl; cerr<<"real:"<<realTimeLim<<";"<<lastRealTime<<";"<<nowRealTime<<endl; cerr<<"iter:"<<iterLim<<";"<<lastIter<<";"<<nowIter<<endl;
+			if (  (virtTimeLim[0]>=0 && nowVirtTime-lastVirtTime>virtTimeLim[1])
+			 || (realTimeLim[0]>=0 && nowRealTime-lastRealTime>realTimeLim[1])
+			 || (iterLim[0]>=0     && nowIter    -lastIter    >iterLim[1])){
 				lastVirtTime=nowVirtTime; lastRealTime=nowRealTime; lastIter=nowIter;
 				return true;
 			} else return false;

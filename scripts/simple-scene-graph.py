@@ -32,9 +32,16 @@ o.engines=[
 	MetaEngine('PhysicalParametersMetaEngine',[EngineUnit('LeapFrogPositionIntegrator')]),
 	MetaEngine('PhysicalParametersMetaEngine',[EngineUnit('LeapFrogOrientationIntegrator')]),
 	###
-	### NOTE this extra engine
+	### NOTE this extra engine:
 	###
-	StandAloneEngine('PlotDataGetter',{'timeInterval':.01,'addPlotDataCall':'myAddPlotData()'})
+	### You want snapshot to be taken every 1 sec (realTimeLim) or every 50 iterations (iterLim),
+	### whichever comes soones. virtTimeLim attribute is unset, hence virtual time period is not taken into account.
+	### If there is too much data, they will be reduced automatically (every second number will be ditched) but
+	### the upper limit will always be guarded. 
+	### 
+	### The engine _must_ be labeled 'plotDataCollector', so that the reducer may find it and adjust its periods if necessary.
+	###
+	StandAloneEngine('PeriodicPythonRunner',{'realTimeLim':[1,1,4],'iterLim':[50,50,200],'command':'myAddPlotData()','label':'plotDataCollector'})
 ]
 from yade import utils
 o.bodies.append(utils.box(center=[0,0,0],extents=[.5,.5,.5],dynamic=False,color=[1,0,0],young=30e9,poisson=.3,density=2400))
@@ -66,7 +73,7 @@ def myAddPlotData():
 o.run();
 print """Now, you can say
 
- yade.plot.show()
+ yade.plot.plot()
 
-to see figures. Calculation will be suspended until all plot windows will have been closed.
+to see figures.
 """
