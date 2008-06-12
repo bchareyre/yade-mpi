@@ -154,7 +154,8 @@ void SimulationController::loadSimulationFromFileName(const std::string& fileNam
 		{
 			Omega::instance().resetRootBody();
 			Omega::instance().setSimulationFileName("");
-			shared_ptr<MessageDialog> md = shared_ptr<MessageDialog>(new MessageDialog(e.what(),this->parentWidget()->parentWidget()));
+			LOG_ERROR(e.what());
+			shared_ptr<MessageDialog> md = shared_ptr<MessageDialog>(new MessageDialog(e.what(),NULL /*this->parentWidget()->parentWidget()*/));
 			md->exec(); 
 			pbStartSimulation->setDisabled(true);
 			pbStopSimulation->setDisabled(true);
@@ -165,7 +166,8 @@ void SimulationController::loadSimulationFromFileName(const std::string& fileNam
 		{
 			Omega::instance().resetRootBody();
 			Omega::instance().setSimulationFileName("");
-			shared_ptr<MessageDialog> md = shared_ptr<MessageDialog>(new MessageDialog(e.what(),this->parentWidget()->parentWidget()));
+			LOG_ERROR(e.what());
+			shared_ptr<MessageDialog> md = shared_ptr<MessageDialog>(new MessageDialog(e.what(),NULL /*this->parentWidget()->parentWidget()*/));
 			md->exec(); 
 			pbStartSimulation->setDisabled(true);
 			pbStopSimulation->setDisabled(true);

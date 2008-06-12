@@ -46,9 +46,11 @@ int QtGUI::run(int argc, char *argv[])
 			default: break;	
 		}
 	if(optind<argc){ // process non-option arguments
-		if(boost::algorithm::ends_with(string(argv[optind]),string(".xml"))) Omega::instance().setSimulationFileName(string(argv[optind]));
+		if(boost::algorithm::ends_with(string(argv[optind]),string(".xml")) ||
+			boost::algorithm::ends_with(string(argv[optind]),string(".xml.gz")) ||
+			boost::algorithm::ends_with(string(argv[optind]),string(".xml.bz2"))) Omega::instance().setSimulationFileName(string(argv[optind]));
 		#ifdef EMBED_PYTHON
-			if(boost::algorithm::ends_with(string(argv[optind]),string(".py"))) PythonUI::runScript=string(argv[optind]);
+		else if(boost::algorithm::ends_with(string(argv[optind]),string(".py"))) PythonUI::runScript=string(argv[optind]);
 		#endif
 		else optind--;
 	}
