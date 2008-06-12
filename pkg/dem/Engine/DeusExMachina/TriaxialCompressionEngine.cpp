@@ -131,7 +131,7 @@ void TriaxialCompressionEngine::doStateTransition(MetaBody * body, stateNum next
 void TriaxialCompressionEngine::updateParameters ( MetaBody * ncb )
 {
 
-	UnbalancedForce=ComputeUnbalancedForce ( ncb ); // calculated at every iteration
+	UnbalancedForce=ComputeUnbalancedForce ( ncb );
 
 
 	if ( currentState==STATE_ISO_COMPACTION || currentState==STATE_ISO_UNLOADING )
@@ -206,6 +206,13 @@ void TriaxialCompressionEngine::applyCondition ( MetaBody * ncb )
 		Shop::saveSpheresToFile ( fileName );
 		saveSimulation = false;
 	}
+	
+	if ( Omega::instance().getCurrentIteration() % testEquilibriumInterval == 0 )
+	{
+		updateParameters ( ncb );
+		LOG_INFO("UnbalancedForce="<< UnbalancedForce);
+	}
+	
 	if ( currentState==STATE_LIMBO )
 	{		
 		return;
@@ -213,11 +220,7 @@ void TriaxialCompressionEngine::applyCondition ( MetaBody * ncb )
 
 	TriaxialStressController::applyCondition ( ncb );
 
-	if ( Omega::instance().getCurrentIteration() % testEquilibriumInterval == 0 )
-	{
-		updateParameters ( ncb );
-		LOG_INFO("UnbalancedForce="<< UnbalancedForce);
-	}
+	
 	
 	if ( currentState==STATE_TRIAX_LOADING )
 	{

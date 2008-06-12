@@ -15,15 +15,17 @@
 
 /*! An engine that can replace the usual series of engines used for integrating the laws of motion.
 
+This engine is faster because it uses less loops and less dispatching 
+
 The result is exactly the same as with :
--CundallNonViscousForceDamping
--CundallNonViscousMomentumDamping
 -NewtonsForceLaw
 -NewtonsMomentumLaw
 -LeapFrogPositionIntegrator
 -LeapFrogOrientationIntegrator
+-CundallNonViscousForceDamping
+-CundallNonViscousMomentumDamping
 
-But this engine is faster because it uses less loops and less dispatching 
+Except that damping is slightly different compared to CundallNonViscousForceDamping+CundallNonViscousMomentumDamping. Here, damping is dependent on predicted (undamped) velocity at t+dt/2, while the other engines use velocity at time t.
  
 Requirements :
 -All dynamic bodies must have physical parameters of type (or inheriting from) BodyMacroParameters
@@ -41,14 +43,7 @@ class NewtonsDampedLaw : public DeusExMachina
 		
 	private :
 		int forceClassIndex, momentumClassIndex;
-		//vector<Vector3r> prevVelocities, prevAngularVelocities;
-		//vector<bool> firsts;
-		unsigned int prevSize;
-		//virtual void go( 	  const shared_ptr<PhysicalAction>&
-		//			, const shared_ptr<PhysicalParameters>&
-		//			, const Body*);
-		
-		
+				
 	public :
 		virtual	void applyCondition(MetaBody *);		
 		NewtonsDampedLaw();

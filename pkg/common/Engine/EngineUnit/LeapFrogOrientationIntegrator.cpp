@@ -17,22 +17,22 @@ void LeapFrogOrientationIntegrator::go(	  const shared_ptr<PhysicalParameters>& 
 {
 	if(!body->isDynamic) return;
 		
-	unsigned int id = body->getId();
+// 	unsigned int id = body->getId();
 	
-	if (prevAngularVelocities.size()<=id)
-	{
-		prevAngularVelocities.resize(id+1);
-		firsts.resize(id+1,true);
-	}
+// 	if (prevAngularVelocities.size()<=id)
+// 	{
+// 		prevAngularVelocities.resize(id+1);
+// 		firsts.resize(id+1,true);
+// 	}
 
 	RigidBodyParameters * rb = YADE_CAST<RigidBodyParameters*>(b.get());
 	
 	Real dt = Omega::instance().getTimeStep();
 		
-	if (!firsts[id])
-		rb->angularVelocity = prevAngularVelocities[id]+rb->angularAcceleration*0.5*dt;
+// 	if (!firsts[id])
+// 		rb->angularVelocity = prevAngularVelocities[id]+rb->angularAcceleration*0.5*dt;
 		
-	prevAngularVelocities[id] = rb->angularVelocity+((Real)(0.5*dt))*rb->angularAcceleration;
+	rb->angularVelocity = rb->angularVelocity+ dt*rb->angularAcceleration;
 	Vector3r axis = rb->angularVelocity;
 	Real angle = axis.Normalize();
 	Quaternionr q;
@@ -40,7 +40,7 @@ void LeapFrogOrientationIntegrator::go(	  const shared_ptr<PhysicalParameters>& 
 	rb->se3.orientation = q*rb->se3.orientation;
 	rb->se3.orientation.Normalize();
 
-	firsts[id] = false;
+// 	firsts[id] = false;
 }
 
 YADE_PLUGIN();

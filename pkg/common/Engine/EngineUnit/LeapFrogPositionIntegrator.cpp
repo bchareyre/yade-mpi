@@ -10,6 +10,7 @@
 #include "ParticleParameters.hpp"
 #include<yade/core/Omega.hpp>
 
+
 // FIXME : should we pass timestep as parameter of functor
 // FIXME : what's with timestepper
 void LeapFrogPositionIntegrator::go(       const shared_ptr<PhysicalParameters>& b
@@ -17,27 +18,27 @@ void LeapFrogPositionIntegrator::go(       const shared_ptr<PhysicalParameters>&
 {
 	if(!body->isDynamic) return;
 
-	unsigned int id = body->getId();
+// 	unsigned int id = body->getId();
 	
-	if (prevVelocities.size()<=id)
-	{
-		prevVelocities.resize(id+1);
-		firsts.resize(id+1,true);
-	}
+// 	if (prevVelocities.size()<=id)
+// 	{
+// 		prevVelocities.resize(id+1);
+// 		firsts.resize(id+1,true);
+// 	}
 
 	ParticleParameters * p = YADE_CAST<ParticleParameters*>(b.get());
 
 	Real dt = Omega::instance().getTimeStep();
 
-	if (!firsts[id])
-		p->velocity = prevVelocities[id]+((Real)0.5)*dt*p->acceleration;
+// 	if (!firsts[id])
+// 		p->velocity = prevVelocities[id]+((Real)0.5)*dt*p->acceleration;
 
-	prevVelocities[id] = p->velocity+((Real)0.5)*dt*p->acceleration;
-	p->se3.position += prevVelocities[id]*dt;
+	p->velocity = p->velocity+dt*p->acceleration;
+	p->se3.position += p->velocity*dt;
 
 	//cerr<<"#"<<body->getId()<<"dx="<<prevVelocities[id]*dt<<endl;
 
-	firsts[id] = false;
+	//firsts[id] = false;
 }
 
 

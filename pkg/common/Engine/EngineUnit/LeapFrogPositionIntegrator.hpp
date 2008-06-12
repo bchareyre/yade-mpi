@@ -14,8 +14,8 @@
 class LeapFrogPositionIntegrator : public PhysicalParametersEngineUnit
 {
 	private :
-		vector<Vector3r> prevVelocities;
-		vector<bool> firsts;
+//		vector<Vector3r> prevVelocities;
+//		vector<bool> firsts;
 	
 	public :
 		virtual void go(	  const shared_ptr<PhysicalParameters>&

@@ -14,8 +14,8 @@
 class LeapFrogOrientationIntegrator : public PhysicalParametersEngineUnit 
 {
 	private :
-		vector<Vector3r> prevAngularVelocities;
-		vector<bool> firsts;
+// 		vector<Vector3r> prevAngularVelocities;
+// 		vector<bool> firsts;
 	
 	public :
 		virtual void go( 	  const shared_ptr<PhysicalParameters>&
