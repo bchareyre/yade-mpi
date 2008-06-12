@@ -41,8 +41,8 @@ class NewtonsDampedLaw : public DeusExMachina
 		
 	private :
 		int forceClassIndex, momentumClassIndex;
-		vector<Vector3r> prevVelocities, prevAngularVelocities;
-		vector<bool> firsts;
+		//vector<Vector3r> prevVelocities, prevAngularVelocities;
+		//vector<bool> firsts;
 		unsigned int prevSize;
 		//virtual void go( 	  const shared_ptr<PhysicalAction>&
 		//			, const shared_ptr<PhysicalParameters>&

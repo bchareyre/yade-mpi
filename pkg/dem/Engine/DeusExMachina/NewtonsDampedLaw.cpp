@@ -20,6 +20,7 @@ void NewtonsDampedLaw::registerAttributes()
 	REGISTER_ATTRIBUTE(damping);
 }
 
+
 NewtonsDampedLaw::NewtonsDampedLaw()
 {
 	damping = 0.2;
@@ -46,17 +47,18 @@ void NewtonsDampedLaw::applyCondition ( MetaBody * ncb )
 		Vector3r& m = ( static_cast<Momentum*> ( ncb->physicalActions->find ( id, momentumClassIndex ).get() ) )->momentum;
 		Vector3r& f = ( static_cast<Force*> ( ncb->physicalActions->find ( id, forceClassIndex ).get() ) )->force;
 
+		Real dt = Omega::instance().getTimeStep();
 
 		if (!b->isClump()) {
 			//Damping moments
 			for ( int i=0; i<3; ++i )
 			{
-				m[i] *= 1 - damping*Mathr::Sign ( m[i]*rb->angularVelocity[i] );
+				m[i] *= 1 - damping*Mathr::Sign ( m[i]*rb->angularVelocity[i] + (Real) 0.5 *dt*rb->angularAcceleration[i] );
 			}
 			//Damping force :
 			for ( int i=0; i<3; ++i )
 			{
-				f[i] *= 1 - damping*Mathr::Sign ( f[i]*rb->velocity[i] );
+				f[i] *= 1 - damping*Mathr::Sign ( f[i]*rb->velocity[i] + (Real) 0.5 *dt*rb->acceleration[i] );
 			}
 		}
 
@@ -90,24 +92,27 @@ void NewtonsDampedLaw::applyCondition ( MetaBody * ncb )
 		}
 
 		//Orientation and Position Integrators :
-		if ( prevSize <=id )
-		{
-			prevSize = id+1;
-			prevAngularVelocities.resize ( prevSize );
-			prevVelocities.resize ( prevSize );
-			firsts.resize ( prevSize,true );
-		}
+// 		if ( prevSize <=id )
+// 		{
+// 			prevSize = id+1;
+// 			prevAngularVelocities.resize ( prevSize );
+// 			prevVelocities.resize ( prevSize );
+// 			firsts.resize ( prevSize,true );
+// 		}
 
-		Real dt = Omega::instance().getTimeStep();
+		
+// 		if ( !firsts[id] )
+// 		{
+// 			rb->angularVelocity = rb->angularVelocity+rb->angularAcceleration*0.5*dt;
+// 			rb->velocity = rb->velocity+ ( ( Real ) 0.5 ) *dt*rb->acceleration;
+// 		}
 
-		if ( !firsts[id] )
-		{
-			rb->angularVelocity = prevAngularVelocities[id]+rb->angularAcceleration*0.5*dt;
-			rb->velocity = prevVelocities[id]+ ( ( Real ) 0.5 ) *dt*rb->acceleration;
-		}
 
-		prevAngularVelocities[id] = rb->angularVelocity+ ( ( Real ) ( 0.5*dt ) ) *rb->angularAcceleration;
-		prevVelocities[id] = rb->velocity+ ( ( Real ) 0.5 ) *dt*rb->acceleration;
+		rb->angularVelocity = rb->angularVelocity+ dt*rb->angularAcceleration;
+		rb->velocity = rb->velocity+ dt*rb->acceleration;
+
+// 		prevAngularVelocities[id] = rb->angularVelocity;
+// 		prevVelocities[id] = rb->velocity;
 
 		Vector3r axis = rb->angularVelocity;
 		Real angle = axis.Normalize();
@@ -117,9 +122,9 @@ void NewtonsDampedLaw::applyCondition ( MetaBody * ncb )
 		rb->se3.orientation.Normalize();
 
 
-		rb->se3.position += prevVelocities[id]*dt;
+		rb->se3.position += rb->velocity*dt;
 
-		firsts[id] = false;
+// 		firsts[id] = false;
 
 
 	}
