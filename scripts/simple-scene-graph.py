@@ -70,6 +70,8 @@ def myAddPlotData():
 	sph=o.bodies[1]
 	yade.plot.addData({'t':o.time,'i':o.iter,'z_sph':sph.phys['se3'][2],'v_sph':sqrt(sum([v**2 for v in sph.phys['velocity']]))})
 
+
+
 o.run();
 print """Now, you can say
 

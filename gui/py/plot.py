@@ -76,6 +76,43 @@ def plot():
 		pylab.xlabel(p)
 	pylab.show()
 
+def saveGnuplot(baseName,term='wxt',extension=None,timestamp=False,comment=None):
+	"""baseName: used for creating baseName.gnuplot (command file for gnuplot),
+			associated baseName.data (data) and output files (if applicable) in the form baseName.[plot number].extension
+		term: specify the gnuplot terminal;
+			defaults to x11, in which case gnuplot will draw persistent windows to screen and terminate
+			other useful terminals are 'png', 'cairopdf' and so on
+		extension: defaults to terminal name
+			fine for png for example; if you use 'cairopdf', you should also say extension='pdf' however
+		timestamp: append numeric time to the basename
+		comment: a user comment (may be multiline) that will be embedded in the control file
+	"""
+	import time,bz2
+	vars=data.keys()
+	lData=len(data[vars[0]])
+	if timestamp: baseName+=time.strftime('_%Y%m%d_%H:%m')
+	baseNameNoPath=baseName.split('/')[-1]
+	fData=bz2.BZ2File(baseName+".data.bz2",'w');
+	fData.write("# "+"\t\t".join(vars)+"\n")
+	for i in range(lData):
+		fData.write("\t".join([str(data[key][i]) for key in data.keys()])+"\n")
+	fData.close()
+	fPlot=file(baseName+".gnuplot",'w')
+	fPlot.write('#!/usr/bin/env gnuplot\n#\n# created '+time.asctime()+' ('+time.strftime('%Y%m%d_%H:%m')+')\n#\n')
+	if comment: fPlot.write('# '+comment.replace('\n','\n# ')+'#\n')
+	fPlot.write('dataFile="< bzcat %s.data.bz2"\n'%(baseNameNoPath))
+	if not extension: extension=term
+	i=0
+	for p in plots:
+		# print p
+		plots_p=[fillNonSequence(o) for o in plots[p]]
+		if term in ['wxt','x11']: fPlot.write("set term %s %d persist\n"%(term,i))
+		else: fPlot.write("set term %s; set output '%s.%d.%s'\n"%(term,baseNameNoPath,i,extension))
+		fPlot.write("plot "+",".join([" dataFile using %d:%d title '%s(%s)'"%(vars.index(p)+1,vars.index(pp[0])+1,pp[0],p) for pp in plots_p])+"\n")
+		i+=1
+	fPlot.close()
+
+
 	
 import random
 if __name__ == "__main__":

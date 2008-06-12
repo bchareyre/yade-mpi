@@ -97,7 +97,7 @@ def PWaveTimeStep():
 		dt=min(dt,thisDt)
 	return dt
 
-def spheresFromFile(filename,**kw):
+def spheresFromFile(filename,scale=1.,**kw):
 	"""Load sphere coordinates from file, create spheres, insert them to the simulation.
 
 	filename is the file holding ASCII numbers (at least 4 colums that hold x_center, y_center, z_center, radius).
@@ -108,7 +108,7 @@ def spheresFromFile(filename,**kw):
 	ret=[]
 	for l in open(filename):
 		ss=[float(i) for i in l.split()]
-		id=o.bodies.append(sphere([ss[0],ss[2],ss[1]],ss[3],**kw))
+		id=o.bodies.append(sphere([scale*ss[0],scale*ss[2],scale*ss[1]],scale*ss[3],**kw))
 		ret.append(id)
 	return ret
 

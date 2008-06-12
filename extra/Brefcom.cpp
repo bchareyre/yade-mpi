@@ -199,15 +199,17 @@ void BrefcomLaw::action(MetaBody* _rootBody){
 		TRVAR1(Omega::instance().getTimeStep());*/
 
 
-		/* FIXME dist>0 doesn't take into account interaction radius!!! */
-		// /* TODO: recover non-cohesive contact deletion: */
-		if(!BC->isCohesive && dist>0){ /* delete this interaction later */ /* (*I)->isReal=false; */ continue; }
+		/* normal strain */
+		epsN=(dist-equilibriumDist)/equilibriumDist;
 
-		if(dist>=0) { epsT=Vector3r::ZERO; }
-		else {
+		// /* TODO: recover non-cohesive contact deletion: */
+		if(!BC->isCohesive && epsN>0.){ /* delete this interaction later */ /* (*I)->isReal=false; */ continue; }
+
+		/* shear strain: always use it, even for epsN>0 */
+		/*if(false && epsN>0) { epsT=Vector3r::ZERO; } else {*/
+
 			/* rotate epsT to the new contact plane */
 				const Real& dt=Omega::instance().getTimeStep();
-#if 1
 				// rotation of the contact normal
 				//TRVAR2(epsT,BC->prevNormal.Cross(contGeom->normal));
 				//TRVAR1((BC->prevNormal.Cross(contGeom->normal)).Cross(epsT));
@@ -219,7 +221,6 @@ void BrefcomLaw::action(MetaBody* _rootBody){
 				//TRVAR1(epsT.Cross(angle*contGeom->normal));
 				epsT+=(angle*contGeom->normal).Cross(epsT);
 
-#endif 
 			/* calculate tangential strain increment */
 				Vector3r AtoC(contGeom->contactPoint-rbp1->se3.position), BtoC(contGeom->contactPoint-rbp2->se3.position);
 				Vector3r relVelocity /* at the contact point */ = 
@@ -233,10 +234,7 @@ void BrefcomLaw::action(MetaBody* _rootBody){
 			/* artificially remove residuum in the normal direction */
 			//epsT-=contGeom->normal*epsT.Dot(contGeom->normal);
 			//TRVAR1(epsT.Dot(contGeom->normal));
-		}
 			
-		/* normal strain */
-		epsN=(dist-equilibriumDist)/equilibriumDist;
 
 		Vector3r sigmaT;
 

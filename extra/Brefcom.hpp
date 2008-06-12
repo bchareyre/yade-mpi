@@ -10,6 +10,7 @@
 #include<yade/pkg-common/InteractionPhysicsEngineUnit.hpp>
 #include<yade/pkg-dem/SpheresContactGeometry.hpp>
 #include<yade/pkg-common/GLDrawInteractionPhysicsFunctor.hpp>
+#include<yade/pkg-common/PeriodicEngines.hpp>
 #include<yade/pkg-dem/GlobalStiffness.hpp>
 
 // #define BREFCOM_REC
@@ -206,15 +207,13 @@ class GLDrawBrefcomContact: public GLDrawInteractionPhysicsFunctor {
 };
 REGISTER_SERIALIZABLE(GLDrawBrefcomContact,false);
 
-class BrefcomDamageColorizer : public StandAloneEngine {
+class BrefcomDamageColorizer : public PeriodicEngine {
 	public :
-		int interval;
-		BrefcomDamageColorizer(){interval=100;}
+		BrefcomDamageColorizer(){}
 		virtual void action(MetaBody*);
-		virtual bool isActivated(){return Omega::instance().getCurrentIteration()%interval==0;}
-	void registerAttributes(){REGISTER_ATTRIBUTE(interval);}
+	virtual void registerAtributes(){PeriodicEngine::registerAttributes();}
 	REGISTER_CLASS_NAME(BrefcomDamageColorizer);
-	REGISTER_BASE_CLASS_NAME(StandAloneEngine);
+	REGISTER_BASE_CLASS_NAME(PeriodicEngine);
 };
 REGISTER_SERIALIZABLE(BrefcomDamageColorizer,false);
 

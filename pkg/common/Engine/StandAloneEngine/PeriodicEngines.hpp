@@ -4,6 +4,37 @@
 #include<time.h>
 #include<yade/core/StandAloneEngine.hpp>
 #include<yade/core/Omega.hpp>
+/* run an action with given fixed periodicity (real time, virtual time, iteration number), by setting any of 
+ * those criteria to a number > 0. */
+class PeriodicEngine:  public StandAloneEngine {
+	private:
+		Real getClock(){ timeval tp; gettimeofday(&tp,NULL); return tp.tv_sec+tp.tv_usec/1e6; }
+		Real virtPeriod, virtLast, realPeriod, realLast; long iterPeriod,iterLast;
+	public:
+		PeriodicEngine(): virtPeriod(0),virtLast(0),realPeriod(0),realLast(0),iterPeriod(0),iterLast(0) { realLast=getClock(); }
+		virtual bool isActivated(){
+			Real virtNow=Omega::instance().getSimulationTime();
+			Real realNow=getClock();
+			long iterNow=Omega::instance().getCurrentIteration();
+			if((virtPeriod>0 && virtNow-virtLast>virtPeriod) ||
+				(realPeriod>0 && realNow-realLast>realPeriod) ||
+				(iterPeriod>0 && iterNow-iterLast>iterPeriod)){
+				realLast=realNow; virtLast=virtNow; iterLast=iterNow;
+				return true;
+			}
+			return false;
+		}
+	protected:
+		void registerAttributes(){ StandAloneEngine::registerAttributes();
+			REGISTER_ATTRIBUTE(virtPeriod);
+			REGISTER_ATTRIBUTE(realPeriod);
+			REGISTER_ATTRIBUTE(iterPeriod);
+			REGISTER_ATTRIBUTE(virtLast);
+			REGISTER_ATTRIBUTE(realLast);
+			REGISTER_ATTRIBUTE(iterLast);
+		}
+};
+REGISTER_SERIALIZABLE(PeriodicEngine,false);
 
 /* Run an action with adjustable and constrained periodicity (real time, virtual time, iteration)
  *
@@ -24,7 +55,7 @@
  *
  * @bug we use gettimeofday() to get current time; benchmark it, since it involves a syscall?; better use HPET timer (async?) instead of polling the clock?
  */
-class PeriodicEngine: public StandAloneEngine {
+class RangePeriodicEngine: public StandAloneEngine {
 	private:
 		Vector3r virtTimeLim,realTimeLim,iterLim;
 		Real lastRealTime,lastVirtTime; long lastIter;
@@ -37,7 +68,7 @@ class PeriodicEngine: public StandAloneEngine {
 			if(v[1]>v[2]) v[2]=v[1]; // put actual value above the upper limit to the upper limit
 		}
 	public :
-		PeriodicEngine(): virtTimeLim(-1,0,0),realTimeLim(-1,0,0),iterLim(-1,0,0), lastRealTime(0.),lastVirtTime(0.),lastIter(0),mayDouble(false),mayHalve(false),perhapsInconsistent(true){};
+		RangePeriodicEngine(): virtTimeLim(-1,0,0),realTimeLim(-1,0,0),iterLim(-1,0,0), lastRealTime(0.),lastVirtTime(0.),lastIter(0),mayDouble(false),mayHalve(false),perhapsInconsistent(true){};
 		virtual void action(MetaBody* b) { throw; }
 		virtual bool isActivated(){
 			if(perhapsInconsistent){ ensureConsistency(virtTimeLim); ensureConsistency(realTimeLim); ensureConsistency(iterLim); perhapsInconsistent=false; }
@@ -47,6 +78,7 @@ class PeriodicEngine: public StandAloneEngine {
 			
 			long nowIter=Omega::instance().getCurrentIteration();
 			Real nowVirtTime=Omega::instance().getSimulationTime();
+			//Real nowRealTime=boost::posix_time::microsec_clock::universal_time()/1e6;
 			timeval tp; gettimeofday(&tp,NULL); Real nowRealTime=tp.tv_sec+tp.tv_usec/1e6;
 			//cerr<<"--------------------"<<endl; cerr<<"virt:"<<virtTimeLim<<";"<<lastVirtTime<<";"<<nowVirtTime<<endl; cerr<<"real:"<<realTimeLim<<";"<<lastRealTime<<";"<<nowRealTime<<endl; cerr<<"iter:"<<iterLim<<";"<<lastIter<<";"<<nowIter<<endl;
 			if (  (virtTimeLim[0]>=0 && nowVirtTime-lastVirtTime>virtTimeLim[1])
@@ -70,8 +102,8 @@ class PeriodicEngine: public StandAloneEngine {
 	protected :
 		virtual void postProcessAttributes(bool deserializing){}
 	DECLARE_LOGGER;
-	REGISTER_CLASS_NAME(PeriodicEngine);
+	REGISTER_CLASS_NAME(RangePeriodicEngine);
 	REGISTER_BASE_CLASS_NAME(StandAloneEngine);
 };
-REGISTER_SERIALIZABLE(PeriodicEngine,false);
+REGISTER_SERIALIZABLE(RangePeriodicEngine,false);
 
