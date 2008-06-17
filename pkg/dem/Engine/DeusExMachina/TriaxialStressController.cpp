@@ -123,6 +123,10 @@ void TriaxialStressController::registerAttributes()
 	REGISTER_ATTRIBUTE(previousStress);
 	REGISTER_ATTRIBUTE(previousMultiplier);
 	REGISTER_ATTRIBUTE(internalCompaction);
+
+	// needed for access from python
+	REGISTER_ATTRIBUTE(meanStress);
+	REGISTER_ATTRIBUTE(volumetricStrain);
 }
 
 void TriaxialStressController::updateStiffness (MetaBody * ncb)
@@ -240,7 +244,16 @@ void TriaxialStressController::applyCondition(MetaBody* ncb)
 	}
 }
 
-Real TriaxialStressController::computeStressStrain(MetaBody* ncb)
+/* Compute:
+ *
+ * # strain[3] along x,y,z axes, 
+ * # volumetricStrain (ε_v=ε_x+ε_y+ε_z)
+ * # stress[6] on all walls
+ * # meanStress
+ *
+ * (This function used to return meanStress, but since the return value was not used anywhere, it now returns void)
+ */
+void TriaxialStressController::computeStressStrain(MetaBody* ncb)
 {
 	
 // 	height = p_top->se3.position.Y() - p_bottom->se3.position.Y() - thickness;
@@ -254,6 +267,8 @@ Real TriaxialStressController::computeStressStrain(MetaBody* ncb)
 	strain[0] = Mathr::Log(width0/width);
 	strain[1] = Mathr::Log(height0/height);
 	strain[2] = Mathr::Log(depth0/depth);
+
+	volumetricStrain=strain[0]+strain[1]+strain[2];
 	
 	Real invXSurface = 1.f/(height*depth);
 	Real invYSurface = 1.f/(width*depth);
@@ -272,8 +287,6 @@ Real TriaxialStressController::computeStressStrain(MetaBody* ncb)
 
 	for (int i=0; i<6; i++) meanStress-=stress[i].Dot(normal[i]);
 	meanStress/=6.;
-	// FIXME: meanStress is both returned as function value and stored in meanStress member. Confusing, change prototype to void, since return value isn't used anywhere.
-	return meanStress;
 }
 
 void TriaxialStressController::controlInternalStress(MetaBody* ncb, Real multiplier)

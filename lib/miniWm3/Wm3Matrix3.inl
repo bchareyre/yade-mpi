@@ -834,7 +834,7 @@ void Matrix3<Real>::EigenDecomposition (Matrix3& rkRot, Matrix3& rkDiag) const
     Real afDiag[3], afSubd[2];
     rkRot = *this;
     bool bReflection = rkRot.Tridiagonalize(afDiag,afSubd);
-    bool bConverged = rkRot.QLAlgorithm(afDiag,afSubd);
+    __attribute__((unused)) bool bConverged = rkRot.QLAlgorithm(afDiag,afSubd);
     assert(bConverged);
 
     // (insertion) sort eigenvalues in increasing order, d0 <= d1 <= d2

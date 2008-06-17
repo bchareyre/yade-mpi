@@ -14,6 +14,8 @@
 #include<boost/shared_ptr.hpp>
 #include<boost/python.hpp>
 #include<boost/foreach.hpp>
+#include<boost/algorithm/string.hpp>
+
 // [boost1.34] #include<boost/python/stl_iterator.hpp>
 
 #include<yade/lib-base/Logging.hpp>
@@ -205,6 +207,33 @@ class pyBodyContainer{
 	}
 	body_id_t insert(pyBody b){return proxee->insert(b.proxee);}
 	void clear(){proxee->clear();}
+};
+
+class pyTags{
+	public:
+		pyTags(const shared_ptr<MetaBody> _mb): mb(_mb){}
+		const shared_ptr<MetaBody> mb;
+		bool hasKey(string key){ FOREACH(string val, mb->tags){ if(algorithm::starts_with(val,key+"=")){ return true;} } return false; }
+		string getItem(string key){
+			FOREACH(string val, mb->tags){
+				if(algorithm::starts_with(val,key+"=")){ algorithm::erase_head(val,val.size()+1); return val;}
+			}
+			PyErr_SetString(PyExc_KeyError, "Invalid key.");
+			python::throw_error_already_set(); /* make compiler happy; never reached */ return string();
+		}
+		void setItem(string key,string newVal){
+			FOREACH(string& val, mb->tags){if(algorithm::starts_with(val,key+"=")){ val=newVal; return; } }
+			mb->tags.push_back(key+"="+newVal);
+			}
+		python::list keys(){
+			python::list ret;
+			FOREACH(string val, mb->tags){
+				size_t i=val.find("=");
+				if(i==string::npos) throw runtime_error("Tags must be in the key:value format");
+				algorithm::erase_head(val,i); ret.append(val);
+			}
+			return ret;
+		}
 };
 
 class pyInteractionIterator{
@@ -403,6 +432,8 @@ class pyOmega{
 		for(map<string,DynlibDescriptor>::const_iterator di=Omega::instance().getDynlibsDescriptor().begin();di!=Omega::instance().getDynlibsDescriptor().end();++di) if (Omega::instance().isInheritingFrom((*di).first,base)) ret.append(di->first);
 		return ret;
 	}
+
+	pyTags tags_get(void){assertRootBody(); return pyTags(OMEGA.getRootBody());}
 	#undef OMEGA
 };
 	
@@ -448,8 +479,13 @@ BOOST_PYTHON_MODULE(wrapper)
 		.add_property("bodies",&pyOmega::bodies_get)
 		.add_property("interactions",&pyOmega::interactions_get)
 		.add_property("actions",&pyOmega::actions_get)
+		.add_property("tags",&pyOmega::tags_get)
 		.def("childClasses",&pyOmega::listChildClasses)
 		;
+	boost::python::class_<pyTags>("TagsWrapper",python::init<pyTags&>())
+		.def("__getitem__",&pyTags::getItem)
+		.def("__setitem__",&pyTags::setItem)
+		.def("keys",&pyTags::keys);
 	
 	boost::python::class_<pyBodyContainer>("BodyContainer",python::init<pyBodyContainer&>())
 		.def("__getitem__",&pyBodyContainer::pyGetitem)

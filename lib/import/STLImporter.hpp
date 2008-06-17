@@ -49,7 +49,7 @@ class STLImporter {
 	int number_of_flat_edges() const { return nbFlatEdges; }
 
 	/// max number of facet vertices (by default 4)
-	int max_vertices_in_facet; 
+	size_t max_vertices_in_facet; 
 
 	void set_imported_stuff(bool v, bool e, bool f) {import_vertices=v; import_edges=e; import_facets=f;}
 	/// import vertices (by default true)

@@ -79,7 +79,7 @@ bool STLReader::open(const char* filename, OutV vertices, OutE edges, OutF facet
     if(file_size ==  expected_file_size) binary = true;
     unsigned char tmpbuf[128];
     fread(tmpbuf,sizeof(tmpbuf),1,fp);
-    for(int i = 0; i < sizeof(tmpbuf); i++)
+    for(size_t i = 0; i < sizeof(tmpbuf); i++)
       {
 	if(tmpbuf[i] > 127)
 		{

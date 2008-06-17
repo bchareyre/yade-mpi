@@ -46,6 +46,7 @@ class TriaxialStressController : public DeusExMachina
 		//! The value of stiffness (updated according to stiffnessUpdateInterval) 
 		Real		stiffness [6];
 		Real 		strain [3];
+		Real volumetricStrain;
 		Vector3r	normal [6];
 		//! The values of stresses 
 		Vector3r	stress [6];
@@ -79,7 +80,7 @@ class TriaxialStressController : public DeusExMachina
 		void controlExternalStress(int wall, MetaBody* ncb, Vector3r resultantForce, PhysicalParameters* p, Real wall_max_vel);
 		void controlInternalStress(MetaBody* ncb, Real multiplier);
 		void updateStiffness(MetaBody* ncb);
-		Real computeStressStrain(MetaBody* ncb); //Compute stresses on walls and store the values in "Vector3r stress[6]", return mean stress
+		void computeStressStrain(MetaBody* ncb); //Compute stresses on walls as "Vector3r stress[6]", compute meanStress, strain[3] and mean strain
 		//! Compute the mean/max unbalanced force in the assembly (normalized by mean contact force)
     		Real ComputeUnbalancedForce(MetaBody * ncb, bool maxUnbalanced=false);
 
