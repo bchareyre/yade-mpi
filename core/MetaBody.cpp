@@ -16,6 +16,7 @@
 #include<yade/lib-base/yadeWm3.hpp>
 #include<boost/foreach.hpp>
 #include<boost/date_time/posix_time/posix_time.hpp>
+#include<boost/algorithm/string.hpp>
 
 
 /* this is meant to improve usability: MetaBody is ready by default (so is Omega by that token)
@@ -47,7 +48,10 @@ MetaBody::MetaBody() :
 	gethostname(hostname,HOST_NAME_MAX);
 	pw=getpwuid(geteuid()); if(!pw) throw runtime_error("getpwuid(geteuid()) failed!");
 	// a few default tags
-	tags.push_back(string("author=")+pw->pw_gecos+" ("+string(pw->pw_name)+"@"+hostname+")");
+	// real name: will have all non-ASCII characters replaced by ? since serialization doesn't handle that
+	// the standard GECOS format is Real Name,,, - first command and after will be discarded
+	string gecos(pw->pw_gecos), gecos2; size_t p=gecos.find(","); if(p!=string::npos) boost::algorithm::erase_tail(gecos,gecos.size()-p); for(size_t i=0;i<gecos.size();i++){gecos2.push_back(((unsigned char)gecos[i])<128 ? gecos[i] : '?'); }
+	tags.push_back(boost::algorithm::replace_all_copy(string("author=")+gecos2+" ("+string(pw->pw_name)+"@"+hostname+")"," ","~"));
 	tags.push_back(string("isoTime="+boost::posix_time::to_iso_string(boost::posix_time::second_clock::local_time())));
 	tags.push_back(string("description="));
 }

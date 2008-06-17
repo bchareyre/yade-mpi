@@ -215,22 +215,23 @@ class pyTags{
 		const shared_ptr<MetaBody> mb;
 		bool hasKey(string key){ FOREACH(string val, mb->tags){ if(algorithm::starts_with(val,key+"=")){ return true;} } return false; }
 		string getItem(string key){
-			FOREACH(string val, mb->tags){
-				if(algorithm::starts_with(val,key+"=")){ algorithm::erase_head(val,val.size()+1); return val;}
+			FOREACH(string& val, mb->tags){
+				if(algorithm::starts_with(val,key+"=")){ string val1(val); algorithm::erase_head(val1,key.size()+1); algorithm::replace_all(val1,"~"," "); return val1;}
 			}
 			PyErr_SetString(PyExc_KeyError, "Invalid key.");
 			python::throw_error_already_set(); /* make compiler happy; never reached */ return string();
 		}
 		void setItem(string key,string newVal){
-			FOREACH(string& val, mb->tags){if(algorithm::starts_with(val,key+"=")){ val=newVal; return; } }
-			mb->tags.push_back(key+"="+newVal);
+			string item=algorithm::replace_all_copy(key+"="+newVal," ","~");
+			FOREACH(string& val, mb->tags){if(algorithm::starts_with(val,key+"=")){ val=item; return; } }
+			mb->tags.push_back(item);
 			}
 		python::list keys(){
 			python::list ret;
 			FOREACH(string val, mb->tags){
 				size_t i=val.find("=");
-				if(i==string::npos) throw runtime_error("Tags must be in the key:value format");
-				algorithm::erase_head(val,i); ret.append(val);
+				if(i==string::npos) throw runtime_error("Tags must be in the key=value format");
+				algorithm::erase_tail(val,val.size()-i); ret.append(val);
 			}
 			return ret;
 		}
