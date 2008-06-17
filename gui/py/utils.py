@@ -63,6 +63,7 @@ def perpendicularArea(axis,consider=lambda body: True):
 	inf=float('inf')
 	ext=[[inf,inf],[-inf,-inf]]
 	otherAxes=((axis+1)%3,(axis+2)%3)
+	o=Omega()
 	for b in o.bodies:
 		if consider(b) and b.shape.name=='Sphere':
 			ext[0]=[min(ext[0][i],b.phys['se3'][otherAxes[i]]-b.shape['radius']) for i in [0,1]]
