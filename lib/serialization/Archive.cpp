@@ -12,7 +12,7 @@
 
 map<SerializableTypes::Type,pair<SerializeFnPtr,DeserializeFnPtr> > Archive::serializationMap;
 map<SerializableTypes::Type,pair<SerializeFnPtr,DeserializeFnPtr> > Archive::serializationMapOfFundamental;
-Archive::SerializableDescriptorMap Archive::map;
+// Archive::SerializableDescriptorMap Archive::myMap;
 
 void Archive::clearSerializablePointers() { serializationMap.clear(); serializationMapOfFundamental.clear(); }
 

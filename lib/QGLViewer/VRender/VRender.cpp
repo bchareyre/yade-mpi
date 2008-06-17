@@ -55,6 +55,8 @@
 # include <GL/gl.h>
 #endif
 
+#include <stdlib.h>
+#include <string.h>
 #include <stdio.h>
 #include <vector>
 #include "VRender.h"

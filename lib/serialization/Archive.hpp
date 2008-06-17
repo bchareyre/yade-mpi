@@ -272,7 +272,7 @@ class Archive
 
 	/*! Type of a Stl map used to map the registered class name with their SerializableDescriptor */
 	private   : typedef std::map< std::string , SerializableDescriptor > SerializableDescriptorMap;
-	private   : static SerializableDescriptorMap map;
+	// private   : static SerializableDescriptorMap myMap;
 	public    : static bool registerSerializableDescriptor( string name, VerifyFactorableFnPtr verify, SerializableTypes::Type type, bool f);
 	public    : static bool findClassInfo(const type_info& tp,SerializableTypes::Type& type, string& serializableClassName,bool& fundamental);
 

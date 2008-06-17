@@ -20,7 +20,7 @@ SerializableSingleton::SerializableSingleton()
 bool SerializableSingleton::registerSerializableDescriptor( string name , VerifyFactorableFnPtr verify, SerializableTypes::Type type, bool f )
 {
 
-	bool tmp = map.insert( SerializableDescriptorMap::value_type( name , SerializableDescriptor(verify,type,f) )).second;
+	bool tmp = myMap.insert( SerializableDescriptorMap::value_type( name , SerializableDescriptor(verify,type,f) )).second;
 
 	#if 0
 		if (tmp)
@@ -35,8 +35,8 @@ bool SerializableSingleton::registerSerializableDescriptor( string name , Verify
 
 bool SerializableSingleton::findClassInfo(const type_info& tp,SerializableTypes::Type& type, string& serializableClassName,bool& fundamental)
 {
-	SerializableDescriptorMap::iterator mi    = map.begin();
-	SerializableDescriptorMap::iterator miEnd = map.end();
+	SerializableDescriptorMap::iterator mi    = myMap.begin();
+	SerializableDescriptorMap::iterator miEnd = myMap.end();
 
 	for( ; mi!=miEnd ; mi++)
 	{

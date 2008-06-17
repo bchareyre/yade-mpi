@@ -38,9 +38,9 @@ class DynLibManager
 {
 	private :
 		#ifdef WIN32
-		std::map<const string, HINSTANCE> handles;	
+		std::map<const std::string, HINSTANCE> handles;	
 		#else	
-		std::map<const string, void *> handles;
+		std::map<const std::string, void *> handles;
 		#endif
 
 		vector<string> baseDirs;
@@ -49,10 +49,10 @@ class DynLibManager
 	public :
 		DynLibManager ();
 		~DynLibManager ();
-		void addBaseDirectory(const string& dir);
+		void addBaseDirectory(const std::string& dir);
 
-		bool load (const string& libName, const string& libName);
-		bool loadFromDirectoryList (const string& fullLibName);
+		bool load (const std::string& libName, const std::string& libName2);
+		bool loadFromDirectoryList (const std::string& fullLibName);
 
 		bool unload (const string libName);
 		bool isLoaded (const string libName);

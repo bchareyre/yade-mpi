@@ -42,7 +42,7 @@ class SerializableSingleton : public Singleton< SerializableSingleton >
 
 	/// Type of a Stl map used to map the registered class name with their SerializableDescriptor
 		typedef std::map< std::string , SerializableDescriptor > SerializableDescriptorMap;
-		SerializableDescriptorMap map;
+		SerializableDescriptorMap myMap;
 
 	public :
 		bool registerSerializableDescriptor( string name, VerifyFactorableFnPtr verify, SerializableTypes::Type type, bool f);

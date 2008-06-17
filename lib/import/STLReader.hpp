@@ -9,6 +9,7 @@
 #define __STLREADER_HPP__
 
 #include <stdio.h>
+#include<string.h>
 #include <set>
 #include <vector>
 #include <cmath>
