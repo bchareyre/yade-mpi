@@ -29,6 +29,7 @@ void BrefcomMakeContact::go(const shared_ptr<PhysicalParameters>& pp1, const sha
 		interaction->isNew; // just in case
 		//TRACE;
 
+
 		const shared_ptr<BodyMacroParameters>& elast1=static_pointer_cast<BodyMacroParameters>(pp1);
 		const shared_ptr<BodyMacroParameters>& elast2=static_pointer_cast<BodyMacroParameters>(pp2);
 
@@ -37,11 +38,13 @@ void BrefcomMakeContact::go(const shared_ptr<PhysicalParameters>& pp1, const sha
 		Real S12=Mathr::PI*pow(min(contGeom->radius1,contGeom->radius2),2); // "surface" of interaction
 		//Real d0=contGeom->radius1 + contGeom->radius2; // equilibrium distace is "just touching"
 		Real d0=(elast1->se3.position-elast2->se3.position).Length(); // equilibrium distance is the initial contact distance
-		Real E=(E12 /* was here for Kn:  *S12/d0  */)*((1+alpha)/(beta*(1+nu12)+gamma*(1-alpha*nu12)));
+		// Real E=(E12 /* was here for Kn:  *S12/d0  */)*((1+alpha)/(beta*(1+nu12)+gamma*(1-alpha*nu12)));
+		Real E=E12; // apply alpha, beta, gamma: garbage values of E !?
 
 		/* recommend default values for parameters
-		 * propose ways to determine them exactly
-		 * */
+		 * propose ways to determine them exactly */
+		assert(!isnan(expBending)); assert(!isnan(sigmaT)); assert(!isnan(xiShear));
+
 		shared_ptr<BrefcomContact> contPhys(new BrefcomContact(
 			/* E */ E,
 			/* G */ E/2*(1+nu12), //FIXME: apply apha, beta, gamma coefficients here as well?! // !!!*(1-alpha*nu12)/(1+nu12),
@@ -189,6 +192,9 @@ void BrefcomLaw::action(MetaBody* _rootBody){
 		Real& epsN(BC->epsN); Vector3r& epsT(BC->epsT); Real& kappaD(BC->kappaD); const Real& equilibriumDist(BC->equilibriumDist); const Real& xiShear(BC->xiShear); const Real& E(BC->E); const Real& undamagedCohesion(BC->undamagedCohesion); const Real& tanFrictionAngle(BC->tanFrictionAngle); const Real& G(BC->G); const Real& crossSection(BC->crossSection); Real& omega(BC->omega); Real& sigmaN(BC->sigmaN); 
 
 		Real dist=(rbp1->se3.position-rbp2->se3.position).Length();
+		#define NNAN(a) assert(!isnan(a));
+		assert(equilibriumDist>0);
+		NNAN(dist);
 
 		/*LOG_DEBUG(" ============= ITERATION "<<Omega::instance().getCurrentIteration()<<" ================");
 		TRVAR4(epsN,epsT,kappaD,equilibriumDist);
@@ -201,25 +207,28 @@ void BrefcomLaw::action(MetaBody* _rootBody){
 
 		/* normal strain */
 		epsN=(dist-equilibriumDist)/equilibriumDist;
+		NNAN(epsN);
 
 		// /* TODO: recover non-cohesive contact deletion: */
 		if(!BC->isCohesive && epsN>0.){ /* delete this interaction later */ /* (*I)->isReal=false; */ continue; }
 
 		/* shear strain: always use it, even for epsN>0 */
 		/*if(false && epsN>0) { epsT=Vector3r::ZERO; } else {*/
-
+				NNAN(epsT[0]); NNAN(epsT[1]);	NNAN(epsT[2]);
 			/* rotate epsT to the new contact plane */
 				const Real& dt=Omega::instance().getTimeStep();
 				// rotation of the contact normal
 				//TRVAR2(epsT,BC->prevNormal.Cross(contGeom->normal));
 				//TRVAR1((BC->prevNormal.Cross(contGeom->normal)).Cross(epsT));
 				epsT+=(BC->prevNormal.Cross(contGeom->normal)).Cross(epsT);
+				NNAN(epsT[0]); NNAN(epsT[1]);	NNAN(epsT[2]);
 				
 				// mutual rotation
 				Real angle=dt*.5*contGeom->normal.Dot(rbp1->angularVelocity+rbp2->angularVelocity); /*assumes equal radii */
 				//TRVAR1(dt*.5*contGeom->normal.Dot(rbp1->angularVelocity+rbp2->angularVelocity));
 				//TRVAR1(epsT.Cross(angle*contGeom->normal));
 				epsT+=(angle*contGeom->normal).Cross(epsT);
+				NNAN(epsT[0]); NNAN(epsT[1]);	NNAN(epsT[2]);
 
 			/* calculate tangential strain increment */
 				Vector3r AtoC(contGeom->contactPoint-rbp1->se3.position), BtoC(contGeom->contactPoint-rbp2->se3.position);
@@ -231,6 +240,7 @@ void BrefcomLaw::action(MetaBody* _rootBody){
 				//TRVAR2(AtoC,BtoC);
 				//TRVAR3(relVelocity,tangentialDisplacement,tangentialDisplacement/dist);
 			epsT+=tangentialDisplacement/dist;
+				NNAN(epsT[0]); NNAN(epsT[1]);	NNAN(epsT[2]);
 			/* artificially remove residuum in the normal direction */
 			//epsT-=contGeom->normal*epsT.Dot(contGeom->normal);
 			//TRVAR1(epsT.Dot(contGeom->normal));
@@ -249,6 +259,11 @@ void BrefcomLaw::action(MetaBody* _rootBody){
 		//if(BC->omega==1){TRVAR5(equilibriumDist,dist,epsN,kappaD,BC->epsFracture);}
 
 		// store Fn (and Fs?), for use with BrefcomStiffnessCounter
+		NNAN(sigmaN);
+		NNAN(sigmaT[0]);
+		NNAN(sigmaT[1]);
+		NNAN(sigmaT[2]);
+		NNAN(crossSection);
 		Fn=sigmaN*crossSection;
 		//TRVAR5(epsN,epsT,sigmaN,sigmaT,crossSection*(contGeom->normal*sigmaN + sigmaT));
 		applyForce(crossSection*(contGeom->normal*sigmaN + sigmaT)); /* this is the force applied on the _first_ body */

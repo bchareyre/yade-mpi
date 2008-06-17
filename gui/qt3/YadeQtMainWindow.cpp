@@ -74,10 +74,10 @@ YadeQtMainWindow::YadeQtMainWindow() : YadeQtGeneratedMainWindow()
 }
 
 void YadeQtMainWindow::timerEvent(QTimerEvent* evt){
-	// if hidden, GUI operations from within ipython will not work...
-	#if 0
-	shared_ptr<MetaBody> rb=Omega::instance().getRootBody();
-		if((rb && rb->bodies->size()>0) || simulationController) {this->hide();}
+	#if 1
+	//shared_ptr<MetaBody> rb=Omega::instance().getRootBody();
+		//if((rb && rb->bodies->size()>0) ||
+		if(simulationController) {this->hide();}
 		else {this->show(); }
 	#endif
 	// update GL views (if any)

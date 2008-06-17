@@ -13,7 +13,7 @@ try: # use psyco if available
 	psyco.full()
 except ImportError: pass
 
-def sphere(center,radius,density=1,young=3e9,poisson=.3,dynamic=True,color=[1,1,1]):
+def sphere(center,radius,density=1,young=30e9,poisson=.3,dynamic=True,color=[1,1,1]):
 	"""Create default sphere, with given parameters. Physical properties such as mass and inertia are calculated automatically."""
 	s=Body()
 	s.shape=GeometricalModel('Sphere',{'radius':radius,'diffuseColor':color})
@@ -25,7 +25,7 @@ def sphere(center,radius,density=1,young=3e9,poisson=.3,dynamic=True,color=[1,1,
 	s['isDynamic']=dynamic
 	return s
 
-def box(center,extents,orientation=[1,0,0,0],density=1,young=3e9,poisson=.3,dynamic=True,color=[1,1,1]):
+def box(center,extents,orientation=[1,0,0,0],density=1,young=30e9,poisson=.3,dynamic=True,color=[1,1,1]):
 	"""Create default box (cuboid), with given parameters. Physical properties such as mass and inertia are calculated automatically."""
 	b=Body()
 	b.shape=GeometricalModel('Box',{'extents':extents,'diffuseColor':color})
@@ -49,7 +49,7 @@ def negPosExtremes(axis,distFactor=1.1):
 	for b in o.bodies:
 		extremes[1]=max(extremes[1],+b.shape['radius']+b.phys['se3'][axis])
 		extremes[0]=min(extremes[0],-b.shape['radius']+b.phys['se3'][axis])
-	print extremes
+	#print extremes
 	for b in o.bodies:
 		if b.phys['se3'][axis]-b.shape['radius']*distFactor<=extremes[0]: ret[0].append(b.id)
 		if b.phys['se3'][axis]+b.shape['radius']*distFactor>=extremes[1]: ret[1].append(b.id)

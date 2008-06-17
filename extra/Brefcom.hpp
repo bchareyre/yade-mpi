@@ -147,15 +147,19 @@ class BrefcomMakeContact: public InteractionPhysicsEngineUnit{
 		 * which would define just those in addition to the elastic ones.
 		 * This might be done later, for now hardcode that here. */
 		/* uniaxial traction resistance, uniaxial compression resistance, fracture energy, strain at complete fracture (calibrated in the constructor), bending parameter of the damage evolution law */
-		Real sigmaT, sigmaC, /* Griffith's fracture energy */ Gf, expBending, xiShear;
+		Real sigmaT, /* sigmaC: unused */ /* Griffith's fracture energy: */ Gf, expBending, xiShear;
 		//! Should new contacts be cohesive? They will before this iter#, they will not be afterwards. If 0, they will never be. If negative, they will always be created as cohesive.
 		long cohesiveThresholdIter;
 
 		BrefcomMakeContact(){
-			alpha=3.7; beta=2.198; gamma=3.79; sigmaC=30e6; sigmaT=sigmaC/10.;
-			expBending=4; /* positive: concave function */
+			// init to signaling_NaN to force crash if not initialized (better than unknowingly using garbage values)
+			alpha=beta=gamma=sigmaT=Gf=expBending=xiShear=std::numeric_limits<Real>::signaling_NaN();
+			/* alpha=3.7; beta=2.198; gamma=3.79; sigmaC=30e6;
+			//sigmaT=sigmaC/10.;
+			expBending=4; // positive: concave function
+			Gf=500; // J/m^2
+			*/
 			cohesiveThresholdIter=-1;
-			Gf=500; /* J/m^2 */
 			#if 0
 				/* calibrate epsFracture; WARNING: this is based on the default E value from Shop
 				 * and therefore may not match the actual E !! */
@@ -183,9 +187,9 @@ class BrefcomMakeContact: public InteractionPhysicsEngineUnit{
 			//REGISTER_ATTRIBUTE(calibratedEpsFracture);
 			REGISTER_ATTRIBUTE(expBending);
 			REGISTER_ATTRIBUTE(xiShear);
-			/* REGISTER_ATTRIBUTE(sigmaT);
-			REGISTER_ATTRIBUTE(sigmaC);
-			REGISTER_ATTRIBUTE(Gf); */
+			REGISTER_ATTRIBUTE(sigmaT);
+			// REGISTER_ATTRIBUTE(sigmaC);
+			/* REGISTER_ATTRIBUTE(Gf); */
 		}
 
 		FUNCTOR2D(BodyMacroParameters,BodyMacroParameters);

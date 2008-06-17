@@ -38,6 +38,8 @@ class PersistentSAPCollider : public BroadInteractor
 			}
 		};
 
+		MetaBody* rootBody; // refreshed at every iteration; to avoid passing it to called members on stack
+
 	protected :
 		/// number of potential transientInteractions = number of interacting AABB
 		int nbPotentialInteractions;

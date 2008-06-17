@@ -55,6 +55,10 @@ o.engines=[
 	## Forces acting on bodies are damped to artificially increase energy dissipation in simulation.
 	## (In this model, the restitution coefficient of interaction is 1, which is not realistic.)
 	## This MetaEngine acts on all PhysicalActions and selects the right EngineUnit base on type of the PhysicalAction.
+	#
+	# note that following 4 engines (till the end) can be replaced by an optimized monolithic version:
+	#	DeusExMachina('NewtonsDampedLaw',{'damping':0.2}),
+	#
 	MetaEngine('PhysicalActionDamper',[
 		EngineUnit('CundallNonViscousForceDamping',{'damping':0.2}),
 		EngineUnit('CundallNonViscousMomentumDamping',{'damping':0.2})

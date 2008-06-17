@@ -75,7 +75,7 @@ SimulationController::SimulationController(QWidget * parent) : QtGeneratedSimula
 	addNewView();
 
 	// there is file existence assertion in lodSimulationFromFilename, so yade will abort cleanly...
-	cerr<<"Omega::instance().getSimulationFileName()="<<Omega::instance().getSimulationFileName()<<endl;
+	LOG_DEBUG("Omega's simulation filename: `"<<Omega::instance().getSimulationFileName()<<"'");
 	if (Omega::instance().getSimulationFileName()!=""){
 		loadSimulationFromFileName(Omega::instance().getSimulationFileName());
 	}

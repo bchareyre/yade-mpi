@@ -31,16 +31,30 @@ void UniaxialStrainer::init(){
 	LOG_DEBUG("Reference particles: positive #"<<posIds[0]<<" at "<<axisCoord(posIds[0])<<"; negative #"<<negIds[0]<<" at "<<axisCoord(negIds[0]));
 	LOG_INFO("Setting initial length to "<<originalLength);
 	if(originalLength<=0) LOG_FATAL("Initial length is negative or zero (swapped reference particles?)! "<<originalLength);
-	assert(originalLength>0);
-	
-	shared_ptr<AABB> rbAABB;
-	if (Omega::instance().getRootBody()->boundingVolume && (rbAABB=dynamic_pointer_cast<AABB>(Omega::instance().getRootBody()->boundingVolume))){
-		int axis2=(axis+1)%3, axis3=(axis+2)%3; // perpendicular axes indices
-		crossSectionArea=4*rbAABB->halfSize[axis2]*rbAABB->halfSize[axis3];
-		LOG_INFO("Setting crossSectionArea="<<crossSectionArea<<", using axes #"<<axis2<<" and #"<<axis3<<".");
-	} else {
-		crossSectionArea=1.;
-		LOG_WARN("No Axis Aligned Bounding Box for rootBody, using garbage value ("<<crossSectionArea<<") for crossSectionArea!");
+	/* this happens is nan propagates from e.g. brefcom consitutive law in case 2 bodies have _exactly_ the same position
+	 * (the the normal strain is 0./0.=nan). That is an user's error, however and should not happen. */
+	if(isnan(originalLength)) LOG_FATAL("Initial length is NaN!");
+	assert(originalLength>0 && !isnan(originalLength));
+
+	/* if we have default (<0) crossSectionArea, try to get it from root's AABB;
+	 * this will not work if there are foreign bodies in the simulation (like transStrainSensors),
+	 * in which case you must give the value yourself as engine attribute.
+	 *
+	 * A TODO option is to get crossSectionArea as average area of bounding boxes' of ABBBs
+	 * of posIds and negIds perpendicular to axis. That might be better, except for cases where
+	 * reference particles on either end do not coincide with the specimen cross-section.
+	 *
+	 * */
+	if(crossSectionArea<=0){
+		shared_ptr<AABB> rbAABB;
+		if (Omega::instance().getRootBody()->boundingVolume && (rbAABB=dynamic_pointer_cast<AABB>(Omega::instance().getRootBody()->boundingVolume))){
+			int axis2=(axis+1)%3, axis3=(axis+2)%3; // perpendicular axes indices
+			crossSectionArea=4*rbAABB->halfSize[axis2]*rbAABB->halfSize[axis3];
+			LOG_INFO("Setting crossSectionArea="<<crossSectionArea<<", using axes #"<<axis2<<" and #"<<axis3<<".");
+		} else {
+			crossSectionArea=1.;
+			LOG_WARN("No Axis Aligned Bounding Box for rootBody, using garbage value ("<<crossSectionArea<<") for crossSectionArea!");
+		}
 	}
 	assert(crossSectionArea>0);
 
@@ -167,7 +181,7 @@ void UniaxialStrainer::applyCondition(MetaBody* rootBody){
 	// reverse if we're over the limit strain
 	if(notYetReversed && limitStrain!=0 && ((currentStrainRate>0 && strain>limitStrain) || (currentStrainRate<0 && strain<limitStrain))) { currentStrainRate*=-1; notYetReversed=false; LOG_INFO("Reversed strain rate to "<<currentStrainRate); }
 
-	if(Omega::instance().getCurrentIteration()%50==0 ) {
+	if(Omega::instance().getCurrentIteration()%10==0 ) {
 		computeAxialForce(rootBody);
 		vector<Real> widths;
 		pushTransStrainSensors(rootBody,widths);
