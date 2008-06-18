@@ -310,6 +310,7 @@ class pyOmega{
 		assert(rb);
 		if(!rb->physicalParameters){rb->physicalParameters=shared_ptr<PhysicalParameters>(new ParticleParameters);} /* PhysicalParameters crashes PhysicalParametersMetaEngine... why? */
 		if(!rb->boundingVolume){rb->boundingVolume=shared_ptr<AABB>(new AABB);}
+		// initialized in constructor now: rb->boundingVolume->diffuseColor=Vector3r(1,1,1); 
 		if(!rb->interactingGeometry){rb->interactingGeometry=shared_ptr<MetaInteractingGeometry>(new MetaInteractingGeometry);}
 		//if(!OMEGA.getRootBody()){shared_ptr<MetaBody> mb=Shop::rootBody(); OMEGA.setRootBody(mb);}
 		/* this is not true if another instance of Omega is created; flag should be stored inside the Omega singleton for clean solution. */

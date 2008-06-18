@@ -31,6 +31,7 @@ class BoundingVolume : public Serializable, public Indexable
 		Vector3r	 diffuseColor		/// Color of the bounding volume. Used only for drawing purpose
 				,min			/// Minimum of the bounding volume
 				,max;			/// Maximum of the bounding volume
+		BoundingVolume(): diffuseColor(Vector3r(1,1,1)){}
 
 /// Serialization
 		void registerAttributes();
