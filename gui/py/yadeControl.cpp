@@ -260,6 +260,11 @@ class pyInteractionContainer{
 			shared_ptr<Interaction> i=proxee->find(id1_(),id2_());
 			if(i) return pyInteraction(i); else throw invalid_argument("No such interaction.");
 		}
+		/* return nth iteration from the container (0-based index); this is to facilitate picking random interaction */
+		pyInteraction pyNth(long n){
+			long i=0; FOREACH(const shared_ptr<Interaction>& I, *proxee){ if(i++==n) return pyInteraction(I); }
+			throw invalid_argument(string("Interaction number out of range (")+lexical_cast<string>(n)+">"+lexical_cast<string>(i)+").");
+		}
 };
 
 
@@ -494,7 +499,8 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("clear", &pyBodyContainer::clear);
 	boost::python::class_<pyInteractionContainer>("InteractionContainer",python::init<pyInteractionContainer&>())
 		.def("__iter__",&pyInteractionContainer::pyIter)
-		.def("__getitem__",&pyInteractionContainer::pyGetitem);
+		.def("__getitem__",&pyInteractionContainer::pyGetitem)
+		.def("nth",&pyInteractionContainer::pyNth);
 	boost::python::class_<pyInteractionIterator>("InteractionIterator",python::init<pyInteractionIterator&>())
 		.def("__iter__",&pyInteractionIterator::pyIter)
 		.def("next",&pyInteractionIterator::pyNext);

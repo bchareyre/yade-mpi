@@ -160,7 +160,7 @@ class BrefcomMakeContact: public InteractionPhysicsEngineUnit{
 		expBending is positive if the damage evolution function is concave after fracture onset;
 		reasonable value seems like 4.
 		*/
-		Real sigmaT, expBending, xiShear;
+		Real sigmaT, expBending, xiShear, epsCrackOnset, relDuctility, G_over_E;
 		//! Should new contacts be cohesive? They will before this iter#, they will not be afterwards. If 0, they will never be. If negative, they will always be created as cohesive.
 		long cohesiveThresholdIter;
 		//! Create contacts that don't receive any damage (BrefcomContact::neverDamage=true); defaults to false
@@ -168,7 +168,7 @@ class BrefcomMakeContact: public InteractionPhysicsEngineUnit{
 
 		BrefcomMakeContact(){
 			// init to signaling_NaN to force crash if not initialized (better than unknowingly using garbage values)
-			sigmaT=expBending=xiShear=std::numeric_limits<Real>::signaling_NaN();
+			sigmaT=expBending=xiShear=epsCrackOnset=relDuctility=G_over_E=std::numeric_limits<Real>::signaling_NaN();
 			neverDamage=false;
 			alpha=3.7; beta=2.198; gamma=3.79; // Laurent's defaults
 			cohesiveThresholdIter=-1;
@@ -177,16 +177,19 @@ class BrefcomMakeContact: public InteractionPhysicsEngineUnit{
 		virtual void go(const shared_ptr<PhysicalParameters>& pp1, const shared_ptr<PhysicalParameters>& pp2, const shared_ptr<Interaction>& interaction);
 		virtual void registerAttributes(){
 			InteractionPhysicsEngineUnit::registerAttributes();
+			REGISTER_ATTRIBUTE(cohesiveThresholdIter);
 			REGISTER_ATTRIBUTE(alpha);
 			REGISTER_ATTRIBUTE(beta);
 			REGISTER_ATTRIBUTE(gamma);
-			REGISTER_ATTRIBUTE(cohesiveThresholdIter);
-			//REGISTER_ATTRIBUTE(calibratedEpsFracture);
+
+			REGISTER_ATTRIBUTE(G_over_E);
 			REGISTER_ATTRIBUTE(expBending);
 			REGISTER_ATTRIBUTE(xiShear);
 			REGISTER_ATTRIBUTE(sigmaT);
 			REGISTER_ATTRIBUTE(neverDamage);
-			// REGISTER_ATTRIBUTE(sigmaC);
+			REGISTER_ATTRIBUTE(epsCrackOnset);
+			REGISTER_ATTRIBUTE(relDuctility);
+			//REGISTER_ATTRIBUTE(calibratedEpsFracture);
 			/* REGISTER_ATTRIBUTE(Gf); */
 		}
 

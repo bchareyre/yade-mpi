@@ -14,7 +14,8 @@ using namespace boost;
 
 struct termios PythonUI::tios, PythonUI::tios_orig;
 string PythonUI::runScript;
-bool PythonUI::stopAfter;
+bool PythonUI::stopAfter=false;
+bool PythonUI::nonInteractive=true;
 vector<string> PythonUI::scriptArgs;
 
 PythonUI* PythonUI::self=NULL;
@@ -27,9 +28,10 @@ void PythonUI::help(){
 	-h       help\n\
 	-s file  run this python script before entering interactive prompt\n\
 	-x       quit after running the script\n\
+	-n       non-interactive (no prompt)\n\
 \nNon-option arguments (after options):\n\
-	*.py     run this script (shorthand for -s *.py)\n\
-	*.xml    open and run this simulation\n\
+	*.py                       run this script (shorthand for -s *.py)\n\
+	*.xml *.xml.gz *.xml.bz2   open and run this simulation\n\
 \n\
 	remaining arguments are copied to yade.runtime.args (no escaping done) \n\
 ";
@@ -86,6 +88,7 @@ void PythonUI::pythonSession(){
 			PYTHON_DEFINE_STRING("simulation",Omega::instance().getSimulationFileName());
 			PYTHON_DEFINE_STRING("script",runScript);
 			PYTHON_DEFINE_BOOL("stopAfter",stopAfter);
+			PYTHON_DEFINE_BOOL("nonInteractive",nonInteractive);
 			{ ostringstream oss; oss<<"yade.runtime.args=["; if(scriptArgs.size()>0){ FOREACH(string s, scriptArgs) oss<<"'"<<s<<"',"; } oss<<"]"; PyRun_SimpleString(oss.str().c_str()); }
 		#undef PYTHON_DEFINE_STRING
 		#undef PYTHON_DEFINE_BOOL
@@ -95,11 +98,12 @@ void PythonUI::pythonSession(){
 
 int PythonUI::run(int argc, char *argv[]) {
 	int ch;
-	while((ch=getopt(argc,argv,"hs:x"))!=-1){
+	while((ch=getopt(argc,argv,"hns:x"))!=-1){
 		switch(ch){
 			case 'h': help(); return 1; break;
 			case 's': runScript=string(optarg); break;
 			case 'x': stopAfter=true; break;
+			case 'n': nonInteractive=true; break;
 			default:
 				LOG_WARN("Unhandled option string: `"<<string(optarg)<<"' (try -h for help on options)");
 				break;
@@ -107,7 +111,9 @@ int PythonUI::run(int argc, char *argv[]) {
 	}
 	if(optind<argc){ // process non-option arguments
 		if(boost::algorithm::ends_with(string(argv[optind]),string(".py"))) runScript=string(argv[optind]);
-		else if(boost::algorithm::ends_with(string(argv[optind]),string(".xml"))) Omega::instance().setSimulationFileName(string(argv[optind]));
+		else if(boost::algorithm::ends_with(string(argv[optind]),string(".xml")) ||
+			boost::algorithm::ends_with(string(argv[optind]),string(".xml.gz")) ||
+			boost::algorithm::ends_with(string(argv[optind]),string(".xml.bz2"))) Omega::instance().setSimulationFileName(string(argv[optind]));
 		else optind--;
 	}
 	for (int index = optind+1; index<argc; index++) scriptArgs.push_back(argv[index]);

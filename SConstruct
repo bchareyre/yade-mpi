@@ -9,7 +9,7 @@
 #
 #	scons -j2 pretty=1 debug=0 optimize=1 profile=1 exclude=extra,fem,lattice,realtime-rigidbody,mass-spring CPPPATH=/usr/local/include/wm3
 #
-# Next time, you can simply run "scons" or "scons -j4" (for 4-parallel builds) to rebuild targets that need it. IF YOU NEED TO READ CODE IN THIS FILE, SOMETHING IS BROKEN AND YOU SHOULD REALLY TELL ME (the goal is to replace qmake eventually).
+# Next time, you can simply run "scons" or "scons -j4" (for 4-parallel builds) to rebuild targets that need it. IF YOU NEED TO READ CODE IN THIS FILE, SOMETHING IS BROKEN AND YOU SHOULD REALLY TELL ME.
 #
 # Scons will do preparatory steps (generating SConscript files from .pro files, creating local include directory and symlinking all headers from there, ...), compile files and install them.
 #
@@ -100,6 +100,7 @@ opts.AddOptions(
 	BoolOption('gprof','Enable profiling information for gprof',0),
 	BoolOption('optimize','Turn on heavy optimizations (generates SSE2 instructions)',defOptions['optimize']),
 	ListOption('exclude','Yade components that will not be built','none',names=['qt3','gui','extra','common','dem','fem','lattice','mass-spring','realtime-rigidbody']),
+	EnumOption('arcs','Whether to generate or use branch probabilities','',['','gen','use'],{'no':'','0':'','false':''},1),
 	# OK, dummy prevents bug in scons: if one selects all, it says all in scons.config, but without quotes, which generates error.
 	ListOption('features','Optional features that are turned on','python,log4cxx',names=['python','log4cxx','binfmt','dummy']),
 	('jobs','Number of jobs to run at the same time (same as -j, but saved)',4,None,int),
@@ -110,7 +111,8 @@ opts.AddOptions(
 	('LIBPATH','Additional paths for the linker (whitespace separated)',None,None,Split),
 	('QTDIR','Directories where to look for qt3',['/usr/share/qt3','/usr/lib/qt','/usr/lib/qt3','/usr/qt/3','/usr/lib/qt-3.3'],None,Split),
 	('CXX','The c++ compiler','g++'),
-	('CXXFLAGS','Additional compiler flags; you can use them for tuning like -march=pentium4.',None,None,Split), # not tested if really propagates
+	('CXXFLAGS','Additional compiler flags; you can use them for tuning like -march=pentium4.',None,None,Split),
+	#('SHLINKFLAGS','Additional linker flags (for shared libs=plugins).',None,None,Split),
 	BoolOption('pretty',"Don't show compiler command line (like the Linux kernel)",1),
 	BoolOption('useMiniWm3','use local miniWm3 library instead of Wm3Foundation',1),
 	#BoolOption('useLocalQGLViewer','use in-tree QGLViewer library instead of the one installed in system',1),
@@ -377,6 +379,9 @@ else:
 if env['gprof']: env.Append(CXXFLAGS=['-pg'],LINKFLAGS=['-pg'],SHLINKFLAGS=['-pg'])
 env.Append(CXXFLAGS=['-pipe','-Wall'])
 
+if env['arcs']=='gen': env.Append(CXXFLAGS=['-fprofile-generate'],LINKFLAGS=['-fprofile-generate'])
+if env['arcs']=='use': env.Append(CXXFLAGS=['-fprofile-use'],LINKFLAGS=['-fprofile-use'])
+
 ### LINKER
 #env['NONPLUGIN_LIBS']=env['LIBS']
 ## libs for all plugins
@@ -387,7 +392,7 @@ env.Append(LIBS=[],SHLINKFLAGS=['-rdynamic'])
 
 # if this is not present, vtables & typeinfos for classes in yade binary itself are not exported; breaks plugin loading
 env.Append(LINKFLAGS=['-rdynamic']) 
-# makes dynamic library loading easied (no LD_LIBRARY_PATH) and perhaps faster
+# makes dynamic library loading easier (no LD_LIBRARY_PATH) and perhaps faster
 env.Append(RPATH=runtimeLibDirs)
 # find already compiled but not yet installed libraries for linking
 #env.Append(LIBPATH=[os.path.join('#',x) for x in libDirs]	# -floop-optimize2 is a gcc-4.x flag, doesn't exist on previous version

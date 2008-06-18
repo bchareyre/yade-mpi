@@ -162,7 +162,7 @@ void UniaxialStrainer::applyCondition(MetaBody* rootBody){
 	//nothing to do
 	if(posIds.size()==0 || negIds.size()==0) return;
 	// linearly increase strain to the desired value
-	if(abs(currentStrainRate)<abs(strainRate))currentStrainRate+=strainRate*.01; else currentStrainRate=strainRate;
+	if(abs(currentStrainRate)<abs(strainRate))currentStrainRate+=strainRate*.005; else currentStrainRate=strainRate;
 	// how much do we move; in the symmetric case, half of the strain is applied at each end;
 	Real dAX=(asymmetry==0?.5:1)*currentStrainRate*originalLength*Omega::instance().getTimeStep();
 	for(size_t i=0; i<negIds.size(); i++){

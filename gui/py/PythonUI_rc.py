@@ -38,8 +38,10 @@ if runtime.script:
 
 # this cannot be run directly, since importing * is allowed only at module level
 
-try:
-	# prefer ipython, since it is colorful and cool
+if runtime.nonInteractive:
+	import time;
+	while True: time.sleep(1)
+else:
 	from IPython.Shell import IPShellEmbed
 	sys.argv=['<embedded python interpreter>']
 	ipshell = IPShellEmbed(banner=r"""__   __    ____          ____                      _      
@@ -51,25 +53,9 @@ try:
 	,rc_override={'execfile':[runtime.prefix+'/lib/yade'+runtime.suffix+'/gui/yade/ipython.py']})
 
 	ipshell()
-except ImportError:
-	## no ipython :-(, let's emulate it
-	# http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/473900
-	import os, readline, rlcompleter, atexit
-	history_file = os.path.join(os.environ['HOME']+'/.yade_python_history')
 	try:
-		 readline.read_history_file(history_file)
-	except IOError:
-		 pass
-	readline.parse_and_bind("tab: complete")
-	readline.set_history_length(1000)
-	atexit.register(readline.write_history_file, history_file) # FIXME: this will probably not work!
-	#del os, readline, rlcompleter, atexit, history_file, __file__
+		import yade.qt
+		yade.qt.close()
+	except ImportError: pass
 
-	# run interactive loop
-	import code
-	code.InteractiveConsole(globals()).interact()
-try:
-	import yade.qt
-	yade.qt.close()
-except ImportError: pass
 

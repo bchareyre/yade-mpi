@@ -34,26 +34,26 @@ void BrefcomMakeContact::go(const shared_ptr<PhysicalParameters>& pp1, const sha
 		const shared_ptr<BodyMacroParameters>& elast2=static_pointer_cast<BodyMacroParameters>(pp2);
 
 		Real E12=2*elast1->young*elast2->young/(elast1->young+elast2->young); // harmonic Young's modulus average
-		Real nu12=2*elast1->poisson*elast2->poisson/(elast1->poisson+elast2->poisson); // dtto for Poisson ratio 
+		//Real nu12=2*elast1->poisson*elast2->poisson/(elast1->poisson+elast2->poisson); // dtto for Poisson ratio 
 		Real S12=Mathr::PI*pow(min(contGeom->radius1,contGeom->radius2),2); // "surface" of interaction
 		//Real d0=contGeom->radius1 + contGeom->radius2; // equilibrium distace is "just touching"
 		Real d0=(elast1->se3.position-elast2->se3.position).Length(); // equilibrium distance is the initial contact distance
-		// Real E=(E12 /* was here for Kn:  *S12/d0  */)*((1+alpha)/(beta*(1+nu12)+gamma*(1-alpha*nu12)));
-		Real E=E12; // apply alpha, beta, gamma: garbage values of E !?
+		//Real E=(E12 /* was here for Kn:  *S12/d0  */)*((1+alpha)/(beta*(1+nu12)+gamma*(1-alpha*nu12)));
+		//Real E=E12; // apply alpha, beta, gamma: garbage values of E !?
 
 		/* recommend default values for parameters
 		 * propose ways to determine them exactly */
 		assert(!isnan(expBending)); assert(!isnan(sigmaT)); assert(!isnan(xiShear));
 
 		shared_ptr<BrefcomContact> contPhys(new BrefcomContact(
-			/* E */ E,
-			/* G */ E/2*(1+nu12), //FIXME: apply apha, beta, gamma coefficients here as well?! // !!!*(1-alpha*nu12)/(1+nu12),
+			/* E */ E12,
+			/* G */ E12/G_over_E,   /*/2*(1+nu12)*(1-alpha*nu12)/(1+nu12),*/
 			/* tanFrictionAngle */ tan(.5*(elast1->frictionAngle+elast2->frictionAngle)),
 			/* undamagedCohesion */ S12*sigmaT,
 			/* equilibriumDist */ d0,
 			/* crossSection */ S12,
-			/* epsCrackOnset */ sigmaT/E12,
-			/* epsFracture */ 5*sigmaT/E12,
+			/* epsCrackOnset */ epsCrackOnset,
+			/* epsFracture */ relDuctility*epsCrackOnset,
 			/* expBending */ expBending,
 			/* xiShear*/ xiShear
 			));
@@ -93,7 +93,7 @@ void BrefcomLaw::applyForce(const Vector3r force){
 void BrefcomLaw::action(MetaBody* _rootBody){
 	rootBody=_rootBody;
 	
-	FOREACH(shared_ptr<Interaction> I, *rootBody->transientInteractions){
+	FOREACH(const shared_ptr<Interaction>& I, *rootBody->transientInteractions){
 		if(!I->isReal) continue;
 		//TRACE;
 		// initialize temporaries

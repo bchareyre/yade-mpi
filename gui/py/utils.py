@@ -13,25 +13,25 @@ try: # use psyco if available
 	psyco.full()
 except ImportError: pass
 
-def sphere(center,radius,density=1,young=30e9,poisson=.3,dynamic=True,color=[1,1,1]):
+def sphere(center,radius,density=1,young=30e9,poisson=.3,frictionAngle=0.5236,dynamic=True,color=[1,1,1]):
 	"""Create default sphere, with given parameters. Physical properties such as mass and inertia are calculated automatically."""
 	s=Body()
 	s.shape=GeometricalModel('Sphere',{'radius':radius,'diffuseColor':color})
 	s.mold=InteractingGeometry('InteractingSphere',{'radius':radius,'diffuseColor':color})
 	V=(4./3)*math.pi*radius**3
 	inert=(2./5.)*V*density*radius**2
-	s.phys=PhysicalParameters('BodyMacroParameters',{'se3':[center[0],center[1],center[2],1,0,0,0],'mass':V*density,'inertia':[inert,inert,inert],'young':young,'poisson':poisson})
+	s.phys=PhysicalParameters('BodyMacroParameters',{'se3':[center[0],center[1],center[2],1,0,0,0],'mass':V*density,'inertia':[inert,inert,inert],'young':young,'poisson':poisson,'frictionAngle':frictionAngle})
 	s.bound=BoundingVolume('AABB',{'diffuseColor':[0,1,0]})
 	s['isDynamic']=dynamic
 	return s
 
-def box(center,extents,orientation=[1,0,0,0],density=1,young=30e9,poisson=.3,dynamic=True,color=[1,1,1]):
+def box(center,extents,orientation=[1,0,0,0],density=1,young=30e9,poisson=.3,frictionAngle=0.5236,dynamic=True,color=[1,1,1]):
 	"""Create default box (cuboid), with given parameters. Physical properties such as mass and inertia are calculated automatically."""
 	b=Body()
 	b.shape=GeometricalModel('Box',{'extents':extents,'diffuseColor':color})
 	b.mold=InteractingGeometry('InteractingBox',{'extents':extents,'diffuseColor':color})
 	mass=8*extents[0]*extents[1]*extents[2]*density
-	b.phys=PhysicalParameters('BodyMacroParameters',{'se3':[center[0],center[1],center[2],orientation[0],orientation[1],orientation[2],orientation[3]],'mass':mass,'inertia':[mass*4*(extents[1]**2+extents[2]**2),mass*4*(extents[0]**2+extents[2]**2),mass*4*(extents[0]**2+extents[1]**2)],'young':young,'poisson':poisson})
+	b.phys=PhysicalParameters('BodyMacroParameters',{'se3':[center[0],center[1],center[2],orientation[0],orientation[1],orientation[2],orientation[3]],'mass':mass,'inertia':[mass*4*(extents[1]**2+extents[2]**2),mass*4*(extents[0]**2+extents[2]**2),mass*4*(extents[0]**2+extents[1]**2)],'young':young,'poisson':poisson,'frictionAngle':frictionAngle})
 	b.bound=BoundingVolume('AABB',{'diffuseColor':[0,1,0]})
 	b['isDynamic']=dynamic
 	return b
@@ -49,7 +49,6 @@ def negPosExtremes(axis,distFactor=1.1):
 	for b in o.bodies:
 		extremes[1]=max(extremes[1],+b.shape['radius']+b.phys['se3'][axis])
 		extremes[0]=min(extremes[0],-b.shape['radius']+b.phys['se3'][axis])
-	#print extremes
 	for b in o.bodies:
 		if b.phys['se3'][axis]-b.shape['radius']*distFactor<=extremes[0]: ret[0].append(b.id)
 		if b.phys['se3'][axis]+b.shape['radius']*distFactor>=extremes[1]: ret[1].append(b.id)
@@ -85,22 +84,7 @@ def randomizeColors(onShapes=True,onMolds=False,onlyDynamic=False):
 		if onMolds  and (b['isDynamic'] or not onlyDynamic): b.mold['diffuseColor']=color
 
 def runInQtGui(background=True):
-	"""[OBSOLETE now that python and QtGUI coexist.]
-	
-	Run the current simulation with the QtGUI.
-	
-	If background is True, the command will be run in background and the saved simulation temporary will not be deleted.
-
-	Note that it runs in separate process, hence no changes will propagate back to this simulation."""
-	import os,tempfile,yade.runtime
-	[fileobj,filename]=tempfile.mkstemp('.xml','yade')
-	Omega().save(filename)
-	if background: bg=' &'
-	else: bg=''
-	cmd=yade.runtime.executable+' -N QtGUI -S "'+filename+'"'+bg
-	print "Running command: `"+cmd+"'"
-	os.system(cmd)
-	if not background: os.remove(filename)
+	raise DeprecationWarning("This  runInQtGui functions is deprecated, since python now coexists with QtGUI.")
 
 def PWaveTimeStep():
 	"""Estimate timestep by the elastic wave propagation speed (p-wave).

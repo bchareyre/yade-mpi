@@ -42,6 +42,8 @@ def reduceData(l):
 				val=plotDataCollector[attr]
 				plotDataCollector[attr]=[val[0],val[1]*2,val[2]]
 
+def reverseData():
+	for k in data: data[k].reverse()
 
 def addData(d):
 	"""Add data from argument {'name':value,...} to yade.plot.data.
@@ -76,7 +78,7 @@ def plot():
 		pylab.xlabel(p)
 	pylab.show()
 
-def saveGnuplot(baseName,term='wxt',extension=None,timestamp=False,comment=None):
+def saveGnuplot(baseName,term='wxt',extension=None,timestamp=False,comment=None,title=None):
 	"""baseName: used for creating baseName.gnuplot (command file for gnuplot),
 			associated baseName.data (data) and output files (if applicable) in the form baseName.[plot number].extension
 		term: specify the gnuplot terminal;
@@ -98,7 +100,7 @@ def saveGnuplot(baseName,term='wxt',extension=None,timestamp=False,comment=None)
 		fData.write("\t".join([str(data[key][i]) for key in data.keys()])+"\n")
 	fData.close()
 	fPlot=file(baseName+".gnuplot",'w')
-	fPlot.write('#!/usr/bin/env gnuplot\n#\n# created '+time.asctime()+' ('+time.strftime('%Y%m%d_%H:%m')+')\n#\n')
+	fPlot.write('#!/usr/bin/env gnuplot\n#\n# created '+time.asctime()+' ('+time.strftime('%Y%m%d_%H:%M')+')\n#\n')
 	if comment: fPlot.write('# '+comment.replace('\n','\n# ')+'#\n')
 	fPlot.write('dataFile="< bzcat %s.data.bz2"\n'%(baseNameNoPath))
 	if not extension: extension=term
@@ -108,7 +110,9 @@ def saveGnuplot(baseName,term='wxt',extension=None,timestamp=False,comment=None)
 		plots_p=[fillNonSequence(o) for o in plots[p]]
 		if term in ['wxt','x11']: fPlot.write("set term %s %d persist\n"%(term,i))
 		else: fPlot.write("set term %s; set output '%s.%d.%s'\n"%(term,baseNameNoPath,i,extension))
-		fPlot.write("plot "+",".join([" dataFile using %d:%d title '%s(%s)'"%(vars.index(p)+1,vars.index(pp[0])+1,pp[0],p) for pp in plots_p])+"\n")
+		fPlot.write("set xlabel '%s'\n"%p)
+		if title: fPlot.write("set title '%s'\n"%title)
+		fPlot.write("plot "+",".join([" dataFile using %d:%d title '%s(%s)' with lines"%(vars.index(p)+1,vars.index(pp[0])+1,pp[0],p) for pp in plots_p])+"\n")
 		i+=1
 	fPlot.close()
 

@@ -13,13 +13,14 @@ class PythonUI: public FrontEnd
 		static void termSetup();
 		static void termRestore();
 	public:
-		PythonUI(){self=this;};
+		PythonUI(){self=this; nonInteractive=false; stopAfter=false; };
 		virtual ~PythonUI(){};
 		static void pythonSession();
 		static PythonUI *self;
 		virtual int run(int argc, char *argv[]);
 		static string runScript;
 		static bool stopAfter;
+		static bool nonInteractive;
 		static vector<string> scriptArgs;
 	
 	REGISTER_CLASS_NAME(PythonUI);
