@@ -97,7 +97,8 @@ o.dt=0.001
 
 ## Save the scene to file, so that it can be loaded later. Supported extension are: .xml, .xml.gz, .xml.bz2.
 o.save('/tmp/a.xml');
+o.load('/tmp/a.xml');
 
-utils.runInQtGui() # will run in background
-quit()
+#utils.runInQtGui() # will run in background
+#quit()
 

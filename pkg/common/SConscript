@@ -249,6 +249,17 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-common',[
 			'yade-multimethods'],
 		CPPPATH=env['CPPPATH']+['$PREFIX/include', 'Engine/DeusExMachina']),
 
+	env.SharedLibrary('ResetPositionEngine',
+		['Engine/DeusExMachina/ResetPositionEngine.cpp'],
+		LIBS=env['LIBS']+['yade-base',
+			'yade-factory',
+			'yade-base',
+			'yade-serialization',
+			'yade-loki',
+			'yade-multimethods',
+			'ParticleParameters'],
+		CPPPATH=env['CPPPATH']+['$PREFIX/include', 'Engine/DeusExMachina']),
+	
 	env.SharedLibrary('BoundingVolumeMetaEngine',
 		['Engine/MetaEngine/BoundingVolumeMetaEngine.cpp'],
 		LIBS=env['LIBS']+['yade-base'],
