@@ -6,6 +6,11 @@
 #include<yade/lib-serialization-xml/XMLFormatManager.hpp>
 #include<boost/python.hpp>
 
+#include<boost/foreach.hpp>
+#ifndef FOREACH
+	#define FOREACH BOOST_FOREACH
+#endif
+
 using namespace std;
 using namespace boost;
 
@@ -16,6 +21,8 @@ using namespace boost;
 #define ATTR_ACCESS_CXX(accessor,ensureFunc) \
 	boost::python::object wrappedPyGet(std::string key){ensureFunc();return accessor->pyGet(key);} \
 	void wrappedPySet(std::string key,python::object val){ensureFunc(); accessor->pySet(key,val);} \
+	string wrappedGetAttrStr(std::string key){ensureFunc();vector<string> a=accessor->getAttrStr(key); string ret("["); FOREACH(string s, a) ret+=s+" "; return ret+"]";} \
+	void wrappedSetAttrStr(std::string key, std::string val){ensureFunc();return accessor->setAttrStr(key,val);} \
 	boost::python::list wrappedPyKeys(){ensureFunc(); return accessor->pyKeys();} \
 	bool wrappedPyHasKey(std::string key){ensureFunc(); return accessor->descriptors.find(key)!=accessor->descriptors.end();}
 	
@@ -23,7 +30,8 @@ using namespace boost;
  *
  * They define python special functions that support dictionary operations on this object and calls proxies for them. */
 #define ATTR_ACCESS_PY(cxxClass) \
-	def("__getitem__",&cxxClass::wrappedPyGet).def("__setitem__",&cxxClass::wrappedPySet).def("keys",&cxxClass::wrappedPyKeys).def("has_key",&cxxClass::wrappedPyHasKey)
+	def("__getitem__",&cxxClass::wrappedPyGet).def("__setitem__",&cxxClass::wrappedPySet).def("keys",&cxxClass::wrappedPyKeys).def("has_key",&cxxClass::wrappedPyHasKey) \
+	.def("getRaw",&cxxClass::wrappedGetAttrStr).def("setRaw",&cxxClass::wrappedSetAttrStr)
 	//def("__getattr__",&cxxClass::wrappedPyGet).def("__setattr__",&cxxClass::wrappedPySet).def("attrs",&cxxClass::wrappedPyKeys)
 
 
@@ -56,7 +64,8 @@ class pyClass{shared_ptr<AttrAccess> accessor; \
 	boost::python::class_<pyClass>(pyName,python::init<python::optional<string,python::dict> >()) \
 	.ATTR_ACCESS_PY(pyClass) \
 	.def("__str__",&pyClass::pyStr).def("__repr__",&pyClass::pyStr) \
-	.add_property("name",&pyClass::className)
+	.add_property("name",&pyClass::className) \
+
 
 
 /*! Helper class for accessing registered attributes through the serialization interface.
@@ -75,13 +84,14 @@ class AttrAccess{
 		//! maps attribute name to its archive and vector of its types (given as ints, from the following enum)
 		DescriptorMap descriptors;
 		//! allowed types
-		enum {BOOL,STRING,NUMBER, SEQ_NUMBER, SEQ_STRING }; // allowed types
+		enum {BOOL,STRING,NUMBER, SEQ_NUMBER, SEQ_STRING, VEC_VEC }; // allowed types
 		
 		AttrAccess(Serializable* _ser): ser(shared_ptr<Serializable>(_ser)){init();}
 		AttrAccess(shared_ptr<Serializable> _ser):ser(_ser){init();}
 
 		//! create archives and descriptors, always called from the constructor
 		void init(){
+			//cerr<<typeid(std::vector<Wm3::Vector3<double> >*).name()<<endl;
 			if(ser->getArchives().empty()) ser->registerSerializableAttributes(false);
 			archives=ser->getArchives();
 			for(Serializable::Archives::iterator ai=archives.begin();ai!=archives.end();++ai){
@@ -89,16 +99,29 @@ class AttrAccess{
 					AttrDesc desc; 
 					desc.archive=*ai;
 					any instance=(*ai)->getAddress(); // gets pointer to the stored value
+					//cerr<<"["<<(*ai)->getName()<<","<<instance.type().name()<<"]";
 					// 3 possibilities: one BOOL, one or more STRINGS, one or more NUMBERs (fallback if none matches)
-					if      (any_cast<string*>(&instance)) desc.type=AttrAccess::STRING;
-					else if (any_cast<bool*>(&instance))   desc.type=AttrAccess::BOOL;
-					else if (any_cast<Real*>(&instance) || any_cast<int*>(&instance) || any_cast<unsigned int*>(&instance) || any_cast<long*>(&instance) || any_cast<unsigned long*>(&instance)) desc.type=AttrAccess::NUMBER;
-					else if (any_cast<vector<string>*>(&instance)) desc.type=AttrAccess::SEQ_STRING;
+					if      (any_cast<string*>(&instance)) { desc.type=AttrAccess::STRING; goto found; }
+					else if (any_cast<bool*>(&instance)) { desc.type=AttrAccess::BOOL; goto found; }
+					else if (any_cast<Real*>(&instance) || any_cast<int*>(&instance) || any_cast<unsigned int*>(&instance) || any_cast<long*>(&instance) || any_cast<unsigned long*>(&instance)) { desc.type=AttrAccess::NUMBER; goto found;}
+					else if (any_cast<vector<string>*>(&instance)) { desc.type=AttrAccess::SEQ_STRING; goto found; }
+				#if 0
+					else if (any_cast<vector<Vector3r>*>(&instance)) { cerr<<"WWWWWWWWWWWWW"<<endl;}
+					//else if (any_cast<vector<Vector3r>*>(&&instance)) { cerr<"QQQQQQQQQQQQQQ"<<endl;}
+					#define GET_TYPE_DIRECT(_type,ATTR_ACCESS_TYPE) try{ cerr<<"Try "<<instance.type().name()<<" to "<<typeid(_type).name()<<endl; any_cast<_type >(instance); desc.type=ATTR_ACCESS_TYPE; cerr<<"OK!!!"<<endl; goto found; } catch(boost::bad_any_cast& e){}
+					GET_TYPE_DIRECT(std::vector<Wm3::Vector3r>*,AttrAccess::VEC_VEC);
+					else if (any_cast<vector<Wm3::Vector3<double> >*>(&instance)) {
+						desc.type=AttrAccess::VEC_VEC;
+						cerr<<"Attribute "<<(*ai)->getName()<<" is a vector<Vector3r>";
 					//else if (any_cast<vector<Real>*>(&instance)) desc.type=AttrAccess::SEQ_NUMBER;
-					else desc.type=AttrAccess::SEQ_NUMBER;
-					descriptors[(*ai)->getName()]=desc;
+					}
+				#endif
+					desc.type=AttrAccess::SEQ_NUMBER;
+					found:
+						descriptors[(*ai)->getName()]=desc;
 				}
 			}
+			//cerr<<dumpAttrs();
 		}
 		
 		//! Return serialized attribute by its name, as vector of strings
@@ -114,7 +137,7 @@ class AttrAccess{
 		string dumpAttr(string name){
 			string vals,types; AttrDesc desc=descriptors[name]; vector<string> values=getAttrStr(name);
 			for(size_t i=0; i<values.size(); i++) vals+=(i>0?" ":"")+values[i];
-			string typeDesc(desc.type==BOOL?"BOOL":(desc.type==STRING?"STRING":(desc.type==NUMBER?"NUMBER":(desc.type==SEQ_NUMBER?"SEQ_NUMBER":(desc.type==SEQ_STRING?"SEQ_STRING":"<unknown>")))));
+			string typeDesc(desc.type==BOOL?"BOOL":(desc.type==STRING?"STRING":(desc.type==NUMBER?"NUMBER":(desc.type==SEQ_NUMBER?"SEQ_NUMBER":(desc.type==SEQ_STRING?"SEQ_STRING":(desc.type==VEC_VEC?"VEC_VEC":"<unknown>"))))));
 			return name+" =\t"+vals+"\t ("+typeDesc+")";
 		}
 		//! call dumpAttr for all attributes (used for debugging)
@@ -140,6 +163,14 @@ class AttrAccess{
 				case STRING: return python::object(raw[0]);
 				case SEQ_STRING: {python::list ret; for(size_t i=0; i<raw.size(); i++) ret.append(python::object(raw[i])); return ret;}
 				case SEQ_NUMBER: {python::list ret; for(size_t i=0; i<raw.size(); i++){ ret.append(python::object(lexical_cast<double>(raw[i]))); LOG_TRACE("Appended "<<raw[i]);} return ret; }
+				case VEC_VEC: {
+					python::list ret; for(size_t i=0; i<raw.size(); i++){
+						/* raw[i] has the form "{number number number}" */
+						vector<string> s; boost::algorithm::split(s,raw[i],algorithm::is_any_of("{} "),algorithm::token_compress_on);
+						python::list subList; FOREACH(string ss, s) subList.append(python::object(lexical_cast<double>(ss)));
+						ret.append(subList);
+					}
+				}
 				default: throw runtime_error("Unhandled attribute type!");
 			}
 		}

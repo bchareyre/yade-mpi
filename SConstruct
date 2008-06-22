@@ -112,6 +112,7 @@ opts.AddOptions(
 	('QTDIR','Directories where to look for qt3',['/usr/share/qt3','/usr/lib/qt','/usr/lib/qt3','/usr/qt/3','/usr/lib/qt-3.3'],None,Split),
 	('CXX','The c++ compiler','g++'),
 	('CXXFLAGS','Additional compiler flags; you can use them for tuning like -march=pentium4.',None,None,Split),
+	#('SHLINK','Linker for shared objects','g++'),
 	#('SHLINKFLAGS','Additional linker flags (for shared libs=plugins).',None,None,Split),
 	BoolOption('pretty',"Don't show compiler command line (like the Linux kernel)",1),
 	BoolOption('useMiniWm3','use local miniWm3 library instead of Wm3Foundation',1),

@@ -31,10 +31,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/extra',[
 		['clump/Clump.cpp'],
 		LIBS=env['LIBS']+['Shop']),
 
-	env.SharedLibrary('ScrewGen',
-		['screw/ScrewGen.cpp'],
-		LIBS=env['LIBS']+['Shop','Clump']),
-		
 	env.SharedLibrary('Tetra',['tetra/Tetra.cpp'],LIBS=env['LIBS']+['Tetrahedron',
          'ParticleParameters',
          'RigidBodyParameters',
