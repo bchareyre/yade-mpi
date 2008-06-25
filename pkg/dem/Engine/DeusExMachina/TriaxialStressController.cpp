@@ -9,6 +9,7 @@
 #include"TriaxialStressController.hpp"
 #include<yade/pkg-common/ParticleParameters.hpp>
 #include<yade/pkg-common/InteractingSphere.hpp>
+#include<yade/pkg-common/InteractingBox.hpp>
 #include<yade/pkg-dem/SpheresContactGeometry.hpp>
 #include<yade/pkg-dem/ElasticContactInteraction.hpp>
 #include<yade/pkg-common/Force.hpp>
@@ -113,8 +114,6 @@ void TriaxialStressController::registerAttributes()
 	REGISTER_ATTRIBUTE(height0);
 	REGISTER_ATTRIBUTE(width0);
 	REGISTER_ATTRIBUTE(depth0);
-	REGISTER_ATTRIBUTE(thickness);
-	
 	
 	REGISTER_ATTRIBUTE(sigma_iso);
 	REGISTER_ATTRIBUTE(maxMultiplier);
@@ -192,12 +191,10 @@ void TriaxialStressController::controlExternalStress(int wall, MetaBody* ncb, Ve
 void TriaxialStressController::applyCondition(MetaBody* ncb)
 {
 	//cerr << "TriaxialStressController::applyCondition" << endl;
-
-	//Update stiffness only if it has been computed by StiffnessCounter (see "stiffnessUpdateInterval")
-	if (Omega::instance().getCurrentIteration() % stiffnessUpdateInterval == 0 || Omega::instance().getCurrentIteration()<1000)
-		updateStiffness(ncb);
 		
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
+
+	if(thickness<=0) thickness=YADE_PTR_CAST<InteractingBox>(Body::byId(wall_bottom_id,ncb)->interactingGeometry)->extents.Y();
 
 	PhysicalParameters* p_bottom = static_cast<PhysicalParameters*>((*bodies)[wall_bottom_id]->physicalParameters.get());
 	PhysicalParameters* p_top   =	 static_cast<PhysicalParameters*>((*bodies)[wall_top_id]->physicalParameters.get());
@@ -209,6 +206,11 @@ void TriaxialStressController::applyCondition(MetaBody* ncb)
 	height = p_top->se3.position.Y() - p_bottom->se3.position.Y() - thickness;
 	width = p_right->se3.position.X() - p_left->se3.position.X() - thickness;
 	depth = p_front->se3.position.Z() - p_back->se3.position.Z() - thickness;
+
+	// must be done _after_ height, width, depth have been calculated
+	//Update stiffness only if it has been computed by StiffnessCounter (see "stiffnessUpdateInterval")
+	if (Omega::instance().getCurrentIteration() % stiffnessUpdateInterval == 0 || Omega::instance().getCurrentIteration()<1000) updateStiffness(ncb);
+
  
 		bool isARadiusControlIteration = (Omega::instance().getCurrentIteration() % radiusControlInterval == 0);
 	if (Omega::instance().getCurrentIteration() % computeStressStrainInterval == 0 ||
@@ -259,6 +261,7 @@ void TriaxialStressController::computeStressStrain(MetaBody* ncb)
 // 	height = p_top->se3.position.Y() - p_bottom->se3.position.Y() - thickness;
 // 	width = p_right->se3.position.X() - p_left->se3.position.X() - thickness;
 // 	depth = p_front->se3.position.Z() - p_back->se3.position.Z() - thickness;
+	assert(height>0); assert(width>0); assert(depth>0);
 	
 	meanStress = 0;
 	if (height0 == 0) height0 = height;

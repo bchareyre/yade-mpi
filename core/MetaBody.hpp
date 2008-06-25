@@ -45,8 +45,7 @@ class MetaBody : public Body
 
 		Real dt;
 
-
-		void runInitializers();
+		bool needsInitializers;
 /// Serialization
 	protected :
 		virtual void postProcessAttributes(bool deserializing);

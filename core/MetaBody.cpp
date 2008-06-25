@@ -34,6 +34,7 @@ MetaBody::MetaBody() :
 {	
 	engines.clear();
 	initializers.clear();
+	needsInitializers=true;
 	recover=false;
 	// I must assign something to avoid "nan" when loading. When recover=false, those can be "nan" and lead to crash.
 	recoverCurrentIteration=1;
@@ -57,15 +58,12 @@ MetaBody::MetaBody() :
 }
 
 
-void MetaBody::runInitializers(){
-	FOREACH(shared_ptr<Engine> e, initializers){
-		if(e->isActivated()) e->action(this);
-	}
-}
 
 void MetaBody::postProcessAttributes(bool deserializing)
 {
-	runInitializers();	
+	// this is now checked in MoveToNextTimeStep
+	//runInitializers();	
+	
 	//	initializers.clear(); // FIXME - we want to delate ONLY some of them!
 	//                                       because when you save and load file, you still want some initializers, but not all of them. Eg - you don't want VRML loader, or FEM loader, but you want BoundingVolumeMetaEngine. Maybe we need two list of initilizers? One that 'survive' between load and save, and others that are deleted on first time?
 }
@@ -93,13 +91,11 @@ void MetaBody::registerAttributes()
 
 void MetaBody::moveToNextTimeStep()
 {
-	vector<shared_ptr<Engine> >::iterator ai    = engines.begin();
-	vector<shared_ptr<Engine> >::iterator aiEnd = engines.end();
-	for( ; ai!=aiEnd ; ++ai )
-	{
-		if ((*ai)->isActivated())
-			(*ai)->action(this);
+	if(needsInitializers){
+		FOREACH(shared_ptr<Engine> e, initializers){ if(e->isActivated()) e->action(this); }
+		needsInitializers=false;
 	}
+	FOREACH(const shared_ptr<Engine>& e, engines){ if(e->isActivated()) e->action(this); }
 }
 
 shared_ptr<Engine> MetaBody::engineByName(string s){

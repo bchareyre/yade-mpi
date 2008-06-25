@@ -68,7 +68,7 @@ class TriaxialStressController : public DeusExMachina
 		int &wall_bottom_id, &wall_top_id, &wall_left_id, &wall_right_id, &wall_front_id, &wall_back_id;
 		bool wall_bottom_activated, wall_top_activated, wall_left_activated, wall_right_activated, wall_front_activated, wall_back_activated;
 		Real height, width, depth, height0, width0, depth0;
-		Real thickness; // FIXME should retrieve "extents" of a InteractingBox
+		Real thickness;
 		Real sigma_iso;
 		Real max_vel;
 

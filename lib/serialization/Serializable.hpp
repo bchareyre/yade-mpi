@@ -60,6 +60,9 @@ class Serializable : public Factorable
 		virtual void serialize(any& )	{ throw SerializableError(SerializationExceptions::SetFunctionNotDeclared); };
 		virtual void deserialize(any& ) { throw SerializableError(SerializationExceptions::GetFunctionNotDeclared); };
 
+		//virtual void __HACK__D@_N@T_ABUSE_postProcessAttributes(bool deserializating){postProcessAttributes;} /* public access to protected postProcessAttributes, from python */
+		virtual void postProcessAttributes(bool /*deserializing*/) {};
+
 	private :
 		Archives				archives;
 		friend class Archive;
@@ -67,7 +70,6 @@ class Serializable : public Factorable
 	protected :
 		virtual void registerAttributes() {};
 		virtual void preProcessAttributes(bool /*deserializing*/) {};
-		virtual void postProcessAttributes(bool /*deserializing*/) {};
 
 		template <typename Type>
 		void registerAttribute(const string& name, Type& attribute)

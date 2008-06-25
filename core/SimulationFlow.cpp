@@ -12,13 +12,13 @@
 
 void SimulationFlow::singleAction()
 {
-	if (Omega::instance().getRootBody()) // FIXME - would it contain the loop in the private variables, this check would be unnecessary
+	Omega& OO=Omega::instance();
+	if (OO.getRootBody()) // FIXME - would it contain the loop in the private variables, this check would be unnecessary
 	{
-		Omega::instance().getRootBody()->moveToNextTimeStep();
-		Omega::instance().incrementCurrentIteration();
-		Omega::instance().incrementSimulationTime();
-		if(Omega::instance().stopAtIteration>0 && Omega::instance().getCurrentIteration()==Omega::instance().stopAtIteration){
-			//cerr<<"PAUSE at iteration #"<<Omega::instance().getCurrentIteration()<<" as requested."<<endl;
+		OO.getRootBody()->moveToNextTimeStep();
+		OO.incrementCurrentIteration();
+		OO.incrementSimulationTime();
+		if(OO.stopAtIteration>0 && OO.getCurrentIteration()==OO.stopAtIteration){
 			setTerminate(true);
 			return;
 		}

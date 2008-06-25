@@ -295,17 +295,12 @@ BASIC_PY_PROXY_TAIL;
 
 
 class pyOmega{
-	#define OMEGA Omega::instance()
 	private:
 		// can be safely removed now, since pyOmega makes an empty rootBody in the constructor, if there is none
 		void assertRootBody(){if(!OMEGA.getRootBody()) throw std::runtime_error("No root body."); }
-		void maybeRunInitializers(){if(needsInitializers){OMEGA.getRootBody()->runInitializers(); needsInitializers=false;}}
-		/*! do we need initializers before running?
-		 * This is set to true in constructor (if we create simulation from scratch) and when we load a simulation.
-		 * Initializers are run ad this flag set to false by maybeRunInitializers when running (step or run) */
-		bool needsInitializers;
+		Omega& OMEGA;
 	public:
-	pyOmega(){
+	pyOmega(): OMEGA(Omega::instance()){
 		shared_ptr<MetaBody> rb=OMEGA.getRootBody();
 		assert(rb);
 		if(!rb->physicalParameters){rb->physicalParameters=shared_ptr<PhysicalParameters>(new ParticleParameters);} /* PhysicalParameters crashes PhysicalParametersMetaEngine... why? */
@@ -316,7 +311,6 @@ class pyOmega{
 		/* this is not true if another instance of Omega is created; flag should be stored inside the Omega singleton for clean solution. */
 		if(!OMEGA.hasSimulationLoop()){
 			OMEGA.createSimulationLoop();
-			needsInitializers=true;
 		}
 	};
 
@@ -339,14 +333,13 @@ class pyOmega{
 
 	void run(long int numIter=-1){
 		if(numIter>0) OMEGA.stopAtIteration=OMEGA.getCurrentIteration()+numIter;
-		maybeRunInitializers();
 		//else OMEGA.stopAtIteration=-1;
 		OMEGA.startSimulationLoop();
 		long toGo=OMEGA.stopAtIteration-OMEGA.getCurrentIteration();
 		LOG_DEBUG("RUN"<<(toGo>0?string(" ("+lexical_cast<string>(toGo)+" to go)"):string(""))<<"!");
 	}
 	void pause(){OMEGA.stopSimulationLoop(); LOG_DEBUG("PAUSE!");}
-	void step() {OMEGA.spawnSingleSimulationLoop(); maybeRunInitializers(); LOG_DEBUG("STEP!");}
+	void step() {OMEGA.spawnSingleSimulationLoop(); LOG_DEBUG("STEP!");}
 
 	void load(std::string fileName) {
 		OMEGA.finishSimulationLoop();
@@ -355,7 +348,6 @@ class pyOmega{
 		OMEGA.loadSimulation();
 		OMEGA.createSimulationLoop();
 		LOG_DEBUG("LOAD!");
-		needsInitializers=true;
 	}
 
 	void reset(){
@@ -411,7 +403,7 @@ class pyOmega{
 	python::list engines_get(void){assertRootBody(); return anyEngines_get(OMEGA.getRootBody()->engines);}
 	void engines_set(python::object egs){assertRootBody(); anyEngines_set(OMEGA.getRootBody()->engines,egs);}
 	python::list initializers_get(void){assertRootBody(); return anyEngines_get(OMEGA.getRootBody()->initializers);}
-	void initializers_set(python::object egs){assertRootBody(); anyEngines_set(OMEGA.getRootBody()->initializers,egs);}
+	void initializers_set(python::object egs){assertRootBody(); anyEngines_set(OMEGA.getRootBody()->initializers,egs); OMEGA.getRootBody()->needsInitializers=true; }
 
 	python::object labeled_engine_get(string label){
 		FOREACH(const shared_ptr<Engine>& eng, OMEGA.getRootBody()->engines){
@@ -441,7 +433,6 @@ class pyOmega{
 	}
 
 	pyTags tags_get(void){assertRootBody(); return pyTags(OMEGA.getRootBody());}
-	#undef OMEGA
 };
 	
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(omega_run_overloads,run,0,1);

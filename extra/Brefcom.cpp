@@ -43,7 +43,7 @@ void BrefcomMakeContact::go(const shared_ptr<PhysicalParameters>& pp1, const sha
 
 		/* recommend default values for parameters
 		 * propose ways to determine them exactly */
-		assert(!isnan(expBending)); assert(!isnan(sigmaT)); assert(!isnan(xiShear));
+		if(!neverDamage) { assert(!isnan(expBending)); assert(!isnan(sigmaT)); assert(!isnan(xiShear));}
 
 		shared_ptr<BrefcomContact> contPhys(new BrefcomContact(
 			/* E */ E12,
@@ -125,7 +125,8 @@ void BrefcomLaw::action(MetaBody* _rootBody){
 
 		Real dist=(rbp1->se3.position-rbp2->se3.position).Length();
 		#define NNAN(a) assert(!isnan(a));
-		assert(equilibriumDist>0);
+		#define NNANV(v) assert(!isnan(v[0])); assert(!isnan(v[1])); assert(!isnan(v[2]));
+		assert(equilibriumDist>0);	assert(dist!=0);
 		NNAN(dist);
 
 		/*LOG_DEBUG(" ============= ITERATION "<<Omega::instance().getCurrentIteration()<<" ================");
@@ -146,33 +147,36 @@ void BrefcomLaw::action(MetaBody* _rootBody){
 
 		/* shear strain: always use it, even for epsN>0 */
 		/*if(false && epsN>0) { epsT=Vector3r::ZERO; } else {*/
-				NNAN(epsT[0]); NNAN(epsT[1]);	NNAN(epsT[2]);
+				NNANV(epsT);
 			/* rotate epsT to the new contact plane */
 				const Real& dt=Omega::instance().getTimeStep();
 				// rotation of the contact normal
 				//TRVAR2(epsT,BC->prevNormal.Cross(contGeom->normal));
 				//TRVAR1((BC->prevNormal.Cross(contGeom->normal)).Cross(epsT));
 				epsT+=(BC->prevNormal.Cross(contGeom->normal)).Cross(epsT);
-				NNAN(epsT[0]); NNAN(epsT[1]);	NNAN(epsT[2]);
+				NNANV(epsT);
 				
 				// mutual rotation
 				Real angle=dt*.5*contGeom->normal.Dot(rbp1->angularVelocity+rbp2->angularVelocity); /*assumes equal radii */
 				//TRVAR1(dt*.5*contGeom->normal.Dot(rbp1->angularVelocity+rbp2->angularVelocity));
 				//TRVAR1(epsT.Cross(angle*contGeom->normal));
 				epsT+=(angle*contGeom->normal).Cross(epsT);
-				NNAN(epsT[0]); NNAN(epsT[1]);	NNAN(epsT[2]);
+				NNANV(epsT);
 
 			/* calculate tangential strain increment */
 				Vector3r AtoC(contGeom->contactPoint-rbp1->se3.position), BtoC(contGeom->contactPoint-rbp2->se3.position);
+				//TRVAR3(contGeom->contactPoint,rbp1->se3.position,rbp2->se3.position);
 				Vector3r relVelocity /* at the contact point */ = 
 					//rbp2->velocity-rbp1->velocity +
 					rbp2->angularVelocity.Cross(BtoC)
 					-rbp1->angularVelocity.Cross(AtoC);
+
 				Vector3r tangentialDisplacement=dt*(relVelocity- /* subtract non-shear component */ contGeom->normal.Dot(relVelocity)*contGeom->normal);
-				//TRVAR2(AtoC,BtoC);
+				//TRVAR4(AtoC,BtoC,rbp2->angularVelocity,rbp1->angularVelocity);
 				//TRVAR3(relVelocity,tangentialDisplacement,tangentialDisplacement/dist);
+				//TRWM3VEC(contGeom->normal);
 			epsT+=tangentialDisplacement/dist;
-				NNAN(epsT[0]); NNAN(epsT[1]);	NNAN(epsT[2]);
+				NNANV(epsT);
 			/* artificially remove residuum in the normal direction */
 			//epsT-=contGeom->normal*epsT.Dot(contGeom->normal);
 			//TRVAR1(epsT.Dot(contGeom->normal));

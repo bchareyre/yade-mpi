@@ -10,7 +10,7 @@
 #define PARTICLEPARAMETERS_HPP
 
 #include<yade/core/PhysicalParameters.hpp>
-#include <Wm3Vector3.h>
+#include<Wm3Vector3.h>
 #include<yade/lib-base/yadeWm3.hpp>
 #include<yade/lib-base/yadeWm3Extra.hpp>
 

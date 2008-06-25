@@ -357,6 +357,9 @@ void SimulationController::doUpdate(){
 
 	if (changeSkipTimeStepper) Omega::instance().skipTimeStepper(skipTimeStepper);
 	if (changeTimeStep) {
+		// wrap the mantissa around
+		if(sbSecond->value()==0){ sbSecond->setValue(9); sb10PowerSecond->setValue(sb10PowerSecond->value()-1); }
+		if(sbSecond->value()==10){ sbSecond->setValue(1); sb10PowerSecond->setValue(sb10PowerSecond->value()+1); }
 		Real second = (Real)(sbSecond->value());
 		Real powerSecond = (Real)(sb10PowerSecond->value());
 		Omega::instance().setTimeStep(second*Mathr::Pow(10,powerSecond));

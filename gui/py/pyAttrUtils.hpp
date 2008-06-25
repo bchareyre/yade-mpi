@@ -24,8 +24,12 @@ using namespace boost;
 	string wrappedGetAttrStr(std::string key){ensureFunc();vector<string> a=accessor->getAttrStr(key); string ret("["); FOREACH(string s, a) ret+=s+" "; return ret+"]";} \
 	void wrappedSetAttrStr(std::string key, std::string val){ensureFunc();return accessor->setAttrStr(key,val);} \
 	boost::python::list wrappedPyKeys(){ensureFunc(); return accessor->pyKeys();} \
-	bool wrappedPyHasKey(std::string key){ensureFunc(); return accessor->descriptors.find(key)!=accessor->descriptors.end();}
+	bool wrappedPyHasKey(std::string key){ensureFunc(); return accessor->descriptors.find(key)!=accessor->descriptors.end();} \
 	
+	
+	//boost::python::object wrappedPyGet_throw(std::string key){ensureFunc(); if(wrappedPyHasKey(key)) return accessor->pyGet(key); PyErr_SetString(PyExc_AttributeError, "No such attribute."); boost::python::throw_error_already_set(); /* make compiler happy*/ return boost::python::object(); }
+
+
 /*! Python special functions complementing proxies defined by ATTR_ACCESS_CXX, to be used with boost::python::class_<>.
  *
  * They define python special functions that support dictionary operations on this object and calls proxies for them. */
@@ -34,6 +38,7 @@ using namespace boost;
 	.def("getRaw",&cxxClass::wrappedGetAttrStr).def("setRaw",&cxxClass::wrappedSetAttrStr)
 	//def("__getattr__",&cxxClass::wrappedPyGet).def("__setattr__",&cxxClass::wrappedPySet).def("attrs",&cxxClass::wrappedPyKeys)
 
+	//.def("__getattribute__",&cxxClass::wrappedPyGet_throw)
 
 #define BASIC_PY_PROXY_HEAD(pyClass,yadeClass) \
 class pyClass{shared_ptr<AttrAccess> accessor; \
@@ -44,6 +49,7 @@ class pyClass{shared_ptr<AttrAccess> accessor; \
 		pyClass(const shared_ptr<yadeClass>& _proxee): proxee(_proxee) {} \
 		std::string pyStr(void){ ensureAcc(); return string(proxee->getClassName()==#yadeClass ? "<"+proxee->getClassName()+">" : "<"+proxee->getClassName()+" "+ #yadeClass +">"); } \
 		string className(void){ ensureAcc(); return proxee->getClassName(); } \
+		void postProcessAttributes(void){ensureAcc(); static_pointer_cast<Serializable>(proxee)->/*__HACK__D@_N@T_ABUSE_*/postProcessAttributes(/*deserializing*/ true); } \
 		ATTR_ACCESS_CXX(accessor,ensureAcc);
 
 #define BASIC_PY_PROXY_TAIL };
@@ -65,6 +71,7 @@ class pyClass{shared_ptr<AttrAccess> accessor; \
 	.ATTR_ACCESS_PY(pyClass) \
 	.def("__str__",&pyClass::pyStr).def("__repr__",&pyClass::pyStr) \
 	.add_property("name",&pyClass::className) \
+	.def("postProcessAttributes",&pyClass::postProcessAttributes)
 
 
 

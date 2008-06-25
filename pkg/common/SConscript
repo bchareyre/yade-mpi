@@ -49,7 +49,8 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-common',[
 		LIBS=env['LIBS']+['yade-base']),
     
 	env.SharedLibrary('InteractingVertex'
-	    ,['DataClass/InteractingGeometry/InteractingVertex.cpp']),
+	    ,['DataClass/InteractingGeometry/InteractingVertex.cpp'],
+		 LIBS=env['LIBS']+['yade-base']),
 	
 	env.SharedLibrary('InteractingEdge'
 	    ,['DataClass/InteractingGeometry/InteractingEdge.cpp']),
@@ -91,7 +92,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-common',[
 
 	env.SharedLibrary('Momentum',
 		['DataClass/PhysicalAction/Momentum.cpp'],
-		LIBS=env['LIBS']+['yade-base','yade-base']),
+		LIBS=env['LIBS']+['yade-base']),
 
 	env.SharedLibrary('Box',
 		['DataClass/GeometricalModel/Box.cpp'],
@@ -120,7 +121,8 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-common',[
 		CPPPATH=env['CPPPATH']+['$PREFIX/include','DataClass/GeometricalModel']),
 
 	env.SharedLibrary('Vertex'
-	    ,['DataClass/GeometricalModel/Vertex.cpp']),
+	    ,['DataClass/GeometricalModel/Vertex.cpp'],
+		 LIBS=env['LIBS']+['yade-base']),
 	
 	env.SharedLibrary('GeometricalEdge'
 	    ,['DataClass/GeometricalModel/GeometricalEdge.cpp']),
@@ -130,7 +132,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-common',[
 	
 	env.SharedLibrary('MomentEngine',
 		['Engine/DeusExMachina/MomentEngine.cpp'],
-		LIBS=env['LIBS']+['yade-base',  'Momentum', 'ParticleParameters'],
+		LIBS=env['LIBS']+['yade-base','Momentum','ParticleParameters'],
 		CPPPATH=env['CPPPATH']+['DataClass/PhysicalParameters',
 			'Engine/DeusExMachina',
 			'$PREFIX/include',
@@ -147,13 +149,10 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-common',[
 	env.SharedLibrary('DisplacementToForceEngine',
 		['Engine/DeusExMachina/DisplacementToForceEngine.cpp'],
 		LIBS=env['LIBS']+['yade-base',
-			
 			'yade-factory',
 			'yade-base',
-
 			'Force',
 			'ParticleParameters',
-			
 			'yade-serialization',
 			'yade-multimethods'],
 		CPPPATH=env['CPPPATH']+['DataClass/PhysicalParameters',

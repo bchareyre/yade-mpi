@@ -23,7 +23,7 @@ class CohesiveFrictionalRelationships;
 
 CREATE_LOGGER(TriaxialCompressionEngine);
 
-TriaxialCompressionEngine::TriaxialCompressionEngine() : actionForce(new Force)
+TriaxialCompressionEngine::TriaxialCompressionEngine() : actionForce(new Force), uniaxialEpsilonCurr(strain[1])
 {
 	translationAxis=TriaxialStressController::normal[wall_bottom_id];
 	strainRate=0;
@@ -79,6 +79,7 @@ void TriaxialCompressionEngine::registerAttributes()
 	REGISTER_ATTRIBUTE(Key);
 	REGISTER_ATTRIBUTE(frictionAngleDegree);
 	REGISTER_ATTRIBUTE(epsilonMax);
+	REGISTER_ATTRIBUTE(uniaxialEpsilonCurr);
 }
 
 void TriaxialCompressionEngine::doStateTransition(MetaBody * body, stateNum nextState){
@@ -93,8 +94,7 @@ void TriaxialCompressionEngine::doStateTransition(MetaBody * body, stateNum next
 		if (frictionAngleDegree>0) setContactProperties(body, frictionAngleDegree);
 		height0 = height; depth0 = depth; width0 = width;
 		//compressionActivated = true;
-		wall_bottom_activated=false;
-		wall_top_activated=false;
+		wall_bottom_activated=false; wall_top_activated=false;
 		if(currentState==STATE_ISO_UNLOADING){ LOG_INFO("Speres -> /tmp/unloaded.spheres"); Shop::saveSpheresToFile("/tmp/unloaded.spheres"); }
 		if(!firstRun) saveSimulation=true; // saving snapshot .xml will actually be done in ::applyCondition
 		Phase1End = "Unloaded";
@@ -155,6 +155,7 @@ void TriaxialCompressionEngine::updateParameters ( MetaBody * ncb )
 			{
 				doStateTransition (ncb, STATE_TRIAX_LOADING ); computeStressStrain ( ncb );
 			}
+			// huh?! this will never happen, because of the first condition...
 			else doStateTransition (ncb, STATE_LIMBO );
 		}
 #if 0

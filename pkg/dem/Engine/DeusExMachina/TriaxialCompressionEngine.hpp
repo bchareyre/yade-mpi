@@ -26,8 +26,20 @@ class PhysicalAction;
 
 /** \brief Class for controlling optional initial isotropic compaction and subsequent triaxial stress test with hydrostatic confinement.
  *
+ * The engine is a state machine with the following states (and automatic transitions):
  *
- * 
+ * 1. STATE_ISO_COMPACTION: isotropic compaction (compression) until
+ *    the prescribed mean pressue sigmaIsoCompaction is reached and the packing is stable.
+ *    The compaction happens either by straining the walls (!internalCompaction)
+ *    or by growing size of grains (internalCompaction)
+ * 2. STATE_ISO_UNLOADING: isotropic unloading from the previously reached state, until
+ *    the mean pressure sigmaLateralConfinement is reached (and stabilizes)
+ * 3. STATE_TRIAX_LOADING: confined uniaxial compression:
+ *		constant sigmaLateralConfinement is kept at lateral walls (left, right, front, back), while
+ * 	top and bottom walls load the packing in their axis (by straining), until the value of epsilonMax
+ * 	(deformation along the loading axis) is reached. At this point, the simulation is stopped.
+ * 4. STATE_TRIAX_LIMBO: currently unused, since simulation is hard-stopped in the previous state.
+ *
  */
 class TriaxialCompressionEngine : public TriaxialStressController
 {
@@ -64,6 +76,8 @@ class TriaxialCompressionEngine : public TriaxialStressController
 		Real sigmaLateralConfinement;
 		//! Value of axial deformation for which the simulation must stop
 		Real epsilonMax;
+		//! Current value of axial deformation during confined loading (is reference to strain[1])
+		Real& uniaxialEpsilonCurr;
 		//! Value of friction to use for the compression test
 		Real frictionAngleDegree;
 		//! Previous state (used to detect manual changes of the state in .xml)

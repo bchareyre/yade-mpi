@@ -111,9 +111,9 @@ opts.AddOptions(
 	('LIBPATH','Additional paths for the linker (whitespace separated)',None,None,Split),
 	('QTDIR','Directories where to look for qt3',['/usr/share/qt3','/usr/lib/qt','/usr/lib/qt3','/usr/qt/3','/usr/lib/qt-3.3'],None,Split),
 	('CXX','The c++ compiler','g++'),
-	('CXXFLAGS','Additional compiler flags; you can use them for tuning like -march=pentium4.',None,None,Split),
+	('CXXFLAGS','Additional compiler flags for compilation (like -march=core2).',None,None,Split),
 	#('SHLINK','Linker for shared objects','g++'),
-	#('SHLINKFLAGS','Additional linker flags (for shared libs=plugins).',None,None,Split),
+	('SHCCFLAGS','Additional compiler flags for linking (for plugins).',None,None,Split),
 	BoolOption('pretty',"Don't show compiler command line (like the Linux kernel)",1),
 	BoolOption('useMiniWm3','use local miniWm3 library instead of Wm3Foundation',1),
 	#BoolOption('useLocalQGLViewer','use in-tree QGLViewer library instead of the one installed in system',1),
@@ -198,7 +198,7 @@ if len(sys.argv)>1 and ('clean' in sys.argv) or ('tags' in sys.argv) or ('doc' i
 ##########################################################################################
 
 # ensure non-None
-env.Append(CPPPATH='',LIBPATH='',LIBS='',CXXFLAGS='')
+env.Append(CPPPATH='',LIBPATH='',LIBS='',CXXFLAGS='',SHCCFLAGS='')
 
 def CheckQt(context, qtdirs):
 	"Attempts to localize qt3 installation in given qtdirs. Sets necessary variables if found and returns True; otherwise returns False."
@@ -510,7 +510,4 @@ else: env['yadeModules']=libDirs+['core']
 # read top-level SConscript file. It is used only so that build_dir is set. This file reads all SConscripts from in yadeModules
 env.SConscript(dirs=['.'],build_dir=buildDir,duplicate=0)
 
-
-
-
-
+#Progress('.', interval=100, file=sys.stderr)

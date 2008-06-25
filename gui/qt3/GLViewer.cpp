@@ -158,6 +158,15 @@ void GLViewer::centerScene()
 	Vector3r min,max;	
 	if(rb->boundingVolume){
 		min=rb->boundingVolume->min; max=rb->boundingVolume->max;
+		if(std::max(max[0]-min[0],std::max(max[1]-min[1],max[2]-min[2]))<=0){
+			// AABB is not yet calculated...
+			Real inf=std::numeric_limits<Real>::infinity();
+			min=Vector3r(inf,inf,inf); max=Vector3r(-inf,-inf,-inf);
+			FOREACH(const shared_ptr<Body>& b, *rb->bodies){
+				max=componentMaxVector(max,b->physicalParameters->se3.position);
+				max=componentMinVector(min,b->physicalParameters->se3.position);
+			}
+		}
 	} else {
 		min=Vector3r(-1,-1,-1); max=Vector3r(1,1,1);
 	}

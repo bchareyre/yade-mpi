@@ -24,7 +24,7 @@ o.engines=[
 	StandAloneEngine('ElasticContactLaw'),
 	StandAloneEngine('GlobalStiffnessCounter',{'interval':500}),
 	StandAloneEngine('GlobalStiffnessTimeStepper',{'defaultDt':1e-4,'active':True,'timeStepUpdateInterval':500}),
-	DeusExMachina('AxialGravityEngine',{'axisPoint':[0,0,0],'axisDirection':[1,0,0],'acceleration':100}),
+	DeusExMachina('AxialGravityEngine',{'axisPoint':[0,0,0],'axisDirection':[1,0,0],'acceleration':10000}),
 	MetaEngine('PhysicalActionDamper',[
 		EngineUnit('CundallNonViscousForceDamping',{'damping':0.4}),
 		EngineUnit('CundallNonViscousMomentumDamping',{'damping':0.4})
