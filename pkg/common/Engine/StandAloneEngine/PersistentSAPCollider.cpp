@@ -49,12 +49,11 @@ void PersistentSAPCollider::action(MetaBody* ncb)
 	int offset;
 	Vector3r min,max;
 
-	BodyContainer::iterator bi=bodies->begin();
-	BodyContainer::iterator bi_end = bodies->end();
-	for(unsigned int i=0 ; bi!=bi_end; ++bi,i++) {
-		const shared_ptr<Body>& b=*bi;
-		offset = 3*i;
-		//FIXME: this is broken: bodies without boundingVolume are just skipped, which means that some garbage values are used later!
+	const long numBodies=(long)bodies->size();
+	// #pragma omp parallel for
+	for(int id=0; id<numBodies; id++){
+		const shared_ptr<Body>& b=(*bodies)[id];
+		offset=3*id;
 		if(b->boundingVolume){ // can't assume that everybody has BoundingVolume
 			min=b->boundingVolume->min; max=b->boundingVolume->max;
 			minima[offset+0]=min[0]; minima[offset+1]=min[1]; minima[offset+2]=min[2];
@@ -82,9 +81,15 @@ void PersistentSAPCollider::action(MetaBody* ncb)
 	nbObjects=bodies->size();
 
 	// permutation sort of the AABBBounds along the 3 axis performed in a independant manner
-	sortBounds(xBounds, nbObjects);
-	sortBounds(yBounds, nbObjects);
-	sortBounds(zBounds, nbObjects);
+	// #pragma omp parallel sections
+	{
+	//	#pragma omp section
+		sortBounds(xBounds, nbObjects);
+	//	#pragma omp section
+		sortBounds(yBounds, nbObjects);
+	//	#pragma omp section
+		sortBounds(zBounds, nbObjects);
+	}
 }
 
 

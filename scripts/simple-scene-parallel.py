@@ -15,6 +15,9 @@ o.engines=[
 	# 	if an element of the list is itself a list, it is run sequentially.
 	#	openMP has number of environment variables (notably, how many threads to use):
 	#  	http://docs.sun.com/source/819-0501/5_compiling.html#19273
+	#
+	# 	try OMP_NUM_THREAD=number yade-version simple-scene-parallel.py to see the difference
+	#  by default, openMP creates as many threads as you have processor cores in your machine
 	#  
 	#  overview: http://en.wikipedia.org/wiki/Openmp
 	#	homepage: http://openmp.org for details,
@@ -27,12 +30,10 @@ o.engines=[
 			StandAloneEngine('PersistentSAPCollider'),
 		]
 	]),
-	# interaction geometry and interaction physics are indepent and may run in parallel
-	ParallelEngine([
-		MetaEngine('InteractionGeometryMetaEngine',[EngineUnit('InteractingSphere2InteractingSphere4SpheresContactGeometry'),EngineUnit('InteractingBox2InteractingSphere4SpheresContactGeometry')]),
-		MetaEngine('InteractionPhysicsMetaEngine',[EngineUnit('SimpleElasticRelationships')]),
-	]),
-	# the rest must be run sequentially
+	# interaction physics depends on interaction geometry
+	MetaEngine('InteractionGeometryMetaEngine',[EngineUnit('InteractingSphere2InteractingSphere4SpheresContactGeometry'),EngineUnit('InteractingBox2InteractingSphere4SpheresContactGeometry')]),
+	MetaEngine('InteractionPhysicsMetaEngine',[EngineUnit('SimpleElasticRelationships')]),
+	# the rest must also be run sequentially
 	# (contact law as well as gravity modify physical actions, which are, once computed, used in the integrator)
 	StandAloneEngine('ElasticContactLaw'),
 	DeusExMachina('GravityEngine',{'gravity':[0,0,-9.81]}),
@@ -44,4 +45,4 @@ o.bodies.append(utils.box(center=[0,0,0],extents=[.5,.5,.5],dynamic=False,color=
 o.bodies.append(utils.sphere([0,0,2],1,color=[0,1,0],young=30e9,poisson=.3,density=2400))
 o.dt=.5*utils.PWaveTimeStep()
 
-o.run(100000); o.wait(); print o.iter/o.realtime,"iterations/sec"
+#o.run(100000); o.wait(); print o.iter/o.realtime,"iterations/sec"

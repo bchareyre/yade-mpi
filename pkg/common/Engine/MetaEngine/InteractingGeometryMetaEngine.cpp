@@ -13,17 +13,14 @@
 
 void InteractingGeometryMetaEngine::action(MetaBody* ncb)
 {
-	shared_ptr<BodyContainer>& bodies = ncb->bodies;
+	const shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	
-	BodyContainer::iterator bi    = bodies->begin();
-	BodyContainer::iterator biEnd = bodies->end();
-	for( ; bi!=biEnd ; ++bi )
-	{
-		shared_ptr<Body> b = *bi;
-		if(b->geometricalModel && b->interactingGeometry)
-			operator()(b->geometricalModel,b->interactingGeometry,b->physicalParameters->se3,b.get());
+	const long numBodies=(long)bodies->size();
+	// #pragma omp parallel for
+	for(int id=0; id<numBodies; id++){
+		const shared_ptr<Body>& b=(*bodies)[id];
+		if(b->geometricalModel && b->interactingGeometry) operator()(b->geometricalModel,b->interactingGeometry,b->physicalParameters->se3,b.get());
 	}
-		
 	if(ncb->geometricalModel && ncb->interactingGeometry)
 		operator()(ncb->geometricalModel,ncb->interactingGeometry,ncb->physicalParameters->se3,ncb);
 }

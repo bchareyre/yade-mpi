@@ -17,16 +17,12 @@
 void BoundingVolumeMetaEngine::action(MetaBody* ncb)
 {
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
-	
-	BodyContainer::iterator bi    = bodies->begin();
-	BodyContainer::iterator biEnd = bodies->end();
-	for( ; bi!=biEnd ; ++bi )
-	{
-		shared_ptr<Body> b = *bi;
-		if(b->interactingGeometry && b->boundingVolume)
-			operator()(b->interactingGeometry,b->boundingVolume,b->physicalParameters->se3,b.get());
+	const long numBodies=(long)bodies->size();
+	// #pragma omp parallel for
+	for(int id=0; id<numBodies; id++){
+		const shared_ptr<Body>& b=(*bodies)[id];
+		if(b->interactingGeometry && b->boundingVolume) operator()(b->interactingGeometry,b->boundingVolume,b->physicalParameters->se3,b.get());
 	}
-		
 	operator()(ncb->interactingGeometry,ncb->boundingVolume,ncb->physicalParameters->se3,ncb);
 }
 

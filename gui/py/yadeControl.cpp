@@ -412,6 +412,7 @@ class pyOmega{
 	void save(std::string fileName, bool recover=false){
 		assertRootBody();
 		OMEGA.saveSimulation(fileName,recover);
+		OMEGA.setSimulationFileName(fileName);
 		LOG_DEBUG("SAVE!");
 	}
 
