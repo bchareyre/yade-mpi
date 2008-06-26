@@ -14,6 +14,7 @@
 #include"YadeQtMainWindow.hpp"
 #include<GL/glut.h>
 #include<yade/lib-opengl/FpsTracker.hpp>
+#include<yade/lib-opengl/OpenGLWrapper.hpp>
 #include<yade/core/Body.hpp>
 #include<yade/core/Interaction.hpp>
 
@@ -22,7 +23,7 @@ GLViewer::GLViewer(int id, shared_ptr<RenderingEngine> rendererInit, const QGLFo
 {
 	isMoving=false;
 	renderer=rendererInit;
-	drawGrid = false;
+	drawGridXYZ[0]=drawGridXYZ[1]=drawGridXYZ[2]=false;
 	viewId = id;
 	cut_plane = 0;
 	cut_plane_delta = -2;
@@ -84,8 +85,10 @@ void GLViewer::keyPressEvent(QKeyEvent *e)
 		setSceneCenter(manipulatedFrame()->position()), updateGL();
 	else if( e->key()==Qt::Key_D )
 		wasDynamic = true;
-	else if( e->key()==Qt::Key_G )
-		drawGrid = !drawGrid, updateGL();
+	else if(e->key()==Qt::Key_G) drawGridXYZ[2]=!drawGridXYZ[2], updateGL();
+	else if(e->key()==Qt::Key_X) drawGridXYZ[0]=!drawGridXYZ[0], updateGL();
+	else if(e->key()==Qt::Key_Y) drawGridXYZ[1]=!drawGridXYZ[1], updateGL();
+	else if(e->key()==Qt::Key_Z) drawGridXYZ[2]=!drawGridXYZ[2], updateGL();
 
 // FIXME BEGIN - arguments for GLDraw*ers should be from dialog box, not through Omega !!!
 	else if( e->key()==Qt::Key_Delete )
@@ -164,7 +167,7 @@ void GLViewer::centerScene()
 			min=Vector3r(inf,inf,inf); max=Vector3r(-inf,-inf,-inf);
 			FOREACH(const shared_ptr<Body>& b, *rb->bodies){
 				max=componentMaxVector(max,b->physicalParameters->se3.position);
-				max=componentMinVector(min,b->physicalParameters->se3.position);
+				min=componentMinVector(min,b->physicalParameters->se3.position);
 			}
 		}
 	} else {
@@ -257,7 +260,7 @@ void GLViewer::endSelection(const QPoint &point)
 
 void GLViewer::postDraw()
 {
-	if( drawGrid ) // FIXME drawGrid is yet another RendererFlowControl's Actor.
+	if(drawGridXYZ[0]||drawGridXYZ[1]||drawGridXYZ[2])
 	{
 //		glMatrixMode(GL_MODELVIEW);
 		glPushMatrix();
@@ -266,35 +269,29 @@ void GLViewer::postDraw()
 		glDisable(GL_LIGHTING);
 		glLineWidth(0.1);
 		glBegin(GL_LINES);
-
-		float sizef = QGLViewer::camera()->sceneRadius()*3.0f; 
-		int size = static_cast<int>(sizef);
-		qglviewer::Vec v = QGLViewer::camera()->sceneCenter();
-		int x = static_cast<int>(v[0]); int y = static_cast<int>(v[1]);
-		float xf = (static_cast<int>(v[0]*100.0))/100.0;
-		float yf = (static_cast<int>(v[1]*100.0))/100.0;
-//		float nbSubdivisions = size;
-//		for (int i=0; i<=nbSubdivisions; ++i)
-		for (int i= -size ; i<=size; ++i )
-		{
-//			const float pos = size*(2.0*i/nbSubdivisions-1.0);
-			glVertex2i( i   +x, -size+y);
-			glVertex2i( i   +x, +size+y);
-			glVertex2i(-size+x, i    +y);
-			glVertex2i( size+x, i    +y);
-		}
-		if(sizef <= 2.0)
-		{
-			glColor3f(0.9,0.9,0.9);
-			for (float i= -(static_cast<int>(sizef*100.0))/100.0 ; i<=sizef; i+=0.01 )
-			{
-				glVertex2f( i    +xf, -sizef+yf);
-				glVertex2f( i    +xf, +sizef+yf);
-				glVertex2f(-sizef+xf, i     +yf);
-				glVertex2f( sizef+xf, i     +yf);
+			Real diameter=QGLViewer::camera()->sceneRadius()*2;
+			qglviewer::Vec center=QGLViewer::camera()->sceneCenter();
+			Real gridStep=pow(10,(floor(log10(diameter)-.5)));
+			int nLines=2*2*((int)(diameter/gridStep))/2+1; // odd number
+			int lineNoExt=(nLines-1)/2;
+			//cerr<<"Diameter "<<diameter<<", center "<<center[0]<<" "<<center[1]<<" "<<center[2]<<"; step "<<gridStep<<"; nLines "<<nLines<<endl;
+			for(int planeAxis=0; planeAxis<3; planeAxis++){
+				if(!drawGridXYZ[planeAxis]) continue;
+				int otherAxes[2]={(planeAxis+1)%3,(planeAxis+2)%3};
+				Vector3r color(.3,.3,.3); color[planeAxis]=.6;
+				glColor3v(color);
+				for(int lineAxisIdx=0; lineAxisIdx<2; lineAxisIdx++){
+					int lineAxis=otherAxes[lineAxisIdx];
+					int linePerp=otherAxes[(lineAxisIdx+1)%2];
+					for(int lineNo=-lineNoExt; lineNo<=lineNoExt; lineNo++){
+						Vector3r from,to;
+						from[planeAxis]=to[planeAxis]=0;
+						from[linePerp]=to[linePerp]=center[linePerp]+lineNo*gridStep;
+						from[lineAxis]=center[lineAxis]-lineNoExt*gridStep; to[lineAxis]=center[lineAxis]+lineNoExt*gridStep;
+						glVertex3v(from); glVertex3v(to);
+					}
+				}
 			}
-		}
-		
 		glEnd();
 		glPopAttrib();
 		glPopMatrix();

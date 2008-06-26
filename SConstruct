@@ -65,12 +65,30 @@ if sconsVersion<9803.0 and not os.environ.has_key('NO_SCONS_GET_RECENT'):
 
 env=Environment(tools=['default'])
 
-
 profileFile='scons.current-profile'
 profOpts=Options(profileFile)
 profOpts.AddOptions(('profile','Config profile to use (predefined: default or "", opt)','default'))
 profOpts.Update(env)
-profOpts.Save(profileFile,env)
+# multiple profiles - run them all at the same time
+# take care not to save current profile for those parallel builds
+if not os.environ.has_key('SCONS_PROFILE_NOSAVE'): profOpts.Save(profileFile,env)
+
+if ',' in env['profile']:
+	profiles=env['profile'].split(',')
+	import threading,subprocess
+	def runProfile(profile): subprocess.call([sys.argv[0],'-Q','profile='+p])
+	profileThreads=[]
+	os.environ['SCONS_PROFILE_NOSAVE']=''
+	for arg in sys.argv[2:]:
+		print "WARNING: parallel-building, extra argument `%s' ignored!"%arg
+	for p in profiles:
+		t=threading.Thread(target=runProfile,name='profile_'+p,args=(p,))
+		t.start()
+		profileThreads.append(t)
+	for t in profileThreads:
+		t.join()
+	Exit()
+
 
 if env['profile']=='': env['profile']='default'
 optsFile='scons.profile-'+env['profile']
@@ -78,9 +96,9 @@ profile=env['profile']
 print '@@@ Using profile',profile,'('+optsFile+') @@@'
 
 # defaults for various profiles
-if profile=='default': defOptions={'debug':1,'variant':'','optimize':0}
-elif profile=='opt': defOptions={'debug':0,'variant':'-opt','optimize':1}
-else: defOptions={'debug':0,'optimize':0,'variant':profile}
+if profile=='default': defOptions={'debug':1,'variant':'','optimize':0,'openmp':True}
+elif profile=='opt': defOptions={'debug':0,'variant':'-opt','optimize':1,'openmp':True}
+else: defOptions={'debug':0,'optimize':0,'variant':profile,'openmp':True}
 
 
 opts=Options(optsFile)
@@ -98,7 +116,8 @@ opts.AddOptions(
 	('variant','Build variant, will be suffixed to all files, along with version (beware: if PREFIX is the same, headers of the older version will still be overwritten',defOptions['variant'],None,lambda x:x),
 	BoolOption('debug', 'Enable debugging information and disable optimizations',defOptions['debug']),
 	BoolOption('gprof','Enable profiling information for gprof',0),
-	BoolOption('optimize','Turn on heavy optimizations (generates SSE2 instructions)',defOptions['optimize']),
+	BoolOption('optimize','Turn on heavy optimizations',defOptions['optimize']),
+	BoolOption('openmp','Compile with openMP parallelization support',defOptions['openmp']),
 	ListOption('exclude','Yade components that will not be built','none',names=['qt3','gui','extra','common','dem','fem','lattice','mass-spring','realtime-rigidbody']),
 	EnumOption('arcs','Whether to generate or use branch probabilities','',['','gen','use'],{'no':'','0':'','false':''},1),
 	# OK, dummy prevents bug in scons: if one selects all, it says all in scons.config, but without quotes, which generates error.
@@ -357,6 +376,7 @@ env.Append(CPPDEFINES=[('SUFFIX',r'\"$SUFFIX\"'),('PREFIX',r'\"$runtimePREFIX\"'
 ### COMPILER
 if env['debug']: env.Append(CXXFLAGS='-ggdb3',CPPDEFINES=['YADE_DEBUG'])
 else: env.Append(CXXFLAGS='-O2')
+if env['openmp']: env.Append(CXXFLAGS='-fopenmp',LIBS='gomp')
 if env['optimize']:
 	env.Append(CXXFLAGS=Split('-O3 -ffast-math'),
 		CPPDEFINES=[('YADE_CAST','static_cast'),('YADE_PTR_CAST','static_pointer_cast'),'NDEBUG'])

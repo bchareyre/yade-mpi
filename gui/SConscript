@@ -56,7 +56,8 @@ if 'EMBED_PYTHON' in env['CPPDEFINES']:
 				'InteractionGeometryMetaEngine',
 				'InteractionPhysicsMetaEngine',
 				'PhysicalParametersMetaEngine',
-				'STLImporter'
+				'STLImporter',
+				'ParallelEngine'
 			],
 			),
 		env.File('__init__.py','py'),

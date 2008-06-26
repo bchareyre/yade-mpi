@@ -143,7 +143,7 @@ void BrefcomLaw::action(MetaBody* _rootBody){
 		NNAN(epsN);
 
 		// /* TODO: recover non-cohesive contact deletion: */
-		if(!BC->isCohesive && epsN>0.){ /* delete this interaction later */ /* (*I)->isReal=false; */ continue; }
+		if(!BC->isCohesive && epsN>0.){ /* delete this interaction later */ I->isReal=false; continue; }
 
 		/* shear strain: always use it, even for epsN>0 */
 		/*if(false && epsN>0) { epsT=Vector3r::ZERO; } else {*/
@@ -274,7 +274,7 @@ void BrefcomDamageColorizer::action(MetaBody* rootBody){
 		bodyDamage[id1].second+=BC->omega; bodyDamage[id2].second+=BC->omega;
 	}
 	FOREACH(shared_ptr<Body> B, *rootBody->bodies){
-		if(bodyDamage[B->getId()].first==0) continue;
+		if(bodyDamage[B->getId()].first==0) {B->geometricalModel->diffuseColor=Vector3r(0.5,0.5,B->isDynamic?0:1); continue; }
 		Real normDmg=bodyDamage[B->getId()].second/bodyDamage[B->getId()].first;
 		B->geometricalModel->diffuseColor=Vector3r(normDmg,1-normDmg,B->isDynamic?0:1);
 	}

@@ -2,6 +2,9 @@
 Import('*')
 env.Install('$PREFIX/lib/yade$SUFFIX/pkg-common',[
 
+	env.SharedLibrary('ParallelEngine',
+		['Engine/ParallelEngine.cpp']),
+
 	env.SharedLibrary('BodyAssocVector',
 		['Container/BodyAssocVector.cpp'],
 		LIBS=env['LIBS']+['yade-base']),

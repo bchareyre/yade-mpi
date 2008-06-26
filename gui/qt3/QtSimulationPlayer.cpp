@@ -29,10 +29,10 @@ void QtSimulationPlayer::pbInputConfigFileClicked()
 {
 	string selectedFilter;
 	std::vector<string> filters;
-	filters.push_back("XML Yade File (*.xml)");
+	filters.push_back("XML Yade File (*.xml *.xml.gz *.xml.bz2)");
 	string fileName = FileDialog::getOpenFileName(".", filters, "Choose a file to load",NULL,selectedFilter );
  
-	if (!fileName.empty() && selectedFilter == "XML Yade File (*.xml)")
+	if (!fileName.empty() && selectedFilter == "XML Yade File (*.xml *.xml.gz *.xml.bz2)")
 		leInputConfigFile->setText(fileName);
 }
 
@@ -112,5 +112,3 @@ void QtSimulationPlayer::setParameters()
 	glSimulationPlayerViewer->outputBaseName=leOutputBaseName->text().ascii();
 	glSimulationPlayerViewer->outputBaseDirectory=leOutputDirectory->text().ascii();
 }
-
-

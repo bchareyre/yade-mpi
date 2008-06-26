@@ -20,7 +20,7 @@ class GLViewer : public QGLViewer
 	friend class QGLThread;
 	private :
 //		GLWindowsManager	wm;
-		bool			drawGrid; // FIXME - draw grid is in fact just another GLDrawActor
+		bool 			drawGridXYZ[3];
 		bool			isMoving;
 		bool			wasDynamic;
 		float			cut_plane;

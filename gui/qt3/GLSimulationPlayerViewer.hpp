@@ -28,6 +28,7 @@ class GLSimulationPlayerViewer : public QGLViewer
 		
 		string fileName, inputBaseName, inputBaseDirectory, outputBaseName, outputBaseDirectory;
 		bool				 saveSnapShots;
+		bool 	drawGridXYZ[3];
 		int				 frameNumber;
 		bool loadPositionOrientationFile();
 		list<string> xyzFiles;
@@ -48,6 +49,9 @@ class GLSimulationPlayerViewer : public QGLViewer
 		virtual void fastDraw();
 		virtual void animate();
 		virtual void initializeGL();
+		virtual void postDraw();
+		virtual void keyPressEvent(QKeyEvent* e);
+		
 	DECLARE_LOGGER;
 };
 

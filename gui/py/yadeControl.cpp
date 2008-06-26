@@ -31,6 +31,7 @@
 #include<yade/core/StandAloneEngine.hpp>
 #include<yade/core/DeusExMachina.hpp>
 #include<yade/core/EngineUnit.hpp>
+#include<yade/pkg-common/ParallelEngine.hpp>
 #include<yade/core/EngineUnit1D.hpp>
 #include<yade/core/EngineUnit2D.hpp>
 
@@ -132,8 +133,39 @@ BASIC_PY_PROXY(pyPhysicalParameters,PhysicalParameters);
 BASIC_PY_PROXY(pyBoundingVolume,BoundingVolume);
 BASIC_PY_PROXY(pyInteractingGeometry,InteractingGeometry);
 
-BASIC_PY_PROXY(pyStandAloneEngine,StandAloneEngine);
 BASIC_PY_PROXY(pyDeusExMachina,DeusExMachina);
+BASIC_PY_PROXY(pyStandAloneEngine,StandAloneEngine);
+
+python::list anyEngines_get(const vector<shared_ptr<Engine> >&);
+void anyEngines_set(vector<shared_ptr<Engine> >&, python::object);
+
+BASIC_PY_PROXY_HEAD(pyParallelEngine,ParallelEngine)
+	pyParallelEngine(python::list slaves){init("ParallelEngine"); slaves_set(slaves);}
+	void slaves_set(python::list slaves){
+		ensureAcc(); shared_ptr<ParallelEngine> me=dynamic_pointer_cast<ParallelEngine>(proxee); if(!me) throw runtime_error("Proxied class not a ParallelEngine. (WTF?)");
+		int len=PySequence_Size(slaves.ptr()); /*[boost1.34] python::len(ftrs)*/;
+		me->slaves=ParallelEngine::slaveContainer(); // empty the container
+		for(int i=0; i<len; i++){
+			python::extract<python::list> grpMaybe(slaves[i]);
+			python::list grpList;
+			if(grpMaybe.check()){ grpList=grpMaybe(); }
+			else{ /* we got a standalone thing; let's wrap it in list */ grpList.append(slaves[i]); }
+			vector<shared_ptr<Engine> > grpVec;
+			anyEngines_set(grpVec,grpList);
+			me->slaves.push_back(grpVec);
+		}
+	}
+	python::list slaves_get(void){	
+		ensureAcc(); shared_ptr<ParallelEngine> me=dynamic_pointer_cast<ParallelEngine>(proxee); if(!me) throw runtime_error("Proxied class not a ParallelEngine. (WTF?)");
+		python::list ret;
+		FOREACH(vector<shared_ptr<Engine > >& grp, me->slaves){
+			python::list rret=anyEngines_get(grp);
+			if(PySequence_Size(rret.ptr())==1){ ret.append(rret[0]); } else ret.append(rret);
+		}
+		return ret;
+	}
+BASIC_PY_PROXY_TAIL;
+
 
 BASIC_PY_PROXY_HEAD(pyEngineUnit,EngineUnit)
 	python::list bases_get(void){ python::list ret; vector<string> t=proxee->getFunctorTypes(); for(size_t i=0; i<t.size(); i++) ret.append(t[i]); return ret; }
@@ -181,6 +213,29 @@ BASIC_PY_PROXY_HEAD(pyMetaEngine,MetaEngine)
 			}
 		}
 BASIC_PY_PROXY_TAIL;
+
+python::list anyEngines_get(const vector<shared_ptr<Engine> >& engContainer){
+	python::list ret; 
+	FOREACH(const shared_ptr<Engine>& eng, engContainer){
+		#define APPEND_ENGINE_IF_POSSIBLE(engineType,pyEngineType) { shared_ptr<engineType> e=dynamic_pointer_cast<engineType>(eng); if(e) { ret.append(pyEngineType(e)); continue; } }
+		APPEND_ENGINE_IF_POSSIBLE(MetaEngine,pyMetaEngine); APPEND_ENGINE_IF_POSSIBLE(StandAloneEngine,pyStandAloneEngine); APPEND_ENGINE_IF_POSSIBLE(DeusExMachina,pyDeusExMachina); APPEND_ENGINE_IF_POSSIBLE(ParallelEngine,pyParallelEngine); 
+		throw std::runtime_error("Unknown engine type: `"+eng->getClassName()+"' (only MetaEngine, StandAloneEngine, DeusExMachina and ParallelEngine are supported)");
+	}
+	return ret;
+}
+
+void anyEngines_set(vector<shared_ptr<Engine> >& engContainer, python::object egs){
+	int len=PySequence_Size(egs.ptr()) /*[boost1.34] python::len(egs)*/;
+	//const shared_ptr<MetaBody>& rootBody=OMEGA.getRootBody(); rootBody->engines.clear();
+	engContainer.clear();
+	for(int i=0; i<len; i++){
+		#define PUSH_BACK_ENGINE_IF_POSSIBLE(pyEngineType) if(python::extract<pyEngineType>(PySequence_GetItem(egs.ptr(),i)).check()){ pyEngineType e=python::extract<pyEngineType>(PySequence_GetItem(egs.ptr(),i)); engContainer.push_back(e.proxee); /* cerr<<"added "<<e.pyStr()<<", a "<<#pyEngineType<<endl; */ continue; }
+		PUSH_BACK_ENGINE_IF_POSSIBLE(pyStandAloneEngine); PUSH_BACK_ENGINE_IF_POSSIBLE(pyMetaEngine); PUSH_BACK_ENGINE_IF_POSSIBLE(pyDeusExMachina); PUSH_BACK_ENGINE_IF_POSSIBLE(pyParallelEngine);
+		throw std::runtime_error("Encountered unknown engine type (unable to extract from python object)");
+	}
+}
+
+
 
 BASIC_PY_PROXY_HEAD(pyInteraction,Interaction)
 	NONPOD_ATTRIBUTE_ACCESS(geom,pyInteractionGeometry,interactionGeometry);
@@ -380,26 +435,6 @@ class pyOmega{
 		}
 	}
 
-	python::list anyEngines_get(vector<shared_ptr<Engine> >& engContainer){
-		python::list ret; 
-		FOREACH(shared_ptr<Engine>& eng, engContainer){
-			#define APPEND_ENGINE_IF_POSSIBLE(engineType,pyEngineType) { shared_ptr<engineType> e=dynamic_pointer_cast<engineType>(eng); if(e) { ret.append(pyEngineType(e)); continue; } }
-			APPEND_ENGINE_IF_POSSIBLE(MetaEngine,pyMetaEngine); APPEND_ENGINE_IF_POSSIBLE(StandAloneEngine,pyStandAloneEngine); APPEND_ENGINE_IF_POSSIBLE(DeusExMachina,pyDeusExMachina);
-			throw std::runtime_error("Unknown engine type: `"+eng->getClassName()+"' (only MetaEngine, StandAloneEngine and DeusExMachina are supported)");
-		}
-		return ret;
-	}
-
-	void anyEngines_set(vector<shared_ptr<Engine> >& engContainer, python::object egs){
-		assertRootBody(); int len=PySequence_Size(egs.ptr()) /*[boost1.34] python::len(egs)*/;
-		//const shared_ptr<MetaBody>& rootBody=OMEGA.getRootBody(); rootBody->engines.clear();
-		engContainer.clear();
-		for(int i=0; i<len; i++){
-			#define PUSH_BACK_ENGINE_IF_POSSIBLE(pyEngineType) if(python::extract<pyEngineType>(PySequence_GetItem(egs.ptr(),i)).check()){ pyEngineType e=python::extract<pyEngineType>(PySequence_GetItem(egs.ptr(),i)); engContainer.push_back(e.proxee); /* cerr<<"added "<<e.pyStr()<<", a "<<#pyEngineType<<endl; */ continue; }
-			PUSH_BACK_ENGINE_IF_POSSIBLE(pyStandAloneEngine); PUSH_BACK_ENGINE_IF_POSSIBLE(pyMetaEngine); PUSH_BACK_ENGINE_IF_POSSIBLE(pyDeusExMachina);
-			throw std::runtime_error("Encountered unknown engine type (unable to extract from python object)");
-		}
-	}
 	python::list engines_get(void){assertRootBody(); return anyEngines_get(OMEGA.getRootBody()->engines);}
 	void engines_set(python::object egs){assertRootBody(); anyEngines_set(OMEGA.getRootBody()->engines,egs);}
 	python::list initializers_get(void){assertRootBody(); return anyEngines_get(OMEGA.getRootBody()->initializers);}
@@ -412,7 +447,8 @@ class pyOmega{
 				RETURN_ENGINE_IF_POSSIBLE(MetaEngine,pyMetaEngine);
 				RETURN_ENGINE_IF_POSSIBLE(StandAloneEngine,pyStandAloneEngine);
 				RETURN_ENGINE_IF_POSSIBLE(DeusExMachina,pyDeusExMachina);
-				throw std::runtime_error("Unable to cast engine to MetaEngine, StandAloneEngine or DeusExMachina? ??");
+				RETURN_ENGINE_IF_POSSIBLE(ParallelEngine,pyParallelEngine);
+				throw std::runtime_error("Unable to cast engine to MetaEngine, StandAloneEngine, DeusExMachina or ParallelEngine? ??");
 			}
 		}
 		throw std::invalid_argument(string("No engine labeled `")+label+"'");
@@ -505,6 +541,9 @@ BOOST_PYTHON_MODULE(wrapper)
 	BASIC_PY_PROXY_WRAPPER(pyMetaEngine,"MetaEngine")
 		.add_property("functors",&pyMetaEngine::functors_get,&pyMetaEngine::functors_set)
 		.def(python::init<string,python::list>());
+	BASIC_PY_PROXY_WRAPPER(pyParallelEngine,"ParallelEngine")
+		.add_property("slaves",&pyParallelEngine::slaves_get,&pyParallelEngine::slaves_set)
+		.def(python::init<python::list>());
 	BASIC_PY_PROXY_WRAPPER(pyDeusExMachina,"DeusExMachina");
 	BASIC_PY_PROXY_WRAPPER(pyEngineUnit,"EngineUnit")
 		.add_property("bases",&pyEngineUnit::bases_get);

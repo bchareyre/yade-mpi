@@ -13,6 +13,8 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
+#include<yade/lib-opengl/OpenGLWrapper.hpp>
+
 
 #undef DEBUG /* I HATE qt3 for this! ::log4cxx::Level::DEBUG becomes ::log4cxx::Level:: becomes syntax error */
 #include<yade/pkg-dem/PositionOrientationRecorder.hpp>
@@ -37,6 +39,22 @@ GLSimulationPlayerViewer::GLSimulationPlayerViewer(QWidget * parent,char* name) 
 	setAnimationPeriod(1);
 	saveSnapShots = false;
 	frameNumber=0;
+	drawGridXYZ[0]=drawGridXYZ[1]=drawGridXYZ[2]=false;
+	
+
+	// cut&paste from GLViewer::notMoving()
+	camera()->frame()->setWheelSensitivity(-1.0f);
+	setMouseBinding(Qt::LeftButton + Qt::RightButton, CAMERA, ZOOM);
+	setMouseBinding(Qt::MidButton, CAMERA, ZOOM);
+	setMouseBinding(Qt::LeftButton, CAMERA, ROTATE);
+	setMouseBinding(Qt::RightButton, CAMERA, TRANSLATE);
+	setWheelBinding(Qt::NoButton, CAMERA, ZOOM);
+	setMouseBinding(Qt::SHIFT + Qt::LeftButton, SELECT);
+	setMouseBinding(Qt::SHIFT + Qt::LeftButton + Qt::RightButton, FRAME, ZOOM);
+	setMouseBinding(Qt::SHIFT + Qt::MidButton, FRAME, TRANSLATE);
+	setMouseBinding(Qt::SHIFT + Qt::RightButton, FRAME, ROTATE);
+	setWheelBinding(Qt::ShiftButton , FRAME, ZOOM);
+
 }
 
 
@@ -86,6 +104,8 @@ void GLSimulationPlayerViewer::load(const string& fileName)
 	updateGL();
 	frameNumber=0;
 	setSnapshotCounter(0);
+	// this is to allow manipulation of bodies from python, Omega().bodies etc.
+	Omega::instance().setRootBody(rootBody);
 
 	for(vector<shared_ptr<Engine> >::iterator I=rootBody->engines.begin(); I!=rootBody->engines.end(); ++I){
 		LOG_TRACE((*I)->getClassName());
@@ -165,4 +185,53 @@ bool GLSimulationPlayerViewer::loadPositionOrientationFile()
 	return true;
 }
 
+// parts copied from GLViewer::keyPressEvent
+void GLSimulationPlayerViewer::keyPressEvent(QKeyEvent *e){
+	     if(e->key()==Qt::Key_G) drawGridXYZ[2]=!drawGridXYZ[2], updateGL();
+	else if(e->key()==Qt::Key_X) drawGridXYZ[0]=!drawGridXYZ[0], updateGL();
+	else if(e->key()==Qt::Key_Y) drawGridXYZ[1]=!drawGridXYZ[1], updateGL();
+	else if(e->key()==Qt::Key_Z) drawGridXYZ[2]=!drawGridXYZ[2], updateGL();
+	else if(e->key()==Qt::Key_T){ if (camera()->type() == qglviewer::Camera::ORTHOGRAPHIC) camera()->setType(qglviewer::Camera::PERSPECTIVE); else camera()->setType(qglviewer::Camera::ORTHOGRAPHIC);}
+	else if(e->key()==Qt::Key_O ) camera()->setFieldOfView(camera()->fieldOfView()*0.9), updateGL();
+	else if(e->key()==Qt::Key_P ) camera()->setFieldOfView(camera()->fieldOfView()*1.1), updateGL();
+	else if(e->key()!=Qt::Key_Escape && e->key()!=Qt::Key_Space) QGLViewer::keyPressEvent(e);
+}
 
+// copied from GLViewer::postDraw
+void GLSimulationPlayerViewer::postDraw(){
+	if(drawGridXYZ[0]||drawGridXYZ[1]||drawGridXYZ[2])
+	{
+		glPushMatrix();
+		glPushAttrib(GL_ALL_ATTRIB_BITS);
+		qglColor(foregroundColor());
+		glDisable(GL_LIGHTING);
+		glLineWidth(0.1);
+		glBegin(GL_LINES);
+			Real diameter=QGLViewer::camera()->sceneRadius()*2;
+			qglviewer::Vec center=QGLViewer::camera()->sceneCenter();
+			Real gridStep=pow(10,(floor(log10(diameter)-.5)));
+			int nLines=2*2*((int)(diameter/gridStep))/2+1; // odd number
+			int lineNoExt=(nLines-1)/2;
+			for(int planeAxis=0; planeAxis<3; planeAxis++){
+				if(!drawGridXYZ[planeAxis]) continue;
+				int otherAxes[2]={(planeAxis+1)%3,(planeAxis+2)%3};
+				Vector3r color(.3,.3,.3); color[planeAxis]=.6;
+				glColor3v(color);
+				for(int lineAxisIdx=0; lineAxisIdx<2; lineAxisIdx++){
+					int lineAxis=otherAxes[lineAxisIdx];
+					int linePerp=otherAxes[(lineAxisIdx+1)%2];
+					for(int lineNo=-lineNoExt; lineNo<=lineNoExt; lineNo++){
+						Vector3r from,to;
+						from[planeAxis]=to[planeAxis]=0;
+						from[linePerp]=to[linePerp]=center[linePerp]+lineNo*gridStep;
+						from[lineAxis]=center[lineAxis]-lineNoExt*gridStep; to[lineAxis]=center[lineAxis]+lineNoExt*gridStep;
+						glVertex3v(from); glVertex3v(to);
+					}
+				}
+			}
+		glEnd();
+		glPopAttrib();
+		glPopMatrix();
+	}
+	QGLViewer::postDraw();
+}

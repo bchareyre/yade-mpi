@@ -126,6 +126,4 @@ o.dt=.2*utils.PWaveTimeStep()
 
 ## Save the scene to file, so that it can be loaded later. Supported extension are: .xml, .xml.gz, .xml.bz2.
 o.save('/tmp/a.xml.bz2');
-
-#utils.runInQtGui() # will run in background
-#quit()
+#o.run(100000); o.wait(); print o.iter/o.realtime,'iterations/sec'

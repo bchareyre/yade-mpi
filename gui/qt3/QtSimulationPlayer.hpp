@@ -33,6 +33,7 @@ class QtSimulationPlayer : public QtGeneratedSimulationPlayer, public Factorable
 	public slots : virtual void pbResetClicked();
 	
  	protected    : void closeEvent(QCloseEvent *);
+//						void keyPressEvent(QKeyEvent *){};
 
 	REGISTER_CLASS_NAME(QtSimulationPlayer);
 	REGISTER_BASE_CLASS_NAME(Factorable);
