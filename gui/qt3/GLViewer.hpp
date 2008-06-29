@@ -27,6 +27,8 @@ class GLViewer : public QGLViewer
 	Q_OBJECT 
 	
 	friend class QGLThread;
+	protected:
+		shared_ptr<OpenGLRenderingEngine> renderer;
 	private :
 //		GLWindowsManager	wm;
 		bool 			drawGridXYZ[3];
@@ -34,14 +36,13 @@ class GLViewer : public QGLViewer
 		bool			wasDynamic;
 		float			cut_plane;
 		int			cut_plane_delta;
-		shared_ptr<OpenGLRenderingEngine> renderer;
 		int manipulatedClipPlane;
 		set<int> boundClipPlanes;
 		shared_ptr<qglviewer::LocalConstraint> xyPlaneConstraint;
 		string strBoundGroup(){string ret;FOREACH(int i, boundClipPlanes) ret+=" "+lexical_cast<string>(i+1);return ret;}
 
-        public :
-		GLViewer (int id, shared_ptr<OpenGLRenderingEngine> renderer, const QGLFormat& format, QWidget * parent=0, QGLWidget * shareWidget=0);
+     public :
+		GLViewer (int id, shared_ptr<OpenGLRenderingEngine> _renderer, QWidget * parent=0, QGLWidget * shareWidget=0);
 		virtual ~GLViewer (){};
 		virtual void draw();
 		virtual void drawWithNames();

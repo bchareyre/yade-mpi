@@ -77,7 +77,7 @@
                     <property name="geometry">
                         <rect>
                             <x>10</x>
-                            <y>26</y>
+                            <y>20</y>
                             <width>285</width>
                             <height>142</height>
                         </rect>
@@ -90,6 +90,9 @@
                             <property name="name">
                                 <cstring>pbInputDirectory</cstring>
                             </property>
+                            <property name="enabled">
+                                <bool>false</bool>
+                            </property>
                             <property name="text">
                                 <string></string>
                             </property>
@@ -100,6 +103,14 @@
                         <widget class="QLabel" row="2" column="0">
                             <property name="name">
                                 <cstring>tlInputBaseName</cstring>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>7</hsizetype>
+                                    <vsizetype>5</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
                             </property>
                             <property name="text">
                                 <string>Base name:</string>
@@ -129,6 +140,14 @@
                             <property name="name">
                                 <cstring>textLabel1</cstring>
                             </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>7</hsizetype>
+                                    <vsizetype>5</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
                             <property name="text">
                                 <string>Stride</string>
                             </property>
@@ -136,6 +155,14 @@
                         <widget class="QLabel" row="0" column="0">
                             <property name="name">
                                 <cstring>tlInputConfigFile</cstring>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>7</hsizetype>
+                                    <vsizetype>5</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
                             </property>
                             <property name="text">
                                 <string>Simluation file:</string>
@@ -145,9 +172,12 @@
                             <property name="name">
                                 <cstring>leInputDirectory</cstring>
                             </property>
+                            <property name="enabled">
+                                <bool>false</bool>
+                            </property>
                             <property name="sizePolicy">
                                 <sizepolicy>
-                                    <hsizetype>3</hsizetype>
+                                    <hsizetype>7</hsizetype>
                                     <vsizetype>1</vsizetype>
                                     <horstretch>0</horstretch>
                                     <verstretch>0</verstretch>
@@ -161,7 +191,7 @@
                                 </color>
                             </property>
                             <property name="text">
-                                <string>[automatic]</string>
+                                <string></string>
                             </property>
                         </widget>
                         <widget class="QPushButton" row="1" column="2" rowspan="1" colspan="2">
@@ -195,6 +225,14 @@
                             <property name="name">
                                 <cstring>tlInputDirectory</cstring>
                             </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>7</hsizetype>
+                                    <vsizetype>5</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
                             <property name="text">
                                 <string>Directory:</string>
                             </property>
@@ -203,9 +241,12 @@
                             <property name="name">
                                 <cstring>leInputBaseName</cstring>
                             </property>
+                            <property name="enabled">
+                                <bool>false</bool>
+                            </property>
                             <property name="sizePolicy">
                                 <sizepolicy>
-                                    <hsizetype>3</hsizetype>
+                                    <hsizetype>7</hsizetype>
                                     <vsizetype>1</vsizetype>
                                     <horstretch>0</horstretch>
                                     <verstretch>0</verstretch>
@@ -219,7 +260,7 @@
                                 </color>
                             </property>
                             <property name="text">
-                                <string>[automatic]</string>
+                                <string></string>
                             </property>
                         </widget>
                         <widget class="QLineEdit" row="0" column="1" rowspan="1" colspan="2">
@@ -228,7 +269,7 @@
                             </property>
                             <property name="sizePolicy">
                                 <sizepolicy>
-                                    <hsizetype>3</hsizetype>
+                                    <hsizetype>7</hsizetype>
                                     <vsizetype>1</vsizetype>
                                     <horstretch>0</horstretch>
                                     <verstretch>0</verstretch>

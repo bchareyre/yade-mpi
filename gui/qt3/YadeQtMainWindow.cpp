@@ -35,6 +35,12 @@ YadeQtMainWindow::YadeQtMainWindow() : YadeQtGeneratedMainWindow()
 {
 	self=this;
 
+	QGLFormat format;
+	format.setStencil(TRUE);
+	format.setAlpha(TRUE);
+	QGLFormat::setDefaultFormat(format);
+
+
 	preferences = shared_ptr<QtGUIPreferences>(new QtGUIPreferences);
 	filesystem::path yadeQtGUIPrefPath = filesystem::path( Omega::instance().yadeConfigPath + "/QtGUIPreferences.xml", filesystem::native);
 
@@ -61,10 +67,6 @@ YadeQtMainWindow::YadeQtMainWindow() : YadeQtGeneratedMainWindow()
 
 	resize(preferences->mainWindowSizeX,preferences->mainWindowSizeY);
 	move(preferences->mainWindowPositionX,preferences->mainWindowPositionY);
-	
-//	connect(btGenerator,SIGNAL(clicked()),this,SLOT(createGenerator()));
-//	connect(btPlayer,SIGNAL(clicked()),this,SLOT(createPlayer()));
-//	connect(btController,SIGNAL(clicked()),this,SLOT(createSimulationController()));
 
 	// HACK
 	if(Omega::instance().getSimulationFileName()!="") createSimulationController();
@@ -174,10 +176,8 @@ void YadeQtMainWindow::deleteSimulationController(){
 void YadeQtMainWindow::createView(){
 	ensureRenderer();
 
-	QGLFormat format; QGLFormat::setDefaultFormat(format);
-	format.setStencil(TRUE); format.setAlpha(TRUE);
 	bool isFirst=glViews.empty();
-	shared_ptr<GLViewer> glv=shared_ptr<GLViewer>(new GLViewer(glViews.size(),renderer,format,NULL,isFirst?NULL:glViews[0].get()));
+	shared_ptr<GLViewer> glv=shared_ptr<GLViewer>(new GLViewer(glViews.size(),renderer,NULL,isFirst?NULL:glViews[0].get()));
 	glv->setCamera(new YadeCamera);
 	glv->camera()->frame()->setWheelSensitivity(-1.0f);
 	glv->centerScene();

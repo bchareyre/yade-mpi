@@ -16,7 +16,11 @@
 #include<qlabel.h>
 #include<qstring.h>
 
-QtSimulationPlayer::QtSimulationPlayer() : QtGeneratedSimulationPlayer(){ glSimulationPlayerViewer->simPlayer=this;}
+QtSimulationPlayer::QtSimulationPlayer() : QtGeneratedSimulationPlayer(){
+	glSimulationPlayerViewer->simPlayer=this;
+	leInputConfigFile->setText(Omega::instance().getSimulationFileName());
+	enableControls(false);
+}
 QtSimulationPlayer::~QtSimulationPlayer(){}
 void QtSimulationPlayer::pbPlayClicked(){	setParameters(); glSimulationPlayerViewer->startAnimation();}
 void QtSimulationPlayer::pbPauseClicked(){ glSimulationPlayerViewer->stopAnimation();}
@@ -26,48 +30,39 @@ void QtSimulationPlayer::cbSaveSnapShotsToggled(bool b){	glSimulationPlayerViewe
 void QtSimulationPlayer::closeEvent(QCloseEvent *e){ QtGeneratedSimulationPlayer::closeEvent(e);}
 
 
-void QtSimulationPlayer::pbInputConfigFileClicked()
-{
+void QtSimulationPlayer::pbInputConfigFileClicked(){
 	string selectedFilter;
 	std::vector<string> filters;
 	filters.push_back("XML Yade File (*.xml *.xml.gz *.xml.bz2)");
 	string fileName = FileDialog::getOpenFileName(".", filters, "Choose a file to load",NULL,selectedFilter );
- 
 	if (!fileName.empty() && selectedFilter == "XML Yade File (*.xml *.xml.gz *.xml.bz2)")
 		leInputConfigFile->setText(fileName);
 }
-
-
-
-void QtSimulationPlayer::pbInputDirectoryClicked()
-{
+void QtSimulationPlayer::pbInputDirectoryClicked(){
 	string directory = FileDialog::getExistingDirectory ( ".","Choose the directory where the recorded file are", NULL );
-	if (!directory.empty())
-		leInputDirectory->setText(directory);
+	if (!directory.empty()) leInputDirectory->setText(directory);
 }
-
-
-void QtSimulationPlayer::pbLoadClicked()
-{
+void QtSimulationPlayer::pbLoadClicked(){
 	glSimulationPlayerViewer->load(leInputConfigFile->text());
 	leInputBaseName->setText(glSimulationPlayerViewer->inputBaseName);
 	leInputDirectory->setText(glSimulationPlayerViewer->inputBaseDirectory);
 }
-
-
-void QtSimulationPlayer::pbOutputDirectoryClicked()
-{
+void QtSimulationPlayer::pbOutputDirectoryClicked(){
 	string directory = FileDialog::getExistingDirectory ( ".","Choose the directory where to save the snapshots", NULL );
-	if (!directory.empty())
-		leOutputDirectory->setText(directory.c_str());
+	if (!directory.empty()) leOutputDirectory->setText(directory.c_str());
 }
-
-void QtSimulationPlayer::setParameters()
-{
+void QtSimulationPlayer::setParameters(){
 	glSimulationPlayerViewer->inputBaseName=leInputBaseName->text().ascii();
 	glSimulationPlayerViewer->inputBaseDirectory=leInputDirectory->text().ascii();
 	glSimulationPlayerViewer->outputBaseName=leOutputBaseName->text().ascii();
 	glSimulationPlayerViewer->outputBaseDirectory=leOutputDirectory->text().ascii();
+}
+
+void QtSimulationPlayer::enableControls(bool enable=true){
+	pbPlay->setEnabled(enable);
+	pbStep->setEnabled(enable);
+	pbPause->setEnabled(enable);
+	pbReset->setEnabled(enable);
 }
 
 void QtSimulationPlayer::pushMessage(string msg){

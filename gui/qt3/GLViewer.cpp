@@ -20,10 +20,10 @@
 
 CREATE_LOGGER(GLViewer);
 
-GLViewer::GLViewer(int id, shared_ptr<OpenGLRenderingEngine> rendererInit, const QGLFormat& format, QWidget * parent, QGLWidget * shareWidget) : QGLViewer(format,parent,"glview",shareWidget)//, qglThread(this,rendererInit)
+GLViewer::GLViewer(int id, shared_ptr<OpenGLRenderingEngine> _renderer, QWidget * parent, QGLWidget * shareWidget) : QGLViewer(parent,"glview",shareWidget)//, qglThread(this,rendererInit)
 {
 	isMoving=false;
-	renderer=rendererInit;
+	renderer=_renderer;
 	drawGridXYZ[0]=drawGridXYZ[1]=drawGridXYZ[2]=false;
 	viewId = id;
 	cut_plane = 0;
@@ -345,8 +345,7 @@ void GLViewer::postDraw(){
 	QGLViewer::postDraw();
 }
 
-void GLViewer::closeEvent(QCloseEvent *e)
-{
+void GLViewer::closeEvent(QCloseEvent *e){
 	//emit closeSignal(viewId);
 	YadeQtMainWindow::self->closeView(this);
 }

@@ -12,7 +12,8 @@
 #include<yade/core/Omega.hpp>
 #include<yade/core/RenderingEngine.hpp>
 #include<yade/core/MetaBody.hpp>
-#include<yade/lib-QGLViewer/qglviewer.h>
+//#include<yade/lib-QGLViewer/qglviewer.h>
+#include<yade/gui-qt3/GLViewer.hpp>
 
 #include<boost/filesystem/operations.hpp>
 #include<boost/filesystem/convenience.hpp>
@@ -20,43 +21,30 @@
 
 class QtSimulationPlayer;
 
-class GLSimulationPlayerViewer : public QGLViewer
-{
-/// Attributes
+class GLSimulationPlayerViewer: public GLViewer {
 	private :
-		shared_ptr<RenderingEngine>	 renderer;
 		shared_ptr<MetaBody>		 rootBody;
+		void tryFillingOutputPattern();	
 	public:
 		QtSimulationPlayer* simPlayer;
 		boost::posix_time::ptime lastCheckPointTime;
 		long lastCheckPointFrame;
-	
 		string fileName, inputBaseName, inputBaseDirectory, outputBaseName, outputBaseDirectory;
-		bool				 saveSnapShots;
-		bool 	drawGridXYZ[3];
-		int				 frameNumber;
+		bool saveSnapShots;
+		int frameNumber;
 		bool loadPositionOrientationFile();
 		list<string> xyzFiles;
 		list<string>::iterator xyzFilesIter;
 	public :
-		GLSimulationPlayerViewer(QWidget * parent=0,char*name=0);
-		virtual ~GLSimulationPlayerViewer();
-
+		GLSimulationPlayerViewer(QWidget* parent,char* name);
+		virtual ~GLSimulationPlayerViewer(){};
 		void setRootBody(shared_ptr<MetaBody> rb) { rootBody = rb;};
-		void load(const string& fileName);
-
-		
+		void load(const string& fileName, bool fromFile=true);
 		void doOneStep();
 		void reset();
-
 	protected :
-		virtual void draw();
-		virtual void fastDraw();
 		virtual void animate();
 		virtual void initializeGL();
-		virtual void postDraw();
-		virtual void keyPressEvent(QKeyEvent* e);
-		
 	DECLARE_LOGGER;
 };
 

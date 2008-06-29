@@ -37,6 +37,8 @@ class QtSimulationPlayer : public QtGeneratedSimulationPlayer, public Factorable
 	
  	protected    : void closeEvent(QCloseEvent *);
 //						void keyPressEvent(QKeyEvent *){};
+	public:
+	void enableControls(bool);
 
 	REGISTER_CLASS_NAME(QtSimulationPlayer);
 	REGISTER_BASE_CLASS_NAME(Factorable);
