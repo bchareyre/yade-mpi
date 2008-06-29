@@ -13,7 +13,7 @@
 #include <GL/glut.h>
 
 
-OpenGLRenderingEngine::OpenGLRenderingEngine() : RenderingEngine()
+OpenGLRenderingEngine::OpenGLRenderingEngine() : RenderingEngine(), clipPlaneNum(2)
 {
 
 	Body_state		= false;
@@ -30,33 +30,22 @@ OpenGLRenderingEngine::OpenGLRenderingEngine() : RenderingEngine()
 	Draw_mask		= ~0;
 	Light_position		= Vector3r(75.0,130.0,0.0);
 	Background_color		= Vector3r(0.2,0.2,0.2);
-	
 	Interaction_geometry	= false;
 	Interaction_physics	= false;
+
+	for(int i=0; i<clipPlaneNum; i++){clipPlaneSe3.push_back(Se3r(Vector3r::ZERO,Quaternionr::IDENTITY)); clipPlaneActive.push_back(false); clipPlaneNormals.push_back(Vector3r(1,0,0));}
 	
 	map<string,DynlibDescriptor>::const_iterator di    = Omega::instance().getDynlibsDescriptor().begin();
 	map<string,DynlibDescriptor>::const_iterator diEnd = Omega::instance().getDynlibsDescriptor().end();
-	for(;di!=diEnd;++di)
-	{
-		if (Omega::instance().isInheritingFrom((*di).first,"GLDrawStateFunctor"))
-			addStateFunctor((*di).first);
-		if (Omega::instance().isInheritingFrom((*di).first,"GLDrawBoundingVolumeFunctor"))
-			addBoundingVolumeFunctor((*di).first);
-		if (Omega::instance().isInheritingFrom((*di).first,"GLDrawInteractingGeometryFunctor"))
-			addInteractingGeometryFunctor((*di).first);
-		if (Omega::instance().isInheritingFrom((*di).first,"GLDrawGeometricalModelFunctor"))
-			addGeometricalModelFunctor((*di).first);
-		if (Omega::instance().isInheritingFrom((*di).first,"GLDrawShadowVolumeFunctor"))
-			addShadowVolumeFunctor((*di).first);
-
-	//	InteractionGeometry
-	//	InteractionPhysics
-		if (Omega::instance().isInheritingFrom((*di).first,"GLDrawInteractionGeometryFunctor"))
-			addInteractionGeometryFunctor((*di).first);
-		if (Omega::instance().isInheritingFrom((*di).first,"GLDrawInteractionPhysicsFunctor"))
-			addInteractionPhysicsFunctor((*di).first);
+	for(;di!=diEnd;++di){
+		if (Omega::instance().isInheritingFrom((*di).first,"GLDrawStateFunctor")) addStateFunctor((*di).first);
+		if (Omega::instance().isInheritingFrom((*di).first,"GLDrawBoundingVolumeFunctor")) addBoundingVolumeFunctor((*di).first);
+		if (Omega::instance().isInheritingFrom((*di).first,"GLDrawInteractingGeometryFunctor")) addInteractingGeometryFunctor((*di).first);
+		if (Omega::instance().isInheritingFrom((*di).first,"GLDrawGeometricalModelFunctor")) addGeometricalModelFunctor((*di).first);
+		if (Omega::instance().isInheritingFrom((*di).first,"GLDrawShadowVolumeFunctor"))	addShadowVolumeFunctor((*di).first);
+		if (Omega::instance().isInheritingFrom((*di).first,"GLDrawInteractionGeometryFunctor")) addInteractionGeometryFunctor((*di).first);
+		if (Omega::instance().isInheritingFrom((*di).first,"GLDrawInteractionPhysicsFunctor"))	addInteractionPhysicsFunctor((*di).first);
 	}
-
 	postProcessAttributes(true);
 }
 
@@ -103,6 +92,12 @@ void OpenGLRenderingEngine::renderWithNames(const shared_ptr<MetaBody>& rootBody
 	}
 };
 
+bool OpenGLRenderingEngine::pointClipped(const Vector3r& p){
+	if(clipPlaneNum<1) return false;
+	for(int i=0;i<clipPlaneNum;i++) if(clipPlaneActive[i]&&(p-clipPlaneSe3[i].position).Dot(clipPlaneNormals[i])<0) return true;
+	return false;
+}
+
 void OpenGLRenderingEngine::render(
 		const shared_ptr<MetaBody>& rootBody, 
 		body_id_t selection	// FIXME: not sure. maybe a list of selections, 
@@ -124,7 +119,7 @@ void OpenGLRenderingEngine::render(
 	}
 #endif
 	current_selection = selection;
-	//
+
 	const GLfloat pos[4]	= {Light_position[0],Light_position[1],Light_position[2],1.0};
 	const GLfloat ambientColor[4]	= {0.5,0.5,0.5,1.0};	
 
@@ -141,19 +136,14 @@ void OpenGLRenderingEngine::render(
 	glutSolidSphere(3,10,10);
 	glPopMatrix();	
 
-	if (Body_geometrical_model)
-	{
-		if (Cast_shadows)
-		{	
-			
-			if (Fast_shadow_volume)
-				renderSceneUsingFastShadowVolumes(rootBody,Light_position);
-			else
-				renderSceneUsingShadowVolumes(rootBody,Light_position);
-				
+	for(int i=0;i<clipPlaneNum; i++){ clipPlaneNormals[i]=clipPlaneSe3[i].orientation*Vector3r(0,0,1); /* glBegin(GL_LINES);glVertex3v(clipPlaneSe3[i].position);glVertex3v(clipPlaneSe3[i].position+clipPlaneNormals[i]);glEnd(); */ }
+
+	if (Body_geometrical_model){
+		if (Cast_shadows){	
+			if (Fast_shadow_volume) renderSceneUsingFastShadowVolumes(rootBody,Light_position);
+			else renderSceneUsingShadowVolumes(rootBody,Light_position);
 			// draw transparent shadow volume
-			if (Shadow_volumes)
-			{
+			if (Shadow_volumes) {
 				glAlphaFunc(GL_GREATER, 1.0f/255.0f);
 				glEnable(GL_ALPHA_TEST);
 				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -166,71 +156,29 @@ void OpenGLRenderingEngine::render(
 			
 				glCullFace(GL_FRONT);
 				renderShadowVolumes(rootBody,Light_position);
-				
+
 				glCullFace(GL_BACK);
 				renderShadowVolumes(rootBody,Light_position);
-				
+
 				glEnable(GL_DEPTH_TEST);
 				glDisable(GL_BLEND);
 				glDisable(GL_ALPHA_TEST);
 			}
-		}
-		else
-		{
+		} else{
 			glEnable(GL_CULL_FACE);
 			glEnable(GL_NORMALIZE);
 			renderGeometricalModel(rootBody);
 		}
 	}
-	
-	if (Body_state)
-		renderState(rootBody);
-	
-	if (Body_bounding_volume)
-		renderBoundingVolume(rootBody);
-	
-	if (Body_interacting_geom)
-	{
+	if (Body_state) renderState(rootBody);
+	if (Body_bounding_volume) renderBoundingVolume(rootBody);
+	if (Body_interacting_geom){
 		glEnable(GL_LIGHTING);
 		glEnable(GL_CULL_FACE);
 		renderInteractingGeometry(rootBody);
 	}
-
-	if (Interaction_geometry)
-		renderInteractionGeometry(rootBody);
-	
-	if (Interaction_physics)
-		renderInteractionPhysics(rootBody);
-	
-
-/*	shared_ptr<BodyContainer> bodies = rootBody->bodies;
-	shared_ptr<InteractionContainer>& collisions = rootBody->transientInteractions;
-	for( collisions->gotoFirst() ; collisions->notAtEnd() ; collisions->gotoNext())
-	{
-		const shared_ptr<Interaction>& col = collisions->getCurrent();
-
-		shared_ptr<Body>& b1 = (*bodies)[col->getId1()];
-		shared_ptr<Body>& b2 = (*bodies)[col->getId2()];
-
-		SpheresContactGeometry * mmcg = static_cast<SpheresContactGeometry*>(col->interactionGeometry.get());
-
-		Vector3r v1 = mmcg->contactPoint+mmcg->normal*mmcg->penetrationDepth*0.5;
-		Vector3r v2 = mmcg->contactPoint-mmcg->normal*mmcg->penetrationDepth*0.5;
-		glBegin(GL_LINES);
-			glVertex3v(v1);
-			glVertex3v(v2);
-		glEnd();
-		glPushMatrix();
-			glColor3v(b1->geometricalModel->diffuseColor);
-			glTranslate(v1[0],v1[1],v1[2]);
-			glutSolidSphere(1,10,10);
-		glPopMatrix();
-		glPushMatrix();
-			glColor3v(b2->geometricalModel->diffuseColor);
-			glTranslate(v2[0],v2[1],v2[2]);
-			glutSolidSphere(1,10,10);
-		glPopMatrix();
-	}*/
+	if (Interaction_geometry) renderInteractionGeometry(rootBody);
+	if (Interaction_physics) renderInteractionPhysics(rootBody);
 }
 
 
@@ -380,6 +328,7 @@ void OpenGLRenderingEngine::renderShadowVolumes(const shared_ptr<MetaBody>& root
 		BodyContainer::iterator biEnd = rootBody->bodies->end();
 		for(; bi!=biEnd ; ++bi )
 		{
+			if(pointClipped((*bi)->physicalParameters->se3.position)) continue;
 			if ((*bi)->geometricalModel->shadowCaster && ( ((*bi)->getGroupMask() & Draw_mask) || (*bi)->getGroupMask()==0 ))
 				shadowVolumeDispatcher((*bi)->geometricalModel,(*bi)->physicalParameters,Light_position);
 		}
@@ -402,8 +351,9 @@ void OpenGLRenderingEngine::renderGeometricalModel(const shared_ptr<MetaBody>& r
 		{
 			if((*bi)->geometricalModel && ( ((*bi)->getGroupMask() & Draw_mask) || (*bi)->getGroupMask()==0 ))
 			{
-				glPushMatrix();
 				Se3r& se3 = (*bi)->physicalParameters->se3;
+				if(pointClipped(se3.position)) continue;
+				glPushMatrix();
 				Real angle;
 				Vector3r axis;	
 				se3.orientation.ToAxisAngle(axis,angle);	
@@ -442,10 +392,13 @@ void OpenGLRenderingEngine::renderInteractionGeometry(const shared_ptr<MetaBody>
 		InteractionContainer::iterator biEnd = rootBody->persistentInteractions->end();
 		for( ; bi!=biEnd ; ++bi)
 		{
-			glPushMatrix();
-			if((*bi)->interactionGeometry)
-				interactionGeometryDispatcher((*bi)->interactionGeometry,(*bi),(*(rootBody->bodies))[(*bi)->getId1()],(*(rootBody->bodies))[(*bi)->getId2()],Interaction_wire);
-			glPopMatrix();
+			if((*bi)->interactionGeometry){
+				const shared_ptr<Body>& b1=Body::byId((*bi)->getId1(),rootBody), b2=Body::byId((*bi)->getId2(),rootBody);
+				if(pointClipped(b1->physicalParameters->se3.position)&&pointClipped(b2->physicalParameters->se3.position)) continue;
+				glPushMatrix();
+					interactionGeometryDispatcher((*bi)->interactionGeometry,(*bi),(*(rootBody->bodies))[(*bi)->getId1()],(*(rootBody->bodies))[(*bi)->getId2()],Interaction_wire);
+				glPopMatrix();
+			}
 		}
 	}
 
@@ -488,10 +441,13 @@ void OpenGLRenderingEngine::renderInteractionPhysics(const shared_ptr<MetaBody>&
 		InteractionContainer::iterator biEnd = rootBody->transientInteractions->end();
 		for( ; bi!=biEnd ; ++bi)
 		{
-			glPushMatrix();
-			if((*bi)->interactionPhysics)
-				interactionPhysicsDispatcher((*bi)->interactionPhysics,(*bi),(*(rootBody->bodies))[(*bi)->getId1()],(*(rootBody->bodies))[(*bi)->getId2()],Interaction_wire);
-			glPopMatrix();
+			if((*bi)->interactionPhysics){
+				const shared_ptr<Body>& b1=Body::byId((*bi)->getId1(),rootBody), b2=Body::byId((*bi)->getId2(),rootBody);
+				if(pointClipped(b1->physicalParameters->se3.position)&&pointClipped(b2->physicalParameters->se3.position)) continue;
+				glPushMatrix();
+					interactionPhysicsDispatcher((*bi)->interactionPhysics,(*bi),(*(rootBody->bodies))[(*bi)->getId1()],(*(rootBody->bodies))[(*bi)->getId2()],Interaction_wire);
+				glPopMatrix();
+			}
 		}
 	}
 }
@@ -503,6 +459,7 @@ void OpenGLRenderingEngine::renderState(const shared_ptr<MetaBody>& rootBody)
 	BodyContainer::iterator biEnd = rootBody->bodies->end();
 	for( ; bi!=biEnd ; ++bi)
 	{
+		if(pointClipped((*bi)->physicalParameters->se3.position)) continue;
 		glPushMatrix();
 		if((*bi)->physicalParameters && ( ((*bi)->getGroupMask() & Draw_mask ) || (*bi)->getGroupMask()==0 ))
 			stateDispatcher((*bi)->physicalParameters);
@@ -521,7 +478,8 @@ void OpenGLRenderingEngine::renderBoundingVolume(const shared_ptr<MetaBody>& roo
 	BodyContainer::iterator bi    = rootBody->bodies->begin();
 	BodyContainer::iterator biEnd = rootBody->bodies->end();
 	for( ; bi!=biEnd ; ++bi)
-	{
+	{		
+		if(pointClipped((*bi)->physicalParameters->se3.position)) continue;
 		glPushMatrix();
 		if((*bi)->boundingVolume && ( ((*bi)->getGroupMask() & Draw_mask) || (*bi)->getGroupMask()==0 ))
 			boundingVolumeDispatcher((*bi)->boundingVolume);
@@ -549,8 +507,9 @@ void OpenGLRenderingEngine::renderInteractingGeometry(const shared_ptr<MetaBody>
 	BodyContainer::iterator biEnd = rootBody->bodies->end();
 	for( ; bi!=biEnd ; ++bi)
 	{
-		glPushMatrix();
 		Se3r& se3 = (*bi)->physicalParameters->se3;
+		if(pointClipped(se3.position)) continue;
+		glPushMatrix();
 		Real angle;
 		Vector3r axis;	
 		se3.orientation.ToAxisAngle(axis,angle);	

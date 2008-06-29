@@ -132,7 +132,7 @@ void YadeQtMainWindow::closeEvent(QCloseEvent *e)
 
 void YadeQtMainWindow::ensureRenderer(){
 	shared_ptr<Factorable> tmpRenderer = ClassFactory::instance().createShared("OpenGLRenderingEngine");
-	renderer = static_pointer_cast<RenderingEngine>(tmpRenderer);
+	renderer = static_pointer_cast<OpenGLRenderingEngine>(tmpRenderer);
 
 	if(!renderer) throw runtime_error("Renderer could not be created, why?");
 

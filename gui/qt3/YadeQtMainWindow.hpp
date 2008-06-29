@@ -19,7 +19,7 @@ class YadeQtMainWindow : public YadeQtGeneratedMainWindow
 	public:
 		shared_ptr<SimulationController> simulationController;
 		vector<shared_ptr<GLViewer> > glViews;
-		shared_ptr<RenderingEngine> renderer;
+		shared_ptr<OpenGLRenderingEngine> renderer;
 		void ensureRenderer();
 		void saveRendererConfig();
 		

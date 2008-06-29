@@ -24,26 +24,18 @@
 
 class OpenGLRenderingEngine : public RenderingEngine
 {	
-	public : // FIXME - why public ?
-		Vector3r	 Light_position
-				,Background_color;
+	public :
+		Vector3r Light_position,Background_color;
+		bool Body_state,Body_bounding_volume,Body_interacting_geom,Body_geometrical_model,Cast_shadows,Shadow_volumes,Fast_shadow_volume,Body_wire,Interaction_wire,Draw_inside,Interaction_geometry,Interaction_physics,needInit;
+		body_id_t current_selection;
+		int Draw_mask;
 
-		bool		 Body_state
-				,Body_bounding_volume
-				,Body_interacting_geom
-				,Body_geometrical_model
-				,Cast_shadows
-				,Shadow_volumes
-				,Fast_shadow_volume
-				,Body_wire
-				,Interaction_wire
-				,Draw_inside
-				,Interaction_geometry
-				,Interaction_physics
-		
-				,needInit;
-		body_id_t 	current_selection;
-		int		Draw_mask;
+		vector<Se3r> clipPlaneSe3;
+		vector<bool> clipPlaneActive;
+		const int clipPlaneNum;
+
+		bool pointClipped(const Vector3r& p);
+		vector<Vector3r> clipPlaneNormals;
 
 	private :
 		DynLibDispatcher< InteractionGeometry , GLDrawInteractionGeometryFunctor, void , TYPELIST_5(const shared_ptr<InteractionGeometry>&, const shared_ptr<Interaction>& , const shared_ptr<Body>&, const shared_ptr<Body>&, bool) > interactionGeometryDispatcher;
@@ -56,13 +48,14 @@ class OpenGLRenderingEngine : public RenderingEngine
 		DynLibDispatcher< GeometricalModel    , GLDrawGeometricalModelFunctor,    void , TYPELIST_3(const shared_ptr<GeometricalModel>&, const shared_ptr<PhysicalParameters>&, bool) > geometricalModelDispatcher;
 		DynLibDispatcher< GeometricalModel    , GLDrawShadowVolumeFunctor,        void , TYPELIST_3(const shared_ptr<GeometricalModel>&, const shared_ptr<PhysicalParameters>&, const Vector3r& ) > shadowVolumeDispatcher;
 
-		vector<vector<string> >  stateFunctorNames;
-		vector<vector<string> >  boundingVolumeFunctorNames;
-		vector<vector<string> >  interactingGeometryFunctorNames;
-		vector<vector<string> >  geometricalModelFunctorNames;
-		vector<vector<string> >  shadowVolumeFunctorNames;
-		vector<vector<string> >  interactionGeometryFunctorNames;
-		vector<vector<string> >  interactionPhysicsFunctorNames;
+		vector<vector<string> >
+			stateFunctorNames,
+			boundingVolumeFunctorNames,
+			interactingGeometryFunctorNames, 
+			geometricalModelFunctorNames,
+			shadowVolumeFunctorNames,
+			interactionGeometryFunctorNames,
+			interactionPhysicsFunctorNames;
 
 	public :
 		void addStateFunctor(const string& str);

@@ -76,7 +76,7 @@ SimulationController::SimulationController(QWidget * parent) : QtGeneratedSimula
 
 	// there is file existence assertion in lodSimulationFromFilename, so yade will abort cleanly...
 	LOG_DEBUG("Omega's simulation filename: `"<<Omega::instance().getSimulationFileName()<<"'");
-	if (Omega::instance().getSimulationFileName()!=""){
+	if (Omega::instance().getSimulationFileName()!="" && (!Omega::instance().getRootBody() || (Omega::instance().getRootBody()->bodies->size()==0 && Omega::instance().getRootBody()->engines.size()==0))){
 		loadSimulationFromFileName(Omega::instance().getSimulationFileName());
 	}
 	// run timer ANY TIME (simulation may be started asynchronously)

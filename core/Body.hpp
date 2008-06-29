@@ -48,6 +48,8 @@ class Body : public Serializable
 		static const body_id_t ID_NONE;
 		//! get Body pointer given its id. 
 		static const shared_ptr<Body>& byId(body_id_t _id,MetaBody* rb=NULL);
+		static const shared_ptr<Body>& byId(body_id_t _id,shared_ptr<MetaBody> rb);
+
 		
 		//! Whether this Body is a Clump.
 		//! @note The following is always true: \code (Body::isClump() XOR Body::isClumpMember() XOR Body::isStandalone()) \endcode
