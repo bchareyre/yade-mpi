@@ -45,6 +45,7 @@ GLViewer::GLViewer(int id, shared_ptr<OpenGLRenderingEngine> _renderer, QWidget 
 	manipulatedFrame()->setConstraint(NULL);
 
 	setKeyDescription(Qt::Key_C,"Set scene center to the selected body (if any)");
+	setKeyDescription(Qt::Key_C & Qt::ALT,"Set scene center to median body position");
 	setKeyDescription(Qt::Key_D,"Toggle Body::isDynamic on selection");
 	setKeyDescription(Qt::Key_G,"Toggle YZ grid");
 	setKeyDescription(Qt::Key_X,"Toggle YZ grid");
@@ -125,6 +126,7 @@ void GLViewer::keyPressEvent(QKeyEvent *e)
 		else{ displayMessage("Moving selected object"); mouseMovesManipulatedFrame();}
 	}
 	else if(e->key()==Qt::Key_C && selectedName() >= 0 && (*(Omega::instance().getRootBody()->bodies)).exists(selectedName())) setSceneCenter(manipulatedFrame()->position()), updateGL();
+	else if(e->key()==Qt::Key_C && (e->state() & AltButton)){ displayMessage("Median centering"); centerMeanDeviate(); updateGL(); }
 
 	else if(e->key()==Qt::Key_Escape){ resetManipulation();displayMessage("Manipulating scene."); }
 	else if(e->key()==Qt::Key_F1 || e->key()==Qt::Key_F2 /* || ... */ ){
@@ -201,6 +203,26 @@ void GLViewer::keyPressEvent(QKeyEvent *e)
 //
 	else if( e->key()!=Qt::Key_Escape && e->key()!=Qt::Key_Space )
 		QGLViewer::keyPressEvent(e);
+}
+
+void GLViewer::centerMeanDeviate(){
+	std::vector<Real> coords[3];
+	long nBodies=Omega::instance().getRootBody()->bodies->size();
+	for(int i=0;i<3;i++)coords[i].reserve(nBodies);
+	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getRootBody()->bodies){
+		for(int i=0; i<3; i++) coords[i].push_back(b->physicalParameters->se3.position[i]);
+	}
+	Vector3r median,interQuart;
+	for(int i=0;i<3;i++){
+		sort(coords[i].begin(),coords[i].end());
+		median[i]=*(coords[i].begin()+nBodies/2);
+		interQuart[i]=*(coords[i].begin()+3*nBodies/4)-*(coords[i].begin()+nBodies/4);
+	}
+	LOG_DEBUG("Median position is"<<median<<", inter-quartile distance is "<<interQuart);
+
+	setSceneCenter(qglviewer::Vec(median[0],median[1],median[2]));
+	setSceneRadius(2*(interQuart[0]+interQuart[1]+interQuart[2])/3.);
+	showEntireScene();
 }
 
 void GLViewer::centerScene()
