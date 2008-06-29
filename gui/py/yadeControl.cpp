@@ -456,7 +456,7 @@ class pyOmega{
 	}
 
 
-	void wait(){ if(OMEGA.isRunning()){LOG_DEBUG("WAIT!");} while(OMEGA.isRunning()) usleep(50000 /*20 ms*/); }
+	void wait(){ if(OMEGA.isRunning()){LOG_DEBUG("WAIT!");} else return; timespec t1,t2; t1.tv_sec=0; t1.tv_nsec=40000000; /*40 ms*/ while(OMEGA.isRunning()) nanosleep(&t1,&t2); }
 	
 	pyBodyContainer bodies_get(void){assertRootBody(); return pyBodyContainer(OMEGA.getRootBody()->bodies); }
 	pyInteractionContainer interactions_get(void){assertRootBody(); return pyInteractionContainer(OMEGA.getRootBody()->transientInteractions); }

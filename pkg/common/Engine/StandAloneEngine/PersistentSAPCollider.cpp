@@ -50,7 +50,7 @@ void PersistentSAPCollider::action(MetaBody* ncb)
 	Vector3r min,max;
 
 	const long numBodies=(long)bodies->size();
-	// #pragma omp parallel for
+	//#pragma omp parallel for
 	for(int id=0; id<numBodies; id++){
 		const shared_ptr<Body>& b=(*bodies)[id];
 		offset=3*id;
@@ -81,13 +81,13 @@ void PersistentSAPCollider::action(MetaBody* ncb)
 	nbObjects=bodies->size();
 
 	// permutation sort of the AABBBounds along the 3 axis performed in a independant manner
-	// #pragma omp parallel sections
+	//#pragma omp parallel sections
 	{
-	//	#pragma omp section
+	//#pragma omp section
 		sortBounds(xBounds, nbObjects);
-	//	#pragma omp section
+	//#pragma omp section
 		sortBounds(yBounds, nbObjects);
-	//	#pragma omp section
+	//#pragma omp section
 		sortBounds(zBounds, nbObjects);
 	}
 }

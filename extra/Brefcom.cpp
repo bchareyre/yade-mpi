@@ -61,6 +61,8 @@ void BrefcomMakeContact::go(const shared_ptr<PhysicalParameters>& pp1, const sha
 		if(neverDamage) contPhys->neverDamage=true;
 		if(cohesiveThresholdIter<0 || Omega::instance().getCurrentIteration()<cohesiveThresholdIter) contPhys->isCohesive=true;
 		else contPhys->isCohesive=false;
+		contPhys->tau=tau;
+		contPhys->expDmgRate=expDmgRate;
 
 		interaction->interactionPhysics=contPhys;
 	}

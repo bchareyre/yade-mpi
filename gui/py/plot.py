@@ -92,7 +92,7 @@ def saveGnuplot(baseName,term='wxt',extension=None,timestamp=False,comment=None,
 	import time,bz2
 	vars=data.keys()
 	lData=len(data[vars[0]])
-	if timestamp: baseName+=time.strftime('_%Y%m%d_%H:%m')
+	if timestamp: baseName+=time.strftime('_%Y%m%d_%H:%M')
 	baseNameNoPath=baseName.split('/')[-1]
 	fData=bz2.BZ2File(baseName+".data.bz2",'w');
 	fData.write("# "+"\t\t".join(vars)+"\n")

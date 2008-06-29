@@ -16,7 +16,9 @@
 
 #include<boost/filesystem/operations.hpp>
 #include<boost/filesystem/convenience.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
+class QtSimulationPlayer;
 
 class GLSimulationPlayerViewer : public QGLViewer
 {
@@ -25,7 +27,10 @@ class GLSimulationPlayerViewer : public QGLViewer
 		shared_ptr<RenderingEngine>	 renderer;
 		shared_ptr<MetaBody>		 rootBody;
 	public:
-		
+		QtSimulationPlayer* simPlayer;
+		boost::posix_time::ptime lastCheckPointTime;
+		long lastCheckPointFrame;
+	
 		string fileName, inputBaseName, inputBaseDirectory, outputBaseName, outputBaseDirectory;
 		bool				 saveSnapShots;
 		bool 	drawGridXYZ[3];

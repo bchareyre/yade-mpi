@@ -23,16 +23,18 @@ class GLDrawSphere : public GLDrawGeometricalModelFunctor
 		void drawSphere(int depth);
 		void drawCircle(bool filled);
 		void clearGlMatrix();
-	
+		static bool glutUse, glutNormalize;
+		static int glutSlices, glutStacks;
+		
 	public :
 		GLDrawSphere();
 		virtual void go(const shared_ptr<GeometricalModel>&, const shared_ptr<PhysicalParameters>&,bool);
+		virtual void registerAttributes(){REGISTER_ATTRIBUTE(glutUse); REGISTER_ATTRIBUTE(glutNormalize); REGISTER_ATTRIBUTE(glutSlices); REGISTER_ATTRIBUTE(glutStacks); }
 		
 	RENDERS(Sphere);
 	REGISTER_CLASS_NAME(GLDrawSphere);
 	REGISTER_BASE_CLASS_NAME(GLDrawGeometricalModelFunctor);
 };
-
 REGISTER_SERIALIZABLE(GLDrawSphere,false);
 
 #endif // GLDRAWSPHERE_HPP

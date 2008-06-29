@@ -19,6 +19,9 @@ class QtSimulationPlayer : public QtGeneratedSimulationPlayer, public Factorable
 	public : ~QtSimulationPlayer();
 
 	private : void setParameters();
+		list<string> messages;
+	public: void pushMessage(std::string);
+
 
 	public slots : virtual void pbInputDirectoryClicked();
 	public slots : virtual void pbLoadClicked();

@@ -21,12 +21,26 @@
 //      glPopMatrix();
 //}
 
-GLDrawSphere::GLDrawSphere() : first(true), glWiredSphereList(-1), glSphereList(-1)
-{
-};
+bool GLDrawSphere::glutUse=false;
+bool GLDrawSphere::glutNormalize=true;
+int  GLDrawSphere::glutSlices=12;
+int  GLDrawSphere::glutStacks=6;
+
+GLDrawSphere::GLDrawSphere() : first(true), glWiredSphereList(-1), glSphereList(-1){};
 
 void GLDrawSphere::go(const shared_ptr<GeometricalModel>& gm, const shared_ptr<PhysicalParameters>& ph,bool wire)
 {
+	if(glutUse){
+		Real r= (static_cast<Sphere*>(gm.get()))->radius;
+		glMaterialv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, Vector3f(gm->diffuseColor[0],gm->diffuseColor[1],gm->diffuseColor[2]));
+		glColor3v(gm->diffuseColor);
+		if(glutNormalize)	glPushAttrib(GL_NORMALIZE); // as per http://lists.apple.com/archives/Mac-opengl/2002/Jul/msg00085.html
+		 	if (gm->wire || wire) glutWireSphere(r,glutSlices,glutStacks);
+			else glutSolidSphere(r,glutSlices,glutStacks);
+		if(glutNormalize) glPopAttrib();
+		return;
+	}
+
 	if (first)
 	{
 		Real X = 0.525731112119133606;

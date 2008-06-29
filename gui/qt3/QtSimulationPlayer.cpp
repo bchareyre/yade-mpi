@@ -13,16 +13,17 @@
 #include <qlineedit.h>
 #include <qpushbutton.h>
 #include <qspinbox.h>
+#include<qlabel.h>
+#include<qstring.h>
 
-QtSimulationPlayer::QtSimulationPlayer() : QtGeneratedSimulationPlayer()
-{
-	
-}
-
-
-QtSimulationPlayer::~QtSimulationPlayer()
-{
-}
+QtSimulationPlayer::QtSimulationPlayer() : QtGeneratedSimulationPlayer(){ glSimulationPlayerViewer->simPlayer=this;}
+QtSimulationPlayer::~QtSimulationPlayer(){}
+void QtSimulationPlayer::pbPlayClicked(){	setParameters(); glSimulationPlayerViewer->startAnimation();}
+void QtSimulationPlayer::pbPauseClicked(){ glSimulationPlayerViewer->stopAnimation();}
+void QtSimulationPlayer::pbStepClicked(){ glSimulationPlayerViewer->stopAnimation(); glSimulationPlayerViewer->doOneStep(); }
+void QtSimulationPlayer::pbResetClicked(){ setParameters();	glSimulationPlayerViewer->reset();}
+void QtSimulationPlayer::cbSaveSnapShotsToggled(bool b){	glSimulationPlayerViewer->saveSnapShots=b;}
+void QtSimulationPlayer::closeEvent(QCloseEvent *e){ QtGeneratedSimulationPlayer::closeEvent(e);}
 
 
 void QtSimulationPlayer::pbInputConfigFileClicked()
@@ -59,51 +60,7 @@ void QtSimulationPlayer::pbOutputDirectoryClicked()
 	string directory = FileDialog::getExistingDirectory ( ".","Choose the directory where to save the snapshots", NULL );
 	if (!directory.empty())
 		leOutputDirectory->setText(directory.c_str());
-
 }
-
-
-void QtSimulationPlayer::pbPlayClicked()
-{	
-	setParameters();
-
-	glSimulationPlayerViewer->startAnimation();
-
-}
-
-
-void QtSimulationPlayer::pbPauseClicked()
-{	
-	glSimulationPlayerViewer->stopAnimation();
-}
-
-
-void QtSimulationPlayer::pbStepClicked()
-{
-	glSimulationPlayerViewer->stopAnimation();
-	glSimulationPlayerViewer->doOneStep();
-}
-
-
-void QtSimulationPlayer::pbResetClicked()
-{
-	setParameters();
-	glSimulationPlayerViewer->reset();
-}
-
-
-void QtSimulationPlayer::cbSaveSnapShotsToggled(bool b)
-{
-	glSimulationPlayerViewer->saveSnapShots=b;
-}
-
-
-void QtSimulationPlayer::closeEvent(QCloseEvent *e)
-{
-	QtGeneratedSimulationPlayer::closeEvent(e);
-	
-}
-
 
 void QtSimulationPlayer::setParameters()
 {
@@ -111,4 +68,15 @@ void QtSimulationPlayer::setParameters()
 	glSimulationPlayerViewer->inputBaseDirectory=leInputDirectory->text().ascii();
 	glSimulationPlayerViewer->outputBaseName=leOutputBaseName->text().ascii();
 	glSimulationPlayerViewer->outputBaseDirectory=leOutputDirectory->text().ascii();
+}
+
+void QtSimulationPlayer::pushMessage(string msg){
+	messages.push_back(msg);
+	if(messages.size()>15) messages.pop_front();
+	QString disp;
+	FOREACH(string m, messages){
+		disp+=m+"\n";
+	}
+	tlStatus->setText(disp);
+	tlStatus->adjustSize();
 }

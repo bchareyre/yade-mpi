@@ -162,7 +162,7 @@ class BrefcomMakeContact: public InteractionPhysicsEngineUnit{
 		expBending is positive if the damage evolution function is concave after fracture onset;
 		reasonable value seems like 4.
 		*/
-		Real sigmaT, expBending, xiShear, epsCrackOnset, relDuctility, G_over_E;
+		Real sigmaT, expBending, xiShear, epsCrackOnset, relDuctility, G_over_E, tau, expDmgRate;
 		//! Should new contacts be cohesive? They will before this iter#, they will not be afterwards. If 0, they will never be. If negative, they will always be created as cohesive.
 		long cohesiveThresholdIter;
 		//! Create contacts that don't receive any damage (BrefcomContact::neverDamage=true); defaults to false
@@ -174,6 +174,7 @@ class BrefcomMakeContact: public InteractionPhysicsEngineUnit{
 			neverDamage=false;
 			alpha=3.7; beta=2.198; gamma=3.79; // Laurent's defaults
 			cohesiveThresholdIter=-1;
+			tau=-1; expDmgRate=0;
 		}
 
 		virtual void go(const shared_ptr<PhysicalParameters>& pp1, const shared_ptr<PhysicalParameters>& pp2, const shared_ptr<Interaction>& interaction);
@@ -191,6 +192,8 @@ class BrefcomMakeContact: public InteractionPhysicsEngineUnit{
 			REGISTER_ATTRIBUTE(neverDamage);
 			REGISTER_ATTRIBUTE(epsCrackOnset);
 			REGISTER_ATTRIBUTE(relDuctility);
+			REGISTER_ATTRIBUTE(tau);
+			REGISTER_ATTRIBUTE(expDmgRate);
 			//REGISTER_ATTRIBUTE(calibratedEpsFracture);
 			/* REGISTER_ATTRIBUTE(Gf); */
 		}
