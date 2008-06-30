@@ -96,7 +96,8 @@ void GLSimulationPlayerViewer::load(const string& fileName, bool fromFile)
 			path=por->outputFile.substr(0,dirSep);
 			prefix=por->outputFile.substr(dirSep+1 /* without slash, till the end */);
 		} else { prefix=por->outputFile; }
-		if(inputBaseDirectory.empty()){ inputBaseDirectory=path; } if(inputBaseName.empty()){ inputBaseName=prefix; }
+		//if(inputBaseDirectory.empty()){ inputBaseDirectory=path; } if(inputBaseName.empty()){ inputBaseName=prefix; }
+		inputBaseDirectory=path; inputBaseName=prefix; 
 	} else { simPlayer->pushMessage("No PositionOrientationEngine in simulation file. ABORTED.");  return; }
 
 	simPlayer->pushMessage("Using directory "+inputBaseDirectory+" and basename "+inputBaseName+".");

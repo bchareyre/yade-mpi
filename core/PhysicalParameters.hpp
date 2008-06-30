@@ -18,6 +18,7 @@
 class PhysicalParameters : public Serializable, public Indexable
 {
 	public : /// FIXME - remove Se3, move Position and move Orientation to Particle and RigidBody. think about ParametersSingleton
+			PhysicalParameters() : se3(Vector3r(0,0,0), Quaternionr(1,0,0,0)) {}
 		Se3r se3;
 
 	protected :
