@@ -104,7 +104,7 @@ void GLSimulationPlayerViewer::load(const string& fileName, bool fromFile)
 	LOG_DEBUG("Using directory `"<<inputBaseDirectory<<"' and basename `"<<inputBaseName<<"'.");
 	if(!filesystem::exists(filesystem::path(inputBaseDirectory))) 
 	{ 
-		if (inputBaseDirectory[0]!="/")  // may be relative path?
+		if (inputBaseDirectory[0]!='/')  // may be relative path?
 		{
 				size_t dirSep=fileName.rfind("/");
 				string path;
