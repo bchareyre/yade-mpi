@@ -102,7 +102,24 @@ void GLSimulationPlayerViewer::load(const string& fileName, bool fromFile)
 
 	simPlayer->pushMessage("Using directory "+inputBaseDirectory+" and basename "+inputBaseName+".");
 	LOG_DEBUG("Using directory `"<<inputBaseDirectory<<"' and basename `"<<inputBaseName<<"'.");
-	if(!filesystem::exists(filesystem::path(inputBaseDirectory))){ LOG_FATAL("Base xyz directory `"<<inputBaseDirectory<<"' doesn't exist!!"); return;}
+	if(!filesystem::exists(filesystem::path(inputBaseDirectory))) 
+	{ 
+		if (inputBaseDirectory[0]!="/")  // may be relative path?
+		{
+				size_t dirSep=fileName.rfind("/");
+				string path;
+				if(dirSep!=string::npos) path=fileName.substr(0,dirSep);
+				inputBaseDirectory=path+"/"+inputBaseDirectory;
+		}
+		if(!filesystem::exists(filesystem::path(inputBaseDirectory)))
+		{
+			LOG_FATAL("Base xyz directory `"<<inputBaseDirectory<<"' doesn't exist!!"); 
+			xyzFiles.clear();
+			simPlayer->enableControls(false);
+			return;
+		}
+	}
+	
 	filesystem::directory_iterator dEnd;
 	xyzFiles.clear();
 	for(filesystem::directory_iterator dIter(inputBaseDirectory); dIter!=dEnd; dIter++){
