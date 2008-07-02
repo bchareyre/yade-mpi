@@ -126,7 +126,7 @@ void GLViewer::keyPressEvent(QKeyEvent *e)
 		else{ displayMessage("Moving selected object"); mouseMovesManipulatedFrame();}
 	}
 	else if(e->key()==Qt::Key_C && selectedName() >= 0 && (*(Omega::instance().getRootBody()->bodies)).exists(selectedName())) setSceneCenter(manipulatedFrame()->position()), updateGL();
-	else if(e->key()==Qt::Key_C && (e->state() & AltButton)){ displayMessage("Median centering"); centerMeanDeviate(); updateGL(); }
+	else if(e->key()==Qt::Key_C && (e->state() & AltButton)){ displayMessage("Median centering"); centerMedianQuartile(); updateGL(); }
 
 	else if(e->key()==Qt::Key_Escape){ resetManipulation();displayMessage("Manipulating scene."); }
 	else if(e->key()==Qt::Key_F1 || e->key()==Qt::Key_F2 /* || ... */ ){
@@ -204,10 +204,20 @@ void GLViewer::keyPressEvent(QKeyEvent *e)
 	else if( e->key()!=Qt::Key_Escape && e->key()!=Qt::Key_Space )
 		QGLViewer::keyPressEvent(e);
 }
-
-void GLViewer::centerMeanDeviate(){
-	std::vector<Real> coords[3];
+/* Calculate medians for x, y and z coordinates of all bodies;
+ *then set scene center to median position and scene radius to 2*inter-quartile distance.
+ *
+ * This function eliminates the effect of lonely bodies that went nuts and enlarge
+ * the scene's AABB in such a way that fitting the scene to see the AABB makes the
+ * "central" (where most bodies is) part very small or even invisible.
+ */
+void GLViewer::centerMedianQuartile(){
 	long nBodies=Omega::instance().getRootBody()->bodies->size();
+	if(nBodies<4) {
+		LOG_INFO("Less than 4 bodies, median makes no sense; calling centerScene() instead.");
+		return centerScene();
+	}
+	std::vector<Real> coords[3];
 	for(int i=0;i<3;i++)coords[i].reserve(nBodies);
 	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getRootBody()->bodies){
 		for(int i=0; i<3; i++) coords[i].push_back(b->physicalParameters->se3.position[i]);
@@ -219,7 +229,6 @@ void GLViewer::centerMeanDeviate(){
 		interQuart[i]=*(coords[i].begin()+3*nBodies/4)-*(coords[i].begin()+nBodies/4);
 	}
 	LOG_DEBUG("Median position is"<<median<<", inter-quartile distance is "<<interQuart);
-
 	setSceneCenter(qglviewer::Vec(median[0],median[1],median[2]));
 	setSceneRadius(2*(interQuart[0]+interQuart[1]+interQuart[2])/3.);
 	showEntireScene();

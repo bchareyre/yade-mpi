@@ -11,7 +11,7 @@
 #include <GL/glu.h>
 #include <GL/gl.h>
 #include <GL/glut.h>
-
+CREATE_LOGGER(OpenGLRenderingEngine);
 
 OpenGLRenderingEngine::OpenGLRenderingEngine() : RenderingEngine(), clipPlaneNum(2)
 {
@@ -32,6 +32,10 @@ OpenGLRenderingEngine::OpenGLRenderingEngine() : RenderingEngine(), clipPlaneNum
 	Background_color		= Vector3r(0.2,0.2,0.2);
 	Interaction_geometry	= false;
 	Interaction_physics	= false;
+
+	scaleDisplacements=false; scaleRotations=false;
+	displacementScale=Vector3r(1,1,1); rotationScale=1;
+
 
 	for(int i=0; i<clipPlaneNum; i++){clipPlaneSe3.push_back(Se3r(Vector3r::ZERO,Quaternionr::IDENTITY)); clipPlaneActive.push_back(false); clipPlaneNormals.push_back(Vector3r(1,0,0));}
 	
@@ -98,6 +102,19 @@ bool OpenGLRenderingEngine::pointClipped(const Vector3r& p){
 	return false;
 }
 
+Se3r OpenGLRenderingEngine::renderedSe3(const shared_ptr<Body>& b){
+	if(!(scaleDisplacements||scaleRotations)) return b->physicalParameters->se3;
+	const body_id_t& id=b->getId();
+	const Se3r& se3=b->physicalParameters->se3; assert(refSe3.size()>(size_t)b->getId());
+	Quaternionr relRot=refSe3[id].orientation.Conjugate()*se3.orientation;
+	Vector3r axis; Real angle; relRot.ToAxisAngle(axis,angle);
+	angle*=rotationScale;
+	return Se3r(
+		scaleDisplacements ? diagMult(displacementScale,se3.position-refSe3[id].position)+refSe3[id].position : se3.position,
+		scaleRotations     ? refSe3[id].orientation*Quaternionr(axis,angle) : se3.orientation
+	);
+}
+
 void OpenGLRenderingEngine::render(
 		const shared_ptr<MetaBody>& rootBody, 
 		body_id_t selection	// FIXME: not sure. maybe a list of selections, 
@@ -136,7 +153,26 @@ void OpenGLRenderingEngine::render(
 	glutSolidSphere(3,10,10);
 	glPopMatrix();	
 
+	// TODO: do this only if clipping is effective (i.e. if clipPlaneActive[i] AND'ed together); dtto for pointClipped
 	for(int i=0;i<clipPlaneNum; i++){ clipPlaneNormals[i]=clipPlaneSe3[i].orientation*Vector3r(0,0,1); /* glBegin(GL_LINES);glVertex3v(clipPlaneSe3[i].position);glVertex3v(clipPlaneSe3[i].position+clipPlaneNormals[i]);glEnd(); */ }
+
+	// if scaling positions or orientations, _and_ if it is for the first time, save current se3 as reference values
+	// if # of bodies changes, we have to reset those
+	if((scaleDisplacements || scaleRotations) && refSe3.size()!=rootBody->bodies->size()){
+		LOG_DEBUG("(re)initializing reference positions and orientations.");
+		refSe3.clear(); refSe3.reserve(rootBody->bodies->size());
+		FOREACH(const shared_ptr<Body>& b, *rootBody->bodies) refSe3.push_back(b->physicalParameters->se3);
+	}
+	// debugging only
+	#if 1
+		if(scaleDisplacements){
+			glColor3d(1,1,0); glBegin(GL_LINES); 
+			FOREACH(const shared_ptr<Body>& b, *rootBody->bodies){
+				Se3r se3=renderedSe3(b);
+				glVertex3v(b->physicalParameters->se3.position); glVertex3v(se3.position); }
+			glEnd();
+		}
+	#endif
 
 	if (Body_geometrical_model){
 		if (Cast_shadows){	
@@ -316,75 +352,44 @@ void OpenGLRenderingEngine::renderSceneUsingFastShadowVolumes(const shared_ptr<M
 	glDepthMask(GL_TRUE);
 	glDepthFunc(GL_LESS);
 	glDisable(GL_STENCIL_TEST);
-	
 }	
 
 
-void OpenGLRenderingEngine::renderShadowVolumes(const shared_ptr<MetaBody>& rootBody,Vector3r Light_position)
-{	
-	if (!rootBody->geometricalModel)
-	{
-		BodyContainer::iterator bi    = rootBody->bodies->begin();
-		BodyContainer::iterator biEnd = rootBody->bodies->end();
-		for(; bi!=biEnd ; ++bi )
-		{
-			if(pointClipped((*bi)->physicalParameters->se3.position)) continue;
-			if ((*bi)->geometricalModel->shadowCaster && ( ((*bi)->getGroupMask() & Draw_mask) || (*bi)->getGroupMask()==0 ))
-				shadowVolumeDispatcher((*bi)->geometricalModel,(*bi)->physicalParameters,Light_position);
+void OpenGLRenderingEngine::renderShadowVolumes(const shared_ptr<MetaBody>& rootBody,Vector3r Light_position){	
+	if (!rootBody->geometricalModel){
+		FOREACH(const shared_ptr<Body>& b, *rootBody->bodies){
+			if(pointClipped(b->physicalParameters->se3.position)) continue;
+			if (b->geometricalModel->shadowCaster && ( (b->getGroupMask() & Draw_mask) || b->getGroupMask()==0 ))
+				shadowVolumeDispatcher(b->geometricalModel,b->physicalParameters,Light_position);
 		}
 	}
-	else
-		shadowVolumeDispatcher(rootBody->geometricalModel,rootBody->physicalParameters,Light_position);
+	else shadowVolumeDispatcher(rootBody->geometricalModel,rootBody->physicalParameters,Light_position);
 }
 
-
-void OpenGLRenderingEngine::renderGeometricalModel(const shared_ptr<MetaBody>& rootBody)
-{	
-	shared_ptr<BodyContainer>& bodies = rootBody->bodies;
-	bool done=false;
-
-	if((rootBody->geometricalModel || Draw_inside) && Draw_inside)
-	{
-		BodyContainer::iterator bi    = bodies->begin();
-		BodyContainer::iterator biEnd = bodies->end();
-		for( ; bi!=biEnd ; ++bi)
-		{
-			if((*bi)->geometricalModel && ( ((*bi)->getGroupMask() & Draw_mask) || (*bi)->getGroupMask()==0 ))
-			{
-				Se3r& se3 = (*bi)->physicalParameters->se3;
+void OpenGLRenderingEngine::renderGeometricalModel(const shared_ptr<MetaBody>& rootBody){	
+	const GLfloat ambientColorSelected[4]={10.0,0.0,0.0,1.0};	
+	const GLfloat ambientColorUnselected[4]={0.5,0.5,0.5,1.0};	
+	if((rootBody->geometricalModel || Draw_inside) && Draw_inside) {
+		FOREACH(const shared_ptr<Body> b, *rootBody->bodies){
+			if(b->geometricalModel && ((b->getGroupMask() & Draw_mask) || b->getGroupMask()==0)){
+				Se3r se3=renderedSe3(b);
 				if(pointClipped(se3.position)) continue;
 				glPushMatrix();
-				Real angle;
-				Vector3r axis;	
-				se3.orientation.ToAxisAngle(axis,angle);	
+				Real angle; Vector3r axis;	se3.orientation.ToAxisAngle(axis,angle);	
 				glTranslatef(se3.position[0],se3.position[1],se3.position[2]);
 				glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
-				if(current_selection == (*bi)->getId())
-				{
-					const GLfloat ambientColor[4]	= {10.0,0.0,0.0,1.0};	
-					glLightModelfv(GL_LIGHT_MODEL_AMBIENT,ambientColor);
-					
-				} else if (done) {
-					done = false;
-					const GLfloat ambientColor[4]	= {0.5,0.5,0.5,1.0};	
-					glLightModelfv(GL_LIGHT_MODEL_AMBIENT,ambientColor);
-				}
-				// FIXME FIXME - in fact it is a 1D dispatcher
-				geometricalModelDispatcher((*bi)->geometricalModel,(*bi)->physicalParameters,Body_wire);
-				if(current_selection == (*bi)->getId())
-					done = true;
+				if(current_selection==b->getId()){glLightModelfv(GL_LIGHT_MODEL_AMBIENT,ambientColorSelected);}
+				geometricalModelDispatcher(b->geometricalModel,b->physicalParameters,Body_wire);
+				if(current_selection == b->getId()){glLightModelfv(GL_LIGHT_MODEL_AMBIENT,ambientColorUnselected);}
 				glPopMatrix();
 			}
 		}
 	}
-	
-	if(rootBody->geometricalModel)
-		geometricalModelDispatcher(rootBody->geometricalModel,rootBody->physicalParameters,Body_wire);
+	if(rootBody->geometricalModel) geometricalModelDispatcher(rootBody->geometricalModel,rootBody->physicalParameters,Body_wire);
 }
 
 
-void OpenGLRenderingEngine::renderInteractionGeometry(const shared_ptr<MetaBody>& rootBody)
-{	
+void OpenGLRenderingEngine::renderInteractionGeometry(const shared_ptr<MetaBody>& rootBody){	
 	{
 		boost::mutex::scoped_lock lock(rootBody->persistentInteractions->drawloopmutex);
 
@@ -502,33 +507,30 @@ void OpenGLRenderingEngine::renderInteractingGeometry(const shared_ptr<MetaBody>
 		glClipPlane(GL_CLIP_PLANE0,clip0);
 		glEnable(GL_CLIP_PLANE0);
 	#endif
-
-	BodyContainer::iterator bi    = rootBody->bodies->begin();
-	BodyContainer::iterator biEnd = rootBody->bodies->end();
-	for( ; bi!=biEnd ; ++bi)
-	{
-		Se3r& se3 = (*bi)->physicalParameters->se3;
-		if(pointClipped(se3.position)) continue;
+	FOREACH(const shared_ptr<Body>& b, *rootBody->bodies){
+		if(pointClipped(b->physicalParameters->se3.position)) continue;
+		Se3r se3=renderedSe3(b);
 		glPushMatrix();
-		Real angle;
-		Vector3r axis;	
-		se3.orientation.ToAxisAngle(axis,angle);	
-		glTranslatef(se3.position[0],se3.position[1],se3.position[2]);
-		glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
-		if((*bi)->interactingGeometry && ( ((*bi)->getGroupMask() & Draw_mask) || (*bi)->getGroupMask()==0 ))
-			interactingGeometryDispatcher((*bi)->interactingGeometry,(*bi)->physicalParameters,Body_wire);
+			Real angle;	Vector3r axis;	se3.orientation.ToAxisAngle(axis,angle);	
+			glTranslatef(se3.position[0],se3.position[1],se3.position[2]);
+			glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
+			if(b->interactingGeometry && ( (b->getGroupMask() & Draw_mask) || b->getGroupMask()==0 ))
+				interactingGeometryDispatcher(b->interactingGeometry,b->physicalParameters,Body_wire);
 		glPopMatrix();
 	}
-	
 	glPushMatrix();
-	if(rootBody->interactingGeometry)
-		interactingGeometryDispatcher(rootBody->interactingGeometry,rootBody->physicalParameters,Body_wire);
+		if(rootBody->interactingGeometry) interactingGeometryDispatcher(rootBody->interactingGeometry,rootBody->physicalParameters,Body_wire);
 	glPopMatrix();
 }
 
 
 void OpenGLRenderingEngine::registerAttributes()
 {
+	REGISTER_ATTRIBUTE(scaleDisplacements);
+	REGISTER_ATTRIBUTE(displacementScale);
+	REGISTER_ATTRIBUTE(scaleRotations);
+	REGISTER_ATTRIBUTE(rotationScale);
+
 	REGISTER_ATTRIBUTE(Light_position);
 	REGISTER_ATTRIBUTE(Background_color);
 	

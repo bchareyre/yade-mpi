@@ -34,7 +34,12 @@ class OpenGLRenderingEngine : public RenderingEngine
 		vector<bool> clipPlaneActive;
 		const int clipPlaneNum;
 
+		vector<Se3r> refSe3;
+		bool scaleDisplacements,scaleRotations;
+		Vector3r displacementScale; Real rotationScale;
+
 		bool pointClipped(const Vector3r& p);
+		Se3r renderedSe3(const shared_ptr<Body>&);
 		vector<Vector3r> clipPlaneNormals;
 
 	private :
@@ -56,6 +61,8 @@ class OpenGLRenderingEngine : public RenderingEngine
 			shadowVolumeFunctorNames,
 			interactionGeometryFunctorNames,
 			interactionPhysicsFunctorNames;
+
+		DECLARE_LOGGER;
 
 	public :
 		void addStateFunctor(const string& str);
