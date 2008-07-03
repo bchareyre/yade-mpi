@@ -143,7 +143,7 @@ def spheresFromFile(filename,scale=1.,wenjieFormat=False,**kw):
 	for l in open(filename):
 		ss=[float(i) for i in l.split()]
 		if wenjieFormat and len(ss)==5 and ss[4]==1.0: continue
-		id=o.bodies.append(sphere([scale*ss[0],scale*ss[2],scale*ss[1]],scale*ss[3],**kw))
+		id=o.bodies.append(sphere([scale*ss[0],scale*ss[1],scale*ss[2]],scale*ss[3],**kw))
 		ret.append(id)
 	return ret
 

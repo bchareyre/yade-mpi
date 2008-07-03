@@ -23,13 +23,18 @@ class ResetPositionEngine : public DeusExMachina {
 
 		int interval;
 		Real Y_min;
-		std::vector<Vector3r> initial_positions;
+		/// import/export initial positions
+		std::string fileName; 
+		std::vector<Vector3r> initial_positions; // for serialization
+
 	protected:
 		virtual void postProcessAttributes(bool);
 		virtual void registerAttributes();
 	REGISTER_CLASS_NAME(ResetPositionEngine);
 	REGISTER_BASE_CLASS_NAME(DeusExMachina);
 	private:
+		std::vector<Vector3r> ini_pos;
+		bool first;
 		void initialize(MetaBody * ncb);
 };
 

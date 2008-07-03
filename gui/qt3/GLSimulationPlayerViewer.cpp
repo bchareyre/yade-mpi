@@ -184,8 +184,9 @@ bool GLSimulationPlayerViewer::loadPositionOrientationFile(){
 		if(!b){ LOG_ERROR("Body #"<<id<<" doesn't exist (skipped)!"); continue; }
 		if(!b->physicalParameters) {LOG_ERROR("Body #"<<id<<" has no physical parameters?! (skipping)"); continue; }
 		Se3r& mySe3=b->physicalParameters->se3;
-		Vector3r& myColor=b->geometricalModel->diffuseColor;
 		f>>mySe3.position[0]>>mySe3.position[1]>>mySe3.position[2]>>mySe3.orientation[0]>>mySe3.orientation[1]>>mySe3.orientation[2]>>mySe3.orientation[3];
+		if(!b->geometricalModel) {LOG_ERROR("Body #"<<id<<" has no geometrical model?! (skipping)"); continue; }
+		Vector3r& myColor=b->geometricalModel->diffuseColor;
 		if(doRgb && !rgb.eof() && !rgb.fail()) rgb>>myColor[0]>>myColor[1]>>myColor[2];
 	}
 	return true;
