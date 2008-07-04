@@ -5,12 +5,7 @@
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
-
-#ifndef BOUNDINGVOLUME_HPP
-#define BOUNDINGVOLUME_HPP
-
-#include <GL/glut.h>
-#include <GL/gl.h>
+#pragma once
 
 #include<yade/lib-base/yadeWm3Extra.hpp>
 #include<yade/lib-serialization/Serializable.hpp>
@@ -25,26 +20,15 @@
 
 class BoundingVolume : public Serializable, public Indexable
 {
-
-/// Attributes
-	public : // FIXME - maybe private?
+	public :
 		Vector3r	 diffuseColor		/// Color of the bounding volume. Used only for drawing purpose
 				,min			/// Minimum of the bounding volume
 				,max;			/// Maximum of the bounding volume
-		BoundingVolume(): diffuseColor(Vector3r(1,1,1)){}
+		BoundingVolume(): diffuseColor(Vector3r(1,1,1)), min(Vector3r(0,0,0)), max(Vector3r(0,0,0)) {}
 
-/// Serialization
 		void registerAttributes();
 	REGISTER_CLASS_NAME(BoundingVolume);
 	REGISTER_BASE_CLASS_NAME(Serializable Indexable);
-
-	
-/// Indexable
 	REGISTER_INDEX_COUNTER(BoundingVolume);
-
 };
-
 REGISTER_SERIALIZABLE(BoundingVolume,false);
-
-#endif // __BOUNDINGVOLUME_H__
-

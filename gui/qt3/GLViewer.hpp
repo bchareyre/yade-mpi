@@ -13,13 +13,26 @@
 #include<yade/lib-QGLViewer/constraint.h>
 #include<set>
 
-/* There can be several clipping planes (default is up to 2).
- * Clipping plane is manipulated after hitting F1, F2, .... To end manipulation, press Escape.
- * During manipulation, hitting 1,2,... will align the current plane with #1,2,... (same orientation).
- * Hitting 'R' will reverse the plane (normal*=-1).
- * Alt-1,Alt-2,... adds/removes the respective plane to boud group: when any of planes in the group is moved,
- * 	all other planes are moved as well so that their relative positions are the same.
+/*! Class handling user interaction with the openGL rendering of simulation.
  *
+ * Clipping planes:
+ * ================
+ *
+ * Clipping plane is manipulated after hitting F1, F2, .... To end the manipulation, press Escape.
+ *
+ * Keystrokes during clipping plane manipulation:
+ * * space activates/deactives the clipping plane
+ * * x,y,z aligns the plane with yz, xz, xy planes
+ * * left-double-click aligns the plane with world coordinates system (canonical planes + 45˚ interpositions)
+ * * 1,2,... will align the current plane with #1, #2, ... (same orientation)
+ * * r reverses the plane (normal*=-1)a
+ *
+ * Keystrokes that work regardless of whether a clipping plane is being manipulated:
+ * * Alt-1,Alt-2,... adds/removes the respective plane to bound group:
+ * 	mutual positions+orientations of planes in the group are maintained when one of those planes is manipulated
+ *
+ * Clip plane number is 3; change OpenGLRenderingEngine::clipPlaneNum, complete switches "|| ..." in keyPressEvent
+ * and recompile to have more.
  */
 
 class GLViewer : public QGLViewer
@@ -62,4 +75,5 @@ class GLViewer : public QGLViewer
 		virtual void closeEvent(QCloseEvent *e);
 		virtual void postSelection(const QPoint& point);
 		virtual void endSelection(const QPoint &point);
+		virtual void mouseDoubleClickEvent (QMouseEvent *e);
 };

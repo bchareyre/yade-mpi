@@ -26,7 +26,8 @@ class ResetPositionEngine : public DeusExMachina {
 		/// import/export initial positions
 		std::string fileName; 
 		std::vector<Vector3r> initial_positions; // for serialization
-
+		
+		DECLARE_LOGGER;
 	protected:
 		virtual void postProcessAttributes(bool);
 		virtual void registerAttributes();

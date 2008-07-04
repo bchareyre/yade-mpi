@@ -13,7 +13,7 @@
 #include <GL/glut.h>
 CREATE_LOGGER(OpenGLRenderingEngine);
 
-OpenGLRenderingEngine::OpenGLRenderingEngine() : RenderingEngine(), clipPlaneNum(2)
+OpenGLRenderingEngine::OpenGLRenderingEngine() : RenderingEngine(), clipPlaneNum(3)
 {
 
 	Body_state		= false;

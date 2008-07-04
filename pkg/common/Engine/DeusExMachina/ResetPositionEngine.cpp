@@ -11,6 +11,8 @@
 #include<yade/pkg-common/ParticleParameters.hpp>
 #include<boost/foreach.hpp>
 
+CREATE_LOGGER(ResetPositionEngine);
+
 ResetPositionEngine::ResetPositionEngine(){
 		Y_min=-1;
 		interval=0;

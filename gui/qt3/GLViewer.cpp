@@ -47,10 +47,10 @@ GLViewer::GLViewer(int id, shared_ptr<OpenGLRenderingEngine> _renderer, QWidget 
 	setKeyDescription(Qt::Key_C,"Set scene center to the selected body (if any)");
 	setKeyDescription(Qt::Key_C & Qt::ALT,"Set scene center to median body position");
 	setKeyDescription(Qt::Key_D,"Toggle Body::isDynamic on selection");
-	setKeyDescription(Qt::Key_G,"Toggle YZ grid");
-	setKeyDescription(Qt::Key_X,"Toggle YZ grid");
-	setKeyDescription(Qt::Key_Y,"Toggle XZ grid");
-	setKeyDescription(Qt::Key_Z,"Toggle XY grid");
+	setKeyDescription(Qt::Key_G,"Toggle grid");
+	setKeyDescription(Qt::Key_X,"Toggle YZ grid (or: align manipulated clip plane normal with +X)");
+	setKeyDescription(Qt::Key_Y,"Toggle XZ grid (or: align manipulated clip plane normal with +Y)");
+	setKeyDescription(Qt::Key_Z,"Toggle XY grid (or: align manipulated clip plane normal with +Z)");
 	setKeyDescription(Qt::Key_Delete,"(lattice) increase isoValue");
 	setKeyDescription(Qt::Key_Insert,"(lattice) decrease isoValue");
 	setKeyDescription(Qt::Key_Next,  "(lattice) increase isoThic");
@@ -110,6 +110,7 @@ void GLViewer::resetManipulation(){
 }
 
 void GLViewer::startClipPlaneManipulation(int planeNo){
+	assert(planeNo<renderer->clipPlaneNum);
 	resetManipulation();
 	mouseMovesManipulatedFrame(xyPlaneConstraint.get());
 	manipulatedClipPlane=planeNo;
@@ -129,8 +130,9 @@ void GLViewer::keyPressEvent(QKeyEvent *e)
 	else if(e->key()==Qt::Key_C && (e->state() & AltButton)){ displayMessage("Median centering"); centerMedianQuartile(); updateGL(); }
 
 	else if(e->key()==Qt::Key_Escape){ resetManipulation();displayMessage("Manipulating scene."); }
-	else if(e->key()==Qt::Key_F1 || e->key()==Qt::Key_F2 /* || ... */ ){
-		int n=0; if(e->key()==Qt::Key_F1) n=1; else if(e->key()==Qt::Key_F2) n=2; /* ... */ assert(n>0); int planeId=n-1;
+	else if(e->key()==Qt::Key_F1 || e->key()==Qt::Key_F2 || e->key()==Qt::Key_F3 /* || ... */ ){
+		int n=0; if(e->key()==Qt::Key_F1) n=1; else if(e->key()==Qt::Key_F2) n=2; else if(e->key()==Qt::Key_F3) n=3; assert(n>0); int planeId=n-1;
+		if(planeId>=renderer->clipPlaneNum) return;
 		if(planeId!=manipulatedClipPlane) startClipPlaneManipulation(planeId);
 		updateGL();
 	}
@@ -146,8 +148,8 @@ void GLViewer::keyPressEvent(QKeyEvent *e)
 		if(manipulatedClipPlane>=0) {displayMessage("Clip plane #"+lexical_cast<string>(manipulatedClipPlane+1)+(renderer->clipPlaneActive[manipulatedClipPlane]?" de":" ")+"activated"); renderer->clipPlaneActive[manipulatedClipPlane]=!renderer->clipPlaneActive[manipulatedClipPlane]; updateGL(); }
 	}
 	else if(e->key()==Qt::Key_0 &&(e->state() & AltButton)) {boundClipPlanes.clear(); displayMessage("Cleared the bound group.");}
-	else if(e->key()==Qt::Key_1 || e->key()==Qt::Key_2 /* || ... */ ){
-		int n=0; if(e->key()==Qt::Key_1) n=1; else if(e->key()==Qt::Key_2) n=2; /* ... */ assert(n>0); int planeId=n-1;
+	else if(e->key()==Qt::Key_1 || e->key()==Qt::Key_2 || e->key()==Qt::Key_3 /* || ... */ ){
+		int n=0; if(e->key()==Qt::Key_1) n=1; else if(e->key()==Qt::Key_2) n=2; else if(e->key()==Qt::Key_3) n=3; assert(n>0); int planeId=n-1;
 		if(planeId>=renderer->clipPlaneNum) return; // no such clipping plane
 		if(e->state() & AltButton){
 			if(boundClipPlanes.count(planeId)==0) {boundClipPlanes.insert(planeId); displayMessage("Added plane #"+lexical_cast<string>(planeId+1)+" to the bound group: "+strBoundGroup());}
@@ -162,7 +164,18 @@ void GLViewer::keyPressEvent(QKeyEvent *e)
 	}
 	else if(e->key()==Qt::Key_D) wasDynamic = true;
 	else if(e->key()==Qt::Key_G) {bool anyDrawn=drawGridXYZ[0]||drawGridXYZ[1]||drawGridXYZ[2]; for(int i=0; i<3; i++)drawGridXYZ[i]=!anyDrawn; updateGL();}
-	else if(e->key()==Qt::Key_X) drawGridXYZ[0]=!drawGridXYZ[0], updateGL();
+	else if(e->key()==Qt::Key_X || e->key()==Qt::Key_Y || e->key()==Qt::Key_Z){
+		int axisIdx=(e->key()==Qt::Key_X?0:(e->key()==Qt::Key_Y?1:2));
+		if(manipulatedClipPlane<0){ drawGridXYZ[axisIdx]=!drawGridXYZ[axisIdx]; }
+		else{ // align clipping plane with world axis
+			// x: (0,1,0),pi/2
+			// y: (0,0,1),pi/2
+			// z: (1,0,0),0
+			qglviewer::Vec axis(0,0,0); axis[(axisIdx+1)%3]=1;
+			manipulatedFrame()->setOrientation(qglviewer::Quaternion(axis,axisIdx==2?0:Mathr::PI/2));
+		}
+		updateGL();
+	}
 	else if(e->key()==Qt::Key_Y) drawGridXYZ[1]=!drawGridXYZ[1], updateGL();
 	else if(e->key()==Qt::Key_Z) drawGridXYZ[2]=!drawGridXYZ[2], updateGL();
 // FIXME BEGIN - arguments for GLDraw*ers should be from dialog box, not through Omega !!!
@@ -248,7 +261,7 @@ void GLViewer::centerScene()
 		min=rb->boundingVolume->min; max=rb->boundingVolume->max;
 		if(std::max(max[0]-min[0],std::max(max[1]-min[1],max[2]-min[2]))<=0){
 			// AABB is not yet calculated...
-			LOG_DEBUG("rootBody's AABB not yet calculated or has one dimension zero, attempt get that from bodies' positions.");
+			LOG_DEBUG("rootBody's boundingVolume not yet calculated or has one dimension zero, attempt get that from bodies' positions.");
 			Real inf=std::numeric_limits<Real>::infinity();
 			min=Vector3r(inf,inf,inf); max=Vector3r(-inf,-inf,-inf);
 			FOREACH(const shared_ptr<Body>& b, *rb->bodies){
@@ -381,3 +394,21 @@ void GLViewer::closeEvent(QCloseEvent *e){
 	YadeQtMainWindow::self->closeView(this);
 }
 
+/* Handle double-click event; if clipping plane is manipulated, align it with the global coordinate system.
+ * Otherwise pass the event to QGLViewer to handle it normally.
+ *
+ * mostly copied over from ManipulatedFrame::mouseDoubleClickEvent
+ */
+void GLViewer::mouseDoubleClickEvent(QMouseEvent *event){
+	if(manipulatedClipPlane<0) { /* LOG_DEBUG("Double click not on clipping plane"); */ QGLViewer::mouseDoubleClickEvent(event); return; }
+#if QT_VERSION >= 0x040000
+	if (event->modifiers() == Qt::NoModifier)
+#else
+	if (event->state() == Qt::NoButton)
+#endif
+	switch (event->button()){
+		case Qt::LeftButton:  manipulatedFrame()->alignWithFrame(NULL,true); LOG_DEBUG("Aligning cutting plane"); break;
+		// case Qt::RightButton: projectOnLine(camera->position(), camera->viewDirection()); break;
+		default: break; // avoid warning
+	}
+}
