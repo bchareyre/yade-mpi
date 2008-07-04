@@ -56,11 +56,14 @@ void ResetPositionEngine::applyCondition(MetaBody * ncb){
 void ResetPositionEngine::initialize(MetaBody * ncb)
 {
 	if (fileName=="")
-	{ // initialize positions from bodies se3
-		initial_positions.resize(subscribedBodies.size());
-		shared_ptr<BodyContainer>& bodies = ncb->bodies;
-		for(int i=0,e=subscribedBodies.size(); i<e; ++i)
-			initial_positions[i]=(*bodies)[subscribedBodies[i]]->physicalParameters->se3.position;
+	{ 
+		if (initial_positions.size()==0) 	
+		{ // initialize positions from bodies se3
+			initial_positions.resize(subscribedBodies.size());
+			shared_ptr<BodyContainer>& bodies = ncb->bodies;
+			for(int i=0,e=subscribedBodies.size(); i<e; ++i)
+				initial_positions[i]=(*bodies)[subscribedBodies[i]]->physicalParameters->se3.position;
+		}
 		ini_pos.assign(initial_positions.begin(),initial_positions.end());
 		return;
 	}
