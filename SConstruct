@@ -257,15 +257,16 @@ def CheckPython(context):
 	context.Result(True)
 	return True
 
-def CheckScientificPython(context):
-	context.Message('Checking for scientific python module (debian: python-scientific)... ')
+def CheckPythonModule(context,modulename):
+	context.Message("Checking for python module `%s' ..."%modulename)
 	try:
-		import Scientific
+		exec("import %s"%modulename)
 		context.Result(True); return True
 	except ImportError:
 		context.Result(False); return False
-
-
+def CheckScientificPython(context): return CheckPythonModule(context,"Scientific")
+def CheckIPython(context): return CheckPythonModule(context,"IPython")
+	
 def CheckCXX(context):
 	context.Message('Checking whether c++ compiler "%s" works...'%env['CXX'])
 	ret=context.TryLink('#include<iostream>\nint main(int argc, char**argv){std::cerr<<std::endl;return 0;}\n','.cpp')
@@ -274,7 +275,7 @@ def CheckCXX(context):
 
 
 if not env.GetOption('clean'):
-	conf=env.Configure(custom_tests={'CheckQt':CheckQt,'CheckCXX':CheckCXX,'CheckPython':CheckPython,'CheckScientificPython':CheckScientificPython},
+	conf=env.Configure(custom_tests={'CheckQt':CheckQt,'CheckCXX':CheckCXX,'CheckPython':CheckPython,'CheckScientificPython':CheckScientificPython,'CheckIPython':CheckIPython},
 		conf_dir='$buildDir/.sconf_temp',log_file='$buildDir/config.log')
 
 	ok=True
@@ -287,17 +288,16 @@ if not env.GetOption('clean'):
 	ok&=conf.CheckLibWithHeader('glut','GL/glut.h','c','glutGetModifiers();',autoadd=1)
 
 	# gentoo has threaded flavour named differently and it must have precedence over the non-threaded one
-	ok&=(conf.CheckLibWithHeader('boost_date_time-mt','boost/date_time/posix_time/posix_time.hpp','c++','boost::posix_time::time_duration::time_duration();',autoadd=1)
-		or conf.CheckLibWithHeader('boost_date_time','boost/date_time/posix_time/posix_time.hpp','c++','boost::posix_time::time_duration::time_duration();',autoadd=1))
-	ok&=(conf.CheckLibWithHeader('boost_thread-mt','boost/thread/thread.hpp','c++','boost::thread::thread();',autoadd=1)
-		or conf.CheckLibWithHeader('boost_thread','boost/thread/thread.hpp','c++','boost::thread::thread();',autoadd=1))
-	ok&=(conf.CheckLibWithHeader('boost_filesystem-mt','boost/filesystem/path.hpp','c++','boost::filesystem::path();',autoadd=1)
-		or conf.CheckLibWithHeader('boost_filesystem','boost/filesystem/path.hpp','c++','boost::filesystem::path();',autoadd=1))
-	ok&=(conf.CheckLibWithHeader('boost_iostreams-mt','boost/iostreams/device/file.hpp','c++','boost::iostreams::file_sink("");',autoadd=1)
-		or conf.CheckLibWithHeader('boost_iostreams','boost/iostreams/device/file.hpp','c++','boost::iostreams::file_sink("");',autoadd=1))
+	def CheckLib_maybeMT(conf,lib,header,lang,func): return conf.CheckLibWithHeader(lib+'-mt',['limits.h',header],'c++',func,autoadd=1) or conf.CheckLibWithHeader(lib,['limits.h',header],lang,func,autoadd=1)
+	ok&=CheckLib_maybeMT(conf,'boost_date_time','boost/date_time/posix_time/posix_time.hpp','c++','boost::posix_time::time_duration::time_duration();')
+	ok&=CheckLib_maybeMT(conf,'boost_thread','boost/thread/thread.hpp','c++','boost::thread::thread();')
+	ok&=CheckLib_maybeMT(conf,'boost_filesystem','boost/filesystem/path.hpp','c++','boost::filesystem::path();')
+	ok&=CheckLib_maybeMT(conf,'boost_iostreams','boost/iostreams/device/file.hpp','c++','boost::iostreams::file_sink("");')
+	ok&=CheckLib_maybeMT(conf,'boost_regex','boost/regex.hpp','c++','boost::regex("");')
 	foreach=conf.CheckCXXHeader('boost/foreach.hpp','<>')
 	if not foreach: print "(You can get the foreach.hpp header from http://article.gmane.org/gmane.science.physics.yade.devel/367 and save it in /usr/include/boost. It will coexist with boost 1.33 without problems.)"
 	ok&=foreach
+	ok&=conf.CheckLibWithHeader('sqlite3','sqlite3.h','c++','sqlite3_close(0L);',autoadd=0)
 
 	if not env['useMiniWm3']: ok&=conf.CheckLibWithHeader('Wm3Foundation','Wm3Math.h','c++','Wm3::Math<double>::PI;',autoadd=1)
 
@@ -309,19 +309,23 @@ if not env.GetOption('clean'):
 	if not ok:
 		print "\nOne of the essential libraries above was not found, unable to continue.\n\nCheck `%s' for possible causes, note that there are options that you may need to customize:\n\n"%(buildDir+'/config.log')+opts.GenerateHelpText(env)
 		Exit(1)
-
-	# check optional libs
-	if 'log4cxx' in env['features'] and conf.CheckLibWithHeader('log4cxx','log4cxx/logger.h','c++','log4cxx::Logger::getLogger("");',autoadd=1):
+	def featureNotOK(featureName):
+		print "\nERROR: Unable to compile with optional feature `%s'.\n\nIf you are sure, remove it from features (scons features=featureOne,featureTwo for example) and build again."
+		Exit(1)
+	# check "optional" libs
+	if 'log4cxx' in env['features']:
+		ok=conf.CheckLibWithHeader('log4cxx','log4cxx/logger.h','c++','log4cxx::Logger::getLogger("");',autoadd=1)
+		if not ok: featureNotOK('log4cxx')
 		env.Append(CPPDEFINES=['LOG4CXX'])
-	if 'python' in env['features'] and conf.CheckPython() and ( ### not needed now: and conf.CheckScientificPython() and (
-		conf.CheckLibWithHeader('boost_python-mt','boost/python.hpp','c++','boost::python::scope();',autoadd=1)
-		or conf.CheckLibWithHeader('boost_python','boost/python.hpp','c++','boost::python::scope();',autoadd=1)):
+	if 'python' in env['features']:
+		ok=(conf.CheckPython() and conf.CheckIPython() # not needed now: and conf.CheckScientificPython()
+			and (conf.CheckLibWithHeader('boost_python-mt','boost/python.hpp','c++','boost::python::scope();',autoadd=1)
+				or conf.CheckLibWithHeader('boost_python','boost/python.hpp','c++','boost::python::scope();',autoadd=1)))
+		if not ok: featureNotOK('python')
 		env.Append(CPPDEFINES=['EMBED_PYTHON'])
-
 	if env['useMiniWm3']: env.Append(LIBS='miniWm3',CPPDEFINES=['MINIWM3'])
 
 	env=conf.Finish()
-
 
 ##########################################################################################
 ############# BUILDING ###################################################################

@@ -1,0 +1,49 @@
+This is the README for the sqlite3x and sq3 C++ wrappers for sqlite3.
+
+sqlite3x: this is an OO C++ wrapper for the sqlite3 API. It makes
+heavy use of exceptions to report any sort of error. It based off code
+written by Cory Nelson. Please see the file sqlite3x.hpp for the
+license.
+
+sq3: this is also an OO C++ wrapper for sqlite3. It is similar in
+design to sqlite3x but does not use exceptions. It is intended for
+platforms, like PocketPC, where exceptions support may not be
+available/desireable. This API is released into the Public Domain.
+
+
+ACHTUNG: the wide-character/string support may or may not work on your
+platform. On my platform (GNU/Linux), std::wstring uses 4-byte wide
+chars, whereas sqlite3 expects 2-byte chars. That means that the code
+is untested on my platform and almost certainly doesn't work. It
+"might" work on Win32 platforms.  The sqlite3x API inherits a
+nearly-complete wide-char implementation from Corey's original
+code. The sq3 API, which was written from scratch, does not have any
+wchar API.
+
+
+Please send questions/concerns/bugs/patches to the maintainer:
+
+	stephan@s11n.net
+
+The latest version of this code can be downloaded from:
+
+	http://s11n.net/download/#sqlite3x
+
+or pulled from CVS as described here:
+
+	http://sourceforge.net/cvs/?group_id=104450
+
+from the "sqlite3x" repository.
+
+
+========================================================================
+Contributors to this code include:
+
+- Nelis Willers (nwillers at csir.co.za) contributed MSVC patches
+for the sqlite3x API.
+
+- Artem Gr (artem at bizlink.ru) contributed some wide-char fixes
+for the sqlite3x API.
+
+- Xosé Antón Otero Ferreira (xoseotero at gmail com) contributed several
+minor features to the sq3 API.

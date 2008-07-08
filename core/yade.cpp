@@ -117,11 +117,11 @@ void printHelp()
 "\n" << Omega::instance().yadeVersionName << "\n\
 \n\
 	-h      : print this help.\n\
+	-N name : specify the user interface (NullGUI, PythonUI, QtGUI; not all of them must be compiled)\n\
 	-n      : use NullGUI (command line interface) instead of default GUI.\n\
-	-N name : specify the user interface (available: NullGUI, PythonUI, QtGUI)\n\
-	-w      : launch the 'first run configuration'\n\
-	-c      : use local directory ./ as configuration directory\n\
-	-C path : configuration directory different than default ~/.yade/\n\
+	-w      : write default configuration (automatic at first run)\n\
+	-c      : use the current directory ./ as configuration directory\n\
+	-C path : configuration directory different from the default ~/.yade-something/\n\
 	-S file : load simulation from file (works with QtGUI only)\n\
 	-v      : be verbose (may be repeated)\n\
 \n\
@@ -140,28 +140,9 @@ int main(int argc, char *argv[])
 	// Since it is a static variable, it infulences all boost::filesystem operations in this respect (fortunately).
 	filesystem::path::default_name_check(filesystem::native);
 
-	string configPath=string(getenv("HOME")) + "/.yade" SUFFIX;
-
-	#ifdef LOG4CXX
-		// read logging configuration from file and watch it (creates a separate thread)a
-		std::string logConf=configPath+"/logging.conf";
-		if(filesystem::exists(logConf)){
-			log4cxx::PropertyConfigurator::configureAndWatch(logConf);
-			LOG_INFO("Logger loaded and watches configuration file: "<<logConf<<".");
-		} else { // otherwise use simple console-directed logging
-			log4cxx::BasicConfigurator::configure();
-			logger->setLevel(log4cxx::Level::WARN);
-			LOG_INFO("Logger uses basic (console) configuration since `"<<logConf<<"' was not found. INFO and DEBUG messages will be ommited.");
-			LOG_INFO("Look at the file doc/logging.conf.sample in the source distribution as an example on how to customize logging.");
-		}
-	#endif
+	string configPath=string(getenv("HOME")) + "/.yade" SUFFIX; // this is the default, may be overridden by -c / -C
 	
-	int ch;
-	string gui="";
-	string simulationFileName="";
-	bool setup=false;
-	int verbose=0;
-	bool coreOptions=true;
+	int ch; string gui=""; string simulationFileName=""; bool setup=false; int verbose=0; bool coreOptions=true;
 	while(coreOptions && (ch=getopt(argc,argv,"hnN:wC:cvS:"))!=-1)
 		switch(ch){
 			case 'h': printHelp(); return 1;
@@ -175,21 +156,29 @@ int main(int argc, char *argv[])
 			case '-': coreOptions=false; break;
 			default: printHelp(); return 1;
 		}
-	// peek to see the first non-option arg that will be passed to the gui; may affect the gui we will use
-	// if(optind<argc && boost::algorithm::ends_with(string(argv[optind]),string(".py"))){ gui="PythonUI"; LOG_DEBUG("Selecting cmdGui for .py"); }
 	// save original options
 	Omega::instance().origArgv=argv; Omega::instance().origArgc=argc;
 	// kill processed options, keep one more which is in fact non-option (normally the binary)
 	argv=&(argv[optind-1]); argc-=optind-1;
-	// reset getopt globals for next processing
+	// reset getopt globals for next processing in frontends
 	optind=0; opterr=0;
 
-	
-	if(configPath[configPath.size()-1] == '/')
-		configPath = configPath.substr(0,configPath.size()-1); 
+
+	#ifdef LOG4CXX
+		// read logging configuration from file and watch it (creates a separate thread)
+		std::string logConf=configPath+"/logging.conf";
+		if(filesystem::exists(logConf)){
+			LOG_INFO("Loading "<<logConf<<" (monitored)");
+			log4cxx::PropertyConfigurator::configureAndWatch(logConf);
+		} else { // otherwise use simple console-directed logging
+			log4cxx::BasicConfigurator::configure();
+			logger->setLevel(log4cxx::Level::WARN);
+			LOG_INFO("Logger uses basic (console) configuration since `"<<logConf<<"' was not found. INFO and DEBUG messages will be ommited.");
+			LOG_INFO("Look at the file doc/logging.conf.sample in the source distribution as an example on how to customize logging.");
+		}
+	#endif
 
 	Omega::instance().yadeVersionName = "Yet Another Dynamic Engine 0.11.x, beta, SVN snapshot.";
-
 	Omega::instance().preferences    = shared_ptr<Preferences>(new Preferences);
 	Omega::instance().yadeConfigPath = configPath; 
 	filesystem::path yadeConfigPath  = filesystem::path(Omega::instance().yadeConfigPath, filesystem::native);
@@ -198,6 +187,10 @@ int main(int argc, char *argv[])
 	#ifdef LOG4CXX
 		if(verbose==1) logger->setLevel(log4cxx::Level::INFO);
 		else if (verbose>=2) logger->setLevel(log4cxx::Level::DEBUG);
+		if(getenv("YADE_DEBUG")){
+			LOG_INFO("YADE_DEBUG environment variable is defined, setting logging level to DEBUG.");
+			logger->setLevel(log4cxx::Level::DEBUG);
+		}
 	#endif
 
 
@@ -226,9 +219,9 @@ int main(int argc, char *argv[])
 		LOG_DEBUG("ABRT/SEGV signal handlers set, crash batch created as "<<Omega::instance().gdbCrashBatch);
 	#endif
 
-	LOG_INFO("Loading configuration file: "<<yadeConfigFile.string()); IOFormatManager::loadFromFile("XMLFormatManager",yadeConfigFile.string(),"preferences",Omega::instance().preferences);
+	LOG_INFO("Loading "<<yadeConfigFile.string()); IOFormatManager::loadFromFile("XMLFormatManager",yadeConfigFile.string(),"preferences",Omega::instance().preferences);
 
-	LOG_INFO("Loading plugins..."); Omega::instance().scanPlugins(); LOG_INFO("Plugins loaded.");
+	LOG_INFO("Loading plugins"); Omega::instance().scanPlugins();
 	Omega::instance().init();
 
 	Omega::instance().setSimulationFileName(simulationFileName); //init() resets to "";

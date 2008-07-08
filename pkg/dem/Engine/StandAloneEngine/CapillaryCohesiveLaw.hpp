@@ -86,6 +86,7 @@ std::ostream& operator<<(std::ostream& os, Tableau& T);
 
 class Tableau
 {	
+	DECLARE_LOGGER;
 	public: 
 		Real R;
 		std::vector<TableauD> full_data;

@@ -306,6 +306,8 @@ Parameters capillarylaw::Interpolate(Real R1, Real R2, Real D, Real P, int* inde
         return result;
 }
 
+CREATE_LOGGER(Tableau);
+
 Tableau::Tableau()
 {}
 
@@ -323,7 +325,7 @@ Tableau::Tableau(const char* filename)
 		static bool first=true;
 		if(first)
 		{
-	                std::cerr << "WARNING: cannot open file used for capillary law, in TriaxalTestWater" << endl;
+			LOG_DEBUG("WARNING: cannot open file used for capillary law, in TriaxalTestWater");
 			first=false;
 		}
 		return;

@@ -41,6 +41,7 @@ class OpenGLRenderingEngine : public RenderingEngine
 		bool pointClipped(const Vector3r& p);
 		Se3r renderedSe3(const shared_ptr<Body>&);
 		vector<Vector3r> clipPlaneNormals;
+		void setRefSe3(const shared_ptr<MetaBody>& rootBody);
 
 	private :
 		DynLibDispatcher< InteractionGeometry , GLDrawInteractionGeometryFunctor, void , TYPELIST_5(const shared_ptr<InteractionGeometry>&, const shared_ptr<Interaction>& , const shared_ptr<Body>&, const shared_ptr<Body>&, bool) > interactionGeometryDispatcher;

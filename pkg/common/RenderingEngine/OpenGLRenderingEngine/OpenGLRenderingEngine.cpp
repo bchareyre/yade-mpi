@@ -102,6 +102,12 @@ bool OpenGLRenderingEngine::pointClipped(const Vector3r& p){
 	return false;
 }
 
+void OpenGLRenderingEngine::setRefSe3(const shared_ptr<MetaBody>& rootBody){
+	LOG_DEBUG("(re)initializing reference positions and orientations.");
+	refSe3.clear(); refSe3.reserve(rootBody->bodies->size());
+	FOREACH(const shared_ptr<Body>& b, *rootBody->bodies) refSe3.push_back(b->physicalParameters->se3);
+}
+
 Se3r OpenGLRenderingEngine::renderedSe3(const shared_ptr<Body>& b){
 	if(!(scaleDisplacements||scaleRotations)) return b->physicalParameters->se3;
 	const body_id_t& id=b->getId();
@@ -158,13 +164,10 @@ void OpenGLRenderingEngine::render(
 
 	// if scaling positions or orientations, _and_ if it is for the first time, save current se3 as reference values
 	// if # of bodies changes, we have to reset those
-	if((scaleDisplacements || scaleRotations) && refSe3.size()!=rootBody->bodies->size()){
-		LOG_DEBUG("(re)initializing reference positions and orientations.");
-		refSe3.clear(); refSe3.reserve(rootBody->bodies->size());
-		FOREACH(const shared_ptr<Body>& b, *rootBody->bodies) refSe3.push_back(b->physicalParameters->se3);
-	}
-	// debugging only
-	#if 1
+	if((scaleDisplacements || scaleRotations) && refSe3.size()!=rootBody->bodies->size()) setRefSe3(rootBody);
+
+	// debugging only: show line between spatial and scaled body position
+	#if 0
 		if(scaleDisplacements){
 			glColor3d(1,1,0); glBegin(GL_LINES); 
 			FOREACH(const shared_ptr<Body>& b, *rootBody->bodies){
@@ -550,7 +553,10 @@ void OpenGLRenderingEngine::registerAttributes()
 
 	REGISTER_ATTRIBUTE(Cast_shadows);
 	REGISTER_ATTRIBUTE(Shadow_volumes);
-	REGISTER_ATTRIBUTE(Fast_shadow_volume);	
+	REGISTER_ATTRIBUTE(Fast_shadow_volume);
+
+	//REGISTER_ATTRIBUTE(clipPlaneSe3);
+	//REGISTER_ATTRIBUTE(clipPlaneActive); // oh, serialization chokes on vector<bool> ... :-|
 }
 
 

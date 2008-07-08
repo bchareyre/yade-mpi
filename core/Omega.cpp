@@ -31,7 +31,7 @@ CREATE_LOGGER(Omega);
 
 Omega::Omega()
 {
-	LOG_INFO("Constructing Omega  (if multiple times - check '-rdynamic' flag!).");
+	if(getenv("YADE_DEBUG")) cerr<<"Constructing Omega; _must_ be only once, otherwise linking is broken (missing -rdynamic?)\n";
 	init();
 	timeInit();
 }

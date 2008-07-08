@@ -17,6 +17,7 @@ import pylab
 
 data={} # global, common for all plots: {'name':[value,...],...}
 plots={} # dictionary x-name -> (yspec,...), where yspec is either y-name or (y-name,'line-specification')
+plotsFilled={} # same as plots but with standalone plot specs filled to tuples (used internally only)
 plotLines={} # dictionary x-name -> Line2d objects (that hopefully still correspond to yspec in plots)
 needsFullReplot=True
 
@@ -73,10 +74,17 @@ def plot():
 	for p in plots:
 		pylab.figure()
 		plots_p=[fillNonSequence(o) for o in plots[p]]
-		pylab.plot(*sum([[data[p],data[d[0]],d[1]] for d in plots_p],[]))
+		plotsFilled[p]=plots_p
+		plotLines[p]=pylab.plot(*sum([[data[p],data[d[0]],d[1]] for d in plots_p],[])V)
 		pylab.legend([_p[0] for _p in plots_p])
 		pylab.xlabel(p)
 	pylab.show()
+
+def update():
+	for p in plots:
+
+		pylab.plot(*sum([[data[p],data[d[0]],d[1]] for d in plots_p],[])V)
+
 
 def saveGnuplot(baseName,term='wxt',extension=None,timestamp=False,comment=None,title=None):
 	"""baseName: used for creating baseName.gnuplot (command file for gnuplot),

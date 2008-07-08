@@ -99,7 +99,7 @@ class ClassFactory : public Singleton< ClassFactory >
 		/// Map that contains the name of the registered class and their description
 		FactorableCreatorsMap map;
 
-		ClassFactory() { cerr<<"Constructing ClassFactory  (if multiple times - check '-rdynamic' flag!).\n";};
+		ClassFactory() { if(getenv("YADE_DEBUG")) cerr<<"Constructing ClassFactory; _must_ be only once, otherwise linking is broken (missing -rdynamic?)\n"; };
 		ClassFactory(const ClassFactory&);
 		ClassFactory& operator=(const ClassFactory&);
 		virtual ~ClassFactory() {};

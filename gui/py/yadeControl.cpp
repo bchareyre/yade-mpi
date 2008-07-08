@@ -1,3 +1,5 @@
+// 2007,2008 © Václav Šmilauer <eudoxos@arcig.cz> 
+
 #include<sstream>
 #include<map>
 #include<vector>

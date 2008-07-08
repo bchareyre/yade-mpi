@@ -43,7 +43,6 @@ class GLViewer : public QGLViewer
 	protected:
 		shared_ptr<OpenGLRenderingEngine> renderer;
 	private :
-//		GLWindowsManager	wm;
 		bool 			drawGridXYZ[3];
 		bool			isMoving;
 		bool			wasDynamic;

@@ -1,6 +1,8 @@
 # vim: set filetype=python :
 Import('*')
 
+
+
 if 'qt3' not in env['exclude']:
 	env.Install('$PREFIX/lib/yade$SUFFIX/lib',[
 		env.SharedLibrary('yade-serialization-qt',
@@ -73,6 +75,14 @@ env.Install('$PREFIX/lib/yade$SUFFIX/lib',[
 		LIBS=filter(lambda l: l!='miniWm3',env['LIBS']),
 		# miniWm3 will be always optimized and without debugging info, even in debug builds.
 		CXXFLAGS=env['CXXFLAGS']+['-O3','-g0']),
+
+		env.SharedLibrary('sqlite3x',Split('''
+			sqlite3x/sqlite3x_command.cpp
+			sqlite3x/sqlite3x_connection.cpp
+			sqlite3x/sqlite3x_cursor.cpp
+			sqlite3x/sqlite3x_exception.cpp
+			sqlite3x/sqlite3x_settings_db.cpp
+			sqlite3x/sqlite3x_transaction.cpp'''),LIBS='sqlite3',CXXFLAGS=env['CXXFLAGS']+['-O3','-g0']),
 
 	env.SharedLibrary('yade-computational-geometry',
 		['computational-geometry/Distances2D.cpp',

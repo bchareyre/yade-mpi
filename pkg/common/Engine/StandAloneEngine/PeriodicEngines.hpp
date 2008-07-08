@@ -9,8 +9,8 @@
 class PeriodicEngine:  public StandAloneEngine {
 	private:
 		Real getClock(){ timeval tp; gettimeofday(&tp,NULL); return tp.tv_sec+tp.tv_usec/1e6; }
-		Real virtPeriod, virtLast, realPeriod, realLast; long iterPeriod,iterLast;
 	public:
+		Real virtPeriod, virtLast, realPeriod, realLast; long iterPeriod,iterLast;
 		PeriodicEngine(): virtPeriod(0),virtLast(0),realPeriod(0),realLast(0),iterPeriod(0),iterLast(0) { realLast=getClock(); }
 		virtual bool isActivated(){
 			Real virtNow=Omega::instance().getSimulationTime();
@@ -36,6 +36,44 @@ class PeriodicEngine:  public StandAloneEngine {
 };
 REGISTER_SERIALIZABLE(PeriodicEngine,false);
 
+/* PeriodicEngine but with constraint that may be stretched by a given stretchFactor (default 2).
+ * Limits for each periodicity criterion may be set and the mayStretch bool says whether the period
+ * can be stretched (default: doubled) without active criteria getting off limits.
+ *
+ * stretchFactor must be positive; if >1, period is stretched, for <1, it is shrunk.
+ *
+ * Limit consistency (whether actual period is not over/below the limit) is checked: period is set to the 
+ * limit value if we are off.
+ */
+class StretchPeriodicEngine: public PeriodicEngine{
+	public:
+	StretchPeriodicEngine(): PeriodicEngine(), realLim(0.), virtLim(0.), iterLim(0), stretchFactor(2.){}
+	Real realLim, virtLim; long iterLim;
+	Real stretchFactor;
+	bool mayStretch;
+	virtual bool isActivated(){
+		assert(stretchFactor>0);
+		if(stretchFactor>1){iterPeriod=min(iterPeriod,iterLim); realPeriod=min(realPeriod,realLim); virtPeriod=min(virtPeriod,virtLim);}
+		else {iterPeriod=max(iterPeriod,iterLim); realPeriod=max(realPeriod,realLim); virtPeriod=max(virtPeriod,virtLim);}
+		mayStretch=((virtPeriod<0 || (stretchFactor>1 ? stretchFactor*virtPeriod<=virtLim : stretchFactor*virtPeriod>=virtLim))
+		&& (realPeriod<0 || (stretchFactor>1 ? stretchFactor*realPeriod<=realLim : stretchFactor*realPeriod>=realLim))
+		&& (iterPeriod<0 || (stretchFactor>1 ? stretchFactor*iterPeriod<=iterLim : stretchFactor*iterPeriod>=iterLim)));
+		return PeriodicEngine::isActivated();
+	}
+	protected:
+		void registerAttributes(){ PeriodicEngine::registerAttributes();
+			REGISTER_ATTRIBUTE(realLim);
+			REGISTER_ATTRIBUTE(virtLim);
+			REGISTER_ATTRIBUTE(iterLim);
+		}
+	REGISTER_CLASS_NAME(StretchPeriodicEngine);
+	REGISTER_BASE_CLASS_NAME(PeriodicEngine);
+};
+REGISTER_SERIALIZABLE(StretchPeriodicEngine,false);
+
+// obsolete, too complicated etc
+#if 1 
+
 /* Run an action with adjustable and constrained periodicity (real time, virtual time, iteration)
  *
  * 3 criteria can be used: iteration period, realTime (wallclock) period, virtTime (simulation time) period.
@@ -52,10 +90,8 @@ REGISTER_SERIALIZABLE(PeriodicEngine,false);
  *
  * This engine may be used only by deriving an engine with something useful in action(MetaBody*);
  * if used as-is, it will throw when activated.
- *
- * @bug we use gettimeofday() to get current time; benchmark it, since it involves a syscall?; better use HPET timer (async?) instead of polling the clock?
  */
-class RangePeriodicEngine: public StandAloneEngine {
+class __attribute__((deprecated)) RangePeriodicEngine: public StandAloneEngine {
 	private:
 		Vector3r virtTimeLim,realTimeLim,iterLim;
 		Real lastRealTime,lastVirtTime; long lastIter;
@@ -107,3 +143,4 @@ class RangePeriodicEngine: public StandAloneEngine {
 };
 REGISTER_SERIALIZABLE(RangePeriodicEngine,false);
 
+#endif

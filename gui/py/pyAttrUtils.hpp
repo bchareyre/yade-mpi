@@ -1,3 +1,4 @@
+// 2007,2008 © Václav Šmilauer <eudoxos@arcig.cz> 
 #include<sstream>
 #include<boost/any.hpp>
 #include<map>

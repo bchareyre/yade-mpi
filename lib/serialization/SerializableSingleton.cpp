@@ -12,8 +12,8 @@
 CREATE_LOGGER(SerializableSingleton);
 
 SerializableSingleton::SerializableSingleton() 
-{	
-	cerr<<"Constructing SerializableSingleton  (if multiple times - check '-rdynamic' flag!)."<<endl;
+{
+	if(getenv("YADE_DEBUG")) cerr<<"Constructing SerializableSingleton; _must_ be only once, otherwise linking is broken (missing -rdynamic?)\n";
 }
 
 

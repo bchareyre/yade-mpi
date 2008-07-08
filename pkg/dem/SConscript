@@ -2,6 +2,10 @@
 Import('*')
 env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 
+	env.SharedLibrary('SQLiteRecorder',
+		['Engine/StandAloneEngine/SQLiteRecorder.cpp'],
+		LIBS=env['LIBS']+['sqlite3x']),
+
 	env.SharedLibrary('InteractingMyTetrahedron',
 		['DataClass/InteractingGeometry/InteractingMyTetrahedron.cpp']),
 
