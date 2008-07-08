@@ -168,8 +168,8 @@ int main(int argc, char *argv[])
 		// read logging configuration from file and watch it (creates a separate thread)
 		std::string logConf=configPath+"/logging.conf";
 		if(filesystem::exists(logConf)){
-			LOG_INFO("Loading "<<logConf<<" (monitored)");
 			log4cxx::PropertyConfigurator::configureAndWatch(logConf);
+			LOG_INFO("Loaded  "<<logConf<<" (monitored)");
 		} else { // otherwise use simple console-directed logging
 			log4cxx::BasicConfigurator::configure();
 			logger->setLevel(log4cxx::Level::WARN);
