@@ -143,11 +143,14 @@ class Omega : public Singleton<Omega>
 		string	getSimulationFileName();
 		void		loadSimulation();
 		void		saveSimulation(const string name, bool recover=false);
+		void 		saveSimulationToStream(std::ostream&);
+		void 		loadSimulationFromStream(std::istream&);
 
 		long int	getCurrentIteration();
 		void		incrementCurrentIteration();
 		
 		Real		getSimulationTime() { return simulationTime;};
+		Real 		getComputationTime();
 		void		incrementSimulationTime() { simulationTime+=getTimeStep();};
 		
 		void init();

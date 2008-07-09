@@ -29,18 +29,29 @@
 
 CREATE_LOGGER(Omega);
 
-Omega::Omega()
-{
+Omega::Omega(){
 	if(getenv("YADE_DEBUG")) cerr<<"Constructing Omega; _must_ be only once, otherwise linking is broken (missing -rdynamic?)\n";
-	init();
-	timeInit();
+	init(); timeInit();
 }
 
+Omega::~Omega(){LOG_INFO("Shuting down; duration "<<(microsec_clock::local_time()-msStartingSimulationTime)/1000<<" s");}
 
-Omega::~Omega()
-{
-	LOG_INFO("Shuting down; duration "<<(msStartingSimulationTime-microsec_clock::local_time())/1000<<" s");
-}
+const map<string,DynlibDescriptor>& Omega::getDynlibsDescriptor(){return dynlibs;}
+
+void Omega::incrementCurrentIteration(){ ++currentIteration;}
+long int Omega::getCurrentIteration(){ return currentIteration; }
+void Omega::setSimulationFileName(const string f){simulationFileName = f;}
+string Omega::getSimulationFileName(){return simulationFileName;}
+
+const shared_ptr<MetaBody>& Omega::getRootBody(){return rootBody;}
+void Omega::setRootBody(shared_ptr<MetaBody>& rb){ rootBody=rb;}
+void Omega::resetRootBody(){ rootBody = shared_ptr<MetaBody>(new MetaBody);}
+boost::mutex& Omega::getRootBodyMutex(){return rootBodyMutex;}
+
+ptime Omega::getMsStartingSimulationTime(){return msStartingSimulationTime;}
+time_duration Omega::getSimulationPauseDuration(){return simulationPauseDuration;}
+Real Omega::getComputationTime(){ return (microsec_clock::local_time()-msStartingSimulationTime-simulationPauseDuration).total_milliseconds()/1e3; }
+
 
 void Omega::reset(){
 	finishSimulationLoop();
@@ -56,39 +67,19 @@ void Omega::init(){
 }
 
 void Omega::timeInit(){
-	//sStartingSimulationTime=second_clock::local_time();
 	msStartingSimulationTime=microsec_clock::local_time();
 	simulationPauseDuration=msStartingSimulationTime-msStartingSimulationTime;
 	msStartingPauseTime=msStartingSimulationTime;
 }
 
-void Omega::createSimulationLoop()
-{
-	simulationLoop   = shared_ptr<ThreadRunner>(new ThreadRunner(&simulationFlow_));
+void Omega::createSimulationLoop(){	simulationLoop   = shared_ptr<ThreadRunner>(new ThreadRunner(&simulationFlow_));}
+void Omega::finishSimulationLoop(){ if (simulationLoop) simulationLoop->stop();}
+void Omega::joinSimulationLoop(){
+	if (simulationLoop){ simulationLoop->stop(); simulationLoop = shared_ptr<ThreadRunner>(); }
 }
 
-
-void Omega::finishSimulationLoop()
-{
-	if (simulationLoop)
-		simulationLoop->stop();
-}
-
-
-void Omega::joinSimulationLoop()
-{
-	if (simulationLoop)
-	{
-		simulationLoop->stop();
-		simulationLoop   = shared_ptr<ThreadRunner>();
-	}
-}
-
-
-void Omega::spawnSingleSimulationLoop()
-{
-	if (simulationLoop)
-	{
+void Omega::spawnSingleSimulationLoop(){
+	if (simulationLoop){
 		msStartingPauseTime = microsec_clock::local_time();
 		simulationLoop->spawnSingleAction();
 	}
@@ -96,20 +87,16 @@ void Omega::spawnSingleSimulationLoop()
 
 
 
-void Omega::startSimulationLoop()
-{
-	if (simulationLoop && !simulationLoop->looping())
-	{
+void Omega::startSimulationLoop(){
+	if (simulationLoop && !simulationLoop->looping()){
 		simulationPauseDuration += microsec_clock::local_time()-msStartingPauseTime;
 		simulationLoop->start();
 	}
 }
 
 
-void Omega::stopSimulationLoop()
-{
-	if (simulationLoop && simulationLoop->looping())
-	{
+void Omega::stopSimulationLoop(){
+	if (simulationLoop && simulationLoop->looping()){
 		msStartingPauseTime = microsec_clock::local_time();
 		simulationLoop->stop();
 	}
@@ -117,18 +104,10 @@ void Omega::stopSimulationLoop()
 
 bool Omega::isRunning(){ if(simulationLoop) return simulationLoop->looping(); else return false; }
 
-void Omega::buildDynlibDatabase(const vector<string>& dynlibsList)
-{	
-
-	vector< string >::const_iterator dlli    = dynlibsList.begin();
-	vector< string >::const_iterator dlliEnd = dynlibsList.end();
-	for( ; dlli!=dlliEnd ; ++dlli)
-	{
-		string name = *dlli;
-		//cerr<<"Library: "<<name<<"\n";
+void Omega::buildDynlibDatabase(const vector<string>& dynlibsList){	
+	FOREACH(string name, dynlibsList){
 		shared_ptr<Factorable> f;
-		try
-		{
+		try {
 			f = ClassFactory::instance().createShared(name);
 			dynlibs[name].isIndexable    = dynamic_pointer_cast<Indexable>(f);
 			dynlibs[name].isFactorable   = dynamic_pointer_cast<Factorable>(f);
@@ -144,40 +123,21 @@ void Omega::buildDynlibDatabase(const vector<string>& dynlibsList)
 
 	map<string,DynlibDescriptor>::iterator dli    = dynlibs.begin();
 	map<string,DynlibDescriptor>::iterator dliEnd = dynlibs.end();
-	for( ; dli!=dliEnd ; ++dli)
-	{
+	for( ; dli!=dliEnd ; ++dli){
 		set<string>::iterator bci    = (*dli).second.baseClasses.begin();
 		set<string>::iterator bciEnd = (*dli).second.baseClasses.end();
-		for( ; bci!=bciEnd ; ++bci)
-		{
+		for( ; bci!=bciEnd ; ++bci){
 			string name = *bci;
-			if (name=="MetaEngine1D" || name=="MetaEngine2D")
-				(*dli).second.baseClasses.insert("MetaEngine");
-			else if (name=="EngineUnit1D" || name=="EngineUnit2D")
-				(*dli).second.baseClasses.insert("EngineUnit");
-			else if (name=="Serializable")
-				(*dli).second.baseClasses.insert("Factorable");
-			else if (name!="Factorable" && name!="Indexable")
-			{
+			if (name=="MetaEngine1D" || name=="MetaEngine2D") (*dli).second.baseClasses.insert("MetaEngine");
+			else if (name=="EngineUnit1D" || name=="EngineUnit2D") (*dli).second.baseClasses.insert("EngineUnit");
+			else if (name=="Serializable") (*dli).second.baseClasses.insert("Factorable");
+			else if (name!="Factorable" && name!="Indexable") {
 				shared_ptr<Factorable> f = ClassFactory::instance().createShared(name);
 				for(int i=0;i<f->getBaseClassNumber();i++)
 					dynlibs[name].baseClasses.insert(f->getBaseClassName(i));
 			}
 		}
 	}
-
-/*
-	dli    = dynlibs.begin();
-	dliEnd = dynlibs.end();
-	for( ; dli!=dliEnd ; ++dli)
-	{
-		cerr << (*dli).first << " : " ;
-		set<string>::iterator bci    = (*dli).second.baseClasses.begin();
-		set<string>::iterator bciEnd = (*dli).second.baseClasses.end();
-		for( ; bci!=bciEnd ; ++bci)
-			cerr << *bci << endl;
-		cerr << endl;
-	}*/
 }
 
 
@@ -189,24 +149,12 @@ bool Omega::isInheritingFrom(const string& className, const string& baseClassNam
 
 void Omega::scanPlugins()
 {
-//	ClassFactory::instance().unloadAll();
-
-
-	vector<string>::iterator dldi    = preferences->dynlibDirectories.begin();
-	vector<string>::iterator dldiEnd = preferences->dynlibDirectories.end();
-	for( ; dldi != dldiEnd ; ++dldi)
-		ClassFactory::instance().addBaseDirectory((*dldi));
+	FOREACH(string dld,preferences->dynlibDirectories) ClassFactory::instance().addBaseDirectory(dld);
 			
 	vector<string> dynlibsList;
-
-	vector<string>::iterator si = preferences->dynlibDirectories.begin();
-	vector<string>::iterator siEnd = preferences->dynlibDirectories.end();
-	for( ; si != siEnd ; ++si)
-	{
-		filesystem::path directory((*si));
-
-		if ( filesystem::exists( directory ) )
-		{
+	FOREACH(string si, preferences->dynlibDirectories)	{
+		filesystem::path directory(si);
+		if ( filesystem::exists( directory ) )	{
 			filesystem::directory_iterator di( directory );
 			filesystem::directory_iterator diEnd;
 			for ( ; di != diEnd; ++di )
@@ -224,109 +172,74 @@ void Omega::scanPlugins()
 					//
 					// my reading of what it is supposed to do: returns the part of filename before the first dot... !!??
 					// humm, perhaps it is a result of obfuscative c++ contest (obfuscative c++ = oxymoron, anyway)
-					while (length!=prevLength)
-					{
-						prevLength=length;
-						name = filesystem::path(filesystem::basename(name));
-						length = name.leaf().size();
+					while (length!=prevLength) { prevLength=length;	name=filesystem::path(filesystem::basename(name)); length = name.leaf().size();
 					}
 					if(name.leaf().length()<1) continue; // filter out 0-length filenames
 					if(dynlibsList.size()==0 || ClassFactory::instance().systemNameToLibName(name.leaf())!=dynlibsList.back()) {
-						LOG_DEBUG("Added plugin: "<<*si<<"/"<<di->leaf()<<".");
+						LOG_DEBUG("Added plugin: "<<si<<"/"<<di->leaf()<<".");
 						dynlibsList.push_back(ClassFactory::instance().systemNameToLibName(name.leaf()));
 					}
-					else LOG_DEBUG("Possible plugin discarded: "<<*si<<"/"<<name.leaf()<<".");
+					else LOG_DEBUG("Possible plugin discarded: "<<si<<"/"<<name.leaf()<<".");
 				} else LOG_DEBUG("File not considered a plugin: "<<di->leaf()<<".");
 			}
 		}
 		else LOG_ERROR("Nonexistent plugin directory: "<<directory.native_directory_string()<<".");
 	}
 
-	bool allLoaded = false;
+	bool allLoaded = true;
 	vector<string> dynlibsClassList; // dynlibsList holds filenames, this holds classes defined inside (may be different if using yadePuginClasses)
-		vector< string >::iterator dlli    = dynlibsList.begin();
-		vector< string >::iterator dlliEnd = dynlibsList.end();
-		allLoaded = true;
-		for( ; dlli!=dlliEnd ; ++dlli ) {
-			bool thisLoaded = ClassFactory::instance().load((*dlli));
-			if (!thisLoaded){
-				string err=ClassFactory::instance().lastError();
-				// HACK
-				if(err.find("cannot open shared object file: No such file or directory")!=std::string::npos){
-					LOG_INFO("Attempted to load nonexistent file; since this may be due to bad algorithm of filename construction, we pretend everything is OK (original error: `"<<err<<"').");
-					thisLoaded=true;
-				}
-				else if(err.find(": undefined symbol: ")!=std::string::npos){
-					size_t pos=err.rfind(":");
-					assert(pos!=std::string::npos);
-					std::string sym(err,pos+2); //2 removes ": " from the beginning
-					int status=0;
-					char* demangled_sym=abi::__cxa_demangle(sym.c_str(),0,0,&status);
-					LOG_FATAL("Undefined symbol `"<<demangled_sym<<"' ("<<err<<").");
-				}
-				else LOG_ERROR("Error loading Library `"<<(*dlli)<<"': "<<err<<" ."); // leave space to not to confuse c++filt
+	FOREACH(string dll, dynlibsList){
+		bool thisLoaded = ClassFactory::instance().load(dll);
+		if (!thisLoaded){
+			string err=ClassFactory::instance().lastError();
+			// HACK
+			if(err.find("cannot open shared object file: No such file or directory")!=std::string::npos){
+				LOG_INFO("Attempted to load nonexistent file; since this may be due to bad algorithm of filename construction, we pretend everything is OK (original error: `"<<err<<"').");
+				thisLoaded=true;
 			}
-			else { // no error
-				if (ClassFactory::instance().lastPluginClasses().size()==0){ // regular plugin, one class per file
-					dynlibsClassList.push_back(*dlli);
-					LOG_DEBUG("Plugin "<<*dlli<<": loaded default class "<<*dlli<<".");
-				} else {// if plugin defines yadePluginClasses (has multiple classes), insert these into dynLibsList
-					vector<string> css=ClassFactory::instance().lastPluginClasses();
-					for(size_t i=0; i<css.size();i++) { dynlibsClassList.push_back(css[i]); LOG_DEBUG("Plugin "<<*dlli<<": loaded explicit class "<<css[i]<<".");  }
-				}
+			else if(err.find(": undefined symbol: ")!=std::string::npos){
+				size_t pos=err.rfind(":");
+				assert(pos!=std::string::npos);
+				std::string sym(err,pos+2); //2 removes ": " from the beginning
+				int status=0;
+				char* demangled_sym=abi::__cxa_demangle(sym.c_str(),0,0,&status);
+				LOG_FATAL("Undefined symbol `"<<demangled_sym<<"' ("<<err<<").");
 			}
-			allLoaded &= thisLoaded;
+			else LOG_ERROR("Error loading Library `"<<dll<<"': "<<err<<" ."); // leave space to not to confuse c++filt
 		}
-	if(!allLoaded) LOG_WARN("Couldn't load everything, some stuff may work incorrectly.");
-	
+		else { // no error
+			if (ClassFactory::instance().lastPluginClasses().size()==0){ // regular plugin, one class per file
+				dynlibsClassList.push_back(dll);
+				LOG_DEBUG("Plugin "<<dll<<": loaded default class "<<dll<<".");
+			} else {// if plugin defines yadePluginClasses (has multiple classes), insert these into dynLibsList
+				vector<string> css=ClassFactory::instance().lastPluginClasses();
+				for(size_t i=0; i<css.size();i++) { dynlibsClassList.push_back(css[i]); LOG_DEBUG("Plugin "<<dll<<": loaded explicit class "<<css[i]<<".");  }
+			}
+		}
+		allLoaded &= thisLoaded;
+	}
+	if(!allLoaded) { LOG_FATAL("Error loading a plugin (see above; run with -v to see more), bailing out."); abort(); }
 	buildDynlibDatabase(dynlibsClassList);
 }
 
-
-// bool Omega::getDynlibDescriptor(const string& libName, string& type)
-// {
-// 	//LOCK(omegaMutex);
-// 		
-// 	map<string,DynlibDescriptor>::iterator it = dynlibs.find(libName);
-// 	if (it!=dynlibs.end())
-// 	{
-// 		type = (*it).second.baseClass;
-// 		return true;
-// 	}
-// 	else
-// 		return false;
-// }
-
-
-const map<string,DynlibDescriptor>& Omega::getDynlibsDescriptor()
-{
-	return dynlibs;
+void Omega::loadSimulationFromStream(std::istream& stream){
+	LOG_DEBUG("Loading simulation from stream.");
+	resetRootBody();
+	timeInit();
+	shared_ptr<IOFormatManager> ioManager(YADE_PTR_CAST<IOFormatManager>(ClassFactory::instance().createShared("XMLFormatManager")));
+	shared_ptr<Archive> ac=Archive::create("rootBody",rootBody);
+	string tmp=ioManager->beginDeserialization(stream,*ac);
+	ac->deserialize(stream,*ac,tmp);
+	ioManager->finalizeDeserialization(stream,*ac);
 }
-
-
-void Omega::incrementCurrentIteration()
-{
-	++currentIteration;
+void Omega::saveSimulationToStream(std::ostream& stream){
+	LOG_DEBUG("Saving simulation to stream.");
+	shared_ptr<IOFormatManager> ioManager(YADE_PTR_CAST<IOFormatManager>(ClassFactory::instance().createShared("XMLFormatManager")));
+	shared_ptr<Archive> ac=Archive::create("rootBody",rootBody);
+	ioManager->beginSerialization(stream, *ac);
+	ac->serialize(stream, *ac, 1);
+	ioManager->finalizeSerialization(stream, *ac);
 }
-
-
-long int Omega::getCurrentIteration()
-{
-	return currentIteration;
-}
-
-
-void Omega::setSimulationFileName(const string f)
-{
-	simulationFileName = f;
-}
-
-
-string Omega::getSimulationFileName()
-{
-	return simulationFileName;
-}
-
 
 void Omega::loadSimulation()
 {
@@ -363,6 +276,8 @@ void Omega::loadSimulation()
 	}
 }
 
+
+
 void Omega::saveSimulation(const string name, bool recover)
 {
 	if(name.size()==0) throw yadeBadFile("Filename with zero length.");
@@ -390,89 +305,29 @@ void Omega::saveSimulation(const string name, bool recover)
 	rootBody->recover=false;
 }
 
-void Omega::resetRootBody()
-{
-	rootBody = shared_ptr<MetaBody>(new MetaBody);
-}
 
 
-// FIXME - remove that
-void Omega::setTimeStep(const Real t)
-{
-	if(rootBody) rootBody->dt=t;
-}
-
-
-Real Omega::getTimeStep()
-{
-	if(rootBody) return rootBody->dt;
-	else return -1;
-}
-
-
-void Omega::skipTimeStepper(bool s)
-{
-	if(rootBody) rootBody->setTimeSteppersActive(!s);
-}
-
+void Omega::setTimeStep(const Real t){	if(rootBody) rootBody->dt=t;}
+Real Omega::getTimeStep(){	if(rootBody) return rootBody->dt; else return -1; }
+void Omega::skipTimeStepper(bool s){ if(rootBody) rootBody->setTimeSteppersActive(!s);}
 
 bool Omega::timeStepperActive(){
 	if(!rootBody) return false;
-	for(vector<shared_ptr<Engine> >::iterator I=rootBody->engines.begin(); I!=rootBody->engines.end(); ++I){
-		if (isInheritingFrom((*I)->getClassName(),"TimeStepper")){
-			return static_pointer_cast<TimeStepper>(*I)->active;
+	FOREACH(const shared_ptr<Engine>& e, rootBody->engines){
+		if (isInheritingFrom(e->getClassName(),"TimeStepper")){
+			return static_pointer_cast<TimeStepper>(e)->active;
 		}
 	}
 	return false;
 }
 
-//FIXME : make that recursive to scan all submetabodies ???
-bool Omega::containTimeStepper()
-{
-        if(!rootBody) 
-		return false;
-
-	vector<shared_ptr<Engine> >::iterator ai    = rootBody->engines.begin();
-	vector<shared_ptr<Engine> >::iterator aiEnd = rootBody->engines.end();
-	for(int i=0;ai!=aiEnd;++ai,i++)
-	{
-		if (isInheritingFrom((*ai)->getClassName(),"TimeStepper"))
-			return true;
-// 
-/*		map<string,DynlibDescriptor>::const_iterator dli = Omega::instance().getDynlibsType().find((*ai)->getClassName());
-		if (dli!=Omega::instance().getDynlibsType().end())
-		{
-			if ((*dli).second.baseClass=="TimeStepper")
-				return true;
-		}*/
+bool Omega::containTimeStepper(){
+	if(!rootBody) return false;
+	FOREACH(const shared_ptr<Engine>& e, rootBody->engines){
+		if (isInheritingFrom(e->getClassName(),"TimeStepper")) return true;
 	}
-        return false;
+	return false;
 }
 
-const shared_ptr<MetaBody>& Omega::getRootBody()
-{
-	return rootBody;
-}
-
-void Omega::setRootBody(shared_ptr<MetaBody>& rb){ rootBody=rb;}
-
-
-ptime Omega::getMsStartingSimulationTime()
-{
-	return msStartingSimulationTime;
-}
-
-
-time_duration Omega::getSimulationPauseDuration()
-{
-	return simulationPauseDuration;
-}
-
-
-
-boost::mutex& Omega::getRootBodyMutex()
-{
-	return rootBodyMutex;
-}
 
 

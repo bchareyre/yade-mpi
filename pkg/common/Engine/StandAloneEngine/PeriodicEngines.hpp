@@ -7,7 +7,7 @@
 /* run an action with given fixed periodicity (real time, virtual time, iteration number), by setting any of 
  * those criteria to a number > 0. */
 class PeriodicEngine:  public StandAloneEngine {
-	private:
+	protected:
 		Real getClock(){ timeval tp; gettimeofday(&tp,NULL); return tp.tv_sec+tp.tv_usec/1e6; }
 	public:
 		Real virtPeriod, virtLast, realPeriod, realLast; long iterPeriod,iterLast;

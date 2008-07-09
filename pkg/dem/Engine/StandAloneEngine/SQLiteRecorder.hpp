@@ -4,12 +4,13 @@
 #include<yade/lib-sqlite3x/sqlite3x.hpp>
 
 class SQLiteRecorder: public PeriodicEngine {
-		sqlite3* db;
+		shared_ptr<sqlite3x::sqlite3_connection> con;
 	public:
 		enum {REC_SE3=0,REC_RGB,REC_SENTINEL};
 		vector<string> recorders;
 		string dbFile;
-		SQLiteRecorder(): db(NULL) {};
+		SQLiteRecorder() {};
+		~SQLiteRecorder(){ if(con) con->close(); }
 		void init(MetaBody*);
 		virtual void registerAttributes(){
 			PeriodicEngine::registerAttributes();
