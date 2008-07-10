@@ -242,10 +242,8 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-common',[
 	env.SharedLibrary('FixedOrientationEngine',
 		['Engine/DeusExMachina/FixedOrientationEngine.cpp'],
 		LIBS=env['LIBS']+['yade-base',
-			
 			'yade-factory',
 			'yade-base',
-			
 			'yade-serialization',
 			'yade-loki',
 			'yade-multimethods'],
@@ -266,22 +264,11 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-common',[
 
 	env.SharedLibrary('ColorizedLayerFilter',
 		['Engine/FiltrEngine/ColorizedLayerFilter.cpp'],
-		LIBS=env['LIBS']+['yade-base',
-			'yade-factory',
-			'yade-base',
-			'yade-serialization',
-			'yade-loki',
-			'yade-multimethods',],
-		CPPPATH=env['CPPPATH']+['$PREFIX/include', 'Engine/FiltrEngine']),
+		LIBS=env['LIBS']+['yade-base','FiltrEngine']),
 	
 	env.SharedLibrary('ColorizedVelocityFilter',
 		['Engine/FiltrEngine/ColorizedVelocityFilter.cpp'],
-		LIBS=env['LIBS']+['yade-base',
-			'yade-factory',
-			'yade-base',
-			'yade-serialization',
-			'yade-loki',
-			'yade-multimethods',],
+		LIBS=env['LIBS']+['yade-base','FiltrEngine'],
 		CPPPATH=env['CPPPATH']+['$PREFIX/include', 'Engine/FiltrEngine']),
 	
 	env.SharedLibrary('BoundingVolumeMetaEngine',

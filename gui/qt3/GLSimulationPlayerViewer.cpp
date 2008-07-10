@@ -89,7 +89,9 @@ void GLSimulationPlayerViewer::load(const string& fileName, bool fromFile)
 	filters.clear();
 
 	FOREACH(shared_ptr<Engine>& e, Omega::instance().getRootBody()->engines){
-		if(dynamic_cast<FiltrEngine*>(e.get())) filters.push_back(e);
+		// FIXME
+		#warning FIXME: this gives me syntax error (invalid conversion) ?!
+		//if(dynamic_cast<FiltrEngine*>(e.get())) filters.push_back(e);
 	}
 
 	if(!useSQLite){
